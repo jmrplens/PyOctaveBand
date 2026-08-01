@@ -66,13 +66,13 @@ la excita y se mide el **nivel de aceleración** estructural en la cara inferior
 y sin el revestimiento. Para revestimientos de reacción local, esa diferencia de
 niveles de aceleración equivale a la reducción de ruido de impactos de ISO 10140.
 
-**Nivel de aceleración (Fórmula (1)).** $L_a = 10\lg(\langle a^2\rangle / a_0^2)$ dB,
+**Nivel de aceleración (Fórmula (1)).** $L_a = 10\log_{10}(\langle a^2\rangle / a_0^2)$ dB,
 referencia $a_0 = 10^{-6}\ \text{m/s}^2$. La **corrección de ruido de fondo
 (Fórmula (2))** sigue la regla de tres ramas de ISO 10140 (sin cambio si ≥ 15 dB;
 sustracción energética para 6 ≤ margen < 15 dB; el límite de 1,3 dB por debajo de
 6 dB, marcado como $> \Delta L$). La mejora es la diferencia promediada por
 posiciones $\Delta L = L_0 - L_1$ (Fórmulas (3)/(4)); las octavas siguen
-$\Delta L_\text{oct} = -10\lg[\tfrac{1}{3}\sum 10^{-\Delta L_n/10}]$ (Fórmula (5)).
+$\Delta L_\text{oct} = -10\log_{10}[\tfrac{1}{3}\sum 10^{-\Delta L_n/10}]$ (Fórmula (5)).
 
 **Mejora ponderada.** $\Delta L_w$ es la reducción ponderada de ISO 717-2: la
 mejora se aplica al **suelo de referencia** pesado $L_{n,r,0}$ (ISO 717-2 Tabla 4),
@@ -206,9 +206,9 @@ construcciones cuyas mayores pérdidas internas siguen la teoría de placa
 infinita:
 
 $$
-\Delta L = 30 \lg \frac{f}{f_0}\ \text{dB (losas de arena/cemento o sulfato de calcio)},
+\Delta L = 30 \log_{10} \frac{f}{f_0}\ \text{dB (losas de arena/cemento o sulfato de calcio)},
 \qquad
-\Delta L = 40 \lg \frac{f}{f_0}\ \text{dB (asfalto, losas secas)}.
+\Delta L = 40 \log_{10} \frac{f}{f_0}\ \text{dB (asfalto, losas secas)}.
 $$
 
 ```python
@@ -233,7 +233,7 @@ print(round(13.0 * np.log10(73.5) - 14.2 * np.log10(8.0) + 20.8, 1))   # 32.2 dB
 ```
 
 La estimación ponderada en forma cerrada de la Fórmula (C.4),
-$\Delta L_w = 13\lg m' - 14{,}2\lg s' + 20{,}8$ dB, condensa la misma física
+$\Delta L_w = 13\log_{10} m' - 14{,}2\log_{10} s' + 20{,}8$ dB, condensa la misma física
 en una línea: losas más pesadas y capas más blandas puntúan mejor. Ambas
 estimaciones son ayudas de proyecto deliberadamente del lado de la seguridad
 (la pendiente de 30 lg recorta la teoría de placa infinita de 40 lg allí
@@ -275,12 +275,12 @@ eje de comparación del ejemplo resuelto de Foret et al. (2011).
   la instalación de ISO 10140 que esta maqueta sustituye para revestimientos
   blandos, y la medición de la mejora a tamaño completo de ISO 10140-3.
 - [Rigidez dinámica de materiales resilientes](/phonometry/es/guides/dynamic-stiffness/):
-  la medición de s' que alimenta la estimación de suelo flotante.
+  la medición de $s'$ que alimenta la estimación de suelo flotante.
 - [Predicción del comportamiento de capas elásticas](/phonometry/es/guides/resilient-layers/):
   la contrapartida de predicción de esta página, del modelo de fuerza de la
   máquina de impactos a los suelos flotantes y los trasdosados.
 - [Predicción del aislamiento acústico (EN 12354)](/phonometry/es/guides/insulation-prediction/):
-  el modelo de impactos cuya Fórmula (21) consume ΔLw.
+  el modelo de impactos cuya Fórmula (21) consume $\Delta L_w$.
 - [Índices globales de aislamiento (ISO 717)](/phonometry/es/guides/insulation-ratings/):
   el motor de curva de referencia tras la mejora ponderada.
 - [Teoría](/phonometry/es/reference/theory/rooms-buildings/): la derivación

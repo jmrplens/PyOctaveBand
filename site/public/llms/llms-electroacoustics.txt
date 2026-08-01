@@ -16,7 +16,7 @@ distortion set: total and nth-order harmonic distortion, THD+N and SINAD
 through the AES17 measurement bandwidth, the per-order modulation and
 difference-frequency intermodulation, dynamic intermodulation (DIM) and the
 ITU-R 468 weighted THD, and the Bendat & Piersol frequency-response estimators
-`H1`/`H2` with the ordinary coherence `γ²`. Every quantity has an exact analytic
+$H_1$/$H_2$ with the ordinary coherence $\gamma^2$. Every quantity has an exact analytic
 oracle, so the numbers are verifiable rather than tuned. The transducer
 data sheets these measurements feed have their own guides:
 [Loudspeaker Characterisation (IEC 60268-5)](https://jmrplens.github.io/phonometry/guides/loudspeakers/), with the
@@ -26,9 +26,9 @@ directional patterns and the inherent-noise weightings.
 
 ## 1. Harmonic distortion (IEC 60268-3 14.12.2–5)
 
-A non-linear device fed a pure sine at `f₁` returns the fundamental plus
-harmonics at `2f₁, 3f₁, …`. The **total harmonic distortion** combines the
-harmonic amplitudes `aₙ`, either relative to the fundamental (`kind='F'`) or to
+A non-linear device fed a pure sine at $f_1$ returns the fundamental plus
+harmonics at $2f_1, 3f_1, \dots$. The **total harmonic distortion** combines the
+harmonic amplitudes $a_n$, either relative to the fundamental (`kind='F'`) or to
 the total RMS (`kind='R'`):
 
 $$
@@ -38,7 +38,7 @@ $$
 d_n = \frac{a_n}{\sqrt{\sum_{k\ge 1} a_k^2}}.
 $$
 
-`dₙ` is the nth-order harmonic distortion (the nth harmonic relative to the
+$d_n$ is the nth-order harmonic distortion (the nth harmonic relative to the
 total). The tones should fall on FFT bins: use coherent sampling (an integer
 number of periods) or a low-leakage window so the amplitudes are read without
 spectral leakage.
@@ -91,13 +91,13 @@ plt.show()
 
 Where THD counts only the harmonics, **THD+N** compares *everything but the
 fundamental* (harmonics **and** noise) with the total signal. AES17 removes the
-fundamental with a standard notch filter (`1.2 ≤ Q ≤ 3`, validated on the
+fundamental with a standard notch filter ($1.2 \le Q \le 3$, validated on the
 *applied* zero-phase response per clause 5.2.8) and takes the ratio of the
 residual to the total RMS; **SINAD** is its reciprocal in dB:
 
 $$
 \mathrm{THD{+}N} = \frac{V_\text{residual}}{V_\text{total}}, \qquad
-\mathrm{SINAD} = -20\lg(\mathrm{THD{+}N})\ \mathrm{dB}.
+\mathrm{SINAD} = -20\log_{10}(\mathrm{THD{+}N})\ \mathrm{dB}.
 $$
 
 Both voltages are measured through the AES17 measurement bandwidth (a 20 Hz
@@ -142,7 +142,7 @@ print(electroacoustics.itu_r_468_weighting([6300.0]))                    # [+12.
 ### 2.2 Dynamic range and idle channel noise (AES17-2015 6.4)
 
 The two catalogue figures of any converter share the AES17 **CCIR-RMS**
-weighting (5.2.7): the ITU-R BS.468-4 curve shifted by a flat `-5.63` dB so it
+weighting (5.2.7): the ITU-R BS.468-4 curve shifted by a flat -5.63 dB so it
 is unity at 2 kHz. **Dynamic range** (6.4.1) drives the device with a 997 Hz
 sine 60 dB below full scale, removes the fundamental with the standard notch
 (5.2.8) and weights the residual noise-plus-distortion, then reports the ratio
@@ -163,7 +163,7 @@ idle = electroacoustics.idle_channel_noise(idle_output, fs)  # dBFS CCIR-RMS
 
 Both reuse the notch and the ITU-R 468 curve of the THD+N chain, and both are
 measured through the AES17 band (a 20 Hz high-pass plus the standard low-pass
-at `bandwidth`). Because the CCIR-RMS filter reads `-5.63` dB at 1 kHz, a 1 kHz
+at `bandwidth`). Because the CCIR-RMS filter reads -5.63 dB at 1 kHz, a 1 kHz
 tone measures its own dBFS minus 5.63 dB, which pins the weighting exactly.
 
 ## 3. Intermodulation distortion (IEC 60268-3 14.12.7–10)
@@ -172,25 +172,27 @@ When two tones pass through a non-linearity they beat against each other,
 producing sum and difference products. IEC 60268-3 standardises three tests,
 each with its own per-order definition:
 
-- **Modulation distortion** (14.12.7): a large low tone `f_low` and a small
-  high tone `f_high` (preferably 4:1). The per-order values are *arithmetic*
-  sums of the sideband amplitudes relative to the `f_high` output:
-  `d_m,2 = (a_{f₂+f₁} + a_{f₂−f₁})/a_{f₂}` and
-  `d_m,3 = (a_{f₂+2f₁} + a_{f₂−2f₁})/a_{f₂}`. The result also carries the
+- **Modulation distortion** (14.12.7): a large low tone $f_\text{low}$ and a
+  small high tone $f_\text{high}$ (preferably 4:1). The per-order values are
+  *arithmetic* sums of the sideband amplitudes relative to the $f_\text{high}$
+  output: $d_{m,2} = (a_{f_2+f_1} + a_{f_2-f_1})/a_{f_2}$ and
+  $d_{m,3} = (a_{f_2+2f_1} + a_{f_2-2f_1})/a_{f_2}$. The result also carries the
   combined-RMS `smpte` value that SMPTE-type analyzers report (not an IEC
   quantity).
 - **Difference-frequency distortion** (14.12.8): two equal high tones
-  `f₁ < f₂`, referenced to `U_{2,ref} = 2·U_{2,f₂}` (the sum of both tone
-  amplitudes): `d_d,2 = a_{f₂−f₁}/(a_{f₁}+a_{f₂})` and the arithmetic
-  `d_d,3 = (a_{2f₂−f₁} + a_{2f₁−f₂})/(a_{f₁}+a_{f₂})`.
+  $f_1 < f_2$, referenced to $U_{2,\text{ref}} = 2U_{2,f_2}$ (the sum of both
+  tone amplitudes): $d_{d,2} = a_{f_2-f_1}/(a_{f_1}+a_{f_2})$ and the arithmetic
+  $d_{d,3} = (a_{2f_2-f_1} + a_{2f_1-f_2})/(a_{f_1}+a_{f_2})$.
 - **Total difference-frequency distortion** (14.12.10): a specific two-tone
-  test (`f₁ = 2f₀`, `f₂ = 3f₀ − δ`; the standard tones 8 kHz and 11.95 kHz
-  are the defaults) where only the two in-band products at `f₀ ∓ δ` count:
-  `d_TDFD = √(a²_{f₂−f₁} + a²_{2f₁−f₂}) / (a_{f₁} + a_{f₂})`.
+  test ($f_1 = 2f_0$, $f_2 = 3f_0 - \delta$; the standard tones 8 kHz and
+  11.95 kHz are the defaults) where only the two in-band products at
+  $f_0 \mp \delta$ count:
+  $d_\text{TDFD} = \sqrt{a_{f_2-f_1}^2 + a_{2f_1-f_2}^2} / (a_{f_1} + a_{f_2})$.
 - **Dynamic intermodulation** (DIM, 14.12.9): a 15 kHz sine plus a
   low-pass-filtered 3.15 kHz square wave (1:4 peak-to-peak). The DIM is the
-  RMS of the intermodulation products `|k·f_square ± f_sine|` that fall below
-  `f_sine` (IEC 60268-3 Table 2), relative to the 15 kHz sine amplitude
+  RMS of the intermodulation products $|k\,f_\text{square} \pm f_\text{sine}|$
+  that fall below $f_\text{sine}$ (IEC 60268-3 Table 2), relative to the 15 kHz
+  sine amplitude
   (the 14.12.9.1 definition; the 14.12.9.2 f) print of the denominator is an
   editorial defect, see [ERRATA](https://jmrplens.github.io/phonometry/reference/errata/)).
 
@@ -206,10 +208,10 @@ dim = electroacoustics.dynamic_intermodulation_distortion(signal, fs)           
 ```
 
 The `ModulationDistortionResult` is plottable: `.plot()` draws the output
-amplitude at the carrier `f₂` (the 0 dB reference) and the four modulation
-sidebands at `f₂ ± f₁` and `f₂ ± 2f₁`, the modulation counterpart of the
-harmonic spectrum of section 1. The asymmetric ratio between the `n = 2` and
-`n = 3` pairs reads the balance between the quadratic and cubic terms of the
+amplitude at the carrier $f_2$ (the 0 dB reference) and the four modulation
+sidebands at $f_2 \pm f_1$ and $f_2 \pm 2f_1$, the modulation counterpart of the
+harmonic spectrum of section 1. The asymmetric ratio between the $n = 2$ and
+$n = 3$ pairs reads the balance between the quadratic and cubic terms of the
 non-linearity at a glance:
 
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/modulation_distortion_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/modulation_distortion.svg" alt="Modulation-distortion spectrum of a 60 Hz plus 7 kHz two-tone test through a weakly non-linear amplifier: the carrier at 7 kHz as the 0 dB reference and the four intermodulation sidebands at 7 kHz plus or minus 60 and 120 Hz marked with their order, annotated with the IEC 60268-3 per-order values d2 and d3 and the SMPTE combined RMS" width="82%"></picture>
@@ -237,19 +239,20 @@ plt.show()
 ## 4. Frequency response and coherence (Bendat & Piersol)
 
 Given an input `x` and the output `y` of a device, the **frequency response**
-`H(f)` is estimated from the Welch-averaged cross- and auto-spectra. Bendat &
+$H(f)$ is estimated from the Welch-averaged cross- and auto-spectra. Bendat &
 Piersol (*Random Data*, 4th ed.) give two estimators, differing in which channel
-carries the noise, plus the **ordinary coherence** `γ²`, the fraction of the
-output power linearly explained by the input:
+carries the noise, plus the **ordinary coherence** $\gamma^2$, the fraction of
+the output power linearly explained by the input:
 
 $$
 H_1 = \frac{G_{xy}}{G_{xx}}, \qquad H_2 = \frac{G_{yy}}{G_{yx}}, \qquad
 \gamma^2 = \frac{|G_{xy}|^2}{G_{xx}\,G_{yy}} \in [0, 1].
 $$
 
-`H1` is unbiased when the noise is on the output, `H2` when it is on the input;
-for a noiseless linear path both recover the true response and `γ² = 1`. Additive
-output noise biases `H2` upward and pulls the coherence down to `SNR/(1+SNR)`.
+$H_1$ is unbiased when the noise is on the output, $H_2$ when it is on the
+input; for a noiseless linear path both recover the true response and
+$\gamma^2 = 1$. Additive output noise biases $H_2$ upward and pulls the
+coherence down to $\mathrm{SNR}/(1+\mathrm{SNR})$.
 
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/frequency_response_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/frequency_response.svg" alt="Bode magnitude of an estimated H1 frequency response tracking the true response of a band-pass system, with the ordinary coherence below dropping towards the band edges where the output signal is weak relative to noise" width="82%"></picture>
 
@@ -264,7 +267,7 @@ freqs, gamma2 = electroacoustics.coherence(x, y, fs)
 ```
 
 Coherence needs averaging over several Welch segments to be meaningful; a single
-segment gives `γ² ≡ 1` by construction.
+segment gives $\gamma^2 \equiv 1$ by construction.
 
 <details>
 <summary>Show the code for this figure</summary>
@@ -305,23 +308,24 @@ in [Microphone Characterisation (IEC 60268-4)](https://jmrplens.github.io/phonom
 - Bendat, J. S., & Piersol, A. G. (2010). *Random data: Analysis and
   measurement procedures* (4th ed.). Wiley. ISBN 978-0-470-24877-5.
   [doi:10.1002/9781118032428](https://doi.org/10.1002/9781118032428).
-  The `H1` and `H2` frequency-response estimators and the ordinary
-  coherence `γ²` of section 4.
+  The $H_1$ and $H_2$ frequency-response estimators and the ordinary
+  coherence $\gamma^2$ of section 4.
 
 ## Standards
 
 IEC 60268-3:2013, *Sound system equipment – Part 3: Amplifiers*
-(clauses 14.12.2–14.12.11): total harmonic distortion `THD_F`/`THD_R` (the
-14.12.3.2 formula defines the R form), nth-order harmonic distortion `dₙ`, the
-per-order modulation (`d_m,n`) and difference-frequency (`d_d,n`)
+(clauses 14.12.2–14.12.11): total harmonic distortion
+$\mathrm{THD}_F$/$\mathrm{THD}_R$ (the
+14.12.3.2 formula defines the R form), nth-order harmonic distortion $d_n$, the
+per-order modulation ($d_{m,n}$) and difference-frequency ($d_{d,n}$)
 intermodulation, total difference-frequency distortion, dynamic intermodulation
 (DIM) and the ITU-R BS.468-4 / IEC 60268-1 weighted THD. AES17-2015,
 *Measurement of digital audio equipment* (clauses 5.2.5, 5.2.8 and 6.3.1): the
 THD+N ratio via the standard notch filter and the standard measurement
 bandwidth; SINAD is derived from it. ITU-R BS.468-4: the weighting-network
 nominal response. Bendat & Piersol (2010), *Random Data: Analysis and
-Measurement Procedures* (4th ed., Wiley): the `H1` and `H2` frequency-response
-estimators and the ordinary coherence `γ²`. The rated-characteristics
+Measurement Procedures* (4th ed., Wiley): the $H_1$ and $H_2$ frequency-response
+estimators and the ordinary coherence $\gamma^2$. The rated-characteristics
 standards of the transducer guides, IEC 60268-5:2003+A1:2007
 (loudspeakers), IEC 60268-4:2014 (microphones) and IEC 60263:1982 (scales
 for the characteristic graphs), are covered in
@@ -367,14 +371,15 @@ referred to an input of 1 W into the rated impedance; expressed as a level re
 20 µPa (clause 20.4) it is the familiar "dB @ 1 W/1 m". Two normalizations
 hide in that sentence:
 
-- *The electrical one.* The test voltage is `Up = √(R · 1 W)`, numerically
-  `√R`: 2.83 V into a rated 8 Ω. A datasheet quoting "dB @ 2.83 V/1 m" for a
+- *The electrical one.* The test voltage is $U_p = \sqrt{R \cdot 1\,\text{W}}$,
+  numerically $\sqrt{R}$: 2.83 V into a rated 8 Ω. A datasheet quoting "dB @ 2.83 V/1 m" for a
   4 Ω loudspeaker is feeding it 2 W, which flatters the figure by 3 dB
   against a true 1 W/1 m rating; check the rated impedance before comparing.
 - *The geometric one.* 1 m is a **reference** distance, not necessarily the
   measurement distance. The standard has you measure in the far field (at
   0.5 m or an integer number of metres, clause 7.1) and refer the result back
-  with the inverse-distance law, `Lp(1 m) = Lp(r) + 20 lg(r / 1 m)`. That
+  with the inverse-distance law,
+  $L_p(1\ \text{m}) = L_p(r) + 20\log_{10}(r / 1\ \text{m})$. That
   scaling only holds where the level actually falls 6 dB per doubling of
   distance, hence the free field of the diagram; at 1 m from a large
   multi-way cabinet the near field may not have ended yet, and the quoted
@@ -390,19 +395,21 @@ reference-value pitfall, is covered in
 The rigid circular **piston in an infinite baffle** is the canonical radiator
 behind a loudspeaker cone, the open end of a duct and the radiation efficiency
 of any finite vibrating surface (Beranek & Mellow §4.19, §13.7). Its mechanical
-radiation impedance is `Z_r = rho c S (R1 + j X1)` with `S = pi a^2` and the
+radiation impedance is $Z_r = \rho c S\,(R_1 + jX_1)$ with $S = \pi a^2$ and the
 dimensionless resistance and reactance functions (Eqs. (13.117), (13.118))
 
-```text
-R1(x) = 1 - 2 J1(x) / x ,   X1(x) = 2 H1(x) / x ,   x = 2ka,
-```
+$$
+R_1(x) = 1 - \frac{2 J_1(x)}{x}, \qquad X_1(x) = \frac{2 H_1(x)}{x},
+\qquad x = 2ka,
+$$
 
-with `J1` the Bessel function and `H1` the Struve function of order one. At low
-frequency `R1 -> (ka)^2 / 2` and the reactance is mass-like with the radiation
-mass `M_r = 8 rho a^3 / 3` (Eq. (4.151)); at high frequency `R1 -> 1`, `X1 -> 0`
-and the piston radiates as into an infinite tube. The far field follows the
-directivity `D(theta) = 2 J1(ka sin theta) / (ka sin theta)`, whose first null
-is at `ka sin theta = 3.8317`.
+with $J_1$ the Bessel function and $H_1$ the Struve function of order one. At
+low frequency $R_1 \to (ka)^2/2$ and the reactance is mass-like with the
+radiation mass $M_r = 8\rho a^3/3$ (Eq. (4.151)); at high frequency
+$R_1 \to 1$, $X_1 \to 0$ and the piston radiates as into an infinite tube. The
+far field follows the directivity
+$D(\theta) = 2 J_1(ka\sin\theta)/(ka\sin\theta)$, whose first null is at
+$ka\sin\theta = 3.8317$.
 
 ```python
 import numpy as np
@@ -418,10 +425,11 @@ res.plot()                                         # R1 and X1 vs ka
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/piston_radiation_impedance_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/piston_radiation_impedance.svg" alt="Normalized radiation resistance R1 and reactance X1 of a 75 mm baffled circular piston against ka on a logarithmic axis: R1 rises from ka squared over two through unity with decaying ripples, while the mass-like X1 peaks near ka of 1.4 and decays, with the high-frequency limit R1 equal to 1 marked" width="82%"></picture>
 
 *The `.plot()` of the result is the classic Beranek & Mellow impedance figure
-computed for this piston: below `ka ≈ 1` the load is almost purely mass-like
-(`X1` dominates and `R1 ∝ (ka)²`, the regime where a loudspeaker's output is
-stiffness- and mass-limited), and above it the resistance settles on `ρcS`
-with interference ripples while the reactance dies away.*
+computed for this piston: below $ka \approx 1$ the load is almost purely
+mass-like ($X_1$ dominates and $R_1 \propto (ka)^2$, the regime where a
+loudspeaker's output is stiffness- and mass-limited), and above it the
+resistance settles on $\rho c S$ with interference ripples while the
+reactance dies away.*
 
 <details>
 <summary>Show the code for this figure</summary>
@@ -447,10 +455,10 @@ callable directly. The piston is the companion radiator of the
 [reactive silencers](https://jmrplens.github.io/phonometry/guides/silencers/).
 
 The far-field **directivity pattern** is a plottable result in its own right:
-`piston_directivity_pattern(ka)` samples `D(theta)` at one or more `ka` values
+`piston_directivity_pattern(ka)` samples $D(\theta)$ at one or more $ka$ values
 and returns a `PistonDirectivity` (the polar angle grid, the linear `directivity`
 and its dB form `directivity_db`, and the `ka` values) whose `.plot()` draws the
-classic polar beam pattern. Several `ka` are shown as one family, so the main
+classic polar beam pattern. Several $ka$ are shown as one family, so the main
 lobe narrowing and the side lobes appearing read at a glance:
 
 ```python
@@ -484,7 +492,7 @@ side.
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/piston_baffle_geometry_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/piston_baffle_geometry.svg" alt="A 10 cm radius rigid piston drawn to scale as a plate of 200 mm diameter set into a hatched vertical baffle, with the piston diameter dimensioned and the normalized far-field directivity lobe at ka of 7.3 overlaid on the radiation side: a long forward main lobe hugging the dotted axis with small side lobes folding back near the plate" width="82%"></picture>
 
 *The piston the impedance and directivity curves describe, to scale: at
-4 kHz this 10 cm radius plate has `ka ≈ 7.3`, so the overlaid lobe is
+4 kHz this 10 cm radius plate has $ka \approx 7.3$, so the overlaid lobe is
 already several times narrower than the low-frequency hemisphere and the
 first side lobes have appeared.*
 
@@ -514,9 +522,10 @@ renders the standard's rated-characteristics data sheet. Two of the numbers are
 computed from the response rather than merely repeated:
 
 - **Characteristic sensitivity level** (20.3/20.4). The on-axis level averaged
-  over a stated band, referred to 1 W into the rated impedance `R` at 1 m:
-  `LM = L_mean + 20 lg(d/d0) + 20 lg(Up/U)` with `Up = sqrt(R · 1 W) = sqrt(R)`.
-  The default drive is that `sqrt(R)` (2.83 V into 8 Ω), so with a 1 m response
+  over a stated band, referred to 1 W into the rated impedance $R$ at 1 m:
+  $L_M = \overline{L} + 20\log_{10}(d/d_0) + 20\log_{10}(U_p/U)$ with
+  $U_p = \sqrt{R\cdot 1\,\text{W}} = \sqrt R$.
+  The default drive is that $\sqrt R$ (2.83 V into 8 Ω), so with a 1 m response
   the sensitivity level is the band mean.
 - **Effective frequency range** (21.2). The band over which the response stays
   within 10 dB of the level averaged over the one-octave band in the region of
@@ -684,19 +693,23 @@ but a **closed loop**: the loudspeaker feeds the audience, and it also feeds the
 microphone that drives it. Long (*Architectural Acoustics* 2e, Chapter 18,
 Equations (18.13) to (18.24)) writes that loop with two decibel gains:
 
-```text
-Zs = L(H-L) − L(T-M)                       (Eq. (18.17))  open-loop system gain
-Gs = L(H-M) − L(H-L) + DM(θ)               (Eq. (18.18))  feedback-loop gain
-```
+$$
+\begin{aligned}
+Z_S &= L_{H\text{-}L} - L_{T\text{-}M}
+  && \text{(Eq. (18.17))  open-loop system gain} \\
+G_S &= L_{H\text{-}M} - L_{H\text{-}L} + D_M(\theta)
+  && \text{(Eq. (18.18))  feedback-loop gain}
+\end{aligned}
+$$
 
-`Zs` is the level the loudspeaker produces at an average listener minus the
-level the talker produces at the microphone; `Zs = -6` dB, typical of an
+$Z_S$ is the level the loudspeaker produces at an average listener minus the
+level the talker produces at the microphone; $Z_S = -6$ dB, typical of an
 auditorium or a church, means a comfortable conversational level at twice the
-talker-to-microphone distance. `DM(θ)` is the directivity index of the
+talker-to-microphone distance. $D_M(\theta)$ is the directivity index of the
 microphone toward the loudspeaker *relative to* the talker: zero for an
 omnidirectional microphone, about −2 to −3 dB for a cardioid pointed at the
 talker. Summing the infinite series of round trips, the system oscillates when
-the loop gain reaches unity, that is `Zs + Gs = 0` (Equation (18.16)).
+the loop gain reaches unity, that is $Z_S + G_S = 0$ (Equation (18.16)).
 
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sound_reinforcement_geometry_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sound_reinforcement_geometry.svg" alt="Schematic of a sound-reinforcement feedback loop: the talker 0.3 metres in front of the microphone, the flown loudspeaker 4 metres from the microphone and 12 metres from the average listener, with the signal path drawn solid and the feedback path dashed" width="85%"></picture>
 
@@ -710,12 +723,12 @@ equalised system (other authors quote 12 dB unequalised and 6 dB carefully
 equalised): 6 dB of it covers a sustained tone adding in phase with a reflection
 off a hard surface, and the remaining 4 dB is safety. With several microphones
 open at once the returned signals add at the mixer, which the
-number-of-open-microphones correction `ΔL_nom = 10 log10 Nm` accounts for
-(Equation (18.23)). The criterion is then
+number-of-open-microphones correction $\Delta L_\text{nom} = 10\log_{10} N_m$
+accounts for (Equation (18.23)). The criterion is then
 
-```text
-Zs + L(H-M) + ΔL_nom ≤ L(H-L) − DM(θ) − 10
-```
+$$
+Z_S + L_{H\text{-}M} + \Delta L_\text{nom} \le L_{H\text{-}L} - D_M(\theta) - 10.
+$$
 
 ```python
 from phonometry import electroacoustics as ea
@@ -736,26 +749,27 @@ res.plot()      # the gain structure against the oscillation and margin lines
 ```
 
 Those two special cases are Long's own (Equations (18.21) and (18.22)): with
-`Zs = -6` dB the criterion collapses to `L(H-M) ≤ L(H-L) − DM(θ) − 4`, so an
-omnidirectional microphone must see the loudspeaker 4 dB below the average level
-in the audience, while a cardioid may let it rise to 2 dB below.
+$Z_S = -6$ dB the criterion collapses to
+$L_{H\text{-}M} \le L_{H\text{-}L} - D_M(\theta) - 4$, so an omnidirectional
+microphone must see the loudspeaker 4 dB below the average level in the
+audience, while a cardioid may let it rise to 2 dB below.
 
 > **A sign slip in the printed equation.** Long prints Equation (18.24) with
-> `+ DM(θ)` on the right-hand side, which contradicts the Equations (18.20) to
+> `+ D_M(theta)` on the right-hand side, which contradicts the Equations (18.20) to
 > (18.22) it generalises and would turn the benefit of a directional microphone
 > into a penalty. `feedback_stability` implements the sign of Equation (18.20),
-> so that `Nm = 1` reproduces Long's own special cases exactly. The defect is
+> so that $N_m = 1$ reproduces Long's own special cases exactly. The defect is
 > recorded in the [errata registry](https://jmrplens.github.io/phonometry/reference/errata/).
 
 ### `feedback_stability()` parameters
 
 | Parameter | Type | Units | Range / default | Notes |
 | :--- | :--- | :--- | :--- | :--- |
-| `open_loop_gain` | float | dB | finite | `Zs = L(H-L) - L(T-M)`; about −6 dB in an auditorium |
-| `level_loudspeaker_at_microphone` | float | dB | finite | `L(H-M)` |
-| `level_loudspeaker_at_listener` | float | dB | finite | `L(H-L)` |
-| `microphone_directivity` | float | dB | default 0 | `DM(theta)`, 0 omni, about −2 cardioid |
-| `open_microphones` | int | — | ≥ 1, default 1 | `Nm` |
+| `open_loop_gain` | float | dB | finite | $Z_S = L_{H\text{-}L} - L_{T\text{-}M}$; about −6 dB in an auditorium |
+| `level_loudspeaker_at_microphone` | float | dB | finite | $L_{H\text{-}M}$ |
+| `level_loudspeaker_at_listener` | float | dB | finite | $L_{H\text{-}L}$ |
+| `microphone_directivity` | float | dB | default 0 | $D_M(\theta)$, 0 omni, about −2 cardioid |
+| `open_microphones` | int | — | ≥ 1, default 1 | $N_m$ |
 | `stability_margin` | float | dB | ≥ 0, default 10 | Long's equalised-system margin |
 
 Returns a `FeedbackStabilityResult` (`open_loop_gain`, `feedback_loop_gain`,
@@ -775,7 +789,7 @@ design separately.
 ## See also
 
 - [Electroacoustics](https://jmrplens.github.io/phonometry/guides/electroacoustics/): the IEC 60268-3 distortion set,
-  THD+N and SINAD, intermodulation and the H1/H2 frequency-response
+  THD+N and SINAD, intermodulation and the $H_1$/$H_2$ frequency-response
   estimators that produce the curves this guide reports.
 - [Microphone Characterisation (IEC 60268-4)](https://jmrplens.github.io/phonometry/guides/microphones/): the companion
   rated-characteristics report for the measuring side of the chain.
@@ -838,9 +852,10 @@ frequency-response measurements themselves live in
 
 ## 1. Sensitivity and its references (IEC 60268-4 clause 11)
 
-**Microphones (IEC 60268-4 clause 11).** The sensitivity `M` is the output
+**Microphones (IEC 60268-4 clause 11).** The sensitivity $M$ is the output
 voltage per unit sound pressure, quoted in mV/Pa; the sensitivity *level* is
-`LM = 20 lg(M / 1 V/Pa)` dB, which is negative for every real microphone (a
+$L_M = 20\log_{10}(M / 1\,\text{V/Pa})$ dB, which is negative for every real
+microphone (a
 50 mV/Pa studio condenser sits at −26 dB re 1 V/Pa). The classic pitfall is
 the reference: −26 dB re 1 V/Pa and +34 dB re 1 mV/Pa are the *same*
 microphone, 60 dB apart on paper, so a sensitivity level without its reference
@@ -867,14 +882,14 @@ pressure) is part of the rating, not a detail.
 The directional response is stated as the pattern of sensitivity against
 the angle of incidence, normalized to the reference axis. The classic
 first-order family mixes an omnidirectional (pressure) term and a cosine
-(pressure-gradient) term, `M(θ) ∝ (1 − b) + b·cos θ`: `b = 0` is the
-omnidirectional capsule, `b = 1/2` the cardioid with its null at 180°, and
-`b = 1` the figure-of-eight with nulls at ±90°. One number condenses the
-pattern: the **directivity index** `D = 20 lg(M0/Mdiff)` compares the
+(pressure-gradient) term, $M(\theta) \propto (1 - b) + b\cos\theta$: $b = 0$
+is the omnidirectional capsule, $b = 1/2$ the cardioid with its null at 180°,
+and $b = 1$ the figure-of-eight with nulls at ±90°. One number condenses the
+pattern: the **directivity index** $D = 20\log_{10}(M_0/M_\mathrm{diff})$ compares the
 reference-axis sensitivity with the diffuse-field sensitivity obtained from
 the clause 11.2.2 a) integral over a rotationally symmetric pattern. An
 omni scores 0 dB, the ideal cardioid and figure-of-eight both
-`10 lg 3 = 4.8` dB: in a diffuse room field, a cardioid picks up three
+$10\log_{10} 3 = 4.8$ dB: in a diffuse room field, a cardioid picks up three
 times less reverberant power than an omni of equal axial sensitivity, which
 is exactly the ratio a talker-to-microphone distance calculation wants.
 Real patterns hold their textbook shape only over the middle of the band;
@@ -887,7 +902,8 @@ capsule diverge there.
 A microphone's electronics and the air load on its diaphragm set a noise
 floor, expressed as the **equivalent noise level**: the sound pressure
 level whose output would equal the weighted inherent-noise voltage,
-`LN = 20 lg((UN/M)/20 µPa)`. The standard states it with two weightings,
+$L_N = 20\log_{10}\bigl((U_N/M)/20\,\mu\text{Pa}\bigr)$. The standard states it
+with two weightings,
 and the numbers are far apart on paper. The **A-weighted** figure (RMS
 detector) is the one most datasheets quote, e.g. 14 dB(A) for a good studio
 condenser. The **ITU-R BS.468-4** figure weights the same noise with the
@@ -913,18 +929,19 @@ defines around a measured free-field frequency response are gathered into a sing
 rated-characteristics data sheet. Four of the numbers are computed from the
 standard's own definitions rather than merely repeated:
 
-- **Sensitivity level** (11.1). The rated free-field sensitivity `M` (mV/Pa,
+- **Sensitivity level** (11.1). The rated free-field sensitivity $M$ (mV/Pa,
   at the 1 kHz reference frequency of 11.3) as a level,
-  `LM = 20 lg(M / 1 V/Pa)`: 12.5 mV/Pa is −38.1 dB re 1 V/Pa.
+  $L_M = 20\log_{10}(M / 1\,\text{V/Pa})$: 12.5 mV/Pa is $-38.1$ dB re 1 V/Pa.
 - **Effective frequency range** (12.2). The band over which the response,
   normalized to 0 dB at the reference frequency, stays within the stated
-  ± tolerance; the edges are the interpolated tolerance crossings.
-- **Directivity index** (13.2.2). `D = 20 lg(M0/M_diff)` with the
+  $\pm$ tolerance; the edges are the interpolated tolerance crossings.
+- **Directivity index** (13.2.2). $D = 20\log_{10}(M_0/M_\mathrm{diff})$ with the
   diffuse-field sensitivity from the 11.2.2 a) integral over a rotationally
-  symmetric pattern; the ideal cardioid returns `10 lg 3 = 4.8` dB.
+  symmetric pattern; the ideal cardioid returns $10\log_{10} 3 = 4.8$ dB.
 - **Equivalent noise level** (17.2). The weighted inherent-noise voltage over
   the rated sensitivity as a sound pressure level,
-  `LN = 20 lg((UN/M)/20 µPa)`, with the signal-to-noise ratio re 1 Pa
+  $L_N = 20\log_{10}\bigl((U_N/M)/20\,\mu\text{Pa}\bigr)$, with the
+  signal-to-noise ratio re 1 Pa
   (94 dB SPL) derived from it. The overload sound pressure level (15.2) is
   read from a distortion-against-level curve at the stated THD limit.
 
@@ -1145,7 +1162,7 @@ Source: https://jmrplens.github.io/phonometry/guides/swept-sine-distortion/
 
 A single exponential sine sweep characterises the linear response and
 every harmonic distortion order of a weakly nonlinear system at once.
-After deconvolution, the distortion products of order `n` pack
+After deconvolution, the distortion products of order $n$ pack
 into separate impulse responses that *precede* the linear response by the
 fixed advance (Farina 2000)
 
@@ -1155,12 +1172,12 @@ $$
 $$
 
 so windowing each arrival yields the **higher harmonic frequency responses**
-`H1(f), H2(f), ..., HN(f)` and, from them, the total harmonic distortion as
+$H_1(f), H_2(f), \dots, H_N(f)$ and, from them, the total harmonic distortion as
 a function of the excitation frequency with one sweep instead of a
 tone-by-tone stepping. This page covers that separation in
 `phonometry.electroacoustics`, with the phase-coherent **synchronized
 sweep** of Novak, Lotton & Simon (2015) as the default, and the companion
-**phase utilities** in `phonometry.metrology`: minimum phase from `|H|`,
+**phase utilities** in `phonometry.metrology`: minimum phase from $|H|$,
 group delay and excess phase.
 
 <picture>
@@ -1171,14 +1188,14 @@ group delay and excess phase.
 ## 1. One sweep, every harmonic
 
 For an exponential sweep the instantaneous frequency rises as
-`f(t) = f1·e^(t/L)`, so the moment the excitation passes `f`, the n-th
-harmonic distortion product appears at `n·f`: exactly where the sweep
-itself will be `L·ln(n)` seconds later. Deconvolving the recording against
+$f(t) = f_1 e^{t/L}$, so the moment the excitation passes $f$, the n-th
+harmonic distortion product appears at $n f$: exactly where the sweep
+itself will be $L\ln(n)$ seconds later. Deconvolving the recording against
 the sweep therefore time-compresses each order into its own impulse
-response, `L·ln(n)` *before* the linear one. `swept_sine_distortion`
+response, $L\ln(n)$ *before* the linear one. `swept_sine_distortion`
 windows each arrival (with the exact fractional-sample alignment), Fourier
-transforms it into `Hn(f)`, and reads the distortion of order `n` at
-excitation frequency `f` from `|Hn(n·f)|`:
+transforms it into $H_n(f)$, and reads the distortion of order $n$ at
+excitation frequency $f$ from $|H_n(n f)|$:
 
 $$
 \mathrm{THD}(f) =
@@ -1244,17 +1261,17 @@ plt.show()
 </details>
 
 The oracle behind the implementation is the memoryless polynomial: driving
-`y = x + a2·x² + a3·x³` with a unit sweep must return, by the Chebyshev
-identities, `|H1| = 1 + 3a3/4`, `|H2| = a2/2` (phase `-π/2`), `|H3| = a3/4`
-(phase `π`) and `THD = √((a2/2)² + (a3/4)²)/(1 + 3a3/4)`. The test and
+$y = x + a_2 x^2 + a_3 x^3$ with a unit sweep must return, by the Chebyshev
+identities, $|H_1| = 1 + 3a_3/4$, $|H_2| = a_2/2$ (phase $-\pi/2$), $|H_3| = a_3/4$
+(phase $\pi$) and $\mathrm{THD} = \sqrt{(a_2/2)^2 + (a_3/4)^2}/(1 + 3a_3/4)$. The test and
 conformance suites pin all four, and the same THD measured tone by tone
 with `phonometry.thd` agrees to 0.1 %.
 
 ## 2. The synchronized sweep (Novak et al. 2015)
 
 Windowing separates the harmonic *magnitudes* with any exponential sweep,
-but the *phases* of `H2..HN` are only meaningful if delaying the sweep by
-`L·ln(n)` is exactly equivalent to generating its n-th harmonic. That holds
+but the *phases* of $H_2 \dots H_N$ are only meaningful if delaying the sweep by
+$L\ln(n)$ is exactly equivalent to generating its n-th harmonic. That holds
 only for
 
 $$
@@ -1263,10 +1280,10 @@ x(t) = \sin\!\big[2\pi f_1 L\, e^{t/L}\big],
 L = \frac{1}{f_1}\,\mathrm{round}\!\Big(\frac{f_1\,\tilde T}{\ln(f_2/f_1)}\Big),
 $$
 
-the **synchronized swept-sine**: the rounding makes `f1·L` an integer, so
+the **synchronized swept-sine**: the rounding makes $f_1 L$ an integer, so
 the sweep starts at zero phase and every harmonic copy lines up.
 `synchronized_sweep_signal` generates it (the duration is quantized
-slightly; when `f2/f1` is an integer the sweep also ends at zero phase),
+slightly; when $f_2/f_1$ is an integer the sweep also ends at zero phase),
 and `swept_sine_distortion(..., method="synchronized")`, the default,
 deconvolves with the closed-form spectrum of the inverse filter,
 
@@ -1276,14 +1293,14 @@ e^{-j 2\pi f L\,(1 - \ln(f/f_1)) + j\pi/4},
 $$
 
 rather than an FFT of the signal. Besides being exact, the analytic
-deconvolution extends the usable band of each `Hn` to `[n·f1, n·f2]`
+deconvolution extends the usable band of each $H_n$ to $[n f_1, n f_2]$
 (Novak et al., Fig. 6): the second harmonic of a 6 kHz sweep is measured
 up to 12 kHz.
 
 Two practical notes from the paper are built in: the recording mean is
 subtracted by default (`remove_dc=True`; a DC offset otherwise leaks a
 scaled inverse filter into the impulse response), and the non-integer part
-of each arrival `L·ln(n)·fs` is removed in the frequency domain, so the
+of each arrival $L\ln(n) f_s$ is removed in the frequency domain, so the
 harmonic phases carry no residual sub-sample skew.
 
 ## 3. Analysing classical ESS recordings (`method="farina"`)
@@ -1295,8 +1312,8 @@ Recordings made with the plain exponential sweep of
 amplitude-compensated inverse filter of Farina (2000). The harmonic
 **magnitudes** and the THD are correct (the Chebyshev oracle passes
 identically), but the sweep's `-1` phase term breaks the time-shift
-equivalence, so the phases of `H2..HN` depend on the excitation and should
-be ignored; the band of every `Hn` is also capped at `f2` by the inverse
+equivalence, so the phases of $H_2 \dots H_N$ depend on the excitation and should
+be ignored; the band of every $H_n$ is also capped at $f_2$ by the inverse
 filter.
 
 ```python
@@ -1313,12 +1330,12 @@ figure read identically; only the harmonic phases (and the top of each
 order's band) differ between the two methods.
 
 Sizing rules for both methods: the closest pair of arrivals is spaced
-`L·ln(N/(N-1))` seconds, so the per-order window (`ir_length`, default the
+$L\ln(N/(N-1))$ seconds, so the per-order window (`ir_length`, default the
 largest power of two that fits, capped at 8192 samples) must not exceed
 it: lengthen the sweep or lower `n_harmonics` for reverberant systems whose
-tails need longer windows. Keep `n_harmonics·f2` below Nyquist: distortion
+tails need longer windows. Keep `n_harmonics` $\cdot f_2$ below Nyquist: distortion
 products above it fold back in any real recording. The analysis is
-referenced to the excitation `amplitude`, so `H1` is the linear gain and
+referenced to the excitation `amplitude`, so $H_1$ is the linear gain and
 the THD is level-referenced exactly as driven.
 
 ## 4. Phase utilities: minimum phase, group delay, excess phase
@@ -1350,7 +1367,7 @@ res.plot()                             # magnitude, phases, group delays
 
 *A +6 dB peaking equalizer measured through a 2.5 ms processing latency: the
 minimum-phase part carries only the small phase wiggle an equalizer could
-invert, the excess phase is the pure `−2πf·t0` ramp of the delay, and the
+invert, the excess phase is the pure $-2\pi f t_0$ ramp of the delay, and the
 excess group delay reads the latency directly as a flat 2.5 ms line.*
 
 <details>
@@ -1380,17 +1397,17 @@ plt.show()
 
 </details>
 
-The decomposition `H = H_min · H_ap` splits what an equalizer can invert
-(`H_min`, minimum phase, causal and causally invertible) from what it never
-can (`H_ap`, the all-pass excess: latency plus non-minimum-phase zeros such
+The decomposition $H = H_\text{min} H_\text{ap}$ splits what an equalizer can invert
+($H_\text{min}$, minimum phase, causal and causally invertible) from what it never
+can ($H_\text{ap}$, the all-pass excess: latency plus non-minimum-phase zeros such
 as reflections). The excess phase is `0` for a minimum-phase response and
-exactly `-2πf·t0` for a pure latency `t0`; its group delay reads the
+exactly $-2\pi f t_0$ for a pure latency $t_0$; its group delay reads the
 latency in seconds.
 
 Numerical contract, pinned by the tests: on a strictly minimum-phase biquad
 sampled on a dense grid the reconstructed phase matches the true phase to
 better than `1e-12` rad; the group delay of a first-order allpass matches
-the closed form `(1-a²)/(1+2a·cosω+a²)` to `1e-5` samples; the excess group
+the closed form $(1-a^2)/(1+2a\cos\omega+a^2)$ to `1e-5` samples; the excess group
 delay of a delayed biquad returns the delay to `1e-6` samples. The
 precautions are documented with the API: the response must be sampled
 uniformly from DC to Nyquist inclusive (the `rfft` layout) and densely
@@ -1419,7 +1436,7 @@ grids.
 
 - Farina, A. (2000). Simultaneous measurement of impulse response and
   distortion with a swept-sine technique. *108th AES Convention*, Paris,
-  preprint 5093. The exponential-sweep deconvolution and the `L·ln(n)`
+  preprint 5093. The exponential-sweep deconvolution and the $L\ln(n)$
   harmonic separation.
 - Novak, A., Lotton, P., & Simon, L. (2015). Synchronized swept-sine:
   Theory, application and implementation. *Journal of the Audio Engineering
@@ -1698,8 +1715,8 @@ res.plot()   # the shaded LRA band spans the P10-P95 spread (needs matplotlib)
 
 *On the Tech 3342 reference case the short-term distribution has two plateaus
 10 LU apart, and the shaded band between the 10th and 95th percentile edges
-reads exactly `LRA = 10.0 LU`; the integrated loudness settles between the
-plateaus. On real programmes the same band tells a dialogue-normalised drama
+reads exactly $\mathrm{LRA} = 10.0\ \text{LU}$; the integrated loudness
+settles between the plateaus. On real programmes the same band tells a dialogue-normalised drama
 (LRA around 10-20 LU) from a compressed commercial (a few LU) at a glance.*
 
 <details>
@@ -1765,7 +1782,8 @@ order `L, R, C, Ls, Rs`, or `L, R, C, LFE, Ls, Rs` with the LFE excluded).
 For any other loudspeaker layout (22.2, 4+7+0 and the rest of the BS.2051
 advanced sound systems), Annex 3 derives the weight of each channel from its
 loudspeaker position: 1.41 (+1.5 dB) for mid-layer side loudspeakers
-(60° ≤ |azimuth| ≤ 120°, |elevation| < 30°), 1.0 elsewhere:
+($60^\circ \le |\text{azimuth}| \le 120^\circ$,
+$|\text{elevation}| < 30^\circ$), 1.0 elsewhere:
 
 ```python
 from phonometry import broadcast

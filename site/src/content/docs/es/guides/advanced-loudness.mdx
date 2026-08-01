@@ -56,7 +56,7 @@ de parámetros.
 | :--- | :--- | :--- | :--- | :--- |
 | [Zwicker](/phonometry/es/guides/loudness/) | ISO 532-1:2017 | ambos | sonos | Método de referencia; entrada en tercios de octava; rápido y muy citado |
 | Moore-Glasberg | ISO 532-2:2017 | estacionario | sonos | Patrón de excitación roex; mejor para tonos y con suma binaural explícita |
-| Moore-Glasberg-Schlittenlacher | ISO 532-3:2023 | variable en el tiempo | sonos (STL/LTL) | Sonoridad variable en el tiempo con trazas de corto/largo plazo y el pico N_max |
+| Moore-Glasberg-Schlittenlacher | ISO 532-3:2023 | variable en el tiempo | sonos (STL/LTL) | Sonoridad variable en el tiempo con trazas de corto/largo plazo y el pico $N_\text{max}$ |
 | Sottek (modelo auditivo) | ECMA-418-2:2025 | variable en el tiempo | sone_HMS | Comparte un único front-end auditivo con las métricas de tonalidad y aspereza de ECMA |
 
 Los cuatro métodos están anclados de modo que un **tono de 1 kHz a 40 dB SPL
@@ -116,7 +116,7 @@ ruido con muesca de oyentes jóvenes a niveles moderados, Glasberg y Moore
 Psychology of Hearing* 6.ª ed., p. 76):
 
 $$
-\mathrm{ERB}_N = 24,7\,(4,37\,F + 1)\ \text{Hz},\qquad F \text{ en kHz}.
+\mathrm{ERB}_N = 24{,}7\,(4{,}37\,F + 1)\ \text{Hz},\qquad F \text{ en kHz}.
 $$
 
 Integrar $df/\mathrm{ERB}_N(f)$ convierte eso en una escala de frecuencia cuya
@@ -124,7 +124,7 @@ unidad es una anchura de filtro auditivo, el **número ERB<sub>N</sub>**, cuya
 unidad se llama **Cam** (por Cambridge):
 
 $$
-\mathrm{ERB}_N\ \text{número} = 21,4 \log_{10}(4,37\,F + 1)\ \text{Cam}.
+\mathrm{ERB}_N\ \text{número} = 21{,}4 \log_{10}(4{,}37\,F + 1)\ \text{Cam}.
 $$
 
 ```python
@@ -137,8 +137,8 @@ print(round(psychoacoustics.frequency_from_cam(cam), 1))     # 1000.0 Hz
 ```
 
 La biblioteca expresa el mismo ajuste con una cifra significativa más,
-$\mathrm{ERB}_N = 24,673\,(0,004368 f + 1)$ y
-$21,366 \log_{10}(0,004368 f + 1)$, la precisión que emplea la implementación
+$\mathrm{ERB}_N = 24{,}673\,(0{,}004368 f + 1)$ y
+$21{,}366 \log_{10}(0{,}004368 f + 1)$, la precisión que emplea la implementación
 de ISO 532-2; ambas formas concuerdan mejor del 0,2 % en todo el margen
 audible, y esas cifras de más son las que hacen de `frequency_from_cam` una
 inversa exacta. Las funciones no son un auxiliar privado del modelo de
@@ -203,7 +203,8 @@ Donde Zwicker usa bandas críticas fijas sobre la escala Bark, Moore-Glasberg
 construye un **patrón de excitación** con filtros auditivos exponenciales
 redondeados (roex) dependientes del nivel sobre la escala del número ERB
 ("Cam"), y luego aplica una transformación compresiva de excitación →
-sonoridad específica con C = 0,0617 sonos/Cam (ISO 532-2:2017, Fórmula 7) y una
+sonoridad específica con $C = 0{,}0617\ \text{sonos/Cam}$ (ISO 532-2:2017,
+Fórmula 7) y una
 etapa de inhibición binaural. Reproduce los casos de tono y de banda ancha del
 Anexo B con un uno o dos por ciento de error y, a diferencia de ISO 532-1,
 modela la suma binaural explícitamente.
@@ -275,8 +276,8 @@ plt.show()
 | `field` | str | — | `'free'` (por defecto) / `'diffuse'` / `'eardrum'` | Transferencia del oído externo |
 | `presentation` | str | — | `'binaural'` (por defecto) / `'diotic'` / `'monaural'` | Suma binaural |
 
-Devuelve un `MooreGlasbergLoudness`: `loudness` (N, sonos), `loudness_level`
-(fonios), `specific` (N′(i), 372 bins de 0,1 Cam), `erb_number`,
+Devuelve un `MooreGlasbergLoudness`: `loudness` ($N$, sonos), `loudness_level`
+(fonios), `specific` ($N'(i)$, 372 bins de 0,1 Cam), `erb_number`,
 `centre_frequencies`, `field`, `presentation`.
 
 ## Sonoridad variable en el tiempo (ISO 532-3)
@@ -284,9 +285,9 @@ Devuelve un `MooreGlasbergLoudness`: `loudness` (N, sonos), `loudness_level`
 ISO 532-3 envuelve el mismo modelo de excitación / sonoridad específica en un
 análisis espectral multirresolución deslizante (seis FFT paralelas, actualizadas
 cada 1 ms) y dos integradores temporales en cascada: la **sonoridad de corto
-plazo** S′(t), rápida, y la **sonoridad de largo plazo** S″(t), más lenta. La
-sonoridad de largo plazo de pico N_max predice la sonoridad de sonidos de hasta
-unos 5 s.
+plazo** $S'(t)$, rápida, y la **sonoridad de largo plazo** $S''(t)$, más
+lenta. La sonoridad de largo plazo de pico $N_\text{max}$ predice la
+sonoridad de sonidos de hasta unos 5 s.
 
 ```python
 import numpy as np
@@ -352,9 +353,9 @@ Devuelve un `MooreGlasbergTimeVaryingLoudness`: `time` (rejilla de 1 ms),
 
 ECMA-418-2:2025 especifica un único front-end auditivo (filtrado del oído
 externo/medio, un banco de 53 filtros de tipo gammatone sobre la escala Bark_HMS
-con z = 0,5 .. 26,5, rectificación de media onda, RMS de bloque y una no
+con $z = 0{,}5\ ..\ 26{,}5$, rectificación de media onda, RMS de bloque y una no
 linealidad compresiva, Fórmula 23) que **comparten** sus métricas de
-sonoridad, tonalidad y aspereza. La sonoridad N se expresa en **sone_HMS**, y el
+sonoridad, tonalidad y aspereza. La sonoridad $N$ se expresa en **sone_HMS**, y el
 mismo ancla de 1 kHz/40 dB calibra el front-end (nuestro valor de sala limpia
 0,984, con el promediado completo de bandas de la cláusula 6.2.3; el origen
 del residuo está documentado en el docstring del módulo).
@@ -412,9 +413,9 @@ plt.show()
 | `fs` | float | Hz | > 0 | Se remuestrea a 48 kHz internamente si es necesario (apartado 5.1.1) |
 | `field` | str | — | `'free'` (por defecto) / `'diffuse'` | Filtro del oído externo/medio (apartado 5.1.3) |
 
-Devuelve un `EcmaLoudness`: `loudness` (N, sone_HMS), `specific_loudness`
-(N′(z), 53 bandas), `bark`, `centre_frequencies`, `time`, `loudness_vs_time`
-(N(l) a 187,5 Hz), `field`.
+Devuelve un `EcmaLoudness`: `loudness` ($N$, sone_HMS), `specific_loudness`
+($N'(z)$, 53 bandas), `bark`, `centre_frequencies`, `time`, `loudness_vs_time`
+($N(l)$ a 187,5 Hz), `field`.
 
 ## Qué cubre esta guía
 
@@ -426,7 +427,7 @@ patrón de excitación roex del apartado 7 y la inhibición binaural del
 apartado 8, mediante `loudness_moore_glasberg()` y sus variantes
 `_from_spectrum`/`_from_third_octave`. ISO 532-3:2023
 (Moore-Glasberg-Schlittenlacher): la sonoridad de corto plazo del apartado
-7.8, la de largo plazo del apartado 7.9 y su pico N_max, mediante
+7.8, la de largo plazo del apartado 7.9 y su pico $N_\text{max}$, mediante
 `loudness_moore_glasberg_time()`. ECMA-418-2:2025 (modelo de Sottek): el
 ensamblaje de sonoridad del apartado 8, mediante `loudness_ecma()`.
 
@@ -453,4 +454,4 @@ apartado.
 
 ### ¿Qué modelo de sonoridad elijo: Zwicker, Moore-Glasberg o Sottek?
 
-El método de Zwicker (ISO 532-1:2017) es el de referencia: estacionario y variable en el tiempo, entrada en tercios de octava, rápido y muy citado. Moore-Glasberg (ISO 532-2:2017) es estacionario, construye patrones de excitación roex y modela la suma binaural explícitamente; ISO 532-3:2023 añade la sonoridad variable en el tiempo de corto y largo plazo con el pico N_max. El modelo de Sottek (ECMA-418-2:2025) se expresa en sone_HMS y comparte su front-end auditivo con las métricas de tonalidad y aspereza de ECMA.
+El método de Zwicker (ISO 532-1:2017) es el de referencia: estacionario y variable en el tiempo, entrada en tercios de octava, rápido y muy citado. Moore-Glasberg (ISO 532-2:2017) es estacionario, construye patrones de excitación roex y modela la suma binaural explícitamente; ISO 532-3:2023 añade la sonoridad variable en el tiempo de corto y largo plazo con el pico $N_\text{max}$. El modelo de Sottek (ECMA-418-2:2025) se expresa en sone_HMS y comparte su front-end auditivo con las métricas de tonalidad y aspereza de ECMA.

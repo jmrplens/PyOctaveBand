@@ -361,11 +361,12 @@ potencia acústica suele venir de datos de fabricante medidos según ASHRAE
 Standard 70, que es lo que usa una hoja real. Cuando no se dispone de ellos,
 `diffuser_sound_power` es la estimación de Reynolds tal como la dan las
 Ecs. 13.27 a 13.33 de Long: un nivel global
-`L_W = 10 lg S_G + 30 lg xi + 60 lg U_G - 31.3` a partir del área de la cara,
-la velocidad de aproximación `U_G = Q / S_G` y el coeficiente normalizado de
-pérdida de carga `xi`, repartido por octavas mediante la función de forma
-`C_D = -11.82 - 0.15 A - 1.13 A^2` (`-5.82` si el equipo es circular) en torno
-a la banda de pico `f_P = 48.8 U_G`.
+$L_W = 10\log_{10} S_G + 30\log_{10}\xi + 60\log_{10} U_G - 31{,}3$ a partir
+del área de la cara, la velocidad de aproximación $U_G = Q/S_G$ y el
+coeficiente normalizado de pérdida de carga $\xi$, repartido por octavas
+mediante la función de forma $C_D = -11{,}82 - 0{,}15 A - 1{,}13 A^2$
+($-5{,}82$ si el equipo es circular) en torno a la banda de pico
+$f_P = 48{,}8\,U_G$.
 
 ```python
 from phonometry import diffuser_sound_power

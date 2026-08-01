@@ -124,7 +124,7 @@ la rigidez a flexión de la losa. Su mejora es, por tanto, el cociente de los
 dos espectros de fuerza,
 
 $$
-\Delta L = 20 \lg \frac{|F_n|_\text{without}}{|F_n|_\text{with}} \ \text{dB},
+\Delta L = 20 \log_{10} \frac{|F_n|_\text{without}}{|F_n|_\text{with}} \ \text{dB},
 $$
 
 y todo el diseño se reduce a un número, la frecuencia de corte del propio
@@ -221,9 +221,9 @@ se aplica es una pregunta sobre el amortiguamiento, no sobre la capa:
 
 | Modelo | Ley | Cuándo |
 | --- | --- | --- |
-| `"cremer"` | $\Delta L = 40 \lg (f/f_0)$ | resultado de placa infinita de Cremer; soleras de asfalto y suelos flotantes secos, cuyas pérdidas internas bastan para comportarse como placas infinitas (fórmula C.3 de ISO 12354-2) |
-| `"en12354"` | $\Delta L = 30 \lg (f/f_0)$ | soleras de mortero de cemento y de sulfato de calcio, cuyo bajo factor de pérdidas las convierte en placas finitas con campo reverberante de flexión (fórmula C.1) |
-| `"cremer_hammer"` | $40 \lg (f/f_0) + 10 \lg[1 + (f/f_\text{limit})^2]$ | superficie de paso ligera, donde la impedancia del martillo ya no es despreciable; tiende a 18 dB por octava |
+| `"cremer"` | $\Delta L = 40 \log_{10} (f/f_0)$ | resultado de placa infinita de Cremer; soleras de asfalto y suelos flotantes secos, cuyas pérdidas internas bastan para comportarse como placas infinitas (fórmula C.3 de ISO 12354-2) |
+| `"en12354"` | $\Delta L = 30 \log_{10} (f/f_0)$ | soleras de mortero de cemento y de sulfato de calcio, cuyo bajo factor de pérdidas las convierte en placas finitas con campo reverberante de flexión (fórmula C.1) |
+| `"cremer_hammer"` | $40 \log_{10} (f/f_0) + 10 \log_{10}[1 + (f/f_\text{limit})^2]$ | superficie de paso ligera, donde la impedancia del martillo ya no es despreciable; tiende a 18 dB por octava |
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/floating_floor_prediction.svg" alt="Mejora del aislamiento a ruido de impactos de una solera flotante de 73,5 kg por metro cuadrado sobre una capa elástica de 8 meganewton por metro cúbico: nada por debajo de la resonancia masa-resorte de 52,8 Hz y después la ley 30 lg de EN 12354-2 alcanzando 59 dB a 5 kHz, frente a la ley 40 lg de Cremer, más pronunciada, y a la rama de 18 dB por octava que incluye la impedancia del martillo de la máquina de impactos" width="80%" />
 
@@ -283,7 +283,7 @@ double_floating_floor_resonances(7.25e6, 12.78, 7.25e6, 12.78)  # (74, 194) Hz
 
 Las magnitudes globales salen directamente de esos mismos dos datos, así que
 un suelo flotante se puede dimensionar sin dibujar un solo espectro:
-$\Delta L_w = 13\lg m' - 14{,}2\lg s' + 20{,}8$ dB para una solera de mortero
+$\Delta L_w = 13\log_{10} m' - 14{,}2\log_{10} s' + 20{,}8$ dB para una solera de mortero
 de cemento (fórmula C.4) y el ajuste más pronunciado de la fórmula (C.5) para
 asfalto y suelos secos. Soleras más pesadas y capas más blandas puntúan mejor,
 y ambas estimaciones están deliberadamente del lado de la seguridad.
@@ -329,7 +329,7 @@ resonancia unas mil veces menor.
 
 La tabla D.1 lee entonces la mejora ponderada en $f_0$, redondeada a la banda
 de tercio de octava en la que cae. Por debajo de 200 Hz la capa adicional ayuda,
-en $74{,}4 - 20\lg f_0 - R_w/2$ dB, y cuanto mejor sea la pared desnuda menos
+en $74{,}4 - 20\log_{10} f_0 - R_w/2$ dB, y cuanto mejor sea la pared desnuda menos
 hay que ganar. De 200 Hz hacia arriba cuesta: 1 dB a 200 Hz bajando hasta
 10 dB de 630 Hz a 1600 Hz, y recuperando a 5 dB por encima. Llevar la
 resonancia bien por debajo del rango de interés es, por tanto, todo el
@@ -383,7 +383,7 @@ $f_0 = 52{,}8$ Hz es un *dato de entrada* del ejemplo, impreso en los datos de
 construcción del apartado G.1.1 y repetido en el recuadro bajo la tabla, no un
 valor deducido de la retícula. Y el 0,0 dB inicial a 50 Hz exige un recorte
 por debajo de $f_0$ que ninguna fórmula impresa establece: la fórmula (C.1)
-está escrita como $\Delta L = 30\lg(f/f_0)$ sin rango de validez alguno, y la
+está escrita como $\Delta L = 30\log_{10}(f/f_0)$ sin rango de validez alguno, y la
 única condición impresa en todo el documento es el informal "for $f > f_0$"
 de ese mismo recuadro. La tabla L.4 de ISO 12354-1:2017 imprime los mismos 21
 números como $\Delta R_\text{d,situ}$, lo que confirma la transcripción en un

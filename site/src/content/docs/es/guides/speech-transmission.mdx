@@ -27,7 +27,7 @@ import ReportPreview from '../../../../components/ReportPreview.astro';
 Un sistema de megafonía, un interfono, un aula reverberante: cada uno es un
 *canal de transmisión* entre la boca de quien habla y el oído de quien escucha,
 y cada uno degrada el habla a su manera. El **índice de transmisión del habla**
-(STI) de IEC 60268-16 califica ese canal con un único número en [0, 1] midiendo
+(STI) de IEC 60268-16 califica ese canal con un único número en $[0, 1]$ midiendo
 cuánta de la *envolvente* del habla sobrevive al trayecto. Esta página cubre la
 física de transferencia de modulación en la que se basa el índice, el método indirecto desde
 una respuesta al impulso medida en la sala y la medición STIPA directa con su
@@ -57,8 +57,8 @@ La reverberación y el ruido no amortiguan el habla de manera uniforme;
 emborronan su *envolvente*: las modulaciones lentas de intensidad
 (0,63–12,5 Hz) que transportan las sílabas. El STI cuantifica cuánta de esa
 modulación sobrevive de la boca al oído, por banda de octava, como la
-**función de transferencia de modulación (MTF)** m(F). Un canal tipo delta
-mantiene m = 1 (STI = 1); la reverberación filtra paso-bajo la envolvente
+**función de transferencia de modulación (MTF)** $m(F)$. Un canal tipo delta
+mantiene $m = 1$ (STI = 1); la reverberación filtra paso-bajo la envolvente
 siguiendo la forma cerrada de Schroeder, y el ruido estacionario la escala:
 
 $$
@@ -75,11 +75,11 @@ reverberante rellena los valles por detrás, porque la energía tardía se
 esparce en los huecos; el ruido estacionario eleva su suelo. En ambos casos la
 profundidad de modulación recibida se encoge, y con ella el contraste entre
 sonidos del habla, aunque el nivel medio apenas cambie. El método completo
-sondea m(F) en 14 frecuencias de modulación (de 0,63 Hz a 12,5 Hz en pasos de
+sondea $m(F)$ en 14 frecuencias de modulación (de 0,63 Hz a 12,5 Hz en pasos de
 tercio de octava) en cada una de las 7 bandas de octava de 125 Hz a 8 kHz,
-convierte cada m en una relación señal-ruido efectiva acotada a ±15 dB y
+convierte cada $m$ en una relación señal-ruido efectiva acotada a ±15 dB y
 combina los resultados, ponderados por banda, en el índice: el STI es una SNR
-efectiva de la *envolvente*, llevada a [0, 1].
+efectiva de la *envolvente*, llevada a $[0, 1]$.
 
 <ThemeImage
   src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sti_vs_t60_es.svg"
@@ -217,9 +217,9 @@ Edición 4 es la base y cada cambio de la Ed. 5 está atribuido a su fuente en e
 código; el único delta numérico es el espectro de habla masculina revisado del
 apartado A.6.1. CI comprueba los vectores de verificación de la propia norma:
 los seis pares de bandas de los factores de ponderación a ±0,001 STI, la tabla
-de correspondencia m ↔ STI, los puntos de control del enmascaramiento
+de correspondencia $m$ ↔ STI, los puntos de control del enmascaramiento
 dependiente del nivel y decaimientos con la forma de Schroeder a cuatro valores
-de T₆₀.
+de $T_{60}$.
 
 El analizador también se verifica de extremo a extremo con las señales del
 **banco de verificación de IEC 60268-16 rev 5** de
@@ -227,7 +227,7 @@ El analizador también se verifica de extremo a extremo con las señales del
 profundidad de modulación del método directo (Anexo C.3.2), los decaimientos
 exponenciales del método indirecto frente a la MTF de Schroeder en forma
 cerrada (C.3.3), la prueba de pendiente del banco de filtros con un tono
-adyacente sin modular a +41 dB (C.4.2, m ≥ 0,5), los pares de bandas de los
+adyacente sin modular a +41 dB (C.4.2, $m \ge 0{,}5$), los pares de bandas de los
 factores de ponderación (A.2.2) y la prueba de distorsión de fase del banco de
 filtros con portadoras en los bordes de media octava (A.3.1.2,
 |sesgo de STI| < 0,01 en TI = 0,1–0,9). Las cinco series pasan con las
@@ -250,7 +250,7 @@ Cada vía tiene modos de fallo que la norma hace explícitos:
   enmascaramiento auditivo y el umbral de recepción actúan sobre los niveles
   de banda *absolutos* en el oyente. Reproduce la señal de ensayo al nivel de
   operación del sistema (la práctica del Anexo J de la norma la fija 3 dB por
-  encima del L_Aeq del habla continua en la posición) y pasa `level=` y
+  encima del $L_{Aeq}$ del habla continua en la posición) y pasa `level=` y
   `ambient=` para que el análisis los incluya; una respuesta al impulso medida
   a nivel alto y reescalada después pierde estos efectos por completo.
 - **Ruido de fondo impulsivo y fluctuante.** Una herramienta que cae o un
@@ -275,7 +275,7 @@ Cada vía tiene modos de fallo que la norma hace explícitos:
 | `snr` | float o vector de 7, opcional | dB | por defecto `None` | Añade la degradación por ruido estacionario |
 | `level` | vector de 7, opcional | dB SPL | por defecto `None` | Activa el enmascaramiento auditivo + umbral de recepción (Tablas A.2/A.3) |
 | `ambient` | vector de 7, opcional | dB SPL | requiere `level` | Niveles de banda del ruido ambiente |
-| `reference` | array 1D, opcional (`stipa`) | — | por defecto `None` | Señal de la fuente medida en lugar del m = 0,55 nominal |
+| `reference` | array 1D, opcional (`stipa`) | — | por defecto `None` | Señal de la fuente medida en lugar del $m = 0{,}55$ nominal |
 
 Ambas devuelven `STIResult`: `sti`, `mti` (7 bandas), `mtf` (7×14 o 7×2),
 `band_levels`, `rating` (letra del Anexo F, `A+`…`U`).
@@ -357,5 +357,5 @@ queda nada por implementar.
   [Métricas de calidad sonora](/phonometry/es/guides/sound-quality/): sonoridad, agudeza,
   tonalidad y aspereza del sonido recibido.
 - [Teoría](/phonometry/es/reference/theory/perception/): la derivación de la transferencia
-  de modulación y la correspondencia m ↔ STI.
+  de modulación y la correspondencia $m$ ↔ STI.
 - Referencia de la API: [`hearing.sti`](/phonometry/es/reference/api/speech/sti/).

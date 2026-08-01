@@ -81,13 +81,13 @@ ISO 717-1 reference curve.
 | `l1` | 1D or 2D array | dB | one/band, or `(positions, bands)` | Source-room levels (2D is energy-averaged) |
 | `l2` | 1D or 2D array | dB | same band count | Receiving-room levels |
 | `t2` | 1D array | s | > 0, one per band | Receiving-room reverberation time |
-| `area` | float, optional | m² | > 0, with `volume` | Partition area `S` (enables `R'`) |
-| `volume` | float, optional | m³ | > 0, with `area` | Receiving-room volume `V` |
-| `t0` | float | s | default `0.5` | Reference reverberation time `T0` |
+| `area` | float, optional | m² | > 0, with `volume` | Partition area $S$ (enables $R'$) |
+| `volume` | float, optional | m³ | > 0, with `area` | Receiving-room volume $V$ |
+| `t0` | float | s | default `0.5` | Reference reverberation time $T_0$ |
 
 `airborne_insulation()` returns an `AirborneInsulationResult` (`d`, `dnt`,
 `r_prime` or `None`). The reference-curve engine that turns any of those
-spectra into `Rw`, `R'w` or `DnT,w`, its spectrum adaptation terms and its
+spectra into $R_w$, $R'_w$ or $D_{nT,w}$, its spectrum adaptation terms and its
 enlarged-range variants are in
 [Insulation Ratings (ISO 717)](insulation-ratings.md).
 
@@ -138,8 +138,8 @@ print(building.weighted_impact_rating(octave).rating)  # 54
 ```
 
 Feed `impact_insulation`'s `l_n_t` (or `l_n`) straight into
-`weighted_impact_rating`; the rating and `CI` reproduce the ISO 717-2 Annex C
-values (thirds `L'nT,w = 79`, `CI = −11`; octave `54`, `CI = 0`).
+`weighted_impact_rating`; the rating and $C_I$ reproduce the ISO 717-2 Annex C
+values (thirds $L'_{nT,w} = 79$, $C_I = -11$; octave 54, $C_I = 0$).
 
 ### `impact_insulation()` parameters
 
@@ -147,8 +147,8 @@ values (thirds `L'nT,w = 79`, `CI = −11`; octave `54`, `CI = 0`).
 | :--- | :--- | :--- | :--- | :--- |
 | `li` | 1D or 2D array | dB | one/band, or `(positions, bands)` | Energy-average impact SPL (2D is averaged over positions) |
 | `t2` | 1D array | s | > 0, one per band | Receiving-room reverberation time |
-| `volume` | float, optional | m³ | > 0 | Receiving-room `V` (enables `L'n`) |
-| `t0` | float | s | default `0.5` | Reference reverberation time `T0` |
+| `volume` | float, optional | m³ | > 0 | Receiving-room $V$ (enables $L'_n$) |
+| `t0` | float | s | default `0.5` | Reference reverberation time $T_0$ |
 
 `impact_insulation()` returns an `ImpactInsulationResult` (`l_n_t`, `l_n` or
 `None`); the ISO 717-2 side of the chain is in
@@ -160,10 +160,10 @@ The per-band field results write the test report of ISO 16283-1:2014 /
 ISO 16283-2:2020 Clause 14 directly, laid out like the recommended results
 forms (Annex B / Annex C) and the accredited field reports built on them.
 `AirborneInsulationResult.report()` renders the standardized level difference
-*DnT* fiche (Figure B.1) or, with `quantity="r_prime"`, the apparent sound
-reduction index *R'* fiche (Figure B.2); `ImpactInsulationResult.report()`
-renders the standardized *L'nT* fiche (Figure C.1) or, with `quantity="l_n"`,
-the normalized *L'n* fiche (Figure C.2). Each fiche names the field standard
+$D_{nT}$ fiche (Figure B.1) or, with `quantity="r_prime"`, the apparent sound
+reduction index $R'$ fiche (Figure B.2); `ImpactInsulationResult.report()`
+renders the standardized $L'_{nT}$ fiche (Figure C.1) or, with
+`quantity="l_n"`, the normalized $L'_n$ fiche (Figure C.2). Each fiche names the field standard
 in its basis line, evaluates the ISO 717-1 / ISO 717-2 single-number rating
 over the 16 core one-third-octave bands (100-3150 Hz), states the quantity to
 one decimal place both in tabular form and as a curve against the shifted
@@ -173,7 +173,7 @@ statement that the evaluation is based on field measurement results obtained
 by an engineering method.
 
 `verbose=True` swaps the two-column table for the per-band measurement chain
-(the energy-average *L1* and *L2*, or *Li*, and the reverberation time *T*
+(the energy-average $L_1$ and $L_2$, or $L_i$, and the reverberation time $T$
 beside the reported quantity), the content accredited field reports annex; it
 needs a result built by `airborne_insulation()` / `impact_insulation()`, which
 retain those inputs on the result (`l1`, `l2`/`li`, `t2`, `t0`). Metadata, the
@@ -220,10 +220,10 @@ imp.report("LnTw_field.pdf",
 
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/field_airborne_insulation_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/field_airborne_insulation.svg" alt="Field airborne measurement chain: the raw level difference D and the standardized DnT across the sixteen one-third-octave bands, with the reverberation correction shaded between them and the resulting DnT,w and R'w ratings annotated" width="80%"></picture>
 
-*The receiving-room reverberation time turns the raw level difference `D`
-into the standardized `DnT` band by band; with `T` above `T0 = 0.5 s`
+*The receiving-room reverberation time turns the raw level difference $D$
+into the standardized $D_{nT}$ band by band; with $T$ above $T_0 = 0.5$ s
 across the range, the correction lifts the curve slightly. The rating box
-carries both single numbers of this measurement, `DnT,w` and `R'w`.*
+carries both single numbers of this measurement, $D_{nT,w}$ and $R'_w$.*
 
 <details>
 <summary>Show the code for this figure</summary>
@@ -357,10 +357,10 @@ plt.show()
 | `measurand` | str | — | `'airborne'` / `'impact'` / `'impact_reduction'` | Selects Table 2 / 4 / 6 |
 | `quantity` | str | — | `'r_w'`, `'ln_w'`, `'delta_lw'` (+ aliases, `+c`/`+ctr` variants) | Single-number descriptor |
 | `situation` | str | — | `'A'` / `'B'` / `'C'` | Measurement situation (Clause 5.2) |
-| `value` | float | dB | — | Best estimate `y` to attach `U` to |
+| `value` | float | dB | — | Best estimate $y$ to attach $U$ to |
 | `coverage` | float | — | default `0.95` | Confidence level (Table 8) |
 | `one_sided` | bool | — | default `False` | One-sided factor for conformity checks |
-| `upper_limit` | bool | — | default `False` | Select the σR95 upper limit (airborne, situation A) |
+| `upper_limit` | bool | — | default `False` | Select the $\sigma_{R95}$ upper limit (airborne, situation A) |
 
 `band_uncertainty()` returns a `BandUncertainty` (`frequencies`,
 `uncertainties`, `.to_arrays()`); `single_number_uncertainty()` a float;

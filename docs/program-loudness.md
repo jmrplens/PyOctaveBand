@@ -255,8 +255,8 @@ res.plot()   # the shaded LRA band spans the P10-P95 spread (needs matplotlib)
 
 *On the Tech 3342 reference case the short-term distribution has two plateaus
 10 LU apart, and the shaded band between the 10th and 95th percentile edges
-reads exactly `LRA = 10.0 LU`; the integrated loudness settles between the
-plateaus. On real programmes the same band tells a dialogue-normalised drama
+reads exactly $\mathrm{LRA} = 10.0\ \text{LU}$; the integrated loudness
+settles between the plateaus. On real programmes the same band tells a dialogue-normalised drama
 (LRA around 10-20 LU) from a compressed commercial (a few LU) at a glance.*
 
 <details>
@@ -322,7 +322,8 @@ order `L, R, C, Ls, Rs`, or `L, R, C, LFE, Ls, Rs` with the LFE excluded).
 For any other loudspeaker layout (22.2, 4+7+0 and the rest of the BS.2051
 advanced sound systems), Annex 3 derives the weight of each channel from its
 loudspeaker position: 1.41 (+1.5 dB) for mid-layer side loudspeakers
-(60° ≤ |azimuth| ≤ 120°, |elevation| < 30°), 1.0 elsewhere:
+($60^\circ \le |\text{azimuth}| \le 120^\circ$,
+$|\text{elevation}| < 30^\circ$), 1.0 elsewhere:
 
 ```python
 from phonometry import broadcast

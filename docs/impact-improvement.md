@@ -27,13 +27,13 @@ concrete plate; a standard tapping machine excites it and the structure-borne
 covering. For locally-reacting coverings that acceleration-level difference
 equals the ISO 10140 impact sound reduction.
 
-**Acceleration level (Formula (1)).** $L_a = 10\lg(\langle a^2\rangle / a_0^2)$ dB,
+**Acceleration level (Formula (1)).** $L_a = 10\log_{10}(\langle a^2\rangle / a_0^2)$ dB,
 reference $a_0 = 10^{-6}\ \text{m/s}^2$. **Background correction (Formula (2))**
 follows the ISO 10140 three-branch rule (unchanged ≥ 15 dB; energy subtraction
 for 6 ≤ margin < 15 dB; the 1.3 dB limit below 6 dB, flagged as $> \Delta L$).
 The improvement is the position-averaged difference
 $\Delta L = L_0 - L_1$ (Formulae (3)/(4)); octaves follow
-$\Delta L_\text{oct} = -10\lg[\tfrac{1}{3}\sum 10^{-\Delta L_n/10}]$ (Formula (5)).
+$\Delta L_\text{oct} = -10\log_{10}[\tfrac{1}{3}\sum 10^{-\Delta L_n/10}]$ (Formula (5)).
 
 **Weighted improvement.** $\Delta L_w$ is the ISO 717-2 weighted reduction: the
 improvement is applied to the heavyweight **reference floor** $L_{n,r,0}$
@@ -104,9 +104,10 @@ res.plot()            # the delta-L(f) improvement spectrum above (needs matplot
 
 `FloorCoveringImprovementResult.report()` writes a one-page accredited
 impact-improvement fiche: the ISO 16251-1 basis line, a metadata header, the
-per-band table (frequency and *delta-L*, bands at the 1.3 dB limit prefixed
-`>`) beside the *delta-L(f)* improvement curve, the boxed single-number
-*delta-Lw (CI,delta)* (the ISO 16251-1 Clause 8 e) statement of results, rated
+per-band table (frequency and $\Delta L$, bands at the 1.3 dB limit prefixed
+`>`) beside the $\Delta L(f)$ improvement curve, the boxed single-number
+$\Delta L_w\ (C_{I,\Delta})$ (the ISO 16251-1 Clause 8 e) statement of
+results, rated
 per ISO 717-2) and a footer. The applicable `ReportMetadata` fields are
 `specimen` (the floor covering under test), `client`, `manufacturer`,
 `mounting`, `mass_per_area`, `test_room`, `test_date`, `temperature`,
@@ -115,7 +116,7 @@ per ISO 717-2) and a footer. The applicable `ReportMetadata` fields are
 verdict passes at or above it). The bare reference floor is the standardised
 heavyweight floor of ISO 717-2:2020 Table 4, fixed by the standard.
 `verbose=True` adds the reference-floor-with-covering column
-*Ln,r = Ln,r,0 - delta-L*, the derivation basis of *delta-Lw*.
+$L_{n,r} = L_{n,r,0} - \Delta L$, the derivation basis of $\Delta L_w$.
 
 ```python
 from phonometry import building, ReportMetadata
@@ -159,9 +160,9 @@ a straight slope per Formula (C.1), with the steeper Formula (C.3) for
 constructions whose higher internal losses follow the infinite-plate theory:
 
 $$
-\Delta L = 30 \lg \frac{f}{f_0}\ \text{dB (sand/cement, calcium-sulfate screeds)},
+\Delta L = 30 \log_{10} \frac{f}{f_0}\ \text{dB (sand/cement, calcium-sulfate screeds)},
 \qquad
-\Delta L = 40 \lg \frac{f}{f_0}\ \text{dB (asphalt, dry screeds)}.
+\Delta L = 40 \log_{10} \frac{f}{f_0}\ \text{dB (asphalt, dry screeds)}.
 $$
 
 ```python
@@ -186,7 +187,7 @@ print(round(13.0 * np.log10(73.5) - 14.2 * np.log10(8.0) + 20.8, 1))   # 32.2 dB
 ```
 
 The closed-form weighted estimate of Formula (C.4),
-$\Delta L_w = 13\lg m' - 14{,}2\lg s' + 20{,}8$ dB, condenses the same
+$\Delta L_w = 13\log_{10} m' - 14{,}2\log_{10} s' + 20{,}8$ dB, condenses the same
 physics into one line: heavier slabs and softer layers rate better. Both
 estimates are design aids kept deliberately on the safe side (the 30 lg
 slope undercuts the 40 lg infinite-plate theory where experimental data say
@@ -205,7 +206,8 @@ this page, or the full ISO 10140-3 floor, is the reference, and the
   reduction of transmitted impact noise by floor coverings measured using
   ISO 140-8 and ISO/CD 16251-1. *Forum Acusticum 2011, Aalborg* (CSTB).
   The measured textile-carpet improvement spectrum used as the worked
-  example on this page (ΔLw = 29 dB); the per-band ΔL was digitized from its
+  example on this page ($\Delta L_w = 29$ dB); the per-band $\Delta L$ was
+  digitized from its
   Figure 4.
 - International Organization for Standardization. (2014). *Acoustics —
   Laboratory measurement of the reduction of transmitted impact noise by
@@ -217,8 +219,8 @@ this page, or the full ISO 10140-3 floor, is the reference, and the
   Rating of sound insulation in buildings and of building elements — Part 2:
   Impact sound insulation* (ISO 717-2:2020).
   [iso.org catalogue](https://www.iso.org/standard/69867.html).
-  The reference floor Ln,r,0 (Table 4) and the rating engine behind ΔLw,
-  with the Formula (A.4) adaptation term CI,Δ.
+  The reference floor $L_{n,r,0}$ (Table 4) and the rating engine behind
+  $\Delta L_w$, with the Formula (A.4) adaptation term $C_{I,\Delta}$.
 
 - International Organization for Standardization. (2017). *Building acoustics
   — Estimation of acoustic performance of buildings from the performance of
@@ -244,12 +246,12 @@ not a measurement).
   suite this mock-up replaces for soft coverings, and the full-size
   ISO 10140-3 improvement measurement.
 - [Dynamic stiffness of resilient materials (EN 29052-1)](dynamic-stiffness.md):
-  the s' measurement that feeds the floating-floor estimate.
+  the $s'$ measurement that feeds the floating-floor estimate.
 - [Predicting Resilient-Layer Performance](resilient-layers.md): the
   prediction counterpart of this page, from the tapping-machine force model
   to floating floors and wall linings.
 - [Predicting Sound Insulation (EN 12354)](insulation-prediction.md): the
-  impact model whose Formula (21) consumes ΔLw.
+  impact model whose Formula (21) consumes $\Delta L_w$.
 - [Insulation Ratings (ISO 717)](insulation-ratings.md): the reference-curve
   engine behind the weighted improvement.
 - API reference: [`building.floor_covering_improvement`](https://jmrplens.github.io/phonometry/reference/api/building/floor-covering-improvement/).

@@ -70,18 +70,18 @@ y(t) = \frac{1}{\tau} \int_{-\infty}^{t} x^2(\xi)\ e^{-(t-\xi)/\tau}\ d\xi
 $$
 
 un paso-bajo de primer orden sobre la señal al cuadrado. La constante de tiempo
-τ fija el compromiso: **Fast** (125 ms) sigue fluctuaciones del tipo del habla
-y **Slow** (1 s) estabiliza la lectura para ruido cuasi estacionario. Tras un
-escalón, la envolvente alcanza el 63 % de su valor final en un τ y ~99,97 %
-tras 8τ; por eso los análisis de nivel descartan los primeros instantes de una
-grabación.
+$\tau$ fija el compromiso: **Fast** (125 ms) sigue fluctuaciones del tipo del
+habla y **Slow** (1 s) estabiliza la lectura para ruido cuasi estacionario.
+Tras un escalón, la envolvente alcanza el 63 % de su valor final en un $\tau$
+y ~99,97 % tras $8\tau$; por eso los análisis de nivel descartan los primeros
+instantes de una grabación.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_time_weighting_es.svg" alt="La cadena del detector exponencial: la presión de banda se eleva al cuadrado, se suaviza con un paso bajo RC de un polo con constante de tiempo tau y se convierte a decibelios, con las constantes de tiempo Fast, Slow e Impulse indicadas" width="88%" loading="eager" />
 
 ## 2. Las tres ponderaciones temporales
 
-* **Fast (`fast`):** τ = 125 ms. Estándar para fluctuaciones de ruido.
-* **Slow (`slow`):** τ = 1000 ms. Estándar para ruido estacionario.
+* **Fast (`fast`):** $\tau = 125\ \text{ms}$. Estándar para fluctuaciones de ruido.
+* **Slow (`slow`):** $\tau = 1000\ \text{ms}$. Estándar para ruido estacionario.
 * **Impulse (`impulse`):** ponderación temporal **asimétrica**. 35 ms de subida para
   capturar ataques rápidos y 1500 ms de caída para facilitar la lectura.
 
@@ -153,7 +153,7 @@ $$
   niveles percentiles, detección de eventos impulsivos, ruido comunitario,
   la gráfica general de "nivel frente a tiempo". Su constante de 125 ms es
   del mismo orden que el tiempo de integración de sonoridad del propio oído,
-  así que una traza LAF sigue a grandes rasgos lo que un oyente percibe.
+  así que una traza $L_{AF}$ sigue a grandes rasgos lo que un oyente percibe.
 - **Slow** conviene a fuentes cuasi estacionarias y a cualquier
   procedimiento que necesite una lectura estable: promedia el parpadeo de
   una fuente fluctuante al precio de perder los eventos cortos (una ráfaga
@@ -183,7 +183,7 @@ $$
 | :--- | :--- | :--- | :--- | :--- |
 | `x` | array 1D o 2D | presión (cualquier escala) | no vacío | Se eleva al cuadrado internamente; la salida es una envolvente cuadrática media |
 | `fs` | int | Hz | > 0 | |
-| `mode` | str | — | `'fast'` (por defecto), `'slow'`, `'impulse'` | τ = 125 ms / 1 s / ataque de 35 ms + caída de 1,5 s |
+| `mode` | str | — | `'fast'` (por defecto), `'slow'`, `'impulse'` | $\tau$ = 125 ms / 1 s / ataque de 35 ms + caída de 1,5 s |
 | `TimeWeighting(fs, mode)` (clase) | — | — | — | Variante con estado para streaming: `process(x)` conserva el estado del integrador entre bloques |
 
 La salida tiene las unidades de $x^2$: toma `10*log10(y / p0**2)` para SPL o
@@ -296,7 +296,7 @@ Sin numba, un fallback en Python puro produce resultados idénticos, solo que m�
 lento.
 
 Consulta [Niveles integrados y estadísticos](/phonometry/es/guides/levels/)
-para las métricas Leq/LN construidas sobre estas envolventes, y
+para las métricas $L_{eq}$/$L_N$ construidas sobre estas envolventes, y
 [Por qué phonometry](/phonometry/es/reference/why-phonometry/) para la
 verificación con ráfagas de tono de IEC 61672-1.
 

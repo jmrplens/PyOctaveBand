@@ -348,11 +348,12 @@ downstream can fix, because there is no ductwork left after it. Its sound
 power is normally manufacturer data measured to ASHRAE Standard 70, and
 that is what a real sheet uses. When there is none to hand,
 `diffuser_sound_power` is Reynolds's estimate as Long Eqs. 13.27 to 13.33:
-an overall level `L_W = 10 lg S_G + 30 lg xi + 60 lg U_G - 31.3` from the
-face area, the approach velocity `U_G = Q / S_G` and the normalised
-pressure-drop coefficient `xi`, spread over the octaves by the shape
-function `C_D = -11.82 - 0.15 A - 1.13 A^2` (`-5.82` for a round device)
-about the peak band `f_P = 48.8 U_G`.
+an overall level
+$L_W = 10\log_{10} S_G + 30\log_{10}\xi + 60\log_{10} U_G - 31.3$ from the
+face area, the approach velocity $U_G = Q/S_G$ and the normalised
+pressure-drop coefficient $\xi$, spread over the octaves by the shape
+function $C_D = -11.82 - 0.15 A - 1.13 A^2$ ($-5.82$ for a round device)
+about the peak band $f_P = 48.8\,U_G$.
 
 ```python
 from phonometry import diffuser_sound_power
@@ -644,11 +645,12 @@ Those ventilation numbers are blunt: in that duct plane waves are the whole
 story only up to the 250 Hz octave, and a 36 x 24 in supply trunk gives up at
 188 Hz.
 
-At 15 m/s the flow correction is invisible: `M = 0.044` gives
-`sqrt(1 - M^2) = 0.999`, which moves the first cut-on by 0.2 Hz. It earns its
-place in high-speed pipework instead. Norton's problem 7.1 is that case, a
-254 mm line carrying steam (`c = 405 m/s`) at 200 m/s, `M = 0.494`, and there
-the two ladders separate by more than a hundred hertz at every rung.
+At 15 m/s the flow correction is invisible: $M = 0.044$ gives
+$\sqrt{1 - M^2} = 0.999$, which moves the first cut-on by 0.2 Hz. It earns
+its place in high-speed pipework instead. Norton's problem 7.1 is that
+case, a 254 mm line carrying steam ($c = 405$ m/s) at 200 m/s, $M = 0.494$,
+and there the two ladders separate by more than a hundred hertz at every
+rung.
 
 ```python
 import numpy as np

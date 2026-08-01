@@ -58,7 +58,7 @@ dos bandas críticas contiguas (apartado 12, Fórmula 23):
 
 $$
 \mathrm{TNR} = L_t - L_n, \qquad
-\mathrm{PR} = 10\,\lg\!\frac{W_M}{\tfrac{1}{2}(W_L + W_U)}\ \text{dB},
+\mathrm{PR} = 10\,\log_{10}\!\frac{W_M}{\tfrac{1}{2}(W_L + W_U)}\ \text{dB},
 $$
 
 donde $L_t$ es el nivel del tono (la suma en energía de las líneas tonales por
@@ -207,7 +207,7 @@ La biblioteca implementa cuatro evaluaciones de tonalidad, y no son
 intercambiables: cada una pertenece a una norma distinta, con su propio
 objetivo, su entrada y su salida.
 
-| | TNR / PR | Audibilidad tonal `ΔL` | Tonalidad psicoacústica `T` | Audibilidad tonal de aerogeneradores |
+| | TNR / PR | Audibilidad tonal $\Delta L$ | Tonalidad psicoacústica `T` | Audibilidad tonal de aerogeneradores |
 | :--- | :--- | :--- | :--- | :--- |
 | Norma | ECMA-418-1:2024, apartados 11 y 12 | ISO/PAS 20065:2016, adoptada por el Anexo J de ISO 1996-2:2017 | ECMA-418-2:2025, apartado 6 | IEC 61400-11:2012, apartado 9.5 |
 | Pregunta que responde | ¿Es prominente este tono discreto en la emisión de un equipo? | ¿Es audible el tono por encima del ruido que lo enmascara, y en cuánto? | ¿Cuán tonal se percibe el sonido? | ¿Es audible el tono del aerogenerador en la posición de referencia, bin de viento a bin de viento? |
@@ -219,7 +219,7 @@ La tabla se lee como una decisión: la métrica la elige el *objetivo del
 informe*, no la comodidad de la entrada. La declaración de emisión de un
 equipo es un veredicto de prominencia de ECMA-418-1; una queja por un tono de
 una instalación es una evaluación según ISO 1996-2, así que necesita la
-audibilidad `ΔL` que se traduce en `Kt`
+audibilidad $\Delta L$ que se traduce en `Kt`
 (la [guía de audibilidad tonal](/phonometry/es/guides/tone-audibility/)); una
 comparación de productos en la que nadie va a ser sancionado es donde la
 tonalidad de ECMA-418-2 se gana su sitio, porque es una magnitud y no un

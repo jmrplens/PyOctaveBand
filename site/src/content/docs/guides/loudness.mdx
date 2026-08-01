@@ -67,14 +67,14 @@ sounds with the same dB(A) can differ audibly depending on how their energy
 spreads over the ear's **critical bands**. The Zwicker method models the
 hearing chain explicitly (outer/middle-ear transmission, critical-band
 analysis on the 24 Bark scale, level-dependent masking slopes) and outputs
-**loudness N in sones**, a ratio scale: 4 sones is twice as loud as 2 sones.
+**loudness $N$ in sones**, a ratio scale: 4 sones is twice as loud as 2 sones.
 By definition a 1 kHz tone at 40 dB SPL is 1 sone, and every +10 phon
 doubles the sone value.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_zwicker.svg" alt="ISO 532-1 Zwicker loudness chain: 28 one-third-octave band levels, transmission and lower-critical-band grouping, core loudness of the 20 critical bands, specific loudness over Bark, integrated into total loudness N in sones and loudness level in phons" width="78%" loading="eager" />
 
 The animation below shows that integration at work: as the band level of a
-1 kHz narrowband sound steps up, the specific-loudness pattern N'(z) grows
+1 kHz narrowband sound steps up, the specific-loudness pattern $N'(z)$ grows
 along the Bark axis and the area under it is the total loudness in sones.
 
 <Video
@@ -113,7 +113,7 @@ res.plot()   # N'(z) over the Bark scale — the specific-loudness pattern (need
 
 *Same band level, very different loudness: energy spread over many critical
 bands (red) sums to far more sones than the same level concentrated in one
-band (blue). The area under N'(z) is the total loudness.*
+band (blue). The area under $N'(z)$ is the total loudness.*
 
 <details>
 <summary>Show the code for this figure</summary>
@@ -155,7 +155,7 @@ The implementation is a clean-room port of the standard's **normative
 reference program** (Annex A.4): all twelve data tables are digit-exact and
 the full Annex B validation set runs in CI: the stationary test case
 reproduces the published value to every printed digit, and the tone-pulse
-N(t) traces stay inside the standard's per-sample 5 % tolerance band.
+$N(t)$ traces stay inside the standard's per-sample 5 % tolerance band.
 
 ### `loudness_zwicker()` parameters
 
@@ -164,21 +164,22 @@ N(t) traces stay inside the standard's per-sample 5 % tolerance band.
 | `x` | 1D array | Pa (after calibration) | ≥ 8 ms at 48 kHz | Resampled internally to 48 kHz if needed |
 | `fs` | int | Hz | > 0 | |
 | `field` | str | — | `'free'` (default) / `'diffuse'` | Sound-field correction (Table A.5) |
-| `stationary` | bool | — | default `False` | `True`: single N from the averaged spectrum |
+| `stationary` | bool | — | default `False` | `True`: single $N$ from the averaged spectrum |
 | `calibration_factor` | float | Pa per digital unit | default `1.0` | From `sensitivity()` |
 
-Returns a `ZwickerLoudness` dataclass: `loudness` (N, sones), `loudness_level`
-(phon), `specific` (N′(z), 240 bins of 0.1 Bark), and for time-varying runs
+Returns a `ZwickerLoudness` dataclass: `loudness` ($N$, sones), `loudness_level`
+(phon), `specific` ($N'(z)$, 240 bins of 0.1 Bark), and for time-varying runs
 `n5`, `n10`, `time`, `loudness_vs_time` (500 Hz trace).
 
 ### ISO 532-1 report (`.report()`)
 
 `ZwickerLoudness.report(path)` renders a one-page PDF fiche laid out like an
 accredited loudness report: a standard-basis line, an optional metadata header
-block, a compact metrics table (total loudness *N*, loudness level *L*<sub>N</sub>,
-and the *N*<sub>5</sub>/*N*<sub>10</sub> percentiles for a time-varying result)
-beside the specific-loudness pattern *N*′(z) (the result's own `.plot()`), the
-boxed `N = X sone (LN = Y phon)` single number, an optional verdict row and a
+block, a compact metrics table (total loudness $N$, loudness level $L_N$,
+and the $N_5$/$N_{10}$ percentiles for a time-varying result)
+beside the specific-loudness pattern $N'(z)$ (the result's own `.plot()`), the
+boxed $N = X\ \text{sone}$ ($L_N = Y\ \text{phon}$) single number, an optional
+verdict row and a
 footer with the fixed disclaimer. It uses the same `ReportMetadata` container
 and rendering engine as the [ISO 717 insulation fiche](/phonometry/guides/insulation-ratings/#iso-717-report-report);
 a supplied `requirement` is read as the maximum permitted loudness in sone (a
@@ -304,7 +305,7 @@ expects one of the Table 1 frequencies.
 - [Sound Quality Metrics](/phonometry/guides/sound-quality/): sharpness,
   tonality and roughness, the other half of the sound-quality story.
 - [Psychoacoustic annoyance and fluctuation strength](/phonometry/guides/psychoacoustic-annoyance/):
-  the Zwicker and Fastl model that consumes the percentile loudness N5.
+  the Zwicker and Fastl model that consumes the percentile loudness $N_5$.
 - [Theory](/phonometry/reference/theory/perception/): the equations behind the loudness models.
 - API reference: [`psychoacoustics.loudness_zwicker`](/phonometry/reference/api/psychoacoustics/loudness-zwicker/) and [`psychoacoustics.loudness_contours`](/phonometry/reference/api/psychoacoustics/loudness-contours/).
 
@@ -312,7 +313,7 @@ expects one of the Table 1 frequencies.
 
 ### What is the difference between loudness in sones and loudness level in phons?
 
-Loudness N in sones (ISO 532-1) is a ratio scale of perceived loudness: 4 sones is twice as loud as 2 sones, and by definition a 1 kHz tone at 40 dB SPL is 1 sone. Loudness level in phons (ISO 226) is the SPL of an equally loud 1 kHz pure tone, and every +10 phon doubles the sone value.
+Loudness $N$ in sones (ISO 532-1) is a ratio scale of perceived loudness: 4 sones is twice as loud as 2 sones, and by definition a 1 kHz tone at 40 dB SPL is 1 sone. Loudness level in phons (ISO 226) is the SPL of an equally loud 1 kHz pure tone, and every +10 phon doubles the sone value.
 
 ### Over what range are the ISO 226:2023 equal-loudness contours valid?
 

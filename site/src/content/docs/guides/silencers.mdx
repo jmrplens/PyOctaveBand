@@ -51,9 +51,9 @@ enclosures, lives in
 
 A reactive silencer attenuates by *reflecting* sound with impedance
 discontinuities. Each acoustic element is a 2x2 **transfer matrix** relating the
-pressure `p` and volume velocity `Su` at its two ends, and a compound silencer
+pressure $p$ and volume velocity $Su$ at its two ends, and a compound silencer
 is the ordered matrix product of its elements (Bies §8.9). A straight duct of
-length `L` and area `S` is
+length $L$ and area $S$ is
 
 $$
 \begin{bmatrix} \cos kL & j\,\tfrac{\rho c}{S}\sin kL \\[2pt]
@@ -65,7 +65,7 @@ and a side branch of impedance $Z_b$ is the shunt
 $\left[\begin{smallmatrix} 1 & 0 \\ 1/Z_b & 1 \end{smallmatrix}\right]$. The
 **transmission loss** follows from the compound matrix $T$ with the port
 impedances $Z_1 = \rho c/S_\text{in}$ and $Z_n = \rho c/S_\text{out}$
-(Munjal Eq. (3.27); Bies Eq. (8.141) prints the $T_{11}$/$T_{22}$ impedance
+(Munjal Eq. (3.27); Bies Eq. (8.141) prints the `T11`/`T22` impedance
 weights of this formula inverted and fails the sudden-expansion limit, see the
 [errata registry](https://github.com/jmrplens/phonometry/blob/main/docs/ERRATA.md))
 
@@ -154,8 +154,8 @@ to scale and fully dimensioned.
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/expansion_chamber_geometry.svg" alt="To-scale cross-section of the expansion-chamber silencer of the transmission-loss example: a 300 mm long chamber of 225.7 mm equivalent diameter inserted between inlet and outlet pipes of 112.8 mm equivalent diameter, with the chamber length and both diameters dimensioned" width="88%" />
 
 *The chamber behind the curves above, to scale: the areas enter the four-pole
-method only through the ratio `m`, and the drawing uses the equivalent
-circular diameters `d = 2√(S/π)` of the 0.04 and 0.01 m² cross-sections.*
+method only through the ratio $m$, and the drawing uses the equivalent
+circular diameters $d = 2\sqrt{S/\pi}$ of the 0.04 and 0.01 m² cross-sections.*
 
 <details>
 <summary>Show the code for this figure</summary>
@@ -180,11 +180,11 @@ plt.show()
 
 </details>
 
-The clip below runs an m = 4 chamber of the same 0.30 m length in a 2D FDTD
-duct at its two characteristic frequencies. At kL = π the chamber is a
-half-wave resonator and the tone crosses as if it were not there; at kL = π/2
-the two area jumps reflect in phase and send the wave back up the inlet, the
-6.5 dB peak of the four-pole curve above.
+The clip below runs an $m = 4$ chamber of the same 0.30 m length in a 2D FDTD
+duct at its two characteristic frequencies. At $kL = \pi$ the chamber is a
+half-wave resonator and the tone crosses as if it were not there; at
+$kL = \pi/2$ the two area jumps reflect in phase and send the wave back up the
+inlet, the 6.5 dB peak of the four-pole curve above.
 
 <Video
   name="anim_fdtd_expansion_chamber"
@@ -269,8 +269,9 @@ neck only 2 cm long.
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/helmholtz_branch_geometry.svg" alt="To-scale cross-section of the side-branch Helmholtz resonator: a duct of 112.8 mm equivalent diameter with a narrow 11.3 mm neck, 20 mm long, opening into a 1 litre cavity drawn as its equal-volume cube on top of the duct, with the neck diameter, neck length and duct diameter dimensioned" width="88%" />
 
 *The whole 120 Hz notch hangs on a 1 L box and a 2 cm neck: the cavity is
-drawn as its equal-volume cube, and the tuning moves as `√(Sₙ/(l_e V))`, so
-small errors in these dimensions shift the spike off its target.*
+drawn as its equal-volume cube, and the tuning moves as
+$\sqrt{S_n/(l_e V)}$, so small errors in these dimensions shift the spike off
+its target.*
 
 <details>
 <summary>Show the code for this figure</summary>
@@ -298,8 +299,8 @@ same duct.
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/quarter_wave_geometry.svg" alt="To-scale cross-section of the quarter-wave side branch: a closed tube 300 mm long and 50.5 mm in equivalent diameter standing on a duct of 112.8 mm equivalent diameter, with the tube length, tube diameter and duct diameter dimensioned" width="88%" />
 
 *A quarter-wave stub is just a closed tube of the right length: 0.3 m of
-pipe puts the spike at `c/4l_e ≈ 285 Hz`, and the 20 cm² branch area only
-sets how strongly the stub loads the duct.*
+pipe puts the spike at $c/4l_e \approx 285\ \text{Hz}$, and the 20 cm² branch
+area only sets how strongly the stub loads the duct.*
 
 <details>
 <summary>Show the code for this figure</summary>

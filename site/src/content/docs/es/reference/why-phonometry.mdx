@@ -30,9 +30,9 @@ semiplano izquierdo ($s = -1/\tau$).
 
 | | phonometry | python-acoustics |
 | :--- | :--- | :--- |
-| Salida | Envolvente continua con ponderación temporal (un valor por muestra) | Salida escalonada (un valor cada τ segundos) |
+| Salida | Envolvente continua con ponderación temporal (un valor por muestra) | Salida escalonada (un valor cada $\tau$ segundos) |
 | Unidades de entrada | Presión acústica cruda (Pa); se eleva al cuadrado internamente | Se espera la magnitud energética (Pa²) como entrada |
-| Filtro | Promediado exponencial estable (polo en $s=-1/\tau$) | Diseño teóricamente inestable (polo en el semiplano derecho) estabilizado reiniciando el estado cada τ segundos |
+| Filtro | Promediado exponencial estable (polo en $s=-1/\tau$) | Diseño teóricamente inestable (polo en el semiplano derecho) estabilizado reiniciando el estado cada $\tau$ segundos |
 | Comportamiento | Ponderación temporal IEC verdadera | Más cercano a un integrador por bloques ($L_{eq,\tau}$) |
 
 Un polo en el eje real negativo corresponde a una respuesta al impulso
@@ -82,7 +82,7 @@ de la Tabla 4 (discontinua) dentro de 0,1 dB para ráfagas de 200/50/10 ms.*
 - Si necesitas **envolventes Fast/Slow/Impulse conformes con la norma**
   (comportamiento de sonómetro, un nivel por muestra), usa
   [`time_weighting`](/phonometry/es/guides/time-weighting/) de phonometry.
-- Si necesitas un **Leq promediado por bloques por intervalo**, esa es una
+- Si necesitas un **$L_{eq}$ promediado por bloques por intervalo**, esa es una
   métrica distinta e igualmente válida; puedes calcularla con
   [`leq`](/phonometry/es/guides/levels/) sobre segmentos consecutivos.
 - Ambos enfoques son útiles; simplemente responden preguntas distintas. La
@@ -101,11 +101,11 @@ metrología:
 | Norma | Qué se verifica | Archivo de test |
 | :--- | :--- | :--- |
 | IEC 61672-1:2013 Tabla 3 | Ponderación A/C/Z en las 34 frecuencias nominales, límites de clase 1, a 48 y 96 kHz | `tests/metrology/test_iec_weighting_table3.py` |
-| IEC 61672-1:2013 Tabla 4 | Respuestas F/S a ráfagas de tono (de 1 s a 1 ms) y la columna LAE para `sel()` | `tests/metrology/test_iec_compliance.py` |
+| IEC 61672-1:2013 Tabla 4 | Respuestas F/S a ráfagas de tono (de 1 s a 1 ms) y la columna $L_{AE}$ para `sel()` | `tests/metrology/test_iec_compliance.py` |
 | IEC 61672-1:2013 Tabla 5 | Respuestas de pico de un ciclo/medio ciclo de `lc_peak()`, límites de clase 1 | `tests/metrology/test_levels.py` |
 | IEC 61260-1:2014 Tabla 1 | Límites de aceptación de clase 1/2 del banco de filtros mediante `verify_filter_class()` | `tests/metrology/test_compliance.py` |
 | ISO 7196:1995 Tabla 2 | Ponderación G (infrasonidos) en todos los valores nominales de respuesta, 0,25–315 Hz | `tests/metrology/test_g_weighting.py` |
-| ISO 226:2023 Tabla 1 y Anexo B | Líneas isofónicas y niveles de sonoridad frente a las tablas del Anexo B, umbral de audición frente a los parámetros `T_f` de la Tabla 1 | `tests/psychoacoustics/test_loudness_contours.py` |
+| ISO 226:2023 Tabla 1 y Anexo B | Líneas isofónicas y niveles de sonoridad frente a las tablas del Anexo B, umbral de audición frente a los parámetros $T_f$ de la Tabla 1 | `tests/psychoacoustics/test_loudness_contours.py` |
 | ECMA-418-1:2024 | Prominencia tonal TNR/PR: anchos de banda críticos, separación de proximidad y criterios de prominencia frente a los ejemplos resueltos de los apartados 10–12 | `tests/psychoacoustics/test_tonality.py` |
 | ISO 1996-1:2016 | `lden()`, `ldn()` y `composite_rating_level()` frente a valores de las fórmulas calculados a mano | `tests/environmental/test_environmental.py` |
 | IEC 60942:2017 Tabla 2 | Límites de estabilidad a corto plazo del calibrador (dependientes de la frecuencia, clase 1) en `sensitivity()` | `tests/metrology/test_calibration_validation.py` |

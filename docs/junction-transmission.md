@@ -14,7 +14,7 @@ reflected and transmitted *bending* waves, with no conversion to in-plane
 waves, and the resulting coefficients are **independent of frequency**. That is
 what makes them convenient closed-form inputs for statistical energy analysis
 (SEA) and for the EN 12354 flanking-transmission model, where they feed the
-coupling loss factor `ηij` and the vibration reduction index `Kij`.
+coupling loss factor $\eta_{ij}$ and the vibration reduction index $K_{ij}$.
 
 The object itself first: a T-junction where a 140 mm concrete floor runs into
 a continuous 200 mm wall. A `junction_transmission` result retains its plates,
@@ -61,19 +61,27 @@ plt.show()
 
 ## 1. Wave parameters χ and ψ (Eqs 5.10, 5.11)
 
-With plate `i` of thickness `h_i`, quasi-longitudinal wave speed `cL_i` and
-surface density `ρs_i`, the whole family of coefficients depends on just two
-dimensionless ratios (Cremer et al. 1973):
+With plate $i$ of thickness $h_i$, quasi-longitudinal wave speed $c_{L,i}$ and
+surface density $\rho_{s,i}$, the whole family of coefficients depends on just
+two dimensionless ratios (Cremer et al. 1973):
 
-```
-χ = kB2 / kB1 = (ρs2 B1 / (ρs1 B2))**0.25 = sqrt(h1 cL1 / (h2 cL2)) = sqrt(fc2 / fc1)
-ψ = B2 kB2**2 / (B1 kB1**2) = (h2 cL2 ρs2) / (h1 cL1 ρs1) = (ρs2 fc1) / (ρs1 fc2)
-```
+$$
+\chi = \frac{k_{B2}}{k_{B1}}
+     = \left(\frac{\rho_{s2} B_1}{\rho_{s1} B_2}\right)^{1/4}
+     = \sqrt{\frac{h_1 c_{L1}}{h_2 c_{L2}}}
+     = \sqrt{\frac{f_{c2}}{f_{c1}}}
+$$
 
-`χ` is the ratio of the plates' bending wavenumbers (equivalently the square
+$$
+\psi = \frac{B_2 k_{B2}^2}{B_1 k_{B1}^2}
+     = \frac{h_2 c_{L2} \rho_{s2}}{h_1 c_{L1} \rho_{s1}}
+     = \frac{\rho_{s2} f_{c1}}{\rho_{s1} f_{c2}}
+$$
+
+$\chi$ is the ratio of the plates' bending wavenumbers (equivalently the square
 root of their critical-frequency ratio) and sets the total-internal-reflection
-cut-off angle `θco = arcsin(χ)`; `ψ` is the ratio of their bending-moment
-mobilities. For **identical plates** both are 1.
+cut-off angle $\theta_\text{co} = \arcsin\chi$; $\psi$ is the ratio of their
+bending-moment mobilities. For **identical plates** both are 1.
 
 ```python
 from phonometry import junction_wave_parameters
@@ -85,22 +93,28 @@ chi, psi = junction_wave_parameters(0.1, 3200.0, 240.0, 0.2, 3200.0, 480.0)
 ## 2. Transmission around a corner and across a straight section
 
 For an incident wave on plate 1, transmission **around the corner** (into the
-perpendicular plate 2) is `τ12(θ)` (Eq. 5.12), and transmission **across the
-straight section** (into the collinear plate 3, X- and T-junction (1) only) is
-`τ13(θ)` (Eq. 5.13):
+perpendicular plate 2) is $\tau_{12}(\theta)$ (Eq. 5.12), and transmission
+**across the straight section** (into the collinear plate 3, X- and
+T-junction (1) only) is $\tau_{13}(\theta)$ (Eq. 5.13):
 
-```
-              0.5 J1 J2 ψ cos θ sqrt(χ² − sin²θ)
-τ12(θ) = ─────────────────────────────────────────────────── ,   χ ≥ sin θ
-          (J2 ψ)² + χ² + J2 ψ ( sqrt((1+sin²θ)(χ²+sin²θ))
-                              + sqrt((1−sin²θ)(χ²−sin²θ)) )
+$$
+\tau_{12}(\theta) =
+\frac{0.5\,J_1 J_2 \psi \cos\theta \sqrt{\chi^2 - \sin^2\theta}}
+     {(J_2\psi)^2 + \chi^2
+      + J_2\psi\left(\sqrt{(1+\sin^2\theta)(\chi^2+\sin^2\theta)}
+      + \sqrt{(1-\sin^2\theta)(\chi^2-\sin^2\theta)}\right)},
+\qquad \chi \ge \sin\theta
+$$
 
-τ12(θ) = 0 ,   χ < sin θ   (no propagating transmitted wave beyond the cut-off)
-```
+$$
+\tau_{12}(\theta) = 0, \qquad \chi < \sin\theta
+$$
 
-The junction constants `J1`, `J2`, `J3` select the geometry:
+(no propagating transmitted wave beyond the cut-off).
 
-| Junction | `J1` | `J2` | `J3` |
+The junction constants $J_1$, $J_2$, $J_3$ select the geometry:
+
+| Junction | $J_1$ | $J_2$ | $J_3$ |
 |---|---|---|---|
 | X | 1 | 1 | 1 |
 | T-junction (1) | 2 | 0.5 | 0.5 |
@@ -127,8 +141,8 @@ tau13 = straight_transmission_coefficient(theta, chi, psi, "X")
 The clip below runs this experiment in the time domain with the library's 2D
 [elastic FDTD solver](elastic-waves.md): a bending packet on a 10 mm steel plate reaches an
 L-junction with an identical plate, and the corner splits it into the
-reflected and transmitted waves this section prices at `τ12(0°) = 0.5`. The
-fast in-plane precursor racing down the receiving plate is the mode
+reflected and transmitted waves this section prices at $\tau_{12}(0°) = 0.5$.
+The fast in-plane precursor racing down the receiving plate is the mode
 conversion the pinned-junction model deliberately leaves out.
 
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anim_elastic_plate_junction_dark.gif"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anim_elastic_plate_junction.gif" alt="Animation: a 4 kHz bending-wave packet travels along a 10 mm steel plate in a 2D elastic FDTD field; on a straight control plate it runs on and nothing returns, while at an L-junction with an identical perpendicular plate it splits into a reflected packet, a transmitted bending wave descending the vertical plate and a faster in-plane precursor, with the closed-form junction transmission coefficient of 0.50 at normal incidence and the diffuse vibration reduction index of 5.2 dB annotated" width="640" height="360" loading="lazy"></picture>
@@ -138,20 +152,22 @@ conversion the pinned-junction model deliberately leaves out.
 ## 3. Diffuse-field angular average (Eq. 5.6)
 
 In a diffuse vibration field every angle of incidence is equally probable and
-the incident intensity carries a `cos θ` obliquity factor, so the average
+the incident intensity carries a $\cos\theta$ obliquity factor, so the average
 transmission coefficient is
 
-```
-τ̄ij = ∫₀^{π/2} τij(θ) cos θ dθ
-```
+$$
+\bar{\tau}_{ij} = \int_0^{\pi/2} \tau_{ij}(\theta)\cos\theta\,\mathrm{d}\theta
+$$
 
-(the `cos θ` weight already normalises the average). For **identical plates**
-the algebra collapses to exact fractions that serve as the library's
+(the $\cos\theta$ weight already normalises the average). For **identical
+plates** the algebra collapses to exact fractions that serve as the library's
 first-principles oracle:
 
-* X-junction corner and straight: `τij(θ) = cos²θ / 8`, so `τ̄ij = 1/12`;
-* L-junction corner: `τij(θ) = cos²θ / 2`, so `τ̄ij = 1/3`;
-* in-line junction: `τ12(0°) = 1` (a continuous plate transmits fully).
+* X-junction corner and straight: $\tau_{ij}(\theta) = \cos^2\theta / 8$, so
+  $\bar{\tau}_{ij} = 1/12$;
+* L-junction corner: $\tau_{ij}(\theta) = \cos^2\theta / 2$, so
+  $\bar{\tau}_{ij} = 1/3$;
+* in-line junction: $\tau_{12}(0°) = 1$ (a continuous plate transmits fully).
 
 ```python
 from phonometry import angular_average_transmission_coefficient
@@ -161,29 +177,32 @@ angular_average_transmission_coefficient(1.0, 1.0, "L", section="corner")  # 1/3
 ```
 
 The two directions obey the SEA consistency relationship (Eq. 5.7),
-`τ̄12 = χ · τ̄21`, so only one direction needs to be computed.
+$\bar{\tau}_{12} = \chi\,\bar{\tau}_{21}$, so only one direction needs to be
+computed.
 
 ## 4. Coupling loss factor and vibration reduction index
 
 The angular average is the bridge to the two junction descriptors used in
-SEA-based building models. The **coupling loss factor** (Eq. 2.154) for a source
-plate `i` of area `S_i`, bending-wave group velocity `cg_i` and junction length
-`L_ij` is
+SEA-based building models. The **coupling loss factor** (Eq. 2.154) for a
+source plate $i$ of area $S_i$, bending-wave group velocity $c_{g,i}$ and
+junction length $L_{ij}$ is
 
-```
-ηij = cg_i L_ij τij / (2 π² f S_i)
-```
+$$
+\eta_{ij} = \frac{c_{g,i} L_{ij} \tau_{ij}}{2\pi^2 f S_i}
+$$
 
 and the wave-approach **vibration reduction index** (Eq. 5.116) is
 
-```
-Kij = 10 lg(1 / τij) + 5 lg(fc_j / f_ref),   f_ref = 1000 Hz
-```
+$$
+K_{ij} = 10\log_{10}(1/\tau_{ij}) + 5\log_{10}(f_{c,j}/f_\text{ref}),
+\qquad f_\text{ref} = 1000\ \text{Hz}
+$$
 
-with `fc_j` the critical frequency of the *receiving* plate. Combined with the
-Eq. 5.7 reciprocity this form is symmetric, `Kij = Kji`, as EN 12354 requires
-of the junction descriptor. For the identical 100 mm concrete X-junction
-(`fc ≈ 203 Hz`), `Kij = 10 lg 12 + 5 lg(203 / 1000) ≈ 7.3 dB`.
+with $f_{c,j}$ the critical frequency of the *receiving* plate. Combined with
+the Eq. 5.7 reciprocity this form is symmetric, $K_{ij} = K_{ji}$, as EN 12354
+requires of the junction descriptor. For the identical 100 mm concrete
+X-junction ($f_c \approx 203\ \text{Hz}$),
+$K_{ij} = 10\log_{10} 12 + 5\log_{10}(203/1000) \approx 7.3\ \text{dB}$.
 
 ```python
 from phonometry import (coupling_loss_factor, junction_transmission,
@@ -199,7 +218,7 @@ kij = res.corner_reduction_index  # the same, precomputed on the result
 res.plot()   # tau(theta) for this junction's corner and straight paths (needs matplotlib)
 ```
 
-`Kij` is also what ISO 10848 measures on a built junction: excite one
+$K_{ij}$ is also what ISO 10848 measures on a built junction: excite one
 element, read the velocity level difference on both, and normalize by the
 junction length, so the closed-form value above has a direct experimental
 counterpart.
@@ -247,7 +266,7 @@ plt.show()
 
 The number this page predicts is exactly what the EN 12354-1 flanking model
 consumes. Take the 100 mm / 200 mm concrete X-junction from the figure at
-the top: its corner path gives `K12 = 9.8` dB. Handing that to
+the top: its corner path gives $K_{12} = 9.8\ \text{dB}$. Handing that to
 `flanking_element` in place of a tabulated Annex E value prices the
 junction's three flanking paths and their effect on the apparent rating:
 
@@ -268,11 +287,11 @@ print(round(pred.r_prime_w, 1))                      # 55.4  (Rw 57 direct)
 print(pred.dominant.label, round(pred.dominant.fraction, 2))   # Dd 0.68
 ```
 
-One junction with a moderate `Kij` already trims 1.6 dB off the direct
-`Rw = 57 dB`; a full building repeats this for every junction, which is the
-[EN 12354 prediction guide](insulation-prediction.md).
+One junction with a moderate $K_{ij}$ already trims 1.6 dB off the direct
+$R_w = 57\ \text{dB}$; a full building repeats this for every junction, which
+is the [EN 12354 prediction guide](insulation-prediction.md).
 
-The measured, EN 12354 counterpart of `Kij` (from the direction-averaged
+The measured, EN 12354 counterpart of $K_{ij}$ (from the direction-averaged
 velocity level difference) is the separate
 [laboratory flanking-transmission](flanking-lab.md) `vibration_reduction_index`; this
 guide is the closed-form *predicted* value from the wave approach.
@@ -285,22 +304,27 @@ adhesives - are not tractable that way, and the **experimental** route inverts
 the steady-state SEA power balance from *measured* subsystem energies instead
 (Norton & Karczub 2003, Sections 6.3.3 and 6.3.4). For two subsystems,
 
-```
-Pi_1 = omega [ (eta_1 + eta_12) E_1 - eta_21 E_2 ]         (6.10)
-0    = omega [ (eta_2 + eta_21) E_2 - eta_12 E_1 ]         (6.11)
-```
+$$
+\Pi_1 = \omega\left[(\eta_1 + \eta_{12})\,E_1 - \eta_{21}\,E_2\right]
+\quad (6.10)
+$$
 
-with `E_i = M_i <v_i²>` the band energy of subsystem `i` (its mass times the
-space- and time-averaged mean-square velocity). Drive subsystem 1 only, add the
-SEA consistency (reciprocity) relationship `n_1 eta_12 = n_2 eta_21` (Eq. 6.8),
-and both coupling loss factors follow from the two measured energies
-(Eq. 6.15):
+$$
+0 = \omega\left[(\eta_2 + \eta_{21})\,E_2 - \eta_{12}\,E_1\right]
+\quad (6.11)
+$$
 
-```
-eta_12 = eta_2 E_2 / (E_1 - E_2 n_1/n_2)
-eta_21 = eta_12 n_1 / n_2
-Pi_in  = omega (eta_1 E_1 + eta_2 E_2)
-```
+with $E_i = M_i \langle v_i^2 \rangle$ the band energy of subsystem $i$ (its
+mass times the space- and time-averaged mean-square velocity). Drive
+subsystem 1 only, add the SEA consistency (reciprocity) relationship
+$n_1\eta_{12} = n_2\eta_{21}$ (Eq. 6.8), and both coupling loss factors follow
+from the two measured energies (Eq. 6.15):
+
+$$
+\eta_{12} = \frac{\eta_2 E_2}{E_1 - E_2\,n_1/n_2}, \qquad
+\eta_{21} = \eta_{12}\,\frac{n_1}{n_2}, \qquad
+\Pi_\text{in} = \omega\,(\eta_1 E_1 + \eta_2 E_2)
+$$
 
 The input power collapses to the total dissipated power, as it must in the
 steady state: substituting Eq. (6.11) into Eq. (6.10) cancels the two coupling
@@ -311,8 +335,8 @@ Norton Section 6.4.1 alongside it: `flat_plate_modal_density` (Eq. 6.25),
 `bar_modal_density` (6.23), `beam_modal_density` (6.24) and
 `cylindrical_shell_modal_density` (6.27 to 6.29, the Szechenyi approximations
 in three regimes about the `ring_frequency` of Eq. 6.26). The flat-plate
-expression `n(f) = S sqrt(12) / (2 cL t)` is the same quantity as EN 12354-4's
-`n = pi S fc / c0²` used by the [flanking model](flanking-lab.md), only
+expression $n(f) = S\sqrt{12}/(2 c_L t)$ is the same quantity as EN 12354-4's
+$n = \pi S f_c / c_0^2$ used by the [flanking model](flanking-lab.md), only
 parametrised by the plate itself rather than by its critical frequency.
 
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/experimental_sea_clf_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/experimental_sea_clf.svg" alt="Two-panel figure. Left panel: coupling loss factor on a logarithmic axis against the octave bands from 125 hertz to 2 kilohertz for two aluminium plates at right angles, with the welded line junction falling from about 3 times 10 to the minus 3 to 8 times 10 to the minus 4 as one over the square root of frequency, the twelve-bolt point connection falling twice as steeply from about 1.4 times 10 to the minus 2 to 9 times 10 to the minus 4 as one over frequency, and a dashed horizontal line marking an internal loss factor of 10 to the minus 2. Right panel: a bar chart of the four loss factors of a satellite platform and cylinder in the 500 hertz octave on a logarithmic axis, the internal loss factors 4.40 times 10 to the minus 3 and 2.40 times 10 to the minus 3 clearly above the coupling loss factors 4.26 times 10 to the minus 4 and 3.91 times 10 to the minus 4, with the injected power of 1.31 watts annotated" width="92%"></picture>
@@ -384,30 +408,30 @@ normally compared against.
 of a right-angle plate junction without any angular integration (Eqs. 6.53 to
 6.55, after Bies & Hamid and Cremer et al.); feeding it to
 `coupling_loss_factor` reproduces Norton Eq. (6.52) identically, because that
-equation and Hopkins Eq. (2.154) are the same expression once `cg = 2 cB`. And
-`point_connection_coupling_loss_factor` covers plates joined at `N` discrete
-points instead of along a line (Eq. 6.56). Which one applies is decided by the
-bending wavelength: use the point form when it is shorter than the joint
-length, and the line form when it is longer. The two differ in slope as well as
-in level, `1/f` against `1/sqrt(f)`, so bolting and welding are not
-interchangeable across the spectrum.
+equation and Hopkins Eq. (2.154) are the same expression once $c_g = 2 c_B$.
+And `point_connection_coupling_loss_factor` covers plates joined at $N$
+discrete points instead of along a line (Eq. 6.56). Which one applies is
+decided by the bending wavelength: use the point form when it is shorter than
+the joint length, and the line form when it is longer. The two differ in slope
+as well as in level, $1/f$ against $1/\sqrt{f}$, so bolting and welding are
+not interchangeable across the spectrum.
 
 When no independent value of the internal loss factors is available, the
 single-drive inversion is underdetermined, and the classical **power-injection
 method** drives each subsystem in turn while measuring both energies each time.
-That gives four equations for `eta_1`, `eta_2`, `eta_12` and `eta_21` with no
-prior assumption at all, which `power_injection_matrix` solves band by band.
-Reciprocity then becomes a *check* on the measurement rather than an input:
-`modal_density_ratio` compares the measured `eta_21/eta_12` against the
-`n_1/n_2` computed from the geometry, and a large disagreement means the
-subsystem boundaries were drawn in the wrong place.
+That gives four equations for $\eta_1$, $\eta_2$, $\eta_{12}$ and $\eta_{21}$
+with no prior assumption at all, which `power_injection_matrix` solves band by
+band. Reciprocity then becomes a *check* on the measurement rather than an
+input: `modal_density_ratio` compares the measured $\eta_{21}/\eta_{12}$
+against the $n_1/n_2$ computed from the geometry, and a large disagreement
+means the subsystem boundaries were drawn in the wrong place.
 
 ## See also
 
 - [Predicting Sound Insulation (EN 12354)](insulation-prediction.md): the
-  flanking model that consumes `Kij` junction by junction.
+  flanking model that consumes $K_{ij}$ junction by junction.
 - [Laboratory Flanking Transmission (ISO 10848)](flanking-lab.md): the
-  measurement of `Kij` from velocity level differences, the empirical
+  measurement of $K_{ij}$ from velocity level differences, the empirical
   counterpart of this page's closed forms.
 - [Structure-borne sound power of equipment (EN 15657)](structure-borne-power.md):
   the source power that these junction transmissions carry through a building.

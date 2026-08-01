@@ -149,12 +149,12 @@ función a `weighted_rating`, de modo que cada banda quede alineada índice a
 | `l1` | array 1D o 2D | dB | uno/banda, o `(posiciones, bandas)` | Niveles del recinto emisor (2D se promedia en energía) |
 | `l2` | array 1D o 2D | dB | mismo número de bandas | Niveles del recinto receptor |
 | `t2` | array 1D | s | > 0, uno por banda | Tiempo de reverberación del recinto receptor |
-| `area` | float, opcional | m² | > 0, con `volume` | Superficie del cerramiento `S` (habilita `R'`) |
-| `volume` | float, opcional | m³ | > 0, con `area` | Volumen del recinto receptor `V` |
-| `t0` | float | s | por defecto `0.5` | Tiempo de reverberación de referencia `T0` |
+| `area` | float, opcional | m² | > 0, con `volume` | Superficie del cerramiento $S$ (habilita $R'$) |
+| `volume` | float, opcional | m³ | > 0, con `area` | Volumen del recinto receptor $V$ |
+| `t0` | float | s | por defecto `0.5` | Tiempo de reverberación de referencia $T_0$ |
 `airborne_insulation()` devuelve un `AirborneInsulationResult` (`d`, `dnt`,
 `r_prime` o `None`). El motor de curva de referencia que convierte cualquiera
-de esos espectros en `Rw`, `R'w` o `DnT,w`, sus términos de adaptación
+de esos espectros en $R_w$, $R'_w$ o $D_{nT,w}$, sus términos de adaptación
 espectral y sus variantes de rango ampliado están en
 [Índices globales de aislamiento (ISO 717)](/phonometry/es/guides/insulation-ratings/).
 
@@ -206,8 +206,8 @@ print(building.weighted_impact_rating(octave).rating)  # 54
 ```
 
 Pasa el `l_n_t` (o `l_n`) de `impact_insulation` directamente a
-`weighted_impact_rating`; el índice y `CI` reproducen los valores del Anexo C de
-ISO 717-2 (tercios `L'nT,w = 79`, `CI = −11`; octava `54`, `CI = 0`).
+`weighted_impact_rating`; el índice y $C_I$ reproducen los valores del Anexo C
+de ISO 717-2 (tercios $L'_{nT,w} = 79$, $C_I = -11$; octava 54, $C_I = 0$).
 
 ### Parámetros de `impact_insulation()`
 
@@ -215,8 +215,8 @@ ISO 717-2 (tercios `L'nT,w = 79`, `CI = −11`; octava `54`, `CI = 0`).
 | :--- | :--- | :--- | :--- | :--- |
 | `li` | array 1D o 2D | dB | uno/banda, o `(posiciones, bandas)` | SPL de impactos promediado en energía (2D se promedia sobre las posiciones) |
 | `t2` | array 1D | s | > 0, uno por banda | Tiempo de reverberación del recinto receptor |
-| `volume` | float, opcional | m³ | > 0 | `V` del recinto receptor (habilita `L'n`) |
-| `t0` | float | s | por defecto `0.5` | Tiempo de reverberación de referencia `T0` |
+| `volume` | float, opcional | m³ | > 0 | $V$ del recinto receptor (habilita $L'_n$) |
+| `t0` | float | s | por defecto `0.5` | Tiempo de reverberación de referencia $T_0$ |
 
 `impact_insulation()` devuelve un `ImpactInsulationResult` (`l_n_t`, `l_n` o
 `None`); el lado ISO 717-2 de la cadena está en
@@ -439,10 +439,10 @@ plt.show()
 | `measurand` | str | — | `'airborne'` / `'impact'` / `'impact_reduction'` | Selecciona la Tabla 2 / 4 / 6 |
 | `quantity` | str | — | `'r_w'`, `'ln_w'`, `'delta_lw'` (+ alias, variantes `+c`/`+ctr`) | Descriptor de un solo número |
 | `situation` | str | — | `'A'` / `'B'` / `'C'` | Situación de medición (Cláusula 5.2) |
-| `value` | float | dB | — | Mejor estimación `y` a la que adjuntar `U` |
+| `value` | float | dB | — | Mejor estimación $y$ a la que adjuntar $U$ |
 | `coverage` | float | — | por defecto `0.95` | Nivel de confianza (Tabla 8) |
 | `one_sided` | bool | — | por defecto `False` | Factor unilateral para verificaciones de conformidad |
-| `upper_limit` | bool | — | por defecto `False` | Selecciona el límite superior σR95 (ruido aéreo, situación A) |
+| `upper_limit` | bool | — | por defecto `False` | Selecciona el límite superior $\sigma_{R95}$ (ruido aéreo, situación A) |
 
 `band_uncertainty()` devuelve una `BandUncertainty` (`frequencies`,
 `uncertainties`, `.to_arrays()`); `single_number_uncertainty()` un float;

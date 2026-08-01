@@ -116,7 +116,7 @@ La implementación sigue exactamente los polos/ceros de la Tabla 1 de ISO 7196 y
 se verifica en CI contra todos los valores nominales de respuesta de la Tabla 2
 (0,25 Hz a 315 Hz). `WeightingFilter(fs, "G")` admite el mismo procesado
 multicanal y por bloques que A/C. Los niveles medidos con la curva G se
-expresan como L<sub>pG</sub> (o L<sub>Geq</sub> para el nivel equivalente).
+expresan como $L_{pG}$ (o $L_{Geq}$ para el nivel equivalente).
 
 ## 2. Curvas históricas y de propósito especial: B, D y AU
 
@@ -248,7 +248,7 @@ El ultrasonido solo llega a un filtro digital si la frecuencia de muestreo lo
 captura, así que mide a 96 kHz o más (a 48 kHz no hay nada por encima de
 24 kHz que rechazar); el diseño AU sobremuestrea internamente hacia 288 kHz
 para mantener preciso el corte abrupto de U. Los niveles se expresan como
-L<sub>AU</sub>. La implementación sigue exactamente las posiciones de polos
+$L_{AU}$. La implementación sigue exactamente las posiciones de polos
 de la Tabla 2 (reproducen todos los valores nominales de la Tabla 1 dentro
 de 0,05 dB) y se verifica en CI contra las tolerancias de la Tabla 1 hasta
 40 kHz.

@@ -70,8 +70,8 @@ la respuesta medida, como post-proceso.
 
 ## 1. Pares complementarios de Golay
 
-Un par de Golay son dos secuencias binarias `a`, `b` de longitud `L = 2**n`,
-construidas con una recursión de dos líneas - anexar `b` a `a`, y `-b` a `a`
+Un par de Golay son dos secuencias binarias $a$, $b$ de longitud $L = 2^n$,
+construidas con una recursión de dos líneas - anexar $b$ a $a$, y $-b$ a $a$
 (Havelock, Parte I, Cap. 6, Ec. (1)). Su propiedad definitoria es
 *algebraica*, no aproximada: las dos autocorrelaciones periódicas suman
 
@@ -81,10 +81,10 @@ $$
 $$
 
 una delta exacta (Ec. (2)). La autocorrelación de una MLS tiene un residuo
-`-1` en cada retardo no nulo; los lóbulos laterales de Golay se cancelan
-idénticamente. La medición emite cada código por turnos - reproducir `a`
+$-1$ en cada retardo no nulo; los lóbulos laterales de Golay se cancelan
+idénticamente. La medición emite cada código por turnos - reproducir $a$
 periódicamente, grabar un período en régimen estacionario, y lo mismo con
-`b` - y suma las dos correlaciones cruzadas circulares (Ec. (4)): para un
+$b$ - y suma las dos correlaciones cruzadas circulares (Ec. (4)): para un
 sistema lineal e invariante en el tiempo sin ruido, la respuesta al impulso
 vuelve con precisión de máquina, una identidad de forma cerrada que los tests
 y el [informe de conformidad](/phonometry/es/reference/conformance/) fijan
@@ -114,7 +114,7 @@ ir.plot(language="es")
 
 *La recuperación de Golay de la respuesta al impulso de un sistema paso
 banda: la suma de las correlaciones complementarias cae sobre la respuesta
-verdadera con precisión de máquina (error máximo 2·10⁻¹⁴ aquí), la
+verdadera con precisión de máquina (error máximo $2\cdot10^{-14}$ aquí), la
 identidad de forma cerrada que fijan los tests.*
 
 <details>
@@ -178,7 +178,7 @@ de Xiang) - el precio de la complementariedad exacta.
 La energía de un barrido en una frecuencia dada puede fijarse de dos maneras:
 con su amplitud, o con *cuánto tiempo permanece en ella*. La síntesis en el
 dominio de la frecuencia de Mueller y Massarani (Secs. 4.2-4.3) usa la
-segunda palanca: definir la magnitud objetivo `|H(f)|`, hacer crecer el
+segunda palanca: definir la magnitud objetivo $|H(f)|$, hacer crecer el
 retardo de grupo en proporción a la potencia del objetivo,
 
 $$
@@ -291,7 +291,7 @@ banda.
 ## 3. Inversión espectral regularizada
 
 Ecualizar con una respuesta medida significa invertirla, y un recíproco puro
-`1/H(f)` estalla allí donde el sistema radia poca energía - un valle en
+$1/H(f)$ estalla allí donde el sistema radia poca energía - un valle en
 banda, todo lo que queda fuera de banda - convirtiendo el ecualizador en un
 amplificador de ruido. Mueller y Massarani confinan la inversión con un paso
 banda (Secs. 3.1, 4.5); la forma general de ese confinamiento es la
@@ -301,12 +301,13 @@ $$
 H_{inv}(f) = \frac{H^*(f)}{|H(f)|^2 + \varepsilon(f)},
 $$
 
-con `ε(f)` pequeña dentro de la banda a ecualizar y grande fuera. En banda,
-la magnitud ecualizada `|H·H_inv|` se desvía de la unidad exactamente en
-`ε/(|H|² + ε)` - una forma cerrada que la suite de conformidad comprueba bin
-a bin - y fuera de banda la ganancia del filtro nunca puede superar
-`1/(2·√ε)`, el máximo analítico de `x/(x² + ε)`. Un retardo de modelado de
-medio bloque del filtro hace causal la inversa, en general anticausal, de una
+con $\varepsilon(f)$ pequeña dentro de la banda a ecualizar y grande fuera. En
+banda, la magnitud ecualizada $|H \cdot H_{inv}|$ se desvía de la unidad
+exactamente en $\varepsilon/(|H|^2 + \varepsilon)$ - una forma cerrada que la
+suite de conformidad comprueba bin a bin - y fuera de banda la ganancia del
+filtro nunca puede superar $1/(2\sqrt{\varepsilon})$, el máximo analítico de
+$x/(x^2 + \varepsilon)$. Un retardo de modelado de medio bloque del filtro hace
+causal la inversa, en general anticausal, de una
 respuesta de fase mixta (Kirkeby y Nelson, Sec. 2.4).
 
 ```python
@@ -366,7 +367,7 @@ plt.show()
 
 </details>
 
-Ambos niveles de regularización son fracciones del pico de `|H|²`,
+Ambos niveles de regularización son fracciones del pico de $|H|^2$,
 generalizando la `regularization` escalar de `impulse_response`:
 `regularization_inside` (por defecto `1e-6`) fija con qué exactitud se
 aplana la banda, `regularization_outside` (por defecto `1.0`) limita el

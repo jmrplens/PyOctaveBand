@@ -177,7 +177,7 @@ list grows as guides gain their References sections.
   equipment* (ISO 4871:1996).
   [iso.org catalogue](https://www.iso.org/standard/10868.html).
   The noise-emission declaration: the dual/single-number forms,
-  L_WAd = L_WA + K_WA and the clause 6.2 verification.
+  $L_{WAd} = L_{WA} + K_{WA}$ and the clause 6.2 verification.
   Cited by [Sound Power](/phonometry/guides/sound-power/).
 - International Organization for Standardization. (1993). *Acoustics —
   Determination of sound power levels of noise sources using sound

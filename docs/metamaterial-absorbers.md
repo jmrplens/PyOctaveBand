@@ -321,7 +321,7 @@ a loop over cells.
   absorption. *Applied Physics Letters*, 109(12), 121902.
   [doi:10.1063/1.4962328](https://doi.org/10.1063/1.4962328). The resonator
   impedance (Eq. A23) and its radiation end corrections (Eqs. A24-A27), and
-  the published λ/88 perfect absorber cited in the introduction.
+  the published $\lambda/88$ perfect absorber cited in the introduction.
 - Stinson, M. R. (1991). The propagation of plane sound waves in narrow and
   wide circular tubes, and generalization to uniform tubes of arbitrary
   cross-sectional shape. *Journal of the Acoustical Society of America*,

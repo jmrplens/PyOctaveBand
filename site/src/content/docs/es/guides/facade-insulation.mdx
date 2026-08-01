@@ -188,14 +188,14 @@ se asume que los niveles por banda ya están corregidos por ruido de fondo.
 
 | Parámetro | Tipo | Unidades | Rango / valor por defecto | Notas |
 | :--- | :--- | :--- | :--- | :--- |
-| `l1_2m` | array 1D o 2D | dB | uno/banda, o `(posiciones, bandas)` | Nivel 2 m frente a la fachada `L1,2m` |
+| `l1_2m` | array 1D o 2D | dB | uno/banda, o `(posiciones, bandas)` | Nivel 2 m frente a la fachada $L_{1,2m}$ |
 | `l2` | array 1D o 2D | dB | mismo número de bandas | Niveles del recinto receptor |
 | `t2` | array 1D | s | > 0, uno por banda | Tiempo de reverberación del recinto receptor |
-| `area` | float, opcional | m² | > 0, con `surface_level`, `volume` | Superficie del elemento de ensayo `S` (habilita `R'`) |
-| `volume` | float, opcional | m³ | > 0 | Recinto receptor `V` (habilita `D2m,n`; requerido para `R'`) |
-| `surface_level` | array 1D/2D, opcional | dB | mismo número de bandas | Nivel superficial `L1,s` sobre el elemento (habilita `R'`) |
-| `method` | str | — | `'loudspeaker'` (−1,5 dB) / `'road_traffic'` (−3 dB) | Corrección por ángulo de incidencia de `R'` |
-| `t0` | float | s | por defecto `0.5` | Tiempo de reverberación de referencia `T0` |
+| `area` | float, opcional | m² | > 0, con `surface_level`, `volume` | Superficie del elemento de ensayo $S$ (habilita $R'$) |
+| `volume` | float, opcional | m³ | > 0 | Recinto receptor $V$ (habilita $D_{2m,n}$; requerido para $R'$) |
+| `surface_level` | array 1D/2D, opcional | dB | mismo número de bandas | Nivel superficial $L_{1,s}$ sobre el elemento (habilita $R'$) |
+| `method` | str | — | `'loudspeaker'` (−1,5 dB) / `'road_traffic'` (−3 dB) | Corrección por ángulo de incidencia de $R'$ |
+| `t0` | float | s | por defecto `0.5` | Tiempo de reverberación de referencia $T_0$ |
 | `frequencies` | array 1D, opcional | Hz | — | Centros de banda que lleva el resultado para representar |
 
 `facade_insulation()` devuelve un `FacadeInsulationResult` (`d_2m`, `d_2m_nt`,
@@ -207,11 +207,12 @@ fachada de 16 bandas a `weighted_rating` para su número único de ISO 717-1.
 `FacadeInsulationResult.report(path)` escribe el informe de ensayo de fachada en
 campo ISO 16283-3 de una página: la línea de base normativa, una cabecera de
 metadatos opcional, la tabla en tercios de octava junto a la curva medida frente
-a la referencia desplazada, el índice de campo `D2m,nT,w (C; Ctr)` en su recuadro,
-la declaración de método de ingeniería, un veredicto opcional (una diferencia de
+a la referencia desplazada, el índice de campo $D_{2m,nT,w}\ (C;\ C_{tr})$ en
+su recuadro, la declaración de método de ingeniería, un veredicto opcional
+(una diferencia de
 niveles cumple si iguala o supera el requisito) y un pie. `quantity="d_2m_nt"`
 (por defecto) informa la diferencia de niveles estandarizada; `"d_2m_n"` la
-normalizada; `"r_prime"` el índice de reducción acústica aparente `R'45`.
+normalizada; `"r_prime"` el índice de reducción acústica aparente $R'_{45}$.
 `verbose=True`, `metadata`, `language="es"` y el extra `phonometry[report]` se
 comportan igual que en las fichas anteriores.
 
@@ -350,8 +351,9 @@ La predicción de fachada también escribe un informe de **predicción** de una
 página mediante un método `report(path)`, con la misma maquetación que las
 fichas de predicción a ruido aéreo y de impactos. `FacadePredictionResult.report()`
 representa la tabla de elementos de la fachada (el índice parcial ponderado
-`Rp,w` de cada elemento) junto a la gráfica por elemento / `R'` / `D2m,nT`, el
-número único previsto `D2m,nT,w` en un recuadro (con `R'tr,s,w` y `Ctr`), la
+$R_{p,w}$ de cada elemento) junto a la gráfica por elemento / $R'$ /
+$D_{2m,nT}$, el número único previsto $D_{2m,nT,w}$ en un recuadro (con
+$R'_{tr,s,w}$ y $C_{tr}$), la
 declaración de predicción y, cuando se aporta un `requirement`, un veredicto
 APTO/NO APTO (la diferencia de niveles cumple si es igual o mayor). `verbose=True`
 añade la fracción de energía sonora transmitida por cada elemento, que señala el
@@ -364,7 +366,7 @@ volumen del recinto receptor `receiving_volume`, la situación exterior/de tráf
 en `test_room`, además de los campos de identidad del calculista / laboratorio
 (`client`, `manufacturer`, `measurement_standard`, `laboratory`, `operator`,
 `report_id`, `test_date`), un resumen libre de la forma de la fachada y del
-modelo en `notes` y el objetivo `D2m,nT,w` en `requirement`. Los metadatos,
+modelo en `notes` y el objetivo $D_{2m,nT,w}$ en `requirement`. Los metadatos,
 `language="es"` y el extra `phonometry[report]` se comportan como en las fichas
 de medición.
 

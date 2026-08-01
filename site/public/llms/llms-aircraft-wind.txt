@@ -31,7 +31,7 @@ then combined into the total noisiness and the perceived noise level:
 
 $$
 N = 0.85\,n_{\max} + 0.15\sum_i n_i, \qquad
-\mathrm{PNL} = 40 + \frac{10}{\lg 2}\,\lg N .
+\mathrm{PNL} = 40 + \frac{10}{\log_{10} 2}\,\log_{10} N .
 $$
 
 ```python
@@ -44,10 +44,11 @@ pnl = aircraft.perceived_noise_level(spl)      # PNdB
 ## 2. Tone correction
 
 Spectral irregularities (fan/turbine tones) are penalised by a **tone
-correction** `C`, found with the slope ("encircling") method: slopes are
-smoothed to a background spectrum `SPL''`, the tone excess `F = SPL − SPL''`
-above 1.5 dB is mapped to a correction factor (frequency-split at 500 Hz /
-5000 Hz, capped at 6⅔ dB), and the maximum over bands is taken.
+correction** $C$, found with the slope ("encircling") method: slopes are
+smoothed to a background spectrum $\mathrm{SPL}''$, the tone excess
+$F = \mathrm{SPL} - \mathrm{SPL}''$ above 1.5 dB is mapped to a correction
+factor (frequency-split at 500 Hz / 5000 Hz, capped at 6⅔ dB), and the maximum
+over bands is taken.
 
 ```python
 from phonometry import aircraft
@@ -56,21 +57,22 @@ c = aircraft.tone_correction(spl)              # dB; added to PNL to give PNLT
 ```
 
 The implementation reproduces the ICAO Doc 9501 ETM Vol. I **Table 3-7**
-turbofan example exactly, including its `SPL''` background column and the
-resulting `C = 2.0 dB` at 2500 Hz.
+turbofan example exactly, including its $\mathrm{SPL}''$ background column and
+the resulting $C = 2.0\ \text{dB}$ at 2500 Hz.
 
 ## 3. EPNL
 
-Over the flyover, the tone-corrected level is `PNLT = PNL + C`; its maximum is
-`PNLTM`. The metric integrates `PNLT` over the **10 dB-down** window (the
-records nearest to `PNLTM − 10` on each side) and normalises to 10 s:
+Over the flyover, the tone-corrected level is
+$\mathrm{PNLT} = \mathrm{PNL} + C$; its maximum is $\mathrm{PNLTM}$. The metric
+integrates $\mathrm{PNLT}$ over the **10 dB-down** window (the records nearest
+to $\mathrm{PNLTM} - 10$ on each side) and normalises to 10 s:
 
 $$
-\mathrm{EPNL} = 10\lg\!\Big(\sum_{k=k_F}^{k_L} 10^{\mathrm{PNLT}(k)/10}\,\Delta t(k)\Big)
-- 10\lg T_0, \qquad T_0 = 10\ \mathrm{s},
+\mathrm{EPNL} = 10\log_{10}\!\Big(\sum_{k=k_F}^{k_L} 10^{\mathrm{PNLT}(k)/10}\,\Delta t(k)\Big)
+- 10\log_{10} T_0, \qquad T_0 = 10\ \mathrm{s},
 $$
 
-so `EPNL = PNLTM + D` with the duration correction `D`.
+so $\mathrm{EPNL} = \mathrm{PNLTM} + D$ with the duration correction $D$.
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/epnl_dark.svg">
@@ -90,10 +92,10 @@ res.plot()   # PNL/PNLT time history (needs matplotlib)
 `effective_perceived_noise_level` returns an `EPNLResult` bundling the per-record
 `pnl`, `tone_correction`, `pnlt`, the peak `pnltm`, the `duration_correction`,
 the `epnl` and the 10 dB-down `band_limits`. The reference-condition
-integrated-method example of ETM Vol. I **Table 4-4** (a 31-record `PNLT`
-history with non-uniform durations) is reproduced as `EPNL = 92.6 EPNdB`.
-`epnl_from_pnlt` exposes the duration/limit machinery directly from a `PNLT`
-series.
+integrated-method example of ETM Vol. I **Table 4-4** (a 31-record
+$\mathrm{PNLT}$ history with non-uniform durations) is reproduced as
+$\mathrm{EPNL} = 92.6\ \text{EPNdB}$. `epnl_from_pnlt` exposes the
+duration/limit machinery directly from a $\mathrm{PNLT}$ series.
 
 <details>
 <summary>Show the code for this figure</summary>
@@ -119,10 +121,11 @@ aircraft.effective_perceived_noise_level(spectra, dt).plot()
 aircraft-noise-certification data sheet: a standard-basis line (ICAO Annex 16
 Vol. I Appendix 2), an optional TCDSN-style metadata header (aircraft,
 manufacturer / type-certificate holder, applicant, measurement point), a
-metrics table of the informational intermediate quantities (the peak `PNLTM`,
-the duration correction `D`, the 10 dB-down record window and, when non-zero,
-the bandsharing adjustment) above the full-width landscape `PNLT`-versus-time
-plot (the result's own `.plot()`), the boxed `EPNL = X EPNdB` single number, a
+metrics table of the informational intermediate quantities (the peak
+$\mathrm{PNLTM}$, the duration correction $D$, the 10 dB-down record window
+and, when non-zero, the bandsharing adjustment) above the full-width landscape
+$\mathrm{PNLT}$-versus-time plot (the result's own `.plot()`), the boxed
+$\mathrm{EPNL} = X\ \text{EPNdB}$ single number, a
 Level | Limit | Margin verdict row when a certification limit is supplied, a
 static reference-conditions strip (25 °C, 70 % RH, sea level, zero wind, ISA)
 and a footer with the fixed disclaimer. It uses the same `ReportMetadata`
@@ -190,9 +193,9 @@ needs the one-third-octave-band attenuation over the path. The pure-tone
 coefficient is the ISO 9613-1 one (identical, per ARP 5534 §3.1) already
 provided by `air_attenuation`; `sae_band_attenuation` adds the **SAE Method**
 (ARP 5534 §3.2.2), a regression that maps the pure-tone mid-band path-length
-attenuation `δ_t = α·s` to the band attenuation `δ_B` and stays consistent with
-the ISO/ANSI Exact Method well beyond the 50 dB limit of the older Approximate
-Method.
+attenuation $\delta_t = \alpha\,s$ to the band attenuation $\delta_B$ and stays
+consistent with the ISO/ANSI Exact Method well beyond the 50 dB limit of the
+older Approximate Method.
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/aircraft_atmospheric_absorption_dark.svg">
@@ -237,8 +240,8 @@ att.plot()                    # band vs pure-tone mid-band (needs matplotlib)
 ```
 
 `sae_band_attenuation` returns an `AircraftBandAttenuation` with `band_attenuation`
-(`δ_B`), `midband_attenuation` (`δ_t = α·s`) and the pure-tone `coefficient`
-(`α`, dB/m). The SAE Method is valid roughly 6–32 °C and 20–95 % RH (the 14 CFR
+($\delta_B$), `midband_attenuation` ($\delta_t = \alpha\,s$) and the pure-tone
+`coefficient` ($\alpha$, dB/m). The SAE Method is valid roughly 6–32 °C and 20–95 % RH (the 14 CFR
 Part 36 test window), over path lengths to 7620 m, and is reciprocal
 (source↔receiver).
 
@@ -321,7 +324,7 @@ barriers) are [Outdoor sound propagation](https://jmrplens.github.io/phonometry/
 ## 1. The noise-power-distance engine
 
 The ECAC Doc 29 airport-noise method describes an aircraft with **noise-power-
-distance (NPD)** tables that give the event level (`LAmax` or `SEL`) of steady straight
+distance (NPD)** tables that give the event level ($L_{Amax}$ or `SEL`) of steady straight
 flight versus engine power and slant distance. `npd_level` reads an event level
 for an arbitrary power and distance, interpolating **linearly in power**
 (Eq. 4-3) and **log-linearly in distance** (Eq. 4-4), extrapolating from the
@@ -379,21 +382,25 @@ The full ECAC Doc 29 single-event calculation places a flight path's noise at a
 receiver by breaking the path into segments and, for each, correcting the NPD
 baseline level (§4.3-4.5):
 
-- **`impedance_adjustment(T, p)`**: corrects the NPD data from their reference
+- **`impedance_adjustment`** ($T$, $p$): corrects the NPD data from their reference
   air impedance (409.81 N·s/m³) to the aerodrome's temperature and pressure
   (Eq. 4-6/4-7; +0.074 dB under the standard atmosphere).
-- **`lateral_attenuation(β, ℓ)`**: excess lateral attenuation over soft ground
+- **`lateral_attenuation`** ($\beta$, $\ell$): excess lateral attenuation over
+  soft ground
   (Eq. 4-18/4-19, AIR-5662).
-- **`engine_installation_correction(φ, mounting)`**: lateral-directivity term
-  for wing/fuselage/propeller installations (Eq. 4-15/4-16).
-- **`duration_correction(Vref, Vseg)`**: the speed/duration adjustment for
+- **`engine_installation_correction`** ($\varphi$, mounting): lateral-
+  directivity term for wing/fuselage/propeller installations (Eq. 4-15/4-16).
+- **`duration_correction`** ($V_{\text{ref}}$, $V_{\text{seg}}$): the
+  speed/duration adjustment for
   exposure levels (Eq. 4-14).
-- **`noise_fraction(q, λ, dλ)`**: the finite-segment energy fraction (Eq. 4-20).
-- **`start_of_roll_directivity(ψ, dSOR, engine)`**: the rearward jet/turboprop
+- **`noise_fraction`** ($q$, $\lambda$, $d_\lambda$): the finite-segment energy
+  fraction (Eq. 4-20).
+- **`start_of_roll_directivity`** ($\psi$, $d_{\text{SOR}}$, engine): the
+  rearward jet/turboprop
   directivity behind takeoff ground-roll segments (Eq. 4-22/4-24/4-25). Pass a
   boolean `ground_roll` mask to `event_level`/`noise_contour` to flag the takeoff
-  ground-roll segments; behind them the reduced (q = 0) noise fraction and `ΔSOR`
-  are applied (Eq. 4-9).
+  ground-roll segments; behind them the reduced ($q = 0$) noise fraction and
+  $\Delta_{\text{SOR}}$ are applied (Eq. 4-9).
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/airport_contour_dark.webp">
@@ -442,10 +449,10 @@ ground and a receiver sitting in an interference dip.
 
 [Watch the high-resolution video (WebM)](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anim_fdtd_ground_effect.webm)
 
-`ΔSOR` is what makes the departure footprint bulge rearward behind the runway:
-jet-exhaust noise radiates a lobed pattern in the rear arc, strongest at an
-azimuth `ψ ≈ 120°` from the nose and falling away both abeam (`ψ = 90°`) and
-directly behind (`ψ = 180°`).
+$\Delta_{\text{SOR}}$ is what makes the departure footprint bulge rearward
+behind the runway: jet-exhaust noise radiates a lobed pattern in the rear arc,
+strongest at an azimuth $\psi \approx 120°$ from the nose and falling away
+both abeam ($\psi = 90°$) and directly behind ($\psi = 180°$).
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/airport_sor_dark.svg">
@@ -478,7 +485,7 @@ plt.show()
 </details>
 
 `event_level` assembles these (Eq. 4-8/4-9) and sums the segments into the exposure
-level `SEL` (Eq. 4-11) or the maximum level `LAmax` (Eq. 4-10); `noise_contour`
+level `SEL` (Eq. 4-11) or the maximum level $L_{Amax}$ (Eq. 4-10); `noise_contour`
 evaluates `event_level` over a ground grid to produce a noise contour. Mark the
 takeoff ground-roll segments with the boolean `ground_roll` mask.
 
@@ -506,10 +513,11 @@ contour.plot()   # SEL contour over the ground (needs matplotlib)
 ```
 
 Validated against the **ECAC Doc 29 5th ed. Vol 3 Part 1 reference workbook**:
-the segment geometry (β, φ), lateral attenuation, engine installation, noise
-fraction and the start-of-roll directivity `ΔSOR` (turbofan and turboprop, all
-124 ground-roll reference rows to < 0.01 dB) reproduce the reference values, and
-the segment energy sum matches the reference `SEL`.
+the segment geometry ($\beta$, $\varphi$), lateral attenuation, engine
+installation, noise fraction and the start-of-roll directivity
+$\Delta_{\text{SOR}}$ (turbofan and turboprop, all 124 ground-roll reference
+rows to $< 0.01\ \text{dB}$) reproduce the reference values, and the segment
+energy sum matches the reference `SEL`.
 
 The model also covers the landing rollout (`landing_roll` mask: reduced noise
 fraction Eq. 4-21b, nearest-end geometry, no directivity term), per-segment
@@ -525,8 +533,8 @@ events of the reference workbook are reproduced end-to-end in the test suite.
 - [Outdoor sound propagation](https://jmrplens.github.io/phonometry/guides/outdoor-propagation/): the ISO 9613-2
   attenuation terms and the ground effect the lateral attenuation condenses
   into one curve.
-- [Environmental levels](https://jmrplens.github.io/phonometry/guides/environmental-levels/): the Lden-style long-term
-  indices that a full airport study accumulates from single events.
+- [Environmental levels](https://jmrplens.github.io/phonometry/guides/environmental-levels/): the $L_{den}$-style
+  long-term indices that a full airport study accumulates from single events.
 - API reference: [`aircraft.airport_noise`](https://jmrplens.github.io/phonometry/reference/api/aeroacoustics/airport-noise/).
 
 ## References
@@ -570,11 +578,11 @@ Source: https://jmrplens.github.io/phonometry/guides/rotorcraft-noise/
 # Rotorcraft noise: the hemisphere method (ECAC Doc 32 / NORAH2)
 
 Helicopter noise is strongly directive, so the ECAC Doc 32 method describes the
-source with a **noise hemisphere**: one-third-octave-band sound pressure levels on
-a spherical grid of azimuth `φ` and polar angle `θ`, measured at a fixed **60 m**
-reference distance under ICAO reference atmospheric conditions. Placing that
-source at a receiver adds the propagation adjustment
-`ΔLp = ΔLs + ΔLa + ΔLg (+ ΔLd)`.
+source with a **noise hemisphere**: one-third-octave-band sound pressure levels
+on a spherical grid of azimuth $\varphi$ and polar angle $\theta$, measured at
+a fixed **60 m** reference distance under ICAO reference atmospheric
+conditions. Placing that source at a receiver adds the propagation adjustment
+$\Delta L_p = \Delta L_s + \Delta L_a + \Delta L_g$ ($+\ \Delta L_d$).
 
 This page covers the source and propagation primitives, the flight-condition
 interpolation across a hemisphere database, the flight-path kinematics, and the
@@ -612,8 +620,10 @@ lv = aircraft.hemisphere_source_level(h, 0.0, 90.0)   # level per band abeam-bel
 The hemisphere level at 60 m is carried to the receiver by three adjustments
 (Doc 32 §A.4):
 
-- **`spherical_spreading_adjustment(r)`**: `ΔLs = −20·log10(r/60)` (Eq. 24).
-- **`atmospheric_adjustment(freqs, r)`**: `ΔLa = −α(f)·(r − 60)` with the
+- **`spherical_spreading_adjustment(r)`**: $\Delta L_s = -20\log_{10}(r/60)$
+  (Eq. 24).
+- **`atmospheric_adjustment(freqs, r)`**: $\Delta L_a = -\alpha(f)\,(r - 60)$
+  with the
   ISO 9613-1 pure-tone coefficient at the exact band centre (Eq. 26/27), reusing
   the library's `air_attenuation`; this is what the NORAH2 reference
   implementation computes. The guidance's alternative SAE (Rickley) band mapping,
@@ -678,11 +688,12 @@ distance-dependent adjustments:
 
 ## 3. Flight conditions: interpolating between hemispheres
 
-A database records one hemisphere per flight condition (airspeed `V`, path
-angle `γ`): approaches at several descent angles, level flyovers at several
-speeds, take-off climbs. Real flight conditions rarely coincide with a measured
-one, so the NORAH2 guidance interpolates (Eq. 3-10): both axes are normalised
-by their database spans (with the empirical scaling factor `Ffc = 2` on the
+A database records one hemisphere per flight condition (airspeed $V$, path
+angle $\gamma$): approaches at several descent angles, level flyovers at
+several speeds, take-off climbs. Real flight conditions rarely coincide with a
+measured one, so the NORAH2 guidance interpolates (Eq. 3-10): both axes are
+normalised by their database spans (with the empirical scaling factor
+$F_\text{fc} = 2$ on the
 path angle), a Delaunay triangulation covers the normalised conditions, and a
 query inside the convex hull blends the three hemispheres of its enveloping
 triangle with inverse-distance weights in the energy domain. Outside the hull
@@ -709,18 +720,20 @@ lv = aircraft.interpolated_source_level(
 The airspeed, not the ground speed, selects the hemisphere. The weights are
 unit-invariant (knots or m/s, as long as the query matches the database), and a
 database lookup triangulation can be passed as `triangles` (the NORAH database
-ships one per type; its shipped tables triangulate the raw `(V, γ)` plane, so
-passing them reproduces the reference implementation bin for bin). Types whose
-rotor configuration is mirrored with respect to their class reference substitute
-`h.mirrored()` (Eq. 2, `φ → −φ`), and certification-level offsets enter as
-`level_offset`.
+ships one per type; its shipped tables triangulate the raw $(V, \gamma)$
+plane, so passing them reproduces the reference implementation bin for bin).
+Types whose rotor configuration is mirrored with respect to their class
+reference substitute `h.mirrored()` (Eq. 2, $\varphi \to -\varphi$), and
+certification-level offsets enter as `level_offset`.
 
 ## 4. Flight-path kinematics
 
 `flight_path_kinematics` derives, from a time-stamped track by central finite
 differences, everything the event needs (Eq. 16-21 / Doc 32 Eq. 8-10): ground
-speed `Vg`, airspeed `VA` (zero wind), heading `Θ = atan2(ΔX, ΔY)`, curvature
-`K = ΔΘ/ΔS`, bank angle `Φ = atan(K·Vg²/g)` and path angle `γ = atan(ΔZ/ΔS)`.
+speed $V_g$, airspeed $V_A$ (zero wind), heading
+$\Theta = \operatorname{atan2}(\Delta X, \Delta Y)$, curvature
+$K = \Delta\Theta/\Delta S$, bank angle $\Phi = \arctan(K V_g^2 / g)$ and
+path angle $\gamma = \arctan(\Delta Z / \Delta S)$.
 The guidance recommends smoothing radar tracks (e.g. spline resampling to a
 0.5 s cadence) before differentiating.
 
@@ -738,8 +751,8 @@ Per track point, the flight condition selects (or blends) the hemispheres and
 the emission angles address the source level; the hemisphere frame is oriented
 by the heading and tilted by the bank angle in turns (pitch attitude is
 implicit in the hemispheres). The received one-third-octave history is
-expressed at recorded time `tr = te + r/c` (Eq. 22, `c = 346.1 m/s`) and
-integrated: `LASmax`, `SEL` over the full history and over the certification
+expressed at recorded time $t_r = t_e + r/c$ (Eq. 22, $c = 346.1\ \text{m/s}$)
+and integrated: `LASmax`, `SEL` over the full history and over the certification
 10 dB-down window (Doc 32 Eq. 27), and `EPNL` per ICAO Annex 16 (Doc 32
 Eq. 28), reusing the library's `epnl_from_pnlt`.
 
@@ -825,7 +838,8 @@ resistivity by the logarithm, weighted by segment length (Eq. 41).
 When terrain blocks the line of sight, the sound follows the shortest convex
 path over it (the guidance's rubber band) and every touched vertex is a
 **diffraction edge**. The attenuation combines the pure diffraction of the
-path difference `δ` (Eq. 42-44, `10·Ch·log10(3 + (40/λ)·C″·δ)`, capped at
+path difference $\delta$ (Eq. 42-44,
+$10 C_h \log_{10}\bigl(3 + (40/\lambda)\,C''\,\delta\bigr)$, capped at
 25 dB) with the source-side and receiver-side ground effects, each over its
 own mean ground plane and weighted by its image-path diffraction (Eq. 45-47,
 the CNOSSOS-EU scheme the guidance adopts). The ground effect is not
@@ -902,10 +916,10 @@ res = aircraft.rotorcraft_event_level(
 ## Validation
 
 Validated against the NORAH2 guidance Table 4 (all 31 bands, 10 Hz-10 kHz), the
-closed-form inverse-square spreading, the analytic rigid-ground `+6 dB` and
+closed-form inverse-square spreading, the analytic rigid-ground +6 dB and
 grazing limits of the ground effect, off-node bilinear lookups on the reference
 hemispheres of all eleven rotorcraft types, hand-checked interpolation
-simplices, closed-form kinematics and the Lorentzian `SEL − LASmax` flyover
+simplices, closed-form kinematics and the Lorentzian $\mathrm{SEL} - L_{ASmax}$ flyover
 integral, and end to end against the NORAH2 prototype's ARP verification cases:
 emission angles reproduce to 0.01°, retarded times to 0.02 s, every step level
 of the hard-ground events to 0.08 dB(A) out to 18 km, `LASmax` to 0.03 dB and
@@ -923,7 +937,7 @@ The terrain machinery is anchored in closed form: the mean ground plane is
 exact on linear and symmetric profiles, a flat section reproduces the
 flat-ground model to machine precision and an inclined plane its analytic
 rotation, the log-mean resistivity recovers the geometric mean, the grazing
-diffraction gives the classical `10·log10(3)`, and a hand-checked hill fixes
+diffraction gives the classical $10\log_{10} 3$, and a hand-checked hill fixes
 the rubber-band path difference. Per-receiver ground handling validates end
 to end against the prototype's ARP Case 3 (187 microphones, each on its own
 ground elevation: every step level to 0.08 dB(A), `SEL`/`LASmax` to 0.05 dB,
@@ -1000,14 +1014,15 @@ formulas and a hand-derived synthetic-tone oracle.
 ## 1. Apparent sound power level
 
 With the reference microphone on a ground board at the horizontal distance
-`R0 = H + D/2` (hub height `H`, rotor diameter `D`), the slant distance to the
-rotor centre is `R1 = √(H² + R0²)` and the per-band apparent sound power level is
+$R_0 = H + D/2$ (hub height $H$, rotor diameter $D$), the slant distance to
+the rotor centre is $R_1 = \sqrt{H^2 + R_0^2}$ and the per-band apparent sound
+power level is
 
 $$
-L_{WA,i} = L_{p,i} - 6 + 10\lg\frac{4\pi R_1^2}{S_0}, \qquad S_0 = 1\ \mathrm{m}^2,
+L_{WA,i} = L_{p,i} - 6 + 10\log_{10}\frac{4\pi R_1^2}{S_0}, \qquad S_0 = 1\ \mathrm{m}^2,
 $$
 
-energy-summed over bands (Formula 27). The `−6 dB` accounts for the ground-board
+energy-summed over bands (Formula 27). The −6 dB accounts for the ground-board
 pressure doubling.
 
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_wind_turbine_iec61400_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_wind_turbine_iec61400.svg" alt="Side view of a horizontal-axis wind turbine with hub height H and rotor diameter D, a microphone lying on a flat ground board downwind at the horizontal distance R0 = H + D/2 from the tower centreline, the slant distance R1 from the rotor centre to the microphone with the board inclination angle phi between 25 and 40 degrees, and a met mast measuring wind speed and direction; a plan-view inset shows the Figure 3 pattern with the reference position downwind and three optional positions at plus and minus 60 degrees and upwind, and the annotations give R1 equals the square root of H squared plus R0 squared and the apparent sound power formula LWA,i = Lp,i minus 6 plus 10 lg(4 pi R1 squared over S0)" width="94%"></picture>
@@ -1081,19 +1096,20 @@ $$
 $$
 
 are classified into masking noise and tone lines (the 70 %-lowest energy mean,
-the `+6 dB` criteria; tone lines must additionally lie within 10 dB of the
+the +6 dB criteria; tone lines must additionally lie within 10 dB of the
 *highest* line above the threshold, and that highest line is the frequency of
 the tone, subclauses 9.5.3/9.5.4). The candidate itself must first pass the
 9.5.2 *possible tone* screening: a local maximum more than 6 dB above the
 band energy average excluding the maximum and its adjacent lines. The
-masking-noise level `L_pn` follows Formula 31, the tonality is
-`ΔL_tn = L_pt − L_pn`, and the tonal audibility is
+masking-noise level $L_{pn}$ follows Formula 31, the tonality is
+$\Delta L_{tn} = L_{pt} - L_{pn}$, and the tonal audibility is
 
 $$
-\Delta L_a = \Delta L_{tn} - L_a, \qquad L_a = -2 - \lg\!\big[1 + (f/502)^{2.5}\big],
+\Delta L_a = \Delta L_{tn} - L_a, \qquad L_a = -2 - \log_{10}\!\big[1 + (f/502)^{2.5}\big],
 $$
 
-reported when `ΔL_a ≥ −3 dB`; a tone is audible when `ΔL_a > 0`.
+reported when $\Delta L_a \ge -3\ \text{dB}$; a tone is audible when
+$\Delta L_a > 0$.
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/wind_turbine_tonality_dark.svg">
@@ -1137,13 +1153,13 @@ res.plot()   # spectrum + critical band + masking level (needs matplotlib)
 `has_identified_tone`. When the candidate fails the 9.5.2 screening or no
 line classifies as "tone", `has_identified_tone` is `False`: the numeric
 fields are non-standard fallbacks and such spectra must be **excluded** from
-the 9.5.1 energy averaging of `ΔL_a` over the spectra of a wind-speed bin
+the 9.5.1 energy averaging of $\Delta L_a$ over the spectra of a wind-speed bin
 (`is_audible` also requires an identified tone). The tone frequency and the
-`L_a` criterion anchor to the highest classified tone line, not the probed
+$L_a$ criterion anchor to the highest classified tone line, not the probed
 candidate. The audibility formula is the ISO 1996-2 Annex C one; what is
 specific to IEC 61400-11 is the determination of the tone and masking levels
 and the Zwicker critical band from the spectrum. For a rating adjustment
-`K_T`, pass the mean audibility to the ISO 1996-2 `tonal_adjustment`.
+$K_T$, pass the mean audibility to the ISO 1996-2 `tonal_adjustment`.
 
 ## References
 
@@ -1279,7 +1295,7 @@ stated $\pm 10$ % accuracy (Clause 7.1). Inputs outside the tabulated ranges
 still compute but raise an `AtmosphericAbsorptionWarning`; non-physical inputs
 (non-positive frequency, humidity outside 0…100 %, sub-absolute-zero
 temperature) raise `ValueError`. `air_attenuation_m` composes $\alpha$ with the
-ISO 354 conversion $m = \alpha/(10 \lg e)$ so an ISO 354 caller can feed real
+ISO 354 conversion $m = \alpha/(10 \log_{10} e)$ so an ISO 354 caller can feed real
 atmospheric conditions straight into `absorption_area` /
 `absorption_coefficient` instead of hand-entering $m$.
 
@@ -1294,7 +1310,7 @@ atmospheric conditions straight into `absorption_area` /
 | `exact_midband` | bool | — | default `False` | Snap to $f_m = 1000\cdot10^{k/10}$ (reproduces Table 1) |
 
 `air_attenuation` returns $\alpha$ in dB/m; `air_attenuation_m` returns
-$m = \alpha/(10 \lg e)$ in 1/m for ISO 354.
+$m = \alpha/(10 \log_{10} e)$ in 1/m for ISO 354.
 
 ### A plottable result: `atmospheric_attenuation()`
 
@@ -1371,7 +1387,7 @@ splits the source-to-receiver distance into $d_{ss}$ and $d_{sr}$, and the extra
 path length over the edge is $z = d_{ss} + d_{sr} - d$. When the line of sight
 passes *above* the top edge, the standard gives $z$ a negative sign
 (`Barrier(line_of_sight_clear=True)`) and Eq. (14) still applies with
-$K_{met} = 1$: $D_z$ falls continuously from $10 \lg 3 \approx 4.8$ dB at
+$K_{met} = 1$: $D_z$ falls continuously from $10 \log_{10} 3 \approx 4.8$ dB at
 grazing incidence to zero as the clearance deepens, never below zero.
 
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_outdoor_geometry_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_outdoor_geometry.svg" alt="ISO 9613-2 source-barrier-receiver geometry: a point source at height hs, a barrier whose top edge splits the path into dss and dsr, and a receiver at height hr, with the blocked direct ray and the diffracted ray over the edge, the path difference z and the Dz formula" width="92%"></picture>
@@ -1380,7 +1396,7 @@ grazing incidence to zero as the clearance deepens, never below zero.
 
 * **Geometrical divergence** $A_{div} = 20 \log_{10}(d/d_0) + 11$ dB, $d_0 = 1$ m
   (Eq. (7)): spherical spreading from a point source. Exactly 51 dB at 100 m,
-  +6 dB per distance doubling. The $+11$ ($= 10 \lg 4\pi$) sets the level at the
+  +6 dB per distance doubling. The $+11$ ($= 10 \log_{10} 4\pi$) sets the level at the
   1 m reference distance.
 * **Atmospheric absorption** $A_{atm} = \alpha\ d$ (Eq. (8)) with $\alpha$ the
   ISO 9613-1 coefficient, negligible at low frequency and dominant at 8 kHz over
@@ -1561,7 +1577,8 @@ double (thick-barrier) diffraction with the $C_3$ factor of Eq. (15) and the
 diffraction (Eq. (13), $K_{met}=1$, ground term retained).
 
 The simulation below shows why $D_z$ grows with frequency: against the same
-2.5 m screen, a 100 Hz wavefront (λ ≈ 3.4 m) diffracts over the edge and fills
+2.5 m screen, a 100 Hz wavefront ($\lambda \approx 3.4\ \text{m}$) diffracts
+over the edge and fills
 the shadow zone, while at 500 Hz the shadow is deep and sharp. A barrier only
 works when the wavelength is short next to the path difference.
 
@@ -1595,7 +1612,7 @@ stacked per-band breakdown with the total overlaid (the figure above).
 | `edge_separation` | float or None | m | `None` | $e$; given ⇒ double diffraction (25 dB cap) |
 | `ground_reflections_by_image` | bool | — | `False` | `True` ⇒ $C_2 = 40$ |
 | `lateral` | bool | — | `False` | `True` ⇒ vertical-edge diffraction (Eq. (13)) |
-| `line_of_sight_clear` | bool | — | `False` | `True` ⇒ the sight line passes above the top edge: the path difference takes a negative sign and Kmet = 1 (text after Eq. (16)) |
+| `line_of_sight_clear` | bool | — | `False` | `True` ⇒ the sight line passes above the top edge: the path difference takes a negative sign and $K_{met} = 1$ (text after Eq. (16)) |
 
 ## 3. Scope, assumptions and pitfalls
 
@@ -1640,7 +1657,7 @@ whether a real barrier delivers its computed $D_z$:
   barrier that looks generous on the section drawing.
 * **Double diffraction is a modest bonus.** A thick obstacle (two edges
   separated by $e$) raises $C_3$ from 1 toward 3 (Eq. (15)), worth at most
-  about $10 \lg 3 \approx 4.8$ dB extra plus the higher 25 dB cap. A building
+  about $10 \log_{10} 3 \approx 4.8$ dB extra plus the higher 25 dB cap. A building
   modelled as a double edge only earns that bonus if both edges really are
   continuous and the roof between them is closed.
 * **The ground effect is spent, not kept.** For a top-edge barrier the
@@ -1708,7 +1725,7 @@ diffraction model behind the number.
 `OutdoorAttenuation.report(path)` boxes the octave-band range of the total
 attenuation on its own; pass a `SourceEmission` (the source sound power and
 directivity) to add the source power and downwind level to the table and box the
-A-weighted downwind level `LAT(DW)` at the receiver instead. A limit
+A-weighted downwind level $L_{AT}(\text{DW})$ at the receiver instead. A limit
 level supplied through the metadata `requirement` then adds a PASS/FAIL verdict
 (a lower level is better). Pass `language="es"` for the Spanish fiche.
 
@@ -1828,7 +1845,7 @@ ground effect (Eq. (9), Table 3) with its A-weighted alternative
 (Eq. (10)/(11)), barrier screening (Eqs. (12)–(17)) and the meteorological
 correction (Eq. (21)/(22)). ISO 354:2003, *Acoustics — Measurement of sound
 absorption in a reverberation room*: only the clause 8.1.2.1 conversion
-$m = \alpha/(10 \lg e)$ behind `air_attenuation_m`; the reverberation-room
+$m = \alpha/(10 \log_{10} e)$ behind `air_attenuation_m`; the reverberation-room
 method itself is covered in the [Room Acoustics guide](https://jmrplens.github.io/phonometry/guides/room-acoustics/).
 
 ---

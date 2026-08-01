@@ -52,9 +52,9 @@ conductos HVAC, el ruido de flujo y los cerramientos de máquina, vive en
 
 Un silenciador reactivo atenúa *reflejando* el sonido con discontinuidades de
 impedancia. Cada elemento acústico es una matriz de transferencia 2x2 que
-relaciona la presión `p` y la velocidad de volumen `Su` en sus dos extremos, y un
+relaciona la presión $p$ y la velocidad de volumen $Su$ en sus dos extremos, y un
 silenciador compuesto es el producto ordenado de las matrices de sus elementos
-(Bies §8.9). Un conducto recto de longitud `L` y área `S` es
+(Bies §8.9). Un conducto recto de longitud $L$ y área $S$ es
 
 $$
 \begin{bmatrix} \cos kL & j\,\tfrac{\rho c}{S}\sin kL \\[2pt]
@@ -67,7 +67,7 @@ $\left[\begin{smallmatrix} 1 & 0 \\ 1/Z_b & 1 \end{smallmatrix}\right]$. La
 **pérdida de transmisión** se obtiene de la matriz compuesta $T$ con las
 impedancias de los puertos $Z_1 = \rho c/S_\text{in}$ y $Z_n = \rho c/S_\text{out}$
 (Munjal Ec. (3.27); Bies Ec. (8.141) imprime invertidos los pesos de impedancia
-de $T_{11}$ y $T_{22}$ de esta fórmula y no cumple el límite de expansión
+de `T11` y `T22` de esta fórmula y no cumple el límite de expansión
 brusca, véase el
 [registro de erratas](https://github.com/jmrplens/phonometry/blob/main/docs/ERRATA.md))
 
@@ -157,8 +157,8 @@ y `.plot_geometry()` lo dibuja: la misma cámara de 0,3 m con su relación de
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/expansion_chamber_geometry_es.svg" alt="Sección a escala del silenciador de cámara de expansión del ejemplo de pérdida de transmisión: una cámara de 300 mm de longitud y 225,7 mm de diámetro equivalente insertada entre tubos de entrada y salida de 112,8 mm de diámetro equivalente, con la longitud de la cámara y ambos diámetros acotados" width="88%" />
 
 *La cámara detrás de las curvas de arriba, a escala: las áreas entran en el
-método de cuatro polos solo a través de la relación `m`, y el dibujo usa los
-diámetros circulares equivalentes `d = 2√(S/π)` de las secciones de 0,04 y
+método de cuatro polos solo a través de la relación $m$, y el dibujo usa los
+diámetros circulares equivalentes $d = 2\sqrt{S/\pi}$ de las secciones de 0,04 y
 0,01 m².*
 
 <details>
@@ -184,10 +184,10 @@ plt.show()
 
 </details>
 
-El clip de abajo ejecuta una cámara con m = 4 y la misma longitud de 0,30 m
-en un conducto FDTD 2D a sus dos frecuencias características. En kL = π la
+El clip de abajo ejecuta una cámara con $m = 4$ y la misma longitud de 0,30 m
+en un conducto FDTD 2D a sus dos frecuencias características. En $kL = \pi$ la
 cámara es un resonador de media onda y el tono la cruza como si no
-existiera; en kL = π/2 los dos saltos de área reflejan en fase y devuelven
+existiera; en $kL = \pi/2$ los dos saltos de área reflejan en fase y devuelven
 la onda por el conducto de entrada, el pico de 6,5 dB de la curva de cuatro
 polos de arriba.
 
@@ -276,8 +276,8 @@ de 1 cm² de solo 2 cm de longitud.
 
 *Todo el valle de 120 Hz cuelga de una caja de 1 L y un cuello de 2 cm: la
 cavidad se dibuja como su cubo de igual volumen, y la sintonía se mueve como
-`√(Sₙ/(l_e V))`, así que pequeños errores en estas dimensiones desplazan el
-pico de su objetivo.*
+$\sqrt{S_n/(l_e V)}$, así que pequeños errores en estas dimensiones desplazan
+el pico de su objetivo.*
 
 <details>
 <summary>Mostrar el código de esta figura</summary>
@@ -305,8 +305,8 @@ plantado sobre el mismo conducto.
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/quarter_wave_geometry_es.svg" alt="Sección a escala de la rama lateral de cuarto de onda: un tubo cerrado de 300 mm de longitud y 50,5 mm de diámetro equivalente plantado sobre un conducto de 112,8 mm de diámetro equivalente, con la longitud del tubo, el diámetro del tubo y el diámetro del conducto acotados" width="88%" />
 
 *Un tubo de cuarto de onda es solo un tubo cerrado de la longitud correcta:
-0,3 m de tubo colocan el pico en `c/4l_e ≈ 285 Hz`, y el área de rama de
-20 cm² solo fija con cuánta fuerza carga el conducto.*
+0,3 m de tubo colocan el pico en $c/4l_e \approx 285\ \text{Hz}$, y el área de
+rama de 20 cm² solo fija con cuánta fuerza carga el conducto.*
 
 <details>
 <summary>Mostrar el código de esta figura</summary>

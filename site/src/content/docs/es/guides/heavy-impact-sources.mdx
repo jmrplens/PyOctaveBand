@@ -71,7 +71,7 @@ la fuerza de impacto** que entrega a un forjado rígido (ISO 16283-2:2020
 Fórmula (A.1) = JIS A 1418-2:2019 Fórmula (1)):
 
 $$
-L_{FE} = 10\lg\!\left[\frac{1}{T_\text{ref}}
+L_{FE} = 10\log_{10}\!\left[\frac{1}{T_\text{ref}}
 \int_{t_1}^{t_2}\frac{F^2(t)}{F_0^2}\,\mathrm{d}t\right]\ \text{dB re 1 N},
 $$
 
@@ -150,23 +150,23 @@ print([round(v, 1) for v in lfe])   # [-1.4, 14.0, 22.1, 20.2, 17.1]
 
 Los ejemplos de construcción que dan las dos normas son informativos, no
 normativos: una pelota de silicona hueca de 180 mm de diámetro exterior con
-30 mm de espesor de pared, masa efectiva $(2,5 \pm 0,1)$ kg y coeficiente de
-restitución $0,8 \pm 0,1$, dejada caer desde $(100 \pm 1)$ cm medidos desde la
-base de la pelota; y un neumático de automóvil inflado a
-$(2,4 \pm 0,2)\times 10^5$ Pa con una masa efectiva de $(7,3 \pm 0,2)$ kg,
-dejado caer desde 85 cm.
+30 mm de espesor de pared, masa efectiva $(2{,}5 \pm 0{,}1)$ kg y coeficiente
+de restitución $0{,}8 \pm 0{,}1$, dejada caer desde $(100 \pm 1)$ cm medidos
+desde la base de la pelota; y un neumático de automóvil inflado a
+$(2{,}4 \pm 0{,}2)\times 10^5$ Pa con una masa efectiva de
+$(7{,}3 \pm 0{,}2)$ kg, dejado caer desde 85 cm.
 
 ## El recinto receptor: un nivel máximo no se corrige como un promedio
 
 La magnitud valorada es un **máximo** de un nivel con ponderación temporal
 Fast, no un promedio energético, así que la estandarización habitual
-$10\lg(T/T_0)$ es incorrecta: un detector Fast nunca integra más de unos 1,7 s
+$10\log_{10}(T/T_0)$ es incorrecta: un detector Fast nunca integra más de unos 1,7 s
 de caída, de modo que la corrección tiene que saturarse. ISO 16283-2:2020
 (definición 3.16, Fórmulas (4), (5) y (6)) usa por tanto
 
 $$
-L'_{i,F\max,V,T} = L_{i,F\max} + 10\lg\frac{V}{V_0}
-- 10\lg\frac{g(C)}{g(C_0)},\qquad
+L'_{i,F\max,V,T} = L_{i,F\max} + 10\log_{10}\frac{V}{V_0}
+- 10\log_{10}\frac{g(C)}{g(C_0)},\qquad
 C = \frac{T}{1{,}7275},\quad C_0 = \frac{T_0}{1{,}7275},
 $$
 
@@ -210,7 +210,7 @@ La valoración es una suma energética de niveles por banda ponderados A
 (Fórmula (D.1)):
 
 $$
-X_{iA,F\max} = 10\lg\!\left(\sum_j 10^{(X_{i,F\max,j} + A_j)/10}\right),
+X_{iA,F\max} = 10\log_{10}\!\left(\sum_j 10^{(X_{i,F\max,j} + A_j)/10}\right),
 $$
 
 sobre las bandas de tercio de octava de 50 Hz a 630 Hz **o** las de octava de

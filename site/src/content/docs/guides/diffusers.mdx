@@ -274,9 +274,9 @@ plt.show()
 </details>
 
 The animation below runs that goniometer experiment numerically: the same
-plane wavefront hits a flat rigid panel and a Schroeder diffuser (an N = 7
+plane wavefront hits a flat rigid panel and a Schroeder diffuser (an $N = 7$
 quadratic-residue profile), and the scattered energy on the receiver arc turns
-a collimated specular beam (d = 0.32) into a wide fan (d = 0.63).
+a collimated specular beam ($d = 0.32$) into a wide fan ($d = 0.63$).
 
 <Video
   name="anim_fdtd_diffusion"
@@ -290,7 +290,7 @@ The single-plane response below is the far-field prediction of a published
 diffuser geometry: an $N = 7$ quadratic-residue diffuser of 6 periods, 3.6 m
 total width and 0.2 m maximum well depth (the "N = 7 QRD, 6 periods, 0.2 m
 deep" row of Cox & D'Antonio, *Acoustic Absorbers and Diffusers*, 3rd ed.,
-Appendix B; the commercial N = 7 QRD measured by Hargreaves, Cox, Lam &
+Appendix B; the commercial $N = 7$ QRD measured by Hargreaves, Cox, Lam &
 D'Antonio, *J. Acoust. Soc. Am.* 108(4), 1710-1720, 2000, Table I) and its
 equal-footprint flat reference panel, at 1000 Hz, normal incidence, on the
 standard 37-point semicircle (5° spacing, $-90°$ to $+90°$). The same model
@@ -504,7 +504,7 @@ A handful of design rules follow directly from the geometry:
   $d_{max} = \max(s_n)\,\lambda_0/(2N)$, close to half a wavelength for large
   $N$; halve $f_0$ and the diffuser gets twice as deep. This is the cost that
   the [metadiffuser](/phonometry/guides/metadiffusers/) attacks: at 500 Hz an
-  N = 5 design already calls for wells 27.4 cm deep.
+  $N = 5$ design already calls for wells 27.4 cm deep.
 - **The sequence repeats what the prime provides.** $s_n$ is symmetric about
   $n = 0$ and periodic in $N$, so one period has $N$ wells and the profile is
   built by repeating it. The flat-phase property also holds at the harmonics
@@ -545,7 +545,7 @@ p(\theta) = F(\theta) \sum_n R_n \, e^{\,j k x_n (\sin\psi + \sin\theta)},
 $$
 
 with $x_n$ the well centre and $k = 2\pi f / c$. The predicted polar levels
-$L_i = 20\lg|p(\theta_i)|$ feed the same `directional_diffusion_coefficient` as
+$L_i = 20\log_{10}|p(\theta_i)|$ feed the same `directional_diffusion_coefficient` as
 a measurement.
 
 ```python
@@ -578,7 +578,7 @@ print(np.round(flat.normalized, 3))            # [0. 0. 0. 0.]
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diffuser_prediction.svg" alt="Predicted diffusion coefficient over the one-third-octave bands from 250 to 5000 Hz for an N = 7 quadratic residue diffuser design compared with a flat panel of the same footprint: the QRD curve sits well above the near-zero flat-panel curve across the band" width="88%" />
 
-*Predicted from the design alone: the N = 7 QRD spreads the reflected energy
+*Predicted from the design alone: the $N = 7$ QRD spreads the reflected energy
 far more evenly than the flat panel of the same footprint, so its predicted
 diffusion coefficient sits well above the near-specular flat reference across
 the band. This is a far-field design estimate, not a substitute for an

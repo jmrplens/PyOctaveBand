@@ -76,7 +76,7 @@ full-scale analysis (calibration does not apply in dBFS mode).
 
 Why the *energy* mean and not the arithmetic mean of dB values? Because sound
 doses add as energy: two periods at 60 dB and 80 dB do not average to 70 dB;
-the 80 dB half dominates and $L_{eq}$ = 77 dB. Averaging decibels directly
+the 80 dB half dominates and $L_{eq} = 77$ dB. Averaging decibels directly
 underestimates every fluctuating noise. $L_{eq}$ is the level of the *steady*
 sound carrying the same energy as the real, fluctuating one, which is why
 regulations are written in terms of it.
@@ -106,8 +106,8 @@ everywhere else, energy.
 ## Percentile levels (LN)
 
 `ln_levels` computes statistical levels from the time-weighted envelope:
-**L10** is the level exceeded 10 % of the time (event peaks), **L50** the median,
-**L90** the background level.
+**$L_{10}$** is the level exceeded 10 % of the time (event peaks),
+**$L_{50}$** the median, **$L_{90}$** the background level.
 
 ```python
 import numpy as np
@@ -130,7 +130,8 @@ print(f"LA10={stats[10]:.1f}  LA50={stats[50]:.1f}  LA90={stats[90]:.1f} dB")
 
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/ln_levels_example_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/ln_levels_example.svg" alt="Fast level history of fluctuating noise with the L10, L50 and L90 statistical levels marked" width="80%"></picture>
 
-*L10 tracks the event peaks, L50 the median level and L90 the background.*
+*$L_{10}$ tracks the event peaks, $L_{50}$ the median level and $L_{90}$ the
+background.*
 
 <details>
 <summary>Show the code for this figure</summary>
@@ -247,7 +248,8 @@ lex = metrology.lex_8h(shift_sample, fs, duration_hours=8, calibration_factor=se
 ```
 
 `lc_peak` is verified against the one-cycle/half-cycle reference responses of
-IEC 61672-1:2013 Table 5, `sel` against the Table 4 LAE toneburst column, and
+IEC 61672-1:2013 Table 5, `sel` against the Table 4 $L_{AE}$ toneburst
+column, and
 the dose functions against the IEC 61252 anchors (3.2 Pa²h ↔ exactly 90 dB).
 `lc_peak` polyphase-oversamples the C-weighted signal by `oversample` (default
 `8`) before taking the maximum, recovering the true inter-sample peak: a raw
@@ -327,10 +329,10 @@ is +3 dB.
 
 | Function | Key parameters | Returns | Standard anchor |
 | :--- | :--- | :--- | :--- |
-| `lc_peak(x, fs, calibration_factor=1.0, dbfs=False)` | `dbfs=True` references full-scale *peak* (1.0), not RMS | LCpeak [dB] | IEC 61672-1 §5.13, Table 5 tone bursts |
-| `sel(x, fs, weighting=None, ...)` | `weighting='A'` gives LAE | SEL [dB] | IEC 61672-1 Table 4 (LAE column) |
-| `sound_exposure(x, fs, duration_hours=None, ...)` | `duration_hours` treats `x` as a sample of that period | E [Pa²h] | IEC 61252 |
-| `lex_8h(x, fs, duration_hours=None, ...)` | same sampling semantics | LEX,8h [dB] | IEC 61252 (≡ LEP,d) |
+| `lc_peak(x, fs, calibration_factor=1.0, dbfs=False)` | `dbfs=True` references full-scale *peak* (1.0), not RMS | $L_{Cpeak}$ [dB] | IEC 61672-1 §5.13, Table 5 tone bursts |
+| `sel(x, fs, weighting=None, ...)` | `weighting='A'` gives $L_{AE}$ | SEL [dB] | IEC 61672-1 Table 4 ($L_{AE}$ column) |
+| `sound_exposure(x, fs, duration_hours=None, ...)` | `duration_hours` treats `x` as a sample of that period | $E$ [Pa²h] | IEC 61252 |
+| `lex_8h(x, fs, duration_hours=None, ...)` | same sampling semantics | $L_{EX,8h}$ [dB] | IEC 61252 ($\equiv L_{EP,d}$) |
 
 `lex_8h` rates *one* recording; assembling a full working day from task or
 job samples, with the normative ISO 9612 uncertainty budget, continues in
@@ -338,7 +340,7 @@ job samples, with the normative ISO 9612 uncertainty budget, continues in
 
 Turning these levels into the regulatory day-evening-night indicators and
 reporting them defensibly is
-[Environmental levels](environmental-levels.md): the Lden and Ldn
+[Environmental levels](environmental-levels.md): the $L_{den}$ and $L_{dn}$
 descriptors, the composite rating levels of ISO 1996-1 with their character
 adjustments, and the ISO 1996-2 determination chain of tonal adjustment,
 residual-noise correction and the measurement uncertainty budget.

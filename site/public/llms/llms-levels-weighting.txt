@@ -189,14 +189,14 @@ for recording in signals:
 ## 5. High-frequency accuracy (`high_accuracy`)
 
 A plain bilinear-transform design compresses the response near Nyquist: at
-fs = 48 kHz the A-curve error at 12.5 kHz reaches −2.7 dB, outside the IEC
+$f_s = 48$ kHz the A-curve error at 12.5 kHz reaches −2.7 dB, outside the IEC
 61672-1 **class 1** tolerance (+2.0/−2.5 dB).
 
 By default (`high_accuracy=True`), phonometry designs and runs the weighting
 filter at an internally oversampled rate (up to 8×, reaching ≥ 144 kHz at
 common audio rates; a 96 kHz input runs ×2) and decimates back, keeping
 the response within class 1 tolerances up to 16 kHz (error ≈ −0.5 dB at
-12.5 kHz for fs = 48 kHz).
+12.5 kHz for $f_s = 48$ kHz).
 
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/weighting_accuracy_hf_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/weighting_accuracy_hf.svg" alt="A-weighting high-frequency accuracy at 48 kHz: analytic curve versus plain bilinear versus oversampled design, with error subplot" width="80%"></picture>
 
@@ -353,7 +353,7 @@ Use C-weighting for peak sound pressure and high-level noise, and use the differ
 
 ### Is A-weighting accurate near 16 kHz at a 48 kHz sample rate?
 
-Not with a plain bilinear design: at fs = 48 kHz the A-curve error reaches −2.7 dB at 12.5 kHz, outside the IEC 61672-1 class 1 tolerance (+2.0/−2.5 dB). The default `high_accuracy=True` oversamples internally (up to 8×, reaching 144 kHz or more at common audio rates) and keeps the response within class 1 tolerances up to 16 kHz, with an error of about −0.5 dB at 12.5 kHz.
+Not with a plain bilinear design: at $f_s = 48$ kHz the A-curve error reaches −2.7 dB at 12.5 kHz, outside the IEC 61672-1 class 1 tolerance (+2.0/−2.5 dB). The default `high_accuracy=True` oversamples internally (up to 8×, reaching 144 kHz or more at common audio rates) and keeps the response within class 1 tolerances up to 16 kHz, with an error of about −0.5 dB at 12.5 kHz.
 
 ## References
 
@@ -462,7 +462,7 @@ The implementation follows the ISO 7196 Table 1 pole/zero values exactly and is
 verified in CI against every Table 2 nominal response value (0.25 Hz to 315 Hz).
 `WeightingFilter(fs, "G")` supports the same multichannel and stateful block
 processing as A/C. Levels measured with the G curve are reported as
-L<sub>pG</sub> (or L<sub>Geq</sub> for the equivalent level over time).
+$L_{pG}$ (or $L_{Geq}$ for the equivalent level over time).
 
 ## 2. Historical and special-purpose curves: B, D and AU
 
@@ -588,7 +588,7 @@ print(f"LA = {la:.1f} dB   LAU = {lau:.1f} dB   audible alone = {la_ref:.1f} dB"
 Ultrasound only reaches a digital filter when the sample rate captures it,
 so measure at 96 kHz or more (at 48 kHz there is nothing above 24 kHz to
 reject); the AU design internally oversamples toward 288 kHz to keep the
-steep U roll-off accurate. Levels are reported as L<sub>AU</sub>. The
+steep U roll-off accurate. Levels are reported as $L_{AU}$. The
 implementation follows the Table 2 pole locations exactly (they reproduce
 every Table 1 nominal value within 0.05 dB) and is verified in CI against
 the Table 1 tolerances up to 40 kHz.
@@ -705,18 +705,19 @@ $$
 y(t) = \frac{1}{\tau} \int_{-\infty}^{t} x^2(\xi)\ e^{-(t-\xi)/\tau}\ d\xi
 $$
 
-a first-order low-pass on the squared signal. The time constant τ sets the
+a first-order low-pass on the squared signal. The time constant $\tau$ sets the
 trade-off: **Fast** (125 ms) follows speech-like fluctuations, **Slow** (1 s)
 steadies the readout for quasi-stationary noise. After a step onset the
-envelope reaches 63 % of its final value in one τ and ~99.97 % after 8τ;
+envelope reaches 63 % of its final value in one $\tau$ and ~99.97 % after
+$8\tau$;
 that is why level analyses discard the first instants of a recording.
 
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_time_weighting_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_time_weighting.svg" alt="The exponential-detector chain: the band pressure is squared, smoothed by a one-pole RC low-pass with time constant tau, and converted to decibels, with the Fast, Slow and Impulse time constants listed" width="88%"></picture>
 
 ## 2. The three time weightings
 
-* **Fast (`fast`):** τ = 125 ms. Standard for noise fluctuations.
-* **Slow (`slow`):** τ = 1000 ms. Standard for steady noise.
+* **Fast (`fast`):** $\tau = 125\ \text{ms}$. Standard for noise fluctuations.
+* **Slow (`slow`):** $\tau = 1000\ \text{ms}$. Standard for steady noise.
 * **Impulse (`impulse`):** **Asymmetric** ballistics. 35 ms rise time for rapid
   onset capture, 1500 ms decay for readability.
 
@@ -783,7 +784,7 @@ $$
 - **Fast** is the default of nearly every modern method: percentile levels,
   impulsive-event detection, community noise, the general "level vs time"
   plot. Its 125 ms constant is of the same order as the ear's own loudness
-  integration time, so an LAF trace roughly tracks what a listener notices.
+  integration time, so an $L_{AF}$ trace roughly tracks what a listener notices.
 - **Slow** suits quasi-stationary sources and any procedure that needs a
   steady readout: it averages away the flicker of a fluctuating source at
   the price of missing short events (a 100 ms burst peaks about 7.5 dB lower
@@ -808,7 +809,7 @@ $$
 | :--- | :--- | :--- | :--- | :--- |
 | `x` | 1D or 2D array | pressure (any scale) | non-empty | Squared internally; output is a mean-square envelope |
 | `fs` | int | Hz | > 0 | |
-| `mode` | str | — | `'fast'` (default), `'slow'`, `'impulse'` | τ = 125 ms / 1 s / 35 ms attack + 1.5 s decay |
+| `mode` | str | — | `'fast'` (default), `'slow'`, `'impulse'` | $\tau$ = 125 ms / 1 s / 35 ms attack + 1.5 s decay |
 | `TimeWeighting(fs, mode)` (class) | — | — | — | Stateful variant for streaming: `process(x)` carries the integrator state between blocks |
 
 The output has the units of $x^2$: take `10*log10(y / p0**2)` for SPL or use
@@ -917,8 +918,8 @@ The `impulse` mode uses an asymmetric kernel that is JIT-compiled when
 [numba](https://numba.pydata.org/) is installed (`pip install phonometry[perf]`).
 Without numba a pure-Python fallback produces identical results, just slower.
 
-See [Integrated & Statistical Levels](https://jmrplens.github.io/phonometry/guides/levels/) for Leq/LN metrics built on
-these envelopes, and [Why phonometry](https://jmrplens.github.io/phonometry/reference/why-phonometry/) for the IEC
+See [Integrated & Statistical Levels](https://jmrplens.github.io/phonometry/guides/levels/) for $L_{eq}$/$L_N$ metrics
+built on these envelopes, and [Why phonometry](https://jmrplens.github.io/phonometry/reference/why-phonometry/) for the IEC
 61672-1 tone-burst verification.
 
 ## References
@@ -1032,7 +1033,7 @@ full-scale analysis (calibration does not apply in dBFS mode).
 
 Why the *energy* mean and not the arithmetic mean of dB values? Because sound
 doses add as energy: two periods at 60 dB and 80 dB do not average to 70 dB;
-the 80 dB half dominates and $L_{eq}$ = 77 dB. Averaging decibels directly
+the 80 dB half dominates and $L_{eq} = 77$ dB. Averaging decibels directly
 underestimates every fluctuating noise. $L_{eq}$ is the level of the *steady*
 sound carrying the same energy as the real, fluctuating one, which is why
 regulations are written in terms of it.
@@ -1062,8 +1063,8 @@ everywhere else, energy.
 ## Percentile levels (LN)
 
 `ln_levels` computes statistical levels from the time-weighted envelope:
-**L10** is the level exceeded 10 % of the time (event peaks), **L50** the median,
-**L90** the background level.
+**$L_{10}$** is the level exceeded 10 % of the time (event peaks),
+**$L_{50}$** the median, **$L_{90}$** the background level.
 
 ```python
 import numpy as np
@@ -1086,7 +1087,8 @@ print(f"LA10={stats[10]:.1f}  LA50={stats[50]:.1f}  LA90={stats[90]:.1f} dB")
 
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/ln_levels_example_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/ln_levels_example.svg" alt="Fast level history of fluctuating noise with the L10, L50 and L90 statistical levels marked" width="80%"></picture>
 
-*L10 tracks the event peaks, L50 the median level and L90 the background.*
+*$L_{10}$ tracks the event peaks, $L_{50}$ the median level and $L_{90}$ the
+background.*
 
 <details>
 <summary>Show the code for this figure</summary>
@@ -1203,7 +1205,8 @@ lex = metrology.lex_8h(shift_sample, fs, duration_hours=8, calibration_factor=se
 ```
 
 `lc_peak` is verified against the one-cycle/half-cycle reference responses of
-IEC 61672-1:2013 Table 5, `sel` against the Table 4 LAE toneburst column, and
+IEC 61672-1:2013 Table 5, `sel` against the Table 4 $L_{AE}$ toneburst
+column, and
 the dose functions against the IEC 61252 anchors (3.2 Pa²h ↔ exactly 90 dB).
 `lc_peak` polyphase-oversamples the C-weighted signal by `oversample` (default
 `8`) before taking the maximum, recovering the true inter-sample peak: a raw
@@ -1283,10 +1286,10 @@ is +3 dB.
 
 | Function | Key parameters | Returns | Standard anchor |
 | :--- | :--- | :--- | :--- |
-| `lc_peak(x, fs, calibration_factor=1.0, dbfs=False)` | `dbfs=True` references full-scale *peak* (1.0), not RMS | LCpeak [dB] | IEC 61672-1 §5.13, Table 5 tone bursts |
-| `sel(x, fs, weighting=None, ...)` | `weighting='A'` gives LAE | SEL [dB] | IEC 61672-1 Table 4 (LAE column) |
-| `sound_exposure(x, fs, duration_hours=None, ...)` | `duration_hours` treats `x` as a sample of that period | E [Pa²h] | IEC 61252 |
-| `lex_8h(x, fs, duration_hours=None, ...)` | same sampling semantics | LEX,8h [dB] | IEC 61252 (≡ LEP,d) |
+| `lc_peak(x, fs, calibration_factor=1.0, dbfs=False)` | `dbfs=True` references full-scale *peak* (1.0), not RMS | $L_{Cpeak}$ [dB] | IEC 61672-1 §5.13, Table 5 tone bursts |
+| `sel(x, fs, weighting=None, ...)` | `weighting='A'` gives $L_{AE}$ | SEL [dB] | IEC 61672-1 Table 4 ($L_{AE}$ column) |
+| `sound_exposure(x, fs, duration_hours=None, ...)` | `duration_hours` treats `x` as a sample of that period | $E$ [Pa²h] | IEC 61252 |
+| `lex_8h(x, fs, duration_hours=None, ...)` | same sampling semantics | $L_{EX,8h}$ [dB] | IEC 61252 ($\equiv L_{EP,d}$) |
 
 `lex_8h` rates *one* recording; assembling a full working day from task or
 job samples, with the normative ISO 9612 uncertainty budget, continues in
@@ -1294,7 +1297,7 @@ job samples, with the normative ISO 9612 uncertainty budget, continues in
 
 Turning these levels into the regulatory day-evening-night indicators and
 reporting them defensibly is
-[Environmental levels](https://jmrplens.github.io/phonometry/guides/environmental-levels/): the Lden and Ldn
+[Environmental levels](https://jmrplens.github.io/phonometry/guides/environmental-levels/): the $L_{den}$ and $L_{dn}$
 descriptors, the composite rating levels of ISO 1996-1 with their character
 adjustments, and the ISO 1996-2 determination chain of tonal adjustment,
 residual-noise correction and the measurement uncertainty budget.
@@ -1438,7 +1441,7 @@ Source: https://jmrplens.github.io/phonometry/guides/environmental-levels/
 
 # Environmental Levels (ISO 1996-1/-2)
 
-A community does not hear a single LAeq: it hears a day whose evenings and
+A community does not hear a single $L_{Aeq}$: it hears a day whose evenings and
 nights matter more, a source whose tones or impulses annoy beyond their
 energy, and a measurement taken over a residual background with a finite
 confidence. This page is the regulatory assessment chain built on top of
@@ -1518,7 +1521,7 @@ plt.show()
 
 | Function | Key parameters | Notes |
 | :--- | :--- | :--- |
-| `lden(lday, levening, lnight, hours=(12, 4, 8))` | period LAeq values [dB]; `hours` must sum to 24 | +5 dB evening, +10 dB night (3.6.4) |
+| `lden(lday, levening, lnight, hours=(12, 4, 8))` | period $L_{Aeq}$ values [dB]; `hours` must sum to 24 | +5 dB evening, +10 dB night (3.6.4) |
 | `ldn(lday, lnight, hours=(15, 9))` | | +10 dB night (3.6.5) |
 | `composite_rating_level(periods)` | iterable of `(level_db, hours, adjustment_db)`; hours positive, finite and summing to 24 | General Formulae (5)-(6); adjustments per Table A.1 |
 
@@ -1526,13 +1529,13 @@ Where you put the microphone changes the number: ISO 1996-2 fixes the receiver p
 
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_env_measurement_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_env_measurement.svg" alt="Environmental noise measurement positions per ISO 1996-2: free field, 2 m from the facade and flush-mounted, with their corrections" width="92%"></picture>
 
-Combine with `laeq()` per time period to go from recordings to Lden. The
+Combine with `laeq()` per time period to go from recordings to $L_{den}$. The
 tonal adjustment itself is justified by the tonal audibility route of the next
 section (fed, for the ISO/PAS 20065 method, by
 [Objective audibility of tones in noise](https://jmrplens.github.io/phonometry/guides/tone-audibility/));
 the `tone_to_noise_ratio()` / `prominence_ratio()` verdicts of
 [Prominent Discrete Tones](https://jmrplens.github.io/phonometry/guides/tone-prominence/) are
-complementary emission screening, not the Kt basis.
+complementary emission screening, not the $K_t$ basis.
 
 ## Determining levels: tonal adjustment, residual noise and uncertainty (ISO 1996-2)
 
@@ -1544,7 +1547,7 @@ tonal adjustment, the residual-noise correction and the uncertainty budget.
 **Tonal adjustment (engineering method, Annex C).** From the energy-summed tone
 level $L_{pt}$ and the masking-noise level $L_{pn}$ in the critical band around a
 tone, the audibility above the masking threshold is
-$\Delta L_{ta} = L_{pt} - L_{pn} + 2 + \lg[1 + (f_c/502)^{2.5}]$ dB (Formula (C.3)),
+$\Delta L_{ta} = L_{pt} - L_{pn} + 2 + \log_{10}[1 + (f_c/502)^{2.5}]$ dB (Formula (C.3)),
 and the adjustment is $K_t = 0$ for $\Delta L_{ta} < 4$, $K_t = \Delta L_{ta} - 4$
 for $4 \le \Delta L_{ta} \le 10$ and $K_t = 6$ above (Formulae (C.4)–(C.6)). The
 critical bandwidth is 100 Hz up to 500 Hz and 20 % of $f_c$ above (Table C.1).
@@ -1572,7 +1575,7 @@ plt.show()
 </details>
 
 **Residual-noise correction (Clause 10.4).** `residual_sound_correction()`
-applies $L = 10\lg(10^{L'/10} - 10^{L_\text{res}/10})$ (Formula (16)). With a
+applies $L = 10\log_{10}(10^{L'/10} - 10^{L_\text{res}/10})$ (Formula (16)). With a
 residual within 3 dB of the measured level no correction is allowed: the
 *uncorrected* measured level $L'$ is then the reportable value, as an upper
 bound of the specific sound (exposed as `reportable_upper_bound`, with
@@ -1618,10 +1621,10 @@ $L_{dn}$ (3.6.5) keeps only the +10 dB night penalty.
 
 ## See also
 
-- [Integrated and Statistical Levels](https://jmrplens.github.io/phonometry/guides/levels/): the Leq/LAeq, percentile
-  and event levels the indicators of this page are assembled from.
+- [Integrated and Statistical Levels](https://jmrplens.github.io/phonometry/guides/levels/): the $L_{eq}$/$L_{Aeq}$,
+  percentile and event levels the indicators of this page are assembled from.
 - [Objective audibility of tones in noise](https://jmrplens.github.io/phonometry/guides/tone-audibility/): the tonal
-  audibility whose mean value maps to the Kt adjustment (Table J.1).
+  audibility whose mean value maps to the $K_t$ adjustment (Table J.1).
 - [Prominent Discrete Tones](https://jmrplens.github.io/phonometry/guides/tone-prominence/): the ECMA-418-1
   tone-to-noise and prominence-ratio verdicts, complementary emission
   screening for the tonal question.
@@ -1748,7 +1751,7 @@ in each phase and corrected, and the period level is the energy mean weighted
 by phase duration (Annex IV A.3.4.2 b):
 
 $$
-L_{Keq,T} = 10 \lg \left[ \frac{1}{T} \sum_i T_i \, 10^{L_{Keq,Ti}/10} \right]
+L_{Keq,T} = 10 \log_{10} \left[ \frac{1}{T} \sum_i T_i \, 10^{L_{Keq,Ti}/10} \right]
 $$
 
 The annual average $L_{K,x}$ of each period is in turn the energy mean of the
@@ -1948,16 +1951,17 @@ exceeds 9 dB.
 
 ## See also
 
-- [Environmental levels](https://jmrplens.github.io/phonometry/guides/environmental-levels/): the Lden and Ldn indicators
-  and the ISO 1996-2 adjustments the corrections of the regulation coexist
-  with.
-- [Integrated & Statistical Levels](https://jmrplens.github.io/phonometry/guides/levels/): the per-phase LAeq, LCeq and
-  LAIeq levels that feed the three corrections.
+- [Environmental levels](https://jmrplens.github.io/phonometry/guides/environmental-levels/): the $L_{den}$ and $L_{dn}$
+  indicators and the ISO 1996-2 adjustments the corrections of the regulation
+  coexist with.
+- [Integrated & Statistical Levels](https://jmrplens.github.io/phonometry/guides/levels/): the per-phase $L_{Aeq}$,
+  $L_{Ceq}$ and $L_{AIeq}$ levels that feed the three corrections.
 - [Spanish Building Code (CTE DB-HR)](https://jmrplens.github.io/phonometry/guides/spanish-building-code/): the other half
-  of the Spanish framework, which shares the site's day noise index Ld with
+  of the Spanish framework, which shares the site's day noise index $L_d$ with
   this page.
 - [Impulsive-sound prominence](https://jmrplens.github.io/phonometry/guides/impulse-prominence/): the ISO/PAS 1996-3
-  impulsive adjustment, the relative of Ki that is not interchangeable with it.
+  impulsive adjustment, the relative of $K_i$ that is not interchangeable with
+  it.
 - API reference: [`environmental.spanish_regulation`](https://jmrplens.github.io/phonometry/reference/api/environment/spanish-regulation/).
 
 ## References
@@ -1982,7 +1986,8 @@ exceeds 9 dB.
 
 RD 1367/2007 (BOE-A-2007-18397), the regulation that develops Ley 37/2003 del
 Ruido on acoustic zoning, quality objectives and acoustic emissions: the
-corrected level LKeq,T and the corrections Kt, Kf and Ki (Annex I A.2 c, Annex
+corrected level $L_{Keq,T}$ and the corrections $K_t$, $K_f$ and $K_i$
+(Annex I A.2 c, Annex
 IV A.3.3), the evaluation periods and the noise-phase integration (Annex I
 A.1, Annex IV A.3.4.2 b), the acoustic quality objectives of Annex II (Table A
 as amended by RD 1038/2012) and the immission limit values of Annex III, with

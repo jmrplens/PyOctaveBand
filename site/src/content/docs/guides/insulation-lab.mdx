@@ -200,8 +200,8 @@ plt.show()
 | `l1` / `l2` | 1D or 2D array | dB | one/band, or `(positions, bands)` | Source / receiving levels (airborne) |
 | `li` | 1D or 2D array | dB | one/band, or `(positions, bands)` | Impact SPL from the tapping machine (impact) |
 | `t2` | 1D array | s | > 0, one per band | Receiving-room reverberation time |
-| `area` | float | m² | > 0 | Free test-opening area `S` (airborne only) |
-| `volume` | float | m³ | > 0 | Receiving-room volume `V` |
+| `area` | float | m² | > 0 | Free test-opening area $S$ (airborne only) |
+| `volume` | float | m³ | > 0 | Receiving-room volume $V$ |
 
 `lab_airborne_insulation()` returns a `LabAirborneInsulationResult` (`r`,
 `absorption`, `rating`); `lab_impact_insulation()` a
@@ -328,11 +328,11 @@ the floor-covering improvement (ISO 16251-1) and flanking transmission
 - [Sound Insulation by Intensity (ISO 15186)](/phonometry/guides/insulation-intensity/):
   the direct-power alternative for high-flanking situations.
 - [Floor-Covering Impact Improvement (ISO 16251-1)](/phonometry/guides/impact-improvement/):
-  the small-mock-up ΔL of soft floor coverings.
+  the small-mock-up $\Delta L$ of soft floor coverings.
 - [Laboratory Flanking Transmission (ISO 10848)](/phonometry/guides/flanking-lab/):
   the measured junction vibration reduction index.
 - [Insulation Ratings (ISO 717)](/phonometry/guides/insulation-ratings/):
-  the reference-curve engine behind Rw and Ln,w.
-- [Sound Power](/phonometry/guides/sound-power/): the `LW` methods that share the
-  absorption-area machinery of the receiving room.
+  the reference-curve engine behind $R_w$ and $L_{n,w}$.
+- [Sound Power](/phonometry/guides/sound-power/): the $L_W$ methods that share
+  the absorption-area machinery of the receiving room.
 - API reference: [`building.lab_insulation`](/phonometry/reference/api/building/lab-insulation/).

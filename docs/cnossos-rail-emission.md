@@ -41,8 +41,8 @@ referred to the plane tangent to the two upper rail surfaces:
 
 | Height | Index | Physical sources allocated to it |
 | :--- | :--- | :--- |
-| **0,5 m** (source A) | `h = 1` | Rolling noise (rail, wheel and freight superstructure), impact noise, curve squeal, bridge noise, and the traction and aerodynamic components that sit low: gears, motors, shrouds and screens. |
-| **4,0 m** (source B) | `h = 2` | The traction and aerodynamic components that sit high: diesel exhausts, roof apparatus, the pantograph recess. |
+| **0,5 m** (source A) | $h = 1$ | Rolling noise (rail, wheel and freight superstructure), impact noise, curve squeal, bridge noise, and the traction and aerodynamic components that sit low: gears, motors, shrouds and screens. |
+| **4,0 m** (source B) | $h = 2$ | The traction and aerodynamic components that sit high: diesel exhausts, roof apparatus, the pantograph recess. |
 
 Nothing in the method decides the traction split for you. Table G-5 tabulates
 the traction sound power **separately for the two heights**, so the split is
@@ -56,12 +56,12 @@ idling equivalent over the reference period (2.3.4):
 
 $$
 L'_{W,\mathrm{eq,line},i}(\psi,\varphi) = L_{W,0,\mathrm{dir},i}(\psi,\varphi)
-  + 10\,\lg\!\left(\frac{Q}{1000\,v}\right),
+  + 10\,\log_{10}\!\left(\frac{Q}{1000\,v}\right),
 \qquad
-+\,10\,\lg\!\left(\frac{T_\mathrm{idle}}{T_\mathrm{ref}\,L}\right).
++\,10\,\log_{10}\!\left(\frac{T_\mathrm{idle}}{T_\mathrm{ref}\,L}\right).
 $$
 
-`Q` is in vehicles per hour, `v` in km/h, `L` the length of the track section in
+$Q$ is in vehicles per hour, $v$ in km/h, $L$ the length of the track section in
 metres. Note the unit: the flow term uses km/h, while the roughness conversion
 two sections down uses m/s. Both are correct, and mixing them up is the single
 most expensive mistake available in this model.
@@ -114,14 +114,14 @@ Rolling noise is the wheel and the rail exciting each other through the
 roughness of the two running surfaces. The method separates the cause from the
 radiation:
 
-- **cause**: the rail roughness `Lr,TR` (Table G-1b, selected by digit 2 of the
-  track descriptor) and the wheel roughness `Lr,VEH` (Table G-1a, selected by
-  the brake type, digit 3 of the vehicle descriptor), energy-summed and then
-  filtered by the **contact filter** `A3` (Table G-2), which accounts for the
-  finite size of the contact patch:
+- **cause**: the rail roughness $L_{r,TR}$ (Table G-1b, selected by digit 2 of
+  the track descriptor) and the wheel roughness $L_{r,VEH}$ (Table G-1a,
+  selected by the brake type, digit 3 of the vehicle descriptor), energy-summed
+  and then filtered by the **contact filter** $A_3$ (Table G-2), which accounts
+  for the finite size of the contact patch:
 
 $$
-L_{R,\mathrm{TOT},i} = 10\,\lg\!\left(10^{L_{r,TR,i}/10} + 10^{L_{r,VEH,i}/10}\right) + A_{3,i};
+L_{R,\mathrm{TOT},i} = 10\,\log_{10}\!\left(10^{L_{r,TR,i}/10} + 10^{L_{r,VEH,i}/10}\right) + A_{3,i};
 $$
 
 - **radiation**: three speed-independent transfer functions turn that roughness
@@ -131,7 +131,7 @@ $$
   (Table G-3c, which is 0,0 dB in every band):
 
 $$
-L_{W,0,TR,i} = L_{R,\mathrm{TOT},i} + L_{H,TR,i} + 10\,\lg N_a,
+L_{W,0,TR,i} = L_{R,\mathrm{TOT},i} + L_{H,TR,i} + 10\,\log_{10} N_a,
 $$
 
 and the same addition for the wheel and the superstructure. The three
@@ -145,7 +145,7 @@ altogether.
 
 ## 4. The wavelength-to-frequency conversion
 
-Roughness is tabulated against **wavelength**, and read at `lambda = v/f`, so
+Roughness is tabulated against **wavelength**, and read at $\lambda = v/f$, so
 the whole roughness spectrum slides along the frequency axis as the train speeds
 up. That is the reason a fast train is bright and a slow one is not: the same
 millimetre-scale roughness excites a higher band.
@@ -227,10 +227,10 @@ density scales it (2.3.12):
 
 $$
 L_{R,\mathrm{IMPACT},i} = L_{R,\mathrm{IMPACT-SINGLE},i}
-  + 10\,\lg\!\left(\frac{n_l}{0{,}01}\right).
+  + 10\,\log_{10}\!\left(\frac{n_l}{0{,}01}\right).
 $$
 
-For jointed track a default `nl = 0,01 m⁻¹` is prescribed. Impact noise is not
+For jointed track a default $n_l = 0{,}01\ \text{m}^{-1}$ is prescribed. Impact noise is not
 modelled below the minimum speed, nor while idling. The increment applies from
 50 m before the joint to 50 m after it, which is a **segmentation** instruction:
 the model gives the source strength, and it is up to the track segmentation to
@@ -242,10 +242,10 @@ the 2015 one:
 
 | Vehicle | Condition | Excess |
 | :--- | :--- | :--- |
-| Train | `300 m < R <= 500 m` over at least 50 m of curve | 5 dB |
-| Train | `R <= 300 m` over at least 50 m of curve | 8 dB |
-| Train | switch turnout with `R <= 300 m` | 8 dB |
-| Tram | curve or switch turnout with `R <= 200 m` | 5 dB |
+| Train | $300\ \text{m} < R \le 500\ \text{m}$ over at least 50 m of curve | 5 dB |
+| Train | $R \le 300\ \text{m}$ over at least 50 m of curve | 8 dB |
+| Train | switch turnout with $R \le 300\ \text{m}$ | 8 dB |
+| Tram | curve or switch turnout with $R \le 200\ \text{m}$ | 5 dB |
 
 ```python
 from phonometry import curve_squeal_excess
@@ -266,19 +266,20 @@ closes both intervals.
 **Traction noise** is tabulated per vehicle and per source height (Table G-5).
 The Directive models only two running conditions, constant speed (which it says
 is valid as well when the train accelerates or decelerates) and idling, and
-takes the source strength at maximum load, so `LW,0,const,i = LW,0,idling,i` and
+takes the source strength at maximum load, so
+$L_{W,0,\mathrm{const},i} = L_{W,0,\mathrm{idling},i}$ and
 the one table serves both. Idling is only considered if trains idle for more
 than half an hour.
 
 **Aerodynamic noise** is relevant only above **200 km/h** and follows a
-logarithmic speed law about `v0 = 300 km/h` (2.3.13, 2.3.14):
+logarithmic speed law about $v_0 = 300\ \text{km/h}$ (2.3.13, 2.3.14):
 
 $$
-L_{W,0,i} = L_{W,0,h,i}(v_0) + \alpha_{h,i}\,\lg\!\left(\frac{v}{v_0}\right),
+L_{W,0,i} = L_{W,0,h,i}(v_0) + \alpha_{h,i}\,\log_{10}\!\left(\frac{v}{v_0}\right),
 $$
 
-with `alpha1 = alpha2 = 50` in every band, so a doubling of speed adds
-15,05 dB. Table G-6 is the reference spectrum of a 20 m vehicle at `v0`: at the
+with $\alpha_1 = \alpha_2 = 50$ in every band, so a doubling of speed adds
+15,05 dB. Table G-6 is the reference spectrum of a 20 m vehicle at $v_0$: at the
 lower height it is broadband, at the upper one it is essentially silent except
 for a 1,6 kHz to 3,15 kHz plateau at 105 to 110 dB, which is the pantograph.
 
@@ -286,21 +287,21 @@ for a 1,6 kHz to 3,15 kHz plateau at 105 to 110 dB, which is the pantograph.
 
 Each source is corrected in the two planes before the flow term is added
 (2.3.5). The **horizontal** correction is a dipole (2.3.15), 0 dB broadside and
-`10 lg 0,01 = -20 dB` along the track:
+$10\log_{10} 0{,}01 = -20\ \text{dB}$ along the track:
 
 $$
-\Delta L_{W,\mathrm{dir,hor},i} = 10\,\lg\!\left(0{,}01 + 0{,}99\,\sin^2\varphi\right).
+\Delta L_{W,\mathrm{dir,hor},i} = 10\,\log_{10}\!\left(0{,}01 + 0{,}99\,\sin^2\varphi\right).
 $$
 
 The **vertical** correction of source A (2.3.16) depends on the band, and it is
 one of the pieces the 2021 amendment rewrote. The current text drops the
 absolute-value bars of the 2015 form and makes the correction identically zero
-for `psi <= 0`:
+for $\psi \le 0$:
 
 $$
 \Delta L_{W,\mathrm{dir,ver},i} = \frac{40}{3}
   \left[\tfrac{2}{3}\sin 2\psi - \sin\psi\right]
-  \lg\!\left(\frac{f_{c,i} + 600}{200}\right), \quad 0 < \psi < \pi/2,
+  \log_{10}\!\left(\frac{f_{c,i} + 600}{200}\right), \quad 0 < \psi < \pi/2,
 $$
 
 and zero elsewhere. The two editions disagree over the whole lower half space,
@@ -315,8 +316,8 @@ vertical_directivity(-30.0)                                        # zeros
 vertical_directivity(-30.0, edition=DirectivityEdition.ORIGINAL_2015)  # positive
 ```
 
-At source B, only the aerodynamic source is directional, `10 lg(cos² psi)` for
-`psi < 0` (2.3.17); everything else at 4,0 m is omni-directional, and so is
+At source B, only the aerodynamic source is directional, $10\log_{10}(\cos^2\psi)$
+for $\psi < 0$ (2.3.17); everything else at 4,0 m is omni-directional, and so is
 bridge noise at 0,5 m.
 
 One point of interpretation: 2.3.15 offers the dipole "by default ... for
@@ -335,7 +336,7 @@ rolling-noise component but with the bridge transfer function of Table G-7
 
 $$
 L_{W,0,\mathrm{bridge},i} = L_{R,\mathrm{TOT},i} + L_{H,\mathrm{bridge},i}
-  + 10\,\lg N_a.
+  + 10\,\log_{10} N_a.
 $$
 
 The rolling noise of the vehicle on the bridge is still computed normally, with
@@ -367,8 +368,8 @@ result.components["rolling"]     # the per-source breakdown, before directivity
 
 Splitting a source line into equivalent point sources is, in the words of
 section 2.5.3, "outside the scope of the current methodology": a point source
-standing for a segment of length `dL` simply carries
-`L'W,eq,line,i + 10 lg(dL)`, which is arithmetic.
+standing for a segment of length $dL$ simply carries
+$L'_{W,\mathrm{eq,line},i} + 10\log_{10}(dL)$, which is arithmetic.
 
 CNOSSOS-EU has **its own** propagation method in section 2.5 of Annex II, and it
 is not ISO 9613-2. Chaining a CNOSSOS emission onto the ISO 9613-2 propagation
@@ -436,4 +437,4 @@ such as depots, stations and loudspeakers, are treated by the industrial method.
 - [Outdoor Sound Propagation](outdoor-propagation.md): the
   ISO 9613-2 chain that carries a source power to a receiver.
 - [Environmental noise levels](environmental-levels.md): the
-  Lden and Lnight indicators the resulting maps are drawn for.
+  $L_{den}$ and $L_{night}$ indicators the resulting maps are drawn for.

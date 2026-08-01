@@ -22,12 +22,12 @@ Three primitives, referred to 1 µPa, are computed from a captured pressure
 signal (in Pa):
 
 $$
-\mathrm{SPL} = 10\lg\frac{\langle p^2\rangle}{p_0^2}, \qquad
-\mathrm{SEL} = 10\lg\frac{\int p^2\,dt}{E_0}, \qquad
-L_{p,\mathrm{pk}} = 20\lg\frac{\max|p|}{p_0},
+\mathrm{SPL} = 10\log_{10}\frac{\langle p^2\rangle}{p_0^2}, \qquad
+\mathrm{SEL} = 10\log_{10}\frac{\int p^2\,dt}{E_0}, \qquad
+L_{p,\mathrm{pk}} = 20\log_{10}\frac{\max|p|}{p_0},
 $$
 
-with `p₀ = 1 µPa` and `E₀ = 1 µPa²·s`. The sound pressure level is the
+with $p_0 = 1\ \mu\text{Pa}$ and $E_0 = 1\ \mu\text{Pa}^2\,\text{s}$. The sound pressure level is the
 mean-square level (ISO 18406 Formula 7); the sound exposure level integrates the
 squared pressure over the record (Formulae 3–4); the peak level is the
 zero-to-peak value.
@@ -41,10 +41,10 @@ pk = underwater.peak_sound_pressure_level(pressure)     # dB re 1 µPa
 ```
 
 To re-reference a level between the underwater (1 µPa) and airborne (20 µPa)
-conventions (a `20·lg(20) ≈ 26.02` dB shift, **not** an energy/intensity
+conventions (a $20\log_{10}(20) \approx 26.02$ dB shift, **not** an energy/intensity
 equivalence), use `underwater_to_in_air_spl` / `in_air_to_underwater_spl`. For
 background-noise subtraction, reuse the ISO 3744 `background_noise_correction`
-(`K1`) helper.
+($K_1$) helper.
 
 ## 2. Ship radiated noise and source level (ISO 17208-1/-2)
 
@@ -52,21 +52,21 @@ A surface ship measured in deep water is described first by its **radiated noise
 level** and then by an **equivalent monopole source level**:
 
 $$
-L_{\mathrm{RN}} = 20\lg\frac{p_{\mathrm{rms}}}{p_0} + 20\lg\frac{r}{r_0}
+L_{\mathrm{RN}} = 20\log_{10}\frac{p_{\mathrm{rms}}}{p_0} + 20\log_{10}\frac{r}{r_0}
 \ \ \mathrm{dB\ re\ 1\ \mu Pa\!\cdot\! m}, \qquad
 L_s = L_{\mathrm{RN}} + \Delta L,
 $$
 
 where the Lloyd's-mirror surface correction (ISO 17208-2 Formula 3) for a
-nominal source depth `d_s = 0.7·D` (D = mean draught) and `u = k·d_s`,
-`k = 2πf/c`, is
+nominal source depth $d_s = 0.7\,D$ ($D$ = mean draught) and $u = k\,d_s$,
+$k = 2\pi f/c$, is
 
 $$
-\Delta L = -10\lg\frac{2u^4 + 14u^2}{14 + 2u^2 + u^4}\ \mathrm{dB}.
+\Delta L = -10\log_{10}\frac{2u^4 + 14u^2}{14 + 2u^2 + u^4}\ \mathrm{dB}.
 $$
 
-`ΔL` diverges at low `u` (grazing / low frequency) and tends to `−10·lg(2) =
-−3.01` dB as `u → ∞`. The reported source level is an *equivalent monopole
+$\Delta L$ diverges at low $u$ (grazing / low frequency) and tends to
+$-10\log_{10}(2) = -3.01$ dB as $u \to \infty$. The reported source level is an *equivalent monopole
 broadside* value and must be quoted with its source depth.
 
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/ship_source_level_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/ship_source_level.svg" alt="Ship radiated noise level and equivalent monopole source level versus frequency, with the Lloyd's-mirror surface correction on a twin axis showing its low-frequency divergence and its approach to −3 dB at high frequency" width="82%"></picture>
@@ -107,7 +107,7 @@ past a vertical string of three hydrophones at a closest point of approach of
 100 m or one ship length, whichever is greater, in water at least 150 m or
 1.5 ship lengths deep so the bottom stays out of the picture (Clauses 5.2,
 5.4). Only the **data window** of ±30° about the CPA is scored: the averaging
-runs while the ship crosses a window of length `2·d_CPA·tan 30°` (about
+runs while the ship crosses a window of length $2\,d_{CPA}\tan 30°$ (about
 1.15 CPA distances), centred on the beam aspect the radiated noise level is
 defined for (Clause 3, Figure 3). Four runs are required, two per side; each
 run's three hydrophone levels are power-averaged (Formula 8), the runs are
@@ -126,12 +126,12 @@ and the data window in plan.
 ## 3. Pile-driving sound (ISO 18406)
 
 Percussive pile driving radiates one impulsive pulse per hammer strike. Each
-strike has a **single-strike sound exposure level** `SEL_ss`; over a driving
+strike has a **single-strike sound exposure level** $\mathrm{SEL}_{ss}$; over a driving
 sequence the exposures add to a **cumulative sound exposure level**:
 
 $$
-\mathrm{SEL_{cum}} = 10\lg\sum_{n} 10^{\mathrm{SEL}_n/10},
-\qquad\text{and for } N \text{ identical strikes } = \mathrm{SEL_{ss}} + 10\lg N.
+\mathrm{SEL_{cum}} = 10\log_{10}\sum_{n} 10^{\mathrm{SEL}_n/10},
+\qquad\text{and for } N \text{ identical strikes } = \mathrm{SEL_{ss}} + 10\log_{10} N.
 $$
 
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/pile_driving_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/pile_driving.svg" alt="A percussive pile-driving strike pressure waveform with its peak marked, and below it the cumulative sound exposure level growing as SEL_ss plus ten times the logarithm of the number of strikes" width="82%"></picture>
@@ -207,7 +207,7 @@ ISO 17208-1:2016 and ISO 17208-2:2019, *Underwater acoustics — Quantities and
 procedures for description and measurement of underwater sound from ships*: the
 radiated noise level, the deep-water three-hydrophone geometry, the tabulated
 source-level uncertainty and the equivalent monopole source level via the
-Lloyd's-mirror surface correction (Formula 3) for a `0.7·draught` source depth.
+Lloyd's-mirror surface correction (Formula 3) for a 0.7·draught source depth.
 ISO 18406:2017, *Underwater acoustics — Measurement of radiated underwater sound
 from percussive pile driving*: the single-strike (Formulae 3–4), peak and
 cumulative (Formulae 8–9) sound exposure. All quantities are verified against
@@ -238,7 +238,7 @@ $$
 TL = \text{spreading} + \alpha R .
 $$
 
-Geometrical spreading is $20 \lg R$ (spherical), $10 \lg R$ (cylindrical) or
+Geometrical spreading is $20 \log_{10} R$ (spherical), $10 \log_{10} R$ (cylindrical) or
 spherical up to a transition range $R_0$ and cylindrical beyond it
 (`"practical"`). The volume absorption coefficient $\alpha$ (dB/km) comes from one of three models: **Francois–Garrison**
 (1982, the default and reference), **Ainslie–McColm** (1998, a legible
@@ -300,17 +300,17 @@ ranges at which they hand over, from the seabed reflectivity alone:
 
 | Regime | Propagation factor $F$ | Loss law | Ends at |
 |---|---|---|---|
-| Spherical | $1/r^2$ | $20 \lg r$ | $r = H/(2\psi_c)$ |
-| Cylindrical | $2\psi_c/(rH)$ | $10 \lg r$ | $r_{CS} = \pi H/(4\eta\psi_c^2)$ |
-| Mode stripping | $\sqrt{\pi/(\eta H)}\, r^{-3/2}$ | $15 \lg r$ | $r_{MS} = k^2 H_e^3/(9\pi\eta)$ |
-| Single mode | Eq. (9.54), exponential | steeper than $15 \lg r$ | — |
+| Spherical | $1/r^2$ | $20 \log_{10} r$ | $r = H/(2\psi_c)$ |
+| Cylindrical | $2\psi_c/(rH)$ | $10 \log_{10} r$ | $r_{CS} = \pi H/(4\eta\psi_c^2)$ |
+| Mode stripping | $\sqrt{\pi/(\eta H)}\, r^{-3/2}$ | $15 \log_{10} r$ | $r_{MS} = k^2 H_e^3/(9\pi\eta)$ |
+| Single mode | Eq. (9.54), exponential | steeper than $15 \log_{10} r$ | — |
 
 $\psi_c = \arccos(c_w/c_{sed})$ is the critical grazing angle, $\eta$ the
 **reflection loss gradient** in nepers per radian ($|R(\theta)| \approx
 e^{-\eta\theta}$) and $H_e$ the Weston effective depth, the level a short
 distance below the true seabed at which a pressure-release boundary appears to
 lie. `weston_propagation_loss` assembles the composite loss
-$PL = -10 \lg F$ and returns each regime's own law alongside it; the
+$PL = -10 \log_{10} F$ and returns each regime's own law alongside it; the
 `boundaries` field carries the three transition ranges plus the waveguide
 cut-off frequency and the number of cut-on modes.
 
@@ -389,7 +389,7 @@ Wong & Zhu 1995 ITS-90 form), **Del Grosso** (1974), **Mackenzie** (1981) or
 **Medwin** (1975). The UNESCO and Del Grosso equations use pressure, so depth is
 first converted with the Leroy & Parthiot (1998) formula (`depth_to_pressure`).
 The four agree to within ~2.5 m/s in their common domain; Mackenzie's canonical
-check value is `1550.744 m/s` at 25 °C, 35 ppt, 1000 m.
+check value is 1550.744 m/s at 25 °C, 35 ppt, 1000 m.
 
 Medwin's six-term form is the simplest of the family and the one worth
 remembering, because its partial derivatives are the classic rules of thumb:
@@ -544,7 +544,7 @@ A plane wave striking the seabed reflects with the fluid–fluid **Rayleigh
 reflection coefficient** (Medwin & Clay). For a faster bottom ($c_2 > c_1$) there
 is a **critical grazing angle** $\varphi_c = \arccos(c_1/c_2)$, below which
 the wave is totally reflected ($|R| = 1$, zero loss). The bottom loss is
-$BL = -20 \lg |R|$.
+$BL = -20 \log_{10} |R|$.
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/seabed_reflection_dark.svg">
@@ -632,7 +632,7 @@ sr.plot()                           # |R| vs grazing angle (needs matplotlib)
 
 The ambient-noise spectrum level (dB re 1 µPa²/Hz) is the energy sum of the two
 physically grounded Wenz components: **wind / sea-surface** noise via the "rule
-of fives" ($51.02 - (5/3)\,10\,(\lg f_{\text{kHz}} - \lg(U/5))$: the historical "25 dB (5 × 5)" anchor at 1 kHz for 5 knots is re 20 µPa, i.e. $25 + 20 \lg 20 \approx 51.02$ dB re 1 µPa) and
+of fives" ($51.02 - (5/3)\,10\,(\log_{10} f_{\text{kHz}} - \log_{10}(U/5))$: the historical "25 dB (5 × 5)" anchor at 1 kHz for 5 knots is re 20 µPa, i.e. $25 + 20 \log_{10} 20 \approx 51.02$ dB re 1 µPa) and
 **Mellen thermal** noise ($4 \pi k T \rho f^2 / c$, dominant above ~50 kHz). A
 **shipping** spectrum may be supplied by the caller, for example one predicted
 by the traffic model in §6.
@@ -985,7 +985,7 @@ $$
 
 each mode weighted by its excitation at the source depth $\Psi_m(z_s)$ and
 its amplitude at the receiver depth $\Psi_m(z)$, and the coherent
-transmission loss follows as $TL = -20 \lg\,\lvert p(r,z)/p_0(1\,\mathrm{m})
+transmission loss follows as $TL = -20 \log_{10}\,\lvert p(r,z)/p_0(1\,\mathrm{m})
 \rvert$ (Eq. 5.15). `normal_modes` discretises the depth equation by finite
 differences (a symmetric tridiagonal eigenproblem) on a grid refined enough
 to keep the near-cutoff eigenvalues honest, and warns when a retained mode
@@ -1134,18 +1134,18 @@ that range; use it when a legible formula matters more than the last percent.
 1000 m) and predates both; keep it for quick low-frequency estimates below a
 few tens of kHz and for comparison with older literature that used it.
 
-**Spreading law.** Spherical spreading (`20 lg R`) describes a wavefront that
+**Spreading law.** Spherical spreading ($20\log_{10} R$) describes a wavefront that
 expands freely in three dimensions, before any boundary confines it;
-cylindrical spreading (`10 lg R`) describes energy trapped between the surface
+cylindrical spreading ($10\log_{10} R$) describes energy trapped between the surface
 and the bottom (or in the SOFAR channel) that can only expand in range. The
-`"practical"` law splices the two at a transition range `R0`, which is
+`"practical"` law splices the two at a transition range $R_0$, which is
 physically of the order of the water (or channel) depth: spherical while the
 wavefront has not yet filled the duct, cylindrical once it has. In the 10 kHz
 example of the
 [transmission-loss section](https://jmrplens.github.io/phonometry/guides/underwater-propagation/) the choice is not
 cosmetic: against the same figure of merit of 87 dB, spherical-only spreading
 predicts detection out to about 8.7 km while the practical law with
-`R0 = 1000 m` stretches it to about 15.8 km. When the spreading law is the
+$R_0 = 1000$ m stretches it to about 15.8 km. When the spreading law is the
 biggest uncertainty in the budget, that is the cue to stop using a closed
 form and compute the field.
 
@@ -1158,8 +1158,8 @@ and boundaries decide the answer, pick the solver by frequency and geometry
 | Solver | Natural regime | What it buys you |
 |---|---|---|
 | `ray_trace` | High frequency (water depth ≫ λ), deep water | Eigenray geometry, travel times, convergence zones; cost independent of frequency |
-| `normal_modes` | Low frequency, shallow water, range-independent | Finite-difference modal sum with few propagating modes (`m < kD/π`); the reference solution for its regime, validated against the ideal waveguide's exact modes |
-| `parabolic_equation` | Low frequency, long one-way paths | Full-field TL(z, r) with refraction, marched in range over the range-independent `c(z)` all three solvers assume |
+| `normal_modes` | Low frequency, shallow water, range-independent | Finite-difference modal sum with few propagating modes ($m < kD/\pi$); the reference solution for its regime, validated against the ideal waveguide's exact modes |
+| `parabolic_equation` | Low frequency, long one-way paths | Full-field TL($z$,$r$) with refraction, marched in range over the range-independent $c(z)$ all three solvers assume |
 
 The boundaries blur in practice: rays remain usable at surprisingly low
 frequencies for travel-time work, and the PE remains the workhorse well above
@@ -1170,14 +1170,14 @@ convergence test.
 **A worked sonar budget.** Chain the pieces end to end: a 140 dB re
 1 µPa²/Hz source at 10 kHz, a 60 dB ambient spectrum level, a 15 dB array
 gain and an 8 dB detection threshold give the figure of merit
-`FOM = 140 - (60 - 15) - 8 = 87 dB` computed by `passive_sonar_equation` in
+$FOM = 140 - (60 - 15) - 8 = 87$ dB computed by `passive_sonar_equation` in
 the [sonar-equation section](https://jmrplens.github.io/phonometry/guides/underwater-propagation/) of the propagation
 guide. The transmission-loss curve of that guide's first section (10 °C,
-35 ppt, 100 m, `alpha = 0.95 dB/km`) crosses 87 dB at about 15.8 km with the
+35 ppt, 100 m, $\alpha = 0.95$ dB/km) crosses 87 dB at about 15.8 km with the
 practical law: that crossing *is* the predicted detection range, and every
 term of the budget moves it. Trim the directivity index to 7.5 dB and the
 figure of merit falls to 79.5 dB, so the range drops to wherever the TL
-curve crosses that value; double the frequency to 20 kHz and `alpha` more
+curve crosses that value; double the frequency to 20 kHz and $\alpha$ more
 than triples to 3.3 dB/km, pulling the crossing sharply inward. This
 coupling between the absorption model, the spreading law and the sonar
 equation is why they all live in one module.
@@ -1306,7 +1306,7 @@ print(underwater.hearing_groups("nmfs-2018"))
 Equation (1), after Finneran (2016):
 
 $$
-T(f) = T_0 + A \lg\!\left(1 + \frac{F_1}{f}\right) + (f/F_2)^{B},
+T(f) = T_0 + A \log_{10}\!\left(1 + \frac{F_1}{f}\right) + (f/F_2)^{B},
 $$
 
 with $f$ in kilohertz. `normalized=False` (the default) uses the Table 2
@@ -1353,7 +1353,7 @@ All three current criteria sets use the same generic band-pass filter (NMFS
 2018 Equation 1, Southall et al. Equation 2):
 
 $$
-W(f) = C + 10 \lg \frac{(f/f_1)^{2a}}
+W(f) = C + 10 \log_{10} \frac{(f/f_1)^{2a}}
                        {\left[1+(f/f_1)^2\right]^{a}\left[1+(f/f_2)^2\right]^{b}} ,
 $$
 
@@ -1455,7 +1455,7 @@ the recorded strike to the verdict:
    `single_strike_sel` of [Underwater acoustics](https://jmrplens.github.io/phonometry/guides/underwater-acoustics/), by
    Parseval);
 2. `weighted_exposure` applies $W(f)$ band by band, sums the weighted energy,
-   accumulates it over the number of strikes (the ISO 18406 $+10\lg N$) and
+   accumulates it over the number of strikes (the ISO 18406 $+10\log_{10} N$) and
    compares the result with the criteria, unweighted peak SPL included.
 
 ```python
@@ -1530,7 +1530,7 @@ piling campaign's weighted exposure falls below a criterion.
 - ISO 18405:2017. *Underwater acoustics — Terminology*.
   [ISO page](https://www.iso.org/standard/62406.html).
   The symbols and references the guidance documents adopt for their criteria
-  (Lp,0-pk and LE,p re 1 µPa and 1 µPa²·s).
+  ($L_{p,\text{0-pk}}$ and $L_{E,p}$ re 1 µPa and 1 µPa²·s).
 
 ## Standards & sources
 

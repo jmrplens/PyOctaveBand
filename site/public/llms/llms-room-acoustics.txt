@@ -54,7 +54,7 @@ the analytic inverse filter; it assumes the reference sweep was generated
 with the default amplitude and fade, so use the spectral method for a
 non-unit-amplitude or custom-fade sweep.
 
-**Maximum-length sequence (MLS, Annex A).** An order-`N` binary sequence of
+**Maximum-length sequence (MLS, Annex A).** An order-$N$ binary sequence of
 length $2^N-1$ whose circular autocorrelation is a near-perfect delta; the
 IR follows from circular cross-correlation of the recorded period with the
 sequence. MLS excites at constant amplitude and is quick to average, but it
@@ -657,8 +657,8 @@ ISO 3382-3 open-plan speech metrics, with their fiche, are
 - [Field](https://jmrplens.github.io/phonometry/guides/insulation-field/), [laboratory](https://jmrplens.github.io/phonometry/guides/insulation-lab/) and
   [predicted](https://jmrplens.github.io/phonometry/guides/insulation-prediction/) sound insulation: field,
   laboratory and predicted sound insulation between spaces, and its measurement uncertainty.
-- [Sound Power](https://jmrplens.github.io/phonometry/guides/sound-power/): the `LW` methods that consume the
-  ISO 354 absorption area (the ISO 3744 `K2` and the ISO 3741 absorption term).
+- [Sound Power](https://jmrplens.github.io/phonometry/guides/sound-power/): the $L_W$ methods that consume the
+  ISO 354 absorption area (the ISO 3744 $K_2$ and the ISO 3741 absorption term).
 - [Loudness](https://jmrplens.github.io/phonometry/guides/loudness/) and [Sound Quality Metrics](https://jmrplens.github.io/phonometry/guides/sound-quality/): loudness,
   sharpness and the other perception metrics of what the room delivers.
 - [Filter Banks](https://jmrplens.github.io/phonometry/guides/filter-banks/): the IEC 61260 fractional-octave filters
@@ -746,16 +746,16 @@ fades to unintelligibility as you walk away. Levels and STI are measured
 along a line of workstations (at least 4 positions, 6–10 preferred), and
 four single-number quantities summarise the room. The **spatial decay
 rate** of A-weighted speech is the slope of the level against
-$\lg(r/r_0)$, scaled to a per-doubling figure using only the 2–16 m
+$\log_{10}(r/r_0)$, scaled to a per-doubling figure using only the 2–16 m
 positions,
 
 $$
-D_{2,S} = -\lg(2)\ b, \qquad L = a + b\ \lg(r/r_0),\ r_0 = 1\ \text{m},
+D_{2,S} = -\log_{10}(2)\ b, \qquad L = a + b\ \log_{10}(r/r_0),\ r_0 = 1\ \text{m},
 $$
 
-with **Lp,A,S,4m** read off the same line at 4 m. The **distraction
-distance** rD (STI = 0.50) and **privacy distance** rP (STI = 0.20) come
-from a linear regression of STI against distance. Good offices push rD
+with **$L_{p,A,S,4m}$** read off the same line at 4 m. The **distraction
+distance** $r_D$ (STI = 0.50) and **privacy distance** $r_P$ (STI = 0.20) come
+from a linear regression of STI against distance. Good offices push $r_D$
 below ~5 m; poor ones leave speech distracting past 10 m.
 
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_open_plan_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_open_plan.svg" alt="ISO 3382-3 open-plan measurement line from the source at 1 m along positions from 2 m to 16 m, feeding the four single-number quantities D2,S, Lp,A,S,4m, rD and rP" width="86%"></picture>
@@ -846,7 +846,7 @@ the axis, and a result that retained its positions redraws its own line with
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/open_plan_line_geometry_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/open_plan_line_geometry.svg" alt="To-scale plan of the open-plan measurement line: the red source star at the origin, six blue microphone dots from 2 m to 16 m on a dotted line through the grey workstation blocks, the dashed distraction distance rD = 6.5 m and privacy distance rP = 13 m marked across the line and the 16 m span dimensioned" width="86%"></picture>
 
 *Every ISO 3382-3 quantity comes off this one line: six microphones from 2 m
-to 16 m through the workstations, with `rD` and `rP` landing between them.*
+to 16 m through the workstations, with $r_D$ and $r_P$ landing between them.*
 
 <details>
 <summary>Show the code for this figure</summary>
@@ -872,7 +872,7 @@ plt.show()
 | Parameter | Type | Units | Range / default | Notes |
 | :--- | :--- | :--- | :--- | :--- |
 | `positions_m` | 1D array | m | ≥ 4 positions, all > 0 | Source-to-receiver distances |
-| `spl_a_speech` | 1D array | dB | same length | A-weighted speech level `Lp,A,S,n` per position |
+| `spl_a_speech` | 1D array | dB | same length | A-weighted speech level $L_{p,A,S,n}$ per position |
 | `sti_values` | 1D array | — | same length | STI per position (full IEC 60268-16 method) |
 
 Returns an `OpenPlanResult` with `d2s`, `lp_as_4m`, `rd` and `rp`; its
@@ -949,15 +949,20 @@ occupants, how loud does the background get, and does conversation still work?
 Long (*Architectural Acoustics* 2e, Chapter 17, Equations (17.50) to (17.54))
 sets the two competing levels at a listener:
 
-```text
-Lp(signal) = Lw + 10 log10( Q / (4 π r²) )                (Eq. (17.50))
-Lp(noise)  = Lw + 10 log10 N + 10 log10( 4 / (N A_tab) )  (Eq. (17.51))
-```
+$$
+L_p(\text{signal}) = L_W + 10\log_{10}\!\left[\frac{Q}{4\pi r^2}\right]
+\quad \text{(Eq. (17.50))}
+$$
 
-with `Lw` the sound power level of one talker (about 70 dB in normal
-conversation), `Q` the talker's forward directivity (about 2), `r` the
-talker-to-listener distance and `A_tab` the equivalent absorption area **per
-occupied table**, so `N A_tab` is the room's total absorption.
+$$
+L_p(\text{noise}) = L_W + 10\log_{10} N + 10\log_{10}\!\left[\frac{4}{N A_\text{tab}}\right]
+\quad \text{(Eq. (17.51))}
+$$
+
+with $L_W$ the sound power level of one talker (about 70 dB in normal
+conversation), $Q$ the talker's forward directivity (about 2), $r$ the
+talker-to-listener distance and $A_\text{tab}$ the equivalent absorption area
+**per occupied table**, so $N A_\text{tab}$ is the room's total absorption.
 
 ```python
 from phonometry import room
@@ -975,24 +980,28 @@ print(round(room.crowd_noise_level(20, 20.0 + 170.0)))   # 66 dB
 Subtracting the two gives the **speech-to-noise ratio**, and this is the result
 worth remembering:
 
-```text
-L_SN = 10 log10( Q / (4 π r²) ) + 10 log10( A_tab / 4 )   (Eq. (17.52))
-```
+$$
+L_{SN} = 10\log_{10}\!\left[\frac{Q}{4\pi r^2}\right]
++ 10\log_{10}\!\left[\frac{A_\text{tab}}{4}\right]
+\quad \text{(Eq. (17.52))}
+$$
 
-Neither `Lw` nor `N` survives. A busier room is not intrinsically worse, because
-each new table brings both a talker and its own share of absorption. What
-decides whether a restaurant works is the absorption **per table**, not the
-absorption of the room. Requiring `L_SN > -6` dB for adequate cross-table
-communication at a separation `rs`, and `L_SN < -9` dB so a neighbouring table
-`rt` away is not overheard, turns into a pair of design bounds:
+Neither $L_W$ nor $N$ survives. A busier room is not intrinsically worse,
+because each new table brings both a talker and its own share of absorption.
+What decides whether a restaurant works is the absorption **per table**, not
+the absorption of the room. Requiring $L_{SN} > -6$ dB for adequate
+cross-table communication at a separation $r_s$, and $L_{SN} < -9$ dB so a
+neighbouring table $r_t$ away is not overheard, turns into a pair of design
+bounds:
 
-```text
-A_tab > 6.31 rs²      (Eq. (17.53))
-A_tab < 3.16 rt²      (Eq. (17.54)),  both for Q = 2
-```
+$$
+A_\text{tab} > 6.31\,r_s^2 \quad \text{(Eq. (17.53))}, \qquad
+A_\text{tab} < 3.16\,r_t^2 \quad \text{(Eq. (17.54))},
+\qquad \text{both for } Q = 2
+$$
 
 > **The first constant is printed as 6.33.** The closed form above, at the same
-> Q = 2 that yields Long's own second constant 3.16 exactly, gives 6.31, and his
+> $Q = 2$ that yields Long's own second constant 3.16 exactly, gives 6.31, and his
 > prose ("6.3 or more square metres, 68 sq ft") converts to 6.317 m². The library
 > computes both bounds from the speech-to-noise ratio rather than hardcoding
 > either constant, so they stay mutually consistent; the misprint is recorded in
@@ -1013,7 +1022,7 @@ crowd.plot()      # self-noise vs occupancy, against the -6 dB limit
 *The same 20 talkers in three rooms. The hard room (20 m² of absorption)
 crosses the communication limit before the fourth table is occupied; adding the
 absorptive ceiling of Long's example (190 m² in total) keeps all 20 tables below
-it. The curves are parallel because occupancy always costs `10 log10 N`: only
+it. The curves are parallel because occupancy always costs $10\log_{10} N$: only
 the vertical offset, which is the absorption, is a design variable.*
 
 ### `crowd_noise()` parameters
@@ -1021,10 +1030,10 @@ the vertical offset, which is the absorption, is a design variable.*
 | Parameter | Type | Units | Range / default | Notes |
 | :--- | :--- | :--- | :--- | :--- |
 | `absorption_areas` | float or 1D array | m² | > 0 | Total room absorption areas to compare |
-| `talkers` | 1D array, optional | — | ≥ 1, default 1..20 | Occupancy axis `N` |
-| `distance` | float | m | > 0, default 1.2 | Talker-to-listener distance `r` |
-| `sound_power_level` | float | dB re 1 pW | default 70 | Talker `Lw` |
-| `directivity` | float | — | > 0, default 2 | Talker `Q` |
+| `talkers` | 1D array, optional | — | ≥ 1, default 1..20 | Occupancy axis $N$ |
+| `distance` | float | m | > 0, default 1.2 | Talker-to-listener distance $r$ |
+| `sound_power_level` | float | dB re 1 pW | default 70 | Talker $L_W$ |
+| `directivity` | float | — | > 0, default 2 | Talker $Q$ |
 
 Returns a `CrowdNoiseResult` (`talkers`, `absorption_areas`, `levels`,
 `signal_level`, `communication_level`, `speech_to_noise()`) with `.plot()`. The
@@ -1105,33 +1114,34 @@ the same room settles to.
 A rigid or absorbing rectangular room reflects a point source in its walls;
 each reflection is exactly the free-field sound of a **mirror image** of the
 source. Mirroring a coordinate in a wall (Vorländer Equation (11.36),
-`S_n = S − 2 d n`) turns the source into a regular lattice of images, and the
-room impulse response is the sum of the direct sound and one delayed,
+$S_n = S - 2 d\,\mathbf{n}$) turns the source into a regular lattice of images,
+and the room impulse response is the sum of the direct sound and one delayed,
 attenuated impulse per image (Kuttruff Equations (4.4)–(4.5),
-`g(t) = Σ_n A_n δ(t − t_n)`).
+$g(t) = \sum_n A_n\,\delta(t - t_n)$).
 
-Image `i` at distance `r_i` from the receiver arrives at `t_i = r_i / c`
+Image $i$ at distance $r_i$ from the receiver arrives at $t_i = r_i / c$
 (Vorländer Equation (11.38)) with amplitude
 
-```text
-A_i = [ Π_walls R_wall^(reflections there) ] · exp(−m r_i / 2) / (4 π r_i)
-```
+$$
+A_i = \left[ \prod_\text{walls} R_\text{wall}^{\,\text{(reflections there)}}
+\right] \cdot e^{-m r_i / 2} / (4 \pi r_i)
+$$
 
-combining the `1 / (4 π r_i)` spherical spreading, the product of the wall
-**pressure reflection factors** `R = √(1 − α)` (Vorländer Equation (11.39);
-`|R|² = 1 − α` in energy, Kuttruff 4.1) each raised to the number of
-reflections that image made off that wall, and the air pressure attenuation
-`exp(−m r_i / 2)` over the path (Kuttruff 4.1; `m` the *intensity* attenuation
-constant, so intensity falls as `exp(−m r)`).
+combining the $1 / (4 \pi r_i)$ spherical spreading, the product of the wall
+**pressure reflection factors** $R = \sqrt{1 - \alpha}$ (Vorländer Equation
+(11.39); $|R|^2 = 1 - \alpha$ in energy, Kuttruff 4.1) each raised to the
+number of reflections that image made off that wall, and the air pressure
+attenuation $e^{-m r_i / 2}$ over the path (Kuttruff 4.1; $m$ the *intensity*
+attenuation constant, so intensity falls as $e^{-m r}$).
 
 Along one axis the reflection count off the two walls of an image at lattice
-index `n` and mirror parity `p` is `|n − p|` (wall at 0) and `|n|` (wall at
-`L`), so the total reflection order is
-`|2 n_x − p_x| + |2 n_y − p_y| + |2 n_z − p_z|` (Allen & Berkley 1979). A
-shoebox has exactly `(2/3)(2 i₀³ + 3 i₀² + 4 i₀)` audible images up to order
-`i₀` (Kuttruff Equation (9.23), e.g. 1560 at order 10), and the temporal
-density of reflections grows as `dN/dt = 4 π c³ t² / V` (Kuttruff Equation
-(4.6)).
+index $n$ and mirror parity $p$ is $|n - p|$ (wall at 0) and $|n|$ (wall at
+$L$), so the total reflection order is
+$|2 n_x - p_x| + |2 n_y - p_y| + |2 n_z - p_z|$ (Allen & Berkley 1979). A
+shoebox has exactly $\tfrac{2}{3}(2 i_0^3 + 3 i_0^2 + 4 i_0)$ audible images up
+to order $i_0$ (Kuttruff Equation (9.23), e.g. 1560 at order 10), and the
+temporal density of reflections grows as
+$\mathrm{d}N/\mathrm{d}t = 4 \pi c^3 t^2 / V$ (Kuttruff Equation (4.6)).
 
 The construction in one plan: every wall reflection is the straight-line sound
 of an image in a mirror room, so the geometry alone fixes each arrival. In the
@@ -1236,7 +1246,7 @@ grid, coloured by reflection order.
 
 *The lattice the reflectogram comes from, to scale: each image sits in a
 mirror room at the height plane of the source, and its distance to the
-receiver alone fixes the arrival time and the `1/(4 pi r)` spreading of that
+receiver alone fixes the arrival time and the $1/(4\pi r)$ spreading of that
 reflection.*
 
 <details>
@@ -1258,10 +1268,10 @@ plt.show()
 
 **Reproducing the statistical decay.** The fitted initial decay slope of the
 reverberant energy density of the synthetic RIR recovers the **Eyring**
-reverberation time `T = −24 V ln 10 / (c S ln(1 − ᾱ))` (Kuttruff Equation
-(5.23)): the mean reflection rate `c S / 4 V` equals
-`(c/2)(1/Lx + 1/Ly + 1/Lz)`, so the specular field's initial decay rate is the
-one that defines that `T`. The match is exact only in the near-cubic
+reverberation time $T = -24 V \ln 10 / (c S \ln(1 - \bar\alpha))$ (Kuttruff
+Equation (5.23)): the mean reflection rate $c S / 4 V$ equals
+$\tfrac{c}{2}(1/L_x + 1/L_y + 1/L_z)$, so the specular field's initial decay
+rate is the one that defines that $T$. The match is exact only in the near-cubic
 limit; an elongated room sustains energy along its long axis, so its pure
 *specular* decay runs slower than Eyring's diffuse-field estimate (the regime
 the [Fitzroy and Arau-Puchades models](https://jmrplens.github.io/phonometry/guides/reverberation-prediction/) correct).
@@ -1276,33 +1286,36 @@ settles to the sum of a **direct field** that falls with distance and a
 **reverberant field** that (to the diffuse approximation) is the same
 everywhere. The **room constant**
 
-```text
-R = S ᾱ / (1 − ᾱ)                       (Bies Equation (6.44))
-```
+$$
+R = S \bar\alpha / (1 - \bar\alpha) \quad \text{(Bies Equation (6.44))}
+$$
 
-with total boundary area `S` and mean Sabine absorption `ᾱ` measures how much
-reverberant field a given power builds up. The **steady-state level** is
+with total boundary area $S$ and mean Sabine absorption $\bar\alpha$ measures
+how much reverberant field a given power builds up. The **steady-state level**
+is
 
-```text
-Lp = Lw + 10 log10( Q / (4 π r²) + 4 / R )   [ + 10 log10(ρc / 400) ]
-                                               (Bies Equation (6.43))
-```
+$$
+L_p = L_W + 10 \log_{10}\!\left( \frac{Q}{4 \pi r^2} + \frac{4}{R} \right)
+\left[ + 10 \log_{10}\frac{\rho c}{400} \right]
+\quad \text{(Bies Equation (6.43))}
+$$
 
-with the source directivity factor `Q` (1 omnidirectional, 2 on a hard floor,
-4 in an edge, 8 in a corner). The optional `10 log10(ρc / 400)` term
+with the source directivity factor $Q$ (1 omnidirectional, 2 on a hard floor,
+4 in an edge, 8 in a corner). The optional $10 \log_{10}(\rho c / 400)$ term
 (about +0.14 dB at 20 °C) corrects for a characteristic impedance differing
 from 400 Pa·s/m and is omitted by default. The **critical distance**
 
-```text
-rc = √( Q R / (16 π) )
-```
+$$
+r_c = \sqrt{Q R / (16 \pi)}
+$$
 
 is where the two fields are equal (the crossover of Equation (6.43)); closer
-than `rc` the direct field dominates, farther the reverberant field does.
-Kuttruff's reverberation distance (Equation (5.44), `rc = √(A / 16 π)` for
-`Q = 1`) uses the Sabine absorption area `A = S ᾱ` instead of the room
-constant `R = A / (1 − ᾱ)`; the two coincide for a small `ᾱ` and this module
-uses `R`, so `rc` is exactly the crossover of its own `steady_state_spl`.
+than $r_c$ the direct field dominates, farther the reverberant field does.
+Kuttruff's reverberation distance (Equation (5.44), $r_c = \sqrt{A / 16 \pi}$
+for $Q = 1$) uses the Sabine absorption area $A = S \bar\alpha$ instead of the
+room constant $R = A / (1 - \bar\alpha)$; the two coincide for a small
+$\bar\alpha$ and this module uses $R$, so $r_c$ is exactly the crossover of its
+own `steady_state_spl`.
 
 ```python
 from phonometry import room
@@ -1365,13 +1378,13 @@ plt.show()
 
 The **Schroeder frequency**
 
-```text
-f_s = 2000 √(T / V)                       (Kuttruff Equation (3.44))
-```
+$$
+f_s = 2000 \sqrt{T / V} \quad \text{(Kuttruff Equation (3.44))}
+$$
 
-(`V` in m³, `T` in s) roughly marks the modal-to-diffuse transition, a
+($V$ in m³, $T$ in s) roughly marks the modal-to-diffuse transition, a
 heuristic crossover rather than a sharp cutoff: well below it discrete room
-modes dominate and the diffuse assumptions of `R` and `rc` grow unreliable,
+modes dominate and the diffuse assumptions of $R$ and $r_c$ grow unreliable,
 well above it the modes overlap and the statistical field of this section
 holds. In borderline rooms it is worth checking band by band.
 
@@ -1386,10 +1399,12 @@ Below the Schroeder frequency the statistical picture of section 2 breaks down
 and the room is a handful of discrete standing waves. For the rigid-walled
 shoebox the wave equation separates and the eigenfrequencies are exact:
 
-```text
-f(nx, ny, nz) = (c0 / 2) √( (nx/lx)² + (ny/ly)² + (nz/lz)² )
-                                        (Long Equation (8.43))
-```
+$$
+f(n_x, n_y, n_z) = \frac{c_0}{2}
+\sqrt{\left(\frac{n_x}{l_x}\right)^2 + \left(\frac{n_y}{l_y}\right)^2
+      + \left(\frac{n_z}{l_z}\right)^2}
+\quad \text{(Long Equation (8.43))}
+$$
 
 with non-negative integer orders counting the nodal planes on each axis. How
 many of the three orders are non-zero names the family: **axial** (one, a wave
@@ -1413,18 +1428,23 @@ modes.plot()                    # mode ladder by family + modal density
 ```
 
 Counting lattice points inside the positive octant of a sphere of radius
-`k = 2 π f / c0`, with the half- and quarter-weight corrections for the points
-on the coordinate planes and axes, gives the smooth **integrated mode count**
-and its derivative the **modal density**:
+$k = 2 \pi f / c_0$, with the half- and quarter-weight corrections for the
+points on the coordinate planes and axes, gives the smooth **integrated mode
+count** and its derivative the **modal density**:
 
-```text
-N(f)     = (4 π / 3) V (f/c0)³ + (π / 4) S (f/c0)² + (L / 8) (f/c0)
-                                        (Long Equation (8.45), after Morse and Pierce)
-dN/df    = 4 π V f² / c0³ + (π / 2) S f / c0² + L / (8 c0)
-                                        (Long Equation (8.46))
-```
+$$
+\begin{aligned}
+N(f) &= \frac{4\pi}{3} V \left(\frac{f}{c_0}\right)^3
+      + \frac{\pi}{4} S \left(\frac{f}{c_0}\right)^2
+      + \frac{L}{8} \frac{f}{c_0}
+      && \text{(Long Equation (8.45), after Morse and Pierce)} \\
+\frac{\mathrm{d}N}{\mathrm{d}f} &= \frac{4\pi V f^2}{c_0^3}
+      + \frac{\pi S f}{2 c_0^2} + \frac{L}{8 c_0}
+      && \text{(Long Equation (8.46))}
+\end{aligned}
+$$
 
-with the volume `V`, the total wall area `S` and the sum `L` of the twelve edge
+with the volume $V$, the total wall area $S$ and the sum $L$ of the twelve edge
 lengths. These are asymptotic estimates: below a few dozen modes the exact
 enumeration of `room_modes` is the honest answer, while high up they are
 accurate and much cheaper.
@@ -1443,7 +1463,7 @@ print(round(float(room.room_modal_density(1000.0, room_dims, speed_of_sound=344.
 
 *The 7 x 5 x 3 m room of Long's Table 8.1 up to 200 Hz. Below about 60 Hz the
 axial modes stand alone and each is separately audible; by the 175 Hz Schroeder
-frequency (T = 0.8 s) the oblique family has filled in and the modal density
+frequency ($T = 0.8$ s) the oblique family has filled in and the modal density
 has passed one mode per hertz, which is where the statistical field of
 section 2 takes over.*
 
@@ -1478,19 +1498,19 @@ mesh the room and run the [2D FDTD solver](https://jmrplens.github.io/phonometry
 The implementations are checked against the closed forms and the source texts'
 own numeric anchors (see [CONFORMANCE.md](https://jmrplens.github.io/phonometry/reference/conformance/)):
 
-- the direct-sound amplitude `1/(4 π r)` and delay `r / c` (exact geometry),
+- the direct-sound amplitude $1/(4 \pi r)$ and delay $r / c$ (exact geometry),
   the audible image count (Kuttruff Equation (9.23)) and the reflection
   density (Equation (4.6));
 - the Eyring reverberation time recovered from the decay of the synthetic RIR
   in the near-cubic limit (documented ≈ 10 % tolerance), and an independent
   2D FDTD (`phonometry.simulation`) reproducing the rigid-wall echo delay and
-  the uniform-damping `T60`;
+  the uniform-damping $T_{60}$;
 - the room constant, the critical distance as the exact direct/reverberant
-  crossover, the Schroeder frequency (Kuttruff's classroom example, `V = 200`,
-  `T = 1` → 141 Hz) and the steady-state level (Bies Equation (6.43));
+  crossover, the Schroeder frequency (Kuttruff's classroom example, $V = 200$,
+  $T = 1$ → 141 Hz) and the steady-state level (Bies Equation (6.43));
 - the six modes Long prints for his 7 x 5 x 3 m room (Table 8.1: 24.6, 34.5,
   42.4, 49.2, 57.4 and 60.1 Hz, reproduced within one unit of the last printed
-  digit at his `c0 = 344` m/s) and the 34 modes per hertz he states for the
+  digit at his $c_0 = 344$ m/s) and the 34 modes per hertz he states for the
   same room at 1 kHz (Equation (8.46)), plus the mode count matched against
   the exact enumeration and the degeneracy of a cubic room.
 
@@ -1924,7 +1944,8 @@ A = \sum_i \alpha_{s,i}\,S_i + \sum_j A_{\mathrm{obj},j}
 $$
 
 For hard, irregular objects whose absorption is not measured, an empirical
-estimate from the volume is used (Formula 4): `Aobj = Vobj**(2/3)`.
+estimate from the volume is used (Formula 4):
+$A_{\mathrm{obj}} = V_{\mathrm{obj}}^{2/3}$.
 
 ```python
 from phonometry import room
@@ -1936,21 +1957,21 @@ print(round(room.equivalent_absorption_area(surfaces), 2))  # 2.26  m2
 print(round(float(room.hard_object_absorption(0.65)), 3))   # 0.75  m2
 ```
 
-Air absorption uses the power attenuation coefficient ``m`` (Formula 2):
-`Aair = 4*m*V*(1 - psi)`. Below 1 kHz and for rooms under 200 m³ it can be
-neglected.
+Air absorption uses the power attenuation coefficient $m$ (Formula 2):
+$A_{\mathrm{air}} = 4\,m\,V\,(1 - \psi)$. Below 1 kHz and for rooms under
+200 m³ it can be neglected.
 
 ## 2. Reverberation time (clause 4.4)
 
 The reverberation time follows from the absorption area, the volume and the
-object fraction `psi = sum(Vobj)/V` (Formula 5):
+object fraction $\psi = \sum V_{\mathrm{obj}}/V$ (Formula 5):
 
 $$
 T = \frac{55.3}{c_0}\,\frac{V\,(1 - \psi)}{A},
 $$
 
-where the speed of sound `c0 = 345.6 m/s` makes the factor `55.3/c0` the
-familiar `0.16`.
+where the speed of sound $c_0 = 345.6\ \text{m/s}$ makes the factor
+$55.3/c_0$ the familiar $0.16$.
 
 ```python
 from phonometry import room
@@ -2119,7 +2140,7 @@ repository. Click the preview to open the PDF:
 
 [![EN 12354-6 enclosed-space example report: a metadata header with the room volume and object fraction, the octave-band table of the equivalent sound absorption area A and the reverberation time T from 125 Hz to 8 kHz beside the reverberation-time plot, and the boxed mid-frequency reverberation time with the mid-frequency absorption area alongside](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/reports/enclosed_space_absorption_example.webp)](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/reports/enclosed_space_absorption_example.pdf)
 
-*Enclosed-space fiche (`ReverberationResult.report`), the per-band A/T table and the boxed $T_\text{mid}$.*
+*Enclosed-space fiche (`ReverberationResult.report`), the per-band $A$/$T$ table and the boxed $T_\text{mid}$.*
 
 ## References
 
@@ -2169,14 +2190,14 @@ levels over the ten bands from 16 Hz to 8000 Hz.
 The **NC curves** (ANSI/ASA S12.2-2019 Table 1) are a family of octave-band
 limits, each designated by its value at 1000 Hz (NC-15 up to NC-70). Clause
 5.2.2 rates a spectrum in **two steps**. First the **speech interference
-level** `SIL` (clause 3.2, the average of the 500/1000/2000/4000 Hz levels)
-selects the NC-(SIL) curve: if no octave band exceeds it, the spectrum is
-simply designated **NC-(SIL)**. Only when the spectrum pokes above that curve
-does the **tangency method** (clause 5.2.3) take over: for each octave band,
-the NC index whose curve passes through the measured level is found, and the
-rating is the maximum across bands. The band where that maximum occurs, the
-one that pushes the spectrum up against the curves, is reported as the
-**governing band**.
+level** $\mathrm{SIL}$ (clause 3.2, the average of the 500/1000/2000/4000 Hz
+levels) selects the NC-(SIL) curve: if no octave band exceeds it, the
+spectrum is simply designated **NC-(SIL)**. Only when the spectrum pokes
+above that curve does the **tangency method** (clause 5.2.3) take over: for
+each octave band, the NC index whose curve passes through the measured level
+is found, and the rating is the maximum across bands. The band where that
+maximum occurs, the one that pushes the spectrum up against the curves, is
+reported as the **governing band**.
 
 ```python
 import numpy as np
@@ -2195,7 +2216,7 @@ nc.plot()   # the spectrum over the NC curve family (left panel below)
 ```
 
 Because a tangency rating interpolates between the tabulated curves it is a
-continuous number: an NC rating of `42.5` sits half-way between NC-40 and
+continuous number: an NC rating of $42.5$ sits half-way between NC-40 and
 NC-45 (a SIL designation is always an integer). The tangency rating is kept
 on `tangency_rating` even when the SIL designation applies. A subset of the
 octave bands may be supplied together with their centre frequencies
@@ -2214,8 +2235,9 @@ with the largest exceedance over NC-70 governs) or `'<NC-15'`; no `NC-71` or
 The **RC Mark II** curves (ANSI/ASA S12.2-2019 Annex D, Table D.1) have a
 constant slope of **−5 dB/octave**, keyed to their value at 1000 Hz, with the
 16 Hz level equal to the 31.5 Hz level and a low-frequency floor of 55 dB.
-The numerical rating is the **mid-frequency average** `LMF`, the mean of the
-500, 1000 and 2000 Hz levels, rounded to the nearest decibel (clause D.4):
+The numerical rating is the **mid-frequency average** $\text{LMF}$, the mean
+of the 500, 1000 and 2000 Hz levels, rounded to the nearest decibel
+(clause D.4):
 
 $$
 \text{LMF} = \tfrac{1}{3}\left(L_{500} + L_{1000} + L_{2000}\right),
@@ -2223,10 +2245,10 @@ $$
 $$
 
 A **spectral tag** then describes the *character* of the noise by how the
-spectrum deviates from the reference RC curve (clause D.3): **rumble** (`R`)
+spectrum deviates from the reference RC curve (clause D.3): **rumble** ($R$)
 when a band at or below 500 Hz exceeds the curve by more than 5 dB, **hiss**
-(`H`) when a band at or above 1000 Hz exceeds it by more than 3 dB, and
-**neutral** (`N`) when neither happens.
+($H$) when a band at or above 1000 Hz exceeds it by more than 3 dB, and
+**neutral** ($N$) when neither happens.
 
 ```python
 import numpy as np
@@ -2242,7 +2264,7 @@ rc.plot()   # the spectrum over the RC reference (right panel below)
 ```
 
 The strong low-frequency content of this spectrum lifts the 63–250 Hz bands
-well above the reference curve, so the noise is tagged `R` (rumble): the
+well above the reference curve, so the noise is tagged $R$ (rumble): the
 subjective "throb" of an oversized air handler.
 
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/room_noise_criteria_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/room_noise_criteria.svg" alt="Two panels for the same ventilation-dominated room spectrum. Left: the measured octave-band levels over the NC curve family, with a red diamond marking the tangent point at 250 Hz that sets the NC-42.5 rating. Right: the same spectrum over the reference RC-35 curve, with the low-frequency bands rising through the shaded rumble tolerance (+5 dB below 500 Hz) so the noise is classified RC-35(R), and the hiss tolerance (+3 dB at and above 1000 Hz) shaded for comparison" width="96%"></picture>
@@ -2293,7 +2315,7 @@ The `NCResult` carries the `rating`, the `sil`, the `tangency_rating`, the
 the `rating`, the `lmf`, the `classification`, the `reference_curve`, an
 `out_of_family` flag (Table D.1 tabulates RC-25 through RC-50 only) and a
 convenience `label` in the `RC-NN(A)` form. Clause D.3.5 admits the tags
-`N`, `R`, `H` or `RV`; when both the rumble and hiss deviations fire, the
+$N$, $R$, $H$ or $RV$; when both the rumble and hiss deviations fire, the
 library reports the combined `RH` as a diagnostic extension. Each result
 exposes a `.plot()` that renders its panel above. Clause D.4 expects at
 least the 31.5 Hz to 4000 Hz octave bands: a spectrum missing any of them
@@ -2302,7 +2324,7 @@ by the tag deviation tests.
 
 The balanced noise criteria (NCB), the room noise criterion for fluctuating
 low-frequency noise (RNC, which needs a time series rather than a single
-spectrum), the vibration/rattle tag (`RV`, which needs the Table 6 test) and
+spectrum), the vibration/rattle tag ($RV$, which needs the Table 6 test) and
 the numeric quality-assessment index (QAI, which the standard defers to
 external references) are not part of this module.
 
@@ -2441,7 +2463,7 @@ Source: https://jmrplens.github.io/phonometry/guides/speech-transmission/
 A public-address system, an intercom, a reverberant lecture hall: each is a
 *transmission channel* between a talker's mouth and a listener's ear, and each
 degrades speech in its own way. The **Speech Transmission Index** (STI) of
-IEC 60268-16 rates that channel with a single number in [0, 1] by measuring
+IEC 60268-16 rates that channel with a single number in $[0, 1]$ by measuring
 how much of the speech *envelope* survives the trip. This page covers the
 modulation-transfer physics behind the index, the indirect method from a
 measured room impulse response, and the direct STIPA measurement with its
@@ -2459,8 +2481,8 @@ standardized test signal.
 Reverberation and noise do not muffle speech uniformly; they blur its
 *envelope*: the slow (0.63–12.5 Hz) intensity modulations that carry
 syllables. STI quantifies how much of that modulation survives from mouth
-to ear, per octave band, as the **modulation transfer function** m(F). A
-delta-like channel keeps m = 1 (STI = 1); reverberation low-passes the
+to ear, per octave band, as the **modulation transfer function** $m(F)$. A
+delta-like channel keeps $m = 1$ (STI = 1); reverberation low-passes the
 envelope following Schroeder's closed form, and steady noise scales it:
 
 $$
@@ -2476,11 +2498,11 @@ those dips. A reverberant tail fills the dips from behind, since late energy
 smears into the gaps; steady noise raises their floor. In both cases the
 received modulation depth shrinks, and with it the contrast between speech
 sounds, even when the average level barely changes. The full method probes
-m(F) at 14 modulation frequencies (0.63 Hz to 12.5 Hz in one-third-octave
-steps) in each of the 7 octave bands from 125 Hz to 8 kHz, converts each m to
+$m(F)$ at 14 modulation frequencies (0.63 Hz to 12.5 Hz in one-third-octave
+steps) in each of the 7 octave bands from 125 Hz to 8 kHz, converts each $m$ to
 an effective signal-to-noise ratio clipped to ±15 dB, and combines the
 results, band-weighted, into the index: the STI is an effective SNR of the
-*envelope*, mapped onto [0, 1].
+*envelope*, mapped onto $[0, 1]$.
 
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sti_vs_t60_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sti_vs_t60.svg" alt="STI versus reverberation time with the IEC 60268-16 Annex F rating bands shaded" width="80%"></picture>
 
@@ -2603,15 +2625,15 @@ The implementation follows **Edition 5 (2020)**: Edition 4's normative PDF
 is the base and every Ed. 5 change is source-attributed in the code; the
 only numeric delta is the revised male speech spectrum of clause A.6.1.
 CI checks the standard's own verification vectors: the six weighting-factor
-band pairs to ±0.001 STI, the m ↔ STI mapping table, the level-dependent
-masking control points, and Schroeder-form decays at four T₆₀ values.
+band pairs to ±0.001 STI, the $m$ ↔ STI mapping table, the level-dependent
+masking control points, and Schroeder-form decays at four $T_{60}$ values.
 
 The analyzer is also verified end to end against the **IEC 60268-16 rev 5
 verification test bench** signals from [stipa.info](https://www.stipa.info)
 (Embedded Acoustics BV): the direct-method modulation-depth staircase
 (Annex C.3.2), the indirect-method exponential decays against the closed-form
 Schroeder MTF (C.3.3), the filter-bank slope test with a +41 dB unmodulated
-adjacent-octave tone (C.4.2, m ≥ 0.5), the weighting-factor band pairs (A.2.2)
+adjacent-octave tone (C.4.2, $m \ge 0.5$), the weighting-factor band pairs (A.2.2)
 and the filter-bank phase-distortion test with half-octave edge carriers
 (A.3.1.2, |STI bias| < 0.01 over TI = 0.1–0.9). All five suites pass with the
 level-dependent features disabled, as the bench prescribes. The 49 certified
@@ -2632,7 +2654,7 @@ Each route has failure modes the standard is explicit about:
 - **Level-dependent effects.** The STI is not level-invariant: auditory
   masking and the reception threshold act on the *absolute* band levels at the
   listener. Play the test signal at the system's operating level (the
-  standard's Annex J practice sets it 3 dB above the L_Aeq of continuous
+  standard's Annex J practice sets it 3 dB above the $L_{Aeq}$ of continuous
   speech at the position) and pass `level=` and `ambient=` so the analysis
   includes them; an impulse response measured loud and rescaled afterwards
   misses these effects entirely.
@@ -2658,7 +2680,7 @@ Each route has failure modes the standard is explicit about:
 | `snr` | float or 7-vector, optional | dB | default `None` | Adds steady-noise degradation |
 | `level` | 7-vector, optional | dB SPL | default `None` | Enables auditory masking + reception threshold (Tables A.2/A.3) |
 | `ambient` | 7-vector, optional | dB SPL | needs `level` | Ambient noise band levels |
-| `reference` | 1D array, optional (`stipa`) | — | default `None` | Measured source signal instead of the nominal m = 0.55 |
+| `reference` | 1D array, optional (`stipa`) | — | default `None` | Measured source signal instead of the nominal $m = 0.55$ |
 
 Both return `STIResult`: `sti`, `mti` (7 bands), `mtf` (7×14 or 7×2),
 `band_levels`, `rating` (Annex F letter `A+`…`U`).
@@ -2712,7 +2734,7 @@ repository. Click the preview to open the PDF:
   audibility-based ANSI S3.5 index that complements the STI.
 - [Loudness](https://jmrplens.github.io/phonometry/guides/loudness/) and [Sound Quality Metrics](https://jmrplens.github.io/phonometry/guides/sound-quality/): loudness,
   sharpness, tonality and roughness of the received sound.
-- [Theory](https://jmrplens.github.io/phonometry/reference/theory/perception/): the modulation-transfer derivation and the m ↔ STI
+- [Theory](https://jmrplens.github.io/phonometry/reference/theory/perception/): the modulation-transfer derivation and the $m$ ↔ STI
   mapping.
 - API reference: [`hearing.sti`](https://jmrplens.github.io/phonometry/reference/api/speech/sti/).
 
@@ -2722,14 +2744,14 @@ repository. Click the preview to open the PDF:
   room acoustics and its use for estimating speech intelligibility in
   auditoria. *The Journal of the Acoustical Society of America*, 77(3),
   1069-1077. [doi:10.1121/1.392224](https://doi.org/10.1121/1.392224).
-  The modulation-transfer framework of section 1 and the m ↔ STI mapping the
+  The modulation-transfer framework of section 1 and the $m$ ↔ STI mapping the
   index is built on.
 
 ## Standards
 
 IEC 60268-16:2020 (Edition 5), *Sound system equipment —
 Part 16: Objective rating of speech intelligibility by speech transmission
-index*: the modulation transfer function and the m ↔ STI mapping, the STIPA
+index*: the modulation transfer function and the $m$ ↔ STI mapping, the STIPA
 test signal and direct method, the indirect method from the impulse response,
 auditory masking and the reception threshold (Tables A.2/A.3), the revised
 male speech spectrum (clause A.6.1) and the Annex F rating letters.

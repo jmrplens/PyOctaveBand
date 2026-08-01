@@ -69,7 +69,7 @@ level** it delivers into a rigid floor (ISO 16283-2:2020 Formula (A.1) =
 JIS A 1418-2:2019 Formula (1)):
 
 $$
-L_{FE} = 10\lg\!\left[\frac{1}{T_\text{ref}}
+L_{FE} = 10\log_{10}\!\left[\frac{1}{T_\text{ref}}
 \int_{t_1}^{t_2}\frac{F^2(t)}{F_0^2}\,\mathrm{d}t\right]\ \text{dB re 1 N},
 $$
 
@@ -154,14 +154,14 @@ effective mass of $(7.3 \pm 0.2)$ kg, dropped from 85 cm.
 ## The receiving room: a maximum level cannot be corrected like an average
 
 The rated quantity is a **maximum** of a Fast time-weighted level, not an
-energy average, so the usual $10\lg(T/T_0)$ standardization is wrong: a Fast
+energy average, so the usual $10\log_{10}(T/T_0)$ standardization is wrong: a Fast
 detector never integrates more than about 1.7 s of decay, so the correction has
 to saturate. ISO 16283-2:2020 (definition 3.16, Formulae (4), (5) and (6))
 therefore uses
 
 $$
-L'_{i,F\max,V,T} = L_{i,F\max} + 10\lg\frac{V}{V_0}
-- 10\lg\frac{g(C)}{g(C_0)},\qquad
+L'_{i,F\max,V,T} = L_{i,F\max} + 10\log_{10}\frac{V}{V_0}
+- 10\log_{10}\frac{g(C)}{g(C_0)},\qquad
 C = \frac{T}{1{,}7275},\quad C_0 = \frac{T_0}{1{,}7275},
 $$
 
@@ -203,7 +203,7 @@ ISO 717-2:2020 Annex D is normative and does not use a reference curve at all.
 The rating is an energy sum of A-weighted band levels (Formula (D.1)):
 
 $$
-X_{iA,F\max} = 10\lg\!\left(\sum_j 10^{(X_{i,F\max,j} + A_j)/10}\right),
+X_{iA,F\max} = 10\log_{10}\!\left(\sum_j 10^{(X_{i,F\max,j} + A_j)/10}\right),
 $$
 
 over the one-third-octave bands 50 Hz to 630 Hz **or** the octave bands 63 Hz

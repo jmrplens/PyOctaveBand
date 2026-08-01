@@ -77,7 +77,7 @@ the body responds at each frequency, reduced to a **weighted r.m.s.**
 acceleration (with dose measures for shocks and long records), condensed across
 axes into a single magnitude (the **vibration total value** for hand-arm
 exposure and for comfort; the **highest axis value** for the whole-body health
-assessment), and finally normalised to an **8-hour daily exposure** `A(8)` that
+assessment), and finally normalised to an **8-hour daily exposure** $A(8)$ that
 is compared against the action and limit values of the European directive.
 
 The weightings themselves are defined once, in **ISO 8041-1:2017**, as a cascade
@@ -297,7 +297,7 @@ print(round(a_v, 3))     # 0.882  m/s^2
 value against the Annex B health guidance caution zone, a band based mainly on
 4 h to 8 h exposures below which health effects are not clearly documented,
 inside which caution is indicated and above which risks are likely; Directive
-2002/44/EC turns that guidance into the enforceable `A(8)` action and limit
+2002/44/EC turns that guidance into the enforceable $A(8)$ action and limit
 values used below. The *comfort* assessment of clause 8 instead combines all
 axes (and, where relevant, backrest, feet and rotation) into the vibration
 total value $a_v$ with its own $k$ set and reads it on the Annex C scale for
@@ -329,8 +329,8 @@ print(round(a, 3))    # 0.62  m/s^2 (max of 0.49, 0.392, 0.62; not a_v = 0.882)
 
 `daily_vibration_exposure` builds the partial exposures, combines them and
 assesses the result against **Directive 2002/44/EC**: hand-arm action value
-`A(8) = 2.5` and limit value `5` m/s²; whole-body action `0.5` and limit `1.15`
-m/s² (or a VDV of `9.1` / `21` m/s¹·⁷⁵):
+$A(8) = 2.5$ and limit value 5 m/s²; whole-body action 0.5 and limit 1.15
+m/s² (or a VDV of 9.1 / 21 m/s¹·⁷⁵):
 
 ```python
 from phonometry import vibration
@@ -398,7 +398,7 @@ from phonometry import vibration
 print(round(vibration.hav_vwf_lifetime_years(7.0), 1))   # 4.0 years (Table C.1)
 ```
 
-The standards deliberately define no safe limit; `A(8)` and the directive's
+The standards deliberately define no safe limit; $A(8)$ and the directive's
 action and limit values are the basis for any exposure criterion. For whole-body
 exposure, `energy_equivalent_acceleration` gives the ISO 2631-1 Eq. (B.3)
 energy-equivalent magnitude across periods of different magnitude and duration.
@@ -476,12 +476,12 @@ repository; click the preview to open the PDF.
 the Table 3 cascade of analog stages (Formulae (1)-(5)) that
 `frequency_weighting` and `apply_weighting` realise for all nine weightings,
 reproducing the Annex B design-goal tables. ISO 2631-1:1997 for whole-body
-vibration, covering the weighted r.m.s. `a_w` and vibration total value `a_v`
+vibration, covering the weighted r.m.s. $a_w$ and vibration total value $a_v$
 (`weighted_acceleration`, `vibration_total_value`), the MTVV, VDV, MSDV and
 crest-factor dose measures, and the Annex B energy-equivalent magnitude
 (`energy_equivalent_acceleration`). ISO 2631-2:2003 (`Wm`), ISO 2631-4:2001
 (`Wb`) and ISO 5349-1/-2:2001 for hand-transmitted vibration, whose vector
-total, daily exposure `A(8)` (`daily_vibration_exposure`,
+total, daily exposure $A(8)$ (`daily_vibration_exposure`,
 `wbv_exposure_basis`) and Annex C vibration-white-finger dose relation
 (`hav_vwf_lifetime_years`) are implemented too. The Directive 2002/44/EC
 action and limit values close the assessment, written up by

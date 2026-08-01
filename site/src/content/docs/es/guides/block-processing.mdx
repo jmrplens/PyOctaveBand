@@ -171,10 +171,10 @@ $y[n-1]$, que es el mismo valor que la API funcional devuelve como
   una operación ligeramente distinta: las salidas ya no se concatenan en el
   resultado continuo. Por eso `detrend` debe ser `False` en modo con estado.
 - **No toda métrica admite streaming.** Las métricas de energía se acumulan
-  limpiamente (un Leq acumulado es una suma de energía acumulada), pero los
-  estadísticos de rango no: el L90 de una grabación no es ninguna
-  combinación de los L90 por bloque. Transmite la *envolvente* y calcula los
-  percentiles una vez, sobre el resultado conjunto.
+  limpiamente (un $L_{eq}$ acumulado es una suma de energía acumulada), pero
+  los estadísticos de rango no: el $L_{90}$ de una grabación no es ninguna
+  combinación de los $L_{90}$ por bloque. Transmite la *envolvente* y
+  calcula los percentiles una vez, sobre el resultado conjunto.
 - **El primer bloque sigue llevando el transitorio de arranque.** El estado
   empieza en reposo, así que el filtro se asienta durante los primeros
   instantes igual que en una sola pasada. Usa `steady_ic=True` para arrancar
@@ -222,7 +222,7 @@ filtros](/phonometry/es/guides/filter-banks/), [Ponderación
 frecuencial](/phonometry/es/guides/weighting/) y [Ponderación
 temporal](/phonometry/es/guides/time-weighting/): `stateful=True` en
 `OctaveFilterBank`, `WeightingFilter` y `TimeWeighting` conserva el estado
-de sección en forma directa II transpuesta (`z1`, `z2`), o el último valor
+de sección en forma directa II transpuesta ($z_1$, $z_2$), o el último valor
 de la envolvente en `TimeWeighting`, entre fronteras de bloque, de modo que
 la salida en streaming concatenada es exactamente igual, bit a bit, a una
 sola pasada sobre la señal completa. Esta página no añade contenido
@@ -236,7 +236,7 @@ clásico en modo con estado (pasar `True` explícitamente lanza
 `ValueError`), porque su etapa de remuestreo polifásico no es compatible
 con bloques; consulta [Ponderación
 frecuencial](/phonometry/es/guides/weighting/) para el diseño de alta
-precisión offline. Los estadísticos de rango como L90 tampoco admiten
+precisión offline. Los estadísticos de rango como $L_{90}$ tampoco admiten
 streaming: transmite la envolvente y calcula los percentiles una vez sobre
 el resultado conjunto, como describe [Niveles integrados y
 estadísticos](/phonometry/es/guides/levels/).

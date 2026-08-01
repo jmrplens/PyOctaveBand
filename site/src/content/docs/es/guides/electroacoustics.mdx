@@ -43,8 +43,8 @@ Esta página cubre el conjunto de distorsión de la IEC 60268-3: distorsión
 armónica total y de orden n, THD+N y SINAD a través del ancho de banda de
 medición AES17, la intermodulación por órdenes de modulación y por frecuencia
 diferencia, la intermodulación dinámica (DIM) y la THD ponderada ITU-R 468, y
-los estimadores de respuesta en frecuencia `H1`/`H2` de Bendat y
-Piersol con la coherencia ordinaria `γ²`. Toda magnitud tiene un oráculo
+los estimadores de respuesta en frecuencia $H_1$/$H_2$ de Bendat y
+Piersol con la coherencia ordinaria $\gamma^2$. Toda magnitud tiene un oráculo
 analítico exacto (señales sintéticas con amplitudes armónicas y de
 intermodulación conocidas, un oráculo de Fourier de seno recortado, una
 síntesis completa de la señal de ensayo DIM y un camino LTI conocido), así que
@@ -58,9 +58,9 @@ con los patrones direccionales y las ponderaciones de ruido propio.
 
 ## 1. Distorsión armónica (IEC 60268-3 14.12.2–5)
 
-Un dispositivo no lineal alimentado con un seno puro en `f₁` devuelve el
-fundamental más armónicos en `2f₁, 3f₁, …`. La **distorsión armónica total**
-combina las amplitudes armónicas `aₙ`, ya sea respecto al fundamental
+Un dispositivo no lineal alimentado con un seno puro en $f_1$ devuelve el
+fundamental más armónicos en $2f_1, 3f_1, \dots$. La **distorsión armónica
+total** combina las amplitudes armónicas $a_n$, ya sea respecto al fundamental
 (`kind='F'`) o respecto al RMS total (`kind='R'`):
 
 $$
@@ -70,7 +70,7 @@ $$
 d_n = \frac{a_n}{\sqrt{\sum_{k\ge 1} a_k^2}}.
 $$
 
-`dₙ` es la distorsión armónica de orden n (el armónico n respecto al total). Los
+$d_n$ es la distorsión armónica de orden n (el armónico n respecto al total). Los
 tonos deben caer en las líneas de la FFT: usa muestreo coherente (un número
 entero de periodos) o una ventana de baja fuga para leer las amplitudes sin
 fuga espectral.
@@ -123,13 +123,13 @@ plt.show()
 
 Mientras que la THD cuenta solo los armónicos, la **THD+N** compara *todo salvo
 el fundamental* (armónicos **y** ruido) con la señal total. AES17 elimina el
-fundamental con un filtro de muesca normalizado (`1,2 ≤ Q ≤ 3`, validado sobre
+fundamental con un filtro de muesca normalizado ($1{,}2 \le Q \le 3$, validado sobre
 la respuesta *aplicada* de fase cero según la cláusula 5.2.8) y toma la razón
 entre el residuo y el RMS total; el **SINAD** es su recíproco en dB:
 
 $$
 \mathrm{THD{+}N} = \frac{V_\text{residuo}}{V_\text{total}}, \qquad
-\mathrm{SINAD} = -20\lg(\mathrm{THD{+}N})\ \mathrm{dB}.
+\mathrm{SINAD} = -20\log_{10}(\mathrm{THD{+}N})\ \mathrm{dB}.
 $$
 
 Ambas tensiones se miden a través del ancho de banda de medición AES17 (un paso
@@ -175,7 +175,7 @@ print(electroacoustics.itu_r_468_weighting([6300.0]))                    # [+12.
 
 Las dos cifras de catálogo de cualquier conversor comparten la ponderación
 AES17 **CCIR-RMS** (5.2.7): la curva ITU-R BS.468-4 desplazada un valor plano de
-`-5,63` dB para que sea unidad a 2 kHz. El **rango dinámico** (6.4.1) excita el
+-5,63 dB para que sea unidad a 2 kHz. El **rango dinámico** (6.4.1) excita el
 dispositivo con un seno de 997 Hz 60 dB por debajo de plena escala, elimina la
 fundamental con la muesca normalizada (5.2.8) y pondera el residuo de
 ruido-más-distorsión, y luego informa de la razón del seno de plena escala a ese
@@ -195,7 +195,7 @@ idle = electroacoustics.idle_channel_noise(idle_output, fs)  # dBFS CCIR-RMS
 
 Ambas reutilizan la muesca y la curva ITU-R 468 de la cadena de THD+N, y ambas
 se miden a través de la banda AES17 (un paso alto de 20 Hz más el paso bajo
-normalizado en `bandwidth`). Como el filtro CCIR-RMS marca `-5,63` dB a 1 kHz, un
+normalizado en `bandwidth`). Como el filtro CCIR-RMS marca -5,63 dB a 1 kHz, un
 tono de 1 kHz mide su propio dBFS menos 5,63 dB, lo que fija la ponderación con
 exactitud.
 
@@ -205,26 +205,28 @@ Cuando dos tonos atraviesan una no linealidad, laten entre sí y producen
 productos de suma y diferencia. La IEC 60268-3 normaliza tres ensayos, cada uno
 con su definición por órdenes:
 
-- **Distorsión de modulación** (14.12.7): un tono grave grande `f_low` y un
-  tono agudo pequeño `f_high` (preferiblemente 4:1). Los valores por orden son
-  sumas *aritméticas* de las amplitudes de las bandas laterales respecto a la
-  salida en `f_high`: `d_m,2 = (a_{f₂+f₁} + a_{f₂−f₁})/a_{f₂}` y
-  `d_m,3 = (a_{f₂+2f₁} + a_{f₂−2f₁})/a_{f₂}`. El resultado también lleva el
+- **Distorsión de modulación** (14.12.7): un tono grave grande $f_\text{low}$
+  y un tono agudo pequeño $f_\text{high}$ (preferiblemente 4:1). Los valores
+  por orden son sumas *aritméticas* de las amplitudes de las bandas laterales
+  respecto a la salida en $f_\text{high}$:
+  $d_{m,2} = (a_{f_2+f_1} + a_{f_2-f_1})/a_{f_2}$ y
+  $d_{m,3} = (a_{f_2+2f_1} + a_{f_2-2f_1})/a_{f_2}$. El resultado también lleva el
   valor `smpte` de RMS combinado que reportan los analizadores tipo SMPTE (no
   es una magnitud IEC).
 - **Distorsión por frecuencia diferencia** (14.12.8): dos tonos agudos iguales
-  `f₁ < f₂`, referida a `U_{2,ref} = 2·U_{2,f₂}` (la suma de las amplitudes de
-  ambos tonos): `d_d,2 = a_{f₂−f₁}/(a_{f₁}+a_{f₂})` y la suma aritmética
-  `d_d,3 = (a_{2f₂−f₁} + a_{2f₁−f₂})/(a_{f₁}+a_{f₂})`.
+  $f_1 < f_2$, referida a $U_{2,\text{ref}} = 2U_{2,f_2}$ (la suma de las
+  amplitudes de ambos tonos): $d_{d,2} = a_{f_2-f_1}/(a_{f_1}+a_{f_2})$ y la
+  suma aritmética $d_{d,3} = (a_{2f_2-f_1} + a_{2f_1-f_2})/(a_{f_1}+a_{f_2})$.
 - **Distorsión total por frecuencia diferencia** (14.12.10): un ensayo de dos
-  tonos específico (`f₁ = 2f₀`, `f₂ = 3f₀ − δ`; los tonos normalizados de
-  8 kHz y 11,95 kHz son los valores por defecto) donde solo cuentan los dos
-  productos en banda en `f₀ ∓ δ`:
-  `d_TDFD = √(a²_{f₂−f₁} + a²_{2f₁−f₂}) / (a_{f₁} + a_{f₂})`.
+  tonos específico ($f_1 = 2f_0$, $f_2 = 3f_0 - \delta$; los tonos
+  normalizados de 8 kHz y 11,95 kHz son los valores por defecto) donde solo
+  cuentan los dos productos en banda en $f_0 \mp \delta$:
+  $d_\text{TDFD} = \sqrt{a_{f_2-f_1}^2 + a_{2f_1-f_2}^2} / (a_{f_1} + a_{f_2})$.
 - **Intermodulación dinámica** (DIM, 14.12.9): un seno de 15 kHz más una onda
   cuadrada de 3,15 kHz filtrada en paso bajo (1:4 pico a pico). La DIM es el
-  RMS de los productos de intermodulación `|k·f_square ± f_sine|` que caen por
-  debajo de `f_sine` (Tabla 2 de la IEC 60268-3), respecto a la amplitud del
+  RMS de los productos de intermodulación
+  $|k\,f_\text{square} \pm f_\text{sine}|$ que caen por
+  debajo de $f_\text{sine}$ (Tabla 2 de la IEC 60268-3), respecto a la amplitud del
   seno de 15 kHz (la definición de 14.12.9.1; el denominador impreso en
   14.12.9.2 f) es un defecto editorial, véase la
   [fe de erratas](https://github.com/jmrplens/phonometry/blob/main/docs/ERRATA.md)).
@@ -241,10 +243,10 @@ dim = electroacoustics.dynamic_intermodulation_distortion(signal, fs)           
 ```
 
 El `ModulationDistortionResult` se puede dibujar: `.plot()` traza la amplitud
-de salida en la portadora `f₂` (la referencia de 0 dB) y las cuatro bandas
-laterales de modulación en `f₂ ± f₁` y `f₂ ± 2f₁`, la contraparte de
+de salida en la portadora $f_2$ (la referencia de 0 dB) y las cuatro bandas
+laterales de modulación en $f_2 \pm f_1$ y $f_2 \pm 2f_1$, la contraparte de
 modulación del espectro armónico de la sección 1. La relación asimétrica entre
-los pares `n = 2` y `n = 3` lee de un vistazo el equilibrio entre los términos
+los pares $n = 2$ y $n = 3$ lee de un vistazo el equilibrio entre los términos
 cuadrático y cúbico de la no linealidad:
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/modulation_distortion_es.svg" alt="Espectro de distorsión de modulación de un ensayo de dos tonos de 60 Hz más 7 kHz a través de un amplificador débilmente no lineal: la portadora a 7 kHz como referencia de 0 dB y las cuatro bandas laterales de intermodulación a 7 kHz más menos 60 y 120 Hz marcadas con su orden, anotado con los valores por orden d2 y d3 de IEC 60268-3 y el RMS combinado SMPTE" width="82%" />
@@ -272,21 +274,21 @@ plt.show()
 ## 4. Respuesta en frecuencia y coherencia (Bendat y Piersol)
 
 Dada una entrada `x` y la salida `y` de un dispositivo, la **respuesta en
-frecuencia** `H(f)` se estima a partir de los autoespectros y el espectro cruzado
+frecuencia** $H(f)$ se estima a partir de los autoespectros y el espectro cruzado
 promediados con Welch. Bendat y Piersol (*Random Data*, 4ª ed.) dan dos
 estimadores, que difieren en qué canal soporta el ruido, más la **coherencia
-ordinaria** `γ²`, la fracción de la potencia de salida explicada linealmente por
-la entrada:
+ordinaria** $\gamma^2$, la fracción de la potencia de salida explicada
+linealmente por la entrada:
 
 $$
 H_1 = \frac{G_{xy}}{G_{xx}}, \qquad H_2 = \frac{G_{yy}}{G_{yx}}, \qquad
 \gamma^2 = \frac{|G_{xy}|^2}{G_{xx}\,G_{yy}} \in [0, 1].
 $$
 
-`H1` es insesgado cuando el ruido está en la salida, y `H2` cuando está en la
-entrada; para un camino lineal sin ruido ambos recuperan la respuesta verdadera y
-`γ² = 1`. El ruido aditivo a la salida sesga `H2` al alza y baja la coherencia
-hasta `SNR/(1+SNR)`.
+$H_1$ es insesgado cuando el ruido está en la salida, y $H_2$ cuando está en la
+entrada; para un camino lineal sin ruido ambos recuperan la respuesta verdadera
+y $\gamma^2 = 1$. El ruido aditivo a la salida sesga $H_2$ al alza y baja la
+coherencia hasta $\mathrm{SNR}/(1+\mathrm{SNR})$.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/frequency_response_es.svg" alt="Magnitud de Bode de una respuesta en frecuencia estimada con H1 que sigue la respuesta verdadera de un sistema paso banda, con la coherencia ordinaria debajo cayendo hacia los bordes de banda donde la señal de salida es débil frente al ruido" width="82%" />
 
@@ -301,7 +303,7 @@ freqs, gamma2 = electroacoustics.coherence(x, y, fs)
 ```
 
 La coherencia necesita promediarse sobre varios segmentos de Welch para ser
-significativa; un único segmento da `γ² ≡ 1` por construcción.
+significativa; un único segmento da $\gamma^2 \equiv 1$ por construcción.
 
 <details>
 <summary>Ver el código de esta figura</summary>
@@ -342,13 +344,13 @@ características nominales, vive en
 ## Qué cubre esta guía
 
 **Cubierto.** El conjunto de distorsión de IEC 60268-3 (cláusulas
-14.12.2-14.12.11): THD_F y THD_R (`thd`), la distorsión armónica de orden n
+14.12.2-14.12.11): $\mathrm{THD}_F$ y $\mathrm{THD}_R$ (`thd`), la distorsión armónica de orden n
 (`harmonic_distortion`), THD+N y SINAD a través del ancho de banda de
 medición de AES17-2015 (`harmonic_analysis`, cláusulas 5.2.5/5.2.8/6.3.1 de
 AES17), la intermodulación por modulación y por frecuencia diferencia, la
 intermodulación dinámica (DIM) y la THD ponderada ITU-R BS.468-4, además del
 margen dinámico y el ruido de canal en reposo de AES17-2015. Los
-estimadores de respuesta en frecuencia `H1`/`H2` de Bendat y Piersol y la
+estimadores de respuesta en frecuencia $H_1$/$H_2$ de Bendat y Piersol y la
 coherencia ordinaria.
 
 **No cubierto.** Otras partes de la serie IEC 60268 quedan fuera de esta

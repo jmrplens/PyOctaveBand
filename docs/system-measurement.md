@@ -25,8 +25,8 @@ post-processing step.
 
 ## 1. Complementary Golay pairs
 
-A Golay pair are two binary sequences `a`, `b` of length `L = 2**n`, built by
-a two-line recursion - append `b` to `a`, and `-b` to `a` (Havelock Part I
+A Golay pair are two binary sequences $a$, $b$ of length $L = 2^n$, built by
+a two-line recursion - append $b$ to $a$, and $-b$ to $a$ (Havelock Part I
 Ch. 6, Eq. (1)). Their defining property is *algebraic*, not approximate: the
 two periodic autocorrelations sum to
 
@@ -35,10 +35,10 @@ $$
 \begin{cases} 2L & k = 0\\ 0 & k \ne 0, \end{cases}
 $$
 
-an exact delta (Eq. (2)). An MLS autocorrelation has a `-1` residue at every
+an exact delta (Eq. (2)). An MLS autocorrelation has a $-1$ residue at every
 nonzero lag; the Golay sidelobes cancel identically. The measurement runs
-each code in turn - play `a` periodically, record one steady-state period,
-then the same with `b` - and sums the two circular cross-correlations
+each code in turn - play $a$ periodically, record one steady-state period,
+then the same with $b$ - and sums the two circular cross-correlations
 (Eq. (4)): for a noiseless linear time-invariant system the impulse response
 comes back to machine precision, a closed-form identity the tests and the
 [conformance report](CONFORMANCE.md) pin at `1e-13`.
@@ -67,7 +67,7 @@ ir.plot()
 
 *The Golay recovery of a band-pass system's impulse response: the summed
 complementary correlations land on the true response to machine precision
-(max error 2·10⁻¹⁴ here), the closed-form identity the tests pin.*
+(max error $2\cdot10^{-14}$ here), the closed-form identity the tests pin.*
 
 <details>
 <summary>Show the code for this figure</summary>
@@ -129,7 +129,7 @@ variance (Xiang's Sec. 2) - the price of the exact complementarity.
 A sweep's energy at a given frequency can be set two ways: by its amplitude,
 or by *how long it dwells there*. Mueller & Massarani's frequency-domain
 synthesis (Secs. 4.2-4.3) uses the second lever: define the target magnitude
-`|H(f)|`, make the group delay grow in proportion to the target's power,
+$|H(f)|$, make the group delay grow in proportion to the target's power,
 
 $$
 \tau_G(f) = \tau_G(f - df) + C\,|H(f)|^2,\qquad
@@ -236,7 +236,7 @@ tail sits at the very end of the full deconvolution buffer - keep
 ## 3. Regularized spectral inversion
 
 Equalizing with a measured response means inverting it, and a plain
-reciprocal `1/H(f)` explodes wherever the system radiates little energy - a
+reciprocal $1/H(f)$ explodes wherever the system radiates little energy - a
 notch in-band, everything out-of-band - turning an equalizer into a noise
 amplifier. Mueller & Massarani confine the inversion with a band-pass
 (Secs. 3.1, 4.5); the general form of that confinement is Kirkeby & Nelson's
@@ -246,12 +246,13 @@ $$
 H_{inv}(f) = \frac{H^*(f)}{|H(f)|^2 + \varepsilon(f)},
 $$
 
-with `ε(f)` small inside the band to be equalized and large outside.
-In-band the equalized magnitude `|H·H_inv|` deviates from unity by exactly
-`ε/(|H|² + ε)` - a closed form the conformance suite checks bin by bin -
-and out-of-band the filter gain can never exceed `1/(2·√ε)`, the analytic
-maximum of `x/(x² + ε)`. A modeling delay of half the filter block makes the
-generally anticausal inverse of a mixed-phase response causal
+with $\varepsilon(f)$ small inside the band to be equalized and large outside.
+In-band the equalized magnitude $|H \cdot H_{inv}|$ deviates from unity by
+exactly $\varepsilon/(|H|^2 + \varepsilon)$ - a closed form the conformance
+suite checks bin by bin - and out-of-band the filter gain can never exceed
+$1/(2\sqrt{\varepsilon})$, the analytic maximum of $x/(x^2 + \varepsilon)$. A
+modeling delay of half the filter block makes the generally anticausal inverse
+of a mixed-phase response causal
 (Kirkeby & Nelson Sec. 2.4).
 
 ```python
@@ -311,7 +312,7 @@ plt.show()
 
 </details>
 
-Both regularization levels are fractions of the peak of `|H|²`, generalising
+Both regularization levels are fractions of the peak of $|H|^2$, generalising
 the scalar `regularization` of `impulse_response`: `regularization_inside`
 (default `1e-6`) sets how exactly the band is flattened,
 `regularization_outside` (default `1.0`) caps the out-of-band boost 6 dB

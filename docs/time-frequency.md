@@ -31,7 +31,7 @@ display instead of averaging them. Because the calibration is the exact
 Welch-module scaling with no detrending, three identities hold:
 
 * a signal in pascals yields Pa²/Hz (`'density'`) or Pa² (`'spectrum'`)
-  per cell, so `10·lg(power/p₀²)` with `'spectrum'` scaling reads a tone's
+  per cell, so $10\log_{10}(\text{power}/p_0^2)$ with `'spectrum'` scaling reads a tone's
   **sound pressure level** directly in any column it spans;
 * the column **mean over time reproduces `power_spectral_density`** bin by
   bin, with the same taper, overlap and scaling;
@@ -50,13 +50,14 @@ print(res.resolution_bandwidth)    # Be of the tapered segment, in Hz
 res.plot()                         # dB image over the time-frequency plane
 ```
 
-The segment length is the whole design decision: `T_B = nperseg/fs` of time
-resolution against `Bₑ ≈ 1/T_B` of frequency resolution, a product of one
+The segment length is the whole design decision: $T_B = \text{nperseg}/f_s$
+of time resolution against $B_e \approx 1/T_B$ of frequency resolution, a
+product of one
 (Section 12.6.4.2). Long segments pin frequencies and smear transients;
 short segments do the opposite. And because each cell is a single
 *unaveraged* estimate, random data carries a per-cell normalized random
-error of 1 (Eq. 8.158 with `nd = 1`; Bendat & Piersol quote
-`√2/1.25 ≈ 1.13` for the magnitude display) - the spectrogram is a tool for
+error of 1 (Eq. 8.158 with $n_d = 1$; Bendat & Piersol quote
+$\sqrt{2}/1.25 \approx 1.13$ for the magnitude display) - the spectrogram is a tool for
 deterministic structure (tones, sweeps, transients), while the averaged
 [Welch estimate](spectral-analysis.md) is the low-variance
 tool for the stationary background.
@@ -114,7 +115,7 @@ Two tones 3 Hz apart - gear sidebands, twin machines, mains hum against a
 rotor harmonic - are invisible to a 1024-point FFT at 8192 Hz: its bins are
 8 Hz wide. The classical analyzer solution is the **zoom transform** of
 Bendat & Piersol Section 11.5.4: bandpass the record, shift the band down
-to zero frequency by complex demodulation with `exp(-j2πf₁t)`
+to zero frequency by complex demodulation with $\exp(-j 2\pi f_1 t)$
 (Eqs. 11.123-11.126), decimate by the bandwidth ratio and Fourier transform
 the decimated record (Eqs. 11.128-11.130), obtaining a fine bin spacing
 over the band without a giant FFT block (Eq. 11.127).
@@ -123,8 +124,8 @@ over the band without a giant FFT block (Eq. 11.127).
 evaluation of the tapered record's DFT on the zoom grid - which yields the
 same DFT samples as the demodulate-decimate chain; the test suite pins the
 two against each other at machine precision. Amplitudes are calibrated per
-the taper's coherent gain, so a sine of peak amplitude `A` on an analysis
-frequency reads `amplitude = A` and `power = A²/2` exactly:
+the taper's coherent gain, so a sine of peak amplitude $A$ on an analysis
+frequency reads `amplitude` $= A$ and `power` $= A^2/2$ exactly:
 
 ```python
 from phonometry import zoom_fft
@@ -140,8 +141,8 @@ res.plot()                               # power spectrum in dB over the band
 One distinction matters and the result states it: the **grid** can be made
 arbitrarily fine (`n_points`), but the **resolution** - the ability to
 separate two tones - is set by the record length and taper, reported as
-`resolution_bandwidth` (`Bₑ = fs·Σw²/(Σw)²`, i.e. `1/T` untapered, `1.5/T`
-for Hann). Zooming refines the sampling of the same underlying spectrum;
+`resolution_bandwidth` ($B_e = f_s \sum w^2/(\sum w)^2$, i.e. $1/T$
+untapered, $1.5/T$ for Hann). Zooming refines the sampling of the same underlying spectrum;
 only a longer record separates closer tones.
 
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/zoom_fft_resolution_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/zoom_fft_resolution.svg" alt="Zoom FFT of a one-second record containing tones at 997 and 1000 hertz: the coarse 1024-point FFT with 8 hertz bins shows a single broad lump, while the zoom FFT over 980 to 1016 hertz draws two separate mainlobes whose peaks sit exactly on the dotted true-tone frequencies" width="82%"></picture>

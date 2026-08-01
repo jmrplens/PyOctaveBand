@@ -400,7 +400,7 @@ Qualification comes *before* the statistics this section's other pages
 compute: the chi-square confidence interval of a
 [Welch PSD](spectral-analysis.md) and the random-error
 formulas of the [correlation estimators](correlation-delay.md)
-all assume the record is stationary, as does the very idea of *the* Leq of
+all assume the record is stationary, as does the very idea of *the* $L_{eq}$ of
 a measurement in [Levels](levels.md). When a record fails
 the test, split it at the change (the `segment_values` sequence shows
 where), analyse the pieces, or move to the short-time views - the

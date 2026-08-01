@@ -159,9 +159,9 @@ derived on the [Theory](theory-environment-transport.md) page.
 
 | Parameter | Applies to | Type | Units | Range / default | Notes |
 | :--- | :--- | :--- | :--- | :--- | :--- |
-| `tasks` | task | list of `Task` | — | ≥ 1 | Each `Task` has `samples`, `duration_hours`, optional `duration_range`/`duration_samples`, `label`, `instrument` |
-| `samples` | job / full-day | sequence | dB | ≥ 2 (≥ 5 / ≥ 3 advised) | Random `Lp,A,eqT` samples |
-| `effective_duration_hours` | job / full-day | float | h | > 0 | Effective working-day duration $T_e$ |
+| `tasks` | task | list of `Task` | — | $\ge 1$ | Each `Task` has `samples`, `duration_hours`, optional `duration_range`/`duration_samples`, `label`, `instrument` |
+| `samples` | job / full-day | sequence | dB | $\ge 2$ ($\ge 5$ / $\ge 3$ advised) | Random $L_{p,A,eqT}$ samples |
+| `effective_duration_hours` | job / full-day | float | h | $> 0$ | Effective working-day duration $T_e$ |
 | `instrument` | all | str | — | `'class1'`, `'class2'`, `'personal_exposimeter'` (default) | Selects $u_2$ (Table C.5) |
 | `u3` | all | float | dB | default `1.0` | Microphone-position uncertainty (Clause C.6) |
 | `include_duration_uncertainty` | task | bool | — | default `True` | `False` omits the $(c_{1b}u_{1b})^2$ term (Annex D case a) |
@@ -227,7 +227,7 @@ Annex D task-based day with the Directive 2003/10/EC assessment.*
 ## See also
 
 - [Levels](levels.md): the `lex_8h` / `sound_exposure` dose primitives
-  (IEC 61252) and the LCpeak these strategies report alongside.
+  (IEC 61252) and the $L_{Cpeak}$ these strategies report alongside.
 - [Measurement uncertainty](gum-uncertainty.md): the GUM machinery behind
   combined and expanded uncertainties.
 - [Theory](theory-environment-transport.md): the derivation of the strategy formulas and the
@@ -248,7 +248,7 @@ Annex D task-based day with the Directive 2003/10/EC assessment.*
   European Union.
   [eur-lex.europa.eu](https://eur-lex.europa.eu/eli/dir/2003/10/oj/eng).
   The EU exposure action values (80/85 dB) and limit value (87 dB) that the
-  `LEX,8h` and its upper limit are assessed against.
+  $L_{EX,8h}$ and its upper limit are assessed against.
 - National Institute for Occupational Safety and Health. (1998). *Criteria for
   a recommended standard: Occupational noise exposure — Revised criteria 1998*
   (DHHS/NIOSH Publication No. 98-126).

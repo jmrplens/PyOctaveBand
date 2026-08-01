@@ -21,50 +21,56 @@ enclosures, lives in [Industrial noise control](noise-control.md).
 
 A reactive silencer attenuates by *reflecting* sound with impedance
 discontinuities. Each acoustic element is a 2×2 **transfer (four-pole)
-matrix** relating the sound pressure `p` and the volume velocity `Su` at its
+matrix** relating the sound pressure $p$ and the volume velocity $Su$ at its
 two ends (Bies Eq. (8.133); Munjal, *Acoustics of Ducts and Mufflers*), and a
 compound silencer is the ordered matrix product of its elements. A straight
-duct of length `L` and area `S` is (Bies Eq. (8.143), no flow)
+duct of length $L$ and area $S$ is (Bies Eq. (8.143), no flow)
 
-```text
-[ cos(kL)            j (rho c / S) sin(kL) ]
-[ j (S / rho c) sin(kL)   cos(kL)          ] ,   k = omega / c,
-```
+$$
+\begin{bmatrix} \cos kL & j\,\tfrac{\rho c}{S}\sin kL \\[2pt]
+j\,\tfrac{S}{\rho c}\sin kL & \cos kL \end{bmatrix},
+\qquad k = \omega/c,
+$$
 
-and a side branch of acoustic impedance `Z_b` is the shunt
-`[[1, 0], [1/Z_b, 1]]` (Eq. (8.144)). The **transmission loss** follows from
-the compound matrix `T` with the port impedances `Z1 = rho c / S_in` and
-`Zn = rho c / S_out` (Munjal Eq. (3.27); Bies Eq. (8.141) prints the
+and a side branch of acoustic impedance $Z_b$ is the shunt
+$\left[\begin{smallmatrix} 1 & 0 \\ 1/Z_b & 1 \end{smallmatrix}\right]$
+(Eq. (8.144)). The **transmission loss** follows from the compound matrix $T$
+with the port impedances $Z_1 = \rho c/S_\text{in}$ and
+$Z_n = \rho c/S_\text{out}$ (Munjal Eq. (3.27); Bies Eq. (8.141) prints the
 `T11`/`T22` impedance weights of this formula inverted and fails the
 sudden-expansion limit, see the [errata registry](ERRATA.md))
 
-```text
-TL = 10 log10[ (Zn/Z1) (1/4) | T11 + T12/Zn + Z1 T21 + (Z1/Zn) T22 |^2 ] ,
-```
+$$
+\mathrm{TL} = 10\log_{10}\!\left[\frac{Z_n}{Z_1}\,\tfrac{1}{4}\left|\,T_{11}
++ \tfrac{T_{12}}{Z_n} + Z_1\,T_{21} + \tfrac{Z_1}{Z_n}\,T_{22}\right|^2\right],
+$$
 
 which for equal inlet/outlet areas reduces to (Bies Eq. (8.148))
 
-```text
-TL = 20 log10( (1/2) | T11 + T12/Zc + Zc T21 + T22 | ) ,   Zc = rho c / S,
-```
+$$
+\mathrm{TL} = 20\log_{10}\!\left(\tfrac{1}{2}\left|\,T_{11}
++ \tfrac{T_{12}}{Z_c} + Z_c\,T_{21} + T_{22}\right|\right),
+\qquad Z_c = \frac{\rho c}{S},
+$$
 
-and the **insertion loss** for a source impedance `Z_s` and a radiation
-impedance `Z_r` is the extra attenuation over a direct (zero-length)
-connection, so a through connection gives `IL = 0`.
+and the **insertion loss** for a source impedance $Z_s$ and a radiation
+impedance $Z_r$ is the extra attenuation over a direct (zero-length)
+connection, so a through connection gives $\mathrm{IL} = 0$.
 
 ### Expansion chamber
 
-A chamber of area `S_exp` and length `L` between pipes of area `S_duct` has the
-closed-form transmission loss (Bies Eq. (8.111)) with area ratio
-`m = S_exp / S_duct`:
+A chamber of area $S_\text{exp}$ and length $L$ between pipes of area
+$S_\text{duct}$ has the closed-form transmission loss (Bies Eq. (8.111)) with
+area ratio $m = S_\text{exp}/S_\text{duct}$:
 
-```text
-TL = 10 log10[ 1 + (1/4) (m - 1/m)^2 sin^2(kL) ] ,
-```
+$$
+\mathrm{TL} = 10\log_{10}\!\left[1 + \tfrac{1}{4}\left(m - \tfrac{1}{m}\right)^2
+\sin^2 kL\right],
+$$
 
-peaking at `10 log10[1 + (1/4)(m - 1/m)^2]` at `kL = pi/2, 3 pi/2, ...`
-(1.94 dB for `m = 2`, 6.55 dB for `m = 4`, 12.18 dB for `m = 8`, 18.10 dB for
-`m = 16`) and dropping to 0 at `kL = n pi`, where the chamber is a
+peaking at $10\log_{10}[1 + \tfrac14(m-1/m)^2]$ at $kL = \pi/2, 3\pi/2, \dots$
+(1.94 dB for $m = 2$, 6.55 dB for $m = 4$, 12.18 dB for $m = 8$, 18.10 dB for
+$m = 16$) and dropping to 0 at $kL = n\pi$, where the chamber is a
 half-wavelength long and transparent. The four-pole product reproduces this
 exactly.
 
@@ -87,8 +93,8 @@ to scale and fully dimensioned.
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/expansion_chamber_geometry_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/expansion_chamber_geometry.svg" alt="To-scale cross-section of the expansion-chamber silencer of the transmission-loss example: a 300 mm long chamber of 225.7 mm equivalent diameter inserted between inlet and outlet pipes of 112.8 mm equivalent diameter, with the chamber length and both diameters dimensioned" width="88%"></picture>
 
 *The chamber behind the curves above, to scale: the areas enter the four-pole
-method only through the ratio `m`, and the drawing uses the equivalent
-circular diameters `d = 2 sqrt(S / pi)` of the 0.04 and 0.01 m² cross-sections.*
+method only through the ratio $m$, and the drawing uses the equivalent
+circular diameters $d = 2\sqrt{S/\pi}$ of the 0.04 and 0.01 m² cross-sections.*
 
 <details>
 <summary>Show the code for this figure</summary>
@@ -113,11 +119,11 @@ plt.show()
 
 </details>
 
-The clip below runs an m = 4 chamber of the same 0.30 m length in a 2D FDTD
-duct at its two characteristic frequencies. At kL = π the chamber is a
-half-wave resonator and the tone crosses as if it were not there; at kL = π/2
-the two area jumps reflect in phase and send the wave back up the inlet, the
-6.5 dB peak of the four-pole curve above.
+The clip below runs an $m = 4$ chamber of the same 0.30 m length in a 2D FDTD
+duct at its two characteristic frequencies. At $kL = \pi$ the chamber is a
+half-wave resonator and the tone crosses as if it were not there; at
+$kL = \pi/2$ the two area jumps reflect in phase and send the wave back up the
+inlet, the 6.5 dB peak of the four-pole curve above.
 
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anim_fdtd_expansion_chamber_dark.gif"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anim_fdtd_expansion_chamber.gif" alt="Animation: a 2D FDTD duct with a 0.30 m expansion chamber of area ratio 4 drawn as hardware between a loudspeaker and an anechoic termination, at two frequencies side by side; at 572 Hz the pressure envelope stays flat and the tone crosses the chamber unchanged with the annotated transmission loss of 0.0 dB, while at 286 Hz a standing wave fills the inlet pipe and the outlet is left with less than half the amplitude, matching the annotated 6.5 dB peak" width="640" height="360" loading="lazy"></picture>
 
@@ -127,8 +133,9 @@ the two area jumps reflect in phase and send the wave back up the inlet, the
 
 A **Helmholtz resonator** (`helmholtz_resonator`) and a closed **quarter-wave
 tube** (`quarter_wave_resonator`) each short the duct at their tuning
-frequency, `f_0 = (c / 2 pi) sqrt(S_neck / (l_e V))` (Bies Eq. (8.46)) and
-`f = c / 4 l_e` (Eq. (8.44)), giving a sharp transmission-loss spike there. An
+frequency, $f_0 = \tfrac{c}{2\pi}\sqrt{S_\text{neck}/(l_e V)}$
+(Bies Eq. (8.46)) and $f = c/4l_e$ (Eq. (8.44)), giving a sharp
+transmission-loss spike there. An
 **extended-tube chamber** (`extended_tube_chamber`) buries quarter-wave side
 branches in an expansion chamber to fill its troughs; with zero extensions it
 reduces exactly to the plain chamber. Advanced layouts chain elements directly
@@ -201,8 +208,9 @@ neck only 2 cm long.
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/helmholtz_branch_geometry_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/helmholtz_branch_geometry.svg" alt="To-scale cross-section of the side-branch Helmholtz resonator: a duct of 112.8 mm equivalent diameter with a narrow 11.3 mm neck, 20 mm long, opening into a 1 litre cavity drawn as its equal-volume cube on top of the duct, with the neck diameter, neck length and duct diameter dimensioned" width="88%"></picture>
 
 *The whole 120 Hz notch hangs on a 1 L box and a 2 cm neck: the cavity is
-drawn as its equal-volume cube, and the tuning moves as `sqrt(S_n / (l_e V))`,
-so small errors in these dimensions shift the spike off its target.*
+drawn as its equal-volume cube, and the tuning moves as
+$\sqrt{S_n/(l_e V)}$, so small errors in these dimensions shift the spike off
+its target.*
 
 <details>
 <summary>Show the code for this figure</summary>
@@ -230,8 +238,8 @@ same duct.
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/quarter_wave_geometry_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/quarter_wave_geometry.svg" alt="To-scale cross-section of the quarter-wave side branch: a closed tube 300 mm long and 50.5 mm in equivalent diameter standing on a duct of 112.8 mm equivalent diameter, with the tube length, tube diameter and duct diameter dimensioned" width="88%"></picture>
 
 *A quarter-wave stub is just a closed tube of the right length: 0.3 m of
-pipe puts the spike at `c / 4 l_e ≈ 285 Hz`, and the 20 cm² branch area only
-sets how strongly the stub loads the duct.*
+pipe puts the spike at $c/4l_e \approx 285\ \text{Hz}$, and the 20 cm² branch
+area only sets how strongly the stub loads the duct.*
 
 <details>
 <summary>Show the code for this figure</summary>
@@ -301,7 +309,7 @@ resistivity, is the same material theory as
 The four-pole expansion chamber is cross-checked against the independent 2D
 [FDTD wave solver](fdtd-simulation.md): a plane-wave duct that widens into a
 chamber and narrows back transmits far less at the four-pole TL peak
-(`kL = pi/2`) than at the transparent trough (`kL = pi`), and the measured
+($kL = \pi/2$) than at the transparent trough ($kL = \pi$), and the measured
 amplitude ratio reproduces the closed-form peak transmission loss to a fraction
 of a decibel (test `tests/noise_control/test_fdtd_crosscheck.py`).
 

@@ -91,11 +91,11 @@ architecture, up to the Linkwitz-Riley crossover, is
 | :--- | :--- | :--- | :--- | :--- |
 | `x` | 1D or 2D array | digital units | non-empty | 2D is `[channels, samples]` |
 | `fs` | int | Hz | > 0 | |
-| `fraction` | int | — | default `1`; common `3`; any `b ≥ 1` | Bands per octave = `b` |
+| `fraction` | int | — | default `1`; common `3`; any $b \ge 1$ | Bands per octave = $b$ |
 | `order` | int | — | default `6` | SOS order per band |
 | `limits` | list `[lo, hi]` | Hz | default `[12, 20000]` | Analysis range |
 | `filter_type` | str | — | `'butter'` (default), `'cheby1'`, `'cheby2'`, `'ellip'`, `'bessel'` | See the [Filter Architecture Gallery](filter-gallery.md) |
-| `ripple` / `attenuation` | float | dB | `ripple` default `0.1`; `attenuation` default `72.0` | Passband ripple / stopband attenuation (cheby/ellip); `cheby2` needs `attenuation ≥ 70` for class 1, since scipy pins its equiripple floor at exactly this value |
+| `ripple` / `attenuation` | float | dB | `ripple` default `0.1`; `attenuation` default `72.0` | Passband ripple / stopband attenuation (cheby/ellip); `cheby2` needs `attenuation` $\ge 70$ for class 1, since scipy pins its equiripple floor at exactly this value |
 | `show` | bool | — | default `False` | Plot the bank response (needs matplotlib) |
 | `sigbands` | bool | — | default `False` | Also return the per-band time signals |
 | `mode` | str | — | `'rms'` (default), `'peak'`, `'sum'` | Per-band statistic returned |

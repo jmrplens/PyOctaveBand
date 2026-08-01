@@ -98,11 +98,11 @@ architecture, up to the Linkwitz-Riley crossover, is
 | :--- | :--- | :--- | :--- | :--- |
 | `x` | 1D or 2D array | digital units | non-empty | 2D is `[channels, samples]` |
 | `fs` | int | Hz | > 0 | |
-| `fraction` | int | — | default `1`; common `3`; any `b ≥ 1` | Bands per octave = `b` |
+| `fraction` | int | — | default `1`; common `3`; any $b \ge 1$ | Bands per octave = $b$ |
 | `order` | int | — | default `6` | SOS order per band |
 | `limits` | list `[lo, hi]` | Hz | default `[12, 20000]` | Analysis range |
 | `filter_type` | str | — | `'butter'` (default), `'cheby1'`, `'cheby2'`, `'ellip'`, `'bessel'` | See the [Filter Architecture Gallery](https://jmrplens.github.io/phonometry/guides/filter-gallery/) |
-| `ripple` / `attenuation` | float | dB | `ripple` default `0.1`; `attenuation` default `72.0` | Passband ripple / stopband attenuation (cheby/ellip); `cheby2` needs `attenuation ≥ 70` for class 1, since scipy pins its equiripple floor at exactly this value |
+| `ripple` / `attenuation` | float | dB | `ripple` default `0.1`; `attenuation` default `72.0` | Passband ripple / stopband attenuation (cheby/ellip); `cheby2` needs `attenuation` $\ge 70$ for class 1, since scipy pins its equiripple floor at exactly this value |
 | `show` | bool | — | default `False` | Plot the bank response (needs matplotlib) |
 | `sigbands` | bool | — | default `False` | Also return the per-band time signals |
 | `mode` | str | — | `'rms'` (default), `'peak'`, `'sum'` | Per-band statistic returned |
@@ -573,7 +573,8 @@ metrology.OctaveFilterBank(fs=48000, fraction=3, order=6, limits=[12, 20000],
 Also known as Inverse Chebyshev, it has a **flat passband** and ripples in the
 stopband. It provides faster roll-off than Butterworth without affecting the
 signal in the passband. The stopband edges are placed automatically so that the
-−3 dB points land on the band edges (`attenuation` must be > 3.01 dB).
+−3 dB points land on the band edges (`attenuation` must be
+$> 3.01\ \text{dB}$).
 
 ```python
 import numpy as np
@@ -822,7 +823,7 @@ print(result["bands"][0])
 
 The Table 1 acceptance mask itself is public too: `class_limits(fraction,
 filter_class, omega)` returns the minimum/maximum relative-attenuation
-limits at normalized frequencies Ω = f/fm, the same limits the verifier
+limits at normalized frequencies $\Omega = f/f_m$, the same limits the verifier
 and the figure below use.
 
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/class_mask_overlay_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/class_mask_overlay.svg" alt="Butterworth band response threading between the forbidden regions of the IEC 61260-1 class 1 acceptance mask" width="80%"></picture>
@@ -870,8 +871,9 @@ plt.show()
 With default parameters (order 6), **Butterworth meets class 1**, and so does
 **Chebyshev II**: its `attenuation` default is now `72` dB, clearing the 70 dB
 far-stopband class 1 limit (scipy pins the cheby2 equiripple floor at exactly
-`attenuation`, so any value ≥ 70 dB qualifies; the 72 dB default keeps the same
-+0.400 dB passband margin as Butterworth). Chebyshev I, Elliptic and Bessel do
+`attenuation`, so any value $\ge 70\ \text{dB}$ qualifies; the 72 dB default
+keeps the same +0.400 dB passband margin as Butterworth). Chebyshev I,
+Elliptic and Bessel do
 not meet class limits at order 6: passband ripple (cheby1/ellip) and slow
 roll-off (bessel) violate the mask.
 
@@ -1260,9 +1262,10 @@ value the functional API hands back as `initial_state` (see
   the outputs no longer concatenate into the continuous result. This is why
   `detrend` must be `False` in stateful mode.
 - **Not every metric streams.** Energy metrics accumulate cleanly (a
-  running Leq is a running energy sum), but rank statistics do not: the L90
-  of a recording is not any combination of per-block L90 values. Stream the
-  *envelope* and compute percentiles once, on the pooled result.
+  running $L_{eq}$ is a running energy sum), but rank statistics do not: the
+  $L_{90}$ of a recording is not any combination of per-block $L_{90}$
+  values. Stream the *envelope* and compute percentiles once, on the pooled
+  result.
 - **The first block still carries the onset transient.** State starts at
   rest, so the filter settles during the first instants exactly as in a
   single pass. Use `steady_ic=True` to start in step-response steady state,

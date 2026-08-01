@@ -144,7 +144,7 @@ $$
 
 cada modo ponderado por su excitación en la profundidad de la fuente
 $\Psi_m(z_s)$ y su amplitud en la del receptor $\Psi_m(z)$, y la pérdida
-por transmisión coherente sale como $TL = -20 \lg\,\lvert
+por transmisión coherente sale como $TL = -20 \log_{10}\,\lvert
 p(r,z)/p_0(1\,\mathrm{m})\rvert$ (Ec. 5.15). `normal_modes` discretiza la
 ecuación en profundidad por diferencias finitas (un problema de autovalores
 tridiagonal simétrico) sobre una malla lo bastante fina para mantener
@@ -303,9 +303,9 @@ la frecuencia (lleva incorporada agua a 4 °C cerca de 1000 m) y es anterior a
 ambas; resérvese para estimaciones rápidas de baja frecuencia por debajo de
 unas decenas de kHz y para comparar con literatura antigua que la usó.
 
-**Ley de ensanchamiento.** El ensanchamiento esférico ($20\lg R$) describe un
+**Ley de ensanchamiento.** El ensanchamiento esférico ($20\log_{10} R$) describe un
 frente de onda que se expande libremente en tres dimensiones, antes de que
-ningún contorno lo confine; el cilíndrico ($10\lg R$) describe energía
+ningún contorno lo confine; el cilíndrico ($10\log_{10} R$) describe energía
 atrapada entre la superficie y el fondo (o en el canal SOFAR) que solo puede
 expandirse en distancia. La ley `"practical"` empalma ambos en una distancia
 de transición $R_0$, físicamente del orden de la profundidad del agua (o del

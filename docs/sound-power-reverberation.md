@@ -19,9 +19,10 @@ and the pressure and intensity alternatives, are weighed in
 
 In a qualified hard-walled **reverberation room** the field is diffuse, so a
 handful of microphones sample the whole radiated energy and the method
-reaches grade 1. The sound power comes from the mean room level `Lp(ST)`,
-the Sabine absorption area `A = (55.26/c)·(V/T60)` and a chain of small
-corrections (ISO 3741 Eq. 20):
+reaches grade 1. The sound power comes from the mean room level
+$L_p(\text{ST})$, the Sabine absorption area
+$A = (55.26/c)\cdot(V/T_{60})$ and a chain of small corrections
+(ISO 3741 Eq. 20):
 
 $$
 L_W = \bar{L}_p + 10 \log_{10}\frac{A}{A_0} + 4.34\ \frac{A}{S}
@@ -31,7 +32,7 @@ $$
 The bracketed term is the **Waterhouse correction**: near the room
 boundaries the sound energy density is higher than in the interior, and
 this term (which vanishes as frequency grows) restores the energy the
-interior microphones miss. `C1` (reference-quantity) and `C2`
+interior microphones miss. $C_1$ (reference-quantity) and $C_2$
 (radiation-impedance) carry the result to the reference meteorological
 conditions of 23 °C and 101.325 kPa,
 
@@ -40,10 +41,11 @@ C_1 = -10 \log_{10}\frac{p_s}{p_{s0}} + 5 \log_{10}\frac{273.15 + \theta}{314}, 
 C_2 = -10 \log_{10}\frac{p_s}{p_{s0}} + 15 \log_{10}\frac{273.15 + \theta}{296},
 $$
 
-with the speed of sound `c = 20.05·√(273 + θ)`. The **comparison method**
-replaces the absorption-area, Waterhouse and `C1` terms by a reference sound
-source of known power `LW(RSS)` measured in the same room, so the room need
-not be characterised: `LW = LW(RSS) + (Lp(ST) − Lp(RSS) + C2)`.
+with the speed of sound $c = 20.05\sqrt{273 + \theta}$. The
+**comparison method** replaces the absorption-area, Waterhouse and $C_1$
+terms by a reference sound source of known power $L_W(\text{RSS})$ measured
+in the same room, so the room need not be characterised:
+$L_W = L_W(\text{RSS}) + (L_p(\text{ST}) - L_p(\text{RSS}) + C_2)$.
 
 ```python
 import numpy as np
@@ -78,8 +80,8 @@ rev.plot()   # reverberation-room LW spectrum, LWA in the title (needs matplotli
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sound_power_reverberation_result_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sound_power_reverberation_result.svg" alt="The reverberation-room sound power level spectrum of the ISO 3741 example, one bar per one-third-octave band from 100 Hz to 10 kHz falling gently with frequency, with the A-weighted total of 92.1 dB(A) in the title" width="88%"></picture>
 
 *The mean room level carried through the absorption-area, Waterhouse and
-meteorological terms of Eq. 20 gives the one-third-octave `LW(f)`, and the
-A-weighted energy sum across the 21 bands gives the `LWA` in the title.*
+meteorological terms of Eq. 20 gives the one-third-octave $L_W(f)$, and the
+A-weighted energy sum across the 21 bands gives the $L_{WA}$ in the title.*
 
 <details>
 <summary>Show the code for this figure</summary>
@@ -124,7 +126,7 @@ plt.show()
 `levels` may be a 1D mean spectrum or a 2D `(NM, NB)` array averaged over
 positions. When the room volume, its reverberation time or the microphone
 count fail an ISO 3741 qualification criterion (Table 1 minimum volume, the
-`V/S` reverberation floor, fewer than 6 positions, or an inter-position
+$V/S$ reverberation floor, fewer than 6 positions, or an inter-position
 spread above 1.5 dB), an advisory `SoundPowerWarning` is emitted and the
 result still returns.
 
@@ -134,12 +136,12 @@ result still returns.
 | :--- | :--- | :--- | :--- | :--- |
 | `levels` | 1D or 2D array | dB | per band, or `(NM, NB)` | Mean room SPL; 2D is energy-averaged over positions |
 | `t60` | float or 1D array | s | > 0 | Room reverberation time (scalar broadcasts) |
-| `volume` | float | m³ | > 0 | Room volume `V` |
-| `surface_area` | float | m² | > 0 | Total room surface `S` (Waterhouse, `A/S`) |
-| `frequencies` | 1D array | Hz | one per band | Required (Waterhouse needs `f`); enables `LWA` |
-| `background_levels` | 1D or 2D array | dB | matches `levels` | `K1i` per microphone position (Eq. 14/15, before the Eq. 16 average; frequency-dependent criterion) |
-| `temperature` | float | °C | default `23.0` | Sets `c`, `C1`, `C2` |
-| `static_pressure` | float | kPa | default `101.325` | Sets `C1`, `C2` |
+| `volume` | float | m³ | > 0 | Room volume $V$ |
+| `surface_area` | float | m² | > 0 | Total room surface $S$ (Waterhouse, $A/S$) |
+| `frequencies` | 1D array | Hz | one per band | Required (Waterhouse needs $f$); enables $L_{WA}$ |
+| `background_levels` | 1D or 2D array | dB | matches `levels` | $K_{1i}$ per microphone position (Eq. 14/15, before the Eq. 16 average; frequency-dependent criterion) |
+| `temperature` | float | °C | default `23.0` | Sets $c$, $C_1$, $C_2$ |
+| `static_pressure` | float | kPa | default `101.325` | Sets $C_1$, $C_2$ |
 
 `sound_power_comparison(levels, levels_ref, lw_ref, *, frequencies=None,
 background_levels=…, background_levels_ref=…, temperature=23.0,
@@ -149,13 +151,14 @@ source's levels and known power.
 | Parameter | Type | Units | Range / default | Notes |
 | :--- | :--- | :--- | :--- | :--- |
 | `levels_ref` | 1D or 2D array | dB | matches `levels` | Mean room SPL with the reference source (RSS) running |
-| `lw_ref` | 1D array | dB | per band | Known sound power `LW(RSS)` of the reference source |
-| `background_levels` | 1D or 2D array | dB | matches `levels` | Background for the test source; per-band `K1` on `Lp(ST)` |
-| `background_levels_ref` | 1D or 2D array | dB | matches `levels_ref` | Background for the **reference** source; per-band `K1` on `Lp(RSS)` |
+| `lw_ref` | 1D array | dB | per band | Known sound power $L_W(\text{RSS})$ of the reference source |
+| `background_levels` | 1D or 2D array | dB | matches `levels` | Background for the test source; per-band $K_1$ on $L_p(\text{ST})$ |
+| `background_levels_ref` | 1D or 2D array | dB | matches `levels_ref` | Background for the **reference** source; per-band $K_1$ on $L_p(\text{RSS})$ |
 
 `background_levels_ref` background-corrects the reference-source room level
-`Lp(RSS)` exactly as `background_levels` does for the test source; both need
-`frequencies` (the ISO 3741 criterion is frequency-dependent). Both return a
+$L_p(\text{RSS})$ exactly as `background_levels` does for the test source;
+both need `frequencies` (the ISO 3741 criterion is frequency-dependent). Both
+return a
 `ReverberationSoundPowerResult`
 (`sound_power_level`, `mean_pressure_level`, `absorption_area`,
 `waterhouse_correction`, `background_correction`, `c1`, `c2`,
@@ -172,13 +175,13 @@ The standard-basis line
 names ISO 3741:2010 and the precision accuracy grade (grade 1) and states which
 method was used, the direct method using the room equivalent absorption area
 (Eq. 20) or the comparison method using a reference sound source (Eq. 21). The
-per-band table lists the mean room sound-pressure level `Lp` and the band
-sound-power level `LW`, and the boxed `LWA` carries the total `LW` and the
-determination method (the reverberation result has no expanded uncertainty `U`).
-`verbose=True` adds the background correction `K1` and, for the direct method,
-the equivalent absorption area `A` and the Waterhouse boundary correction `Cw`;
+per-band table lists the mean room sound-pressure level $L_p$ and the band
+sound-power level $L_W$, and the boxed $L_{WA}$ carries the total $L_W$ and the
+determination method (the reverberation result has no expanded uncertainty $U$).
+`verbose=True` adds the background correction $K_1$ and, for the direct method,
+the equivalent absorption area $A$ and the Waterhouse boundary correction $C_w$;
 the basis strip states the correction model (Eq. 20 or Eq. 21), the applied
-meteorological corrections `C1`/`C2` and the speed of sound, and cites the
+meteorological corrections $C_1$/$C_2$ and the speed of sound, and cites the
 Annex F A-weighting.
 
 ```python
@@ -215,22 +218,22 @@ repository. Click the preview to open the PDF:
 
 *Reverberation-room sound power fiche (`ReverberationSoundPowerResult.report`),
 an ISO 3741 precision-grade direct-method determination with the Waterhouse and
-C1/C2 corrections and the boxed LWA.*
+$C_1$/$C_2$ corrections and the boxed $L_{WA}$.*
 
 
 ## See also
 
 - [Sound Power](sound-power.md): choosing among the five determination
   routes, what the accuracy grades promise, and the ISO 4871 noise-emission
-  declaration a measured `LWA` feeds.
+  declaration a measured $L_{WA}$ feeds.
 - [Sound Power by Pressure Methods (ISO 3744 / ISO 3746 / ISO 3745)](sound-power-pressure.md):
   the in-situ enveloping surface and the precision anechoic array.
 - [Sound Power by Intensity Scanning (ISO 9614)](sound-power-intensity.md):
   the routes that tolerate steady background noise.
 - [Room Acoustics](room-acoustics.md): measuring the reverberation time
-  `T60` that sets the Sabine absorption area.
-- [Levels](levels.md): energy averaging and the A-weighting behind `LWA`.
-- [Theory](theory-environment-transport.md): the Waterhouse and C1/C2
+  $T_{60}$ that sets the Sabine absorption area.
+- [Levels](levels.md): energy averaging and the A-weighting behind $L_{WA}$.
+- [Theory](theory-environment-transport.md): the Waterhouse and $C_1$/$C_2$
   derivations.
 - API reference: [`emission.sound_power_reverberation`](https://jmrplens.github.io/phonometry/reference/api/power/sound-power-reverberation/).
 

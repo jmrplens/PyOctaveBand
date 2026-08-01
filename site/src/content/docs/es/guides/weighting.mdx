@@ -223,14 +223,15 @@ for recording in signals:
 ## 5. Precisión en alta frecuencia (`high_accuracy`)
 
 Un diseño con transformación bilineal simple comprime la respuesta cerca de
-Nyquist: a fs = 48 kHz el error de la curva A a 12,5 kHz alcanza −2,7 dB, fuera
+Nyquist: a $f_s = 48$ kHz el error de la curva A a 12,5 kHz alcanza −2,7 dB,
+fuera
 de la tolerancia **clase 1** de IEC 61672-1 (+2,0/−2,5 dB).
 
 Por defecto (`high_accuracy=True`), phonometry diseña y ejecuta el filtro de
 ponderación a una frecuencia interna sobremuestreada (hasta 8×, alcanzando
 ≥ 144 kHz a frecuencias de audio habituales; una entrada de 96 kHz funciona
 a ×2) y diezma de vuelta, manteniendo la respuesta dentro de las tolerancias
-de clase 1 hasta 16 kHz (error ≈ −0,5 dB a 12,5 kHz para fs = 48 kHz).
+de clase 1 hasta 16 kHz (error ≈ −0,5 dB a 12,5 kHz para $f_s = 48$ kHz).
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/weighting_accuracy_hf_es.svg" alt="Precisión en alta frecuencia de la ponderación A a 48 kHz: curva analítica frente a bilineal simple y diseño sobremuestreado, con error" width="80%" />
 
@@ -411,4 +412,4 @@ Usa la ponderación C para presión acústica de pico y ruido de alto nivel, y u
 
 ### ¿Es precisa la ponderación A cerca de 16 kHz con una frecuencia de muestreo de 48 kHz?
 
-No con un diseño bilineal simple: a fs = 48 kHz el error de la curva A alcanza −2,7 dB a 12,5 kHz, fuera de la tolerancia de clase 1 de IEC 61672-1 (+2,0/−2,5 dB). El `high_accuracy=True` por defecto sobremuestrea internamente (hasta 8×, alcanzando 144 kHz o más a frecuencias de audio habituales) y mantiene la respuesta dentro de las tolerancias de clase 1 hasta 16 kHz, con un error de aproximadamente −0,5 dB a 12,5 kHz.
+No con un diseño bilineal simple: a $f_s = 48$ kHz el error de la curva A alcanza −2,7 dB a 12,5 kHz, fuera de la tolerancia de clase 1 de IEC 61672-1 (+2,0/−2,5 dB). El `high_accuracy=True` por defecto sobremuestrea internamente (hasta 8×, alcanzando 144 kHz o más a frecuencias de audio habituales) y mantiene la respuesta dentro de las tolerancias de clase 1 hasta 16 kHz, con un error de aproximadamente −0,5 dB a 12,5 kHz.

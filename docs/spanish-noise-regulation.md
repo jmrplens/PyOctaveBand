@@ -91,7 +91,7 @@ in each phase and corrected, and the period level is the energy mean weighted
 by phase duration (Annex IV A.3.4.2 b):
 
 $$
-L_{Keq,T} = 10 \lg \left[ \frac{1}{T} \sum_i T_i \, 10^{L_{Keq,Ti}/10} \right]
+L_{Keq,T} = 10 \log_{10} \left[ \frac{1}{T} \sum_i T_i \, 10^{L_{Keq,Ti}/10} \right]
 $$
 
 The annual average $L_{K,x}$ of each period is in turn the energy mean of the
@@ -291,16 +291,17 @@ exceeds 9 dB.
 
 ## See also
 
-- [Environmental levels](environmental-levels.md): the Lden and Ldn indicators
-  and the ISO 1996-2 adjustments the corrections of the regulation coexist
-  with.
-- [Integrated & Statistical Levels](levels.md): the per-phase LAeq, LCeq and
-  LAIeq levels that feed the three corrections.
+- [Environmental levels](environmental-levels.md): the $L_{den}$ and $L_{dn}$
+  indicators and the ISO 1996-2 adjustments the corrections of the regulation
+  coexist with.
+- [Integrated & Statistical Levels](levels.md): the per-phase $L_{Aeq}$,
+  $L_{Ceq}$ and $L_{AIeq}$ levels that feed the three corrections.
 - [Spanish Building Code (CTE DB-HR)](spanish-building-code.md): the other half
-  of the Spanish framework, which shares the site's day noise index Ld with
+  of the Spanish framework, which shares the site's day noise index $L_d$ with
   this page.
 - [Impulsive-sound prominence](impulse-prominence.md): the ISO/PAS 1996-3
-  impulsive adjustment, the relative of Ki that is not interchangeable with it.
+  impulsive adjustment, the relative of $K_i$ that is not interchangeable with
+  it.
 - API reference: [`environmental.spanish_regulation`](https://jmrplens.github.io/phonometry/reference/api/environment/spanish-regulation/).
 
 ## References
@@ -325,7 +326,8 @@ exceeds 9 dB.
 
 RD 1367/2007 (BOE-A-2007-18397), the regulation that develops Ley 37/2003 del
 Ruido on acoustic zoning, quality objectives and acoustic emissions: the
-corrected level LKeq,T and the corrections Kt, Kf and Ki (Annex I A.2 c, Annex
+corrected level $L_{Keq,T}$ and the corrections $K_t$, $K_f$ and $K_i$
+(Annex I A.2 c, Annex
 IV A.3.3), the evaluation periods and the noise-phase integration (Annex I
 A.1, Annex IV A.3.4.2 b), the acoustic quality objectives of Annex II (Table A
 as amended by RD 1038/2012) and the immission limit values of Annex III, with

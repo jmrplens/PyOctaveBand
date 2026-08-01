@@ -27,7 +27,8 @@ A = \sum_i \alpha_{s,i}\,S_i + \sum_j A_{\mathrm{obj},j}
 $$
 
 For hard, irregular objects whose absorption is not measured, an empirical
-estimate from the volume is used (Formula 4): `Aobj = Vobj**(2/3)`.
+estimate from the volume is used (Formula 4):
+$A_{\mathrm{obj}} = V_{\mathrm{obj}}^{2/3}$.
 
 ```python
 from phonometry import room
@@ -39,21 +40,21 @@ print(round(room.equivalent_absorption_area(surfaces), 2))  # 2.26  m2
 print(round(float(room.hard_object_absorption(0.65)), 3))   # 0.75  m2
 ```
 
-Air absorption uses the power attenuation coefficient ``m`` (Formula 2):
-`Aair = 4*m*V*(1 - psi)`. Below 1 kHz and for rooms under 200 m³ it can be
-neglected.
+Air absorption uses the power attenuation coefficient $m$ (Formula 2):
+$A_{\mathrm{air}} = 4\,m\,V\,(1 - \psi)$. Below 1 kHz and for rooms under
+200 m³ it can be neglected.
 
 ## 2. Reverberation time (clause 4.4)
 
 The reverberation time follows from the absorption area, the volume and the
-object fraction `psi = sum(Vobj)/V` (Formula 5):
+object fraction $\psi = \sum V_{\mathrm{obj}}/V$ (Formula 5):
 
 $$
 T = \frac{55.3}{c_0}\,\frac{V\,(1 - \psi)}{A},
 $$
 
-where the speed of sound `c0 = 345.6 m/s` makes the factor `55.3/c0` the
-familiar `0.16`.
+where the speed of sound $c_0 = 345.6\ \text{m/s}$ makes the factor
+$55.3/c_0$ the familiar $0.16$.
 
 ```python
 from phonometry import room
@@ -222,7 +223,7 @@ repository. Click the preview to open the PDF:
 
 [![EN 12354-6 enclosed-space example report: a metadata header with the room volume and object fraction, the octave-band table of the equivalent sound absorption area A and the reverberation time T from 125 Hz to 8 kHz beside the reverberation-time plot, and the boxed mid-frequency reverberation time with the mid-frequency absorption area alongside](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/reports/enclosed_space_absorption_example.webp)](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/reports/enclosed_space_absorption_example.pdf)
 
-*Enclosed-space fiche (`ReverberationResult.report`), the per-band A/T table and the boxed $T_\text{mid}$.*
+*Enclosed-space fiche (`ReverberationResult.report`), the per-band $A$/$T$ table and the boxed $T_\text{mid}$.*
 
 ## References
 

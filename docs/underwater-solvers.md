@@ -114,7 +114,7 @@ $$
 
 each mode weighted by its excitation at the source depth $\Psi_m(z_s)$ and
 its amplitude at the receiver depth $\Psi_m(z)$, and the coherent
-transmission loss follows as $TL = -20 \lg\,\lvert p(r,z)/p_0(1\,\mathrm{m})
+transmission loss follows as $TL = -20 \log_{10}\,\lvert p(r,z)/p_0(1\,\mathrm{m})
 \rvert$ (Eq. 5.15). `normal_modes` discretises the depth equation by finite
 differences (a symmetric tridiagonal eigenproblem) on a grid refined enough
 to keep the near-cutoff eigenvalues honest, and warns when a retained mode
@@ -263,18 +263,18 @@ that range; use it when a legible formula matters more than the last percent.
 1000 m) and predates both; keep it for quick low-frequency estimates below a
 few tens of kHz and for comparison with older literature that used it.
 
-**Spreading law.** Spherical spreading (`20 lg R`) describes a wavefront that
+**Spreading law.** Spherical spreading ($20\log_{10} R$) describes a wavefront that
 expands freely in three dimensions, before any boundary confines it;
-cylindrical spreading (`10 lg R`) describes energy trapped between the surface
+cylindrical spreading ($10\log_{10} R$) describes energy trapped between the surface
 and the bottom (or in the SOFAR channel) that can only expand in range. The
-`"practical"` law splices the two at a transition range `R0`, which is
+`"practical"` law splices the two at a transition range $R_0$, which is
 physically of the order of the water (or channel) depth: spherical while the
 wavefront has not yet filled the duct, cylindrical once it has. In the 10 kHz
 example of the
 [transmission-loss section](underwater-propagation.md) the choice is not
 cosmetic: against the same figure of merit of 87 dB, spherical-only spreading
 predicts detection out to about 8.7 km while the practical law with
-`R0 = 1000 m` stretches it to about 15.8 km. When the spreading law is the
+$R_0 = 1000$ m stretches it to about 15.8 km. When the spreading law is the
 biggest uncertainty in the budget, that is the cue to stop using a closed
 form and compute the field.
 
@@ -287,8 +287,8 @@ and boundaries decide the answer, pick the solver by frequency and geometry
 | Solver | Natural regime | What it buys you |
 |---|---|---|
 | `ray_trace` | High frequency (water depth ≫ λ), deep water | Eigenray geometry, travel times, convergence zones; cost independent of frequency |
-| `normal_modes` | Low frequency, shallow water, range-independent | Finite-difference modal sum with few propagating modes (`m < kD/π`); the reference solution for its regime, validated against the ideal waveguide's exact modes |
-| `parabolic_equation` | Low frequency, long one-way paths | Full-field TL(z, r) with refraction, marched in range over the range-independent `c(z)` all three solvers assume |
+| `normal_modes` | Low frequency, shallow water, range-independent | Finite-difference modal sum with few propagating modes ($m < kD/\pi$); the reference solution for its regime, validated against the ideal waveguide's exact modes |
+| `parabolic_equation` | Low frequency, long one-way paths | Full-field TL($z$,$r$) with refraction, marched in range over the range-independent $c(z)$ all three solvers assume |
 
 The boundaries blur in practice: rays remain usable at surprisingly low
 frequencies for travel-time work, and the PE remains the workhorse well above
@@ -299,14 +299,14 @@ convergence test.
 **A worked sonar budget.** Chain the pieces end to end: a 140 dB re
 1 µPa²/Hz source at 10 kHz, a 60 dB ambient spectrum level, a 15 dB array
 gain and an 8 dB detection threshold give the figure of merit
-`FOM = 140 - (60 - 15) - 8 = 87 dB` computed by `passive_sonar_equation` in
+$FOM = 140 - (60 - 15) - 8 = 87$ dB computed by `passive_sonar_equation` in
 the [sonar-equation section](underwater-propagation.md) of the propagation
 guide. The transmission-loss curve of that guide's first section (10 °C,
-35 ppt, 100 m, `alpha = 0.95 dB/km`) crosses 87 dB at about 15.8 km with the
+35 ppt, 100 m, $\alpha = 0.95$ dB/km) crosses 87 dB at about 15.8 km with the
 practical law: that crossing *is* the predicted detection range, and every
 term of the budget moves it. Trim the directivity index to 7.5 dB and the
 figure of merit falls to 79.5 dB, so the range drops to wherever the TL
-curve crosses that value; double the frequency to 20 kHz and `alpha` more
+curve crosses that value; double the frequency to 20 kHz and $\alpha$ more
 than triples to 3.3 dB/km, pulling the crossing sharply inward. This
 coupling between the absorption model, the spreading law and the sonar
 equation is why they all live in one module.

@@ -51,11 +51,11 @@ mirrors `fdtd_simulation` piece by piece: wave-speed maps `c_p` and `c_s`
 injection) and `ForceSource` (a directional body force) as sources, probes
 that record ``p``, ``vx`` or ``vy``, the same sponge and obstacle
 machinery, and a frozen `ElasticFDTDResult` with the same `.plot()`. The
-Courant bound depends only on the fastest ``c_P`` in the map (Virieux
+Courant bound depends only on the fastest $c_P$ in the map (Virieux
 Eqs. 6-7), while the resolution rule uses the slowest wave speed anywhere
-in the domain -- the slowest non-zero ``c_S`` of the solid cells or, if a
-fluid region carries a still slower ``c_P``, that fluid speed:
-``dx <= c_min / (10 f)`` (in a wholly solid map the S wavelength is always
+in the domain -- the slowest non-zero $c_S$ of the solid cells or, if a
+fluid region carries a still slower $c_P$, that fluid speed:
+$\Delta x \le c_\text{min} / (10 f)$ (in a wholly solid map the S wavelength is always
 the shortest; in mixed domains the fluid P wavelength can be shorter, as
 in water at 1480 m/s over a 2000 m/s-shear sediment).
 
@@ -90,7 +90,7 @@ harmonically onto the corners (Moczo et al. 2007, Eqs. 7.37-7.39), the
 traction continuity of every internal interface, fluid-solid contacts
 included, emerges from the maps alone. The validation suite measures the
 normal-incidence reflection of a water-steel interface within 2 % of
-``(Z2 - Z1)/(Z2 + Z1)`` (typically a fraction of a percent) and recovers
+$(Z_2 - Z_1)/(Z_2 + Z_1)$ (typically a fraction of a percent) and recovers
 the normal-incidence mass law of a 3 mm immersed steel plate within
 0.3 dB of `mass_law_transmission_loss`.
 
@@ -148,7 +148,7 @@ That flexural wave is worth watching in motion: the
 animation of this solver launching a 4 kHz bending packet along a 10 mm
 steel plate into an L-junction, where the corner splits it into the
 reflected and transmitted waves the closed form prices at
-``τ12(0°) = 0.5``, plus the fast in-plane precursor the pinned-junction
+$\tau_{12}(0°) = 0.5$, plus the fast in-plane precursor the pinned-junction
 model deliberately leaves out.
 
 ## 4. Fluid-solid coupling at normal incidence
@@ -195,9 +195,9 @@ sound refracts into **two** transmitted waves, P and SV (**mode
 conversion**), each with its own critical angle: for water over steel,
 14.5° (P) and 27.5° (S). Between them the transmitted P is evanescent and
 the shear wave carries the transmitted power, so the reflection dips to
-|V| = 0.918 at 20° instead of reflecting totally as a fluid bottom of the
-same ``c_P`` would; beyond the S critical angle the reflection is total,
-|V| = 1 with a phase. The validation suite launches oblique carrier beams
+$|V| = 0.918$ at 20° instead of reflecting totally as a fluid bottom of the
+same $c_P$ would; beyond the S critical angle the reflection is total,
+$|V| = 1$ with a phase. The validation suite launches oblique carrier beams
 at 10° and 20° and matches the exact reflection coefficient of
 Brekhovskikh & Godin (Eqs. 4.2.22-4.2.26) within a fraction of a percent,
 mode conversion included. This is exactly the shear physics that the
@@ -229,7 +229,7 @@ Scholte wave hugs the water speed (1480 m/s) to within 0.03 % and its
 evanescent tail reaches ~7 wavelengths up into the water: it is essentially
 a grazing water wave and cannot be separated by time of flight in any
 reasonable domain
-(over air-solid contacts the deficit collapses to ~10⁻¹² of ``c`` and the
+(over air-solid contacts the deficit collapses to ~$10^{-12}$ of $c$ and the
 wave is unobservable outright). Over a **soft** sediment the speed drops
 well below the water speed and the wave squeezes to within half a
 wavelength of the contact, which is why measured seabed interface waves are
@@ -286,13 +286,13 @@ At normal incidence no shear is excited, so an elastic plate in water is
 exactly the three-media fluid layer of B&G §2.4: its transmission follows
 the closed form of Eq. 2.4.14, which reduces to the familiar mass law for
 thin plates and low frequencies and predicts **total transmission** at the
-half-wave thickness resonances ``f_n = n c_P / (2 h)`` (Eq. 2.4.19). For a
+half-wave thickness resonances $f_n = n c_P / (2 h)$ (Eq. 2.4.19). For a
 10 mm steel plate that first resonance sits at 295 kHz, and one broadband
 FDTD run reproduces the whole curve: 5.8 dB at 10 kHz (where
 `mass_law_transmission_loss` with water as the ambient fluid agrees with
 the exact form to 0.02 dB), 18.1 dB at 50 kHz, and a transmission-loss
 dip within 0.1 % of the 295 kHz resonance. The same suite stress-tests the
-extreme contrast of an air-steel contact (impedance ratio ~10⁵:1): stable
+extreme contrast of an air-steel contact (impedance ratio ~$10^5$:1): stable
 over 10 000 steps with the reflected amplitude conserved to 0.5 %.
 
 At oblique incidence the plate physics gets richer, and the
@@ -318,7 +318,8 @@ stepping cost.
 
 Resolve at least 10 cells per shortest wavelength using the slowest wave
 speed in the domain -- the slowest non-zero shear speed or a slower fluid
-sound speed if one is present -- ``dx <= c_min / (10 f)``. Allow 15-20 cells per wavelength along free
+sound speed if one is present -- $\Delta x \le c_\text{min} / (10 f)$.
+Allow 15-20 cells per wavelength along free
 surfaces (the stress-imaging boundary is the most dispersive part of the
 scheme), and at least 15 points per wavelength when an interface wave has
 to be timed (van Vossen et al. 2002).

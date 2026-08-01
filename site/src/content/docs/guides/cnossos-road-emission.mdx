@@ -77,20 +77,20 @@ power, which is why the method calls it a semi-free-field quantity. A traffic
 flow is an incoherent **source line**, ideally one line per lane at the lane
 centre.
 
-For each vehicle category `m` and octave band `i`, formula (2.2.1) turns a
+For each vehicle category $m$ and octave band $i$, formula (2.2.1) turns a
 single-vehicle sound power into a power per metre of line:
 
 $$
-L'_{W,\mathrm{eq,line},i,m} = L_{W,i,m} + 10\,\lg\!\left(\frac{Q_m}{1000\,v_m}\right),
+L'_{W,\mathrm{eq,line},i,m} = L_{W,i,m} + 10\,\log_{10}\!\left(\frac{Q_m}{1000\,v_m}\right),
 $$
 
-with `Qm` in vehicles per hour and `vm` in km/h. The vehicle power itself is the
-energy sum of a **rolling** and a **propulsion** term (2.2.2), except for the
+with $Q_m$ in vehicles per hour and $v_m$ in km/h. The vehicle power itself is
+the energy sum of a **rolling** and a **propulsion** term (2.2.2), except for the
 powered two-wheelers of category 4, which have no rolling noise at all and take
 the propulsion term alone (2.2.3):
 
 $$
-L_{W,i,m} = 10\,\lg\!\left(10^{L_{WR,i,m}/10} + 10^{L_{WP,i,m}/10}\right).
+L_{W,i,m} = 10\,\log_{10}\!\left(10^{L_{WR,i,m}/10} + 10^{L_{WP,i,m}/10}\right).
 $$
 
 Table [2.2.a] fixes five modelled categories: **1** light motor vehicles, **2**
@@ -137,10 +137,10 @@ plt.show()
 ## 3. Rolling noise (2.2.4 to 2.2.10)
 
 Rolling noise is tyre-road noise. It grows logarithmically with speed from the
-reference speed `vref = 70 km/h`:
+reference speed $v_\mathrm{ref} = 70\ \text{km/h}$:
 
 $$
-L_{WR,i,m} = A_{R,i,m} + B_{R,i,m}\,\lg\!\left(\frac{v_m}{v_\mathrm{ref}}\right)
+L_{WR,i,m} = A_{R,i,m} + B_{R,i,m}\,\log_{10}\!\left(\frac{v_m}{v_\mathrm{ref}}\right)
              + \Delta L_{WR,i,m},
 $$
 
@@ -148,24 +148,25 @@ where the correction collects four independent effects (2.2.5): the road
 surface, the studded tyres, the junction and the air temperature.
 
 **Air temperature** (2.2.10) is a straight line, applied equally to all eight
-bands: `dLW,temp = Km (20 °C − tau)`, with `K1 = 0,08 dB/°C` for light vehicles
-and `K2 = K3 = 0,04 dB/°C` for the two heavy categories. Cold air makes tyres
+bands: $\Delta L_{W,\mathrm{temp}} = K_m\,(20\ \text{°C} - \tau)$, with
+$K_1 = 0{,}08\ \text{dB/°C}$ for light vehicles and
+$K_2 = K_3 = 0{,}04\ \text{dB/°C}$ for the two heavy categories. Cold air makes tyres
 harder and the road louder, so the correction is *positive* below 20 °C.
 
 **Studded tyres** (2.2.6 to 2.2.9) apply to category 1 only. The per-tyre excess
-`Dstud,i(v)` saturates below 50 km/h and above 90 km/h, and the fleet-level
-correction weights it by the share of the year that studded tyres are on the
-road, `ps = Qstud,ratio · Ts/12`:
+$D_{\mathrm{stud},i}(v)$ saturates below 50 km/h and above 90 km/h, and the
+fleet-level correction weights it by the share of the year that studded tyres
+are on the road, $p_s = Q_{\mathrm{stud,ratio}} \cdot T_s/12$:
 
 $$
-\Delta L_{\mathrm{studded},i} = 10\,\lg\!\left[(1 - p_s) + p_s\,10^{D_{\mathrm{stud},i}/10}\right].
+\Delta L_{\mathrm{studded},i} = 10\,\log_{10}\!\left[(1 - p_s) + p_s\,10^{D_{\mathrm{stud},i}/10}\right].
 $$
 
-**Junctions** (2.2.17) add `CR,m,k · max(1 − |x|/100, 0)`, with `x` the distance
-in metres to the nearest junction and `k` the junction type: 1 for a crossing
-with traffic lights, 2 for a roundabout. The rolling coefficients `CR` are
-*negative* (traffic near a junction is slower), the propulsion coefficients `CP`
-positive (it is accelerating). Both vanish from 100 m out.
+**Junctions** (2.2.17) add $C_{R,m,k} \cdot \max(1 - |x|/100,\ 0)$, with $x$
+the distance in metres to the nearest junction and $k$ the junction type: 1 for
+a crossing with traffic lights, 2 for a roundabout. The rolling coefficients
+$C_R$ are *negative* (traffic near a junction is slower), the propulsion
+coefficients $C_P$ positive (it is accelerating). Both vanish from 100 m out.
 
 ## 4. Propulsion noise (2.2.11 to 2.2.16)
 
@@ -226,11 +227,11 @@ is genuinely asymmetric, and the asymmetry is not a transcription slip. For
 light vehicles the downhill branch has **no speed factor**, while the two heavy
 categories do and use different speed offsets:
 
-| Category | Downhill (`s` below the breakpoint) | Flat band | Uphill |
+| Category | Downhill ($s$ below the breakpoint) | Flat band | Uphill |
 | :--- | :--- | :--- | :--- |
-| 1 | `(min(12 %, −s) − 6 %)/1 %` | −6 % to 2 % | `(min(12 %, s) − 2 %)/1,5 % · v/100` |
-| 2 | `(min(12 %, −s) − 4 %)/0,7 % · (v − 20)/100` | −4 % to 0 % | `min(12 %, s)/1 % · v/100` |
-| 3 | `(min(12 %, −s) − 4 %)/0,5 % · (v − 10)/100` | −4 % to 0 % | `min(12 %, s)/0,8 % · v/100` |
+| 1 | $(\min(12\ \%, -s) - 6\ \%)/1\ \%$ | −6 % to 2 % | $(\min(12\ \%, s) - 2\ \%)/1{,}5\ \% \cdot v/100$ |
+| 2 | $(\min(12\ \%, -s) - 4\ \%)/0{,}7\ \% \cdot (v - 20)/100$ | −4 % to 0 % | $\min(12\ \%, s)/1\ \% \cdot v/100$ |
+| 3 | $(\min(12\ \%, -s) - 4\ \%)/0{,}5\ \% \cdot (v - 10)/100$ | −4 % to 0 % | $\min(12\ \%, s)/0{,}8\ \% \cdot v/100$ |
 
 Category 4 takes no gradient correction. The slope saturates at 12 % in both
 directions. Downhill noise comes from engine braking, uphill noise from load, so
@@ -240,13 +241,13 @@ correct one half uphill and the other downhill.
 ## 5. The road surface (2.2.19, 2.2.20 and Table F-4)
 
 Table F-4 gives, for the reference surface and each of fourteen named
-pavements, an octave-band coefficient `alpha` and a speed coefficient `beta`,
+pavements, an octave-band coefficient $\alpha$ and a speed coefficient $\beta$,
 per vehicle category, with the speed range over which the row is declared
 valid. The surface enters the two terms
 differently:
 
 $$
-\Delta L_{WR,\mathrm{road},i,m} = \alpha_{i,m} + \beta_m\,\lg\!\left(\frac{v_m}{v_\mathrm{ref}}\right),
+\Delta L_{WR,\mathrm{road},i,m} = \alpha_{i,m} + \beta_m\,\log_{10}\!\left(\frac{v_m}{v_\mathrm{ref}}\right),
 \qquad
 \Delta L_{WP,\mathrm{road},i,m} = \min\{\alpha_{i,m};\,0\}.
 $$
@@ -270,16 +271,17 @@ of a dense asphalt concrete 0/11 and a stone mastic asphalt 0/11, between two
 and seven years old, in representative maintenance condition, dry, with no
 studded tyres, at 20 °C, on the flat. Under exactly those conditions every
 correction in 2.2 vanishes identically, so at the reference speed
-`vm = vref = 70 km/h`, where the two speed terms vanish as well, the sound
-powers **are** the Table F-1 coefficients `AR,i,m` and `AP,i,m`.
+$v_m = v_\mathrm{ref} = 70\ \text{km/h}$, where the two speed terms vanish as
+well, the sound powers **are** the Table F-1 coefficients $A_{R,i,m}$ and
+$A_{P,i,m}$.
 
 ## 6. Handing the source to a propagation model
 
 The emission stage produces a power per metre. Splitting that line into
 equivalent point sources is, in the words of section 2.5.3, "outside the scope
 of the current methodology": a point source standing for a segment of length
-`dL` simply carries `L'W,eq,line,i + 10 lg(dL)`, which is arithmetic and is
-offered as such.
+$dL$ simply carries $L'_{W,\mathrm{eq,line},i} + 10\log_{10}(dL)$, which is
+arithmetic and is offered as such.
 
 ```python
 from phonometry import (
@@ -370,4 +372,4 @@ split into point sources is declared out of scope by the method itself.
 - [Outdoor Sound Propagation](/phonometry/guides/outdoor-propagation/): the
   ISO 9613-2 chain that carries a source power to a receiver.
 - [Environmental noise levels](/phonometry/guides/environmental-levels/): the
-  Lden and Lnight indicators the resulting maps are drawn for.
+  $L_{den}$ and $L_{night}$ indicators the resulting maps are drawn for.

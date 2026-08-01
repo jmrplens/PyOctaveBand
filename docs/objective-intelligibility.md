@@ -75,7 +75,7 @@ the flat-masker example.
 ## 2. STOI: envelope correlation with clipping
 
 For every band and segment STOI normalises the degraded envelope to the clean
-one, clips it at a lower signal-to-distortion bound (`beta = -15` dB) so that a
+one, clips it at a lower signal-to-distortion bound ($\beta = -15$ dB) so that a
 fully degraded unit cannot drag the score below its floor, and takes the
 sample correlation of the two envelopes (Taal et al. 2011, Eqs. 3-6). The index
 is the average of those intermediate correlations over all bands and segments

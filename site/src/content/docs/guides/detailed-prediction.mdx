@@ -90,7 +90,7 @@ junction actually produces (Formula 10):
 
 $$
 \overline{D}_{v,ij,\text{situ}} = K_{ij}
-- 10\lg\!\left(\frac{l_{ij}}{\sqrt{a_{i,\text{situ}}\,a_{j,\text{situ}}}}\right)
+- 10\log_{10}\!\left(\frac{l_{ij}}{\sqrt{a_{i,\text{situ}}\,a_{j,\text{situ}}}}\right)
 \ \ge 0\ \text{dB}
 $$
 
@@ -102,16 +102,16 @@ $$
 R_{ij} = \frac{R_{i,\text{situ}}}{2} + \Delta R_{i,\text{situ}}
 + \frac{R_{j,\text{situ}}}{2} + \Delta R_{j,\text{situ}}
 + \overline{D}_{v,ij,\text{situ}}
-+ 10\lg\!\left(\frac{S_s}{\sqrt{S_i S_j}}\right)
++ 10\log_{10}\!\left(\frac{S_s}{\sqrt{S_i S_j}}\right)
 $$
 
 The impact side runs in parallel: the bare slab's per-band level is
-$L_n = 155 - 30\lg m' + 10\lg T_s + 10\lg\sigma + 10\lg(f/f_\text{ref})$
+$L_n = 155 - 30\log_{10} m' + 10\log_{10} T_s + 10\log_{10}\sigma + 10\log_{10}(f/f_\text{ref})$
 (Part 2 Formula B.2), the direct path subtracts the covering and any ceiling
 (Formula 11), and each flanking path is Formula (12).
 
-**5. Assembly.** $R' = -10\lg\sum 10^{-R/10}$ over the thirteen paths of a
-four-flanking-element room, and $L'_n = 10\lg\sum 10^{L_n/10}$ over the five
+**5. Assembly.** $R' = -10\log_{10}\sum 10^{-R/10}$ over the thirteen paths of a
+four-flanking-element room, and $L'_n = 10\log_{10}\sum 10^{L_n/10}$ over the five
 impact paths, then ISO 717.
 
 ## The worked building of Annex L / Annex G
@@ -360,8 +360,8 @@ ln_13 = flanking_impact_level_from_flanking_level(
 
 Two identities let a spectrum check itself. For a homogeneous floor the
 airborne index and the impact level add up to a function of frequency alone
-(Part 2 Formulae B.3/B.4), $R + L_n = 38 + 30\lg f$ in one-third-octave bands
-and $43 + 30\lg f$ in octave bands, valid where forced transmission is
+(Part 2 Formulae B.3/B.4), $R + L_n = 38 + 30\log_{10} f$ in one-third-octave bands
+and $43 + 30\log_{10} f$ in octave bands, valid where forced transmission is
 negligible; `reciprocity_impact_level` implements it. And Table B.2 of Part 2
 tabulates the octave-band $L_n$ of four monolithic floors calculated the way
 this module does, a useful sanity target for a new floor build-up.
@@ -370,12 +370,12 @@ this module does, a useful sanity target for a new floor build-up.
 
 | Parameter | Type | Units | Range / default | Notes |
 | :--- | :--- | :--- | :--- | :--- |
-| `element` | `HomogeneousElement` | — | — | Area, side lengths, `m'`, `fc`, `ηint`, `Σ lk αk`, and optionally `ρ`/`cL` |
+| `element` | `HomogeneousElement` | — | — | Area, side lengths, $m'$, $f_c$, $\eta_\text{int}$, $\sum l_k \alpha_k$, and optionally $\rho$/$c_L$ |
 | `frequencies` | array | Hz | > 0 | Band centres |
-| `bands` | str | — | `'third'` (default) / `'octave'` | Sets the band that carries the `f ≈ fc` branch |
-| `resonant_only` | bool | — | default `False` | Drops the forced-transmission term below `fc` (Annex B.1, flanking paths) |
+| `bands` | str | — | `'third'` (default) / `'octave'` | Sets the band that carries the $f \approx f_c$ branch |
+| `resonant_only` | bool | — | default `False` | Drops the forced-transmission term below $f_c$ (Annex B.1, flanking paths) |
 | `speed_of_sound` | float | m/s | default `340` | The value ISO 12354-1 Annex A fixes |
-| `air_density` | float | kg/m³ | default `1.29` | `ρo` of the Annex B model |
+| `air_density` | float | kg/m³ | default `1.29` | $\rho_o$ of the Annex B model |
 
 ## `airborne_flanking_path()` / `impact_flanking_path()` parameters
 
@@ -384,9 +384,9 @@ this module does, a useful sanity target for a new floor build-up.
 | `label` | str | — | — | Display name of the path |
 | `kind` | str | — | `'Ff'` / `'Df'` / `'Fd'` | Airborne only; the impact builder is always `Df` |
 | `element_i` / `element_j` | `InSituElementResult` | — | — | Source-room and receiving-room elements (`floor` / `element_j` for impact) |
-| `vibration_reduction_index` | float or array | dB | — | `Kij` of this path |
-| `coupling_length` | float | m | > 0 | Junction coupling length `lij` |
-| `separating_area` | float | m² | > 0 | `Ss` (airborne only) |
+| `vibration_reduction_index` | float or array | dB | — | $K_{ij}$ of this path |
+| `coupling_length` | float | m | > 0 | Junction coupling length $l_{ij}$ |
+| `separating_area` | float | m² | > 0 | $S_s$ (airborne only) |
 | `delta_r_i` / `delta_r_j` | float or array | dB | default `0` | Lining improvements |
 | `delta_l` | float or array | dB | default `0` | Floor-covering improvement (impact only) |
 
@@ -396,7 +396,7 @@ this module does, a useful sanity target for a new floor build-up.
 per-band counterpart of the simplified prediction fiches: the same one-page
 layout, a basis line naming ISO 12354-1/-2:2017 Clause 4.2, the per-path
 share-of-energy table beside the per-band path-contribution figure, the boxed
-`R'w` / `L'n,w`, the detailed model's 1,5 dB to 2,5 dB standard deviation and a
+$R'_w$ / $L'_{n,w}$, the detailed model's 1,5 dB to 2,5 dB standard deviation and a
 PASS/FAIL verdict against a `requirement`. `verbose=True` annexes the band in
 which each path peaks. Both need the ISO 717 rating, so the spectrum must cover
 100 Hz to 3150 Hz (or 125 Hz to 2000 Hz in octaves).
@@ -407,11 +407,11 @@ which each path peaks. Both need the ISO 717 rating, so the spectrum must cover
   simplified single-number model and the Annex E junction catalogue this page
   builds on.
 - [Laboratory Flanking Transmission (ISO 10848)](/phonometry/guides/flanking-lab/): where the
-  measured `Kij` and the equivalent absorption length come from.
+  measured $K_{ij}$ and the equivalent absorption length come from.
 - [Insulation Ratings (ISO 717)](/phonometry/guides/insulation-ratings/): the reference-curve
-  engine that turns the predicted spectrum into `R'w` / `L'n,w`.
+  engine that turns the predicted spectrum into $R'_w$ / $L'_{n,w}$.
 - [Field Insulation Measurement (ISO 16283)](/phonometry/guides/insulation-field/): the built
   result the prediction is checked against.
 - [Dynamic stiffness of resilient materials (EN 29052-1)](/phonometry/guides/dynamic-stiffness/):
-  the `s'` behind the floating floor's resonance frequency.
+  the $s'$ behind the floating floor's resonance frequency.
 - API reference: [`building.detailed_prediction`](/phonometry/reference/api/building/detailed-prediction/).

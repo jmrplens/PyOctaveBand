@@ -51,7 +51,7 @@ en [Propagación exterior](/phonometry/es/guides/outdoor-propagation/).
 
 El método de ruido de aeropuerto de ECAC Doc 29 describe la aeronave con tablas
 **nivel-potencia-distancia (NPD)**. `npd_level` lee el nivel de evento
-(`LAmax`/`SEL`) para una potencia y distancia arbitrarias, interpolando
+($L_{Amax}$/`SEL`) para una potencia y distancia arbitrarias, interpolando
 linealmente en potencia (Ec. 4-3) y log-linealmente en distancia oblicua
 (Ec. 4-4).
 
@@ -100,11 +100,12 @@ Es el motor NPD que sustenta el método.
 ## 2. El cálculo de evento único
 
 El cálculo de evento único trocea la trayectoria en segmentos y corrige el nivel
-base NPD por segmento (§4.3-4.5): `impedance_adjustment` (T, p),
-`lateral_attenuation` (β,ℓ), `engine_installation_correction` (φ, montaje),
-`duration_correction`, la fracción de segmento finito `noise_fraction` y, detrás
-de los segmentos de rodaje de despegue, `start_of_roll_directivity` (ΔSOR).
-`event_level` los ensambla y suma en `SEL`/`LAmax`, y `noise_contour` lo evalúa
+base NPD por segmento (§4.3-4.5): `impedance_adjustment` ($T$, $p$),
+`lateral_attenuation` ($\beta$,$\ell$), `engine_installation_correction`
+($\varphi$, montaje), `duration_correction`, la fracción de segmento finito
+`noise_fraction` y, detrás de los segmentos de rodaje de despegue,
+`start_of_roll_directivity` ($\Delta_{\text{SOR}}$).
+`event_level` los ensambla y suma en `SEL`/$L_{Amax}$, y `noise_contour` lo evalúa
 sobre una malla en tierra (marca los segmentos de rodaje con una máscara
 `ground_roll`).
 
@@ -158,8 +159,8 @@ de interferencia.
 />
 
 La directividad de inicio de rodaje es la radiación trasera lobulada del ruido
-de chorro: máxima hacia un acimut ψ ≈ 120° respecto al morro, y decreciente al
-través (ψ = 90°) y directamente detrás (ψ = 180°).
+de chorro: máxima hacia un acimut $\psi \approx 120°$ respecto al morro, y
+decreciente al través ($\psi = 90°$) y directamente detrás ($\psi = 180°$).
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/airport_sor_es.svg" alt="Diagrama polar de la directividad de inicio de rodaje ΔSOR sobre el semicírculo trasero para reactor turbofán y turbohélice, con un lóbulo cerca de 120° respecto al morro" width="75%" />
 
@@ -207,14 +208,15 @@ aircraft.noise_contour(path, powers, distances, sel, lmax, ground_roll=ground_ro
 Validado contra el workbook de referencia de ECAC Doc 29 5.ª ed. Vol. 3 Parte 1:
 la geometría de segmento, la atenuación lateral, la instalación del motor, la
 fracción de ruido y la directividad de inicio de rodaje (turbofán y turbohélice)
-reproducen los valores de referencia con < 0,01 dB, y la suma energética de
-segmentos coincide con el `SEL` de referencia.
+reproducen los valores de referencia con $< 0{,}01\ \text{dB}$, y la suma
+energética de segmentos coincide con el `SEL` de referencia.
 
 El modelo cubre también el rodaje de aterrizaje (máscara `landing_roll`:
 fracción de ruido reducida Ec. 4-21b, geometría al extremo más cercano, sin
 término de directividad), el ángulo de alabeo por segmento (`bank`, positivo
-con el ala de estribor arriba; el ángulo de depresión es φ = β + ε para
-observadores a estribor de la traza y φ = β − ε para observadores a babor,
+con el ala de estribor arriba; el ángulo de depresión es
+$\varphi = \beta + \varepsilon$ para observadores a estribor de la traza y
+$\varphi = \beta - \varepsilon$ para observadores a babor,
 §4.5.2), la geometría lateral §4.5.5 al extremo más cercano detrás
 del rodaje de despegue, la velocidad media Ec. 4-13b en segmentos de pista y la
 cota inferior recomendada de 30 m en las consultas NPD. Siete eventos de receptor del
@@ -227,14 +229,14 @@ Doc 29: la interpolación NPD de `npd_level`/`npd_curve` (Ecs. 4-3, 4-4), las
 correcciones por segmento `impedance_adjustment`, `lateral_attenuation`
 (suelo blando de SAE AIR 5662), `engine_installation_correction`,
 `duration_correction`, `noise_fraction` y `start_of_roll_directivity`, su
-ensamblado en `SEL`/`LAmax` por `event_level` y el contorno en malla de
+ensamblado en `SEL`/$L_{Amax}$ por `event_level` y el contorno en malla de
 tierra `noise_contour`, incluidos el rodaje de aterrizaje, el ángulo de
 alabeo por segmento y la geometría lateral de extremo más próximo. Validada
 por debajo de 0,01 dB contra el workbook de referencia de la Parte 1 del
 Vol. 3 de la Doc 29 5.ª ed.
 
 **No cubierto.** La cadena construye solo contornos de evento único: no
-ensambla los índices acumulados multievento (una suma tipo Lden sobre un
+ensambla los índices acumulados multievento (una suma tipo $L_{den}$ sobre un
 programa de vuelos completo) que un estudio de contornos Doc 29 completo
 necesita por encima de estos niveles de evento único. Las propias tablas NPD
 son un dato de entrada, no una predicción: la biblioteca interpola las tablas
@@ -250,7 +252,7 @@ de motor.
   términos de atenuación de ISO 9613-2 y el efecto suelo que la atenuación
   lateral condensa en una sola curva.
 - [Niveles ambientales](/phonometry/es/guides/environmental-levels/): los
-  índices de largo plazo tipo Lden que un estudio de aeropuerto completo
+  índices de largo plazo tipo $L_{den}$ que un estudio de aeropuerto completo
   acumula a partir de eventos únicos.
 - Referencia de la API:
   [`aircraft.airport_noise`](/phonometry/es/reference/api/aeroacoustics/airport-noise/).

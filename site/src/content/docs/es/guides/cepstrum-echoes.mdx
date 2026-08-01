@@ -42,22 +42,22 @@ ondulación en un único pico de quefrencia.
 
 ## 1. El cepstro y sus tres variantes
 
-Como el logaritmo convierte la convolución `x = h * u` en la suma
-`ln X = ln H + ln U`, componentes que se solapan en el espectro se suman - y
+Como el logaritmo convierte la convolución $x = h \ast u$ en la suma
+$\ln X = \ln H + \ln U$, componentes que se solapan en el espectro se suman - y
 se separan - en el dominio cepstral (Havelock cap. 27, Ecs. (22)-(23)).
 `cepstrum` calcula las tres variantes estándar sobre el eje de quefrencia:
 
-- `'power'` (por defecto): la DFT inversa de `ln|X|²` (Fig. 21 de Milner).
+- `'power'` (por defecto): la DFT inversa de $\ln|X|^2$ (Fig. 21 de Milner).
   Real, par y ciega a la fase - el caballo de batalla para detectar ecos y
   familias de armónicos. Es el cepstro *con signo* del espectro logarítmico
   de potencia según Milner; el "cepstro de potencia" original de Bogert
   (1963) eleva al cuadrado una vez más y es no negativo - la biblioteca
   sigue a Milner en todo, así que los rahmónicos negativos conservan su
   signo;
-- `'real'`: la DFT inversa de `ln|X|` - exactamente la mitad del cepstro de
+- `'real'`: la DFT inversa de $\ln|X|$ - exactamente la mitad del cepstro de
   potencia, y la cantidad cuyo plegado causal es la reconstrucción de fase
   mínima (más abajo);
-- `'complex'`: la DFT inversa de `ln|X| + j·arg X` con la fase desenrollada
+- `'complex'`: la DFT inversa de $\ln|X| + j\arg X$ con la fase desenrollada
   y su componente lineal eliminada (Havelock cap. 87, Ec. (14)). Conserva la
   fase, así que es **invertible**: la puerta de entrada a la deconvolución
   homomórfica.
@@ -78,8 +78,8 @@ res.plot(language="es")
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/cepstrum_variants_es.svg" alt="Los cepstros de potencia, real y complejo de una ondícula con un eco de 8 milisegundos superpuestos frente a la quefrencia hasta 20 milisegundos: los tres llevan un pico positivo nítido en 8 milisegundos y uno negativo pequeño en 16 milisegundos, la ondícula fuente llena la región por debajo de unos 2 milisegundos, y un recuadro ampliado sobre el primer rahmónico muestra los picos de potencia y complejo llegando a 0,5 mientras el cepstro real llega exactamente a la mitad" width="86%" />
 
 *Las tres variantes de un mismo registro con eco (una ondícula de banda
-limitada más una reflexión en 8 ms, a = 0,5). Las tres llevan los
-rahmónicos en 8 y 16 ms con alturas a y −a²/2 (convención con signo de
+limitada más una reflexión en 8 ms, $a = 0{,}5$). Las tres llevan los
+rahmónicos en 8 y 16 ms con alturas $a$ y $-a^2/2$ (convención con signo de
 Milner); el recuadro muestra el cepstro real exactamente a la mitad del de
 potencia, y la ondícula fuente se concentra por debajo de 2 ms.*
 
@@ -128,33 +128,34 @@ exactamente igual que el relleno `oversample` de
 
 ## 2. Detección de ecos: el tren de picos rahmónicos
 
-Una reflexión única `x(t) = s(t) + a·s(t-t0)` multiplica el espectro por
-`1 + a·e^{-j2πft0}` - un rizado de período `1/t0` en toda la banda. Su
-logaritmo se expande, para `|a| < 1`, en la serie exactamente sumable
+Una reflexión única $x(t) = s(t) + a\,s(t-t_0)$ multiplica el espectro por
+$1 + a e^{-j 2\pi f t_0}$ - un rizado de período $1/t_0$ en toda la banda.
+Su logaritmo se expande, para $|a| < 1$, en la serie exactamente sumable
 
 $$
 \ln\!\left(1 + a e^{-j\theta}\right)
 = \sum_{n \ge 1} (-1)^{n+1} \frac{a^n}{n}\, e^{-jn\theta},
 $$
 
-así que el cepstro lleva un tren de picos en los **rahmónicos** `n·t0` con
-amplitudes `a, -a²/2, a³/3, ...` (su suma es `ln(1+a)`), independientemente
-del espectro de la propia `s`, que se concentra en las quefrencias bajas. En
+así que el cepstro lleva un tren de picos en los **rahmónicos** $n t_0$ con
+amplitudes $a, -a^2/2, a^3/3, \dots$ (su suma es $\ln(1+a)$),
+independientemente del espectro de la propia $s$, que se concentra en las
+quefrencias bajas. En
 el cepstro con signo del espectro logarítmico de potencia (`kind='power'`,
 la convención de Milner) la altura del primer pico es el coeficiente de
-reflexión `a` - con su signo - más lo que el cepstro de la fuente aporte en
+reflexión $a$ - con su signo - más lo que el cepstro de la fuente aporte en
 esa quefrencia (despreciable para fuentes de banda ancha, cuyo cepstro se
 concentra en las quefrencias bajas); sobre un impulso ideal con eco la
 identidad es una forma cerrada que los tests y la batería de conformidad
 fijan a 1e-10. `echo_detection`
 automatiza la lectura: busca el mayor pico de `|cepstrum|` en la banda de
-búsqueda (así una reflexión inversora, `a < 0`, se encuentra en su retardo
+búsqueda (así una reflexión inversora, $a < 0$, se encuentra en su retardo
 verdadero en vez de perderse), refina el retardo por interpolación
 cuadrática a través del pico y sus vecinos, y devuelve como coeficiente de
 reflexión el valor del pico con su signo. Cuando el retardo verdadero cae
 entre muestras, el rahmónico se reparte entre bins de quefrencia vecinos:
 el retardo interpolado sigue acertando, pero el coeficiente devuelto
-subestima `|a|` (hasta cerca del 65 % de su valor a mitad de camino entre
+subestima $|a|$ (hasta cerca del 65 % de su valor a mitad de camino entre
 muestras).
 
 ```python
@@ -213,7 +214,7 @@ que ocupa la envolvente espectral de la propia fuente (`min_quefrency`, por
 defecto 16 muestras) y termina en la mitad no ambigua del eje
 (`max_quefrency`). Los trenes de picos por reverberación de la sismología
 (Havelock cap. 87) son la misma firma a escala geofísica. Obsérvese el
-segundo rahmónico negativo en `2·t0` de la figura: el término `-a²/2` de la
+segundo rahmónico negativo en $2 t_0$ de la figura: el término $-a^2/2$ de la
 serie, una confirmación útil de que un pico es de verdad un eco y no una
 periodicidad espectral sin relación.
 
@@ -246,7 +247,7 @@ low.plot(language="es")
 *El reparto del lifter de 4 ms sobre un registro de eco puro: el lado paso
 bajo devuelve la envolvente espectral suave, el lado paso alto aísla el
 rizado de 125 Hz del eco, oscilando exactamente entre las formas cerradas
-20·lg(1±a) = +3,5 y −6,0 dB.*
+$20\log_{10}(1 \pm a) = +3{,}5$ y $-6{,}0$ dB.*
 
 <details>
 <summary>Mostrar el código de esta figura</summary>
@@ -293,7 +294,7 @@ plt.show()
 </details>
 
 Para la señal de eco puro el rizado del paso alto oscila entre las formas
-cerradas `20·log10(1+a)` y `20·log10(1-a)` dB, otro oráculo que fijan los
+cerradas $20\log_{10}(1+a)$ y $20\log_{10}(1-a)$ dB, otro oráculo que fijan los
 tests. En análisis de voz la misma operación separa la envolvente del tracto
 vocal (formantes) de los armónicos de la excitación; aquí es la herramienta
 general para separar "lo suave de lo periódico" en cualquier respuesta en
@@ -327,7 +328,7 @@ quiera - eso es la deconvolución homomórfica (Havelock cap. 87, sec. 3.3):
 anular los rahmónicos elimina un eco, conservar solo las quefrencias bajas
 extrae la ondícula de la fuente. Una señal de fase mínima tiene un cepstro
 complejo causal, y por eso plegar el cepstro real sobre las quefrencias
-positivas reconstruye la fase mínima a partir de `|H|` únicamente:
+positivas reconstruye la fase mínima a partir de $|H|$ únicamente:
 [`minimum_phase`](/phonometry/es/guides/swept-sine-distortion/) y
 `phase_decomposition` corren sobre ese mismo núcleo de plegado (Bendat y
 Piersol sec. 13.1.4; Tohyama, en Havelock cap. 75, edita la reverberación
@@ -356,13 +357,13 @@ Butterworth de cuarto orden aplicado hacia delante y hacia atrás; el
 rechazo es finito, y el paso de fase cero deja pequeños transitorios en
 los bordes del registro).
 
-Para un tono AM `A0·(1 + m·cos(2πfm·t))·cos(2πfc·t)` con `fm` en un bin de
-análisis las formas cerradas son:
+Para un tono AM $A_0 (1 + m \cos(2\pi f_m t)) \cos(2\pi f_c t)$ con $f_m$
+en un bin de análisis las formas cerradas son:
 
-| `kind` | nivel medio | línea en `fm` | línea en `2fm` |
+| `kind` | nivel medio | línea en $f_m$ | línea en $2f_m$ |
 |---|---|---|---|
-| `'magnitude'` | `A0` | `A0·m` | - |
-| `'squared'` | `A0²·(1 + m²/2)` | `2·A0²·m` | `A0²·m²/2` |
+| `'magnitude'` | $A_0$ | $A_0 m$ | - |
+| `'squared'` | $A_0^2 (1 + m^2/2)$ | $2 A_0^2 m$ | $A_0^2 m^2/2$ |
 
 ```python
 import numpy as np

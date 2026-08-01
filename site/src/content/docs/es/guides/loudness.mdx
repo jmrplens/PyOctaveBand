@@ -70,7 +70,7 @@ cómo se reparta su energía entre las **bandas críticas** del oído. El métod
 Zwicker modela explícitamente la cadena auditiva (transmisión del oído
 externo/medio, análisis en bandas críticas sobre la escala de 24 Bark,
 pendientes de enmascaramiento dependientes del nivel) y produce la
-**sonoridad N en sonos**, una escala de razón: 4 sonos es el doble de sonoro
+**sonoridad $N$ en sonos**, una escala de razón: 4 sonos es el doble de sonoro
 que 2 sonos. Por definición, un tono de 1 kHz a 40 dB SPL es 1 sono, y cada
 +10 fonios duplica el valor en sonos.
 
@@ -78,7 +78,7 @@ que 2 sonos. Por definición, un tono de 1 kHz a 40 dB SPL es 1 sono, y cada
 
 La animación de abajo muestra esa integración en acción: al subir el nivel
 de banda de un sonido de banda estrecha de 1 kHz, el patrón de sonoridad
-específica N'(z) crece a lo largo del eje de Bark y el área bajo él es la
+específica $N'(z)$ crece a lo largo del eje de Bark y el área bajo él es la
 sonoridad total en sonos.
 
 <Video
@@ -118,7 +118,7 @@ res.plot()   # N'(z) sobre la escala Bark — el patrón de sonoridad específic
 
 *Mismo nivel de banda, sonoridad muy distinta: la energía repartida entre
 muchas bandas críticas (rojo) suma muchos más sonos que el mismo nivel
-concentrado en una sola banda (azul). El área bajo N'(z) es la sonoridad
+concentrado en una sola banda (azul). El área bajo $N'(z)$ es la sonoridad
 total.*
 
 <details>
@@ -161,7 +161,7 @@ La implementación es un port de sala limpia del **programa de referencia
 normativo** de la norma (Anexo A.4): las doce tablas de datos son exactas
 dígito a dígito y el conjunto completo de validación del Anexo B se ejecuta en
 CI: el caso de prueba estacionario reproduce el valor publicado hasta el
-último dígito impreso, y las trazas N(t) de los pulsos de tono se mantienen
+último dígito impreso, y las trazas $N(t)$ de los pulsos de tono se mantienen
 dentro de la banda de tolerancia del 5 % por muestra que fija la norma.
 
 ### Parámetros de `loudness_zwicker()`
@@ -171,11 +171,11 @@ dentro de la banda de tolerancia del 5 % por muestra que fija la norma.
 | `x` | array 1D | Pa (tras calibración) | ≥ 8 ms a 48 kHz | Se remuestrea internamente a 48 kHz si es necesario |
 | `fs` | int | Hz | > 0 | |
 | `field` | str | — | `'free'` (por defecto) / `'diffuse'` | Corrección de campo sonoro (Tabla A.5) |
-| `stationary` | bool | — | por defecto `False` | `True`: un único N a partir del espectro promediado |
+| `stationary` | bool | — | por defecto `False` | `True`: un único $N$ a partir del espectro promediado |
 | `calibration_factor` | float | Pa por unidad digital | por defecto `1.0` | De `sensitivity()` |
 
-Devuelve un dataclass `ZwickerLoudness`: `loudness` (N, sonos),
-`loudness_level` (fonios), `specific` (N′(z), 240 bins de 0,1 Bark) y, para los
+Devuelve un dataclass `ZwickerLoudness`: `loudness` ($N$, sonos),
+`loudness_level` (fonios), `specific` ($N'(z)$, 240 bins de 0,1 Bark) y, para los
 análisis variables en el tiempo, `n5`, `n10`, `time`, `loudness_vs_time`
 (traza a 500 Hz).
 
@@ -184,10 +184,11 @@ análisis variables en el tiempo, `n5`, `n10`, `time`, `loudness_vs_time`
 `ZwickerLoudness.report(path)` renderiza una ficha PDF de una página con el
 formato de un informe de sonoridad acreditado: la línea de base normativa, un
 bloque opcional de metadatos de cabecera, una tabla compacta de métricas
-(sonoridad total *N*, nivel de sonoridad *L*<sub>N</sub> y los percentiles
-*N*<sub>5</sub>/*N*<sub>10</sub> para un resultado variable en el tiempo) junto
-al patrón de sonoridad específica *N*′(z) (el propio `.plot()` del resultado),
-el número único `N = X sono (LN = Y fonio)` en caja, una fila opcional de
+(sonoridad total $N$, nivel de sonoridad $L_N$ y los percentiles
+$N_5$/$N_{10}$ para un resultado variable en el tiempo) junto
+al patrón de sonoridad específica $N'(z)$ (el propio `.plot()` del resultado),
+el número único $N = X\ \text{sono}$ ($L_N = Y\ \text{fonio}$) en caja, una
+fila opcional de
 veredicto y un pie con el descargo fijo. Usa el mismo contenedor
 `ReportMetadata` y el mismo motor de renderizado que la
 [ficha de aislamiento de ISO 717](/phonometry/es/guides/insulation-ratings/#informe-de-iso-717-report);
@@ -319,7 +320,7 @@ espera una de las frecuencias de la Tabla 1.
 - [Métricas de calidad sonora](/phonometry/es/guides/sound-quality/): agudeza,
   tonalidad y aspereza, la otra mitad de la calidad sonora.
 - [Molestia psicoacústica e intensidad de fluctuación](/phonometry/es/guides/psychoacoustic-annoyance/):
-  el modelo de Zwicker y Fastl que consume la sonoridad percentil N5.
+  el modelo de Zwicker y Fastl que consume la sonoridad percentil $N_5$.
 - [Teoría](/phonometry/es/reference/theory/perception/): las ecuaciones que sustentan los modelos de sonoridad.
 - Referencia de la API: [`psychoacoustics.loudness_zwicker`](/phonometry/es/reference/api/psychoacoustics/loudness-zwicker/) y [`psychoacoustics.loudness_contours`](/phonometry/es/reference/api/psychoacoustics/loudness-contours/).
 
@@ -327,7 +328,7 @@ espera una de las frecuencias de la Tabla 1.
 
 ### ¿Cuál es la diferencia entre la sonoridad en sonos y el nivel de sonoridad en fonios?
 
-La sonoridad N en sonos (ISO 532-1) es una escala de razón de la sonoridad percibida: 4 sonos es el doble de sonoro que 2 sonos y, por definición, un tono de 1 kHz a 40 dB SPL es 1 sono. El nivel de sonoridad en fonios (ISO 226) es el SPL de un tono puro de 1 kHz igual de fuerte, y cada +10 fonios duplica el valor en sonos.
+La sonoridad $N$ en sonos (ISO 532-1) es una escala de razón de la sonoridad percibida: 4 sonos es el doble de sonoro que 2 sonos y, por definición, un tono de 1 kHz a 40 dB SPL es 1 sono. El nivel de sonoridad en fonios (ISO 226) es el SPL de un tono puro de 1 kHz igual de fuerte, y cada +10 fonios duplica el valor en sonos.
 
 ### ¿En qué rango son válidas las curvas isofónicas de ISO 226:2023?
 

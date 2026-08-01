@@ -159,7 +159,7 @@ plt.show()
 | :--- | :--- | :--- | :--- | :--- |
 | `ref_signal` | 1D/2D array | digital units | non-empty, non-silent | Recording of the calibration tone only (trim handling noise) |
 | `target_spl` | float | dB re 20 µPa | default `94.0` | The calibrator's nominal level (114 dB calibrators: pass `114.0`) |
-| `ref_pressure` | float | Pa | default `2e-5` | Reference pressure p₀; rarely changed |
+| `ref_pressure` | float | Pa | default `2e-5` | Reference pressure $p_0$; rarely changed |
 | `fs` | int, optional | Hz | > 0; default `None` | Required for the stability validation; omit to skip it |
 | `validate` | bool | — | default `True` | Emit `CalibrationWarning` on unstable/short recordings |
 | `max_fluctuation_db` | float, optional | dB | default `None` → Table 2 class 1 | Explicit override of the stability limit |
@@ -192,14 +192,14 @@ Calibration lives at three time scales:
   humidity and capsule aging; electronics with battery voltage. A healthy
   class 1 chain drifts a few hundredths of a dB over a session, which is
   why a pre/post difference of half a decibel signals damage rather than
-  weather. The largest "drift" of all is a touched gain knob: the factor S
-  is valid only while the chain stays exactly as calibrated.
+  weather. The largest "drift" of all is a touched gain knob: the factor
+  $S$ is valid only while the chain stays exactly as calibrated.
 
 One more class subtlety: tolerances chain. A class 1 measurement requires a
 class 1 (or LS) calibrator *and* a class 1 meter; calibrating a class 1
 chain with a class 2 calibrator silently downgrades every derived level to
-class 2 accuracy, because the calibrator's wider level tolerance enters S
-directly.
+class 2 accuracy, because the calibrator's wider level tolerance enters
+$S$ directly.
 
 ## Digital Analysis (dBFS)
 
@@ -975,7 +975,7 @@ Qualification comes *before* the statistics this section's other pages
 compute: the chi-square confidence interval of a
 [Welch PSD](https://jmrplens.github.io/phonometry/guides/spectral-analysis/) and the random-error
 formulas of the [correlation estimators](https://jmrplens.github.io/phonometry/guides/correlation-delay/)
-all assume the record is stationary, as does the very idea of *the* Leq of
+all assume the record is stationary, as does the very idea of *the* $L_{eq}$ of
 a measurement in [Levels](https://jmrplens.github.io/phonometry/guides/levels/). When a record fails
 the test, split it at the change (the `segment_values` sequence shows
 where), analyse the pieces, or move to the short-time views - the

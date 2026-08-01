@@ -30,14 +30,15 @@ referred to an input of 1 W into the rated impedance; expressed as a level re
 20 µPa (clause 20.4) it is the familiar "dB @ 1 W/1 m". Two normalizations
 hide in that sentence:
 
-- *The electrical one.* The test voltage is `Up = √(R · 1 W)`, numerically
-  `√R`: 2.83 V into a rated 8 Ω. A datasheet quoting "dB @ 2.83 V/1 m" for a
+- *The electrical one.* The test voltage is $U_p = \sqrt{R \cdot 1\,\text{W}}$,
+  numerically $\sqrt{R}$: 2.83 V into a rated 8 Ω. A datasheet quoting "dB @ 2.83 V/1 m" for a
   4 Ω loudspeaker is feeding it 2 W, which flatters the figure by 3 dB
   against a true 1 W/1 m rating; check the rated impedance before comparing.
 - *The geometric one.* 1 m is a **reference** distance, not necessarily the
   measurement distance. The standard has you measure in the far field (at
   0.5 m or an integer number of metres, clause 7.1) and refer the result back
-  with the inverse-distance law, `Lp(1 m) = Lp(r) + 20 lg(r / 1 m)`. That
+  with the inverse-distance law,
+  $L_p(1\ \text{m}) = L_p(r) + 20\log_{10}(r / 1\ \text{m})$. That
   scaling only holds where the level actually falls 6 dB per doubling of
   distance, hence the free field of the diagram; at 1 m from a large
   multi-way cabinet the near field may not have ended yet, and the quoted
@@ -53,19 +54,21 @@ reference-value pitfall, is covered in
 The rigid circular **piston in an infinite baffle** is the canonical radiator
 behind a loudspeaker cone, the open end of a duct and the radiation efficiency
 of any finite vibrating surface (Beranek & Mellow §4.19, §13.7). Its mechanical
-radiation impedance is `Z_r = rho c S (R1 + j X1)` with `S = pi a^2` and the
+radiation impedance is $Z_r = \rho c S\,(R_1 + jX_1)$ with $S = \pi a^2$ and the
 dimensionless resistance and reactance functions (Eqs. (13.117), (13.118))
 
-```text
-R1(x) = 1 - 2 J1(x) / x ,   X1(x) = 2 H1(x) / x ,   x = 2ka,
-```
+$$
+R_1(x) = 1 - \frac{2 J_1(x)}{x}, \qquad X_1(x) = \frac{2 H_1(x)}{x},
+\qquad x = 2ka,
+$$
 
-with `J1` the Bessel function and `H1` the Struve function of order one. At low
-frequency `R1 -> (ka)^2 / 2` and the reactance is mass-like with the radiation
-mass `M_r = 8 rho a^3 / 3` (Eq. (4.151)); at high frequency `R1 -> 1`, `X1 -> 0`
-and the piston radiates as into an infinite tube. The far field follows the
-directivity `D(theta) = 2 J1(ka sin theta) / (ka sin theta)`, whose first null
-is at `ka sin theta = 3.8317`.
+with $J_1$ the Bessel function and $H_1$ the Struve function of order one. At
+low frequency $R_1 \to (ka)^2/2$ and the reactance is mass-like with the
+radiation mass $M_r = 8\rho a^3/3$ (Eq. (4.151)); at high frequency
+$R_1 \to 1$, $X_1 \to 0$ and the piston radiates as into an infinite tube. The
+far field follows the directivity
+$D(\theta) = 2 J_1(ka\sin\theta)/(ka\sin\theta)$, whose first null is at
+$ka\sin\theta = 3.8317$.
 
 ```python
 import numpy as np
@@ -81,10 +84,11 @@ res.plot()                                         # R1 and X1 vs ka
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/piston_radiation_impedance_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/piston_radiation_impedance.svg" alt="Normalized radiation resistance R1 and reactance X1 of a 75 mm baffled circular piston against ka on a logarithmic axis: R1 rises from ka squared over two through unity with decaying ripples, while the mass-like X1 peaks near ka of 1.4 and decays, with the high-frequency limit R1 equal to 1 marked" width="82%"></picture>
 
 *The `.plot()` of the result is the classic Beranek & Mellow impedance figure
-computed for this piston: below `ka ≈ 1` the load is almost purely mass-like
-(`X1` dominates and `R1 ∝ (ka)²`, the regime where a loudspeaker's output is
-stiffness- and mass-limited), and above it the resistance settles on `ρcS`
-with interference ripples while the reactance dies away.*
+computed for this piston: below $ka \approx 1$ the load is almost purely
+mass-like ($X_1$ dominates and $R_1 \propto (ka)^2$, the regime where a
+loudspeaker's output is stiffness- and mass-limited), and above it the
+resistance settles on $\rho c S$ with interference ripples while the
+reactance dies away.*
 
 <details>
 <summary>Show the code for this figure</summary>
@@ -110,10 +114,10 @@ callable directly. The piston is the companion radiator of the
 [reactive silencers](silencers.md).
 
 The far-field **directivity pattern** is a plottable result in its own right:
-`piston_directivity_pattern(ka)` samples `D(theta)` at one or more `ka` values
+`piston_directivity_pattern(ka)` samples $D(\theta)$ at one or more $ka$ values
 and returns a `PistonDirectivity` (the polar angle grid, the linear `directivity`
 and its dB form `directivity_db`, and the `ka` values) whose `.plot()` draws the
-classic polar beam pattern. Several `ka` are shown as one family, so the main
+classic polar beam pattern. Several $ka$ are shown as one family, so the main
 lobe narrowing and the side lobes appearing read at a glance:
 
 ```python
@@ -147,7 +151,7 @@ side.
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/piston_baffle_geometry_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/piston_baffle_geometry.svg" alt="A 10 cm radius rigid piston drawn to scale as a plate of 200 mm diameter set into a hatched vertical baffle, with the piston diameter dimensioned and the normalized far-field directivity lobe at ka of 7.3 overlaid on the radiation side: a long forward main lobe hugging the dotted axis with small side lobes folding back near the plate" width="82%"></picture>
 
 *The piston the impedance and directivity curves describe, to scale: at
-4 kHz this 10 cm radius plate has `ka ≈ 7.3`, so the overlaid lobe is
+4 kHz this 10 cm radius plate has $ka \approx 7.3$, so the overlaid lobe is
 already several times narrower than the low-frequency hemisphere and the
 first side lobes have appeared.*
 
@@ -177,9 +181,10 @@ renders the standard's rated-characteristics data sheet. Two of the numbers are
 computed from the response rather than merely repeated:
 
 - **Characteristic sensitivity level** (20.3/20.4). The on-axis level averaged
-  over a stated band, referred to 1 W into the rated impedance `R` at 1 m:
-  `LM = L_mean + 20 lg(d/d0) + 20 lg(Up/U)` with `Up = sqrt(R · 1 W) = sqrt(R)`.
-  The default drive is that `sqrt(R)` (2.83 V into 8 Ω), so with a 1 m response
+  over a stated band, referred to 1 W into the rated impedance $R$ at 1 m:
+  $L_M = \overline{L} + 20\log_{10}(d/d_0) + 20\log_{10}(U_p/U)$ with
+  $U_p = \sqrt{R\cdot 1\,\text{W}} = \sqrt R$.
+  The default drive is that $\sqrt R$ (2.83 V into 8 Ω), so with a 1 m response
   the sensitivity level is the band mean.
 - **Effective frequency range** (21.2). The band over which the response stays
   within 10 dB of the level averaged over the one-octave band in the region of
@@ -347,19 +352,23 @@ but a **closed loop**: the loudspeaker feeds the audience, and it also feeds the
 microphone that drives it. Long (*Architectural Acoustics* 2e, Chapter 18,
 Equations (18.13) to (18.24)) writes that loop with two decibel gains:
 
-```text
-Zs = L(H-L) − L(T-M)                       (Eq. (18.17))  open-loop system gain
-Gs = L(H-M) − L(H-L) + DM(θ)               (Eq. (18.18))  feedback-loop gain
-```
+$$
+\begin{aligned}
+Z_S &= L_{H\text{-}L} - L_{T\text{-}M}
+  && \text{(Eq. (18.17))  open-loop system gain} \\
+G_S &= L_{H\text{-}M} - L_{H\text{-}L} + D_M(\theta)
+  && \text{(Eq. (18.18))  feedback-loop gain}
+\end{aligned}
+$$
 
-`Zs` is the level the loudspeaker produces at an average listener minus the
-level the talker produces at the microphone; `Zs = -6` dB, typical of an
+$Z_S$ is the level the loudspeaker produces at an average listener minus the
+level the talker produces at the microphone; $Z_S = -6$ dB, typical of an
 auditorium or a church, means a comfortable conversational level at twice the
-talker-to-microphone distance. `DM(θ)` is the directivity index of the
+talker-to-microphone distance. $D_M(\theta)$ is the directivity index of the
 microphone toward the loudspeaker *relative to* the talker: zero for an
 omnidirectional microphone, about −2 to −3 dB for a cardioid pointed at the
 talker. Summing the infinite series of round trips, the system oscillates when
-the loop gain reaches unity, that is `Zs + Gs = 0` (Equation (18.16)).
+the loop gain reaches unity, that is $Z_S + G_S = 0$ (Equation (18.16)).
 
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sound_reinforcement_geometry_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sound_reinforcement_geometry.svg" alt="Schematic of a sound-reinforcement feedback loop: the talker 0.3 metres in front of the microphone, the flown loudspeaker 4 metres from the microphone and 12 metres from the average listener, with the signal path drawn solid and the feedback path dashed" width="85%"></picture>
 
@@ -373,12 +382,12 @@ equalised system (other authors quote 12 dB unequalised and 6 dB carefully
 equalised): 6 dB of it covers a sustained tone adding in phase with a reflection
 off a hard surface, and the remaining 4 dB is safety. With several microphones
 open at once the returned signals add at the mixer, which the
-number-of-open-microphones correction `ΔL_nom = 10 log10 Nm` accounts for
-(Equation (18.23)). The criterion is then
+number-of-open-microphones correction $\Delta L_\text{nom} = 10\log_{10} N_m$
+accounts for (Equation (18.23)). The criterion is then
 
-```text
-Zs + L(H-M) + ΔL_nom ≤ L(H-L) − DM(θ) − 10
-```
+$$
+Z_S + L_{H\text{-}M} + \Delta L_\text{nom} \le L_{H\text{-}L} - D_M(\theta) - 10.
+$$
 
 ```python
 from phonometry import electroacoustics as ea
@@ -399,26 +408,27 @@ res.plot()      # the gain structure against the oscillation and margin lines
 ```
 
 Those two special cases are Long's own (Equations (18.21) and (18.22)): with
-`Zs = -6` dB the criterion collapses to `L(H-M) ≤ L(H-L) − DM(θ) − 4`, so an
-omnidirectional microphone must see the loudspeaker 4 dB below the average level
-in the audience, while a cardioid may let it rise to 2 dB below.
+$Z_S = -6$ dB the criterion collapses to
+$L_{H\text{-}M} \le L_{H\text{-}L} - D_M(\theta) - 4$, so an omnidirectional
+microphone must see the loudspeaker 4 dB below the average level in the
+audience, while a cardioid may let it rise to 2 dB below.
 
 > **A sign slip in the printed equation.** Long prints Equation (18.24) with
-> `+ DM(θ)` on the right-hand side, which contradicts the Equations (18.20) to
+> `+ D_M(theta)` on the right-hand side, which contradicts the Equations (18.20) to
 > (18.22) it generalises and would turn the benefit of a directional microphone
 > into a penalty. `feedback_stability` implements the sign of Equation (18.20),
-> so that `Nm = 1` reproduces Long's own special cases exactly. The defect is
+> so that $N_m = 1$ reproduces Long's own special cases exactly. The defect is
 > recorded in the [errata registry](ERRATA.md).
 
 ### `feedback_stability()` parameters
 
 | Parameter | Type | Units | Range / default | Notes |
 | :--- | :--- | :--- | :--- | :--- |
-| `open_loop_gain` | float | dB | finite | `Zs = L(H-L) - L(T-M)`; about −6 dB in an auditorium |
-| `level_loudspeaker_at_microphone` | float | dB | finite | `L(H-M)` |
-| `level_loudspeaker_at_listener` | float | dB | finite | `L(H-L)` |
-| `microphone_directivity` | float | dB | default 0 | `DM(theta)`, 0 omni, about −2 cardioid |
-| `open_microphones` | int | — | ≥ 1, default 1 | `Nm` |
+| `open_loop_gain` | float | dB | finite | $Z_S = L_{H\text{-}L} - L_{T\text{-}M}$; about −6 dB in an auditorium |
+| `level_loudspeaker_at_microphone` | float | dB | finite | $L_{H\text{-}M}$ |
+| `level_loudspeaker_at_listener` | float | dB | finite | $L_{H\text{-}L}$ |
+| `microphone_directivity` | float | dB | default 0 | $D_M(\theta)$, 0 omni, about −2 cardioid |
+| `open_microphones` | int | — | ≥ 1, default 1 | $N_m$ |
 | `stability_margin` | float | dB | ≥ 0, default 10 | Long's equalised-system margin |
 
 Returns a `FeedbackStabilityResult` (`open_loop_gain`, `feedback_loop_gain`,
@@ -438,7 +448,7 @@ design separately.
 ## See also
 
 - [Electroacoustics](electroacoustics.md): the IEC 60268-3 distortion set,
-  THD+N and SINAD, intermodulation and the H1/H2 frequency-response
+  THD+N and SINAD, intermodulation and the $H_1$/$H_2$ frequency-response
   estimators that produce the curves this guide reports.
 - [Microphone Characterisation (IEC 60268-4)](microphones.md): the companion
   rated-characteristics report for the measuring side of the chain.

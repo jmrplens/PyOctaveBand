@@ -55,7 +55,7 @@ of the excess of the noise exposure level over a frequency-dependent cut-off
 $L_0$ (ISO 1999 clause 6.3.1, Formula 2, Table 1):
 
 $$
-N_{50} = \left[u + v\,\lg\frac{t}{t_0}\right](L_{EX,8h} - L_0)^2,
+N_{50} = \left[u + v\,\log_{10}\frac{t}{t_0}\right](L_{EX,8h} - L_0)^2,
 $$
 
 with $t$ the exposure in years and $t_0 = 1$ year; below $L_0$ the effect is
@@ -222,7 +222,8 @@ population's *percentage beyond fence* depends on the fractile spread, not just
 the median, so it must be read from the distribution, never from the median
 threshold alone.
 
-The `NiptsResult` carries the `median` (`N50`), the `spread_upper`/`spread_lower`
+The `NiptsResult` carries the `median` ($N_{50}$), the
+`spread_upper`/`spread_lower`
 and the `value` at the requested fractile; the `HtlanResult` carries `htla`,
 `nipts` and the combined `threshold`. Both expose `.plot()`. The age component
 alone is the subject of the

@@ -87,9 +87,9 @@ la longitud de onda de flexión libre iguala la longitud de onda de traza del
 sonido incidente y el panel se vuelve transparente: el **valle de coincidencia**.
 El método de Sharp mantiene la ley de masas de campo hasta $f_c/2$, cae con una
 recta en $\log f$ y desde $f_c$ sigue (Ec. 7.44)
-$TL = 10\lg[1 + (\pi f m''/\rho_0 c_0)^2] + 10\lg(2\eta f/\pi f_c)$ con el factor
+$TL = 10\log_{10}[1 + (\pi f m''/\rho_0 c_0)^2] + 10\log_{10}(2\eta f/\pi f_c)$ con el factor
 de pérdidas $\eta$. El valle se sitúa en el punto B de la carta de diseño de
-Bies, $TL = 20\lg(f_c m'') + 10\lg\eta - 44$.
+Bies, $TL = 20\log_{10}(f_c m'') + 10\log_{10}\eta - 44$.
 
 Toda la sección en un esquema: un campo difuso excita una hoja simple y el
 $R(f)$ predicho sube con la ley de masas hasta el valle de coincidencia. Una
@@ -221,7 +221,7 @@ La construcción tiene tres partes:
    sube 6 dB por octava;
 2. una **meseta de coincidencia** horizontal a la altura tabulada, con el punto
    **A** donde la recta de la ley de masas la alcanza;
-3. el punto **B** en `B/A × f_A`, por encima del cual la estimación se recupera
+3. el punto **B** en $B/A \times f_A$, por encima del cual la estimación se recupera
    a **10 dB por octava**.
 
 No necesita ni la rigidez a flexión ni el factor de pérdidas (la meseta
@@ -262,7 +262,7 @@ plt.show()
 </details>
 
 Una comprobación trabajada frente al libro: un muro de ladrillo macizo de
-8 m x 3 m y 110 mm de espesor a 2,1 kg/m² por mm (`m'' = 231 kg/m²`) da
+8 m x 3 m y 110 mm de espesor a 2,1 kg/m² por mm ($m'' = 231\ \text{kg/m}^2$) da
 35,8 dB en la octava de 63 Hz, sobre la recta de la ley de masas, luego la
 meseta de ladrillo de 37 dB en las octavas de 125 Hz y 250 Hz, y después 10 dB
 por octava por encima del punto B: exactamente la respuesta publicada de Norton
@@ -659,7 +659,7 @@ R = -10\log_{10}\!\left( \frac{1}{\sum_n S_n} \sum_n S_n\, 10^{-R_n/10} \right),
 $$
 
 de modo que una abertura desnuda de área relativa $S_a/S$ limita la composición
-a $10\lg(S/S_a)$: una abertura del 1 % nunca puede superar los 20 dB, sea cual
+a $10\log_{10}(S/S_a)$: una abertura del 1 % nunca puede superar los 20 dB, sea cual
 sea la pared.
 
 ```python

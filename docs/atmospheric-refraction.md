@@ -16,7 +16,7 @@ Renterghem, *Predicting Outdoor Sound* 2e (2021, Ch. 11).
 
 Whether refraction matters is mostly a question of range. A representative
 surface-layer gradient of ±0.1 s⁻¹ curves rays with a radius
-`Rc = c0/|g| ≈ 3.4 km`, so over the first hundred metres the paths are
+$R_c = c_0/|g| \approx 3.4$ km, so over the first hundred metres the paths are
 sensibly straight and the homogeneous models above are accurate. Beyond a few
 hundred metres the geometry takes over: downwind, or under a nocturnal
 temperature inversion, the downward-curved rays close over the ground and hold
@@ -26,7 +26,7 @@ same wind profile opens an acoustic shadow into which the level collapses by
 familiar upwind/downwind asymmetry of any steady outdoor source: the same
 machine at the same distance, tens of decibels apart depending on which side
 you stand. It is also why ISO 9613-2 fixes its "favourable" downwind
-atmosphere by decree, and what its scalar `C_met` compresses; the models on
+atmosphere by decree, and what its scalar $C_{met}$ compresses; the models on
 this page compute the physics that decides both.
 
 The sketch below puts both sides in one scene: one source, a receiver 350 m
@@ -90,16 +90,19 @@ plt.show()
 ## 1. Effective sound-speed profile
 
 A moving (windy) atmosphere is well approximated by a non-moving one with the
-**effective sound speed** `c_eff(z) = c(z) + u(z)`, the adiabatic sound speed
+**effective sound speed** $c_\text{eff}(z) = c(z) + u(z)$, the adiabatic sound
+speed
 plus the component of the wind in the propagation direction (Salomons Eq. 4.4).
 Two profile shapes cover most surface-layer cases:
 
-- a **linear** profile `c_eff(z) = c0 + g·z` (`linear_sound_speed_profile`),
-  the simplest refracting atmosphere and the one with exact ray geometry;
+- a **linear** profile $c_\text{eff}(z) = c_0 + g\,z$
+  (`linear_sound_speed_profile`), the simplest refracting atmosphere and the
+  one with exact ray geometry;
 - the realistic **logarithmic** surface-layer profile
-  `c_eff(z) = c0 + b·ln(1 + z/z0)` (`log_linear_sound_speed_profile`, Salomons
-  Eq. 4.5), with `b ≈ +1 m/s` for a typical downward-refracting atmosphere,
-  `b ≈ -1 m/s` for an upward-refracting one, and `z0` the roughness length
+  $c_\text{eff}(z) = c_0 + b\ln(1 + z/z_0)$ (`log_linear_sound_speed_profile`,
+  Salomons Eq. 4.5), with $b \approx +1\ \text{m/s}$ for a typical
+  downward-refracting atmosphere, $b \approx -1\ \text{m/s}$ for an
+  upward-refracting one, and $z_0$ the roughness length
   (about 0.1 m for grassland).
 
 A positive gradient (sound speed increasing upward) bends rays **down** toward
@@ -136,7 +139,7 @@ plt.show()
 ## 2. Ray model
 
 In geometrical acoustics a sound ray obeys Snell's law
-`cos(γ(z))/c(z) = const` (Salomons Eq. 4.3). `atmospheric_ray_paths` integrates
+$\cos(\gamma(z))/c(z) = \text{const}$ (Salomons Eq. 4.3). `atmospheric_ray_paths` integrates
 it with a fourth-order Runge-Kutta scheme, marching in range and reflecting
 specularly at the ground, and returns the curved paths, the turning points, the
 travel times and the number of ground reflections.
@@ -153,7 +156,7 @@ rays.plot()   # curved ray fan with the acoustic shadow near the ground
 ```
 
 The page-top figure shows this upward-refracting fan opening its shadow. The
-favourable case is its mirror image: under **downward** refraction (`b = +1`)
+favourable case is its mirror image: under **downward** refraction ($b = +1$)
 the shallow rays are bent back to the ground, bounce, and carry energy along
 the surface instead of losing it upward.
 
@@ -189,8 +192,9 @@ R_c = \frac{1}{|g|\,\xi}, \qquad \xi = \frac{\cos\theta_0}{c(\text{launch})},
 R_c = \frac{c_0}{|g|\cos\theta_0},
 $$
 
-exposed as `ray_curvature_radius`. A ray launched at angle `θ0` in downward
-refraction turns at the height `Rc(1 - cos θ0)`. For an **upward-refracting**
+exposed as `ray_curvature_radius`. A ray launched at angle $\theta_0$ in
+downward refraction turns at the height $R_c(1 - \cos\theta_0)$. For an
+**upward-refracting**
 linear profile the ground-grazing ray bounds a region beyond which no direct or
 once-reflected ray arrives, at the closed-form **shadow-zone distance**
 (`shadow_zone_distance`):
@@ -201,7 +205,7 @@ x_\text{shadow} = \sqrt{2 R_c}\left(\sqrt{h_s} + \sqrt{h_r}\right),
 $$
 
 These closed forms are the exact oracle for the ray tracer: a circle fit of a
-traced ray recovers `Rc` to machine precision.
+traced ray recovers $R_c$ to machine precision.
 
 ## 3. Parabolic equation (Green's Function PE)
 
@@ -214,19 +218,21 @@ split-step Fourier family as the ocean
 [`parabolic_equation`](underwater-solvers.md). Each range step:
 
 1. transforms the field to the vertical-wavenumber domain (FFT);
-2. applies the free-space propagator `exp(i Δr (√(ka² − kz²) − ka))` together
+2. applies the free-space propagator
+   $\exp(i\,\Delta r\,(\sqrt{k_a^2 - k_z^2} - k_a))$ together
    with the finite-impedance ground reflection
-   `R(kz) = (kz Z − k0)/(kz Z + k0)` (Salomons Eq. H.28);
+   $R(k_z) = (k_z Z - k_0)/(k_z Z + k_0)$ (Salomons Eq. H.28);
 3. transforms back and adds the surface-wave residue of the reflection pole
-   at `kz = −k0/Z` (the third term of Eq. H.49, present for a passive ground,
-   `Im(Z) > 0`);
-4. applies the refraction phase screen `exp(i Δr (k(z) − ka))` (Eq. H.58).
+   at $k_z = -k_0/Z$ (the third term of Eq. H.49, present for a passive
+   ground, $\operatorname{Im}(Z) > 0$);
+4. applies the refraction phase screen $\exp(i\,\Delta r\,(k(z) - k_a))$
+   (Eq. H.58).
 
 The source is a **Gaussian starter** with its ground image (Eqs. G.64, G.76)
 and an **absorbing layer** at the top of the grid (Sec. G.9) suppresses
 top-boundary reflections. The result is the **relative sound level**
-`ΔL(z, r) = 20 lg(|p| R1)` (dB re free field, Salomons Eq. 3.6) over the whole
-range-height plane.
+$\Delta L(z, r) = 20\log_{10}(|p| R_1)$ (dB re free field, Salomons Eq. 3.6) over
+the whole range-height plane.
 
 ```python
 from phonometry import atmospheric_parabolic_equation, log_linear_sound_speed_profile
@@ -287,15 +293,16 @@ plt.show()
 </details>
 
 The ground impedance is supplied directly (`impedance=`, a normalized complex
-value in the `e^{-iωt}` convention of Salomons, with `Im(Z) > 0` for a passive
-ground), as a `PorousMediumResult`, or from an effective `flow_resistivity` via
+value in the $e^{-i\omega t}$ convention of Salomons, with
+$\operatorname{Im}(Z) > 0$ for a passive ground), as a `PorousMediumResult`,
+or from an effective `flow_resistivity` via
 the [porous models](porous-absorbers.md) of the materials domain; the porous
-models work in the opposite `e^{+jωt}` convention, so their impedance is
+models work in the opposite $e^{+j\omega t}$ convention, so their impedance is
 conjugated internally.
 
 The clip below runs the full wave physics through both signs of the
 logarithmic profile: a steady 50 Hz source 2 m over rigid ground in a 2D FDTD
-slice, with the library's ray fans traced through the same c(z) profiles laid
+slice, with the library's ray fans traced through the same $c(z)$ profiles laid
 over the fields. Downwind the fronts bend back and stream along the ground to
 the 350 m receiver; upwind they lift off the surface and the ground goes
 quiet beyond the ray-model shadow boundary.
@@ -316,7 +323,7 @@ The models are anchored by independent oracles:
   over a rigid ground.
 - **Exact ray geometry.** For a linear profile the traced ray is a circular arc
   whose fitted radius matches the closed-form `ray_curvature_radius` to machine
-  precision, and the turning height matches `Rc(1 - cos θ0)`.
+  precision, and the turning height matches $R_c(1 - \cos\theta_0)$.
 - **Reciprocity.** Swapping the source and receiver heights leaves the PE level.
 - **Shadow zone.** Over an upward-refracting profile the PE level collapses far
   inside the closed-form shadow distance.

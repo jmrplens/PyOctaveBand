@@ -111,7 +111,7 @@ full-scale analysis (calibration does not apply in dBFS mode).
 
 Why the *energy* mean and not the arithmetic mean of dB values? Because sound
 doses add as energy: two periods at 60 dB and 80 dB do not average to 70 dB;
-the 80 dB half dominates and $L_{eq}$ = 77 dB. Averaging decibels directly
+the 80 dB half dominates and $L_{eq} = 77$ dB. Averaging decibels directly
 underestimates every fluctuating noise. $L_{eq}$ is the level of the *steady*
 sound carrying the same energy as the real, fluctuating one, which is why
 regulations are written in terms of it.
@@ -142,8 +142,8 @@ everywhere else, energy.
 ## Percentile levels (LN)
 
 `ln_levels` computes statistical levels from the time-weighted envelope:
-**L10** is the level exceeded 10 % of the time (event peaks), **L50** the median,
-**L90** the background level.
+**$L_{10}$** is the level exceeded 10 % of the time (event peaks),
+**$L_{50}$** the median, **$L_{90}$** the background level.
 
 ```python
 import numpy as np
@@ -166,7 +166,8 @@ print(f"LA10={stats[10]:.1f}  LA50={stats[50]:.1f}  LA90={stats[90]:.1f} dB")
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/ln_levels_example.svg" alt="Fast level history of fluctuating noise with the L10, L50 and L90 statistical levels marked" width="80%" loading="eager" />
 
-*L10 tracks the event peaks, L50 the median level and L90 the background.*
+*$L_{10}$ tracks the event peaks, $L_{50}$ the median level and $L_{90}$ the
+background.*
 
 <details>
 <summary>Show the code for this figure</summary>
@@ -283,7 +284,8 @@ lex = metrology.lex_8h(shift_sample, fs, duration_hours=8, calibration_factor=se
 ```
 
 `lc_peak` is verified against the one-cycle/half-cycle reference responses of
-IEC 61672-1:2013 Table 5, `sel` against the Table 4 LAE toneburst column, and
+IEC 61672-1:2013 Table 5, `sel` against the Table 4 $L_{AE}$ toneburst
+column, and
 the dose functions against the IEC 61252 anchors (3.2 Pa²h ↔ exactly 90 dB).
 `lc_peak` polyphase-oversamples the C-weighted signal by `oversample` (default
 `8`) before taking the maximum, recovering the true inter-sample peak: a raw
@@ -363,10 +365,10 @@ is +3 dB.
 
 | Function | Key parameters | Returns | Standard anchor |
 | :--- | :--- | :--- | :--- |
-| `lc_peak(x, fs, calibration_factor=1.0, dbfs=False)` | `dbfs=True` references full-scale *peak* (1.0), not RMS | LCpeak [dB] | IEC 61672-1 §5.13, Table 5 tone bursts |
-| `sel(x, fs, weighting=None, ...)` | `weighting='A'` gives LAE | SEL [dB] | IEC 61672-1 Table 4 (LAE column) |
-| `sound_exposure(x, fs, duration_hours=None, ...)` | `duration_hours` treats `x` as a sample of that period | E [Pa²h] | IEC 61252 |
-| `lex_8h(x, fs, duration_hours=None, ...)` | same sampling semantics | LEX,8h [dB] | IEC 61252 (≡ LEP,d) |
+| `lc_peak(x, fs, calibration_factor=1.0, dbfs=False)` | `dbfs=True` references full-scale *peak* (1.0), not RMS | $L_{Cpeak}$ [dB] | IEC 61672-1 §5.13, Table 5 tone bursts |
+| `sel(x, fs, weighting=None, ...)` | `weighting='A'` gives $L_{AE}$ | SEL [dB] | IEC 61672-1 Table 4 ($L_{AE}$ column) |
+| `sound_exposure(x, fs, duration_hours=None, ...)` | `duration_hours` treats `x` as a sample of that period | $E$ [Pa²h] | IEC 61252 |
+| `lex_8h(x, fs, duration_hours=None, ...)` | same sampling semantics | $L_{EX,8h}$ [dB] | IEC 61252 ($\equiv L_{EP,d}$) |
 
 `lex_8h` rates *one* recording; assembling a full working day from task or
 job samples, with the normative ISO 9612 uncertainty budget, continues in
@@ -374,8 +376,9 @@ job samples, with the normative ISO 9612 uncertainty budget, continues in
 
 Turning these levels into the regulatory day-evening-night indicators and
 reporting them defensibly is
-[Environmental Levels](/phonometry/guides/environmental-levels/): the Lden
-and Ldn descriptors, the composite rating levels of ISO 1996-1 with their
+[Environmental Levels](/phonometry/guides/environmental-levels/): the
+$L_{den}$ and $L_{dn}$ descriptors, the composite rating levels of
+ISO 1996-1 with their
 character adjustments, and the ISO 1996-2 determination chain of tonal
 adjustment, residual-noise correction and the measurement uncertainty
 budget.
@@ -457,7 +460,7 @@ ISO 9612 occupational strategies continue in
 [Occupational Noise Exposure](/phonometry/guides/occupational-exposure/), the ECMA-418-1
 tonal-prominence verdicts in [Prominent Discrete Tones](/phonometry/guides/tone-prominence/),
 and the ISO 226 equal-loudness contours live with the perception metrics in
-[Loudness](/phonometry/guides/loudness/). Whether a single Leq is a fair
+[Loudness](/phonometry/guides/loudness/). Whether a single $L_{eq}$ is a fair
 summary of a measurement at all is a stationarity question - the
 [data qualification](/phonometry/guides/data-qualification/) tests answer it
 objectively from segment mean squares.
@@ -467,11 +470,13 @@ objectively from segment mean squares.
 **Covered.** IEC 61672-1:2013's Fast/Slow/Impulse envelope ballistics
 behind the percentile levels, the C-weighted peak of clause 5.13
 (`lc_peak`, verified against Table 5) and the sound exposure level (`sel`,
-verified against the Table 4 LAE column); IEC 61252:1993's sound exposure
-and LEX,8h (`sound_exposure`, `lex_8h`); and the fractional-octave-band
+verified against the Table 4 $L_{AE}$ column); IEC 61252:1993's sound
+exposure and $L_{EX,8h}$ (`sound_exposure`, `lex_8h`); and the
+fractional-octave-band
 spectrogram of `OctaveFilterBank.spectrogram`.
 
-**Not covered.** The ISO 1996-1 whole-day indicators (Lden, Ldn, rating
+**Not covered.** The ISO 1996-1 whole-day indicators ($L_{den}$, $L_{dn}$,
+rating
 levels) and the ISO 1996-2 determination procedures have moved to
 [Environmental Levels](/phonometry/guides/environmental-levels/). IEC
 61252 was revised in 2025; only the formulae of the implemented first
@@ -479,7 +484,7 @@ edition (1993) are here, not the newer one.
 
 ## See also
 
-- [Environmental Levels (ISO 1996-1/-2)](/phonometry/guides/environmental-levels/): the Lden/Ldn indicators, rating levels and the ISO 1996-2 determination chain built on the levels of this page.
+- [Environmental Levels (ISO 1996-1/-2)](/phonometry/guides/environmental-levels/): the $L_{den}$/$L_{dn}$ indicators, rating levels and the ISO 1996-2 determination chain built on the levels of this page.
 - [Time Weighting](/phonometry/guides/time-weighting/): the Fast/Slow/Impulse detector the percentile levels are defined on.
 - [Calibration](/phonometry/guides/calibration/): the sensitivity factor that turns digital units into the pascals every level here assumes.
 - [Occupational exposure (ISO 9612)](/phonometry/guides/occupational-exposure/): the workplace measurement strategies the dose measures feed.

@@ -3,7 +3,7 @@
 # Mechanical mobility and the FRF family (ISO 7626-1)
 
 Mechanical **mobility** is the complex ratio of a velocity response to the
-force that produces it, `Y = v/F`. It is one member of a family of
+force that produces it, $Y = v/F$. It is one member of a family of
 motion-per-force **frequency-response functions** (FRFs): which one is used
 depends only on whether the motion is a displacement, a velocity or an
 acceleration, and each has a force-per-motion reciprocal. **ISO 7626-1:2011**
@@ -43,22 +43,23 @@ plt.legend(); plt.show()
 
 ## 1. The frequency-response-function family (Table 1)
 
-For a harmonic motion `x·e^{jωt}` the velocity is `jω·x` and the acceleration
-`−ω²·x`, so all three motion-per-force FRFs follow from the receptance `H` by a
-power of `jω`, and each has a force-per-motion reciprocal:
+For a harmonic motion $x\,e^{j\omega t}$ the velocity is $j\omega x$ and the
+acceleration $-\omega^2 x$, so all three motion-per-force FRFs follow from
+the receptance $H$ by a power of $j\omega$, and each has a force-per-motion
+reciprocal:
 
 | Motion | FRF (motion / force) | Unit | Reciprocal (force / motion) | Unit |
 |---|---|---|---|---|
-| displacement | receptance `H = x/F` | m/N | dynamic stiffness `1/H` | N/m |
-| velocity | mobility `Y = jω·H` | m/(N·s) | impedance `1/Y` | N·s/m |
-| acceleration | accelerance `A = −ω²·H` | 1/kg | apparent mass `1/A` | kg |
+| displacement | receptance $H = x/F$ | m/N | dynamic stiffness $1/H$ | N/m |
+| velocity | mobility $Y = j\omega H$ | m/(N·s) | impedance $1/Y$ | N·s/m |
+| acceleration | accelerance $A = -\omega^2 H$ | 1/kg | apparent mass $1/A$ | kg |
 
 `convert_frf` moves between any two of the six FRFs, pivoting through the
 receptance. A **driving-point** FRF has the response and force at the same point
-(`i = j`); a **transfer** FRF has them at different points. Note that the
+($i = j$); a **transfer** FRF has them at different points. Note that the
 force-per-motion kinds are element-wise reciprocals: the *free* quantities of
 ISO 7626-1, 3.1.4; the *blocked* matrix quantities of Table 1 do not invert
-element-wise for multi-coordinate systems (Table 1 also names `F/a` the
+element-wise for multi-coordinate systems (Table 1 also names $F/a$ the
 "effective mass", the quantity called apparent mass here).
 
 ```python
@@ -74,13 +75,15 @@ The choice between the three motion FRFs is one of convenience, not physics:
 they carry the same information and `convert_frf` moves between them exactly.
 Accelerance is what an accelerometer-based measurement delivers directly;
 mobility is the natural currency of the structure-borne power standards
-(power is force times velocity, so `P = ½·Re{Y}·|F|²` at a contact); the
+(power is force times velocity, so
+$P = \tfrac{1}{2}\operatorname{Re}\{Y\}\,|F|^2$ at a contact); the
 reciprocals appear whenever a source is described by what it imposes rather
 than by how it responds. Reading a driving-point mobility plot is a
 structural diagnosis in itself: below a resonance the magnitude climbs
-proportionally to frequency along a **stiffness line** (`|Y| ≈ ω/k`), above
-it the magnitude falls along a **mass line** (`|Y| ≈ 1/(ωm)`), and the height
-of the peak between them reflects the damping: it equals `1/c` for the
+proportionally to frequency along a **stiffness line**
+($|Y| \approx \omega/k$), above it the magnitude falls along a **mass line**
+($|Y| \approx 1/(\omega m)$), and the height
+of the peak between them reflects the damping: it equals $1/c$ for the
 isolated viscously damped resonator of the next section, while on real
 structures with overlapping modes damping is instead estimated by modal
 fitting or from the half-power bandwidth.
@@ -88,7 +91,7 @@ fitting or from the half-power bandwidth.
 ## 2. The SDOF reference resonator (closed form)
 
 The canonical closed-form reference, expressed in the Table 1 / 3.1.2 FRF
-taxonomy, is a mass `m`, viscous damping `c` and stiffness `k`, whose
+taxonomy, is a mass $m$, viscous damping $c$ and stiffness $k$, whose
 receptance is
 
 $$
@@ -96,9 +99,9 @@ H(\omega) = \frac{1}{k - \omega^2 m + j\,\omega c}, \qquad
 \omega_0 = \sqrt{k/m}.
 $$
 
-At the resonance `ω0` the driving-point mobility is **purely real** and equal to
-`1/c` (the mobility peak measures the damping) while the static receptance
-(`ω → 0`) is the compliance `1/k`:
+At the resonance $\omega_0$ the driving-point mobility is **purely real** and
+equal to $1/c$ (the mobility peak measures the damping) while the static
+receptance ($\omega \to 0$) is the compliance $1/k$:
 
 ```python
 import numpy as np
@@ -131,17 +134,19 @@ impactor mass and tip stiffness.
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_mobility_rig_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_mobility_rig.svg" alt="ISO 7626 mobility measurement: a free-free beam on soft suspension driven by an exciter through an impedance head at the driving point, an accelerometer at a transfer point, and an impact hammer as the alternative excitation" width="92%"></picture>
 
 Processing measured random-excitation records per ISO 7626-2, 8.1.3 (the H1
-estimator `Ĥ = G(response, force)/G(force, force)`) and the ordinary coherence
-`γ² = |Gxy|²/(Gxx·Gyy)` used for its data-quality checks are the library's
+estimator $\hat{H} = G(\text{response}, \text{force})/G(\text{force}, \text{force})$)
+and the ordinary coherence $\gamma^2 = |G_{xy}|^2/(G_{xx}\,G_{yy})$ used for
+its data-quality checks are the library's
 existing spectral estimators [`transfer_function` and
 `coherence`](electroacoustics.md) (H1 is their default). On top of them,
 two ISO 7626-2 acceptance criteria are provided:
 
 * **Operational rigid-mass calibration (7.5.2).** The measured FRF of a freely
-  suspended rigid block of known mass must agree within ±5 % with `|A| = 1/m`
-  (accelerance) or `|Y| = 1/(2πf·m)` (mobility).
+  suspended rigid block of known mass must agree within ±5 % with
+  $|A| = 1/m$ (accelerance) or $|Y| = 1/(2\pi f m)$ (mobility).
 * **Random error (Annex A + 8.1.3).** Enough spectra must be averaged that the
-  normalized random error `ε = √((1−γ²)/(2nγ²))` at each resonance of a
+  normalized random error $\varepsilon = \sqrt{(1-\gamma^2)/(2n\gamma^2)}$ at
+  each resonance of a
   driving-point mobility is below 5 %.
 
 ```python
@@ -217,7 +222,7 @@ plt.show()
 
 `sdof_mobility_result` bundles the FRF over frequency into a `MobilityResult`,
 which exposes `.magnitude`, `.phase`, `.to(target)` (any Table-1 kind) and a
-`.plot()` of `|Y(f)|` with the resonance marked:
+`.plot()` of $|Y(f)|$ with the resonance marked:
 
 ```python
 import numpy as np
@@ -234,9 +239,9 @@ res.plot()   # |Y(f)| with the resonance marked (needs matplotlib)
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/mobility_result_lines_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/mobility_result_lines.svg" alt="Driving-point mobility magnitude of a single-degree-of-freedom resonator on log-log axes, climbing along the stiffness line below resonance, falling along the mass line above it, and peaking at one over the damping coefficient at the resonance" width="82%"></picture>
 
 *Reading a driving-point mobility is a structural diagnosis: below the
-resonance the magnitude climbs along the **stiffness line** `ω/k`,
-above it it falls along the **mass line** `1/(ωm)`, and the height of
-the peak between them is `1/c`, a direct read of the damping (Section 1).*
+resonance the magnitude climbs along the **stiffness line** $\omega/k$,
+above it it falls along the **mass line** $1/(\omega m)$, and the height of
+the peak between them is $1/c$, a direct read of the damping (Section 1).*
 
 <details>
 <summary>Show the code for this figure</summary>
@@ -274,13 +279,13 @@ plt.show()
 mechanical-mobility measurement report (ISO 7626-1:2011 FRF definitions,
 measurement per ISO 7626-2:2015). Mobility is a continuous frequency-response
 function, not an octave-band quantity, so the sheet presents it honestly as the
-`|Y(f)|` magnitude spectrum plus a compact table of characteristic points (the
+$|Y(f)|$ magnitude spectrum plus a compact table of characteristic points (the
 FRF type, driving-point or transfer, the frequency range, the peak frequency,
 the peak mobility magnitude and the phase there), and a boxed peak mobility
-`|Y|` at the frequency it occurs at (for a driving-point FRF a resonance, where
-`|Y| = 1/c` measures the damping). It is a characterisation, so there is no
+$|Y|$ at the frequency it occurs at (for a driving-point FRF a resonance, where
+$|Y| = 1/c$ measures the damping). It is a characterisation, so there is no
 pass/fail verdict; `language="es"` renders the Spanish fiche. The fiche always
-embeds the `|Y(f)|` spectrum, so it needs both the report and plot extras
+embeds the $|Y(f)|$ spectrum, so it needs both the report and plot extras
 (`pip install "phonometry[report,plot]"`).
 
 ```python
@@ -305,7 +310,7 @@ res.report(
   (3rd ed.). Springer. ISBN 978-3-540-22696-3.
   [doi:10.1007/b137728](https://doi.org/10.1007/b137728).
   The standard monograph on structural vibration: point and transfer
-  mobilities of beams and plates, and the power flow `P = ½·Re{Y}·|F|²` that
+  mobilities of beams and plates, and the power flow P = ½·Re{Y}·|F|² that
   makes mobility the working quantity of this page.
 - International Organization for Standardization. (2011). *Mechanical
   vibration and shock — Experimental determination of mechanical mobility —
@@ -332,8 +337,9 @@ translation excitation with an attached vibration exciter*: the 8.1.3 H1
 processing of random excitation, the 7.5.2 rigid-mass operational calibration
 (±5 %) and the Annex A random-error criterion (< 5 % at resonances).
 Conformance is anchored on the closed-form SDOF identities (consistent with the
-Table 1 / 3.1.2 definitions): the driving-point mobility peak `|Y(ω0)| = 1/c`,
-the static receptance `H(0) = 1/k`, the exact Table-1 reciprocity
-`impedance·mobility = 1`, the rigid-mass calibration values (`|A| = 0.100` 1/kg
-for 10 kg; `|Y| = 1.59155e-4` m/(N·s) at 100 Hz) and the Annex A example
-(γ² = 0.8, n = 75 → ε = 4.08 %).
+Table 1 / 3.1.2 definitions): the driving-point mobility peak
+$|Y(\omega_0)| = 1/c$, the static receptance $H(0) = 1/k$, the exact Table-1
+reciprocity $\text{impedance} \cdot \text{mobility} = 1$, the rigid-mass
+calibration values ($|A| = 0.100$ 1/kg for 10 kg;
+$|Y| = 1.59155 \times 10^{-4}$ m/(N·s) at 100 Hz) and the Annex A example
+($\gamma^2 = 0.8$, $n = 75$ → $\varepsilon = 4.08$ %).

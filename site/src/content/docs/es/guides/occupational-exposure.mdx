@@ -55,7 +55,7 @@ en energía.
 Describe cada actividad como una `hearing.Task` con sus muestras y su duración
 y llama a `hearing.task_based_exposure(tasks)`. Para la jornada del soldador
 del anexo D que se usa abajo devuelve `lex_8h` = 84,3 dB con una incertidumbre
-expandida $U$ = 2,7 dB, así que el `upper_limit` unilateral al 95 % es 87,0 dB.
+expandida $U = 2{,}7$ dB, así que el `upper_limit` unilateral al 95 % es 87,0 dB.
 Las jornadas sin estructura usan `job_based_exposure()` o `full_day_exposure()`
 sobre muestras aleatorias.
 
@@ -218,9 +218,9 @@ en la página de [Teoría](/phonometry/es/reference/theory/environment-transport
 
 | Parámetro | Se aplica a | Tipo | Unidades | Rango / def. | Notas |
 | :--- | :--- | :--- | :--- | :--- | :--- |
-| `tasks` | tarea | lista de `Task` | — | ≥ 1 | Cada `Task` tiene `samples`, `duration_hours`, `duration_range`/`duration_samples` opcionales, `label`, `instrument` |
-| `samples` | función / jornada | secuencia | dB | ≥ 2 (≥ 5 / ≥ 3 recomendado) | Muestras aleatorias `Lp,A,eqT` |
-| `effective_duration_hours` | función / jornada | float | h | > 0 | Duración efectiva de la jornada $T_e$ |
+| `tasks` | tarea | lista de `Task` | — | $\ge 1$ | Cada `Task` tiene `samples`, `duration_hours`, `duration_range`/`duration_samples` opcionales, `label`, `instrument` |
+| `samples` | función / jornada | secuencia | dB | $\ge 2$ ($\ge 5$ / $\ge 3$ recomendado) | Muestras aleatorias $L_{p,A,eqT}$ |
+| `effective_duration_hours` | función / jornada | float | h | $> 0$ | Duración efectiva de la jornada $T_e$ |
 | `instrument` | todas | str | — | `'class1'`, `'class2'`, `'personal_exposimeter'` (def.) | Selecciona $u_2$ (Tabla C.5) |
 | `u3` | todas | float | dB | def. `1.0` | Incertidumbre de posición del micrófono (apartado C.6) |
 | `include_duration_uncertainty` | tarea | bool | — | def. `True` | `False` omite el término $(c_{1b}u_{1b})^2$ (anexo D caso a) |
@@ -301,7 +301,7 @@ el repositorio; pulsa en la vista previa para abrir el PDF.
 ## Véase también
 
 - [Niveles](/phonometry/es/guides/levels/): las primitivas de dosis `lex_8h` /
-  `sound_exposure` (IEC 61252) y el LCpeak que estas estrategias declaran al
+  `sound_exposure` (IEC 61252) y el $L_{Cpeak}$ que estas estrategias declaran al
   lado.
 - [Incertidumbre de medición](/phonometry/es/guides/gum-uncertainty/): la
   maquinaria GUM que sustenta las incertidumbres combinadas y expandidas.

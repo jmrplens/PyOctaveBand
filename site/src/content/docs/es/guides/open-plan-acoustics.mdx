@@ -43,17 +43,17 @@ medida que uno se aleja. Los niveles y el STI se miden a lo largo de una fila
 de puestos de trabajo (al menos 4 posiciones, preferiblemente 6–10), y cuatro
 magnitudes de un solo número resumen la sala. La **tasa de decaimiento
 espacial** del habla ponderada A es la pendiente del nivel frente a
-$\lg(r/r_0)$, escalada a una cifra por duplicación usando solo las posiciones
+$\log_{10}(r/r_0)$, escalada a una cifra por duplicación usando solo las posiciones
 de 2–16 m,
 
 $$
-D_{2,S} = -\lg(2)\ b, \qquad L = a + b\ \lg(r/r_0),\ r_0 = 1\ \text{m},
+D_{2,S} = -\log_{10}(2)\ b, \qquad L = a + b\ \log_{10}(r/r_0),\ r_0 = 1\ \text{m},
 $$
 
-con **Lp,A,S,4m** leído en la misma recta a 4 m. La **distancia de
-distracción** rD (STI = 0,50) y la **distancia de privacidad** rP
+con **$L_{p,A,S,4m}$** leído en la misma recta a 4 m. La **distancia de
+distracción** $r_D$ (STI = 0,50) y la **distancia de privacidad** $r_P$
 (STI = 0,20) provienen de una regresión lineal del STI frente a la distancia.
-Las buenas oficinas empujan rD por debajo de ~5 m; las malas dejan el habla
+Las buenas oficinas empujan $r_D$ por debajo de ~5 m; las malas dejan el habla
 molesta más allá de 10 m.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_open_plan_es.svg" alt="Línea de medición de oficina diáfana ISO 3382-3 desde la fuente a 1 m a lo largo de posiciones de 2 m a 16 m, que alimenta las cuatro magnitudes de índice único D2,S, Lp,A,S,4m, rD y rP" width="86%" />
@@ -171,7 +171,7 @@ plt.show()
 | Parámetro | Tipo | Unidades | Rango / valor por defecto | Notas |
 | :--- | :--- | :--- | :--- | :--- |
 | `positions_m` | array 1D | m | ≥ 4 posiciones, todas > 0 | Distancias fuente-receptor |
-| `spl_a_speech` | array 1D | dB | misma longitud | Nivel de habla ponderado A `Lp,A,S,n` por posición |
+| `spl_a_speech` | array 1D | dB | misma longitud | Nivel de habla ponderado A $L_{p,A,S,n}$ por posición |
 | `sti_values` | array 1D | — | misma longitud | STI por posición (método completo de IEC 60268-16) |
 
 Devuelve un `OpenPlanResult` con `d2s`, `lp_as_4m`, `rd` y `rp`; su
@@ -260,13 +260,13 @@ conversación? Long (*Architectural Acoustics* 2.ª ed., cap. 17, ecs. (17.50) a
 campo directo de la persona sentada enfrente,
 
 $$
-L_p(\text{señal}) = L_W + 10\lg\!\left[\frac{Q}{4\pi r^2}\right],
+L_p(\text{señal}) = L_W + 10\log_{10}\!\left[\frac{Q}{4\pi r^2}\right],
 $$
 
 y el ruido es el campo reverberante que levantan $N$ hablantes simultáneos,
 
 $$
-L_p(\text{ruido}) = L_W + 10\lg N + 10\lg\!\left[\frac{4}{N A_\text{mesa}}\right],
+L_p(\text{ruido}) = L_W + 10\log_{10} N + 10\log_{10}\!\left[\frac{4}{N A_\text{mesa}}\right],
 $$
 
 con $L_W$ el nivel de potencia acústica de un hablante (unos 70 dB en
@@ -292,7 +292,7 @@ Restar ambos da la **relación habla-ruido**, y este es el resultado que merece
 la pena recordar:
 
 $$
-L_{SN} = 10\lg\!\left[\frac{Q}{4\pi r^2}\right] + 10\lg\!\left[\frac{A_\text{mesa}}{4}\right].
+L_{SN} = 10\log_{10}\!\left[\frac{Q}{4\pi r^2}\right] + 10\log_{10}\!\left[\frac{A_\text{mesa}}{4}\right].
 $$
 
 No sobrevive ni $L_W$ ni $N$. Una sala más llena no es intrínsecamente peor,
@@ -332,7 +332,7 @@ crowd.plot()      # ruido autogenerado vs ocupación, frente al límite de -6 dB
 cruza el límite de comunicación antes de que se ocupe la cuarta mesa; añadir
 el techo absorbente del ejemplo de Long (190 m² en total) mantiene las 20
 mesas por debajo. Las curvas son paralelas porque la ocupación siempre cuesta
-$10\lg N$: la única variable de diseño es el desplazamiento vertical, que es
+$10\log_{10} N$: la única variable de diseño es el desplazamiento vertical, que es
 la absorción.*
 
 <details>
@@ -369,10 +369,10 @@ plt.show()
 | Parámetro | Tipo | Unidades | Rango / defecto | Notas |
 | :--- | :--- | :--- | :--- | :--- |
 | `absorption_areas` | float o array 1D | m² | > 0 | Áreas de absorción total de la sala a comparar |
-| `talkers` | array 1D, opcional | — | ≥ 1, defecto 1..20 | Eje de ocupación `N` |
-| `distance` | float | m | > 0, defecto 1,2 | Distancia hablante-oyente `r` |
-| `sound_power_level` | float | dB re 1 pW | defecto 70 | `Lw` del hablante |
-| `directivity` | float | — | > 0, defecto 2 | `Q` del hablante |
+| `talkers` | array 1D, opcional | — | ≥ 1, defecto 1..20 | Eje de ocupación $N$ |
+| `distance` | float | m | > 0, defecto 1,2 | Distancia hablante-oyente $r$ |
+| `sound_power_level` | float | dB re 1 pW | defecto 70 | $L_W$ del hablante |
+| `directivity` | float | — | > 0, defecto 2 | $Q$ del hablante |
 
 Devuelve un `CrowdNoiseResult` (`talkers`, `absorption_areas`, `levels`,
 `signal_level`, `communication_level`, `speech_to_noise()`) con `.plot()`.

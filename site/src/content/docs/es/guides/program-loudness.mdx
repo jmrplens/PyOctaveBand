@@ -325,7 +325,8 @@ res.plot()   # la banda sombreada de LRA abarca la separación P10-P95 (necesita
 
 *En el caso de referencia de Tech 3342 la distribución de corto plazo tiene
 dos mesetas separadas 10 LU, y la banda sombreada entre los percentiles 10 y
-95 lee exactamente `LRA = 10,0 LU`; la sonoridad integrada se asienta entre
+95 lee exactamente $\mathrm{LRA} = 10{,}0\ \text{LU}$; la sonoridad
+integrada se asienta entre
 las mesetas. En programas reales, la misma banda distingue de un vistazo un
 drama normalizado por diálogo (LRA en torno a 10-20 LU) de un anuncio
 comprimido (unos pocos LU).*
@@ -395,8 +396,9 @@ Con 1, 2, 5 o 6 canales las ponderaciones de la Tabla 3 se aplican solas
 excluido). Para cualquier otra disposición de altavoces (22.2, 4+7+0 y el
 resto de sistemas de sonido avanzados de BS.2051), el Anexo 3 deriva la
 ponderación de cada canal de la posición de su altavoz: 1,41 (+1,5 dB) para
-los altavoces laterales de la capa media (60° ≤ |acimut| ≤ 120°,
-|elevación| < 30°), 1,0 en el resto:
+los altavoces laterales de la capa media
+($60^\circ \le |\text{acimut}| \le 120^\circ$,
+$|\text{elevación}| < 30^\circ$), 1,0 en el resto:
 
 ```python
 from phonometry import broadcast

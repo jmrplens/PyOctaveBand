@@ -897,6 +897,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Changed
 
+- The symbols the documentation names as quantities and the relations it
+  states in prose are now typeset as maths rather than left as code spans
+  or plain text, across the guides, the reference and the errata registry,
+  in English and Spanish alike, and in the GitHub mirror under `docs/`.
+  Quotations of a printed source keep their original characters, and names
+  that are code identifiers stay code. Every formula now writes the decimal
+  logarithm as $\log_{10}$, the spelling that needs no key to read, in place
+  of the ISO $\lg$ the pages used to mix with it.
+
 - Every editable page now links to its source in the footer, in both
   languages. The generated API reference opts out through the route
   middleware, since those pages are written from docstrings and a

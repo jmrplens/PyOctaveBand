@@ -36,10 +36,11 @@ audible above the masking noise.
 ## Apparent sound power level
 
 With the reference microphone on a ground board at the horizontal distance
-`R0 = H + D/2` (hub height `H`, rotor diameter `D`), the slant distance to the
-rotor centre is `R1 = √(H² + R0²)` and the apparent sound power level is
-`L_WA,i = L_p,i − 6 + 10·lg(4π R1²/S0)` per band (`S0 = 1 m²`), energy-summed
-over bands. The `−6 dB` accounts for the ground-board pressure doubling.
+$R_0 = H + D/2$ (hub height $H$, rotor diameter $D$), the slant distance to
+the rotor centre is $R_1 = \sqrt{H^2 + R_0^2}$ and the apparent sound power
+level is $L_{WA,i} = L_{p,i} - 6 + 10\log_{10}(4\pi R_1^2/S_0)$ per band
+($S_0 = 1\ \text{m}^2$), energy-summed over bands. The −6 dB accounts for the
+ground-board pressure doubling.
 
 <ThemeImage loading="eager" src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_wind_turbine_iec61400.svg" alt="Side view of a horizontal-axis wind turbine with hub height H and rotor diameter D, a microphone lying on a flat ground board downwind at the horizontal distance R0 = H + D/2 from the tower centreline, the slant distance R1 from the rotor centre to the microphone with the board inclination angle phi between 25 and 40 degrees, and a met mast measuring wind speed and direction; a plan-view inset shows the Figure 3 pattern with the reference position downwind and three optional positions at plus and minus 60 degrees and upwind, and the annotations give R1 equals the square root of H squared plus R0 squared and the apparent sound power formula LWA,i = Lp,i minus 6 plus 10 lg(4 pi R1 squared over S0)" width="94%" />
 
@@ -105,17 +106,19 @@ and stays out of scope.
 ## Tonal audibility
 
 From a narrowband spectrum (1–2 Hz resolution), the lines in the **critical
-band** about the tone, `CBW = 25 + 75·[1 + 1.4·(fc/1000)²]^0.69` Hz, are
+band** about the tone,
+$\mathrm{CBW} = 25 + 75\,[\,1 + 1.4\,(f_c/1000)^2\,]^{0.69}$ Hz, are
 classified into masking noise and tone lines (the 70 %-lowest energy mean, the
-`+6 dB` criteria; tone lines must additionally lie within 10 dB of the
++6 dB criteria; tone lines must additionally lie within 10 dB of the
 *highest* line above the threshold, and that highest line is the frequency of
 the tone, subclauses 9.5.3/9.5.4). The candidate itself must first pass the
 9.5.2 *possible tone* screening: a local maximum more than 6 dB above the
 band energy average excluding the maximum and its adjacent lines. The
-masking-noise level `L_pn` follows Formula 31, the
-tonality is `ΔL_tn = L_pt − L_pn`, and the tonal audibility is
-`ΔL_a = ΔL_tn − L_a` with `L_a = −2 − lg[1 + (f/502)^2.5]`, reported when
-`ΔL_a ≥ −3 dB` and audible when `ΔL_a > 0`.
+masking-noise level $L_{pn}$ follows Formula 31, the
+tonality is $\Delta L_{tn} = L_{pt} - L_{pn}$, and the tonal audibility is
+$\Delta L_a = \Delta L_{tn} - L_a$ with
+$L_a = -2 - \log_{10}\!\big[1 + (f/502)^{2.5}\big]$, reported when
+$\Delta L_a \ge -3\ \text{dB}$ and audible when $\Delta L_a > 0$.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/wind_turbine_tonality.svg" alt="A wind-turbine narrowband spectrum with a discrete tone near 200 Hz standing above a shaped broadband floor, the critical band about the tone shaded, the masking-noise level drawn as a horizontal line, and the tonal audibility annotated" width="82%" />
 
@@ -156,13 +159,13 @@ res.plot()   # spectrum + critical band + masking level (needs matplotlib)
 `has_identified_tone`. When the candidate fails the 9.5.2 screening or no
 line classifies as "tone", `has_identified_tone` is `False`: the numeric
 fields are non-standard fallbacks and such spectra must be **excluded** from
-the 9.5.1 energy averaging of `ΔL_a` over the spectra of a wind-speed bin
+the 9.5.1 energy averaging of $\Delta L_a$ over the spectra of a wind-speed bin
 (`is_audible` also requires an identified tone). The tone frequency and the
-`L_a` criterion anchor to the highest classified tone line, not the probed
+$L_a$ criterion anchor to the highest classified tone line, not the probed
 candidate. The audibility formula coincides with ISO 1996-2 Annex C; what is
 specific to IEC 61400-11 is the determination of the tone and masking levels
 and the Zwicker critical band from the spectrum. For a rating adjustment
-`K_T`, pass the mean audibility to the ISO 1996-2 `tonal_adjustment`.
+$K_T$, pass the mean audibility to the ISO 1996-2 `tonal_adjustment`.
 
 ## See also
 

@@ -32,24 +32,25 @@ crosses the partition equals what the room absorbs plus what leaks back
 through the partition. Replacing intensities with mean-square pressures and
 taking logarithms gives Equation (4.101),
 
-```text
-NR = TL - 10 lg[ S_w / (S_2 alpha_2 + tau S_w) ] ,
-```
+$$
+\text{NR} = \text{TL}
+- 10\log_{10}\!\left[\frac{S_w}{S_2 \alpha_2 + \tau S_w}\right],
+$$
 
-with `NR = L_p1 - L_p2` the noise reduction between the two reverberant
-fields, `TL = 10 lg(1/tau)` the transmission loss of the partition (the
-quantity UNE calls the sound reduction index `R`), `S_w` the area of the
-partition and `S_2 alpha_2` the equivalent absorption area of the receiving
-room.
+with $\text{NR} = L_{p1} - L_{p2}$ the noise reduction between the two
+reverberant fields, $\text{TL} = 10\log_{10}(1/\tau)$ the transmission loss of the
+partition (the quantity UNE calls the sound reduction index $R$), $S_w$ the
+area of the partition and $S_2 \alpha_2$ the equivalent absorption area of
+the receiving room.
 
 Read the logarithm and the whole page follows. A **large partition into a
 hard room** delivers *less* than its transmission loss: a lot of area
 radiating into a room with nothing to soak it up. A **small partition into
 a well-absorbing room** delivers *more*. The two rooms and the wall are not
-separable, which is why quoting a wall's `R_w` and stopping is not an
+separable, which is why quoting a wall's $R_w$ and stopping is not an
 answer.
 
-The `tau S_w` term is the power the partition itself passes back into the
+The $\tau S_w$ term is the power the partition itself passes back into the
 source room. At any realistic transmission loss it is worth a few
 hundredths of a decibel, so it is off by default and
 `include_partition_transmission=True` switches it on.
@@ -106,25 +107,26 @@ quote move by more than 5 dB depending on a room the wall never touches.
 
 Problem 4.18 (printed pp. 585-586) is the whole calculation, and it starts
 one step earlier: the source-room level is not given, only the blower's
-free-field sound power level. Two decisions turn that into `L_p1`, and both
+free-field sound power level. Two decisions turn that into $L_{p1}$, and both
 are Norton's.
 
 **The reverberant field is what drives the partition.** The receiver of
 interest is the wall, not a point beside the machine, so the level that
-matters is `L_p1 = L_W + 10 lg(4 / R_1)`. That is `steady_state_spl` with
-`distance=None`, the `r -> infinity` limit of the same Bies Equation (6.43)
+matters is $L_{p1} = L_W + 10\log_{10}(4/R_1)$. That is `steady_state_spl` with
+`distance=None`, the $r \to \infty$ limit of the same Bies Equation (6.43)
 the library has always used for a receiver at a distance.
 
 **The problem asks for a conservative estimate, and conservative has a
 meaning.** The blower sits on the floor along the middle of a wall, in the
-intersection of two large flat surfaces, so `Q = 4`. Norton's §4.6
+intersection of two large flat surfaces, so $Q = 4$. Norton's §4.6
 Table 4.5 lists three sound power models: a *constant-power* source radiates
-the same `Pi_0` wherever it stands, a *constant-volume* source is loaded by
-the nearby boundaries and radiates `Pi_0 Q`, and a *constant-pressure*
-source, a theoretical floor, radiates `Pi_0 / Q`. Real machines sit between
+the same $\Pi_0$ wherever it stands, a *constant-volume* source is loaded by
+the nearby boundaries and radiates $\Pi_0 Q$, and a *constant-pressure*
+source, a theoretical floor, radiates $\Pi_0 / Q$. Real machines sit between
 the first two whenever they are closer to the boundary than a wavelength,
 and the constant-volume model is the upper bound. Here it is worth
-`10 lg 4 = 6.02 dB`, and without it the printed answers come out 6 dB low.
+$10\log_{10} 4 = 6.02\ \text{dB}$, and without it the printed answers come out
+6 dB low.
 
 ```python
 from phonometry import (
@@ -224,8 +226,8 @@ The result rates itself. `.rating` is the ANSI/ASA S12.2-2019 rating of the
 received spectrum, `.criterion_curve` is the design curve sampled at the
 analysis bands, `.exceedance` is the band-by-band excess and
 `.meets_target` is the plain verdict a design sheet writes down.
-`.required_transmission_loss` is Equation (4.101) solved for `TL`, which is
-the number that goes into a specification.
+`.required_transmission_loss` is Equation (4.101) solved for $\text{TL}$,
+which is the number that goes into a specification.
 
 ```python
 print(chain.meets_target)                       # False
@@ -258,13 +260,13 @@ NC-45 curve, and the enclosure walls have to make up the difference. Norton
 derives the enclosure equation from the same power balance as §4.9 and gets
 Equation (4.115),
 
-```text
-IL = TL - 10 lg( S_E / R_i ) ,
-```
+$$
+\text{IL} = \text{TL} - 10\log_{10}(S_E / R_i),
+$$
 
-with `S_E` the external radiating area and `R_i` the room constant of the
+with $S_E$ the external radiating area and $R_i$ the room constant of the
 enclosure interior, machine surface included. Solved for the panels,
-`TL = IL + 10 lg(S_E / R_i)`, which is
+$\text{TL} = \text{IL} + 10\log_{10}(S_E / R_i)$, which is
 `enclosure_required_transmission_loss`.
 
 ```python
@@ -308,9 +310,10 @@ right panel here.
 
 Two footnotes on that snippet, both about being faithful to the source.
 `model="norton"` matters: the library's default enclosure model is Bies,
-Hansen & Howard's Equation (7.111), which carries a `0.3` inside the
+Hansen & Howard's Equation (7.111), which carries a $0.3$ inside the
 logarithm and so floors the insertion loss of a fully lined enclosure at
-`TL + 5.2 dB`. Norton's Equation (4.115) has no such floor. The two agree
+$\text{TL} + 5.2\ \text{dB}$. Norton's Equation (4.115) has no such floor.
+The two agree
 within a few tenths while the interior is hard and diverge once the lining
 takes over, and reproducing a published answer means using the model its
 author used. `ENCLOSURE_MODELS` lists both.

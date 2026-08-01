@@ -2,7 +2,7 @@
 
 # Environmental Levels (ISO 1996-1/-2)
 
-A community does not hear a single LAeq: it hears a day whose evenings and
+A community does not hear a single $L_{Aeq}$: it hears a day whose evenings and
 nights matter more, a source whose tones or impulses annoy beyond their
 energy, and a measurement taken over a residual background with a finite
 confidence. This page is the regulatory assessment chain built on top of
@@ -82,7 +82,7 @@ plt.show()
 
 | Function | Key parameters | Notes |
 | :--- | :--- | :--- |
-| `lden(lday, levening, lnight, hours=(12, 4, 8))` | period LAeq values [dB]; `hours` must sum to 24 | +5 dB evening, +10 dB night (3.6.4) |
+| `lden(lday, levening, lnight, hours=(12, 4, 8))` | period $L_{Aeq}$ values [dB]; `hours` must sum to 24 | +5 dB evening, +10 dB night (3.6.4) |
 | `ldn(lday, lnight, hours=(15, 9))` | | +10 dB night (3.6.5) |
 | `composite_rating_level(periods)` | iterable of `(level_db, hours, adjustment_db)`; hours positive, finite and summing to 24 | General Formulae (5)-(6); adjustments per Table A.1 |
 
@@ -90,13 +90,13 @@ Where you put the microphone changes the number: ISO 1996-2 fixes the receiver p
 
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_env_measurement_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_env_measurement.svg" alt="Environmental noise measurement positions per ISO 1996-2: free field, 2 m from the facade and flush-mounted, with their corrections" width="92%"></picture>
 
-Combine with `laeq()` per time period to go from recordings to Lden. The
+Combine with `laeq()` per time period to go from recordings to $L_{den}$. The
 tonal adjustment itself is justified by the tonal audibility route of the next
 section (fed, for the ISO/PAS 20065 method, by
 [Objective audibility of tones in noise](tone-audibility.md));
 the `tone_to_noise_ratio()` / `prominence_ratio()` verdicts of
 [Prominent Discrete Tones](tone-prominence.md) are
-complementary emission screening, not the Kt basis.
+complementary emission screening, not the $K_t$ basis.
 
 ## Determining levels: tonal adjustment, residual noise and uncertainty (ISO 1996-2)
 
@@ -108,7 +108,7 @@ tonal adjustment, the residual-noise correction and the uncertainty budget.
 **Tonal adjustment (engineering method, Annex C).** From the energy-summed tone
 level $L_{pt}$ and the masking-noise level $L_{pn}$ in the critical band around a
 tone, the audibility above the masking threshold is
-$\Delta L_{ta} = L_{pt} - L_{pn} + 2 + \lg[1 + (f_c/502)^{2.5}]$ dB (Formula (C.3)),
+$\Delta L_{ta} = L_{pt} - L_{pn} + 2 + \log_{10}[1 + (f_c/502)^{2.5}]$ dB (Formula (C.3)),
 and the adjustment is $K_t = 0$ for $\Delta L_{ta} < 4$, $K_t = \Delta L_{ta} - 4$
 for $4 \le \Delta L_{ta} \le 10$ and $K_t = 6$ above (Formulae (C.4)–(C.6)). The
 critical bandwidth is 100 Hz up to 500 Hz and 20 % of $f_c$ above (Table C.1).
@@ -136,7 +136,7 @@ plt.show()
 </details>
 
 **Residual-noise correction (Clause 10.4).** `residual_sound_correction()`
-applies $L = 10\lg(10^{L'/10} - 10^{L_\text{res}/10})$ (Formula (16)). With a
+applies $L = 10\log_{10}(10^{L'/10} - 10^{L_\text{res}/10})$ (Formula (16)). With a
 residual within 3 dB of the measured level no correction is allowed: the
 *uncorrected* measured level $L'$ is then the reportable value, as an upper
 bound of the specific sound (exposed as `reportable_upper_bound`, with
@@ -182,10 +182,10 @@ $L_{dn}$ (3.6.5) keeps only the +10 dB night penalty.
 
 ## See also
 
-- [Integrated and Statistical Levels](levels.md): the Leq/LAeq, percentile
-  and event levels the indicators of this page are assembled from.
+- [Integrated and Statistical Levels](levels.md): the $L_{eq}$/$L_{Aeq}$,
+  percentile and event levels the indicators of this page are assembled from.
 - [Objective audibility of tones in noise](tone-audibility.md): the tonal
-  audibility whose mean value maps to the Kt adjustment (Table J.1).
+  audibility whose mean value maps to the $K_t$ adjustment (Table J.1).
 - [Prominent Discrete Tones](tone-prominence.md): the ECMA-418-1
   tone-to-noise and prominence-ratio verdicts, complementary emission
   screening for the tonal question.

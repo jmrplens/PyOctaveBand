@@ -56,7 +56,7 @@ cuadrado del exceso del nivel de exposición sobre un umbral de corte $L_0$
 dependiente de la frecuencia (ISO 1999, cláusula 6.3.1, Fórmula 2, Tabla 1):
 
 $$
-N_{50} = \left[u + v\,\lg\frac{t}{t_0}\right](L_{EX,8h} - L_0)^2,
+N_{50} = \left[u + v\,\log_{10}\frac{t}{t_0}\right](L_{EX,8h} - L_0)^2,
 $$
 
 con $t$ la exposición en años y $t_0 = 1$ año; por debajo de $L_0$ el efecto es
@@ -222,7 +222,8 @@ población más allá del fence* depende de la dispersión de fractiles, no solo
 la mediana, así que debe leerse de la distribución, nunca del umbral mediano en
 solitario.
 
-El `NiptsResult` lleva la `median` (`N50`), las `spread_upper`/`spread_lower` y
+El `NiptsResult` lleva la `median` ($N_{50}$), las
+`spread_upper`/`spread_lower` y
 el `value` en el fractil pedido; el `HtlanResult` lleva `htla`, `nipts` y el
 `threshold` combinado. Ambos exponen `.plot()`. La componente de edad por sí
 sola es el tema de la guía de

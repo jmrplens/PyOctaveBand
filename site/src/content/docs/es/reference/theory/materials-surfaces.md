@@ -108,7 +108,7 @@ $$
 siendo cada $\alpha$ una diferencia de Sabine entre dos condiciones,
 $55{,}3 (V/S) [1/(c_b T_b) - 1/(c_a T_a)] - 4 (V/S)(m_b - m_a)$, con
 $c = 343{,}2 \sqrt{(273{,}15 + t)/293{,}15}$ (Fórmula 2) y $m$ de ISO 9613-1
-mediante $m = \alpha_{dB}/(10 \lg e)$ (Fórmula 3). La propia placa base debe
+mediante $m = \alpha_{dB}/(10 \log_{10} e)$ (Fórmula 3). La propia placa base debe
 dispersar poco: la Tabla 1 acota su coeficiente (Fórmula 6) a 0,05–0,25 entre
 100 Hz y 5 kHz (cláusula 6.2). El $s$ negativo se trunca a cero para su
 presentación (cláusula 8.3), pero los valores por encima de 1 en bandas
@@ -143,7 +143,7 @@ la difracción de borde (cláusula 8.2, Fórmula 7):
 $d_{\theta,n} = (d_\theta - d_{\theta,r})/(1 - d_{\theta,r})$. El valor a
 incidencia aleatoria promedia los ángulos de fuente con pesos 1:3:3:3:3 para
 0°, ±30°, ±60° (cláusula 8.4). Anclajes: el arco de 37 receptores predicho
-por el modelo para el QRD N = 7 publicado de seis periodos (Cox & D'Antonio
+por el modelo para el QRD $N = 7$ publicado de seis periodos (Cox & D'Antonio
 3.ª ed., Apéndice B; Hargreaves et al. 2000, Tabla I) a 1000 Hz da
 $d_\theta = 0{,}1099$, su referencia plana $0{,}0049$ y
 $d_{\theta,n} = 0{,}1055$; las predicciones del modelo promediadas por banda
@@ -269,7 +269,7 @@ $[p; u]_0 = T\,[p; u]_d$ (Ecs. 16/22–24), de la que sale la pérdida por
 transmisión a incidencia normal con terminación anecoica (Ecs. 25/26)
 
 $$
-TL = 20 \lg \frac{\left| T_{11} + T_{12}/\rho c + \rho c\ T_{21} + T_{22} \right|}{2},
+TL = 20 \log_{10} \frac{\left| T_{11} + T_{12}/\rho c + \rho c\ T_{21} + T_{22} \right|}{2},
 $$
 
 más la reflexión con fondo rígido
@@ -280,7 +280,8 @@ deliberadamente su propio convenio de signos y sus unidades de temperatura
 (ISO en kelvin, ASTM en Celsius), y las resoluciones de cargas casi singulares
 emiten un aviso. Como ninguna norma imprime un ejemplo numérico, los oráculos
 son identidades físicas: la matriz analítica de una capa de aire
-($\det T = 1$, $T_{11} = T_{22}$, TL = 0 dB, $|R| = 1$ con fondo rígido),
+($\det T = 1$, $T_{11} = T_{22}$, $TL = 0\ \text{dB}$, $|R| = 1$ con fondo
+rígido),
 recorridos de ida y vuelta sintéticos que recuperan una $r$ conocida y la
 recuperación con dos cargas de una muestra recíproca asimétrica.
 

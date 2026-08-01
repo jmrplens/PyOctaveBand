@@ -23,7 +23,7 @@ Renterghem, *Predicting Outdoor Sound* 2e (2021, Ch. 11).
 
 Whether refraction matters is mostly a question of range. A representative
 surface-layer gradient of ±0.1 s⁻¹ curves rays with a radius
-`Rc = c0/|g| ≈ 3.4 km`, so over the first hundred metres the paths are
+$R_c = c_0/|g| \approx 3.4$ km, so over the first hundred metres the paths are
 sensibly straight and the homogeneous models above are accurate. Beyond a few
 hundred metres the geometry takes over: downwind, or under a nocturnal
 temperature inversion, the downward-curved rays close over the ground and hold
@@ -33,7 +33,7 @@ same wind profile opens an acoustic shadow into which the level collapses by
 familiar upwind/downwind asymmetry of any steady outdoor source: the same
 machine at the same distance, tens of decibels apart depending on which side
 you stand. It is also why ISO 9613-2 fixes its "favourable" downwind
-atmosphere by decree, and what its scalar `C_met` compresses; the models on
+atmosphere by decree, and what its scalar $C_{met}$ compresses; the models on
 this page compute the physics that decides both.
 
 The sketch below puts both sides in one scene: one source, a receiver 350 m
@@ -97,16 +97,19 @@ plt.show()
 ## 1. Effective sound-speed profile
 
 A moving (windy) atmosphere is well approximated by a non-moving one with the
-**effective sound speed** `c_eff(z) = c(z) + u(z)`, the adiabatic sound speed
+**effective sound speed** $c_\text{eff}(z) = c(z) + u(z)$, the adiabatic sound
+speed
 plus the component of the wind in the propagation direction (Salomons Eq. 4.4).
 Two profile shapes cover most surface-layer cases:
 
-- a **linear** profile `c_eff(z) = c0 + g·z` (`linear_sound_speed_profile`),
-  the simplest refracting atmosphere and the one with exact ray geometry;
+- a **linear** profile $c_\text{eff}(z) = c_0 + g\,z$
+  (`linear_sound_speed_profile`), the simplest refracting atmosphere and the
+  one with exact ray geometry;
 - the realistic **logarithmic** surface-layer profile
-  `c_eff(z) = c0 + b·ln(1 + z/z0)` (`log_linear_sound_speed_profile`, Salomons
-  Eq. 4.5), with `b ≈ +1 m/s` for a typical downward-refracting atmosphere,
-  `b ≈ -1 m/s` for an upward-refracting one, and `z0` the roughness length
+  $c_\text{eff}(z) = c_0 + b\ln(1 + z/z_0)$ (`log_linear_sound_speed_profile`,
+  Salomons Eq. 4.5), with $b \approx +1\ \text{m/s}$ for a typical
+  downward-refracting atmosphere, $b \approx -1\ \text{m/s}$ for an
+  upward-refracting one, and $z_0$ the roughness length
   (about 0.1 m for grassland).
 
 A positive gradient (sound speed increasing upward) bends rays **down** toward
@@ -143,7 +146,7 @@ plt.show()
 ## 2. Ray model
 
 In geometrical acoustics a sound ray obeys Snell's law
-`cos(γ(z))/c(z) = const` (Salomons Eq. 4.3). `atmospheric_ray_paths` integrates
+$\cos(\gamma(z))/c(z) = \text{const}$ (Salomons Eq. 4.3). `atmospheric_ray_paths` integrates
 it with a fourth-order Runge-Kutta scheme, marching in range and reflecting
 specularly at the ground, and returns the curved paths, the turning points, the
 travel times and the number of ground reflections.
@@ -160,7 +163,7 @@ rays.plot()   # curved ray fan with the acoustic shadow near the ground
 ```
 
 The page-top figure shows this upward-refracting fan opening its shadow. The
-favourable case is its mirror image: under **downward** refraction (`b = +1`)
+favourable case is its mirror image: under **downward** refraction ($b = +1$)
 the shallow rays are bent back to the ground, bounce, and carry energy along
 the surface instead of losing it upward.
 
@@ -196,8 +199,9 @@ R_c = \frac{1}{|g|\,\xi}, \qquad \xi = \frac{\cos\theta_0}{c(\text{launch})},
 R_c = \frac{c_0}{|g|\cos\theta_0},
 $$
 
-exposed as `ray_curvature_radius`. A ray launched at angle `θ0` in downward
-refraction turns at the height `Rc(1 - cos θ0)`. For an **upward-refracting**
+exposed as `ray_curvature_radius`. A ray launched at angle $\theta_0$ in
+downward refraction turns at the height $R_c(1 - \cos\theta_0)$. For an
+**upward-refracting**
 linear profile the ground-grazing ray bounds a region beyond which no direct or
 once-reflected ray arrives, at the closed-form **shadow-zone distance**
 (`shadow_zone_distance`):
@@ -208,7 +212,7 @@ x_\text{shadow} = \sqrt{2 R_c}\left(\sqrt{h_s} + \sqrt{h_r}\right),
 $$
 
 These closed forms are the exact oracle for the ray tracer: a circle fit of a
-traced ray recovers `Rc` to machine precision.
+traced ray recovers $R_c$ to machine precision.
 
 ## 3. Parabolic equation (Green's Function PE)
 
@@ -221,19 +225,21 @@ split-step Fourier family as the ocean
 [`parabolic_equation`](https://jmrplens.github.io/phonometry/guides/underwater-solvers/). Each range step:
 
 1. transforms the field to the vertical-wavenumber domain (FFT);
-2. applies the free-space propagator `exp(i Δr (√(ka² − kz²) − ka))` together
+2. applies the free-space propagator
+   $\exp(i\,\Delta r\,(\sqrt{k_a^2 - k_z^2} - k_a))$ together
    with the finite-impedance ground reflection
-   `R(kz) = (kz Z − k0)/(kz Z + k0)` (Salomons Eq. H.28);
+   $R(k_z) = (k_z Z - k_0)/(k_z Z + k_0)$ (Salomons Eq. H.28);
 3. transforms back and adds the surface-wave residue of the reflection pole
-   at `kz = −k0/Z` (the third term of Eq. H.49, present for a passive ground,
-   `Im(Z) > 0`);
-4. applies the refraction phase screen `exp(i Δr (k(z) − ka))` (Eq. H.58).
+   at $k_z = -k_0/Z$ (the third term of Eq. H.49, present for a passive
+   ground, $\operatorname{Im}(Z) > 0$);
+4. applies the refraction phase screen $\exp(i\,\Delta r\,(k(z) - k_a))$
+   (Eq. H.58).
 
 The source is a **Gaussian starter** with its ground image (Eqs. G.64, G.76)
 and an **absorbing layer** at the top of the grid (Sec. G.9) suppresses
 top-boundary reflections. The result is the **relative sound level**
-`ΔL(z, r) = 20 lg(|p| R1)` (dB re free field, Salomons Eq. 3.6) over the whole
-range-height plane.
+$\Delta L(z, r) = 20\log_{10}(|p| R_1)$ (dB re free field, Salomons Eq. 3.6) over
+the whole range-height plane.
 
 ```python
 from phonometry import atmospheric_parabolic_equation, log_linear_sound_speed_profile
@@ -294,15 +300,16 @@ plt.show()
 </details>
 
 The ground impedance is supplied directly (`impedance=`, a normalized complex
-value in the `e^{-iωt}` convention of Salomons, with `Im(Z) > 0` for a passive
-ground), as a `PorousMediumResult`, or from an effective `flow_resistivity` via
+value in the $e^{-i\omega t}$ convention of Salomons, with
+$\operatorname{Im}(Z) > 0$ for a passive ground), as a `PorousMediumResult`,
+or from an effective `flow_resistivity` via
 the [porous models](https://jmrplens.github.io/phonometry/guides/porous-absorbers/) of the materials domain; the porous
-models work in the opposite `e^{+jωt}` convention, so their impedance is
+models work in the opposite $e^{+j\omega t}$ convention, so their impedance is
 conjugated internally.
 
 The clip below runs the full wave physics through both signs of the
 logarithmic profile: a steady 50 Hz source 2 m over rigid ground in a 2D FDTD
-slice, with the library's ray fans traced through the same c(z) profiles laid
+slice, with the library's ray fans traced through the same $c(z)$ profiles laid
 over the fields. Downwind the fronts bend back and stream along the ground to
 the 350 m receiver; upwind they lift off the surface and the ground goes
 quiet beyond the ray-model shadow boundary.
@@ -323,7 +330,7 @@ The models are anchored by independent oracles:
   over a rigid ground.
 - **Exact ray geometry.** For a linear profile the traced ray is a circular arc
   whose fitted radius matches the closed-form `ray_curvature_radius` to machine
-  precision, and the turning height matches `Rc(1 - cos θ0)`.
+  precision, and the turning height matches $R_c(1 - \cos\theta_0)$.
 - **Reciprocity.** Swapping the source and receiver heights leaves the PE level.
 - **Shadow zone.** Over an upward-refracting profile the PE level collapses far
   inside the closed-form shadow distance.
@@ -379,8 +386,8 @@ frozen result object.
 ## 1. The scheme: a wave equation on a grid
 
 In a non-moving medium the linearised equations of fluid dynamics reduce to a
-first-order system in the acoustic pressure ``p`` and particle velocity ``v``
-(Attenborough & Van Renterghem Eqs. 4.3-4.4):
+first-order system in the acoustic pressure $p$ and particle velocity
+$\mathbf{v}$ (Attenborough & Van Renterghem Eqs. 4.3-4.4):
 
 $$
 \frac{\partial p}{\partial t} + \rho c^2\,\nabla\!\cdot\!\mathbf{v} = 0,
@@ -407,7 +414,7 @@ $$
 
 and `fdtd_simulation` derives the time step from the `cfl` parameter (the
 Courant number, default 0.6) and the largest sound speed in the map; values
-outside ``(0, 1)`` are rejected because the scheme is unconditionally
+outside $(0, 1)$ are rejected because the scheme is unconditionally
 meaningless beyond the bound (Eq. 4.14).
 
 ```python
@@ -474,14 +481,14 @@ face touching a masked cell is closed (Eq. 4.32 again), so walls, barriers
 and scatterers of any shape are just boolean arrays. Each domain side can
 carry its own boundary condition:
 
-- ``"rigid"`` (default): a perfect reflector, ``R = +1``.
+- ``"rigid"`` (default): a perfect reflector, $R = +1$.
 - ``"absorbing"``: a sponge layer of `absorbing_layer_cells` cells whose
   absorption rate ramps quadratically, emulating an open boundary (the
   simple precursor of the perfectly matched layers of section 4.2.3).
-- a **real specific impedance** ``Z`` in Pa·s/m (a scalar or one value per
+- a **real specific impedance** $Z$ in Pa·s/m (a scalar or one value per
   edge cell): the locally reacting boundary of Eqs. 4.33-4.35, updated
   implicitly, with the normal-incidence reflection coefficient
-  ``R = (Z - ρc)/(Z + ρc)``; ``Z = ρc`` is anechoic.
+  $R = (Z - \rho c)/(Z + \rho c)$; $Z = \rho c$ is anechoic.
 
 The stepping engine `FDTD2D` is public too: it exposes `step()`, `run()`,
 the field arrays and the energy, for callers that need frame-by-frame access
@@ -520,7 +527,7 @@ wrong place costs seconds here and a full re-run later.
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/fdtd_domain_geometry_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/fdtd_domain_geometry.svg" alt="Setup drawing of a 4.5 by 3 metre FDTD domain before any time stepping: pale blue sponge layers along the left and right edges, an orange impedance edge along the top, a grey rectangular obstacle just left of centre, the source star at (0.5, 1.5) and two probe circles at (3, 1.5) and (4, 2), with a legend naming the sponge layer, impedance edge, rigid edge, source and probe" width="88%"></picture>
 
 *Everything the run will see, before it runs: the sponge layers eat the
-left and right boundaries, the top edge carries the anechoic `ρc` impedance,
+left and right boundaries, the top edge carries the anechoic $\rho c$ impedance,
 the untreated bottom stays rigid, and both probes sit clear of the obstacle
 and the sponges.*
 
@@ -565,9 +572,9 @@ pressure and outward normal velocity on a closed rectangle of cell faces
 into complex accumulators (an on-the-fly DFT per point and frequency, so a
 continuous-wave run stores no time histories), and the integral propagates
 those phasors to infinity with the free-space Green function
-`-(j/4) H0⁽²⁾(kR)` — the same construction full-wave FEM solvers use to
+$-(j/4)\,H_0^{(2)}(kR)$ — the same construction full-wave FEM solvers use to
 report scattering patterns from near-field data. Two properties carry the
-scheme: the staggered grid already holds `v_n` exactly on the contour
+scheme: the staggered grid already holds $v_n$ exactly on the contour
 faces, and any field whose sources lie *outside* the contour integrates to
 nothing (extinction), so the total-field phasors of a plane-wave scattering
 run transform directly into the *scattered* far field. In the discrete
@@ -813,8 +820,8 @@ plt.show()
 
 The domain is **two-dimensional**, and that changes the physics, not just
 the cost. A 2D point source is physically an infinite **line source**: its
-amplitude spreads cylindrically as ``1/sqrt(r)`` (3.0 dB per doubling of
-distance) instead of the spherical ``1/r`` (6.0 dB) of a 3D point source,
+amplitude spreads cylindrically as $1/\sqrt{r}$ (3.0 dB per doubling of
+distance) instead of the spherical $1/r$ (6.0 dB) of a 3D point source,
 and the 2D impulse response trails a wake behind the wavefront instead of
 passing cleanly. Interference and diffraction *patterns* are faithful;
 absolute levels and decay rates are not those of a 3D room. Treat 2D runs as
@@ -835,19 +842,19 @@ $$
 $$
 
 with a leading-order relative frequency error of magnitude
-``(1 - S^2) (k dx)^2 / 24`` along the grid axes (the modelled frequency
-under-reads, so the signed error is negative), where ``S = c dt / dx``;
+$(1 - S^2)\,(k\,\Delta x)^2 / 24$ along the grid axes (the modelled frequency
+under-reads, so the signed error is negative), where $S = c\,\Delta t / \Delta x$;
 the error is largest exactly on-axis and vanishes along the cell diagonal
-at the Courant limit ``CN = 1``. The practical rule is to resolve **at
-least 10 cells per shortest wavelength**, ``dx <= c_min / (10 f_max)``
+at the Courant limit $\mathrm{CN} = 1$. The practical rule is to resolve **at
+least 10 cells per shortest wavelength**, $\Delta x \le c_\text{min} / (10 f_\text{max})$
 with the smallest sound speed of the domain: at exactly 10 cells the
-small-Courant bound ``(k dx)^2 / 24`` evaluates to about 1.6 %, reduced
-by the ``1 - S^2`` factor to about 1.4 % at the default ``cfl = 0.6``
+small-Courant bound $(k\,\Delta x)^2 / 24$ evaluates to about 1.6 %, reduced
+by the $1 - S^2$ factor to about 1.4 % at the default ``cfl = 0.6``
 (in a heterogeneous domain the time step follows the fastest cells, so
 slower regions run at a lower local Courant number and sit nearer the
 1.6 % bound), and every finer-resolved or off-axis component is more
-accurate. With ``dx = 1`` cm the 10-cell point in air sits at roughly
-3.4 kHz, and halving ``dx`` quarters the error (the scheme is second
+accurate. With $\Delta x = 1$ cm the 10-cell point in air sits at roughly
+3.4 kHz, and halving $\Delta x$ quarters the error (the scheme is second
 order, and the validation suite measures that observed order under grid
 refinement). The tests pin the
 solver to analytic oracles: box and duct eigenfrequencies, free-field
@@ -873,10 +880,11 @@ solver has its own guide,
 ### How do I choose the FDTD grid spacing?
 
 Resolve at least 10 cells per shortest wavelength,
-``dx <= c_min / (10 f_max)``, using the smallest sound speed in the domain.
+$\Delta x \le c_\text{min} / (10 f_\text{max})$, using the smallest sound
+speed in the domain.
 At exactly 10 cells the on-axis dispersion error bound is about 1.6 %,
-reduced to about 1.4 % at the default ``cfl = 0.6``, and halving ``dx``
-quarters the error (the scheme is second order). With ``dx = 1`` cm the
+reduced to about 1.4 % at the default ``cfl = 0.6``, and halving $\Delta x$
+quarters the error (the scheme is second order). With $\Delta x = 1$ cm the
 10-cell point in air sits at roughly 3.4 kHz.
 
 ### What Courant number keeps an FDTD simulation stable?
@@ -891,8 +899,8 @@ speed in the map, rejecting values outside $(0, 1)$.
 ### Can I trust the absolute levels from a 2D FDTD run?
 
 No. A 2D point source is physically an infinite line source: its amplitude
-spreads cylindrically as ``1/sqrt(r)``, 3.0 dB per doubling of distance,
-instead of the spherical ``1/r`` (6.0 dB per doubling) of a 3D point source.
+spreads cylindrically as $1/\sqrt{r}$, 3.0 dB per doubling of distance,
+instead of the spherical $1/r$ (6.0 dB per doubling) of a 3D point source.
 Interference and diffraction patterns are faithful, but absolute levels and
 decay rates are not those of a 3D room; validate any 3D-quantitative claim
 against a closed form or a 3D solver.
@@ -995,11 +1003,11 @@ mirrors `fdtd_simulation` piece by piece: wave-speed maps `c_p` and `c_s`
 injection) and `ForceSource` (a directional body force) as sources, probes
 that record ``p``, ``vx`` or ``vy``, the same sponge and obstacle
 machinery, and a frozen `ElasticFDTDResult` with the same `.plot()`. The
-Courant bound depends only on the fastest ``c_P`` in the map (Virieux
+Courant bound depends only on the fastest $c_P$ in the map (Virieux
 Eqs. 6-7), while the resolution rule uses the slowest wave speed anywhere
-in the domain -- the slowest non-zero ``c_S`` of the solid cells or, if a
-fluid region carries a still slower ``c_P``, that fluid speed:
-``dx <= c_min / (10 f)`` (in a wholly solid map the S wavelength is always
+in the domain -- the slowest non-zero $c_S$ of the solid cells or, if a
+fluid region carries a still slower $c_P$, that fluid speed:
+$\Delta x \le c_\text{min} / (10 f)$ (in a wholly solid map the S wavelength is always
 the shortest; in mixed domains the fluid P wavelength can be shorter, as
 in water at 1480 m/s over a 2000 m/s-shear sediment).
 
@@ -1034,7 +1042,7 @@ harmonically onto the corners (Moczo et al. 2007, Eqs. 7.37-7.39), the
 traction continuity of every internal interface, fluid-solid contacts
 included, emerges from the maps alone. The validation suite measures the
 normal-incidence reflection of a water-steel interface within 2 % of
-``(Z2 - Z1)/(Z2 + Z1)`` (typically a fraction of a percent) and recovers
+$(Z_2 - Z_1)/(Z_2 + Z_1)$ (typically a fraction of a percent) and recovers
 the normal-incidence mass law of a 3 mm immersed steel plate within
 0.3 dB of `mass_law_transmission_loss`.
 
@@ -1092,7 +1100,7 @@ That flexural wave is worth watching in motion: the
 animation of this solver launching a 4 kHz bending packet along a 10 mm
 steel plate into an L-junction, where the corner splits it into the
 reflected and transmitted waves the closed form prices at
-``τ12(0°) = 0.5``, plus the fast in-plane precursor the pinned-junction
+$\tau_{12}(0°) = 0.5$, plus the fast in-plane precursor the pinned-junction
 model deliberately leaves out.
 
 ## 4. Fluid-solid coupling at normal incidence
@@ -1139,9 +1147,9 @@ sound refracts into **two** transmitted waves, P and SV (**mode
 conversion**), each with its own critical angle: for water over steel,
 14.5° (P) and 27.5° (S). Between them the transmitted P is evanescent and
 the shear wave carries the transmitted power, so the reflection dips to
-|V| = 0.918 at 20° instead of reflecting totally as a fluid bottom of the
-same ``c_P`` would; beyond the S critical angle the reflection is total,
-|V| = 1 with a phase. The validation suite launches oblique carrier beams
+$|V| = 0.918$ at 20° instead of reflecting totally as a fluid bottom of the
+same $c_P$ would; beyond the S critical angle the reflection is total,
+$|V| = 1$ with a phase. The validation suite launches oblique carrier beams
 at 10° and 20° and matches the exact reflection coefficient of
 Brekhovskikh & Godin (Eqs. 4.2.22-4.2.26) within a fraction of a percent,
 mode conversion included. This is exactly the shear physics that the
@@ -1173,7 +1181,7 @@ Scholte wave hugs the water speed (1480 m/s) to within 0.03 % and its
 evanescent tail reaches ~7 wavelengths up into the water: it is essentially
 a grazing water wave and cannot be separated by time of flight in any
 reasonable domain
-(over air-solid contacts the deficit collapses to ~10⁻¹² of ``c`` and the
+(over air-solid contacts the deficit collapses to ~$10^{-12}$ of $c$ and the
 wave is unobservable outright). Over a **soft** sediment the speed drops
 well below the water speed and the wave squeezes to within half a
 wavelength of the contact, which is why measured seabed interface waves are
@@ -1230,13 +1238,13 @@ At normal incidence no shear is excited, so an elastic plate in water is
 exactly the three-media fluid layer of B&G §2.4: its transmission follows
 the closed form of Eq. 2.4.14, which reduces to the familiar mass law for
 thin plates and low frequencies and predicts **total transmission** at the
-half-wave thickness resonances ``f_n = n c_P / (2 h)`` (Eq. 2.4.19). For a
+half-wave thickness resonances $f_n = n c_P / (2 h)$ (Eq. 2.4.19). For a
 10 mm steel plate that first resonance sits at 295 kHz, and one broadband
 FDTD run reproduces the whole curve: 5.8 dB at 10 kHz (where
 `mass_law_transmission_loss` with water as the ambient fluid agrees with
 the exact form to 0.02 dB), 18.1 dB at 50 kHz, and a transmission-loss
 dip within 0.1 % of the 295 kHz resonance. The same suite stress-tests the
-extreme contrast of an air-steel contact (impedance ratio ~10⁵:1): stable
+extreme contrast of an air-steel contact (impedance ratio ~$10^5$:1): stable
 over 10 000 steps with the reflected amplitude conserved to 0.5 %.
 
 At oblique incidence the plate physics gets richer, and the
@@ -1262,7 +1270,8 @@ stepping cost.
 
 Resolve at least 10 cells per shortest wavelength using the slowest wave
 speed in the domain -- the slowest non-zero shear speed or a slower fluid
-sound speed if one is present -- ``dx <= c_min / (10 f)``. Allow 15-20 cells per wavelength along free
+sound speed if one is present -- $\Delta x \le c_\text{min} / (10 f)$.
+Allow 15-20 cells per wavelength along free
 surfaces (the stress-imaging boundary is the most dispersive part of the
 scheme), and at least 15 points per wavelength when an interface wave has
 to be timed (van Vossen et al. 2002).

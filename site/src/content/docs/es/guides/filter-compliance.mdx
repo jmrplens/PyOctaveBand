@@ -70,7 +70,8 @@ print(result["bands"][0])
 
 La propia máscara de aceptación de la Tabla 1 también es pública:
 `class_limits(fraction, filter_class, omega)` devuelve los límites
-mínimo/máximo de atenuación relativa en frecuencias normalizadas Ω = f/fm,
+mínimo/máximo de atenuación relativa en frecuencias normalizadas
+$\Omega = f/f_m$,
 los mismos límites que usan el verificador y la figura de abajo.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/class_mask_overlay_es.svg" alt="Respuesta Butterworth serpenteando entre las regiones prohibidas de la máscara de clase 1 de IEC 61260-1" width="80%" />
@@ -119,8 +120,9 @@ Con parámetros por defecto (orden 6), **Butterworth cumple clase 1**, y tambié
 lo hace **Chebyshev II**: su valor por defecto de `attenuation` es ahora `72` dB,
 superando el límite de clase 1 de 70 dB en la banda atenuada lejana (scipy fija el
 suelo equirizado de cheby2 en exactamente `attenuation`, así que cualquier valor
-≥ 70 dB cumple; el valor por defecto de 72 dB mantiene el mismo margen de banda
-de paso de +0,400 dB que Butterworth). Chebyshev I, elíptico y Bessel no cumplen
+$\ge 70\ \text{dB}$ cumple; el valor por defecto de 72 dB mantiene el mismo
+margen de banda de paso de +0,400 dB que Butterworth). Chebyshev I, elíptico y
+Bessel no cumplen
 los límites de clase con orden 6: el rizado de banda de paso (cheby1/ellip) y la
 caída lenta (bessel) violan la máscara.
 

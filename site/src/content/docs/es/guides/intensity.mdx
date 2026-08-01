@@ -37,7 +37,8 @@ situ (ISO 9614) donde una medición de presión por sí sola no puede.
 
 ## El principio de dos micrófonos (IEC 61043)
 
-Una sonda p-p sostiene dos micrófonos apareados a una pequeña distancia Δr. La
+Una sonda p-p sostiene dos micrófonos apareados a una pequeña distancia
+$\Delta r$. La
 presión en el centro de la sonda es su media, y la velocidad de partícula
 proviene del *gradiente* de presión (ecuación de Euler, en forma de
 diferencias finitas):
@@ -109,8 +110,9 @@ res.plot()   # Lp frente a LI por banda + el índice presión-intensidad (requie
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/intensity_demo_es.svg" alt="Niveles de presión e intensidad en tercios de octava para una onda plana progresiva frente a una onda estacionaria" width="92%" />
 
 *Izquierda: en una onda plana progresiva toda la presión se transporta, así que
-L_I ≈ L_p. Derecha: una onda estacionaria no transporta (casi) energía neta, así que
-la presión es alta pero la intensidad se desploma. La diferencia L_p − L_I es
+$L_I \approx L_p$. Derecha: una onda estacionaria no transporta (casi) energía
+neta, así que la presión es alta pero la intensidad se desploma. La diferencia
+$L_p - L_I$ es
 el **índice presión-intensidad**, el indicador de calidad fundamental de toda
 medición de intensidad.*
 
@@ -177,26 +179,28 @@ otro.
 Dos límites físicos acotan toda medición p-p, y el objeto de resultado incluye
 ambos:
 
-- **Alta frecuencia**: el gradiente por diferencias finitas subestima I en el
+- **Alta frecuencia**: el gradiente por diferencias finitas subestima $I$ en el
   factor $\sin(k\Delta r)/(k\Delta r)$, verificado en CI contra la Tabla 3 de
   IEC 61043. `IntensityResult.bias_correction` proporciona el factor y
-  `max_valid_frequency` (≈ 0,1·c/Δr; 2,9 kHz para un separador de 12 mm) el
+  `max_valid_frequency` ($\approx 0{,}1\,c/\Delta r$; 2,9 kHz para un
+  separador de 12 mm) el
   techo práctico. Los separadores mayores alcanzan frecuencias más bajas; los
   menores, más altas.
-- **Campos reactivos**: cuando `pressure_intensity_index` (F2 en ISO 9614-1)
-  se acerca al índice residual δ_pI0 de la sonda, dominan los errores de fase.
+- **Campos reactivos**: cuando `pressure_intensity_index` ($F_2$ en ISO 9614-1)
+  se acerca al índice residual $\delta_{pI0}$ de la sonda, dominan los errores
+  de fase.
 
 Antes que nada, ISO 9614-1 plantea una pregunta sobre el *campo* y no sobre
 la superficie: ¿es lo bastante estacionario como para barrerlo? En el ensayo
 inicial (apartado 8.2) se elige una posición "típica" sobre una superficie
-inicial de medida y allí se muestrea la intensidad normal `M` veces con un
-tiempo de promediación corto (la nota 9 sugiere `M = 10` y, para señales
+inicial de medida y allí se muestrea la intensidad normal $M$ veces con un
+tiempo de promediación corto (la nota 9 sugiere $M = 10$ y, para señales
 periódicas, de 8 s a 12 s por muestra o cualquier número entero de ciclos).
-**F1**, el indicador de variabilidad temporal, es el coeficiente de
+**$F_1$**, el indicador de variabilidad temporal, es el coeficiente de
 variación de esas muestras (ecuaciones (A.1)-(A.2)), de modo que vale cero
 para un campo perfectamente estacionario y crece a medida que la intensidad
 parásita fluctúa. La tabla B.3 exige el código de acción (e) por encima de
-`F1 > 0,6`: reducir la variabilidad, medir en periodos más tranquilos o
+$F_1 > 0{,}6$: reducir la variabilidad, medir en periodos más tranquilos o
 alargar el tiempo de promediación en cada posición. El Anexo B además lo
 evalúa inmediatamente antes y después de la medida en cualquiera de las
 superficies (B.1.4).
@@ -220,13 +224,13 @@ print(fi.field_is_stationary())              # True (límite 0,6 de la tabla B.3
 ```
 
 Sobre una superficie de medición, los demás indicadores de campo del Anexo A
-de ISO 9614-1 califican el propio barrido. **F2**, el indicador
+de ISO 9614-1 califican el propio barrido. **$F_2$**, el indicador
 presión-intensidad de superficie, es el nivel de presión de superficie menos
 el nivel de la *magnitud* media de la intensidad normal: cuanto mayor es,
-más cerca está la medición del suelo de error de fase de la sonda. **F3**, el
+más cerca está la medición del suelo de error de fase de la sonda. **$F_3$**, el
 indicador de potencia parcial negativa, es la misma diferencia tomada con la
-intensidad media *con signo*: F3 − F2 > 0 revela potencia que entra por
-partes de la superficie. **F4**, el indicador de no uniformidad del campo, es
+intensidad media *con signo*: $F_3 - F_2 > 0$ revela potencia que entra por
+partes de la superficie. **$F_4$**, el indicador de no uniformidad del campo, es
 la dispersión normalizada de las intensidades por posición: cuanto mayor es,
 más posiciones de medición necesita la superficie. Junto con el criterio de
 capacidad dinámica están disponibles directamente:
@@ -257,12 +261,13 @@ fi.plot(dynamic_capability=ld)   # F2/F3 por banda frente a Ld, F4 en eje gemelo
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/field_indicators_es.svg" alt="Indicadores de campo de ISO 9614-1 de un barrido de diez posiciones sobre seis bandas de octava: F2 y F3 suben hacia baja frecuencia al volverse reactivo el campo, cruzando la línea discontinua de capacidad dinámica Ld en 125 Hz, donde F3 además sube por encima de F2, con la no uniformidad del campo F4 dibujada como barras en un eje gemelo" width="88%" />
 
-*F2 sube hacia baja frecuencia al volverse reactivo el campo y en 125 Hz cruza
-la capacidad dinámica del instrumento `Ld = δpI0 − K`: esa banda falla el
-criterio 1, y ningún promediado lo arregla — pide un separador mayor, otra
-superficie o una sala más silenciosa. Que F3 suba por encima de F2 en la misma
-banda revela intensidad parcial entrante (negativa), y las barras de F4 fijan
-el número de posiciones que necesita la superficie (criterio 2, `N > C·F4²`).*
+*$F_2$ sube hacia baja frecuencia al volverse reactivo el campo y en 125 Hz
+cruza la capacidad dinámica del instrumento $L_d = \delta_{pI0} - K$: esa banda
+falla el criterio 1, y ningún promediado lo arregla — pide un separador mayor,
+otra superficie o una sala más silenciosa. Que $F_3$ suba por encima de $F_2$
+en la misma banda revela intensidad parcial entrante (negativa), y las barras
+de $F_4$ fijan el número de posiciones que necesita la superficie (criterio 2,
+$N > C \cdot F_4^2$).*
 
 <details>
 <summary>Mostrar el código de esta figura</summary>
@@ -329,11 +334,12 @@ perfectamente emparejados en fase. Alimenta ambos canales con la *misma*
 señal (el ensayo de intensidad residual de IEC 61043): la intensidad
 verdadera es exactamente cero y, aun así, el desajuste indica una pequeña
 intensidad falsa. La distancia entre el nivel de presión y ese nivel de
-intensidad falsa es el **índice presión-intensidad residual** `δpI0`, el
+intensidad falsa es el **índice presión-intensidad residual** $\delta_{pI0}$, el
 suelo de error de fase del instrumento expresado como índice; IEC 61043
 clasifica sondas y procesadores (clase 1 / clase 2) sobre todo por él.
 
-En campo, el índice medido `δpI = Lp − LI` dice cuánto sobresale el nivel
+En campo, el índice medido $\delta_{pI} = L_p - L_I$ dice cuánto sobresale el
+nivel
 de presión respecto al del flujo neto, y el error sistemático de la
 estimación de intensidad está acotado por el margen entre ambos índices:
 
@@ -342,27 +348,29 @@ $$
 $$
 
 Un margen de 10 dB mantiene el sesgo dentro de unos 0,5 dB y uno de 7 dB
-dentro de aproximadamente 1 dB; son precisamente los factores de sesgo `K`
-de ISO 9614, y la **capacidad dinámica** `Ld = δpI0 − K` es el mayor índice
-de campo que el instrumento puede tolerar para un grado de precisión dado.
-Léelo como un presupuesto: cada decibelio que sube el `δpI` del campo consume
-un decibelio de margen, y cuando `δpI` alcanza `δpI0` la lectura es puro
+dentro de aproximadamente 1 dB; son precisamente los factores de sesgo $K$
+de ISO 9614, y la **capacidad dinámica** $L_d = \delta_{pI0} - K$ es el mayor
+índice de campo que el instrumento puede tolerar para un grado de precisión
+dado. Léelo como un presupuesto: cada decibelio que sube el $\delta_{pI}$ del
+campo consume un decibelio de margen, y cuando $\delta_{pI}$ alcanza
+$\delta_{pI0}$ la lectura es puro
 error de fase, de cualquier signo. Por eso el índice presión-intensidad, y
 no la calidad de los micrófonos, es el que acota la exactitud alcanzable de
 toda medida de intensidad.
 
 ### Clasificar el instrumento: tabla 2 de IEC 61043
 
-`δpI0` no es solo un número al que restar `K`; es aquello por lo que
-IEC 61043 clasifica el hardware. La tabla 2 de la norma fija un `δpI0`
+$\delta_{pI0}$ no es solo un número al que restar $K$; es aquello por lo que
+IEC 61043 clasifica el hardware. La tabla 2 de la norma fija un $\delta_{pI0}$
 **mínimo** en cada banda de tercio de octava de 50 Hz a 6,3 kHz, por separado
 para una **sonda**, un **procesador** y un **instrumento completo**, en
 clase 1 y clase 2, impreso para la separación nominal entre micrófonos de
 25 mm. La nota 1 reescala toda la tabla para cualquier otro separador con
-`+10 lg(x/25)`, con `x` en milímetros: los mismos 3 dB por duplicación a los
+$+10\log_{10}(x/25)$, con $x$ en milímetros: los mismos 3 dB por duplicación a los
 que llegaba el apartado anterior a partir de la física.
 
-`intensity_class_compliance` compara un espectro de `δpI0` medido con ambas
+`intensity_class_compliance` compara un espectro de $\delta_{pI0}$ medido con
+ambas
 máscaras banda a banda y devuelve la clase que la cadena cumple realmente: la
 clase más laxa que superan todas las bandas, o `None` cuando alguna banda no
 supera ninguna de las dos:
@@ -389,7 +397,8 @@ res.report("verificacion.pdf")    # ficha de verificación de una página (PDF)
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/intensity_class_es.svg" alt="Índice presión-intensidad residual medido de un instrumento de intensidad completo con separador de 12 mm, dibujado como curva escalonada sobre los mínimos de clase 1 y clase 2 de la tabla 2 de IEC 61043; la región de aceptación de clase 2 sombreada queda por encima de la máscara discontinua de clase 2, y la banda de 100 Hz aparece marcada donde el índice medido cae por debajo de la máscara continua de clase 1" width="92%" />
 
-*Ambas máscaras de la tabla 2 bajan `10 lg(12/25) = −3,2 dB` por el separador
+*Ambas máscaras de la tabla 2 bajan $10\log_{10}(12/25) = -3{,}2\ \text{dB}$ por el
+separador
 de 12 mm. El índice medido sube 10 dB por década en baja frecuencia, paralelo
 al requisito, porque un desfase entre canales constante en grados compra
 exactamente esa pendiente; se aplana por encima de 1 kHz, donde el desfase de
@@ -442,8 +451,8 @@ solo cuando ambos son de clase 1, y 2 para cualquier otra combinación.
 
 El requisito es en realidad un requisito de emparejamiento de fase
 disfrazado. En una onda plana que se propaga axialmente la diferencia de fase
-*verdadera* entre los dos puntos es `kd`, de modo que una intensidad residual
-producida por un desfase entre canales `φs` da
+*verdadera* entre los dos puntos es $kd$, de modo que una intensidad residual
+producida por un desfase entre canales $\varphi_s$ da
 
 $$
 \delta_{pI0} = 10 \log_{10}\!\left( \frac{k d}{\varphi_s} \right)
@@ -479,15 +488,15 @@ separador con el que realmente se va a usar.
 Cerca de una fuente el campo se vuelve **reactivo**: la presión y la
 velocidad de partícula tienden a la cuadratura, así que una presión grande
 transporta poco flujo neto. Para una fuente pequeña la componente en
-cuadratura crece como `1/(kr)`; a 100 Hz y 0,25 m de la fuente ya es
-aproximadamente el doble de la activa, y `δpI` sube igual que en la onda
+cuadratura crece como $1/(kr)$; a 100 Hz y 0,25 m de la fuente ya es
+aproximadamente el doble de la activa, y $\delta_{pI}$ sube igual que en la onda
 estacionaria de la figura anterior. Lo mismo ocurre entre una máquina y una
 superficie reflectante rígida, y en cámaras reverberantes donde el campo difuso
 eleva la presión sin transportar energía hacia fuera. Por eso ISO 9614-1
 mantiene la superficie de medida a más de 0,5 m de la fuente en promedio, y
 por eso, cuando un barrido no cumple el criterio de capacidad dinámica,
-alejar la superficie o añadir absorción a la sala suele bajar `F2` por
-debajo de `Ld` con menos coste que un hardware mejor.
+alejar la superficie o añadir absorción a la sala suele bajar $F_2$ por
+debajo de $L_d$ con menos coste que un hardware mejor.
 
 ### Elegir el separador
 
@@ -495,25 +504,27 @@ El separador fija los dos extremos de la banda utilizable, en sentidos
 opuestos:
 
 - **El extremo alto es geometría.** La diferencia finita subestima el
-  gradiente en el factor `sin(kΔr)/(kΔr)`, así que el techo escala como
-  `1/Δr`: `max_valid_frequency ≈ 0.1·c/Δr` mantiene el sesgo dentro de unos 0,3 dB,
+  gradiente en el factor $\sin(k\Delta r)/(k\Delta r)$, así que el techo escala
+  como $1/\Delta r$: `max_valid_frequency` $\approx 0{,}1\,c/\Delta r$
+  mantiene el sesgo dentro de unos 0,3 dB,
   lo que da aproximadamente 5,7 kHz con un separador de 6 mm, 2,9 kHz con
   12 mm y 690 Hz con 50 mm (`bias_correct=True` deshace el sesgo conocido
   algo más allá).
 - **El extremo bajo es fase.** Una onda progresiva introduce solo
-  `360·f·Δr/c` grados de fase verdadera a lo largo del separador, 0,8° a
-  63 Hz con 12 mm, mientras el desajuste entre canales permanece fijo. Bajar
-  la frecuencia encoge la señal, no el error, así que el margen sobre `δpI0`
-  se desploma en baja frecuencia. Un separador mayor recupera ese margen:
-  los requisitos de índice residual de IEC 61043 escalan como
-  `10·lg(Δr/25 mm)`, de modo que doblar el separador aporta 3 dB de margen en
-  baja frecuencia.
+  $360\,f\,\Delta r/c$ grados de fase verdadera a lo largo del separador,
+  0,8° a 63 Hz con 12 mm, mientras el desajuste entre canales permanece fijo.
+  Bajar la frecuencia encoge la señal, no el error, así que el margen sobre
+  $\delta_{pI0}$ se desploma en baja frecuencia. Un separador mayor recupera
+  ese margen: los requisitos de índice residual de IEC 61043 escalan como
+  $10\log_{10}(\Delta r/25\ \text{mm})$, de modo que doblar el separador aporta
+  3 dB de margen en baja frecuencia.
 
 Ningún separador cubre por sí solo todo el rango de audio: el de 6 mm sirve
 para el trabajo en alta frecuencia, el de 50 mm para la baja frecuencia y el
 habitual de 12 mm cubre la banda media. Las mediciones de banda ancha se
 realizan dos veces con dos separadores y se combinan los resultados por
-banda; sea cual sea el separador montado, verifica `δpI0` con ese separador
+banda; sea cual sea el separador montado, verifica $\delta_{pI0}$ con ese
+separador
 instalado, porque el índice pertenece a la cadena
 sonda-separador-analizador, no a los micrófonos por sí solos.
 
@@ -523,7 +534,7 @@ sonda-separador-analizador, no a los micrófonos por sí solos.
 | :--- | :--- | :--- | :--- | :--- |
 | `p1`, `p2` | arrays 1D | Pa | misma longitud | Primero el micrófono más cercano a la fuente; invertirlos cambia el signo |
 | `fs` | int | Hz | > 0 | |
-| `spacing` | float | m | > 0 | Separación entre micrófonos Δr (típ. 6/12/50 mm) |
+| `spacing` | float | m | > 0 | Separación entre micrófonos $\Delta r$ (típ. 6/12/50 mm) |
 | `rho` | float | kg/m³ | por defecto `1.204` | Densidad del aire |
 | `c` | float | m/s | por defecto `343.0` | Velocidad del sonido (estimaciones de sesgo/validez) |
 | `fraction` | int, opcional | — | `1`, `3` o `None` (por defecto) | Integración en bandas de octava/tercio de octava |
@@ -540,27 +551,29 @@ los dos canales.
 intensidad por espectro cruzado de dos micrófonos de `sound_intensity`, la
 corrección de sesgo por diferencias finitas y su límite de ancho de banda
 útil (apartado 7.3, tabla 3), el índice residual de presión-intensidad
-`δpI0` como el suelo de error de fase del instrumento, y la clasificación del
+$\delta_{pI0}$ como el suelo de error de fase del instrumento, y la clasificación del
 instrumento construida sobre él: los mínimos por banda de la tabla 2 para
 sondas, procesadores e instrumentos con la regla de separación de la nota 1,
 los rangos de frecuencia del apartado 6.1 y la regla de combinación de
 componentes del apartado 8 (`intensity_class_compliance`,
 `residual_index_limits`, `instrument_class_from_components`), además de la
-conversión entre `δpI0` y desfase en ambos sentidos. ISO 9614-1:1993 para los
-indicadores de campo del Anexo A F1 a F4 (`temporal_variability_indicator`,
-`field_indicators`) con el límite de la tabla B.3 sobre F1, y el criterio de
+conversión entre $\delta_{pI0}$ y desfase en ambos sentidos. ISO 9614-1:1993
+para los indicadores de campo del Anexo A $F_1$ a $F_4$
+(`temporal_variability_indicator`, `field_indicators`) con el límite de la
+tabla B.3 sobre $F_1$, y el criterio de
 capacidad dinámica del Anexo B (`dynamic_capability_index`).
 
 **No cubierto.** La propia determinación de potencia acústica de ISO 9614-1,
-apartados 8 y 9, que suma las potencias parciales `Ii·Si` de los puntos de
-medida discretos hasta `LW`, no está implementada como función aquí:
+apartados 8 y 9, que suma las potencias parciales $I_i \cdot S_i$ de los
+puntos de medida discretos hasta $L_W$, no está implementada como función aquí:
 `sound_intensity` y `field_indicators` informan de la intensidad y la
 calidad de campo, no de una potencia sumada. Las vías de barrido que sí
-calculan `LW` a partir de la intensidad (ISO 9614-2 e ISO 9614-3) están en
+calculan $L_W$ a partir de la intensidad (ISO 9614-2 e ISO 9614-3) están en
 la guía de
 [potencia acústica por barrido de intensidad](/phonometry/es/guides/sound-power-intensity/).
 El propio *ensayo* de intensidad residual de IEC 61043 tampoco lo realiza la
-biblioteca: `δpI0` es un valor que quien mide obtiene en su propia cadena
+biblioteca: $\delta_{pI0}$ es un valor que quien mide obtiene en su propia
+cadena
 sonda-analizador, con el separador que va a montar, y aporta. Lo que
 phonometry hace con él es clasificarlo frente a la tabla 2.
 

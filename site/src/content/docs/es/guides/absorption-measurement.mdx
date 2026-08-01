@@ -61,8 +61,8 @@ octava de la sala vacía ($T_1$) y de la sala con la probeta instalada ($T_2$),
 el volumen de la sala $V$ y el área de la probeta $S$, y devuelve un
 `SoundAbsorptionMeasurement` inmutable. Las áreas de absorción equivalente
 salen de la ecuación de Sabine (ISO 354:2003 Ec. (5)/(7)),
-$A = 55.3\,V/(c\,T) - 4\,V\,m$, con la velocidad del sonido de la Ec. (6),
-$c = 331 + 0.6\,t$; el coeficiente de absorción acústica es
+$A = 55{,}3\,V/(c\,T) - 4\,V\,m$, con la velocidad del sonido de la Ec. (6),
+$c = 331 + 0{,}6\,t$; el coeficiente de absorción acústica es
 $\alpha_s = (A_2 - A_1)/S$ (Ec. (8)/(9)). El coeficiente puede superar 1,0 por
 efectos de borde y difracción (apartado 3.7 NOTA 2) y nunca se recorta. La
 atenuación del aire entra solo por el coeficiente por banda $m$ (por defecto 0,
@@ -190,8 +190,8 @@ m.report(
 
 ## 2. Áreas de absorción a partir de los decaimientos de la sala
 
-El área de absorción acústica equivalente `A` que gobierna `R'`, `L'n`, la
-corrección ambiental `K2` de ISO 3744 y el término de absorción de ISO 3741 se
+El área de absorción acústica equivalente $A$ que gobierna $R'$, $L'_n$, la
+corrección ambiental $K_2$ de ISO 3744 y el término de absorción de ISO 3741 se
 mide a su vez en una cámara reverberante
 (ISO 354). Mide el tiempo de reverberación de la cámara **vacía** ($T_1$) y de
 nuevo **con la muestra de ensayo instalada** ($T_2$); la absorción de la muestra
@@ -227,7 +227,7 @@ alpha = materials.absorption_coefficient(t1, t2, volume=200.0, sample_area=10.8,
 print(np.round(alpha, 3))                      # [0.398 0.448 0.498]
 ```
 
-`T1` y `T2` son exactamente los tiempos de reverberación que devuelve
+$T_1$ y $T_2$ son exactamente los tiempos de reverberación que devuelve
 [`room_parameters`](/phonometry/es/guides/room-acoustics/), así que una medición de decaimiento ISO 3382-2 de la sala
 vacía y tratada fluye directamente a `absorption_coefficient`. Un volumen de
 sala por debajo del mínimo de 150 m³ o un área de muestra fuera de 10–12 m²
@@ -238,15 +238,15 @@ genera un `AbsorptionWarning` de aviso; el resultado se devuelve igualmente.
 | Parámetro | Tipo | Unidades | Rango / valor por defecto | Notas |
 | :--- | :--- | :--- | :--- | :--- |
 | `t60` / `t1`, `t2` | array 1D | s | > 0 | Tiempo(s) de reverberación; `t1` vacía, `t2` con la muestra |
-| `volume` | float | m³ | > 0 | Volumen de la sala `V` (aviso por debajo de 150 m³) |
-| `sample_area` | float | m² | > 0 | Área `S` que cubre la muestra (solo coeficiente) |
-| `temperature` / `temperature1`, `temperature2` | float | °C | por defecto `20.0`, 15–30 | Fija `c` vía Ec. (6); `temperature2` por defecto es `temperature1` |
-| `speed_of_sound` (`…1`, `…2`) | float, opcional | m/s | > 0 | Sobrescribe la `c` derivada de la temperatura |
+| `volume` | float | m³ | > 0 | Volumen de la sala $V$ (aviso por debajo de 150 m³) |
+| `sample_area` | float | m² | > 0 | Área $S$ que cubre la muestra (solo coeficiente) |
+| `temperature` / `temperature1`, `temperature2` | float | °C | por defecto `20.0`, 15–30 | Fija $c$ vía Ec. (6); `temperature2` por defecto es `temperature1` |
+| `speed_of_sound` (`…1`, `…2`) | float, opcional | m/s | > 0 | Sobrescribe la $c$ derivada de la temperatura |
 | `m` (`m1`, `m2`) | float o array 1D | 1/m | ≥ 0, por defecto `0` | Coeficiente de atenuación en potencia del aire |
 
-`absorption_area()` devuelve el área de absorción acústica equivalente `A` (m²)
-con la forma de `t60`; `absorption_coefficient()` devuelve `alpha_s`;
-`attenuation_from_alpha(alpha)` convierte un `alpha` de ISO 9613-1 (dB/m) a `m`.
+`absorption_area()` devuelve el área de absorción acústica equivalente $A$ (m²)
+con la forma de `t60`; `absorption_coefficient()` devuelve $\alpha_s$;
+`attenuation_from_alpha(alpha)` convierte un $\alpha$ de ISO 9613-1 (dB/m) a $m$.
 
 
 ## 3. Valoración ponderada y clase de absorción (ISO 11654)
@@ -290,10 +290,10 @@ rangos particionan la rejilla de forma exacta.
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/absorption_rating_es.svg" alt="Valoración ponderada de absorción acústica de ISO 11654: el espectro de absorción práctica trazado frente a la curva de referencia desplazada de 250 Hz a 4000 Hz, con la desviación desfavorable a 250 Hz sombreada y el coeficiente ponderado alpha_w leído a 500 Hz" width="80%" />
 
 *El ejemplo resuelto del Anexo A.2: la curva de referencia se desplaza hacia
-abajo 0,40 hasta que las desviaciones desfavorables suman 0,05 (≤ 0,10), dando
-$\alpha_w = 0{,}60$; el pico de 500 Hz sobrepasa la curva desplazada en ≥ 0,25,
-añadiendo el indicador `M`, de modo que la valoración es $0{,}60(\text{M})$, clase
-C.*
+abajo 0,40 hasta que las desviaciones desfavorables suman 0,05 ($\le 0{,}10$),
+dando $\alpha_w = 0{,}60$; el pico de 500 Hz sobrepasa la curva desplazada en
+$\ge 0{,}25$, añadiendo el indicador `M`, de modo que la valoración es
+$0{,}60(\text{M})$, clase C.*
 
 <details>
 <summary>Mostrar el código de esta figura</summary>

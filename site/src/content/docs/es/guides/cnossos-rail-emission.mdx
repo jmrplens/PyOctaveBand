@@ -83,8 +83,8 @@ referidas al plano tangente a las dos superficies superiores de los carriles:
 
 | Altura | Índice | Fuentes físicas asignadas |
 | :--- | :--- | :--- |
-| **0,5 m** (fuente A) | `h = 1` | Ruido de rodadura (carril, rueda y superestructura de mercancías), ruido de impacto, chirrido en curva, ruido de puente, y las componentes de tracción y aerodinámicas que van bajas: engranajes, motores, carenados y pantallas. |
-| **4,0 m** (fuente B) | `h = 2` | Las componentes de tracción y aerodinámicas que van altas: escapes diésel, equipos de techo, el hueco del pantógrafo. |
+| **0,5 m** (fuente A) | $h = 1$ | Ruido de rodadura (carril, rueda y superestructura de mercancías), ruido de impacto, chirrido en curva, ruido de puente, y las componentes de tracción y aerodinámicas que van bajas: engranajes, motores, carenados y pantallas. |
+| **4,0 m** (fuente B) | $h = 2$ | Las componentes de tracción y aerodinámicas que van altas: escapes diésel, equipos de techo, el hueco del pantógrafo. |
 
 Nada en el método decide por usted el reparto de la tracción. La Tabla G-5
 tabula la potencia acústica de tracción **por separado para las dos alturas**, de
@@ -99,12 +99,12 @@ vehículo parado, en el equivalente al ralentí sobre el periodo de referencia
 
 $$
 L'_{W,\mathrm{eq,line},i}(\psi,\varphi) = L_{W,0,\mathrm{dir},i}(\psi,\varphi)
-  + 10\,\lg\!\left(\frac{Q}{1000\,v}\right),
+  + 10\,\log_{10}\!\left(\frac{Q}{1000\,v}\right),
 \qquad
-+\,10\,\lg\!\left(\frac{T_\mathrm{idle}}{T_\mathrm{ref}\,L}\right).
++\,10\,\log_{10}\!\left(\frac{T_\mathrm{idle}}{T_\mathrm{ref}\,L}\right).
 $$
 
-`Q` va en vehículos por hora, `v` en km/h y `L` es la longitud del tramo de vía
+$Q$ va en vehículos por hora, $v$ en km/h y $L$ es la longitud del tramo de vía
 en metros. Atención a la unidad: el término de flujo usa km/h, mientras que la
 conversión de rugosidad dos apartados más abajo usa m/s. Las dos son correctas,
 y confundirlas es el error más caro disponible en este modelo.
@@ -162,15 +162,15 @@ El ruido de rodadura es la rueda y el carril excitándose mutuamente a través d
 la rugosidad de las dos superficies de rodadura. El método separa la causa de la
 radiación:
 
-- **causa**: la rugosidad del carril `Lr,TR` (Tabla G-1b, que selecciona el
-  dígito 2 del descriptor de vía) y la rugosidad de la rueda `Lr,VEH`
+- **causa**: la rugosidad del carril $L_{r,TR}$ (Tabla G-1b, que selecciona el
+  dígito 2 del descriptor de vía) y la rugosidad de la rueda $L_{r,VEH}$
   (Tabla G-1a, que selecciona el tipo de freno, dígito 3 del descriptor de
   vehículo), sumadas energéticamente y filtradas después por el **filtro de
-  contacto** `A3` (Tabla G-2), que da cuenta del tamaño finito de la huella de
+  contacto** $A_3$ (Tabla G-2), que da cuenta del tamaño finito de la huella de
   contacto:
 
 $$
-L_{R,\mathrm{TOT},i} = 10\,\lg\!\left(10^{L_{r,TR,i}/10} + 10^{L_{r,VEH,i}/10}\right) + A_{3,i};
+L_{R,\mathrm{TOT},i} = 10\,\log_{10}\!\left(10^{L_{r,TR,i}/10} + 10^{L_{r,VEH,i}/10}\right) + A_{3,i};
 $$
 
 - **radiación**: tres funciones de transferencia independientes de la velocidad
@@ -181,7 +181,7 @@ $$
   todas las bandas):
 
 $$
-L_{W,0,TR,i} = L_{R,\mathrm{TOT},i} + L_{H,TR,i} + 10\,\lg N_a,
+L_{W,0,TR,i} = L_{R,\mathrm{TOT},i} + L_{H,TR,i} + 10\,\log_{10} N_a,
 $$
 
 y la misma suma para la rueda y la superestructura. Las tres componentes se
@@ -197,7 +197,7 @@ completo.
 ## 4. La conversión de longitud de onda a frecuencia
 
 La rugosidad se tabula frente a la **longitud de onda** y se lee en
-`lambda = v/f`, así que todo el espectro de rugosidad se desplaza a lo largo del
+$\lambda = v/f$, así que todo el espectro de rugosidad se desplaza a lo largo del
 eje de frecuencias a medida que el tren acelera. Esa es la razón de que un tren
 rápido suene brillante y uno lento no: la misma rugosidad de escala milimétrica
 excita una banda más alta.
@@ -284,10 +284,11 @@ las funciones de transferencia (2.3.11). La Tabla G-4 se da para una junta cada
 
 $$
 L_{R,\mathrm{IMPACT},i} = L_{R,\mathrm{IMPACT-SINGLE},i}
-  + 10\,\lg\!\left(\frac{n_l}{0{,}01}\right).
+  + 10\,\log_{10}\!\left(\frac{n_l}{0{,}01}\right).
 $$
 
-Para vía con juntas se prescribe un valor por defecto `nl = 0,01 m⁻¹`. El ruido
+Para vía con juntas se prescribe un valor por defecto
+$n_l = 0{,}01\ \text{m}^{-1}$. El ruido
 de impacto no se modeliza por debajo de la velocidad mínima ni al ralentí. El
 incremento se aplica desde 50 m antes de la junta hasta 50 m después, lo que es
 una instrucción de **segmentación**: el modelo da la potencia de la fuente, y
@@ -299,10 +300,10 @@ de 2021, no la de 2015:
 
 | Vehículo | Condición | Exceso |
 | :--- | :--- | :--- |
-| Tren | `300 m < R <= 500 m` sobre al menos 50 m de curva | 5 dB |
-| Tren | `R <= 300 m` sobre al menos 50 m de curva | 8 dB |
-| Tren | aguja con `R <= 300 m` | 8 dB |
-| Tranvía | curva o aguja con `R <= 200 m` | 5 dB |
+| Tren | $300\ \text{m} < R \le 500\ \text{m}$ sobre al menos 50 m de curva | 5 dB |
+| Tren | $R \le 300\ \text{m}$ sobre al menos 50 m de curva | 8 dB |
+| Tren | aguja con $R \le 300\ \text{m}$ | 8 dB |
+| Tranvía | curva o aguja con $R \le 200\ \text{m}$ | 5 dB |
 
 ```python
 from phonometry import curve_squeal_excess
@@ -324,19 +325,21 @@ El **ruido de tracción** se tabula por vehículo y por altura de fuente
 (Tabla G-5). La Directiva solo modeliza dos condiciones de marcha, velocidad
 constante (que, dice, vale igualmente cuando el tren acelera o decelera) y
 ralentí, y toma la potencia de la fuente en condiciones de carga máxima, de modo
-que `LW,0,const,i = LW,0,idling,i` y una sola tabla sirve para ambas. El ralentí
+que $L_{W,0,\mathrm{const},i} = L_{W,0,\mathrm{idling},i}$ y una sola tabla
+sirve para ambas. El ralentí
 solo se considera si los trenes están parados más de media hora.
 
 El **ruido aerodinámico** solo es relevante por encima de **200 km/h** y sigue
-una ley logarítmica de velocidad en torno a `v0 = 300 km/h` (2.3.13, 2.3.14):
+una ley logarítmica de velocidad en torno a $v_0 = 300\ \text{km/h}$
+(2.3.13, 2.3.14):
 
 $$
-L_{W,0,i} = L_{W,0,h,i}(v_0) + \alpha_{h,i}\,\lg\!\left(\frac{v}{v_0}\right),
+L_{W,0,i} = L_{W,0,h,i}(v_0) + \alpha_{h,i}\,\log_{10}\!\left(\frac{v}{v_0}\right),
 $$
 
-con `alpha1 = alpha2 = 50` en todas las bandas, así que duplicar la velocidad
+con $\alpha_1 = \alpha_2 = 50$ en todas las bandas, así que duplicar la velocidad
 añade 15,05 dB. La Tabla G-6 es el espectro de referencia de un vehículo de 20 m
-a `v0`: en la altura baja es de banda ancha, en la alta es prácticamente
+a $v_0$: en la altura baja es de banda ancha, en la alta es prácticamente
 silencioso salvo una meseta de 1,6 kHz a 3,15 kHz entre 105 y 110 dB, que es el
 pantógrafo.
 
@@ -344,21 +347,21 @@ pantógrafo.
 
 Cada fuente se corrige en los dos planos antes de añadir el término de flujo
 (2.3.5). La corrección **horizontal** es un dipolo (2.3.15), 0 dB de través y
-`10 lg 0,01 = -20 dB` a lo largo de la vía:
+$10\log_{10} 0{,}01 = -20\ \text{dB}$ a lo largo de la vía:
 
 $$
-\Delta L_{W,\mathrm{dir,hor},i} = 10\,\lg\!\left(0{,}01 + 0{,}99\,\sin^2\varphi\right).
+\Delta L_{W,\mathrm{dir,hor},i} = 10\,\log_{10}\!\left(0{,}01 + 0{,}99\,\sin^2\varphi\right).
 $$
 
 La corrección **vertical** de la fuente A (2.3.16) depende de la banda, y es una
 de las piezas que reescribió la modificación de 2021. El texto vigente suprime
 las barras de valor absoluto de la forma de 2015 y hace la corrección
-idénticamente nula para `psi <= 0`:
+idénticamente nula para $\psi \le 0$:
 
 $$
 \Delta L_{W,\mathrm{dir,ver},i} = \frac{40}{3}
   \left[\tfrac{2}{3}\sin 2\psi - \sin\psi\right]
-  \lg\!\left(\frac{f_{c,i} + 600}{200}\right), \quad 0 < \psi < \pi/2,
+  \log_{10}\!\left(\frac{f_{c,i} + 600}{200}\right), \quad 0 < \psi < \pi/2,
 $$
 
 y nula en el resto. Las dos ediciones discrepan en todo el semiespacio inferior,
@@ -373,8 +376,9 @@ vertical_directivity(-30.0)                                        # ceros
 vertical_directivity(-30.0, edition=DirectivityEdition.ORIGINAL_2015)  # positivo
 ```
 
-En la fuente B solo es direccional la fuente aerodinámica, `10 lg(cos² psi)` para
-`psi < 0` (2.3.17); todo lo demás a 4,0 m es omnidireccional, igual que el ruido
+En la fuente B solo es direccional la fuente aerodinámica, $10\log_{10}(\cos^2\psi)$
+para $\psi < 0$ (2.3.17); todo lo demás a 4,0 m es omnidireccional, igual que el
+ruido
 de puente a 0,5 m.
 
 Un punto de interpretación: el 2.3.15 ofrece el dipolo «por defecto [...] para
@@ -394,7 +398,7 @@ transferencia de puente de la Tabla G-7 (2.3.18):
 
 $$
 L_{W,0,\mathrm{bridge},i} = L_{R,\mathrm{TOT},i} + L_{H,\mathrm{bridge},i}
-  + 10\,\lg N_a.
+  + 10\,\log_{10} N_a.
 $$
 
 El ruido de rodadura del vehículo sobre el puente se sigue calculando de forma
@@ -427,8 +431,8 @@ result.components["rolling"]     # el desglose por fuente, antes de la directivi
 
 Dividir una línea fuente en fuentes puntuales equivalentes queda, en palabras
 del apartado 2.5.3, «fuera del alcance de la presente metodología»: una fuente
-puntual que represente un tramo de longitud `dL` simplemente lleva
-`L'W,eq,line,i + 10 lg(dL)`, que es aritmética.
+puntual que represente un tramo de longitud $dL$ simplemente lleva
+$L'_{W,\mathrm{eq,line},i} + 10\log_{10}(dL)$, que es aritmética.
 
 CNOSSOS-EU tiene **su propio** método de propagación en el apartado 2.5 del
 Anexo II, y no es la ISO 9613-2. Encadenar una emisión CNOSSOS con la propagación
@@ -500,4 +504,5 @@ depósitos, estaciones y megafonía, se tratan por el método industrial.
 - [Propagación del sonido en exteriores](/phonometry/es/guides/outdoor-propagation/):
   la cadena ISO 9613-2 que lleva una potencia de fuente hasta un receptor.
 - [Niveles de ruido ambiental](/phonometry/es/guides/environmental-levels/): los
-  indicadores Lden y Lnight para los que se trazan los mapas resultantes.
+  indicadores $L_{den}$ y $L_{night}$ para los que se trazan los mapas
+  resultantes.

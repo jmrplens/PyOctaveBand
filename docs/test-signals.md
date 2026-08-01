@@ -43,7 +43,7 @@ The result carries the record, the rectangular gating **envelope** and the
 exact sample bookkeeping (`burst_samples`, `onset_sample`, `period_samples`,
 `duty_cycle`), so a test report can state its stimulus numerically. Because
 the gate spans an integral number of full periods starting at a zero
-crossing, the burst energy has the closed form `A²N/2` exactly, which is how
+crossing, the burst energy has the closed form $A^2 N/2$ exactly, which is how
 the generator is verified.
 
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/tone_burst_train_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/tone_burst_train.svg" alt="IEC 60268-1 tone bursts: a single 5 ms burst of 5 kHz tone starting at a zero crossing with its rectangular gating envelope, and a repetitive train of four bursts at 10 bursts per second with a 5 percent duty cycle" width="82%"></picture>
@@ -102,7 +102,7 @@ numbers the caller controls:
 - `transition_width` (default 0.05): the fraction of that Nyquist frequency
   given up to the filter's transition band, so the passband ends at
   `(1 - transition_width)·f_Nyq` and is flat within the same Kaiser ripple
-  bound `δ = 10^(-A/20)`.
+  bound $\delta = 10^{-A/20}$.
 
 ```python
 from phonometry import noise_signal, resample_signal
@@ -169,7 +169,7 @@ leakage against the design's own ripple bound (the design internally targets
 1 dB past the request, so the delivered filter meets the stated numbers
 rather than a Kaiser-formula approximation of them). A passband tone
 resampled through the default specification matches the analytic tone at the
-new rate within `10^(-120/20) = 10^-6`.
+new rate within $10^{-120/20} = 10^{-6}$.
 
 Several estimators resample internally at fixed rates (the ECMA-418-2
 psychoacoustics at 48 kHz, STOI at 10 kHz); this function is the public,
@@ -179,7 +179,7 @@ documented counterpart for preparing records outside those chains.
 
 `fractional_delay` shifts a record by any number of samples, including
 sub-sample amounts, by multiplying the spectrum with the phase ramp
-`e^(-j2πf·D/fs)`: every component is delayed by exactly `D` samples. Two
+$e^{-j 2\pi f D/f_s}$: every component is delayed by exactly `D` samples. Two
 boundary conventions cover the two use cases:
 
 - `mode="linear"` (default) zero-pads the record past the shift, so samples
@@ -190,7 +190,7 @@ boundary conventions cover the two use cases:
 - `mode="circular"` applies the ramp over the record itself and wraps. For
   periodic records it is exact: a tone centered on a DFT bin delayed by
   `D` samples equals the analytically delayed tone to machine precision,
-  and its phase changes by exactly `-2πf·D/fs` radians.
+  and its phase changes by exactly $-2\pi f D/f_s$ radians.
 
 ```python
 import numpy as np
@@ -230,7 +230,7 @@ smearing them.
 - [Correlation and delay](correlation-delay.md): the alignment work built
   on the fractional-delay kernel.
 - [Synchronous averaging](synchronous-averaging.md): period alignment with
-  the same band-limited shift when `fs·T` is not an integer.
+  the same band-limited shift when $f_s T$ is not an integer.
 - [Spectral analysis](spectral-analysis.md): the colored-noise verification
   and the window metrics.
 

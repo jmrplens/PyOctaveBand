@@ -38,18 +38,19 @@ $$
 y(t) = \frac{1}{\tau} \int_{-\infty}^{t} x^2(\xi)\ e^{-(t-\xi)/\tau}\ d\xi
 $$
 
-a first-order low-pass on the squared signal. The time constant τ sets the
+a first-order low-pass on the squared signal. The time constant $\tau$ sets the
 trade-off: **Fast** (125 ms) follows speech-like fluctuations, **Slow** (1 s)
 steadies the readout for quasi-stationary noise. After a step onset the
-envelope reaches 63 % of its final value in one τ and ~99.97 % after 8τ;
+envelope reaches 63 % of its final value in one $\tau$ and ~99.97 % after
+$8\tau$;
 that is why level analyses discard the first instants of a recording.
 
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_time_weighting_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_time_weighting.svg" alt="The exponential-detector chain: the band pressure is squared, smoothed by a one-pole RC low-pass with time constant tau, and converted to decibels, with the Fast, Slow and Impulse time constants listed" width="88%"></picture>
 
 ## 2. The three time weightings
 
-* **Fast (`fast`):** τ = 125 ms. Standard for noise fluctuations.
-* **Slow (`slow`):** τ = 1000 ms. Standard for steady noise.
+* **Fast (`fast`):** $\tau = 125\ \text{ms}$. Standard for noise fluctuations.
+* **Slow (`slow`):** $\tau = 1000\ \text{ms}$. Standard for steady noise.
 * **Impulse (`impulse`):** **Asymmetric** ballistics. 35 ms rise time for rapid
   onset capture, 1500 ms decay for readability.
 
@@ -116,7 +117,7 @@ $$
 - **Fast** is the default of nearly every modern method: percentile levels,
   impulsive-event detection, community noise, the general "level vs time"
   plot. Its 125 ms constant is of the same order as the ear's own loudness
-  integration time, so an LAF trace roughly tracks what a listener notices.
+  integration time, so an $L_{AF}$ trace roughly tracks what a listener notices.
 - **Slow** suits quasi-stationary sources and any procedure that needs a
   steady readout: it averages away the flicker of a fluctuating source at
   the price of missing short events (a 100 ms burst peaks about 7.5 dB lower
@@ -141,7 +142,7 @@ $$
 | :--- | :--- | :--- | :--- | :--- |
 | `x` | 1D or 2D array | pressure (any scale) | non-empty | Squared internally; output is a mean-square envelope |
 | `fs` | int | Hz | > 0 | |
-| `mode` | str | — | `'fast'` (default), `'slow'`, `'impulse'` | τ = 125 ms / 1 s / 35 ms attack + 1.5 s decay |
+| `mode` | str | — | `'fast'` (default), `'slow'`, `'impulse'` | $\tau$ = 125 ms / 1 s / 35 ms attack + 1.5 s decay |
 | `TimeWeighting(fs, mode)` (class) | — | — | — | Stateful variant for streaming: `process(x)` carries the integrator state between blocks |
 
 The output has the units of $x^2$: take `10*log10(y / p0**2)` for SPL or use
@@ -250,8 +251,8 @@ The `impulse` mode uses an asymmetric kernel that is JIT-compiled when
 [numba](https://numba.pydata.org/) is installed (`pip install phonometry[perf]`).
 Without numba a pure-Python fallback produces identical results, just slower.
 
-See [Integrated & Statistical Levels](levels.md) for Leq/LN metrics built on
-these envelopes, and [Why phonometry](why-phonometry.md) for the IEC
+See [Integrated & Statistical Levels](levels.md) for $L_{eq}$/$L_N$ metrics
+built on these envelopes, and [Why phonometry](why-phonometry.md) for the IEC
 61672-1 tone-burst verification.
 
 ## References

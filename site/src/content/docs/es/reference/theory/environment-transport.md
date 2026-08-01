@@ -135,14 +135,14 @@ Consulta la [guía de niveles ambientales](/phonometry/es/guides/environmental-l
 
 <img class="light-only" src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/lden_profile_es.svg" alt="Perfil LAeq urbano sintético de 24 horas con las bandas de día, tarde y noche, los niveles por periodo ponderados con +5 y +10 dB y el Lden resultante" style="width:80%" loading="lazy"><img class="dark-only" src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/lden_profile_es_dark.svg" alt="Perfil LAeq urbano sintético de 24 horas con las bandas de día, tarde y noche, los niveles por periodo ponderados con +5 y +10 dB y el Lden resultante" style="width:80%" loading="lazy">
 
-*Un perfil LAeq de 24 horas dividido en día, tarde y noche, las penalizaciones de +5/+10 dB y el Lden resultante.*
+*Un perfil $L_{Aeq}$ de 24 horas dividido en día, tarde y noche, las penalizaciones de +5/+10 dB y el $L_{den}$ resultante.*
 
 ## Prominencia de sonidos impulsivos (NT ACOU 112)
 
 Un impulso molesta más allá de su energía, por lo que las evaluaciones ambientales según ISO 1996-2 penalizan los periodos con sonidos impulsivos prominentes; NT ACOU 112:2002 hace objetiva esa penalización. A partir del historial de nivel ponderado A con ponderación temporal F de un único evento, la tasa de crecimiento (dB/s) y la diferencia de nivel (dB) del arranque (que cualifica cuando supera los 10 dB/s, cláusulas 4.5–4.7) predicen la prominencia percibida (cláusula 7, Fórmula 1):
 
 $$
-P = 3 \lg(\text{tasa de crecimiento}) + 2 \lg(\text{diferencia de nivel}),
+P = 3 \log_{10}(\text{tasa de crecimiento}) + 2 \log_{10}(\text{diferencia de nivel}),
 $$
 
 diseñada para alcanzar en torno a 15 en impulsos muy súbitos e intensos. El ajuste al nivel del periodo de medición toma el impulso determinante (el de mayor $P$) (cláusula 8, Fórmula 2):
@@ -154,10 +154,10 @@ $$
 y el nivel de evaluación de la jornada completa combina energéticamente los periodos ajustados (cláusula 8, Nota 1):
 
 $$
-L_{Ar,T} = 10 \lg\Big[ \frac{1}{T} \sum_N \Delta t_N\ 10^{(L_{Aeq,N} + K_{I,N})/10} \Big].
+L_{Ar,T} = 10 \log_{10}\Big[ \frac{1}{T} \sum_N \Delta t_N\ 10^{(L_{Aeq,N} + K_{I,N})/10} \Big].
 $$
 
-$K_I$ es exactamente el tipo de ajuste por carácter de la fuente que entra en el nivel de evaluación compuesto de ISO 1996-1 anterior. Los anclajes $P(1000\ \text{dB/s}, 30\ \text{dB}) = 9 + 2\lg 30 = 11{,}95$ y $K_I(P{=}10) = 9{,}0$ dB se reproducen exactamente.
+$K_I$ es exactamente el tipo de ajuste por carácter de la fuente que entra en el nivel de evaluación compuesto de ISO 1996-1 anterior. Los anclajes $P(1000\ \text{dB/s}, 30\ \text{dB}) = 9 + 2\log_{10} 30 = 11{,}95$ y $K_I(P{=}10) = 9{,}0$ dB se reproducen exactamente.
 
 Consulta la [guía de prominencia de sonidos impulsivos](/phonometry/es/guides/impulse-prominence/) para su uso.
 
@@ -191,11 +191,11 @@ precisión impresa del estándar), muy dentro de su $\pm 10$ % declarado; pasar
 `exact_midband=True` ajusta cada frecuencia a los centros exactos
 $f_m = 1000 \cdot 10^{k/10}$ (Nota 5) empleados para calcular esa tabla. El mismo
 $\alpha$ es la única vía hacia el coeficiente de atenuación de potencia de la
-ISO 354 $m = \alpha/(10 \lg e)$, expuesto como `air_attenuation_m`.
+ISO 354 $m = \alpha/(10 \log_{10} e)$, expuesto como `air_attenuation_m`.
 
 <img class="light-only" src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/atmospheric_attenuation_es.svg" alt="Coeficiente de atenuación atmosférica de tono puro alfa de la ISO 9613-1 en dB/km frente a la frecuencia, con ordenada lineal en decibelios sobre un eje de frecuencia logarítmico, para la atmósfera de referencia de 20 grados Celsius y 50 por ciento de humedad relativa, producido por el método plot del resultado AtmosphericAttenuation" style="width:80%" loading="lazy"><img class="dark-only" src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/atmospheric_attenuation_es_dark.svg" alt="Coeficiente de atenuación atmosférica de tono puro alfa de la ISO 9613-1 en dB/km frente a la frecuencia, con ordenada lineal en decibelios sobre un eje de frecuencia logarítmico, para la atmósfera de referencia de 20 grados Celsius y 50 por ciento de humedad relativa, producido por el método plot del resultado AtmosphericAttenuation" style="width:80%" loading="lazy">
 
-*El coeficiente de ISO 9613-1 para la atmósfera de referencia de 20 °C y 50 % de humedad relativa: la subida en f² abarca dos décadas de 50 Hz a 10 kHz.*
+*El coeficiente de ISO 9613-1 para la atmósfera de referencia de 20 °C y 50 % de humedad relativa: la subida en $f^2$ abarca dos décadas de 50 Hz a 10 kHz.*
 
 ### Método general de cálculo en exteriores (ISO 9613-2)
 
@@ -292,7 +292,7 @@ distancia al receptor ni de la sala. Tres familias de métodos lo recuperan.
 
 <img class="light-only" src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sound_power_methods_es.svg" alt="Las tres vías de potencia acústica en paralelo: una superficie envolvente de presión sobre un plano reflectante (ISO 3744/3746), una fuente en una cámara reverberante muestreada por micrófonos (ISO 3741) y una sonda de intensidad barriendo una superficie alrededor de la fuente (ISO 9614-2)" style="width:92%" loading="lazy"><img class="dark-only" src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sound_power_methods_es_dark.svg" alt="Las tres vías de potencia acústica en paralelo: una superficie envolvente de presión sobre un plano reflectante (ISO 3744/3746), una fuente en una cámara reverberante muestreada por micrófonos (ISO 3741) y una sonda de intensidad barriendo una superficie alrededor de la fuente (ISO 9614-2)" style="width:92%" loading="lazy">
 
-*Las tres vías hacia LW: superficie envolvente de presión, cámara reverberante y barrido de intensidad.*
+*Las tres vías hacia $L_W$: superficie envolvente de presión, cámara reverberante y barrido de intensidad.*
 
 ### Presión sobre superficie envolvente (ISO 3744/3746)
 
@@ -319,16 +319,16 @@ laxos. La incertidumbre expandida es $U = 2 \sqrt{\sigma_{R0}^2 + \sigma_{omc}^2
 ISO 3745:2012 es el hermano de grado 1 (precisión): una cámara anecoica o
 semianecoica cualificada elimina el campo reverberante, así que no hay término
 $K_2$ y las correcciones pasan a ser meteorológicas. El nivel de potencia es
-$L_W = \bar{L}_p + 10 \lg(S/S_0) + C_1 + C_2 + C_3$ (Ec. 14/15) sobre una
+$L_W = \bar{L}_p + 10 \log_{10}(S/S_0) + C_1 + C_2 + C_3$ (Ec. 14/15) sobre una
 esfera completa $S = 4 \pi r^2$ o una semiesfera $S = 2 \pi r^2$, con la
-corrección por ruido de fondo $K_{1i} = -10 \lg(1 - 10^{-0{,}1 \Delta L_{pi}})$
+corrección por ruido de fondo $K_{1i} = -10 \log_{10}(1 - 10^{-0{,}1 \Delta L_{pi}})$
 aplicada por posición de micrófono *antes* del promedio energético (Ec. 11);
 no hace falta corrección por encima de un margen de 15 dB, y por debajo de
 10 dB (250 Hz – 5 kHz) o 6 dB (bandas extremas) la corrección se satura y el
 resultado se marca como cota superior (cláusula 9.4.2). Los términos
 meteorológicos son
-$C_1 = -10 \lg(p_s/p_{s0}) + 5 \lg[(273 + \theta)/\theta_0]$ y
-$C_2 = -10 \lg(p_s/p_{s0}) + 15 \lg[(273 + \theta)/\theta_1]$ con
+$C_1 = -10 \log_{10}(p_s/p_{s0}) + 5 \log_{10}[(273 + \theta)/\theta_0]$ y
+$C_2 = -10 \log_{10}(p_s/p_{s0}) + 15 \log_{10}[(273 + \theta)/\theta_1]$ con
 $\theta_0 = 314$ K, $\theta_1 = 296$ K: en la referencia de 23 °C /
 101,325 kPa, $C_2 = 0$ exactamente y $C_1 = -0{,}128$ dB; y
 $C_3 = A_0 (1{,}0053 - 0{,}0012 A_0)^{1{,}6}$ con $A_0 = a(f)\ r$ restituye la
@@ -392,7 +392,7 @@ $F_{pIn}(\text{con signo}) - F_{pIn}(\text{sin signo}) \le 3$ dB (C.3),
 $F_S \le 2$ (C.4) y la convergencia de densidad de barrido
 $0{,}83 \le F_S(1)/F_S(2) \le 1{,}2$ (C.5). La Ec. 10 normaliza el resultado a
 las condiciones meteorológicas de referencia,
-$L_{W0} = L_W - 15 \lg[(B/101325) \cdot 296{,}15/(273{,}15 + \theta)]$. Las
+$L_{W0} = L_W - 15 \log_{10}[(B/101325) \cdot 296{,}15/(273{,}15 + \theta)]$. Las
 bandas con potencia neta negativa son no determinables (cláusula 9.2) y se
 marcan. Una intensidad normal uniforme recupera la potencia exactamente
 (100 µW sobre 3,75 m² → 80,0 dB re 1 pW), con independencia de cómo se

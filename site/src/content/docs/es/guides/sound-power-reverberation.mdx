@@ -40,8 +40,9 @@ qué trabajo, y las alternativas de presión e intensidad, se sopesan en
 En una **cámara reverberante** cualificada de paredes rígidas el campo es
 difuso, así que un puñado de micrófonos muestrea toda la energía radiada y el
 método alcanza el grado 1. La potencia acústica proviene del nivel medio de la
-cámara `Lp(ST)`, el área de absorción de Sabine `A = (55.26/c)·(V/T60)` y una
-cadena de pequeñas correcciones (ISO 3741 Ec. 20):
+cámara $L_p(\text{ST})$, el área de absorción de Sabine
+$A = (55{,}26/c)\cdot(V/T_{60})$ y una cadena de pequeñas correcciones
+(ISO 3741 Ec. 20):
 
 $$
 L_W = \bar{L}_p + 10 \log_{10}\frac{A}{A_0} + 4{,}34\ \frac{A}{S}
@@ -51,7 +52,7 @@ $$
 El término entre paréntesis es la **corrección de Waterhouse**: cerca de los
 contornos de la cámara la densidad de energía sonora es mayor que en el interior,
 y este término (que se anula al crecer la frecuencia) restituye la energía que
-los micrófonos del interior no captan. `C1` (cantidad de referencia) y `C2`
+los micrófonos del interior no captan. $C_1$ (cantidad de referencia) y $C_2$
 (impedancia de radiación) llevan el resultado a las condiciones meteorológicas
 de referencia de 23 °C y 101,325 kPa,
 
@@ -60,11 +61,11 @@ C_1 = -10 \log_{10}\frac{p_s}{p_{s0}} + 5 \log_{10}\frac{273{,}15 + \theta}{314}
 C_2 = -10 \log_{10}\frac{p_s}{p_{s0}} + 15 \log_{10}\frac{273{,}15 + \theta}{296},
 $$
 
-con la velocidad del sonido `c = 20.05·√(273 + θ)`. El **método de comparación**
-sustituye los términos de área de absorción, Waterhouse y `C1` por una fuente
-sonora de referencia de potencia conocida `LW(RSS)` medida en la misma cámara,
-de modo que la cámara no necesita caracterizarse:
-`LW = LW(RSS) + (Lp(ST) − Lp(RSS) + C2)`.
+con la velocidad del sonido $c = 20{,}05\sqrt{273 + \theta}$. El **método de
+comparación** sustituye los términos de área de absorción, Waterhouse y $C_1$
+por una fuente sonora de referencia de potencia conocida $L_W(\text{RSS})$
+medida en la misma cámara, de modo que la cámara no necesita caracterizarse:
+$L_W = L_W(\text{RSS}) + (L_p(\text{ST}) - L_p(\text{RSS}) + C_2)$.
 
 ```python
 import numpy as np
@@ -99,8 +100,8 @@ rev.plot()   # espectro LW de la cámara reverberante; LWA en el título (requie
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sound_power_reverberation_result_es.svg" alt="El espectro de nivel de potencia acústica en cámara reverberante del ejemplo de ISO 3741, una barra por banda de tercio de octava de 100 Hz a 10 kHz descendiendo suavemente con la frecuencia, con el total ponderado A de 92,1 dB(A) en el título" width="88%" />
 
 *El nivel medio de la cámara llevado a través de los términos de área de
-absorción, de Waterhouse y meteorológicos de la Ec. 20 da el `LW(f)` por tercio
-de octava, y la suma energética ponderada A entre las 21 bandas da el `LWA` del
+absorción, de Waterhouse y meteorológicos de la Ec. 20 da el $L_W(f)$ por tercio
+de octava, y la suma energética ponderada A entre las 21 bandas da el $L_{WA}$ del
 título.*
 
 <details>
@@ -146,7 +147,7 @@ plt.show()
 `levels` puede ser un espectro medio 1D o un array 2D `(NM, NB)` promediado
 sobre las posiciones. Cuando el volumen de la cámara, su tiempo de reverberación
 o el número de micrófonos incumplen un criterio de cualificación de ISO 3741
-(volumen mínimo de la Tabla 1, el suelo de reverberación `V/S`, menos de 6
+(volumen mínimo de la Tabla 1, el suelo de reverberación $V/S$, menos de 6
 posiciones, o una dispersión entre posiciones superior a 1,5 dB), se emite un
 `SoundPowerWarning` de aviso y el resultado se devuelve igualmente.
 
@@ -156,12 +157,12 @@ posiciones, o una dispersión entre posiciones superior a 1,5 dB), se emite un
 | :--- | :--- | :--- | :--- | :--- |
 | `levels` | array 1D o 2D | dB | por banda, o `(NM, NB)` | SPL medio de cámara; 2D se promedia en energía sobre las posiciones |
 | `t60` | float o array 1D | s | > 0 | Tiempo de reverberación de la cámara (el escalar se difunde) |
-| `volume` | float | m³ | > 0 | Volumen de la cámara `V` |
-| `surface_area` | float | m² | > 0 | Superficie total de la cámara `S` (Waterhouse, `A/S`) |
-| `frequencies` | array 1D | Hz | uno por banda | Obligatorio (Waterhouse necesita `f`); habilita `LWA` |
-| `background_levels` | array 1D o 2D | dB | coincide con `levels` | `K1` por banda (criterio dependiente de la frecuencia) |
-| `temperature` | float | °C | por defecto `23.0` | Fija `c`, `C1`, `C2` |
-| `static_pressure` | float | kPa | por defecto `101.325` | Fija `C1`, `C2` |
+| `volume` | float | m³ | > 0 | Volumen de la cámara $V$ |
+| `surface_area` | float | m² | > 0 | Superficie total de la cámara $S$ (Waterhouse, $A/S$) |
+| `frequencies` | array 1D | Hz | uno por banda | Obligatorio (Waterhouse necesita $f$); habilita $L_{WA}$ |
+| `background_levels` | array 1D o 2D | dB | coincide con `levels` | $K_1$ por banda (criterio dependiente de la frecuencia) |
+| `temperature` | float | °C | por defecto `23.0` | Fija $c$, $C_1$, $C_2$ |
+| `static_pressure` | float | kPa | por defecto `101.325` | Fija $C_1$, $C_2$ |
 
 `sound_power_comparison(levels, levels_ref, lw_ref, *, frequencies=None,
 background_levels=…, background_levels_ref=…, temperature=23.0,
@@ -171,14 +172,14 @@ fuente de referencia y su potencia conocida.
 | Parámetro | Tipo | Unidades | Rango / defecto | Notas |
 | :--- | :--- | :--- | :--- | :--- |
 | `levels_ref` | array 1D o 2D | dB | coincide con `levels` | SPL medio de cámara con la fuente de referencia (RSS) en marcha |
-| `lw_ref` | array 1D | dB | por banda | Potencia acústica conocida `LW(RSS)` de la fuente de referencia |
-| `background_levels` | array 1D o 2D | dB | coincide con `levels` | Ruido de fondo de la fuente de ensayo; `K1` por banda sobre `Lp(ST)` |
-| `background_levels_ref` | array 1D o 2D | dB | coincide con `levels_ref` | Ruido de fondo de la fuente de **referencia**; `K1` por banda sobre `Lp(RSS)` |
+| `lw_ref` | array 1D | dB | por banda | Potencia acústica conocida $L_W(\text{RSS})$ de la fuente de referencia |
+| `background_levels` | array 1D o 2D | dB | coincide con `levels` | Ruido de fondo de la fuente de ensayo; $K_1$ por banda sobre $L_p(\text{ST})$ |
+| `background_levels_ref` | array 1D o 2D | dB | coincide con `levels_ref` | Ruido de fondo de la fuente de **referencia**; $K_1$ por banda sobre $L_p(\text{RSS})$ |
 
 `background_levels_ref` corrige por ruido de fondo el nivel de cámara de la fuente
-de referencia `Lp(RSS)` igual que `background_levels` lo hace para la fuente de
-ensayo; ambos requieren `frequencies` (el criterio ISO 3741 depende de la
-frecuencia). Ambas devuelven un
+de referencia $L_p(\text{RSS})$ igual que `background_levels` lo hace para la
+fuente de ensayo; ambos requieren `frequencies` (el criterio ISO 3741 depende de
+la frecuencia). Ambas devuelven un
 `ReverberationSoundPowerResult` (`sound_power_level`, `mean_pressure_level`,
 `absorption_area`, `waterhouse_correction`, `background_correction`, `c1`, `c2`,
 `speed_of_sound`, `sound_power_level_a`, `method`; los campos de
@@ -250,7 +251,7 @@ el repositorio; haz clic en la vista previa para abrir el PDF.
 **Cubierto.** La determinación en cámara reverberante de ISO 3741
 (`sound_power_reverberation`): el método directo (Ec. 20) mediante el área
 de absorción de Sabine, la corrección de contorno de Waterhouse y las
-correcciones meteorológicas C1/C2, y el método de comparación con una
+correcciones meteorológicas $C_1$/$C_2$, y el método de comparación con una
 fuente sonora de referencia (`sound_power_comparison`, Ec. 21), ambos con
 corrección de fondo por banda y el total ponderado A del Anexo F,
 presentados como ficha de potencia acústica de estilo acreditado mediante
@@ -260,7 +261,7 @@ presentados como ficha de potencia acústica de estilo acreditado mediante
 (Anexo C/D, recuento de frecuencias propias o comparación con una fuente de
 referencia) se da por supuesta, no se ejecuta; la biblioteca solo avisa de
 los criterios orientativos que ISO 3741 declara explícitamente (el volumen
-mínimo de la Tabla 1, el suelo de reverberación V/S, menos de 6 posiciones,
+mínimo de la Tabla 1, el suelo de reverberación $V/S$, menos de 6 posiciones,
 una dispersión entre posiciones superior a 1,5 dB). La elección entre las
 cinco vías, y la declaración ISO 4871 que un resultado alimenta, viven en
 [Potencia acústica](/phonometry/es/guides/sound-power/).
@@ -275,9 +276,9 @@ cinco vías, y la declaración ISO 4871 que un resultado alimenta, viven en
 - [Potencia acústica por barrido de intensidad (ISO 9614)](/phonometry/es/guides/sound-power-intensity/):
   las vías que toleran el ruido de fondo estacionario.
 - [Acústica de salas](/phonometry/es/guides/room-acoustics/): la medición del
-  tiempo de reverberación `T60` que fija el área de absorción de Sabine.
+  tiempo de reverberación $T_{60}$ que fija el área de absorción de Sabine.
 - [Niveles](/phonometry/es/guides/levels/): el promediado en energía y la
-  ponderación A que sustentan `LWA`.
+  ponderación A que sustentan $L_{WA}$.
 - [Teoría](/phonometry/es/reference/theory/environment-transport/): las
-  derivaciones de Waterhouse y C1/C2.
+  derivaciones de Waterhouse y $C_1$/$C_2$.
 - Referencia de la API: [`emission.sound_power_reverberation`](/phonometry/es/reference/api/power/sound-power-reverberation/).

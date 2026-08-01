@@ -121,7 +121,7 @@ its mass is negligible and it barely touches the slab's loss factor or bending
 stiffness. So its improvement is simply the ratio of the two force spectra,
 
 $$
-\Delta L = 20 \lg \frac{|F_n|_\text{without}}{|F_n|_\text{with}} \ \text{dB},
+\Delta L = 20 \log_{10} \frac{|F_n|_\text{without}}{|F_n|_\text{with}} \ \text{dB},
 $$
 
 and the whole design collapses to one number, the covering's own cut-off
@@ -215,9 +215,9 @@ applies is a question about damping, not about the layer:
 
 | Model | Law | When |
 | --- | --- | --- |
-| `"cremer"` | $\Delta L = 40 \lg (f/f_0)$ | Cremer's infinite-plate result; asphalt screeds and dry floating floors, whose internal losses are high enough to behave as infinite plates (ISO 12354-2 Formula C.3) |
-| `"en12354"` | $\Delta L = 30 \lg (f/f_0)$ | sand-cement and calcium-sulfate screeds, whose low loss factor makes them finite plates with a reverberant bending field (Formula C.1) |
-| `"cremer_hammer"` | $40 \lg (f/f_0) + 10 \lg[1 + (f/f_\text{limit})^2]$ | a lightweight walking surface, where the hammer impedance is no longer negligible; tends to 18 dB per octave |
+| `"cremer"` | $\Delta L = 40 \log_{10} (f/f_0)$ | Cremer's infinite-plate result; asphalt screeds and dry floating floors, whose internal losses are high enough to behave as infinite plates (ISO 12354-2 Formula C.3) |
+| `"en12354"` | $\Delta L = 30 \log_{10} (f/f_0)$ | sand-cement and calcium-sulfate screeds, whose low loss factor makes them finite plates with a reverberant bending field (Formula C.1) |
+| `"cremer_hammer"` | $40 \log_{10} (f/f_0) + 10 \log_{10}[1 + (f/f_\text{limit})^2]$ | a lightweight walking surface, where the hammer impedance is no longer negligible; tends to 18 dB per octave |
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/floating_floor_prediction.svg" alt="Improvement of impact sound insulation of a 35 mm floating screed of 73.5 kg per square metre on an 8 meganewton per cubic metre resilient layer: nothing below the 52.8 Hz mass-spring resonance, then the 30 lg law of EN 12354-2 reaching 59 dB at 5 kHz against the steeper 40 lg law of Cremer and the 18 dB per octave branch that includes the tapping-machine hammer impedance" width="80%" />
 
@@ -277,7 +277,7 @@ double_floating_floor_resonances(7.25e6, 12.78, 7.25e6, 12.78)  # (74, 194) Hz
 
 The weighted single numbers come straight from the same two inputs, so a
 floating floor can be sized without ever drawing a spectrum:
-$\Delta L_w = 13\lg m' - 14.2\lg s' + 20.8$ dB for a sand-cement screed
+$\Delta L_w = 13\log_{10} m' - 14.2\log_{10} s' + 20.8$ dB for a sand-cement screed
 (Formula C.4) and the steeper Formula (C.5) fit for asphalt and dry floors.
 Heavier slabs and softer layers rate better, and both estimates are
 deliberately on the safe side.
@@ -321,7 +321,7 @@ too low.
 
 Table D.1 then reads the weighted improvement off $f_0$, rounded to the
 one-third-octave band it falls in. Below 200 Hz the lining helps, by
-$74.4 - 20\lg f_0 - R_w/2$ dB, and the better the bare wall the less there is
+$74.4 - 20\log_{10} f_0 - R_w/2$ dB, and the better the bare wall the less there is
 to gain. From 200 Hz upwards it costs: 1 dB at 200 Hz falling to 10 dB from
 630 Hz to 1600 Hz, recovering to 5 dB above. Getting the resonance well below
 the range of interest is therefore the entire design brief.
@@ -373,7 +373,7 @@ $\Delta L_\text{situ} = \Delta L$ outright. The resonance $f_0 = 52.8$ Hz is
 an *input* of the example, printed in Clause G.1.1's construction data and
 repeated in the box under the table, not a value derived from the grid. And
 the leading 0.0 dB at 50 Hz needs a clamp below $f_0$ that no printed formula
-states: Formula (C.1) is written as $\Delta L = 30\lg(f/f_0)$ with no range of
+states: Formula (C.1) is written as $\Delta L = 30\log_{10}(f/f_0)$ with no range of
 validity at all, and the only condition printed anywhere is the informal
 "for $f > f_0$" inside that same input box. ISO 12354-1:2017 Table L.4 prints
 the identical 21 numbers as $\Delta R_\text{d,situ}$, which confirms the

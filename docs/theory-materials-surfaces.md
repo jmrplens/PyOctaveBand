@@ -26,7 +26,7 @@ $$
 each $\alpha$ being a two-condition Sabine difference
 $55.3 (V/S) [1/(c_b T_b) - 1/(c_a T_a)] - 4 (V/S)(m_b - m_a)$ with
 $c = 343.2 \sqrt{(273.15 + t)/293.15}$ (Formula 2) and $m$ from ISO 9613-1
-via $m = \alpha_{dB}/(10 \lg e)$ (Formula 3). The base plate itself must
+via $m = \alpha_{dB}/(10 \log_{10} e)$ (Formula 3). The base plate itself must
 scatter little: Table 1 caps its coefficient (Formula 6) at 0.05–0.25 across
 100 Hz – 5 kHz (clause 6.2). Negative $s$ is truncated to zero for
 presentation (clause 8.3), but values above 1 near grazing bands are kept
@@ -55,7 +55,7 @@ size removes edge diffraction (clause 8.2, Formula 7):
 $d_{\theta,n} = (d_\theta - d_{\theta,r})/(1 - d_{\theta,r})$. The
 random-incidence value averages the source angles with weights 1:3:3:3:3 for
 0°, ±30°, ±60° (clause 8.4). Anchors: the model-predicted 37-receiver arc of
-the published six-period N = 7 QRD (Cox & D'Antonio 3rd ed., Appendix B;
+the published six-period $N = 7$ QRD (Cox & D'Antonio 3rd ed., Appendix B;
 Hargreaves et al. 2000, Table I) at 1000 Hz gives $d_\theta = 0.1099$, its
 flat reference $0.0049$ and $d_{\theta,n} = 0.1055$; the band-averaged model
 predictions match the published Appendix B BEM normalised diffusion in the
@@ -171,7 +171,7 @@ from which the anechoic-backing normal-incidence transmission loss is
 (Eqs. 25/26)
 
 $$
-TL = 20 \lg \frac{\left| T_{11} + T_{12}/\rho c + \rho c\ T_{21} + T_{22} \right|}{2},
+TL = 20 \log_{10} \frac{\left| T_{11} + T_{12}/\rho c + \rho c\ T_{21} + T_{22} \right|}{2},
 $$
 
 plus the hard-backed reflection
@@ -181,8 +181,9 @@ impedance $\sqrt{T_{12}/T_{21}}$ (Eq. 30). The three standards deliberately
 keep their own sign ansatz and temperature units (ISO in kelvin, ASTM in
 Celsius), and near-singular load solves raise a warning. Since neither
 standard prints a numeric example, the oracles are physics identities: the
-analytic air-layer matrix ($\det T = 1$, $T_{11} = T_{22}$, TL = 0 dB,
-hard-backed $|R| = 1$), synthetic round-trips that recover a known $r$, and
+analytic air-layer matrix ($\det T = 1$, $T_{11} = T_{22}$,
+$TL = 0\ \text{dB}$, hard-backed $|R| = 1$), synthetic round-trips that
+recover a known $r$, and
 two-load recovery of an asymmetric reciprocal specimen.
 
 See the [Impedance Tube guide](impedance-tube.md) for usage.

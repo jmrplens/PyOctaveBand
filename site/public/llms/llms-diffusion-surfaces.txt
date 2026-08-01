@@ -198,7 +198,7 @@ at 10 m on the normal.
 
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diffusion_goniometer_geometry_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diffusion_goniometer_geometry.svg" alt="To-scale plan of the free-field diffusion goniometer: a semicircle of 37 microphone dots every 5 degrees at 5 m radius around the small sample at the centre, the red source star at 10 m on the normal above it, and the 10 m and 5 m distances dimensioned" width="88%"></picture>
 
-*The polar arc behind every `L_i` of Formula (5), to scale: 37 receivers every
+*The polar arc behind every $L_i$ of Formula (5), to scale: 37 receivers every
 5 degrees at 5 m, the source twice as far out on the normal, and the sample a
 sliver at the centre.*
 
@@ -218,22 +218,22 @@ plt.show()
 </details>
 
 The animation below runs that goniometer experiment numerically: the same
-plane wavefront hits a flat rigid panel and a Schroeder diffuser (an N = 7
+plane wavefront hits a flat rigid panel and a Schroeder diffuser (an $N = 7$
 quadratic-residue profile), and the scattered energy on the receiver arc turns
-a collimated specular beam (d = 0.32) into a wide fan (d = 0.63).
+a collimated specular beam ($d = 0.32$) into a wide fan ($d = 0.63$).
 
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anim_fdtd_diffusion_dark.gif"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anim_fdtd_diffusion.gif" alt="Animation: a 2D FDTD simulation of a plane wavefront hitting a flat rigid panel and a Schroeder quadratic-residue diffuser side by side; the flat panel throws a collimated specular beam back while the diffuser's phase-step wells spread the same energy into a wide fan, and the scattered field on a receiver arc yields diffusion coefficients of 0.32 versus 0.63" width="640" height="360" loading="lazy"></picture>
 
 [Watch the high-resolution video (WebM)](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anim_fdtd_diffusion.webm)
 
 The single-plane response below is the far-field prediction of a published
-diffuser geometry: an N = 7 quadratic-residue diffuser of 6 periods, 3.6 m
+diffuser geometry: an $N = 7$ quadratic-residue diffuser of 6 periods, 3.6 m
 total width and 0.2 m maximum well depth (the "N = 7 QRD, 6 periods, 0.2 m
 deep" row of Cox & D'Antonio, *Acoustic Absorbers and Diffusers*, 3rd ed.,
-Appendix B; the commercial N = 7 QRD measured by Hargreaves, Cox, Lam &
+Appendix B; the commercial $N = 7$ QRD measured by Hargreaves, Cox, Lam &
 D'Antonio, *J. Acoust. Soc. Am.* 108(4), 1710-1720, 2000, Table I) and its
 equal-footprint flat reference panel, at 1000 Hz, normal incidence, on the
-standard 37-point semicircle (5 deg spacing, -90 to +90 deg). The same model
+standard 37-point semicircle (5° spacing, $-90°$ to $+90°$). The same model
 levels drive the phonometry conformance suite as an arithmetic oracle for
 Formulas (5) and (7); the external third-party anchor checks the model's
 band-averaged normalised diffusion against the published Appendix B BEM table
@@ -427,7 +427,7 @@ A handful of design rules follow directly from the geometry:
 - **The design frequency sets the depth.** The deepest well is
   $d_{max} = \max(s_n)\,\lambda_0/(2N)$, close to half a wavelength for large
   $N$; halve $f_0$ and the diffuser gets twice as deep. This is the cost that
-  the [metadiffuser](https://jmrplens.github.io/phonometry/guides/metadiffusers/) attacks: at 500 Hz an N = 5 design
+  the [metadiffuser](https://jmrplens.github.io/phonometry/guides/metadiffusers/) attacks: at 500 Hz an $N = 5$ design
   already calls for wells 27.4 cm deep.
 - **The sequence repeats what the prime provides.** $s_n$ is symmetric about
   $n = 0$ and periodic in $N$, so one period has $N$ wells and the profile is
@@ -469,7 +469,7 @@ p(\theta) = F(\theta) \sum_n R_n \, e^{\,j k x_n (\sin\psi + \sin\theta)},
 $$
 
 with $x_n$ the well centre and $k = 2\pi f / c$. The predicted polar levels
-$L_i = 20\lg|p(\theta_i)|$ feed the same `directional_diffusion_coefficient` as
+$L_i = 20\log_{10}|p(\theta_i)|$ feed the same `directional_diffusion_coefficient` as
 a measurement.
 
 ```python
@@ -502,7 +502,7 @@ print(np.round(flat.normalized, 3))            # [0. 0. 0. 0.]
 
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diffuser_prediction_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diffuser_prediction.svg" alt="Predicted diffusion coefficient over the one-third-octave bands from 250 to 5000 Hz for an N = 7 quadratic residue diffuser design compared with a flat panel of the same footprint: the QRD curve sits well above the near-zero flat-panel curve across the band" width="88%"></picture>
 
-*Predicted from the design alone: the N = 7 QRD spreads the reflected energy
+*Predicted from the design alone: the $N = 7$ QRD spreads the reflected energy
 far more evenly than the flat panel of the same footprint, so its predicted
 diffusion coefficient sits well above the near-specular flat reference across
 the band. This is a far-field design estimate, not a substitute for an
@@ -626,7 +626,7 @@ no longer small against the wavelength; a frequency-blind single number
   108(4), 1710-1720.
   [doi:10.1121/1.1310192](https://doi.org/10.1121/1.1310192).
   The free-field diffusion-coefficient method behind ISO 17497-2; its Table I
-  documents the commercial N = 7 QRD geometry (0.2 m maximum well depth) used
+  documents the commercial $N = 7$ QRD geometry (0.2 m maximum well depth) used
   in the worked example above.
 - Audio Engineering Society. (2001). *AES information document for room
   acoustics and sound reinforcement systems — Characterization and
@@ -653,7 +653,7 @@ no longer small against the wavelength; a frequency-blind single number
 
 ISO 17497-1:2004+A1:2014 (scattering coefficient), ISO 17497-2:2012 (diffusion
 coefficient), and ISO 9613-1:1993, from which only the pure-tone attenuation
-coefficient α consumed by the ISO 17497-1 Clause 8 air-attenuation relations
+coefficient $\alpha$ consumed by the ISO 17497-1 Clause 8 air-attenuation relations
 (Eqs. (2)/(3)); the full atmospheric-absorption model is covered in
 [Outdoor Sound Propagation](https://jmrplens.github.io/phonometry/guides/outdoor-propagation/). Numerical conformance
 against the standards' worked examples and closed forms is tracked in
@@ -728,7 +728,7 @@ for a flat rigid strip ($R = 1$), the $+1$ state of ternary designs.
 
 ## 2. The published quadratic-residue metadiffuser
 
-The published design packs a whole N = 5 quadratic-residue diffuser into a
+The published design packs a whole $N = 5$ quadratic-residue diffuser into a
 35 cm x 2 cm panel: five slits, each loaded by two resonators, on a 7 cm
 pitch. Its first slit reaches critical coupling (the reflection zero the
 ternary `0` state is built from), and at the 2 kHz evaluation frequency the

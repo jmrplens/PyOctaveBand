@@ -79,20 +79,20 @@ acústica, y por eso el método la llama magnitud de semicampo libre. Un flujo d
 tráfico es una **línea fuente** incoherente, idealmente una por carril en el eje
 del carril.
 
-Para cada categoría de vehículo `m` y banda de octava `i`, la fórmula (2.2.1)
+Para cada categoría de vehículo $m$ y banda de octava $i$, la fórmula (2.2.1)
 convierte la potencia acústica de un vehículo en potencia por metro de línea:
 
 $$
-L'_{W,\mathrm{eq,line},i,m} = L_{W,i,m} + 10\,\lg\!\left(\frac{Q_m}{1000\,v_m}\right),
+L'_{W,\mathrm{eq,line},i,m} = L_{W,i,m} + 10\,\log_{10}\!\left(\frac{Q_m}{1000\,v_m}\right),
 $$
 
-con `Qm` en vehículos por hora y `vm` en km/h. La potencia del vehículo es a su
-vez la suma energética de un término de **rodadura** y otro de **propulsión**
+con $Q_m$ en vehículos por hora y $v_m$ en km/h. La potencia del vehículo es a
+su vez la suma energética de un término de **rodadura** y otro de **propulsión**
 (2.2.2), salvo para los vehículos de dos ruedas de la categoría 4, que no tienen
 rodadura alguna y se quedan solo con la propulsión (2.2.3):
 
 $$
-L_{W,i,m} = 10\,\lg\!\left(10^{L_{WR,i,m}/10} + 10^{L_{WP,i,m}/10}\right).
+L_{W,i,m} = 10\,\log_{10}\!\left(10^{L_{WR,i,m}/10} + 10^{L_{WP,i,m}/10}\right).
 $$
 
 La Tabla [2.2.a] fija cinco categorías modelizadas: **1** vehículos ligeros,
@@ -139,10 +139,11 @@ plt.show()
 ## 3. Ruido de rodadura (2.2.4 a 2.2.10)
 
 El ruido de rodadura es el ruido neumático-calzada. Crece logarítmicamente con
-la velocidad a partir de la velocidad de referencia `vref = 70 km/h`:
+la velocidad a partir de la velocidad de referencia
+$v_\mathrm{ref} = 70\ \text{km/h}$:
 
 $$
-L_{WR,i,m} = A_{R,i,m} + B_{R,i,m}\,\lg\!\left(\frac{v_m}{v_\mathrm{ref}}\right)
+L_{WR,i,m} = A_{R,i,m} + B_{R,i,m}\,\log_{10}\!\left(\frac{v_m}{v_\mathrm{ref}}\right)
              + \Delta L_{WR,i,m},
 $$
 
@@ -150,25 +151,27 @@ donde la corrección reúne cuatro efectos independientes (2.2.5): el pavimento,
 los neumáticos con clavos, el cruce y la temperatura del aire.
 
 La **temperatura del aire** (2.2.10) es una recta, aplicada por igual a las ocho
-bandas: `dLW,temp = Km (20 °C − tau)`, con `K1 = 0,08 dB/°C` para los ligeros y
-`K2 = K3 = 0,04 dB/°C` para las dos categorías pesadas. El aire frío endurece
+bandas: $\Delta L_{W,\mathrm{temp}} = K_m\,(20\ \text{°C} - \tau)$, con
+$K_1 = 0{,}08\ \text{dB/°C}$ para los ligeros y
+$K_2 = K_3 = 0{,}04\ \text{dB/°C}$ para las dos categorías pesadas. El aire frío endurece
 los neumáticos y hace más ruidosa la calzada, así que la corrección es
 *positiva* por debajo de 20 °C.
 
 Los **neumáticos con clavos** (2.2.6 a 2.2.9) solo se aplican a la categoría 1.
-El exceso por neumático `Dstud,i(v)` se satura por debajo de 50 km/h y por
-encima de 90 km/h, y la corrección de parque lo pondera por la fracción del año
-en que los clavos están en circulación, `ps = Qstud,ratio · Ts/12`:
+El exceso por neumático $D_{\mathrm{stud},i}(v)$ se satura por debajo de
+50 km/h y por encima de 90 km/h, y la corrección de parque lo pondera por la
+fracción del año en que los clavos están en circulación,
+$p_s = Q_{\mathrm{stud,ratio}} \cdot T_s/12$:
 
 $$
-\Delta L_{\mathrm{studded},i} = 10\,\lg\!\left[(1 - p_s) + p_s\,10^{D_{\mathrm{stud},i}/10}\right].
+\Delta L_{\mathrm{studded},i} = 10\,\log_{10}\!\left[(1 - p_s) + p_s\,10^{D_{\mathrm{stud},i}/10}\right].
 $$
 
-Los **cruces** (2.2.17) suman `CR,m,k · max(1 − |x|/100, 0)`, con `x` la
-distancia en metros al cruce más próximo y `k` el tipo de cruce: 1 para un cruce
-regulado por semáforo y 2 para una glorieta. Los coeficientes de rodadura `CR`
-son *negativos* (el tráfico junto a un cruce va más despacio) y los de
-propulsión `CP` positivos (va acelerando). Ambos se anulan a partir de 100 m.
+Los **cruces** (2.2.17) suman $C_{R,m,k} \cdot \max(1 - |x|/100,\ 0)$, con $x$
+la distancia en metros al cruce más próximo y $k$ el tipo de cruce: 1 para un
+cruce regulado por semáforo y 2 para una glorieta. Los coeficientes de rodadura
+$C_R$ son *negativos* (el tráfico junto a un cruce va más despacio) y los de
+propulsión $C_P$ positivos (va acelerando). Ambos se anulan a partir de 100 m.
 
 ## 4. Ruido de propulsión (2.2.11 a 2.2.16)
 
@@ -232,11 +235,11 @@ transcripción. Para los ligeros la rama de bajada **no lleva factor de
 velocidad**, mientras que las dos categorías pesadas sí lo llevan y con
 desplazamientos de velocidad distintos:
 
-| Categoría | Bajada (`s` por debajo del codo) | Banda plana | Subida |
+| Categoría | Bajada ($s$ por debajo del codo) | Banda plana | Subida |
 | :--- | :--- | :--- | :--- |
-| 1 | `(min(12 %, −s) − 6 %)/1 %` | −6 % a 2 % | `(min(12 %, s) − 2 %)/1,5 % · v/100` |
-| 2 | `(min(12 %, −s) − 4 %)/0,7 % · (v − 20)/100` | −4 % a 0 % | `min(12 %, s)/1 % · v/100` |
-| 3 | `(min(12 %, −s) − 4 %)/0,5 % · (v − 10)/100` | −4 % a 0 % | `min(12 %, s)/0,8 % · v/100` |
+| 1 | $(\min(12\ \%, -s) - 6\ \%)/1\ \%$ | −6 % a 2 % | $(\min(12\ \%, s) - 2\ \%)/1{,}5\ \% \cdot v/100$ |
+| 2 | $(\min(12\ \%, -s) - 4\ \%)/0{,}7\ \% \cdot (v - 20)/100$ | −4 % a 0 % | $\min(12\ \%, s)/1\ \% \cdot v/100$ |
+| 3 | $(\min(12\ \%, -s) - 4\ \%)/0{,}5\ \% \cdot (v - 10)/100$ | −4 % a 0 % | $\min(12\ \%, s)/0{,}8\ \% \cdot v/100$ |
 
 La categoría 4 no lleva corrección por pendiente. La pendiente se satura en el
 12 % en ambos sentidos. El ruido de bajada viene del freno motor y el de subida
@@ -246,13 +249,13 @@ divide el flujo en dos y corrige una mitad en subida y la otra en bajada.
 ## 5. El pavimento (2.2.19, 2.2.20 y Tabla F-4)
 
 La Tabla F-4 da, para el pavimento de referencia y para cada uno de los catorce
-pavimentos con nombre, un coeficiente por banda de octava `alpha` y un
-coeficiente de velocidad `beta`, por categoría de vehículo, con el rango de
+pavimentos con nombre, un coeficiente por banda de octava $\alpha$ y un
+coeficiente de velocidad $\beta$, por categoría de vehículo, con el rango de
 velocidad en que la fila se declara válida. El
 pavimento entra de forma distinta en cada término:
 
 $$
-\Delta L_{WR,\mathrm{road},i,m} = \alpha_{i,m} + \beta_m\,\lg\!\left(\frac{v_m}{v_\mathrm{ref}}\right),
+\Delta L_{WR,\mathrm{road},i,m} = \alpha_{i,m} + \beta_m\,\log_{10}\!\left(\frac{v_m}{v_\mathrm{ref}}\right),
 \qquad
 \Delta L_{WP,\mathrm{road},i,m} = \min\{\alpha_{i,m};\,0\}.
 $$
@@ -276,17 +279,17 @@ virtual de una mezcla bituminosa densa 0/11 y una mezcla bituminosa discontinua
 tipo SMA 0/11, de entre dos y siete años, en estado de mantenimiento
 representativo, seca, sin neumáticos con clavos, a 20 °C y en llano. Exactamente
 en esas condiciones toda corrección del 2.2 se anula de forma idéntica, así que
-a la velocidad de referencia `vm = vref = 70 km/h`, donde también se anulan los
-dos términos de velocidad, las potencias acústicas **son** los coeficientes
-`AR,i,m` y `AP,i,m` de la Tabla F-1.
+a la velocidad de referencia $v_m = v_\mathrm{ref} = 70\ \text{km/h}$, donde
+también se anulan los dos términos de velocidad, las potencias acústicas
+**son** los coeficientes $A_{R,i,m}$ y $A_{P,i,m}$ de la Tabla F-1.
 
 ## 6. Entregar la fuente a un modelo de propagación
 
 La etapa de emisión produce una potencia por metro. Trocear esa línea en fuentes
 puntuales equivalentes queda, en palabras del apartado 2.5.3, "fuera del alcance
 de la presente metodología": una fuente puntual que representa un tramo de
-longitud `dL` lleva simplemente `L'W,eq,line,i + 10 lg(dL)`, que es aritmética y
-se ofrece como tal.
+longitud $dL$ lleva simplemente $L'_{W,\mathrm{eq,line},i} + 10\log_{10}(dL)$, que
+es aritmética y se ofrece como tal.
 
 ```python
 from phonometry import (
@@ -380,4 +383,5 @@ fuente en fuentes puntuales lo declara fuera de alcance el propio método.
 - [Propagación del sonido en exteriores](/phonometry/es/guides/outdoor-propagation/):
   la cadena ISO 9613-2 que lleva una potencia de fuente hasta un receptor.
 - [Niveles de ruido ambiental](/phonometry/es/guides/environmental-levels/): los
-  indicadores Lden y Lnight para los que se trazan los mapas resultantes.
+  indicadores $L_{den}$ y $L_{night}$ para los que se trazan los mapas
+  resultantes.

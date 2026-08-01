@@ -4,24 +4,28 @@
 
 The airborne sound power a machine radiates through the structure-borne
 vibration of its outer surface can be estimated from the surface vibratory
-velocity and a **radiation factor** `ε` (the radiation efficiency), without an
+velocity and a **radiation factor** $\varepsilon$ (the radiation efficiency),
+without an
 acoustic measurement. The radiated power is (ISO/TS 7849-1, Formula 6)
 
 $$
 P = Z_c \, \langle v^2 \rangle \, S \, \varepsilon \quad [\mathrm{W}],
 $$
 
-with `Z_c` the characteristic impedance of air, `⟨v²⟩` the mean-square vibratory
-velocity over the radiating area `S`. Expressed in levels (velocity level re
-`v₀ = 5·10⁻⁸ m/s`), the A-weighted sound power level is (Formula 12 / 15)
+with $Z_c$ the characteristic impedance of air, $\langle v^2 \rangle$ the
+mean-square vibratory velocity over the radiating area $S$. Expressed in levels
+(velocity level re $v_0 = 5\times10^{-8}\ \text{m/s}$), the A-weighted sound
+power level is (Formula 12 / 15)
 
 $$
-L_W = L_v + 10\lg\frac{S}{S_0} + 10\lg\varepsilon
-      + 10\lg\frac{Z_{c,n}}{Z_{c,0}},
+L_W = L_v + 10\log_{10}\frac{S}{S_0} + 10\log_{10}\varepsilon
+      + 10\log_{10}\frac{Z_{c,n}}{Z_{c,0}},
 $$
 
-where `S₀ = 1 m²`, the normalized impedance `Z_{c,n} = 411 N·s/m³` and the
-reference `Z_{c,0} = 400 N·s/m³` give the fixed `10 lg(411/400) = 0.118 dB`
+where $S_0 = 1\ \text{m}^2$, the normalized impedance
+$Z_{c,n} = 411\ \text{N·s/m}^3$ and the reference
+$Z_{c,0} = 400\ \text{N·s/m}^3$ give the fixed
+$10\log_{10}(411/400) = 0.118\ \text{dB}$
 term. This module feeds the structure-borne source and building prediction
 standards (ISO 9611, EN 15657, EN 12354-5).
 
@@ -33,8 +37,8 @@ that supplies a predicted radiation factor retains its geometry, and
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/radiation_plate_geometry_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/radiation_plate_geometry.svg" alt="To-scale front view of the plate of the radiation model: a grey 1.5 m by 1.25 m simply supported plate inside its hatched rigid baffle, both side lengths dimensioned and the boundary condition named in the title" width="82%"></picture>
 
 *The radiator behind the radiation factor, to scale: the 1.5 m by 1.25 m
-simply supported plate in its rigid baffle, whose area `S` enters `L_W`
-directly while its size decides how far `ε` falls below one under
+simply supported plate in its rigid baffle, whose area $S$ enters $L_W$
+directly while its size decides how far $\varepsilon$ falls below one under
 coincidence.*
 
 <details>
@@ -94,9 +98,10 @@ plt.show()
 ## 1. The two parts
 
 The two parts differ only in the radiation factor. **Part 1 (survey)** assumes
-`ε = 1` and yields the *upper limit* `L_W,max`, needing only the velocity level
-and the area. **Part 2 (engineering)** applies a frequency-band radiation factor
-`εⱼ` determined (per ISO 9614) as `εⱼ = Pⱼ/(Z_{c,n}·⟨vⱼ²⟩·S)`.
+$\varepsilon = 1$ and yields the *upper limit* $L_{W,\max}$, needing only the
+velocity level and the area. **Part 2 (engineering)** applies a frequency-band
+radiation factor $\varepsilon_j$ determined (per ISO 9614) as
+$\varepsilon_j = P_j/(Z_{c,n}\,\langle v_j^2 \rangle\,S)$.
 
 ```python
 import numpy as np
@@ -119,9 +124,10 @@ eng.plot()   # the LW(f) spectrum, as in the figure above (needs matplotlib)
 
 ## 2. Velocity level, calibration and the radiation factor
 
-The velocity level is `L_v = 20·lg(v/v₀)` (Formula 3); a sinusoidal calibration
-acceleration converts as `L_v = 20·lg(â/(2πf·v₀·√2))` (Formula 8). The radiation
-factor comes from an independently measured power:
+The velocity level is $L_v = 20\log_{10}(v/v_0)$ (Formula 3); a sinusoidal
+calibration acceleration converts as
+$L_v = 20\log_{10}\!\left(\hat{a}/(2\pi f\,v_0\sqrt{2})\right)$ (Formula 8). The
+radiation factor comes from an independently measured power:
 
 ```python
 from phonometry import emission
@@ -139,9 +145,9 @@ mean `mean_velocity_level` (Formula 10) or its area-weighted form (Formula 11),
 and the correction `extraneous_velocity_correction` removes extraneous
 vibration per Table 2.
 
-Those positions are not free: the standard divides the radiating surface `S`
-into `N` equal cells and puts one accelerometer at the centre of each. The
-area table gives the initial `N`; a strongly non-uniform vibration field can
+Those positions are not free: the standard divides the radiating surface $S$
+into $N$ equal cells and puts one accelerometer at the centre of each. The
+area table gives the initial $N$; a strongly non-uniform vibration field can
 call for more positions or a redistribution.
 
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_vibration_sound_power_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_vibration_sound_power.svg" alt="ISO/TS 7849 surface-velocity method: a machine under test with its vibrating measurement surface of 2.5 by 1.6 metres divided into twenty equal cells, an accelerometer at each cell centre, the radiated airborne sound leaving the surface, the table for the initial number of measurement positions and the survey relation LWA = LvA + 10 lg(S/S0) + 10 lg epsilon" width="92%"></picture>
@@ -149,11 +155,13 @@ call for more positions or a redistribution.
 ## 3. When the radiation-factor assumption breaks
 
 The whole method stands on one substitution: replacing the acoustic
-measurement by `ε`. The Part 1 value `ε = 1` is close to the true radiation
+measurement by $\varepsilon$. The Part 1 value $\varepsilon = 1$ is close to
+the true radiation
 factor only above the **critical (coincidence) frequency** of plate-like
 parts, where bending waves travel faster than sound and the surface radiates
 like a piston. Below coincidence, adjacent zones of the
-plate move in antiphase and their radiation largely cancels: `ε` drops far
+plate move in antiphase and their radiation largely cancels: $\varepsilon$
+drops far
 below one and falls quickly with decreasing frequency, so the survey method
 can overstate the low-frequency bands of a large thin casing by 10 dB and
 more. The same cancellation makes small sources radiate poorly (the acoustic
@@ -161,7 +169,8 @@ short circuit around an unbaffled panel). Two further assumptions are easy
 to violate in the field:
 
 * **The measured vibration must be the machine's own.** Vibration fed in
-  from neighbouring machinery inflates `⟨v²⟩`; Table 2 prescribes the
+  from neighbouring machinery inflates $\langle v^2 \rangle$; Table 2
+  prescribes the
   source-off check and `extraneous_velocity_correction` applies it.
 * **The surface must be the dominant radiator.** Airborne sound from
   openings, intakes or internal sources that bypasses the measured casing is
@@ -169,8 +178,9 @@ to violate in the field:
   structure-borne part only.
 
 Part 2 exists exactly for the radiation-factor problem: it replaces the
-fixed `ε = 1`
-with a band-by-band `εⱼ` determined from one reference measurement of the
+fixed $\varepsilon = 1$
+with a band-by-band $\varepsilon_j$ determined from one reference measurement
+of the
 radiated power (ISO 9614 intensity), after which the velocity survey can be
 repeated cheaply on nominally identical machines.
 
@@ -179,22 +189,23 @@ repeated cheaply on nominally identical machines.
 A determination ends as a *document*. `VibrationSoundPowerResult.report(path)`
 writes a one-page PDF fiche laid out like a sound-power test sheet: the
 standard-basis line naming the applied method (the ISO/TS 7849-1 survey method
-with a fixed radiation factor `ε = 1`, or the ISO/TS 7849-2 engineering method
+with a fixed radiation factor $\varepsilon = 1$, or the ISO/TS 7849-2
+engineering method
 with a determined radiation factor), an optional metadata header (client,
 machine/source, test environment, instrumentation, climate, date), a per-band
 table (nominal octave/one-third-octave frequency, the surface vibratory
-velocity level `Lv` and the band sound-power level `LW`), the sound-power
-spectrum `LW(f)` with a nominal band axis, and a boxed A-weighted sound power
-level `LWA` (dB re 1 pW) with the total `LW`, the radiating area `S` and the
+velocity level $L_v$ and the band sound-power level $L_W$), the sound-power
+spectrum $L_W(f)$ with a nominal band axis, and a boxed A-weighted sound power
+level $L_{WA}$ (dB re 1 pW) with the total $L_W$, the radiating area $S$ and the
 applied method alongside.
 
 The relevant `ReportMetadata` fields are `client`, `specimen` (the
 machine/source), `test_room` (the test environment), `instrumentation`,
 `temperature`, `relative_humidity`, `pressure`, `test_date` and the footer
 identity `laboratory`, `operator`, `report_id` and `notes`; the radiating area
-`S` comes from the result itself. Supplying `requirement` adds a PASS/FAIL
+$S$ comes from the result itself. Supplying `requirement` adds a PASS/FAIL
 verdict against a declared A-weighted sound-power limit (lower is better).
-`verbose=True` adds the radiation factor `ε` column, and `language="es"`
+`verbose=True` adds the radiation factor $\varepsilon$ column, and `language="es"`
 renders the Spanish fiche (comma decimals). Rendering needs the optional
 `phonometry[report]` extra (reportlab), plus matplotlib for the spectrum.
 
@@ -245,7 +256,7 @@ factor and the boxed LWA.*
   vibration measurement — Part 1: Survey method using a fixed radiation
   factor* (ISO/TS 7849-1:2009).
   [iso.org catalogue](https://www.iso.org/standard/40537.html).
-  The upper-limit method with `ε = 1`.
+  The upper-limit method with $\varepsilon = 1$.
 - International Organization for Standardization. (2009). *Acoustics —
   Determination of airborne sound power levels emitted by machinery using
   vibration measurement — Part 2: Engineering method including determination
@@ -259,9 +270,10 @@ ISO/TS 7849-1:2009 (*survey method using a fixed radiation
 factor*) and ISO/TS 7849-2:2009 (*engineering method including determination of
 the adequate radiation factor*), *Acoustics — Determination of airborne sound
 power levels emitted by machinery using vibration measurement*: the radiated
-power `P = Z_c⟨v²⟩Sε` (Formula 6), the velocity level and its calibration
+power $P = Z_c \, \langle v^2 \rangle \, S \, \varepsilon$ (Formula 6), the
+velocity level and its calibration
 (Formulae 3, 8), the mean over the surface (Formulae 10/11), the extraneous
 correction (Table 2), the radiation factor (Formula 4/8) and the sound power
 level (Formulae 12/15). Conformance is anchored on the standard's own worked
 calibration example, the exact round-trip between the radiation factor and
-`L_W = 10 lg(P/P₀)`, and the fixed impedance term.
+$L_W = 10\log_{10}(P/P_0)$, and the fixed impedance term.

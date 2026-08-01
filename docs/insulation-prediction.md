@@ -180,8 +180,8 @@ imp.plot()   # the Formula (21) terms as bars: Ln,w,eq - dLw + K -> L'n,w (needs
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/impact_prediction_terms_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/impact_prediction_terms.svg" alt="The EN 12354-2 Annex E.3 impact prediction as its Formula 21 terms: the bare-floor equivalent level of 76.2 dB, the minus 33 dB floating-floor improvement, the plus 2 dB flanking correction, and the resulting predicted apparent impact level of 45.2 dB" width="80%"></picture>
 
 *The whole EN 12354-2 simplified model is one subtraction: the massive bare
-floor starts at `Ln,w,eq = 76.2 dB`, the floating floor buys back 33 dB,
-and the flanking correction returns 2 dB, landing at `L'n,w = 45 dB`.*
+floor starts at $L_{n,w,eq} = 76.2$ dB, the floating floor buys back 33 dB,
+and the flanking correction returns 2 dB, landing at $L'_{n,w} = 45$ dB.*
 
 <details>
 <summary>Show the code for this figure</summary>
@@ -217,7 +217,7 @@ plt.show()
 </details>
 
 The airborne counterpart of that closure is Formula (5b),
-$D_{nT} = R' + 10\lg(0.32\,V/S_s)$, exposed as `standardized_level_difference`;
+$D_{nT} = R' + 10\log_{10}(0.32\,V/S_s)$, exposed as `standardized_level_difference`;
 it closes the Annex H.3 example (`standardized_level_difference(52.2, 50.0,
 11.5)` gives 53.6 dB, the printed $V/(3S)$ chain 53.8 dB, both rounding to
 $D_{nT,w} = 54$ dB).
@@ -236,15 +236,15 @@ element.
 | Parameter | Type | Units | Range / default | Notes |
 | :--- | :--- | :--- | :--- | :--- |
 | `junction_type` | str | — | `'rigid_cross'` / `'rigid_t'` / `'flexible_t'` / `'lightweight_facade'` / `'lightweight_double_homogeneous'` / `'lightweight_double_coupled'` / `'corner'` / `'thickness_change'` | Junction geometry (Annex E.3-E.9) |
-| `path` | str | — | `'through'` (K13) / `'corner'` (K12 = K23) / `'double_leaf'` (K24) | Path branch |
-| `mass_ratio` | float | — | > 0 | `m'⊥,i / m'i` (Formula E.2) |
+| `path` | str | — | `'through'` ($K_{13}$) / `'corner'` ($K_{12} = K_{23}$) / `'double_leaf'` ($K_{24}$) | Path branch |
+| `mass_ratio` | float | — | > 0 | $m'_{\perp,i}/m'_i$ (Formula E.2) |
 | `frequency` | float | Hz | default `500` | `flexible_t` and the E.7/E.8 double-leaf junctions are frequency-dependent |
 | `r_flanking` / `r_separating` | float | dB | — | Weighted indices of the flanking / separating element |
-| `k_ff` / `k_fd` / `k_df` | float | dB | — | Junction `Kij` for the three paths |
-| `separating_area` | float | m² | > 0 | Separating-element area `Ss` |
-| `coupling_length` | float | m | > 0 | Junction coupling length `lf` |
+| `k_ff` / `k_fd` / `k_df` | float | dB | — | Junction $K_{ij}$ for the three paths |
+| `separating_area` | float | m² | > 0 | Separating-element area $S_s$ |
+| `coupling_length` | float | m | > 0 | Junction coupling length $l_f$ |
 | `delta_r_ff` / `delta_r_fd` / `delta_r_df` | float | dB | default `0` | Lining improvements per path |
-| `flanking_area` | float | m² | default `None` | Flanking-element area `SF`; enables the automatic `Kij,min` clamp (Clause 4.4.2 / Formula 29) |
+| `flanking_area` | float | m² | default `None` | Flanking-element area $S_F$; enables the automatic $K_{ij,\min}$ clamp (Clause 4.4.2 / Formula 29) |
 
 ### `flanking_path()` parameters
 
@@ -254,8 +254,8 @@ element.
 | `kind` | str | — | `'Ff'` / `'Df'` / `'Fd'` | Which flanking branch the path is |
 | `r_source` / `r_receive` | float | dB | — | Weighted indices of the source-side / receive-side elements |
 | `k_ij` | float | dB | — | Junction vibration-reduction index for this path |
-| `separating_area` | float | m² | > 0 | Separating-element area `Ss` |
-| `coupling_length` | float | m | > 0 | Junction coupling length `lf` |
+| `separating_area` | float | m² | > 0 | Separating-element area $S_s$ |
+| `coupling_length` | float | m | > 0 | Junction coupling length $l_f$ |
 | `delta_r` | float | dB | default `0` | Lining improvement on this path |
 | `kij_min` | float | dB | default `None` | When given, `k_ij` is floored at this Formula (29) minimum |
 
@@ -274,9 +274,9 @@ the flanking transmission across the junctions; the sheet states this
 explicitly and is labelled a prediction, never a measurement.
 `AirbornePredictionResult.report()` renders the predicted apparent sound
 reduction index fiche (the transmission-path table beside the per-path
-share-of-energy plot, the boxed `R'w`); `ImpactPredictionResult.report()`
+share-of-energy plot, the boxed $R'_w$); `ImpactPredictionResult.report()`
 renders the predicted apparent impact-level fiche (the Formula (21) term table
-beside the term plot, the boxed `L'n,w`). Each names EN/ISO 12354-1/-2 and the
+beside the term plot, the boxed $L'_{n,w}$). Each names EN/ISO 12354-1/-2 and the
 ISO 717 rating part in its basis line, prints the model's ~2 dB standard
 deviation and, when a `requirement` is supplied, adds a PASS/FAIL verdict
 (airborne passes at or above it, impact at or below it). `verbose=True` annexes
@@ -351,13 +351,13 @@ member of the family is EN 12354-6.
 - [Field Insulation Measurement (ISO 16283)](insulation-field.md):
   the measured in-situ quantities the prediction is checked against.
 - [Insulation Ratings (ISO 717)](insulation-ratings.md): the reference-curve
-  engine behind the predicted R'w and L'n,w.
+  engine behind the predicted $R'_w$ and $L'_{n,w}$.
 - [Laboratory Insulation Measurement](insulation-lab.md): the
   ISO 10140 ratings the model consumes.
 - [Laboratory Flanking Transmission (ISO 10848)](flanking-lab.md): the
-  measured junction vibration reduction index Kij the model consumes.
+  measured junction vibration reduction index $K_{ij}$ the model consumes.
 - [Sound absorption in enclosed spaces (EN 12354-6)](enclosed-space-absorption.md):
   the absorption member of the same EN 12354 family.
 - [Dynamic stiffness of resilient materials (EN 29052-1)](dynamic-stiffness.md):
-  the s' input to the EN 12354-2 floating-floor term.
+  the $s'$ input to the EN 12354-2 floating-floor term.
 - API reference: [`building.building_prediction`](https://jmrplens.github.io/phonometry/reference/api/building/building-prediction/) and [`building.facade_prediction`](https://jmrplens.github.io/phonometry/reference/api/building/facade-prediction/).

@@ -31,7 +31,8 @@ import ReportPreview from '../../../../components/ReportPreview.astro';
 
 La potencia acústica aérea que una máquina radia a través de la vibración
 estructural de su superficie exterior puede estimarse a partir de la velocidad
-vibratoria de la superficie y un **factor de radiación** `ε` (la eficiencia de
+vibratoria de la superficie y un **factor de radiación** $\varepsilon$ (la
+eficiencia de
 radiación), sin una medición acústica. La potencia radiada es (ISO/TS 7849-1,
 Fórmula 6)
 
@@ -39,19 +40,22 @@ $$
 P = Z_c \, \langle v^2 \rangle \, S \, \varepsilon \quad [\mathrm{W}],
 $$
 
-con `Z_c` la impedancia característica del aire y `⟨v²⟩` la velocidad vibratoria
-cuadrática media sobre el área radiante `S`. Expresada en niveles (nivel de
-velocidad re `v₀ = 5·10⁻⁸ m/s`), el nivel de potencia acústica con ponderación A es
+con $Z_c$ la impedancia característica del aire y $\langle v^2 \rangle$ la
+velocidad vibratoria cuadrática media sobre el área radiante $S$. Expresada en
+niveles (nivel de velocidad re $v_0 = 5\times10^{-8}\ \text{m/s}$), el nivel de
+potencia acústica con ponderación A es
 (Fórmula 12 / 15)
 
 $$
-L_W = L_v + 10\lg\frac{S}{S_0} + 10\lg\varepsilon
-      + 10\lg\frac{Z_{c,n}}{Z_{c,0}},
+L_W = L_v + 10\log_{10}\frac{S}{S_0} + 10\log_{10}\varepsilon
+      + 10\log_{10}\frac{Z_{c,n}}{Z_{c,0}},
 $$
 
-donde `S₀ = 1 m²`, la impedancia normalizada `Z_{c,n} = 411 N·s/m³` y la de
-referencia `Z_{c,0} = 400 N·s/m³` dan el término fijo `10 lg(411/400) =
-0,118 dB`. Este módulo alimenta las normas de fuente estructural y de predicción
+donde $S_0 = 1\ \text{m}^2$, la impedancia normalizada
+$Z_{c,n} = 411\ \text{N·s/m}^3$ y la de referencia
+$Z_{c,0} = 400\ \text{N·s/m}^3$ dan el término fijo
+$10\log_{10}(411/400) = 0{,}118\ \text{dB}$.
+Este módulo alimenta las normas de fuente estructural y de predicción
 en edificación (ISO 9611, EN 15657, EN 12354-5).
 
 Antes que los niveles, el propio radiador. El modelo de placa de
@@ -124,9 +128,10 @@ plt.show()
 
 Las dos partes difieren solo en el factor de radiación. La **Parte 1** (*survey
 method*, sin versión en español)
-asume `ε = 1` y da el *límite superior* `L_W,max`, necesitando solo el nivel de
-velocidad y el área. La **Parte 2 (ingeniería)** aplica un factor de radiación
-por banda `εⱼ` determinado (según ISO 9614) como `εⱼ = Pⱼ/(Z_{c,n}·⟨vⱼ²⟩·S)`.
+asume $\varepsilon = 1$ y da el *límite superior* $L_{W,\max}$, necesitando
+solo el nivel de velocidad y el área. La **Parte 2 (ingeniería)** aplica un
+factor de radiación por banda $\varepsilon_j$ determinado (según ISO 9614) como
+$\varepsilon_j = P_j/(Z_{c,n}\,\langle v_j^2 \rangle\,S)$.
 
 ```python
 import numpy as np
@@ -149,8 +154,9 @@ eng.plot()   # el espectro LW(f), como en la figura de arriba (requiere matplotl
 
 ## 2. Nivel de velocidad, calibración y factor de radiación
 
-El nivel de velocidad es `L_v = 20·lg(v/v₀)` (Fórmula 3); una aceleración de
-calibración sinusoidal se convierte como `L_v = 20·lg(â/(2πf·v₀·√2))`
+El nivel de velocidad es $L_v = 20\log_{10}(v/v_0)$ (Fórmula 3); una aceleración de
+calibración sinusoidal se convierte como
+$L_v = 20\log_{10}\!\left(\hat{a}/(2\pi f\,v_0\sqrt{2})\right)$
 (Fórmula 8). El factor de radiación procede de una potencia medida de forma
 independiente:
 
@@ -170,9 +176,9 @@ media energética `mean_velocity_level` (Fórmula 10) o su forma ponderada por �
 (Fórmula 11), y la corrección `extraneous_velocity_correction` elimina la
 vibración extraña según la Tabla 2.
 
-Esas posiciones no son libres: la norma divide la superficie radiante `S` en
-`N` celdas iguales y coloca un acelerómetro en el centro de cada una. La
-tabla por área da el `N` inicial; un campo de vibración muy poco uniforme
+Esas posiciones no son libres: la norma divide la superficie radiante $S$ en
+$N$ celdas iguales y coloca un acelerómetro en el centro de cada una. La
+tabla por área da el $N$ inicial; un campo de vibración muy poco uniforme
 puede exigir más posiciones o redistribuirlas.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_vibration_sound_power_es.svg" alt="Método de velocidad superficial de ISO/TS 7849: una máquina en ensayo con su superficie de medición vibrante de 2,5 por 1,6 metros dividida en veinte celdas iguales, un acelerómetro en el centro de cada celda, el sonido aéreo radiado saliendo de la superficie, la tabla del número inicial de posiciones de medida y la relación de control LWA = LvA + 10 lg(S/S0) + 10 lg épsilon" width="92%" />
@@ -180,19 +186,22 @@ puede exigir más posiciones o redistribuirlas.
 ## 3. Cuándo se rompe la hipótesis del factor de radiación
 
 Todo el método descansa en una sustitución: reemplazar la medición acústica
-por `ε`. El valor `ε = 1` de la Parte 1 solo se acerca al factor de
+por $\varepsilon$. El valor $\varepsilon = 1$ de la Parte 1 solo se acerca al
+factor de
 radiación real por encima de la **frecuencia crítica (de coincidencia)** de
 las partes tipo placa, donde las ondas de flexión viajan más rápido que el
 sonido y la superficie radia como un pistón. Por debajo de la coincidencia,
 zonas adyacentes de la placa se mueven en contrafase y su radiación se
-cancela en gran medida: `ε` cae muy por debajo de uno y baja deprisa al bajar
+cancela en gran medida: $\varepsilon$ cae muy por debajo de uno y baja deprisa
+al bajar
 la frecuencia, de modo que el método de control puede sobrestimar las bandas
 graves de una carcasa grande y delgada en 10 dB o más. La misma cancelación hace que las fuentes pequeñas
 radien mal (el cortocircuito acústico alrededor de un panel sin bafle). Otras
 dos hipótesis son fáciles de violar en campo:
 
 * **La vibración medida debe ser la de la propia máquina.** La vibración que
-  entra desde la maquinaria vecina infla `⟨v²⟩`; la Tabla 2 prescribe la
+  entra desde la maquinaria vecina infla $\langle v^2 \rangle$; la Tabla 2
+  prescribe la
   comprobación con la fuente parada y `extraneous_velocity_correction` la
   aplica.
 * **La superficie debe ser el radiador dominante.** El sonido aéreo de
@@ -201,7 +210,8 @@ dos hipótesis son fáciles de violar en campo:
   parte estructural.
 
 La Parte 2 existe exactamente para el problema del factor de radiación:
-sustituye el `ε = 1` fijo por un `εⱼ` banda a banda determinado a partir de una medición de
+sustituye el $\varepsilon = 1$ fijo por un $\varepsilon_j$ banda a banda
+determinado a partir de una medición de
 referencia de la potencia radiada (intensidad ISO 9614), tras lo cual la
 medición de velocidad puede repetirse a bajo coste en máquinas nominalmente
 idénticas.
@@ -212,7 +222,8 @@ Una determinación termina como un *documento*. El `VibrationSoundPowerResult`
 expone un método `.report()` que escribe una ficha PDF de una página con el
 formato de una hoja de ensayo de potencia acústica: la línea de base normativa
 que nombra el método aplicado (el método de control de la ISO/TS 7849-1 con un
-factor de radiación fijo `ε = 1`, o el método de ingeniería de la ISO/TS
+factor de radiación fijo $\varepsilon = 1$, o el método de ingeniería de la
+ISO/TS
 7849-2 con un factor de radiación determinado), una cabecera de metadatos
 opcional (cliente, máquina/fuente, entorno de ensayo, instrumentación, clima,
 fecha), una tabla por bandas (frecuencia nominal de octava/tercio de octava, el
@@ -229,7 +240,7 @@ ensayo** (`test_room`), el **cliente**, la **instrumentación**, la
 de ensayo** (`test_date`) y la identidad del pie (`laboratory`, `operator`,
 `report_id`, `notes`); el área radiante $S$ procede del propio resultado y se
 imprime en el recuadro, junto con la relación de potencia acústica
-$L_W = L_v + 10\lg(S/S_0) + 10\lg\varepsilon + 10\lg(Z_{c,n}/Z_{c,0})$ en la
+$L_W = L_v + 10\log_{10}(S/S_0) + 10\log_{10}\varepsilon + 10\log_{10}(Z_{c,n}/Z_{c,0})$ en la
 tira de base. Aportar `requirement` añade un veredicto APTO/NO APTO frente a un
 límite de potencia acústica ponderado A declarado (una emisión de potencia
 acústica es una magnitud en la que menos es mejor, así que la fuente cumple en
@@ -277,7 +288,8 @@ el repositorio; pulsa la vista previa para abrir el PDF.
 
 **Cubierto.** La ISO/TS 7849-1:2009 y la ISO/TS 7849-2:2009 en lo que
 definen el cálculo de la potencia acústica a partir de la vibración: la
-potencia radiada `P = Z_c⟨v²⟩Sε` (Fórmula 6), el nivel de velocidad y su
+potencia radiada $P = Z_c \, \langle v^2 \rangle \, S \, \varepsilon$
+(Fórmula 6), el nivel de velocidad y su
 conversión de calibración (Fórmulas 3, 8) que ejecutan `velocity_level` y
 `velocity_level_from_acceleration`, la media sobre la superficie (Fórmulas
 10/11) que ejecuta `mean_velocity_level`, la corrección por vibración
@@ -287,7 +299,7 @@ Parte 1) o con un factor de radiación medido por banda (Fórmula 15, Parte 2)
 que ejecutan `radiated_sound_power_level` y `sound_power_from_vibration`.
 `radiation_factor` implementa la Fórmula 8 de la Parte 2 para una sola
 máquina, que convierte una potencia acústica medida de forma independiente
-en `ε`.
+en $\varepsilon$.
 
 **No cubierto.** Los apartados de procedimiento de medición de ambas partes
 (instrumentación, instalación de la fuente, el número y montaje de las
@@ -295,9 +307,10 @@ posiciones de medición, las condiciones ambientales: apartados 5 a 7) y sus
 apartados de incertidumbre de medida y anexos informativos no están
 implementados: son práctica de laboratorio que esta guía asume. El apartado
 8 de la Parte 2 pide además el factor de radiación de un lote o familia de
-máquinas, promediando `εⱼ` sobre varias máquinas y su desviación estándar
-(Fórmulas 9, 10); solo está implementada la Fórmula 8 de una sola máquina,
-así que pasa un `ε` ya promediado para una determinación de familia. La
+máquinas, promediando $\varepsilon_j$ sobre varias máquinas y su desviación
+estándar (Fórmulas 9, 10); solo está implementada la Fórmula 8 de una sola
+máquina, así que pasa un $\varepsilon$ ya promediado para una determinación de
+familia. La
 potencia acústica que alimenta a `radiation_factor` debe proceder de una
 medición de intensidad según la ISO 9614, cubierta aparte en la
 [guía de intensidad acústica](/phonometry/es/guides/intensity/).

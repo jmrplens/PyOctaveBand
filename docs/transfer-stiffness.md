@@ -3,9 +3,10 @@
 # Dynamic transfer stiffness of resilient elements (ISO 10846)
 
 The vibro-acoustic transfer property of a resilient element (a vibration
-isolator, mount, bellows or hose) is its **dynamic transfer stiffness** `k₂₁`,
-the frequency-dependent ratio of the *blocking force* on the output (receiver)
-side to the displacement on the input (source) side (ISO 10846-1, 3.7):
+isolator, mount, bellows or hose) is its **dynamic transfer stiffness**
+$k_{2,1}$, the frequency-dependent ratio of the *blocking force* on the output
+(receiver) side to the displacement on the input (source) side
+(ISO 10846-1, 3.7):
 
 $$
 k_{2,1} = \frac{F_{2,b}}{u_1} \quad [\mathrm{N/m}].
@@ -13,9 +14,9 @@ $$
 
 Because a vibration isolator is only effective between structures of large
 driving-point stiffness, the force it delivers to the receiver approximates this
-blocking force (ISO 10846-1, Eq. 7), so `k₂₁` is the quantity that characterises
-the isolator's transmission. `k₂₁` feeds the structure-borne source and building
-prediction standards: ISO 9611, EN 15657 and EN 12354-5.
+blocking force (ISO 10846-1, Eq. 7), so $k_{2,1}$ is the quantity that
+characterises the isolator's transmission. $k_{2,1}$ feeds the structure-borne
+source and building prediction standards: ISO 9611, EN 15657 and EN 12354-5.
 
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/transfer_stiffness_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/transfer_stiffness.svg" alt="Dynamic transfer stiffness level of a Kelvin-Voigt isolator: the true level (flat at 120 dB, rising with the damping term at high frequency) and the indirect-method estimate, which diverges at the mass/spring resonance where the transmissibility is not small and converges to the true level above three times the resonance" width="82%"></picture>
 
@@ -59,13 +60,13 @@ plt.show()
 
 ## 1. The transfer-stiffness level and loss factor
 
-Results are reported as a **level** re the reference stiffness `k₀ = 1 N/m`
-(ISO 10846-2 and -3, 3.17), and in the low-frequency range where inertial forces
-in the element are negligible the **loss factor** is the tangent of the phase
-angle of `k₂₁` (ISO 10846-1, 3.8):
+Results are reported as a **level** re the reference stiffness
+$k_0 = 1\ \text{N/m}$ (ISO 10846-2 and -3, 3.17), and in the low-frequency range
+where inertial forces in the element are negligible the **loss factor** is the
+tangent of the phase angle of $k_{2,1}$ (ISO 10846-1, 3.8):
 
 $$
-L_k = 10\lg\frac{|k_{2,1}|^2}{k_0^2} = 20\lg\frac{|k_{2,1}|}{k_0}, \qquad
+L_k = 10\log_{10}\frac{|k_{2,1}|^2}{k_0^2} = 20\log_{10}\frac{|k_{2,1}|}{k_0}, \qquad
 \eta = \frac{\mathrm{Im}(k_{2,1})}{\mathrm{Re}(k_{2,1})}.
 $$
 
@@ -94,17 +95,17 @@ known mass:
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_transfer_stiffness_rig_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_transfer_stiffness_rig.svg" alt="ISO 10846 transfer-stiffness rigs: the isolator under test between a driven excitation mass and either a blocked output with a force transducer, the direct method, or a resiliently supported blocking mass, the indirect method" width="92%"></picture>
 
 The **direct method** (ISO 10846-2) measures the blocked output force and the
-input displacement, `k₂₁ = F₂,b/u₁`. The **indirect method** (ISO 10846-3) loads
-the output with a compact blocking mass `m₂` and measures the vibration
-transmissibility `T = u₂/u₁`; the blocking force is then the inertia force of the
-mass (ISO 10846-3, Eq. 1):
+input displacement, $k_{2,1} = F_{2,b}/u_1$. The **indirect method**
+(ISO 10846-3) loads the output with a compact blocking mass $m_2$ and measures
+the vibration transmissibility $T = u_2/u_1$; the blocking force is then the
+inertia force of the mass (ISO 10846-3, Eq. 1):
 
 $$
 k_{2,1} = -(2\pi f)^2\,(m_2 + m_f)\,T \qquad (T \ll 1),
 $$
 
-with `m_f` the mass of the output flange. The approximation is valid well above
-the mass/spring resonance, where `T` is small.
+with $m_f$ the mass of the output flange. The approximation is valid well above
+the mass/spring resonance, where $T$ is small.
 
 ```python
 import numpy as np
@@ -123,7 +124,7 @@ print(round(float(res.level[-1]), 1))      # ~126  dB re 1 N/m (high-f)
 res.plot()   # the Lk(f) level spectrum, as in the figure above (needs matplotlib)
 ```
 
-The `TransferStiffnessResult` carries the complex `k₂₁` and exposes `.level`,
+The `TransferStiffnessResult` carries the complex $k_{2,1}$ and exposes `.level`,
 `.loss_factor`, `.magnitude`, `.to("impedance"/"apparent_mass")` and `.plot()`.
 
 **Test-report fiche.** `TransferStiffnessResult.report(path)` renders a one-page
@@ -131,14 +132,14 @@ dynamic-transfer-stiffness characterisation report for a resilient element
 (ISO 10846-1:2008 definition; determined by the direct method, ISO 10846-2:2008,
 or the indirect blocking-mass method, ISO 10846-3:2002). The transfer stiffness
 is a continuous frequency-response function, not an octave-band quantity, so the
-sheet presents it honestly as the `L_k(f)` level spectrum plus a compact table
+sheet presents it honestly as the $L_k(f)$ level spectrum plus a compact table
 of characteristic points (the determination method, the blocking mass for the
 indirect method, the frequency range, and the low-frequency stiffness plateau
-`|k₂₁|`, its level `L_k` and the loss factor there), and a boxed low-frequency
-`L_k` (the plateau that characterises the element below its internal
-resonances). It is a characterisation, so there is no pass/fail verdict;
-`language="es"` renders the Spanish fiche. The fiche always embeds the `L_k(f)`
-spectrum, so it needs both the report and plot extras
+$|k_{2,1}|$, its level $L_k$ and the loss factor there), and a boxed
+low-frequency $L_k$ (the plateau that characterises the element below its
+internal resonances). It is a characterisation, so there is no pass/fail
+verdict; `language="es"` renders the Spanish fiche. The fiche always embeds the
+$L_k(f)$ spectrum, so it needs both the report and plot extras
 (`pip install "phonometry[report,plot]"`).
 
 [![ISO 10846 dynamic-transfer-stiffness example report: a metadata header, a table of the FRF characteristic points (method, frequency range and low-frequency stiffness, level and loss factor) beside the transfer-stiffness level spectrum, and the boxed low-frequency level](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/reports/iso10846_transfer_stiffness_example.webp)](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/reports/iso10846_transfer_stiffness_example.pdf)
@@ -154,26 +155,27 @@ usually the two spliced together.
 
 ## 3. Validity of the indirect method
 
-ISO 10846-3 (clause 6) requires the `T ≪ 1` approximation to be accurate
+ISO 10846-3 (clause 6) requires the $T \ll 1$ approximation to be accurate
 within **1 dB** (12 % of the stiffness magnitude), which bounds the usable
 frequency range on both sides:
 
 * **Impedance mismatch (Inequality 2).** Valid only where
-  `ΔL₁,₂ = La₁ − La₂ ≥ 20 dB`, i.e. `|T| ≤ 0.1`, the constant
-  `TRANSMISSIBILITY_LIMIT`. `transfer_stiffness_indirect` computes the
-  per-band `|T|` and emits a `PhonometryWarning` when any band exceeds it
+  $\Delta L_{1,2} = L_{a1} - L_{a2} \ge 20\ \text{dB}$, i.e. $|T| \le 0.1$, the
+  constant `TRANSMISSIBILITY_LIMIT`. `transfer_stiffness_indirect` computes the
+  per-band $|T|$ and emits a `PhonometryWarning` when any band exceeds it
   (routine near or below the mass/spring resonance, as in the figure above).
-* **Rigid blocking mass (Inequality 3).** Above an upper frequency `f₃` the
+* **Rigid blocking mass (Inequality 3).** Above an upper frequency $f_3$ the
   blocking mass no longer moves as a rigid body; results are valid only while
-  its measured effective mass `m₂,eff = 2F₂/(a′₁ + a″₁)` (Eq. 4) stays within
-  1 dB of the rigid mass: `10 lg(m₂,eff²/m₂²) ≤ 1 dB`.
+  its measured effective mass $m_{2,\text{eff}} = 2F_2/(a'_1 + a''_1)$ (Eq. 4)
+  stays within 1 dB of the rigid mass:
+  $10\log_{10}(m_{2,\text{eff}}^2/m_2^2) \le 1\ \text{dB}$.
 * **Linearity (clause 7.6).** Two input spectra 10 dB apart must give
   transfer-stiffness levels within 1.5 dB.
 
 The blocking-force idealisation itself is quantified by ISO 10846-1, Eq. (6):
-for an isolator of output driving-point stiffness `k₂,₂` on a termination of
-stiffness `k_t`, the delivered force is `F₂/F₂,b = 1/(1 + k₂,₂/k_t)`, within
-10 % of the blocking force for `|k₂,₂| < 0.1 |k_t|` (Eq. 7):
+for an isolator of output driving-point stiffness $k_{2,2}$ on a termination of
+stiffness $k_t$, the delivered force is $F_2/F_{2,b} = 1/(1 + k_{2,2}/k_t)$,
+within 10 % of the blocking force for $|k_{2,2}| < 0.1\,|k_t|$ (Eq. 7):
 
 ```python
 import warnings
@@ -193,8 +195,8 @@ print(round(abs(complex(vibration.blocking_force_ratio(1e5, 1e6))), 4))   # 0.90
 
 The dynamic stiffness is a member of the frequency-response-function family
 (ISO 10846-1, Annex A / Table A.2): it is the reciprocal of the receptance and
-relates to the mechanical impedance `Z` and effective mass `m_eff` by
-`k = jω·Z = −ω²·m_eff`. These conversions are the same as the
+relates to the mechanical impedance $Z$ and effective mass $m_\text{eff}$ by
+$k = j\omega Z = -\omega^2 m_\text{eff}$. These conversions are the same as the
 [mechanical-mobility](mechanical-mobility.md) `convert_frf` pivot:
 
 ```python
@@ -212,14 +214,14 @@ dynamic-transfer-stiffness characterisation report for a resilient element
 (ISO 10846-1:2008 definition; determined by the direct method, ISO 10846-2:2008,
 or the indirect blocking-mass method, ISO 10846-3:2002). The transfer stiffness
 is a continuous frequency-response function, not an octave-band quantity, so the
-sheet presents it honestly as the `Lk(f)` level spectrum plus a compact table
+sheet presents it honestly as the $L_k(f)$ level spectrum plus a compact table
 of characteristic points (the determination method, the blocking mass for the
 indirect method, the frequency range, and the low-frequency stiffness plateau
-`|k2,1|`, its level `Lk` and the loss factor there), and a boxed
-low-frequency `Lk` (the plateau that characterises the element below its
+$|k_{2,1}|$, its level $L_k$ and the loss factor there), and a boxed
+low-frequency $L_k$ (the plateau that characterises the element below its
 internal resonances). It is a characterisation, so there is no pass/fail
 verdict; `language="es"` renders the Spanish fiche. The fiche always embeds the
-`Lk(f)` spectrum, so it needs both the report and plot extras
+$L_k(f)$ spectrum, so it needs both the report and plot extras
 (`pip install "phonometry[report,plot]"`).
 
 ```python
@@ -268,15 +270,17 @@ characteristic points and the transfer-stiffness level spectrum.*
 
 ISO 10846 (parts 1-5), *Acoustics and vibration — Laboratory
 measurement of vibro-acoustic transfer properties of resilient elements*: the
-dynamic transfer stiffness `k₂₁ = F₂,b/u₁` and its FRF relations (Part 1,
-clause 5 and Annex A / Table A.2), the level `L_k` re 1 N/m and the loss factor
+dynamic transfer stiffness $k_{2,1} = F_{2,b}/u_1$ and its FRF relations (Part 1,
+clause 5 and Annex A / Table A.2), the level $L_k$ re 1 N/m and the loss factor
 (Parts 2 and 3, clauses 3.8/3.17), the direct method (Part 2) and the indirect
-method `k₂₁ = −(2πf)²(m₂+m_f)T` (Part 3, Formula 1) with its validity
+method $k_{2,1} = -(2\pi f)^2 (m_2 + m_f) T$ (Part 3, Formula 1) with its
+validity
 conditions (Part 3, clause 6: Inequalities 2 and 3; clause 7.6 linearity) and
 the blocking-force approximation (Part 1, Eqs. 6/7). Parts 4 and 5 extend the
 same quantities to elements other than supports and to the driving-point
 low-frequency method. Conformance is anchored on the standard's closed-form
 definitions: the level of a decade of stiffness, the indirect inertia relation,
-the Table-A.2 identity `k = jω·Z`, the `|T| = 0.1 ↔ ΔL₁,₂ = 20 dB` validity
-limit and its 1 dB (12 %) accuracy bound, the Eq. (6) force ratio `1/1.1`, and
+the Table-A.2 identity $k = j\omega Z$, the
+$|T| = 0.1 \leftrightarrow \Delta L_{1,2} = 20\ \text{dB}$ validity
+limit and its 1 dB (12 %) accuracy bound, the Eq. (6) force ratio $1/1.1$, and
 the 7.6 linearity criterion.

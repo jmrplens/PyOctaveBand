@@ -27,7 +27,7 @@ references:
 
 import ThemeImage from '../../../../components/ThemeImage.astro';
 
-Una comunidad no oye un único LAeq: oye un día cuyas tardes y noches pesan
+Una comunidad no oye un único $L_{Aeq}$: oye un día cuyas tardes y noches pesan
 más, una fuente cuyos tonos o impulsos molestan más allá de su energía, y
 una medición tomada sobre un fondo residual con una confianza finita. Esta
 página es la cadena de evaluación regulatoria construida sobre los niveles
@@ -107,7 +107,7 @@ plt.show()
 
 | Función | Parámetros clave | Notas |
 | :--- | :--- | :--- |
-| `lden(lday, levening, lnight, hours=(12, 4, 8))` | LAeq por periodo [dB]; `hours` debe sumar 24 | +5 dB tarde, +10 dB noche (3.6.4) |
+| `lden(lday, levening, lnight, hours=(12, 4, 8))` | $L_{Aeq}$ por periodo [dB]; `hours` debe sumar 24 | +5 dB tarde, +10 dB noche (3.6.4) |
 | `ldn(lday, lnight, hours=(15, 9))` | | +10 dB noche (3.6.5) |
 | `composite_rating_level(periods)` | iterable de `(level_db, hours, adjustment_db)` | Fórmulas generales (5)-(6); ajustes según la Tabla A.1 |
 
@@ -115,13 +115,13 @@ Dónde pones el micrófono cambia el número: ISO 1996-2 fija las posiciones del
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_env_measurement_es.svg" alt="Posiciones de medida de ruido ambiental según ISO 1996-2: campo libre, a 2 m de la fachada y enrasado, con sus correcciones" width="92%" />
 
-Combínalo con `laeq()` por periodo para ir de grabaciones a Lden. El propio
+Combínalo con `laeq()` por periodo para ir de grabaciones a $L_{den}$. El propio
 ajuste tonal se justifica por la vía de audibilidad tonal de la sección
 siguiente (alimentada, para el método de ISO/PAS 20065, por
 [Audibilidad objetiva de tonos en ruido](/phonometry/es/guides/tone-audibility/));
 los veredictos `tone_to_noise_ratio()` / `prominence_ratio()` de
 [Tonos discretos prominentes](/phonometry/es/guides/tone-prominence/) son un
-cribado de emisión complementario, no la base del Kt.
+cribado de emisión complementario, no la base del $K_t$.
 
 ## Determinación de niveles: ajuste tonal, ruido residual e incertidumbre (ISO 1996-2)
 
@@ -134,7 +134,7 @@ presupuesto de incertidumbre.
 **Ajuste tonal (método de ingeniería, Anexo C).** A partir del nivel tonal
 sumado en energía $L_{pt}$ y el nivel de ruido enmascarante $L_{pn}$ en la banda
 crítica alrededor de un tono, la audibilidad sobre el umbral de enmascaramiento es
-$\Delta L_{ta} = L_{pt} - L_{pn} + 2 + \lg[1 + (f_c/502)^{2.5}]$ dB (Fórmula (C.3)),
+$\Delta L_{ta} = L_{pt} - L_{pn} + 2 + \log_{10}[1 + (f_c/502)^{2{,}5}]$ dB (Fórmula (C.3)),
 y el ajuste es $K_t = 0$ para $\Delta L_{ta} < 4$, $K_t = \Delta L_{ta} - 4$ para
 $4 \le \Delta L_{ta} \le 10$ y $K_t = 6$ por encima (Fórmulas (C.4)–(C.6)). El
 ancho de banda crítico es 100 Hz hasta 500 Hz y el 20 % de $f_c$ por encima
@@ -162,7 +162,7 @@ plt.show()
 </details>
 
 **Corrección de ruido residual (Cláusula 10.4).** `residual_sound_correction()`
-aplica $L = 10\lg(10^{L'/10} - 10^{L_\text{res}/10})$ (Fórmula (16)). Con un
+aplica $L = 10\log_{10}(10^{L'/10} - 10^{L_\text{res}/10})$ (Fórmula (16)). Con un
 residual dentro de 3 dB del nivel medido no se permite corrección alguna: el
 valor reportable es entonces el nivel medido *sin corregir* $L'$, como cota
 superior del sonido específico (expuesto como `reportable_upper_bound`, con
@@ -172,7 +172,7 @@ invertidas.
 
 **Incertidumbre de medición (Cláusula 4, Anexo F).**
 `combined_standard_uncertainty()` forma $u = \sqrt{\sum (c_j u_j)^2}$ (Fórmula (2))
-y `expanded_uncertainty()` aplica $k = 2$ (95 %) o $k = 1.3$ (80 %);
+y `expanded_uncertainty()` aplica $k = 2$ (95 %) o $k = 1{,}3$ (80 %);
 `residual_correction_uncertainty()` lleva la sensibilidad de la corrección residual
 (Fórmulas (F.7)/(F.8)) y `uncertainty_from_repeated_measurements()` la
 incertidumbre típica de mediciones repetidas: la vía primaria en el dominio
@@ -194,7 +194,7 @@ environmental.expanded_uncertainty(u)                            # 4,36 dB (k = 
 
 ## Qué cubre esta guía
 
-**Cubierto.** El Lden, el Ldn y el nivel de valoración compuesto de la ISO
+**Cubierto.** El $L_{den}$, el $L_{dn}$ y el nivel de valoración compuesto de la ISO
 1996-1:2016 (apartado 6.5,
 `environmental.lden`/`ldn`/`composite_rating_level`); y el ajuste tonal
 (anexo C), la corrección de ruido residual (apartado 10.4) y el balance de
@@ -208,8 +208,8 @@ aplicados.
 
 ## Véase también
 
-- [Niveles integrados y estadísticos](/phonometry/es/guides/levels/): los niveles Leq/LAeq, percentiles y de suceso con los que se componen los indicadores de esta página.
-- [Audibilidad objetiva de tonos en ruido (ISO/PAS 20065)](/phonometry/es/guides/tone-audibility/): la audibilidad tonal cuyo valor medio se traduce en el ajuste Kt (Tabla J.1).
+- [Niveles integrados y estadísticos](/phonometry/es/guides/levels/): los niveles $L_{eq}$/$L_{Aeq}$, percentiles y de suceso con los que se componen los indicadores de esta página.
+- [Audibilidad objetiva de tonos en ruido (ISO/PAS 20065)](/phonometry/es/guides/tone-audibility/): la audibilidad tonal cuyo valor medio se traduce en el ajuste $K_t$ (Tabla J.1).
 - [Tonos discretos prominentes](/phonometry/es/guides/tone-prominence/): los veredictos de relación tono-ruido y de prominencia de ECMA-418-1, cribado de emisión complementario para la cuestión tonal.
 - [Exposición laboral (ISO 9612)](/phonometry/es/guides/occupational-exposure/): la contraparte en el puesto de trabajo, de las muestras por tarea al nivel de exposición diario con su balance de incertidumbre.
 - Referencia de la API: [`environmental.measurement`](/phonometry/es/reference/api/environment/measurement/) y [`environmental.rating`](/phonometry/es/reference/api/environment/rating/).

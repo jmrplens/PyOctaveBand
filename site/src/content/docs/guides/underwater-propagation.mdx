@@ -175,7 +175,7 @@ $$
 TL = \text{spreading} + \alpha R .
 $$
 
-Geometrical spreading is $20 \lg R$ (spherical), $10 \lg R$ (cylindrical) or
+Geometrical spreading is $20 \log_{10} R$ (spherical), $10 \log_{10} R$ (cylindrical) or
 spherical up to a transition range $R_0$ and cylindrical beyond it (`"practical"`). The
 volume absorption $\alpha$ (dB/km) comes
 from **Francois–Garrison** (1982, default and reference), **Ainslie–McColm**
@@ -224,16 +224,16 @@ ranges at which they hand over, from the seabed reflectivity alone:
 
 | Regime | Propagation factor $F$ | Loss law | Ends at |
 |---|---|---|---|
-| Spherical | $1/r^2$ | $20 \lg r$ | $r = H/(2\psi_c)$ |
-| Cylindrical | $2\psi_c/(rH)$ | $10 \lg r$ | $r_{CS} = \pi H/(4\eta\psi_c^2)$ |
-| Mode stripping | $\sqrt{\pi/(\eta H)}\, r^{-3/2}$ | $15 \lg r$ | $r_{MS} = k^2 H_e^3/(9\pi\eta)$ |
-| Single mode | Eq. (9.54), exponential | steeper than $15 \lg r$ | — |
+| Spherical | $1/r^2$ | $20 \log_{10} r$ | $r = H/(2\psi_c)$ |
+| Cylindrical | $2\psi_c/(rH)$ | $10 \log_{10} r$ | $r_{CS} = \pi H/(4\eta\psi_c^2)$ |
+| Mode stripping | $\sqrt{\pi/(\eta H)}\, r^{-3/2}$ | $15 \log_{10} r$ | $r_{MS} = k^2 H_e^3/(9\pi\eta)$ |
+| Single mode | Eq. (9.54), exponential | steeper than $15 \log_{10} r$ | — |
 
 $\psi_c = \arccos(c_w/c_{sed})$ is the critical grazing angle, $\eta$ the
 **reflection loss gradient** in nepers per radian ($|R(\theta)| \approx
 e^{-\eta\theta}$) and $H_e$ the Weston effective depth, the level a short
 distance below the true seabed at which a pressure-release boundary appears to
-lie. `weston_propagation_loss` assembles the composite loss $PL = -10 \lg F$
+lie. `weston_propagation_loss` assembles the composite loss $PL = -10 \log_{10} F$
 and returns each regime's own law alongside it; the `boundaries` field carries
 the three transition ranges plus the waveguide cut-off frequency and the number
 of cut-on modes.
@@ -291,7 +291,7 @@ the derivation-consistent form; see
 equation (default, in the Wong & Zhu 1995 ITS-90 form), **Del Grosso** (1974),
 **Mackenzie** (1981) or **Medwin** (1975). Depth is converted to pressure with
 Leroy & Parthiot (1998). The four agree to within ~2.5 m/s; Mackenzie's canonical
-check value is `1550.744 m/s` at 25 °C, 35 ppt, 1000 m. Medwin's six-term form is
+check value is 1550.744 m/s at 25 °C, 35 ppt, 1000 m. Medwin's six-term form is
 the coarsest of the family and the one behind the classic rules of thumb
 $\partial c/\partial T \approx 4.6 - 0.110\,T$ m/s per °C and
 $\partial c/\partial z \approx 0.016$ m/s per metre.
@@ -425,7 +425,7 @@ A plane wave striking the seabed reflects with the fluid–fluid **Rayleigh
 reflection coefficient** (Medwin & Clay). For a faster bottom ($c_2 > c_1$) there is a **critical
 grazing angle** $\varphi_c = \arccos(c_1/c_2)$, below which the wave is
 totally reflected ($|R| = 1$, zero loss). The bottom loss is
-$BL = -20 \lg |R|$.
+$BL = -20 \log_{10} |R|$.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/seabed_reflection.svg" alt="Bottom reflection loss versus grazing angle for a fast sandy seabed: zero loss below the critical grazing angle, rising sharply above it" width="82%" />
 

@@ -95,7 +95,7 @@ El sonómetro nunca muestra la presión en bruto. La señal pasa primero por la
 **ponderación frecuencial A** (la curva de respuesta del oído de
 IEC 61672-1), se eleva al cuadrado y se suaviza con el **detector
 exponencial Fast** (constante de tiempo de 125 ms). El resultado es el nivel
-móvil que sigue la pantalla de un sonómetro, LAF(t):
+móvil que sigue la pantalla de un sonómetro, $L_{AF}(t)$:
 
 ```python
 pressure = cal * recording                          # unidades digitales -> Pa
@@ -108,7 +108,7 @@ laf_t = 10 * np.log10(np.maximum(envelope, 1e-12) / (2e-5) ** 2)
 Rara vez escribirás esta cadena a mano: todas las funciones de nivel del paso
 siguiente aplican la ponderación frecuencial internamente, y los niveles
 percentiles reconstruyen por ti esta envolvente Fast. Las métricas de energía
-(Leq, SEL) integran directamente la señal ponderada al cuadrado, sin
+($L_{eq}$, SEL) integran directamente la señal ponderada al cuadrado, sin
 balística, exactamente como hace un sonómetro. La cadena se muestra aquí
 porque *es* la pantalla del sonómetro.
 
@@ -119,8 +119,9 @@ Guías de fondo:
 ## 4. Integra: los números que reporta un sonómetro
 
 Una sola pasada sobre la grabación calibrada produce las lecturas estándar:
-el **LAeq** equivalente en energía, los **niveles percentiles** que describen
-cómo fluctuó el nivel (L90 es el fondo, L10 los eventos), el **nivel de
+el **$L_{Aeq}$** equivalente en energía, los **niveles percentiles** que
+describen cómo fluctuó el nivel ($L_{90}$ es el fondo, $L_{10}$ los eventos),
+el **nivel de
 exposición sonora** que normaliza el evento a un segundo, y el **pico** con
 ponderación C para contenido impulsivo.
 
@@ -137,13 +138,14 @@ print(f"LAeq {la_eq:.1f} dB | L10 {ln[10]:.1f} | L90 {ln[90]:.1f} "
 ```
 
 Fíjate en la aritmética que codifican los números: el evento de 1 s domina
-el LAeq (está 25 dB por encima del fondo, mucho más de los 10 dB que el
-fondo, nueve veces más largo, recupera por duración), el LAE es el LAeq más
-10 log10 de los 10 s de duración, y el L90 apenas nota el evento.
+el $L_{Aeq}$ (está 25 dB por encima del fondo, mucho más de los 10 dB que el
+fondo, nueve veces más largo, recupera por duración), el $L_{AE}$ es el
+$L_{Aeq}$ más $10\log_{10}$ de los 10 s de duración, y el $L_{90}$ apenas nota el
+evento.
 
 Guía de fondo:
 [Niveles integrados y estadísticos](/phonometry/es/guides/levels/), que añade
-dosis de ruido y espectrogramas de octava; el Lden y los niveles de
+dosis de ruido y espectrogramas de octava; el $L_{den}$ y los niveles de
 valoración continúan en
 [Niveles ambientales](/phonometry/es/guides/environmental-levels/).
 
@@ -199,7 +201,7 @@ verificación de clase) y
 El sonómetro construido aquí es el tronco; el resto del núcleo crece de él.
 
 - [Incertidumbre de medida (GUM y Monte Carlo)](/phonometry/es/guides/gum-uncertainty/):
-  acompaña de una incertidumbre el LAeq que acabas de calcular, término de
+  acompaña de una incertidumbre el $L_{Aeq}$ que acabas de calcular, término de
   calibración incluido.
 - [Análisis espectral calibrado](/phonometry/es/guides/spectral-analysis/):
   cuando las bandas se quedan cortas, la PSD de Welch con intervalos de
@@ -214,7 +216,7 @@ El sonómetro construido aquí es el tronco; el resto del núcleo crece de él.
 
 **Cubierto.** Esta página compone etapas ya implementadas en otras guías en
 la cadena que describe IEC 61672-1:2013: la ponderación frecuencial A y la
-ponderación temporal exponencial Fast, el LAeq, los niveles percentiles, el
+ponderación temporal exponencial Fast, el $L_{Aeq}$, los niveles percentiles, el
 nivel de exposición sonora y el pico con ponderación C, los filtros de banda
 de octava de IEC 61260-1:2014 de `octave_filter`, y los límites de
 aceptación de clase de la Tabla 3 (ponderación) y la Tabla 1 (filtro) que

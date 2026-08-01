@@ -181,7 +181,7 @@ que las guías incorporan sus secciones de Referencias.
   equipment* (ISO 4871:1996).
   [Catálogo iso.org](https://www.iso.org/standard/10868.html).
   La declaración de emisión sonora: las formas de doble/único número,
-  L_WAd = L_WA + K_WA y la verificación de la cláusula 6.2.
+  $L_{WAd} = L_{WA} + K_{WA}$ y la verificación de la cláusula 6.2.
   Citado por [Potencia acústica](/phonometry/es/guides/sound-power/).
 - International Organization for Standardization. (1993). *Acoustics —
   Determination of sound power levels of noise sources using sound

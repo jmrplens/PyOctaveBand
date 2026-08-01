@@ -21,16 +21,16 @@ fades to unintelligibility as you walk away. Levels and STI are measured
 along a line of workstations (at least 4 positions, 6–10 preferred), and
 four single-number quantities summarise the room. The **spatial decay
 rate** of A-weighted speech is the slope of the level against
-$\lg(r/r_0)$, scaled to a per-doubling figure using only the 2–16 m
+$\log_{10}(r/r_0)$, scaled to a per-doubling figure using only the 2–16 m
 positions,
 
 $$
-D_{2,S} = -\lg(2)\ b, \qquad L = a + b\ \lg(r/r_0),\ r_0 = 1\ \text{m},
+D_{2,S} = -\log_{10}(2)\ b, \qquad L = a + b\ \log_{10}(r/r_0),\ r_0 = 1\ \text{m},
 $$
 
-with **Lp,A,S,4m** read off the same line at 4 m. The **distraction
-distance** rD (STI = 0.50) and **privacy distance** rP (STI = 0.20) come
-from a linear regression of STI against distance. Good offices push rD
+with **$L_{p,A,S,4m}$** read off the same line at 4 m. The **distraction
+distance** $r_D$ (STI = 0.50) and **privacy distance** $r_P$ (STI = 0.20) come
+from a linear regression of STI against distance. Good offices push $r_D$
 below ~5 m; poor ones leave speech distracting past 10 m.
 
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_open_plan_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_open_plan.svg" alt="ISO 3382-3 open-plan measurement line from the source at 1 m along positions from 2 m to 16 m, feeding the four single-number quantities D2,S, Lp,A,S,4m, rD and rP" width="86%"></picture>
@@ -121,7 +121,7 @@ the axis, and a result that retained its positions redraws its own line with
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/open_plan_line_geometry_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/open_plan_line_geometry.svg" alt="To-scale plan of the open-plan measurement line: the red source star at the origin, six blue microphone dots from 2 m to 16 m on a dotted line through the grey workstation blocks, the dashed distraction distance rD = 6.5 m and privacy distance rP = 13 m marked across the line and the 16 m span dimensioned" width="86%"></picture>
 
 *Every ISO 3382-3 quantity comes off this one line: six microphones from 2 m
-to 16 m through the workstations, with `rD` and `rP` landing between them.*
+to 16 m through the workstations, with $r_D$ and $r_P$ landing between them.*
 
 <details>
 <summary>Show the code for this figure</summary>
@@ -147,7 +147,7 @@ plt.show()
 | Parameter | Type | Units | Range / default | Notes |
 | :--- | :--- | :--- | :--- | :--- |
 | `positions_m` | 1D array | m | ≥ 4 positions, all > 0 | Source-to-receiver distances |
-| `spl_a_speech` | 1D array | dB | same length | A-weighted speech level `Lp,A,S,n` per position |
+| `spl_a_speech` | 1D array | dB | same length | A-weighted speech level $L_{p,A,S,n}$ per position |
 | `sti_values` | 1D array | — | same length | STI per position (full IEC 60268-16 method) |
 
 Returns an `OpenPlanResult` with `d2s`, `lp_as_4m`, `rd` and `rp`; its
@@ -224,15 +224,20 @@ occupants, how loud does the background get, and does conversation still work?
 Long (*Architectural Acoustics* 2e, Chapter 17, Equations (17.50) to (17.54))
 sets the two competing levels at a listener:
 
-```text
-Lp(signal) = Lw + 10 log10( Q / (4 π r²) )                (Eq. (17.50))
-Lp(noise)  = Lw + 10 log10 N + 10 log10( 4 / (N A_tab) )  (Eq. (17.51))
-```
+$$
+L_p(\text{signal}) = L_W + 10\log_{10}\!\left[\frac{Q}{4\pi r^2}\right]
+\quad \text{(Eq. (17.50))}
+$$
 
-with `Lw` the sound power level of one talker (about 70 dB in normal
-conversation), `Q` the talker's forward directivity (about 2), `r` the
-talker-to-listener distance and `A_tab` the equivalent absorption area **per
-occupied table**, so `N A_tab` is the room's total absorption.
+$$
+L_p(\text{noise}) = L_W + 10\log_{10} N + 10\log_{10}\!\left[\frac{4}{N A_\text{tab}}\right]
+\quad \text{(Eq. (17.51))}
+$$
+
+with $L_W$ the sound power level of one talker (about 70 dB in normal
+conversation), $Q$ the talker's forward directivity (about 2), $r$ the
+talker-to-listener distance and $A_\text{tab}$ the equivalent absorption area
+**per occupied table**, so $N A_\text{tab}$ is the room's total absorption.
 
 ```python
 from phonometry import room
@@ -250,24 +255,28 @@ print(round(room.crowd_noise_level(20, 20.0 + 170.0)))   # 66 dB
 Subtracting the two gives the **speech-to-noise ratio**, and this is the result
 worth remembering:
 
-```text
-L_SN = 10 log10( Q / (4 π r²) ) + 10 log10( A_tab / 4 )   (Eq. (17.52))
-```
+$$
+L_{SN} = 10\log_{10}\!\left[\frac{Q}{4\pi r^2}\right]
++ 10\log_{10}\!\left[\frac{A_\text{tab}}{4}\right]
+\quad \text{(Eq. (17.52))}
+$$
 
-Neither `Lw` nor `N` survives. A busier room is not intrinsically worse, because
-each new table brings both a talker and its own share of absorption. What
-decides whether a restaurant works is the absorption **per table**, not the
-absorption of the room. Requiring `L_SN > -6` dB for adequate cross-table
-communication at a separation `rs`, and `L_SN < -9` dB so a neighbouring table
-`rt` away is not overheard, turns into a pair of design bounds:
+Neither $L_W$ nor $N$ survives. A busier room is not intrinsically worse,
+because each new table brings both a talker and its own share of absorption.
+What decides whether a restaurant works is the absorption **per table**, not
+the absorption of the room. Requiring $L_{SN} > -6$ dB for adequate
+cross-table communication at a separation $r_s$, and $L_{SN} < -9$ dB so a
+neighbouring table $r_t$ away is not overheard, turns into a pair of design
+bounds:
 
-```text
-A_tab > 6.31 rs²      (Eq. (17.53))
-A_tab < 3.16 rt²      (Eq. (17.54)),  both for Q = 2
-```
+$$
+A_\text{tab} > 6.31\,r_s^2 \quad \text{(Eq. (17.53))}, \qquad
+A_\text{tab} < 3.16\,r_t^2 \quad \text{(Eq. (17.54))},
+\qquad \text{both for } Q = 2
+$$
 
 > **The first constant is printed as 6.33.** The closed form above, at the same
-> Q = 2 that yields Long's own second constant 3.16 exactly, gives 6.31, and his
+> $Q = 2$ that yields Long's own second constant 3.16 exactly, gives 6.31, and his
 > prose ("6.3 or more square metres, 68 sq ft") converts to 6.317 m². The library
 > computes both bounds from the speech-to-noise ratio rather than hardcoding
 > either constant, so they stay mutually consistent; the misprint is recorded in
@@ -288,7 +297,7 @@ crowd.plot()      # self-noise vs occupancy, against the -6 dB limit
 *The same 20 talkers in three rooms. The hard room (20 m² of absorption)
 crosses the communication limit before the fourth table is occupied; adding the
 absorptive ceiling of Long's example (190 m² in total) keeps all 20 tables below
-it. The curves are parallel because occupancy always costs `10 log10 N`: only
+it. The curves are parallel because occupancy always costs $10\log_{10} N$: only
 the vertical offset, which is the absorption, is a design variable.*
 
 ### `crowd_noise()` parameters
@@ -296,10 +305,10 @@ the vertical offset, which is the absorption, is a design variable.*
 | Parameter | Type | Units | Range / default | Notes |
 | :--- | :--- | :--- | :--- | :--- |
 | `absorption_areas` | float or 1D array | m² | > 0 | Total room absorption areas to compare |
-| `talkers` | 1D array, optional | — | ≥ 1, default 1..20 | Occupancy axis `N` |
-| `distance` | float | m | > 0, default 1.2 | Talker-to-listener distance `r` |
-| `sound_power_level` | float | dB re 1 pW | default 70 | Talker `Lw` |
-| `directivity` | float | — | > 0, default 2 | Talker `Q` |
+| `talkers` | 1D array, optional | — | ≥ 1, default 1..20 | Occupancy axis $N$ |
+| `distance` | float | m | > 0, default 1.2 | Talker-to-listener distance $r$ |
+| `sound_power_level` | float | dB re 1 pW | default 70 | Talker $L_W$ |
+| `directivity` | float | — | > 0, default 2 | Talker $Q$ |
 
 Returns a `CrowdNoiseResult` (`talkers`, `absorption_areas`, `levels`,
 `signal_level`, `communication_level`, `speech_to_noise()`) with `.plot()`. The

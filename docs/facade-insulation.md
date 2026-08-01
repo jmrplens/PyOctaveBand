@@ -78,10 +78,11 @@ fac.plot()   # per-band D2m,nT with D2m, D2m,n and R' overlaid (needs matplotlib
 
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/facade_field_insulation_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/facade_field_insulation.svg" alt="Field facade insulation of a dwelling under the 45-degree loudspeaker method: the standardized D2m,nT, the raw D2m, the normalized D2m,n and the apparent reduction index R'45 per one-third-octave band, with the Dls,2m,nT,w rating annotated" width="80%"></picture>
 
-*The four façade quantities of one measurement: the raw `D2m`, its
-standardized and normalized forms, and the element `R'45°` carrying the
+*The four façade quantities of one measurement: the raw $D_{2m}$, its
+standardized and normalized forms, and the element $R'_{45°}$ carrying the
 −1.5 dB angle-of-incidence correction. The rating box reads the single
-number `Dls,2m,nT,w` obtained by feeding `D2m,nT` to the ISO 717-1 engine.*
+number $D_{ls,2m,nT,w}$ obtained by feeding $D_{2m,nT}$ to the ISO 717-1
+engine.*
 
 <details>
 <summary>Show the code for this figure</summary>
@@ -135,14 +136,14 @@ assumed already corrected for background noise.
 
 | Parameter | Type | Units | Range / default | Notes |
 | :--- | :--- | :--- | :--- | :--- |
-| `l1_2m` | 1D or 2D array | dB | one/band, or `(positions, bands)` | Level 2 m in front of the façade `L1,2m` |
+| `l1_2m` | 1D or 2D array | dB | one/band, or `(positions, bands)` | Level 2 m in front of the façade $L_{1,2m}$ |
 | `l2` | 1D or 2D array | dB | same band count | Receiving-room levels |
 | `t2` | 1D array | s | > 0, one per band | Receiving-room reverberation time |
-| `area` | float, optional | m² | > 0, with `surface_level`, `volume` | Test-element area `S` (enables `R'`) |
-| `volume` | float, optional | m³ | > 0 | Receiving-room `V` (enables `D2m,n`; required for `R'`) |
-| `surface_level` | 1D/2D array, optional | dB | same band count | Surface level `L1,s` on the element (enables `R'`) |
-| `method` | str | — | `'loudspeaker'` (−1.5 dB) / `'road_traffic'` (−3 dB) | Angle-of-incidence correction of `R'` |
-| `t0` | float | s | default `0.5` | Reference reverberation time `T0` |
+| `area` | float, optional | m² | > 0, with `surface_level`, `volume` | Test-element area $S$ (enables $R'$) |
+| `volume` | float, optional | m³ | > 0 | Receiving-room $V$ (enables $D_{2m,n}$; required for $R'$) |
+| `surface_level` | 1D/2D array, optional | dB | same band count | Surface level $L_{1,s}$ on the element (enables $R'$) |
+| `method` | str | — | `'loudspeaker'` (−1.5 dB) / `'road_traffic'` (−3 dB) | Angle-of-incidence correction of $R'$ |
+| `t0` | float | s | default `0.5` | Reference reverberation time $T_0$ |
 | `frequencies` | 1D array, optional | Hz | — | Band centres carried on the result for plotting |
 
 `facade_insulation()` returns a `FacadeInsulationResult` (`d_2m`, `d_2m_nt`,
@@ -154,11 +155,11 @@ quantity to `weighted_rating` for its ISO 717-1 single number.
 `FacadeInsulationResult.report(path)` writes the one-page ISO 16283-3 field
 façade test report: the standard-basis line, an optional metadata header, the
 one-third-octave table beside the measured-versus-shifted-reference curve, the
-boxed field rating `D2m,nT,w (C; Ctr)`, the engineering-method statement, an
-optional requirement verdict (a level difference passes at or above it) and a
+boxed field rating $D_{2m,nT,w}\ (C;\ C_{tr})$, the engineering-method
+statement, an optional requirement verdict (a level difference passes at or above it) and a
 footer. `quantity="d_2m_nt"` (default) reports the standardized level
 difference; `"d_2m_n"` the normalized one; `"r_prime"` the apparent sound
-reduction index `R'45`. `verbose=True`, `metadata`, `language="es"` and the
+reduction index $R'_{45}$. `verbose=True`, `metadata`, `language="es"` and the
 `phonometry[report]` extra behave exactly as in the fiches above.
 
 ```python
@@ -168,7 +169,7 @@ fac.report("Rp45_facade.pdf", quantity="r_prime")      # R'45,w (C; Ctr)
 
 [![Field facade ISO 16283-3 example report: metadata header, one-third-octave D2m,nT table beside the measured-versus-shifted-reference curve, boxed D2m,nT,w (C; Ctr), the engineering-method statement and a PASS verdict](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/reports/iso16283_facade_example.webp)](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/reports/iso16283_facade_example.pdf)
 
-*Field façade fiche (`FacadeInsulationResult.report`), D2m,nT,w (C; Ctr).*
+*Field façade fiche (`FacadeInsulationResult.report`), $D_{2m,nT,w}\ (C;\ C_{tr})$.*
 
 ## Prediction from the elements (EN 12354-3)
 
@@ -263,7 +264,7 @@ and a prediction that retained its `elements` redraws its own façade with
 
 *The areas the energy sum weighs, to scale: the window holds a quarter of the
 wall's area but each square metre of it transmits a hundred times more, so the
-small tiles decide `R'`.*
+small tiles decide $R'$.*
 
 <details>
 <summary>Show the code for this figure</summary>
@@ -292,9 +293,10 @@ plt.show()
 The façade prediction also writes a one-page **prediction** report through a
 `report(path)` method, the same layout as the airborne and impact prediction
 fiches. `FacadePredictionResult.report()` renders the façade-element table (each
-element's weighted partial index `Rp,w`) beside the per-element / `R'` /
-`D2m,nT` plot, the boxed predicted `D2m,nT,w` (with `R'tr,s,w` and `Ctr`), the
-prediction statement and, when a `requirement` is supplied, a PASS/FAIL verdict
+element's weighted partial index $R_{p,w}$) beside the per-element / $R'$ /
+$D_{2m,nT}$ plot, the boxed predicted $D_{2m,nT,w}$ (with $R'_{tr,s,w}$ and
+$C_{tr}$), the prediction statement and, when a `requirement` is supplied, a
+PASS/FAIL verdict
 (the level difference passes at or above it). `verbose=True` annexes each
 element's share of the transmitted sound energy, which singles out the limiting
 element (the air inlet here, not the wall). The report needs the ISO 717-1
@@ -304,8 +306,8 @@ bands. The applicable `ReportMetadata` fields describe the predicted situation:
 receiving-room `receiving_volume`, the outdoor/traffic situation in `test_room`,
 plus the calculator / laboratory identity fields (`client`, `manufacturer`,
 `measurement_standard`, `laboratory`, `operator`, `report_id`, `test_date`), a
-free-text façade-shape and model summary in `notes` and the target `D2m,nT,w` in
-`requirement`. Metadata, `language="es"` and the `phonometry[report]` extra
+free-text façade-shape and model summary in `notes` and the target
+$D_{2m,nT,w}$ in `requirement`. Metadata, `language="es"` and the `phonometry[report]` extra
 behave as in the measurement fiches.
 
 ```python
@@ -362,9 +364,9 @@ seg.plot()   # radiated LW per octave with the A-weighted LWA line (needs matplo
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/radiated_power_outdoor_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/radiated_power_outdoor.svg" alt="Radiated sound power level per octave band of the EN 12354-4 Annex G wall segment with an industrial door, with the A-weighted single number drawn as a dashed line across the bars" width="80%"></picture>
 
 *The Annex G side-1 segment: the wall dominates the area but the door's
-weaker `R` carries the radiated power, so the octave spectrum stays flat
+weaker $R$ carries the radiated power, so the octave spectrum stays flat
 where the wall alone would fall. The dashed line is the A-weighted single
-number `LWA` formed from the octave bands.*
+number $L_{WA}$ formed from the octave bands.*
 
 <details>
 <summary>Show the code for this figure</summary>

@@ -2,14 +2,14 @@
 
 # Sound Power by Pressure Methods (ISO 3744 / ISO 3746 / ISO 3745)
 
-Of the standardised routes to the sound power level `LW`, the pressure
+Of the standardised routes to the sound power level $L_W$, the pressure
 methods are the ones that need nothing more exotic than a sound level meter:
 sample the sound pressure on a surface that envelops the source, energy-average
 it, correct it, and add the surface term. This guide covers the three of
 them. The **enveloping-surface** methods of ISO 3744 (engineering grade) and
 ISO 3746 (survey grade) work in situ, over one or more reflecting planes,
-and clean the surface level with the background-noise correction `K1` and
-the environmental correction `K2`. The **precision method** of ISO 3745
+and clean the surface level with the background-noise correction $K_1$ and
+the environmental correction $K_2$. The **precision method** of ISO 3745
 moves the same idea into a qualified anechoic or hemi-anechoic room, where a
 fixed microphone array samples the free field directly and the grade-1
 corrections are meteorological rather than environmental. The closing
@@ -20,39 +20,40 @@ are weighed in [Sound Power](sound-power.md).
 ## 1. Enveloping surface, sound pressure (ISO 3744 / ISO 3746)
 
 Place the source on a reflecting plane and imagine a **measurement surface**
-of area `S` wrapping it: a hemisphere for a compact source, a box (right
+of area $S$ wrapping it: a hemisphere for a compact source, a box (right
 parallelepiped) for a large or elongated one. Sample the sound pressure
 level at an array of microphone positions on that surface, energy-average
 them, and the sound power follows because a diffuse-enough surface captures
 all the radiated energy:
 
 $$
-\bar{L}_p = 10 \log_{10}\left( \frac{1}{N_M} \sum_i 10^{L_{pi}/10} \right), \qquad
-L_W = \bar{L}_p - K_1 - K_2 + 10 \log_{10}\frac{S}{S_0},\quad S_0 = 1\ \text{m}^2 .
+\bar{L}_p = 10\log_{10}\left( \frac{1}{N_M} \sum_i 10^{L_{pi}/10} \right), \qquad
+L_W = \bar{L}_p - K_1 - K_2 + 10\log_{10}\frac{S}{S_0},\quad S_0 = 1\ \text{m}^2 .
 $$
 
 Two corrections clean up the surface level. The **background-noise
 correction** removes the energy that would have been there with the source
-switched off, from the margin `ΔLp` between source-on and background levels,
+switched off, from the margin $\Delta L_p$ between source-on and background
+levels,
 
 $$
-K_1 = -10 \log_{10}\left( 1 - 10^{-\Delta L_p/10} \right),
+K_1 = -10\log_{10}\left( 1 - 10^{-\Delta L_p/10} \right),
 $$
 
 and the **environmental correction** removes the reverberant build-up of the
-test room from its equivalent absorption area `A`,
+test room from its equivalent absorption area $A$,
 
 $$
-K_2 = 10 \log_{10}\left( 1 + \frac{4 S}{A} \right).
+K_2 = 10\log_{10}\left( 1 + \frac{4 S}{A} \right).
 $$
 
 The surface area is a closed form of the geometry: a hemisphere is
-`S = 2πr²` over one reflecting plane (halved and quartered for two and three
-planes), and a one-plane box is `S = 4(ab + bc + ca)` with
-`a = 0.5·l1 + d`, `b = 0.5·l2 + d`, `c = l3 + d` for measurement distance
-`d`. ISO 3746 (survey) shares every formula but is coarser: fewer
+$S = 2\pi r^2$ over one reflecting plane (halved and quartered for two and
+three planes), and a one-plane box is $S = 4(ab + bc + ca)$ with
+$a = 0.5\,l_1 + d$, $b = 0.5\,l_2 + d$, $c = l_3 + d$ for measurement distance
+$d$. ISO 3746 (survey) shares every formula but is coarser: fewer
 microphone positions, a 3 dB background criterion instead of 6 dB, and
-validity up to `K2 ≤ 7 dB` instead of 4 dB.
+validity up to $K_2 \le 7\ \text{dB}$ instead of 4 dB.
 
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_sound_power_surfaces_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_sound_power_surfaces.svg" alt="Measurement surfaces of ISO 3744: a hemisphere of radius r enveloping a compact source on a reflecting plane, and a right parallelepiped (box) at measurement distance d around a large source, both with microphone positions marked" width="88%"></picture>
 
@@ -89,9 +90,9 @@ res.plot()   # sound power level bars per band, LWA in the title (needs matplotl
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sound_power_pressure_result_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sound_power_pressure_result.svg" alt="The enveloping-surface sound power level spectrum of the ISO 3744 hemisphere example, one bar per octave band from 63 Hz to 8 kHz peaking near 500 Hz, with the A-weighted total of 92.4 dB(A) in the title" width="88%"></picture>
 
 *One bar per band: the energy-averaged surface pressure minus the background
-(`K1`) and environmental (`K2`) corrections plus the surface term
-`10 lg(S/S0)` gives `LW(f)`, and the A-weighted energy sum across bands gives
-the single-number `LWA` in the title.*
+($K_1$) and environmental ($K_2$) corrections plus the surface term
+$10\log_{10}(S/S_0)$ gives $L_W(f)$, and the A-weighted energy sum across bands
+gives the single-number $L_{WA}$ in the title.*
 
 <details>
 <summary>Show the code for this figure</summary>
@@ -135,12 +136,13 @@ plt.show()
 
 </details>
 
-The A-weighted total `LWA` is combined from the band powers with the ISO 3744
+The A-weighted total $L_{WA}$ is combined from the band powers with the
+ISO 3744
 Annex E A-weighting corrections, so it needs `frequencies`. Passing the room
 data (`reverberation_time` + `volume`, or `absorption_area`, or
-`mean_absorption_coefficient` + `room_surface`) enables `K2`; omit it and the
-field is treated as free (`K2 = 0`). If the background margin drops below the
-grade criterion or `K2` exceeds the validity limit, a `SoundPowerWarning`
+`mean_absorption_coefficient` + `room_surface`) enables $K_2$; omit it and the
+field is treated as free ($K_2 = 0$). If the background margin drops below the
+grade criterion or $K_2$ exceeds the validity limit, a `SoundPowerWarning`
 flags that the levels are upper bounds; the determination still returns.
 
 ### K1 and K2 pitfalls
@@ -150,32 +152,33 @@ either one understates the emission. That is why the standards cap them, and
 why most disputes over an enveloping-surface result trace back to one of
 these habits:
 
-- **K1 has a cliff, not a slope.** At a 15 dB margin the correction is a
+- **$K_1$ has a cliff, not a slope.** At a 15 dB margin the correction is a
   negligible 0.14 dB; at the 6 dB engineering criterion it is already
   1.26 dB, the largest value the grade accepts. Below the criterion the
-  standard does not let the formula run on: `K1` is capped and the result is
+  standard does not let the formula run on: $K_1$ is capped and the result is
   reported as an upper bound. Never extrapolate the subtraction into a
   smaller margin; raise the margin (quieter site, closer surface) or switch
   to the intensity method.
-- **K1 assumes a stationary background.** The source-off reading must be
+- **$K_1$ assumes a stationary background.** The source-off reading must be
   taken at the same positions with the room in the same state, and the
   background energy must be the same during both readings. A ventilation
   system that cycles or a vehicle passing during either reading invalidates
   the pair; the energy subtraction also assumes source and background are
   incoherent, which holds for unrelated noise but not for the source's own
   reflections.
-- **K2 removes the average room build-up, not discrete reflections.** A
+- **$K_2$ removes the average room build-up, not discrete reflections.** A
   nearby wall, a trolley or another machine just outside the surface adds a
   specular contribution concentrated at a few microphones. That imbalance
-  shows up in the apparent directivity index `DIi*`, and no room-average
+  shows up in the apparent directivity index $DI_i^*$, and no room-average
   correction can remove it: move the surface, remove the reflector or treat
   it with absorption.
-- **K2 is only as good as `A`.** With `A` from Sabine (`0.16·V/T`), errors
-  in the reverberation time or the volume propagate directly. At the
-  `K2 = 4 dB` validity limit about 60 % of the measured energy is room, not
-  source, and a 20 % error in `A` still moves `LW` by about 0.5 dB. Prefer a
-  measured `T60` over a guessed absorption coefficient, and keep the
-  measurement distance small enough that `K2` stays well under the limit.
+- **$K_2$ is only as good as $A$.** With $A$ from Sabine ($0.16\,V/T$),
+  errors in the reverberation time or the volume propagate directly. At the
+  $K_2 = 4\ \text{dB}$ validity limit about 60 % of the measured energy is
+  room, not source, and a 20 % error in $A$ still moves $L_W$ by about
+  0.5 dB. Prefer a measured $T_{60}$ over a guessed absorption coefficient,
+  and keep the measurement distance small enough that $K_2$ stays well under
+  the limit.
 
 ### `sound_power_pressure()` parameters
 
@@ -183,24 +186,24 @@ these habits:
 | :--- | :--- | :--- | :--- | :--- |
 | `levels_positions` | 2D array | dB | `(NM, NB)` | One row per position, one column per band (or a single A-weighted column) |
 | `surface` | str | — | `'hemisphere'` / `'box'` | Measurement-surface shape |
-| `radius` | float | m | > 0 (hemisphere) | Hemisphere radius `r` |
-| `dimensions` | (float, float, float) | m | > 0 (box) | Reference-box `(l1, l2, l3)` |
-| `distance` | float | m | > 0 (box) | Measurement distance `d` |
+| `radius` | float | m | > 0 (hemisphere) | Hemisphere radius $r$ |
+| `dimensions` | (float, float, float) | m | > 0 (box) | Reference-box $(l_1, l_2, l_3)$ |
+| `distance` | float | m | > 0 (box) | Measurement distance $d$ |
 | `reflecting_planes` | int | — | `1` / `2` / `3`, default `1` | Halves/quarters the hemisphere area |
-| `background_levels` | 2D array or spectrum | dB | `(NM, NB)`, or `(NB,)` / `(1, NB)` | Enables `K1`; a single spectrum broadcasts to every position |
-| `frequencies` | 1D array | Hz | nominal band centres | Enables `LWA` (Annex E) |
-| `absorption_area` | float or 1D array | m² | > 0 | `A` for `K2` (direct); per-band array → per-band `K2` |
-| `reverberation_time`, `volume` | float/array, float | s, m³ | > 0 | `A = 0.16 V/T` for `K2`; per-band `T` → per-band `K2` |
-| `mean_absorption_coefficient`, `room_surface` | float/array, float | —, m² | `(0,1]`, > 0 | `A = α·Sv` (Eq. A.7); per-band `α` → per-band `K2` |
+| `background_levels` | 2D array or spectrum | dB | `(NM, NB)`, or `(NB,)` / `(1, NB)` | Enables $K_1$; a single spectrum broadcasts to every position |
+| `frequencies` | 1D array | Hz | nominal band centres | Enables $L_{WA}$ (Annex E) |
+| `absorption_area` | float or 1D array | m² | > 0 | $A$ for $K_2$ (direct); per-band array → per-band $K_2$ |
+| `reverberation_time`, `volume` | float/array, float | s, m³ | > 0 | $A = 0.16\,V/T$ for $K_2$; per-band $T$ → per-band $K_2$ |
+| `mean_absorption_coefficient`, `room_surface` | float/array, float | —, m² | `(0,1]`, > 0 | $A = \alpha\,S_v$ (Eq. A.7); per-band $\alpha$ → per-band $K_2$ |
 | `grade` | str | — | `'engineering'` (default) / `'survey'` | ISO 3744 vs ISO 3746 |
-| `omc_uncertainty` | float | dB | default `0.0` | `σomc`, operating/mounting instability, folded into `U` |
+| `omc_uncertainty` | float | dB | default `0.0` | $\sigma_\text{omc}$, operating/mounting instability, folded into $U$ |
 
-Returns a `SoundPowerResult`: `sound_power_level` (per-band `LW`),
-`surface_pressure_level` (`Lp` after K1/K2), `mean_pressure_level`,
-`background_correction`/`environmental_correction` (`K1`/`K2`),
-`directivity_index` (apparent `DIi*` per microphone position **and** frequency
+Returns a `SoundPowerResult`: `sound_power_level` (per-band $L_W$),
+`surface_pressure_level` ($L_p$ after $K_1$/$K_2$), `mean_pressure_level`,
+`background_correction`/`environmental_correction` ($K_1$/$K_2$),
+`directivity_index` (apparent $DI_i^*$ per microphone position **and** frequency
 band, shape `(NM, NB)`; ISO 3744 clause 8.6), `surface_area`,
-`sound_power_level_a` (`LWA`), `uncertainty` (expanded, 95 %) and `grade`.
+`sound_power_level_a` ($L_{WA}$), `uncertainty` (expanded, 95 %) and `grade`.
 `measurement_positions('hemisphere', radius=…, reflecting_planes=…, tones=…,
 grade=…)` returns the normative `(N, 3)` microphone coordinates (Table B.1 for
 tonal sources, B.2 for broadband). Those coordinates plot directly with
@@ -244,7 +247,7 @@ explicit meteorological correction.
 surface-averaged pressure level plus the surface term and the corrections:
 
 $$
-L_W = \overline{L_p} + 10\lg\frac{S}{S_0} + C_1 + C_2 + C_3,
+L_W = \overline{L_p} + 10\log_{10}\frac{S}{S_0} + C_1 + C_2 + C_3,
 $$
 
 with $S = 4\pi r^2$ over the sphere or $S = 2\pi r^2$ over the hemisphere,
@@ -294,14 +297,15 @@ print(round(mc.c1, 4), round(mc.c2, 4))   # -0.1282 0.0
 print(round(emission.precision_uncertainty(0.5, 2.0, 2.0), 3))   # 4.123
 ```
 
-The `MeteorologicalCorrection` is a pair of scalars (plus the per-band `C3`
+The `MeteorologicalCorrection` is a pair of scalars (plus the per-band $C_3$
 when the attenuation coefficient is supplied per band) rather than a
 plottable spectrum: the corrections fold into the
 `PrecisionSoundPowerResult` as its `c1`/`c2`/`c3` fields, and the `.report()`
 fiche prints them on its measurement-basis strip.
 
 Over several bands `sound_power_anechoic` returns a plottable
-`PrecisionSoundPowerResult` carrying the per-band `LW` and the A-weighted total:
+`PrecisionSoundPowerResult` carrying the per-band $L_W$ and the A-weighted
+total:
 
 ```python
 import numpy as np
@@ -323,8 +327,8 @@ result.plot()   # LW spectrum, LWA in the title (needs matplotlib)
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/precision_anechoic_power_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/precision_anechoic_power.svg" alt="The precision sound power level spectrum of a mid-frequency-peaked machine measured over the ISO 3745 hemisphere array, one bar per band peaking near 1 kHz, with the A-weighted total of 89.3 dB(A) in the title" width="88%"></picture>
 
 *One bar per band: the surface-averaged pressure plus the area, background and
-meteorological corrections give `LW(f)`, and the A-weighted energy sum across
-bands gives the single-number `LWA` in the title.*
+meteorological corrections give $L_W(f)$, and the A-weighted energy sum across
+bands gives the single-number $L_{WA}$ in the title.*
 
 <details>
 <summary>Show the code for this figure</summary>
@@ -367,7 +371,7 @@ plt.show()
 
 A sound power determination ends as a *document*. Every result of this page
 stays plottable while it is being worked on (`res.plot()` draws the same
-`LW` spectrum interactively that the fiche typesets), and the report step
+$L_W$ spectrum interactively that the fiche typesets), and the report step
 wraps it into the deliverable. Both the enveloping-surface result
 (`SoundPowerResult`, ISO 3744/3746) and the precision result
 (`PrecisionSoundPowerResult`, ISO 3745) expose a `.report()` method that writes
@@ -375,26 +379,26 @@ a one-page PDF fiche laid out like a sound-power test sheet: the standard-basis
 line naming the applied method and accuracy grade, an optional metadata header
 (client, noise source, test environment, instrumentation, climate, date), a
 per-band table (nominal octave/one-third-octave frequency, the surface
-sound-pressure level `Lp` and the band sound-power level `LW`), the
-sound-power spectrum `LW(f)` with a nominal band axis, and a boxed A-weighted
-sound power level `LWA` (dB re 1 pW) with the total `LW`, the expanded
-uncertainty `U` and the measurement surface area `S` alongside.
+sound-pressure level $L_p$ and the band sound-power level $L_W$), the
+sound-power spectrum $L_W(f)$ with a nominal band axis, and a boxed A-weighted
+sound power level $L_{WA}$ (dB re 1 pW) with the total $L_W$, the expanded
+uncertainty $U$ and the measurement surface area $S$ alongside.
 
 The metadata is supplied through a `ReportMetadata`, whose applicable fields
 here are the **source description** (`specimen`), the **test environment**
 (`test_room`), the **client**, the **instrumentation**, the **temperature**,
 **relative humidity** and **ambient pressure**, the **date of test**
 (`test_date`) and the footer identity (`laboratory`, `operator`, `report_id`,
-`notes`); the measurement surface area `S` comes from the result itself and is
+`notes`); the measurement surface area $S$ comes from the result itself and is
 printed in the result box and the basis strip, together with the applied
-corrections (the background `K1` and environmental `K2` for the ISO 3744/3746
-surface method, or the meteorological `C1`/`C2`/`C3` for the ISO 3745
+corrections (the background $K_1$ and environmental $K_2$ for the ISO 3744/3746
+surface method, or the meteorological $C_1$/$C_2$/$C_3$ for the ISO 3745
 precision method). Supplying `requirement` adds a PASS/FAIL verdict against a
 declared A-weighted sound-power limit (a sound-power emission is a quantity where
 less is better, so the source passes at or below the limit). `verbose=True`
-adds the energy-averaged level `Lp'` to the table, and for the ISO 3744/3746
-surface result it also adds the `K1`/`K2` correction columns (the ISO 3745
-precision result carries no `K1`/`K2`; its `C1`/`C2`/`C3` appear in the
+adds the energy-averaged level $L_p'$ to the table, and for the ISO 3744/3746
+surface result it also adds the $K_1$/$K_2$ correction columns (the ISO 3745
+precision result carries no $K_1$/$K_2$; its $C_1$/$C_2$/$C_3$ appear in the
 basis strip). `language="es"` renders the Spanish fiche with comma decimals.
 
 ```python
@@ -432,15 +436,15 @@ repository. Click the preview to open the PDF:
 [![ISO 3744 sound power determination example report: a header with the client, the noise source, the hemi-anechoic test environment and the instrumentation and climate, the octave-band table (63 Hz to 8 kHz) of surface sound-pressure levels Lp and band sound-power levels LW, the sound-power spectrum LW(f) with a nominal band axis, the boxed A-weighted sound power level LWA = 103.7 dB(A) re 1 pW with the total LW = 105.8 dB, the expanded uncertainty U = 3.0 dB and the measurement surface S = 100.53 m2, and a PASS verdict against the declared 105 dB(A) limit, closed by a basis strip stating the applied K1 = 0.5 dB and K2 = 1.0 dB corrections](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/reports/iso3744_sound_power_example.webp)](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/reports/iso3744_sound_power_example.pdf)
 
 *Sound power determination fiche (`SoundPowerResult.report`), an ISO 3744
-engineering-grade hemisphere measurement with the K1/K2 corrections and the
-boxed LWA.*
+engineering-grade hemisphere measurement with the $K_1$/$K_2$ corrections and
+the boxed $L_{WA}$.*
 
 
 ## See also
 
 - [Sound Power](sound-power.md): choosing among the five determination
   routes, what the accuracy grades promise, and the ISO 4871 noise-emission
-  declaration a measured `LWA` feeds.
+  declaration a measured $L_{WA}$ feeds.
 - [Sound Power in the Reverberation Room (ISO 3741)](sound-power-reverberation.md):
   the precision-grade diffuse-field alternative when the source can travel
   to a qualified room.
@@ -448,9 +452,10 @@ boxed LWA.*
   the routes that tolerate the steady background noise a pressure method
   cannot subtract.
 - [Room Acoustics](room-acoustics.md): the reverberation time and equivalent
-  absorption area that feed `K2`.
-- [Levels](levels.md): energy averaging and the A-weighting behind `LWA`.
-- [Theory](theory-environment-transport.md): the K1/K2 and C1/C2 derivations.
+  absorption area that feed $K_2$.
+- [Levels](levels.md): energy averaging and the A-weighting behind $L_{WA}$.
+- [Theory](theory-environment-transport.md): the $K_1$/$K_2$ and $C_1$/$C_2$
+  derivations.
 - API reference: [`emission.sound_power`](https://jmrplens.github.io/phonometry/reference/api/power/sound-power/).
 
 ## References
@@ -485,7 +490,7 @@ boxed LWA.*
 ISO 3744:2010, *Acoustics — Determination of sound power levels
 and sound energy levels of noise sources using sound pressure — Engineering
 methods for an essentially free field over a reflecting plane*: the
-enveloping-surface method: hemisphere and box surface areas, the `K1`/`K2`
+enveloping-surface method: hemisphere and box surface areas, the $K_1$/$K_2$
 corrections, the Annex B microphone positions and the Annex E A-weighting.
 ISO 3746:2010, *… Survey method using an enveloping measurement surface over a
 reflecting plane*: the survey grade sharing the same formulae with coarser
