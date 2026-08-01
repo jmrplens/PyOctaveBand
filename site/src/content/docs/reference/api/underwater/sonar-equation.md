@@ -11,19 +11,22 @@ Combines the sonar performance terms -- source level `SL`, transmission loss
 `TL`, noise level `NL`, directivity index `DI`, detection threshold `DT`,
 target strength `TS` and reverberation level `RL` -- into the signal excess
 `SE`, the signal-to-noise ratio and the figure of merit (the maximum allowable
-transmission loss at the detection limit `SE = 0`):
+transmission loss at the detection limit $\mathrm{SE} = 0$):
 
-* [`passive_sonar_equation`](/phonometry/reference/api/underwater/sonar-equation/#passive_sonar_equation) -- `SE = SL − TL − (NL − DI) − DT`.
+* [`passive_sonar_equation`](/phonometry/reference/api/underwater/sonar-equation/#passive_sonar_equation) --
+  $\mathrm{SE} = \mathrm{SL} - \mathrm{TL} - (\mathrm{NL} - \mathrm{DI}) - \mathrm{DT}$.
 * [`active_sonar_equation`](/phonometry/reference/api/underwater/sonar-equation/#active_sonar_equation) -- monostatic, noise-limited
-  `SE = SL − 2·TL + TS − (NL − DI) − DT` or, when a reverberation level is
-  given, reverberation-limited `SE = SL − 2·TL + TS − RL − DT`.
+  $\mathrm{SE} = \mathrm{SL} - 2\,\mathrm{TL} + \mathrm{TS} - (\mathrm{NL} - \mathrm{DI}) - \mathrm{DT}$ or, when a reverberation level
+  is given, reverberation-limited
+  $\mathrm{SE} = \mathrm{SL} - 2\,\mathrm{TL} + \mathrm{TS} - \mathrm{RL} - \mathrm{DT}$.
 
 All quantities are in dB (levels re a plane wave of 1 µPa rms; the terms are
 spectrum levels, i.e. referred to a 1 Hz band). Source: Urick, *Principles of
 Underwater Sound*, via Etter (2003), Table 10.2.
 
 The figure of merit is the *maximum allowable transmission loss*, so inverting
-a transmission-loss law at `TL = FOM` gives the **detection range**, the
+a transmission-loss law at $\mathrm{TL} = \mathrm{FOM}$ gives the
+**detection range**, the
 range at which the detection probability is 50 %:
 
 * [`detection_range`](/phonometry/reference/api/underwater/sonar-equation/#detection_range) inverts the closed-form loss of
@@ -54,16 +57,16 @@ active_sonar_equation(
 
 Monostatic active sonar equation with a two-way transmission loss.
 
-Noise-limited: `SE = SL − 2·TL + TS − (NL − DI) − DT`. When
+Noise-limited: $\mathrm{SE} = \mathrm{SL} - 2\,\mathrm{TL} + \mathrm{TS} - (\mathrm{NL} - \mathrm{DI}) - \mathrm{DT}$. When
 `reverberation_level` is given, reverberation-limited:
-`SE = SL − 2·TL + TS − RL − DT` (`DI` does not apply to reverberation).
+$\mathrm{SE} = \mathrm{SL} - 2\,\mathrm{TL} + \mathrm{TS} - \mathrm{RL} - \mathrm{DT}$ (`DI` does not apply to reverberation).
 
 **Parameters**
 
 | Name | Description |
 | :--- | :--- |
 | `source_level` | Source level `SL`, in dB. |
-| `transmission_loss` | One-way transmission loss `TL`, in dB (scalar or array); the equation applies `2·TL`. |
+| `transmission_loss` | One-way transmission loss `TL`, in dB (scalar or array); the equation applies $2\,\mathrm{TL}$. |
 | `target_strength` | Target strength `TS`, in dB. |
 | `noise_level` | Background noise level `NL`, in dB. |
 | `directivity_index` | Receiver directivity index `DI`, in dB. |
@@ -97,9 +100,10 @@ detection_range(
 ) -> DetectionRangeResult
 ```
 
-Range at which the closed-form transmission loss equals the figure of merit.
+Range at which the closed-form transmission loss equals the figure of
+merit.
 
-Solves `TL(r) = FOM` for the loss of
+Solves $\mathrm{TL}(r) = \mathrm{FOM}$ for the loss of
 [`transmission_loss`](/phonometry/reference/api/underwater/propagation/#transmission_loss), which is
 strictly increasing in range, so the root is unique. A **one-way** figure of
 merit works for both sonar modes: the active figure of merit returned by
@@ -190,7 +194,7 @@ Detection range obtained by inverting a transmission-loss law.
 | `frequency` | Acoustic frequency, in Hz. |
 | `range_m` | Range grid over which the loss was evaluated, in metres. |
 | `transmission_loss` | Transmission loss at each range, in dB. |
-| `absorption_coefficient` | Absorption coefficient `α`, in dB/km. |
+| `absorption_coefficient` | Absorption coefficient $\alpha$, in dB/km. |
 | `law` | The spreading law used. |
 | `model` | The absorption model used. |
 
@@ -220,7 +224,7 @@ passive_sonar_equation(
 ) -> SonarEquationResult
 ```
 
-Passive sonar equation `SE = SL − TL − (NL − DI) − DT`.
+Passive sonar equation $\mathrm{SE} = \mathrm{SL} - \mathrm{TL} - (\mathrm{NL} - \mathrm{DI}) - \mathrm{DT}$.
 
 **Parameters**
 
@@ -266,11 +270,11 @@ Sonar-equation solution.
 | :--- | :--- |
 | `mode` | `"passive"` or `"active"`. |
 | `signal_excess` | Signal excess `SE` per transmission loss, in dB (detection when `SE >= 0`). |
-| `snr` | Signal-to-noise (or signal-to-reverberation) ratio, in dB (`SE + DT`). |
-| `figure_of_merit` | Maximum allowable (one-way) transmission loss at the detection limit `SE = 0`, in dB. |
+| `snr` | Signal-to-noise (or signal-to-reverberation) ratio, in dB ($\mathrm{SE} + \mathrm{DT}$). |
+| `figure_of_merit` | Maximum allowable (one-way) transmission loss at the detection limit $\mathrm{SE} = 0$, in dB. |
 | `transmission_loss` | The transmission-loss values, in dB. |
 | `source_level` | Source level `SL`, in dB. |
-| `noise_level` | Background noise level `NL` input, in dB. The masking term is `NL − DI`, except when `reverberation_limited` is true, where the reverberation level `RL` masks instead. |
+| `noise_level` | Background noise level `NL` input, in dB. The masking term is $\mathrm{NL} - \mathrm{DI}$, except when `reverberation_limited` is true, where the reverberation level `RL` masks instead. |
 | `directivity_index` | Receiver directivity index `DI`, in dB. |
 | `detection_threshold` | Detection threshold `DT`, in dB. |
 | `target_strength` | Target strength `TS`, in dB (`None` for passive). |

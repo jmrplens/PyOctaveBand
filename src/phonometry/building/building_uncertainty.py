@@ -1,5 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""
+r"""
 Measurement uncertainty in building acoustics (ISO 12999-1:2020).
 
 This module supplies the **measurement uncertainty** of the sound-insulation
@@ -28,14 +28,17 @@ standard uncertainty ``u``:
   Tables 2/3.
 - Maximum repeatability standard deviation for lab self-verification: Table 1.
 
-**Expansion (Clause 8).** ``U = k·u`` (Formula 2) with the coverage factor ``k`` of
-Table 8 (a minimum of ``k = 1`` is enforced). Declaring conformity with a
+**Expansion (Clause 8).** :math:`U = k\,u` (Formula 2) with the coverage
+factor ``k`` of
+Table 8 (a minimum of :math:`k = 1` is enforced). Declaring conformity with a
 requirement uses the **one-sided** factor (Formulae 4/5); reporting a two-sided
-interval ``Y = y ± U`` (Formula 3) uses the two-sided factor.
+interval :math:`Y = y \pm U` (Formula 3) uses the two-sided factor.
 
-**Combination.** Uncorrelated quadrature ``uc = sqrt(Σ u_i²)`` (Formula C.2);
+**Combination.** Uncorrelated quadrature :math:`u_c = \sqrt{\sum u_i^2}`
+(Formula C.2);
 prediction input uncertainty (Formula A.1); model/reality combination (Formula A.2);
-reduction by ``m`` independent measurements ``u/sqrt(m)`` (Formula A.7); and the
+reduction by ``m`` independent measurements :math:`u/\sqrt{m}` (Formula A.7);
+and the
 uncorrelated single-number combination of Annex B (Formula B.2).
 
 Clause/table numbers refer to ISO 12999-1:2020(E).
@@ -231,12 +234,12 @@ class BandUncertainty:
 
 @dataclass(frozen=True)
 class UncertainValue:
-    """A best estimate with its ISO 12999-1 expanded uncertainty (Clause 8).
+    r"""A best estimate with its ISO 12999-1 expanded uncertainty (Clause 8).
 
     :ivar value: Best estimate ``y`` (e.g. a weighted rating), in dB.
     :ivar standard_uncertainty: Standard uncertainty ``u``, in dB.
     :ivar coverage_factor: Coverage factor ``k`` (Table 8).
-    :ivar expanded_uncertainty: ``U = k·u``, in dB.
+    :ivar expanded_uncertainty: :math:`U = k\,u`, in dB.
     :ivar confidence: Confidence level as a fraction (e.g. ``0.95``).
     :ivar one_sided: ``True`` for a one-sided interval (conformity checks).
     """
@@ -250,12 +253,12 @@ class UncertainValue:
 
     @property
     def lower(self) -> float:
-        """Lower interval bound ``y − U`` (Formula 3/5)."""
+        r"""Lower interval bound :math:`y - U` (Formula 3/5)."""
         return self.value - self.expanded_uncertainty
 
     @property
     def upper(self) -> float:
-        """Upper interval bound ``y + U`` (Formula 3/4)."""
+        r"""Upper interval bound :math:`y + U` (Formula 3/4)."""
         return self.value + self.expanded_uncertainty
 
 
@@ -400,10 +403,10 @@ def insulation_expanded_uncertainty(
     coverage: float = 0.95,
     one_sided: bool = False,
 ) -> float:
-    """Return the expanded uncertainty ``U = k·u`` (Formula 2, Clause 8).
+    r"""Return the expanded uncertainty :math:`U = k\,u` (Formula 2, Clause 8).
 
     The coverage factor ``k`` is taken from Table 8 for the requested confidence
-    level; a minimum of ``k = 1`` is enforced (Clause 8).
+    level; a minimum of :math:`k = 1` is enforced (Clause 8).
 
     :param u: Standard uncertainty ``u``, in dB (must be non-negative).
     :param coverage: Confidence level as a fraction (see :func:`insulation_coverage_factor`).
@@ -425,11 +428,11 @@ def uncertain_value(
     one_sided: bool = False,
     upper_limit: bool = False,
 ) -> UncertainValue:
-    """Attach the ISO 12999-1 expanded uncertainty to a single-number rating.
+    r"""Attach the ISO 12999-1 expanded uncertainty to a single-number rating.
 
     Convenience wrapper combining :func:`single_number_uncertainty`,
     :func:`insulation_coverage_factor` and :func:`insulation_expanded_uncertainty` into an
-    :class:`UncertainValue` (``value ± U``) without modifying the rating
+    :class:`UncertainValue` (:math:`y \pm U`) without modifying the rating
     dataclasses. For conformity checks pass ``one_sided=True`` and read
     :attr:`UncertainValue.lower` / :attr:`UncertainValue.upper` (Formulae 4/5).
 
@@ -456,9 +459,10 @@ def uncertain_value(
 # Combination of uncertainties (Clause 6, Annexes A/B/C).
 # --------------------------------------------------------------------------- #
 def combine_uncertainties(*components: float) -> float:
-    """Combine independent standard uncertainties in quadrature (Formula C.2).
+    r"""Combine independent standard uncertainties in quadrature (Formula C.2).
 
-    ``uc = sqrt(Σ u_i²)`` for uncorrelated contributions with unit sensitivity
+    :math:`u_c = \sqrt{\sum u_i^2}` for uncorrelated contributions with unit
+    sensitivity
     coefficients, also the model/reality combination of Formula (A.2).
 
     :param components: Standard-uncertainty contributions, in dB (non-negative).
@@ -476,15 +480,21 @@ def prediction_input_uncertainty(
     sigma_product: float,
     n: int,
 ) -> float:
-    """Return the prediction input uncertainty ``u_input`` (Formula A.1).
+    r"""Return the prediction input uncertainty ``u_input`` (Formula A.1).
 
-    ``u_input = sqrt( (σR² + σ_product²)/n + σ_product² )`` combines the
+    .. math::
+
+       u_{\mathrm{input}} =
+       \sqrt{\frac{\sigma_R^2 + \sigma_{\mathrm{product}}^2}{n}
+       + \sigma_{\mathrm{product}}^2}
+
+    combines the
     reproducibility standard deviation with the product-homogeneity scatter over
     ``n`` measurements of nominally identical specimens.
 
     :param sigma_reproducibility: Reproducibility standard deviation ``σR``, in dB.
     :param sigma_product: Product-homogeneity standard deviation ``σ_product``, in dB.
-    :param n: Number of measurements of the product (``n >= 1``).
+    :param n: Number of measurements of the product (:math:`n \ge 1`).
     :raises ValueError: Non-positive ``n`` or a negative standard deviation.
     """
     if n < 1:
@@ -495,13 +505,14 @@ def prediction_input_uncertainty(
 
 
 def reduce_by_independent_measurements(u: float, m: int) -> float:
-    """Reduce a standard uncertainty by ``m`` independent measurements (Formula A.7).
+    r"""Reduce a standard uncertainty by ``m`` independent measurements (Formula A.7).
 
-    ``u_reduced = u / sqrt(m)``: measurements by different persons with different
+    :math:`u_{\mathrm{reduced}} = u / \sqrt{m}`: measurements by different
+    persons with different
     equipment lower the in-situ uncertainty.
 
     :param u: Standard uncertainty of a single measurement, in dB (non-negative).
-    :param m: Number of independent measurements (``m >= 1``).
+    :param m: Number of independent measurements (:math:`m \ge 1`).
     :raises ValueError: Non-positive ``m`` or negative ``u``.
     """
     if m < 1:
@@ -515,17 +526,26 @@ def single_number_uncertainty_uncorrelated(
     band_uncertainties: Sequence[float] | np.ndarray,
     reference_differences: Sequence[float] | np.ndarray,
 ) -> float:
-    """Uncorrelated single-number uncertainty from band uncertainties (Formula B.2).
+    r"""Uncorrelated single-number uncertainty from band uncertainties (Formula B.2).
 
-    ``u(Rw+C) = sqrt( Σ_i (w_i · u_i)² )`` with energy weights
-    ``w_i = 10^((L_i − R_i)/10) / Σ_j 10^((L_j − R_j)/10)`` derived from the
+    .. math::
+
+       u(R_w{+}C) = \sqrt{\sum_i (w_i \, u_i)^2}
+
+    with energy weights
+
+    .. math::
+
+       w_i = \frac{10^{(L_i - R_i)/10}}{\sum_j 10^{(L_j - R_j)/10}}
+
+    derived from the
     reference spectrum. This is the *no-correlation* estimate of Annex B; the
     fully correlated bound (Formulae B.3-B.6) instead re-runs the ISO 717 rating
     and is not reproduced here.
 
     :param band_uncertainties: Per-band standard uncertainties ``u_i``, in dB.
-    :param reference_differences: Per-band ``L_i − R_i`` (reference-spectrum level
-        minus measured band value), in dB.
+    :param reference_differences: Per-band :math:`L_i - R_i`
+        (reference-spectrum level minus measured band value), in dB.
     :raises ValueError: Mismatched lengths, empty input, or negative ``u_i``.
     """
     u_arr = np.asarray(band_uncertainties, dtype=float)
@@ -556,9 +576,10 @@ def satisfies_lower_requirement(
     expanded_uncertainty_value: float,
     requirement: float,
 ) -> bool:
-    """Test a minimum requirement with one-sided uncertainty (Formula 5).
+    r"""Test a minimum requirement with one-sided uncertainty (Formula 5).
 
-    Returns ``True`` when ``value − U > requirement``, e.g. an apparent sound
+    Returns ``True`` when
+    :math:`\text{value} - U > \text{requirement}`, e.g. an apparent sound
     reduction index ``R'w`` provably exceeds a minimum. ``U`` should be computed
     with the one-sided coverage factor.
     """
@@ -570,9 +591,10 @@ def satisfies_upper_requirement(
     expanded_uncertainty_value: float,
     requirement: float,
 ) -> bool:
-    """Test a maximum requirement with one-sided uncertainty (Formula 4).
+    r"""Test a maximum requirement with one-sided uncertainty (Formula 4).
 
-    Returns ``True`` when ``value + U < requirement``, e.g. a normalized impact
+    Returns ``True`` when
+    :math:`\text{value} + U < \text{requirement}`, e.g. a normalized impact
     level ``L'n,w`` provably stays below a maximum. ``U`` should be computed with
     the one-sided coverage factor.
     """

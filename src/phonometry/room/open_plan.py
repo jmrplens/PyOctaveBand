@@ -1,5 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""
+r"""
 Open-plan-office spatial metrics per ISO 3382-3:2012.
 
 From a line of measurement positions across workstations (ISO 3382-3:2012,
@@ -8,7 +8,8 @@ From a line of measurement positions across workstations (ISO 3382-3:2012,
 - the spatial decay rate of the A-weighted sound pressure level of speech
   ``D2,S`` and the nominal A-weighted speech level at 4 m ``Lp,A,S,4m``
   (Clause 6.2), obtained by a least-squares fit of the A-weighted speech
-  level against ``lg(r/r0)`` (logarithmic distance axis, ``r0 = 1 m``)
+  level against :math:`\lg(r/r_0)` (logarithmic distance axis,
+  :math:`r_0 = 1` m)
   using only positions in the 2 m to 16 m range (Equation (5)); and
 - the distraction distance ``rD`` (STI = 0.50) and privacy distance
   ``rP`` (STI = 0.20) (Clause 3.6, 3.7, 6.3), obtained from a linear
@@ -189,7 +190,8 @@ class OpenPlanResult:
 
 
 def _linear_fit(x: np.ndarray, y: np.ndarray) -> tuple[float, float]:
-    """Ordinary least-squares fit ``y = slope*x + intercept``.
+    r"""Ordinary least-squares fit
+    :math:`y = \text{slope} \cdot x + \text{intercept}`.
 
     :param x: Independent variable samples.
     :param y: Dependent variable samples (same length as ``x``).
@@ -202,12 +204,13 @@ def _linear_fit(x: np.ndarray, y: np.ndarray) -> tuple[float, float]:
 def _sti_crossing(
     slope: float, intercept: float, threshold: float
 ) -> float:
-    """Distance where the STI regression line reaches ``threshold``.
+    r"""Distance where the STI regression line reaches ``threshold``.
 
-    Solves ``slope*r + intercept = threshold`` (ISO 3382-3:2012, 6.3).
+    Solves :math:`\text{slope} \cdot r + \text{intercept} = \text{threshold}`
+    (ISO 3382-3:2012, 6.3).
     Returns ``nan`` when the STI does not decrease with distance
-    (``slope >= 0``) or the crossing is at or before the source
-    (``r <= 0``); otherwise the (possibly extrapolated) crossing distance.
+    (:math:`\text{slope} \ge 0`) or the crossing is at or before the source
+    (:math:`r \le 0`); otherwise the (possibly extrapolated) crossing distance.
     """
     if slope >= 0.0:
         return float("nan")
@@ -222,13 +225,14 @@ def open_plan_metrics(
     spl_a_speech: list[float] | np.ndarray,
     sti_values: list[float] | np.ndarray,
 ) -> OpenPlanResult:
-    """
+    r"""
     Open-plan-office single-number quantities per ISO 3382-3:2012.
 
     Computes the spatial decay rate ``D2,S`` and the nominal A-weighted
     speech level at 4 m ``Lp,A,S,4m`` (Clause 6.2, Equation (5)) from a
-    least-squares fit of the A-weighted speech level against ``lg(r/r0)``
-    (``r0 = 1 m``) restricted to positions in the 2 m to 16 m range, and
+    least-squares fit of the A-weighted speech level against
+    :math:`\lg(r/r_0)` (:math:`r_0 = 1` m) restricted to positions in the
+    2 m to 16 m range, and
     the distraction distance ``rD`` (STI = 0.50) and privacy distance
     ``rP`` (STI = 0.20) from a linear regression of STI against distance
     (Clause 3.6, 3.7, 6.3).

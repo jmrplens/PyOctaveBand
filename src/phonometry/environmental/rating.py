@@ -50,11 +50,14 @@ def lden(
     lnight: float,
     hours: tuple[float, float, float] = (12.0, 4.0, 8.0),
 ) -> float:
-    """
+    r"""
     Day-evening-night sound level Lden (ISO 1996-1:2016, 3.6.4).
 
-    ``Lden = 10*lg{(1/24)*[t_d*10^(0.1*Lday) + t_e*10^(0.1*(Levening+5))
-    + t_n*10^(0.1*(Lnight+10))]}``
+    .. math::
+
+       L_{den} = 10 \lg\left\{ (1/24) \left[ t_d \cdot 10^{0.1 L_{day}}
+       + t_e \cdot 10^{0.1 (L_{evening}+5)}
+       + t_n \cdot 10^{0.1 (L_{night}+10)} \right] \right\}
 
     :param lday: LAeq over the day period, in dB.
     :param levening: LAeq over the evening period, in dB (+5 dB weighting).
@@ -75,10 +78,13 @@ def ldn(
     lnight: float,
     hours: tuple[float, float] = (15.0, 9.0),
 ) -> float:
-    """
+    r"""
     Day-night sound level Ldn (ISO 1996-1:2016, 3.6.5).
 
-    ``Ldn = 10*lg{(1/24)*[t_d*10^(0.1*Lday) + t_n*10^(0.1*(Lnight+10))]}``
+    .. math::
+
+       L_{dn} = 10 \lg\left\{ (1/24) \left[ t_d \cdot 10^{0.1 L_{day}}
+       + t_n \cdot 10^{0.1 (L_{night}+10)} \right] \right\}
 
     :param lday: LAeq over the day period, in dB.
     :param lnight: LAeq over the night period, in dB (+10 dB weighting).

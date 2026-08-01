@@ -16,7 +16,8 @@ implemented, each faithful to its own standard:
   Sabine-form absorption coefficients: the random-incidence absorption
   coefficient `alpha_s` (Clause 8.1.1, Eq. (1)) and the specular absorption
   coefficient `alpha_spec` (Clause 8.1.2, Eq. (4)). Their ratio yields the
-  scattering coefficient `s = (alpha_spec - alpha_s) / (1 - alpha_s)`
+  scattering coefficient
+  $s = (\alpha_{\mathrm{spec}} - \alpha_s) / (1 - \alpha_s)$
   (Clause 8.1.3, Eq. (5)). The turntable base plate is qualified through its
   own scattering coefficient (Clause 8.1.4, Eq. (6)) against the Table 1
   limits (Clause 6.2). Air properties come from the speed-of-sound and
@@ -60,9 +61,11 @@ absorption_coefficient_uncertainty(
 ) -> Real
 ```
 
-Uncertainty of a Sabine absorption coefficient (ISO 17497-1, Eqs. (A.3)/(A.4)).
+Uncertainty of a Sabine absorption coefficient (ISO 17497-1, A.3/A.4).
 
-`u_alpha = (55,3 V) / (c S) * sqrt((u_b / T_b^2)^2 + (u_a / T_a^2)^2)`.
+$$
+u_\alpha = \frac{55.3 V}{c S} \sqrt{(u_b / T_b^2)^2 + (u_a / T_a^2)^2}
+$$
 
 With situations `(T1, T2)` this is `u(alpha_s)` (Eq. (A.3)); with
 `(T3, T4)` it is `u(alpha_spec)` (Eq. (A.4)). The unsubscripted `c` of
@@ -96,9 +99,10 @@ air_attenuation_coefficient(
 ) -> Real
 ```
 
-Energy attenuation coefficient `m` (ISO 17497-1:2004, Clause 8, Eq. (3)).
+Energy attenuation coefficient `m` (ISO 17497-1, Clause 8, Eq. (3)).
 
-`m = alpha / (10 * lg(e)) approx. alpha / 4,343` (1/m), where `alpha` is
+$m = \alpha / (10 \lg(e)) \approx \alpha / 4.343$ (1/m), where
+`alpha` is
 the sound-*pressure* attenuation coefficient in dB/m obtained from
 ISO 9613-1 using the measured temperature and relative humidity.
 
@@ -130,27 +134,25 @@ area_factors(
 Per-receiver area weights `N_i` (ISO 17497-2, Clause 8.3, Formula (8)).
 
 For a hemispherical measurement the solid-angle area sampled by a receiver
-at elevation `theta` (with angular spacings `delta_theta`, `delta_phi`)
-is:
+at elevation `theta` (with angular spacings `delta_theta`,
+`delta_phi`) is:
 
-```text
-A_i = (4 pi / delta_phi) * sin^2(delta_theta / 4)   for theta = 0 deg
-A_i = 2 sin(theta) sin(delta_theta / 2)             for theta != 0, 90 deg
-A_i = sin(delta_theta / 2)                          for |theta| = 90 deg
-```
+$$
+\begin{aligned} A_i &= (4 \pi / \Delta\phi) \sin^{2}(\Delta\theta / 4) && \text{for } \theta = 0^\circ \\ A_i &= 2 \sin(\theta) \sin(\Delta\theta / 2) && \text{for } \theta \ne 0^\circ, 90^\circ \\ A_i &= \sin(\Delta\theta / 2) && \text{for } \lvert \theta \rvert = 90^\circ \end{aligned}
+$$
 
-and `N_i = A_i / A_min` (Formula (8)), with `A_min` the smallest `A_i`.
-All angles are handled internally in **radians**; the `theta = 0` form in
-particular requires `delta_phi` in radians to be dimensionally consistent
-with the `4 pi` factor.
+and $N_i = A_i / A_{\min}$ (Formula (8)), with `A_min` the
+smallest `A_i`. All angles are handled internally in **radians**; the
+$\theta = 0$ form in particular requires `delta_phi` in radians to
+be dimensionally consistent with the $4 \pi$ factor.
 
 **Parameters**
 
 | Name | Description |
 | :--- | :--- |
-| `elevations` | Receiver elevation angles `theta` from the reference normal, in **degrees** (1-D), over the measurement domain `0 <= theta <= 90` (Figure 7). Formula (8) assumes a single receiver at `theta = 0` (the zenith); duplicate zenith entries would each take the full zenith area. |
+| `elevations` | Receiver elevation angles `theta` from the reference normal, in **degrees** (1-D), over the measurement domain $0 \le \theta \le 90$ (Figure 7). Formula (8) assumes a single receiver at $\theta = 0$ (the zenith); duplicate zenith entries would each take the full zenith area. |
 | `delta_theta` | Elevation spacing between adjacent receivers, in degrees (typically 5). |
-| `delta_phi` | Azimuth spacing between adjacent receivers, in degrees; defaults to `delta_theta`. Required (implicitly) for the `theta = 0` receiver. |
+| `delta_phi` | Azimuth spacing between adjacent receivers, in degrees; defaults to `delta_theta`. Required (implicitly) for the $\theta = 0$ receiver. |
 
 **Returns:** Per-receiver area weights `N_i` (dimensionless, min value 1).
 
@@ -194,9 +196,12 @@ base_plate_scattering(
 
 Scattering coefficient of the base plate alone (ISO 17497-1, Eq. (6)).
 
-`s_base = 55,3 * (V / S) * (1 / (c3 T3) - 1 / (c1 T1)) - (4 V / S) * (m3 - m1)`.
+$$
+s_{\mathrm{base}} = 55.3 \frac{V}{S} \left( \frac{1}{c_3 T_3} - \frac{1}{c_1 T_1} \right) - \frac{4 V}{S} (m_3 - m_1)
+$$
 
-Ideally `T1 == T3`; a slightly non-symmetrical base plate shortens `T3`
+Ideally $T_1 = T_3$; a slightly non-symmetrical base plate shortens
+`T3`
 and this quality metric captures the resulting spurious scattering, which
 must not exceed the Table 1 limits (Clause 6.2). See
 [`check_base_plate_scattering`](/phonometry/reference/api/materials/scattering-diffusion/#check_base_plate_scattering).
@@ -502,18 +507,17 @@ For a fixed source position and one-third-octave band, from the `n`
 reflected sound-pressure levels `L_i` (dB). With equal-area receivers
 (`area_weights is None`, Formula (5)):
 
-```text
-d_theta = ((sum p_i)^2 - sum p_i^2) / ((n - 1) * sum p_i^2)
-```
+$$
+d_\theta = \frac{\left( \sum_i p_i \right)^{2} - \sum_i p_i^{2}} {(n - 1) \sum_i p_i^{2}}
+$$
 
-where `p_i = 10^(L_i / 10)`. When each receiver samples a different area
-(Formula (6)) the per-receiver weights `N_i` (from [`area_factors`](/phonometry/reference/api/materials/scattering-diffusion/#area_factors))
-enter:
+where $p_i = 10^{L_i / 10}$. When each receiver samples a different
+area (Formula (6)) the per-receiver weights `N_i` (from
+[`area_factors`](/phonometry/reference/api/materials/scattering-diffusion/#area_factors)) enter:
 
-```text
-d_theta = ((sum p_i N_i)^2 - sum N_i p_i^2)
-          / ((sum N_i - 1) * sum N_i p_i^2)
-```
+$$
+d_\theta = \frac{\left( \sum_i p_i N_i \right)^{2} - \sum_i N_i p_i^{2}} {\left( \sum_i N_i - 1 \right) \sum_i N_i p_i^{2}}
+$$
 
 which reduces to Formula (5) for uniform weights. The coefficient is 0 when
 only one receiver has non-zero scattered energy and 1 when all receivers
@@ -523,7 +527,7 @@ are equal.
 
 | Name | Description |
 | :--- | :--- |
-| `levels` | The `n >= 2` reflected sound-pressure levels `L_i`, in decibels (a level of `-inf` denotes a receiver with zero energy). |
+| `levels` | The $n \ge 2$ reflected sound-pressure levels `L_i`, in decibels (a level of `-inf` denotes a receiver with zero energy). |
 | `area_weights` | Optional per-receiver area weights `N_i` (Formula (8)); `None` selects the equal-area Formula (5). |
 
 **Returns:** Directional diffusion coefficient `d_theta` (a scalar).
@@ -545,10 +549,12 @@ normalized_diffusion_coefficient(
 
 Normalised directional diffusion coefficient (ISO 17497-2, Formula (7)).
 
-`d_theta_n = (d_theta - d_theta_r) / (1 - d_theta_r)`, removing the
+$d_{\theta,n} = (d_\theta - d_{\theta,r}) / (1 - d_{\theta,r})$,
+removing the
 finite-panel diffusion of the reference flat surface `d_theta_r` (same
-projected footprint as the test surface). It maps `d_theta = d_theta_r`
-to 0 and `d_theta = 1` to 1.
+projected footprint as the test surface). It maps
+$d_\theta = d_{\theta,r}$
+to 0 and $d_\theta = 1$ to 1.
 
 **Parameters**
 
@@ -619,7 +625,9 @@ random_incidence_absorption(
 
 Random-incidence absorption coefficient `alpha_s` (ISO 17497-1, Eq. (1)).
 
-`alpha_s = 55,3 * (V / S) * (1 / (c2 T2) - 1 / (c1 T1)) - (4 V / S) * (m2 - m1)`.
+$$
+\alpha_s = 55.3 \, \frac{V}{S} \left( \frac{1}{c_2 T_2} - \frac{1}{c_1 T_1} \right) - \frac{4 V}{S} (m_2 - m_1)
+$$
 
 Situation 1 is the empty room with the (static) base plate present;
 situation 2 adds the test sample, still without turntable rotation
@@ -688,7 +696,11 @@ reverberation_time_uncertainty(times: ArrayLike) -> Real
 
 Standard uncertainty of a reverberation time (ISO 17497-1, Eq. (A.1)).
 
-`u = sqrt( sum_i (T_i - Tbar)^2 / (N (N - 1)) )` with `Tbar` the mean of
+$$
+u = \sqrt{ \sum_i (T_i - \overline{T})^2 / (N (N - 1)) }
+$$
+
+with $\overline{T}$ the mean of
 the `N` spatially-averaged measurements (Eq. (A.2)); this is the standard
 error of the mean.
 
@@ -696,7 +708,7 @@ error of the mean.
 
 | Name | Description |
 | :--- | :--- |
-| `times` | The `N >= 2` reverberation-time measurements, in seconds. |
+| `times` | The $N \ge 2$ reverberation-time measurements, in seconds. |
 
 **Returns:** Standard uncertainty `u` of the mean reverberation time (0-d).
 
@@ -719,8 +731,9 @@ scattering_coefficient(
 
 Random-incidence scattering coefficient `s` (ISO 17497-1, Eq. (5)).
 
-`s = 1 - (1 - alpha_spec) / (1 - alpha_s)
-= (alpha_spec - alpha_s) / (1 - alpha_s)`.
+$$
+s = 1 - \frac{1 - \alpha_{\text{spec}}}{1 - \alpha_s} = \frac{\alpha_{\text{spec}} - \alpha_s}{1 - \alpha_s}
+$$
 
 Following the presentation rule of Clause 8.3, negative results are
 truncated to 0 while values greater than 1 (which can occur through edge
@@ -792,10 +805,11 @@ scattering_coefficient_uncertainty(
 
 Uncertainty of the scattering coefficient (ISO 17497-1, Eq. (A.5)).
 
-`u_s = |(alpha_spec - 1) / (1 - alpha_s)|
-* sqrt((u_alpha_spec / (alpha_spec - 1))^2 + (u_alpha_s / (1 - alpha_s))^2)`,
+$$
+u_s = \left\lvert \frac{\alpha_{\mathrm{spec}} - 1}{1 - \alpha_s} \right\rvert \sqrt{\left( \frac{u_{\alpha_{\mathrm{spec}}}} {\alpha_{\mathrm{spec}} - 1} \right)^{2} + \left( \frac{u_{\alpha_s}}{1 - \alpha_s} \right)^{2}}
+$$
 
-with the expanded uncertainty `U = 2 u_s` (95 % confidence).
+with the expanded uncertainty $U = 2 u_s$ (95 % confidence).
 
 **Parameters**
 
@@ -806,7 +820,7 @@ with the expanded uncertainty `U = 2 u_s` (95 % confidence).
 | `u_alpha_spec` | Standard uncertainty of `alpha_spec` (Eq. (A.4)). |
 | `u_alpha_s` | Standard uncertainty of `alpha_s` (Eq. (A.3)). |
 
-**Returns:** A [`ScatteringUncertainty`](/phonometry/reference/api/materials/scattering-diffusion/#scatteringuncertainty) with `u_s` and `U = 2 u_s`.
+**Returns:** A [`ScatteringUncertainty`](/phonometry/reference/api/materials/scattering-diffusion/#scatteringuncertainty) with `u_s` and $U = 2 u_s$.
 
 **Raises**
 
@@ -913,7 +927,7 @@ Uncertainty of the scattering coefficient (ISO 17497-1, Annex A).
 | Name | Description |
 | :--- | :--- |
 | `u_scattering` | Combined standard uncertainty `u_s` of the scattering coefficient (Eq. (A.5)). |
-| `expanded` | Expanded uncertainty `U = 2 u_s` at 95 % confidence (Annex A). |
+| `expanded` | Expanded uncertainty $U = 2 u_s$ at 95 % confidence (Annex A). |
 
 ## specular_absorption_coefficient
 
@@ -933,7 +947,9 @@ specular_absorption_coefficient(
 
 Specular absorption coefficient `alpha_spec` (ISO 17497-1, Eq. (4)).
 
-`alpha_spec = 55,3 * (V / S) * (1 / (c4 T4) - 1 / (c3 T3)) - (4 V / S) * (m4 - m3)`.
+$$
+\alpha_{\text{spec}} = 55.3 \, \frac{V}{S} \left( \frac{1}{c_4 T_4} - \frac{1}{c_3 T_3} \right) - \frac{4 V}{S} (m_4 - m_3)
+$$
 
 Situation 3 is the rotating base plate without the sample; situation 4 is
 the sample on the rotating turntable (Table 2, rows T3 and T4). The
@@ -968,7 +984,7 @@ speed_of_sound(temperature: ArrayLike) -> Real
 
 Speed of sound in air (ISO 17497-1:2004, Clause 8, Eq. (2)).
 
-`c = 343,2 * sqrt((273,15 + t) / 293,15)` (m/s).
+$c = 343.2 \sqrt{(273.15 + t) / 293.15}$ (m/s).
 
 **Parameters**
 
@@ -982,7 +998,7 @@ Speed of sound in air (ISO 17497-1:2004, Clause 8, Eq. (2)).
 
 | Exception | When |
 | :--- | :--- |
-| ValueError | if any temperature is at or below -273,15 degC. |
+| ValueError | if any temperature is at or below -273.15 degC. |
 
 ## TWO_DIMENSIONAL_SOURCE_WEIGHTS
 

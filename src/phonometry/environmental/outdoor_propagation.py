@@ -1,30 +1,36 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""
+r"""
 Outdoor sound propagation: ISO 9613-2:1996 general method of calculation.
 
 This part of ISO 9613 predicts octave-band attenuation of sound propagating
 outdoors from a point source to a receiver under conditions favourable to
 propagation (moderate downwind, or the equivalent moderate temperature
 inversion; ISO 9613-2:1996, clause 5). The equivalent-continuous downwind
-octave-band sound pressure level is (ISO 9613-2:1996, Eq. (3))::
+octave-band sound pressure level is (ISO 9613-2:1996):
 
-    LfT(DW) = Lw + Dc - A
+.. math::
 
-with ``Lw`` the octave-band sound power level, ``Dc`` the directivity correction
-(directivity index plus a solid-angle index ``DOmega``) and ``A`` the octave-band
-attenuation, itself a sum of physical mechanisms (Eq. (4))::
+   L_{fT}(DW) = L_W + D_c - A \tag{Eq. 3}
 
-    A = Adiv + Aatm + Agr + Abar + Amisc
+with :math:`L_W` the octave-band sound power level, :math:`D_c` the
+directivity correction
+(directivity index plus a solid-angle index ``DOmega``) and ``A`` the
+octave-band attenuation, itself a sum of physical mechanisms:
+
+.. math::
+
+   A = A_{div} + A_{atm} + A_{gr} + A_{bar} + A_{misc} \tag{Eq. 4}
 
 Implemented here are the four general terms of clause 7:
 
-* ``Adiv`` geometrical divergence, ``20 lg(d/d0) + 11`` (Eq. (7));
-* ``Aatm`` atmospheric absorption, ``alpha * d`` (Eq. (8)) with ``alpha`` the
-  ISO 9613-1 coefficient supplied by :mod:`phonometry.air_absorption`;
+* ``Adiv`` geometrical divergence, :math:`20 \lg(d/d_0) + 11` (Eq. (7));
+* ``Aatm`` atmospheric absorption, :math:`\alpha d` (Eq. (8)) with ``alpha``
+  the ISO 9613-1 coefficient supplied by :mod:`phonometry.air_absorption`;
 * ``Agr`` ground effect, both the general per-region method of 7.3.1 with the
   Table 3 functions ``a'/b'/c'/d'`` (Eq. (9)) and the alternative simplified
   method of 7.3.2 (Eq. (10));
-* ``Abar`` screening by a barrier, ``Dz - Agr`` with the ``Dz`` diffraction
+* ``Abar`` screening by a barrier, :math:`D_z - A_{gr}` with the ``Dz``
+  diffraction
   formula of Eq. (14) including the ``C2``/``C3`` factors, the pathlength
   difference ``z`` (Eq. (16)/(17)), the meteorological factor ``Kmet``
   (Eq. (18)) and the 20 dB (single) / 25 dB (double) limits.
@@ -70,7 +76,7 @@ _NOMINAL_BANDS = np.array(DEFAULT_FREQUENCIES, dtype=np.float64)
 
 @dataclass(frozen=True)
 class Barrier:
-    """Screening obstacle for the ISO 9613-2 barrier term (clause 7.4).
+    r"""Screening obstacle for the ISO 9613-2 barrier term (clause 7.4).
 
     The barrier is described by the diffraction geometry that feeds the
     pathlength-difference equations (16)/(17) directly, which is the cleanest
@@ -84,21 +90,22 @@ class Barrier:
         parallel to the barrier edge, in metres (0 for a purely 2-D section).
     :param edge_separation: Spacing ``e`` between the two diffraction edges for
         double (thick-barrier) diffraction, in metres; ``None`` selects single
-        diffraction (Eq. (16), ``C3 = 1``). When given, Eq. (17) and the ``C3``
-        factor of Eq. (15) are used with the 25 dB limit.
+        diffraction (Eq. (16), :math:`C_3 = 1`). When given, Eq. (17) and the
+        ``C3`` factor of Eq. (15) are used with the 25 dB limit.
     :param ground_reflections_by_image: When ``True`` the ground reflections are
-        assumed to be handled separately by image sources, so ``C2 = 40``;
-        otherwise ``C2 = 20`` (Eq. (14)).
+        assumed to be handled separately by image sources, so
+        :math:`C_2 = 40`; otherwise :math:`C_2 = 20` (Eq. (14)).
     :param lateral: When ``True`` the diffraction is around a vertical edge
-        (Eq. (13)): ``Abar = Dz`` (the ground term is not cancelled) and
-        ``Kmet = 1``. Default ``False`` selects top-edge diffraction (Eq. (12)).
+        (Eq. (13)): :math:`A_{bar} = D_z` (the ground term is not cancelled)
+        and :math:`K_{met} = 1`. Default ``False`` selects top-edge
+        diffraction (Eq. (12)).
     :param line_of_sight_clear: When ``True`` the line of sight between source
         and receiver passes *above* the top edge: ISO 9613-2:1996 (text after
         Eq. (16)) then gives the path difference ``z`` a negative sign, and
-        Eq. (14) is still evaluated (with ``Kmet = 1``, Eq. (18)), so ``Dz``
-        falls continuously from ``10 lg 3 = 4.8 dB`` at grazing to 0 for
-        deeper geometries. The edge distances stay the unsigned geometric
-        lengths; only the sign convention of ``z`` changes.
+        Eq. (14) is still evaluated (with :math:`K_{met} = 1`, Eq. (18)), so
+        ``Dz`` falls continuously from :math:`10 \lg 3 = 4.8` dB at grazing
+        to 0 for deeper geometries. The edge distances stay the unsigned
+        geometric lengths; only the sign convention of ``z`` changes.
     """
 
     source_to_edge: float
@@ -127,12 +134,13 @@ class Barrier:
 
 @dataclass(frozen=True)
 class SourceEmission:
-    """Source emission terms for the ISO 9613-2 downwind receiver level (Eq. (3)).
+    r"""Source emission terms for the ISO 9613-2 downwind receiver level (Eq. (3)).
 
     Passed to :meth:`OutdoorAttenuation.report` so the prediction fiche can box
     the A-weighted downwind level at the receiver from an octave-band
-    attenuation breakdown. The level is composed as ``LfT(DW) = Lw + Dc - A``
-    with the directivity correction ``Dc = directivity_index + d_omega``
+    attenuation breakdown. The level is composed as
+    :math:`L_{fT}(DW) = L_W + D_c - A`
+    with the directivity correction :math:`D_c = D_i + D_\Omega`
     (ISO 9613-2:1996, Eq. (3)); an optional meteorological correction ``cmet``
     is subtracted for the long-term average level (Eq. (6)).
 
@@ -147,7 +155,7 @@ class SourceEmission:
         :func:`directivity_omega` for the alternative ground method).
     :param cmet: Optional meteorological correction ``Cmet`` (dB), obtained from
         :func:`meteorological_correction`; ``None`` reports the downwind level
-        ``LfT(DW)`` directly (``Cmet = 0``).
+        ``LfT(DW)`` directly (:math:`C_{met} = 0`).
     """
 
     sound_power_level: ArrayLike
@@ -268,14 +276,17 @@ class OutdoorAttenuation:
 # Geometrical divergence (7.1) and atmospheric absorption (7.2)
 # --------------------------------------------------------------------------- #
 def geometric_divergence(distance: float) -> float:
-    """Attenuation due to geometrical divergence (ISO 9613-2:1996, Eq. (7)).
+    r"""Attenuation due to geometrical divergence (ISO 9613-2:1996, Eq. (7)).
 
-    Spherical spreading in the free field from a point source::
+    Spherical spreading in the free field from a point source:
 
-        Adiv = 20 lg(d/d0) + 11   dB ,   d0 = 1 m
+    .. math::
 
-    The ``+11`` (= ``10 lg 4pi``) sets the sound pressure level at the reference
-    distance ``d0 = 1 m`` from an omnidirectional point source (Note 7).
+       A_{div} = 20 \lg(d/d_0) + 11~\text{dB}, \qquad d_0 = 1~\text{m}
+
+    The ``+11`` (:math:`= 10 \lg 4\pi`) sets the sound pressure level at the
+    reference distance :math:`d_0 = 1` m from an omnidirectional point source
+    (Note 7).
 
     :param distance: Straight-line source-to-receiver distance ``d``, in metres.
     :return: ``Adiv``, in decibels (51 dB at 100 m, 11 dB at 1 m).
@@ -318,12 +329,14 @@ def atmospheric_absorption(
     *,
     humidity: float | str = "deprecated",
 ) -> NDArray[np.float64]:
-    """Attenuation due to atmospheric absorption (ISO 9613-2:1996, Eq. (8)).
+    r"""Attenuation due to atmospheric absorption (ISO 9613-2:1996, Eq. (8)).
 
-    ``Aatm = alpha * d`` with ``alpha`` the ISO 9613-1 atmospheric attenuation
+    :math:`A_{atm} = \alpha d` with ``alpha`` the ISO 9613-1 atmospheric
+    attenuation
     coefficient (here in dB/m, from :func:`phonometry.air_absorption.air_attenuation`)
-    at each octave-band midband frequency. Eq. (8) writes ``alpha`` in dB/km with
-    ``Aatm = alpha_dBkm * d / 1000``; the two forms are identical.
+    at each octave-band midband frequency. Eq. (8) writes ``alpha`` in dB/km
+    with :math:`A_{atm} = \alpha_{\text{dB/km}} \, d / 1000`; the two forms
+    are identical.
 
     ``alpha`` is evaluated at the *exact* base-10 midband frequency behind
     each nominal band label (e.g. 7 943.3 Hz for the "8 kHz" band), the
@@ -407,18 +420,24 @@ def ground_attenuation(
     ground_receiver: float = 0.0,
     projected_distance: float | None = None,
 ) -> NDArray[np.float64]:
-    """Ground attenuation by the general per-region method (7.3.1, Eq. (9)).
+    r"""Ground attenuation by the general per-region method (7.3.1, Eq. (9)).
 
-    ``Agr = As + Ar + Am`` (source, receiver and middle regions), each evaluated
+    :math:`A_{gr} = A_s + A_r + A_m` (source, receiver and middle regions),
+    each evaluated
     with the Table 3 expressions and its ground factor ``G`` (0 = hard, 1 =
-    porous, in between = porous fraction). For the source region ``G = Gs`` and
-    ``h = hs``; for the receiver region ``G = Gr`` and ``h = hr`` (Table 3,
-    note 1). The middle-region term uses the overlap factor ``q`` of note 2::
+    porous, in between = porous fraction). For the source region
+    :math:`G = G_s` and :math:`h = h_s`; for the receiver region
+    :math:`G = G_r` and :math:`h = h_r` (Table 3,
+    note 1). The middle-region term uses the overlap factor ``q`` of note 2:
 
-        q = 0                       if dp <= 30(hs + hr)
-        q = 1 - 30(hs + hr)/dp      if dp > 30(hs + hr)
+    .. math::
 
-    with ``Am = -3q`` at 63 Hz and ``Am = -3q(1 - Gm)`` above.
+       q = 0 \quad \text{if } d_p \le 30 (h_s + h_r)
+
+       q = 1 - \frac{30 (h_s + h_r)}{d_p} \quad
+       \text{if } d_p > 30 (h_s + h_r)
+
+    with :math:`A_m = -3q` at 63 Hz and :math:`A_m = -3q(1 - G_m)` above.
 
     :param distance: Straight-line source-to-receiver distance ``d``, in metres.
     :param source_height: Source height ``hs`` above ground, in metres.
@@ -431,7 +450,7 @@ def ground_attenuation(
     :param ground_middle: Ground factor ``Gm`` of the middle region ([0, 1]).
     :param ground_receiver: Ground factor ``Gr`` of the receiver region ([0, 1]).
     :param projected_distance: Ground-plane projected distance ``dp``, in metres;
-        defaults to ``sqrt(d^2 - (hs - hr)^2)``.
+        defaults to :math:`\sqrt{d^2 - (h_s - h_r)^2}`.
     :return: ``Agr`` per band, in decibels (negative denotes a net gain).
     :raises ValueError: If a ground factor is outside ``[0, 1]``, ``distance``
         is not positive, a height is negative, or a frequency is not positive.
@@ -468,20 +487,23 @@ def ground_attenuation_alternative(
     distance: float,
     mean_height: float,
 ) -> float:
-    """Ground attenuation by the alternative A-weighted method (7.3.2, Eq. (10)).
+    r"""Ground attenuation by the alternative A-weighted method (7.3.2, Eq. (10)).
 
     Valid only when the A-weighted receiver level alone is of interest, the sound
     propagates over porous or mostly-porous ground and is not a pure tone
-    (ISO 9613-2:1996, 7.3.2)::
+    (ISO 9613-2:1996, 7.3.2):
 
-        Agr = 4,8 - (2 hm / d) [17 + (300 / d)]   >= 0   dB
+    .. math::
+
+       A_{gr} = 4.8 - \frac{2 h_m}{d} \left[ 17 + \frac{300}{d} \right]
+       \ge 0~\text{dB}
 
     Negative results are replaced by zero. When this method is used, add the
     solid-angle index :func:`directivity_omega` (Eq. (11)) to ``Dc`` in Eq. (3).
 
     :param distance: Source-to-receiver distance ``d``, in metres.
     :param mean_height: Mean height ``hm`` of the propagation path above the
-        ground (``hm = F/d``, figure 3), in metres.
+        ground (:math:`h_m = F/d`, figure 3), in metres.
     :return: ``Agr``, in decibels (>= 0).
     :raises ValueError: If ``distance`` is not positive.
     """
@@ -496,12 +518,16 @@ def directivity_omega(
     receiver_height: float,
     projected_distance: float,
 ) -> float:
-    """Solid-angle directivity index ``DOmega`` (ISO 9613-2:1996, Eq. (11)).
+    r"""Solid-angle directivity index ``DOmega`` (ISO 9613-2:1996, Eq. (11)).
 
-    Accounts for the apparent increase in source power from ground reflection near
-    the source when the alternative ground method (Eq. (10)) is used::
+    Accounts for the apparent increase in source power from ground reflection
+    near the source when the alternative ground method (Eq. (10)) is used:
 
-        DOmega = 10 lg{ 1 + [dp^2 + (hs - hr)^2] / [dp^2 + (hs + hr)^2] }   dB
+    .. math::
+
+       D_\Omega = 10 \lg\!\left\{ 1 +
+       \frac{d_p^2 + (h_s - h_r)^2}{d_p^2 + (h_s + h_r)^2} \right\}
+       ~\text{dB}
 
     :param source_height: Source height ``hs``, in metres.
     :param receiver_height: Receiver height ``hr``, in metres.
@@ -527,23 +553,25 @@ def barrier_attenuation(
     distance: float,
     frequencies: ArrayLike = DEFAULT_FREQUENCIES,
 ) -> NDArray[np.float64]:
-    """Barrier diffraction attenuation ``Dz`` (ISO 9613-2:1996, Eq. (14)).
+    r"""Barrier diffraction attenuation ``Dz`` (ISO 9613-2:1996, Eq. (14)).
 
-    ::
+    .. math::
 
-        Dz = 10 lg[ 3 + (C2/lambda) C3 z Kmet ]   dB
+       D_z = 10 \lg\!\left[ 3 + \frac{C_2}{\lambda} \, C_3 \, z \, K_{met}
+       \right] ~\text{dB}
 
-    with ``C2 = 20`` (or 40 when ground reflections are handled by image
-    sources), ``C3 = 1`` for single diffraction or Eq. (15) for double, the
-    pathlength difference ``z`` (Eq. (16)/(17)), ``lambda = 340/f`` and the
-    meteorological factor ``Kmet`` (Eq. (18), 1 for ``z <= 0``). ``Dz`` is
-    limited to 20 dB (single) or 25 dB (double). When the line of sight passes
-    above the top edge (``Barrier(line_of_sight_clear=True)``) ``z`` takes a
-    negative sign (ISO 9613-2:1996, text after Eq. (16)) and Eq. (14) still
-    applies: ``Dz`` falls continuously from ``10 lg 3 = 4.8 dB`` at grazing
-    (``z = 0``) towards 0 as the clearance deepens, clamped at 0 (the
-    logarithm's argument is floored at 1 -- a barrier below the sight line
-    never amplifies).
+    with :math:`C_2 = 20` (or 40 when ground reflections are handled by image
+    sources), :math:`C_3 = 1` for single diffraction or Eq. (15) for double,
+    the pathlength difference ``z`` (Eq. (16)/(17)),
+    :math:`\lambda = 340/f` and the
+    meteorological factor ``Kmet`` (Eq. (18), 1 for :math:`z \le 0`). ``Dz``
+    is limited to 20 dB (single) or 25 dB (double). When the line of sight
+    passes above the top edge (``Barrier(line_of_sight_clear=True)``) ``z``
+    takes a negative sign (ISO 9613-2:1996, text after Eq. (16)) and Eq. (14)
+    still applies: ``Dz`` falls continuously from :math:`10 \lg 3 = 4.8` dB
+    at grazing (:math:`z = 0`) towards 0 as the clearance deepens, clamped at
+    0 (the logarithm's argument is floored at 1 -- a barrier below the sight
+    line never amplifies).
 
     :param barrier: Barrier geometry (:class:`Barrier`).
     :param distance: Straight-line source-to-receiver distance ``d``, in metres.
@@ -601,12 +629,14 @@ def meteorological_correction(
     receiver_height: float,
     c0: float,
 ) -> float:
-    """Meteorological correction ``Cmet`` (ISO 9613-2:1996, Eq. (21)/(22)).
+    r"""Meteorological correction ``Cmet`` (ISO 9613-2:1996, Eq. (21)/(22)).
 
-    ::
+    .. math::
 
-        Cmet = 0                             if dp <= 10(hs + hr)
-        Cmet = C0 [1 - 10(hs + hr)/dp]       if dp >  10(hs + hr)
+       C_{met} = 0 \quad \text{if } d_p \le 10 (h_s + h_r)
+
+       C_{met} = C_0 \left[ 1 - \frac{10 (h_s + h_r)}{d_p} \right] \quad
+       \text{if } d_p > 10 (h_s + h_r)
 
     ``C0`` (dB) reflects local wind and temperature-gradient statistics; practical
     values lie in 0..~5 dB (note 22). Subtract ``Cmet`` from ``LAT(DW)`` for the
@@ -616,7 +646,7 @@ def meteorological_correction(
     :param source_height: Source height ``hs``, in metres.
     :param receiver_height: Receiver height ``hr``, in metres.
     :param c0: Meteorological factor ``C0``, in decibels.
-    :return: ``Cmet``, in decibels (>= 0 for ``C0 >= 0``).
+    :return: ``Cmet``, in decibels (>= 0 for :math:`C_0 \ge 0`).
     """
     threshold = 10.0 * (source_height + receiver_height)
     if projected_distance <= threshold:
@@ -647,10 +677,10 @@ def _compose_receiver_level(
     a_total: NDArray[np.float64],
     cmet: float | None,
 ) -> NDArray[np.float64]:
-    """Compose the octave-band receiver level from ``Lw``, ``Dc`` and ``A``.
+    r"""Compose the octave-band receiver level from ``Lw``, ``Dc`` and ``A``.
 
-    ``LfT = Lw + Dc - A`` (ISO 9613-2:1996, Eq. (3)) with ``Dc =
-    directivity_index + DOmega``; when a meteorological correction ``cmet`` is
+    :math:`L_{fT} = L_W + D_c - A` (ISO 9613-2:1996, Eq. (3)) with
+    :math:`D_c = D_i + D_\Omega`; when a meteorological correction ``cmet`` is
     given it is subtracted band by band to approximate the long-term average
     level (Eq. (6)). Used by :func:`predicted_receiver_level` and by the
     :class:`OutdoorAttenuation` report when a :class:`SourceEmission` is given.
@@ -677,13 +707,15 @@ def outdoor_propagation_attenuation(
     *,
     humidity: float | str = "deprecated",
 ) -> OutdoorAttenuation:
-    """Total octave-band outdoor attenuation (ISO 9613-2:1996, Eq. (4)).
+    r"""Total octave-band outdoor attenuation (ISO 9613-2:1996, Eq. (4)).
 
-    Assembles the four general terms of clause 7 into ``A = Adiv + Aatm + Agr +
-    Abar`` (the informative ``Amisc`` is omitted). The ground effect uses the
-    general per-region method (7.3.1). With a barrier, the top-edge insertion loss
-    ``Abar = Dz - Agr`` (Eq. (12)) folds the ground effect of the screened path
-    into ``Dz`` (note 13); for a lateral (vertical-edge) barrier ``Abar = Dz``
+    Assembles the four general terms of clause 7 into
+    :math:`A = A_{div} + A_{atm} + A_{gr} + A_{bar}` (the informative
+    ``Amisc`` is omitted). The ground effect uses the
+    general per-region method (7.3.1). With a barrier, the top-edge insertion
+    loss :math:`A_{bar} = D_z - A_{gr}` (Eq. (12)) folds the ground effect of
+    the screened path into ``Dz`` (note 13); for a lateral (vertical-edge)
+    barrier :math:`A_{bar} = D_z`
     (Eq. (13)) and the ground term is retained.
 
     :param distance: Straight-line source-to-receiver distance ``d``, in metres.
@@ -702,7 +734,7 @@ def outdoor_propagation_attenuation(
     :param relative_humidity: Relative humidity, in percent (default 70).
     :param pressure: Atmospheric pressure, in kilopascals.
     :param projected_distance: Ground-plane projected distance ``dp``, in metres;
-        defaults to ``sqrt(d^2 - (hs - hr)^2)``.
+        defaults to :math:`\sqrt{d^2 - (h_s - h_r)^2}`.
     :param humidity: Deprecated alias of ``relative_humidity`` (remove in 4.0).
     :return: :class:`OutdoorAttenuation` with the per-band term breakdown.
     :raises ValueError: If ``distance`` is not positive.
@@ -762,11 +794,13 @@ def predicted_receiver_level(
     *,
     humidity: float | str = "deprecated",
 ) -> NDArray[np.float64]:
-    """Predicted octave-band receiver level (ISO 9613-2:1996, Eq. (3)/(6)).
+    r"""Predicted octave-band receiver level (ISO 9613-2:1996, Eq. (3)/(6)).
 
-    Composes the downwind octave-band sound pressure level::
+    Composes the downwind octave-band sound pressure level:
 
-        LfT(DW) = Lw + Dc - A ,   Dc = directivity_index + DOmega
+    .. math::
+
+       L_{fT}(DW) = L_W + D_c - A, \qquad D_c = D_i + D_\Omega
 
     from the total attenuation :func:`outdoor_propagation_attenuation`. When ``c0``
     is given, the meteorological correction ``Cmet`` (Eq. (21)/(22)) is subtracted
@@ -791,7 +825,7 @@ def predicted_receiver_level(
     :param d_omega: Solid-angle index ``DOmega``, in decibels (see
         :func:`directivity_omega` for the alternative ground method).
     :param c0: Meteorological factor ``C0``, in decibels; ``None`` returns the
-        downwind level ``LfT(DW)`` (``Cmet = 0``).
+        downwind level ``LfT(DW)`` (:math:`C_{met} = 0`).
     :param projected_distance: Ground-plane projected distance ``dp``, in metres.
     :param humidity: Deprecated alias of ``relative_humidity`` (remove in 4.0).
     :return: Predicted octave-band level per frequency, in decibels.

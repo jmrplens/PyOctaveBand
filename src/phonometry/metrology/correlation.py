@@ -1,5 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""
+r"""
 Correlation analysis and time-delay estimation.
 
 Auto- and cross-correlation estimators with the three standard
@@ -10,26 +10,35 @@ Measurement Procedures* (4th ed., 2010) and Knapp & Carter (1976):
 
 * **correlation estimates** computed via FFT with zero padding so the
   circular product never wraps (B&P Section 11.4.2, Eq. 11.95), with the
-  ``1/N`` *biased*, ``1/(N-r)`` *unbiased* (Eq. 11.96) and *coefficient*
-  ``ρxy(τ) = Cxy(τ)/(σx·σy)`` (Eq. 5.16) normalizations, plus the
+  :math:`1/N` *biased*, :math:`1/(N-r)` *unbiased* (Eq. 11.96) and
+  *coefficient*
+  :math:`\rho_{xy}(\tau) = C_{xy}(\tau)/(\sigma_x \sigma_y)` (Eq. 5.16)
+  normalizations, plus the
   large-``T`` normalized random error of the estimate for bandwidth-limited
-  Gaussian data, ``ε[R̂xy(τ)] = [1 + ρ⁻²xy(τ)]^½ / √(2BT)``
+  Gaussian data,
+  :math:`\varepsilon[\hat{R}_{xy}(\tau)]
+  = [1 + \rho_{xy}^{-2}(\tau)]^{1/2} / \sqrt{2BT}`
   (Eqs. 8.109/8.112), exposed as :func:`correlation_random_error`;
 * **time-delay estimation**: the peak of the cross-correlation locates the
   delay of a common signal between two sensors (B&P Section 5.1.4,
   Eq. 5.21). :func:`time_delay` implements the direct correlator, the
   weighted-phase-slope estimator of the cross-spectrum (Eq. 5.101b) and the
   **generalized cross-correlation** of Knapp & Carter (1976): the averaged
-  cross-spectrum is weighted by ``ψ(f)`` before the inverse transform,
-  with the Table I processors ``'roth'`` (``1/Gxx``), ``'scot'``
-  (``1/√(Gxx·Gyy)``), ``'phat'`` (``1/|Gxy|``) and the maximum-likelihood
+  cross-spectrum is weighted by :math:`\psi(f)` before the inverse
+  transform, with the Table I processors ``'roth'``
+  (:math:`1/G_{xx}`), ``'scot'``
+  (:math:`1/\sqrt{G_{xx} G_{yy}}`), ``'phat'``
+  (:math:`1/\lvert G_{xy} \rvert`) and the maximum-likelihood
   ``'ml'`` (Hannan-Thomson) weighting
-  ``|γ|²/(|Gxy|·(1-|γ|²))`` that attains the Cramér-Rao bound;
+  :math:`\lvert \gamma \rvert^2 /
+  (\lvert G_{xy} \rvert (1 - \lvert \gamma \rvert^2))`
+  that attains the Cramér-Rao bound;
 * **sub-sample peak location** by three-point parabolic interpolation,
   optionally after band-limited local upsampling of the correlation around
   its peak, and the **peak-location uncertainty** of the delay estimate,
-  ``σ(τ̂0) ≈ (3/4)^¼ · √ε / (πB)`` (Eq. 8.129), with the 95 % interval
-  ``τ̂0 ± 2σ`` (Eq. 8.130);
+  :math:`\sigma(\hat{\tau}_0) \approx (3/4)^{1/4} \sqrt{\varepsilon} /
+  (\pi B)` (Eq. 8.129), with the 95 % interval
+  :math:`\hat{\tau}_0 \pm 2\sigma` (Eq. 8.130);
 * **impulse-response utilities**: the sub-sample arrival time of a single
   IR (its peak is the cross-correlation with an ideal impulse) and the
   alignment of an IR pair by the estimated delay, applied as an exact
@@ -94,10 +103,10 @@ _Interpolation = Literal["parabolic", "none"]
 def _linear_correlation(
     x: NDArray[np.float64], y: NDArray[np.float64]
 ) -> NDArray[np.float64]:
-    """Raw linear correlation sums ``c(r) = Σₖ x[k]·y[k+r]`` via FFT.
+    r"""Raw linear correlation sums :math:`c(r) = \sum_k x[k] y[k+r]`.
 
     Zero-padded FFT computation (B&P Section 11.4.2): the returned array
-    covers lags ``r = -(N-1) ... N-1`` in order.
+    covers lags :math:`r = -(N-1) \ldots N-1` in order.
     """
     from scipy import signal as sp_signal
 
@@ -109,10 +118,11 @@ def _linear_correlation(
 def _coefficient_correlation(
     x: NDArray[np.float64], y: NDArray[np.float64]
 ) -> NDArray[np.float64]:
-    """Correlation coefficient function ``ρxy(τ)`` (B&P Eq. 5.16).
+    r"""Correlation coefficient function :math:`\rho_{xy}(\tau)`.
 
-    Biased covariance estimate over the mean-removed records, normalized
-    by ``σx·σy`` so ``|ρ| ≤ 1`` always holds (Cauchy-Schwarz).
+    B&P Eq. 5.16: biased covariance estimate over the mean-removed
+    records, normalized by :math:`\sigma_x \sigma_y` so
+    :math:`\lvert \rho \rvert \le 1` always holds (Cauchy-Schwarz).
     """
     xc = x - float(np.mean(x))
     yc = y - float(np.mean(y))
@@ -124,22 +134,24 @@ def _coefficient_correlation(
 
 @dataclass(frozen=True)
 class CorrelationResult:
-    """Auto- or cross-correlation estimate (B&P Sections 5.1, 8.4, 11.4).
+    r"""Auto- or cross-correlation estimate (B&P Sections 5.1, 8.4, 11.4).
 
-    :ivar lags: Lag axis ``τ``, in seconds, symmetric about zero. Positive
-        lag means the second signal is delayed relative to the first
-        (``R̂xy(τ) ~ E[x(t)·y(t+τ)]``, B&P Eq. 5.19-5.20 convention).
+    :ivar lags: Lag axis :math:`\tau`, in seconds, symmetric about zero.
+        Positive lag means the second signal is delayed relative to the
+        first (:math:`\hat{R}_{xy}(\tau) \sim E[x(t) y(t+\tau)]`, B&P
+        Eq. 5.19-5.20 convention).
     :ivar values: Correlation estimate on ``lags`` with the requested
         :attr:`normalization`.
-    :ivar coefficient: Correlation coefficient function ``ρ̂xy(τ)`` ∈
-        [-1, 1] on the same lags (Eq. 5.16; equals :attr:`values` when
+    :ivar coefficient: Correlation coefficient function
+        :math:`\hat{\rho}_{xy}(\tau) \in [-1, 1]` on the same lags
+        (Eq. 5.16; equals :attr:`values` when
         ``normalization='coefficient'``).
-    :ivar normalization: ``'biased'`` (``1/N``), ``'unbiased'``
-        (``1/(N-|r|)``, Eq. 11.96) or ``'coefficient'``.
+    :ivar normalization: ``'biased'`` (:math:`1/N`), ``'unbiased'``
+        (:math:`1/(N - \lvert r \rvert)`, Eq. 11.96) or ``'coefficient'``.
     :ivar kind: ``'autocorrelation'`` or ``'cross-correlation'``.
     :ivar fs: Sample rate, in Hz.
     :ivar n_samples: Record length ``N``, in samples.
-    :ivar duration: Record length ``T = N/fs``, in seconds.
+    :ivar duration: Record length :math:`T = N/f_s`, in seconds.
     """
 
     lags: NDArray[np.float64]
@@ -152,17 +164,21 @@ class CorrelationResult:
     duration: float
 
     def random_error(self, signal_bandwidth: float) -> NDArray[np.float64]:
-        """Normalized random error of the estimate at each lag.
+        r"""Normalized random error of the estimate at each lag.
 
         For bandwidth-limited Gaussian data of bandwidth ``B`` and record
         length ``T`` (B&P Eqs. 8.109 and 8.112, identical in form for the
         cross- and autocorrelation, with the measured coefficient in place
         of the true value):
 
-        ``ε[R̂xy(τ)] = [1 + ρ⁻²xy(τ)]^½ / √(2BT)``
+        .. math::
 
-        so ``ε[R̂xx(0)] = 1/√(BT)`` (Eq. 8.111). The large-``T``
-        approximation behind it assumes ``T ≥ 10·|τ|`` and ``BT ≥ 5``
+           \varepsilon[\hat{R}_{xy}(\tau)]
+           = \frac{[1 + \rho_{xy}^{-2}(\tau)]^{1/2}}{\sqrt{2BT}}
+
+        so :math:`\varepsilon[\hat{R}_{xx}(0)] = 1/\sqrt{BT}`
+        (Eq. 8.111). The large-``T`` approximation behind it assumes
+        :math:`T \ge 10 \lvert \tau \rvert` and :math:`BT \ge 5`
         (Section 8.4.1). Lags where the measured coefficient is zero
         return ``inf``.
 
@@ -204,22 +220,26 @@ def correlation(
     normalization: _Normalization = "unbiased",
     max_lag: float | None = None,
 ) -> CorrelationResult:
-    """Auto- or cross-correlation estimate with a chosen normalization.
+    r"""Auto- or cross-correlation estimate with a chosen normalization.
 
     Computed via zero-padded FFT so the circular product never wraps (B&P
     Section 11.4.2). ``y=None`` gives the autocorrelation of ``x``. The
     sign convention follows B&P Eq. 5.19-5.20: with
-    ``y(t) = α·x(t-τ0) + n(t)`` the estimate peaks at ``τ = +τ0``.
+    :math:`y(t) = \alpha x(t - \tau_0) + n(t)` the estimate peaks at
+    :math:`\tau = +\tau_0`.
 
     Normalizations:
 
     * ``'biased'`` - the raw lag sums divided by ``N``; tapers toward the
-      record ends and stays bounded by ``[R̂xx(0)·R̂yy(0)]^½``;
-    * ``'unbiased'`` - divided by ``N-|r|`` (Eq. 11.96), an unbiased
-      estimate of ``Rxy(τ)`` whose variance grows toward the ends;
+      record ends and stays bounded by
+      :math:`[\hat{R}_{xx}(0) \hat{R}_{yy}(0)]^{1/2}`;
+    * ``'unbiased'`` - divided by :math:`N - \lvert r \rvert`
+      (Eq. 11.96), an unbiased estimate of :math:`R_{xy}(\tau)` whose
+      variance grows toward the ends;
     * ``'coefficient'`` - the correlation coefficient function
-      ``ρ̂xy(τ) = Ĉxy(τ)/(σx·σy)`` ∈ [-1, 1] over the mean-removed
-      records (Eq. 5.16).
+      :math:`\hat{\rho}_{xy}(\tau)
+      = \hat{C}_{xy}(\tau)/(\sigma_x \sigma_y) \in [-1, 1]` over the
+      mean-removed records (Eq. 5.16).
 
     :param x: First signal, 1-D.
     :param y: Second signal, same length, or ``None`` for autocorrelation.
@@ -280,23 +300,33 @@ def correlation(
 def correlation_random_error(
     coefficient: float, signal_bandwidth: float, duration: float
 ) -> float:
-    """Normalized random error of a correlation estimate (Eqs. 8.109/8.112).
+    r"""Normalized random error of a correlation estimate.
 
-    ``ε[R̂xy(τ)] = [1 + ρ⁻²xy(τ)]^½ / √(2BT)`` for bandwidth-limited
+    B&P Eqs. 8.109/8.112:
+    :math:`\varepsilon[\hat{R}_{xy}(\tau)]
+    = [1 + \rho_{xy}^{-2}(\tau)]^{1/2} / \sqrt{2BT}` for
+    bandwidth-limited
     Gaussian data of bandwidth ``B`` observed for ``T`` seconds, with
-    ``ρxy(τ)`` the correlation coefficient at the lag of interest. At the
-    zero lag of an autocorrelation (``ρ = 1``) this is ``1/√(BT)``
-    (Eq. 8.111). Valid for ``T ≥ 10·|τ|`` and ``BT ≥ 5`` (Section 8.4.1).
+    :math:`\rho_{xy}(\tau)` the correlation coefficient at the lag of
+    interest. At the zero lag of an autocorrelation (:math:`\rho = 1`)
+    this is :math:`1/\sqrt{BT}`
+    (Eq. 8.111). Valid for :math:`T \ge 10 \lvert \tau \rvert` and
+    :math:`BT \ge 5` (Section 8.4.1).
 
-    For the two-detector time-delay problem ``x = s + m``, ``y = s' + n``
+    For the two-detector time-delay problem
+    :math:`x = s + m`, :math:`y = s' + n`
     (Section 8.4.2) the peak coefficient is
-    ``ρ = S/√((S+M)(S+N))``, which reproduces the book's Example 8.5:
-    ``B = 100`` Hz, ``T = 5`` s, ``M/S = N/S = 10`` give ``ε ≈ 0.35``.
+    :math:`\rho = S/\sqrt{(S+M)(S+N)}`, which reproduces the book's
+    Example 8.5:
+    :math:`B = 100` Hz, :math:`T = 5` s, :math:`M/S = N/S = 10` give
+    :math:`\varepsilon \approx 0.35`.
 
-    :param coefficient: Correlation coefficient ``ρxy(τ)`` at the lag.
+    :param coefficient: Correlation coefficient :math:`\rho_{xy}(\tau)`
+        at the lag.
     :param signal_bandwidth: Signal bandwidth ``B``, in Hz.
     :param duration: Record length ``T``, in seconds.
-    :return: Normalized random error (dimensionless; ``inf`` at ``ρ = 0``).
+    :return: Normalized random error (dimensionless; ``inf`` at
+        :math:`\rho = 0`).
     :raises ValueError: If the bandwidth or duration is not positive, or
         the coefficient is outside [-1, 1].
     """
@@ -313,12 +343,13 @@ def correlation_random_error(
 
 
 def _peak_location_std(random_error: float, bandwidth: float) -> float:
-    """Standard deviation of the correlation-peak location (Eq. 8.129).
+    r"""Standard deviation of the correlation-peak location (Eq. 8.129).
 
-    ``σ(τ̂0) ≈ (3/4)^¼ · √ε / (πB)`` for a bandwidth-limited-white
+    :math:`\sigma(\hat{\tau}_0) \approx (3/4)^{1/4} \sqrt{\varepsilon} /
+    (\pi B)` for a bandwidth-limited-white
     correlation peak (Eq. 8.120) whose magnitude estimate carries the
-    normalized random error ``ε``; B&P Example 8.5 rounds the ``(3/4)^¼``
-    factor to 0.93.
+    normalized random error :math:`\varepsilon`; B&P Example 8.5 rounds
+    the :math:`(3/4)^{1/4}` factor to 0.93.
     """
     return float(
         (0.75**0.25) * np.sqrt(random_error) / (np.pi * bandwidth)
@@ -415,9 +446,10 @@ def _validate_refinement(interpolation: str, upsample: int) -> int:
 
 @dataclass(frozen=True)
 class TimeDelayResult:
-    """Time-delay estimate between two records.
+    r"""Time-delay estimate between two records.
 
-    :ivar delay: Estimated delay ``τ̂0`` of the second record relative to
+    :ivar delay: Estimated delay :math:`\hat{\tau}_0` of the second
+        record relative to
         the first, in seconds (positive: ``y`` lags ``x``).
     :ivar delay_samples: The same delay in (fractional) samples.
     :ivar method: ``'direct'``, ``'gcc'`` or ``'phase'``.
@@ -425,19 +457,22 @@ class TimeDelayResult:
         ``method='gcc'``).
     :ivar lags: Lag axis of :attr:`correlation`, in seconds.
     :ivar correlation: The correlation function whose peak was located:
-        the correlation coefficient ``ρ̂xy(τ)`` for ``'direct'``, the
-        weighted GCC ``R̂ψ(τ)`` (normalized to unit peak magnitude) for
+        the correlation coefficient :math:`\hat{\rho}_{xy}(\tau)` for
+        ``'direct'``, the weighted GCC :math:`\hat{R}_\psi(\tau)`
+        (normalized to unit peak magnitude) for
         ``'gcc'``, and the unweighted equivalent for ``'phase'`` (whose
         estimate comes from Eq. 5.101b, not from this curve).
-    :ivar peak_correlation: Plain correlation coefficient ``ρ̂xy`` at the
+    :ivar peak_correlation: Plain correlation coefficient
+        :math:`\hat{\rho}_{xy}` at the
         estimated delay (rounded to the nearest sample) - the quantity
         entering the B&P error formulas, whatever the method.
     :ivar delay_std: Standard deviation of the peak-location estimate,
-        ``σ(τ̂0) ≈ (3/4)^¼·√ε/(πB)`` (Eq. 8.129), in seconds; ``None``
+        :math:`\sigma(\hat{\tau}_0) \approx (3/4)^{1/4}
+        \sqrt{\varepsilon} / (\pi B)` (Eq. 8.129), in seconds; ``None``
         unless ``signal_bandwidth`` was given.
     :ivar delay_interval: Approximate 95 % confidence interval
-        ``τ̂0 ± 2σ`` (Eq. 8.130), in seconds; ``None`` without a
-        bandwidth.
+        :math:`\hat{\tau}_0 \pm 2\sigma` (Eq. 8.130), in seconds;
+        ``None`` without a bandwidth.
     :ivar signal_bandwidth: The bandwidth ``B`` used for the error, Hz.
     :ivar fs: Sample rate, in Hz.
     """
@@ -473,11 +508,11 @@ def _gcc_weight(
     gxx: NDArray[np.float64],
     gyy: NDArray[np.float64],
 ) -> NDArray[np.float64]:
-    """Knapp & Carter (1976) Table I weighting ``ψ(f)``.
+    r"""Knapp & Carter (1976) Table I weighting :math:`\psi(f)`.
 
     Bins where the required denominator vanishes get zero weight (the
     band carries no usable information; Knapp & Carter note the PHAT
-    phase is erratic wherever ``|Gxy| = 0``).
+    phase is erratic wherever :math:`\lvert G_{xy} \rvert = 0`).
     """
     mag = np.abs(gxy)
     if weighting == "none":
@@ -537,17 +572,25 @@ def _delay_error(
 def _phase_slope_delay(
     freqs: NDArray[np.float64], gxy: NDArray[np.complex128]
 ) -> float:
-    """Weighted phase-slope delay from the cross-spectrum (Eq. 5.101b).
+    r"""Weighted phase-slope delay from the cross-spectrum (Eq. 5.101b).
 
-    ``τ̂0 = ∫(2πf)·|Ĝxy|·θ̂xy df / ∫(2πf)²·|Ĝxy| df`` with
-    ``θ̂xy = -arg Ĝxy`` unwrapped (a delayed second record has
-    ``Ĝxy ∝ e^{-j2πfτ0}``, Eq. 5.95b). The small-angle linearization
-    behind it assumes the residual ``2πfτ0 - θ̂xy`` stays small, i.e. a
+    .. math::
+
+       \hat{\tau}_0 = \frac{\int 2 \pi f \,
+       \lvert \hat{G}_{xy} \rvert \, \hat{\theta}_{xy} \, df}
+       {\int (2 \pi f)^2 \, \lvert \hat{G}_{xy} \rvert \, df}
+
+    with :math:`\hat{\theta}_{xy} = -\arg \hat{G}_{xy}` unwrapped (a
+    delayed second record has
+    :math:`\hat{G}_{xy} \propto e^{-j 2 \pi f \tau_0}`, Eq. 5.95b). The
+    small-angle linearization behind it assumes the residual
+    :math:`2 \pi f \tau_0 - \hat{\theta}_{xy}` stays small, i.e. a
     clean, moderate delay.
 
     The phase is referenced to its DC value before the fit: a pure delay
-    has ``θ(0) = 0``, but a polarity-inverted path (``α < 0``) carries a
-    constant ``π`` offset that the intercept-free least squares of
+    has :math:`\theta(0) = 0`, but a polarity-inverted path
+    (:math:`\alpha < 0`) carries a
+    constant :math:`\pi` offset that the intercept-free least squares of
     Eq. 5.101b would otherwise fold into the slope.
     """
     theta = -np.unwrap(np.angle(gxy))
@@ -637,30 +680,37 @@ def time_delay(
     upsample: int = 1,
     signal_bandwidth: float | None = None,
 ) -> TimeDelayResult:
-    """Time delay of ``y`` relative to ``x`` (TDE).
+    r"""Time delay of ``y`` relative to ``x`` (TDE).
 
-    Three estimators of the delay ``τ0`` in the two-sensor model
-    ``y(t) = α·x(t-τ0) + n(t)`` (B&P Section 5.1.4):
+    Three estimators of the delay :math:`\tau_0` in the two-sensor model
+    :math:`y(t) = \alpha x(t - \tau_0) + n(t)` (B&P Section 5.1.4):
 
     * ``'direct'`` - the peak of the full-record correlation coefficient
       function (Eq. 5.21);
     * ``'gcc'`` - the peak of the generalized cross-correlation of
       Knapp & Carter (1976): the Welch-averaged cross-spectrum (shared
       core with :func:`~phonometry.metrology.spectra.cross_spectral_density`)
-      is weighted by ``ψ(f)`` before the inverse transform. Weightings
-      (Table I): ``'none'`` (plain correlator), ``'roth'`` (``1/Gxx``,
+      is weighted by :math:`\psi(f)` before the inverse transform.
+      Weightings (Table I): ``'none'`` (plain correlator), ``'roth'``
+      (:math:`1/G_{xx}`,
       suppresses bands where the first sensor is noisy), ``'scot'``
-      (``1/√(Gxx·Gyy)``, prewhitens both channels), ``'phat'``
-      (``1/|Gxy|``: for uncorrelated noises the ideal GCC is a delta at
+      (:math:`1/\sqrt{G_{xx} G_{yy}}`, prewhitens both channels),
+      ``'phat'``
+      (:math:`1/\lvert G_{xy} \rvert`: for uncorrelated noises the ideal
+      GCC is a delta at
       the delay, but errors are accentuated wherever signal power is
       small), and ``'ml'`` (Hannan-Thomson,
-      ``|γ|²/(|Gxy|·(1-|γ|²))``): the maximum-likelihood processor that
+      :math:`\lvert \gamma \rvert^2 / (\lvert G_{xy} \rvert
+      (1 - \lvert \gamma \rvert^2))`):
+      the maximum-likelihood processor that
       weights the phase by its coherence-derived reliability and attains
       the Cramér-Rao bound - provided the coherence estimate is averaged
       over at least two segments, the discrete form of Knapp & Carter's
-      ``|γ|² ≠ 1`` existence condition (enforced here). The delay must
+      :math:`\lvert \gamma \rvert^2 \ne 1` existence condition (enforced
+      here). The delay must
       fit within half a segment; raise ``nperseg`` for long delays.
-    * ``'phase'`` - the ``|Ĝxy|``-weighted least-squares slope of the
+    * ``'phase'`` - the :math:`\lvert \hat{G}_{xy} \rvert`-weighted
+      least-squares slope of the
       cross-spectrum phase (Eq. 5.101b); accurate for clean, moderate
       delays where the unwrapped phase is unambiguous, and independent of
       any peak interpolation (``interpolation``/``upsample`` do not
@@ -671,8 +721,8 @@ def time_delay(
     band-limited local upsampling (``upsample > 1``); this presumes the
     signals are band-limited below Nyquist so the peak is oversampled.
     With ``signal_bandwidth`` given, the result carries the B&P
-    peak-location uncertainty (Eq. 8.129) and its ±2σ interval
-    (Eq. 8.130).
+    peak-location uncertainty (Eq. 8.129) and its :math:`\pm 2\sigma`
+    interval (Eq. 8.130).
 
     :param x: Reference record, 1-D.
     :param y: Delayed record, 1-D, same length.
@@ -775,7 +825,7 @@ def impulse_response_delay(
     cross-correlation of an IR with an ideal unit impulse *is* the IR, so
     its peak magnitude location - refined to sub-sample resolution by
     band-limited local upsampling plus parabolic interpolation - is the
-    delay relative to ``t = 0``. With a ``reference`` IR, the delay of
+    delay relative to :math:`t = 0`. With a ``reference`` IR, the delay of
     ``ir`` relative to it, from the peak of their full-record
     cross-correlation with the same refinement (one-shot transients are
     not stationary records, so the direct correlator is used rather than
@@ -783,8 +833,8 @@ def impulse_response_delay(
 
     Sub-sample accuracy presumes the IR is band-limited below Nyquist;
     the synthetic fractional-delay tests pin the achievable accuracy
-    (about 1e-3 samples for a 0.4·fs band-limited pulse at the default
-    ``upsample=8``).
+    (about 1e-3 samples for a :math:`0.4 f_s` band-limited pulse at the
+    default ``upsample=8``).
 
     :param ir: Impulse response, 1-D.
     :param fs: Sample rate, in Hz.
@@ -792,7 +842,7 @@ def impulse_response_delay(
         measured against.
     :param interpolation: ``'parabolic'`` (default) or ``'none'``.
     :param upsample: Integer local-upsampling factor (default 8).
-    :return: Delay in seconds (relative to ``t = 0`` or to ``reference``).
+    :return: Delay in seconds (relative to :math:`t = 0` or to ``reference``).
     :raises ValueError: If the inputs or parameters are invalid.
     """
     ira = _validate_signal(ir, "ir", context=_DELAY_CONTEXT)

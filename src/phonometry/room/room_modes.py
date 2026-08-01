@@ -1,13 +1,18 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""Normal modes of a rectangular room: frequencies, kinds, count and density.
+r"""Normal modes of a rectangular room: frequencies, kinds, count and density.
 
 Below the Schroeder frequency a room is not a diffuse field but a handful of
 discrete standing waves. For the idealised rigid-walled rectangular room of
-dimensions ``lx x ly x lz`` the wave equation separates and the eigen-
+dimensions :math:`l_x \times l_y \times l_z` the wave equation separates and
+the eigen-
 frequencies are known in closed form (Long, *Architectural Acoustics* 2nd ed.,
 Equation (8.43); Kuttruff, *Room Acoustics* 6th ed., 3.1):
 
-    f(nx, ny, nz) = (c0 / 2) sqrt( (nx/lx)^2 + (ny/ly)^2 + (nz/lz)^2 )
+.. math::
+
+   f(n_x, n_y, n_z) = \frac{c_0}{2}
+   \sqrt{ \left(\frac{n_x}{l_x}\right)^2 + \left(\frac{n_y}{l_y}\right)^2
+   + \left(\frac{n_z}{l_z}\right)^2 }
 
 with non-negative integer orders ``nx, ny, nz`` counting the nodal planes
 perpendicular to each axis. Each mode is classified by how many of its orders
@@ -19,18 +24,26 @@ are non-zero:
 * **oblique** (three): a wave involving all six walls, weaker still.
 
 **How many modes.** Counting lattice points of the ``k``-space grid inside the
-positive octant of a sphere of radius ``k = 2 pi f / c0``, with the half- and
+positive octant of a sphere of radius :math:`k = 2 \pi f / c_0`, with the
+half- and
 quarter-weight corrections for the points lying on the coordinate planes and
 axes, gives the integrated mode count (Long Equation (8.45), after Morse 1948
 and Pierce 1981):
 
-    N(f) = (4 pi / 3) V (f/c0)^3 + (pi / 4) S (f/c0)^2 + (L / 8) (f/c0)
+.. math::
+
+   N(f) = \frac{4 \pi}{3} V \left(\frac{f}{c_0}\right)^3
+   + \frac{\pi}{4} S \left(\frac{f}{c_0}\right)^2
+   + \frac{L}{8} \frac{f}{c_0}
 
 with the room volume ``V``, the total wall area ``S`` and the sum ``L`` of the
 twelve edge lengths. Its derivative is the **modal density** in modes per hertz
 (Long Equation (8.46)):
 
-    dN/df = 4 pi V f^2 / c0^3 + (pi / 2) S f / c0^2 + L / (8 c0)
+.. math::
+
+   \frac{dN}{df} = \frac{4 \pi V f^2}{c_0^3}
+   + \frac{\pi}{2} \frac{S f}{c_0^2} + \frac{L}{8 c_0}
 
 The smooth count is an asymptotic estimate: at low frequency, where only a few
 modes exist, the exact enumeration of :func:`room_modes` is the honest answer,
@@ -103,9 +116,14 @@ def room_mode_frequency(
     *,
     speed_of_sound: float = DEFAULT_SPEED_OF_SOUND,
 ) -> np.ndarray | float:
-    """Eigenfrequency of a rectangular-room mode (Long Equation (8.43)).
+    r"""Eigenfrequency of a rectangular-room mode (Long Equation (8.43)).
 
-    ``f = (c0/2) sqrt((nx/lx)^2 + (ny/ly)^2 + (nz/lz)^2)``.
+    .. math::
+
+       f = \frac{c_0}{2}
+       \sqrt{ \left(\frac{n_x}{l_x}\right)^2
+       + \left(\frac{n_y}{l_y}\right)^2
+       + \left(\frac{n_z}{l_z}\right)^2 }
 
     :param orders: Mode orders ``(nx, ny, nz)``, non-negative integers; either
         a single triple or an ``(N, 3)`` array of triples.
@@ -137,9 +155,15 @@ def room_mode_count(
     *,
     speed_of_sound: float = DEFAULT_SPEED_OF_SOUND,
 ) -> np.ndarray | float:
-    """Integrated number of modes below ``frequency`` (Long Equation (8.45)).
+    r"""Integrated number of modes below ``frequency`` (Long Equation (8.45)).
 
-    ``N(f) = (4 pi/3) V (f/c0)^3 + (pi/4) S (f/c0)^2 + (L/8) (f/c0)``, the
+    .. math::
+
+       N(f) = \frac{4 \pi}{3} V \left(\frac{f}{c_0}\right)^3
+       + \frac{\pi}{4} S \left(\frac{f}{c_0}\right)^2
+       + \frac{L}{8} \frac{f}{c_0}
+
+    This is the
     Morse/Pierce lattice count with its wall-plane and axis corrections. It is
     a smooth asymptotic estimate, so it is only meaningful once several modes
     fit below ``f``; the exact enumeration is :func:`room_modes`.
@@ -170,9 +194,14 @@ def room_modal_density(
     *,
     speed_of_sound: float = DEFAULT_SPEED_OF_SOUND,
 ) -> np.ndarray | float:
-    """Modal density ``dN/df`` in modes per hertz (Long Equation (8.46)).
+    r"""Modal density :math:`dN/df` in modes per hertz (Long Equation (8.46)).
 
-    ``dN/df = 4 pi V f^2 / c0^3 + (pi/2) S f / c0^2 + L / (8 c0)``, the
+    .. math::
+
+       \frac{dN}{df} = \frac{4 \pi V f^2}{c_0^3}
+       + \frac{\pi}{2} \frac{S f}{c_0^2} + \frac{L}{8 c_0}
+
+    This is the
     derivative of :func:`room_mode_count`. Its reciprocal is the mean spacing
     between adjacent eigenfrequencies.
 
@@ -271,10 +300,11 @@ def room_modes(
     speed_of_sound: float = DEFAULT_SPEED_OF_SOUND,
     reverberation_time: float | None = None,
 ) -> RoomModesResult:
-    """Enumerate the normal modes of a rectangular room (Long Chapter 8).
+    r"""Enumerate the normal modes of a rectangular room (Long Chapter 8).
 
     Every order triple ``(nx, ny, nz)`` whose frequency
-    ``(c0/2) sqrt((nx/lx)^2 + (ny/ly)^2 + (nz/lz)^2)`` does not exceed
+    :math:`(c_0/2) \sqrt{(n_x/l_x)^2 + (n_y/l_y)^2 + (n_z/l_z)^2}` does not
+    exceed
     ``max_frequency`` is listed, sorted by frequency and classified as axial,
     tangential or oblique. The trivial ``(0, 0, 0)`` mode (the static pressure
     solution) is excluded.
@@ -284,7 +314,7 @@ def room_modes(
     :param speed_of_sound: Speed of sound ``c0``, m/s (default
         :data:`DEFAULT_SPEED_OF_SOUND`).
     :param reverberation_time: Optional reverberation time ``T``, s. When
-        given, the Schroeder frequency ``2000 sqrt(T/V)`` is computed and
+        given, the Schroeder frequency :math:`2000 \sqrt{T/V}` is computed and
         carried in the result (and marked by :meth:`RoomModesResult.plot`).
     :return: A :class:`RoomModesResult`.
     """

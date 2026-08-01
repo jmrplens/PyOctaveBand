@@ -19,8 +19,8 @@ is available:
   DC (low shelf) or Nyquist (high shelf), 0 dB at the opposite end, with the
   transition centred on `f0` (the midpoint-gain frequency).
 * `lowpass` / `highpass` - second-order Butterworth-style sections with
-  a resonance set by `Q` (`Q = 1/sqrt(2)` is the Butterworth alignment;
-  the magnitude at `f0` is exactly `Q`).
+  a resonance set by `Q` ($Q = 1/\sqrt{2}$ is the Butterworth
+  alignment; the magnitude at `f0` is exactly `Q`).
 * `bandpass` - constant 0 dB peak gain at `f0`.
 * `bandpass_skirt` - the cookbook's constant-skirt-gain variant (peak
   gain `Q`).
@@ -32,16 +32,17 @@ Each section is parameterized exactly as the cookbook defines: sample rate
 `fs`, centre/corner frequency `f0`, gain `gain_db` (peaking and
 shelves only) and one of
 
-* `q` - the quality factor (default `1/sqrt(2)`),
+* `q` - the quality factor (default $1/\sqrt{2}$),
 * `bw` - the bandwidth in octaves, mapped through the cookbook's
-  digital-domain relation `alpha = sin(w0) * sinh(ln(2)/2 * BW *
-  w0/sin(w0))` (the `w0/sin(w0)` factor compensates the bilinear
+  digital-domain relation
+  $\alpha = \sin(\omega_0) \sinh\!\left( \frac{\ln 2}{2} \, BW \, \frac{\omega_0}{\sin \omega_0} \right)$
+  (the $\omega_0/\sin \omega_0$ factor compensates the bilinear
   frequency warping), or
-* `slope` - the shelf-slope parameter `S` (shelves only; `S = 1` is
-  the steepest slope that stays monotonic).
+* `slope` - the shelf-slope parameter `S` (shelves only;
+  $S = 1$ is the steepest slope that stays monotonic).
 
 For the peaking filter the bandwidth is measured between the midpoint-gain
-(`G/2` dB) frequencies; for band-pass and notch, between the -3 dB
+($G/2$ dB) frequencies; for band-pass and notch, between the -3 dB
 frequencies - both as the cookbook states.
 
 The design is exact, not approximate: the cookbook's formulas are the
@@ -135,9 +136,9 @@ One biquad of the RBJ Audio EQ Cookbook.
 | `filter_type` | `'peaking'`, `'lowshelf'`, `'highshelf'`, `'lowpass'`, `'highpass'`, `'bandpass'` (constant 0 dB peak gain), `'bandpass_skirt'` (constant skirt gain, peak gain `Q`), `'notch'` or `'allpass'`. |
 | `f0` | Centre/corner frequency, in Hz (must sit below Nyquist). |
 | `gain_db` | Gain `G` in dB - peaking and shelving types only. |
-| `q` | Quality factor. Exactly one of `q`, `bw` and `slope` may be given; with none, `q = 1/sqrt(2)` (Butterworth alignment). |
+| `q` | Quality factor. Exactly one of `q`, `bw` and `slope` may be given; with none, $q = 1/\sqrt{2}$ (Butterworth alignment). |
 | `bw` | Bandwidth in octaves (peaking: between the midpoint-gain frequencies; band-pass/notch: between the -3 dB frequencies). |
-| `slope` | Shelf-slope parameter `S` (shelves only; `S = 1` is the steepest monotonic slope, and `S` must stay below the gain-dependent bound `(A + 1/A)/(A + 1/A - 2)` with `A = 10^(gain_db/40)`, beyond which the cookbook's alpha turns complex; at 0 dB gain `A = 1`, the bound is unbounded and every positive slope is admissible). |
+| `slope` | Shelf-slope parameter `S` (shelves only; $S = 1$ is the steepest monotonic slope, and `S` must stay below the gain-dependent bound $(A + 1/A)/(A + 1/A - 2)$ with $A = 10^{\text{gain\_db}/40}$, beyond which the cookbook's alpha turns complex; at 0 dB gain $A = 1$, the bound is unbounded and every positive slope is admissible). |
 
 ## parametric_eq
 

@@ -1,5 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""
+r"""
 Insertion loss of a close or free-standing machine enclosure.
 
 Wrapping a machine in a sealed enclosure reduces the radiated noise by the
@@ -7,19 +7,27 @@ transmission loss of its panels, *minus* a penalty for the reverberant build-up
 inside the small, hard cavity. Bies, Hansen & Howard, *Engineering Noise
 Control* 5th ed., §7.4.2 (Eqs. (7.103), (7.111)) write the net reduction as
 
-    IL = R - C,        C = 10 log10[ 0.3 + S_E (1 - alpha_i) / (S_i alpha_i) ],
+.. math::
+
+   \mathrm{IL} = R - C, \qquad
+   C = 10 \log_{10}\!\left[0.3 +
+   \frac{S_E (1 - \alpha_i)}{S_i \alpha_i}\right],
 
 where ``R`` is the field-incidence transmission loss of the enclosure panels,
 ``S_E`` the external surface area, ``S_i`` the internal surface area (including
 the machine) and ``alpha_i`` the mean absorption of the enclosure interior. The
 reverberant term is exactly ``S_E`` over the interior **room constant**
-``R_i = S_i alpha_i / (1 - alpha_i)`` (:func:`phonometry.room.room_constant`), so
+:math:`R_i = S_i \alpha_i / (1 - \alpha_i)`
+(:func:`phonometry.room.room_constant`), so
 
-    C = 10 log10( 0.3 + S_E / R_i ).
+.. math::
+
+   C = 10 \log_{10}(0.3 + S_E / R_i).
 
 A hard interior (``alpha_i`` small) makes ``C`` large and wastes much of the
 panel ``R``; lining the enclosure drives ``C`` toward its floor
-``10 log10 0.3 = -5.2 dB`` (a fully absorbing interior, where ``IL = R + 5.2``).
+:math:`10 \log_{10} 0.3 = -5.2` dB (a fully absorbing interior, where
+:math:`\mathrm{IL} = R + 5.2`).
 Bies terms this net reduction the enclosure *noise reduction*; it is the
 insertion loss of the enclosure.
 
@@ -27,10 +35,13 @@ Norton & Karczub, *Fundamentals of Noise and Vibration Analysis for Engineers*
 2nd ed., 4.10 (Equation (4.115)) derive the same design equation from the same
 power balance but **without the ``0.3``**:
 
-    IL = R - 10 log10( S_E / R_i ) ,
+.. math::
 
-so a well-lined enclosure keeps rising instead of levelling off at ``R + 5.2``.
-The two agree to a few tenths of a decibel while ``S_E / R_i`` stays above about
+   \mathrm{IL} = R - 10 \log_{10}(S_E / R_i),
+
+so a well-lined enclosure keeps rising instead of levelling off at
+:math:`R + 5.2`. The two agree to a few tenths of a decibel while
+:math:`S_E / R_i` stays above about
 unity (a hard or lightly lined interior) and diverge once the lining takes over,
 where Bies' floor is the safer statement. ``model`` selects between them, and
 the difference is the reason a published worked answer has to be reproduced with
@@ -77,14 +88,15 @@ if TYPE_CHECKING:
 
 @dataclass(frozen=True)
 class EnclosureResult:
-    """Insertion loss of a machine enclosure over frequency (Bies §7.4.2).
+    r"""Insertion loss of a machine enclosure over frequency (Bies §7.4.2).
 
     :ivar frequencies: Frequencies ``f``, Hz, or ``None`` if the panel ``R``
         was given as a bare per-band array with no frequency labels.
     :ivar panel_transmission_loss: The supplied panel transmission loss ``R``
         per band, dB.
     :ivar correction: The interior-build-up correction ``C`` per band, dB.
-    :ivar insertion_loss: The net enclosure insertion loss ``IL = R - C``, dB.
+    :ivar insertion_loss: The net enclosure insertion loss
+        :math:`\mathrm{IL} = R - C`, dB.
     :ivar external_area: External enclosure surface area ``S_E``, m2.
     :ivar internal_area: Internal surface area ``S_i``, m2.
     :ivar room_constant: Interior room constant ``R_i`` per band, m2.
@@ -119,7 +131,7 @@ class EnclosureResult:
         verbose: bool = False,
         language: str = "en",
     ) -> str:
-        """Render a machine-enclosure insertion-loss fiche to ``path``.
+        r"""Render a machine-enclosure insertion-loss fiche to ``path``.
 
         Writes a one-page enclosure-performance sheet: the method-basis line
         naming the Bies, Hansen & Howard insertion-loss model
@@ -127,11 +139,12 @@ class EnclosureResult:
         header (client, enclosed machine, test environment, instrumentation,
         climate, date), a per-band table (nominal frequency, the supplied panel
         transmission loss ``R``, the interior build-up correction ``C`` and the
-        net insertion loss ``IL = R - C``) beside the ``R``, ``C`` and ``IL``
-        curves, the boxed mean insertion loss over the analysis bands with the
-        external and internal surface areas, an optional verdict row against a
-        declared minimum, and a method-basis strip stating
-        ``IL = R - C`` with ``C = 10 lg(0.3 + S_E / R_i)``.
+        net insertion loss :math:`\mathrm{IL} = R - C`) beside the ``R``, ``C``
+        and ``IL`` curves, the boxed mean insertion loss over the analysis
+        bands with the external and internal surface areas, an optional verdict
+        row against a declared minimum, and a method-basis strip stating
+        :math:`\mathrm{IL} = R - C` with
+        :math:`C = 10 \lg(0.3 + S_E / R_i)`.
 
         :param path: Destination path of the PDF file.
         :param metadata: Optional :class:`~phonometry.ReportMetadata` supplying
@@ -281,10 +294,11 @@ def enclosure_insertion_loss(
     frequencies: ArrayLike | None = None,
     model: str = "bies",
 ) -> EnclosureResult:
-    """Net insertion loss of a machine enclosure (Bies Eqs. (7.103), (7.111)).
+    r"""Net insertion loss of a machine enclosure (Bies Eqs. (7.103), (7.111)).
 
-    ``IL = R - C`` with ``C = 10 log10(0.3 + S_E / R_i)`` and the interior room
-    constant ``R_i = S_i alpha_i / (1 - alpha_i)``.
+    :math:`\mathrm{IL} = R - C` with
+    :math:`C = 10 \log_{10}(0.3 + S_E / R_i)` and the interior room
+    constant :math:`R_i = S_i \alpha_i / (1 - \alpha_i)`.
 
     :param panel_transmission_loss: Panel transmission loss ``R`` per band, dB.
         One of: a per-band array (measured); a callable mapping a frequency
@@ -307,7 +321,7 @@ def enclosure_insertion_loss(
         label the result and the plot).
     :param model: Interior build-up model, one of :data:`ENCLOSURE_MODELS`:
         ``"bies"`` (default) carries the ``0.3`` floor of Bies Equation (7.111),
-        ``"norton"`` the bare ``C = 10 lg(S_E / R_i)`` of Norton & Karczub
+        ``"norton"`` the bare :math:`C = 10 \lg(S_E / R_i)` of Norton & Karczub
         Equation (4.115).
     :return: An :class:`EnclosureResult`.
     """
@@ -353,10 +367,11 @@ def enclosure_required_transmission_loss(
     frequencies: ArrayLike | None = None,
     model: str = "bies",
 ) -> EnclosureResult:
-    """Panel ``R`` an enclosure needs to deliver a given insertion loss.
+    r"""Panel ``R`` an enclosure needs to deliver a given insertion loss.
 
     The design equation of :func:`enclosure_insertion_loss` solved the other
-    way, ``R = IL + C``: the enclosure geometry and its interior lining fix the
+    way, :math:`R = \mathrm{IL} + C`: the enclosure geometry and its interior
+    lining fix the
     build-up correction ``C``, and the panels have to make up the rest. This is
     the number an enclosure is specified from, and the form Norton & Karczub use
     in 4.10 when the target ``IL`` is the gap between the level a machine

@@ -17,28 +17,40 @@ situation-invariant junction descriptor that feeds straight into the
 [`phonometry.flanking_path`](/phonometry/reference/api/building/building-prediction/#flanking_path) model.
 
 **Vibration reduction index (Part 1, Clause 3.9).** From the *direction
-averaged* velocity level difference `D̄v,ij = ½(Dv,ij + Dv,ji)` (Formula (11))
+averaged* velocity level difference
+$\overline{D}_{v,ij} = \frac{1}{2}(D_{v,ij} + D_{v,ji})$ (Formula (11))
 this module forms, per one-third-octave band,
-`Kij = D̄v,ij + 10 lg( lij / √(ai·aj) )` (Formula (13)) with the common-edge
+$K_{ij} = \overline{D}_{v,ij} + 10 \lg(l_{ij} / \sqrt{a_i a_j})$
+(Formula (13)) with the common-edge
 junction length `lij` and the equivalent absorption lengths `ai`, `aj` of
 the two elements. For lightweight, well-damped elements the equivalent
-absorption length collapses to the element area (`aj = Sj / l0`, `l0 = 1 m`,
+absorption length collapses to the element area ($a_j = S_j / l_0$,
+$l_0 = 1$ m,
 Clause 3.8 Note 3) and Formula (13) reduces to Formula (14),
-`Kij = D̄v,ij + 10 lg( lij / √(Si·Sj) )`. Because it uses the direction average,
-`Kij` is symmetric (`Kij = Kji`).
+$K_{ij} = \overline{D}_{v,ij} + 10 \lg(l_{ij} / \sqrt{S_i S_j})$.
+Because it uses the direction average,
+`Kij` is symmetric ($K_{ij} = K_{ji}$).
 
 **Equivalent absorption length (Part 1, Formula (12)).**
-`aj = (2,2 · π² · Sj) / (Ts,j · c0) · √(f_ref / f)` with the structural
+
+$$
+a_j = \frac{2.2\,\pi^2\,S_j}{T_{s,j}\,c_0} \sqrt{\frac{f_{\mathrm{ref}}}{f}}
+$$
+
+with the structural
 reverberation time `Ts,j`, the element area `Sj`, the speed of sound in air
-`c0` and the reference frequency `f_ref = 1000 Hz`. The related total loss
-factor is `η = 2,2 / (f · Ts)` (Clause 7.3.1).
+`c0` and the reference frequency $f_{\mathrm{ref}} = 1000$ Hz. The
+related total loss
+factor is $\eta = 2.2 / (f \, T_s)$ (Clause 7.3.1).
 
 **Overall flanking descriptors (Part 1, Clauses 3.2/3.3).** With airborne
 excitation the normalized flanking level difference is
-`Dn,f = L1 − L2 − 10 lg(A/A0)` (Formula (4)); with a tapping machine on the
+$D_{n,f} = L_1 - L_2 - 10 \lg(A/A_0)$ (Formula (4)); with a tapping
+machine on the
 source-room floor the normalized flanking impact level is
-`Ln,f = L2 + 10 lg(A/A0)` (Formula (5)), both with the reference absorption
-area `A0 = 10 m²`. Their single-number ratings `Dn,f,w (C; Ctr)` and
+$L_{n,f} = L_2 + 10 \lg(A/A_0)$ (Formula (5)), both with the reference
+absorption
+area $A_0 = 10$ m². Their single-number ratings `Dn,f,w (C; Ctr)` and
 `Ln,f,w (CI)` follow ISO 717-1/-2 through the verified
 [`phonometry.weighted_rating`](/phonometry/reference/api/building/insulation/#weighted_rating) / [`phonometry.weighted_impact_rating`](/phonometry/reference/api/building/insulation/#weighted_impact_rating)
 engines, reused unchanged.
@@ -77,10 +89,12 @@ band_mode_count(
 ) -> np.ndarray
 ```
 
-In-band mode count `N = B · n` (Part 4, Formula (4)).
+In-band mode count $N = B \cdot n$ (Part 4, Formula (4)).
 
-With the one-third-octave bandwidth approximation `B = 0,23 · f` and the
-modal density `n` from [`modal_density`](/phonometry/reference/api/building/flanking-transmission/#modal_density). `N ≥ 5` modes per band is
+With the one-third-octave bandwidth approximation
+$B = 0.23 \cdot f$ and the
+modal density `n` from [`modal_density`](/phonometry/reference/api/building/flanking-transmission/#modal_density). $N \ge 5$ modes per
+band is
 "always satisfactory".
 
 **Parameters**
@@ -113,18 +127,22 @@ critical_frequency(
 
 Thin-plate critical frequency `fc` (Part 1, Formula (20)).
 
-`fc = c0² / (1,8 · cL · h)` for a homogeneous isotropic element. The
-constant 1,8 already carries the `2π/√12` factor of the thin-plate
+$f_c = c_0^2 / (1.8 \, c_L \, h)$ for a homogeneous isotropic
+element. The
+constant 1.8 already carries the $2\pi/\sqrt{12}$ factor of the
+thin-plate
 dispersion relation, so for a plate whose bending stiffness and mass are
 mutually consistent this equals [`phonometry.coincidence_frequency`](/phonometry/reference/api/vibration/radiation-efficiency/#coincidence_frequency)
 (Hopkins Eq. 2.201) to within the rounding of the constant.
 
 :::note
 The printed ISO 10848-1:2006 Formula (20) carries a spurious extra
-`π` in the denominator (`1,8 cL · h · π`), which would misplace
+`π` in the denominator ($1.8 \, c_L \, h \, \pi$), which
+would misplace
 `fc` by a factor π; the π-free form implemented here is the one
 ISO 10848-1:2017 restores in its Formula (5), ISO 12354-1:2017
-prints in its symbol definitions (`fc = c0²/(1,8 cL t)`) and
+prints in its symbol definitions
+($f_c = c_0^2/(1.8 \, c_L t)$) and
 Hopkins Eq. 2.201 derives. See `docs/ERRATA.md`.
 :::
 
@@ -155,7 +173,8 @@ direction_averaged_level_difference(
 
 Direction-averaged velocity level difference (Formula (11)).
 
-`D̄v,ij = ½ (Dv,ij + Dv,ji)` with `Dv,ij` measured exciting element
+$\overline{D}_{v,ij} = \frac{1}{2}(D_{v,ij} + D_{v,ji})$ with
+`Dv,ij` measured exciting element
 `i` and `Dv,ji` exciting element `j`. The average makes the derived
 `Kij` symmetric.
 
@@ -188,8 +207,11 @@ equivalent_absorption_length(
 
 Equivalent absorption length `aj` (Formula (12)).
 
-`aj = (2,2 · π² · Sj) / (Ts,j · c0) · √(f_ref / f)` with
-`f_ref = 1000 Hz`.
+$$
+a_j = \frac{2.2\,\pi^2\,S_j}{T_{s,j}\,c_0} \sqrt{\frac{f_{\mathrm{ref}}}{f}}
+$$
+
+with $f_{\mathrm{ref}} = 1000$ Hz.
 
 **Parameters**
 
@@ -223,7 +245,7 @@ Normalized flanking impact level `Ln,f` (Formula (5)).
 
 | Name | Description |
 | :--- | :--- |
-| `l_n_f` | `Ln,f = L2 + 10 lg(A/A0)` per band, in dB. |
+| `l_n_f` | $L_{n,f} = L_2 + 10 \lg(A/A_0)$ per band, in dB. |
 | `rating` | Single-number `Ln,f,w` with `CI` (ISO 717-2), or `None` when the band count is neither 16 nor 5. |
 
 ### FlankingImpactLevelResult.plot()
@@ -297,7 +319,7 @@ Normalized flanking level difference `Dn,f` (airborne, Formula (4)).
 
 | Name | Description |
 | :--- | :--- |
-| `d_n_f` | `Dn,f = L1 − L2 − 10 lg(A/A0)` per band, in dB. |
+| `d_n_f` | $D_{n,f} = L_1 - L_2 - 10 \lg(A/A_0)$ per band, in dB. |
 | `rating` | Single-number `Dn,f,w` with `C`/`Ctr` (ISO 717-1), or `None` when the band count is neither 16 nor 5. |
 
 ### FlankingLevelDifferenceResult.plot()
@@ -367,7 +389,7 @@ modal_density(
 ) -> float
 ```
 
-Modal density `n = π · S · fc / c0²` (Part 4, Formula (5)).
+Modal density $n = \pi \cdot S \cdot f_c / c_0^2$ (Part 4, (5)).
 
 **Parameters**
 
@@ -397,10 +419,11 @@ modal_overlap_factor(
 ) -> np.ndarray
 ```
 
-Modal overlap factor `M = 2,2 · n / Ts` (Part 4, Formula (6)).
+Modal overlap factor $M = 2.2 \cdot n / T_s$ (Part 4, F. (6)).
 
 With the modal density `n` from [`modal_density`](/phonometry/reference/api/building/flanking-transmission/#modal_density). Part 4 prefers
-`M ≥ 1` at 250 Hz and above, and requires bands with `M < 0,25` to be
+$M \ge 1$ at 250 Hz and above, and requires bands with
+$M < 0.25$ to be
 bracketed in the report and excluded from the single-number rating
 (Clause 9). This function only computes `M`; pass it to
 [`vibration_reduction_index`](/phonometry/reference/api/building/flanking-transmission/#vibration_reduction_index) via `modal_overlap` to apply the
@@ -437,9 +460,9 @@ normalized_flanking_impact_level(
 
 Normalized flanking impact level `Ln,f` (Formula (5)).
 
-`Ln,f = L2 + 10 lg(A/A0)` with the reference absorption area
-`A0 = 10 m²`, from the receiving-room impact level with the tapping
-machine on the source-room floor.
+$L_{n,f} = L_2 + 10 \lg(A/A_0)$ with the reference absorption
+area $A_0 = 10$ m², from the receiving-room impact level with the
+tapping machine on the source-room floor.
 
 **Parameters**
 
@@ -473,8 +496,8 @@ normalized_flanking_level_difference(
 
 Normalized flanking level difference `Dn,f` (airborne, Formula (4)).
 
-`Dn,f = L1 − L2 − 10 lg(A/A0)` with the reference absorption area
-`A0 = 10 m²`.
+$D_{n,f} = L_1 - L_2 - 10 \lg(A/A_0)$ with the reference absorption
+area $A_0 = 10$ m².
 
 **Parameters**
 
@@ -509,7 +532,7 @@ strong_coupling_satisfied(
 Strong-coupling applicability check (Part 1, Formula (15)).
 
 `Kij` is relevant only where
-`D̄v,ij ≥ 3 − 10 lg( (mi·fcj)/(mj·fci) )`.
+$\overline{D}_{v,ij} \ge 3 - 10 \lg\frac{m_i f_{cj}}{m_j f_{ci}}$.
 
 **Parameters**
 
@@ -538,7 +561,7 @@ total_loss_factor(
 ) -> np.ndarray
 ```
 
-Total loss factor `η = 2,2 / (f · Ts)` (Clause 7.3.1).
+Total loss factor $\eta = 2.2 / (f \, T_s)$ (Clause 7.3.1).
 
 **Parameters**
 
@@ -564,7 +587,7 @@ velocity_level_difference(
 ) -> np.ndarray
 ```
 
-Velocity level difference `Dv,ij = Lv,i − Lv,j` (Formula (8)).
+Velocity level difference $D_{v,ij} = L_{v,i} - L_{v,j}$ (Formula (8)).
 
 **Parameters**
 
@@ -600,12 +623,14 @@ vibration_reduction_index(
 
 Vibration reduction index `Kij` (Formula (13), or simplified (14)).
 
-`Kij = D̄v,ij + 10 lg( lij / √(ai·aj) )`. When the structural reverberation
+$K_{ij} = \overline{D}_{v,ij} + 10 \lg(l_{ij} / \sqrt{a_i a_j})$.
+When the structural reverberation
 times and the frequencies are supplied, the equivalent absorption lengths
 `ai`, `aj` come from Formula (12) and the full Formula (13) is used.
-Otherwise the lightweight, well-damped simplification `aj = Sj / l0`
-(`l0 = 1 m`) applies and Formula (14),
-`Kij = D̄v,ij + 10 lg( lij / √(Si·Sj) )`, is used.
+Otherwise the lightweight, well-damped simplification
+$a_j = S_j / l_0$ ($l_0 = 1$ m) applies and Formula (14),
+$K_{ij} = \overline{D}_{v,ij} + 10 \lg(l_{ij} / \sqrt{S_i S_j})$,
+is used.
 
 **Parameters**
 
@@ -619,7 +644,7 @@ Otherwise the lightweight, well-damped simplification `aj = Sj / l0`
 | `structural_reverberation_time_i` | `Ts,i` per band (or a single value), in s. Supply together with `structural_reverberation_time_j` and `frequency` to use Formula (12); omit for the simplified form. |
 | `structural_reverberation_time_j` | `Ts,j` per band (or a single value), in s. |
 | `speed_of_sound` | Speed of sound in air `c0`, in m/s. |
-| `modal_overlap` | Modal overlap factor `M` per band for the heavier (least-overlapped) of the two elements (see [`modal_overlap_factor`](/phonometry/reference/api/building/flanking-transmission/#modal_overlap_factor)). When supplied, bands with `M < 0,25` are flagged as bracketed and excluded from the single-number `K̄ij` (ISO 10848-4:2010, Clause 9). |
+| `modal_overlap` | Modal overlap factor `M` per band for the heavier (least-overlapped) of the two elements (see [`modal_overlap_factor`](/phonometry/reference/api/building/flanking-transmission/#modal_overlap_factor)). When supplied, bands with $M < 0.25$ are flagged as bracketed and excluded from the single-number `K̄ij` (ISO 10848-4:2010, Clause 9). |
 
 **Returns:** A [`VibrationReductionResult`](/phonometry/reference/api/building/flanking-transmission/#vibrationreductionresult).
 
@@ -650,9 +675,9 @@ Indirect `Kij` from the normalized flanking level difference.
 
 ISO 10848-1:2006, Clause 4.3.1 Note 2 (unnumbered):
 
-```text
-Kij = Dn,f − (Ri + Rj)/2 − 10 lg(√(ai·aj)/lij) + 10 lg(√(Si·Sj)/A0)
-```
+$$
+K_{ij} = D_{n,f} - \frac{R_i + R_j}{2} - 10 \lg\frac{\sqrt{a_i a_j}}{l_{ij}} + 10 \lg\frac{\sqrt{S_i S_j}}{A_0}
+$$
 
 The standard warns this holds only for resonant-only transmission; measured
 `R` also includes forced transmission, so a direct measurement of `Kij`
@@ -710,7 +735,8 @@ VibrationReductionResult.octave_bands() -> VibrationReductionResult
 
 Combine one-third-octave `Kij` into octave bands.
 
-`Kij,oct = −10 lg[ (1/3) Σ 10^(−Kij/10) ]` over each group of three
+$K_{ij,\mathrm{oct}} = -10 \lg\!\left[ \tfrac{1}{3} \sum 10^{-K_{ij}/10} \right]$
+over each group of three
 one-third-octave bands (Part 2/3/4). Requires a band count that is a
 multiple of three and, for the frequency labels, that frequencies were
 supplied; supplied frequencies must group into whole octave triples

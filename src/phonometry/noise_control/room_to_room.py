@@ -1,5 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""
+r"""
 Room-to-room noise reduction: source room, partition, receiving room, criterion.
 
 The other classic bookkeeping exercise of noise control, beside the duct-borne
@@ -22,10 +22,15 @@ for Engineers* 2nd ed., 4.9, balance the steady-state power crossing the
 partition against the power the receiving room absorbs and the power that leaks
 back, and arrive at Equation (4.101):
 
-    NR = TL - 10 lg[ S_w / (S_2 alpha_2 + tau S_w) ] ,
+.. math::
 
-with ``NR = L_p1 - L_p2`` the noise reduction between the two reverberant
-fields, ``TL = 10 lg(1/tau)`` the transmission loss of the partition, ``S_w``
+   \mathrm{NR} = \mathrm{TL} -
+   10 \lg\!\left[\frac{S_w}{S_2 \alpha_2 + \tau S_w}\right],
+
+with :math:`\mathrm{NR} = L_{p1} - L_{p2}` the noise reduction between the two
+reverberant
+fields, :math:`\mathrm{TL} = 10 \lg(1/\tau)` the transmission loss of the
+partition, ``S_w``
 the area of the partition and ``S_2 alpha_2`` the equivalent absorption area of
 the receiving room. The ``tau S_w`` term is the power the partition itself
 passes back and is normally negligible beside the room absorption; it is
@@ -41,7 +46,7 @@ and air leaks, which ``flanking_penalty`` applies as an explicit debit.
 **The source-room level.** In a plant room the receiver of interest is the
 partition, not a point near the machine, so the level that drives the
 transmission is the reverberant field alone,
-``L_p1 = L_W + 10 lg(4 / R_1)``. That is
+:math:`L_{p1} = L_W + 10 \lg(4 / R_1)`. That is
 :func:`phonometry.room.steady_state_spl` at ``distance=None``, and this module
 delegates to it rather than repeating it. Norton's Table 4.5 adds the choice of
 *sound power model*: a machine standing in the intersection of a floor and a
@@ -85,7 +90,7 @@ if TYPE_CHECKING:
 
 @dataclass(frozen=True)
 class RoomToRoomResult:
-    """The room-to-room chain of one partition (Norton 2e, 4.9).
+    r"""The room-to-room chain of one partition (Norton 2e, 4.9).
 
     Built by :func:`room_to_room_transmission`. The four spectra are the four
     rows a hand calculation writes down: the level in the source room, the
@@ -102,7 +107,7 @@ class RoomToRoomResult:
     :ivar noise_reduction: The delivered noise reduction ``NR`` per band, dB:
         Equation (4.101) less :attr:`flanking_penalty`.
     :ivar received_level: Reverberant sound pressure level in the receiving
-        room ``L_p2 = L_p1 - NR``, dB.
+        room :math:`L_{p2} = L_{p1} - \mathrm{NR}`, dB.
     :ivar flanking_penalty: The debit applied to the predicted noise reduction
         for flanking transmission and air leaks, dB.
     :ivar source_power_level: The source sound power level ``L_W`` the source
@@ -167,13 +172,17 @@ class RoomToRoomResult:
     # -- design inverse ---------------------------------------------------
     @property
     def required_transmission_loss(self) -> np.ndarray | None:
-        """Partition ``TL`` that would just meet the criterion, per band, dB.
+        r"""Partition ``TL`` that would just meet the criterion, per band, dB.
 
         The chain of Equation (4.101) solved for the transmission loss,
 
-            TL_req = L_p1 - L_p2,target + 10 lg(S_w / S_2 alpha_2) + penalty ,
+        .. math::
 
-        with ``L_p2,target`` the design criterion curve. The ``tau S_w`` term is
+           \mathrm{TL}_{req} = L_{p1} - L_{p2,\mathrm{target}}
+           + 10 \lg(S_w / S_2 \alpha_2) + \text{penalty},
+
+        with :math:`L_{p2,\mathrm{target}}` the design criterion curve. The
+        ``tau S_w`` term is
         left out of the inverse (it depends on the answer), which is how the
         equation is used to specify a partition. ``None`` when no target was
         declared.
@@ -310,7 +319,7 @@ def room_to_room_transmission(
     target: float | None = None,
     label: str = "Room to room",
 ) -> RoomToRoomResult:
-    """Sound transmission from one room to another (Norton 2e Equation (4.101)).
+    r"""Sound transmission from one room to another (Norton 2e Equation (4.101)).
 
     Computes the noise reduction the partition and the receiving room deliver
     together, and the reverberant spectrum in the receiving room. The
@@ -342,11 +351,12 @@ def room_to_room_transmission(
     :param source_model: Sound power model of Norton Table 4.5:
         ``"constant_power"`` (default, the radiated power does not depend on the
         source position), ``"constant_volume"`` (the conservative upper bound,
-        the power rises by ``10 lg Q``) or ``"constant_pressure"`` (the lower
-        bound, it falls by ``10 lg Q``).
+        the power rises by :math:`10 \lg Q`) or ``"constant_pressure"`` (the
+        lower bound, it falls by :math:`10 \lg Q`).
     :param include_partition_transmission: When ``True`` the ``tau S_w`` term of
         Equation (4.101) is added to the receiving-room absorption, with
-        ``tau = 10^(-TL/10)``. Default ``False``, the form hand calculations
+        :math:`\tau = 10^{-\mathrm{TL}/10}`. Default ``False``, the form hand
+        calculations
         use.
     :param flanking_penalty: Decibels debited from the predicted noise
         reduction for flanking transmission through mechanical connections and

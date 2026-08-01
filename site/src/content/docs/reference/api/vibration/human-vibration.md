@@ -11,7 +11,8 @@ The measurement chain of the ISO human-vibration family is implemented from the
 standards' own analog definitions, clean-room:
 
 * **ISO 8041-1:2017** - the authoritative *master* definition of every
-  frequency weighting.  A single cascade `H(s) = Hh(s)*Hl(s)*Ht(s)*Hs(s)`
+  frequency weighting.  A single cascade
+  $H(s) = H_h(s) H_l(s) H_t(s) H_s(s)$
   (Formula (5)) of second-order band-limiting Butterworth sections
   (Formulae (1)/(2)), an acceleration-velocity transition (Formula (3)) and an
   upward step (Formula (4)) realises all nine weightings from the one Table 3
@@ -40,13 +41,14 @@ standards' own analog definitions, clean-room:
   and the vibration-white-finger dose relation of 5349-1 Annex C (Eq. (C.1)).
 
 * **Directive 2002/44/EC** - the daily exposure action and limit values
-  (Article 3) that ISO does not fix: hand-arm `A(8)` EAV `2,5` /
-  ELV `5` m/s2; whole-body `A(8)` EAV `0,5` / ELV `1,15` m/s2 (or VDV
-  EAV `9,1` / ELV `21` m/s^1,75).  The hand-arm `A(8)` is based on the
+  (Article 3) that ISO does not fix: hand-arm `A(8)` EAV `2.5` /
+  ELV `5` m/s2; whole-body `A(8)` EAV `0.5` / ELV `1.15` m/s2 (or VDV
+  EAV `9.1` / ELV `21` m/s^1.75).  The hand-arm `A(8)` is based on the
   ISO 5349-1 vector total `a_hv` (Annex, Part A, point 1); the whole-body
   `A(8)` is based on the *highest* of the frequency-weighted axis values
-  `1,4*a_wx`, `1,4*a_wy`, `a_wz` (Annex, Part B, point 1; see
-  [`wbv_exposure_basis`](/phonometry/reference/api/vibration/human-vibration/#wbv_exposure_basis)), not on the ISO 2631-1 Eq. (10) vector total.
+  $1.4 a_{wx}$, $1.4 a_{wy}$, $a_{wz}$ (Annex, Part B,
+  point 1; see [`wbv_exposure_basis`](/phonometry/reference/api/vibration/human-vibration/#wbv_exposure_basis)), not on the ISO 2631-1 Eq. (10)
+  vector total.
 
 The band (spectrum) method and the exposure arithmetic carry the standards'
 worked-example oracles; the time-domain metrics operate on a weighted
@@ -94,13 +96,13 @@ combine_partial_exposures(partials: ArrayLike) -> float
 
 Combine partial exposures into `A(8)` (ISO 5349-1/-2 Eq. (3)).
 
-`A(8) = sqrt( sum_i A_i(8)^2 )`.
+$A(8) = \sqrt{\sum_i A_i(8)^2}$.
 
 **Parameters**
 
 | Name | Description |
 | :--- | :--- |
-| `partials` | Partial exposures `A_i(8)`, in m/s2. |
+| `partials` | Partial exposures $A_i(8)$, in m/s2. |
 
 **Returns:** The combined daily exposure `A(8)`, in m/s2.
 
@@ -142,10 +144,10 @@ daily_exposure(total_value: float, duration_s: float) -> float
 
 Daily exposure `A(8)` for one operation (ISO 5349-1 Eq. (2)).
 
-`A(8) = a_hv * sqrt(T / T0)` with `T0 = 8 h`.  The identical form gives
-the whole-body `A(8)` of Directive 2002/44/EC, whose magnitude is the
-Annex Part B dominant-axis value (see [`wbv_exposure_basis`](/phonometry/reference/api/vibration/human-vibration/#wbv_exposure_basis)) rather
-than a vector total.
+$A(8) = a_{hv} \sqrt{T / T_0}$ with $T_0 = 8$ h.  The
+identical form gives the whole-body `A(8)` of Directive 2002/44/EC,
+whose magnitude is the Annex Part B dominant-axis value (see
+[`wbv_exposure_basis`](/phonometry/reference/api/vibration/human-vibration/#wbv_exposure_basis)) rather than a vector total.
 
 **Parameters**
 
@@ -308,16 +310,16 @@ energy_equivalent_acceleration(
 
 Energy-equivalent weighted acceleration (ISO 2631-1 Eq. (B.3)).
 
-`a_w,e = sqrt( sum a_wi^2 * T_i / sum T_i )`.
+$a_{w,e} = \sqrt{\sum a_{wi}^2 T_i / \sum T_i}$.
 
 **Parameters**
 
 | Name | Description |
 | :--- | :--- |
-| `magnitudes` | Weighted r.m.s. magnitudes `a_wi`, in m/s2. |
-| `durations_s` | Duration `T_i` per period, in seconds. |
+| `magnitudes` | Weighted r.m.s. magnitudes $a_{wi}$, in m/s2. |
+| `durations_s` | Duration $T_i$ per period, in seconds. |
 
-**Returns:** The energy-equivalent magnitude `a_w,e`, in m/s2.
+**Returns:** The energy-equivalent magnitude $a_{w,e}$, in m/s2.
 
 **Raises**
 
@@ -418,14 +420,14 @@ hav_daily_exposure(total_values: ArrayLike, durations_s: ArrayLike) -> float
 
 Daily exposure `A(8)` for several operations (ISO 5349-1 Eq. (3)).
 
-`A(8) = sqrt( (1/T0) * sum_i a_hvi^2 * T_i )`.
+$A(8) = \sqrt{(1/T_0) \sum_i a_{hvi}^2 T_i}$.
 
 **Parameters**
 
 | Name | Description |
 | :--- | :--- |
-| `total_values` | Vibration total value `a_hvi` per operation, in m/s2. |
-| `durations_s` | Duration `T_i` per operation, in seconds. |
+| `total_values` | Vibration total value $a_{hvi}$ per operation, in m/s2. |
+| `durations_s` | Duration $T_i$ per operation, in seconds. |
 
 **Returns:** The daily exposure `A(8)`, in m/s2.
 
@@ -457,11 +459,12 @@ HAV_ELV_A8 = 5.0
 hav_vwf_lifetime_years(a8: float) -> float
 ```
 
-Years to 10 % vibration-white-finger prevalence (ISO 5349-1 Eq. (C.1)).
+Years to 10 % vibration-white-finger prevalence (ISO 5349-1
+Eq. (C.1)).
 
-`Dy = 31,8 * A(8)^(-1,06)` - the group-mean lifetime exposure that
-produces finger blanching in 10 % of an exposed group (informative
-Annex C).
+$D_y = 31.8 \, A(8)^{-1.06}$ - the group-mean lifetime exposure
+that produces finger blanching in 10 % of an exposed group
+(informative Annex C).
 
 **Parameters**
 
@@ -469,7 +472,7 @@ Annex C).
 | :--- | :--- |
 | `a8` | Daily vibration exposure `A(8)`, in m/s2 (> 0). |
 
-**Returns:** The lifetime exposure duration `Dy`, in years.
+**Returns:** The lifetime exposure duration $D_y$, in years.
 
 **Raises**
 
@@ -487,10 +490,11 @@ Advisory for out-of-range human-vibration measurement conditions.
 motion_sickness_dose_value(signal: ArrayLike, fs: float) -> float
 ```
 
-Motion sickness dose value `MSDV` (ISO 2631-1 clause 9; 8041-1 3.1.2.5).
+Motion sickness dose value `MSDV` (ISO 2631-1 clause 9; 8041-1
+3.1.2.5).
 
-`MSDV = ( integral a_w(t)^2 dt )^(1/2)`, in m/s^1,5; the `Wf`-weighted
-signal is the intended input.
+$\mathrm{MSDV} = \left( \int a_w(t)^2 \, dt \right)^{1/2}$, in
+m/s^1.5; the `Wf`-weighted signal is the intended input.
 
 **Parameters**
 
@@ -499,7 +503,7 @@ signal is the intended input.
 | `signal` | Frequency-weighted acceleration signal (1-D), in m/s2. |
 | `fs` | Sampling frequency, in hertz. |
 
-**Returns:** The MSDV, in m/s^1,5.
+**Returns:** The MSDV, in m/s^1.5.
 
 **Raises**
 
@@ -540,10 +544,10 @@ partial_exposure(total_value: float, duration_s: float) -> float
 
 Daily exposure `A(8)` for one operation (ISO 5349-1 Eq. (2)).
 
-`A(8) = a_hv * sqrt(T / T0)` with `T0 = 8 h`.  The identical form gives
-the whole-body `A(8)` of Directive 2002/44/EC, whose magnitude is the
-Annex Part B dominant-axis value (see [`wbv_exposure_basis`](/phonometry/reference/api/vibration/human-vibration/#wbv_exposure_basis)) rather
-than a vector total.
+$A(8) = a_{hv} \sqrt{T / T_0}$ with $T_0 = 8$ h.  The
+identical form gives the whole-body `A(8)` of Directive 2002/44/EC,
+whose magnitude is the Annex Part B dominant-axis value (see
+[`wbv_exposure_basis`](/phonometry/reference/api/vibration/human-vibration/#wbv_exposure_basis)) rather than a vector total.
 
 **Parameters**
 
@@ -615,8 +619,8 @@ vibration_dose_value(signal: ArrayLike, fs: float) -> float
 
 Vibration dose value `VDV` (ISO 2631-1 Eq. (5)).
 
-`VDV = ( integral a_w(t)^4 dt )^(1/4)`, in m/s^1,75; more sensitive to
-peaks than the r.m.s. value.
+$\mathrm{VDV} = \left( \int a_w(t)^4 \, dt \right)^{1/4}$, in
+m/s^1.75; more sensitive to peaks than the r.m.s. value.
 
 **Parameters**
 
@@ -625,7 +629,7 @@ peaks than the r.m.s. value.
 | `signal` | Frequency-weighted acceleration signal (1-D), in m/s2. |
 | `fs` | Sampling frequency, in hertz. |
 
-**Returns:** The VDV, in m/s^1,75.
+**Returns:** The VDV, in m/s^1.75.
 
 **Raises**
 
@@ -645,16 +649,17 @@ vibration_total_value(
 
 Vibration total value `a_v` / `a_hv` (ISO 2631-1 Eq. (10)).
 
-`a_v = sqrt( sum_j k_j^2 * a_wj^2 )` over the (up to three) axis-weighted
-r.m.s. accelerations.  With `k = None` the unweighted vector sum of
-ISO 5349-1 Eq. (1) (`a_hv`, all `k = 1`) is returned.
+$a_v = \sqrt{\sum_j k_j^2 a_{wj}^2}$ over the (up to three)
+axis-weighted r.m.s. accelerations.  With `k = None` the unweighted
+vector sum of ISO 5349-1 Eq. (1) (`a_hv`, all $k = 1$) is
+returned.
 
 **Parameters**
 
 | Name | Description |
 | :--- | :--- |
-| `components` | Axis-weighted r.m.s. accelerations `a_wj`, in m/s2. |
-| `k` | Optional per-axis multiplying factors `k_j` (ISO 2631-1 7.2.3); `None` uses unity for every axis. |
+| `components` | Axis-weighted r.m.s. accelerations $a_{wj}$, in m/s2. |
+| `k` | Optional per-axis multiplying factors $k_j$ (ISO 2631-1 7.2.3); `None` uses unity for every axis. |
 
 **Returns:** The vibration total value, in m/s2.
 
@@ -704,10 +709,11 @@ wbv_exposure_basis(a_wx: float, a_wy: float, a_wz: float) -> float
 
 Whole-body exposure basis of Directive 2002/44/EC (Annex, Part B).
 
-`max(1,4*a_wx, 1,4*a_wy, a_wz)` - the Directive bases the whole-body
-daily exposure `A(8)` on the *highest* of the frequency-weighted axis
-values `1,4*a_wx`, `1,4*a_wy`, `a_wz` for a seated or standing
-worker (Annex, Part B, point 1, with the ISO 2631-1 clause 7.2.3
+$\max(1.4 a_{wx}, 1.4 a_{wy}, a_{wz})$ - the Directive bases
+the whole-body daily exposure `A(8)` on the *highest* of the
+frequency-weighted axis values $1.4 a_{wx}$,
+$1.4 a_{wy}$, $a_{wz}$ for a seated or standing worker
+(Annex, Part B, point 1, with the ISO 2631-1 clause 7.2.3
 multiplying factors), **not** on the ISO 2631-1 Eq. (10) vector total
 `a_v`.  Feed the returned dominant-axis value to
 [`daily_vibration_exposure`](/phonometry/reference/api/vibration/human-vibration/#daily_vibration_exposure) (`kind="wbv"`) for a
@@ -722,7 +728,7 @@ vector total `a_hv` instead (Annex, Part A, point 1).
 | `a_wy` | `Wd`-weighted r.m.s. acceleration on the y axis, in m/s2. |
 | `a_wz` | `Wk`-weighted r.m.s. acceleration on the z axis, in m/s2. |
 
-**Returns:** The dominant-axis value `max(1,4*a_wx, 1,4*a_wy, a_wz)`, in m/s2.
+**Returns:** The dominant-axis value $\max(1.4 a_{wx}, 1.4 a_{wy}, a_{wz})$, in m/s2.
 
 **Raises**
 
@@ -740,28 +746,30 @@ weighted_acceleration(
 ) -> WeightedSpectrum
 ```
 
-Weighted r.m.s. acceleration from a band spectrum (ISO 2631-1 Eq. (9)).
+Weighted r.m.s. acceleration from a band spectrum (ISO 2631-1
+Eq. (9)).
 
-`a_w = sqrt( sum_i (W_i * a_i)^2 )` with the per-band weighting factors
-`W_i` of ISO 8041-1 evaluated at the band centres (ISO 5349-1 Eq. (A.1)
-is the identical construction for the hand-arm weighting `Wh`).
+$a_w = \sqrt{\sum_i (W_i a_i)^2}$ with the per-band weighting
+factors $W_i$ of ISO 8041-1 evaluated at the band centres
+(ISO 5349-1 Eq. (A.1) is the identical construction for the hand-arm
+weighting `Wh`).
 
 :::note
 The weightings are evaluated at exactly the frequencies you pass. The
 ISO tables (ISO 8041-1 Annex B, ISO 2631-1 Table 3, ISO 5349-1
-Table A.2) tabulate `W_i` at the *true* one-third-octave centres
-`10^(n/10)` Hz (6.31, 7.943, 15.85, ...), not at the nominal band
-labels (6.3, 8, 16, ...). Pass true centres when comparing against
-the tabulated factors; a nominal label (e.g. 16.0 instead of 15.85)
-gives a slightly different `W_i`.
+Table A.2) tabulate $W_i$ at the *true* one-third-octave
+centres $10^{n/10}$ Hz (6.31, 7.943, 15.85, ...), not at the
+nominal band labels (6.3, 8, 16, ...). Pass true centres when
+comparing against the tabulated factors; a nominal label (e.g.
+16.0 instead of 15.85) gives a slightly different $W_i$.
 :::
 
 **Parameters**
 
 | Name | Description |
 | :--- | :--- |
-| `band_accelerations` | r.m.s. acceleration `a_i` per band, in m/s2. |
-| `frequencies` | Band centre frequencies, in hertz (true one-third-octave centres `10^(n/10)` for table-conformant band values). |
+| `band_accelerations` | r.m.s. acceleration $a_i$ per band, in m/s2. |
+| `frequencies` | Band centre frequencies, in hertz (true one-third-octave centres $10^{n/10}$ for table-conformant band values). |
 | `weighting` | Weighting name (one of [`WEIGHTING_NAMES`](/phonometry/reference/api/vibration/human-vibration/#weighting_names)). |
 
 **Returns:** A [`WeightedSpectrum`](/phonometry/reference/api/vibration/human-vibration/#weightedspectrum) with `.plot()`.

@@ -1,5 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""
+r"""
 Prediction of resilient-layer performance: tapping force, coverings, floors, linings.
 
 The measurement modules of this domain report what a resilient layer *achieved*
@@ -11,38 +11,41 @@ covering or a floating floor can be sized before anything is built.
 
 The chain is one story told in four steps.
 
-**1. The excitation (Hopkins 3.6.3).** The ISO tapping machine drops a 0,5 kg
+**1. The excitation (Hopkins 3.6.3).** The ISO tapping machine drops a 0.5 kg
 hammer from 40 mm, ten impacts per second, so the impact velocity is
-``vo = √(2 g h) = 0,886 m/s`` (Eq. 3.85) and, for a short impact, the peak force
-per Fourier line is ``|Fn| = 2 m vo/Ti`` (Eq. 3.90), giving the band mean-square
-force ``F²rms = 3,9 B`` (Eq. 3.92). Real floors are not that simple: the hammer,
-the contact stiffness ``K`` it deforms and the floor's driving-point impedance
-``Zdp`` form a mass-spring-dashpot (Fig. 3.28) whose force pulse
-(:func:`force_pulse`, Eqs. 3.95/3.96) is **over-critical** when ``K m ≥ 4 Zdp²``
-(a single positive pulse, no rebound) and **under-critical** otherwise (a
-rebound; only the first positive lobe is transformed). Its spectrum
-(:func:`tapping_force_spectrum`) is flat up to the cut-off ``fco``
-(Eqs. 3.101/3.102) and falls above it, and it asymptotes at low frequency
-between ``|Fn|lower = m vo/Ti`` and ``|Fn|upper = 2 m vo/Ti``, 6 dB apart in
-mean square (Eqs. 3.99/3.100).
+:math:`v_o = \sqrt{2 g h} = 0.886` m/s (Eq. 3.85) and, for a short impact, the
+peak force per Fourier line is :math:`|F_n| = 2 m v_o/T_i` (Eq. 3.90), giving
+the band mean-square force :math:`F_{rms}^{2} = 3.9 B` (Eq. 3.92). Real floors
+are not that simple: the hammer, the contact stiffness ``K`` it deforms and the
+floor's driving-point impedance ``Zdp`` form a mass-spring-dashpot (Fig. 3.28)
+whose force pulse (:func:`force_pulse`, Eqs. 3.95/3.96) is **over-critical**
+when :math:`K m \ge 4 Z_{dp}^{2}` (a single positive pulse, no rebound) and
+**under-critical** otherwise (a rebound; only the first positive lobe is
+transformed). Its spectrum (:func:`tapping_force_spectrum`) is flat up to the
+cut-off ``fco`` (Eqs. 3.101/3.102) and falls above it, and it asymptotes at low
+frequency between :math:`|F_n|_{\text{lower}} = m v_o/T_i` and
+:math:`|F_n|_{\text{upper}} = 2 m v_o/T_i`, 6 dB apart in mean square
+(Eqs. 3.99/3.100).
 
 **2. Soft floor coverings (Hopkins 4.4.3.1).** A soft covering on a heavyweight
-floor changes nothing but the force input, so its improvement is the force ratio
-``ΔL = 20 lg(|Fn|without/|Fn|with)`` (Eq. 4.114). The covering's contact
-stiffness ``K = E π r²/d`` (Eq. 3.98) sets its cut-off, against the bare plate's
-``K = 2 r E/(1 − ν²)`` (Eq. 3.97), which is why a two-line estimate,
-``ΔL ≈ 0`` below ``fco`` and 12 dB/octave above it, captures the whole design
-question (:func:`covering_improvement`).
+floor changes nothing but the force input, so its improvement is the force
+ratio :math:`\Delta L = 20 \lg(|F_n|_{\text{without}}/|F_n|_{\text{with}})`
+(Eq. 4.114). The covering's contact stiffness :math:`K = E \pi r^{2}/d`
+(Eq. 3.98) sets its cut-off, against the bare plate's
+:math:`K = 2 r E/(1 - \nu^{2})` (Eq. 3.97), which is why a two-line estimate,
+:math:`\Delta L \approx 0` below ``fco`` and 12 dB/octave above it, captures
+the whole design question (:func:`covering_improvement`).
 
 **3. Floating floors (Hopkins 4.4.4, ISO 12354-2 Annex C, Vigran 8.4).** Above
-the mass-spring resonance ``fo = 160 √(s'/m')`` (Formula C.2) the improvement
-follows one of three laws (:func:`floating_floor_improvement_spectrum`): the
-infinite-plate result of Cremer, ``ΔL = 40 lg(f/fo)`` (Eq. 4.119, Vigran
-Eq. 8.40), the empirical ``ΔL = 30 lg(f/fo)`` that EN 12354-2 adopted for
+the mass-spring resonance :math:`f_o = 160 \sqrt{s'/m'}` (Formula C.2) the
+improvement follows one of three laws
+(:func:`floating_floor_improvement_spectrum`): the infinite-plate result of
+Cremer, :math:`\Delta L = 40 \lg(f/f_o)` (Eq. 4.119, Vigran Eq. 8.40), the
+empirical :math:`\Delta L = 30 \lg(f/f_o)` that EN 12354-2 adopted for
 sand-cement screeds (Formula C.1, Eq. 4.124), and the same 40 lg law with the
-hammer-impedance term ``10 lg[1 + (f/flimit)²]`` that a lightweight walking
-surface needs (Eq. 4.123, Vigran Eq. 8.48). A floating floor on discrete
-mounts instead of a continuous layer is a two-subsystem SEA problem
+hammer-impedance term :math:`10 \lg[1 + (f/f_{limit})^{2}]` that a lightweight
+walking surface needs (Eq. 4.123, Vigran Eq. 8.48). A floating floor on
+discrete mounts instead of a continuous layer is a two-subsystem SEA problem
 (:func:`resilient_mount_improvement`, Vér's model as Hopkins Eq. 4.118 and
 Vigran Eq. 8.45) and rises at 30 dB/decade, not 40. Two floating floors stacked
 give two resonances (:func:`double_floating_floor_resonances`, Eq. 4.125), and
@@ -67,8 +70,8 @@ recorded in ``docs/ERRATA.md``: the overlap of the last two rows of Table D.1 at
 
 Several relations used here carry no published worked example, so they are
 implemented as printed and checked only for self-consistency: the cavity
-stiffness ``0,111/d`` of Formula (D.2), the asphalt fit of Formula (C.5), and
-the exterior-system and stud fits of Formulae (D.3) to (D.8). The guide
+stiffness :math:`0.111/d` of Formula (D.2), the asphalt fit of Formula (C.5),
+and the exterior-system and stud fits of Formulae (D.3) to (D.8). The guide
 "Predicting Resilient-Layer Performance" says which pieces have an oracle and
 which do not.
 """
@@ -260,7 +263,7 @@ FloatingFloorModel = Literal["en12354", "cremer", "cremer_hammer"]
 
 
 def _band_factor(band: BandWidth) -> float:
-    """Band-width factor ``B/f`` of Hopkins Eq. (3.91)."""
+    """Band-width factor :math:`B/f` of Hopkins Eq. (3.91)."""
     require_choice(band, "band", ("third", "octave"))
     return _BANDWIDTH_FACTOR[band]
 
@@ -271,9 +274,11 @@ def _band_factor(band: BandWidth) -> float:
 def hammer_impact_velocity(
     drop_height: float = TAPPING_DROP_HEIGHT, *, gravity: float = _GRAVITY
 ) -> float:
-    """Hammer velocity at impact ``vo = √(2 g h)`` (Hopkins Eq. 3.85).
+    r"""Hammer velocity at impact :math:`v_o = \sqrt{2 g h}` (Hopkins
+    Eq. 3.85).
 
-    The ISO tapping machine's nominal 40 mm drop gives ``vo = 0,886 m/s``.
+    The ISO tapping machine's nominal 40 mm drop gives
+    :math:`v_o = 0.886` m/s.
 
     :param drop_height: Drop height ``h``, in m (Default: 0,04).
     :param gravity: Acceleration of free fall ``g``, in m/s² (Default: 9,81).
@@ -291,7 +296,8 @@ def plate_contact_stiffness(
     poisson_ratio: float = 0.2,
     radius: float = TAPPING_HAMMER_RADIUS,
 ) -> float:
-    """Contact stiffness of a plate material ``K = 2 r E/(1 − ν²)`` (Eq. 3.97).
+    r"""Contact stiffness of a plate material
+    :math:`K = 2 r E/(1 - \nu^{2})` (Eq. 3.97).
 
     The stiffness the hammer deforms when it lands on the bare walking surface
     (Timoshenko and Goodier's Hertzian contact for a flat circular punch), as
@@ -304,7 +310,7 @@ def plate_contact_stiffness(
     :param radius: Contact radius ``r``, in m (Default: 0,015).
     :return: The contact stiffness ``K``, in N/m.
     :raises ValueError: If an input is not positive and finite, or
-        ``|ν| >= 1``.
+        :math:`\lvert \nu \rvert \ge 1`.
     """
     e = require_positive(youngs_modulus, "youngs_modulus")
     r = require_positive(radius, "radius")
@@ -319,12 +325,13 @@ def covering_contact_stiffness(
     *,
     radius: float = TAPPING_HAMMER_RADIUS,
 ) -> float:
-    """Contact stiffness of a soft floor covering ``K = E π r²/d`` (Eq. 3.98).
+    r"""Contact stiffness of a soft floor covering
+    :math:`K = E \pi r^{2}/d` (Eq. 3.98).
 
-    The covering is treated as a linear spring of area ``π r²`` under the
-    hammer, so only the ratio ``E/d`` matters. Vigran's Eq. (8.51) is the same
-    expression written with the hammer area ``Sh``, quoted there as 7 cm²
-    against the 7,07 cm² of a 15 mm radius.
+    The covering is treated as a linear spring of area :math:`\pi r^{2}`
+    under the hammer, so only the ratio :math:`E/d` matters. Vigran's
+    Eq. (8.51) is the same expression written with the hammer area ``Sh``,
+    quoted there as 7 cm² against the 7.07 cm² of a 15 mm radius.
 
     :param youngs_modulus: Young's modulus ``E`` of the covering, in Pa.
     :param thickness: Covering thickness ``d``, in m.
@@ -339,7 +346,8 @@ def covering_contact_stiffness(
 
 
 def _is_over_critical(stiffness: float, impedance: float, mass: float) -> bool:
-    """``True`` for an over-critical oscillation, ``K m ≥ 4 Zdp²`` (Eq. 3.95)."""
+    r"""``True`` for an over-critical oscillation,
+    :math:`K m \ge 4 Z_{dp}^{2}` (Eq. 3.95)."""
     return stiffness * mass >= 4.0 * impedance**2
 
 
@@ -349,14 +357,16 @@ def tapping_cut_off_frequency(
     *,
     mass: float = TAPPING_HAMMER_MASS,
 ) -> float:
-    """Cut-off frequency ``fco`` of the force spectrum (Eqs. 3.101/3.102).
+    r"""Cut-off frequency ``fco`` of the force spectrum (Eqs. 3.101/3.102).
 
     Above ``fco`` the tapping machine's force spectrum is no longer flat and
     the force falls away. For an under-critical oscillation
-    (``K m < 4 Zdp²``, the case of a concrete slab with or without a soft
-    covering) it is the undamped mass-spring value ``fco = √(K/m)/(2 π)``
-    (Eq. 3.102); for an over-critical one (a lightweight walking surface) it is
-    the lower root ``[K/(2 Zdp) − √((K/(2 Zdp))² − K/m)]/(2 π)`` (Eq. 3.101).
+    (:math:`K m < 4 Z_{dp}^{2}`, the case of a concrete slab with or without
+    a soft covering) it is the undamped mass-spring value
+    :math:`f_{co} = \sqrt{K/m}/(2 \pi)` (Eq. 3.102); for an over-critical one
+    (a lightweight walking surface) it is the lower root
+    :math:`[K/(2 Z_{dp}) - \sqrt{(K/(2 Z_{dp}))^{2} - K/m}]/(2 \pi)`
+    (Eq. 3.101).
 
     :param contact_stiffness: Contact stiffness ``K``, in N/m (see
         :func:`plate_contact_stiffness` / :func:`covering_contact_stiffness`).
@@ -379,13 +389,15 @@ def tapping_cut_off_frequency(
 def hammer_limiting_frequency(
     impedance: float, *, mass: float = TAPPING_HAMMER_MASS
 ) -> float:
-    """Limiting frequency ``flimit = Zdp/(2 π m)`` (Hopkins Eq. 3.106).
+    r"""Limiting frequency :math:`f_{limit} = Z_{dp}/(2 \pi m)` (Hopkins
+    Eq. 3.106).
 
     The frequency at which the floor's driving-point impedance equals the
-    magnitude of the hammer's own mass impedance ``|Zh| = ω m``; above it the
-    hammer mass, not the floor, limits the injected power, and the power input
-    stops rising at 3 dB per doubling of frequency. Vigran's Eq. (8.48) writes
-    the same frequency as ``fz = 4 √(m1 B1)/(π mh)``.
+    magnitude of the hammer's own mass impedance :math:`|Z_h| = \omega m`;
+    above it the hammer mass, not the floor, limits the injected power, and
+    the power input stops rising at 3 dB per doubling of frequency. Vigran's
+    Eq. (8.48) writes the same frequency as
+    :math:`f_z = 4 \sqrt{m_1 B_1}/(\pi m_h)`.
 
     :param impedance: Driving-point impedance ``Zdp``, in N.s/m.
     :param mass: Hammer mass ``m``, in kg (Default: 0,5).
@@ -405,13 +417,13 @@ def force_pulse(
     mass: float = TAPPING_HAMMER_MASS,
     impact_velocity: float | None = None,
 ) -> np.ndarray:
-    """Force pulse ``F1(t)`` of a single hammer impact (Eqs. 3.95/3.96).
+    r"""Force pulse ``F1(t)`` of a single hammer impact (Eqs. 3.95/3.96).
 
     Lindblad's solution of the mass-spring-dashpot of Hopkins Fig. 3.28, the
     hammer mass ``m`` on the contact stiffness ``K`` in series with the floor's
     driving-point impedance ``Zdp``. For an **over-critical** oscillation
-    (``K m ≥ 4 Zdp²``) the pulse decays to zero without changing sign
-    (Eq. 3.95); for an **under-critical** one it is a decaying sinusoid
+    (:math:`K m \ge 4 Z_{dp}^{2}`) the pulse decays to zero without changing
+    sign (Eq. 3.95); for an **under-critical** one it is a decaying sinusoid
     (Eq. 3.96) whose first positive lobe is the impact proper. Hopkins's rule
     is stated in terms of the sign of the force rather than of any mechanism:
     "only the initial force pulse that has zero or positive force values is
@@ -419,15 +431,16 @@ def force_pulse(
     due to the oscillations set to zero before taking the Fourier transform",
     the hammer having rebounded from the plate. That truncation is applied
     here, so the under-critical pulse is returned as zero beyond its
-    first zero crossing at ``t = π/β``; it is the same truncation
+    first zero crossing at :math:`t = \pi/\beta`; it is the same truncation
     :func:`tapping_force_spectrum` transforms, so integrating this pulse over
-    ``0 ≤ t ≤ π/β`` reproduces that spectrum.
+    :math:`0 \le t \le \pi/\beta` reproduces that spectrum.
 
     The over-critical pulse has no such cut and decays for all ``t``; it is
     evaluated in a form that stays finite over the whole 0,1 s between
     impacts rather than one that overflows partway through it.
 
-    :param time: Time ``t`` since the impact, in s (scalar or array, ``≥ 0``).
+    :param time: Time ``t`` since the impact, in s (scalar or array,
+        :math:`\ge 0`).
     :param contact_stiffness: Contact stiffness ``K``, in N/m.
     :param impedance: Driving-point impedance ``Zdp``, in N.s/m.
     :param mass: Hammer mass ``m``, in kg (Default: 0,5).
@@ -478,16 +491,18 @@ def force_pulse(
 def short_pulse_mean_square_force(
     frequencies: ArrayLike, *, band: BandWidth = "third"
 ) -> np.ndarray:
-    """Band mean-square force of a short impact ``F²rms = 3,9 B`` (Eq. 3.92).
+    r"""Band mean-square force of a short impact
+    :math:`F_{rms}^{2} = 3.9 B` (Eq. 3.92).
 
     The limiting case in which the impact is short enough that the hammer's
-    momentum alone sets the force: combining ``|Fn| = 2 m vo/Ti`` (Eq. 3.90)
-    with ``F²rms = |Fn|² B/(2 fi)`` (Eq. 3.91) gives 3,925 B, printed as 3,9 B.
-    Hopkins finds it adequate for bare concrete slabs of at least 100 mm.
+    momentum alone sets the force: combining :math:`|F_n| = 2 m v_o/T_i`
+    (Eq. 3.90) with :math:`F_{rms}^{2} = |F_n|^{2} B/(2 f_i)` (Eq. 3.91)
+    gives 3.925 B, printed as 3.9 B. Hopkins finds it adequate for bare
+    concrete slabs of at least 100 mm.
 
     :param frequencies: Band centre frequencies ``f``, in Hz.
-    :param band: ``"third"`` (``B = 0,23 f``) or ``"octave"``
-        (``B = 0,707 f``).
+    :param band: ``"third"`` (:math:`B = 0.23 f`) or ``"octave"``
+        (:math:`B = 0.707 f`).
     :return: The band mean-square force ``F²rms``, in N².
     :raises ValueError: If an input is not positive and finite, or ``band`` is
         unknown.
@@ -498,25 +513,26 @@ def short_pulse_mean_square_force(
 
 @dataclass(frozen=True)
 class TappingForceResult:
-    """Force spectrum of the ISO tapping machine on one walking surface.
+    r"""Force spectrum of the ISO tapping machine on one walking surface.
 
     :ivar frequencies: Band centre frequencies ``f``, in Hz.
     :ivar peak_force: Magnitude of the Fourier force component ``|Fn|``, in N
         (Hopkins Fig. 3.32).
     :ivar mean_square_force: Band mean-square force ``F²rms``, in N²
         (Eq. 3.91).
-    :ivar power_input: Power injected into the floor ``Win = F²rms/Zdp``, in W
-        (Eq. 3.103).
+    :ivar power_input: Power injected into the floor
+        :math:`W_{in} = F_{rms}^{2}/Z_{dp}`, in W (Eq. 3.103).
     :ivar cut_off_frequency: Cut-off frequency ``fco``, in Hz
         (Eqs. 3.101/3.102).
     :ivar limiting_frequency: Limiting frequency ``flimit``, in Hz (Eq. 3.106).
-    :ivar over_critical: ``True`` when ``K m ≥ 4 Zdp²``, i.e. the hammer does
-        not rebound.
+    :ivar over_critical: ``True`` when :math:`K m \ge 4 Z_{dp}^{2}`, i.e. the
+        hammer does not rebound.
     :ivar contact_stiffness: Contact stiffness ``K`` used, in N/m.
     :ivar impedance: Driving-point impedance ``Zdp`` used, in N.s/m.
-    :ivar lower_limit: Low-frequency asymptote ``|Fn|lower = m vo/Ti``, in N
-        (Eq. 3.99).
-    :ivar upper_limit: Low-frequency asymptote ``|Fn|upper = 2 m vo/Ti``, in N
+    :ivar lower_limit: Low-frequency asymptote
+        :math:`\lvert F_n \rvert_{\text{lower}} = m v_o/T_i`, in N (Eq. 3.99).
+    :ivar upper_limit: Low-frequency asymptote
+        :math:`\lvert F_n \rvert_{\text{upper}} = 2 m v_o/T_i`, in N
         (Eq. 3.100); 6 dB above ``lower_limit`` in mean square.
     :ivar band: Band width used for ``mean_square_force``.
     """
@@ -536,7 +552,8 @@ class TappingForceResult:
 
     @property
     def power_input_level(self) -> np.ndarray:
-        """Power input level ``10 lg(Win/1 pW)``, in dB (Hopkins Fig. 3.33)."""
+        r"""Power input level :math:`10 \lg(W_{in}/1~\text{pW})`, in dB
+        (Hopkins Fig. 3.33)."""
         return np.asarray(10.0 * np.log10(self.power_input / _POWER_REFERENCE))
 
     def plot(self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any) -> Axes:
@@ -562,23 +579,25 @@ def tapping_force_spectrum(
     impact_velocity: float | None = None,
     band: BandWidth = "third",
 ) -> TappingForceResult:
-    """Force spectrum of the ISO tapping machine on a floor (Hopkins 3.6.3.1).
+    r"""Force spectrum of the ISO tapping machine on a floor (Hopkins 3.6.3.1).
 
     The Fourier transform of the single-impact force pulse
     (:func:`force_pulse`), scaled by the impact repetition rate. Writing
-    ``a = K/(2 Zdp)`` and ``ωo² = K/m``, the transform of Eqs. (3.95)/(3.96) is
-    the same rational function in both critical cases,
-    ``F̂(ω) = vo K/(ωo² − ω² + 2 i a ω)``, multiplied for the under-critical
-    case by ``1 + e^(−a π/β) e^(−i ω π/β)`` because only the first positive
-    lobe (of duration ``π/β``) is transformed. That truncation is what produces
-    the deep troughs at ``n fco``, ``n = 3, 5, 7`` that Hopkins notes below
-    Fig. 4.64; they vanish once the covering's internal damping is included and
-    the spectrum is averaged into bands.
+    :math:`a = K/(2 Z_{dp})` and :math:`\omega_o^{2} = K/m`, the transform of
+    Eqs. (3.95)/(3.96) is the same rational function in both critical cases,
+    :math:`\hat{F}(\omega) = v_o K/(\omega_o^{2} - \omega^{2} + 2 i a \omega)`,
+    multiplied for the under-critical case by
+    :math:`1 + e^{-a \pi/\beta} e^{-i \omega \pi/\beta}` because only the
+    first positive lobe (of duration :math:`\pi/\beta`) is transformed. That
+    truncation is what produces the deep troughs at :math:`n f_{co}`,
+    :math:`n = 3, 5, 7` that Hopkins notes below Fig. 4.64; they vanish once
+    the covering's internal damping is included and the spectrum is averaged
+    into bands.
 
     The transform is normalised so that the low-frequency asymptote is
-    ``m vo/Ti`` for an over-critical impact (no rebound) and ``2 m vo/Ti`` for
-    a lightly damped under-critical one (full rebound), the two limits of
-    Eqs. (3.99)/(3.100).
+    :math:`m v_o/T_i` for an over-critical impact (no rebound) and
+    :math:`2 m v_o/T_i` for a lightly damped under-critical one (full
+    rebound), the two limits of Eqs. (3.99)/(3.100).
 
     :param frequencies: Band centre frequencies ``f``, in Hz.
     :param contact_stiffness: Contact stiffness ``K``, in N/m.
@@ -638,21 +657,25 @@ def tapping_force_spectrum(
 # --------------------------------------------------------------------------- #
 @dataclass(frozen=True)
 class CoveringImprovementResult:
-    """Predicted improvement ``ΔL`` of a soft floor covering (Hopkins 4.4.3.1).
+    r"""Predicted improvement ``ΔL`` of a soft floor covering
+    (Hopkins 4.4.3.1).
 
     :ivar frequencies: Band centre frequencies ``f``, in Hz.
     :ivar improvement: Band improvement ``ΔL``, in dB: Eq. (4.114) evaluated
         over the tapping machine's Fourier lines and summed in mean square
-        across each band, ``10 lg(Σ|Fn|²without/Σ|Fn|²with)``.
+        across each band, :math:`10 \lg(\sum \lvert F_n
+        \rvert^{2}_{\text{without}}/\sum \lvert F_n
+        \rvert^{2}_{\text{with}})`.
     :ivar two_line: The two-line estimate, in dB: 0 below ``fco`` and
         12 dB/octave (40 dB/decade) above it.
     :ivar cut_off_frequency: Cut-off frequency ``fco`` of the covered floor,
         in Hz.
     :ivar bare_cut_off_frequency: Cut-off frequency of the bare plate, in Hz.
-    :ivar lines: Fourier line frequencies ``n fi`` of the tapping machine, in
-        Hz, covering every band in ``frequencies``.
+    :ivar lines: Fourier line frequencies :math:`n f_i` of the tapping
+        machine, in Hz, covering every band in ``frequencies``.
     :ivar line_improvement: The per-line ratio
-        ``ΔL = 20 lg(|Fn|without/|Fn|with)`` of Eq. (4.114) at ``lines``, in
+        :math:`\Delta L = 20 \lg(\lvert F_n \rvert_{\text{without}}/\lvert
+        F_n \rvert_{\text{with}})` of Eq. (4.114) at ``lines``, in
         dB. It carries the deep troughs at odd multiples of ``fco`` that
         Hopkins notes below Fig. 4.64, which are an artefact of the undamped
         model and disappear from ``improvement``.
@@ -694,14 +717,15 @@ def covering_improvement(
     impact_rate: float = TAPPING_IMPACT_RATE,
     band: BandWidth = "third",
 ) -> CoveringImprovementResult:
-    """Improvement of impact sound insulation by a soft covering (Eq. 4.114).
+    r"""Improvement of impact sound insulation by a soft covering (Eq. 4.114).
 
     On a heavyweight base floor a soft covering has a negligible effect on the
     mass, bending stiffness and total loss factor of the slab, so it alters
-    only the force the hammer injects. The improvement is then the ratio of the
-    two force spectra, ``ΔL = 20 lg(|Fn|without/|Fn|with)``, computed here from
-    :func:`tapping_force_spectrum` with the covering's contact stiffness
-    (Eq. 3.98) and with the plate's (Eq. 3.97).
+    only the force the hammer injects. The improvement is then the ratio of
+    the two force spectra,
+    :math:`\Delta L = 20 \lg(|F_n|_{\text{without}}/|F_n|_{\text{with}})`,
+    computed here from :func:`tapping_force_spectrum` with the covering's
+    contact stiffness (Eq. 3.98) and with the plate's (Eq. 3.97).
 
     The tapping machine excites a **line** spectrum, at multiples of the 10 Hz
     impact rate, so Eq. (4.114) is a statement about one Fourier component and
@@ -711,13 +735,14 @@ def covering_improvement(
     distinction matters: the undamped model's transform has exact nulls at odd
     multiples of ``fco``, so a band centre that happens to land on one reads
     tens of dB high. With the 100 Hz cut-off of Hopkins's covering No. 2, the
-    line ratio at 500 Hz is 66,8 dB against a two-line estimate of 27,9 dB,
-    while the band value is 33,3 dB. Hopkins notes below Fig. 4.64 that the
+    line ratio at 500 Hz is 66.8 dB against a two-line estimate of 27.9 dB,
+    while the band value is 33.3 dB. Hopkins notes below Fig. 4.64 that the
     troughs vanish once the covering's internal damping is included and the
     spectrum is averaged into bands.
 
-    ``two_line`` is Hopkins's design estimate: ``ΔL ≈ 0`` below the covering's
-    cut-off and a straight 12 dB/octave above it, that is ``40 lg(f/fco)``.
+    ``two_line`` is Hopkins's design estimate: :math:`\Delta L \approx 0`
+    below the covering's cut-off and a straight 12 dB/octave above it, that
+    is :math:`40 \lg(f/f_{co})`.
     Real coverings behave as non-linear springs under the tapping machine's
     high force and show two or three slopes between 5 and 22 dB/octave, so the
     model identifies the general features rather than replacing a measurement.
@@ -791,15 +816,18 @@ def covering_improvement(
 def floating_floor_resonance_frequency(
     dynamic_stiffness: float, mass_per_area: float
 ) -> float:
-    """Resonance ``fo = 160 √(s'/m')`` of a floating floor (Formula C.2).
+    r"""Resonance :math:`f_o = 160 \sqrt{s'/m'}` of a floating floor
+    (Formula C.2).
 
     ISO 12354-2:2017 Formula (C.2), with ``s'`` the EN 29052-1 dynamic
     stiffness per unit area of the resilient layer measured without pre-load
     and ``m'`` the mass per unit area of the floating floor. The printed
-    constant 160 rounds the exact mass-spring value ``1000/(2 π) = 159,15``
-    that :func:`phonometry.materials.natural_frequency` applies, so the two
-    differ by 0,5 %; this function reproduces the standard, whose own Annex G
-    example prints ``fo = 52,8 Hz`` for ``s' = 8 MN/m³``, ``m' = 73,5 kg/m²``.
+    constant 160 rounds the exact mass-spring value
+    :math:`1000/(2 \pi) = 159.15` that
+    :func:`phonometry.materials.natural_frequency` applies, so the two differ
+    by 0.5 %; this function reproduces the standard, whose own Annex G
+    example prints :math:`f_o = 52.8` Hz for :math:`s' = 8` MN/m³,
+    :math:`m' = 73.5` kg/m².
 
     :param dynamic_stiffness: Dynamic stiffness per unit area ``s'``, in N/m³
         (i.e. 8e6 for the 8 MN/m³ of the standard's example).
@@ -814,11 +842,12 @@ def floating_floor_resonance_frequency(
 
 
 def combined_dynamic_stiffness(layers: ArrayLike) -> float:
-    """Total dynamic stiffness of stacked resilient layers (Formula C.6).
+    r"""Total dynamic stiffness of stacked resilient layers (Formula C.6).
 
-    ``s'tot = (Σ 1/s'i)^(−1)``, springs in series (Hopkins Eq. 4.121 states the
-    same rule). ISO 12354-2:2017 warns that it holds only if every layer covers
-    the whole floor without cuts for pipes or electrical devices.
+    :math:`s'_{tot} = (\sum 1/s'_i)^{-1}`, springs in series (Hopkins
+    Eq. 4.121 states the same rule). ISO 12354-2:2017 warns that it holds only
+    if every layer covers the whole floor without cuts for pipes or electrical
+    devices.
 
     :param layers: Dynamic stiffnesses per unit area ``s'i``, in N/m³
         (any 1-D array-like).
@@ -835,19 +864,25 @@ def double_floating_floor_resonances(
     upper_stiffness: float,
     upper_mass_per_area: float,
 ) -> tuple[float, float]:
-    """The two resonances of a double floating floor (Hopkins Eq. 4.125).
+    r"""The two resonances of a double floating floor (Hopkins Eq. 4.125).
 
     One floating floor on top of another over a heavyweight base is a
     mass-spring-mass-spring system with
 
-    ``fmsms = (1/(2^(3/2) π)) √(X ± √(X² − 4 s1 s2/(ρs1 ρs2)))``, where
-    ``X = s1/ρs1 + s2/ρs1 + s2/ρs2``,
+    .. math::
+
+       f_{msms} = \frac{1}{2^{3/2} \pi}
+       \sqrt{X \pm \sqrt{X^{2} - \frac{4 s_1 s_2}{\rho_{s1} \rho_{s2}}}},
+       \qquad
+       X = \frac{s_1}{\rho_{s1}} + \frac{s_2}{\rho_{s1}} +
+       \frac{s_2}{\rho_{s2}}
 
     subscript 1 being the lower floating floor (on the resilient layer that
     rests on the base) and 2 the upper one. The double floor avoids the single
     floor's dip at ``fms``, but the steep rise in ``ΔL`` only starts above the
     higher of the two resonances. For two identical floors the roots are
-    ``fms √((3 ± √5)/2)``, that is ``0,618 fms`` and ``1,618 fms``.
+    :math:`f_{ms} \sqrt{(3 \pm \sqrt{5})/2}`, that is :math:`0.618 f_{ms}`
+    and :math:`1.618 f_{ms}`.
 
     :param lower_stiffness: Dynamic stiffness per unit area ``s1`` of the lower
         resilient layer, in N/m³.
@@ -876,7 +911,7 @@ def weighted_floating_floor_improvement(
     *,
     floor: FloorType = "screed",
 ) -> float:
-    """Weighted improvement ``ΔLw`` of a floating floor (Formulae C.4/C.5).
+    r"""Weighted improvement ``ΔLw`` of a floating floor (Formulae C.4/C.5).
 
     The single number that feeds the simplified prediction
     (:func:`phonometry.predicted_impact_insulation`), read directly from the
@@ -885,9 +920,9 @@ def weighted_floating_floor_improvement(
     and C.2 and prints the fits:
 
     * ``floor="screed"`` (sand-cement or calcium-sulfate screeds, Formula C.4):
-      ``ΔLw = 13 lg(m') − 14,2 lg(s') + 20,8``;
+      :math:`\Delta L_w = 13 \lg(m') - 14.2 \lg(s') + 20.8`;
     * ``floor="asphalt"`` (asphalt or dry floating floors, Formula C.5):
-      ``ΔLw = (−0,21 m' − 5,45) lg(s') + 0,46 m' + 23,8``.
+      :math:`\Delta L_w = (-0.21 m' - 5.45) \lg(s') + 0.46 m' + 23.8`.
 
     :param mass_per_area: Mass per unit area ``m'`` of the floating floor, in
         kg/m².
@@ -954,32 +989,33 @@ def floating_floor_improvement_spectrum(
     mass_per_area: float | None = None,
     dynamic_stiffness: float | None = None,
 ) -> FloatingFloorImprovementResult:
-    """Improvement ``ΔL(f)`` of a floating floor on a heavyweight base floor.
+    r"""Improvement ``ΔL(f)`` of a floating floor on a heavyweight base floor.
 
     Three laws share the same anchor, the mass-spring resonance ``fo`` of the
     walking surface on the resilient layer (:func:`floating_floor_resonance_frequency`),
-    and all give ``ΔL = 0`` at and below it (in the band containing ``fo``,
-    ``ΔL`` is in practice between −5 dB and 0 dB):
+    and all give :math:`\Delta L = 0` at and below it (in the band containing
+    ``fo``, ``ΔL`` is in practice between −5 dB and 0 dB):
 
-    * ``"cremer"``: ``ΔL = 40 lg(f/fo)``, Cremer's 1952 result for two
-      infinite, locally reacting plates coupled by a spring layer (Hopkins
+    * ``"cremer"``: :math:`\Delta L = 40 \lg(f/f_o)`, Cremer's 1952 result for
+      two infinite, locally reacting plates coupled by a spring layer (Hopkins
       Eq. 4.119, Vigran Eq. 8.40), i.e. 12 dB per octave. It holds for
       constructions with high internal damping, such as asphalt screeds, and is
       the branch ISO 12354-2 Formula (C.3) prescribes for asphalt and dry
       floating floors.
-    * ``"en12354"`` (default): ``ΔL = 30 lg(f/fo)``, the empirical law of
-      ISO 12354-2 Formula (C.1) for sand-cement and calcium-sulfate screeds
-      (Hopkins Eq. 4.124). Sand-cement screeds have a low internal loss factor
-      and act as finite plates with a reverberant bending field, for which the
-      40 lg law overestimates ``ΔL``.
-    * ``"cremer_hammer"``: ``ΔL = 40 lg(f/fo) + 10 lg[1 + (f/flimit)²]``, the
+    * ``"en12354"`` (default): :math:`\Delta L = 30 \lg(f/f_o)`, the empirical
+      law of ISO 12354-2 Formula (C.1) for sand-cement and calcium-sulfate
+      screeds (Hopkins Eq. 4.124). Sand-cement screeds have a low internal
+      loss factor and act as finite plates with a reverberant bending field,
+      for which the 40 lg law overestimates ``ΔL``.
+    * ``"cremer_hammer"``:
+      :math:`\Delta L = 40 \lg(f/f_o) + 10 \lg[1 + (f/f_{limit})^{2}]`, the
       40 lg law with the reduction in power input above the limiting frequency
       of the hammer's own impedance (Hopkins Eq. 4.123, Vigran Eq. 8.48). A
       lightweight walking surface such as chipboard needs it, and tends to
       18 dB per octave well above ``flimit``.
 
     The laws are stated as valid above ``fo``, and Cremer's derivation is
-    reported to hold in ``fo < f < 4 fo``.
+    reported to hold in :math:`f_o < f < 4 f_o`.
 
     :param frequencies: Band centre frequencies ``f``, in Hz.
     :param resonance_frequency: Mass-spring resonance ``fo``, in Hz.
@@ -1044,24 +1080,31 @@ def resilient_mount_improvement(
     mount_stiffness: float,
     mount_density: float,
 ) -> np.ndarray:
-    """Improvement of a floating floor on discrete resilient mounts (Vér).
+    r"""Improvement of a floating floor on discrete resilient mounts (Vér).
 
     Vér's two-subsystem SEA model of a walking surface carrying a reverberant
     bending-wave field, connected to a heavyweight base floor by ``N`` mounts
     per unit area of stiffness ``k`` each, with all transmission through the
     mounts and none through the cavity. Hopkins Eq. (4.118) writes it as
 
-    ``ΔL ≈ 10 lg(2,3 ρs1² cL1 h1 η1 S1 ω³/(N k²))``
+    .. math::
+
+       \Delta L \approx 10 \lg\!\left(
+       \frac{2.3 \rho_{s1}^{2} c_{L1} h_1 \eta_1 S_1 \omega^{3}}{N k^{2}}
+       \right)
 
     where ``k`` is the dynamic stiffness of each mount, ``N`` the **number** of
     mounts and ``S1`` the area of the walking surface. Since
-    ``2,3 ρs1² cL1 h1 = Zdp1 ρs1`` for ``Zdp1 = 2,3 ρ cL h²`` (Eq. 2.190), the
-    same expression reads ``10 lg(Zdp1 ρs1 η1 ω³/(N/S1 · k²))``, which is the
-    form evaluated here: this function takes the mount **density** ``N/S1``,
-    not the count.
+    :math:`2.3 \rho_{s1}^{2} c_{L1} h_1 = Z_{dp1} \rho_{s1}` for
+    :math:`Z_{dp1} = 2.3 \rho c_L h^{2}` (Eq. 2.190), the same expression
+    reads :math:`10 \lg(Z_{dp1} \rho_{s1} \eta_1 \omega^{3}/(N/S_1 \cdot
+    k^{2}))`, which is the form evaluated here: this function takes the mount
+    **density** ``N/S1``, not the count.
 
-    Vigran's Eq. (8.45) is a sum of three terms, ``Z1/Z2``, ``m1 η1/(m2 η2)``
-    and ``Z1 η1 N f³/(2 π m1 fo⁴)`` with ``fo = √(N k/m1)/(2 π)``. Only the
+    Vigran's Eq. (8.45) is a sum of three terms, :math:`Z_1/Z_2`,
+    :math:`m_1 \eta_1/(m_2 \eta_2)` and
+    :math:`Z_1 \eta_1 N f^{3}/(2 \pi m_1 f_o^{4})` with
+    :math:`f_o = \sqrt{N k/m_1}/(2 \pi)`. Only the
     **third** of them is the model implemented here, and that term is
     algebraically identical to Hopkins Eq. (4.118); the first two are the
     low-frequency floor, negligible once the third dominates, which is the
@@ -1071,9 +1114,9 @@ def resilient_mount_improvement(
     a thicker walking surface or more internal damping all raise ``ΔL``.
 
     Vigran's simplified Eq. (8.46) inserts ``Z1`` into that third term and
-    prints the coefficient as ``2/(√3 π) = 0,3676``, which is the same number
-    as the ``2,3094/(2 π) = 0,3676`` the substitution gives; the two forms
-    agree.
+    prints the coefficient as :math:`2/(\sqrt{3} \pi) = 0.3676`, which is the
+    same number as the :math:`2.3094/(2 \pi) = 0.3676` the substitution
+    gives; the two forms agree.
 
     :param frequencies: Band centre frequencies ``f``, in Hz.
     :param impedance: Driving-point impedance ``Zdp1`` of the walking surface,
@@ -1118,18 +1161,18 @@ def lining_resonance_frequency(
     dynamic_stiffness: float | None = None,
     cavity_depth: float | None = None,
 ) -> float:
-    """Resonance ``fo`` of a lining on a basic element (Formulae D.1/D.2).
+    r"""Resonance ``fo`` of a lining on a basic element (Formulae D.1/D.2).
 
     Exactly one of the two branches applies:
 
     * ``dynamic_stiffness`` (Formula D.1), for an insulation layer fixed
       **directly** to the basic construction, without studs or battens:
-      ``fo = √(s' (1/m'1 + 1/m'2))/(2 π)``.
+      :math:`f_o = \sqrt{s' (1/m'_1 + 1/m'_2)}/(2 \pi)`.
     * ``cavity_depth`` (Formula D.2), for a layer built on metal or wooden
       studs **not** connected to the basic element, with the cavity filled by a
-      porous layer of airflow resistivity ``r ≥ 5 kPa·s/m²``:
-      ``fo = √((0,111/d)(1/m'1 + 1/m'2))/(2 π)``, i.e. the near-isothermal
-      stiffness of the filled cavity replaces ``s'``.
+      porous layer of airflow resistivity :math:`r \ge 5` kPa·s/m²:
+      :math:`f_o = \sqrt{(0.111/d)(1/m'_1 + 1/m'_2)}/(2 \pi)`, i.e. the
+      near-isothermal stiffness of the filled cavity replaces ``s'``.
 
     :param base_mass_per_area: Mass per unit area ``m'1`` of the basic
         structural element, in kg/m².
@@ -1159,20 +1202,20 @@ def lining_resonance_frequency(
 
 
 def _round_to_third_octave(frequency: float) -> float:
-    """Nominal centre of the one-third-octave band containing ``frequency``.
+    r"""Nominal centre of the one-third-octave band containing ``frequency``.
 
     Clause D.2.2 rounds ``fo`` to "the centre frequency of the one-third-octave
     band in which fo falls", which is band membership, not proximity to a
     nominal label. The band is therefore found from the exact midband
-    frequencies of the base-ten system, ``10^(n/10)``, whose edges are
-    ``10^((n ± 0,5)/10)``; the nominal label of that band is returned.
+    frequencies of the base-ten system, :math:`10^{n/10}`, whose edges are
+    :math:`10^{(n \pm 0.5)/10}`; the nominal label of that band is returned.
 
     The distinction is not cosmetic. Nominal labels are rounded, so the
     midpoint between two of them is not the band edge: the 63 Hz band ends at
-    ``10^1,85 = 70,79 Hz`` while the geometric mean of the labels 63 and 80 is
-    70,99 Hz, and any ``fo`` between the two would be read off the wrong row
-    of Table D.1, by 2,1 dB at that boundary and by 8,8 dB at the 160 Hz to
-    200 Hz one.
+    :math:`10^{1.85} = 70.79` Hz while the geometric mean of the labels 63
+    and 80 is 70.99 Hz, and any ``fo`` between the two would be read off the
+    wrong row of Table D.1, by 2.1 dB at that boundary and by 8.8 dB at the
+    160 Hz to 200 Hz one.
     """
     index = int(np.floor(10.0 * np.log10(frequency) + 0.5))
     band = index - _THIRD_OCTAVE_FIRST_INDEX
@@ -1186,17 +1229,17 @@ def _round_to_third_octave(frequency: float) -> float:
 def weighted_lining_improvement(
     resonance_frequency: float, base_rating: float
 ) -> float:
-    """Weighted improvement ``ΔRw`` of an interior lining (Table D.1).
+    r"""Weighted improvement ``ΔRw`` of an interior lining (Table D.1).
 
     ISO 12354-1:2017 Table D.1 reads ``ΔRw`` off the lining's resonance
     frequency, rounded to the centre of the one-third-octave band in which it
     falls. Below 200 Hz the improvement also depends on the bare element:
-    ``ΔRw = 74,4 − 20 lg(fo) − Rw/2``, never below 0 dB (NOTE 1). At and above
-    200 Hz the lining *degrades* the insulation, by 1 dB at 200 Hz down to
-    10 dB from 630 Hz to 1 600 Hz, recovering to 5 dB from 1 600 Hz to
-    5 000 Hz.
+    :math:`\Delta R_w = 74.4 - 20 \lg(f_o) - R_w/2`, never below 0 dB
+    (NOTE 1). At and above 200 Hz the lining *degrades* the insulation, by
+    1 dB at 200 Hz down to 10 dB from 630 Hz to 1 600 Hz, recovering to 5 dB
+    from 1 600 Hz to 5 000 Hz.
 
-    Table D.1 is stated for basic elements with ``20 dB ≤ Rw ≤ 60 dB``.
+    Table D.1 is stated for basic elements with :math:`20 \le R_w \le 60` dB.
     Its last two rows both cover 1 600 Hz with different values; this function
     takes the more conservative −10 dB there (see ``docs/ERRATA.md``).
 
@@ -1292,32 +1335,35 @@ def lining_improvement(
     anchors: bool = False,
     glued_area: float | None = None,
 ) -> LiningImprovementResult:
-    """Single-number ratings of an additional layer (Formulae D.3 to D.7).
+    r"""Single-number ratings of an additional layer (Formulae D.3 to D.7).
 
     For the reference situation of ISO 12354-1:2017 Annex D, a system applied
     to a heavy basic wall of about 350 kg/m²:
 
     * ``system="mineral_wool"`` (Formula D.3), an exterior thermal system on
       mineral wool with 40 % glued area and no anchors:
-      ``ΔRw = −36 lg(fo) + 82,5``, ``ΔRA = −42 lg(fo) + 92,0``,
-      ``ΔRA,tr = −39 lg(fo) + 87,7``, each floored at −4 dB.
+      :math:`\Delta R_w = -36 \lg(f_o) + 82.5`,
+      :math:`\Delta R_A = -42 \lg(f_o) + 92.0`,
+      :math:`\Delta R_{A,tr} = -39 \lg(f_o) + 87.7`, each floored at −4 dB.
     * ``system="foam"`` (Formula D.4), the same on PS, EPS or EEPS foams:
-      ``−33 lg(fo) + 76,0``, ``−33 lg(fo) + 74,0``, ``−36 lg(fo) + 77,0``,
-      floored at −3 dB.
+      :math:`-33 \lg(f_o) + 76.0`, :math:`-33 \lg(f_o) + 74.0`,
+      :math:`-36 \lg(f_o) + 77.0`, floored at −3 dB.
     * ``system="studs"`` (Formula D.7), a layer on studs not directly fixed to
-      the basic wall: ``−20 lg(fo) + 48``, ``−22 lg(fo) + 51``,
-      ``−24 lg(fo) + 54``, floored at −4 dB.
+      the basic wall: :math:`-20 \lg(f_o) + 48`, :math:`-22 \lg(f_o) + 51`,
+      :math:`-24 \lg(f_o) + 54`, floored at −4 dB.
 
     ``anchors=True`` applies Formula (D.5) for 4 to 10 anchors or battens per
-    m² (``0,66 ΔRw,ref − 1,2`` and its two companions), and ``glued_area``
-    applies Formula (D.6), ``ΔR − 0,05 %So + 2,0``, for a glued area other than
-    the 40 % reference. Both corrections are applied after the floor of the
+    m² (:math:`0.66 \Delta R_{w,ref} - 1.2` and its two companions), and
+    ``glued_area`` applies Formula (D.6),
+    :math:`\Delta R - 0.05\,\%S_o + 2.0`, for a glued area other than the
+    40 % reference. Both corrections are applied after the floor of the
     reference formula, in the order the annex states them.
 
-    The annex places the ``≥ −4 dB`` (or ``≥ −3 dB``) floor inside Formulae
-    (D.3) and (D.4) and says nothing about re-applying it after (D.5) and
-    (D.6), so this function does not: a fully glued system on anchors can
-    return about −6,8 dB, below the reference floor. That is the annex read
+    The annex places the :math:`\ge -4` dB (or :math:`\ge -3` dB) floor
+    inside Formulae (D.3) and (D.4) and says nothing about re-applying it
+    after (D.5) and (D.6), so this function does not: a fully glued system on
+    anchors can
+    return about −6.8 dB, below the reference floor. That is the annex read
     literally, and the reason the two corrections are exposed as flags rather
     than folded into the fit.
 
@@ -1384,14 +1430,14 @@ def lining_improvement_in_situ(
     resonance_frequency: float,
     base_rating_in_situ: float,
 ) -> float:
-    """Transfer a weighted lining improvement to the field (Formula D.8).
+    r"""Transfer a weighted lining improvement to the field (Formula D.8).
 
     Even when the per-band improvement is invariant, its single-number rating
     still depends on the basic element it sits on, so ISO 12354-1:2017
-    Formula (D.8) shifts the laboratory rating by ``a X`` with
+    Formula (D.8) shifts the laboratory rating by :math:`a X` with
 
-    ``a = 1,35 lg(fo) − 3,5``, capped at 0, and ``X = Rw,situ − 53``, clamped
-    to ``[−10, +7]``.
+    :math:`a = 1.35 \lg(f_o) - 3.5`, capped at 0, and
+    :math:`X = R_{w,situ} - 53`, clamped to ``[−10, +7]``.
 
     The same formula applies to ``ΔRw``, ``ΔRA`` and ``ΔRA,tr``.
 

@@ -10,17 +10,18 @@ Petersson 2005, Chapter 5, Table 5.1).
 
 The **point mobility** `Y` of a structure is the complex ratio of the
 velocity response at a driving point to the point force that produces it, and
-its reciprocal is the **point impedance** `Z = 1/Y` (the same
+its reciprocal is the **point impedance** $Z = 1/Y$ (the same
 motion-per-force / force-per-motion pair as ISO 7626-1 mechanical mobility, so
 these theoretical values slot straight into [`MobilityResult`](/phonometry/reference/api/vibration/mechanical-mobility/#mobilityresult)
 and [`convert_frf`](/phonometry/reference/api/vibration/mechanical-mobility/#convert_frf)). For an *infinite* structure the driving
 point never sees a reflected wave, so the mobility is the free-field value that
 sets the vibrational power a source injects (Cremer 5.5): with a point force of
-amplitude `F` the time-averaged injected power is (Cremer Eq. 5.23):
+amplitude `F` the time-averaged injected power, in watts, is
+(Cremer Eq. 5.23):
 
-```text
-W = 0.5 * |F|**2 * Re{Y}                                    [W]
-```
+$$
+W = 0.5\, |F|^2 \operatorname{Re}\{Y\}
+$$
 
 These are the theoretical companions of the *measured* driving-point mobilities
 of ISO 7626 and the isolator transfer stiffnesses of ISO 10846, and they supply
@@ -30,26 +31,37 @@ EN 12354-5 needs when no measurement is available.
 **Compilation (Cremer Table 5.1).** With `m'` the mass per unit length
 (kg/m), `m''` the mass per unit area (kg/m^2), `B` the bending stiffness of
 a beam (N.m^2) and `B'` the bending stiffness of a plate *per unit width*
-(N.m):
+(N.m), the impedance `Z` and mobility `Y` for a point force are:
 
-===============================  =========================  =============
-Structure (point force)          Impedance `Z`            Mobility `Y`
-===============================  =========================  =============
-Longitudinal rod                 `rho cL S`               `1/(rho cL S)`
-Slender beam, bending, centre    `2 m' cB (1 + j)`        `(1 - j)/(4 m' cB)`
-Slender beam, bending, end       `(m' cB / 2)(1 + j)`     `(1 - j)/(m' cB)`
-Thin plate, bending, centre      `8 sqrt(B' m'')`         `1/(8 sqrt(B' m''))`
-Thin plate, bending, edge        `3.5 sqrt(B' m'')`       `1/(3.5 sqrt(B' m''))`
-===============================  =========================  =============
+$$
+\text{Longitudinal rod:} \quad Z = \rho c_L S, \qquad Y = \frac{1}{\rho c_L S}
+$$
 
-The thin-plate driving-point impedance `Z = 8 sqrt(B' m'')` is real and
-frequency independent (the plate behaves as a pure resistance to a point
-force), so a plate absorbs power like a matched resistance. The beam impedance
-grows as `cB = (B omega**2 / m')**(1/4)` (the bending wave speed), so its
-mobility falls as `omega**(-1/2)`; the `(1 - j)` factor means half the
-input goes into a reactive near field. A moment excitation of the beam has the
-mobility (Cremer Eq. 5.75) `Y_M = omega (1 + j) / (4 B kB)` with
-`kB = omega / cB` the bending wavenumber.
+$$
+\text{Slender beam, bending, centre:} \quad Z = 2 m' c_B (1 + j), \qquad Y = \frac{1 - j}{4 m' c_B}
+$$
+
+$$
+\text{Slender beam, bending, end:} \quad Z = \frac{m' c_B}{2} (1 + j), \qquad Y = \frac{1 - j}{m' c_B}
+$$
+
+$$
+\text{Thin plate, bending, centre:} \quad Z = 8 \sqrt{B' m''}, \qquad Y = \frac{1}{8 \sqrt{B' m''}}
+$$
+
+$$
+\text{Thin plate, bending, edge:} \quad Z = 3.5 \sqrt{B' m''}, \qquad Y = \frac{1}{3.5 \sqrt{B' m''}}
+$$
+
+The thin-plate driving-point impedance $Z = 8 \sqrt{B' m''}$ is real
+and frequency independent (the plate behaves as a pure resistance to a point
+force), so a plate absorbs power like a matched resistance. The beam
+impedance grows as $c_B = (B \omega^2 / m')^{1/4}$ (the bending wave
+speed), so its mobility falls as $\omega^{-1/2}$; the
+$(1 - j)$ factor means half the input goes into a reactive near field.
+A moment excitation of the beam has the mobility (Cremer Eq. 5.75)
+$Y_M = \omega (1 + j) / (4 B k_B)$ with $k_B = \omega / c_B$ the
+bending wavenumber.
 
 > Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
 
@@ -67,16 +79,17 @@ infinite_beam_mobility(
 
 Point mobility of an infinite beam in bending (Cremer Table 5.1).
 
-`Y = (1 - j) / (4 m' cB)` for a force at the centre and
-`Y = (1 - j) / (m' cB)` for a force at a free end, the reciprocal of
-`infinite_beam_impedance`. The mobility falls as `omega**(-1/2)`.
+$Y = (1 - j) / (4 m' c_B)$ for a force at the centre and
+$Y = (1 - j) / (m' c_B)$ for a force at a free end, the reciprocal
+of `infinite_beam_impedance`. The mobility falls as
+$\omega^{-1/2}$.
 
 **Parameters**
 
 | Name | Description |
 | :--- | :--- |
 | `frequency` | Frequency `f`, in hertz (scalar or array, > 0). |
-| `bending_stiffness` | Beam bending stiffness `B = E I`, in N.m^2. |
+| `bending_stiffness` | Beam bending stiffness $B = E I$, in N.m^2. |
 | `mass_per_length` | Mass per unit length `m'`, in kg/m. |
 | `location` | `"centre"` or `"end"`. |
 
@@ -100,16 +113,16 @@ infinite_beam_moment_mobility(
 
 Moment (rotational) mobility of an infinite beam (Cremer Eq. 5.75).
 
-`Y_M = omega (1 + j) / (4 B kB)` with the bending wavenumber
-`kB = omega / cB`, the angular velocity per unit applied moment at the
-driving point.
+$Y_M = \omega (1 + j) / (4 B k_B)$ with the bending wavenumber
+$k_B = \omega / c_B$, the angular velocity per unit applied moment
+at the driving point.
 
 **Parameters**
 
 | Name | Description |
 | :--- | :--- |
 | `frequency` | Frequency `f`, in hertz (scalar or array, > 0). |
-| `bending_stiffness` | Beam bending stiffness `B = E I`, in N.m^2. |
+| `bending_stiffness` | Beam bending stiffness $B = E I$, in N.m^2. |
 | `mass_per_length` | Mass per unit length `m'`, in kg/m. |
 
 **Returns:** The complex moment mobility `Y_M`, in rad/(N.m.s).
@@ -139,7 +152,7 @@ Infinite-beam point mobility bundled as a [`MobilityResult`](/phonometry/referen
 | Name | Description |
 | :--- | :--- |
 | `frequency` | Frequencies `f`, in hertz (array, > 0). |
-| `bending_stiffness` | Beam bending stiffness `B = E I`, in N.m^2. |
+| `bending_stiffness` | Beam bending stiffness $B = E I$, in N.m^2. |
 | `mass_per_length` | Mass per unit length `m'`, in kg/m. |
 | `location` | `"centre"` or `"end"`. |
 
@@ -158,8 +171,9 @@ infinite_plate_impedance(
 
 Point impedance of an infinite thin plate (Cremer Table 5.1).
 
-`Z = C sqrt(B' m'')` with `C = 8` for a force at the plate centre and
-`C = 3.5` for a force at a free edge. The impedance is purely real and
+$Z = C \sqrt{B' m''}$ with $C = 8$ for a force at the plate
+centre and $C = 3.5$ for a force at a free edge. The impedance is
+purely real and
 frequency independent: an infinite plate presents a matched resistance to a
 point force.
 
@@ -169,7 +183,7 @@ point force.
 | :--- | :--- |
 | `bending_stiffness` | Plate bending stiffness per unit width `B'`, in N.m (see [`plate_bending_stiffness`](/phonometry/reference/api/vibration/point-mobility/#plate_bending_stiffness)). |
 | `mass_per_area` | Mass per unit area `m''`, in kg/m^2. |
-| `location` | `"centre"` (`C = 8`) or `"edge"` (`C = 3.5`). |
+| `location` | `"centre"` ($C = 8$) or `"edge"` ($C = 3.5$). |
 
 **Returns:** The point impedance `Z`, in N.s/m.
 
@@ -190,7 +204,8 @@ infinite_plate_mobility(
 ) -> float
 ```
 
-Point mobility of an infinite thin plate `Y = 1 / (C sqrt(B' m''))`.
+Point mobility of an infinite thin plate
+$Y = 1 / (C \sqrt{B' m''})$.
 
 The reciprocal of [`infinite_plate_impedance`](/phonometry/reference/api/vibration/point-mobility/#infinite_plate_impedance) (real, frequency
 independent).
@@ -201,7 +216,7 @@ independent).
 | :--- | :--- |
 | `bending_stiffness` | Plate bending stiffness per unit width `B'`, in N.m. |
 | `mass_per_area` | Mass per unit area `m''`, in kg/m^2. |
-| `location` | `"centre"` (`C = 8`) or `"edge"` (`C = 3.5`). |
+| `location` | `"centre"` ($C = 8$) or `"edge"` ($C = 3.5$). |
 
 **Returns:** The point mobility `Y`, in m/(N.s).
 
@@ -248,8 +263,9 @@ injected_power(force: ArrayLike, mobility: ArrayLike) -> NDArray[np.float64]
 
 Time-averaged vibrational power injected by a point force (Cremer 5.23).
 
-`W = 0.5 |F|**2 Re{Y}`: only the real part (conductance) of the mobility
-carries power; the reactive part stores near-field energy.
+$W = 0.5\, |F|^2 \operatorname{Re}\{Y\}$: only the real part
+(conductance) of the mobility carries power; the reactive part stores
+near-field energy.
 
 **Parameters**
 
@@ -272,7 +288,7 @@ longitudinal_rod_impedance(
 
 Point impedance of an infinite rod in longitudinal motion (Table 5.1).
 
-`Z = rho cL S`, real and frequency independent.
+$Z = \rho c_L S$, real and frequency independent.
 
 **Parameters**
 
@@ -302,8 +318,8 @@ plate_bending_stiffness(
 
 Bending stiffness of a thin plate per unit width (Cremer Eq. 4.22).
 
-`B' = E h**3 / (12 (1 - nu**2))`, the plate bending stiffness `B'` in
-N.m used throughout this module and by the coincidence frequency of
+$B' = E h^3 / (12 (1 - \nu^2))$, the plate bending stiffness `B'`
+in N.m used throughout this module and by the coincidence frequency of
 [`phonometry.vibration.radiation_efficiency.coincidence_frequency`](/phonometry/reference/api/vibration/radiation-efficiency/#coincidence_frequency).
 
 **Parameters**
@@ -320,4 +336,4 @@ N.m used throughout this module and by the coincidence frequency of
 
 | Exception | When |
 | :--- | :--- |
-| ValueError | for a non-positive modulus/thickness or `\|nu\| >= 1`. |
+| ValueError | for a non-positive modulus/thickness or $\lvert\nu\rvert \ge 1$. |

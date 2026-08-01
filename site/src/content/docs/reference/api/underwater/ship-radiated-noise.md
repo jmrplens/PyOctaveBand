@@ -11,12 +11,14 @@ A surface ship measured in deep water is characterised by its **radiated noise
 level** and then by an **equivalent monopole source level** referred to a point
 source below the sea surface:
 
-* [`radiated_noise_level`](/phonometry/reference/api/underwater/ship-radiated-noise/#radiated_noise_level) -- `LRN = 20·lg(p_rms/p₀) + 20·lg(r/r₀)`
+* [`radiated_noise_level`](/phonometry/reference/api/underwater/ship-radiated-noise/#radiated_noise_level) --
+  $L_{\mathrm{RN}} = 20 \lg(p_{\mathrm{rms}}/p_0) + 20 \lg(r/r_0)$
   dB re 1 µPa·m (ISO 17208-1), the level of the product of the far-field RMS
   pressure and the source distance.
 * [`monopole_source_level`](/phonometry/reference/api/underwater/ship-radiated-noise/#monopole_source_level) -- converts `LRN` to the source level
-  `Ls = LRN + ΔL` with the Lloyd's-mirror surface correction `ΔL` of
-  ISO 17208-2 Formula 3, for a nominal source depth `d_s = 0.7·D` (Formula 1).
+  $L_s = L_{\mathrm{RN}} + \Delta L$ with the Lloyd's-mirror surface
+  correction $\Delta L$ of ISO 17208-2 Formula 3, for a nominal source
+  depth $d_s = 0.7 D$ (Formula 1).
 
 Supporting helpers give the ISO 17208-1 three-hydrophone measurement depths
 ([`hydrophone_depths`](/phonometry/reference/api/underwater/ship-radiated-noise/#hydrophone_depths)) and the ISO 17208-2 tabulated source-level
@@ -40,13 +42,13 @@ Hydrophone depths for the ISO 17208-1 deep-water geometry.
 At the closest point of approach the three hydrophones sit at depression
 angles from the sea surface seen from the ship reference point; at a
 horizontal range equal to `cpa_distance` the depth of each is
-`d = cpa·tan(angle)`.
+$d = d_{\mathrm{CPA}} \tan(\mathrm{angle})$.
 
 **Parameters**
 
 | Name | Description |
 | :--- | :--- |
-| `cpa_distance` | Horizontal distance at the closest point of approach, in m (`dCPA = max(100 m, ship length)`). |
+| `cpa_distance` | Horizontal distance at the closest point of approach, in m ($d_{\mathrm{CPA}} = \max(100~\text{m}, \text{ship length})$). |
 | `angles` | Depression angles, in degrees (default 15°, 30°, 45°). |
 
 **Returns:** The hydrophone depths, in m.
@@ -69,11 +71,17 @@ monopole_source_level(
 ) -> ShipSourceLevelResult
 ```
 
-Equivalent monopole source level from radiated noise level (ISO 17208-2).
+Equivalent monopole source level from radiated noise level
+(ISO 17208-2).
 
-`Ls = LRN + ΔL` with the surface correction (Formula 3)
-`ΔL = −10·lg[(2u⁴ + 14u²) / (14 + 2u² + u⁴)]`, `u = k·d_s`,
-`k = 2πf/c` and the nominal source depth `d_s = 0.7·D` (Formula 1).
+$L_s = L_{\mathrm{RN}} + \Delta L$ with the surface correction
+
+$$
+\Delta L = -10 \lg \frac{2 u^4 + 14 u^2}{14 + 2 u^2 + u^4} \tag{Formula 3}
+$$
+
+where $u = k d_s$, $k = 2 \pi f/c$ and the nominal source
+depth is $d_s = 0.7 D$ (Formula 1).
 
 **Parameters**
 
@@ -100,9 +108,9 @@ radiated_noise_level(rms_pressure: float, distance: float) -> float
 
 Radiated noise level `LRN` (ISO 17208-1), dB re 1 µPa·m.
 
-`LRN = 20·lg(p_rms/p₀) + 20·lg(r/r₀)` -- the level of the product of the
-far-field RMS sound pressure and the source distance, referred to
-1 µPa·m.
+$L_{\mathrm{RN}} = 20 \lg(p_{\mathrm{rms}}/p_0) + 20 \lg(r/r_0)$ --
+the level of the product of the far-field RMS sound pressure and the
+source distance, referred to 1 µPa·m.
 
 **Parameters**
 
@@ -140,9 +148,9 @@ Equivalent monopole source level of a ship (ISO 17208-2).
 | :--- | :--- |
 | `frequencies` | Frequencies, in Hz. |
 | `radiated_noise_level` | Input RNL per frequency, in dB re 1 µPa·m. |
-| `surface_correction` | Lloyd's-mirror correction `ΔL` per frequency, dB. |
-| `source_level` | Equivalent monopole source level `Ls = LRN + ΔL`, in dB re 1 µPa·m. |
-| `source_depth` | Nominal source depth `d_s = 0.7·D`, in m. |
+| `surface_correction` | Lloyd's-mirror correction $\Delta L$ per frequency, dB. |
+| `source_level` | Equivalent monopole source level $L_s = L_{\mathrm{RN}} + \Delta L$, in dB re 1 µPa·m. |
+| `source_depth` | Nominal source depth $d_s = 0.7 D$, in m. |
 | `sound_speed` | Speed of sound used, in m/s. |
 
 ### ShipSourceLevelResult.plot()

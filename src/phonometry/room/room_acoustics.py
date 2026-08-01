@@ -333,9 +333,9 @@ def _fit_decay_time(
 ) -> float:
     """Least-squares decay time over an evaluation range (Annex C).
 
-    Fits ``L = a + b*t`` to the decay-curve samples between
+    Fits :math:`L = a + b t` to the decay-curve samples between
     ``-decay_range[0]`` and ``-decay_range[1]`` dB and returns
-    ``T = -60/b`` (ISO 3382-2:2008, Equations (C.1)-(C.6)). NaN when the
+    :math:`T = -60/b` (ISO 3382-2:2008, Equations (C.1)-(C.6)). NaN when the
     range is unreachable or extends below the trusted part of the curve
     (noise floor + 10 dB).
     """

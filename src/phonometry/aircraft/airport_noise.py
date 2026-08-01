@@ -99,7 +99,9 @@ def engine_installation_correction(depression_deg: float, mounting: str = "wing"
 
 
 def duration_correction(reference_speed: float, segment_speed: float) -> float:
-    """Duration correction ``ΔV = 10·log10(Vref/Vseg)`` (Eq. 4-14, exposure only).
+    r"""Duration correction (Eq. 4-14, exposure only).
+
+    :math:`\Delta V = 10 \cdot \log_{10}(V_{\mathrm{ref}}/V_{\mathrm{seg}})`.
 
     :param reference_speed: NPD reference speed ``Vref`` (any consistent unit).
     :param segment_speed: Segment speed ``Vseg`` (same unit).
@@ -151,12 +153,14 @@ _T0_C = 15.0
 
 
 def impedance_adjustment(temperature: float = _T0_C, pressure: float = _P0_KPA) -> float:
-    """Acoustic-impedance adjustment of the standard NPD data (Eq. 4-6/4-7).
+    r"""Acoustic-impedance adjustment of the standard NPD data (Eq. 4-6/4-7).
 
     The ANP NPD levels are normalised to a reference specific acoustic impedance
     of 409.81 N·s/m³. At the aerodrome's temperature and pressure the air
-    impedance is ``ρc = 416.86·(δ/√θ)`` with ``δ = p/p0`` and
-    ``θ = (T+273.15)/(T0+273.15)``, and the adjustment ``10·log10(ρc/409.81)`` is
+    impedance is :math:`\rho c = 416.86 \cdot (\delta/\sqrt{\theta})` with
+    :math:`\delta = p/p_0` and
+    :math:`\theta = (T+273.15)/(T_0+273.15)`, and the adjustment
+    :math:`10 \cdot \log_{10}(\rho c/409.81)` is
     added to the NPD levels. Under the standard atmosphere it is +0.074 dB.
 
     :param temperature: Aerodrome air temperature ``T``, in °C (default 15 °C).
@@ -182,18 +186,21 @@ _DSOR0_M = 762.0
 
 def start_of_roll_directivity(
     azimuth_deg: float, distance_m: float, engine: str = "jet") -> float:
-    """Start-of-roll (ground-roll) directivity correction ``ΔSOR`` (Eq. 4-22/4-25).
+    r"""Start-of-roll (ground-roll) directivity correction ``ΔSOR`` (Eq. 4-22/4-25).
 
     Behind a takeoff ground-roll segment, jet-exhaust noise radiates a lobed
     rearward pattern. ``ΔSOR`` adjusts the segment level relative to the level to
     the side of the start of roll, as a function of the azimuth ``ψ`` between the
     aircraft forward axis and the observer (Eq. 4-24a for turbofan jets, 4-24b for
-    turboprops), scaled beyond 762 m by ``dSOR,0/dSOR`` (Eq. 4-25). It is only
-    applied behind takeoff ground-roll segments (``90° ≤ ψ ≤ 180°``); ahead of the
-    aircraft (``ψ < 90°``) it is zero.
+    turboprops), scaled beyond 762 m by :math:`d_{SOR,0}/d_{SOR}` (Eq. 4-25).
+    It is only
+    applied behind takeoff ground-roll segments
+    (:math:`90^\circ \le \psi \le 180^\circ`); ahead of the
+    aircraft (:math:`\psi < 90^\circ`) it is zero.
 
     :param azimuth_deg: Azimuth ``ψ`` from the forward axis to the observer, in
-        degrees (``ψ = arccos(q/dSOR)``, in ``[90, 180]`` behind the aircraft).
+        degrees (:math:`\psi = \arccos(q/d_{SOR})`, in ``[90, 180]`` behind
+        the aircraft).
         Values below 90° return 0; values above 180° are clamped to 180°.
     :param distance_m: Distance ``dSOR`` from the observer to the segment start,
         in metres.
@@ -390,14 +397,16 @@ def _segment_angles(
     q: float, length: float, dp: float, lateral: float,
     z_foot: float, z_near: float, bank_deg: float,
 ) -> tuple[float, float]:
-    """Elevation ``beta`` and depression ``phi`` for one segment, in degrees.
+    r"""Elevation ``beta`` and depression ``phi`` for one segment, in degrees.
 
     §4.5.5 equivalent level path (Fig. 4-6): rotating the observer-segment
     triangle about the ground track makes the elevation of the perpendicular
-    point ``β = arccos(ℓ/dp)``, which differs from ``atan2(z, ℓ)`` on inclined
+    point :math:`\beta = \arccos(\ell/d_p)`, which differs from
+    :math:`\operatorname{atan2}(z, \ell)` on inclined
     segments. Alongside the segment ``β`` uses that equivalent angle; behind or
     ahead it uses the nearest segment end over the same horizontal offset.
-    The engine-installation depression angle ``φ = β ± ε`` uses the equivalent
+    The engine-installation depression angle
+    :math:`\phi = \beta \pm \varepsilon` uses the equivalent
     angle of the perpendicular point on the EXTENDED line (Eq. 4-17): the sign
     is positive for observers to starboard (right of the flight direction) and
     negative for observers to port (§4.5.2), with the bank angle ``ε`` measured
@@ -520,11 +529,12 @@ def _attenuation_geometry(
     q: float, length: float, beta: float, phi: float, lateral: float,
     key: str, roll_behind: bool, roll_ahead: bool,
 ) -> tuple[float, float, float]:
-    """Lateral-attenuation and installation angles for one segment (§4.5.5).
+    r"""Lateral-attenuation and installation angles for one segment (§4.5.5).
 
     Returns ``(beta_att, ell_att, phi_att)``: the general equivalent-path
-    values, or the nearest-end geometry (``beta1 = asin(z1/d1)``,
-    ``l = OC1 = sqrt(d1^2 - z1^2)`` and the d2/z2 analogues) for maximum-level
+    values, or the nearest-end geometry (:math:`\beta_1 = \arcsin(z_1/d_1)`,
+    :math:`l = OC_1 = \sqrt{d_1^2 - z_1^2}` and the d2/z2 analogues) for
+    maximum-level
     metrics behind/ahead of the segment and for exposure metrics behind
     takeoff / ahead of landing ground roll.
     """
@@ -930,7 +940,7 @@ def event_level(
     landing_roll: NDArray[np.bool_] | list[bool] | None = None,
     bank: NDArray[np.float64] | list[float] | None = None,
 ) -> FlyoverResult:
-    """Single-event noise level of a flight path at a receiver (ECAC Doc 29).
+    r"""Single-event noise level of a flight path at a receiver (ECAC Doc 29).
 
     Assembles the segment event levels (Eq. 4-8/4-9), the NPD baseline plus the
     duration, engine-installation, lateral-attenuation and finite-segment
@@ -959,8 +969,9 @@ def event_level(
     :param bank: Optional per-segment bank angle ``ε`` in degrees (length
         ``N-1``), measured counter-clockwise about the roll axis (positive in
         a left turn, starboard wing up); the depression angle becomes
-        ``φ = β + ε`` for observers to starboard (right) of the track and
-        ``φ = β − ε`` for observers to port (§4.5.2).
+        :math:`\phi = \beta + \varepsilon` for observers to starboard (right)
+        of the track and
+        :math:`\phi = \beta - \varepsilon` for observers to port (§4.5.2).
     :return: A :class:`FlyoverResult`. If every segment is degenerate
         (zero length) the level is ``-inf``.
     :raises ValueError: If the inputs are invalid.

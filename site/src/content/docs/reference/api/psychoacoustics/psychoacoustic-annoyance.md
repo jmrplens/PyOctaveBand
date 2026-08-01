@@ -13,17 +13,20 @@ tracks annoyance ratings from listening experiments. The model is due to
 Widmann (1992) and is given in Fastl & Zwicker, *Psychoacoustics: Facts and
 Models* (Equations 16.2-16.4):
 
-```text
-PA = N5 * (1 + sqrt(wS**2 + wFR**2))
-```
+$$
+PA = N_5 \left( 1 + \sqrt{w_S^2 + w_{FR}^2} \right) \tag{Eq. 16.2}
+$$
 
 with the percentile loudness `N5` in sone and the two loudness-weighted
-terms:
+terms
 
-```text
-wS  = (S - 1.75) * 0.25 * lg(N5 + 10)          for S > 1.75 acum, else 0
-wFR = (2.18 / N5**0.4) * (0.4 * F + 0.6 * R)
-```
+$$
+w_S = (S - 1.75) \cdot 0.25 \cdot \lg(N_5 + 10) \quad \text{for } S > 1.75~\text{acum, else } 0 \tag{Eq. 16.3}
+$$
+
+$$
+w_{FR} = \frac{2.18}{N_5^{0.4}} \left( 0.4 F + 0.6 R \right) \tag{Eq. 16.4}
+$$
 
 describing sharpness `S` (acum) and the joint influence of fluctuation
 strength `F` (vacil) and roughness `R` (asper). Note the "1 +" sits
@@ -56,9 +59,10 @@ psychoacoustic_annoyance(
 
 Psychoacoustic annoyance from the four hearing sensations (16.2-16.4).
 
-`PA = N5 * (1 + sqrt(wS**2 + wFR**2))` with the loudness-weighted sharpness
-term `wS` (Equation 16.3) and the fluctuation/roughness term `wFR`
-(Equation 16.4). The sharpness term is zero for `S <= 1.75 acum`.
+$PA = N_5 (1 + \sqrt{w_S^2 + w_{FR}^2})$ with the loudness-weighted
+sharpness term `wS` (Equation 16.3) and the fluctuation/roughness term
+`wFR` (Equation 16.4). The sharpness term is zero for
+$S \le 1.75$ acum.
 
 **Parameters**
 

@@ -11,19 +11,21 @@ Noise-exposure assessments weight a spectrum by a hearing-group filter before
 comparing it with a threshold. The filter is the same band-pass form in all
 current guidance (NMFS 2018 Equation 1, Southall et al. 2019 Equation 2):
 
-.. math::
-    W(f) = C + 10\,\lg\frac{(f/f_1)^{2a}}
-                              {[1+(f/f_1)^2]^{a}\,[1+(f/f_2)^2]^{b}}
+$$
+W(f) = C + 10\,\lg\frac{(f/f_1)^{2a}} {[1+(f/f_1)^2]^{a}\,[1+(f/f_2)^2]^{b}}
+$$
 
 with `f` in kilohertz. `C` is fixed by putting the peak of `W` at 0 dB,
-so the companion **exposure function** `E(f) = K − 10·lg(…) = K + C − W(f)`
-has its minimum at the weighted threshold `Tw = K + C`. Only the parameter
-table changes between guidance versions, so the version is explicit in the API
-and is carried on every result object:
+so the companion **exposure function**
+$E(f) = K - 10 \lg(\dots) = K + C - W(f)$
+has its minimum at the weighted threshold $T_w = K + C$. Only the
+parameter table changes between guidance versions, so the version is explicit
+in the API and is carried on every result object:
 
 * `"nmfs-2024"` -- NOAA Fisheries, *Updated Technical Guidance*, version 3.0
   (October 2024), Table 5 and Table ES3. **The default**: it supersedes the
-  2018 revision, uses `b = 5` for every group, renames the groups to the
+  2018 revision, uses $b = 5$ for every group, renames the groups to
+  the
   Southall scheme (LF/HF/VHF cetaceans, PW/OW in water, PA/OA in air) and
   replaces "PTS onset" with "auditory injury (AUD INJ) onset".
 * `"nmfs-2018"` -- the 2018 revision, version 2.0, Table 3 and Table ES3.
@@ -44,14 +46,16 @@ published thresholds ([`exposure_criteria`](/phonometry/reference/api/underwater
 a number of events and reports the exceedance of each applicable criterion.
 
 Implemented clean-room from the three documents; validated against the worked
-example of NMFS (2018) Appendix D (`W(1 kHz)` for the five groups), against
-`C` recomputed as the peak of `W` for all three parameter sets, and against
-the published `Tw = K + C` and injury = TTS + 20 dB identities.
+example of NMFS (2018) Appendix D ($W(1~\text{kHz})$ for the five
+groups), against `C` recomputed as the peak of `W` for all three
+parameter sets, and against the published $T_w = K + C$ and
+injury = TTS + 20 dB identities.
 
 :::note
-NMFS (2024) Table 5 prints `C = 1.37` dB for otariid pinnipeds in water,
-and its own footnote states the value should be 1.36 dB (NMFS kept 1.37 for
-consistency with the U.S. Navy). Recomputing `C` from the peak of `W`
+NMFS (2024) Table 5 prints $C = 1.37$ dB for otariid pinnipeds in
+water, and its own footnote states the value should be 1.36 dB (NMFS kept
+1.37 for consistency with the U.S. Navy). Recomputing `C` from the peak
+of `W`
 with that row's parameters gives 1.3643 dB, confirming 1.36. This module
 implements **1.36**; the printed 1.37 remains available as
 `WeightingParameters.c_db_as_printed`. See `docs/ERRATA.md`.
@@ -109,12 +113,12 @@ Auditory weighting and exposure functions of one hearing group.
 | Name | Description |
 | :--- | :--- |
 | `frequencies` | Frequencies, in Hz. |
-| `weighting` | Weighting-function amplitude `W(f)`, in dB (`≤ 0`). |
-| `exposure_function` | Exposure function `E(f) = K + C − W(f)`, in dB (the frequency-dependent TTS-onset level). |
+| `weighting` | Weighting-function amplitude `W(f)`, in dB ($\le 0$). |
+| `exposure_function` | Exposure function $E(f) = K + C - W(f)$, in dB (the frequency-dependent TTS-onset level). |
 | `parameters` | The [`WeightingParameters`](/phonometry/reference/api/underwater/marine-mammal-weighting/#weightingparameters) used. |
 | `guidance` | The guidance version. |
 | `group` | Hearing-group code. |
-| `weighted_tts_onset` | `Tw = K + C`, the minimum of the exposure function, in dB. |
+| `weighted_tts_onset` | $T_w = K + C$, the minimum of the exposure function, in dB. |
 
 ### AuditoryWeightingResult.plot()
 
@@ -235,11 +239,12 @@ weighted_exposure(
 ) -> WeightedExposureResult
 ```
 
-Weight a band spectrum, accumulate it and compare it with the criteria.
+Weight a band spectrum, accumulate it and compare it with the
+criteria.
 
 The per-band single-event sound exposure levels are weighted with
 [`auditory_weighting`](/phonometry/reference/api/underwater/marine-mammal-weighting/#auditory_weighting), summed on an energy basis and accumulated over
-`n_events` identical events (`+10·lg N`, the ISO 18406 Formula 9
+`n_events` identical events ($+10 \lg N$, the ISO 18406 Formula 9
 identity used by [`cumulative_sel_identical`](/phonometry/reference/api/underwater/pile-driving-noise/#cumulative_sel_identical)).
 The result is compared with the group's TTS and injury onset criteria; the
 peak sound pressure level, if supplied, is compared **unweighted**, as the
@@ -254,7 +259,7 @@ dual-metric rule requires.
 | `group` | Hearing-group code as used by `guidance`. |
 | `guidance` | `"nmfs-2024"` (default), `"nmfs-2018"` or `"southall-2019"`. |
 | `impulsive` | Compare against the impulsive criteria (the default, the case for pile driving and air guns). |
-| `n_events` | Number of identical accumulated events, `≥ 1`. |
+| `n_events` | Number of identical accumulated events, $\ge 1$. |
 | `peak_spl` | Unweighted zero-to-peak sound pressure level of the loudest single event, in dB; enables the peak-SPL half of the dual metric. |
 
 **Returns:** A [`WeightedExposureResult`](/phonometry/reference/api/underwater/marine-mammal-weighting/#weightedexposureresult).
@@ -302,14 +307,14 @@ Weighted exposure of a spectrum against a hearing group's criteria.
 | `weighted_band_sel` | `band_sel + W(f)` per band, in dB. |
 | `unweighted_sel` | Energy sum of `band_sel`, in dB. |
 | `weighted_sel` | Energy sum of `weighted_band_sel`, in dB. |
-| `cumulative_sel` | `weighted_sel + 10·lg(n_events)`, in dB. |
+| `cumulative_sel` | `weighted_sel` plus $10 \lg(N)$ for the `n_events` accumulated events, in dB. |
 | `peak_spl` | The unweighted peak sound pressure level supplied, in dB (`None` when not given). |
 | `n_events` | Number of accumulated events (e.g. hammer strikes). |
 | `criteria` | The [`ExposureCriteria`](/phonometry/reference/api/underwater/marine-mammal-weighting/#exposurecriteria) compared against. |
-| `sel_margin` | `cumulative_sel − injury_sel`, in dB (`None` when the criterion is not published); positive means the criterion is exceeded. |
-| `tts_margin` | `cumulative_sel − tts_sel`, in dB (or `None`). |
-| `peak_margin` | `peak_spl − injury_peak_spl`, in dB (or `None`). |
-| `tts_peak_margin` | `peak_spl − tts_peak_spl`, in dB (or `None`) -- the peak-SPL half of the dual metric on the TTS side, which can trip `exceeds_tts` on its own. |
+| `sel_margin` | `cumulative_sel - injury_sel`, in dB (`None` when the criterion is not published); positive means the criterion is exceeded. |
+| `tts_margin` | `cumulative_sel - tts_sel`, in dB (or `None`). |
+| `peak_margin` | `peak_spl - injury_peak_spl`, in dB (or `None`). |
+| `tts_peak_margin` | `peak_spl - tts_peak_spl`, in dB (or `None`) -- the peak-SPL half of the dual metric on the TTS side, which can trip `exceeds_tts` on its own. |
 | `exceeds_injury` | Whether any injury-onset criterion is reached. The test is `margin >= 0`, so an exposure landing exactly **on** the criterion counts as exceeding it; the criteria are onset thresholds and the precautionary reading is the one an assessment wants. |
 | `exceeds_tts` | Whether any TTS-onset criterion is reached, on the same `margin >= 0` convention as `exceeds_injury`. |
 | `guidance` | The guidance version. |

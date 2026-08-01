@@ -9,33 +9,41 @@ Two-microphone (p-p) sound intensity per IEC 61043:1993 and the
 ISO 9614-1:1993 field indicators.
 
 A p-p probe holds two pressure microphones a fixed distance `spacing`
-(dr) apart. The mean of the two pressures is taken as the sound pressure
-at the probe reference point, while the pressure differential is used to
-derive the particle velocity component along the probe axis
-(IEC 61043:1993, definition 3.2):
+($\Delta r$) apart. The mean of the two pressures is taken as the
+sound pressure at the probe reference point, while the pressure
+differential is used to derive the particle velocity component along
+the probe axis (IEC 61043:1993, definition 3.2):
 
-```text
-p(t) = (p1(t) + p2(t)) / 2
-u(t) = -(1 / (rho * dr)) * integral of (p2(t) - p1(t)) dt
-I    = < p(t) * u(t) >          (time average)
-```
+$$
+p(t) = \frac{p_1(t) + p_2(t)}{2}
+$$
+
+$$
+u(t) = -\frac{1}{\rho \, \Delta r} \int \left( p_2(t) - p_1(t) \right) \mathrm{d}t
+$$
+
+$$
+I = \langle p(t) \, u(t) \rangle \quad \text{(time average)}
+$$
 
 For stationary signals the time-averaged intensity reduces to the
-imaginary part of the one-sided cross spectrum G12 of the two microphone
-pressures (the frequency-domain form of the same finite-difference
-estimator):
+imaginary part of the one-sided cross spectrum $G_{12}$ of the
+two microphone pressures (the frequency-domain form of the same
+finite-difference estimator):
 
-```text
-I(f) = -Im{G12(f)} / (2 * pi * f * rho * dr)
-```
+$$
+I(f) = \frac{-\operatorname{Im}\{G_{12}(f)\}}{2 \pi f \rho \, \Delta r}
+$$
 
 The finite-difference gradient underestimates the true plane-wave
-intensity by the factor `sin(k*dr) / (k*dr)` with `k = 2*pi*f/c`;
-IEC 61043:1993 clause 7.3 specifies the probe intensity response with
-exactly this argument (`Ff = dr * f * 2 * pi / c`) and Table 3 lists
-the resulting nominal response (e.g. -10,5 dB at 6,3 kHz for a 25 mm
-separation). Below `f = 0,1 * c / dr` (k\*dr \< 0,63) the bias stays
-under about 0,3 dB (factor >= 0,935).
+intensity by the factor $\sin(k \Delta r) / (k \Delta r)$ with
+$k = 2\pi f/c$; IEC 61043:1993 clause 7.3 specifies the probe
+intensity response with exactly this argument
+($F_f = \Delta r \, f \, 2\pi / c$) and Table 3 lists
+the resulting nominal response (e.g. -10.5 dB at 6.3 kHz for a 25 mm
+separation). Below $f = 0.1 \, c / \Delta r$
+($k \Delta r < 0.63$) the bias stays under about 0.3 dB (factor
+$\ge 0.935$).
 
 Field indicators F1 (temporal variability), F2 (surface
 pressure-intensity), F3 (negative partial power) and F4 (field
@@ -44,12 +52,13 @@ non-uniformity) follow ISO 9614-1:1993 Annex A (normative), equations
 typical position on the initial measurement surface and qualifies the
 *field*, not the surface: it is the coefficient of variation of M
 short-time-averaged samples of the normal intensity at that fixed
-point, and Table B.3 calls for action code (e) when it exceeds 0,6.
+point, and Table B.3 calls for action code (e) when it exceeds 0.6.
 The dynamic capability index is
-`Ld = delta_pI0 - K` (ISO 9614-1 clause 3.12, equation (10)); the
-instrument is adequate for a measurement when `Ld > F2` (criterion 1,
-Annex B equation (B.1)). The residual index `delta_pI0` that feeds it
-is classified against IEC 61043:1993 Table 2 by
+$L_d = \delta_{pI0} - K$ (ISO 9614-1 clause 3.12, equation (10));
+the instrument is adequate for a measurement when $L_d > F_2$
+(criterion 1, Annex B equation (B.1)). The residual index
+$\delta_{pI0}$ that feeds it is classified against
+IEC 61043:1993 Table 2 by
 [`phonometry.metrology.intensity_compliance.intensity_class_compliance`](/phonometry/reference/api/power/intensity-compliance/#intensity_class_compliance).
 
 > Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
@@ -65,20 +74,21 @@ dynamic_capability_index(
 
 Dynamic capability index Ld (ISO 9614-1:1993, clause 3.12).
 
-`Ld = delta_pI0 - K` (equation (10)), where `delta_pI0` is the
+$L_d = \delta_{pI0} - K$ (equation (10)), where
+$\delta_{pI0}$ is the
 instrument pressure-residual intensity index (clause 3.11, equation
 (9); determined per IEC 61043:1993, which requires the Table 2
 minima per class) and `K` the bias error factor of Table 1: 10 dB
 for precision (grade 1) and engineering (grade 2) measurements, 7 dB
 for survey (grade 3). The measurement arrangement is adequate when
-`Ld > F2` (criterion 1, Annex B equation (B.1)).
+$L_d > F_2$ (criterion 1, Annex B equation (B.1)).
 
 **Parameters**
 
 | Name | Description |
 | :--- | :--- |
-| `pressure_residual_intensity_index` | delta_pI0 in decibels. |
-| `bias_error_factor` | K in decibels (default 10,0). |
+| `pressure_residual_intensity_index` | $\delta_{pI0}$ in decibels. |
+| `bias_error_factor` | K in decibels (default 10.0). |
 
 **Returns:** Ld in decibels.
 
@@ -100,13 +110,12 @@ Given the sound pressure level `Lpi` (dB) and the signed normal
 sound intensity `Ini` (W/m^2) measured at each of the N discrete
 positions on the measurement surface:
 
-- F2 = Lp - L|In| (equation (A.3)), with the surface pressure level
-  from equation (A.4) and the level of the mean magnitude of the
-  normal intensity from equation (A.5);
-- F3 = Lp - LIn (equation (A.6)), with the algebraic surface
-  intensity level from equation (A.7);
-- F4 = (1/|mean In|) * sqrt(sum((Ini - mean In)^2) / (N - 1))
-  (equations (A.8)-(A.9)).
+- $F_2 = L_p - L_{|I_n|}$ (equation (A.3)), with the surface
+  pressure level from equation (A.4) and the level of the mean magnitude
+  of the normal intensity from equation (A.5);
+- $F_3 = L_p - L_{I_n}$ (equation (A.6)), with the algebraic
+  surface intensity level from equation (A.7);
+- $F_4 = \frac{1}{|\overline{I_n}|} \sqrt{ \sum_i ( I_{ni} - \overline{I_n} )^2 / (N - 1) }$ (equations (A.8)-(A.9)).
 
 F1, the temporal variability indicator (equation (A.1)), does not come
 from the surface scan: it is evaluated in the initial test at one
@@ -151,10 +160,10 @@ ISO 9614-1:1993 Annex A field indicators over a measurement surface.
 `f2` is the surface pressure-intensity indicator (equation (A.3)),
 `f3` the negative partial power indicator (equation (A.6)) and
 `f4` the field non-uniformity indicator (equation (A.8)).
-`f3 - f2 > 0` reveals negative partial power flowing through parts
-of the surface. The instrument's dynamic capability index must
-satisfy `Ld > f2` (criterion 1, equation (B.1)); the number of
-positions N must satisfy `N > C * f4**2` (criterion 2, equation
+$F_3 - F_2 > 0$ reveals negative partial power flowing through
+parts of the surface. The instrument's dynamic capability index must
+satisfy $L_d > F_2$ (criterion 1, equation (B.1)); the number of
+positions N must satisfy $N > C F_4^2$ (criterion 2, equation
 (B.2)).
 
 `f1` is the temporal variability indicator (equation (A.1)), present
@@ -178,9 +187,9 @@ FieldIndicators.field_is_stationary(limit: float = 0.6) -> bool | np.ndarray
 
 Whether the temporal variability stays within the Table B.3 limit.
 
-ISO 9614-1:1993 Table B.3 lists `F1 > 0,6` as the condition that
-calls for action code (e), i.e. reducing the temporal variability of
-the extraneous intensity, measuring during quieter periods or
+ISO 9614-1:1993 Table B.3 lists $F_1 > 0.6$ as the condition
+that calls for action code (e), i.e. reducing the temporal variability
+of the extraneous intensity, measuring during quieter periods or
 lengthening the averaging time at each position. A field at exactly
 the limit is not flagged.
 
@@ -188,7 +197,7 @@ the limit is not flagged.
 
 | Name | Description |
 | :--- | :--- |
-| `limit` | The Table B.3 threshold (default [`TEMPORAL_VARIABILITY_LIMIT`](/phonometry/reference/api/power/intensity/#temporal_variability_limit), 0,6). |
+| `limit` | The Table B.3 threshold (default [`TEMPORAL_VARIABILITY_LIMIT`](/phonometry/reference/api/power/intensity/#temporal_variability_limit), 0.6). |
 
 **Returns:** `True`/`False` for a scalar `f1`, or a boolean array per band for a per-band `f1`.
 
@@ -212,7 +221,7 @@ FieldIndicators.plot(
 
 Plot the per-band indicators F2/F3, the Ld line and F4.
 
-F1 and its Table B.3 limit of 0,6 are drawn beside F4 when the
+F1 and its Table B.3 limit of 0.6 are drawn beside F4 when the
 result carries them, that is when `temporal_intensity` was
 supplied to [`field_indicators`](/phonometry/reference/api/power/intensity/#field_indicators).
 
@@ -226,7 +235,7 @@ Requires per-band data (call [`field_indicators`](/phonometry/reference/api/powe
 | Name | Description |
 | :--- | :--- |
 | `ax` | Existing axes, or `None` to create a figure. |
-| `dynamic_capability` | Optional instrument dynamic capability index `Ld` in dB (scalar or per band), drawn as the criterion-1 reference line (`Ld > F2`, equation (B.1)); see [`dynamic_capability_index`](/phonometry/reference/api/power/intensity/#dynamic_capability_index). |
+| `dynamic_capability` | Optional instrument dynamic capability index `Ld` in dB (scalar or per band), drawn as the criterion-1 reference line ($L_d > F_2$, equation (B.1)); see [`dynamic_capability_index`](/phonometry/reference/api/power/intensity/#dynamic_capability_index). |
 | `language` | Label language, `"en"` (default) or `"es"`. |
 | `kwargs` | Forwarded to the F2 curve `plot` call. |
 
@@ -262,14 +271,18 @@ Result of a p-p sound intensity measurement.
 Per-band arrays are `None` unless a band `fraction` was requested.
 `intensity` is signed (positive along the probe axis, from
 microphone 1 towards microphone 2); `intensity_level` is computed
-from the magnitude, `10*lg(|I|/1e-12)` dB, with the sign reported
-separately in `direction` (+1/-1). `pressure_intensity_index` is
-`Lp - LI` (the single-position form of the ISO 9614-1:1993 F2
+from the magnitude, $10 \lg(|I|/10^{-12})$ dB, with the sign
+reported separately in `direction` (+1/-1).
+`pressure_intensity_index` is
+$L_p - L_I$ (the single-position form of the ISO 9614-1:1993 F2
 indicator, equation (A.3)). `bias_correction` is the multiplicative
-factor `(k*dr)/sin(k*dr)` compensating the finite-difference
+factor $(k \Delta r)/\sin(k \Delta r)$ compensating the
+finite-difference
 underestimation at each band centre (IEC 61043:1993, 7.3); it is NaN
-at and beyond the first null `k*dr >= pi`. `max_valid_frequency`
-is the usable-bandwidth bound `0,1*c/spacing` (bias \< ~0,3 dB).
+at and beyond the first null $k \Delta r \ge \pi$.
+`max_valid_frequency`
+is the usable-bandwidth bound $0.1 \, c / \Delta r$
+(bias \< ~0.3 dB).
 `spacing` retains the microphone separation the measurement was
 reduced with so `plot_geometry` can draw the probe; it is
 appended after the original fields and `None` for hand-built
@@ -363,33 +376,34 @@ Sound intensity from a two-microphone (p-p) probe (IEC 61043:1993).
 The one-sided cross spectrum `G12` of the two microphone pressures
 is estimated with Welch-averaged, Hann-windowed segments
 (`scipy.signal.csd`) and converted to the intensity spectral
-density along the probe axis (definition 3.2 of IEC 61043:1993 gives
-the underlying p-p formulation):
+density along the probe axis, with $\Delta r$ the microphone
+`spacing` (definition 3.2 of IEC 61043:1993 gives the underlying
+p-p formulation):
 
-```text
-I(f) = -Im{G12(f)} / (2 * pi * f * rho * spacing)
-```
+$$
+I(f) = \frac{-\operatorname{Im}\{G_{12}(f)\}}{2 \pi f \rho \, \Delta r}
+$$
 
 Positive intensity flows from microphone 1 towards microphone 2.
 The mean-square pressure is taken from the mean signal
-`(p1 + p2)/2` at the probe reference point. When `fraction` is
+$(p_1 + p_2)/2$ at the probe reference point. When `fraction` is
 given, both quantities are integrated into octave (1) or one-third
 octave (3) bands using the ANSI S1.11/IEC 61260-1 band edges of
 [`phonometry.nominal_frequencies`](/phonometry/reference/api/filters/frequencies/#nominal_frequencies); bands without any spectral
 bin are dropped. Broadband totals are always computed (over
 `limits` when provided, otherwise over all positive frequencies).
 
-The pressure-intensity index `Lp - LI` is reported per band and
+The pressure-intensity index $L_p - L_I$ is reported per band and
 broadband; in a free plane progressive wave it equals
-`10*lg(rho*c/400)` = 0,14 dB (IEC 61043:1993 clause 5 note), while
-large values flag reactive or noisy fields (compare with the
+$10 \lg(\rho c/400) = 0.14$ dB (IEC 61043:1993 clause 5 note),
+while large values flag reactive or noisy fields (compare with the
 instrument dynamic capability, ISO 9614-1:1993 criterion 1).
 
 Usable bandwidth: the finite-difference gradient biases the result
-by the factor `sin(k*spacing)/(k*spacing)` (IEC 61043:1993, 7.3);
-results are essentially unbiased (\< ~0,3 dB) below
-`max_valid_frequency = 0,1 * c / spacing`, and `bias_correction`
-provides the per-band compensation factor.
+by the factor $\sin(k \Delta r)/(k \Delta r)$ (IEC 61043:1993,
+7.3); results are essentially unbiased (\< ~0.3 dB) below
+`max_valid_frequency` $= 0.1 \, c / \Delta r$, and
+`bias_correction` provides the per-band compensation factor.
 
 **Parameters**
 
@@ -398,12 +412,12 @@ provides the per-band compensation factor.
 | `p1` | Pressure signal of microphone 1, in pascals (1D). |
 | `p2` | Pressure signal of microphone 2, in pascals (1D). |
 | `fs` | Sample rate in Hz. |
-| `spacing` | Microphone separation dr, in metres. |
-| `rho` | Air density, in kg/m^3. Default 1,204 (20 degC). |
-| `c` | Speed of sound, in m/s. Default 343,0. |
+| `spacing` | Microphone separation $\Delta r$, in metres. |
+| `rho` | Air density, in kg/m^3. Default 1.204 (20 degC). |
+| `c` | Speed of sound, in m/s. Default 343.0. |
 | `fraction` | `None` (broadband only), 1 (octave bands) or 3 (one-third octave bands). |
 | `limits` | [f_min, f_max] band limits in Hz (default [12, 20000], as in [`phonometry.nominal_frequencies`](/phonometry/reference/api/filters/frequencies/#nominal_frequencies)). |
-| `bias_correct` | If True, apply the per-bin finite-difference correction `(k*spacing)/sin(k*spacing)` (IEC 61043:1993, 7.3) to the intensity spectral density before summing the band and broadband totals, so the totals no longer under-read as the frequency approaches `max_valid_frequency`. The reciprocal diverges as `k*spacing -> pi` (the first spatial-aliasing null at `c/(2*spacing)`, inside the default band range for close spacings), so it is applied only over the probe's usable range (up to `k*spacing = pi/2`) and held constant beyond, keeping the totals bounded instead of letting a few near-null bins dominate them. Default False keeps the exact legacy totals; the per-band `bias_correction` factor (same clamped definition) is reported either way. |
+| `bias_correct` | If True, apply the per-bin finite-difference correction $(k \Delta r)/\sin(k \Delta r)$ (IEC 61043:1993, 7.3) to the intensity spectral density before summing the band and broadband totals, so the totals no longer under-read as the frequency approaches `max_valid_frequency`. The reciprocal diverges as $k \Delta r \to \pi$ (the first spatial-aliasing null at $c/(2 \Delta r)$, inside the default band range for close spacings), so it is applied only over the probe's usable range (up to $k \Delta r = \pi/2$) and held constant beyond, keeping the totals bounded instead of letting a few near-null bins dominate them. Default False keeps the exact legacy totals; the per-band `bias_correction` factor (same clamped definition) is reported either way. |
 
 **Returns:** [`IntensityResult`](/phonometry/reference/api/power/intensity/#intensityresult).
 
@@ -422,17 +436,18 @@ initial measurement surface and the normal sound intensity is sampled
 there M times with a short averaging time (clause 8.2). The indicator
 is the coefficient of variation of those samples:
 
-```text
-F1 = (1 / In) * sqrt( sum_k (Ink - In)**2 / (M - 1) )
-```
+$$
+F_1 = \frac{1}{\overline{I_n}} \sqrt{ \frac{\sum_k \left( I_{nk} - \overline{I_n} \right)^2}{M - 1} }
+$$
 
-with `In` the mean of the M samples (equation (A.2)). It is
+with $\overline{I_n}$ the mean of the M samples (equation (A.2)).
+It is
 dimensionless, and it is zero for a perfectly steady field, so it
 qualifies the *stationarity of the field*, not the uniformity of the
 surface (that is F4). Note 9 of Annex A recommends M = 10 samples, with
 a short averaging time of 8 s to 12 s (or a whole number of cycles) for
 periodic signals. Table B.3 requires corrective action when
-`F1 > 0,6` ([`TEMPORAL_VARIABILITY_LIMIT`](/phonometry/reference/api/power/intensity/#temporal_variability_limit)).
+$F_1 > 0.6$ ([`TEMPORAL_VARIABILITY_LIMIT`](/phonometry/reference/api/power/intensity/#temporal_variability_limit)).
 
 **Parameters**
 

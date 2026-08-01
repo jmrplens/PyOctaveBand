@@ -16,42 +16,50 @@ from the resonance of a standard load plate on a 200 mm x 200 mm specimen.
 The dynamic stiffness per unit area is the ratio of a dynamic force per area to
 the resulting change in thickness (Formula 1):
 
-```text
-s' = (F / S) / dd     [N/m3]
-```
+$$
+s' = \frac{F/S}{\Delta d} \qquad [\text{N/m}^3]
+$$
 
 The resiliently supported floor is a mass-spring resonator; its natural
 frequency (Formula 2) and, in the laboratory arrangement, the measured resonant
 frequency (Formula 3) are:
 
-```text
-f0 = (1 / 2pi) * sqrt(s'  / m' )        (installed floor)
-fr = (1 / 2pi) * sqrt(s't / m't)        (test arrangement)
-```
+$$
+f_0 = \frac{1}{2\pi} \sqrt{\frac{s'}{m'}} \qquad \text{(installed floor)}
+$$
+
+$$
+f_r = \frac{1}{2\pi} \sqrt{\frac{s'_t}{m'_t}} \qquad \text{(test arrangement)}
+$$
 
 so the *apparent* dynamic stiffness follows from the resonance (Formula 4):
 
-```text
-s't = 4 * pi**2 * m't * fr**2
-```
+$$
+s'_t = 4 \pi^2 m'_t f_r^2
+$$
 
 With an air-permeable resilient material the enclosed gas adds a parallel
 stiffness (Formula 7), from the isothermal compression of the pore air:
 
-```text
-s'a = p0 / (d * epsilon)
-```
+$$
+s'_a = \frac{p_0}{d\,\epsilon}
+$$
 
-(`s'a = 111 / d` MN/m3 for `p0 = 0,1 MPa`, `epsilon = 0,9` and `d` in mm,
-the standard's worked NOTE). The dynamic stiffness of the installed material is
-then obtained by airflow resistivity `r` (clause 8.2):
+($s'_a = 111/d$ MN/m3 for $p_0 = 0.1$ MPa,
+$\epsilon = 0.9$ and `d` in mm, the standard's worked NOTE). The
+dynamic stiffness of the installed material is then obtained by airflow
+resistivity `r` (clause 8.2):
 
-```text
-r >= 100 kPa.s/m2         s' = s't                     (Formula 5)
-10 <= r < 100 kPa.s/m2    s' = s't + s'a               (Formula 6)
-r < 10 kPa.s/m2           s'a from Formula 7; the method only applies when
-                          s't >> s'a, otherwise s' cannot be resolved.
-```
+$$
+s' = s'_t, \qquad r \ge 100~\text{kPa}\cdot\text{s/m}^2 \tag{Formula 5}
+$$
+
+$$
+s' = s'_t + s'_a, \qquad 10 \le r < 100~\text{kPa}\cdot\text{s/m}^2 \tag{Formula 6}
+$$
+
+For $r < 10$ kPa.s/m2, `s'a` follows Formula 7; the method only
+applies when $s'_t \gg s'_a$, otherwise `s'` cannot be resolved.
 
 This module is the resilient-layer characterisation feeding the floating-floor
 term of the EN 12354-2 impact model
@@ -73,15 +81,15 @@ apparent_dynamic_stiffness(
 
 Apparent dynamic stiffness per unit area `s't` (Formula 4).
 
-Inverts the test resonance `fr = (1/2pi) sqrt(s't/m't)` to
-`s't = 4 pi**2 m't fr**2`.
+Inverts the test resonance $f_r = (1/2\pi)\sqrt{s'_t/m'_t}$ to
+$s'_t = 4 \pi^2 m'_t f_r^2$.
 
 **Parameters**
 
 | Name | Description |
 | :--- | :--- |
 | `resonant_frequency` | Extrapolated resonant frequency `fr`, in hertz (scalar or array). |
-| `total_mass_per_area` | Total mass per unit area used during the test `m't`, in kg/m2 (the load plate plus fittings over the 0,04 m2 specimen; the standard's plate gives `m't = 8 kg / 0,04 m2 = 200 kg/m2`). |
+| `total_mass_per_area` | Total mass per unit area used during the test `m't`, in kg/m2 (the load plate plus fittings over the 0,04 m2 specimen; the standard's plate gives $m'_t = 8~\text{kg} / 0.04~\text{m}^2 = 200$ kg/m2). |
 
 **Returns:** The apparent dynamic stiffness per unit area `s't`, in N/m3 (numerically MN/m3 when divided by 1e6).
 
@@ -197,8 +205,8 @@ enclosed_gas_stiffness(
 
 Enclosed-gas dynamic stiffness per unit area `s'a` (Formula 7).
 
-The isothermal compression of the pore air adds a stiffness in parallel with
-the material's structure: `s'a = p0 / (d * epsilon)`.
+The isothermal compression of the pore air adds a stiffness in parallel
+with the material's structure: $s'_a = p_0 / (d\,\epsilon)$.
 
 **Parameters**
 
@@ -211,8 +219,9 @@ the material's structure: `s'a = p0 / (d * epsilon)`.
 **Returns:** The enclosed-gas dynamic stiffness per unit area `s'a`, in N/m3.
 
 :::note
-With the standard's `p0 = 0,1 MPa` and `epsilon = 0,9` this reduces
-to `s'a = 111 / d` MN/m3 for `d` in millimetres (clause 8.2 NOTE).
+With the standard's $p_0 = 0.1$ MPa and $\epsilon = 0.9$
+this reduces to $s'_a = 111/d$ MN/m3 for `d` in millimetres
+(clause 8.2 NOTE).
 :::
 
 ## floating_floor_resonance
@@ -244,8 +253,8 @@ frequency (Formula 2).
 | `resonant_frequency` | Measured resonant frequency `fr`, in hertz. |
 | `total_mass_per_area` | Test total mass per unit area `m't`, kg/m2. |
 | `floor_mass_per_area` | Supported-floor mass per unit area `m'`, kg/m2. |
-| `airflow_resistivity` | Lateral airflow resistivity `r`, in kPa.s/m2 (default `inf` -> the high-resistivity case `s' = s't`). |
-| `thickness` | Specimen thickness `d` under load, in metres (required for the enclosed-gas term when `r < 100 kPa.s/m2`). |
+| `airflow_resistivity` | Lateral airflow resistivity `r`, in kPa.s/m2 (default `inf` -> the high-resistivity case $s' = s'_t$). |
+| `thickness` | Specimen thickness `d` under load, in metres (required for the enclosed-gas term when $r < 100$ kPa.s/m2). |
 | `porosity` | Specimen porosity `epsilon` (required with `thickness`). |
 | `atmospheric_pressure` | Atmospheric pressure `p0`, in pascals. |
 
@@ -267,12 +276,13 @@ Dynamic stiffness per unit area `s'` of the installed material (clause 8.2).
 Combines the apparent stiffness with the enclosed-gas term according to the
 lateral airflow resistivity `r`:
 
-* `r >= 100 kPa.s/m2` -> `s' = s't` (Formula 5);
-* `10 <= r < 100 kPa.s/m2` -> `s' = s't + s'a` (Formula 6);
-* `r < 10 kPa.s/m2` -> the standard only requires the qualitative
-  criterion `s't >> s'a` (clause 8.2). This implementation applies its own
-  engineering threshold: `s'a` below 10 % of `s't` is treated as
-  negligible and `s' = s't` (a [`DynamicStiffnessWarning`](/phonometry/reference/api/materials/dynamic-stiffness/#dynamicstiffnesswarning) is
+* $r \ge 100$ kPa.s/m2 -> $s' = s'_t$ (Formula 5);
+* $10 \le r < 100$ kPa.s/m2 -> $s' = s'_t + s'_a$
+  (Formula 6);
+* $r < 10$ kPa.s/m2 -> the standard only requires the qualitative
+  criterion $s'_t \gg s'_a$ (clause 8.2). This implementation
+  applies its own engineering threshold: `s'a` below 10 % of `s't` is treated as
+  negligible and $s' = s'_t$ (a [`DynamicStiffnessWarning`](/phonometry/reference/api/materials/dynamic-stiffness/#dynamicstiffnesswarning) is
   emitted; clause 8.2 requires the error caused by disregarding `s'a` to
   be stated in the test report); above it the result is `nan`, as the
   method cannot resolve `s'`.
@@ -283,7 +293,7 @@ lateral airflow resistivity `r`:
 | :--- | :--- |
 | `apparent_stiffness` | Apparent dynamic stiffness `s't`, in N/m3. |
 | `airflow_resistivity` | Lateral airflow resistivity `r`, in kPa.s/m2 (ISO 9053). |
-| `gas_stiffness` | Enclosed-gas dynamic stiffness `s'a`, in N/m3 (see [`enclosed_gas_stiffness`](/phonometry/reference/api/materials/dynamic-stiffness/#enclosed_gas_stiffness)); needed for `r < 100 kPa.s/m2`. |
+| `gas_stiffness` | Enclosed-gas dynamic stiffness `s'a`, in N/m3 (see [`enclosed_gas_stiffness`](/phonometry/reference/api/materials/dynamic-stiffness/#enclosed_gas_stiffness)); needed for $r < 100$ kPa.s/m2. |
 
 **Returns:** The installed dynamic stiffness per unit area `s'`, in N/m3 (`nan` when the method cannot resolve it).
 
@@ -298,7 +308,7 @@ natural_frequency(
 
 Natural frequency `f0` of the resiliently supported floor (Formula 2).
 
-`f0 = (1 / 2pi) sqrt(s' / m')`.
+$f_0 = (1/2\pi)\sqrt{s'/m'}$.
 
 **Parameters**
 

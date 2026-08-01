@@ -14,7 +14,7 @@ hammer strike. ISO 18406 characterises them with:
   `SEL_ss` of one pulse (Formulae 3-4), reusing the 1 µPa²·s reference.
 * [`cumulative_sel`](/phonometry/reference/api/underwater/pile-driving-noise/#cumulative_sel) / [`cumulative_sel_identical`](/phonometry/reference/api/underwater/pile-driving-noise/#cumulative_sel_identical) -- the cumulative
   sound exposure level over N strikes (Formulae 8-9); for N identical strikes
-  `SEL_cum = SEL_ss + 10·lg(N)`.
+  $\mathrm{SEL}_{\mathrm{cum}} = \mathrm{SEL}_{\mathrm{ss}} + 10 \lg N$.
 * [`pile_strike_metrics`](/phonometry/reference/api/underwater/pile-driving-noise/#pile_strike_metrics) -- a [`PileStrikeResult`](/phonometry/reference/api/underwater/pile-driving-noise/#pilestrikeresult) bundling the
   single-strike SEL, the peak sound pressure level, the SPL/Leq and the
   90 %-energy pulse duration for one recorded strike, with a `.plot()`.
@@ -33,9 +33,10 @@ hammer strike. ISO 18406 characterises them with:
 cumulative_sel(single_sels: NDArray[np.float64] | list[float]) -> float
 ```
 
-Cumulative sound exposure level over N strikes (ISO 18406 Formulae 8-9).
+Cumulative sound exposure level over N strikes (ISO 18406
+Formulae 8-9).
 
-`SEL_cum = 10·lg(Σₙ 10^(SELₙ/10))` -- the energy sum of the per-strike
+$\mathrm{SEL}_{\mathrm{cum}} = 10 \lg \sum_n 10^{\mathrm{SEL}_n/10}$ -- the energy sum of the per-strike
 single-strike SELs.
 
 **Parameters**
@@ -58,14 +59,15 @@ single-strike SELs.
 cumulative_sel_identical(sel_ss: float, n_strikes: int) -> float
 ```
 
-Cumulative SEL of `n_strikes` identical strikes: `SEL_ss + 10·lg(N)`.
+Cumulative SEL of `n_strikes` identical strikes:
+$\mathrm{SEL}_{\mathrm{ss}} + 10 \lg N$.
 
 **Parameters**
 
 | Name | Description |
 | :--- | :--- |
 | `sel_ss` | Single-strike SEL, in dB re 1 µPa²·s. |
-| `n_strikes` | Number of (identical) strikes, `N ≥ 1`. |
+| `n_strikes` | Number of (identical) strikes, $N \ge 1$. |
 
 **Returns:** Cumulative SEL, in dB re 1 µPa²·s.
 
@@ -73,7 +75,7 @@ Cumulative SEL of `n_strikes` identical strikes: `SEL_ss + 10·lg(N)`.
 
 | Exception | When |
 | :--- | :--- |
-| ValueError | If `n_strikes` is not a whole number `≥ 1`. |
+| ValueError | If `n_strikes` is not a whole number $\ge 1$. |
 
 ## pile_strike_metrics
 
@@ -186,8 +188,9 @@ strike_sel_spectrum(
 
 Band-resolved single-strike sound exposure level.
 
-The sound exposure `E = ∫p² dt` is split between fractional-octave bands
-by integrating the discrete power spectrum over each band (Parseval), so
+The sound exposure $E = \int p^2 \, dt$ is split between
+fractional-octave bands by integrating the discrete power spectrum over
+each band (Parseval), so
 the energy sum of the returned band levels reproduces the broadband
 [`single_strike_sel`](/phonometry/reference/api/underwater/pile-driving-noise/#single_strike_sel) of the same record to within the energy that
 falls outside `limits`.

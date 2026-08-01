@@ -1,5 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""
+r"""
 Radiated underwater sound from percussive pile driving (ISO 18406:2017).
 
 Percussive pile driving radiates a train of impulsive acoustic pulses, one per
@@ -9,7 +9,8 @@ hammer strike. ISO 18406 characterises them with:
   ``SEL_ss`` of one pulse (Formulae 3-4), reusing the 1 µPa²·s reference.
 * :func:`cumulative_sel` / :func:`cumulative_sel_identical` -- the cumulative
   sound exposure level over N strikes (Formulae 8-9); for N identical strikes
-  ``SEL_cum = SEL_ss + 10·lg(N)``.
+  :math:`\mathrm{SEL}_{\mathrm{cum}} =
+  \mathrm{SEL}_{\mathrm{ss}} + 10 \lg N`.
 * :func:`pile_strike_metrics` -- a :class:`PileStrikeResult` bundling the
   single-strike SEL, the peak sound pressure level, the SPL/Leq and the
   90 %-energy pulse duration for one recorded strike, with a ``.plot()``.
@@ -60,9 +61,11 @@ def single_strike_sel(pressure: NDArray[np.float64] | list[float], fs: float) ->
 
 
 def cumulative_sel(single_sels: NDArray[np.float64] | list[float]) -> float:
-    """Cumulative sound exposure level over N strikes (ISO 18406 Formulae 8-9).
+    r"""Cumulative sound exposure level over N strikes (ISO 18406
+    Formulae 8-9).
 
-    ``SEL_cum = 10·lg(Σₙ 10^(SELₙ/10))`` -- the energy sum of the per-strike
+    :math:`\mathrm{SEL}_{\mathrm{cum}} =
+    10 \lg \sum_n 10^{\mathrm{SEL}_n/10}` -- the energy sum of the per-strike
     single-strike SELs.
 
     :param single_sels: Per-strike single-strike SELs, in dB re 1 µPa²·s.
@@ -78,12 +81,14 @@ def cumulative_sel(single_sels: NDArray[np.float64] | list[float]) -> float:
 
 
 def cumulative_sel_identical(sel_ss: float, n_strikes: int) -> float:
-    """Cumulative SEL of ``n_strikes`` identical strikes: ``SEL_ss + 10·lg(N)``.
+    r"""Cumulative SEL of ``n_strikes`` identical strikes:
+    :math:`\mathrm{SEL}_{\mathrm{ss}} + 10 \lg N`.
 
     :param sel_ss: Single-strike SEL, in dB re 1 µPa²·s.
-    :param n_strikes: Number of (identical) strikes, ``N ≥ 1``.
+    :param n_strikes: Number of (identical) strikes, :math:`N \ge 1`.
     :return: Cumulative SEL, in dB re 1 µPa²·s.
-    :raises ValueError: If ``n_strikes`` is not a whole number ``≥ 1``.
+    :raises ValueError: If ``n_strikes`` is not a whole number
+        :math:`\ge 1`.
     """
     n_float = float(n_strikes)
     if not n_float.is_integer():
@@ -179,10 +184,11 @@ def strike_sel_spectrum(
     fraction: int = 3,
     limits: tuple[float, float] = (10.0, 20_000.0),
 ) -> StrikeSelSpectrum:
-    """Band-resolved single-strike sound exposure level.
+    r"""Band-resolved single-strike sound exposure level.
 
-    The sound exposure ``E = ∫p² dt`` is split between fractional-octave bands
-    by integrating the discrete power spectrum over each band (Parseval), so
+    The sound exposure :math:`E = \int p^2 \, dt` is split between
+    fractional-octave bands by integrating the discrete power spectrum over
+    each band (Parseval), so
     the energy sum of the returned band levels reproduces the broadband
     :func:`single_strike_sel` of the same record to within the energy that
     falls outside ``limits``.

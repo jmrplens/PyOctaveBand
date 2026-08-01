@@ -1,5 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""The ERB_N scale: auditory-filter bandwidth and the Cam frequency scale.
+r"""The ERB_N scale: auditory-filter bandwidth and the Cam frequency scale.
 
 The cochlea behaves as a bank of overlapping band-pass **auditory filters**.
 The width of the filter centred on a given frequency is summarised by its
@@ -9,13 +9,19 @@ Glasberg and Moore (1990), fitting notched-noise data for young listeners at
 moderate levels, give it as a straight line in frequency (Moore, *An
 Introduction to the Psychology of Hearing* 6th ed., p. 76):
 
-    ERB_N = 24.7 (4.37 F + 1)   Hz,  with F in kHz
+.. math::
 
-Integrating ``df / ERB_N(f)`` turns that into a frequency scale whose unit is
+   \text{ERB}_N = 24.7 \, (4.37 F + 1)~\text{Hz},
+   \qquad F~\text{in kHz}
+
+Integrating :math:`df / \text{ERB}_N(f)` turns that into a frequency scale
+whose unit is
 one auditory-filter width, the **ERB_N number**, whose unit is called the
 **Cam** (after Cambridge, following a suggestion by Hartmann):
 
-    ERB_N number = 21.4 log10(4.37 F + 1)   Cam
+.. math::
+
+   \text{ERB}_N\ \text{number} = 21.4 \log_{10}(4.37 F + 1)~\text{Cam}
 
 The Cam scale plays the same role as the Bark scale of Zwicker and Terhardt or
 the mel scale of pitch: it is the axis on which masking patterns, excitation
@@ -28,8 +34,12 @@ implementation of the Moore-Glasberg loudness model
 (:mod:`phonometry.psychoacoustics.loudness_moore_glasberg`), which shares
 them:
 
-    ERB_N = 24.673 (0.004368 f + 1)   Hz,  with f in Hz
-    ERB_N number = 21.366 log10(0.004368 f + 1)   Cam
+.. math::
+
+   \text{ERB}_N = 24.673 \, (0.004368 f + 1)~\text{Hz},
+   \qquad f~\text{in Hz}
+
+   \text{ERB}_N\ \text{number} = 21.366 \log_{10}(0.004368 f + 1)~\text{Cam}
 
 They are the same fit written with one more digit: the two forms agree to
 better than 0.2 % over the whole audible range. The extra digits matter for
@@ -59,11 +69,11 @@ CAM_C = 21.366
 
 
 def erb_bandwidth(frequency: ArrayLike) -> np.ndarray | float:
-    """Equivalent rectangular bandwidth of the auditory filter, Hz.
+    r"""Equivalent rectangular bandwidth of the auditory filter, Hz.
 
-    ``ERB_N = 24.673 (0.004368 f + 1)`` (Glasberg and Moore 1990; Moore 6th
-    ed., p. 76, printed there with the rounded constants
-    ``24.7 (4.37 F + 1)`` for ``F`` in kHz).
+    :math:`\text{ERB}_N = 24.673 \, (0.004368 f + 1)` (Glasberg and Moore
+    1990; Moore 6th ed., p. 76, printed there with the rounded constants
+    :math:`24.7 \, (4.37 F + 1)` for ``F`` in kHz).
 
     :param frequency: Filter centre frequency ``f``, Hz (scalar or array,
         non-negative).
@@ -76,10 +86,11 @@ def erb_bandwidth(frequency: ArrayLike) -> np.ndarray | float:
 
 
 def cam_from_frequency(frequency: ArrayLike) -> np.ndarray | float:
-    """ERB_N number (Cam) of a frequency.
+    r"""ERB_N number (Cam) of a frequency.
 
-    ``i = 21.366 log10(0.004368 f + 1)`` (Glasberg and Moore 1990; Moore 6th
-    ed., p. 76, printed there as ``21.4 log10(4.37 F + 1)`` for ``F`` in kHz).
+    :math:`i = 21.366 \log_{10}(0.004368 f + 1)` (Glasberg and Moore 1990;
+    Moore 6th ed., p. 76, printed there as
+    :math:`21.4 \log_{10}(4.37 F + 1)` for ``F`` in kHz).
     One Cam is one auditory-filter width.
 
     :param frequency: Frequency ``f``, Hz (scalar or array, non-negative).
@@ -92,9 +103,9 @@ def cam_from_frequency(frequency: ArrayLike) -> np.ndarray | float:
 
 
 def frequency_from_cam(cam: ArrayLike) -> np.ndarray | float:
-    """Frequency of an ERB_N number, the inverse of :func:`cam_from_frequency`.
+    r"""Frequency of an ERB_N number, the inverse of :func:`cam_from_frequency`.
 
-    ``f = (10^(i / 21.366) - 1) / 0.004368``.
+    :math:`f = (10^{i / 21.366} - 1) / 0.004368`.
 
     :param cam: ERB_N number ``i``, Cam (scalar or array, non-negative).
     :return: The frequency ``f``, Hz; a float for a scalar input.

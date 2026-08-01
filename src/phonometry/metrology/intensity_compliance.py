@@ -1,5 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""
+r"""
 IEC 61043:1993 sound-intensity instrument class verification.
 
 A two-microphone (p-p) intensity chain is graded by its **pressure-residual
@@ -8,14 +8,15 @@ noise (or expose both probe microphones to the same pressure) and the true
 intensity is exactly zero, yet the residual phase mismatch between the channels
 reports a small false intensity. The difference between the indicated sound
 pressure level and that residual intensity level, evaluated for an air density
-of 1,2048 kg/m3, is ``delta_pI0`` (IEC 61043:1993, definition 3.11).
+of 1.2048 kg/m3, is ``delta_pI0`` (IEC 61043:1993, definition 3.11).
 
 **Table 2** of the standard (EN 61043:1994 standard page 14) prescribes the
-*minimum* ``delta_pI0`` per one-third-octave band from 50 Hz to 6,3 kHz for a
+*minimum* ``delta_pI0`` per one-third-octave band from 50 Hz to 6.3 kHz for a
 probe, a processor and a complete instrument, in class 1 and class 2, at the
 nominal microphone separation of 25 mm. The table is transcribed digit for
 digit below. Its Note 1 gives the separation rule: for any other microphone
-separation ``x`` in millimetres, add ``10 lg(x/25)`` dB to every figure, so a
+separation ``x`` in millimetres, add :math:`10 \lg(x/25)` dB to every figure,
+so a
 wider spacer both earns and demands more low-frequency margin. Note 2 restricts
 the requirement to the octave-band centre frequencies for processors that only
 analyse in octave bands.
@@ -23,9 +24,9 @@ analyse in octave bands.
 Two related requirements of the same standard are exposed here as well:
 
 * **Clause 6.1** (frequency range of processors): a class 1 processor covers at
-  least 45 Hz to 7,1 kHz in one-third-octave bands (the 22 tabulated bands from
-  50 Hz to 6,3 kHz). A class 2 processor covers *either* that same
-  one-third-octave range *or*, alternatively, 45 Hz to 5,6 kHz in octave bands
+  least 45 Hz to 7.1 kHz in one-third-octave bands (the 22 tabulated bands from
+  50 Hz to 6.3 kHz). A class 2 processor covers *either* that same
+  one-third-octave range *or*, alternatively, 45 Hz to 5.6 kHz in octave bands
   (the 7 octave bands from 63 Hz to 4 kHz). A verdict computed over a narrower
   set of bands attests only the bands supplied, which
   :func:`verify_intensity_class` flags as ``range_limited``. Because the octave
@@ -43,18 +44,20 @@ Two related requirements of the same standard are exposed here as well:
 
 The index is also the instrument's phase-error floor in disguise. In an axially
 propagating plane progressive wave the true phase difference across the spacer
-is ``k d``, so a residual intensity produced by a channel phase mismatch
-``phi_s`` gives ``delta_pI0 = 10 lg(k d / phi_s)`` (Fahy, *Sound Intensity*
+is :math:`k d`, so a residual intensity produced by a channel phase mismatch
+:math:`\phi_s` gives :math:`\delta_{pI0} = 10 \lg(k d / \phi_s)` (Fahy,
+*Sound Intensity*
 2nd ed., equation (7.16)); :func:`phase_mismatch_from_residual_index` and
 :func:`residual_index_from_phase_mismatch` convert between the two. Fahy's
-worked check in section 6.8 is the anchor: ``delta_pI0 = 20 dB`` means a
-mismatch of one hundredth of ``k d``, about 0,26 degrees at 1 kHz over a 25 mm
+worked check in section 6.8 is the anchor: :math:`\delta_{pI0} = 20` dB means
+a mismatch of one hundredth of :math:`k d`, about 0.26 degrees at 1 kHz over
+a 25 mm
 separation.
 
 The measured ``delta_pI0`` this module classifies is a property of the whole
 probe-spacer-analyser chain and must be determined with the spacer that will be
 fitted in the field; the library does not measure it. Once classified, the
-ISO 9614 dynamic capability ``Ld = delta_pI0 - K`` follows from
+ISO 9614 dynamic capability :math:`L_d = \delta_{pI0} - K` follows from
 :func:`phonometry.emission.intensity.dynamic_capability_index`.
 """
 
@@ -164,7 +167,8 @@ def _match_band(frequency: float) -> float:
 
 
 def _spacing_offset(spacing: float) -> float:
-    """Table 2 Note 1 separation term ``10 lg(x/25)`` in dB, ``x`` in mm."""
+    r"""Table 2 Note 1 separation term :math:`10 \lg(x/25)` in dB, ``x`` in
+    mm."""
     if not np.isfinite(spacing) or spacing <= 0.0:
         raise ValueError("'spacing' must be a positive, finite distance in metres.")
     return float(10.0 * np.log10(spacing / REFERENCE_SPACING))
@@ -187,17 +191,18 @@ def residual_index_limits(
     spacing: float = REFERENCE_SPACING,
     frequencies: list[float] | np.ndarray | None = None,
 ) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
-    """
+    r"""
     IEC 61043:1993 Table 2 minimum pressure-residual intensity index.
 
     Returns the class 1 and class 2 minima the standard requires of a device
     kind, already rescaled to the microphone separation in use with the Note 1
-    rule ``+10 lg(x/25)`` (``x`` in millimetres, i.e. ``10 lg(spacing/0,025)``
+    rule :math:`+10 \lg(x/25)` (``x`` in millimetres, i.e.
+    :math:`10 \lg(\text{spacing}/0.025)`
     for a spacing in metres).
 
     :param device: ``"probe"``, ``"processor"`` or ``"instrument"`` (the three
         column groups of Table 2).
-    :param spacing: Microphone separation in metres (default 0,025, the
+    :param spacing: Microphone separation in metres (default 0.025, the
         nominal separation the table is printed for).
     :param frequencies: Band centre frequencies in Hz to report the limits at,
         as nominal labels or the exact base-ten centres behind them. ``None``
@@ -285,20 +290,20 @@ def verify_intensity_class(
     device: str = "instrument",
     spacing: float = REFERENCE_SPACING,
 ) -> dict[str, Any]:
-    """
+    r"""
     Verify a measured ``delta_pI0`` spectrum against IEC 61043:1993 Table 2.
 
     Each band's measured pressure-residual intensity index is compared with the
     class 1 and class 2 minima of Table 2 for the device kind, rescaled to the
-    microphone separation in use (Note 1, ``+10 lg(x/25)``). A band meets a
-    class when its measured index is greater than or equal to that class's
+    microphone separation in use (Note 1, :math:`+10 \lg(x/25)`). A band meets
+    a class when its measured index is greater than or equal to that class's
     minimum, so the margin is ``measured - minimum`` and a band exactly on the
     limit passes. The overall class is the loosest per-band class, or ``None``
     when any band meets neither class.
 
-    Clause 6.1 fixes the frequency range the class attests: 45 Hz to 7,1 kHz in
-    one-third-octave bands (the 22 tabulated bands, 50 Hz to 6,3 kHz), or, for
-    an octave-band processor, 45 Hz to 5,6 kHz in octave bands (63 Hz to
+    Clause 6.1 fixes the frequency range the class attests: 45 Hz to 7.1 kHz in
+    one-third-octave bands (the 22 tabulated bands, 50 Hz to 6.3 kHz), or, for
+    an octave-band processor, 45 Hz to 5.6 kHz in octave bands (63 Hz to
     4 kHz). ``range_limited`` is ``True`` when the supplied bands cover neither
     of those sets, in which case the returned class attests the bands actually
     verified and not the standard's full frequency range. The one-third-octave
@@ -308,14 +313,14 @@ def verify_intensity_class(
     when it reaches class 1. The octave
     alternative is not open to a ``"probe"`` at all: a probe has no analysis
     bands of its own and clause 12.4 determines its index at one-third-octave
-    intervals across the whole 50 Hz to 6,3 kHz range.
+    intervals across the whole 50 Hz to 6.3 kHz range.
 
     :param residual_index: Measured ``delta_pI0`` per band, in decibels.
     :param frequencies: Band centre frequencies in Hz, one per entry of
         ``residual_index``, as nominal Table 2 labels or the exact base-ten
         centres behind them.
     :param device: ``"probe"``, ``"processor"`` or ``"instrument"``.
-    :param spacing: Microphone separation in metres (default 0,025).
+    :param spacing: Microphone separation in metres (default 0.025).
     :return: Dict with ``overall_class`` (1, 2 or ``None``), ``range_limited``,
         ``bands`` (a list of ``{"freq", "class", "residual_index_db",
         "limit_class1_db", "limit_class2_db", "margin_class1_db",
@@ -381,7 +386,7 @@ def verify_intensity_class(
 
 @dataclass(frozen=True)
 class IntensityInstrumentComplianceResult:
-    """IEC 61043:1993 class verdict of a p-p sound-intensity chain.
+    r"""IEC 61043:1993 class verdict of a p-p sound-intensity chain.
 
     Wraps the outcome of :func:`verify_intensity_class` together with the
     measured spectrum and the two Table 2 masks it was judged against, so the
@@ -398,8 +403,8 @@ class IntensityInstrumentComplianceResult:
     :ivar limit_class2: Class 2 minimum per band, in dB, likewise rescaled.
     :ivar device: ``"probe"``, ``"processor"`` or ``"instrument"``.
     :ivar spacing: Microphone separation the verdict applies to, in metres.
-    :ivar spacing_offset_db: The Table 2 Note 1 term ``10 lg(x/25)`` added to
-        the printed 25 mm figures, in dB.
+    :ivar spacing_offset_db: The Table 2 Note 1 term :math:`10 \lg(x/25)`
+        added to the printed 25 mm figures, in dB.
     :ivar range_limited: ``True`` when the verified bands cover neither the 22
         one-third-octave bands nor the 7 octave bands of clause 6.1, so the
         stated class attests only the bands supplied.
@@ -456,7 +461,7 @@ class IntensityInstrumentComplianceResult:
         microphone separation, so the verdict can be read as the phase-matching
         the chain achieves.
 
-        :param c: Speed of sound in m/s (default 343,0).
+        :param c: Speed of sound in m/s (default 343.0).
         """
         return phase_mismatch_from_residual_index(
             self.residual_index, self.frequency, self.spacing, c=c
@@ -540,7 +545,7 @@ def intensity_class_compliance(
     :param residual_index: Measured ``delta_pI0`` per band, in decibels.
     :param frequencies: Band centre frequencies in Hz, one per entry.
     :param device: ``"probe"``, ``"processor"`` or ``"instrument"``.
-    :param spacing: Microphone separation in metres (default 0,025).
+    :param spacing: Microphone separation in metres (default 0.025).
     :return: An :class:`IntensityInstrumentComplianceResult`.
     """
     verdict = verify_intensity_class(
@@ -575,7 +580,8 @@ def intensity_class_compliance(
 def _plane_wave_phase_deg(
     frequency: np.ndarray, spacing: float, c: float
 ) -> np.ndarray:
-    """Plane-wave phase difference ``k d`` across the spacer, in degrees."""
+    r"""Plane-wave phase difference :math:`k d` across the spacer, in
+    degrees."""
     if not np.isfinite(spacing) or spacing <= 0.0:
         raise ValueError("'spacing' must be a positive, finite distance in metres.")
     if not np.isfinite(c) or c <= 0.0:
@@ -592,25 +598,28 @@ def phase_mismatch_from_residual_index(
     spacing: float,
     c: float = 343.0,
 ) -> np.ndarray:
-    """
+    r"""
     Channel phase mismatch equivalent to a pressure-residual intensity index.
 
     In an axially propagating plane progressive wave the true phase difference
-    between the two sensing points is ``k d = 2 pi f d / c``, and a residual
-    intensity produced by a channel phase mismatch ``phi_s`` satisfies
-    ``delta_pI0 = 10 lg(k d / phi_s)`` (Fahy, *Sound Intensity* 2nd ed.,
-    equations (7.4) and (7.16)), so::
+    between the two sensing points is :math:`k d = 2\pi f d / c`, and a
+    residual
+    intensity produced by a channel phase mismatch :math:`\phi_s` satisfies
+    :math:`\delta_{pI0} = 10 \lg(k d / \phi_s)` (Fahy, *Sound Intensity*
+    2nd ed., equations (7.4) and (7.16)), so:
 
-        phi_s = k d * 10 ** (-delta_pI0 / 10)
+    .. math::
 
-    The ratio is dimensionless, so ``phi_s`` is returned in the same angular
-    unit ``k d`` is expressed in; degrees are used here.
+       \phi_s = k d \cdot 10^{-\delta_{pI0} / 10}
+
+    The ratio is dimensionless, so :math:`\phi_s` is returned in the same
+    angular unit :math:`k d` is expressed in; degrees are used here.
 
     :param residual_index: ``delta_pI0`` in decibels (scalar or array).
     :param frequency: Frequency in Hz (scalar or array, broadcast against
         ``residual_index``).
     :param spacing: Microphone separation in metres.
-    :param c: Speed of sound in m/s (default 343,0).
+    :param c: Speed of sound in m/s (default 343.0).
     :return: The equivalent phase mismatch in degrees, as a
         :class:`numpy.ndarray` (0-d for scalar inputs).
     :raises ValueError: If ``spacing``, ``c`` or ``frequency`` are not positive
@@ -629,26 +638,31 @@ def residual_index_from_phase_mismatch(
     spacing: float,
     c: float = 343.0,
 ) -> np.ndarray:
-    """
+    r"""
     Pressure-residual intensity index of a given channel phase mismatch.
 
-    The inverse of :func:`phase_mismatch_from_residual_index`::
+    The inverse of :func:`phase_mismatch_from_residual_index`:
 
-        delta_pI0 = 10 lg(k d / phi_s),   k d = 2 pi f d / c
+    .. math::
 
-    with ``k d`` and ``phi_s`` both in degrees (the ratio is dimensionless).
-    Because ``k d`` grows with frequency while a mismatch that is constant in
+       \delta_{pI0} = 10 \lg\frac{k d}{\phi_s}, \qquad
+       k d = \frac{2 \pi f d}{c}
+
+    with :math:`k d` and :math:`\phi_s` both in degrees (the ratio is
+    dimensionless).
+    Because :math:`k d` grows with frequency while a mismatch that is constant
+    in
     degrees does not, the index rises by 10 dB per decade of frequency: this is
     why a fixed phase-matching quality yields the falling low-frequency
     ``delta_pI0`` that IEC 61043 Table 2 grades band by band, and why a wider
-    spacer buys ``10 lg(x/25)`` dB of index exactly as Note 1 of that table
-    requires.
+    spacer buys :math:`10 \lg(x/25)` dB of index exactly as Note 1 of that
+    table requires.
 
-    :param phase_mismatch: ``phi_s`` in degrees (scalar or array, > 0).
+    :param phase_mismatch: :math:`\phi_s` in degrees (scalar or array, > 0).
     :param frequency: Frequency in Hz (scalar or array, broadcast against
         ``phase_mismatch``).
     :param spacing: Microphone separation in metres.
-    :param c: Speed of sound in m/s (default 343,0).
+    :param c: Speed of sound in m/s (default 343.0).
     :return: ``delta_pI0`` in decibels, as a :class:`numpy.ndarray` (0-d for
         scalar inputs).
     :raises ValueError: If ``phase_mismatch`` is not positive and finite, or

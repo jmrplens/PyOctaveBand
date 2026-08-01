@@ -1,12 +1,15 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""
+r"""
 CNOSSOS-EU road traffic source emission (Directive 2002/49/EC Annex II, 2.2).
 
 The common noise assessment methods of the European Union describe a road as an
-incoherent **source line** of point sources 0,05 m above the pavement. Each
+incoherent **source line** of point sources 0.05 m above the pavement. Each
 vehicle category ``m`` radiates a directional sound power per metre of line
 
-``L'_W,eq,line,i,m = L_W,i,m + 10 lg( Q_m / (1000 v_m) )``   (2.2.1)
+.. math::
+
+   L'_{W,eq,line,i,m} = L_{W,i,m}
+   + 10 \lg\left( \frac{Q_m}{1000 v_m} \right) \tag{2.2.1}
 
 built from a **rolling** term (2.2.4) and a **propulsion** term (2.2.11), each
 with its own corrections for road surface, air temperature, studded tyres, road
@@ -604,9 +607,10 @@ def road_rolling_noise(
     junction_type: JunctionType = JunctionType.NONE,
     coefficients: RoadEmissionCoefficients = ROAD_COEFFICIENTS,
 ) -> NDArray[np.float64]:
-    """Rolling-noise sound power ``L_WR,i,m`` of one vehicle (2.2.4)/(2.2.5).
+    r"""Rolling-noise sound power ``L_WR,i,m`` of one vehicle (2.2.4)/(2.2.5).
 
-    ``L_WR,i,m = A_R,i,m + B_R,i,m lg(v_m/v_ref) + dL_WR,i,m`` with the
+    :math:`L_{WR,i,m} = A_{R,i,m} + B_{R,i,m} \lg(v_m/v_{ref}) +
+    dL_{WR,i,m}` with the
     correction term ``dL_WR`` collecting the road surface (2.2.19), the studded
     tyres (2.2.8), the junction (2.2.17) and the air temperature (2.2.10).
     Categories 4a and 4b have no rolling noise: their Table F-1 rows are zero,
@@ -663,12 +667,14 @@ def road_propulsion_noise(
     junction_type: JunctionType = JunctionType.NONE,
     coefficients: RoadEmissionCoefficients = ROAD_COEFFICIENTS,
 ) -> NDArray[np.float64]:
-    """Propulsion-noise sound power ``L_WP,i,m`` of one vehicle (2.2.11)/(2.2.12).
+    r"""Propulsion-noise sound power ``L_WP,i,m`` of one vehicle (2.2.11)/(2.2.12).
 
-    ``L_WP,i,m = A_P,i,m + B_P,i,m (v_m - v_ref)/v_ref + dL_WP,i,m`` with
+    :math:`L_{WP,i,m} = A_{P,i,m} + B_{P,i,m} (v_m - v_{ref})/v_{ref} +
+    dL_{WP,i,m}` with
     ``dL_WP`` collecting the road surface (2.2.20), the road gradient
     (2.2.13)-(2.2.16) and the junction (2.2.18). Unlike rolling noise, the
-    surface term is ``min{alpha_i,m ; 0}``: an absorbing surface reduces
+    surface term is :math:`\min\{\alpha_{i,m}; 0\}`: an absorbing surface
+    reduces
     propulsion noise, a noisy one does not increase it.
 
     :param category: Vehicle category (Table [2.2.a]).
@@ -823,9 +829,10 @@ def road_source_power(
     junction_type: JunctionType = JunctionType.NONE,
     coefficients: RoadEmissionCoefficients = ROAD_COEFFICIENTS,
 ) -> RoadEmissionResult:
-    """Directional sound power per metre of a road source line (2.2.1).
+    r"""Directional sound power per metre of a road source line (2.2.1).
 
-    Evaluates ``L'_W,eq,line,i,m = L_W,i,m + 10 lg(Q_m/(1000 v_m))`` for every
+    Evaluates
+    :math:`L'_{W,eq,line,i,m} = L_{W,i,m} + 10 \lg(Q_m/(1000 v_m))` for every
     category of the traffic mix and sums the categories energetically. The
     flow term uses the true average speed even where the sound power itself is
     frozen at 20 km/h (2.2.1).
@@ -901,9 +908,10 @@ def road_source_power(
 def line_source_segment_power(
     line_power: NDArray[np.float64] | list[float] | float, length: float
 ) -> NDArray[np.float64]:
-    """Sound power of the point source representing a segment of source line.
+    r"""Sound power of the point source representing a segment of source line.
 
-    ``L_W,segment,i = L'_W,eq,line,i + 10 lg(dL)``. This is arithmetic, not a
+    :math:`L_{W,segment,i} = L'_{W,eq,line,i} + 10 \lg(dL)`. This is
+    arithmetic, not a
     normative rule: section 2.5.3 of Annex II states that how a line source is
     split into equivalent point sources "is outside the scope of the current
     methodology". Only the per-metre line power is defined by the method.

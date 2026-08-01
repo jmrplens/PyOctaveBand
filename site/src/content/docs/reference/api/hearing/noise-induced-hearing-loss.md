@@ -13,15 +13,17 @@ into the hearing threshold level associated with age and noise (HTLAN), over
 the six audiometric frequencies 500 Hz to 6000 Hz.
 
 The median NIPTS for exposure durations of 10 to 40 years is
-`N50 = [u + v*lg(t/t0)] * (L_EX,8h - L0)**2` (clause 6.3.1, Formula 2, with
+$N_{50} = [u + v \lg(t/t_0)] \, (L_{EX,8h} - L_0)^2$ (clause 6.3.1,
+Formula 2, with
 the values `u, v, L0` of Table 1), extrapolated below 10 years by Formula 3.
 The statistical distribution about the median is two half-Gaussians whose
 spreads `du` (worse than the median) and `dl` (better) follow Formulae 6/7
 with the coefficients of Table 3; a population fractile is
-`N50 + z * spread` with `z` the standard-normal quantile (clause 6.3.2,
+$N_{50} + z \cdot \text{spread}$ with `z` the standard-normal
+quantile (clause 6.3.2,
 Formulae 4/5, Table 2), clamped at zero. The HTLAN combines the age component
 `H` (HTLA, database A = ISO 7029) with the noise component `N` by
-`H' = H + N - H*N/120` (clause 6.1, Formula 1).
+$H' = H + N - H N / 120$ (clause 6.1, Formula 1).
 
 > Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
 
@@ -33,7 +35,8 @@ combine_age_and_noise(htla: ArrayLike, nipts_value: ArrayLike) -> np.ndarray
 
 Combine the age and noise components by Formula (1) (clause 6.1).
 
-`H' = H + N - H*N/120`, the hearing threshold level associated with age
+$H' = H + N - H N / 120$, the hearing threshold level associated
+with age
 and noise. The formula "is applicable only to corresponding percentage
 values of H', H and N", so both components must be taken at the same
 population percentage.
@@ -71,7 +74,8 @@ Hearing threshold level associated with age and noise (clause 6.1).
 Combines the age component `H` (HTLA from database A, evaluated from
 ISO 7029:2017 - the edition ISO 1999:2013 references undated in 6.2.2 - at
 the same population fractile) with the noise component `N` (the NIPTS at
-that fractile) by Formula (1): `H' = H + N - H*N/120`. The formula applies
+that fractile) by Formula (1): $H' = H + N - H N / 120$. The
+formula applies
 to corresponding percentage values, so the same `fractile` drives both
 components.
 
@@ -131,7 +135,7 @@ All arrays are in dB and aligned with `NIPTS_FREQUENCIES`.
 | `frequencies` | Audiometric frequencies, in hertz. |
 | `htla` | Age component `H` (HTLA, database A, evaluated from ISO 7029:2017, the edition ISO 1999:2013 references undated in 6.2.2). |
 | `nipts` | Noise component `N` (NIPTS at `fractile`). |
-| `threshold` | Combined HTLAN `H' = H + N - H*N/120`. |
+| `threshold` | Combined HTLAN $H' = H + N - H N / 120$. |
 
 ### HtlanResult.plot()
 
@@ -168,7 +172,8 @@ Writes a one-page statistical-prediction report of the hearing
 threshold level associated with age and noise (ISO 1999:2013 clause
 6.1): a prediction-basis line, an optional metadata header, a
 per-audiometric-frequency table of the age component `H`, the noise
-component `N` and the combined threshold `H' = H + N - H*N/120`
+component `N` and the combined threshold
+$H' = H + N - H N / 120$
 beside the result's own plot, the boxed representative threshold
 averaged over the 2/3/4 kHz hearing-handicap set with the
 listener/exposure conditions, and a statistical-prediction note. The

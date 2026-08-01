@@ -170,7 +170,8 @@ sel(
 
 Sound exposure level (SEL / LAE): the event level normalized to 1 second.
 
-`SEL = Leq,T + 10*log10(T / 1 s)`, the standard single-event metric
+$\text{SEL} = L_{eq,T} + 10 \log_{10}(T / 1\,\text{s})$, the
+standard single-event metric
 (aircraft flyovers, train passes). With `weighting="A"` this is LAE as
 defined by IEC 61672-1:2013 (verified against the Table 4 toneburst
 reference responses, Equation 8, in the test suite).

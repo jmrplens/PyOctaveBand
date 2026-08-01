@@ -1,12 +1,13 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""
+r"""
 Weighting filters (A, B, C, D, G, AU, Z) and time weighting utilities.
 
 A/C/Z per IEC 61672-1:2013; G (infrasound) per ISO 7196:1995.
 
 B is the historical weighting of ANSI S1.4-1983 (Appendix C): the C curve
 with one extra zero at the origin and one extra real pole at
-``f5 = 158.48932 Hz``. It was dropped from the sound-level-meter standards
+:math:`f_5 = 158.48932` Hz. It was dropped from the sound-level-meter
+standards
 when IEC 61672-1 replaced IEC 60651 (first edition 2002) and is provided for
 historical data and older national codes only.
 
@@ -20,8 +21,14 @@ cuts steeply above (U alone, Table 1: -2.8 dB at 12.5 kHz; -61.8 dB at
 
 D per the withdrawn IEC 537:1976 (aircraft-noise weighting): implemented
 from the widely published rational transfer function
-``k s (s^2 + 6532 s + 4.0975e7) / ((s + 1776.3)(s + 7288.5)
-(s^2 + 21514 s + 3.8836e8))``, with ``k`` renormalized to exactly 0 dB at
+
+.. math::
+
+   \frac{k s \left( s^2 + 6532 s + 4.0975 \times 10^7 \right)}
+        {(s + 1776.3)(s + 7288.5)
+         \left( s^2 + 21514 s + 3.8836 \times 10^8 \right)}
+
+with ``k`` renormalized to exactly 0 dB at
 1 kHz. The standard itself is withdrawn and unavailable, so the constants
 are corroborated against two independent implementations: SQAT
 (``sound_level_meter/Gen_weighting_filters.m``: identical zeros and poles;

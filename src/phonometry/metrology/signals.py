@@ -1,5 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""
+r"""
 Test signals and sample-rate utilities.
 
 The signal toolbox of the metrology domain: deterministic test signals and
@@ -9,11 +9,13 @@ with their accuracy stated instead of implied.
 * :func:`noise_signal` - Gaussian noise with an exact power-law spectral
   slope: white (0 dB/octave), pink (-3.01), red (-6.02, also called
   Brownian), blue (+3.01) and violet (+6.02). The autospectral density
-  follows ``Gxx(f) ∝ f^α`` with ``α`` = 0, -1, -2, +1 and +2 respectively,
-  so the level changes by exactly ``3.01·α`` dB per octave
-  (``10·lg 2 = 3.0103`` dB). The colors are synthesized by filtering seeded
-  white Gaussian noise in the frequency domain: the DFT of the white record
-  is multiplied by the exact magnitude response ``|H(f)| = (f/f_ref)^(α/2)``
+  follows :math:`G_{xx}(f) \propto f^\alpha` with :math:`\alpha` = 0,
+  -1, -2, +1 and +2 respectively,
+  so the level changes by exactly :math:`3.01 \alpha` dB per octave
+  (:math:`10 \lg 2 = 3.0103` dB). The colors are synthesized by filtering
+  seeded white Gaussian noise in the frequency domain: the DFT of the
+  white record is multiplied by the exact magnitude response
+  :math:`\lvert H(f) \rvert = (f/f_{\mathrm{ref}})^{\alpha/2}`
   bin by bin (a zero-phase FIR filter applied circularly), so the *expected*
   spectrum follows the power law exactly at every synthesis bin above DC and
   a measured slope deviates only by the random error of the spectral
@@ -90,9 +92,10 @@ def noise_signal(
     rms: float = 1.0,
     seed: int | None = None,
 ) -> NDArray[np.float64]:
-    """Generate Gaussian noise with an exact power-law spectral slope.
+    r"""Generate Gaussian noise with an exact power-law spectral slope.
 
-    ``Gxx(f) ∝ f^α`` with α = 0 (white), -1 (pink, -3.01 dB/octave),
+    :math:`G_{xx}(f) \propto f^\alpha` with :math:`\alpha` = 0 (white),
+    -1 (pink, -3.01 dB/octave),
     -2 (red/Brownian, -6.02), +1 (blue, +3.01) or +2 (violet, +6.02),
     shaped by an exact frequency-domain filter (see the module docstring),
     zero-mean and rescaled to the requested RMS exactly.
@@ -104,7 +107,7 @@ def noise_signal(
     :param rms: Root-mean-square value of the returned record.
     :param seed: Seed for :func:`numpy.random.default_rng`; the same seed
         reproduces the same record. ``None`` draws fresh entropy.
-    :return: The noise record, ``round(fs·seconds)`` samples.
+    :return: The noise record, ``round(fs * seconds)`` samples.
     :raises ValueError: If the inputs or parameters are invalid.
     """
     fs_v = float(fs)
@@ -185,7 +188,8 @@ class ToneBurstResult:
     :ivar cycles: Full tone periods per burst.
     :ivar amplitude: Peak amplitude of the tone.
     :ivar burst_seconds: Burst duration ``cycles/frequency``, in seconds.
-    :ivar burst_samples: Samples per burst, ``round(fs·cycles/frequency)``.
+    :ivar burst_samples: Samples per burst,
+        ``round(fs * cycles / frequency)``.
     :ivar onset_sample: Index of the first sample of the first burst.
     :ivar repetitions: Number of bursts in the record.
     :ivar repetition_rate: Bursts per second, or ``None`` (single burst).
@@ -288,7 +292,7 @@ def tone_burst(
     pre_silence: float = 0.0,
     post_silence: float = 0.0,
 ) -> ToneBurstResult:
-    """Generate an IEC 60268-1 tone burst (single or repetitive).
+    r"""Generate an IEC 60268-1 tone burst (single or repetitive).
 
     IEC 60268-1:1985, Clause A2.1: "The burst should start at the
     zero-crossing of the [...] tone and should consist of an integral
@@ -298,12 +302,14 @@ def tone_burst(
     repetition period, as in the repetitive-burst test of Clause A2.2
     (there: 5 ms bursts of 5 kHz tone at 2, 10 or 100 bursts per second).
 
-    The gate closes after ``round(fs·cycles/frequency)`` samples, so the
-    "integral number of full periods" is sample-exact only when ``fs``
-    and ``frequency`` are commensurate (``fs·cycles/frequency`` an
-    integer). Otherwise the gate closes up to half a sample away from
+    The gate closes after ``round(fs * cycles / frequency)`` samples, so
+    the "integral number of full periods" is sample-exact only when
+    ``fs`` and ``frequency`` are commensurate (``fs * cycles/frequency``
+    an integer). Otherwise the gate closes up to half a sample away from
     the tone's final zero crossing and the gated waveform carries a
-    residual step of up to ``amplitude·sin(π·frequency/fs)`` there
+    residual step of up to
+    :math:`\text{amplitude} \cdot \sin(\pi \cdot \text{frequency}/f_s)`
+    there
     (e.g. 10 cycles of 997 Hz at 48 kHz span 481.44 samples, gated at
     481); a :class:`~phonometry.PhonometryWarning` quantifies the
     realized residual.
@@ -398,10 +404,10 @@ def tone_burst(
 
 @dataclass(frozen=True)
 class ResampledSignalResult:
-    """Resampled record with the designed anti-alias filter and its spec.
+    r"""Resampled record with the designed anti-alias filter and its spec.
 
     The polyphase resampler filters at the intermediate rate
-    ``fs_original·up`` with a linear-phase Kaiser-window lowpass designed
+    ``fs_original * up`` with a linear-phase Kaiser-window lowpass designed
     from the two numbers below; the filter taps are returned so the spec
     can be verified against the filter itself.
 
@@ -412,14 +418,15 @@ class ResampledSignalResult:
     :ivar down: Decimation factor of the rational ratio ``up/down``.
     :ivar filter_taps: Anti-alias FIR taps (unit passband gain; the
         polyphase engine applies the ``up`` interpolation gain), designed
-        at the intermediate rate ``original_fs·up``. A single ``1.0`` tap
+        at the intermediate rate ``original_fs * up``. A single ``1.0`` tap
         when the ratio is 1 (no filtering).
     :ivar passband_edge_hz: Passband edge of the design, in Hz.
     :ivar stopband_edge_hz: Stopband edge of the design (the smaller of
         the two Nyquist frequencies), in Hz.
     :ivar stopband_attenuation_db: Designed stopband attenuation, in dB
         (also the passband ripple bound: the Kaiser window method holds
-        the ripple of both bands within the same ``δ = 10^(-A/20)``,
+        the ripple of both bands within the same
+        :math:`\delta = 10^{-A/20}`,
         though -- unlike a true equiripple design -- its ripple decays
         away from the band edges rather than staying at the bound).
     :ivar transition_width: Transition-band width as a fraction of the
@@ -472,14 +479,15 @@ def resample_signal(
     transition_width: float = 0.05,
     max_denominator: int = 1000,
 ) -> ResampledSignalResult:
-    """Resample a record with a stated anti-alias specification.
+    r"""Resample a record with a stated anti-alias specification.
 
     Polyphase rational resampling (:func:`scipy.signal.resample_poly`)
     behind a lowpass FIR designed *here* by the Kaiser window method: the
     stopband starts at the smaller of the two Nyquist frequencies and
     provides ``stopband_attenuation_db`` of alias rejection, the passband
     ends ``transition_width`` below it and is flat within the same ripple
-    bound ``δ = 10^(-A/20)``. The designed taps travel with the result, so
+    bound :math:`\delta = 10^{-A/20}`. The designed taps travel with the
+    result, so
     the spec is a property of the returned filter, not of a library
     default.
 
@@ -582,9 +590,10 @@ def resample_signal(
 def _fractional_advance(
     x: NDArray[np.float64], shift: float
 ) -> NDArray[np.float64]:
-    """Advance ``x`` by ``shift`` samples (band-limited, non-circular).
+    r"""Advance ``x`` by ``shift`` samples (band-limited, non-circular).
 
-    Frequency-domain phase ramp ``e^{+j2πk·shift/nfft}`` over a record
+    Frequency-domain phase ramp
+    :math:`e^{+j 2 \pi k \cdot \text{shift} / \text{nfft}}` over a record
     zero-padded past the shift, so the advanced samples leaving one end
     land in the padding instead of wrapping around. This is the alignment
     kernel of :func:`~phonometry.metrology.correlation.align_impulse_responses`.
@@ -608,11 +617,13 @@ def fractional_delay(
     *,
     mode: Literal["linear", "circular"] = "linear",
 ) -> NDArray[np.float64]:
-    """Delay a record by an arbitrary (sub-sample) number of samples.
+    r"""Delay a record by an arbitrary (sub-sample) number of samples.
 
     Band-limited delay via a frequency-domain phase ramp
-    ``e^{-j2πk·delay/N}``: every spectral component is delayed by exactly
-    ``delay`` samples, i.e. its phase changes by ``-2π·f·delay/fs``
+    :math:`e^{-j 2 \pi k \cdot \text{delay} / N}`: every spectral
+    component is delayed by exactly
+    ``delay`` samples, i.e. its phase changes by
+    :math:`-2 \pi f \cdot \text{delay} / f_s`
     radians. Two boundary conventions:
 
     * ``'linear'`` (default): the record is zero-padded past the shift

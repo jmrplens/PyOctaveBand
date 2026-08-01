@@ -1,5 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""
+r"""
 Sound power level of a noise source measured in a reverberation test room:
 ISO 3741:2010 (precision method, accuracy grade 1).
 
@@ -8,28 +8,42 @@ field is sampled by microphones. Two methods are provided.
 
 The **direct method** derives the sound power from the mean corrected room
 sound pressure level ``Lp(ST)`` and the equivalent absorption area ``A`` of the
-room (ISO 3741:2010 clause 9.1.4, Eq. 20)::
+room, with the Sabine absorption area and the speed of sound ``c`` in m/s
+(ISO 3741:2010 clause 9.1.4, Eq. 20):
 
-    Lp(ST) = 10*lg( (1/NM) * sum_i 10^(0,1*Lpi) )                     (Eq. 16)
-    A      = (55,26/c) * (V/T60)          (Sabine)                    (clause 9.1.4)
-    c      = 20,05 * sqrt(273 + theta)    speed of sound, m/s
-    LW = Lp(ST) + 10*lg(A/A0) + 4,34*(A/S) + 10*lg(1 + S*c/(8*V*f))
-                + C1 + C2 - 6                                         (Eq. 20)
+.. math::
 
-``10*lg(1 + S*c/(8*V*f))`` is the Waterhouse boundary correction (energy stored
-near the room boundaries); it vanishes as the frequency grows. ``C1`` (Eq. 20,
-reference-quantity correction) and ``C2`` (radiation-impedance correction) carry
-the result to the reference meteorological conditions of clause 4 (23,0 C,
-101,325 kPa, 50 %)::
+   L_p(\text{ST}) = 10 \lg\!\left[ \frac{1}{N_M} \sum_i 10^{0.1 L_{pi}}
+   \right] \tag{Eq. 16}
 
-    C1 = -10*lg(ps/ps0) + 5*lg((273,15+theta)/314)                   (clause 9.1.4)
-    C2 = -10*lg(ps/ps0) + 15*lg((273,15+theta)/296)
+   A = \frac{55.26}{c} \, \frac{V}{T_{60}}
+
+   c = 20.05 \sqrt{273 + \theta}
+
+   L_W = L_p(\text{ST}) + 10 \lg\frac{A}{A_0} + 4.34 \frac{A}{S}
+   + 10 \lg\!\left( 1 + \frac{S c}{8 V f} \right) + C_1 + C_2 - 6
+   \tag{Eq. 20}
+
+:math:`10 \lg(1 + Sc/(8Vf))` is the Waterhouse boundary correction (energy
+stored near the room boundaries); it vanishes as the frequency grows. ``C1``
+(Eq. 20, reference-quantity correction) and ``C2`` (radiation-impedance
+correction) carry the result to the reference meteorological conditions of
+clause 4 (23.0 C, 101.325 kPa, 50 %), per clause 9.1.4:
+
+.. math::
+
+   C_1 = -10 \lg\frac{p_s}{p_{s0}} + 5 \lg\frac{273.15 + \theta}{314}
+
+   C_2 = -10 \lg\frac{p_s}{p_{s0}} + 15 \lg\frac{273.15 + \theta}{296}
 
 The **comparison method** replaces the absorption-area terms by a reference
 sound source (RSS) of known sound power ``LW(RSS)`` measured at the same
-positions (ISO 3741:2010 clause 9.1.5, Eq. 21)::
+positions (ISO 3741:2010 clause 9.1.5, Eq. 21):
 
-    LW = LW(RSS) + ( Lp(ST) - Lp(RSS) + C2 )                         (Eq. 21)
+.. math::
+
+   L_W = L_W(\text{RSS}) + \left( L_p(\text{ST}) - L_p(\text{RSS}) + C_2
+   \right) \tag{Eq. 21}
 
 Both methods cover the one-third-octave bands from 100 Hz to 10 kHz (clause
 8.1). Octave-band, A-weighted and total levels follow ISO 3741 Annex F, which
@@ -63,13 +77,13 @@ _THETA1 = 296.0  #: Reference temperature for C2, in K (ISO 3741 clause 9.1.4).
 
 @dataclass(frozen=True)
 class ReverberationSoundPowerResult:
-    """Result of an ISO 3741:2010 reverberation-room sound power determination.
+    r"""Result of an ISO 3741:2010 reverberation-room sound power determination.
 
     ``sound_power_level`` is the per-band ``LW`` (Eq. 20 direct method, Eq. 21
     comparison method). ``mean_pressure_level`` is the mean corrected room level
     ``Lp(ST)`` (Eq. 16). For the direct method ``absorption_area`` is the Sabine
     equivalent absorption area ``A`` per band and ``waterhouse_correction`` the
-    boundary term ``10*lg(1 + S*c/(8*V*f))``; both are ``NaN`` for the
+    boundary term :math:`10 \lg(1 + Sc/(8Vf))`; both are ``NaN`` for the
     comparison method. ``background_correction`` is the effective per-band
     background correction ``K1``: with per-position input each position is
     corrected by its own ``K1i`` (Eq. 14/15) before the energy average
@@ -167,11 +181,12 @@ class ReverberationSoundPowerResult:
 
 
 def _validate_meteorology(temperature: float, static_pressure: float) -> None:
-    """Guard the meteorological inputs before the log10/sqrt of C1/C2 and c.
+    r"""Guard the meteorological inputs before the log10/sqrt of C1/C2 and c.
 
-    A non-finite or ``<= -273 degC`` temperature makes ``sqrt(273 + theta)``
-    complex/zero, and a non-finite or non-positive static pressure makes
-    ``lg(ps/ps0)`` undefined; both are rejected with a clean ``ValueError``."""
+    A non-finite or :math:`\le -273` degC temperature makes
+    :math:`\sqrt{273 + \theta}` complex/zero, and a non-finite or non-positive
+    static pressure makes :math:`\lg(p_s/p_{s0})` undefined; both are rejected
+    with a clean ``ValueError``."""
     if not np.isfinite(temperature) or temperature <= -273.0:
         raise ValueError(
             "'temperature' must be finite and greater than -273 degC."
@@ -181,7 +196,8 @@ def _validate_meteorology(temperature: float, static_pressure: float) -> None:
 
 
 def _speed_of_sound(temperature: float) -> float:
-    """Speed of sound ``c = 20,05*sqrt(273 + theta)`` (ISO 3741 clause 9.1.4)."""
+    r"""Speed of sound :math:`c = 20.05 \sqrt{273 + \theta}` (ISO 3741,
+    clause 9.1.4)."""
     return float(20.05 * np.sqrt(273.0 + temperature))
 
 
@@ -214,13 +230,14 @@ def _mean_level(levels: np.ndarray) -> np.ndarray:
 
 
 def _k1_eq14(delta: np.ndarray, frequencies: np.ndarray) -> tuple[np.ndarray, bool]:
-    """Background-noise correction ``K1`` from ``dLp`` (ISO 3741:2010 Eq. 14).
+    r"""Background-noise correction ``K1`` from ``dLp`` (ISO 3741:2010 Eq. 14).
 
-    ``K1 = -10*lg(1 - 10^(-0,1*dLp))``. The precision-grade qualification is
-    frequency dependent (clause 9.1.2): ``dLp >= 15 dB`` -> ``K1 = 0``; below
+    :math:`K_1 = -10 \lg(1 - 10^{-0.1 \Delta L_p})`. The precision-grade
+    qualification is frequency dependent (clause 9.1.2):
+    :math:`\Delta L_p \ge 15` dB gives :math:`K_1 = 0`; below
     the lower criterion (6 dB for bands <= 200 Hz and >= 6 300 Hz, 10 dB for
-    250 Hz to 5 000 Hz) ``K1`` is clamped to the criterion value (1,26 dB /
-    0,46 dB) and the levels become upper bounds. ``delta`` may be per band
+    250 Hz to 5 000 Hz) ``K1`` is clamped to the criterion value (1.26 dB /
+    0.46 dB) and the levels become upper bounds. ``delta`` may be per band
     ``(NB,)`` or per position and band ``(NM, NB)``; the second returned value
     flags whether any element fell below the lower criterion."""
     low = np.where((frequencies <= 200.0) | (frequencies >= 6300.0), 6.0, 10.0)
@@ -235,12 +252,13 @@ def _background_corrected_mean(
     background_levels: np.ndarray,
     frequencies: np.ndarray,
 ) -> tuple[np.ndarray, np.ndarray]:
-    """Background-corrected mean room level and effective per-band ``K1``.
+    r"""Background-corrected mean room level and effective per-band ``K1``.
 
     With per-position 2D ``levels`` the correction follows ISO 3741:2010
     clauses 9.1.2/9.1.3 exactly: the correction ``K1i`` is computed at each
     microphone position (Eq. 14), each position level is corrected first
-    (``Lpi(ST) = L'pi(ST) - K1i``, Eq. 15) and the corrected levels are then
+    (:math:`L_{pi}(\text{ST}) = L'_{pi}(\text{ST}) - K_{1i}`, Eq. 15) and the
+    corrected levels are then
     energy-averaged (Eq. 16). ``background_levels`` may be per position
     (matching shape) or a single ``(NB,)`` spectrum used at every position.
     The returned per-band ``K1`` is the effective correction (uncorrected mean
@@ -397,21 +415,24 @@ def sound_power_reverberation(
     temperature: float = 23.0,
     static_pressure: float = 101.325,
 ) -> ReverberationSoundPowerResult:
-    """Sound power level in a reverberation room, direct method (ISO 3741:2010).
+    r"""Sound power level in a reverberation room, direct method (ISO 3741:2010).
 
     ``levels`` is either a 1D per-band spectrum of the mean room sound pressure
     level or a 2D ``(NM, NB)`` array (one row per microphone position, one
     column per band) that is energy-averaged over positions (Eq. 16). The sound
-    power level in each band follows Eq. (20)::
+    power level in each band follows Eq. (20):
 
-        LW = Lp(ST) + 10*lg(A/A0) + 4,34*(A/S) + 10*lg(1 + S*c/(8*V*f))
-                    + C1 + C2 - 6
+    .. math::
 
-    with the Sabine equivalent absorption area ``A = (55,26/c)*(V/T60)`` and the
-    speed of sound ``c = 20,05*sqrt(273 + theta)``. The Waterhouse term
-    ``10*lg(1 + S*c/(8*V*f))`` needs the band mid-frequencies, so ``frequencies``
-    is required. ``C1`` and ``C2`` carry the result to the reference
-    meteorological conditions (clause 4).
+       L_W = L_p(\text{ST}) + 10 \lg\frac{A}{A_0} + 4.34 \frac{A}{S}
+       + 10 \lg\!\left( 1 + \frac{S c}{8 V f} \right) + C_1 + C_2 - 6
+
+    with the Sabine equivalent absorption area
+    :math:`A = (55.26/c)(V/T_{60})` and the speed of sound
+    :math:`c = 20.05 \sqrt{273 + \theta}`. The Waterhouse term
+    :math:`10 \lg(1 + Sc/(8Vf))` needs the band mid-frequencies, so
+    ``frequencies`` is required. ``C1`` and ``C2`` carry the result to the
+    reference meteorological conditions (clause 4).
 
     :param levels: Mean room SPL per band (1D) or ``(NM, NB)`` per-position
         levels, in decibels.
@@ -494,13 +515,16 @@ def sound_power_comparison(
     temperature: float = 23.0,
     static_pressure: float = 101.325,
 ) -> ReverberationSoundPowerResult:
-    """Sound power level in a reverberation room, comparison method (ISO 3741).
+    r"""Sound power level in a reverberation room, comparison method (ISO 3741).
 
     A reference sound source of known per-band sound power ``lw_ref`` is
     measured at the same microphone positions as the source under test. The
-    sound power level in each band follows Eq. (21)::
+    sound power level in each band follows Eq. (21):
 
-        LW = LW(RSS) + ( Lp(ST) - Lp(RSS) + C2 )
+    .. math::
+
+       L_W = L_W(\text{RSS}) + \left( L_p(\text{ST}) - L_p(\text{RSS}) + C_2
+       \right)
 
     where ``Lp(ST)`` and ``Lp(RSS)`` are the mean room levels (Eq. 16/17) of the
     test source and the reference source and ``C2`` is the radiation-impedance

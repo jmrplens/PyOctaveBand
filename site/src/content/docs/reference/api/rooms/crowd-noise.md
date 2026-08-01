@@ -14,44 +14,53 @@ Equations (17.50) to (17.54)) writes the two competing levels at a listener:
 
 * the **signal**, the direct field of the person across the table
   (Equation (17.50)),
-
-      Lp(signal) = Lw + 10 log10[ Q / (4 pi r^2) ]
+  $L_p^{\text{signal}} = L_W + 10 \log_{10}[Q / (4 \pi r^2)]$;
 
 * the **noise**, the reverberant field built up by `N` simultaneous talkers
   spread over the room (Equation (17.51)),
-
-      Lp(noise) = Lw + 10 log10 N + 10 log10[ 4 / (N A_tab) ]
+  $L_p^{\text{noise}} = L_W + 10 \log_{10} N + 10 \log_{10}[4 / (N A_{\text{tab}})]$;
 
 where `Lw` is the sound power level of one talker (about 70 dB for normal
 conversation), `Q` the talker's directivity factor (about 2 in the forward
 direction), `r` the talker-to-listener distance and `A_tab` the equivalent
-absorption area *per occupied table*, so that `N A_tab` is the room's total
+absorption area *per occupied table*, so that $N A_{\text{tab}}$ is the
+room's total
 absorption. Their difference is the speech-to-noise ratio (Equation (17.52)):
 
-    L_SN = 10 log10[ Q / (4 pi r^2) ] + 10 log10[ A_tab / 4 ]
+$$
+L_{SN} = 10 \log_{10}\!\left[ \frac{Q}{4 \pi r^2} \right] + 10 \log_{10}\!\left[ \frac{A_{\text{tab}}}{4} \right]
+$$
 
 which is independent of the talker's power and of the number of talkers: adding
 a table adds both a talker and its share of absorption. What decides whether a
 restaurant works is therefore the *absorption per table*, not its total
-absorption. Requiring `L_SN > -6 dB` for adequate cross-table communication
-at a separation `rs`, and `L_SN < -9 dB` for privacy between tables a
-distance `rt` apart, turns into a pair of design bounds
+absorption. Requiring $L_{SN} > -6$ dB for adequate cross-table
+communication
+at a separation `rs`, and $L_{SN} < -9$ dB for privacy between tables
+a distance `rt` apart, turns into a pair of design bounds
 (Equations (17.53) and (17.54)):
 
-    A_tab > 16 pi 10^(-0.6) rs^2 / Q  ~  6.31 rs^2   (Q = 2)
-    A_tab \< 16 pi 10^(-0.9) rt^2 / Q  ~  3.16 rt^2   (Q = 2)
+$$
+A_{\text{tab}} > 16 \pi\, 10^{-0.6}\, r_s^2 / Q \approx 6.31\, r_s^2 \quad (Q = 2)
+$$
+
+$$
+A_{\text{tab}} < 16 \pi\, 10^{-0.9}\, r_t^2 / Q \approx 3.16\, r_t^2 \quad (Q = 2)
+$$
 
 :::note
 Long prints the first constant as `6.33`; the closed form with the same
-`Q = 2` and `-6 dB` that yield his second constant `3.16` gives
+$Q = 2$ and `-6 dB` that yield his second constant `3.16` gives
 `6.31`, which is also what his own conversion of the result ("6.3 or more
 square metres (68 sq ft)") implies (see `docs/ERRATA.md`). This module
 computes both constants from [`speech_to_noise_ratio`](/phonometry/reference/api/rooms/crowd-noise/#speech_to_noise_ratio), so they stay
 mutually consistent.
 
 His prose also puts the direct field at an adjacent table 3 m away at
-"about 54 dB", where [`speech_direct_level`](/phonometry/reference/api/rooms/crowd-noise/#speech_direct_level) with the same `Q = 2`
-and `L_w = 70 dB` gives 52.5 dB. That one is left as printed rather than
+"about 54 dB", where [`speech_direct_level`](/phonometry/reference/api/rooms/crowd-noise/#speech_direct_level) with the same
+$Q = 2$
+and $L_w = 70$ dB gives 52.5 dB. That one is left as printed rather
+than
 reconciled, because the intended reading cannot be established from the
 book; it is recorded under the non-errata notes of `docs/ERRATA.md`.
 :::
@@ -83,7 +92,8 @@ absorption_per_table(
 
 Absorption per table giving a chosen `L_SN` (inverse of (17.52)).
 
-`A_tab = 16 pi r^2 10^(L_SN/10) / Q`. With `L_SN = -6 dB` this is
+$A_{\text{tab}} = 16 \pi r^2\, 10^{L_{SN}/10} / Q$. With
+$L_{SN} = -6$ dB this is
 Long's communication bound (Equation (17.53)), with `-9 dB` his privacy
 bound (Equation (17.54)).
 
@@ -149,8 +159,9 @@ crowd_noise_level(
 
 Reverberant level of `N` simultaneous talkers (Long Equation (17.51)).
 
-`Lp = Lw + 10 log10 N + 10 log10(4 / A)` with the room's total
-equivalent absorption area `A` (`= N A_tab` when the absorption is
+$L_p = L_W + 10 \log_{10} N + 10 \log_{10}(4 / A)$ with the room's
+total equivalent absorption area `A`
+($= N A_{\text{tab}}$ when the absorption is
 counted per occupied table).
 
 **Parameters**
@@ -249,8 +260,8 @@ speech_direct_level(
 
 Direct-field level of one talker (Long Equation (17.50)).
 
-`Lp = Lw + 10 log10[Q / (4 pi r^2)]`, the signal a listener across the
-table receives.
+$L_p = L_W + 10 \log_{10}[Q / (4 \pi r^2)]$, the signal a listener
+across the table receives.
 
 **Parameters**
 
@@ -275,7 +286,7 @@ speech_to_noise_ratio(
 
 Speech-to-noise ratio across a table (Long Equation (17.52)).
 
-`L_SN = 10 log10[Q / (4 pi r^2)] + 10 log10[A_tab / 4]`, the difference
+$L_{SN} = 10 \log_{10}[Q / (4 \pi r^2)] + 10 \log_{10}[A_{\text{tab}} / 4]$, the difference
 between Equations (17.50) and (17.51). Neither the talker's power nor the
 number of talkers appears: a busier room brings its own absorption with it.
 

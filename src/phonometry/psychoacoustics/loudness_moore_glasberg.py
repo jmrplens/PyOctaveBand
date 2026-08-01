@@ -591,10 +591,11 @@ def _source_levels(freqs: np.ndarray, powers: np.ndarray) -> np.ndarray:
 
 
 def _excitation_pattern(freqs: np.ndarray, levels_cochlea: np.ndarray) -> np.ndarray:
-    """Excitation ratio E/E0 at every ERB-number filter (clause 7.4).
+    r"""Excitation ratio E/E0 at every ERB-number filter (clause 7.4).
 
     Each filter is a level-dependent rounded-exponential (roex) filter
-    (Formulae 2-5): the upper skirt slope ``p_u = 4 fc / ERB_n`` is level
+    (Formulae 2-5): the upper skirt slope
+    :math:`p_u = 4 f_c / \mathrm{ERB}_n` is level
     independent while the lower skirt slope ``p_l`` decreases (broadens) with
     the source level X_j of the component it filters, giving the
     level-dependent upward spread of excitation.
@@ -811,12 +812,15 @@ def loudness_moore_glasberg_from_spectrum(
 def _third_octave_components(
     band_levels: np.ndarray,
 ) -> tuple[np.ndarray, np.ndarray]:
-    """Sinusoidal-component representation of one-third-octave levels (clause 5.5).
+    r"""Sinusoidal-component representation of one-third-octave levels
+    (clause 5.5).
 
-    Each band is treated as flat: its spectrum level is ``L_T - 10 lg(W/Hz)``
-    with band width ``W = fT (2^(1/6) - 2^(-1/6))``, and it is replaced by
-    components spaced 10 Hz apart (1 Hz for centre frequencies <= 125 Hz) with
-    a level of ``spectrum level + 10 lg(spacing/Hz)``.
+    Each band is treated as flat: its spectrum level is
+    :math:`L_T - 10 \lg(W/\text{Hz})`
+    with band width :math:`W = f_T (2^{1/6} - 2^{-1/6})`, and it is replaced
+    by components spaced 10 Hz apart (1 Hz for centre frequencies <= 125 Hz)
+    with a level of the spectrum level plus
+    :math:`10 \lg(\text{spacing}/\text{Hz})`.
     """
     freqs: list[float] = []
     levels: list[float] = []

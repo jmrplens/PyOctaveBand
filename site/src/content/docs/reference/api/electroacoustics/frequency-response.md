@@ -11,17 +11,19 @@ Two-channel (input/output) system identification from measured signals, using
 the Welch-averaged cross- and auto-spectral densities. Following Bendat &
 Piersol, *Random Data: Analysis and Measurement Procedures* (4th ed., 2010):
 
-* the **H1** estimator `H1 = Gxy / Gxx` (unbiased when the noise is on the
-  output),
-* the **H2** estimator `H2 = Gyy / Gyx` (unbiased when the noise is on the
-  input),
-* the **ordinary coherence** `γ² = |Gxy|² / (Gxx · Gyy)` ∈ [0, 1], the
-  fraction of the output power linearly explained by the input.
+* the **H1** estimator $H_1 = G_{xy} / G_{xx}$ (unbiased when the
+  noise is on the output),
+* the **H2** estimator $H_2 = G_{yy} / G_{yx}$ (unbiased when the
+  noise is on the input),
+* the **ordinary coherence**
+  $\gamma^2 = \lvert G_{xy} \rvert^2 / (G_{xx} \cdot G_{yy}) \in [0, 1]$, the fraction of the output power linearly explained by the
+  input.
 
 For a noiseless linear time-invariant path both estimators recover the true
 transfer function and the coherence is unity; additive output noise biases H2
-but not H1 and pulls the coherence down to `SNR / (1 + SNR)`, which is the
-analytic oracle used to verify the implementation.
+but not H1 and pulls the coherence down to
+$\mathrm{SNR} / (1 + \mathrm{SNR})$, which is the analytic oracle used
+to verify the implementation.
 
 > Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
 
@@ -38,11 +40,13 @@ coherence(
 ) -> tuple[NDArray[np.float64], NDArray[np.float64]]
 ```
 
-Ordinary coherence `γ²(f)` between `x` and `y` (Bendat & Piersol).
+Ordinary coherence $\gamma^2(f)$ between `x` and `y`
+(Bendat & Piersol).
 
-`γ² = |Gxy|² / (Gxx·Gyy)` ∈ [0, 1]: unity for a noiseless linear path and
-`SNR/(1+SNR)` with additive output noise. Averaging over several segments
-is required for a meaningful estimate (a single segment gives `γ² ≡ 1`).
+$\gamma^2 = \lvert G_{xy} \rvert^2 / (G_{xx} G_{yy}) \in [0, 1]$: unity for a noiseless linear path and
+$\mathrm{SNR}/(1+\mathrm{SNR})$ with additive output noise.
+Averaging over several segments is required for a meaningful estimate
+(a single segment gives $\gamma^2 \equiv 1$).
 
 **Parameters**
 
@@ -75,7 +79,8 @@ FrequencyResponseResult(
 )
 ```
 
-Estimated frequency response of an input/output path (Bendat & Piersol).
+Estimated frequency response of an input/output path (Bendat &
+Piersol).
 
 **Attributes**
 
@@ -83,9 +88,9 @@ Estimated frequency response of an input/output path (Bendat & Piersol).
 | :--- | :--- |
 | `frequencies` | Frequency axis, in Hz. |
 | `response` | Complex frequency-response estimate `H(f)`. |
-| `magnitude_db` | Magnitude `20·lg\|H\|`, in dB. |
+| `magnitude_db` | Magnitude $20 \lg \lvert H \rvert$, in dB. |
 | `phase` | Phase of `H`, in radians (unwrapped). |
-| `coherence` | Ordinary coherence `γ²(f)` ∈ [0, 1]. |
+| `coherence` | Ordinary coherence $\gamma^2(f) \in [0, 1]$. |
 | `estimator` | Estimator used (`'H1'` or `'H2'`). |
 
 ### FrequencyResponseResult.plot()
@@ -123,10 +128,11 @@ transfer_function(
 
 Estimate the frequency response from input `x` to output `y`.
 
-`H1 = Gxy / Gxx` (the default; unbiased for output noise) or
-`H2 = Gyy / Gyx` (unbiased for input noise), from Welch-averaged Hann
-segments. The ordinary coherence `γ² = |Gxy|² / (Gxx·Gyy)` is returned
-alongside as a data-quality indicator.
+$H_1 = G_{xy} / G_{xx}$ (the default; unbiased for output
+noise) or $H_2 = G_{yy} / G_{yx}$ (unbiased for input noise),
+from Welch-averaged Hann segments. The ordinary coherence
+$\gamma^2 = \lvert G_{xy} \rvert^2 / (G_{xx} G_{yy})$ is
+returned alongside as a data-quality indicator.
 
 **Parameters**
 

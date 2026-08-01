@@ -19,13 +19,13 @@ informative Table B.1 (Annex B).
 practical coefficient is the arithmetic mean of the three one-third-octave
 coefficients it contains:
 
-```text
-alpha_p,i = (alpha_i1 + alpha_i2 + alpha_i3) / 3
-```
+$$
+\alpha_{p,i} = \frac{\alpha_{i1} + \alpha_{i2} + \alpha_{i3}}{3}
+$$
 
 The mean is evaluated to the second decimal and then rounded in steps of
-0,05 (the NOTE of Clause 4.1 gives `0,92 -> 0,90`); rounded means above
-1,00 are set to 1,00. The five rating bands are 250, 500, 1000, 2000 and
+0.05 (the NOTE of Clause 4.1 gives $0.92 \to 0.90$); rounded means
+above 1.00 are set to 1.00. The five rating bands are 250, 500, 1000, 2000 and
 4000 Hz, fed from the fifteen one-third octaves 200 Hz to 5000 Hz.
 
 **Weighted absorption (Clause 4.2).** The fixed reference curve of Figure 1
@@ -94,7 +94,7 @@ Weighted sound absorption rating (ISO 11654:1997).
 | `alpha_w` | Weighted sound absorption coefficient `alpha_w`, the shifted reference curve read at 500 Hz (Clause 4.2). A multiple of 0,05 in `[0, 1]`. |
 | `shape_indicator` | Concatenated shape indicators, `L`/`M`/`H` in that order, or an empty string when none applies (Clause 4.3). |
 | `absorption_class` | Sound absorption class `A`-`E` or `"Not classified"` from Table B.1 (Annex B). |
-| `shift` | Downward shift applied to the reference curve, in absorption units (Clause 4.2); `alpha_w == 1.00 - shift`. |
+| `shift` | Downward shift applied to the reference curve, in absorption units (Clause 4.2); $\alpha_w = 1.00 - \text{shift}$. |
 | `unfavourable_sum` | Sum of the unfavourable deviations at the final shift (Clause 4.2); at most 0,10. |
 | `band_centers` | Octave rating-band centre frequencies, in Hz (250 Hz to 4000 Hz). |
 | `measured` | Practical absorption coefficients `alpha_p` used for the rating (snapped to the 0,05 grid of Clause 4.1). |

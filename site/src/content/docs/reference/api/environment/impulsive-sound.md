@@ -10,7 +10,7 @@ Objective prominence of impulsive sounds and the `LAeq` adjustment
 
 ISO/PAS 1996-3 objectively categorises a source by how prominently its
 impulsive sound is perceived and derives an adjustment `KI` (typically in the
-range 0,0 dB to 9,0 dB) that is added to `LAeq`. Unlike the closed-form
+range 0.0 dB to 9.0 dB) that is added to `LAeq`. Unlike the closed-form
 [`impulse_prominence`](/phonometry/reference/api/environment/impulse-prominence/) helpers (NT ACOU 112, which
 take the onset rate and level difference as inputs), this module implements the
 *objective measurement chain* that reads those quantities directly from a
@@ -24,14 +24,19 @@ The chain follows the standard:
   gradient exceeds 10 dB/s; its **starting** and **end** points are found from
   procedures a) to d) of Clause 4, merging events separated by less than 50 ms
   (Clause 3.3, Figure 2);
-* for each onset the **level difference** `LD = Le - Ls` and the **onset
+* for each onset the **level difference** $\mathrm{LD} = L_e - L_s$
+  and the **onset
   rate** `OR` (the least-squares slope over the onset) are measured
   (Clauses 3.4, 3.5, Figures 1 and 2);
-* the **prominence** `P = 3*lg(OR) + 2*lg(LD)` follows (Clause 5, Formula 2)
+* the **prominence**
+  $P = 3 \cdot \lg(\mathrm{OR}) + 2 \cdot \lg(\mathrm{LD})$ follows
+  (Clause 5, Formula 2)
   and the impulse with the highest `P` gives the **adjustment**
-  `KI = 1.8*(P - 5)` dB for `P > 5`, else 0 dB (Clause 6, Formula 3);
-* the source is categorised (Clause 7) as *not impulsive* (`KI = 0`),
-  *regular impulsive* (`0 < KI <= 5`) or *highly impulsive* (`KI > 5`).
+  $K_I = 1.8 \cdot (P - 5)$ dB for $P > 5$, else 0 dB (Clause 6,
+  Formula 3);
+* the source is categorised (Clause 7) as *not impulsive* ($K_I = 0$),
+  *regular impulsive* ($0 < K_I \le 5$) or *highly impulsive*
+  ($K_I > 5$).
 
 The prominence and adjustment formulae are shared with NT ACOU 112 (both derive
 from Pedersen's method) and are reused from
@@ -60,7 +65,8 @@ Applies procedures a) to d) of the standard: the starting point is the
 first sample where the gradient exceeds 10 dB/s, the end point the first
 later sample where it drops below 10 dB/s, and onsets separated by less
 than 50 ms are merged. Each onset carries its level difference
-`LD = Le - Ls` (3.4), its onset rate (3.5) and its prominence `P`.
+$\mathrm{LD} = L_e - L_s$ (3.4), its onset rate (3.5) and its
+prominence `P`.
 
 **Parameters**
 
@@ -107,7 +113,7 @@ A single detected onset of `LpAF` (ISO/PAS 1996-3, Clause 3).
 | `time_end` | Time of the end point, in seconds. |
 | `level_start` | Level `Ls` at the starting point, in dB. |
 | `level_end` | Level `Le` at the end point, in dB. |
-| `level_difference` | Level difference `LD = Le - Ls`, in dB (3.4). |
+| `level_difference` | Level difference $\mathrm{LD} = L_e - L_s$, in dB (3.4). |
 | `onset_rate` | Onset rate `OR`, in dB/s, the least-squares slope over the onset (3.5). |
 | `prominence` | Predicted prominence `P` of this onset (Formula 2). |
 | `qualifies` | Whether the onset rate exceeds 10 dB/s, so the onset can contribute an adjustment (Clause 6). |
@@ -231,7 +237,8 @@ sound_pressure_level_history(
 
 A frequency-weighted, F time-weighted level history `LpAF` (Clause 4).
 
-The signal is A-weighted (IEC 61672-1), F time-weighted (`tau = 125 ms`)
+The signal is A-weighted (IEC 61672-1), F time-weighted
+($\tau = 125$ ms)
 and sampled at intervals `dt` in the 10-25 ms range required by the
 standard.
 

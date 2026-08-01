@@ -1,10 +1,11 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""
+r"""
 Cepstral analysis: real/power/complex cepstrum, liftering and echo detection.
 
 The **cepstrum** is the inverse Fourier transform of the logarithm of a
-spectrum. Because the log turns the convolution ``x = h * u`` into the sum
-``ln X = ln H + ln U`` (Havelock, Kahle & Cocchi (eds.), *Handbook of Signal
+spectrum. Because the log turns the convolution :math:`x = h * u` into the
+sum :math:`\ln X = \ln H + \ln U` (Havelock, Kahle & Cocchi (eds.),
+*Handbook of Signal
 Processing in Acoustics*, Springer 2008: Milner, Ch. 27, Eqs. (22)-(23)),
 components that overlap hopelessly in the spectrum separate cleanly in the
 cepstral domain -- the smooth spectral envelope collapses onto the low
@@ -13,29 +14,38 @@ periodic spectral ripple from harmonics, reflections or echoes concentrates
 at the quefrency of its period. Three variants are standard:
 
 * the **power cepstrum**, the inverse transform of the log *power* spectrum
-  ``ln|X|^2`` (Milner Fig. 21) -- real, even, phase-blind. (Convention
-  note: Bogert, Healy & Tukey's original 1963 power cepstrum squares once
-  more, ``|IDFT(ln|X|^2)|^2``; this module follows Milner's linear
-  ``IDFT(ln|X|^2)`` throughout.);
-* the **real cepstrum**, the inverse transform of ``ln|X|`` -- exactly half
+  :math:`\ln \lvert X \rvert^2` (Milner Fig. 21) -- real, even,
+  phase-blind. (Convention note: Bogert, Healy & Tukey's original 1963
+  power cepstrum squares once more,
+  :math:`\lvert \operatorname{IDFT}(\ln \lvert X \rvert^2) \rvert^2`; this
+  module follows Milner's linear
+  :math:`\operatorname{IDFT}(\ln \lvert X \rvert^2)` throughout.);
+* the **real cepstrum**, the inverse transform of
+  :math:`\ln \lvert X \rvert` -- exactly half
   the power cepstrum, and the quantity whose causal folding yields the
   minimum-phase reconstruction of :func:`phonometry.minimum_phase`
   (Bendat & Piersol, *Random Data*, 4th ed., Sec. 13.1.4; Tohyama in
   Havelock Ch. 75 manipulates minimum-phase and all-pass components the
   same way);
 * the **complex cepstrum**, the inverse transform of the full complex
-  logarithm ``ln|X| + j arg X`` with the phase unwrapped (Neelamani in
+  logarithm :math:`\ln \lvert X \rvert + j \arg X` with the phase
+  unwrapped (Neelamani in
   Havelock Ch. 87, Eq. (14)) -- invertible, hence the engine of
   homomorphic deconvolution.
 
-**Echoes.** A single reflection ``x(t) = s(t) + a s(t - t0)`` multiplies the
-spectrum by ``1 + a e^{-j 2 pi f t0}``, whose complex logarithm expands (for
-``|a| < 1``) into the exactly summable series
+**Echoes.** A single reflection :math:`x(t) = s(t) + a s(t - t_0)`
+multiplies the spectrum by :math:`1 + a e^{-j 2 \pi f t_0}`, whose complex
+logarithm expands (for :math:`\lvert a \rvert < 1`) into the exactly
+summable series
 
-``ln(1 + a e^{-j theta}) = sum_{n>=1} (-1)^{n+1} (a^n / n) e^{-j n theta}``,
+.. math::
 
-so the cepstrum carries a spike train at the *rahmonics* ``n t0`` with
-amplitudes ``a, -a^2/2, a^3/3, ...`` (their sum is ``ln(1 + a)``): a peak at
+   \ln(1 + a e^{-j \theta})
+   = \sum_{n \ge 1} (-1)^{n+1} \frac{a^n}{n} e^{-j n \theta}
+
+so the cepstrum carries a spike train at the *rahmonics* :math:`n t_0` with
+amplitudes :math:`a, -a^2/2, a^3/3, \ldots` (their sum is
+:math:`\ln(1 + a)`): a peak at
 exactly the echo delay whose height reads out the reflection coefficient.
 :func:`echo_detection` automates that reading on the power cepstrum, where
 the first rahmonic's height is ``a`` itself.
@@ -422,7 +432,7 @@ def _parabolic_offset(
 
 @dataclass(frozen=True)
 class EchoDetectionResult:
-    """An echo delay and reflection coefficient read off the power cepstrum.
+    r"""An echo delay and reflection coefficient read off the power cepstrum.
 
     :ivar quefrencies: Quefrency axis, in seconds.
     :ivar cepstrum: Power cepstrum searched.
@@ -436,13 +446,15 @@ class EchoDetectionResult:
         is read, so ``delay`` differs from ``delay_samples/fs`` by the
         interpolated sub-sample offset (at most half a sample).
     :ivar reflection_coefficient: Signed cepstrum value at the peak sample.
-        For a single in-record echo ``x(t) = s(t) + a s(t - t0)`` the power
-        cepstrum's first rahmonic height is exactly ``a`` -- of either sign
-        -- (the ``n = 1`` term of the ``ln(1 + a e^{-j theta})`` series),
-        so the value estimates the reflection coefficient directly,
-        including its polarity. When the true delay falls between samples
-        the rahmonic is split across neighbouring quefrency bins and the
-        reported coefficient underestimates ``|a|`` (down to roughly 65 %
+        For a single in-record echo
+        :math:`x(t) = s(t) + a s(t - t_0)` the power cepstrum's first
+        rahmonic height is exactly ``a`` -- of either sign -- (the
+        :math:`n = 1` term of the :math:`\ln(1 + a e^{-j \theta})`
+        series), so the value estimates the reflection coefficient
+        directly, including its polarity. When the true delay falls
+        between samples the rahmonic is split across neighbouring
+        quefrency bins and the reported coefficient underestimates
+        :math:`\lvert a \rvert` (down to roughly 65 %
         of it for a delay midway between samples); the interpolated
         :attr:`delay` is unaffected.
     :ivar search_range: The ``(min, max)`` quefrency band searched, s.
@@ -481,16 +493,17 @@ def echo_detection(
     max_quefrency: float | None = None,
     nfft: int | None = None,
 ) -> EchoDetectionResult:
-    """
+    r"""
     Detect an echo as the largest power-cepstrum peak in a quefrency band.
 
-    A reflection ``x(t) = s(t) + a s(t - t0)`` leaves a spike of height
-    ``a`` -- positive or negative with the sign of the reflection -- at
-    quefrency ``t0`` in the power cepstrum (module note; the seismic
+    A reflection :math:`x(t) = s(t) + a s(t - t_0)` leaves a spike of
+    height ``a`` -- positive or negative with the sign of the reflection --
+    at quefrency :math:`t_0` in the power cepstrum (module note; the
+    seismic
     reverberation spike trains of Neelamani Sec. 3.3 are the same
     signature), regardless of the spectrum of ``s`` itself, which
     concentrates at low quefrencies. The peak is therefore picked on
-    ``|cepstrum|``, so an inverting reflection (``a < 0``, e.g. a
+    ``|cepstrum|``, so an inverting reflection (:math:`a < 0`, e.g. a
     pressure-release boundary) is found at its true delay, and the
     *signed* cepstrum value at the peak is returned as the reflection
     coefficient. The search band starts above the low-quefrency region

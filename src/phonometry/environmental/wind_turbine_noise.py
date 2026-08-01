@@ -1,5 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""
+r"""
 Wind-turbine acoustic noise (IEC 61400-11:2012+A1:2018).
 
 Two closed-form quantities of the standard:
@@ -7,7 +7,8 @@ Two closed-form quantities of the standard:
 * :func:`apparent_sound_power_level` -- the A-weighted apparent sound power
   level ``L_WA`` referred to the equivalent point source at the rotor centre,
   from the ground-board sound pressure level and the slant distance
-  (:func:`slant_distance`), ``L_WA = L_p − 6 + 10·lg(4π R1²/S0)`` (Formula 26).
+  (:func:`slant_distance`),
+  :math:`L_{WA} = L_p - 6 + 10 \cdot \lg(4\pi R_1^2/S_0)` (Formula 26).
 * :func:`wind_turbine_tonality` -- the tonal-audibility chain (Formulae 30-34):
   the critical bandwidth (:func:`critical_bandwidth`), the masking-noise level,
   the tonality and the audibility criterion, giving the tonal audibility
@@ -63,12 +64,13 @@ def _positive(value: float, name: str) -> float:
 def slant_distance(
     hub_height: float, rotor_diameter: float, *, rotor_axis: str = "horizontal"
 ) -> float:
-    """Slant distance ``R1`` from the rotor centre to the ground microphone.
+    r"""Slant distance ``R1`` from the rotor centre to the ground microphone.
 
     With the reference microphone on the ground at the horizontal distance
     ``R0`` and the rotor centre at height ``H``, the slant distance is
-    ``R1 = sqrt(H² + R0²)``. For a horizontal-axis turbine ``R0 = H + D/2``
-    (IEC 61400-11 Formula 1); for a vertical-axis turbine ``R0 = H + D``
+    :math:`R_1 = \sqrt{H^2 + R_0^2}`. For a horizontal-axis turbine
+    :math:`R_0 = H + D/2`
+    (IEC 61400-11 Formula 1); for a vertical-axis turbine :math:`R_0 = H + D`
     (Formula 2, with ``H`` the height of the equator of the rotor).
 
     :param hub_height: Hub height ``H`` (ground to rotor centre; for a
@@ -94,11 +96,12 @@ def slant_distance(
 def apparent_sound_power_level(
     band_levels: float | NDArray[np.float64] | list[float], r1: float
 ) -> float:
-    """A-weighted apparent sound power level ``L_WA`` (IEC 61400-11 Formula 26).
+    r"""A-weighted apparent sound power level ``L_WA`` (IEC 61400-11 Formula 26).
 
-    ``L_WA,i = L_p,i − 6 + 10·lg(4π R1²/S0)`` per one-third-octave band, energy
+    :math:`L_{WA,i} = L_{p,i} - 6 + 10 \cdot \lg(4\pi R_1^2/S_0)` per
+    one-third-octave band, energy
     summed over bands (Formula 27). The ``−6 dB`` accounts for the ground-board
-    pressure doubling; ``S0 = 1 m²``.
+    pressure doubling; :math:`S_0 = 1` m².
 
     :param band_levels: Background-corrected A-weighted band sound pressure
         levels ``L_p,i``, in dB (scalar or per band). The 61400-11-specific
@@ -121,9 +124,10 @@ def apparent_sound_power_level(
 
 
 def critical_bandwidth(fc: float) -> float:
-    """Critical bandwidth about a tone (IEC 61400-11 Formula 30), in Hz.
+    r"""Critical bandwidth about a tone (IEC 61400-11 Formula 30), in Hz.
 
-    ``CBW = 25 + 75·[1 + 1.4·(fc/1000)²]^0.69``. For a candidate tone in the
+    :math:`\mathrm{CBW} = 25 + 75 \cdot [1 + 1.4 \cdot
+    (f_c/1000)^2]^{0.69}`. For a candidate tone in the
     20-70 Hz range the critical band is fixed to 20-120 Hz (100 Hz wide),
     per subclause 9.5.3.
 
@@ -169,7 +173,7 @@ _LA_OFFSET, _LA_PIVOT, _LA_EXP = -2.0, 502.0, 2.5
 
 @dataclass(frozen=True)
 class WindTurbineTonalityResult:
-    """Tonal audibility of a narrowband spectrum (IEC 61400-11).
+    r"""Tonal audibility of a narrowband spectrum (IEC 61400-11).
 
     :ivar tone_frequency: The frequency of the identified tone: the spectral
         line with the highest level among the lines classified as "tone"
@@ -179,11 +183,12 @@ class WindTurbineTonalityResult:
     :ivar critical_bandwidth: The critical bandwidth about the candidate, Hz.
     :ivar tone_level: Tone level ``L_pt`` (energy sum of the tone lines), in dB.
     :ivar masking_level: Masking-noise level ``L_pn``, in dB.
-    :ivar tonality: Tonality ``ΔL_tn = L_pt − L_pn``, in dB.
+    :ivar tonality: Tonality :math:`\Delta L_{tn} = L_{pt} - L_{pn}`, in dB.
     :ivar audibility_criterion: The criterion ``L_a`` (Formula 34), in dB.
-    :ivar tonal_audibility: Tonal audibility ``ΔL_a = ΔL_tn − L_a``, in dB.
+    :ivar tonal_audibility: Tonal audibility
+        :math:`\Delta L_a = \Delta L_{tn} - L_a`, in dB.
     :ivar is_audible: Whether an identified tone is audible
-        (``ΔL_a > 0`` *and* ``has_identified_tone``).
+        (:math:`\Delta L_a > 0` *and* ``has_identified_tone``).
     :ivar has_identified_tone: Whether the candidate passed the 9.5.2
         possible-tone screening *and* at least one spectral line was
         classified as "tone" (subclause 9.5.4). When ``False`` the numeric
@@ -330,16 +335,17 @@ def wind_turbine_tonality(
     *,
     tone_frequency: float | None = None,
 ) -> WindTurbineTonalityResult:
-    """Tonal audibility of a narrowband spectrum (IEC 61400-11 Formulae 30-34).
+    r"""Tonal audibility of a narrowband spectrum (IEC 61400-11 Formulae 30-34).
 
     From a uniformly-spaced narrowband spectrum, screens the candidate as a
     possible tone (subclause 9.5.2: a local maximum more than 6 dB above the
     critical-band energy average excluding the maximum and its two adjacent
     lines), classifies the lines in the critical band about the candidate into
     masking noise and tone lines, forms the masking-noise level ``L_pn``
-    (Formula 31), the tonality ``ΔL_tn = L_pt − L_pn`` (Formula 32), the
+    (Formula 31), the tonality :math:`\Delta L_{tn} = L_{pt} - L_{pn}`
+    (Formula 32), the
     audibility criterion ``L_a`` (Formula 34) and the tonal audibility
-    ``ΔL_a = ΔL_tn − L_a`` (Formula 33).
+    :math:`\Delta L_a = \Delta L_{tn} - L_a` (Formula 33).
 
     Per subclause 9.5.3 the tone lines are those above ``L_pn,avg + 6 dB``
     *and* within 10 dB of the highest such line; the frequency of the tone is

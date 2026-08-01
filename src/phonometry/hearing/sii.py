@@ -291,12 +291,13 @@ class _BandProcedure:
 
 
 def _masking_geometry(edges: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
-    """Masking-slope bandwidth term and band separation from band limits.
+    r"""Masking-slope bandwidth term and band separation from band limits.
 
     For a procedure whose bands are given by their limits (the critical-band
     and equally-contributing critical-band procedures of Tables 1 and 2), the
-    masking slope of clause 5.4 uses the band width ``Wi = fi_upper -
-    fi_lower`` and the masking spreads from the upper limit of the masker band
+    masking slope of clause 5.4 uses the band width
+    :math:`W_i = f_{i,\text{upper}} - f_{i,\text{lower}}`
+    and the masking spreads from the upper limit of the masker band
     ``k`` up to the (geometric) centre frequency of the masked band ``i``.
     """
     lower, upper = edges[:-1], edges[1:]
@@ -306,18 +307,21 @@ def _masking_geometry(edges: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
 
 
 def _third_octave_geometry() -> tuple[np.ndarray, np.ndarray]:
-    """Masking-slope bandwidth term and band separation of Table 3.
+    r"""Masking-slope bandwidth term and band separation of Table 3.
 
     The one-third-octave procedure states the same geometry in terms of the
-    band centre frequencies instead of the band limits, with the two constants
-    of clause 5.4 printed rounded: ``10 log10(Wi) = 10 log10(fi) - 6.353``
-    (a one-third-octave band is ``0.2316 fi`` wide) and the separation
-    ``0.89 fi / fk`` (the upper limit of band ``k`` is ``2**(1/6) fk``). The
+    band centre frequencies instead of the band limits, with the two
+    constants of clause 5.4 printed rounded:
+    :math:`10 \log_{10}(W_i) = 10 \log_{10}(f_i) - 6.353`
+    (a one-third-octave band is :math:`0.2316 f_i` wide) and the separation
+    :math:`0.89 f_i / f_k` (the upper limit of band ``k`` is
+    :math:`2^{1/6} f_k`). The
     printed constants are used as printed, so the procedure reproduces the
     standard's own worked examples digit for digit.
 
     The ``6.353`` is deliberately *not* folded into the returned array. The
-    standard prints this slope as ``-80 + 0.6 (Bi + 10 lg fi - 6.353)``, which
+    standard prints this slope as
+    :math:`-80 + 0.6 (B_i + 10 \lg f_i - 6.353)`, which
     evaluates as ``(Bi + 10 lg fi) - 6.353``; folding the constant in first
     would evaluate ``Bi + (10 lg fi - 6.353)`` instead, and floating-point
     addition is not associative. The two differ in the last bits, so the fold
@@ -628,10 +632,11 @@ def _as_band_vector(
 def _equivalent_masking(
     noise: np.ndarray, self_masked: np.ndarray, procedure: _BandProcedure
 ) -> np.ndarray:
-    """Equivalent masking spectrum level ``Zi`` of clause 5.4.
+    r"""Equivalent masking spectrum level ``Zi`` of clause 5.4.
 
     The masker level ``Bi`` of each band spreads upward in frequency with the
-    level-dependent slope ``Ci = -80 + 0.6 (Bi + 10 log10 Wi)`` dB per decade,
+    level-dependent slope :math:`C_i = -80 + 0.6 (B_i + 10 \log_{10} W_i)`
+    dB per decade,
     and the spread contributions add on an energy basis to the equivalent noise
     of the masked band. The octave-band procedure carries no spread of masking,
     so its equivalent masking spectrum level is the equivalent noise spectrum

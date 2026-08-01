@@ -1,5 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""
+r"""
 Whole-body vibration containing multiple shocks (ISO 2631-5:2018).
 
 Implements the normative Clause 5 spinal-response model and the Annex C
@@ -8,29 +8,51 @@ assessment of adverse health effects for the vertical (``z``) axis.
 The 2018 edition is vertical-axis only by design: clause 4 (delineation,
 item a) neglects the ``x`` and ``y`` contributions to spinal compression, the
 seat-to-spine transfer function of clause 5.2 is the vertical seat-to-lumbar
-response, and the Annex C stress conversion ``mz`` is the vertical one. The
-horizontal spinal model of the withdrawn 2004 edition is not reproduced.
+response, and the Annex C stress conversion :math:`m_z` is the vertical one.
+The horizontal spinal model of the withdrawn 2004 edition is not reproduced.
 Assess horizontal whole-body exposure with the ISO 2631-1 metrics in this
 domain instead: the weighted r.m.s. acceleration
 (:func:`~phonometry.vibration.weighted_acceleration`) and the vibration dose
 value (:func:`~phonometry.vibration.vibration_dose_value`).
 
-A seat-to-spine transfer function ``H(w)`` (clause 5.2, Formula 1) maps the
-measured seat acceleration ``az(t)`` to the spinal response acceleration
-``Az(t) = F^-1[H(w) * F[az(t)]]`` (Formula 2). The standard assumes a
-*conditioned* input: ``H`` has unity transmissibility at 0 Hz, so any DC
-offset in the record (e.g. the gravity component of a non-AC-coupled
-accelerometer) passes straight into ``Az(t)`` and corrupts the response
-peaks; remove the mean (high-pass) before processing. The acceleration
-dose is
-``Dz = 1.07 * (sum_i Az,i**6)**(1/6)`` over the positive response peaks
-(Formula 3), scaled to a daily dose ``Dzd = Dz * (td/tm)**(1/6)`` (Formula 4/5).
+A seat-to-spine transfer function :math:`H(\omega)` (clause 5.2, Formula 1)
+maps the measured seat acceleration :math:`a_z(t)` to the spinal response
+acceleration
 
-Annex C turns the daily dose into an injury risk: the daily compressive stress
-``Sd = mz * Dzd`` (Formula C.1), the age-cumulated stress variable
-``R = [sum_i (Sd * N**(1/6) / (Su,i - Sstat))**6]**(1/6)`` (Formulae C.3/C.4)
-and the Weibull probability of lumbar injury ``P = 1 - exp(-(R/alpha)**beta)``
-(Formula C.5, Table C.1).
+.. math::
+
+   A_z(t) = F^{-1}[H(\omega) \, F[a_z(t)]] \tag{Formula 2}
+
+The standard assumes a *conditioned* input: :math:`H` has unity
+transmissibility at 0 Hz, so any DC offset in the record (e.g. the gravity
+component of a non-AC-coupled accelerometer) passes straight into
+:math:`A_z(t)` and corrupts the response peaks; remove the mean (high-pass)
+before processing. The acceleration dose is
+
+.. math::
+
+   D_z = 1.07 \left( \sum_i A_{z,i}^6 \right)^{1/6} \tag{Formula 3}
+
+over the positive response peaks, scaled to a daily dose
+
+.. math::
+
+   D_{zd} = D_z \, (t_d/t_m)^{1/6} \tag{Formula 4/5}
+
+Annex C turns the daily dose into an injury risk: the daily compressive
+stress :math:`S_d` (Formula C.1), the age-cumulated stress variable
+:math:`R` (Formulae C.3/C.4) and the Weibull probability of lumbar injury
+:math:`P` (Formula C.5, Table C.1):
+
+.. math::
+
+   S_d = m_z D_{zd} \tag{Formula C.1}
+
+   R = \left[ \sum_i \left(
+   S_d N^{1/6} / (S_{u,i} - S_\text{stat})
+   \right)^6 \right]^{1/6} \tag{Formulae C.3/C.4}
+
+   P = 1 - \exp\left(-(R/\alpha)^\beta\right) \tag{Formula C.5}
 
 The Annex A / Annex E model (intervertebral compressive forces via a
 finite-element model distributed by ISO) is not reproducible from the standard
@@ -115,7 +137,8 @@ def _mz_for_sex(sex: str) -> float:
 
 
 def seat_to_spine_transfer(frequencies: ArrayLike) -> np.ndarray:
-    """Seat-to-spine transfer function ``H(w)`` (clause 5.2, Formula 1).
+    r"""Seat-to-spine transfer function :math:`H(\omega)` (clause 5.2,
+    Formula 1).
 
     A single complex zero and six complex poles map the seat acceleration to
     the vertical spinal response; the transmissibility is unity at 0 Hz.
@@ -134,7 +157,7 @@ def seat_to_spine_transfer(frequencies: ArrayLike) -> np.ndarray:
 
 
 def spinal_response(acceleration: ArrayLike, fs: float) -> np.ndarray:
-    """Vertical spinal response ``Az(t)`` (clause 5.2, Formula 2).
+    r"""Vertical spinal response :math:`A_z(t)` (clause 5.2, Formula 2).
 
     Applies the seat-to-spine transfer function to the measured conditioned
     seat acceleration in the frequency domain and returns the time-domain
@@ -143,14 +166,15 @@ def spinal_response(acceleration: ArrayLike, fs: float) -> np.ndarray:
     The input must be **conditioned (DC-removed)**: the transfer function is
     unity at 0 Hz by design (clause 5.2), so a DC offset (e.g. the 1 g
     gravity component of a DC-coupled accelerometer) is passed unattenuated
-    and produces a spurious constant shift in ``Az(t)`` that corrupts the
-    positive response peaks of the dose. Subtract the mean (or high-pass) of
-    ``az(t)`` before calling.
+    and produces a spurious constant shift in :math:`A_z(t)` that corrupts
+    the positive response peaks of the dose. Subtract the mean (or
+    high-pass) of :math:`a_z(t)` before calling.
 
     :param acceleration: Measured, conditioned (zero-mean) vertical seat
-        acceleration ``az(t)``, m/s2.
+        acceleration :math:`a_z(t)`, m/s2.
     :param fs: Sampling frequency, in hertz.
-    :return: The spinal response acceleration ``Az(t)``, m/s2, same length.
+    :return: The spinal response acceleration :math:`A_z(t)`, m/s2, same
+        length.
     """
     fs = require_positive(fs, "fs")
     az = np.asarray(acceleration, dtype=np.float64)
@@ -165,12 +189,12 @@ def spinal_response(acceleration: ArrayLike, fs: float) -> np.ndarray:
 
 
 def response_peaks(response: ArrayLike) -> np.ndarray:
-    """Positive response peaks ``Az,i`` (clause 5.3).
+    r"""Positive response peaks :math:`A_{z,i}` (clause 5.3).
 
     A peak is the maximum value of the response between two consecutive zero
     crossings; only positive peaks are counted.
 
-    :param response: The spinal response acceleration ``Az(t)``.
+    :param response: The spinal response acceleration :math:`A_z(t)`.
     :return: The positive peak values, in the order they occur.
     """
     sig = require_1d_signal(response, name="response")
@@ -188,10 +212,12 @@ def response_peaks(response: ArrayLike) -> np.ndarray:
 
 
 def dose_from_peaks(peaks: ArrayLike) -> float:
-    """Acceleration dose ``Dz`` from response peaks (clause 5.3, Formula 3).
+    r"""Acceleration dose :math:`D_z` from response peaks (clause 5.3,
+    Formula 3).
 
-    :param peaks: The positive response peaks ``Az,i``, m/s2.
-    :return: The acceleration dose ``Dz = 1.07 * (sum Az,i**6)**(1/6)``, m/s2.
+    :param peaks: The positive response peaks :math:`A_{z,i}`, m/s2.
+    :return: The acceleration dose
+        :math:`D_z = 1.07 \left( \sum A_{z,i}^6 \right)^{1/6}`, m/s2.
     """
     az = np.asarray(peaks, dtype=np.float64).ravel()
     if az.size == 0:
@@ -201,7 +227,7 @@ def dose_from_peaks(peaks: ArrayLike) -> float:
 
 
 def acceleration_dose(acceleration: ArrayLike, fs: float) -> float:
-    """Acceleration dose ``Dz`` from a seat acceleration time history.
+    r"""Acceleration dose :math:`D_z` from a seat acceleration time history.
 
     Filters the acceleration through the seat-to-spine transfer function
     (Formula 2), takes the positive response peaks and combines them by
@@ -209,21 +235,22 @@ def acceleration_dose(acceleration: ArrayLike, fs: float) -> float:
     :func:`spinal_response`.
 
     :param acceleration: Measured, conditioned (zero-mean) vertical seat
-        acceleration ``az(t)``, m/s2.
+        acceleration :math:`a_z(t)`, m/s2.
     :param fs: Sampling frequency, in hertz.
-    :return: The acceleration dose ``Dz``, m/s2.
+    :return: The acceleration dose :math:`D_z`, m/s2.
     """
     return dose_from_peaks(response_peaks(spinal_response(acceleration, fs)))
 
 
 def daily_dose(dose: float, exposure_time: float, measurement_time: float) -> float:
-    """Daily acceleration dose ``Dzd`` (clause 5.3, Formula 4).
+    r"""Daily acceleration dose :math:`D_{zd}` (clause 5.3, Formula 4).
 
-    :param dose: The measured acceleration dose ``Dz``, m/s2.
-    :param exposure_time: Daily exposure period ``td`` (any time unit).
-    :param measurement_time: Period ``tm`` over which ``Dz`` was measured
-        (same unit as ``exposure_time``).
-    :return: The daily dose ``Dzd = Dz * (td/tm)**(1/6)``, m/s2.
+    :param dose: The measured acceleration dose :math:`D_z`, m/s2.
+    :param exposure_time: Daily exposure period :math:`t_d` (any time
+        unit).
+    :param measurement_time: Period :math:`t_m` over which :math:`D_z`
+        was measured (same unit as ``exposure_time``).
+    :return: The daily dose :math:`D_{zd} = D_z (t_d/t_m)^{1/6}`, m/s2.
     """
     if not measurement_time > 0.0 or not exposure_time > 0.0:
         raise ValueError("exposure_time and measurement_time must be positive.")
@@ -233,13 +260,17 @@ def daily_dose(dose: float, exposure_time: float, measurement_time: float) -> fl
 def daily_dose_multi(
     doses: ArrayLike, exposure_times: ArrayLike, measurement_times: ArrayLike
 ) -> float:
-    """Daily dose from several exposure conditions (clause 5.3, Formula 5).
+    r"""Daily dose from several exposure conditions (clause 5.3, Formula 5).
 
-    :param doses: Acceleration dose ``Dz,j`` of each condition, m/s2.
-    :param exposure_times: Daily exposure duration ``td,j`` of each condition.
-    :param measurement_times: Measurement duration ``tm,j`` of each condition.
+    :param doses: Acceleration dose :math:`D_{z,j}` of each condition,
+        m/s2.
+    :param exposure_times: Daily exposure duration :math:`t_{d,j}` of
+        each condition.
+    :param measurement_times: Measurement duration :math:`t_{m,j}` of
+        each condition.
     :return: The combined daily dose
-        ``Dzd = [sum_j Dz,j**6 * (td,j/tm,j)]**(1/6)``, m/s2.
+        :math:`D_{zd} = \left[ \sum_j D_{z,j}^6 \,
+        (t_{d,j}/t_{m,j}) \right]^{1/6}`, m/s2.
     """
     dz = np.asarray(doses, dtype=np.float64).ravel()
     td = np.asarray(exposure_times, dtype=np.float64).ravel()
@@ -260,27 +291,32 @@ def daily_dose_multi(
 
 
 def compression_dose(daily_dose_value: float, *, mz: float = MZ_MALE) -> float:
-    """Daily compressive stress ``Sd`` (Annex C, Formula C.1).
+    r"""Daily compressive stress :math:`S_d` (Annex C, Formula C.1).
 
-    :param daily_dose_value: The daily acceleration dose ``Dzd``, m/s2.
-    :param mz: Stress conversion ``mz`` (MPa per m/s2); default the 82 kg male
-        value :data:`MZ_MALE`. See :data:`MZ_FEMALE`.
-    :return: The daily compressive stress ``Sd = mz * Dzd``, MPa.
+    :param daily_dose_value: The daily acceleration dose :math:`D_{zd}`,
+        m/s2.
+    :param mz: Stress conversion :math:`m_z` (MPa per m/s2); default the
+        82 kg male value :data:`MZ_MALE`. See :data:`MZ_FEMALE`.
+    :return: The daily compressive stress :math:`S_d = m_z D_{zd}`, MPa.
     """
     return mz * daily_dose_value
 
 
 def static_stress(mz: float = MZ_MALE) -> float:
-    """Static compressive stress ``Sstat = mz * 9.81`` (Annex C), MPa."""
+    r"""Static compressive stress :math:`S_\text{stat} = m_z \cdot 9.81`
+    (Annex C), MPa."""
     return mz * GRAVITY
 
 
 def ultimate_strength(age: ArrayLike, *, sex: Literal["male", "female"] = "male") -> np.ndarray:
-    """Ultimate lumbar strength ``Su`` at an age (Annex C, Formula C.4).
+    r"""Ultimate lumbar strength :math:`S_u` at an age (Annex C,
+    Formula C.4).
 
-    :param age: Age ``b + i``, in years.
-    :param sex: ``"male"`` or ``"female"`` (sets the age slope ``Sage``).
-    :return: The ultimate strength ``Su = 6.75 - Sage*(b+i)``, MPa.
+    :param age: Age :math:`b + i`, in years.
+    :param sex: ``"male"`` or ``"female"`` (sets the age slope
+        :math:`S_\text{age}`).
+    :return: The ultimate strength
+        :math:`S_u = 6.75 - S_\text{age} (b+i)`, MPa.
     """
     require_choice(sex, "sex", _SEXES)
     slope = STRENGTH_AGE_SLOPE_MALE if sex == "male" else STRENGTH_AGE_SLOPE_FEMALE
@@ -297,21 +333,25 @@ def injury_risk(
     sex: Literal["male", "female"] = "male",
     mz: float | None = None,
 ) -> float:
-    """Cumulative injury stress variable ``R`` (Annex C, Formula C.3).
+    r"""Cumulative injury stress variable :math:`R` (Annex C, Formula C.3).
 
     Accumulates the daily compressive stress over the exposure years, each year
     weighted by the reducing ultimate strength of the ageing spine.
 
-    :param daily_compression: The daily compressive stress ``Sd``, MPa.
-    :param start_age: Age ``b`` at which the exposure started, in years.
+    :param daily_compression: The daily compressive stress :math:`S_d`,
+        MPa.
+    :param start_age: Age :math:`b` at which the exposure started, in
+        years.
     :param years: Number of exposure years ``n``.
     :param days_per_year: Number of exposure days per year ``N``.
     :param sex: ``"male"`` or ``"female"``.
-    :param mz: Stress conversion for the static stress ``Sstat = mz*9.81``;
-        defaults to the sex-specific value.
-    :return: The stress variable ``R``.
-    :raises ValueError: if ``years`` is not positive or the spine strength is
-        exhausted (``Su - Sstat <= 0``) within the exposure period.
+    :param mz: Stress conversion for the static stress
+        :math:`S_\text{stat} = m_z \cdot 9.81`; defaults to the
+        sex-specific value.
+    :return: The stress variable :math:`R`.
+    :raises ValueError: if ``years`` is not positive or the spine strength
+        is exhausted (:math:`S_u - S_\text{stat} \le 0`) within the
+        exposure period.
     """
     require_choice(sex, "sex", _SEXES)
     if years <= 0:
@@ -333,13 +373,14 @@ def injury_risk(
 
 
 def injury_probability(risk: ArrayLike, *, sex: Literal["male", "female"] = "male") -> np.ndarray | float:
-    """Probability of lumbar injury ``P(R)`` (Annex C, Formula C.5).
+    r"""Probability of lumbar injury :math:`P(R)` (Annex C, Formula C.5).
 
-    :param risk: The stress variable ``R`` (see :func:`injury_risk`); scalar or
-        array-like.
+    :param risk: The stress variable :math:`R` (see :func:`injury_risk`);
+        scalar or array-like.
     :param sex: ``"male"`` or ``"female"`` (sets the Weibull coefficients).
-    :return: The injury probability ``P = 1 - exp(-(R/alpha)**beta)`` in 0-1;
-        a float for a scalar input, otherwise an array. Negative ``R`` gives 0.
+    :return: The injury probability
+        :math:`P = 1 - \exp(-(R/\alpha)^\beta)` in 0-1; a float for a
+        scalar input, otherwise an array. Negative :math:`R` gives 0.
     """
     require_choice(sex, "sex", _SEXES)
     alpha, beta = WEIBULL_MALE if sex == "male" else WEIBULL_FEMALE
@@ -354,20 +395,23 @@ def _risk_thresholds(sex: str) -> tuple[float, float, float]:
 
 @dataclass(frozen=True)
 class MultipleShockResult:
-    """Multiple-shock health assessment (ISO 2631-5:2018, Clause 5 + Annex C).
+    r"""Multiple-shock health assessment (ISO 2631-5:2018, Clause 5 +
+    Annex C).
 
     :ivar sex: ``"male"`` or ``"female"``.
-    :ivar acceleration_dose: The acceleration dose ``Dz``, m/s2.
-    :ivar daily_dose: The daily acceleration dose ``Dzd``, m/s2.
-    :ivar compression_dose: The daily compressive stress ``Sd``, MPa.
-    :ivar risk: The cumulative stress variable ``R``.
-    :ivar probability: The probability of lumbar injury ``P(R)`` in 0-1.
+    :ivar acceleration_dose: The acceleration dose :math:`D_z`, m/s2.
+    :ivar daily_dose: The daily acceleration dose :math:`D_{zd}`, m/s2.
+    :ivar compression_dose: The daily compressive stress :math:`S_d`, MPa.
+    :ivar risk: The cumulative stress variable :math:`R`.
+    :ivar probability: The probability of lumbar injury :math:`P(R)` in
+        0-1.
     :ivar start_age: Age at which the exposure started, in years.
     :ivar years: Number of exposure years.
     :ivar days_per_year: Number of exposure days per year.
-    :ivar peaks: The positive response peaks ``Az,i`` used for the dose, m/s2.
-    :ivar risk_thresholds: The ``R`` values for 10 %, 50 % and 90 % risk of
-        injury for this sex (Table C.2).
+    :ivar peaks: The positive response peaks :math:`A_{z,i}` used for the
+        dose, m/s2.
+    :ivar risk_thresholds: The :math:`R` values for 10 %, 50 % and 90 %
+        risk of injury for this sex (Table C.2).
     """
 
     sex: Literal["male", "female"]
@@ -383,7 +427,8 @@ class MultipleShockResult:
     risk_thresholds: tuple[float, float, float]
 
     def plot(self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any) -> Axes:
-        """Plot the injury-probability curve with this assessment's ``R``.
+        """Plot the injury-probability curve with this assessment's
+        :math:`R`.
 
         Requires matplotlib (``pip install phonometry[plot]``); returns the
         :class:`~matplotlib.axes.Axes`.
@@ -408,24 +453,25 @@ class MultipleShockResult:
         containing multiple shocks (ISO 2631-5:2018): the standard-basis line
         (Clause 5 spinal response and Annex C risk model), an optional metadata
         header (client, subject, workplace/vehicle, instrumentation,
-        calibration), the exposure-scenario grid (subject sex, the age ``b`` at
-        which the exposure started, the number of exposure years ``n``, the
-        number of exposure days per year ``N`` and the number of counted
-        response shocks), the dose-and-stress analysis table (the acceleration
-        dose ``Dz`` of Formula 3, the daily dose ``Dzd`` of Formula 4, the daily
-        compressive stress ``Sd`` of Formula C.1, the cumulative stress variable
-        ``R`` of Formula C.3 and the probability of lumbar injury ``P`` of
-        Formula C.5), the injury-probability chart, the boxed ``R`` and ``P``
-        with the Annex C risk classification, a classification table against the
-        Table C.2 risk levels with a zone row, and a footer identity/disclaimer
-        block.
+        calibration), the exposure-scenario grid (subject sex, the age
+        ``b`` at which the exposure started, the number of exposure years
+        ``n``, the number of exposure days per year ``N`` and the number
+        of counted response shocks), the dose-and-stress analysis table
+        (the acceleration dose :math:`D_z` of Formula 3, the daily dose
+        :math:`D_{zd}` of Formula 4, the daily compressive stress
+        :math:`S_d` of Formula C.1, the cumulative stress variable
+        :math:`R` of Formula C.3 and the probability of lumbar injury
+        :math:`P` of Formula C.5), the injury-probability chart, the boxed
+        :math:`R` and :math:`P` with the Annex C risk classification, a
+        classification table against the Table C.2 risk levels with a zone
+        row, and a footer identity/disclaimer block.
 
         The Annex C classification is informative (ISO 2631-5:2018 defines no
         exposure limit), so the fiche carries a risk-band zone row rather than a
-        PASS/FAIL verdict: ``R`` is placed among the Table C.2 stress variables
-        for 10 / 50 / 90 % risk of injury (low / moderate / high / very high
-        probability of an adverse health effect), the moderate band matching the
-        Annex C worked example.
+        PASS/FAIL verdict: :math:`R` is placed among the Table C.2 stress
+        variables for 10 / 50 / 90 % risk of injury (low / moderate /
+        high / very high probability of an adverse health effect), the
+        moderate band matching the Annex C worked example.
 
         :param path: Destination path of the PDF file.
         :param metadata: Optional :class:`~phonometry.ReportMetadata` supplying
@@ -470,12 +516,14 @@ def multiple_shock_assessment(
     sex: Literal["male", "female"] = "male",
     mz: float | None = None,
 ) -> MultipleShockResult:
-    """Full multiple-shock assessment from a seat acceleration time history.
+    r"""Full multiple-shock assessment from a seat acceleration time
+    history.
 
-    Chains the Clause 5 dose and the Annex C risk: spinal response (Formula 2),
-    acceleration dose (Formula 3), daily dose (Formula 4), compressive stress
-    (C.1), stress variable ``R`` (C.3) and injury probability (C.5). The input
-    must be conditioned (DC-removed); see :func:`spinal_response`.
+    Chains the Clause 5 dose and the Annex C risk: spinal response
+    (Formula 2), acceleration dose (Formula 3), daily dose (Formula 4),
+    compressive stress (C.1), stress variable :math:`R` (C.3) and injury
+    probability (C.5). The input must be conditioned (DC-removed); see
+    :func:`spinal_response`.
 
     The model is vertical-axis only (clause 4a of the 2018 edition); for
     horizontal whole-body exposure use the ISO 2631-1 metrics in this domain
@@ -483,18 +531,20 @@ def multiple_shock_assessment(
     :func:`~phonometry.vibration.vibration_dose_value`).
 
     :param acceleration: Measured, conditioned (zero-mean) vertical seat
-        acceleration ``az(t)``, m/s2.
+        acceleration :math:`a_z(t)`, m/s2.
     :param fs: Sampling frequency, in hertz.
     :param start_age: Age ``b`` at which the exposure started, in years.
     :param years: Number of exposure years ``n``.
     :param days_per_year: Number of exposure days per year ``N``.
-    :param exposure_time: Daily exposure period ``td``; when given with
-        ``measurement_time`` the dose is scaled to a daily dose (Formula 4),
-        otherwise the measured dose is taken as the daily dose.
-    :param measurement_time: Period ``tm`` over which the record was measured.
+    :param exposure_time: Daily exposure period :math:`t_d`; when given
+        with ``measurement_time`` the dose is scaled to a daily dose
+        (Formula 4), otherwise the measured dose is taken as the daily
+        dose.
+    :param measurement_time: Period :math:`t_m` over which the record was
+        measured.
     :param sex: ``"male"`` or ``"female"``.
-    :param mz: Stress conversion ``mz`` (MPa per m/s2); defaults to the
-        sex-specific value.
+    :param mz: Stress conversion :math:`m_z` (MPa per m/s2); defaults to
+        the sex-specific value.
     :return: The :class:`MultipleShockResult`.
     """
     require_choice(sex, "sex", _SEXES)

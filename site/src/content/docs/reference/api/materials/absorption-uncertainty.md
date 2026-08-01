@@ -26,17 +26,20 @@ to ISO 5725. Where specimen-specific uncertainty data exist they take precedence
 (Clause 4).
 
 **Band formulae (Clause 5-6).** For the absorption coefficient
-`σR = m·α + n` (Formula (1)/(4)); for the equivalent area
-`σR = m·AT + n·S` with `S = 10 m²` (Formula (2)); the repeatability value is
-`σr = 0,6·σR` (Formula (3)/(5)). `m` and `n` are the frequency-dependent
+$\sigma_R = m \alpha + n$ (Formula (1)/(4)); for the equivalent area
+$\sigma_R = m A_T + n S$ with $S = 10~\text{m}^2$ (Formula (2));
+the repeatability value is $\sigma_r = 0.6\,\sigma_R$ (Formula (3)/(5)).
+`m` and `n` are the frequency-dependent
 constants of Table 1 (one-third-octave, 63-5000 Hz) and Table 2 (octave,
 250-4000 Hz).
 
-**Single numbers (Clause 7).** `αw`: `σR = 0,035` (Formula (6)),
-`σr = 0,020` (Formula (7)). `DLα,NRD`: `σR = 0,10·DLα,NRD` (Formula (8)),
-`σr = 0,02·DLα,NRD` (Formula (9)).
+**Single numbers (Clause 7).** `αw`: $\sigma_R = 0.035$
+(Formula (6)), $\sigma_r = 0.020$ (Formula (7)). `DLα,NRD`:
+$\sigma_R = 0.10\,D_{L\alpha,\mathrm{NRD}}$ (Formula (8)),
+$\sigma_r = 0.02\,D_{L\alpha,\mathrm{NRD}}$ (Formula (9)).
 
-**Reporting (Clause 8).** The expanded uncertainty is `U = k·u` (Formula (10))
+**Reporting (Clause 8).** The expanded uncertainty is
+$U = k\,u$ (Formula (10))
 with the coverage factor `k` of Table 3 (Gaussian assumption). The reported
 `U` is rounded to two decimal digits for absorption coefficients and one decimal
 digit for the equivalent area and `DLα,NRD`; the code keeps the exact `U` and
@@ -78,7 +81,8 @@ AbsorptionUncertaintyResult(
 )
 ```
 
-Standard and expanded uncertainty of an absorption quantity (ISO 12999-2).
+Standard and expanded uncertainty of an absorption quantity
+(ISO 12999-2).
 
 For the single-number quantities (`αw`, `DLα,NRD`) the frequency and value
 arrays are empty and the uncertainty arrays hold a single element.
@@ -93,7 +97,7 @@ arrays are empty and the uncertainty arrays hold a single element.
 | `values` | The input quantity per band (empty for single numbers). |
 | `standard_uncertainty` | Standard uncertainty `u` (`σR`/`σr`), one per band. |
 | `coverage_factor` | Coverage factor `k` (Table 3). |
-| `expanded_uncertainty` | Exact `U = k·u` (Formula (10)), one per band. |
+| `expanded_uncertainty` | Exact $U = k\,u$ (Formula (10)), one per band. |
 
 ### AbsorptionUncertaintyResult.lower
 
@@ -142,10 +146,11 @@ equivalent_area_uncertainty(
 ) -> AbsorptionUncertaintyResult
 ```
 
-Uncertainty of the ISO 354 equivalent sound absorption area `AT` (Clause 5).
+Uncertainty of the ISO 354 equivalent sound absorption area `AT`
+(Clause 5).
 
-`σR = m·AT + n·S` with `S = 10 m²` (Formula (2)) per one-third-octave band;
-`σr = 0,6·σR` (Formula (3)).
+$\sigma_R = m A_T + n S$ with $S = 10~\text{m}^2$ (Formula (2))
+per one-third-octave band; $\sigma_r = 0.6\,\sigma_R$ (Formula (3)).
 
 **Parameters**
 
@@ -174,9 +179,11 @@ practical_coefficient_uncertainty(
 ) -> AbsorptionUncertaintyResult
 ```
 
-Uncertainty of the ISO 11654 practical absorption coefficient `αp` (Clause 6).
+Uncertainty of the ISO 11654 practical absorption coefficient `αp`
+(Clause 6).
 
-`σR = m·αp + n` (Formula (4)) per octave band; `σr = 0,6·σR` (Formula (5)).
+$\sigma_R = m \alpha_p + n$ (Formula (4)) per octave band;
+$\sigma_r = 0.6\,\sigma_R$ (Formula (5)).
 
 **Parameters**
 
@@ -204,9 +211,11 @@ single_number_rating_uncertainty(
 ) -> AbsorptionUncertaintyResult
 ```
 
-Uncertainty of the EN 1793-1 single-number rating `DLα,NRD` (Clause 7).
+Uncertainty of the EN 1793-1 single-number rating `DLα,NRD`
+(Clause 7).
 
-`σR = 0,10·DLα,NRD` (Formula (8)), `σr = 0,02·DLα,NRD` (Formula (9)).
+$\sigma_R = 0.10\,D_{L\alpha,\mathrm{NRD}}$ (Formula (8)),
+$\sigma_r = 0.02\,D_{L\alpha,\mathrm{NRD}}$ (Formula (9)).
 
 **Parameters**
 
@@ -234,10 +243,11 @@ sound_absorption_coefficient_uncertainty(
 ) -> AbsorptionUncertaintyResult
 ```
 
-Uncertainty of the ISO 354 sound absorption coefficient `αs` (Clause 5).
+Uncertainty of the ISO 354 sound absorption coefficient `αs`
+(Clause 5).
 
-`σR = m·αs + n` (Formula (1)) per one-third-octave band; `σr = 0,6·σR`
-(Formula (3)).
+$\sigma_R = m \alpha_s + n$ (Formula (1)) per one-third-octave band;
+$\sigma_r = 0.6\,\sigma_R$ (Formula (3)).
 
 **Parameters**
 
@@ -265,10 +275,12 @@ weighted_coefficient_uncertainty(
 ) -> AbsorptionUncertaintyResult
 ```
 
-Uncertainty of the ISO 11654 weighted absorption coefficient `αw` (Clause 7).
+Uncertainty of the ISO 11654 weighted absorption coefficient `αw`
+(Clause 7).
 
-The standard uncertainty is a constant: `σR = 0,035` (Formula (6)),
-`σr = 0,020` (Formula (7)), independent of the value.
+The standard uncertainty is a constant: $\sigma_R = 0.035$
+(Formula (6)), $\sigma_r = 0.020$ (Formula (7)), independent of
+the value.
 
 **Parameters**
 

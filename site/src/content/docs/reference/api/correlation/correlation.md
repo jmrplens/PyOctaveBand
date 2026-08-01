@@ -15,26 +15,32 @@ Measurement Procedures* (4th ed., 2010) and Knapp & Carter (1976):
 
 * **correlation estimates** computed via FFT with zero padding so the
   circular product never wraps (B&P Section 11.4.2, Eq. 11.95), with the
-  `1/N` *biased*, `1/(N-r)` *unbiased* (Eq. 11.96) and *coefficient*
-  `ρxy(τ) = Cxy(τ)/(σx·σy)` (Eq. 5.16) normalizations, plus the
+  $1/N$ *biased*, $1/(N-r)$ *unbiased* (Eq. 11.96) and
+  *coefficient*
+  $\rho_{xy}(\tau) = C_{xy}(\tau)/(\sigma_x \sigma_y)$ (Eq. 5.16)
+  normalizations, plus the
   large-`T` normalized random error of the estimate for bandwidth-limited
-  Gaussian data, `ε[R̂xy(τ)] = [1 + ρ⁻²xy(τ)]^½ / √(2BT)`
+  Gaussian data,
+  $\varepsilon[\hat{R}_{xy}(\tau)] = [1 + \rho_{xy}^{-2}(\tau)]^{1/2} / \sqrt{2BT}$
   (Eqs. 8.109/8.112), exposed as [`correlation_random_error`](/phonometry/reference/api/correlation/correlation/#correlation_random_error);
 * **time-delay estimation**: the peak of the cross-correlation locates the
   delay of a common signal between two sensors (B&P Section 5.1.4,
   Eq. 5.21). [`time_delay`](/phonometry/reference/api/correlation/correlation/#time_delay) implements the direct correlator, the
   weighted-phase-slope estimator of the cross-spectrum (Eq. 5.101b) and the
   **generalized cross-correlation** of Knapp & Carter (1976): the averaged
-  cross-spectrum is weighted by `ψ(f)` before the inverse transform,
-  with the Table I processors `'roth'` (`1/Gxx`), `'scot'`
-  (`1/√(Gxx·Gyy)`), `'phat'` (`1/|Gxy|`) and the maximum-likelihood
+  cross-spectrum is weighted by $\psi(f)$ before the inverse
+  transform, with the Table I processors `'roth'`
+  ($1/G_{xx}$), `'scot'`
+  ($1/\sqrt{G_{xx} G_{yy}}$), `'phat'`
+  ($1/\lvert G_{xy} \rvert$) and the maximum-likelihood
   `'ml'` (Hannan-Thomson) weighting
-  `|γ|²/(|Gxy|·(1-|γ|²))` that attains the Cramér-Rao bound;
+  $\lvert \gamma \rvert^2 / (\lvert G_{xy} \rvert (1 - \lvert \gamma \rvert^2))$
+  that attains the Cramér-Rao bound;
 * **sub-sample peak location** by three-point parabolic interpolation,
   optionally after band-limited local upsampling of the correlation around
   its peak, and the **peak-location uncertainty** of the delay estimate,
-  `σ(τ̂0) ≈ (3/4)^¼ · √ε / (πB)` (Eq. 8.129), with the 95 % interval
-  `τ̂0 ± 2σ` (Eq. 8.130);
+  $\sigma(\hat{\tau}_0) \approx (3/4)^{1/4} \sqrt{\varepsilon} / (\pi B)$ (Eq. 8.129), with the 95 % interval
+  $\hat{\tau}_0 \pm 2\sigma$ (Eq. 8.130);
 * **impulse-response utilities**: the sub-sample arrival time of a single
   IR (its peak is the cross-correlation with an ideal impulse) and the
   alignment of an IR pair by the estimated delay, applied as an exact
@@ -147,17 +153,20 @@ Auto- or cross-correlation estimate with a chosen normalization.
 Computed via zero-padded FFT so the circular product never wraps (B&P
 Section 11.4.2). `y=None` gives the autocorrelation of `x`. The
 sign convention follows B&P Eq. 5.19-5.20: with
-`y(t) = α·x(t-τ0) + n(t)` the estimate peaks at `τ = +τ0`.
+$y(t) = \alpha x(t - \tau_0) + n(t)$ the estimate peaks at
+$\tau = +\tau_0$.
 
 Normalizations:
 
 * `'biased'` - the raw lag sums divided by `N`; tapers toward the
-  record ends and stays bounded by `[R̂xx(0)·R̂yy(0)]^½`;
-* `'unbiased'` - divided by `N-|r|` (Eq. 11.96), an unbiased
-  estimate of `Rxy(τ)` whose variance grows toward the ends;
+  record ends and stays bounded by
+  $[\hat{R}_{xx}(0) \hat{R}_{yy}(0)]^{1/2}$;
+* `'unbiased'` - divided by $N - \lvert r \rvert$
+  (Eq. 11.96), an unbiased estimate of $R_{xy}(\tau)$ whose
+  variance grows toward the ends;
 * `'coefficient'` - the correlation coefficient function
-  `ρ̂xy(τ) = Ĉxy(τ)/(σx·σy)` ∈ [-1, 1] over the mean-removed
-  records (Eq. 5.16).
+  $\hat{\rho}_{xy}(\tau) = \hat{C}_{xy}(\tau)/(\sigma_x \sigma_y) \in [-1, 1]$ over the
+  mean-removed records (Eq. 5.16).
 
 **Parameters**
 
@@ -187,28 +196,35 @@ correlation_random_error(
 ) -> float
 ```
 
-Normalized random error of a correlation estimate (Eqs. 8.109/8.112).
+Normalized random error of a correlation estimate.
 
-`ε[R̂xy(τ)] = [1 + ρ⁻²xy(τ)]^½ / √(2BT)` for bandwidth-limited
+B&P Eqs. 8.109/8.112:
+$\varepsilon[\hat{R}_{xy}(\tau)] = [1 + \rho_{xy}^{-2}(\tau)]^{1/2} / \sqrt{2BT}$ for
+bandwidth-limited
 Gaussian data of bandwidth `B` observed for `T` seconds, with
-`ρxy(τ)` the correlation coefficient at the lag of interest. At the
-zero lag of an autocorrelation (`ρ = 1`) this is `1/√(BT)`
-(Eq. 8.111). Valid for `T ≥ 10·|τ|` and `BT ≥ 5` (Section 8.4.1).
+$\rho_{xy}(\tau)$ the correlation coefficient at the lag of
+interest. At the zero lag of an autocorrelation ($\rho = 1$)
+this is $1/\sqrt{BT}$
+(Eq. 8.111). Valid for $T \ge 10 \lvert \tau \rvert$ and
+$BT \ge 5$ (Section 8.4.1).
 
-For the two-detector time-delay problem `x = s + m`, `y = s' + n`
+For the two-detector time-delay problem
+$x = s + m$, $y = s' + n$
 (Section 8.4.2) the peak coefficient is
-`ρ = S/√((S+M)(S+N))`, which reproduces the book's Example 8.5:
-`B = 100` Hz, `T = 5` s, `M/S = N/S = 10` give `ε ≈ 0.35`.
+$\rho = S/\sqrt{(S+M)(S+N)}$, which reproduces the book's
+Example 8.5:
+$B = 100$ Hz, $T = 5$ s, $M/S = N/S = 10$ give
+$\varepsilon \approx 0.35$.
 
 **Parameters**
 
 | Name | Description |
 | :--- | :--- |
-| `coefficient` | Correlation coefficient `ρxy(τ)` at the lag. |
+| `coefficient` | Correlation coefficient $\rho_{xy}(\tau)$ at the lag. |
 | `signal_bandwidth` | Signal bandwidth `B`, in Hz. |
 | `duration` | Record length `T`, in seconds. |
 
-**Returns:** Normalized random error (dimensionless; `inf` at `ρ = 0`).
+**Returns:** Normalized random error (dimensionless; `inf` at $\rho = 0$).
 
 **Raises**
 
@@ -237,14 +253,14 @@ Auto- or cross-correlation estimate (B&P Sections 5.1, 8.4, 11.4).
 
 | Name | Description |
 | :--- | :--- |
-| `lags` | Lag axis `τ`, in seconds, symmetric about zero. Positive lag means the second signal is delayed relative to the first (`R̂xy(τ) ~ E[x(t)·y(t+τ)]`, B&P Eq. 5.19-5.20 convention). |
+| `lags` | Lag axis $\tau$, in seconds, symmetric about zero. Positive lag means the second signal is delayed relative to the first ($\hat{R}_{xy}(\tau) \sim E[x(t) y(t+\tau)]$, B&P Eq. 5.19-5.20 convention). |
 | `values` | Correlation estimate on `lags` with the requested `normalization`. |
-| `coefficient` | Correlation coefficient function `ρ̂xy(τ)` ∈ [-1, 1] on the same lags (Eq. 5.16; equals `values` when `normalization='coefficient'`). |
-| `normalization` | `'biased'` (`1/N`), `'unbiased'` (`1/(N-\|r\|)`, Eq. 11.96) or `'coefficient'`. |
+| `coefficient` | Correlation coefficient function $\hat{\rho}_{xy}(\tau) \in [-1, 1]$ on the same lags (Eq. 5.16; equals `values` when `normalization='coefficient'`). |
+| `normalization` | `'biased'` ($1/N$), `'unbiased'` ($1/(N - \lvert r \rvert)$, Eq. 11.96) or `'coefficient'`. |
 | `kind` | `'autocorrelation'` or `'cross-correlation'`. |
 | `fs` | Sample rate, in Hz. |
 | `n_samples` | Record length `N`, in samples. |
-| `duration` | Record length `T = N/fs`, in seconds. |
+| `duration` | Record length $T = N/f_s$, in seconds. |
 
 ### CorrelationResult.plot()
 
@@ -280,10 +296,13 @@ length `T` (B&P Eqs. 8.109 and 8.112, identical in form for the
 cross- and autocorrelation, with the measured coefficient in place
 of the true value):
 
-`ε[R̂xy(τ)] = [1 + ρ⁻²xy(τ)]^½ / √(2BT)`
+$$
+\varepsilon[\hat{R}_{xy}(\tau)] = \frac{[1 + \rho_{xy}^{-2}(\tau)]^{1/2}}{\sqrt{2BT}}
+$$
 
-so `ε[R̂xx(0)] = 1/√(BT)` (Eq. 8.111). The large-`T`
-approximation behind it assumes `T ≥ 10·|τ|` and `BT ≥ 5`
+so $\varepsilon[\hat{R}_{xx}(0)] = 1/\sqrt{BT}$
+(Eq. 8.111). The large-`T` approximation behind it assumes
+$T \ge 10 \lvert \tau \rvert$ and $BT \ge 5$
 (Section 8.4.1). Lags where the measured coefficient is zero
 return `inf`.
 
@@ -320,7 +339,7 @@ Without a reference, the arrival time of the IR itself: the
 cross-correlation of an IR with an ideal unit impulse *is* the IR, so
 its peak magnitude location - refined to sub-sample resolution by
 band-limited local upsampling plus parabolic interpolation - is the
-delay relative to `t = 0`. With a `reference` IR, the delay of
+delay relative to $t = 0$. With a `reference` IR, the delay of
 `ir` relative to it, from the peak of their full-record
 cross-correlation with the same refinement (one-shot transients are
 not stationary records, so the direct correlator is used rather than
@@ -328,8 +347,8 @@ the Welch-averaged GCC).
 
 Sub-sample accuracy presumes the IR is band-limited below Nyquist;
 the synthetic fractional-delay tests pin the achievable accuracy
-(about 1e-3 samples for a 0.4·fs band-limited pulse at the default
-`upsample=8`).
+(about 1e-3 samples for a $0.4 f_s$ band-limited pulse at the
+default `upsample=8`).
 
 **Parameters**
 
@@ -341,7 +360,7 @@ the synthetic fractional-delay tests pin the achievable accuracy
 | `interpolation` | `'parabolic'` (default) or `'none'`. |
 | `upsample` | Integer local-upsampling factor (default 8). |
 
-**Returns:** Delay in seconds (relative to `t = 0` or to `reference`).
+**Returns:** Delay in seconds (relative to $t = 0$ or to `reference`).
 
 **Raises**
 
@@ -371,28 +390,34 @@ time_delay(
 
 Time delay of `y` relative to `x` (TDE).
 
-Three estimators of the delay `τ0` in the two-sensor model
-`y(t) = α·x(t-τ0) + n(t)` (B&P Section 5.1.4):
+Three estimators of the delay $\tau_0$ in the two-sensor model
+$y(t) = \alpha x(t - \tau_0) + n(t)$ (B&P Section 5.1.4):
 
 * `'direct'` - the peak of the full-record correlation coefficient
   function (Eq. 5.21);
 * `'gcc'` - the peak of the generalized cross-correlation of
   Knapp & Carter (1976): the Welch-averaged cross-spectrum (shared
   core with [`cross_spectral_density`](/phonometry/reference/api/spectra/spectra/#cross_spectral_density))
-  is weighted by `ψ(f)` before the inverse transform. Weightings
-  (Table I): `'none'` (plain correlator), `'roth'` (`1/Gxx`,
+  is weighted by $\psi(f)$ before the inverse transform.
+  Weightings (Table I): `'none'` (plain correlator), `'roth'`
+  ($1/G_{xx}$,
   suppresses bands where the first sensor is noisy), `'scot'`
-  (`1/√(Gxx·Gyy)`, prewhitens both channels), `'phat'`
-  (`1/|Gxy|`: for uncorrelated noises the ideal GCC is a delta at
+  ($1/\sqrt{G_{xx} G_{yy}}$, prewhitens both channels),
+  `'phat'`
+  ($1/\lvert G_{xy} \rvert$: for uncorrelated noises the ideal
+  GCC is a delta at
   the delay, but errors are accentuated wherever signal power is
   small), and `'ml'` (Hannan-Thomson,
-  `|γ|²/(|Gxy|·(1-|γ|²))`): the maximum-likelihood processor that
+  $\lvert \gamma \rvert^2 / (\lvert G_{xy} \rvert (1 - \lvert \gamma \rvert^2))$):
+  the maximum-likelihood processor that
   weights the phase by its coherence-derived reliability and attains
   the Cramér-Rao bound - provided the coherence estimate is averaged
   over at least two segments, the discrete form of Knapp & Carter's
-  `|γ|² ≠ 1` existence condition (enforced here). The delay must
+  $\lvert \gamma \rvert^2 \ne 1$ existence condition (enforced
+  here). The delay must
   fit within half a segment; raise `nperseg` for long delays.
-* `'phase'` - the `|Ĝxy|`-weighted least-squares slope of the
+* `'phase'` - the $\lvert \hat{G}_{xy} \rvert$-weighted
+  least-squares slope of the
   cross-spectrum phase (Eq. 5.101b); accurate for clean, moderate
   delays where the unwrapped phase is unambiguous, and independent of
   any peak interpolation (`interpolation`/`upsample` do not
@@ -403,8 +428,8 @@ resolution by three-point parabolic interpolation, optionally after
 band-limited local upsampling (`upsample > 1`); this presumes the
 signals are band-limited below Nyquist so the peak is oversampled.
 With `signal_bandwidth` given, the result carries the B&P
-peak-location uncertainty (Eq. 8.129) and its ±2σ interval
-(Eq. 8.130).
+peak-location uncertainty (Eq. 8.129) and its $\pm 2\sigma$
+interval (Eq. 8.130).
 
 **Parameters**
 
@@ -455,15 +480,15 @@ Time-delay estimate between two records.
 
 | Name | Description |
 | :--- | :--- |
-| `delay` | Estimated delay `τ̂0` of the second record relative to the first, in seconds (positive: `y` lags `x`). |
+| `delay` | Estimated delay $\hat{\tau}_0$ of the second record relative to the first, in seconds (positive: `y` lags `x`). |
 | `delay_samples` | The same delay in (fractional) samples. |
 | `method` | `'direct'`, `'gcc'` or `'phase'`. |
 | `weighting` | GCC weighting name (`None` unless `method='gcc'`). |
 | `lags` | Lag axis of [`correlation`](/phonometry/reference/api/correlation/correlation/#correlation), in seconds. |
-| `correlation` | The correlation function whose peak was located: the correlation coefficient `ρ̂xy(τ)` for `'direct'`, the weighted GCC `R̂ψ(τ)` (normalized to unit peak magnitude) for `'gcc'`, and the unweighted equivalent for `'phase'` (whose estimate comes from Eq. 5.101b, not from this curve). |
-| `peak_correlation` | Plain correlation coefficient `ρ̂xy` at the estimated delay (rounded to the nearest sample) - the quantity entering the B&P error formulas, whatever the method. |
-| `delay_std` | Standard deviation of the peak-location estimate, `σ(τ̂0) ≈ (3/4)^¼·√ε/(πB)` (Eq. 8.129), in seconds; `None` unless `signal_bandwidth` was given. |
-| `delay_interval` | Approximate 95 % confidence interval `τ̂0 ± 2σ` (Eq. 8.130), in seconds; `None` without a bandwidth. |
+| `correlation` | The correlation function whose peak was located: the correlation coefficient $\hat{\rho}_{xy}(\tau)$ for `'direct'`, the weighted GCC $\hat{R}_\psi(\tau)$ (normalized to unit peak magnitude) for `'gcc'`, and the unweighted equivalent for `'phase'` (whose estimate comes from Eq. 5.101b, not from this curve). |
+| `peak_correlation` | Plain correlation coefficient $\hat{\rho}_{xy}$ at the estimated delay (rounded to the nearest sample) - the quantity entering the B&P error formulas, whatever the method. |
+| `delay_std` | Standard deviation of the peak-location estimate, $\sigma(\hat{\tau}_0) \approx (3/4)^{1/4} \sqrt{\varepsilon} / (\pi B)$ (Eq. 8.129), in seconds; `None` unless `signal_bandwidth` was given. |
+| `delay_interval` | Approximate 95 % confidence interval $\hat{\tau}_0 \pm 2\sigma$ (Eq. 8.130), in seconds; `None` without a bandwidth. |
 | `signal_bandwidth` | The bandwidth `B` used for the error, Hz. |
 | `fs` | Sample rate, in Hz. |
 

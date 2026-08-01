@@ -75,9 +75,9 @@ class MetadiffuserWell:
     ``slit_height`` is the slit opening ``h_n`` along the panel face and
     ``resonators`` the Helmholtz resonators loading the slit, ordered from
     the panel face towards the rigid backing; the resonator lattice step is
-    ``a = L / M`` for a panel of depth ``L`` and ``M`` resonators. All
+    :math:`a = L / M` for a panel of depth ``L`` and ``M`` resonators. All
     lengths are in metres. A ``None`` entry in a well sequence stands for a
-    flat rigid strip of the panel face (``R = 1``), the ``+1`` state of
+    flat rigid strip of the panel face (:math:`R = 1`), the ``+1`` state of
     ternary-sequence designs.
     """
 
@@ -92,13 +92,14 @@ class MetadiffuserWell:
 
 @dataclass(frozen=True)
 class MetadiffuserResult:
-    """Spectra of a metadiffuser panel, one reflection row per well.
+    r"""Spectra of a metadiffuser panel, one reflection row per well.
 
     ``reflection`` has shape ``(N, len(frequency))`` with the complex
     pressure reflection factor of each well (flat strips are exactly ``1``),
     ``absorption`` is the face-averaged energy absorption
-    ``alpha(f) = 1 - mean_n |R_n|^2`` and ``well_absorption`` the per-well
-    ``alpha_n = 1 - |R_n|^2``. The trailing fields retain the geometry the
+    :math:`\alpha(f) = 1 - \operatorname{mean}_n \lvert R_n \rvert^2` and
+    ``well_absorption`` the per-well
+    :math:`\alpha_n = 1 - \lvert R_n \rvert^2`. The trailing fields retain the geometry the
     prediction was run with (``wells``, ``depth``, ``period``) so
     :meth:`plot_geometry` can draw the panel section; they default to
     ``None`` for hand-built results.
@@ -188,7 +189,8 @@ def metadiffuser_reflection(
     :func:`~phonometry.materials.slow_sound_absorber.slit_helmholtz_absorber`
     once per well: each :class:`MetadiffuserWell` becomes a slit of height
     ``h_n`` and depth ``L`` loaded by its ``M`` resonators on the lattice
-    ``a = L / M``, and ``None`` wells are flat rigid strips with ``R = 1``.
+    :math:`a = L / M`, and ``None`` wells are flat rigid strips with
+    :math:`R = 1`.
     The panel is locally reacting, so a well's reflection does not depend on
     its neighbours and the incidence ``angle`` enters only through the front
     air impedance.
@@ -332,7 +334,7 @@ def metadiffuser_diffusion_spectrum(
     Evaluates the far-field polar response at each frequency with
     :func:`metadiffuser_polar_response`, forms the ISO 17497-2 directional
     diffusion coefficient band by band and normalises it against a flat
-    rigid reference of the same footprint (all wells ``R = 1``) with
+    rigid reference of the same footprint (all wells :math:`R = 1`) with
     :func:`~phonometry.materials.scattering_diffusion.normalized_diffusion_coefficient`,
     exactly as the paper reports ``delta_n``.
 

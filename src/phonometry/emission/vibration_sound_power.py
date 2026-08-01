@@ -1,36 +1,46 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""
+r"""
 Airborne sound power from surface vibration (ISO/TS 7849-1/-2:2009).
 
 The airborne sound power a machine radiates through the structure-borne
 vibration of its outer surface is estimated from the surface vibratory velocity
 and a **radiation factor** ``epsilon`` (the radiation efficiency). The radiated
-power is (ISO/TS 7849-1, Equation 6)::
+power, in watts, is (ISO/TS 7849-1, Equation 6):
 
-    P = Z_c * <v**2> * S * epsilon                              [W]
+.. math::
 
-with ``Z_c`` the characteristic impedance of air, ``<v**2>`` the mean-square
-vibratory velocity averaged over the radiating area ``S``. The vibratory
-velocity is reported as a **level** re ``v0 = 5e-8 m/s`` (Equation 3)::
+   P = Z_c \, \langle v^2 \rangle \, S \, \epsilon
 
-    L_v = 10 lg(<v**2> / v0**2) = 20 lg(v / v0)                 [dB]
+with :math:`Z_c` the characteristic impedance of air and
+:math:`\langle v^2 \rangle` the mean-square vibratory velocity averaged over
+the radiating area :math:`S`. The vibratory velocity is reported as a
+**level**, in decibels, re :math:`v_0 = 5 \times 10^{-8}` m/s (Equation 3):
 
-so the A-weighted sound power level follows in logarithmic form (ISO/TS 7849-1,
-Equation 12; ISO/TS 7849-2, Equation 15)::
+.. math::
 
-    L_W = L_v + 10 lg(S / S0) + 10 lg(epsilon) + 10 lg(Z_c,n / Z_c,0)   [dB]
+   L_v = 10 \lg\frac{\langle v^2 \rangle}{v_0^2} = 20 \lg\frac{v}{v_0}
 
-where ``S0 = 1 m2``, the normalized characteristic impedance ``Z_c,n =
-411 N.s/m3`` (at 23 degC, 101,3 kPa) and the reference acoustic impedance
-``Z_c,0 = 400 N.s/m3`` give the fixed ``10 lg(411/400) = 0,118 dB`` term.
+so the A-weighted sound power level follows in logarithmic form, in decibels
+(ISO/TS 7849-1, Equation 12; ISO/TS 7849-2, Equation 15):
+
+.. math::
+
+   L_W = L_v + 10 \lg\frac{S}{S_0} + 10 \lg \epsilon
+   + 10 \lg\frac{Z_{c,n}}{Z_{c,0}}
+
+where :math:`S_0 = 1~\text{m}^2`, the normalized characteristic impedance
+:math:`Z_{c,n} = 411~\text{N s/m}^3` (at 23 degC, 101.3 kPa) and the
+reference acoustic impedance :math:`Z_{c,0} = 400~\text{N s/m}^3` give the
+fixed :math:`10 \lg(411/400) = 0.118` dB term.
 
 The two parts differ only in ``epsilon``:
 
-* **Part 1 (survey)** assumes ``epsilon = 1`` and yields the *upper limit*
-  ``L_W,max`` of the radiated power, needing only ``<v**2>`` and ``S``.
+* **Part 1 (survey)** assumes :math:`\epsilon = 1` and yields the *upper
+  limit* ``L_W,max`` of the radiated power, needing only
+  :math:`\langle v^2 \rangle` and ``S``.
 * **Part 2 (engineering)** applies a frequency-band radiation factor
-  ``epsilon_j`` determined (per ISO 9614) as ``epsilon_j = P_j /
-  (Z_c,n <v_j**2> S)`` (Equation 8).
+  ``epsilon_j`` determined (per ISO 9614) as
+  :math:`\epsilon_j = P_j / (Z_{c,n} \langle v_j^2 \rangle S)` (Equation 8).
 
 This module feeds the structure-borne source characterisation standards
 (ISO 9611, EN 15657, EN 12354-5).
@@ -72,7 +82,9 @@ _K1A_TABLE: dict[int, float] = {3: 3.0, 4: 2.0, 5: 2.0, 6: 1.0,
 def velocity_level(
     velocity: ArrayLike, *, reference: float = REFERENCE_VELOCITY
 ) -> np.ndarray:
-    """Vibratory velocity level ``L_v = 20 lg(v/v0)`` (ISO/TS 7849-1, Eq. 3).
+    r"""Vibratory velocity level (ISO/TS 7849-1, Eq. 3).
+
+    :math:`L_v = 20 \lg(v/v_0)` with ``v0`` the reference velocity.
 
     :param velocity: R.m.s. vibratory velocity ``v`` (scalar or array), in m/s.
     :param reference: Reference velocity ``v0`` (Default: 5e-8 m/s).
@@ -90,10 +102,11 @@ def velocity_level_from_acceleration(
     *,
     reference: float = REFERENCE_VELOCITY,
 ) -> np.ndarray:
-    """Velocity level from a sinusoidal acceleration (ISO/TS 7849-1, Eq. 8).
+    r"""Velocity level from a sinusoidal acceleration (ISO/TS 7849-1, Eq. 8).
 
-    ``L_v = 20 lg( a_peak / (2 pi f v0 sqrt(2)) )``, used to convert a
-    calibration acceleration to the equivalent r.m.s. velocity level.
+    :math:`L_v = 20 \lg\!\left( \frac{a_{\text{peak}}}{2\pi f v_0 \sqrt{2}}
+    \right)`, used to convert a calibration acceleration to the equivalent
+    r.m.s. velocity level.
 
     :param peak_acceleration: Peak acceleration ``a_peak`` (scalar or array),
         in m/s^2.
@@ -144,17 +157,17 @@ def radiation_factor(
     *,
     impedance: float = NORMALIZED_IMPEDANCE,
 ) -> np.ndarray:
-    """A-weighted radiation factor ``epsilon`` (ISO/TS 7849-1 Eq. 4, -2 Eq. 8).
+    r"""A-weighted radiation factor ``epsilon`` (ISO/TS 7849-1 Eq. 4, -2 Eq. 8).
 
-    ``epsilon = P / (Z_c <v**2> S)``, the sound-radiation efficiency, from an
-    independently measured radiated power (ISO 9614), the surface area and the
-    mean-square vibratory velocity.
+    :math:`\epsilon = P / (Z_c \langle v^2 \rangle S)`, the sound-radiation
+    efficiency, from an independently measured radiated power (ISO 9614), the
+    surface area and the mean-square vibratory velocity.
 
     :param sound_power: Radiated airborne sound power ``P`` (scalar or array),
         in W.
     :param area: Radiating surface area ``S``, in m^2 (> 0).
-    :param mean_square_velocity: Mean-square vibratory velocity ``<v**2>``, in
-        (m/s)^2.
+    :param mean_square_velocity: Mean-square vibratory velocity
+        :math:`\langle v^2 \rangle`, in (m/s)^2.
     :param impedance: Characteristic impedance ``Z_c`` (Default: 411 N.s/m^3).
     :return: The radiation factor ``epsilon`` (dimensionless).
     :raises ValueError: for a non-positive area or impedance.
@@ -175,9 +188,13 @@ def radiated_sound_power_level(
     normalized_impedance: float = NORMALIZED_IMPEDANCE,
     reference_impedance: float = REFERENCE_IMPEDANCE,
 ) -> np.ndarray:
-    """Radiated sound power level (ISO/TS 7849-1 Eq. 12, -2 Eq. 15).
+    r"""Radiated sound power level (ISO/TS 7849-1 Eq. 12, -2 Eq. 15).
 
-    ``L_W = L_v + 10 lg(S/S0) + 10 lg(epsilon) + 10 lg(Z_c,n/Z_c,0)``.
+    .. math::
+
+       L_W = L_v + 10 \lg\frac{S}{S_0} + 10 \lg \epsilon
+       + 10 \lg\frac{Z_{c,n}}{Z_{c,0}}
+
     With the default ``radiation_factor = 1`` this is the Part 1 *upper limit*
     ``L_W,max``; pass a measured ``epsilon`` for the Part 2 engineering value.
 
@@ -209,15 +226,16 @@ def radiated_sound_power_level(
 
 
 def extraneous_velocity_correction(level_difference: float) -> float:
-    """Correction K1A for extraneous vibration (ISO/TS 7849-1, Table 2).
+    r"""Correction K1A for extraneous vibration (ISO/TS 7849-1, Table 2).
 
-    ``dLv`` is the difference between the operating and the extraneous vibratory
-    velocity levels. The correction is subtracted from the measured level; per
-    the standard ``dLv >= 10 dB`` gives 0 dB, and ``dLv < 3 dB`` uses the 3 dB
-    value (the result is then an upper boundary). The level difference is
-    rounded to the nearest integer decibel to index the standard's table.
+    :math:`\Delta L_v` is the difference between the operating and the
+    extraneous vibratory velocity levels. The correction is subtracted from
+    the measured level; per the standard :math:`\Delta L_v \ge 10` dB gives
+    0 dB, and :math:`\Delta L_v < 3` dB uses the 3 dB value (the result is
+    then an upper boundary). The level difference is rounded to the nearest
+    integer decibel to index the standard's table.
 
-    :param level_difference: Level difference ``dLv``, in dB.
+    :param level_difference: Level difference :math:`\Delta L_v`, in dB.
     :return: The correction ``K1A`` to subtract, in dB.
     """
     if level_difference >= 10.0:
@@ -247,7 +265,8 @@ class VibrationSoundPowerResult:
 
     @property
     def total_level(self) -> float:
-        """Band-summed sound power level ``10 lg(sum 10^(0.1 L_Wj))``, in dB."""
+        r"""Band-summed sound power level, in dB:
+        :math:`10 \lg \sum_j 10^{0.1 L_{Wj}}`."""
         lw = np.asarray(self.sound_power_level, dtype=np.float64)
         return float(10.0 * np.log10(np.sum(10.0 ** (0.1 * lw))))
 
@@ -294,7 +313,7 @@ class VibrationSoundPowerResult:
         verbose: bool = False,
         language: str = "en",
     ) -> str:
-        """Render an ISO/TS 7849 sound-power-from-vibration determination fiche.
+        r"""Render an ISO/TS 7849 sound-power-from-vibration determination fiche.
 
         Writes a one-page sound-power test sheet: the standard-basis line naming
         the vibration method (the ISO/TS 7849-1 survey method with a fixed
@@ -308,7 +327,8 @@ class VibrationSoundPowerResult:
         power level ``LWA`` (dB re 1 pW) with the total ``LW``, the radiating
         area ``S`` and the applied method, an optional verdict row against a
         declared limit, and a measurement-basis strip stating the sound-power
-        relation ``LW = Lv + 10 lg(S/S0) + 10 lg(epsilon) + 10 lg(Zc,n/Zc,0)``.
+        relation :math:`L_W = L_v + 10 \lg(S/S_0) + 10 \lg \epsilon
+        + 10 \lg(Z_{c,n}/Z_{c,0})`.
 
         :param path: Destination path of the PDF file.
         :param metadata: Optional :class:`~phonometry.ReportMetadata` supplying

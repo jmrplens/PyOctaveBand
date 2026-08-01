@@ -1,5 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""
+r"""
 Calibrated time-frequency analysis: STFT spectrogram and zoom FFT.
 
 Fine-band time-frequency views of a record, following Bendat & Piersol,
@@ -13,20 +13,24 @@ Fine-band time-frequency views of a record, following Bendat & Piersol,
   :func:`~phonometry.metrology.spectra.power_spectral_density`, so a
   signal in pascals reads directly in Pa²/Hz or Pa² and averaging the
   columns reproduces the Welch estimate bin by bin). Each cell trades the
-  time resolution ``T_B = nperseg/fs`` against the frequency resolution
-  ``1/T_B`` at a resolution-bandwidth-time product of one, so a single
+  time resolution :math:`T_B = \text{nperseg}/f_s` against the frequency
+  resolution
+  :math:`1/T_B` at a resolution-bandwidth-time product of one, so a single
   cell of random data is an unaveraged estimate: the power carries a
-  normalized random error of ``1/√nd = 1`` with ``nd = 1`` (Eq. 8.158),
-  and the magnitude display an error of ``√2/1.25 ≈ 1.13`` - the
+  normalized random error of :math:`1/\sqrt{n_d} = 1` with
+  :math:`n_d = 1` (Eq. 8.158),
+  and the magnitude display an error of
+  :math:`\sqrt{2}/1.25 \approx 1.13` - the
   Rayleigh-ratio result Bendat & Piersol quote in Section 12.6.4.2.
   Deterministic structure (tones, sweeps, transients) is unaffected by
   that caveat and is what the spectrogram is for.
 
 * the **zoom FFT** (Section 11.5.4): the spectrum of a narrow band
-  ``[f_min, f_max]`` computed on an arbitrarily fine frequency grid
-  without the giant FFT block a full-band analysis would need
+  :math:`[f_{\min}, f_{\max}]` computed on an arbitrarily fine frequency
+  grid without the giant FFT block a full-band analysis would need
   (Eq. 11.122). The book's procedure - bandpass, complex demodulation by
-  ``exp(-j2πf₁t)``, decimation by ``d = k₂/(k₂-k₁)`` and an FFT of the
+  :math:`\exp(-j 2 \pi f_1 t)`, decimation by
+  :math:`d = k_2/(k_2 - k_1)` and an FFT of the
   decimated record (Eqs. 11.123-11.130) - is realized here in its exact
   single-pass digital equivalent, the chirp-Z evaluation of the DFT on
   the zoom grid (:func:`scipy.signal.zoom_fft`): both compute the same
@@ -34,11 +38,13 @@ Fine-band time-frequency views of a record, following Bendat & Piersol,
   precision against the demodulate-decimate-DFT chain. The bin spacing
   can be made arbitrarily fine, but the true resolution stays set by the
   record length and taper (the reported effective noise bandwidth
-  ``Bₑ = fs·Σw²/(Σw)²``): zooming refines the grid, only a longer record
+  :math:`B_e = f_s \sum w^2 / \left( \sum w \right)^2`): zooming refines
+  the grid, only a longer record
   refines the resolution (Eq. 11.127).
 
 Amplitudes are calibrated so that a sine of peak amplitude ``A`` on an
-analysis frequency reads ``|spectrum| = A``, ``power = A²/2`` (its mean
+analysis frequency reads :math:`\lvert \text{spectrum} \rvert = A`,
+:math:`\text{power} = A^2/2` (its mean
 square) - consistent with the ``'spectrum'`` scaling of the Welch module.
 """
 
@@ -84,7 +90,7 @@ def _taper(window: str, nperseg: int) -> NDArray[np.float64]:
 
 @dataclass(frozen=True)
 class SpectrogramResult:
-    """Calibrated STFT power spectrogram (B&P Section 12.6.4.2).
+    r"""Calibrated STFT power spectrogram (B&P Section 12.6.4.2).
 
     :ivar times: Segment-centre times, in seconds (one per column).
     :ivar frequencies: One-sided frequency axis, in Hz (one per row).
@@ -95,20 +101,27 @@ class SpectrogramResult:
         :func:`~phonometry.metrology.spectra.power_spectral_density`:
         the column mean over time reproduces the Welch spectrum bin by
         bin. Integrating a ``'density'`` column over frequency gives that
-        segment's taper-weighted mean square ``Σ(x·w)²/Σw²``; summing
+        segment's taper-weighted mean square
+        :math:`\sum (x w)^2 / \sum w^2`; summing
         those over time *and multiplying by the hop duration* ``hop/fs``
-        recovers the record energy ``Σx²/fs`` when the squared taper
+        recovers the record energy :math:`\sum x^2 / f_s` when the
+        squared taper
         overlap-adds to a constant (e.g. Hann at 75 % overlap), up to the
         taper roll-off at the record edges (the first and last segments
         are under-weighted: about 1-2 % low for typical records).
-    :ivar time_resolution: Segment duration ``T_B = nperseg/fs``, in
+    :ivar time_resolution: Segment duration
+        :math:`T_B = \text{nperseg}/f_s`, in
         seconds - the time resolution of the display.
-    :ivar resolution_bandwidth: Effective noise bandwidth ``Bₑ`` of the
-        tapered segment, in Hz - the frequency resolution (``≈ 1/T_B``
-        for a light taper; the ``BₑT_B`` product per cell is close to 1).
+    :ivar resolution_bandwidth: Effective noise bandwidth :math:`B_e` of
+        the tapered segment, in Hz - the frequency resolution
+        (:math:`\approx 1/T_B`
+        for a light taper; the :math:`B_e T_B` product per cell is close
+        to 1).
     :ivar random_error: Normalized random error of each (unaveraged)
-        power cell for random data, ``1/√nd = 1`` with ``nd = 1``
-        (Eq. 8.158); Bendat & Piersol quote ``√2/1.25 ≈ 1.13`` for the
+        power cell for random data, :math:`1/\sqrt{n_d} = 1` with
+        :math:`n_d = 1`
+        (Eq. 8.158); Bendat & Piersol quote
+        :math:`\sqrt{2}/1.25 \approx 1.13` for the
         magnitude display (Section 12.6.4.2). Deterministic components
         are unaffected.
     :ivar n_segments: Number of segments (columns).
@@ -155,7 +168,7 @@ def spectrogram(
     overlap: float = _DEFAULT_OVERLAP,
     scaling: Literal["density", "spectrum"] = "density",
 ) -> SpectrogramResult:
-    """Calibrated STFT power spectrogram (Bendat & Piersol 12.6.4.2).
+    r"""Calibrated STFT power spectrogram (Bendat & Piersol 12.6.4.2).
 
     The record is split into tapered (Hann by default), overlapped
     segments - exactly the segmentation of
@@ -166,15 +179,19 @@ def spectrogram(
     No detrending is applied, so absolute calibration is preserved: a
     signal in pascals yields Pa²/Hz (``'density'``) or Pa²
     (``'spectrum'``), and a sine of amplitude ``A`` on an analysis
-    frequency reads ``A²/2`` - its mean square - in every ``'spectrum'``
-    column it spans.
+    frequency reads :math:`A^2/2` - its mean square - in every
+    ``'spectrum'`` column it spans.
 
     The display trades time against frequency resolution through the
-    segment length: ``T_B = nperseg/fs`` of time resolution against
-    ``Bₑ ≈ 1/T_B`` of frequency resolution (Section 12.6.4.2). Because
-    each cell is a single unaveraged estimate (``BₑT_B ≈ 1``), random
+    segment length: :math:`T_B = \text{nperseg}/f_s` of time resolution
+    against
+    :math:`B_e \approx 1/T_B` of frequency resolution
+    (Section 12.6.4.2). Because
+    each cell is a single unaveraged estimate
+    (:math:`B_e T_B \approx 1`), random
     data carries a per-cell normalized random error of 1 (Eq. 8.158 with
-    ``nd = 1``): the spectrogram is a tool for deterministic structure -
+    :math:`n_d = 1`): the spectrogram is a tool for deterministic
+    structure -
     tones, sweeps, transients - not a low-variance spectral estimator.
 
     :param x: Signal, 1-D.
@@ -234,22 +251,26 @@ def spectrogram(
 
 @dataclass(frozen=True)
 class ZoomFFTResult:
-    """Narrow-band zoom spectrum on a fine frequency grid (B&P 11.5.4).
+    r"""Narrow-band zoom spectrum on a fine frequency grid (B&P 11.5.4).
 
     :ivar frequencies: Zoom frequency grid from ``f_min`` to ``f_max``
         inclusive, in Hz.
     :ivar spectrum: Complex amplitude-calibrated coefficients: a sine of
         peak amplitude ``A`` on an analysis frequency reads
-        ``|spectrum| = A`` (calibration ``2·X(f)/Σw``; no one-sided
+        :math:`\lvert \text{spectrum} \rvert = A` (calibration
+        :math:`2 X(f) / \sum w`; no one-sided
         doubling at exactly 0 Hz or the Nyquist frequency).
-    :ivar amplitude: ``|spectrum|`` - peak-amplitude spectrum.
-    :ivar power: Mean-square spectrum ``amplitude²/2`` (``amplitude²``
+    :ivar amplitude: :math:`\lvert \text{spectrum} \rvert` -
+        peak-amplitude spectrum.
+    :ivar power: Mean-square spectrum :math:`\text{amplitude}^2/2`
+        (:math:`\text{amplitude}^2`
         at DC/Nyquist), consistent with the ``'spectrum'`` scaling of
-        the Welch module: a tone reads its mean square ``A²/2``.
+        the Welch module: a tone reads its mean square :math:`A^2/2`.
     :ivar bin_spacing: Grid spacing, in Hz - freely chosen, finer than
-        ``fs/N`` if requested (the zoom gain of Eq. 11.127).
+        :math:`f_s/N` if requested (the zoom gain of Eq. 11.127).
     :ivar resolution_bandwidth: Effective noise bandwidth
-        ``Bₑ = fs·Σw²/(Σw)²`` of the tapered record, in Hz - the true
+        :math:`B_e = f_s \sum w^2 / \left( \sum w \right)^2` of the
+        tapered record, in Hz - the true
         resolution, set by the record length and taper, that no grid
         refinement improves.
     :ivar window: Taper name.
@@ -288,7 +309,7 @@ def zoom_fft(
     n_points: int | None = None,
     window: str = "hann",
 ) -> ZoomFFTResult:
-    """Zoom FFT: the spectrum of a narrow band on a fine grid (B&P 11.5.4).
+    r"""Zoom FFT: the spectrum of a narrow band on a fine grid (B&P 11.5.4).
 
     Resolves closely spaced tones - gear sidebands, twin machines, power
     hum - separated by less than a practical full-band FFT bin, without
@@ -300,21 +321,23 @@ def zoom_fft(
     zoom grid (:func:`scipy.signal.zoom_fft`), which yields the same DFT
     samples to machine precision.
 
-    Amplitudes are calibrated per taper coherent gain (``2·X/Σw``), so a
+    Amplitudes are calibrated per taper coherent gain
+    (:math:`2 X / \sum w`), so a
     sine of peak amplitude ``A`` on an analysis frequency reads
-    ``amplitude = A`` and ``power = A²/2`` exactly. The grid can be made
+    :math:`\text{amplitude} = A` and :math:`\text{power} = A^2/2`
+    exactly. The grid can be made
     arbitrarily fine, but the true resolution remains the reported
-    effective noise bandwidth of the tapered record (``1/T`` for no
+    effective noise bandwidth of the tapered record (:math:`1/T` for no
     taper): the zoom refines the *grid*; only a longer record separates
-    tones closer than ``Bₑ`` (Eq. 11.127).
+    tones closer than :math:`B_e` (Eq. 11.127).
 
     :param x: Signal, 1-D.
     :param fs: Sample rate, in Hz.
-    :param f_min: Lower edge of the zoom band, in Hz (``≥ 0``).
-    :param f_max: Upper edge of the zoom band, in Hz (``≤ fs/2``).
+    :param f_min: Lower edge of the zoom band, in Hz (:math:`\ge 0`).
+    :param f_max: Upper edge of the zoom band, in Hz (:math:`\le f_s/2`).
     :param n_points: Grid points across ``[f_min, f_max]`` (endpoints
         included); ``None`` places one point per record-length resolution
-        ``fs/N``.
+        :math:`f_s/N`.
     :param window: Record taper (any scipy window name; default Hann;
         ``'boxcar'`` for none).
     :return: A :class:`ZoomFFTResult`.

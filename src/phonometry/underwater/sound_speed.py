@@ -1,5 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""
+r"""
 Speed of sound in sea water (empirical equations).
 
 Four coexisting equations for the sound speed ``c`` as a function of
@@ -12,7 +12,8 @@ temperature, salinity and depth/pressure, selectable through ``model``:
 * ``"mackenzie"`` -- the Mackenzie (1981) nine-term depth-based equation.
 * ``"medwin"`` -- the Medwin (1975) six-term short formula, the simplest member
   of the family, whose partial derivatives are the classic rules of thumb
-  ``∂c/∂T ≈ 4.6 − 0.110·T`` m/s per °C and ``∂c/∂z ≈ 0.016`` m/s per m.
+  :math:`\partial c/\partial T \approx 4.6 - 0.110 T` m/s per °C and
+  :math:`\partial c/\partial z \approx 0.016` m/s per m.
 
 The UNESCO and Del Grosso equations use pressure, not depth, so a depth is first
 converted with the Leroy & Parthiot (1998) standard-ocean formula
@@ -64,13 +65,14 @@ def _finite(value: float, name: str) -> float:
 
 
 def depth_to_pressure(depth: float, latitude: float = 45.0) -> float:
-    """Gauge pressure at a given ocean depth (Leroy & Parthiot 1998), in MPa.
+    r"""Gauge pressure at a given ocean depth (Leroy & Parthiot 1998), in
+    MPa.
 
     Standard-ocean formula (an ideal medium of 0 °C and 35 ppt); no local
     corrections are applied.
 
     :param depth: Depth below the surface ``Z``, in metres (``>= 0``).
-    :param latitude: Latitude ``φ``, in degrees (default 45°).
+    :param latitude: Latitude :math:`\varphi`, in degrees (default 45°).
     :return: Gauge pressure, in megapascals.
     :raises ValueError: If the depth is negative or non-finite.
     """
@@ -123,10 +125,15 @@ def _medwin(
     t: float | NDArray[np.float64], s: float | NDArray[np.float64],
     depth: float | NDArray[np.float64],
 ) -> float | NDArray[np.float64]:
-    """Medwin's short formula, Ainslie (2010) Equation (1.2), printed p. 20.
+    r"""Medwin's short formula, Ainslie (2010) Equation (1.2), printed p. 20.
 
-    ``c = 1449.2 + 4.6·T + 0.016·z − 0.055·T² + [(1.34 − 0.010·T)(S − 35)
-    + 2.9e-4·T³]``; the bracketed pair are the salinity and cubic-temperature
+    .. math::
+
+       c = 1449.2 + 4.6 T + 0.016 z - 0.055 T^2
+       + \left[ (1.34 - 0.010 T)(S - 35)
+       + 2.9 \times 10^{-4} T^3 \right]
+
+    The bracketed pair are the salinity and cubic-temperature
     corrections, negligible under typical ocean conditions.
     """
     return (

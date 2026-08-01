@@ -1,5 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""
+r"""
 Sound power level of a noise source from sound pressure measurements over an
 enveloping measurement surface: ISO 3744:2010 (engineering, accuracy grade 2)
 and ISO 3746:2010 (survey, accuracy grade 3).
@@ -7,30 +7,43 @@ and ISO 3746:2010 (survey, accuracy grade 3).
 The source stands on one (or more) reflecting plane(s). Sound pressure levels
 are measured at an array of microphone positions on a hypothetical surface of
 area ``S`` enveloping the source (a hemisphere or a right parallelepiped). The
-sound power level follows from the surface-averaged pressure level and the
-surface area (ISO 3744:2010 clause 8.2, equations (12), (16)-(18))::
+sound power level follows from the energy-averaged pressure level, the
+background correction :math:`K_1`, the environmental correction :math:`K_2`
+and the surface area (ISO 3744:2010 clause 8.2, equations (12), (16)-(18)):
 
-    Lp_mean = 10*lg( (1/NM) * sum_i 10^(0,1*Lpi) )      (energy average, Eq. 12)
-    K1      = -10*lg( 1 - 10^(-0,1*dLp) )               (background, Eq. 16)
-    K2      = 10*lg( 1 + 4*S/A )                        (environment, Eq. A.2)
-    Lp      = Lp_mean - K1 - K2                         (surface SPL, Eq. 17)
-    LW      = Lp + 10*lg(S/S0)     S0 = 1 m^2           (Eq. 18)
+.. math::
+
+   \overline{L_p} = 10 \lg\!\left[ \frac{1}{N_M}
+   \sum_i 10^{0.1 L_{pi}} \right] \tag{Eq. 12}
+
+   K_1 = -10 \lg\!\left( 1 - 10^{-0.1 \Delta L_p} \right) \tag{Eq. 16}
+
+   K_2 = 10 \lg\!\left( 1 + \frac{4S}{A} \right) \tag{Eq. A.2}
+
+   L_p = \overline{L_p} - K_1 - K_2 \tag{Eq. 17}
+
+   L_W = L_p + 10 \lg\frac{S}{S_0}, \qquad S_0 = 1~\text{m}^2 \tag{Eq. 18}
 
 The measurement surface area is a closed form of the source geometry: a full
-hemisphere ``S = 2*pi*r^2`` (half ``pi*r^2``, quarter ``pi*r^2/2``) for one,
-two or three reflecting planes (ISO 3744 clause 7.2.3); a parallelepiped
-``S = 4(ab+bc+ca)`` with ``a = 0,5*l1+d``, ``b = 0,5*l2+d``, ``c = l3+d`` for
-one plane (clause 7.2.4, equations (9)-(11)).
+hemisphere :math:`S = 2\pi r^2` (half :math:`\pi r^2`, quarter
+:math:`\pi r^2/2`) for one, two or three reflecting planes (ISO 3744 clause
+7.2.3); a parallelepiped :math:`S = 4(ab+bc+ca)` with :math:`a = 0.5\,l_1+d`,
+:math:`b = 0.5\,l_2+d`, :math:`c = l_3+d` for one plane (clause 7.2.4,
+equations (9)-(11)).
 
 The A-weighted sound power level is combined from band levels with the
-A-weighting band corrections ``Ck`` of ISO 3744 Annex E (Tables E.1/E.2)::
+A-weighting band corrections :math:`C_k` of ISO 3744 Annex E (Tables
+E.1/E.2):
 
-    LWA = 10*lg( sum_k 10^(0,1*(LWk + Ck)) )            (Eq. E.1)
+.. math::
+
+   L_{WA} = 10 \lg\!\left[ \sum_k 10^{0.1 (L_{Wk} + C_k)} \right]
+   \tag{Eq. E.1}
 
 ISO 3746:2010 shares the surfaces, the energy average and the LW/K1/K2 forms
 but is coarser: fewer microphone positions (clause 8.2.1), a background
 criterion of 3 dB instead of 6 dB (clause 8.4.1) and validity up to
-``K2A <= 7 dB`` instead of ``4 dB`` (clause 4.3).
+:math:`K_{2A} \le 7` dB instead of 4 dB (clause 4.3).
 """
 
 from __future__ import annotations
@@ -145,7 +158,7 @@ _SIGMA_R0: dict[str, float] = {"engineering": 1.5, "survey": 3.0}
 
 @dataclass(frozen=True)
 class SoundPowerResult:
-    """Result of a sound power determination from surface pressure levels.
+    r"""Result of a sound power determination from surface pressure levels.
 
     ``sound_power_level`` is the per-band ``LW`` (ISO 3744 Eq. 18);
     ``surface_pressure_level`` the surface SPL ``Lp`` after the K1/K2
@@ -159,7 +172,8 @@ class SoundPowerResult:
     microphone position and frequency band, shape ``(NM, NB)`` (Eq. 7,
     evaluated per band per clause 8.4). ``uncertainty`` is the expanded
     uncertainty
-    ``U = 2*sqrt(sigma_R0^2 + sigma_omc^2)`` (95 %, ISO 3744 clause 9.5)."""
+    :math:`U = 2\sqrt{\sigma_{R0}^2 + \sigma_{omc}^2}` (95 %, ISO 3744
+    clause 9.5)."""
 
     frequencies: np.ndarray | None
     sound_power_level: np.ndarray
@@ -260,7 +274,7 @@ class SoundPowerResult:
         declared measured value ``L_WA`` of a single operating mode, with the
         uncertainty ``K_WA`` defaulting to the result's own expanded uncertainty
         ``U`` (ISO 3744/3746 clause 9.5). The declared single-number value is
-        ``L_WAd = L_WA + K_WA`` (ISO 4871 clause 3.15).
+        :math:`L_{WAd} = L_{WA} + K_{WA}` (ISO 4871 clause 3.15).
 
         :param uncertainty: ``K_WA`` in decibels; defaults to this result's
             expanded uncertainty :attr:`uncertainty`.
@@ -315,16 +329,19 @@ def background_noise_correction(
     background_levels: np.ndarray,
     grade: Grade = "engineering",
 ) -> np.ndarray:
-    """Background-noise correction ``K1`` per band (ISO 3744:2010 Eq. 16).
+    r"""Background-noise correction ``K1`` per band (ISO 3744:2010 Eq. 16).
 
-    ``K1 = -10*lg(1 - 10^(-0,1*dLp))`` with ``dLp = source - background``. For
-    ``dLp`` strictly above the upper criterion (15 dB engineering, 10 dB
-    survey) the background is negligible and ``K1 = 0``; at the criterion
-    itself Eq. (16) still applies (ISO 3744:2010, 8.2.3: 6 dB <= dLp <= 15 dB;
-    ISO 3746:2010, 8.3.3: 3 dB <= dLp <= 10 dB). For ``dLp`` below the lower
-    criterion (6 dB engineering, 3 dB survey) the accuracy is reduced: ``K1``
-    is clamped to its value at that criterion and a :class:`SoundPowerWarning`
-    is emitted, the result then being an upper bound (clause 8.2.3).
+    :math:`K_1 = -10 \lg\left( 1 - 10^{-0.1 \Delta L_p} \right)` with
+    :math:`\Delta L_p = L_{\text{source}} - L_{\text{background}}`. For
+    :math:`\Delta L_p` strictly above the upper criterion (15 dB engineering,
+    10 dB survey) the background is negligible and :math:`K_1 = 0`; at the
+    criterion itself Eq. (16) still applies (ISO 3744:2010, 8.2.3:
+    :math:`6 \le \Delta L_p \le 15` dB; ISO 3746:2010, 8.3.3:
+    :math:`3 \le \Delta L_p \le 10` dB). For :math:`\Delta L_p` below the
+    lower criterion (6 dB engineering, 3 dB survey) the accuracy is reduced:
+    ``K1`` is clamped to its value at that criterion and a
+    :class:`SoundPowerWarning` is emitted, the result then being an upper
+    bound (clause 8.2.3).
 
     :param source_levels: Levels with the source operating, in decibels.
     :param background_levels: Background-noise levels, in decibels.
@@ -359,14 +376,16 @@ def environmental_correction(
     room_surface: float | None = None,
     room_volume: float | str | None = "deprecated",
 ) -> float | np.ndarray:
-    """Environmental correction ``K2`` (ISO 3744:2010 Eq. A.2).
+    r"""Environmental correction ``K2`` (ISO 3744:2010 Eq. A.2).
 
-    ``K2 = 10*lg(1 + 4*S/A)`` where ``A`` is the equivalent sound absorption
-    area of the room. ``A`` is taken directly from ``absorption_area``, or from
-    the Sabine reverberation time ``A = 0,16*V/T`` (Eq. A.3, ``reverberation_
-    time`` + ``volume``), or from the mean absorption coefficient
-    ``A = alpha*Sv`` (Eq. A.7, ``mean_absorption_coefficient`` + ``room_
-    surface``). With no room data the field is treated as free and ``K2 = 0``;
+    :math:`K_2 = 10 \lg\left( 1 + 4 S / A \right)` where ``A`` is the
+    equivalent sound absorption area of the room. ``A`` is taken directly
+    from ``absorption_area``, or from
+    the Sabine reverberation time :math:`A = 0.16 V / T` (Eq. A.3,
+    ``reverberation_time`` + ``volume``), or from the mean absorption
+    coefficient :math:`A = \alpha S_v` (Eq. A.7,
+    ``mean_absorption_coefficient`` + ``room_surface``). With no room data the
+    field is treated as free and :math:`K_2 = 0`;
     supplying only one member of a pair raises :class:`ValueError` rather than
     silently falling back to the free-field result.
 
@@ -569,16 +588,19 @@ def sound_power_pressure(
     omc_uncertainty: float = 0.0,
     room_volume: float | str | None = "deprecated",
 ) -> SoundPowerResult:
-    """Sound power level from surface pressure levels (ISO 3744/3746:2010).
+    r"""Sound power level from surface pressure levels (ISO 3744/3746:2010).
 
     ``levels_positions`` is an ``(NM, NB)`` array of time-averaged sound
     pressure levels: one row per microphone position, one column per frequency
     band (or a single column for a directly measured A-weighted level). The
     surface-averaged level is corrected for background noise (``K1``, from
     ``background_levels``) and for the test environment (``K2``, from the room
-    absorption data) and combined with the measurement surface area::
+    absorption data) and combined with the measurement surface area:
 
-        LW = 10*lg((1/NM) sum 10^(0,1*Lpi)) - K1 - K2 + 10*lg(S/S0)
+    .. math::
+
+       L_W = 10 \lg\!\left[ \frac{1}{N_M} \sum_i 10^{0.1 L_{pi}} \right]
+       - K_1 - K_2 + 10 \lg\frac{S}{S_0}
 
     The surface area ``S`` is computed from the geometry: ``radius`` for a
     ``'hemisphere'`` (clause 7.2.3) or ``dimensions`` + ``distance`` for a
@@ -855,21 +877,25 @@ class MeteorologicalCorrection:
 
 @dataclass(frozen=True)
 class PrecisionSoundPowerResult:
-    """Result of an ISO 3745:2012 (precision) sound power determination.
+    r"""Result of an ISO 3745:2012 (precision) sound power determination.
 
-    ``sound_power_level`` is the per-band ``LW = Lp_bar + 10*lg(S/S0) + C1 +
-    C2 + C3`` (Eq. 14/15). ``surface_pressure_level`` is the surface time-
+    ``sound_power_level`` is the per-band
+    :math:`L_W = \overline{L_p} + 10\lg(S/S_0) + C_1 + C_2 + C_3`
+    (Eq. 14/15). ``surface_pressure_level`` is the surface time-
     averaged level ``Lp_bar`` after the per-position background correction
     (Eq. 12/13); ``mean_pressure_level`` the same energy average of the raw
-    (uncorrected) position levels. ``background_correction`` is the per-position
-    per-band ``K1i`` (Eq. 11), shape ``(NM, NB)``. ``c1``/``c2``/``c3`` are the
-    meteorological corrections (Eq. 14). ``directivity_index`` is ``DIi = Lpi -
-    Lp_bar`` per position and band (Eq. 21); ``non_uniformity_index`` the
+    (uncorrected) position levels. ``background_correction`` is the
+    per-position per-band ``K1i`` (Eq. 11), shape ``(NM, NB)``.
+    ``c1``/``c2``/``c3`` are the
+    meteorological corrections (Eq. 14). ``directivity_index`` is
+    :math:`DI_i = L_{pi} - \overline{L_p}`
+    per position and band (Eq. 21); ``non_uniformity_index`` the
     per-band ``VIr`` sample standard deviation about the arithmetic mean
-    (Eq. 22). ``uncertainty`` is the A-weighted expanded uncertainty ``U =
-    k*sqrt(sigma_R0^2 + sigma_omc^2)`` (Eq. 24/25) and ``uncertainty_bands`` the
-    per-band value (``NaN`` without ``frequencies``). ``sound_power_level_a`` is
-    the A-weighted total ``LWA`` (Eq. C.1)."""
+    (Eq. 22). ``uncertainty`` is the A-weighted expanded uncertainty
+    :math:`U = k\sqrt{\sigma_{R0}^2 + \sigma_{omc}^2}`
+    (Eq. 24/25) and ``uncertainty_bands`` the
+    per-band value (``NaN`` without ``frequencies``).
+    ``sound_power_level_a`` is the A-weighted total ``LWA`` (Eq. C.1)."""
 
     frequencies: np.ndarray | None
     sound_power_level: np.ndarray
@@ -1014,15 +1040,17 @@ def precision_background_correction(
     background_levels: np.ndarray,
     frequencies: np.ndarray,
 ) -> np.ndarray:
-    """Per-position background correction ``K1i`` (ISO 3745:2012 Eq. 11).
+    r"""Per-position background correction ``K1i`` (ISO 3745:2012 Eq. 11).
 
-    ``K1i = -10*lg(1 - 10^(-0,1*dLpi))`` with ``dLpi = L'pi(ST) - Lpi(B)``
+    :math:`K_{1i} = -10 \lg\left( 1 - 10^{-0.1 \Delta L_{pi}} \right)` with
+    :math:`\Delta L_{pi} = L'_{pi(\mathrm{ST})} - L_{pi(\mathrm{B})}`
     evaluated at each microphone position ``i`` and band. Above the upper
-    criterion (``dLpi >= 15 dB``) the background is negligible and
-    ``K1i = 0``. The lower criterion is frequency dependent: ``10 dB`` for
-    one-third-octave mid-bands 250 Hz to 5000 Hz and ``6 dB`` for bands
-    ``<= 200 Hz`` and ``>= 6300 Hz``. Below it, ``K1i`` is clamped to its value
-    at the criterion (``0,46 dB`` and ``1,26 dB`` respectively), a
+    criterion (:math:`\Delta L_{pi} \ge 15` dB) the background is negligible
+    and :math:`K_{1i} = 0`. The lower criterion is frequency dependent:
+    ``10 dB`` for one-third-octave mid-bands 250 Hz to 5000 Hz and ``6 dB``
+    for bands :math:`\le 200` Hz and :math:`\ge 6300` Hz. Below it,
+    :math:`K_{1i}` is clamped to its value
+    at the criterion (``0.46 dB`` and ``1.26 dB`` respectively), a
     :class:`SoundPowerWarning` is emitted and those band results are upper
     bounds (clause 9.4.2).
 
@@ -1066,27 +1094,38 @@ def meteorological_corrections(
     air_absorption_coefficient: float | np.ndarray | None = None,
     radius: float = 1.0,
 ) -> MeteorologicalCorrection:
-    """Meteorological corrections C1, C2, C3 (ISO 3745:2012 Eq. 14 block).
+    r"""Meteorological corrections C1, C2, C3 (ISO 3745:2012 Eq. 14 block).
 
-    Using the measured static pressure ``ps`` (kPa) and air temperature
-    ``theta`` (deg C) form::
+    Using the measured static pressure :math:`p_s` (kPa) and air temperature
+    :math:`\theta` (deg C) form:
 
-        C1 = -10*lg(ps/ps0) + 5*lg((273+theta)/theta0)     theta0 = 314 K
-        C2 = -10*lg(ps/ps0) + 15*lg((273+theta)/theta1)    theta1 = 296 K
-        C3 = A0*(1,005 3 - 0,001 2*A0)^1,6                  A0 = a(f)*r
+    .. math::
 
-    ``ps0 = 101,325 kPa``. This is the ``ps``/``theta`` form of C1 (not the
-    characteristic-impedance form), chosen because it needs only the measured
-    ``ps`` and ``theta`` and is consistent with C2. At the reference conditions
-    (23 deg C, 101,325 kPa) ``C2 = 0`` exactly while ``C1 = 5*lg(296/314) =
-    -0,128 dB``. C3 requires the atmospheric attenuation coefficient ``a(f)``
-    from ISO 9613-1 (not computed here); without it ``C3 = 0``.
+       C_1 = -10 \lg\frac{p_s}{p_{s,0}}
+       + 5 \lg\frac{273 + \theta}{\theta_0},
+       \qquad \theta_0 = 314~\text{K}
+
+       C_2 = -10 \lg\frac{p_s}{p_{s,0}}
+       + 15 \lg\frac{273 + \theta}{\theta_1},
+       \qquad \theta_1 = 296~\text{K}
+
+       C_3 = A_0 \left( 1.0053 - 0.0012\,A_0 \right)^{1.6},
+       \qquad A_0 = \alpha(f)\,r
+
+    :math:`p_{s,0} = 101.325` kPa. This is the :math:`p_s`/:math:`\theta`
+    form of C1 (not the characteristic-impedance form), chosen because it
+    needs only the measured :math:`p_s` and :math:`\theta` and is consistent
+    with C2. At the reference conditions (23 deg C, 101.325 kPa)
+    :math:`C_2 = 0` exactly while :math:`C_1 = 5 \lg(296/314) = -0.128` dB.
+    C3 requires the atmospheric attenuation coefficient :math:`\alpha(f)`
+    from ISO 9613-1 (not computed here); without it :math:`C_3 = 0`.
 
     :param temperature: Air temperature ``theta`` at the test, in degrees C.
     :param static_pressure: Static pressure ``ps`` at the test, in kilopascals.
     :param air_absorption_coefficient: ``a(f)`` (dB/m), scalar or per band, for
-        C3; ``None`` leaves ``C3 = 0``.
-    :param radius: Measurement radius ``r`` (m), used only in ``A0 = a(f)*r``.
+        C3; ``None`` leaves :math:`C_3 = 0`.
+    :param radius: Measurement radius ``r`` (m), used only in
+        :math:`A_0 = \alpha(f)\,r`.
     :return: :class:`MeteorologicalCorrection`.
     """
     if static_pressure <= 0.0:
@@ -1133,15 +1172,16 @@ def precision_uncertainty(
     sigma_omc: float = 0.0,
     coverage_factor: float = 2.0,
 ) -> float | np.ndarray:
-    """Expanded uncertainty ``U = k*sqrt(sigma_R0^2 + sigma_omc^2)``.
+    r"""Expanded uncertainty :math:`U = k \sigma_{tot}` (ISO 3745:2012).
 
-    ISO 3745:2012 Eq. 24/25: ``sigma_tot = sqrt(sigma_R0^2 + sigma_omc^2)`` and
-    ``U = k*sigma_tot``, with ``k = 2`` (95 %, two-sided) or ``k = 1,6`` (95 %,
-    one-sided, when comparing to a limit).
+    ISO 3745:2012 Eq. 24/25:
+    :math:`\sigma_{tot} = \sqrt{\sigma_{R0}^2 + \sigma_{omc}^2}` and
+    :math:`U = k \sigma_{tot}`, with :math:`k = 2` (95 %, two-sided) or
+    :math:`k = 1.6` (95 %, one-sided, when comparing to a limit).
 
     :param sigma_r0: Reproducibility standard deviation (Tables 2/3), dB.
     :param sigma_omc: Operating/mounting standard deviation ``sigma_omc``, dB.
-    :param coverage_factor: ``k`` (typically 2 or 1,6).
+    :param coverage_factor: ``k`` (typically 2 or 1.6).
     :return: ``U`` in decibels, scalar or per band matching ``sigma_r0``.
     """
     if coverage_factor <= 0.0:
@@ -1167,20 +1207,25 @@ def sound_power_anechoic(
     sigma_omc: float = 0.0,
     coverage_factor: float = 2.0,
 ) -> PrecisionSoundPowerResult:
-    """Sound power level in an (hemi-)anechoic room (ISO 3745:2012, precision).
+    r"""Sound power level in an (hemi-)anechoic room (ISO 3745:2012, precision).
 
     ``levels_positions`` is an ``(NM, NB)`` array of time-averaged position
-    levels ``L'pi(ST)`` (one row per microphone, one column per band). Each
-    position is background-corrected by ``K1i`` (Eq. 11, from
-    ``background_levels`` and ``frequencies``), the corrected levels are
-    surface-averaged (equal-area Eq. 12, or area-weighted Eq. 13 when ``areas``
-    are given) and combined with the surface area and the meteorological
-    corrections::
+    levels :math:`L'_{pi(\mathrm{ST})}` (one row per microphone, one column
+    per band). Each position is background-corrected by :math:`K_{1i}`
+    (Eq. 11, from ``background_levels`` and ``frequencies``), the corrected
+    levels are surface-averaged (equal-area Eq. 12, or area-weighted Eq. 13
+    when ``areas`` are given) and combined with the surface area and the
+    meteorological corrections:
 
-        LW = 10*lg((1/NM) sum 10^(0,1*(L'pi - K1i))) + 10*lg(S/S0) + C1+C2+C3
+    .. math::
 
-    ``S = 4*pi*r^2`` for a ``'sphere'`` (anechoic, Eq. 14) or ``2*pi*r^2`` for a
-    ``'hemisphere'`` (hemi-anechoic, Eq. 15). There is no ISO 3744 ``K2``
+       L_W = 10 \lg\!\left[ \frac{1}{N_M}
+       \sum_i 10^{0.1 (L'_{pi} - K_{1i})} \right]
+       + 10 \lg\frac{S}{S_0} + C_1 + C_2 + C_3
+
+    :math:`S = 4\pi r^2` for a ``'sphere'`` (anechoic, Eq. 14) or
+    :math:`2\pi r^2` for a ``'hemisphere'`` (hemi-anechoic, Eq. 15). There is
+    no ISO 3744 ``K2``
     environmental term. The reproducibility ``sigma_R0`` is taken from Table 3
     (sphere/anechoic) or Table 2 (hemisphere/hemi-anechoic).
 
@@ -1196,9 +1241,9 @@ def sound_power_anechoic(
     :param temperature: Air temperature ``theta`` (deg C), for C1/C2.
     :param static_pressure: Static pressure ``ps`` (kPa), for C1/C2.
     :param air_absorption_coefficient: ``a(f)`` (dB/m) for C3, scalar or
-        per band; ``None`` leaves ``C3 = 0``.
+        per band; ``None`` leaves :math:`C_3 = 0`.
     :param sigma_omc: Operating/mounting standard deviation, dB.
-    :param coverage_factor: ``k`` (2 two-sided, 1,6 one-sided).
+    :param coverage_factor: ``k`` (2 two-sided, 1.6 one-sided).
     :return: :class:`PrecisionSoundPowerResult`.
     """
     if surface not in ("sphere", "hemisphere"):
@@ -1341,15 +1386,15 @@ _FS_RATIO_HIGH = 1.2  #: Criterion 5 upper bound on FS(1)/FS(2) (Eq. C.5).
 
 @dataclass(frozen=True)
 class PrecisionFieldIndicators:
-    """ISO 9614-3:2002 Annex B field indicators (per band).
+    r"""ISO 9614-3:2002 Annex B field indicators (per band).
 
     ``ft`` is the temporal-variability indicator (= F1 of ISO 9614-1, Eq. B.1),
     ``None`` unless time-window intensities are supplied. ``f_pi_unsigned`` is
     the unsigned pressure-intensity indicator (= F2, Eq. B.3, using the mean
     magnitude of the segment intensities) and ``f_pi_signed`` the signed one
     (= F3, Eq. B.6, using the algebraic mean); by construction
-    ``f_pi_signed >= f_pi_unsigned``. ``fs`` is the field-non-uniformity
-    indicator (= F4, Eq. B.8)."""
+    :math:`F_{pI_n}^{\mathrm{signed}} \ge F_{pI_n}^{\mathrm{unsigned}}`.
+    ``fs`` is the field-non-uniformity indicator (= F4, Eq. B.8)."""
 
     ft: np.ndarray | None
     f_pi_unsigned: np.ndarray
@@ -1359,19 +1404,23 @@ class PrecisionFieldIndicators:
 
 @dataclass(frozen=True)
 class PrecisionCriteria:
-    """ISO 9614-3:2002 Annex C acceptance criteria (per band, pass/fail).
+    r"""ISO 9614-3:2002 Annex C acceptance criteria (per band, pass/fail).
 
     Each attribute is a boolean array (True = satisfied) or ``None`` when its
     inputs are absent. ``criterion_1`` scan repeatability
-    ``|LIn(1)-LIn(2)| <= s/2`` (Eq. C.1); ``criterion_2`` dynamic-capability
-    adequacy ``Ld >= F_pIn(signed)`` (Eq. C.2); ``criterion_3``
-    ``F_pIn(signed) - F_pIn(unsigned) <= 3 dB`` (Eq. C.3); ``criterion_4``
-    ``FS <= 2`` (Eq. C.4); ``criterion_5`` scan-density convergence
-    ``0,83 <= FS(1)/FS(2) <= 1,2`` (Eq. C.5). ``qualified`` is the conjunction
-    of criteria 1-3 with the field non-uniformity accepted through criterion 4
+    :math:`\lvert L_{I_n}(1) - L_{I_n}(2) \rvert \le s/2` (Eq. C.1);
+    ``criterion_2`` dynamic-capability
+    adequacy :math:`L_d \ge F_{pI_n}^{\mathrm{signed}}` (Eq. C.2);
+    ``criterion_3``
+    :math:`F_{pI_n}^{\mathrm{signed}} - F_{pI_n}^{\mathrm{unsigned}} \le 3` dB
+    (Eq. C.3); ``criterion_4``
+    :math:`F_S \le 2` (Eq. C.4); ``criterion_5`` scan-density convergence
+    :math:`0.83 \le F_S(1)/F_S(2) \le 1.2` (Eq. C.5). ``qualified`` is the
+    conjunction of criteria 1-3 with the field non-uniformity accepted
+    through criterion 4
     or, where evaluated, criterion 5 (C.1.6.2: a band satisfying criterion 5
-    is qualified as a final result even if ``FS(2) >= 2``); ``None`` unless
-    both criterion 1 and criterion 2 are evaluable."""
+    is qualified as a final result even if :math:`F_S(2) \ge 2`); ``None``
+    unless both criterion 1 and criterion 2 are evaluable."""
 
     criterion_1: np.ndarray | None
     criterion_2: np.ndarray | None
@@ -1383,12 +1432,13 @@ class PrecisionCriteria:
 
 @dataclass(frozen=True)
 class PrecisionIntensityResult:
-    """Result of an ISO 9614-3:2002 sound-power-by-scanning determination.
+    r"""Result of an ISO 9614-3:2002 sound-power-by-scanning determination.
 
-    ``partial_power`` is the signed ``Pi = In_i*Si`` per partial surface and
-    band (Eq. 5); ``sound_power`` the signed band total ``P = sum Pi`` (Eq. 8)
-    and ``sound_power_level`` its level ``LW = 10*lg(P/P0)`` (Eq. 9), ``NaN``
-    where ``P <= 0`` (``not_applicable_band`` True, clause 9.2).
+    ``partial_power`` is the signed :math:`P_i = I_{n,i} S_i` per partial
+    surface and band (Eq. 5); ``sound_power`` the signed band total
+    :math:`P = \sum P_i` (Eq. 8) and ``sound_power_level`` its level
+    :math:`L_W = 10 \lg(P/P_0)` (Eq. 9), ``NaN``
+    where :math:`P \le 0` (``not_applicable_band`` True, clause 9.2).
     ``sound_power_level_normalized`` is ``LW0`` normalized to 23 deg C /
     101 325 Pa (Eq. 10). ``sound_power_level_a`` is the A-weighted total over
     applicable bands (``NaN`` without ``frequencies`` and more than one band)."""
@@ -1421,16 +1471,28 @@ def precision_field_indicators(
     *,
     time_window_intensity: np.ndarray | None = None,
 ) -> PrecisionFieldIndicators:
-    """ISO 9614-3:2002 Annex B field indicators from segment data.
+    r"""ISO 9614-3:2002 Annex B field indicators from segment data.
 
-    Over the ``N`` segments of the whole measurement surface (per band)::
+    Over the ``N`` segments of the whole measurement surface (per band):
 
-        Lp_bar       = 10*lg( (1/N) sum 10^(0,1*Lpj) )          (Eq. B.4)
-        LIn_unsigned = 10*lg( (1/N) sum |In_j| / I0 )           (Eq. B.5)
-        LIn_signed   = 10*lg( |(1/N) sum In_j| / I0 )           (Eq. B.7)
-        F_pIn(unsigned) = Lp_bar - LIn_unsigned                 (Eq. B.3)
-        F_pIn(signed)   = Lp_bar - LIn_signed                   (Eq. B.6)
-        FS = (1/In_bar) sqrt( (1/(N-1)) sum (In_j - In_bar)^2 ) (Eq. B.8)
+    .. math::
+
+       \overline{L_p} = 10 \lg\!\left[ \frac{1}{N}
+       \sum_j 10^{0.1 L_{pj}} \right] \tag{Eq. B.4}
+
+       L_{|I_n|} = 10 \lg\!\left[ \frac{1}{N}
+       \sum_j \frac{|I_{nj}|}{I_0} \right] \tag{Eq. B.5}
+
+       L_{I_n} = 10 \lg\!\left[ \frac{1}{I_0} \left| \frac{1}{N}
+       \sum_j I_{nj} \right| \right] \tag{Eq. B.7}
+
+       F_{pI_n}^{\mathrm{unsigned}} = \overline{L_p} - L_{|I_n|}
+       \tag{Eq. B.3}
+
+       F_{pI_n}^{\mathrm{signed}} = \overline{L_p} - L_{I_n} \tag{Eq. B.6}
+
+       F_S = \frac{1}{\overline{I_n}} \sqrt{ \frac{1}{N-1}
+       \sum_j \left( I_{nj} - \overline{I_n} \right)^2 } \tag{Eq. B.8}
 
     With ``time_window_intensity`` (an ``(M, NB)`` array of window-averaged
     intensities) the temporal-variability indicator ``FT`` (Eq. B.1) is also
@@ -1517,15 +1579,17 @@ def precision_qualification(
     frequencies: np.ndarray | None = None,
     repeatability_limit: float | np.ndarray | None = None,
 ) -> PrecisionCriteria:
-    """Evaluate the five ISO 9614-3:2002 Annex C acceptance criteria per band.
+    r"""Evaluate the five ISO 9614-3:2002 Annex C acceptance criteria per band.
 
     :param indicators: The :class:`PrecisionFieldIndicators` (gives criteria 3
         and 4 directly).
     :param scan_intensity_level_1: ``LIn(1)`` per band (dB), first scan.
     :param scan_intensity_level_2: ``LIn(2)`` per band (dB), second scan; with
-        the first scan and ``s`` this gives criterion 1 (``|dL| <= s/2``).
+        the first scan and ``s`` this gives criterion 1
+        (:math:`\lvert \Delta L \rvert \le s/2`).
     :param pressure_residual_index: ``delta_pI0`` (dB), scalar or per band; with
-        ``K = 10`` gives ``Ld`` for criterion 2 (``Ld >= F_pIn(signed)``).
+        :math:`K = 10` gives ``Ld`` for criterion 2
+        (:math:`L_d \ge F_{pI_n}^{\mathrm{signed}}`).
     :param field_nonuniformity_1: ``FS(1)`` per band (initial scan density).
     :param field_nonuniformity_2: ``FS(2)`` per band (doubled density); with
         ``FS(1)`` gives criterion 5.
@@ -1609,17 +1673,21 @@ def sound_power_intensity_precision(
     temperature: float = 23.0,
     barometric_pressure: float = 101325.0,
 ) -> PrecisionIntensityResult:
-    """Sound power by intensity scanning, precision (ISO 9614-3:2002).
+    r"""Sound power by intensity scanning, precision (ISO 9614-3:2002).
 
     ``partial_intensity`` is an ``(N, NB)`` array (or ``(N,)`` for a single
-    band) of the signed normal intensity ``In_i`` on each of the ``N`` partial
-    surfaces (already the two-scan result), and ``areas`` the ``(N,)`` partial
-    surface areas ``Si``. The partial powers ``Pi = In_i*Si`` (Eq. 5) are summed
-    to ``P`` (Eq. 8) and ``LW = 10*lg(P/P0)`` (Eq. 9); a band with net ``P <= 0``
-    is flagged (``not_applicable_band``, clause 9.2) and reported as ``NaN``.
-    ``LW0`` normalizes to reference meteorology (Eq. 10)::
+    band) of the signed normal intensity :math:`I_{ni}` on each of the ``N``
+    partial surfaces (already the two-scan result), and ``areas`` the ``(N,)``
+    partial surface areas :math:`S_i`. The partial powers
+    :math:`P_i = I_{ni} S_i` (Eq. 5) are summed to :math:`P` (Eq. 8) and
+    :math:`L_W = 10 \lg(P/P_0)` (Eq. 9); a band with net :math:`P \le 0` is
+    flagged (``not_applicable_band``, clause 9.2) and reported as ``NaN``.
+    :math:`L_{W0}` normalizes to reference meteorology:
 
-        LW0 = LW - 15*lg( (B/101325) * (296,15/(273,15+theta)) )
+    .. math::
+
+       L_{W0} = L_W - 15 \lg\!\left( \frac{B}{101325} \cdot
+       \frac{296.15}{273.15 + \theta} \right) \tag{Eq. 10}
 
     :param partial_intensity: ``(N, NB)`` signed normal intensity, W/m^2.
     :param areas: ``(N,)`` partial surface areas ``Si``, m^2.

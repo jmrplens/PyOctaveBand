@@ -1,20 +1,21 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""
+r"""
 Field airborne sound insulation (ISO 16283-1:2014) and impact sound
 insulation (ISO 16283-2), with single-number weighted ratings and
 spectrum adaptation terms (ISO 717-1 airborne, ISO 717-2 impact).
 
 **Field quantities (ISO 16283-1:2014).** From the energy-average sound
 pressure levels in the source and receiving rooms this module forms the
-level difference ``D = L1 - L2`` (Clause 3.12, Formula (1)), the
-standardized level difference ``DnT = D + 10 lg(T/T0)`` with the
-reference reverberation time ``T0 = 0,5 s`` (Clause 3.13, Formula (2)),
-and the apparent sound reduction index
-``R' = D + 10 lg(S/A)`` with the Sabine equivalent absorption area
-``A = 0,16 V / T`` (Clause 3.14/3.15, Formula (4) and (5)). Source and
+level difference :math:`D = L_1 - L_2` (Clause 3.12, Formula (1)), the
+standardized level difference :math:`D_{nT} = D + 10 \lg(T/T_0)` with the
+reference reverberation time :math:`T_0 = 0.5` s (Clause 3.13,
+Formula (2)), and the apparent sound reduction index
+:math:`R' = D + 10 \lg(S/A)` with the Sabine equivalent absorption area
+:math:`A = 0.16 V / T` (Clause 3.14/3.15, Formula (4) and (5)). Source and
 receiving levels may be supplied already averaged (one value per band) or
 as several microphone positions, which are then energy-averaged with
-``10 lg( (1/n) sum 10^(Li/10) )`` (Clause 7.8, Formula (9)). All
+:math:`10 \lg\left( \frac{1}{n} \sum 10^{L_i/10} \right)` (Clause 7.8,
+Formula (9)). All
 quantities are evaluated per one-third-octave band over the core range
 100 Hz to 3150 Hz (Clause 5), the caller having already applied any
 background-noise correction (Clause 9.2).
@@ -26,8 +27,10 @@ shifted reference) is as large as possible but not more than 32,0 dB for
 the 16 one-third-octave bands (100 Hz to 3150 Hz) or 10,0 dB for the 5
 octave bands (125 Hz to 2000 Hz). The weighted rating (``Rw``, ``R'w``,
 ``Dn,w``, ``DnT,w`` ...) is the shifted reference read at 500 Hz. The
-spectrum adaptation terms are ``C = XA1 - Xw`` and ``Ctr = XA2 - Xw``
-with ``XAj = -10 lg sum 10^((Lij - Xi)/10)`` rounded to an integer, using
+spectrum adaptation terms are :math:`C = X_{A1} - X_w` and
+:math:`C_{tr} = X_{A2} - X_w`
+with :math:`X_{Aj} = -10 \lg \sum 10^{(L_{ij} - X_i)/10}` rounded to an
+integer, using
 the A-weighted spectra No. 1 (pink noise, ``C``) and No. 2 (urban traffic,
 ``Ctr``) of Table 4 (Clause 4.5, Formula (1) and (2)). Input levels are
 reduced to one decimal place before use (Clause 4.4, footnote 1). The
@@ -48,10 +51,13 @@ when stating the uncertainty of single-number values.
 **Field impact quantities (ISO 16283-2).** With the tapping machine as the
 impact source this module forms, from the energy-average impact sound
 pressure level ``Li`` in the receiving room, the standardized impact sound
-pressure level ``L'nT = Li - 10 lg(T/T0)`` with ``T0 = 0,5 s`` (Clause
+pressure level :math:`L'_{nT} = L_i - 10 \lg(T/T_0)` with
+:math:`T_0 = 0.5` s (Clause
 3.13, Formula (1)) and the normalized impact sound pressure level
-``L'n = Li + 10 lg(A/A0)`` with the Sabine absorption area ``A = 0,16 V/T``
-and the reference area ``A0 = 10 m²`` (Clause 3.14, Formula (2)). Levels
+:math:`L'_n = L_i + 10 \lg(A/A_0)` with the Sabine absorption area
+:math:`A = 0.16 V/T`
+and the reference area :math:`A_0 = 10` m² (Clause 3.14, Formula (2)).
+Levels
 may be supplied already averaged or as several microphone positions, then
 energy-averaged (Clause 7.8, Formula (10)), over the core one-third-octave
 range 100 Hz to 3150 Hz (Clause 5.1).
@@ -59,16 +65,20 @@ range 100 Hz to 3150 Hz (Clause 5.1).
 **Field façade quantities (ISO 16283-3:2016).** With an outdoor sound
 source this module forms, from the level 2 m in front of the façade
 ``L1,2m`` and the receiving-room level ``L2``, the level difference
-``D2m = L1,2m - L2`` (Clause 3.14), its standardized form
-``D2m,nT = D2m + 10 lg(T/T0)`` with ``T0 = 0,5 s`` (Clause 3.15) and
-normalized form ``D2m,n = D2m - 10 lg(A/A0)`` with the Sabine absorption
-area ``A = 0,16 V/T`` (Clause 3.17) and reference ``A0 = 10 m²``
+:math:`D_{2m} = L_{1,2m} - L_2` (Clause 3.14), its standardized form
+:math:`D_{2m,nT} = D_{2m} + 10 \lg(T/T_0)` with :math:`T_0 = 0.5` s
+(Clause 3.15) and
+normalized form :math:`D_{2m,n} = D_{2m} - 10 \lg(A/A_0)` with the Sabine
+absorption
+area :math:`A = 0.16 V/T` (Clause 3.17) and reference :math:`A_0 = 10` m²
 (Clause 3.16): the global loudspeaker / traffic quantities
 ``Dls,2m,*`` / ``Dtr,2m,*``. When a surface level ``L1,s`` (microphone on
 the test element) with the element area ``S`` and volume are given it
 forms the apparent sound reduction index
-``R'45° = L1,s - L2 + 10 lg(S/A) - 1,5`` for the loudspeaker element method
-(Clause 3.12) or ``R'tr,s = L1,s - L2 + 10 lg(S/A) - 3`` for the
+:math:`R'_{45^\circ} = L_{1,s} - L_2 + 10 \lg(S/A) - 1.5` for the
+loudspeaker element method
+(Clause 3.12) or :math:`R'_{tr,s} = L_{1,s} - L_2 + 10 \lg(S/A) - 3` for
+the
 road-traffic element method (Clause 3.13). These quantities are defined by
 unnumbered formulas inline in the Clause 3 terms; positions are
 energy-averaged with the surface-level formula (Clause 9.5.1, Formula (7)).
@@ -86,7 +96,8 @@ as large as possible but not more than 32,0 dB (16 one-third-octave bands)
 or 10,0 dB (5 octave bands). The rating (``Ln,w``, ``L'n,w``, ``L'nT,w``)
 is the shifted reference read at 500 Hz, reduced by a further 5 dB for
 octave bands (Clause 4.3.2). The spectrum adaptation term
-``CI = Ln,sum - 15 - Ln,w`` uses the energetic sum ``Ln,sum`` over
+:math:`C_I = L_{n,sum} - 15 - L_{n,w}` uses the energetic sum ``Ln,sum``
+over
 100 Hz to 2500 Hz (one-third octave) or 125 Hz to 2000 Hz (octave),
 rounded to an integer (Clause A.2.1, Formulae (A.1) to (A.3)). The Table 3
 reference values, the shifting rule and CI are identical in the 2013 and
@@ -240,9 +251,9 @@ _VALUES_FINITE_MSG = "'values_by_band' must contain only finite values."
 
 @dataclass(frozen=True)
 class AirborneInsulationResult:
-    """Per-band field airborne sound insulation (ISO 16283-1:2014).
+    r"""Per-band field airborne sound insulation (ISO 16283-1:2014).
 
-    :ivar d: Level difference ``D = L1 - L2`` per band, in dB
+    :ivar d: Level difference :math:`D = L_1 - L_2` per band, in dB
         (Clause 3.12, Formula (1)).
     :ivar dnt: Standardized level difference ``DnT`` per band, in dB
         (Clause 3.13, Formula (2)).
@@ -431,13 +442,13 @@ class WeightedRatingResult:
 
 @dataclass(frozen=True)
 class ImpactInsulationResult:
-    """Per-band field impact sound insulation (ISO 16283-2).
+    r"""Per-band field impact sound insulation (ISO 16283-2).
 
     :ivar l_n_t: Standardized impact sound pressure level
-        ``L'nT = Li - 10 lg(T/T0)`` per band, in dB (Clause 3.13,
+        :math:`L'_{nT} = L_i - 10 \lg(T/T_0)` per band, in dB (Clause 3.13,
         Formula (1)).
     :ivar l_n: Normalized impact sound pressure level
-        ``L'n = Li + 10 lg(A/A0)`` per band, in dB (Clause 3.14,
+        :math:`L'_n = L_i + 10 \lg(A/A_0)` per band, in dB (Clause 3.14,
         Formula (2)), or ``None`` when the receiving-room volume was not
         supplied.
     :ivar li: Energy-average impact sound pressure levels the quantities
@@ -616,14 +627,16 @@ class ImpactRatingResult:
 
 @dataclass(frozen=True)
 class FacadeInsulationResult:
-    """Per-band field façade sound insulation (ISO 16283-3).
+    r"""Per-band field façade sound insulation (ISO 16283-3).
 
-    :ivar d_2m: Level difference ``D2m = L1,2m - L2`` per band, in dB
-        (Clause 3.14; ``Dls,2m`` loudspeaker, ``Dtr,2m`` traffic).
+    :ivar d_2m: Level difference :math:`D_{2m} = L_{1,2m} - L_2` per band,
+        in dB (Clause 3.14; ``Dls,2m`` loudspeaker, ``Dtr,2m`` traffic).
     :ivar d_2m_nt: Standardized level difference
-        ``D2m,nT = D2m + 10 lg(T/T0)`` per band, in dB (Clause 3.15).
+        :math:`D_{2m,nT} = D_{2m} + 10 \lg(T/T_0)` per band, in dB
+        (Clause 3.15).
     :ivar d_2m_n: Normalized level difference
-        ``D2m,n = D2m - 10 lg(A/A0)`` per band, in dB (Clause 3.16), or
+        :math:`D_{2m,n} = D_{2m} - 10 \lg(A/A_0)` per band, in dB
+        (Clause 3.16), or
         ``None`` when the receiving-room volume was not supplied.
     :ivar r_prime: Apparent sound reduction index ``R'45°`` (loudspeaker,
         Clause 3.12) or ``R'tr,s`` (road traffic, Clause 3.13) per band, in
@@ -903,17 +916,19 @@ def _render_iso16283_facade(
 
 
 def _round_half_up_tenths(values: np.ndarray) -> np.ndarray:
-    """Reduce levels to one decimal place (ISO 717-1 Clause 4.4, note 1).
+    r"""Reduce levels to one decimal place (ISO 717-1 Clause 4.4, note 1).
 
     Rounds each value to the nearest tenth of a decibel, half away from
-    zero (``floor(x*10 + 0,5)/10`` for non-negative values, mirrored for
+    zero (:math:`\lfloor x \cdot 10 + 0.5 \rfloor / 10` for non-negative
+    values, mirrored for
     negative ones).
 
     .. note::
-        This rounds negative halves *away from zero* (−0,05 → −0,1), whereas
+        This rounds negative halves *away from zero* (−0.05 → −0.1), whereas
         the adaptation-term reductions (:func:`_adaptation_term`,
         :func:`_impact_ci`) use the ISO 80000-1 footnote form
-        ``floor(x + 0,5)`` which rounds them *towards* +∞ (−0,5 → 0). The two
+        :math:`\lfloor x + 0.5 \rfloor` which rounds them *towards* +∞
+        (−0.5 → 0). The two
         conventions differ only for exactly-half negative values, which do
         not occur with realistic (positive-level) insulation data; the
         difference is documented here rather than unified so each function
@@ -926,11 +941,12 @@ def _round_half_up_tenths(values: np.ndarray) -> np.ndarray:
 def energy_average_level(
     levels: Sequence[float] | np.ndarray, axis: int = -1
 ) -> np.ndarray | float:
-    """
+    r"""
     Energy-average sound pressure level (ISO 16283-1:2014, Formula (9)).
 
     Combines sound pressure levels measured at several microphone
-    positions into ``L = 10 lg( (1/n) sum_i 10^(Li/10) )``.
+    positions into
+    :math:`L = 10 \lg\left( \frac{1}{n} \sum_i 10^{L_i/10} \right)`.
 
     :param levels: Sound pressure levels, in dB, at the ``n`` positions to
         be averaged along ``axis``.
@@ -980,15 +996,17 @@ def airborne_insulation(
     volume: float | None = None,
     t0: float = 0.5,
 ) -> AirborneInsulationResult:
-    """
+    r"""
     Field airborne sound insulation per ISO 16283-1:2014.
 
-    Computes, per frequency band, the level difference ``D = L1 - L2``
+    Computes, per frequency band, the level difference
+    :math:`D = L_1 - L_2`
     (Formula (1)), the standardized level difference
-    ``DnT = D + 10 lg(T/T0)`` (Formula (2)) and, when the partition area
+    :math:`D_{nT} = D + 10 \lg(T/T_0)` (Formula (2)) and, when the partition
+    area
     and receiving-room volume are given, the apparent sound reduction
-    index ``R' = D + 10 lg(S/A)`` with ``A = 0,16 V / T`` (Formula (4)
-    and (5)).
+    index :math:`R' = D + 10 \lg(S/A)` with :math:`A = 0.16\,V/T`
+    (Formula (4) and (5)).
 
     ``l1`` and ``l2`` may be one value per band (already energy-averaged)
     or a two-dimensional ``(positions, bands)`` array, in which case the
@@ -1091,10 +1109,12 @@ def _best_shift(
     limit: float,
     step: float = 1.0,
 ) -> tuple[float, float]:
-    """Largest ``step``-sized shift with unfavourable-deviation sum in ``limit``.
+    r"""Largest ``step``-sized shift with unfavourable-deviation sum bounded.
 
     Shifts the reference by multiples of ``step`` and returns the largest
-    shift for which ``sum max(0, reference + shift - measured) <= limit``
+    shift for which
+    :math:`\sum \max(0, \mathrm{reference} + \mathrm{shift}
+    - \mathrm{measured}) \le \mathrm{limit}`
     (the sum is monotone non-decreasing in the shift), together with that
     sum. ``step`` is 1 dB for the standard rating (ISO 717-1 Clause 4.4 /
     ISO 717-2 Clause 4.3) or 0,1 dB for the one-decimal rating used in
@@ -1197,15 +1217,17 @@ def impact_insulation(
     volume: float | None = None,
     t0: float = 0.5,
 ) -> ImpactInsulationResult:
-    """
+    r"""
     Field impact sound insulation per ISO 16283-2 (tapping machine).
 
     Computes, per frequency band, the standardized impact sound pressure
-    level ``L'nT = Li - 10 lg(T/T0)`` (Formula (1)) and, when the
+    level :math:`L'_{nT} = L_i - 10 \lg(T/T_0)` (Formula (1)) and, when the
     receiving-room volume is given, the normalized impact sound pressure
-    level ``L'n = Li + 10 lg(A/A0)`` with the Sabine equivalent absorption
-    area ``A = 0,16 V / T`` (Formula (6)) and the reference absorption area
-    ``A0 = 10 m²`` (Formula (2)).
+    level :math:`L'_n = L_i + 10 \lg(A/A_0)` with the Sabine equivalent
+    absorption
+    area :math:`A = 0.16\,V/T` (Formula (6)) and the reference absorption
+    area
+    :math:`A_0 = 10` m² (Formula (2)).
 
     ``li`` may be one value per band (already energy-averaged) or a
     two-dimensional ``(positions, bands)`` array, in which case the
@@ -1262,20 +1284,24 @@ def facade_insulation(
     t0: float = 0.5,
     frequencies: Sequence[float] | np.ndarray | None = None,
 ) -> FacadeInsulationResult:
-    """
+    r"""
     Field façade sound insulation per ISO 16283-3:2016.
 
     Computes, per frequency band, the global-method level difference
-    ``D2m = L1,2m - L2`` (Clause 3.14), its standardized form
-    ``D2m,nT = D2m + 10 lg(T/T0)`` (Clause 3.15) and, when the
+    :math:`D_{2m} = L_{1,2m} - L_2` (Clause 3.14), its standardized form
+    :math:`D_{2m,nT} = D_{2m} + 10 \lg(T/T_0)` (Clause 3.15) and, when the
     receiving-room volume is given, its normalized form
-    ``D2m,n = D2m - 10 lg(A/A0)`` with the Sabine equivalent absorption
-    area ``A = 0,16 V/T`` (Clause 3.17) and ``A0 = 10 m²`` (Clause 3.16).
+    :math:`D_{2m,n} = D_{2m} - 10 \lg(A/A_0)` with the Sabine equivalent
+    absorption
+    area :math:`A = 0.16\,V/T` (Clause 3.17) and :math:`A_0 = 10` m²
+    (Clause 3.16).
     When a surface level ``L1,s`` (microphone on the test element),
     together with the element area ``S`` and the volume, is supplied it
     also computes the apparent sound reduction index of the element
-    method: ``R'45° = L1,s - L2 + 10 lg(S/A) - 1,5`` for a loudspeaker
-    source (Clause 3.12) or ``R'tr,s = L1,s - L2 + 10 lg(S/A) - 3`` for a
+    method: :math:`R'_{45^\circ} = L_{1,s} - L_2 + 10 \lg(S/A) - 1.5` for a
+    loudspeaker
+    source (Clause 3.12) or
+    :math:`R'_{tr,s} = L_{1,s} - L_2 + 10 \lg(S/A) - 3` for a
     road-traffic source (Clause 3.13). The defining formulas are unnumbered
     inline in the Clause 3 terms.
 
@@ -1441,10 +1467,11 @@ def _resolve_impact_band_set(
 
 
 def _impact_ci(measured: np.ndarray, rating: int, n_bands: int) -> int:
-    """Spectrum adaptation term ``CI`` (ISO 717-2 Clause A.2.1).
+    r"""Spectrum adaptation term ``CI`` (ISO 717-2 Clause A.2.1).
 
-    ``CI = Ln,sum - 15 - Ln,w`` with the energetic sum ``Ln,sum = 10 lg
-    Σ 10^(Li/10)`` over the CI range (one-third octave 100-2500 Hz, i.e.
+    :math:`C_I = L_{n,sum} - 15 - L_{n,w}` with the energetic sum
+    :math:`L_{n,sum} = 10 \lg \sum
+    10^{L_i/10}` over the CI range (one-third octave 100-2500 Hz, i.e.
     the first 15 bands; octave 125-2000 Hz), rounded to an integer
     (round half up), Formulae (A.1) to (A.3).
     """
@@ -1532,13 +1559,17 @@ _IMPACT_REFERENCE_FLOOR_CI = -11
 def weighted_impact_improvement(
     delta_l: Sequence[float] | np.ndarray,
 ) -> int:
-    """Weighted reduction of impact sound pressure level ``ΔLw`` (ISO 717-2:2020 §5).
+    r"""Weighted reduction of impact level ``ΔLw`` (ISO 717-2:2020 §5).
 
-    Relates a measured improvement spectrum ``ΔL`` to the heavyweight reference
+    Relates a measured improvement spectrum ``ΔL`` to the heavyweight
+    reference
     floor of Table 4: the reference level with the covering is
-    ``Ln,r = Ln,r,0 − ΔL`` (Formula (1)) and the weighted improvement is
-    ``ΔLw = Ln,r,0,w − Ln,r,w = 78 − Ln,r,w`` (Formula (2)), where ``Ln,r,w`` is
-    the ISO 717-2 weighted rating of ``Ln,r`` from :func:`weighted_impact_rating`.
+    :math:`L_{n,r} = L_{n,r,0} - \Delta L` (Formula (1)) and the weighted
+    improvement is
+    :math:`\Delta L_w = L_{n,r,0,w} - L_{n,r,w} = 78 - L_{n,r,w}`
+    (Formula (2)), where ``Ln,r,w`` is
+    the ISO 717-2 weighted rating of ``Ln,r`` from
+    :func:`weighted_impact_rating`.
 
     :param delta_l: The reduction of impact sound pressure level ``ΔL`` per band,
         in dB; 16 one-third-octave values from 100 Hz to 3150 Hz (e.g. from a
@@ -1562,14 +1593,16 @@ def weighted_impact_improvement(
 def impact_improvement_adaptation_term(
     delta_l: Sequence[float] | np.ndarray,
 ) -> int:
-    """Spectrum adaptation term ``CI,Δ`` of a floor covering (ISO 717-2:2020 A.2.2).
+    r"""Adaptation term ``CI,Δ`` of a floor covering (ISO 717-2:2020 A.2.2).
 
-    ``CI,Δ = CI,r,0 − CI,r`` (Formula (A.4)) with ``CI,r,0 = −11 dB`` (the
+    :math:`C_{I,\Delta} = C_{I,r,0} - C_{I,r}` (Formula (A.4)) with
+    :math:`C_{I,r,0} = -11` dB (the
     bare Table 4 reference floor) and ``CI,r`` the ISO 717-2 spectrum
     adaptation term of the reference floor with the covering under test,
-    ``Ln,r = Ln,r,0 − ΔL`` (Formula (1)). Together with
+    :math:`L_{n,r} = L_{n,r,0} - \Delta L` (Formula (1)). Together with
     :func:`weighted_impact_improvement` it yields the single-number reduction
-    for a flat spectrum, ``ΔLlin = ΔLw + CI,Δ`` (Formula (A.5)). ISO 16251-1
+    for a flat spectrum, :math:`\Delta L_{lin} = \Delta L_w + C_{I,\Delta}`
+    (Formula (A.5)). ISO 16251-1
     Clause 8 e) requires this term in the statement of results.
 
     :param delta_l: The reduction of impact sound pressure level ``ΔL`` per
@@ -1765,13 +1798,14 @@ def weighted_rating_extended(
     *,
     one_decimal: bool = False,
 ) -> ExtendedWeightedRatingResult:
-    """Weighted rating with enlarged-range adaptation terms (ISO 717-1 Annex B).
+    """Weighted rating with enlarged-range adaptation terms (ISO 717-1 An. B).
 
     Computes the weighted rating from the core one-third-octave bands
     100-3150 Hz (Clause 4.4) and, for every enlarged frequency range covered
     by the input, the additional spectrum adaptation terms of Annex B
     (``C50-3150``, ``C50-5000``, ``C100-5000`` and the ``Ctr`` counterparts)
-    with the Table B.1 spectra: ``Cj = XAj − Xw`` where ``XAj`` sums over the
+    with the Table B.1 spectra: :math:`C_j = X_{Aj} - X_w` where ``XAj`` sums
+    over the
     bands of the enlarged range (Clause 4.5 with Annex B).
 
     With ``one_decimal=True`` the reference-curve shift runs in 0,1 dB steps
@@ -1838,17 +1872,18 @@ def weighted_impact_rating_extended(
     *,
     one_decimal: bool = False,
 ) -> ExtendedImpactRatingResult:
-    """Weighted impact rating with ``CI,50-2500`` (ISO 717-2:2020 A.2.1).
+    r"""Weighted impact rating with ``CI,50-2500`` (ISO 717-2:2020 A.2.1).
 
     Computes the weighted impact rating from the core one-third-octave bands
     100-3150 Hz (Clause 4.3) and, when the input covers 50-2500 Hz, the
     enlarged-range spectrum adaptation term ``CI,50-2500`` of the A.2.1 NOTE:
     the energetic sum runs over 50-2500 Hz instead of 100-2500 Hz in
-    Formula (A.1), ``CI = Ln,sum − 15 − Ln,w``.
+    Formula (A.1), :math:`C_I = L_{n,sum} - 15 - L_{n,w}`.
 
     With ``one_decimal=True`` the reference-curve shift runs in 0,1 dB steps
     and the sums keep one decimal place (Clauses 4.3.1/4.4; e.g. the
-    reference floor yields ``Ln,r,0,w = 77,6 dB`` and ``CI,r,0 = −10,3 dB``
+    reference floor yields :math:`L_{n,r,0,w} = 77.6` dB and
+    :math:`C_{I,r,0} = -10.3` dB
     as printed in A.2.2).
 
     :param values_by_band: Measured impact levels (``Ln``, ``L'n``, ``L'nT``)

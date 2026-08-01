@@ -1,6 +1,7 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""
-Impact-sound improvement of floor coverings on a small mock-up (ISO 16251-1:2014).
+r"""
+Impact-sound improvement of floor coverings on a small mock-up
+(ISO 16251-1:2014).
 
 Laboratory method for the **improvement of impact sound insulation** ``ΔL`` of a
 soft, locally-reacting floor covering (carpet, PVC, linoleum; ISO 10140-1
@@ -12,24 +13,32 @@ on the underside of the plate is measured with and without the covering. For
 locally-reacting coverings this acceleration-level difference equals the ISO
 10140 impact sound reduction (Clause 4).
 
-**Acceleration level (Formula (1)).** ``La = 10 lg[(1/Tm) ∫ a(t)²/a0² dt]`` dB,
-with the reference acceleration ``a0 = 1e-6 m/s²``, i.e. ``La = 10 lg(⟨a²⟩/a0²)``.
+**Acceleration level (Formula (1)).**
+:math:`L_a = 10 \lg[(1/T_m) \int a(t)^2/a_0^2\,dt]` dB,
+with the reference acceleration :math:`a_0 = 10^{-6}` m/s², i.e.
+:math:`L_a = 10 \lg(\overline{a^2}/a_0^2)`.
 
-**Background correction (Formula (2)).** Each measured level ``L'`` is corrected
+**Background correction (Formula (2)).** Each measured level ``L'`` is
+corrected
 against the background ``Lb`` per accelerometer position, by the margin
-``L' − Lb``: unchanged for ``≥ 15 dB``; energy subtraction
-``10 lg(10^(L'/10) − 10^(Lb/10))`` for ``6 ≤ margin < 15 dB``; and the fixed
-``L' − 1,3 dB`` limit for ``< 6 dB``. Bands hitting the 1,3 dB limit are flagged
-as the *limit of measurement* (reported as ``> ΔL``). This differs from the ISO
+:math:`L' - L_b`: unchanged for :math:`\ge 15` dB; energy subtraction
+:math:`10 \lg(10^{L'/10} - 10^{L_b/10})` for
+:math:`6 \le \mathrm{margin} < 15` dB; and the fixed
+:math:`L' - 1.3` dB limit for :math:`< 6` dB. Bands hitting the 1.3 dB limit
+are flagged
+as the *limit of measurement* (reported as :math:`> \Delta L`). This differs
+from the ISO
 10140-4 correction (:func:`phonometry.background_correction`) only at exactly
-``margin = 6 dB``.
+:math:`\mathrm{margin} = 6` dB.
 
 **Improvement (Formulae (3)/(4)).** The per-position difference is
-``ΔLt,a = L0,t,a − L1,t,a`` (0 = bare plate, 1 = specimen) and the improvement is
+:math:`\Delta L_{t,a} = L_{0,t,a} - L_{1,t,a}` (0 = bare plate, 1 = specimen)
+and the improvement is
 their arithmetic mean over all tapping-machine (t) and accelerometer (a)
-positions, ``ΔL = (1/(t·a)) Σt Σa ΔLt,a``.
+positions, :math:`\Delta L = (1/(t \cdot a)) \sum_t \sum_a \Delta L_{t,a}`.
 
-**Octave bands (Formula (5)).** ``ΔLoct = −10 lg[(1/3) Σ 10^(−ΔL_n/10)]`` dB from
+**Octave bands (Formula (5)).**
+:math:`\Delta L_{oct} = -10 \lg[(1/3) \sum 10^{-\Delta L_n/10}]` dB from
 the three one-third-octave values in each octave.
 
 **Weighted improvement.** ``ΔLw`` is the ISO 717-2 weighted reduction of impact
@@ -95,9 +104,9 @@ def acceleration_level(
     *,
     reference: float = _ACCELERATION_REFERENCE,
 ) -> np.ndarray:
-    """Vibratory acceleration level ``La`` (ISO 16251-1 Formula (1)).
+    r"""Vibratory acceleration level ``La`` (ISO 16251-1 Formula (1)).
 
-    ``La = 10 lg(a_rms² / a0²) = 20 lg(a_rms / a0)`` dB.
+    :math:`L_a = 10 \lg(a_{rms}^2 / a_0^2) = 20 \lg(a_{rms} / a_0)` dB.
 
     :param acceleration: RMS acceleration ``a_rms`` per band, in m/s² (> 0).
     :param reference: Reference acceleration ``a0``, in m/s² (default 1e-6).
@@ -117,12 +126,14 @@ def background_corrected_level(
     signal_and_background: float | Sequence[float] | np.ndarray,
     background: float | Sequence[float] | np.ndarray,
 ) -> tuple[np.ndarray, np.ndarray]:
-    """Correct a measured level for background noise (ISO 16251-1 Formula (2)).
+    r"""Correct a measured level for background noise (ISO 16251-1 F. (2)).
 
-    :param signal_and_background: Measured level ``L'`` (with background) per band, in dB.
+    :param signal_and_background: Measured level ``L'`` (with background) per
+        band, in dB.
     :param background: Background-noise level ``Lb`` per band, in dB.
-    :return: ``(corrected, limited)``: the corrected levels ``L`` per band, in dB,
-        and a boolean mask of bands at the 1,3 dB limit of measurement (report as ``> ΔL``).
+    :return: ``(corrected, limited)``: the corrected levels ``L`` per band,
+        in dB, and a boolean mask of bands at the 1.3 dB limit of measurement
+        (report as :math:`> \Delta L`).
     :raises ValueError: Mismatched shapes or non-finite values.
     """
     lp = _finite(signal_and_background, "signal_and_background")
@@ -144,12 +155,14 @@ def background_corrected_level(
 
 @dataclass(frozen=True)
 class FloorCoveringImprovementResult:
-    """Impact-sound improvement of a floor covering (ISO 16251-1).
+    r"""Impact-sound improvement of a floor covering (ISO 16251-1).
 
     :ivar frequencies: One-third-octave band centre frequencies, in Hz.
-    :ivar improvement: Improvement of impact sound insulation ``ΔL`` per band, in dB.
-    :ivar limited: Per-band boolean mask of bands at the 1,3 dB limit of
-        measurement (reported as ``> ΔL``); all ``False`` when no background
+    :ivar improvement: Improvement of impact sound insulation ``ΔL`` per
+        band, in dB.
+    :ivar limited: Per-band boolean mask of bands at the 1.3 dB limit of
+        measurement (reported as :math:`> \Delta L`); all ``False`` when no
+        background
         correction was applied.
     :ivar delta_lw: Weighted improvement ``ΔLw`` (ISO 717-2), in dB, or ``None``
         when the spectrum does not contain the 16 one-third-octave rating
@@ -192,7 +205,7 @@ class FloorCoveringImprovementResult:
         verbose: bool = False,
         language: str = "en",
     ) -> str:
-        """Render an ISO 16251-1 impact-improvement test-report fiche to a PDF.
+        r"""Render an ISO 16251-1 impact-improvement test-report fiche to PDF.
 
         Writes a one-page accredited report (BS EN ISO 16251-1:2014, the
         small-mock-up laboratory method for the reduction of transmitted impact
@@ -220,7 +233,8 @@ class FloorCoveringImprovementResult:
             at or above the requirement).
         :param engine: Rendering back end; only ``"reportlab"`` is supported.
         :param verbose: When ``True``, the per-band table gains the
-            reference-floor-with-covering column ``Ln,r = Ln,r,0 - ΔL``
+            reference-floor-with-covering column
+            :math:`L_{n,r} = L_{n,r,0} - \Delta L`
             (ISO 717-2:2020 Formula (1)), the derivation basis of ``ΔLw``, when
             the spectrum is exactly the 16 rating bands 100-3150 Hz.
         :param language: Fiche language: ``"en"`` (default, English, decimal
@@ -285,15 +299,21 @@ def impact_improvement(
     *,
     background: float | Sequence[float] | np.ndarray | None = None,
 ) -> FloorCoveringImprovementResult:
-    """Improvement of impact sound insulation ``ΔL`` of a floor covering (ISO 16251-1).
+    r"""Improvement of impact sound insulation ``ΔL`` of a floor covering.
 
-    The acceleration levels without (``L0``) and with (``L1``) the specimen may be
-    given either as one value per band (already averaged over the tapping-machine
+    ISO 16251-1. The acceleration levels without (``L0``) and with (``L1``)
+    the specimen may be
+    given either as one value per band (already averaged over the
+    tapping-machine
     and accelerometer positions) or, for the raw measurement, as a
-    ``(positions, bands)`` array. The standard's order of operations is followed:
-    the background correction (Formula (2)) is applied **per position**, then the
-    level difference ``ΔLt,a = L0 − L1`` (Formula (3)), then the arithmetic mean
-    over positions ``ΔL = mean(ΔLt,a)`` (Formula (4)), necessary because Formula
+    ``(positions, bands)`` array. The standard's order of operations is
+    followed:
+    the background correction (Formula (2)) is applied **per position**, then
+    the
+    level difference :math:`\Delta L_{t,a} = L_0 - L_1` (Formula (3)), then
+    the arithmetic mean
+    over positions :math:`\Delta L = \mathrm{mean}(\Delta L_{t,a})`
+    (Formula (4)), necessary because Formula
     (2) is non-linear, so correcting must precede averaging.
 
     :param bare: Bare-plate acceleration level ``L0``, in dB; ``(bands,)`` or
@@ -302,8 +322,9 @@ def impact_improvement(
     :param frequencies: One-third-octave band centre frequencies, in Hz (``(bands,)``).
     :param background: Optional background-noise level ``Lb``, in dB; ``(bands,)``
         (applied to every position) or ``(positions, bands)``. When given, ``L0``
-        and ``L1`` are background-corrected (Formula (2)) per position before the
-        difference, and bands where any position hits the 1,3 dB limit are flagged.
+        and ``L1`` are background-corrected (Formula (2)) per position before
+        the difference, and bands where any position hits the 1.3 dB limit
+        are flagged.
     :return: :class:`FloorCoveringImprovementResult` (``ΔL`` per band).
     :raises ValueError: Mismatched shapes or non-finite values.
     """
@@ -354,9 +375,10 @@ def improvement_octave_bands(
     improvement: Sequence[float] | np.ndarray,
     frequencies: Sequence[float] | np.ndarray,
 ) -> tuple[np.ndarray, np.ndarray]:
-    """Convert a one-third-octave improvement spectrum to octaves (Formula (5)).
+    r"""Convert a one-third-octave improvement spectrum to octaves (F. (5)).
 
-    ``ΔLoct = −10 lg[(1/3) Σ_{n=1..3} 10^(−ΔL_n/10)]`` dB over the three thirds of
+    :math:`\Delta L_{oct} = -10 \lg[(1/3) \sum_{n=1}^{3} 10^{-\Delta L_n/10}]`
+    dB over the three thirds of
     each octave.
 
     :param improvement: Improvement ``ΔL`` per one-third-octave band, in dB.

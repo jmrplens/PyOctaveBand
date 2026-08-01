@@ -1,16 +1,18 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""
+r"""
 Measurement uncertainty by the GUM and its Monte Carlo supplement.
 
 Implements the two propagation methods of the *Guide to the Expression of
 Uncertainty in Measurement*:
 
 * the **law of propagation of uncertainty** (ISO/IEC Guide 98-3:2008, clause 5)
-  - the combined standard uncertainty of a measurement model ``y = f(x1..xN)``
+  - the combined standard uncertainty of a measurement model
+  :math:`y = f(x_1, \ldots, x_N)`
   from the input standard uncertainties and sensitivity coefficients, with
   optional input correlations, the effective degrees of freedom
   (Welch-Satterthwaite, Annex G.4) and the expanded uncertainty
-  ``U = k * uc`` with a coverage factor from the t-distribution (clause 6);
+  :math:`U = k u_c` with a coverage factor from the t-distribution
+  (clause 6);
 * the **Monte Carlo method** (ISO/IEC Guide 98-3-1:2008, Supplement 1) - the
   numerical propagation of the input probability density functions, giving the
   estimate, its standard uncertainty and a probabilistically symmetric coverage
@@ -57,10 +59,10 @@ DISTRIBUTIONS: tuple[str, ...] = ("gaussian", "rectangular", "triangular", "u-sh
 
 @dataclass(frozen=True)
 class Quantity:
-    """An input quantity of a measurement model (GUM clause 4).
+    r"""An input quantity of a measurement model (GUM clause 4).
 
-    :ivar value: Best estimate ``xi`` of the input quantity.
-    :ivar uncertainty: Standard uncertainty ``u(xi)`` (>= 0).
+    :ivar value: Best estimate :math:`x_i` of the input quantity.
+    :ivar uncertainty: Standard uncertainty :math:`u(x_i)` (>= 0).
     :ivar distribution: PDF used by the Monte Carlo method: ``"gaussian"``,
         ``"rectangular"``, ``"triangular"`` or ``"u-shaped"``.
     :ivar dof: Degrees of freedom of ``uncertainty`` (``inf`` for Type B).
@@ -86,37 +88,40 @@ class Quantity:
 
 
 def rectangular(value: float, half_width: float, name: str = "") -> Quantity:
-    """Type B quantity with a rectangular PDF of half-width ``a`` (GUM 4.3.7).
+    r"""Type B quantity with a rectangular PDF of half-width ``a`` (GUM 4.3.7).
 
-    The standard uncertainty is ``a / sqrt(3)``.
+    The standard uncertainty is :math:`a / \sqrt{3}`.
     """
     return Quantity(value, half_width / math.sqrt(3.0), "rectangular", name=name)
 
 
 def triangular(value: float, half_width: float, name: str = "") -> Quantity:
-    """Type B quantity with a triangular PDF of half-width ``a`` (GUM 4.3.9).
+    r"""Type B quantity with a triangular PDF of half-width ``a`` (GUM 4.3.9).
 
-    The standard uncertainty is ``a / sqrt(6)``.
+    The standard uncertainty is :math:`a / \sqrt{6}`.
     """
     return Quantity(value, half_width / math.sqrt(6.0), "triangular", name=name)
 
 
 def u_shaped(value: float, half_width: float, name: str = "") -> Quantity:
-    """Type B quantity with a U-shaped (arcsine) PDF of half-width ``a``.
+    r"""Type B quantity with a U-shaped (arcsine) PDF of half-width ``a``.
 
-    The standard uncertainty is ``a / sqrt(2)``.
+    The standard uncertainty is :math:`a / \sqrt{2}`.
     """
     return Quantity(value, half_width / math.sqrt(2.0), "u-shaped", name=name)
 
 
 @dataclass(frozen=True)
 class UncertaintyResult:
-    """Result of the GUM law of propagation of uncertainty (Guide 98-3).
+    r"""Result of the GUM law of propagation of uncertainty (Guide 98-3).
 
-    :ivar value: The output estimate ``y = f(x1..xN)``.
-    :ivar combined_uncertainty: Combined standard uncertainty ``uc(y)``.
-    :ivar sensitivities: Sensitivity coefficients ``ci = df/dxi``.
-    :ivar contributions: Per-input contributions ``|ci| u(xi)`` to ``uc(y)``.
+    :ivar value: The output estimate :math:`y = f(x_1, \ldots, x_N)`.
+    :ivar combined_uncertainty: Combined standard uncertainty
+        :math:`u_c(y)`.
+    :ivar sensitivities: Sensitivity coefficients
+        :math:`c_i = \partial f/\partial x_i`.
+    :ivar contributions: Per-input contributions
+        :math:`\lvert c_i \rvert u(x_i)` to :math:`u_c(y)`.
     :ivar effective_dof: Welch-Satterthwaite effective degrees of freedom
         (Annex G.4, defined for independent inputs). For a correlated budget
         with finite input dof it is ``NaN`` (undefined: the GUM has no
@@ -136,7 +141,7 @@ class UncertaintyResult:
     def expanded(
         self, coverage: float = 0.95, *, coverage_factor_override: float | None = None
     ) -> tuple[float, float]:
-        """Coverage factor ``k`` and expanded uncertainty ``U = k*uc``.
+        r"""Coverage factor ``k`` and expanded uncertainty :math:`U = k u_c`.
 
         :param coverage: Coverage probability in (0, 1); ``0.95`` by default.
         :param coverage_factor_override: Explicit ``k``. Required for a
@@ -180,7 +185,8 @@ class MonteCarloResult:
     """Result of the Monte Carlo method (Guide 98-3-1, Supplement 1).
 
     :ivar value: Estimate ``y`` (the sample mean of the output).
-    :ivar standard_uncertainty: ``u(y)`` (the sample standard deviation).
+    :ivar standard_uncertainty: :math:`u(y)` (the sample standard
+        deviation).
     :ivar interval: Probabilistically symmetric coverage interval
         ``(low, high)`` (clause 7.7).
     :ivar coverage: The coverage probability of ``interval``.
@@ -215,13 +221,16 @@ class MonteCarloResult:
 
 
 def _sensitivity(model: Model, values: np.ndarray, uncertainties: np.ndarray) -> np.ndarray:
-    """Central-difference sensitivity coefficients ``df/dxi`` (GUM 5.1.3).
+    r"""Central-difference sensitivities :math:`\partial f/\partial x_i`.
 
-    The step is ``max(u(xi), sqrt(eps) |xi|)`` -- GUM 5.1.4 NOTE 2 itself
-    suggests ``dxi = u(xi)`` -- with a floating-point guard of a few ULP of
-    ``xi`` and an absolute floor for all-zero inputs, so a tiny uncertainty
-    on a large value can no longer underflow the perturbation and silently
-    zero the sensitivity (e.g. ``xi = 1e9``, ``u = 1e-6``).
+    Follows GUM 5.1.3. The step is
+    :math:`\max(u(x_i), \sqrt{\epsilon} \lvert x_i \rvert)` -- GUM 5.1.4
+    NOTE 2 itself suggests :math:`dx_i = u(x_i)` -- with a floating-point
+    guard of a few ULP of
+    :math:`x_i` and an absolute floor for all-zero inputs, so a tiny
+    uncertainty on a large value can no longer underflow the perturbation
+    and silently zero the sensitivity (e.g. :math:`x_i = 10^9`,
+    :math:`u = 10^{-6}`).
     """
     import warnings
 
@@ -262,19 +271,22 @@ def combine_uncertainty(
     quantities: Sequence[Quantity],
     correlation: ArrayLike | None = None,
 ) -> UncertaintyResult:
-    """Combined standard uncertainty by the GUM law of propagation (clause 5).
+    r"""Combined standard uncertainty by the GUM law of propagation (clause 5).
 
-    :param model: The measurement function ``f(x1, ..., xN)`` returning ``y``.
+    :param model: The measurement function
+        :math:`f(x_1, \ldots, x_N)` returning ``y``.
     :param quantities: The input :class:`Quantity` objects, in the order the
         model takes its arguments.
-    :param correlation: Optional ``N x N`` correlation matrix ``r_ij`` between
+    :param correlation: Optional ``N x N`` correlation matrix
+        :math:`r_{ij}` between
         the inputs; ``None`` treats them as uncorrelated. With a non-identity
         matrix and finite input dof the effective degrees of freedom are
         ``NaN`` (undefined; the GUM defines no correlated
         fallback -- Welch-Satterthwaite holds for independent inputs only)
         and an :class:`UncertaintyWarning` is issued when finite input dof
         would otherwise have been propagated.
-    :return: An :class:`UncertaintyResult` with ``uc(y)``, the sensitivity
+    :return: An :class:`UncertaintyResult` with :math:`u_c(y)`, the
+        sensitivity
         coefficients, the contributions and the effective degrees of freedom.
     :raises ValueError: for no inputs or a malformed correlation matrix.
     """
@@ -349,11 +361,12 @@ def combine_uncertainty(
 
 
 def coverage_factor(coverage: float = 0.95, dof: float = math.inf) -> float:
-    """Coverage factor ``k`` from the t-distribution (GUM clause 6, Annex G).
+    r"""Coverage factor ``k`` from the t-distribution (GUM clause 6, Annex G).
 
     :param coverage: Coverage probability in (0, 1).
     :param dof: Effective degrees of freedom; ``inf`` gives the normal quantile.
-    :return: The two-sided coverage factor ``k = t_p(dof)``.
+    :return: The two-sided coverage factor
+        :math:`k = t_p(\text{dof})`.
     :raises ValueError: for a coverage outside (0, 1).
     """
     if not 0.0 < coverage < 1.0:
@@ -412,7 +425,7 @@ def monte_carlo(
     seed: int | None = None,
     keep_samples: bool = False,
 ) -> MonteCarloResult:
-    """Propagate uncertainty by the Monte Carlo method (Supplement 1).
+    r"""Propagate uncertainty by the Monte Carlo method (Supplement 1).
 
     Draws ``trials`` samples of each input from its PDF, evaluates the model and
     reports the sample mean, the sample standard deviation and the
@@ -425,7 +438,8 @@ def monte_carlo(
     of clause 7.9 is not implemented) and the reported interval is the
     probabilistically symmetric one (not the 5.3.4 shortest interval).
 
-    :param model: The measurement function ``f(x1, ..., xN)`` returning ``y``;
+    :param model: The measurement function
+        :math:`f(x_1, \ldots, x_N)` returning ``y``;
         it must accept array arguments (vectorised over the trials).
     :param quantities: The input :class:`Quantity` objects, in argument order.
     :param trials: Number of Monte Carlo trials ``M`` (at least 2; the sample

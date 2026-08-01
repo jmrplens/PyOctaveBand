@@ -11,11 +11,13 @@ Implements the two propagation methods of the *Guide to the Expression of
 Uncertainty in Measurement*:
 
 * the **law of propagation of uncertainty** (ISO/IEC Guide 98-3:2008, clause 5)
-  - the combined standard uncertainty of a measurement model `y = f(x1..xN)`
+  - the combined standard uncertainty of a measurement model
+  $y = f(x_1, \ldots, x_N)$
   from the input standard uncertainties and sensitivity coefficients, with
   optional input correlations, the effective degrees of freedom
   (Welch-Satterthwaite, Annex G.4) and the expanded uncertainty
-  `U = k * uc` with a coverage factor from the t-distribution (clause 6);
+  $U = k u_c$ with a coverage factor from the t-distribution
+  (clause 6);
 * the **Monte Carlo method** (ISO/IEC Guide 98-3-1:2008, Supplement 1) - the
   numerical propagation of the input probability density functions, giving the
   estimate, its standard uncertainty and a probabilistically symmetric coverage
@@ -50,11 +52,11 @@ Combined standard uncertainty by the GUM law of propagation (clause 5).
 
 | Name | Description |
 | :--- | :--- |
-| `model` | The measurement function `f(x1, ..., xN)` returning `y`. |
+| `model` | The measurement function $f(x_1, \ldots, x_N)$ returning `y`. |
 | `quantities` | The input [`Quantity`](/phonometry/reference/api/metrology/uncertainty/#quantity) objects, in the order the model takes its arguments. |
-| `correlation` | Optional `N x N` correlation matrix `r_ij` between the inputs; `None` treats them as uncorrelated. With a non-identity matrix and finite input dof the effective degrees of freedom are `NaN` (undefined; the GUM defines no correlated fallback -- Welch-Satterthwaite holds for independent inputs only) and an [`UncertaintyWarning`](/phonometry/reference/api/metrology/uncertainty/#uncertaintywarning) is issued when finite input dof would otherwise have been propagated. |
+| `correlation` | Optional `N x N` correlation matrix $r_{ij}$ between the inputs; `None` treats them as uncorrelated. With a non-identity matrix and finite input dof the effective degrees of freedom are `NaN` (undefined; the GUM defines no correlated fallback -- Welch-Satterthwaite holds for independent inputs only) and an [`UncertaintyWarning`](/phonometry/reference/api/metrology/uncertainty/#uncertaintywarning) is issued when finite input dof would otherwise have been propagated. |
 
-**Returns:** An [`UncertaintyResult`](/phonometry/reference/api/metrology/uncertainty/#uncertaintyresult) with `uc(y)`, the sensitivity coefficients, the contributions and the effective degrees of freedom.
+**Returns:** An [`UncertaintyResult`](/phonometry/reference/api/metrology/uncertainty/#uncertaintyresult) with $u_c(y)$, the sensitivity coefficients, the contributions and the effective degrees of freedom.
 
 **Raises**
 
@@ -92,7 +94,7 @@ probabilistically symmetric one (not the 5.3.4 shortest interval).
 
 | Name | Description |
 | :--- | :--- |
-| `model` | The measurement function `f(x1, ..., xN)` returning `y`; it must accept array arguments (vectorised over the trials). |
+| `model` | The measurement function $f(x_1, \ldots, x_N)$ returning `y`; it must accept array arguments (vectorised over the trials). |
 | `quantities` | The input [`Quantity`](/phonometry/reference/api/metrology/uncertainty/#quantity) objects, in argument order. |
 | `trials` | Number of Monte Carlo trials `M` (at least 2; the sample standard deviation needs two values). |
 | `coverage` | Coverage probability of the reported interval. |
@@ -127,7 +129,7 @@ Result of the Monte Carlo method (Guide 98-3-1, Supplement 1).
 | Name | Description |
 | :--- | :--- |
 | `value` | Estimate `y` (the sample mean of the output). |
-| `standard_uncertainty` | `u(y)` (the sample standard deviation). |
+| `standard_uncertainty` | $u(y)$ (the sample standard deviation). |
 | `interval` | Probabilistically symmetric coverage interval `(low, high)` (clause 7.7). |
 | `coverage` | The coverage probability of `interval`. |
 | `trials` | Number of Monte Carlo trials. |
@@ -174,8 +176,8 @@ An input quantity of a measurement model (GUM clause 4).
 
 | Name | Description |
 | :--- | :--- |
-| `value` | Best estimate `xi` of the input quantity. |
-| `uncertainty` | Standard uncertainty `u(xi)` (>= 0). |
+| `value` | Best estimate $x_i$ of the input quantity. |
+| `uncertainty` | Standard uncertainty $u(x_i)$ (>= 0). |
 | `distribution` | PDF used by the Monte Carlo method: `"gaussian"`, `"rectangular"`, `"triangular"` or `"u-shaped"`. |
 | `dof` | Degrees of freedom of `uncertainty` (`inf` for Type B). |
 | `name` | Optional label used in the uncertainty budget and its plot. |
@@ -188,7 +190,7 @@ rectangular(value: float, half_width: float, name: str = '') -> Quantity
 
 Type B quantity with a rectangular PDF of half-width `a` (GUM 4.3.7).
 
-The standard uncertainty is `a / sqrt(3)`.
+The standard uncertainty is $a / \sqrt{3}$.
 
 ## triangular
 
@@ -198,7 +200,7 @@ triangular(value: float, half_width: float, name: str = '') -> Quantity
 
 Type B quantity with a triangular PDF of half-width `a` (GUM 4.3.9).
 
-The standard uncertainty is `a / sqrt(6)`.
+The standard uncertainty is $a / \sqrt{6}$.
 
 ## u_shaped
 
@@ -208,7 +210,7 @@ u_shaped(value: float, half_width: float, name: str = '') -> Quantity
 
 Type B quantity with a U-shaped (arcsine) PDF of half-width `a`.
 
-The standard uncertainty is `a / sqrt(2)`.
+The standard uncertainty is $a / \sqrt{2}$.
 
 ## UncertaintyResult
 
@@ -229,10 +231,10 @@ Result of the GUM law of propagation of uncertainty (Guide 98-3).
 
 | Name | Description |
 | :--- | :--- |
-| `value` | The output estimate `y = f(x1..xN)`. |
-| `combined_uncertainty` | Combined standard uncertainty `uc(y)`. |
-| `sensitivities` | Sensitivity coefficients `ci = df/dxi`. |
-| `contributions` | Per-input contributions `\|ci\| u(xi)` to `uc(y)`. |
+| `value` | The output estimate $y = f(x_1, \ldots, x_N)$. |
+| `combined_uncertainty` | Combined standard uncertainty $u_c(y)$. |
+| `sensitivities` | Sensitivity coefficients $c_i = \partial f/\partial x_i$. |
+| `contributions` | Per-input contributions $\lvert c_i \rvert u(x_i)$ to $u_c(y)$. |
 | `effective_dof` | Welch-Satterthwaite effective degrees of freedom (Annex G.4, defined for independent inputs). For a correlated budget with finite input dof it is `NaN` (undefined: the GUM has no correlated form and `expanded()` then needs an explicit factor); with all-infinite input dof it is `inf` (normal-distribution coverage factor), since the GUM defines no correlated Welch-Satterthwaite form. |
 | `names` | Input labels aligned with the arrays above. |
 
@@ -246,7 +248,7 @@ UncertaintyResult.expanded(
 ) -> tuple[float, float]
 ```
 
-Coverage factor `k` and expanded uncertainty `U = k*uc`.
+Coverage factor `k` and expanded uncertainty $U = k u_c$.
 
 **Parameters**
 

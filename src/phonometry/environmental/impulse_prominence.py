@@ -1,5 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""
+r"""
 Prominence of impulsive sounds and the LAeq adjustment (NT ACOU 112:2002).
 
 Noise with prominent impulses is more annoying than a steady sound of the same
@@ -8,12 +8,18 @@ measured ``LAeq``. The audibility of an impulse is captured by the **predicted
 prominence** ``P``, a logarithmic measure of the onset rate and the level
 difference of the impulse (clause 7):
 
-``P = 3*lg(onset_rate) + 2*lg(level_difference)``   (Formula 1)
+.. math::
+
+   P = 3 \lg(\text{onset rate}) + 2 \lg(\text{level difference})
+   \tag{Formula 1}
 
 From the impulse with the highest prominence over a 30-minute period, a
 graduated adjustment follows (clause 8):
 
-``KI = 1.8*(P - 5)`` dB for ``P > 5``, else ``0``   (Formula 2)
+.. math::
+
+   K_I = 1.8 \, (P - 5)~\text{dB} \quad \text{for } P > 5,
+   \text{ else } 0 \tag{Formula 2}
 
 and the rating level over a reference time interval combines the adjusted
 sub-interval levels (clause 8, Note 1). An impulse qualifies when its onset
@@ -166,9 +172,10 @@ class ImpulseProminenceResult:
 def predicted_prominence(
     onset_rate: ArrayLike, level_difference: ArrayLike
 ) -> np.ndarray:
-    """Predicted prominence ``P`` of an impulse (NT ACOU 112, clause 7).
+    r"""Predicted prominence ``P`` of an impulse (NT ACOU 112, clause 7).
 
-    ``P = 3*lg(onset_rate) + 2*lg(level_difference)`` (Formula 1), with ``lg``
+    :math:`P = 3 \lg(\text{onset rate}) + 2 \lg(\text{level difference})`
+    (Formula 1), with :math:`\lg`
     the base-10 logarithm. Both quantities are read from the A-weighted,
     time-weighting-F level history: the onset rate is the slope of the onset in
     dB/s and the level difference is the level rise over the onset in dB
@@ -189,9 +196,10 @@ def predicted_prominence(
 
 
 def impulse_adjustment(prominence: ArrayLike) -> np.ndarray:
-    """Adjustment ``KI`` to ``LAeq`` from the prominence (clause 8, Formula 2).
+    r"""Adjustment ``KI`` to ``LAeq`` from the prominence (clause 8, Formula 2).
 
-    ``KI = 1.8*(P - 5)`` dB for ``P > 5``, else ``0`` dB. The adjustment is made
+    :math:`K_I = 1.8 \, (P - 5)` dB for :math:`P > 5`, else 0 dB. The
+    adjustment is made
     to ``LAeq,30min`` on the basis of the single impulse with the highest ``P``.
     This helper applies the bare Formula 2; the clause 8 onset-rate
     qualification (> 10 dB/s, clause 4.5) is enforced by
@@ -279,12 +287,15 @@ def rating_level(
     durations: ArrayLike,
     reference_time: float,
 ) -> float:
-    """Rating level over a reference time interval (clause 8, Note 1).
+    r"""Rating level over a reference time interval (clause 8, Note 1).
 
     Combines the impulse-adjusted equivalent levels of the measurement
-    sub-intervals into a single rating level::
+    sub-intervals into a single rating level:
 
-        LAr,T = 10*lg( (1/T) * sum_N dt_N * 10**((LAeq,N + KI,N) / 10) )
+    .. math::
+
+       L_{Ar,T} = 10 \lg\!\left[ \frac{1}{T}
+       \sum_N \Delta t_N \, 10^{(L_{Aeq,N} + K_{I,N})/10} \right]
 
     :param laeq: Equivalent level ``LAeq,N`` of each sub-interval, in dB.
     :param adjustment: Adjustment ``KI,N`` of each sub-interval, in dB.

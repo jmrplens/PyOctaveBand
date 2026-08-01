@@ -18,28 +18,34 @@ building. The chain closes the structural-vibroacoustics series:
    [`phonometry.building.structure_borne_power`](/phonometry/reference/api/building/structure-borne-power/)) and then referred to the
    actual receiver with the Annex I mobility correction
    ([`installed_power_from_reception_plate`](/phonometry/reference/api/building/installed-structure-borne/#installed_power_from_reception_plate)),
-   `L_Ws,inst,i = L_Ws,n + 10 lg(Y_inf,i / Y_inf,rec)` with the reference
-   plate mobility `Y_inf,rec = 5e-6 m/(N.s)`, or equivalently to the
-   characteristic level `L_Ws,c = L_Ws,n + 10 lg(Y_s / Y_inf,rec)` with the
+   $L_{Ws,inst,i} = L_{Ws,n} + 10 \lg( Y_{\infty,i} / Y_{\infty,rec} )$
+   with the reference plate mobility
+   $Y_{\infty,rec} = 5 \cdot 10^{-6}$ m/(N.s), or equivalently to the
+   characteristic level
+   $L_{Ws,c} = L_{Ws,n} + 10 \lg( Y_s / Y_{\infty,rec} )$ with the
    source mobility (Annex I.3, Table I.8), from which `D_C` is subtracted.
 2. Only part of that power is actually injected into the supporting element; the
    loss is the **coupling term** `D_C` (clause 4.4.3), positive in the usual
    mobility-mismatched cases (see [`coupling_term`](/phonometry/reference/api/building/installed-structure-borne/#coupling_term) for the exception),
    set by the source mobility `Y_s` and the receiver mobility `Y_i`
    (Formula 19b):
-   `D_C,i = 10 lg( |Y_s + Y_i|**2 / (|Y_s| Re{Y_i}) )`, which reduces to
-   `10 lg(|Y_s|/Re{Y_i})` for a force source (high source mobility,
-   Formula 19c) and to `-10 lg(|Y_s| Re{Z_i})` for a velocity source (low
+   $D_{C,i} = 10 \lg\left( |Y_s + Y_i|^2 / (|Y_s| \operatorname{Re}\{Y_i\}) \right)$, which reduces to
+   $10 \lg( |Y_s| / \operatorname{Re}\{Y_i\} )$ for a force source
+   (high source mobility,
+   Formula 19c) and to $-10 \lg( |Y_s| \operatorname{Re}\{Z_i\} )$
+   for a velocity source (low
    source mobility, Formula 19d). An elastic support adds its transfer
    mobility `Y_k` inside the modulus (Formula 19e).
-3. The **installed** power level is then `L_Ws,inst,i = L_Ws,c - D_C,i`
+3. The **installed** power level is then
+   $L_{Ws,inst,i} = L_{Ws,c} - D_{C,i}$
    (Formula 18b).
 4. The normalised sound pressure level in the receiving room for one path (i->j)
    follows from the installed power, the structure-to-airborne adjustment term
    `D_sa` (clause 4.4.4), the flanking sound reduction index `R_ij,ref` and
    the element area (Formula 18a):
-   `L_n,s,ij = L_Ws,inst,i - D_sa,i - R_ij,ref - 10 lg(S_i/S0) - 10 lg(A0/4)`
-   with `S0 = A0 = 10 m2`; the paths combine energetically (Formula 17).
+   $L_{n,s,ij} = L_{Ws,inst,i} - D_{sa,i} - R_{ij,ref} - 10 \lg(S_i/S_0) - 10 \lg(A_0/4)$
+   with $S_0 = A_0 = 10$ m²; the paths combine energetically
+   (Formula 17).
 
 The source and receiver mobilities/impedances are those of
 [`phonometry.mechanical_mobility`](/phonometry/reference/api/vibration/mechanical-mobility/) and [`phonometry.transfer_stiffness`](/phonometry/reference/api/vibration/transfer-stiffness/).
@@ -59,7 +65,7 @@ coupling_term(
 
 Coupling term `D_C` for a point excitation (EN 12354-5, Formula 19b/19e).
 
-`D_C = 10 lg( |Y_s + Y_i + Y_k|**2 / (|Y_s| Re{Y_i}) )` -- the loss between
+$D_C = 10 \lg\left( |Y_s + Y_i + Y_k|^2 / (|Y_s| \operatorname{Re}\{Y_i\}) \right)$ -- the loss between
 the characteristic and the injected structure-borne power. `Y_k` is the
 transfer mobility of an elastic support (Formula 19e; 0 for a rigid
 connection, Formula 19b).
@@ -72,7 +78,7 @@ connection, Formula 19b).
 | `receiver_mobility` | Receiver point mobility `Y_i` (complex, positive real part). |
 | `transfer_mobility` | Elastic-support transfer mobility `Y_k` (Default: 0.0). |
 
-**Returns:** The coupling term `D_C`, in dB. Positive whenever the source and receiver mobilities are well mismatched (the usual installed case), but **not** guaranteed non-negative: near a mounting resonance where `Y_s` and `Y_i` are of comparable magnitude and opposite phase the numerator `|Y_s + Y_i|²` collapses and `D_C` goes negative (the installed power then exceeds the characteristic level; e.g. `Y_s = j·1e-4`, `Y_i = 1e-5 − j·1e-4` m/(N·s) gives `D_C ≈ −10 dB`).
+**Returns:** The coupling term `D_C`, in dB. Positive whenever the source and receiver mobilities are well mismatched (the usual installed case), but **not** guaranteed non-negative: near a mounting resonance where `Y_s` and `Y_i` are of comparable magnitude and opposite phase the numerator $\lvert Y_s + Y_i \rvert^2$ collapses and `D_C` goes negative (the installed power then exceeds the characteristic level; e.g. $Y_s = j \cdot 10^{-4}$, $Y_i = 10^{-5} - j \cdot 10^{-4}$ m/(N·s) gives $D_C \approx -10$ dB).
 
 **Raises**
 
@@ -91,7 +97,9 @@ coupling_term_force_source(
 
 Coupling term for a force source, high source mobility (Formula 19c).
 
-`D_C = 10 lg(|Y_s| / Re{Y_i})`.
+$$
+D_C = 10 \lg\frac{|Y_s|}{\operatorname{Re}\{Y_i\}}
+$$
 
 **Parameters**
 
@@ -119,7 +127,9 @@ coupling_term_velocity_source(
 
 Coupling term for a velocity source, low source mobility (Formula 19d).
 
-`D_C = -10 lg(|Y_s| Re{Z_i})`.
+$$
+D_C = -10 \lg\left( |Y_s| \operatorname{Re}\{Z_i\} \right)
+$$
 
 **Parameters**
 
@@ -149,9 +159,10 @@ installed_power_from_reception_plate(
 
 Mobility correction of the reception-plate power (EN 12354-5, Annex I).
 
-`L_Ws,inst,i = L_Ws,n,i + 10 lg(Y_inf,i / Y_inf,rec)`, which refers the
+$L_{Ws,inst,i} = L_{Ws,n,i} + 10 \lg( Y_{\infty,i} / Y_{\infty,rec} )$, which refers the
 characteristic reception-plate power level `L_Ws,n` (EN 15657
-Formula (17), re the 10 cm concrete plate `Y_inf,rec = 5e-6 m/(N.s)`)
+Formula (17), re the 10 cm concrete plate
+$Y_{\infty,rec} = 5 \cdot 10^{-6}$ m/(N.s))
 to the characteristic mobility `Y_inf,i` of the actual receiving
 element (floor, wall), yielding the installed power of that element as in
 the Annex I.2 whirlpool example. The same correction with the *source*
@@ -165,7 +176,7 @@ mobility instead of `Y_inf,i` yields the characteristic level
 | :--- | :--- |
 | `reception_plate_level` | Power level to re-refer (per band), in dB re 1 pW: either the characteristic level `L_Ws,n` (EN 15657 Formula 17, referred to the default 5e-6 m/(N.s) plate) or a raw Formula (14) plate power together with the mobility of the plate it was measured on, passed as `plate_mobility`. |
 | `receiver_mobility` | Characteristic mobility `Y_inf,i` of the receiving element (per band; complex values use their magnitude), in m/(N.s). |
-| `plate_mobility` | Mobility the input level is referred to (Default: the EN 15657 reference plate, `Y_inf,rec = 5e-6 m/(N.s)`; pass the measured plate mobility when the input is a raw Formula (14) level). |
+| `plate_mobility` | Mobility the input level is referred to (Default: the EN 15657 reference plate, $Y_{\infty,rec} = 5 \cdot 10^{-6}$ m/(N.s); pass the measured plate mobility when the input is a raw Formula (14) level). |
 
 **Returns:** The mobility-corrected power level, in dB re 1 pW.
 
@@ -225,7 +236,9 @@ installed_structure_borne_power_level(
 
 Installed structure-borne power level (EN 12354-5, Formula 18b).
 
-`L_Ws,inst,i = L_Ws,c - D_C,i`.
+$$
+L_{Ws,inst,i} = L_{Ws,c} - D_{C,i}
+$$
 
 **Parameters**
 
@@ -262,7 +275,8 @@ Installed structure-borne sound prediction (EN 12354-5).
 
 *property*
 
-Band-summed total level `10 lg(sum 10^(0.1 L_n,s))`, in dB.
+Band-summed total level $10 \lg(\sum 10^{0.1 L_{n,s}})$,
+in dB.
 
 ### InstalledSourceResult.plot()
 
@@ -349,7 +363,9 @@ structure_borne_pressure_level_path(
 
 Normalised structure-borne SPL for one path i->j (Formula 18a).
 
-`L_n,s,ij = L_Ws,inst,i - D_sa,i - R_ij,ref - 10 lg(S_i/S0) - 10 lg(A0/4)`.
+$$
+L_{n,s,ij} = L_{Ws,inst,i} - D_{sa,i} - R_{ij,ref} - 10 \lg\frac{S_i}{S_0} - 10 \lg\frac{A_0}{4}
+$$
 
 **Parameters**
 
@@ -359,7 +375,7 @@ Normalised structure-borne SPL for one path i->j (Formula 18a).
 | `adjustment_term` | Structure-to-airborne adjustment `D_sa,i` (clause 4.4.4 / Annex F), in dB. |
 | `flanking_reduction_index` | Flanking sound reduction index `R_ij,ref` re `S0` (EN 12354-1), in dB. |
 | `element_area` | Supporting-element area `S_i`, in m^2 (> 0). |
-| `reference_area` | Reference area `S0 = A0` (Default: 10 m^2). |
+| `reference_area` | Reference area $S_0 = A_0$ (Default: 10 m^2). |
 
 **Returns:** The normalised path sound pressure level `L_n,s,ij`, in dB.
 
@@ -377,7 +393,9 @@ total_structure_borne_pressure_level(path_levels: ArrayLike) -> np.ndarray
 
 Combine path sound pressure levels energetically (Formula 17).
 
-`L_n,s = 10 lg( sum_j 10^(L_n,s,ij/10) )`.
+$$
+L_{n,s} = 10 \lg\!\left( \sum_j 10^{L_{n,s,ij}/10} \right)
+$$
 
 **Parameters**
 

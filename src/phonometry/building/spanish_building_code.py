@@ -1,5 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""
+r"""
 Spanish building code CTE DB-HR: global indices and requirement checks.
 
 The *Documento Basico HR Proteccion frente al ruido* of the Spanish Codigo
@@ -11,7 +11,9 @@ weighted ratings: ``RA``, ``RA,tr``, ``DnT,A`` and ``D2m,nT,Atr``.
 reference curve, DB-HR weights the measured one-third-octave insulation with a
 normalised A-weighted source spectrum and sums it energetically:
 
-``I_x = -10 lg sum_i 10^((L_x,i - X_i)/10)``   [dBA]
+.. math::
+
+   I_x = -10 \lg \sum_i 10^{(L_{x,i} - X_i)/10} \quad [\mathrm{dBA}]
 
 where ``X_i`` is the band insulation (``R``, ``R'``, ``DnT``, ``D2m,nT`` ...)
 and ``L_x,i`` the normalised spectrum of the source. The sum runs over the
@@ -312,9 +314,9 @@ def db_hr_global_index(
     frequencies: Sequence[float] | np.ndarray | None = None,
     name: str | None = None,
 ) -> DbHrGlobalIndexResult:
-    """A-weighted global insulation index per DB-HR Annex A.
+    r"""A-weighted global insulation index per DB-HR Annex A.
 
-    ``I_x = -10 lg sum_i 10^((L_x,i - X_i)/10)`` over the eighteen
+    :math:`I_x = -10 \lg \sum_i 10^{(L_{x,i} - X_i)/10}` over the eighteen
     one-third-octave bands 100 Hz to 5 kHz (Formulae (A.5) to (A.7)).
 
     :param band_values: The band insulation ``X_i``, in dB. Either exactly the

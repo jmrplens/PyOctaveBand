@@ -34,7 +34,7 @@ Three arithmetic conventions matter and are worth stating once:
   worksheet sign so the printed sheet reads like the reference.
 * **Regenerated noise adds on a power basis.** The self-noise of an element is
   a sound power level in its own right and is combined with the level arriving
-  at that point as `10 lg(10^(L/10) + 10^(L_sn/10))`.
+  at that point as $10 \lg(10^{L/10} + 10^{L_{sn}/10})$.
 * **There is a self-noise floor.** Long's worked sheet uses a 0 dB self-noise
   sound power level as the default and whenever a calculated level would be
   negative, which is why his received spectrum bottoms out near 0 dB rather

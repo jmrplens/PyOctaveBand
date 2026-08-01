@@ -1,20 +1,24 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""
+r"""
 Envelope and instantaneous phase via the Hilbert transform.
 
 Signal-envelope analysis following Bendat & Piersol, *Random Data:
 Analysis and Measurement Procedures* (4th ed., 2010), Chapter 13. The
-analytic signal ``z(t) = x(t) + j·x̃(t)`` (Eq. 13.15, with ``x̃`` the
-Hilbert transform of ``x``) yields
+analytic signal :math:`z(t) = x(t) + j \tilde{x}(t)` (Eq. 13.15, with
+:math:`\tilde{x}` the Hilbert transform of ``x``) yields
 
-* the **envelope** ``A(t) = [x²(t) + x̃²(t)]^½`` (Eq. 13.17),
-* the **instantaneous phase** ``θ(t) = arctan[x̃(t)/x(t)]``, unwrapped
+* the **envelope**
+  :math:`A(t) = [x^2(t) + \tilde{x}^2(t)]^{1/2}` (Eq. 13.17),
+* the **instantaneous phase**
+  :math:`\theta(t) = \arctan[\tilde{x}(t)/x(t)]`, unwrapped
   (Eq. 13.18), and
-* the **instantaneous frequency** ``f(t) = (1/2π)·dθ/dt`` (Eq. 13.19).
+* the **instantaneous frequency**
+  :math:`f(t) = (1/2\pi) \, d\theta/dt` (Eq. 13.19).
 
 The analytic signal is computed the way the book recommends
 (Section 13.1.1): the one-sided spectrum construction
-``Z(f) = 2·X(f)`` for ``f > 0``, ``X(0)`` at DC and ``0`` for ``f < 0``
+:math:`Z(f) = 2 X(f)` for :math:`f > 0`, :math:`X(0)` at DC and ``0``
+for :math:`f < 0`
 (Eq. 13.25) - which is exactly what :func:`scipy.signal.hilbert`
 implements, and the same construction the ECMA-418-2 psychoacoustic chain
 of :mod:`phonometry.psychoacoustics` applies per auditory band (its
@@ -36,9 +40,9 @@ correlating (Figure 13.11), because the spectral content of the envelope
 - not of the signal - is where amplitude modulations show as discrete
 lines. The optional ``band`` argument reproduces the figure's band-pass
 front end (the classical bearing-envelope chain: isolate the resonance
-band, then envelope it). An AM tone with modulation frequency ``f_m``
+band, then envelope it). An AM tone with modulation frequency :math:`f_m`
 (on an analysis bin) and depth ``m`` puts a line of closed-form
-amplitude at exactly ``f_m``, the anchor the tests pin; off-bin
+amplitude at exactly :math:`f_m`, the anchor the tests pin; off-bin
 modulation lines read low by the taper's scalloping loss.
 """
 
@@ -65,16 +69,18 @@ __all__ = [
 
 @dataclass(frozen=True)
 class EnvelopeResult:
-    """Envelope and instantaneous phase of a signal (B&P Chapter 13).
+    r"""Envelope and instantaneous phase of a signal (B&P Chapter 13).
 
     All output arrays share the (possibly decimated) time axis
     :attr:`times`; the original record is kept at full rate for plotting.
 
     :ivar times: Time axis of the outputs, in seconds.
-    :ivar envelope: Envelope ``A(t) = |z(t)|`` (Eq. 13.17).
-    :ivar phase: Unwrapped instantaneous phase ``θ(t)``, in radians
-        (Eq. 13.18).
-    :ivar instantaneous_frequency: ``f(t) = (1/2π)·dθ/dt``, in Hz
+    :ivar envelope: Envelope :math:`A(t) = \lvert z(t) \rvert`
+        (Eq. 13.17).
+    :ivar phase: Unwrapped instantaneous phase :math:`\theta(t)`, in
+        radians (Eq. 13.18).
+    :ivar instantaneous_frequency:
+        :math:`f(t) = (1/2\pi) \, d\theta/dt`, in Hz
         (Eq. 13.19), differentiated at full rate before any decimation.
     :ivar fs: Sample rate of the outputs, in Hz (``signal_fs`` divided by
         :attr:`decimation_factor`).
@@ -130,14 +136,15 @@ def envelope(
     decimation_factor: int = 1,
     antialias: bool = True,
 ) -> EnvelopeResult:
-    """Envelope, instantaneous phase and frequency via Hilbert transform.
+    r"""Envelope, instantaneous phase and frequency via Hilbert transform.
 
     Builds the analytic signal by the one-sided spectrum construction of
     Bendat & Piersol Eq. 13.25 (``scipy.signal.hilbert``) and returns the
-    envelope ``|z(t)|``, the unwrapped instantaneous phase and the
-    instantaneous frequency (Eqs. 13.17-13.19). For an amplitude-modulated
-    carrier ``u(t)·cos(2πf0t)`` with ``u`` low-frequency and non-negative
-    the envelope recovers ``u(t)`` exactly in the ideal continuous case
+    envelope :math:`\lvert z(t) \rvert`, the unwrapped instantaneous phase
+    and the instantaneous frequency (Eqs. 13.17-13.19). For an
+    amplitude-modulated carrier :math:`u(t) \cos(2 \pi f_0 t)` with ``u``
+    low-frequency and non-negative
+    the envelope recovers :math:`u(t)` exactly in the ideal continuous case
     (Eq. 13.27); a discrete record shows small edge effects at the record
     boundaries.
 
@@ -211,8 +218,8 @@ class EnvelopeSpectrumResult:
     :ivar mean_level: Mean of the detected envelope (the DC the remover of
         Figure 13.11 takes out): the carrier amplitude for
         ``kind="magnitude"``, its mean square for ``kind="squared"``.
-    :ivar kind: ``"magnitude"`` (Hilbert envelope ``A(t)``) or
-        ``"squared"`` (the book's square-law detector, ``A^2(t)``).
+    :ivar kind: ``"magnitude"`` (Hilbert envelope :math:`A(t)`) or
+        ``"squared"`` (the book's square-law detector, :math:`A^2(t)`).
     :ivar times: Time axis of :attr:`envelope`, in seconds.
     :ivar envelope: The detector output that was transformed, at full rate
         (before mean removal and tapering).
@@ -299,14 +306,16 @@ def envelope_spectrum(
     remove_dc: bool = True,
     band: tuple[float, float] | None = None,
 ) -> EnvelopeSpectrumResult:
-    """Amplitude spectrum of the envelope: where modulations become lines.
+    r"""Amplitude spectrum of the envelope: where modulations become lines.
 
     Follows the structure of Bendat & Piersol Section 13.3 (Figure 13.11):
     a band-pass filter (optional here), an envelope detector, a DC
     remover, and a spectral view of what is left. The detector is the
-    Hilbert envelope ``A(t) = |z(t)|`` (``kind="magnitude"``, the
-    practical default) or the book's square-law detector
-    ``A^2(t) = x^2 + x_hat^2`` (``kind="squared"``); its mean is removed
+    Hilbert envelope :math:`A(t) = \lvert z(t) \rvert`
+    (``kind="magnitude"``, the practical default) or the book's
+    square-law detector
+    :math:`A^2(t) = x^2 + \tilde{x}^2` (``kind="squared"``); its mean is
+    removed
     (kept in :attr:`EnvelopeSpectrumResult.mean_level`) and the remainder
     is tapered and transformed once, scaled by the taper's coherent gain
     so a sinusoidal modulation whose frequency falls on an analysis bin
@@ -315,13 +324,15 @@ def envelope_spectrum(
     1.4 dB (~15 %) for the default Hann midway between bins -- like any
     single-record amplitude spectrum.
 
-    Closed forms for an AM tone ``A0 (1 + m cos(2 pi f_m t)) cos(2 pi f_c t)``
-    with ``0 <= m < 1`` and ``f_m`` on an analysis bin:
+    Closed forms for an AM tone
+    :math:`A_0 (1 + m \cos(2 \pi f_m t)) \cos(2 \pi f_c t)`
+    with :math:`0 \le m < 1` and :math:`f_m` on an analysis bin:
 
-    * ``kind="magnitude"``: a line of amplitude ``A0 m`` at ``f_m``;
-      mean level ``A0``.
-    * ``kind="squared"``: lines ``2 A0^2 m`` at ``f_m`` and
-      ``A0^2 m^2 / 2`` at ``2 f_m``; mean level ``A0^2 (1 + m^2/2)``.
+    * ``kind="magnitude"``: a line of amplitude :math:`A_0 m` at
+      :math:`f_m`; mean level :math:`A_0`.
+    * ``kind="squared"``: lines :math:`2 A_0^2 m` at :math:`f_m` and
+      :math:`A_0^2 m^2 / 2` at :math:`2 f_m`; mean level
+      :math:`A_0^2 (1 + m^2/2)`.
 
     Amplitude modulation of rotating machinery (bearing and gear defect
     frequencies), mains hum and wind-turbine amplitude modulation appear
@@ -343,7 +354,8 @@ def envelope_spectrum(
         (default ``True``, the Figure 13.11 DC remover); the mean is
         reported either way.
     :param band: Optional ``(low, high)`` band-pass edges, in Hz
-        (``0 < low < high < fs/2``), applied to the record before
+        (:math:`0 < \text{low} < \text{high} < f_s/2`), applied to the
+        record before
         envelope detection as a zero-phase 4th-order Butterworth
         (:func:`scipy.signal.sosfiltfilt`, giving an 8th-order magnitude
         roll-off). Default ``None``: detect on the record as given.

@@ -1,5 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""
+r"""
 Laboratory sound insulation of building elements (ISO 10140).
 
 This is the **laboratory** counterpart of the field ISO 16283 family in
@@ -11,9 +11,10 @@ room's equivalent absorption area ``A`` is a property of the known facility.
 **Airborne sound reduction index (ISO 10140-2:2010).** From the
 energy-average sound pressure levels in the source room ``L1`` and receiving
 room ``L2`` this module forms, per one-third-octave band,
-``R = L1 - L2 + 10 lg(S/A)`` (Clause 3.1, Formula (2)) with the free test
+:math:`R = L_1 - L_2 + 10 \lg(S/A)` (Clause 3.1, Formula (2)) with the free
+test
 opening area ``S`` and the Sabine equivalent absorption area
-``A = 0,16 V / T`` (ISO 10140-4:2010, Clause 4.6.3, Formula (5)). The
+:math:`A = 0.16\,V/T` (ISO 10140-4:2010, Clause 4.6.3, Formula (5)). The
 single-number weighted rating ``Rw`` and the adaptation terms ``C`` / ``Ctr``
 follow ISO 717-1 (Clause 5.3) through the verified
 :func:`phonometry.weighted_rating` engine, reused unchanged.
@@ -21,20 +22,22 @@ follow ISO 717-1 (Clause 5.3) through the verified
 **Impact sound pressure level (ISO 10140-3:2010).** With the standard
 tapping machine exciting the floor under test this module forms, from the
 energy-average impact sound pressure level ``Li`` in the receiving room, the
-normalized impact sound pressure level ``Ln = Li + 10 lg(A/A0)`` (Clause 3.2,
-Formula (1)) with ``A = 0,16 V / T`` and the reference absorption area
-``A0 = 10 m²``. The single-number weighted rating ``Ln,w`` and the term
+normalized impact sound pressure level :math:`L_n = L_i + 10 \lg(A/A_0)`
+(Clause 3.2,
+Formula (1)) with :math:`A = 0.16\,V/T` and the reference absorption area
+:math:`A_0 = 10` m². The single-number weighted rating ``Ln,w`` and the term
 ``CI`` follow ISO 717-2 (Clause 5.3) through
 :func:`phonometry.weighted_impact_rating`, reused unchanged.
 
 **Background-noise correction (ISO 10140-4:2010, Clause 4.3, Formula (4)).**
 The receiving-room levels must be corrected for background noise before the
 insulation is formed. :func:`background_correction` implements the correction
-``L = 10 lg(10^(Lsb/10) - 10^(Lb/10))`` for a signal-to-background margin
-between 6 dB and 15 dB, the fixed 1,3 dB correction (limit of measurement)
+:math:`L = 10 \lg(10^{L_{sb}/10} - 10^{L_b/10})` for a signal-to-background
+margin
+between 6 dB and 15 dB, the fixed 1.3 dB correction (limit of measurement)
 for a margin of 6 dB or less, and no correction for a margin of 15 dB or
 more. The 6/15 dB criteria are the laboratory analogue of the 6/10 dB
-criteria of ISO 16283-1 Clause 9.2; both cap the correction at 1,3 dB.
+criteria of ISO 16283-1 Clause 9.2; both cap the correction at 1.3 dB.
 
 **Frequency range (ISO 10140-4:2010, Clause 4.1).** Quantities are measured
 over the mandatory one-third-octave range 100 Hz to 5000 Hz (optionally down
@@ -92,12 +95,12 @@ class LabInsulationWarning(PhonometryWarning):
 
 @dataclass(frozen=True)
 class LabAirborneInsulationResult:
-    """Per-band laboratory airborne sound insulation (ISO 10140-2:2010).
+    r"""Per-band laboratory airborne sound insulation (ISO 10140-2:2010).
 
-    :ivar r: Sound reduction index ``R = L1 - L2 + 10 lg(S/A)`` per band, in
-        dB (Clause 3.1, Formula (2)).
-    :ivar absorption: Equivalent sound absorption area ``A = 0,16 V / T`` per
-        band, in m² (ISO 10140-4:2010, Formula (5)).
+    :ivar r: Sound reduction index :math:`R = L_1 - L_2 + 10 \lg(S/A)` per
+        band, in dB (Clause 3.1, Formula (2)).
+    :ivar absorption: Equivalent sound absorption area :math:`A = 0.16\,V/T`
+        per band, in m² (ISO 10140-4:2010, Formula (5)).
     :ivar rating: Single-number weighted rating ``Rw`` with ``C`` / ``Ctr``
         (ISO 717-1), or ``None`` when the number of bands is neither 16
         (one-third octave) nor 5 (octave) and no rating can be formed.
@@ -173,12 +176,13 @@ class LabAirborneInsulationResult:
 
 @dataclass(frozen=True)
 class LabImpactInsulationResult:
-    """Per-band laboratory impact sound insulation (ISO 10140-3:2010).
+    r"""Per-band laboratory impact sound insulation (ISO 10140-3:2010).
 
     :ivar l_n: Normalized impact sound pressure level
-        ``Ln = Li + 10 lg(A/A0)`` per band, in dB (Clause 3.2, Formula (1)).
-    :ivar absorption: Equivalent sound absorption area ``A = 0,16 V / T`` per
-        band, in m² (ISO 10140-4:2010, Formula (5)).
+        :math:`L_n = L_i + 10 \lg(A/A_0)` per band, in dB (Clause 3.2,
+        Formula (1)).
+    :ivar absorption: Equivalent sound absorption area :math:`A = 0.16\,V/T`
+        per band, in m² (ISO 10140-4:2010, Formula (5)).
     :ivar rating: Single-number weighted rating ``Ln,w`` with ``CI``
         (ISO 717-2), or ``None`` when the number of bands is neither 16
         (one-third octave) nor 5 (octave) and no rating can be formed.
@@ -296,7 +300,7 @@ def _render_iso10140(
 def _absorption_area(
     t2: Sequence[float] | np.ndarray, volume: float, n_bands: int
 ) -> np.ndarray:
-    """Sabine equivalent absorption area ``A = 0,16 V / T`` per band.
+    r"""Sabine equivalent absorption area :math:`A = 0.16\,V/T` per band.
 
     (ISO 10140-4:2010, Clause 4.6.3, Formula (5).)
     """
@@ -318,27 +322,34 @@ def background_correction(
     signal_and_background: Sequence[float] | np.ndarray,
     background: Sequence[float] | np.ndarray,
 ) -> np.ndarray:
-    """Correct receiving-room levels for background noise (ISO 10140-4:2010).
+    r"""Correct receiving-room levels for background noise (ISO 10140-4:2010).
 
     Applies the correction of Clause 4.3 per band from the combined
     signal-plus-background level ``Lsb`` and the background level ``Lb``,
     using the margin ``Lsb - Lb``:
 
-    - ``margin >= 15 dB``: the background is negligible and the level is
+    - :math:`\mathrm{margin} \ge 15` dB: the background is negligible and
+      the level is
       returned unchanged (Clause 4.3, quality requirement).
-    - ``6 dB < margin < 15 dB``: the level is corrected with Formula (4),
-      ``L = 10 lg(10^(Lsb/10) - 10^(Lb/10))``.
-    - ``margin <= 6 dB``: the fixed 1,3 dB correction is applied
-      (``L = Lsb - 1,3``); such bands are the *limit of measurement* and a
+    - :math:`6\,\mathrm{dB} < \mathrm{margin} < 15\,\mathrm{dB}`: the level
+      is corrected with Formula (4),
+      :math:`L = 10 \lg(10^{L_{sb}/10} - 10^{L_b/10})`.
+    - :math:`\mathrm{margin} \le 6` dB: the fixed 1.3 dB correction is
+      applied
+      (:math:`L = L_{sb} - 1.3`); such bands are the *limit of measurement*
+      and a
       :class:`LabInsulationWarning` is emitted (Clause 4.3). A *negative*
-      margin (``Lb > Lsb``, i.e. background above the measured signal) falls
-      in this branch and is likewise capped at ``Lsb - 1,3``: the band is
+      margin (:math:`L_b > L_{sb}`, i.e. background above the measured
+      signal) falls
+      in this branch and is likewise capped at :math:`L_{sb} - 1.3`: the
+      band is
       simply flagged as the limit of measurement rather than yielding a
       nonsensical (or ``NaN``) corrected level.
 
     This is the sound-insulation counterpart of
     :func:`phonometry.background_noise_correction` (ISO 3744:2010): both apply
-    the same energy subtraction ``10 lg(10^(Lsb/10) - 10^(Lb/10))``, but that
+    the same energy subtraction
+    :math:`10 \lg(10^{L_{sb}/10} - 10^{L_b/10})`, but that
     routine returns the correction *offset* ``K1`` (to subtract from ``Lsb``),
     whereas this one returns the already-corrected levels ``L`` directly.
 
@@ -386,13 +397,14 @@ def lab_airborne_insulation(
     area: float,
     volume: float,
 ) -> LabAirborneInsulationResult:
-    """
+    r"""
     Laboratory airborne sound reduction index per ISO 10140-2:2010.
 
     Computes, per frequency band, the sound reduction index
-    ``R = L1 - L2 + 10 lg(S/A)`` (Clause 3.1, Formula (2)) with the free test
+    :math:`R = L_1 - L_2 + 10 \lg(S/A)` (Clause 3.1, Formula (2)) with the
+    free test
     opening area ``S`` and the Sabine equivalent absorption area
-    ``A = 0,16 V / T`` (ISO 10140-4:2010, Formula (5)). When exactly 16
+    :math:`A = 0.16\,V/T` (ISO 10140-4:2010, Formula (5)). When exactly 16
     one-third-octave (100-3150 Hz) or 5 octave (125-2000 Hz) values are
     supplied, the single-number weighted rating ``Rw`` with ``C`` / ``Ctr``
     is also formed via :func:`phonometry.weighted_rating` (ISO 717-1).
@@ -436,13 +448,15 @@ def lab_impact_insulation(
     *,
     volume: float,
 ) -> LabImpactInsulationResult:
-    """
+    r"""
     Laboratory impact sound pressure level per ISO 10140-3:2010.
 
     Computes, per frequency band, the normalized impact sound pressure level
-    ``Ln = Li + 10 lg(A/A0)`` (Clause 3.2, Formula (1)) with the Sabine
-    equivalent absorption area ``A = 0,16 V / T`` (ISO 10140-4:2010,
-    Formula (5)) and the reference absorption area ``A0 = 10 m²``. When exactly
+    :math:`L_n = L_i + 10 \lg(A/A_0)` (Clause 3.2, Formula (1)) with the
+    Sabine
+    equivalent absorption area :math:`A = 0.16\,V/T` (ISO 10140-4:2010,
+    Formula (5)) and the reference absorption area :math:`A_0 = 10` m².
+    When exactly
     16 one-third-octave (100-3150 Hz) or 5 octave (125-2000 Hz) values are
     supplied, the single-number weighted rating ``Ln,w`` with ``CI`` is also
     formed via :func:`phonometry.weighted_impact_rating` (ISO 717-2).

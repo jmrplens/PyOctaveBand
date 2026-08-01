@@ -1,5 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""
+r"""
 Age-related hearing threshold (ISO 7029:2017) and audiometric reference zero
 (ISO 389-7:2005).
 
@@ -10,7 +10,8 @@ listening (ISO 389-7:2005, Table 1), over the audiometric frequencies from
 125 Hz to 8000 Hz.
 
 ISO 7029 gives the median threshold deviation from the value at age 18 as
-``dHmd = a * (age - 18) ** b`` (clause 4.2, Table 1) and the spread around the
+:math:`dH_{md} = a \, (\mathrm{age} - 18)^b` (clause 4.2, Table 1) and the
+spread around the
 median as two half-Gaussian standard deviations ``su`` (worse than median) and
 ``sl`` (better than median), each a fifth-degree polynomial in ``age - 18``
 (clause 4.3, Tables 2-5). A population fractile is obtained by shifting the

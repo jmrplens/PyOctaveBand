@@ -1,5 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""
+r"""
 Atmospheric absorption of sound: ISO 9613-1:1993.
 
 The attenuation of a pure tone propagating through the atmosphere is governed by
@@ -8,46 +8,61 @@ temperature, humidity and pressure through the vibrational relaxation of the
 oxygen and nitrogen molecules plus classical and rotational losses
 (ISO 9613-1:1993, clause 6).
 
-The attenuation coefficient (ISO 9613-1:1993, Eq. (5))::
+The attenuation coefficient, in decibels per metre (ISO 9613-1:1993):
 
-    alpha = 8,686 * f^2 * {
-              1,84e-11 * (pa/pr)^-1 * (T/T0)^(1/2)
-            + (T/T0)^(-5/2) * [
-                  0,012 75 * exp(-2239,1/T) * (frO + f^2/frO)^-1
-                + 0,106 8  * exp(-3352,0/T) * (frN + f^2/frN)^-1
-              ]
-          }
+.. math::
 
-in decibels per metre, with the oxygen and nitrogen relaxation frequencies
-(ISO 9613-1:1993, Eq. (3) and Eq. (4))::
+   \alpha = 8.686 f^2 \left\{ 1.84 \times 10^{-11}
+   \left( \frac{p_a}{p_r} \right)^{-1}
+   \left( \frac{T}{T_0} \right)^{1/2}
+   + \left( \frac{T}{T_0} \right)^{-5/2}
+   \left[ 0.01275 \, e^{-2239.1/T}
+   \left( f_{rO} + \frac{f^2}{f_{rO}} \right)^{-1}
+   + 0.1068 \, e^{-3352.0/T}
+   \left( f_{rN} + \frac{f^2}{f_{rN}} \right)^{-1}
+   \right] \right\} \tag{Eq. 5}
 
-    frO = (pa/pr) * [24 + 4,04e4 * h * (0,02 + h)/(0,391 + h)]
-    frN = (pa/pr) * (T/T0)^(-1/2)
-          * [9 + 280 * h * exp{-4,170 * [(T/T0)^(-1/3) - 1]}]
+with the oxygen and nitrogen relaxation frequencies (ISO 9613-1:1993):
 
-Here ``T`` is the ambient temperature (K), ``T0 = 293,15 K`` and
-``pr = 101,325 kPa`` are the reference conditions (ISO 9613-1:1993, clause 4.2),
-``pa`` is the ambient pressure (kPa) and ``h`` is the molar concentration of
-water vapour as a percentage, obtained from the relative humidity by the
-psychrometric conversion (ISO 9613-1:1993, clause 6.4 / Annex B)::
+.. math::
 
-    h = hr * (psat/pr) / (pa/pr)
-    psat/pr = 10 ^ (-6,8346 * (T01/T)^1,261 + 4,6151),  T01 = 273,16 K
+   f_{rO} = \frac{p_a}{p_r} \left[ 24 + 4.04 \times 10^{4} \, h \,
+   \frac{0.02 + h}{0.391 + h} \right] \tag{Eq. 3}
+
+   f_{rN} = \frac{p_a}{p_r} \left( \frac{T}{T_0} \right)^{-1/2}
+   \left\{ 9 + 280 \, h \exp\!\left[ -4.170 \left(
+   \left( \frac{T}{T_0} \right)^{-1/3} - 1 \right) \right] \right\}
+   \tag{Eq. 4}
+
+Here ``T`` is the ambient temperature (K), :math:`T_0 = 293.15` K and
+:math:`p_r = 101.325` kPa are the reference conditions (ISO 9613-1:1993,
+clause 4.2), ``pa`` is the ambient pressure (kPa) and ``h`` is the molar
+concentration of water vapour as a percentage, obtained from the relative
+humidity by the psychrometric conversion (ISO 9613-1:1993, clause 6.4 /
+Annex B):
+
+.. math::
+
+   h = h_r \, \frac{p_{sat}/p_r}{p_a/p_r}
+
+   \frac{p_{sat}}{p_r} = 10^{-6.8346 \, (T_{01}/T)^{1.261} + 4.6151},
+   \qquad T_{01} = 273.16~\text{K}
 
 with ``hr`` the relative humidity (%) and ``T01`` the triple-point temperature of
 water.
 
 Table 1 of ISO 9613-1:1993 tabulates ``alpha`` (in dB/km) at the reference
 pressure for a grid of temperature, relative humidity and one-third-octave
-frequency; its rows are labelled with the ISO 266 preferred frequencies but the
-coefficients are computed at the exact midband frequencies (Note 5)
-``fm = 1000 * 10^(k/10)``, ``k`` integer. Pass ``exact_midband=True`` to snap the
-requested frequencies onto that grid and reproduce Table 1 exactly.
+frequency; its rows are labelled with the ISO 266 preferred frequencies but
+the coefficients are computed at the exact midband frequencies (Note 5)
+:math:`f_m = 1000 \cdot 10^{k/10}`, ``k`` integer. Pass
+``exact_midband=True`` to snap the requested frequencies onto that grid and
+reproduce Table 1 exactly.
 
 This module closes the loop with :mod:`phonometry.sound_absorption` (ISO 354),
-whose air power-attenuation coefficient ``m`` (1/m) is defined only through the
-ISO 9613-1 ``alpha`` via ``m = alpha / (10 * lg e)``. :func:`air_attenuation_m`
-returns that ``m`` directly.
+whose air power-attenuation coefficient ``m`` (1/m) is defined only through
+the ISO 9613-1 ``alpha`` via :math:`m = \alpha / (10 \lg e)`.
+:func:`air_attenuation_m` returns that ``m`` directly.
 """
 
 from __future__ import annotations
@@ -89,10 +104,11 @@ class AtmosphericAbsorptionWarning(PhonometryWarning):
 
 
 def _exact_midband(frequencies: NDArray[np.float64]) -> NDArray[np.float64]:
-    """Snap frequencies to the exact one-third-octave midbands, Eq. (6).
+    r"""Snap frequencies to the exact one-third-octave midbands, Eq. (6).
 
-    ``fm = 1000 * 10^(k/10)`` with ``k = round(10 * lg(f/1000))`` the nearest
-    integer band index. Reproduces the frequencies used to compute Table 1
+    :math:`f_m = 1000 \cdot 10^{k/10}` with
+    :math:`k = \operatorname{round}(10 \lg(f/1000))` the nearest integer band
+    index. Reproduces the frequencies used to compute Table 1
     (ISO 9613-1:1993, clause 6.4, Note 5).
     """
     k = np.round(10.0 * np.log10(frequencies / 1000.0))
@@ -102,10 +118,11 @@ def _exact_midband(frequencies: NDArray[np.float64]) -> NDArray[np.float64]:
 def _molar_water_vapour(
     temperature_k: float, relative_humidity: float, pressure: float
 ) -> float:
-    """Molar concentration of water vapour ``h`` (%), ISO 9613-1 clause 6.4.
+    r"""Molar concentration of water vapour ``h`` (%), ISO 9613-1 clause 6.4.
 
-    ``psat/pr = 10^(-6,8346 (T01/T)^1,261 + 4,6151)`` and
-    ``h = hr (psat/pr)/(pa/pr)`` (Annex B psychrometric conversion).
+    :math:`p_{sat}/p_r = 10^{-6.8346 \, (T_{01}/T)^{1.261} + 4.6151}` and
+    :math:`h = h_r \, (p_{sat}/p_r)/(p_a/p_r)` (Annex B psychrometric
+    conversion).
     """
     psat_over_pr = 10.0 ** (
         -6.8346 * (_T01 / temperature_k) ** 1.261 + 4.6151
@@ -172,7 +189,7 @@ def air_attenuation(
     *,
     exact_midband: bool = False,
 ) -> NDArray[np.float64]:
-    """Pure-tone atmospheric attenuation coefficient (ISO 9613-1:1993, Eq. (5)).
+    r"""Pure-tone atmospheric attenuation coefficient (ISO 9613-1, Eq. (5)).
 
     Evaluates ``alpha`` in decibels per metre from the oxygen and nitrogen
     relaxation frequencies (Eq. (3)/(4)) and the classical, rotational and
@@ -191,19 +208,20 @@ def air_attenuation(
         :class:`AtmosphericAbsorptionWarning`; outside [0, 100] % raises
         ``ValueError``.
     :param pressure: Ambient atmospheric pressure ``pa``, in kilopascals
-        (default 101,325 kPa = one standard atmosphere = ``pr``). Above 200 kPa
+        (default 101.325 kPa = one standard atmosphere = ``pr``). Above 200 kPa
         emits an :class:`AtmosphericAbsorptionWarning`; non-positive raises
         ``ValueError``.
     :param exact_midband: When ``True``, each requested frequency is snapped to
-        the nearest exact one-third-octave midband ``fm = 1000*10^(k/10)``
-        (Eq. (6)) before evaluation, reproducing the frequencies used for
-        Table 1 (Note 5). Default ``False`` (use ``frequencies`` verbatim).
+        the nearest exact one-third-octave midband
+        :math:`f_m = 1000 \cdot 10^{k/10}` (Eq. (6)) before evaluation,
+        reproducing the frequencies used for Table 1 (Note 5). Default
+        ``False`` (use ``frequencies`` verbatim).
     :return: Attenuation coefficient ``alpha``, in dB/m, with the shape of
         ``frequencies``.
 
     .. note::
         ISO 354:2003 defers its air power-attenuation coefficient ``m`` (1/m)
-        entirely to this ``alpha`` via ``m = alpha / (10 * lg e)``. Use
+        entirely to this ``alpha`` via :math:`m = \alpha / (10 \lg e)`. Use
         :func:`air_attenuation_m` to obtain that ``m`` for
         :func:`phonometry.sound_absorption.absorption_area` /
         :func:`~phonometry.sound_absorption.absorption_coefficient`.
@@ -243,10 +261,11 @@ def air_attenuation_m(
     *,
     exact_midband: bool = False,
 ) -> NDArray[np.float64]:
-    """ISO 354 air power-attenuation coefficient ``m`` (1/m) from conditions.
+    r"""ISO 354 air power-attenuation coefficient ``m`` (1/m) from conditions.
 
     Convenience composition of :func:`air_attenuation` (ISO 9613-1 ``alpha`` in
-    dB/m) with the ISO 354:2003 (8.1.2.1) conversion ``m = alpha / (10 * lg e)``
+    dB/m) with the ISO 354:2003 (8.1.2.1) conversion
+    :math:`m = \alpha / (10 \lg e)`
     (via :func:`phonometry.sound_absorption.attenuation_from_alpha`). It lets an
     ISO 354 caller feed real atmospheric conditions into
     :func:`~phonometry.sound_absorption.absorption_area` /
@@ -257,7 +276,7 @@ def air_attenuation_m(
     :param temperature: Ambient air temperature, in degrees Celsius (default 20).
     :param relative_humidity: Relative humidity, in percent (default 50).
     :param pressure: Ambient atmospheric pressure, in kilopascals
-        (default 101,325).
+        (default 101.325).
     :param exact_midband: Snap frequencies to exact midbands; see
         :func:`air_attenuation`.
     :return: Power attenuation coefficient ``m``, in 1/m, with the shape of
@@ -278,7 +297,7 @@ def air_attenuation_m(
 
 @dataclass(frozen=True)
 class AtmosphericAttenuation:
-    """A pure-tone atmospheric attenuation curve (ISO 9613-1:1993).
+    r"""A pure-tone atmospheric attenuation curve (ISO 9613-1:1993).
 
     Bundles the ISO 9613-1 attenuation coefficient ``alpha`` (Eq. (5)) over a
     frequency grid with the atmospheric conditions it was evaluated for, so the
@@ -290,13 +309,13 @@ class AtmosphericAttenuation:
         (the exact one-third-octave midbands when ``exact_midband`` was used).
     :ivar attenuation_coefficient: Pure-tone attenuation coefficient ``alpha``,
         per frequency, in decibels per metre (Table 1 prints dB/km, i.e.
-        ``x 1000``).
+        :math:`\times 1000`).
     :ivar temperature: Ambient air temperature, in degrees Celsius.
     :ivar relative_humidity: Relative humidity, in percent.
     :ivar pressure: Ambient atmospheric pressure ``pa``, in kilopascals.
     :ivar distance: Propagation distance ``d``, in metres, or ``None`` when the
         result carries only the coefficient. When given, :attr:`total_attenuation`
-        returns the total attenuation ``A = alpha * d`` over that distance.
+        returns the total attenuation :math:`A = \alpha d` over that distance.
     """
 
     frequencies: NDArray[np.float64]
@@ -322,7 +341,7 @@ class AtmosphericAttenuation:
 
     @property
     def total_attenuation(self) -> NDArray[np.float64] | None:
-        """Total atmospheric attenuation ``A = alpha * d`` over :attr:`distance`.
+        r"""Total attenuation :math:`A = \alpha d` over :attr:`distance`.
 
         The pure-tone attenuation ``alpha`` (dB/m) accumulated over the
         propagation distance ``d`` (m), per frequency, in decibels; this is the
@@ -366,7 +385,7 @@ def atmospheric_attenuation(
     exact_midband: bool = False,
     distance: float | None = None,
 ) -> AtmosphericAttenuation:
-    """Build a plottable ISO 9613-1 atmospheric-attenuation curve.
+    r"""Build a plottable ISO 9613-1 atmospheric-attenuation curve.
 
     Evaluates :func:`air_attenuation` at ``frequencies`` for the given
     atmospheric conditions and bundles the result into an
@@ -380,13 +399,14 @@ def atmospheric_attenuation(
     :param pressure: Ambient atmospheric pressure, in kilopascals
         (default 101.325 kPa, one standard atmosphere).
     :param exact_midband: Snap the frequencies to the exact one-third-octave
-        midbands ``fm = 1000*10^(k/10)`` (Eq. (6)) before evaluation; see
-        :func:`air_attenuation`. When ``True`` the stored :attr:`frequencies`
-        are the snapped midbands the coefficient was computed at.
+        midbands :math:`f_m = 1000 \cdot 10^{k/10}` (Eq. (6)) before
+        evaluation; see :func:`air_attenuation`. When ``True`` the stored
+        :attr:`frequencies` are the snapped midbands the coefficient was
+        computed at.
     :param distance: Optional propagation distance ``d``, in metres. When given,
         the result's :attr:`~AtmosphericAttenuation.total_attenuation` returns
-        the total attenuation ``A = alpha * d`` over that distance (ISO 9613-2
-        Eq. (8)). Must be finite and non-negative.
+        the total attenuation :math:`A = \alpha d` over that distance
+        (ISO 9613-2 Eq. (8)). Must be finite and non-negative.
     :return: A frozen :class:`AtmosphericAttenuation`.
     :raises ValueError: If ``distance`` is negative or non-finite (NaN/inf); the
         check lives on :class:`AtmosphericAttenuation` so it also guards direct

@@ -17,7 +17,8 @@ temperature, salinity and depth/pressure, selectable through `model`:
 * `"mackenzie"` -- the Mackenzie (1981) nine-term depth-based equation.
 * `"medwin"` -- the Medwin (1975) six-term short formula, the simplest member
   of the family, whose partial derivatives are the classic rules of thumb
-  `∂c/∂T ≈ 4.6 − 0.110·T` m/s per °C and `∂c/∂z ≈ 0.016` m/s per m.
+  $\partial c/\partial T \approx 4.6 - 0.110 T$ m/s per °C and
+  $\partial c/\partial z \approx 0.016$ m/s per m.
 
 The UNESCO and Del Grosso equations use pressure, not depth, so a depth is first
 converted with the Leroy & Parthiot (1998) standard-ocean formula
@@ -40,7 +41,8 @@ Leroy & Parthiot (1998) JASA 103, Medwin (1975) as printed in Ainslie,
 depth_to_pressure(depth: float, latitude: float = 45.0) -> float
 ```
 
-Gauge pressure at a given ocean depth (Leroy & Parthiot 1998), in MPa.
+Gauge pressure at a given ocean depth (Leroy & Parthiot 1998), in
+MPa.
 
 Standard-ocean formula (an ideal medium of 0 °C and 35 ppt); no local
 corrections are applied.
@@ -50,7 +52,7 @@ corrections are applied.
 | Name | Description |
 | :--- | :--- |
 | `depth` | Depth below the surface `Z`, in metres (`>= 0`). |
-| `latitude` | Latitude `φ`, in degrees (default 45°). |
+| `latitude` | Latitude $\varphi$, in degrees (default 45°). |
 
 **Returns:** Gauge pressure, in megapascals.
 

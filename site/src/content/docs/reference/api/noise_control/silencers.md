@@ -17,52 +17,67 @@ elements (Bies, Hansen & Howard, *Engineering Noise Control* 5th ed., §8.8-8.9;
 Munjal, *Acoustics of Ducts and Mufflers*).
 
 **Transfer matrix** (Bies Eq. (8.133)), state vector `[p, S u]` with the
-characteristic acoustic impedance `Z = rho c / S`. The plane-wave element for
+characteristic acoustic impedance $Z = \rho c / S$. The plane-wave
+element for
 a straight duct of length `L` and area `S` is (Bies Eq. (8.143), no flow)
 
-    [[ cos(kL),              j (rho c / S) sin(kL) ],
-     [ j (S / rho c) sin(kL), cos(kL)              ]],    k = omega / c,
+$$
+\begin{bmatrix} \cos(kL) & j (\rho c / S) \sin(kL) \\ j (S / \rho c) \sin(kL) & \cos(kL) \end{bmatrix}, \qquad k = \omega / c,
+$$
 
 and a **side branch** of acoustic impedance `Z_b` is the shunt element
 (Bies Eq. (8.144))
 
-    [[ 1,       0 ],
-     [ 1 / Z_b, 1 ]].
+$$
+\begin{bmatrix} 1 & 0 \\ 1 / Z_b & 1 \end{bmatrix}.
+$$
 
 **Transmission loss** from the compound matrix `T` (Munjal, *Acoustics of
 Ducts and Mufflers* 2nd ed., Eq. (3.27), no flow; reduces to Bies Eq. (8.148)
 for equal inlet/outlet areas):
 
-    TL = 10 log10[ (Zn / Z1) (1/4) | T11 + T12 / Zn + Z1 T21 + (Z1 / Zn) T22 |^2 ]
+$$
+\mathrm{TL} = 10 \log_{10}\!\left[\frac{Z_n}{Z_1} \cdot \frac{1}{4} \left\lvert T_{11} + \frac{T_{12}}{Z_n} + Z_1 T_{21} + \frac{Z_1}{Z_n} T_{22} \right\rvert^2\right]
+$$
 
-with `Z1 = rho c / S_in` and `Zn = rho c / S_out`. A zero-length element
+with $Z_1 = \rho c / S_{\mathrm{in}}$ and
+$Z_n = \rho c / S_{\mathrm{out}}$. A zero-length element
 between unequal areas then reproduces the classic sudden-expansion result
-`TL = 10 log10[(1 + m)^2 / (4 m)]` with `m = S_out / S_in`, and the TL is
+$\mathrm{TL} = 10 \log_{10}[(1 + m)^2 / (4 m)]$ with
+$m = S_{\mathrm{out}} / S_{\mathrm{in}}$, and the TL is
 the same from either side, as reciprocity of a passive two-port requires.
 Bies Eq. (8.141) prints this formula with impedance ratios on `T11` and
-`T22` (`Z_A1/Z_An` and `Z_An/Z_A1`) instead of the overall `Zn/Z1`
+`T22` ($Z_{A1}/Z_{An}$ and $Z_{An}/Z_{A1}$) instead of the
+overall $Z_n/Z_1$
 prefactor; as printed it fails the sudden-expansion limit (see
 `docs/ERRATA.md`). `TL` is the intrinsic attenuation for an anechoic
 termination. The **insertion loss** for a source of internal impedance
 `Z_s` radiating into a termination impedance `Z_r` is the extra
 attenuation of inserting the silencer in place of a direct connection,
 
-    IL = 20 log10 | (T11 Z_r + T12 + Z_s Z_r T21 + Z_s T22) / (Z_s + Z_r) |,
+$$
+\mathrm{IL} = 20 \log_{10} \left\lvert \frac{T_{11} Z_r + T_{12} + Z_s Z_r T_{21} + Z_s T_{22}} {Z_s + Z_r} \right\rvert,
+$$
 
-which is `0` when the silencer reduces to a through connection (`T = I`)
+which is `0` when the silencer reduces to a through connection
+($T = I$)
 and, for equal inlet/outlet areas, equals the transmission loss for the
-anechoic reference `Z_s = Z_r = rho c / S` (with unequal areas the direct
+anechoic reference $Z_s = Z_r = \rho c / S$ (with unequal areas the
+direct
 connection contains the same area jump, so its mismatch loss cancels from
 the insertion loss but not from the transmission loss).
 
 **Simple expansion chamber.** A chamber of area `S_exp` and length `L`
 between pipes of area `S_duct` has the closed-form transmission loss (Bies
-Eq. (8.111)) with area ratio `m = S_exp / S_duct`
+Eq. (8.111)) with area ratio $m = S_{\mathrm{exp}} / S_{\mathrm{duct}}$
 
-    TL = 10 log10[ 1 + (1/4) (m - 1/m)^2 sin^2(kL) ],
+$$
+\mathrm{TL} = 10 \log_{10}\!\left[1 + \frac{1}{4} \left(m - \frac{1}{m}\right)^2 \sin^2(kL)\right],
+$$
 
-peaking at `10 log10[1 + (1/4)(m - 1/m)^2]` when `kL = pi/2, 3pi/2, ...` and
-dropping to `0` at `kL = n pi` (no dissipation). The four-pole product
+peaking at $10 \log_{10}[1 + (1/4)(m - 1/m)^2]$ when
+$kL = \pi/2, 3\pi/2, \ldots$ and
+dropping to `0` at $kL = n \pi$ (no dissipation). The four-pole product
 reproduces this exactly, and the machinery extends to side-branch (Helmholtz,
 quarter-wave) and extended-tube resonators that the closed form cannot cover.
 
@@ -108,7 +123,7 @@ Simple expansion-chamber silencer (Bies Eq. (8.111) / four-pole).
 | `source_impedance` | Optional source impedance `Z_s` for the insertion loss, Pa s/m3. |
 | `radiation_impedance` | Optional radiation impedance `Z_r` for the insertion loss, Pa s/m3. |
 
-**Returns:** A [`ReactiveSilencerResult`](/phonometry/reference/api/noise_control/silencers/#reactivesilencerresult) (its `transmission_loss` equals the closed form `10 log10[1 + (1/4)(m - 1/m)^2 sin^2(kL)]`).
+**Returns:** A [`ReactiveSilencerResult`](/phonometry/reference/api/noise_control/silencers/#reactivesilencerresult) (its `transmission_loss` equals the closed form $10 \log_{10}[1 + (1/4)(m - 1/m)^2 \sin^2(kL)]$).
 
 ## extended_tube_chamber
 
@@ -131,11 +146,14 @@ extended_tube_chamber(
 Extended-inlet/outlet expansion chamber (Bies §8.9.7).
 
 The inlet and outlet pipes extend a distance into the chamber, forming
-annular quarter-wave side branches (of area `S_exp - S_duct` and lengths
+annular quarter-wave side branches (of area
+$S_{\mathrm{exp}} - S_{\mathrm{duct}}$ and lengths
 equal to the extensions, Bies Eq. (8.156)) at the two junctions. Tuning the
-extensions (classically `L/4` and `L/2`) places quarter-wave peaks that
-fill the `kL = n pi` troughs of the plain expansion chamber. With both
-extensions `0` the result reduces exactly to [`expansion_chamber`](/phonometry/reference/api/noise_control/silencers/#expansion_chamber).
+extensions (classically $L/4$ and $L/2$) places quarter-wave
+peaks that
+fill the $kL = n \pi$ troughs of the plain expansion chamber. With
+both extensions `0` the result reduces exactly to
+[`expansion_chamber`](/phonometry/reference/api/noise_control/silencers/#expansion_chamber).
 
 **Parameters**
 
@@ -189,7 +207,7 @@ Side-branch Helmholtz resonator on a duct (Bies Eqs. (8.144), (8.152)).
 | `source_impedance` | Optional source impedance `Z_s`, Pa s/m3. |
 | `radiation_impedance` | Optional radiation impedance `Z_r`, Pa s/m3. |
 
-**Returns:** A [`ReactiveSilencerResult`](/phonometry/reference/api/noise_control/silencers/#reactivesilencerresult); `resonances` holds `f_0 = (c / 2 pi) sqrt(S_neck / (l_e V))`.
+**Returns:** A [`ReactiveSilencerResult`](/phonometry/reference/api/noise_control/silencers/#reactivesilencerresult); `resonances` holds $f_0 = (c / 2 \pi) \sqrt{S_{\mathrm{neck}} / (l_e V)}$.
 
 ## plot_silencer_geometry
 
@@ -271,7 +289,7 @@ Closed quarter-wave side-branch tube on a duct (Bies Eqs. (8.144), (8.146)).
 | `source_impedance` | Optional source impedance `Z_s`, Pa s/m3. |
 | `radiation_impedance` | Optional radiation impedance `Z_r`, Pa s/m3. |
 
-**Returns:** A [`ReactiveSilencerResult`](/phonometry/reference/api/noise_control/silencers/#reactivesilencerresult); `resonances` holds the odd multiples of `f = c / (4 l_e)` within the frequency range.
+**Returns:** A [`ReactiveSilencerResult`](/phonometry/reference/api/noise_control/silencers/#reactivesilencerresult); `resonances` holds the odd multiples of $f = c / (4 l_e)$ within the frequency range.
 
 ## ReactiveSilencerResult
 

@@ -1,5 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""
+r"""
 Higher-order acoustic modes in ducts, with the mean-flow cut-on shift.
 
 Every plane-wave duct method has the same expiry date: the frequency at which
@@ -13,14 +13,17 @@ being right.
 This module implements the cut-on analysis of Norton & Karczub, *Fundamentals
 of Noise and Vibration Analysis for Engineers* 2nd ed., section 7.3:
 
-* circular ducts (Eq. 7.6), ``(f_co)_pq = pi alpha_pq c / (2 pi a_i)``, with the
-  ``pi alpha_pq`` eigenvalues of Table 7.1 that solve ``J'_p(kappa_pq a_i) = 0``
-  (the first is 1.8412, which sets the plane-wave limit ``k a_i < 1.8412``);
+* circular ducts (Eq. 7.6),
+  :math:`(f_{co})_{pq} = \pi \alpha_{pq} c / (2 \pi a_i)`, with the
+  :math:`\pi \alpha_{pq}` eigenvalues of Table 7.1 that solve
+  :math:`J'_p(\kappa_{pq} a_i) = 0` (the first is 1.8412, which sets the
+  plane-wave limit :math:`k a_i < 1.8412`);
 * rectangular ducts (Eq. 7.10),
-  ``(f_co)_pq = (c / 2) sqrt[(p / a)^2 + (q / b)^2]``;
+  :math:`(f_{co})_{pq} = (c / 2) \sqrt{(p / a)^2 + (q / b)^2}`;
 * the **mean-flow correction** (Eq. 7.8): a uniform axial flow of Mach number
-  ``M`` lowers every cut-on frequency by ``sqrt(1 - M^2)`` and moves the cut-on
-  from ``k_x = 0`` to ``k_x = -M kappa_pq / sqrt(1 - M^2)`` (Eq. 7.9), so the
+  ``M`` lowers every cut-on frequency by :math:`\sqrt{1 - M^2}` and moves the
+  cut-on from :math:`k_x = 0` to
+  :math:`k_x = -M \kappa_{pq} / \sqrt{1 - M^2}` (Eq. 7.9), so the
   dispersion curve, symmetric about the frequency axis in still air, becomes
   asymmetric. For a turbulent rather than uniform profile Norton notes that
   replacing ``M`` by the centre-line Mach number ``M_0`` represents the
@@ -96,7 +99,7 @@ class DuctModeResult:
     :ivar cut_on_no_flow: Cut-on frequency of each mode in still air, Hz.
     :ivar axial_wavenumber: Axial wavenumber ``k_x`` at cut-on, 1/m (zero
         without flow, negative with it).
-    :ivar mach: Mean-flow Mach number ``M = U / c``.
+    :ivar mach: Mean-flow Mach number :math:`M = U / c`.
     :ivar section: ``"circular"`` or ``"rectangular"``.
     :ivar label: A short human label of the duct.
     """
@@ -151,16 +154,21 @@ def circular_duct_cut_on(
     speed_of_sound: float = _C_AIR,
     count: int = 6,
 ) -> DuctModeResult:
-    """Cut-on frequencies of the higher-order modes of a circular duct.
+    r"""Cut-on frequencies of the higher-order modes of a circular duct.
 
     Norton & Karczub Eq. 7.6 with the Table 7.1 eigenvalues, corrected for a
-    uniform axial mean flow by Eqs. 7.8 and 7.9::
+    uniform axial mean flow by Eqs. 7.8 and 7.9:
 
-        (f_co)_pq = pi alpha_pq c sqrt(1 - M^2) / (2 pi a_i)
-        k_x       = -M kappa_pq / sqrt(1 - M^2),   kappa_pq = pi alpha_pq / a_i
+    .. math::
+
+       (f_{co})_{pq} = \frac{\pi \alpha_{pq} c \sqrt{1 - M^2}}{2 \pi a_i}
+
+       k_x = \frac{-M \kappa_{pq}}{\sqrt{1 - M^2}}, \qquad
+       \kappa_{pq} = \frac{\pi \alpha_{pq}}{a_i}
 
     The flow lowers every cut-on frequency and shifts the cut-on away from
-    ``k_x = 0``: the mode is already travelling upstream, against the flow, at
+    :math:`k_x = 0`: the mode is already travelling upstream, against the
+    flow, at
     the frequency at which it appears. Only the first twelve modes are
     tabulated by Norton, so ``count`` cannot exceed twelve.
 
@@ -203,12 +211,16 @@ def rectangular_duct_cut_on(
     speed_of_sound: float = _C_AIR,
     count: int = 3,
 ) -> DuctModeResult:
-    """Cut-on frequencies of the higher-order modes of a rectangular duct.
+    r"""Cut-on frequencies of the higher-order modes of a rectangular duct.
 
-    Norton & Karczub Eq. 7.10, with the same ``sqrt(1 - M^2)`` convective
-    factor as the circular case::
+    Norton & Karczub Eq. 7.10, with the same :math:`\sqrt{1 - M^2}`
+    convective factor as the circular case:
 
-        (f_co)_pq = (c / 2) sqrt[(p / a)^2 + (q / b)^2] sqrt(1 - M^2)
+    .. math::
+
+       (f_{co})_{pq} = \frac{c}{2}
+       \sqrt{\left(\frac{p}{a}\right)^2 + \left(\frac{q}{b}\right)^2}
+       \sqrt{1 - M^2}
 
     where ``a`` and ``b`` are the cross-sectional dimensions and ``(p, q)``
     the mode order; ``(0, 0)`` is the plane wave and is excluded. The modes are
@@ -266,13 +278,13 @@ def plane_wave_limit(
     flow_velocity: float = 0.0,
     speed_of_sound: float = _C_AIR,
 ) -> float:
-    """The first cut-on frequency of a duct: plane waves only below it.
+    r"""The first cut-on frequency of a duct: plane waves only below it.
 
     A convenience over :func:`circular_duct_cut_on` and
     :func:`rectangular_duct_cut_on` that takes whichever description of the
     cross section is at hand. Give either ``diameter``, or both ``width`` and
     ``height``, or ``area`` (treated as a circular duct of the equivalent
-    diameter ``sqrt(4 S / pi)``).
+    diameter :math:`\sqrt{4S/\pi}`).
 
     :param diameter: Internal diameter of a circular duct, m.
     :param width: Cross-sectional dimension ``a`` of a rectangular duct, m.

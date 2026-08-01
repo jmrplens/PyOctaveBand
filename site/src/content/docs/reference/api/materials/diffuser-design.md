@@ -19,27 +19,24 @@ and Diffusers* (3rd ed., CRC Press, 2017):
 
 * Each well of depth `d_n` behaves, at normal incidence and with a rigid
   bottom, as a locally reacting patch of pressure reflection coefficient
-  `R_n = exp(-2 j k d_n)` (Chapter 10; the phase change of a wave travelling
+  $R_n = e^{-2jkd_n}$ (Chapter 10; the phase change of a wave travelling
   down and back up the well). An arbitrary complex reflection coefficient per
   well is accepted as well, so admittance or resonator-loaded surfaces computed
   elsewhere can be fed in directly.
-* The scattered pressure at reflection angle `theta` for a source at incidence
-  `psi` is the sum over the wells of the periodic surface (Chapter 5,
-  Equation (5.8), and Chapter 9, Equation (9.32)):
+* The scattered pressure at reflection angle $\theta$ for a source at
+  incidence $\psi$ is the sum over the wells of the periodic surface
+  (Chapter 5, Equation (5.8), and Chapter 9, Equation (9.32)):
+  $p(\theta) = F(\theta) \sum_n R_n e^{jkx_n(\sin\psi + \sin\theta)}$,
+  with `x_n` the centre of the `n`-th well and $k = 2\pi f/c$. The
+  optional prefactor $F(\theta)$ collects the single-well aperture
+  directivity $\operatorname{sinc}(kw(\sin\psi + \sin\theta)/2)$ (the
+  Fourier transform of one well of width `w`) and the Kirchhoff obliquity
+  factor $(1 + \cos\theta)/2$ of Equation (9.32); both are absorbed
+  into the constant `A` of Equation (5.8) and can be switched off to
+  recover the plain Fourier form.
 
-```text
-p(theta) = F(theta) * sum_n R_n * exp(j k x_n (sin psi + sin theta))
-```
-
-  with `x_n` the centre of the `n`-th well and `k = 2 pi f / c`. The
-  optional prefactor `F(theta)` collects the single-well aperture directivity
-  `sinc(k w (sin psi + sin theta) / 2)` (the Fourier transform of one well of
-  width `w`) and the Kirchhoff obliquity factor `(1 + cos theta) / 2` of
-  Equation (9.32); both are absorbed into the constant `A` of Equation (5.8)
-  and can be switched off to recover the plain Fourier form.
-
-The polar levels `L_i = 20 lg|p(theta_i)|` are then passed to the ISO 17497-2
-autocorrelation diffusion coefficient of
+The polar levels $L_i = 20 \lg|p(\theta_i)|$ are then passed to the
+ISO 17497-2 autocorrelation diffusion coefficient of
 [`directional_diffusion_coefficient`](/phonometry/reference/api/materials/scattering-diffusion/#directional_diffusion_coefficient),
 and normalised against the same-footprint flat reference with
 [`normalized_diffusion_coefficient`](/phonometry/reference/api/materials/scattering-diffusion/#normalized_diffusion_coefficient)
@@ -49,9 +46,9 @@ For a quadratic residue diffuser the depth sequence follows from the prime
 generator `N` and the design frequency `f_0` (Cox and D'Antonio,
 Equations (10.2) and (10.3)):
 
-```text
-s_n = n^2 mod N          d_n = s_n * lambda_0 / (2 N),    lambda_0 = c / f_0.
-```
+$$
+s_n = n^2 \bmod N, \qquad d_n = \frac{s_n \lambda_0}{2N}, \qquad \lambda_0 = c / f_0.
+$$
 
 The model is a far-field approximation and, like every Fourier diffuser model,
 loses accuracy at low frequencies, at grazing angles and for surfaces with
@@ -198,7 +195,7 @@ Predict the far-field polar response of a diffuser (Cox and D'Antonio, Eq. (5.8)
 Evaluates the single-plane Fraunhofer scattered pressure of a periodic
 phase-grating surface and reduces it to the ISO 17497-2 directional
 diffusion coefficient. Supply the surface either as rigid-bottom well
-`depths` (`R_n = exp(-2 j k d_n)`) or as an explicit per-well complex
+`depths` ($R_n = e^{-2jkd_n}$) or as an explicit per-well complex
 `reflection` sequence (for admittance or resonator-loaded surfaces); give
 exactly one.
 
@@ -214,8 +211,8 @@ exactly one.
 | `source_angle` | Angle of incidence `psi` of the source, in degrees (0 = normal incidence). |
 | `periods` | Number of repetitions `N_p` of the single period; the grating lobes that define a Schroeder diffuser require `periods >= 2`. |
 | `speed_of_sound` | Speed of sound `c`, in metres per second. |
-| `include_aperture` | Include the single-well aperture directivity `sinc(k w (sin psi + sin theta) / 2)` of Eq. (9.32); defaults to `True`. |
-| `include_obliquity` | Include the Kirchhoff obliquity factor `(cos theta + cos psi) / 2`, the oblique-source generalisation of the normal-incidence `(1 + cos theta) / 2` of Eq. (9.32); defaults to `True`. |
+| `include_aperture` | Include the single-well aperture directivity $\operatorname{sinc}(kw(\sin\psi + \sin\theta)/2)$ of Eq. (9.32); defaults to `True`. |
+| `include_obliquity` | Include the Kirchhoff obliquity factor $(\cos\theta + \cos\psi)/2$, the oblique-source generalisation of the normal-incidence $(1 + \cos\theta)/2$ of Eq. (9.32); defaults to `True`. |
 
 **Returns:** A [`DiffuserPolarResponse`](/phonometry/reference/api/materials/diffuser-design/#diffuserpolarresponse) with the per-angle levels, the directional diffusion coefficient and `.plot()`.
 
@@ -297,9 +294,10 @@ qrd_well_depths(
 
 Well depths of a quadratic residue diffuser (Cox and D'Antonio, Eq. (10.3)).
 
-`d_n = s_n * lambda_0 / (2 N)` with the quadratic residue sequence `s_n`
-of [`quadratic_residue_sequence`](/phonometry/reference/api/materials/diffuser-design/#quadratic_residue_sequence) and the design wavelength
-`lambda_0 = c / f_0`. The depths span 0 to roughly `lambda_0 / 2`.
+$d_n = s_n \lambda_0 / (2N)$ with the quadratic residue sequence
+`s_n` of [`quadratic_residue_sequence`](/phonometry/reference/api/materials/diffuser-design/#quadratic_residue_sequence) and the design wavelength
+$\lambda_0 = c / f_0$. The depths span 0 to roughly
+$\lambda_0 / 2$.
 
 **Parameters**
 
@@ -325,9 +323,10 @@ quadratic_residue_sequence(prime: int) -> Real
 
 Quadratic residue sequence `s_n` (Cox and D'Antonio, Eq. (10.2)).
 
-`s_n = n^2 mod N` for `n = 0, 1, ..., N - 1`, the least non-negative
-remainders, where `N` is the (odd) prime generator and number of wells per
-period. For `N = 7` this returns `[0, 1, 4, 2, 2, 4, 1]`.
+$s_n = n^2 \bmod N$ for $n = 0, 1, \ldots, N - 1$, the least
+non-negative remainders, where `N` is the (odd) prime generator and
+number of wells per period. For $N = 7$ this returns
+`[0, 1, 4, 2, 2, 4, 1]`.
 
 **Parameters**
 

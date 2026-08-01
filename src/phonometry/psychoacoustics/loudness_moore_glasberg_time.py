@@ -23,7 +23,7 @@ The signal chain is:
   (clause 7.4, Formulae 1-6);
 * the compressive transformation of excitation into instantaneous specific
   loudness ``N'(i)`` in sone/Cam (clause 7.5, Formulae 7-9, Tables 2-4, with
-  ``C = 0.063`` sone/Cam);
+  :math:`C = 0.063` sone/Cam);
 * an attack/release temporal smoothing of the specific loudness at every centre
   frequency to the short-term specific loudness (clause 7.6, Formulae 10-13);
 * the across-frequency smoothing and binaural inhibition of ISO 532-2
@@ -419,9 +419,10 @@ def _specific_loudness(excitation: np.ndarray) -> np.ndarray:
     """Instantaneous specific loudness N'(i) in sone/Cam (clause 7.5).
 
     Applies the compressive transformation of Formulae (7)-(9) with the
-    ISO 532-3 constants (``C = 0.063``, Tables 2-4, ``E_THRQ/E0 = 2.307`` for
-    fc >= 500 Hz): the near-threshold Formula (8) below E_THRQ/E0 and the
-    high-level Formula (9) above E/E0 = 1e10.
+    ISO 532-3 constants (:math:`C = 0.063`, Tables 2-4,
+    :math:`E_{THRQ}/E_0 = 2.307` for
+    fc >= 500 Hz): the near-threshold Formula (8) below :math:`E_{THRQ}/E_0`
+    and the high-level Formula (9) above :math:`E/E_0 = 10^{10}`.
     """
     n_spec = np.zeros(_FC_GRID.size, dtype=np.float64)
     active = excitation > 0.0

@@ -186,12 +186,14 @@ def _rating(sti: float) -> str:
 
 
 def _masking_amdb(level: np.ndarray | float) -> np.ndarray:
-    """Level-dependent auditory masking ``amdB`` in dB (Ed.5 Table A.2).
+    r"""Level-dependent auditory masking ``amdB`` in dB (Ed.5 Table A.2).
 
     Four-segment continuous function of the total (signal + noise) level
     ``L`` of the next lower octave band, identical to Ed.4 Table A.1:
-    ``0,5*L - 65`` (L < 63), ``1,8*L - 146,9`` (63 <= L < 67),
-    ``0,5*L - 59,8`` (67 <= L < 100) and ``-10`` (L >= 100).
+    :math:`0.5 L - 65` (:math:`L < 63`),
+    :math:`1.8 L - 146.9` (:math:`63 \le L < 67`),
+    :math:`0.5 L - 59.8` (:math:`67 \le L < 100`) and
+    :math:`-10` (:math:`L \ge 100`).
     """
     lvl = np.asarray(level, dtype=np.float64)
     return np.asarray(
@@ -230,20 +232,22 @@ def _sti_from_mtf(
     level: Sequence[float] | np.ndarray | None = None,
     ambient: Sequence[float] | np.ndarray | None = None,
 ) -> STIResult:
-    """STI computation chain from a matrix of modulation transfer values.
+    r"""STI computation chain from a matrix of modulation transfer values.
 
     Applies, in order: m > 1 truncation (Ed.4 A.5.3 NOTE 1), the optional
     signal-to-noise and level-dependent corrections (Ed.4 A.5.3 = Ed.5),
     the effective SNR with +/-15 dB limits (A.5.4), the transmission
-    indices TI = (SNR_eff + 15)/30 (A.5.5), the band MTIs and the final
-    weighted STI truncated to 1,0 (A.5.6, male factors of Ed.5 Table A.1).
+    indices :math:`TI = (SNR_{\mathrm{eff}} + 15)/30` (A.5.5), the band MTIs
+    and the final
+    weighted STI truncated to 1.0 (A.5.6, male factors of Ed.5 Table A.1).
 
-    Noise handling: ``snr`` alone multiplies m by 1/(1 + 10^(-SNR/10)),
-    which is exactly the I_k/(I_k + I_n,k) factor of the standard. When
-    ``level`` is provided the full intensity-domain correction
-    ``m' = m * I_k / (I_k + I_am,k + I_rt,k + I_n,k)`` is used instead,
-    with ``ambient`` (or ``level - snr``) defining I_n,k, so the noise
-    degradation is never applied twice.
+    Noise handling: ``snr`` alone multiplies ``m`` by
+    :math:`1/(1 + 10^{-SNR/10})`,
+    which is exactly the :math:`I_k/(I_k + I_{n,k})` factor of the standard.
+    When ``level`` is provided the full intensity-domain correction
+    :math:`m' = m \cdot I_k / (I_k + I_{am,k} + I_{rt,k} + I_{n,k})` is used
+    instead, with ``ambient`` (or ``level - snr``) defining :math:`I_{n,k}`,
+    so the noise degradation is never applied twice.
     """
     m = np.array(mtf, dtype=np.float64)
     if m.ndim != 2 or m.shape[0] != _NUM_BANDS:
@@ -336,14 +340,19 @@ def sti_from_impulse_response(
     level: Sequence[float] | np.ndarray | None = None,
     ambient: Sequence[float] | np.ndarray | None = None,
 ) -> STIResult:
-    """
+    r"""
     Full STI from a room/system impulse response (indirect method).
 
     The impulse response is filtered into the seven octave bands 125 Hz -
     8 kHz (IEC 61260-1 filters) and the modulation transfer function is
     obtained from the Schroeder integral (IEC 60268-16, indirect method):
-    ``m_k(f_m) = |integral h_k^2(t) exp(-j 2 pi f_m t) dt| /
-    integral h_k^2(t) dt`` at the 14 modulation frequencies 0,63-12,5 Hz
+
+    .. math::
+
+       m_k(f_m) = \left| \int h_k^2(t)\, e^{-j 2\pi f_m t}\, dt \right|
+       \Big/ \int h_k^2(t)\, dt
+
+    at the 14 modulation frequencies 0,63-12,5 Hz
     (A.2.2). The result then follows the standard chain: optional noise
     degradation, optional auditory masking and absolute reception
     threshold correction, effective SNR clipped to +/-15 dB, transmission
@@ -430,9 +439,15 @@ def _intensity_envelopes(x: np.ndarray, fs: int) -> np.ndarray:
 
 
 def _stipa_modulation_depths(env: np.ndarray, fs: int) -> np.ndarray:
-    """Modulation depths mdr_{k,fm} of the intensity envelopes at the two
-    Table B.1 frequencies of each band, over an integer number of periods:
-    ``mdr = 2 sqrt[(sum I sin)^2 + (sum I cos)^2] / sum I`` (Ed.4 A.5.2)."""
+    r"""Modulation depths :math:`mdr_{k,f_m}` of the intensity envelopes at
+    the two Table B.1 frequencies of each band, over an integer number of
+    periods (Ed.4 A.5.2):
+
+    .. math::
+
+       mdr = \frac{2 \sqrt{\left( \sum I \sin \right)^2
+       + \left( \sum I \cos \right)^2}}{\sum I}
+    """
     n = env.shape[-1]
     duration = n / fs
     mdr = np.empty((_NUM_BANDS, 2))

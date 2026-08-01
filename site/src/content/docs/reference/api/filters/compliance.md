@@ -12,9 +12,12 @@ official text (BS EN 61260-1:2014, **Table 1**, standard pages 15-16):
 octave-band breakpoint frequencies with class 1 and class 2 minimum/maximum
 limits. Fractional-octave-band breakpoints are derived with Formulas (9) and
 (10) (subclauses 5.10.3-5.10.4) and limits between breakpoints are interpolated
-linearly in lg(Omega) per Formula (11) (subclause 5.10.6). Relative attenuation
-is `deltaA(Omega) = A(Omega) - Aref` (Formula 8) with `A = Lin - Lout`
-(Formula 7); here `Aref` is the attenuation at the exact mid-band frequency
+linearly in $\lg \Omega$ per Formula (11) (subclause 5.10.6).
+Relative attenuation is
+$\Delta A(\Omega) = A(\Omega) - A_{\mathrm{ref}}$ (Formula 8) with
+$A = L_{\mathrm{in}} - L_{\mathrm{out}}$
+(Formula 7); here $A_{\mathrm{ref}}$ is the attenuation at the exact
+mid-band frequency
 (subclause 5.9: the pass-band reference attenuation).
 
 IEC 61260-1:2014 defines only classes 1 and 2. **Class 0** (the tightest,
@@ -68,19 +71,22 @@ Acceptance limits on relative attenuation at normalized frequencies.
 | :--- | :--- |
 | `fraction` | Bandwidth designator denominator b (1 for octave, 3 for one-third octave, ...). |
 | `filter_class` | Performance class: 1 or 2 for `edition="2014"`; 0, 1 or 2 for `edition="1995"`. |
-| `omega` | Normalized frequencies f/fm (> 0). |
+| `omega` | Normalized frequencies $f/f_m$ (> 0). |
 | `edition` | `"2014"` (IEC 61260-1:2014, classes 1/2) or `"1995"` (IEC 61260:1995 / ANSI S1.11-2004, classes 0/1/2). |
 
 **Returns:** Tuple (minimum, maximum) relative attenuation in dB per point; the maximum is `+inf` outside the pass-band.
 
 :::note
-The exact band-edge point `Omega = G^(1/2)` is treated as pass-band.
+The exact band-edge point $\Omega = G^{1/2}$ is treated as
+pass-band.
 The 1995 edition's Table 1 prints a dedicated minimum (+2.3/+2.0/
 +1.6 dB) *at* that single frequency, which this convention relaxes to
 the pass-band minimum; the discrepancy has measure zero -- any
-continuous response violating the edge row is caught at `edge + eps`
-by the interpolated stop-band mask. The 2014 edition defines only the
-`G^(1/2) - eps` and `G^(1/2) + eps` rows, which the masks match
+continuous response violating the edge row is caught at
+$\text{edge} + \epsilon$
+by the interpolated stop-band mask. The 2014 edition defines only
+the $G^{1/2} - \epsilon$ and $G^{1/2} + \epsilon$
+rows, which the masks match
 exactly.
 :::
 
@@ -348,7 +354,8 @@ against its published transfer function and tabulated curve).
 The filter's relative response (normalized to its 1 kHz gain) is evaluated
 at the *exact* base-10 frequency behind each nominal label below
 the Nyquist frequency (IEC 61672-1 Table 3 NOTE: the design goals are
-computed at `f = 1000 * 10^(0.1 (n - 30))`, e.g. 15 848.9 Hz for
+computed at $f = 1000 \cdot 10^{0.1 (n - 30)}$, e.g.
+15 848.9 Hz for
 "16 kHz"; IEC 61672-3:2013 subclause 13.3 tests the deviation at the same
 exact frequencies, and IEC 61012 Table 1 lists the same exact
 frequencies). The deviation from the design-goal weighting is checked

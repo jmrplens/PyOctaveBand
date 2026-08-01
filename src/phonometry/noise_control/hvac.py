@@ -1,5 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""
+r"""
 HVAC duct acoustics: fan power, duct losses, plenums and flow-generated noise.
 
 A ventilation duct network attenuates fan noise through several mechanisms
@@ -23,9 +23,9 @@ rather than merged:
   the terminal device into a sound pressure level in the room.
 
 Both references trace back to the same ASHRAE data for the elbows: Bies
-Table 8.11 is indexed by ``W / lambda`` and Long Tables 14.5-14.7 by the
+Table 8.11 is indexed by :math:`W / \lambda` and Long Tables 14.5-14.7 by the
 frequency-width product ``f w`` (kHz times inches), and the two indexings agree
-band by band (``W / lambda = 0.074 f w``), so :func:`elbow_insertion_loss`
+band by band (:math:`W / \lambda = 0.074 f w`), so :func:`elbow_insertion_loss`
 serves both. Where they genuinely differ -- the end reflection, tabulated by
 Bies and given in closed form by Long -- both are selectable
 (``method="bies"`` or ``method="long"``) and neither replaces the other.
@@ -37,7 +37,7 @@ end-to-end fan-to-room calculation.
    Bies 5th ed. gives the duct end reflection only as the ASHRAE Table 8.14
    look-up (there is no closed form in this edition); this module reproduces
    that table and interpolates it. Rectangular ducts use the equivalent
-   diameter ``D = sqrt(4 S / pi)``.
+   diameter :math:`D = \sqrt{4S/\pi}`.
 
 .. warning::
    Long's worked duct-borne sheet (Table 14.9) was produced by a commercial
@@ -48,7 +48,7 @@ end-to-end fan-to-room calculation.
 
    * ``split_loss`` reproduces the 25 per cent split row (-6 dB) exactly, and
      :func:`elbow_insertion_loss` reproduces the unlined-elbow row exactly
-     when the elbow is read as round (Table 14.7) at ``w = 24 in``;
+     when the elbow is read as round (Table 14.7) at :math:`w = 24` in;
    * :func:`lined_rectangular_duct_attenuation` with ``include_unlined=True``
      reproduces the 18 x 12 in run from 500 Hz up (11/25/22/16/13 dB) and the
      36 x 24 in run at 500 Hz and 8 kHz, but is 1-2 dB low at 63-250 Hz on
@@ -539,9 +539,10 @@ def elbow_insertion_loss(
     lined: bool = False,
     speed_of_sound: float = _C_AIR,
 ) -> HvacSpectrumResult:
-    """Duct bend/elbow insertion loss per bend (Bies Table 8.11, ASHRAE).
+    r"""Duct bend/elbow insertion loss per bend (Bies Table 8.11, ASHRAE).
 
-    Indexed by the frequency-to-width ratio ``W / lambda`` (``lambda = c / f``).
+    Indexed by the frequency-to-width ratio :math:`W / \lambda`
+    (:math:`\lambda = c / f`).
     Lined bends assume the lining extends at least three duct diameters up- and
     downstream. Round bends are treated as unlined with no vanes.
 
@@ -586,11 +587,17 @@ def plenum_attenuation(
     *,
     angle: float = 0.0,
 ) -> np.ndarray | float:
-    """Plenum-chamber transmission loss by Wells' method (Bies Eq. (8.275)).
+    r"""Plenum-chamber transmission loss by Wells' method (Bies Eq. (8.275)).
 
-    ``TL = -10 log10[ S_out ( cos(theta) / (pi r^2) + (1 - alpha) / (S_w alpha) ) ]``,
+    .. math::
+
+       \mathrm{TL} = -10 \log_{10}\!\left[S_{\mathrm{out}}
+       \left(\frac{\cos(\theta)}{\pi r^2}
+       + \frac{1 - \alpha}{S_w \alpha}\right)\right],
+
     where the reverberant term uses the plenum room constant
-    ``R = S_w alpha / (1 - alpha)`` (:func:`phonometry.room.room_constant`). The
+    :math:`R = S_w \alpha / (1 - \alpha)`
+    (:func:`phonometry.room.room_constant`). The
     method holds above the inlet cut-on and when the plenum is large compared
     with the wavelength; it underpredicts the low-frequency loss by 5-10 dB.
 
@@ -622,9 +629,13 @@ def flow_noise_straight_duct(
     flow_velocity: float,
     area: float,
 ) -> HvacSpectrumResult:
-    """Flow-generated octave-band sound power of a straight duct (Bies Eq. (8.251)).
+    r"""Flow-generated octave-band sound power of a straight duct (Bies Eq. (8.251)).
 
-    ``L_WB = 7 + 50 log10(U) + 10 log10(S) - 2 - 26 log10(1.14 + 0.02 f / U)``
+    .. math::
+
+       L_{WB} = 7 + 50 \log_{10}(U) + 10 \log_{10}(S) - 2
+       - 26 \log_{10}(1.14 + 0.02 f / U)
+
     in dB re 1e-12 W (VDI 2081-1), for airflow speed ``U`` in a duct of area
     ``S``.
 
@@ -658,16 +669,23 @@ def flow_noise_bend(
     *,
     density: float = 1.206,
 ) -> HvacSpectrumResult:
-    """Flow-generated octave-band sound power of a mitred bend (Bies Eqs. (8.252), (8.254)).
+    r"""Flow-generated octave-band sound power of a mitred bend (Bies Eqs. (8.252), (8.254)).
 
-    ``L_WB = L_Ws - 10 log10(1 + 0.165 N_s^2) + 30 log10(U) - 103`` with the
-    stream power level ``L_Ws = 30 log10(U) + 10 log10(S) + 10 log10(rho) + 117``
-    (Bies Eq. (8.252)) and the Strouhal number ``N_s = f H / U`` (``H`` the duct
+    .. math::
+
+       L_{WB} = L_{Ws} - 10 \log_{10}(1 + 0.165 N_s^2)
+       + 30 \log_{10}(U) - 103
+
+       L_{Ws} = 30 \log_{10}(U) + 10 \log_{10}(S)
+       + 10 \log_{10}(\rho) + 117
+
+    with the stream power level :math:`L_{Ws}` (Bies Eq. (8.252)) and the
+    Strouhal number :math:`N_s = f H / U` (``H`` the duct
     height in the plane of the bend). The radiated sound power grows as the
     sixth power of the stream speed at low ``N_s`` (the inner-corner drag
     dipole) and the eighth power at high ``N_s`` (the outer-corner shear
     quadrupole); equivalently, the *efficiency* referenced to the stream power
-    grows as ``U^3`` and ``U^5`` respectively.
+    grows as :math:`U^3` and :math:`U^5` respectively.
 
     :param frequencies: Octave-band centre frequencies ``f``, Hz (1-D array).
     :param flow_velocity: Mean flow speed ``U``, m/s.
@@ -695,7 +713,9 @@ def flow_noise_bend(
 # Fan sound power (Long Chapter 13)
 # ---------------------------------------------------------------------------
 def blade_passing_frequency(rotational_speed: float, blades: int) -> float:
-    """Blade passing frequency ``f_bp = rpm x blades / 60`` (Long Eq. 13.4).
+    r"""Blade passing frequency (Long Eq. 13.4).
+
+    :math:`f_{bp} = \mathrm{rpm} \times \mathrm{blades} / 60`.
 
     :param rotational_speed: Fan speed, revolutions per minute.
     :param blades: Number of impeller blades.
@@ -741,21 +761,24 @@ def fan_sound_power(
     blade_frequency: float | None = None,
     frequencies: ArrayLike | None = None,
 ) -> HvacSpectrumResult:
-    """Octave-band fan sound power from the operating point (Long Eq. 13.1).
+    r"""Octave-band fan sound power from the operating point (Long Eq. 13.1).
 
     The ASHRAE (1987) scaling law, originally due to Beranek and published by
-    Graham (1975)::
+    Graham (1975):
 
-        L_W = K_F + 10 lg(Q_F / Q_REF) + 10 lg(P_F / P_REF) + C_EFF + C_BFI
+    .. math::
+
+       L_W = K_F + 10 \lg(Q_F / Q_{REF}) + 10 \lg(P_F / P_{REF})
+       + C_{EFF} + C_{BFI}
 
     with the spectral constant ``K_F`` of Long Table 13.5 (one row per fan
     type), the off-peak efficiency correction ``C_EFF`` of Table 13.6
     (:func:`fan_efficiency_correction`) and the blade frequency increment
     ``C_BFI`` of Table 13.7, added to the single octave band that contains the
     blade passing frequency. In SI the reference volume flow is
-    ``Q_REF = 0.472 L/s`` and the reference pressure ``P_REF = 249 Pa``, so the
-    two logarithmic terms take the same values as the foot-pound form in cfm
-    and inches of water gauge.
+    :math:`Q_{REF} = 0.472` L/s and the reference pressure
+    :math:`P_{REF} = 249` Pa, so the two logarithmic terms take the same
+    values as the foot-pound form in cfm and inches of water gauge.
 
     The law assumes ideal inlet and outlet flow conditions and gives the power
     radiated into the duct; the fan radiates the same power from its intake and
@@ -851,14 +874,15 @@ def unlined_rectangular_duct_attenuation(
     *,
     wrapped: bool = False,
 ) -> HvacSpectrumResult:
-    """Attenuation of an unlined rectangular sheet-metal duct (Long Eqs. 14.9-14.11).
+    r"""Attenuation of an unlined rectangular sheet-metal duct (Long Eqs. 14.9-14.11).
 
     Sound running down an unlined duct loses energy into the induced motion of
     the duct walls, so the loss grows with the perimeter-to-area ratio ``P / S``
     (a wide, shallow duct has floppier side walls). Reynolds (1990) fits the
-    63 Hz to 250 Hz bands with ``R = 17.0 (P/S)^0.25 f^-0.85 l`` for
-    ``P/S >= 3 ft^-1`` and ``R = 1.64 (P/S)^0.73 f^-0.58 l`` below it, and
-    everything above 250 Hz with ``R = 0.02 (P/S)^0.8 l``. An external
+    63 Hz to 250 Hz bands with :math:`R = 17.0 (P/S)^{0.25} f^{-0.85} l` for
+    :math:`P/S \ge 3` ft^-1 and :math:`R = 1.64 (P/S)^{0.73} f^{-0.58} l`
+    below it, and
+    everything above 250 Hz with :math:`R = 0.02 (P/S)^{0.8} l`. An external
     fibreglass blanket adds surface mass and doubles the low-frequency loss
     (``wrapped=True``).
 
@@ -926,9 +950,9 @@ def lined_rectangular_duct_attenuation(
     *,
     include_unlined: bool = False,
 ) -> HvacSpectrumResult:
-    """Insertion loss of a lined rectangular duct (Long Eq. 14.12, Table 14.2).
+    r"""Insertion loss of a lined rectangular duct (Long Eq. 14.12, Table 14.2).
 
-    The Reynolds (1990) regression ``R = B (P/S)^C t^D l``, with the duct
+    The Reynolds (1990) regression :math:`R = B (P/S)^C t^D l`, with the duct
     perimeter ``P`` in feet, its area ``S`` in square feet, the lining
     thickness ``t`` in inches and the run length ``l`` in feet. It was fitted
     to 25 mm to 52 mm linings of 24 to 48 kg/m3 density over ``P / S`` from
@@ -976,10 +1000,10 @@ def lined_circular_duct_attenuation(
     length: float,
     lining_thickness: float,
 ) -> HvacSpectrumResult:
-    """Insertion loss of a lined circular duct (Long Eq. 14.13, Table 14.3).
+    r"""Insertion loss of a lined circular duct (Long Eq. 14.13, Table 14.3).
 
     The Reynolds (1990) third-order regression
-    ``R = (A + B t + C t^2 + D d + E d^2 + F d^3) l``, with the lining
+    :math:`R = (A + B t + C t^2 + D d + E d^2 + F d^3) l`, with the lining
     thickness ``t`` and the internal diameter ``d`` in inches and the length
     ``l`` in feet. It was developed for spiral ducts with a 12 kg/m3 fibreglass
     lining 25 mm to 76 mm thick behind a 25 per cent open perforated facing,
@@ -1063,13 +1087,17 @@ def split_loss(
     *,
     branch: int = 0,
 ) -> float:
-    """Power split loss into one branch of a duct division (Long Eq. 14.17).
+    r"""Power split loss into one branch of a duct division (Long Eq. 14.17).
 
     Where a duct divides, the sound power is shared between the branches in
     proportion to their areas, and a further reflection occurs when the total
-    branch area does not match the feeder area::
+    branch area does not match the feeder area:
 
-        R = -10 lg[1 - ((sum S_i - S_m)/(sum S_i + S_m))^2] - 10 lg(S_i / sum S_i)
+    .. math::
+
+       R = -10 \lg\!\left[ 1
+       - \left( \frac{\sum S_i - S_m}{\sum S_i + S_m} \right)^2 \right]
+       - 10 \lg\!\left( \frac{S_i}{\sum S_i} \right)
 
     Long prints this as a negative level change (a 25 per cent area split shows
     as -6 dB in his worked sheet); this function returns it as a positive
@@ -1103,10 +1131,11 @@ def end_reflection_loss_closed_form(
     termination: str = "flush",
     speed_of_sound: float = _C_AIR,
 ) -> HvacSpectrumResult:
-    """Duct end reflection loss in closed form (Long Eqs. 14.14-14.15, Reynolds).
+    r"""Duct end reflection loss in closed form (Long Eqs. 14.14-14.15, Reynolds).
 
-    ``R = 10 lg[1 + (c / (pi f d))^1.88]`` for a duct terminated in free space
-    and ``R = 10 lg[1 + (0.8 c / (pi f d))^1.88]`` for one terminated flush with
+    :math:`R = 10 \lg[1 + (c / (\pi f d))^{1.88}]` for a duct terminated in
+    free space and :math:`R = 10 \lg[1 + (0.8 c / (\pi f d))^{1.88}]` for one
+    terminated flush with
     a wall, ``d`` being the duct diameter (use the equivalent diameter
     :func:`equivalent_diameter` for a rectangular duct, Eq. 14.16). The
     exponent 1.88 is Reynolds' empirical fit: the plane-wave area-change result
@@ -1138,7 +1167,7 @@ def end_reflection_loss_closed_form(
 
 
 def equivalent_diameter(area: float) -> float:
-    """Equivalent duct diameter ``d = sqrt(4 S / pi)`` (Long Eq. 14.16).
+    r"""Equivalent duct diameter :math:`d = \sqrt{4S/\pi}` (Long Eq. 14.16).
 
     :param area: Duct cross-sectional area ``S``, m2.
     :return: The equivalent diameter, m.
@@ -1156,15 +1185,18 @@ def splitter_silencer_insertion_loss(
     airway_widths: ArrayLike,
     splitter_thickness: float,
 ) -> HvacSpectrumResult:
-    """Insertion loss of a parallel-splitter (dissipative) silencer.
+    r"""Insertion loss of a parallel-splitter (dissipative) silencer.
 
     A splitter silencer divides the duct into parallel airways separated by
     absorbent baffles. Bies, Hansen & Howard (§8.10.5) reduce it to a lined
     duct: each airway is calculated *as a lined duct whose liner thickness is
     half the splitter thickness*, because each face of a splitter lines the
-    airway beside it, and the insertion losses of the airways combine as::
+    airway beside it, and the insertion losses of the airways combine as
 
-        IL_tot = -10 lg[(1 / N) sum_i 10^(-IL_i / 10)]                (8.241)
+    .. math::
+
+       \mathrm{IL}_{tot} = -10 \lg\!\left[ \frac{1}{N}
+       \sum_i 10^{-\mathrm{IL}_i / 10} \right] \tag{8.241}
 
     which is the energy average over the airways: when they are identical the
     total equals the loss of a single passage, and when they differ the leakiest
@@ -1228,25 +1260,29 @@ def silencer_self_noise(
     passages: int,
     height: float,
 ) -> HvacSpectrumResult:
-    """Regenerated (self) noise of a splitter silencer (Long Eq. 14.31, Table 14.8).
+    r"""Regenerated (self) noise of a splitter silencer (Long Eq. 14.31).
 
     Fry's (1988) estimate, for when manufacturer self-noise data is not
-    available::
+    available:
 
-        L_W = 55 lg(V / V_0) + 10 lg N + 10 lg(H / H_0) - 45
+    .. math::
 
-    with ``V`` the velocity in the splitter airway (``V_0 = 1 m/s``), ``N`` the
-    number of air passages and ``H`` the silencer height or, for a round unit,
-    its circumference (``H_0 = 1 mm``). The octave-band spectrum follows by
-    subtracting the corrections of Table 14.8, which fall steeply above 500 Hz.
+       L_W = 55 \lg(V / V_0) + 10 \lg N + 10 \lg(H / H_0) - 45
+
+    with ``V`` the velocity in the splitter airway (:math:`V_0 = 1` m/s),
+    ``N`` the number of air passages and ``H`` the silencer height or, for a
+    round unit, its circumference (:math:`H_0 = 1` mm). The octave-band
+    spectrum follows by subtracting the corrections of Table 14.8, which
+    fall steeply above 500 Hz.
+
     The fifth-and-a-half power of the airway velocity is the practical message:
     doubling the face velocity of a silencer adds about 17 dB, which is how a
     silencer ends up *making* the noise it was bought to remove.
 
     Manufacturer self-noise data is measured on a 600 x 600 mm face, so a
-    published spectrum has to be corrected by ``10 lg(S / S_0)`` for the actual
-    face area before it is used; this estimate needs no such correction because
-    the face size enters through ``N`` and ``H``.
+    published spectrum has to be corrected by :math:`10 \lg(S / S_0)` for
+    the actual face area before it is used; this estimate needs no such
+    correction because the face size enters through ``N`` and ``H``.
 
     :param frequencies: Octave-band centres, Hz; ``None`` uses
         :data:`OCTAVE_BANDS`.
@@ -1289,29 +1325,37 @@ def diffuser_sound_power(
     shape: str = "rectangular",
     count: int = 1,
 ) -> HvacSpectrumResult:
-    """Regenerated (self) noise of a grille, register or diffuser.
+    r"""Regenerated (self) noise of a grille, register or diffuser.
 
     Reynolds's estimate as Long Eqs. 13.27 to 13.33, for when the
     manufacturer's ASHRAE Standard 70 data is not to hand. The overall sound
-    power level is Eq. 13.27::
+    power level is Eq. 13.27:
 
-        L_W = 10 lg S_G + 30 lg xi + 60 lg U_G - 31.3
+    .. math::
 
-    with ``S_G`` the face area of the device (ft2), ``U_G = Q / (60 S_G)`` the
-    approach velocity (ft/s) and ``xi = 334.9 dP / (rho_0 U_G^2)`` the
-    normalised pressure-drop coefficient of Eq. 13.28 (``dP`` in inches of
-    water gauge, ``rho_0 = 0.075 lb/ft3``); this function takes and returns SI
-    and converts internally.
+       L_W = 10 \lg S_G + 30 \lg \xi + 60 \lg U_G - 31.3
 
-    The octave-band spectrum follows from Eq. 13.29, ``L_W,oct = L_W + C_D``,
-    with the shape functions of Eqs. 13.30 and 13.31::
+    with ``S_G`` the face area of the device (ft2),
+    :math:`U_G = Q / (60 S_G)` the approach velocity (ft/s) and
+    :math:`\xi = 334.9\, dP / (\rho_0 U_G^2)` the normalised pressure-drop
+    coefficient of Eq. 13.28 (``dP`` in inches of water gauge,
+    :math:`\rho_0 = 0.075` lb/ft3); this function takes and returns SI and
+    converts internally.
 
-        C_D = -5.82 - 0.15 A - 1.13 A^2      (round)
-        C_D = -11.82 - 0.15 A - 1.13 A^2     (rectangular, including slot)
+    The octave-band spectrum follows from Eq. 13.29,
+    :math:`L_{W,oct} = L_W + C_D`, with the shape functions of Eqs. 13.30
+    and 13.31:
 
-    normalised to the peak frequency ``f_P = 48.8 U_G`` of Eq. 13.32, where
-    ``A = N_B(f_P) - N_B(f)`` is the distance in octaves from the peak band
-    (Eq. 13.33) counted on Long's band numbering, 0 at 32 Hz.
+    .. math::
+
+       C_D = -5.82 - 0.15 A - 1.13 A^2 \qquad \text{(round)}
+
+       C_D = -11.82 - 0.15 A - 1.13 A^2
+       \qquad \text{(rectangular, including slot)}
+
+    normalised to the peak frequency :math:`f_P = 48.8 U_G` of Eq. 13.32,
+    where :math:`A = N_B(f_P) - N_B(f)` is the distance in octaves from the
+    peak band (Eq. 13.33) counted on Long's band numbering, 0 at 32 Hz.
 
     The sixth power of velocity in Eq. 13.27 is the design message: the level
     rises about 18 dB for every doubling of the approach velocity, and for a
@@ -1320,8 +1364,8 @@ def diffuser_sound_power(
     left, which is why the terminal device usually sets the room criterion in
     the mid and high bands.
 
-    Several identical devices serving the same room add ``10 lg n``, which is
-    what ``count`` applies.
+    Several identical devices serving the same room add :math:`10 \lg n`,
+    which is what ``count`` applies.
 
     :param frequencies: Octave-band centres, Hz; ``None`` uses
         :data:`OCTAVE_BANDS`.
@@ -1443,21 +1487,21 @@ def room_effect(
     *,
     directivity: float = 2.0,
 ) -> np.ndarray | float:
-    """Room effect: the drop from the terminal sound power to the room level.
+    r"""Room effect: the drop from the terminal sound power to the room level.
 
     The last step of a duct-path calculation turns the sound power arriving at
     the terminal device into a sound pressure level at the listener, through
     the steady-state room relation
-    ``L_p = L_W + 10 lg[Q / (4 pi r^2) + 4 / R]`` (Long Eq. 14.40; Bies
+    :math:`L_p = L_W + 10 \lg[Q / (4 \pi r^2) + 4 / R]` (Long Eq. 14.40; Bies
     Eq. (6.43), :func:`phonometry.room.steady_state_spl`). This function
     returns the *attenuation*, the positive number
-    ``-10 lg[Q / (4 pi r^2) + 4 / R]``, so it drops into a duct-path cascade
-    beside every other loss; Long's worked sheets print it as the negative
-    level change. A ceiling diffuser radiates into a half space, hence the
-    default ``Q = 2``.
+    :math:`-10 \lg[Q / (4 \pi r^2) + 4 / R]`, so it drops into a duct-path
+    cascade beside every other loss; Long's worked sheets print it as the
+    negative level change. A ceiling diffuser radiates into a half space,
+    hence the default :math:`Q = 2`.
 
     :param distance: Terminal-to-listener distance ``r``, m.
-    :param room_constant: Room constant ``R = S alpha / (1 - alpha)``, m2
+    :param room_constant: Room constant :math:`R = S \alpha / (1 - \alpha)`, m2
         (scalar or per-band; from :func:`phonometry.room.room_constant`).
     :param directivity: Directivity factor ``Q`` of the terminal device
         (``2`` flush in a ceiling or wall, ``4`` at an edge, ``8`` in a corner).

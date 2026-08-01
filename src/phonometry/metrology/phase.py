@@ -1,23 +1,28 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""
+r"""
 Phase utilities: minimum phase, group delay and excess phase.
 
 For a causal, stable, minimum-phase system the log-magnitude and the phase
 of the frequency response form a Hilbert-transform pair (Bendat & Piersol,
 *Random Data*, 4th ed., 2010, Sec. 13.1.4; Oppenheim & Schafer,
 *Discrete-Time Signal Processing*, Ch. 12): the phase is fully determined
-by ``|H(f)|``. This module computes that **minimum phase** with the real
-cepstrum -- fold the inverse transform of ``ln|H|`` onto positive
+by :math:`\lvert H(f) \rvert`. This module computes that **minimum
+phase** with the real cepstrum -- fold the inverse transform of
+:math:`\ln \lvert H \rvert` onto positive
 quefrencies and transform back -- and derives the standard decomposition
 of a measured response,
 
-``H(f) = H_min(f) * H_ap(f)`` with
-``phi_excess(f) = phi(f) - phi_min(f)``,
+.. math::
+
+   H(f) = H_{\mathrm{min}}(f) \, H_{\mathrm{ap}}(f)
+   \quad \text{with} \quad
+   \phi_{\mathrm{excess}}(f) = \phi(f) - \phi_{\mathrm{min}}(f)
 
 whose all-pass **excess phase** collects pure latency and any genuine
 non-minimum-phase behaviour (reflections, non-invertible zeros): the part
 of the phase no stable causal equalizer can remove. The **group delay**
-``tau_g = -(1/2pi) * dphi/df`` is estimated from the unwrapped phase.
+:math:`\tau_g = -(1/2\pi) \, d\phi/df` is estimated from the unwrapped
+phase.
 
 Sampling precautions (documented, and the reason for the ``oversample``
 padding): the estimate operates on a *uniformly sampled* one-sided response
@@ -125,12 +130,13 @@ def minimum_phase(
     *,
     oversample: int = 8,
 ) -> NDArray[np.complex128]:
-    """
+    r"""
     Minimum-phase response with the magnitude of ``response``.
 
     Computes the phase that the Hilbert relation between log-magnitude and
-    phase assigns to ``|H(f)|`` (Bendat & Piersol Sec. 13.1.4) via the real
-    cepstrum: the inverse transform of ``ln|H|`` is folded onto positive
+    phase assigns to :math:`\lvert H(f) \rvert` (Bendat & Piersol
+    Sec. 13.1.4) via the real cepstrum: the inverse transform of
+    :math:`\ln \lvert H \rvert` is folded onto positive
     quefrencies (doubling them, keeping the ends; the folding core is
     shared with :mod:`phonometry.metrology.cepstrum`) and transformed
     back, so ``exp`` of the result is the unique stable, causal, causally
@@ -172,14 +178,14 @@ def group_delay(
     response: NDArray[np.complex128] | list[float],
     fs: float,
 ) -> NDArray[np.float64]:
-    """
-    Group delay ``tau_g(f) = -(1/2pi) * dphi/df`` of a sampled response.
+    r"""
+    Group delay :math:`\tau_g(f) = -(1/2\pi) \, d\phi/df` of a response.
 
     The phase is unwrapped and differentiated with second-order central
     differences (one-sided at the grid ends). The estimate is exact for a
-    linear phase and accurate to ``O(df**2)`` otherwise; the unwrapping
+    linear phase and accurate to :math:`O(df^2)` otherwise; the unwrapping
     requires the response to be sampled densely enough that the phase
-    advances less than ``pi`` per bin -- a pure delay of ``D`` samples
+    advances less than :math:`\pi` per bin -- a pure delay of ``D`` samples
     needs fewer than ``response.size`` of them, i.e. the underlying
     impulse response must fit the record the grid implies.
 
@@ -203,12 +209,16 @@ def excess_phase(
     *,
     oversample: int = 8,
 ) -> NDArray[np.float64]:
-    """
-    Excess phase: measured phase minus the minimum phase of ``|H|``.
+    r"""
+    Excess phase: measured phase minus the minimum phase of
+    :math:`\lvert H \rvert`.
 
-    ``phi_excess = unwrap(arg H) - phi_min`` is the phase of the all-pass
-    factor in ``H = H_min * H_ap``: zero for a minimum-phase system,
-    ``-2*pi*f*t0`` for a pure latency ``t0``, and it additionally bends
+    :math:`\phi_{\mathrm{excess}} = \operatorname{unwrap}(\arg H) -
+    \phi_{\mathrm{min}}` is the phase of the all-pass
+    factor in :math:`H = H_{\mathrm{min}} H_{\mathrm{ap}}`: zero for a
+    minimum-phase system,
+    :math:`-2 \pi f t_0` for a pure latency :math:`t_0`, and it
+    additionally bends
     wherever the response has non-minimum-phase zeros. Equalizing a
     response down to its excess phase is the realizability limit of any
     stable causal inverse filter.
@@ -231,19 +241,20 @@ def excess_phase(
 
 @dataclass(frozen=True)
 class PhaseDecompositionResult:
-    """Minimum-phase / all-pass decomposition of a frequency response.
+    r"""Minimum-phase / all-pass decomposition of a frequency response.
 
     :ivar frequencies: Frequency axis, in Hz.
-    :ivar magnitude: ``|H(f)|`` (shared by the measured and minimum-phase
-        responses).
+    :ivar magnitude: :math:`\lvert H(f) \rvert` (shared by the measured
+        and minimum-phase responses).
     :ivar phase: Measured phase, unwrapped and referenced to DC, rad.
-    :ivar minimum_phase: Phase reconstructed from ``|H|`` alone, rad.
+    :ivar minimum_phase: Phase reconstructed from :math:`\lvert H \rvert`
+        alone, rad.
     :ivar excess_phase: ``phase - minimum_phase``: the all-pass part, rad.
     :ivar group_delay: Group delay of the measured response, s.
     :ivar excess_group_delay: Group delay of the all-pass part alone, s
-        (constant ``t0`` for a pure latency).
+        (constant :math:`t_0` for a pure latency).
     :ivar minimum_phase_response: Complex minimum-phase response
-        ``|H| * exp(j*minimum_phase)``.
+        :math:`\lvert H \rvert \exp(j \, \text{minimum\_phase})`.
     :ivar fs: Sample rate of the underlying record, in Hz.
     """
 
@@ -260,9 +271,10 @@ class PhaseDecompositionResult:
     def plot(
         self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
     ) -> Axes | NDArray[Any]:
-        """Plot the magnitude, the phase decomposition and the group delay.
+        r"""Plot the magnitude, the phase decomposition and the group delay.
 
-        Three stacked panels: ``|H|`` in dB, the measured / minimum /
+        Three stacked panels: :math:`\lvert H \rvert` in dB, the
+        measured / minimum /
         excess phases, and the total and excess group delays. With ``ax``
         given, only the phase panel is drawn on it.
 

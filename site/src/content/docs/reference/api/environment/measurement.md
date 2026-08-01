@@ -16,9 +16,12 @@ residual-noise correction, and the measurement-uncertainty budget.
 energy-summed tone level `Lpt` (Formula (C.1)) and the masking-noise level
 `Lpn` in the critical band around the tone, the tonal audibility above the
 masking threshold is
-`ΔLta = Lpt − Lpn + 2 + lg[1 + (fc/502)²·⁵]` dB (Formula (C.3)), and the
-tonal adjustment is the piecewise function `Kt = 0` for `ΔLta < 4`,
-`Kt = ΔLta − 4` for `4 ≤ ΔLta ≤ 10` and `Kt = 6` for `ΔLta > 10`
+$\Delta L_{ta} = L_{pt} - L_{pn} + 2 + \lg[1 + (f_c/502)^{2.5}]$ dB
+(Formula (C.3)), and the
+tonal adjustment is the piecewise function $K_t = 0$ for
+$\Delta L_{ta} < 4$,
+$K_t = \Delta L_{ta} - 4$ for $4 \le \Delta L_{ta} \le 10$ and
+$K_t = 6$ for $\Delta L_{ta} > 10$
 (Formulae (C.4)–(C.6)). The critical bandwidth is 100 Hz for centre
 frequencies up to 500 Hz and 20 % of the centre frequency above (Table C.1).
 [`assess_tonal_audibility`](/phonometry/reference/api/environment/measurement/#assess_tonal_audibility) returns both in a plottable result. (The 2017
@@ -34,14 +37,16 @@ neighbours by 15 dB (25–125 Hz), 8 dB (160–400 Hz) or 5 dB (500–10 000 Hz)
 audibility `ΔL` to `Kt` (0–6 dB).
 
 **Residual-noise correction (Clause 10.4).**
-`L = 10 lg(10^(L'/10) − 10^(Lres/10))` (Formula (16)); with a residual
+$L = 10 \lg(10^{L'/10} - 10^{L_{res}/10})$ (Formula (16)); with a
+residual
 within 3 dB of the measured level no correction is allowed; the
 *uncorrected* measured level `L'` is then the reportable value, as an upper
 bound of the specific sound. [`gaussian_residual_level`](/phonometry/reference/api/environment/measurement/#gaussian_residual_level) estimates the
 residual from percentile levels (Annex I, Formulae (I.1)/(I.2)).
 
-**Measurement uncertainty (Clause 4, Annex F).** `u = √(Σ (cⱼ·uⱼ)²)`
-(Formula (2)) expanded by `k = 2` (95 %) or `k = 1.3` (80 %). The
+**Measurement uncertainty (Clause 4, Annex F).**
+$u = \sqrt{\sum (c_j \cdot u_j)^2}$
+(Formula (2)) expanded by $k = 2$ (95 %) or $k = 1.3$ (80 %). The
 residual-correction sensitivity coefficients (Formulae (F.7)/(F.8)) and the
 repeated-measurement standard uncertainty (Formulae (17)–(20)) are provided.
 
@@ -80,13 +85,15 @@ combined_standard_uncertainty(
 ) -> float
 ```
 
-Combined standard uncertainty `u = √(Σ (cⱼ·uⱼ)²)` (Formula (2)).
+Combined standard uncertainty (Formula (2)).
+
+$u = \sqrt{\sum (c_j \cdot u_j)^2}$.
 
 **Parameters**
 
 | Name | Description |
 | :--- | :--- |
-| `contributions` | Either the per-component products `cⱼ·uⱼ` (dB), or `(uⱼ, cⱼ)` pairs whose product is formed. Independent inputs are assumed (no covariance term). |
+| `contributions` | Either the per-component products $c_j \cdot u_j$ (dB), or `(uⱼ, cⱼ)` pairs whose product is formed. Independent inputs are assumed (no covariance term). |
 
 **Returns:** The combined standard uncertainty, in dB.
 
@@ -131,9 +138,9 @@ environmental_expanded_uncertainty(
 ) -> float
 ```
 
-Expanded uncertainty `U = k·u` (Clause 4).
+Expanded uncertainty $U = k \cdot u$ (Clause 4).
 
-Coverage factor `k = 2` for 95 % or `k = 1.3` for 80 %.
+Coverage factor $k = 2$ for 95 % or $k = 1.3$ for 80 %.
 
 **Parameters**
 
@@ -163,8 +170,10 @@ gaussian_residual_level(
 
 Estimate the residual equivalent level from percentiles (Annex I).
 
-`Leq = L50 + 0.115·((L50 − L90)/1.28)²` (Formula (I.1)) or, with `L95`,
-`Leq = L50 + 0.115·((L50 − L95)/1.65)²` (Formula (I.2)). Supply exactly
+$L_{eq} = L_{50} + 0.115 \cdot ((L_{50} - L_{90})/1.28)^2$
+(Formula (I.1)) or, with `L95`,
+$L_{eq} = L_{50} + 0.115 \cdot ((L_{50} - L_{95})/1.65)^2$
+(Formula (I.2)). Supply exactly
 one of `l90` / `l95`.
 
 **Parameters**
@@ -200,9 +209,9 @@ Energy-mean level and its uncertainty from repeats (Formulae (17)–(20)).
 
 | Name | Description |
 | :--- | :--- |
-| `mean_level` | Energy-mean level `Lk = 10 lg((1/N)·Σ 10^(0.1·Li))`, dB (Formula (18)). |
-| `standard_uncertainty` | Standard uncertainty `uk` by the primary route, Formulae (17)+(19): the sample standard deviation `sk` of the energy values `10^(0.1·Li)` mapped back to level, `uk = 10 lg(10^(0.1·Lk) + sk) − Lk`, in dB. |
-| `approximate_uncertainty` | The Note 2 substitute (Formula (20)), `√(Σ(Li − Lk)²/(N − 1))`, in dB; valid only when the spread of the `Li` is small; it grossly inflates for spread levels. |
+| `mean_level` | Energy-mean level $L_k = 10 \lg((1/N) \cdot \sum 10^{0.1 \cdot L_i})$, dB (Formula (18)). |
+| `standard_uncertainty` | Standard uncertainty `uk` by the primary route, Formulae (17)+(19): the sample standard deviation `sk` of the energy values $10^{0.1 \cdot L_i}$ mapped back to level, $u_k = 10 \lg(10^{0.1 \cdot L_k} + s_k) - L_k$, in dB. |
+| `approximate_uncertainty` | The Note 2 substitute (Formula (20)), $\sqrt{\sum (L_i - L_k)^2/(N - 1)}$, in dB; valid only when the spread of the `Li` is small; it grossly inflates for spread levels. |
 | `n` | Number of measurements. |
 
 ## residual_correction_uncertainty
@@ -218,9 +227,10 @@ residual_correction_uncertainty(
 
 Uncertainty of the residual-corrected level (Formulae (F.7)–(F.9)).
 
-With `m = 10^(−0.1(L'−Lres))`, the sensitivity coefficients are
-`cL' = 1/(1 − m)` and `cres = −m/(1 − m)`, and
-`uL = √(cL'²·uL'² + cres²·ures²)`.
+With $m = 10^{-0.1(L' - L_{res})}$, the sensitivity coefficients
+are
+$c_{L'} = 1/(1 - m)$ and $c_{res} = -m/(1 - m)$, and
+$u_L = \sqrt{c_{L'}^2 \cdot u_{L'}^2 + c_{res}^2 \cdot u_{res}^2}$.
 
 **Parameters**
 
@@ -250,7 +260,8 @@ residual_sound_correction(
 
 Correct a measured level for residual sound (Formula (16)).
 
-`L = 10 lg(10^(L'/10) − 10^(Lres/10))`. When the residual is within 3 dB
+$L = 10 \lg(10^{L'/10} - 10^{L_{res}/10})$. When the residual is
+within 3 dB
 of the measured level, §10.4 allows **no** correction: the *uncorrected*
 measured level `L'` is the reportable value, as an upper bound of the
 specific sound (the corrected value would understate reliability, being
@@ -303,8 +314,11 @@ tonal_adjustment(audibility: float) -> float
 
 Tonal adjustment `Kt` from the audibility (Formulae (C.4)–(C.6)).
 
-`Kt = 0` for `ΔLta < 4`, `Kt = ΔLta − 4` for `4 ≤ ΔLta ≤ 10` and
-`Kt = 6` for `ΔLta > 10`. `Kt` is not restricted to integers.
+$K_t = 0$ for $\Delta L_{ta} < 4$,
+$K_t = \Delta L_{ta} - 4$ for $4 \le \Delta L_{ta} \le 10$
+and
+$K_t = 6$ for $\Delta L_{ta} > 10$. `Kt` is not restricted
+to integers.
 
 **Parameters**
 
@@ -334,7 +348,8 @@ Tonal adjustment `Kt` from the mean audibility `ΔL` (Table J.1).
 
 The ISO 1996-2:2017 route that maps the ISO/PAS 20065 mean audibility
 `ΔL` to an integer adjustment. With `coarse=True` the 3-dB-step
-alternative applies (`ΔL ≤ 2` → 0, `2 < ΔL ≤ 9` → 3, `ΔL > 9` → 6).
+alternative applies ($\Delta L \le 2$ → 0,
+$2 < \Delta L \le 9$ → 3, $\Delta L > 9$ → 6).
 
 **Parameters**
 
@@ -363,7 +378,8 @@ tonal_audibility(
 
 Tonal audibility above the masking threshold (Formula (C.3)).
 
-`ΔLta = Lpt − Lpn + 2 + lg[1 + (fc/502)²·⁵]` dB.
+$\Delta L_{ta} = L_{pt} - L_{pn} + 2 + \lg[1 + (f_c/502)^{2.5}]$
+dB.
 
 **Parameters**
 
@@ -467,12 +483,16 @@ uncertainty_from_repeated_measurements(
 
 Energy mean and its uncertainty from repeated levels (Formulae (17)–(20)).
 
-`Lk = 10 lg((1/N)·Σ 10^(0.1·Li))` (Formula (18)). The standard
+$L_k = 10 \lg((1/N) \cdot \sum 10^{0.1 \cdot L_i})$ (Formula (18)).
+The standard
 uncertainty follows the primary §10.5 route: the sample standard
-deviation `sk` of the energy values `10^(0.1·Li)` (Formula (17))
-propagated back to level, `uk = 10 lg(10^(0.1·Lk) + sk) − Lk`
+deviation `sk` of the energy values $10^{0.1 \cdot L_i}$
+(Formula (17))
+propagated back to level,
+$u_k = 10 \lg(10^{0.1 \cdot L_k} + s_k) - L_k$
 (Formula (19)). The Note 2 level-domain approximation
-`√(Σ(Li − Lk)²/(N − 1))` (Formula (20)) is also reported as
+$\sqrt{\sum (L_i - L_k)^2/(N - 1)}$ (Formula (20)) is also
+reported as
 `approximate_uncertainty`; it is valid only "if the difference between
 different Li is small", so a spread above 3 dB triggers an
 `EnvironmentalMeasurementWarning` (e.g. [50, 60, 70] dB gives

@@ -1,5 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""
+r"""
 Reactive silencers by the four-pole (transmission-matrix) method.
 
 A reactive silencer controls noise by *reflecting* it back to the source with
@@ -12,52 +12,79 @@ elements (Bies, Hansen & Howard, *Engineering Noise Control* 5th ed., §8.8-8.9;
 Munjal, *Acoustics of Ducts and Mufflers*).
 
 **Transfer matrix** (Bies Eq. (8.133)), state vector ``[p, S u]`` with the
-characteristic acoustic impedance ``Z = rho c / S``. The plane-wave element for
+characteristic acoustic impedance :math:`Z = \rho c / S`. The plane-wave
+element for
 a straight duct of length ``L`` and area ``S`` is (Bies Eq. (8.143), no flow)
 
-    [[ cos(kL),              j (rho c / S) sin(kL) ],
-     [ j (S / rho c) sin(kL), cos(kL)              ]],    k = omega / c,
+.. math::
+
+   \begin{bmatrix}
+   \cos(kL) & j (\rho c / S) \sin(kL) \\
+   j (S / \rho c) \sin(kL) & \cos(kL)
+   \end{bmatrix},
+   \qquad k = \omega / c,
 
 and a **side branch** of acoustic impedance ``Z_b`` is the shunt element
 (Bies Eq. (8.144))
 
-    [[ 1,       0 ],
-     [ 1 / Z_b, 1 ]].
+.. math::
+
+   \begin{bmatrix}
+   1 & 0 \\
+   1 / Z_b & 1
+   \end{bmatrix}.
 
 **Transmission loss** from the compound matrix ``T`` (Munjal, *Acoustics of
 Ducts and Mufflers* 2nd ed., Eq. (3.27), no flow; reduces to Bies Eq. (8.148)
 for equal inlet/outlet areas):
 
-    TL = 10 log10[ (Zn / Z1) (1/4) | T11 + T12 / Zn + Z1 T21 + (Z1 / Zn) T22 |^2 ]
+.. math::
 
-with ``Z1 = rho c / S_in`` and ``Zn = rho c / S_out``. A zero-length element
+   \mathrm{TL} = 10 \log_{10}\!\left[\frac{Z_n}{Z_1} \cdot \frac{1}{4}
+   \left\lvert T_{11} + \frac{T_{12}}{Z_n} + Z_1 T_{21}
+   + \frac{Z_1}{Z_n} T_{22} \right\rvert^2\right]
+
+with :math:`Z_1 = \rho c / S_{\mathrm{in}}` and
+:math:`Z_n = \rho c / S_{\mathrm{out}}`. A zero-length element
 between unequal areas then reproduces the classic sudden-expansion result
-``TL = 10 log10[(1 + m)^2 / (4 m)]`` with ``m = S_out / S_in``, and the TL is
+:math:`\mathrm{TL} = 10 \log_{10}[(1 + m)^2 / (4 m)]` with
+:math:`m = S_{\mathrm{out}} / S_{\mathrm{in}}`, and the TL is
 the same from either side, as reciprocity of a passive two-port requires.
 Bies Eq. (8.141) prints this formula with impedance ratios on ``T11`` and
-``T22`` (``Z_A1/Z_An`` and ``Z_An/Z_A1``) instead of the overall ``Zn/Z1``
+``T22`` (:math:`Z_{A1}/Z_{An}` and :math:`Z_{An}/Z_{A1}`) instead of the
+overall :math:`Z_n/Z_1`
 prefactor; as printed it fails the sudden-expansion limit (see
 ``docs/ERRATA.md``). ``TL`` is the intrinsic attenuation for an anechoic
 termination. The **insertion loss** for a source of internal impedance
 ``Z_s`` radiating into a termination impedance ``Z_r`` is the extra
 attenuation of inserting the silencer in place of a direct connection,
 
-    IL = 20 log10 | (T11 Z_r + T12 + Z_s Z_r T21 + Z_s T22) / (Z_s + Z_r) |,
+.. math::
 
-which is ``0`` when the silencer reduces to a through connection (``T = I``)
+   \mathrm{IL} = 20 \log_{10}
+   \left\lvert \frac{T_{11} Z_r + T_{12} + Z_s Z_r T_{21} + Z_s T_{22}}
+   {Z_s + Z_r} \right\rvert,
+
+which is ``0`` when the silencer reduces to a through connection
+(:math:`T = I`)
 and, for equal inlet/outlet areas, equals the transmission loss for the
-anechoic reference ``Z_s = Z_r = rho c / S`` (with unequal areas the direct
+anechoic reference :math:`Z_s = Z_r = \rho c / S` (with unequal areas the
+direct
 connection contains the same area jump, so its mismatch loss cancels from
 the insertion loss but not from the transmission loss).
 
 **Simple expansion chamber.** A chamber of area ``S_exp`` and length ``L``
 between pipes of area ``S_duct`` has the closed-form transmission loss (Bies
-Eq. (8.111)) with area ratio ``m = S_exp / S_duct``
+Eq. (8.111)) with area ratio :math:`m = S_{\mathrm{exp}} / S_{\mathrm{duct}}`
 
-    TL = 10 log10[ 1 + (1/4) (m - 1/m)^2 sin^2(kL) ],
+.. math::
 
-peaking at ``10 log10[1 + (1/4)(m - 1/m)^2]`` when ``kL = pi/2, 3pi/2, ...`` and
-dropping to ``0`` at ``kL = n pi`` (no dissipation). The four-pole product
+   \mathrm{TL} = 10 \log_{10}\!\left[1 + \frac{1}{4}
+   \left(m - \frac{1}{m}\right)^2 \sin^2(kL)\right],
+
+peaking at :math:`10 \log_{10}[1 + (1/4)(m - 1/m)^2]` when
+:math:`kL = \pi/2, 3\pi/2, \ldots` and
+dropping to ``0`` at :math:`kL = n \pi` (no dissipation). The four-pole product
 reproduces this exactly, and the machinery extends to side-branch (Helmholtz,
 quarter-wave) and extended-tube resonators that the closed form cannot cover.
 
@@ -190,10 +217,16 @@ def transmission_loss(
     speed_of_sound: float = _C_AIR,
     density: float = _RHO_AIR,
 ) -> NDArray[np.float64]:
-    """Transmission loss of a four-pole element (Munjal Eq. (3.27), no flow).
+    r"""Transmission loss of a four-pole element (Munjal Eq. (3.27), no flow).
 
-    ``TL = 10 lg[(Zn/Z1) (1/4) |T11 + T12/Zn + Z1 T21 + (Z1/Zn) T22|^2]``
-    with ``Z1 = rho c / S_in`` and ``Zn = rho c / S_out`` (Munjal, *Acoustics
+    .. math::
+
+       \mathrm{TL} = 10 \lg\!\left[(Z_n/Z_1) \frac{1}{4}
+       \lvert T_{11} + T_{12}/Z_n + Z_1 T_{21}
+       + (Z_1/Z_n) T_{22} \rvert^2\right]
+
+    with :math:`Z_1 = \rho c / S_{\mathrm{in}}` and
+    :math:`Z_n = \rho c / S_{\mathrm{out}}` (Munjal, *Acoustics
     of Ducts and Mufflers* 2nd ed., Eq. (3.27)). Do not "restore" the Bies
     Eq. (8.141) weighting: as printed there the equation fails the
     sudden-expansion limit for unequal port areas (see ``docs/ERRATA.md``).
@@ -228,14 +261,17 @@ def insertion_loss(
     source_impedance: ArrayLike,
     radiation_impedance: ArrayLike,
 ) -> NDArray[np.float64]:
-    """Insertion loss of a four-pole element for given end impedances.
+    r"""Insertion loss of a four-pole element for given end impedances.
 
     The attenuation from inserting the element in place of a direct (zero
     length) connection between a source of internal impedance ``Z_s`` and a
     radiation (termination) impedance ``Z_r``:
 
-        IL = 20 log10 | (T11 Z_r + T12 + Z_s Z_r T21 + Z_s T22) /
-                        (Z_s + Z_r) |.
+    .. math::
+
+       \mathrm{IL} = 20 \log_{10}
+       \left\lvert \frac{T_{11} Z_r + T_{12} + Z_s Z_r T_{21} + Z_s T_{22}}
+       {Z_s + Z_r} \right\rvert.
 
     :param transfer_matrix: A ``(n_freq, 2, 2)`` compound matrix.
     :param source_impedance: Source internal acoustic impedance ``Z_s``,
@@ -271,11 +307,14 @@ def helmholtz_impedance(
     speed_of_sound: float = _C_AIR,
     density: float = _RHO_AIR,
 ) -> _Complex:
-    """Acoustic impedance of a Helmholtz side branch (Bies Eq. (8.152)).
+    r"""Acoustic impedance of a Helmholtz side branch (Bies Eq. (8.152)).
 
-    ``Z = R + j( rho omega l_e / S_neck - rho c^2 / (omega V) )`` with acoustic
-    mass ``rho l_e / S_neck`` and compliance ``V / (rho c^2)``; the resonance
-    ``f_0 = (c / 2 pi) sqrt(S_neck / (l_e V))`` (Bies Eq. (8.46)) is where the
+    :math:`Z = R + j(\rho \omega l_e / S_{\mathrm{neck}} -
+    \rho c^2 / (\omega V))` with acoustic
+    mass :math:`\rho l_e / S_{\mathrm{neck}}` and compliance
+    :math:`V / (\rho c^2)`; the resonance
+    :math:`f_0 = (c / 2 \pi) \sqrt{S_{\mathrm{neck}} / (l_e V)}`
+    (Bies Eq. (8.46)) is where the
     reactance vanishes and the branch shorts the duct.
 
     :param frequencies: Frequencies ``f``, Hz (1-D array).
@@ -307,10 +346,11 @@ def quarter_wave_impedance(
     speed_of_sound: float = _C_AIR,
     density: float = _RHO_AIR,
 ) -> _Complex:
-    """Acoustic impedance of a closed quarter-wave side branch (Bies Eq. (8.146)).
+    r"""Acoustic impedance of a closed quarter-wave side branch (Bies Eq. (8.146)).
 
-    ``Z = -j (rho c / S) cot(k l_e)``; the reactance vanishes at
-    ``l_e = lambda / 4`` (``f = c / 4 l_e``), where the closed tube presents a
+    :math:`Z = -j (\rho c / S) \cot(k l_e)`; the reactance vanishes at
+    :math:`l_e = \lambda / 4` (:math:`f = c / 4 l_e`), where the closed tube
+    presents a
     pressure node and shorts the duct.
 
     :param frequencies: Frequencies ``f``, Hz (1-D array).
@@ -521,7 +561,7 @@ def expansion_chamber(
     source_impedance: ArrayLike | None = None,
     radiation_impedance: ArrayLike | None = None,
 ) -> ReactiveSilencerResult:
-    """Simple expansion-chamber silencer (Bies Eq. (8.111) / four-pole).
+    r"""Simple expansion-chamber silencer (Bies Eq. (8.111) / four-pole).
 
     :param frequencies: Frequencies ``f``, Hz (1-D array).
     :param length: Chamber length ``L``, m.
@@ -534,7 +574,8 @@ def expansion_chamber(
     :param radiation_impedance: Optional radiation impedance ``Z_r`` for the
         insertion loss, Pa s/m3.
     :return: A :class:`ReactiveSilencerResult` (its ``transmission_loss``
-        equals the closed form ``10 log10[1 + (1/4)(m - 1/m)^2 sin^2(kL)]``).
+        equals the closed form
+        :math:`10 \log_{10}[1 + (1/4)(m - 1/m)^2 \sin^2(kL)]`).
     """
     f = _frequencies(frequencies)
     c = require_positive(speed_of_sound, "speed_of_sound")
@@ -566,7 +607,7 @@ def helmholtz_resonator(
     source_impedance: ArrayLike | None = None,
     radiation_impedance: ArrayLike | None = None,
 ) -> ReactiveSilencerResult:
-    """Side-branch Helmholtz resonator on a duct (Bies Eqs. (8.144), (8.152)).
+    r"""Side-branch Helmholtz resonator on a duct (Bies Eqs. (8.144), (8.152)).
 
     :param frequencies: Frequencies ``f``, Hz (1-D array).
     :param duct_area: Main-duct cross-sectional area ``S_d``, m2.
@@ -579,7 +620,7 @@ def helmholtz_resonator(
     :param source_impedance: Optional source impedance ``Z_s``, Pa s/m3.
     :param radiation_impedance: Optional radiation impedance ``Z_r``, Pa s/m3.
     :return: A :class:`ReactiveSilencerResult`; ``resonances`` holds
-        ``f_0 = (c / 2 pi) sqrt(S_neck / (l_e V))``.
+        :math:`f_0 = (c / 2 \pi) \sqrt{S_{\mathrm{neck}} / (l_e V)}`.
     """
     f = _frequencies(frequencies)
     c = require_positive(speed_of_sound, "speed_of_sound")
@@ -627,7 +668,7 @@ def quarter_wave_resonator(
     :param source_impedance: Optional source impedance ``Z_s``, Pa s/m3.
     :param radiation_impedance: Optional radiation impedance ``Z_r``, Pa s/m3.
     :return: A :class:`ReactiveSilencerResult`; ``resonances`` holds the odd
-        multiples of ``f = c / (4 l_e)`` within the frequency range.
+        multiples of :math:`f = c / (4 l_e)` within the frequency range.
     """
     f = _frequencies(frequencies)
     c = require_positive(speed_of_sound, "speed_of_sound")
@@ -670,14 +711,17 @@ def extended_tube_chamber(
     source_impedance: ArrayLike | None = None,
     radiation_impedance: ArrayLike | None = None,
 ) -> ReactiveSilencerResult:
-    """Extended-inlet/outlet expansion chamber (Bies §8.9.7).
+    r"""Extended-inlet/outlet expansion chamber (Bies §8.9.7).
 
     The inlet and outlet pipes extend a distance into the chamber, forming
-    annular quarter-wave side branches (of area ``S_exp - S_duct`` and lengths
+    annular quarter-wave side branches (of area
+    :math:`S_{\mathrm{exp}} - S_{\mathrm{duct}}` and lengths
     equal to the extensions, Bies Eq. (8.156)) at the two junctions. Tuning the
-    extensions (classically ``L/4`` and ``L/2``) places quarter-wave peaks that
-    fill the ``kL = n pi`` troughs of the plain expansion chamber. With both
-    extensions ``0`` the result reduces exactly to :func:`expansion_chamber`.
+    extensions (classically :math:`L/4` and :math:`L/2`) places quarter-wave
+    peaks that
+    fill the :math:`kL = n \pi` troughs of the plain expansion chamber. With
+    both extensions ``0`` the result reduces exactly to
+    :func:`expansion_chamber`.
 
     :param frequencies: Frequencies ``f``, Hz (1-D array).
     :param length: Chamber length ``L``, m.

@@ -21,44 +21,58 @@ coefficient `Q` (Attenborough & Van Renterghem, *Predicting Outdoor Sound*
 2e, 2021, Eq. (2.40a); Salomons, *Computational Atmospheric Acoustics*, 2001,
 Eq. (3.2)):
 
-```text
-p = e^{ikR1}/(4 pi R1) + Q e^{ikR2}/(4 pi R2)
-```
+$$
+p = \frac{e^{ikR_1}}{4 \pi R_1} + Q \, \frac{e^{ikR_2}}{4 \pi R_2}
+$$
 
-with `R1` the source-receiver distance, `R2` the image-source distance and
-(Attenborough Eq. (2.40c) / Salomons Eq. (D.58)):
+with $R_1$ the source-receiver distance, $R_2$ the image-source
+distance and (Attenborough Eq. (2.40c) / Salomons Eq. (D.58)):
 
-```text
-Q  = Rp + (1 - Rp) F(w)
-Rp = (Z cos(theta) - 1) / (Z cos(theta) + 1)        (Salomons Eq. (D.59))
-F(w) = 1 + i sqrt(pi) w exp(-w^2) erfc(-i w)         (Salomons Eq. (D.60))
-w  = sqrt(i k R2 / 2) (cos(theta) + 1/Z)             (Salomons Eq. (D.57))
-```
+$$
+Q = R_p + (1 - R_p) F(w)
+$$
+
+$$
+R_p = \frac{Z \cos\theta - 1}{Z \cos\theta + 1} \tag{Salomons Eq. D.59}
+$$
+
+$$
+F(w) = 1 + i \sqrt{\pi} \, w \exp(-w^2) \operatorname{erfc}(-i w) \tag{Salomons Eq. D.60}
+$$
+
+$$
+w = \sqrt{i k R_2 / 2} \, \left( \cos\theta + \frac{1}{Z} \right) \tag{Salomons Eq. D.57}
+$$
 
 Here `Z` is the normalized (by `rho c`) surface impedance of the ground,
 `theta` is the angle of incidence from the ground normal
-(`cos(theta) = (hs + hr)/R2`) and `F(w)` is the boundary-loss factor written
-through the scaled complementary error function `exp(-w^2) erfc(-i w)`, i.e.
+($\cos\theta = (h_s + h_r)/R_2$) and $F(w)$ is the boundary-loss
+factor written through the scaled complementary error function
+$\exp(-w^2) \operatorname{erfc}(-i w)$, i.e.
 the Faddeeva function `scipy.special.wofz`. The relative sound level (the
-"excess attenuation", dB re free field) is (Salomons Eq. (3.4)):
+"excess attenuation", dB re free field) is:
 
-```text
-dL = 20 lg| 1 + Q (R1/R2) exp(i k (R2 - R1)) |
-```
+$$
+\Delta L = 20 \lg \left| 1 + Q \, \frac{R_1}{R_2} \, e^{i k (R_2 - R_1)} \right| \tag{Salomons Eq. 3.4}
+$$
 
 Limits reproduced by the implementation: an acoustically hard ground
-(`|Z| -> inf`) gives `Rp -> 1`, so `(1 - Rp) -> 0` and `Q -> 1`
-regardless of the boundary loss (the ground wave vanishes), and `dL` reaches
+($|Z| \to \infty$) gives $R_p \to 1$, so
+$(1 - R_p) \to 0$ and $Q \to 1$
+regardless of the boundary loss (the ground wave vanishes), and
+$\Delta L$ reaches
 `+6 dB` in phase (Salomons Sec. 3.4); at grazing incidence
-(`hs, hr -> 0`, `cos(theta) -> 0`) `Rp -> -1`; and as the range grows
-(`R2 -> inf`) `|w| -> inf` and `F -> 0`. The ground impedance is taken in
-the `e^{-i omega t}` time convention of Salomons, in which a passive ground
-has `Im(Z) > 0`; it may be supplied directly or derived from the porous
-models of `phonometry.materials`
+($h_s, h_r \to 0$, $\cos\theta \to 0$) $R_p \to -1$; and as
+the range grows ($R_2 \to \infty$) $|w| \to \infty$ and
+$F \to 0$. The ground impedance is taken in
+the $e^{-i \omega t}$ time convention of Salomons, in which a passive
+ground has $\operatorname{Im}(Z) > 0$; it may be supplied directly or
+derived from the porous models of `phonometry.materials`
 ([`delany_bazley`](/phonometry/reference/api/materials/porous-absorber/#delany_bazley) / [`miki`](/phonometry/reference/api/materials/porous-absorber/#miki)),
 which model a semi-infinite porous ground whose surface impedance equals the
 characteristic impedance of the medium. The materials domain works in the
-opposite `e^{+j omega t}` convention (`Im(Z) < 0` for a passive medium), so
+opposite $e^{+j \omega t}$ convention ($\operatorname{Im}(Z) < 0$
+for a passive medium), so
 any impedance obtained from a porous model is conjugated internally before it
 enters the formulas above.
 
@@ -68,14 +82,11 @@ Three levels of screening beyond the ISO 9613-2 `Dz` term are provided:
 
 * the Kurze-Anderson closed form in the Fresnel number `N` (Bies, Hansen &
   Howard, *Engineering Noise Control* 5e, 2017, Eq. (5.138); Kurze & Anderson,
-  1971):
-
-```text
-Delta = 5 + 20 lg( sqrt(2 pi N) / tanh(sqrt(2 pi N)) )
-```
-
-  which tends to `5 dB` at `N -> 0` and stays within about 1.5 dB of
-  Maekawa's point-source curve for all `N` (a very good fit for `N > 0.5`);
+  1971),
+  $\Delta = 5 + 20 \lg\!\left[ \sqrt{2 \pi N} / \tanh\sqrt{2 \pi N} \right]$,
+  which tends to `5 dB` at $N \to 0$ and stays within about 1.5 dB of
+  Maekawa's point-source curve for all `N` (a very good fit for
+  $N > 0.5$);
 
 * the wave-theoretic insertion loss of a rigid thin screen (half-plane), the
   flat-wedge limit of the MacDonald / Hadden & Pierce solution
@@ -89,7 +100,7 @@ Delta = 5 + 20 lg( sqrt(2 pi N) / tanh(sqrt(2 pi N)) )
   ground-barrier interference structure a purely energetic sum cannot.
 
 Thick barriers (or two parallel thin screens) are handled by the double-edge
-Fresnel number `N = (2/lambda)(A + B + e - d)` (Bies Eq. (5.157)).
+Fresnel number $N = (2/\lambda)(A + B + e - d)$ (Bies Eq. (5.157)).
 
 > Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
 
@@ -123,11 +134,11 @@ at `(receiver_distance, receiver_height)`. Three models are available:
 * `method="kurze_anderson"`: the closed form
   [`kurze_anderson_attenuation`](/phonometry/reference/api/environment/ground-barriers/#kurze_anderson_attenuation) of the Fresnel number
   [`fresnel_number`](/phonometry/reference/api/environment/ground-barriers/#fresnel_number) (Bies Eqs. (5.134)/(5.138)); with `thickness` the
-  double-edge Fresnel number `N = (2/lambda)(A + B + e - d)` of
+  double-edge Fresnel number $N = (2/\lambda)(A + B + e - d)$ of
   Bies Eq. (5.157) is used, `e` being the top width.
 * `method="exact"` without ground: the wave-theoretic insertion loss of the
   rigid thin screen (`_screen_field`, MacDonald / Hadden & Pierce),
-  `IL = 20 lg|p_free / p_diffracted|`.
+  $\mathrm{IL} = 20 \lg |p_{\text{free}} / p_{\text{diffracted}}|$.
 * `method="exact"` with a ground (`ground_impedance` or
   `ground_flow_resistivity`): the coherent four-path model. The field with
   the barrier sums the four source-image / receiver-image diffracted paths,
@@ -152,7 +163,7 @@ at `(receiver_distance, receiver_height)`. Three models are available:
 | `receiver_height` | Receiver height, in metres. |
 | `method` | `"kurze_anderson"` or `"exact"`. |
 | `thickness` | Top width `e` of a thick barrier (double diffraction), in metres; `None` for a thin screen. |
-| `ground_impedance` | Normalized ground impedance for the coherent ground model (`"exact"` only), in the `e^{-i omega t}` convention (`Im(Z) > 0` for a passive ground); a `PorousMediumResult` is conjugated internally from the materials' `e^{+j omega t}` convention. |
+| `ground_impedance` | Normalized ground impedance for the coherent ground model (`"exact"` only), in the $e^{-i \omega t}$ convention ($\operatorname{Im}(Z) > 0$ for a passive ground); a `PorousMediumResult` is conjugated internally from the materials' $e^{+j \omega t}$ convention. |
 | `ground_flow_resistivity` | Effective flow resistivity `sigma` (Pa s/m2) for the ground model, as an alternative to `ground_impedance`. |
 | `ground_model` | Porous model for `ground_flow_resistivity`. |
 | `speed_of_sound` | Speed of sound `c`, in m/s. |
@@ -191,7 +202,7 @@ Per-frequency barrier insertion loss (IL vs frequency).
 | Name | Description |
 | :--- | :--- |
 | `frequencies` | Frequencies, in hertz. |
-| `insertion_loss` | Insertion loss `IL = 20 lg\|p_without / p_with\|`, in decibels, per frequency. |
+| `insertion_loss` | Insertion loss $\mathrm{IL} = 20 \lg \lvert p_{\text{without}} / p_{\text{with}} \rvert$, in decibels, per frequency. |
 | `fresnel_number` | Fresnel number `N` per frequency (single-edge geometry; the double-edge `N` for a thick barrier). |
 | `method` | Diffraction model used (`"kurze_anderson"` or `"exact"`). |
 | `ground` | Whether the coherent four-path ground model was applied. |
@@ -299,12 +310,12 @@ fresnel_number(
 ) -> Real
 ```
 
-Fresnel number `N = (2/lambda)(A + B - d)` (Bies Eq. (5.134)).
+Fresnel number $N = (2/\lambda)(A + B - d)$ (Bies Eq. (5.134)).
 
 `A` and `B` are the two segments of the shortest source-edge-receiver
 path and `d` is the straight source-receiver distance. `N` is positive
-when the receiver is in the shadow zone (`A + B > d`) and negative in the
-bright zone.
+when the receiver is in the shadow zone ($A + B > d$) and negative
+in the bright zone.
 
 **Parameters**
 
@@ -343,10 +354,12 @@ ground_effect(
 
 Spherical-wave ground effect above a finite-impedance ground.
 
-Assembles the two-ray field `p = e^{ikR1}/(4 pi R1) + Q e^{ikR2}/(4 pi R2)`
+Assembles the two-ray field
+$p = e^{ikR_1}/(4 \pi R_1) + Q \, e^{ikR_2}/(4 \pi R_2)$
 with the spherical-wave reflection coefficient `Q` of
-[`spherical_reflection_coefficient`](/phonometry/reference/api/environment/ground-barriers/#spherical_reflection_coefficient) and reports the relative sound level
-`dL = 20 lg| 1 + Q (R1/R2) exp(i k (R2 - R1)) |` (Salomons Eq. (3.4)),
+[`spherical_reflection_coefficient`](/phonometry/reference/api/environment/ground-barriers/#spherical_reflection_coefficient) and reports the relative sound
+level
+$\Delta L = 20 \lg\left| 1 + Q (R_1/R_2) e^{i k (R_2 - R_1)} \right|$ (Salomons Eq. (3.4)),
 i.e. the level re the free field.
 
 The ground surface impedance is either supplied through `impedance` (a
@@ -363,8 +376,8 @@ of the materials domain. Exactly one of the two must be given.
 | `source_height` | Source height `hs`, in metres. |
 | `receiver_height` | Receiver height `hr`, in metres. |
 | `distance` | Horizontal source-receiver distance, in metres. |
-| `impedance` | Normalized ground impedance (`e^{-i omega t}` convention, `Im(Z) > 0` for a passive ground), or a `PorousMediumResult` (which is conjugated internally from the materials' `e^{+j omega t}` convention). |
-| `flow_resistivity` | Effective flow resistivity `sigma` (Pa s/m2); grassland is about `2e5` (Salomons Sec. 3.1). The porous model raises a [`PorousAbsorberWarning`](/phonometry/reference/api/materials/porous-absorber/#porousabsorberwarning) when the lowest bands fall below its published fit range `0.01 < rho f / sigma < 1` (it still extrapolates a value there). |
+| `impedance` | Normalized ground impedance ($e^{-i \omega t}$ convention, $\operatorname{Im}(Z) > 0$ for a passive ground), or a `PorousMediumResult` (which is conjugated internally from the materials' $e^{+j \omega t}$ convention). |
+| `flow_resistivity` | Effective flow resistivity `sigma` (Pa s/m2); grassland is about `2e5` (Salomons Sec. 3.1). The porous model raises a [`PorousAbsorberWarning`](/phonometry/reference/api/materials/porous-absorber/#porousabsorberwarning) when the lowest bands fall below its published fit range $0.01 < \rho f / \sigma < 1$ (it still extrapolates a value there). |
 | `model` | Porous model for `flow_resistivity` (`"delany_bazley"` or `"miki"`). |
 | `speed_of_sound` | Speed of sound `c`, in m/s. |
 | `air_density` | Air density `rho`, in kg/m3. |
@@ -385,18 +398,19 @@ kurze_anderson_attenuation(fresnel_number: ArrayLike) -> Real
 
 Kurze-Anderson barrier attenuation (Bies Eq. (5.138); Kurze & Anderson, 1971).
 
-```text
-Delta = 5 + 20 lg( sqrt(2 pi N) / tanh(sqrt(2 pi N)) )   dB
-```
+$$
+\Delta = 5 + 20 \lg\!\left[ \frac{\sqrt{2 \pi N}} {\tanh\sqrt{2 \pi N}} \right] \qquad \text{dB}
+$$
 
-For `N -> 0` the ratio tends to 1 and `Delta -> 5 dB`; for `N < 0`
+For $N \to 0$ the ratio tends to 1 and $\Delta \to 5$ dB; for
+$N < 0$
 (bright zone) the square root is imaginary and `tanh` becomes `tan`, so
-the expression continues smoothly until, below `N = -0.2` (the
+the expression continues smoothly until, below $N = -0.2$ (the
 illuminated-zone limit of Maekawa's curve), the diffraction is taken as
 negligible (0 dB) rather than let the closed form oscillate through the
 tangent poles. It stays within about 1.5 dB of Maekawa's point-source curve
-for all `N` (a very good fit for `N > 0.5`). The result is clamped at
-0 dB (a barrier never amplifies).
+for all `N` (a very good fit for $N > 0.5$). The result is clamped
+at 0 dB (a barrier never amplifies).
 
 **Parameters**
 
@@ -462,18 +476,20 @@ spherical_reflection_coefficient(
 
 Spherical-wave reflection coefficient `Q` (Weyl-Van der Pol).
 
-Implements `Q = Rp + (1 - Rp) F(w)` (Attenborough Eq. (2.40c); Salomons
-Eq. (D.58)) with the plane-wave coefficient `Rp` (Eq. (D.59)), the
-boundary-loss factor `F(w) = 1 + i sqrt(pi) w exp(-w^2) erfc(-i w)`
-(Eq. (D.60), evaluated through `scipy.special.wofz`) and the numerical
-distance `w = sqrt(i k R2 / 2) (cos(theta) + 1/Z)` (Eq. (D.57)).
+Implements $Q = R_p + (1 - R_p) F(w)$ (Attenborough Eq. (2.40c);
+Salomons Eq. (D.58)) with the plane-wave coefficient `Rp` (Eq. (D.59)),
+the boundary-loss factor
+$F(w) = 1 + i \sqrt{\pi} \, w \exp(-w^2) \operatorname{erfc}(-i w)$
+(Eq. (D.60), evaluated through `scipy.special.wofz`) and the
+numerical distance
+$w = \sqrt{i k R_2 / 2} \, (\cos\theta + 1/Z)$ (Eq. (D.57)).
 
 **Parameters**
 
 | Name | Description |
 | :--- | :--- |
 | `frequencies` | Frequencies, in hertz. |
-| `normalized_impedance` | Ground surface impedance normalized by `rho c` (complex, per frequency or scalar), in the `e^{-i omega t}` time convention (a passive ground has `Im(Z) > 0`). |
+| `normalized_impedance` | Ground surface impedance normalized by `rho c` (complex, per frequency or scalar), in the $e^{-i \omega t}$ time convention (a passive ground has $\operatorname{Im}(Z) > 0$). |
 | `source_height` | Source height `hs` above the ground, in metres. |
 | `receiver_height` | Receiver height `hr` above the ground, in metres. |
 | `distance` | Horizontal source-receiver distance, in metres. |
@@ -511,7 +527,7 @@ Every array is aligned with `frequencies`.
 | Name | Description |
 | :--- | :--- |
 | `frequencies` | Frequencies, in hertz. |
-| `excess_attenuation` | Relative sound level `dL` (dB re free field, Salomons Eq. (3.4)); positive is enhancement (up to +6 dB over hard ground), negative is the ground-effect dip. |
+| `excess_attenuation` | Relative sound level $\Delta L$ (dB re free field, Salomons Eq. (3.4)); positive is enhancement (up to +6 dB over hard ground), negative is the ground-effect dip. |
 | `reflection_coefficient` | Spherical-wave reflection coefficient `Q` (complex, Attenborough Eq. (2.40c)). |
 | `plane_reflection_coefficient` | Plane-wave reflection coefficient `Rp` (complex, Salomons Eq. (D.59)). |
 | `boundary_loss` | Boundary-loss factor `F(w)` (complex, Eq. (D.60)). |
@@ -530,7 +546,7 @@ SphericalGroundResult.plot(
 ) -> Axes
 ```
 
-Plot the excess attenuation `dL` versus frequency.
+Plot the excess attenuation $\Delta L$ versus frequency.
 
 Requires matplotlib (`pip install phonometry[plot]`); returns the
 `Axes`.

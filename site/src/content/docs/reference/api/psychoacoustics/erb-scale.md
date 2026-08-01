@@ -15,13 +15,18 @@ Glasberg and Moore (1990), fitting notched-noise data for young listeners at
 moderate levels, give it as a straight line in frequency (Moore, *An
 Introduction to the Psychology of Hearing* 6th ed., p. 76):
 
-    ERB_N = 24.7 (4.37 F + 1)   Hz,  with F in kHz
+$$
+\text{ERB}_N = 24.7 \, (4.37 F + 1)~\text{Hz}, \qquad F~\text{in kHz}
+$$
 
-Integrating `df / ERB_N(f)` turns that into a frequency scale whose unit is
+Integrating $df / \text{ERB}_N(f)$ turns that into a frequency scale
+whose unit is
 one auditory-filter width, the **ERB_N number**, whose unit is called the
 **Cam** (after Cambridge, following a suggestion by Hartmann):
 
-    ERB_N number = 21.4 log10(4.37 F + 1)   Cam
+$$
+\text{ERB}_N\ \text{number} = 21.4 \log_{10}(4.37 F + 1)~\text{Cam}
+$$
 
 The Cam scale plays the same role as the Bark scale of Zwicker and Terhardt or
 the mel scale of pitch: it is the axis on which masking patterns, excitation
@@ -34,8 +39,13 @@ implementation of the Moore-Glasberg loudness model
 ([`phonometry.psychoacoustics.loudness_moore_glasberg`](/phonometry/reference/api/psychoacoustics/loudness-moore-glasberg/)), which shares
 them:
 
-    ERB_N = 24.673 (0.004368 f + 1)   Hz,  with f in Hz
-    ERB_N number = 21.366 log10(0.004368 f + 1)   Cam
+$$
+\text{ERB}_N = 24.673 \, (0.004368 f + 1)~\text{Hz}, \qquad f~\text{in Hz}
+$$
+
+$$
+\text{ERB}_N\ \text{number} = 21.366 \log_{10}(0.004368 f + 1)~\text{Cam}
+$$
 
 They are the same fit written with one more digit: the two forms agree to
 better than 0.2 % over the whole audible range. The extra digits matter for
@@ -64,8 +74,9 @@ cam_from_frequency(frequency: ArrayLike) -> np.ndarray | float
 
 ERB_N number (Cam) of a frequency.
 
-`i = 21.366 log10(0.004368 f + 1)` (Glasberg and Moore 1990; Moore 6th
-ed., p. 76, printed there as `21.4 log10(4.37 F + 1)` for `F` in kHz).
+$i = 21.366 \log_{10}(0.004368 f + 1)$ (Glasberg and Moore 1990;
+Moore 6th ed., p. 76, printed there as
+$21.4 \log_{10}(4.37 F + 1)$ for `F` in kHz).
 One Cam is one auditory-filter width.
 
 **Parameters**
@@ -84,9 +95,9 @@ erb_bandwidth(frequency: ArrayLike) -> np.ndarray | float
 
 Equivalent rectangular bandwidth of the auditory filter, Hz.
 
-`ERB_N = 24.673 (0.004368 f + 1)` (Glasberg and Moore 1990; Moore 6th
-ed., p. 76, printed there with the rounded constants
-`24.7 (4.37 F + 1)` for `F` in kHz).
+$\text{ERB}_N = 24.673 \, (0.004368 f + 1)$ (Glasberg and Moore
+1990; Moore 6th ed., p. 76, printed there with the rounded constants
+$24.7 \, (4.37 F + 1)$ for `F` in kHz).
 
 **Parameters**
 
@@ -120,7 +131,7 @@ frequency_from_cam(cam: ArrayLike) -> np.ndarray | float
 
 Frequency of an ERB_N number, the inverse of [`cam_from_frequency`](/phonometry/reference/api/psychoacoustics/erb-scale/#cam_from_frequency).
 
-`f = (10^(i / 21.366) - 1) / 0.004368`.
+$f = (10^{i / 21.366} - 1) / 0.004368$.
 
 **Parameters**
 

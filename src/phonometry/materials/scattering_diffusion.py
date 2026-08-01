@@ -1,5 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""
+r"""
 Random-incidence scattering and directional diffusion coefficients.
 
 Two complementary free-field / reverberation-room surface descriptors are
@@ -11,7 +11,8 @@ implemented, each faithful to its own standard:
   Sabine-form absorption coefficients: the random-incidence absorption
   coefficient ``alpha_s`` (Clause 8.1.1, Eq. (1)) and the specular absorption
   coefficient ``alpha_spec`` (Clause 8.1.2, Eq. (4)). Their ratio yields the
-  scattering coefficient ``s = (alpha_spec - alpha_s) / (1 - alpha_s)``
+  scattering coefficient
+  :math:`s = (\alpha_{\mathrm{spec}} - \alpha_s) / (1 - \alpha_s)`
   (Clause 8.1.3, Eq. (5)). The turntable base plate is qualified through its
   own scattering coefficient (Clause 8.1.4, Eq. (6)) against the Table 1
   limits (Clause 6.2). Air properties come from the speed-of-sound and
@@ -168,14 +169,14 @@ def _nonneg_array(value: ArrayLike, name: str) -> Real:
 # ISO 17497-1: air properties (Clause 8, Eqs. (2)/(3), after ISO 9613-1).
 # ---------------------------------------------------------------------------
 def speed_of_sound(temperature: ArrayLike) -> Real:
-    """Speed of sound in air (ISO 17497-1:2004, Clause 8, Eq. (2)).
+    r"""Speed of sound in air (ISO 17497-1:2004, Clause 8, Eq. (2)).
 
-    ``c = 343,2 * sqrt((273,15 + t) / 293,15)`` (m/s).
+    :math:`c = 343.2 \sqrt{(273.15 + t) / 293.15}` (m/s).
 
     :param temperature: Air temperature ``t``, in **degrees Celsius** (scalar
         or per band).
     :return: Speed of sound ``c``, in metres per second.
-    :raises ValueError: if any temperature is at or below -273,15 degC.
+    :raises ValueError: if any temperature is at or below -273.15 degC.
     """
     t = np.asarray(temperature, dtype=np.float64)
     kelvin = _T0 + t
@@ -187,9 +188,10 @@ def speed_of_sound(temperature: ArrayLike) -> Real:
 
 
 def air_attenuation_coefficient(pressure_attenuation_db_per_m: ArrayLike) -> Real:
-    """Energy attenuation coefficient ``m`` (ISO 17497-1:2004, Clause 8, Eq. (3)).
+    r"""Energy attenuation coefficient ``m`` (ISO 17497-1, Clause 8, Eq. (3)).
 
-    ``m = alpha / (10 * lg(e)) approx. alpha / 4,343`` (1/m), where ``alpha`` is
+    :math:`m = \alpha / (10 \lg(e)) \approx \alpha / 4.343` (1/m), where
+    ``alpha`` is
     the sound-*pressure* attenuation coefficient in dB/m obtained from
     ISO 9613-1 using the measured temperature and relative humidity.
 
@@ -213,12 +215,15 @@ def _sabine_absorption(
     situation_a: tuple[ArrayLike, ArrayLike, ArrayLike],
     situation_b: tuple[ArrayLike, ArrayLike, ArrayLike],
 ) -> Real:
-    """Sabine-form absorption difference between two measurement situations.
+    r"""Sabine-form absorption difference between two measurement situations.
 
-    Implements the common kernel of ISO 17497-1 Eqs. (1), (4) and (6)::
+    Implements the common kernel of ISO 17497-1 Eqs. (1), (4) and (6):
 
-        55,3 * (V / S) * (1 / (c_b T_b) - 1 / (c_a T_a))
-            - (4 V / S) * (m_b - m_a)
+    .. math::
+
+       55.3 \, \frac{V}{S}
+       \left( \frac{1}{c_b T_b} - \frac{1}{c_a T_a} \right)
+       - \frac{4 V}{S} (m_b - m_a)
 
     Each situation is the tuple ``(c, T, m)`` of speed of sound (m/s),
     reverberation time (s) and energy attenuation coefficient (1/m). ``V`` and
@@ -254,9 +259,13 @@ def random_incidence_absorption(
     m1: ArrayLike = 0.0,
     m2: ArrayLike = 0.0,
 ) -> Real:
-    """Random-incidence absorption coefficient ``alpha_s`` (ISO 17497-1, Eq. (1)).
+    r"""Random-incidence absorption coefficient ``alpha_s`` (ISO 17497-1, Eq. (1)).
 
-    ``alpha_s = 55,3 * (V / S) * (1 / (c2 T2) - 1 / (c1 T1)) - (4 V / S) * (m2 - m1)``.
+    .. math::
+
+       \alpha_s = 55.3 \, \frac{V}{S}
+       \left( \frac{1}{c_2 T_2} - \frac{1}{c_1 T_1} \right)
+       - \frac{4 V}{S} (m_2 - m_1)
 
     Situation 1 is the empty room with the (static) base plate present;
     situation 2 adds the test sample, still without turntable rotation
@@ -288,9 +297,13 @@ def specular_absorption_coefficient(
     m3: ArrayLike = 0.0,
     m4: ArrayLike = 0.0,
 ) -> Real:
-    """Specular absorption coefficient ``alpha_spec`` (ISO 17497-1, Eq. (4)).
+    r"""Specular absorption coefficient ``alpha_spec`` (ISO 17497-1, Eq. (4)).
 
-    ``alpha_spec = 55,3 * (V / S) * (1 / (c4 T4) - 1 / (c3 T3)) - (4 V / S) * (m4 - m3)``.
+    .. math::
+
+       \alpha_{\text{spec}} = 55.3 \, \frac{V}{S}
+       \left( \frac{1}{c_4 T_4} - \frac{1}{c_3 T_3} \right)
+       - \frac{4 V}{S} (m_4 - m_3)
 
     Situation 3 is the rotating base plate without the sample; situation 4 is
     the sample on the rotating turntable (Table 2, rows T3 and T4). The
@@ -316,10 +329,12 @@ def scattering_coefficient(
     *,
     truncate_negative: bool = True,
 ) -> Real:
-    """Random-incidence scattering coefficient ``s`` (ISO 17497-1, Eq. (5)).
+    r"""Random-incidence scattering coefficient ``s`` (ISO 17497-1, Eq. (5)).
 
-    ``s = 1 - (1 - alpha_spec) / (1 - alpha_s)
-    = (alpha_spec - alpha_s) / (1 - alpha_s)``.
+    .. math::
+
+       s = 1 - \frac{1 - \alpha_{\text{spec}}}{1 - \alpha_s}
+         = \frac{\alpha_{\text{spec}} - \alpha_s}{1 - \alpha_s}
 
     Following the presentation rule of Clause 8.3, negative results are
     truncated to 0 while values greater than 1 (which can occur through edge
@@ -724,11 +739,16 @@ def base_plate_scattering(
     m1: ArrayLike = 0.0,
     m3: ArrayLike = 0.0,
 ) -> Real:
-    """Scattering coefficient of the base plate alone (ISO 17497-1, Eq. (6)).
+    r"""Scattering coefficient of the base plate alone (ISO 17497-1, Eq. (6)).
 
-    ``s_base = 55,3 * (V / S) * (1 / (c3 T3) - 1 / (c1 T1)) - (4 V / S) * (m3 - m1)``.
+    .. math::
 
-    Ideally ``T1 == T3``; a slightly non-symmetrical base plate shortens ``T3``
+       s_{\mathrm{base}} = 55.3 \frac{V}{S}
+       \left( \frac{1}{c_3 T_3} - \frac{1}{c_1 T_1} \right)
+       - \frac{4 V}{S} (m_3 - m_1)
+
+    Ideally :math:`T_1 = T_3`; a slightly non-symmetrical base plate shortens
+    ``T3``
     and this quality metric captures the resulting spurious scattering, which
     must not exceed the Table 1 limits (Clause 6.2). See
     :func:`check_base_plate_scattering`.
@@ -805,13 +825,18 @@ def check_base_plate_scattering(
 # ISO 17497-1: measurement uncertainty (Annex A, Eqs. (A.1)-(A.5)).
 # ---------------------------------------------------------------------------
 def reverberation_time_uncertainty(times: ArrayLike) -> Real:
-    """Standard uncertainty of a reverberation time (ISO 17497-1, Eq. (A.1)).
+    r"""Standard uncertainty of a reverberation time (ISO 17497-1, Eq. (A.1)).
 
-    ``u = sqrt( sum_i (T_i - Tbar)^2 / (N (N - 1)) )`` with ``Tbar`` the mean of
+    .. math::
+
+       u = \sqrt{ \sum_i (T_i - \overline{T})^2 / (N (N - 1)) }
+
+    with :math:`\overline{T}` the mean of
     the ``N`` spatially-averaged measurements (Eq. (A.2)); this is the standard
     error of the mean.
 
-    :param times: The ``N >= 2`` reverberation-time measurements, in seconds.
+    :param times: The :math:`N \ge 2` reverberation-time measurements, in
+        seconds.
     :return: Standard uncertainty ``u`` of the mean reverberation time (0-d).
     :raises ValueError: if fewer than two measurements are supplied.
     """
@@ -836,9 +861,12 @@ def absorption_coefficient_uncertainty(
     T_b: ArrayLike,
     u_b: ArrayLike,
 ) -> Real:
-    """Uncertainty of a Sabine absorption coefficient (ISO 17497-1, Eqs. (A.3)/(A.4)).
+    r"""Uncertainty of a Sabine absorption coefficient (ISO 17497-1, A.3/A.4).
 
-    ``u_alpha = (55,3 V) / (c S) * sqrt((u_b / T_b^2)^2 + (u_a / T_a^2)^2)``.
+    .. math::
+
+       u_\alpha = \frac{55.3 V}{c S}
+       \sqrt{(u_b / T_b^2)^2 + (u_a / T_a^2)^2}
 
     With situations ``(T1, T2)`` this is ``u(alpha_s)`` (Eq. (A.3)); with
     ``(T3, T4)`` it is ``u(alpha_spec)`` (Eq. (A.4)). The unsubscripted ``c`` of
@@ -872,7 +900,7 @@ class ScatteringUncertainty:
 
     :ivar u_scattering: Combined standard uncertainty ``u_s`` of the scattering
         coefficient (Eq. (A.5)).
-    :ivar expanded: Expanded uncertainty ``U = 2 u_s`` at 95 % confidence
+    :ivar expanded: Expanded uncertainty :math:`U = 2 u_s` at 95 % confidence
         (Annex A).
     """
 
@@ -886,18 +914,24 @@ def scattering_coefficient_uncertainty(
     u_alpha_spec: ArrayLike,
     u_alpha_s: ArrayLike,
 ) -> ScatteringUncertainty:
-    """Uncertainty of the scattering coefficient (ISO 17497-1, Eq. (A.5)).
+    r"""Uncertainty of the scattering coefficient (ISO 17497-1, Eq. (A.5)).
 
-    ``u_s = |(alpha_spec - 1) / (1 - alpha_s)|
-    * sqrt((u_alpha_spec / (alpha_spec - 1))^2 + (u_alpha_s / (1 - alpha_s))^2)``,
+    .. math::
 
-    with the expanded uncertainty ``U = 2 u_s`` (95 % confidence).
+       u_s = \left\lvert
+       \frac{\alpha_{\mathrm{spec}} - 1}{1 - \alpha_s} \right\rvert
+       \sqrt{\left( \frac{u_{\alpha_{\mathrm{spec}}}}
+       {\alpha_{\mathrm{spec}} - 1} \right)^{2}
+       + \left( \frac{u_{\alpha_s}}{1 - \alpha_s} \right)^{2}}
+
+    with the expanded uncertainty :math:`U = 2 u_s` (95 % confidence).
 
     :param alpha_spec: Specular absorption coefficient ``alpha_spec`` (Eq. (4)).
     :param alpha_s: Random-incidence absorption coefficient ``alpha_s`` (Eq. (1)).
     :param u_alpha_spec: Standard uncertainty of ``alpha_spec`` (Eq. (A.4)).
     :param u_alpha_s: Standard uncertainty of ``alpha_s`` (Eq. (A.3)).
-    :return: A :class:`ScatteringUncertainty` with ``u_s`` and ``U = 2 u_s``.
+    :return: A :class:`ScatteringUncertainty` with ``u_s`` and
+        :math:`U = 2 u_s`.
     :raises ValueError: if any ``alpha_s`` equals 1 or any ``alpha_spec`` equals 1.
     """
     spec = np.asarray(alpha_spec, dtype=np.float64)
@@ -928,26 +962,33 @@ def directional_diffusion_coefficient(
     *,
     area_weights: ArrayLike | None = None,
 ) -> float:
-    """Directional diffusion coefficient ``d_theta`` (ISO 17497-2, Formulas (5)/(6)).
+    r"""Directional diffusion coefficient ``d_theta`` (ISO 17497-2, Formulas (5)/(6)).
 
     For a fixed source position and one-third-octave band, from the ``n``
     reflected sound-pressure levels ``L_i`` (dB). With equal-area receivers
-    (``area_weights is None``, Formula (5))::
+    (``area_weights is None``, Formula (5)):
 
-        d_theta = ((sum p_i)^2 - sum p_i^2) / ((n - 1) * sum p_i^2)
+    .. math::
 
-    where ``p_i = 10^(L_i / 10)``. When each receiver samples a different area
-    (Formula (6)) the per-receiver weights ``N_i`` (from :func:`area_factors`)
-    enter::
+       d_\theta = \frac{\left( \sum_i p_i \right)^{2} - \sum_i p_i^{2}}
+       {(n - 1) \sum_i p_i^{2}}
 
-        d_theta = ((sum p_i N_i)^2 - sum N_i p_i^2)
-                  / ((sum N_i - 1) * sum N_i p_i^2)
+    where :math:`p_i = 10^{L_i / 10}`. When each receiver samples a different
+    area (Formula (6)) the per-receiver weights ``N_i`` (from
+    :func:`area_factors`) enter:
+
+    .. math::
+
+       d_\theta = \frac{\left( \sum_i p_i N_i \right)^{2}
+       - \sum_i N_i p_i^{2}}
+       {\left( \sum_i N_i - 1 \right) \sum_i N_i p_i^{2}}
 
     which reduces to Formula (5) for uniform weights. The coefficient is 0 when
     only one receiver has non-zero scattered energy and 1 when all receivers
     are equal.
 
-    :param levels: The ``n >= 2`` reflected sound-pressure levels ``L_i``, in
+    :param levels: The :math:`n \ge 2` reflected sound-pressure levels
+        ``L_i``, in
         decibels (a level of ``-inf`` denotes a receiver with zero energy).
     :param area_weights: Optional per-receiver area weights ``N_i`` (Formula (8));
         ``None`` selects the equal-area Formula (5).
@@ -992,12 +1033,14 @@ def normalized_diffusion_coefficient(
     d_theta: ArrayLike,
     d_theta_reference: ArrayLike,
 ) -> Real:
-    """Normalised directional diffusion coefficient (ISO 17497-2, Formula (7)).
+    r"""Normalised directional diffusion coefficient (ISO 17497-2, Formula (7)).
 
-    ``d_theta_n = (d_theta - d_theta_r) / (1 - d_theta_r)``, removing the
+    :math:`d_{\theta,n} = (d_\theta - d_{\theta,r}) / (1 - d_{\theta,r})`,
+    removing the
     finite-panel diffusion of the reference flat surface ``d_theta_r`` (same
-    projected footprint as the test surface). It maps ``d_theta = d_theta_r``
-    to 0 and ``d_theta = 1`` to 1.
+    projected footprint as the test surface). It maps
+    :math:`d_\theta = d_{\theta,r}`
+    to 0 and :math:`d_\theta = 1` to 1.
 
     :param d_theta: Directional diffusion coefficient of the test surface.
     :param d_theta_reference: Directional diffusion coefficient of the
@@ -1021,30 +1064,40 @@ def area_factors(
     delta_theta: float,
     delta_phi: float | None = None,
 ) -> Real:
-    """Per-receiver area weights ``N_i`` (ISO 17497-2, Clause 8.3, Formula (8)).
+    r"""Per-receiver area weights ``N_i`` (ISO 17497-2, Clause 8.3, Formula (8)).
 
     For a hemispherical measurement the solid-angle area sampled by a receiver
-    at elevation ``theta`` (with angular spacings ``delta_theta``, ``delta_phi``)
-    is::
+    at elevation ``theta`` (with angular spacings ``delta_theta``,
+    ``delta_phi``) is:
 
-        A_i = (4 pi / delta_phi) * sin^2(delta_theta / 4)   for theta = 0 deg
-        A_i = 2 sin(theta) sin(delta_theta / 2)             for theta != 0, 90 deg
-        A_i = sin(delta_theta / 2)                          for |theta| = 90 deg
+    .. math::
 
-    and ``N_i = A_i / A_min`` (Formula (8)), with ``A_min`` the smallest ``A_i``.
-    All angles are handled internally in **radians**; the ``theta = 0`` form in
-    particular requires ``delta_phi`` in radians to be dimensionally consistent
-    with the ``4 pi`` factor.
+       \begin{aligned}
+       A_i &= (4 \pi / \Delta\phi) \sin^{2}(\Delta\theta / 4)
+       && \text{for } \theta = 0^\circ \\
+       A_i &= 2 \sin(\theta) \sin(\Delta\theta / 2)
+       && \text{for } \theta \ne 0^\circ, 90^\circ \\
+       A_i &= \sin(\Delta\theta / 2)
+       && \text{for } \lvert \theta \rvert = 90^\circ
+       \end{aligned}
+
+    and :math:`N_i = A_i / A_{\min}` (Formula (8)), with ``A_min`` the
+    smallest ``A_i``. All angles are handled internally in **radians**; the
+    :math:`\theta = 0` form in particular requires ``delta_phi`` in radians to
+    be dimensionally consistent with the :math:`4 \pi` factor.
 
     :param elevations: Receiver elevation angles ``theta`` from the reference
         normal, in **degrees** (1-D), over the measurement domain
-        ``0 <= theta <= 90`` (Figure 7). Formula (8) assumes a single receiver
-        at ``theta = 0`` (the zenith); duplicate zenith entries would each take
+        :math:`0 \le \theta \le 90` (Figure 7). Formula (8) assumes a single
+        receiver
+        at :math:`\theta = 0` (the zenith); duplicate zenith entries would
+        each take
         the full zenith area.
     :param delta_theta: Elevation spacing between adjacent receivers, in degrees
         (typically 5).
     :param delta_phi: Azimuth spacing between adjacent receivers, in degrees;
-        defaults to ``delta_theta``. Required (implicitly) for the ``theta = 0``
+        defaults to ``delta_theta``. Required (implicitly) for the
+        :math:`\theta = 0`
         receiver.
     :return: Per-receiver area weights ``N_i`` (dimensionless, min value 1).
     :raises ValueError: for a non-1-D input or non-positive spacings.

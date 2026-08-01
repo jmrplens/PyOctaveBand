@@ -1,16 +1,18 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""
+r"""
 Ocean ambient-noise spectrum levels (Wenz framework).
 
 Deep-water ambient-noise **spectrum levels** (dB re 1 µPa²/Hz) from the two
 physically grounded components of the Wenz curves:
 
 * :func:`wind_noise_spectrum` -- wind / sea-surface (Knudsen) noise via Wenz's
-  "rule of fives", ``NL = 51.02 − (5/3)·10·(lg f − lg(U/5))`` (``f`` in kHz,
-  ``U`` in knots; the historical 25 dB anchor is re 20 µPa and becomes
-  ``25 + 20·lg(20)`` re 1 µPa), valid over roughly 500 Hz-5 kHz.
+  "rule of fives",
+  :math:`\mathrm{NL} = 51.02 - (5/3) \cdot 10 (\lg f - \lg(U/5))`
+  (``f`` in kHz, ``U`` in knots; the historical 25 dB anchor is re 20 µPa and
+  becomes :math:`25 + 20 \lg(20)` re 1 µPa), valid over roughly 500 Hz-5 kHz.
 * :func:`thermal_noise_spectrum` -- the molecular thermal-noise limit (Mellen
-  1952), ``<p²(f)> = 4π·k·T·ρ·f²/c`` (Pa²/Hz), dominant above ~50 kHz.
+  1952), :math:`\langle p^2(f) \rangle = 4 \pi k T \rho f^2 / c` (Pa²/Hz),
+  dominant above ~50 kHz.
 
 :func:`ocean_ambient_noise` energy-sums the enabled components (and an optional
 caller-supplied shipping spectrum) into a composite :class:`AmbientNoiseResult`
@@ -57,12 +59,15 @@ _WIND_ANCHOR_DB = 25.0 + 20.0 * np.log10(20.0)
 def wind_noise_spectrum(
     frequency_hz: NDArray[np.float64] | list[float] | float, wind_speed_knots: float
 ) -> NDArray[np.float64]:
-    """Wind / sea-surface noise spectrum level (Wenz rule of fives), dB re 1 µPa²/Hz.
+    r"""Wind / sea-surface noise spectrum level (Wenz rule of fives), dB re
+    1 µPa²/Hz.
 
-    ``NL(f, U) = 51.02 − (5/3)·10·(lg f − lg(U/5))`` with ``f`` in kHz and ``U``
+    :math:`\mathrm{NL}(f, U) = 51.02 - (5/3) \cdot 10 (\lg f - \lg(U/5))`
+    with ``f`` in kHz and ``U``
     in knots: −5 dB per octave and +5 dB per doubling of wind speed about the
     canonical anchor, which Wenz/Knudsen state as "25 dB (5 × 5)" at 1 kHz for
-    5 knots **re 0.0002 dyn/cm² (20 µPa)**, i.e. ``25 + 20·lg(20) ≈ 51.02`` dB
+    5 knots **re 0.0002 dyn/cm² (20 µPa)**, i.e.
+    :math:`25 + 20 \lg(20) \approx 51.02` dB
     once referenced to the ISO 18405 1 µPa. Valid over roughly 500 Hz-5 kHz
     and winds of 2.5-40 knots (the stated range of the wind-doubling law);
     outside both the formula extrapolates.
@@ -90,14 +95,15 @@ def thermal_noise_spectrum(
     density: float = 1025.0,
     sound_speed: float = 1500.0,
 ) -> NDArray[np.float64]:
-    """Molecular thermal-noise spectrum level (Mellen 1952), dB re 1 µPa²/Hz.
+    r"""Molecular thermal-noise spectrum level (Mellen 1952), dB re 1 µPa²/Hz.
 
-    ``<p²(f)> = 4π·k·T·ρ·f²/c`` (Pa²/Hz); the level is ``10·lg(<p²>/p₀²)``.
+    :math:`\langle p^2(f) \rangle = 4 \pi k T \rho f^2 / c` (Pa²/Hz); the
+    level is :math:`10 \lg(\langle p^2 \rangle / p_0^2)`.
 
     :param frequency_hz: Frequency, in Hz (scalar or array).
     :param temperature: Water temperature, in degrees Celsius (default 16.85 °C
         = 290 K).
-    :param density: Water density ``ρ``, in kg/m³ (default 1025).
+    :param density: Water density :math:`\rho`, in kg/m³ (default 1025).
     :param sound_speed: Sound speed ``c``, in m/s (default 1500).
     :return: Thermal-noise spectrum level per frequency, in dB re 1 µPa²/Hz.
     :raises ValueError: If the inputs are invalid.

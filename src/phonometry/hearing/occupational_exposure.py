@@ -1,5 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""
+r"""
 Occupational noise exposure: measurement strategies and uncertainty (ISO 9612:2009).
 
 ISO 9612:2009 is the engineering method (accuracy grade 2) for determining a
@@ -14,22 +14,26 @@ the normative **Annex C** uncertainty budget.
 
 - *Task-based* (Clause 9): the nominal day is split into tasks; each task level is
   the energy average of ``I >= 3`` samples (Eq 7), its contribution is
-  ``LEX,8h,m = Lp,A,eqT,m + 10 lg(T_m/T0)`` (Eq 8), and the daily level is the
-  energy sum over tasks (Eq 9/10).
+  :math:`L_{EX,8h,m} = L_{p,A,eqT,m} + 10 \lg(T_m/T_0)` (Eq 8), and the
+  daily level is the energy sum over tasks (Eq 9/10).
 - *Job-based* (Clause 10): ``N >= 5`` random samples over a homogeneous exposure
   group; the effective-day level is their energy average (Eq 11) and
-  ``LEX,8h = Lp,A,eqTe + 10 lg(Te/T0)`` (Eq 12). The minimum cumulative
-  measurement duration follows Table 1.
+  :math:`L_{EX,8h} = L_{p,A,eqTe} + 10 \lg(T_e/T_0)` (Eq 12). The minimum
+  cumulative measurement duration follows Table 1.
 - *Full-day* (Clause 11): three (or more) whole-day measurements averaged (Eq 11),
   then Eq 13, the same arithmetic as the job method.
 
-**Uncertainty (Annex C, normative).** Combined ``u^2 = sum c_i^2 u_i^2`` (C.1),
-expanded ``U = k*u`` with ``k = 1.65`` for a one-sided 95 % confidence interval
+**Uncertainty (Annex C, normative).** Combined
+:math:`u^2 = \sum c_i^2 u_i^2` (C.1),
+expanded :math:`U = k u` with :math:`k = 1.65` for a one-sided 95 %
+confidence interval
 (Clause 14). Task-based uses Eq C.3 with sampling ``u1a`` (C.6), duration ``u1b``
 (C.7) and sensitivity coefficients ``c1a`` (C.4)/``c1b`` (C.5). Job-based and
-full-day use Eq C.9 with ``c1*u1`` read from Table C.4 and ``c2 = c3 = 1``. The
+full-day use Eq C.9 with :math:`c_1 u_1` read from Table C.4 and
+:math:`c_2 = c_3 = 1`. The
 instrument standard uncertainty ``u2`` is from Table C.5 and the microphone
-position ``u3 = 1.0 dB`` (C.6). Peak levels ``Lp,Cpeak`` are reported without an
+position :math:`u_3 = 1.0` dB (C.6). Peak levels ``Lp,Cpeak`` are reported
+without an
 uncertainty: Annex C gives no method for them (Table C.5, NOTE 1).
 
 The three worked examples of Annexes D (task), E (job) and F (full-day) are
@@ -112,8 +116,9 @@ _C4_ADVISORY_THRESHOLD: float = 3.5
 
 
 def table_c4_contribution(n_samples: int, u1: float) -> float:
-    """
-    Uncertainty contribution ``c1*u1`` (dB) from Table C.4 (job/full-day sampling).
+    r"""
+    Uncertainty contribution :math:`c_1 u_1` (dB) from Table C.4
+    (job/full-day sampling).
 
     Bilinear interpolation on the sample count ``N`` and the sampling standard
     uncertainty ``u1``. The ``u1`` axis is anchored at the origin (``u1 = 0`` gives
@@ -123,7 +128,7 @@ def table_c4_contribution(n_samples: int, u1: float) -> float:
 
     :param n_samples: Number of job/full-day samples ``N`` (>= 2).
     :param u1: Standard uncertainty of the samples, dB (>= 0).
-    :return: The contribution ``c1*u1`` in dB.
+    :return: The contribution :math:`c_1 u_1` in dB.
     """
     if n_samples < 2:
         raise ValueError("Table C.4 needs at least 2 samples.")
@@ -246,7 +251,8 @@ class TaskContribution:
 
     @property
     def variance_contribution(self) -> float:
-        """This task's contribution to ``u^2(LEX,8h)`` (a term of Eq C.3), dB²."""
+        r"""This task's contribution to :math:`u^2(L_{EX,8h})` (a term of
+        Eq C.3), dB²."""
         return self.c1a**2 * (self.u1a**2 + self.u2**2 + self.u3**2) + (self.c1b * self.u1b) ** 2
 
 
@@ -258,14 +264,15 @@ class ExposureResult:
     :ivar lex_8h: A-weighted daily noise exposure level ``LEX,8h``, dB.
     :ivar combined_standard_uncertainty: Combined standard uncertainty ``u``
         (Eq C.1), dB.
-    :ivar expanded_uncertainty: Expanded uncertainty ``U = 1.65*u`` for a
+    :ivar expanded_uncertainty: Expanded uncertainty :math:`U = 1.65 u` for a
         one-sided 95 % confidence interval, dB.
     :ivar strategy: ``"task"``, ``"job"`` or ``"full_day"``.
     :ivar instrument: Instrument class the measurement was made with (the call
         default; individual tasks may override it): ``"class1"``, ``"class2"``
         or ``"personal_exposimeter"``. Printed on the ``.report()`` fiche
         (ISO 9612:2009 Clause 15 c).
-    :ivar upper_limit: ``LEX,8h + U``, the value 95 % of readings fall below.
+    :ivar upper_limit: :math:`L_{EX,8h} + U`, the value 95 % of readings fall
+        below.
     """
 
     lex_8h: float
@@ -547,8 +554,9 @@ def job_based_exposure(
 
     The effective-day level is the energy average of ``N >= 5`` random job samples
     (Eq 11); the daily level follows Eq 12. The sampling uncertainty ``u1`` is the
-    sample standard deviation (Eq C.12) and its contribution ``c1*u1`` is read
-    from Table C.4; the combined uncertainty is Eq C.9 with ``c2 = c3 = 1``.
+    sample standard deviation (Eq C.12) and its contribution :math:`c_1 u_1`
+    is read from Table C.4; the combined uncertainty is Eq C.9 with
+    :math:`c_2 = c_3 = 1`.
 
     :param samples: Measured ``Lp,A,eqT,n`` job samples, dB (at least five per
         Clause 10.2; a minimum of two is enforced numerically).

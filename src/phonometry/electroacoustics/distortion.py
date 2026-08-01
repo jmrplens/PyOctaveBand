@@ -177,11 +177,19 @@ def thd(
     n_harmonics: int = _DEFAULT_N_HARMONICS,
     window: str = "hann",
 ) -> float:
-    """Total harmonic distortion (IEC 60268-3 14.12.2-3).
+    r"""Total harmonic distortion (IEC 60268-3 14.12.2-3).
 
-    ``THD_F = √(Σ_{n≥2} aₙ²) / a₁`` (relative to the fundamental, ``kind='F'``)
-    or ``THD_R = √(Σ_{n≥2} aₙ²) / √(Σ_{n≥1} aₙ²)`` (relative to the total RMS,
-    ``kind='R'``), from the harmonic amplitudes ``aₙ``.
+    From the harmonic amplitudes :math:`a_n`:
+
+    .. math::
+
+       \mathrm{THD}_F = \sqrt{\sum_{n \ge 2} a_n^2} / a_1
+
+       \mathrm{THD}_R = \sqrt{\sum_{n \ge 2} a_n^2} /
+       \sqrt{\sum_{n \ge 1} a_n^2}
+
+    relative to the fundamental (``kind='F'``) or to the total RMS
+    (``kind='R'``), respectively.
 
     Convention note: the quantity the IEC 60268-3 14.12.3.2 formula defines
     is the R form (harmonic RMS over total RMS). The default ``kind='F'`` is
@@ -191,8 +199,8 @@ def thd(
     :param signal: Captured signal (1-D). Coherent sampling (integer periods) or
         a low-leakage window gives the exact value.
     :param fs: Sample rate, in Hz.
-    :param fundamental: Fundamental frequency ``f₁`` in Hz, or ``None`` to take
-        the largest spectral peak.
+    :param fundamental: Fundamental frequency :math:`f_1` in Hz, or ``None``
+        to take the largest spectral peak.
     :param kind: ``'F'`` (relative to the fundamental, the default) or ``'R'``
         (relative to the total RMS, the 14.12.3.2 quantity).
     :param n_harmonics: Highest harmonic order summed (default 10).
@@ -229,14 +237,14 @@ def harmonic_distortion(
     n_harmonics: int = _DEFAULT_N_HARMONICS,
     window: str = "hann",
 ) -> float:
-    """nth-order harmonic distortion ``dₙ`` (IEC 60268-3 14.12.5).
+    r"""nth-order harmonic distortion :math:`d_n` (IEC 60268-3 14.12.5).
 
-    ``dₙ = aₙ / √(Σ_{k≥1} a_k²)`` -- the nth harmonic amplitude relative to the
-    total RMS.
+    :math:`d_n = a_n / \sqrt{\sum_{k \ge 1} a_k^2}` -- the nth harmonic
+    amplitude relative to the total RMS.
 
     :param signal: Captured signal (1-D).
     :param fs: Sample rate, in Hz.
-    :param fundamental: Fundamental frequency ``f₁``, in Hz.
+    :param fundamental: Fundamental frequency :math:`f_1`, in Hz.
     :param order: Harmonic order ``n`` (>= 2).
     :param n_harmonics: Highest harmonic order used for the total RMS.
     :param window: FFT window (default ``'hann'``).
@@ -294,7 +302,7 @@ def _band_rms(x: NDArray[np.float64], fs: float, f_lo: float, f_hi: float) -> fl
 
     Computed in the frequency domain via Parseval (AES17 5.2.10 sanctions
     frequency-domain filters); a brick-wall band comfortably exceeds the
-    5.2.5 low-pass template (passband ±0,1 dB, stopband >= 60 dB).
+    5.2.5 low-pass template (passband ±0.1 dB, stopband >= 60 dB).
     """
     n = x.size
     spec = np.fft.rfft(x)
@@ -348,15 +356,16 @@ def thd_plus_noise(
     window: str = "hann",
     as_db: bool = False,
 ) -> float:
-    """THD+N ratio (AES17-2015 6.3.1).
+    r"""THD+N ratio (AES17-2015 6.3.1).
 
-    The fundamental is removed with the standard notch filter (``1.2 ≤ Q ≤ 3``,
-    validated on the applied zero-phase response per 5.2.8) and the residual
-    RMS is compared with the total RMS: ``THD+N = V_residual / V_total`` (a
-    ratio, or ``20·lg`` of it in dB). Both voltages are measured through the
-    AES17 measurement bandwidth -- a 20 Hz high-pass plus the standard
-    low-pass at ``bandwidth`` (5.2.5 / 6.3.1) -- so DC offsets and
-    out-of-band noise do not inflate the result.
+    The fundamental is removed with the standard notch filter
+    (:math:`1.2 \le Q \le 3`, validated on the applied zero-phase response
+    per 5.2.8) and the residual RMS is compared with the total RMS:
+    :math:`\mathrm{THD{+}N} = V_\text{residual} / V_\text{total}` (a
+    ratio, or :math:`20 \lg` of it in dB). Both voltages are measured
+    through the AES17 measurement bandwidth -- a 20 Hz high-pass plus the
+    standard low-pass at ``bandwidth`` (5.2.5 / 6.3.1) -- so DC offsets
+    and out-of-band noise do not inflate the result.
 
     :param signal: Captured signal (1-D).
     :param fs: Sample rate, in Hz.
@@ -367,7 +376,8 @@ def thd_plus_noise(
         ``None`` disables the chain and measures the full Nyquist band
         (20 Hz high-pass included only when the chain is active).
     :param window: FFT window used only for fundamental auto-detection.
-    :param as_db: Return ``20·lg(ratio)`` in dB instead of the ratio.
+    :param as_db: Return :math:`20 \lg(\text{ratio})` in dB instead of the
+        ratio.
     :return: THD+N as a ratio (default) or in dB.
     :raises ValueError: If the inputs are invalid or ``notch_q`` out of range.
     """
@@ -400,12 +410,16 @@ def sinad(
     bandwidth: float | None = _AES17_BANDWIDTH_HZ,
     window: str = "hann",
 ) -> float:
-    """Signal-to-noise-and-distortion ratio SINAD, in dB.
+    r"""Signal-to-noise-and-distortion ratio SINAD, in dB.
 
-    ``SINAD = −(THD+N in dB) = 20·lg(V_total / V_residual)`` -- the
-    reciprocal, in dB, of the THD+N ratio. AES17-2015 does not itself define
-    SINAD; this value is derived from the AES17 6.3.1 THD+N measurement
-    (same notch, same measurement bandwidth).
+    .. math::
+
+       \mathrm{SINAD} = -(\text{THD+N in dB})
+       = 20 \lg(V_\text{total} / V_\text{residual}),
+
+    the reciprocal, in dB, of the THD+N ratio. AES17-2015 does not itself
+    define SINAD; this value is derived from the AES17 6.3.1 THD+N
+    measurement (same notch, same measurement bandwidth).
 
     :param signal: Captured signal (1-D).
     :param fs: Sample rate, in Hz.
@@ -572,13 +586,13 @@ def _imd_component(
     half_width: float,
     exclude: tuple[float, ...] = (),
 ) -> float:
-    """Peak amplitude within ``±half_width`` of an intermodulation product.
+    r"""Peak amplitude within ``±half_width`` of an intermodulation product.
 
     Returns 0 for products outside (0, Nyquist). The window is shrunk so it
     never contains the DC bin or an excluded component (a primary tone): a
     product that cannot be separated from a primary reads 0 rather than the
     primary's amplitude (e.g. octave-spaced clean tones must not report
-    ``d2 = 1``).
+    :math:`d_2 = 1`).
     """
     df = float(freqs[1] - freqs[0]) if freqs.size > 1 else 0.0
     nyquist = float(freqs[-1])
@@ -594,23 +608,25 @@ def _imd_component(
 
 @dataclass(frozen=True)
 class ModulationDistortionResult:
-    """Modulation (intermodulation) distortion (IEC 60268-3 14.12.7).
+    r"""Modulation (intermodulation) distortion (IEC 60268-3 14.12.7).
 
-    :ivar d2: Second-order modulation distortion ``d_m,2`` (14.12.7.2 g):
-        the *arithmetic* sum of the sideband amplitudes at ``f2 ± f1``
-        relative to the output amplitude at ``f2``.
-    :ivar d3: Third-order modulation distortion ``d_m,3`` (14.12.7.2 h):
-        the arithmetic sum of the sidebands at ``f2 ± 2·f1`` relative to
-        the output amplitude at ``f2``.
+    :ivar d2: Second-order modulation distortion :math:`d_{m,2}`
+        (14.12.7.2 g): the *arithmetic* sum of the sideband amplitudes at
+        :math:`f_2 \pm f_1` relative to the output amplitude at ``f2``.
+    :ivar d3: Third-order modulation distortion :math:`d_{m,3}`
+        (14.12.7.2 h): the arithmetic sum of the sidebands at
+        :math:`f_2 \pm 2 f_1` relative to the output amplitude at ``f2``.
     :ivar smpte: Combined-RMS convention of SMPTE-type analyzers (not an
-        IEC 60268-3 quantity): ``√(Σ aₛ²) / a_f2`` over all four sidebands.
+        IEC 60268-3 quantity): :math:`\sqrt{\sum a_s^2} / a_{f_2}` over
+        all four sidebands.
     :ivar f_low: Low modulating tone ``f1``, in Hz.
     :ivar f_high: High carrier tone ``f2``, in Hz.
     :ivar carrier_amplitude: Measured output amplitude at ``f2`` (the
         reference of the per-order ratios).
     :ivar sideband_frequencies: The four intermodulation product
-        frequencies in ascending order: ``f2 − 2f1``, ``f2 − f1``,
-        ``f2 + f1`` and ``f2 + 2f1``, in Hz.
+        frequencies in ascending order: :math:`f_2 - 2f_1`,
+        :math:`f_2 - f_1`, :math:`f_2 + f_1` and :math:`f_2 + 2f_1`,
+        in Hz.
     :ivar sideband_amplitudes: Measured peak amplitudes at
         ``sideband_frequencies`` (zero for a product that falls outside
         the analysis band or cannot be separated from a primary tone).
@@ -627,12 +643,14 @@ class ModulationDistortionResult:
 
     def plot(self, ax: Axes | None = None, *, language: str = "en",
              **kwargs: Any) -> Axes:
-        """Plot the carrier and its modulation sidebands, with d2/d3 annotated.
+        r"""Plot the carrier and its modulation sidebands, with d2/d3
+        annotated.
 
-        Draws the output amplitude at ``f2`` (the 0 dB reference) and the four
-        intermodulation sidebands at ``f2 ± f1`` and ``f2 ± 2f1`` as a
-        stem-style spectrum in dB relative to the carrier, the modulation
-        counterpart of :meth:`HarmonicDistortionResult.plot`.
+        Draws the output amplitude at ``f2`` (the 0 dB reference) and the
+        four intermodulation sidebands at :math:`f_2 \pm f_1` and
+        :math:`f_2 \pm 2f_1` as a stem-style spectrum in dB relative to
+        the carrier, the modulation counterpart of
+        :meth:`HarmonicDistortionResult.plot`.
 
         :param ax: Existing axes, or ``None`` to create a figure.
         :param language: Label language, ``"en"`` (default) or ``"es"``.
@@ -656,20 +674,24 @@ def modulation_distortion(
     *,
     window: str = "hann",
 ) -> ModulationDistortionResult:
-    """Modulation distortion of the nth order (IEC 60268-3 14.12.7).
+    r"""Modulation distortion of the nth order (IEC 60268-3 14.12.7).
 
-    A low-frequency tone ``f1 = f_low`` (large) and a high-frequency tone
-    ``f2 = f_high`` (small, amplitude ratio preferably 4:1) are applied; the
-    nth-order distortion shows up as modulation sidebands at
-    ``f2 ± (n−1)·f1``. Per 14.12.7.2 g)-h) the per-order values use the
-    *arithmetic* sum of the two sideband amplitudes, referenced to the output
-    voltage at ``f2``:
+    A low-frequency tone :math:`f_1` (``f_low``, large) and a
+    high-frequency tone :math:`f_2` (``f_high``; small, amplitude ratio
+    preferably 4:1) are applied; the nth-order distortion shows up as
+    modulation sidebands at :math:`f_2 \pm (n-1) f_1`. Per 14.12.7.2
+    g)-h) the per-order values use the *arithmetic* sum of the two
+    sideband amplitudes, referenced to the output voltage at ``f2``:
 
-    ``d_m,2 = (a_{f2+f1} + a_{f2−f1}) / a_{f2}`` and
-    ``d_m,3 = (a_{f2+2f1} + a_{f2−2f1}) / a_{f2}``.
+    .. math::
 
-    (The alternative presentation ``d'_m,n = 5·d_m,n`` references the 4:1
-    reference output voltage ``U_2,ref = 5·U_2,f2`` instead.) The combined
+       d_{m,2} = (a_{f_2+f_1} + a_{f_2-f_1}) / a_{f_2}
+
+       d_{m,3} = (a_{f_2+2f_1} + a_{f_2-2f_1}) / a_{f_2}
+
+    (The alternative presentation :math:`d'_{m,n} = 5 d_{m,n}` references
+    the 4:1 reference output voltage
+    :math:`U_{2,\mathrm{ref}} = 5 U_{2,f_2}` instead.) The combined
     root-sum-square that SMPTE-type analyzers report is returned alongside
     as ``smpte``.
 
@@ -732,15 +754,19 @@ def difference_frequency_distortion(
     order: int = 2,
     window: str = "hann",
 ) -> float:
-    """Difference-frequency distortion of the nth order (IEC 60268-3 14.12.8).
+    r"""Difference-frequency distortion of the nth order (IEC 60268-3
+    14.12.8).
 
-    Two equal-amplitude tones ``f1 < f2`` are applied. Per 14.12.8.1 the
-    reference voltage is ``U_2,ref = 2·U_2,f2`` -- realised here as the sum of
-    both measured tone amplitudes, identical for the standard equal-amplitude
-    tones -- and
+    Two equal-amplitude tones :math:`f_1 < f_2` are applied. Per 14.12.8.1
+    the reference voltage is :math:`U_{2,\mathrm{ref}} = 2 U_{2,f_2}` --
+    realised here as the sum of both measured tone amplitudes, identical
+    for the standard equal-amplitude tones -- and
 
-    ``d_d,2 = a_{f2−f1} / (a_{f1} + a_{f2})``,
-    ``d_d,3 = (a_{2f2−f1} + a_{2f1−f2}) / (a_{f1} + a_{f2})``
+    .. math::
+
+       d_{d,2} = a_{f_2-f_1} / (a_{f_1} + a_{f_2})
+
+       d_{d,3} = (a_{2f_2-f_1} + a_{2f_1-f_2}) / (a_{f_1} + a_{f_2})
 
     with the third order an *arithmetic* sum of the two products. Products
     that fall outside (0, Nyquist) or that cannot be separated from a primary
@@ -786,23 +812,29 @@ def total_difference_frequency_distortion(
     *,
     window: str = "hann",
 ) -> float:
-    """Total difference-frequency distortion (IEC 60268-3 14.12.10).
+    r"""Total difference-frequency distortion (IEC 60268-3 14.12.10).
 
-    A specific two-tone test with ``f1 = 2·f0`` and ``f2 = 3·f0 − δ`` (the
-    standard values, kept as defaults, are ``f1 = 8 kHz``, ``f2 = 11,95 kHz``,
-    so ``f0 = 4 kHz`` and ``δ = 50 Hz``). Only the two in-band products at
-    ``f0 ∓ δ`` enter -- the second-order product at ``f2 − f1`` and the
-    third-order product at ``2·f1 − f2`` -- combined in RMS over the
-    arithmetic sum of the two tone output amplitudes (14.12.10.2 g):
+    A specific two-tone test with :math:`f_1 = 2 f_0` and
+    :math:`f_2 = 3 f_0 - \delta` (the standard values, kept as defaults,
+    are :math:`f_1 = 8` kHz, :math:`f_2 = 11.95` kHz, so
+    :math:`f_0 = 4` kHz and :math:`\delta = 50` Hz). Only the two in-band
+    products at :math:`f_0 \mp \delta` enter -- the second-order product
+    at :math:`f_2 - f_1` and the third-order product at
+    :math:`2 f_1 - f_2` -- combined in RMS over the arithmetic sum of the
+    two tone output amplitudes (14.12.10.2 g):
 
-    ``d_TDFD = √(a²_{f2−f1} + a²_{2f1−f2}) / (a_{f1} + a_{f2})``.
+    .. math::
 
-    (The out-of-band product at ``2·f2 − f1`` is explicitly not part of it.)
+       d_{\mathrm{TDFD}} =
+       \sqrt{a_{f_2-f_1}^2 + a_{2f_1-f_2}^2} / (a_{f_1} + a_{f_2})
+
+    (The out-of-band product at :math:`2 f_2 - f_1` is explicitly not
+    part of it.)
 
     :param signal: Captured signal (1-D).
     :param fs: Sample rate, in Hz.
     :param f1: Lower tone, in Hz (default 8 kHz, per 14.12.10.2 b).
-    :param f2: Upper tone, in Hz (default 11,95 kHz, per 14.12.10.2 b).
+    :param f2: Upper tone, in Hz (default 11.95 kHz, per 14.12.10.2 b).
     :param window: FFT window (default ``'hann'``).
     :return: Total difference-frequency distortion, as a ratio.
     :raises ValueError: If the inputs are invalid.
@@ -842,7 +874,9 @@ _DIM_SEARCH_FACTOR = 0.1
 
 
 def _dim_components(f_sine: float, f_square: float, nyquist: float) -> list[float]:
-    """DIM difference products ``|k·f_square − f_sine|`` below ``f_sine`` (Table 2)."""
+    r"""DIM difference products
+    :math:`\lvert k \, f_\mathrm{square} - f_\mathrm{sine} \rvert`
+    below ``f_sine`` (Table 2)."""
     products: set[float] = set()
     for k in range(1, _DIM_MAX_ORDER + 1):
         for sign in (-1.0, 1.0):
@@ -860,12 +894,13 @@ def dynamic_intermodulation_distortion(
     f_square: float = 3150.0,
     window: str = "hann",
 ) -> float:
-    """Dynamic intermodulation distortion DIM (IEC 60268-3 14.12.9).
+    r"""Dynamic intermodulation distortion DIM (IEC 60268-3 14.12.9).
 
     From the standard test signal -- a ``f_sine`` = 15 kHz sine plus a
-    low-pass-filtered ``f_square`` = 3.15 kHz square wave in a 1:4 peak ratio --
-    the DIM is the RMS of the intermodulation products ``|k·f_square ± f_sine|``
-    that fall below ``f_sine`` (IEC 60268-3 Table 2), relative to the 15 kHz
+    low-pass-filtered ``f_square`` = 3.15 kHz square wave in a 1:4 peak
+    ratio -- the DIM is the RMS of the intermodulation products
+    :math:`\lvert k \, f_\mathrm{square} \pm f_\mathrm{sine} \rvert` that
+    fall below ``f_sine`` (IEC 60268-3 Table 2), relative to the 15 kHz
     sine amplitude.
 
     :param signal: Captured signal (1-D).
@@ -906,9 +941,11 @@ def dynamic_intermodulation_distortion(
 class HarmonicDistortionResult:
     """Harmonic analysis of a signal (IEC 60268-3 / AES17).
 
-    :ivar fundamental: Fundamental frequency ``f₁``, in Hz.
-    :ivar harmonic_frequencies: Harmonic frequencies ``n·f₁`` present, in Hz.
-    :ivar harmonic_amplitudes: Peak amplitudes ``aₙ`` of the harmonics.
+    :ivar fundamental: Fundamental frequency :math:`f_1`, in Hz.
+    :ivar harmonic_frequencies: Harmonic frequencies :math:`n f_1`
+        present, in Hz.
+    :ivar harmonic_amplitudes: Peak amplitudes :math:`a_n` of the
+        harmonics.
     :ivar thd_f: Total harmonic distortion relative to the fundamental.
     :ivar thd_r: Total harmonic distortion relative to the total RMS.
     :ivar thd_plus_noise: THD+N ratio (AES17).
@@ -1053,7 +1090,7 @@ def dynamic_range(
     full_scale: float = 1.0,
     window: str = "hann",
 ) -> float:
-    """Dynamic range of an audio device (AES17-2015 6.4.1), in dB CCIR-RMS.
+    r"""Dynamic range of an audio device (AES17-2015 6.4.1), in dB CCIR-RMS.
 
     The device is driven with a 997 Hz sine 60 dB below full scale; the
     captured output has its fundamental removed by the standard notch filter
@@ -1062,7 +1099,11 @@ def dynamic_range(
     is the ratio of the maximum output level (a full-scale sine, 6.2.6) to
     that weighted residual level:
 
-    ``DR = 20 lg( (full_scale / sqrt(2)) / V_residual,CCIR-RMS )``.
+    .. math::
+
+       \mathrm{DR} = 20 \lg\left(
+       (\text{full\_scale} / \sqrt{2}) / V_\text{residual,CCIR-RMS}
+       \right)
 
     It includes all harmonic, inharmonic and noise components and is also
     known as the signal-to-noise ratio (6.4.1 note).
@@ -1106,14 +1147,18 @@ def idle_channel_noise(
     bandwidth: float | None = _AES17_BANDWIDTH_HZ,
     full_scale: float = 1.0,
 ) -> float:
-    """Idle channel noise level (AES17-2015 6.4.2), in dBFS CCIR-RMS.
+    r"""Idle channel noise level (AES17-2015 6.4.2), in dBFS CCIR-RMS.
 
     The weighted output of the device when driven with no signal (a
     short-circuited analogue input or digital zero at the input). The captured
     idle output is weighted by the CCIR-RMS filter (5.2.7) over the AES17
     measurement band and reported relative to full scale:
 
-    ``L_idle = 20 lg( V_idle,CCIR-RMS / (full_scale / sqrt(2)) )``.
+    .. math::
+
+       L_\text{idle} = 20 \lg\left(
+       V_\text{idle,CCIR-RMS} / (\text{full\_scale} / \sqrt{2})
+       \right)
 
     :param signal: Captured idle output of the device under test (1-D), scaled
         so that ``full_scale`` is the digital full-scale peak amplitude.

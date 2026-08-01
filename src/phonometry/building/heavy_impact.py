@@ -1,5 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""
+r"""
 Heavy and soft impact sources: rubber ball and bang machine
 (ISO 16283-2:2020 Annex A, ISO 10140-5:2010 Annex F, JIS A 1418-2:2019,
 ISO 717-2:2020 Annex D).
@@ -17,11 +17,16 @@ time-weighted) sound pressure level rather than by an energy average.
 
 **Impact force exposure level (ISO 16283-2 Formula (A.1) = JIS A 1418-2
 Formula (1)).** A heavy source is specified not by its geometry but by the
-octave-band energy of its force pulse::
+octave-band energy of its force pulse:
 
-    LFE = 10 lg[ (1/Tref) integral_t1^t2 F(t)**2 / F0**2 dt ]   dB re 1 N
+.. math::
 
-with ``F0 = 1 N``, ``Tref = 1 s`` and ``t2 - t1`` the duration of the impact
+   L_{FE} = 10 \lg\!\left[ \frac{1}{T_{\text{ref}}}
+   \int_{t_1}^{t_2} \frac{F(t)^{2}}{F_0^{2}} \,dt \right]
+   \qquad \text{dB re 1 N}
+
+with :math:`F_0 = 1` N, :math:`T_{\text{ref}} = 1` s and
+:math:`t_2 - t_1` the duration of the impact
 force. The specification is stated **per octave band**, so the force record is
 band-filtered before the integral (JIS A 1418-2:2019 Annex C puts the filter
 between the force transducer and the analyser).
@@ -49,28 +54,38 @@ Octave (Hz)  Rubber ball LFE (dB)  Bang machine LFE (dB)
 **Standardized maximum impact sound pressure level (ISO 16283-2 Formulae (4),
 (5) and (6)).** Because the rated quantity is a *maximum* of a Fast-weighted
 level and not an energy average, the receiving room cannot be corrected with
-the usual ``10 lg(T/T0)``: the Fast detector only ever sees the first
-``1,7275 s`` worth of decay. The standard therefore uses::
+the usual :math:`10 \lg(T/T_0)`: the Fast detector only ever sees the first
+``1.7275 s`` worth of decay. The standard therefore uses:
 
-    L'i,Fmax,V,T = Li,Fmax + 10 lg(V/V0) - 10 lg[ g(C) / g(C0) ]
-    C0 = T0 / 1,7275                                            (5)
-    C  = T  / 1,7275                                            (6)
+.. math::
 
-with ``T0 = 0,5 s``, ``V0 = 50 m3`` and, writing Formula (4) in the compact
-form used here,
+   L'_{i,F\text{max},V,T} = L_{i,F\text{max}} + 10 \lg(V/V_0)
+   - 10 \lg\!\left[ \frac{g(C)}{g(C_0)} \right]
 
-    ``g(C) = (C**(1/(1-C)) - C**(-1/(1-1/C))) / (1 - 1/C)``.
+   C_0 = \frac{T_0}{1.7275} \tag{5}
+
+   C = \frac{T}{1.7275} \tag{6}
+
+with :math:`T_0 = 0.5` s, :math:`V_0 = 50` m³ and, writing Formula (4) in
+the compact form used here,
+
+.. math::
+
+   g(C) = \frac{C^{1/(1-C)} - C^{-1/(1-1/C)}}{1 - 1/C}
 
 ``g`` is the peak of the Fast-weighted response to an exponentially decaying
-burst; for ``T = T0`` the bracket collapses to 1 and the correction reduces to
-the pure volume term ``10 lg(V/V0)``, as it must. See
+burst; for :math:`T = T_0` the bracket collapses to 1 and the correction
+reduces to the pure volume term :math:`10 \lg(V/V_0)`, as it must. See
 :func:`standardized_maximum_impact_level` and
 :func:`fast_reverberation_correction`.
 
 **A-weighted rating (ISO 717-2:2020 Annex D, normative).** The single number is
-not a shifted reference curve but an A-weighted sum (Formula (D.1))::
+not a shifted reference curve but an A-weighted sum (Formula (D.1)):
 
-    XiA,Fmax = 10 lg( sum_j 10**((Xi,Fmax,j + Aj)/10) )
+.. math::
+
+   X_{iA,F\text{max}} = 10 \lg\!\left( \sum_j
+   10^{(X_{i,F\text{max},j} + A_j)/10} \right)
 
 over the one-third-octave bands 50 Hz to 630 Hz **or** the octave bands 63 Hz to
 500 Hz, with the Table D.3 A-weighting corrections, rounded half-up to an
@@ -303,9 +318,9 @@ def impact_force_exposure_level(
     reference_force: float = _FORCE_REFERENCE,
     reference_time: float = _TIME_REFERENCE,
 ) -> float:
-    """Impact force exposure level ``LFE`` of a force pulse (Formula (A.1)).
+    r"""Impact force exposure level ``LFE`` of a force pulse (Formula (A.1)).
 
-    ``LFE = 10 lg[(1/Tref) integral F(t)**2 / F0**2 dt]`` dB re 1 N
+    :math:`L_{FE} = 10 \lg[(1/T_{ref}) \int F(t)^2 / F_0^2\,dt]` dB re 1 N
     (ISO 16283-2:2020 Formula (A.1) = ISO 10140-5:2010 Formula (F.2) =
     JIS A 1418-2:2019 Formula (1)). The integral is taken over the whole
     supplied record with the trapezoidal rule, so pass one isolated impact.
@@ -421,11 +436,11 @@ def check_heavy_impact_source(
 
 
 def _fast_peak_factor(c: np.ndarray) -> np.ndarray:
-    """``g(C)``: peak of the Fast-weighted response of a decaying burst.
+    r"""``g(C)``: peak of the Fast-weighted response of a decaying burst.
 
     The bracket of ISO 16283-2:2020 Formula (4) is ``g(C)/g(C0)`` with
-    ``g(C) = (C**(1/(1-C)) - C**(-1/(1-1/C))) / (1 - 1/C)``. ``g`` has a
-    removable singularity at ``C = 1`` where its limit is ``1/e``.
+    :math:`g(C) = (C^{1/(1-C)} - C^{-1/(1-1/C)}) / (1 - 1/C)`. ``g`` has a
+    removable singularity at :math:`C = 1` where its limit is ``1/e``.
     """
     out = np.empty_like(c)
     near = np.abs(c - 1.0) <= _G_SINGULARITY
@@ -441,14 +456,17 @@ def _fast_peak_factor(c: np.ndarray) -> np.ndarray:
 def fast_reverberation_correction(
     reverberation_time: ArrayLike, *, reference_time: float = _T0
 ) -> np.ndarray:
-    """Fast time-weighting reverberation correction (Formulae (4), (5), (6)).
+    r"""Fast time-weighting reverberation correction (Formulae (4), (5), (6)).
 
-    The term ``10 lg[g(C)/g(C0)]`` subtracted in ISO 16283-2:2020 Formula (4),
-    with ``C = T/1,7275`` (Formula (6)) and ``C0 = T0/1,7275`` (Formula (5)).
-    It is the *maximum-level* counterpart of the energy-average ``10 lg(T/T0)``:
-    a Fast detector never integrates more than about 1,7 s of decay, so the
+    The term :math:`10 \lg[g(C)/g(C_0)]` subtracted in ISO 16283-2:2020
+    Formula (4),
+    with :math:`C = T/1.7275` (Formula (6)) and :math:`C_0 = T_0/1.7275`
+    (Formula (5)).
+    It is the *maximum-level* counterpart of the energy-average
+    :math:`10 \lg(T/T_0)`:
+    a Fast detector never integrates more than about 1.7 s of decay, so the
     correction saturates instead of growing without bound. It is exactly 0 dB
-    when ``T = T0``.
+    when :math:`T = T_0`.
 
     :param reverberation_time: Receiving-room reverberation time ``T`` per
         band, in seconds (> 0).
@@ -514,9 +532,9 @@ def standardized_maximum_impact_level(
     reference_time: float = _T0,
     reference_volume: float = _V0,
 ) -> StandardizedMaximumImpactResult:
-    """Standardized maximum impact level ``L'i,Fmax,V,T`` (Formulae (4)-(6)).
+    r"""Standardized maximum impact level ``L'i,Fmax,V,T`` (Formulae (4)-(6)).
 
-    ``L'i,Fmax,V,T = Li,Fmax + 10 lg(V/V0) - 10 lg[g(C)/g(C0)]``
+    :math:`L'_{i,Fmax,V,T} = L_{i,Fmax} + 10 \lg(V/V_0) - 10 \lg[g(C)/g(C_0)]`
     (ISO 16283-2:2020, definition 3.16), the field quantity used to rate a
     floor excited by the rubber ball. The reverberation term is
     :func:`fast_reverberation_correction`.
@@ -561,9 +579,13 @@ def standardized_maximum_impact_level(
 
 
 def heavy_impact_octave_levels(level: ArrayLike) -> np.ndarray:
-    """Combine one-third-octave maximum levels into octaves (Formula (20)).
+    r"""Combine one-third-octave maximum levels into octaves (Formula (20)).
 
-    ``L'i,Fmax,V,T,oct = 10 lg( sum_{n=1..3} 10**(L'i,Fmax,V,T,1/3oct,n / 10) )``
+    .. math::
+
+       L'_{i,Fmax,V,T,oct} =
+       10 \lg\left( \sum_{n=1}^{3} 10^{L'_{i,Fmax,V,T,1/3oct,n} / 10} \right)
+
     (ISO 16283-2:2020, printed p. 19). The input length must be a multiple of
     three and the bands must be in ascending order, three per octave.
 
@@ -637,9 +659,10 @@ def a_weighted_maximum_impact_level(
     *,
     band: str | None = None,
 ) -> AWeightedMaximumImpactResult:
-    """A-weighted maximum impact level ``XiA,Fmax`` (ISO 717-2:2020 Formula (D.1)).
+    r"""A-weighted maximum impact level ``XiA,Fmax`` (ISO 717-2:2020, (D.1)).
 
-    ``XiA,Fmax = 10 lg( sum_j 10**((Xi,Fmax,j + Aj)/10) )``, rounded half-up to
+    :math:`X_{iA,Fmax} = 10 \lg( \sum_j 10^{(X_{i,Fmax,j} + A_j)/10} )`,
+    rounded half-up to
     an integer, over the one-third-octave bands 50 Hz to 630 Hz (12 values) or
     the octave bands 63 Hz to 500 Hz (4 values), with the A-weighting
     corrections of Table D.3. The same formula rates ``LiA,Fmax``,

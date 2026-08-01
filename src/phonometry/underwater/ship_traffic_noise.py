@@ -131,13 +131,13 @@ def _wales_heitmeyer(f: NDArray[np.float64]) -> NDArray[np.float64]:
 
 @dataclass(frozen=True)
 class ShipTrafficSpectrum:
-    """Predicted ship source-level spectrum.
+    r"""Predicted ship source-level spectrum.
 
     :ivar frequency: Frequencies, in Hz.
     :ivar source_psd: Source pressure spectral-density level, in dB re 1 µPa²/Hz
         at 1 m (equivalent monopole).
     :ivar band_level: Decidecade-band source level, in dB re 1 µPa m
-        (``source_psd + 10·log10(0.231·f)``).
+        (``source_psd`` plus :math:`10 \log_{10}(0.231 f)`).
     :ivar model: The model used.
     :ivar vessel_class: The vessel class (JOMOPANS-ECHO only; else ``None``).
     :ivar speed_knots: Speed used, in knots (``None`` if the model ignores it).

@@ -8,12 +8,13 @@ sidebar:
 Radiation efficiency of a plate in bending (Hopkins 2007, Sound Insulation,
 Section 2.9; Leppington et al. 1982; Maidanik 1962).
 
-The **radiation efficiency** `sigma` of a vibrating plate relates the airborne
-sound power it radiates to its mean-square surface velocity:
+The **radiation efficiency** `sigma` of a vibrating plate relates the
+airborne sound power it radiates, in watts, to its mean-square surface
+velocity:
 
-```text
-P = rho0 c0 S <v**2> sigma                                  [W]
-```
+$$
+P = \rho_0 c_0 S \langle v^2 \rangle \sigma
+$$
 
 so `sigma` is exactly the radiation factor `epsilon` that
 [`phonometry.sound_power_from_vibration`](/phonometry/reference/api/power/vibration-sound-power/#sound_power_from_vibration) (ISO/TS 7849) otherwise takes as a
@@ -28,35 +29,36 @@ bending wavelength is shorter than the acoustic wavelength, so the plate
 radiates weakly; above it the bending wave is supersonic and radiates
 efficiently:
 
-```text
-fc = (c0**2 / (2 pi)) sqrt(m'' / B')
-```
+$$
+f_c = \frac{c_0^2}{2\pi} \sqrt{\frac{m''}{B'}} \tag{Eq. 2.201}
+$$
 
-with `m''` the mass per unit area (kg/m^2) and `B'` the bending stiffness
-per unit width (N.m). This is the closed form `fc = 0.55 c0**2 / (cL h)` in
-terms of the plate longitudinal wave speed `cL` and thickness `h`.
+with `m''` the mass per unit area (kg/m^2) and `B'` the bending
+stiffness per unit width (N.m). This is the closed form
+$f_c = 0.55\,c_0^2 / (c_L h)$ in terms of the plate longitudinal wave
+speed `cL` and thickness `h`.
 
 **Frequency-averaged efficiency (Hopkins 2.9.4, "method no. 1").** With
-`mu = sqrt(fc / f)` (Eq. 2.228), the perimeter `U`, area `S`, the boundary
-constant `C_BC` (1 simply supported, 2 clamped) and the baffle-orientation
-constant `C_OB` (1 plate flush in an infinite baffle, 2 baffles perpendicular
-to the edges):
+$\mu = \sqrt{f_c / f}$ (Eq. 2.228), the perimeter `U`, area `S`,
+the boundary constant $C_{BC}$ (1 simply supported, 2 clamped) and the
+baffle-orientation constant $C_{OB}$ (1 plate flush in an infinite
+baffle, 2 baffles perpendicular to the edges), the efficiency below `fc`
+is
 
-* below `fc` (Eq. 2.227):
+$$
+\sigma = \frac{U}{2\pi \mu k S \sqrt{\mu^2 - 1}} \left[ \ln\frac{\mu + 1}{\mu - 1} + \frac{2\mu}{\mu^2 - 1} \right] \left[ C_{BC} C_{OB} - \mu^{-8} \left( C_{BC} C_{OB} - 1 \right) \right] \tag{Eq. 2.227}
+$$
 
-```text
-    sigma = U / (2 pi mu k S sqrt(mu**2 - 1))
-            * [ ln((mu + 1)/(mu - 1)) + 2 mu/(mu**2 - 1) ]
-            * [ C_BC C_OB - mu**-8 (C_BC C_OB - 1) ]
+with $k = 2\pi f / c_0$ the acoustic wavenumber. Above `fc`,
+$\sigma = 1 / \sqrt{1 - \mu^2} = (1 - f_c/f)^{-0.5}$ (Eq. 2.229), so
+$\sigma \to 1$ well above coincidence. In the band that contains
+`fc`,
 
-with ``k = 2 pi f / c0`` the acoustic wavenumber;
-```
+$$
+\sigma \approx \left( 0.5 - 0.15 \frac{L_1}{L_2} \right) \sqrt{k_{fc} L_1}, \qquad k_{fc} = \frac{2\pi f_c}{c_0} \tag{Eq. 2.230}
+$$
 
-* above `fc` (Eq. 2.229): `sigma = 1 / sqrt(1 - mu**2) = (1 - fc/f)**-0.5`,
-  so `sigma -> 1` well above coincidence;
-* in the band that contains `fc` (Eq. 2.230):
-  `sigma ~= (0.5 - 0.15 L1/L2) sqrt(k fc L1)` with `k fc = 2 pi fc / c0`,
-  `L1` the smaller and `L2` the larger plate dimension.
+with `L1` the smaller and `L2` the larger plate dimension.
 
 > Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
 
@@ -73,7 +75,7 @@ coincidence_frequency(
 
 Coincidence (critical) frequency `fc` of a thin plate (Hopkins 2.201).
 
-`fc = (c0**2 / 2 pi) sqrt(m'' / B')` (identical to Bies Eq. 7.3).
+$f_c = (c_0^2 / 2\pi) \sqrt{m'' / B'}$ (identical to Bies Eq. 7.3).
 
 **Parameters**
 
@@ -153,8 +155,8 @@ expressions.
 | `length_x` | Plate dimension `Lx`, in m (> 0). |
 | `length_y` | Plate dimension `Ly`, in m (> 0). |
 | `critical_frequency` | Coincidence frequency `fc`, in hertz (> 0); see [`coincidence_frequency`](/phonometry/reference/api/vibration/radiation-efficiency/#coincidence_frequency). |
-| `boundary` | `"simply_supported"` (`C_BC = 1`) or `"clamped"` (`C_BC = 2`). |
-| `baffle` | `"infinite"` (`C_OB = 1`, plate flush in a rigid baffle) or `"perpendicular"` (`C_OB = 2`, baffles perpendicular to the edges). |
+| `boundary` | `"simply_supported"` ($C_{BC} = 1$) or `"clamped"` ($C_{BC} = 2$). |
+| `baffle` | `"infinite"` ($C_{OB} = 1$, plate flush in a rigid baffle) or `"perpendicular"` ($C_{OB} = 2$, baffles perpendicular to the edges). |
 | `speed_of_sound` | Speed of sound in air `c0` (Default: 343 m/s). |
 
 **Returns:** A [`RadiationEfficiencyResult`](/phonometry/reference/api/vibration/radiation-efficiency/#radiationefficiencyresult).
@@ -229,4 +231,4 @@ Requires matplotlib (`pip install phonometry[plot]`); returns the
 
 *property*
 
-Radiation index `10 lg(sigma)` per band, in dB.
+Radiation index $10 \lg(\sigma)$ per band, in dB.

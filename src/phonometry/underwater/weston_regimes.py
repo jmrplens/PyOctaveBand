@@ -1,5 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""
+r"""
 Weston's shallow-water propagation regimes (flux theory).
 
 A source in a shallow-water waveguide loses energy in four successive range
@@ -7,13 +7,14 @@ regimes, each with its own power law. The boundaries between them follow from
 the seabed reflectivity alone, which makes the set an inexpensive analytic
 reference for any numerical propagation model:
 
-* **spherical spreading** -- ``F = 1/r²`` (``20·lg r``), while the sound has not
-  yet felt the boundaries;
-* **cylindrical spreading** -- ``F = 2·ψc/(r·H)`` (``10·lg r``), once the energy
-  is confined to a cylinder of height ``H`` and only rays within the critical
-  angle ``ψc`` survive;
-* **mode stripping** -- ``F = (π/(η·H))^½ · r^−3/2`` (``15·lg r``), once the
-  accumulated reflection loss has eroded the steep paths;
+* **spherical spreading** -- :math:`F = 1/r^2` (:math:`20 \lg r`), while the
+  sound has not yet felt the boundaries;
+* **cylindrical spreading** -- :math:`F = 2\psi_c/(r H)` (:math:`10 \lg r`),
+  once the energy is confined to a cylinder of height ``H`` and only rays
+  within the critical angle :math:`\psi_c` survive;
+* **mode stripping** -- :math:`F = (\pi/(\eta H))^{1/2} \, r^{-3/2}`
+  (:math:`15 \lg r`), once the accumulated reflection loss has eroded the
+  steep paths;
 * **single mode** -- an exponential decay dominated by the lowest-order mode.
 
 Everything here is implemented clean-room from Ainslie, *Principles of Sonar
@@ -21,26 +22,29 @@ Performance Modelling* (Springer 2010), §9.1.1.2 (printed pp. 452-458):
 Equations (9.42) to (9.61) and the seabed properties of Table 9.1
 (:data:`WESTON_SEABEDS`). The quantity computed is Ainslie's **propagation
 factor** ``F`` (units m⁻²), reported as the propagation loss
-``PL = −10·lg F`` dB re 1 m², which equals the usual transmission loss for a
-point source in free water.
+:math:`\mathrm{PL} = -10 \lg F` dB re 1 m², which equals the usual
+transmission loss for a point source in free water.
 
 The regime formulae are energy-flux (incoherent) results: they describe the
 range-averaged field, not its modal interference. That is exactly what makes
 them a usable cross-check for :mod:`phonometry.underwater.numerical_propagation`
 -- the range average of a normal-mode or parabolic-equation field over many
 interference cycles converges on the cylindrical-spreading law, with
-``ψc = π/2`` for a totally reflecting (pressure-release) bottom.
+:math:`\psi_c = \pi/2` for a totally reflecting (pressure-release) bottom.
 
 .. note::
     Ainslie's Equation (9.57) for the mode-stripping/single-mode transition is
-    printed as ``r_MS ≈ k²·He³/(9·η)``. Carrying out the derivation the
-    accompanying text prescribes -- "equating ``θ_n`` and ``θ_eff`` with
-    ``n = 3/2``" -- with the two equations exactly as they are printed, namely
-    ``θ_eff = (π·H/(4·η·r))^½`` (Equation 9.47, with the **true** water depth
-    ``H``) and ``θ_n = n·π/(k·He)`` (Equation 9.56, with the **effective**
-    depth ``He``), gives ``r_MS = k²·He²·H/(9·π·η)`` instead. The printed form
-    is larger by ``π·He/H``. This module implements the derivation-consistent
-    value, which also keeps ``θ_eff`` defined with ``H`` everywhere it is used
+    printed as :math:`r_{\mathrm{MS}} \approx k^2 H_e^3/(9\eta)`. Carrying out
+    the derivation the accompanying text prescribes -- "equating
+    :math:`\theta_n` and :math:`\theta_{\mathrm{eff}}` with :math:`n = 3/2`"
+    -- with the two equations exactly as they are printed, namely
+    :math:`\theta_{\mathrm{eff}} = (\pi H/(4 \eta r))^{1/2}` (Equation 9.47,
+    with the **true** water depth ``H``) and :math:`\theta_n = n\pi/(k H_e)`
+    (Equation 9.56, with the **effective** depth ``He``), gives
+    :math:`r_{\mathrm{MS}} = k^2 H_e^2 H/(9\pi\eta)` instead. The printed
+    form is larger by :math:`\pi H_e/H`. This module implements the
+    derivation-consistent value, which also keeps
+    :math:`\theta_{\mathrm{eff}}` defined with ``H`` everywhere it is used
     (the composite loss below evaluates Equation 9.47 the same way), and
     records the discrepancy in ``docs/ERRATA.md``.
 """
@@ -65,14 +69,17 @@ WESTON_REGIMES = ("spherical", "cylindrical", "mode-stripping", "single-mode")
 
 @dataclass(frozen=True)
 class WestonSeabed:
-    """Characteristic seabed properties (Ainslie Table 9.1, printed p. 454).
+    r"""Characteristic seabed properties (Ainslie Table 9.1, printed p. 454).
 
     :ivar name: Sediment name.
     :ivar grain_size: Grain size ``Mz`` (phi units).
-    :ivar sound_speed_ratio: ``c_sed/c_w``.
-    :ivar density_ratio: ``ρ_sed/ρ_w``.
-    :ivar attenuation_db_per_wavelength: ``β_sed``, in dB per wavelength.
-    :ivar loss_parameter: ``ε = β_sed/(40·π·lg e)`` (Equation 9.23).
+    :ivar sound_speed_ratio: :math:`c_{\mathrm{sed}}/c_w`.
+    :ivar density_ratio: :math:`\rho_{\mathrm{sed}}/\rho_w`.
+    :ivar attenuation_db_per_wavelength: :math:`\beta_{\mathrm{sed}}`, in dB
+        per wavelength.
+    :ivar loss_parameter:
+        :math:`\varepsilon = \beta_{\mathrm{sed}}/(40 \pi \lg e)`
+        (Equation 9.23).
     :ivar sound_speed_gradient: ``c'``, the sediment sound-speed gradient, in
         s⁻¹ (0 for sand, 1 for mud).
     """
@@ -123,14 +130,16 @@ def _seabed(seabed: str | WestonSeabed) -> WestonSeabed:
 
 
 def critical_grazing_angle(sound_speed_ratio: float) -> float:
-    """Critical grazing angle ``ψc = arccos(c_w/c_sed)``, in radians.
+    r"""Critical grazing angle
+    :math:`\psi_c = \arccos(c_w/c_{\mathrm{sed}})`, in radians.
 
-    A seabed slower than the water (``c_sed ≤ c_w``, e.g. mud) has **no**
-    critical angle; the function then returns ``0``, which correctly switches
-    the reflection-loss gradient to the refracting-sediment branch of
-    :func:`reflection_loss_gradient`.
+    A seabed slower than the water (:math:`c_{\mathrm{sed}} \le c_w`, e.g.
+    mud) has **no** critical angle; the function then returns ``0``, which
+    correctly switches the reflection-loss gradient to the
+    refracting-sediment branch of :func:`reflection_loss_gradient`.
 
-    :param sound_speed_ratio: ``c_sed/c_w``, dimensionless and positive.
+    :param sound_speed_ratio: :math:`c_{\mathrm{sed}}/c_w`, dimensionless and
+        positive.
     :return: The critical grazing angle, in radians (``0`` if none exists).
     :raises ValueError: If the ratio is not positive and finite.
     """
@@ -141,10 +150,13 @@ def critical_grazing_angle(sound_speed_ratio: float) -> float:
 
 
 def loss_parameter(attenuation_db_per_wavelength: float) -> float:
-    """Sediment loss parameter ``ε = β_sed/(40·π·lg e)`` (Ainslie Eq. 9.23).
+    r"""Sediment loss parameter
+    :math:`\varepsilon = \beta_{\mathrm{sed}}/(40 \pi \lg e)`
+    (Ainslie Eq. 9.23).
 
-    :param attenuation_db_per_wavelength: ``β_sed``, in dB per wavelength.
-    :return: The dimensionless loss parameter ``ε``.
+    :param attenuation_db_per_wavelength: :math:`\beta_{\mathrm{sed}}`, in dB
+        per wavelength.
+    :return: The dimensionless loss parameter :math:`\varepsilon`.
     :raises ValueError: If the attenuation is negative or non-finite.
     """
     beta = float(attenuation_db_per_wavelength)
@@ -156,20 +168,23 @@ def loss_parameter(attenuation_db_per_wavelength: float) -> float:
 def reflection_loss_gradient(
     seabed: str | WestonSeabed = "sand", *, frequency_hz: float | None = None
 ) -> float:
-    """Reflection loss gradient ``η``, in nepers per radian.
+    r"""Reflection loss gradient :math:`\eta`, in nepers per radian.
 
     The rate at which the seabed reflection loss grows with grazing angle,
-    ``|R(θ)| ≈ exp(−η·θ)`` (Ainslie Eq. 9.45). Two branches:
+    :math:`\lvert R(\theta) \rvert \approx \exp(-\eta \theta)` (Ainslie
+    Eq. 9.45). Two branches:
 
     * a **reflecting** seabed with a critical angle (sand, coarse silt),
-      ``η = 2·ε·(ρ_sed/ρ_w)·cos²ψc/sin³ψc`` (Eq. 9.51), frequency-independent;
+      :math:`\eta = 2 \varepsilon (\rho_{\mathrm{sed}}/\rho_w)
+      \cos^2 \psi_c / \sin^3 \psi_c` (Eq. 9.51), frequency-independent;
     * a **refracting** seabed with none (mud, clay, fine silt),
-      ``η = 2·ω·ε/c'`` (Eq. 9.53), proportional to frequency.
+      :math:`\eta = 2 \omega \varepsilon / c'` (Eq. 9.53), proportional to
+      frequency.
 
     :param seabed: ``"sand"``, ``"mud"`` or an explicit :class:`WestonSeabed`.
     :param frequency_hz: Acoustic frequency, in Hz; required only for the
-        refracting branch (``c' > 0``).
-    :return: The reflection loss gradient ``η``, in Np/rad.
+        refracting branch (:math:`c' > 0`).
+    :return: The reflection loss gradient :math:`\eta`, in Np/rad.
     :raises ValueError: If the frequency is missing or invalid for a refracting
         seabed.
     """
@@ -201,9 +216,10 @@ def effective_depth(
     seabed: str | WestonSeabed = "sand",
     sound_speed: float = 1500.0,
 ) -> float:
-    """Weston effective water depth ``He`` (Ainslie Eq. 9.55), in metres.
+    r"""Weston effective water depth ``He`` (Ainslie Eq. 9.55), in metres.
 
-    ``He = H + (ρ_sed/ρ_w)/((ω/c_w)·sin ψc)``: the depth at which a
+    :math:`H_e = H + (\rho_{\mathrm{sed}}/\rho_w) /
+    ((\omega/c_w) \sin \psi_c)`: the depth at which a
     pressure-release boundary appears to lie, a short distance below the true
     seabed. Only meaningful for a seabed with a critical angle.
 
@@ -235,9 +251,11 @@ def waveguide_cutoff_frequency(
     seabed: str | WestonSeabed = "sand",
     sound_speed: float = 1500.0,
 ) -> float:
-    """Shallow-water waveguide cut-off frequency ``fc`` (Ainslie Eq. 9.60), in Hz.
+    r"""Shallow-water waveguide cut-off frequency ``fc`` (Ainslie Eq. 9.60),
+    in Hz.
 
-    ``fc = (π − ρ_sed/ρ_w)/(2·π·sin ψc) · c_w/H`` -- below it no mode is cut on
+    :math:`f_c = (\pi - \rho_{\mathrm{sed}}/\rho_w) /
+    (2 \pi \sin \psi_c) \cdot c_w/H` -- below it no mode is cut on
     and ducted propagation does not occur.
 
     :param water_depth: Water-column depth ``H``, in metres.
@@ -263,21 +281,24 @@ def waveguide_cutoff_frequency(
 
 @dataclass(frozen=True)
 class WestonRegimeBoundaries:
-    """Range boundaries between Weston's four propagation regimes.
+    r"""Range boundaries between Weston's four propagation regimes.
 
-    :ivar spherical_to_cylindrical: Range at which ``1/r²`` and ``2ψc/(rH)``
-        are equal, ``H/(2·ψc)``, in metres.
+    :ivar spherical_to_cylindrical: Range at which :math:`1/r^2` and
+        :math:`2\psi_c/(r H)` are equal, :math:`H/(2\psi_c)`, in metres.
     :ivar cylindrical_to_mode_stripping: Ainslie Eq. (9.50)
-        ``r_CS = π·H/(4·η·ψc²)``, in metres (``inf`` for a lossless bottom).
-    :ivar mode_stripping_to_single_mode: ``r_MS = k²·He²·H/(9·π·η)``, in metres
+        :math:`r_{\mathrm{CS}} = \pi H/(4 \eta \psi_c^2)`, in metres
+        (``inf`` for a lossless bottom).
+    :ivar mode_stripping_to_single_mode:
+        :math:`r_{\mathrm{MS}} = k^2 H_e^2 H/(9 \pi \eta)`, in metres
         (``inf`` for a lossless bottom). See the module note on Eq. (9.57).
-    :ivar critical_angle: Critical grazing angle ``ψc``, in radians.
-    :ivar reflection_loss_gradient: ``η``, in Np/rad.
+    :ivar critical_angle: Critical grazing angle :math:`\psi_c`, in radians.
+    :ivar reflection_loss_gradient: :math:`\eta`, in Np/rad.
     :ivar effective_depth: Weston effective depth ``He``, in metres.
-    :ivar cutoff_frequency: Waveguide cut-off frequency, in Hz (``nan`` when the
-        seabed has no critical angle).
-    :ivar mode_count: Number of cut-on modes, ``(ω/c_w)·He·sin ψc/π``
-        (Eq. 9.58), as a real number.
+    :ivar cutoff_frequency: Waveguide cut-off frequency, in Hz (``nan`` when
+        the seabed has no critical angle).
+    :ivar mode_count: Number of cut-on modes,
+        :math:`(\omega/c_w) H_e \sin \psi_c / \pi` (Eq. 9.58), as a real
+        number.
     """
 
     spherical_to_cylindrical: float
@@ -299,24 +320,26 @@ def weston_regime_boundaries(
     critical_angle: float | None = None,
     reflection_loss_gradient_value: float | None = None,
 ) -> WestonRegimeBoundaries:
-    """Regime boundaries of a shallow-water waveguide (Ainslie §9.1.1.2).
+    r"""Regime boundaries of a shallow-water waveguide (Ainslie §9.1.1.2).
 
     :param frequency_hz: Acoustic frequency, in Hz.
     :param water_depth: Water-column depth ``H``, in metres.
     :param seabed: ``"sand"``, ``"mud"`` or a :class:`WestonSeabed`.
     :param sound_speed: Water sound speed ``c_w``, in m/s.
-    :param critical_angle: Override the seabed critical angle ``ψc``, in
-        degrees. Use ``90`` for the ideal totally reflecting waveguide.
-    :param reflection_loss_gradient_value: Override ``η``, in Np/rad. Use ``0``
-        for a lossless bottom (no mode stripping, no single-mode regime).
+    :param critical_angle: Override the seabed critical angle :math:`\psi_c`,
+        in degrees. Use ``90`` for the ideal totally reflecting waveguide.
+    :param reflection_loss_gradient_value: Override :math:`\eta`, in Np/rad.
+        Use ``0`` for a lossless bottom (no mode stripping, no single-mode
+        regime).
     :return: A :class:`WestonRegimeBoundaries`.
     :raises ValueError: If an input is invalid.
 
     .. note::
         The two overrides are independent: overriding ``critical_angle``
-        alone leaves ``η`` computed from the seabed's *own* critical angle
-        through Equation (9.51), which mixes two different bottoms. Pass both
-        together (as the ideal-waveguide case ``critical_angle=90`` with
+        alone leaves :math:`\eta` computed from the seabed's *own* critical
+        angle through Equation (9.51), which mixes two different bottoms.
+        Pass both together (as the ideal-waveguide case
+        ``critical_angle=90`` with
         ``reflection_loss_gradient_value=0`` does) whenever the intent is a
         hypothetical seabed rather than a tweak of the tabulated one.
     """
@@ -365,7 +388,7 @@ def _angle_and_gradient(
     critical_angle: float | None,
     gradient: float | None,
 ) -> tuple[float, float]:
-    """Resolve ``(ψc, η)`` from the seabed and the optional overrides."""
+    r"""Resolve :math:`(\psi_c, \eta)` from the seabed and the overrides."""
     if critical_angle is None:
         psi_c = critical_grazing_angle(bed.sound_speed_ratio)
         if psi_c <= 0.0:
@@ -389,15 +412,16 @@ def _angle_and_gradient(
 
 @dataclass(frozen=True)
 class WestonPropagationResult:
-    """Weston regime propagation loss versus range.
+    r"""Weston regime propagation loss versus range.
 
     :ivar range_m: Ranges from the source, in metres.
-    :ivar propagation_loss: Composite propagation loss ``PL = −10·lg F`` per
-        range, in dB re 1 m².
+    :ivar propagation_loss: Composite propagation loss
+        :math:`\mathrm{PL} = -10 \lg F` per range, in dB re 1 m².
     :ivar propagation_factor: The composite propagation factor ``F``, in m⁻².
     :ivar regime: The active regime label at each range (one of
         :data:`WESTON_REGIMES`).
-    :ivar spherical: Spherical-spreading loss ``20·lg r`` at every range, in dB.
+    :ivar spherical: Spherical-spreading loss :math:`20 \lg r` at every
+        range, in dB.
     :ivar cylindrical: Cylindrical-spreading loss (Eq. 9.42) at every range, dB.
     :ivar mode_stripping: Mode-stripping loss (Eq. 9.49) at every range, dB
         (``nan`` when the bottom is lossless: without reflection loss there is
@@ -438,7 +462,7 @@ class WestonPropagationResult:
 
 
 def _to_db(factor: NDArray[np.float64]) -> NDArray[np.float64]:
-    """Propagation loss ``−10·lg F``, with a non-positive factor mapped to ``nan``."""
+    r"""Loss :math:`-10 \lg F`; a non-positive factor maps to ``nan``."""
     with np.errstate(divide="ignore"):
         return np.asarray(-10.0 * np.log10(np.where(factor > 0.0, factor, np.nan)),
                           dtype=np.float64)
@@ -456,7 +480,7 @@ def weston_propagation_loss(
     critical_angle: float | None = None,
     reflection_loss_gradient_value: float | None = None,
 ) -> WestonPropagationResult:
-    """Propagation loss across Weston's four shallow-water regimes.
+    r"""Propagation loss across Weston's four shallow-water regimes.
 
     Assembles the piecewise loss from Ainslie's Equations (9.42), (9.49) and
     (9.54), switching regime at the boundaries of
@@ -472,10 +496,11 @@ def weston_propagation_loss(
     :param source_depth: Source depth ``z0``, in metres; defaults to ``H/2``
         (used only by the single-mode formula).
     :param receiver_depth: Receiver depth ``z``, in metres; defaults to ``H/2``.
-    :param critical_angle: Override ``ψc``, in degrees (``90`` for an ideal
-        totally reflecting waveguide).
-    :param reflection_loss_gradient_value: Override ``η``, in Np/rad (``0`` for
-        a lossless bottom: no mode stripping, no single-mode regime).
+    :param critical_angle: Override :math:`\psi_c`, in degrees (``90`` for an
+        ideal totally reflecting waveguide).
+    :param reflection_loss_gradient_value: Override :math:`\eta`, in Np/rad
+        (``0`` for a lossless bottom: no mode stripping, no single-mode
+        regime).
     :return: A :class:`WestonPropagationResult`.
     :raises ValueError: If an input is invalid.
     """

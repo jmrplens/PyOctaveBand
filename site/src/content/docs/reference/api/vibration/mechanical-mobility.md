@@ -8,7 +8,8 @@ sidebar:
 Mechanical mobility and the frequency-response-function family (ISO 7626-1:2011).
 
 Mechanical **mobility** is the complex ratio of a velocity response to the
-excitation force that produces it, `Y_ij = v_i / F_j` (ISO 7626-1, 3.1.2). It is
+excitation force that produces it, $Y_{ij} = v_i / F_j$ (ISO 7626-1,
+3.1.2). It is
 one of a family of motion-per-force frequency-response functions (FRFs); which
 member is used depends only on whether the motion is expressed as displacement,
 velocity or acceleration, and each has a force-per-motion reciprocal
@@ -23,37 +24,52 @@ velocity         mobility `Y`         m/(N.s)        impedance          (N.s/m)
 acceleration     accelerance `A`      1/kg           apparent mass      (kg)
 ===============  =====================  ===========  =========================
 
-For a harmonic motion `x e^{j omega t}` the velocity is `j omega x` and the
-acceleration `-omega**2 x`, so every FRF follows from the receptance `H`:
+For a harmonic motion $x e^{j \omega t}$ the velocity is
+$j \omega x$ and the acceleration $-\omega^2 x$, so every FRF
+follows from the receptance `H`:
 
-```text
-Y = j omega H          A = -omega**2 H
-Z (impedance)      = 1 / Y
-M (apparent mass)  = 1 / A     (Table 1 name: "effective mass")
-K (dyn. stiffness) = 1 / H
-```
+$$
+Y = j \omega H \qquad A = -\omega^2 H
+$$
+
+$$
+Z~\text{(impedance)} = \frac{1}{Y}
+$$
+
+$$
+M~\text{(apparent mass)} = \frac{1}{A} \quad \text{(Table 1 name: "effective mass")}
+$$
+
+$$
+K~\text{(dyn. stiffness)} = \frac{1}{H}
+$$
 
 These element-wise reciprocals are the **free** quantities of ISO 7626-1,
 3.1.4; the *blocked* matrix quantities of Table 1 do not invert element-wise
-(`Z_ij != 1/Y_ij` for multi-coordinate systems); see [`convert_frf`](/phonometry/reference/api/vibration/mechanical-mobility/#convert_frf).
+($Z_{ij} \ne 1/Y_{ij}$ for multi-coordinate systems); see
+[`convert_frf`](/phonometry/reference/api/vibration/mechanical-mobility/#convert_frf).
 
 [`convert_frf`](/phonometry/reference/api/vibration/mechanical-mobility/#convert_frf) moves between any two of the six FRFs through the receptance
 pivot. A **driving-point** FRF has the response and force at the same point
-(`i = j`); a **transfer** FRF has them at different points.
+($i = j$); a **transfer** FRF has them at different points.
 
 The canonical closed-form reference is the single-degree-of-freedom resonator
 of mass `m`, viscous damping `c` and stiffness `k`, whose receptance is
-`H(omega) = 1 / (k - omega**2 m + j omega c)` (consistent with the ISO 7626-1
-Table 1 / 3.1.2 definitions). At its resonance `omega0 = sqrt(k/m)` the
-driving-point mobility is purely real and equal to `1/c` -- the mobility peak
+$H(\omega) = 1 / (k - \omega^2 m + j \omega c)$ (consistent with the
+ISO 7626-1
+Table 1 / 3.1.2 definitions). At its resonance $\omega_0 = \sqrt{k/m}$
+the driving-point mobility is purely real and equal to $1/c$ -- the
+mobility peak
 measures the damping. This module is the FRF backbone for the structure-borne
 source and transmission standards (ISO 9611, ISO 10846, EN 15657, EN 12354-5).
 
 **Measured FRFs (ISO 7626-2:2015).** The single-point measurement side is
 covered by the library's spectral estimators: processing of random-excitation
-records per ISO 7626-2, 8.1.3 -- the H1 estimator `H = G(response, force) /
-G(force, force)` -- and the ordinary coherence `gamma**2 = |Gxy|**2 /
-(Gxx Gyy)` used for its data-quality checks are
+records per ISO 7626-2, 8.1.3 -- the H1 estimator
+$H = G(\text{response},\text{force}) / G(\text{force},\text{force})$
+-- and the ordinary coherence
+$\gamma^2 = |G_{xy}|^2 / (G_{xx} G_{yy})$
+used for its data-quality checks are
 [`phonometry.electroacoustics.frequency_response.transfer_function`](/phonometry/reference/api/electroacoustics/frequency-response/#transfer_function) (with
 `estimator="H1"`, the default) and
 [`phonometry.electroacoustics.frequency_response.coherence`](/phonometry/reference/api/electroacoustics/frequency-response/#coherence); both are
@@ -83,7 +99,8 @@ the motion-per-force FRFs: the **free** quantities of ISO 7626-1,
 3.1.4 (all other response coordinates unconstrained). They coincide
 with the **blocked** matrix quantities of Table 1 only for a scalar
 (single-coordinate) system: blocked matrices do not invert
-element-wise, `Z_ij != 1/Y_ij` in general. For driving-point or
+element-wise, $Z_{ij} \ne 1/Y_{ij}$ in general. For
+driving-point or
 single-path use (e.g. the ISO 10846-1 Table A.2 relations) the free
 forms are exactly what is needed; for multi-coordinate blocked
 quantities invert the full FRF matrix instead. ISO 7626-1 Table 1
@@ -223,7 +240,7 @@ Convert the mobility to another FRF kind (see [`convert_frf`](/phonometry/refere
 The force-per-motion kinds are element-wise reciprocals, i.e. the
 *free* quantities of ISO 7626-1, 3.1.4: on a transfer FRF
 (`driving_point=False`), `to("impedance")` returns the free
-impedance `1/Y_ij`, not the blocked matrix impedance of Table 1
+impedance $1/Y_{ij}$, not the blocked matrix impedance of Table 1
 (which does not invert element-wise).
 
 ## random_error_percent
@@ -234,19 +251,21 @@ random_error_percent(coherence: ArrayLike, n_averages: int) -> np.ndarray
 
 Normalized random error of an averaged FRF magnitude (ISO 7626-2 Annex A).
 
-`eps = sqrt((1 - gamma**2) / (2 n gamma**2))`, the normalized random
+$\epsilon = \sqrt{(1 - \gamma^2) / (2 n \gamma^2)}$, the normalized
+random
 error of the frequency-response-function magnitude estimated from `n`
-averaged spectra with ordinary coherence `gamma**2` (the relation behind
+averaged spectra with ordinary coherence $\gamma^2$ (the relation
+behind
 Figure A.2, from Bendat & Piersol). ISO 7626-2, 8.1.3 requires enough
 averages that the error at each resonance of a driving-point mobility is
-below 5 %: e.g. `gamma**2 = 0.8` needs about `n = 75` spectra
-(`eps = 4.08 %`), the Annex A example.
+below 5 %: e.g. $\gamma^2 = 0.8$ needs about $n = 75$ spectra
+($\epsilon = 4.08$ %), the Annex A example.
 
 **Parameters**
 
 | Name | Description |
 | :--- | :--- |
-| `coherence` | Ordinary coherence `gamma**2` per frequency, in (0, 1]. |
+| `coherence` | Ordinary coherence $\gamma^2$ per frequency, in (0, 1]. |
 | `n_averages` | Number of averaged spectra `n` (>= 1). |
 
 **Returns:** The normalized random error, in percent (same shape as input).
@@ -263,7 +282,8 @@ below 5 %: e.g. `gamma**2 = 0.8` needs about `n = 75` spectra
 resonance_frequency(mass: float, stiffness: float) -> float
 ```
 
-Undamped natural frequency `f0 = (1/2pi) sqrt(k/m)` of the SDOF, in Hz.
+Undamped natural frequency $f_0 = (1/2\pi) \sqrt{k/m}$ of the
+SDOF, in Hz.
 
 **Parameters**
 
@@ -291,8 +311,10 @@ Check an operational calibration on a rigid mass (ISO 7626-2, 7.5.2).
 
 The measured frequency response of a freely suspended rigid calibration
 block of known mass `m` shall agree within +/- 5 % with its known correct
-value: the accelerance magnitude `|A| = 1/m` or the mobility magnitude
-`|Y| = 1/(2 pi f m)`. All components of the measurement chain (including
+value: the accelerance magnitude $\lvert A \rvert = 1/m$ or the
+mobility magnitude
+$\lvert Y \rvert = 1/(2 \pi f m)$. All components of the
+measurement chain (including
 the attachment hardware) are connected as in the test series, so a failure
 flags transducer, chain or attachment-compliance errors.
 
@@ -303,7 +325,7 @@ flags transducer, chain or attachment-compliance errors.
 | `frf` | Measured calibration FRF (complex or magnitude, scalar or array), in 1/kg (accelerance) or m/(N.s) (mobility). |
 | `frequencies` | Frequencies of *frf*, in hertz (> 0, same shape). |
 | `mass` | Known mass `m` of the calibration block, in kg (> 0). |
-| `quantity` | `"accelerance"` (`\|A\| = 1/m`) or `"mobility"` (`\|Y\| = 1/(omega m)`). (Default: `"accelerance"`.) |
+| `quantity` | `"accelerance"` ($\lvert A \rvert = 1/m$) or `"mobility"` ($\lvert Y \rvert = 1/(\omega m)$). (Default: `"accelerance"`.) |
 | `tolerance` | Relative tolerance (Default: 0.05, the +/- 5 % of 7.5.2). |
 
 **Returns:** A [`RigidMassCalibrationResult`](/phonometry/reference/api/vibration/mechanical-mobility/#rigidmasscalibrationresult) with per-band pass flags.
@@ -338,7 +360,7 @@ Operational rigid-mass calibration check (ISO 7626-2:2015, 7.5.2).
 | :--- | :--- |
 | `frequencies` | Frequencies of the calibration FRF, in hertz. |
 | `measured` | Measured FRF magnitude per frequency (`1/kg` for accelerance, `m/(N.s)` for mobility). |
-| `expected` | Known correct magnitude of the rigid calibration block per frequency: `1/m` (accelerance) or `1/(2 pi f m)` (mobility). |
+| `expected` | Known correct magnitude of the rigid calibration block per frequency: $1/m$ (accelerance) or $1/(2 \pi f m)$ (mobility). |
 | `deviation` | Relative deviation `measured/expected - 1` per frequency. |
 | `within_tolerance` | Per-frequency pass flag `\|deviation\| <= tolerance`. |
 | `passed` | `True` if every frequency is within the tolerance. |
@@ -377,7 +399,7 @@ sdof_accelerance(
 ) -> np.ndarray
 ```
 
-Accelerance of a viscously damped SDOF resonator: `A = -omega**2 H`.
+Accelerance of a damped SDOF resonator: $A = -\omega^2 H$.
 
 **Parameters**
 
@@ -401,7 +423,7 @@ sdof_mobility(
 ) -> np.ndarray
 ```
 
-Mobility of a viscously damped SDOF resonator: `Y = j omega H`.
+Mobility of a viscously damped SDOF resonator: $Y = j \omega H$.
 
 **Parameters**
 
@@ -451,7 +473,7 @@ sdof_receptance(
 
 Receptance of a viscously damped SDOF resonator (closed form).
 
-`H(omega) = 1 / (k - omega**2 m + j omega c)`, the textbook
+$H(\omega) = 1 / (k - \omega^2 m + j \omega c)$, the textbook
 single-degree-of-freedom reference, expressed in the FRF taxonomy of
 ISO 7626-1 (Table 1 / 3.1.2 definitions).
 

@@ -1,24 +1,30 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""
+r"""
 The sonar equation (passive and active), in decibels.
 
 Combines the sonar performance terms -- source level ``SL``, transmission loss
 ``TL``, noise level ``NL``, directivity index ``DI``, detection threshold ``DT``,
 target strength ``TS`` and reverberation level ``RL`` -- into the signal excess
 ``SE``, the signal-to-noise ratio and the figure of merit (the maximum allowable
-transmission loss at the detection limit ``SE = 0``):
+transmission loss at the detection limit :math:`\mathrm{SE} = 0`):
 
-* :func:`passive_sonar_equation` -- ``SE = SL − TL − (NL − DI) − DT``.
+* :func:`passive_sonar_equation` --
+  :math:`\mathrm{SE} = \mathrm{SL} - \mathrm{TL} -
+  (\mathrm{NL} - \mathrm{DI}) - \mathrm{DT}`.
 * :func:`active_sonar_equation` -- monostatic, noise-limited
-  ``SE = SL − 2·TL + TS − (NL − DI) − DT`` or, when a reverberation level is
-  given, reverberation-limited ``SE = SL − 2·TL + TS − RL − DT``.
+  :math:`\mathrm{SE} = \mathrm{SL} - 2\,\mathrm{TL} + \mathrm{TS} -
+  (\mathrm{NL} - \mathrm{DI}) - \mathrm{DT}` or, when a reverberation level
+  is given, reverberation-limited
+  :math:`\mathrm{SE} = \mathrm{SL} - 2\,\mathrm{TL} + \mathrm{TS} -
+  \mathrm{RL} - \mathrm{DT}`.
 
 All quantities are in dB (levels re a plane wave of 1 µPa rms; the terms are
 spectrum levels, i.e. referred to a 1 Hz band). Source: Urick, *Principles of
 Underwater Sound*, via Etter (2003), Table 10.2.
 
 The figure of merit is the *maximum allowable transmission loss*, so inverting
-a transmission-loss law at ``TL = FOM`` gives the **detection range**, the
+a transmission-loss law at :math:`\mathrm{TL} = \mathrm{FOM}` gives the
+**detection range**, the
 range at which the detection probability is 50 %:
 
 * :func:`detection_range` inverts the closed-form loss of
@@ -59,20 +65,21 @@ def _finite_array(values: NDArray[np.float64] | list[float] | float, name: str) 
 
 @dataclass(frozen=True)
 class SonarEquationResult:
-    """Sonar-equation solution.
+    r"""Sonar-equation solution.
 
     :ivar mode: ``"passive"`` or ``"active"``.
     :ivar signal_excess: Signal excess ``SE`` per transmission loss, in dB
         (detection when ``SE >= 0``).
     :ivar snr: Signal-to-noise (or signal-to-reverberation) ratio, in dB
-        (``SE + DT``).
-    :ivar figure_of_merit: Maximum allowable (one-way) transmission loss at the
-        detection limit ``SE = 0``, in dB.
+        (:math:`\mathrm{SE} + \mathrm{DT}`).
+    :ivar figure_of_merit: Maximum allowable (one-way) transmission loss at
+        the detection limit :math:`\mathrm{SE} = 0`, in dB.
     :ivar transmission_loss: The transmission-loss values, in dB.
     :ivar source_level: Source level ``SL``, in dB.
     :ivar noise_level: Background noise level ``NL`` input, in dB. The masking
-        term is ``NL − DI``, except when ``reverberation_limited`` is true, where
-        the reverberation level ``RL`` masks instead.
+        term is :math:`\mathrm{NL} - \mathrm{DI}`, except when
+        ``reverberation_limited`` is true, where the reverberation level
+        ``RL`` masks instead.
     :ivar directivity_index: Receiver directivity index ``DI``, in dB.
     :ivar detection_threshold: Detection threshold ``DT``, in dB.
     :ivar target_strength: Target strength ``TS``, in dB (``None`` for passive).
@@ -107,7 +114,8 @@ def passive_sonar_equation(
     directivity_index: float = 0.0,
     detection_threshold: float = 0.0,
 ) -> SonarEquationResult:
-    """Passive sonar equation ``SE = SL − TL − (NL − DI) − DT``.
+    r"""Passive sonar equation :math:`\mathrm{SE} = \mathrm{SL} -
+    \mathrm{TL} - (\mathrm{NL} - \mathrm{DI}) - \mathrm{DT}`.
 
     :param source_level: Source level ``SL`` (of the target), in dB.
     :param transmission_loss: One-way transmission loss ``TL``, in dB (scalar or
@@ -152,15 +160,17 @@ def active_sonar_equation(
     detection_threshold: float = 0.0,
     reverberation_level: float | None = None,
 ) -> SonarEquationResult:
-    """Monostatic active sonar equation with a two-way transmission loss.
+    r"""Monostatic active sonar equation with a two-way transmission loss.
 
-    Noise-limited: ``SE = SL − 2·TL + TS − (NL − DI) − DT``. When
+    Noise-limited: :math:`\mathrm{SE} = \mathrm{SL} - 2\,\mathrm{TL} +
+    \mathrm{TS} - (\mathrm{NL} - \mathrm{DI}) - \mathrm{DT}`. When
     ``reverberation_level`` is given, reverberation-limited:
-    ``SE = SL − 2·TL + TS − RL − DT`` (``DI`` does not apply to reverberation).
+    :math:`\mathrm{SE} = \mathrm{SL} - 2\,\mathrm{TL} + \mathrm{TS} -
+    \mathrm{RL} - \mathrm{DT}` (``DI`` does not apply to reverberation).
 
     :param source_level: Source level ``SL``, in dB.
     :param transmission_loss: One-way transmission loss ``TL``, in dB (scalar or
-        array); the equation applies ``2·TL``.
+        array); the equation applies :math:`2\,\mathrm{TL}`.
     :param target_strength: Target strength ``TS``, in dB.
     :param noise_level: Background noise level ``NL``, in dB.
     :param directivity_index: Receiver directivity index ``DI``, in dB.
@@ -202,7 +212,7 @@ def active_sonar_equation(
 
 @dataclass(frozen=True)
 class DetectionRangeResult:
-    """Detection range obtained by inverting a transmission-loss law.
+    r"""Detection range obtained by inverting a transmission-loss law.
 
     :ivar detection_range: Range at which ``TL`` equals the figure of merit, in
         metres. ``inf`` when the loss never reaches it inside ``max_range``
@@ -212,7 +222,8 @@ class DetectionRangeResult:
     :ivar frequency: Acoustic frequency, in Hz.
     :ivar range_m: Range grid over which the loss was evaluated, in metres.
     :ivar transmission_loss: Transmission loss at each range, in dB.
-    :ivar absorption_coefficient: Absorption coefficient ``α``, in dB/km.
+    :ivar absorption_coefficient: Absorption coefficient :math:`\alpha`, in
+        dB/km.
     :ivar law: The spreading law used.
     :ivar model: The absorption model used.
     """
@@ -248,9 +259,10 @@ def detection_range(
     max_range: float = 500_000.0,
     n_points: int = 400,
 ) -> DetectionRangeResult:
-    """Range at which the closed-form transmission loss equals the figure of merit.
+    r"""Range at which the closed-form transmission loss equals the figure of
+    merit.
 
-    Solves ``TL(r) = FOM`` for the loss of
+    Solves :math:`\mathrm{TL}(r) = \mathrm{FOM}` for the loss of
     :func:`~phonometry.underwater.propagation.transmission_loss`, which is
     strictly increasing in range, so the root is unique. A **one-way** figure of
     merit works for both sonar modes: the active figure of merit returned by

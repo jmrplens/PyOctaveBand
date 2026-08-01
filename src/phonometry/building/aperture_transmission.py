@@ -1,5 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""
+r"""
 Sound transmission through slits, holes and apertures (Hopkins 2007, Sound
 Insulation, Section 4.3.10; Gomperts 1964; Wilson & Soroka 1965).
 
@@ -11,34 +11,45 @@ wall into a composite sound reduction index, the practical answer to "why do I
 never reach the catalogue ``Rw``".
 
 **Straight-edged slit (Hopkins Eq. 4.99, Gomperts).** With the acoustic
-wavenumber ``k = 2 pi f / c0``, ``K = k w`` (``w`` slit width), ``X = d / w``
-(``d`` slit depth) and the end correction ``e = (1/pi)(ln(8/K) - 0.57722)``::
+wavenumber :math:`k = 2\pi f / c_0`, :math:`K = k w` (``w`` slit width),
+:math:`X = d / w` (``d`` slit depth) and the end correction
+:math:`e = (1/\pi)(\ln(8/K) - 0.57722)`:
 
-    tau = m K cos^2(Ke)
-          / ( 2 n^2 [ sin^2(KX + 2Ke)/cos^2(Ke)
-                      + (K^2 / 2 n^2)(1 + cos(KX) cos(KX + 2Ke)) ] )
+.. math::
 
-where ``m = 8`` (diffuse field) or ``4`` (normal incidence), and ``n = 1`` (slit
-in the middle of a plate) or ``0.5`` (slit along an edge). The model assumes an
-inviscid air path; maxima in ``tau`` (dips in ``R``) occur at the resonances
-``d + 2e = z lambda/2`` (Eq. 4.101, ``z = 1, 2, 3, ...``).
+   \tau = \frac{m K \cos^2(Ke)}
+   {2 n^2 \left[ \frac{\sin^2(KX + 2Ke)}{\cos^2(Ke)}
+   + \frac{K^2}{2 n^2} \left( 1 + \cos(KX) \cos(KX + 2Ke) \right) \right]}
+
+where :math:`m = 8` (diffuse field) or ``4`` (normal incidence), and
+:math:`n = 1` (slit in the middle of a plate) or ``0.5`` (slit along an
+edge). The model assumes an inviscid air path; maxima in ``tau`` (dips in
+``R``) occur at the resonances :math:`d + 2e = z\lambda/2` (Eq. 4.101,
+:math:`z = 1, 2, 3, \ldots`).
 
 **Circular aperture (Hopkins Eq. 4.102, Wilson & Soroka).** With the piston
-radiation resistance ``R0(2ka) = 1 - 2 J1(2ka)/(2ka)`` and reactance
-``X0(2ka) = 2 H1(2ka)/(2ka)`` (``J1`` Bessel, ``H1`` Struve; radius ``a``,
-depth ``d``)::
+radiation resistance :math:`R_0(2ka) = 1 - 2 J_1(2ka)/(2ka)` and reactance
+:math:`X_0(2ka) = 2 H_1(2ka)/(2ka)` (:math:`J_1` Bessel, :math:`H_1` Struve;
+radius ``a``, depth ``d``):
 
-    tau = 4 R0 / ( 4 R0^2 [cos(kd) - X0 sin(kd)]^2
-                   + [(R0^2 - X0^2 + 1) sin(kd) + 2 X0 cos(kd)]^2 )
+.. math::
 
-**Composite (Hopkins Eq. 4.92).** For elements of area ``S_n`` and sound
-reduction index ``R_n`` the resultant is the area-weighted energy sum::
+   \tau = \frac{4 R_0}
+   {4 R_0^2 \left[ \cos(kd) - X_0 \sin(kd) \right]^2
+   + \left[ \left( R_0^2 - X_0^2 + 1 \right) \sin(kd)
+   + 2 X_0 \cos(kd) \right]^2}
 
-    R = -10 lg( (1 / sum S_n) sum S_n 10^(-R_n/10) )
+**Composite (Hopkins Eq. 4.92).** For elements of area :math:`S_n` and sound
+reduction index :math:`R_n` the resultant is the area-weighted energy sum
 
-so a bare opening (``R = 0``, ``tau = 1``) of relative area ``S_a/S`` caps the
-composite at ``10 lg(S / S_a)``. This is the same energetic combination used by
-the EN 12354-3/-4 facade model of :mod:`phonometry.building.facade_prediction`.
+.. math::
+
+   R = -10 \lg\!\left[ \frac{1}{\sum S_n} \sum S_n \, 10^{-R_n/10} \right]
+
+so a bare opening (:math:`R = 0`, :math:`\tau = 1`) of relative area
+:math:`S_a/S` caps the composite at :math:`10 \lg(S / S_a)`. This is the same
+energetic combination used by the EN 12354-3/-4 facade model of
+:mod:`phonometry.building.facade_prediction`.
 """
 
 from __future__ import annotations
@@ -75,7 +86,8 @@ __all__ = [
 
 
 def transmission_loss_from_coefficient(tau: ArrayLike) -> np.ndarray:
-    """Sound reduction index ``R = -10 lg(tau)`` from a transmission coefficient.
+    r"""Sound reduction index :math:`R = -10 \lg(\tau)` from a transmission
+    coefficient.
 
     :param tau: Transmission coefficient(s) ``tau`` (> 0). Values above 1 (a
         resonating aperture that transmits more than the incident intensity)
@@ -113,7 +125,8 @@ class ApertureTransmissionResult:
 
     @property
     def transmission_loss(self) -> np.ndarray:
-        """Aperture sound reduction index ``R = -10 lg(tau)`` per band, dB."""
+        r"""Aperture sound reduction index :math:`R = -10 \lg(\tau)` per
+        band, dB."""
         return transmission_loss_from_coefficient(self.transmission_coefficient)
 
     def plot(self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any) -> Axes:
@@ -148,7 +161,8 @@ class ApertureTransmissionResult:
 
 
 def _slit_end_correction(k_big: np.ndarray) -> np.ndarray:
-    """End correction ``e = (1/pi)(ln(8/K) - gamma)`` (Hopkins Eq. 4.100)."""
+    r"""End correction :math:`e = (1/\pi)(\ln(8/K) - \gamma)` (Hopkins
+    Eq. 4.100)."""
     return np.asarray(
         (np.log(8.0 / k_big) - _EULER_GAMMA) / np.pi, dtype=np.float64
     )
@@ -168,8 +182,10 @@ def slit_transmission_coefficient(
     :param frequency: Band centre frequencies ``f``, in hertz (array, > 0).
     :param width: Slit width ``w``, in m (> 0).
     :param depth: Slit depth ``d`` (wall thickness across the slit), in m (> 0).
-    :param field: ``"diffuse"`` (``m = 8``) or ``"normal"`` (``m = 4``).
-    :param position: ``"mid"`` (``n = 1``) or ``"edge"`` (``n = 0.5``).
+    :param field: ``"diffuse"`` (:math:`m = 8`) or ``"normal"``
+        (:math:`m = 4`).
+    :param position: ``"mid"`` (:math:`n = 1`) or ``"edge"``
+        (:math:`n = 0.5`).
     :param speed_of_sound: Speed of sound in air ``c0`` (Default: 343 m/s).
     :return: An :class:`ApertureTransmissionResult` (kind ``"slit"``).
     :raises ValueError: for a non-positive input or unknown field/position.
@@ -220,7 +236,8 @@ def slit_resonance_frequencies(
     orders: int = 3,
     speed_of_sound: float = _SPEED_OF_SOUND,
 ) -> np.ndarray:
-    """Slit resonance frequencies ``d + 2e = z lambda/2`` (Hopkins Eq. 4.101).
+    r"""Slit resonance frequencies :math:`d + 2e = z\lambda/2` (Hopkins
+    Eq. 4.101).
 
     Maxima in the transmission coefficient (dips in ``R``) occur where the
     effective slit depth is a half-wavelength multiple. Solved iteratively
@@ -232,7 +249,7 @@ def slit_resonance_frequencies(
     :param speed_of_sound: Speed of sound in air ``c0`` (Default: 343 m/s).
     :return: The resonance frequencies (Hz), one per order.
     :raises ValueError: for a non-positive input, ``orders < 1``, or a slit so
-        wide relative to its depth that the effective depth ``d + 2e`` is
+        wide relative to its depth that the effective depth :math:`d + 2e` is
         non-positive (no resonance exists; ``width`` must be much less than the
         wavelength).
     """
@@ -312,11 +329,18 @@ def circular_aperture_transmission_coefficient(
 def composite_transmission_loss(
     areas: ArrayLike, reduction_indices: ArrayLike
 ) -> np.ndarray:
-    """Composite sound reduction index of parallel elements (Hopkins Eq. 4.92).
+    r"""Composite sound reduction index of parallel elements (Hopkins
+    Eq. 4.92).
 
-    ``R = -10 lg( (1/sum S_n) sum S_n 10^(-R_n/10) )``, the area-weighted
-    energy combination of ``N`` elements (wall, window, slit, open aperture ...)
-    sharing a partition. A bare opening enters with ``R = 0`` (``tau = 1``).
+    The area-weighted energy combination of ``N`` elements (wall, window,
+    slit, open aperture ...) sharing a partition:
+
+    .. math::
+
+       R = -10 \lg\!\left[ \frac{1}{\sum S_n} \sum S_n \, 10^{-R_n/10}
+       \right]
+
+    A bare opening enters with :math:`R = 0` (:math:`\tau = 1`).
 
     :param areas: Element areas ``S_n``, in m^2 (1-D, length ``N``, all > 0).
     :param reduction_indices: Element sound reduction indices ``R_n``, in dB.

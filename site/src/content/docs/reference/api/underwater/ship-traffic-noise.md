@@ -90,7 +90,7 @@ Predicted ship source-level spectrum.
 | :--- | :--- |
 | `frequency` | Frequencies, in Hz. |
 | `source_psd` | Source pressure spectral-density level, in dB re 1 µPa²/Hz at 1 m (equivalent monopole). |
-| `band_level` | Decidecade-band source level, in dB re 1 µPa m (`source_psd + 10·log10(0.231·f)`). |
+| `band_level` | Decidecade-band source level, in dB re 1 µPa m (`source_psd` plus $10 \log_{10}(0.231 f)$). |
 | `model` | The model used. |
 | `vessel_class` | The vessel class (JOMOPANS-ECHO only; else `None`). |
 | `speed_knots` | Speed used, in knots (`None` if the model ignores it). |

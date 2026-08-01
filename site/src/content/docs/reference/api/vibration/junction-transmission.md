@@ -24,52 +24,45 @@ plate `i` of thickness `h_i`, quasi-longitudinal wave speed `cL_i`,
 surface density `rho_s,i` (kg/m^2), bending stiffness per unit width `B_i`
 and critical frequency `fc_i`:
 
-```text
-chi = kB2 / kB1 = (rho_s2 B1 / (rho_s1 B2))**0.25
-    = sqrt(h1 cL1 / (h2 cL2)) = sqrt(fc2 / fc1)                    (5.10)
+$$
+\chi = \frac{k_{B2}}{k_{B1}} = \left( \frac{\rho_{s2} B_1}{\rho_{s1} B_2} \right)^{0.25} = \sqrt{\frac{h_1 c_{L1}}{h_2 c_{L2}}} = \sqrt{\frac{f_{c2}}{f_{c1}}} \tag{5.10}
+$$
 
-psi = B2 kB2**2 / (B1 kB1**2)
-    = (h2 cL2 rho_s2) / (h1 cL1 rho_s1) = (rho_s2 fc1) / (rho_s1 fc2)  (5.11)
-```
+$$
+\psi = \frac{B_2 k_{B2}^2}{B_1 k_{B1}^2} = \frac{h_2 c_{L2} \rho_{s2}}{h_1 c_{L1} \rho_{s1}} = \frac{\rho_{s2} f_{c1}}{\rho_{s1} f_{c2}} \tag{5.11}
+$$
 
 `chi` is the ratio of bending wavenumbers (it fixes the total-internal-
-reflection cut-off `theta_co = arcsin(chi)`) and `psi` is the ratio of the
-plates' bending-moment mobilities.
+reflection cut-off $\theta_{co} = \arcsin\chi$) and `psi` is the
+ratio of the plates' bending-moment mobilities.
 
 **Transmission around a corner (Hopkins Eq. 5.12, Craik 1981/1996).** For an
-incident wave on plate 1, if `chi >= sin(theta)`:
+incident wave on plate 1, if $\chi \ge \sin\theta$,
 
-```text
-                 0.5 J1 J2 psi cos(theta) sqrt(chi**2 - sin**2(theta))
-tau12(theta) = --------------------------------------------------------
-                (J2 psi)**2 + chi**2 + J2 psi ( sqrt((1 + sin**2 theta)
-                (chi**2 + sin**2 theta)) + sqrt((1 - sin**2 theta)
-                (chi**2 - sin**2 theta)) )
-```
+$$
+\tau_{12}(\theta) = \frac{0.5\, J_1 J_2 \psi \cos\theta \sqrt{\chi^2 - \sin^2\theta}} {(J_2 \psi)^2 + \chi^2 + J_2 \psi \left[ \sqrt{(1 + \sin^2\theta)(\chi^2 + \sin^2\theta)} + \sqrt{(1 - \sin^2\theta)(\chi^2 - \sin^2\theta)} \right]}
+$$
 
-and `tau12(theta) = 0` for `chi < sin(theta)` (no propagating transmitted
-wave beyond the cut-off angle).
+and $\tau_{12}(\theta) = 0$ for $\chi < \sin\theta$ (no
+propagating transmitted wave beyond the cut-off angle).
 
 **Transmission across a straight section (Hopkins Eq. 5.13, Craik 1981/1996).**
 Only the X-junction and T-junction (1) have an in-line (straight-through)
-section. If `chi >= sin(theta)`:
+section. If $\chi \ge \sin\theta$,
 
-```text
-                      0.5 chi**2 cos**2(theta)
-tau13(theta) = -----------------------------------------  (same denominator
-                (J3 psi)**2 + chi**2 + J3 psi ( ... )       shape as 5.12)
-```
+$$
+\tau_{13}(\theta) = \frac{0.5\, \chi^2 \cos^2\theta} {(J_3 \psi)^2 + \chi^2 + J_3 \psi \left[ \sqrt{(1 + \sin^2\theta)(\chi^2 + \sin^2\theta)} + \sqrt{(1 - \sin^2\theta)(\chi^2 - \sin^2\theta)} \right]}
+$$
 
-and for `chi < sin(theta)`:
+(the same denominator shape as Eq. 5.12), and for
+$\chi < \sin\theta$,
 
-```text
-                                cos**2(theta)
-tau13(theta) = ------------------------------------------------------
-                2 + (J3 psi)**2 C**2 / chi**4
-                    + (2 J3 psi C / chi**2) sqrt(1 + sin**2 theta)
-```
+$$
+\tau_{13}(\theta) = \frac{\cos^2\theta} {2 + \dfrac{(J_3 \psi)^2 C^2}{\chi^4} + \dfrac{2 J_3 \psi C}{\chi^2} \sqrt{1 + \sin^2\theta}}
+$$
 
-with `C = sqrt(chi**2 + sin**2 theta) + sqrt(sin**2 theta - chi**2)`.
+with
+$C = \sqrt{\chi^2 + \sin^2\theta} + \sqrt{\sin^2\theta - \chi^2}$.
 
 **Junction constants.** `J1`, `J2` set the corner coefficient and `J3` the
 straight one:
@@ -89,48 +82,50 @@ for the L-junction.
 
 **In-line junction (Hopkins Eq. 5.14, Cremer et al. 1973).** Two collinear
 plates (a change of section). Only normal incidence is used; it is within 1 dB
-of the angular average when `chi >= 1`:
+of the angular average when $\chi \ge 1$:
 
-```text
-                         2 (1 + chi)(1 + psi) sqrt(chi psi)     2
-tau12 ~= tau12(0 deg) = [ ------------------------------------ ]   (5.14)
-                          chi (1 + psi)**2 + 2 psi (1 + chi**2)
-```
+$$
+\tau_{12} \approx \tau_{12}(0^\circ) = \left[ \frac{2 (1 + \chi)(1 + \psi) \sqrt{\chi \psi}} {\chi (1 + \psi)^2 + 2 \psi (1 + \chi^2)} \right]^2 \tag{5.14}
+$$
 
 **Angular average (Hopkins Eq. 5.6).** In a diffuse vibration field every angle
 of incidence is equally probable and the incident intensity carries a
-`cos(theta)` obliquity factor, so the average transmission coefficient is:
+$\cos\theta$ obliquity factor, so the average transmission coefficient
+is:
 
-```text
-tau_bar_ij = integral_0^(pi/2) tau_ij(theta) cos(theta) d(theta)   (5.6)
-```
+$$
+\bar{\tau}_{ij} = \int_0^{\pi/2} \tau_{ij}(\theta) \cos\theta \,\mathrm{d}\theta \tag{5.6}
+$$
 
-(the `cos(theta)` weight already normalises the average, since
-`integral_0^(pi/2) cos(theta) d(theta) = 1`).
+(the $\cos\theta$ weight already normalises the average, since
+$\int_0^{\pi/2} \cos\theta \,\mathrm{d}\theta = 1$).
 
 **Coupling loss factor (Hopkins Eq. 2.154).** For a source plate `i` of area
 `S_i`, bending-wave group velocity `cg_i` and junction length `L_ij`:
 
-```text
-eta_ij = cg_i L_ij tau_ij / (2 pi**2 f S_i)                        (2.154)
-```
+$$
+\eta_{ij} = \frac{c_{g,i} L_{ij} \tau_{ij}}{2 \pi^2 f S_i} \tag{2.154}
+$$
 
 **Vibration reduction index (Hopkins Eq. 5.116).** The wave-approach value of
 the EN 12354 junction descriptor, with `fc_j` the critical frequency of the
-**receiving** plate and the reference frequency `f_ref = 1000 Hz`:
+**receiving** plate and the reference frequency
+$f_{\text{ref}} = 1000$ Hz:
 
-```text
-K_ij = 10 lg(1 / tau_ij) + 5 lg(fc_j / f_ref)                      (5.116)
-```
+$$
+K_{ij} = 10 \lg\!\left( \frac{1}{\tau_{ij}} \right) + 5 \lg\!\left( \frac{f_{cj}}{f_{\text{ref}}} \right) \tag{5.116}
+$$
 
-Combined with the reciprocity relationship below (`tau_bar_12 = chi
-tau_bar_21` with `chi = sqrt(fc_2 / fc_1)`) this form is symmetric,
-`K_ij = K_ji`, as EN 12354 and ISO 10848 require of the junction descriptor.
+Combined with the reciprocity relationship below
+($\bar{\tau}_{12} = \chi \bar{\tau}_{21}$ with
+$\chi = \sqrt{f_{c2} / f_{c1}}$) this form is symmetric,
+$K_{ij} = K_{ji}$, as EN 12354 and ISO 10848 require of the junction
+descriptor.
 
-**Reciprocity (Hopkins Eq. 5.7, the SEA consistency relationship).** The angular
-averages of the two directions are linked by
-`tau_bar_ij = tau_bar_ji sqrt(h_i cL_i / (h_j cL_j)) = tau_bar_ji sqrt(fc_j /
-fc_i)`, i.e. `tau_bar_12 = chi tau_bar_21`.
+**Reciprocity (Hopkins Eq. 5.7, the SEA consistency relationship).** The
+angular averages of the two directions are linked by
+$\bar{\tau}_{ij} = \bar{\tau}_{ji} \sqrt{h_i c_{Li} / (h_j c_{Lj})} = \bar{\tau}_{ji} \sqrt{f_{cj} / f_{ci}}$,
+i.e. $\bar{\tau}_{12} = \chi \bar{\tau}_{21}$.
 
 **Two shortcuts for right-angle joints (Norton & Karczub 2003, Section
 6.6.1).** Alongside the angle-resolved wave approach above, the SEA literature
@@ -140,14 +135,15 @@ compared against:
 
 * [`right_angle_transmission_coefficient`](/phonometry/reference/api/vibration/junction-transmission/#right_angle_transmission_coefficient) (Norton Eqs. 6.53 to 6.55, after
   Bies & Hamid and Cremer et al.). The normal-incidence coefficient of two
-  plates at right angles is `tau12(0) = 2 (psi_N**0.5 + psi_N**-0.5)**-2`
-  with `psi_N = rho_1 cL1**1.5 h1**2.5 / (rho_2 cL2**1.5 h2**2.5)` (note
-  this is a *different* `psi` from Hopkins Eq. 5.11 above), and the random
-  incidence value follows from the empirical factor `2,754 X / (1 + 3,24 X)`
-  with `X = h1/h2`. Feeding it to [`coupling_loss_factor`](/phonometry/reference/api/vibration/junction-transmission/#coupling_loss_factor) reproduces
-  Norton Eq. (6.52), `eta_12 = 2 cB L tau12 / (pi omega S1)`, identically:
+  plates at right angles is
+  $\tau_{12}(0) = 2 (\psi_N^{0.5} + \psi_N^{-0.5})^{-2}$ with
+  $\psi_N = \rho_1 c_{L1}^{1.5} h_1^{2.5} / (\rho_2 c_{L2}^{1.5} h_2^{2.5})$ (note this is a *different* `psi` from
+  Hopkins Eq. 5.11 above), and the random incidence value follows from the
+  empirical factor $2.754 X / (1 + 3.24 X)$ with $X = h_1/h_2$.
+  Feeding it to [`coupling_loss_factor`](/phonometry/reference/api/vibration/junction-transmission/#coupling_loss_factor) reproduces Norton Eq. (6.52),
+  $\eta_{12} = 2 c_B L \tau_{12} / (\pi \omega S_1)$, identically:
   that equation and Hopkins Eq. (2.154) are the same expression once
-  `cg = 2 cB`.
+  $c_g = 2 c_B$.
 * [`point_connection_coupling_loss_factor`](/phonometry/reference/api/vibration/junction-transmission/#point_connection_coupling_loss_factor) (Norton Eq. 6.56, after
   Clarkson & Ranky). Plates joined at `N` discrete points (bolts, rivets,
   spot welds) rather than along a line. Use it when the bending wavelength is
@@ -170,8 +166,7 @@ angular_average_transmission_coefficient(
 
 Diffuse-field angular average of a transmission coefficient (Hopkins 5.6).
 
-`tau_bar = integral_0^(pi/2) tau(theta) cos(theta) d(theta)`, evaluated by
-adaptive quadrature.
+$\bar{\tau} = \int_0^{\pi/2} \tau(\theta) \cos\theta \,\mathrm{d}\theta$, evaluated by adaptive quadrature.
 
 **Parameters**
 
@@ -203,14 +198,14 @@ corner_transmission_coefficient(
 
 Transmission around a corner `tau12(theta)` (Hopkins Eq. 5.12).
 
-Returns `0` for angles beyond the cut-off `arcsin(chi)` (only reached
-when `chi < 1`).
+Returns `0` for angles beyond the cut-off $\arcsin(\chi)$
+(only reached when $\chi < 1$).
 
 **Parameters**
 
 | Name | Description |
 | :--- | :--- |
-| `angle` | Incidence angle `theta`, in **radians** (scalar or array, `0 <= theta <= pi/2`). |
+| `angle` | Incidence angle `theta`, in **radians** (scalar or array, $0 \le \theta \le \pi/2$). |
 | `chi` | Wave parameter `chi` (Eq. 5.10, > 0). |
 | `psi` | Wave parameter `psi` (Eq. 5.11, > 0). |
 | `junction` | `"X"`, `"T1"`, `"T2"` or `"L"`. |
@@ -237,16 +232,16 @@ coupling_loss_factor(
 
 Coupling loss factor from a transmission coefficient (Hopkins Eq. 2.154).
 
-`eta_ij = cg_i L_ij tau_ij / (2 pi**2 f S_i)` with the source-plate
-bending-wave group velocity `cg_i`, the junction length `L_ij`, the
-frequency `f` and the source-plate area `S_i`.
+$\eta_{ij} = c_{g,i} L_{ij} \tau_{ij} / (2 \pi^2 f S_i)$ with the
+source-plate bending-wave group velocity `cg_i`, the junction length
+`L_ij`, the frequency `f` and the source-plate area `S_i`.
 
 **Parameters**
 
 | Name | Description |
 | :--- | :--- |
 | `transmission_coefficient` | Angular-average `tau_ij` (scalar/array). |
-| `group_velocity` | Source-plate bending-wave group velocity `cg_i`, in m/s (> 0). For a thin plate `cg = 2 cB` with the bending phase speed `cB` (see [`phonometry.vibration.point_mobility.plate_bending_wave_speed`](/phonometry/reference/api/vibration/point-mobility/)). |
+| `group_velocity` | Source-plate bending-wave group velocity `cg_i`, in m/s (> 0). For a thin plate $c_g = 2 c_B$ with the bending phase speed `cB` (see [`phonometry.vibration.point_mobility.plate_bending_wave_speed`](/phonometry/reference/api/vibration/point-mobility/)). |
 | `junction_length` | Junction length `L_ij`, in m (> 0). |
 | `frequency` | Frequency `f`, in hertz (scalar or array, > 0). |
 | `plate_area` | Source-plate area `S_i`, in m^2 (> 0). |
@@ -267,9 +262,9 @@ inline_transmission_coefficient(chi: float, psi: float) -> float
 
 Normal-incidence transmission across an in-line junction (Hopkins 5.14).
 
-`tau12 = [2 (1 + chi)(1 + psi) sqrt(chi psi) / (chi (1 + psi)**2 +
-2 psi (1 + chi**2))]**2` (Cremer et al. 1973). For identical plates
-(`chi = psi = 1`) this is 1 (a continuous plate transmits fully).
+$\tau_{12} = [2 (1 + \chi)(1 + \psi) \sqrt{\chi \psi} / (\chi (1 + \psi)^2 + 2 \psi (1 + \chi^2))]^2$ (Cremer et al. 1973). For
+identical plates ($\chi = \psi = 1$) this is 1 (a continuous plate
+transmits fully).
 
 **Parameters**
 
@@ -307,10 +302,10 @@ Bending-wave transmission of a rigid perpendicular plate junction.
 Builds the angle-resolved corner (and, for X / T-junction (1), straight)
 transmission coefficients of Hopkins Eqs 5.12/5.13 and their diffuse-field
 angular averages (Eq. 5.6) from the two plates' properties, together with
-the thin-plate critical frequencies `fc = sqrt(12) c0**2 / (2 pi h cL)`
-(`c0 = 343 m/s`) used by the Eq. 5.116 vibration reduction index. For the
-in-line junction (normal incidence only) use
-[`inline_transmission_coefficient`](/phonometry/reference/api/vibration/junction-transmission/#inline_transmission_coefficient).
+the thin-plate critical frequencies
+$f_c = \sqrt{12}\, c_0^2 / (2\pi h c_L)$ ($c_0 = 343$ m/s)
+used by the Eq. 5.116 vibration reduction index. For the in-line junction
+(normal incidence only) use [`inline_transmission_coefficient`](/phonometry/reference/api/vibration/junction-transmission/#inline_transmission_coefficient).
 
 **Parameters**
 
@@ -348,9 +343,9 @@ junction_wave_parameters(
 
 Wave parameters `chi` and `psi` of a plate pair (Hopkins 5.10/5.11).
 
-`chi = sqrt(h1 cL1 / (h2 cL2))` (Eq. 5.10) and
-`psi = (h2 cL2 rho_s2) / (h1 cL1 rho_s1)` (Eq. 5.11), with plate 1 the
-plate carrying the incident wave.
+$\chi = \sqrt{h_1 c_{L1} / (h_2 c_{L2})}$ (Eq. 5.10) and
+$\psi = (h_2 c_{L2} \rho_{s2}) / (h_1 c_{L1} \rho_{s1})$
+(Eq. 5.11), with plate 1 the plate carrying the incident wave.
 
 **Parameters**
 
@@ -399,8 +394,8 @@ Bending-wave transmission across a rigid plate junction (Hopkins 5.2.1.3).
 | `junction` | Junction type (`"X"`, `"T1"`, `"T2"` or `"L"`). |
 | `chi` | Wave parameter `chi` (Eq. 5.10). |
 | `psi` | Wave parameter `psi` (Eq. 5.11). |
-| `critical_frequency1` | Critical frequency `fc_1` of the source plate, in hertz (thin plate, `c0 = 343 m/s`). |
-| `critical_frequency2` | Critical frequency `fc_2` of the receiving plate, in hertz (thin plate, `c0 = 343 m/s`). |
+| `critical_frequency1` | Critical frequency `fc_1` of the source plate, in hertz (thin plate, $c_0 = 343$ m/s). |
+| `critical_frequency2` | Critical frequency `fc_2` of the receiving plate, in hertz (thin plate, $c_0 = 343$ m/s). |
 | `angles_deg` | Incidence-angle grid, in degrees. |
 | `corner` | Corner transmission coefficient `tau12(theta)` on the grid. |
 | `straight` | Straight-section coefficient `tau13(theta)` on the grid, or `None` when the junction has no straight section. |
@@ -415,10 +410,11 @@ Bending-wave transmission across a rigid plate junction (Hopkins 5.2.1.3).
 
 Wave-approach `K_12` of the corner path, in dB (Hopkins Eq. 5.116).
 
-`K_12 = 10 lg(1 / tau_bar_12) + 5 lg(fc_2 / 1000)` with the receiving
+$K_{12} = 10 \lg(1 / \bar{\tau}_{12}) + 5 \lg(f_{c2} / 1000)$
+with the receiving
 plate's critical frequency `fc_2`. The value is symmetric: building
 the reverse junction (plates swapped, and for a T-junction the matching
-constants `T1` \<-> `T2`) gives the same `K_21 = K_12`.
+constants `T1` \<-> `T2`) gives the same $K_{21} = K_{12}$.
 
 ### JunctionTransmissionResult.plot()
 
@@ -514,18 +510,18 @@ Coupling loss factor of a point-connected plate pair (Norton Eq. 6.56).
 Two homogeneous plates joined by `N` bolts, rivets or spot welds rather
 than along a continuous line:
 
-```text
-         4 N h1 cL1        A1 A2
-eta_12 = -------------- ------------ ,   Ai = rho_si**2 hi**2 cLi**2
-         sqrt(3) w S1   (A1 + A2)**2
-```
+$$
+\eta_{12} = \frac{4 N h_1 c_{L1}}{\sqrt{3}\, \omega S_1} \frac{A_1 A_2}{(A_1 + A_2)^2}, \qquad A_i = \rho_{si}^2 h_i^2 c_{Li}^2 \tag{6.56}
+$$
 
-with `rho_si` the surface density in kg/m^2, `w = 2 pi f` and `S1`
-the source-plate area. Norton recommends it when the bending wavelength in
-the plates is shorter than the length of the connected edge, and the line
-junction ([`coupling_loss_factor`](/phonometry/reference/api/vibration/junction-transmission/#coupling_loss_factor) on
+with `rho_si` the surface density in kg/m^2,
+$\omega = 2 \pi f$ and `S1` the source-plate area. Norton
+recommends it when the bending wavelength in the plates is shorter than
+the length of the connected edge, and the line junction
+([`coupling_loss_factor`](/phonometry/reference/api/vibration/junction-transmission/#coupling_loss_factor) on
 [`right_angle_transmission_coefficient`](/phonometry/reference/api/vibration/junction-transmission/#right_angle_transmission_coefficient)) when it is longer. The
-result falls as `1/f`, unlike the line junction's `1/sqrt(f)`.
+result falls as $1/f$, unlike the line junction's
+$1/\sqrt{f}$.
 
 :::note
 Equation (6.56) is printed in the book with the `(A1 + A2)` bracket
@@ -577,17 +573,23 @@ Right-angle plate junction `tau12` (Norton Eqs. 6.53 to 6.55).
 The closed form used throughout the SEA literature for two flat plates
 coupled at right angles along a line, with no angular integration:
 
-```text
-psi_N = rho1 cL1**1.5 h1**2.5 / (rho2 cL2**1.5 h2**2.5)          (6.54)
-tau12(0) = 2 (sqrt(psi_N) + 1/sqrt(psi_N))**-2                   (6.53)
-tau12    = tau12(0) 2,754 X / (1 + 3,24 X),  X = h1/h2            (6.55)
-```
+$$
+\psi_N = \frac{\rho_1 c_{L1}^{1.5} h_1^{2.5}} {\rho_2 c_{L2}^{1.5} h_2^{2.5}} \tag{6.54}
+$$
+
+$$
+\tau_{12}(0) = 2 \left( \sqrt{\psi_N} + \frac{1}{\sqrt{\psi_N}} \right)^{-2} \tag{6.53}
+$$
+
+$$
+\tau_{12} = \tau_{12}(0)\, \frac{2.754 X}{1 + 3.24 X}, \qquad X = h_1/h_2 \tag{6.55}
+$$
 
 `tau12(0)` is symmetric in the two plates (swapping them inverts
 `psi_N`, which the expression does not see); the random-incidence factor
 is not, so `tau12` and `tau21` differ. Pass the result to
 [`coupling_loss_factor`](/phonometry/reference/api/vibration/junction-transmission/#coupling_loss_factor) with the source plate's group velocity
-`cg = 2 cB` to obtain Norton Eq. (6.52).
+$c_g = 2 c_B$ to obtain Norton Eq. (6.52).
 
 `rho` here is the **volume** density in kg/m^3, not the surface density
 of [`junction_wave_parameters`](/phonometry/reference/api/vibration/junction-transmission/#junction_wave_parameters).
@@ -625,14 +627,15 @@ straight_transmission_coefficient(
 
 Transmission across a straight section `tau13(theta)` (Hopkins 5.13).
 
-Defined only for the X-junction and T-junction (1); both incidence regimes
-`chi >= sin(theta)` and `chi < sin(theta)` are covered.
+Defined only for the X-junction and T-junction (1); both incidence
+regimes $\chi \ge \sin\theta$ and $\chi < \sin\theta$ are
+covered.
 
 **Parameters**
 
 | Name | Description |
 | :--- | :--- |
-| `angle` | Incidence angle `theta`, in **radians** (scalar or array, `0 <= theta <= pi/2`). |
+| `angle` | Incidence angle `theta`, in **radians** (scalar or array, $0 \le \theta \le \pi/2$). |
 | `chi` | Wave parameter `chi` (Eq. 5.10, > 0). |
 | `psi` | Wave parameter `psi` (Eq. 5.11, > 0). |
 | `junction` | `"X"` or `"T1"` (the only junctions with a straight section). |
@@ -656,11 +659,13 @@ wave_vibration_reduction_index(
 
 Vibration reduction index from a transmission coefficient (Hopkins 5.116).
 
-`K_ij = 10 lg(1 / tau_ij) + 5 lg(fc_j / f_ref)` with `fc_j` the
-critical frequency of the **receiving** plate and the reference frequency
-`f_ref = 1000 Hz`. Because the angular-average transmission coefficients
-satisfy the reciprocity relationship `tau_bar_ij = tau_bar_ji
-sqrt(fc_j / fc_i)` (Eq. 5.7), this form is symmetric: `K_ij = K_ji`.
+$K_{ij} = 10 \lg(1 / \tau_{ij}) + 5 \lg(f_{cj} / f_{\text{ref}})$
+with `fc_j` the critical frequency of the **receiving** plate and the
+reference frequency $f_{\text{ref}} = 1000$ Hz. Because the
+angular-average transmission coefficients satisfy the reciprocity
+relationship
+$\bar{\tau}_{ij} = \bar{\tau}_{ji} \sqrt{f_{cj} / f_{ci}}$
+(Eq. 5.7), this form is symmetric: $K_{ij} = K_{ji}$.
 
 **Parameters**
 

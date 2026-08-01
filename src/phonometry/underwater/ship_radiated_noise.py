@@ -1,17 +1,19 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""
+r"""
 Ship radiated noise and equivalent monopole source level (ISO 17208-1/-2).
 
 A surface ship measured in deep water is characterised by its **radiated noise
 level** and then by an **equivalent monopole source level** referred to a point
 source below the sea surface:
 
-* :func:`radiated_noise_level` -- ``LRN = 20·lg(p_rms/p₀) + 20·lg(r/r₀)``
+* :func:`radiated_noise_level` --
+  :math:`L_{\mathrm{RN}} = 20 \lg(p_{\mathrm{rms}}/p_0) + 20 \lg(r/r_0)`
   dB re 1 µPa·m (ISO 17208-1), the level of the product of the far-field RMS
   pressure and the source distance.
 * :func:`monopole_source_level` -- converts ``LRN`` to the source level
-  ``Ls = LRN + ΔL`` with the Lloyd's-mirror surface correction ``ΔL`` of
-  ISO 17208-2 Formula 3, for a nominal source depth ``d_s = 0.7·D`` (Formula 1).
+  :math:`L_s = L_{\mathrm{RN}} + \Delta L` with the Lloyd's-mirror surface
+  correction :math:`\Delta L` of ISO 17208-2 Formula 3, for a nominal source
+  depth :math:`d_s = 0.7 D` (Formula 1).
 
 Supporting helpers give the ISO 17208-1 three-hydrophone measurement depths
 (:func:`hydrophone_depths`) and the ISO 17208-2 tabulated source-level
@@ -44,11 +46,11 @@ _STANDARD_ANGLES = (15.0, 30.0, 45.0)
 
 
 def radiated_noise_level(rms_pressure: float, distance: float) -> float:
-    """Radiated noise level ``LRN`` (ISO 17208-1), dB re 1 µPa·m.
+    r"""Radiated noise level ``LRN`` (ISO 17208-1), dB re 1 µPa·m.
 
-    ``LRN = 20·lg(p_rms/p₀) + 20·lg(r/r₀)`` -- the level of the product of the
-    far-field RMS sound pressure and the source distance, referred to
-    1 µPa·m.
+    :math:`L_{\mathrm{RN}} = 20 \lg(p_{\mathrm{rms}}/p_0) + 20 \lg(r/r_0)` --
+    the level of the product of the far-field RMS sound pressure and the
+    source distance, referred to 1 µPa·m.
 
     :param rms_pressure: Far-field RMS sound pressure ``p_rms``, in Pa.
     :param distance: Distance ``r`` from the ship reference point, in m.
@@ -66,15 +68,16 @@ def radiated_noise_level(rms_pressure: float, distance: float) -> float:
 def hydrophone_depths(
     cpa_distance: float, angles: tuple[float, ...] = _STANDARD_ANGLES
 ) -> NDArray[np.float64]:
-    """Hydrophone depths for the ISO 17208-1 deep-water geometry.
+    r"""Hydrophone depths for the ISO 17208-1 deep-water geometry.
 
     At the closest point of approach the three hydrophones sit at depression
     angles from the sea surface seen from the ship reference point; at a
     horizontal range equal to ``cpa_distance`` the depth of each is
-    ``d = cpa·tan(angle)``.
+    :math:`d = d_{\mathrm{CPA}} \tan(\mathrm{angle})`.
 
     :param cpa_distance: Horizontal distance at the closest point of approach,
-        in m (``dCPA = max(100 m, ship length)``).
+        in m (:math:`d_{\mathrm{CPA}} = \max(100~\text{m},
+        \text{ship length})`).
     :param angles: Depression angles, in degrees (default 15°, 30°, 45°).
     :return: The hydrophone depths, in m.
     :raises ValueError: If the distance or any angle is out of range.
@@ -132,14 +135,15 @@ def _surface_correction(
 
 @dataclass(frozen=True)
 class ShipSourceLevelResult:
-    """Equivalent monopole source level of a ship (ISO 17208-2).
+    r"""Equivalent monopole source level of a ship (ISO 17208-2).
 
     :ivar frequencies: Frequencies, in Hz.
     :ivar radiated_noise_level: Input RNL per frequency, in dB re 1 µPa·m.
-    :ivar surface_correction: Lloyd's-mirror correction ``ΔL`` per frequency, dB.
-    :ivar source_level: Equivalent monopole source level ``Ls = LRN + ΔL``,
-        in dB re 1 µPa·m.
-    :ivar source_depth: Nominal source depth ``d_s = 0.7·D``, in m.
+    :ivar surface_correction: Lloyd's-mirror correction :math:`\Delta L` per
+        frequency, dB.
+    :ivar source_level: Equivalent monopole source level
+        :math:`L_s = L_{\mathrm{RN}} + \Delta L`, in dB re 1 µPa·m.
+    :ivar source_depth: Nominal source depth :math:`d_s = 0.7 D`, in m.
     :ivar sound_speed: Speed of sound used, in m/s.
     """
 
@@ -165,11 +169,18 @@ def monopole_source_level(
     *,
     c: float = _DEFAULT_SOUND_SPEED,
 ) -> ShipSourceLevelResult:
-    """Equivalent monopole source level from radiated noise level (ISO 17208-2).
+    r"""Equivalent monopole source level from radiated noise level
+    (ISO 17208-2).
 
-    ``Ls = LRN + ΔL`` with the surface correction (Formula 3)
-    ``ΔL = −10·lg[(2u⁴ + 14u²) / (14 + 2u² + u⁴)]``, ``u = k·d_s``,
-    ``k = 2πf/c`` and the nominal source depth ``d_s = 0.7·D`` (Formula 1).
+    :math:`L_s = L_{\mathrm{RN}} + \Delta L` with the surface correction
+
+    .. math::
+
+       \Delta L = -10 \lg \frac{2 u^4 + 14 u^2}{14 + 2 u^2 + u^4}
+       \tag{Formula 3}
+
+    where :math:`u = k d_s`, :math:`k = 2 \pi f/c` and the nominal source
+    depth is :math:`d_s = 0.7 D` (Formula 1).
 
     :param rnl: Radiated noise level per frequency, in dB re 1 µPa·m (scalar or
         array; array length must match ``frequency``).

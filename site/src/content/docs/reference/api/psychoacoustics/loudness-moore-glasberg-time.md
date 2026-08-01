@@ -28,7 +28,7 @@ The signal chain is:
   (clause 7.4, Formulae 1-6);
 * the compressive transformation of excitation into instantaneous specific
   loudness `N'(i)` in sone/Cam (clause 7.5, Formulae 7-9, Tables 2-4, with
-  `C = 0.063` sone/Cam);
+  $C = 0.063$ sone/Cam);
 * an attack/release temporal smoothing of the specific loudness at every centre
   frequency to the short-term specific loudness (clause 7.6, Formulae 10-13);
 * the across-frequency smoothing and binaural inhibition of ISO 532-2

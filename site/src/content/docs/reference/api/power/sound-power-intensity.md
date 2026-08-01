@@ -10,50 +10,72 @@ ISO 9614-2:1996 (engineering, grade 2; survey/control, grade 3).
 
 A probe is swept continuously over each segment of a hypothetical surface that
 encloses the source, reporting the time-averaged signed normal intensity
-`<In,i>` and mean-square pressure per segment. The sound power follows from the
-partial powers `Pi = <In,i>*Si` summed over the `N` segments (clause 9,
-equations (5), (6), (12), (13)):
+$\langle I_{n,i} \rangle$ and mean-square pressure per segment. The
+sound power follows from the partial powers
+$P_i = \langle I_{n,i} \rangle S_i$ summed over the `N` segments
+(clause 9, equations (5), (6), (12), (13)):
 
-```text
-Pi = <In,i> * Si                       (partial power, Eq. 12)
-P  = sum_i Pi                          (total power, Eq. 6)
-LW = 10*lg(P/P0),  P0 = 1e-12 W        (sound power level, Eq. 13)
-```
+$$
+P_i = \langle I_{n,i} \rangle \, S_i \tag{Eq. 12}
+$$
 
-The method is **not applicable to any band in which P \< 0** (clause 9.2): a
-strong parasitic source outside the surface makes the net energy flow inward and
-the determination invalid for that band.
+$$
+P = \sum_i P_i \tag{Eq. 6}
+$$
 
-Two scanning-method field indicators qualify the determination (Annex A,
+$$
+L_W = 10 \lg\frac{P}{P_0}, \qquad P_0 = 10^{-12}~\text{W} \tag{Eq. 13}
+$$
+
+The method is **not applicable to any band in which** $P < 0$
+(clause 9.2): a strong parasitic source outside the surface makes the net
+energy flow inward and the determination invalid for that band.
+
+Two scanning-method field indicators qualify the determination, with
+$[L_p]$ the area-weighted surface sound pressure level (Annex A,
 normative):
 
-```text
-FpI  = [Lp] - LW + 10*lg(S/S0)                       (Eq. A.1)
-[Lp] = 10*lg( (1/S) * sum_i Si*10^(0,1*Lpi) )        (area-weighted surface SPL)
-F+/- = 10*lg( sum_i |Pi| / |sum_i Pi| )              (Eq. A.2)
-```
+$$
+F_{pI} = [L_p] - L_W + 10 \lg\frac{S}{S_0} \tag{Eq. A.1}
+$$
+
+$$
+[L_p] = 10 \lg\!\left[ \frac{1}{S} \sum_i S_i \, 10^{0.1 L_{pi}} \right]
+$$
+
+$$
+F_{+/-} = 10 \lg\frac{\sum_i |P_i|}{\left| \sum_i P_i \right|} \tag{Eq. A.2}
+$$
 
 `FpI` is the surface pressure-intensity indicator (equivalent to ISO 9614-1
 `F3` for uniform-area segments, Note 14); `F+/-` the negative-partial-power
 indicator (equivalent to ISO 9614-1 `F3-F2`, Note 15). Because Part 2 weights
 by segment area `Si` while [`phonometry.field_indicators`](/phonometry/reference/api/power/intensity/#field_indicators) (ISO 9614-1)
 assumes equal-area positions, the indicators are computed directly here; only
-the dynamic-capability index `Ld = delta_pI0 - K` is shared with
+the dynamic-capability index $L_d = \delta_{pI0} - K$ is shared with
 [`phonometry.dynamic_capability_index`](/phonometry/reference/api/power/intensity/#dynamic_capability_index).
 
-Qualification criteria per band (Annex B):
+Qualification criteria per band (Annex B), where `K` is 10 (engineering) or
+7 (survey) per Table 1, criterion 2 is mandatory for grade 2 and optional for
+grade 3, and the per-segment repeatability limit `s` comes from Table 2:
 
-```text
-criterion 1:  Ld > FpI        Ld = delta_pI0 - K  (K = 10 eng / 7 survey, Table 1)
-criterion 2:  F+/- <= 3 dB    (mandatory grade 2; optional grade 3)
-criterion 3:  |LWi(1) - LWi(2)| <= s   per segment  (s from Table 2)
-```
+$$
+\text{criterion 1:} \quad L_d > F_{pI}, \qquad L_d = \delta_{pI0} - K
+$$
+
+$$
+\text{criterion 2:} \quad F_{+/-} \le 3~\text{dB}
+$$
+
+$$
+\text{criterion 3:} \quad |L_{Wi}(1) - L_{Wi}(2)| \le s \quad \text{per segment}
+$$
 
 A band achieves the **engineering** grade when criteria 1, 2 and 3 hold, the
 **survey** grade when criteria 1 and 3 hold (clause 8.4), otherwise none.
-An A-weighted sound power level omits, besides the non-determinable `P <= 0`
-bands, the bands in which criteria 1 and/or 2 are not satisfied (clause
-10.6 b).
+An A-weighted sound power level omits, besides the non-determinable
+$P \le 0$ bands, the bands in which criteria 1 and/or 2 are not
+satisfied (clause 10.6 b).
 
 > Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
 
@@ -78,11 +100,12 @@ Sound power level by sound-intensity scanning (ISO 9614-2:1996).
 
 `normal_intensity` is an `(N_seg, N_bands)` array (or `(N_seg,)` for a
 single band) of the signed, segment-averaged normal sound intensity
-`<In,i>` (W/m^2), and `areas` the `(N_seg,)` segment areas `Si`
-(m^2). The partial powers `Pi = <In,i>*Si` are summed to the band sound
-power `P` and level `LW = 10*lg(P/P0)` (equations (12), (6), (13)). Bands
-with `P < 0` are flagged (`negative_band`) and reported as `NaN`
-(clause 9.2).
+$\langle I_{n,i} \rangle$ (W/m^2), and `areas` the `(N_seg,)`
+segment areas `Si` (m^2). The partial powers
+$P_i = \langle I_{n,i} \rangle S_i$ are summed to the band sound
+power `P` and level $L_W = 10 \lg(P/P_0)$ (equations (12), (6),
+(13)). Bands with $P < 0$ are flagged (`negative_band`) and
+reported as `NaN` (clause 9.2).
 
 Supplying `normal_intensity_2` (the second grade-2 sweep) makes
 `normal_intensity` the first sweep, uses their mean for the partial powers
@@ -137,16 +160,19 @@ SoundPowerIntensityResult(
 
 Result of an ISO 9614-2:1996 sound-power-by-scanning determination.
 
-`partial_power` is the signed `Pi = <In,i>*Si` per segment and band
-(Eq. 12); `partial_power_level` the magnitude level `10*lg(|Pi|/P0)`
-(Eq. 8), with the sign carried by `partial_power`. `sound_power` is the
-signed band total `P = sum Pi` (Eq. 6) and `sound_power_level` its level
-`10*lg(P/P0)` (Eq. 13), `NaN` where `P <= 0` (`negative_band` True,
-method not applicable, clause 9.2). `surface_pressure_intensity_index`
+`partial_power` is the signed $P_i = \langle I_{n,i} \rangle S_i$
+per segment and band (Eq. 12); `partial_power_level` the magnitude level
+$10 \lg(|P_i|/P_0)$ (Eq. 8), with the sign carried by
+`partial_power`. `sound_power` is the signed band total
+$P = \sum P_i$ (Eq. 6) and `sound_power_level` its level
+$10 \lg(P/P_0)$ (Eq. 13), `NaN` where $P \le 0$
+(`negative_band` True, method not applicable, clause 9.2).
+`surface_pressure_intensity_index`
 (FpI, Eq. A.1) and `negative_partial_power_index` (F+/-, Eq. A.2) are
 per band, `None` when the inputs they need are absent. `repeatability`
-is `|LWi(1)-LWi(2)|` per segment and band (criterion 3), `None` without
-a second scan; it is `+inf` where the two sweeps reverse the flow
+is $|L_{Wi}(1) - L_{Wi}(2)|$ per segment and band (criterion 3),
+`None` without
+a second scan; it is $+\infty$ where the two sweeps reverse the flow
 direction on a segment (opposite-sign partial powers), a gross
 non-repeatability that criterion 3 must reject even when the magnitudes
 happen to match. `dynamic_capability_index` is `Ld` for the requested

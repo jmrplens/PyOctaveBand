@@ -42,7 +42,9 @@ Doc 29 5th ed. Vol 3 Part 1 reference workbook.
 duration_correction(reference_speed: float, segment_speed: float) -> float
 ```
 
-Duration correction `ΔV = 10·log10(Vref/Vseg)` (Eq. 4-14, exposure only).
+Duration correction (Eq. 4-14, exposure only).
+
+$\Delta V = 10 \cdot \log_{10}(V_{\mathrm{ref}}/V_{\mathrm{seg}})$.
 
 **Parameters**
 
@@ -132,7 +134,7 @@ ground-roll segments, and combines them into the exposure level `SEL`
 | `pressure` | Aerodrome air pressure, in kPa (impedance adjustment). |
 | `ground_roll` | Optional boolean mask of length `N-1` marking takeoff ground-roll segments; these receive the start-of-roll directivity `ΔSOR` and reduced noise fraction behind the aircraft (§4.5.6-4.5.7). |
 | `landing_roll` | Optional boolean mask of length `N-1` marking landing rollout segments; ahead of them the reduced fraction (Eq. 4-21b), the nearest-end lateral geometry and no directivity term apply (§4.5.5-4.5.6). |
-| `bank` | Optional per-segment bank angle `ε` in degrees (length `N-1`), measured counter-clockwise about the roll axis (positive in a left turn, starboard wing up); the depression angle becomes `φ = β + ε` for observers to starboard (right) of the track and `φ = β − ε` for observers to port (§4.5.2). |
+| `bank` | Optional per-segment bank angle `ε` in degrees (length `N-1`), measured counter-clockwise about the roll axis (positive in a left turn, starboard wing up); the depression angle becomes $\phi = \beta + \varepsilon$ for observers to starboard (right) of the track and $\phi = \beta - \varepsilon$ for observers to port (§4.5.2). |
 
 **Returns:** A [`FlyoverResult`](/phonometry/reference/api/aeroacoustics/airport-noise/#flyoverresult). If every segment is degenerate (zero length) the level is `-inf`.
 
@@ -190,8 +192,10 @@ Acoustic-impedance adjustment of the standard NPD data (Eq. 4-6/4-7).
 
 The ANP NPD levels are normalised to a reference specific acoustic impedance
 of 409.81 N·s/m³. At the aerodrome's temperature and pressure the air
-impedance is `ρc = 416.86·(δ/√θ)` with `δ = p/p0` and
-`θ = (T+273.15)/(T0+273.15)`, and the adjustment `10·log10(ρc/409.81)` is
+impedance is $\rho c = 416.86 \cdot (\delta/\sqrt{\theta})$ with
+$\delta = p/p_0$ and
+$\theta = (T+273.15)/(T_0+273.15)$, and the adjustment
+$10 \cdot \log_{10}(\rho c/409.81)$ is
 added to the NPD levels. Under the standard atmosphere it is +0.074 dB.
 
 **Parameters**
@@ -471,15 +475,17 @@ Behind a takeoff ground-roll segment, jet-exhaust noise radiates a lobed
 rearward pattern. `ΔSOR` adjusts the segment level relative to the level to
 the side of the start of roll, as a function of the azimuth `ψ` between the
 aircraft forward axis and the observer (Eq. 4-24a for turbofan jets, 4-24b for
-turboprops), scaled beyond 762 m by `dSOR,0/dSOR` (Eq. 4-25). It is only
-applied behind takeoff ground-roll segments (`90° ≤ ψ ≤ 180°`); ahead of the
-aircraft (`ψ < 90°`) it is zero.
+turboprops), scaled beyond 762 m by $d_{SOR,0}/d_{SOR}$ (Eq. 4-25).
+It is only
+applied behind takeoff ground-roll segments
+($90^\circ \le \psi \le 180^\circ$); ahead of the
+aircraft ($\psi < 90^\circ$) it is zero.
 
 **Parameters**
 
 | Name | Description |
 | :--- | :--- |
-| `azimuth_deg` | Azimuth `ψ` from the forward axis to the observer, in degrees (`ψ = arccos(q/dSOR)`, in `[90, 180]` behind the aircraft). Values below 90° return 0; values above 180° are clamped to 180°. |
+| `azimuth_deg` | Azimuth `ψ` from the forward axis to the observer, in degrees ($\psi = \arccos(q/d_{SOR})$, in `[90, 180]` behind the aircraft). Values below 90° return 0; values above 180° are clamped to 180°. |
 | `distance_m` | Distance `dSOR` from the observer to the segment start, in metres. |
 | `engine` | `"jet"` (turbofan, Eq. 4-24a) or `"turboprop"` (Eq. 4-24b). |
 

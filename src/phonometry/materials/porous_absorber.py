@@ -1,34 +1,35 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""
+r"""
 Porous-material models and multilayer absorber prediction.
 
-Three complementary building blocks, all in the ``e^{+j w t}`` time
-convention with the forward wave carried by ``e^{-j k x}`` (so a passive
-medium has ``Im(k) < 0``):
+Three complementary building blocks, all in the :math:`e^{+j \omega t}`
+time convention with the forward wave carried by :math:`e^{-j k x}` (so a
+passive medium has :math:`\operatorname{Im}(k) < 0`):
 
 * **Equivalent-fluid models** for the characteristic impedance ``Zc`` and the
   complex wavenumber ``k`` of a rigid-frame porous material:
 
   - the one-parameter **Delany-Bazley** power law in the absorber variable
-    ``X = rho0 f / sigma`` (Mechel, *Formulas of Acoustics* 2e, Sect. G.11
-    Eqs. (1)-(2); Bies, Hansen & Howard, *Engineering Noise Control* 5e,
-    Appendix D Eqs. (D.22)-(D.23) and Table D.1; Hopkins, *Sound Insulation*,
-    Eqs. (1.171)-(1.174)), stated valid for ``0.01 < X < 1.0`` and porosity
-    close to one. Table D.1 also provides coefficient sets fitted to
-    polyester (Garai & Pompoli 2005) and to foams (Dunn & Davern 1986,
-    Wu 1988), exposed here as presets.
+    :math:`X = \rho_0 f / \sigma` (Mechel, *Formulas of Acoustics* 2e,
+    Sect. G.11 Eqs. (1)-(2); Bies, Hansen & Howard, *Engineering Noise
+    Control* 5e, Appendix D Eqs. (D.22)-(D.23) and Table D.1; Hopkins,
+    *Sound Insulation*, Eqs. (1.171)-(1.174)), stated valid for
+    :math:`0.01 < X < 1.0` and porosity close to one. Table D.1 also
+    provides coefficient sets fitted to polyester (Garai & Pompoli 2005)
+    and to foams (Dunn & Davern 1986, Wu 1988), exposed here as presets.
   - the **Miki** modification, regressed on the same Delany-Bazley data under
     a positive-real (passivity) constraint so the model stays well behaved
     below the fit range (Miki 1990, *J. Acoust. Soc. Jpn (E)* 11(1),
-    Eqs. (30)-(34), in the variable ``f / sigma``).
+    Eqs. (30)-(34), in the variable :math:`f / \sigma`).
   - the five-parameter **Johnson-Champoux-Allard (JCA)** semi-phenomenological
     model with flow resistivity, porosity, tortuosity and the viscous/thermal
     characteristic lengths (Cox & D'Antonio, *Acoustic Absorbers and
     Diffusers* 3e, Eqs. (6.19)-(6.25); Attenborough & Van Renterghem,
     *Predicting Outdoor Sound* 2e, Eqs. (5.13)-(5.14)). The returned
     equivalent-fluid density and bulk modulus are the surface-normalised
-    quantities (they absorb the porosity), so ``Zc = sqrt(rho_e K_e)`` and
-    ``k = w sqrt(rho_e / K_e)`` hold for every model.
+    quantities (they absorb the porosity), so
+    :math:`Z_c = \sqrt{\rho_e K_e}` and
+    :math:`k = \omega \sqrt{\rho_e / K_e}` hold for every model.
   - the **limp-frame** correction of any of the three rigid-frame models
     (Allard & Atalla, *Propagation of Sound in Porous Media* 2e, Sect. 11.3.4,
     Eqs. (11.53)-(11.55), printed pp. 251-253): a light frame is dragged along
@@ -38,16 +39,18 @@ medium has ``Im(k) < 0``):
     :func:`decoupling_frequency`.
 
 * **Transfer-matrix multilayer prediction**: each fluid layer contributes
-  ``[[cos(kx d), j Zx sin(kx d)], [j sin(kx d)/Zx, cos(kx d)]]`` with the
-  in-depth wavenumber ``kx = sqrt(k^2 - k0^2 sin^2 theta)`` from Snell's law
-  and ``Zx = Zc k / kx`` (Cox & D'Antonio Eqs. (2.29)-(2.32); Bies
+  :math:`[[\cos(k_x d), jZ_x\sin(k_x d)], [j\sin(k_x d)/Z_x, \cos(k_x d)]]`
+  with the in-depth wavenumber
+  :math:`k_x = \sqrt{k^2 - k_0^2 \sin^2 \theta}` from Snell's law and
+  :math:`Z_x = Z_c k / k_x` (Cox & D'Antonio Eqs. (2.29)-(2.32); Bies
   Eq. (D.83); equivalent to the layer-recursion of Bies Eq. (D.95) and
   Mechel Sect. D.4). Thin resonant sheets (perforated plate, microperforated
   plate, limp membrane) enter as series transfer impedances
-  ``[[1, z],[0, 1]]``. The stack is closed by a rigid wall, by free air or
-  by an arbitrary termination impedance, giving the surface impedance, the
-  oblique reflection factor and ``alpha(theta)``. This same layer transfer
-  matrix underlies the critically-coupled perfect-absorber designs of Jiménez,
+  :math:`[[1, z], [0, 1]]`. The stack is closed by a rigid wall, by free air
+  or by an arbitrary termination impedance, giving the surface impedance,
+  the oblique reflection factor and :math:`\alpha(\theta)`. This same
+  layer transfer matrix underlies the critically-coupled perfect-absorber
+  designs of Jiménez,
   Groby, Pagneux & Romero-García (2017, *Applied Sciences* 7(6), 618,
   doi:10.3390/app7060618) and, for a rigidly-backed high-porosity layer,
   Jiménez, Romero-García & Groby (2018, *Acta Acustica united with Acustica*
@@ -62,7 +65,7 @@ medium has ``Im(k) < 0``):
   with the Eq. (5) end corrections; reproduced as Cox & D'Antonio
   Eqs. (7.33)-(7.35) and built on the same Bessel kernel as Mechel
   Sect. G.3); the membrane is the limp surface
-  mass ``j w m`` (Cox & D'Antonio Eq. (7.14); Bies Eq. (D.96)). The
+  mass :math:`j \omega m` (Cox & D'Antonio Eq. (7.14); Bies Eq. (D.96)). The
   random-incidence (Paris) integral follows Mechel Sect. D.5 Eqs. (9)-(10),
   with the closed form for locally reacting surfaces implemented in
   :func:`statistical_absorption` (its maximum over passive impedances is the
@@ -183,15 +186,17 @@ class PorousAbsorberWarning(PhonometryWarning):
 # ---------------------------------------------------------------------------
 @dataclass(frozen=True)
 class PorousMediumResult:
-    """Equivalent-fluid characterisation of a porous material.
+    r"""Equivalent-fluid characterisation of a porous material.
 
     All arrays share the shape of ``frequency``. ``characteristic_impedance``
     is the complex characteristic impedance ``Zc`` in Pa s/m as seen from the
     material surface, ``wavenumber`` the complex wavenumber ``k`` in rad/m
-    (``Im(k) < 0`` for the ``e^{+j w t}`` convention),
-    ``effective_density = Zc k / w`` and ``bulk_modulus = Zc w / k`` the
-    surface-normalised equivalent-fluid density and bulk modulus, so that
-    ``Zc = sqrt(rho_e K_e)`` and ``k = w sqrt(rho_e / K_e)`` for every model.
+    (:math:`\operatorname{Im}(k) < 0` for the :math:`e^{+j \omega t}`
+    convention), ``effective_density`` :math:`= Z_c k / \omega` and
+    ``bulk_modulus`` :math:`= Z_c \omega / k` the surface-normalised
+    equivalent-fluid density and bulk modulus, so that
+    :math:`Z_c = \sqrt{\rho_e K_e}` and
+    :math:`k = \omega \sqrt{\rho_e / K_e}` for every model.
     """
 
     frequency: Real
@@ -206,13 +211,14 @@ class PorousMediumResult:
 
     @property
     def normalized_impedance(self) -> Complex:
-        """Characteristic impedance normalised by ``rho c`` of air."""
+        r"""Characteristic impedance normalised by :math:`\rho c` of air."""
         rc = self.air_density * self.speed_of_sound
         return np.asarray(self.characteristic_impedance / rc, dtype=np.complex128)
 
     @property
     def normalized_wavenumber(self) -> Complex:
-        """Wavenumber normalised by the free-air wavenumber ``k0 = w / c``."""
+        r"""Wavenumber normalised by the free-air wavenumber
+        :math:`k_0 = \omega / c`."""
         k0 = 2.0 * np.pi * self.frequency / self.speed_of_sound
         return np.asarray(self.wavenumber / k0, dtype=np.complex128)
 
@@ -276,15 +282,16 @@ def delany_bazley(
     speed_of_sound: float = _SPEED_OF_SOUND,
     air_density: float = _AIR_DENSITY,
 ) -> PorousMediumResult:
-    """Delany-Bazley one-parameter porous model (power laws in ``X``).
+    r"""Delany-Bazley one-parameter porous model (power laws in ``X``).
 
-    ``Zc = rho c (1 + C1 X^-C2 - j C3 X^-C4)`` and
-    ``k = (w/c)(1 + C5 X^-C6 - j C7 X^-C8)`` with ``X = rho f / sigma``
+    :math:`Z_c = \rho c (1 + C_1 X^{-C_2} - j C_3 X^{-C_4})` and
+    :math:`k = (\omega/c)(1 + C_5 X^{-C_6} - j C_7 X^{-C_8})` with
+    :math:`X = \rho f / \sigma`
     (Mechel 2e Sect. G.11 Eqs. (1)-(2); Bies 5e Eqs. (D.22)-(D.23) with the
     Table D.1 coefficients; Hopkins Eqs. (1.171)-(1.173)). A
     :class:`PorousAbsorberWarning` is raised when any ``X`` leaves the stated
-    ``0.01 < X < 1.0`` validity range (Hopkins Eq. (1.174)); the values are
-    still returned.
+    :math:`0.01 < X < 1.0` validity range (Hopkins Eq. (1.174)); the values
+    are still returned.
 
     :param frequency: Frequency vector ``f``, in hertz.
     :param flow_resistivity: Airflow resistivity ``sigma``, in Pa s/m2.
@@ -338,16 +345,18 @@ def miki(
     speed_of_sound: float = _SPEED_OF_SOUND,
     air_density: float = _AIR_DENSITY,
 ) -> PorousMediumResult:
-    """Miki (1990) positive-real modification of the Delany-Bazley model.
+    r"""Miki (1990) positive-real modification of the Delany-Bazley model.
 
-    In the variable ``Y = f / sigma`` (Miki 1990, Eqs. (30)-(34)):
-    ``Zc = rho c (1 + 0.070 Y^-0.632 - j 0.107 Y^-0.632)`` and, from the
-    propagation constant ``gamma = alpha + j beta`` via ``k = beta - j alpha``,
-    ``k = (w/c)(1 + 0.109 Y^-0.618 - j 0.160 Y^-0.618)``. The regression was
-    constrained to be positive real, so the surface impedance of a
-    hard-backed layer keeps a non-negative real part even below the
+    In the variable :math:`Y = f / \sigma` (Miki 1990, Eqs. (30)-(34)):
+    :math:`Z_c = \rho c (1 + 0.070 Y^{-0.632} - j 0.107 Y^{-0.632})` and,
+    from the propagation constant :math:`\gamma = \alpha + j \beta` via
+    :math:`k = \beta - j \alpha`,
+    :math:`k = (\omega/c)(1 + 0.109 Y^{-0.618} - j 0.160 Y^{-0.618})`. The
+    regression was constrained to be positive real, so the surface impedance
+    of a hard-backed layer keeps a non-negative real part even below the
     Delany-Bazley range; a :class:`PorousAbsorberWarning` still flags
-    ``Y`` outside the fit range ``0.01 < f/sigma < 1.0`` (paper Sect. 4.1).
+    ``Y`` outside the fit range :math:`0.01 < f/\sigma < 1.0` (paper
+    Sect. 4.1).
 
     :param frequency: Frequency vector ``f``, in hertz.
     :param flow_resistivity: Airflow resistivity ``sigma``, in Pa s/m2.
@@ -389,33 +398,43 @@ def johnson_champoux_allard(
     heat_capacity_ratio: float = _HEAT_CAPACITY_RATIO,
     atmospheric_pressure: float = _ATMOSPHERIC_PRESSURE,
 ) -> PorousMediumResult:
-    """Johnson-Champoux-Allard five-parameter rigid-frame model.
+    r"""Johnson-Champoux-Allard five-parameter rigid-frame model.
 
     Effective density (Cox & D'Antonio 3e, Eq. (6.19)):
 
-    ``rho_e = (T rho / phi) [1 + (sigma phi / (j w rho T))
-    sqrt(1 + 4 j T^2 eta rho w / (sigma^2 L^2 phi^2))]``
+    .. math::
+
+       \rho_e = \frac{T \rho}{\phi} \left[1
+       + \frac{\sigma \phi}{j \omega \rho T}
+       \sqrt{1 + \frac{4 j T^2 \eta \rho \omega}{\sigma^2 L^2 \phi^2}}
+       \right]
 
     and effective bulk modulus (Eq. (6.20)):
 
-    ``K_e = (gamma P0 / phi) / (gamma - (gamma - 1) [1 +
-    (8 eta / (j L'^2 Pr w rho)) sqrt(1 + j rho w Pr L'^2 / (16 eta))]^-1)``
+    .. math::
+
+       K_e = \frac{\gamma P_0 / \phi}{\gamma - (\gamma - 1) \left[1
+       + \frac{8 \eta}{j {L'}^2 \mathrm{Pr}\, \omega \rho}
+       \sqrt{1 + \frac{j \rho \omega \mathrm{Pr}\, {L'}^2}{16 \eta}}
+       \right]^{-1}}
 
     with tortuosity ``T``, porosity ``phi``, viscous/thermal characteristic
-    lengths ``L`` / ``L'``; then ``Zc = sqrt(K_e rho_e)`` and
-    ``k = w sqrt(rho_e / K_e)`` (Eqs. (6.24)-(6.25)). Both quantities are
-    surface-normalised (the ``1/phi`` factors are included). The model has
-    the exact limits ``j w rho_e -> sigma`` as ``w -> 0`` and
-    ``rho_e -> (T rho / phi)(1 + (1 - j) delta_v / L)`` as ``w -> inf``
-    (Johnson et al. 1987), pinned in the tests.
+    lengths ``L`` / ``L'``; then :math:`Z_c = \sqrt{K_e \rho_e}` and
+    :math:`k = \omega \sqrt{\rho_e / K_e}` (Eqs. (6.24)-(6.25)). Both
+    quantities are surface-normalised (the :math:`1/\phi` factors are
+    included). The model has the exact limits
+    :math:`j \omega \rho_e \to \sigma` as :math:`\omega \to 0` and
+    :math:`\rho_e \to (T \rho / \phi)(1 + (1 - j) \delta_v / L)` as
+    :math:`\omega \to \infty` (Johnson et al. 1987), pinned in the tests.
 
     :param frequency: Frequency vector ``f``, in hertz.
     :param flow_resistivity: Airflow resistivity ``sigma``, in Pa s/m2.
     :param porosity: Open porosity ``phi`` (0 < phi <= 1).
-    :param tortuosity: High-frequency tortuosity ``T = alpha_inf`` (>= 1).
+    :param tortuosity: High-frequency tortuosity :math:`T = \alpha_\infty`
+        (>= 1).
     :param viscous_length: Viscous characteristic length ``L``, in metres.
     :param thermal_length: Thermal characteristic length ``L'``, in metres
-        (physically ``L' >= L``).
+        (physically :math:`L' \ge L`).
     :param speed_of_sound: Speed of sound ``c`` in air, in m/s.
     :param air_density: Air density ``rho``, in kg/m3.
     :param viscosity: Dynamic viscosity ``eta`` of air, in Pa s.
@@ -472,10 +491,11 @@ def johnson_champoux_allard(
 def decoupling_frequency(
     flow_resistivity: float, *, porosity: float, frame_density: float
 ) -> float:
-    """Zwikker-Kosten decoupling frequency ``Fd`` of a porous frame.
+    r"""Zwikker-Kosten decoupling frequency ``Fd`` of a porous frame.
 
-    ``Fd = sigma phi**2 / (2 pi rho1)`` (Allard & Atalla 2e, Sect. 11.3.4,
-    printed p. 251; the same closed form as their Eq. (6.90), printed p. 126).
+    :math:`F_d = \sigma \phi^2 / (2 \pi \rho_1)` (Allard & Atalla 2e,
+    Sect. 11.3.4, printed p. 251; the same closed form as their Eq. (6.90),
+    printed p. 126).
     Above ``Fd`` the visco-inertial coupling between the pore fluid and the
     frame is too weak for the acoustic wave to shake the frame, so the
     rigid-frame equivalent fluid of :func:`johnson_champoux_allard` applies;
@@ -505,14 +525,16 @@ def limp_frame_applicable(
     criterion: str = "doutres",
     fluid_bulk_modulus: float = _ATMOSPHERIC_PRESSURE,
 ) -> bool:
-    """Whether the limp-frame model may be used, by published rule of thumb.
+    r"""Whether the limp-frame model may be used, by published rule of thumb.
 
     Both published criteria compare the bulk modulus of the frame *in vacuum*
     ``K_c`` with that of the fluid in the pores ``K_f`` (Allard & Atalla 2e,
-    printed pp. 253-254): Beranek (1947) requires ``|K_c/K_f| < 0.05``, and the
-    frame structural interaction study of Doutres et al. (2007) relaxes it to
-    ``|K_c/K_f| < 0.2``. With ``K_f`` taken as the isothermal bulk modulus of
-    air, ``P0 = 101,3 kPa``, the relaxed criterion is the book's statement that
+    printed pp. 253-254): Beranek (1947) requires
+    :math:`\lvert K_c/K_f \rvert < 0.05`, and the frame structural
+    interaction study of Doutres et al. (2007) relaxes it to
+    :math:`\lvert K_c/K_f \rvert < 0.2`. With ``K_f`` taken as the
+    isothermal bulk modulus of air, :math:`P_0 = 101.3` kPa, the relaxed
+    criterion is the book's statement that
     "the limp model is applicable for materials having a bulk modulus lower
     than 20 kPa". Neither criterion accounts for boundary or mounting
     conditions, and the book notes that a thin light foam decoupled from a
@@ -524,7 +546,8 @@ def limp_frame_applicable(
         (Default, 0,2) or ``"beranek"`` (0,05).
     :param fluid_bulk_modulus: Bulk modulus of the pore fluid ``K_f``, in Pa
         (Default: 101 325, the isothermal value for air).
-    :return: ``True`` when ``|K_c/K_f|`` does not exceed the threshold.
+    :return: ``True`` when :math:`\lvert K_c/K_f \rvert` does not exceed
+        the threshold.
     :raises ValueError: for a negative modulus or an unknown criterion.
     """
     key = require_choice(criterion, "criterion", tuple(LIMP_FRAME_CRITERIA))
@@ -539,7 +562,7 @@ def limp_frame(
     *,
     porosity: float = 1.0,
 ) -> PorousMediumResult:
-    """Limp-frame correction of a rigid-frame equivalent fluid (A&A 11.3.4).
+    r"""Limp-frame correction of a rigid-frame equivalent fluid (A&A 11.3.4).
 
     A light frame (aeronautic-grade fibreglass, felts, screens) is dragged
     along by the pore fluid instead of standing still, and the rigid-frame
@@ -550,25 +573,35 @@ def limp_frame(
     bulk modulus and a corrected effective density (Allard & Atalla 2e,
     Eqs. (11.53)-(11.55), printed pp. 252-253, after Panneton 2007):
 
-    ``rho_limp = (rho_t rho_eq - rho0**2) / (rho_t + rho_eq - 2 rho0)``
+    .. math::
 
-    with ``rho_eq`` the rigid-frame effective density of *medium*, ``rho0`` the
-    density of the pore fluid and ``rho_t = rho1 + phi rho0`` the apparent
-    total density of the material. What anchors this expression is the printed
+       \rho_{\mathrm{limp}} =
+       \frac{\rho_t \rho_{\mathrm{eq}} - \rho_0^2}
+       {\rho_t + \rho_{\mathrm{eq}} - 2 \rho_0}
+
+    with ``rho_eq`` the rigid-frame effective density of *medium*, ``rho0``
+    the density of the pore fluid and :math:`\rho_t = \rho_1 + \phi \rho_0`
+    the apparent total density of the material. What anchors this
+    expression is the printed
     equation itself, transcribed term by term; Allard & Atalla tabulate no
     computed limp density anywhere, so there are no published digits to check
     against. The book also states two exact limits in prose, and both are
-    verified, but they are weaker than they look: neither pins the ``rho0**2``
-    and ``2 rho0`` terms, since a sign-flipped variant of Eq. (11.55) satisfies
-    both of them (and even the ``1/rho1`` decay of the heavy-frame residual).
+    verified, but they are weaker than they look: neither pins the
+    :math:`\rho_0^2` and :math:`2 \rho_0` terms, since a sign-flipped
+    variant of Eq. (11.55) satisfies both of them (and even the
+    :math:`1/\rho_1` decay of the heavy-frame residual).
     They corroborate the transcription rather than determine it:
 
-    * **heavy frame**: as ``rho1 -> inf`` the correction vanishes and the
-      rigid-frame result is recovered (the book's own reading of Eq. (11.55));
-    * **low frequency**: since ``rho_eq -> sigma / (j w)`` as ``w -> 0``
-      (Eq. (5.37)), ``rho_limp -> rho_t``, a finite real density, where the
-      rigid-frame model diverges. The rigid frame forbids rigid-body motion of
-      the sample; the limp one allows it, which is why the two differ mainly
+    * **heavy frame**: as :math:`\rho_1 \to \infty` the correction vanishes
+      and the rigid-frame result is recovered (the book's own reading of
+      Eq. (11.55));
+    * **low frequency**: since
+      :math:`\rho_{\mathrm{eq}} \to \sigma / (j \omega)` as
+      :math:`\omega \to 0` (Eq. (5.37)),
+      :math:`\rho_{\mathrm{limp}} \to \rho_t`, a finite real density, where
+      the rigid-frame model diverges. The rigid frame forbids rigid-body
+      motion of the sample; the limp one allows it, which is why the two
+      differ mainly
       at low frequency and why the limp model is the right one for an
       unconstrained sample in an impedance tube.
 
@@ -620,12 +653,17 @@ def limp_frame(
 # Resonant sheet impedances
 # ---------------------------------------------------------------------------
 def perforation_end_correction(open_area: float) -> float:
-    """End-correction factor ``delta`` of a circular perforation.
+    r"""End-correction factor ``delta`` of a circular perforation.
 
-    ``delta = 0.85 (1 - 1.47 eps^1/2 + 0.47 eps^3/2)`` - the Fok-function
-    interaction correction for circular holes (Cox & D'Antonio 3e, Table 7.1,
-    Nesterov row; no open-area limit). Each orifice end adds ``delta a`` of
-    air-plug length, and ``delta -> 0.85`` for an isolated hole.
+    The Fok-function interaction correction for circular holes (Cox &
+    D'Antonio 3e, Table 7.1, Nesterov row; no open-area limit):
+
+    .. math::
+
+       \delta = 0.85 (1 - 1.47 \varepsilon^{1/2} + 0.47 \varepsilon^{3/2})
+
+    Each orifice end adds :math:`\delta a` of air-plug length, and
+    :math:`\delta \to 0.85` for an isolated hole.
 
     :param open_area: Fractional open area ``eps`` of the sheet (0..1).
     :return: End-correction factor ``delta`` (dimensionless, per end).
@@ -646,19 +684,25 @@ def perforated_plate_impedance(
     air_density: float = _AIR_DENSITY,
     viscosity: float = _AIR_VISCOSITY,
 ) -> Complex:
-    """Transfer impedance of a rigid perforated plate with circular holes.
+    r"""Transfer impedance of a rigid perforated plate with circular holes.
 
     Acoustic mass with both end corrections and the boundary-layer term
     (Cox & D'Antonio 3e, Eq. (7.6)):
 
-    ``m = (rho/eps)[t + 2 delta a + sqrt(8 nu / w)(1 + t/(2a))]``
+    .. math::
+
+       m = \frac{\rho}{\varepsilon} \left[t + 2 \delta a
+       + \sqrt{\frac{8 \nu}{\omega}} \left(1 + \frac{t}{2a}\right)\right]
 
     and visco-thermal surface resistance (Eq. (7.12)):
 
-    ``r = (rho/eps) sqrt(8 nu w) (1 + t/(2a))``,
+    .. math::
 
-    giving ``z = r + j w m`` (the series impedance added on top of the
-    backing, Eq. (7.21)). Assumes hole radii well above the boundary-layer
+       r = \frac{\rho}{\varepsilon} \sqrt{8 \nu \omega}
+       \left(1 + \frac{t}{2a}\right)
+
+    giving :math:`z = r + j \omega m` (the series impedance added on top of
+    the backing, Eq. (7.21)). Assumes hole radii well above the boundary-layer
     thickness; use :func:`microperforated_plate_impedance` for submillimetre
     holes.
 
@@ -703,20 +747,25 @@ def microperforated_plate_impedance(
     air_density: float = _AIR_DENSITY,
     viscosity: float = _AIR_VISCOSITY,
 ) -> Complex:
-    """Transfer impedance of a microperforated plate (Maa's exact model).
+    r"""Transfer impedance of a microperforated plate (Maa's exact model).
 
     The specific impedance of one submillimetre hole is the exact short-tube
     result (Maa 1998, Eq. (2); reproduced as Cox & D'Antonio 3e Eq. (7.33)
     and the same Bessel kernel as Mechel 2e Sect. G.3):
 
-    ``z1 = j w rho t [1 - (2 / (x sqrt(-j))) J1(x sqrt(-j)) / J0(x sqrt(-j))]^-1``
+    .. math::
 
-    with the perforate constant ``x = a sqrt(rho w / eta)``. Dividing by the
-    open area and adding Maa's Eq. (5) end corrections - the Rayleigh/Ingard
-    surface resistance ``sqrt(2 w rho eta) / (2 eps)`` and the piston
-    end-correction reactance ``j w rho (2 delta a) / eps`` (``0.85 d`` total
-    for the default ``delta = 0.85`` per end) - gives the sheet transfer
-    impedance (Cox & D'Antonio Eq. (7.35)).
+       z_1 = j \omega \rho t \left[1 - \frac{2}{x \sqrt{-j}}
+       \frac{J_1(x \sqrt{-j})}{J_0(x \sqrt{-j})}\right]^{-1}
+
+    with the perforate constant :math:`x = a \sqrt{\rho \omega / \eta}`.
+    Dividing by the open area and adding Maa's Eq. (5) end corrections - the
+    Rayleigh/Ingard surface resistance
+    :math:`\sqrt{2 \omega \rho \eta} / (2 \varepsilon)` and the piston
+    end-correction reactance
+    :math:`j \omega \rho (2 \delta a) / \varepsilon` (:math:`0.85 d` total
+    for the default :math:`\delta = 0.85` per end) - gives the sheet
+    transfer impedance (Cox & D'Antonio Eq. (7.35)).
 
     :param frequency: Frequency vector ``f``, in hertz.
     :param thickness: Plate thickness ``t``, in metres.
@@ -756,11 +805,11 @@ def membrane_impedance(
     surface_density: float,
     resistance: float = 0.0,
 ) -> Complex:
-    """Transfer impedance of a limp impervious membrane.
+    r"""Transfer impedance of a limp impervious membrane.
 
-    ``z = r + j w m`` - the surface-mass reactance (Cox & D'Antonio 3e,
-    Eq. (7.14); Bies 5e Eq. (D.96)) plus an optional empirical resistance
-    for the internal/fixing losses.
+    :math:`z = r + j \omega m` - the surface-mass reactance (Cox & D'Antonio
+    3e, Eq. (7.14); Bies 5e Eq. (D.96)) plus an optional empirical
+    resistance for the internal/fixing losses.
 
     :param frequency: Frequency vector ``f``, in hertz.
     :param surface_density: Mass per unit area ``m``, in kg/m2.
@@ -782,11 +831,11 @@ def helmholtz_resonance_frequency(
     end_correction: float | None = None,
     speed_of_sound: float = _SPEED_OF_SOUND,
 ) -> float:
-    """Resonance of a perforated sheet over a shallow cavity (closed form).
+    r"""Resonance of a perforated sheet over a shallow cavity (closed form).
 
-    ``f0 = (c / 2 pi) sqrt(eps / (t' d))`` with the end-corrected plug length
-    ``t' = t + 2 delta a`` (Cox & D'Antonio 3e, Eqs. (7.4)/(7.6), valid for
-    ``k d << 1``).
+    :math:`f_0 = (c / 2 \pi) \sqrt{\varepsilon / (t' d)}` with the
+    end-corrected plug length :math:`t' = t + 2 \delta a` (Cox & D'Antonio
+    3e, Eqs. (7.4)/(7.6), valid for :math:`k d \ll 1`).
 
     :param cavity_depth: Cavity depth ``d``, in metres.
     :param plate_thickness: Plate thickness ``t``, in metres.
@@ -821,13 +870,13 @@ def membrane_resonance_frequency(
     speed_of_sound: float = _SPEED_OF_SOUND,
     air_density: float = _AIR_DENSITY,
 ) -> float:
-    """Mass-spring resonance of a membrane over a shallow cavity.
+    r"""Mass-spring resonance of a membrane over a shallow cavity.
 
-    ``f0 = (1 / 2 pi) sqrt(rho c^2 / (m d))`` for an adiabatic air spring -
-    numerically the classical ``f0 = 60 / sqrt(m d)`` (Cox & D'Antonio 3e,
-    Eq. (7.9)). With ``isothermal=True`` the spring stiffness drops by
-    ``gamma``, giving ``~50 / sqrt(m d)`` (Eq. (7.10)), the porous-filled
-    cavity case below about 500 Hz.
+    :math:`f_0 = (1 / 2 \pi) \sqrt{\rho c^2 / (m d)}` for an adiabatic air
+    spring - numerically the classical :math:`f_0 = 60 / \sqrt{m d}` (Cox &
+    D'Antonio 3e, Eq. (7.9)). With ``isothermal=True`` the spring stiffness
+    drops by ``gamma``, giving :math:`\sim 50 / \sqrt{m d}` (Eq. (7.10)),
+    the porous-filled cavity case below about 500 Hz.
 
     :param surface_density: Membrane mass per unit area ``m``, in kg/m2.
     :param cavity_depth: Cavity depth ``d``, in metres.
@@ -969,15 +1018,16 @@ Layer = (
 
 @dataclass(frozen=True)
 class LayeredAbsorberResult:
-    """Oblique-incidence prediction of a layered absorber.
+    r"""Oblique-incidence prediction of a layered absorber.
 
     All arrays share the shape of ``frequency``. ``surface_impedance`` is the
-    specific impedance ``Zs = p / u_n`` at the front face (may be ``inf``
-    for a lossless-sheet stack over a rigid wall), ``reflection`` the complex
-    plane-wave reflection factor ``R(theta)``, ``absorption`` the coefficient
-    ``alpha(theta) = 1 - |R|^2`` and ``transfer_matrix`` the total chain
-    matrix with shape ``(2, 2, len(frequency))`` (unimodular: every layer is
-    reciprocal).
+    specific impedance :math:`Z_s = p / u_n` at the front face (may be
+    ``inf`` for a lossless-sheet stack over a rigid wall), ``reflection``
+    the complex plane-wave reflection factor :math:`R(\theta)`,
+    ``absorption`` the coefficient
+    :math:`\alpha(\theta) = 1 - \lvert R \rvert^2` and ``transfer_matrix``
+    the total chain matrix with shape ``(2, 2, len(frequency))``
+    (unimodular: every layer is reciprocal).
 
     ``layers`` retains the layer sequence the stack was solved with (front
     layer first) so :meth:`plot_geometry` can draw the cross-section; it is
@@ -995,7 +1045,8 @@ class LayeredAbsorberResult:
     layers: tuple[Layer, ...] | None = None
 
     def plot(self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any) -> Axes:
-        """Plot the absorption spectrum ``alpha(f)`` with ``|R|`` overlaid.
+        r"""Plot the absorption spectrum :math:`\alpha(f)` with
+        :math:`\lvert R \rvert` overlaid.
 
         Requires matplotlib (``pip install phonometry[plot]``); returns the
         :class:`~matplotlib.axes.Axes`.
@@ -1027,11 +1078,12 @@ class LayeredAbsorberResult:
 
 @dataclass(frozen=True)
 class DiffuseFieldAbsorptionResult:
-    """Random-incidence (Paris-integral) absorption of a layered absorber.
+    r"""Random-incidence (Paris-integral) absorption of a layered absorber.
 
-    ``absorption`` is ``alpha_dif(f)`` from Mechel 2e Sect. D.5 Eq. (9):
-    the plane-wave ``alpha(theta)`` weighted by ``cos(theta) sin(theta)`` and
-    normalised by ``sin^2(theta_limit)``.
+    ``absorption`` is :math:`\alpha_{\mathrm{dif}}(f)` from Mechel 2e
+    Sect. D.5 Eq. (9): the plane-wave :math:`\alpha(\theta)` weighted by
+    :math:`\cos(\theta) \sin(\theta)` and normalised by
+    :math:`\sin^2(\theta_{\mathrm{limit}})`.
     """
 
     frequency: Real
@@ -1039,7 +1091,8 @@ class DiffuseFieldAbsorptionResult:
     angle_limit: float
 
     def plot(self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any) -> Axes:
-        """Plot the random-incidence absorption spectrum ``alpha_dif(f)``.
+        r"""Plot the random-incidence absorption spectrum
+        :math:`\alpha_{\mathrm{dif}}(f)`.
 
         Requires matplotlib (``pip install phonometry[plot]``); returns the
         :class:`~matplotlib.axes.Axes`.
@@ -1091,12 +1144,12 @@ def _sheet_impedance(
 def _fluid_layer_terms(
     zc: Complex, k: Complex, thickness: float, k0_sin2: Real
 ) -> tuple[Complex, Complex]:
-    """In-depth impedance ``Zx`` and phase ``kx d`` of an oblique fluid layer.
+    r"""In-depth impedance ``Zx`` and phase ``kx d`` of an oblique layer.
 
-    ``kx = sqrt(k^2 - k0^2 sin^2 theta)`` (Snell's law, Cox & D'Antonio 3e
-    Eq. (2.30)) and the in-depth wave impedance ``Zx = zc k / kx``; the
-    layer chain matrix (Eq. (2.29)) is built from ``cos``/``sin`` of
-    ``kx d`` with these two terms.
+    :math:`k_x = \sqrt{k^2 - k_0^2 \sin^2 \theta}` (Snell's law, Cox &
+    D'Antonio 3e Eq. (2.30)) and the in-depth wave impedance
+    :math:`Z_x = z_c k / k_x`; the layer chain matrix (Eq. (2.29)) is built
+    from ``cos``/``sin`` of :math:`k_x d` with these two terms.
     """
     kx = np.sqrt(k * k - k0_sin2)
     # Passive decay: keep the branch with non-positive imaginary part.
@@ -1171,13 +1224,14 @@ def _termination_admittance(
     cos_t: float,
     rc: float,
 ) -> Complex:
-    """Admittance ``G = u/p`` at the termination face of the stack.
+    r"""Admittance :math:`G = u/p` at the termination face of the stack.
 
-    ``"free"`` is evaluated as the literal ``cos(theta) / rho c`` the
+    ``"free"`` is evaluated as the literal :math:`\cos(\theta) / \rho c` the
     recursion has always used, not as the reciprocal of the impedance the
-    global-matrix assembly needs: ``1 / (rho c / cos theta)`` is a different
-    double for about a quarter of the angles in ``[0, pi/2)``, and the
-    equivalent-fluid path must stay bit-identical.
+    global-matrix assembly needs: :math:`1 / (\rho c / \cos \theta)` is a
+    different double for about a quarter of the angles in
+    :math:`[0, \pi/2)`, and the equivalent-fluid path must stay
+    bit-identical.
     """
     if isinstance(termination, str) and termination == "free":
         return np.full(f.shape, cos_t / rc, dtype=np.complex128)
@@ -1194,7 +1248,7 @@ def _termination_impedance(
     cos_t: float,
     rc: float,
 ) -> Complex | None:
-    """Impedance ``p/v3`` closing the stack, or ``None`` for a hard wall.
+    """Impedance :math:`p/v_3` closing the stack, or ``None`` for a hard wall.
 
     The global-matrix assembly of Allard & Atalla Sect. 11.5 needs the
     termination as an impedance (their Eq. (11.84)); the admittance the
@@ -1276,15 +1330,16 @@ def _check_medium_grid(medium: PorousMediumResult, f: Real, owner: str) -> None:
 def _split_fluid_run(
     terms: list[tuple[str, Complex, Complex]], budget: float, limit: int
 ) -> list[list[tuple[str, Complex, Complex]]]:
-    """Group a fluid run into chain blocks of at most *budget* nepers.
+    r"""Group a fluid run into chain blocks of at most *budget* nepers.
 
     A fluid run that attenuates by ``b`` nepers has chain-matrix entries of
-    order ``e^b`` while the same block's back face is the identity, so the
-    assembled system of Allard & Atalla Sect. 11.6 holds rows differing by
-    ``e^b`` and the elimination of the block loses about ``b / ln(10)``
-    digits; past ``b ~ 710`` the entries overflow float64 outright. The split
-    is algebraically exact, because a homogeneous fluid layer of phase
-    ``kx d`` is the product of ``m`` layers of phase ``kx d / m``.
+    order :math:`e^b` while the same block's back face is the identity, so
+    the assembled system of Allard & Atalla Sect. 11.6 holds rows differing
+    by :math:`e^b` and the elimination of the block loses about
+    :math:`b / \ln(10)` digits; past :math:`b \sim 710` the entries overflow
+    float64 outright. The split is algebraically exact, because a
+    homogeneous fluid layer of phase :math:`k_x d` is the product of ``m``
+    layers of phase :math:`k_x d / m`.
 
     Returns the run unchanged, as a single group, whenever it stays inside
     the budget, so ordinary stacks keep the exact chain product they had.
@@ -1417,7 +1472,7 @@ def layered_absorber(
     air_density: float = _AIR_DENSITY,
     viscosity: float = _AIR_VISCOSITY,
 ) -> LayeredAbsorberResult:
-    """Transfer-matrix prediction of a layered absorber at one angle.
+    r"""Transfer-matrix prediction of a layered absorber at one angle.
 
     The *layers* list is ordered from the sound-incidence side towards the
     *termination*. Fluid layers (:class:`AirLayer`, :class:`PorousLayer`)
@@ -1430,21 +1485,24 @@ def layered_absorber(
     six-variable global-matrix assembly of Allard & Atalla 2e Sect. 11.5, with
     the coupling matrices of Sect. 11.4. The chain is closed by a rigid wall
     (``termination="rigid"``), by radiation into free air behind
-    (``termination="free"``, ``Z_L = rho c / cos(theta)``) or by an arbitrary
-    complex impedance. The reflection factor is
-    ``R = (Zs cos(theta) - rho c) / (Zs cos(theta) + rho c)`` and
-    ``alpha = 1 - |R|^2`` (Mechel 2e Sect. D.3 Eq. (2)).
+    (``termination="free"``, :math:`Z_L = \rho c / \cos(\theta)`) or by an
+    arbitrary complex impedance. The reflection factor is
+    :math:`R = (Z_s \cos(\theta) - \rho c) / (Z_s \cos(\theta) + \rho c)`
+    and :math:`\alpha = 1 - \lvert R \rvert^2` (Mechel 2e Sect. D.3
+    Eq. (2)).
 
     ``Zs``, ``R`` and ``alpha`` are evaluated with the numerically robust
     admittance recursion (algebraically identical to the chain product but
-    immune to the ``e^{|Im(kx)| d}`` overflow of the raw matrix entries for
+    immune to the :math:`e^{\lvert \operatorname{Im}(k_x) \rvert d}`
+    overflow of the raw matrix entries for
     extremely attenuating layers); the raw chain matrix is still returned in
     ``transfer_matrix`` and may overflow in such extreme cases.
 
     :param frequency: Frequency vector ``f``, in hertz.
     :param layers: Layer stack from the incidence side to the termination.
     :param angle: Polar angle of incidence ``theta``, in radians
-        (``0 <= theta < pi/2 - 1e-6``; grazing incidence is excluded).
+        (:math:`0 \le \theta < \pi/2 - 10^{-6}`; grazing incidence is
+        excluded).
     :param termination: ``"rigid"`` (default), ``"free"``, or a non-zero
         complex impedance (scalar or per-frequency array), in Pa s/m.
     :param speed_of_sound: Speed of sound ``c`` in air, in m/s.
@@ -1527,13 +1585,18 @@ def diffuse_field_absorption(
     air_density: float = _AIR_DENSITY,
     viscosity: float = _AIR_VISCOSITY,
 ) -> DiffuseFieldAbsorptionResult:
-    """Random-incidence absorption by the Paris integral (Mechel Sect. D.5).
+    r"""Random-incidence absorption by the Paris integral (Mechel Sect. D.5).
 
-    ``alpha_dif = (2 / sin^2 theta_lim) * int_0^theta_lim alpha(theta)
-    cos(theta) sin(theta) d(theta)`` (Mechel 2e Sect. D.5 Eq. (9)), evaluated
+    .. math::
+
+       \alpha_{\mathrm{dif}} = \frac{2}{\sin^2 \theta_{\mathrm{lim}}}
+       \int_0^{\theta_{\mathrm{lim}}} \alpha(\theta) \cos(\theta)
+       \sin(\theta) \, d\theta
+
+    (Mechel 2e Sect. D.5 Eq. (9)), evaluated
     with fixed-order Gauss-Legendre quadrature over the bulk-reacting
-    ``alpha(theta)`` of :func:`layered_absorber` (Sect. D.6 notes the bulk
-    integral generally must be evaluated numerically). Some references
+    :math:`\alpha(\theta)` of :func:`layered_absorber` (Sect. D.6 notes the
+    bulk integral generally must be evaluated numerically). Some references
     truncate the integral at 75-87 degrees instead of 90 (Sect. D.5); set
     ``angle_limit`` accordingly.
 
@@ -1583,21 +1646,28 @@ def statistical_absorption(
     *,
     angle_limit: float = np.pi / 2.0,
 ) -> Real:
-    """Closed-form Paris integral for a locally reacting plane.
+    r"""Closed-form Paris integral for a locally reacting plane.
 
-    With the normalised surface admittance ``Z0 G = g1 + j g2 = 1/z``
+    With the normalised surface admittance :math:`Z_0 G = g_1 + j g_2 = 1/z`
     (Mechel 2e Sect. D.5 Eq. (10)):
 
-    ``alpha_dif = (8 g1 / sin^2 T) [1 - cos T
-    + ((g1^2 - g2^2)/g2)(arctan((1 + g1)/g2) - arctan((g1 + cos T)/g2))
-    + g1 ln((g1^2 + g2^2 + 2 g1 cos T + cos^2 T)/(1 + g1^2 + g2^2 + 2 g1))]``
+    .. math::
 
-    reducing for ``T = pi/2`` to Eq. (4) and, for real admittance, to the
-    printed ``g2 = 0`` special case. The maximum over passive impedances is
-    0.951 (the published bound for locally reacting absorbers, Sect. D.5).
+       \alpha_{\mathrm{dif}} = \frac{8 g_1}{\sin^2 T} \left[1 - \cos T
+       + \frac{g_1^2 - g_2^2}{g_2}
+       \left(\arctan\frac{1 + g_1}{g_2}
+       - \arctan\frac{g_1 + \cos T}{g_2}\right)
+       + g_1 \ln\frac{g_1^2 + g_2^2 + 2 g_1 \cos T + \cos^2 T}
+       {1 + g_1^2 + g_2^2 + 2 g_1}\right]
+
+    reducing for :math:`T = \pi/2` to Eq. (4) and, for real admittance, to
+    the printed :math:`g_2 = 0` special case. The maximum over passive
+    impedances is 0.951 (the published bound for locally reacting absorbers,
+    Sect. D.5).
 
     :param normalized_impedance: Normalised surface impedance
-        ``z = Zs / (rho c)`` (complex scalar or array), with ``Re(z) > 0``.
+        :math:`z = Z_s / (\rho c)` (complex scalar or array), with
+        :math:`\operatorname{Re}(z) > 0`.
     :param angle_limit: Upper integration angle ``theta_lim``, in radians
         (0 < theta_lim <= pi/2; default pi/2).
     :return: Statistical absorption coefficient ``alpha_dif``.

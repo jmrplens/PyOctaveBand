@@ -1,5 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""
+r"""
 Field survey method for sound insulation and service-equipment noise
 (ISO 10052:2021).
 
@@ -14,39 +14,48 @@ the formulas and that table are identical in the harmonized
 EN ISO 10052:2004+A1:2010.
 
 **Reverberation index (Clause 3.3).** The correction for the receiving room is
-carried by a single quantity, the reverberation index ``k = 10 lg(T/T0)`` dB
-with the reference reverberation time ``T0 = 0,5 s``. It may be **measured** (pass
+carried by a single quantity, the reverberation index
+:math:`k = 10 \lg(T/T_0)` dB
+with the reference reverberation time :math:`T_0 = 0.5` s. It may be
+**measured** (pass
 the reverberation time ``T`` per band to :func:`reverberation_index`) or,
 in a control survey, **estimated** from the room type and volume with
 :func:`estimate_reverberation_index` (Clause 6.5, Tables 3 and 4).
 
 **Airborne between rooms (Clauses 3.2-3.6).** From the source- and
-receiving-room levels ``L1`` and ``L2`` the level difference ``D = L1 - L2``
-(Clause 3.2) gives the standardized level difference ``DnT = D + k``
-(Clause 3.4), the normalized level difference ``Dn = D + k +
-10 lg(A0 T0 / (0,16 V))`` (Clause 3.5, ``A0 = 10 m²``) and, when a common
+receiving-room levels ``L1`` and ``L2`` the level difference
+:math:`D = L_1 - L_2`
+(Clause 3.2) gives the standardized level difference :math:`D_{nT} = D + k`
+(Clause 3.4), the normalized level difference
+:math:`D_n = D + k + 10 \lg(A_0 T_0 / (0.16\,V))` (Clause 3.5,
+:math:`A_0 = 10` m²) and, when a common
 partition area ``S`` is given, the apparent sound reduction index
-``R' = D + k + 10 lg(S T0 / (0,16 V))`` (Clause 3.6). Where ``V/7,5 > S`` the
-value ``V/7,5`` is used for ``S``, with ``V`` the smaller room.
+:math:`R' = D + k + 10 \lg(S T_0 / (0.16\,V))` (Clause 3.6). Where
+:math:`V/7.5 > S` the
+value :math:`V/7.5` is used for ``S``, with ``V`` the smaller room.
 
 **Impact (Clauses 3.7-3.9).** From the impact level ``Li`` (Clause 3.7,
 energy-averaged over the tapping-machine positions; the 2021 edition also
 admits the heavy/soft impact source of Clause 3.10 with the maximum level
-``Li,Fmax`` of Clause 3.11) the standardized impact level ``L'nT = Li - k``
-(Clause 3.8) and the normalized impact level ``L'n = Li - k -
-10 lg(A0 T0 / (0,16 V))`` (Clause 3.9).
+``Li,Fmax`` of Clause 3.11) the standardized impact level
+:math:`L'_{nT} = L_i - k`
+(Clause 3.8) and the normalized impact level
+:math:`L'_n = L_i - k - 10 \lg(A_0 T_0 / (0.16\,V))` (Clause 3.9).
 
 **Façade (Clauses 3.13-3.15).** From the outdoor level 2 m in front of the
 façade ``L1,2m`` and the receiving-room level ``L2`` the façade level
-difference ``D2m = L1,2m - L2`` (Clause 3.13), the standardized
-``D2m,nT = D2m + k`` (Clause 3.14) and the normalized
-``D2m,n = D2m + k + 10 lg(A0 T0 / (0,16 V))`` (Clause 3.15).
+difference :math:`D_{2m} = L_{1,2m} - L_2` (Clause 3.13), the standardized
+:math:`D_{2m,nT} = D_{2m} + k` (Clause 3.14) and the normalized
+:math:`D_{2m,n} = D_{2m} + k + 10 \lg(A_0 T_0 / (0.16\,V))` (Clause 3.15).
 
 **Service equipment (Clauses 3.16-3.18).** From three A- or C-weighted sound
 pressure levels (one near a room corner, two in the reverberant field) the
-service-equipment level ``LXY = 10 lg[(1/3) sum 10^(0,1 LXY,i)]``
-(Clause 3.16), its standardized form ``LXY,nT = LXY - k`` (Clause 3.17) and
-normalized form ``LXY,n = LXY - k - 10 lg(A0 T0 / (0,16 V))`` (Clause 3.18).
+service-equipment level
+:math:`L_{XY} = 10 \lg[(1/3) \sum 10^{0.1 L_{XY,i}}]`
+(Clause 3.16), its standardized form :math:`L_{XY,nT} = L_{XY} - k`
+(Clause 3.17) and
+normalized form :math:`L_{XY,n} = L_{XY} - k - 10 \lg(A_0 T_0 / (0.16\,V))`
+(Clause 3.18).
 
 **Frequency range (Clause 6.4).** Airborne and tapping-machine impact
 quantities are measured in octave bands 125 Hz to 2000 Hz (5 bands); the
@@ -225,7 +234,7 @@ def _rate_impact(values: np.ndarray) -> ImpactRatingResult | None:
 def reverberation_index(
     t: Sequence[float] | np.ndarray, *, t0: float = _T0
 ) -> np.ndarray:
-    """Reverberation index ``k = 10 lg(T/T0)`` (ISO 10052:2021, Clause 3.3).
+    r"""Reverberation index :math:`k = 10 \lg(T/T_0)` (ISO 10052, Cl. 3.3).
 
     :param t: Receiving-room reverberation time per band, in seconds.
     :param t0: Reference reverberation time ``T0``, in seconds (Default: 0,5 s).
@@ -247,10 +256,12 @@ def estimate_reverberation_index(
     reverberation index ``k`` may be read from ISO 10052:2021 Table 4 (Table 3
     of EN ISO 10052:2004+A1:2010) by classifying the room. Furnished rooms use
     the ``room`` categories ``"kitchen"`` / ``"bathroom"`` (tabulated only for
-    ``V < 35``) and ``"furnished"`` (a general furnished living/sleeping room);
+    :math:`V < 35`) and ``"furnished"`` (a general furnished living/sleeping
+    room);
     unfurnished rooms use the Table 3 (2004: Table 2) construction letters
     ``"a"``-``"h"`` and the area-averaged mixed classes ``"a+e"``, ``"b+f"``,
-    ``"c+g"`` and ``"d+h"``. The table is valid for ``T0 = 0,5 s`` and rooms up
+    ``"c+g"`` and ``"d+h"``. The table is valid for :math:`T_0 = 0.5` s and
+    rooms up
     to 150 m³.
 
     :param volume: Receiving-room volume ``V``, in m³ (0 < V <= 150).
@@ -303,8 +314,8 @@ def estimate_reverberation_index(
 class SurveyAirborneResult:
     """Per-band airborne sound insulation, survey method (ISO 10052).
 
-    :ivar d: Level difference ``D = L1 - L2`` per band, in dB (Clause 3.2).
-    :ivar d_nt: Standardized level difference ``DnT = D + k`` (Clause 3.4).
+    :ivar d: Level difference :math:`D = L_1 - L_2` per band, dB (Clause 3.2).
+    :ivar d_nt: Standardized level difference :math:`D_{nT} = D + k` (Cl. 3.4).
     :ivar d_n: Normalized level difference ``Dn`` (Clause 3.5), or ``None``
         when the receiving-room volume was not supplied.
     :ivar r_prime: Apparent sound reduction index ``R'`` (Clause 3.6), or
@@ -407,7 +418,7 @@ class SurveyImpactResult:
 
     :ivar l_i: Energy-average impact sound pressure level ``Li`` per band, in
         dB (Clause 3.7).
-    :ivar l_nt: Standardized impact level ``L'nT = Li - k`` (Clause 3.8).
+    :ivar l_nt: Standardized impact level :math:`L'_{nT} = L_i - k` (Cl. 3.8).
     :ivar l_n: Normalized impact level ``L'n`` (Clause 3.9), or ``None``
         when the receiving-room volume was not supplied.
     :ivar rating: Weighted standardized impact level ``L'nT,w`` with ``CI``
@@ -482,7 +493,8 @@ class SurveyImpactResult:
 class SurveyFacadeResult:
     """Per-band façade sound insulation, survey method (ISO 10052).
 
-    :ivar d_2m: Façade level difference ``D2m = L1,2m - L2`` (Clause 3.13).
+    :ivar d_2m: Façade level difference :math:`D_{2m} = L_{1,2m} - L_2`
+        (Clause 3.13).
     :ivar d_2m_nt: Standardized façade level difference ``D2m,nT``
         (Clause 3.14).
     :ivar d_2m_n: Normalized façade level difference ``D2m,n`` (Clause 3.15),
@@ -561,7 +573,8 @@ class SurveyServiceEquipmentResult:
 
     :ivar l_xy: Service-equipment level ``LXY`` (Clause 3.16), the energy
         average of the three measurement positions, in dB.
-    :ivar l_xy_nt: Standardized level ``LXY,nT = LXY - k`` (Clause 3.17).
+    :ivar l_xy_nt: Standardized level :math:`L_{XY,nT} = L_{XY} - k`
+        (Clause 3.17).
     :ivar l_xy_n: Normalized level ``LXY,n`` (Clause 3.18), or ``None`` when
         the receiving-room volume was not supplied.
     """
@@ -590,16 +603,19 @@ def survey_airborne_insulation(
     volume: float | None = None,
     area: float | None = None,
 ) -> SurveyAirborneResult:
-    """
+    r"""
     Airborne sound insulation between rooms, survey method (ISO 10052:2021).
 
-    Computes, per octave band, the level difference ``D = L1 - L2``
-    (Clause 3.2), the standardized level difference ``DnT = D + k``
+    Computes, per octave band, the level difference :math:`D = L_1 - L_2`
+    (Clause 3.2), the standardized level difference :math:`D_{nT} = D + k`
     (Clause 3.4) and, when ``volume`` is given, the normalized level
-    difference ``Dn = D + k + 10 lg(A0 T0 / (0,16 V))`` (Clause 3.5). When a
+    difference :math:`D_n = D + k + 10 \lg(A_0 T_0 / (0.16\,V))` (Clause 3.5).
+    When a
     common-partition ``area`` is also given, the apparent sound reduction index
-    ``R' = D + k + 10 lg(S T0 / (0,16 V))`` (Clause 3.6) is formed, using
-    ``V/7,5`` for ``S`` where that exceeds the given area (Clause 3.6). The
+    :math:`R' = D + k + 10 \lg(S T_0 / (0.16\,V))` (Clause 3.6) is formed,
+    using
+    :math:`V/7.5` for ``S`` where that exceeds the given area (Clause 3.6).
+    The
     reverberation index ``k`` comes from :func:`reverberation_index` (measured
     ``T``) or a Clause 6.5 estimate.
 
@@ -654,13 +670,14 @@ def survey_impact_insulation(
     *,
     volume: float | None = None,
 ) -> SurveyImpactResult:
-    """
+    r"""
     Impact sound insulation between rooms, survey method (ISO 10052:2021).
 
     Computes, per octave band, the energy-average impact sound pressure level
-    ``Li`` (Clause 3.7), the standardized impact level ``L'nT = Li - k``
+    ``Li`` (Clause 3.7), the standardized impact level
+    :math:`L'_{nT} = L_i - k`
     (Clause 3.8) and, when ``volume`` is given, the normalized impact level
-    ``L'n = Li - k - 10 lg(A0 T0 / (0,16 V))`` (Clause 3.9).
+    :math:`L'_n = L_i - k - 10 \lg(A_0 T_0 / (0.16\,V))` (Clause 3.9).
 
     ``li`` may be one value per band or a two-dimensional
     ``(positions, bands)`` array (energy-averaged over the tapping-machine
@@ -690,14 +707,17 @@ def survey_facade_insulation(
     *,
     volume: float | None = None,
 ) -> SurveyFacadeResult:
-    """
+    r"""
     Façade sound insulation, survey method (ISO 10052:2021).
 
     Computes, per octave band, the façade level difference
-    ``D2m = L1,2m - L2`` (Clause 3.13), the standardized façade level
-    difference ``D2m,nT = D2m + k`` (Clause 3.14) and, when ``volume`` is
+    :math:`D_{2m} = L_{1,2m} - L_2` (Clause 3.13), the standardized façade
+    level
+    difference :math:`D_{2m,nT} = D_{2m} + k` (Clause 3.14) and, when
+    ``volume`` is
     given, the normalized façade level difference
-    ``D2m,n = D2m + k + 10 lg(A0 T0 / (0,16 V))`` (Clause 3.15).
+    :math:`D_{2m,n} = D_{2m} + k + 10 \lg(A_0 T_0 / (0.16\,V))`
+    (Clause 3.15).
 
     :param l1_2m: Outdoor sound pressure levels 2 m in front of the façade,
         in dB (one value per band or ``(positions, bands)``).
@@ -730,15 +750,18 @@ def survey_service_equipment_level(
     *,
     volume: float | None = None,
 ) -> SurveyServiceEquipmentResult:
-    """
+    r"""
     Service-equipment sound pressure level, survey method (ISO 10052:2021).
 
-    Computes the service-equipment level ``LXY = 10 lg[(1/3) sum 10^(0,1
-    LXY,i)]`` (Clause 3.16) as the energy average of the three measurement
+    Computes the service-equipment level
+    :math:`L_{XY} = 10 \lg[(1/3) \sum 10^{0.1 L_{XY,i}}]`
+    (Clause 3.16) as the energy average of the three measurement
     positions (one near a corner, two in the reverberant field, Clause 6.3.3),
-    the standardized level ``LXY,nT = LXY - k`` (Clause 3.17) and, when
-    ``volume`` is given, the normalized level ``LXY,n = LXY - k -
-    10 lg(A0 T0 / (0,16 V))`` (Clause 3.18). ``X`` is the frequency weighting
+    the standardized level :math:`L_{XY,nT} = L_{XY} - k` (Clause 3.17) and,
+    when
+    ``volume`` is given, the normalized level
+    :math:`L_{XY,n} = L_{XY} - k - 10 \lg(A_0 T_0 / (0.16\,V))`
+    (Clause 3.18). ``X`` is the frequency weighting
     (A or C) and ``Y`` the time weighting (F, S or Leq).
 
     :param measurements: The three A- or C-weighted levels, in dB; either

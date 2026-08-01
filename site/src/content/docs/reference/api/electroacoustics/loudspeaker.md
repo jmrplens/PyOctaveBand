@@ -25,16 +25,20 @@ the report never merely repeats a manufacturer number:
   measured at a constant voltage `U` and distance `d`; the sensitivity
   level referred to 1 W into the rated impedance `R` at 1 m is
 
-      L_M = L_band + 20 lg(d / d0) + 20 lg(U_p / U),   d0 = 1 m,
+$$
+L_M = L_\text{band} + 20 \lg(d / d_0) + 20 \lg(U_p / U), \qquad d_0 = 1\ \mathrm{m}
+$$
 
-  where `L_band` is the energetic mean of the on-axis level over a stated
-  band (20.1.2.4: the r.m.s. of the band pressures) and `U_p = sqrt(R * P0)`
-  with `P0 = 1 W` is the voltage that drives 1 W into `R` (20.3.2). With the
-  default drive `U = sqrt(R)` at `d = 1 m` the two corrections vanish and
-  the sensitivity level equals the band mean, which for `R = 8` ohm is the
-  familiar "dB / 2.83 V @ 1 m" figure. This is the clean-room oracle: a flat
-  `L0` response driven at `sqrt(R)` volts and 1 m returns `L0` exactly,
-  and a doubled voltage returns `L0 - 6,02` dB.
+  where $L_\text{band}$ is the energetic mean of the on-axis level
+  over a stated band (20.1.2.4: the r.m.s. of the band pressures) and
+  $U_p = \sqrt{R P_0}$ with $P_0 = 1$ W is the voltage that
+  drives 1 W into `R` (20.3.2). With the default drive
+  $U = \sqrt{R}$ at $d = 1$ m the two corrections vanish and
+  the sensitivity level equals the band mean, which for $R = 8$ ohm
+  is the familiar "dB / 2.83 V @ 1 m" figure. This is the clean-room
+  oracle: a flat $L_0$ response driven at $\sqrt{R}$ volts
+  and 1 m returns $L_0$ exactly, and a doubled voltage returns
+  $L_0 - 6.02$ dB.
 
 * **Effective frequency range** (21.2). The range of frequencies for which the
   on-axis response is not more than 10 dB below the level averaged over a
@@ -72,7 +76,8 @@ loudspeaker_characteristics(
 ) -> LoudspeakerCharacteristics
 ```
 
-Assemble the rated loudspeaker characteristics for an IEC 60268-5 report.
+Assemble the rated loudspeaker characteristics for an IEC 60268-5
+report.
 
 The characteristic sensitivity level (20.3/20.4) and the effective frequency
 range (21.2) are computed from the on-axis response; the optional impedance,
@@ -85,7 +90,7 @@ distortion and directivity data feed the corresponding report panels.
 | `frequencies` | On-axis response frequency axis, in Hz (1-D, > 0). Logarithmically spaced samples are strongly recommended: the band averages behind the sensitivity level and the effective-range reference weight each sample equally, so a linearly spaced grid over-weights the high-frequency end of every band. |
 | `spl_db` | On-axis sound pressure level, in dB re 20 uPa. |
 | `rated_impedance` | Rated impedance `R`, in ohm (16.1). |
-| `input_voltage` | Constant drive voltage of the response, in V; defaults to `sqrt(R)` (1 W into `R`, the 2,83 V @ 8 ohm convention). |
+| `input_voltage` | Constant drive voltage of the response, in V; defaults to $\sqrt{R}$ (1 W into `R`, the 2.83 V @ 8 ohm convention). |
 | `distance` | Measuring distance of the response, in m (default 1). |
 | `sensitivity_band` | Stated band `(lo, hi)` for the characteristic sensitivity, in Hz; defaults to the one-octave band in the region of maximum sensitivity. |
 | `tolerance_db` | Half-width of the plotted response tolerance band, in dB (default 3). |
@@ -179,7 +184,7 @@ computed from the on-axis response (see the module docstring).
 Characteristic sensitivity as a pressure, in Pa (20.3).
 
 The sound pressure at 1 m for 1 W into the rated impedance:
-`p_M = p_ref * 10 ** (L_M / 20)`.
+$p_M = p_\text{ref} \cdot 10^{L_M / 20}$.
 
 ### LoudspeakerCharacteristics.minimum_impedance
 
