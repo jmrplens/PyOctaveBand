@@ -389,13 +389,21 @@ const menuId = `page-actions-menu-${variant}`;
       if (returnFocus) toggle.focus();
     };
 
-    toggle.addEventListener('click', () => {
-      if (menu.hidden) open();
-      else close();
+    // A press of the pointer leaves focus where it is: the reader is looking at
+    // the menu and will click what they want. A press of the keyboard cannot,
+    // because the entries are out of the tab order, so a keyboard reader left
+    // standing on the toggle has an open menu and no way into it that the page
+    // ever mentioned. `detail` is 0 only for a click the browser synthesised
+    // from a key, which is what tells the two apart here.
+    toggle.addEventListener('click', (event) => {
+      if (!menu.hidden) close();
+      else if (event.detail === 0) open(0);
+      else open();
     });
 
     // Down and Up open the menu onto its first or last entry, the standard
-    // keyboard entry points for a button that owns a popup.
+    // keyboard entry points for a button that owns a popup. Enter and Space
+    // arrive as the synthesised click above and land on the first entry too.
     toggle.addEventListener('keydown', (event) => {
       if (event.key === 'ArrowDown') {
         event.preventDefault();
