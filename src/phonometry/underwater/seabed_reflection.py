@@ -1,26 +1,34 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""
+r"""
 Plane-wave reflection at the seabed (fluid-fluid Rayleigh model).
 
-A plane wave in the water column (density ``ρ1``, sound speed ``c1``) striking a
-fluid sediment half-space (``ρ2``, ``c2``) reflects with the Rayleigh pressure
-reflection coefficient (Medwin & Clay, Eq. 2.6.11a). Using the grazing angle
-``φ`` (measured from the interface), the angle of incidence from the normal is
-``θ1 = 90° − φ``, Snell's law gives ``sinθ2 = (c2/c1)·cosφ`` and
-``R = (ρ2·c2·sinφ − ρ1·c1·cosθ2) / (ρ2·c2·sinφ + ρ1·c1·cosθ2)``.
+A plane wave in the water column (density :math:`\rho_1`, sound speed
+``c1``) striking a fluid sediment half-space (:math:`\rho_2`, ``c2``)
+reflects with the Rayleigh pressure reflection coefficient (Medwin & Clay,
+Eq. 2.6.11a). Using the grazing angle :math:`\varphi` (measured from the
+interface), the angle of incidence from the normal is
+:math:`\theta_1 = 90^\circ - \varphi`, Snell's law gives
+:math:`\sin\theta_2 = (c_2/c_1) \cos\varphi` and
 
-* :func:`critical_angle` -- the critical grazing angle ``φc = arccos(c1/c2)``
-  (only when ``c2 > c1``); below it the wave is totally reflected (``|R| = 1``).
+.. math::
+
+   R = \frac{\rho_2 c_2 \sin\varphi - \rho_1 c_1 \cos\theta_2}
+   {\rho_2 c_2 \sin\varphi + \rho_1 c_1 \cos\theta_2}
+
+* :func:`critical_angle` -- the critical grazing angle
+  :math:`\varphi_c = \arccos(c_1/c_2)` (only when ``c2 > c1``); below it the
+  wave is totally reflected (:math:`\lvert R \rvert = 1`).
 * :func:`reflection_coefficient` -- the complex ``R`` per grazing angle.
 * :func:`seabed_reflection` -- the complex ``R``, its magnitude ``|R|`` and the
   bottom loss bundled with the interface parameters into a
   :class:`SeabedReflection` whose ``.plot()`` draws ``|R|`` versus grazing angle.
-* :func:`bottom_reflection_loss` -- the bottom loss ``BL = −20·lg|R|`` (dB),
-  returned as a :class:`BottomLossResult` with a ``.plot()``.
+* :func:`bottom_reflection_loss` -- the bottom loss
+  :math:`\mathrm{BL} = -20 \log_{10} \lvert R \rvert` (dB), returned as a
+  :class:`BottomLossResult` with a ``.plot()``.
 
-Lossless fluid-fluid model (real ``ρ``/``c``); sediment attenuation is out of
-scope. Densities enter only through the impedance ratio, so any consistent unit
-works (kg/m³ by convention).
+Lossless fluid-fluid model (real :math:`\rho`/``c``); sediment attenuation is
+out of scope. Densities enter only through the impedance ratio, so any
+consistent unit works (kg/m³ by convention).
 """
 
 from __future__ import annotations
@@ -38,7 +46,8 @@ if TYPE_CHECKING:
 
 
 def critical_angle(c1: float, c2: float) -> float:
-    """Critical grazing angle ``φc = arccos(c1/c2)``, in degrees.
+    r"""Critical grazing angle :math:`\varphi_c = \arccos(c_1/c_2)`, in
+    degrees.
 
     Defined only when the sediment is faster than the water (``c2 > c1``); at and
     below this grazing angle the wave is totally reflected.
@@ -63,13 +72,14 @@ def reflection_coefficient(
     rho2: float,
     c2: float,
 ) -> NDArray[np.complex128]:
-    """Complex plane-wave pressure reflection coefficient at the seabed.
+    r"""Complex plane-wave pressure reflection coefficient at the seabed.
 
-    :param grazing_angle: Grazing angle(s) ``φ`` from the interface, in degrees
-        (``0`` grazing to ``90`` normal incidence).
-    :param rho1: Water density ``ρ1`` (any consistent unit; kg/m³ by convention).
+    :param grazing_angle: Grazing angle(s) :math:`\varphi` from the
+        interface, in degrees (``0`` grazing to ``90`` normal incidence).
+    :param rho1: Water density :math:`\rho_1` (any consistent unit; kg/m³ by
+        convention).
     :param c1: Sound speed in the water ``c1``, in m/s.
-    :param rho2: Sediment density ``ρ2``.
+    :param rho2: Sediment density :math:`\rho_2`.
     :param c2: Sound speed in the sediment ``c2``, in m/s.
     :return: The complex reflection coefficient per grazing angle.
     :raises ValueError: If the inputs are invalid.
@@ -102,10 +112,12 @@ def reflection_coefficient(
 
 @dataclass(frozen=True)
 class BottomLossResult:
-    """Bottom reflection loss versus grazing angle (fluid-fluid Rayleigh model).
+    r"""Bottom reflection loss versus grazing angle (fluid-fluid Rayleigh
+    model).
 
     :ivar grazing_angle: Grazing angles, in degrees.
-    :ivar reflection_loss: Bottom loss ``BL = −20·lg|R|`` per angle, in dB.
+    :ivar reflection_loss: Bottom loss
+        :math:`\mathrm{BL} = -20 \log_{10} \lvert R \rvert` per angle, in dB.
     :ivar reflection_coefficient: Complex reflection coefficient per angle.
     :ivar critical_angle: The critical grazing angle, in degrees, or ``None`` if
         the sediment is not faster than the water.
@@ -132,16 +144,18 @@ def bottom_reflection_loss(
     rho2: float,
     c2: float,
 ) -> BottomLossResult:
-    """Bottom reflection loss ``BL = −20·lg|R|`` versus grazing angle (dB).
+    r"""Bottom reflection loss :math:`\mathrm{BL} = -20 \log_{10} \lvert R \rvert`
+    versus grazing angle (dB).
 
-    At an angle of intromission ``R = 0`` and the loss is ``inf`` (total
+    At an angle of intromission :math:`R = 0` and the loss is ``inf`` (total
     transmission into the sediment); that is a legitimate bottom-loss value,
     returned without warning.
 
-    :param grazing_angle: Grazing angle(s) ``φ`` from the interface, in degrees.
-    :param rho1: Water density ``ρ1`` (default 1000 kg/m³).
+    :param grazing_angle: Grazing angle(s) :math:`\varphi` from the
+        interface, in degrees.
+    :param rho1: Water density :math:`\rho_1` (default 1000 kg/m³).
     :param c1: Sound speed in the water ``c1``, in m/s (default 1500).
-    :param rho2: Sediment density ``ρ2``.
+    :param rho2: Sediment density :math:`\rho_2`.
     :param c2: Sound speed in the sediment ``c2``, in m/s.
     :return: A :class:`BottomLossResult`.
     :raises ValueError: If the inputs are invalid.
@@ -163,26 +177,30 @@ def bottom_reflection_loss(
 
 @dataclass(frozen=True)
 class SeabedReflection:
-    """Plane-wave seabed reflection coefficient versus grazing angle.
+    r"""Plane-wave seabed reflection coefficient versus grazing angle.
 
     Bundles the complex Rayleigh reflection coefficient ``R`` over a
     grazing-angle grid with its magnitude ``|R|``, the bottom loss
-    ``BL = −20·lg|R|`` and the fluid-fluid interface parameters, so the classic
-    ``|R|`` versus grazing-angle curve can be drawn with :meth:`plot`. Build it
-    with :func:`seabed_reflection`; the frozen instance is a thin, plottable
-    wrapper and re-runs none of the maths.
+    :math:`\mathrm{BL} = -20 \log_{10} \lvert R \rvert` and the fluid-fluid
+    interface parameters, so the classic ``|R|`` versus grazing-angle curve
+    can be drawn with :meth:`plot`. Build it with :func:`seabed_reflection`;
+    the frozen instance is a thin, plottable wrapper and re-runs none of the
+    maths.
 
-    :ivar grazing_angle: Grazing angles ``φ`` from the interface, in degrees.
+    :ivar grazing_angle: Grazing angles :math:`\varphi` from the interface,
+        in degrees.
     :ivar reflection_coefficient: Complex pressure reflection coefficient ``R``
         per grazing angle.
     :ivar magnitude: Reflection-coefficient magnitude ``|R|`` per grazing angle
         (``1`` below the critical angle for a faster sediment).
-    :ivar bottom_loss: Bottom loss ``BL = −20·lg|R|`` per grazing angle, in dB.
+    :ivar bottom_loss: Bottom loss
+        :math:`\mathrm{BL} = -20 \log_{10} \lvert R \rvert` per grazing angle, in
+        dB.
     :ivar critical_angle: The critical grazing angle, in degrees, or ``None`` if
         the sediment is not faster than the water.
-    :ivar rho1: Water density ``ρ1``.
+    :ivar rho1: Water density :math:`\rho_1`.
     :ivar c1: Sound speed in the water ``c1``, in m/s.
-    :ivar rho2: Sediment density ``ρ2``.
+    :ivar rho2: Sediment density :math:`\rho_2`.
     :ivar c2: Sound speed in the sediment ``c2``, in m/s.
     """
 
@@ -223,21 +241,23 @@ def seabed_reflection(
     rho2: float,
     c2: float,
 ) -> SeabedReflection:
-    """Build a plottable seabed reflection-coefficient result (Rayleigh model).
+    r"""Build a plottable seabed reflection-coefficient result (Rayleigh
+    model).
 
     Evaluates :func:`reflection_coefficient` at ``grazing_angle`` for the given
     fluid-fluid interface and bundles the complex ``R``, its magnitude ``|R|``,
-    the bottom loss ``BL = −20·lg|R|`` and the interface parameters into a
-    :class:`SeabedReflection` that exposes ``.plot()``. The maths is unchanged;
-    this is a thin, plottable wrapper around the existing function (the same
-    ``ValueError`` cases apply). At an angle of intromission ``R = 0`` and the
-    bottom loss is ``inf`` (total transmission), returned without warning.
+    the bottom loss :math:`\mathrm{BL} = -20 \log_{10} \lvert R \rvert` and the
+    interface parameters into a :class:`SeabedReflection` that exposes
+    ``.plot()``. The maths is unchanged; this is a thin, plottable wrapper
+    around the existing function (the same ``ValueError`` cases apply). At an
+    angle of intromission :math:`R = 0` and the bottom loss is ``inf`` (total
+    transmission), returned without warning.
 
-    :param grazing_angle: Grazing angle(s) ``φ`` from the interface, in degrees
-        (``0`` grazing to ``90`` normal incidence).
-    :param rho1: Water density ``ρ1`` (default 1000 kg/m³).
+    :param grazing_angle: Grazing angle(s) :math:`\varphi` from the
+        interface, in degrees (``0`` grazing to ``90`` normal incidence).
+    :param rho1: Water density :math:`\rho_1` (default 1000 kg/m³).
     :param c1: Sound speed in the water ``c1``, in m/s (default 1500).
-    :param rho2: Sediment density ``ρ2``.
+    :param rho2: Sediment density :math:`\rho_2`.
     :param c2: Sound speed in the sediment ``c2``, in m/s.
     :return: A frozen :class:`SeabedReflection`.
     :raises ValueError: If the inputs are invalid.

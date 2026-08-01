@@ -1,20 +1,27 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""
+r"""
 Psychoacoustic annoyance (PA) after Fastl & Zwicker.
 
 Psychoacoustic annoyance combines four hearing sensations -- loudness,
 sharpness, fluctuation strength and roughness -- into a single figure that
 tracks annoyance ratings from listening experiments. The model is due to
 Widmann (1992) and is given in Fastl & Zwicker, *Psychoacoustics: Facts and
-Models* (Equations 16.2-16.4)::
+Models* (Equations 16.2-16.4):
 
-    PA = N5 * (1 + sqrt(wS**2 + wFR**2))
+.. math::
+
+   PA = N_5 \left( 1 + \sqrt{w_S^2 + w_{FR}^2} \right) \tag{Eq. 16.2}
 
 with the percentile loudness ``N5`` in sone and the two loudness-weighted
-terms::
+terms
 
-    wS  = (S - 1.75) * 0.25 * lg(N5 + 10)          for S > 1.75 acum, else 0
-    wFR = (2.18 / N5**0.4) * (0.4 * F + 0.6 * R)
+.. math::
+
+   w_S = (S - 1.75) \cdot 0.25 \cdot \log_{10}(N_5 + 10)
+   \quad \text{for } S > 1.75~\text{acum, else } 0 \tag{Eq. 16.3}
+
+   w_{FR} = \frac{2.18}{N_5^{0.4}} \left( 0.4 F + 0.6 R \right)
+   \tag{Eq. 16.4}
 
 describing sharpness ``S`` (acum) and the joint influence of fluctuation
 strength ``F`` (vacil) and roughness ``R`` (asper). Note the "1 +" sits
@@ -103,11 +110,12 @@ def psychoacoustic_annoyance(
     fluctuation_strength: float,
     roughness: float,
 ) -> PsychoacousticAnnoyanceResult:
-    """Psychoacoustic annoyance from the four hearing sensations (16.2-16.4).
+    r"""Psychoacoustic annoyance from the four hearing sensations (16.2-16.4).
 
-    ``PA = N5 * (1 + sqrt(wS**2 + wFR**2))`` with the loudness-weighted sharpness
-    term ``wS`` (Equation 16.3) and the fluctuation/roughness term ``wFR``
-    (Equation 16.4). The sharpness term is zero for ``S <= 1.75 acum``.
+    :math:`PA = N_5 (1 + \sqrt{w_S^2 + w_{FR}^2})` with the loudness-weighted
+    sharpness term ``wS`` (Equation 16.3) and the fluctuation/roughness term
+    ``wFR`` (Equation 16.4). The sharpness term is zero for
+    :math:`S \le 1.75` acum.
 
     :param n5: Percentile loudness ``N5``, in sone (the loudness exceeded 5 %
         of the time; :attr:`~phonometry.ZwickerLoudness.n5`).

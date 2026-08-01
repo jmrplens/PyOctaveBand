@@ -38,8 +38,12 @@ Full STI from a room/system impulse response (indirect method).
 The impulse response is filtered into the seven octave bands 125 Hz -
 8 kHz (IEC 61260-1 filters) and the modulation transfer function is
 obtained from the Schroeder integral (IEC 60268-16, indirect method):
-`m_k(f_m) = |integral h_k^2(t) exp(-j 2 pi f_m t) dt| /
-integral h_k^2(t) dt` at the 14 modulation frequencies 0,63-12,5 Hz
+
+$$
+m_k(f_m) = \left| \int h_k^2(t)\, e^{-j 2\pi f_m t}\, dt \right| \Big/ \int h_k^2(t)\, dt
+$$
+
+at the 14 modulation frequencies 0,63-12,5 Hz
 (A.2.2). The result then follows the standard chain: optional noise
 degradation, optional auditory masking and absolute reception
 threshold correction, effective SNR clipped to +/-15 dB, transmission

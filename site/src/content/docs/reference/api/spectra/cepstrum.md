@@ -8,8 +8,9 @@ sidebar:
 Cepstral analysis: real/power/complex cepstrum, liftering and echo detection.
 
 The **cepstrum** is the inverse Fourier transform of the logarithm of a
-spectrum. Because the log turns the convolution `x = h * u` into the sum
-`ln X = ln H + ln U` (Havelock, Kahle & Cocchi (eds.), *Handbook of Signal
+spectrum. Because the log turns the convolution $x = h * u$ into the
+sum $\ln X = \ln H + \ln U$ (Havelock, Kahle & Cocchi (eds.),
+*Handbook of Signal
 Processing in Acoustics*, Springer 2008: Milner, Ch. 27, Eqs. (22)-(23)),
 components that overlap hopelessly in the spectrum separate cleanly in the
 cepstral domain -- the smooth spectral envelope collapses onto the low
@@ -18,29 +19,37 @@ periodic spectral ripple from harmonics, reflections or echoes concentrates
 at the quefrency of its period. Three variants are standard:
 
 * the **power cepstrum**, the inverse transform of the log *power* spectrum
-  `ln|X|^2` (Milner Fig. 21) -- real, even, phase-blind. (Convention
-  note: Bogert, Healy & Tukey's original 1963 power cepstrum squares once
-  more, `|IDFT(ln|X|^2)|^2`; this module follows Milner's linear
-  `IDFT(ln|X|^2)` throughout.);
-* the **real cepstrum**, the inverse transform of `ln|X|` -- exactly half
+  $\ln \lvert X \rvert^2$ (Milner Fig. 21) -- real, even,
+  phase-blind. (Convention note: Bogert, Healy & Tukey's original 1963
+  power cepstrum squares once more,
+  $\lvert \operatorname{IDFT}(\ln \lvert X \rvert^2) \rvert^2$; this
+  module follows Milner's linear
+  $\operatorname{IDFT}(\ln \lvert X \rvert^2)$ throughout.);
+* the **real cepstrum**, the inverse transform of
+  $\ln \lvert X \rvert$ -- exactly half
   the power cepstrum, and the quantity whose causal folding yields the
   minimum-phase reconstruction of [`phonometry.minimum_phase`](/phonometry/reference/api/spectra/phase/#minimum_phase)
   (Bendat & Piersol, *Random Data*, 4th ed., Sec. 13.1.4; Tohyama in
   Havelock Ch. 75 manipulates minimum-phase and all-pass components the
   same way);
 * the **complex cepstrum**, the inverse transform of the full complex
-  logarithm `ln|X| + j arg X` with the phase unwrapped (Neelamani in
+  logarithm $\ln \lvert X \rvert + j \arg X$ with the phase
+  unwrapped (Neelamani in
   Havelock Ch. 87, Eq. (14)) -- invertible, hence the engine of
   homomorphic deconvolution.
 
-**Echoes.** A single reflection `x(t) = s(t) + a s(t - t0)` multiplies the
-spectrum by `1 + a e^{-j 2 pi f t0}`, whose complex logarithm expands (for
-`|a| < 1`) into the exactly summable series
+**Echoes.** A single reflection $x(t) = s(t) + a s(t - t_0)$
+multiplies the spectrum by $1 + a e^{-j 2 \pi f t_0}$, whose complex
+logarithm expands (for $\lvert a \rvert < 1$) into the exactly
+summable series
 
-`ln(1 + a e^{-j theta}) = sum_{n>=1} (-1)^{n+1} (a^n / n) e^{-j n theta}`,
+$$
+\ln(1 + a e^{-j \theta}) = \sum_{n \ge 1} (-1)^{n+1} \frac{a^n}{n} e^{-j n \theta}
+$$
 
-so the cepstrum carries a spike train at the *rahmonics* `n t0` with
-amplitudes `a, -a^2/2, a^3/3, ...` (their sum is `ln(1 + a)`): a peak at
+so the cepstrum carries a spike train at the *rahmonics* $n t_0$ with
+amplitudes $a, -a^2/2, a^3/3, \ldots$ (their sum is
+$\ln(1 + a)$): a peak at
 exactly the echo delay whose height reads out the reflection coefficient.
 [`echo_detection`](/phonometry/reference/api/spectra/cepstrum/#echo_detection) automates that reading on the power cepstrum, where
 the first rahmonic's height is `a` itself.
@@ -195,13 +204,14 @@ echo_detection(
 
 Detect an echo as the largest power-cepstrum peak in a quefrency band.
 
-A reflection `x(t) = s(t) + a s(t - t0)` leaves a spike of height
-`a` -- positive or negative with the sign of the reflection -- at
-quefrency `t0` in the power cepstrum (module note; the seismic
+A reflection $x(t) = s(t) + a s(t - t_0)$ leaves a spike of
+height `a` -- positive or negative with the sign of the reflection --
+at quefrency $t_0$ in the power cepstrum (module note; the
+seismic
 reverberation spike trains of Neelamani Sec. 3.3 are the same
 signature), regardless of the spectrum of `s` itself, which
 concentrates at low quefrencies. The peak is therefore picked on
-`|cepstrum|`, so an inverting reflection (`a < 0`, e.g. a
+`|cepstrum|`, so an inverting reflection ($a < 0$, e.g. a
 pressure-release boundary) is found at its true delay, and the
 *signed* cepstrum value at the peak is returned as the reflection
 coefficient. The search band starts above the low-quefrency region
@@ -255,7 +265,7 @@ An echo delay and reflection coefficient read off the power cepstrum.
 | `cepstrum` | Power cepstrum searched. |
 | `delay` | The echo delay, in seconds: the quefrency of the largest `\|cepstrum\|` peak in the searched band, refined by quadratic (parabolic) interpolation of `\|cepstrum\|` through the peak sample and its two neighbours, so an off-sample delay is estimated to a fraction of a sample. |
 | `delay_samples` | The peak position in whole samples (no interpolation): the index at which `reflection_coefficient` is read, so `delay` differs from `delay_samples/fs` by the interpolated sub-sample offset (at most half a sample). |
-| `reflection_coefficient` | Signed cepstrum value at the peak sample. For a single in-record echo `x(t) = s(t) + a s(t - t0)` the power cepstrum's first rahmonic height is exactly `a` -- of either sign -- (the `n = 1` term of the `ln(1 + a e^{-j theta})` series), so the value estimates the reflection coefficient directly, including its polarity. When the true delay falls between samples the rahmonic is split across neighbouring quefrency bins and the reported coefficient underestimates `\|a\|` (down to roughly 65 % of it for a delay midway between samples); the interpolated `delay` is unaffected. |
+| `reflection_coefficient` | Signed cepstrum value at the peak sample. For a single in-record echo $x(t) = s(t) + a s(t - t_0)$ the power cepstrum's first rahmonic height is exactly `a` -- of either sign -- (the $n = 1$ term of the $\ln(1 + a e^{-j \theta})$ series), so the value estimates the reflection coefficient directly, including its polarity. When the true delay falls between samples the rahmonic is split across neighbouring quefrency bins and the reported coefficient underestimates $\lvert a \rvert$ (down to roughly 65 % of it for a delay midway between samples); the interpolated `delay` is unaffected. |
 | `search_range` | The `(min, max)` quefrency band searched, s. |
 | `fs` | Sample rate of the analysed record, in Hz. |
 | `nfft` | FFT length used. |

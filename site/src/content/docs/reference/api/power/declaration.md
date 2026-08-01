@@ -27,12 +27,12 @@ of two forms selected by the relevant noise test code (clause 4):
   unlikely to exceed at the stated confidence level.
 
 `K` combines the measurement uncertainty (reproducibility) and, for a batch,
-the production spread (clauses 3.20 to 3.24; `K = 1,645 sigma_R` for a single
-machine, Annex A.2.2). Verification (clause 6) compares a verification
+the production spread (clauses 3.20 to 3.24; $K = 1.645 \sigma_R$ for a
+single machine, Annex A.2.2). Verification (clause 6) compares a verification
 measurement `L_1` against the declared form: for a single machine the
-combined form is verified when `L_1 <= L_d` and the dual-number form when
-`L_1 <= (L + K)`, the sum of the separately rounded declared values
-(clause 6.2).
+combined form is verified when $L_1 \le L_d$ and the dual-number form
+when $L_1 \le (L + K)$, the sum of the separately rounded declared
+values (clause 6.2).
 
 This module models a declaration as [`NoiseEmissionDeclaration`](/phonometry/reference/api/power/declaration/#noiseemissiondeclaration), a set of
 [`OperatingModeDeclaration`](/phonometry/reference/api/power/declaration/#operatingmodedeclaration) values (one per operating mode, clause 4), and
@@ -73,7 +73,7 @@ fiche.
 | `operating_conditions` | Operating and mounting conditions the values refer to (clause 5 c), e.g. `"50 Hz, 230 V, rated load"`. |
 | `noise_test_code` | The noise test code the values were determined to (clause 5 b), e.g. an ISO family-specific test code; `None` when none exists. |
 | `basic_standards` | The basic noise-emission standard(s) used to obtain the values (clause 5 b), e.g. `("ISO 3744",)`. A single string is accepted and wrapped in a one-tuple. |
-| `form` | Which declaration form the fiche presents, `"dual-number"` (default, clause 3.16: `L` and `K` separately) or `"single-number"` (clause 3.15: the derived `L_d = L + K`). |
+| `form` | Which declaration form the fiche presents, `"dual-number"` (default, clause 3.16: `L` and `K` separately) or `"single-number"` (clause 3.15: the derived $L_d = L + K$). |
 
 **Raises**
 
@@ -101,7 +101,8 @@ Writes a one-page declaration data sheet: the standard-basis line
 identification and operating conditions, the declared dual- or
 single-number table across the operating-mode columns following the
 ISO 4871 Annex B layouts (`L_WA` and `K_WA` for the dual-number
-form, the derived `L_WAd = L_WA + K_WA` for the single-number form,
+form, the derived $L_{WAd} = L_{WA} + K_{WA}$ for the
+single-number form,
 plus the emission sound pressure level when declared), the
 noise-test-code and basic-standards footnote, a verification verdict
 table when a verification measurement is supplied (clause 6.2, against
@@ -147,12 +148,13 @@ Holds the measured A-weighted sound power level `L_WA` and its uncertainty
 `K_WA` (ISO 4871 clause 3.16), and optionally the A-weighted emission sound
 pressure level `L_pA` at a work station with its uncertainty `K_pA`
 (clause 3.11). The derived declared single-number values follow from
-`L_d = L + K` (clause 3.15), the sum rounded to the nearest decibel. When a
-verification measurement `L_1` (an A-weighted sound power level determined
-for verification, clause 6) is supplied, `verified` applies the
-single-machine criterion of clause 6.2 for the combined form (verified when
-`L_1 <= L_WAd`) and `verified_dual` the dual-number one (verified
-when `L_1 <= round(L_WA) + round(K_WA)`).
+$L_d = L + K$ (clause 3.15), the sum rounded to the nearest decibel.
+When a verification measurement `L_1` (an A-weighted sound power level
+determined for verification, clause 6) is supplied, `verified`
+applies the single-machine criterion of clause 6.2 for the combined form
+(verified when $L_1 \le L_{WAd}$) and `verified_dual` the
+dual-number one (verified when
+$L_1 \le \mathrm{round}(L_{WA}) + \mathrm{round}(K_{WA})$).
 
 **Attributes**
 
@@ -175,19 +177,20 @@ when `L_1 <= round(L_WA) + round(K_WA)`).
 
 *property*
 
-Declared single-number emission pressure level `L_pAd = L_pA + K_pA`.
+Declared single-number emission pressure level (clause 3.15).
 
-The sum `L_pA + K_pA` rounded once to the nearest decibel (clause
-3.15); `None` when no emission sound pressure level is declared for
-the mode.
+The sum $L_{pAd} = L_{pA} + K_{pA}$ rounded once to the nearest
+decibel (clause 3.15); `None` when no emission sound pressure level
+is declared for the mode.
 
 ### OperatingModeDeclaration.declared_sound_power_level
 
 *property*
 
-Declared single-number sound power level `L_WAd = L_WA + K_WA` (3.15).
+Declared single-number sound power level (ISO 4871 clause 3.15).
 
-Clause 3.15 defines the declared value as the *sum* of the measured
+Clause 3.15 defines the declared value
+$L_{WAd} = L_{WA} + K_{WA}$ as the *sum* of the measured
 value and its uncertainty, rounded to the nearest decibel: the sum is
 formed from the unrounded quantities (clause 3.12) and rounded once,
 not assembled from the separately rounded dual-number values (3.16).
@@ -211,7 +214,8 @@ against their sum `(L + K)`; the limit is therefore
 Single-machine verification verdict, combined form (clause 6.2).
 
 `True` when the verification measurement `L_1` does not exceed the
-combined (single-number) declared value `L_WAd` (`L_1 <= L_WAd`),
+combined (single-number) declared value `L_WAd`
+($L_1 \le L_{WAd}$),
 `False` otherwise, and `None` when no verification measurement is
 supplied. For a dual-number declaration use `verified_dual`,
 which compares against the separately rounded `L + K`.
@@ -224,6 +228,7 @@ Single-machine verification verdict, dual-number form (clause 6.2).
 
 `True` when the verification measurement `L_1` does not exceed the
 sum of the separately rounded declared values
-(`L_1 <= round(L_WA) + round(K_WA)`, clauses 3.16 and 6.2),
+($L_1 \le \mathrm{round}(L_{WA}) + \mathrm{round}(K_{WA})$,
+clauses 3.16 and 6.2),
 `False` otherwise, and `None` when no verification measurement is
 supplied.

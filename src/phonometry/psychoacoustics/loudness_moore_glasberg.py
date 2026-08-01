@@ -591,10 +591,11 @@ def _source_levels(freqs: np.ndarray, powers: np.ndarray) -> np.ndarray:
 
 
 def _excitation_pattern(freqs: np.ndarray, levels_cochlea: np.ndarray) -> np.ndarray:
-    """Excitation ratio E/E0 at every ERB-number filter (clause 7.4).
+    r"""Excitation ratio E/E0 at every ERB-number filter (clause 7.4).
 
     Each filter is a level-dependent rounded-exponential (roex) filter
-    (Formulae 2-5): the upper skirt slope ``p_u = 4 fc / ERB_n`` is level
+    (Formulae 2-5): the upper skirt slope
+    :math:`p_u = 4 f_c / \mathrm{ERB}_n` is level
     independent while the lower skirt slope ``p_l`` decreases (broadens) with
     the source level X_j of the component it filters, giving the
     level-dependent upward spread of excitation.
@@ -811,12 +812,15 @@ def loudness_moore_glasberg_from_spectrum(
 def _third_octave_components(
     band_levels: np.ndarray,
 ) -> tuple[np.ndarray, np.ndarray]:
-    """Sinusoidal-component representation of one-third-octave levels (clause 5.5).
+    r"""Sinusoidal-component representation of one-third-octave levels
+    (clause 5.5).
 
-    Each band is treated as flat: its spectrum level is ``L_T - 10 lg(W/Hz)``
-    with band width ``W = fT (2^(1/6) - 2^(-1/6))``, and it is replaced by
-    components spaced 10 Hz apart (1 Hz for centre frequencies <= 125 Hz) with
-    a level of ``spectrum level + 10 lg(spacing/Hz)``.
+    Each band is treated as flat: its spectrum level is
+    :math:`L_T - 10 \log_{10}(W/\text{Hz})`
+    with band width :math:`W = f_T (2^{1/6} - 2^{-1/6})`, and it is replaced
+    by components spaced 10 Hz apart (1 Hz for centre frequencies <= 125 Hz)
+    with a level of the spectrum level plus
+    :math:`10 \log_{10}(\text{spacing}/\text{Hz})`.
     """
     freqs: list[float] = []
     levels: list[float] = []
@@ -873,7 +877,7 @@ _AUDIBLE_LO, _AUDIBLE_HI = 20.0, 20000.0  # component band retained (clause 7.2)
 
 
 def _signal_components(pressure: np.ndarray, fs: float) -> np.ndarray:
-    """Narrowband sinusoidal-component spectrum of a pressure signal.
+    r"""Narrowband sinusoidal-component spectrum of a pressure signal.
 
     ISO 532-2:2017 is a spectrum-based method whose exact input (clauses
     5.2/5.4) is a set of discrete sinusoidal components ``(frequency, level)``.
@@ -885,9 +889,10 @@ def _signal_components(pressure: np.ndarray, fs: float) -> np.ndarray:
     requires - rather than being smeared over a one-third-octave band.
 
     The single-sided power spectrum uses the power-preserving (Parseval)
-    window normalisation ``|X|^2 / (N * sum(w^2))`` so that the summed bin
-    powers equal the signal's mean square regardless of the window: a 1 kHz
-    tone at 40 dB SPL yields 1.000 sone, the definitional anchor of the sone.
+    window normalisation :math:`\lvert X \rvert^2 / (N \sum w^2)` so that the
+    summed bin powers equal the signal's mean square regardless of the
+    window: a 1 kHz tone at 40 dB SPL yields 1.000 sone, the definitional
+    anchor of the sone.
     Bins outside the audible range or more than ``_SIGNAL_FLOOR_DB`` below the
     spectral peak are dropped as inaudible.
     """

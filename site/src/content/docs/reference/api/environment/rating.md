@@ -25,7 +25,9 @@ Composite whole-day rating level (ISO 1996-1:2016, 6.5).
 Generalizes Formulae (5) and (6): each period contributes its rating
 level plus adjustment, weighted by its share of the 24 h day:
 
-`10*lg[ sum_i (h_i / 24) * 10^(0.1*(L_i + K_i)) ]`
+$$
+10 \log_{10}\left[ \sum_i \frac{h_i}{24} \cdot 10^{0.1 (L_i + K_i)} \right]
+$$
 
 **Parameters**
 
@@ -48,8 +50,9 @@ lden(
 
 Day-evening-night sound level Lden (ISO 1996-1:2016, 3.6.4).
 
-`Lden = 10*lg{(1/24)*[t_d*10^(0.1*Lday) + t_e*10^(0.1*(Levening+5))
-+ t_n*10^(0.1*(Lnight+10))]}`
+$$
+L_{den} = 10 \log_{10}\left\{ (1/24) \left[ t_d \cdot 10^{0.1 L_{day}} + t_e \cdot 10^{0.1 (L_{evening}+5)} + t_n \cdot 10^{0.1 (L_{night}+10)} \right] \right\}
+$$
 
 **Parameters**
 
@@ -74,7 +77,9 @@ ldn(
 
 Day-night sound level Ldn (ISO 1996-1:2016, 3.6.5).
 
-`Ldn = 10*lg{(1/24)*[t_d*10^(0.1*Lday) + t_n*10^(0.1*(Lnight+10))]}`
+$$
+L_{dn} = 10 \log_{10}\left\{ (1/24) \left[ t_d \cdot 10^{0.1 L_{day}} + t_n \cdot 10^{0.1 (L_{night}+10)} \right] \right\}
+$$
 
 **Parameters**
 

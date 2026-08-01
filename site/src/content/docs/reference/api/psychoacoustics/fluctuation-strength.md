@@ -21,7 +21,8 @@ Two routes are provided:
 * [`fluctuation_strength`](/phonometry/reference/api/psychoacoustics/fluctuation-strength/#fluctuation_strength) -- the signal model of Osses, García &
   Kohlrausch (2016), which estimates `F` from an arbitrary calibrated pressure
   signal. It sums specific contributions over 47 auditory filters,
-  `F = C_FS·Σ (m*_i)^p_m·|k_{i-2}·k_i|^p_k·g(z_i)^p_g` (Osses 2016 Eq. 1),
+  $F = C_{FS} \sum_i (m^*_i)^{p_m} |k_{i-2} k_i|^{p_k} g(z_i)^{p_g}$
+  (Osses 2016 Eq. 1),
   where `m*` is a generalised modulation depth, `k` a cross-covariance
   between neighbouring bands and `g(z)` a frequency weighting.
 
@@ -37,7 +38,8 @@ corners documented at `_HP_LO`): the paper analyses 2 s frames with 90 %
 overlap and 50 ms raised-cosine gating and screens components against the
 absolute hearing threshold; this implementation uses 50 % overlap, a Hann
 analysis window and relative floors (component magnitude > max/10^4,
-excitation level > max - 60 dB), with `k = 1` at the filter-bank edges.
+excitation level > max - 60 dB), with $k = 1$ at the filter-bank
+edges.
 Measured consequences: a steady 1 kHz tone returns ~0.09 vacil instead of ~0
 (analysis-window envelope leakage through the 2 Hz high-pass) and steady
 broadband noise returns ~0.4 vacil (partly physical level fluctuation of the
@@ -83,15 +85,17 @@ FM tones. For an exact figure on AM broadband noise use
 **Calibration.** The constant `C_FS` (Eq. 1) is not the paper's literal
 0.2490 -- that was fitted to the paper's own 4096-tap FIR front-end. Here
 it is derived once from the 1-vacil reference stimulus (1 kHz, 60 dB,
-`m = 1`, 4 Hz) run through this implementation's front-end, so the
-reference returns **exactly 1.00 vacil by construction** (`C_FS ≈ 0.28`;
-see `_c_fs`).
+$m = 1$, 4 Hz) run through this implementation's front-end, so
+the reference returns **exactly 1.00 vacil by construction**
+($C_{FS} \approx 0.28$; see `_c_fs`).
 
 **Achieved tolerance** (against Osses 2016 Table 1 literature values):
 the reference tone is 1.00 vacil exactly; the AM-tone 70 dB sweep
-(`fmod = 1, 2, 4, 8, 16, 32` Hz) has Pearson correlation ≈ 0.98 with
+($f_{mod} = 1, 2, 4, 8, 16, 32$ Hz) has Pearson correlation
+≈ 0.98 with
 the literature, peaks at 4 Hz and stays within a factor ≈ 2.1 at every
-point; the AM-tone carrier sweep at `fmod = 4 Hz` reproduces the
+point; the AM-tone carrier sweep at $f_{mod} = 4$ Hz reproduces
+the
 Fastl & Zwicker Fig. 10.5 trend (low-mid plateau, roll-off at 8 kHz);
 the AM broadband-noise 60 dB sweep shows the correct band-pass shape
 (maximum at 4 Hz, monotone tails) but overshoots the absolute
@@ -127,11 +131,15 @@ fluctuation_strength_am_noise(
 
 Fluctuation strength of AM broadband noise (Fastl & Zwicker Eq. 10.2).
 
-`F = 5.8·(1.25·m − 0.25)·[0.05·(L/dB) − 1] / [(fmod/5Hz)² + (4Hz/fmod) +
-1.5]` vacil, the closed form for a sinusoidally amplitude-modulated
+$$
+F = \frac{5.8 \, (1.25 m - 0.25) \left[ 0.05 \, (L/\text{dB}) - 1 \right]}{(f_{mod}/5~\text{Hz})^2 + (4~\text{Hz}/f_{mod}) + 1.5}
+$$
+
+in vacil, the closed form for a sinusoidally amplitude-modulated
 broadband noise of level `L`, modulation factor `m` and modulation
-frequency `fmod`. Exact; the result is clamped at `0` (the formula goes
-negative below ~20 dB or `m < 0.2` where the sensation vanishes).
+frequency `fmod`. Exact; the result is clamped at `0` (the formula
+goes negative below ~20 dB or $m < 0.2$ where the sensation
+vanishes).
 
 **Parameters**
 

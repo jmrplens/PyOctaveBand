@@ -22,32 +22,44 @@ spot welds, adhesives) whose wave behaviour is not tractable.
 For two subsystems the steady-state power balance is (Norton Eqs. 6.10 and
 6.11, generalised to a drive on either subsystem):
 
-```text
-Pi_1 = omega [ (eta_1 + eta_12) E_1 - eta_21 E_2 ]
-Pi_2 = omega [ (eta_2 + eta_21) E_2 - eta_12 E_1 ]
-```
+$$
+\Pi_1 = \omega \left[ (\eta_1 + \eta_{12}) E_1 - \eta_{21} E_2 \right] \tag{6.10}
+$$
 
-with `E_i = M_i <v_i^2>` the band energy of subsystem `i` (mass times the
-space- and time-averaged mean-square velocity), `eta_i` its internal loss
-factor and `omega` the band centre frequency in rad/s. Two inversions follow.
+$$
+\Pi_2 = \omega \left[ (\eta_2 + \eta_{21}) E_2 - \eta_{12} E_1 \right] \tag{6.11}
+$$
+
+with $E_i = M_i \langle v_i^2 \rangle$ the band energy of subsystem
+`i` (mass times the space- and time-averaged mean-square velocity),
+`eta_i` its internal loss factor and `omega` the band centre frequency
+in rad/s. Two inversions follow.
 
 **Single drive plus reciprocity** ([`power_injection_clf`](/phonometry/reference/api/vibration/experimental-sea/#power_injection_clf)). Drive
-subsystem 1 only. The second equation with `Pi_2 = 0` gives one relation
-between `eta_12` and `eta_21`; the SEA consistency (reciprocity)
-relationship `eta_12 n_1 = eta_21 n_2` (Eq. 6.8) supplies the second, so
-with the modal densities `n_1`, `n_2` known (Eq. 6.15):
+subsystem 1 only. The second equation with $\Pi_2 = 0$ gives one
+relation between `eta_12` and `eta_21`; the SEA consistency
+(reciprocity) relationship $\eta_{12} n_1 = \eta_{21} n_2$ (Eq. 6.8)
+supplies the second, so with the modal densities `n_1`, `n_2` known
+(Eq. 6.15):
 
-```text
-eta_12 = eta_2 E_2 / (E_1 - E_2 n_1/n_2)
-eta_21 = eta_12 n_1 / n_2
-Pi_in  = omega (eta_1 E_1 + eta_2 E_2)
-```
+$$
+\eta_{12} = \frac{\eta_2 E_2}{E_1 - E_2\, n_1/n_2}
+$$
+
+$$
+\eta_{21} = \eta_{12} \frac{n_1}{n_2}
+$$
+
+$$
+\Pi_{\text{in}} = \omega (\eta_1 E_1 + \eta_2 E_2)
+$$
 
 The input power reduces to the total dissipated power, as it must in the
-steady state: substituting the balance of subsystem 2 into Eq. (6.10) cancels
-the two coupling terms exactly. The bracket `E_1 - E_2 n_1/n_2` is positive
-exactly when the *modal* energy of the driven subsystem exceeds that of the
-receiver, `E_1/n_1 > E_2/n_2`; a measurement that violates it is not a
+steady state: substituting the balance of subsystem 2 into Eq. (6.10)
+cancels the two coupling terms exactly. The bracket
+$E_1 - E_2\, n_1/n_2$ is positive exactly when the *modal* energy of
+the driven subsystem exceeds that of the receiver,
+$E_1/n_1 > E_2/n_2$; a measurement that violates it is not a
 two-subsystem SEA system and is rejected.
 
 **Two drives, no reciprocity assumed** ([`power_injection_matrix`](/phonometry/reference/api/vibration/experimental-sea/#power_injection_matrix)). The
@@ -56,13 +68,14 @@ both energies each time, giving four equations for the four unknowns
 `eta_1`, `eta_2`, `eta_12`, `eta_21` with no prior assumption at all.
 Reciprocity then becomes a *check* on the measurement rather than an input:
 [`PowerInjectionResult.modal_density_ratio`](/phonometry/reference/api/vibration/experimental-sea/#powerinjectionresultmodal_density_ratio) compares the measured
-`eta_12/eta_21` with the expected `n_2/n_1`.
+$\eta_{12}/\eta_{21}$ with the expected $n_2/n_1$.
 
 Modal densities for the usual subsystems are provided as well
 ([`flat_plate_modal_density`](/phonometry/reference/api/vibration/experimental-sea/#flat_plate_modal_density), [`cylindrical_shell_modal_density`](/phonometry/reference/api/vibration/experimental-sea/#cylindrical_shell_modal_density),
 [`bar_modal_density`](/phonometry/reference/api/vibration/experimental-sea/#bar_modal_density), [`beam_modal_density`](/phonometry/reference/api/vibration/experimental-sea/#beam_modal_density)), following Norton
-Eqs. 6.23-6.29. The flat-plate expression `n(f) = S sqrt(12) / (2 cL t)` is
-the same quantity as EN 12354-4's `n = pi S fc / c0**2`
+Eqs. 6.23-6.29. The flat-plate expression
+$n(f) = S \sqrt{12} / (2 c_L t)$ is the same quantity as EN 12354-4's
+$n = \pi S f_c / c_0^2$
 ([`modal_density`](/phonometry/reference/api/building/flanking-transmission/#modal_density)), only
 parametrised by the plate itself rather than by its critical frequency; the
 two agree identically and a regression test pins that.
@@ -77,14 +90,14 @@ bar_modal_density(length: float, longitudinal_wave_speed: float) -> float
 
 Modal density of a uniform bar in longitudinal vibration (Eq. 6.23).
 
-`n(f) = 2 L / cL`, independent of frequency.
+$n(f) = 2 L / c_L$, independent of frequency.
 
 **Parameters**
 
 | Name | Description |
 | :--- | :--- |
 | `length` | Bar length `L`, in m (> 0). |
-| `longitudinal_wave_speed` | Bar wave speed `cL = sqrt(E/rho)`, in m/s (> 0). |
+| `longitudinal_wave_speed` | Bar wave speed $c_L = \sqrt{E/\rho}$, in m/s (> 0). |
 
 **Returns:** The modal density `n(f)`, in modes per hertz.
 
@@ -107,8 +120,8 @@ beam_modal_density(
 
 Modal density of a uniform beam in flexure (Norton Eq. 6.24).
 
-`n(f) = L (rho A / E I)**(1/4) / sqrt(2 pi f)`: unlike every other
-subsystem here, it *decreases* with frequency.
+$n(f) = L (\rho A / E I)^{1/4} / \sqrt{2\pi f}$: unlike every
+other subsystem here, it *decreases* with frequency.
 
 **Parameters**
 
@@ -144,18 +157,23 @@ cylindrical_shell_modal_density(
 Average modal density of a thin-walled cylinder (Norton 6.27-6.29).
 
 The semi-empirical approximations of Szechenyi, as collected by Clarkson &
-Pope, in three regimes of `x = f / fr` around the ring frequency
+Pope, in three regimes of $x = f / f_r$ around the ring frequency
 [`ring_frequency`](/phonometry/reference/api/vibration/experimental-sea/#ring_frequency):
 
-```text
-x <= 0,48        n = (5 S / (pi cL t)) sqrt(x)                  (6.27)
-0,48 < x <= 0,83 n = (7,2 S / (pi cL t)) x                      (6.28)
-x > 0,83         n = (2 S / (pi cL t)) [2 + (0,596/(F - 1/F))
-                     (F acos(1,745/(F^2 x^2))
-                      - acos(1,745 F^2/x^2)/F)]                 (6.29)
-```
+$$
+n = \frac{5 S}{\pi c_L t} \sqrt{x}, \qquad x \le 0.48 \tag{6.27}
+$$
 
-with the bandwidth factor `F = sqrt(f_upper/f_lower)`. These are
+$$
+n = \frac{7.2 S}{\pi c_L t}\, x, \qquad 0.48 < x \le 0.83 \tag{6.28}
+$$
+
+$$
+n = \frac{2 S}{\pi c_L t} \left[ 2 + \frac{0.596}{F - 1/F} \left( F \arccos\frac{1.745}{F^2 x^2} - \frac{1}{F} \arccos\frac{1.745 F^2}{x^2} \right) \right], \qquad x > 0.83 \tag{6.29}
+$$
+
+with the bandwidth factor
+$F = \sqrt{f_{\text{upper}}/f_{\text{lower}}}$. These are
 *average* values: they do not resolve the large fluctuations that the
 cut-on of successive circumferential orders produces below the ring
 frequency, which for long thin shells can be substantial.
@@ -169,7 +187,7 @@ frequency, which for long thin shells can be substantial.
 | `thickness` | Wall thickness `t`, in m (> 0). |
 | `mean_radius` | Mean shell radius `a_m`, in m (> 0). |
 | `longitudinal_wave_speed` | Plate wave speed `cL`, in m/s (> 0). |
-| `band` | Analysis bandwidth, `"octave"` (Default, `F = 1,414`) or `"third"` (`F = 1,122`). |
+| `band` | Analysis bandwidth, `"octave"` (Default, $F = 1.414$) or `"third"` ($F = 1.122$). |
 
 **Returns:** The modal density `n(f)`, in modes per hertz.
 
@@ -191,8 +209,9 @@ flat_plate_modal_density(
 
 Modal density of a flat plate in flexure (Norton Eq. 6.25).
 
-`n(f) = S sqrt(12) / (2 cL t)`, independent of frequency, with the
-plate (quasi-longitudinal) wave speed `cL = sqrt(E / (rho (1 - nu^2)))`.
+$n(f) = S \sqrt{12} / (2 c_L t)$, independent of frequency, with
+the plate (quasi-longitudinal) wave speed
+$c_L = \sqrt{E / (\rho (1 - \nu^2))}$.
 
 **Parameters**
 
@@ -228,14 +247,23 @@ Coupling loss factors from a single-drive energy measurement.
 
 Subsystem 1 is driven and subsystem 2 receives power only through the
 junction. Inverting the steady-state balance of subsystem 2 together with
-the reciprocity relationship `eta_12 n_1 = eta_21 n_2` gives
+the reciprocity relationship $\eta_{12} n_1 = \eta_{21} n_2$ gives
 
-`eta_12 = eta_2 E_2 / (E_1 - E_2 n_1/n_2)`,
-`eta_21 = eta_12 n_1 / n_2`,
-`Pi_in = omega (eta_1 E_1 + eta_2 E_2)`.
+$$
+\eta_{12} = \frac{\eta_2 E_2}{E_1 - E_2\, n_1/n_2}
+$$
 
-Energies are `E_i = M_i <v_i^2>` with `M_i` the subsystem mass and
-`<v_i^2>` the space- and time-averaged mean-square velocity in the band.
+$$
+\eta_{21} = \eta_{12} \frac{n_1}{n_2}
+$$
+
+$$
+\Pi_{\text{in}} = \omega (\eta_1 E_1 + \eta_2 E_2)
+$$
+
+Energies are $E_i = M_i \langle v_i^2 \rangle$ with `M_i` the
+subsystem mass and $\langle v_i^2 \rangle$ the space- and
+time-averaged mean-square velocity in the band.
 
 **Parameters**
 
@@ -255,7 +283,7 @@ Energies are `E_i = M_i <v_i^2>` with `M_i` the subsystem mass and
 
 | Exception | When |
 | :--- | :--- |
-| ValueError | for a non-positive input, mismatched band lengths, or a measurement with `E_1/n_1 <= E_2/n_2` (the receiving subsystem holds at least as much modal energy as the driven one, so no two-subsystem SEA model fits it). |
+| ValueError | for a non-positive input, mismatched band lengths, or a measurement with $E_1/n_1 \le E_2/n_2$ (the receiving subsystem holds at least as much modal energy as the driven one, so no two-subsystem SEA model fits it). |
 
 ## power_injection_matrix
 
@@ -335,7 +363,7 @@ All arrays share the band axis `frequencies`.
 
 *property*
 
-Coupling ratio `eta_12 / eta_1`.
+Coupling ratio $\eta_{12} / \eta_1$.
 
 SEA subsystems should be *weakly* coupled: values well below 1 mean
 the junction leaks far less power than the subsystem dissipates, the
@@ -347,8 +375,9 @@ regime where the two-subsystem model is trustworthy.
 
 Total power dissipated internally, in watts.
 
-`omega (eta_1 E_1 + eta_2 E_2)`, which equals `input_power`
-in the steady state and is the round-trip check of the inversion.
+$\omega (\eta_1 E_1 + \eta_2 E_2)$, which equals
+`input_power` in the steady state and is the round-trip check
+of the inversion.
 
 ### PowerInjectionResult.input_power
 
@@ -360,10 +389,12 @@ Total power injected into the system, in watts.
 
 *property*
 
-Ratio `n_1 / n_2` implied by the measured coupling loss factors.
+Ratio $n_1 / n_2$ implied by the measured coupling loss
+factors.
 
-From the reciprocity relationship `eta_12 n_1 = eta_21 n_2`, so it
-equals `eta_21 / eta_12`. For a `"two-drive"` inversion, where
+From the reciprocity relationship
+$\eta_{12} n_1 = \eta_{21} n_2$, so it equals
+$\eta_{21} / \eta_{12}$. For a `"two-drive"` inversion, where
 reciprocity was never assumed, comparing this with the modal densities
 computed from the geometry is the consistency check on the
 measurement.
@@ -402,8 +433,8 @@ Requires matplotlib (`pip install phonometry[plot]`); returns the
 
 Net power flowing from subsystem 1 to 2, in watts.
 
-`Pi_12 = omega (eta_12 E_1 - eta_21 E_2)`; negative when the net
-flow runs the other way.
+$\Pi_{12} = \omega (\eta_{12} E_1 - \eta_{21} E_2)$; negative
+when the net flow runs the other way.
 
 ## ring_frequency
 
@@ -413,7 +444,7 @@ ring_frequency(mean_radius: float, longitudinal_wave_speed: float) -> float
 
 Ring frequency of a cylindrical shell (Norton Eq. 6.26).
 
-`fr = cL / (2 pi a_m)`: the frequency at which the shell vibrates
+$f_r = c_L / (2\pi a_m)$: the frequency at which the shell vibrates
 uniformly in the breathing mode. Above it a cylinder behaves like a flat
 plate; below it the modes group by circumferential order and the modal
 density is no longer a simple function of frequency.

@@ -1,5 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""
+r"""
 Impulse-response acquisition per BS EN ISO 18233:2006.
 
 This module provides the deterministic-excitation front end for the "new
@@ -14,7 +14,8 @@ Two excitation families are implemented:
   rises exponentially with time, which mimics a pink-noise source
   (ISO 18233:2006, B.3.2) and is the recommended broadband excitation. The
   IR is recovered by linear (zero-padded, non-circular) spectral
-  deconvolution (B.5, Figure B.3): ``H = Y * conj(X) / (|X|^2 + reg)``. A
+  deconvolution (B.5, Figure B.3):
+  :math:`H = Y \overline{X} / (|X|^2 + \text{reg})`. A
   Farina inverse-filter variant (``method="farina"``) convolves the
   recording with the time-reversed, amplitude-compensated sweep (B.5,
   Figure B.2). Because a low-to-high sweep places distortion products at
@@ -25,7 +26,7 @@ Two excitation families are implemented:
   :func:`phonometry.swept_sine_distortion`.
 
 * **Maximum-length sequence (Annex A)** -- an order-``N`` binary sequence of
-  length ``2**N - 1`` generated with a linear-feedback shift register
+  length :math:`2^N - 1` generated with a linear-feedback shift register
   (LFSR). Its circular autocorrelation is a near-perfect delta (A.1), so the
   IR of a periodically excited linear system is recovered by circular
   cross-correlation of the recorded period with the sequence
@@ -35,8 +36,8 @@ Two further excitations from the transfer-function measurement literature
 complete the family:
 
 * **Complementary Golay pair** -- two binary sequences of length
-  ``L = 2**n`` whose periodic autocorrelations sum to an *exact* delta of
-  height ``2L`` (Golay 1961; Havelock, Kuwano & Vorlaender (eds.), Handbook
+  :math:`L = 2^n` whose periodic autocorrelations sum to an *exact* delta of
+  height :math:`2L` (Golay 1961; Havelock, Kuwano & Vorlaender (eds.), Handbook
   of Signal Processing in Acoustics, Springer 2008, Part I Ch. 6 by
   N. Xiang, Eq. (2)). Exciting the system with each code in turn and
   summing the two circular cross-correlations recovers the IR with zero
@@ -194,21 +195,21 @@ def sweep_signal(
     amplitude: float = 1.0,
     fade: float = 0.01,
 ) -> np.ndarray:
-    """
+    r"""
     Generate an exponential sine sweep (ESS) with exact analytic phase.
 
     The instantaneous frequency rises exponentially from ``f1`` to ``f2``,
-    ``f(t) = f1 * (f2/f1) ** (t/T)``, so the time spent per octave is
+    :math:`f(t) = f_1 (f_2/f_1)^{t/T}`, so the time spent per octave is
     constant and the sweep mimics a pink-noise excitation
     (ISO 18233:2006, B.3.2). The phase is the closed-form integral of
-    ``2*pi*f(t)`` (Farina, AES 108th Conv., 2000; ISO 18233 Bibliography
+    :math:`2 \pi f(t)` (Farina, AES 108th Conv., 2000; ISO 18233 Bibliography
     [14]), avoiding numerical phase accumulation.
 
     :param fs: Sampling frequency in Hz.
     :param f1: Start frequency in Hz (at or below the lowest band edge to be
         measured, ISO 18233 B.3.1). Must be > 0.
     :param f2: Stop frequency in Hz (at or above the highest band edge). Must
-        satisfy ``f1 < f2 <= fs/2``.
+        satisfy :math:`f_1 < f_2 \le f_s/2`.
     :param seconds: Sweep duration in seconds. Any duration may be used; a
         longer sweep raises the effective signal-to-noise ratio (B.2, B.6).
     :param amplitude: Peak amplitude of the sweep. Default 1.0.
@@ -376,7 +377,7 @@ def impulse_response(
     length: int | None = None,
     return_full: bool = False,
 ) -> ImpulseResponseResult:
-    """
+    r"""
     Recover the broadband impulse response by sweep deconvolution.
 
     Implements the linear (non-circular) deconvolution of ISO 18233:2006,
@@ -391,7 +392,8 @@ def impulse_response(
     :param fs: Sampling frequency in Hz (kept for API symmetry; the
         deconvolution itself is sample-rate agnostic).
     :param method: ``"spectral"`` for spectral division
-        ``H = Y*conj(X)/(|X|^2+reg)`` (Figure B.3, default) or ``"farina"``
+        :math:`H = Y \overline{X} / (\lvert X \rvert^2 + \text{reg})`
+        (Figure B.3, default) or ``"farina"``
         for convolution with the analytic inverse filter (Figure B.2). The
         Farina method requires ``f_range`` and the **exact-length, unpadded**
         excitation sweep as ``reference`` (it rebuilds the inverse filter from
@@ -405,7 +407,8 @@ def impulse_response(
     :param f_range: ``(f1, f2)`` of the sweep, required for ``method="farina"``
         to rebuild the inverse filter; ignored for the spectral method.
     :param regularization: Tikhonov term added to the denominator, expressed
-        as a fraction of the peak spectral energy ``max(|X|^2)`` (spectral
+        as a fraction of the peak spectral energy
+        :math:`\max(\lvert X \rvert^2)` (spectral
         method only). Guards against amplifying noise where the sweep has
         little energy, e.g. outside its frequency range (B.5). Default 1e-6.
     :param length: Number of samples of the causal IR to return. Defaults to
@@ -597,7 +600,7 @@ _SHAPED_EDGE_OCTAVES = 1.0 / 6.0
 
 
 def golay_pair(order: int) -> tuple[np.ndarray, np.ndarray]:
-    """
+    r"""
     Generate a complementary Golay pair of length ``2**order``.
 
     Built with the append recursion of Golay (1961): starting from
@@ -605,12 +608,12 @@ def golay_pair(order: int) -> tuple[np.ndarray, np.ndarray]:
     and ``-b`` to ``a`` (Havelock, Handbook of Signal Processing in
     Acoustics, Springer 2008, Part I Ch. 6 (N. Xiang), Eq. (1)). The pair is
     *complementary*: the sum of the two periodic autocorrelations is exactly
-    ``2L`` at zero lag and exactly zero everywhere else (Xiang Eq. (2)) --
+    :math:`2L` at zero lag and exactly zero everywhere else (Xiang Eq. (2)) --
     an algebraic identity, not an approximation, unlike the near-delta
     autocorrelation of an MLS.
 
     :param order: Number of recursion steps ``n`` (1 to 22). Each code has
-        ``L = 2**order`` samples.
+        :math:`L = 2^{\text{order}}` samples.
     :return: The pair ``(a, b)`` as bipolar float arrays (values ``+1/-1``).
     """
     if not 1 <= order <= _GOLAY_MAX_ORDER:
@@ -632,17 +635,20 @@ def golay_impulse_response(
     length: int | None = None,
     fs: int | None = None,
 ) -> ImpulseResponseResult:
-    """
+    r"""
     Recover an impulse response from a complementary Golay-pair excitation.
 
     Each code of the pair is emitted periodically (as with an MLS, record in
     the steady state: at least one settling period before acquisition); the
     recorded periods of each code are averaged and the IR is the sum of the
-    two circular cross-correlations, normalised by ``2L`` (Havelock 2008,
+    two circular cross-correlations, normalised by :math:`2L` (Havelock 2008,
     Part I Ch. 6 (N. Xiang), Eq. (4) and the measurement procedure of
     Fig. 2):
 
-    ``h = IFFT[ conj(A)*FFT(y_a) + conj(B)*FFT(y_b) ] / (2L)``.
+    .. math::
+
+       h = \operatorname{IFFT}\!\left[ \overline{A}\, \operatorname{FFT}(y_a)
+       + \overline{B}\, \operatorname{FFT}(y_b) \right] / (2L)
 
     Because the pair's autocorrelations are *exactly* complementary
     (Xiang Eq. (2)), the recovery has no correlation noise: for a noiseless
@@ -787,10 +793,10 @@ def _shaped_target_db(
     freqs: np.ndarray,
     f_range: tuple[float, float],
 ) -> np.ndarray:
-    """Evaluate the target magnitude, in dB, on the synthesis grid.
+    r"""Evaluate the target magnitude, in dB, on the synthesis grid.
 
     Named targets: ``"white"`` is flat; ``"pink"`` falls 3 dB per octave in
-    magnitude (``-10*log10(f/f1)``), the spectrum of the classical
+    magnitude (:math:`-10 \log_{10}(f/f_1)`), the spectrum of the classical
     logarithmic sweep (Mueller & Massarani 2001, Sec. 4). An arbitrary
     target is a ``(frequencies_hz, magnitude_db)`` pair, interpolated
     linearly in dB over log-frequency and held constant beyond its ends.
@@ -860,17 +866,21 @@ def shaped_sweep_signal(
     start_delay: float | None = None,
     fade: float = 0.01,
 ) -> ShapedSweepResult:
-    """
+    r"""
     Synthesize a sweep with an arbitrary target magnitude spectrum.
 
     Implements the frequency-domain sweep construction of
     Mueller & Massarani ("Transfer-Function Measurement with Sweeps", JAES
     49(6), 2001, Secs. 4.2-4.3): the magnitude of the synthesis spectrum is
     set to the band-limited target, and the group delay grows in proportion
-    to the target's spectral power,
+    to the target's spectral power (Eqs. (11)-(12)):
 
-    ``tau_G(f) = tau_G(f - df) + C * |H(f)|**2`` with
-    ``C = (tau_G(f_end) - tau_G(f_start)) / sum(|H|**2)``  (Eqs. (11)-(12)),
+    .. math::
+
+       \tau_G(f) = \tau_G(f - df) + C\, |H(f)|^2
+
+       C = \frac{\tau_G(f_{\text{end}}) - \tau_G(f_{\text{start}})}
+       {\sum |H|^2}
 
     so the sweep dwells on each frequency for a time proportional to the
     energy it must radiate there and its temporal envelope stays nearly
@@ -891,9 +901,10 @@ def shaped_sweep_signal(
     :param f1: Start frequency of the sweep band in Hz. Must be > 0. The
         magnitude rolls off over 1/6 octave *below* ``f1`` (clipped at the
         first FFT bin), so the full target level holds across ``[f1, f2]``.
-    :param f2: Stop frequency in Hz. Must satisfy ``f1 < f2 <= fs/2``; keep
-        some margin below Nyquist so the upper roll-off has room.
-    :param seconds: Sweep duration ``tau_G(f2) - tau_G(f1)`` in seconds.
+    :param f2: Stop frequency in Hz. Must satisfy :math:`f_1 < f_2 \le f_s/2`;
+        keep some margin below Nyquist so the upper roll-off has room.
+    :param seconds: Sweep duration :math:`\tau_G(f_2) - \tau_G(f_1)` in
+        seconds.
         The returned signal is slightly longer (lead-in plus tail margin,
         see ``start_delay``).
     :param target: The magnitude shape: ``"pink"`` (default; 3 dB per

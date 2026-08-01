@@ -1,5 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""
+r"""
 Psychoacoustic roughness per ECMA-418-2:2025 (4th ed., Sottek Hearing Model).
 
 Clean-room implementation of the roughness signal chain of ECMA-418-2:2025
@@ -10,7 +10,8 @@ is reused from :mod:`.loudness_ecma`; this module adds the roughness-specific
 chain:
 
 * roughness-specific zero-padding (Clause 5.1.2.2) and segmentation
-  (Clause 5.1.5.2) with the fixed block/hop ``s_b = 16384`` / ``s_h = 4096``
+  (Clause 5.1.5.2) with the fixed block/hop :math:`s_b = 16384` /
+  :math:`s_h = 4096`
   (Clause 7.1.1);
 * the Hilbert envelope of each critical-band block and a factor-32 downsampling
   to 1500 Hz (Clause 7.1.2, Formula 65);

@@ -1,5 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""
+r"""
 Parametric equalizer biquads per the RBJ Audio EQ Cookbook.
 
 Second-order (biquad) IIR sections designed from the closed-form recipes of
@@ -14,8 +14,8 @@ is available:
   DC (low shelf) or Nyquist (high shelf), 0 dB at the opposite end, with the
   transition centred on ``f0`` (the midpoint-gain frequency).
 * ``lowpass`` / ``highpass`` - second-order Butterworth-style sections with
-  a resonance set by ``Q`` (``Q = 1/sqrt(2)`` is the Butterworth alignment;
-  the magnitude at ``f0`` is exactly ``Q``).
+  a resonance set by ``Q`` (:math:`Q = 1/\sqrt{2}` is the Butterworth
+  alignment; the magnitude at ``f0`` is exactly ``Q``).
 * ``bandpass`` - constant 0 dB peak gain at ``f0``.
 * ``bandpass_skirt`` - the cookbook's constant-skirt-gain variant (peak
   gain ``Q``).
@@ -27,16 +27,18 @@ Each section is parameterized exactly as the cookbook defines: sample rate
 ``fs``, centre/corner frequency ``f0``, gain ``gain_db`` (peaking and
 shelves only) and one of
 
-* ``q`` - the quality factor (default ``1/sqrt(2)``),
+* ``q`` - the quality factor (default :math:`1/\sqrt{2}`),
 * ``bw`` - the bandwidth in octaves, mapped through the cookbook's
-  digital-domain relation ``alpha = sin(w0) * sinh(ln(2)/2 * BW *
-  w0/sin(w0))`` (the ``w0/sin(w0)`` factor compensates the bilinear
+  digital-domain relation
+  :math:`\alpha = \sin(\omega_0) \sinh\!\left( \frac{\ln 2}{2} \, BW \,
+  \frac{\omega_0}{\sin \omega_0} \right)`
+  (the :math:`\omega_0/\sin \omega_0` factor compensates the bilinear
   frequency warping), or
-* ``slope`` - the shelf-slope parameter ``S`` (shelves only; ``S = 1`` is
-  the steepest slope that stays monotonic).
+* ``slope`` - the shelf-slope parameter ``S`` (shelves only;
+  :math:`S = 1` is the steepest slope that stays monotonic).
 
 For the peaking filter the bandwidth is measured between the midpoint-gain
-(``G/2`` dB) frequencies; for band-pass and notch, between the -3 dB
+(:math:`G/2` dB) frequencies; for band-pass and notch, between the -3 dB
 frequencies - both as the cookbook states.
 
 The design is exact, not approximate: the cookbook's formulas are the
@@ -101,7 +103,7 @@ _DEFAULT_Q = 1.0 / math.sqrt(2.0)
 
 @dataclass(frozen=True)
 class EQSection:
-    """One biquad of the RBJ Audio EQ Cookbook.
+    r"""One biquad of the RBJ Audio EQ Cookbook.
 
     :ivar filter_type: ``'peaking'``, ``'lowshelf'``, ``'highshelf'``,
         ``'lowpass'``, ``'highpass'``, ``'bandpass'`` (constant 0 dB peak
@@ -110,15 +112,16 @@ class EQSection:
     :ivar f0: Centre/corner frequency, in Hz (must sit below Nyquist).
     :ivar gain_db: Gain ``G`` in dB - peaking and shelving types only.
     :ivar q: Quality factor. Exactly one of ``q``, ``bw`` and ``slope`` may
-        be given; with none, ``q = 1/sqrt(2)`` (Butterworth alignment).
+        be given; with none, :math:`q = 1/\sqrt{2}` (Butterworth
+        alignment).
     :ivar bw: Bandwidth in octaves (peaking: between the midpoint-gain
         frequencies; band-pass/notch: between the -3 dB frequencies).
-    :ivar slope: Shelf-slope parameter ``S`` (shelves only; ``S = 1`` is the
-        steepest monotonic slope, and ``S`` must stay below the
-        gain-dependent bound ``(A + 1/A)/(A + 1/A - 2)`` with
-        ``A = 10^(gain_db/40)``, beyond which the cookbook's alpha turns
-        complex; at 0 dB gain ``A = 1``, the bound is unbounded and every
-        positive slope is admissible).
+    :ivar slope: Shelf-slope parameter ``S`` (shelves only; :math:`S = 1`
+        is the steepest monotonic slope, and ``S`` must stay below the
+        gain-dependent bound :math:`(A + 1/A)/(A + 1/A - 2)` with
+        :math:`A = 10^{\text{gain\_db}/40}`, beyond which the cookbook's
+        alpha turns complex; at 0 dB gain :math:`A = 1`, the bound is
+        unbounded and every positive slope is admissible).
     """
 
     filter_type: EQFilterType
@@ -155,7 +158,7 @@ def _validate_section(section: EQSection) -> None:
 
 
 def _gain_amplitude(gain_db: float) -> float:
-    """The cookbook's amplitude ``A = 10^(gain_db/40)``, representable.
+    r"""The cookbook's amplitude :math:`A = 10^{\text{gain\_db}/40}`.
 
     A finite but extreme ``gain_db`` overflows the power (about
     +12320 dB) or underflows it to zero (about -12320 dB), where the
@@ -175,12 +178,12 @@ def _gain_amplitude(gain_db: float) -> float:
 
 
 def _validate_shelf_slope(section: EQSection) -> None:
-    """Bound the shelf slope so the cookbook's alpha stays real.
+    r"""Bound the shelf slope so the cookbook's alpha stays real.
 
-    The alpha recipe takes ``sqrt((A + 1/A)·(1/S - 1) + 2)``, which is
-    real only for ``S < (A + 1/A)/(A + 1/A - 2)`` (any ``S`` when the
-    gain is 0 dB, i.e. ``A = 1``); at the bound itself alpha is 0 and the
-    poles land on the unit circle.
+    The alpha recipe takes :math:`\sqrt{(A + 1/A)(1/S - 1) + 2}`, which
+    is real only for :math:`S < (A + 1/A)/(A + 1/A - 2)` (any ``S`` when
+    the gain is 0 dB, i.e. :math:`A = 1`); at the bound itself alpha is 0
+    and the poles land on the unit circle.
     """
     if section.slope is None:
         return
@@ -343,9 +346,9 @@ def _section_alpha(section: EQSection, w0: float, big_a: float) -> float:
 def _check_section_stability(
     fs: float, section: EQSection, a1: float, a2: float
 ) -> None:
-    """Require the realized poles strictly inside the unit circle.
+    r"""Require the realized poles strictly inside the unit circle.
 
-    In exact arithmetic every cookbook section with ``alpha > 0`` is
+    In exact arithmetic every cookbook section with :math:`\alpha > 0` is
     stable, but at the extremes (a very wide ``bw`` or ``f0`` within a few
     ppm of DC or the Nyquist frequency) the rounded coefficients can land
     exactly on the stability-triangle boundary -- e.g. ``a2 == -1.0``, a

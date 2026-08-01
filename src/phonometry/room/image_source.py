@@ -1,5 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""
+r"""
 Synthetic room impulse response by the image-source method (rectangular room).
 
 A rigid-walled (or absorbing) rectangular room -- a *shoebox* -- reflects a
@@ -13,38 +13,53 @@ the deterministic complement of the statistical reverberation-time formulae of
 decay rate, the image-source model gives the whole early reflection pattern and
 the decay it implies.
 
-**Image lattice.** For a room ``[0, Lx] x [0, Ly] x [0, Lz]`` with the source at
+**Image lattice.** For a room
+:math:`[0, L_x] \times [0, L_y] \times [0, L_z]` with the source at
 ``(xs, ys, zs)``, mirroring a coordinate in a wall (Vorlander Equation (11.36),
-``S_n = S - 2 d n``) turns the source into a regular lattice of images. Along
-one axis the images sit at ``2 n L +- x`` for every integer ``n`` and the two
+:math:`S_n = S - 2 d n`) turns the source into a regular lattice of images.
+Along one axis the images sit at :math:`2 n L \pm x` for every integer ``n``
+and the two
 mirror parities; the parity index ``p`` and the lattice index ``n`` give the
-number of reflections off the two walls of that axis as ``|n - p|`` (wall at 0)
-and ``|n|`` (wall at ``L``), so the total reflection order of an image is
-``|2 n_x - p_x| + |2 n_y - p_y| + |2 n_z - p_z|`` (Allen & Berkley, *J. Acoust.
+number of reflections off the two walls of that axis as :math:`|n - p|`
+(wall at 0)
+and :math:`|n|` (wall at ``L``), so the total reflection order of an image is
+:math:`|2 n_x - p_x| + |2 n_y - p_y| + |2 n_z - p_z|` (Allen & Berkley,
+*J. Acoust.
 Soc. Am.* 65 (1979) 943). The audible images up to order ``i0`` number
-``(2/3)(2 i0^3 + 3 i0^2 + 4 i0)`` in a shoebox (Kuttruff Equation (9.23)); the
-temporal density of reflections grows as ``dN/dt = 4 pi c^3 t^2 / V``
+:math:`(2/3)(2 i_0^3 + 3 i_0^2 + 4 i_0)` in a shoebox (Kuttruff Equation
+(9.23)); the
+temporal density of reflections grows as
+:math:`dN/dt = 4 \pi c^3 t^2 / V`
 (Kuttruff Equation (4.6)).
 
 **Per-image contribution.** Image ``i`` at distance ``r_i`` from the receiver
-arrives at ``t_i = r_i / c`` (Vorlander Equation (11.38)) with amplitude
+arrives at :math:`t_i = r_i / c` (Vorlander Equation (11.38)) with amplitude
 
-    A_i = [ product over walls of R_wall ^ (reflections there) ]
-          * exp(-m r_i / 2) / (4 pi r_i),
+.. math::
 
-the ``1 / (4 pi r_i)`` spherical spreading, the product of the wall
-*pressure* reflection factors ``R = sqrt(1 - alpha)`` (Vorlander Equation
-(11.39); ``|R|^2 = 1 - alpha`` in energy, Kuttruff 4.1) each raised to the
+   A_i = \left[ \prod_{\text{walls}} R_{\text{wall}}^{n_{\text{wall}}}
+   \right] \frac{e^{-m r_i / 2}}{4 \pi r_i}
+
+with :math:`n_{\text{wall}}` the reflections that image made off each wall:
+the :math:`1 / (4 \pi r_i)` spherical spreading, the product of the wall
+*pressure* reflection factors :math:`R = \sqrt{1 - \alpha}` (Vorlander
+Equation
+(11.39); :math:`|R|^2 = 1 - \alpha` in energy, Kuttruff 4.1) each raised to
+the
 number of reflections that image made off that wall, and the air pressure
-attenuation ``exp(-m r_i / 2)`` over the path (Kuttruff 4.1; ``m`` the
-*intensity* attenuation constant, so intensity falls as ``exp(-m r)``). The RIR
-is the sum of unit impulses at ``t_i`` weighted by ``A_i`` (Kuttruff Equation
-(4.5), ``g(t) = sum_i A_i delta(t - t_i)``), assembled broadband from a single
+attenuation :math:`e^{-m r_i / 2}` over the path (Kuttruff 4.1; ``m`` the
+*intensity* attenuation constant, so intensity falls as :math:`e^{-m r}`).
+The RIR
+is the sum of unit impulses at :math:`t_i` weighted by :math:`A_i` (Kuttruff
+Equation
+(4.5), :math:`g(t) = \sum_i A_i \delta(t - t_i)`), assembled broadband from a
+single
 absorption set or one curve per octave band from per-band coefficients.
 
 The Schroeder backward integral of the synthetic RIR (see
 :func:`phonometry.room.decay_curve`) reproduces the Eyring reverberation time
-``T = -24 V ln 10 / (c S ln(1 - alpha_bar))`` (Kuttruff Equation (5.23)) of the
+:math:`T = -24 V \ln 10 / (c S \ln(1 - \bar{\alpha}))` (Kuttruff Equation
+(5.23)) of the
 same room to within a few percent, closing the loop between this deterministic
 model and the statistical prediction. The construction is exact only for walls
 whose reflection factor is real and angle-independent (Kuttruff 4.1: exact for
@@ -77,13 +92,13 @@ WALL_ORDER = ("x0", "xL", "y0", "yL", "z0", "zL")
 def _resolve_walls(
     absorption: ArrayLike, n_freq: int | None
 ) -> tuple[NDArray[np.float64], int]:
-    """Validate the absorption spec into a ``(6, n_bands)`` reflection map.
+    r"""Validate the absorption spec into a ``(6, n_bands)`` reflection map.
 
     Accepts a scalar (uniform on every wall and band), a length-6 per-wall
     vector, a per-band vector (uniform across walls) or a ``(6, n_bands)``
     per-wall per-band array. Returns ``(R, n_bands)`` with the *pressure*
-    reflection factor ``R = sqrt(1 - alpha)`` (Vorlander Equation (11.39)),
-    shaped ``(6, n_bands)``.
+    reflection factor :math:`R = \sqrt{1 - \alpha}` (Vorlander Equation
+    (11.39)), shaped ``(6, n_bands)``.
 
     ``n_freq`` (the length of the caller's ``frequencies``, or ``None``)
     disambiguates a length-6 1D array: with a matching ``frequencies`` it is
@@ -93,7 +108,7 @@ def _resolve_walls(
 
     :raises ValueError: for a non-finite coefficient, a coefficient outside
         ``[0, 1]`` (a wall cannot reflect more energy than it receives, so
-        unlike the Sabine models the edge-effect ``alpha > 1`` is rejected
+        unlike the Sabine models the edge-effect :math:`\alpha > 1` is rejected
         here), or a shape that is neither a scalar, length 6, a band vector
         nor ``(6, n_bands)``.
     """
@@ -130,12 +145,14 @@ def _resolve_walls(
 def _axis_images(
     coord: float, length: float, max_order: int
 ) -> tuple[NDArray[np.float64], NDArray[np.int_], NDArray[np.int_]]:
-    """Image positions and per-wall reflection counts along one axis.
+    r"""Image positions and per-wall reflection counts along one axis.
 
     Enumerates the lattice index ``n`` and parity ``p`` with axial order
-    ``|2 n - p| <= max_order``. Returns ``(positions, counts_low,
-    counts_high)`` where ``counts_low = |n - p|`` reflections off the wall at
-    ``0`` and ``counts_high = |n|`` off the wall at ``length``.
+    :math:`\lvert 2 n - p \rvert \le \text{max\_order}`. Returns
+    ``(positions, counts_low, counts_high)`` where
+    :math:`\text{counts\_low} = \lvert n - p \rvert` reflections off the wall
+    at ``0`` and :math:`\text{counts\_high} = \lvert n \rvert` off the wall at
+    ``length``.
     """
     positions: list[float] = []
     low: list[int] = []
@@ -158,7 +175,7 @@ def _axis_images(
 
 @dataclass(frozen=True)
 class ImageSourceResult:
-    """Synthetic room impulse response by the image-source method.
+    r"""Synthetic room impulse response by the image-source method.
 
     ``ir`` is the sampled RIR: a 1D array for a broadband model, or a
     ``(n_bands, n_samples)`` array with one decay per octave band for per-band
@@ -172,7 +189,7 @@ class ImageSourceResult:
     :ivar fs: Sample rate, Hz.
     :ivar frequencies: Band centre frequencies, Hz, or ``None`` for a
         broadband model.
-    :ivar times: Exact arrival time ``t_i = r_i / c`` of every image, s
+    :ivar times: Exact arrival time :math:`t_i = r_i / c` of every image, s
         (sorted ascending).
     :ivar distances: Image-to-receiver distance ``r_i``, m (aligned with
         ``times``).
@@ -209,10 +226,10 @@ class ImageSourceResult:
         return float(self.times[int(np.argmin(self.distances))])
 
     def plot(self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any) -> Axes:
-        """Plot the reflectogram: reflection level in dB against arrival time.
+        r"""Plot the reflectogram: reflection level in dB against arrival time.
 
         Stems the per-image amplitudes (in dB re the direct sound), coloured by
-        reflection order, with the ``1 / r`` free-field envelope overlaid.
+        reflection order, with the :math:`1 / r` free-field envelope overlaid.
         Requires matplotlib (``pip install phonometry[plot]``); returns the
         :class:`~matplotlib.axes.Axes`.
         """
@@ -357,10 +374,11 @@ def _image_amplitudes(
     m_bands: NDArray[np.float64],
     distances: NDArray[np.float64],
 ) -> NDArray[np.float64]:
-    """Per-band per-image amplitude ``prod R^count * exp(-m r / 2)/(4 pi r)``.
+    r"""Per-band per-image amplitude
+    :math:`\prod R^{\text{count}} \exp(-m r / 2)/(4 \pi r)`.
 
     The reflection product is formed in log space so a fully absorbing wall
-    (``R = 0``) is handled by an explicit annihilation mask rather than a
+    (:math:`R = 0`) is handled by an explicit annihilation mask rather than a
     ``0 ** 0`` indeterminate form: only images that actually reflect off that
     wall are zeroed.
     """
@@ -412,17 +430,19 @@ def image_source_rir(
     duration: float | None = None,
     frequencies: ArrayLike | None = None,
 ) -> ImageSourceResult:
-    """Synthetic room impulse response of a shoebox by the image-source method.
+    r"""Synthetic room impulse response of a shoebox by the image-source method.
 
     Builds every image of the source up to reflection order ``max_order``
     (Vorlander Equation (11.36); Allen & Berkley 1979), then assembles the RIR
     as the sum of the direct sound and one attenuated, delayed unit impulse per
-    image (Kuttruff Equations (4.4)-(4.5)). Each image at distance ``r`` arrives
-    at ``r / c`` (Vorlander Equation (11.38)) with amplitude
-    ``[prod R_wall^n_wall] exp(-m r / 2) / (4 pi r)``: the ``1 / (4 pi r)``
+    image (Kuttruff Equations (4.4)-(4.5)). Each image at distance ``r``
+    arrives at :math:`r / c` (Vorlander Equation (11.38)) with amplitude
+    :math:`\left[ \prod R_{\text{wall}}^{n_{\text{wall}}} \right]
+    e^{-m r / 2} / (4 \pi r)`: the :math:`1 / (4 \pi r)`
     spherical spreading, the product of the wall pressure reflection factors
-    ``R = sqrt(1 - alpha)`` (Vorlander Equation (11.39)) over the reflections
-    the image made, and the air pressure attenuation ``exp(-m r / 2)``.
+    :math:`R = \sqrt{1 - \alpha}` (Vorlander Equation (11.39)) over the
+    reflections
+    the image made, and the air pressure attenuation :math:`e^{-m r / 2}`.
 
     With scalar or per-wall ``absorption`` (and no ``frequencies``) the result
     is a broadband RIR; a per-band ``absorption`` (or a given ``frequencies``)
@@ -443,13 +463,13 @@ def image_source_rir(
         for six per-wall values that also vary with frequency.
     :param fs: Sample rate, Hz.
     :param max_order: Reflection-order cut-off (total wall reflections). The
-        shoebox has ``(2/3)(2 i0^3 + 3 i0^2 + 4 i0)`` audible images up to
-        order ``i0`` (Kuttruff Equation (9.23)). Default 20.
+        shoebox has :math:`(2/3)(2 i_0^3 + 3 i_0^2 + 4 i_0)` audible images
+        up to order ``i0`` (Kuttruff Equation (9.23)). Default 20.
     :param speed_of_sound: Speed of sound ``c``, m/s (default
         :data:`DEFAULT_SPEED_OF_SOUND`).
     :param air_attenuation: Air *intensity* attenuation constant ``m``, in
         neper per metre (scalar or per-band); the pressure amplitude of each
-        path is scaled by ``exp(-m r / 2)`` (Kuttruff 4.1). Default 0 (air
+        path is scaled by :math:`e^{-m r / 2}` (Kuttruff 4.1). Default 0 (air
         absorption neglected). Obtain a physical ``m`` from
         :func:`phonometry.air_absorption.air_attenuation_m`.
     :param duration: RIR length, s; default the latest image arrival rounded up
@@ -522,10 +542,11 @@ def image_source_rir(
 
 
 def audible_image_count(max_order: int) -> int:
-    """Number of audible shoebox images up to reflection order ``max_order``.
+    r"""Number of audible shoebox images up to reflection order ``max_order``.
 
     Kuttruff *Room Acoustics* 6th ed., Equation (9.23):
-    ``(2/3)(2 i0^3 + 3 i0^2 + 4 i0)``. Every image of a rectangular room is
+    :math:`(2/3)(2 i_0^3 + 3 i_0^2 + 4 i_0)`. Every image of a rectangular
+    room is
     audible (no visibility test needed), so this is exactly the number of
     impulses :func:`image_source_rir` sums at that order.
 
@@ -539,10 +560,11 @@ def audible_image_count(max_order: int) -> int:
 
 
 def reflection_density(time: ArrayLike, volume: float, speed_of_sound: float = DEFAULT_SPEED_OF_SOUND) -> np.ndarray | float:
-    """Temporal density of reflections ``dN/dt = 4 pi c^3 t^2 / V``.
+    r"""Temporal density of reflections :math:`dN/dt = 4 \pi c^3 t^2 / V`.
 
     Kuttruff *Room Acoustics* 6th ed., Equation (4.6): the number of image
-    sources per unit time whose spheres of radius ``c t`` sweep the receiver.
+    sources per unit time whose spheres of radius :math:`c t` sweep the
+    receiver.
     Independent of room shape. Useful to judge the reflection-order cut-off of
     :func:`image_source_rir` (the model is complete only while its images keep
     up with this density).

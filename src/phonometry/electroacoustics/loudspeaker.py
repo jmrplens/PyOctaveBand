@@ -1,5 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""
+r"""
 Rated loudspeaker characteristics (IEC 60268-5).
 
 A loudspeaker measurement/rating report gathers the *rated characteristics*
@@ -20,16 +20,21 @@ the report never merely repeats a manufacturer number:
   measured at a constant voltage ``U`` and distance ``d``; the sensitivity
   level referred to 1 W into the rated impedance ``R`` at 1 m is
 
-      L_M = L_band + 20 lg(d / d0) + 20 lg(U_p / U),   d0 = 1 m,
+  .. math::
 
-  where ``L_band`` is the energetic mean of the on-axis level over a stated
-  band (20.1.2.4: the r.m.s. of the band pressures) and ``U_p = sqrt(R * P0)``
-  with ``P0 = 1 W`` is the voltage that drives 1 W into ``R`` (20.3.2). With the
-  default drive ``U = sqrt(R)`` at ``d = 1 m`` the two corrections vanish and
-  the sensitivity level equals the band mean, which for ``R = 8`` ohm is the
-  familiar "dB / 2.83 V @ 1 m" figure. This is the clean-room oracle: a flat
-  ``L0`` response driven at ``sqrt(R)`` volts and 1 m returns ``L0`` exactly,
-  and a doubled voltage returns ``L0 - 6,02`` dB.
+     L_M = L_\text{band} + 20 \log_{10}(d / d_0) + 20 \log_{10}(U_p / U),
+     \qquad d_0 = 1\ \mathrm{m}
+
+  where :math:`L_\text{band}` is the energetic mean of the on-axis level
+  over a stated band (20.1.2.4: the r.m.s. of the band pressures) and
+  :math:`U_p = \sqrt{R P_0}` with :math:`P_0 = 1` W is the voltage that
+  drives 1 W into ``R`` (20.3.2). With the default drive
+  :math:`U = \sqrt{R}` at :math:`d = 1` m the two corrections vanish and
+  the sensitivity level equals the band mean, which for :math:`R = 8` ohm
+  is the familiar "dB / 2.83 V @ 1 m" figure. This is the clean-room
+  oracle: a flat :math:`L_0` response driven at :math:`\sqrt{R}` volts
+  and 1 m returns :math:`L_0` exactly, and a doubled voltage returns
+  :math:`L_0 - 6.02` dB.
 
 * **Effective frequency range** (21.2). The range of frequencies for which the
   on-axis response is not more than 10 dB below the level averaged over a
@@ -102,10 +107,12 @@ def _energetic_mean_db(levels: NDArray[np.float64]) -> float:
 def _reference_level(
     frequencies: NDArray[np.float64], spl_db: NDArray[np.float64]
 ) -> float:
-    """Level averaged over a one-octave band in the region of maximum sensitivity.
+    r"""Level averaged over a one-octave band in the region of maximum
+    sensitivity.
 
     The reference is the largest energetic (r.m.s.-pressure) mean over any
-    one-octave band ``[f / sqrt(2), f * sqrt(2)]`` centred on a response sample
+    one-octave band :math:`[f / \sqrt{2}, f \sqrt{2}]` centred on a
+    response sample
     (IEC 60268-5 21.2: "averaged over a bandwidth of one octave in the region
     of maximum sensitivity"). The clause does not pin down how the "region of
     maximum sensitivity" is located; this implementation reads it as the
@@ -290,10 +297,10 @@ class LoudspeakerCharacteristics:
 
     @property
     def characteristic_sensitivity_pa(self) -> float:
-        """Characteristic sensitivity as a pressure, in Pa (20.3).
+        r"""Characteristic sensitivity as a pressure, in Pa (20.3).
 
         The sound pressure at 1 m for 1 W into the rated impedance:
-        ``p_M = p_ref * 10 ** (L_M / 20)``.
+        :math:`p_M = p_\text{ref} \cdot 10^{L_M / 20}`.
         """
         return float(_P_REF * 10.0 ** (self.sensitivity_level_db / 20.0))
 
@@ -533,7 +540,8 @@ def loudspeaker_characteristics(
     polar_frequency: float | None = None,
     directivity_index_db: float | None = None,
 ) -> LoudspeakerCharacteristics:
-    """Assemble the rated loudspeaker characteristics for an IEC 60268-5 report.
+    r"""Assemble the rated loudspeaker characteristics for an IEC 60268-5
+    report.
 
     The characteristic sensitivity level (20.3/20.4) and the effective frequency
     range (21.2) are computed from the on-axis response; the optional impedance,
@@ -546,8 +554,9 @@ def loudspeaker_characteristics(
         over-weights the high-frequency end of every band.
     :param spl_db: On-axis sound pressure level, in dB re 20 uPa.
     :param rated_impedance: Rated impedance ``R``, in ohm (16.1).
-    :param input_voltage: Constant drive voltage of the response, in V; defaults
-        to ``sqrt(R)`` (1 W into ``R``, the 2,83 V @ 8 ohm convention).
+    :param input_voltage: Constant drive voltage of the response, in V;
+        defaults to :math:`\sqrt{R}` (1 W into ``R``, the 2.83 V @ 8 ohm
+        convention).
     :param distance: Measuring distance of the response, in m (default 1).
     :param sensitivity_band: Stated band ``(lo, hi)`` for the characteristic
         sensitivity, in Hz; defaults to the one-octave band in the region of

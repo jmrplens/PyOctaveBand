@@ -15,7 +15,8 @@ is reused from [`.loudness_ecma`](/phonometry/reference/api/psychoacoustics/loud
 chain:
 
 * roughness-specific zero-padding (Clause 5.1.2.2) and segmentation
-  (Clause 5.1.5.2) with the fixed block/hop `s_b = 16384` / `s_h = 4096`
+  (Clause 5.1.5.2) with the fixed block/hop $s_b = 16384$ /
+  $s_h = 4096$
   (Clause 7.1.1);
 * the Hilbert envelope of each critical-band block and a factor-32 downsampling
   to 1500 Hz (Clause 7.1.2, Formula 65);

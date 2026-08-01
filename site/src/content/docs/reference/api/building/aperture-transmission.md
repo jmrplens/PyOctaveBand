@@ -16,40 +16,40 @@ wall into a composite sound reduction index, the practical answer to "why do I
 never reach the catalogue `Rw`".
 
 **Straight-edged slit (Hopkins Eq. 4.99, Gomperts).** With the acoustic
-wavenumber `k = 2 pi f / c0`, `K = k w` (`w` slit width), `X = d / w`
-(`d` slit depth) and the end correction `e = (1/pi)(ln(8/K) - 0.57722)`:
+wavenumber $k = 2\pi f / c_0$, $K = k w$ (`w` slit width),
+$X = d / w$ (`d` slit depth) and the end correction
+$e = (1/\pi)(\ln(8/K) - 0.57722)$:
 
-```text
-tau = m K cos^2(Ke)
-      / ( 2 n^2 [ sin^2(KX + 2Ke)/cos^2(Ke)
-                  + (K^2 / 2 n^2)(1 + cos(KX) cos(KX + 2Ke)) ] )
-```
+$$
+\tau = \frac{m K \cos^2(Ke)} {2 n^2 \left[ \frac{\sin^2(KX + 2Ke)}{\cos^2(Ke)} + \frac{K^2}{2 n^2} \left( 1 + \cos(KX) \cos(KX + 2Ke) \right) \right]}
+$$
 
-where `m = 8` (diffuse field) or `4` (normal incidence), and `n = 1` (slit
-in the middle of a plate) or `0.5` (slit along an edge). The model assumes an
-inviscid air path; maxima in `tau` (dips in `R`) occur at the resonances
-`d + 2e = z lambda/2` (Eq. 4.101, `z = 1, 2, 3, ...`).
+where $m = 8$ (diffuse field) or `4` (normal incidence), and
+$n = 1$ (slit in the middle of a plate) or `0.5` (slit along an
+edge). The model assumes an inviscid air path; maxima in `tau` (dips in
+`R`) occur at the resonances $d + 2e = z\lambda/2$ (Eq. 4.101,
+$z = 1, 2, 3, \ldots$).
 
 **Circular aperture (Hopkins Eq. 4.102, Wilson & Soroka).** With the piston
-radiation resistance `R0(2ka) = 1 - 2 J1(2ka)/(2ka)` and reactance
-`X0(2ka) = 2 H1(2ka)/(2ka)` (`J1` Bessel, `H1` Struve; radius `a`,
-depth `d`):
+radiation resistance $R_0(2ka) = 1 - 2 J_1(2ka)/(2ka)$ and reactance
+$X_0(2ka) = 2 H_1(2ka)/(2ka)$ ($J_1$ Bessel, $H_1$ Struve;
+radius `a`, depth `d`):
 
-```text
-tau = 4 R0 / ( 4 R0^2 [cos(kd) - X0 sin(kd)]^2
-               + [(R0^2 - X0^2 + 1) sin(kd) + 2 X0 cos(kd)]^2 )
-```
+$$
+\tau = \frac{4 R_0} {4 R_0^2 \left[ \cos(kd) - X_0 \sin(kd) \right]^2 + \left[ \left( R_0^2 - X_0^2 + 1 \right) \sin(kd) + 2 X_0 \cos(kd) \right]^2}
+$$
 
-**Composite (Hopkins Eq. 4.92).** For elements of area `S_n` and sound
-reduction index `R_n` the resultant is the area-weighted energy sum:
+**Composite (Hopkins Eq. 4.92).** For elements of area $S_n$ and sound
+reduction index $R_n$ the resultant is the area-weighted energy sum
 
-```text
-R = -10 lg( (1 / sum S_n) sum S_n 10^(-R_n/10) )
-```
+$$
+R = -10 \log_{10}\!\left[ \frac{1}{\sum S_n} \sum S_n \, 10^{-R_n/10} \right]
+$$
 
-so a bare opening (`R = 0`, `tau = 1`) of relative area `S_a/S` caps the
-composite at `10 lg(S / S_a)`. This is the same energetic combination used by
-the EN 12354-3/-4 facade model of [`phonometry.building.facade_prediction`](/phonometry/reference/api/building/facade-prediction/).
+so a bare opening ($R = 0$, $\tau = 1$) of relative area
+$S_a/S$ caps the composite at $10 \log_{10}(S / S_a)$. This is the same
+energetic combination used by the EN 12354-3/-4 facade model of
+[`phonometry.building.facade_prediction`](/phonometry/reference/api/building/facade-prediction/).
 
 > Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
 
@@ -121,7 +121,8 @@ Requires matplotlib (`pip install phonometry[plot]`); returns the
 
 *property*
 
-Aperture sound reduction index `R = -10 lg(tau)` per band, dB.
+Aperture sound reduction index $R = -10 \log_{10}(\tau)$ per
+band, dB.
 
 ## circular_aperture_transmission_coefficient
 
@@ -163,11 +164,17 @@ composite_transmission_loss(
 ) -> np.ndarray
 ```
 
-Composite sound reduction index of parallel elements (Hopkins Eq. 4.92).
+Composite sound reduction index of parallel elements (Hopkins
+Eq. 4.92).
 
-`R = -10 lg( (1/sum S_n) sum S_n 10^(-R_n/10) )`, the area-weighted
-energy combination of `N` elements (wall, window, slit, open aperture ...)
-sharing a partition. A bare opening enters with `R = 0` (`tau = 1`).
+The area-weighted energy combination of `N` elements (wall, window,
+slit, open aperture ...) sharing a partition:
+
+$$
+R = -10 \log_{10}\!\left[ \frac{1}{\sum S_n} \sum S_n \, 10^{-R_n/10} \right]
+$$
+
+A bare opening enters with $R = 0$ ($\tau = 1$).
 
 **Parameters**
 
@@ -232,7 +239,8 @@ slit_resonance_frequencies(
 ) -> np.ndarray
 ```
 
-Slit resonance frequencies `d + 2e = z lambda/2` (Hopkins Eq. 4.101).
+Slit resonance frequencies $d + 2e = z\lambda/2$ (Hopkins
+Eq. 4.101).
 
 Maxima in the transmission coefficient (dips in `R`) occur where the
 effective slit depth is a half-wavelength multiple. Solved iteratively
@@ -253,7 +261,7 @@ because the end correction `e` depends weakly on frequency.
 
 | Exception | When |
 | :--- | :--- |
-| ValueError | for a non-positive input, `orders < 1`, or a slit so wide relative to its depth that the effective depth `d + 2e` is non-positive (no resonance exists; `width` must be much less than the wavelength). |
+| ValueError | for a non-positive input, `orders < 1`, or a slit so wide relative to its depth that the effective depth $d + 2e$ is non-positive (no resonance exists; `width` must be much less than the wavelength). |
 
 ## slit_transmission_coefficient
 
@@ -278,8 +286,8 @@ Transmission coefficient of a straight-edged slit (Hopkins Eq. 4.99).
 | `frequency` | Band centre frequencies `f`, in hertz (array, > 0). |
 | `width` | Slit width `w`, in m (> 0). |
 | `depth` | Slit depth `d` (wall thickness across the slit), in m (> 0). |
-| `field` | `"diffuse"` (`m = 8`) or `"normal"` (`m = 4`). |
-| `position` | `"mid"` (`n = 1`) or `"edge"` (`n = 0.5`). |
+| `field` | `"diffuse"` ($m = 8$) or `"normal"` ($m = 4$). |
+| `position` | `"mid"` ($n = 1$) or `"edge"` ($n = 0.5$). |
 | `speed_of_sound` | Speed of sound in air `c0` (Default: 343 m/s). |
 
 **Returns:** An [`ApertureTransmissionResult`](/phonometry/reference/api/building/aperture-transmission/#aperturetransmissionresult) (kind `"slit"`).
@@ -296,7 +304,8 @@ Transmission coefficient of a straight-edged slit (Hopkins Eq. 4.99).
 transmission_loss_from_coefficient(tau: ArrayLike) -> np.ndarray
 ```
 
-Sound reduction index `R = -10 lg(tau)` from a transmission coefficient.
+Sound reduction index $R = -10 \log_{10}(\tau)$ from a transmission
+coefficient.
 
 **Parameters**
 

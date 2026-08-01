@@ -10,20 +10,28 @@ sidebar:
 Given the steady-state pressure and outward normal velocity phasors on a
 closed contour that encloses a scatterer (or any source region), the
 exterior field is fully determined by the Kirchhoff-Helmholtz boundary
-integral. In two dimensions, with the `exp(+j omega t)` time convention
+integral. In two dimensions, with the $e^{+j \omega t}$ time
+convention
 used throughout the library, the free-space Green function is
 
-    `G(R) = -(j / 4) H0(2)(k R)`,
+$$
+G(R) = -(j / 4)\, H_0^{(2)}(k R),
+$$
 
-with `H0(2)` the Hankel function of the second kind (outgoing waves) and
+with $H_0^{(2)}$ the Hankel function of the second kind (outgoing
+waves) and
 `R` the source-observer distance, and the exterior representation reads
 
-    `p(r) = oint_S [ p(r') dG/dn' + j omega rho v_n(r') G ] dl'`,
+$$
+p(r) = \oint_S \left[ p(r')\, dG/dn' + j \omega \rho\, v_n(r')\, G \right] dl',
+$$
 
 where `n'` is the outward normal of the contour `S` and the momentum
-equation `dp/dn = -j omega rho v_n` eliminated the pressure gradient. The
-normal derivative of the Green function brings in `H1(2)`:
-`dG/dR = (j k / 4) H1(2)(k R)`. This is the same construction full-wave
+equation $dp/dn = -j \omega \rho v_n$ eliminated the pressure
+gradient. The
+normal derivative of the Green function brings in $H_1^{(2)}$:
+$dG/dR = (j k / 4) H_1^{(2)}(k R)$. This is the same construction
+full-wave
 solvers use to report far-field scattering patterns from near-field data
 (e.g. the finite-element polar responses of Jimenez, Cox, Romero-Garcia
 and Groby, *Metadiffusers: Deep-subwavelength sound diffusers*, Sci. Rep.
@@ -33,9 +41,11 @@ and Groby, *Metadiffusers: Deep-subwavelength sound diffusers*, Sci. Rep.
 [`far_field_from_contour`](/phonometry/reference/api/simulation/ntff/#far_field_from_contour) evaluates that integral for phasors captured
 by `add_contour_probe` (or assembled by
 hand into a [`ContourPhasors`](/phonometry/reference/api/simulation/ntff/#contourphasors)), either in the true far-field limit,
-where `H0(2)(kR) -> sqrt(2 / (pi k R)) exp(-j (k R - pi / 4))` turns the
-integral into an angular pattern `F(theta)` with
-`p(r, theta) -> F(theta) exp(-j k r) / sqrt(r)`, or at a finite
+where
+$H_0^{(2)}(kR) \to \sqrt{2 / (\pi k R)}\, e^{-j (k R - \pi / 4)}$
+turns the
+integral into an angular pattern $F(\theta)$ with
+$p(r, \theta) \to F(\theta)\, e^{-j k r} / \sqrt{r}$, or at a finite
 observation radius with the exact Hankel kernels.
 
 Because the integral representation is source-free inside `S` for any
@@ -71,8 +81,9 @@ ContourPhasors(
 
 Steady-state `p` and `v_n` phasors sampled on a closed contour.
 
-The phasors follow the library's `exp(+j omega t)` convention:
-`p(t) = Re{ pressure * exp(+j omega t) }`. `normals` point outward
+The phasors follow the library's $e^{+j \omega t}$ convention:
+$p(t) = \operatorname{Re}\{p \, e^{+j \omega t}\}$.
+`normals` point outward
 (away from the enclosed region) and `normal_velocity` is the particle
 velocity component along them. Instances are produced by
 `add_contour_probe` probes; they can
@@ -120,21 +131,28 @@ Exterior field of a closed contour: the 2D Kirchhoff-Helmholtz integral.
 
 Evaluates, for each observation angle `a` (degrees, measured from the
 `+x` axis towards `+y` of the grid coordinates, so the unit
-direction is `u = (cos a, sin a)`),
+direction is $u = (\cos a, \sin a)$),
 
-    `p(r) = oint_S [ p dG/dn' + j omega rho v_n G ] dl'`
+$$
+p(r) = \oint_S \left[ p\, dG/dn' + j \omega \rho\, v_n G \right] dl'
+$$
 
 with the outgoing 2D free-space Green function
-`G = -(j/4) H0(2)(k R)` and its normal derivative through
-`dG/dR = (j k / 4) H1(2)(k R)` (`exp(+j omega t)` convention,
+$G = -(j/4) H_0^{(2)}(k R)$ and its normal derivative through
+$dG/dR = (j k / 4) H_1^{(2)}(k R)$ ($e^{+j \omega t}$
+convention,
 `scipy.special.hankel2`).
 
 With `distance=None` (the default) the far-field limit
-`H0(2)(kR) -> sqrt(2 / (pi k R)) exp(-j (k R - pi/4))` is taken
-analytically and the returned complex pattern `F(a)` is the relative
+$H_0^{(2)}(kR) \to \sqrt{2 / (\pi k R)}\, e^{-j (k R - \pi/4)}$
+is taken
+analytically and the returned complex pattern $F(a)$ is the
+relative
 far-field amplitude defined by
 
-    `p(r, a) -> F(a) exp(-j k r) / sqrt(r)`  as `r -> oo`,
+$$
+p(r, a) \to F(a)\, e^{-j k r} / \sqrt{r} \quad \text{as } r \to \infty,
+$$
 
 with `r` measured from `origin` (the phase reference; magnitudes at
 infinity do not depend on it). With a finite `distance` the exact

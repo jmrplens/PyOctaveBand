@@ -28,33 +28,40 @@ spectra are known and the dominant path per band matters.
    ([`calculated_sound_reduction_index`](/phonometry/reference/api/building/detailed-prediction/#calculated_sound_reduction_index)).
 2. In-situ conversion (Clause 4.2.2). The total loss factor in situ follows
    from Annex C Formula (C.1),
-   `ηtot = ηint + 2 ρo co σ / (2 π f m') + co/(π² S √(f fc)) · Σ lk αk`
+
+   $$
+   \eta_{tot} = \eta_{int} + \frac{2 \rho_o c_o \sigma}{2 \pi f m'} + \frac{c_o}{\pi^2 S \sqrt{f f_c}} \sum_k l_k \alpha_k
+   $$
+
    ([`in_situ_total_loss_factor`](/phonometry/reference/api/building/detailed-prediction/#in_situ_total_loss_factor)), with the perimeter absorption
    coefficients deduced from the junctions' vibration reduction indices
    (Formula C.4, [`perimeter_absorption_coefficient`](/phonometry/reference/api/building/detailed-prediction/#perimeter_absorption_coefficient)). From it come the
-   structural reverberation time `Ts = 2,2/(f ηtot)`
+   structural reverberation time $T_s = 2.2/(f \eta_{tot})$
    ([`structural_reverberation_time`](/phonometry/reference/api/building/detailed-prediction/#structural_reverberation_time)), the in-situ index
-   `Rsitu = R − 10 lg(Ts,situ/Ts,lab)` (Formula 9,
+   $R_{situ} = R - 10 \log_{10}(T_{s,situ}/T_{s,lab})$ (Formula 9,
    [`in_situ_reduction_index`](/phonometry/reference/api/building/detailed-prediction/#in_situ_reduction_index)) and the equivalent absorption length
-   `asitu = 2,2 π² S √(fref/f)/(co Ts,situ)` (Formula 11).
-3. Junctions (Formula 10). `Dv,ij,situ = Kij − 10 lg(lij/√(ai,situ aj,situ))`,
+   $a_{situ} = 2.2\,\pi^2 S \sqrt{f_{ref}/f}/(c_o T_{s,situ})$
+   (Formula 11).
+3. Junctions (Formula 10).
+   $D_{v,ij,situ} = K_{ij} - 10 \log_{10}(l_{ij}/\sqrt{a_{i,situ} a_{j,situ}})$,
    floored at 0 dB ([`in_situ_velocity_level_difference`](/phonometry/reference/api/building/detailed-prediction/#in_situ_velocity_level_difference)).
-4. Paths. The direct path is `RDd = Rs,situ + ΔRD,situ + ΔRd,situ`
+4. Paths. The direct path is
+   $R_{Dd} = R_{s,situ} + \Delta R_{D,situ} + \Delta R_{d,situ}$
    (Formula 14) and each flanking path (Formula 15) is
-   `Rij = Ri,situ/2 + ΔRi,situ + Rj,situ/2 + ΔRj,situ + Dv,ij,situ + T`
-   with the geometry term `T = 10 lg(Ss/√(Si Sj))`
+   $R_{ij} = R_{i,situ}/2 + \Delta R_{i,situ} + R_{j,situ}/2 + \Delta R_{j,situ} + D_{v,ij,situ} + T$
+   with the geometry term $T = 10 \log_{10}(S_s/\sqrt{S_i S_j})$
    ([`flanking_reduction_index`](/phonometry/reference/api/building/detailed-prediction/#flanking_reduction_index)).
-5. Assembly. `R' = −10 lg(Σ 10^(−R/10))` over the direct path and all
-   flanking paths (Formulae 1 to 4), then `R'w (C; Ctr)` per ISO 717-1
+5. Assembly. $R' = -10 \log_{10}(\sum 10^{-R/10})$ over the direct path and
+   all flanking paths (Formulae 1 to 4), then `R'w (C; Ctr)` per ISO 717-1
    ([`detailed_airborne_prediction`](/phonometry/reference/api/building/detailed-prediction/#detailed_airborne_prediction)).
 
 **Chain, impact (ISO 12354-2:2017, Clause 4.2).** The bare floor's normalized
 impact sound pressure level per band follows from Annex B Formula (B.2),
-`Ln = 155 − 30 lg(m') + 10 lg(Ts) + 10 lg(σ) + 10 lg(f/fref)`
+$L_n = 155 - 30 \log_{10}(m') + 10 \log_{10}(T_s) + 10 \log_{10}(\sigma) + 10 \log_{10}(f/f_{ref})$
 ([`bare_floor_impact_level`](/phonometry/reference/api/building/detailed-prediction/#bare_floor_impact_level)); the direct path is
-`Ln,d = Ln,situ − ΔLsitu − ΔLd,situ` (Formula 11) and each flanking path
-(Formula 12) is `Ln,ij = Ln,situ − ΔLsitu + (Ri,situ − Rj,situ)/2`
-`− ΔRj,situ − Dv,ij,situ − 10 lg(Si/√(Si Sj))`
+$L_{n,d} = L_{n,situ} - \Delta L_{situ} - \Delta L_{d,situ}$
+(Formula 11) and each flanking path (Formula 12) is
+$L_{n,ij} = L_{n,situ} - \Delta L_{situ} + (R_{i,situ} - R_{j,situ})/2 - \Delta R_{j,situ} - D_{v,ij,situ} - 10 \log_{10}(S_i/\sqrt{S_i S_j})$
 ([`flanking_impact_level`](/phonometry/reference/api/building/detailed-prediction/#flanking_impact_level)), combined
 energetically into `L'n` and rated `L'n,w (CI)` per ISO 717-2
 ([`detailed_impact_prediction`](/phonometry/reference/api/building/detailed-prediction/#detailed_impact_prediction)).
@@ -67,7 +74,8 @@ both the airborne and the impact chain read the same
 **Type A and Type B elements.** [`HomogeneousElement`](/phonometry/reference/api/building/detailed-prediction/#homogeneouselement) and
 [`in_situ_element`](/phonometry/reference/api/building/detailed-prediction/#in_situ_element) describe a **Type A** element, one whose structural
 reverberation time is set by the elements connected to it. For a **Type B**
-element the standard takes `Ts,situ = Ts,lab` (so no in-situ transfer is
+element the standard takes $T_{s,situ} = T_{s,lab}$ (so no in-situ
+transfer is
 needed) and describes the junction with the normalized direction-averaged
 velocity level difference `Dv,ij,n` instead of `Kij`, or with a laboratory
 measurement of the flanking level difference `Dn,f`. Those branches are
@@ -158,16 +166,20 @@ bare_floor_impact_level(
 ) -> np.ndarray
 ```
 
-Normalized impact level of a bare monolithic floor (Part 2, Formula B.2).
+Normalized impact level of a bare monolithic floor (Part 2, F. B.2).
 
-`Ln = 155 − 30 lg(m'/1 kg/m²) + 10 lg(Ts/1 s) + 10 lg σ + 10 lg(f/fref)`
-with `fref = 1000 Hz`, the closed form obtained with
+$$
+L_n = 155 - 30 \log_{10}(m'/1\,\mathrm{kg/m^2}) + 10 \log_{10}(T_s/1\,\mathrm{s}) + 10 \log_{10} \sigma + 10 \log_{10}(f/f_{ref})
+$$
+
+with $f_{ref} = 1000$ Hz, the closed form obtained with
 the force level of the standard tapping machine on a low-mobility floor.
 Supplying the *in-situ* structural reverberation time and radiation factor
 returns `Ln,situ` directly.
 
 The reciprocity relation of Part 2 Formulae (B.3)/(B.4),
-`R + Ln = 38 + 30 lg f` in one-third-octave bands (43 in octave bands),
+$R + L_n = 38 + 30 \log_{10} f$ in one-third-octave bands (43 in octave
+bands),
 holds where forced transmission is negligible and gives an independent
 check on the pair.
 
@@ -205,18 +217,22 @@ Radiation factor for free bending waves `σ` (Formulae B.4 to B.6).
 
 The three candidate factors of Formula (B.4) are
 
-- `σ1 = 1/√(1 − fc/f)` (above the critical frequency),
-- `σ2 = 4 l1 l2 (f/co)²` (the plate acting as a small piston),
-- `σ3 = √(2 π f (l1 + l2)/(16 co))` (corner and edge modes),
+- $\sigma_1 = 1/\sqrt{1 - f_c/f}$ (above the critical frequency),
+- $\sigma_2 = 4 l_1 l_2 (f/c_o)^2$ (the plate acting as a small
+  piston),
+- $\sigma_3 = \sqrt{2 \pi f (l_1 + l_2)/(16 c_o)}$ (corner and
+  edge modes),
 
-and the first plate mode `f11 = co²/(4 fc)·(1/l1² + 1/l2²)` selects
-between the two regimes. For `f11 ≤ fc/2` the element is mode dense at
-its critical frequency and Formula (B.5) applies: `σ = σ1` at and above
-`fc`, and below it the edge/corner sum
-`σ = 2(l1+l2)/(l1 l2)·(co/fc)·δ1 + δ2` with `λ = √(f/fc)` and `δ2`
-vanishing above `fc/2`. For `f11 > fc/2` Formula (B.6) picks `σ3`
-unless `σ2` (below `fc`) or `σ1` (above `fc`) is smaller. Every
-branch is capped at `σ ≤ 2,0`.
+and the first plate mode
+$f_{11} = c_o^2/(4 f_c) \cdot (1/l_1^2 + 1/l_2^2)$ selects
+between the two regimes. For $f_{11} \le f_c/2$ the element is mode
+dense at its critical frequency and Formula (B.5) applies:
+$\sigma = \sigma_1$ at and above `fc`, and below it the
+edge/corner sum
+$\sigma = 2(l_1+l_2)/(l_1 l_2) \cdot (c_o/f_c) \cdot \delta_1 + \delta_2$ with $\lambda = \sqrt{f/f_c}$ and `δ2`
+vanishing above `fc/2`. For $f_{11} > f_c/2$ Formula (B.6) picks
+`σ3` unless `σ2` (below `fc`) or `σ1` (above `fc`) is smaller.
+Every branch is capped at $\sigma \le 2.0$.
 
 These relations hold for a plate in an infinite baffle; the standard notes
 that walls and floors surrounded by orthogonal elements radiate 2 (edge
@@ -227,7 +243,7 @@ modes) to 4 (corner modes) times more efficiently well below `fc`.
 | Name | Description |
 | :--- | :--- |
 | `frequencies` | Band centre frequencies `f`, in Hz. |
-| `critical_frequency` | Critical frequency `fc = co²/(1,8 cL t)`, Hz. |
+| `critical_frequency` | Critical frequency $f_c = c_o^2/(1.8\,c_L t)$, Hz. |
 | `length1` | One side length of the rectangular element, in m. |
 | `length2` | The other side length, in m. |
 | `speed_of_sound` | Speed of sound in air `co`, in m/s (Default: 340 m/s, the value ISO 12354-1 Annex A fixes). |
@@ -260,17 +276,21 @@ calculated_sound_reduction_index(
 ) -> np.ndarray
 ```
 
-Sound reduction index of a homogeneous element (Formulae B.2 and B.10).
+Sound reduction index of a homogeneous element (Formulae B.2, B.10).
 
-`R = −10 lg τ` with the three-branch transmission factor
+$R = -10 \log_{10} \tau$ with the three-branch transmission factor
 
-- `f > fc`: `τ = (2 ρo co/(2 π f m'))² · π fc σ²/(2 f ηtot)`,
-- `f ≈ fc`: `τ = (2 ρo co/(2 π f m'))² · π σ²/(2 ηtot)`,
-- `f < fc`: `τ = (2 ρo co/(2 π f m'))² · (F + R)` with the forced
-  term `F = 2 σf [1 − f²/fc²]^(−2)` and the resonant term
-  `R = 2 (π fc/(4 f)) σ²/ηtot`.
+- $f > f_c$:
+  $\tau = (2 \rho_o c_o/(2 \pi f m'))^2 \cdot \pi f_c \sigma^2/(2 f \eta_{tot})$,
+- $f \approx f_c$:
+  $\tau = (2 \rho_o c_o/(2 \pi f m'))^2 \cdot \pi \sigma^2/(2 \eta_{tot})$,
+- $f < f_c$:
+  $\tau = (2 \rho_o c_o/(2 \pi f m'))^2 \cdot (F + R)$ with the
+  forced term $F = 2 \sigma_f [1 - f^2/f_c^2]^{-2}$ and the
+  resonant term $R = 2 (\pi f_c/(4 f)) \sigma^2/\eta_{tot}$.
 
-The `f ≈ fc` branch is applied to the band whose limits straddle the
+The $f \approx f_c$ branch is applied to the band whose limits
+straddle the
 critical frequency, which is how the Annex L worked example selects it.
 
 Below the critical frequency the first term is the *forced* contribution.
@@ -281,9 +301,11 @@ worked example keeps it on every path, so the default is `False`.
 
 **High-frequency plateau (Formula B.10).** At high frequency the index of
 a thick element stops growing; the standard bounds the transmission factor
-from below by `τplateau = (4 ρo co/(1,1 ρ cL))² · 0,02/ηtot`. Supplying
+from below by
+$\tau_{plateau} = (4 \rho_o c_o/(1.1\,\rho c_L))^2 \cdot 0.02/\eta_{tot}$. Supplying
 both `density` and `longitudinal_velocity` applies that floor,
-`τ = max(τ, τplateau)`, as the Annex L example does from about 1250 Hz
+$\tau = \max(\tau, \tau_{plateau})$, as the Annex L example does
+from about 1250 Hz
 upwards on its lightweight blockwork.
 
 **Parameters**
@@ -296,7 +318,7 @@ upwards on its lightweight blockwork.
 | `total_loss_factor` | Total loss factor `ηtot` per band (laboratory or in situ, matching the situation being described). |
 | `radiation_factor` | Radiation factor for free bending waves `σ` per band (see [`bending_radiation_factor`](/phonometry/reference/api/building/detailed-prediction/#bending_radiation_factor)). |
 | `forced_radiation_factor` | Radiation factor for forced waves `σf` per band (see [`forced_radiation_factor`](/phonometry/reference/api/building/detailed-prediction/#forced_radiation_factor)); ignored when `resonant_only` is set. |
-| `bands` | `"third"` (default) or `"octave"`, setting the band limits used to locate the `f ≈ fc` branch. |
+| `bands` | `"third"` (default) or `"octave"`, setting the band limits used to locate the $f \approx f_c$ branch. |
 | `resonant_only` | Drop the forced-transmission term below `fc`. |
 | `density` | Density `ρ` of the material, in kg/m³; with `longitudinal_velocity` it enables the Formula (B.10) plateau. |
 | `longitudinal_velocity` | Quasi-longitudinal phase velocity `cL` of the material, in m/s. |
@@ -324,9 +346,10 @@ detailed_airborne_prediction(
 ) -> DetailedAirborneResult
 ```
 
-Combine direct and flanking paths into `R'` per band (Formulae 1 to 4).
+Combine direct and flanking paths into `R'` per band (F. 1 to 4).
 
-`R' = −10 lg(Σ 10^(−R/10))` over the direct path `RDd` and every
+$R' = -10 \log_{10}(\sum 10^{-R/10})$ over the direct path `RDd` and
+every
 flanking path `Rij`. The result exposes each path's share of the
 transmitted energy in every band, which is what identifies the path to
 treat first, and the ISO 717-1 rating of the resulting spectrum whenever
@@ -366,7 +389,8 @@ detailed_impact_prediction(
 
 Combine direct and flanking paths into `L'n` per band (Part 2, (1)).
 
-`L'n = 10 lg(Σ 10^(Ln/10))` over the direct impact path `Ln,d` and
+$L'_n = 10 \log_{10}(\sum 10^{L_n/10})$ over the direct impact path
+`Ln,d` and
 every flanking path `Ln,ij`, with the ISO 717-2 rating of the resulting
 spectrum whenever the bands cover the rating range. For rooms next to each
 other there is no direct impact path and the sum runs over the flanking
@@ -574,9 +598,10 @@ direct_impact_level(
 ) -> np.ndarray
 ```
 
-Normalized impact level of the direct path `Ln,d` (Part 2, Formula 11).
+Normalized impact level of the direct path `Ln,d` (Part 2, F. 11).
 
-`Ln,d = Ln,situ − ΔLsitu − ΔLd,situ`: the in-situ level of the bare
+$L_{n,d} = L_{n,situ} - \Delta L_{situ} - \Delta L_{d,situ}$: the
+in-situ level of the bare
 floor reduced by the floor covering and by any additional layer on the
 receiving side (a suspended ceiling).
 
@@ -603,7 +628,8 @@ direct_reduction_index(
 
 Sound reduction index of the direct path `RDd` (Formula 14).
 
-`RDd = Rs,situ + ΔRD,situ + ΔRd,situ`: the in-situ index of the
+$R_{Dd} = R_{s,situ} + \Delta R_{D,situ} + \Delta R_{d,situ}$: the
+in-situ index of the
 separating element plus the improvement of any lining on its source and
 receiving faces (for the in-situ improvement the standard accepts the
 laboratory value, Formula 8).
@@ -634,10 +660,11 @@ flanking_impact_level(
 ) -> np.ndarray
 ```
 
-Flanking normalized impact level `Ln,ij` per band (Part 2, Formula 12).
+Flanking normalized impact level `Ln,ij` per band (Part 2, F. 12).
 
-`Ln,ij = Ln,situ − ΔLsitu + (Ri,situ − Rj,situ)/2 − ΔRj,situ − Dv,ij,situ − T`
-with the geometry term `T = 10 lg(Si/√(Si Sj))`, `i` the excited floor
+$L_{n,ij} = L_{n,situ} - \Delta L_{situ} + (R_{i,situ} - R_{j,situ})/2 - \Delta R_{j,situ} - D_{v,ij,situ} - T$
+with the geometry term $T = 10 \log_{10}(S_i/\sqrt{S_i S_j})$, `i` the
+excited floor
 and `j` the flanking element radiating in the receiving room.
 
 **Parameters**
@@ -676,7 +703,7 @@ flanking_impact_level_from_flanking_level(
 
 Flanking impact level from a measured `Ln,f` (Part 2, Formula 13).
 
-`Ln,ij = Ln,f,ij,situ − 10 lg(Si llab/(Si,lab lij))`, the impact twin of
+$L_{n,ij} = L_{n,f,ij,situ} - 10 \log_{10}(S_i l_{lab}/(S_{i,lab} l_{ij}))$, the impact twin of
 the airborne [`flanking_reduction_index_from_flanking_level`](/phonometry/reference/api/building/detailed-prediction/#flanking_reduction_index_from_flanking_level): the
 route used when the flanking construction is characterised as a whole by a
 laboratory measurement of the normalized flanking impact sound pressure
@@ -720,8 +747,9 @@ flanking_impact_level_from_normalized_difference(
 
 Flanking impact level of a Type B junction (Part 2, Formula 14).
 
-`Ln,ij = Ln,ii − ΔLi + (Ri − Rj)/2 − ΔRj − Dv,ij,n − 10 lg(Si/(lo lij))`
-with the reference length `lo = 1 m`: Formula (12) with the junction described by the
+$L_{n,ij} = L_{n,ii} - \Delta L_i + (R_i - R_j)/2 - \Delta R_j - D_{v,ij,n} - 10 \log_{10}(S_i/(l_o l_{ij}))$
+with the reference length $l_o = 1$ m: Formula (12) with the
+junction described by the
 normalized direction-averaged velocity level difference instead of
 `Kij`, the form used for lightweight constructions.
 
@@ -764,10 +792,10 @@ flanking_reduction_index(
 
 Flanking sound reduction index `Rij` per band (Formula 15).
 
-`Rij = Ri,situ/2 + ΔRi,situ + Rj,situ/2 + ΔRj,situ + Dv,ij,situ + T`
+$R_{ij} = R_{i,situ}/2 + \Delta R_{i,situ} + R_{j,situ}/2 + \Delta R_{j,situ} + D_{v,ij,situ} + T$
 for `ij = Ff, Fd, Df`, with the geometry term
-`T = 10 lg(Ss/√(Si Sj))`. For diagonal transmission the standard fixes
-`Ss = 10 m²`.
+$T = 10 \log_{10}(S_s/\sqrt{S_i S_j})$. For diagonal transmission the
+standard fixes $S_s = 10$ m².
 
 The element indices depend on the path: `Ff` takes the flanking element
 on both sides, `Fd` the flanking element as `i` and the separating
@@ -810,7 +838,8 @@ flanking_reduction_index_from_flanking_level(
 
 Flanking index from a measured `Dn,f` (Formula 16).
 
-`Rij = Dn,f,ij,situ + 10 lg(Ss llab/(Ao lij))` with `Ao = 10 m²`, the
+$R_{ij} = D_{n,f,ij,situ} + 10 \log_{10}(S_s l_{lab}/(A_o l_{ij}))$ with
+$A_o = 10$ m², the
 route used when the flanking construction is characterised as a whole by a
 laboratory measurement of the flanking normalized level difference
 (ISO 10848). ISO 12354-1 Clause 4.4.2 gives the usual laboratory coupling
@@ -852,9 +881,9 @@ flanking_reduction_index_from_normalized_difference(
 
 Flanking index of a Type B junction `Rij` (Formula 17).
 
-`Rij = Ri,situ/2 + ΔRi,situ + Rj,situ/2 + ΔRj,situ + Dv,ij,n + T` with
-the geometry term `T = 10 lg(Ss/(lo lij))` and the reference length
-`lo = 1 m`. It is
+$R_{ij} = R_{i,situ}/2 + \Delta R_{i,situ} + R_{j,situ}/2 + \Delta R_{j,situ} + D_{v,ij,n} + T$ with
+the geometry term $T = 10 \log_{10}(S_s/(l_o l_{ij}))$ and the reference
+length $l_o = 1$ m. It is
 Formula (15) with Formula (12) substituted, so the junction is described by
 the *normalized* direction-averaged velocity level difference `Dv,ij,n`
 (ISO 12354-1 Annex F) rather than by `Kij`: the form used for lightweight
@@ -895,12 +924,15 @@ floating_floor_improvement(
 
 Improvement of a floating floor `ΔL` per band (Part 2, Formula C.1).
 
-`ΔL = 30 lg(f/fo)` for sand/cement or calcium-sulfate screeds and
-`ΔL = 40 lg(f/fo)` (`slope=40`, Formula C.3) for asphalt or dry
-floating floors, with the system resonance `fo = 160 √(s'/m')`
+$\Delta L = 30 \log_{10}(f/f_o)$ for sand/cement or calcium-sulfate
+screeds and
+$\Delta L = 40 \log_{10}(f/f_o)$ (`slope=40`, Formula C.3) for asphalt
+or dry
+floating floors, with the system resonance
+$f_o = 160 \sqrt{s'/m'}$
 (Formula C.2) and no improvement at or below it. The Annex L airborne
 example reuses the same curve as `ΔR`, noting explicitly that assuming
-`ΔR = ΔL` is rough.
+$\Delta R = \Delta L$ is rough.
 
 **Parameters**
 
@@ -932,15 +964,19 @@ forced_radiation_factor(
 
 Radiation factor for forced waves `σf` (Formula B.3).
 
-`σf = 0,5 (ln(ko √(l1 l2)) − Λ)` capped at `σf ≤ 2`, with
-`ko = 2 π f / co` and, for `l1 > l2`,
+$\sigma_f = 0.5 (\ln(k_o \sqrt{l_1 l_2}) - \Lambda)$ capped at
+$\sigma_f \le 2$, with $k_o = 2 \pi f / c_o$ and, for
+$l_1 > l_2$,
 
-`Λ = −0,964 − (0,5 + l2/(π l1)) ln(l2/l1) + 5 l2/(2 π l1) − E`
-with `E = 1/(4 π l1 l2 ko²)`.
+$$
+\Lambda = -0.964 - \left(0.5 + \frac{l_2}{\pi l_1}\right) \ln\frac{l_2}{l_1} + \frac{5 l_2}{2 \pi l_1} - E
+$$
 
-ISO 12354-1:2017 Table B.1 tabulates `10 lg σf` for the two standard
-laboratory openings (2 m² and 10 m²), which this implementation
-reproduces.
+with $E = 1/(4 \pi l_1 l_2 k_o^2)$.
+
+ISO 12354-1:2017 Table B.1 tabulates $10 \log_{10} \sigma_f$ for the
+two standard laboratory openings (2 m² and 10 m²), which this
+implementation reproduces.
 
 **Parameters**
 
@@ -951,7 +987,7 @@ reproduces.
 | `length2` | The other side length, in m. |
 | `speed_of_sound` | Speed of sound in air `co`, in m/s (Default: 340 m/s). |
 
-**Returns:** The forced radiation factor `σf` per band (dimensionless), clipped to `0 ≤ σf ≤ 2` (the standard prints only the upper bound; the lower one guards the deep low-frequency extrapolation, where the logarithm turns negative).
+**Returns:** The forced radiation factor `σf` per band (dimensionless), clipped to $0 \le \sigma_f \le 2$ (the standard prints only the upper bound; the lower one guards the deep low-frequency extrapolation, where the logarithm turns negative).
 
 **Raises**
 
@@ -989,7 +1025,7 @@ A Type A homogeneous element of the detailed model.
 | `mass_per_area` | Mass per unit area `m'`, in kg/m². |
 | `critical_frequency` | Critical frequency `fc`, in Hz. |
 | `internal_loss_factor` | Internal loss factor `ηint` of the material (about 0,01 for common homogeneous building materials; ISO 12354-1 Table B.3 tabulates it per material). |
-| `perimeter_absorption` | `Σ lk αk` over the element's perimeter, in m (Formula C.1; build it from [`perimeter_absorption_coefficient`](/phonometry/reference/api/building/detailed-prediction/#perimeter_absorption_coefficient) times the border lengths). |
+| `perimeter_absorption` | $\sum l_k \alpha_k$ over the element's perimeter, in m (Formula C.1; build it from [`perimeter_absorption_coefficient`](/phonometry/reference/api/building/detailed-prediction/#perimeter_absorption_coefficient) times the border lengths). |
 | `density` | Density `ρ` of the material, in kg/m³; supplied together with `longitudinal_velocity` it enables the high-frequency plateau of Formula (B.10). `None` (the default) leaves the plateau off. |
 | `longitudinal_velocity` | Quasi-longitudinal phase velocity `cL` of the material, in m/s (ISO 12354-1 Table B.3). |
 
@@ -1053,9 +1089,9 @@ index and, for a floor, the calculated in-situ normalized impact level.
 
 Because the element performance is *calculated from material properties*,
 the in-situ loss factor enters Formula (B.2) directly and no
-`10 lg(Ts,situ/Ts,lab)` transfer is needed (Annex B.3). Use
-[`in_situ_reduction_index`](/phonometry/reference/api/building/detailed-prediction/#in_situ_reduction_index) instead when the element data come from a
-laboratory measurement.
+$10 \log_{10}(T_{s,situ}/T_{s,lab})$ transfer is needed
+(Annex B.3). Use [`in_situ_reduction_index`](/phonometry/reference/api/building/detailed-prediction/#in_situ_reduction_index) instead when the element
+data come from a laboratory measurement.
 
 **Parameters**
 
@@ -1090,14 +1126,16 @@ in_situ_equivalent_absorption_length(
 
 In-situ equivalent absorption length `asitu` (Formula 11).
 
-`asitu = 2,2 π² S √(fref/f)/(co Ts,situ)` with `fref = 1000 Hz`. Note
-the `√(fref/f)` dependence: the absorption length grows as the element
+$a_{situ} = 2.2\,\pi^2 S \sqrt{f_{ref}/f}/(c_o T_{s,situ})$ with
+$f_{ref} = 1000$ Hz. Note
+the $\sqrt{f_{ref}/f}$ dependence: the absorption length grows as
+the element
 rings shorter at high frequency. For a Type B element the standard
-replaces it by the element area, `asitu = S/lo` (Formula 13).
+replaces it by the element area, $a_{situ} = S/l_o$ (Formula 13).
 
 This is the ISO 10848 Formula (12) quantity
 ([`phonometry.equivalent_absorption_length`](/phonometry/reference/api/building/flanking-transmission/#equivalent_absorption_length)) evaluated with the
-ISO 12354 value `co = 340 m/s`.
+ISO 12354 value $c_o = 340$ m/s.
 
 **Parameters**
 
@@ -1128,7 +1166,8 @@ in_situ_impact_level(
 
 In-situ normalized impact level `Ln,situ` (Part 2, Formula 5).
 
-`Ln,situ = Ln + 10 lg(Ts,situ/Ts,lab)`, the sign opposite to
+$L_{n,situ} = L_n + 10 \log_{10}(T_{s,situ}/T_{s,lab})$, the sign
+opposite to
 [`in_situ_reduction_index`](/phonometry/reference/api/building/detailed-prediction/#in_situ_reduction_index): a floor that rings longer in the building
 than in the laboratory radiates more impact sound.
 
@@ -1160,9 +1199,11 @@ in_situ_reduction_index(
 
 In-situ sound reduction index `Rsitu` (Formula 9).
 
-`Rsitu = R − 10 lg(Ts,situ/Ts,lab)`: an element that is better damped in
+$R_{situ} = R - 10 \log_{10}(T_{s,situ}/T_{s,lab})$: an element that is
+better damped in
 the building than in the test frame radiates less and gains index. The
-standard notes that `Rsitu = R` is a usable first approximation, and the
+standard notes that $R_{situ} = R$ is a usable first approximation,
+and the
 correction is exactly zero for Type B elements (Clause 4.2.2.3).
 
 **Parameters**
@@ -1200,11 +1241,12 @@ in_situ_total_loss_factor(
 
 Total loss factor in situ `ηtot,situ` (Formula C.1).
 
-`ηtot = ηint + 2 ρo co σ/(2 π f m') + co/(π² S √(f fc)) · Σ lk αk`: the
+$\eta_{tot} = \eta_{int} + 2 \rho_o c_o \sigma/(2 \pi f m') + c_o/(\pi^2 S \sqrt{f f_c}) \cdot \sum_k l_k \alpha_k$: the
 internal losses of the material, the losses by radiation into the air
-and the losses at the perimeter of the element. `Σ lk αk` is the
-junction-length-weighted sum of the Formula (C.4) absorption coefficients
-(see [`perimeter_absorption_coefficient`](/phonometry/reference/api/building/detailed-prediction/#perimeter_absorption_coefficient)).
+and the losses at the perimeter of the element.
+$\sum l_k \alpha_k$ is the junction-length-weighted sum of the
+Formula (C.4) absorption coefficients (see
+[`perimeter_absorption_coefficient`](/phonometry/reference/api/building/detailed-prediction/#perimeter_absorption_coefficient)).
 
 **Parameters**
 
@@ -1216,7 +1258,7 @@ junction-length-weighted sum of the Formula (C.4) absorption coefficients
 | `area` | Element area `S`, in m². |
 | `critical_frequency` | Critical frequency `fc`, in Hz. |
 | `radiation_factor` | Radiation factor `σ` per band. |
-| `perimeter_absorption` | `Σ lk αk` over the element's perimeter, in m (may be zero for a free-edged element). |
+| `perimeter_absorption` | $\sum l_k \alpha_k$ over the element's perimeter, in m (may be zero for a free-edged element). |
 | `speed_of_sound` | Speed of sound in air `co`, in m/s. |
 | `air_density` | Density of air `ρo`, in kg/m³. |
 
@@ -1242,7 +1284,7 @@ in_situ_velocity_level_difference(
 
 In-situ velocity level difference `Dv,ij,situ` (Formula 10).
 
-`Dv,ij,situ = Kij − 10 lg(lij/√(ai,situ aj,situ))`, floored at 0 dB as
+$D_{v,ij,situ} = K_{ij} - 10 \log_{10}(l_{ij}/\sqrt{a_{i,situ} a_{j,situ}})$, floored at 0 dB as
 the formula prescribes. It converts the situation-invariant junction
 descriptor `Kij` (ISO 12354-1 Annex E, or measured per ISO 10848) into
 the level drop the junction actually produces between the two elements as
@@ -1328,9 +1370,10 @@ laboratory_total_loss_factor(
 
 Total loss factor in the laboratory `ηtot,lab` (Formula C.3).
 
-`ηtot,lab ≈ ηint + m'/(485 √f)`, the estimate for the heavy test frame
+$\eta_{tot,lab} \approx \eta_{int} + m'/(485 \sqrt{f})$, the
+estimate for the heavy test frame
 of an ISO 10140 facility. The relation holds for elements below
-`m' = 800 kg/m²` and `ηint` can normally be taken as 0,01.
+$m' = 800$ kg/m² and `ηint` can normally be taken as 0.01.
 
 **Parameters**
 
@@ -1359,11 +1402,13 @@ perimeter_absorption_coefficient(
 
 Absorption coefficient for bending waves at one border (Formula C.4).
 
-`αk = Σj √(fc,j/fref) · 10^(−Kij/10)` summed over the elements `j`
+$\alpha_k = \sum_j \sqrt{f_{c,j}/f_{ref}} \cdot 10^{-K_{ij}/10}$
+summed over the elements `j`
 connected to the considered element at border `k` (the standard sums
 over at most three). Multiplied by the border length and summed over the
-perimeter it gives the `Σ lk αk` that [`in_situ_total_loss_factor`](/phonometry/reference/api/building/detailed-prediction/#in_situ_total_loss_factor)
-takes. Annex C.3 places the in-situ coefficients between 0,05 and 0,5.
+perimeter it gives the $\sum l_k \alpha_k$ that
+[`in_situ_total_loss_factor`](/phonometry/reference/api/building/detailed-prediction/#in_situ_total_loss_factor) takes. Annex C.3 places the in-situ
+coefficients between 0,05 and 0,5.
 
 **Parameters**
 
@@ -1393,8 +1438,10 @@ reciprocity_impact_level(
 
 Impact level of a homogeneous floor by reciprocity (Part 2, B.3/B.4).
 
-`R + Ln = 38 + 30 lg(f/1 Hz)` in one-third-octave bands and
-`R + Ln = 43 + 30 lg(f/1 Hz)` in octave bands: for a homogeneous floor
+$R + L_n = 38 + 30 \log_{10}(f/1\,\mathrm{Hz})$ in one-third-octave bands
+and
+$R + L_n = 43 + 30 \log_{10}(f/1\,\mathrm{Hz})$ in octave bands: for a
+homogeneous floor
 the sum of the airborne index and the normalized impact level depends only
 on frequency, provided forced transmission is negligible (normally up to
 about 1 kHz, above which the stiffness of the floor's top layer matters).
@@ -1429,7 +1476,8 @@ resonant_sound_reduction_index(
 
 Correct a measured `R` to resonant transmission only (Formula B.1).
 
-`R* = R + 10 lg(σa/σs)`. No standardized method exists to measure the
+$R^* = R + 10 \log_{10}(\sigma_a/\sigma_s)$. No standardized method
+exists to measure the
 two radiation factors, so Annex B.2 gives the estimate this function
 applies: no correction for elements separated by one or two cavities, and
 a fixed correction (8 dB, the standard's figure for single homogeneous or
@@ -1463,7 +1511,7 @@ structural_reverberation_time(
 ) -> np.ndarray
 ```
 
-Structural reverberation time `Ts = 2,2/(f ηtot)` (Formula C.1).
+Structural reverberation time $T_s = 2.2/(f \eta_{tot})$ (C.1).
 
 **Parameters**
 

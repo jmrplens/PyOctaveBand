@@ -1,5 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""
+r"""
 IEC 61260-1:2014 filter and IEC 61672-1:2013 weighting class verification.
 
 **Filters.** Acceptance limits on relative attenuation transcribed from the
@@ -7,9 +7,12 @@ official text (BS EN 61260-1:2014, **Table 1**, standard pages 15-16):
 octave-band breakpoint frequencies with class 1 and class 2 minimum/maximum
 limits. Fractional-octave-band breakpoints are derived with Formulas (9) and
 (10) (subclauses 5.10.3-5.10.4) and limits between breakpoints are interpolated
-linearly in lg(Omega) per Formula (11) (subclause 5.10.6). Relative attenuation
-is ``deltaA(Omega) = A(Omega) - Aref`` (Formula 8) with ``A = Lin - Lout``
-(Formula 7); here ``Aref`` is the attenuation at the exact mid-band frequency
+linearly in :math:`\log_{10} \Omega` per Formula (11) (subclause 5.10.6).
+Relative attenuation is
+:math:`\Delta A(\Omega) = A(\Omega) - A_{\mathrm{ref}}` (Formula 8) with
+:math:`A = L_{\mathrm{in}} - L_{\mathrm{out}}`
+(Formula 7); here :math:`A_{\mathrm{ref}}` is the attenuation at the exact
+mid-band frequency
 (subclause 5.9: the pass-band reference attenuation).
 
 IEC 61260-1:2014 defines only classes 1 and 2. **Class 0** (the tightest,
@@ -145,12 +148,16 @@ _FILTER_EDITIONS: dict[str, dict[str, Any]] = {
 
 
 def _map_breakpoint(exponent: float, fraction: float) -> float:
-    """
-    Map an octave-band breakpoint G**x to a fractional-octave-band one.
+    r"""
+    Map an octave-band breakpoint :math:`G^x` to a fractional-octave one.
 
     BS EN 61260-1:2014 Formula (9): the high-frequency breakpoint for
     bandwidth designator 1/b is
-    ``1 + (G**(1/(2b)) - 1) / (G**(1/2) - 1) * (Omega_h(1/1) - 1)``.
+
+    .. math::
+
+       1 + \frac{G^{1/(2b)} - 1}{G^{1/2} - 1}
+       \left( \Omega_h(1/1) - 1 \right)
     """
     omega_octave = _G ** exponent
     scale = (_G ** (1 / (2 * fraction)) - 1) / (_G ** 0.5 - 1)
@@ -160,27 +167,30 @@ def _map_breakpoint(exponent: float, fraction: float) -> float:
 def class_limits(
     fraction: float, filter_class: int, omega: np.ndarray, *, edition: str = "2014"
 ) -> tuple[np.ndarray, np.ndarray]:
-    """
+    r"""
     Acceptance limits on relative attenuation at normalized frequencies.
 
     :param fraction: Bandwidth designator denominator b (1 for octave,
         3 for one-third octave, ...).
     :param filter_class: Performance class: 1 or 2 for ``edition="2014"``;
         0, 1 or 2 for ``edition="1995"``.
-    :param omega: Normalized frequencies f/fm (> 0).
+    :param omega: Normalized frequencies :math:`f/f_m` (> 0).
     :param edition: ``"2014"`` (IEC 61260-1:2014, classes 1/2) or ``"1995"``
         (IEC 61260:1995 / ANSI S1.11-2004, classes 0/1/2).
     :return: Tuple (minimum, maximum) relative attenuation in dB per point;
         the maximum is ``+inf`` outside the pass-band.
 
     .. note::
-        The exact band-edge point ``Omega = G^(1/2)`` is treated as pass-band.
+        The exact band-edge point :math:`\Omega = G^{1/2}` is treated as
+        pass-band.
         The 1995 edition's Table 1 prints a dedicated minimum (+2.3/+2.0/
         +1.6 dB) *at* that single frequency, which this convention relaxes to
         the pass-band minimum; the discrepancy has measure zero -- any
-        continuous response violating the edge row is caught at ``edge + eps``
-        by the interpolated stop-band mask. The 2014 edition defines only the
-        ``G^(1/2) - eps`` and ``G^(1/2) + eps`` rows, which the masks match
+        continuous response violating the edge row is caught at
+        :math:`\text{edge} + \epsilon`
+        by the interpolated stop-band mask. The 2014 edition defines only
+        the :math:`G^{1/2} - \epsilon` and :math:`G^{1/2} + \epsilon`
+        rows, which the masks match
         exactly.
     """
     spec = _FILTER_EDITIONS.get(edition)
@@ -714,10 +724,11 @@ _F4 = 12194.217
 
 
 def _exact_base10(frequencies: np.ndarray) -> np.ndarray:
-    """Exact base-10 frequencies ``1000 * 10^(n/10)`` behind nominal labels.
+    r"""Exact base-10 frequencies :math:`1000 \cdot 10^{n/10}`.
 
-    IEC 61672-1:2013 Table 3 NOTE: the tabulated weightings are computed at
-    the exact frequencies ``f = 1000 * 10^(0.1 (n - 30))``, not at the nominal
+    IEC 61672-1:2013 Table 3 NOTE: the tabulated weightings are computed
+    at the exact frequencies
+    :math:`f = 1000 \cdot 10^{0.1 (n - 30)}`, not at the nominal
     labels (e.g. 15 848.9 Hz behind "16 kHz").
     """
     return np.asarray(
@@ -929,7 +940,7 @@ def _between_nominals_sweep(
 def verify_weighting_class(
     wf: WeightingFilter, *, sweep_points: int = 4096
 ) -> dict[str, Any]:
-    """
+    r"""
     Verify a frequency-weighting filter against its standard's tolerances.
 
     ``A``/``C``/``Z`` are checked against IEC 61672-1:2013 Table 3 (classes 1
@@ -950,7 +961,8 @@ def verify_weighting_class(
     The filter's relative response (normalized to its 1 kHz gain) is evaluated
     at the *exact* base-10 frequency behind each nominal label below
     the Nyquist frequency (IEC 61672-1 Table 3 NOTE: the design goals are
-    computed at ``f = 1000 * 10^(0.1 (n - 30))``, e.g. 15 848.9 Hz for
+    computed at :math:`f = 1000 \cdot 10^{0.1 (n - 30)}`, e.g.
+    15 848.9 Hz for
     "16 kHz"; IEC 61672-3:2013 subclause 13.3 tests the deviation at the same
     exact frequencies, and IEC 61012 Table 1 lists the same exact
     frequencies). The deviation from the design-goal weighting is checked

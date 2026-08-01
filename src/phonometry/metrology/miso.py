@@ -1,5 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""Multiple and partial coherence of a multiple-input/single-output system.
+r"""Multiple and partial coherence of a multiple-input/single-output system.
 
 When several partially correlated sources drive one response, the ordinary
 coherence of each source with the output is misleading: a source that only
@@ -9,37 +9,46 @@ Bendat & Piersol, *Random Data: Analysis and Measurement Procedures*
 (MISO) coherence functions, computed here from the Welch cross-spectral
 machinery of :mod:`phonometry.metrology.spectra`:
 
-* the **ordinary coherence** ``γ²iy = |Giy|²/(Gii·Gyy)`` (Eq. 7.109) of each
-  input with the output, taken on its own;
-* the **multiple coherence** ``γ²y:x = Gvv/Gyy = 1 - Gnn/Gyy`` (Eq. 7.35):
+* the **ordinary coherence**
+  :math:`\gamma^2_{iy} = \lvert G_{iy} \rvert^2 / (G_{ii} G_{yy})`
+  (Eq. 7.109) of each input with the output, taken on its own;
+* the **multiple coherence**
+  :math:`\gamma^2_{y:x} = G_{vv}/G_{yy} = 1 - G_{nn}/G_{yy}` (Eq. 7.35):
   the fraction of the output autospectrum linearly explained by *all* inputs
-  jointly, obtained from the input cross-spectral matrix ``Gxx`` and the
-  input-output vector ``Giy`` (matrix form ``γ²y:x = GiyᴴGxx⁻¹Giy/Gyy``,
+  jointly, obtained from the input cross-spectral matrix :math:`G_{xx}` and
+  the input-output vector :math:`G_{iy}` (matrix form
+  :math:`\gamma^2_{y:x} = G_{iy}^{\mathsf{H}} G_{xx}^{-1} G_{iy} / G_{yy}`,
   Eqs. 7.170-7.192). For additive uncorrelated output noise of per-band
-  signal-to-noise ratio ``SNR = Gvv/Gnn`` this is exactly ``SNR/(1+SNR)``;
-* the **partial coherence** ``γ²iy·(i-1)! = |Giy·(i-1)!|²/(Gii·(i-1)!·Gyy)``
+  signal-to-noise ratio :math:`\mathrm{SNR} = G_{vv}/G_{nn}` this is exactly
+  :math:`\mathrm{SNR}/(1+\mathrm{SNR})`;
+* the **partial coherence** :math:`\gamma^2_{iy \cdot (i-1)!} =
+  \lvert G_{iy \cdot (i-1)!} \rvert^2 / (G_{ii \cdot (i-1)!} G_{yy})`
   (Eq. 7.87): the coherence of input ``i`` with the output once the linear
   effect of the inputs *before it in the conditioning order* has been
-  removed. The 4th-edition definition uses the *total* output ``Gyy`` in the
-  denominator (not the conditioned output), which makes the partial
-  coherences of the ordered inputs add up to the multiple coherence,
-  ``γ²y:x = Σ γ²iy·(i-1)!`` (Eq. 7.116), and reduce exactly to the ordinary
-  coherences when the inputs are mutually uncorrelated (Eq. 7.117);
-* the **conditioned (residual) spectra** ``Gij·r!`` computed by the
-  Gaussian-elimination recursion
-  ``Gij·r! = Gij·(r-1)! - Grj·(r-1)!·Gir·(r-1)!/Grr·(r-1)!`` (Eq. 7.94,
-  base case Eq. 7.95), the Schur complement that removes the linear effect
-  of the pivot input ``r`` from every remaining record;
+  removed. The 4th-edition definition uses the *total* output
+  :math:`G_{yy}` in the denominator (not the conditioned output), which
+  makes the partial coherences of the ordered inputs add up to the multiple
+  coherence, :math:`\gamma^2_{y:x} = \sum \gamma^2_{iy \cdot (i-1)!}`
+  (Eq. 7.116), and reduce exactly to the ordinary coherences when the
+  inputs are mutually uncorrelated (Eq. 7.117);
+* the **conditioned (residual) spectra** :math:`G_{ij \cdot r!}` computed by
+  the Gaussian-elimination recursion :math:`G_{ij \cdot r!} =
+  G_{ij \cdot (r-1)!} - G_{rj \cdot (r-1)!} G_{ir \cdot (r-1)!} /
+  G_{rr \cdot (r-1)!}` (Eq. 7.94, base case Eq. 7.95), the Schur complement
+  that removes the linear effect of the pivot input ``r`` from every
+  remaining record;
 * the **partial (cumulative) coherent output spectra**
-  ``Gvᵢ = |Liy|²·Gii·(i-1)! = γ²iy·(i-1)!·Gyy`` (Eq. 7.86): the share of
-  output power the ``i``-th ordered input contributes, so that
-  ``Gyy = Σ Gvᵢ + Gnn`` (Eqs. 7.88-7.89, 7.121). Comparing them band by band
-  answers "which source dominates here?".
+  :math:`G_{v_i} = \lvert L_{iy} \rvert^2 G_{ii \cdot (i-1)!} =
+  \gamma^2_{iy \cdot (i-1)!} G_{yy}` (Eq. 7.86): the share of output power
+  the ``i``-th ordered input contributes, so that
+  :math:`G_{yy} = \sum G_{v_i} + G_{nn}` (Eqs. 7.88-7.89, 7.121). Comparing
+  them band by band answers "which source dominates here?".
 
 The random errors follow Bendat & Piersol Section 9.3: conditioning on the
-``i-1`` preceding inputs costs ``i-1`` degrees of freedom, so the ``i``-th
-ordered input carries ``nd-(i-1)`` effective averages (Eqs. 9.100/9.101) and
-the ``q``-input multiple coherence carries ``nd-(q-1)`` (Eqs. 9.98/9.99).
+:math:`i-1` preceding inputs costs :math:`i-1` degrees of freedom, so the
+``i``-th ordered input carries :math:`n_d - (i-1)` effective averages
+(Eqs. 9.100/9.101) and the ``q``-input multiple coherence carries
+:math:`n_d - (q-1)` (Eqs. 9.98/9.99).
 """
 
 from __future__ import annotations
@@ -192,10 +201,11 @@ def _pivot_safe(piv: NDArray[np.float64]) -> NDArray[np.bool_]:
 def _schur_eliminate(
     mat: NDArray[np.complex128], r: int, safe: NDArray[np.bool_]
 ) -> None:
-    """Remove the linear effect of pivot record ``r`` in place (Eq. 7.94).
+    r"""Remove the linear effect of pivot record ``r`` in place (Eq. 7.94).
 
     Updates the trailing block (records ``> r``) with the Schur complement
-    ``Gij·r! = Gij·(r-1)! - Gir·(r-1)!·Grj·(r-1)!/Grr·(r-1)!``. Only the
+    :math:`G_{ij \cdot r!} = G_{ij \cdot (r-1)!} - G_{ir \cdot (r-1)!}
+    G_{rj \cdot (r-1)!} / G_{rr \cdot (r-1)!}`. Only the
     frequency bins flagged by ``safe`` (pivot autospectrum above the power
     floor, see :func:`_pivot_safe`) are updated; the rest are left unchanged
     so their conditioning contribution is exactly null. ``safe`` is computed
@@ -219,17 +229,19 @@ def _condition(
 ) -> tuple[
     NDArray[np.float64], NDArray[np.float64], NDArray[np.float64]
 ]:
-    """Ordered conditioning of the augmented matrix (Bendat & Piersol 7.3).
+    r"""Ordered conditioning of the augmented matrix (Bendat & Piersol 7.3).
 
     Pivots on the inputs in ``order``, output last. Returns, indexed by the
     *original* input index:
 
-    * ``partial`` - partial coherence ``γ²iy·(i-1)!`` (Eq. 7.87, total ``Gyy``
-      denominator so the values sum to the multiple coherence, Eq. 7.116);
-    * ``coherent`` - partial coherent output spectrum ``Gvᵢ`` (Eq. 7.86);
+    * ``partial`` - partial coherence :math:`\gamma^2_{iy \cdot (i-1)!}`
+      (Eq. 7.87, total :math:`G_{yy}` denominator so the values sum to the
+      multiple coherence, Eq. 7.116);
+    * ``coherent`` - partial coherent output spectrum :math:`G_{v_i}`
+      (Eq. 7.86);
 
-    and, shared, ``noise`` - the residual output autospectrum ``Gyy·q!``
-    after all inputs are removed (Eq. 7.121).
+    and, shared, ``noise`` - the residual output autospectrum
+    :math:`G_{yy \cdot q!}` after all inputs are removed (Eq. 7.121).
     """
     q = len(order)
     n_freq = mat.shape[0]
@@ -267,12 +279,13 @@ def _condition(
 def _coherent_output_errors(
     partial: NDArray[np.float64], order: tuple[int, ...], nd: float
 ) -> NDArray[np.float64]:
-    """Random error of each partial coherent output spectrum (Eq. 9.100).
+    r"""Random error of each partial coherent output spectrum (Eq. 9.100).
 
-    ``ε = (2-γ²)^½ / (|γ|·√(nd-(i-1)))`` for the ``i``-th ordered input,
-    with ``γ² = γ²iy·(i-1)!`` its partial coherence. Bins with zero partial
-    coherence, or an effective average count ``nd-(i-1) <= 0``, report
-    ``inf`` (no usable estimate).
+    :math:`\varepsilon = (2-\gamma^2)^{1/2} /
+    (\lvert \gamma \rvert \sqrt{n_d - (i-1)})` for the ``i``-th ordered
+    input, with :math:`\gamma^2 = \gamma^2_{iy \cdot (i-1)!}` its partial
+    coherence. Bins with zero partial coherence, or an effective average
+    count :math:`n_d - (i-1) \le 0`, report ``inf`` (no usable estimate).
     """
     err = np.full_like(partial, np.inf)
     for pos, orig in enumerate(order):
@@ -292,9 +305,10 @@ def _coherent_output_errors(
 def _multiple_coherence_error(
     multiple: NDArray[np.float64], q: int, nd: float
 ) -> NDArray[np.float64]:
-    """Random error of the multiple coherence estimate (Eq. 9.98).
+    r"""Random error of the multiple coherence estimate (Eq. 9.98).
 
-    ``ε = √2·(1-γ²y:x) / (|γy:x|·√(nd-(q-1)))``.
+    :math:`\varepsilon = \sqrt{2}\,(1-\gamma^2_{y:x}) /
+    (\lvert \gamma_{y:x} \rvert \sqrt{n_d - (q-1)})`.
     """
     eff = nd - (q - 1)
     gamma = np.sqrt(multiple)
@@ -316,7 +330,7 @@ def _multiple_coherence_error(
 
 @dataclass(frozen=True)
 class MISOCoherenceResult:
-    """Multiple and partial coherence of a MISO system (B&P Chapter 7).
+    r"""Multiple and partial coherence of a MISO system (B&P Chapter 7).
 
     Every per-input array is indexed by the *original* input index (the order
     in which the records were passed), so ``ordinary_coherence[i]`` and
@@ -329,29 +343,35 @@ class MISOCoherenceResult:
     :ivar order: Conditioning order actually applied, as original input
         indices; ``partial_coherence[order[k]]`` is conditioned on the inputs
         ``order[:k]``.
-    :ivar ordinary_coherence: ``γ²iy(f) ∈ [0, 1]`` per input (Eq. 7.109),
-        shape ``(q, F)``: each input against the output on its own.
-    :ivar multiple_coherence: ``γ²y:x(f) ∈ [0, 1]`` (Eq. 7.35): the fraction
-        of output power explained by all inputs jointly. Equals the sum of
-        the partial coherences (Eq. 7.116) and ``1 - noise_psd/output_psd``.
-    :ivar partial_coherence: ``γ²iy·(i-1)!(f) ∈ [0, 1]`` per input (Eq. 7.87,
-        total-output denominator), shape ``(q, F)``: the coherence of the
-        input with the output once the linear effect of the inputs preceding
-        it in :attr:`order` is removed.
-    :ivar coherent_output_spectra: Partial coherent output spectrum ``Gvᵢ``
-        per input (Eq. 7.86), shape ``(q, F)``: the output power the input
-        contributes, with ``Σᵢ Gvᵢ + noise_psd = output_psd``.
-    :ivar output_psd: Measured output autospectrum ``Ĝyy(f)``.
-    :ivar noise_psd: Residual (uncorrelated) output spectrum ``Ĝnn = Ĝyy·q!``
-        after removing every input (Eq. 7.121).
+    :ivar ordinary_coherence: :math:`\gamma^2_{iy}(f) \in [0, 1]` per input
+        (Eq. 7.109), shape ``(q, F)``: each input against the output on its
+        own.
+    :ivar multiple_coherence: :math:`\gamma^2_{y:x}(f) \in [0, 1]`
+        (Eq. 7.35): the fraction of output power explained by all inputs
+        jointly. Equals the sum of the partial coherences (Eq. 7.116) and
+        ``1 - noise_psd/output_psd``.
+    :ivar partial_coherence: :math:`\gamma^2_{iy \cdot (i-1)!}(f) \in [0, 1]`
+        per input (Eq. 7.87, total-output denominator), shape ``(q, F)``:
+        the coherence of the input with the output once the linear effect of
+        the inputs preceding it in :attr:`order` is removed.
+    :ivar coherent_output_spectra: Partial coherent output spectrum
+        :math:`G_{v_i}` per input (Eq. 7.86), shape ``(q, F)``: the output
+        power the input contributes, with
+        ``sum(coherent_output_spectra) + noise_psd = output_psd``.
+    :ivar output_psd: Measured output autospectrum :math:`\hat{G}_{yy}(f)`.
+    :ivar noise_psd: Residual (uncorrelated) output spectrum
+        :math:`\hat{G}_{nn} = \hat{G}_{yy \cdot q!}` after removing every
+        input (Eq. 7.121).
     :ivar multiple_coherence_random_error: Normalized random error of
-        ``γ²y:x`` (Eq. 9.98), using ``nd-(q-1)`` effective averages.
+        :math:`\gamma^2_{y:x}` (Eq. 9.98), using :math:`n_d - (q-1)`
+        effective averages.
     :ivar coherent_output_random_error: Normalized random error of each
-        ``Gvᵢ`` (Eq. 9.100), shape ``(q, F)``, using ``nd-(i-1)`` effective
-        averages for the ``i``-th ordered input.
+        :math:`G_{v_i}` (Eq. 9.100), shape ``(q, F)``, using
+        :math:`n_d - (i-1)` effective averages for the ``i``-th ordered
+        input.
     :ivar n_segments: Raw number of (possibly overlapped) segments averaged.
-    :ivar n_averages: Effective number of independent averages ``nd``.
-    :ivar resolution_bandwidth: Effective noise bandwidth ``Bₑ``, in Hz.
+    :ivar n_averages: Effective number of independent averages :math:`n_d`.
+    :ivar resolution_bandwidth: Effective noise bandwidth :math:`B_e`, in Hz.
     :ivar window: Taper name.
     :ivar nperseg: Segment length, in samples.
     :ivar overlap: Segment overlap fraction.
@@ -416,7 +436,7 @@ def miso_coherence(
     overlap: float = _DEFAULT_OVERLAP,
     scaling: Literal["density", "spectrum"] = "density",
 ) -> MISOCoherenceResult:
-    """Multiple and partial coherence of a MISO system (Bendat & Piersol 7).
+    r"""Multiple and partial coherence of a MISO system (Bendat & Piersol 7).
 
     Estimates every auto- and cross-spectrum of the ``q`` inputs and the
     output by the shared Welch core of
@@ -425,13 +445,14 @@ def miso_coherence(
 
     * reports the **ordinary coherence** of each input with the output
       (Eq. 7.109);
-    * forms the **multiple coherence** ``γ²y:x`` (Eq. 7.35) from the residual
-      output spectrum left by the Gaussian-elimination conditioning of
-      Section 7.3;
+    * forms the **multiple coherence** :math:`\gamma^2_{y:x}` (Eq. 7.35)
+      from the residual output spectrum left by the Gaussian-elimination
+      conditioning of Section 7.3;
     * conditions the inputs in ``order`` to get the **partial coherences**
-      ``γ²iy·(i-1)!`` (Eq. 7.87) and the **partial coherent output spectra**
-      ``Gvᵢ`` (Eq. 7.86), which decompose the output power source by source
-      (``Σᵢ Gvᵢ + Gnn = Gyy``).
+      :math:`\gamma^2_{iy \cdot (i-1)!}` (Eq. 7.87) and the **partial
+      coherent output spectra** :math:`G_{v_i}` (Eq. 7.86), which decompose
+      the output power source by source
+      (:math:`\sum_i G_{v_i} + G_{nn} = G_{yy}`).
 
     The partial coherences and the coherent-output decomposition depend on
     the conditioning order; the ordinary and multiple coherences do not.

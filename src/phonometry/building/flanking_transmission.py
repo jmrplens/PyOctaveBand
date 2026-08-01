@@ -1,5 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""
+r"""
 Laboratory measurement of flanking sound transmission (ISO 10848:2006/2010).
 
 This is the **measurement** counterpart of the flanking-transmission
@@ -12,28 +12,41 @@ situation-invariant junction descriptor that feeds straight into the
 :func:`phonometry.flanking_path` model.
 
 **Vibration reduction index (Part 1, Clause 3.9).** From the *direction
-averaged* velocity level difference ``D̄v,ij = ½(Dv,ij + Dv,ji)`` (Formula (11))
+averaged* velocity level difference
+:math:`\overline{D}_{v,ij} = \frac{1}{2}(D_{v,ij} + D_{v,ji})` (Formula (11))
 this module forms, per one-third-octave band,
-``Kij = D̄v,ij + 10 lg( lij / √(ai·aj) )`` (Formula (13)) with the common-edge
+:math:`K_{ij} = \overline{D}_{v,ij} + 10 \log_{10}(l_{ij} / \sqrt{a_i a_j})`
+(Formula (13)) with the common-edge
 junction length ``lij`` and the equivalent absorption lengths ``ai``, ``aj`` of
 the two elements. For lightweight, well-damped elements the equivalent
-absorption length collapses to the element area (``aj = Sj / l0``, ``l0 = 1 m``,
+absorption length collapses to the element area (:math:`a_j = S_j / l_0`,
+:math:`l_0 = 1` m,
 Clause 3.8 Note 3) and Formula (13) reduces to Formula (14),
-``Kij = D̄v,ij + 10 lg( lij / √(Si·Sj) )``. Because it uses the direction average,
-``Kij`` is symmetric (``Kij = Kji``).
+:math:`K_{ij} = \overline{D}_{v,ij} + 10 \log_{10}(l_{ij} / \sqrt{S_i S_j})`.
+Because it uses the direction average,
+``Kij`` is symmetric (:math:`K_{ij} = K_{ji}`).
 
 **Equivalent absorption length (Part 1, Formula (12)).**
-``aj = (2,2 · π² · Sj) / (Ts,j · c0) · √(f_ref / f)`` with the structural
+
+.. math::
+
+   a_j = \frac{2.2\,\pi^2\,S_j}{T_{s,j}\,c_0}
+   \sqrt{\frac{f_{\mathrm{ref}}}{f}}
+
+with the structural
 reverberation time ``Ts,j``, the element area ``Sj``, the speed of sound in air
-``c0`` and the reference frequency ``f_ref = 1000 Hz``. The related total loss
-factor is ``η = 2,2 / (f · Ts)`` (Clause 7.3.1).
+``c0`` and the reference frequency :math:`f_{\mathrm{ref}} = 1000` Hz. The
+related total loss
+factor is :math:`\eta = 2.2 / (f \, T_s)` (Clause 7.3.1).
 
 **Overall flanking descriptors (Part 1, Clauses 3.2/3.3).** With airborne
 excitation the normalized flanking level difference is
-``Dn,f = L1 − L2 − 10 lg(A/A0)`` (Formula (4)); with a tapping machine on the
+:math:`D_{n,f} = L_1 - L_2 - 10 \log_{10}(A/A_0)` (Formula (4)); with a tapping
+machine on the
 source-room floor the normalized flanking impact level is
-``Ln,f = L2 + 10 lg(A/A0)`` (Formula (5)), both with the reference absorption
-area ``A0 = 10 m²``. Their single-number ratings ``Dn,f,w (C; Ctr)`` and
+:math:`L_{n,f} = L_2 + 10 \log_{10}(A/A_0)` (Formula (5)), both with the reference
+absorption
+area :math:`A_0 = 10` m². Their single-number ratings ``Dn,f,w (C; Ctr)`` and
 ``Ln,f,w (CI)`` follow ISO 717-1/-2 through the verified
 :func:`phonometry.weighted_rating` / :func:`phonometry.weighted_impact_rating`
 engines, reused unchanged.
@@ -173,7 +186,7 @@ def velocity_level_difference(
     source_level: Sequence[float] | np.ndarray,
     receive_level: Sequence[float] | np.ndarray,
 ) -> np.ndarray:
-    """Velocity level difference ``Dv,ij = Lv,i − Lv,j`` (Formula (8)).
+    r"""Velocity level difference :math:`D_{v,ij} = L_{v,i} - L_{v,j}` (Formula (8)).
 
     :param source_level: Average velocity level ``Lv,i`` of the excited
         element, in dB, per band.
@@ -194,9 +207,10 @@ def direction_averaged_level_difference(
     dv_ij: Sequence[float] | np.ndarray,
     dv_ji: Sequence[float] | np.ndarray,
 ) -> np.ndarray:
-    """Direction-averaged velocity level difference (Formula (11)).
+    r"""Direction-averaged velocity level difference (Formula (11)).
 
-    ``D̄v,ij = ½ (Dv,ij + Dv,ji)`` with ``Dv,ij`` measured exciting element
+    :math:`\overline{D}_{v,ij} = \frac{1}{2}(D_{v,ij} + D_{v,ji})` with
+    ``Dv,ij`` measured exciting element
     ``i`` and ``Dv,ji`` exciting element ``j``. The average makes the derived
     ``Kij`` symmetric.
 
@@ -220,7 +234,7 @@ def total_loss_factor(
     frequency: Sequence[float] | np.ndarray,
     structural_reverberation_time: float | Sequence[float] | np.ndarray,
 ) -> np.ndarray:
-    """Total loss factor ``η = 2,2 / (f · Ts)`` (Clause 7.3.1).
+    r"""Total loss factor :math:`\eta = 2.2 / (f \, T_s)` (Clause 7.3.1).
 
     :param frequency: Band centre frequency ``f``, in Hz, per band.
     :param structural_reverberation_time: Structural reverberation time
@@ -242,10 +256,14 @@ def equivalent_absorption_length(
     *,
     speed_of_sound: float = _DEFAULT_SPEED_OF_SOUND,
 ) -> np.ndarray:
-    """Equivalent absorption length ``aj`` (Formula (12)).
+    r"""Equivalent absorption length ``aj`` (Formula (12)).
 
-    ``aj = (2,2 · π² · Sj) / (Ts,j · c0) · √(f_ref / f)`` with
-    ``f_ref = 1000 Hz``.
+    .. math::
+
+       a_j = \frac{2.2\,\pi^2\,S_j}{T_{s,j}\,c_0}
+       \sqrt{\frac{f_{\mathrm{ref}}}{f}}
+
+    with :math:`f_{\mathrm{ref}} = 1000` Hz.
 
     :param area: Element surface area ``Sj``, in m².
     :param structural_reverberation_time: Structural reverberation time
@@ -302,9 +320,11 @@ class VibrationReductionResult:
     bracketed: np.ndarray | None = None
 
     def octave_bands(self) -> VibrationReductionResult:
-        """Combine one-third-octave ``Kij`` into octave bands.
+        r"""Combine one-third-octave ``Kij`` into octave bands.
 
-        ``Kij,oct = −10 lg[ (1/3) Σ 10^(−Kij/10) ]`` over each group of three
+        :math:`K_{ij,\mathrm{oct}} =
+        -10 \log_{10}\!\left[ \tfrac{1}{3} \sum 10^{-K_{ij}/10} \right]`
+        over each group of three
         one-third-octave bands (Part 2/3/4). Requires a band count that is a
         multiple of three and, for the frequency labels, that frequencies were
         supplied; supplied frequencies must group into whole octave triples
@@ -394,11 +414,11 @@ class VibrationReductionResult:
 
 
 def _validate_octave_triples(freq_groups: np.ndarray) -> None:
-    """Require each frequency triple to be the thirds of one octave band.
+    r"""Require each frequency triple to be the thirds of one octave band.
 
     Each group of three one-third-octave centres must open on an octave
     triple: the middle frequency is a nominal octave centre and the outer
-    two sit one third below/above it (ratio ``2^(1/3)``, 6 % tolerance).
+    two sit one third below/above it (ratio :math:`2^{1/3}`, 6 % tolerance).
     """
     centres = np.asarray(_OCTAVE_CENTRES)
     for low, mid, high in freq_groups:
@@ -469,14 +489,16 @@ def vibration_reduction_index(
     speed_of_sound: float = _DEFAULT_SPEED_OF_SOUND,
     modal_overlap: Sequence[float] | np.ndarray | None = None,
 ) -> VibrationReductionResult:
-    """Vibration reduction index ``Kij`` (Formula (13), or simplified (14)).
+    r"""Vibration reduction index ``Kij`` (Formula (13), or simplified (14)).
 
-    ``Kij = D̄v,ij + 10 lg( lij / √(ai·aj) )``. When the structural reverberation
+    :math:`K_{ij} = \overline{D}_{v,ij} + 10 \log_{10}(l_{ij} / \sqrt{a_i a_j})`.
+    When the structural reverberation
     times and the frequencies are supplied, the equivalent absorption lengths
     ``ai``, ``aj`` come from Formula (12) and the full Formula (13) is used.
-    Otherwise the lightweight, well-damped simplification ``aj = Sj / l0``
-    (``l0 = 1 m``) applies and Formula (14),
-    ``Kij = D̄v,ij + 10 lg( lij / √(Si·Sj) )``, is used.
+    Otherwise the lightweight, well-damped simplification
+    :math:`a_j = S_j / l_0` (:math:`l_0 = 1` m) applies and Formula (14),
+    :math:`K_{ij} = \overline{D}_{v,ij} + 10 \log_{10}(l_{ij} / \sqrt{S_i S_j})`,
+    is used.
 
     :param velocity_level_difference: Direction-averaged velocity level
         difference ``D̄v,ij`` (see :func:`direction_averaged_level_difference`),
@@ -494,7 +516,8 @@ def vibration_reduction_index(
     :param speed_of_sound: Speed of sound in air ``c0``, in m/s.
     :param modal_overlap: Modal overlap factor ``M`` per band for the heavier
         (least-overlapped) of the two elements (see
-        :func:`modal_overlap_factor`). When supplied, bands with ``M < 0,25``
+        :func:`modal_overlap_factor`). When supplied, bands with
+        :math:`M < 0.25`
         are flagged as bracketed and excluded from the single-number ``K̄ij``
         (ISO 10848-4:2010, Clause 9).
     :return: A :class:`VibrationReductionResult`.
@@ -562,11 +585,15 @@ def vibration_reduction_index_from_flanking(
     *,
     reference_area: float = _REFERENCE_ABSORPTION_AREA,
 ) -> np.ndarray:
-    """Indirect ``Kij`` from the normalized flanking level difference.
+    r"""Indirect ``Kij`` from the normalized flanking level difference.
 
-    ISO 10848-1:2006, Clause 4.3.1 Note 2 (unnumbered)::
+    ISO 10848-1:2006, Clause 4.3.1 Note 2 (unnumbered):
 
-        Kij = Dn,f − (Ri + Rj)/2 − 10 lg(√(ai·aj)/lij) + 10 lg(√(Si·Sj)/A0)
+    .. math::
+
+       K_{ij} = D_{n,f} - \frac{R_i + R_j}{2}
+       - 10 \log_{10}\frac{\sqrt{a_i a_j}}{l_{ij}}
+       + 10 \log_{10}\frac{\sqrt{S_i S_j}}{A_0}
 
     The standard warns this holds only for resonant-only transmission; measured
     ``R`` also includes forced transmission, so a direct measurement of ``Kij``
@@ -610,9 +637,9 @@ def vibration_reduction_index_from_flanking(
 # --------------------------------------------------------------------------- #
 @dataclass(frozen=True)
 class FlankingLevelDifferenceResult:
-    """Normalized flanking level difference ``Dn,f`` (airborne, Formula (4)).
+    r"""Normalized flanking level difference ``Dn,f`` (airborne, Formula (4)).
 
-    :ivar d_n_f: ``Dn,f = L1 − L2 − 10 lg(A/A0)`` per band, in dB.
+    :ivar d_n_f: :math:`D_{n,f} = L_1 - L_2 - 10 \log_{10}(A/A_0)` per band, in dB.
     :ivar rating: Single-number ``Dn,f,w`` with ``C``/``Ctr`` (ISO 717-1), or
         ``None`` when the band count is neither 16 nor 5.
     """
@@ -686,9 +713,9 @@ class FlankingLevelDifferenceResult:
 
 @dataclass(frozen=True)
 class FlankingImpactLevelResult:
-    """Normalized flanking impact level ``Ln,f`` (Formula (5)).
+    r"""Normalized flanking impact level ``Ln,f`` (Formula (5)).
 
-    :ivar l_n_f: ``Ln,f = L2 + 10 lg(A/A0)`` per band, in dB.
+    :ivar l_n_f: :math:`L_{n,f} = L_2 + 10 \log_{10}(A/A_0)` per band, in dB.
     :ivar rating: Single-number ``Ln,f,w`` with ``CI`` (ISO 717-2), or ``None``
         when the band count is neither 16 nor 5.
     """
@@ -768,10 +795,10 @@ def normalized_flanking_level_difference(
     reference_area: float = _REFERENCE_ABSORPTION_AREA,
     bands: str | None = None,
 ) -> FlankingLevelDifferenceResult:
-    """Normalized flanking level difference ``Dn,f`` (airborne, Formula (4)).
+    r"""Normalized flanking level difference ``Dn,f`` (airborne, Formula (4)).
 
-    ``Dn,f = L1 − L2 − 10 lg(A/A0)`` with the reference absorption area
-    ``A0 = 10 m²``.
+    :math:`D_{n,f} = L_1 - L_2 - 10 \log_{10}(A/A_0)` with the reference absorption
+    area :math:`A_0 = 10` m².
 
     :param source_level: Source-room average SPL ``L1`` per band, in dB.
     :param receive_level: Receiving-room average SPL ``L2`` per band, in dB.
@@ -802,11 +829,11 @@ def normalized_flanking_impact_level(
     reference_area: float = _REFERENCE_ABSORPTION_AREA,
     bands: str | None = None,
 ) -> FlankingImpactLevelResult:
-    """Normalized flanking impact level ``Ln,f`` (Formula (5)).
+    r"""Normalized flanking impact level ``Ln,f`` (Formula (5)).
 
-    ``Ln,f = L2 + 10 lg(A/A0)`` with the reference absorption area
-    ``A0 = 10 m²``, from the receiving-room impact level with the tapping
-    machine on the source-room floor.
+    :math:`L_{n,f} = L_2 + 10 \log_{10}(A/A_0)` with the reference absorption
+    area :math:`A_0 = 10` m², from the receiving-room impact level with the
+    tapping machine on the source-room floor.
 
     :param receive_level: Receiving-room average impact SPL ``L2`` per band,
         in dB.
@@ -849,20 +876,24 @@ def critical_frequency(
     *,
     speed_of_sound: float = _DEFAULT_SPEED_OF_SOUND,
 ) -> float:
-    """Thin-plate critical frequency ``fc`` (Part 1, Formula (20)).
+    r"""Thin-plate critical frequency ``fc`` (Part 1, Formula (20)).
 
-    ``fc = c0² / (1,8 · cL · h)`` for a homogeneous isotropic element. The
-    constant 1,8 already carries the ``2π/√12`` factor of the thin-plate
+    :math:`f_c = c_0^2 / (1.8 \, c_L \, h)` for a homogeneous isotropic
+    element. The
+    constant 1.8 already carries the :math:`2\pi/\sqrt{12}` factor of the
+    thin-plate
     dispersion relation, so for a plate whose bending stiffness and mass are
     mutually consistent this equals :func:`phonometry.coincidence_frequency`
     (Hopkins Eq. 2.201) to within the rounding of the constant.
 
     .. note::
         The printed ISO 10848-1:2006 Formula (20) carries a spurious extra
-        ``π`` in the denominator (``1,8 cL · h · π``), which would misplace
+        ``π`` in the denominator (:math:`1.8 \, c_L \, h \, \pi`), which
+        would misplace
         ``fc`` by a factor π; the π-free form implemented here is the one
         ISO 10848-1:2017 restores in its Formula (5), ISO 12354-1:2017
-        prints in its symbol definitions (``fc = c0²/(1,8 cL t)``) and
+        prints in its symbol definitions
+        (:math:`f_c = c_0^2/(1.8 \, c_L t)`) and
         Hopkins Eq. 2.201 derives. See ``docs/ERRATA.md``.
 
     :param longitudinal_wave_speed: Longitudinal wave speed ``cL``, in m/s.
@@ -884,10 +915,10 @@ def strong_coupling_satisfied(
     critical_frequency_i: float,
     critical_frequency_j: float,
 ) -> np.ndarray:
-    """Strong-coupling applicability check (Part 1, Formula (15)).
+    r"""Strong-coupling applicability check (Part 1, Formula (15)).
 
     ``Kij`` is relevant only where
-    ``D̄v,ij ≥ 3 − 10 lg( (mi·fcj)/(mj·fci) )``.
+    :math:`\overline{D}_{v,ij} \ge 3 - 10 \log_{10}\frac{m_i f_{cj}}{m_j f_{ci}}`.
 
     :param velocity_level_difference: Direction-averaged ``D̄v,ij`` per band,
         in dB.
@@ -915,7 +946,7 @@ def modal_density(
     *,
     speed_of_sound: float = _DEFAULT_SPEED_OF_SOUND,
 ) -> float:
-    """Modal density ``n = π · S · fc / c0²`` (Part 4, Formula (5)).
+    r"""Modal density :math:`n = \pi \cdot S \cdot f_c / c_0^2` (Part 4, (5)).
 
     :param area: Element area ``S``, in m².
     :param critical_frequency: Critical frequency ``fc``, in Hz.
@@ -936,10 +967,11 @@ def modal_overlap_factor(
     *,
     speed_of_sound: float = _DEFAULT_SPEED_OF_SOUND,
 ) -> np.ndarray:
-    """Modal overlap factor ``M = 2,2 · n / Ts`` (Part 4, Formula (6)).
+    r"""Modal overlap factor :math:`M = 2.2 \cdot n / T_s` (Part 4, F. (6)).
 
     With the modal density ``n`` from :func:`modal_density`. Part 4 prefers
-    ``M ≥ 1`` at 250 Hz and above, and requires bands with ``M < 0,25`` to be
+    :math:`M \ge 1` at 250 Hz and above, and requires bands with
+    :math:`M < 0.25` to be
     bracketed in the report and excluded from the single-number rating
     (Clause 9). This function only computes ``M``; pass it to
     :func:`vibration_reduction_index` via ``modal_overlap`` to apply the
@@ -965,10 +997,12 @@ def band_mode_count(
     *,
     speed_of_sound: float = _DEFAULT_SPEED_OF_SOUND,
 ) -> np.ndarray:
-    """In-band mode count ``N = B · n`` (Part 4, Formula (4)).
+    r"""In-band mode count :math:`N = B \cdot n` (Part 4, Formula (4)).
 
-    With the one-third-octave bandwidth approximation ``B = 0,23 · f`` and the
-    modal density ``n`` from :func:`modal_density`. ``N ≥ 5`` modes per band is
+    With the one-third-octave bandwidth approximation
+    :math:`B = 0.23 \cdot f` and the
+    modal density ``n`` from :func:`modal_density`. :math:`N \ge 5` modes per
+    band is
     "always satisfactory".
 
     :param frequency: Band centre frequency ``f``, in Hz, per band.

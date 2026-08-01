@@ -28,53 +28,73 @@ or collapse the harmonic families in the cepstrum
 measured envelope spectrum**, which is the working view.
 
 **Rolling-contact bearings** (Eqs. 8.4 to 8.14, after Shahan & Kamperman).
-With shaft speed `N` in r/min, `Z` rolling elements of diameter `d` on a
-pitch diameter `D` and a contact angle `phi`, writing `g = (d/D) cos phi`
-and `fs = N/60`:
+With shaft speed `N` in r/min, `Z` rolling elements of diameter `d` on
+a pitch diameter `D` and a contact angle `phi`, writing
+$g = (d/D) \cos\phi$ and $f_s = N/60$:
 
-```text
-FTF     = (fs/2)(1 - g)             cage, stationary outer race  (8.5)
-FTF_rel = fs - FTF                  cage seen from the shaft     (8.11)
-BSF     = (fs/2)(D/d)(1 - g**2)     element rotation             (8.7)
-BDF     = 2 BSF                     element spin (both races)    (8.10)
-BPFO    = Z (fs/2)(1 - g)           element pass, outer race     (8.8)
-BPFI    = Z (fs/2)(1 + g)           element pass, inner race     (8.9)
-```
+$$
+\mathrm{FTF} = \frac{f_s}{2}(1 - g) \qquad \text{cage, stationary outer race} \tag{8.5}
+$$
 
-so `BPFO + BPFI = Z fs` exactly, and `BPFO = Z FTF`. Norton notes that
+$$
+\mathrm{FTF_{rel}} = f_s - \mathrm{FTF} \qquad \text{cage seen from the shaft} \tag{8.11}
+$$
+
+$$
+\mathrm{BSF} = \frac{f_s}{2} \frac{D}{d} (1 - g^2) \qquad \text{element rotation} \tag{8.7}
+$$
+
+$$
+\mathrm{BDF} = 2\, \mathrm{BSF} \qquad \text{element spin (both races)} \tag{8.10}
+$$
+
+$$
+\mathrm{BPFO} = Z \frac{f_s}{2}(1 - g) \qquad \text{element pass, outer race} \tag{8.8}
+$$
+
+$$
+\mathrm{BPFI} = Z \frac{f_s}{2}(1 + g) \qquad \text{element pass, inner race} \tag{8.9}
+$$
+
+so $\mathrm{BPFO} + \mathrm{BPFI} = Z f_s$ exactly, and
+$\mathrm{BPFO} = Z\, \mathrm{FTF}$. Norton notes that
 Eqs. (8.8) and (8.14), and (8.9) and (8.13), are identical: `BPFO` and
 `BPFI` do not depend on which race turns. Only the cage does, and with the
-outer race rotating it becomes `(fs/2)(1 + g)` (Eq. 8.6).
+outer race rotating it becomes $(f_s/2)(1 + g)$ (Eq. 8.6).
 
-**Gears** (Eq. 8.3). The gear-meshing (tooth-passing) frequency of a wheel with
-`n_teeth` teeth is `GMF = n_teeth fs`, with integer harmonics. A discrete
-tooth fault adds shaft-rate lines and low, flat sidebands around every mesh
-harmonic; distributed wear raises tall sideband groups at `k GMF +/- m fs`.
+**Gears** (Eq. 8.3). The gear-meshing (tooth-passing) frequency of a wheel
+with `n_teeth` teeth is $\mathrm{GMF} = n_{\text{teeth}} f_s$, with
+integer harmonics. A discrete tooth fault adds shaft-rate lines and low,
+flat sidebands around every mesh harmonic; distributed wear raises tall
+sideband groups at $k\, \mathrm{GMF} \pm m f_s$.
 
 **Induction motors** (Eqs. 8.19, 8.20). The three lines always present in a
-motor bearing signal are `fs` (mechanical unbalance), `2 fs`
-(misalignment with the driven load) and `2 fe` (non-uniform air gap, torque
-pulses and the electrical faults). Norton's Eq. (8.19) writes the supply
-frequency as `fe = fs p / 2` for `p` magnetic poles, which is the
-synchronous, zero-slip form; this module uses the slip-consistent
-`fe = fs p / (2 (1 - s))`, identical at `s = 0` and the only version that
-makes the rotor-slot harmonics of Eq. (8.20),
+motor bearing signal are `fs` (mechanical unbalance), $2 f_s$
+(misalignment with the driven load) and $2 f_e$ (non-uniform air gap,
+torque pulses and the electrical faults). Norton's Eq. (8.19) writes the
+supply frequency as $f_e = f_s p / 2$ for `p` magnetic poles, which
+is the synchronous, zero-slip form; this module uses the slip-consistent
+$f_e = f_s p / (2 (1 - s))$, identical at $s = 0$ and the only
+version that makes the rotor-slot harmonics of Eq. (8.20),
 
-`fsh = fe [(2 R / p)(1 - s) +/- 2 (n - 1)]`,
+$$
+f_{sh} = f_e \left[ \frac{2 R}{p}(1 - s) \pm 2 (n - 1) \right] \tag{8.20}
+$$
 
-collapse to the physical rotor-bar passing rate `R fs` at `n = 1` for
-`R` rotor bars. Dynamic eccentricity dresses that line with sidebands at
-+/- the shaft rate and +/- the slip frequency.
+collapse to the physical rotor-bar passing rate $R f_s$ at
+$n = 1$ for `R` rotor bars. Dynamic eccentricity dresses that line
+with sidebands at $\pm$ the shaft rate and $\pm$ the slip
+frequency.
 
 **Fans, blowers and pumps** (Eqs. 8.15 to 8.18). The blade-passing frequency
-of an impeller with `N` blades is `fb = n N fs`; a pump's hydraulic
-pulsations follow the same form with `N` pumping events per revolution
-(Eq. 8.18), and a rotary positive-displacement blower repeats four times per
-revolution. In a ducted axial fan the blade-vane interaction sets up rotating
-pressure patterns with `mL = n N +/- k V` lobes for `V` vanes (Eq. 8.16),
-turning at `n N fs / mL` (Eq. 8.17): a pattern that spins faster than the
-blades themselves, and the reason a careful choice of `N` and `V` matters
-for radiated power.
+of an impeller with `N` blades is $f_b = n N f_s$; a pump's
+hydraulic pulsations follow the same form with `N` pumping events per
+revolution (Eq. 8.18), and a rotary positive-displacement blower repeats
+four times per revolution. In a ducted axial fan the blade-vane interaction
+sets up rotating pressure patterns with $m_L = n N \pm k V$ lobes for
+`V` vanes (Eq. 8.16), turning at $n N f_s / m_L$ (Eq. 8.17): a
+pattern that spins faster than the blades themselves, and the reason a
+careful choice of `N` and `V` matters for radiated power.
 
 > Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
 
@@ -112,7 +132,8 @@ Name         Meaning                                           Norton eq.
 `BPFO` and `BPFI` are the outer- and inner-race defect lines and
 `BDF` the rolling-element/cage defect line; all three are exact
 kinematics of a pure-rolling contact, so a real bearing's lines wander by
-1 % to 2 % with load-dependent slip. `BPFO + BPFI = Z fs` always, and
+1 % to 2 % with load-dependent slip.
+$\mathrm{BPFO} + \mathrm{BPFI} = Z f_s$ always, and
 both are independent of which race turns (Norton's Eqs. 8.8 and 8.14, and
 8.9 and 8.13, are identical); *rotating_race* only moves the cage.
 
@@ -150,13 +171,16 @@ blade_pass_frequencies(
 
 Blade-passing frequency and interaction patterns (Norton 8.15-8.17).
 
-`fb = n N_blades x N/60` for `n = 1 .. harmonics`, the discrete tone
+$f_b = n\, N_{\text{blades}} \times N/60$ for `n = 1 .. harmonics`,
+the discrete tone
 family of any fan, blower or pump impeller; a rotary positive-displacement
 blower repeats four times per revolution, so pass `4 x` its speed.
 
 In a ducted axial fan the blades also interact with the stator vanes and
-set up rotating pressure patterns with `mL = n N_blades +/- k N_vanes`
-lobes (Eq. 8.16) turning at `ML = n N_blades fs / mL` (Eq. 8.17). Those
+set up rotating pressure patterns with
+$m_L = n\, N_{\text{blades}} \pm k\, N_{\text{vanes}}$
+lobes (Eq. 8.16) turning at
+$M_L = n\, N_{\text{blades}} f_s / m_L$ (Eq. 8.17). Those
 patterns radiate strongly when they can drive a higher-order duct mode, so
 they are the lines to check against the duct cut-on frequencies. Give
 *n_vanes* to include them, named `"lobe n=1 m=2"`, `"lobe n=1 m=10"`,
@@ -172,7 +196,7 @@ pattern turning at a different speed.
 | `n_blades` | Number of blades (integer >= 1). |
 | `harmonics` | Number of blade-pass harmonics (integer >= 1, Default: 3). |
 | `n_vanes` | Number of stator vanes `V` (integer >= 1) to include the lobed interaction patterns (Default: `None`, blade tones only). |
-| `lobe_orders` | Highest `\|k\|` in `mL = n N_blades +/- k N_vanes` (integer >= 1, Default: 1). |
+| `lobe_orders` | Highest `\|k\|` in $m_L = n\, N_{\text{blades}} \pm k\, N_{\text{vanes}}$ (integer >= 1, Default: 1). |
 
 **Returns:** A [`FaultFrequencyResult`](/phonometry/reference/api/vibration/machine-diagnostics/#faultfrequencyresult) (source `"bladed rotor"`).
 
@@ -260,9 +284,9 @@ The first *count* integer harmonics of the line called *name*.
 | Name | Description |
 | :--- | :--- |
 | `name` | Line name (see `names`). |
-| `count` | Number of harmonics, `>= 1` (the fundamental first). |
+| `count` | Number of harmonics, $\ge 1$ (the fundamental first). |
 
-**Returns:** Frequencies `n * f` for `n = 1 .. count`, in hertz.
+**Returns:** Frequencies $n f$ for `n = 1 .. count`, in hertz.
 
 **Raises**
 
@@ -377,8 +401,9 @@ gear_mesh_frequencies(
 
 Gear-meshing frequency and its sideband family (Norton Eq. 8.3).
 
-`GMF = n_teeth x N/60`, with integer harmonics `k GMF` (`k = 1 ..
-harmonics`) named `"GMF"`, `"2xGMF"`, ... Each harmonic can carry a
+$\mathrm{GMF} = n_{\text{teeth}} \times N/60$, with integer
+harmonics `k GMF` (`k = 1 .. harmonics`) named `"GMF"`,
+`"2xGMF"`, ... Each harmonic can carry a
 modulation family at `k GMF +/- m f_mod` (`m = 1 .. sidebands`), named
 `"GMF-1x"`, `"2xGMF+2x"`, and so on. The default modulation rate is
 the shaft rate of the wheel: a chipped tooth or an eccentric wheel
@@ -429,7 +454,7 @@ and `2fe` (a non-uniform air gap, torque pulses and the winding/rotor-bar
 electrical faults). Rotor defects that produce static or dynamic air-gap
 eccentricity are read on the **slot harmonics** of the stator core,
 
-`fsh = fe [(2 R / p)(1 - s) +/- 2 (n - 1)] = R fs +/- 2 (n - 1) fe`
+$f_{sh} = f_e\left[\left(\dfrac{2R}{p}\right)(1-s) \pm 2(n-1)\right] = R f_s \pm 2(n-1) f_e$
 
 for `R` rotor bars, `p` magnetic poles (not pole pairs), unit slip
 `s` and `n = 1, 2, ...`. Dynamic eccentricity modulates the dominant
@@ -438,16 +463,16 @@ what *sidebands* adds around `fsh`.
 
 Give the slip directly, or give the mains *supply_frequency* and let it be
 derived from `fe` and the measured shaft speed. The supply frequency is
-taken as `fe = fs p / (2 (1 - s))`: Norton's Eq. (8.19) writes
-`fe = fs p / 2`, which is the same expression at zero slip but does not
-reduce Eq. (8.20) to the physical rotor-bar passing rate `R fs` when the
-machine is loaded.
+taken as $f_e = f_s p / (2(1-s))$: Norton's Eq. (8.19) writes
+$f_e = f_s p / 2$, which is the same expression at zero slip but
+does not reduce Eq. (8.20) to the physical rotor-bar passing rate
+`R fs` when the machine is loaded.
 
-With a non-zero slip the pole-pass line `FP = p f_slip` is included as
-well. That name is standard condition-monitoring practice rather than
-Norton's: he gives the slip frequency itself as the sideband spacing of a
-broken rotor bar (his Section 8.4.8) and does not multiply it by the pole
-count.
+With a non-zero slip the pole-pass line $F_P = p\,f_{\text{slip}}$
+is included as well. That name is standard condition-monitoring practice
+rather than Norton's: he gives the slip frequency itself as the sideband
+spacing of a broken rotor bar (his Section 8.4.8) and does not multiply
+it by the pole count.
 
 **Parameters**
 
@@ -475,7 +500,7 @@ count.
 shaft_rate(speed_rpm: float) -> float
 ```
 
-Shaft rotational frequency `fs = N/60` (Norton Eq. 8.4).
+Shaft rotational frequency $f_s = N/60$ (Norton Eq. 8.4).
 
 **Parameters**
 
@@ -483,7 +508,7 @@ Shaft rotational frequency `fs = N/60` (Norton Eq. 8.4).
 | :--- | :--- |
 | `speed_rpm` | Shaft speed `N`, in r/min (> 0). |
 
-**Returns:** The shaft rotational frequency `fs`, in hertz.
+**Returns:** The shaft rotational frequency $f_s$, in hertz.
 
 **Raises**
 

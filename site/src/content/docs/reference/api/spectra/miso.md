@@ -15,37 +15,42 @@ Bendat & Piersol, *Random Data: Analysis and Measurement Procedures*
 (MISO) coherence functions, computed here from the Welch cross-spectral
 machinery of [`phonometry.metrology.spectra`](/phonometry/reference/api/spectra/spectra/):
 
-* the **ordinary coherence** `γ²iy = |Giy|²/(Gii·Gyy)` (Eq. 7.109) of each
-  input with the output, taken on its own;
-* the **multiple coherence** `γ²y:x = Gvv/Gyy = 1 - Gnn/Gyy` (Eq. 7.35):
+* the **ordinary coherence**
+  $\gamma^2_{iy} = \lvert G_{iy} \rvert^2 / (G_{ii} G_{yy})$
+  (Eq. 7.109) of each input with the output, taken on its own;
+* the **multiple coherence**
+  $\gamma^2_{y:x} = G_{vv}/G_{yy} = 1 - G_{nn}/G_{yy}$ (Eq. 7.35):
   the fraction of the output autospectrum linearly explained by *all* inputs
-  jointly, obtained from the input cross-spectral matrix `Gxx` and the
-  input-output vector `Giy` (matrix form `γ²y:x = GiyᴴGxx⁻¹Giy/Gyy`,
+  jointly, obtained from the input cross-spectral matrix $G_{xx}$ and
+  the input-output vector $G_{iy}$ (matrix form
+  $\gamma^2_{y:x} = G_{iy}^{\mathsf{H}} G_{xx}^{-1} G_{iy} / G_{yy}$,
   Eqs. 7.170-7.192). For additive uncorrelated output noise of per-band
-  signal-to-noise ratio `SNR = Gvv/Gnn` this is exactly `SNR/(1+SNR)`;
-* the **partial coherence** `γ²iy·(i-1)! = |Giy·(i-1)!|²/(Gii·(i-1)!·Gyy)`
+  signal-to-noise ratio $\mathrm{SNR} = G_{vv}/G_{nn}$ this is exactly
+  $\mathrm{SNR}/(1+\mathrm{SNR})$;
+* the **partial coherence** $\gamma^2_{iy \cdot (i-1)!} = \lvert G_{iy \cdot (i-1)!} \rvert^2 / (G_{ii \cdot (i-1)!} G_{yy})$
   (Eq. 7.87): the coherence of input `i` with the output once the linear
   effect of the inputs *before it in the conditioning order* has been
-  removed. The 4th-edition definition uses the *total* output `Gyy` in the
-  denominator (not the conditioned output), which makes the partial
-  coherences of the ordered inputs add up to the multiple coherence,
-  `γ²y:x = Σ γ²iy·(i-1)!` (Eq. 7.116), and reduce exactly to the ordinary
-  coherences when the inputs are mutually uncorrelated (Eq. 7.117);
-* the **conditioned (residual) spectra** `Gij·r!` computed by the
-  Gaussian-elimination recursion
-  `Gij·r! = Gij·(r-1)! - Grj·(r-1)!·Gir·(r-1)!/Grr·(r-1)!` (Eq. 7.94,
-  base case Eq. 7.95), the Schur complement that removes the linear effect
-  of the pivot input `r` from every remaining record;
+  removed. The 4th-edition definition uses the *total* output
+  $G_{yy}$ in the denominator (not the conditioned output), which
+  makes the partial coherences of the ordered inputs add up to the multiple
+  coherence, $\gamma^2_{y:x} = \sum \gamma^2_{iy \cdot (i-1)!}$
+  (Eq. 7.116), and reduce exactly to the ordinary coherences when the
+  inputs are mutually uncorrelated (Eq. 7.117);
+* the **conditioned (residual) spectra** $G_{ij \cdot r!}$ computed by
+  the Gaussian-elimination recursion $G_{ij \cdot r!} = G_{ij \cdot (r-1)!} - G_{rj \cdot (r-1)!} G_{ir \cdot (r-1)!} / G_{rr \cdot (r-1)!}$ (Eq. 7.94, base case Eq. 7.95), the Schur complement
+  that removes the linear effect of the pivot input `r` from every
+  remaining record;
 * the **partial (cumulative) coherent output spectra**
-  `Gvᵢ = |Liy|²·Gii·(i-1)! = γ²iy·(i-1)!·Gyy` (Eq. 7.86): the share of
-  output power the `i`-th ordered input contributes, so that
-  `Gyy = Σ Gvᵢ + Gnn` (Eqs. 7.88-7.89, 7.121). Comparing them band by band
-  answers "which source dominates here?".
+  $G_{v_i} = \lvert L_{iy} \rvert^2 G_{ii \cdot (i-1)!} = \gamma^2_{iy \cdot (i-1)!} G_{yy}$ (Eq. 7.86): the share of output power
+  the `i`-th ordered input contributes, so that
+  $G_{yy} = \sum G_{v_i} + G_{nn}$ (Eqs. 7.88-7.89, 7.121). Comparing
+  them band by band answers "which source dominates here?".
 
 The random errors follow Bendat & Piersol Section 9.3: conditioning on the
-`i-1` preceding inputs costs `i-1` degrees of freedom, so the `i`-th
-ordered input carries `nd-(i-1)` effective averages (Eqs. 9.100/9.101) and
-the `q`-input multiple coherence carries `nd-(q-1)` (Eqs. 9.98/9.99).
+$i-1$ preceding inputs costs $i-1$ degrees of freedom, so the
+`i`-th ordered input carries $n_d - (i-1)$ effective averages
+(Eqs. 9.100/9.101) and the `q`-input multiple coherence carries
+$n_d - (q-1)$ (Eqs. 9.98/9.99).
 
 > Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
 
@@ -74,13 +79,14 @@ and 50 % overlap by default, no detrending), then:
 
 * reports the **ordinary coherence** of each input with the output
   (Eq. 7.109);
-* forms the **multiple coherence** `γ²y:x` (Eq. 7.35) from the residual
-  output spectrum left by the Gaussian-elimination conditioning of
-  Section 7.3;
+* forms the **multiple coherence** $\gamma^2_{y:x}$ (Eq. 7.35)
+  from the residual output spectrum left by the Gaussian-elimination
+  conditioning of Section 7.3;
 * conditions the inputs in `order` to get the **partial coherences**
-  `γ²iy·(i-1)!` (Eq. 7.87) and the **partial coherent output spectra**
-  `Gvᵢ` (Eq. 7.86), which decompose the output power source by source
-  (`Σᵢ Gvᵢ + Gnn = Gyy`).
+  $\gamma^2_{iy \cdot (i-1)!}$ (Eq. 7.87) and the **partial
+  coherent output spectra** $G_{v_i}$ (Eq. 7.86), which decompose
+  the output power source by source
+  ($\sum_i G_{v_i} + G_{nn} = G_{yy}$).
 
 The partial coherences and the coherent-output decomposition depend on
 the conditioning order; the ordinary and multiple coherences do not.
@@ -148,17 +154,17 @@ conditioning that produced the partial coherences is recorded in
 | `frequencies` | One-sided frequency axis, in Hz. |
 | `n_inputs` | Number of inputs `q` (`q >= 2`). |
 | `order` | Conditioning order actually applied, as original input indices; `partial_coherence[order[k]]` is conditioned on the inputs `order[:k]`. |
-| `ordinary_coherence` | `γ²iy(f) ∈ [0, 1]` per input (Eq. 7.109), shape `(q, F)`: each input against the output on its own. |
-| `multiple_coherence` | `γ²y:x(f) ∈ [0, 1]` (Eq. 7.35): the fraction of output power explained by all inputs jointly. Equals the sum of the partial coherences (Eq. 7.116) and `1 - noise_psd/output_psd`. |
-| `partial_coherence` | `γ²iy·(i-1)!(f) ∈ [0, 1]` per input (Eq. 7.87, total-output denominator), shape `(q, F)`: the coherence of the input with the output once the linear effect of the inputs preceding it in `order` is removed. |
-| `coherent_output_spectra` | Partial coherent output spectrum `Gvᵢ` per input (Eq. 7.86), shape `(q, F)`: the output power the input contributes, with `Σᵢ Gvᵢ + noise_psd = output_psd`. |
-| `output_psd` | Measured output autospectrum `Ĝyy(f)`. |
-| `noise_psd` | Residual (uncorrelated) output spectrum `Ĝnn = Ĝyy·q!` after removing every input (Eq. 7.121). |
-| `multiple_coherence_random_error` | Normalized random error of `γ²y:x` (Eq. 9.98), using `nd-(q-1)` effective averages. |
-| `coherent_output_random_error` | Normalized random error of each `Gvᵢ` (Eq. 9.100), shape `(q, F)`, using `nd-(i-1)` effective averages for the `i`-th ordered input. |
+| `ordinary_coherence` | $\gamma^2_{iy}(f) \in [0, 1]$ per input (Eq. 7.109), shape `(q, F)`: each input against the output on its own. |
+| `multiple_coherence` | $\gamma^2_{y:x}(f) \in [0, 1]$ (Eq. 7.35): the fraction of output power explained by all inputs jointly. Equals the sum of the partial coherences (Eq. 7.116) and `1 - noise_psd/output_psd`. |
+| `partial_coherence` | $\gamma^2_{iy \cdot (i-1)!}(f) \in [0, 1]$ per input (Eq. 7.87, total-output denominator), shape `(q, F)`: the coherence of the input with the output once the linear effect of the inputs preceding it in `order` is removed. |
+| `coherent_output_spectra` | Partial coherent output spectrum $G_{v_i}$ per input (Eq. 7.86), shape `(q, F)`: the output power the input contributes, with `sum(coherent_output_spectra) + noise_psd = output_psd`. |
+| `output_psd` | Measured output autospectrum $\hat{G}_{yy}(f)$. |
+| `noise_psd` | Residual (uncorrelated) output spectrum $\hat{G}_{nn} = \hat{G}_{yy \cdot q!}$ after removing every input (Eq. 7.121). |
+| `multiple_coherence_random_error` | Normalized random error of $\gamma^2_{y:x}$ (Eq. 9.98), using $n_d - (q-1)$ effective averages. |
+| `coherent_output_random_error` | Normalized random error of each $G_{v_i}$ (Eq. 9.100), shape `(q, F)`, using $n_d - (i-1)$ effective averages for the `i`-th ordered input. |
 | `n_segments` | Raw number of (possibly overlapped) segments averaged. |
-| `n_averages` | Effective number of independent averages `nd`. |
-| `resolution_bandwidth` | Effective noise bandwidth `Bₑ`, in Hz. |
+| `n_averages` | Effective number of independent averages $n_d$. |
+| `resolution_bandwidth` | Effective noise bandwidth $B_e$, in Hz. |
 | `window` | Taper name. |
 | `nperseg` | Segment length, in samples. |
 | `overlap` | Segment overlap fraction. |

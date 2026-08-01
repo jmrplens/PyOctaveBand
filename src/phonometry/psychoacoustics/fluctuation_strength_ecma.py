@@ -1,5 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""
+r"""
 Psychoacoustic fluctuation strength per ECMA-418-2:2025 (4th ed., Clause 9).
 
 Clean-room implementation of the fluctuation-strength signal chain of
@@ -11,7 +11,8 @@ mirrors the roughness chain of Clause 7 but replaces the DFT-based envelope
 analysis with High-resolution Spectral Analysis (HSA):
 
 * fluctuation-strength zero-padding (Clause 5.1.2.2) and segmentation
-  (Clause 5.1.5.2) with the fixed block/hop ``s_b = 65536`` / ``s_h = 16384``
+  (Clause 5.1.5.2) with the fixed block/hop :math:`s_b = 65536` /
+  :math:`s_h = 16384`
   (Clause 9.1.1);
 * the Hilbert envelope of each critical-band block and a factor-32
   downsampling to 1500 Hz (Clause 9.1.2, Formula 119);
@@ -55,13 +56,16 @@ Clause 9 interpretation notes (all resolved by internal consistency and
 pinned by the calibration signal; the confirmed defects are recorded in
 ``docs/ERRATA.md``):
 
-* Formula (127) prints the phase factor ``exp(-j*2*pi*f_n*(s~_b - n_ze +
-  n_zb - 1))``; the DFT of the rectangular analysis window requires ``pi``
-  in place of ``2*pi`` (with ``2*pi`` the HSA cannot reproduce the very
+* Formula (127) prints the phase factor
+  :math:`\exp(-j 2\pi f_n (\tilde{s}_b - n_{ze} + n_{zb} - 1))`; the DFT of
+  the rectangular analysis window requires :math:`\pi`
+  in place of :math:`2\pi` (with :math:`2\pi` the HSA cannot reproduce the
+  very
   spectra it fits, breaking the exact-recovery property claimed for it).
 * Formula (144) subtracts 1 from the three-bin centroid before scaling by
   ``delta_f``; with the 0-based bin convention stated below Formula (122)
-  (bin k maps to ``k * r~_s / s~_b``) that offset shifts every modulation
+  (bin k maps to :math:`k \tilde{r}_s / \tilde{s}_b`) that offset shifts
+  every modulation
   rate one bin low, so the centroid is used without the offset.
 * Clause 9.1.7 states the Newton constants (differential step 1e-5, damped
   step cap 2e-4, stop tolerance 1e-7) without units; read in Hz they cap the
@@ -71,7 +75,8 @@ pinned by the calibration signal; the confirmed defects are recorded in
   module applies them.
 * The amplitude of a spectral line pair (Formulae 146-147, 155, 157-160) is
   taken as the squared magnitude of the half-line solution components of
-  Formula (123), ``x_2m^2 + x_2m+1^2 = |p^_m|^2 / 4``: with that reading
+  Formula (123), :math:`x_{2m}^2 + x_{2m+1}^2 = |\hat{p}_m|^2 / 4`: with
+  that reading
   Formula (160) is exactly the RMS of the modelled band signal (the loudness
   chain of Formulae 22-23 applied to the harmonic complex) and the tabulated
   c_F reproduces the calibration signal.
@@ -524,9 +529,10 @@ def _hsa_error(
 
 
 def _pair_amplitudes(x: np.ndarray) -> np.ndarray:
-    """Squared line-pair magnitudes from a solution vector (Formula 123).
+    r"""Squared line-pair magnitudes from a solution vector (Formula 123).
 
-    ``x_2m^2 + x_2m+1^2 = |p^_m|^2 / 4`` per pair; see the module docstring
+    :math:`x_{2m}^2 + x_{2m+1}^2 = \lvert \hat{p}_m \rvert^2 / 4` per pair;
+    see the module docstring
     for why the half-line magnitude is the consistent amplitude convention.
     """
     return np.asarray(x[1::2] ** 2 + x[2::2] ** 2, dtype=np.float64)
@@ -661,11 +667,12 @@ def _harmonic_complex(
     band: int,
     w0: np.ndarray,
 ) -> tuple[float, float, float]:
-    """Harmonic analysis and weighting (Clauses 9.1.8-9.1.9).
+    r"""Harmonic analysis and weighting (Clauses 9.1.8-9.1.9).
 
     Returns ``(a_hat, harmonic_power, p0)`` where ``a_hat`` is the weighted
     sum of the harmonic complex (Formula 157) and ``harmonic_power`` is
-    ``p^_0^2 + 2 * sum(A_i)`` over the refined complex (Formulae 159-160).
+    :math:`\hat{p}_0^2 + 2 \sum A_i` over the refined complex
+    (Formulae 159-160).
     """
     best_energy = -1.0
     best: tuple[np.ndarray, np.ndarray] = (np.empty(0, dtype=np.intp), np.empty(0))

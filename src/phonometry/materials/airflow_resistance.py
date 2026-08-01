@@ -1,40 +1,47 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""
+r"""
 Airflow resistance of porous materials: ISO 9053-1 and ISO 9053-2.
 
 Two standardised measurement methods share the same three quantities and units
 (ISO 9053-1:2018, Clause 3; ISO 9053-2:2020, Clause 3):
 
-- **Airflow resistance** ``R = dp / q_v`` in Pa*s/m3, with ``dp`` the air pressure
-  difference across the specimen (Pa) and ``q_v`` the volumetric airflow rate
-  through it (m3/s) (ISO 9053-1:2018, 3.1).
-- **Specific airflow resistance** ``R_s = R * A`` in **Pa*s/m** (not Pa*s/m2),
-  with ``A`` the cross-sectional area of the specimen perpendicular to the flow
-  (m2) (ISO 9053-1:2018, 3.2). Equivalently ``R_s = dp / u`` with ``u`` the linear
-  airflow velocity, since ``u = q_v / A``.
-- **Airflow resistivity** ``sigma = R_s / d`` in Pa*s/m2, with ``d`` the specimen
-  thickness in the flow direction (m), for homogeneous materials
-  (ISO 9053-1:2018, 3.3). Equivalently ``sigma = R * A / d``.
+- **Airflow resistance** :math:`R = \Delta p / q_v` in Pa*s/m3, with
+  :math:`\Delta p` the air pressure difference across the specimen (Pa) and
+  ``q_v`` the volumetric airflow rate through it (m3/s)
+  (ISO 9053-1:2018, 3.1).
+- **Specific airflow resistance** :math:`R_s = R\,A` in **Pa*s/m** (not
+  Pa*s/m2), with ``A`` the cross-sectional area of the specimen perpendicular
+  to the flow (m2) (ISO 9053-1:2018, 3.2). Equivalently
+  :math:`R_s = \Delta p / u` with ``u`` the linear airflow velocity, since
+  :math:`u = q_v / A`.
+- **Airflow resistivity** :math:`\sigma = R_s / d` in Pa*s/m2, with ``d`` the
+  specimen thickness in the flow direction (m), for homogeneous materials
+  (ISO 9053-1:2018, 3.3). Equivalently :math:`\sigma = R\,A / d`.
 
-The linear airflow velocity is ``u = q_v / A`` (ISO 9053-1:2018, 3.4).
+The linear airflow velocity is :math:`u = q_v / A` (ISO 9053-1:2018, 3.4).
 
 **Static (DC) method, ISO 9053-1:2018.** A steady unidirectional flow in the
 laminar regime is used. The recommended reference linear airflow velocity is
-``u = 0.5e-3 m/s`` (0.5 mm/s, clause 7.5); if measured stepwise the highest
-velocity shall not exceed ``15e-3 m/s`` (15 mm/s), beyond which the flow may be
-non-linear. When measured stepwise the pressure difference is plotted against
-``u`` and fitted with a regression of at least second order constrained through
-the origin, ``dp = a*u + b*u**2``; ``dp`` and ``R_s`` are then evaluated at
-``u = 0.5e-3 m/s`` (clause 7.5). Because ``R_s = dp / u = a + b*u``, the linear
-coefficient ``a`` is the zero-velocity specific airflow resistance.
+:math:`u = 0.5\times 10^{-3}` m/s (0.5 mm/s, clause 7.5); if measured stepwise
+the highest velocity shall not exceed ``15e-3 m/s`` (15 mm/s), beyond which
+the flow may be non-linear. When measured stepwise the pressure difference is
+plotted against ``u`` and fitted with a regression of at least second order
+constrained through the origin, :math:`\Delta p = a u + b u^2`;
+:math:`\Delta p` and ``R_s`` are then evaluated at
+:math:`u = 0.5\times 10^{-3}` m/s (clause 7.5). Because
+:math:`R_s = \Delta p / u = a + b u`, the linear coefficient ``a`` is the
+zero-velocity specific airflow resistance.
 
 **Alternating (AC) method, ISO 9053-2:2020.** A sinusoidally moving piston
 (frequency 1 Hz to 4 Hz, typically 2 Hz; clause 6.2) drives an alternating volume
 flow into an air cavity terminated either by the specimen or by an airtight
 termination. The airflow resistance follows from the sound-pressure-level
-difference between the two terminations (ISO 9053-2:2020, Formula (2), 8.7)::
+difference between the two terminations (ISO 9053-2:2020, Formula (2), 8.7):
 
-    R = kappa' * P_S / (2*pi*f*V) * (h_t/h_s) * 10**((L_ps - L_pt)/20)
+.. math::
+
+   R = \frac{\kappa' P_S}{2\pi f V} \, \frac{h_t}{h_s} \,
+   10^{(L_{ps} - L_{pt})/20}
 
 with ``kappa'`` the effective ratio of specific heats for air (Annex A),
 ``P_S`` the static (atmospheric) pressure (Pa), ``f`` the piston frequency (Hz),
@@ -43,18 +50,18 @@ piston stroke amplitudes with the airtight termination / specimen cell, and
 ``L_ps``/``L_pt`` the cavity sound pressure levels with the specimen /
 airtight termination (dB). Only the level *difference* enters, so the sound level
 device needs no absolute calibration (clause 8.7). The RMS piston volume flow is
-``q_v = 2*pi*f*h*A_P`` (ISO 9053-2:2020, 6.2), with ``h`` the stroke amplitude
-and ``A_P`` the piston cross-sectional area.
+:math:`q_v = 2\pi f h A_P` (ISO 9053-2:2020, 6.2), with ``h`` the stroke
+amplitude and ``A_P`` the piston cross-sectional area.
 
 The **effective** ratio of specific heats ``kappa'`` accounts for heat conduction
 between the oscillating air and the cavity walls, which makes the compression not
 fully adiabatic. ISO 9053-2:2020 Annex A (normative) gives its evaluation from the
 cavity geometry and air properties (:func:`effective_kappa`, Formula (A.7)); the
-Annex A.3 worked example yields ``kappa' = 1.370`` (about 2 % below the adiabatic
-``kappa = 1.4008``). When no cavity/air data are supplied,
+Annex A.3 worked example yields :math:`\kappa' = 1.370` (about 2 % below the
+adiabatic :math:`\kappa = 1.4008`). When no cavity/air data are supplied,
 :func:`alternating_airflow_resistance` falls back to the **uncorrected adiabatic**
-value ``kappa = 1.4`` (Formula (A.1)); for a conforming result compute ``kappa'``
-per Annex A and pass it explicitly.
+value :math:`\kappa = 1.4` (Formula (A.1)); for a conforming result compute
+``kappa'`` per Annex A and pass it explicitly.
 
 Neither part defines a temperature/atmospheric normalisation of the result.
 """
@@ -123,16 +130,16 @@ class AirflowResistanceWarning(PhonometryWarning):
 
 @dataclass(frozen=True)
 class StaticAirflowResult:
-    """Result of an ISO 9053-1:2018 stepwise (static-method) determination.
+    r"""Result of an ISO 9053-1:2018 stepwise (static-method) determination.
 
     ``resistance`` (``R``, Pa*s/m3), ``specific_resistance`` (``R_s``, Pa*s/m) and
     ``resistivity`` (``sigma``, Pa*s/m2; ``None`` when no thickness is supplied)
     are evaluated at ``evaluation_velocity`` (m/s, the ISO 9053-1 clause 7.5
     reference 0.5 mm/s by default). ``linear_coefficient`` (``a``) and
     ``quadratic_coefficient`` (``b``) are the through-origin fit
-    ``dp = a*u + b*u**2`` (clause 7.5); ``a`` is the zero-velocity specific
-    airflow resistance (Pa*s/m). ``pressure_drop`` is the fitted ``dp`` at
-    ``evaluation_velocity`` (Pa).
+    :math:`\Delta p = a u + b u^2` (clause 7.5); ``a`` is the zero-velocity
+    specific airflow resistance (Pa*s/m). ``pressure_drop`` is the fitted
+    :math:`\Delta p` at ``evaluation_velocity`` (Pa).
     """
 
     resistance: float
@@ -164,7 +171,7 @@ class StaticAirflowResult:
         verbose: bool = False,
         language: str = "en",
     ) -> str:
-        """Render an ISO 9053-1 static airflow-resistance test-report fiche to a PDF.
+        r"""Render an ISO 9053-1 static airflow-resistance test-report fiche to a PDF.
 
         Writes a one-page accredited airflow-resistance report
         (ISO 9053-1:2018, static/direct airflow method): the standard-basis
@@ -180,9 +187,10 @@ class StaticAirflowResult:
         disclaimer. ISO 9053-1 is a material characterisation, so there is no
         pass/fail verdict.
 
-        The clause 7.5 stepwise procedure fits ``dp = a*u + b*u**2`` through the
-        origin and evaluates the resistances at the reference velocity
-        ``u = 0.5 mm/s``; the linear coefficient ``a`` is the zero-velocity
+        The clause 7.5 stepwise procedure fits :math:`\Delta p = a u + b u^2`
+        through the origin and evaluates the resistances at the reference
+        velocity :math:`u = 0.5` mm/s; the linear coefficient ``a`` is the
+        zero-velocity
         specific airflow resistance. Resistance quantities are printed to the
         nearest whole Pa*s unit and the evaluation velocity to one decimal
         place (mm/s).
@@ -223,7 +231,7 @@ class StaticAirflowResult:
 
 
 def linear_airflow_velocity(volume_flow_rate: float, area: float) -> float:
-    """Linear airflow velocity ``u = q_v / A`` (ISO 9053-1:2018, 3.4).
+    r"""Linear airflow velocity :math:`u = q_v / A` (ISO 9053-1:2018, 3.4).
 
     ``volume_flow_rate`` is ``q_v`` (m3/s) and ``area`` is ``A`` (m2); returns
     ``u`` in m/s.
@@ -236,11 +244,11 @@ def linear_airflow_velocity(volume_flow_rate: float, area: float) -> float:
 
 
 def airflow_resistance(pressure_drop: float, volume_flow_rate: float) -> float:
-    """Airflow resistance ``R = dp / q_v`` (ISO 9053-1:2018, 3.1).
+    r"""Airflow resistance :math:`R = \Delta p / q_v` (ISO 9053-1:2018, 3.1).
 
-    ``pressure_drop`` is the pressure difference ``dp`` across the specimen (Pa)
-    and ``volume_flow_rate`` is the volumetric airflow rate ``q_v`` (m3/s).
-    Returns ``R`` in Pa*s/m3.
+    ``pressure_drop`` is the pressure difference :math:`\Delta p` across the
+    specimen (Pa) and ``volume_flow_rate`` is the volumetric airflow rate
+    ``q_v`` (m3/s). Returns ``R`` in Pa*s/m3.
     """
     if pressure_drop < 0.0:
         raise ValueError("'pressure_drop' must be non-negative.")
@@ -256,13 +264,15 @@ def specific_airflow_resistance(
     pressure_drop: float | None = None,
     velocity: float | None = None,
 ) -> float:
-    """Specific airflow resistance ``R_s`` in Pa*s/m (ISO 9053-1:2018, 3.2).
+    r"""Specific airflow resistance ``R_s`` in Pa*s/m (ISO 9053-1:2018, 3.2).
 
     Two equivalent routes are accepted; supply exactly one:
 
-    - ``resistance`` (``R``, Pa*s/m3) and ``area`` (``A``, m2): ``R_s = R * A``.
-    - ``pressure_drop`` (``dp``, Pa) and ``velocity`` (``u``, m/s): ``R_s = dp/u``
-      (from ``R_s = R*A`` with ``u = q_v/A``).
+    - ``resistance`` (``R``, Pa*s/m3) and ``area`` (``A``, m2):
+      :math:`R_s = R\,A`.
+    - ``pressure_drop`` (:math:`\Delta p`, Pa) and ``velocity`` (``u``, m/s):
+      :math:`R_s = \Delta p / u` (from :math:`R_s = R\,A` with
+      :math:`u = q_v / A`).
 
     The unit is pascal second per metre (Pa*s/m), not Pa*s/m2.
     """
@@ -292,7 +302,7 @@ def specific_airflow_resistance(
 
 
 def airflow_resistivity(specific_resistance: float, thickness: float) -> float:
-    """Airflow resistivity ``sigma = R_s / d`` in Pa*s/m2 (ISO 9053-1:2018, 3.3).
+    r"""Airflow resistivity :math:`\sigma = R_s / d` (ISO 9053-1:2018, 3.3).
 
     ``specific_resistance`` is ``R_s`` (Pa*s/m) and ``thickness`` is ``d`` (m),
     the specimen thickness in the flow direction. Returns ``sigma`` in Pa*s/m2.
@@ -325,21 +335,23 @@ def static_airflow_resistance(
     *,
     evaluation_velocity: float = _STATIC_REFERENCE_VELOCITY,
 ) -> StaticAirflowResult:
-    """Stepwise static-method airflow resistance (ISO 9053-1:2018, clause 7.5).
+    r"""Stepwise static-method airflow resistance (ISO 9053-1:2018, clause 7.5).
 
-    Fits the measured pressure difference against the linear airflow velocity with
-    a second-order regression constrained through the origin,
-    ``dp = a*u + b*u**2``, and evaluates the resistances at
+    Fits the measured pressure difference against the linear airflow velocity
+    with a second-order regression constrained through the origin,
+    :math:`\Delta p = a u + b u^2`, and evaluates the resistances at
     ``evaluation_velocity`` (the clause 7.5 reference ``0.5e-3 m/s`` by default).
 
     ``velocities`` are the linear airflow velocities ``u`` (m/s) and
-    ``pressure_drops`` the matching pressure differences ``dp`` (Pa) of at least
-    two measurement steps; ``area`` is the cross-section ``A`` (m2) and
-    ``thickness`` the specimen thickness ``d`` (m, optional, enabling ``sigma``).
+    ``pressure_drops`` the matching pressure differences :math:`\Delta p` (Pa)
+    of at least two measurement steps; ``area`` is the cross-section ``A`` (m2)
+    and ``thickness`` the specimen thickness ``d`` (m, optional, enabling
+    ``sigma``).
 
-    Because ``R_s = dp/u = a + b*u``, the returned ``linear_coefficient`` ``a`` is
-    the zero-velocity specific airflow resistance. A velocity above the clause 7.5
-    upper limit (15 mm/s) raises :class:`AirflowResistanceWarning`.
+    Because :math:`R_s = \Delta p / u = a + b u`, the returned
+    ``linear_coefficient`` ``a`` is the zero-velocity specific airflow
+    resistance. A velocity above the clause 7.5 upper limit (15 mm/s) raises
+    :class:`AirflowResistanceWarning`.
     """
     u = np.asarray(velocities, dtype=np.float64)
     dp = np.asarray(pressure_drops, dtype=np.float64)
@@ -387,7 +399,7 @@ def static_airflow_resistance(
 def piston_volume_flow_rate(
     frequency: float, stroke_amplitude: float, piston_area: float
 ) -> float:
-    """RMS piston volume flow ``q_v = 2*pi*f*h*A_P`` (ISO 9053-2:2020, 6.2).
+    r"""RMS piston volume flow :math:`q_v = 2\pi f h A_P` (ISO 9053-2, 6.2).
 
     ``frequency`` is the piston frequency ``f`` (Hz), ``stroke_amplitude`` the
     stroke amplitude ``h`` (m) and ``piston_area`` the piston cross-section
@@ -413,18 +425,19 @@ def thermal_boundary_layer_thickness(
     specific_heat_cp: float = _ANNEX_A_SPECIFIC_HEAT_CP,
     thermal_conductivity: float = _ANNEX_A_THERMAL_CONDUCTIVITY,
 ) -> float:
-    """Thermal boundary-layer thickness ``b`` (ISO 9053-2:2020, Formulae (A.4)/(A.5)).
+    r"""Thermal boundary-layer thickness ``b`` (ISO 9053-2:2020, Formulae (A.4)/(A.5)).
 
-    ::
+    .. math::
 
-        l_h = k_a / (rho0 * c0 * C_P)              (A.5)
-        b   = sqrt(2 * c0 * l_h / omega)           (A.4),  omega = 2*pi*f
+       l_h = \frac{k_a}{\rho_0 c_0 C_P} \tag{A.5}
+
+       b = \sqrt{\frac{2 c_0 l_h}{\omega}}, \qquad \omega = 2\pi f \tag{A.4}
 
     ``frequency`` is the piston frequency ``f`` (Hz); ``speed_of_sound`` ``c0`` (m/s),
     ``air_density`` ``rho0`` (kg/m3), ``specific_heat_cp`` ``C_P`` (J/(kg*K)) and
     ``thermal_conductivity`` ``k_a`` (J/(s*m*K)) are air properties, defaulting to the
     IEC 61094-2:2009 values used in ISO 9053-2:2020 Annex A.3. Returns ``b`` in metres;
-    with the Annex A.3 example (``f = 2 Hz``) this is ``1.83e-3 m``.
+    with the Annex A.3 example (:math:`f = 2` Hz) this is ``1.83e-3 m``.
     """
     if frequency <= 0.0:
         raise ValueError("'frequency' must be positive.")
@@ -452,12 +465,15 @@ def effective_kappa(
     specific_heat_cp: float = _ANNEX_A_SPECIFIC_HEAT_CP,
     thermal_conductivity: float = _ANNEX_A_THERMAL_CONDUCTIVITY,
 ) -> float:
-    """Effective ratio of specific heats ``kappa'`` (ISO 9053-2:2020, Annex A, Formula (A.7)).
+    r"""Effective ratio of specific heats ``kappa'`` (ISO 9053-2:2020, Annex A, Formula (A.7)).
 
     Heat conduction between the oscillating air and the cavity walls makes the
-    compression not fully adiabatic, lowering ``kappa`` to::
+    compression not fully adiabatic, lowering ``kappa`` to:
 
-        kappa' = kappa / sqrt(1 + (kappa-1)*(S/V)*b + 0.5*((kappa-1)*(S/V)*b)**2)   (A.7)
+    .. math::
+
+       \kappa' = \frac{\kappa}{\sqrt{1 + (\kappa - 1)\frac{S}{V} b
+       + 0.5 \left( (\kappa - 1)\frac{S}{V} b \right)^{2}}} \tag{A.7}
 
     with ``b`` the thermal boundary-layer thickness (Formulae (A.4)/(A.5),
     :func:`thermal_boundary_layer_thickness`), ``S`` the total internal surface area
@@ -468,7 +484,8 @@ def effective_kappa(
     the remaining air properties default to the ISO 9053-2:2020 Annex A.3 values.
     Returns the dimensionless ``kappa'`` for use in
     :func:`alternating_airflow_resistance`; the Annex A.3 worked example
-    (``S = 0.0471 m2``, ``V = 7.854e-4 m3``, ``f = 2 Hz``) yields ``kappa' = 1.370``.
+    (:math:`S = 0.0471` m2, :math:`V = 7.854\times 10^{-4}` m3,
+    :math:`f = 2` Hz) yields :math:`\kappa' = 1.370`.
     """
     if cavity_surface <= 0.0:
         raise ValueError("'cavity_surface' must be positive.")
@@ -527,11 +544,14 @@ def alternating_airflow_resistance(
     kappa_prime: float = _ADIABATIC_KAPPA,
     background_level: float | None = None,
 ) -> float:
-    """Alternating-method airflow resistance (ISO 9053-2:2020, Formula (2), 8.7).
+    r"""Alternating-method airflow resistance (ISO 9053-2:2020, Formula (2), 8.7).
 
-    Implements::
+    Implements:
 
-        R = kappa' * P_S / (2*pi*f*V) * (h_t/h_s) * 10**((L_ps - L_pt)/20)
+    .. math::
+
+       R = \frac{\kappa' P_S}{2\pi f V} \, \frac{h_t}{h_s} \,
+       10^{(L_{ps} - L_{pt})/20}
 
     ``level_specimen`` (``L_ps``) and ``level_termination`` (``L_pt``) are the
     cavity sound pressure levels (dB) with the specimen cell and the airtight
@@ -544,10 +564,11 @@ def alternating_airflow_resistance(
     cavity background level ``L_pb`` (dB) for the Formula (4) check. Returns ``R`` in
     Pa*s/m3.
 
-    ``kappa_prime`` defaults to the **uncorrected adiabatic** ``kappa = 1.4``
-    (Formula (A.1)). For a result conforming to the normative Annex A, compute the
-    heat-conduction-corrected ``kappa'`` with :func:`effective_kappa` from the cavity
-    geometry and pass it here (the Annex A.3 example gives ``kappa' = 1.370``).
+    ``kappa_prime`` defaults to the **uncorrected adiabatic**
+    :math:`\kappa = 1.4` (Formula (A.1)). For a result conforming to the
+    normative Annex A, compute the heat-conduction-corrected ``kappa'`` with
+    :func:`effective_kappa` from the cavity geometry and pass it here (the
+    Annex A.3 example gives :math:`\kappa' = 1.370`).
 
     Emits :class:`AirflowResistanceWarning` when the piston frequency is outside
     1-4 Hz or when the Formula (3)/(4) validity criteria are not met.

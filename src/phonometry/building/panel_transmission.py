@@ -1,5 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""
+r"""
 Predicted airborne sound reduction index of panels (Bies, Hansen & Howard
 2017, Engineering Noise Control 5e, Section 7.2; Sharp 1973).
 
@@ -13,39 +13,57 @@ chain from panel physics to the single-number ``Rw``.
 
 **Mass law (Bies Eq. 7.40/7.42).** A non-stiff panel transmits by forced motion;
 the transmission coefficient of an infinite limp panel gives the normal- and
-field-incidence transmission loss::
+field-incidence transmission loss:
 
-    TL_normal = 10 lg(1 + (pi f m'' / (rho0 c0))**2)
-    TL_field  = TL_normal - dB(band)
+.. math::
 
-with ``m''`` the mass per unit area, ``rho0 c0`` the characteristic impedance of
-air and the field-incidence correction ``dB = 5.5`` dB for one-third-octave or
-``4.0`` dB for octave bands (Eq. 7.42). The mass law rises 6 dB per octave and
-6 dB per doubling of mass.
+   \mathrm{TL}_{\mathrm{normal}} = 10 \log_{10}\!\left[ 1 +
+   \left( \frac{\pi f m''}{\rho_0 c_0} \right)^{2} \right]
+
+   \mathrm{TL}_{\mathrm{field}} = \mathrm{TL}_{\mathrm{normal}}
+   - \mathrm{dB}(\text{band})
+
+with ``m''`` the mass per unit area, :math:`\rho_0 c_0` the characteristic
+impedance of air and the field-incidence correction
+:math:`\mathrm{dB} = 5.5` dB for one-third-octave or ``4.0`` dB for octave
+bands (Eq. 7.42). The mass law rises 6 dB per octave and 6 dB per doubling of
+mass.
 
 **Single panel, Sharp's method (Bies 7.2.4.1).** Below the coincidence region
 the field-incidence mass law holds; from the coincidence frequency ``fc``
-upwards the loss factor ``eta`` controls the transmission (Eq. 7.44)::
+upwards the loss factor ``eta`` controls the transmission (Eq. 7.44):
 
-    TL = 10 lg(1 + (pi f m'' / rho0 c0)**2) + 10 lg(2 eta f / (pi fc))
+.. math::
 
-and between ``fc/2`` and ``fc`` the curve is a straight line on ``TL`` versus
-``log10 f``. The coincidence dip at ``fc`` sits ``10 lg(2 eta / pi)`` below the
-extrapolated mass law (Bies design-chart point B,
-``TL = 20 lg(fc m'') + 10 lg eta - 44``).
+   \mathrm{TL} = 10 \log_{10}\!\left[ 1 +
+   \left( \frac{\pi f m''}{\rho_0 c_0} \right)^{2} \right]
+   + 10 \log_{10}\frac{2 \eta f}{\pi f_c}
+
+and between :math:`f_c/2` and :math:`f_c` the curve is a straight line on
+:math:`\mathrm{TL}` versus :math:`\log_{10} f`. The coincidence dip at
+:math:`f_c` sits :math:`10 \log_{10}(2\eta/\pi)` below the extrapolated mass law
+(Bies design-chart point B,
+:math:`\mathrm{TL} = 20 \log_{10}(f_c m'') + 10 \log_{10}\eta - 44`).
 
 **Double wall (Bies 7.2.6, Eq. 7.62-7.64).** Two leaves ``m1``, ``m2`` separated
 by a gap ``d`` behave as a mass-spring-mass system. Below the resonance
-``f0 = (1/2 pi) sqrt(s'' (m1 + m2)/(m1 m2))`` the pair follows the mass law of
-the combined mass ``m1 + m2``; above it the two mass laws add, boosted by the
-cavity (Eq. 7.64)::
+:math:`f_0 = \frac{1}{2\pi} \sqrt{s'' (m_1 + m_2)/(m_1 m_2)}` the pair
+follows the mass law of the combined mass :math:`m_1 + m_2`; above it the two
+mass laws add, boosted by the cavity (Eq. 7.64):
 
-    TL = TL_M                              , f <= f0
-    TL = TL_1 + TL_2 + 20 lg(2 k d)        , f0 < f < f_l   (k = 2 pi f / c0)
-    TL = TL_1 + TL_2 + 6                   , f >= f_l = c0 / (2 pi d)
+.. math::
 
-The cavity stiffness ``s''`` is ``rho0 c0**2 / d`` for an empty (adiabatic) air
-gap; a porous fill (a :class:`~phonometry.materials.PorousMediumResult` from
+   \mathrm{TL} = \mathrm{TL}_M, \qquad f \le f_0
+
+   \mathrm{TL} = \mathrm{TL}_1 + \mathrm{TL}_2 + 20 \log_{10}(2 k d),
+   \qquad f_0 < f < f_l, \quad k = 2 \pi f / c_0
+
+   \mathrm{TL} = \mathrm{TL}_1 + \mathrm{TL}_2 + 6,
+   \qquad f \ge f_l = \frac{c_0}{2 \pi d}
+
+The cavity stiffness ``s''`` is :math:`\rho_0 c_0^{2} / d` for an empty
+(adiabatic) air gap; a porous fill (a
+:class:`~phonometry.materials.PorousMediumResult` from
 :mod:`phonometry.materials.porous_absorber`) lowers the resonance through its
 softer, near-isothermal effective bulk modulus and damps the cavity so the
 mid-band slope is realised without standing-wave dips.
@@ -53,9 +71,10 @@ mid-band slope is realised without standing-wave dips.
 **Orthotropic panels (Bies 7.2.4.5; Vigran, Building Acoustics, 3.7.3 and
 6.5.3).** Ribbed and corrugated cladding is stiff along the corrugations and
 limp across them, so a single coincidence frequency no longer exists: the panel
-has a *range* ``fc1 <= f <= fc2`` bounded by the stiffest and the least stiff
-direction (Vigran Eq. 6.107). The bending-wave impedance then depends on the
-azimuth ``theta`` as well as the incidence angle ``phi`` (Heckl 1960; Hansen
+has a *range* :math:`f_{c1} \le f \le f_{c2}` bounded by the stiffest and the
+least stiff direction (Vigran Eq. 6.107). The bending-wave impedance then
+depends on the azimuth ``theta`` as well as the incidence angle ``phi``
+(Heckl 1960; Hansen
 1993; Vigran Eq. 6.108 = Bies Eq. 7.30), and the diffuse-field average is a
 double integral (Vigran Eq. 6.111 = Bies Eq. 7.38). The consequence is the
 whole point of the model: over one to two decades the resonant transmission
@@ -168,10 +187,11 @@ def mass_law_transmission_loss(
     speed_of_sound: float = _SPEED_OF_SOUND,
     air_density: float = _AIR_DENSITY,
 ) -> np.ndarray:
-    """Mass-law transmission loss of a limp panel (Bies Eq. 7.40/7.42).
+    r"""Mass-law transmission loss of a limp panel (Bies Eq. 7.40/7.42).
 
-    ``TL_normal = 10 lg(1 + (pi f m'' / rho0 c0)**2)``; the field-incidence
-    value subtracts the band correction of :func:`field_incidence_correction`,
+    :math:`\mathrm{TL}_{\mathrm{normal}} = 10 \log_{10}[1 +
+    (\pi f m'' / \rho_0 c_0)^{2}]`; the field-incidence value subtracts the
+    band correction of :func:`field_incidence_correction`,
     or the explicit *field_correction* when one is given (Norton & Karczub
     Eq. 3.106 uses a flat 5 dB, the line :func:`plateau_transmission_loss`
     builds its estimate on).
@@ -254,7 +274,7 @@ class SoundReductionResult:
 
     @property
     def transmission_coefficient(self) -> np.ndarray:
-        """Transmission coefficient ``tau = 10**(-R/10)`` per band."""
+        r"""Transmission coefficient :math:`\tau = 10^{-R/10}` per band."""
         r = np.asarray(self.transmission_loss, dtype=np.float64)
         return np.asarray(10.0 ** (-r / 10.0), dtype=np.float64)
 
@@ -331,15 +351,19 @@ def single_panel_transmission_loss(
     speed_of_sound: float = _SPEED_OF_SOUND,
     air_density: float = _AIR_DENSITY,
 ) -> SoundReductionResult:
-    """Sound reduction index of a single panel, Sharp's method (Bies 7.2.4.1).
+    r"""Sound reduction index of a single panel, Sharp's method (Bies 7.2.4.1).
 
-    Field-incidence mass law up to ``fc/2``, Eq. 7.44 from ``fc`` upwards, and a
-    straight line in ``log10 f`` across the coincidence region between them.
+    Field-incidence mass law up to :math:`f_c/2`, Eq. 7.44 from ``fc``
+    upwards, and a straight line in :math:`\log_{10} f` across the
+    coincidence region between them.
 
     With ``coincidence_model="cremer"`` the region above ``fc`` follows Cremer's
     empirical relationship instead (Norton & Karczub Eq. 3.110),
 
-    ``TL = TL_0 + 10 lg(f/fc - 1) + 10 lg(eta) - 2 dB``,
+    .. math::
+
+       \mathrm{TL} = \mathrm{TL}_0 + 10 \log_{10}(f/f_c - 1)
+       + 10 \log_{10}\eta - 2~\text{dB}
 
     which also rises at 10 dB per octave far above coincidence but starts from
     the singularity at ``fc`` itself rather than from a finite value. Norton
@@ -347,12 +371,13 @@ def single_panel_transmission_loss(
     as the whole model, so there is no interpolated bridge: the mass law runs
     all the way to ``fc``.
 
-    The empirical line is floored at ``TL = 0 dB``, which is where it lands at
-    ``f = fc``: Norton's Eq. (3.109) has ``theta_CO = 90 degrees`` there and the
-    panel "offers no resistance to incident sound waves", ``tau = 1``. It is
-    also the hard bound of a passive panel, so without the floor a band centre
-    landing on ``fc`` would report an arbitrarily large negative TL and a
-    transmission coefficient above one.
+    The empirical line is floored at :math:`\mathrm{TL} = 0` dB, which is
+    where it lands at :math:`f = f_c`: Norton's Eq. (3.109) has
+    :math:`\theta_{\mathrm{CO}} = 90` degrees there and the
+    panel "offers no resistance to incident sound waves", :math:`\tau = 1`.
+    It is also the hard bound of a passive panel, so without the floor a band
+    centre landing on ``fc`` would report an arbitrarily large negative TL
+    and a transmission coefficient above one.
 
     Provide the coincidence frequency directly through *critical_frequency*, or
     let it be computed from *bending_stiffness* and *mass_per_area* through
@@ -366,8 +391,8 @@ def single_panel_transmission_loss(
     :param loss_factor: Total loss factor ``eta`` (> 0, Default: 0.01).
     :param band: Band width for the field correction (``"third"``/``"octave"``).
     :param coincidence_model: ``"sharp"`` (Default, Bies Eq. 7.44 above ``fc``
-        with the interpolated bridge from ``fc/2``) or ``"cremer"`` (Norton
-        Eq. 3.110, mass law right up to ``fc``).
+        with the interpolated bridge from :math:`f_c/2`) or ``"cremer"``
+        (Norton Eq. 3.110, mass law right up to ``fc``).
     :param field_correction: Explicit field-incidence correction of the mass-law
         region, in dB (>= 0), overriding the band table (Default: ``None``;
         Norton's Eq. 3.106 uses a flat 5 dB).
@@ -509,15 +534,16 @@ def plateau_transmission_loss(
     speed_of_sound: float = _SPEED_OF_SOUND,
     air_density: float = _AIR_DENSITY,
 ) -> SoundReductionResult:
-    """Plateau-method estimate of a single panel's TL (Norton 3.9.1).
+    r"""Plateau-method estimate of a single panel's TL (Norton 3.9.1).
 
     The plateau (Watters) construction is the empirical shortcut practitioners
     draw by hand, and it approximates the whole curve from three numbers per
     material (Norton & Karczub Table 3.1, tabulated in
     :data:`PLATEAU_MATERIALS`):
 
-    1. the **field-incidence mass law** ``TL = 10 lg(1 + (pi f m''/rho0 c0)^2)
-       - 5`` (Eqs. 3.104/3.106), rising 6 dB per octave;
+    1. the **field-incidence mass law**
+       :math:`\mathrm{TL} = 10 \log_{10}[1 + (\pi f m''/\rho_0 c_0)^{2}] - 5`
+       (Eqs. 3.104/3.106), rising 6 dB per octave;
     2. a horizontal **coincidence plateau** at the material's plateau height;
        point **A** is where the mass-law line reaches it;
     3. point **B** at ``frequency_ratio x fA``, above which the estimate
@@ -540,10 +566,10 @@ def plateau_transmission_loss(
         *material* to get the surface density.
     :param mass_per_area: Mass per unit area ``m''``, in kg/m^2 (> 0).
     :param plateau_height: Coincidence plateau height, in dB (> 0).
-    :param frequency_ratio: Ratio ``B/A`` locating the 10 dB/octave recovery
-        (> 1).
+    :param frequency_ratio: Ratio :math:`B/A` locating the 10 dB/octave
+        recovery (> 1).
     :param field_correction: Field-incidence correction of the mass-law line,
-        in dB (Default: 5,0, Norton Eq. 3.106).
+        in dB (Default: 5.0, Norton Eq. 3.106).
     :param speed_of_sound: Speed of sound in air ``c0`` (Default: 343 m/s).
     :param air_density: Air density ``rho0`` (Default: 1.205 kg/m^3).
     :return: A :class:`SoundReductionResult` (model ``"plateau"``) carrying
@@ -597,15 +623,18 @@ def plateau_transmission_loss(
 def corrugated_plate_mass_factor(
     corrugation_amplitude: float, corrugation_wavelength: float
 ) -> float:
-    """Surface-density increase of a sine-corrugated plate.
+    r"""Surface-density increase of a sine-corrugated plate.
 
     Corrugating a sheet does not change its thickness, so its mass per unit
     area grows in proportion to the **developed** length of the profile.
     For a sinusoid of amplitude ``H`` and wavelength ``L`` the developed length
     per period, divided by the period, is the closed form
 
-    ``m''/m''_flat = (2/pi) sqrt(1 + q**2) E(q**2/(1 + q**2))``,
-    ``q = 2 pi H / L``
+    .. math::
+
+       \frac{m''}{m''_{\mathrm{flat}}} = \frac{2}{\pi} \sqrt{1 + q^{2}}\,
+       E\!\left( \frac{q^{2}}{1 + q^{2}} \right),
+       \qquad q = \frac{2 \pi H}{L}
 
     with ``E`` the complete elliptic integral of the second kind. Vigran, in
     the worked example following his Eq. (3.115) (printed p. 96), warns that
@@ -614,7 +643,7 @@ def corrugated_plate_mass_factor(
     reproduces his published eigenfrequencies.
 
     :param corrugation_amplitude: Corrugation amplitude ``H``, in m (> 0); the
-        total peak-to-trough depth of the profile is ``2 H``.
+        total peak-to-trough depth of the profile is :math:`2H`.
     :param corrugation_wavelength: Corrugation wavelength ``L``, in m (> 0).
     :return: The factor (>= 1) multiplying the flat-sheet surface density.
     :raises ValueError: for a non-positive input.
@@ -634,15 +663,22 @@ def corrugated_plate_stiffness(
     youngs_modulus: float,
     poisson_ratio: float = 0.3,
 ) -> tuple[float, float, float]:
-    """Equivalent orthotropic stiffnesses of a "wavy" corrugated plate.
+    r"""Equivalent orthotropic stiffnesses of a "wavy" corrugated plate.
 
     Timoshenko & Woinowsky-Krieger's (1959) equivalent bending stiffnesses of a
     plate of thickness ``h`` whose profile is a sinusoid of amplitude ``H`` and
     wavelength ``L``, as transcribed by Vigran Eq. (3.115) (printed p. 96):
 
-    ``Bx  = E h**3 / (12 (1 - nu**2) (1 + (pi H / L)**2))``
-    ``Bz  = (E H**2 h / 2) [1 - 0.81 / (1 + 2.5 (H/L)**2)]``
-    ``Bxz = (E h**3 / (12 (1 + nu))) [1 + (pi H / L)**2]``
+    .. math::
+
+       B_x = \frac{E h^{3}}{12 (1 - \nu^{2})
+       \left[ 1 + (\pi H / L)^{2} \right]}
+
+       B_z = \frac{E H^{2} h}{2}
+       \left[ 1 - \frac{0.81}{1 + 2.5\,(H/L)^{2}} \right]
+
+       B_{xz} = \frac{E h^{3}}{12 (1 + \nu)}
+       \left[ 1 + (\pi H / L)^{2} \right]
 
     ``Bx`` is the stiffness **across** the corrugations (slightly *below* the
     flat-plate value), ``Bz`` the stiffness **along** them (larger by orders of
@@ -660,9 +696,10 @@ def corrugated_plate_stiffness(
     :param corrugation_amplitude: Corrugation amplitude ``H``, in m (> 0).
     :param corrugation_wavelength: Corrugation wavelength ``L``, in m (> 0).
     :param youngs_modulus: Young's modulus ``E``, in Pa (> 0).
-    :param poisson_ratio: Poisson's ratio ``nu`` (Default: 0,3).
+    :param poisson_ratio: Poisson's ratio ``nu`` (Default: 0.3).
     :return: The triple ``(Bx, Bz, Bxz)`` in N.m.
-    :raises ValueError: for a non-positive input or ``|nu| >= 1``.
+    :raises ValueError: for a non-positive input or
+        :math:`\lvert\nu\rvert \ge 1`.
     """
     h = require_positive(thickness, "thickness")
     amplitude = require_positive(corrugation_amplitude, "corrugation_amplitude")
@@ -692,19 +729,23 @@ def orthotropic_plate_resonance(
     bending_stiffness_z: float,
     bending_stiffness_xz: float,
 ) -> float:
-    """Eigenfrequency of a simply supported orthotropic plate (Vigran 3.113).
+    r"""Eigenfrequency of a simply supported orthotropic plate (Vigran 3.113).
 
-    ``f_in = (pi / (2 sqrt(m''))) sqrt(i**4 Bx / a**4 + n**4 Bz / b**4
-    + 2 i**2 n**2 Bxz / (a**2 b**2))`` (Vigran Eq. (3.113), printed p. 95;
-    identical to Bies Eq. (7.27) after Hearmon 1959). It collapses to the
-    isotropic Eq. (3.109) when ``Bx = Bz = B`` and
-    ``Bxz = B (nu + 2 (1 - nu)/2) = B``.
+    .. math::
 
-    The lowest eigenfrequency ``f_1,1`` matters to the transmission-loss
+       f_{i,n} = \frac{\pi}{2 \sqrt{m''}}
+       \sqrt{ \frac{i^{4} B_x}{a^{4}} + \frac{n^{4} B_z}{b^{4}}
+       + \frac{2 i^{2} n^{2} B_{xz}}{a^{2} b^{2}} }
+
+    (Vigran Eq. (3.113), printed p. 95; identical to Bies Eq. (7.27) after
+    Hearmon 1959). It collapses to the isotropic Eq. (3.109) when
+    :math:`B_x = B_z = B` and :math:`B_{xz} = B\,(\nu + 2 (1 - \nu)/2) = B`.
+
+    The lowest eigenfrequency :math:`f_{1,1}` matters to the transmission-loss
     prediction because the infinite-panel models of
     :func:`orthotropic_transmission_loss` and
     :func:`single_panel_transmission_loss` are only valid above about
-    ``1,5 f_1,1`` (Bies, Sect. 7.2.4).
+    :math:`1.5 f_{1,1}` (Bies, Sect. 7.2.4).
 
     :param mode_x: Mode order ``i`` along ``a`` (integer >= 1).
     :param mode_z: Mode order ``n`` along ``b`` (integer >= 1).
@@ -743,11 +784,11 @@ def orthotropic_critical_frequencies(
     *,
     speed_of_sound: float = _SPEED_OF_SOUND,
 ) -> tuple[float, float]:
-    """Coincidence range ``(fc1, fc2)`` of an orthotropic panel (Vigran 6.107).
+    r"""Coincidence range ``(fc1, fc2)`` of orthotropic panels (Vigran 6.107).
 
-    ``fc = (c0**2 / 2 pi) sqrt(m'' / B)`` evaluated for both principal bending
-    stiffnesses (Vigran Eq. (6.107), printed p. 252; the same closed form as
-    the isotropic
+    :math:`f_c = \frac{c_0^{2}}{2 \pi} \sqrt{m'' / B}` evaluated for both
+    principal bending stiffnesses (Vigran Eq. (6.107), printed p. 252; the
+    same closed form as the isotropic
     :func:`~phonometry.vibration.radiation_efficiency.coincidence_frequency`).
     The stiffest direction gives the **lowest** coincidence frequency, so the
     returned pair is sorted: ``fc1`` from the larger stiffness, ``fc2`` from the
@@ -762,7 +803,8 @@ def orthotropic_critical_frequencies(
     :param bending_stiffness_2: The other principal bending stiffness, in N.m
         (> 0). The argument order does not matter.
     :param speed_of_sound: Speed of sound in air ``c0`` (Default: 343 m/s).
-    :return: The pair ``(fc1, fc2)`` in hertz, with ``fc1 <= fc2``.
+    :return: The pair ``(fc1, fc2)`` in hertz, with
+        :math:`f_{c1} \le f_{c2}`.
     :raises ValueError: for a non-positive input.
     """
     m2 = require_positive(mass_per_area, "mass_per_area")
@@ -777,13 +819,13 @@ def orthotropic_critical_frequencies(
 def _limiting_sin_squared(
     area: float | None, limiting_angle: float, wavelength: float
 ) -> float:
-    """Upper limit ``sin^2(theta_L)`` of the diffuse-field integral.
+    r"""Upper limit :math:`\sin^{2}\theta_L` of the diffuse-field integral.
 
     With an *area* the Davy (2009) limit of Bies Eq. (7.36) applies
-    (``cos^2(theta_L) = min(lambda / (2 pi sqrt(A)), 0.9)``, the finite-size
-    correction Vigran writes as Eq. (6.113)); otherwise the fixed
+    (:math:`\cos^{2}\theta_L = \min(\lambda / (2 \pi \sqrt{A}), 0.9)`, the
+    finite-size correction Vigran writes as Eq. (6.113)); otherwise the fixed
     *limiting_angle* is used (Sharp's 78 degrees, the value Vigran also fixes
-    at ``sin^2 = 0,96``).
+    at :math:`\sin^{2}\theta_L = 0.96`).
     """
     if area is None:
         return float(math.sin(math.radians(limiting_angle)) ** 2)
@@ -800,16 +842,17 @@ def _orthotropic_tau(
     z0: float,
     upper: float,
 ) -> float:
-    """Diffuse-field ``tau`` of an infinite orthotropic panel (Vigran 6.111).
+    r"""Diffuse-field ``tau`` of an infinite orthotropic panel (Vigran 6.111).
 
     The double integral of Vigran Eq. (6.111) / Bies Eq. (7.38) over the
-    azimuth ``theta`` and ``x = sin^2(phi)``, with the wall impedance of
+    azimuth ``theta`` and :math:`x = \sin^{2}\phi`, with the wall impedance of
     Vigran Eq. (6.108) / Bies Eq. (7.30) and the angular transmission
     coefficient of Eq. (6.109) / Eq. (7.31).
 
     Above the coincidence range and at a low loss factor the inner integrand
     is a narrow spike at the angle where the bracket of Eq. (6.108) vanishes,
-    ``x = 1/sqrt(ratio)``, whose width is set by ``eta``. That location is
+    :math:`x = 1/\sqrt{\mathrm{ratio}}`, whose width is set by ``eta``. That
+    location is
     known in closed form, so it is handed to the quadrature as a break point
     (``points``, i.e. QUADPACK's QAGP) instead of being left for the adaptive
     subdivision to stumble on.
@@ -848,11 +891,12 @@ def _heckl_transmission_loss(
     air_density: float,
     correction: float,
 ) -> np.ndarray:
-    """Heckl's (1960) piecewise orthotropic estimate (Bies 7.2.4.5).
+    r"""Heckl's (1960) piecewise orthotropic estimate (Bies 7.2.4.5).
 
-    Field-incidence mass law below ``fc1/2``, Bies Eq. (7.59) (= the first of
-    Vigran Eq. (6.112)) from ``fc1`` to ``fc2/2``, Bies Eq. (7.60) (= the
-    second) above ``2 fc2``, and straight lines in ``log10 f`` across the two
+    Field-incidence mass law below :math:`f_{c1}/2`, Bies Eq. (7.59) (= the
+    first of Vigran Eq. (6.112)) from ``fc1`` to :math:`f_{c2}/2`, Bies
+    Eq. (7.60) (= the second) above :math:`2 f_{c2}`, and straight lines in
+    :math:`\log_{10} f` across the two
     gaps, as Bies Figure 7.9(b) draws them.
     """
     z0 = air_density * speed_of_sound
@@ -916,7 +960,7 @@ def orthotropic_transmission_loss(
     speed_of_sound: float = _SPEED_OF_SOUND,
     air_density: float = _AIR_DENSITY,
 ) -> SoundReductionResult:
-    """Sound reduction index of an orthotropic panel (Vigran 6.5.3, Bies 7.2.4.5).
+    r"""Orthotropic-panel sound reduction index (Vigran 6.5.3, Bies 7.2.4.5).
 
     A ribbed or corrugated sheet is stiff along the corrugations and limp across
     them, so instead of one coincidence dip it has a whole **coincidence range**
@@ -928,39 +972,49 @@ def orthotropic_transmission_loss(
     Two prediction routes, both from the same wall impedance (Heckl 1960;
     Hansen 1993; Vigran Eq. (6.108) = Bies Eq. (7.30))
 
-    ``Zw = j w m'' [1 - ((f/fc1) cos^2(theta) + (f/fc2) sin^2(theta))**2
-    (1 + j eta) sin^4(phi)]``
+    .. math::
+
+       Z_w = j \omega m'' \left[ 1
+       - \left( (f/f_{c1}) \cos^{2}\theta
+       + (f/f_{c2}) \sin^{2}\theta \right)^{2}
+       (1 + j \eta) \sin^{4}\phi \right]
 
     * ``method="integral"`` (Default) averages the angular transmission
-      coefficient ``tau = |1 + Zw cos(phi) / (2 rho0 c0)|**-2`` (Vigran
-      Eq. (6.109) = Bies Eq. (7.31)) over azimuth and incidence angle,
-      ``tau_F = (2/pi) int_0^{pi/2} int_0^{sin^2(theta_L)} tau d(sin^2 phi)
-      d(theta)`` (Vigran Eq. (6.111) = Bies Eq. (7.38)), numerically. The
+      coefficient
+      :math:`\tau = \lvert 1 + Z_w \cos\phi / (2 \rho_0 c_0) \rvert^{-2}`
+      (Vigran Eq. (6.109) = Bies Eq. (7.31)) over azimuth and incidence
+      angle, :math:`\tau_F = \frac{2}{\pi} \int_0^{\pi/2}
+      \int_0^{\sin^{2}\theta_L} \tau \,d(\sin^{2}\phi)\, d\theta`
+      (Vigran Eq. (6.111) = Bies Eq. (7.38)), numerically. The
       near-grazing angles are excluded by the limiting angle: pass *area* for
       the size-dependent limit of Bies Eq. (7.36) (the correction Vigran writes
       as Eq. (6.113)) or leave it out for the fixed *limiting_angle*. This is
       the only route that responds to the loss factor.
-    * ``method="heckl"`` is Heckl's closed-form approximation for ``eta = 0``,
-      the design chart of Bies Figure 7.9(b): field-incidence mass law below
-      ``fc1/2``, Eq. (7.59) (the first of Vigran Eq. (6.112)) from ``fc1`` to
-      ``fc2/2``, Eq. (7.60) (the second) above ``2 fc2``, and straight lines in
-      ``log10 f`` across the two gaps. It is cheap and it needs no loss factor,
-      but it cannot show the depth of the coincidence region and it requires
-      ``fc2 > 4 fc1`` for its four construction points to stay ordered.
+    * ``method="heckl"`` is Heckl's closed-form approximation for
+      :math:`\eta = 0`, the design chart of Bies Figure 7.9(b):
+      field-incidence mass law below :math:`f_{c1}/2`, Eq. (7.59) (the first
+      of Vigran Eq. (6.112)) from ``fc1`` to :math:`f_{c2}/2`, Eq. (7.60)
+      (the second) above :math:`2 f_{c2}`, and straight lines in
+      :math:`\log_{10} f` across the two gaps. It is cheap and it needs no
+      loss factor, but it cannot show the depth of the coincidence region and
+      it requires :math:`f_{c2} > 4 f_{c1}` for its four construction points
+      to stay ordered.
 
-    The two routes are not interchangeable. Above ``2 fc2`` they converge as
-    the loss factor falls: with ``eta -> 0`` the integral lands within about
-    0,3 dB of Eq. (7.60), which is a useful independent check on both
+    The two routes are not interchangeable. Above :math:`2 f_{c2}` they
+    converge as the loss factor falls: with :math:`\eta \to 0` the integral
+    lands within about 0.3 dB of Eq. (7.60), which is a useful independent
+    check on both
     transcriptions. Across the coincidence range Eq. (7.59) is a much rougher
     approximation and stays a few decibels above the integral even at
-    ``eta -> 0``, as Vigran's Figure 6.27 shows for its own worked case.
+    :math:`\eta \to 0`, as Vigran's Figure 6.27 shows for its own worked case.
 
-    Both models are infinite-panel models, valid above roughly ``1,5 f_1,1``
-    (:func:`orthotropic_plate_resonance`). Bies also notes two systematic
-    departures of the Heckl branch from measurement: below about ``0,7 fc1`` it
-    underestimates ``R`` on small panels, and real corrugated panels show a dip
-    of up to 5 dB between 2 kHz and 4 kHz caused by resonances of the panel
-    sections between the ribs, which no smooth model predicts.
+    Both models are infinite-panel models, valid above roughly
+    :math:`1.5 f_{1,1}` (:func:`orthotropic_plate_resonance`). Bies also
+    notes two systematic departures of the Heckl branch from measurement:
+    below about :math:`0.7 f_{c1}` it underestimates ``R`` on small panels,
+    and real corrugated panels show a dip of up to 5 dB between 2 kHz and
+    4 kHz caused by resonances of the panel sections between the ribs, which
+    no smooth model predicts.
 
     :param frequency: Band centre frequencies ``f``, in hertz (array, > 0).
     :param mass_per_area: Mass per unit area ``m''``, in kg/m^2 (> 0).
@@ -968,15 +1022,16 @@ def orthotropic_transmission_loss(
         hertz (> 0), from the stiffest direction.
     :param critical_frequency_upper: Upper coincidence frequency ``fc2``, in
         hertz (> ``fc1``).
-    :param loss_factor: Total loss factor ``eta`` (> 0, Default: 0,01); used
+    :param loss_factor: Total loss factor ``eta`` (> 0, Default: 0.01); used
         only by ``method="integral"``, but validated on both routes.
     :param method: ``"integral"`` (Default) or ``"heckl"``.
     :param area: Panel area ``S``, in m^2 (> 0), selecting the size-dependent
         limiting angle of Bies Eq. (7.36) (Default: ``None``); used only by
         ``method="integral"``, but validated on both routes.
     :param limiting_angle: Fixed limiting angle ``theta_L``, in degrees
-        (0 < theta_L < 90, Default: 78,0), used when *area* is ``None`` and
-        only by ``method="integral"``, but validated on both routes.
+        (:math:`0 < \theta_L < 90`, Default: 78.0), used when *area* is
+        ``None`` and only by ``method="integral"``, but validated on both
+        routes.
     :param band: Band width for the field correction of the Heckl mass-law
         branch (``"third"``/``"octave"``).
     :param speed_of_sound: Speed of sound in air ``c0`` (Default: 343 m/s).
@@ -1058,17 +1113,18 @@ def mass_spring_mass_resonance(
     speed_of_sound: float = _SPEED_OF_SOUND,
     air_density: float = _AIR_DENSITY,
 ) -> float:
-    """Mass-spring-mass resonance ``f0`` of a double wall (Bies Eq. 7.62).
+    r"""Mass-spring-mass resonance ``f0`` of a double wall (Bies Eq. 7.62).
 
-    ``f0 = (1/2 pi) sqrt(s'' (m1 + m2)/(m1 m2))`` with the cavity stiffness per
-    unit area ``s''``. For an empty air gap ``s'' = rho0 c0**2 / d`` (adiabatic,
+    :math:`f_0 = \frac{1}{2 \pi} \sqrt{s'' (m_1 + m_2)/(m_1 m_2)}` with the
+    cavity stiffness per unit area ``s''``. For an empty air gap
+    :math:`s'' = \rho_0 c_0^{2} / d` (adiabatic,
     Hopkins Eq. 4.72); with a porous *cavity_medium* the fill's effective
     (near-isothermal) bulk modulus at the lowest supplied frequency sets a
-    softer ``s'' = Re(K_e) / d``, lowering ``f0``.
+    softer :math:`s'' = \operatorname{Re}(K_e) / d`, lowering ``f0``.
 
     An array of mechanical connections across the cavity (wall ties in a
     masonry cavity wall, resilient mounts under a floating floor) acts as a
-    spring **in parallel** with the cavity, adding ``N k / S`` to ``s''``
+    spring **in parallel** with the cavity, adding :math:`N k / S` to ``s''``
     (Hopkins Eq. 4.89). Pass that term as *tie_stiffness_per_area*; the helper
     :func:`phonometry.wall_tie_stiffness_per_area` builds it from a tie density
     and Hopkins' Table A4.
@@ -1079,7 +1135,7 @@ def mass_spring_mass_resonance(
     :param cavity_medium: Optional porous fill (a
         :class:`~phonometry.materials.PorousMediumResult`) whose effective bulk
         modulus sets the cavity stiffness.
-    :param tie_stiffness_per_area: Stiffness per unit area ``N k / S`` of a
+    :param tie_stiffness_per_area: Stiffness per unit area :math:`N k / S` of a
         connection array bridging the cavity, in N/m^3 (>= 0, Default: 0).
     :param speed_of_sound: Speed of sound in air ``c0`` (Default: 343 m/s).
     :param air_density: Air density ``rho0`` (Default: 1.205 kg/m^3).
@@ -1118,13 +1174,13 @@ def double_wall_transmission_loss(
     speed_of_sound: float = _SPEED_OF_SOUND,
     air_density: float = _AIR_DENSITY,
 ) -> SoundReductionResult:
-    """Sound reduction index of a double wall (Bies 7.2.6, Eq. 7.64).
+    r"""Sound reduction index of a double wall (Bies 7.2.6, Eq. 7.64).
 
     Piecewise Sharp model: below the mass-spring-mass resonance ``f0`` the pair
     behaves as the mass law of the combined mass; between ``f0`` and the
-    limiting frequency ``f_l = c0/(2 pi d)`` the two mass laws add plus
-    ``20 lg(2 k d)``; above ``f_l`` they add plus 6 dB. The curve is continuous
-    at ``f_l`` (``20 lg(2 k d) = 6`` there).
+    limiting frequency :math:`f_l = c_0/(2 \pi d)` the two mass laws add plus
+    :math:`20 \log_{10}(2 k d)`; above ``f_l`` they add plus 6 dB. The curve is
+    continuous at ``f_l`` (:math:`20 \log_{10}(2 k d) = 6` there).
 
     Ties or mounts bridging the cavity stiffen it (Hopkins Eq. 4.89), pushing
     ``f0`` up and extending the combined-mass branch; pass their stiffness per
@@ -1139,7 +1195,7 @@ def double_wall_transmission_loss(
         for the coincidence extension and reported for reference.
     :param cavity_medium: Optional porous fill; see
         :func:`mass_spring_mass_resonance`.
-    :param tie_stiffness_per_area: Stiffness per unit area ``N k / S`` of a
+    :param tie_stiffness_per_area: Stiffness per unit area :math:`N k / S` of a
         connection array bridging the cavity, in N/m^3 (>= 0, Default: 0).
     :param band: Band width for the field correction (``"third"``/``"octave"``).
     :param speed_of_sound: Speed of sound in air ``c0`` (Default: 343 m/s).

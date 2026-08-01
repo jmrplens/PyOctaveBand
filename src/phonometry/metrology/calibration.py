@@ -23,9 +23,9 @@ class CalibrationWarning(PhonometryWarning):
 def _class1_fluctuation_limit(frequency: float) -> float:
     """Class 1 short-term fluctuation limit for a nominal calibrator frequency.
 
-    IEC 60942:2017 Table 2 rows: 31,5-63 Hz -> 0,20 dB; > 63 to < 160 Hz ->
-    0,10 dB; 160 Hz and above -> 0,07 dB. Frequencies outside the specified
-    31,5 Hz to 16 kHz span fall back to the strictest limit (0,07 dB).
+    IEC 60942:2017 Table 2 rows: 31.5-63 Hz -> 0.20 dB; > 63 to < 160 Hz ->
+    0.10 dB; 160 Hz and above -> 0.07 dB. Frequencies outside the specified
+    31.5 Hz to 16 kHz span fall back to the strictest limit (0.07 dB).
     """
     if 31.5 <= frequency <= 63.0:
         return 0.20
@@ -44,7 +44,7 @@ def sensitivity(
     frequency: float = 1000.0,
     narrowband: bool = False,
 ) -> float:
-    """
+    r"""
     Calculate the calibration factor (multiplier) to convert digital units
     to Pascals based on a reference recording (e.g., 1kHz @ 94dB).
 
@@ -55,8 +55,8 @@ def sensitivity(
     the maximum and minimum levels and the mean level) must not exceed the
     Table 2 acceptance limit for the calibrator class (class 1: 0.07 dB at
     and above 160 Hz, relaxed to 0.10 dB above 63 Hz and below 160 Hz, and to
-    0.20 dB for the 31,5-63 Hz rows where the F time-weighting itself ripples;
-    below Table 2's 31,5 Hz span the strict 0.07 dB applies). A larger
+    0.20 dB for the 31.5-63 Hz rows where the F time-weighting itself ripples;
+    below Table 2's 31.5 Hz span the strict 0.07 dB applies). A larger
     fluctuation usually means a badly coupled microphone or handling noise in
     the recording, which would silently corrupt every calibrated level; a
     :class:`CalibrationWarning` is emitted.
@@ -82,7 +82,8 @@ def sensitivity(
         a coherent single-frequency (Goertzel) detector locked to the tone
         near ``frequency`` instead of the full-band RMS. This rejects
         broadband hum/noise in the reference take, which otherwise inflates
-        the RMS and shrinks the factor by ``-10*lg(1 + 1/SNR)`` (about
+        the RMS and shrinks the factor by
+        :math:`-10 \log_{10}(1 + 1/\mathrm{SNR})` (about
         -0.44 dB at 20 dB SNR), silently biasing every subsequent level.
         The default (False) keeps the exact legacy broadband-RMS behaviour;
         enable it for noisy coupler recordings.
@@ -182,11 +183,12 @@ def _validate_reference_stability(
 def _narrowband_tone_rms(
     signal_arr: np.ndarray, fs: int, frequency: float
 ) -> float:
-    """RMS amplitude of the calibration tone via coherent detection.
+    r"""RMS amplitude of the calibration tone via coherent detection.
 
     A Hann-windowed single-frequency (Goertzel) detector locked to the tone
     near ``frequency`` recovers the tone RMS while rejecting broadband noise,
-    which averages toward zero as ``1/sqrt(N)`` because it is incoherent with
+    which averages toward zero as :math:`1/\sqrt{N}` because it is
+    incoherent with
     the detector. Multichannel input is reduced to the same flattened power
     the broadband path uses. The nominal frequency is refined to the local
     spectral peak (parabolic interpolation) so calibrator frequency tolerance

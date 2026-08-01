@@ -1,17 +1,20 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""
+r"""
 Underwater sound propagation: transmission loss (closed-form).
 
 Transmission loss ``TL`` (dB) is the sum of geometrical spreading and volume
 absorption:
 
-* :func:`spreading_loss` -- geometrical spreading, ``20·lg R`` (spherical),
-  ``10·lg R`` (cylindrical) or spherical-then-cylindrical (``"practical"``).
-* :func:`seawater_absorption` -- the volume absorption coefficient ``α`` in
+* :func:`spreading_loss` -- geometrical spreading, :math:`20 \log_{10} R`
+  (spherical), :math:`10 \log_{10} R` (cylindrical) or spherical-then-cylindrical
+  (``"practical"``).
+* :func:`seawater_absorption` -- the volume absorption coefficient
+  :math:`\alpha` in
   dB/km, from three coexisting formulations selectable through ``model``:
   Francois & Garrison (1982, the default and reference), Ainslie & McColm (1998,
   a legible simplification of it) and Thorp (1967, a frequency-only form).
-* :func:`transmission_loss` -- the total ``TL = spreading + α·R`` versus range,
+* :func:`transmission_loss` -- the total
+  :math:`\mathrm{TL} = \text{spreading} + \alpha R` versus range,
   returned as a :class:`TransmissionLossResult` with a ``.plot()``.
 
 Sources (clean-room, implemented from the published equations): Francois &
@@ -62,12 +65,12 @@ def spreading_loss(
     law: str = "spherical",
     transition_range: float | None = None,
 ) -> NDArray[np.float64]:
-    """Geometrical spreading loss, in dB.
+    r"""Geometrical spreading loss, in dB.
 
-    ``"spherical"`` gives ``20·lg(R)`` (free field), ``"cylindrical"`` gives
-    ``10·lg(R)`` (perfect waveguide) and ``"practical"`` is spherical up to
-    ``transition_range`` ``R0`` then cylindrical:
-    ``20·lg(R0) + 10·lg(R/R0)`` (mode stripping in a channel).
+    ``"spherical"`` gives :math:`20 \log_{10}(R)` (free field), ``"cylindrical"``
+    gives :math:`10 \log_{10}(R)` (perfect waveguide) and ``"practical"`` is
+    spherical up to ``transition_range`` ``R0`` then cylindrical:
+    :math:`20 \log_{10}(R_0) + 10 \log_{10}(R/R_0)` (mode stripping in a channel).
 
     :param range_m: Range ``R`` from the source, in metres (scalar or array,
         strictly positive).
@@ -146,7 +149,7 @@ def seawater_absorption(
     ph: float = 8.0,
     model: str = "francois-garrison",
 ) -> NDArray[np.float64]:
-    """Volume absorption coefficient ``α``, in dB/km.
+    r"""Volume absorption coefficient :math:`\alpha`, in dB/km.
 
     :param frequency_hz: Acoustic frequency, in Hz (scalar or array).
     :param temperature: Temperature ``T``, in degrees Celsius.
@@ -179,14 +182,15 @@ def seawater_absorption(
 
 @dataclass(frozen=True)
 class TransmissionLossResult:
-    """Transmission loss versus range (closed-form).
+    r"""Transmission loss versus range (closed-form).
 
     :ivar range_m: Ranges from the source, in metres.
     :ivar tl: Total transmission loss per range, in dB.
     :ivar spreading: Geometrical-spreading contribution per range, in dB.
     :ivar absorption: Volume-absorption contribution per range, in dB.
     :ivar frequency: The acoustic frequency, in Hz.
-    :ivar absorption_coefficient: The absorption coefficient ``α``, in dB/km.
+    :ivar absorption_coefficient: The absorption coefficient :math:`\alpha`,
+        in dB/km.
     :ivar law: The spreading law used.
     :ivar model: The absorption model used.
     """
@@ -220,7 +224,8 @@ def transmission_loss(
     model: str = "francois-garrison",
     transition_range: float | None = None,
 ) -> TransmissionLossResult:
-    """Total transmission loss ``TL = spreading + α·R`` versus range.
+    r"""Total transmission loss
+    :math:`\mathrm{TL} = \text{spreading} + \alpha R` versus range.
 
     :param range_m: Range(s) from the source, in metres (scalar or array).
     :param frequency_hz: Acoustic frequency, in Hz.

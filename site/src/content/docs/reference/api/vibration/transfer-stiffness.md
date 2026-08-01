@@ -11,46 +11,46 @@ The vibro-acoustic transfer property of a resilient element (a vibration
 isolator, mount, bellows or hose) is its **dynamic transfer stiffness**: the
 frequency-dependent ratio of the *blocking force* phasor `F2,b` on the output
 (receiver) side to the displacement phasor `u1` on the input (source) side,
-with the output blocked (ISO 10846-1, 3.7):
+with the output blocked (ISO 10846-1, 3.7), in N/m:
 
-```text
-k2,1 = F2,b / u1                                             [N/m]
-```
+$$
+k_{2,1} = \frac{F_{2,b}}{u_1}
+$$
 
 For an isolator between two structures of large driving-point stiffness, the
 force delivered to the receiver approximates this blocking force (ISO 10846-1,
-Equation 7), so `k2,1` characterises the isolator's transmission. Results are
-reported as a **level** re the reference stiffness `k0 = 1 N/m` (ISO 10846-2
-and -3, 3.17):
+Equation 7), so $k_{2,1}$ characterises the isolator's transmission.
+Results are reported as a **level**, in dB, re the reference stiffness
+$k_0 = 1$ N/m (ISO 10846-2 and -3, 3.17):
 
-```text
-L_k = 10 lg(|k2,1|**2 / k0**2) = 20 lg(|k2,1| / k0)          [dB]
-```
+$$
+L_k = 10 \log_{10}\!\left( \frac{|k_{2,1}|^2}{k_0^2} \right) = 20 \log_{10}\!\left( \frac{|k_{2,1}|}{k_0} \right)
+$$
 
 and, in the low-frequency range where inertial forces in the element are
-negligible, the **loss factor** is the tangent of the phase angle of `k2,1`
-(ISO 10846-1, 3.8): `eta = Im(k2,1) / Re(k2,1)`.
+negligible, the **loss factor** is the tangent of the phase angle of
+$k_{2,1}$ (ISO 10846-1, 3.8):
+$\eta = \operatorname{Im}(k_{2,1}) / \operatorname{Re}(k_{2,1})$.
 
-Two laboratory methods determine `k2,1`:
+Two laboratory methods determine $k_{2,1}$:
 
 * **Direct method** (ISO 10846-2): measure the blocked output force `F2,b`
-  and the input displacement `u1` directly: `k2,1 = F2,b / u1`.
+  and the input displacement `u1` directly:
+  $k_{2,1} = F_{2,b} / u_1$.
 * **Indirect method** (ISO 10846-3): load the output with a compact blocking
-  mass `m2` and measure the vibration transmissibility `T = u2/u1`; the
-  blocking force is the mass's inertia force (ISO 10846-3, Equation 1):
-
-```text
-k2,1 = -(2 pi f)**2 (m2 + mf) T          for  T << 1
-```
-
+  mass `m2` and measure the vibration transmissibility
+  $T = u_2/u_1$; the blocking force is the mass's inertia force
+  (ISO 10846-3, Equation 1):
+  $k_{2,1} = -(2\pi f)^2 (m_2 + m_f) T$ for $T \ll 1$,
   where `mf` is the mass of the output flange of the test element. The
-  approximation is valid only where `|T| <= 0.1` (Inequality (2):
-  `DeltaL1,2 >= 20 dB`) and while the blocking mass still behaves rigidly,
-  `10 lg(m2,eff**2/m2**2) <= 1 dB` (Inequality (3)); see
-  [`transfer_stiffness_indirect`](/phonometry/reference/api/vibration/transfer-stiffness/#transfer_stiffness_indirect).
+  approximation is valid only where $|T| \le 0.1$ (Inequality (2):
+  $\Delta L_{1,2} \ge 20$ dB) and while the blocking mass still
+  behaves rigidly, $10 \log_{10}(m_{2,\mathrm{eff}}^2/m_2^2) \le 1$ dB
+  (Inequality (3)); see [`transfer_stiffness_indirect`](/phonometry/reference/api/vibration/transfer-stiffness/#transfer_stiffness_indirect).
 
 The dynamic transfer stiffness is a member of the frequency-response-function
-family (ISO 10846-1, Annex A / Table A.2): `k = j omega Z = -omega**2 m_eff`,
+family (ISO 10846-1, Annex A / Table A.2):
+$k = j\omega Z = -\omega^2 m_{\mathrm{eff}}$,
 so it converts to mechanical impedance and effective mass through
 [`phonometry.convert_frf`](/phonometry/reference/api/vibration/mechanical-mobility/#convert_frf) (`"dynamic_stiffness"` \<-> `"impedance"` \<->
 `"apparent_mass"`). This module feeds the structure-borne source and building
@@ -75,12 +75,15 @@ The output mass `m` on a massless Kelvin-Voigt element (spring `k` in
 parallel with a viscous damper `c`) driven at the input has the
 base-excitation transmissibility
 
-`T = u2/u1 = (k + j omega c) / (k - omega**2 m + j omega c)`.
+$$
+T = \frac{u_2}{u_1} = \frac{k + j\omega c}{k - \omega^2 m + j\omega c}
+$$
 
 This ideal-element model is the counterpart of the indirect-method test
-arrangement (ISO 10846-3): feeding `T` into [`transfer_stiffness_indirect`](/phonometry/reference/api/vibration/transfer-stiffness/#transfer_stiffness_indirect)
-with the same mass recovers the element's transfer stiffness `k + j omega c`
-in the high-frequency limit `T << 1`.
+arrangement (ISO 10846-3): feeding `T` into
+[`transfer_stiffness_indirect`](/phonometry/reference/api/vibration/transfer-stiffness/#transfer_stiffness_indirect) with the same mass recovers the
+element's transfer stiffness $k + j\omega c$ in the high-frequency
+limit $T \ll 1$.
 
 **Parameters**
 
@@ -105,16 +108,20 @@ blocking_force_ratio(
 Ratio of the delivered force to the blocking force (ISO 10846-1, Eq. 6).
 
 For an isolator driving a receiving structure, the output force for a
-given source displacement `u1` is `F2 = k2,1 u1 / (1 + k2,2/kt)`
+given source displacement `u1` is
+$F_2 = k_{2,1} u_1 / (1 + k_{2,2}/k_t)$
 (Equation (6)), where `k2,2` is the isolator's output driving-point
 stiffness (output blocked at the input) and `kt` the dynamic
 driving-point stiffness of the termination. This function returns
 
-`F2 / F2,b = 1 / (1 + k2,2/kt)`
+$$
+\frac{F_2}{F_{2,b}} = \frac{1}{1 + k_{2,2}/k_t}
+$$
 
 the factor by which the delivered force deviates from the blocking force
-`F2,b = k2,1 u1` of Equation (7). For `|k2,2| < 0.1 |kt|` the ratio is
-within 10 % of unity (`1/1.1 = 0.909` at the limit), which is the
+$F_{2,b} = k_{2,1} u_1$ of Equation (7). For
+$|k_{2,2}| < 0.1 |k_t|$ the ratio is within 10 % of unity
+($1/1.1 = 0.909$ at the limit), which is the
 stiffness mismatch that justifies characterising an isolator by its
 blocked transfer stiffness alone.
 
@@ -148,15 +155,15 @@ indirect_transfer_stiffness_result(
 Indirect-method transfer stiffness bundled as a [`TransferStiffnessResult`](/phonometry/reference/api/vibration/transfer-stiffness/#transferstiffnessresult).
 
 See [`transfer_stiffness_indirect`](/phonometry/reference/api/vibration/transfer-stiffness/#transfer_stiffness_indirect) for the ISO 10846-3 validity
-conditions (Inequalities (2) and (3)); bands with `|T| > 0.1` trigger a
-[`PhonometryWarning`](/phonometry/reference/api/filters/phonometry/#phonometrywarning).
+conditions (Inequalities (2) and (3)); bands with $|T| > 0.1$
+trigger a [`PhonometryWarning`](/phonometry/reference/api/filters/phonometry/#phonometrywarning).
 
 **Parameters**
 
 | Name | Description |
 | :--- | :--- |
 | `frequency` | Frequencies `f`, in hertz (array). |
-| `transmissibility` | Vibration transmissibility `T = u2/u1` (complex). |
+| `transmissibility` | Vibration transmissibility $T = u_2/u_1$ (complex). |
 | `blocking_mass` | Blocking mass `m2`, in kg (> 0). |
 | `flange_mass` | Output-flange mass `mf`, in kg (Default: 0.0). |
 
@@ -166,7 +173,7 @@ conditions (Inequalities (2) and (3)); bands with `|T| > 0.1` trigger a
 
 | Warning | When |
 | :--- | :--- |
-| PhonometryWarning | where any `\|T\| > 0.1` (Inequality (2) violated). |
+| PhonometryWarning | where any $\lvert T\rvert > 0.1$ (Inequality (2) violated). |
 
 ## loss_factor
 
@@ -174,7 +181,9 @@ conditions (Inequalities (2) and (3)); bands with `|T| > 0.1` trigger a
 loss_factor(stiffness: ArrayLike) -> np.ndarray
 ```
 
-Loss factor `eta = Im(k2,1) / Re(k2,1)` (ISO 10846-1, 3.8).
+Loss factor
+$\eta = \operatorname{Im}(k_{2,1}) / \operatorname{Re}(k_{2,1})$
+(ISO 10846-1, 3.8).
 
 Valid in the low-frequency range where inertial forces in the element are
 negligible; it is the tangent of the phase angle of the transfer stiffness.
@@ -183,7 +192,7 @@ negligible; it is the tangent of the phase angle of the transfer stiffness.
 
 | Name | Description |
 | :--- | :--- |
-| `stiffness` | Dynamic transfer stiffness `k2,1` (complex, scalar or array, with a non-zero real part), in N/m. |
+| `stiffness` | Dynamic transfer stiffness $k_{2,1}$ (complex, scalar or array, with a non-zero real part), in N/m. |
 
 **Returns:** The loss factor `eta` (dimensionless).
 
@@ -191,7 +200,7 @@ negligible; it is the tangent of the phase angle of the transfer stiffness.
 
 | Exception | When |
 | :--- | :--- |
-| ValueError | for a purely imaginary stiffness (`Re(k2,1) = 0`), for which the loss factor is undefined. |
+| ValueError | for a purely imaginary stiffness ($\operatorname{Re}(k_{2,1}) = 0$), for which the loss factor is undefined. |
 
 ## REFERENCE_STIFFNESS
 
@@ -212,8 +221,8 @@ transfer_stiffness_direct(
 
 Dynamic transfer stiffness by the direct method (ISO 10846-2).
 
-`k2,1 = F2,b / u1`, the blocked output force phasor over the input
-displacement phasor.
+$k_{2,1} = F_{2,b} / u_1$, the blocked output force phasor over
+the input displacement phasor.
 
 **Parameters**
 
@@ -222,7 +231,7 @@ displacement phasor.
 | `blocking_force` | Blocked output force phasor `F2,b` (complex), in N. |
 | `input_displacement` | Input displacement phasor `u1` (complex, non-zero), in m. |
 
-**Returns:** The dynamic transfer stiffness `k2,1`, in N/m.
+**Returns:** The dynamic transfer stiffness $k_{2,1}$, in N/m.
 
 **Raises**
 
@@ -244,35 +253,39 @@ transfer_stiffness_indirect(
 
 Dynamic transfer stiffness by the indirect method (ISO 10846-3, Eq. 1).
 
-`k2,1 = -(2 pi f)**2 (m2 + mf) T`: the blocking force is the inertia
-force of a compact blocking mass `m2` (plus the output flange mass
-`mf`), derived from the measured vibration transmissibility `T = u2/u1`.
-Valid for `T << 1` (i.e. well above the mass/spring resonance).
+$k_{2,1} = -(2\pi f)^2 (m_2 + m_f) T$: the blocking force is the
+inertia force of a compact blocking mass `m2` (plus the output flange
+mass `mf`), derived from the measured vibration transmissibility
+$T = u_2/u_1$. Valid for $T \ll 1$ (i.e. well above the
+mass/spring resonance).
 
-**Validity (ISO 10846-3, clause 6).** The `T << 1` approximation of
-Formula (1) is required accurate within 1 dB, i.e. within 12 % of the
+**Validity (ISO 10846-3, clause 6).** The $T \ll 1$ approximation
+of Formula (1) is required accurate within 1 dB, i.e. within 12 % of the
 calculated stiffness magnitude. This holds only where Inequality (2) is
-met: `DeltaL1,2 = La1 - La2 >= 20 dB`, i.e. `|T| <= 0.1`
-([`TRANSMISSIBILITY_LIMIT`](/phonometry/reference/api/vibration/transfer-stiffness/#transmissibility_limit)). Bands with `|T|` above that limit
+met: $\Delta L_{1,2} = L_{a1} - L_{a2} \ge 20$ dB, i.e.
+$|T| \le 0.1$ ([`TRANSMISSIBILITY_LIMIT`](/phonometry/reference/api/vibration/transfer-stiffness/#transmissibility_limit)). Bands with
+`|T|` above that limit
 (routine near or below the mass/spring resonance) trigger a
 [`PhonometryWarning`](/phonometry/reference/api/filters/phonometry/#phonometrywarning); treat those bands as outside the
 valid frequency range of the test arrangement. The upper frequency limit
 `f3` additionally requires the blocking mass to vibrate as a rigid
-body: results are valid only while its effective mass `m2,eff`, measured
-per Formula (4) as `m2,eff = 2 F2 / (a'1 + a''1)` (two accelerometers
-spaced `D = sqrt(S)` across the contact area), stays within 1 dB of the
-rigid mass, `10 lg(m2,eff**2 / m2**2) <= 1 dB` (Inequality (3), 6.2.3).
+body: results are valid only while its effective mass `m2,eff`,
+measured per Formula (4) as
+$m_{2,\mathrm{eff}} = 2 F_2 / (a'_1 + a''_1)$ (two accelerometers
+spaced $D = \sqrt{S}$ across the contact area), stays within 1 dB
+of the rigid mass, $10 \log_{10}(m_{2,\mathrm{eff}}^2 / m_2^2) \le 1$ dB
+(Inequality (3), 6.2.3).
 
 **Parameters**
 
 | Name | Description |
 | :--- | :--- |
 | `frequency` | Frequency `f`, in hertz (scalar or array). |
-| `transmissibility` | Vibration transmissibility `T = u2/u1` (complex, scalar or array; velocity and acceleration ratios have the same value). |
+| `transmissibility` | Vibration transmissibility $T = u_2/u_1$ (complex, scalar or array; velocity and acceleration ratios have the same value). |
 | `blocking_mass` | Blocking mass `m2`, in kg (> 0). |
 | `flange_mass` | Output-flange mass `mf`, in kg (Default: 0.0). |
 
-**Returns:** The dynamic transfer stiffness `k2,1`, in N/m.
+**Returns:** The dynamic transfer stiffness $k_{2,1}$, in N/m.
 
 **Raises**
 
@@ -284,7 +297,7 @@ rigid mass, `10 lg(m2,eff**2 / m2**2) <= 1 dB` (Inequality (3), 6.2.3).
 
 | Warning | When |
 | :--- | :--- |
-| PhonometryWarning | where any `\|T\| > 0.1` (Inequality (2) violated). |
+| PhonometryWarning | where any $\lvert T\rvert > 0.1$ (Inequality (2) violated). |
 
 ## transfer_stiffness_level
 
@@ -298,13 +311,14 @@ transfer_stiffness_level(
 
 Level of the dynamic transfer stiffness (ISO 10846-2/-3, 3.17).
 
-`L_k = 20 lg(|k2,1| / k0)` dB, with `k0` the reference stiffness.
+$L_k = 20 \log_{10}(|k_{2,1}| / k_0)$ dB, with `k0` the reference
+stiffness.
 
 **Parameters**
 
 | Name | Description |
 | :--- | :--- |
-| `stiffness` | Dynamic transfer stiffness `k2,1` (complex or real, scalar or array, non-zero), in N/m. |
+| `stiffness` | Dynamic transfer stiffness $k_{2,1}$ (complex or real, scalar or array, non-zero), in N/m. |
 | `reference` | Reference stiffness `k0` (Default: 1 N/m), in N/m. |
 
 **Returns:** The level `L_k`, in dB re `k0`.
@@ -332,7 +346,7 @@ A dynamic transfer stiffness over frequency (ISO 10846).
 | Name | Description |
 | :--- | :--- |
 | `frequencies` | Frequencies, in hertz. |
-| `transfer_stiffness` | Complex `k2,1` per frequency, in N/m. |
+| `transfer_stiffness` | Complex $k_{2,1}$ per frequency, in N/m. |
 | `blocking_mass` | Blocking mass `m2` used (indirect method), in kg, or `None` for the direct method. |
 
 ### TransferStiffnessResult.level
@@ -345,13 +359,14 @@ Transfer-stiffness level `L_k` re 1 N/m, in dB (3.17).
 
 *property*
 
-Loss factor `eta = Im/Re` per frequency (3.8).
+Loss factor $\eta = \operatorname{Im}/\operatorname{Re}$
+per frequency (3.8).
 
 ### TransferStiffnessResult.magnitude
 
 *property*
 
-Transfer-stiffness magnitude `|k2,1|`, in N/m.
+Transfer-stiffness magnitude $|k_{2,1}|$, in N/m.
 
 ### TransferStiffnessResult.plot()
 
@@ -391,7 +406,8 @@ ISO 10846-3:2002; definition per ISO 10846-1:2008), an optional metadata
 header, a two-panel body with a compact table of the FRF's
 characteristic points (the method, the blocking mass for the indirect
 method, the frequency range, and the low-frequency stiffness plateau
-`|k2,1|`, its level `L_k` and the loss factor `eta` there) beside
+$|k_{2,1}|$, its level `L_k` and the loss factor `eta`
+there) beside
 the transfer-stiffness level spectrum `L_k(f)`, a boxed low-frequency
 `L_k` with the stiffness magnitude and method alongside, and a footer
 identity/disclaimer block.
@@ -426,10 +442,10 @@ there is no pass/fail verdict.
 TransferStiffnessResult.to(target: str) -> np.ndarray
 ```
 
-Convert `k2,1` to a related FRF (ISO 10846-1 Annex A / Table A.2).
+Convert $k_{2,1}$ to an FRF (ISO 10846-1 Annex A / Table A.2).
 
-`target` is `"impedance"` (`Z = k/(j omega)`) or
-`"apparent_mass"` (`m_eff = -k/omega**2`); see
+`target` is `"impedance"` ($Z = k/(j\omega)$) or
+`"apparent_mass"` ($m_{\mathrm{eff}} = -k/\omega^2$); see
 [`phonometry.convert_frf`](/phonometry/reference/api/vibration/mechanical-mobility/#convert_frf).
 
 ## TRANSMISSIBILITY_LIMIT

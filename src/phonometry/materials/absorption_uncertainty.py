@@ -1,5 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""
+r"""
 Measurement uncertainty for sound absorption (ISO 12999-2:2020).
 
 Companion of the sound-insulation uncertainty of :mod:`phonometry.building_uncertainty`
@@ -21,17 +21,20 @@ to ISO 5725. Where specimen-specific uncertainty data exist they take precedence
 (Clause 4).
 
 **Band formulae (Clause 5-6).** For the absorption coefficient
-``σR = m·α + n`` (Formula (1)/(4)); for the equivalent area
-``σR = m·AT + n·S`` with ``S = 10 m²`` (Formula (2)); the repeatability value is
-``σr = 0,6·σR`` (Formula (3)/(5)). ``m`` and ``n`` are the frequency-dependent
+:math:`\sigma_R = m \alpha + n` (Formula (1)/(4)); for the equivalent area
+:math:`\sigma_R = m A_T + n S` with :math:`S = 10~\text{m}^2` (Formula (2));
+the repeatability value is :math:`\sigma_r = 0.6\,\sigma_R` (Formula (3)/(5)).
+``m`` and ``n`` are the frequency-dependent
 constants of Table 1 (one-third-octave, 63-5000 Hz) and Table 2 (octave,
 250-4000 Hz).
 
-**Single numbers (Clause 7).** ``αw``: ``σR = 0,035`` (Formula (6)),
-``σr = 0,020`` (Formula (7)). ``DLα,NRD``: ``σR = 0,10·DLα,NRD`` (Formula (8)),
-``σr = 0,02·DLα,NRD`` (Formula (9)).
+**Single numbers (Clause 7).** ``αw``: :math:`\sigma_R = 0.035`
+(Formula (6)), :math:`\sigma_r = 0.020` (Formula (7)). ``DLα,NRD``:
+:math:`\sigma_R = 0.10\,D_{L\alpha,\mathrm{NRD}}` (Formula (8)),
+:math:`\sigma_r = 0.02\,D_{L\alpha,\mathrm{NRD}}` (Formula (9)).
 
-**Reporting (Clause 8).** The expanded uncertainty is ``U = k·u`` (Formula (10))
+**Reporting (Clause 8).** The expanded uncertainty is
+:math:`U = k\,u` (Formula (10))
 with the coverage factor ``k`` of Table 3 (Gaussian assumption). The reported
 ``U`` is rounded to two decimal digits for absorption coefficients and one decimal
 digit for the equivalent area and ``DLα,NRD``; the code keeps the exact ``U`` and
@@ -169,7 +172,8 @@ def absorption_coverage_factor(confidence: float = 0.95) -> float:
 
 @dataclass(frozen=True)
 class AbsorptionUncertaintyResult:
-    """Standard and expanded uncertainty of an absorption quantity (ISO 12999-2).
+    r"""Standard and expanded uncertainty of an absorption quantity
+    (ISO 12999-2).
 
     For the single-number quantities (``αw``, ``DLα,NRD``) the frequency and value
     arrays are empty and the uncertainty arrays hold a single element.
@@ -181,7 +185,8 @@ class AbsorptionUncertaintyResult:
     :ivar values: The input quantity per band (empty for single numbers).
     :ivar standard_uncertainty: Standard uncertainty ``u`` (``σR``/``σr``), one per band.
     :ivar coverage_factor: Coverage factor ``k`` (Table 3).
-    :ivar expanded_uncertainty: Exact ``U = k·u`` (Formula (10)), one per band.
+    :ivar expanded_uncertainty: Exact :math:`U = k\,u` (Formula (10)), one
+        per band.
     """
 
     quantity: str
@@ -247,7 +252,8 @@ def _band_uncertainty(
     confidence: float,
     band_kind: str,
 ) -> AbsorptionUncertaintyResult:
-    """Shared engine for the coefficient formulae ``σR = m·α + n`` (values == α)."""
+    r"""Shared engine for the coefficient formulae
+    :math:`\sigma_R = m \alpha + n` (values == α)."""
     if values.shape != frequencies.shape:
         raise ValueError(
             f"'{quantity}' values and frequencies must have the same shape; "
@@ -275,10 +281,11 @@ def sound_absorption_coefficient_uncertainty(
     condition: str = "reproducibility",
     confidence: float = 0.95,
 ) -> AbsorptionUncertaintyResult:
-    """Uncertainty of the ISO 354 sound absorption coefficient ``αs`` (Clause 5).
+    r"""Uncertainty of the ISO 354 sound absorption coefficient ``αs``
+    (Clause 5).
 
-    ``σR = m·αs + n`` (Formula (1)) per one-third-octave band; ``σr = 0,6·σR``
-    (Formula (3)).
+    :math:`\sigma_R = m \alpha_s + n` (Formula (1)) per one-third-octave band;
+    :math:`\sigma_r = 0.6\,\sigma_R` (Formula (3)).
 
     :param alpha: Sound absorption coefficient ``αs`` per band.
     :param frequencies: One-third-octave midband frequencies in Hz (Table 1,
@@ -306,10 +313,11 @@ def equivalent_area_uncertainty(
     condition: str = "reproducibility",
     confidence: float = 0.95,
 ) -> AbsorptionUncertaintyResult:
-    """Uncertainty of the ISO 354 equivalent sound absorption area ``AT`` (Clause 5).
+    r"""Uncertainty of the ISO 354 equivalent sound absorption area ``AT``
+    (Clause 5).
 
-    ``σR = m·AT + n·S`` with ``S = 10 m²`` (Formula (2)) per one-third-octave band;
-    ``σr = 0,6·σR`` (Formula (3)).
+    :math:`\sigma_R = m A_T + n S` with :math:`S = 10~\text{m}^2` (Formula (2))
+    per one-third-octave band; :math:`\sigma_r = 0.6\,\sigma_R` (Formula (3)).
 
     :param area: Equivalent sound absorption area ``AT`` per band, in m².
     :param frequencies: One-third-octave midband frequencies in Hz (Table 1),
@@ -349,9 +357,11 @@ def practical_coefficient_uncertainty(
     condition: str = "reproducibility",
     confidence: float = 0.95,
 ) -> AbsorptionUncertaintyResult:
-    """Uncertainty of the ISO 11654 practical absorption coefficient ``αp`` (Clause 6).
+    r"""Uncertainty of the ISO 11654 practical absorption coefficient ``αp``
+    (Clause 6).
 
-    ``σR = m·αp + n`` (Formula (4)) per octave band; ``σr = 0,6·σR`` (Formula (5)).
+    :math:`\sigma_R = m \alpha_p + n` (Formula (4)) per octave band;
+    :math:`\sigma_r = 0.6\,\sigma_R` (Formula (5)).
 
     :param alpha_p: Practical sound absorption coefficient ``αp`` per band.
     :param frequencies: Octave midband frequencies in Hz (Table 2, 250-4000),
@@ -399,10 +409,12 @@ def weighted_coefficient_uncertainty(
     condition: str = "reproducibility",
     confidence: float = 0.95,
 ) -> AbsorptionUncertaintyResult:
-    """Uncertainty of the ISO 11654 weighted absorption coefficient ``αw`` (Clause 7).
+    r"""Uncertainty of the ISO 11654 weighted absorption coefficient ``αw``
+    (Clause 7).
 
-    The standard uncertainty is a constant: ``σR = 0,035`` (Formula (6)),
-    ``σr = 0,020`` (Formula (7)), independent of the value.
+    The standard uncertainty is a constant: :math:`\sigma_R = 0.035`
+    (Formula (6)), :math:`\sigma_r = 0.020` (Formula (7)), independent of
+    the value.
 
     :param alpha_w: Weighted sound absorption coefficient ``αw`` (carried through
         for the reported interval; does not affect ``u``).
@@ -426,9 +438,11 @@ def single_number_rating_uncertainty(
     condition: str = "reproducibility",
     confidence: float = 0.95,
 ) -> AbsorptionUncertaintyResult:
-    """Uncertainty of the EN 1793-1 single-number rating ``DLα,NRD`` (Clause 7).
+    r"""Uncertainty of the EN 1793-1 single-number rating ``DLα,NRD``
+    (Clause 7).
 
-    ``σR = 0,10·DLα,NRD`` (Formula (8)), ``σr = 0,02·DLα,NRD`` (Formula (9)).
+    :math:`\sigma_R = 0.10\,D_{L\alpha,\mathrm{NRD}}` (Formula (8)),
+    :math:`\sigma_r = 0.02\,D_{L\alpha,\mathrm{NRD}}` (Formula (9)).
 
     :param dl_alpha: Single-number rating ``DLα,NRD``, in dB (non-negative).
     :param condition: ``"reproducibility"`` (default) or ``"repeatability"``.

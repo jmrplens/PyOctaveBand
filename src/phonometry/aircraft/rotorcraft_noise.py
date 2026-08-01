@@ -1,13 +1,15 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""
+r"""
 Rotorcraft noise by the hemisphere method (ECAC Doc 32 / NORAH2).
 
 The ECAC Doc 32 rotorcraft-noise method describes a helicopter's highly directive
 source with a **noise hemisphere**: one-third-octave-band sound pressure levels on
 a spherical grid of azimuth ``φ`` and polar angle ``θ`` at a fixed 60 m reference
 distance (at ICAO reference atmospheric conditions). Placing that source at a
-receiver adds the propagation adjustment ``ΔLp = ΔLs + ΔLa + ΔLg (+ ΔLd)``
-(spherical spreading, atmospheric absorption, ground effect and, later, shielding).
+receiver adds the propagation adjustment
+:math:`\Delta L_p = \Delta L_s + \Delta L_a + \Delta L_g` (plus
+:math:`\Delta L_d` with shielding): spherical spreading, atmospheric
+absorption, ground effect and, later, shielding.
 
 This module provides the source and propagation primitives and the single-event
 method built on them (clean-room, from the NORAH2 guidance SC01.D1.5d, the basis
@@ -16,8 +18,10 @@ of ECAC Doc 32):
 * :func:`hemisphere_source_level` -- the interpolated source level ``L(fc, φ, θ)``
   from a :class:`RotorcraftHemisphere`, bilinear over the 10° grid (Eq. 13) with
   nearest-bin fill outside the measured coverage (Eq. 14/15).
-* :func:`spherical_spreading_adjustment` -- ``ΔLs = −20·log10(r/60)`` (Eq. 24).
-* :func:`atmospheric_adjustment` -- ``ΔLa = −α(f)·(r−60)`` with the ISO 9613-1
+* :func:`spherical_spreading_adjustment` --
+  :math:`\Delta L_s = -20 \cdot \log_{10}(r/60)` (Eq. 24).
+* :func:`atmospheric_adjustment` --
+  :math:`\Delta L_a = -\alpha(f) \cdot (r - 60)` with the ISO 9613-1
   pure-tone coefficient (Eq. 26/27), reusing
   :func:`~phonometry.environmental.air_absorption.air_attenuation`.
 * :func:`ground_effect_adjustment` -- ``ΔLg`` for a point source over an impedance
@@ -86,11 +90,11 @@ _FLOW_RESISTIVITY = {
 def spherical_spreading_adjustment(
     distance: float, *, reference_distance: float = _RH,
 ) -> float:
-    """Spherical-spreading adjustment ``ΔLs`` of the hemisphere level (Eq. 24).
+    r"""Spherical-spreading adjustment ``ΔLs`` of the hemisphere level (Eq. 24).
 
     The hemisphere levels are defined at the reference distance ``rh`` (60 m in
     the standard database), so at slant distance ``r`` the geometric spreading
-    adjustment is ``ΔLs = −20·log10(r/rh)``.
+    adjustment is :math:`\Delta L_s = -20 \cdot \log_{10}(r/r_h)`.
 
     :param distance: Slant distance ``r`` from the rotorcraft to the observer, in
         metres (``> 0``).
@@ -114,11 +118,12 @@ def atmospheric_adjustment(
     pressure: float = 101.325,
     reference_distance: float = _RH,
 ) -> NDArray[np.float64]:
-    """Atmospheric-absorption adjustment ``ΔLa`` of the hemisphere level (Eq. 26/27).
+    r"""Atmospheric-absorption adjustment ``ΔLa`` of the hemisphere level (Eq. 26/27).
 
     The hemisphere already includes absorption out to the reference distance
-    ``rh``, so only the excess path ``r − rh`` is corrected:
-    ``ΔLa = −α(f)·(r − rh)`` with the ISO 9613-1 pure-tone coefficient ``α``
+    ``rh``, so only the excess path :math:`r - r_h` is corrected:
+    :math:`\Delta L_a = -\alpha(f) \cdot (r - r_h)` with the ISO 9613-1
+    pure-tone coefficient ``α``
     evaluated at the exact band centre (Eq. 26/27, ICAO reference atmosphere by
     default). This matches the guidance Eq. 27 to 0.02 dB/km and the NORAH2
     reference implementation. The guidance's alternative per-band mapping (SAE
@@ -128,8 +133,9 @@ def atmospheric_adjustment(
 
     .. note::
         The printed guidance Eq. 27 pairs the coefficient ``6.6928e-6`` with
-        ``fr,O = 630.7`` Hz, which evaluates to nonsense (14.3 dB/km at 500 Hz
-        against Table 4's 3.1). The physically correct pairing (``6.6928e-6``
+        :math:`f_{r,O} = 630.7` Hz, which evaluates to nonsense (14.3 dB/km
+        at 500 Hz against Table 4's 3.1). The physically correct pairing
+        (``6.6928e-6``
         with the oxygen relaxation frequency, ``1.3415e-6`` with 630.7 Hz)
         reproduces Table 4 and this implementation to 0.02 dB/km; do not
         "fix" the code by transcribing the typo.
@@ -151,8 +157,8 @@ def atmospheric_adjustment(
     :param reference_distance: Hemisphere reference distance ``rh``, in metres
         (default 60). Pass :attr:`RotorcraftHemisphere.distance` when the data
         uses a non-standard polar distance.
-    :return: The adjustment ``ΔLa`` per band, in dB (added to the level, ``<= 0``
-        for ``r >= rh``).
+    :return: The adjustment ``ΔLa`` per band, in dB (added to the level,
+        :math:`\le 0` for :math:`r \ge r_h`).
     :raises ValueError: If a distance is not strictly positive.
     """
     f = require_positive_array(frequencies, "frequencies")
@@ -179,12 +185,13 @@ def ground_effect_adjustment(
     *,
     flow_resistivity: float | str = "G",
 ) -> NDArray[np.float64]:
-    """Ground-effect adjustment ``ΔLg`` over an impedance plane (Eq. 28-35).
+    r"""Ground-effect adjustment ``ΔLg`` over an impedance plane (Eq. 28-35).
 
     A point source over a locally-reacting impedance ground produces interference
     between the direct and reflected rays. With the spherical reflection
     coefficient ``Q`` (Chien-Soroka) and the Delany-Bazley impedance,
-    ``ΔLg = 10·log10{1 + (r1/r2)²|Q|² + 2(r1/r2)|Q|·I}`` (Eq. 29), where ``I``
+    :math:`\Delta L_g = 10 \cdot \log_{10}\{1 + (r_1/r_2)^2 \lvert Q \rvert^2
+    + 2 (r_1/r_2) \lvert Q \rvert \cdot I\}` (Eq. 29), where ``I``
     (Eq. 30) is the in-band interference factor.
 
     :param frequencies: One-third-octave-band centre frequencies, in Hz.
@@ -197,8 +204,9 @@ def ground_effect_adjustment(
     :param flow_resistivity: Ground flow resistivity ``σ`` in Pa·s/m², or a
         CNOSSOS class letter ``"A"``-``"H"``. The default ``"G"`` (20e6, hard
         surfaces) is the CNOSSOS class covering the paved surroundings typical
-        of heliports; the guidance's own suggestions, concrete ``σ = 65e6`` for
-        city areas and grass ``σ = 200e3`` for rural areas (§A.4.3), can be
+        of heliports; the guidance's own suggestions, concrete
+        :math:`\sigma = 65 \times 10^6` for city areas and grass
+        :math:`\sigma = 200 \times 10^3` for rural areas (§A.4.3), can be
         passed as numeric values.
     :return: The adjustment ``ΔLg`` per band, in dB (added to the level).
     :raises ValueError: If the inputs are invalid.
@@ -432,12 +440,13 @@ def _fill_grid(
     azimuth: NDArray[np.float64], polar: NDArray[np.float64],
     levels: NDArray[np.float64],
 ) -> NDArray[np.float64]:
-    """Nearest-bin gap fill of a hemisphere grid (Eq. 14/15).
+    r"""Nearest-bin gap fill of a hemisphere grid (Eq. 14/15).
 
     Every empty ``(φ, θ)`` bin of each band takes the level of its angularly
-    nearest filled bin, ``ρ = arccos(x·x_{m,n})``, compared through the dot
-    product itself (monotone in ``ρ`` and, unlike the angle, well-conditioned
-    near ``ρ = 0``). Equally-near bins are energy-averaged, as required by the
+    nearest filled bin, :math:`\rho = \arccos(x \cdot x_{m,n})`, compared
+    through the dot product itself (monotone in ``ρ`` and, unlike the angle,
+    well-conditioned near :math:`\rho = 0`). Equally-near bins are
+    energy-averaged, as required by the
     guidance under Eq. 14/15. Bands with no filled bin at all stay ``NaN``.
     """
     n_az, n_po, n_f = levels.shape
@@ -470,12 +479,13 @@ def _fill_grid(
 
 @dataclass(frozen=True)
 class MeanGroundPlaneResult:
-    """A mean ground plane fitted to a terrain section (guidance Eq. 36-40).
+    r"""A mean ground plane fitted to a terrain section (guidance Eq. 36-40).
 
     ECAC Doc 32, 1st ed., assumes flat terrain; its guidance (§A.4.4)
     represents a varying vertical section by the least-squares line
-    ``z = a·d + b`` through the terrain polyline, evaluated in closed form
-    from the per-segment integrals (Eq. 37-40). Equivalent source and
+    :math:`z = a \cdot d + b` through the terrain polyline, evaluated in
+    closed form from the per-segment integrals (Eq. 37-40). Equivalent source
+    and
     receiver heights are then measured orthogonally to this plane and
     substituted into the flat-ground equations.
 
@@ -491,7 +501,7 @@ class MeanGroundPlaneResult:
     heights: NDArray[np.float64]
 
     def height(self, distance: float | NDArray[np.float64]) -> NDArray[np.float64]:
-        """The plane height ``a·d + b`` at ``distance``, in metres."""
+        r"""The plane height :math:`a\,d + b` at ``distance``, in metres."""
         return np.asarray(self.slope * np.asarray(distance, dtype=np.float64)
                           + self.intercept, dtype=np.float64)
 
@@ -517,15 +527,16 @@ def mean_ground_plane(
     distances: NDArray[np.float64] | list[float],
     heights: NDArray[np.float64] | list[float],
 ) -> MeanGroundPlaneResult:
-    """The mean ground plane of a terrain section (guidance Eq. 36-40).
+    r"""The mean ground plane of a terrain section (guidance Eq. 36-40).
 
-    Fits ``z = a·d + b`` to the polyline of straight segments that form the
+    Fits :math:`z = a \cdot d + b` to the polyline of straight segments that
+    form the
     terrain profile by continuous least squares (the residual is integrated
     along ``d``, not summed over the vertices), using the closed forms of
     Eq. 37/38 with the segment integrals ``A`` and ``B`` of Eq. 39/40.
 
     :param distances: Section distances ``d``, in metres, strictly
-        increasing, shape ``(M,)`` with ``M ≥ 2`` (arbitrary spacing).
+        increasing, shape ``(M,)`` with :math:`M \ge 2` (arbitrary spacing).
     :param heights: Terrain heights ``z(d)``, in metres, shape ``(M,)``.
     :return: A :class:`MeanGroundPlaneResult`.
     :raises ValueError: If the inputs are invalid.
@@ -570,11 +581,13 @@ def mean_flow_resistivity(
     lengths: NDArray[np.float64] | list[float],
     resistivities: NDArray[np.float64] | list[float],
 ) -> float:
-    """Logarithmic mean flow resistivity along a path (guidance Eq. 41).
+    r"""Logarithmic mean flow resistivity along a path (guidance Eq. 41).
 
     When the ground type changes along a terrain profile, the guidance
     averages the flow resistivity by the logarithm, weighted by the length of
-    each ground segment: ``σ̄ = 10^(Σ dᵢ·log10(σᵢ) / Σ dᵢ)``.
+    each ground segment:
+    :math:`\bar{\sigma} = 10^{\sum d_i \cdot \log_{10}(\sigma_i)
+    / \sum d_i}`.
 
     :param lengths: Segment lengths ``dᵢ``, in metres (``> 0``), shape ``(n,)``.
     :param resistivities: Segment flow resistivities ``σᵢ``, in Pa·s/m²
@@ -597,22 +610,28 @@ def diffraction_attenuation(
     edge_span: float = 0.0,
     capped: bool = True,
 ) -> NDArray[np.float64]:
-    """Pure diffraction attenuation ``ΔLd`` per band (guidance Eq. 42-44).
+    r"""Pure diffraction attenuation ``ΔLd`` per band (guidance Eq. 42-44).
 
-    ``ΔLd = 10·Ch·log10(3 + (40/λ)·C″·δ)`` where the argument is at least 1
-    (below it the attenuation is 0), ``Ch = min(fm·h0/250, 1)`` (Eq. 43) and
-    ``C″`` accounts for multiple diffraction (Eq. 44: 1 for a single edge or
-    an edge span ``e ≤ 0.3 m``, ``(1 + (5λ/e)²)/(1/3 + (5λ/e)²)`` otherwise).
+    :math:`\Delta L_d = 10 \cdot C_h \cdot \log_{10}(3 + (40/\lambda)
+    \cdot C'' \cdot \delta)` where the argument is at least 1
+    (below it the attenuation is 0),
+    :math:`C_h = \min(f_m \cdot h_0/250, 1)` (Eq. 43) and
+    :math:`C''` accounts for multiple diffraction (Eq. 44: 1 for a single
+    edge or an edge span :math:`e \le 0.3` m,
+    :math:`(1 + (5\lambda/e)^2)/(1/3 + (5\lambda/e)^2)` otherwise).
     A negative path difference (edge below the line of sight) still yields a
-    small attenuation down to ``(40/λ)·C″·δ = −2``; for bands with
-    ``δ < −λ/20`` the screening chain evaluates the clear-path ground effect
+    small attenuation down to
+    :math:`(40/\lambda) \cdot C'' \cdot \delta = -2`; for bands with
+    :math:`\delta < -\lambda/20` the screening chain evaluates the
+    clear-path ground effect
     instead of the diffraction (§A.4.5). At grazing incidence
-    (``δ = 0``) the attenuation is the classical ``10·log10(3) ≈ 4.8 dB``.
+    (:math:`\delta = 0`) the attenuation is the classical
+    :math:`10 \cdot \log_{10}(3) \approx 4.8` dB.
 
     The attenuation is returned positive (a loss); in the Doc 32 Eq. 23
     chain, whose adjustments are added to the level, it enters with a minus
     sign. The wavelength uses the Doc 32 reference speed of sound
-    ``c = 346.1 m/s``.
+    :math:`c = 346.1` m/s.
 
     :param frequencies: One-third-octave-band centre frequencies, in Hz.
     :param path_difference: Path difference ``δ`` between the diffracted and
@@ -648,13 +667,14 @@ def diffraction_attenuation(
 
 @dataclass(frozen=True)
 class TerrainScreeningResult:
-    """Ground and screening over a terrain section (guidance §A.4.4-A.4.5).
+    r"""Ground and screening over a terrain section (guidance §A.4.4-A.4.5).
 
     :ivar frequencies: Band centre frequencies, in Hz, shape ``(F,)``.
     :ivar adjustment: The combined ground-and-screening adjustment per band,
         in dB, added to the received level in the Doc 32 Eq. 23 chain (it
         replaces the flat-ground ``ΔLg``): the mean-ground-plane ground
-        effect when the line of sight is clear, ``−(ΔLd + ΔLg)`` of Eq. 45
+        effect when the line of sight is clear,
+        :math:`-(\Delta L_d + \Delta L_g)` of Eq. 45
         when terrain blocks it.
     :ivar screened: Whether terrain blocks the line of sight (any profile
         point strictly above it).
@@ -695,7 +715,7 @@ def terrain_screening_adjustment(
     *,
     flow_resistivity: float | str | NDArray[np.float64] | list[float] = "G",
 ) -> TerrainScreeningResult:
-    """Ground effect and terrain screening over a vertical section (§A.4.4-A.4.5).
+    r"""Ground effect and terrain screening over a vertical section (§A.4.4-A.4.5).
 
     The terrain profile between the source and the receiver decides the
     propagation regime:
@@ -714,10 +734,11 @@ def terrain_screening_adjustment(
       receiver-side ground effects weighted by their image-path diffractions
       (Eq. 45-47), each side using its own mean ground plane, equivalent
       heights and log-mean flow resistivity. The ground effect is not
-      evaluated separately in this regime; bands with ``δ < −λ/20`` fall
+      evaluated separately in this regime; bands with
+      :math:`\delta < -\lambda/20` fall
       back to the clear-path evaluation (with terrain-only obstacles
-      ``δ > 0``, so the rule engages for constructed screens below the line
-      of sight rather than for terrain).
+      :math:`\delta > 0`, so the rule engages for constructed screens below
+      the line of sight rather than for terrain).
 
     ECAC Doc 32, 1st ed., defines no screening or topography (its Eq. 12
     propagation chain ends at the flat-ground ``ΔLg``); this implements the
@@ -900,10 +921,11 @@ def _screening_core(
 def _mirrored_point(
     point: tuple[float, float], equivalent_height: float, slope: float,
 ) -> tuple[float, float]:
-    """The orthogonal mirror image of a point across a side mean plane.
+    r"""The orthogonal mirror image of a point across a side mean plane.
 
     The image sits at twice the (orthogonal) equivalent height along the
-    plane's downward normal, ``p − 2·h·n̂`` with ``n̂ = (−a, 1)/√(1+a²)``
+    plane's downward normal, :math:`p - 2 \cdot h \cdot \hat{n}` with
+    :math:`\hat{n} = (-a, 1)/\sqrt{1+a^2}`
     (guidance Figure 8: S′/R′ are the images in relation to the side mean
     ground planes).
     """
@@ -944,16 +966,21 @@ def flight_condition_weights(
     scaling_factor: float = 2.0,
     triangles: NDArray[np.int_] | list[list[int]] | None = None,
 ) -> list[tuple[int, float]]:
-    """Hemisphere blending weights for a flight condition (Eq. 3-10).
+    r"""Hemisphere blending weights for a flight condition (Eq. 3-10).
 
     The database flight conditions and the query are scaled by the database
-    spans, ``V̄ = V/(V_max − V_min)`` and ``γ̄ = F_fc·γ/(γ_max − γ_min)`` with
-    the empirical flight-condition scaling factor ``F_fc = 2``: the guidance's
+    spans, :math:`\bar{V} = V/(V_{\mathrm{max}} - V_{\mathrm{min}})` and
+    :math:`\bar{\gamma} = F_{fc} \cdot \gamma
+    / (\gamma_{\mathrm{max}} - \gamma_{\mathrm{min}})` with
+    the empirical flight-condition scaling factor :math:`F_{fc} = 2`: the
+    guidance's
     normalisation (Eq. 3-6), which subtracts no minima -- a shared offset
     cancels in the distances ``δ_j`` (Eq. 7) either way. Inside the
     convex hull of the database conditions the enveloping Delaunay triangle
-    contributes with inverse-distance weights ``(1/δ_j)/Σ(1/δ_j)``,
-    ``δ_j = √((γ̄−γ̄_j)² + (V̄−V̄_j)²)`` (Eq. 7/8); outside it (and whenever no
+    contributes with inverse-distance weights
+    :math:`(1/\delta_j)/\sum (1/\delta_j)`,
+    :math:`\delta_j = \sqrt{(\bar{\gamma}-\bar{\gamma}_j)^2
+    + (\bar{V}-\bar{V}_j)^2}` (Eq. 7/8); outside it (and whenever no
     triangulation exists, e.g. collinear conditions) the nearest database
     condition is adopted unblended (Eq. 9/10). A query on a database condition
     returns that hemisphere alone. ECAC Doc 32, 1st ed., §4.1 defines no
@@ -1126,7 +1153,7 @@ def _common_frequencies(
 
 @dataclass(frozen=True)
 class FlightPathKinematics:
-    """Kinematics of a rotorcraft track (guidance Eq. 16-21 / Doc 32 Eq. 8-10).
+    r"""Kinematics of a rotorcraft track (guidance Eq. 16-21 / Doc 32 Eq. 8-10).
 
     All rates come from central finite differences around each track point.
 
@@ -1134,17 +1161,22 @@ class FlightPathKinematics:
     :ivar positions: Track positions ``(x, y, z)``, in metres, shape ``(N, 3)``.
     :ivar ground_speed: Ground speed ``V_g`` (Eq. 16), in m/s, shape ``(N,)``.
     :ivar airspeed: Airspeed ``V_A`` (Eq. 17, zero-wind), in m/s, shape ``(N,)``.
-    :ivar heading: Heading ``Θ = atan2(ΔX, ΔY)`` (Eq. 19), in degrees, shape
-        ``(N,)``.
-    :ivar curvature: Track curvature ``K = ΔΘ/ΔS`` (Eq. 18), in rad/m, shape
+    :ivar heading: Heading
+        :math:`\Theta = \operatorname{atan2}(\Delta X, \Delta Y)` (Eq. 19),
+        in degrees, shape ``(N,)``.
+    :ivar curvature: Track curvature :math:`K = \Delta\Theta/\Delta S`
+        (Eq. 18), in rad/m, shape
         ``(N,)`` (zero where the ground speed vanishes).
-    :ivar bank_angle: Bank angle ``Φ = atan(K·V_g²/g)`` (Eq. 20), in degrees,
+    :ivar bank_angle: Bank angle
+        :math:`\Phi = \arctan(K \cdot V_g^2/g)` (Eq. 20), in degrees,
         positive starboard down, shape ``(N,)``.
-    :ivar path_angle: Path angle ``γ = atan(ΔZ/ΔS)`` (Doc 32 Eq. 10), in
+    :ivar path_angle: Path angle
+        :math:`\gamma = \arctan(\Delta Z/\Delta S)` (Doc 32 Eq. 10), in
         degrees, positive climbing, shape ``(N,)``.
 
     .. note::
-        The guidance prints Eq. 21 as ``γ = acos(ΔZ/ΔS)``, which returns the
+        The guidance prints Eq. 21 as
+        :math:`\gamma = \arccos(\Delta Z/\Delta S)`, which returns the
         complement of the path angle (90° in level flight) and is dimensionally
         inconsistent with its use; ECAC Doc 32 Eq. 10 states the correct
         ``atan`` form, which this implementation follows.
@@ -1173,18 +1205,21 @@ def flight_path_kinematics(
     *,
     gravity: float = _G0,
 ) -> FlightPathKinematics:
-    """Track kinematics by central finite differences (Eq. 16-21 / Doc 32 Eq. 8-10).
+    r"""Track kinematics by central finite differences (Eq. 16-21 / Doc 32 Eq. 8-10).
 
     Computes, at every point of a time-stamped track, the ground speed ``V_g``
     (Eq. 16), the zero-wind airspeed ``V_A`` (Eq. 17), the heading
-    ``Θ = atan2(ΔX, ΔY)`` (Eq. 19), the curvature ``K = ΔΘ/ΔS`` (Eq. 18), the
-    bank angle ``Φ = atan(K·V_g²/g)`` (Eq. 20) and the path angle
-    ``γ = atan(ΔZ/ΔS)`` (Doc 32 Eq. 10). The airspeed, not the ground speed,
+    :math:`\Theta = \operatorname{atan2}(\Delta X, \Delta Y)` (Eq. 19), the
+    curvature :math:`K = \Delta\Theta/\Delta S` (Eq. 18), the
+    bank angle :math:`\Phi = \arctan(K \cdot V_g^2/g)` (Eq. 20) and the path
+    angle
+    :math:`\gamma = \arctan(\Delta Z/\Delta S)` (Doc 32 Eq. 10). The
+    airspeed, not the ground speed,
     selects the hemisphere (guidance §A.3.3); the guidance recommends smoothing
     radar tracks (e.g. spline resampling) before differentiating.
 
     :param times: Track times, in s, strictly increasing, shape ``(N,)``,
-        ``N ≥ 2``.
+        :math:`N \ge 2`.
     :param positions: Track positions ``(x, y, z)``, in metres, shape ``(N, 3)``
         (x east, y north, z up; any consistent right-handed ground frame works,
         headings are then relative to its y axis).
@@ -1278,11 +1313,11 @@ def _emission_angles(
 
 @dataclass(frozen=True)
 class RotorcraftEventResult:
-    """A rotorcraft single-event time history at a receiver (Doc 32 §6.1).
+    r"""A rotorcraft single-event time history at a receiver (Doc 32 §6.1).
 
     :ivar frequencies: Band centre frequencies, in Hz, shape ``(F,)``.
     :ivar emission_times: Emission times ``t_e``, in s, shape ``(K,)``.
-    :ivar times: Recorded times ``t_r = t_e + r/c`` (Eq. 22), in s, shape
+    :ivar times: Recorded times :math:`t_r = t_e + r/c` (Eq. 22), in s, shape
         ``(K,)``.
     :ivar distance: Slant distance ``r`` per step, in metres, shape ``(K,)``.
     :ivar azimuth: Emission azimuth ``φ`` per step, in degrees, shape ``(K,)``.
@@ -1293,7 +1328,8 @@ class RotorcraftEventResult:
         shape ``(K,)``.
     :ivar la_max: Maximum A-weighted level ``LASmax``, in dB(A).
     :ivar sel: Sound exposure level over the full history (Doc 32 Eq. 27,
-        ``t_0 = 1 s``), in dB(A). The full-history integration is the land-use
+        :math:`t_0 = 1` s), in dB(A). The full-history integration is the
+        land-use
         planning convention of the NORAH2 reference implementation.
     :ivar sel_10db: Sound exposure level restricted to the 10 dB-down window
         about ``LASmax`` (the certification convention), in dB(A).
@@ -1728,7 +1764,7 @@ def _terrain_adjustments(
 def _exposure_level(
     la: NDArray[np.float64], trec: NDArray[np.float64],
 ) -> NDArray[np.float64]:
-    """``SEL`` (Doc 32 Eq. 27, ``t_0 = 1 s``) per receiver from ``(K, G)`` histories.
+    r"""``SEL`` (Doc 32 Eq. 27, :math:`t_0 = 1` s) per receiver, ``(K, G)``.
 
     Trapezoidal integration of the received A-weighted energy over recorded
     time, the integration the NORAH2 reference implementation applies over the
@@ -1847,13 +1883,16 @@ def rotorcraft_event_level(
     terrain: tuple[NDArray[np.float64], NDArray[np.float64], NDArray[np.float64]] | Sequence[NDArray[np.float64]] | None = None,
     terrain_resolution: float | None = None,
 ) -> RotorcraftEventResult:
-    """Rotorcraft single-event level at a receiver (Doc 32 §6.1 / guidance §A.5.1).
+    r"""Rotorcraft single-event level at a receiver (Doc 32 §6.1 / guidance §A.5.1).
 
     For every track point the flight condition selects (or blends, Eq. 3-10)
     the hemispheres, the emission angles address the source level (Eq. 13-15)
-    and the propagation adjustment ``ΔLp = ΔLs + ΔLa + ΔLg`` (Eq. 23-35) places
+    and the propagation adjustment
+    :math:`\Delta L_p = \Delta L_s + \Delta L_a + \Delta L_g` (Eq. 23-35)
+    places
     it at the receiver. The received one-third-octave history is expressed at
-    recorded time ``t_r = t_e + r/c`` (Eq. 22) and integrated into ``LASmax``,
+    recorded time :math:`t_r = t_e + r/c` (Eq. 22) and integrated into
+    ``LASmax``,
     ``SEL`` (Doc 32 Eq. 27) and ``EPNL`` (Doc 32 Eq. 28, ICAO Annex 16 App. 2,
     reusing
     :func:`~phonometry.aircraft.aircraft_noise.epnl_from_pnlt`).

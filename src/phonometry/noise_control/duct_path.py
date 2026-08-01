@@ -1,5 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""
+r"""
 End-to-end duct-borne noise calculation: fan to room, element by element.
 
 The classic consulting workflow of HVAC acoustics is a bookkeeping exercise.
@@ -29,7 +29,7 @@ Three arithmetic conventions matter and are worth stating once:
   worksheet sign so the printed sheet reads like the reference.
 * **Regenerated noise adds on a power basis.** The self-noise of an element is
   a sound power level in its own right and is combined with the level arriving
-  at that point as ``10 lg(10^(L/10) + 10^(L_sn/10))``.
+  at that point as :math:`10 \log_{10}(10^{L/10} + 10^{L_{sn}/10})`.
 * **There is a self-noise floor.** Long's worked sheet uses a 0 dB self-noise
   sound power level as the default and whenever a calculated level would be
   negative, which is why his received spectrum bottoms out near 0 dB rather
@@ -77,7 +77,7 @@ DEFAULT_SELF_NOISE_FLOOR = 0.0
 
 
 def _combine(a: NDArray[np.float64], b: NDArray[np.float64]) -> NDArray[np.float64]:
-    """Energy sum of two level spectra, ``10 lg(10^(a/10) + 10^(b/10))``."""
+    r"""Energy sum of two spectra, :math:`10 \log_{10}(10^{a/10} + 10^{b/10})`."""
     return 10.0 * np.log10(10.0 ** (a / 10.0) + 10.0 ** (b / 10.0))
 
 

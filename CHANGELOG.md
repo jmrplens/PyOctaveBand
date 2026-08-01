@@ -965,6 +965,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   logarithm as $\log_{10}$, the spelling that needs no key to read, in place
   of the ISO $\lg$ the pages used to mix with it.
 
+- The equations in the library's own docstrings are written in LaTeX now, and
+  the API reference renders them. They had been plain-text snippets, so the
+  reference published `LWA = 10*lg( sum_k 10^(0,1*(LWk + Ck)) )` as a code
+  block where a reader wanted a typeset formula, and the generator understood
+  no maths at all, so the handful of docstrings that already used the `:math:`
+  role had that markup published verbatim and nothing else could state a
+  formula except as a code block. The 287 display blocks and 3703 inline
+  expressions across 134 modules now carry the same operands, subscripts and
+  signs as the standard each one cites, with the clause number kept as a
+  `\tag` so a reader can still find the source, and decimal points in place of
+  the commas, the fractions drawn with dashes and the stray Unicode maths
+  glyphs the snippets used to mix. The decimal logarithm is written
+  $\log_{10}$ here too, so the docstrings, the guides and the reference all
+  spell it the same way. The generator translates the `:math:` role and the
+  `.. math::` directive into the `$...$` and `$$...$$` the site's KaTeX pass
+  already expected, one display block per blank-line-separated equation as in
+  Sphinx, and keeps a directive that sits inside a list at the item's own
+  indentation, without which the block closed the list and left the equation
+  and the prose after it stranded outside the step that introduced them.
+
 - Every editable page now links to its source in the footer, in both
   languages. The generated API reference opts out through the route
   middleware, since those pages are written from docstrings and a

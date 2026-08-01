@@ -1,5 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""
+r"""
 Rated microphone characteristics (IEC 60268-4).
 
 A microphone measurement/rating report gathers the *rated characteristics*
@@ -22,11 +22,13 @@ so the report never merely repeats a manufacturer number:
 * **Sensitivity level** (11.1). The sensitivity ``M`` is the ratio of the
   output voltage to the sound pressure, in volts per pascal; its level is
 
-      L_M = 20 lg(M / M_r),   M_r = 1 V/Pa,
+  .. math::
+
+     L_M = 20 \log_{10}(M / M_r), \qquad M_r = 1\ \mathrm{V/Pa}
 
   the rated sensitivity referring to the standard reference frequency of
-  1 000 Hz (11.3). This is the first clean-room oracle: 12,5 mV/Pa returns
-  ``20 lg 0,0125 = -38,06`` dB re 1 V/Pa exactly.
+  1 000 Hz (11.3). This is the first clean-room oracle: 12.5 mV/Pa returns
+  :math:`20 \log_{10} 0.0125 = -38.06` dB re 1 V/Pa exactly.
 
 * **Effective frequency range** (12.2). The range of frequencies over which
   the response does not deviate by more than a specified amount from the ideal
@@ -36,19 +38,24 @@ so the report never merely repeats a manufacturer number:
   the second oracle: a response crossing a limit at chosen frequencies returns
   exactly those frequencies.
 
-* **Directivity index** (13.2.2). ``D = 20 lg(M_0 / M_diff)`` where the
-  diffuse-field sensitivity of a rotationally symmetric pattern follows
-  11.2.2 a):
+* **Directivity index** (13.2.2). :math:`D = 20 \log_{10}(M_0 / M_\text{diff})`
+  where the diffuse-field sensitivity of a rotationally symmetric pattern
+  follows 11.2.2 a):
 
-      M_diff^2 = (1/2) * integral over 0..pi of M^2(theta) sin(theta) dtheta.
+  .. math::
 
-  For the ideal cardioid ``M(theta) = M_0 (1 + cos theta) / 2`` the integral
-  is ``M_0^2 / 3``, so ``D = 10 lg 3 = 4,77`` dB, the third oracle.
+     M_\text{diff}^2 =
+     \frac{1}{2} \int_0^{\pi} M^2(\theta) \sin(\theta) \, d\theta
+
+  For the ideal cardioid :math:`M(\theta) = M_0 (1 + \cos\theta) / 2`
+  the integral is :math:`M_0^2 / 3`, so :math:`D = 10 \log_{10} 3 = 4.77` dB,
+  the third oracle.
 
 * **Equivalent sound pressure level due to inherent noise** (17.2 d/e). The
-  equivalent sound pressure is the ratio of the weighted inherent-noise output
-  voltage to the rated free-field sensitivity, ``p_N = U_N / M``, and its
-  level is ``L_N = 20 lg(p_N / p_0)`` with ``p_0 = 20`` uPa, the fourth
+  equivalent sound pressure is the ratio of the weighted inherent-noise
+  output voltage to the rated free-field sensitivity,
+  :math:`p_N = U_N / M`, and its level is
+  :math:`L_N = 20 \log_{10}(p_N / p_0)` with :math:`p_0 = 20` uPa, the fourth
   oracle. The overload sound pressure level (15.2.2) is read from a measured
   distortion-against-level curve as the interpolated sound pressure level
   where the distortion reaches the specified limit.
@@ -82,7 +89,8 @@ _MIN_POLAR_SPAN_DEG = 150.0
 
 
 def _sensitivity_level_db(sensitivity_v_per_pa: float) -> float:
-    """Sensitivity level ``20 lg(M / 1 V/Pa)``, in dB re 1 V/Pa (11.1)."""
+    r"""Sensitivity level :math:`20 \log_{10}(M / 1\,\mathrm{V/Pa})`, in dB re
+    1 V/Pa (11.1)."""
     return float(20.0 * np.log10(sensitivity_v_per_pa / _M_REF))
 
 
@@ -168,12 +176,14 @@ def _fold_angles_deg(angles_deg: NDArray[np.float64]) -> NDArray[np.float64]:
 def _directivity_index_from_polar(
     angles_deg: NDArray[np.float64], rel_db: NDArray[np.float64]
 ) -> float:
-    """Directivity index from a rotationally symmetric pattern (13.2.2).
+    r"""Directivity index from a rotationally symmetric pattern (13.2.2).
 
-    ``D = 20 lg(M_0 / M_diff)`` with the diffuse-field sensitivity from the
-    11.2.2 a) integral, evaluated by the trapezoidal rule over the supplied
-    angles. The polar levels are relative to the reference axis (13.1.2), so
-    ``Gamma(theta) = 10 ** (G(theta) / 20)`` with ``Gamma(0) = 1``. Angles
+    :math:`D = 20 \log_{10}(M_0 / M_\text{diff})` with the diffuse-field
+    sensitivity from the 11.2.2 a) integral, evaluated by the trapezoidal
+    rule over the supplied angles. The polar levels are relative to the
+    reference axis (13.1.2), so
+    :math:`\Gamma(\theta) = 10^{G(\theta) / 20}` with
+    :math:`\Gamma(0) = 1`. Angles
     beyond 180 degrees are folded onto ``360 - angle`` first
     (:func:`_fold_angles_deg`), interleaving both halves of a full-circle
     measurement into the same 0..pi integral (duplicated folded angles form
@@ -215,7 +225,7 @@ def _overload_spl(
 
 @dataclass(frozen=True)
 class MicrophoneCharacteristics:
-    """Rated microphone characteristics for an IEC 60268-4 report.
+    r"""Rated microphone characteristics for an IEC 60268-4 report.
 
     The free-field frequency response and the rated free-field sensitivity are
     the required inputs; the directional pattern, the inherent-noise spectrum
@@ -231,8 +241,8 @@ class MicrophoneCharacteristics:
         sensitivity and the response normalization, in Hz (11.3).
     :ivar sensitivity_mv_per_pa: Rated free-field sensitivity ``M`` at the
         reference frequency, in mV/Pa (11.2.1/11.3).
-    :ivar sensitivity_level_db: Sensitivity level ``20 lg(M / 1 V/Pa)``, in dB
-        re 1 V/Pa (11.1).
+    :ivar sensitivity_level_db: Sensitivity level
+        :math:`20 \log_{10}(M / 1\,\mathrm{V/Pa})`, in dB re 1 V/Pa (11.1).
     :ivar tolerance_db: Half-width of the response tolerance, in dB (12.1.1).
     :ivar effective_range: Computed effective frequency range ``(lo, hi)``
         against the tolerance limits, in Hz (12.2).
@@ -260,7 +270,7 @@ class MicrophoneCharacteristics:
         dB SPL (17.2 b), or ``None``.
     :ivar polar_angles_deg: Directional-pattern angles, in degrees (13.1), or
         ``None``.
-    :ivar polar_db: Directional pattern ``G(theta)`` relative to the
+    :ivar polar_db: Directional pattern :math:`G(\theta)` relative to the
         reference-axis response, in dB (13.1.2), or ``None``.
     :ivar polar_frequency: Stated frequency of the directional pattern, in Hz,
         or ``None``.
@@ -303,12 +313,13 @@ class MicrophoneCharacteristics:
 
     @property
     def signal_to_noise_ratio_db(self) -> float | None:
-        """Signal-to-noise ratio re 1 Pa (94 dB SPL), in dB, or ``None``.
+        r"""Signal-to-noise ratio re 1 Pa (94 dB SPL), in dB, or ``None``.
 
-        The datasheet companion of the equivalent noise level: the level of
-        1 Pa (``20 lg(1 Pa / 20 uPa) = 93,98`` dB SPL) minus the equivalent
-        sound pressure level due to inherent noise (17), carrying the same
-        weighting.
+        The datasheet companion of the equivalent noise level: the level
+        of 1 Pa
+        (:math:`20 \log_{10}(1\,\mathrm{Pa} / 20\,\mathrm{\mu Pa}) = 93.98` dB
+        SPL) minus the equivalent sound pressure level due to inherent
+        noise (17), carrying the same weighting.
         """
         if self.equivalent_noise_level_db is None:
             return None

@@ -49,15 +49,21 @@ difference_frequency_distortion(
 ) -> float
 ```
 
-Difference-frequency distortion of the nth order (IEC 60268-3 14.12.8).
+Difference-frequency distortion of the nth order (IEC 60268-3
+14.12.8).
 
-Two equal-amplitude tones `f1 < f2` are applied. Per 14.12.8.1 the
-reference voltage is `U_2,ref = 2·U_2,f2` -- realised here as the sum of
-both measured tone amplitudes, identical for the standard equal-amplitude
-tones -- and
+Two equal-amplitude tones $f_1 < f_2$ are applied. Per 14.12.8.1
+the reference voltage is $U_{2,\mathrm{ref}} = 2 U_{2,f_2}$ --
+realised here as the sum of both measured tone amplitudes, identical
+for the standard equal-amplitude tones -- and
 
-`d_d,2 = a_{f2−f1} / (a_{f1} + a_{f2})`,
-`d_d,3 = (a_{2f2−f1} + a_{2f1−f2}) / (a_{f1} + a_{f2})`
+$$
+d_{d,2} = a_{f_2-f_1} / (a_{f_1} + a_{f_2})
+$$
+
+$$
+d_{d,3} = (a_{2f_2-f_1} + a_{2f_1-f_2}) / (a_{f_1} + a_{f_2})
+$$
 
 with the third order an *arithmetic* sum of the two products. Products
 that fall outside (0, Nyquist) or that cannot be separated from a primary
@@ -98,9 +104,10 @@ dynamic_intermodulation_distortion(
 Dynamic intermodulation distortion DIM (IEC 60268-3 14.12.9).
 
 From the standard test signal -- a `f_sine` = 15 kHz sine plus a
-low-pass-filtered `f_square` = 3.15 kHz square wave in a 1:4 peak ratio --
-the DIM is the RMS of the intermodulation products `|k·f_square ± f_sine|`
-that fall below `f_sine` (IEC 60268-3 Table 2), relative to the 15 kHz
+low-pass-filtered `f_square` = 3.15 kHz square wave in a 1:4 peak
+ratio -- the DIM is the RMS of the intermodulation products
+$\lvert k \, f_\mathrm{square} \pm f_\mathrm{sine} \rvert$ that
+fall below `f_sine` (IEC 60268-3 Table 2), relative to the 15 kHz
 sine amplitude.
 
 **Parameters**
@@ -145,7 +152,9 @@ CCIR-RMS filter (5.2.7) over the AES17 measurement band. The dynamic range
 is the ratio of the maximum output level (a full-scale sine, 6.2.6) to
 that weighted residual level:
 
-`DR = 20 lg( (full_scale / sqrt(2)) / V_residual,CCIR-RMS )`.
+$$
+\mathrm{DR} = 20 \log_{10}\left( (\text{full\_scale} / \sqrt{2}) / V_\text{residual,CCIR-RMS} \right)
+$$
 
 It includes all harmonic, inharmonic and noise components and is also
 known as the signal-to-noise ratio (6.4.1 note).
@@ -224,10 +233,10 @@ harmonic_distortion(
 ) -> float
 ```
 
-nth-order harmonic distortion `dₙ` (IEC 60268-3 14.12.5).
+nth-order harmonic distortion $d_n$ (IEC 60268-3 14.12.5).
 
-`dₙ = aₙ / √(Σ_{k≥1} a_k²)` -- the nth harmonic amplitude relative to the
-total RMS.
+$d_n = a_n / \sqrt{\sum_{k \ge 1} a_k^2}$ -- the nth harmonic
+amplitude relative to the total RMS.
 
 **Parameters**
 
@@ -235,7 +244,7 @@ total RMS.
 | :--- | :--- |
 | `signal` | Captured signal (1-D). |
 | `fs` | Sample rate, in Hz. |
-| `fundamental` | Fundamental frequency `f₁`, in Hz. |
+| `fundamental` | Fundamental frequency $f_1$, in Hz. |
 | `order` | Harmonic order `n` (>= 2). |
 | `n_harmonics` | Highest harmonic order used for the total RMS. |
 | `window` | FFT window (default `'hann'`). |
@@ -268,9 +277,9 @@ Harmonic analysis of a signal (IEC 60268-3 / AES17).
 
 | Name | Description |
 | :--- | :--- |
-| `fundamental` | Fundamental frequency `f₁`, in Hz. |
-| `harmonic_frequencies` | Harmonic frequencies `n·f₁` present, in Hz. |
-| `harmonic_amplitudes` | Peak amplitudes `aₙ` of the harmonics. |
+| `fundamental` | Fundamental frequency $f_1$, in Hz. |
+| `harmonic_frequencies` | Harmonic frequencies $n f_1$ present, in Hz. |
+| `harmonic_amplitudes` | Peak amplitudes $a_n$ of the harmonics. |
 | `thd_f` | Total harmonic distortion relative to the fundamental. |
 | `thd_r` | Total harmonic distortion relative to the total RMS. |
 | `thd_plus_noise` | THD+N ratio (AES17). |
@@ -314,7 +323,9 @@ short-circuited analogue input or digital zero at the input). The captured
 idle output is weighted by the CCIR-RMS filter (5.2.7) over the AES17
 measurement band and reported relative to full scale:
 
-`L_idle = 20 lg( V_idle,CCIR-RMS / (full_scale / sqrt(2)) )`.
+$$
+L_\text{idle} = 20 \log_{10}\left( V_\text{idle,CCIR-RMS} / (\text{full\_scale} / \sqrt{2}) \right)
+$$
 
 **Parameters**
 
@@ -378,18 +389,24 @@ modulation_distortion(
 
 Modulation distortion of the nth order (IEC 60268-3 14.12.7).
 
-A low-frequency tone `f1 = f_low` (large) and a high-frequency tone
-`f2 = f_high` (small, amplitude ratio preferably 4:1) are applied; the
-nth-order distortion shows up as modulation sidebands at
-`f2 ± (n−1)·f1`. Per 14.12.7.2 g)-h) the per-order values use the
-*arithmetic* sum of the two sideband amplitudes, referenced to the output
-voltage at `f2`:
+A low-frequency tone $f_1$ (`f_low`, large) and a
+high-frequency tone $f_2$ (`f_high`; small, amplitude ratio
+preferably 4:1) are applied; the nth-order distortion shows up as
+modulation sidebands at $f_2 \pm (n-1) f_1$. Per 14.12.7.2
+g)-h) the per-order values use the *arithmetic* sum of the two
+sideband amplitudes, referenced to the output voltage at `f2`:
 
-`d_m,2 = (a_{f2+f1} + a_{f2−f1}) / a_{f2}` and
-`d_m,3 = (a_{f2+2f1} + a_{f2−2f1}) / a_{f2}`.
+$$
+d_{m,2} = (a_{f_2+f_1} + a_{f_2-f_1}) / a_{f_2}
+$$
 
-(The alternative presentation `d'_m,n = 5·d_m,n` references the 4:1
-reference output voltage `U_2,ref = 5·U_2,f2` instead.) The combined
+$$
+d_{m,3} = (a_{f_2+2f_1} + a_{f_2-2f_1}) / a_{f_2}
+$$
+
+(The alternative presentation $d'_{m,n} = 5 d_{m,n}$ references
+the 4:1 reference output voltage
+$U_{2,\mathrm{ref}} = 5 U_{2,f_2}$ instead.) The combined
 root-sum-square that SMPTE-type analyzers report is returned alongside
 as `smpte`.
 
@@ -432,13 +449,13 @@ Modulation (intermodulation) distortion (IEC 60268-3 14.12.7).
 
 | Name | Description |
 | :--- | :--- |
-| `d2` | Second-order modulation distortion `d_m,2` (14.12.7.2 g): the *arithmetic* sum of the sideband amplitudes at `f2 ± f1` relative to the output amplitude at `f2`. |
-| `d3` | Third-order modulation distortion `d_m,3` (14.12.7.2 h): the arithmetic sum of the sidebands at `f2 ± 2·f1` relative to the output amplitude at `f2`. |
-| `smpte` | Combined-RMS convention of SMPTE-type analyzers (not an IEC 60268-3 quantity): `√(Σ aₛ²) / a_f2` over all four sidebands. |
+| `d2` | Second-order modulation distortion $d_{m,2}$ (14.12.7.2 g): the *arithmetic* sum of the sideband amplitudes at $f_2 \pm f_1$ relative to the output amplitude at `f2`. |
+| `d3` | Third-order modulation distortion $d_{m,3}$ (14.12.7.2 h): the arithmetic sum of the sidebands at $f_2 \pm 2 f_1$ relative to the output amplitude at `f2`. |
+| `smpte` | Combined-RMS convention of SMPTE-type analyzers (not an IEC 60268-3 quantity): $\sqrt{\sum a_s^2} / a_{f_2}$ over all four sidebands. |
 | `f_low` | Low modulating tone `f1`, in Hz. |
 | `f_high` | High carrier tone `f2`, in Hz. |
 | `carrier_amplitude` | Measured output amplitude at `f2` (the reference of the per-order ratios). |
-| `sideband_frequencies` | The four intermodulation product frequencies in ascending order: `f2 − 2f1`, `f2 − f1`, `f2 + f1` and `f2 + 2f1`, in Hz. |
+| `sideband_frequencies` | The four intermodulation product frequencies in ascending order: $f_2 - 2f_1$, $f_2 - f_1$, $f_2 + f_1$ and $f_2 + 2f_1$, in Hz. |
 | `sideband_amplitudes` | Measured peak amplitudes at `sideband_frequencies` (zero for a product that falls outside the analysis band or cannot be separated from a primary tone). |
 
 ### ModulationDistortionResult.plot()
@@ -452,12 +469,14 @@ ModulationDistortionResult.plot(
 ) -> Axes
 ```
 
-Plot the carrier and its modulation sidebands, with d2/d3 annotated.
+Plot the carrier and its modulation sidebands, with d2/d3
+annotated.
 
-Draws the output amplitude at `f2` (the 0 dB reference) and the four
-intermodulation sidebands at `f2 ± f1` and `f2 ± 2f1` as a
-stem-style spectrum in dB relative to the carrier, the modulation
-counterpart of [`HarmonicDistortionResult.plot`](/phonometry/reference/api/electroacoustics/distortion/#harmonicdistortionresultplot).
+Draws the output amplitude at `f2` (the 0 dB reference) and the
+four intermodulation sidebands at $f_2 \pm f_1$ and
+$f_2 \pm 2f_1$ as a stem-style spectrum in dB relative to
+the carrier, the modulation counterpart of
+[`HarmonicDistortionResult.plot`](/phonometry/reference/api/electroacoustics/distortion/#harmonicdistortionresultplot).
 
 **Parameters**
 
@@ -491,10 +510,13 @@ sinad(
 
 Signal-to-noise-and-distortion ratio SINAD, in dB.
 
-`SINAD = −(THD+N in dB) = 20·lg(V_total / V_residual)` -- the
-reciprocal, in dB, of the THD+N ratio. AES17-2015 does not itself define
-SINAD; this value is derived from the AES17 6.3.1 THD+N measurement
-(same notch, same measurement bandwidth).
+$$
+\mathrm{SINAD} = -(\text{THD+N in dB}) = 20 \log_{10}(V_\text{total} / V_\text{residual}),
+$$
+
+the reciprocal, in dB, of the THD+N ratio. AES17-2015 does not itself
+define SINAD; this value is derived from the AES17 6.3.1 THD+N
+measurement (same notch, same measurement bandwidth).
 
 **Parameters**
 
@@ -531,9 +553,18 @@ thd(
 
 Total harmonic distortion (IEC 60268-3 14.12.2-3).
 
-`THD_F = √(Σ_{n≥2} aₙ²) / a₁` (relative to the fundamental, `kind='F'`)
-or `THD_R = √(Σ_{n≥2} aₙ²) / √(Σ_{n≥1} aₙ²)` (relative to the total RMS,
-`kind='R'`), from the harmonic amplitudes `aₙ`.
+From the harmonic amplitudes $a_n$:
+
+$$
+\mathrm{THD}_F = \sqrt{\sum_{n \ge 2} a_n^2} / a_1
+$$
+
+$$
+\mathrm{THD}_R = \sqrt{\sum_{n \ge 2} a_n^2} / \sqrt{\sum_{n \ge 1} a_n^2}
+$$
+
+relative to the fundamental (`kind='F'`) or to the total RMS
+(`kind='R'`), respectively.
 
 Convention note: the quantity the IEC 60268-3 14.12.3.2 formula defines
 is the R form (harmonic RMS over total RMS). The default `kind='F'` is
@@ -546,7 +577,7 @@ datasheets; the two agree to first order for small distortion.
 | :--- | :--- |
 | `signal` | Captured signal (1-D). Coherent sampling (integer periods) or a low-leakage window gives the exact value. |
 | `fs` | Sample rate, in Hz. |
-| `fundamental` | Fundamental frequency `f₁` in Hz, or `None` to take the largest spectral peak. |
+| `fundamental` | Fundamental frequency $f_1$ in Hz, or `None` to take the largest spectral peak. |
 | `kind` | `'F'` (relative to the fundamental, the default) or `'R'` (relative to the total RMS, the 14.12.3.2 quantity). |
 | `n_harmonics` | Highest harmonic order summed (default 10). |
 | `window` | FFT window (default `'hann'`). |
@@ -576,13 +607,14 @@ thd_plus_noise(
 
 THD+N ratio (AES17-2015 6.3.1).
 
-The fundamental is removed with the standard notch filter (`1.2 ≤ Q ≤ 3`,
-validated on the applied zero-phase response per 5.2.8) and the residual
-RMS is compared with the total RMS: `THD+N = V_residual / V_total` (a
-ratio, or `20·lg` of it in dB). Both voltages are measured through the
-AES17 measurement bandwidth -- a 20 Hz high-pass plus the standard
-low-pass at `bandwidth` (5.2.5 / 6.3.1) -- so DC offsets and
-out-of-band noise do not inflate the result.
+The fundamental is removed with the standard notch filter
+($1.2 \le Q \le 3$, validated on the applied zero-phase response
+per 5.2.8) and the residual RMS is compared with the total RMS:
+$\mathrm{THD{+}N} = V_\text{residual} / V_\text{total}$ (a
+ratio, or $20 \log_{10}$ of it in dB). Both voltages are measured
+through the AES17 measurement bandwidth -- a 20 Hz high-pass plus the
+standard low-pass at `bandwidth` (5.2.5 / 6.3.1) -- so DC offsets
+and out-of-band noise do not inflate the result.
 
 **Parameters**
 
@@ -594,7 +626,7 @@ out-of-band noise do not inflate the result.
 | `notch_q` | Effective notch quality factor (AES17: 1.2..3; default 2.0). |
 | `bandwidth` | Upper band-edge frequency of the AES17 chain, in Hz (default 20 kHz, the 5.2.5 standard value; capped at Nyquist). `None` disables the chain and measures the full Nyquist band (20 Hz high-pass included only when the chain is active). |
 | `window` | FFT window used only for fundamental auto-detection. |
-| `as_db` | Return `20·lg(ratio)` in dB instead of the ratio. |
+| `as_db` | Return $20 \log_{10}(\text{ratio})$ in dB instead of the ratio. |
 
 **Returns:** THD+N as a ratio (default) or in dB.
 
@@ -619,16 +651,21 @@ total_difference_frequency_distortion(
 
 Total difference-frequency distortion (IEC 60268-3 14.12.10).
 
-A specific two-tone test with `f1 = 2·f0` and `f2 = 3·f0 − δ` (the
-standard values, kept as defaults, are `f1 = 8 kHz`, `f2 = 11,95 kHz`,
-so `f0 = 4 kHz` and `δ = 50 Hz`). Only the two in-band products at
-`f0 ∓ δ` enter -- the second-order product at `f2 − f1` and the
-third-order product at `2·f1 − f2` -- combined in RMS over the
-arithmetic sum of the two tone output amplitudes (14.12.10.2 g):
+A specific two-tone test with $f_1 = 2 f_0$ and
+$f_2 = 3 f_0 - \delta$ (the standard values, kept as defaults,
+are $f_1 = 8$ kHz, $f_2 = 11.95$ kHz, so
+$f_0 = 4$ kHz and $\delta = 50$ Hz). Only the two in-band
+products at $f_0 \mp \delta$ enter -- the second-order product
+at $f_2 - f_1$ and the third-order product at
+$2 f_1 - f_2$ -- combined in RMS over the arithmetic sum of the
+two tone output amplitudes (14.12.10.2 g):
 
-`d_TDFD = √(a²_{f2−f1} + a²_{2f1−f2}) / (a_{f1} + a_{f2})`.
+$$
+d_{\mathrm{TDFD}} = \sqrt{a_{f_2-f_1}^2 + a_{2f_1-f_2}^2} / (a_{f_1} + a_{f_2})
+$$
 
-(The out-of-band product at `2·f2 − f1` is explicitly not part of it.)
+(The out-of-band product at $2 f_2 - f_1$ is explicitly not
+part of it.)
 
 **Parameters**
 
@@ -637,7 +674,7 @@ arithmetic sum of the two tone output amplitudes (14.12.10.2 g):
 | `signal` | Captured signal (1-D). |
 | `fs` | Sample rate, in Hz. |
 | `f1` | Lower tone, in Hz (default 8 kHz, per 14.12.10.2 b). |
-| `f2` | Upper tone, in Hz (default 11,95 kHz, per 14.12.10.2 b). |
+| `f2` | Upper tone, in Hz (default 11.95 kHz, per 14.12.10.2 b). |
 | `window` | FFT window (default `'hann'`). |
 
 **Returns:** Total difference-frequency distortion, as a ratio.

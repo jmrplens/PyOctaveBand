@@ -1,5 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""
+r"""
 Random-data qualification: stationarity tests and Rice crossing statistics.
 
 Before a record is averaged into a PSD, condensed into a Leq or fed to a GUM
@@ -13,13 +13,13 @@ intervals, a mean square value (or another moment) is computed for each, and
 the sequence is tested for underlying trends with a *nonparametric* test --
 no assumption about the sampling distribution of the values is needed. The
 book's test is the **reverse arrangement test** (Sec. 4.5.2): count the pairs
-``i < j`` with ``x_i > x_j``. For an ordered sequence of independent
+:math:`i < j` with :math:`x_i > x_j`. For an ordered sequence of independent
 observations that count ``A`` has mean ``N(N-1)/4`` (Eq. (4.54)) and variance
 ``N(2N+5)(N-1)/72`` (Eq. (4.55)), and the hypothesis of no trend is accepted
 at significance ``alpha`` when ``A`` falls inside the two-sided acceptance
-region of Table A.6 (for ``N = 20`` and ``alpha = 0.05``: more than 64 and at
-most 125 reverse arrangements, the book's Examples 4.4 and 10.3). The
-classical companion **runs test** (the run distribution tabulated in the
+region of Table A.6 (for :math:`N = 20` and :math:`\alpha = 0.05`: more than
+64 and at most 125 reverse arrangements, the book's Examples 4.4 and 10.3).
+The classical companion **runs test** (the run distribution tabulated in the
 third edition; Wald & Wolfowitz 1940) classifies each value as above or below
 the sequence median and counts runs of like classification: a trend produces
 too few runs, rapid alternation too many. Both tests are distribution-free
@@ -30,29 +30,36 @@ standard deviations or any other parameter sequence.
 mean value stationary Gaussian record with one-sided autospectrum ``G(f)``,
 the geometric moments
 
-``sigma_x^2 = int G df``, ``sigma_v^2 = int (2 pi f)^2 G df`` and
-``sigma_a^2 = int (2 pi f)^4 G df``
+.. math::
+
+   \sigma_x^2 = \int G \, df, \qquad
+   \sigma_v^2 = \int (2\pi f)^2 G \, df, \qquad
+   \sigma_a^2 = \int (2\pi f)^4 G \, df
 
 (Eqs. (5.214)-(5.216)) determine every crossing and peak statistic:
 
 * the expected number of zero crossings per unit time (both slopes),
-  ``N0 = (1/pi) (sigma_v / sigma_x)`` (Eq. (5.195)) -- equivalently
-  ``2 sqrt(m2 / m0)`` with the plain frequency moments
-  ``mk = int f^k G df``; twice the record's *apparent frequency*;
+  :math:`N_0 = (1/\pi)(\sigma_v / \sigma_x)` (Eq. (5.195)) -- equivalently
+  :math:`2\sqrt{m_2 / m_0}` with the plain frequency moments
+  :math:`m_k = \int f^k G \, df`; twice the record's *apparent frequency*;
 * the expected number of crossings of level ``a``,
-  ``Na = N0 exp(-a^2 / (2 sigma_x^2))`` (Eq. (5.196));
+  :math:`N_a = N_0 e^{-a^2 / (2\sigma_x^2)}` (Eq. (5.196));
 * the expected number of maxima per unit time,
-  ``M = (1/2 pi) (sigma_a / sigma_v) = sqrt(m4 / m2)`` (Eq. (5.211));
-* the **irregularity factor** ``r = N0 / (2 M)``, between 0 and 1
+  :math:`M = (1/2\pi)(\sigma_a / \sigma_v) = \sqrt{m_4 / m_2}`
+  (Eq. (5.211));
+* the **irregularity factor** :math:`r = N_0 / (2M)`, between 0 and 1
   (Eq. (5.220)): 1 for narrow bandwidth data (one maximum per zero-crossing
   cycle), toward 0 as ever more local maxima ride on each cycle;
 * the peak probability functions: Rayleigh for narrow bandwidth data
-  (Eqs. (5.206)-(5.207)), the standardized Gaussian for ``r -> 0``
+  (Eqs. (5.206)-(5.207)), the standardized Gaussian for :math:`r \to 0`
   (Eq. (5.221)) and, in between, Rice's mixture for the standardized peak
-  height ``z`` (Eqs. (5.217) and (5.223) with ``epsilon = sqrt(1 - r^2)``):
+  height ``z`` (Eqs. (5.217) and (5.223) with
+  :math:`\epsilon = \sqrt{1 - r^2}`):
 
-  ``P[peak > z] = Q(z / epsilon)
-  + r exp(-z^2 / 2) [1 - Q(r z / epsilon)]``
+  .. math::
+
+     P[\text{peak} > z] = Q(z / \epsilon)
+     + r\, e^{-z^2 / 2} \left[ 1 - Q(rz / \epsilon) \right]
 
   where ``Q`` is the standardized normal exceedance (Eq. (5.250)).
 
@@ -108,10 +115,12 @@ _MIN_OBSERVATIONS = 10
 
 
 def _reverse_arrangements(values: NDArray[np.float64]) -> int:
-    """Count reverse arrangements ``A``: pairs ``i < j`` with ``x_i > x_j``.
+    r"""Count reverse arrangements ``A``: pairs :math:`i < j` with
+    :math:`x_i > x_j`.
 
     B&P Eqs. (4.51)-(4.53). Equal values do not count (the inequality is
-    strict), matching the book's definition ``h_ij = 1`` iff ``x_i > x_j``.
+    strict), matching the book's definition :math:`h_{ij} = 1` iff
+    :math:`x_i > x_j`.
     """
     greater = values[:, np.newaxis] > values[np.newaxis, :]
     return int(np.sum(np.triu(greater, k=1)))
@@ -125,14 +134,15 @@ def _reverse_arrangement_moments(n: int) -> tuple[float, float]:
 
 
 def _mahonian_cdf(n: int) -> NDArray[np.float64]:
-    """Exact null CDF of the reverse-arrangement count for ``n`` values.
+    r"""Exact null CDF of the reverse-arrangement count for ``n`` values.
 
     For independent continuous observations the ranks form a uniformly
     random permutation and ``A`` is its inversion count, whose distribution
     (the Mahonian distribution) follows from convolving uniform steps: the
     ``i``-th value inserted into the running order creates 0 to ``i - 1``
     new inversions with equal probability, independently of the previous
-    ones. ``cdf[k] = P(A <= k)``, ``k = 0 .. n(n-1)/2``.
+    ones. :math:`\mathrm{cdf}[k] = P(A \le k)`,
+    :math:`k = 0, \ldots, n(n-1)/2`.
     """
     pmf = np.ones(1)
     for i in range(2, n + 1):
@@ -145,24 +155,25 @@ def _mahonian_cdf(n: int) -> NDArray[np.float64]:
 
 
 def _reverse_arrangement_bounds(n: int, alpha: float) -> tuple[int, int]:
-    """Two-sided acceptance bounds on ``A``: accept ``lower < A <= upper``.
+    r"""Two-sided acceptance bounds on ``A``: accept ``lower < A <= upper``.
 
-    Percentage points ``A_{N;a}`` with ``P(A > A_{N;a}) = a`` for
-    ``a = 1 - alpha/2`` (lower) and ``a = alpha/2`` (upper), computed from
-    the normal approximation with the B&P moments and a continuity
-    correction. This reproduces every ``alpha = 0.05`` entry of B&P
-    Table A.6 (``N`` = 10 to 100), e.g. ``(64, 125)`` for ``N = 20`` --
-    the book's Examples 4.4 and 10.3.
+    Percentage points ``A_{N;a}`` with :math:`P(A > A_{N;a}) = a` for
+    :math:`a = 1 - \alpha/2` (lower) and :math:`a = \alpha/2` (upper),
+    computed from the normal approximation with the B&P moments and a
+    continuity correction. This reproduces every :math:`\alpha = 0.05`
+    entry of B&P Table A.6 (``N`` = 10 to 100), e.g. ``(64, 125)`` for
+    :math:`N = 20` -- the book's Examples 4.4 and 10.3.
 
     The normal approximation is kept *deliberately*, for all ``N``: the
     book's table itself follows it. No percentage-point convention on the
     exact Mahonian null distribution reproduces every tabulated entry
-    (checked digit by digit: e.g. at ``N = 40``, ``a = 0.975`` the exact
-    tail jumps from ``P(A > 304) = 0.9771`` to ``P(A > 305) = 0.9758``,
-    neither equal to 0.975, and the nearest-tail point would be 306, yet
-    the table prints 305 -- exactly where the continuity-corrected normal
-    point 305.39 rounds to; ``N = 100``, ``a = 0.975`` behaves the same
-    way). Exact-distribution bounds would therefore *disagree* with the
+    (checked digit by digit: e.g. at :math:`N = 40`, :math:`a = 0.975` the
+    exact tail jumps from :math:`P(A > 304) = 0.9771` to
+    :math:`P(A > 305) = 0.9758`, neither equal to 0.975, and the
+    nearest-tail point would be 306, yet the table prints 305 -- exactly
+    where the continuity-corrected normal point 305.39 rounds to;
+    :math:`N = 100`, :math:`a = 0.975` behaves the same way).
+    Exact-distribution bounds would therefore *disagree* with the
     published Table A.6 that users check against. The p-value, which has
     no tabulated convention to honour, does use the exact distribution
     (:func:`_reverse_arrangement_p_value`), so verdict and p-value can
@@ -194,7 +205,7 @@ def _reverse_arrangement_p_value(n: int, statistic: int) -> float:
 
 
 def _log_comb(n: int, k: NDArray[np.int64]) -> NDArray[np.float64]:
-    """``ln C(n, k)`` element-wise, ``-inf`` outside ``0 <= k <= n``."""
+    r"""``ln C(n, k)`` element-wise, ``-inf`` outside :math:`0 \le k \le n`."""
     kk = np.asarray(k, dtype=np.float64)
     valid = (kk >= 0.0) & (kk <= n)
     safe = np.where(valid, kk, 0.0)
@@ -207,7 +218,8 @@ def _log_comb(n: int, k: NDArray[np.int64]) -> NDArray[np.float64]:
 
 
 def _runs_pmf(n1: int, n2: int) -> NDArray[np.float64]:
-    """Exact null PMF of the number of runs, indexed ``r = 0 .. n1+n2``.
+    r"""Exact null PMF of the number of runs, indexed
+    :math:`r = 0, \ldots, n_1+n_2`.
 
     Wald & Wolfowitz (1940): conditional on ``n1`` values of one kind and
     ``n2`` of the other, all ``C(n1+n2, n1)`` orderings are equally likely
@@ -248,13 +260,13 @@ def _runs_moments(n1: int, n2: int) -> tuple[float, float]:
 
 
 def _runs_bounds(n1: int, n2: int, alpha: float) -> tuple[int, int]:
-    """Two-sided acceptance bounds on ``r``: accept ``lower < r <= upper``.
+    r"""Two-sided acceptance bounds on ``r``: accept ``lower < r <= upper``.
 
     Conservative percentage points from the exact distribution: ``lower``
     is the largest count with ``P(r <= lower) <= alpha/2`` and ``upper``
     the largest count with ``P(r > upper) <= alpha/2``, so the two-sided
-    size never exceeds ``alpha``. For ``n1 = n2 = 10`` at
-    ``alpha = 0.05`` this is ``(6, 15)`` -- the classical tabulated
+    size never exceeds ``alpha``. For :math:`n_1 = n_2 = 10` at
+    :math:`\alpha = 0.05` this is ``(6, 15)`` -- the classical tabulated
     critical values (reject at 6 or fewer, or 16 or more, runs).
     """
     cdf = np.cumsum(_runs_pmf(n1, n2))
@@ -286,7 +298,7 @@ def _count_runs(flags: NDArray[np.bool_]) -> int:
 
 @dataclass(frozen=True)
 class TrendTestResult:
-    """A nonparametric trend test on a sequence of parameter estimates.
+    r"""A nonparametric trend test on a sequence of parameter estimates.
 
     The hypothesis of *no underlying trend* is accepted at significance
     :attr:`alpha` when :attr:`statistic` lies inside the two-sided
@@ -307,12 +319,13 @@ class TrendTestResult:
         ``lower < statistic <= upper``. For reverse arrangements these
         follow B&P Table A.6's own convention (normal approximation with
         continuity correction, which reproduces the book's tabulated
-        ``alpha = 0.05`` entries exactly; the table is not derivable from
-        the exact Mahonian distribution), so at an acceptance boundary
-        the verdict and the exact :attr:`p_value` can disagree by one
-        count.
+        :math:`\alpha = 0.05` entries exactly; the table is not derivable
+        from the exact Mahonian distribution), so at an acceptance
+        boundary the verdict and the exact :attr:`p_value` can disagree
+        by one count.
     :ivar p_value: Two-sided p-value from the exact null distribution
-        (normal approximation above ``n = 100`` for reverse arrangements).
+        (normal approximation above :math:`n = 100` for reverse
+        arrangements).
     :ivar trend_free: ``True`` when the statistic falls inside the
         acceptance region.
     :ivar alpha: Significance level of the region (default 0.05).
@@ -443,7 +456,7 @@ def trend_test(
     method: str = "reverse_arrangements",
     alpha: float = 0.05,
 ) -> TrendTestResult:
-    """
+    r"""
     Nonparametric trend test on a sequence of observations or estimates.
 
     Tests the hypothesis that the sequence holds independent observations
@@ -451,10 +464,11 @@ def trend_test(
     sampling distribution (B&P Sec. 4.5.2). Two classical statistics:
 
     * ``"reverse_arrangements"`` (default): the count ``A`` of pairs
-      ``i < j`` with ``x_i > x_j``. A downward trend inflates ``A``, an
-      upward trend depresses it. The acceptance region reproduces B&P
-      Table A.6 (``alpha = 0.05``, ``N`` = 10 to 100); the p-value uses
-      the exact Mahonian null distribution up to ``N = 100``.
+      :math:`i < j` with :math:`x_i > x_j`. A downward trend inflates
+      ``A``, an upward trend depresses it. The acceptance region
+      reproduces B&P Table A.6 (:math:`\alpha = 0.05`, ``N`` = 10 to
+      100); the p-value uses the exact Mahonian null distribution up to
+      :math:`N = 100`.
     * ``"runs"``: values are classified against the sequence median and
       runs of like classification are counted (the run test of B&P's
       earlier editions; Wald & Wolfowitz 1940). Trends and slow drifts
@@ -560,7 +574,7 @@ def stationarity_test(
     method: str = "reverse_arrangements",
     alpha: float = 0.05,
 ) -> StationarityTestResult:
-    """
+    r"""
     Test a record for stationarity via trends in segment statistics.
 
     The B&P Sec. 10.3.1.1 procedure: (1) divide the record into
@@ -573,7 +587,7 @@ def stationarity_test(
     running up) are detected regardless of the record's spectrum; the
     default 20 segments matches the book's worked Example 10.3, which
     rejects stationarity for a noise record with a 20 % gain ramp
-    (``A = 52``, below the Table A.6 lower bound of 64).
+    (:math:`A = 52`, below the Table A.6 lower bound of 64).
 
     Any trailing samples that do not fill the last segment are discarded.
     The segment count trades resolution against independence: each
@@ -637,12 +651,14 @@ def stationarity_test(
 def _spectral_moments(
     x: NDArray[np.float64], fs: float, nperseg: int | None
 ) -> tuple[float, float, float]:
-    """Frequency moments ``m0, m2, m4`` of the one-sided Welch autospectrum.
+    r"""Frequency moments ``m0, m2, m4`` of the one-sided Welch autospectrum.
 
-    ``mk = int f^k G(f) df`` -- the B&P Eqs. (5.214)-(5.216) variances are
-    ``sigma_x^2 = m0``, ``sigma_v^2 = (2 pi)^2 m2`` and
-    ``sigma_a^2 = (2 pi)^4 m4``, so every ``2 pi`` cancels in the rate
-    formulas: ``N0 = 2 sqrt(m2/m0)`` and ``M = sqrt(m4/m2)``.
+    :math:`m_k = \int f^k G(f) \, df` -- the B&P Eqs. (5.214)-(5.216)
+    variances are :math:`\sigma_x^2 = m_0`,
+    :math:`\sigma_v^2 = (2\pi)^2 m_2` and
+    :math:`\sigma_a^2 = (2\pi)^4 m_4`, so every ``2 pi`` cancels in the
+    rate formulas: :math:`N_0 = 2\sqrt{m_2/m_0}` and
+    :math:`M = \sqrt{m_4/m_2}`.
     """
     psd = power_spectral_density(x, fs, nperseg=nperseg)
     f = psd.frequencies
@@ -665,22 +681,23 @@ def _count_level_crossings(
 
 @dataclass(frozen=True)
 class LevelCrossingResult:
-    """Measured level-crossing rates against the Rice expectation.
+    r"""Measured level-crossing rates against the Rice expectation.
 
     All rates count crossings with *both* slopes per unit time, following
     B&P Sec. 5.5.1; the rate of zero crossings is twice the record's
     apparent frequency. The Rice curve
-    ``Na = N0 exp(-a^2 / (2 sigma^2))`` (Eq. (5.196)) holds for Gaussian
-    records; systematic departures of the measured rates from it are
-    themselves a useful non-Gaussianity screen (B&P Sec. 5.5.1.1).
+    :math:`N_a = N_0 e^{-a^2 / (2\sigma^2)}` (Eq. (5.196)) holds for
+    Gaussian records; systematic departures of the measured rates from
+    it are themselves a useful non-Gaussianity screen (B&P Sec. 5.5.1.1).
 
     :ivar levels: Crossing levels ``a``, in signal units (about the
         removed record mean).
     :ivar rates: Measured crossing rates per level, in 1/s.
-    :ivar rice_rates: Rice expectation ``N0 exp(-a^2/(2 sigma^2))``, 1/s.
+    :ivar rice_rates: Rice expectation :math:`N_0 e^{-a^2/(2\sigma^2)}`, 1/s.
     :ivar zero_crossing_rate: Measured zero-crossing rate ``N0``, in 1/s.
-    :ivar zero_crossing_rate_rice: Expected ``N0 = 2 sqrt(m2/m0)`` from
-        the record's Welch autospectrum moments (Eq. (5.195)), in 1/s.
+    :ivar zero_crossing_rate_rice: Expected
+        :math:`N_0 = 2\sqrt{m_2/m_0}` from the record's Welch
+        autospectrum moments (Eq. (5.195)), in 1/s.
     :ivar apparent_frequency: ``N0 / 2`` from the spectral moments, in Hz
         (a 60 Hz sine crosses zero 120 times per second).
     :ivar sigma: RMS value of the demeaned record, in signal units.
@@ -721,19 +738,20 @@ def level_crossing_rate(
     levels: NDArray[np.float64] | list[float] | None = None,
     nperseg: int | None = None,
 ) -> LevelCrossingResult:
-    """
+    r"""
     Level-crossing rates of a record and their Rice expectations.
 
     Counts the crossings of each level ``a`` (both slopes, B&P Sec. 5.5.1)
     and compares them with the closed forms for Gaussian data: the
-    zero-crossing rate ``N0 = (1/pi)(sigma_v/sigma_x) = 2 sqrt(m2/m0)``
+    zero-crossing rate
+    :math:`N_0 = (1/\pi)(\sigma_v/\sigma_x) = 2\sqrt{m_2/m_0}`
     (Eq. (5.195)) and the level dependence
-    ``Na = N0 exp(-a^2/(2 sigma_x^2))`` (Eq. (5.196)), with the spectral
-    moments taken from the record's own Welch autospectrum. For low-pass
-    white noise of bandwidth ``B`` the expectation is
-    ``N0 = 2 B / sqrt(3)`` -- an apparent frequency of ``0.58 B`` (B&P
+    :math:`N_a = N_0 e^{-a^2/(2\sigma_x^2)}` (Eq. (5.196)), with the
+    spectral moments taken from the record's own Welch autospectrum. For
+    low-pass white noise of bandwidth ``B`` the expectation is
+    :math:`N_0 = 2B/\sqrt{3}` -- an apparent frequency of ``0.58 B`` (B&P
     Example 5.12) -- and for bandwidth-limited white noise centred on
-    ``fc``, ``N0 = 2 sqrt(fc^2 + B^2/12)`` (Example 5.13).
+    ``fc``, :math:`N_0 = 2\sqrt{f_c^2 + B^2/12}` (Example 5.13).
 
     The record mean is removed first (the formulas hold for zero mean
     value records); ``levels`` are then relative to that mean. Crossings
@@ -790,12 +808,14 @@ def level_crossing_rate(
 def _rice_peak_exceedance(
     z: NDArray[np.float64], irregularity: float
 ) -> NDArray[np.float64]:
-    """``P[peak > z]`` for standardized peak height ``z`` (B&P Eq. (5.223)).
+    r""":math:`P[\text{peak} > z]` for standardized peak height ``z``
+    (B&P Eq. (5.223)).
 
-    ``Q(z/eps) + r exp(-z^2/2) [1 - Q(r z / eps)]`` with
-    ``eps = sqrt(1 - r^2)``: the Rayleigh exceedance ``exp(-z^2/2)`` for
-    narrow bandwidth data (``r -> 1``, B&P Eq. (5.206)) and the Gaussian
-    exceedance for ``r -> 0`` (Eq. (5.221)).
+    :math:`Q(z/\epsilon) + r\, e^{-z^2/2} \left[ 1 - Q(rz/\epsilon) \right]`
+    with :math:`\epsilon = \sqrt{1 - r^2}`: the Rayleigh exceedance
+    :math:`e^{-z^2/2}` for narrow bandwidth data (:math:`r \to 1`, B&P
+    Eq. (5.206)) and the Gaussian exceedance for :math:`r \to 0`
+    (Eq. (5.221)).
     """
     r = irregularity
     eps_sq = max(0.0, 1.0 - r * r)
@@ -813,12 +833,12 @@ def _rice_peak_exceedance(
 def _rice_peak_density(
     z: NDArray[np.float64], irregularity: float
 ) -> NDArray[np.float64]:
-    """Peak probability density ``w(z)`` (B&P Eq. (5.217)).
+    r"""Peak probability density ``w(z)`` (B&P Eq. (5.217)).
 
-    ``(eps/sqrt(2 pi)) exp(-z^2/(2 eps^2))
-    + r z exp(-z^2/2) [1 - Q(r z / eps)]`` -- the mixture between the
-    standardized Gaussian (``r = 0``, Eq. (5.221)) and Rayleigh
-    (``r = 1``, Eq. (5.222)) densities; minus the derivative of
+    :math:`\frac{\epsilon}{\sqrt{2\pi}} e^{-z^2/(2\epsilon^2)}
+    + r z\, e^{-z^2/2} \left[ 1 - Q(rz/\epsilon) \right]`: the mixture
+    between the standardized Gaussian (:math:`r = 0`, Eq. (5.221)) and Rayleigh
+    (:math:`r = 1`, Eq. (5.222)) densities; minus the derivative of
     :func:`_rice_peak_exceedance`.
     """
     r = irregularity
@@ -836,24 +856,25 @@ def _rice_peak_density(
 
 @dataclass(frozen=True)
 class PeakStatisticsResult:
-    """Peak (maxima) statistics of a record against the Rice expectations.
+    r"""Peak (maxima) statistics of a record against the Rice expectations.
 
     "Positive peaks" are the record's local maxima, positive or negative
     in value (B&P Sec. 5.5.3). For Gaussian records the expected rate of
-    maxima is ``M = (1/2 pi)(sigma_a/sigma_v) = sqrt(m4/m2)``
-    (Eq. (5.211)), and the ratio ``r = N0/(2M)`` -- the **irregularity
-    factor**, between 0 and 1 by the Schwartz inequality (Eq. (5.220)) --
-    fixes the standardized peak-height distribution: Rayleigh at
-    ``r = 1`` (every cycle carries one maximum), Gaussian as ``r -> 0``
-    (Sec. 5.5.4).
+    maxima is :math:`M = (1/2\pi)(\sigma_a/\sigma_v) = \sqrt{m_4/m_2}`
+    (Eq. (5.211)), and the ratio :math:`r = N_0/(2M)` -- the
+    **irregularity factor**, between 0 and 1 by the Schwartz inequality
+    (Eq. (5.220)) -- fixes the standardized peak-height distribution:
+    Rayleigh at :math:`r = 1` (every cycle carries one maximum), Gaussian
+    as :math:`r \to 0` (Sec. 5.5.4).
 
     :ivar peak_rate: Measured rate of local maxima, in 1/s.
-    :ivar peak_rate_rice: Expected rate ``M = sqrt(m4/m2)`` from the
-        Welch autospectrum moments, in 1/s.
-    :ivar zero_crossing_rate_rice: Expected ``N0 = 2 sqrt(m2/m0)``, 1/s.
+    :ivar peak_rate_rice: Expected rate :math:`M = \sqrt{m_4/m_2}` from
+        the Welch autospectrum moments, in 1/s.
+    :ivar zero_crossing_rate_rice: Expected
+        :math:`N_0 = 2\sqrt{m_2/m_0}`, 1/s.
     :ivar irregularity_factor: ``N0 / (2 M)`` from the spectral moments.
-    :ivar peak_values: Standardized heights ``z = peak / sigma`` of the
-        detected maxima.
+    :ivar peak_values: Standardized heights
+        :math:`z = \text{peak} / \sigma` of the detected maxima.
     :ivar sigma: RMS value of the demeaned record, in signal units.
     :ivar duration: Record duration used for the rates, in seconds.
     :ivar fs: Sample rate, in Hz.
@@ -871,13 +892,14 @@ class PeakStatisticsResult:
     def peak_exceedance(
         self, z: NDArray[np.float64] | list[float] | float
     ) -> NDArray[np.float64]:
-        """``P[peak > z]`` at the record's irregularity factor.
+        r""":math:`P[\text{peak} > z]` at the record's irregularity
+        factor.
 
         B&P Eq. (5.223): the probability that a maximum chosen at random
-        exceeds ``z`` record RMS units. ``exp(-z^2/2)`` for narrow
-        bandwidth data -- ``exp(-8) = 0.00033`` at ``z = 4``, B&P
-        Example 5.14 -- and the Gaussian exceedance in the wide bandwidth
-        limit.
+        exceeds ``z`` record RMS units. :math:`e^{-z^2/2}` for narrow
+        bandwidth data -- :math:`e^{-8} = 0.00033` at :math:`z = 4`, B&P
+        Example 5.14 -- and the Gaussian exceedance in the wide
+        bandwidth limit.
 
         :param z: Standardized peak heights (units of the record RMS).
         :return: Exceedance probabilities, same shape.
@@ -916,21 +938,22 @@ def peak_statistics(
     *,
     nperseg: int | None = None,
 ) -> PeakStatisticsResult:
-    """
+    r"""
     Peak rate, irregularity factor and peak-height distribution of a record.
 
     Detects the record's local maxima and compares their rate and height
     distribution with the Rice closed forms for Gaussian data (B&P
-    Secs. 5.5.2 to 5.5.4): expected maxima rate ``M = sqrt(m4/m2)``
-    (Eq. (5.211)), irregularity factor ``r = N0/(2M)`` (Eq. (5.220)) and
-    the standardized peak-height distribution that interpolates between
-    Rayleigh (narrow bandwidth, ``r = 1``) and Gaussian (wide bandwidth,
-    ``r -> 0``) via :meth:`PeakStatisticsResult.peak_exceedance`. The
+    Secs. 5.5.2 to 5.5.4): expected maxima rate :math:`M = \sqrt{m_4/m_2}`
+    (Eq. (5.211)), irregularity factor :math:`r = N_0/(2M)` (Eq. (5.220))
+    and the standardized peak-height distribution that interpolates
+    between Rayleigh (narrow bandwidth, :math:`r = 1`) and Gaussian
+    (wide bandwidth, :math:`r \to 0`) via
+    :meth:`PeakStatisticsResult.peak_exceedance`. The
     irregularity factor is the bridge to fatigue and vibro-acoustic
     damage models, where it selects the cycle-counting correction.
 
     The record mean is removed first. The ``m4`` moment weights the
-    autospectrum by ``f^4``, so broadband instrumentation noise far above
+    autospectrum by :math:`f^4`, so broadband instrumentation noise far above
     the physical band inflates ``M`` and deflates ``r``: band-limit the
     record to the physically meaningful band first.
 

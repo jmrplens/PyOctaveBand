@@ -55,8 +55,8 @@ itself (5.3.3): levels are measured with time-weighting F and the
 the maximum and minimum levels and the mean level) must not exceed the
 Table 2 acceptance limit for the calibrator class (class 1: 0.07 dB at
 and above 160 Hz, relaxed to 0.10 dB above 63 Hz and below 160 Hz, and to
-0.20 dB for the 31,5-63 Hz rows where the F time-weighting itself ripples;
-below Table 2's 31,5 Hz span the strict 0.07 dB applies). A larger
+0.20 dB for the 31.5-63 Hz rows where the F time-weighting itself ripples;
+below Table 2's 31.5 Hz span the strict 0.07 dB applies). A larger
 fluctuation usually means a badly coupled microphone or handling noise in
 the recording, which would silently corrupt every calibrated level; a
 [`CalibrationWarning`](/phonometry/reference/api/levels/calibration/#calibrationwarning) is emitted.
@@ -79,6 +79,6 @@ integrator attack).
 | `validate` | If True (default) and `fs` is given, warn when the recording's short-term level fluctuation exceeds the limit. |
 | `max_fluctuation_db` | Explicit fluctuation limit in dB. Default (None) resolves the IEC 60942:2017 Table 2 class 1 limit for `frequency`. |
 | `frequency` | Nominal frequency of the calibration tone in Hz (default 1000.0), used to select the Table 2 row. |
-| `narrowband` | If True (requires `fs`), estimate the tone level with a coherent single-frequency (Goertzel) detector locked to the tone near `frequency` instead of the full-band RMS. This rejects broadband hum/noise in the reference take, which otherwise inflates the RMS and shrinks the factor by `-10*lg(1 + 1/SNR)` (about -0.44 dB at 20 dB SNR), silently biasing every subsequent level. The default (False) keeps the exact legacy broadband-RMS behaviour; enable it for noisy coupler recordings. |
+| `narrowband` | If True (requires `fs`), estimate the tone level with a coherent single-frequency (Goertzel) detector locked to the tone near `frequency` instead of the full-band RMS. This rejects broadband hum/noise in the reference take, which otherwise inflates the RMS and shrinks the factor by $-10 \log_{10}(1 + 1/\mathrm{SNR})$ (about -0.44 dB at 20 dB SNR), silently biasing every subsequent level. The default (False) keeps the exact legacy broadband-RMS behaviour; enable it for noisy coupler recordings. |
 
 **Returns:** Calibration factor (sensitivity multiplier).

@@ -1,5 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""
+r"""
 Programme loudness and true-peak level (ITU-R BS.1770-5, EBU R 128).
 
 Implements the objective multichannel loudness measurement algorithm of
@@ -396,16 +396,17 @@ def _resolve_weights(n_channels: int, weights: ArrayLike | None) -> np.ndarray:
 def _windowed_loudness(
     csum: np.ndarray, weights: np.ndarray, n_window: int, step: int
 ) -> tuple[np.ndarray, np.ndarray]:
-    """Channel-weighted loudness of every full sliding window.
+    r"""Channel-weighted loudness of every full sliding window.
 
     :param csum: Per-channel cumulative sum of the squared K-weighted signal,
         shape ``(channels, samples + 1)``.
     :param weights: Per-channel weights ``Gi``.
     :param n_window: Window length in samples.
     :param step: Hop between consecutive windows in samples.
-    :return: ``(loudness, end_samples)``: the loudness ``-0.691 + 10 lg
-        (sum_i Gi z_i)`` of each window in LUFS, and the sample index of
-        each window's end. Empty arrays when no full window fits.
+    :return: ``(loudness, end_samples)``: the loudness
+        :math:`-0.691 + 10 \log_{10} (\sum_i G_i z_i)` of each window in LUFS,
+        and the sample index of each window's end. Empty arrays when no full
+        window fits.
     """
     n_samples = csum.shape[-1] - 1
     if n_window > n_samples:
@@ -427,7 +428,7 @@ def _gated_power(block_power: np.ndarray, gate: np.ndarray) -> float:
 
 
 def _power_to_loudness(power: float) -> float:
-    """``-0.691 + 10 lg power`` with a -inf guard for zero power."""
+    r""":math:`-0.691 + 10 \log_{10} \text{power}` with a -inf guard for zero power."""
     if power <= 0.0:
         return float("-inf")
     return _K_OFFSET + 10.0 * float(np.log10(power))

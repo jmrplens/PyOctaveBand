@@ -1,5 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""
+r"""
 Sound insulation measured with sound intensity (ISO 15186).
 
 This is the sound-**intensity** counterpart of the sound-pressure methods in
@@ -14,8 +14,11 @@ radiated by the element itself.
 **Intensity sound reduction index (ISO 15186-1:2000, Clause 3.8, Formula
 (7)).** From the average source-room sound pressure level ``Lp1`` and the
 average normal sound intensity level ``LIn`` over the measurement surface,
+in dB,
 
-``RI = Lp1 - 6 - [LIn + 10 lg(Sm / S)]`` dB
+.. math::
+
+   R_I = L_{p1} - 6 - \left[ L_{In} + 10 \log_{10}\frac{S_m}{S} \right]
 
 with the measurement-surface area ``Sm`` and the specimen area ``S``. The
 constant ``6`` dB is the diffuse-field relationship between the sound pressure
@@ -25,29 +28,38 @@ difference being the measurement condition (flanking is not suppressed), not
 the arithmetic.
 
 **Modified intensity sound reduction index (Clause 3.10, Formula (9)).**
-``RI,M = RI + Kc`` corrects ``RI`` so that it reproduces the ISO 140-3 (now
-ISO 10140-2) pressure result, which slightly overestimates ``R`` because the
-power radiated into the receiving room is underestimated. The adaptation term
-``Kc`` (Annex B) is ``10 lg(1 + Sb2 lambda / (8 V2))`` (Formula (B.1)) for a
-well-defined receiving room of boundary area ``Sb2`` and volume ``V2``, or the
-room-independent approximation ``10 lg(1 + 61,4 / f)`` (Formula (B.2)); both
-use the speed of sound ``c = 340 m/s`` so that (B.1) with the reference room
-``Sb2 = 117 m²``, ``V2 = 81 m³`` reduces to (B.2).
+:math:`R_{I,M} = R_I + K_c` corrects ``RI`` so that it reproduces the
+ISO 140-3 (now ISO 10140-2) pressure result, which slightly overestimates
+``R`` because the power radiated into the receiving room is underestimated.
+The adaptation term ``Kc`` (Annex B) is
+:math:`10 \log_{10}(1 + S_{b2} \lambda / (8 V_2))` (Formula (B.1)) for a
+well-defined receiving room of boundary area ``Sb2`` and volume ``V2``, or
+the room-independent approximation :math:`10 \log_{10}(1 + 61.4 / f)`
+(Formula (B.2)); both use the speed of sound :math:`c = 340` m/s so that
+(B.1) with the reference room :math:`S_{b2} = 117` m², :math:`V_2 = 81` m³
+reduces to (B.2).
 
 **Intensity element normalized level difference (Clause 3.9, Formula (8)).**
-For small building elements, ``DI,n,e = Lp1 - 6 - (LIn + 10 lg(Sm / A0)) +
-10 lg N`` dB with the reference absorption area ``A0 = 10 m²`` and the number
-``N`` of element units in the measurement surface. The printed Formula (8)
-subtracts its ``10 lg(N)`` term instead of adding it, which is physically
+For small building elements, in dB,
+
+.. math::
+
+   D_{I,n,e} = L_{p1} - 6 - \left( L_{In} + 10 \log_{10}\frac{S_m}{A_0} \right)
+   + 10 \log_{10} N
+
+with the reference absorption area :math:`A_0 = 10` m² and the number ``N``
+of element units in the measurement surface. The printed Formula (8)
+subtracts its :math:`10 \log_{10} N` term instead of adding it, which is physically
 inconsistent with ISO 10140-2:2010 Formula (6) and ISO 15186-2:2010
 Formula (12); the corrected per-unit form is implemented (see
 ``docs/ERRATA.md``).
 
 **Surface pressure-intensity indicator (Clause 3.6 / 6.4.2, Formula (10)).**
-``FpI = Lp - LIn`` qualifies the measurement surface: it must not exceed
-10 dB for a sound-reflecting specimen (6 dB when the receiving side is
+:math:`F_{pI} = L_p - L_{In}` qualifies the measurement surface: it must not
+exceed 10 dB for a sound-reflecting specimen (6 dB when the receiving side is
 sound absorbing), and the probe's pressure-residual intensity index must
-exceed ``FpI + 10`` dB (Clause 4.1) for the dynamic capability to be adequate.
+exceed :math:`F_{pI} + 10` dB (Clause 4.1) for the dynamic capability to be
+adequate.
 
 **Frequency range (Clause 6.6).** Quantities are measured over the mandatory
 one-third-octave range 100 Hz to 5000 Hz (18 bands), optionally extended down
@@ -141,12 +153,13 @@ def _validate_intensity_report(
 
 @dataclass(frozen=True)
 class IntensityReductionResult:
-    """Per-band intensity sound reduction index (ISO 15186-1:2000).
+    r"""Per-band intensity sound reduction index (ISO 15186-1:2000).
 
-    :ivar r_i: Intensity sound reduction index ``RI = Lp1 - 6 -
-        [LIn + 10 lg(Sm/S)]`` per band, in dB (Clause 3.8, Formula (7)). In
+    :ivar r_i: Intensity sound reduction index
+        :math:`R_I = L_{p1} - 6 - [L_{In} + 10 \log_{10}(S_m/S)]` per band, in dB
+        (Clause 3.8, Formula (7)). In
         the field (ISO 15186-2) this is the apparent index ``R'I``.
-    :ivar r_i_modified: Modified index ``RI,M = RI + Kc`` per band, in dB
+    :ivar r_i_modified: Modified index :math:`R_{I,M} = R_I + K_c` per band, in dB
         (Clause 3.10, Formula (9)), or ``None`` when no adaptation term was
         supplied.
     :ivar rating: Single-number weighted rating ``RI,w`` with ``C`` / ``Ctr``
@@ -267,12 +280,13 @@ class IntensityReductionResult:
 
 @dataclass(frozen=True)
 class IntensityElementNormalizedResult:
-    """Per-band intensity element normalized level difference (ISO 15186-1).
+    r"""Per-band intensity element normalized level difference (ISO 15186-1).
 
     :ivar d_i_n_e: Intensity element normalized level difference
-        ``DI,n,e = Lp1 - 6 - (LIn + 10 lg(Sm/A0)) + 10 lg N`` per band, in dB
-        (Clause 3.9, Formula (8) with the corrected sign of its ``10 lg N``
-        term; see ``docs/ERRATA.md``).
+        :math:`D_{I,n,e} = L_{p1} - 6 - (L_{In} + 10 \log_{10}(S_m/A_0)) +
+        10 \log_{10} N` per band, in dB
+        (Clause 3.9, Formula (8) with the corrected sign of its
+        :math:`10 \log_{10} N` term; see ``docs/ERRATA.md``).
     :ivar rating: Single-number weighted rating ``DI,n,e,w`` with ``C`` /
         ``Ctr`` (ISO 717-1), or ``None`` when the band count is neither 16
         (one-third octave) nor 5 (octave).
@@ -400,19 +414,20 @@ def adaptation_term_kc(
     boundary_area: float | None = None,
     volume: float | None = None,
 ) -> np.ndarray:
-    """Adaptation term ``Kc`` per ISO 15186-1:2000, Annex B.
+    r"""Adaptation term ``Kc`` per ISO 15186-1:2000, Annex B.
 
     Returns, per one-third-octave midband frequency, the term ``Kc`` that
     turns the intensity sound reduction index ``RI`` into the modified index
-    ``RI,M = RI + Kc`` (Clause 3.10). Two forms are available:
+    :math:`R_{I,M} = R_I + K_c` (Clause 3.10). Two forms are available:
 
     - **Well-defined receiving room (Formula (B.1)):** when both
       ``boundary_area`` (``Sb2``) and ``volume`` (``V2``) are supplied,
-      ``Kc = 10 lg(1 + Sb2 lambda / (8 V2))`` with the midband wavelength
-      ``lambda = c / f`` and ``c = 340 m/s``.
+      :math:`K_c = 10 \log_{10}(1 + S_{b2} \lambda / (8 V_2))` with the midband
+      wavelength :math:`\lambda = c / f` and :math:`c = 340` m/s.
     - **Room-independent approximation (Formula (B.2)):** when neither is
-      supplied, ``Kc = 10 lg(1 + 61,4 / f)``, the exact reduction of (B.1)
-      for the reference room ``Sb2 = 117 m²``, ``V2 = 81 m³``.
+      supplied, :math:`K_c = 10 \log_{10}(1 + 61.4 / f)`, the exact reduction of
+      (B.1) for the reference room :math:`S_{b2} = 117` m²,
+      :math:`V_2 = 81` m³.
 
     :param freq: One-third-octave midband frequencies, in Hz.
     :param boundary_area: Total boundary-surface area ``Sb2`` of the
@@ -448,16 +463,18 @@ def surface_pressure_intensity_indicator(
     lp: Sequence[float] | np.ndarray,
     l_in: Sequence[float] | np.ndarray,
 ) -> np.ndarray:
-    """Surface pressure-intensity indicator ``FpI`` (ISO 15186-1, Formula (10)).
+    r"""Surface pressure-intensity indicator ``FpI`` (ISO 15186-1, Formula (10)).
 
-    Returns ``FpI = Lp - LIn`` per band from the surface- and time-averaged
+    Returns :math:`F_{pI} = L_p - L_{In}` per band from the surface- and
+    time-averaged
     sound pressure level ``Lp`` and normal sound intensity level ``LIn`` on
     the measurement surface (Clause 3.6 / 6.4.2). The measurement surface is
     adequately qualified when ``FpI`` does not exceed 10 dB for a
     sound-reflecting specimen, or 6 dB when the receiving side is sound
-    absorbing (Clause 6.4.2 flags ``FpI > 10 dB`` / ``FpI > 6 dB`` as not
+    absorbing (Clause 6.4.2 flags :math:`F_{pI} > 10` dB /
+    :math:`F_{pI} > 6` dB as not
     satisfactory); in addition the probe's pressure-residual intensity index
-    must exceed ``FpI + 10`` dB (Clause 4.1).
+    must exceed :math:`F_{pI} + 10` dB (Clause 4.1).
 
     :param lp: Surface-averaged sound pressure levels, in dB.
     :param l_in: Normal sound intensity levels on the surface, in dB.
@@ -477,15 +494,19 @@ def combine_subareas(
     l_in: Sequence[Sequence[float]] | np.ndarray,
     measurement_area: Sequence[float] | np.ndarray,
 ) -> tuple[np.ndarray, float]:
-    """Combine per-subarea intensity levels (ISO 15186-1, Formulas (11)-(12)).
+    r"""Combine per-subarea intensity levels (ISO 15186-1, Formulas (11)-(12)).
 
     When the measurement surface is divided into subareas ``Smi`` each scanned
     individually, the normal sound intensity level over the whole surface is
-    the area-weighted energy average
+    the area-weighted energy average, in dB,
 
-    ``LIn = 10 lg[ (1/Sm) sum_i Smi 10^(0,1 LIni) ]`` dB
+    .. math::
 
-    with the total measured area ``Sm = sum_i |Smi|`` (Formula (12)).
+       L_{In} = 10 \log_{10}\!\left[ \frac{1}{S_m}
+       \sum_i S_{mi}\, 10^{0.1 L_{Ini}} \right]
+
+    with the total measured area :math:`S_m = \sum_i |S_{mi}|`
+    (Formula (12)).
 
     **Negative-direction subareas (Clause 6.4.6).** When the sound intensity
     of a subarea has a negative direction (net energy flowing back towards
@@ -500,7 +521,8 @@ def combine_subareas(
         Negative values mark reverse-flow subareas per Clause 6.4.6; zero is
         invalid.
     :return: A tuple ``(LIn, Sm)`` with the combined level per band, in dB,
-        and the total measured area ``Sm = sum |Smi|``, in m².
+        and the total measured area
+        :math:`S_m = \sum \lvert S_{mi} \rvert`, in m².
     :raises ValueError: If the shapes are inconsistent or values non-finite,
         if any subarea area is zero, or if the signed energy sum of
         Formula (11) is not positive in some band (the reverse flows cancel
@@ -545,19 +567,22 @@ def intensity_sound_reduction(
     area: float,
     kc: Sequence[float] | np.ndarray | None = None,
 ) -> IntensityReductionResult:
-    """
+    r"""
     Intensity sound reduction index per ISO 15186-1:2000 (Formula (7)).
 
-    Computes, per frequency band, the intensity sound reduction index
+    Computes, per frequency band, the intensity sound reduction index, in dB,
 
-    ``RI = Lp1 - 6 - [LIn + 10 lg(Sm / S)]`` dB
+    .. math::
+
+       R_I = L_{p1} - 6 - \left[ L_{In} + 10 \log_{10}\frac{S_m}{S} \right]
 
     from the average source-room sound pressure level ``Lp1`` and the average
     normal sound intensity level ``LIn`` over the measurement surface of area
     ``Sm`` (``measurement_area``), for a specimen of area ``S`` (``area``).
     The same formula gives the apparent index ``R'I`` in the field
     (ISO 15186-2). When an adaptation term ``kc`` is supplied (see
-    :func:`adaptation_term_kc`), the modified index ``RI,M = RI + Kc``
+    :func:`adaptation_term_kc`), the modified index
+    :math:`R_{I,M} = R_I + K_c`
     (Formula (9)) is also formed. Weighted ratings ``RI,w`` (and ``RI,M,w``)
     are computed via :func:`phonometry.weighted_rating` (ISO 717-1) when
     exactly 16 one-third-octave (100-3150 Hz) or 5 octave (125-2000 Hz)
@@ -620,29 +645,33 @@ def intensity_element_normalized_difference(
     measurement_area: float,
     n: int = 1,
 ) -> IntensityElementNormalizedResult:
-    """
+    r"""
     Intensity element normalized level difference per ISO 15186-1 (Formula (8)).
 
     Computes, per frequency band, the intensity element normalized level
-    difference of a single element unit
+    difference of a single element unit, in dB,
 
-    ``DI,n,e = Lp1 - 6 - (LIn + 10 lg(Sm / A0)) + 10 lg N`` dB
+    .. math::
+
+       D_{I,n,e} = L_{p1} - 6 - \left( L_{In} + 10 \log_{10}\frac{S_m}{A_0}
+       \right) + 10 \log_{10} N
 
     from the average source-room sound pressure level ``Lp1``, the average
     normal sound intensity level ``LIn`` over the measurement surface of area
-    ``Sm`` (``measurement_area``), the reference absorption area ``A0 = 10
-    m²`` and the number ``N`` of element units installed within the surface.
+    ``Sm`` (``measurement_area``), the reference absorption area
+    :math:`A_0 = 10` m² and the number ``N`` of element units installed
+    within the surface.
     The weighted rating ``DI,n,e,w`` is computed via
     :func:`phonometry.weighted_rating` (ISO 717-1) when exactly 16 or 5 values
     are supplied.
 
     .. note::
-        The printed Formula (8) *subtracts* its ``10 lg(N)`` term. That sign
-        cannot be derived: measuring ``N`` identical units together raises
-        the transmitted power by ``10 lg N``, so recovering the per-unit
-        ``DI,n,e`` requires *adding* ``10 lg N``, exactly as the
-        pressure-based ISO 10140-2:2010 Formula (6) does with its
-        ``10 lg(nA0/A)`` term (and consistently with ISO 15186-2:2010
+        The printed Formula (8) *subtracts* its :math:`10 \log_{10} N` term. That
+        sign cannot be derived: measuring ``N`` identical units together
+        raises the transmitted power by :math:`10 \log_{10} N`, so recovering the
+        per-unit ``DI,n,e`` requires *adding* :math:`10 \log_{10} N`, exactly as
+        the pressure-based ISO 10140-2:2010 Formula (6) does with its
+        :math:`10 \log_{10}(n A_0/A)` term (and consistently with ISO 15186-2:2010
         Formula (12), which is Formula (8) without an ``N`` term). This
         function implements the corrected per-unit form and warns when
         ``n > 1`` deviates from the print (see ``docs/ERRATA.md``).

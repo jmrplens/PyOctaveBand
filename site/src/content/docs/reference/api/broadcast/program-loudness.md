@@ -21,7 +21,7 @@ ITU-R BS.1770-5 Annex 1 and its companions:
   threshold at -70 LKFS and a relative threshold 10 LU below the
   absolute-gated loudness (Formulae 3-7).
 * **Channel weights for advanced sound systems** (Annex 3): the
-  position-dependent weighting :math:`G_i` from the azimuth and elevation of
+  position-dependent weighting $G_i$ from the azimuth and elevation of
   each loudspeaker (Table 4), covering the BS.2051 configurations (Table 5).
 * **True-peak level** (Annex 2): the inter-sample peak in dBTP estimated by
   oversampling to at least 192 kHz before taking the absolute maximum.

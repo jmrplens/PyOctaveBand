@@ -1,5 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""
+r"""
 Reverberation-time prediction from room geometry and absorption.
 
 Predicts the reverberation time ``T`` of an enclosed space from its volume,
@@ -10,29 +10,38 @@ exponential energy decay, ``T`` is the time for the level to fall by 60 dB.
 Five models are provided, in order of increasing account of a non-uniform
 absorption distribution:
 
-* **Sabine** -- the original diffuse-field estimate, ``T = k V / (A + 4 m V)``
-  with the total equivalent absorption area ``A = sum_i S_i alpha_i`` and the
-  air term ``4 m V``. Exact only for low, uniform absorption.
-* **Eyring** (Norris-Eyring) -- replaces ``A`` by ``-S ln(1 - alpha_bar)`` with
-  the mean absorption ``alpha_bar = A / S`` over the total surface ``S``;
-  correct in the strong-absorption limit where Sabine overestimates ``T``.
-* **Millington-Sette** -- ``-sum_i S_i ln(1 - alpha_i)`` sums the Eyring term
+* **Sabine** -- the original diffuse-field estimate,
+  :math:`T = k V / (A + 4 m V)`
+  with the total equivalent absorption area
+  :math:`A = \sum_i S_i \alpha_i` and the
+  air term :math:`4 m V`. Exact only for low, uniform absorption.
+* **Eyring** (Norris-Eyring) -- replaces ``A`` by
+  :math:`-S \ln(1 - \bar{\alpha})` with
+  the mean absorption :math:`\bar{\alpha} = A / S` over the total surface
+  ``S``; correct in the strong-absorption limit where Sabine overestimates
+  ``T``.
+* **Millington-Sette** -- :math:`-\sum_i S_i \ln(1 - \alpha_i)` sums the
+  Eyring term
   per surface, so a single perfectly absorbing surface drives ``T`` to zero.
 * **Fitzroy** -- an *area-weighted arithmetic* mean of three axial Eyring
   reverberation times, one per pair of opposing walls; captures rooms with the
   absorption concentrated on one axis (e.g. a carpeted, otherwise hard room).
-* **Arau-Puchades** -- an *area-weighted geometric* mean of the same three axial
-  Eyring times (Arau-Puchades, *Acustica* 65 (1988) 163): ``T = prod_i T_i **
-  (S_i / S)``. Recommended by its author over Fitzroy for anisotropic rooms.
+* **Arau-Puchades** -- an *area-weighted geometric* mean of the same three
+  axial Eyring times (Arau-Puchades, *Acustica* 65 (1988) 163):
+  :math:`T = \prod_i T_i^{S_i / S}`. Recommended by its author over Fitzroy
+  for anisotropic rooms.
 
-The Sabine constant is ``k = 24 ln 10 / c0`` (``= 55.26 / c0``); with the
-default ``c0 = 343 m/s`` it takes the familiar textbook value ``0.161``. (The
+The Sabine constant is :math:`k = 24 \ln 10 / c_0`
+(:math:`= 55.26 / c_0`); with the
+default :math:`c_0 = 343` m/s it takes the familiar textbook value
+``0.161``. (The
 :mod:`~phonometry.enclosed_space_absorption` EN 12354-6 model instead rounds
-``k`` to ``55.3`` and uses ``c0 = 345.6`` to pin the factor at exactly ``0.16``.)
+``k`` to ``55.3`` and uses :math:`c_0 = 345.6` to pin the factor at exactly
+``0.16``.)
 
 Air absorption enters every model through the ``air_attenuation`` power
-coefficient ``m`` (in neper per metre) as the additive term ``4 m V``; obtain a
-physical ``m`` from temperature and humidity with
+coefficient ``m`` (in neper per metre) as the additive term :math:`4 m V`;
+obtain a physical ``m`` from temperature and humidity with
 :func:`phonometry.air_absorption.air_attenuation_m`.
 
 Each model enforces its own mathematical domain on the absorption
@@ -40,7 +49,7 @@ coefficients. Sabine's linear sum is finite for any non-negative coefficient,
 so it accepts measured ISO 354 values at or above 1 (up to a unit-error guard
 at 2). The logarithmic models are stricter exactly where the maths requires
 it: Millington-Sette needs *every* coefficient below 1, while Eyring, Fitzroy
-and Arau-Puchades need each *mean* entering ``ln(1 - alpha)`` below 1.
+and Arau-Puchades need each *mean* entering :math:`\ln(1 - \alpha)` below 1.
 
 The Fitzroy and Arau-Puchades models require a rectangular (shoebox) room and
 take the room ``dimensions`` together with the mean absorption of each of the
@@ -120,9 +129,10 @@ def _broadcast_or_raise(
 def _accumulate_surfaces(
     surfaces: Sequence[Surface],
 ) -> tuple[float, NDArray[np.float64], list[tuple[float, NDArray[np.float64]]]]:
-    """Total area ``S``, total absorption area ``A`` and the validated surfaces.
+    r"""Total area ``S``, total absorption area ``A`` and the validated surfaces.
 
-    Returns ``(S, A, pairs)`` where ``A = sum_i S_i alpha_i`` is a per-band
+    Returns ``(S, A, pairs)`` where :math:`A = \sum_i S_i \alpha_i` is a
+    per-band
     array (0-d for scalar coefficients) and ``pairs`` is the list of validated
     ``(area, alpha)`` items for model-specific processing.
 
@@ -189,11 +199,13 @@ def _add_air(
 def _millington_absorption(
     pairs: Sequence[tuple[float, NDArray[np.float64]]],
 ) -> NDArray[np.float64]:
-    """Millington equivalent absorption ``-sum_i S_i ln(1 - alpha_i)`` (per band).
+    r"""Millington equivalent absorption (per band).
+
+    :math:`-\sum_i S_i \ln(1 - \alpha_i)`.
 
     :raises ValueError: for any coefficient at or above 1; the per-surface
-        ``ln(1 - alpha_i)`` diverges there, so Millington-Sette (alone among
-        the five models) requires every individual coefficient below 1.
+        :math:`\ln(1 - \alpha_i)` diverges there, so Millington-Sette (alone
+        among the five models) requires every individual coefficient below 1.
     """
     total = np.asarray(0.0, dtype=np.float64)
     for area, alpha_arr in pairs:
@@ -209,7 +221,7 @@ def _millington_absorption(
 
 
 def _eyring_absorption(total_area: float, mean_absorption: NDArray[np.float64]) -> NDArray[np.float64]:
-    """Eyring equivalent absorption ``-S ln(1 - alpha_bar)`` (per band)."""
+    r"""Eyring equivalent absorption :math:`-S \ln(1 - \bar{\alpha})` (per band)."""
     # A mean of exactly 1 (fully absorbing on average) has no finite Eyring
     # time: ln(1 - mean) diverges, so fail with a clear message instead.
     if np.any(mean_absorption >= 1.0):
@@ -226,7 +238,8 @@ def _eyring_absorption(total_area: float, mean_absorption: NDArray[np.float64]) 
 def _reverberation_time(
     volume: float, absorption: NDArray[np.float64], speed_of_sound: float
 ) -> np.ndarray | float:
-    """``T = 24 ln 10 / c0 * V / absorption``, with a positive-absorption guard."""
+    r""":math:`T = 24 \ln 10 / c_0 \cdot V / \text{absorption}`, with a
+    positive-absorption guard."""
     if np.any(absorption <= 0.0):
         raise ValueError(
             "the total absorption is non-positive; a perfectly reflecting room "
@@ -237,11 +250,13 @@ def _reverberation_time(
 
 
 def mean_absorption(surfaces: Sequence[Surface]) -> np.ndarray | float:
-    """Area-weighted mean absorption coefficient ``alpha_bar = A / S``.
+    r"""Area-weighted mean absorption coefficient
+    :math:`\bar{\alpha} = A / S`.
 
     :param surfaces: Sequence of ``(area, absorption_coefficient)`` pairs; each
         coefficient a scalar or a per-band array.
-    :return: The mean absorption ``sum_i S_i alpha_i / sum_i S_i``; a float for
+    :return: The mean absorption
+        :math:`\sum_i S_i \alpha_i / \sum_i S_i`; a float for
         scalar coefficients, otherwise a per-band array.
     """
     total_area, absorption_area, _ = _accumulate_surfaces(surfaces)
@@ -260,9 +275,10 @@ def sabine_reverberation_time(
     air_attenuation: ArrayLike = 0.0,
     speed_of_sound: float = DEFAULT_SPEED_OF_SOUND,
 ) -> np.ndarray | float:
-    """Sabine reverberation time ``T = k V / (A + 4 m V)``.
+    r"""Sabine reverberation time :math:`T = k V / (A + 4 m V)`.
 
-    ``A = sum_i S_i alpha_i`` is finite for any non-negative coefficient, so
+    :math:`A = \sum_i S_i \alpha_i` is finite for any non-negative
+    coefficient, so
     unlike the logarithmic models Sabine accepts coefficients at or above 1:
     measured ISO 354 reverberation-room values of 1.05 to 1.20 (the edge
     effect) and the exact 1.0 that the ISO 11654 practical rating caps at are
@@ -295,13 +311,18 @@ def eyring_reverberation_time(
     air_attenuation: ArrayLike = 0.0,
     speed_of_sound: float = DEFAULT_SPEED_OF_SOUND,
 ) -> np.ndarray | float:
-    """Eyring (Norris-Eyring) reverberation time.
+    r"""Eyring (Norris-Eyring) reverberation time.
 
-    ``T = k V / (-S ln(1 - alpha_bar) + 4 m V)`` with the total surface ``S``
+    .. math::
+
+       T = \frac{k V}{-S \ln(1 - \bar{\alpha}) + 4 m V}
+
+    with the total surface ``S``
     and its area-weighted mean absorption ``alpha_bar``.
 
-    The formula constrains only the *mean*: ``ln(1 - alpha_bar)`` requires
-    ``alpha_bar < 1``, while individual coefficients at or above 1 (a measured
+    The formula constrains only the *mean*: :math:`\ln(1 - \bar{\alpha})`
+    requires :math:`\bar{\alpha} < 1`, while individual coefficients at or
+    above 1 (a measured
     ISO 354 outcome) are accepted as long as the mean stays below 1 and each
     coefficient stays within the shared unit-error ceiling of 2.
 
@@ -326,11 +347,17 @@ def millington_sette_reverberation_time(
     air_attenuation: ArrayLike = 0.0,
     speed_of_sound: float = DEFAULT_SPEED_OF_SOUND,
 ) -> np.ndarray | float:
-    """Millington-Sette reverberation time.
+    r"""Millington-Sette reverberation time.
 
-    ``T = k V / (-sum_i S_i ln(1 - alpha_i) + 4 m V)``: the Eyring absorption
-    term summed surface by surface rather than through a single mean. A surface
-    approaching total absorption (``alpha_i -> 1``) drives ``T`` to zero.
+    .. math::
+
+       T = \frac{k V}{-\sum_i S_i \ln(1 - \alpha_i) + 4 m V}
+
+    The Eyring absorption
+    term is summed surface by surface rather than through a single mean.
+    A surface
+    approaching total absorption (:math:`\alpha_i \to 1`) drives ``T`` to
+    zero.
     Because the logarithm applies per surface, *every* coefficient must be
     strictly below 1; measured ISO 354 coefficients at or above 1 are outside
     this model's domain (use Sabine, or Eyring while the mean stays below 1).
@@ -354,10 +381,11 @@ def millington_sette_reverberation_time(
 
 
 def _axial_geometry(dimensions: Sequence[float]) -> tuple[float, float, NDArray[np.float64]]:
-    """Volume ``V``, total surface ``S`` and the three wall-pair areas ``S_i``.
+    r"""Volume ``V``, total surface ``S`` and the three wall-pair areas ``S_i``.
 
     ``S_i`` is the combined area of the two walls perpendicular to axis ``i``:
-    ``S_x = 2 L_y L_z``, ``S_y = 2 L_x L_z``, ``S_z = 2 L_x L_y``.
+    :math:`S_x = 2 L_y L_z`, :math:`S_y = 2 L_x L_z`,
+    :math:`S_z = 2 L_x L_y`.
     """
     if len(dimensions) != 3:
         raise ValueError("'dimensions' must be the three room lengths (Lx, Ly, Lz).")
@@ -423,13 +451,16 @@ def fitzroy_reverberation_time(
     air_attenuation: ArrayLike = 0.0,
     speed_of_sound: float = DEFAULT_SPEED_OF_SOUND,
 ) -> np.ndarray | float:
-    """Fitzroy reverberation time -- area-weighted arithmetic mean of axial times.
+    r"""Fitzroy reverberation time -- area-weighted arithmetic mean of axial times.
 
-    ``T = sum_i (S_i / S) T_i`` with ``T_i`` the Eyring time of the wall pair
+    :math:`T = \sum_i (S_i / S)\, T_i` with :math:`T_i` the Eyring time of
+    the wall pair
     perpendicular to axis ``i`` (Fitzroy, *J. Acoust. Soc. Am.* 31 (1959) 893).
-    Equivalent to ``T = k V / S**2 * sum_i S_i / (-ln(1 - alpha_i))`` without
-    air. Reduces to Eyring for a uniform absorption distribution. Each input
-    is itself a mean entering ``ln(1 - alpha_i)``, so each must be below 1.
+    Equivalent to
+    :math:`T = \frac{k V}{S^2} \sum_i \frac{S_i}{-\ln(1 - \alpha_i)}`
+    without air. Reduces to Eyring for a uniform absorption distribution.
+    Each input is itself a mean entering :math:`\ln(1 - \alpha_i)`, so each
+    must be below 1.
 
     :param dimensions: Room lengths ``(Lx, Ly, Lz)``, m.
     :param absorptions: Mean absorption ``(alpha_x, alpha_y, alpha_z)`` of the
@@ -453,14 +484,14 @@ def arau_puchades_reverberation_time(
     air_attenuation: ArrayLike = 0.0,
     speed_of_sound: float = DEFAULT_SPEED_OF_SOUND,
 ) -> np.ndarray | float:
-    """Arau-Puchades reverberation time -- area-weighted geometric mean of axial times.
+    r"""Arau-Puchades reverberation time -- area-weighted geometric mean of axial times.
 
-    ``T = prod_i T_i ** (S_i / S)`` with ``T_i`` the Eyring time of the wall
-    pair perpendicular to axis ``i`` (Arau-Puchades, *Acustica* 65 (1988) 163,
-    Formula 18). Preferred by its author over Fitzroy for rooms with an
-    anisotropic absorption distribution. Reduces to Eyring for a uniform
-    distribution. Each input is itself a mean entering ``ln(1 - alpha_i)``,
-    so each must be below 1.
+    :math:`T = \prod_i T_i^{S_i / S}` with :math:`T_i` the Eyring time of the
+    wall pair perpendicular to axis ``i`` (Arau-Puchades, *Acustica* 65
+    (1988) 163, Formula 18). Preferred by its author over Fitzroy for rooms
+    with an anisotropic absorption distribution. Reduces to Eyring for a
+    uniform distribution. Each input is itself a mean entering
+    :math:`\ln(1 - \alpha_i)`, so each must be below 1.
 
     :param dimensions: Room lengths ``(Lx, Ly, Lz)``, m.
     :param absorptions: Mean absorption ``(alpha_x, alpha_y, alpha_z)`` of the

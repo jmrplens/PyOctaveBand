@@ -1,10 +1,11 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""
+r"""
 Regularized spectral inversion with frequency-dependent regularization.
 
 Inverting a measured transfer function -- to equalize a measurement
 loudspeaker, flatten a microphone response or post-process an acquired
-impulse response -- cannot be a plain reciprocal ``1/H(f)``: wherever the
+impulse response -- cannot be a plain reciprocal :math:`1/H(f)`: wherever
+the
 system radiates little energy (outside its passband, in deep notches) the
 reciprocal explodes and the inverse filter amplifies nothing but noise.
 Mueller & Massarani ("Transfer-Function Measurement with Sweeps", JAES
@@ -16,21 +17,26 @@ This module implements that behaviour with the frequency-dependent
 Tikhonov regularization of Kirkeby & Nelson ("Digital Filter Design for
 Inversion Problems in Sound Reproduction", JAES 47(7/8), 1999, Eq. (17)):
 
-``H_inv(f) = conj(H(f)) / (|H(f)|**2 + epsilon(f))``,
+.. math::
 
-where the regularization profile ``epsilon(f)`` is small inside the band
-``[f1, f2]`` (the filter equalizes to unity within an analytic bound) and
-large outside (the out-of-band gain is capped at ``1/(2*sqrt(epsilon))``,
-the maximum of ``x/(x**2 + epsilon)``), with a smooth geometric cross-fade
+   H_{\mathrm{inv}}(f)
+   = \frac{\overline{H(f)}}{\lvert H(f) \rvert^2 + \epsilon(f)}
+
+where the regularization profile :math:`\epsilon(f)` is small inside the
+band :math:`[f_1, f_2]` (the filter equalizes to unity within an analytic
+bound) and large outside (the out-of-band gain is capped at
+:math:`1/(2\sqrt{\epsilon})`, the maximum of
+:math:`x/(x^2 + \epsilon)`), with a smooth geometric cross-fade
 over a transition zone bordering the band edges. A modeling delay makes
 the mixed-phase inverse causal (Kirkeby & Nelson Sec. 2.4: the inverse of
 a non-minimum-phase response is anticausal and must be delayed to be
 realisable).
 
 The closed forms above are the module's oracles: in-band the equalized
-magnitude ``|H*H_inv|`` deviates from unity by exactly
-``epsilon/( |H|**2 + epsilon )``, and out-of-band the filter gain never
-exceeds the ``1/(2*sqrt(epsilon))`` bound.
+magnitude :math:`\lvert H \, H_{\mathrm{inv}} \rvert` deviates from unity
+by exactly :math:`\epsilon/(\lvert H \rvert^2 + \epsilon)`, and
+out-of-band the filter gain never exceeds the
+:math:`1/(2\sqrt{\epsilon})` bound.
 """
 
 from __future__ import annotations
@@ -53,32 +59,38 @@ __all__ = [
 
 @dataclass(frozen=True)
 class InverseFilterResult:
-    """A regularized inverse filter with its achieved equalization.
+    r"""A regularized inverse filter with its achieved equalization.
 
     Returned by :func:`regularized_inverse_filter`. The causal filter
     samples live in ``inverse`` (the equalized response arrives ``delay``
     samples late; :meth:`apply` compensates it). ``spectrum`` is the
     complex inverse spectrum *including* the modeling delay;
-    ``regularization`` is the ``epsilon(f)`` profile actually used, and
-    ``flatness_db`` reports how flat the equalized magnitude
-    ``|H(f) * H_inv(f)|`` actually is across the requested band.
+    ``regularization`` is the :math:`\epsilon(f)` profile actually used,
+    and ``flatness_db`` reports how flat the equalized magnitude
+    :math:`\lvert H(f) \, H_{\mathrm{inv}}(f) \rvert` actually is across
+    the requested band.
 
     :ivar inverse: Inverse-filter samples (time domain, length ``n_fft``).
     :ivar frequencies: Frequency grid of the design, in Hz.
     :ivar spectrum: Complex inverse spectrum on :attr:`frequencies`,
-        including the ``exp(-j*2*pi*f*delay/fs)`` modeling delay.
+        including the :math:`\exp(-j 2 \pi f \, \text{delay} / f_s)`
+        modeling delay.
     :ivar response_spectrum: Complex spectrum of the measured response the
         filter was designed from, on the same grid.
-    :ivar regularization: The frequency-dependent profile ``epsilon(f)``
-        (absolute units of ``|H|**2``).
+    :ivar regularization: The frequency-dependent profile
+        :math:`\epsilon(f)` (absolute units of
+        :math:`\lvert H \rvert^2`).
     :ivar f_range: ``(f1, f2)`` band equalized to unity, in Hz.
     :ivar delay: Modeling delay of the filter, in samples.
     :ivar fs: Sample rate, in Hz.
     :ivar flatness_db: Largest deviation of the equalized magnitude
-        ``20*log10|H*H_inv|`` from 0 dB inside ``[f1, f2]``.
+        :math:`20 \log_{10} \lvert H \, H_{\mathrm{inv}} \rvert` from 0 dB
+        inside :math:`[f_1, f_2]`.
     :ivar max_gain_db: Largest filter gain *outside* the transition-padded
-        band, peak-normalized as ``20*log10(max|H_inv| * peak_h)`` where
-        ``peak_h`` is the peak of ``|H|`` -- the achieved out-of-band boost
+        band, peak-normalized as
+        :math:`20 \log_{10}(\max \lvert H_{\mathrm{inv}} \rvert \cdot
+        \text{peak}_h)` where ``peak_h`` is the peak of
+        :math:`\lvert H \rvert` -- the achieved out-of-band boost
         the regularization allowed where the measurement carries no signal.
     """
 
@@ -128,10 +140,12 @@ class InverseFilterResult:
     def plot(
         self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
     ) -> Axes:
-        """Plot the measured, inverse and equalized magnitudes.
+        r"""Plot the measured, inverse and equalized magnitudes.
 
-        One panel: ``|H|``, ``|H_inv|`` and the equalized product
-        ``|H*H_inv|`` in dB over log-frequency, with the equalized band
+        One panel: :math:`\lvert H \rvert`,
+        :math:`\lvert H_{\mathrm{inv}} \rvert` and the equalized product
+        :math:`\lvert H \, H_{\mathrm{inv}} \rvert` in dB over
+        log-frequency, with the equalized band
         shaded. Requires matplotlib (``pip install phonometry[plot]``).
 
         :param language: Label language, ``"en"`` (default) or ``"es"``.
@@ -150,12 +164,13 @@ def _regularization_profile(
     eps_outside: float,
     transition_octaves: float,
 ) -> np.ndarray:
-    """Frequency-dependent ``epsilon(f)``: geometric in/out cross-fade.
+    r"""Frequency-dependent :math:`\epsilon(f)`: geometric cross-fade.
 
-    ``epsilon`` equals ``eps_inside`` across all of ``[f1, f2]`` and
-    ``eps_outside`` beyond a ``transition_octaves``-wide zone bordering
+    :math:`\epsilon` equals ``eps_inside`` across all of
+    :math:`[f_1, f_2]` and ``eps_outside`` beyond a
+    ``transition_octaves``-wide zone bordering
     each edge; inside each zone the two levels are blended geometrically
-    (linearly in ``log(epsilon)``) with a half-cosine, following the
+    (linearly in :math:`\log \epsilon`) with a half-cosine, following the
     smooth transition-band advice of Kirkeby & Nelson (1999, Sec. 3.2).
     """
     f1, f2 = f_range
@@ -229,28 +244,34 @@ def regularized_inverse_filter(
     n_fft: int | None = None,
     delay: int | None = None,
 ) -> InverseFilterResult:
-    """
+    r"""
     Design a regularized inverse filter for a measured impulse response.
 
     Computes the frequency-dependent Tikhonov inverse of Kirkeby & Nelson
     (JAES 47(7/8), 1999, Eq. (17)),
 
-    ``H_inv(f) = conj(H(f)) / (|H(f)|**2 + epsilon(f))``,
+    .. math::
 
-    with ``epsilon(f)`` small across ``[f1, f2]`` and large outside, so the
-    filter equalizes the response to unity in-band while the out-of-band
-    gain stays bounded by ``1/(2*sqrt(epsilon_outside))`` -- the behaviour
+       H_{\mathrm{inv}}(f)
+       = \frac{\overline{H(f)}}{\lvert H(f) \rvert^2 + \epsilon(f)}
+
+    with :math:`\epsilon(f)` small across :math:`[f_1, f_2]` and large
+    outside, so the filter equalizes the response to unity in-band while
+    the out-of-band gain stays bounded by
+    :math:`1/(2\sqrt{\epsilon_{\mathrm{outside}}})` -- the behaviour
     Mueller & Massarani (JAES 49(6), 2001, Secs. 3.1/4.5) obtain by
     band-passing the plain inverse. A modeling delay of ``delay`` samples
     (default half the FFT block) shifts the generally anticausal inverse of
     a mixed-phase response into a causal filter (Kirkeby & Nelson,
     Sec. 2.4).
 
-    Both regularization levels are *relative* to the peak of ``|H|**2``
+    Both regularization levels are *relative* to the peak of
+    :math:`\lvert H \rvert^2`
     (like the scalar ``regularization`` of :func:`phonometry.impulse_response`,
     which this generalises): in-band the equalized magnitude deviates from
     unity by at most ``regularization_inside * max|H|**2 / min|H|**2`` --
-    the analytic residue ``epsilon/(|H|**2 + epsilon)`` -- and the achieved
+    the analytic residue
+    :math:`\epsilon/(\lvert H \rvert^2 + \epsilon)` -- and the achieved
     figure is reported as :attr:`InverseFilterResult.flatness_db`.
 
     Use the result's :meth:`InverseFilterResult.apply` to equalize
@@ -265,10 +286,11 @@ def regularized_inverse_filter(
         equalized to unity. Choose it inside the band actually excited and
         radiated; inverting unexcited regions only amplifies noise.
     :param regularization_inside: In-band regularization, as a fraction of
-        the peak spectral power ``max|H|**2``. Default 1e-6.
+        the peak spectral power :math:`\max \lvert H \rvert^2`.
+        Default 1e-6.
     :param regularization_outside: Out-of-band regularization, same units.
         Default 1.0, which caps the out-of-band gain at 6 dB below the
-        peak-normalised unity (``1/(2*sqrt(1)) = 0.5``).
+        peak-normalised unity (:math:`1/(2\sqrt{1}) = 0.5`).
     :param transition_octaves: Width of the geometric cross-fade between
         the two regularization levels, in octaves outside each band edge.
         Default 1/3.

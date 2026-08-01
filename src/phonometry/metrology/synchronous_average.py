@@ -1,27 +1,36 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""
+r"""
 Time synchronous averaging (TSA) of a periodic waveform in noise.
 
 Time domain averaging extracts a repetitive signal of known period ``T``
 from additive noise by ensemble-averaging successive length-``T`` blocks,
 following P. D. McFadden, "A revised model for the extraction of periodic
 waveforms by time domain averaging", *Mechanical Systems and Signal
-Processing* 1(1) 1987, 83-95. Given a signal ``y(t) = x(t) + e(t)`` with
-``x`` periodic in ``T`` and ``e`` asynchronous, the average
+Processing* 1(1) 1987, 83-95. Given a signal
+:math:`y(t) = x(t) + e(t)` with ``x`` periodic in ``T`` and ``e``
+asynchronous, the average
 
-    ``a(t) = (1/N) Σ_{n=0}^{N-1} y(t + n·T)``   (McFadden Eq. 5)
+.. math::
+
+   a(t) = \frac{1}{N} \sum_{n=0}^{N-1} y(t + n T)
+   \tag{McFadden Eq. 5}
 
 reinforces every component synchronous with ``T`` and suppresses the rest.
 
 **Two models, one implementation.** McFadden distinguishes the *existing*
 comb-filter model from the *revised* model. In the frequency domain the
-average is the multiplication of ``Y(f)`` by the comb filter (Eq. 8)
+average is the multiplication of :math:`Y(f)` by the comb filter (Eq. 8)
 
-    ``C(f) = (1/N)·sin(N·π·f·T) / sin(π·f·T)``,
+.. math::
 
-whose magnitude ``|C(f)| = |sin(N·π·f·T) / (N·sin(π·f·T))|`` is a Dirichlet
-kernel: unity at every harmonic ``k/T`` (the teeth, Eq. 9, of unit height
-regardless of ``N``) and zero at the nodes ``j/(N·T)`` with ``j`` not a
+   C(f) = \frac{1}{N} \, \frac{\sin(N \pi f T)}{\sin(\pi f T)}
+
+whose magnitude
+:math:`\lvert C(f) \rvert
+= \lvert \sin(N \pi f T) / (N \sin(\pi f T)) \rvert` is a Dirichlet
+kernel: unity at every harmonic :math:`k/T` (the teeth, Eq. 9, of unit
+height regardless of ``N``) and zero at the nodes :math:`j/(N T)` with
+``j`` not a
 multiple of ``N``. That model assumes knowledge of ``y`` over infinite time
 and produces a result that is not exactly periodic. McFadden's *revised*
 model applies a rectangular window of width ``T`` in the time domain and
@@ -32,35 +41,40 @@ consecutive periods of an integer number of samples reduced to one period,
 *is* that revised model: the returned :attr:`period_waveform`, repeated,
 is exactly periodic.
 
-**Noise reduction.** Asynchronous noise of variance ``σ²`` averaged over
-``N`` periods has residual variance ``σ²/N``: the residual standard
-deviation falls as ``1/√N`` and the amplitude signal-to-noise ratio
-improves by ``√N`` (a power reduction of ``10·log₁₀ N`` dB, reported as
+**Noise reduction.** Asynchronous noise of variance :math:`\sigma^2`
+averaged over ``N`` periods has residual variance :math:`\sigma^2/N`:
+the residual standard deviation falls as :math:`1/\sqrt{N}` and the
+amplitude signal-to-noise ratio improves by :math:`\sqrt{N}` (a power
+reduction of :math:`10 \log_{10} N` dB, reported as
 :attr:`noise_reduction_db`).
 
 **Choosing N (McFadden's revised-model correction).** Because a discrete
-interfering tone at a *non-harmonic* order ``q = f·T`` is only attenuated,
-not removed, its rejection is optimised by choosing ``N`` so that a comb
-node lands exactly on it, i.e. the smallest ``N`` with ``N·q`` an integer.
-McFadden's own example, a tone at 32.05 orders, is suppressed by more than
-100 dB with ``N = 20`` (since ``20·32.05 = 641``) yet -- evaluating Eq. 8
+interfering tone at a *non-harmonic* order :math:`q = f T` is only
+attenuated, not removed, its rejection is optimised by choosing ``N`` so
+that a comb node lands exactly on it, i.e. the smallest ``N`` with
+:math:`N q` an integer.
+McFadden's own example, a tone at 32.05 orders, is suppressed by more
+than 100 dB with :math:`N = 20` (since :math:`20 \cdot 32.05 = 641`)
+yet -- evaluating Eq. 8
 at that order -- by only about 14 dB with the common power-of-two choice
-``N = 32`` (``32·32.05 = 1025.6``; the paper makes the comparison but does
+:math:`N = 32` (:math:`32 \cdot 32.05 = 1025.6`; the paper makes the
+comparison but does
 not print this figure). Thus the habit of taking a power-of-two number of
 averages is not, in general, optimal.
 
-**Non-integer samples per period.** When ``fs·T`` is not an integer the
-period boundaries fall between samples. Each block is then aligned to a
-common integer grid by the band-limited fractional delay of
+**Non-integer samples per period.** When :math:`f_s T` is not an integer
+the period boundaries fall between samples. Each block is then aligned to
+a common integer grid by the band-limited fractional delay of
 :func:`phonometry.metrology.signals.fractional_delay` before averaging, so
 the periodic waveform is recovered within the interpolation error of that
-band-limited shift. An integer ``fs·T`` needs no interpolation and the
-waveform is recovered to machine precision. The averaged samples stay on
-the ``1/fs`` sampling grid throughout: output sample ``m`` is the average
-of the input at the times ``n·T + m/fs``, so the returned time axis is
-``m/fs`` and the ``M = round(fs·T)`` samples cover one period exactly when
-``fs·T`` is an integer and to within half a sample otherwise. No
-resampling onto an ``M``-point angular grid is performed.
+band-limited shift. An integer :math:`f_s T` needs no interpolation and
+the waveform is recovered to machine precision. The averaged samples stay
+on the :math:`1/f_s` sampling grid throughout: output sample ``m`` is the
+average of the input at the times :math:`n T + m/f_s`, so the returned
+time axis is :math:`m/f_s` and the
+:math:`M = \operatorname{round}(f_s T)` samples cover one period exactly
+when :math:`f_s T` is an integer and to within half a sample otherwise.
+No resampling onto an ``M``-point angular grid is performed.
 """
 
 from __future__ import annotations
@@ -93,12 +107,14 @@ def comb_filter_response(
     period: float,
     n_averages: int,
 ) -> NDArray[np.float64]:
-    """Magnitude of the N-period synchronous-averaging comb filter.
+    r"""Magnitude of the N-period synchronous-averaging comb filter.
 
-    The closed form of McFadden Eq. 8, ``|C(f)| = |sin(N·π·f·T) /
-    (N·sin(π·f·T))|``, a Dirichlet kernel with unit-height teeth at the
-    harmonics ``k/T`` (Eq. 9) and nodes at ``j/(N·T)`` for ``j`` not a
-    multiple of ``N``.
+    The closed form of McFadden Eq. 8,
+    :math:`\lvert C(f) \rvert
+    = \lvert \sin(N \pi f T) / (N \sin(\pi f T)) \rvert`,
+    a Dirichlet kernel with unit-height teeth at the
+    harmonics :math:`k/T` (Eq. 9) and nodes at :math:`j/(N T)` for ``j``
+    not a multiple of ``N``.
 
     :param frequencies: Frequencies at which to evaluate, in Hz.
     :param period: Repetition period ``T``, in seconds.
@@ -136,17 +152,17 @@ def comb_filter_response(
 
 @dataclass(frozen=True)
 class SynchronousAverageResult:
-    """Time synchronous average of a periodic waveform in noise.
+    r"""Time synchronous average of a periodic waveform in noise.
 
     :ivar period_waveform: The averaged periodic waveform, one period of
         :attr:`samples_per_period` samples.
     :ivar times: Time axis of :attr:`period_waveform`, in seconds: the
-        sampling grid ``m/fs``, ``m = 0 .. M-1`` (the averaged samples stay
-        on the ``1/fs`` grid; see the module note). The axis spans one
-        period exactly when ``fs·T`` is an integer, and to within half a
-        sample otherwise.
+        sampling grid :math:`m/f_s`, :math:`m = 0 \ldots M-1` (the
+        averaged samples stay on the :math:`1/f_s` grid; see the module
+        note). The axis spans one period exactly when :math:`f_s T` is an
+        integer, and to within half a sample otherwise.
     :ivar residual: Input minus the periodic reconstruction, over the
-        analysed span (``n_averages·samples_per_period`` samples, aligned
+        analysed span (``n_averages * samples_per_period`` samples, aligned
         to the integer period grid): what is left after the synchronous
         component is removed.
     :ivar n_averages: Number of periods averaged, ``N``.
@@ -155,9 +171,9 @@ class SynchronousAverageResult:
     :ivar period: Repetition period ``T``, in seconds.
     :ivar fs: Sample rate, in Hz.
     :ivar interpolated: Whether band-limited fractional-delay alignment was
-        applied (``True`` when ``fs·T`` is not an integer).
+        applied (``True`` when :math:`f_s T` is not an integer).
     :ivar noise_reduction_db: Power reduction of asynchronous noise,
-        ``10·log₁₀ N`` dB (amplitude SNR gain ``√N``).
+        :math:`10 \log_{10} N` dB (amplitude SNR gain :math:`\sqrt{N}`).
     :ivar residual_rms: Root-mean-square of :attr:`residual`.
     :ivar comb_frequencies: Frequency axis of the comb-filter response, in
         Hz (from DC over a whole number of harmonics of ``1/T``).
@@ -180,7 +196,7 @@ class SynchronousAverageResult:
 
     @property
     def amplitude_snr_gain(self) -> float:
-        """Amplitude signal-to-noise improvement ``√N`` from averaging."""
+        r"""Amplitude signal-to-noise improvement :math:`\sqrt{N}`."""
         return float(np.sqrt(self.n_averages))
 
     def plot(
@@ -270,12 +286,13 @@ def time_synchronous_average(
     n_averages: int | None = None,
     n_harmonics: int = 8,
 ) -> SynchronousAverageResult:
-    """Extract a periodic waveform of known period by time domain averaging.
+    r"""Extract a periodic waveform of known period by time domain averaging.
 
     Ensemble-averages ``N`` successive periods of the record (McFadden
     Eq. 5) to reinforce the component synchronous with ``period`` and
     suppress asynchronous noise, whose residual standard deviation falls as
-    ``1/√N``. When ``fs·period`` is an integer the periods are sliced
+    :math:`1/\sqrt{N}`. When ``fs * period`` is an integer the periods are
+    sliced
     directly and a noiseless periodic signal is recovered exactly; otherwise
     each period is aligned to a common integer grid by the band-limited
     fractional delay of :func:`~phonometry.metrology.signals.fractional_delay`
@@ -286,7 +303,8 @@ def time_synchronous_average(
     :param period: Known repetition period ``T``, in seconds (e.g. one
         revolution of a rotating machine).
     :param n_averages: Number of whole periods to average (default: as many
-        as the record holds). Choosing ``N`` so that ``N·q`` is an integer
+        as the record holds). Choosing ``N`` so that :math:`N q` is an
+        integer
         places a comb node on an interfering tone at order ``q`` and
         maximises its rejection (McFadden's revised-model result).
     :param n_harmonics: Number of harmonics of ``1/T`` spanned by the

@@ -19,7 +19,8 @@ Two excitation families are implemented:
   rises exponentially with time, which mimics a pink-noise source
   (ISO 18233:2006, B.3.2) and is the recommended broadband excitation. The
   IR is recovered by linear (zero-padded, non-circular) spectral
-  deconvolution (B.5, Figure B.3): `H = Y * conj(X) / (|X|^2 + reg)`. A
+  deconvolution (B.5, Figure B.3):
+  $H = Y \overline{X} / (|X|^2 + \text{reg})$. A
   Farina inverse-filter variant (`method="farina"`) convolves the
   recording with the time-reversed, amplitude-compensated sweep (B.5,
   Figure B.2). Because a low-to-high sweep places distortion products at
@@ -30,7 +31,7 @@ Two excitation families are implemented:
   [`phonometry.swept_sine_distortion`](/phonometry/reference/api/electroacoustics/swept-sine/#swept_sine_distortion).
 
 * **Maximum-length sequence (Annex A)** -- an order-`N` binary sequence of
-  length `2**N - 1` generated with a linear-feedback shift register
+  length $2^N - 1$ generated with a linear-feedback shift register
   (LFSR). Its circular autocorrelation is a near-perfect delta (A.1), so the
   IR of a periodically excited linear system is recovered by circular
   cross-correlation of the recorded period with the sequence
@@ -40,8 +41,8 @@ Two further excitations from the transfer-function measurement literature
 complete the family:
 
 * **Complementary Golay pair** -- two binary sequences of length
-  `L = 2**n` whose periodic autocorrelations sum to an *exact* delta of
-  height `2L` (Golay 1961; Havelock, Kuwano & Vorlaender (eds.), Handbook
+  $L = 2^n$ whose periodic autocorrelations sum to an *exact* delta of
+  height $2L$ (Golay 1961; Havelock, Kuwano & Vorlaender (eds.), Handbook
   of Signal Processing in Acoustics, Springer 2008, Part I Ch. 6 by
   N. Xiang, Eq. (2)). Exciting the system with each code in turn and
   summing the two circular cross-correlations recovers the IR with zero
@@ -85,11 +86,13 @@ Recover an impulse response from a complementary Golay-pair excitation.
 Each code of the pair is emitted periodically (as with an MLS, record in
 the steady state: at least one settling period before acquisition); the
 recorded periods of each code are averaged and the IR is the sum of the
-two circular cross-correlations, normalised by `2L` (Havelock 2008,
+two circular cross-correlations, normalised by $2L$ (Havelock 2008,
 Part I Ch. 6 (N. Xiang), Eq. (4) and the measurement procedure of
 Fig. 2):
 
-`h = IFFT[ conj(A)*FFT(y_a) + conj(B)*FFT(y_b) ] / (2L)`.
+$$
+h = \operatorname{IFFT}\!\left[ \overline{A}\, \operatorname{FFT}(y_a) + \overline{B}\, \operatorname{FFT}(y_b) \right] / (2L)
+$$
 
 Because the pair's autocorrelations are *exactly* complementary
 (Xiang Eq. (2)), the recovery has no correlation noise: for a noiseless
@@ -132,7 +135,7 @@ Built with the append recursion of Golay (1961): starting from
 and `-b` to `a` (Havelock, Handbook of Signal Processing in
 Acoustics, Springer 2008, Part I Ch. 6 (N. Xiang), Eq. (1)). The pair is
 *complementary*: the sum of the two periodic autocorrelations is exactly
-`2L` at zero lag and exactly zero everywhere else (Xiang Eq. (2)) --
+$2L$ at zero lag and exactly zero everywhere else (Xiang Eq. (2)) --
 an algebraic identity, not an approximation, unlike the near-delta
 autocorrelation of an MLS.
 
@@ -140,7 +143,7 @@ autocorrelation of an MLS.
 
 | Name | Description |
 | :--- | :--- |
-| `order` | Number of recursion steps `n` (1 to 22). Each code has `L = 2**order` samples. |
+| `order` | Number of recursion steps `n` (1 to 22). Each code has $L = 2^{\text{order}}$ samples. |
 
 **Returns:** The pair `(a, b)` as bipolar float arrays (values `+1/-1`).
 
@@ -176,9 +179,9 @@ causal part (B.5).
 | `recorded` | Recorded system response to the sweep. |
 | `reference` | The emitted sweep (excitation signal). |
 | `fs` | Sampling frequency in Hz (kept for API symmetry; the deconvolution itself is sample-rate agnostic). |
-| `method` | `"spectral"` for spectral division `H = Y*conj(X)/(\|X\|^2+reg)` (Figure B.3, default) or `"farina"` for convolution with the analytic inverse filter (Figure B.2). The Farina method requires `f_range` and the **exact-length, unpadded** excitation sweep as `reference` (it rebuilds the inverse filter from `reference.size/fs` as the sweep duration); a reference zero-padded to the recording length - the correct input for the spectral method - is rejected with a `ValueError` because it would silently produce a wrong inverse filter. It also assumes the reference sweep was generated with the default `amplitude`/`fade` of [`sweep_signal`](/phonometry/reference/api/rooms/room-ir/#sweep_signal); a non-unit amplitude or custom fade yields a scaled IR, so use the spectral method in that case. |
+| `method` | `"spectral"` for spectral division $H = Y \overline{X} / (\lvert X \rvert^2 + \text{reg})$ (Figure B.3, default) or `"farina"` for convolution with the analytic inverse filter (Figure B.2). The Farina method requires `f_range` and the **exact-length, unpadded** excitation sweep as `reference` (it rebuilds the inverse filter from `reference.size/fs` as the sweep duration); a reference zero-padded to the recording length - the correct input for the spectral method - is rejected with a `ValueError` because it would silently produce a wrong inverse filter. It also assumes the reference sweep was generated with the default `amplitude`/`fade` of [`sweep_signal`](/phonometry/reference/api/rooms/room-ir/#sweep_signal); a non-unit amplitude or custom fade yields a scaled IR, so use the spectral method in that case. |
 | `f_range` | `(f1, f2)` of the sweep, required for `method="farina"` to rebuild the inverse filter; ignored for the spectral method. |
-| `regularization` | Tikhonov term added to the denominator, expressed as a fraction of the peak spectral energy `max(\|X\|^2)` (spectral method only). Guards against amplifying noise where the sweep has little energy, e.g. outside its frequency range (B.5). Default 1e-6. |
+| `regularization` | Tikhonov term added to the denominator, expressed as a fraction of the peak spectral energy $\max(\lvert X \rvert^2)$ (spectral method only). Guards against amplifying noise where the sweep has little energy, e.g. outside its frequency range (B.5). Default 1e-6. |
 | `length` | Number of samples of the causal IR to return. Defaults to `len(recorded)`. Ignored when `return_full` is True. |
 | `return_full` | If True, return the full deconvolution sequence (causal IR at index 0, negative-time distortion products in the tail) instead of the trimmed causal IR. Default False. |
 
@@ -405,10 +408,15 @@ Implements the frequency-domain sweep construction of
 Mueller & Massarani ("Transfer-Function Measurement with Sweeps", JAES
 49(6), 2001, Secs. 4.2-4.3): the magnitude of the synthesis spectrum is
 set to the band-limited target, and the group delay grows in proportion
-to the target's spectral power,
+to the target's spectral power (Eqs. (11)-(12)):
 
-`tau_G(f) = tau_G(f - df) + C * |H(f)|**2` with
-`C = (tau_G(f_end) - tau_G(f_start)) / sum(|H|**2)`  (Eqs. (11)-(12)),
+$$
+\tau_G(f) = \tau_G(f - df) + C\, |H(f)|^2
+$$
+
+$$
+C = \frac{\tau_G(f_{\text{end}}) - \tau_G(f_{\text{start}})} {\sum |H|^2}
+$$
 
 so the sweep dwells on each frequency for a time proportional to the
 energy it must radiate there and its temporal envelope stays nearly
@@ -431,8 +439,8 @@ measurement's noise floor (that is its purpose: SNR shaping).
 | :--- | :--- |
 | `fs` | Sampling frequency in Hz. |
 | `f1` | Start frequency of the sweep band in Hz. Must be > 0. The magnitude rolls off over 1/6 octave *below* `f1` (clipped at the first FFT bin), so the full target level holds across `[f1, f2]`. |
-| `f2` | Stop frequency in Hz. Must satisfy `f1 < f2 <= fs/2`; keep some margin below Nyquist so the upper roll-off has room. |
-| `seconds` | Sweep duration `tau_G(f2) - tau_G(f1)` in seconds. The returned signal is slightly longer (lead-in plus tail margin, see `start_delay`). |
+| `f2` | Stop frequency in Hz. Must satisfy $f_1 < f_2 \le f_s/2$; keep some margin below Nyquist so the upper roll-off has room. |
+| `seconds` | Sweep duration $\tau_G(f_2) - \tau_G(f_1)$ in seconds. The returned signal is slightly longer (lead-in plus tail margin, see `start_delay`). |
 | `target` | The magnitude shape: `"pink"` (default; 3 dB per octave falling, the classical room-measurement emphasis), `"white"` (flat), or a `(frequencies_hz, magnitude_db)` pair of arrays interpolated in dB over log-frequency (only the shape matters; any overall offset is normalised away). |
 | `amplitude` | Peak amplitude of the returned sweep. Default 1.0. |
 | `start_delay` | Group delay assigned to `f1`, in seconds; the same margin is left after `tau_G(f2)`, so the signal lasts `seconds + 2*start_delay`. The sweep spreads slightly beyond its nominal start (Sec. 4.2: the group delay of the lowest bin "should not be set to zero"), so the default `0.05*seconds` gives the first half-wave room to evolve. |
@@ -525,10 +533,10 @@ sweep_signal(
 Generate an exponential sine sweep (ESS) with exact analytic phase.
 
 The instantaneous frequency rises exponentially from `f1` to `f2`,
-`f(t) = f1 * (f2/f1) ** (t/T)`, so the time spent per octave is
+$f(t) = f_1 (f_2/f_1)^{t/T}$, so the time spent per octave is
 constant and the sweep mimics a pink-noise excitation
 (ISO 18233:2006, B.3.2). The phase is the closed-form integral of
-`2*pi*f(t)` (Farina, AES 108th Conv., 2000; ISO 18233 Bibliography
+$2 \pi f(t)$ (Farina, AES 108th Conv., 2000; ISO 18233 Bibliography
 [14]), avoiding numerical phase accumulation.
 
 **Parameters**
@@ -537,7 +545,7 @@ constant and the sweep mimics a pink-noise excitation
 | :--- | :--- |
 | `fs` | Sampling frequency in Hz. |
 | `f1` | Start frequency in Hz (at or below the lowest band edge to be measured, ISO 18233 B.3.1). Must be > 0. |
-| `f2` | Stop frequency in Hz (at or above the highest band edge). Must satisfy `f1 < f2 <= fs/2`. |
+| `f2` | Stop frequency in Hz (at or above the highest band edge). Must satisfy $f_1 < f_2 \le f_s/2$. |
 | `seconds` | Sweep duration in seconds. Any duration may be used; a longer sweep raises the effective signal-to-noise ratio (B.2, B.6). |
 | `amplitude` | Peak amplitude of the sweep. Default 1.0. |
 | `fade` | Half-Hann fade-in/out length as a fraction of the sweep duration, applied to suppress start/stop transients (B.3.3). Default 0.01. Set to 0.0 to disable. Because the sweep frequency is logarithmic in time, the fades consume roughly `fade*log2(f2/f1)` octaves at each band edge (the fade-out lands on the highest frequencies): with the default 0.01 the top ~29 dB of the highest band is unusable, so choose `f1`/`f2` with margin beyond the analysis range (ISO 18233 B.3.1) rather than relying on a smaller fade. |

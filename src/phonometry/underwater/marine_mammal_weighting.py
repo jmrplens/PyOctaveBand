@@ -1,5 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""
+r"""
 Regulatory auditory weighting and exposure criteria for marine mammals.
 
 Noise-exposure assessments weight a spectrum by a hearing-group filter before
@@ -7,19 +7,20 @@ comparing it with a threshold. The filter is the same band-pass form in all
 current guidance (NMFS 2018 Equation 1, Southall et al. 2019 Equation 2):
 
 .. math::
-    W(f) = C + 10\\,\\lg\\frac{(f/f_1)^{2a}}
-                              {[1+(f/f_1)^2]^{a}\\,[1+(f/f_2)^2]^{b}}
+    W(f) = C + 10\,\log_{10}\frac{(f/f_1)^{2a}}
+                              {[1+(f/f_1)^2]^{a}\,[1+(f/f_2)^2]^{b}}
 
 with ``f`` in kilohertz. ``C`` is fixed by putting the peak of ``W`` at 0 dB,
-so the companion **exposure function** ``E(f) = K − 10·lg(…) = K + C − W(f)``
-has its minimum at the weighted threshold ``Tw = K + C``. Only the parameter
-table changes between guidance versions, so the version is explicit in the API
-and is carried on every result object:
+so the companion **exposure function**
+:math:`E(f) = K - 10 \log_{10}(\dots) = K + C - W(f)`
+has its minimum at the weighted threshold :math:`T_w = K + C`. Only the
+parameter table changes between guidance versions, so the version is explicit
+in the API and is carried on every result object:
 
 * ``"nmfs-2024"`` -- NOAA Fisheries, *Updated Technical Guidance*, version 3.0
   (October 2024), Table 5 and Table ES3. **The default**: it supersedes the
-  2018 revision, uses ``b = 5`` for every group, renames the groups to the
-  Southall scheme (LF/HF/VHF cetaceans, PW/OW in water, PA/OA in air) and
+  2018 revision, uses :math:`b = 5` for every group, renames the groups to
+  the Southall scheme (LF/HF/VHF cetaceans, PW/OW in water, PA/OA in air) and
   replaces "PTS onset" with "auditory injury (AUD INJ) onset".
 * ``"nmfs-2018"`` -- the 2018 revision, version 2.0, Table 3 and Table ES3.
   Still cited by assessments already in flight.
@@ -39,14 +40,16 @@ published thresholds (:func:`exposure_criteria`) and the assessment chain
 a number of events and reports the exceedance of each applicable criterion.
 
 Implemented clean-room from the three documents; validated against the worked
-example of NMFS (2018) Appendix D (``W(1 kHz)`` for the five groups), against
-``C`` recomputed as the peak of ``W`` for all three parameter sets, and against
-the published ``Tw = K + C`` and injury = TTS + 20 dB identities.
+example of NMFS (2018) Appendix D (:math:`W(1~\text{kHz})` for the five
+groups), against ``C`` recomputed as the peak of ``W`` for all three
+parameter sets, and against the published :math:`T_w = K + C` and
+injury = TTS + 20 dB identities.
 
 .. note::
-    NMFS (2024) Table 5 prints ``C = 1.37`` dB for otariid pinnipeds in water,
-    and its own footnote states the value should be 1.36 dB (NMFS kept 1.37 for
-    consistency with the U.S. Navy). Recomputing ``C`` from the peak of ``W``
+    NMFS (2024) Table 5 prints :math:`C = 1.37` dB for otariid pinnipeds in
+    water, and its own footnote states the value should be 1.36 dB (NMFS kept
+    1.37 for consistency with the U.S. Navy). Recomputing ``C`` from the peak
+    of ``W``
     with that row's parameters gives 1.3643 dB, confirming 1.36. This module
     implements **1.36**; the printed 1.37 remains available as
     ``WeightingParameters.c_db_as_printed``. See ``docs/ERRATA.md``.
@@ -330,7 +333,8 @@ def weighting_parameters(group: str, *, guidance: str = "nmfs-2024") -> Weightin
 
 
 def _band_pass_db(f_khz: NDArray[np.float64], p: WeightingParameters) -> NDArray[np.float64]:
-    """``10·lg`` of the band-pass ratio shared by ``W(f)`` and ``E(f)``."""
+    r""":math:`10 \log_{10}` of the band-pass ratio shared by ``W(f)`` and
+    ``E(f)``."""
     ratio = (f_khz / p.f1_khz) ** (2.0 * p.a) / (
         (1.0 + (f_khz / p.f1_khz) ** 2) ** p.a
         * (1.0 + (f_khz / p.f2_khz) ** 2) ** p.b
@@ -340,17 +344,19 @@ def _band_pass_db(f_khz: NDArray[np.float64], p: WeightingParameters) -> NDArray
 
 @dataclass(frozen=True)
 class AuditoryWeightingResult:
-    """Auditory weighting and exposure functions of one hearing group.
+    r"""Auditory weighting and exposure functions of one hearing group.
 
     :ivar frequencies: Frequencies, in Hz.
-    :ivar weighting: Weighting-function amplitude ``W(f)``, in dB (``≤ 0``).
-    :ivar exposure_function: Exposure function ``E(f) = K + C − W(f)``, in dB
-        (the frequency-dependent TTS-onset level).
+    :ivar weighting: Weighting-function amplitude ``W(f)``, in dB
+        (:math:`\le 0`).
+    :ivar exposure_function: Exposure function
+        :math:`E(f) = K + C - W(f)`, in dB (the frequency-dependent
+        TTS-onset level).
     :ivar parameters: The :class:`WeightingParameters` used.
     :ivar guidance: The guidance version.
     :ivar group: Hearing-group code.
-    :ivar weighted_tts_onset: ``Tw = K + C``, the minimum of the exposure
-        function, in dB.
+    :ivar weighted_tts_onset: :math:`T_w = K + C`, the minimum of the
+        exposure function, in dB.
     """
 
     frequencies: NDArray[np.float64]
@@ -446,7 +452,7 @@ def exposure_criteria(
 
 @dataclass(frozen=True)
 class WeightedExposureResult:
-    """Weighted exposure of a spectrum against a hearing group's criteria.
+    r"""Weighted exposure of a spectrum against a hearing group's criteria.
 
     :ivar frequencies: Band centre frequencies, in Hz.
     :ivar band_sel: Per-band single-event sound exposure level, in dB.
@@ -454,16 +460,17 @@ class WeightedExposureResult:
     :ivar weighted_band_sel: ``band_sel + W(f)`` per band, in dB.
     :ivar unweighted_sel: Energy sum of ``band_sel``, in dB.
     :ivar weighted_sel: Energy sum of ``weighted_band_sel``, in dB.
-    :ivar cumulative_sel: ``weighted_sel + 10·lg(n_events)``, in dB.
+    :ivar cumulative_sel: ``weighted_sel`` plus :math:`10 \log_{10}(N)` for the
+        ``n_events`` accumulated events, in dB.
     :ivar peak_spl: The unweighted peak sound pressure level supplied, in dB
         (``None`` when not given).
     :ivar n_events: Number of accumulated events (e.g. hammer strikes).
     :ivar criteria: The :class:`ExposureCriteria` compared against.
-    :ivar sel_margin: ``cumulative_sel − injury_sel``, in dB (``None`` when the
+    :ivar sel_margin: ``cumulative_sel - injury_sel``, in dB (``None`` when the
         criterion is not published); positive means the criterion is exceeded.
-    :ivar tts_margin: ``cumulative_sel − tts_sel``, in dB (or ``None``).
-    :ivar peak_margin: ``peak_spl − injury_peak_spl``, in dB (or ``None``).
-    :ivar tts_peak_margin: ``peak_spl − tts_peak_spl``, in dB (or ``None``) --
+    :ivar tts_margin: ``cumulative_sel - tts_sel``, in dB (or ``None``).
+    :ivar peak_margin: ``peak_spl - injury_peak_spl``, in dB (or ``None``).
+    :ivar tts_peak_margin: ``peak_spl - tts_peak_spl``, in dB (or ``None``) --
         the peak-SPL half of the dual metric on the TTS side, which can trip
         ``exceeds_tts`` on its own.
     :ivar exceeds_injury: Whether any injury-onset criterion is reached. The
@@ -521,11 +528,12 @@ def weighted_exposure(
     n_events: int = 1,
     peak_spl: float | None = None,
 ) -> WeightedExposureResult:
-    """Weight a band spectrum, accumulate it and compare it with the criteria.
+    r"""Weight a band spectrum, accumulate it and compare it with the
+    criteria.
 
     The per-band single-event sound exposure levels are weighted with
     :func:`auditory_weighting`, summed on an energy basis and accumulated over
-    ``n_events`` identical events (``+10·lg N``, the ISO 18406 Formula 9
+    ``n_events`` identical events (:math:`+10 \log_{10} N`, the ISO 18406 Formula 9
     identity used by :func:`~phonometry.underwater.cumulative_sel_identical`).
     The result is compared with the group's TTS and injury onset criteria; the
     peak sound pressure level, if supplied, is compared **unweighted**, as the
@@ -544,7 +552,7 @@ def weighted_exposure(
         ``"southall-2019"``.
     :param impulsive: Compare against the impulsive criteria (the default, the
         case for pile driving and air guns).
-    :param n_events: Number of identical accumulated events, ``≥ 1``.
+    :param n_events: Number of identical accumulated events, :math:`\ge 1`.
     :param peak_spl: Unweighted zero-to-peak sound pressure level of the
         loudest single event, in dB; enables the peak-SPL half of the dual
         metric.

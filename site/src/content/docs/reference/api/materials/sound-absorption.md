@@ -13,39 +13,42 @@ sound absorption area of the specimen is obtained via Sabine's equation, and for
 a plane absorber the sound absorption coefficient follows by dividing by the
 covered area (ISO 354:2003, Clauses 4 and 8.1).
 
-Equivalent sound absorption area (ISO 354:2003, Eq. (5) empty room / Eq. (7) with
-specimen; identical form):
+Equivalent sound absorption area (ISO 354:2003, Eq. (5) empty room / Eq. (7)
+with specimen; identical form):
 
-```text
-A = 55,3 * V / (c * T) - 4 * V * m
-```
+$$
+A = \frac{55.3 V}{c T} - 4 V m
+$$
 
 with `V` the room volume (m3), `c` the speed of sound (m/s), `T` the
 reverberation time (s) and `m` the power attenuation coefficient of air (1/m).
 The speed of sound follows Eq. (6), valid for 15 degC to 30 degC:
 
-```text
-c = (331 + 0,6 * t/degC) m/s
-```
+$$
+c = \left( 331 + 0.6\,t/{}^{\circ}\text{C} \right)~\text{m/s}
+$$
 
 The equivalent sound absorption area of the specimen and its absorption
 coefficient (ISO 354:2003, Eq. (8) and Eq. (9)):
 
-```text
-AT = A2 - A1 = 55,3 * V * (1/(c2*T2) - 1/(c1*T1)) - 4 * V * (m2 - m1)
-alpha_s = AT / S
-```
+$$
+A_T = A_2 - A_1 = 55.3 V \left( \frac{1}{c_2 T_2} - \frac{1}{c_1 T_1} \right) - 4 V (m_2 - m_1)
+$$
 
-`alpha_s` may exceed 1,0 (e.g. from diffraction/edge effects) and is not a
+$$
+\alpha_s = \frac{A_T}{S}
+$$
+
+`alpha_s` may exceed 1.0 (e.g. from diffraction/edge effects) and is not a
 percentage (ISO 354:2003, Clause 3.7 NOTE 2); it is therefore never clamped.
 
 The air attenuation coefficient `m` is defined by ISO 354 only through its
 conversion from the ISO 9613-1 attenuation coefficient `alpha` (in dB/m)
 (ISO 354:2003, 8.1.2.1):
 
-```text
-m = alpha / (10 * lg e)
-```
+$$
+m = \frac{\alpha}{10 \log_{10} e}
+$$
 
 ISO 354 otherwise defers the calculation of `alpha` entirely to ISO 9613-1.
 `m` is therefore a user-supplied per-band parameter here (default 0, i.e. no air
@@ -69,7 +72,7 @@ absorption_area(
 
 Equivalent sound absorption area of a room (ISO 354:2003, Eq. (5)/(7)).
 
-`A = 55,3 * V / (c * T) - 4 * V * m`. This is Sabine's equation with the
+$A = 55.3 V / (c T) - 4 V m$. This is Sabine's equation with the
 air-absorption term; it gives the empty-room area `A1` from `T1` or the
 with-specimen area `A2` from `T2` (both equations have identical form).
 
@@ -106,18 +109,24 @@ absorption_coefficient(
 Sound absorption coefficient of a plane absorber (ISO 354:2003, Eq. (9)).
 
 Builds the equivalent sound absorption area of the specimen from Eq. (8),
-`AT = A2 - A1 = 55,3*V*(1/(c2*T2) - 1/(c1*T1)) - 4*V*(m2 - m1)`, using the
-empty-room reverberation time `T1` and the with-specimen time `T2`, then
-returns `alpha_s = AT / S` (Eq. (9)).
+using the empty-room reverberation time `T1` and the with-specimen time
+`T2`:
+
+$$
+A_T = A_2 - A_1 = 55.3 V \left( \frac{1}{c_2 T_2} - \frac{1}{c_1 T_1} \right) - 4 V (m_2 - m_1)
+$$
+
+then returns $\alpha_s = A_T / S$ (Eq. (9)).
 
 The two measurements may be at different temperatures; `c1` and `c2` are
-resolved independently. `alpha_s` is returned unclamped and may exceed 1,0
-(Clause 3.7 NOTE 2). Because adding an absorber must reduce the reverberation
-time, `T2 >= T1` (`alpha_s <= 0`) is non-physical and emits an
-[`AbsorptionWarning`](/phonometry/reference/api/materials/sound-absorption/#absorptionwarning). A room volume below the 150 m3 minimum of
-clause 6.1.1, or a sample area outside the clause 6.2.1.1 range
-(`10 m2 <= S <= 12 m2`, upper limit scaled by `(V/200)^(2/3)` when
-`V > 200 m3`), each emit an advisory [`AbsorptionWarning`](/phonometry/reference/api/materials/sound-absorption/#absorptionwarning).
+resolved independently. `alpha_s` is returned unclamped and may exceed 1.0
+(Clause 3.7 NOTE 2). Because adding an absorber must reduce the
+reverberation time, $T_2 \ge T_1$ ($\alpha_s \le 0$) is
+non-physical and emits an [`AbsorptionWarning`](/phonometry/reference/api/materials/sound-absorption/#absorptionwarning). A room volume below
+the 150 m3 minimum of clause 6.1.1, or a sample area outside the clause
+6.2.1.1 range ($10~\text{m}^2 \le S \le 12~\text{m}^2$, upper limit
+scaled by $(V/200)^{2/3}$ when $V > 200$ m3), each emit an
+advisory [`AbsorptionWarning`](/phonometry/reference/api/materials/sound-absorption/#absorptionwarning).
 
 **Parameters**
 
@@ -148,7 +157,8 @@ attenuation_from_alpha(alpha: ArrayLike) -> NDArray[np.float64]
 
 Air power attenuation coefficient `m` from ISO 9613-1 `alpha`.
 
-Applies the ISO 354:2003 (8.1.2.1) conversion `m = alpha / (10 * lg e)`,
+Applies the ISO 354:2003 (8.1.2.1) conversion
+$m = \alpha / (10 \log_{10} e)$,
 where `alpha` is the attenuation coefficient in decibels per metre used by
 ISO 9613-1 and `m` is the power attenuation coefficient in reciprocal
 metres entering Eq. (5)/(7)/(8). ISO 354 itself provides no `alpha` table
@@ -187,7 +197,7 @@ reverberation times of the empty room (`T1`) and of the room with the
 specimen installed (`T2`). The equivalent sound absorption areas `A1`
 and `A2` follow from Sabine's equation (Eq. (5)/(7), delegated to
 [`absorption_area`](/phonometry/reference/api/materials/sound-absorption/#absorption_area)) and the sound absorption coefficient
-`alpha_s = (A2 - A1) / S` from Eq. (8)/(9) (delegated to
+$\alpha_s = (A_2 - A_1)/S$ from Eq. (8)/(9) (delegated to
 [`absorption_coefficient`](/phonometry/reference/api/materials/sound-absorption/#absorption_coefficient)); no formula is re-derived here.
 
 Both measurements are taken at the same air temperature and, for the air
@@ -204,7 +214,7 @@ with-specimen climates differ.
 | `t_empty` | Empty-room reverberation time `T1`, per band, in seconds. |
 | `t_specimen` | With-specimen reverberation time `T2`, per band, in seconds. |
 | `volume` | Reverberation-room volume `V`, in cubic metres. A volume below the 150 m3 minimum of clause 6.1.1 emits an advisory [`AbsorptionWarning`](/phonometry/reference/api/materials/sound-absorption/#absorptionwarning). |
-| `area` | Area `S` covered by the test specimen, in square metres. An area outside the clause 6.2.1.1 range (10 m2 to 12 m2, upper limit scaled by `(V/200)^(2/3)` for `V > 200 m3`) emits an advisory [`AbsorptionWarning`](/phonometry/reference/api/materials/sound-absorption/#absorptionwarning). |
+| `area` | Area `S` covered by the test specimen, in square metres. An area outside the clause 6.2.1.1 range (10 m2 to 12 m2, upper limit scaled by $(V/200)^{2/3}$ for $V > 200$ m3) emits an advisory [`AbsorptionWarning`](/phonometry/reference/api/materials/sound-absorption/#absorptionwarning). |
 | `temperature` | Air temperature during the test, in degrees Celsius (default 20). Used for the speed of sound via Eq. (6) unless `speed_of_sound` is given; a temperature outside 15..30 degC emits an [`AbsorptionWarning`](/phonometry/reference/api/materials/sound-absorption/#absorptionwarning). |
 | `humidity` | Relative humidity during the test, in % (informational; recorded on the result but not used in the computation, which sees the climate only through `m`). `None` leaves it unrecorded. |
 | `speed_of_sound` | Explicit speed of sound `c`, in m/s; overrides `temperature` and Eq. (6) when supplied. |
@@ -274,7 +284,7 @@ is therefore not produced here; pass `alpha_s` to
 
 *property*
 
-Equivalent sound absorption area of the specimen `AT = A2 - A1`.
+Equivalent sound absorption area $A_T = A_2 - A_1$.
 
 The ISO 354:2003 Eq. (8) quantity, per band, in square metres; dividing
 it by the specimen area `S` gives `alpha_s` (Eq. (9)).

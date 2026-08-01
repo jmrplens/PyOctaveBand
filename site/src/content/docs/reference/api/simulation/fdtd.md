@@ -15,8 +15,9 @@ formulation of Attenborough & Van Renterghem, *Predicting Outdoor Sound*
 * the governing first-order system in `p` and `v` (Eqs. 4.3-4.4);
 * the staggered-in-place, staggered-in-time discretisation (Eqs. 4.11-4.12),
   with pressure at cell centres and velocity components on cell faces;
-* the Courant stability condition `CN <= 1` with
-  `CN = c dt sqrt(1/dx^2 + 1/dy^2)` (Eqs. 4.13-4.14);
+* the Courant stability condition $C_N \le 1$ with
+  $C_N = c\,\Delta t \sqrt{1/\Delta x^2 + 1/\Delta y^2}$
+  (Eqs. 4.13-4.14);
 * rigid boundaries as zero normal face velocity (Eq. 4.32) and the
   frequency-independent real-impedance boundary update (Eqs. 4.33-4.35);
 * absorbing edges as a graded sponge layer, the simple precursor of the
@@ -36,10 +37,10 @@ bit-identical outputs on the same platform.
 Validated against analytic oracles: the eigenfrequencies of a rigid
 rectangular box and of an effectively 1D tube, the numerical dispersion
 relation of the leapfrog scheme (the discrete counterpart of Eq. 4.15),
-free-field pulse arrival times and cylindrical `1/sqrt(r)` amplitude
+free-field pulse arrival times and cylindrical $1/\sqrt{r}$ amplitude
 decay, the image-source echo of a rigid wall, the normal-incidence
-reflection coefficient `(Z - rho c)/(Z + rho c)` of an impedance edge,
-and second-order convergence under grid refinement.
+reflection coefficient $(Z - \rho c)/(Z + \rho c)$ of an impedance
+edge, and second-order convergence under grid refinement.
 
 > Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
 
@@ -66,11 +67,12 @@ the pressure averaged from the two adjacent cell centres, and folds
 them into complex accumulators at each requested frequency, so a
 continuous-wave run never stores full time histories.
 
-After every step the accumulators gain `p * exp(-j omega t)` with the
-fields' own leapfrog time stamps (`t = n dt` for pressure,
-`t = (n - 1/2) dt` for velocity, so the half-step stagger is handled
+After every step the accumulators gain $p\, e^{-j \omega t}$ with
+the fields' own leapfrog time stamps ($t = n\,\Delta t$ for
+pressure, $t = (n - 1/2)\,\Delta t$ for velocity, so the half-step
+stagger is handled
 exactly). `phasors` scales the sums by `2 / n_samples` into the
-steady-state complex amplitudes of the library's `exp(+j omega t)`
+steady-state complex amplitudes of the library's $e^{+j \omega t}$
 convention. Accumulate only over the steady state: run the transient
 out, call `reset`, then integrate a window as close as possible
 to a whole number of periods (the residual leakage falls as one over
@@ -187,13 +189,13 @@ sides into absorbing or locally reacting boundaries. Sources are soft
 | `c` | Sound-speed map [m/s], shape `(ny, nx)`. A scalar with an explicit `shape` is also accepted. |
 | `dx` | Grid spacing [m] (square cells). |
 | `rho` | Density map [kg/m3]; scalar or `(ny, nx)` array (default 1.2). |
-| `cfl` | Courant number `CN = c_max dt sqrt(2) / dx` (Eq. 4.13); the explicit scheme is stable for `CN <= 1` (Eq. 4.14) and values in `(0, 1)` are accepted. The default 0.6 keeps a wide stability margin with moderate numerical dispersion. |
+| `cfl` | Courant number $C_N = c_{\max}\, \Delta t \sqrt{2} / \Delta x$ (Eq. 4.13); the explicit scheme is stable for $C_N \le 1$ (Eq. 4.14) and values in `(0, 1)` are accepted. The default 0.6 keeps a wide stability margin with moderate numerical dispersion. |
 | `sponge_width` | Thickness of the absorbing layer in cells (0 = no absorbing sides). |
 | `sponge_sides` | Which sides absorb: a single side name or an iterable drawn from `{"left", "right", "top", "bottom"}` (default: all four when `sponge_width > 0`). `left`/`right` are the low/high column edges and `top`/`bottom` the low/high row edges (the default `imshow` origin). |
 | `sponge_reflection` | Target round-trip amplitude reflection of the sponge layer; sets the peak absorption rate. |
-| `damping` | Bulk amplitude decay rate [1/s]: a scalar applied to the whole field (a simple stand-in for air/wall absorption; `6.91 / T60` gives a `T60` seconds reverberant decay) or an `(ny, nx)` map for locally lossy regions, e.g. an equivalent fluid modelling a porous sample (plane waves inside a uniform lossy region follow `k = (omega - j sigma) / c` with the real characteristic impedance `rho c`). |
+| `damping` | Bulk amplitude decay rate [1/s]: a scalar applied to the whole field (a simple stand-in for air/wall absorption; `6.91 / T60` gives a `T60` seconds reverberant decay) or an `(ny, nx)` map for locally lossy regions, e.g. an equivalent fluid modelling a porous sample (plane waves inside a uniform lossy region follow $k = (\omega - j \sigma) / c$ with the real characteristic impedance $\rho c$). |
 | `shape` | Grid shape `(ny, nx)`, required only when `c` is a scalar. |
-| `edge_impedance` | Locally reacting boundary sides: a mapping from side name to a real specific acoustic impedance [Pa s/m], either a scalar or a per-edge-cell 1D array (length `ny` for `left`/ `right`, `nx` for `top`/`bottom`). Implements Eqs. (4.33)-(4.35); `Z = rho c` is a normal-incidence matched (anechoic) edge. A side cannot be both a sponge and an impedance boundary. |
+| `edge_impedance` | Locally reacting boundary sides: a mapping from side name to a real specific acoustic impedance [Pa s/m], either a scalar or a per-edge-cell 1D array (length `ny` for `left`/ `right`, `nx` for `top`/`bottom`). Implements Eqs. (4.33)-(4.35); $Z = \rho c$ is a normal-incidence matched (anechoic) edge. A side cannot be both a sponge and an impedance boundary. |
 | `obstacle_mask` | Boolean map, shape `(ny, nx)`, of rigid cells: every face adjacent to a masked cell is closed (zero normal velocity, Eq. 4.32), rasterising arbitrary interior geometry. |
 
 ### FDTD2D.add_contour_probe()
@@ -213,8 +215,9 @@ Record `p` and `v_n` phasors on a closed rectangular contour.
 
 The contour is the rectangle of cell faces enclosing the cell
 block `ix0..ix1` x `iy0..iy1` (both ends inclusive): its sides
-lie on `x = ix0 dx`, `x = (ix1 + 1) dx`, `y = iy0 dx` and
-`y = (iy1 + 1) dx`. From the step after registration the engine
+lie on $x = i_{x0}\,\Delta x$, $x = (i_{x1}+1)\,\Delta x$,
+$y = i_{y0}\,\Delta x$ and $y = (i_{y1}+1)\,\Delta x$. From
+the step after registration the engine
 folds the face pressures (averaged from the two adjacent cell
 centres) and the outward face normal velocities into running DFT
 accumulators at each requested frequency; see [`ContourProbe`](/phonometry/reference/api/simulation/fdtd/#contourprobe)
@@ -403,17 +406,19 @@ at every probe each time step and, optionally, full-field snapshots.
 The grid covers `(nx * dx, ny * dx)` metres; a cell index `(ix, iy)`
 maps to the physical cell centre `((ix + 0.5) * dx, (iy + 0.5) * dx)`.
 Resolve at least 10 cells per shortest wavelength using the smallest
-sound speed of the domain (`dx <= c_min / (10 f)`), the usual rule for
+sound speed of the domain ($\Delta x \le c_{\min} / (10 f)$), the
+usual rule for
 this lowest-order scheme: the worst-case (on-axis) numerical dispersion
-error magnitude, `(k dx)^2 / 24` from the discrete counterpart of
+error magnitude, $(k \Delta x)^2 / 24$ from the discrete counterpart
+of
 Eq. 4.15 (the modelled frequency under-reads, so the signed error is
 negative), is then about 1.6 % (about 1.4 % at the default `cfl`;
 in a heterogeneous domain the slower cells run at a lower local Courant
 number and sit nearer the 1.6 % bound) and finer grids reduce it
 quadratically. The
 simulation is 2D, so a point source is
-physically a line source with cylindrical `1/sqrt(r)` amplitude
-spreading rather than the 3D spherical `1/r`.
+physically a line source with cylindrical $1/\sqrt{r}$ amplitude
+spreading rather than the 3D spherical $1/r$.
 
 **Parameters**
 
@@ -425,13 +430,13 @@ spreading rather than the 3D spherical `1/r`.
 | `sources` | One or more of [`GaussianPulse`](/phonometry/reference/api/simulation/fdtd/#gaussianpulse), [`CWSource`](/phonometry/reference/api/simulation/fdtd/#cwsource) or [`SignalSource`](/phonometry/reference/api/simulation/fdtd/#signalsource). |
 | `shape` | Grid shape `(ny, nx)`, required when `c` is a scalar. |
 | `rho` | Density map [kg/m3]; scalar or `(ny, nx)` array. |
-| `cfl` | Courant number in `(0, 1)` (Eqs. 4.13-4.14); the time step is `dt = cfl * dx / (c_max * sqrt(2))`. Default 0.6. |
+| `cfl` | Courant number in `(0, 1)` (Eqs. 4.13-4.14); the time step is $\Delta t = C_N\, \Delta x / (c_{\max} \sqrt{2})$. Default 0.6. |
 | `probes` | Pressure-probe cells as `(ix, iy)` index pairs. |
 | `boundaries` | `"rigid"` (default), `"absorbing"`, or a mapping from side name (`left`/`right`/`top`/`bottom`) to `"rigid"`, `"absorbing"`, or a real specific impedance [Pa s/m] (scalar or per-edge-cell 1D array, Eqs. 4.33-4.35). |
 | `absorbing_layer_cells` | Sponge-layer thickness for absorbing sides, in cells. |
 | `obstacle_mask` | Boolean map, shape `(ny, nx)`, of rigid cells (rasterised interior geometry). |
 | `damping` | Uniform bulk amplitude decay rate [1/s]. |
-| `snapshot_every` | Record a full pressure-field snapshot every this many steps (and at `t = 0`); `None` records none. |
+| `snapshot_every` | Record a full pressure-field snapshot every this many steps (and at $t = 0$); `None` records none. |
 
 **Returns:** A [`FDTDResult`](/phonometry/reference/api/simulation/fdtd/#fdtdresult).
 
@@ -465,7 +470,7 @@ Frozen result of a [`fdtd_simulation`](/phonometry/reference/api/simulation/fdtd
 
 | Name | Description |
 | :--- | :--- |
-| `times` | Time axis [s], length `n_steps + 1` (includes `t = 0`). |
+| `times` | Time axis [s], length `n_steps + 1` (includes $t = 0$). |
 | `pressures` | Pressure history at each probe [Pa], shape `(n_probes, n_steps + 1)`. |
 | `probes` | Probe cell indices `(ix, iy)`, shape `(n_probes, 2)`. |
 | `probe_positions` | Probe cell-centre positions `(x, y)` [m], shape `(n_probes, 2)`. |
@@ -524,14 +529,15 @@ GaussianPulse(
 
 A soft Gaussian pressure pulse injected at one cell.
 
-`s(t) = amplitude * exp(-((t - t0) / width)**2)` with `t0` defaulting
-to `4 * width` so the pulse starts from (numerically) zero.
+$s(t) = \text{amplitude} \cdot e^{-((t - t_0)/\text{width})^2}$
+with `t0` defaulting to `4 * width` so the pulse starts from
+(numerically) zero.
 
 **Attributes**
 
 | Name | Description |
 | :--- | :--- |
-| `ix` | Source column (x) index; the cell centre is at `x = (ix + 0.5) * dx`. |
+| `ix` | Source column (x) index; the cell centre is at $x = (i_x + 0.5)\,\Delta x$. |
 | `iy` | Source row (y) index. |
 | `width` | Gaussian half-width [s]; sets the pulse bandwidth. |
 | `t0` | Pulse centre time [s] (default `4 * width`). |

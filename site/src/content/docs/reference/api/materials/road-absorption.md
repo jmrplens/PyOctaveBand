@@ -17,18 +17,20 @@ opposite ends of the absorption scale and are **not** interchangeable:
   to frequency, and ratioed. The normal-incidence sound absorption coefficient
   is (Clause 4.1):
 
-```text
-alpha(f) = 1 - QW(f) = 1 - (1 / Kr^2) * | Hr(f) / Hi(f) |^2
-```
+  $$
+  \alpha(f) = 1 - Q_W(f) = 1 - \frac{1}{K_r^{2}} \left\lvert \frac{H_r(f)}{H_i(f)} \right\rvert^{2}
+  $$
 
   with `Hi`/`Hr` the incident/reflected transfer functions and `Kr` the
-  geometrical-spreading factor `Kr = (ds - dm) / (ds + dm)` for the mandatory
-  geometry `ds = 1.25 m` (source-to-plane) and `dm = 0.25 m` (mic-to-plane),
-  giving `Kr = 2/3` (Clause 4.2 / Annex C). The complex pressure reflection
-  factor `Qp = (1/Kr)(Hr/Hi) exp(+j 2 pi f dtau)` with `dtau = 2 dm / c`
-  (Annex C) is available for theory comparison. A highly reflective reference
-  surface removes the electro-acoustic chain error and the geometry factor by a
-  ratio (Annex B), and non-normal incidence uses `Kr,theta` (Annex F).
+  geometrical-spreading factor $K_r = (d_s - d_m) / (d_s + d_m)$ for the
+  mandatory geometry $d_s = 1.25$ m (source-to-plane) and
+  $d_m = 0.25$ m (mic-to-plane), giving $K_r = 2/3$ (Clause 4.2 /
+  Annex C). The complex pressure reflection factor
+  $Q_p = (1/K_r)(H_r/H_i)\, e^{+j 2 \pi f \Delta\tau}$ with
+  $\Delta\tau = 2 d_m / c$ (Annex C) is available for theory comparison.
+  A highly reflective reference surface removes the electro-acoustic chain
+  error and the geometry factor by a ratio (Annex B), and non-normal incidence
+  uses $K_{r,\theta}$ (Annex F).
 
 * **BS ISO 13472-2:2010** - *spot method*. This is an **in-situ application of
   the ISO 10534-2 two-microphone impedance tube** for reflective surfaces
@@ -39,14 +41,16 @@ alpha(f) = 1 - QW(f) = 1 - (1 / Kr^2) * | Hr(f) / Hi(f) |^2
   reimplemented here. This module contributes only the Part-2 tube
   geometry/validity helpers (upper usable frequency, microphone-spacing bounds,
   the 250-1600 Hz one-third-octave working range) and the Annex A internal-loss
-  system correction `alpha ~ alpha_measured - alpha_system`.
+  system correction
+  $\alpha \approx \alpha_{\text{measured}} - \alpha_{\text{system}}$.
 
 Sign / normalisation convention (ISO 13472-1): the forward transform is
-NumPy's `rfft` with kernel `e^{-j 2 pi f t}` (unnormalised); every quantity
-here is a ratio of two transforms from the same processing chain, so the
-transform normalisation cancels (Clause 6.1). A pure time delay `tau` of the
-reflected path scales its spectrum by `e^{-j 2 pi f tau}`; the optional phase
-restoration multiplies by `e^{+j 2 pi f tau}` to recover `Qp` (Annex C /
+NumPy's `rfft` with kernel $e^{-j 2 \pi f t}$ (unnormalised); every
+quantity here is a ratio of two transforms from the same processing chain, so
+the transform normalisation cancels (Clause 6.1). A pure time delay `tau` of
+the reflected path scales its spectrum by $e^{-j 2 \pi f \tau}$; the
+optional phase restoration multiplies by $e^{+j 2 \pi f \tau}$ to
+recover `Qp` (Annex C /
 Annex G, resolving the Clause 4.1 NOTE shorthand to the frequency-dependent
 form).
 
@@ -75,13 +79,17 @@ Dividing the road and reference measured pressure reflection factors removes
 both the electro-acoustic chain error `e(f)` and, because the geometry is
 identical, the `Kr` factor:
 
-```text
-Qp,road(f) = Qp,road,meas(f) / Qp,ref,meas(f)
-alpha_road(f) = 1 - |Qp,road,meas(f) / Qp,ref,meas(f)|^2
-```
+$$
+Q_{p,\text{road}}(f) = \frac{Q_{p,\text{road,meas}}(f)}{Q_{p,\text{ref,meas}}(f)}
+$$
 
-The reference surface is assumed totally reflecting (`|Qp,ref| = 1`,
-checked in an impedance tube to have absorption \< 0.05, Annex B).
+$$
+\alpha_{\text{road}}(f) = 1 - \left\lvert \frac{Q_{p,\text{road,meas}}(f)}{Q_{p,\text{ref,meas}}(f)} \right\rvert^{2}
+$$
+
+The reference surface is assumed totally reflecting
+($\lvert Q_{p,\text{ref}} \rvert = 1$, checked in an impedance tube
+to have absorption \< 0.05, Annex B).
 
 **Parameters**
 
@@ -205,10 +213,11 @@ geometric_spreading_factor(
 
 Geometrical-spreading factor `Kr` (ISO 13472-1:2002, Clause 4.1).
 
-`Kr = (ds - dm) / (ds + dm)`. It corrects the reflected path for the
-extra spherical spreading over the image-source distance `ds + dm`
-relative to the direct distance `ds - dm` (Annex C). The mandatory
-geometry `ds = 1.25 m`, `dm = 0.25 m` gives `Kr = 2/3` (Clause 4.2).
+$K_r = (d_s - d_m) / (d_s + d_m)$. It corrects the reflected path
+for the extra spherical spreading over the image-source distance
+$d_s + d_m$ relative to the direct distance $d_s - d_m$
+(Annex C). The mandatory geometry $d_s = 1.25$ m,
+$d_m = 0.25$ m gives $K_r = 2/3$ (Clause 4.2).
 
 **Parameters**
 
@@ -217,13 +226,13 @@ geometry `ds = 1.25 m`, `dm = 0.25 m` gives `Kr = 2/3` (Clause 4.2).
 | `source_height` | Source-to-reference-plane distance `ds`, in metres. |
 | `mic_height` | Microphone-to-reference-plane distance `dm`, in metres. |
 
-**Returns:** Geometrical-spreading factor `Kr` (dimensionless, `0 < Kr < 1`).
+**Returns:** Geometrical-spreading factor `Kr` (dimensionless, $0 < K_r < 1$).
 
 **Raises**
 
 | Exception | When |
 | :--- | :--- |
-| ValueError | If `ds` or `dm` is not positive or `ds <= dm`. |
+| ValueError | If `ds` or `dm` is not positive or $d_s \le d_m$. |
 
 ## geometric_spreading_factor_angle
 
@@ -235,10 +244,11 @@ geometric_spreading_factor_angle(
 ) -> float
 ```
 
-Oblique geometrical-spreading factor `Kr,theta` (ISO 13472-1, Annex F).
+Oblique geometrical-spreading factor (ISO 13472-1, Annex F).
 
-`Kr,theta^2 = 1 - cos^2(theta) * (1 - Kr^2)` with `Kr` the normal-
-incidence factor of [`geometric_spreading_factor`](/phonometry/reference/api/materials/road-absorption/#geometric_spreading_factor). At `theta = 0` the
+$K_{r,\theta}^2 = 1 - \cos^2(\theta) (1 - K_r^2)$ with `Kr` the
+normal-incidence factor of [`geometric_spreading_factor`](/phonometry/reference/api/materials/road-absorption/#geometric_spreading_factor). At
+$\theta = 0$ the
 cosine is unity and `Kr,theta` collapses to `Kr` (Clause 4.1).
 
 **Parameters**
@@ -267,7 +277,7 @@ insitu_absorption_coefficient(
 
 Normal-incidence absorption coefficient `alpha(f)` (ISO 13472-1, 4.1).
 
-`alpha(f) = 1 - QW(f) = 1 - (1 / Kr^2) * |Hr(f) / Hi(f)|^2` (the direct
+$\alpha(f) = 1 - Q_W(f) = 1 - (1 / K_r^2) \lvert H_r(f) / H_i(f) \rvert^2$ (the direct
 energy route via [`power_reflection_coefficient`](/phonometry/reference/api/materials/road-absorption/#power_reflection_coefficient); for oblique incidence
 `Kr` is replaced by `Kr,theta`, Annex F). Non-specularly reflected energy
 is treated as absorbed, so `alpha` may be slightly overestimated
@@ -294,7 +304,8 @@ insitu_absorption_from_reflection(reflection: ArrayLike) -> Real
 
 Absorption coefficient from the reflection factor (ISO 13472-1, 4.1).
 
-`alpha = 1 - |r|^2`. With `r` already carrying the `1 / Kr` factor
+$\alpha = 1 - \lvert r \rvert^2$. With `r` already carrying the
+$1 / K_r$ factor
 (see [`insitu_reflection_factor`](/phonometry/reference/api/materials/road-absorption/#insitu_reflection_factor)) this is the **reflection-factor route** to
 `alpha` and equals the direct energy route of
 [`insitu_absorption_coefficient`](/phonometry/reference/api/materials/road-absorption/#insitu_absorption_coefficient).
@@ -377,12 +388,15 @@ insitu_reflection_factor(
 
 Complex pressure reflection factor `r(f)` (ISO 13472-1, Clause 4.1).
 
-`r(f) = (1 / Kr) * Hr(f) / Hi(f)` from the windowed reflected and incident
+$r(f) = (1 / K_r) H_r(f) / H_i(f)$ from the windowed reflected and
+incident
 impulse responses, with `Hr`/`Hi` their real FFTs and `Kr` the
 geometrical-spreading factor (or `Kr,theta` when `incidence_angle` is
 given, Annex F). When both `fs` and `delay` are supplied the
-reflected-path time offset is undone by `exp(+j 2 pi f * delay)`, yielding
-the complex `Qp` of the Clause 4.1 NOTE (with `delay = dtau = 2 dm / c`,
+reflected-path time offset is undone by
+$\exp(+j 2 \pi f \, \text{delay})$, yielding
+the complex `Qp` of the Clause 4.1 NOTE (with `delay` set to
+$\Delta\tau = 2 d_m / c$,
 Annex C; the frequency-dependent form of Annex G).
 
 **Parameters**
@@ -483,14 +497,14 @@ Radius of the maximum sampled area (ISO 13472-1:2002, Annex A).
 
 For normal incidence the maximum sampled area is a circle of radius (m):
 
-```text
-r = (1 / (ds + dm + c Tw))
-    * sqrt[ (ds + dm + c Tw/2)(ds + c Tw/2)(2 dm + c Tw)(c Tw) ]
-```
+$$
+r = \frac{1}{d_s + d_m + c T_w} \sqrt{(d_s + d_m + c T_w/2)(d_s + c T_w/2) (2 d_m + c T_w)(c T_w)}
+$$
 
 with `Tw` the width of the temporal window isolating the reflected wave.
-The Annex A worked example (`ds = 1.25`, `dm = 0.25`, `c = 340` m/s,
-and the 5 ms flat window) gives `r ~ 1.34 m`.
+The Annex A worked example ($d_s = 1.25$, $d_m = 0.25$,
+$c = 340$ m/s, and the 5 ms flat window) gives
+$r \approx 1.34$ m.
 
 **Parameters**
 
@@ -522,11 +536,12 @@ msa_major_axis(
 ) -> float
 ```
 
-Major axis of the oblique sampled-area ellipsoid (ISO 13472-1, Annex F).
+Major axis of the oblique sampled-area ellipsoid (ISO 13472-1,
+Annex F).
 
-`a = c Tw + sqrt((ds + dm)^2 + dp^2)` for the ellipsoid of revolution with
-the source and microphone at its foci; `dp` is the source-to-microphone
-distance projected on the reference plane.
+$a = c\,T_w + \sqrt{(d_s + d_m)^2 + d_p^2}$ for the ellipsoid of
+revolution with the source and microphone at its foci; `dp` is the
+source-to-microphone distance projected on the reference plane.
 
 **Parameters**
 
@@ -564,7 +579,7 @@ Aggregate narrow-band absorption into one-third-octave bands.
 Both parts require a **linear average** of the narrow-band absorption over
 each one-third-octave band (ISO 13472-1 Clause 4.1; ISO 13472-2 Clause 6.6),
 keeping negative narrow-band values during the averaging. The band edges are
-the IEC base-two limits `fc * 2^(+/-1/6)`. Negative one-third-octave
+the IEC base-two limits $f_c \cdot 2^{\pm 1/6}$. Negative one-third-octave
 results are set to zero when `clip_negative` is true (ISO 13472-2
 Clause 6.6 step 5); Part 1 does not mandate clipping, so pass
 `clip_negative=False` to reproduce its raw output.
@@ -643,10 +658,12 @@ power_reflection_coefficient(
 ) -> Real
 ```
 
-Sound-power reflection factor `QW(f)` (ISO 13472-1, Clause 4.1 / Annex C).
+Sound-power reflection factor `QW(f)` (ISO 13472-1, 4.1 / Annex C).
 
-The **direct energy route** `QW(f) = (1 / Kr^2) * |Hr(f) / Hi(f)|^2`
-(`Kr,theta` for oblique incidence). It equals `|r|^2` from
+The **direct energy route**
+$Q_W(f) = (1 / K_r^2) \lvert H_r(f) / H_i(f) \rvert^2$
+(`Kr,theta` for oblique incidence). It equals
+$\lvert r \rvert^2$ from
 [`insitu_reflection_factor`](/phonometry/reference/api/materials/road-absorption/#insitu_reflection_factor) but is formed from magnitudes only, so it is
 independent of any reflected-path time offset.
 
@@ -674,9 +691,10 @@ reflected_path_delay(
 
 Reflected-path arrival delay `dtau` (ISO 13472-1:2002, Annex C).
 
-`dtau = 2 dm / c` is the time difference between the direct and the
-surface-reflected impulses for the normal-incidence geometry; it is the
-delay undone by the phase-restoration term of [`insitu_reflection_factor`](/phonometry/reference/api/materials/road-absorption/#insitu_reflection_factor).
+$\Delta\tau = 2 d_m / c$ is the time difference between the direct
+and the surface-reflected impulses for the normal-incidence geometry; it
+is the delay undone by the phase-restoration term of
+[`insitu_reflection_factor`](/phonometry/reference/api/materials/road-absorption/#insitu_reflection_factor).
 
 **Parameters**
 
@@ -722,9 +740,9 @@ The tube reads all thermal/viscous losses between the microphones and the
 surface as absorption. For reflective surfaces this is removed by
 subtracting the reading on a totally reflecting reference plate:
 
-```text
-alpha(f) ~ alpha_measured(f) - alpha_system(f)
-```
+$$
+\alpha(f) \approx \alpha_{\text{measured}}(f) - \alpha_{\text{system}}(f)
+$$
 
 Valid because both terms are small (measured \< 0.15, internal \< 0.03). This
 is the **subtractive** Part-2 correction and must not be confused with the
@@ -761,11 +779,15 @@ spot_microphone_spacing_bounds(
 
 Microphone-spacing bounds `(s_min, s_max)` (ISO 13472-2:2010, 5.4.2).
 
-`s_max < 0.45 c0 / f_max` avoids spacing approaching half a wavelength at
-the top frequency, and `s_min > 0.05 c0 / f_min` keeps the spacing above
+$s_{\mathrm{max}} < 0.45 c_0 / f_{\mathrm{max}}$ avoids spacing
+approaching half a wavelength at
+the top frequency, and $s_{\mathrm{min}} > 0.05 c_0 / f_{\mathrm{min}}$
+keeps the spacing above
 5 % of a wavelength at the bottom frequency. For the narrow band
-220-1800 Hz (`c0 ~ 340 m/s`) these give `s_max ~ 85 mm` and
-`s_min ~ 77 mm`, bracketing the nominal `s = (81 +/- 4) mm`.
+220-1800 Hz ($c_0 \approx 340$ m/s) these give
+$s_{\mathrm{max}} \approx 85$ mm and
+$s_{\mathrm{min}} \approx 77$ mm, bracketing the nominal
+$s = (81 \pm 4)$ mm.
 
 **Parameters**
 
@@ -800,11 +822,12 @@ spot_tube_upper_frequency(
 ) -> float
 ```
 
-Upper usable frequency of the spot tube (ISO 13472-2:2010, Clause 5.4.1).
+Upper usable frequency of the spot tube (ISO 13472-2:2010, 5.4.1).
 
-`f_u = 0.58 c0 / d` (circular tube), the highest frequency at which only
-plane waves propagate. A 100 mm tube at `c0 = 340 m/s` gives
-`f_u ~ 1972 Hz`, comfortably above the 1800 Hz narrow-band top.
+$f_u = 0.58 c_0 / d$ (circular tube), the highest frequency at which
+only plane waves propagate. A 100 mm tube at $c_0 = 340$ m/s gives
+$f_u \approx 1972$ Hz, comfortably above the 1800 Hz narrow-band
+top.
 
 **Parameters**
 

@@ -52,12 +52,17 @@ loudness-vs-time trace is left unchanged.
 
 Input scaling follows the reference implementation's WAV convention:
 `x * calibration_factor` must be the instantaneous sound pressure in
-pascals, so that band levels are `10*lg(p^2 / (20 uPa)^2)` dB SPL.
+pascals, so that band levels are
+$10 \log_{10}(p^2 / (20~\mu\text{Pa})^2)$ dB SPL.
 The reference program reads 32-bit float WAV files as pressure in Pa
 directly (`calibration_factor = 1`), while 16-bit PCM samples are
 divided by 32768 (full scale = +-1) and multiplied by a calibration
 factor derived from a reference recording of known level Lref:
-`calibration_factor = sqrt(10**(Lref/10) * 4e-10 / mean(ref**2))`
+
+$$
+\text{calibration factor} = \sqrt{ 10^{L_{\text{ref}}/10} \cdot 4\times10^{-10} / \overline{\text{ref}^2} }
+$$
+
 with `ref` scaled to +-1 full scale as well.
 
 **Parameters**

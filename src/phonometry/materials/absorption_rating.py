@@ -1,5 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""
+r"""
 Single-number rating of sound absorption (ISO 11654:1997).
 
 From one-third-octave sound absorption coefficients ``alpha_s`` measured in
@@ -12,13 +12,15 @@ informative Table B.1 (Annex B).
 
 **Practical absorption coefficient (Clause 4.1).** For each octave band the
 practical coefficient is the arithmetic mean of the three one-third-octave
-coefficients it contains::
+coefficients it contains:
 
-    alpha_p,i = (alpha_i1 + alpha_i2 + alpha_i3) / 3
+.. math::
+
+   \alpha_{p,i} = \frac{\alpha_{i1} + \alpha_{i2} + \alpha_{i3}}{3}
 
 The mean is evaluated to the second decimal and then rounded in steps of
-0,05 (the NOTE of Clause 4.1 gives ``0,92 -> 0,90``); rounded means above
-1,00 are set to 1,00. The five rating bands are 250, 500, 1000, 2000 and
+0.05 (the NOTE of Clause 4.1 gives :math:`0.92 \to 0.90`); rounded means
+above 1.00 are set to 1.00. The five rating bands are 250, 500, 1000, 2000 and
 4000 Hz, fed from the fifteen one-third octaves 200 Hz to 5000 Hz.
 
 **Weighted absorption (Clause 4.2).** The fixed reference curve of Figure 1
@@ -125,8 +127,8 @@ def _round_half_up(value: float) -> int:
 
 
 def _practical_round(mean: float) -> float:
-    """Round an octave mean per Clause 4.1: to the second decimal, then in
-    steps of 0,05, capped at 1,00 (the NOTE gives ``0,92 -> 0,90``)."""
+    r"""Round an octave mean per Clause 4.1: to the second decimal, then in
+    steps of 0.05, capped at 1.00 (the NOTE gives :math:`0.92 \to 0.90`)."""
     hundredths = _round_half_up(mean * 100.0)  # second decimal
     fives = _round_half_up(hundredths / 5.0) * 5  # nearest 0,05
     fives = max(0, min(100, fives))  # maximise to 1,00 (Clause 4.1)
@@ -184,7 +186,7 @@ def _coerce(
 
 @dataclass(frozen=True)
 class AbsorptionRatingResult:
-    """Weighted sound absorption rating (ISO 11654:1997).
+    r"""Weighted sound absorption rating (ISO 11654:1997).
 
     :ivar alpha_w: Weighted sound absorption coefficient ``alpha_w``, the
         shifted reference curve read at 500 Hz (Clause 4.2). A multiple of
@@ -194,9 +196,9 @@ class AbsorptionRatingResult:
     :ivar absorption_class: Sound absorption class ``A``-``E`` or
         ``"Not classified"`` from Table B.1 (Annex B).
     :ivar shift: Downward shift applied to the reference curve, in
-        absorption units (Clause 4.2); ``alpha_w == 1.00 - shift``.
+        absorption units (Clause 4.2); :math:`\alpha_w = 1.00 - \text{shift}`.
     :ivar unfavourable_sum: Sum of the unfavourable deviations at the final
-        shift (Clause 4.2); at most 0,10.
+        shift (Clause 4.2); at most 0.10.
     :ivar band_centers: Octave rating-band centre frequencies, in Hz
         (250 Hz to 4000 Hz).
     :ivar measured: Practical absorption coefficients ``alpha_p`` used for

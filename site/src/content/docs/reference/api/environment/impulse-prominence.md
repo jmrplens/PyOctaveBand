@@ -13,12 +13,16 @@ measured `LAeq`. The audibility of an impulse is captured by the **predicted
 prominence** `P`, a logarithmic measure of the onset rate and the level
 difference of the impulse (clause 7):
 
-`P = 3*lg(onset_rate) + 2*lg(level_difference)`   (Formula 1)
+$$
+P = 3 \log_{10}(\text{onset rate}) + 2 \log_{10}(\text{level difference}) \tag{Formula 1}
+$$
 
 From the impulse with the highest prominence over a 30-minute period, a
 graduated adjustment follows (clause 8):
 
-`KI = 1.8*(P - 5)` dB for `P > 5`, else `0`   (Formula 2)
+$$
+K_I = 1.8 \, (P - 5)~\text{dB} \quad \text{for } P > 5, \text{ else } 0 \tag{Formula 2}
+$$
 
 and the rating level over a reference time interval combines the adjusted
 sub-interval levels (clause 8, Note 1). An impulse qualifies when its onset
@@ -36,7 +40,8 @@ impulse_adjustment(prominence: ArrayLike) -> np.ndarray
 
 Adjustment `KI` to `LAeq` from the prominence (clause 8, Formula 2).
 
-`KI = 1.8*(P - 5)` dB for `P > 5`, else `0` dB. The adjustment is made
+$K_I = 1.8 \, (P - 5)$ dB for $P > 5$, else 0 dB. The
+adjustment is made
 to `LAeq,30min` on the basis of the single impulse with the highest `P`.
 This helper applies the bare Formula 2; the clause 8 onset-rate
 qualification (> 10 dB/s, clause 4.5) is enforced by
@@ -192,7 +197,8 @@ predicted_prominence(
 
 Predicted prominence `P` of an impulse (NT ACOU 112, clause 7).
 
-`P = 3*lg(onset_rate) + 2*lg(level_difference)` (Formula 1), with `lg`
+$P = 3 \log_{10}(\text{onset rate}) + 2 \log_{10}(\text{level difference})$
+(Formula 1), with $\log_{10}$
 the base-10 logarithm. Both quantities are read from the A-weighted,
 time-weighting-F level history: the onset rate is the slope of the onset in
 dB/s and the level difference is the level rise over the onset in dB
@@ -230,9 +236,9 @@ Rating level over a reference time interval (clause 8, Note 1).
 Combines the impulse-adjusted equivalent levels of the measurement
 sub-intervals into a single rating level:
 
-```text
-LAr,T = 10*lg( (1/T) * sum_N dt_N * 10**((LAeq,N + KI,N) / 10) )
-```
+$$
+L_{Ar,T} = 10 \log_{10}\!\left[ \frac{1}{T} \sum_N \Delta t_N \, 10^{(L_{Aeq,N} + K_{I,N})/10} \right]
+$$
 
 **Parameters**
 

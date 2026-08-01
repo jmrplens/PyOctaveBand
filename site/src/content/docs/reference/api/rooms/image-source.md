@@ -18,38 +18,52 @@ the deterministic complement of the statistical reverberation-time formulae of
 decay rate, the image-source model gives the whole early reflection pattern and
 the decay it implies.
 
-**Image lattice.** For a room `[0, Lx] x [0, Ly] x [0, Lz]` with the source at
+**Image lattice.** For a room
+$[0, L_x] \times [0, L_y] \times [0, L_z]$ with the source at
 `(xs, ys, zs)`, mirroring a coordinate in a wall (Vorlander Equation (11.36),
-`S_n = S - 2 d n`) turns the source into a regular lattice of images. Along
-one axis the images sit at `2 n L +- x` for every integer `n` and the two
+$S_n = S - 2 d n$) turns the source into a regular lattice of images.
+Along one axis the images sit at $2 n L \pm x$ for every integer `n`
+and the two
 mirror parities; the parity index `p` and the lattice index `n` give the
-number of reflections off the two walls of that axis as `|n - p|` (wall at 0)
-and `|n|` (wall at `L`), so the total reflection order of an image is
-`|2 n_x - p_x| + |2 n_y - p_y| + |2 n_z - p_z|` (Allen & Berkley, *J. Acoust.
+number of reflections off the two walls of that axis as $|n - p|$
+(wall at 0)
+and $|n|$ (wall at `L`), so the total reflection order of an image is
+$|2 n_x - p_x| + |2 n_y - p_y| + |2 n_z - p_z|$ (Allen & Berkley,
+*J. Acoust.
 Soc. Am.* 65 (1979) 943). The audible images up to order `i0` number
-`(2/3)(2 i0^3 + 3 i0^2 + 4 i0)` in a shoebox (Kuttruff Equation (9.23)); the
-temporal density of reflections grows as `dN/dt = 4 pi c^3 t^2 / V`
+$(2/3)(2 i_0^3 + 3 i_0^2 + 4 i_0)$ in a shoebox (Kuttruff Equation
+(9.23)); the
+temporal density of reflections grows as
+$dN/dt = 4 \pi c^3 t^2 / V$
 (Kuttruff Equation (4.6)).
 
 **Per-image contribution.** Image `i` at distance `r_i` from the receiver
-arrives at `t_i = r_i / c` (Vorlander Equation (11.38)) with amplitude
+arrives at $t_i = r_i / c$ (Vorlander Equation (11.38)) with amplitude
 
-    A_i = [ product over walls of R_wall ^ (reflections there) ]
-          * exp(-m r_i / 2) / (4 pi r_i),
+$$
+A_i = \left[ \prod_{\text{walls}} R_{\text{wall}}^{n_{\text{wall}}} \right] \frac{e^{-m r_i / 2}}{4 \pi r_i}
+$$
 
-the `1 / (4 pi r_i)` spherical spreading, the product of the wall
-*pressure* reflection factors `R = sqrt(1 - alpha)` (Vorlander Equation
-(11.39); `|R|^2 = 1 - alpha` in energy, Kuttruff 4.1) each raised to the
+with $n_{\text{wall}}$ the reflections that image made off each wall:
+the $1 / (4 \pi r_i)$ spherical spreading, the product of the wall
+*pressure* reflection factors $R = \sqrt{1 - \alpha}$ (Vorlander
+Equation
+(11.39); $|R|^2 = 1 - \alpha$ in energy, Kuttruff 4.1) each raised to
+the
 number of reflections that image made off that wall, and the air pressure
-attenuation `exp(-m r_i / 2)` over the path (Kuttruff 4.1; `m` the
-*intensity* attenuation constant, so intensity falls as `exp(-m r)`). The RIR
-is the sum of unit impulses at `t_i` weighted by `A_i` (Kuttruff Equation
-(4.5), `g(t) = sum_i A_i delta(t - t_i)`), assembled broadband from a single
+attenuation $e^{-m r_i / 2}$ over the path (Kuttruff 4.1; `m` the
+*intensity* attenuation constant, so intensity falls as $e^{-m r}$).
+The RIR
+is the sum of unit impulses at $t_i$ weighted by $A_i$ (Kuttruff
+Equation
+(4.5), $g(t) = \sum_i A_i \delta(t - t_i)$), assembled broadband from a
+single
 absorption set or one curve per octave band from per-band coefficients.
 
 The Schroeder backward integral of the synthetic RIR (see
 [`phonometry.room.decay_curve`](/phonometry/reference/api/rooms/room-acoustics/#decay_curve)) reproduces the Eyring reverberation time
-`T = -24 V ln 10 / (c S ln(1 - alpha_bar))` (Kuttruff Equation (5.23)) of the
+$T = -24 V \ln 10 / (c S \ln(1 - \bar{\alpha}))$ (Kuttruff Equation
+(5.23)) of the
 same room to within a few percent, closing the loop between this deterministic
 model and the statistical prediction. The construction is exact only for walls
 whose reflection factor is real and angle-independent (Kuttruff 4.1: exact for
@@ -68,7 +82,8 @@ audible_image_count(max_order: int) -> int
 Number of audible shoebox images up to reflection order `max_order`.
 
 Kuttruff *Room Acoustics* 6th ed., Equation (9.23):
-`(2/3)(2 i0^3 + 3 i0^2 + 4 i0)`. Every image of a rectangular room is
+$(2/3)(2 i_0^3 + 3 i_0^2 + 4 i_0)$. Every image of a rectangular
+room is
 audible (no visibility test needed), so this is exactly the number of
 impulses [`image_source_rir`](/phonometry/reference/api/rooms/image-source/#image_source_rir) sums at that order.
 
@@ -103,12 +118,13 @@ Synthetic room impulse response of a shoebox by the image-source method.
 Builds every image of the source up to reflection order `max_order`
 (Vorlander Equation (11.36); Allen & Berkley 1979), then assembles the RIR
 as the sum of the direct sound and one attenuated, delayed unit impulse per
-image (Kuttruff Equations (4.4)-(4.5)). Each image at distance `r` arrives
-at `r / c` (Vorlander Equation (11.38)) with amplitude
-`[prod R_wall^n_wall] exp(-m r / 2) / (4 pi r)`: the `1 / (4 pi r)`
+image (Kuttruff Equations (4.4)-(4.5)). Each image at distance `r`
+arrives at $r / c$ (Vorlander Equation (11.38)) with amplitude
+$\left[ \prod R_{\text{wall}}^{n_{\text{wall}}} \right] e^{-m r / 2} / (4 \pi r)$: the $1 / (4 \pi r)$
 spherical spreading, the product of the wall pressure reflection factors
-`R = sqrt(1 - alpha)` (Vorlander Equation (11.39)) over the reflections
-the image made, and the air pressure attenuation `exp(-m r / 2)`.
+$R = \sqrt{1 - \alpha}$ (Vorlander Equation (11.39)) over the
+reflections
+the image made, and the air pressure attenuation $e^{-m r / 2}$.
 
 With scalar or per-wall `absorption` (and no `frequencies`) the result
 is a broadband RIR; a per-band `absorption` (or a given `frequencies`)
@@ -126,9 +142,9 @@ reproduces the Eyring reverberation time of the room (Kuttruff Equation
 | `receiver` | Receiver position `(x, y, z)`, m, strictly inside. |
 | `absorption` | Wall absorption coefficient(s) in `[0, 1]`: a scalar (uniform), a length-6 per-wall vector (order `WALL_ORDER`), a per-band vector, or a `(6, n_bands)` per-wall per-band array. A length-6 vector is read as the six per-wall values *unless* `frequencies` declares six bands, in which case it is a per-band curve (uniform across walls); use the `(6, n_bands)` form for six per-wall values that also vary with frequency. |
 | `fs` | Sample rate, Hz. |
-| `max_order` | Reflection-order cut-off (total wall reflections). The shoebox has `(2/3)(2 i0^3 + 3 i0^2 + 4 i0)` audible images up to order `i0` (Kuttruff Equation (9.23)). Default 20. |
+| `max_order` | Reflection-order cut-off (total wall reflections). The shoebox has $(2/3)(2 i_0^3 + 3 i_0^2 + 4 i_0)$ audible images up to order `i0` (Kuttruff Equation (9.23)). Default 20. |
 | `speed_of_sound` | Speed of sound `c`, m/s (default [`DEFAULT_SPEED_OF_SOUND`](/phonometry/reference/api/materials/road-absorption/#default_speed_of_sound)). |
-| `air_attenuation` | Air *intensity* attenuation constant `m`, in neper per metre (scalar or per-band); the pressure amplitude of each path is scaled by `exp(-m r / 2)` (Kuttruff 4.1). Default 0 (air absorption neglected). Obtain a physical `m` from [`phonometry.air_absorption.air_attenuation_m`](/phonometry/reference/api/environment/air-absorption/#air_attenuation_m). |
+| `air_attenuation` | Air *intensity* attenuation constant `m`, in neper per metre (scalar or per-band); the pressure amplitude of each path is scaled by $e^{-m r / 2}$ (Kuttruff 4.1). Default 0 (air absorption neglected). Obtain a physical `m` from [`phonometry.air_absorption.air_attenuation_m`](/phonometry/reference/api/environment/air-absorption/#air_attenuation_m). |
 | `duration` | RIR length, s; default the latest image arrival rounded up to the next sample. |
 | `frequencies` | Optional band centre frequencies, Hz, labelling a per-band result. When given, its length must match the band count of `absorption` (or broadcast against it). |
 
@@ -176,7 +192,7 @@ separately in `times` / `distances` / `orders` / `amplitudes` /
 | `ir` | Sampled impulse response (Kuttruff Equation (4.5)); shape `(n_samples,)` (broadband) or `(n_bands, n_samples)` (per band). |
 | `fs` | Sample rate, Hz. |
 | `frequencies` | Band centre frequencies, Hz, or `None` for a broadband model. |
-| `times` | Exact arrival time `t_i = r_i / c` of every image, s (sorted ascending). |
+| `times` | Exact arrival time $t_i = r_i / c$ of every image, s (sorted ascending). |
 | `distances` | Image-to-receiver distance `r_i`, m (aligned with `times`). |
 | `orders` | Total reflection order of every image (aligned with `times`). |
 | `amplitudes` | Exact per-image amplitude `A_i`; shape `(n_images,)` (broadband) or `(n_bands, n_images)` (per band). |
@@ -207,7 +223,7 @@ ImageSourceResult.plot(
 Plot the reflectogram: reflection level in dB against arrival time.
 
 Stems the per-image amplitudes (in dB re the direct sound), coloured by
-reflection order, with the `1 / r` free-field envelope overlaid.
+reflection order, with the $1 / r$ free-field envelope overlaid.
 Requires matplotlib (`pip install phonometry[plot]`); returns the
 `Axes`.
 
@@ -247,10 +263,11 @@ reflection_density(
 ) -> np.ndarray | float
 ```
 
-Temporal density of reflections `dN/dt = 4 pi c^3 t^2 / V`.
+Temporal density of reflections $dN/dt = 4 \pi c^3 t^2 / V$.
 
 Kuttruff *Room Acoustics* 6th ed., Equation (4.6): the number of image
-sources per unit time whose spheres of radius `c t` sweep the receiver.
+sources per unit time whose spheres of radius $c t$ sweep the
+receiver.
 Independent of room shape. Useful to judge the reflection-order cut-off of
 [`image_source_rir`](/phonometry/reference/api/rooms/image-source/#image_source_rir) (the model is complete only while its images keep
 up with this density).

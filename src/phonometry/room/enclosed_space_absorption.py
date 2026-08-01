@@ -1,5 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""
+r"""
 Sound absorption in enclosed spaces (EN 12354-6:2003).
 
 Estimates the total equivalent sound absorption area of a room and the
@@ -8,15 +8,20 @@ resulting reverberation time from the absorption of its surfaces and objects
 
 The total equivalent absorption area sums the surface contributions, the
 equivalent absorption areas of objects and object arrays and the air
-absorption (Formula 1)::
+absorption:
 
-    A = sum_i alpha_s,i * S_i + sum_j Aobj,j + sum_k alpha_s,k * S_k + Aair
+.. math::
 
-with the air term ``Aair = 4*m*V*(1 - psi)`` (Formula 2), the object fraction
-``psi = sum Vobj / V`` (Formula 3) and, for hard irregular objects, the
-empirical equivalent area ``Aobj = Vobj**(2/3)`` (Formula 4). The reverberation
-time follows from ``T = 55.3/c0 * V*(1 - psi) / A`` (Formula 5); with the
-standard's ``c0 = 345.6 m/s`` the factor ``55.3/c0`` is the familiar ``0.16``.
+   A = \sum_i \alpha_{s,i} S_i + \sum_j A_{\text{obj},j}
+   + \sum_k \alpha_{s,k} S_k + A_{\text{air}} \tag{Formula 1}
+
+with the air term :math:`A_{\text{air}} = 4 m V (1 - \psi)` (Formula 2),
+the object fraction :math:`\psi = \sum V_{\text{obj}} / V` (Formula 3) and,
+for hard irregular objects, the empirical equivalent area
+:math:`A_{\text{obj}} = V_{\text{obj}}^{2/3}` (Formula 4). The reverberation
+time follows from :math:`T = \frac{55.3}{c_0} \frac{V (1 - \psi)}{A}`
+(Formula 5); with the standard's :math:`c_0 = 345.6` m/s the factor
+:math:`55.3/c_0` is the familiar ``0.16``.
 
 The informative Annex D method for irregular spaces / uneven absorption
 distribution is out of scope.
@@ -80,11 +85,12 @@ DEFAULT_AIR_CONDITION = "20C_50-70"
 
 
 def object_fraction(object_volumes: ArrayLike, volume: float) -> float:
-    """Object fraction ``psi`` of an enclosed space (Formula 3).
+    r"""Object fraction ``psi`` of an enclosed space (Formula 3).
 
     :param object_volumes: Volumes of the objects and object arrays, m3.
     :param volume: Volume of the empty enclosed space ``V``, m3.
-    :return: The object fraction ``psi = sum(Vobj) / V``.
+    :return: The object fraction
+        :math:`\psi = \sum V_{\text{obj}} / V`.
     """
     volume = require_positive(volume, "volume")
     vols = np.asarray(object_volumes, dtype=np.float64)
@@ -97,13 +103,14 @@ def object_fraction(object_volumes: ArrayLike, volume: float) -> float:
 
 
 def hard_object_absorption(object_volume: ArrayLike) -> np.ndarray:
-    """Equivalent absorption area of a hard object (Formula 4).
+    r"""Equivalent absorption area of a hard object (Formula 4).
 
     An empirical estimate for hard, irregularly shaped objects (machinery,
     furniture) whose equivalent area is not otherwise available.
 
     :param object_volume: Volume ``Vobj`` of the hard object(s), m3.
-    :return: The equivalent absorption area ``Aobj = Vobj**(2/3)``, m2.
+    :return: The equivalent absorption area
+        :math:`A_{\text{obj}} = V_{\text{obj}}^{2/3}`, m2.
     """
     vol = np.asarray(object_volume, dtype=np.float64)
     if np.any(vol < 0.0):
@@ -114,13 +121,14 @@ def hard_object_absorption(object_volume: ArrayLike) -> np.ndarray:
 def air_absorption_area(
     m: ArrayLike, volume: float, object_fraction: float = 0.0
 ) -> np.ndarray | float:
-    """Equivalent absorption area of the air (Formula 2).
+    r"""Equivalent absorption area of the air (Formula 2).
 
     :param m: Power attenuation coefficient of air, in Neper per metre (see
         :data:`AIR_ATTENUATION`).
     :param volume: Volume of the empty enclosed space ``V``, m3.
     :param object_fraction: Object fraction ``psi`` (0-1).
-    :return: The air absorption area ``Aair = 4*m*V*(1 - psi)``, m2.
+    :return: The air absorption area
+        :math:`A_{\text{air}} = 4 m V (1 - \psi)`, m2.
     """
     volume = require_positive(volume, "volume")
     object_fraction = require_fraction(object_fraction, "object_fraction")
@@ -181,14 +189,15 @@ def reverberation_time(
     object_fraction: float = 0.0,
     speed_of_sound: float = SPEED_OF_SOUND,
 ) -> np.ndarray | float:
-    """Reverberation time from the equivalent absorption area (Formula 5).
+    r"""Reverberation time from the equivalent absorption area (Formula 5).
 
     :param absorption_area: Total equivalent absorption area ``A``, m2.
     :param volume: Volume of the empty enclosed space ``V``, m3.
     :param object_fraction: Object fraction ``psi`` (0-1).
     :param speed_of_sound: Speed of sound ``c0``, m/s (default
         :data:`SPEED_OF_SOUND`, giving the factor ``0.16``).
-    :return: The reverberation time ``T = 55.3/c0 * V*(1 - psi) / A``, s.
+    :return: The reverberation time
+        :math:`T = \frac{55.3}{c_0} \frac{V (1 - \psi)}{A}`, s.
     """
     volume = require_positive(volume, "volume")
     speed_of_sound = require_positive(speed_of_sound, "speed_of_sound")

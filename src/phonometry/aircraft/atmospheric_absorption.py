@@ -59,12 +59,13 @@ def _sae_band(delta_t: NDArray[np.float64]) -> NDArray[np.float64]:
 
 @dataclass(frozen=True)
 class AircraftBandAttenuation:
-    """One-third-octave-band atmospheric attenuation over a path (SAE ARP 5534).
+    r"""One-third-octave-band atmospheric attenuation over a path (SAE ARP 5534).
 
     :ivar frequency: Nominal one-third-octave-band centre frequencies, in Hz.
     :ivar band_attenuation: SAE-Method band attenuation ``δ_B`` per band, in dB.
     :ivar midband_attenuation: Pure-tone mid-band path-length attenuation
-        ``δ_t = α·s`` per band, in dB (ISO 9613-1 coefficient).
+        :math:`\delta_t = \alpha \cdot s` per band, in dB (ISO 9613-1
+        coefficient).
     :ivar coefficient: Pure-tone mid-band attenuation coefficient ``α`` per band,
         in dB/m.
     :ivar path_length: Propagation path length ``s``, in metres.
@@ -98,11 +99,12 @@ def sae_band_attenuation(
     relative_humidity: float = 70.0,
     pressure: float = 101.325,
 ) -> AircraftBandAttenuation:
-    """One-third-octave-band atmospheric attenuation (SAE ARP 5534, SAE Method).
+    r"""One-third-octave-band atmospheric attenuation (SAE ARP 5534, SAE Method).
 
     Computes the pure-tone attenuation coefficient at each band's exact mid-band
-    frequency (ISO 9613-1, ``f_{m,i} = 10^{i/10}``), forms the mid-band
-    path-length attenuation ``δ_t = α·s`` and maps it to the band attenuation
+    frequency (ISO 9613-1, :math:`f_{m,i} = 10^{i/10}`), forms the mid-band
+    path-length attenuation :math:`\delta_t = \alpha \cdot s` and maps it to
+    the band attenuation
     ``δ_B`` with the SAE-Method regression (Eqs. 7-8).
 
     :param frequencies: Nominal one-third-octave-band centre frequencies, in Hz

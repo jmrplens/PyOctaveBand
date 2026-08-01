@@ -33,14 +33,17 @@ standard uncertainty `u`:
   Tables 2/3.
 - Maximum repeatability standard deviation for lab self-verification: Table 1.
 
-**Expansion (Clause 8).** `U = k·u` (Formula 2) with the coverage factor `k` of
-Table 8 (a minimum of `k = 1` is enforced). Declaring conformity with a
+**Expansion (Clause 8).** $U = k\,u$ (Formula 2) with the coverage
+factor `k` of
+Table 8 (a minimum of $k = 1$ is enforced). Declaring conformity with a
 requirement uses the **one-sided** factor (Formulae 4/5); reporting a two-sided
-interval `Y = y ± U` (Formula 3) uses the two-sided factor.
+interval $Y = y \pm U$ (Formula 3) uses the two-sided factor.
 
-**Combination.** Uncorrelated quadrature `uc = sqrt(Σ u_i²)` (Formula C.2);
+**Combination.** Uncorrelated quadrature $u_c = \sqrt{\sum u_i^2}$
+(Formula C.2);
 prediction input uncertainty (Formula A.1); model/reality combination (Formula A.2);
-reduction by `m` independent measurements `u/sqrt(m)` (Formula A.7); and the
+reduction by `m` independent measurements $u/\sqrt{m}$ (Formula A.7);
+and the
 uncorrelated single-number combination of Annex B (Formula B.2).
 
 Clause/table numbers refer to ISO 12999-1:2020(E).
@@ -134,7 +137,8 @@ combine_uncertainties(*components: float) -> float
 
 Combine independent standard uncertainties in quadrature (Formula C.2).
 
-`uc = sqrt(Σ u_i²)` for uncorrelated contributions with unit sensitivity
+$u_c = \sqrt{\sum u_i^2}$ for uncorrelated contributions with unit
+sensitivity
 coefficients, also the model/reality combination of Formula (A.2).
 
 **Parameters**
@@ -211,10 +215,10 @@ insulation_expanded_uncertainty(
 ) -> float
 ```
 
-Return the expanded uncertainty `U = k·u` (Formula 2, Clause 8).
+Return the expanded uncertainty $U = k\,u$ (Formula 2, Clause 8).
 
 The coverage factor `k` is taken from Table 8 for the requested confidence
-level; a minimum of `k = 1` is enforced (Clause 8).
+level; a minimum of $k = 1$ is enforced (Clause 8).
 
 **Parameters**
 
@@ -253,7 +257,11 @@ prediction_input_uncertainty(
 
 Return the prediction input uncertainty `u_input` (Formula A.1).
 
-`u_input = sqrt( (σR² + σ_product²)/n + σ_product² )` combines the
+$$
+u_{\mathrm{input}} = \sqrt{\frac{\sigma_R^2 + \sigma_{\mathrm{product}}^2}{n} + \sigma_{\mathrm{product}}^2}
+$$
+
+combines the
 reproducibility standard deviation with the product-homogeneity scatter over
 `n` measurements of nominally identical specimens.
 
@@ -263,7 +271,7 @@ reproducibility standard deviation with the product-homogeneity scatter over
 | :--- | :--- |
 | `sigma_reproducibility` | Reproducibility standard deviation `σR`, in dB. |
 | `sigma_product` | Product-homogeneity standard deviation `σ_product`, in dB. |
-| `n` | Number of measurements of the product (`n >= 1`). |
+| `n` | Number of measurements of the product ($n \ge 1$). |
 
 **Raises**
 
@@ -279,7 +287,8 @@ reduce_by_independent_measurements(u: float, m: int) -> float
 
 Reduce a standard uncertainty by `m` independent measurements (Formula A.7).
 
-`u_reduced = u / sqrt(m)`: measurements by different persons with different
+$u_{\mathrm{reduced}} = u / \sqrt{m}$: measurements by different
+persons with different
 equipment lower the in-situ uncertainty.
 
 **Parameters**
@@ -287,7 +296,7 @@ equipment lower the in-situ uncertainty.
 | Name | Description |
 | :--- | :--- |
 | `u` | Standard uncertainty of a single measurement, in dB (non-negative). |
-| `m` | Number of independent measurements (`m >= 1`). |
+| `m` | Number of independent measurements ($m \ge 1$). |
 
 **Raises**
 
@@ -307,7 +316,8 @@ satisfies_lower_requirement(
 
 Test a minimum requirement with one-sided uncertainty (Formula 5).
 
-Returns `True` when `value − U > requirement`, e.g. an apparent sound
+Returns `True` when
+$\text{value} - U > \text{requirement}$, e.g. an apparent sound
 reduction index `R'w` provably exceeds a minimum. `U` should be computed
 with the one-sided coverage factor.
 
@@ -323,7 +333,8 @@ satisfies_upper_requirement(
 
 Test a maximum requirement with one-sided uncertainty (Formula 4).
 
-Returns `True` when `value + U < requirement`, e.g. a normalized impact
+Returns `True` when
+$\text{value} + U < \text{requirement}$, e.g. a normalized impact
 level `L'n,w` provably stays below a maximum. `U` should be computed with
 the one-sided coverage factor.
 
@@ -377,8 +388,17 @@ single_number_uncertainty_uncorrelated(
 
 Uncorrelated single-number uncertainty from band uncertainties (Formula B.2).
 
-`u(Rw+C) = sqrt( Σ_i (w_i · u_i)² )` with energy weights
-`w_i = 10^((L_i − R_i)/10) / Σ_j 10^((L_j − R_j)/10)` derived from the
+$$
+u(R_w{+}C) = \sqrt{\sum_i (w_i \, u_i)^2}
+$$
+
+with energy weights
+
+$$
+w_i = \frac{10^{(L_i - R_i)/10}}{\sum_j 10^{(L_j - R_j)/10}}
+$$
+
+derived from the
 reference spectrum. This is the *no-correlation* estimate of Annex B; the
 fully correlated bound (Formulae B.3-B.6) instead re-runs the ISO 717 rating
 and is not reproduced here.
@@ -388,7 +408,7 @@ and is not reproduced here.
 | Name | Description |
 | :--- | :--- |
 | `band_uncertainties` | Per-band standard uncertainties `u_i`, in dB. |
-| `reference_differences` | Per-band `L_i − R_i` (reference-spectrum level minus measured band value), in dB. |
+| `reference_differences` | Per-band $L_i - R_i$ (reference-spectrum level minus measured band value), in dB. |
 
 **Raises**
 
@@ -414,7 +434,7 @@ Attach the ISO 12999-1 expanded uncertainty to a single-number rating.
 
 Convenience wrapper combining [`single_number_uncertainty`](/phonometry/reference/api/building/building-uncertainty/#single_number_uncertainty),
 [`insulation_coverage_factor`](/phonometry/reference/api/building/building-uncertainty/#insulation_coverage_factor) and [`insulation_expanded_uncertainty`](/phonometry/reference/api/building/building-uncertainty/#insulation_expanded_uncertainty) into an
-[`UncertainValue`](/phonometry/reference/api/building/building-uncertainty/#uncertainvalue) (`value ± U`) without modifying the rating
+[`UncertainValue`](/phonometry/reference/api/building/building-uncertainty/#uncertainvalue) ($y \pm U$) without modifying the rating
 dataclasses. For conformity checks pass `one_sided=True` and read
 [`UncertainValue.lower`](/phonometry/reference/api/building/building-uncertainty/#uncertainvaluelower) / [`UncertainValue.upper`](/phonometry/reference/api/building/building-uncertainty/#uncertainvalueupper) (Formulae 4/5).
 
@@ -451,7 +471,7 @@ A best estimate with its ISO 12999-1 expanded uncertainty (Clause 8).
 | `value` | Best estimate `y` (e.g. a weighted rating), in dB. |
 | `standard_uncertainty` | Standard uncertainty `u`, in dB. |
 | `coverage_factor` | Coverage factor `k` (Table 8). |
-| `expanded_uncertainty` | `U = k·u`, in dB. |
+| `expanded_uncertainty` | $U = k\,u$, in dB. |
 | `confidence` | Confidence level as a fraction (e.g. `0.95`). |
 | `one_sided` | `True` for a one-sided interval (conformity checks). |
 
@@ -459,10 +479,10 @@ A best estimate with its ISO 12999-1 expanded uncertainty (Clause 8).
 
 *property*
 
-Lower interval bound `y − U` (Formula 3/5).
+Lower interval bound $y - U$ (Formula 3/5).
 
 ### UncertainValue.upper
 
 *property*
 
-Upper interval bound `y + U` (Formula 3/4).
+Upper interval bound $y + U$ (Formula 3/4).

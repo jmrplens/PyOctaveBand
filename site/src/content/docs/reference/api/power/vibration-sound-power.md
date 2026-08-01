@@ -10,38 +10,41 @@ Airborne sound power from surface vibration (ISO/TS 7849-1/-2:2009).
 The airborne sound power a machine radiates through the structure-borne
 vibration of its outer surface is estimated from the surface vibratory velocity
 and a **radiation factor** `epsilon` (the radiation efficiency). The radiated
-power is (ISO/TS 7849-1, Equation 6):
+power, in watts, is (ISO/TS 7849-1, Equation 6):
 
-```text
-P = Z_c * <v**2> * S * epsilon                              [W]
-```
+$$
+P = Z_c \, \langle v^2 \rangle \, S \, \epsilon
+$$
 
-with `Z_c` the characteristic impedance of air, `<v**2>` the mean-square
-vibratory velocity averaged over the radiating area `S`. The vibratory
-velocity is reported as a **level** re `v0 = 5e-8 m/s` (Equation 3):
+with $Z_c$ the characteristic impedance of air and
+$\langle v^2 \rangle$ the mean-square vibratory velocity averaged over
+the radiating area $S$. The vibratory velocity is reported as a
+**level**, in decibels, re $v_0 = 5 \times 10^{-8}$ m/s (Equation 3):
 
-```text
-L_v = 10 lg(<v**2> / v0**2) = 20 lg(v / v0)                 [dB]
-```
+$$
+L_v = 10 \log_{10}\frac{\langle v^2 \rangle}{v_0^2} = 20 \log_{10}\frac{v}{v_0}
+$$
 
-so the A-weighted sound power level follows in logarithmic form (ISO/TS 7849-1,
-Equation 12; ISO/TS 7849-2, Equation 15):
+so the A-weighted sound power level follows in logarithmic form, in decibels
+(ISO/TS 7849-1, Equation 12; ISO/TS 7849-2, Equation 15):
 
-```text
-L_W = L_v + 10 lg(S / S0) + 10 lg(epsilon) + 10 lg(Z_c,n / Z_c,0)   [dB]
-```
+$$
+L_W = L_v + 10 \log_{10}\frac{S}{S_0} + 10 \log_{10} \epsilon + 10 \log_{10}\frac{Z_{c,n}}{Z_{c,0}}
+$$
 
-where `S0 = 1 m2`, the normalized characteristic impedance `Z_c,n =
-411 N.s/m3` (at 23 degC, 101,3 kPa) and the reference acoustic impedance
-`Z_c,0 = 400 N.s/m3` give the fixed `10 lg(411/400) = 0,118 dB` term.
+where $S_0 = 1~\text{m}^2$, the normalized characteristic impedance
+$Z_{c,n} = 411~\text{N s/m}^3$ (at 23 degC, 101.3 kPa) and the
+reference acoustic impedance $Z_{c,0} = 400~\text{N s/m}^3$ give the
+fixed $10 \log_{10}(411/400) = 0.118$ dB term.
 
 The two parts differ only in `epsilon`:
 
-* **Part 1 (survey)** assumes `epsilon = 1` and yields the *upper limit*
-  `L_W,max` of the radiated power, needing only `<v**2>` and `S`.
+* **Part 1 (survey)** assumes $\epsilon = 1$ and yields the *upper
+  limit* `L_W,max` of the radiated power, needing only
+  $\langle v^2 \rangle$ and `S`.
 * **Part 2 (engineering)** applies a frequency-band radiation factor
-  `epsilon_j` determined (per ISO 9614) as `epsilon_j = P_j /
-  (Z_c,n <v_j**2> S)` (Equation 8).
+  `epsilon_j` determined (per ISO 9614) as
+  $\epsilon_j = P_j / (Z_{c,n} \langle v_j^2 \rangle S)$ (Equation 8).
 
 This module feeds the structure-borne source characterisation standards
 (ISO 9611, EN 15657, EN 12354-5).
@@ -56,17 +59,18 @@ extraneous_velocity_correction(level_difference: float) -> float
 
 Correction K1A for extraneous vibration (ISO/TS 7849-1, Table 2).
 
-`dLv` is the difference between the operating and the extraneous vibratory
-velocity levels. The correction is subtracted from the measured level; per
-the standard `dLv >= 10 dB` gives 0 dB, and `dLv < 3 dB` uses the 3 dB
-value (the result is then an upper boundary). The level difference is
-rounded to the nearest integer decibel to index the standard's table.
+$\Delta L_v$ is the difference between the operating and the
+extraneous vibratory velocity levels. The correction is subtracted from
+the measured level; per the standard $\Delta L_v \ge 10$ dB gives
+0 dB, and $\Delta L_v < 3$ dB uses the 3 dB value (the result is
+then an upper boundary). The level difference is rounded to the nearest
+integer decibel to index the standard's table.
 
 **Parameters**
 
 | Name | Description |
 | :--- | :--- |
-| `level_difference` | Level difference `dLv`, in dB. |
+| `level_difference` | Level difference $\Delta L_v$, in dB. |
 
 **Returns:** The correction `K1A` to subtract, in dB.
 
@@ -118,7 +122,10 @@ radiated_sound_power_level(
 
 Radiated sound power level (ISO/TS 7849-1 Eq. 12, -2 Eq. 15).
 
-`L_W = L_v + 10 lg(S/S0) + 10 lg(epsilon) + 10 lg(Z_c,n/Z_c,0)`.
+$$
+L_W = L_v + 10 \log_{10}\frac{S}{S_0} + 10 \log_{10} \epsilon + 10 \log_{10}\frac{Z_{c,n}}{Z_{c,0}}
+$$
+
 With the default `radiation_factor = 1` this is the Part 1 *upper limit*
 `L_W,max`; pass a measured `epsilon` for the Part 2 engineering value.
 
@@ -155,9 +162,9 @@ radiation_factor(
 
 A-weighted radiation factor `epsilon` (ISO/TS 7849-1 Eq. 4, -2 Eq. 8).
 
-`epsilon = P / (Z_c <v**2> S)`, the sound-radiation efficiency, from an
-independently measured radiated power (ISO 9614), the surface area and the
-mean-square vibratory velocity.
+$\epsilon = P / (Z_c \langle v^2 \rangle S)$, the sound-radiation
+efficiency, from an independently measured radiated power (ISO 9614), the
+surface area and the mean-square vibratory velocity.
 
 **Parameters**
 
@@ -165,7 +172,7 @@ mean-square vibratory velocity.
 | :--- | :--- |
 | `sound_power` | Radiated airborne sound power `P` (scalar or array), in W. |
 | `area` | Radiating surface area `S`, in m^2 (> 0). |
-| `mean_square_velocity` | Mean-square vibratory velocity `<v**2>`, in (m/s)^2. |
+| `mean_square_velocity` | Mean-square vibratory velocity $\langle v^2 \rangle$, in (m/s)^2. |
 | `impedance` | Characteristic impedance `Z_c` (Default: 411 N.s/m^3). |
 
 **Returns:** The radiation factor `epsilon` (dimensionless).
@@ -219,7 +226,9 @@ velocity_level(
 ) -> np.ndarray
 ```
 
-Vibratory velocity level `L_v = 20 lg(v/v0)` (ISO/TS 7849-1, Eq. 3).
+Vibratory velocity level (ISO/TS 7849-1, Eq. 3).
+
+$L_v = 20 \log_{10}(v/v_0)$ with `v0` the reference velocity.
 
 **Parameters**
 
@@ -249,8 +258,8 @@ velocity_level_from_acceleration(
 
 Velocity level from a sinusoidal acceleration (ISO/TS 7849-1, Eq. 8).
 
-`L_v = 20 lg( a_peak / (2 pi f v0 sqrt(2)) )`, used to convert a
-calibration acceleration to the equivalent r.m.s. velocity level.
+$L_v = 20 \log_{10}\!\left( \frac{a_{\text{peak}}}{2\pi f v_0 \sqrt{2}} \right)$, used to convert a calibration acceleration to the equivalent
+r.m.s. velocity level.
 
 **Parameters**
 
@@ -335,7 +344,7 @@ spectrum `LW(f)` with a nominal band axis, the boxed A-weighted sound
 power level `LWA` (dB re 1 pW) with the total `LW`, the radiating
 area `S` and the applied method, an optional verdict row against a
 declared limit, and a measurement-basis strip stating the sound-power
-relation `LW = Lv + 10 lg(S/S0) + 10 lg(epsilon) + 10 lg(Zc,n/Zc,0)`.
+relation $L_W = L_v + 10 \log_{10}(S/S_0) + 10 \log_{10} \epsilon + 10 \log_{10}(Z_{c,n}/Z_{c,0})$.
 
 **Parameters**
 
@@ -374,4 +383,5 @@ claim, and no A-weighted verdict is drawn).
 
 *property*
 
-Band-summed sound power level `10 lg(sum 10^(0.1 L_Wj))`, in dB.
+Band-summed sound power level, in dB:
+$10 \log_{10} \sum_j 10^{0.1 L_{Wj}}$.

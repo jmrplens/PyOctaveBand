@@ -1,5 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""
+r"""
 Impedance-tube material characterisation.
 
 Three complementary standardised methods are implemented, each kept in its
@@ -9,11 +9,12 @@ own sign convention (they are **not** interchangeable):
   complex reflection factor ``r`` at the sample surface is obtained from the
   measured transfer function ``H12`` between two microphones, and from it the
   surface impedance and the normal-incidence absorption coefficient
-  (Clause 7, Eqs. (17)-(20)). Time convention ``e^{+j w t}``; the incident
-  wave carries ``e^{+j k0 x}`` and the reflected wave ``e^{-j k0 x}`` (Annex D,
-  Eqs. (D.1)-(D.8)). The complex wavenumber is ``k0 = k0' - j k0''`` with the
-  attenuation constant ``k0''`` (Clause 2.6, Annex A). Air properties from
-  Clause 7.2, Eqs. (5)/(7), use temperature in **kelvin**.
+  (Clause 7, Eqs. (17)-(20)). Time convention :math:`e^{+j\omega t}`; the
+  incident wave carries :math:`e^{+jk_0x}` and the reflected wave
+  :math:`e^{-jk_0x}` (Annex D, Eqs. (D.1)-(D.8)). The complex wavenumber is
+  :math:`k_0 = k_0' - jk_0''` with the attenuation constant :math:`k_0''`
+  (Clause 2.6, Annex A). Air properties from Clause 7.2, Eqs. (5)/(7), use
+  temperature in **kelvin**.
 
 * **BS EN ISO 10534-1:2001** - standing-wave-ratio method. The reflection
   magnitude, phase, absorption coefficient and normalised impedance follow
@@ -27,9 +28,9 @@ own sign convention (they are **not** interchangeable):
   from a two-load (Eq. (22)) or a symmetric one-load (Eq. (24)) measurement.
   Transmission loss (Eq. (26)), hard-backed reflection/absorption
   (Eqs. (27)/(28)) and the material wavenumber/characteristic impedance
-  (Eqs. (29)/(30)) follow. Time convention ``e^{+j w t}`` with the forward
-  wave carried by ``e^{-j k x}`` (Eq. (21)); air properties from Clause 8.2/8.3,
-  Eqs. (4)/(5), use temperature in **degrees Celsius**.
+  (Eqs. (29)/(30)) follow. Time convention :math:`e^{+j\omega t}` with the
+  forward wave carried by :math:`e^{-jkx}` (Eq. (21)); air properties from
+  Clause 8.2/8.3, Eqs. (4)/(5), use temperature in **degrees Celsius**.
 
 The two standards adopt different sign ansaetze and different temperature
 units on purpose; the helpers are named per standard so the two are never
@@ -153,9 +154,9 @@ class ImpedanceTubeWarning(PhonometryWarning):
 # Air properties (kept separate: ISO uses kelvin, ASTM uses Celsius).
 # ---------------------------------------------------------------------------
 def speed_of_sound_iso(temperature: ArrayLike) -> Real:
-    """Speed of sound in air (ISO 10534-2:2001, Eq. (5)).
+    r"""Speed of sound in air (ISO 10534-2:2001, Eq. (5)).
 
-    ``c0 = 343,2 * sqrt(T / 293)``.
+    :math:`c_0 = 343.2 \sqrt{T / 293}`.
 
     :param temperature: Air temperature ``T``, in **kelvin**.
     :return: Speed of sound ``c0``, in metres per second.
@@ -169,10 +170,10 @@ def speed_of_sound_iso(temperature: ArrayLike) -> Real:
 def air_density_iso(
     temperature: ArrayLike, atmospheric_pressure: ArrayLike = _ISO_P_REF
 ) -> Real:
-    """Air density (ISO 10534-2:2001, Eq. (7)).
+    r"""Air density (ISO 10534-2:2001, Eq. (7)).
 
-    ``rho = rho0 * (pa * T0) / (p0 * T)`` with ``rho0 = 1,186 kg/m3``,
-    ``T0 = 293 K`` and ``p0 = 101,325 kPa``.
+    :math:`\rho = \rho_0 (p_a T_0) / (p_0 T)` with :math:`\rho_0 = 1.186`
+    kg/m3, :math:`T_0 = 293` K and :math:`p_0 = 101.325` kPa.
 
     :param temperature: Air temperature ``T``, in **kelvin**.
     :param atmospheric_pressure: Atmospheric pressure ``pa``, in kilopascals
@@ -191,9 +192,9 @@ def air_density_iso(
 
 
 def speed_of_sound_astm(temperature: ArrayLike) -> Real:
-    """Speed of sound in air (ASTM E2611-19, Eq. (4)).
+    r"""Speed of sound in air (ASTM E2611-19, Eq. (4)).
 
-    ``c = 20,047 * sqrt(273,15 + T)``.
+    :math:`c = 20.047 \sqrt{273.15 + T}`.
 
     :param temperature: Room temperature ``T``, in **degrees Celsius**.
     :return: Speed of sound ``c``, in metres per second.
@@ -207,9 +208,9 @@ def speed_of_sound_astm(temperature: ArrayLike) -> Real:
 def air_density_astm(
     temperature: ArrayLike, atmospheric_pressure: ArrayLike = _ASTM_P_REF
 ) -> Real:
-    """Air density (ASTM E2611-19, Eq. (5)).
+    r"""Air density (ASTM E2611-19, Eq. (5)).
 
-    ``rho = 1,290 * (P / 101,325) * (273,15 / (273,15 + T))``.
+    :math:`\rho = 1.290 \, \frac{P}{101.325} \, \frac{273.15}{273.15 + T}`.
 
     :param temperature: Room temperature ``T``, in **degrees Celsius**.
     :param atmospheric_pressure: Atmospheric pressure ``P``, in kilopascals
@@ -242,17 +243,17 @@ def _canonical_shape(shape: str) -> str:
 
 
 def hydraulic_diameter(width: float, height: float) -> float:
-    """Hydraulic diameter of a rectangular tube, ``4 A / P`` (ISO 10534-2, A.2.1.5).
+    r"""Hydraulic diameter of a rectangular tube, :math:`4A/P` (ISO 10534-2, A.2.1.5).
 
     For a rectangular cross-section of side lengths ``w`` and ``h`` the ratio
     of four times the area to the perimeter reduces to
-    ``d_h = 2 w h / (w + h)``; a square tube gives ``d_h`` equal to the side
+    :math:`d_h = 2wh/(w + h)`; a square tube gives ``d_h`` equal to the side
     length. This is the ``d`` the Eq. (A.18) attenuation estimate expects for
     rectangular tubes (see :func:`tube_attenuation_constant`).
 
     :param width: Inner side length ``w``, in metres.
     :param height: Inner side length ``h``, in metres.
-    :return: Hydraulic diameter ``d_h = 4 A / P``, in metres.
+    :return: Hydraulic diameter :math:`d_h = 4A/P`, in metres.
     """
     if width <= 0.0 or height <= 0.0:
         raise ValueError("'width' and 'height' must be positive.")
@@ -262,9 +263,10 @@ def hydraulic_diameter(width: float, height: float) -> float:
 def tube_attenuation_constant(
     frequency: ArrayLike, speed_of_sound: float, diameter: float
 ) -> Real:
-    """Lower-bound tube attenuation constant ``k0''`` (ISO 10534-2, Eq. (A.18)).
+    r"""Lower-bound tube attenuation constant ``k0''`` (ISO 10534-2, Eq. (A.18)).
 
-    ``k0'' = 1,94e-2 * sqrt(f) / (c0 * d)`` (nepers per metre). This ignores
+    :math:`k_0'' = 1.94\times 10^{-2} \sqrt{f} / (c_0 d)`
+    (nepers per metre). This ignores
     porous-wall and object losses and is therefore a lower limit (Clause A.2.1.5).
 
     :param frequency: Frequency ``f``, in hertz (scalar or per band).
@@ -293,9 +295,9 @@ def tube_wavenumber(
     *,
     attenuation: ArrayLike | None = None,
 ) -> Complex:
-    """Complex wavenumber ``k0 = k0' - j k0''`` (ISO 10534-2, Clause 2.6).
+    r"""Complex wavenumber :math:`k_0 = k_0' - jk_0''` (ISO 10534-2, Clause 2.6).
 
-    The real part is ``k0' = 2 pi f / c0`` (Eq. (2)); the optional attenuation
+    The real part is :math:`k_0' = 2\pi f/c_0` (Eq. (2)); the optional attenuation
     constant ``k0''`` enters with a **minus** sign on the imaginary part
     (Clause 2.6 NOTE, Eq. (A.1)).
 
@@ -328,18 +330,22 @@ def reflection_factor(
     x1: float,
     wavenumber: ArrayLike,
 ) -> Complex:
-    """Complex reflection factor at the sample surface (ISO 10534-2, Eq. (17)).
+    r"""Complex reflection factor at the sample surface (ISO 10534-2, Eq. (17)).
 
-    ``r = ((H12 - HI) / (HR - H12)) * exp(+2 j k0 x1)`` with the incident- and
-    reflected-wave transfer functions ``HI = exp(-j k0 s)`` (Eq. (D.5)) and
-    ``HR = exp(+j k0 s)`` (Eq. (D.6)), ``s`` the microphone spacing and ``x1``
-    the distance from the sample to the **farther** microphone (Clause 7.7).
+    .. math::
+
+       r = \frac{H_{12} - H_I}{H_R - H_{12}} \, e^{+2jk_0x_1}
+
+    with the incident- and reflected-wave transfer functions
+    :math:`H_I = e^{-jk_0s}` (Eq. (D.5)) and :math:`H_R = e^{+jk_0s}`
+    (Eq. (D.6)), ``s`` the microphone spacing and ``x1`` the distance from
+    the sample to the **farther** microphone (Clause 7.7).
 
     :param h12: Measured transfer function ``H12`` between microphone
         positions 1 and 2 (Clause 7.6, Eq. (14)); complex, scalar or per band.
         It must already be corrected for microphone mismatch (see
         :func:`apply_mic_calibration`).
-    :param spacing: Microphone spacing ``s = x1 - x2``, in metres.
+    :param spacing: Microphone spacing :math:`s = x_1 - x_2`, in metres.
     :param x1: Distance from the sample surface to the farther microphone
         (position 1), in metres.
     :param wavenumber: Complex wavenumber ``k0`` (from :func:`tube_wavenumber`),
@@ -359,12 +365,12 @@ def reflection_factor(
 
 
 def normalized_surface_impedance(reflection: ArrayLike) -> Complex:
-    """Normalised surface impedance ``Z / (rho c0)`` (ISO 10534-2, Eq. (19)).
+    r"""Normalised surface impedance :math:`Z/(\rho c_0)` (ISO 10534-2, Eq. (19)).
 
-    ``Z / (rho c0) = (1 + r) / (1 - r)``.
+    :math:`Z / (\rho c_0) = (1 + r) / (1 - r)`.
 
     :param reflection: Complex reflection factor ``r``.
-    :return: Normalised surface impedance ``Z / (rho c0)`` (complex).
+    :return: Normalised surface impedance :math:`Z/(\rho c_0)` (complex).
     """
     r = np.asarray(reflection, dtype=np.complex128)
     return np.asarray((1.0 + r) / (1.0 - r), dtype=np.complex128)
@@ -373,9 +379,9 @@ def normalized_surface_impedance(reflection: ArrayLike) -> Complex:
 def surface_impedance(
     reflection: ArrayLike, characteristic_impedance: float
 ) -> Complex:
-    """Absolute surface impedance ``Z`` (ISO 10534-2, Eq. (19)).
+    r"""Absolute surface impedance ``Z`` (ISO 10534-2, Eq. (19)).
 
-    ``Z = rho c0 * (1 + r) / (1 - r)``.
+    :math:`Z = \rho c_0 (1 + r) / (1 - r)`.
 
     :param reflection: Complex reflection factor ``r``.
     :param characteristic_impedance: Characteristic impedance of air
@@ -391,9 +397,9 @@ def surface_impedance(
 
 
 def normalized_surface_admittance(reflection: ArrayLike) -> Complex:
-    """Normalised surface admittance ``G rho c0`` (ISO 10534-2, Eq. (20)).
+    r"""Normalised surface admittance :math:`G \rho c_0` (ISO 10534-2, Eq. (20)).
 
-    ``G rho c0 = (rho c0) / Z = (1 - r) / (1 + r)``.
+    :math:`G \rho c_0 = (\rho c_0) / Z = (1 - r) / (1 + r)`.
 
     :param reflection: Complex reflection factor ``r``.
     :return: Normalised surface admittance (complex).
@@ -403,9 +409,9 @@ def normalized_surface_admittance(reflection: ArrayLike) -> Complex:
 
 
 def absorption_from_reflection(reflection: ArrayLike) -> Real:
-    """Normal-incidence absorption coefficient (ISO 10534-2, Eq. (18)).
+    r"""Normal-incidence absorption coefficient (ISO 10534-2, Eq. (18)).
 
-    ``alpha = 1 - |r|^2``. This form is shared with ISO 10534-1 Eq. (9) and
+    :math:`\alpha = 1 - |r|^2`. This form is shared with ISO 10534-1 Eq. (9) and
     ASTM E2611-19 Eq. (28).
 
     :param reflection: Complex reflection factor ``r``.
@@ -418,9 +424,9 @@ def absorption_from_reflection(reflection: ArrayLike) -> Real:
 def mic_calibration_factor(
     h12_config1: ArrayLike, h12_config2: ArrayLike
 ) -> Complex:
-    """Microphone-mismatch calibration factor ``Hc`` (ISO 10534-2, Eq. (10)).
+    r"""Microphone-mismatch calibration factor ``Hc`` (ISO 10534-2, Eq. (10)).
 
-    ``Hc = sqrt(H12^I / H12^II)`` from a transfer function measured on an
+    :math:`H_c = \sqrt{H_{12}^{I} / H_{12}^{II}}` from a transfer function measured on an
     absorptive specimen in the standard configuration (I) and with the two
     microphones physically interchanged (II) - the cabling to the analyser is
     **not** swapped (Clause 7.5.2).
@@ -437,9 +443,9 @@ def mic_calibration_factor(
 def apply_mic_calibration(
     h12_uncorrected: ArrayLike, calibration_factor: ArrayLike
 ) -> Complex:
-    """Apply the microphone calibration factor (ISO 10534-2, Eq. (13)).
+    r"""Apply the microphone calibration factor (ISO 10534-2, Eq. (13)).
 
-    ``H12 = H12_uncorrected / Hc``.
+    :math:`H_{12} = H_{12,\text{uncorrected}} / H_c`.
 
     :param h12_uncorrected: Uncorrected measured transfer function.
     :param calibration_factor: Calibration factor ``Hc`` from
@@ -458,14 +464,14 @@ def plane_wave_frequency_range(
     diameter: float | None = None,
     shape: str = "circular",
 ) -> tuple[float, float]:
-    """Working plane-wave frequency range ``(f_l, f_u)`` (ISO 10534-2, 4.2-4.5).
+    r"""Working plane-wave frequency range ``(f_l, f_u)`` (ISO 10534-2, 4.2-4.5).
 
     The upper limit is the smaller of the microphone-spacing bound
-    ``f_u s < 0,45 c0`` (Eq. (4)) and, when the tube ``diameter`` is given, the
-    cut-on bound ``f_u d < 0,58 c0`` for a circular tube (Eq. (2)) or
-    ``< 0,50 c0`` for a rectangular tube (Eq. (3)). The lower limit uses the
-    Clause 4.2 guideline that the spacing exceed 5 % of the wavelength, i.e.
-    ``f_l = c0 / (20 s)``.
+    :math:`f_u s < 0.45 c_0` (Eq. (4)) and, when the tube ``diameter`` is
+    given, the cut-on bound :math:`f_u d < 0.58 c_0` for a circular tube
+    (Eq. (2)) or :math:`f_u d < 0.50 c_0` for a rectangular tube (Eq. (3)).
+    The lower limit uses the Clause 4.2 guideline that the spacing exceed
+    5 % of the wavelength, i.e. :math:`f_l = c_0 / (20 s)`.
 
     :param spacing: Microphone spacing ``s``, in metres.
     :param speed_of_sound: Speed of sound ``c0``, in metres per second.
@@ -495,15 +501,16 @@ def plane_wave_frequency_range_astm(
     diameter: float | None = None,
     shape: str = "circular",
 ) -> tuple[float, float]:
-    """Working plane-wave frequency range ``(f_l, f_u)`` (ASTM E2611-19).
+    r"""Working plane-wave frequency range ``(f_l, f_u)`` (ASTM E2611-19).
 
     The upper limit is the smaller of the microphone-spacing bound
-    ``s <= 0,8 c / (2 f_u)``, i.e. ``f_u s < 0,40 c`` (6.5.4), and, when the
-    tube ``diameter`` is given, the cut-on bound ``f_u < K c / d`` with
-    ``K = 0,586`` for a circular tube (6.2.4.1, Eq. (2)) or ``K = 0,500`` for
-    a rectangular tube with ``d`` the largest section dimension (6.2.5). The
-    lower limit follows 6.2.3: the spacing shall be greater than 1 % of the
-    wavelength, i.e. ``f_l = c / (100 s)``.
+    :math:`s \le 0.8 c / (2 f_u)`, i.e. :math:`f_u s < 0.40 c` (6.5.4), and,
+    when the tube ``diameter`` is given, the cut-on bound
+    :math:`f_u < K c / d` with :math:`K = 0.586` for a circular tube
+    (6.2.4.1, Eq. (2)) or :math:`K = 0.500` for a rectangular tube with ``d``
+    the largest section dimension (6.2.5). The lower limit follows 6.2.3: the
+    spacing shall be greater than 1 % of the wavelength, i.e.
+    :math:`f_l = c / (100 s)`.
 
     With two different spacings ``s1``/``s2``, call with the larger one for
     the upper bound and the smaller one for the lower bound (each bound is
@@ -576,14 +583,14 @@ def _warn_frequency_range(
 
 @dataclass(frozen=True)
 class ImpedanceTubeResult:
-    """Two-microphone impedance-tube result (ISO 10534-2:2001).
+    r"""Two-microphone impedance-tube result (ISO 10534-2:2001).
 
     All arrays share the shape of ``frequency``. ``reflection`` is the complex
     reflection factor ``r`` at the sample surface (Eq. (17)),
     ``surface_impedance`` the absolute surface impedance ``Z`` in rayls
-    (Eq. (19)), ``normalized_impedance`` the ratio ``Z / (rho c0)`` (Eq. (19))
-    and ``absorption`` the normal-incidence coefficient ``alpha = 1 - |r|^2``
-    (Eq. (18)).
+    (Eq. (19)), ``normalized_impedance`` the ratio :math:`Z/(\rho c_0)`
+    (Eq. (19)) and ``absorption`` the normal-incidence coefficient
+    :math:`\alpha = 1 - \lvert r\rvert^2` (Eq. (18)).
 
     The trailing fields retain the tube geometry the reduction was run with
     (microphone ``spacing`` ``s``, distance ``x1`` from the sample to the
@@ -643,7 +650,7 @@ class ImpedanceTubeResult:
         verbose: bool = False,
         language: str = "en",
     ) -> str:
-        """Render an ISO 10534-2 impedance-tube test-report fiche to a PDF.
+        r"""Render an ISO 10534-2 impedance-tube test-report fiche to a PDF.
 
         Writes a one-page accredited normal-incidence report (BS EN ISO
         10534-2:2001, two-microphone transfer-function method): the
@@ -652,7 +659,7 @@ class ImpedanceTubeResult:
         frequency range, mounting, climate ...), a two-panel body with the
         per-frequency table (frequency, absorption ``alpha`` and the
         real/imaginary parts of the normalised surface impedance
-        ``z = Z / (rho c0)``) beside the ``alpha(f)`` curve, and a footer with
+        :math:`z = Z/(\rho c_0)`) beside the ``alpha(f)`` curve, and a footer with
         the fixed disclaimer. ISO 10534-2 is a characterisation, so there is no
         pass/fail verdict and no single-number rating (the random-incidence
         weighted ``alpha_w`` is an ISO 11654 / ISO 354 quantity, not comparable
@@ -757,11 +764,13 @@ def two_microphone_impedance(
 # ISO 10534-1: standing-wave-ratio method.
 # ---------------------------------------------------------------------------
 def standing_wave_ratio_from_level(level_difference: ArrayLike) -> Real:
-    """Standing-wave ratio from a level difference (ISO 10534-1, Eq. (15)).
+    r"""Standing-wave ratio from a level difference (ISO 10534-1, Eq. (15)).
 
-    ``s = 10^(dL / 20)`` with ``dL = L_max - L_min`` in decibels.
+    :math:`s = 10^{\Delta L / 20}` with
+    :math:`\Delta L = L_{\max} - L_{\min}` in decibels.
 
-    :param level_difference: Level difference ``dL = L_max - L_min``, in dB.
+    :param level_difference: Level difference
+        :math:`\Delta L = L_{\max} - L_{\min}`, in dB.
     :return: Standing-wave ratio ``s`` (>= 1).
     """
     dl = np.asarray(level_difference, dtype=np.float64)
@@ -776,9 +785,9 @@ def _check_swr(swr: NDArray[np.float64]) -> None:
 
 
 def standing_wave_reflection_magnitude(swr: ArrayLike) -> Real:
-    """Reflection magnitude from the standing-wave ratio (ISO 10534-1, Eq. (14)).
+    r"""Reflection magnitude from the standing-wave ratio (ISO 10534-1, Eq. (14)).
 
-    ``|r| = (s - 1) / (s + 1)``.
+    :math:`|r| = (s - 1) / (s + 1)`.
 
     :param swr: Standing-wave ratio ``s`` (>= 1).
     :return: Reflection magnitude ``|r|`` in ``[0, 1]``.
@@ -789,10 +798,11 @@ def standing_wave_reflection_magnitude(swr: ArrayLike) -> Real:
 
 
 def standing_wave_absorption(swr: ArrayLike) -> Real:
-    """Absorption coefficient from the standing-wave ratio (ISO 10534-1).
+    r"""Absorption coefficient from the standing-wave ratio (ISO 10534-1).
 
-    Combining ``alpha = 1 - |r|^2`` (Eq. (9)) with ``|r| = (s - 1)/(s + 1)``
-    (Eq. (14)) gives ``alpha = 4 s / (s + 1)^2``.
+    Combining :math:`\alpha = 1 - |r|^2` (Eq. (9)) with
+    :math:`|r| = (s - 1)/(s + 1)` (Eq. (14)) gives
+    :math:`\alpha = 4s/(s + 1)^2`.
 
     :param swr: Standing-wave ratio ``s`` (>= 1).
     :return: Absorption coefficient ``alpha`` in ``[0, 1]``.
@@ -818,11 +828,11 @@ def _standing_wave_phase(
 def standing_wave_reflection(
     swr: ArrayLike, first_min_distance: ArrayLike, wavelength: ArrayLike
 ) -> Complex:
-    """Complex reflection factor from the standing wave (ISO 10534-1, Eqs. (17)-(23)).
+    r"""Complex reflection factor from the standing wave (ISO 10534-1, Eqs. (17)-(23)).
 
-    ``r = |r| e^{j phi}`` with ``|r| = (s - 1)/(s + 1)`` (Eq. (14)) and the
-    phase at the first pressure minimum ``phi = pi (4 x_min1 / lambda0 - 1)``
-    (Eq. (20)).
+    :math:`r = |r| e^{j\phi}` with :math:`|r| = (s - 1)/(s + 1)` (Eq. (14))
+    and the phase at the first pressure minimum
+    :math:`\phi = \pi (4 x_{\text{min},1} / \lambda_0 - 1)` (Eq. (20)).
 
     :param swr: Standing-wave ratio ``s`` (>= 1).
     :param first_min_distance: Distance ``x_min1`` from the reference plane to
@@ -841,9 +851,10 @@ def standing_wave_reflection(
 def standing_wave_normalized_impedance(
     swr: ArrayLike, first_min_distance: ArrayLike, wavelength: ArrayLike
 ) -> Complex:
-    """Normalised impedance from the standing wave (ISO 10534-1, Eqs. (24)-(26)).
+    r"""Normalised impedance from the standing wave (ISO 10534-1, Eqs. (24)-(26)).
 
-    ``z = Z / Z0 = (1 + r) / (1 - r)``; the real/imaginary split is Eqs. (25)/(26).
+    :math:`z = Z/Z_0 = (1 + r)/(1 - r)`; the real/imaginary split is
+    Eqs. (25)/(26).
 
     :param swr: Standing-wave ratio ``s`` (>= 1).
     :param first_min_distance: Distance ``x_min1`` to the first minimum, in metres.
@@ -866,12 +877,13 @@ def _warn_astm_plane_wave(
     shape: str,
     stacklevel: int,
 ) -> None:
-    """Advise when wavenumbers leave the ASTM E2611-19 plane-wave range.
+    r"""Advise when wavenumbers leave the ASTM E2611-19 plane-wave range.
 
     The check runs on the real part of ``k`` so no speed of sound is needed:
-    ``f s < 0,40 c`` maps to ``k s < 0,80 pi`` (6.5.4), ``f d < K c`` to
-    ``k d < 2 pi K`` (6.2.4.1/6.2.5) and the greater-than-1 %-of-wavelength
-    spacing bound to ``k s > 0,02 pi`` (6.2.3). The upper spacing bound binds
+    :math:`f s < 0.40 c` maps to :math:`k s < 0.80 \pi` (6.5.4),
+    :math:`f d < K c` to :math:`k d < 2 \pi K` (6.2.4.1/6.2.5) and the
+    greater-than-1 %-of-wavelength spacing bound to
+    :math:`k s > 0.02 \pi` (6.2.3). The upper spacing bound binds
     every microphone pair (largest spacing), the lower one the smallest.
     """
     if s1 <= 0.0 or s2 <= 0.0:
@@ -911,23 +923,33 @@ def wave_decomposition(
     diameter: float | None = None,
     shape: str = "circular",
 ) -> tuple[Complex, Complex, Complex, Complex]:
-    """Decompose the wave field into ``(A, B, C, D)`` (ASTM E2611-19, Eqs. (17)-(20)).
+    r"""Decompose the wave field into ``(A, B, C, D)`` (ASTM E2611-19, Eqs. (17)-(20)).
 
-    The exponents are implemented exactly as printed::
+    The exponents are implemented exactly as printed:
 
-        A = j (H1 e^{-j k l1}       - H2 e^{-j k (l1+s1)}) / (2 sin(k s1))
-        B = j (H2 e^{+j k (l1+s1)}  - H1 e^{+j k l1})      / (2 sin(k s1))
-        C = j (H3 e^{+j k (l2+s2)}  - H4 e^{+j k l2})      / (2 sin(k s2))
-        D = j (H4 e^{-j k l2}       - H3 e^{-j k (l2+s2)}) / (2 sin(k s2))
+    .. math::
+
+       A = \frac{j \left( H_1 e^{-jkl_1} - H_2 e^{-jk(l_1+s_1)} \right)}
+       {2 \sin(k s_1)}
+
+       B = \frac{j \left( H_2 e^{+jk(l_1+s_1)} - H_1 e^{+jkl_1} \right)}
+       {2 \sin(k s_1)}
+
+       C = \frac{j \left( H_3 e^{+jk(l_2+s_2)} - H_4 e^{+jkl_2} \right)}
+       {2 \sin(k s_2)}
+
+       D = \frac{j \left( H_4 e^{-jkl_2} - H_3 e^{-jk(l_2+s_2)} \right)}
+       {2 \sin(k s_2)}
 
     ``A``/``B`` are the forward/backward complex amplitudes on the upstream
     (source) side and ``C``/``D`` those on the downstream side, all referenced
-    to the front face ``x = 0``. With the ``e^{+j w t}`` / forward-``e^{-j k x}``
+    to the front face :math:`x = 0`. With the :math:`e^{+j\omega t}` /
+    forward-:math:`e^{-jkx}`
     convention these exponents correspond to the microphone whose transfer
     function is ``H2`` sitting nearest the front face at distance ``l1`` (and
-    ``H1`` at ``l1 + s1``), and to ``H3`` nearest the downstream side at ``l2``
-    (and ``H4`` at ``l2 + s2``), with ``l1``, ``l2`` measured from the front
-    reference plane. The convention was locked down against the analytic
+    ``H1`` at :math:`l_1 + s_1`), and to ``H3`` nearest the downstream side at
+    ``l2`` (and ``H4`` at :math:`l_2 + s_2`), with ``l1``, ``l2`` measured
+    from the front reference plane. The convention was locked down against the analytic
     air-layer transfer matrix (see :func:`air_layer_transfer_matrix`).
 
     :param h1: Transfer function ``H1,ref`` (upstream, farther microphone).
@@ -983,10 +1005,15 @@ def face_quantities(
     thickness: float,
     characteristic_impedance: float,
 ) -> tuple[Complex, Complex, Complex, Complex]:
-    """Face pressures and particle velocities (ASTM E2611-19, Eq. (21)).
+    r"""Face pressures and particle velocities (ASTM E2611-19, Eq. (21)).
 
-    ``p0 = A + B``, ``pd = C e^{-j k d} + D e^{+j k d}``,
-    ``u0 = (A - B) / (rho c)``, ``ud = (C e^{-j k d} - D e^{+j k d}) / (rho c)``.
+    .. math::
+
+       p_0 = A + B, \qquad
+       p_d = C e^{-jkd} + D e^{+jkd}
+
+       u_0 = \frac{A - B}{\rho c}, \qquad
+       u_d = \frac{C e^{-jkd} - D e^{+jkd}}{\rho c}
 
     :param a: Upstream forward amplitude ``A``.
     :param b: Upstream backward amplitude ``B``.
@@ -1020,10 +1047,10 @@ def face_quantities(
 
 @dataclass(frozen=True)
 class TransferMatrix:
-    """Acoustic transfer matrix ``[[T11, T12], [T21, T22]]`` (ASTM E2611-19).
+    r"""Acoustic transfer matrix ``[[T11, T12], [T21, T22]]`` (ASTM E2611-19).
 
     Relates the pressure and normal particle velocity across a specimen,
-    ``[p; u]_{x=0} = T [p; u]_{x=d}`` (Eq. (16)). Each entry is complex and
+    :math:`[p; u]_{x=0} = T \, [p; u]_{x=d}` (Eq. (16)). Each entry is complex and
     may be scalar or a per-frequency array of matching shape.
 
     The trailing fields retain the measurement context when the matrix comes
@@ -1051,17 +1078,28 @@ class TransferMatrix:
     air_characteristic_impedance: float | None = None
 
     def determinant(self) -> Complex:
-        """Determinant ``T11 T22 - T12 T21`` (unity for a reciprocal specimen)."""
+        r"""Determinant :math:`T_{11} T_{22} - T_{12} T_{21}` (unity for a reciprocal specimen)."""
         return np.asarray(
             self.t11 * self.t22 - self.t12 * self.t21, dtype=np.complex128
         )
 
     def transmission_loss(self, characteristic_impedance: float) -> Real:
-        """Normal-incidence transmission loss in dB (ASTM E2611-19, Eq. (26)).
+        r"""Normal-incidence transmission loss in dB (ASTM E2611-19, Eq. (26)).
 
-        With ``t = 2 e^{j k d} / (T11 + T12/(rho c) + rho c T21 + T22)``
-        (Eq. (25)), ``TL = 20 log10 |1/t| = 20 log10 |T11 + T12/(rho c) +
-        rho c T21 + T22| / 2`` (the ``e^{j k d}`` factor has unit magnitude for
+        With
+
+        .. math::
+
+           t = \frac{2 e^{jkd}}
+           {T_{11} + T_{12}/(\rho c) + \rho c \, T_{21} + T_{22}}
+           \tag{Eq. 25}
+
+           TL = 20 \log_{10} \left| \frac{1}{t} \right|
+           = 20 \log_{10} \frac{\lvert T_{11} + T_{12}/(\rho c)
+           + \rho c \, T_{21} + T_{22} \rvert}{2}
+           \tag{Eq. 26}
+
+        (the :math:`e^{jkd}` factor has unit magnitude for
         a real wavenumber).
 
         :param characteristic_impedance: Characteristic impedance ``rho c``.
@@ -1074,9 +1112,9 @@ class TransferMatrix:
         return np.asarray(20.0 * np.log10(np.abs(combo) / 2.0), dtype=np.float64)
 
     def reflection_hard_backed(self, characteristic_impedance: float) -> Complex:
-        """Hard-backed reflection coefficient (ASTM E2611-19, Eq. (27)).
+        r"""Hard-backed reflection coefficient (ASTM E2611-19, Eq. (27)).
 
-        ``R = (T11 - rho c T21) / (T11 + rho c T21)``.
+        :math:`R = (T_{11} - \rho c T_{21}) / (T_{11} + \rho c T_{21})`.
 
         :param characteristic_impedance: Characteristic impedance ``rho c``.
         :return: Complex reflection coefficient ``R``.
@@ -1090,9 +1128,9 @@ class TransferMatrix:
         )
 
     def absorption_hard_backed(self, characteristic_impedance: float) -> Real:
-        """Hard-backed absorption coefficient (ASTM E2611-19, Eq. (28)).
+        r"""Hard-backed absorption coefficient (ASTM E2611-19, Eq. (28)).
 
-        ``alpha = 1 - |R|^2``.
+        :math:`\alpha = 1 - \lvert R \rvert^2`.
 
         :param characteristic_impedance: Characteristic impedance ``rho c``.
         :return: Absorption coefficient ``alpha``.
@@ -1101,9 +1139,9 @@ class TransferMatrix:
         return np.asarray(1.0 - np.abs(r) ** 2, dtype=np.float64)
 
     def material_wavenumber(self, thickness: float) -> Complex:
-        """Propagation wavenumber inside the material (ASTM E2611-19, Eq. (29)).
+        r"""Propagation wavenumber inside the material (ASTM E2611-19, Eq. (29)).
 
-        ``k' = arccos(T11) / d`` (complex ``arccos``).
+        :math:`k' = \arccos(T_{11}) / d` (complex ``arccos``).
 
         :param thickness: Specimen thickness ``d``, in metres.
         :return: Complex material wavenumber ``k'``, in reciprocal metres.
@@ -1114,9 +1152,9 @@ class TransferMatrix:
         return np.asarray(np.arccos(t11) / thickness, dtype=np.complex128)
 
     def characteristic_impedance_material(self) -> Complex:
-        """Characteristic impedance of the material (ASTM E2611-19, Eq. (30)).
+        r"""Characteristic impedance of the material (ASTM E2611-19, Eq. (30)).
 
-        ``Z = sqrt(T12 / T21)``.
+        :math:`Z = \sqrt{T_{12} / T_{21}}`.
 
         :return: Complex characteristic impedance ``Z``, in rayls.
         """
@@ -1203,11 +1241,16 @@ class TransferMatrix:
 def air_layer_transfer_matrix(
     wavenumber: ArrayLike, thickness: float, characteristic_impedance: float
 ) -> TransferMatrix:
-    """Analytic transfer matrix of a pure air layer of thickness ``d``.
+    r"""Analytic transfer matrix of a pure air layer of thickness ``d``.
 
-    ``T = [[cos(k d), j rho c sin(k d)], [j sin(k d) / (rho c), cos(k d)]]`` -
+    .. math::
+
+       T = [[\cos(k d),\; j \rho c \sin(k d)],\;
+       [j \sin(k d) / (\rho c),\; \cos(k d)]]
+
     the classical loss-free layer used to validate the ASTM E2611-19 reduction
-    (it is reciprocal, ``det(T) = 1``, and symmetric, ``T11 = T22``).
+    (it is reciprocal, :math:`\operatorname{det}(T) = 1`, and symmetric,
+    :math:`T_{11} = T_{22}`).
 
     :param wavenumber: Air wavenumber ``k``.
     :param thickness: Layer thickness ``d``, in metres.
@@ -1325,17 +1368,21 @@ def transfer_matrix_two_load(
     diameter: float | None = None,
     shape: str = "circular",
 ) -> TransferMatrix:
-    """Two-load transfer matrix (ASTM E2611-19, Eqs. (17)-(22)).
+    r"""Two-load transfer matrix (ASTM E2611-19, Eqs. (17)-(22)).
 
     Each load is the tuple ``(H1, H2, H3, H4)`` of the four microphone transfer
     functions measured with a different downstream termination. The two loads
-    give four equations for the four unknowns (Eq. (22))::
+    give four equations for the four unknowns (Eq. (22)):
 
-        DEN = p_da u_db - p_db u_da
-        T11 = (p0a u_db - p0b u_da) / DEN
-        T12 = (p0b p_da - p0a p_db) / DEN
-        T21 = (u0a u_db - u0b u_da) / DEN
-        T22 = (p_da u0b - p_db u0a) / DEN
+    .. math::
+
+       \begin{aligned}
+       \mathrm{DEN} &= p_{da} u_{db} - p_{db} u_{da} \\
+       T_{11} &= (p_{0a} u_{db} - p_{0b} u_{da}) / \mathrm{DEN} \\
+       T_{12} &= (p_{0b} p_{da} - p_{0a} p_{db}) / \mathrm{DEN} \\
+       T_{21} &= (u_{0a} u_{db} - u_{0b} u_{da}) / \mathrm{DEN} \\
+       T_{22} &= (p_{da} u_{0b} - p_{db} u_{0a}) / \mathrm{DEN}
+       \end{aligned}
 
     :param load_a: Microphone transfer functions ``(H1, H2, H3, H4)`` for load a.
     :param load_b: Microphone transfer functions ``(H1, H2, H3, H4)`` for load b.
@@ -1403,15 +1450,20 @@ def transfer_matrix_one_load(
     diameter: float | None = None,
     shape: str = "circular",
 ) -> TransferMatrix:
-    """One-load transfer matrix, symmetric specimen (ASTM E2611-19, Eqs. (23)-(24)).
+    r"""One-load transfer matrix, symmetric specimen (ASTM E2611-19, Eqs. (23)-(24)).
 
-    Valid only for a reciprocal **and** symmetric specimen (``T11 = T22`` and
-    ``T11 T22 - T12 T21 = 1``, Eq. (23)). A single termination suffices::
+    Valid only for a reciprocal **and** symmetric specimen
+    (:math:`T_{11} = T_{22}` and :math:`T_{11} T_{22} - T_{12} T_{21} = 1`,
+    Eq. (23)). A single termination suffices:
 
-        DEN = p0 ud + pd u0
-        T11 = T22 = (pd ud + p0 u0) / DEN
-        T12 = (p0^2 - pd^2) / DEN
-        T21 = (u0^2 - ud^2) / DEN
+    .. math::
+
+       \begin{aligned}
+       \mathrm{DEN} &= p_0 u_d + p_d u_0 \\
+       T_{11} = T_{22} &= (p_d u_d + p_0 u_0) / \mathrm{DEN} \\
+       T_{12} &= (p_0^{2} - p_d^{2}) / \mathrm{DEN} \\
+       T_{21} &= (u_0^{2} - u_d^{2}) / \mathrm{DEN}
+       \end{aligned}
 
     :param load: Microphone transfer functions ``(H1, H2, H3, H4)``.
     :param l1: Upstream reference distance ``l1``, in metres.

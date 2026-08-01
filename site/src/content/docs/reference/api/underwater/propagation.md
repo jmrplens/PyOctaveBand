@@ -10,13 +10,16 @@ Underwater sound propagation: transmission loss (closed-form).
 Transmission loss `TL` (dB) is the sum of geometrical spreading and volume
 absorption:
 
-* [`spreading_loss`](/phonometry/reference/api/underwater/propagation/#spreading_loss) -- geometrical spreading, `20·lg R` (spherical),
-  `10·lg R` (cylindrical) or spherical-then-cylindrical (`"practical"`).
-* [`seawater_absorption`](/phonometry/reference/api/underwater/propagation/#seawater_absorption) -- the volume absorption coefficient `α` in
+* [`spreading_loss`](/phonometry/reference/api/underwater/propagation/#spreading_loss) -- geometrical spreading, $20 \log_{10} R$
+  (spherical), $10 \log_{10} R$ (cylindrical) or spherical-then-cylindrical
+  (`"practical"`).
+* [`seawater_absorption`](/phonometry/reference/api/underwater/propagation/#seawater_absorption) -- the volume absorption coefficient
+  $\alpha$ in
   dB/km, from three coexisting formulations selectable through `model`:
   Francois & Garrison (1982, the default and reference), Ainslie & McColm (1998,
   a legible simplification of it) and Thorp (1967, a frequency-only form).
-* [`transmission_loss`](/phonometry/reference/api/underwater/propagation/#transmission_loss) -- the total `TL = spreading + α·R` versus range,
+* [`transmission_loss`](/phonometry/reference/api/underwater/propagation/#transmission_loss) -- the total
+  $\mathrm{TL} = \text{spreading} + \alpha R$ versus range,
   returned as a [`TransmissionLossResult`](/phonometry/reference/api/underwater/propagation/#transmissionlossresult) with a `.plot()`.
 
 Sources (clean-room, implemented from the published equations): Francois &
@@ -43,7 +46,7 @@ seawater_absorption(
 ) -> NDArray[np.float64]
 ```
 
-Volume absorption coefficient `α`, in dB/km.
+Volume absorption coefficient $\alpha$, in dB/km.
 
 **Parameters**
 
@@ -77,10 +80,10 @@ spreading_loss(
 
 Geometrical spreading loss, in dB.
 
-`"spherical"` gives `20·lg(R)` (free field), `"cylindrical"` gives
-`10·lg(R)` (perfect waveguide) and `"practical"` is spherical up to
-`transition_range` `R0` then cylindrical:
-`20·lg(R0) + 10·lg(R/R0)` (mode stripping in a channel).
+`"spherical"` gives $20 \log_{10}(R)$ (free field), `"cylindrical"`
+gives $10 \log_{10}(R)$ (perfect waveguide) and `"practical"` is
+spherical up to `transition_range` `R0` then cylindrical:
+$20 \log_{10}(R_0) + 10 \log_{10}(R/R_0)$ (mode stripping in a channel).
 
 **Parameters**
 
@@ -115,7 +118,8 @@ transmission_loss(
 ) -> TransmissionLossResult
 ```
 
-Total transmission loss `TL = spreading + α·R` versus range.
+Total transmission loss
+$\mathrm{TL} = \text{spreading} + \alpha R$ versus range.
 
 **Parameters**
 
@@ -165,7 +169,7 @@ Transmission loss versus range (closed-form).
 | `spreading` | Geometrical-spreading contribution per range, in dB. |
 | `absorption` | Volume-absorption contribution per range, in dB. |
 | `frequency` | The acoustic frequency, in Hz. |
-| `absorption_coefficient` | The absorption coefficient `α`, in dB/km. |
+| `absorption_coefficient` | The absorption coefficient $\alpha$, in dB/km. |
 | `law` | The spreading law used. |
 | `model` | The absorption model used. |
 

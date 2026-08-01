@@ -1,5 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""Biot poroelastic layers: the three waves and the 6x6 transfer matrix.
+r"""Biot poroelastic layers: the three waves and the 6x6 transfer matrix.
 
 An equivalent fluid replaces a porous material by a single wave travelling in
 the pores while the skeleton stands still (rigid frame) or is merely dragged
@@ -12,19 +12,22 @@ and it predicts **three** waves in an isotropic porous layer, two compressional
 and one shear (Allard & Atalla, *Propagation of Sound in Porous Media* 2e,
 chapter 6).
 
-This module implements that theory in the ``e^{+j w t}`` convention of the rest
-of the package, exactly as printed:
+This module implements that theory in the :math:`e^{+j \omega t}` convention
+of the rest of the package, exactly as printed:
 
-* **Elastic coefficients** ``P``, ``Q`` and ``R`` for the usual case of a frame
-  built from a material far stiffer than the frame itself (``Ks -> inf``),
-  Eqs. (6.26)-(6.29) printed pp. 116-117: ``R = phi Kf``,
-  ``Q = (1 - phi) Kf``, ``P = 4N/3 + Kb + (1 - phi)^2 Kf / phi`` with the frame
-  bulk modulus ``Kb = 2N(1 + nu)/(3(1 - 2 nu))``.
+* **Elastic coefficients** ``P``, ``Q`` and ``R`` for the usual case of a
+  frame built from a material far stiffer than the frame itself
+  (:math:`K_s \to \infty`), Eqs. (6.26)-(6.29) printed pp. 116-117:
+  :math:`R = \phi K_f`, :math:`Q = (1 - \phi) K_f`,
+  :math:`P = 4N/3 + K_b + (1 - \phi)^2 K_f / \phi` with the frame bulk
+  modulus :math:`K_b = 2N(1 + \nu)/(3(1 - 2\nu))`.
 * **Modified densities** ``rho11``, ``rho12``, ``rho22`` (Eq. (6.56), printed
-  p. 120) built from the inertial coupling ``rho_a = phi rho0 (a_inf - 1)`` and
-  the visco-inertial term ``j sigma phi^2 G(w) / w``. The latter is *not*
+  p. 120) built from the inertial coupling
+  :math:`\rho_a = \phi \rho_0 (\alpha_\infty - 1)` and the visco-inertial
+  term :math:`j \sigma \phi^2 G(\omega) / \omega`. The latter is *not*
   re-derived here: it is read back from the equivalent-fluid model handed in,
-  through the identity ``rho22 = phi^2 rho_eq`` stated on printed p. 253, so a
+  through the identity :math:`\rho_{22} = \phi^2 \rho_{\mathrm{eq}}` stated
+  on printed p. 253, so a
   Biot layer and a rigid-frame layer built from the same
   :class:`~phonometry.materials.porous_absorber.PorousMediumResult` share one
   visco-thermal description by construction.
@@ -34,22 +37,23 @@ of the package, exactly as printed:
   (Eq. (6.84)).
 * **The closed-form surface impedance** of a hard-backed layer at normal
   incidence, Eqs. (6.107)-(6.108) printed p. 128, in
-  :func:`biot_surface_impedance`, and the ``lambda/4`` frame resonance it
+  :func:`biot_surface_impedance`, and the :math:`\lambda/4` frame resonance it
   develops, Eq. (6.110) printed p. 129, in
   :func:`frame_quarter_wave_resonance`.
 * **The 6x6 layer matrix** of chapter 11: the field vector
-  ``[v1s, v3s, v3f, s33s, s13s, s33f]`` (Eq. (11.26)) expressed through the
-  wave-amplitude matrix ``[Gamma(x3)]`` of Table 11.1 (printed p. 252), from
-  which :func:`poroelastic_transfer_matrix` returns
-  ``[T] = [Gamma(-h)][Gamma(0)]^-1`` (Eq. (11.34)).
+  :math:`[v_1^s, v_3^s, v_3^f, s_{33}^s, s_{13}^s, s_{33}^f]` (Eq. (11.26))
+  expressed through the wave-amplitude matrix :math:`[\Gamma(x_3)]` of
+  Table 11.1 (printed p. 252), from which
+  :func:`poroelastic_transfer_matrix` returns
+  :math:`[T] = [\Gamma(-h)][\Gamma(0)]^{-1}` (Eq. (11.34)).
 
 The layer is used through
 :class:`~phonometry.materials.porous_absorber.PoroelasticLayer` inside
 :func:`~phonometry.materials.porous_absorber.layered_absorber`, which switches
 to the global-matrix assembly of Sect. 11.5 as soon as a poroelastic layer is
-present, with the coupling matrices of Sect. 11.4 (``[Ipf]``/``[Jpf]``
-Eq. (11.73), ``[Ipp]`` Eq. (11.67)) and the hard-wall conditions ``[Y]`` of
-Eq. (11.81).
+present, with the coupling matrices of Sect. 11.4 (:math:`[I_{pf}]` /
+:math:`[J_{pf}]` Eq. (11.73), :math:`[I_{pp}]` Eq. (11.67)) and the hard-wall
+conditions :math:`[Y]` of Eq. (11.81).
 
 **On oracles.** Allard & Atalla publish no table of computed surface
 impedances, so the model is anchored on closed forms and on exact limits: the
@@ -59,12 +63,13 @@ equivalent fluid, the limp limit reproduces
 assembly reproduces the chapter 6 closed form Eq. (6.107) to machine precision.
 The book does print four *output* numbers for the fully specified glass wool of
 Table 6.1, and all four are reproduced: the airborne branch changes from
-``(delta1, mu1)`` to ``(delta2, mu2)`` at 495 Hz, ``|mu_a| > 40`` above 50 Hz,
-and ``mu_b`` runs from 1,0 at 50 Hz to 0,82 at 1500 Hz (all printed
-pp. 124-125), while the impedance peak of a 5,6 cm layer sits at 860 Hz
-(printed p. 129). The third of those is reproduced by ``Re(mu_b)``: the printed
-sentence calls it a modulus, but ``|mu_b|`` is 0,939 at 1500 Hz against the
-printed 0,82, and ``docs/ERRATA.md`` records why. See
+:math:`(\delta_1, \mu_1)` to :math:`(\delta_2, \mu_2)` at 495 Hz,
+:math:`\lvert \mu_a \rvert > 40` above 50 Hz, and ``mu_b`` runs from 1.0 at
+50 Hz to 0.82 at 1500 Hz (all printed pp. 124-125), while the impedance peak
+of a 5.6 cm layer sits at 860 Hz (printed p. 129). The third of those is
+reproduced by :math:`\operatorname{Re}(\mu_b)`: the printed sentence calls it
+a modulus, but :math:`\lvert \mu_b \rvert` is 0.939 at 1500 Hz against the
+printed 0.82, and ``docs/ERRATA.md`` records why. See
 ``tests/materials/test_biot.py``.
 """
 
@@ -101,7 +106,7 @@ _POROSITY_MESSAGE = "'porosity' must not exceed 1."
 
 
 def _require_shear_modulus(value: complex, name: str) -> complex:
-    """Validate a complex shear modulus ``N = N'(1 + j eta)``."""
+    r"""Validate a complex shear modulus :math:`N = N'(1 + j \eta)`."""
     n = complex(value)
     if not np.isfinite(n):
         raise ValueError(f"'{name}' must be finite.")
@@ -124,21 +129,23 @@ def _require_poisson_ratio(value: float) -> float:
 
 
 def frame_bulk_modulus(shear_modulus: complex, poisson_ratio: float) -> complex:
-    """Bulk modulus ``Kb`` of the frame in vacuum from ``N`` and ``nu``.
+    r"""Bulk modulus ``Kb`` of the frame in vacuum from ``N`` and ``nu``.
 
-    ``Kb = 2 N (nu + 1) / (3 (1 - 2 nu))`` (Allard & Atalla 2e, Eq. (6.29),
-    printed p. 116). ``Kb`` is the quantity the jacketed "gedanken experiment"
-    of Eq. (6.7) measures, and the one the limp-frame rules of thumb of
+    :math:`K_b = 2 N (\nu + 1) / (3 (1 - 2 \nu))` (Allard & Atalla 2e,
+    Eq. (6.29), printed p. 116). ``Kb`` is the quantity the jacketed
+    "gedanken experiment" of Eq. (6.7) measures, and the one the limp-frame
+    rules of thumb of
     :func:`~phonometry.materials.porous_absorber.limp_frame_applicable` compare
     with the bulk modulus of the pore fluid.
 
     :param shear_modulus: Complex shear modulus ``N`` of the frame, in Pa
-        (``Im(N) >= 0`` for a lossy frame in the ``e^{+j w t}`` convention).
+        (:math:`\operatorname{Im}(N) \ge 0` for a lossy frame in the
+        :math:`e^{+j \omega t}` convention).
     :param poisson_ratio: Poisson coefficient ``nu`` of the frame
-        (``-1 < nu < 0,5``).
+        (:math:`-1 < \nu < 0.5`).
     :return: The complex bulk modulus ``Kb`` of the frame in vacuum, in Pa.
     :raises ValueError: for a non-positive or non-finite ``N``, a negative
-        ``Im(N)`` or a ``nu`` outside ``(-1, 0,5)``.
+        :math:`\operatorname{Im}(N)` or a ``nu`` outside :math:`(-1, 0.5)`.
     """
     n = _require_shear_modulus(shear_modulus, "shear_modulus")
     nu = _require_poisson_ratio(poisson_ratio)
@@ -148,13 +155,16 @@ def frame_bulk_modulus(shear_modulus: complex, poisson_ratio: float) -> complex:
 def frame_elastic_coefficient(
     shear_modulus: complex, poisson_ratio: float
 ) -> complex:
-    """Longitudinal elastic coefficient ``Kc`` of the frame in vacuum.
+    r"""Longitudinal elastic coefficient ``Kc`` of the frame in vacuum.
 
-    ``Kc = lambda + 2 mu = Kb + 4 N / 3 = 2 (1 - nu) N / (1 - 2 nu)``
+    .. math::
+
+       K_c = \lambda + 2 \mu = K_b + 4 N / 3 = 2 (1 - \nu) N / (1 - 2 \nu)
+
     (Allard & Atalla 2e, Eqs. (1.76) and (6.111), printed pp. 12 and 130).
     A compressional wave in the frame *in vacuum* travels at
-    ``sqrt(Kc / rho1)``, which is what sets the ``lambda/4`` frame resonance of
-    :func:`frame_quarter_wave_resonance`.
+    :math:`\sqrt{K_c / \rho_1}`, which is what sets the :math:`\lambda/4`
+    frame resonance of :func:`frame_quarter_wave_resonance`.
 
     :param shear_modulus: Complex shear modulus ``N`` of the frame, in Pa.
     :param poisson_ratio: Poisson coefficient ``nu`` of the frame.
@@ -173,17 +183,21 @@ def frame_quarter_wave_resonance(
     poisson_ratio: float,
     frame_density: float,
 ) -> float:
-    """Quarter-wavelength resonance of the frame-borne wave (closed form).
+    r"""Quarter-wavelength resonance of the frame-borne wave (closed form).
 
     A porous layer glued to a rigid wall holds the frame still at the wall and
     free at the front face, so the frame-borne compressional wave resonates
-    where ``l Re(delta_b) = pi/2`` (Allard & Atalla 2e, Eq. (6.109), printed
-    p. 129). Since ``delta_b`` stays close to the frame-in-vacuum wavenumber
-    ``omega sqrt(rho1 / Kc)`` of Eq. (6.88), the resonance sits at
+    where :math:`l \operatorname{Re}(\delta_b) = \pi/2` (Allard & Atalla 2e,
+    Eq. (6.109), printed p. 129). Since ``delta_b`` stays close to the
+    frame-in-vacuum wavenumber :math:`\omega \sqrt{\rho_1 / K_c}` of
+    Eq. (6.88), the resonance sits at
 
-    ``fr = (1 / 4 l) sqrt(Re(Kc) / rho1)``
+    .. math::
 
-    (Eq. (6.110)). This is the frequency at which the peak that no
+       f_r = \frac{1}{4 l} \sqrt{\operatorname{Re}(K_c) / \rho_1}
+       \tag{Eq. 6.110}
+
+    This is the frequency at which the peak that no
     equivalent-fluid model can produce appears in the surface impedance of
     :func:`biot_surface_impedance`; Eq. (6.110) is an approximation to it
     (``delta_b`` is not exactly the in-vacuum wavenumber), so the peak lands a
@@ -206,12 +220,13 @@ def frame_quarter_wave_resonance(
 
 @dataclass(frozen=True)
 class BiotWavesResult:
-    """The three Biot waves of an isotropic air-saturated porous material.
+    r"""The three Biot waves of an isotropic air-saturated porous material.
 
     All arrays share the shape of ``frequency``. ``compressional_wavenumber_1``
     and ``compressional_wavenumber_2`` are ``delta1`` and ``delta2`` of
-    Eqs. (6.67)-(6.68) (the branch with ``-sqrt(Delta)`` first, as printed,
-    with ``sqrt(Delta)`` taken on the root with non-positive real part so that
+    Eqs. (6.67)-(6.68) (the branch with :math:`-\sqrt{\Delta}` first, as
+    printed, with :math:`\sqrt{\Delta}` taken on the root with non-positive
+    real part so that
     the numbering matches the book's own example), ``shear_wavenumber`` is
     ``delta3`` of Eq. (6.83), all in rad/m and all taken on the root with
     non-negative real part. ``velocity_ratio_1``,
@@ -221,7 +236,8 @@ class BiotWavesResult:
     coefficients and ``density_11``, ``density_12``, ``density_22`` the
     modified densities of Eq. (6.56).
 
-    The **airborne** wave is the one whose ``|mu|`` is the larger (the pore
+    The **airborne** wave is the one whose :math:`\lvert \mu \rvert` is the
+    larger (the pore
     fluid moves far more than the frame); the **frame-borne** wave is the
     other. Which of ``delta1`` / ``delta2`` plays which role swaps with
     frequency, so use the ``airborne_*`` and ``frame_borne_*`` properties
@@ -249,23 +265,27 @@ class BiotWavesResult:
 
     @property
     def airborne_is_second(self) -> NDArray[np.bool_]:
-        """Whether the airborne wave is ``(delta2, mu2)`` at each frequency.
+        r"""Whether the airborne wave is :math:`(\delta_2, \mu_2)` at each
+        frequency.
 
         **Neither labelling is continuous in general.** ``delta1`` and
         ``delta2`` are the two branches of one square root (Eqs. (6.67) and
         (6.68)), so ``compressional_wavenumber_1`` and
         ``compressional_wavenumber_2`` swap wherever the discriminant crosses
         the cut of :func:`numpy.sqrt`; on the Table 6.1 glass wool that
-        happens at 495,99 Hz, exactly where the book puts the change of root,
+        happens at 495.99 Hz, exactly where the book puts the change of root,
         and the two wavenumbers jump past each other by 24 rad/m there. This
-        ``|mu|`` sorting is the physical labelling of Sect. 6.5.4 and it
+        :math:`\lvert \mu \rvert` sorting is the physical labelling of
+        Sect. 6.5.4 and it
         removes that jump where the two events coincide, as they do there,
-        but it introduces one of its own wherever ``|mu1|`` and ``|mu2|``
+        but it introduces one of its own wherever :math:`\lvert \mu_1 \rvert`
+        and :math:`\lvert \mu_2 \rvert`
         cross *away* from the cut: on a sweep of 864 parameter sets, 30 left
         a visible step in the sorted airborne wavenumber.
 
         Nothing downstream depends on which root is called which. The closed
-        form Eq. (6.107) and the ``[Gamma]`` of Table 11.1 are both invariant
+        form Eq. (6.107) and the :math:`[\Gamma]` of Table 11.1 are both
+        invariant
         under the permutation of the two compressional waves and under a sign
         flip of either, so the surface impedance is continuous across the
         crossing even where the labels are not.
@@ -356,11 +376,12 @@ def biot_waves(
     shear_modulus: complex,
     poisson_ratio: float = 0.0,
 ) -> BiotWavesResult:
-    """The two compressional waves and the shear wave of a Biot layer.
+    r"""The two compressional waves and the shear wave of a Biot layer.
 
     *medium* supplies the visco-thermal description of the pore fluid, through
     the two identities of Allard & Atalla printed p. 253,
-    ``rho22 = phi^2 rho_eq`` and ``R = phi^2 K_eq``, where ``rho_eq`` and
+    :math:`\rho_{22} = \phi^2 \rho_{\mathrm{eq}}` and
+    :math:`R = \phi^2 K_{\mathrm{eq}}`, where ``rho_eq`` and
     ``K_eq`` are the surface-normalised effective density and bulk modulus that
     every model in :mod:`~phonometry.materials.porous_absorber` returns. Pass
     the rigid-frame :func:`~phonometry.materials.porous_absorber.johnson_champoux_allard`
@@ -368,16 +389,19 @@ def biot_waves(
     fluid's, so the *rigid-frame* effective density is the correct input (a
     limp-corrected one would count the frame inertia twice).
 
-    From it, with the inertial coupling ``rho_a = phi rho0 (a_inf - 1)``
-    (Eq. (6.44)):
+    From it, with the inertial coupling
+    :math:`\rho_a = \phi \rho_0 (\alpha_\infty - 1)` (Eq. (6.44)):
 
-    * ``rho22 = phi rho0 + rho_a - j sigma phi^2 G(w)/w``, ``rho12 = -rho_a +
-      j sigma phi^2 G(w)/w`` and ``rho11 = rho1 + rho_a - j sigma phi^2 G(w)/w``
+    * :math:`\rho_{22} = \phi\rho_0 + \rho_a - j\sigma\phi^2 G(\omega)/\omega`,
+      :math:`\rho_{12} = -\rho_a + j\sigma\phi^2 G(\omega)/\omega` and
+      :math:`\rho_{11} = \rho_1 + \rho_a - j\sigma\phi^2 G(\omega)/\omega`
       (Eq. (6.56), printed p. 120), the visco-inertial term being recovered as
-      ``phi rho0 a_inf - rho22``;
-    * ``Kf = phi K_eq``, then ``R = phi Kf``, ``Q = (1 - phi) Kf`` and
-      ``P = 4N/3 + Kb + (1 - phi)^2 Kf / phi`` (Eqs. (6.26)-(6.28));
-    * ``delta1^2`` and ``delta2^2`` from Eqs. (6.67)-(6.69), ``delta3^2`` from
+      :math:`\phi \rho_0 \alpha_\infty - \rho_{22}`;
+    * :math:`K_f = \phi K_{\mathrm{eq}}`, then :math:`R = \phi K_f`,
+      :math:`Q = (1 - \phi) K_f` and
+      :math:`P = 4N/3 + K_b + (1 - \phi)^2 K_f / \phi` (Eqs. (6.26)-(6.28));
+    * :math:`\delta_1^2` and :math:`\delta_2^2` from Eqs. (6.67)-(6.69),
+      :math:`\delta_3^2` from
       Eq. (6.83), ``mu1``, ``mu2`` from Eq. (6.71) and ``mu3`` from Eq. (6.84).
 
     :param medium: Rigid-frame :class:`~phonometry.materials.porous_absorber.PorousMediumResult`
@@ -386,8 +410,8 @@ def biot_waves(
     :param tortuosity: High-frequency tortuosity ``a_inf`` (>= 1).
     :param frame_density: Bulk density of the frame ``rho1``, in kg/m3 (> 0).
     :param shear_modulus: Complex shear modulus ``N`` of the frame, in Pa
-        (``Im(N) >= 0``; a structural loss factor ``eta`` gives
-        ``N = N'(1 + j eta)``).
+        (:math:`\operatorname{Im}(N) \ge 0`; a structural loss factor ``eta``
+        gives :math:`N = N'(1 + j \eta)`).
     :param poisson_ratio: Poisson coefficient ``nu`` of the frame (Default: 0,
         the value Allard & Atalla use for their glass wool).
     :return: A :class:`BiotWavesResult`.
@@ -473,7 +497,7 @@ def biot_waves(
 
 
 def biot_surface_impedance(waves: BiotWavesResult, thickness: float) -> Complex:
-    """Surface impedance of a hard-backed Biot layer at normal incidence.
+    r"""Surface impedance of a hard-backed Biot layer at normal incidence.
 
     The closed form of Allard & Atalla 2e, Eqs. (6.107)-(6.108) (printed
     p. 128), obtained by writing the four compressional-wave amplitudes against
@@ -482,13 +506,18 @@ def biot_surface_impedance(waves: BiotWavesResult, thickness: float) -> Complex:
     pressure and of the total normal stress at the free face, Eqs. (6.97)-(6.99);
     conservation of the volume flow, Eq. (6.100)):
 
-    ``Z = -j (Z1s Z2f mu2 - Z2s Z1f mu1) / D``
+    .. math::
 
-    ``D = (1 - phi + phi mu2)[Z1s - (1 - phi) Z1f mu1] tan(delta2 l)
-    + (1 - phi + phi mu1)[(1 - phi) Z2f mu2 - Z2s] tan(delta1 l)``
+       Z = -j (Z_1^s Z_2^f \mu_2 - Z_2^s Z_1^f \mu_1) / D
+
+       D = (1 - \phi + \phi \mu_2)
+       [Z_1^s - (1 - \phi) Z_1^f \mu_1] \tan(\delta_2 l)
+       + (1 - \phi + \phi \mu_1)
+       [(1 - \phi) Z_2^f \mu_2 - Z_2^s] \tan(\delta_1 l)
 
     with the four characteristic impedances of Eqs. (6.74)-(6.77),
-    ``Zif = (R + Q/mui) deltai / (phi w)`` and ``Zis = (P + Q mui) deltai / w``.
+    :math:`Z_i^f = (R + Q/\mu_i) \delta_i / (\phi \omega)` and
+    :math:`Z_i^s = (P + Q \mu_i) \delta_i / \omega`.
 
     This is an independent derivation of the same physics as the chapter 11
     transfer-matrix assembly reached through
@@ -529,17 +558,18 @@ def biot_surface_impedance(waves: BiotWavesResult, thickness: float) -> Complex:
 def _gamma(
     waves: BiotWavesResult, x3: float, transverse_wavenumber: Complex
 ) -> Complex:
-    """The matrix ``[Gamma(x3)]`` of Allard & Atalla Table 11.1.
+    r"""The matrix :math:`[\Gamma(x_3)]` of Allard & Atalla Table 11.1.
 
     Columns are the coefficients of the amplitude vector
-    ``[(A1 + A1'), (A1 - A1'), (A2 + A2'), (A2 - A2'), (A3 + A3'), (A3 - A3')]``
+    :math:`[(A_1 + A_1'), (A_1 - A_1'), (A_2 + A_2'), (A_2 - A_2'),
+    (A_3 + A_3'), (A_3 - A_3')]`
     (Eq. (11.30)); rows are the six field variables of Eq. (11.26),
-    ``[v1s, v3s, v3f, s33s, s13s, s33f]``. Returned with shape
-    ``(len(frequency), 6, 6)``.
+    :math:`[v_1^s, v_3^s, v_3^f, s_{33}^s, s_{13}^s, s_{33}^f]`. Returned
+    with shape ``(len(frequency), 6, 6)``.
 
-    Table 11.1 prints ``k_{i3}`` in its first two columns where the ``mu1``,
-    ``D1`` and ``E1`` of the same columns make ``k_{13}`` the only consistent
-    reading; that reading is implemented here.
+    Table 11.1 prints :math:`k_{i3}` in its first two columns where the
+    ``mu1``, ``D1`` and ``E1`` of the same columns make :math:`k_{13}` the
+    only consistent reading; that reading is implemented here.
     """
     omega = 2.0 * np.pi * np.asarray(waves.frequency, dtype=np.float64)
     k_t = np.asarray(transverse_wavenumber, dtype=np.complex128)
@@ -608,25 +638,28 @@ def poroelastic_transfer_matrix(
     *,
     transverse_wavenumber: ArrayLike = 0.0,
 ) -> Complex:
-    """The 6x6 transfer matrix ``[T p]`` of a Biot poroelastic layer.
+    r"""The 6x6 transfer matrix :math:`[T^p]` of a Biot poroelastic layer.
 
-    ``[T p] = [Gamma(-h)][Gamma(0)]^-1`` (Allard & Atalla 2e, Eq. (11.34),
-    printed p. 249), relating the field vector
-    ``[v1s, v3s, v3f, s33s, s13s, s33f]`` (Eq. (11.26)) just inside the front
+    :math:`[T^p] = [\Gamma(-h)][\Gamma(0)]^{-1}` (Allard & Atalla 2e,
+    Eq. (11.34), printed p. 249), relating the field vector
+    :math:`[v_1^s, v_3^s, v_3^f, s_{33}^s, s_{13}^s, s_{33}^f]` (Eq. (11.26))
+    just inside the front
     face of the layer to the same vector just inside its back face,
-    ``V(M) = [T p] V(M')``. The wave-amplitude matrix ``[Gamma]`` of Table 11.1
-    behind it is built by :func:`_gamma`.
+    :math:`V(M) = [T^p] V(M')`. The wave-amplitude matrix :math:`[\Gamma]` of
+    Table 11.1 behind it is built by :func:`_gamma`.
 
     The layer solver of
     :func:`~phonometry.materials.porous_absorber.layered_absorber` does *not*
     use this matrix: it assembles the wave amplitudes directly, which avoids
-    inverting ``[Gamma(0)]`` and is far better conditioned for a very soft or a
+    inverting :math:`[\Gamma(0)]` and is far better conditioned for a very
+    soft or a
     very thick frame. The matrix is exposed because it is the object chapter 11
     is written around and the one an external multilayer chain expects.
 
     :param waves: The :class:`BiotWavesResult` of the material.
     :param thickness: Layer thickness ``h``, in metres (> 0).
-    :param transverse_wavenumber: In-plane wavenumber ``kt = k sin(theta)``,
+    :param transverse_wavenumber: In-plane wavenumber
+        :math:`k_t = k \sin(\theta)`,
         in rad/m (Default: 0, normal incidence). Scalar or one value per
         frequency.
     :return: The transfer matrix with shape ``(len(frequency), 6, 6)``.
@@ -643,10 +676,11 @@ def poroelastic_transfer_matrix(
 # Global-matrix assembly (Allard & Atalla Sects. 11.4-11.6)
 # ---------------------------------------------------------------------------
 def _porous_fluid_matrices(porosity: float) -> tuple[Complex, Complex]:
-    """``[Ipf]`` and ``[Jpf]`` of A&A Eq. (11.73), printed p. 259.
+    r""":math:`[I_{pf}]` and :math:`[J_{pf}]` of A&A Eq. (11.73), p. 259.
 
     Continuity at a porous-fluid boundary (Eq. (11.72)): volume-flow
-    conservation, ``s33s = -(1 - phi) p``, ``s13s = 0`` and ``s33f = -phi p``.
+    conservation, :math:`s_{33}^s = -(1 - \phi) p`, :math:`s_{13}^s = 0` and
+    :math:`s_{33}^f = -\phi p`.
     """
     phi = porosity
     i_pf = np.zeros((4, 6), dtype=np.complex128)
@@ -663,7 +697,9 @@ def _porous_fluid_matrices(porosity: float) -> tuple[Complex, Complex]:
 
 
 def _porous_porous_matrix(left: float, right: float) -> Complex:
-    """``[Ipp]`` of A&A Eq. (11.67), printed p. 258, for bonded frames."""
+    r""":math:`[I_{pp}]` of A&A Eq. (11.67), printed p. 258, for bonded
+    frames.
+    """
     i_pp = np.eye(6, dtype=np.complex128)
     i_pp[2, 1] = 1.0 - right / left
     i_pp[2, 2] = right / left
@@ -674,9 +710,9 @@ def _porous_porous_matrix(left: float, right: float) -> Complex:
 
 @dataclass(frozen=True)
 class _Block:
-    """One solved layer block of the global assembly.
+    r"""One solved layer block of the global assembly.
 
-    ``kind`` is ``"fluid"`` (two field variables ``[p, v3]``) or
+    ``kind`` is ``"fluid"`` (two field variables :math:`[p, v_3]`) or
     ``"poroelastic"`` (six field variables). ``unknowns`` is the number of
     unknowns the block contributes: the back-face field vector for a fluid
     block, the six wave amplitudes for a poroelastic one. ``front`` and
@@ -787,12 +823,13 @@ def _poroelastic_blocks(
 
 
 def _interface(left: _Block | None, right: _Block) -> tuple[Complex, Complex]:
-    """Coupling matrices ``([I], [J])`` between two adjacent media.
+    r"""Coupling matrices :math:`([I], [J])` between two adjacent media.
 
     *left* is ``None`` for the free air on the excitation side, which is a
     fluid. A&A Sect. 11.4: two media of the same nature couple through the
-    identity (fluid) or through ``[Ipp]`` (porous, Eq. (11.67)); a porous and a
-    fluid medium couple through ``[Ipf]``/``[Jpf]`` (Eq. (11.73)), with the two
+    identity (fluid) or through :math:`[I_{pp}]` (porous, Eq. (11.67)); a
+    porous and a fluid medium couple through :math:`[I_{pf}]` /
+    :math:`[J_{pf}]` (Eq. (11.73)), with the two
     matrices interchanged for a fluid-porous boundary.
     """
     left_kind = "fluid" if left is None else left.kind
@@ -814,7 +851,7 @@ def _interface(left: _Block | None, right: _Block) -> tuple[Complex, Complex]:
 
 
 def _wall_matrix(block: _Block) -> Complex:
-    """``[Y]`` of A&A Eq. (11.81): zero velocity against a hard wall."""
+    r""":math:`[Y]` of A&A Eq. (11.81): zero velocity against a hard wall."""
     if block.kind == "fluid":
         return np.array([[0.0, 1.0]], dtype=np.complex128)
     return np.eye(6, dtype=np.complex128)[:3]
@@ -831,19 +868,21 @@ def _identity_map(n_freq: int) -> Complex:
 def _stack_surface_impedance(
     blocks: list[_Block], termination: Complex | None
 ) -> Complex:
-    """Surface impedance of a stratified medium by the global-matrix method.
+    r"""Surface impedance of a stratified medium by the global-matrix method.
 
-    Assembles the linear system ``[D] V = 0`` of Allard & Atalla Eqs. (11.78)
+    Assembles the linear system :math:`[D] V = 0` of Allard & Atalla
+    Eqs. (11.78)
     to (11.85) and solves it with the incident pressure fixed to one
-    (Sect. 11.6.1, Eq. (11.97)), so that ``Zs = 1 / V1(1)``. Unlike the printed
+    (Sect. 11.6.1, Eq. (11.97)), so that :math:`Z_s = 1 / V_1(1)`. Unlike the
+    printed
     determinant form Eq. (11.88) this needs a single linear solve per
     frequency, and unlike the transfer-matrix form of
-    :func:`poroelastic_transfer_matrix` it never inverts ``[Gamma(0)]``.
+    :func:`poroelastic_transfer_matrix` it never inverts :math:`[\Gamma(0)]`.
 
     :param blocks: The layer blocks, from the incidence side inwards.
     :param termination: ``None`` for a hard wall (Eq. (11.81)), otherwise the
-        impedance ``p / v3`` seen at the back face, one value per frequency
-        (Eq. (11.84) with ``ZB / cos(theta)``).
+        impedance :math:`p / v_3` seen at the back face, one value per
+        frequency (Eq. (11.84) with :math:`Z_B / \cos(\theta)`).
     :return: The complex surface impedance per frequency, in Pa s/m.
     """
     n_freq = int(blocks[0].front.shape[0])

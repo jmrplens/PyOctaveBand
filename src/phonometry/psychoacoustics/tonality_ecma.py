@@ -1,5 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""
+r"""
 Psychoacoustic tonality per ECMA-418-2:2025 (4th ed., Sottek Hearing Model).
 
 Clean-room implementation of the tonality signal chain of ECMA-418-2:2025
@@ -11,7 +11,7 @@ same underlying ``N'_tonal(l, z)`` for the same signal; this module adds
 
 * the tonality output stages (Clause 6.2.8-6.2.11): the overall-SNR gate
   ``q(l)`` (Formulae 49-50), the time-dependent specific tonality
-  ``T'(l, z) = c_T * q(l) * N'_tonal(l, z)`` (Formula 51), the average
+  :math:`T'(l, z) = c_T q(l) N'_{tonal}(l, z)` (Formula 51), the average
   specific tonality ``T'(z)`` and its frequency ``f_ton,z(z)`` (Formulae
   53-55), the time-dependent tonality ``T(l)`` with its frequency
   ``f_ton(l)`` (Formulae 61-62) and the representative single value ``T``
@@ -108,12 +108,15 @@ class EcmaTonality:
 
 
 def _band_range(f_low: float | None, f_high: float | None) -> tuple[int, int]:
-    """Critical-band index range [z_L, z_H] for a user band (Formulae 56-60).
+    r"""Critical-band index range [z_L, z_H] for a user band
+    (Formulae 56-60).
 
     ``None`` limits default to the full 0..52 band range.  A band z is included
     when its edge midpoints to the neighbouring bands straddle the user edge:
-    ``f_low < (F(z) + F(z+0.5))/2`` selects z_L (Formula 56) and
-    ``f_high > (F(z) + F(z-0.5))/2`` selects z_H (Formula 57).  ``mid[i]`` is
+    :math:`f_{\mathrm{low}} < (F(z) + F(z+0.5))/2` selects z_L (Formula 56)
+    and
+    :math:`f_{\mathrm{high}} > (F(z) + F(z-0.5))/2` selects z_H (Formula 57).
+    ``mid[i]`` is
     the boundary between bands ``i`` and ``i+1`` on the 0.5-Bark_HMS grid.
 
     Enforces the Formulae 56/57 preconditions: 16 Hz < f_L, f_H < 20 kHz and

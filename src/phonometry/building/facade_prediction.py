@@ -1,47 +1,64 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""
+r"""
 Façade sound insulation and outdoor radiation prediction (EN 12354-3/-4:2000).
 
 Two companion prediction models for the building envelope, both built on the
-same energy summation of element transmission factors ``τ = 10^(-R/10)``,
-area-weighted by ``Sᵢ/S`` (small elements / air paths enter through their
-element-normalized level difference ``Dn,e`` with the reference area
-``A₀ = 10 m²``):
+same energy summation of element transmission factors
+:math:`\tau = 10^{-R/10}`, area-weighted by :math:`S_i/S` (small elements /
+air paths enter through their element-normalized level difference ``Dn,e``
+with the reference area :math:`A_0 = 10` m²):
 
 **EN 12354-3, outdoor → indoor (façade sound insulation).** The apparent
-sound reduction index of a façade for diffuse incidence (Formula 10)::
+sound reduction index of a façade for diffuse incidence (Formula 10):
 
-    R' = -10 lg( Σ τe,i )         τe,i = (Sᵢ/S)·10^(-Rᵢ/10)   (Formula 15)
-                                  τe,i = (A₀/S)·10^(-Dn,e,i/10) (Formula 14)
+.. math::
 
-from which the loudspeaker- and traffic-referenced indices ``R45 = R' + 1``
-(Formula 11) and ``Rtr,s = R'`` (Formula 12), and the primary output, the
-standardized level difference at 2 m (Formula 13)::
+   R' = -10 \log_{10}\!\left( \sum \tau_{e,i} \right)
 
-    D2m,nT = R' + ΔLfs + 10 lg( V / (6·T0·S) )      T0 = 0,5 s
+   \tau_{e,i} = \frac{S_i}{S}\, 10^{-R_i/10} \tag{Formula 15}
+
+   \tau_{e,i} = \frac{A_0}{S}\, 10^{-D_{n,e,i}/10} \tag{Formula 14}
+
+from which the loudspeaker- and traffic-referenced indices
+:math:`R_{45} = R' + 1` (Formula 11) and :math:`R_{tr,s} = R'` (Formula 12),
+and the primary output, the standardized level difference at 2 m
+(Formula 13):
+
+.. math::
+
+   D_{2m,nT} = R' + \Delta L_{fs}
+   + 10 \log_{10}\!\left( \frac{V}{6 T_0 S} \right)
+   \qquad T_0 = 0.5~\text{s}
 
 with the façade-shape term ``ΔLfs`` (Annex C; 0 dB for a flat reflecting
 façade).
 
 **EN 12354-4, indoor → outdoor (sound radiated to the outside).** The sound
-power level radiated by a segment (Formulas 2-3)::
+power level radiated by a segment (Formulas 2-3):
 
-    R' = -10 lg( Σ (Sᵢ/S)·10^(-Rᵢ/10) + Σ (A₀/S)·10^(-Dn,e,i/10) )
-    LW = Lp,in + Cd - R' + 10 lg( S / S0 )          S0 = 1 m²
+.. math::
+
+   R' = -10 \log_{10}\!\left( \sum \frac{S_i}{S}\, 10^{-R_i/10}
+   + \sum \frac{A_0}{S}\, 10^{-D_{n,e,i}/10} \right)
+
+   L_W = L_{p,\text{in}} + C_d - R'
+   + 10 \log_{10}\!\left( \frac{S}{S_0} \right)
+   \qquad S_0 = 1~\text{m}^2
 
 with the inside-field diffusivity term ``Cd`` (Annex B; -6 dB ideal diffuse,
 -5 dB average industrial). An opening is modelled here as an element whose "R"
-is the silencer insertion loss ``D`` (a bare opening is ``D = 0``), combined in
-the *same* energy sum as the structural elements over the segment area ``S`` --
-a practical extension for a mixed wall-plus-opening segment. This is NOT the
-standard's Formula (4), which treats a segment made up *only* of openings with a
-different area normalization (``S`` = the opening area) and sums its ``LW`` with
-the envelope segments only at the final energetic stage. The exterior level
-follows from the simplified Annex E attenuation ``Atot`` of a finite radiating
-side and ``Lp = LW - Atot``.
+is the silencer insertion loss ``D`` (a bare opening is :math:`D = 0`),
+combined in the *same* energy sum as the structural elements over the segment
+area ``S`` -- a practical extension for a mixed wall-plus-opening segment.
+This is NOT the standard's Formula (4), which treats a segment made up *only*
+of openings with a different area normalization (``S`` = the opening area) and
+sums its ``LW`` with the envelope segments only at the final energetic stage.
+The exterior level follows from the simplified Annex E attenuation ``Atot`` of
+a finite radiating side and :math:`L_p = L_W - A_{tot}`.
 
 Single-number ratings reuse EN ISO 717-1 via :func:`phonometry.weighted_rating`
-(exact for ``R'w + Ctr``, a good approximation for ``R'w``, Part 3 NOTE 7).
+(exact for :math:`R'_w + C_{tr}`, a good approximation for ``R'w``, Part 3
+NOTE 7).
 
 Clause/formula citations refer to EN 12354-3:2000 or EN 12354-4:2000.
 """
@@ -145,15 +162,17 @@ def _band_count(elements: Sequence[FacadeElement]) -> int:
 
 @dataclass(frozen=True)
 class FacadePredictionResult:
-    """Predicted façade airborne insulation (EN 12354-3:2000).
+    r"""Predicted façade airborne insulation (EN 12354-3:2000).
 
     :ivar r_prime: Apparent sound reduction index ``R'`` per band, in dB
         (Formula 10).
-    :ivar r_45: ``R45 = R' + 1`` (loudspeaker method, Formula 11), in dB.
-    :ivar r_tr_s: ``Rtr,s = R'`` (traffic, Formula 12), in dB.
+    :ivar r_45: :math:`R_{45} = R' + 1` (loudspeaker method, Formula 11),
+        in dB.
+    :ivar r_tr_s: :math:`R_{tr,s} = R'` (traffic, Formula 12), in dB.
     :ivar d_2m_nt: Standardized level difference ``D2m,nT`` per band, in dB
         (Formula 13).
-    :ivar element_r: Per-element partial index ``Rp = -10 lg τ`` per band, in dB.
+    :ivar element_r: Per-element partial index :math:`R_p = -10 \log_{10} \tau` per
+        band, in dB.
     :ivar r_tr_s_w: Single-number ``Rtr,s,w`` (ISO 717-1); ``None`` if the bands
         are not the ISO 717-1 octave/third-octave set.
     :ivar d_2m_nt_w: Single-number ``D2m,nT,w`` (ISO 717-1); ``None`` as above.
@@ -301,7 +320,7 @@ _A_WEIGHT_OCTAVE = {
 def _apparent_reduction(elements: Sequence[FacadeElement], total_area: float) -> tuple[
     np.ndarray, dict[str, np.ndarray]
 ]:
-    """``R' = -10 lg(Σ τ)`` (Formula 10 / Part 4 Formula 3) and per-element ``Rp``."""
+    r""":math:`R' = -10 \log_{10}(\sum \tau)` (F. 10 / Part 4 F. 3), plus ``Rp``."""
     if not elements:
         raise ValueError("At least one façade element is required.")
     if total_area <= 0:
@@ -398,10 +417,11 @@ def radiated_sound_power(
     r_prime_cap: float | None = None,
     octave_bands: Sequence[int] | None = None,
 ) -> RadiatedPowerResult:
-    """Predict the sound power radiated outside by a segment (EN 12354-4:2000).
+    r"""Predict the sound power radiated outside by a segment (EN 12354-4).
 
     ``R'`` combines the element transmission factors (Formula 3); the radiated
-    power level is ``LW = Lp,in + Cd - R' + 10 lg(S/S0)`` (Formula 2). Openings
+    power level is :math:`L_W = L_{p,in} + C_d - R' + 10 \log_{10}(S/S_0)`
+    (Formula 2). Openings
     may be included as :class:`FacadeElement` entries with an ``insertion_loss``
     (0 for a bare opening); see the module docstring for how this differs from
     the standard's separate segment-of-openings Formula (4).
@@ -448,10 +468,11 @@ def radiated_sound_power(
 
 
 def outdoor_attenuation(width: float, height: float, distance: float) -> float:
-    """Simplified attenuation ``Atot`` of a finite radiating side (EN 12354-4 Annex E).
+    r"""Simplified attenuation ``Atot`` of a finite side (EN 12354-4 Annex E).
 
-    Reception point in front of the centre of a rectangular side ``S = width ·
-    height`` at perpendicular ``distance`` d. Uses the finite-side Formula (E.2a)
+    Reception point in front of the centre of a rectangular side
+    :math:`S = \mathrm{width} \cdot \mathrm{height}` at perpendicular
+    ``distance`` d. Uses the finite-side Formula (E.2a)
     up to the largest side dimension and the point-source Formula (E.2b) beyond
     it, following the Annex E Note 3 switching rule. The two branches do not
     join continuously at the switch distance: for a square 10 m x 10 m side
@@ -558,9 +579,10 @@ def outdoor_level(
     l_w: float | Sequence[float],
     attenuation: float | Sequence[float],
 ) -> float:
-    """Exterior level from one or more radiating sides (EN 12354-4 Formula E.1).
+    r"""Exterior level from one or more radiating sides (EN 12354-4 Formula E.1).
 
-    ``Lp = 10 lg( Σ 10^(LW,k/10) ) - Atot`` for sides sharing a reception point,
+    :math:`L_p = 10 \log_{10}( \sum 10^{L_{W,k}/10} ) - A_{tot}` for sides sharing
+    a reception point,
     or the per-side ``LW - Atot`` energetically summed. Pass matching sequences
     of side power levels and their attenuations, or scalars for a single side; a
     scalar broadcasts against an array (e.g. several sides, one common ``Atot``).

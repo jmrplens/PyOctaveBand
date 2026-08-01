@@ -1,5 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""
+r"""
 Far-field polar response and diffusion coefficient predicted from a diffuser design.
 
 Where :mod:`phonometry.materials.scattering_diffusion` evaluates the *measured*
@@ -14,25 +14,25 @@ and Diffusers* (3rd ed., CRC Press, 2017):
 
 * Each well of depth ``d_n`` behaves, at normal incidence and with a rigid
   bottom, as a locally reacting patch of pressure reflection coefficient
-  ``R_n = exp(-2 j k d_n)`` (Chapter 10; the phase change of a wave travelling
+  :math:`R_n = e^{-2jkd_n}` (Chapter 10; the phase change of a wave travelling
   down and back up the well). An arbitrary complex reflection coefficient per
   well is accepted as well, so admittance or resonator-loaded surfaces computed
   elsewhere can be fed in directly.
-* The scattered pressure at reflection angle ``theta`` for a source at incidence
-  ``psi`` is the sum over the wells of the periodic surface (Chapter 5,
-  Equation (5.8), and Chapter 9, Equation (9.32))::
+* The scattered pressure at reflection angle :math:`\theta` for a source at
+  incidence :math:`\psi` is the sum over the wells of the periodic surface
+  (Chapter 5, Equation (5.8), and Chapter 9, Equation (9.32)):
+  :math:`p(\theta) = F(\theta) \sum_n R_n
+  e^{jkx_n(\sin\psi + \sin\theta)}`,
+  with ``x_n`` the centre of the ``n``-th well and :math:`k = 2\pi f/c`. The
+  optional prefactor :math:`F(\theta)` collects the single-well aperture
+  directivity :math:`\operatorname{sinc}(kw(\sin\psi + \sin\theta)/2)` (the
+  Fourier transform of one well of width ``w``) and the Kirchhoff obliquity
+  factor :math:`(1 + \cos\theta)/2` of Equation (9.32); both are absorbed
+  into the constant ``A`` of Equation (5.8) and can be switched off to
+  recover the plain Fourier form.
 
-      p(theta) = F(theta) * sum_n R_n * exp(j k x_n (sin psi + sin theta))
-
-  with ``x_n`` the centre of the ``n``-th well and ``k = 2 pi f / c``. The
-  optional prefactor ``F(theta)`` collects the single-well aperture directivity
-  ``sinc(k w (sin psi + sin theta) / 2)`` (the Fourier transform of one well of
-  width ``w``) and the Kirchhoff obliquity factor ``(1 + cos theta) / 2`` of
-  Equation (9.32); both are absorbed into the constant ``A`` of Equation (5.8)
-  and can be switched off to recover the plain Fourier form.
-
-The polar levels ``L_i = 20 lg|p(theta_i)|`` are then passed to the ISO 17497-2
-autocorrelation diffusion coefficient of
+The polar levels :math:`L_i = 20 \log_{10}|p(\theta_i)|` are then passed to the
+ISO 17497-2 autocorrelation diffusion coefficient of
 :func:`~phonometry.materials.scattering_diffusion.directional_diffusion_coefficient`,
 and normalised against the same-footprint flat reference with
 :func:`~phonometry.materials.scattering_diffusion.normalized_diffusion_coefficient`
@@ -40,9 +40,13 @@ and normalised against the same-footprint flat reference with
 
 For a quadratic residue diffuser the depth sequence follows from the prime
 generator ``N`` and the design frequency ``f_0`` (Cox and D'Antonio,
-Equations (10.2) and (10.3))::
+Equations (10.2) and (10.3)):
 
-    s_n = n^2 mod N          d_n = s_n * lambda_0 / (2 N),    lambda_0 = c / f_0.
+.. math::
+
+   s_n = n^2 \bmod N, \qquad
+   d_n = \frac{s_n \lambda_0}{2N}, \qquad
+   \lambda_0 = c / f_0.
 
 The model is a far-field approximation and, like every Fourier diffuser model,
 loses accuracy at low frequencies, at grazing angles and for surfaces with
@@ -123,11 +127,12 @@ def _prime_generator(prime: int) -> int:
 # Quadratic residue diffuser geometry (Cox and D'Antonio, Eqs. (10.2)/(10.3)).
 # ---------------------------------------------------------------------------
 def quadratic_residue_sequence(prime: int) -> Real:
-    """Quadratic residue sequence ``s_n`` (Cox and D'Antonio, Eq. (10.2)).
+    r"""Quadratic residue sequence ``s_n`` (Cox and D'Antonio, Eq. (10.2)).
 
-    ``s_n = n^2 mod N`` for ``n = 0, 1, ..., N - 1``, the least non-negative
-    remainders, where ``N`` is the (odd) prime generator and number of wells per
-    period. For ``N = 7`` this returns ``[0, 1, 4, 2, 2, 4, 1]``.
+    :math:`s_n = n^2 \bmod N` for :math:`n = 0, 1, \ldots, N - 1`, the least
+    non-negative remainders, where ``N`` is the (odd) prime generator and
+    number of wells per period. For :math:`N = 7` this returns
+    ``[0, 1, 4, 2, 2, 4, 1]``.
 
     :param prime: Prime generator ``N`` (odd prime, at least 3).
     :return: The sequence ``s_n`` as an integer-valued float array of length
@@ -145,11 +150,12 @@ def qrd_well_depths(
     *,
     speed_of_sound: float = _C_DEFAULT,
 ) -> Real:
-    """Well depths of a quadratic residue diffuser (Cox and D'Antonio, Eq. (10.3)).
+    r"""Well depths of a quadratic residue diffuser (Cox and D'Antonio, Eq. (10.3)).
 
-    ``d_n = s_n * lambda_0 / (2 N)`` with the quadratic residue sequence ``s_n``
-    of :func:`quadratic_residue_sequence` and the design wavelength
-    ``lambda_0 = c / f_0``. The depths span 0 to roughly ``lambda_0 / 2``.
+    :math:`d_n = s_n \lambda_0 / (2N)` with the quadratic residue sequence
+    ``s_n`` of :func:`quadratic_residue_sequence` and the design wavelength
+    :math:`\lambda_0 = c / f_0`. The depths span 0 to roughly
+    :math:`\lambda_0 / 2`.
 
     :param prime: Prime generator ``N`` (odd prime, at least 3).
     :param design_frequency: Design frequency ``f_0``, in hertz, normally the
@@ -183,9 +189,10 @@ def _scattered_pressure(
     include_aperture: bool,
     include_obliquity: bool,
 ) -> Complex:
-    """Complex far-field scattered pressure of a periodic surface (arbitrary units).
+    r"""Complex far-field scattered pressure of a periodic surface (arbitrary units).
 
-    Implements ``p(theta) = F(theta) sum_n R_n exp(j k x_n (sin psi + sin theta))``
+    Implements
+    :math:`p(\theta) = F(\theta) \sum_n R_n e^{jkx_n(\sin\psi + \sin\theta)}`
     (Cox and D'Antonio, Eqs. (5.8)/(9.32)) for ``periods`` repetitions of the
     single-period reflection sequence ``reflection``. The result is defined only
     up to the overall constant ``A``; only relative levels matter for the
@@ -216,7 +223,7 @@ def _scattered_pressure(
 
 
 def _polar_levels(pressure: Complex) -> Real:
-    """Reflected sound-pressure levels ``L_i = 20 lg|p_i|`` (dB), floored finitely.
+    r"""Reflected levels :math:`L_i = 20 \log_{10}|p_i|` (dB), floored finitely.
 
     The levels are referenced to the peak magnitude so the strongest receiver is
     at 0 dB; the reference is immaterial to the diffusion coefficient, which is a
@@ -303,10 +310,11 @@ def _resolve_reflection(
     frequency: float,
     speed_of_sound: float,
 ) -> Complex:
-    """Return the per-well reflection coefficient sequence at ``frequency``.
+    r"""Return the per-well reflection coefficient sequence at ``frequency``.
 
-    Exactly one of ``depths`` (rigid-bottom wells, ``R_n = exp(-2 j k d_n)``) or
-    ``reflection`` (an explicit complex sequence) must be given.
+    Exactly one of ``depths`` (rigid-bottom wells,
+    :math:`R_n = e^{-2jkd_n}`) or ``reflection`` (an explicit complex
+    sequence) must be given.
     """
     if (depths is None) == (reflection is None):
         raise ValueError(
@@ -367,12 +375,12 @@ def predict_diffuser_polar_response(
     include_aperture: bool = True,
     include_obliquity: bool = True,
 ) -> DiffuserPolarResponse:
-    """Predict the far-field polar response of a diffuser (Cox and D'Antonio, Eq. (5.8)).
+    r"""Predict the far-field polar response of a diffuser (Cox and D'Antonio, Eq. (5.8)).
 
     Evaluates the single-plane Fraunhofer scattered pressure of a periodic
     phase-grating surface and reduces it to the ISO 17497-2 directional
     diffusion coefficient. Supply the surface either as rigid-bottom well
-    ``depths`` (``R_n = exp(-2 j k d_n)``) or as an explicit per-well complex
+    ``depths`` (:math:`R_n = e^{-2jkd_n}`) or as an explicit per-well complex
     ``reflection`` sequence (for admittance or resonator-loaded surfaces); give
     exactly one.
 
@@ -391,12 +399,12 @@ def predict_diffuser_polar_response(
         grating lobes that define a Schroeder diffuser require ``periods >= 2``.
     :param speed_of_sound: Speed of sound ``c``, in metres per second.
     :param include_aperture: Include the single-well aperture directivity
-        ``sinc(k w (sin psi + sin theta) / 2)`` of Eq. (9.32); defaults to
-        ``True``.
+        :math:`\operatorname{sinc}(kw(\sin\psi + \sin\theta)/2)` of
+        Eq. (9.32); defaults to ``True``.
     :param include_obliquity: Include the Kirchhoff obliquity factor
-        ``(cos theta + cos psi) / 2``, the oblique-source generalisation of
-        the normal-incidence ``(1 + cos theta) / 2`` of Eq. (9.32); defaults
-        to ``True``.
+        :math:`(\cos\theta + \cos\psi)/2`, the oblique-source generalisation
+        of the normal-incidence :math:`(1 + \cos\theta)/2` of Eq. (9.32);
+        defaults to ``True``.
     :return: A :class:`DiffuserPolarResponse` with the per-angle levels, the
         directional diffusion coefficient and ``.plot()``.
     :raises ValueError: for invalid geometry, or if not exactly one of ``depths``

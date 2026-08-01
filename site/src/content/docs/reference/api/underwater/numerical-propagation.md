@@ -55,11 +55,12 @@ Solves the depth-separated Sturm-Liouville problem (Jensen Eq. 5.3) on a
 uniform finite-difference grid, then assembles the coherent transmission
 loss from the propagating modes (Eq. 5.17).
 
-The finite-difference eigenvalues carry an `O(dz²)` error that grows with
-the mode's vertical wavenumber, so near-cutoff modes need a fine grid. Two
-guards apply: eigenvalues inside the scheme's error band
-(`kr² ≤ max(k²)²·dz²/12`) are discarded as numerically indistinguishable
-from cutoff, and a [`PhonometryWarning`](/phonometry/reference/api/filters/phonometry/#phonometrywarning) is emitted when a
+The finite-difference eigenvalues carry an $O(dz^2)$ error that
+grows with the mode's vertical wavenumber, so near-cutoff modes need a
+fine grid. Two guards apply: eigenvalues inside the scheme's error band
+($k_r^2 \le \max(k^2)^2 \, dz^2 / 12$) are discarded as numerically
+indistinguishable from cutoff, and a
+[`PhonometryWarning`](/phonometry/reference/api/filters/phonometry/#phonometrywarning) is emitted when a
 retained mode sits within ten times that band (increase `n_depth_points`
 to resolve it).
 
@@ -75,7 +76,7 @@ to resolve it).
 | `ranges_m` | Ranges at which to evaluate the loss, in metres; defaults to 100 m to 10 km. |
 | `density` | Water density (constant), in kg/m3. |
 | `bottom` | `"pressure-release"` (default) or `"rigid"`. |
-| `n_depth_points` | Number of finite-difference depth points. Default (`None`): derived from the physics as `max(400, ceil(60·D·f/c_min))`, which keeps the near-cutoff eigenvalue error small at any frequency/depth combination, capped at 20 000 points (very high `f·D` products exceed the cap; the near-cutoff warning then indicates whether the capped grid suffices, and an explicit `n_depth_points` overrides the cap). |
+| `n_depth_points` | Number of finite-difference depth points. Default (`None`): derived from the physics as $\max(400, \operatorname{ceil}(60 D f / c_{\mathrm{min}}))$, which keeps the near-cutoff eigenvalue error small at any frequency/depth combination, capped at 20 000 points (very high $f D$ products exceed the cap; the near-cutoff warning then indicates whether the capped grid suffices, and an explicit `n_depth_points` overrides the cap). |
 
 **Returns:** A [`NormalModeResult`](/phonometry/reference/api/underwater/numerical-propagation/#normalmoderesult).
 
@@ -143,12 +144,14 @@ parabolic_equation(
 ) -> ParabolicEquationResult
 ```
 
-Transmission-loss field from the standard (Tappert) parabolic equation.
+Transmission-loss field from the standard (Tappert) parabolic
+equation.
 
 Marches the split-step Fourier solution (Jensen Ch. 6) in range with a
 discrete sine transform in depth, enforcing a pressure-release surface at
 `z = 0` and bottom at `z = water_depth`. The envelope is related to
-pressure by `p = ψ e^{i(k0 r − π/4)}/√r` and `TL = −20·log10(|ψ|/√r)`
+pressure by $p = \psi \, e^{i(k_0 r - \pi/4)} / \sqrt{r}$ and
+$\mathrm{TL} = -20 \log_{10}(\lvert \psi \rvert / \sqrt{r})$
 (Eqs. 6.70-6.71), using a Gaussian starter.
 
 The standard PE is **paraxial**: it is accurate for propagation within
@@ -167,7 +170,7 @@ calibration itself is exact to ~1e-4 dB at the default `range_step`.
 | `sound_speeds` | Sound speed at each depth, in m/s. |
 | `source_depth` | Source depth, in metres. |
 | `max_range` | Maximum range, in metres. |
-| `range_step` | Range marching step `Δr`, in metres. |
+| `range_step` | Range marching step $\Delta r$, in metres. |
 | `n_depth_points` | Number of depth points (interior sine-transform grid). |
 
 **Returns:** A [`ParabolicEquationResult`](/phonometry/reference/api/underwater/numerical-propagation/#parabolicequationresult).

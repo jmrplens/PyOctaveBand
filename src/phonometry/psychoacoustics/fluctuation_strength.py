@@ -1,5 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""
+r"""
 Fluctuation strength after Fastl & Zwicker / Osses et al.
 
 Fluctuation strength ``F`` (unit: vacil) rates the slow loudness fluctuations of
@@ -16,7 +16,8 @@ Two routes are provided:
 * :func:`fluctuation_strength` -- the signal model of Osses, García &
   Kohlrausch (2016), which estimates ``F`` from an arbitrary calibrated pressure
   signal. It sums specific contributions over 47 auditory filters,
-  ``F = C_FS·Σ (m*_i)^p_m·|k_{i-2}·k_i|^p_k·g(z_i)^p_g`` (Osses 2016 Eq. 1),
+  :math:`F = C_{FS} \sum_i (m^*_i)^{p_m} |k_{i-2} k_i|^{p_k} g(z_i)^{p_g}`
+  (Osses 2016 Eq. 1),
   where ``m*`` is a generalised modulation depth, ``k`` a cross-covariance
   between neighbouring bands and ``g(z)`` a frequency weighting.
 
@@ -32,7 +33,8 @@ corners documented at ``_HP_LO``): the paper analyses 2 s frames with 90 %
 overlap and 50 ms raised-cosine gating and screens components against the
 absolute hearing threshold; this implementation uses 50 % overlap, a Hann
 analysis window and relative floors (component magnitude > max/10^4,
-excitation level > max - 60 dB), with ``k = 1`` at the filter-bank edges.
+excitation level > max - 60 dB), with :math:`k = 1` at the filter-bank
+edges.
 Measured consequences: a steady 1 kHz tone returns ~0.09 vacil instead of ~0
 (analysis-window envelope leakage through the 2 Hz high-pass) and steady
 broadband noise returns ~0.4 vacil (partly physical level fluctuation of the
@@ -74,13 +76,18 @@ _BBN_DENOM_OFFSET = 1.5
 def fluctuation_strength_am_noise(
     level_db: float, modulation_factor: float, mod_frequency: float
 ) -> float:
-    """Fluctuation strength of AM broadband noise (Fastl & Zwicker Eq. 10.2).
+    r"""Fluctuation strength of AM broadband noise (Fastl & Zwicker Eq. 10.2).
 
-    ``F = 5.8·(1.25·m − 0.25)·[0.05·(L/dB) − 1] / [(fmod/5Hz)² + (4Hz/fmod) +
-    1.5]`` vacil, the closed form for a sinusoidally amplitude-modulated
+    .. math::
+
+       F = \frac{5.8 \, (1.25 m - 0.25) \left[ 0.05 \, (L/\text{dB})
+       - 1 \right]}{(f_{mod}/5~\text{Hz})^2 + (4~\text{Hz}/f_{mod}) + 1.5}
+
+    in vacil, the closed form for a sinusoidally amplitude-modulated
     broadband noise of level ``L``, modulation factor ``m`` and modulation
-    frequency ``fmod``. Exact; the result is clamped at ``0`` (the formula goes
-    negative below ~20 dB or ``m < 0.2`` where the sensation vanishes).
+    frequency ``fmod``. Exact; the result is clamped at ``0`` (the formula
+    goes negative below ~20 dB or :math:`m < 0.2` where the sensation
+    vanishes).
 
     :param level_db: Broadband-noise level ``L``, in dB.
     :param modulation_factor: Modulation factor ``m`` (0..1).
@@ -338,8 +345,9 @@ def _modulation_depth(
 
 
 def _neighbour_covariance(h_bp: NDArray[np.float64]) -> NDArray[np.float64]:
-    """Cross covariance |k_{i-2}·k_{i+2}| with the bands two indices away
-    (Osses 2016 Eq. 9), with ``k = 1`` at the filter-bank edges."""
+    r"""Cross covariance :math:`\lvert k_{i-2} \cdot k_{i+2} \rvert` with the
+    bands two indices away (Osses 2016 Eq. 9), with :math:`k = 1` at the
+    filter-bank edges."""
     k = np.ones(_N_FILTERS)
     for i in range(_N_FILTERS):
         lo = i - 2
@@ -351,7 +359,8 @@ def _neighbour_covariance(h_bp: NDArray[np.float64]) -> NDArray[np.float64]:
 
 
 def _analyze(sig: NDArray[np.float64]) -> tuple[NDArray[np.float64], NDArray[np.float64], NDArray[np.float64]]:
-    """Un-calibrated Osses 2016 sum (``C_FS = 1``) of a model-rate signal.
+    r"""Un-calibrated Osses 2016 sum (:math:`C_{FS} = 1`) of a model-rate
+    signal.
 
     Runs the full front-end -- ear transmission, 47-band excitation filter bank
     (:func:`_band_envelopes`), generalised modulation depth ``m*``
@@ -435,7 +444,7 @@ def fluctuation_strength(
     signal_in: NDArray[np.float64],
     fs: float,
 ) -> FluctuationStrengthResult:
-    """Fluctuation strength of a calibrated signal (Osses 2016 model).
+    r"""Fluctuation strength of a calibrated signal (Osses 2016 model).
 
     Estimates ``F`` in vacil from an arbitrary calibrated sound-pressure signal
     by the model of Osses, García & Kohlrausch (2016): an outer/middle-ear
@@ -460,15 +469,17 @@ def fluctuation_strength(
         **Calibration.** The constant ``C_FS`` (Eq. 1) is not the paper's literal
         0.2490 -- that was fitted to the paper's own 4096-tap FIR front-end. Here
         it is derived once from the 1-vacil reference stimulus (1 kHz, 60 dB,
-        ``m = 1``, 4 Hz) run through this implementation's front-end, so the
-        reference returns **exactly 1.00 vacil by construction** (``C_FS ≈ 0.28``;
-        see :func:`_c_fs`).
+        :math:`m = 1`, 4 Hz) run through this implementation's front-end, so
+        the reference returns **exactly 1.00 vacil by construction**
+        (:math:`C_{FS} \approx 0.28`; see :func:`_c_fs`).
 
         **Achieved tolerance** (against Osses 2016 Table 1 literature values):
         the reference tone is 1.00 vacil exactly; the AM-tone 70 dB sweep
-        (``fmod = 1, 2, 4, 8, 16, 32`` Hz) has Pearson correlation ≈ 0.98 with
+        (:math:`f_{mod} = 1, 2, 4, 8, 16, 32` Hz) has Pearson correlation
+        ≈ 0.98 with
         the literature, peaks at 4 Hz and stays within a factor ≈ 2.1 at every
-        point; the AM-tone carrier sweep at ``fmod = 4 Hz`` reproduces the
+        point; the AM-tone carrier sweep at :math:`f_{mod} = 4` Hz reproduces
+        the
         Fastl & Zwicker Fig. 10.5 trend (low-mid plateau, roll-off at 8 kHz);
         the AM broadband-noise 60 dB sweep shows the correct band-pass shape
         (maximum at 4 Hz, monotone tails) but overshoots the absolute

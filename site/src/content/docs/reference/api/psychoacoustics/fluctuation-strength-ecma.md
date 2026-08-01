@@ -16,7 +16,8 @@ mirrors the roughness chain of Clause 7 but replaces the DFT-based envelope
 analysis with High-resolution Spectral Analysis (HSA):
 
 * fluctuation-strength zero-padding (Clause 5.1.2.2) and segmentation
-  (Clause 5.1.5.2) with the fixed block/hop `s_b = 65536` / `s_h = 16384`
+  (Clause 5.1.5.2) with the fixed block/hop $s_b = 65536$ /
+  $s_h = 16384$
   (Clause 9.1.1);
 * the Hilbert envelope of each critical-band block and a factor-32
   downsampling to 1500 Hz (Clause 9.1.2, Formula 119);
@@ -60,13 +61,16 @@ Clause 9 interpretation notes (all resolved by internal consistency and
 pinned by the calibration signal; the confirmed defects are recorded in
 `docs/ERRATA.md`):
 
-* Formula (127) prints the phase factor `exp(-j*2*pi*f_n*(s~_b - n_ze +
-  n_zb - 1))`; the DFT of the rectangular analysis window requires `pi`
-  in place of `2*pi` (with `2*pi` the HSA cannot reproduce the very
+* Formula (127) prints the phase factor
+  $\exp(-j 2\pi f_n (\tilde{s}_b - n_{ze} + n_{zb} - 1))$; the DFT of
+  the rectangular analysis window requires $\pi$
+  in place of $2\pi$ (with $2\pi$ the HSA cannot reproduce the
+  very
   spectra it fits, breaking the exact-recovery property claimed for it).
 * Formula (144) subtracts 1 from the three-bin centroid before scaling by
   `delta_f`; with the 0-based bin convention stated below Formula (122)
-  (bin k maps to `k * r~_s / s~_b`) that offset shifts every modulation
+  (bin k maps to $k \tilde{r}_s / \tilde{s}_b$) that offset shifts
+  every modulation
   rate one bin low, so the centroid is used without the offset.
 * Clause 9.1.7 states the Newton constants (differential step 1e-5, damped
   step cap 2e-4, stop tolerance 1e-7) without units; read in Hz they cap the
@@ -76,7 +80,8 @@ pinned by the calibration signal; the confirmed defects are recorded in
   module applies them.
 * The amplitude of a spectral line pair (Formulae 146-147, 155, 157-160) is
   taken as the squared magnitude of the half-line solution components of
-  Formula (123), `x_2m^2 + x_2m+1^2 = |p^_m|^2 / 4`: with that reading
+  Formula (123), $x_{2m}^2 + x_{2m+1}^2 = |\hat{p}_m|^2 / 4$: with
+  that reading
   Formula (160) is exactly the RMS of the modelled band signal (the loudness
   chain of Formulae 22-23 applied to the harmonic complex) and the tabulated
   c_F reproduces the calibration signal.

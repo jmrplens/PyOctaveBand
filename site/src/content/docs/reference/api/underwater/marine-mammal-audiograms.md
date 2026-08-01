@@ -12,8 +12,9 @@ Two independent published descriptions of how well a marine mammal hears:
 * [`group_audiogram`](/phonometry/reference/api/underwater/marine-mammal-audiograms/#group_audiogram) -- the **group audiogram** of Southall et al. (2019),
   a four-parameter band-pass fit (their Equation 1, after Finneran 2016)
 
-  .. math::
-      T(f) = T_0 + A \lg\!\left(1 + \frac{F_1}{f}\right) + (f/F_2)^{B}
+  $$
+  T(f) = T_0 + A \log_{10}\!\left(1 + \frac{F_1}{f}\right) + (f/F_2)^{B}
+  $$
 
   with the group parameters of their Table 2 (absolute thresholds) and Table 3
   (normalised to 0 dB at best sensitivity).
@@ -29,9 +30,10 @@ Thresholds are sound pressure levels in dB re 1 µPa under water and dB re
 :::note
 Southall et al. publish **no fitted audiogram for low-frequency (LF)
 cetaceans**: no audiometric data exist for them. The article gives
-`A = 20` dB/decade, `B = 3.2`, `F2 = 9.4` kHz and `T0 = 53.2` dB
-(0.8 dB normalised) in prose but never prints `F1`, only the criterion
-used to choose it. The group is therefore absent from
+$A = 20$ dB/decade, $B = 3.2$, $F_2 = 9.4$ kHz and
+$T_0 = 53.2$ dB (0.8 dB normalised) in prose but never prints
+$F_1$, only the criterion used to choose it. The group is
+therefore absent from
 [`AUDIOGRAM_GROUPS`](/phonometry/reference/api/underwater/marine-mammal-audiograms/#audiogram_groups) rather than reconstructed by guesswork.
 :::
 
@@ -105,7 +107,7 @@ Group-audiogram fit parameters (Southall et al. 2019, Tables 2 and 3).
 | `f2_khz` | High-frequency inflection `F2`, in kHz. |
 | `a` | Low-frequency slope parameter `A`, in dB/decade. |
 | `b` | High-frequency exponent `B`. |
-| `r_squared` | Goodness of fit `R²` reported with the row. |
+| `r_squared` | Goodness of fit $R^2$ reported with the row. |
 | `in_air` | Whether the group's reference pressure is 20 µPa (in air). |
 
 ## AudiogramResult
@@ -170,9 +172,9 @@ group_audiogram(
 
 Marine-mammal group audiogram (Southall et al. 2019, Equation 1).
 
-`T(f) = T0 + A·lg(1 + F1/f) + (f/F2)^B`, with `f` in kilohertz and the
-group parameters of Table 2 (`normalized=False`) or Table 3
-(`normalized=True`).
+$T(f) = T_0 + A \log_{10}(1 + F_1/f) + (f/F_2)^B$, with `f` in
+kilohertz and the group parameters of Table 2 (`normalized=False`) or
+Table 3 (`normalized=True`).
 
 **Parameters**
 
@@ -200,11 +202,13 @@ orca_audiogram(
 
 Killer-whale hearing threshold (Ainslie 2010, Equation 11.159).
 
-A three-branch fit in `F = f/1 kHz`, valid over 0.5 to 80 kHz:
+A three-branch fit in $F = f/(1~\text{kHz})$, valid over 0.5 to
+80 kHz:
 
-* `445.2·F^−0.05401 − 344.3`           for `0.5 ≤ F < 11.3`,
-* `242.9·F^−0.7578 + 0.5643·F^1.076`   for `11.3 ≤ F < 46.2`,
-* `2.792·F^0.7537 − 2.064`             for `46.2 ≤ F ≤ 80`.
+* $445.2 F^{-0.05401} - 344.3$ for $0.5 \le F < 11.3$,
+* $242.9 F^{-0.7578} + 0.5643 F^{1.076}$ for
+  $11.3 \le F < 46.2$,
+* $2.792 F^{0.7537} - 2.064$ for $46.2 \le F \le 80$.
 
 The published check points are the minimum, 39.0 dB re 1 µPa at 22.6 kHz
 (second branch), and 51.2 dB re 1 µPa at 50 kHz -- the latter **needs the

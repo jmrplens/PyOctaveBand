@@ -658,11 +658,11 @@ def _sone_to_phon(loudness: float) -> float:
 
 
 def _percentile(values: np.ndarray, percentile: int) -> float:
-    """Percentile loudness as computed by the reference implementation.
+    r"""Percentile loudness as computed by the reference implementation.
 
     NX is the loudness exceeded X % of the time: with the values sorted
-    ascending and ``k = int((1 - X/100) * n)``, the mean of the samples at
-    positions k-1 and k (clause 6.5, Annex A main program).
+    ascending and :math:`k = \lfloor (1 - X/100)\, n \rfloor`, the mean of
+    the samples at positions k-1 and k (clause 6.5, Annex A main program).
 
     Provenance: this (k-1, k) mean comes from the electronic attachment's
     main program, not from a printed formula, and is supported by the
@@ -753,7 +753,7 @@ def loudness_zwicker(
     calibration_factor: float = 1.0,
     time_skip: float = 0.0,
 ) -> ZwickerLoudness:
-    """
+    r"""
     Zwicker loudness of a calibrated time signal per ISO 532-1:2017.
 
     The signal is resampled to the internal 48 kHz rate if needed, split
@@ -769,12 +769,20 @@ def loudness_zwicker(
 
     Input scaling follows the reference implementation's WAV convention:
     ``x * calibration_factor`` must be the instantaneous sound pressure in
-    pascals, so that band levels are ``10*lg(p^2 / (20 uPa)^2)`` dB SPL.
+    pascals, so that band levels are
+    :math:`10 \log_{10}(p^2 / (20~\mu\text{Pa})^2)` dB SPL.
     The reference program reads 32-bit float WAV files as pressure in Pa
     directly (``calibration_factor = 1``), while 16-bit PCM samples are
     divided by 32768 (full scale = +-1) and multiplied by a calibration
     factor derived from a reference recording of known level Lref:
-    ``calibration_factor = sqrt(10**(Lref/10) * 4e-10 / mean(ref**2))``
+
+    .. math::
+
+       \text{calibration factor} = \sqrt{
+           10^{L_{\text{ref}}/10} \cdot 4\times10^{-10} /
+           \overline{\text{ref}^2}
+       }
+
     with ``ref`` scaled to +-1 full scale as well.
 
     :param x: Single-channel time signal (see scaling convention above).

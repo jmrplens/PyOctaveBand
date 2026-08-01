@@ -1,5 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""
+r"""
 Calibrated spectral-density estimation with statistical error analysis.
 
 Welch-averaged auto- and cross-spectral density estimators that report,
@@ -8,26 +8,39 @@ following Bendat & Piersol, *Random Data: Analysis and Measurement
 Procedures* (4th ed., 2010):
 
 * the **number of averages**: the raw segment count and the effective number
-  of independent averages ``nd`` once the correlation between overlapped,
+  of independent averages :math:`n_d` once the correlation between
+  overlapped,
   tapered segments is accounted for (Section 11.5.2.2 and its Ref. 11,
   Welch 1967);
 * the **normalized random error** of the autospectrum estimate,
-  ``ε[Ĝxx] = 1/√nd`` (Eq. 8.158), and of the cross-spectrum magnitude and
-  phase, ``ε[|Ĝxy|] = 1/(|γxy|·√nd)`` (Eq. 9.33) and
-  ``s.d.[θ̂xy] = (1-γ²xy)^½ / (|γxy|·√(2·nd))`` (Eq. 9.52);
+  :math:`\varepsilon[\hat{G}_{xx}] = 1/\sqrt{n_d}` (Eq. 8.158), and of
+  the cross-spectrum magnitude and phase,
+  :math:`\varepsilon[\lvert \hat{G}_{xy} \rvert]
+  = 1/(\lvert \gamma_{xy} \rvert \sqrt{n_d})` (Eq. 9.33) and
+  :math:`\mathrm{s.d.}[\hat{\theta}_{xy}]
+  = (1 - \gamma^2_{xy})^{1/2} /
+  (\lvert \gamma_{xy} \rvert \sqrt{2 n_d})` (Eq. 9.52);
 * **chi-square confidence intervals** for the autospectrum: the sampling
-  distribution is ``n·Ĝxx/Gxx ~ χ²ₙ`` with ``n = 2·nd`` degrees of freedom
+  distribution is :math:`n \hat{G}_{xx}/G_{xx} \sim \chi^2_n` with
+  :math:`n = 2 n_d` degrees of freedom
   (Eq. 8.162), giving the interval
-  ``n·Ĝxx/χ²ₙ;α/2 ≤ Gxx ≤ n·Ĝxx/χ²ₙ;1-α/2`` (Eq. 8.163);
-* the **first-order resolution-bias error**: ``b[Ĝxx] ≈ (Bₑ²/24)·G″xx``
-  (Eq. 8.139), which for a resonance peak of half-power bandwidth ``Br``
-  becomes ``εb ≈ -(Bₑ/Br)²/3`` (Eq. 8.141) - exposed here as
+  :math:`n \hat{G}_{xx}/\chi^2_{n;\alpha/2} \le G_{xx} \le
+  n \hat{G}_{xx}/\chi^2_{n;1-\alpha/2}` (Eq. 8.163);
+* the **first-order resolution-bias error**:
+  :math:`b[\hat{G}_{xx}] \approx (B_e^2/24) \, G''_{xx}`
+  (Eq. 8.139), which for a resonance peak of half-power bandwidth
+  :math:`B_r`
+  becomes :math:`\varepsilon_b \approx -(B_e/B_r)^2/3` (Eq. 8.141) -
+  exposed here as
   :func:`resolution_bias_error`;
-* the **coherent output spectrum** ``Gvv = γ²xy·Gyy`` and the noise output
-  spectrum ``Gnn = (1-γ²xy)·Gyy`` of the single-input/single-output model
+* the **coherent output spectrum**
+  :math:`G_{vv} = \gamma^2_{xy} G_{yy}` and the noise output
+  spectrum :math:`G_{nn} = (1 - \gamma^2_{xy}) G_{yy}` of the
+  single-input/single-output model
   (Eqs. 9.55-9.56), with the spectral signal-to-noise ratio
-  ``γ²/(1-γ²)`` and the random error
-  ``ε[Ĝvv] = (2-γ²xy)^½ / (|γxy|·√nd)`` (Eq. 9.73).
+  :math:`\gamma^2/(1 - \gamma^2)` and the random error
+  :math:`\varepsilon[\hat{G}_{vv}] = (2 - \gamma^2_{xy})^{1/2} /
+  (\lvert \gamma_{xy} \rvert \sqrt{n_d})` (Eq. 9.73).
 
 The same Welch core (Hann taper and 50% overlap by default, ``detrend``
 off so absolute calibration is preserved) also backs the H1/H2 frequency
@@ -54,7 +67,7 @@ Percival & Walden, *Spectral Analysis for Physical Applications*, 1993,
 Chapter 7) as the whole-record alternative to Welch segment averaging:
 ``K`` orthogonal discrete prolate spheroidal (Slepian) tapers of
 time-half-bandwidth ``NW`` produce ``K`` nearly uncorrelated eigenspectra
-whose (adaptively weighted) average carries about ``2K`` chi-square
+whose (adaptively weighted) average carries about :math:`2K` chi-square
 degrees of freedom without splitting the record - the estimator of choice
 for short records where Welch would leave too few segments.
 """
@@ -225,22 +238,30 @@ def _welch_pair(
 def _segment_statistics(
     n: int, nperseg: int, noverlap: int, window: str, fs: float
 ) -> tuple[int, float, float]:
-    """Averaging statistics of the Welch estimate.
+    r"""Averaging statistics of the Welch estimate.
 
     Returns ``(n_segments, n_averages, resolution_bandwidth)``:
 
     * ``n_segments`` - raw number of (possibly overlapped) segments averaged;
-    * ``n_averages`` - effective number of *independent* averages ``nd``.
-      Bendat & Piersol's error formulas assume ``nd`` distinct records
+    * ``n_averages`` - effective number of *independent* averages
+      :math:`n_d`.
+      Bendat & Piersol's error formulas assume :math:`n_d` distinct
+      records
       (Section 9.1.1); with overlapped, tapered segments (Section 11.5.2.2)
       the variance reduction follows their Ref. 11 (Welch 1967, Eq. 12):
-      ``Var ∝ (1/k)·[1 + 2·Σⱼ (1-j/k)·ρ²(j·D)]`` where ``ρ(s)`` is the
+      :math:`\mathrm{Var} \propto (1/k)
+      \left[ 1 + 2 \sum_j (1 - j/k) \rho^2(j D) \right]`
+      where :math:`\rho(s)` is the
       normalized correlation of the taper with itself shifted by the hop
-      ``D``, so ``nd = k / (1 + 2·Σⱼ (1-j/k)·ρ²(j·D))``. Without overlap
-      this reduces to ``nd = k`` exactly.
+      ``D``, so
+      :math:`n_d = k / \left( 1 + 2 \sum_j (1 - j/k)
+      \rho^2(j D) \right)`. Without overlap
+      this reduces to :math:`n_d = k` exactly.
     * ``resolution_bandwidth`` - the effective noise bandwidth of the
-      tapered segment, ``Bₑ = fs·Σw² / (Σw)²``, the tapered-window analog
-      of Bendat & Piersol's ``Bₑ ≈ 1/T`` (Eq. 8.160).
+      tapered segment,
+      :math:`B_e = f_s \sum w^2 / \left( \sum w \right)^2`, the
+      tapered-window analog
+      of Bendat & Piersol's :math:`B_e \approx 1/T` (Eq. 8.160).
     """
     from scipy import signal as sp_signal
 
@@ -265,9 +286,11 @@ def _segment_statistics(
 
 
 def _chi2_bounds(dof: float, confidence: float) -> tuple[float, float]:
-    """Interval factors ``n/χ²ₙ;α/2`` and ``n/χ²ₙ;1-α/2`` (Eq. 8.163).
+    r"""Interval factors :math:`n/\chi^2_{n;\alpha/2}` and
+    :math:`n/\chi^2_{n;1-\alpha/2}` (Eq. 8.163).
 
-    B&P's ``χ²_{n;α}`` is the value exceeded with probability ``α`` (isf).
+    B&P's :math:`\chi^2_{n;\alpha}` is the value exceeded with
+    probability :math:`\alpha` (isf).
     """
     from scipy import stats as sp_stats
 
@@ -284,13 +307,13 @@ def _chi2_interval(
     confidence: float,
     nyquist_bin: bool,
 ) -> tuple[NDArray[np.float64], NDArray[np.float64]]:
-    """Chi-square confidence interval for the autospectrum (Eq. 8.163).
+    r"""Chi-square confidence interval for the autospectrum (Eq. 8.163).
 
     Interior bins average two squared Gaussian components per segment
-    (``n = 2·nd``, Eq. 8.162); the DC bin - and the Nyquist bin when the
-    segment length is even - has a single real Fourier component, so its
-    estimate carries only ``n = nd`` degrees of freedom and a wider
-    interval.
+    (:math:`n = 2 n_d`, Eq. 8.162); the DC bin - and the Nyquist bin when
+    the segment length is even - has a single real Fourier component, so
+    its estimate carries only :math:`n = n_d` degrees of freedom and a
+    wider interval.
     """
     low_i, up_i = _chi2_bounds(2.0 * nd, confidence)
     lower = low_i * gxx
@@ -309,7 +332,8 @@ def _coherence_from_spectra(
     gxx: NDArray[np.float64],
     gyy: NDArray[np.float64],
 ) -> NDArray[np.float64]:
-    """Ordinary coherence ``γ² = |Gxy|²/(Gxx·Gyy)`` clipped to [0, 1]."""
+    r"""Coherence :math:`\gamma^2 = \lvert G_{xy} \rvert^2 /
+    (G_{xx} G_{yy})` clipped to [0, 1]."""
     denom = gxx * gyy
     coh = np.divide(
         np.abs(gxy) ** 2, denom, out=np.zeros_like(gxx), where=denom > 0.0
@@ -337,26 +361,31 @@ def _validate_scaling(scaling: str) -> str:
 
 @dataclass(frozen=True)
 class SpectralDensityResult:
-    """Welch autospectral density with its statistical error (B&P Ch. 8).
+    r"""Welch autospectral density with its statistical error (B&P Ch. 8).
 
     :ivar frequencies: One-sided frequency axis, in Hz.
-    :ivar psd: Autospectral density ``Ĝxx(f)`` (units²/Hz for ``'density'``
-        scaling, units² for ``'spectrum'``).
-    :ivar ci_lower: Lower chi-square confidence bound on ``Gxx`` (Eq. 8.163;
+    :ivar psd: Autospectral density :math:`\hat{G}_{xx}(f)` (units²/Hz
+        for ``'density'`` scaling, units² for ``'spectrum'``).
+    :ivar ci_lower: Lower chi-square confidence bound on
+        :math:`G_{xx}` (Eq. 8.163;
         the DC bin, and the Nyquist bin for an even segment length, use
-        ``n = nd`` degrees of freedom - a wider interval - because those
-        bins carry a single real Fourier component).
-    :ivar ci_upper: Upper chi-square confidence bound on ``Gxx``.
+        :math:`n = n_d` degrees of freedom - a wider interval - because
+        those bins carry a single real Fourier component).
+    :ivar ci_upper: Upper chi-square confidence bound on :math:`G_{xx}`.
     :ivar confidence: Confidence level of the interval (e.g. ``0.95``).
-    :ivar random_error: Normalized random error ``ε[Ĝxx] = 1/√nd``
-        (Eq. 8.158) of the interior bins (``√(2/nd)`` at DC/Nyquist).
+    :ivar random_error: Normalized random error
+        :math:`\varepsilon[\hat{G}_{xx}] = 1/\sqrt{n_d}`
+        (Eq. 8.158) of the interior bins (:math:`\sqrt{2/n_d}` at
+        DC/Nyquist).
     :ivar n_segments: Raw number of (possibly overlapped) segments averaged.
-    :ivar n_averages: Effective number of independent averages ``nd``
+    :ivar n_averages: Effective number of independent averages
+        :math:`n_d`
         (equals ``n_segments`` without overlap; smaller with overlap).
-    :ivar degrees_of_freedom: Chi-square degrees of freedom ``n = 2·nd`` of
-        the interior bins (Eq. 8.162; ``nd`` at DC/Nyquist).
-    :ivar resolution_bandwidth: Effective noise bandwidth ``Bₑ`` of the
-        tapered segment, in Hz (drives the bias error of Eq. 8.139).
+    :ivar degrees_of_freedom: Chi-square degrees of freedom
+        :math:`n = 2 n_d` of
+        the interior bins (Eq. 8.162; :math:`n_d` at DC/Nyquist).
+    :ivar resolution_bandwidth: Effective noise bandwidth :math:`B_e` of
+        the tapered segment, in Hz (drives the bias error of Eq. 8.139).
     :ivar window: Taper name.
     :ivar nperseg: Segment length, in samples.
     :ivar overlap: Segment overlap fraction.
@@ -401,14 +430,16 @@ def power_spectral_density(
     scaling: Literal["density", "spectrum"] = "density",
     confidence: float = 0.95,
 ) -> SpectralDensityResult:
-    """Calibrated autospectral density with chi-square confidence interval.
+    r"""Calibrated autospectral density with chi-square confidence interval.
 
     Welch's method (Bendat & Piersol Section 11.5.2: tapered, overlapped
     segment averaging, no detrending so absolute calibration is preserved).
-    Alongside ``Ĝxx(f)`` the result reports the effective number of
-    independent averages ``nd``, the normalized random error
-    ``ε = 1/√nd`` (Eq. 8.158) and the chi-square confidence interval with
-    ``2·nd`` degrees of freedom (Eq. 8.163). For the first-order
+    Alongside :math:`\hat{G}_{xx}(f)` the result reports the effective
+    number of
+    independent averages :math:`n_d`, the normalized random error
+    :math:`\varepsilon = 1/\sqrt{n_d}` (Eq. 8.158) and the chi-square
+    confidence interval with
+    :math:`2 n_d` degrees of freedom (Eq. 8.163). For the first-order
     resolution-bias error at a resonance peak see
     :func:`resolution_bias_error`.
 
@@ -417,7 +448,8 @@ def power_spectral_density(
     :param window: Segment taper (any scipy window name; default Hann,
         the B&P Section 11.5.2 recommendation for side-lobe suppression).
     :param nperseg: Welch segment length; ``None`` picks a length giving a
-        bin spacing of at most 4 Hz (the resolution bandwidth ``Be`` further
+        bin spacing of at most 4 Hz (the resolution bandwidth
+        :math:`B_e` further
         depends on the taper; see :attr:`SpectralDensityResult.resolution_bandwidth`).
     :param overlap: Segment overlap fraction in [0, 1) (default 0.5, which
         with a Hann taper retrieves most of the stability lost to tapering,
@@ -461,17 +493,20 @@ def power_spectral_density(
 def resolution_bias_error(
     resolution_bandwidth: float, half_power_bandwidth: float
 ) -> float:
-    """First-order resolution-bias error at a resonance peak (Eq. 8.141).
+    r"""First-order resolution-bias error at a resonance peak (Eq. 8.141).
 
-    ``εb[Ĝxx(fr)] ≈ -(Bₑ/Br)²/3`` for a resonance of half-power bandwidth
-    ``Br`` analysed with resolution bandwidth ``Bₑ``: peaks are
+    :math:`\varepsilon_b[\hat{G}_{xx}(f_r)] \approx -(B_e/B_r)^2/3` for
+    a resonance of half-power bandwidth
+    :math:`B_r` analysed with resolution bandwidth :math:`B_e`: peaks are
     underestimated (and valleys overestimated) by frequency smoothing, in
     the direction of reduced dynamic range (B&P Section 8.5.1). The
-    approximation assumes ``Bₑ < Br``.
+    approximation assumes :math:`B_e < B_r`.
 
-    :param resolution_bandwidth: Analysis resolution bandwidth ``Bₑ``, Hz
+    :param resolution_bandwidth: Analysis resolution bandwidth
+        :math:`B_e`, Hz
         (:attr:`SpectralDensityResult.resolution_bandwidth`).
-    :param half_power_bandwidth: Half-power (-3 dB) bandwidth ``Br`` of the
+    :param half_power_bandwidth: Half-power (-3 dB) bandwidth
+        :math:`B_r` of the
         spectral peak, in Hz.
     :return: Normalized bias error (dimensionless, negative at a peak).
     :raises ValueError: If either bandwidth is not positive.
@@ -488,23 +523,30 @@ def resolution_bias_error(
 
 @dataclass(frozen=True)
 class CrossSpectralDensityResult:
-    """Welch cross-spectral density with its statistical error (B&P Ch. 9).
+    r"""Welch cross-spectral density with its statistical error (B&P Ch. 9).
 
     The error formulas replace the unknown true coherence with the computed
     estimate, as Bendat & Piersol recommend for measured data (Section 9.2).
 
     :ivar frequencies: One-sided frequency axis, in Hz.
-    :ivar csd: Complex cross-spectral density ``Ĝxy(f)``.
-    :ivar magnitude: ``|Ĝxy(f)|``.
-    :ivar phase: Cross-spectrum phase ``θ̂xy(f)``, in radians (unwrapped).
-    :ivar coherence: Ordinary coherence ``γ̂²xy(f)`` ∈ [0, 1].
-    :ivar magnitude_random_error: Normalized random error of ``|Ĝxy|``,
-        ``ε = 1/(|γxy|·√nd)`` (Eq. 9.33).
+    :ivar csd: Complex cross-spectral density :math:`\hat{G}_{xy}(f)`.
+    :ivar magnitude: :math:`\lvert \hat{G}_{xy}(f) \rvert`.
+    :ivar phase: Cross-spectrum phase :math:`\hat{\theta}_{xy}(f)`, in
+        radians (unwrapped).
+    :ivar coherence: Ordinary coherence
+        :math:`\hat{\gamma}^2_{xy}(f) \in [0, 1]`.
+    :ivar magnitude_random_error: Normalized random error of
+        :math:`\lvert \hat{G}_{xy} \rvert`,
+        :math:`\varepsilon = 1/(\lvert \gamma_{xy} \rvert \sqrt{n_d})`
+        (Eq. 9.33).
     :ivar phase_std: Standard deviation of the phase estimate, in radians,
-        ``s.d. = (1-γ²xy)^½/(|γxy|·√(2·nd))`` (Eq. 9.52).
+        :math:`\mathrm{s.d.} = (1 - \gamma^2_{xy})^{1/2} /
+        (\lvert \gamma_{xy} \rvert \sqrt{2 n_d})` (Eq. 9.52).
     :ivar n_segments: Raw number of segments averaged.
-    :ivar n_averages: Effective number of independent averages ``nd``.
-    :ivar resolution_bandwidth: Effective noise bandwidth ``Bₑ``, in Hz.
+    :ivar n_averages: Effective number of independent averages
+        :math:`n_d`.
+    :ivar resolution_bandwidth: Effective noise bandwidth :math:`B_e`, in
+        Hz.
     :ivar window: Taper name.
     :ivar nperseg: Segment length, in samples.
     :ivar overlap: Segment overlap fraction.
@@ -551,12 +593,16 @@ def cross_spectral_density(
     overlap: float = _DEFAULT_OVERLAP,
     scaling: Literal["density", "spectrum"] = "density",
 ) -> CrossSpectralDensityResult:
-    """Calibrated cross-spectral density with statistical error analysis.
+    r"""Calibrated cross-spectral density with statistical error analysis.
 
-    Welch's method on both channels; alongside ``Ĝxy(f)`` the result
+    Welch's method on both channels; alongside
+    :math:`\hat{G}_{xy}(f)` the result
     reports the ordinary coherence and the Bendat & Piersol random errors:
-    ``ε[|Ĝxy|] = 1/(|γxy|·√nd)`` (Eq. 9.33) for the magnitude and
-    ``s.d.[θ̂xy] = (1-γ²xy)^½/(|γxy|·√(2·nd))`` (Eq. 9.52) for the phase,
+    :math:`\varepsilon[\lvert \hat{G}_{xy} \rvert]
+    = 1/(\lvert \gamma_{xy} \rvert \sqrt{n_d})` (Eq. 9.33) for the
+    magnitude and
+    :math:`\mathrm{s.d.}[\hat{\theta}_{xy}] = (1 - \gamma^2_{xy})^{1/2} /
+    (\lvert \gamma_{xy} \rvert \sqrt{2 n_d})` (Eq. 9.52) for the phase,
     with the measured coherence in place of the unknown true value.
 
     :param x: First signal, 1-D.
@@ -617,32 +663,47 @@ def cross_spectral_density(
 
 @dataclass(frozen=True)
 class CoherentOutputSpectrumResult:
-    """Coherent output spectrum of a single-input/single-output model.
+    r"""Coherent output spectrum of a single-input/single-output model.
 
-    The measured output autospectrum splits into the part linearly explained
-    by the input, ``Gvv = γ²xy·Gyy`` (Eq. 9.55), and the uncorrelated noise
-    remainder ``Gnn = (1-γ²xy)·Gyy`` (Eq. 9.56), with ``Gyy = Gvv + Gnn``
+    The measured output autospectrum splits into the part linearly
+    explained by the input,
+    :math:`G_{vv} = \gamma^2_{xy} G_{yy}` (Eq. 9.55), and the
+    uncorrelated noise remainder
+    :math:`G_{nn} = (1 - \gamma^2_{xy}) G_{yy}` (Eq. 9.56), with
+    :math:`G_{yy} = G_{vv} + G_{nn}`
     (Eq. 9.57). Their ratio is the spectral signal-to-noise ratio.
 
     :ivar frequencies: One-sided frequency axis, in Hz.
-    :ivar output_psd: Measured output autospectrum ``Ĝyy(f)``.
-    :ivar coherent_psd: Coherent output spectrum ``Ĝvv = γ̂²xy·Ĝyy``.
-    :ivar noise_psd: Noise output spectrum ``Ĝnn = (1-γ̂²xy)·Ĝyy``.
-    :ivar coherence: Ordinary coherence ``γ̂²xy(f)`` ∈ [0, 1].
-    :ivar snr: Spectral signal-to-noise ratio ``γ̂²/(1-γ̂²)`` (∞ at
-        ``γ̂² = 1``).
-    :ivar snr_db: ``10·lg`` of :attr:`snr`, in dB.
-    :ivar random_error: Normalized random error of ``Ĝvv``,
-        ``ε = (2-γ²xy)^½/(|γxy|·√nd)`` (Eq. 9.73), with the measured
-        coherence in place of the true value.
+    :ivar output_psd: Measured output autospectrum
+        :math:`\hat{G}_{yy}(f)`.
+    :ivar coherent_psd: Coherent output spectrum
+        :math:`\hat{G}_{vv} = \hat{\gamma}^2_{xy} \hat{G}_{yy}`.
+    :ivar noise_psd: Noise output spectrum
+        :math:`\hat{G}_{nn} = (1 - \hat{\gamma}^2_{xy}) \hat{G}_{yy}`.
+    :ivar coherence: Ordinary coherence
+        :math:`\hat{\gamma}^2_{xy}(f) \in [0, 1]`.
+    :ivar snr: Spectral signal-to-noise ratio
+        :math:`\hat{\gamma}^2/(1 - \hat{\gamma}^2)` (:math:`\infty` at
+        :math:`\hat{\gamma}^2 = 1`).
+    :ivar snr_db: :math:`10 \log_{10}` of :attr:`snr`, in dB.
+    :ivar random_error: Normalized random error of :math:`\hat{G}_{vv}`,
+        :math:`\varepsilon = (2 - \gamma^2_{xy})^{1/2} /
+        (\lvert \gamma_{xy} \rvert \sqrt{n_d})` (Eq. 9.73), with the
+        measured coherence in place of the true value.
     :ivar snr_random_error: Normalized random error of the SNR,
-        ``ε = √2/(|γxy|·√nd)``, first-order propagation of the coherence
-        random error of Eq. 9.82 through ``γ²/(1-γ²)``.
+        :math:`\varepsilon = \sqrt{2} /
+        (\lvert \gamma_{xy} \rvert \sqrt{n_d})`, first-order propagation
+        of the coherence
+        random error of Eq. 9.82 through
+        :math:`\gamma^2/(1 - \gamma^2)`.
     :ivar coherence_bias: First-order bias of the coherence estimate,
-        ``b[γ̂²] ≈ (1-γ²)²/nd`` (Eq. 9.75).
+        :math:`b[\hat{\gamma}^2] \approx (1 - \gamma^2)^2 / n_d`
+        (Eq. 9.75).
     :ivar n_segments: Raw number of segments averaged.
-    :ivar n_averages: Effective number of independent averages ``nd``.
-    :ivar resolution_bandwidth: Effective noise bandwidth ``Bₑ``, in Hz.
+    :ivar n_averages: Effective number of independent averages
+        :math:`n_d`.
+    :ivar resolution_bandwidth: Effective noise bandwidth :math:`B_e`, in
+        Hz.
     :ivar window: Taper name.
     :ivar nperseg: Segment length, in samples.
     :ivar overlap: Segment overlap fraction.
@@ -692,15 +753,20 @@ def coherent_output_spectrum(
     overlap: float = _DEFAULT_OVERLAP,
     scaling: Literal["density", "spectrum"] = "density",
 ) -> CoherentOutputSpectrumResult:
-    """Coherent output spectrum and spectral SNR (Bendat & Piersol 9.2.2).
+    r"""Coherent output spectrum and spectral SNR (Bendat & Piersol 9.2.2).
 
-    Splits the measured output autospectrum ``Gyy`` into the coherent part
-    ``Gvv = γ²xy·Gyy`` linearly explained by the input ``x`` and the noise
-    remainder ``Gnn = (1-γ²xy)·Gyy``, and reports the spectral
-    signal-to-noise ratio ``γ²/(1-γ²)`` together with the Bendat & Piersol
+    Splits the measured output autospectrum :math:`G_{yy}` into the
+    coherent part
+    :math:`G_{vv} = \gamma^2_{xy} G_{yy}` linearly explained by the
+    input ``x`` and the noise
+    remainder :math:`G_{nn} = (1 - \gamma^2_{xy}) G_{yy}`, and reports
+    the spectral
+    signal-to-noise ratio :math:`\gamma^2/(1 - \gamma^2)` together with
+    the Bendat & Piersol
     random errors (Eqs. 9.73 and 9.82). For additive uncorrelated output
     noise of known level the coherence satisfies
-    ``γ² = SNR/(1+SNR)``, which is the closed-form oracle used to verify
+    :math:`\gamma^2 = \mathrm{SNR}/(1 + \mathrm{SNR})`, which is the
+    closed-form oracle used to verify
     the implementation.
 
     :param x: Input (reference) signal, 1-D.
@@ -849,11 +915,12 @@ def fractional_octave_smoothing(
     *,
     domain: Literal["power", "amplitude", "db"] = "power",
 ) -> NDArray[np.float64]:
-    """Smooth a spectrum with a constant-power 1/n-octave kernel.
+    r"""Smooth a spectrum with a constant-power 1/n-octave kernel.
 
     Each output point is the power average of the input over a rectangular
     window of 1/``fraction`` octave centred (geometrically) on its
-    frequency: ``[f·2^(-1/2n), f·2^(+1/2n)]``. This is the
+    frequency: :math:`[f \cdot 2^{-1/2n}, f \cdot 2^{+1/2n}]`. This is
+    the
     constant-percentage resolution bandwidth that Bendat & Piersol
     (Section 8.5.3) recommend for spectra of resonant systems, and the de
     facto standard presentation of loudspeaker and room responses. The
@@ -900,7 +967,7 @@ _WINDOW_OVERSAMPLE = 256
 
 @dataclass(frozen=True)
 class WindowMetricsResult:
-    """Figures of merit of a taper (Harris 1978), DFT-even sampling.
+    r"""Figures of merit of a taper (Harris 1978), DFT-even sampling.
 
     Losses are positive dB (how much is lost), sidelobe levels negative dB
     (relative to the main lobe), bandwidths in DFT bins (multiply by
@@ -912,15 +979,19 @@ class WindowMetricsResult:
         ``(name, param)`` tuple :func:`scipy.signal.get_window` accepts).
     :ivar n: Window length, in samples.
     :ivar taps: The window samples ``w[m]`` (DFT-even).
-    :ivar coherent_gain: Normalized DC gain ``Σw/n`` (1 for rectangular);
+    :ivar coherent_gain: Normalized DC gain :math:`\sum w / n` (1 for
+        rectangular);
         the amplitude a bin-centered tone is scaled by before correction.
-    :ivar enbw_bins: Equivalent noise bandwidth ``n·Σw²/(Σw)²``, in bins:
+    :ivar enbw_bins: Equivalent noise bandwidth
+        :math:`n \sum w^2 / \left( \sum w \right)^2`, in bins:
         the width of the ideal rectangular filter that would pass the same
         white-noise power (1 rectangular, 1.5 Hann, 1987/1458 Hamming).
     :ivar scalloping_loss_db: Attenuation of a tone midway between two
-        bins, ``-20·lg|W(1/2)/W(0)|``, in dB (positive).
+        bins, :math:`-20 \log_{10} \lvert W(1/2)/W(0) \rvert`, in dB
+        (positive).
     :ivar worst_case_processing_loss_db: Scalloping loss plus the ENBW
-        processing loss ``10·lg(ENBW)``, in dB: the worst-case reduction
+        processing loss :math:`10 \log_{10}(\mathrm{ENBW})`, in dB: the
+        worst-case reduction
         in output signal-to-noise ratio for a tone in white noise.
     :ivar highest_sidelobe_db: Level of the highest sidelobe relative to
         the main lobe, in dB (negative; -13.3 rectangular, -31.5 Hann).
@@ -1067,48 +1138,61 @@ _ADAPTIVE_MAX_ITER = 100
 
 @dataclass(frozen=True)
 class MultitaperSpectralDensityResult:
-    """Thomson multitaper spectral density (Percival & Walden Ch. 7).
+    r"""Thomson multitaper spectral density (Percival & Walden Ch. 7).
 
     One whole-record estimate from ``K`` orthogonal Slepian (dpss) tapers:
     the ``K`` eigenspectra are nearly uncorrelated, so their weighted
     average trades the two chi-square degrees of freedom of a periodogram
-    for about ``2K`` - without segmenting the record as Welch's method
-    does. The chi-square machinery mirrors
+    for about :math:`2K` - without segmenting the record as Welch's
+    method does. The chi-square machinery mirrors
     :class:`SpectralDensityResult`, but here the degrees of freedom are
     per-frequency: Thomson's adaptive weights (P&W Eq. 368a) downweight
     leakage-prone tapers wherever the spectrum is locally weak, which
     costs degrees of freedom there (P&W Eq. 370b).
 
     :ivar frequencies: One-sided frequency axis, in Hz.
-    :ivar psd: Multitaper spectral density ``Ŝ(mt)(f)`` (units²/Hz for
+    :ivar psd: Multitaper spectral density
+        :math:`\hat{S}^{(mt)}(f)` (units²/Hz for
         ``'density'`` scaling, units² for ``'spectrum'``).
     :ivar ci_lower: Lower chi-square confidence bound,
-        ``ν·Ŝ/χ²ᵥ;α/2`` with the per-frequency ``ν`` (the same interval
-        form as B&P Eq. 8.163, with ``ν`` from P&W Eq. 370b).
+        :math:`\nu \hat{S}/\chi^2_{\nu;\alpha/2}` with the per-frequency
+        :math:`\nu` (the same interval
+        form as B&P Eq. 8.163, with :math:`\nu` from P&W Eq. 370b).
     :ivar ci_upper: Upper chi-square confidence bound.
     :ivar confidence: Confidence level of the interval (e.g. ``0.95``).
     :ivar degrees_of_freedom: Per-frequency equivalent chi-square degrees
-        of freedom ``ν(f) = 2·(Σₖdₖ)²/Σₖdₖ²`` with ``dₖ = b²ₖ(f)·λₖ``
-        (P&W Eq. 370b); ``2K·(Σλₖ/K)²·K/Σλ²ₖ ≈ 2K`` for unity weights.
+        of freedom
+        :math:`\nu(f) = 2 \left( \sum_k d_k \right)^2 / \sum_k d_k^2`
+        with :math:`d_k = b_k^2(f) \lambda_k`
+        (P&W Eq. 370b);
+        :math:`2K \left( \sum \lambda_k / K \right)^2 K /
+        \sum \lambda_k^2 \approx 2K` for unity weights.
         The DC bin - and the Nyquist bin for an even record length -
         carries half (a single real Fourier component per eigenspectrum).
     :ivar random_error: Per-frequency normalized random error
-        ``ε[Ŝ(mt)] = √(2/ν)`` (``≈ 1/√K``), the multitaper counterpart of
+        :math:`\varepsilon[\hat{S}^{(mt)}] = \sqrt{2/\nu}`
+        (:math:`\approx 1/\sqrt{K}`), the multitaper counterpart of
         B&P Eq. 8.158.
-    :ivar weights: Normalized combination weights ``dₖ(f)/Σⱼdⱼ(f)``,
+    :ivar weights: Normalized combination weights
+        :math:`d_k(f) / \sum_j d_j(f)`,
         shape ``(n_tapers, n_frequencies)``. Adaptive weighting makes them
-        frequency dependent; they converge to ``≈ 1/K`` where the spectrum
-        is locally white (exactly uniform weights would be ``λₖ/Σλⱼ``).
-    :ivar eigenvalues: Concentration ratios ``λₖ(N, W)`` of the tapers -
+        frequency dependent; they converge to :math:`\approx 1/K` where
+        the spectrum
+        is locally white (exactly uniform weights would be
+        :math:`\lambda_k / \sum \lambda_j`).
+    :ivar eigenvalues: Concentration ratios :math:`\lambda_k(N, W)` of
+        the tapers -
         the fraction of each taper's spectral-window energy inside the
-        design band ``[-W, W]`` (P&W Section 7.1; near unity for
-        ``k < 2NW``).
+        design band :math:`[-W, W]` (P&W Section 7.1; near unity for
+        :math:`k < 2NW`).
     :ivar time_half_bandwidth: The duration x half-bandwidth product
-        ``NW`` (dimensionless; ``W = NW/(N·Δt)``).
+        ``NW`` (dimensionless; :math:`W = NW/(N \Delta t)`).
     :ivar n_tapers: Number of tapers ``K`` averaged.
-    :ivar resolution_bandwidth: The resolution bandwidth ``2W`` of the
-        estimator, in Hz - the multitaper analog of the Welch ``Bₑ``
-        (P&W call ``2W`` *the* natural resolution measure of the method).
+    :ivar resolution_bandwidth: The resolution bandwidth :math:`2W` of
+        the estimator, in Hz - the multitaper analog of the Welch
+        :math:`B_e`
+        (P&W call :math:`2W` *the* natural resolution measure of the
+        method).
     :ivar adaptive: Whether Thomson's adaptive weights were used.
     :ivar scaling: ``'density'`` or ``'spectrum'``.
     """
@@ -1146,11 +1230,11 @@ class MultitaperSpectralDensityResult:
 def _validate_multitaper_params(
     n: int, time_half_bandwidth: float, n_tapers: int | None
 ) -> tuple[float, int]:
-    """Validate ``NW`` and ``K`` against the record length.
+    r"""Validate ``NW`` and ``K`` against the record length.
 
-    ``K`` defaults to ``2NW - 1`` and is capped at the Shannon number
-    ``2NW``: beyond it the taper concentrations collapse (P&W Section 7.1)
-    and the extra eigenspectra are pure leakage.
+    ``K`` defaults to :math:`2NW - 1` and is capped at the Shannon number
+    :math:`2NW`: beyond it the taper concentrations collapse (P&W
+    Section 7.1) and the extra eigenspectra are pure leakage.
     """
     nw = _positive(time_half_bandwidth, "time_half_bandwidth")
     if nw < 1.0 or nw >= n / 2.0:
@@ -1173,15 +1257,23 @@ def _dpss_eigenspectra(
 ) -> tuple[
     NDArray[np.float64], NDArray[np.float64], NDArray[np.float64]
 ]:
-    """Eigenspectra ``Ŝₖ(f)`` on the one-sided rfft grid, two-sided scale.
+    r"""Eigenspectra :math:`\hat{S}_k(f)` on the one-sided rfft grid.
 
-    The Slepian tapers come from :func:`scipy.signal.windows.dpss`
-    (unit-energy normalization, ``Σₜh²ₜₖ = 1``, exactly P&W Eq. 334b);
+    Two-sided scale. The Slepian tapers come from
+    :func:`scipy.signal.windows.dpss`
+    (unit-energy normalization, :math:`\sum_t h_{tk}^2 = 1`, exactly P&W
+    Eq. 334b);
     the estimator built on them is P&W Eq. 333: each eigenspectrum is the
-    direct spectral estimator ``Ŝₖ(f) = Δt·|Σₜ hₜₖ·xₜ·e^(-i2πftΔt)|²``.
+    direct spectral estimator
+
+    .. math::
+
+       \hat{S}_k(f) = \Delta t \left\lvert \sum_t h_{tk} x_t
+       e^{-i 2 \pi f t \Delta t} \right\rvert^2
 
     Returns ``(eigenspectra, eigenvalues, taper_dc_gains_squared)`` where
-    the last term is ``(Σₜhₜₖ)²``, needed for the ``'spectrum'`` scaling.
+    the last term is :math:`\left( \sum_t h_{tk} \right)^2`, needed for
+    the ``'spectrum'`` scaling.
     """
     from scipy.signal import windows as sp_windows
 
@@ -1205,15 +1297,19 @@ def _adaptive_multitaper_weights(
     eigenvalues: NDArray[np.float64],
     power_density: float,
 ) -> NDArray[np.float64]:
-    """Thomson's adaptive weights ``dₖ(f) = b²ₖ(f)·λₖ`` (P&W Section 7.4).
+    r"""Thomson's adaptive weights :math:`d_k(f) = b_k^2(f) \lambda_k`.
 
-    Fixed-point iteration of P&W Eq. 368a,
-    ``bₖ(f) = S(f)/(λₖ·S(f) + (1-λₖ)·σ²·Δt)``, through the weighted
-    estimator of Eq. 370a, ``Ŝ = Σₖdₖ·Ŝₖ/Σₖdₖ``, seeded with the
+    P&W Section 7.4: fixed-point iteration of P&W Eq. 368a,
+    :math:`b_k(f) = S(f) / (\lambda_k S(f) +
+    (1 - \lambda_k) \sigma^2 \Delta t)`, through the weighted
+    estimator of Eq. 370a,
+    :math:`\hat{S} = \sum_k d_k \hat{S}_k / \sum_k d_k`, seeded with the
     eigenvalue-weighted average of the two lowest-order eigenspectra
-    (P&W's recipe). ``σ²·Δt`` - the flat density carrying the process
+    (P&W's recipe). :math:`\sigma^2 \Delta t` - the flat density carrying
+    the process
     power - is the broad-band bias scale: high-order tapers (smaller
-    ``λₖ``) are downweighted wherever the local spectrum falls below the
+    :math:`\lambda_k`) are downweighted wherever the local spectrum falls
+    below the
     leakage that the total power could push through their sidelobes.
     """
     lam = eigenvalues[:, np.newaxis]
@@ -1252,13 +1348,15 @@ def _adaptive_multitaper_weights(
 def _multitaper_dof(
     d: NDArray[np.float64], nyquist_bin: bool
 ) -> NDArray[np.float64]:
-    """Equivalent degrees of freedom ``ν(f) = 2·(Σₖdₖ)²/Σₖdₖ²``.
+    r"""Equivalent degrees of freedom
+    :math:`\nu(f) = 2 \left( \sum_k d_k \right)^2 / \sum_k d_k^2`.
 
     P&W Eq. 370b: each eigenspectrum contributes two chi-square degrees
     of freedom (one complex Fourier component), combined with weights
-    ``dₖ``. The DC bin - and the Nyquist bin when the record length is
-    even - has a single real component per eigenspectrum, so its ``ν``
-    is halved (same convention as the Welch estimators above).
+    :math:`d_k`. The DC bin - and the Nyquist bin when the record length
+    is even - has a single real component per eigenspectrum, so its
+    :math:`\nu` is halved (same convention as the Welch estimators
+    above).
     """
     dof = 2.0 * np.sum(d, axis=0) ** 2 / np.sum(d * d, axis=0)
     dof[0] /= 2.0
@@ -1272,10 +1370,12 @@ def _chi2_interval_pointwise(
     dof: NDArray[np.float64],
     confidence: float,
 ) -> tuple[NDArray[np.float64], NDArray[np.float64]]:
-    """Chi-square interval with per-frequency degrees of freedom.
+    r"""Chi-square interval with per-frequency degrees of freedom.
 
-    Same form as B&P Eq. 8.163 (``ν·Ŝ/χ²ᵥ;α/2 ≤ S ≤ ν·Ŝ/χ²ᵥ;1-α/2``)
-    with the P&W Eq. 370b ``ν(f)`` of the multitaper estimator.
+    Same form as B&P Eq. 8.163
+    (:math:`\nu \hat{S}/\chi^2_{\nu;\alpha/2} \le S \le
+    \nu \hat{S}/\chi^2_{\nu;1-\alpha/2}`)
+    with the P&W Eq. 370b :math:`\nu(f)` of the multitaper estimator.
     """
     from scipy import stats as sp_stats
 
@@ -1299,16 +1399,18 @@ def multitaper_psd(
     scaling: Literal["density", "spectrum"] = "density",
     confidence: float = 0.95,
 ) -> MultitaperSpectralDensityResult:
-    """Thomson multitaper spectral density with chi-square interval.
+    r"""Thomson multitaper spectral density with chi-square interval.
 
     Implements the multitaper estimator of Thomson (1982) as developed in
     Percival & Walden (1993, Chapter 7): the record is multiplied by
     ``K`` orthogonal discrete prolate spheroidal (Slepian) data tapers -
     the sequences that maximize spectral concentration in the design band
-    ``[-W, W]``, computed by :func:`scipy.signal.windows.dpss` - and the
+    :math:`[-W, W]`, computed by :func:`scipy.signal.windows.dpss` - and
+    the
     ``K`` resulting eigenspectra (P&W Eq. 333) are averaged. Because the
     tapers are orthogonal the eigenspectra are nearly uncorrelated, so the
-    average has about ``2K`` chi-square degrees of freedom and ``1/K`` of
+    average has about :math:`2K` chi-square degrees of freedom and
+    :math:`1/K` of
     the periodogram's variance *without* segmenting the record: the
     estimator of choice for short records, where Welch's method
     (:func:`power_spectral_density`) would leave too few segments.
@@ -1319,7 +1421,8 @@ def multitaper_psd(
     broad-band leakage each taper could carry, the leakier high-order
     tapers are downweighted, trading degrees of freedom (Eq. 370b) for
     leakage protection in high-dynamic-range spectra. The broadband
-    ``σ²`` driving the weights is ``mean(x²)`` with no mean removal,
+    :math:`\sigma^2` driving the weights is
+    :math:`\operatorname{mean}(x^2)` with no mean removal,
     consistent with the no-detrending calibration below. For a locally
     white spectrum the weights converge to uniform and nothing is lost.
     With ``adaptive=False`` the eigenvalue-weighted average of P&W
@@ -1327,21 +1430,25 @@ def multitaper_psd(
 
     Calibration matches the Welch estimators of this module exactly: no
     detrending, ``'density'`` scaling integrates to the signal power
-    (units²/Hz, one-sided) and ``'spectrum'`` scaling reads ``A²/2`` at
+    (units²/Hz, one-sided) and ``'spectrum'`` scaling reads
+    :math:`A^2/2` at
     the peak of a sinusoid of amplitude ``A`` (the tone calibration is
     exact for the taper set in use, computed from the taper DC gains
-    ``(Σₜhₜₖ)²``; a tone's power in ``'density'`` scaling is spread over
-    the resolution bandwidth ``2W``).
+    :math:`\left( \sum_t h_{tk} \right)^2`; a tone's power in
+    ``'density'`` scaling is spread over
+    the resolution bandwidth :math:`2W`).
 
     :param x: Signal, 1-D (used whole; no segmentation).
     :param fs: Sample rate, in Hz.
     :param time_half_bandwidth: Duration x half-bandwidth product ``NW``
         (dimensionless; default 4, P&W's worked choice). The design
-        half-bandwidth is ``W = NW·fs/N`` Hz; larger ``NW`` admits more
-        tapers (lower variance) at the cost of resolution ``2W``.
-    :param n_tapers: Number of tapers ``K``; ``None`` picks ``2·NW - 1``
+        half-bandwidth is :math:`W = NW f_s / N` Hz; larger ``NW``
+        admits more
+        tapers (lower variance) at the cost of resolution :math:`2W`.
+    :param n_tapers: Number of tapers ``K``; ``None`` picks
+        :math:`2 NW - 1`
         (all tapers with near-unity concentration, P&W Section 7.1). At
-        most the Shannon number ``2·NW``.
+        most the Shannon number :math:`2 NW`.
     :param adaptive: Use Thomson's adaptive weights (default) or the
         eigenvalue-weighted average.
     :param scaling: ``'density'`` (units²/Hz) or ``'spectrum'`` (units²,

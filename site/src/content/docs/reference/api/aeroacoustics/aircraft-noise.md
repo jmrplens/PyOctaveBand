@@ -14,13 +14,16 @@ is built from a half-second spectral time history (24 one-third-octave bands,
 
 * [`perceived_noisiness`](/phonometry/reference/api/aeroacoustics/aircraft-noise/#perceived_noisiness) -- per-band perceived noisiness `n` (noys),
   the analytic piecewise noy law with the Table A2-3 constants.
-* [`perceived_noise_level`](/phonometry/reference/api/aeroacoustics/aircraft-noise/#perceived_noise_level) -- `PNL = 40 + (10/lg2)·lg N` from the total
-  noisiness `N = 0.85·n_max + 0.15·Σn`.
+* [`perceived_noise_level`](/phonometry/reference/api/aeroacoustics/aircraft-noise/#perceived_noise_level) --
+  $\mathrm{PNL} = 40 + (10/\log_{10} 2) \cdot \log_{10} N$ from the total
+  noisiness $N = 0.85 \cdot n_{\mathrm{max}} + 0.15 \cdot \sum n$.
 * [`tone_correction`](/phonometry/reference/api/aeroacoustics/aircraft-noise/#tone_correction) -- the tone-correction factor `C` (the slope /
   "encircling" method) that penalises spectral irregularities.
 * [`effective_perceived_noise_level`](/phonometry/reference/api/aeroacoustics/aircraft-noise/#effective_perceived_noise_level) -- the end-to-end metric: per-record
-  `PNLT = PNL + C`, the maximum `PNLTM`, the 10 dB-down integration limits
-  and the duration correction, giving `EPNL = PNLTM + D`.
+  $\mathrm{PNLT} = \mathrm{PNL} + C$, the maximum `PNLTM`, the
+  10 dB-down integration limits
+  and the duration correction, giving
+  $\mathrm{EPNL} = \mathrm{PNLTM} + D$.
 
 > Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
 
@@ -40,8 +43,9 @@ Effective Perceived Noise Level from a spectral time history (ICAO Annex 16).
 
 Each record (row) is a 24-band one-third-octave spectrum sampled every
 `dt` seconds. The per-record `PNL` and tone correction `C` give
-`PNLT = PNL + C`; the maximum `PNLTM` and the duration correction over
-the 10 dB-down window give `EPNL = PNLTM + D`.
+$\mathrm{PNLT} = \mathrm{PNL} + C$; the maximum `PNLTM` and the
+duration correction over
+the 10 dB-down window give $\mathrm{EPNL} = \mathrm{PNLTM} + D$.
 
 **Parameters**
 
@@ -74,9 +78,14 @@ epnl_from_pnlt(
 
 EPNL from a tone-corrected perceived-noise-level time history (App. 2 §4.5-4.6).
 
-`EPNL = 10·lg( Σ_{kF..kL} 10^{PNLT(k)/10}·Δt(k) ) − 10·lg(T0)` with the
+$$
+\mathrm{EPNL} = 10 \cdot \log_{10}\left( \sum_{k_F..k_L} 10^{\mathrm{PNLT}(k)/10} \cdot \Delta t(k) \right) - 10 \cdot \log_{10}(T_0)
+$$
+
+with the
 10 dB-down integration limits about the maximum `PNLTM`. The exact
-`−10·lg(T0)` form is used rather than the Annex's rounded constant 13 for
+$-10 \cdot \log_{10}(T_0)$ form is used rather than the Annex's rounded
+constant 13 for
 uniform 0.5 s records (difference 0.0103 dB); the ETM Table 4-4 integrated
 reference reproduces the exact form to five decimals.
 
@@ -134,7 +143,7 @@ Effective Perceived Noise Level of an aircraft flyover (ICAO Annex 16).
 | `pnlt` | Tone-corrected perceived noise level per record, in PNdB. |
 | `pnltm` | Maximum tone-corrected perceived noise level, in PNdB, including the bandsharing adjustment `ΔB` (App. 2 §4.4.3). |
 | `bandsharing_adjustment` | The bandsharing adjustment `ΔB`, in dB (zero unless the tone correction at PNLTM is suppressed). |
-| `duration_correction` | Duration correction `D = EPNL − PNLTM`, in dB. |
+| `duration_correction` | Duration correction $D = \mathrm{EPNL} - \mathrm{PNLTM}$, in dB. |
 | `epnl` | Effective perceived noise level, in EPNdB. |
 | `band_limits` | The 0-based 10 dB-down record indices `(kF, kL)`. |
 
@@ -208,7 +217,8 @@ perceived_noise_level(spl: NDArray[np.float64] | list[float]) -> float
 
 Perceived noise level `PNL` (ICAO Annex 16 App. 2 §4.2), in PNdB.
 
-`N = 0.85·n_max + 0.15·Σn` and `PNL = 40 + (10/lg2)·lg N`. If the total
+$N = 0.85 \cdot n_{\mathrm{max}} + 0.15 \cdot \sum n$ and
+$\mathrm{PNL} = 40 + (10/\log_{10} 2) \cdot \log_{10} N$. If the total
 noisiness is not positive the PNL is defined as 0.
 
 **Parameters**
@@ -237,11 +247,16 @@ Per-band perceived noisiness `n` in noys (ICAO Annex 16 App. 2 §4.7).
 
 The analytic piecewise noy law, using the Table A2-3 constants:
 
-* `SPL ≥ SPL(a)`: `n = 10^{M(c)·(SPL − SPL(c))}`
-* `SPL(b) ≤ SPL < SPL(a)`: `n = 10^{M(b)·(SPL − SPL(b))}`
-* `SPL(e) ≤ SPL < SPL(b)`: `n = 0.3·10^{M(e)·(SPL − SPL(e))}`
-* `SPL(d) ≤ SPL < SPL(e)`: `n = 0.1·10^{M(d)·(SPL − SPL(d))}`
-* `SPL < SPL(d)`: `n = 0` (below the noy floor)
+* $\mathrm{SPL} \ge \mathrm{SPL}(a)$:
+  $n = 10^{M(c) \cdot (\mathrm{SPL} - \mathrm{SPL}(c))}$
+* $\mathrm{SPL}(b) \le \mathrm{SPL} < \mathrm{SPL}(a)$:
+  $n = 10^{M(b) \cdot (\mathrm{SPL} - \mathrm{SPL}(b))}$
+* $\mathrm{SPL}(e) \le \mathrm{SPL} < \mathrm{SPL}(b)$:
+  $n = 0.3 \cdot 10^{M(e) \cdot (\mathrm{SPL} - \mathrm{SPL}(e))}$
+* $\mathrm{SPL}(d) \le \mathrm{SPL} < \mathrm{SPL}(e)$:
+  $n = 0.1 \cdot 10^{M(d) \cdot (\mathrm{SPL} - \mathrm{SPL}(d))}$
+* $\mathrm{SPL} < \mathrm{SPL}(d)$: $n = 0$ (below the noy
+  floor)
 
 **Parameters**
 

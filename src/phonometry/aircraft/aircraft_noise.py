@@ -1,5 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""
+r"""
 Aircraft noise certification: Effective Perceived Noise Level (ICAO Annex 16).
 
 The EPNL is the noise-certification metric for transport-category aircraft. It
@@ -9,13 +9,16 @@ is built from a half-second spectral time history (24 one-third-octave bands,
 
 * :func:`perceived_noisiness` -- per-band perceived noisiness ``n`` (noys),
   the analytic piecewise noy law with the Table A2-3 constants.
-* :func:`perceived_noise_level` -- ``PNL = 40 + (10/lg2)·lg N`` from the total
-  noisiness ``N = 0.85·n_max + 0.15·Σn``.
+* :func:`perceived_noise_level` --
+  :math:`\mathrm{PNL} = 40 + (10/\log_{10} 2) \cdot \log_{10} N` from the total
+  noisiness :math:`N = 0.85 \cdot n_{\mathrm{max}} + 0.15 \cdot \sum n`.
 * :func:`tone_correction` -- the tone-correction factor ``C`` (the slope /
   "encircling" method) that penalises spectral irregularities.
 * :func:`effective_perceived_noise_level` -- the end-to-end metric: per-record
-  ``PNLT = PNL + C``, the maximum ``PNLTM``, the 10 dB-down integration limits
-  and the duration correction, giving ``EPNL = PNLTM + D``.
+  :math:`\mathrm{PNLT} = \mathrm{PNL} + C`, the maximum ``PNLTM``, the
+  10 dB-down integration limits
+  and the duration correction, giving
+  :math:`\mathrm{EPNL} = \mathrm{PNLTM} + D`.
 """
 
 from __future__ import annotations
@@ -89,15 +92,20 @@ def _validate_spectrum(spl: NDArray[np.float64] | list[float]) -> NDArray[np.flo
 
 
 def perceived_noisiness(spl: NDArray[np.float64] | list[float]) -> NDArray[np.float64]:
-    """Per-band perceived noisiness ``n`` in noys (ICAO Annex 16 App. 2 §4.7).
+    r"""Per-band perceived noisiness ``n`` in noys (ICAO Annex 16 App. 2 §4.7).
 
     The analytic piecewise noy law, using the Table A2-3 constants:
 
-    * ``SPL ≥ SPL(a)``: ``n = 10^{M(c)·(SPL − SPL(c))}``
-    * ``SPL(b) ≤ SPL < SPL(a)``: ``n = 10^{M(b)·(SPL − SPL(b))}``
-    * ``SPL(e) ≤ SPL < SPL(b)``: ``n = 0.3·10^{M(e)·(SPL − SPL(e))}``
-    * ``SPL(d) ≤ SPL < SPL(e)``: ``n = 0.1·10^{M(d)·(SPL − SPL(d))}``
-    * ``SPL < SPL(d)``: ``n = 0`` (below the noy floor)
+    * :math:`\mathrm{SPL} \ge \mathrm{SPL}(a)`:
+      :math:`n = 10^{M(c) \cdot (\mathrm{SPL} - \mathrm{SPL}(c))}`
+    * :math:`\mathrm{SPL}(b) \le \mathrm{SPL} < \mathrm{SPL}(a)`:
+      :math:`n = 10^{M(b) \cdot (\mathrm{SPL} - \mathrm{SPL}(b))}`
+    * :math:`\mathrm{SPL}(e) \le \mathrm{SPL} < \mathrm{SPL}(b)`:
+      :math:`n = 0.3 \cdot 10^{M(e) \cdot (\mathrm{SPL} - \mathrm{SPL}(e))}`
+    * :math:`\mathrm{SPL}(d) \le \mathrm{SPL} < \mathrm{SPL}(e)`:
+      :math:`n = 0.1 \cdot 10^{M(d) \cdot (\mathrm{SPL} - \mathrm{SPL}(d))}`
+    * :math:`\mathrm{SPL} < \mathrm{SPL}(d)`: :math:`n = 0` (below the noy
+      floor)
 
     :param spl: The 24 one-third-octave-band sound pressure levels, in dB.
     :return: The per-band perceived noisiness, in noys.
@@ -128,9 +136,10 @@ def perceived_noisiness(spl: NDArray[np.float64] | list[float]) -> NDArray[np.fl
 
 
 def perceived_noise_level(spl: NDArray[np.float64] | list[float]) -> float:
-    """Perceived noise level ``PNL`` (ICAO Annex 16 App. 2 §4.2), in PNdB.
+    r"""Perceived noise level ``PNL`` (ICAO Annex 16 App. 2 §4.2), in PNdB.
 
-    ``N = 0.85·n_max + 0.15·Σn`` and ``PNL = 40 + (10/lg2)·lg N``. If the total
+    :math:`N = 0.85 \cdot n_{\mathrm{max}} + 0.15 \cdot \sum n` and
+    :math:`\mathrm{PNL} = 40 + (10/\log_{10} 2) \cdot \log_{10} N`. If the total
     noisiness is not positive the PNL is defined as 0.
 
     :param spl: The 24 one-third-octave-band sound pressure levels, in dB.
@@ -152,11 +161,12 @@ def _tone_background(
     spl: NDArray[np.float64] | list[float],
     start: int | None = None,
 ) -> tuple[NDArray[np.float64], NDArray[np.float64]]:
-    """Tone-correction background level ``SPL''`` and excess ``F`` (App. 2 §4.3).
+    r"""Tone-correction background level ``SPL''`` and excess ``F`` (App. 2 §4.3).
 
     Implements Steps 1-8 of the slope ("encircling") method: slopes, the
     encircling of irregular slopes, the adjusted spectrum ``SPL'``, its smoothed
-    slopes, the background ``SPL''`` and the tone excess ``F = SPL − SPL''``.
+    slopes, the background ``SPL''`` and the tone excess
+    :math:`F = \mathrm{SPL} - \mathrm{SPL}''`.
     Bands 1-2 (50, 63 Hz) do not participate; the routine starts at 80 Hz.
 
     :return: ``(spl_background, excess_f)``, each length 24; entries below the
@@ -306,11 +316,18 @@ def epnl_from_pnlt(
     reference_time: float = _EPNL_REFERENCE_TIME,
     tone_corrections: NDArray[np.float64] | list[float] | None = None,
 ) -> tuple[float, float, int, int]:
-    """EPNL from a tone-corrected perceived-noise-level time history (App. 2 §4.5-4.6).
+    r"""EPNL from a tone-corrected perceived-noise-level time history (App. 2 §4.5-4.6).
 
-    ``EPNL = 10·lg( Σ_{kF..kL} 10^{PNLT(k)/10}·Δt(k) ) − 10·lg(T0)`` with the
+    .. math::
+
+       \mathrm{EPNL} = 10 \cdot \log_{10}\left( \sum_{k_F..k_L}
+       10^{\mathrm{PNLT}(k)/10} \cdot \Delta t(k) \right)
+       - 10 \cdot \log_{10}(T_0)
+
+    with the
     10 dB-down integration limits about the maximum ``PNLTM``. The exact
-    ``−10·lg(T0)`` form is used rather than the Annex's rounded constant 13 for
+    :math:`-10 \cdot \log_{10}(T_0)` form is used rather than the Annex's rounded
+    constant 13 for
     uniform 0.5 s records (difference 0.0103 dB); the ETM Table 4-4 integrated
     reference reproduces the exact form to five decimals.
 
@@ -359,7 +376,7 @@ def epnl_from_pnlt(
 
 @dataclass(frozen=True)
 class EPNLResult:
-    """Effective Perceived Noise Level of an aircraft flyover (ICAO Annex 16).
+    r"""Effective Perceived Noise Level of an aircraft flyover (ICAO Annex 16).
 
     :ivar frequencies: The 24 one-third-octave band centre frequencies, in Hz.
     :ivar times: Record times, in s.
@@ -370,7 +387,8 @@ class EPNLResult:
         including the bandsharing adjustment ``ΔB`` (App. 2 §4.4.3).
     :ivar bandsharing_adjustment: The bandsharing adjustment ``ΔB``, in dB
         (zero unless the tone correction at PNLTM is suppressed).
-    :ivar duration_correction: Duration correction ``D = EPNL − PNLTM``, in dB.
+    :ivar duration_correction: Duration correction
+        :math:`D = \mathrm{EPNL} - \mathrm{PNLTM}`, in dB.
     :ivar epnl: Effective perceived noise level, in EPNdB.
     :ivar band_limits: The 0-based 10 dB-down record indices ``(kF, kL)``.
     """
@@ -459,12 +477,13 @@ def effective_perceived_noise_level(
     reference_time: float = _EPNL_REFERENCE_TIME,
     procedure: str = "aeroplane",
 ) -> EPNLResult:
-    """Effective Perceived Noise Level from a spectral time history (ICAO Annex 16).
+    r"""Effective Perceived Noise Level from a spectral time history (ICAO Annex 16).
 
     Each record (row) is a 24-band one-third-octave spectrum sampled every
     ``dt`` seconds. The per-record ``PNL`` and tone correction ``C`` give
-    ``PNLT = PNL + C``; the maximum ``PNLTM`` and the duration correction over
-    the 10 dB-down window give ``EPNL = PNLTM + D``.
+    :math:`\mathrm{PNLT} = \mathrm{PNL} + C`; the maximum ``PNLTM`` and the
+    duration correction over
+    the 10 dB-down window give :math:`\mathrm{EPNL} = \mathrm{PNLTM} + D`.
 
     :param spectra: Spectral time history, shape ``(K, 24)``, in dB.
     :param dt: Per-record duration, in s (scalar or per record, default 0.5).
