@@ -207,13 +207,13 @@ La media angular es el puente hacia los dos descriptores de unión usados en los
 modelos de edificios basados en SEA: el **factor de pérdidas por acoplamiento**
 (Ec. 2.154) $\eta_{ij} = c_{g,i} L_{ij} \tau_{ij} / (2\pi^2 f S_i)$ y el
 **índice de reducción vibracional** del enfoque ondulatorio (Ec. 5.116)
-$K_{ij} = 10\lg(1/\tau_{ij}) + 5\lg(f_{c,j}/f_\text{ref})$ con
+$K_{ij} = 10\log_{10}(1/\tau_{ij}) + 5\log_{10}(f_{c,j}/f_\text{ref})$ con
 $f_\text{ref} = 1000\ \text{Hz}$ y $f_{c,j}$
 la frecuencia crítica de la placa *receptora*. Combinada con la reciprocidad de
 la Ec. 5.7, esta forma es simétrica, $K_{ij} = K_{ji}$, como exige la EN 12354
 al descriptor de unión. Para la unión en X idéntica de hormigón de 100 mm
 ($f_c \approx 203\ \text{Hz}$),
-$K_{ij} = 10\lg 12 + 5\lg(203/1000) \approx 7{,}3\ \text{dB}$.
+$K_{ij} = 10\log_{10} 12 + 5\log_{10}(203/1000) \approx 7{,}3\ \text{dB}$.
 
 ```python
 from phonometry import (coupling_loss_factor, junction_transmission,

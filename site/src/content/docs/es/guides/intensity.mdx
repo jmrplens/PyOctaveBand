@@ -366,7 +366,7 @@ IEC 61043 clasifica el hardware. La tabla 2 de la norma fija un $\delta_{pI0}$
 para una **sonda**, un **procesador** y un **instrumento completo**, en
 clase 1 y clase 2, impreso para la separación nominal entre micrófonos de
 25 mm. La nota 1 reescala toda la tabla para cualquier otro separador con
-$+10\lg(x/25)$, con $x$ en milímetros: los mismos 3 dB por duplicación a los
+$+10\log_{10}(x/25)$, con $x$ en milímetros: los mismos 3 dB por duplicación a los
 que llegaba el apartado anterior a partir de la física.
 
 `intensity_class_compliance` compara un espectro de $\delta_{pI0}$ medido con
@@ -397,7 +397,7 @@ res.report("verificacion.pdf")    # ficha de verificación de una página (PDF)
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/intensity_class_es.svg" alt="Índice presión-intensidad residual medido de un instrumento de intensidad completo con separador de 12 mm, dibujado como curva escalonada sobre los mínimos de clase 1 y clase 2 de la tabla 2 de IEC 61043; la región de aceptación de clase 2 sombreada queda por encima de la máscara discontinua de clase 2, y la banda de 100 Hz aparece marcada donde el índice medido cae por debajo de la máscara continua de clase 1" width="92%" />
 
-*Ambas máscaras de la tabla 2 bajan $10\lg(12/25) = -3{,}2\ \text{dB}$ por el
+*Ambas máscaras de la tabla 2 bajan $10\log_{10}(12/25) = -3{,}2\ \text{dB}$ por el
 separador
 de 12 mm. El índice medido sube 10 dB por década en baja frecuencia, paralelo
 al requisito, porque un desfase entre canales constante en grados compra
@@ -516,7 +516,7 @@ opuestos:
   Bajar la frecuencia encoge la señal, no el error, así que el margen sobre
   $\delta_{pI0}$ se desploma en baja frecuencia. Un separador mayor recupera
   ese margen: los requisitos de índice residual de IEC 61043 escalan como
-  $10\lg(\Delta r/25\ \text{mm})$, de modo que doblar el separador aporta
+  $10\log_{10}(\Delta r/25\ \text{mm})$, de modo que doblar el separador aporta
   3 dB de margen en baja frecuencia.
 
 Ningún separador cubre por sí solo todo el rango de audio: el de 6 mm sirve

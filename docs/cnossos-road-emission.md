@@ -40,7 +40,7 @@ For each vehicle category $m$ and octave band $i$, formula (2.2.1) turns a
 single-vehicle sound power into a power per metre of line:
 
 $$
-L'_{W,\mathrm{eq,line},i,m} = L_{W,i,m} + 10\,\lg\!\left(\frac{Q_m}{1000\,v_m}\right),
+L'_{W,\mathrm{eq,line},i,m} = L_{W,i,m} + 10\,\log_{10}\!\left(\frac{Q_m}{1000\,v_m}\right),
 $$
 
 with $Q_m$ in vehicles per hour and $v_m$ in km/h. The vehicle power itself is
@@ -49,7 +49,7 @@ powered two-wheelers of category 4, which have no rolling noise at all and take
 the propulsion term alone (2.2.3):
 
 $$
-L_{W,i,m} = 10\,\lg\!\left(10^{L_{WR,i,m}/10} + 10^{L_{WP,i,m}/10}\right).
+L_{W,i,m} = 10\,\log_{10}\!\left(10^{L_{WR,i,m}/10} + 10^{L_{WP,i,m}/10}\right).
 $$
 
 Table [2.2.a] fixes five modelled categories: **1** light motor vehicles, **2**
@@ -94,7 +94,7 @@ Rolling noise is tyre-road noise. It grows logarithmically with speed from the
 reference speed $v_\mathrm{ref} = 70\ \text{km/h}$:
 
 $$
-L_{WR,i,m} = A_{R,i,m} + B_{R,i,m}\,\lg\!\left(\frac{v_m}{v_\mathrm{ref}}\right)
+L_{WR,i,m} = A_{R,i,m} + B_{R,i,m}\,\log_{10}\!\left(\frac{v_m}{v_\mathrm{ref}}\right)
              + \Delta L_{WR,i,m},
 $$
 
@@ -113,7 +113,7 @@ fleet-level correction weights it by the share of the year that studded tyres
 are on the road, $p_s = Q_{\mathrm{stud,ratio}} \cdot T_s/12$:
 
 $$
-\Delta L_{\mathrm{studded},i} = 10\,\lg\!\left[(1 - p_s) + p_s\,10^{D_{\mathrm{stud},i}/10}\right].
+\Delta L_{\mathrm{studded},i} = 10\,\log_{10}\!\left[(1 - p_s) + p_s\,10^{D_{\mathrm{stud},i}/10}\right].
 $$
 
 **Junctions** (2.2.17) add $C_{R,m,k} \cdot \max(1 - |x|/100,\ 0)$, with $x$
@@ -197,7 +197,7 @@ valid. The surface enters the two terms
 differently:
 
 $$
-\Delta L_{WR,\mathrm{road},i,m} = \alpha_{i,m} + \beta_m\,\lg\!\left(\frac{v_m}{v_\mathrm{ref}}\right),
+\Delta L_{WR,\mathrm{road},i,m} = \alpha_{i,m} + \beta_m\,\log_{10}\!\left(\frac{v_m}{v_\mathrm{ref}}\right),
 \qquad
 \Delta L_{WP,\mathrm{road},i,m} = \min\{\alpha_{i,m};\,0\}.
 $$
@@ -230,7 +230,7 @@ $A_{P,i,m}$.
 The emission stage produces a power per metre. Splitting that line into
 equivalent point sources is, in the words of section 2.5.3, "outside the scope
 of the current methodology": a point source standing for a segment of length
-$dL$ simply carries $L'_{W,\mathrm{eq,line},i} + 10\lg(dL)$, which is
+$dL$ simply carries $L'_{W,\mathrm{eq,line},i} + 10\log_{10}(dL)$, which is
 arithmetic and is offered as such.
 
 ```python

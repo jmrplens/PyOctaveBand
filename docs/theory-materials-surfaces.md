@@ -26,7 +26,7 @@ $$
 each $\alpha$ being a two-condition Sabine difference
 $55.3 (V/S) [1/(c_b T_b) - 1/(c_a T_a)] - 4 (V/S)(m_b - m_a)$ with
 $c = 343.2 \sqrt{(273.15 + t)/293.15}$ (Formula 2) and $m$ from ISO 9613-1
-via $m = \alpha_{dB}/(10 \lg e)$ (Formula 3). The base plate itself must
+via $m = \alpha_{dB}/(10 \log_{10} e)$ (Formula 3). The base plate itself must
 scatter little: Table 1 caps its coefficient (Formula 6) at 0.05–0.25 across
 100 Hz – 5 kHz (clause 6.2). Negative $s$ is truncated to zero for
 presentation (clause 8.3), but values above 1 near grazing bands are kept
@@ -171,7 +171,7 @@ from which the anechoic-backing normal-incidence transmission loss is
 (Eqs. 25/26)
 
 $$
-TL = 20 \lg \frac{\left| T_{11} + T_{12}/\rho c + \rho c\ T_{21} + T_{22} \right|}{2},
+TL = 20 \log_{10} \frac{\left| T_{11} + T_{12}/\rho c + \rho c\ T_{21} + T_{22} \right|}{2},
 $$
 
 plus the hard-backed reflection

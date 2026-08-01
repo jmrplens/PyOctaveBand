@@ -50,7 +50,7 @@ print(underwater.hearing_groups("nmfs-2018"))
 Equation (1), after Finneran (2016):
 
 $$
-T(f) = T_0 + A \lg\!\left(1 + \frac{F_1}{f}\right) + (f/F_2)^{B},
+T(f) = T_0 + A \log_{10}\!\left(1 + \frac{F_1}{f}\right) + (f/F_2)^{B},
 $$
 
 with $f$ in kilohertz. `normalized=False` (the default) uses the Table 2
@@ -97,7 +97,7 @@ All three current criteria sets use the same generic band-pass filter (NMFS
 2018 Equation 1, Southall et al. Equation 2):
 
 $$
-W(f) = C + 10 \lg \frac{(f/f_1)^{2a}}
+W(f) = C + 10 \log_{10} \frac{(f/f_1)^{2a}}
                        {\left[1+(f/f_1)^2\right]^{a}\left[1+(f/f_2)^2\right]^{b}} ,
 $$
 
@@ -199,7 +199,7 @@ the recorded strike to the verdict:
    `single_strike_sel` of [Underwater acoustics](underwater-acoustics.md), by
    Parseval);
 2. `weighted_exposure` applies $W(f)$ band by band, sums the weighted energy,
-   accumulates it over the number of strikes (the ISO 18406 $+10\lg N$) and
+   accumulates it over the number of strikes (the ISO 18406 $+10\log_{10} N$) and
    compares the result with the criteria, unweighted peak SPL included.
 
 ```python

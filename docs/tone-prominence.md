@@ -39,7 +39,7 @@ Formula 23):
 
 $$
 \mathrm{TNR} = L_t - L_n, \qquad
-\mathrm{PR} = 10\,\lg\!\frac{W_M}{\tfrac{1}{2}(W_L + W_U)}\ \text{dB},
+\mathrm{PR} = 10\,\log_{10}\!\frac{W_M}{\tfrac{1}{2}(W_L + W_U)}\ \text{dB},
 $$
 
 where $L_t$ is the tone level (the energy sum of the tonal lines above the

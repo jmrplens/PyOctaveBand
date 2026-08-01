@@ -423,7 +423,7 @@ where inertial forces in the element are negligible the **loss factor** is the
 tangent of the phase angle of $k_{2,1}$ (ISO 10846-1, 3.8):
 
 $$
-L_k = 10\lg\frac{|k_{2,1}|^2}{k_0^2} = 20\lg\frac{|k_{2,1}|}{k_0}, \qquad
+L_k = 10\log_{10}\frac{|k_{2,1}|^2}{k_0^2} = 20\log_{10}\frac{|k_{2,1}|}{k_0}, \qquad
 \eta = \frac{\mathrm{Im}(k_{2,1})}{\mathrm{Re}(k_{2,1})}.
 $$
 
@@ -525,7 +525,7 @@ frequency range on both sides:
   blocking mass no longer moves as a rigid body; results are valid only while
   its measured effective mass $m_{2,\text{eff}} = 2F_2/(a'_1 + a''_1)$ (Eq. 4)
   stays within 1 dB of the rigid mass:
-  $10\lg(m_{2,\text{eff}}^2/m_2^2) \le 1\ \text{dB}$.
+  $10\log_{10}(m_{2,\text{eff}}^2/m_2^2) \le 1\ \text{dB}$.
 * **Linearity (clause 7.6).** Two input spectra 10 dB apart must give
   transfer-stiffness levels within 1.5 dB.
 
@@ -666,14 +666,14 @@ mean-square vibratory velocity over the radiating area $S$. Expressed in levels
 power level is (Formula 12 / 15)
 
 $$
-L_W = L_v + 10\lg\frac{S}{S_0} + 10\lg\varepsilon
-      + 10\lg\frac{Z_{c,n}}{Z_{c,0}},
+L_W = L_v + 10\log_{10}\frac{S}{S_0} + 10\log_{10}\varepsilon
+      + 10\log_{10}\frac{Z_{c,n}}{Z_{c,0}},
 $$
 
 where $S_0 = 1\ \text{m}^2$, the normalized impedance
 $Z_{c,n} = 411\ \text{N·s/m}^3$ and the reference
 $Z_{c,0} = 400\ \text{N·s/m}^3$ give the fixed
-$10\lg(411/400) = 0.118\ \text{dB}$
+$10\log_{10}(411/400) = 0.118\ \text{dB}$
 term. This module feeds the structure-borne source and building prediction
 standards (ISO 9611, EN 15657, EN 12354-5).
 
@@ -772,9 +772,9 @@ eng.plot()   # the LW(f) spectrum, as in the figure above (needs matplotlib)
 
 ## 2. Velocity level, calibration and the radiation factor
 
-The velocity level is $L_v = 20\lg(v/v_0)$ (Formula 3); a sinusoidal
+The velocity level is $L_v = 20\log_{10}(v/v_0)$ (Formula 3); a sinusoidal
 calibration acceleration converts as
-$L_v = 20\lg\!\left(\hat{a}/(2\pi f\,v_0\sqrt{2})\right)$ (Formula 8). The
+$L_v = 20\log_{10}\!\left(\hat{a}/(2\pi f\,v_0\sqrt{2})\right)$ (Formula 8). The
 radiation factor comes from an independently measured power:
 
 ```python
@@ -924,7 +924,7 @@ velocity level and its calibration
 correction (Table 2), the radiation factor (Formula 4/8) and the sound power
 level (Formulae 12/15). Conformance is anchored on the standard's own worked
 calibration example, the exact round-trip between the radiation factor and
-$L_W = 10\lg(P/P_0)$, and the fixed impedance term.
+$L_W = 10\log_{10}(P/P_0)$, and the fixed impedance term.
 
 ---
 
@@ -1002,19 +1002,19 @@ $P = \omega\,\eta\,(m S)\,\langle v^2 \rangle$, so the injected
 power level in one-third-octave bands is (Formula 14)
 
 $$
-L_{Ws} = 10\lg\!\left(\frac{2\pi f\,\eta\,m\,S}{f_0\,m_0\,S_0}\right)
+L_{Ws} = 10\log_{10}\!\left(\frac{2\pi f\,\eta\,m\,S}{f_0\,m_0\,S_0}\right)
          + L_v - 60 \;\;[\mathrm{dB\ re\ 1\ pW}],
 $$
 
 with references $f_0 = 1\ \text{Hz}$, $m_0 = 1\ \text{kg}$,
-$S_0 = 1\ \text{m}^2$; the $-60\ \text{dB}$ term is $10\lg(v_0^2/P_0)$ for
+$S_0 = 1\ \text{m}^2$; the $-60\ \text{dB}$ term is $10\log_{10}(v_0^2/P_0)$ for
 the EN 15657 velocity reference $v_0 = 10^{-9}\ \text{m/s}$. The plate
 velocity is the energetic spatial average over the $N$ positions (Formula 12)
 and the loss factor comes from the structural reverberation time $T_s$
 (Formula 13, identical to the ISO 10848 total loss factor):
 
 $$
-L_v = 10\lg\!\Big(\tfrac{1}{N}\textstyle\sum 10^{L_{v,i}/10}\Big), \qquad
+L_v = 10\log_{10}\!\Big(\tfrac{1}{N}\textstyle\sum 10^{L_{v,i}/10}\Big), \qquad
 \eta = \frac{2.2}{f\,T_s}.
 $$
 
@@ -1055,7 +1055,7 @@ plate-independent quantities: the **equivalent blocked force level**
 (Formula 15, re $F_0 = 10^{-6}\ \text{N}$) from the low-mobility plate,
 
 $$
-L_{Fb,eq} = L_{Ws,\mathrm{low}} - 10\lg\frac{\mathrm{Re}\{Y_{R,\mathrm{low,eq}}\}}{Y_0},
+L_{Fb,eq} = L_{Ws,\mathrm{low}} - 10\log_{10}\frac{\mathrm{Re}\{Y_{R,\mathrm{low,eq}}\}}{Y_0},
 $$
 
 the **characteristic reception-plate power level** that EN 12354-5 consumes
@@ -1064,7 +1064,7 @@ mobility $Y_{R,\infty,\text{low}} = 5\times10^{-6}\ \text{m/(N·s)}$
 (clause 7.2.4),
 
 $$
-L_{Wsn} = L_{Fb,eq} + 10\lg\frac{Y_{R,\infty,\mathrm{low}}}{Y_0},
+L_{Wsn} = L_{Fb,eq} + 10\log_{10}\frac{Y_{R,\infty,\mathrm{low}}}{Y_0},
 $$
 
 and, from the high-mobility plate, the **equivalent free velocity level**
@@ -1202,7 +1202,7 @@ mobilities set how much power is actually coupled into the structure, and the
 building transmission carries it to the receiving room. The Annex I mobility
 correction `installed_power_from_reception_plate` refers the characteristic
 reception-plate level $L_{Ws,n}$ to the actual receiver,
-$L_{Ws,\mathrm{inst}} = L_{Ws,n} + 10\lg(Y_{\infty,i} / Y_{\infty,\mathrm{rec}})$
+$L_{Ws,\mathrm{inst}} = L_{Ws,n} + 10\log_{10}(Y_{\infty,i} / Y_{\infty,\mathrm{rec}})$
 with $Y_{\infty,\mathrm{rec}} = 5\cdot 10^{-6}\ \text{m/(N·s)}$;
 with the source mobility instead it yields $L_{Ws,c}$ (Annex I.3, Table I.8).
 
@@ -1245,11 +1245,11 @@ excitation by the source mobility $Y_s$ and the receiver mobility $Y_i$
 (Formula 19b):
 
 $$
-D_{C,i} = 10\lg\frac{|Y_s + Y_i|^2}{|Y_s|\,\mathrm{Re}\{Y_i\}},
+D_{C,i} = 10\log_{10}\frac{|Y_s + Y_i|^2}{|Y_s|\,\mathrm{Re}\{Y_i\}},
 $$
 
-which reduces to $10\lg(|Y_s|/\mathrm{Re}\{Y_i\})$ for a **force source** (high source
-mobility, Formula 19c) and to $-10\lg(|Y_s|\,\mathrm{Re}\{Z_i\})$ for a **velocity source**
+which reduces to $10\log_{10}(|Y_s|/\mathrm{Re}\{Y_i\})$ for a **force source** (high source
+mobility, Formula 19c) and to $-10\log_{10}(|Y_s|\,\mathrm{Re}\{Z_i\})$ for a **velocity source**
 (low source mobility, Formula 19d); an elastic support adds its transfer
 mobility $Y_k$ inside the modulus (Formula 19e). The **installed** power level is
 then (Formula 18b) $L_{Ws,\mathrm{inst}} = L_{Ws,c} - D_C$.
@@ -1295,7 +1295,7 @@ sound reduction index $R_{ij,\mathrm{ref}}$ (EN 12354-1) and the element area
 
 $$
 L_{n,s,ij} = L_{Ws,\mathrm{inst},i} - D_{sa,i} - R_{ij,\mathrm{ref}}
-             - 10\lg\frac{S_i}{S_0} - 10\lg\frac{A_0}{4},
+             - 10\log_{10}\frac{S_i}{S_0} - 10\log_{10}\frac{A_0}{4},
 $$
 
 with $S_0 = A_0 = 10\ \text{m}^2$, and the paths combine energetically (Formula 17):
@@ -1630,7 +1630,7 @@ $$
 and the wave-approach **vibration reduction index** (Eq. 5.116) is
 
 $$
-K_{ij} = 10\lg(1/\tau_{ij}) + 5\lg(f_{c,j}/f_\text{ref}),
+K_{ij} = 10\log_{10}(1/\tau_{ij}) + 5\log_{10}(f_{c,j}/f_\text{ref}),
 \qquad f_\text{ref} = 1000\ \text{Hz}
 $$
 
@@ -1638,7 +1638,7 @@ with $f_{c,j}$ the critical frequency of the *receiving* plate. Combined with
 the Eq. 5.7 reciprocity this form is symmetric, $K_{ij} = K_{ji}$, as EN 12354
 requires of the junction descriptor. For the identical 100 mm concrete
 X-junction ($f_c \approx 203\ \text{Hz}$),
-$K_{ij} = 10\lg 12 + 5\lg(203/1000) \approx 7.3\ \text{dB}$.
+$K_{ij} = 10\log_{10} 12 + 5\log_{10}(203/1000) \approx 7.3\ \text{dB}$.
 
 ```python
 from phonometry import (coupling_loss_factor, junction_transmission,

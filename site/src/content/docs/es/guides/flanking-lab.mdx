@@ -87,7 +87,7 @@ toma como entrada, junto con los descriptores globales de flanco $D_{n,f}$
 empírica `junction_vibration_reduction()` de esa predicción.
 
 **Índice de reducción de vibraciones (Fórmula (13)).**
-$K_{ij} = \overline{D}_{v,ij} + 10\lg\!\big(l_{ij} / \sqrt{a_i a_j}\big)$ dB, a
+$K_{ij} = \overline{D}_{v,ij} + 10\log_{10}\!\big(l_{ij} / \sqrt{a_i a_j}\big)$ dB, a
 partir de la diferencia de nivel de velocidad promediada en dirección
 $\overline{D}_{v,ij} = \tfrac{1}{2}(D_{v,ij} + D_{v,ji})$ (Fórmula (11), que hace
 $K_{ij}$ simétrico), la longitud de unión de arista común $l_{ij}$ y las
@@ -97,8 +97,8 @@ $f_\text{ref} = 1000$ Hz). Para elementos ligeros y bien amortiguados
 $a_j = S_j / l_0$ ($l_0 = 1$ m) y la Fórmula (13) se reduce a la Fórmula (14)
 simplificada. El **factor de pérdidas total** asociado es $\eta = 2{,}2/(f T_s)$.
 
-**Descriptores globales.** $D_{n,f} = L_1 - L_2 - 10\lg(A/A_0)$ (Fórmula (4),
-aéreo) y $L_{n,f} = L_2 + 10\lg(A/A_0)$ (Fórmula (5), máquina de impactos),
+**Descriptores globales.** $D_{n,f} = L_1 - L_2 - 10\log_{10}(A/A_0)$ (Fórmula (4),
+aéreo) y $L_{n,f} = L_2 + 10\log_{10}(A/A_0)$ (Fórmula (5), máquina de impactos),
 $A_0 = 10\ \text{m}^2$; sus números únicos $D_{n,f,w}$ / $L_{n,f,w}$ reutilizan
 los motores de ISO 717. El número único $\overline{K}_{ij}$ es la media
 aritmética entre 200 y 1250 Hz en tercios de octava, o entre 125 y 1000 Hz en
@@ -257,14 +257,14 @@ $s_S = s_R = 0{,}5$ eso se reduce a la forma compacta que hace visible la
 geometría (Ecs. (9.19) y (9.20)):
 
 $$
-R_{cl} = R_S + R_R - 10\lg\!\left[\frac{\varepsilon^2 L_R}{4h}\right],
+R_{cl} = R_S + R_R - 10\log_{10}\!\left[\frac{\varepsilon^2 L_R}{4h}\right],
 $$
 
 con $\varepsilon = 1$ para paredes laterales del plenum totalmente absorbentes
 y $\varepsilon = 2$ para totalmente reflectantes. Un plenum profundo ayuda, un
 recinto largo perjudica, y duplicar el aislamiento de las placas ayuda el doble
 porque $R_S$ y $R_R$ aparecen los dos. Referido al área del tabique en lugar de
-a la del techo, $R_{cl,p} = R_{cl} + 10\lg(H_S/L_S)$ (Ec. (9.13)), que es lo
+a la del techo, $R_{cl,p} = R_{cl} + 10\log_{10}(H_S/L_S)$ (Ec. (9.13)), que es lo
 que permite sumar el trayecto por el techo al trayecto directo como factores de
 transmisión.
 
@@ -296,7 +296,7 @@ print(partition_referenced_reduction_index(res.reduction_index, 2.7, 4.75))
 ```
 
 **La magnitud medida.** Un techo no se valora por $R_{cl}$ sino por la
-**diferencia de niveles normalizada del techo suspendido** $D_{n,c} = D - 10\lg(A/A_0)$
+**diferencia de niveles normalizada del techo suspendido** $D_{n,c} = D - 10\log_{10}(A/A_0)$
 (ISO 140-9:1985, apartado 3.3), con $A$ el área de absorción acústica
 equivalente del recinto receptor y la referencia $A_0 = 10\ \text{m}^2$. La
 instalación tiene dos recintos de al menos 50 m³ cuyos volúmenes difieren en al
@@ -307,7 +307,7 @@ revestimiento, $\alpha_s \ge 0{,}65$ a 125 Hz y $\ge 0{,}80$ de 250 Hz a
 4000 Hz, y exige $\alpha < 0{,}10$ en la otra pared lateral y en el techo del
 plenum. Su equivalente norteamericana, ASTM E1414, usa
 $A_0 = 12\ \text{m}^2$, de modo que un valor ASTM queda unos
-$10\lg(12/10) = 0{,}79$ dB por encima para los mismos recintos.
+$10\log_{10}(12/10) = 0{,}79$ dB por encima para los mismos recintos.
 
 ISO valora $D_{n,c}$ con la curva de ISO 717-1, dando $D_{n,c,w}$; ASTM E1414
 lo valora a través de ASTM E413 como **clase de atenuación de techo**. E413

@@ -224,7 +224,7 @@ plt.show()
 </details>
 
 The airborne counterpart of that closure is Formula (5b),
-$D_{nT} = R' + 10\lg(0.32\,V/S_s)$, exposed as `standardized_level_difference`;
+$D_{nT} = R' + 10\log_{10}(0.32\,V/S_s)$, exposed as `standardized_level_difference`;
 it closes the Annex H.3 example (`standardized_level_difference(52.2, 50.0,
 11.5)` gives 53.6 dB, the printed $V/(3S)$ chain 53.8 dB, both rounding to
 $D_{nT,w} = 54$ dB).
@@ -434,7 +434,7 @@ junction actually produces (Formula 10):
 
 $$
 \overline{D}_{v,ij,\text{situ}} = K_{ij}
-- 10\lg\!\left(\frac{l_{ij}}{\sqrt{a_{i,\text{situ}}\,a_{j,\text{situ}}}}\right)
+- 10\log_{10}\!\left(\frac{l_{ij}}{\sqrt{a_{i,\text{situ}}\,a_{j,\text{situ}}}}\right)
 \ \ge 0\ \text{dB}
 $$
 
@@ -446,16 +446,16 @@ $$
 R_{ij} = \frac{R_{i,\text{situ}}}{2} + \Delta R_{i,\text{situ}}
 + \frac{R_{j,\text{situ}}}{2} + \Delta R_{j,\text{situ}}
 + \overline{D}_{v,ij,\text{situ}}
-+ 10\lg\!\left(\frac{S_s}{\sqrt{S_i S_j}}\right)
++ 10\log_{10}\!\left(\frac{S_s}{\sqrt{S_i S_j}}\right)
 $$
 
 The impact side runs in parallel: the bare slab's per-band level is
-$L_n = 155 - 30\lg m' + 10\lg T_s + 10\lg\sigma + 10\lg(f/f_\text{ref})$
+$L_n = 155 - 30\log_{10} m' + 10\log_{10} T_s + 10\log_{10}\sigma + 10\log_{10}(f/f_\text{ref})$
 (Part 2 Formula B.2), the direct path subtracts the covering and any ceiling
 (Formula 11), and each flanking path is Formula (12).
 
-**5. Assembly.** $R' = -10\lg\sum 10^{-R/10}$ over the thirteen paths of a
-four-flanking-element room, and $L'_n = 10\lg\sum 10^{L_n/10}$ over the five
+**5. Assembly.** $R' = -10\log_{10}\sum 10^{-R/10}$ over the thirteen paths of a
+four-flanking-element room, and $L'_n = 10\log_{10}\sum 10^{L_n/10}$ over the five
 impact paths, then ISO 717.
 
 ## The worked building of Annex L / Annex G
@@ -703,8 +703,8 @@ ln_13 = flanking_impact_level_from_flanking_level(
 
 Two identities let a spectrum check itself. For a homogeneous floor the
 airborne index and the impact level add up to a function of frequency alone
-(Part 2 Formulae B.3/B.4), $R + L_n = 38 + 30\lg f$ in one-third-octave bands
-and $43 + 30\lg f$ in octave bands, valid where forced transmission is
+(Part 2 Formulae B.3/B.4), $R + L_n = 38 + 30\log_{10} f$ in one-third-octave bands
+and $43 + 30\log_{10} f$ in octave bands, valid where forced transmission is
 negligible; `reciprocity_impact_level` implements it. And Table B.2 of Part 2
 tabulates the octave-band $L_n$ of four monolithic floors calculated the way
 this module does, a useful sanity target for a new floor build-up.
@@ -826,7 +826,7 @@ the free bending wavelength matches the trace wavelength and the panel goes
 transparent: the **coincidence dip**. Sharp's method holds the field-incidence
 mass law up to $f_c/2$, drops through a straight line in $\log f$, and from $f_c$
 upward follows Eq. 7.44 with the loss factor $\eta$; the dip sits at Bies
-design-chart point B, $TL = 20\lg(f_c m'') + 10\lg\eta - 44$.
+design-chart point B, $TL = 20\log_{10}(f_c m'') + 10\log_{10}\eta - 44$.
 
 The whole section in one sketch: a diffuse field drives a single leaf, and the
 predicted $R(f)$ climbs with the mass law until the coincidence dip. A 12.5 mm
@@ -948,7 +948,7 @@ width.
 The construction has three parts:
 
 1. the **field-incidence mass law**
-   $TL = 10\lg(1 + (\pi f m''/\rho_0 c_0)^2) - 5\ \text{dB}$
+   $TL = 10\log_{10}(1 + (\pi f m''/\rho_0 c_0)^2) - 5\ \text{dB}$
    (Norton Eqs. 3.104 and 3.106), rising 6 dB per octave;
 2. a horizontal **coincidence plateau** at the tabulated height, with point
    **A** where the mass-law line reaches it;
@@ -1012,7 +1012,7 @@ print(res.transmission_loss.round(1))
 
 The physical model has its own Norton-flavoured variant for the region above
 coincidence: `coincidence_model="cremer"` replaces Sharp's Eq. 7.44 with
-Cremer's empirical $TL = TL_0 + 10\lg(f/f_c - 1) + 10\lg\eta - 2\ \text{dB}$
+Cremer's empirical $TL = TL_0 + 10\log_{10}(f/f_c - 1) + 10\log_{10}\eta - 2\ \text{dB}$
 (Norton Eq. 3.110), and runs the mass law right up to $f_c$ with no interpolated
 bridge. Both rise at about 10 dB per octave far above coincidence; they differ
 in how they leave the dip.
@@ -1378,7 +1378,7 @@ $$
 R = -10\log_{10}\!\left( \frac{1}{\sum_n S_n} \sum_n S_n\, 10^{-R_n/10} \right),
 $$
 
-so a bare opening of relative area $S_a/S$ caps the composite at $10\lg(S/S_a)$:
+so a bare opening of relative area $S_a/S$ caps the composite at $10\log_{10}(S/S_a)$:
 a 1 % opening can never do better than 20 dB, whatever the wall.
 
 ```python
@@ -1607,13 +1607,13 @@ concrete plate; a standard tapping machine excites it and the structure-borne
 covering. For locally-reacting coverings that acceleration-level difference
 equals the ISO 10140 impact sound reduction.
 
-**Acceleration level (Formula (1)).** $L_a = 10\lg(\langle a^2\rangle / a_0^2)$ dB,
+**Acceleration level (Formula (1)).** $L_a = 10\log_{10}(\langle a^2\rangle / a_0^2)$ dB,
 reference $a_0 = 10^{-6}\ \text{m/s}^2$. **Background correction (Formula (2))**
 follows the ISO 10140 three-branch rule (unchanged ≥ 15 dB; energy subtraction
 for 6 ≤ margin < 15 dB; the 1.3 dB limit below 6 dB, flagged as $> \Delta L$).
 The improvement is the position-averaged difference
 $\Delta L = L_0 - L_1$ (Formulae (3)/(4)); octaves follow
-$\Delta L_\text{oct} = -10\lg[\tfrac{1}{3}\sum 10^{-\Delta L_n/10}]$ (Formula (5)).
+$\Delta L_\text{oct} = -10\log_{10}[\tfrac{1}{3}\sum 10^{-\Delta L_n/10}]$ (Formula (5)).
 
 **Weighted improvement.** $\Delta L_w$ is the ISO 717-2 weighted reduction: the
 improvement is applied to the heavyweight **reference floor** $L_{n,r,0}$
@@ -1740,9 +1740,9 @@ a straight slope per Formula (C.1), with the steeper Formula (C.3) for
 constructions whose higher internal losses follow the infinite-plate theory:
 
 $$
-\Delta L = 30 \lg \frac{f}{f_0}\ \text{dB (sand/cement, calcium-sulfate screeds)},
+\Delta L = 30 \log_{10} \frac{f}{f_0}\ \text{dB (sand/cement, calcium-sulfate screeds)},
 \qquad
-\Delta L = 40 \lg \frac{f}{f_0}\ \text{dB (asphalt, dry screeds)}.
+\Delta L = 40 \log_{10} \frac{f}{f_0}\ \text{dB (asphalt, dry screeds)}.
 $$
 
 ```python
@@ -1767,7 +1767,7 @@ print(round(13.0 * np.log10(73.5) - 14.2 * np.log10(8.0) + 20.8, 1))   # 32.2 dB
 ```
 
 The closed-form weighted estimate of Formula (C.4),
-$\Delta L_w = 13\lg m' - 14{,}2\lg s' + 20{,}8$ dB, condenses the same
+$\Delta L_w = 13\log_{10} m' - 14{,}2\log_{10} s' + 20{,}8$ dB, condenses the same
 physics into one line: heavier slabs and softer layers rate better. Both
 estimates are design aids kept deliberately on the safe side (the 30 lg
 slope undercuts the 40 lg infinite-plate theory where experimental data say
@@ -2164,7 +2164,7 @@ its mass is negligible and it barely touches the slab's loss factor or bending
 stiffness. So its improvement is simply the ratio of the two force spectra,
 
 $$
-\Delta L = 20 \lg \frac{|F_n|_\text{without}}{|F_n|_\text{with}} \ \text{dB},
+\Delta L = 20 \log_{10} \frac{|F_n|_\text{without}}{|F_n|_\text{with}} \ \text{dB},
 $$
 
 and the whole design collapses to one number, the covering's own cut-off
@@ -2258,9 +2258,9 @@ applies is a question about damping, not about the layer:
 
 | Model | Law | When |
 | --- | --- | --- |
-| `"cremer"` | $\Delta L = 40 \lg (f/f_0)$ | Cremer's infinite-plate result; asphalt screeds and dry floating floors, whose internal losses are high enough to behave as infinite plates (ISO 12354-2 Formula C.3) |
-| `"en12354"` | $\Delta L = 30 \lg (f/f_0)$ | sand-cement and calcium-sulfate screeds, whose low loss factor makes them finite plates with a reverberant bending field (Formula C.1) |
-| `"cremer_hammer"` | $40 \lg (f/f_0) + 10 \lg[1 + (f/f_\text{limit})^2]$ | a lightweight walking surface, where the hammer impedance is no longer negligible; tends to 18 dB per octave |
+| `"cremer"` | $\Delta L = 40 \log_{10} (f/f_0)$ | Cremer's infinite-plate result; asphalt screeds and dry floating floors, whose internal losses are high enough to behave as infinite plates (ISO 12354-2 Formula C.3) |
+| `"en12354"` | $\Delta L = 30 \log_{10} (f/f_0)$ | sand-cement and calcium-sulfate screeds, whose low loss factor makes them finite plates with a reverberant bending field (Formula C.1) |
+| `"cremer_hammer"` | $40 \log_{10} (f/f_0) + 10 \log_{10}[1 + (f/f_\text{limit})^2]$ | a lightweight walking surface, where the hammer impedance is no longer negligible; tends to 18 dB per octave |
 
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/floating_floor_prediction_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/floating_floor_prediction.svg" alt="Improvement of impact sound insulation of a 35 mm floating screed of 73.5 kg per square metre on an 8 meganewton per cubic metre resilient layer: nothing below the 52.8 Hz mass-spring resonance, then the 30 lg law of EN 12354-2 reaching 59 dB at 5 kHz against the steeper 40 lg law of Cremer and the 18 dB per octave branch that includes the tapping-machine hammer impedance" width="80%"></picture>
 
@@ -2320,7 +2320,7 @@ double_floating_floor_resonances(7.25e6, 12.78, 7.25e6, 12.78)  # (74, 194) Hz
 
 The weighted single numbers come straight from the same two inputs, so a
 floating floor can be sized without ever drawing a spectrum:
-$\Delta L_w = 13\lg m' - 14.2\lg s' + 20.8$ dB for a sand-cement screed
+$\Delta L_w = 13\log_{10} m' - 14.2\log_{10} s' + 20.8$ dB for a sand-cement screed
 (Formula C.4) and the steeper Formula (C.5) fit for asphalt and dry floors.
 Heavier slabs and softer layers rate better, and both estimates are
 deliberately on the safe side.
@@ -2357,14 +2357,14 @@ f_0 = \frac{1}{2\pi}\sqrt{\frac{0.111}{d}\left(\frac{1}{m_1'} + \frac{1}{m_2'}\r
 $$
 
 Both stiffnesses are in MN/m³ and both masses per unit area in kg/m², which is
-how the annex prints them: the cavity term of (D.2) is $s' = 0.111/d$ MN/m³
-with $d$ in metres, that is $0.111\times10^{6}/d$ in SI units. Substituting
+how the annex prints them: the cavity term of (D.2) is $s' = 0{,}111/d$ MN/m³
+with $d$ in metres, that is $0{,}111\times10^{6}/d$ in SI units. Substituting
 the SI value without the conversion gives a resonance about a thousand times
 too low.
 
 Table D.1 then reads the weighted improvement off $f_0$, rounded to the
 one-third-octave band it falls in. Below 200 Hz the lining helps, by
-$74.4 - 20\lg f_0 - R_w/2$ dB, and the better the bare wall the less there is
+$74.4 - 20\log_{10} f_0 - R_w/2$ dB, and the better the bare wall the less there is
 to gain. From 200 Hz upwards it costs: 1 dB at 200 Hz falling to 10 dB from
 630 Hz to 1600 Hz, recovering to 5 dB above. Getting the resonance well below
 the range of interest is therefore the entire design brief.
@@ -2416,7 +2416,7 @@ $\Delta L_\text{situ} = \Delta L$ outright. The resonance $f_0 = 52.8$ Hz is
 an *input* of the example, printed in Clause G.1.1's construction data and
 repeated in the box under the table, not a value derived from the grid. And
 the leading 0.0 dB at 50 Hz needs a clamp below $f_0$ that no printed formula
-states: Formula (C.1) is written as $\Delta L = 30\lg(f/f_0)$ with no range of
+states: Formula (C.1) is written as $\Delta L = 30\log_{10}(f/f_0)$ with no range of
 validity at all, and the only condition printed anywhere is the informal
 "for $f > f_0$" inside that same input box. ISO 12354-1:2017 Table L.4 prints
 the identical 21 numbers as $\Delta R_\text{d,situ}$, which confirms the

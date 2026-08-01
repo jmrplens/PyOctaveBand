@@ -19,7 +19,7 @@ frequency-response measurements themselves live in
 
 **Microphones (IEC 60268-4 clause 11).** The sensitivity $M$ is the output
 voltage per unit sound pressure, quoted in mV/Pa; the sensitivity *level* is
-$L_M = 20\lg(M / 1\,\text{V/Pa})$ dB, which is negative for every real
+$L_M = 20\log_{10}(M / 1\,\text{V/Pa})$ dB, which is negative for every real
 microphone (a
 50 mV/Pa studio condenser sits at −26 dB re 1 V/Pa). The classic pitfall is
 the reference: −26 dB re 1 V/Pa and +34 dB re 1 mV/Pa are the *same*
@@ -50,11 +50,11 @@ first-order family mixes an omnidirectional (pressure) term and a cosine
 (pressure-gradient) term, $M(\theta) \propto (1 - b) + b\cos\theta$: $b = 0$
 is the omnidirectional capsule, $b = 1/2$ the cardioid with its null at 180°,
 and $b = 1$ the figure-of-eight with nulls at ±90°. One number condenses the
-pattern: the **directivity index** $D = 20\lg(M_0/M_\mathrm{diff})$ compares the
+pattern: the **directivity index** $D = 20\log_{10}(M_0/M_\mathrm{diff})$ compares the
 reference-axis sensitivity with the diffuse-field sensitivity obtained from
 the clause 11.2.2 a) integral over a rotationally symmetric pattern. An
 omni scores 0 dB, the ideal cardioid and figure-of-eight both
-$10\lg 3 = 4.8$ dB: in a diffuse room field, a cardioid picks up three
+$10\log_{10} 3 = 4.8$ dB: in a diffuse room field, a cardioid picks up three
 times less reverberant power than an omni of equal axial sensitivity, which
 is exactly the ratio a talker-to-microphone distance calculation wants.
 Real patterns hold their textbook shape only over the middle of the band;
@@ -67,7 +67,7 @@ capsule diverge there.
 A microphone's electronics and the air load on its diaphragm set a noise
 floor, expressed as the **equivalent noise level**: the sound pressure
 level whose output would equal the weighted inherent-noise voltage,
-$L_N = 20\lg\bigl((U_N/M)/20\,\mu\text{Pa}\bigr)$. The standard states it
+$L_N = 20\log_{10}\bigl((U_N/M)/20\,\mu\text{Pa}\bigr)$. The standard states it
 with two weightings,
 and the numbers are far apart on paper. The **A-weighted** figure (RMS
 detector) is the one most datasheets quote, e.g. 14 dB(A) for a good studio
@@ -96,16 +96,16 @@ standard's own definitions rather than merely repeated:
 
 - **Sensitivity level** (11.1). The rated free-field sensitivity $M$ (mV/Pa,
   at the 1 kHz reference frequency of 11.3) as a level,
-  $L_M = 20\lg(M / 1\,\text{V/Pa})$: 12.5 mV/Pa is $-38.1$ dB re 1 V/Pa.
+  $L_M = 20\log_{10}(M / 1\,\text{V/Pa})$: 12.5 mV/Pa is $-38.1$ dB re 1 V/Pa.
 - **Effective frequency range** (12.2). The band over which the response,
   normalized to 0 dB at the reference frequency, stays within the stated
   $\pm$ tolerance; the edges are the interpolated tolerance crossings.
-- **Directivity index** (13.2.2). $D = 20\lg(M_0/M_\mathrm{diff})$ with the
+- **Directivity index** (13.2.2). $D = 20\log_{10}(M_0/M_\mathrm{diff})$ with the
   diffuse-field sensitivity from the 11.2.2 a) integral over a rotationally
-  symmetric pattern; the ideal cardioid returns $10\lg 3 = 4.8$ dB.
+  symmetric pattern; the ideal cardioid returns $10\log_{10} 3 = 4.8$ dB.
 - **Equivalent noise level** (17.2). The weighted inherent-noise voltage over
   the rated sensitivity as a sound pressure level,
-  $L_N = 20\lg\bigl((U_N/M)/20\,\mu\text{Pa}\bigr)$, with the
+  $L_N = 20\log_{10}\bigl((U_N/M)/20\,\mu\text{Pa}\bigr)$, with the
   signal-to-noise ratio re 1 Pa
   (94 dB SPL) derived from it. The overload sound pressure level (15.2) is
   read from a distortion-against-level curve at the stated THD limit.

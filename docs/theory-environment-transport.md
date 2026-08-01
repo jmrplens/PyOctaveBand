@@ -33,7 +33,7 @@ See the [Environmental levels guide](environmental-levels.md) for usage.
 An impulse annoys beyond its energy, so environmental surveys after ISO 1996-2 penalize periods containing prominent impulsive sounds; NT ACOU 112:2002 makes that penalty objective. From the A-weighted, time-weighting-F level history of a single event, the onset rate (dB/s) and the level difference (dB) of the onset (which qualifies when steeper than 10 dB/s, clauses 4.5–4.7) predict the perceived prominence (clause 7, Formula 1):
 
 $$
-P = 3 \lg(\text{onset rate}) + 2 \lg(\text{level difference}),
+P = 3 \log_{10}(\text{onset rate}) + 2 \log_{10}(\text{level difference}),
 $$
 
 designed to peak around 15 for very sudden, loud impulses. The adjustment to the measurement-period level takes the governing (highest-$P$) impulse (clause 8, Formula 2):
@@ -45,10 +45,10 @@ $$
 and the whole-day rating level combines the adjusted periods energetically (clause 8, Note 1):
 
 $$
-L_{Ar,T} = 10 \lg\Big[ \frac{1}{T} \sum_N \Delta t_N\ 10^{(L_{Aeq,N} + K_{I,N})/10} \Big].
+L_{Ar,T} = 10 \log_{10}\Big[ \frac{1}{T} \sum_N \Delta t_N\ 10^{(L_{Aeq,N} + K_{I,N})/10} \Big].
 $$
 
-$K_I$ is exactly the kind of source-character adjustment that enters the ISO 1996-1 composite rating level above. The anchors $P(1000\ \text{dB/s}, 30\ \text{dB}) = 9 + 2\lg 30 = 11.95$ and $K_I(P{=}10) = 9.0$ dB are reproduced exactly.
+$K_I$ is exactly the kind of source-character adjustment that enters the ISO 1996-1 composite rating level above. The anchors $P(1000\ \text{dB/s}, 30\ \text{dB}) = 9 + 2\log_{10} 30 = 11.95$ and $K_I(P{=}10) = 9.0$ dB are reproduced exactly.
 
 See the [Impulse Prominence guide](impulse-prominence.md) for usage.
 
@@ -80,7 +80,7 @@ own printed precision), well inside its stated $\pm 10$ %; passing
 `exact_midband=True` snaps each frequency onto the exact midbands
 $f_m = 1000 \cdot 10^{k/10}$ (Note 5) used to compute that table. The same
 $\alpha$ is the only route to the ISO 354 power attenuation coefficient
-$m = \alpha/(10 \lg e)$, exposed as `air_attenuation_m`.
+$m = \alpha/(10 \log_{10} e)$, exposed as `air_attenuation_m`.
 
 ### Outdoor propagation, general method (ISO 9613-2)
 
@@ -192,15 +192,15 @@ $U = 2 \sqrt{\sigma_{R0}^2 + \sigma_{omc}^2}$.
 ISO 3745:2012 is the grade-1 (precision) sibling: a qualified anechoic or
 hemi-anechoic room removes the reverberant field, so there is no $K_2$ term and
 the corrections become meteorological. The power level is
-$L_W = \bar{L}_p + 10 \lg(S/S_0) + C_1 + C_2 + C_3$ (Eq. 14/15) over a full
+$L_W = \bar{L}_p + 10 \log_{10}(S/S_0) + C_1 + C_2 + C_3$ (Eq. 14/15) over a full
 sphere $S = 4 \pi r^2$ or hemisphere $S = 2 \pi r^2$, with the background
-correction $K_{1i} = -10 \lg(1 - 10^{-0.1 \Delta L_{pi}})$ applied per
+correction $K_{1i} = -10 \log_{10}(1 - 10^{-0.1 \Delta L_{pi}})$ applied per
 microphone position *before* the energy average (Eq. 11); no correction is
 needed above a 15 dB margin, and below 10 dB (250 Hz – 5 kHz) or 6 dB (edge
 bands) the correction is clamped and the result flagged as an upper bound
 (clause 9.4.2). The meteorological terms are
-$C_1 = -10 \lg(p_s/p_{s0}) + 5 \lg[(273 + \theta)/\theta_0]$ and
-$C_2 = -10 \lg(p_s/p_{s0}) + 15 \lg[(273 + \theta)/\theta_1]$ with
+$C_1 = -10 \log_{10}(p_s/p_{s0}) + 5 \log_{10}[(273 + \theta)/\theta_0]$ and
+$C_2 = -10 \log_{10}(p_s/p_{s0}) + 15 \log_{10}[(273 + \theta)/\theta_1]$ with
 $\theta_0 = 314$ K, $\theta_1 = 296$ K: at the 23 °C / 101.325 kPa reference
 $C_2 = 0$ exactly and $C_1 = -0.128$ dB; and
 $C_3 = A_0 (1.0053 - 0.0012 A_0)^{1.6}$ with $A_0 = a(f)\ r$ restores the
@@ -260,7 +260,7 @@ $F_{pIn}(\text{signed}) - F_{pIn}(\text{unsigned}) \le 3$ dB (C.3),
 $F_S \le 2$ (C.4) and the scan-density convergence
 $0.83 \le F_S(1)/F_S(2) \le 1.2$ (C.5). Eq. 10 normalizes the result to the
 reference meteorological conditions,
-$L_{W0} = L_W - 15 \lg[(B/101325) \cdot 296.15/(273.15 + \theta)]$. Bands whose
+$L_{W0} = L_W - 15 \log_{10}[(B/101325) \cdot 296.15/(273.15 + \theta)]$. Bands whose
 net power is negative are not determinable (clause 9.2) and are flagged. A
 uniform normal intensity recovers the power exactly (100 µW over 3.75 m² →
 80.0 dB re 1 pW), independent of how the surface is segmented.

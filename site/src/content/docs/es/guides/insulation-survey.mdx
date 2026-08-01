@@ -39,12 +39,12 @@ Los métodos de ingeniería anteriores compran precisión con esfuerzo:
 micrófonos barridos, tiempos de reverberación por banda, corrección de ruido de
 fondo cuidadosa. Para una comprobación rápida en una vivienda, ISO 10052 define
 un **método de control (survey)**: bandas de octava, un sonómetro de mano y una
-sola magnitud, el **índice de reverberación** $k = 10\lg(T/T_0)$
+sola magnitud, el **índice de reverberación** $k = 10\log_{10}(T/T_0)$
 ($T_0 = 0{,}5\ \text{s}$), que arrastra la corrección del recinto receptor.
 Cada magnitud del control es entonces una simple suma de $k$: la diferencia
 de niveles estandarizada $D_{nT} = D + k$, la normalizada
-$D_n = D + k + 10\lg(A_0 T_0/(0{,}16\,V))$, la aparente
-$R' = D + k + 10\lg(S T_0/(0{,}16\,V))$ (usando $V/7{,}5$ como $S$ cuando es
+$D_n = D + k + 10\log_{10}(A_0 T_0/(0{,}16\,V))$, la aparente
+$R' = D + k + 10\log_{10}(S T_0/(0{,}16\,V))$ (usando $V/7{,}5$ como $S$ cuando es
 mayor) y, para impactos y fachadas, $L'_{nT} = L_i - k$ y
 $D_{2m,nT} = D_{2m} + k$. Las referencias a
 cláusulas siguen ISO 10052:2021; las fórmulas y la tabla del índice de
@@ -86,7 +86,7 @@ res.plot()   # DnT vs curva de referencia ISO 717-1 desplazada (necesita matplot
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/survey_insulation_es.svg" alt="Aislamiento a ruido aéreo por el método de control: la diferencia de niveles bruta D y la estandarizada DnT en las cinco bandas de octava, con la corrección por índice de reverberación k sombreada entre ambas" width="80%" />
 
-*El índice de reverberación $k = 10\lg(T/T_0)$ desplaza la diferencia de
+*El índice de reverberación $k = 10\log_{10}(T/T_0)$ desplaza la diferencia de
 niveles bruta $D$ hacia la estandarizada $D_{nT}$: hacia arriba donde la sala
 es viva ($T > T_0$), hacia abajo donde es apagada. El índice automático solo
 se forma con
@@ -241,7 +241,7 @@ plt.show()
 ## Qué cubre esta guía
 
 **Cubierto.** El método de control de ISO 10052:2021: el índice de
-reverberación $k = 10\lg(T/T_0)$ medido con
+reverberación $k = 10\log_{10}(T/T_0)$ medido con
 `building.reverberation_index` o estimado desde las clases de recinto de la
 Tabla 4 con `building.estimate_reverberation_index`; las magnitudes de
 control aéreas, de impacto y de fachada ($D_{nT}$, $D_n$, $R'$ con la regla

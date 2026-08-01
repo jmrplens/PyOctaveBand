@@ -258,7 +258,7 @@ $R = S\bar\alpha/(1-\bar\alpha)$ measures how much reverberant field a given
 power builds up, and the steady-state level is
 
 $$
-L_p = L_W + 10 \lg\!\left( \frac{Q}{4\pi r^2} + \frac{4}{R} \right),
+L_p = L_W + 10 \log_{10}\!\left( \frac{Q}{4\pi r^2} + \frac{4}{R} \right),
 $$
 
 with the source directivity factor $Q$ (1 omnidirectional, 2 on a hard floor,
@@ -341,7 +341,7 @@ Sabine absorption area $A = S\bar\alpha$ rather than the room constant
 $R = A/(1-\bar\alpha)$; the two coincide for a small $\bar\alpha$, and this
 module uses $R$ so that $r_c$ is exactly the crossover of its own
 `steady_state_spl`. Pass `characteristic_impedance=rho_c` to add the Bies
-$10\lg(\rho c / 400)$ term (about +0.14 dB at 20 °C).
+$10\log_{10}(\rho c / 400)$ term (about +0.14 dB at 20 °C).
 
 **Where the statistics fade.** The **Schroeder frequency**
 $f_s = 2000\sqrt{T/V}$ ($V$ in m³, $T$ in s) roughly marks the modal-to-diffuse

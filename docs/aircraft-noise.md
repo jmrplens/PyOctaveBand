@@ -24,7 +24,7 @@ then combined into the total noisiness and the perceived noise level:
 
 $$
 N = 0.85\,n_{\max} + 0.15\sum_i n_i, \qquad
-\mathrm{PNL} = 40 + \frac{10}{\lg 2}\,\lg N .
+\mathrm{PNL} = 40 + \frac{10}{\log_{10} 2}\,\log_{10} N .
 $$
 
 ```python
@@ -61,8 +61,8 @@ integrates $\mathrm{PNLT}$ over the **10 dB-down** window (the records nearest
 to $\mathrm{PNLTM} - 10$ on each side) and normalises to 10 s:
 
 $$
-\mathrm{EPNL} = 10\lg\!\Big(\sum_{k=k_F}^{k_L} 10^{\mathrm{PNLT}(k)/10}\,\Delta t(k)\Big)
-- 10\lg T_0, \qquad T_0 = 10\ \mathrm{s},
+\mathrm{EPNL} = 10\log_{10}\!\Big(\sum_{k=k_F}^{k_L} 10^{\mathrm{PNLT}(k)/10}\,\Delta t(k)\Big)
+- 10\log_{10} T_0, \qquad T_0 = 10\ \mathrm{s},
 $$
 
 so $\mathrm{EPNL} = \mathrm{PNLTM} + D$ with the duration correction $D$.

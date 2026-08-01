@@ -302,7 +302,7 @@ res.plot()                               # Gyy, Gvv, Gnn y el panel de SNR
 
 *El reparto exacto del modelo del fragmento: $G_{vv} = \gamma^2 G_{yy}$ explica la
 salida salvo el resto de ruido plano $G_{nn}$, y la SNR espectral se dispersa
-alrededor de su forma cerrada $10\lg(0{,}64/0{,}25) = 4{,}1$ dB en toda
+alrededor de su forma cerrada $10\log_{10}(0{,}64/0{,}25) = 4{,}1$ dB en toda
 frecuencia.*
 
 <details>
@@ -425,14 +425,14 @@ periódico (DFT-even) exactamente como las aplican los estimadores de Welch:
   que el resultado de la PSD informa como `resolution_bandwidth`
   (`ENBW·fs/nperseg` en Hz), y entra directamente en el balance tono/ruido:
   un suelo de ruido de banda ancha leído de un espectro con ventana queda
-  $10\lg(\mathrm{ENBW})$ dB por encima de la densidad verdadera.
+  $10\log_{10}(\mathrm{ENBW})$ dB por encima de la densidad verdadera.
 - **Ganancia coherente**: la ganancia en continua $\sum w/N$ que escala un
   tono centrado en un bin.
 - **Pérdida de festoneado**: la atenuación en el peor caso de un tono que
   cae a medio camino entre dos bins (3,92 dB para la rectangular, 1,42 dB
   para Hann).
 - **Pérdida de proceso en el peor caso**: el festoneado más
-  $10\lg(\mathrm{ENBW})$,
+  $10\log_{10}(\mathrm{ENBW})$,
   la reducción de SNR de salida en el peor caso al detectar un tono en
   ruido blanco.
 - **Lóbulo lateral máximo** y **anchura a -3 dB del lóbulo principal**:
@@ -451,7 +451,7 @@ m.plot()                        # ventana + espectro con las métricas
 Las formas cerradas anclan los tests: el ENBW es exactamente 1 para la
 rectangular, 3/2 para Hann, 1987/1458 para Hamming y 1523/882 para Blackman
 (muestreo DFT-even), y la pérdida de festoneado de la rectangular es
-$20\lg(N\sin(\pi/2N))$, el núcleo de Dirichlet evaluado medio bin fuera del
+$20\log_{10}(N\sin(\pi/2N))$, el núcleo de Dirichlet evaluado medio bin fuera del
 centro.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/window_functions_tradeoff_es.svg" alt="Espectros de las ventanas rectangular, Hann, Hamming y Blackman a lo largo de 16 bins de la DFT, mostrando el compromiso entre anchura del lóbulo principal y nivel de los lóbulos laterales, con el ancho de banda equivalente de ruido y el lóbulo lateral máximo de cada ventana en la leyenda" width="82%" />

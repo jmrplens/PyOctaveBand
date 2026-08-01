@@ -39,7 +39,7 @@ Con el micrófono de referencia sobre una placa en el suelo a la distancia
 horizontal $R_0 = H + D/2$ (altura de buje $H$, diámetro de rotor $D$), la
 distancia oblicua al centro del rotor es $R_1 = \sqrt{H^2 + R_0^2}$ y el nivel
 de potencia acústica aparente es
-$L_{WA,i} = L_{p,i} - 6 + 10\lg(4\pi R_1^2/S_0)$ por banda
+$L_{WA,i} = L_{p,i} - 6 + 10\log_{10}(4\pi R_1^2/S_0)$ por banda
 ($S_0 = 1\ \text{m}^2$), sumado energéticamente sobre las bandas. Los −6 dB
 dan cuenta de la duplicación de presión en la placa del suelo.
 
@@ -123,7 +123,7 @@ energética de la banda excluyendo el máximo y sus líneas adyacentes. El nivel
 de enmascaramiento $L_{pn}$ sigue la Fórmula 31, la tonalidad es
 $\Delta L_{tn} = L_{pt} - L_{pn}$ y la audibilidad tonal es
 $\Delta L_a = \Delta L_{tn} - L_a$ con
-$L_a = -2 - \lg\!\big[1 + (f/502)^{2{,}5}\big]$, reportada cuando
+$L_a = -2 - \log_{10}\!\big[1 + (f/502)^{2{,}5}\big]$, reportada cuando
 $\Delta L_a \ge -3\ \text{dB}$ y audible cuando $\Delta L_a > 0$.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/wind_turbine_tonality_es.svg" alt="Espectro de banda estrecha de un aerogenerador con un tono discreto cerca de 200 Hz sobre un fondo de banda ancha, la banda crítica sombreada, el nivel de ruido de enmascaramiento como línea horizontal y la audibilidad tonal anotada" width="82%" />

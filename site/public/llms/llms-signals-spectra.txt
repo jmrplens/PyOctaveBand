@@ -257,7 +257,7 @@ res.plot()                               # Gyy, Gvv, Gnn and the SNR panel
 
 *The exact split of the snippet's model: $G_{vv} = \gamma^2 G_{yy}$ explains
 the output except for the flat noise remainder $G_{nn}$, and the spectral SNR
-scatters around its closed form $10\lg(0.64/0.25) = 4.1$ dB at every
+scatters around its closed form $10\log_{10}(0.64/0.25) = 4.1$ dB at every
 frequency.*
 
 <details>
@@ -374,12 +374,12 @@ it:
   bin the effective analysis bandwidth is. This is the same number the PSD
   result reports as `resolution_bandwidth` (`ENBW·fs/nperseg` in Hz), and
   it enters directly in the tone/noise trade: a broadband noise floor read
-  from a windowed spectrum sits $10\lg(\mathrm{ENBW})$ dB above the true
+  from a windowed spectrum sits $10\log_{10}(\mathrm{ENBW})$ dB above the true
   density.
 - **Coherent gain**: the DC gain $\sum w/N$ a bin-centered tone is scaled by.
 - **Scalloping loss**: the worst-case attenuation of a tone that falls
   midway between two bins (3.92 dB for rectangular, 1.42 dB for Hann).
-- **Worst-case processing loss**: scalloping plus $10\lg(\mathrm{ENBW})$, the
+- **Worst-case processing loss**: scalloping plus $10\log_{10}(\mathrm{ENBW})$, the
   worst-case reduction in output SNR for tone detection in white noise.
 - **Highest sidelobe** and **main-lobe -3 dB width**: leakage floor versus
   resolution.
@@ -396,7 +396,7 @@ m.plot()                        # window + spectrum with metrics marked
 
 The closed forms anchor the tests: ENBW is exactly 1 for rectangular, 3/2
 for Hann, 1987/1458 for Hamming and 1523/882 for Blackman (DFT-even
-sampling), and the rectangular scalloping loss is $20\lg(N\sin(\pi/2N))$,
+sampling), and the rectangular scalloping loss is $20\log_{10}(N\sin(\pi/2N))$,
 the Dirichlet kernel evaluated half a bin off center.
 
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/window_functions_tradeoff_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/window_functions_tradeoff.svg" alt="Spectra of the rectangular, Hann, Hamming and Blackman windows over 16 DFT bins, showing the trade-off between main-lobe width and sidelobe level, with each window's equivalent noise bandwidth and highest sidelobe level in the legend" width="82%"></picture>
@@ -808,7 +808,7 @@ display instead of averaging them. Because the calibration is the exact
 Welch-module scaling with no detrending, three identities hold:
 
 * a signal in pascals yields Pa²/Hz (`'density'`) or Pa² (`'spectrum'`)
-  per cell, so $10\lg(\text{power}/p_0^2)$ with `'spectrum'` scaling reads a tone's
+  per cell, so $10\log_{10}(\text{power}/p_0^2)$ with `'spectrum'` scaling reads a tone's
   **sound pressure level** directly in any column it spans;
 * the column **mean over time reproduces `power_spectral_density`** bin by
   bin, with the same taper, overlap and scaling;
@@ -1222,7 +1222,7 @@ low.plot()
 *The 4 ms lifter split on a pure-echo record: the lowpass side returns the
 smooth spectral envelope, the highpass side isolates the echo's 125 Hz
 ripple, swinging exactly between the closed forms
-$20\lg(1 \pm a) = +3.5$ and $-6.0$ dB.*
+$20\log_{10}(1 \pm a) = +3.5$ and $-6.0$ dB.*
 
 <details>
 <summary>Show the code for this figure</summary>
@@ -1269,7 +1269,7 @@ plt.show()
 </details>
 
 For the pure-echo signal the highpass ripple swings between the closed forms
-$20\lg(1+a)$ and $20\lg(1-a)$ dB, another oracle the tests pin. In
+$20\log_{10}(1+a)$ and $20\log_{10}(1-a)$ dB, another oracle the tests pin. In
 speech analysis the identical operation separates the vocal-tract envelope
 (formants) from the excitation harmonics; here it is the general tool for
 "smooth versus periodic" splits of any measured magnitude response.
@@ -2931,7 +2931,7 @@ print(round(res["1x"]), round(res["2x"]),
 
 Give the slip directly, or give the mains `supply_frequency` and let the slip
 follow from it and the measured shaft speed. The supply frequency is taken as
-$f_e = f_s\,p / (2(1 - s))$; Norton's Eq. (8.19) writes $f_e = f_s\,p/2$,
+$f_e = f_s\,p / (2(1 - s))$; Norton's Eq. (8.19) writes `fe = fs p / 2`,
 which is the same expression at zero slip but does not reduce Eq. (8.20) to
 the physical rotor-bar passing rate $R f_s$ when the machine is loaded.
 Under load the result also carries the slip frequency and the pole-pass

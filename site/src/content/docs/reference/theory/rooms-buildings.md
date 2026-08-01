@@ -190,10 +190,10 @@ with $t_e = 50$ ms (C50, speech) or 80 ms (C80, music), and the **centre time** 
 
 ### Open-plan spatial decay (ISO 3382-3, Clause 6)
 
-The spatial decay rate of A-weighted speech is the ordinary least-squares slope of $L_{p,A,S}$ against $\lg(r/r_0)$ ($r_0 = 1$ m) over the 2–16 m positions, rescaled to a per-doubling figure, and the nominal level is read off the same line at 4 m:
+The spatial decay rate of A-weighted speech is the ordinary least-squares slope of $L_{p,A,S}$ against $\log_{10}(r/r_0)$ ($r_0 = 1$ m) over the 2–16 m positions, rescaled to a per-doubling figure, and the nominal level is read off the same line at 4 m:
 
 $$
-L = a + b\ \lg(r/r_0), \qquad D_{2,S} = -\lg(2)\ b, \qquad L_{p,A,S,4\text{m}} = a + b\ \lg(4/r_0).
+L = a + b\ \log_{10}(r/r_0), \qquad D_{2,S} = -\log_{10}(2)\ b, \qquad L_{p,A,S,4\text{m}} = a + b\ \log_{10}(4/r_0).
 $$
 
 The distraction distance rD and privacy distance rP are the distances where a **linear** (not logarithmic) regression of STI against distance crosses 0.50 and 0.20; a non-negative fitted slope (STI not falling with distance) makes them undefined, realising the standard's "can prove impossible to determine" note.
@@ -232,7 +232,7 @@ $A = 55.3\ V/(c\ T) - 4 V m$ (the $4 V m$ term is the air absorption, $m$ the
 power attenuation coefficient in 1/m), so the specimen area is
 $A_T = A_2 - A_1$ and its coefficient $\alpha_s = A_T/S$. With the speed of
 sound from Eq. (6), $c = 331 + 0.6\ t$ (°C), and $m$ converted from an
-ISO 9613-1 attenuation coefficient by $m = \alpha / (10 \lg e)$. Because
+ISO 9613-1 attenuation coefficient by $m = \alpha / (10 \log_{10} e)$. Because
 diffraction and edge scattering intercept more than the flat sample area,
 $\alpha_s$ is left unclamped and may exceed 1.0 (Clause 3.7 NOTE 2).
 
@@ -360,23 +360,23 @@ See the [Room Acoustics](/phonometry/guides/room-acoustics/) and
 
 Where EN 12354 takes the element $R$ as a measurement, the sound reduction index
 of a panel can also be **predicted** from its physical properties. A limp panel
-follows the mass law $TL_0 = 10\lg[1 + (\pi f m''/\rho_0 c_0)^2]$ (Bies Eq. 7.40),
+follows the mass law $TL_0 = 10\log_{10}[1 + (\pi f m''/\rho_0 c_0)^2]$ (Bies Eq. 7.40),
 which rises 6 dB per octave and 6 dB per doubling of the surface mass $m''$; the
 field-incidence value subtracts 5.5 dB (one-third octave). Stiffness adds a
 **coincidence dip** at $f_c = (c_0^2/2\pi)\sqrt{m''/B'}$ (Eq. 7.3), where the free
 bending wavelength matches the acoustic trace wavelength. Sharp's method holds
 the mass law to $f_c/2$, drops linearly in $\log f$ to the dip
-$TL = 20\lg(f_c m'') + 10\lg\eta - 44$ and rises again above $f_c$ with the loss
+$TL = 20\log_{10}(f_c m'') + 10\log_{10}\eta - 44$ and rises again above $f_c$ with the loss
 factor $\eta$ (Eq. 7.44). A **double wall** is a mass-spring-mass system with the
 cavity as the spring: below $f_0 = 60\sqrt{(m_1+m_2)/(m_1 m_2 d)}$ (Eq. 7.62) it
 follows the mass law of the combined mass, and above it the two leaves' mass laws
-add plus the cavity term $20\lg(2kd)$, saturating at +6 dB beyond
+add plus the cavity term $20\log_{10}(2kd)$, saturating at +6 dB beyond
 $f_l = c_0/(2\pi d)$ (Eq. 7.64); a porous fill lowers $f_0$. Small air paths cap
 any construction: the transmission coefficient of a straight slit (Gomperts,
 Hopkins Eq. 4.99, with resonances at $d + 2e = z\lambda/2$) or a circular hole
 (Wilson & Soroka, Eq. 4.102) combines with the wall in the area-weighted energy
-sum $R = -10\lg[(1/\sum S_n)\sum S_n 10^{-R_n/10}]$ (Eq. 4.92), so a bare opening
-of relative area $S_a/S$ limits the composite to $10\lg(S/S_a)$. The resonant
+sum $R = -10\log_{10}[(1/\sum S_n)\sum S_n 10^{-R_n/10}]$ (Eq. 4.92), so a bare opening
+of relative area $S_a/S$ limits the composite to $10\log_{10}(S/S_a)$. The resonant
 transmission path and the double-wall radiation draw on the plate radiation
 efficiency and point mobilities of the
 [vibration theory](/phonometry/reference/theory/vibration/).

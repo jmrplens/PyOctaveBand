@@ -134,7 +134,7 @@ presupuesto de incertidumbre.
 **Ajuste tonal (método de ingeniería, Anexo C).** A partir del nivel tonal
 sumado en energía $L_{pt}$ y el nivel de ruido enmascarante $L_{pn}$ en la banda
 crítica alrededor de un tono, la audibilidad sobre el umbral de enmascaramiento es
-$\Delta L_{ta} = L_{pt} - L_{pn} + 2 + \lg[1 + (f_c/502)^{2{,}5}]$ dB (Fórmula (C.3)),
+$\Delta L_{ta} = L_{pt} - L_{pn} + 2 + \log_{10}[1 + (f_c/502)^{2{,}5}]$ dB (Fórmula (C.3)),
 y el ajuste es $K_t = 0$ para $\Delta L_{ta} < 4$, $K_t = \Delta L_{ta} - 4$ para
 $4 \le \Delta L_{ta} \le 10$ y $K_t = 6$ por encima (Fórmulas (C.4)–(C.6)). El
 ancho de banda crítico es 100 Hz hasta 500 Hz y el 20 % de $f_c$ por encima
@@ -162,7 +162,7 @@ plt.show()
 </details>
 
 **Corrección de ruido residual (Cláusula 10.4).** `residual_sound_correction()`
-aplica $L = 10\lg(10^{L'/10} - 10^{L_\text{res}/10})$ (Fórmula (16)). Con un
+aplica $L = 10\log_{10}(10^{L'/10} - 10^{L_\text{res}/10})$ (Fórmula (16)). Con un
 residual dentro de 3 dB del nivel medido no se permite corrección alguna: el
 valor reportable es entonces el nivel medido *sin corregir* $L'$, como cota
 superior del sonido específico (expuesto como `reportable_upper_bound`, con

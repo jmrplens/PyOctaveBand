@@ -318,7 +318,7 @@ $\delta_{pI0}$ in every
 one-third-octave band from 50 Hz to 6.3 kHz, separately for a **probe**, a
 **processor** and a **complete instrument**, in class 1 and class 2, printed
 for the nominal 25 mm microphone separation. Note 1 rescales the whole table
-for any other spacer by $+10\lg(x/25)$ with $x$ in millimetres, which is the
+for any other spacer by $+10\log_{10}(x/25)$ with $x$ in millimetres, which is the
 same 3 dB per doubling the previous section arrived at from the physics.
 
 `intensity_class_compliance` compares a measured $\delta_{pI0}$ spectrum
@@ -348,7 +348,7 @@ res.report("verification.pdf")    # one-page verification fiche (PDF)
 
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/intensity_class_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/intensity_class.svg" alt="Measured pressure-residual intensity index of a complete intensity instrument with a 12 mm spacer, drawn as a step curve over the IEC 61043 Table 2 class 1 and class 2 minima; the shaded class 2 pass region lies above the dashed class 2 mask, and the 100 Hz band is ringed where the measured index dips below the solid class 1 mask" width="92%"></picture>
 
-*Both Table 2 masks come down by $10\lg(12/25) = -3.2\ \text{dB}$ for the 12 mm
+*Both Table 2 masks come down by $10\log_{10}(12/25) = -3.2\ \text{dB}$ for the 12 mm
 spacer. The measured index climbs 10 dB per decade at low frequency, parallel
 to the requirement, because a channel phase mismatch that is constant in
 degrees buys exactly that slope; it flattens above 1 kHz where the mismatch of
@@ -462,7 +462,7 @@ The spacer sets both ends of the usable band, in opposite directions:
   shrinks the signal, not the error, so the margin over $\delta_{pI0}$
   collapses at low frequency. A larger spacer buys back that margin: the
   IEC 61043 residual-index requirements scale as
-  $10\lg(\Delta r/25\ \text{mm})$, so doubling the spacer is worth 3 dB of
+  $10\log_{10}(\Delta r/25\ \text{mm})$, so doubling the spacer is worth 3 dB of
   low-frequency margin.
 
 No single spacer covers the full audio range: 6 mm suits high-frequency
@@ -502,7 +502,7 @@ for absolute scaling of the two channels.
   [IEC webstore](https://webstore.iec.ch/en/publication/4353).
   The instrument standard: the cross-spectral estimator, the
   residual-intensity test behind $\delta_{pI0}$, the Table 2 minima per band
-  for probes, processors and instruments with the $+10\lg(x/25)$ separation
+  for probes, processors and instruments with the $+10\log_{10}(x/25)$ separation
   rule
   (Note 1), the frequency ranges of clause 6.1 and the component-combination
   rule of clause 8.

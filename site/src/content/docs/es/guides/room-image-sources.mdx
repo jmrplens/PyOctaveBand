@@ -262,7 +262,7 @@ reverberante** difuso que es (aproximadamente) el mismo en todas partes. La
 reverberante levanta una potencia dada, y el nivel estacionario es
 
 $$
-L_p = L_W + 10 \lg\!\left( \frac{Q}{4\pi r^2} + \frac{4}{R} \right),
+L_p = L_W + 10 \log_{10}\!\left( \frac{Q}{4\pi r^2} + \frac{4}{R} \right),
 $$
 
 con el factor de directividad de la fuente $Q$ (1 omnidireccional, 2 sobre un
@@ -345,7 +345,7 @@ usa el área de absorción de Sabine $A = S\bar\alpha$ en lugar de la constante 
 sala $R = A/(1-\bar\alpha)$; ambas coinciden para $\bar\alpha$ pequeño, y este
 módulo usa $R$ de modo que $r_c$ es exactamente el cruce de su propio
 `steady_state_spl`. Pasa `characteristic_impedance=rho_c` para añadir el término
-$10\lg(\rho c / 400)$ de Bies (unos +0,14 dB a 20 °C).
+$10\log_{10}(\rho c / 400)$ de Bies (unos +0,14 dB a 20 °C).
 
 **Dónde se difumina la estadística.** La **frecuencia de Schroeder**
 $f_s = 2000\sqrt{T/V}$ ($V$ en m³, $T$ en s) marca aproximadamente la transición

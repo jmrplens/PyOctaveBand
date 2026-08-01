@@ -42,7 +42,7 @@ realmente a la estructura, y la transmisión del edificio la lleva al recinto
 receptor. La corrección de movilidad del Anexo I,
 `installed_power_from_reception_plate`, refiere el nivel característico de
 placa receptora $L_{Ws,n}$ al receptor real,
-$L_{Ws,\mathrm{inst}} = L_{Ws,n} + 10\lg(Y_{\infty,i} / Y_{\infty,\mathrm{rec}})$
+$L_{Ws,\mathrm{inst}} = L_{Ws,n} + 10\log_{10}(Y_{\infty,i} / Y_{\infty,\mathrm{rec}})$
 con $Y_{\infty,\mathrm{rec}} = 5\cdot 10^{-6}\ \text{m/(N·s)}$;
 con la movilidad de la fuente en su lugar da $L_{Ws,c}$ (Anexo I.3, Tabla I.8).
 
@@ -85,11 +85,11 @@ una excitación puntual por la movilidad de la fuente $Y_s$ y la del receptor
 $Y_i$ (Fórmula 19b):
 
 $$
-D_{C,i} = 10\lg\frac{|Y_s + Y_i|^2}{|Y_s|\,\mathrm{Re}\{Y_i\}},
+D_{C,i} = 10\log_{10}\frac{|Y_s + Y_i|^2}{|Y_s|\,\mathrm{Re}\{Y_i\}},
 $$
 
-que se reduce a $10\lg(|Y_s|/\mathrm{Re}\{Y_i\})$ para una **fuente de fuerza** (movilidad
-de fuente alta, Fórmula 19c) y a $-10\lg(|Y_s|\,\mathrm{Re}\{Z_i\})$ para una **fuente de
+que se reduce a $10\log_{10}(|Y_s|/\mathrm{Re}\{Y_i\})$ para una **fuente de fuerza** (movilidad
+de fuente alta, Fórmula 19c) y a $-10\log_{10}(|Y_s|\,\mathrm{Re}\{Z_i\})$ para una **fuente de
 velocidad** (movilidad de fuente baja, Fórmula 19d); un soporte elástico añade su
 movilidad de transferencia $Y_k$ dentro del módulo (Fórmula 19e). El nivel de
 potencia **instalada** es entonces (Fórmula 18b) $L_{Ws,\mathrm{inst}} = L_{Ws,c} - D_C$.
@@ -137,7 +137,7 @@ elemento (Fórmula 18a):
 
 $$
 L_{n,s,ij} = L_{Ws,\mathrm{inst},i} - D_{sa,i} - R_{ij,\mathrm{ref}}
-             - 10\lg\frac{S_i}{S_0} - 10\lg\frac{A_0}{4},
+             - 10\log_{10}\frac{S_i}{S_0} - 10\log_{10}\frac{A_0}{4},
 $$
 
 con $S_0 = A_0 = 10\ \text{m}^2$, y los caminos se combinan energéticamente (Fórmula 17):

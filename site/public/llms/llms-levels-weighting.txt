@@ -1547,7 +1547,7 @@ tonal adjustment, the residual-noise correction and the uncertainty budget.
 **Tonal adjustment (engineering method, Annex C).** From the energy-summed tone
 level $L_{pt}$ and the masking-noise level $L_{pn}$ in the critical band around a
 tone, the audibility above the masking threshold is
-$\Delta L_{ta} = L_{pt} - L_{pn} + 2 + \lg[1 + (f_c/502)^{2.5}]$ dB (Formula (C.3)),
+$\Delta L_{ta} = L_{pt} - L_{pn} + 2 + \log_{10}[1 + (f_c/502)^{2.5}]$ dB (Formula (C.3)),
 and the adjustment is $K_t = 0$ for $\Delta L_{ta} < 4$, $K_t = \Delta L_{ta} - 4$
 for $4 \le \Delta L_{ta} \le 10$ and $K_t = 6$ above (Formulae (C.4)–(C.6)). The
 critical bandwidth is 100 Hz up to 500 Hz and 20 % of $f_c$ above (Table C.1).
@@ -1575,7 +1575,7 @@ plt.show()
 </details>
 
 **Residual-noise correction (Clause 10.4).** `residual_sound_correction()`
-applies $L = 10\lg(10^{L'/10} - 10^{L_\text{res}/10})$ (Formula (16)). With a
+applies $L = 10\log_{10}(10^{L'/10} - 10^{L_\text{res}/10})$ (Formula (16)). With a
 residual within 3 dB of the measured level no correction is allowed: the
 *uncorrected* measured level $L'$ is then the reportable value, as an upper
 bound of the specific sound (exposed as `reportable_upper_bound`, with
@@ -1751,7 +1751,7 @@ in each phase and corrected, and the period level is the energy mean weighted
 by phase duration (Annex IV A.3.4.2 b):
 
 $$
-L_{Keq,T} = 10 \lg \left[ \frac{1}{T} \sum_i T_i \, 10^{L_{Keq,Ti}/10} \right]
+L_{Keq,T} = 10 \log_{10} \left[ \frac{1}{T} \sum_i T_i \, 10^{L_{Keq,Ti}/10} \right]
 $$
 
 The annual average $L_{K,x}$ of each period is in turn the energy mean of the

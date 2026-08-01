@@ -105,7 +105,7 @@ print(underwater.hearing_groups("nmfs-2018"))
 Ecuación (1), según Finneran (2016):
 
 $$
-T(f) = T_0 + A \lg\!\left(1 + \frac{F_1}{f}\right) + (f/F_2)^{B},
+T(f) = T_0 + A \log_{10}\!\left(1 + \frac{F_1}{f}\right) + (f/F_2)^{B},
 $$
 
 con $f$ en kilohercios. `normalized=False` (por defecto) usa los parámetros de
@@ -152,7 +152,7 @@ Los tres conjuntos de criterios vigentes usan el mismo filtro paso banda
 genérico (NMFS 2018 Ecuación 1, Southall et al. Ecuación 2):
 
 $$
-W(f) = C + 10 \lg \frac{(f/f_1)^{2a}}
+W(f) = C + 10 \log_{10} \frac{(f/f_1)^{2a}}
                        {\left[1+(f/f_1)^2\right]^{a}\left[1+(f/f_2)^2\right]^{b}} ,
 $$
 
@@ -254,7 +254,7 @@ golpe registrado al veredicto:
    [Acústica submarina](/phonometry/es/guides/underwater-acoustics/), por
    Parseval);
 2. `weighted_exposure` aplica $W(f)$ banda a banda, suma la energía ponderada,
-   la acumula sobre el número de golpes (el $+10\lg N$ de la ISO 18406) y
+   la acumula sobre el número de golpes (el $+10\log_{10} N$ de la ISO 18406) y
    compara el resultado con los criterios, nivel de pico sin ponderar incluido.
 
 ```python

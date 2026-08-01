@@ -37,7 +37,7 @@ $\left[\begin{smallmatrix} 1 & 0 \\ 1/Z_b & 1 \end{smallmatrix}\right]$
 (Eq. (8.144)). The **transmission loss** follows from the compound matrix $T$
 with the port impedances $Z_1 = \rho c/S_\text{in}$ and
 $Z_n = \rho c/S_\text{out}$ (Munjal Eq. (3.27); Bies Eq. (8.141) prints the
-$T_{11}$/$T_{22}$ impedance weights of this formula inverted and fails the
+`T11`/`T22` impedance weights of this formula inverted and fails the
 sudden-expansion limit, see the [errata registry](ERRATA.md))
 
 $$

@@ -231,7 +231,7 @@ split-step Fourier family as the ocean
 The source is a **Gaussian starter** with its ground image (Eqs. G.64, G.76)
 and an **absorbing layer** at the top of the grid (Sec. G.9) suppresses
 top-boundary reflections. The result is the **relative sound level**
-$\Delta L(z, r) = 20\lg(|p| R_1)$ (dB re free field, Salomons Eq. 3.6) over
+$\Delta L(z, r) = 20\log_{10}(|p| R_1)$ (dB re free field, Salomons Eq. 3.6) over
 the whole range-height plane.
 
 ```python

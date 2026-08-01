@@ -62,9 +62,9 @@ Tres primitivos, referidos a 1 µPa, se calculan desde una señal de presión
 capturada (en Pa):
 
 $$
-\mathrm{SPL} = 10\lg\frac{\langle p^2\rangle}{p_0^2}, \qquad
-\mathrm{SEL} = 10\lg\frac{\int p^2\,dt}{E_0}, \qquad
-L_{p,\mathrm{pk}} = 20\lg\frac{\max|p|}{p_0},
+\mathrm{SPL} = 10\log_{10}\frac{\langle p^2\rangle}{p_0^2}, \qquad
+\mathrm{SEL} = 10\log_{10}\frac{\int p^2\,dt}{E_0}, \qquad
+L_{p,\mathrm{pk}} = 20\log_{10}\frac{\max|p|}{p_0},
 $$
 
 con $p_0 = 1\ \mu\text{Pa}$ y $E_0 = 1\ \mu\text{Pa}^2\,\text{s}$. El nivel de presión acústica es el nivel
@@ -81,7 +81,7 @@ pk = underwater.peak_sound_pressure_level(pressure)     # dB re 1 µPa
 ```
 
 Para re-referenciar un nivel entre las convenciones submarina (1 µPa) y aérea
-(20 µPa), que supone un desplazamiento de $20\lg(20) \approx 26{,}02$ dB y **no** una
+(20 µPa), que supone un desplazamiento de $20\log_{10}(20) \approx 26{,}02$ dB y **no** una
 equivalencia de energía/intensidad, usa `underwater_to_in_air_spl` /
 `in_air_to_underwater_spl`. Para restar el ruido de fondo, reutiliza el
 `background_noise_correction` ($K_1$) de la ISO 3744.
@@ -93,7 +93,7 @@ Un buque de superficie medido en aguas profundas se describe primero por su
 equivalente:
 
 $$
-L_{\mathrm{RN}} = 20\lg\frac{p_{\mathrm{rms}}}{p_0} + 20\lg\frac{r}{r_0}
+L_{\mathrm{RN}} = 20\log_{10}\frac{p_{\mathrm{rms}}}{p_0} + 20\log_{10}\frac{r}{r_0}
 \ \ \mathrm{dB\ re\ 1\ \mu Pa\!\cdot\! m}, \qquad
 L_s = L_{\mathrm{RN}} + \Delta L,
 $$
@@ -103,11 +103,12 @@ una profundidad de fuente nominal $d_s = 0{,}7\,D$ ($D$ = calado medio) y $u = k
 $k = 2\pi f/c$, es
 
 $$
-\Delta L = -10\lg\frac{2u^4 + 14u^2}{14 + 2u^2 + u^4}\ \mathrm{dB}.
+\Delta L = -10\log_{10}\frac{2u^4 + 14u^2}{14 + 2u^2 + u^4}\ \mathrm{dB}.
 $$
 
-$\Delta L$ diverge a `u` bajo (rasante / baja frecuencia) y tiende a `−10·lg(2) =
-−3,01` dB cuando `u → ∞`. El nivel de fuente reportado es un valor *monopolar
+$\Delta L$ diverge a $u$ bajo (rasante / baja frecuencia) y tiende a
+$-10\log_{10}(2) = -3{,}01$ dB cuando $u \to \infty$. El nivel de fuente
+reportado es un valor *monopolar
 equivalente de través* y debe indicarse junto con su profundidad de fuente.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/ship_source_level_es.svg" alt="Nivel de ruido radiado y nivel de fuente monopolar equivalente de un buque en función de la frecuencia, con la corrección de superficie de Lloyd's mirror en un eje gemelo que muestra su divergencia a baja frecuencia y su aproximación a −3 dB a alta frecuencia" width="82%" loading="eager" />
@@ -175,8 +176,8 @@ a lo largo de una secuencia de hincado las exposiciones se suman en un **nivel d
 exposición sonora acumulado**:
 
 $$
-\mathrm{SEL_{cum}} = 10\lg\sum_{n} 10^{\mathrm{SEL}_n/10},
-\qquad\text{y para } N \text{ golpes idénticos } = \mathrm{SEL_{ss}} + 10\lg N.
+\mathrm{SEL_{cum}} = 10\log_{10}\sum_{n} 10^{\mathrm{SEL}_n/10},
+\qquad\text{y para } N \text{ golpes idénticos } = \mathrm{SEL_{ss}} + 10\log_{10} N.
 $$
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/pile_driving_es.svg" alt="Forma de onda de presión de un golpe de hincado de pilotes por percusión con su pico marcado, y debajo el nivel de exposición sonora acumulado creciendo como SEL_ss más diez veces el logaritmo del número de golpes" width="82%" />

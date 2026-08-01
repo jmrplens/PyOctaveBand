@@ -14,7 +14,7 @@ mobilities set how much power is actually coupled into the structure, and the
 building transmission carries it to the receiving room. The Annex I mobility
 correction `installed_power_from_reception_plate` refers the characteristic
 reception-plate level $L_{Ws,n}$ to the actual receiver,
-$L_{Ws,\mathrm{inst}} = L_{Ws,n} + 10\lg(Y_{\infty,i} / Y_{\infty,\mathrm{rec}})$
+$L_{Ws,\mathrm{inst}} = L_{Ws,n} + 10\log_{10}(Y_{\infty,i} / Y_{\infty,\mathrm{rec}})$
 with $Y_{\infty,\mathrm{rec}} = 5\cdot 10^{-6}\ \text{m/(N·s)}$;
 with the source mobility instead it yields $L_{Ws,c}$ (Annex I.3, Table I.8).
 
@@ -57,11 +57,11 @@ excitation by the source mobility $Y_s$ and the receiver mobility $Y_i$
 (Formula 19b):
 
 $$
-D_{C,i} = 10\lg\frac{|Y_s + Y_i|^2}{|Y_s|\,\mathrm{Re}\{Y_i\}},
+D_{C,i} = 10\log_{10}\frac{|Y_s + Y_i|^2}{|Y_s|\,\mathrm{Re}\{Y_i\}},
 $$
 
-which reduces to $10\lg(|Y_s|/\mathrm{Re}\{Y_i\})$ for a **force source** (high source
-mobility, Formula 19c) and to $-10\lg(|Y_s|\,\mathrm{Re}\{Z_i\})$ for a **velocity source**
+which reduces to $10\log_{10}(|Y_s|/\mathrm{Re}\{Y_i\})$ for a **force source** (high source
+mobility, Formula 19c) and to $-10\log_{10}(|Y_s|\,\mathrm{Re}\{Z_i\})$ for a **velocity source**
 (low source mobility, Formula 19d); an elastic support adds its transfer
 mobility $Y_k$ inside the modulus (Formula 19e). The **installed** power level is
 then (Formula 18b) $L_{Ws,\mathrm{inst}} = L_{Ws,c} - D_C$.
@@ -107,7 +107,7 @@ sound reduction index $R_{ij,\mathrm{ref}}$ (EN 12354-1) and the element area
 
 $$
 L_{n,s,ij} = L_{Ws,\mathrm{inst},i} - D_{sa,i} - R_{ij,\mathrm{ref}}
-             - 10\lg\frac{S_i}{S_0} - 10\lg\frac{A_0}{4},
+             - 10\log_{10}\frac{S_i}{S_0} - 10\log_{10}\frac{A_0}{4},
 $$
 
 with $S_0 = A_0 = 10\ \text{m}^2$, and the paths combine energetically (Formula 17):

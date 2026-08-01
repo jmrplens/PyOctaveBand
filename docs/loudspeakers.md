@@ -38,7 +38,7 @@ hide in that sentence:
   measurement distance. The standard has you measure in the far field (at
   0.5 m or an integer number of metres, clause 7.1) and refer the result back
   with the inverse-distance law,
-  $L_p(1\ \text{m}) = L_p(r) + 20\lg(r / 1\ \text{m})$. That
+  $L_p(1\ \text{m}) = L_p(r) + 20\log_{10}(r / 1\ \text{m})$. That
   scaling only holds where the level actually falls 6 dB per doubling of
   distance, hence the free field of the diagram; at 1 m from a large
   multi-way cabinet the near field may not have ended yet, and the quoted
@@ -182,7 +182,7 @@ computed from the response rather than merely repeated:
 
 - **Characteristic sensitivity level** (20.3/20.4). The on-axis level averaged
   over a stated band, referred to 1 W into the rated impedance $R$ at 1 m:
-  $L_M = \overline{L} + 20\lg(d/d_0) + 20\lg(U_p/U)$ with
+  $L_M = \overline{L} + 20\log_{10}(d/d_0) + 20\log_{10}(U_p/U)$ with
   $U_p = \sqrt{R\cdot 1\,\text{W}} = \sqrt R$.
   The default drive is that $\sqrt R$ (2.83 V into 8 Ω), so with a 1 m response
   the sensitivity level is the band mean.
@@ -382,7 +382,7 @@ equalised system (other authors quote 12 dB unequalised and 6 dB carefully
 equalised): 6 dB of it covers a sustained tone adding in phase with a reflection
 off a hard surface, and the remaining 4 dB is safety. With several microphones
 open at once the returned signals add at the mixer, which the
-number-of-open-microphones correction $\Delta L_\text{nom} = 10\lg N_m$
+number-of-open-microphones correction $\Delta L_\text{nom} = 10\log_{10} N_m$
 accounts for (Equation (18.23)). The criterion is then
 
 $$
@@ -414,7 +414,7 @@ microphone must see the loudspeaker 4 dB below the average level in the
 audience, while a cardioid may let it rise to 2 dB below.
 
 > **A sign slip in the printed equation.** Long prints Equation (18.24) with
-> $+ D_M(\theta)$ on the right-hand side, which contradicts the Equations (18.20) to
+> `+ D_M(theta)` on the right-hand side, which contradicts the Equations (18.20) to
 > (18.22) it generalises and would turn the benefit of a directional microphone
 > into a penalty. `feedback_stability` implements the sign of Equation (18.20),
 > so that $N_m = 1$ reproduces Long's own special cases exactly. The defect is

@@ -176,7 +176,7 @@ $$
 TL = \text{ensanchamiento} + \alpha R .
 $$
 
-El ensanchamiento geométrico es $20 \lg R$ (esférico), $10 \lg R$ (cilíndrico)
+El ensanchamiento geométrico es $20 \log_{10} R$ (esférico), $10 \log_{10} R$ (cilíndrico)
 o esférico hasta una distancia de transición $R_0$ y cilíndrico más allá
 de esta (`"practical"`). El coeficiente de absorción de volumen $\alpha$ (dB/km)
 procede de **Francois–Garrison** (1982, por
@@ -226,16 +226,16 @@ a partir de la reflectividad del fondo:
 
 | Régimen | Factor de propagación $F$ | Ley de pérdida | Termina en |
 |---|---|---|---|
-| Esférico | $1/r^2$ | $20 \lg r$ | $r = H/(2\psi_c)$ |
-| Cilíndrico | $2\psi_c/(rH)$ | $10 \lg r$ | $r_{CS} = \pi H/(4\eta\psi_c^2)$ |
-| Descamado de modos | $\sqrt{\pi/(\eta H)}\, r^{-3/2}$ | $15 \lg r$ | $r_{MS} = k^2 H_e^3/(9\pi\eta)$ |
-| Modo único | Ec. (9.54), exponencial | más pronunciada que $15 \lg r$ | — |
+| Esférico | $1/r^2$ | $20 \log_{10} r$ | $r = H/(2\psi_c)$ |
+| Cilíndrico | $2\psi_c/(rH)$ | $10 \log_{10} r$ | $r_{CS} = \pi H/(4\eta\psi_c^2)$ |
+| Descamado de modos | $\sqrt{\pi/(\eta H)}\, r^{-3/2}$ | $15 \log_{10} r$ | $r_{MS} = k^2 H_e^3/(9\pi\eta)$ |
+| Modo único | Ec. (9.54), exponencial | más pronunciada que $15 \log_{10} r$ | — |
 
 $\psi_c = \arccos(c_w/c_{sed})$ es el ángulo rasante crítico, $\eta$ el
 **gradiente de pérdida por reflexión** en neperios por radián ($|R(\theta)|
 \approx e^{-\eta\theta}$) y $H_e$ la profundidad efectiva de Weston, el nivel
 poco por debajo del fondo real en el que parece situarse un contorno de presión
-nula. `weston_propagation_loss` compone la pérdida $PL = -10 \lg F$ y devuelve
+nula. `weston_propagation_loss` compone la pérdida $PL = -10 \log_{10} F$ y devuelve
 además la ley propia de cada régimen; el campo `boundaries` lleva las tres
 distancias de transición junto con la frecuencia de corte de la guía de ondas y
 el número de modos propagantes.
@@ -428,7 +428,7 @@ Una onda plana que incide en el fondo se refleja con el **coeficiente de
 reflexión de Rayleigh** fluido–fluido (Medwin & Clay). Para un fondo más rápido ($c_2 > c_1$)
 existe un **ángulo rasante crítico** $\varphi_c = \arccos(c_1/c_2)$, por
 debajo del cual la onda se refleja totalmente ($|R| = 1$, pérdida nula). La
-pérdida es $BL = -20 \lg |R|$.
+pérdida es $BL = -20 \log_{10} |R|$.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/seabed_reflection_es.svg" alt="Pérdida por reflexión en el fondo frente al ángulo rasante para un fondo arenoso rápido: pérdida nula por debajo del ángulo rasante crítico, creciendo bruscamente por encima" width="82%" />
 

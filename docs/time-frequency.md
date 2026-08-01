@@ -31,7 +31,7 @@ display instead of averaging them. Because the calibration is the exact
 Welch-module scaling with no detrending, three identities hold:
 
 * a signal in pascals yields Pa²/Hz (`'density'`) or Pa² (`'spectrum'`)
-  per cell, so $10\lg(\text{power}/p_0^2)$ with `'spectrum'` scaling reads a tone's
+  per cell, so $10\log_{10}(\text{power}/p_0^2)$ with `'spectrum'` scaling reads a tone's
   **sound pressure level** directly in any column it spans;
 * the column **mean over time reproduces `power_spectral_density`** bin by
   bin, with the same taper, overlap and scaling;

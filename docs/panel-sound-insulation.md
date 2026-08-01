@@ -38,7 +38,7 @@ the free bending wavelength matches the trace wavelength and the panel goes
 transparent: the **coincidence dip**. Sharp's method holds the field-incidence
 mass law up to $f_c/2$, drops through a straight line in $\log f$, and from $f_c$
 upward follows Eq. 7.44 with the loss factor $\eta$; the dip sits at Bies
-design-chart point B, $TL = 20\lg(f_c m'') + 10\lg\eta - 44$.
+design-chart point B, $TL = 20\log_{10}(f_c m'') + 10\log_{10}\eta - 44$.
 
 The whole section in one sketch: a diffuse field drives a single leaf, and the
 predicted $R(f)$ climbs with the mass law until the coincidence dip. A 12.5 mm
@@ -160,7 +160,7 @@ width.
 The construction has three parts:
 
 1. the **field-incidence mass law**
-   $TL = 10\lg(1 + (\pi f m''/\rho_0 c_0)^2) - 5\ \text{dB}$
+   $TL = 10\log_{10}(1 + (\pi f m''/\rho_0 c_0)^2) - 5\ \text{dB}$
    (Norton Eqs. 3.104 and 3.106), rising 6 dB per octave;
 2. a horizontal **coincidence plateau** at the tabulated height, with point
    **A** where the mass-law line reaches it;
@@ -224,7 +224,7 @@ print(res.transmission_loss.round(1))
 
 The physical model has its own Norton-flavoured variant for the region above
 coincidence: `coincidence_model="cremer"` replaces Sharp's Eq. 7.44 with
-Cremer's empirical $TL = TL_0 + 10\lg(f/f_c - 1) + 10\lg\eta - 2\ \text{dB}$
+Cremer's empirical $TL = TL_0 + 10\log_{10}(f/f_c - 1) + 10\log_{10}\eta - 2\ \text{dB}$
 (Norton Eq. 3.110), and runs the mass law right up to $f_c$ with no interpolated
 bridge. Both rise at about 10 dB per octave far above coincidence; they differ
 in how they leave the dip.
@@ -590,7 +590,7 @@ $$
 R = -10\log_{10}\!\left( \frac{1}{\sum_n S_n} \sum_n S_n\, 10^{-R_n/10} \right),
 $$
 
-so a bare opening of relative area $S_a/S$ caps the composite at $10\lg(S/S_a)$:
+so a bare opening of relative area $S_a/S$ caps the composite at $10\log_{10}(S/S_a)$:
 a 1 % opening can never do better than 20 dB, whatever the wall.
 
 ```python

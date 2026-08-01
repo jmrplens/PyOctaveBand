@@ -61,9 +61,9 @@ Three primitives, referred to 1 µPa, are computed from a captured pressure
 signal (in Pa):
 
 $$
-\mathrm{SPL} = 10\lg\frac{\langle p^2\rangle}{p_0^2}, \qquad
-\mathrm{SEL} = 10\lg\frac{\int p^2\,dt}{E_0}, \qquad
-L_{p,\mathrm{pk}} = 20\lg\frac{\max|p|}{p_0},
+\mathrm{SPL} = 10\log_{10}\frac{\langle p^2\rangle}{p_0^2}, \qquad
+\mathrm{SEL} = 10\log_{10}\frac{\int p^2\,dt}{E_0}, \qquad
+L_{p,\mathrm{pk}} = 20\log_{10}\frac{\max|p|}{p_0},
 $$
 
 with $p_0 = 1\ \mu\text{Pa}$ and $E_0 = 1\ \mu\text{Pa}^2\,\text{s}$. The sound pressure level is the
@@ -80,7 +80,7 @@ pk = underwater.peak_sound_pressure_level(pressure)     # dB re 1 µPa
 ```
 
 To re-reference a level between the underwater (1 µPa) and airborne (20 µPa)
-conventions (a $20\lg(20) \approx 26.02$ dB shift, **not** an energy/intensity
+conventions (a $20\log_{10}(20) \approx 26.02$ dB shift, **not** an energy/intensity
 equivalence), use `underwater_to_in_air_spl` / `in_air_to_underwater_spl`. For
 background-noise subtraction, reuse the ISO 3744 `background_noise_correction`
 ($K_1$) helper.
@@ -91,7 +91,7 @@ A surface ship measured in deep water is described first by its **radiated noise
 level** and then by an **equivalent monopole source level**:
 
 $$
-L_{\mathrm{RN}} = 20\lg\frac{p_{\mathrm{rms}}}{p_0} + 20\lg\frac{r}{r_0}
+L_{\mathrm{RN}} = 20\log_{10}\frac{p_{\mathrm{rms}}}{p_0} + 20\log_{10}\frac{r}{r_0}
 \ \ \mathrm{dB\ re\ 1\ \mu Pa\!\cdot\! m}, \qquad
 L_s = L_{\mathrm{RN}} + \Delta L,
 $$
@@ -101,11 +101,11 @@ nominal source depth $d_s = 0.7\,D$ ($D$ = mean draught) and $u = k\,d_s$,
 $k = 2\pi f/c$, is
 
 $$
-\Delta L = -10\lg\frac{2u^4 + 14u^2}{14 + 2u^2 + u^4}\ \mathrm{dB}.
+\Delta L = -10\log_{10}\frac{2u^4 + 14u^2}{14 + 2u^2 + u^4}\ \mathrm{dB}.
 $$
 
-$\Delta L$ diverges at low `u` (grazing / low frequency) and tends to `−10·lg(2) =
-−3.01` dB as `u → ∞`. The reported source level is an *equivalent monopole
+$\Delta L$ diverges at low $u$ (grazing / low frequency) and tends to
+$-10\log_{10}(2) = -3.01$ dB as $u \to \infty$. The reported source level is an *equivalent monopole
 broadside* value and must be quoted with its source depth.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/ship_source_level.svg" alt="Ship radiated noise level and equivalent monopole source level versus frequency, with the Lloyd's-mirror surface correction on a twin axis showing its low-frequency divergence and its approach to −3 dB at high frequency" width="82%" loading="eager" />
@@ -170,8 +170,8 @@ strike has a **single-strike sound exposure level** $\mathrm{SEL}_{ss}$; over a 
 sequence the exposures add to a **cumulative sound exposure level**:
 
 $$
-\mathrm{SEL_{cum}} = 10\lg\sum_{n} 10^{\mathrm{SEL}_n/10},
-\qquad\text{and for } N \text{ identical strikes } = \mathrm{SEL_{ss}} + 10\lg N.
+\mathrm{SEL_{cum}} = 10\log_{10}\sum_{n} 10^{\mathrm{SEL}_n/10},
+\qquad\text{and for } N \text{ identical strikes } = \mathrm{SEL_{ss}} + 10\log_{10} N.
 $$
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/pile_driving.svg" alt="A percussive pile-driving strike pressure waveform with its peak marked, and below it the cumulative sound exposure level growing as SEL_ss plus ten times the logarithm of the number of strikes" width="82%" />

@@ -25,7 +25,7 @@ as an input, together with the overall flanking descriptors $D_{n,f}$
 empirical `junction_vibration_reduction()` of that prediction.
 
 **Vibration reduction index (Formula (13)).**
-$K_{ij} = \overline{D}_{v,ij} + 10\lg\!\big(l_{ij} / \sqrt{a_i a_j}\big)$ dB, from
+$K_{ij} = \overline{D}_{v,ij} + 10\log_{10}\!\big(l_{ij} / \sqrt{a_i a_j}\big)$ dB, from
 the direction-averaged velocity level difference
 $\overline{D}_{v,ij} = \tfrac{1}{2}(D_{v,ij} + D_{v,ji})$ (Formula (11), which
 makes $K_{ij}$ symmetric), the common-edge junction length $l_{ij}$ and the
@@ -34,8 +34,8 @@ makes $K_{ij}$ symmetric), the common-edge junction length $l_{ij}$ and the
 $a_j = S_j / l_0$ ($l_0 = 1$ m) and Formula (13) reduces to the simplified
 Formula (14). The related **total loss factor** is $\eta = 2.2/(f T_s)$.
 
-**Overall descriptors.** $D_{n,f} = L_1 - L_2 - 10\lg(A/A_0)$ (Formula (4),
-airborne) and $L_{n,f} = L_2 + 10\lg(A/A_0)$ (Formula (5), tapping machine),
+**Overall descriptors.** $D_{n,f} = L_1 - L_2 - 10\log_{10}(A/A_0)$ (Formula (4),
+airborne) and $L_{n,f} = L_2 + 10\log_{10}(A/A_0)$ (Formula (5), tapping machine),
 $A_0 = 10\ \text{m}^2$; their $D_{n,f,w}$ / $L_{n,f,w}$ single numbers reuse the
 ISO 717 rating engines. The single-number $\overline{K}_{ij}$ is the arithmetic
 mean over 200–1250 Hz for one-third-octave bands, or over 125–1000 Hz for
@@ -188,14 +188,14 @@ attenuation and $s_S = s_R = 0{,}5$ that collapses to the compact form that
 makes the geometry visible (Eqs. (9.19) and (9.20)):
 
 $$
-R_{cl} = R_S + R_R - 10\lg\!\left[\frac{\varepsilon^2 L_R}{4h}\right],
+R_{cl} = R_S + R_R - 10\log_{10}\!\left[\frac{\varepsilon^2 L_R}{4h}\right],
 $$
 
 with $\varepsilon = 1$ for totally absorbing plenum sidewalls and
 $\varepsilon = 2$ for totally reflecting ones. A deep plenum helps, a long room
 hurts, and doubling the tile insulation helps twice over because $R_S$ and
 $R_R$ both appear. Referred to the partition area instead of the ceiling,
-$R_{cl,p} = R_{cl} + 10\lg(H_S/L_S)$ (Eq. (9.13)), which is what lets the
+$R_{cl,p} = R_{cl} + 10\log_{10}(H_S/L_S)$ (Eq. (9.13)), which is what lets the
 ceiling path be added to the direct path as transmission factors.
 
 ```python
@@ -225,7 +225,7 @@ print(partition_referenced_reduction_index(res.reduction_index, 2.7, 4.75))
 ```
 
 **The measured quantity.** A ceiling is not rated by $R_{cl}$ but by the
-**normalized ceiling attenuation** $D_{n,c} = D - 10\lg(A/A_0)$ (ISO 140-9:1985
+**normalized ceiling attenuation** $D_{n,c} = D - 10\log_{10}(A/A_0)$ (ISO 140-9:1985
 clause 3.3), with $A$ the receiving-room equivalent absorption area and the
 reference $A_0 = 10\ \text{m}^2$. The facility has two rooms of at least
 50 m³ whose volumes differ by at least 10 %, a dividing wall tapered to at most
@@ -234,7 +234,7 @@ both end walls lined; the standard prints the required lining absorption
 $\alpha_s \ge 0{,}65$ at 125 Hz and $\ge 0{,}80$ from 250 Hz to 4000 Hz, and
 requires $\alpha < 0{,}10$ on the other sidewall and on the plenum ceiling.
 The North American counterpart, ASTM E1414, uses $A_0 = 12\ \text{m}^2$, so an
-ASTM value runs about $10\lg(12/10) = 0{,}79$ dB higher for the same rooms.
+ASTM value runs about $10\log_{10}(12/10) = 0{,}79$ dB higher for the same rooms.
 
 ISO rates $D_{n,c}$ with the ISO 717-1 curve, giving $D_{n,c,w}$; ASTM E1414
 rates it through ASTM E413 as the **ceiling attenuation class**. E413 rounds the

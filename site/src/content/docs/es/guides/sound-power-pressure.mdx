@@ -61,8 +61,8 @@ sobre esa superficie, promédialas en energía, y la potencia acústica se obtie
 porque una superficie suficientemente difusa capta toda la energía radiada:
 
 $$
-\bar{L}_p = 10\lg\left( \frac{1}{N_M} \sum_i 10^{L_{pi}/10} \right), \qquad
-L_W = \bar{L}_p - K_1 - K_2 + 10\lg\frac{S}{S_0},\quad S_0 = 1\ \text{m}^2 .
+\bar{L}_p = 10\log_{10}\left( \frac{1}{N_M} \sum_i 10^{L_{pi}/10} \right), \qquad
+L_W = \bar{L}_p - K_1 - K_2 + 10\log_{10}\frac{S}{S_0},\quad S_0 = 1\ \text{m}^2 .
 $$
 
 Dos correcciones depuran el nivel superficial. La **corrección por ruido de
@@ -71,14 +71,14 @@ partir del margen $\Delta L_p$ entre los niveles con la fuente encendida y los
 de fondo,
 
 $$
-K_1 = -10\lg\left( 1 - 10^{-\Delta L_p/10} \right),
+K_1 = -10\log_{10}\left( 1 - 10^{-\Delta L_p/10} \right),
 $$
 
 y la **corrección ambiental** elimina la acumulación reverberante de la sala
 de ensayo a partir de su área de absorción acústica equivalente $A$,
 
 $$
-K_2 = 10\lg\left( 1 + \frac{4 S}{A} \right).
+K_2 = 10\log_{10}\left( 1 + \frac{4 S}{A} \right).
 $$
 
 El área de la superficie es una forma cerrada de la geometría: una semiesfera
@@ -125,7 +125,7 @@ res.plot()   # barras de nivel de potencia acústica por banda; LWA en el títul
 
 *Una barra por banda: la presión superficial promediada en energía menos las
 correcciones de fondo ($K_1$) y ambiental ($K_2$) más el término de superficie
-$10\lg(S/S_0)$ dan $L_W(f)$, y la suma energética ponderada A entre bandas da
+$10\log_{10}(S/S_0)$ dan $L_W(f)$, y la suma energética ponderada A entre bandas da
 el número único $L_{WA}$ del título.*
 
 <details>
@@ -286,7 +286,7 @@ el nivel de presión promediado en la superficie más el término de superficie 
 correcciones:
 
 $$
-L_W = \overline{L_p} + 10\lg\frac{S}{S_0} + C_1 + C_2 + C_3,
+L_W = \overline{L_p} + 10\log_{10}\frac{S}{S_0} + C_1 + C_2 + C_3,
 $$
 
 con $S = 4\pi r^2$ sobre la esfera o $S = 2\pi r^2$ sobre la semiesfera,

@@ -21,7 +21,7 @@ of the excess of the noise exposure level over a frequency-dependent cut-off
 $L_0$ (ISO 1999 clause 6.3.1, Formula 2, Table 1):
 
 $$
-N_{50} = \left[u + v\,\lg\!\frac{t}{t_0}\right](L_{EX,8h} - L_0)^2,
+N_{50} = \left[u + v\,\log_{10}\!\frac{t}{t_0}\right](L_{EX,8h} - L_0)^2,
 $$
 
 with $t$ the exposure in years and $t_0 = 1$ year; below $L_0$ the effect is

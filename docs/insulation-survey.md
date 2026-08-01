@@ -19,11 +19,11 @@ The [engineering methods](insulation-field.md) buy accuracy with effort: swept m
 per-band reverberation times, careful background correction. For a quick check
 in a dwelling, ISO 10052 defines a **survey (control) method**: octave bands, a
 hand-held meter, and a single quantity, the **reverberation index**
-$k = 10\lg(T/T_0)$ ($T_0 = 0.5\ \text{s}$), to carry the receiving-room
+$k = 10\log_{10}(T/T_0)$ ($T_0 = 0.5\ \text{s}$), to carry the receiving-room
 correction. Every survey quantity is then just an addition of $k$: the
 standardized level difference $D_{nT} = D + k$, the normalized
-$D_n = D + k + 10\lg(A_0 T_0/(0.16\,V))$, the apparent
-$R' = D + k + 10\lg(S T_0/(0.16\,V))$ (using $V/7.5$ for $S$ where
+$D_n = D + k + 10\log_{10}(A_0 T_0/(0.16\,V))$, the apparent
+$R' = D + k + 10\log_{10}(S T_0/(0.16\,V))$ (using $V/7.5$ for $S$ where
 that is larger), and, for impacts and façades, $L'_{nT} = L_i - k$ and
 $D_{2m,nT} = D_{2m} + k$. The clause references follow ISO 10052:2021; the formulas
 and the reverberation-index table are identical in the harmonized
@@ -64,7 +64,7 @@ res.plot()   # DnT vs shifted ISO 717-1 reference (needs matplotlib)
 
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/survey_insulation_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/survey_insulation.svg" alt="Survey-method airborne insulation: the raw level difference D and the standardized DnT across the five octave bands, with the reverberation-index correction k shaded between them" width="80%"></picture>
 
-*The reverberation index $k = 10\lg(T/T_0)$ shifts the raw level difference
+*The reverberation index $k = 10\log_{10}(T/T_0)$ shifts the raw level difference
 $D$ into the standardized $D_{nT}$: up where the room is live ($T > T_0$),
 down where
 it is dead. The automatic rating is formed only for exactly 5 octave (or 16

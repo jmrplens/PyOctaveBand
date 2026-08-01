@@ -102,15 +102,15 @@ enmascaramiento tiene en cuenta el oído (Fórmula 13) y la audibilidad es su
 diferencia (Fórmula 14):
 
 $$
-L_G = L_S + 10\lg\!\frac{\Delta f_c}{\Delta f}, \qquad
-a_v = -2 - \lg\!\Big[1 + \big(\tfrac{f}{502}\big)^{2{,}5}\Big], \qquad
+L_G = L_S + 10\log_{10}\!\frac{\Delta f_c}{\Delta f}, \qquad
+a_v = -2 - \log_{10}\!\Big[1 + \big(\tfrac{f}{502}\big)^{2{,}5}\Big], \qquad
 \Delta L = L_T - L_G - a_v .
 $$
 
 Un tono proporcionado es *audible* cuando $\Delta L > 0$. $\Delta f$ es el
 espaciado de líneas (resolución en frecuencia); las sumas energéticas sobre
 $K > 1$ líneas llevan una corrección de ventana de
-$10\lg(\Delta f/\Delta f_e)$ (−1,76 dB para la ventana de Hanning recomendada,
+$10\log_{10}(\Delta f/\Delta f_e)$ (−1,76 dB para la ventana de Hanning recomendada,
 $\Delta f_e = 1{,}5\,\Delta f$, Fórmula (8)), mientras que un tono de una sola
 línea ($K = 1$) toma su nivel sin cambios (Fórmula (7), sin corrección de
 ancho de banda).
@@ -329,7 +329,7 @@ debajo de 1000 Hz, el oído todavía puede distinguirlos (y entonces se evalúan
 $|f_{T1} - f_{T2}|$ (Fórmula 18) supera
 
 $$
-f_D = 21 \cdot 10^{\,1{,}2\,\left|\lg(f_T/212)\right|^{1{,}8}}\ \text{Hz}
+f_D = 21 \cdot 10^{\,1{,}2\,\left|\log_{10}(f_T/212)\right|^{1{,}8}}\ \text{Hz}
 \qquad (\text{Fórmula 19},\ 88\ \text{Hz} < f_T < 1000\ \text{Hz})
 $$
 

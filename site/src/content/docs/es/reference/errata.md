@@ -215,19 +215,19 @@ which is the check that enforces the rule; see
 - **The print:** K24 = 3,0 − 14,1 M + 5,7 M² dB (for m2/m1 > 3), under a
   figure whose x-axis is m2/m1.
 - **The problem:** Annex E defines $M$ per transmission path as
-  $M = \lg(m'_{\perp,i}/m'_i)$ (perpendicular element over the element
+  `M = lg(m'⊥,i/m'i)` (perpendicular element over the element
   carrying the path). The $K_{24}$ path 2→4 is carried by the homogeneous
   element ($m_2 = m_4$) with the leaf ($m_1$) perpendicular, so the per-path
-  $M$ is $\lg(m_1/m_2)$ — but the printed $K_{24}$ line only matches its own
-  figure's curve when $M$ is read as the x-axis variable $\lg(m_2/m_1)$
+  $M$ is $\log_{10}(m_1/m_2)$ — but the printed $K_{24}$ line only matches its own
+  figure's curve when $M$ is read as the x-axis variable $\log_{10}(m_2/m_1)$
   (e.g. −2,4 dB at $m_2/m_1 = 3$, −5,4 dB at 10). Read with the annex's
   declared $M$, the line contradicts the figure by
-  $28{,}2 \cdot |\lg(m_2/m_1)|\ \text{dB}$. The same edition's other $K_{24}$
+  $28{,}2 \cdot |\log_{10}(m_2/m_1)|\ \text{dB}$. The same edition's other $K_{24}$
   line (Figure E.5, Formula (E.5)) *does* follow the declared per-path $M$,
   so the two $K_{24}$ prints of the 2000 edition silently use different
   conventions. ISO 12354-1:2017 E.3.5 prints the relation consistently in the
   per-path convention of its Formula (E.3),
-  $K_{24} = 3{,}0 + 14{,}1 M + 5{,}7 M^2$; the two editions agree numerically
+  `K24 = 3,0 + 14,1 M + 5,7 M²`; the two editions agree numerically
   (an earlier revision of this entry read the 2017 print as a sign misprint —
   re-derivation against both editions' figures shows it is a convention
   recast, not a defect of the 2017 text).
@@ -272,13 +272,13 @@ which is the check that enforces the rule; see
 - **The print:** `D2m,n = D2m,nT − 10 lg[0,16 V/(T0 A0)] = D2m,nT −
   10 lg 0,32 V dB`.
 - **The problem:** the reduced form is off by a factor of ten. Six lines above
-  it, the where-list of clause 3.1.4 defines $A_0$ as "the reference
+  it, the where-list of clause 3.1.4 defines `A0` as "the reference
   equivalent sound absorption area, in square metres, for dwellings given as
   10 m²", and the where-list of clause 3.1.3 on the preceding page defines
-  $T_0$ as "the reference reverberation time, in seconds, for dwellings given
+  `T0` as "the reference reverberation time, in seconds, for dwellings given
   as 0,5 s". So $0{,}16/(T_0 A_0) = 0{,}16/5 = 0{,}032$, not 0,32.
   Applied as printed, the reduced form shifts every normalized façade level
-  difference by exactly $10\lg 10 = 10\ \text{dB}$. The exact analogue in the
+  difference by exactly $10\log_{10} 10 = 10\ \text{dB}$. The exact analogue in the
   companion part, EN 12354-2:2000 Formula (3), prints the same algebra
   correctly: `L'nT = L'n − 10 lg[0,16 V/(A0 T0)] = L'n − 10 lg 0,032 V dB`.
   ISO 12354-3:2017 dropped the reduced form altogether: its Formula (5) prints
@@ -298,11 +298,11 @@ which is the check that enforces the rule; see
   the façade model computes $D_{2m,nT}$ from Formula (13)
   ([`facade_prediction.py`](https://github.com/jmrplens/phonometry/blob/main/src/phonometry/building/facade_prediction.py)),
   and the survey method converts with the unreduced
-  $D_{2m,n} = D_{2m} + k + 10\lg[A_0 T_0/(0{,}16 V)]$ of ISO 10052 Clause 3.15
+  $D_{2m,n} = D_{2m} + k + 10\log_{10}[A_0 T_0/(0{,}16 V)]$ of ISO 10052 Clause 3.15
   ([`survey_insulation.py`](https://github.com/jmrplens/phonometry/blob/main/src/phonometry/building/survey_insulation.py)).
   The two standardization constants that *are* pre-folded elsewhere in the
   library are both correct: $0{,}032$ for the Part 2 impact form and $0{,}32$
-  for the Part 1 airborne form $D_{nT} = R' + 10\lg(0{,}16 V/(T_0 S_s))$,
+  for the Part 1 airborne form $D_{nT} = R' + 10\log_{10}(0{,}16 V/(T_0 S_s))$,
   where the denominator is an area rather than $A_0$.
 - **Status:** unreported.
 
@@ -319,11 +319,11 @@ which is the check that enforces the rule; see
   outlier. With the example's own inputs ($V = 50\ \text{m}^3$,
   $S = 11{,}3\ \text{m}^2$, $T_0 = 0{,}5\ \text{s}$, $\Delta L_\text{fs} = 0$),
   the Sabine form gives
-  $10\lg[0{,}16 \cdot 50/(0{,}5 \cdot 11{,}3)] = 1{,}5116\ \text{dB}$, which
+  $10\log_{10}[0{,}16 \cdot 50/(0{,}5 \cdot 11{,}3)] = 1{,}5116\ \text{dB}$, which
   is the printed +1,5 dB row; Formula (13) as printed gives
-  $10\lg[50/(6 \cdot 0{,}5 \cdot 11{,}3)] = 1{,}6893\ \text{dB}$.
+  $10\log_{10}[50/(6 \cdot 0{,}5 \cdot 11{,}3)] = 1{,}6893\ \text{dB}$.
   The gap is the constant: Formula (13)'s "6" is a rounded $1/0{,}16 = 6{,}25$,
-  and $10\lg(6{,}25/6) = 0{,}177\ \text{dB}$ is exactly the discrepancy.
+  and $10\log_{10}(6{,}25/6) = 0{,}177\ \text{dB}$ is exactly the discrepancy.
   ISO 12354-3:2017
   replaced it with an explicit Sabine constant, printing Formula (4) as
   `D2m,nT = R' + ΔLfs + [10 lg(Csab V/(T0 S))]` with `Csab = 0,16 s/m`, which
@@ -354,8 +354,8 @@ which is the check that enforces the rule; see
 - **The print:** R' = 24,4 / 21,5 / 24,9 / 35,4 / 37,5 dB at
   125 / 250 / 500 / 1000 / 2000 Hz.
 - **The problem:** the last two cells do not follow from the table's own
-  element rows. Formula (10), $R' = -10\lg \sum \tau_{e,i}$, applied to the
-  four $-10\lg \tau_e$ columns printed immediately above gives
+  element rows. Formula (10), $R' = -10\log_{10} \sum \tau_{e,i}$, applied to the
+  four $-10\log_{10} \tau_e$ columns printed immediately above gives
   24,41 / 21,50 / 24,86 / **35,78** / **37,99** dB. The first three cells
   reproduce to the 0,05 dB the table carries; the 1 kHz and 2 kHz cells are
   printed 0,4 dB and 0,5 dB low.
@@ -517,7 +517,7 @@ which is the check that enforces the rule; see
 - **The print:** row "Int. wall 1/2 - Ext. wall 1/2" gives Kij = 6,6 dB; the
   row below it, "Ext. wall 1/2 - Ext. wall 1/2", gives m'i = 2,19 kg/m².
 - **The problem:** two independent misprints. The rigid-T corner branch
-  $K_{12} = 5{,}7 + 5{,}7 M^2$ with $M = \lg(360/219) = 0{,}215\,6$ gives
+  $K_{12} = 5{,}7 + 5{,}7 M^2$ with $M = \log_{10}(360/219) = 0{,}215\,6$ gives
   5,97, i.e. **6,0**, and ISO 12354-1:2017 Table L.8 prints 6,0 for the
   identical junction of the identical example. And the external wall's mass per
   unit area is 219,0 kg/m² throughout the example, not 2,19 (a factor 100).
@@ -543,7 +543,7 @@ which is the check that enforces the rule; see
   those of the in-line internal-wall path, and ISO 12354-1:2017 Table L.6
   prints the same row correctly as "Int. wall 1/2 - Int. wall 1/2".
 - **Evidence:** the rigid-cross through branch $8{,}7 + 17{,}1 M + 5{,}7 M^2$
-  with $M = \lg(484/360)$ gives 10,99, the printed 11,0, for the internal wall.
+  with $M = \log_{10}(484/360)$ gives 10,99, the printed 11,0, for the internal wall.
   Render: `plan/[ISO 12354-2_2017] impact sound insulation between rooms
   prediction.pdf`, PDF page 46, printed p. 40, 200 dpi.
 - **Library behaviour:** treats the row as the internal-wall in-line path.
@@ -603,11 +603,11 @@ which is the check that enforces the rule; see
 - **Status:** unreported.
 
 - **Related, not an erratum:** NOTE 1 of the same table sets a floor of 0 dB
-  on the 30 Hz to 160 Hz branch $74{,}4 - 20\lg(f_0) - R_w/2$. Inside the
+  on the 30 Hz to 160 Hz branch $74{,}4 - 20\log_{10}(f_0) - R_w/2$. Inside the
   validity box Clause D.2.2 states for the table
   ($30\ \text{Hz} \le f_0 \le 160\ \text{Hz}$,
   $20\ \text{dB} \le R_w \le 60\ \text{dB}$) the branch never reaches it: its
-  minimum is $74{,}4 - 20\lg(160) - 60/2 = 0{,}32\ \text{dB}$. The floor is
+  minimum is $74{,}4 - 20\log_{10}(160) - 60/2 = 0{,}32\ \text{dB}$. The floor is
   therefore inactive for every input the table is stated for, but it was not
   always: the 2000 edition tabulated the low branch as four discrete rows
   ending in "160 -> 28 - Rw/2", whose minimum is $28 - 60/2 = -2\ \text{dB}$,
@@ -627,21 +627,21 @@ which is the check that enforces the rule; see
   10 lg N term is subtracted.
 - **The problem:** the subtracted sign cannot be derived. Measuring $N$
   identical units within one measurement surface raises the transmitted
-  power (and hence $L_{In} + 10\lg S_m$) by $10\lg N$, so recovering the
-  per-unit $D_{I,n,e}$ requires *adding* $10\lg N$. The pressure-based
+  power (and hence $L_{In} + 10\log_{10} S_m$) by $10\log_{10} N$, so recovering the
+  per-unit $D_{I,n,e}$ requires *adding* $10\log_{10} N$. The pressure-based
   equivalent, ISO 10140-2:2010 Formula (6), prints exactly that correction
-  ($D_{n,e} = L_1 - L_2 + 10\lg(nA_0/A)$), and ISO 15186-2:2010 Formula (12)
+  ($D_{n,e} = L_1 - L_2 + 10\log_{10}(nA_0/A)$), and ISO 15186-2:2010 Formula (12)
   prints Formula (8) without any $N$ term (the $N = 1$ case, with which both
   signs agree). As printed, installing more units would *lower* the per-unit
-  rating by $20\lg N$ relative to the derivable value.
+  rating by $20\log_{10} N$ relative to the derivable value.
 - **Evidence:** derivation from the diffuse-field receiving-room relation
-  $L_2 = L_W + 10\lg(4/A)$ against ISO 10140-2:2010 Formula (6); cross-check
+  $L_2 = L_W + 10\log_{10}(4/A)$ against ISO 10140-2:2010 Formula (6); cross-check
   against ISO 15186-2:2010 Formula (12) and Hopkins, *Sound Insulation* (2007),
   Eq. 3.45. Render: `plan/[BS EN ISO 15186-1_2003] sound insulation via sound
   intensity lab.pdf`, PDF page 11, printed p. 3, 400 dpi, which shows the
   `+ 10 lg(N)` inside the subtracted bracket.
 - **Library behaviour:** implements the derivable per-unit form
-  (`intensity_element_normalized_difference`, $+10\lg N$) and emits a warning
+  (`intensity_element_normalized_difference`, $+10\log_{10} N$) and emits a warning
   whenever $n > 1$, where the result deviates from the print.
 - **Status:** unreported.
 
@@ -817,8 +817,8 @@ which is the check that enforces the rule; see
   the lower band-edge frequency $f_{1,L}$ of the lower critical band.
 - **The print:** `f_1,L = C_L,0 + C_L,0 f_t + C_L,2 f_t²`.
 - **The problem:** the linear coefficient repeats the constant term. The
-  where-list immediately below the formula declares "$C_{L,0}$, $C_{L,1}$,
-  $C_{L,2}$ are constants given in Table 2", Table 2 tabulates a $C_{L,1}$
+  where-list immediately below the formula declares "`C_L,0`, `C_L,1`,
+  `C_L,2` are constants given in Table 2", Table 2 tabulates a $C_{L,1}$
   column, and the parallel Formula (22) for the upper band edge prints
   `f_2,U = C_U,0 + C_U,1 f_t + C_U,2 f_t²` correctly. The misprint is
   numerically fatal, not cosmetic: over the middle fit range
@@ -1006,7 +1006,7 @@ which is the check that enforces the rule; see
 - **Evidence:** recomputation from the printed per-tone levels of
   Tabelle I.6. The offset is the discriminator and it is a constant, not a
   deduplication: $82{,}873\,4 - 81{,}11 = 1{,}763\ \text{dB}$, and 1,76 dB is
-  $10\lg 1{,}5$, the standard's own Hanning effective-bandwidth correction
+  $10\log_{10} 1{,}5$, the standard's own Hanning effective-bandwidth correction
   (clause 5.3.2). The same offset appears in the "5 FG" row of Tabelle I.10
   (printed p. 46), where the two member tones at 705,2 and 732,1 Hz have
   $L_T = 55{,}12$ and 54,23 dB, sum to 57,708 dB, and are printed as 55,95 dB,
@@ -1066,15 +1066,15 @@ which is the check that enforces the rule; see
   dynamic intermodulation distortion $d_\text{DIM}$.
 - **The print:** `d_DIM = (Σ_{i=1}^{9} U'_i²)^{1/2} / U_2 × 100 %`.
 - **The problem:** the denominator is one of the nine terms of its own
-  numerator. Table 2 of the same clause (printed p. 38) defines $U_2$ as the
-  intermodulation component at $f_s - 2f_q = 8{,}70\ \text{kHz}$, and item d)
-  defines $U_1, U_2, \ldots U_i$ as exactly those components, so the sum
+  numerator. Table 2 of the same clause (printed p. 38) defines `U_2` as the
+  intermodulation component at `f_s − 2f_q = 8,70 kHz`, and item d)
+  defines `U_1, U_2, … U_i` as exactly those components, so the sum
   $i = 1\ldots9$ runs over $U_1 \ldots U_9$ and includes $U_2$. Meanwhile the
   defining clause
   14.12.9.1 states the ratio of the r.m.s. sum of the Table 2 intermodulation
   product voltages "to the amplitude of the output voltage at the frequency
   f_s", i.e. the 15 kHz sine component $U_s$, the Otala convention, and item
-  d) measures "the amplitudes of the sinusoidal signal $U_s$" precisely so
+  d) measures "the amplitudes of the sinusoidal signal `U_s`" precisely so
   that it can be used, which the f) formula then never does. The denominator
   should be $U_s$. An earlier revision of this entry said that "U2 is used
   throughout 14.12 for the total output voltage"; that is false, in both the
@@ -1130,7 +1130,7 @@ which is the check that enforces the rule; see
 ## ISO/PAS 1996-3:2022, Clause 5 (cross-references of r and d)
 
 - **Location:** Clause 5, Formula (2), the definitions of the symbols of the
-  prominence $P = 3\lg[r/(\text{dB/s})] + 2\lg(d/\text{dB})$.
+  prominence $P = 3\log_{10}[r/(\text{dB/s})] + 2\log_{10}(d/\text{dB})$.
 - **The print:** "r is the onset rate (OR) as defined in 3.4" and "d is the
   level difference (LD) as defined in 3.5".
 - **The problem:** the two cross-references are swapped. The document's own
@@ -1197,7 +1197,7 @@ which is the check that enforces the rule; see
   $U_5 = 9.33\ \text{dB}$) gives $L_5 = 1 - (20 - 9.33 - 10)/160 = 0.9958$,
   which prints to two decimals as 1.00, not 0.10. (b) Clause 5.4 with the
   example's inputs ($B_1 = 40\ \text{dB}$, $f_1 = 160\ \text{Hz}$) gives
-  $C_1 = -80 + 0.6 (40 + 10\lg 160 - 6.353) = -46.587$, which prints as
+  $C_1 = -80 + 0.6 (40 + 10\log_{10} 160 - 6.353) = -46.587$, which prints as
   −46.59, not −45.59; the example's $Z_i$ column is only consistent with the
   corrected slope ($Z_2$ recomputes to 34.658 = printed 34.66 dB, whereas the
   misprinted
@@ -1349,11 +1349,11 @@ which is the check that enforces the rule; see
   by diffraction).
 - **The print:** the weighting exponent reads (ΔL_g,s′ − ΔL_d,s)/20.
 - **The problem:** no term $\Delta L_{g,s'}$ exists; the prose directly below
-  the equation defines $\Delta L_{d,s'}$ as "the attenuation due to the
+  the equation defines `ΔL_d,s′` as "the attenuation due to the
   diffraction between the image source S′ and R", the receiver-side companion
-  Eq. (47) prints the parallel term correctly as $\Delta L_{d,r'}$, and the
-  CNOSSOS-EU method the section is based on writes $\Delta_\text{ground}(S,O)$
-  with $\Delta_\text{dif}(S',R)$ in that position. The
+  Eq. (47) prints the parallel term correctly as `ΔL_d,r′`, and the
+  CNOSSOS-EU method the section is based on writes `Δ_ground(S,O)`
+  with `Δ_dif(S′,R)` in that position. The
   subscript g is a misprint for d.
 - **Evidence:** internal consistency of the section (its own prose and
   Eq. (47)) and the CNOSSOS-EU source of the equations.
@@ -1406,9 +1406,9 @@ which is the check that enforces the rule; see
 - **The print:** z(f) = 13·arctan(0,76·10⁻⁴·f) + 3,5·arctan((f/7500)²).
 - **The problem:** the first coefficient is the Zwicker-Terhardt
   $0{,}76 \cdot 10^{-3}$ with the exponent misprinted. The paper's own anchors
-  disprove the print: it states $0{,}5\ \text{Bark} = 50\ \text{Hz}$ and
-  $23{,}5\ \text{Bark} = 13{,}2\ \text{kHz}$ (section 2.1.2) and
-  $15\ \text{Bark} = 2{,}7\ \text{kHz}$ (section 3.1), all of which require
+  disprove the print: it states 0,5 Bark = 50 Hz and
+  23,5 Bark = 13,2 kHz (section 2.1.2) and
+  15 Bark = 2,7 kHz (section 3.1), all of which require
   $10^{-3}$. With $10^{-4}$, $z(1\ \text{kHz}) = 1{,}05$ instead of
   8,51 Bark and the model's 47 filter centres
   would span 491 Hz to 20 kHz instead of 50 Hz to 13,2 kHz.
@@ -1596,12 +1596,12 @@ which is the check that enforces the rule; see
   Z_A1/Z_An weighting T11 and its inverse weighting T22.
 - **The problem:** the source the equation itself cites (Munjal, *Acoustics
   of Ducts and Mufflers* 2e, Eq. (3.27), p. 105) carries the overall
-  prefactor $Z_{An}/Z_{A1}$ (equivalently $\sqrt{S_1/S_n}$ inside a $20\lg$
+  prefactor $Z_{An}/Z_{A1}$ (equivalently $\sqrt{S_1/S_n}$ inside a $20\log_{10}$
   form) with $T_{11}$ unweighted and $Z_{A1}/Z_{An}$ on $T_{22}$. As printed,
   Eq. (8.141) fails the sudden-expansion limit: a zero-length element
   ($T = I$) between $S_1 = 0{,}01\ \text{m}^2$
   and $S_n = 0{,}02\ \text{m}^2$ is a sudden area expansion with the classic
-  $TL = 10\lg[(1+m)^2/(4m)] = 0{,}512\ \text{dB}$ ($m = S_n/S_1 = 2$), but the
+  $TL = 10\log_{10}[(1+m)^2/(4m)] = 0{,}512\ \text{dB}$ ($m = S_n/S_1 = 2$), but the
   printed equation gives
   $\tfrac{1}{4} \cdot (Z_{A1}/Z_{An} + Z_{An}/Z_{A1})^2 = 1{,}938\ \text{dB}$.
   Reading the ratios
@@ -1679,7 +1679,7 @@ which is the check that enforces the rule; see
   communication.
 - **The print:** `A_tab > 6.33 r_s²`.
 - **The problem:** the bound is Eq. (17.52),
-  $L_\text{SN} = 10\lg[Q/(4\pi r^2)] + 10\lg[A_\text{tab}/4]$, solved for
+  $L_\text{SN} = 10\log_{10}[Q/(4\pi r^2)] + 10\log_{10}[A_\text{tab}/4]$, solved for
   $A_\text{tab}$ at the stated threshold $L_\text{SN} > -6\ \text{dB}$, which
   gives $A_\text{tab} > 16\pi \cdot 10^{-0{,}6} r_s^2/Q$. With the
   $Q = 2$ the chapter uses for a talker, that constant is 6,3130, not 6,33.
@@ -1766,9 +1766,9 @@ which is the check that enforces the rule; see
 - **Evidence:** dimensional check of $Q/(60 S_G)$; reconstruction of the
   $334{,}9/\rho_0$ constant from the velocity-pressure relation; and the peak
   frequency. What does **not** discriminate is the overall level: Eq. 13.27
-  carries $30\lg\xi + 60\lg U_G$, and substituting Eq. 13.28 makes the
+  carries $30\log_{10}\xi + 60\log_{10} U_G$, and substituting Eq. 13.28 makes the
   velocity cancel identically,
-  $30\lg\xi + 60\lg U_G = 30\lg(334{,}9 \Delta P/\rho_0)$. For the
+  $30\log_{10}\xi + 60\log_{10} U_G = 30\log_{10}(334{,}9 \Delta P/\rho_0)$. For the
   Table 14.9 supply diffuser ($S_G = 4\ \text{ft}^2$, $Q = 312$ cfm,
   $\Delta P = 0{,}05$ in w.g.)
   both readings therefore return the same $L_W = 45{,}18\ \text{dB}$. An
@@ -1912,11 +1912,11 @@ which is the check that enforces the rule; see
   "~1,5 × 10⁻²"; the answer gives 27 dB at 8 kHz and 38,6 dB at 16 kHz.
 - **The problem:** those two values are above the panel's critical frequency
   (4885 Hz for Appendix 4 particle board, $f_c t = 97{,}7\ \text{m/s}$) and
-  therefore follow Cremer's Eq. (3.110), which contains $10\lg(\eta)$. With
+  therefore follow Cremer's Eq. (3.110), which contains $10\log_{10}(\eta)$. With
   $\eta = 1{,}5 \cdot 10^{-2}$ the equation gives 37,0 dB and 48,5 dB, ten
   decibels above the printed answers; with $\eta = 1{,}5 \cdot 10^{-3}$ it
   gives 27,0 dB and 38,5 dB.
-- **Evidence:** the 10 dB offset is exactly one decade of $10\lg(\eta)$, and
+- **Evidence:** the 10 dB offset is exactly one decade of $10\log_{10}(\eta)$, and
   the frequency dependence of the printed pair independently fixes
   $f_c = 4939\ \text{Hz}$ against the Appendix 4 value of 4885 Hz. The eight
   values below
@@ -2525,7 +2525,7 @@ published sources:
   assignments return the same 5,965 → 6,0 dB. The second row of each table,
   "Ext. wall 1/2 – Ext. wall 1/2", is the through branch
   $5{,}7 + 14{,}1 M + 5{,}7 M^2$, where the sign of $M$ does matter, and it is
-  labelled and populated consistently ($M = \lg(360/219)$ gives 9,006 → the
+  labelled and populated consistently ($M = \log_{10}(360/219)$ gives 9,006 → the
   printed 9,0).
   Renders: `plan/[ISO 12354-1_2017] airborne insulation between rooms
   prediction.pdf`, PDF page 89, printed p. 83, 200 dpi, and `plan/[ISO
@@ -2570,7 +2570,7 @@ published sources:
   Eq. (17.50) as printed, so it returns 52,5 dB there; do not "correct" it
   toward 54 dB.
 - **ICAO Annex 16 EPNL constant:** the Annex's rounded constant 13 for
-  uniform 0,5 s records differs from the exact $-10\lg(T_0)$ form by 0,0103 dB;
+  uniform 0,5 s records differs from the exact $-10\log_{10}(T_0)$ form by 0,0103 dB;
   the library uses the exact form, which the ETM's integrated reference
   reproduces to five decimals.
 - **Long Table 14.9 element rows:** the worked duct-borne sheet of Chapter 14

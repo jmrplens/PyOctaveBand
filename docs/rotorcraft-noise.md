@@ -45,7 +45,7 @@ lv = aircraft.hemisphere_source_level(h, 0.0, 90.0)   # level per band abeam-bel
 The hemisphere level at 60 m is carried to the receiver by three adjustments
 (Doc 32 §A.4):
 
-- **`spherical_spreading_adjustment(r)`**: $\Delta L_s = -20\lg(r/60)$
+- **`spherical_spreading_adjustment(r)`**: $\Delta L_s = -20\log_{10}(r/60)$
   (Eq. 24).
 - **`atmospheric_adjustment(freqs, r)`**: $\Delta L_a = -\alpha(f)\,(r - 60)$
   with the
@@ -264,7 +264,7 @@ When terrain blocks the line of sight, the sound follows the shortest convex
 path over it (the guidance's rubber band) and every touched vertex is a
 **diffraction edge**. The attenuation combines the pure diffraction of the
 path difference $\delta$ (Eq. 42-44,
-$10 C_h \lg\bigl(3 + (40/\lambda)\,C''\,\delta\bigr)$, capped at
+$10 C_h \log_{10}\bigl(3 + (40/\lambda)\,C''\,\delta\bigr)$, capped at
 25 dB) with the source-side and receiver-side ground effects, each over its
 own mean ground plane and weighted by its image-path diffraction (Eq. 45-47,
 the CNOSSOS-EU scheme the guidance adopts). The ground effect is not
@@ -362,7 +362,7 @@ The terrain machinery is anchored in closed form: the mean ground plane is
 exact on linear and symmetric profiles, a flat section reproduces the
 flat-ground model to machine precision and an inclined plane its analytic
 rotation, the log-mean resistivity recovers the geometric mean, the grazing
-diffraction gives the classical $10\lg 3$, and a hand-checked hill fixes
+diffraction gives the classical $10\log_{10} 3$, and a hand-checked hill fixes
 the rubber-band path difference. Per-receiver ground handling validates end
 to end against the prototype's ARP Case 3 (187 microphones, each on its own
 ground elevation: every step level to 0.08 dB(A), `SEL`/`LASmax` to 0.05 dB,

@@ -114,7 +114,7 @@ $$
 
 each mode weighted by its excitation at the source depth $\Psi_m(z_s)$ and
 its amplitude at the receiver depth $\Psi_m(z)$, and the coherent
-transmission loss follows as $TL = -20 \lg\,\lvert p(r,z)/p_0(1\,\mathrm{m})
+transmission loss follows as $TL = -20 \log_{10}\,\lvert p(r,z)/p_0(1\,\mathrm{m})
 \rvert$ (Eq. 5.15). `normal_modes` discretises the depth equation by finite
 differences (a symmetric tridiagonal eigenproblem) on a grid refined enough
 to keep the near-cutoff eigenvalues honest, and warns when a retained mode
@@ -263,9 +263,9 @@ that range; use it when a legible formula matters more than the last percent.
 1000 m) and predates both; keep it for quick low-frequency estimates below a
 few tens of kHz and for comparison with older literature that used it.
 
-**Spreading law.** Spherical spreading ($20\lg R$) describes a wavefront that
+**Spreading law.** Spherical spreading ($20\log_{10} R$) describes a wavefront that
 expands freely in three dimensions, before any boundary confines it;
-cylindrical spreading ($10\lg R$) describes energy trapped between the surface
+cylindrical spreading ($10\log_{10} R$) describes energy trapped between the surface
 and the bottom (or in the SOFAR channel) that can only expand in range. The
 `"practical"` law splices the two at a transition range $R_0$, which is
 physically of the order of the water (or channel) depth: spherical while the

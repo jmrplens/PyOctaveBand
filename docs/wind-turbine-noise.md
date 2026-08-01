@@ -17,7 +17,7 @@ the rotor centre is $R_1 = \sqrt{H^2 + R_0^2}$ and the per-band apparent sound
 power level is
 
 $$
-L_{WA,i} = L_{p,i} - 6 + 10\lg\frac{4\pi R_1^2}{S_0}, \qquad S_0 = 1\ \mathrm{m}^2,
+L_{WA,i} = L_{p,i} - 6 + 10\log_{10}\frac{4\pi R_1^2}{S_0}, \qquad S_0 = 1\ \mathrm{m}^2,
 $$
 
 energy-summed over bands (Formula 27). The −6 dB accounts for the ground-board
@@ -103,7 +103,7 @@ masking-noise level $L_{pn}$ follows Formula 31, the tonality is
 $\Delta L_{tn} = L_{pt} - L_{pn}$, and the tonal audibility is
 
 $$
-\Delta L_a = \Delta L_{tn} - L_a, \qquad L_a = -2 - \lg\!\big[1 + (f/502)^{2.5}\big],
+\Delta L_a = \Delta L_{tn} - L_a, \qquad L_a = -2 - \log_{10}\!\big[1 + (f/502)^{2.5}\big],
 $$
 
 reported when $\Delta L_a \ge -3\ \text{dB}$; a tone is audible when

@@ -18,14 +18,14 @@ mean-square vibratory velocity over the radiating area $S$. Expressed in levels
 power level is (Formula 12 / 15)
 
 $$
-L_W = L_v + 10\lg\frac{S}{S_0} + 10\lg\varepsilon
-      + 10\lg\frac{Z_{c,n}}{Z_{c,0}},
+L_W = L_v + 10\log_{10}\frac{S}{S_0} + 10\log_{10}\varepsilon
+      + 10\log_{10}\frac{Z_{c,n}}{Z_{c,0}},
 $$
 
 where $S_0 = 1\ \text{m}^2$, the normalized impedance
 $Z_{c,n} = 411\ \text{N·s/m}^3$ and the reference
 $Z_{c,0} = 400\ \text{N·s/m}^3$ give the fixed
-$10\lg(411/400) = 0.118\ \text{dB}$
+$10\log_{10}(411/400) = 0.118\ \text{dB}$
 term. This module feeds the structure-borne source and building prediction
 standards (ISO 9611, EN 15657, EN 12354-5).
 
@@ -124,9 +124,9 @@ eng.plot()   # the LW(f) spectrum, as in the figure above (needs matplotlib)
 
 ## 2. Velocity level, calibration and the radiation factor
 
-The velocity level is $L_v = 20\lg(v/v_0)$ (Formula 3); a sinusoidal
+The velocity level is $L_v = 20\log_{10}(v/v_0)$ (Formula 3); a sinusoidal
 calibration acceleration converts as
-$L_v = 20\lg\!\left(\hat{a}/(2\pi f\,v_0\sqrt{2})\right)$ (Formula 8). The
+$L_v = 20\log_{10}\!\left(\hat{a}/(2\pi f\,v_0\sqrt{2})\right)$ (Formula 8). The
 radiation factor comes from an independently measured power:
 
 ```python
@@ -276,4 +276,4 @@ velocity level and its calibration
 correction (Table 2), the radiation factor (Formula 4/8) and the sound power
 level (Formulae 12/15). Conformance is anchored on the standard's own worked
 calibration example, the exact round-trip between the radiation factor and
-$L_W = 10\lg(P/P_0)$, and the fixed impedance term.
+$L_W = 10\log_{10}(P/P_0)$, and the fixed impedance term.

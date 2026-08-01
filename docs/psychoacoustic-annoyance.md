@@ -66,7 +66,7 @@ roughness/fluctuation weighting $w_{FR}$:
 
 $$
 PA = N_5\left(1 + \sqrt{w_S^2 + w_{FR}^2}\right), \qquad
-w_S = (S - 1.75)\,0.25\,\lg(N_5 + 10)\ \ (S > 1.75\ \mathrm{acum}), \qquad
+w_S = (S - 1.75)\,0.25\,\log_{10}(N_5 + 10)\ \ (S > 1.75\ \mathrm{acum}), \qquad
 w_{FR} = \frac{2.18}{N_5^{0.4}}\,(0.4\,F + 0.6\,R).
 $$
 

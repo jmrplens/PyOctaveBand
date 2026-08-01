@@ -211,13 +211,13 @@ how much reverberant field a given power builds up. The **steady-state level**
 is
 
 $$
-L_p = L_W + 10 \lg\!\left( \frac{Q}{4 \pi r^2} + \frac{4}{R} \right)
-\left[ + 10 \lg\frac{\rho c}{400} \right]
+L_p = L_W + 10 \log_{10}\!\left( \frac{Q}{4 \pi r^2} + \frac{4}{R} \right)
+\left[ + 10 \log_{10}\frac{\rho c}{400} \right]
 \quad \text{(Bies Equation (6.43))}
 $$
 
 with the source directivity factor $Q$ (1 omnidirectional, 2 on a hard floor,
-4 in an edge, 8 in a corner). The optional $10 \lg(\rho c / 400)$ term
+4 in an edge, 8 in a corner). The optional $10 \log_{10}(\rho c / 400)$ term
 (about +0.14 dB at 20 °C) corrects for a characteristic impedance differing
 from 400 Pa·s/m and is omitted by default. The **critical distance**
 

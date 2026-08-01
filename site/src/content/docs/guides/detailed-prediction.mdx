@@ -90,7 +90,7 @@ junction actually produces (Formula 10):
 
 $$
 \overline{D}_{v,ij,\text{situ}} = K_{ij}
-- 10\lg\!\left(\frac{l_{ij}}{\sqrt{a_{i,\text{situ}}\,a_{j,\text{situ}}}}\right)
+- 10\log_{10}\!\left(\frac{l_{ij}}{\sqrt{a_{i,\text{situ}}\,a_{j,\text{situ}}}}\right)
 \ \ge 0\ \text{dB}
 $$
 
@@ -102,16 +102,16 @@ $$
 R_{ij} = \frac{R_{i,\text{situ}}}{2} + \Delta R_{i,\text{situ}}
 + \frac{R_{j,\text{situ}}}{2} + \Delta R_{j,\text{situ}}
 + \overline{D}_{v,ij,\text{situ}}
-+ 10\lg\!\left(\frac{S_s}{\sqrt{S_i S_j}}\right)
++ 10\log_{10}\!\left(\frac{S_s}{\sqrt{S_i S_j}}\right)
 $$
 
 The impact side runs in parallel: the bare slab's per-band level is
-$L_n = 155 - 30\lg m' + 10\lg T_s + 10\lg\sigma + 10\lg(f/f_\text{ref})$
+$L_n = 155 - 30\log_{10} m' + 10\log_{10} T_s + 10\log_{10}\sigma + 10\log_{10}(f/f_\text{ref})$
 (Part 2 Formula B.2), the direct path subtracts the covering and any ceiling
 (Formula 11), and each flanking path is Formula (12).
 
-**5. Assembly.** $R' = -10\lg\sum 10^{-R/10}$ over the thirteen paths of a
-four-flanking-element room, and $L'_n = 10\lg\sum 10^{L_n/10}$ over the five
+**5. Assembly.** $R' = -10\log_{10}\sum 10^{-R/10}$ over the thirteen paths of a
+four-flanking-element room, and $L'_n = 10\log_{10}\sum 10^{L_n/10}$ over the five
 impact paths, then ISO 717.
 
 ## The worked building of Annex L / Annex G
@@ -360,8 +360,8 @@ ln_13 = flanking_impact_level_from_flanking_level(
 
 Two identities let a spectrum check itself. For a homogeneous floor the
 airborne index and the impact level add up to a function of frequency alone
-(Part 2 Formulae B.3/B.4), $R + L_n = 38 + 30\lg f$ in one-third-octave bands
-and $43 + 30\lg f$ in octave bands, valid where forced transmission is
+(Part 2 Formulae B.3/B.4), $R + L_n = 38 + 30\log_{10} f$ in one-third-octave bands
+and $43 + 30\log_{10} f$ in octave bands, valid where forced transmission is
 negligible; `reciprocity_impact_level` implements it. And Table B.2 of Part 2
 tabulates the octave-band $L_n$ of four monolithic floors calculated the way
 this module does, a useful sanity target for a new floor build-up.

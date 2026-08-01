@@ -97,19 +97,19 @@ $P = \omega\,\eta\,(m S)\,\langle v^2 \rangle$, so the injected
 power level in one-third-octave bands is (Formula 14)
 
 $$
-L_{Ws} = 10\lg\!\left(\frac{2\pi f\,\eta\,m\,S}{f_0\,m_0\,S_0}\right)
+L_{Ws} = 10\log_{10}\!\left(\frac{2\pi f\,\eta\,m\,S}{f_0\,m_0\,S_0}\right)
          + L_v - 60 \;\;[\mathrm{dB\ re\ 1\ pW}],
 $$
 
 with references $f_0 = 1\ \text{Hz}$, $m_0 = 1\ \text{kg}$,
-$S_0 = 1\ \text{m}^2$; the $-60\ \text{dB}$ term is $10\lg(v_0^2/P_0)$ for
+$S_0 = 1\ \text{m}^2$; the $-60\ \text{dB}$ term is $10\log_{10}(v_0^2/P_0)$ for
 the EN 15657 velocity reference $v_0 = 10^{-9}\ \text{m/s}$. The plate
 velocity is the energetic spatial average over the $N$ positions (Formula 12)
 and the loss factor comes from the structural reverberation time $T_s$
 (Formula 13, identical to the ISO 10848 total loss factor):
 
 $$
-L_v = 10\lg\!\Big(\tfrac{1}{N}\textstyle\sum 10^{L_{v,i}/10}\Big), \qquad
+L_v = 10\log_{10}\!\Big(\tfrac{1}{N}\textstyle\sum 10^{L_{v,i}/10}\Big), \qquad
 \eta = \frac{2.2}{f\,T_s}.
 $$
 
@@ -150,7 +150,7 @@ plate-independent quantities: the **equivalent blocked force level**
 (Formula 15, re $F_0 = 10^{-6}\ \text{N}$) from the low-mobility plate,
 
 $$
-L_{Fb,eq} = L_{Ws,\mathrm{low}} - 10\lg\frac{\mathrm{Re}\{Y_{R,\mathrm{low,eq}}\}}{Y_0},
+L_{Fb,eq} = L_{Ws,\mathrm{low}} - 10\log_{10}\frac{\mathrm{Re}\{Y_{R,\mathrm{low,eq}}\}}{Y_0},
 $$
 
 the **characteristic reception-plate power level** that EN 12354-5 consumes
@@ -159,7 +159,7 @@ mobility $Y_{R,\infty,\text{low}} = 5\times10^{-6}\ \text{m/(N·s)}$
 (clause 7.2.4),
 
 $$
-L_{Wsn} = L_{Fb,eq} + 10\lg\frac{Y_{R,\infty,\mathrm{low}}}{Y_0},
+L_{Wsn} = L_{Fb,eq} + 10\log_{10}\frac{Y_{R,\infty,\mathrm{low}}}{Y_0},
 $$
 
 and, from the high-mobility plate, the **equivalent free velocity level**

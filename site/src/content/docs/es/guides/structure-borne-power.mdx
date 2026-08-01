@@ -99,12 +99,12 @@ $P = \omega\,\eta\,(m S)\,\langle v^2 \rangle$, de modo que
 el nivel de potencia inyectada en bandas de tercio de octava es (Fórmula 14)
 
 $$
-L_{Ws} = 10\lg\!\left(\frac{2\pi f\,\eta\,m\,S}{f_0\,m_0\,S_0}\right)
+L_{Ws} = 10\log_{10}\!\left(\frac{2\pi f\,\eta\,m\,S}{f_0\,m_0\,S_0}\right)
          + L_v - 60 \;\;[\mathrm{dB\ re\ 1\ pW}],
 $$
 
 con las referencias $f_0 = 1\ \text{Hz}$, $m_0 = 1\ \text{kg}$,
-$S_0 = 1\ \text{m}^2$; el término $-60\ \text{dB}$ es $10\lg(v_0^2/P_0)$ para
+$S_0 = 1\ \text{m}^2$; el término $-60\ \text{dB}$ es $10\log_{10}(v_0^2/P_0)$ para
 la velocidad de referencia de EN 15657 $v_0 = 10^{-9}\ \text{m/s}$. La
 velocidad de la placa es la media energética espacial sobre las $N$ posiciones
 (Fórmula 12) y el factor de pérdida procede del tiempo de reverberación
@@ -112,7 +112,7 @@ estructural $T_s$ (Fórmula 13, idéntica al factor de pérdida total de
 ISO 10848):
 
 $$
-L_v = 10\lg\!\Big(\tfrac{1}{N}\textstyle\sum 10^{L_{v,i}/10}\Big), \qquad
+L_v = 10\log_{10}\!\Big(\tfrac{1}{N}\textstyle\sum 10^{L_{v,i}/10}\Big), \qquad
 \eta = \frac{2{,}2}{f\,T_s}.
 $$
 
@@ -156,7 +156,7 @@ bloqueada equivalente** (Fórmula 15, re $F_0 = 10^{-6}\ \text{N}$) desde la
 placa de baja movilidad,
 
 $$
-L_{Fb,eq} = L_{Ws,\mathrm{baja}} - 10\lg\frac{\mathrm{Re}\{Y_{R,\mathrm{baja,eq}}\}}{Y_0},
+L_{Fb,eq} = L_{Ws,\mathrm{baja}} - 10\log_{10}\frac{\mathrm{Re}\{Y_{R,\mathrm{baja,eq}}\}}{Y_0},
 $$
 
 el **nivel de potencia característico de placa receptora** que consume
@@ -165,7 +165,7 @@ de movilidad característica
 $Y_{R,\infty,\text{baja}} = 5\times10^{-6}\ \text{m/(N·s)}$ (apartado 7.2.4),
 
 $$
-L_{Wsn} = L_{Fb,eq} + 10\lg\frac{Y_{R,\infty,\mathrm{baja}}}{Y_0},
+L_{Wsn} = L_{Fb,eq} + 10\log_{10}\frac{Y_{R,\infty,\mathrm{baja}}}{Y_0},
 $$
 
 y, desde la placa de alta movilidad, el **nivel de velocidad libre

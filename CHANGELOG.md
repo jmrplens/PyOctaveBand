@@ -902,7 +902,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   or plain text, across the guides, the reference and the errata registry,
   in English and Spanish alike, and in the GitHub mirror under `docs/`.
   Quotations of a printed source keep their original characters, and names
-  that are code identifiers stay code.
+  that are code identifiers stay code. Every formula now writes the decimal
+  logarithm as $\log_{10}$, the spelling that needs no key to read, in place
+  of the ISO $\lg$ the pages used to mix with it.
 
 - Every editable page now links to its source in the footer, in both
   languages. The generated API reference opts out through the route

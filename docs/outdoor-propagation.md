@@ -95,7 +95,7 @@ stated $\pm 10$ % accuracy (Clause 7.1). Inputs outside the tabulated ranges
 still compute but raise an `AtmosphericAbsorptionWarning`; non-physical inputs
 (non-positive frequency, humidity outside 0…100 %, sub-absolute-zero
 temperature) raise `ValueError`. `air_attenuation_m` composes $\alpha$ with the
-ISO 354 conversion $m = \alpha/(10 \lg e)$ so an ISO 354 caller can feed real
+ISO 354 conversion $m = \alpha/(10 \log_{10} e)$ so an ISO 354 caller can feed real
 atmospheric conditions straight into `absorption_area` /
 `absorption_coefficient` instead of hand-entering $m$.
 
@@ -110,7 +110,7 @@ atmospheric conditions straight into `absorption_area` /
 | `exact_midband` | bool | — | default `False` | Snap to $f_m = 1000\cdot10^{k/10}$ (reproduces Table 1) |
 
 `air_attenuation` returns $\alpha$ in dB/m; `air_attenuation_m` returns
-$m = \alpha/(10 \lg e)$ in 1/m for ISO 354.
+$m = \alpha/(10 \log_{10} e)$ in 1/m for ISO 354.
 
 ### A plottable result: `atmospheric_attenuation()`
 
@@ -187,16 +187,16 @@ splits the source-to-receiver distance into $d_{ss}$ and $d_{sr}$, and the extra
 path length over the edge is $z = d_{ss} + d_{sr} - d$. When the line of sight
 passes *above* the top edge, the standard gives $z$ a negative sign
 (`Barrier(line_of_sight_clear=True)`) and Eq. (14) still applies with
-$K_{met} = 1$: $D_z$ falls continuously from $10 \lg 3 \approx 4.8$ dB at
+$K_{met} = 1$: $D_z$ falls continuously from $10 \log_{10} 3 \approx 4.8$ dB at
 grazing incidence to zero as the clearance deepens, never below zero.
 
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_outdoor_geometry_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_outdoor_geometry.svg" alt="ISO 9613-2 source-barrier-receiver geometry: a point source at height hs, a barrier whose top edge splits the path into dss and dsr, and a receiver at height hr, with the blocked direct ray and the diffracted ray over the edge, the path difference z and the Dz formula" width="92%"></picture>
 
 ### The four attenuation terms
 
-* **Geometrical divergence** $A_{div} = 20 \lg(d/d_0) + 11$ dB, $d_0 = 1$ m
+* **Geometrical divergence** $A_{div} = 20 \log_{10}(d/d_0) + 11$ dB, $d_0 = 1$ m
   (Eq. (7)): spherical spreading from a point source. Exactly 51 dB at 100 m,
-  +6 dB per distance doubling. The $+11$ ($= 10 \lg 4\pi$) sets the level at the
+  +6 dB per distance doubling. The $+11$ ($= 10 \log_{10} 4\pi$) sets the level at the
   1 m reference distance.
 * **Atmospheric absorption** $A_{atm} = \alpha\ d$ (Eq. (8)) with $\alpha$ the
   ISO 9613-1 coefficient, negligible at low frequency and dominant at 8 kHz over
@@ -212,7 +212,7 @@ grazing incidence to zero as the clearance deepens, never below zero.
   ground factor $G$ (0 = hard/reflective, 1 = porous/absorbing). A **negative**
   $A_{gr}$ is a net *gain* from constructive ground reflection.
 * **Screening** by a barrier is the diffraction insertion loss
-  $D_z = 10 \lg\big[ 3 + (C_2/\lambda)\ C_3\ z\ K_{met} \big]$ (Eq. (14)),
+  $D_z = 10 \log_{10}\big[ 3 + (C_2/\lambda)\ C_3\ z\ K_{met} \big]$ (Eq. (14)),
   capped at 20 dB (single edge) or 25 dB (double edge). For a top-edge barrier
   the ground effect of the screened path folds into it,
   $A_{bar} = D_z - A_{gr} \ge 0$ (Eq. (12), Note 13); for a lateral barrier
@@ -457,7 +457,7 @@ whether a real barrier delivers its computed $D_z$:
   barrier that looks generous on the section drawing.
 * **Double diffraction is a modest bonus.** A thick obstacle (two edges
   separated by $e$) raises $C_3$ from 1 toward 3 (Eq. (15)), worth at most
-  about $10 \lg 3 \approx 4.8$ dB extra plus the higher 25 dB cap. A building
+  about $10 \log_{10} 3 \approx 4.8$ dB extra plus the higher 25 dB cap. A building
   modelled as a double edge only earns that bonus if both edges really are
   continuous and the roof between them is closed.
 * **The ground effect is spent, not kept.** For a top-edge barrier the
@@ -645,5 +645,5 @@ ground effect (Eq. (9), Table 3) with its A-weighted alternative
 (Eq. (10)/(11)), barrier screening (Eqs. (12)–(17)) and the meteorological
 correction (Eq. (21)/(22)). ISO 354:2003, *Acoustics — Measurement of sound
 absorption in a reverberation room*: only the clause 8.1.2.1 conversion
-$m = \alpha/(10 \lg e)$ behind `air_attenuation_m`; the reverberation-room
+$m = \alpha/(10 \log_{10} e)$ behind `air_attenuation_m`; the reverberation-room
 method itself is covered in the [Room Acoustics guide](room-acoustics.md).

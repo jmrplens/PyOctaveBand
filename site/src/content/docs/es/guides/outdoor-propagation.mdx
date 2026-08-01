@@ -160,7 +160,7 @@ $\pm 10$ % (apartado 7.1). Las entradas fuera de los rangos tabulados
 de 200 kPa) siguen calculándose pero emiten una `AtmosphericAbsorptionWarning`;
 las entradas no físicas (frecuencia no positiva, humedad fuera de 0…100 %,
 temperatura bajo el cero absoluto) lanzan `ValueError`. `air_attenuation_m`
-compone $\alpha$ con la conversión de la ISO 354 $m = \alpha/(10 \lg e)$, de modo
+compone $\alpha$ con la conversión de la ISO 354 $m = \alpha/(10 \log_{10} e)$, de modo
 que quien use la ISO 354 puede alimentar condiciones atmosféricas reales
 directamente a `absorption_area` / `absorption_coefficient` en vez de introducir
 $m$ a mano.
@@ -176,7 +176,7 @@ $m$ a mano.
 | `exact_midband` | bool | — | def. `False` | Ajusta a $f_m = 1000\cdot10^{k/10}$ (reproduce la Tabla 1) |
 
 `air_attenuation` devuelve $\alpha$ en dB/m; `air_attenuation_m` devuelve
-$m = \alpha/(10 \lg e)$ en 1/m para la ISO 354.
+$m = \alpha/(10 \log_{10} e)$ en 1/m para la ISO 354.
 
 ### Un resultado representable: `atmospheric_attenuation()`
 
@@ -257,16 +257,16 @@ exceso de recorrido sobre el borde es $z = d_{ss} + d_{sr} - d$. Cuando la
 línea de visión pasa *por encima* del borde superior, la norma da a $z$ signo
 negativo (`Barrier(line_of_sight_clear=True)`) y la Ec. (14) sigue
 aplicándose con $K_{met} = 1$: $D_z$ cae de forma continua desde
-$10 \lg 3 \approx 4{,}8$ dB en incidencia rasante hasta cero al aumentar el
+$10 \log_{10} 3 \approx 4{,}8$ dB en incidencia rasante hasta cero al aumentar el
 margen libre, sin bajar nunca de cero.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_outdoor_geometry_es.svg" alt="Geometría fuente-barrera-receptor de la ISO 9613-2: una fuente puntual a altura hs, una barrera cuyo borde superior divide el recorrido en dss y dsr, y un receptor a altura hr, con el rayo directo bloqueado y el rayo difractado sobre el borde, la diferencia de camino z y la fórmula de Dz" width="92%" />
 
 ### Los cuatro términos de atenuación
 
-* **Divergencia geométrica** $A_{div} = 20 \lg(d/d_0) + 11$ dB, $d_0 = 1$ m
+* **Divergencia geométrica** $A_{div} = 20 \log_{10}(d/d_0) + 11$ dB, $d_0 = 1$ m
   (Ec. (7)): expansión esférica desde una fuente puntual. Exactamente 51 dB a
-  100 m, +6 dB por cada duplicación de la distancia. El $+11$ ($= 10 \lg 4\pi$)
+  100 m, +6 dB por cada duplicación de la distancia. El $+11$ ($= 10 \log_{10} 4\pi$)
   fija el nivel a la distancia de referencia de 1 m.
 * **Absorción atmosférica** $A_{atm} = \alpha\ d$ (Ec. (8)) con $\alpha$ el
   coeficiente de la ISO 9613-1, despreciable a baja frecuencia y dominante a 8 kHz
@@ -284,7 +284,7 @@ margen libre, sin bajar nunca de cero.
   poroso/absorbente). Un $A_{gr}$ **negativo** es una *ganancia* neta por la
   reflexión constructiva en el suelo.
 * **Apantallamiento** por una barrera es la pérdida por inserción por difracción
-  $D_z = 10 \lg\big[ 3 + (C_2/\lambda)\ C_3\ z\ K_{met} \big]$ (Ec. (14)),
+  $D_z = 10 \log_{10}\big[ 3 + (C_2/\lambda)\ C_3\ z\ K_{met} \big]$ (Ec. (14)),
   limitada a 20 dB (un borde) o 25 dB (doble borde). Para una barrera de borde
   superior, el efecto del suelo del recorrido apantallado se integra en él,
   $A_{bar} = D_z - A_{gr} \ge 0$ (Ec. (12), Nota 13); para una barrera lateral
@@ -548,7 +548,7 @@ deciden si una barrera real entrega su $D_z$ calculado:
   que parecía generosa en el alzado.
 * **La difracción doble es una bonificación modesta.** Un obstáculo grueso
   (dos bordes separados $e$) eleva $C_3$ de 1 hacia 3 (Ec. (15)), que vale
-  como mucho unos $10 \lg 3 \approx 4{,}8$ dB extra más el tope superior de
+  como mucho unos $10 \log_{10} 3 \approx 4{,}8$ dB extra más el tope superior de
   25 dB. Un edificio modelado como doble borde solo gana esa bonificación si
   ambos bordes son realmente continuos y la cubierta entre ellos está
   cerrada.

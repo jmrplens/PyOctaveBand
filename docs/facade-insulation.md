@@ -335,7 +335,7 @@ fac.report("D2mnT_prediction.pdf", metadata=ReportMetadata(
 **Part 4: indoor → outdoor.** The sound power level radiated by a segment
 (Formula 2) is $L_W = L_{p,in} + C_d - R' + 10 \log_{10}(S/S_0)$ with $S_0 = 1$ m²
 and the inside-field diffusivity term $C_d$ (Annex B; −6 dB ideal diffuse, −5 dB
-average industrial). Openings are elements whose "$R$" is the silencer insertion
+average industrial). Openings are elements whose "R" is the silencer insertion
 loss (a bare opening is 0 dB). The exterior level follows from the simplified
 Annex E attenuation $A_{tot}$ of a finite radiating side, $L_p = L_W - A_{tot}$.
 

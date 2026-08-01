@@ -38,7 +38,7 @@ audible above the masking noise.
 With the reference microphone on a ground board at the horizontal distance
 $R_0 = H + D/2$ (hub height $H$, rotor diameter $D$), the slant distance to
 the rotor centre is $R_1 = \sqrt{H^2 + R_0^2}$ and the apparent sound power
-level is $L_{WA,i} = L_{p,i} - 6 + 10\lg(4\pi R_1^2/S_0)$ per band
+level is $L_{WA,i} = L_{p,i} - 6 + 10\log_{10}(4\pi R_1^2/S_0)$ per band
 ($S_0 = 1\ \text{m}^2$), energy-summed over bands. The −6 dB accounts for the
 ground-board pressure doubling.
 
@@ -117,7 +117,7 @@ band energy average excluding the maximum and its adjacent lines. The
 masking-noise level $L_{pn}$ follows Formula 31, the
 tonality is $\Delta L_{tn} = L_{pt} - L_{pn}$, and the tonal audibility is
 $\Delta L_a = \Delta L_{tn} - L_a$ with
-$L_a = -2 - \lg\!\big[1 + (f/502)^{2.5}\big]$, reported when
+$L_a = -2 - \log_{10}\!\big[1 + (f/502)^{2.5}\big]$, reported when
 $\Delta L_a \ge -3\ \text{dB}$ and audible when $\Delta L_a > 0$.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/wind_turbine_tonality.svg" alt="A wind-turbine narrowband spectrum with a discrete tone near 200 Hz standing above a shaped broadband floor, the critical band about the tone shaded, the masking-noise level drawn as a horizontal line, and the tonal audibility annotated" width="82%" />

@@ -194,7 +194,7 @@ $$
 and the wave-approach **vibration reduction index** (Eq. 5.116) is
 
 $$
-K_{ij} = 10\lg(1/\tau_{ij}) + 5\lg(f_{c,j}/f_\text{ref}),
+K_{ij} = 10\log_{10}(1/\tau_{ij}) + 5\log_{10}(f_{c,j}/f_\text{ref}),
 \qquad f_\text{ref} = 1000\ \text{Hz}
 $$
 
@@ -202,7 +202,7 @@ with $f_{c,j}$ the critical frequency of the *receiving* plate. Combined with
 the Eq. 5.7 reciprocity this form is symmetric, $K_{ij} = K_{ji}$, as EN 12354
 requires of the junction descriptor. For the identical 100 mm concrete
 X-junction ($f_c \approx 203\ \text{Hz}$),
-$K_{ij} = 10\lg 12 + 5\lg(203/1000) \approx 7.3\ \text{dB}$.
+$K_{ij} = 10\log_{10} 12 + 5\log_{10}(203/1000) \approx 7.3\ \text{dB}$.
 
 ```python
 from phonometry import (coupling_loss_factor, junction_transmission,

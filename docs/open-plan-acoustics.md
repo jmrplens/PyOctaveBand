@@ -21,11 +21,11 @@ fades to unintelligibility as you walk away. Levels and STI are measured
 along a line of workstations (at least 4 positions, 6–10 preferred), and
 four single-number quantities summarise the room. The **spatial decay
 rate** of A-weighted speech is the slope of the level against
-$\lg(r/r_0)$, scaled to a per-doubling figure using only the 2–16 m
+$\log_{10}(r/r_0)$, scaled to a per-doubling figure using only the 2–16 m
 positions,
 
 $$
-D_{2,S} = -\lg(2)\ b, \qquad L = a + b\ \lg(r/r_0),\ r_0 = 1\ \text{m},
+D_{2,S} = -\log_{10}(2)\ b, \qquad L = a + b\ \log_{10}(r/r_0),\ r_0 = 1\ \text{m},
 $$
 
 with **$L_{p,A,S,4m}$** read off the same line at 4 m. The **distraction
@@ -225,12 +225,12 @@ Long (*Architectural Acoustics* 2e, Chapter 17, Equations (17.50) to (17.54))
 sets the two competing levels at a listener:
 
 $$
-L_p(\text{signal}) = L_W + 10\lg\!\left[\frac{Q}{4\pi r^2}\right]
+L_p(\text{signal}) = L_W + 10\log_{10}\!\left[\frac{Q}{4\pi r^2}\right]
 \quad \text{(Eq. (17.50))}
 $$
 
 $$
-L_p(\text{noise}) = L_W + 10\lg N + 10\lg\!\left[\frac{4}{N A_\text{tab}}\right]
+L_p(\text{noise}) = L_W + 10\log_{10} N + 10\log_{10}\!\left[\frac{4}{N A_\text{tab}}\right]
 \quad \text{(Eq. (17.51))}
 $$
 
@@ -256,8 +256,8 @@ Subtracting the two gives the **speech-to-noise ratio**, and this is the result
 worth remembering:
 
 $$
-L_{SN} = 10\lg\!\left[\frac{Q}{4\pi r^2}\right]
-+ 10\lg\!\left[\frac{A_\text{tab}}{4}\right]
+L_{SN} = 10\log_{10}\!\left[\frac{Q}{4\pi r^2}\right]
++ 10\log_{10}\!\left[\frac{A_\text{tab}}{4}\right]
 \quad \text{(Eq. (17.52))}
 $$
 
@@ -297,7 +297,7 @@ crowd.plot()      # self-noise vs occupancy, against the -6 dB limit
 *The same 20 talkers in three rooms. The hard room (20 m² of absorption)
 crosses the communication limit before the fourth table is occupied; adding the
 absorptive ceiling of Long's example (190 m² in total) keeps all 20 tables below
-it. The curves are parallel because occupancy always costs $10\lg N$: only
+it. The curves are parallel because occupancy always costs $10\log_{10} N$: only
 the vertical offset, which is the absorption, is a design variable.*
 
 ### `crowd_noise()` parameters

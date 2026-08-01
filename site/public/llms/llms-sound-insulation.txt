@@ -346,8 +346,8 @@ $R'_I$ in the field (ISO 15186-2). Because the intensity method slightly
 index** $R_{I,M} = R_I + K_c$ reproduces the ISO 10140-2 pressure result; the
 adaptation term $K_c$ (Annex B) is $10 \log_{10}(1 + S_{b2}\lambda/8V_2)$ for a
 well-defined room, or the room-independent $10 \log_{10}(1 + 61.4/f)$. For small
-elements the **element normalized level difference** replaces $10\lg(S_m/S)$
-with $10\lg(S_m/A_0) + 10\lg N$ ($A_0 = 10\ \text{m}^2$, $N$ element units).
+elements the **element normalized level difference** replaces $10\log_{10}(S_m/S)$
+with $10\log_{10}(S_m/A_0) + 10\log_{10} N$ ($A_0 = 10\ \text{m}^2$, $N$ element units).
 
 ```python
 import numpy as np
@@ -526,7 +526,7 @@ res.report("DIne.pdf", metadata=metadata)               # DI,n,e,w (C; Ctr)
 
 *The small element is rated exactly like a wall: $D_{I,n,e}$ feeds the
 ISO 717-1 engine and the unfavourable deviations (reference above the
-measurement) set $D_{I,n,e,w}$. The $10\lg(S_m/A_0)$ normalization replaces
+measurement) set $D_{I,n,e,w}$. The $10\log_{10}(S_m/A_0)$ normalization replaces
 the specimen-area term, so the number describes the element irrespective of
 the wall it sits in.*
 
@@ -659,7 +659,7 @@ as an input, together with the overall flanking descriptors $D_{n,f}$
 empirical `junction_vibration_reduction()` of that prediction.
 
 **Vibration reduction index (Formula (13)).**
-$K_{ij} = \overline{D}_{v,ij} + 10\lg\!\big(l_{ij} / \sqrt{a_i a_j}\big)$ dB, from
+$K_{ij} = \overline{D}_{v,ij} + 10\log_{10}\!\big(l_{ij} / \sqrt{a_i a_j}\big)$ dB, from
 the direction-averaged velocity level difference
 $\overline{D}_{v,ij} = \tfrac{1}{2}(D_{v,ij} + D_{v,ji})$ (Formula (11), which
 makes $K_{ij}$ symmetric), the common-edge junction length $l_{ij}$ and the
@@ -668,8 +668,8 @@ makes $K_{ij}$ symmetric), the common-edge junction length $l_{ij}$ and the
 $a_j = S_j / l_0$ ($l_0 = 1$ m) and Formula (13) reduces to the simplified
 Formula (14). The related **total loss factor** is $\eta = 2.2/(f T_s)$.
 
-**Overall descriptors.** $D_{n,f} = L_1 - L_2 - 10\lg(A/A_0)$ (Formula (4),
-airborne) and $L_{n,f} = L_2 + 10\lg(A/A_0)$ (Formula (5), tapping machine),
+**Overall descriptors.** $D_{n,f} = L_1 - L_2 - 10\log_{10}(A/A_0)$ (Formula (4),
+airborne) and $L_{n,f} = L_2 + 10\log_{10}(A/A_0)$ (Formula (5), tapping machine),
 $A_0 = 10\ \text{m}^2$; their $D_{n,f,w}$ / $L_{n,f,w}$ single numbers reuse the
 ISO 717 rating engines. The single-number $\overline{K}_{ij}$ is the arithmetic
 mean over 200–1250 Hz for one-third-octave bands, or over 125–1000 Hz for
@@ -822,14 +822,14 @@ attenuation and $s_S = s_R = 0{,}5$ that collapses to the compact form that
 makes the geometry visible (Eqs. (9.19) and (9.20)):
 
 $$
-R_{cl} = R_S + R_R - 10\lg\!\left[\frac{\varepsilon^2 L_R}{4h}\right],
+R_{cl} = R_S + R_R - 10\log_{10}\!\left[\frac{\varepsilon^2 L_R}{4h}\right],
 $$
 
 with $\varepsilon = 1$ for totally absorbing plenum sidewalls and
 $\varepsilon = 2$ for totally reflecting ones. A deep plenum helps, a long room
 hurts, and doubling the tile insulation helps twice over because $R_S$ and
 $R_R$ both appear. Referred to the partition area instead of the ceiling,
-$R_{cl,p} = R_{cl} + 10\lg(H_S/L_S)$ (Eq. (9.13)), which is what lets the
+$R_{cl,p} = R_{cl} + 10\log_{10}(H_S/L_S)$ (Eq. (9.13)), which is what lets the
 ceiling path be added to the direct path as transmission factors.
 
 ```python
@@ -859,7 +859,7 @@ print(partition_referenced_reduction_index(res.reduction_index, 2.7, 4.75))
 ```
 
 **The measured quantity.** A ceiling is not rated by $R_{cl}$ but by the
-**normalized ceiling attenuation** $D_{n,c} = D - 10\lg(A/A_0)$ (ISO 140-9:1985
+**normalized ceiling attenuation** $D_{n,c} = D - 10\log_{10}(A/A_0)$ (ISO 140-9:1985
 clause 3.3), with $A$ the receiving-room equivalent absorption area and the
 reference $A_0 = 10\ \text{m}^2$. The facility has two rooms of at least
 50 m³ whose volumes differ by at least 10 %, a dividing wall tapered to at most
@@ -868,7 +868,7 @@ both end walls lined; the standard prints the required lining absorption
 $\alpha_s \ge 0{,}65$ at 125 Hz and $\ge 0{,}80$ from 250 Hz to 4000 Hz, and
 requires $\alpha < 0{,}10$ on the other sidewall and on the plenum ceiling.
 The North American counterpart, ASTM E1414, uses $A_0 = 12\ \text{m}^2$, so an
-ASTM value runs about $10\lg(12/10) = 0{,}79$ dB higher for the same rooms.
+ASTM value runs about $10\log_{10}(12/10) = 0{,}79$ dB higher for the same rooms.
 
 ISO rates $D_{n,c}$ with the ISO 717-1 curve, giving $D_{n,c,w}$; ASTM E1414
 rates it through ASTM E413 as the **ceiling attenuation class**. E413 rounds the
@@ -1543,11 +1543,11 @@ The [engineering methods](https://jmrplens.github.io/phonometry/guides/insulatio
 per-band reverberation times, careful background correction. For a quick check
 in a dwelling, ISO 10052 defines a **survey (control) method**: octave bands, a
 hand-held meter, and a single quantity, the **reverberation index**
-$k = 10\lg(T/T_0)$ ($T_0 = 0.5\ \text{s}$), to carry the receiving-room
+$k = 10\log_{10}(T/T_0)$ ($T_0 = 0.5\ \text{s}$), to carry the receiving-room
 correction. Every survey quantity is then just an addition of $k$: the
 standardized level difference $D_{nT} = D + k$, the normalized
-$D_n = D + k + 10\lg(A_0 T_0/(0.16\,V))$, the apparent
-$R' = D + k + 10\lg(S T_0/(0.16\,V))$ (using $V/7.5$ for $S$ where
+$D_n = D + k + 10\log_{10}(A_0 T_0/(0.16\,V))$, the apparent
+$R' = D + k + 10\log_{10}(S T_0/(0.16\,V))$ (using $V/7.5$ for $S$ where
 that is larger), and, for impacts and façades, $L'_{nT} = L_i - k$ and
 $D_{2m,nT} = D_{2m} + k$. The clause references follow ISO 10052:2021; the formulas
 and the reverberation-index table are identical in the harmonized
@@ -1588,7 +1588,7 @@ res.plot()   # DnT vs shifted ISO 717-1 reference (needs matplotlib)
 
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/survey_insulation_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/survey_insulation.svg" alt="Survey-method airborne insulation: the raw level difference D and the standardized DnT across the five octave bands, with the reverberation-index correction k shaded between them" width="80%"></picture>
 
-*The reverberation index $k = 10\lg(T/T_0)$ shifts the raw level difference
+*The reverberation index $k = 10\log_{10}(T/T_0)$ shifts the raw level difference
 $D$ into the standardized $D_{nT}$: up where the room is live ($T > T_0$),
 down where
 it is dead. The automatic rating is formed only for exactly 5 octave (or 16
@@ -2543,7 +2543,7 @@ fac.report("D2mnT_prediction.pdf", metadata=ReportMetadata(
 **Part 4: indoor → outdoor.** The sound power level radiated by a segment
 (Formula 2) is $L_W = L_{p,in} + C_d - R' + 10 \log_{10}(S/S_0)$ with $S_0 = 1$ m²
 and the inside-field diffusivity term $C_d$ (Annex B; −6 dB ideal diffuse, −5 dB
-average industrial). Openings are elements whose "$R$" is the silencer insertion
+average industrial). Openings are elements whose "R" is the silencer insertion
 loss (a bare opening is 0 dB). The exterior level follows from the simplified
 Annex E attenuation $A_{tot}$ of a finite radiating side, $L_p = L_W - A_{tot}$.
 
@@ -2819,7 +2819,7 @@ insulation with a normalised source spectrum and sums it energetically
 (Formulae A.5 to A.7):
 
 $$
-I_x = -10 \lg \sum_i 10^{(L_{x,i} - X_i)/10} \quad \text{[dBA]}
+I_x = -10 \log_{10} \sum_i 10^{(L_{x,i} - X_i)/10} \quad \text{[dBA]}
 $$
 
 where $X_i$ is the band insulation (the sound reduction index $R$ or $R'$, the

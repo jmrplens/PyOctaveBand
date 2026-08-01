@@ -108,7 +108,7 @@ $$
 siendo cada $\alpha$ una diferencia de Sabine entre dos condiciones,
 $55{,}3 (V/S) [1/(c_b T_b) - 1/(c_a T_a)] - 4 (V/S)(m_b - m_a)$, con
 $c = 343{,}2 \sqrt{(273{,}15 + t)/293{,}15}$ (Fórmula 2) y $m$ de ISO 9613-1
-mediante $m = \alpha_{dB}/(10 \lg e)$ (Fórmula 3). La propia placa base debe
+mediante $m = \alpha_{dB}/(10 \log_{10} e)$ (Fórmula 3). La propia placa base debe
 dispersar poco: la Tabla 1 acota su coeficiente (Fórmula 6) a 0,05–0,25 entre
 100 Hz y 5 kHz (cláusula 6.2). El $s$ negativo se trunca a cero para su
 presentación (cláusula 8.3), pero los valores por encima de 1 en bandas
@@ -269,7 +269,7 @@ $[p; u]_0 = T\,[p; u]_d$ (Ecs. 16/22–24), de la que sale la pérdida por
 transmisión a incidencia normal con terminación anecoica (Ecs. 25/26)
 
 $$
-TL = 20 \lg \frac{\left| T_{11} + T_{12}/\rho c + \rho c\ T_{21} + T_{22} \right|}{2},
+TL = 20 \log_{10} \frac{\left| T_{11} + T_{12}/\rho c + \rho c\ T_{21} + T_{22} \right|}{2},
 $$
 
 más la reflexión con fondo rígido

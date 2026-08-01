@@ -149,7 +149,7 @@ print(round(res["1x"]), round(res["2x"]),
 
 Give the slip directly, or give the mains `supply_frequency` and let the slip
 follow from it and the measured shaft speed. The supply frequency is taken as
-$f_e = f_s\,p / (2(1 - s))$; Norton's Eq. (8.19) writes $f_e = f_s\,p/2$,
+$f_e = f_s\,p / (2(1 - s))$; Norton's Eq. (8.19) writes `fe = fs p / 2`,
 which is the same expression at zero slip but does not reduce Eq. (8.20) to
 the physical rotor-bar passing rate $R f_s$ when the machine is loaded.
 Under load the result also carries the slip frequency and the pole-pass

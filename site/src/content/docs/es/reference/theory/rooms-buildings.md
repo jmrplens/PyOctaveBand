@@ -190,10 +190,10 @@ con $t_e = 50$ ms (C50, habla) o 80 ms (C80, música), y el **tiempo central** $
 
 ### Decaimiento espacial en oficinas diáfanas (ISO 3382-3, Cláusula 6)
 
-La tasa de decaimiento espacial del habla ponderada A es la pendiente por mínimos cuadrados ordinarios de $L_{p,A,S}$ frente a $\lg(r/r_0)$ ($r_0 = 1$ m) sobre las posiciones de 2–16 m, reescalada a una cifra por duplicación, y el nivel nominal se lee en la misma recta a 4 m:
+La tasa de decaimiento espacial del habla ponderada A es la pendiente por mínimos cuadrados ordinarios de $L_{p,A,S}$ frente a $\log_{10}(r/r_0)$ ($r_0 = 1$ m) sobre las posiciones de 2–16 m, reescalada a una cifra por duplicación, y el nivel nominal se lee en la misma recta a 4 m:
 
 $$
-L = a + b\ \lg(r/r_0), \qquad D_{2,S} = -\lg(2)\ b, \qquad L_{p,A,S,4\text{m}} = a + b\ \lg(4/r_0).
+L = a + b\ \log_{10}(r/r_0), \qquad D_{2,S} = -\log_{10}(2)\ b, \qquad L_{p,A,S,4\text{m}} = a + b\ \log_{10}(4/r_0).
 $$
 
 La distancia de distracción rD y la distancia de privacidad rP son las distancias donde una regresión **lineal** (no logarítmica) del STI frente a la distancia cruza 0,50 y 0,20; una pendiente ajustada no negativa (el STI no decrece con la distancia) las deja indefinidas, materializando la nota de la norma de que "puede resultar imposible de determinar".
@@ -233,7 +233,7 @@ $A = 55{,}3\ V/(c\ T) - 4 V m$ (el término $4 V m$ es la absorción del aire, $
 coeficiente de atenuación en potencia en 1/m), de modo que el área de la muestra
 es $A_T = A_2 - A_1$ y su coeficiente $\alpha_s = A_T/S$. Con la velocidad del
 sonido de la Ec. (6), $c = 331 + 0{,}6\ t$ (°C), y $m$ convertido de un
-coeficiente de atenuación de ISO 9613-1 mediante $m = \alpha / (10 \lg e)$. Como
+coeficiente de atenuación de ISO 9613-1 mediante $m = \alpha / (10 \log_{10} e)$. Como
 la difracción y la dispersión de borde interceptan más que el área plana de la
 muestra, $\alpha_s$ se deja sin saturar y puede superar 1,0 (Cláusula 3.7
 NOTA 2).
@@ -367,26 +367,26 @@ Consulta las guías de [acústica de salas](/phonometry/es/guides/room-acoustics
 Donde EN 12354 toma el $R$ de elemento como una medida, el índice de reducción
 acústica de un panel también se puede **predecir** a partir de sus propiedades
 físicas. Un panel flexible sigue la ley de masas
-$TL_0 = 10\lg[1 + (\pi f m''/\rho_0 c_0)^2]$ (Bies Ec. 7.40), que sube 6 dB por
+$TL_0 = 10\log_{10}[1 + (\pi f m''/\rho_0 c_0)^2]$ (Bies Ec. 7.40), que sube 6 dB por
 octava y 6 dB por duplicar la masa superficial $m''$; el valor de campo resta
 5,5 dB (tercio de octava). La rigidez añade un **valle de coincidencia** en
 $f_c = (c_0^2/2\pi)\sqrt{m''/B'}$ (Ec. 7.3), donde la longitud de onda de flexión
 libre iguala la de traza acústica. El método de Sharp mantiene la ley de masas
 hasta $f_c/2$, cae linealmente en $\log f$ hasta el valle
-$TL = 20\lg(f_c m'') + 10\lg\eta - 44$ y vuelve a subir por encima de $f_c$ con el
+$TL = 20\log_{10}(f_c m'') + 10\log_{10}\eta - 44$ y vuelve a subir por encima de $f_c$ con el
 factor de pérdidas $\eta$ (Ec. 7.44). Una **pared doble** es un sistema
 masa-muelle-masa con la cámara como muelle: por debajo de
 $f_0 = 60\sqrt{(m_1+m_2)/(m_1 m_2 d)}$ (Ec. 7.62) sigue la ley de masas de la
 masa combinada, y por encima las leyes de masas de las dos hojas se suman más el
-término de cámara $20\lg(2kd)$, saturando en +6 dB más allá de
+término de cámara $20\log_{10}(2kd)$, saturando en +6 dB más allá de
 $f_l = c_0/(2\pi d)$ (Ec. 7.64); un relleno poroso baja $f_0$. Los pequeños
 caminos de aire limitan cualquier construcción: el coeficiente de transmisión de
 una rendija recta (Gomperts, Hopkins Ec. 4.99, con resonancias en
 $d + 2e = z\lambda/2$) o de un orificio circular (Wilson y Soroka, Ec. 4.102) se
 combina con la pared en la suma energética ponderada por área
-$R = -10\lg[(1/\sum S_n)\sum S_n 10^{-R_n/10}]$ (Ec. 4.92), de modo que una
+$R = -10\log_{10}[(1/\sum S_n)\sum S_n 10^{-R_n/10}]$ (Ec. 4.92), de modo que una
 abertura desnuda de área relativa $S_a/S$ limita la composición a
-$10\lg(S/S_a)$. El camino de transmisión resonante y la radiación de la pared
+$10\log_{10}(S/S_a)$. El camino de transmisión resonante y la radiación de la pared
 doble se apoyan en la eficiencia de radiación de placa y las movilidades
 puntuales de la [teoría de vibración](/phonometry/es/reference/theory/vibration/).
 

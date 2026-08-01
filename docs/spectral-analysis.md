@@ -250,7 +250,7 @@ res.plot()                               # Gyy, Gvv, Gnn and the SNR panel
 
 *The exact split of the snippet's model: $G_{vv} = \gamma^2 G_{yy}$ explains
 the output except for the flat noise remainder $G_{nn}$, and the spectral SNR
-scatters around its closed form $10\lg(0.64/0.25) = 4.1$ dB at every
+scatters around its closed form $10\log_{10}(0.64/0.25) = 4.1$ dB at every
 frequency.*
 
 <details>
@@ -367,12 +367,12 @@ it:
   bin the effective analysis bandwidth is. This is the same number the PSD
   result reports as `resolution_bandwidth` (`ENBW·fs/nperseg` in Hz), and
   it enters directly in the tone/noise trade: a broadband noise floor read
-  from a windowed spectrum sits $10\lg(\mathrm{ENBW})$ dB above the true
+  from a windowed spectrum sits $10\log_{10}(\mathrm{ENBW})$ dB above the true
   density.
 - **Coherent gain**: the DC gain $\sum w/N$ a bin-centered tone is scaled by.
 - **Scalloping loss**: the worst-case attenuation of a tone that falls
   midway between two bins (3.92 dB for rectangular, 1.42 dB for Hann).
-- **Worst-case processing loss**: scalloping plus $10\lg(\mathrm{ENBW})$, the
+- **Worst-case processing loss**: scalloping plus $10\log_{10}(\mathrm{ENBW})$, the
   worst-case reduction in output SNR for tone detection in white noise.
 - **Highest sidelobe** and **main-lobe -3 dB width**: leakage floor versus
   resolution.
@@ -389,7 +389,7 @@ m.plot()                        # window + spectrum with metrics marked
 
 The closed forms anchor the tests: ENBW is exactly 1 for rectangular, 3/2
 for Hann, 1987/1458 for Hamming and 1523/882 for Blackman (DFT-even
-sampling), and the rectangular scalloping loss is $20\lg(N\sin(\pi/2N))$,
+sampling), and the rectangular scalloping loss is $20\log_{10}(N\sin(\pi/2N))$,
 the Dirichlet kernel evaluated half a bin off center.
 
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/window_functions_tradeoff_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/window_functions_tradeoff.svg" alt="Spectra of the rectangular, Hann, Hamming and Blackman windows over 16 DFT bins, showing the trade-off between main-lobe width and sidelobe level, with each window's equivalent noise bandwidth and highest sidelobe level in the legend" width="82%"></picture>

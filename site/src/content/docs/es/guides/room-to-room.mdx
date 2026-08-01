@@ -70,11 +70,11 @@ logaritmos se llega a la Ecuación (4.101),
 
 $$
 \text{NR} = \text{TL}
-- 10\lg\!\left[\frac{S_w}{S_2 \alpha_2 + \tau S_w}\right],
+- 10\log_{10}\!\left[\frac{S_w}{S_2 \alpha_2 + \tau S_w}\right],
 $$
 
 con $\text{NR} = L_{p1} - L_{p2}$ la reducción de ruido entre los dos campos
-reverberantes, $\text{TL} = 10\lg(1/\tau)$ la pérdida por transmisión de la
+reverberantes, $\text{TL} = 10\log_{10}(1/\tau)$ la pérdida por transmisión de la
 partición (la magnitud que UNE llama índice de reducción acústica $R$), $S_w$
 el área de la partición y $S_2 \alpha_2$ el área de absorción sonora
 equivalente del recinto receptor.
@@ -149,7 +149,7 @@ $L_{p1}$, y las dos son de Norton.
 
 **El campo reverberante es lo que excita la partición.** El receptor que
 importa es el muro, no un punto junto a la máquina, así que el nivel
-relevante es $L_{p1} = L_W + 10\lg(4/R_1)$. Eso es `steady_state_spl` con
+relevante es $L_{p1} = L_W + 10\log_{10}(4/R_1)$. Eso es `steady_state_spl` con
 `distance=None`, el límite $r \to \infty$ de la misma Ecuación (6.43) de
 Bies que la biblioteca ha usado siempre para un receptor a una distancia.
 
@@ -163,7 +163,7 @@ y radia $\Pi_0 Q$, y una fuente de *presión constante*, un suelo teórico,
 radia $\Pi_0 / Q$. Las máquinas reales están entre las dos primeras siempre
 que estén más cerca del contorno que una longitud de onda, y el modelo de
 volumen constante es la cota superior. Aquí vale
-$10\lg 4 = 6{,}02\ \text{dB}$, y sin él las respuestas impresas salen 6 dB
+$10\log_{10} 4 = 6{,}02\ \text{dB}$, y sin él las respuestas impresas salen 6 dB
 por debajo.
 
 ```python
@@ -301,12 +301,12 @@ diferencia. Norton deduce la ecuación del encapsulado del mismo balance de
 potencia del apartado 4.9 y obtiene la Ecuación (4.115),
 
 $$
-\text{IL} = \text{TL} - 10\lg(S_E / R_i),
+\text{IL} = \text{TL} - 10\log_{10}(S_E / R_i),
 $$
 
 con $S_E$ el área radiante exterior y $R_i$ la constante de recinto del
 interior del encapsulado, superficie de la máquina incluida. Resuelta para
-los paneles, $\text{TL} = \text{IL} + 10\lg(S_E / R_i)$, que es
+los paneles, $\text{TL} = \text{IL} + 10\log_{10}(S_E / R_i)$, que es
 `enclosure_required_transmission_loss`.
 
 ```python

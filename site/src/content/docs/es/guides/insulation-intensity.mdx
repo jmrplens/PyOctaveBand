@@ -71,8 +71,8 @@ modificado** $R_{I,M} = R_I + K_c$ reproduce el resultado por presión de la
 ISO 10140-2; el término de adaptación $K_c$ (Anexo B) es
 $10 \log_{10}(1 + S_{b2}\lambda/8V_2)$ para una sala bien definida, o el
 independiente de la sala $10 \log_{10}(1 + 61{,}4/f)$. Para elementos pequeños, la
-**diferencia de niveles normalizada por elemento** sustituye $10\lg(S_m/S)$ por
-$10\lg(S_m/A_0) + 10\lg N$ ($A_0 = 10\ \text{m}^2$, $N$ unidades de elemento).
+**diferencia de niveles normalizada por elemento** sustituye $10\log_{10}(S_m/S)$ por
+$10\log_{10}(S_m/A_0) + 10\log_{10} N$ ($A_0 = 10\ \text{m}^2$, $N$ unidades de elemento).
 
 ```python
 import numpy as np
@@ -260,7 +260,7 @@ res.report("DIne.pdf", metadata=metadata)               # DI,n,e,w (C; Ctr)
 *El elemento pequeño se evalúa exactamente como un muro: $D_{I,n,e}$
 alimenta el motor de ISO 717-1 y las desviaciones desfavorables (referencia
 por encima de la medición) fijan $D_{I,n,e,w}$. La normalización
-$10\lg(S_m/A_0)$ sustituye al término de superficie de la muestra, de modo
+$10\log_{10}(S_m/A_0)$ sustituye al término de superficie de la muestra, de modo
 que el número describe el elemento con independencia del muro en el que se
 monte.*
 

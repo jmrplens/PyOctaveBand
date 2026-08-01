@@ -66,13 +66,13 @@ concrete plate; a standard tapping machine excites it and the structure-borne
 covering. For locally-reacting coverings that acceleration-level difference
 equals the ISO 10140 impact sound reduction.
 
-**Acceleration level (Formula (1)).** $L_a = 10\lg(\langle a^2\rangle / a_0^2)$ dB,
+**Acceleration level (Formula (1)).** $L_a = 10\log_{10}(\langle a^2\rangle / a_0^2)$ dB,
 reference $a_0 = 10^{-6}\ \text{m/s}^2$. **Background correction (Formula (2))**
 follows the ISO 10140 three-branch rule (unchanged ≥ 15 dB; energy subtraction
 for 6 ≤ margin < 15 dB; the 1.3 dB limit below 6 dB, flagged as $> \Delta L$).
 The improvement is the position-averaged difference
 $\Delta L = L_0 - L_1$ (Formulae (3)/(4)); octaves follow
-$\Delta L_\text{oct} = -10\lg[\tfrac{1}{3}\sum 10^{-\Delta L_n/10}]$ (Formula (5)).
+$\Delta L_\text{oct} = -10\log_{10}[\tfrac{1}{3}\sum 10^{-\Delta L_n/10}]$ (Formula (5)).
 
 **Weighted improvement.** $\Delta L_w$ is the ISO 717-2 weighted reduction: the
 improvement is applied to the heavyweight **reference floor** $L_{n,r,0}$
@@ -196,9 +196,9 @@ a straight slope per Formula (C.1), with the steeper Formula (C.3) for
 constructions whose higher internal losses follow the infinite-plate theory:
 
 $$
-\Delta L = 30 \lg \frac{f}{f_0}\ \text{dB (sand/cement, calcium-sulfate screeds)},
+\Delta L = 30 \log_{10} \frac{f}{f_0}\ \text{dB (sand/cement, calcium-sulfate screeds)},
 \qquad
-\Delta L = 40 \lg \frac{f}{f_0}\ \text{dB (asphalt, dry screeds)}.
+\Delta L = 40 \log_{10} \frac{f}{f_0}\ \text{dB (asphalt, dry screeds)}.
 $$
 
 ```python
@@ -223,7 +223,7 @@ print(round(13.0 * np.log10(73.5) - 14.2 * np.log10(8.0) + 20.8, 1))   # 32.2 dB
 ```
 
 The closed-form weighted estimate of Formula (C.4),
-$\Delta L_w = 13\lg m' - 14{,}2\lg s' + 20{,}8$ dB, condenses the same
+$\Delta L_w = 13\log_{10} m' - 14{,}2\log_{10} s' + 20{,}8$ dB, condenses the same
 physics into one line: heavier slabs and softer layers rate better. Both
 estimates are design aids kept deliberately on the safe side (the 30 lg
 slope undercuts the 40 lg infinite-plate theory where experimental data say

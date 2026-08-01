@@ -85,7 +85,7 @@ h.plot()                                          # directividad proa-popa
 ## Ajustes de propagación
 
 El nivel del hemisferio a 60 m se lleva al receptor con tres ajustes (§A.4):
-`spherical_spreading_adjustment` ($\Delta L_s = -20\lg(r/60)$, Ec. 24),
+`spherical_spreading_adjustment` ($\Delta L_s = -20\log_{10}(r/60)$, Ec. 24),
 `atmospheric_adjustment` ($\Delta L_a = -\alpha(f)\,(r - 60)$ con el
 coeficiente de
 ISO 9613-1, Ec. 26/27) y `ground_effect_adjustment` (interferencia directo/
@@ -290,7 +290,7 @@ Cuando el terreno bloquea la línea de visión, el sonido sigue el camino
 convexo más corto sobre él (la banda elástica de la guía) y cada vértice
 tocado es una **arista de difracción**. La atenuación combina la difracción
 pura de la diferencia de camino $\delta$ (Ec. 42-44,
-$10 C_h \lg\bigl(3 + (40/\lambda)\,C''\,\delta\bigr)$, con tope de 25 dB) con
+$10 C_h \log_{10}\bigl(3 + (40/\lambda)\,C''\,\delta\bigr)$, con tope de 25 dB) con
 los efectos de suelo
 del lado fuente y del lado receptor, cada uno sobre su propio plano medio y
 ponderado por la difracción de su camino imagen (Ec. 45-47, el esquema
@@ -388,7 +388,7 @@ La maquinaria de terreno está anclada en forma cerrada: el plano medio del
 suelo es exacto en perfiles lineales y simétricos, una sección plana
 reproduce el modelo de suelo plano a precisión de máquina y un plano
 inclinado su rotación analítica, la resistividad media logarítmica recupera
-la media geométrica, la difracción rasante da el clásico $10\lg 3$, y
+la media geométrica, la difracción rasante da el clásico $10\log_{10} 3$, y
 una colina comprobada a mano fija la diferencia de camino de la banda
 elástica. El tratamiento del suelo por receptor valida de extremo a extremo
 contra el Case 3 ARP del prototipo (187 micrófonos, cada uno sobre su propia

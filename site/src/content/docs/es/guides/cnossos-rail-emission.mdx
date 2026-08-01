@@ -64,7 +64,7 @@ siete tablas y reescribió tres piezas del método.
 | Instrumento | Qué hace a la fuente ferroviaria |
 | :--- | :--- |
 | Directiva (UE) **2015/996** de la Comisión | Sustituye por completo el Anexo II. Aporta las fórmulas 2.3.1 a 2.3.18 y las Tablas G-1 a G-7. |
-| **Corrección de errores** del DO L 5, 10.1.2018 | Sustituye el **Apéndice G entero** (suprime sus columnas de validez Mín./Máx. y añade los códigos descriptores a las cabeceras) y corrige la conversión de rugosidad $f = v/\lambda$, donde el texto publicado dice que la velocidad va en km/h. Va en **metros por segundo**: leída al pie de la letra, la fórmula impresa se equivoca en un factor 3,6. |
+| **Corrección de errores** del DO L 5, 10.1.2018 | Sustituye el **Apéndice G entero** (suprime sus columnas de validez Mín./Máx. y añade los códigos descriptores a las cabeceras) y corrige la conversión de rugosidad `f = v/lambda`, donde el texto publicado dice que la velocidad va en km/h. Va en **metros por segundo**: leída al pie de la letra, la fórmula impresa se equivoca en un factor 3,6. |
 | Directiva Delegada (UE) **2021/1226** de la Comisión | Sustituye íntegramente las Tablas **G-1b, G-2, G-3a, G-4 y G-7**; cambia la **regla de chirrido en curva**; convierte el ruido de puente en una **fuente independiente** construida sobre una función de transferencia en lugar de una constante; reescribe la **directividad vertical** de la fuente A; corrige tres rótulos de banda y un par de valores de la Tabla G-5. |
 
 La biblioteca implementa el resultado consolidado, y cada tabla que se distribuye
@@ -99,9 +99,9 @@ vehículo parado, en el equivalente al ralentí sobre el periodo de referencia
 
 $$
 L'_{W,\mathrm{eq,line},i}(\psi,\varphi) = L_{W,0,\mathrm{dir},i}(\psi,\varphi)
-  + 10\,\lg\!\left(\frac{Q}{1000\,v}\right),
+  + 10\,\log_{10}\!\left(\frac{Q}{1000\,v}\right),
 \qquad
-+\,10\,\lg\!\left(\frac{T_\mathrm{idle}}{T_\mathrm{ref}\,L}\right).
++\,10\,\log_{10}\!\left(\frac{T_\mathrm{idle}}{T_\mathrm{ref}\,L}\right).
 $$
 
 $Q$ va en vehículos por hora, $v$ en km/h y $L$ es la longitud del tramo de vía
@@ -170,7 +170,7 @@ radiación:
   contacto:
 
 $$
-L_{R,\mathrm{TOT},i} = 10\,\lg\!\left(10^{L_{r,TR,i}/10} + 10^{L_{r,VEH,i}/10}\right) + A_{3,i};
+L_{R,\mathrm{TOT},i} = 10\,\log_{10}\!\left(10^{L_{r,TR,i}/10} + 10^{L_{r,VEH,i}/10}\right) + A_{3,i};
 $$
 
 - **radiación**: tres funciones de transferencia independientes de la velocidad
@@ -181,7 +181,7 @@ $$
   todas las bandas):
 
 $$
-L_{W,0,TR,i} = L_{R,\mathrm{TOT},i} + L_{H,TR,i} + 10\,\lg N_a,
+L_{W,0,TR,i} = L_{R,\mathrm{TOT},i} + L_{H,TR,i} + 10\,\log_{10} N_a,
 $$
 
 y la misma suma para la rueda y la superestructura. Las tres componentes se
@@ -284,7 +284,7 @@ las funciones de transferencia (2.3.11). La Tabla G-4 se da para una junta cada
 
 $$
 L_{R,\mathrm{IMPACT},i} = L_{R,\mathrm{IMPACT-SINGLE},i}
-  + 10\,\lg\!\left(\frac{n_l}{0{,}01}\right).
+  + 10\,\log_{10}\!\left(\frac{n_l}{0{,}01}\right).
 $$
 
 Para vía con juntas se prescribe un valor por defecto
@@ -314,8 +314,7 @@ curve_squeal_excess(280.0, tram=True)            # 0.0 dB, los tranvías piden R
 curve_squeal_excess(280.0, track_length=20.0)    # 0.0 dB, la curva es demasiado corta
 ```
 
-El texto de 2015 decía «8 dB para $R < 300\ \text{m}$ y 5 dB para
-$300\ \text{m} < R < 500\ \text{m}$», lo
+El texto de 2015 decía «8 dB para R < 300 m y 5 dB para 300 m < R < 500 m», lo
 que dejaba los dos extremos sin regla alguna aunque el mismo párrafo acotaba el
 efecto a «curvas con radio inferior **o igual** a 500 m». La redacción de 2021
 cierra ambos intervalos.
@@ -335,7 +334,7 @@ una ley logarítmica de velocidad en torno a $v_0 = 300\ \text{km/h}$
 (2.3.13, 2.3.14):
 
 $$
-L_{W,0,i} = L_{W,0,h,i}(v_0) + \alpha_{h,i}\,\lg\!\left(\frac{v}{v_0}\right),
+L_{W,0,i} = L_{W,0,h,i}(v_0) + \alpha_{h,i}\,\log_{10}\!\left(\frac{v}{v_0}\right),
 $$
 
 con $\alpha_1 = \alpha_2 = 50$ en todas las bandas, así que duplicar la velocidad
@@ -348,10 +347,10 @@ pantógrafo.
 
 Cada fuente se corrige en los dos planos antes de añadir el término de flujo
 (2.3.5). La corrección **horizontal** es un dipolo (2.3.15), 0 dB de través y
-$10\lg 0{,}01 = -20\ \text{dB}$ a lo largo de la vía:
+$10\log_{10} 0{,}01 = -20\ \text{dB}$ a lo largo de la vía:
 
 $$
-\Delta L_{W,\mathrm{dir,hor},i} = 10\,\lg\!\left(0{,}01 + 0{,}99\,\sin^2\varphi\right).
+\Delta L_{W,\mathrm{dir,hor},i} = 10\,\log_{10}\!\left(0{,}01 + 0{,}99\,\sin^2\varphi\right).
 $$
 
 La corrección **vertical** de la fuente A (2.3.16) depende de la banda, y es una
@@ -362,7 +361,7 @@ idénticamente nula para $\psi \le 0$:
 $$
 \Delta L_{W,\mathrm{dir,ver},i} = \frac{40}{3}
   \left[\tfrac{2}{3}\sin 2\psi - \sin\psi\right]
-  \lg\!\left(\frac{f_{c,i} + 600}{200}\right), \quad 0 < \psi < \pi/2,
+  \log_{10}\!\left(\frac{f_{c,i} + 600}{200}\right), \quad 0 < \psi < \pi/2,
 $$
 
 y nula en el resto. Las dos ediciones discrepan en todo el semiespacio inferior,
@@ -377,7 +376,7 @@ vertical_directivity(-30.0)                                        # ceros
 vertical_directivity(-30.0, edition=DirectivityEdition.ORIGINAL_2015)  # positivo
 ```
 
-En la fuente B solo es direccional la fuente aerodinámica, $10\lg(\cos^2\psi)$
+En la fuente B solo es direccional la fuente aerodinámica, $10\log_{10}(\cos^2\psi)$
 para $\psi < 0$ (2.3.17); todo lo demás a 4,0 m es omnidireccional, igual que el
 ruido
 de puente a 0,5 m.
@@ -399,7 +398,7 @@ transferencia de puente de la Tabla G-7 (2.3.18):
 
 $$
 L_{W,0,\mathrm{bridge},i} = L_{R,\mathrm{TOT},i} + L_{H,\mathrm{bridge},i}
-  + 10\,\lg N_a.
+  + 10\,\log_{10} N_a.
 $$
 
 El ruido de rodadura del vehículo sobre el puente se sigue calculando de forma
@@ -433,7 +432,7 @@ result.components["rolling"]     # el desglose por fuente, antes de la directivi
 Dividir una línea fuente en fuentes puntuales equivalentes queda, en palabras
 del apartado 2.5.3, «fuera del alcance de la presente metodología»: una fuente
 puntual que represente un tramo de longitud $dL$ simplemente lleva
-$L'_{W,\mathrm{eq,line},i} + 10\lg(dL)$, que es aritmética.
+$L'_{W,\mathrm{eq,line},i} + 10\log_{10}(dL)$, que es aritmética.
 
 CNOSSOS-EU tiene **su propio** método de propagación en el apartado 2.5 del
 Anexo II, y no es la ISO 9613-2. Encadenar una emisión CNOSSOS con la propagación

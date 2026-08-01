@@ -47,14 +47,14 @@ potencia acústica con ponderación A es
 (Fórmula 12 / 15)
 
 $$
-L_W = L_v + 10\lg\frac{S}{S_0} + 10\lg\varepsilon
-      + 10\lg\frac{Z_{c,n}}{Z_{c,0}},
+L_W = L_v + 10\log_{10}\frac{S}{S_0} + 10\log_{10}\varepsilon
+      + 10\log_{10}\frac{Z_{c,n}}{Z_{c,0}},
 $$
 
 donde $S_0 = 1\ \text{m}^2$, la impedancia normalizada
 $Z_{c,n} = 411\ \text{N·s/m}^3$ y la de referencia
 $Z_{c,0} = 400\ \text{N·s/m}^3$ dan el término fijo
-$10\lg(411/400) = 0{,}118\ \text{dB}$.
+$10\log_{10}(411/400) = 0{,}118\ \text{dB}$.
 Este módulo alimenta las normas de fuente estructural y de predicción
 en edificación (ISO 9611, EN 15657, EN 12354-5).
 
@@ -154,9 +154,9 @@ eng.plot()   # el espectro LW(f), como en la figura de arriba (requiere matplotl
 
 ## 2. Nivel de velocidad, calibración y factor de radiación
 
-El nivel de velocidad es $L_v = 20\lg(v/v_0)$ (Fórmula 3); una aceleración de
+El nivel de velocidad es $L_v = 20\log_{10}(v/v_0)$ (Fórmula 3); una aceleración de
 calibración sinusoidal se convierte como
-$L_v = 20\lg\!\left(\hat{a}/(2\pi f\,v_0\sqrt{2})\right)$
+$L_v = 20\log_{10}\!\left(\hat{a}/(2\pi f\,v_0\sqrt{2})\right)$
 (Fórmula 8). El factor de radiación procede de una potencia medida de forma
 independiente:
 
@@ -240,7 +240,7 @@ ensayo** (`test_room`), el **cliente**, la **instrumentación**, la
 de ensayo** (`test_date`) y la identidad del pie (`laboratory`, `operator`,
 `report_id`, `notes`); el área radiante $S$ procede del propio resultado y se
 imprime en el recuadro, junto con la relación de potencia acústica
-$L_W = L_v + 10\lg(S/S_0) + 10\lg\varepsilon + 10\lg(Z_{c,n}/Z_{c,0})$ en la
+$L_W = L_v + 10\log_{10}(S/S_0) + 10\log_{10}\varepsilon + 10\log_{10}(Z_{c,n}/Z_{c,0})$ en la
 tira de base. Aportar `requirement` añade un veredicto APTO/NO APTO frente a un
 límite de potencia acústica ponderado A declarado (una emisión de potencia
 acústica es una magnitud en la que menos es mejor, así que la fuente cumple en

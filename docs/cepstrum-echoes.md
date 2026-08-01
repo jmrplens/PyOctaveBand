@@ -218,7 +218,7 @@ low.plot()
 *The 4 ms lifter split on a pure-echo record: the lowpass side returns the
 smooth spectral envelope, the highpass side isolates the echo's 125 Hz
 ripple, swinging exactly between the closed forms
-$20\lg(1 \pm a) = +3.5$ and $-6.0$ dB.*
+$20\log_{10}(1 \pm a) = +3.5$ and $-6.0$ dB.*
 
 <details>
 <summary>Show the code for this figure</summary>
@@ -265,7 +265,7 @@ plt.show()
 </details>
 
 For the pure-echo signal the highpass ripple swings between the closed forms
-$20\lg(1+a)$ and $20\lg(1-a)$ dB, another oracle the tests pin. In
+$20\log_{10}(1+a)$ and $20\log_{10}(1-a)$ dB, another oracle the tests pin. In
 speech analysis the identical operation separates the vocal-tract envelope
 (formants) from the excitation harmonics; here it is the general tool for
 "smooth versus periodic" splits of any measured magnitude response.

@@ -43,11 +43,11 @@ medida que uno se aleja. Los niveles y el STI se miden a lo largo de una fila
 de puestos de trabajo (al menos 4 posiciones, preferiblemente 6–10), y cuatro
 magnitudes de un solo número resumen la sala. La **tasa de decaimiento
 espacial** del habla ponderada A es la pendiente del nivel frente a
-$\lg(r/r_0)$, escalada a una cifra por duplicación usando solo las posiciones
+$\log_{10}(r/r_0)$, escalada a una cifra por duplicación usando solo las posiciones
 de 2–16 m,
 
 $$
-D_{2,S} = -\lg(2)\ b, \qquad L = a + b\ \lg(r/r_0),\ r_0 = 1\ \text{m},
+D_{2,S} = -\log_{10}(2)\ b, \qquad L = a + b\ \log_{10}(r/r_0),\ r_0 = 1\ \text{m},
 $$
 
 con **$L_{p,A,S,4m}$** leído en la misma recta a 4 m. La **distancia de
@@ -260,13 +260,13 @@ conversación? Long (*Architectural Acoustics* 2.ª ed., cap. 17, ecs. (17.50) a
 campo directo de la persona sentada enfrente,
 
 $$
-L_p(\text{señal}) = L_W + 10\lg\!\left[\frac{Q}{4\pi r^2}\right],
+L_p(\text{señal}) = L_W + 10\log_{10}\!\left[\frac{Q}{4\pi r^2}\right],
 $$
 
 y el ruido es el campo reverberante que levantan $N$ hablantes simultáneos,
 
 $$
-L_p(\text{ruido}) = L_W + 10\lg N + 10\lg\!\left[\frac{4}{N A_\text{mesa}}\right],
+L_p(\text{ruido}) = L_W + 10\log_{10} N + 10\log_{10}\!\left[\frac{4}{N A_\text{mesa}}\right],
 $$
 
 con $L_W$ el nivel de potencia acústica de un hablante (unos 70 dB en
@@ -292,7 +292,7 @@ Restar ambos da la **relación habla-ruido**, y este es el resultado que merece
 la pena recordar:
 
 $$
-L_{SN} = 10\lg\!\left[\frac{Q}{4\pi r^2}\right] + 10\lg\!\left[\frac{A_\text{mesa}}{4}\right].
+L_{SN} = 10\log_{10}\!\left[\frac{Q}{4\pi r^2}\right] + 10\log_{10}\!\left[\frac{A_\text{mesa}}{4}\right].
 $$
 
 No sobrevive ni $L_W$ ni $N$. Una sala más llena no es intrínsecamente peor,
@@ -332,7 +332,7 @@ crowd.plot()      # ruido autogenerado vs ocupación, frente al límite de -6 dB
 cruza el límite de comunicación antes de que se ocupe la cuarta mesa; añadir
 el techo absorbente del ejemplo de Long (190 m² en total) mantiene las 20
 mesas por debajo. Las curvas son paralelas porque la ocupación siempre cuesta
-$10\lg N$: la única variable de diseño es el desplazamiento vertical, que es
+$10\log_{10} N$: la única variable de diseño es el desplazamiento vertical, que es
 la absorción.*
 
 <details>

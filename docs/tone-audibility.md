@@ -69,14 +69,14 @@ bandwidth (Formula 12), the masking index accounts for the ear (Formula 13) and
 the audibility is their difference (Formula 14):
 
 $$
-L_G = L_S + 10\lg\!\frac{\Delta f_c}{\Delta f}, \qquad
-a_v = -2 - \lg\!\Big[1 + \big(\tfrac{f}{502}\big)^{2.5}\Big], \qquad
+L_G = L_S + 10\log_{10}\!\frac{\Delta f_c}{\Delta f}, \qquad
+a_v = -2 - \log_{10}\!\Big[1 + \big(\tfrac{f}{502}\big)^{2.5}\Big], \qquad
 \Delta L = L_T - L_G - a_v .
 $$
 
 A supplied tone is *audible* when $\Delta L > 0$. $\Delta f$ is the line
 spacing (frequency resolution); the energy sums over $K > 1$ lines carry a
-window correction of $10\lg(\Delta f/\Delta f_e)$ (−1.76 dB for the
+window correction of $10\log_{10}(\Delta f/\Delta f_e)$ (−1.76 dB for the
 recommended Hanning window, $\Delta f_e = 1.5\,\Delta f$, Formula (8)), while
 a single-line tone ($K = 1$) takes its level unchanged (Formula (7), no
 bandwidth correction).
@@ -286,7 +286,7 @@ FG-combined) if their frequency difference $|f_{T1} - f_{T2}|$ (Formula 18)
 exceeds
 
 $$
-f_D = 21 \cdot 10^{\,1.2\,\left|\lg(f_T/212)\right|^{1.8}}\ \text{Hz}
+f_D = 21 \cdot 10^{\,1.2\,\left|\log_{10}(f_T/212)\right|^{1.8}}\ \text{Hz}
 \qquad (\text{Formula 19},\ 88\ \text{Hz} < f_T < 1000\ \text{Hz})
 $$
 

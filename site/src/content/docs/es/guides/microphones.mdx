@@ -53,7 +53,7 @@ altavoz tiene [su propia guía](/phonometry/es/guides/loudspeakers/).
 
 **Micrófonos (IEC 60268-4, cláusula 11).** La sensibilidad $M$ es la tensión
 de salida por unidad de presión acústica, expresada en mV/Pa; el *nivel* de
-sensibilidad es $L_M = 20\lg(M / 1\,\text{V/Pa})$ dB, negativo para todo
+sensibilidad es $L_M = 20\log_{10}(M / 1\,\text{V/Pa})$ dB, negativo para todo
 micrófono real (un condensador de estudio de 50 mV/Pa queda en −26 dB re
 1 V/Pa). El tropiezo clásico es la referencia: −26 dB re 1 V/Pa y +34 dB re
 1 mV/Pa son el *mismo* micrófono, a 60 dB de distancia sobre el papel, así
@@ -87,11 +87,11 @@ término coseno (de gradiente de presión),
 $M(\theta) \propto (1 - b) + b\cos\theta$: $b = 0$ es la cápsula
 omnidireccional, $b = 1/2$ el cardioide con su nulo a 180° y $b = 1$ la
 figura en ocho con nulos a ±90°. Un número condensa el patrón: el **índice
-de directividad** $D = 20\lg(M_0/M_\mathrm{diff})$ compara la sensibilidad
+de directividad** $D = 20\log_{10}(M_0/M_\mathrm{diff})$ compara la sensibilidad
 en el eje de referencia con la sensibilidad de campo difuso obtenida de la
 integral de la cláusula 11.2.2 a) sobre un patrón con simetría de
 revolución. Un omni puntúa 0 dB; el cardioide ideal y la figura en ocho,
-ambos $10\lg 3 = 4{,}8$ dB: en un campo difuso de sala, un cardioide
+ambos $10\log_{10} 3 = 4{,}8$ dB: en un campo difuso de sala, un cardioide
 capta tres veces menos potencia reverberante que un omni de igual
 sensibilidad axial, que es exactamente la relación que quiere un cálculo de
 distancia locutor-micrófono. Los patrones reales solo conservan su forma de
@@ -105,7 +105,7 @@ misma cápsula.
 La electrónica del micrófono y la carga de aire sobre su diafragma fijan un
 suelo de ruido, expresado como el **nivel de ruido equivalente**: el nivel
 de presión acústica cuya salida igualaría la tensión de ruido propio
-ponderada, $L_N = 20\lg\bigl((U_N/M)/20\,\mu\text{Pa}\bigr)$. La norma lo
+ponderada, $L_N = 20\log_{10}\bigl((U_N/M)/20\,\mu\text{Pa}\bigr)$. La norma lo
 declara con dos ponderaciones, y los números quedan muy separados sobre el
 papel. La cifra **ponderada A** (detector RMS) es la que citan la mayoría
 de las hojas de datos, p. ej. 14 dB(A) para un buen condensador de estudio.
@@ -136,17 +136,17 @@ de solo repetirse:
 
 - **Nivel de sensibilidad** (11.1). La sensibilidad nominal en campo libre $M$
   (mV/Pa, a la frecuencia de referencia de 1 kHz de 11.3) como nivel,
-  $L_M = 20\lg(M / 1\,\text{V/Pa})$: 12,5 mV/Pa son $-38{,}1$ dB re 1 V/Pa.
+  $L_M = 20\log_{10}(M / 1\,\text{V/Pa})$: 12,5 mV/Pa son $-38{,}1$ dB re 1 V/Pa.
 - **Rango de frecuencias efectivo** (12.2). La banda en la que la respuesta,
   normalizada a 0 dB en la frecuencia de referencia, se mantiene dentro de la
   tolerancia $\pm$ declarada; los bordes son los cruces interpolados con la
   tolerancia.
-- **Índice de directividad** (13.2.2). $D = 20\lg(M_0/M_\mathrm{diff})$ con la
+- **Índice de directividad** (13.2.2). $D = 20\log_{10}(M_0/M_\mathrm{diff})$ con la
   sensibilidad de campo difuso de la integral de 11.2.2 a) sobre un diagrama
-  con simetría de revolución; el cardioide ideal devuelve $10\lg 3 = 4{,}8$ dB.
+  con simetría de revolución; el cardioide ideal devuelve $10\log_{10} 3 = 4{,}8$ dB.
 - **Nivel de ruido equivalente** (17.2). La tensión de ruido inherente
   ponderada sobre la sensibilidad nominal como nivel de presión acústica,
-  $L_N = 20\lg\bigl((U_N/M)/20\,\mu\text{Pa}\bigr)$, con la relación
+  $L_N = 20\log_{10}\bigl((U_N/M)/20\,\mu\text{Pa}\bigr)$, con la relación
   señal-ruido re 1 Pa (94 dB SPL) derivada de él. El nivel de presión acústica de
   sobrecarga (15.2) se lee de una curva de distorsión frente a nivel en el
   límite de THD declarado.

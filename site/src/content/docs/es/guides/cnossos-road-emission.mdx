@@ -83,7 +83,7 @@ Para cada categoría de vehículo $m$ y banda de octava $i$, la fórmula (2.2.1)
 convierte la potencia acústica de un vehículo en potencia por metro de línea:
 
 $$
-L'_{W,\mathrm{eq,line},i,m} = L_{W,i,m} + 10\,\lg\!\left(\frac{Q_m}{1000\,v_m}\right),
+L'_{W,\mathrm{eq,line},i,m} = L_{W,i,m} + 10\,\log_{10}\!\left(\frac{Q_m}{1000\,v_m}\right),
 $$
 
 con $Q_m$ en vehículos por hora y $v_m$ en km/h. La potencia del vehículo es a
@@ -92,7 +92,7 @@ su vez la suma energética de un término de **rodadura** y otro de **propulsió
 rodadura alguna y se quedan solo con la propulsión (2.2.3):
 
 $$
-L_{W,i,m} = 10\,\lg\!\left(10^{L_{WR,i,m}/10} + 10^{L_{WP,i,m}/10}\right).
+L_{W,i,m} = 10\,\log_{10}\!\left(10^{L_{WR,i,m}/10} + 10^{L_{WP,i,m}/10}\right).
 $$
 
 La Tabla [2.2.a] fija cinco categorías modelizadas: **1** vehículos ligeros,
@@ -143,7 +143,7 @@ la velocidad a partir de la velocidad de referencia
 $v_\mathrm{ref} = 70\ \text{km/h}$:
 
 $$
-L_{WR,i,m} = A_{R,i,m} + B_{R,i,m}\,\lg\!\left(\frac{v_m}{v_\mathrm{ref}}\right)
+L_{WR,i,m} = A_{R,i,m} + B_{R,i,m}\,\log_{10}\!\left(\frac{v_m}{v_\mathrm{ref}}\right)
              + \Delta L_{WR,i,m},
 $$
 
@@ -164,7 +164,7 @@ fracción del año en que los clavos están en circulación,
 $p_s = Q_{\mathrm{stud,ratio}} \cdot T_s/12$:
 
 $$
-\Delta L_{\mathrm{studded},i} = 10\,\lg\!\left[(1 - p_s) + p_s\,10^{D_{\mathrm{stud},i}/10}\right].
+\Delta L_{\mathrm{studded},i} = 10\,\log_{10}\!\left[(1 - p_s) + p_s\,10^{D_{\mathrm{stud},i}/10}\right].
 $$
 
 Los **cruces** (2.2.17) suman $C_{R,m,k} \cdot \max(1 - |x|/100,\ 0)$, con $x$
@@ -255,7 +255,7 @@ velocidad en que la fila se declara válida. El
 pavimento entra de forma distinta en cada término:
 
 $$
-\Delta L_{WR,\mathrm{road},i,m} = \alpha_{i,m} + \beta_m\,\lg\!\left(\frac{v_m}{v_\mathrm{ref}}\right),
+\Delta L_{WR,\mathrm{road},i,m} = \alpha_{i,m} + \beta_m\,\log_{10}\!\left(\frac{v_m}{v_\mathrm{ref}}\right),
 \qquad
 \Delta L_{WP,\mathrm{road},i,m} = \min\{\alpha_{i,m};\,0\}.
 $$
@@ -288,7 +288,7 @@ también se anulan los dos términos de velocidad, las potencias acústicas
 La etapa de emisión produce una potencia por metro. Trocear esa línea en fuentes
 puntuales equivalentes queda, en palabras del apartado 2.5.3, "fuera del alcance
 de la presente metodología": una fuente puntual que representa un tramo de
-longitud $dL$ lleva simplemente $L'_{W,\mathrm{eq,line},i} + 10\lg(dL)$, que
+longitud $dL$ lleva simplemente $L'_{W,\mathrm{eq,line},i} + 10\log_{10}(dL)$, que
 es aritmética y se ofrece como tal.
 
 ```python
