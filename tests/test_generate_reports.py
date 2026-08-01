@@ -5,13 +5,17 @@ The rendered PDFs (and their WebP previews) under ``.github/reports/`` are not
 byte-checked (their vector plot differs by ~1 ULP across CPUs, and the raster
 inherits it); this test only guards that ``scripts/generate_reports.py`` still
 runs and writes a valid single-page PDF plus a valid WebP preview for every
-registered example.
+registered example. One test per registered example: each fiche is rendered
+exactly once (PDF and preview asserted together on the same run) and the
+examples spread across the xdist workers instead of forming one monolithic
+test.
 """
 
 from __future__ import annotations
 
 import importlib.util
 import pathlib
+from collections.abc import Callable
 
 import pytest
 
@@ -34,29 +38,36 @@ def _load_generator():
     return module
 
 
-def test_generate_reports_writes_one_page_pdfs(tmp_path) -> None:
+_MODULE = _load_generator()
+
+
+def test_generator_registers_examples() -> None:
+    assert _MODULE._EXAMPLES, "the generator registered no examples"
+    # No factory is registered twice: a duplicate entry would render the
+    # same fiche twice and hide a forgotten registration elsewhere.
+    names = [factory.__name__ for factory in _MODULE._EXAMPLES]
+    assert len(set(names)) == len(names)
+
+
+@pytest.mark.parametrize(
+    "factory", _MODULE._EXAMPLES, ids=lambda factory: factory.__name__.strip("_")
+)
+def test_each_example_writes_a_one_page_pdf_and_preview(
+    factory: Callable[..., object], tmp_path: pathlib.Path
+) -> None:
+    from PIL import Image
     from pypdf import PdfReader
 
-    module = _load_generator()
-    written = module.generate_reports(str(tmp_path))
-    assert written, "the generator registered no examples"
-    for path in written:
-        p = pathlib.Path(path)
-        assert p.is_file() and p.stat().st_size > 0
-        with open(p, "rb") as handle:
-            assert handle.read(4) == b"%PDF"
-        assert len(PdfReader(str(p)).pages) == 1
-
-
-def test_generate_reports_writes_webp_previews(tmp_path) -> None:
-    from PIL import Image
-
-    module = _load_generator()
-    written = module.generate_reports(str(tmp_path))
-    for path in written:
-        preview = pathlib.Path(module.preview_path_for(path))
-        assert preview.suffix == ".webp"
-        assert preview.is_file() and preview.stat().st_size > 0
-        with Image.open(preview) as image:
-            assert image.format == "WEBP"
-            assert image.width == module._PREVIEW_WIDTH_PX
+    written = _MODULE.generate_reports(str(tmp_path), examples=[factory])
+    assert len(written) == 1
+    p = pathlib.Path(written[0])
+    assert p.is_file() and p.stat().st_size > 0
+    with open(p, "rb") as handle:
+        assert handle.read(4) == b"%PDF"
+    assert len(PdfReader(str(p)).pages) == 1
+    preview = pathlib.Path(_MODULE.preview_path_for(str(p)))
+    assert preview.suffix == ".webp"
+    assert preview.is_file() and preview.stat().st_size > 0
+    with Image.open(preview) as image:
+        assert image.format == "WEBP"
+        assert image.width == _MODULE._PREVIEW_WIDTH_PX

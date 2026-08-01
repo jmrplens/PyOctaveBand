@@ -54,6 +54,7 @@ def broadband_noise() -> EcmaTonality:
 # --------------------------------------------------------------------------
 
 
+@pytest.mark.xdist_group("ecma-tonality-ref")
 def test_calibration_1khz_40db_is_one_tu(ref_1k_40: EcmaTonality) -> None:
     # c_T is defined so the 1 kHz / 40 dB tone gives 1 tu_HMS; the standard
     # allows c_T to vary within 0.25 %, and implementation differences add a
@@ -100,6 +101,7 @@ def test_decision_thresholds_are_the_standard_constants() -> None:
 # --------------------------------------------------------------------------
 
 
+@pytest.mark.xdist_group("ecma-tonality-ref")
 def test_pure_tone_far_exceeds_noise(
     ref_1k_40: EcmaTonality, broadband_noise: EcmaTonality
 ) -> None:
@@ -110,6 +112,7 @@ def test_pure_tone_far_exceeds_noise(
     assert ref_1k_40.tonality > 0.8
 
 
+@pytest.mark.xdist_group("ecma-tonality-ref")
 def test_tonal_frequency_tracks_tone(ref_1k_40: EcmaTonality) -> None:
     peak_band = int(np.argmax(ref_1k_40.specific_tonality))
     # The peaking band centres on the tone and its estimated tonal frequency
@@ -149,6 +152,7 @@ def test_silence_is_zero() -> None:
     assert np.all(result.specific_tonality == 0.0)
 
 
+@pytest.mark.xdist_group("ecma-tonality-ref")
 def test_specific_tonality_peaks_near_tone(ref_1k_40: EcmaTonality) -> None:
     peak_band = int(np.argmax(ref_1k_40.specific_tonality))
     assert ref_1k_40.centre_frequencies[peak_band] == pytest.approx(1000.0, rel=0.15)
@@ -249,6 +253,7 @@ def test_free_and_diffuse_fields_differ() -> None:
 # --------------------------------------------------------------------------
 
 
+@pytest.mark.xdist_group("ecma-tonality-ref")
 def test_result_structure(ref_1k_40: EcmaTonality) -> None:
     assert ref_1k_40.specific_tonality.shape == (53,)
     assert ref_1k_40.tonal_frequencies.shape == (53,)
@@ -279,6 +284,7 @@ def test_empty_signal() -> None:
         tonality_ecma(np.array([]), FS)
 
 
+@pytest.mark.xdist_group("ecma-tonality-ref")
 def test_plot_smoke(ref_1k_40: EcmaTonality) -> None:
     import matplotlib
 

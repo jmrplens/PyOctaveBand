@@ -19,6 +19,11 @@ if _SCRIPTS not in sys.path:
 
 import conformance_report as cr
 
+# One xdist worker runs the whole module: the registry memoizes each check's
+# outcome per process, so the full-report render and the per-check tests
+# together compute every check exactly once instead of once per worker.
+pytestmark = pytest.mark.xdist_group("conformance-report")
+
 
 def test_registry_is_populated() -> None:
     # Realistic floors for the current registry size (95 checks / 22 domains

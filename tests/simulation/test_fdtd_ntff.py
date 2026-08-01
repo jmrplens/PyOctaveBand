@@ -146,6 +146,7 @@ def monopole_far_field() -> dict[str, object]:
     }
 
 
+@pytest.mark.xdist_group("fdtd-ntff-monopole")
 def test_monopole_pattern_is_omnidirectional(
         monopole_far_field: dict[str, object]) -> None:
     # A line source has no directivity: the reconstructed far-field
@@ -154,6 +155,7 @@ def test_monopole_pattern_is_omnidirectional(
     assert float(levels.max() - levels.min()) < 0.2
 
 
+@pytest.mark.xdist_group("fdtd-ntff-monopole")
 def test_monopole_level_matches_2d_green_function(
         monopole_far_field: dict[str, object]) -> None:
     # p = A H0(2)(k r) has the far-field pattern A sqrt(2/(pi k))
@@ -168,6 +170,7 @@ def test_monopole_level_matches_2d_green_function(
     assert float(np.abs(phase_error).max()) < 5.0
 
 
+@pytest.mark.xdist_group("fdtd-ntff-monopole")
 def test_monopole_finite_distance_matches_hankel(
         monopole_far_field: dict[str, object]) -> None:
     # The exact (finite-radius) evaluation must reproduce A H0(2)(k R) on
@@ -180,6 +183,7 @@ def test_monopole_finite_distance_matches_hankel(
         np.angle(reconstructed / exact))).max()) < 5.0
 
 
+@pytest.mark.xdist_group("fdtd-ntff-monopole")
 def test_contour_not_enclosing_the_source_extinguishes(
         monopole_far_field: dict[str, object]) -> None:
     # Fields whose sources lie outside the contour contribute nothing to
@@ -189,6 +193,7 @@ def test_contour_not_enclosing_the_source_extinguishes(
     assert outside < 0.02 * inside
 
 
+@pytest.mark.xdist_group("fdtd-ntff-monopole")
 def test_subtracting_a_run_from_itself_cancels(
         monopole_far_field: dict[str, object]) -> None:
     phasors = monopole_far_field["phasors"]
@@ -340,6 +345,7 @@ def metadiffuser_levels() -> np.ndarray:
                             settle=8e-3, cycles=10.0)
 
 
+@pytest.mark.xdist_group("fdtd-ntff-mesh")
 def test_meshed_qrd_far_field_matches_fraunhofer_model(
         qrd_levels: np.ndarray) -> None:
     model = predict_diffuser_polar_response(
@@ -359,6 +365,7 @@ def test_meshed_qrd_far_field_matches_fraunhofer_model(
                - model.coefficient) < 0.1
 
 
+@pytest.mark.xdist_group("fdtd-ntff-mesh")
 def test_meshed_metadiffuser_mimics_the_meshed_qrd(
         qrd_levels: np.ndarray,
         metadiffuser_levels: np.ndarray) -> None:
@@ -377,6 +384,7 @@ def test_meshed_metadiffuser_mimics_the_meshed_qrd(
                - directional_diffusion_coefficient(qrd_levels)) < 0.15
 
 
+@pytest.mark.xdist_group("fdtd-ntff-mesh")
 def test_meshed_metadiffuser_far_field_matches_tmm_model(
         metadiffuser_levels: np.ndarray) -> None:
     # End to end against the TMM + Fraunhofer chain, the library-side

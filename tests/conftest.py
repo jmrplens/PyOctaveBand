@@ -21,6 +21,53 @@ def pytest_configure(config):
     os.environ.setdefault("NUMBA_DISABLE_JIT", "1")
 
 
+# The modules whose tests dominate the wall clock (steady-state FDTD runs,
+# the conformance registry, ECMA-418-2 chains, report generation). Collection
+# order is dispatch order under pytest-xdist, so fronting them lets the long
+# tests start while the workers still have plenty of short tests left to
+# backfill with; leaving them in alphabetical collection order used to strand
+# a 3-5 minute test on a lone worker at the end of the run.
+_FRONTLOADED_MODULES = (
+    "tests/simulation/test_fdtd_ntff.py",
+    "tests/test_conformance_report.py",
+    "tests/simulation/test_elastic_fdtd.py",
+    "tests/aircraft/test_rotorcraft_norah2.py",
+    "tests/test_generate_reports.py",
+    "tests/simulation/test_elastic_fluid_solid.py",
+    "tests/test_impact_insulation.py",
+    "tests/building/test_insulation.py",
+    "tests/psychoacoustics/test_tonality_ecma.py",
+    "tests/psychoacoustics/test_loudness_ecma.py",
+    "tests/psychoacoustics/test_fluctuation_strength_ecma.py",
+    "tests/psychoacoustics/test_loudness_moore_glasberg_time.py",
+    "tests/psychoacoustics/test_loudness_zwicker.py",
+    "tests/underwater/test_numerical_propagation.py",
+    "tests/metrology/test_iec61260_report.py",
+    "tests/room/test_room_ir.py",
+    "tests/test_golden_baseline.py",
+)
+
+
+def pytest_collection_modifyitems(config, items):
+    """Move the known-heavy modules to the front of the dispatch order.
+
+    The sort is stable, so relative order inside every module (and among all
+    remaining modules) is untouched.
+    """
+    rank = {}
+    for item in items:
+        path = item.nodeid.split("::", 1)[0]
+        if path not in rank:
+            rank[path] = len(_FRONTLOADED_MODULES)
+            for i, module in enumerate(_FRONTLOADED_MODULES):
+                # Match on the tail so the rank survives being invoked from
+                # a different rootdir (nodeids are rootdir-relative).
+                if path.endswith(module) or module.endswith(path):
+                    rank[path] = i
+                    break
+    items.sort(key=lambda item: rank[item.nodeid.split("::", 1)[0]])
+
+
 def pytest_report_header(config):
     """Report which copy of every heavy oracle set this run will read.
 
