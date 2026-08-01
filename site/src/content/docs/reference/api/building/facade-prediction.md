@@ -347,7 +347,7 @@ outdoor_level(
 ) -> float
 ```
 
-Exterior level from one or more radiating sides (EN 12354-4 F. E.1).
+Exterior level from one or more radiating sides (EN 12354-4 Formula E.1).
 
 $L_p = 10 \log_{10}( \sum 10^{L_{W,k}/10} ) - A_{tot}$ for sides sharing
 a reception point,

@@ -64,7 +64,7 @@ from .._internal.validation import require_positive
 
 #: Reference vibratory velocity ``v0`` (ISO/TS 7849, Equation 3), m/s.
 REFERENCE_VELOCITY: float = 5.0e-8
-#: Normalized characteristic impedance ``Z_c,n`` at 23 degC, 101,3 kPa, N.s/m3.
+#: Normalized characteristic impedance ``Z_c,n`` at 23 degC, 101.3 kPa, N.s/m3.
 NORMALIZED_IMPEDANCE: float = 411.0
 #: Reference acoustic impedance of air ``Z_c,0``, N.s/m3.
 REFERENCE_IMPEDANCE: float = 400.0

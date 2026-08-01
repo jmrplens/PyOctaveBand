@@ -20,8 +20,7 @@ in the API and is carried on every result object:
 * ``"nmfs-2024"`` -- NOAA Fisheries, *Updated Technical Guidance*, version 3.0
   (October 2024), Table 5 and Table ES3. **The default**: it supersedes the
   2018 revision, uses :math:`b = 5` for every group, renames the groups to
-  the
-  Southall scheme (LF/HF/VHF cetaceans, PW/OW in water, PA/OA in air) and
+  the Southall scheme (LF/HF/VHF cetaceans, PW/OW in water, PA/OA in air) and
   replaces "PTS onset" with "auditory injury (AUD INJ) onset".
 * ``"nmfs-2018"`` -- the 2018 revision, version 2.0, Table 3 and Table ES3.
   Still cited by assessments already in flight.

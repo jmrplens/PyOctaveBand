@@ -579,7 +579,7 @@ def outdoor_level(
     l_w: float | Sequence[float],
     attenuation: float | Sequence[float],
 ) -> float:
-    r"""Exterior level from one or more radiating sides (EN 12354-4 F. E.1).
+    r"""Exterior level from one or more radiating sides (EN 12354-4 Formula E.1).
 
     :math:`L_p = 10 \log_{10}( \sum 10^{L_{W,k}/10} ) - A_{tot}` for sides sharing
     a reception point,
