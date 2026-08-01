@@ -501,7 +501,7 @@ class MeanGroundPlaneResult:
     heights: NDArray[np.float64]
 
     def height(self, distance: float | NDArray[np.float64]) -> NDArray[np.float64]:
-        """The plane height ``a·d + b`` at ``distance``, in metres."""
+        r"""The plane height :math:`a\,d + b` at ``distance``, in metres."""
         return np.asarray(self.slope * np.asarray(distance, dtype=np.float64)
                           + self.intercept, dtype=np.float64)
 

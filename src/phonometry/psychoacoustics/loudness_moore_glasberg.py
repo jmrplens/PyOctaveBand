@@ -877,7 +877,7 @@ _AUDIBLE_LO, _AUDIBLE_HI = 20.0, 20000.0  # component band retained (clause 7.2)
 
 
 def _signal_components(pressure: np.ndarray, fs: float) -> np.ndarray:
-    """Narrowband sinusoidal-component spectrum of a pressure signal.
+    r"""Narrowband sinusoidal-component spectrum of a pressure signal.
 
     ISO 532-2:2017 is a spectrum-based method whose exact input (clauses
     5.2/5.4) is a set of discrete sinusoidal components ``(frequency, level)``.
@@ -889,9 +889,10 @@ def _signal_components(pressure: np.ndarray, fs: float) -> np.ndarray:
     requires - rather than being smeared over a one-third-octave band.
 
     The single-sided power spectrum uses the power-preserving (Parseval)
-    window normalisation ``|X|^2 / (N * sum(w^2))`` so that the summed bin
-    powers equal the signal's mean square regardless of the window: a 1 kHz
-    tone at 40 dB SPL yields 1.000 sone, the definitional anchor of the sone.
+    window normalisation :math:`\lvert X \rvert^2 / (N \sum w^2)` so that the
+    summed bin powers equal the signal's mean square regardless of the
+    window: a 1 kHz tone at 40 dB SPL yields 1.000 sone, the definitional
+    anchor of the sone.
     Bins outside the audible range or more than ``_SIGNAL_FLOOR_DB`` below the
     spectral peak are dropped as inaudible.
     """

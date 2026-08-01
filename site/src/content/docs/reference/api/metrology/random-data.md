@@ -152,7 +152,7 @@ it are themselves a useful non-Gaussianity screen (B&P Sec. 5.5.1.1).
 | :--- | :--- |
 | `levels` | Crossing levels `a`, in signal units (about the removed record mean). |
 | `rates` | Measured crossing rates per level, in 1/s. |
-| `rice_rates` | Rice expectation `N0 exp(-a^2/(2 sigma^2))`, 1/s. |
+| `rice_rates` | Rice expectation $N_0 e^{-a^2/(2\sigma^2)}$, 1/s. |
 | `zero_crossing_rate` | Measured zero-crossing rate `N0`, in 1/s. |
 | `zero_crossing_rate_rice` | Expected $N_0 = 2\sqrt{m_2/m_0}$ from the record's Welch autospectrum moments (Eq. (5.195)), in 1/s. |
 | `apparent_frequency` | `N0 / 2` from the spectral moments, in Hz (a 60 Hz sine crosses zero 120 times per second). |
@@ -204,7 +204,7 @@ irregularity factor is the bridge to fatigue and vibro-acoustic
 damage models, where it selects the cycle-counting correction.
 
 The record mean is removed first. The `m4` moment weights the
-autospectrum by `f^4`, so broadband instrumentation noise far above
+autospectrum by $f^4$, so broadband instrumentation noise far above
 the physical band inflates `M` and deflates `r`: band-limit the
 record to the physically meaningful band first.
 
@@ -293,7 +293,7 @@ $P[\text{peak} > z]$ at the record's irregularity
 factor.
 
 B&P Eq. (5.223): the probability that a maximum chosen at random
-exceeds `z` record RMS units. `exp(-z^2/2)` for narrow
+exceeds `z` record RMS units. $e^{-z^2/2}$ for narrow
 bandwidth data -- $e^{-8} = 0.00033$ at $z = 4$, B&P
 Example 5.14 -- and the Gaussian exceedance in the wide
 bandwidth limit.

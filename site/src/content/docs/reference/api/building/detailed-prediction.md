@@ -974,9 +974,9 @@ $$
 
 with $E = 1/(4 \pi l_1 l_2 k_o^2)$.
 
-ISO 12354-1:2017 Table B.1 tabulates `10 lg σf` for the two standard
-laboratory openings (2 m² and 10 m²), which this implementation
-reproduces.
+ISO 12354-1:2017 Table B.1 tabulates $10 \log_{10} \sigma_f$ for the
+two standard laboratory openings (2 m² and 10 m²), which this
+implementation reproduces.
 
 **Parameters**
 
@@ -1025,7 +1025,7 @@ A Type A homogeneous element of the detailed model.
 | `mass_per_area` | Mass per unit area `m'`, in kg/m². |
 | `critical_frequency` | Critical frequency `fc`, in Hz. |
 | `internal_loss_factor` | Internal loss factor `ηint` of the material (about 0,01 for common homogeneous building materials; ISO 12354-1 Table B.3 tabulates it per material). |
-| `perimeter_absorption` | `Σ lk αk` over the element's perimeter, in m (Formula C.1; build it from [`perimeter_absorption_coefficient`](/phonometry/reference/api/building/detailed-prediction/#perimeter_absorption_coefficient) times the border lengths). |
+| `perimeter_absorption` | $\sum l_k \alpha_k$ over the element's perimeter, in m (Formula C.1; build it from [`perimeter_absorption_coefficient`](/phonometry/reference/api/building/detailed-prediction/#perimeter_absorption_coefficient) times the border lengths). |
 | `density` | Density `ρ` of the material, in kg/m³; supplied together with `longitudinal_velocity` it enables the high-frequency plateau of Formula (B.10). `None` (the default) leaves the plateau off. |
 | `longitudinal_velocity` | Quasi-longitudinal phase velocity `cL` of the material, in m/s (ISO 12354-1 Table B.3). |
 
@@ -1089,9 +1089,9 @@ index and, for a floor, the calculated in-situ normalized impact level.
 
 Because the element performance is *calculated from material properties*,
 the in-situ loss factor enters Formula (B.2) directly and no
-`10 lg(Ts,situ/Ts,lab)` transfer is needed (Annex B.3). Use
-[`in_situ_reduction_index`](/phonometry/reference/api/building/detailed-prediction/#in_situ_reduction_index) instead when the element data come from a
-laboratory measurement.
+$10 \log_{10}(T_{s,situ}/T_{s,lab})$ transfer is needed
+(Annex B.3). Use [`in_situ_reduction_index`](/phonometry/reference/api/building/detailed-prediction/#in_situ_reduction_index) instead when the element
+data come from a laboratory measurement.
 
 **Parameters**
 
@@ -1243,9 +1243,10 @@ Total loss factor in situ `ηtot,situ` (Formula C.1).
 
 $\eta_{tot} = \eta_{int} + 2 \rho_o c_o \sigma/(2 \pi f m') + c_o/(\pi^2 S \sqrt{f f_c}) \cdot \sum_k l_k \alpha_k$: the
 internal losses of the material, the losses by radiation into the air
-and the losses at the perimeter of the element. `Σ lk αk` is the
-junction-length-weighted sum of the Formula (C.4) absorption coefficients
-(see [`perimeter_absorption_coefficient`](/phonometry/reference/api/building/detailed-prediction/#perimeter_absorption_coefficient)).
+and the losses at the perimeter of the element.
+$\sum l_k \alpha_k$ is the junction-length-weighted sum of the
+Formula (C.4) absorption coefficients (see
+[`perimeter_absorption_coefficient`](/phonometry/reference/api/building/detailed-prediction/#perimeter_absorption_coefficient)).
 
 **Parameters**
 
@@ -1257,7 +1258,7 @@ junction-length-weighted sum of the Formula (C.4) absorption coefficients
 | `area` | Element area `S`, in m². |
 | `critical_frequency` | Critical frequency `fc`, in Hz. |
 | `radiation_factor` | Radiation factor `σ` per band. |
-| `perimeter_absorption` | `Σ lk αk` over the element's perimeter, in m (may be zero for a free-edged element). |
+| `perimeter_absorption` | $\sum l_k \alpha_k$ over the element's perimeter, in m (may be zero for a free-edged element). |
 | `speed_of_sound` | Speed of sound in air `co`, in m/s. |
 | `air_density` | Density of air `ρo`, in kg/m³. |
 
@@ -1405,8 +1406,9 @@ $\alpha_k = \sum_j \sqrt{f_{c,j}/f_{ref}} \cdot 10^{-K_{ij}/10}$
 summed over the elements `j`
 connected to the considered element at border `k` (the standard sums
 over at most three). Multiplied by the border length and summed over the
-perimeter it gives the `Σ lk αk` that [`in_situ_total_loss_factor`](/phonometry/reference/api/building/detailed-prediction/#in_situ_total_loss_factor)
-takes. Annex C.3 places the in-situ coefficients between 0,05 and 0,5.
+perimeter it gives the $\sum l_k \alpha_k$ that
+[`in_situ_total_loss_factor`](/phonometry/reference/api/building/detailed-prediction/#in_situ_total_loss_factor) takes. Annex C.3 places the in-situ
+coefficients between 0,05 and 0,5.
 
 **Parameters**
 

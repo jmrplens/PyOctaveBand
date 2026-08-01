@@ -267,13 +267,14 @@ def _weighting_response(name: str, freq: Real) -> Complex:
 
 @dataclass(frozen=True)
 class WeightingResponse:
-    """A frequency-weighting magnitude response (ISO 8041-1, Formula (5)).
+    r"""A frequency-weighting magnitude response (ISO 8041-1, Formula (5)).
 
     :ivar name: Weighting name (one of :data:`WEIGHTING_NAMES`).
     :ivar frequencies: Frequencies at which the response was evaluated, in Hz.
-    :ivar response: Complex weighting ``H(j*2*pi*f)`` per frequency.
-    :ivar magnitude: Weighting factor ``|H|`` per frequency.
-    :ivar magnitude_db: ``20*log10(|H|)`` per frequency, in decibels.
+    :ivar response: Complex weighting :math:`H(j2\pi f)` per frequency.
+    :ivar magnitude: Weighting factor :math:`\lvert H \rvert` per frequency.
+    :ivar magnitude_db: :math:`20 \log_{10}\lvert H \rvert` per frequency, in
+        decibels.
     """
 
     name: str
@@ -904,7 +905,7 @@ class DailyVibrationExposure:
             footer identity.
         :param engine: Rendering back end; only ``"reportlab"`` is supported.
         :param verbose: When True, the operations table adds each operation's
-            share of the daily vibration energy ``A_i(8)^2 / A(8)^2``.
+            share of the daily vibration energy :math:`A_i(8)^2 / A(8)^2`.
         :param language: Fiche language: ``"en"`` (default, English) or
             ``"es"`` (Spanish, with a comma decimal separator).
         :return: The written ``path`` as a :class:`str`.

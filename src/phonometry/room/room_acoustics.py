@@ -249,7 +249,7 @@ def _noise_power(p2: np.ndarray) -> float:
 def _truncation(
     p2: np.ndarray, fs: int, noise_power: float
 ) -> tuple[int, float, float]:
-    """Truncation point and tail compensation (ISO 3382-1, 5.3.3, Eq. (3)).
+    r"""Truncation point and tail compensation (ISO 3382-1, 5.3.3, Eq. (3)).
 
     Fits a sloping line to the smoothed squared IR (in dB) between 5 dB
     below its peak and 10 dB above the noise level; the integration stops
@@ -262,9 +262,9 @@ def _truncation(
     :param noise_power: Background-noise power (same units as ``p2``).
     :return: ``(i1, tail_energy, tail_first_moment)`` where ``i1`` is the
         truncation sample, ``tail_energy`` approximates
-        ``integral_{t1}^inf p^2 dt`` and ``tail_first_moment``
-        approximates ``integral_{t1}^inf t*p^2 dt`` (both in seconds
-        units, i.e. energy = sum(p2)/fs).
+        :math:`\int_{t_1}^{\infty} p^2 \, dt` and ``tail_first_moment``
+        approximates :math:`\int_{t_1}^{\infty} t \, p^2 \, dt` (both in
+        seconds units, i.e. energy = sum(p2)/fs).
     """
     n = p2.size
     no_truncation = (n, 0.0, 0.0)
@@ -303,16 +303,16 @@ def _truncation(
 def _schroeder(
     p2: np.ndarray, fs: int
 ) -> tuple[np.ndarray, np.ndarray, np.ndarray, float, int, float]:
-    """Backward-integrated decay curve (ISO 3382-1, 5.3.3, Eq. (1)-(3)).
+    r"""Backward-integrated decay curve (ISO 3382-1, 5.3.3, Eq. (1)-(3)).
 
     :param p2: Squared impulse response, onset-trimmed.
     :param fs: Sample rate in Hz.
     :return: ``(time, level, cumulative, total, i1, tail_moment)``:
         decay times in seconds, decay levels in dB re the steady-state
         level (0 dB at t = 0), the running early energy
-        ``integral_0^t p^2``, the total energy including the tail
+        :math:`\int_0^t p^2`, the total energy including the tail
         compensation, the truncation sample ``i1`` and the tail first
-        moment ``integral_{t1}^inf t*p^2 dt``.
+        moment :math:`\int_{t_1}^{\infty} t \, p^2 \, dt`.
     """
     noise = _noise_power(p2)
     i1, tail_energy, tail_moment = _truncation(p2, fs, noise)

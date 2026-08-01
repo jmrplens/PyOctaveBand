@@ -35,12 +35,12 @@ phonometry (a passive medium has :math:`\operatorname{Im}(k) < 0`):
   :math:`\alpha_k = (2k+1) \pi / a` and :math:`\beta_m = (2m+1) \pi / b`.
   The duct series is printed in the opposite time convention of the source;
   it is returned conjugated here so the neck and cavity share the
-  ``e^{+j w t}`` passivity of the slit. Both models are pinned in the tests
-  to their exact limits: the effective density tends to ``rho0`` and the
-  bulk modulus to ``kappa0`` as the boundary layers vanish, and ``j w rho``
-  tends to the Poiseuille flow resistivity of the channel as
-  :math:`\omega \to 0` (``12 eta / h^2`` for the slit,
-  ``28.454 eta / w^2`` for a square duct).
+  :math:`e^{+j\omega t}` passivity of the slit. Both models are pinned in the
+  tests to their exact limits: the effective density tends to ``rho0`` and the
+  bulk modulus to ``kappa0`` as the boundary layers vanish, and
+  :math:`j\omega\rho` tends to the Poiseuille flow resistivity of the channel
+  as :math:`\omega \to 0` (:math:`12\eta/h^2` for the slit,
+  :math:`28.454\,\eta/w^2` for a square duct).
 
 * **Helmholtz-resonator impedance.** Each resonator is a neck (length ``l_n``,
   side ``w_n``) over a closed cavity (length ``l_c``, side ``w_c``); its
@@ -226,11 +226,11 @@ def rectangular_duct_properties(
     :math:`G_\kappa^2 = j \omega \mathrm{Pr} \rho_0 / \eta`. Here the duct
     is square (:math:`a = b`, both equal to ``side``). The series is
     transcribed in the source's time convention and returned conjugated so
-    the result is passive in the ``e^{+j w t}`` convention
+    the result is passive in the :math:`e^{+j\omega t}` convention
     (:math:`\operatorname{Im}(k) < 0`). The normalising constant 64 is fixed
     by the exact limits :math:`\rho \to \rho_0`, :math:`\kappa \to \kappa_0`
     as the boundary layers vanish and by the Poiseuille resistivity
-    ``28.454 eta / side^2`` as :math:`\omega \to 0`.
+    :math:`28.454\,\eta/\text{side}^2` as :math:`\omega \to 0`.
 
     :param frequency: Frequency vector ``f``, in hertz.
     :param side: Square-duct side length, in metres.

@@ -322,11 +322,12 @@ def _third_octave_geometry() -> tuple[np.ndarray, np.ndarray]:
     The ``6.353`` is deliberately *not* folded into the returned array. The
     standard prints this slope as
     :math:`-80 + 0.6 (B_i + 10 \log_{10} f_i - 6.353)`, which
-    evaluates as ``(Bi + 10 lg fi) - 6.353``; folding the constant in first
-    would evaluate ``Bi + (10 lg fi - 6.353)`` instead, and floating-point
-    addition is not associative. The two differ in the last bits, so the fold
-    would silently shift a shipped, released quantity. It is returned as the
-    procedure's ``bandwidth_offset_db`` and subtracted after the addition.
+    evaluates as :math:`(B_i + 10 \log_{10} f_i) - 6.353`; folding the constant
+    in first would evaluate :math:`B_i + (10 \log_{10} f_i - 6.353)` instead,
+    and floating-point addition is not associative. The two differ in the last
+    bits, so the fold would silently shift a shipped, released quantity. It is
+    returned as the procedure's ``bandwidth_offset_db`` and subtracted after
+    the addition.
     """
     f = BAND_CENTERS
     return 10.0 * np.log10(f), np.log10(
@@ -643,13 +644,14 @@ def _equivalent_masking(
     level itself.
 
     The slope is summed in the order the standard prints it for the procedure
-    at hand: ``(Bi + 10 lg fi) - 6.353`` for the one-third-octave form, and
-    ``Bi + 10 lg Wi`` for the band-limit form, whose offset is ``0.0`` and
-    whose subtraction is therefore exact. Floating-point addition is not
-    associative, so summing in any other order shifts the result by a few
-    units in the last place. That matters here beyond tidiness: this is the
-    library's shipped SII, it feeds a report fiche, and a released quantity
-    should not drift in its last bits because the code was refactored.
+    at hand: :math:`(B_i + 10 \log_{10} f_i) - 6.353` for the one-third-octave
+    form, and :math:`B_i + 10 \log_{10} W_i` for the band-limit form, whose
+    offset is ``0.0`` and whose subtraction is therefore exact. Floating-point
+    addition is not associative, so summing in any other order shifts the
+    result by a few units in the last place. That matters here beyond
+    tidiness: this is the library's shipped SII, it feeds a report fiche, and
+    a released quantity should not drift in its last bits because the code was
+    refactored.
     """
     bandwidth_db, spread_decades = procedure.bandwidth_db, procedure.spread_decades
     if bandwidth_db is None or spread_decades is None:

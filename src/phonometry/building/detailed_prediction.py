@@ -352,9 +352,9 @@ def forced_radiation_factor(
 
     with :math:`E = 1/(4 \pi l_1 l_2 k_o^2)`.
 
-    ISO 12354-1:2017 Table B.1 tabulates ``10 lg σf`` for the two standard
-    laboratory openings (2 m² and 10 m²), which this implementation
-    reproduces.
+    ISO 12354-1:2017 Table B.1 tabulates :math:`10 \log_{10} \sigma_f` for the
+    two standard laboratory openings (2 m² and 10 m²), which this
+    implementation reproduces.
 
     :param frequencies: Band centre frequencies ``f``, in Hz.
     :param length1: One side length of the rectangular element, in m.
@@ -561,8 +561,9 @@ def perimeter_absorption_coefficient(
     summed over the elements ``j``
     connected to the considered element at border ``k`` (the standard sums
     over at most three). Multiplied by the border length and summed over the
-    perimeter it gives the ``Σ lk αk`` that :func:`in_situ_total_loss_factor`
-    takes. Annex C.3 places the in-situ coefficients between 0,05 and 0,5.
+    perimeter it gives the :math:`\sum l_k \alpha_k` that
+    :func:`in_situ_total_loss_factor` takes. Annex C.3 places the in-situ
+    coefficients between 0,05 and 0,5.
 
     :param critical_frequencies: Critical frequency ``fc,j`` of each connected
         element, in Hz.
@@ -602,9 +603,10 @@ def in_situ_total_loss_factor(
     :math:`\eta_{tot} = \eta_{int} + 2 \rho_o c_o \sigma/(2 \pi f m')
     + c_o/(\pi^2 S \sqrt{f f_c}) \cdot \sum_k l_k \alpha_k`: the
     internal losses of the material, the losses by radiation into the air
-    and the losses at the perimeter of the element. ``Σ lk αk`` is the
-    junction-length-weighted sum of the Formula (C.4) absorption coefficients
-    (see :func:`perimeter_absorption_coefficient`).
+    and the losses at the perimeter of the element.
+    :math:`\sum l_k \alpha_k` is the junction-length-weighted sum of the
+    Formula (C.4) absorption coefficients (see
+    :func:`perimeter_absorption_coefficient`).
 
     :param frequencies: Band centre frequencies ``f``, in Hz.
     :param internal_loss_factor: Internal loss factor ``ηint`` of the material
@@ -613,8 +615,8 @@ def in_situ_total_loss_factor(
     :param area: Element area ``S``, in m².
     :param critical_frequency: Critical frequency ``fc``, in Hz.
     :param radiation_factor: Radiation factor ``σ`` per band.
-    :param perimeter_absorption: ``Σ lk αk`` over the element's perimeter, in
-        m (may be zero for a free-edged element).
+    :param perimeter_absorption: :math:`\sum l_k \alpha_k` over the element's
+        perimeter, in m (may be zero for a free-edged element).
     :param speed_of_sound: Speed of sound in air ``co``, in m/s.
     :param air_density: Density of air ``ρo``, in kg/m³.
     :return: The total loss factor ``ηtot,situ`` per band (dimensionless).
@@ -1256,7 +1258,7 @@ def floating_floor_improvement(
 # --------------------------------------------------------------------------- #
 @dataclass(frozen=True)
 class HomogeneousElement:
-    """A Type A homogeneous element of the detailed model.
+    r"""A Type A homogeneous element of the detailed model.
 
     :ivar label: Human-readable element name, e.g. ``"separating floor"``.
     :ivar area: Element area ``S``, in m².
@@ -1267,8 +1269,8 @@ class HomogeneousElement:
     :ivar internal_loss_factor: Internal loss factor ``ηint`` of the material
         (about 0,01 for common homogeneous building materials; ISO 12354-1
         Table B.3 tabulates it per material).
-    :ivar perimeter_absorption: ``Σ lk αk`` over the element's perimeter, in m
-        (Formula C.1; build it from
+    :ivar perimeter_absorption: :math:`\sum l_k \alpha_k` over the element's
+        perimeter, in m (Formula C.1; build it from
         :func:`perimeter_absorption_coefficient` times the border lengths).
     :ivar density: Density ``ρ`` of the material, in kg/m³; supplied together
         with ``longitudinal_velocity`` it enables the high-frequency plateau
@@ -1343,7 +1345,7 @@ def in_situ_element(
     speed_of_sound: float = SPEED_OF_SOUND,
     air_density: float = AIR_DENSITY,
 ) -> InSituElementResult:
-    """Evaluate one homogeneous element in situ, per band (Clause 4.2.2).
+    r"""Evaluate one homogeneous element in situ, per band (Clause 4.2.2).
 
     Runs the whole Annex B / Annex C chain in one call: the two radiation
     factors, the in-situ total loss factor and structural reverberation time,
@@ -1352,9 +1354,9 @@ def in_situ_element(
 
     Because the element performance is *calculated from material properties*,
     the in-situ loss factor enters Formula (B.2) directly and no
-    ``10 lg(Ts,situ/Ts,lab)`` transfer is needed (Annex B.3). Use
-    :func:`in_situ_reduction_index` instead when the element data come from a
-    laboratory measurement.
+    :math:`10 \log_{10}(T_{s,situ}/T_{s,lab})` transfer is needed
+    (Annex B.3). Use :func:`in_situ_reduction_index` instead when the element
+    data come from a laboratory measurement.
 
     :param element: The :class:`HomogeneousElement` description.
     :param frequencies: Band centre frequencies, in Hz.

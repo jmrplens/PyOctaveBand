@@ -25,7 +25,9 @@ Composite whole-day rating level (ISO 1996-1:2016, 6.5).
 Generalizes Formulae (5) and (6): each period contributes its rating
 level plus adjustment, weighted by its share of the 24 h day:
 
-`10*lg[ sum_i (h_i / 24) * 10^(0.1*(L_i + K_i)) ]`
+$$
+10 \log_{10}\left[ \sum_i \frac{h_i}{24} \cdot 10^{0.1 (L_i + K_i)} \right]
+$$
 
 **Parameters**
 

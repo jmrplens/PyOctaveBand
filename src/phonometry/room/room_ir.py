@@ -793,10 +793,10 @@ def _shaped_target_db(
     freqs: np.ndarray,
     f_range: tuple[float, float],
 ) -> np.ndarray:
-    """Evaluate the target magnitude, in dB, on the synthesis grid.
+    r"""Evaluate the target magnitude, in dB, on the synthesis grid.
 
     Named targets: ``"white"`` is flat; ``"pink"`` falls 3 dB per octave in
-    magnitude (``-10*log10(f/f1)``), the spectrum of the classical
+    magnitude (:math:`-10 \log_{10}(f/f_1)`), the spectrum of the classical
     logarithmic sweep (Mueller & Massarani 2001, Sec. 4). An arbitrary
     target is a ``(frequencies_hz, magnitude_db)`` pair, interpolated
     linearly in dB over log-frequency and held constant beyond its ends.

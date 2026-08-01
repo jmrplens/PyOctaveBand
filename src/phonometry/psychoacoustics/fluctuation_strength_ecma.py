@@ -667,11 +667,12 @@ def _harmonic_complex(
     band: int,
     w0: np.ndarray,
 ) -> tuple[float, float, float]:
-    """Harmonic analysis and weighting (Clauses 9.1.8-9.1.9).
+    r"""Harmonic analysis and weighting (Clauses 9.1.8-9.1.9).
 
     Returns ``(a_hat, harmonic_power, p0)`` where ``a_hat`` is the weighted
     sum of the harmonic complex (Formula 157) and ``harmonic_power`` is
-    ``p^_0^2 + 2 * sum(A_i)`` over the refined complex (Formulae 159-160).
+    :math:`\hat{p}_0^2 + 2 \sum A_i` over the refined complex
+    (Formulae 159-160).
     """
     best_energy = -1.0
     best: tuple[np.ndarray, np.ndarray] = (np.empty(0, dtype=np.intp), np.empty(0))

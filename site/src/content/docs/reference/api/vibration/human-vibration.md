@@ -287,7 +287,7 @@ verdict against the limit value, and a footer identity/disclaimer block.
 | `path` | Destination path of the PDF file. |
 | `metadata` | Optional [`ReportMetadata`](/phonometry/reference/api/building/insulation/#reportmetadata) supplying the header identity (`client` is the company, `specimen` the operator/worker, `test_room` the workplace) plus the `instrumentation` and `calibration` free-text fields and the footer identity. |
 | `engine` | Rendering back end; only `"reportlab"` is supported. |
-| `verbose` | When True, the operations table adds each operation's share of the daily vibration energy `A_i(8)^2 / A(8)^2`. |
+| `verbose` | When True, the operations table adds each operation's share of the daily vibration energy $A_i(8)^2 / A(8)^2$. |
 | `language` | Fiche language: `"en"` (default, English) or `"es"` (Spanish, with a comma decimal separator). |
 
 **Returns:** The written `path` as a `str`.
@@ -870,9 +870,9 @@ A frequency-weighting magnitude response (ISO 8041-1, Formula (5)).
 | :--- | :--- |
 | `name` | Weighting name (one of [`WEIGHTING_NAMES`](/phonometry/reference/api/vibration/human-vibration/#weighting_names)). |
 | `frequencies` | Frequencies at which the response was evaluated, in Hz. |
-| `response` | Complex weighting `H(j*2*pi*f)` per frequency. |
-| `magnitude` | Weighting factor `\|H\|` per frequency. |
-| `magnitude_db` | `20*log10(\|H\|)` per frequency, in decibels. |
+| `response` | Complex weighting $H(j2\pi f)$ per frequency. |
+| `magnitude` | Weighting factor $\lvert H \rvert$ per frequency. |
+| `magnitude_db` | $20 \log_{10}\lvert H \rvert$ per frequency, in decibels. |
 
 ### WeightingResponse.plot()
 

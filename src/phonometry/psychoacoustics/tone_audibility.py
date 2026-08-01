@@ -494,18 +494,19 @@ def _is_distinct(
     high: int,
     line_spacing: float,
 ) -> bool:
-    """Distinctness test: bandwidth (Formula (9)) and edge steepness (10)/(11)).
+    r"""Distinctness test: bandwidth (Formula (9)) and edge steepness (10)/(11)).
 
     NOTE (DIN-vs-ISO print difference): ISO/PAS 20065:2016 5.3.4 prints
-    *asymmetric* edge-steepness formulas -- ``fT/2`` on the lower edge and
-    ``fT`` (no divisor) on the upper. DIN 45681:2005-03 prints ``fT/sqrt(2)``
-    on BOTH edges and its executable Annex J reference program does the same
-    (``Frequenz(i)/Sqr(2)``). The two cannot both be satisfied; this
-    implementation follows the DIN/sqrt(2) reading (the ISO print is
-    plausibly a typesetting corruption of it, see docs/ERRATA.md).
-    Relative to DIN, the ISO print is sqrt(2) STRICTER on the lower edge
-    (1/2 < 1/sqrt(2)) and sqrt(2) MORE LENIENT on the upper (no divisor at
-    all). Borderline tones with a one-sided edge steepness in roughly
+    *asymmetric* edge-steepness formulas, :math:`f_T/2` on the lower edge and
+    :math:`f_T` (no divisor) on the upper. DIN 45681:2005-03 prints
+    :math:`f_T/\sqrt{2}` on BOTH edges and its executable Annex J reference
+    program does the same (``Frequenz(i)/Sqr(2)``). The two cannot both be
+    satisfied; this implementation follows the DIN :math:`\sqrt{2}` reading
+    (the ISO print is plausibly a typesetting corruption of it, see
+    docs/ERRATA.md). Relative to DIN, the ISO print is :math:`\sqrt{2}`
+    STRICTER on the lower edge (:math:`1/2 < 1/\sqrt{2}`) and :math:`\sqrt{2}`
+    MORE LENIENT on the upper (no divisor at all). Borderline tones with a
+    one-sided edge steepness in roughly
     [17, 34] dB/oct flip classification between the two readings.
     """
     n_lines = high - low + 1

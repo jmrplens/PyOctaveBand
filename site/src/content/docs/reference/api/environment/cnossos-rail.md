@@ -722,9 +722,9 @@ superstructure_transfer() -> NDArray[np.float64]
 Superstructure transfer `L_H,VEH,SUP,i` of Table G-3c, in dB per axle.
 
 Only one superstructure is tabulated, the "EU standard" of vehicle type
-`a` (freight), and it is 0,0 dB in every band, so (2.3.10) reduces to
-`L_R,TOT,i + 10 lg(N_a)`. The contribution is considered for freight
-wagons only.
+`a` (freight), and it is 0.0 dB in every band, so (2.3.10) reduces to
+$L_{R,TOT,i} + 10 \log_{10}(N_a)$. The contribution is considered
+for freight wagons only.
 
 **Returns:** The 24 1/3-octave values, all zero.
 

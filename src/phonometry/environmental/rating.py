@@ -14,13 +14,16 @@ import numpy as np
 
 
 def composite_rating_level(periods: Iterable[tuple[float, float, float]]) -> float:
-    """
+    r"""
     Composite whole-day rating level (ISO 1996-1:2016, 6.5).
 
     Generalizes Formulae (5) and (6): each period contributes its rating
     level plus adjustment, weighted by its share of the 24 h day:
 
-    ``10*lg[ sum_i (h_i / 24) * 10^(0.1*(L_i + K_i)) ]``
+    .. math::
+
+       10 \log_{10}\left[ \sum_i \frac{h_i}{24} \cdot
+       10^{0.1 (L_i + K_i)} \right]
 
     :param periods: Iterable of ``(level_db, hours, adjustment_db)`` tuples.
         ``level_db`` is the period's (rating) equivalent continuous level,

@@ -966,9 +966,11 @@ Clause A.2.1. Input values are first reduced to one decimal place
 (Clause 4.3.1, footnote 1).
 
 The shift search reuses the verified engine of [`weighted_rating`](/phonometry/reference/api/building/insulation/#weighted_rating)
-on the negated curves: minimising `Σ max(0, measured - (ref + k))`
-over `k` equals maximising `Σ max(0, (-ref) + (-k) - (-measured))`,
-the airborne problem, so no separate search is duplicated.
+on the negated curves: minimising
+$\sum \max(0, \text{measured} - (\text{ref} + k))$ over `k`
+equals maximising
+$\sum \max(0, (-\text{ref}) + (-k) - (-\text{measured}))$, the
+airborne problem, so no separate search is duplicated.
 
 **Parameters**
 

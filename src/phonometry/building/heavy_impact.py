@@ -489,14 +489,15 @@ def fast_reverberation_correction(
 
 @dataclass(frozen=True)
 class StandardizedMaximumImpactResult:
-    """Standardized maximum impact sound pressure level (ISO 16283-2 3.16).
+    r"""Standardized maximum impact sound pressure level (ISO 16283-2 3.16).
 
     :ivar frequencies: Band centre frequencies, in Hz, or ``None``.
     :ivar measured: Energy-averaged maximum level ``Li,Fmax`` per band, in dB.
     :ivar standardized: ``L'i,Fmax,V,T`` per band, in dB.
-    :ivar volume_term: The volume correction ``10 lg(V/V0)``, in dB (scalar).
-    :ivar reverberation_correction: The ``10 lg[g(C)/g(C0)]`` term subtracted
-        per band, in dB.
+    :ivar volume_term: The volume correction :math:`10 \log_{10}(V/V_0)`, in
+        dB (scalar).
+    :ivar reverberation_correction: The :math:`10 \log_{10}[g(C)/g(C_0)]`
+        term subtracted per band, in dB.
     :ivar volume: Receiving-room volume ``V``, in m3.
     :ivar reverberation_time: Receiving-room reverberation time ``T`` per band,
         in seconds.

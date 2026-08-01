@@ -387,8 +387,9 @@ def task_based_exposure(
     :param instrument: Default instrument class selecting ``u2`` (Table C.5);
         may be overridden per :class:`Task`.
     :param u3: Microphone-position standard uncertainty, dB (Clause C.6 gives 1.0).
-    :param include_duration_uncertainty: Include the ``(c1b*u1b)^2`` duration term
-        (Eq C.3). When False the budget omits it (ISO 9612 Annex D case a).
+    :param include_duration_uncertainty: Include the :math:`(c_{1b} u_{1b})^2`
+        duration term (Eq C.3). When False the budget omits it (ISO 9612
+        Annex D case a).
     :param warn: Emit :class:`OccupationalExposureWarning` when a task triggers the 3 dB
         spread rule (Clause 9.3).
     :return: An :class:`ExposureResult` with per-task contributions.

@@ -199,11 +199,13 @@ def _add_air(
 def _millington_absorption(
     pairs: Sequence[tuple[float, NDArray[np.float64]]],
 ) -> NDArray[np.float64]:
-    """Millington equivalent absorption ``-sum_i S_i ln(1 - alpha_i)`` (per band).
+    r"""Millington equivalent absorption (per band).
+
+    :math:`-\sum_i S_i \ln(1 - \alpha_i)`.
 
     :raises ValueError: for any coefficient at or above 1; the per-surface
-        ``ln(1 - alpha_i)`` diverges there, so Millington-Sette (alone among
-        the five models) requires every individual coefficient below 1.
+        :math:`\ln(1 - \alpha_i)` diverges there, so Millington-Sette (alone
+        among the five models) requires every individual coefficient below 1.
     """
     total = np.asarray(0.0, dtype=np.float64)
     for area, alpha_arr in pairs:
@@ -219,7 +221,7 @@ def _millington_absorption(
 
 
 def _eyring_absorption(total_area: float, mean_absorption: NDArray[np.float64]) -> NDArray[np.float64]:
-    """Eyring equivalent absorption ``-S ln(1 - alpha_bar)`` (per band)."""
+    r"""Eyring equivalent absorption :math:`-S \ln(1 - \bar{\alpha})` (per band)."""
     # A mean of exactly 1 (fully absorbing on average) has no finite Eyring
     # time: ln(1 - mean) diverges, so fail with a clear message instead.
     if np.any(mean_absorption >= 1.0):

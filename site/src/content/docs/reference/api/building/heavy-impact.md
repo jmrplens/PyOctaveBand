@@ -564,8 +564,8 @@ Standardized maximum impact sound pressure level (ISO 16283-2 3.16).
 | `frequencies` | Band centre frequencies, in Hz, or `None`. |
 | `measured` | Energy-averaged maximum level `Li,Fmax` per band, in dB. |
 | `standardized` | `L'i,Fmax,V,T` per band, in dB. |
-| `volume_term` | The volume correction `10 lg(V/V0)`, in dB (scalar). |
-| `reverberation_correction` | The `10 lg[g(C)/g(C0)]` term subtracted per band, in dB. |
+| `volume_term` | The volume correction $10 \log_{10}(V/V_0)$, in dB (scalar). |
+| `reverberation_correction` | The $10 \log_{10}[g(C)/g(C_0)]$ term subtracted per band, in dB. |
 | `volume` | Receiving-room volume `V`, in m3. |
 | `reverberation_time` | Receiving-room reverberation time `T` per band, in seconds. |
 

@@ -234,7 +234,7 @@ Meteorological corrections C1, C2, C3 (ISO 3745:2012 Eq. 14 block).
 radiation-impedance correction, both scalars in decibels; `c3` is the
 air-absorption correction (scalar, or per band when the attenuation
 coefficient `a(f)` is supplied per band). All three are added to
-`Lp_bar + 10*lg(S/S0)` to obtain `LW`.
+$\overline{L_p} + 10 \log_{10}(S/S_0)$ to obtain `LW`.
 
 ## plot_microphone_positions
 

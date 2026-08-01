@@ -1483,7 +1483,7 @@ def weighted_impact_rating(
     values_by_band: Sequence[float] | np.ndarray,
     bands: str | None = None,
 ) -> ImpactRatingResult:
-    """
+    r"""
     Single-number weighted impact rating and CI per ISO 717-2.
 
     Applies the reference-curve method of Clause 4.3: the Table 3 impact
@@ -1499,9 +1499,11 @@ def weighted_impact_rating(
     (Clause 4.3.1, footnote 1).
 
     The shift search reuses the verified engine of :func:`weighted_rating`
-    on the negated curves: minimising ``Σ max(0, measured - (ref + k))``
-    over ``k`` equals maximising ``Σ max(0, (-ref) + (-k) - (-measured))``,
-    the airborne problem, so no separate search is duplicated.
+    on the negated curves: minimising
+    :math:`\sum \max(0, \text{measured} - (\text{ref} + k))` over ``k``
+    equals maximising
+    :math:`\sum \max(0, (-\text{ref}) + (-k) - (-\text{measured}))`, the
+    airborne problem, so no separate search is duplicated.
 
     :param values_by_band: Measured impact levels (``Ln``, ``L'n``,
         ``L'nT``) in dB. 16 values are read as one-third-octave bands, 5

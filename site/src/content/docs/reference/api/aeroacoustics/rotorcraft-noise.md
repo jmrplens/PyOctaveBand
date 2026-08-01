@@ -555,7 +555,7 @@ MeanGroundPlaneResult.height(
 ) -> NDArray[np.float64]
 ```
 
-The plane height `a·d + b` at `distance`, in metres.
+The plane height $a\,d + b$ at `distance`, in metres.
 
 ### MeanGroundPlaneResult.plot()
 

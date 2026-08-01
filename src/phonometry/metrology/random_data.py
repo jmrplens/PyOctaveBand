@@ -693,7 +693,7 @@ class LevelCrossingResult:
     :ivar levels: Crossing levels ``a``, in signal units (about the
         removed record mean).
     :ivar rates: Measured crossing rates per level, in 1/s.
-    :ivar rice_rates: Rice expectation ``N0 exp(-a^2/(2 sigma^2))``, 1/s.
+    :ivar rice_rates: Rice expectation :math:`N_0 e^{-a^2/(2\sigma^2)}`, 1/s.
     :ivar zero_crossing_rate: Measured zero-crossing rate ``N0``, in 1/s.
     :ivar zero_crossing_rate_rice: Expected
         :math:`N_0 = 2\sqrt{m_2/m_0}` from the record's Welch
@@ -896,7 +896,7 @@ class PeakStatisticsResult:
         factor.
 
         B&P Eq. (5.223): the probability that a maximum chosen at random
-        exceeds ``z`` record RMS units. ``exp(-z^2/2)`` for narrow
+        exceeds ``z`` record RMS units. :math:`e^{-z^2/2}` for narrow
         bandwidth data -- :math:`e^{-8} = 0.00033` at :math:`z = 4`, B&P
         Example 5.14 -- and the Gaussian exceedance in the wide
         bandwidth limit.
@@ -953,7 +953,7 @@ def peak_statistics(
     damage models, where it selects the cycle-counting correction.
 
     The record mean is removed first. The ``m4`` moment weights the
-    autospectrum by ``f^4``, so broadband instrumentation noise far above
+    autospectrum by :math:`f^4`, so broadband instrumentation noise far above
     the physical band inflates ``M`` and deflates ``r``: band-limit the
     record to the physically meaningful band first.
 

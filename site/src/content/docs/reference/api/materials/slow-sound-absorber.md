@@ -39,12 +39,12 @@ phonometry (a passive medium has $\operatorname{Im}(k) < 0$):
   $\alpha_k = (2k+1) \pi / a$ and $\beta_m = (2m+1) \pi / b$.
   The duct series is printed in the opposite time convention of the source;
   it is returned conjugated here so the neck and cavity share the
-  `e^{+j w t}` passivity of the slit. Both models are pinned in the tests
-  to their exact limits: the effective density tends to `rho0` and the
-  bulk modulus to `kappa0` as the boundary layers vanish, and `j w rho`
-  tends to the Poiseuille flow resistivity of the channel as
-  $\omega \to 0$ (`12 eta / h^2` for the slit,
-  `28.454 eta / w^2` for a square duct).
+  $e^{+j\omega t}$ passivity of the slit. Both models are pinned in the
+  tests to their exact limits: the effective density tends to `rho0` and the
+  bulk modulus to `kappa0` as the boundary layers vanish, and
+  $j\omega\rho$ tends to the Poiseuille flow resistivity of the channel
+  as $\omega \to 0$ ($12\eta/h^2$ for the slit,
+  $28.454\,\eta/w^2$ for a square duct).
 
 * **Helmholtz-resonator impedance.** Each resonator is a neck (length `l_n`,
   side `w_n`) over a closed cavity (length `l_c`, side `w_c`); its
@@ -344,11 +344,11 @@ $G_\rho^2 = j \omega \rho_0 / \eta$ and
 $G_\kappa^2 = j \omega \mathrm{Pr} \rho_0 / \eta$. Here the duct
 is square ($a = b$, both equal to `side`). The series is
 transcribed in the source's time convention and returned conjugated so
-the result is passive in the `e^{+j w t}` convention
+the result is passive in the $e^{+j\omega t}$ convention
 ($\operatorname{Im}(k) < 0$). The normalising constant 64 is fixed
 by the exact limits $\rho \to \rho_0$, $\kappa \to \kappa_0$
 as the boundary layers vanish and by the Poiseuille resistivity
-`28.454 eta / side^2` as $\omega \to 0$.
+$28.454\,\eta/\text{side}^2$ as $\omega \to 0$.
 
 **Parameters**
 

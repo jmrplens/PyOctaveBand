@@ -334,7 +334,7 @@ follows Eq C.3 with sampling `u1a` (Eq C.6), optional duration `u1b`
 | `tasks` | The tasks making up the nominal day. |
 | `instrument` | Default instrument class selecting `u2` (Table C.5); may be overridden per [`Task`](/phonometry/reference/api/hearing/occupational-exposure/#task). |
 | `u3` | Microphone-position standard uncertainty, dB (Clause C.6 gives 1.0). |
-| `include_duration_uncertainty` | Include the `(c1b*u1b)^2` duration term (Eq C.3). When False the budget omits it (ISO 9612 Annex D case a). |
+| `include_duration_uncertainty` | Include the $(c_{1b} u_{1b})^2$ duration term (Eq C.3). When False the budget omits it (ISO 9612 Annex D case a). |
 | `warn` | Emit [`OccupationalExposureWarning`](/phonometry/reference/api/hearing/occupational-exposure/#occupationalexposurewarning) when a task triggers the 3 dB spread rule (Clause 9.3). |
 
 **Returns:** An [`ExposureResult`](/phonometry/reference/api/hearing/occupational-exposure/#exposureresult) with per-task contributions.

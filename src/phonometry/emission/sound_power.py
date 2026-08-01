@@ -862,13 +862,14 @@ _SIGMA_R0_3745_A = 0.5
 
 @dataclass(frozen=True)
 class MeteorologicalCorrection:
-    """Meteorological corrections C1, C2, C3 (ISO 3745:2012 Eq. 14 block).
+    r"""Meteorological corrections C1, C2, C3 (ISO 3745:2012 Eq. 14 block).
 
     ``c1`` is the reference-quantity (impedance) correction and ``c2`` the
     radiation-impedance correction, both scalars in decibels; ``c3`` is the
     air-absorption correction (scalar, or per band when the attenuation
     coefficient ``a(f)`` is supplied per band). All three are added to
-    ``Lp_bar + 10*lg(S/S0)`` to obtain ``LW``."""
+    :math:`\overline{L_p} + 10 \log_{10}(S/S_0)` to obtain ``LW``.
+    """
 
     c1: float
     c2: float
