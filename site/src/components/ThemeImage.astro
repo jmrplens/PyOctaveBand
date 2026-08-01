@@ -26,8 +26,11 @@ interface Props {
 	loading?: 'lazy' | 'eager';
 }
 
+import { Zoom } from 'starlight-image-zoom/components';
+
 import { figureSize } from '../lib/figure-size.mjs';
 import { mediaUrl } from '../lib/media.mjs';
+import ZoomI18n from './ZoomI18n.astro';
 
 const { src, alt, width, loading = 'lazy' } = Astro.props;
 
@@ -64,8 +67,17 @@ const priority = loading === 'eager' ? 'high' : undefined;
 const effectiveLoading = 'lazy';
 ---
 
-{/* Same-line pair, matching the hand-authored markup this replaces. */}
-<img
+{/*
+	Same-line pair, matching the hand-authored markup this replaces, each half
+	wrapped in the plugin's <Zoom> so the figure opens full-viewport like any
+	other. The wrapping has to be explicit here: starlight-image-zoom finds
+	images by walking the markdown tree, which reaches the hand-written <img>
+	pairs on the theory pages but never sees the ones a component emits, so
+	without this the guides would be the half of the site whose figures do not
+	zoom. ZoomI18n translates the button label on the Spanish pages; the
+	elements stay adjacent inside it so the pair keeps flowing as one figure.
+*/}
+<ZoomI18n><Zoom label={alt}><img
 	class="light-only"
 	src={lightUrl}
 	alt={alt}
@@ -74,7 +86,7 @@ const effectiveLoading = 'lazy';
 	fetchpriority={priority}
 	width={size?.width}
 	height={size?.height}
-/><img
+/></Zoom><Zoom label={alt}><img
 	class="dark-only"
 	src={darkUrl}
 	alt={alt}
@@ -83,4 +95,4 @@ const effectiveLoading = 'lazy';
 	fetchpriority={priority}
 	width={size?.width}
 	height={size?.height}
-/>
+/></Zoom></ZoomI18n>

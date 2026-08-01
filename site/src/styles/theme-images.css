@@ -14,6 +14,19 @@
   display: none;
 }
 
+/* Hide the wrapper too, not just the image inside it.
+   starlight-image-zoom wraps every <img> in the markdown in its own
+   inline-block element carrying the zoom button, so each of these figures is
+   authored once but wrapped twice, and the rules above only reach the <img>.
+   Left alone, the off-theme half stays in the flow as an empty full-width box
+   whose zoom button is still in the tab order, and activating it opens a
+   dialog on a zero-sized image. The wrapper is matched by the variant of the
+   image it holds so the pair keeps behaving as one figure. */
+[data-theme='light'] starlight-image-zoom-zoomable:has(> img.dark-only),
+[data-theme='dark'] starlight-image-zoom-zoomable:has(> img.light-only) {
+  display: none;
+}
+
 /* Tier-1 animations embedded as looping, muted, never-autoplaying WebM with
    native controls (keyboard-accessible playback control, WCAG 2.2.2).
    Match the figure treatment: centred block, rounded, never wider than the

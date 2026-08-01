@@ -9,6 +9,36 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- Every figure on the documentation site zooms to the full viewport
+  (`starlight-image-zoom`). The reading column is 720 px at its widest and the
+  source drawings are 1200 px and more, so a ten-curve third-octave plot or a
+  block diagram with labelled arrows arrived at the page already too small to
+  read: the detail was in the file and the layout was the only thing hiding
+  it. The control is a button on each figure, visible once it takes focus and
+  operable with Enter, and the zoomed view is a native `<dialog>` that Escape
+  closes and that returns focus to the figure it came from, so the whole
+  interaction works without a pointer. Nothing is fetched from a third party
+  and no script evaluates a string, which is what lets the page keep the
+  existing `script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval'` policy
+  untouched. The plugin hard-codes its two accessible names in English and
+  offers no translation hook, so the site supplies them: a rehype pass
+  (`src/lib/zoom-labels.mjs`) rewrites the labels the plugin writes into the
+  markdown and `src/components/ZoomI18n.astro` rewrites the ones its own
+  components render, both asserting that the English text they replace is
+  still there so
+  a plugin upgrade fails the build instead of quietly shipping a Spanish page
+  with an English control. The plugin finds images by walking the markdown
+  tree, which reaches the hand-written `<img>` pairs on the theory pages but
+  never sees the ones `ThemeImage.astro` emits, so that component wraps its
+  own pair and the guides are not left as the half of the site whose figures
+  do not zoom. Each figure ships a light and a dark variant and both get
+  wrapped, so `theme-images.css` now hides the wrapper of the off-theme half
+  as well; without that the hidden variant left an empty full-width box in the
+  flow whose zoom button was still in the tab order and opened on a zero-sized
+  image. Captions are disabled: the alt texts here are sentence-long
+  descriptions written for a reader who cannot see the plot, and painted over
+  the zoomed figure they would cover the thing the reader zoomed in to see.
+
 - Heavy and soft impact sources (`building/heavy_impact.py`, ISO 16283-2:2020
   Annex A, ISO 10140-5:2010 Annex F, JIS A 1418-2:2019, ISO 717-2:2020
   Annex D): the rubber ball and the bang machine, the two standard sources for

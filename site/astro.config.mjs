@@ -3,8 +3,10 @@ import { readFileSync } from 'node:fs';
 import { defineConfig } from 'astro/config';
 import starlight from '@astrojs/starlight';
 import starlightLinksValidator from 'starlight-links-validator';
+import starlightImageZoom from 'starlight-image-zoom';
 import remarkMath from 'remark-math';
 import rehypeKatex from 'rehype-katex';
+import { starlightZoomLabels } from './src/lib/zoom-labels.mjs';
 import { sidebar } from './src/data/sidebar.mjs';
 import { basePath, siteUrl } from './src/data/site.mjs';
 import { isOurMedia, mediaUrl, REMOTE_PREFIXES } from './src/lib/media.mjs';
@@ -456,6 +458,18 @@ export default defineConfig({
           errorOnRelativeLinks: false,
           errorOnFallbackPages: false,
         }),
+        // Full-viewport zoom for every figure. The technical plots carry ten
+        // curves and axis labels at the width of the reading column, which is
+        // 720 px at most, and the source SVGs are 1200 px and wider: the
+        // detail is in the file and the page was the only thing hiding it.
+        // Captions are off because this site's alt texts are deliberately
+        // long, sentence-length descriptions of what a plot shows, written
+        // for a reader who cannot see it; painted over the zoomed figure they
+        // would cover the very thing the reader zoomed in to look at.
+        starlightImageZoom({ showCaptions: false }),
+        // Must follow starlightImageZoom: it translates the accessible names
+        // that plugin hard-codes in English. See src/lib/zoom-labels.mjs.
+        starlightZoomLabels(),
       ],
       description: siteDescription,
       lastUpdated: true,
