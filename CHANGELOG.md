@@ -1005,8 +1005,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   had just stated $\log_{10}$ in its prose showed `lg` in the picture below
   it, and the same quantity was named two ways on one screen. They now write
   `log10` in plain text and $\log_{10}$ in maths, in English and Spanish
-  alike; 44 figures were regenerated for it, and the ISO 10846 fiche with
-  them, because its embedded plot carries the same legend. Spelling the
+  alike; 44 figures were regenerated for it, the ISO 10846 fiche with them,
+  because its embedded plot carries the same legend, and the two sound power
+  formulas of the free field versus reverberation room clip, which is
+  re-encoded in its four variants. Spelling the
   logarithm out costs three characters, which pushed eight diagram lines out
   of the frame that used to hold them: the ISO 3744 formula card, the
   energetic sum of the installed-paths cascade, the survey relation of the
