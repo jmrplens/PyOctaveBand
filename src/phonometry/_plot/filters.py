@@ -128,9 +128,11 @@ def plot_filter_class(
     omega_max = float(omega[-1])
     lo_x, hi_x = 1.0 / omega_max, omega_max
     win = (omega >= lo_x) & (omega <= hi_x)
-    if not np.any(win):
+    if not np.any(win):  # pragma: no cover - the bank designer rejects the band
         # Degenerate band (mid-band at or above the decimated Nyquist), so the
-        # symmetric window is empty; fail clearly instead of a cryptic reduction.
+        # symmetric window is empty. Unreachable through the public verifier,
+        # which never designs such a band; kept so a future designer that does
+        # fails clearly instead of on a cryptic reduction.
         raise ValueError(
             "Cannot plot the filter class corridor: the mid-band frequency is at "
             "or above the analysis Nyquist, so the f/f_m window is empty."
