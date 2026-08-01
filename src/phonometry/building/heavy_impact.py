@@ -335,7 +335,7 @@ def impact_force_exposure_level(
        *broadband* level, which is several decibels above any single band value
        and must not be compared with the table. Band-filter the force record
        first (for example with
-       :class:`~phonometry.metrology.core.OctaveFilterBank`) and call this once
+       :class:`~phonometry.filters.core.OctaveFilterBank`) and call this once
        per band, then hand the five results to
        :func:`check_heavy_impact_source`.
 

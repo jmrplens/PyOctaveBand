@@ -561,7 +561,7 @@ def weighted_thd(
     if weighting == "468":
         weighted_rms = _weighted_rms_468(np.asarray(residual[sl]), fs_v)
     else:
-        from ..metrology.parametric_filters import weighting_filter
+        from ..filters.weighting import weighting_filter
 
         weighted = weighting_filter(residual, int(fs_v), curve=weighting)
         weighted_rms = float(np.sqrt(np.mean(weighted[sl] ** 2)))

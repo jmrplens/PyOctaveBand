@@ -204,7 +204,7 @@ def sound_pressure_level_history(
         slightly from ``dt`` because it is an integer number of samples.
     :raises ValueError: for a non-positive ``fs`` or ``dt`` outside 10-25 ms.
     """
-    from ..metrology.parametric_filters import time_weighting, weighting_filter
+    from ..filters.weighting import time_weighting, weighting_filter
 
     x = np.asarray(signal, dtype=np.float64).ravel()
     if fs <= 0.0:
@@ -240,7 +240,7 @@ def _equivalent_level(
     signal: np.ndarray, fs: float, reference_pressure: float, calibration_offset: float
 ) -> float:
     """A-weighted equivalent continuous level ``LAeq`` of the interval, in dB."""
-    from ..metrology.parametric_filters import weighting_filter
+    from ..filters.weighting import weighting_filter
 
     weighted = np.asarray(weighting_filter(signal, round(fs), curve="A"), dtype=np.float64)
     mean_square = float(np.mean(weighted**2))

@@ -45,8 +45,8 @@ def main() -> int:
     # diagnose is what broke the environment.
     import numpy as np
 
-    from phonometry.metrology import parametric_filters as pf
-    from phonometry.metrology.parametric_filters import time_weighting
+    from phonometry.filters import weighting as pf
+    from phonometry.filters.weighting import time_weighting
 
     rng = np.random.default_rng(0)
     # Both shapes the library reaches the kernel with: a single channel (scalar

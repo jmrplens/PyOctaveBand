@@ -59,7 +59,7 @@ armónica total en función de la frecuencia de excitación con un barrido en
 lugar de un recorrido tono a tono. Esta página cubre esa separación en
 `phonometry.electroacoustics`, con el **barrido sincronizado** de Novak,
 Lotton y Simon (2015), coherente en fase, como método por defecto, y las
-**utilidades de fase** que la acompañan en `phonometry.metrology`: fase
+**utilidades de fase** que la acompañan en `phonometry.signal`: fase
 mínima desde $|H|$, retardo de grupo y exceso de fase.
 
 ## 1. Un barrido, todos los armónicos
@@ -223,7 +223,7 @@ THD queda referida al nivel exactamente como se excitó.
 En un sistema causal, estable y de fase mínima, la log-magnitud y la fase
 de la respuesta en frecuencia forman un par de transformadas de Hilbert
 (Bendat y Piersol, Sec. 13.1.4): la fase queda totalmente determinada por
-`|H(f)|`. Las utilidades de `phonometry.metrology` calculan esa
+`|H(f)|`. Las utilidades de `phonometry.signal` calculan esa
 reconstrucción con el cepstrum real y descomponen cualquier respuesta
 medida en su parte invertible y su parte paso-todo:
 

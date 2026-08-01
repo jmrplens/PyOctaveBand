@@ -28,13 +28,13 @@ sources with significant energy below 20 Hz (wind turbines, HVAC, blasting):
 
 ```python
 import numpy as np
-from phonometry import metrology
+from phonometry import filters
 
 # recording: a calibrated microphone capture (Pa) — recorded through your measurement chain. Synthesized here so the guide runs standalone.
 fs = 48000
 recording = 0.2 * np.sin(2 * np.pi * 1000 * np.arange(fs) / fs)
 
-g_weighted = metrology.weighting_filter(recording, fs, curve='G')
+g_weighted = filters.weighting_filter(recording, fs, curve='G')
 ```
 
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/g_weighting_response_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/g_weighting_response.svg" alt="G-weighting frequency response from 0.1 Hz to 1 kHz with the ISO 7196 Table 2 nominal values overlaid" width="80%"></picture>
@@ -45,7 +45,7 @@ g_weighted = metrology.weighting_filter(recording, fs, curve='G')
 ```python
 import matplotlib.pyplot as plt
 import numpy as np
-from phonometry import metrology
+from phonometry import filters
 
 # Measure the G response: weight a centered unit impulse and take its
 # spectrum. A long buffer gives the resolution the infrasound range
@@ -54,7 +54,7 @@ fs = 4000
 impulse = np.zeros(20 * fs)
 impulse[impulse.size // 2] = 1.0
 freqs = np.fft.rfftfreq(impulse.size, 1 / fs)
-spectrum = np.fft.rfft(metrology.weighting_filter(impulse, fs, curve="G"))
+spectrum = np.fft.rfft(filters.weighting_filter(impulse, fs, curve="G"))
 
 fig, ax = plt.subplots(figsize=(9, 5))
 ax.semilogx(freqs[1:],
@@ -98,7 +98,7 @@ and A, C and Z are in [Frequency Weighting](weighting.md).*
 ```python
 import matplotlib.pyplot as plt
 import numpy as np
-from phonometry import metrology
+from phonometry import filters
 
 # Measure each curve's response: weight a centered unit impulse and take its
 # spectrum. 96 kHz, not 48 kHz: it reaches the 40 kHz top row of the
@@ -111,7 +111,7 @@ freqs = np.fft.rfftfreq(fs, 1 / fs)
 fig, ax = plt.subplots(figsize=(9, 5))
 # A goes first and wide, as the reference the other three are read against.
 for curve, width in (("A", 4.0), ("B", 1.8), ("D", 1.8), ("AU", 1.8)):
-    spectrum = np.fft.rfft(metrology.weighting_filter(impulse, fs, curve=curve))
+    spectrum = np.fft.rfft(filters.weighting_filter(impulse, fs, curve=curve))
     ax.semilogx(freqs[1:], 20 * np.log10(np.abs(spectrum[1:]) + np.finfo(float).eps),
                 label=curve, linewidth=width)
 ax.set(xlim=(10, 40000), ylim=(-90, 18),
@@ -154,7 +154,7 @@ republished in NASA CR-3406.
 
 ```python
 import numpy as np
-from phonometry import metrology
+from phonometry import filters, signal
 
 # A 3.15 kHz whine sits right on the D-weighting hump: D rates it
 # 10 dB *louder* than A does.
@@ -162,8 +162,8 @@ fs = 96000
 t = np.arange(fs) / fs
 whine = 0.1 * np.sin(2 * np.pi * 3150 * t)
 
-ld = metrology.leq(metrology.weighting_filter(whine, fs, curve="D"))
-la = metrology.leq(metrology.weighting_filter(whine, fs, curve="A"))
+ld = signal.leq(filters.weighting_filter(whine, fs, curve="D"))
+la = signal.leq(filters.weighting_filter(whine, fs, curve="A"))
 print(f"LD = {ld:.1f} dB   LA = {la:.1f} dB")
 # LD = 82.5 dB   LA = 72.2 dB
 ```
@@ -180,7 +180,7 @@ high-frequency roll-off and overstate the *audible* exposure:
 
 ```python
 import numpy as np
-from phonometry import metrology
+from phonometry import filters, signal
 
 # 1 kHz tone (audible) buried under a strong 25 kHz ultrasonic component.
 fs = 96000
@@ -188,9 +188,9 @@ t = np.arange(fs) / fs
 audible = 0.1 * np.sin(2 * np.pi * 1000 * t)
 x = audible + 1.0 * np.sin(2 * np.pi * 25000 * t)
 
-la = metrology.leq(metrology.weighting_filter(x, fs, curve="A"))
-lau = metrology.leq(metrology.weighting_filter(x, fs, curve="AU"))
-la_ref = metrology.leq(metrology.weighting_filter(audible, fs, curve="A"))
+la = signal.leq(filters.weighting_filter(x, fs, curve="A"))
+lau = signal.leq(filters.weighting_filter(x, fs, curve="AU"))
+la_ref = signal.leq(filters.weighting_filter(audible, fs, curve="A"))
 print(f"LA = {la:.1f} dB   LAU = {lau:.1f} dB   audible alone = {la_ref:.1f} dB")
 # LA = 78.6 dB   LAU = 71.0 dB   audible alone = 71.0 dB
 # The ultrasound inflates LA by 7.6 dB; AU recovers the audible level.
@@ -232,7 +232,7 @@ Use the G frequency weighting of ISO 7196:1995, which rates infrasound the way A
 - [Frequency Weighting](weighting.md): the A, C and Z curves, the
   `high_accuracy` design and the IEC 61672-1 Table 3 class verification
   these curves build on.
-- API reference: [`metrology.parametric_filters`](https://jmrplens.github.io/phonometry/reference/api/filters/parametric-filters/) and [`metrology.compliance`](https://jmrplens.github.io/phonometry/reference/api/filters/compliance/).
+- API reference: [`filters.weighting`](https://jmrplens.github.io/phonometry/reference/api/filters/parametric-filters/) and [`filters.compliance`](https://jmrplens.github.io/phonometry/reference/api/filters/compliance/).
 
 ## References
 

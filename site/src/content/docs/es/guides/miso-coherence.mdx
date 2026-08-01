@@ -22,7 +22,7 @@ fuente equivocada. Bendat y Piersol, *Random Data* (4.a ed., 2010,
 capítulo 7), lo resuelven para un sistema de entradas múltiples y salida única
 (MISO) con las funciones de coherencia **múltiple** y **parcial**.
 `miso_coherence` las calcula desde el mismo núcleo de espectros cruzados de
-Welch que el resto de `phonometry.metrology`, para varias entradas correladas
+Welch que el resto de `phonometry.signal`, para varias entradas correladas
 y una salida.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/miso_coherence_es.svg" alt="Figura de dos paneles. Arriba: el autoespectro de salida medido en dB con la contribución de salida coherente de dos entradas sombreada debajo; la entrada 1 llena la banda baja hasta unos 400 Hz y la entrada 2 la banda alta por encima de unos 1,5 kHz, con el ruido residual muy por debajo. Abajo: para la segunda entrada correlada, su coherencia ordinaria ronda 0,3 en toda la banda baja aunque no excita ningún camino de baja frecuencia, mientras que su coherencia parcial se desploma a cero ahí una vez que se condiciona fuera la primera entrada; la coherencia múltiple se mantiene cerca de uno salvo en el nulo del cruce." width="88%" loading="eager" />
@@ -34,7 +34,7 @@ y una salida.
 import matplotlib.pyplot as plt
 import numpy as np
 from scipy import signal
-from phonometry import miso_coherence, noise_signal
+from phonometry import miso_coherence, noise_signal, signal
 
 fs = 8192.0
 # La entrada 1 excita un camino de baja frecuencia; la entrada 2 =
@@ -259,4 +259,4 @@ salida.
 - [Análisis espectral](/phonometry/es/guides/spectral-analysis/): el espectro de salida coherente de una entrada que esta página generaliza, y el núcleo de Welch compartido.
 - [Correlación y retardo](/phonometry/es/guides/correlation-delay/): estimar y eliminar los retardos globales que sesgan la coherencia a la baja.
 - [Multicanal y rendimiento](/phonometry/es/guides/multichannel/): la ruta por canal que este análisis cruzado complementa.
-- Referencia de la API: [`metrology.miso`](/phonometry/es/reference/api/spectra/miso/).
+- Referencia de la API: [`signal.miso`](/phonometry/es/reference/api/spectra/miso/).

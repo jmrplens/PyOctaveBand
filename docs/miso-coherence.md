@@ -9,7 +9,7 @@ reading the ordinary coherences alone can credit the wrong source. Bendat &
 Piersol, *Random Data* (4th ed., 2010, Chapter 7), resolve this for a
 multiple-input/single-output (MISO) system with the **multiple** and
 **partial** coherence functions. `miso_coherence` computes them from the same
-Welch cross-spectral core as the rest of `phonometry.metrology`, for several
+Welch cross-spectral core as the rest of `phonometry.signal`, for several
 correlated inputs and one output.
 
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/miso_coherence_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/miso_coherence.svg" alt="Two-panel figure. Top: the measured output autospectrum in dB with the coherent output contribution of two inputs shaded underneath; input 1 fills the low band and input 2 the high band, with the residual noise far below. Bottom: for the correlated second input, its ordinary coherence sits around 0.3 across the low band even though it drives no low-frequency path, while its partial coherence collapses to zero there once the first input is conditioned out; the multiple coherence stays near one except at the crossover null" width="82%"></picture>

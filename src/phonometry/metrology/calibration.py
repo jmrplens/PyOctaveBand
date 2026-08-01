@@ -146,7 +146,7 @@ def _validate_reference_stability(
     signal_arr: np.ndarray, fs: int, max_fluctuation_db: float
 ) -> None:
     """Warn if the F-weighted level of the recording fluctuates too much."""
-    from .parametric_filters import time_weighting
+    from ..filters.weighting import time_weighting
 
     # The integrator attack lasts ~8*tau (1 s for F); we need at least
     # another second of settled envelope to assess the fluctuation.

@@ -55,11 +55,11 @@ import reference_data as ref
 
 import phonometry as ph
 from phonometry import OctaveFilterBank, WeightingFilter
-from phonometry.hearing.sti import _sti_from_mtf
-from phonometry.metrology.compliance import (
+from phonometry.filters.compliance import (
     class_limits,
     verify_filter_class,
 )
+from phonometry.hearing.sti import _sti_from_mtf
 from phonometry.psychoacoustics.sharpness import reference_sound
 
 
@@ -386,7 +386,7 @@ def _chk_butter_class0_1995() -> Outcome:
     "Formula (9) breakpoint mapping, b=3, Omega at G**(1/2)",
 )
 def _chk_map_breakpoint_table_f1() -> Outcome:
-    from phonometry.metrology.compliance import _map_breakpoint
+    from phonometry.filters.compliance import _map_breakpoint
 
     return numeric(
         ref.IEC61260_TABLE_F1[0.5][0], _map_breakpoint(0.5, 3), 5e-6, places=5
@@ -5730,7 +5730,7 @@ def _miso_problem_7_2() -> tuple[float, float, float]:
     Returns ``(Gv1, Gv2, gamma2_2y.1)`` computed by the module's
     Gaussian-elimination conditioning on the hand-set augmented matrix.
     """
-    from phonometry.metrology.miso import _condition
+    from phonometry.signal.miso import _condition
 
     mat = np.zeros((1, 3, 3), dtype=np.complex128)
     mat[0, 0, 0] = 3.0
@@ -7183,7 +7183,7 @@ def _chk_ac_epnl() -> Outcome:
     "Directional-response tolerance at 4 kHz / 90°, dB",
 )
 def _chk_ac_iec61265() -> Outcome:
-    from phonometry.metrology.compliance import _iec61265_directional_limit
+    from phonometry.filters.compliance import _iec61265_directional_limit
 
     return numeric(2.0, _iec61265_directional_limit(4000.0, 90.0), 1e-9, unit="dB", places=1)
 

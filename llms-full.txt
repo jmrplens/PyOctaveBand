@@ -278,8 +278,6 @@ The generated API reference, one page per module. Fetch these only when a specif
 - [building/spanish-building-code](https://jmrplens.github.io/phonometry/reference/api/building/spanish-building-code/)
 - [building/structure-borne-power](https://jmrplens.github.io/phonometry/reference/api/building/structure-borne-power/)
 - [building/survey-insulation](https://jmrplens.github.io/phonometry/reference/api/building/survey-insulation/)
-- [correlation/correlation](https://jmrplens.github.io/phonometry/reference/api/correlation/correlation/)
-- [correlation/envelope](https://jmrplens.github.io/phonometry/reference/api/correlation/envelope/)
 - [electroacoustics/distortion](https://jmrplens.github.io/phonometry/reference/api/electroacoustics/distortion/)
 - [electroacoustics/frequency-response](https://jmrplens.github.io/phonometry/reference/api/electroacoustics/frequency-response/)
 - [electroacoustics/loudspeaker](https://jmrplens.github.io/phonometry/reference/api/electroacoustics/loudspeaker/)
@@ -302,13 +300,11 @@ The generated API reference, one page per module. Fetch these only when a specif
 - [filters/core](https://jmrplens.github.io/phonometry/reference/api/filters/core/)
 - [filters/equalizer](https://jmrplens.github.io/phonometry/reference/api/filters/equalizer/)
 - [filters/frequencies](https://jmrplens.github.io/phonometry/reference/api/filters/frequencies/)
-- [filters/parametric-filters](https://jmrplens.github.io/phonometry/reference/api/filters/parametric-filters/)
 - [filters/phonometry](https://jmrplens.github.io/phonometry/reference/api/filters/phonometry/)
+- [filters/weighting](https://jmrplens.github.io/phonometry/reference/api/filters/weighting/)
 - [hearing/noise-induced-hearing-loss](https://jmrplens.github.io/phonometry/reference/api/hearing/noise-induced-hearing-loss/)
 - [hearing/occupational-exposure](https://jmrplens.github.io/phonometry/reference/api/hearing/occupational-exposure/)
 - [hearing/threshold](https://jmrplens.github.io/phonometry/reference/api/hearing/threshold/)
-- [levels/calibration](https://jmrplens.github.io/phonometry/reference/api/levels/calibration/)
-- [levels/levels](https://jmrplens.github.io/phonometry/reference/api/levels/levels/)
 - [materials/absorption-rating](https://jmrplens.github.io/phonometry/reference/api/materials/absorption-rating/)
 - [materials/absorption-uncertainty](https://jmrplens.github.io/phonometry/reference/api/materials/absorption-uncertainty/)
 - [materials/airflow-resistance](https://jmrplens.github.io/phonometry/reference/api/materials/airflow-resistance/)
@@ -322,7 +318,8 @@ The generated API reference, one page per module. Fetch these only when a specif
 - [materials/scattering-diffusion](https://jmrplens.github.io/phonometry/reference/api/materials/scattering-diffusion/)
 - [materials/slow-sound-absorber](https://jmrplens.github.io/phonometry/reference/api/materials/slow-sound-absorber/)
 - [materials/sound-absorption](https://jmrplens.github.io/phonometry/reference/api/materials/sound-absorption/)
-- [metrology/random-data](https://jmrplens.github.io/phonometry/reference/api/metrology/random-data/)
+- [metrology/calibration](https://jmrplens.github.io/phonometry/reference/api/metrology/calibration/)
+- [metrology/data-qualification](https://jmrplens.github.io/phonometry/reference/api/metrology/data-qualification/)
 - [metrology/uncertainty](https://jmrplens.github.io/phonometry/reference/api/metrology/uncertainty/)
 - [noise_control/duct-modes](https://jmrplens.github.io/phonometry/reference/api/noise_control/duct-modes/)
 - [noise_control/duct-path](https://jmrplens.github.io/phonometry/reference/api/noise_control/duct-path/)
@@ -361,17 +358,20 @@ The generated API reference, one page per module. Fetch these only when a specif
 - [rooms/room-modes](https://jmrplens.github.io/phonometry/reference/api/rooms/room-modes/)
 - [rooms/room-noise](https://jmrplens.github.io/phonometry/reference/api/rooms/room-noise/)
 - [rooms/steady-field](https://jmrplens.github.io/phonometry/reference/api/rooms/steady-field/)
+- [signal/cepstrum](https://jmrplens.github.io/phonometry/reference/api/signal/cepstrum/)
+- [signal/correlation](https://jmrplens.github.io/phonometry/reference/api/signal/correlation/)
+- [signal/envelope](https://jmrplens.github.io/phonometry/reference/api/signal/envelope/)
+- [signal/inversion](https://jmrplens.github.io/phonometry/reference/api/signal/inversion/)
+- [signal/levels](https://jmrplens.github.io/phonometry/reference/api/signal/levels/)
+- [signal/miso](https://jmrplens.github.io/phonometry/reference/api/signal/miso/)
+- [signal/phase](https://jmrplens.github.io/phonometry/reference/api/signal/phase/)
+- [signal/spectra](https://jmrplens.github.io/phonometry/reference/api/signal/spectra/)
+- [signal/synchronous-average](https://jmrplens.github.io/phonometry/reference/api/signal/synchronous-average/)
+- [signal/test-signals](https://jmrplens.github.io/phonometry/reference/api/signal/test-signals/)
+- [signal/time-frequency](https://jmrplens.github.io/phonometry/reference/api/signal/time-frequency/)
 - [simulation/elastic-fdtd](https://jmrplens.github.io/phonometry/reference/api/simulation/elastic-fdtd/)
 - [simulation/fdtd](https://jmrplens.github.io/phonometry/reference/api/simulation/fdtd/)
 - [simulation/ntff](https://jmrplens.github.io/phonometry/reference/api/simulation/ntff/)
-- [spectra/cepstrum](https://jmrplens.github.io/phonometry/reference/api/spectra/cepstrum/)
-- [spectra/inversion](https://jmrplens.github.io/phonometry/reference/api/spectra/inversion/)
-- [spectra/miso](https://jmrplens.github.io/phonometry/reference/api/spectra/miso/)
-- [spectra/phase](https://jmrplens.github.io/phonometry/reference/api/spectra/phase/)
-- [spectra/signals](https://jmrplens.github.io/phonometry/reference/api/spectra/signals/)
-- [spectra/spectra](https://jmrplens.github.io/phonometry/reference/api/spectra/spectra/)
-- [spectra/synchronous-average](https://jmrplens.github.io/phonometry/reference/api/spectra/synchronous-average/)
-- [spectra/time-frequency](https://jmrplens.github.io/phonometry/reference/api/spectra/time-frequency/)
 - [speech/objective-intelligibility](https://jmrplens.github.io/phonometry/reference/api/speech/objective-intelligibility/)
 - [speech/sii](https://jmrplens.github.io/phonometry/reference/api/speech/sii/)
 - [speech/sti](https://jmrplens.github.io/phonometry/reference/api/speech/sti/)
@@ -2215,7 +2215,7 @@ Source: https://jmrplens.github.io/phonometry/reference/api/
 
 # API Reference
 
-All core functionality lives in fifteen domain subpackages; every public name
+All core functionality lives in seventeen domain subpackages; every public name
 is also re-exported by the top-level `phonometry` package.
 
 > **Note.** This page is the curated quick table for the GitHub/PyPI audience:
@@ -2226,7 +2226,7 @@ is also re-exported by the top-level `phonometry` package.
 
 ## Namespaces
 
-The library is organized into fifteen domain subpackages, and importing the
+The library is organized into seventeen domain subpackages, and importing the
 domain namespace is the primary form used throughout the documentation:
 
 ```python
@@ -2237,7 +2237,9 @@ contour = aircraft.noise_contour(path, powers, distances, sel, lmax, x=gx, y=gy)
 
 | Subpackage | Scope |
 | :--- | :--- |
-| `phonometry.metrology` | Filter banks, weighting and time weighting, levels, calibration, IEC verifiers, GUM uncertainty |
+| `phonometry.filters` | Octave and fractional-octave filter banks, frequency weightings and time weighting, parametric EQ, IEC 61260-1 and IEC 61672-1 class verification |
+| `phonometry.signal` | Levels (Leq, LAeq, percentiles), Welch and multitaper spectra, coherence, time-frequency, correlation, envelope, cepstrum, phase, synchronous averaging, test signals |
+| `phonometry.metrology` | Calibration, GUM uncertainty and Monte Carlo, data qualification (stationarity, trends, peak statistics), IEC 61043 intensity class |
 | `phonometry.psychoacoustics` | Loudness (Zwicker, ECMA, Moore-Glasberg), sharpness, tonality, roughness, fluctuation strength, annoyance, tonal audibility |
 | `phonometry.hearing` | Hearing threshold, NIHL, occupational exposure, SII, STI |
 | `phonometry.emission` | Sound power (ISO 3740 family), sound intensity, vibration-based power |
@@ -4329,7 +4331,7 @@ Source: https://jmrplens.github.io/phonometry/guides/cepstrum-echoes/
 The [spectral estimators](https://jmrplens.github.io/phonometry/guides/spectral-analysis/) describe *what
 frequencies* a signal contains; this page covers what hides in the *shape* of
 that spectrum. The **cepstrum** - the inverse Fourier transform of the log
-spectrum - lives in `phonometry.metrology` and turns two hard spectral
+spectrum - lives in `phonometry.signal` and turns two hard spectral
 problems into easy peak-picking: periodic spectral ripple (an echo, a harmonic
 family) collapses onto a single spike at the **quefrency** of its period, and
 the smooth spectral envelope separates from the fine structure by plain
@@ -5523,7 +5525,7 @@ Source: https://jmrplens.github.io/phonometry/guides/correlation-delay/
 
 Where the [calibrated spectral estimators](https://jmrplens.github.io/phonometry/guides/spectral-analysis/) describe a
 signal in frequency, this page covers their time-domain counterparts in
-`phonometry.metrology`: **auto- and cross-correlation** estimates with the
+`phonometry.signal`: **auto- and cross-correlation** estimates with the
 three standard normalizations and their Bendat & Piersol random errors;
 **time-delay estimation** (TDE) by the direct correlator, the cross-spectrum
 phase slope and the **generalized cross-correlation** (GCC) of Knapp & Carter
@@ -6273,7 +6275,7 @@ res.plot()   # empirical exceedance against the Rice mixture (figure below)
 import matplotlib.pyplot as plt
 import numpy as np
 from phonometry import peak_statistics
-from phonometry.metrology.random_data import _rice_peak_exceedance
+from phonometry.metrology.data_qualification import _rice_peak_exceedance
 
 fs = 20480.0
 n = 1 << 19
@@ -12486,7 +12488,7 @@ safe to pass `wavfile.read` output directly.
 
 ## Where to go next
 
-The octave analysis above uses the `metrology` core, one of fifteen domain
+The octave analysis above uses the `filters` core, one of seventeen domain
 namespaces; the documentation index walks through the rest, from
 psychoacoustics and room, building and vibration acoustics to environmental,
 aircraft and underwater noise, electroacoustics and FDTD wave simulation.
@@ -15686,7 +15688,7 @@ bands = [100, 125, 160, 200, 250, 315, 400, 500,
 x = np.arange(len(bands))
 w = building.weighted_rating(field.dnt)
 fig, ax = plt.subplots()
-ax.fill_between(x, field.d, field.dnt, alpha=0.2, label="10 lg(T/T0)")
+ax.fill_between(x, field.d, field.dnt, alpha=0.2, label="10 log10(T/T0)")
 ax.plot(x, field.d, "--o", label="D (level difference)")
 ax.plot(x, field.dnt, "-s", label="DnT (standardized)")
 ax.set_xticks(x, [str(b) for b in bands], rotation=45)
@@ -17422,7 +17424,7 @@ res = building.survey_airborne_insulation(l1, l2, k, volume=50.0)
 
 x = np.arange(len(bands))
 fig, ax = plt.subplots()
-ax.fill_between(x, res.d, res.d_nt, alpha=0.2, label="k = 10 lg(T/T0)")
+ax.fill_between(x, res.d, res.d_nt, alpha=0.2, label="k = 10 log10(T/T0)")
 ax.plot(x, res.d, "--o", label="D (level difference)")
 ax.plot(x, res.d_nt, "-s", label="DnT (standardized)")
 ax.set_xticks(x, [str(b) for b in bands])
@@ -17514,7 +17516,7 @@ plt.show()
 # By hand, showing the sign flip of the correction:
 x = np.arange(len(bands))
 fig, ax = plt.subplots()
-ax.fill_between(x, impact.l_i, impact.l_nt, alpha=0.2, label="-k = -10 lg(T/T0)")
+ax.fill_between(x, impact.l_i, impact.l_nt, alpha=0.2, label="-k = -10 log10(T/T0)")
 ax.plot(x, impact.l_i, "--o", label="Li (impact level)")
 ax.plot(x, impact.l_nt, "-s", label="L'nT (standardized)")
 ax.set_xticks(x, [str(b) for b in bands])
@@ -17974,6 +17976,11 @@ for class 2 and drops the one-third-octave one; the library follows the
 EN/IEC text (see the [errata registry](https://jmrplens.github.io/phonometry/reference/errata/)). Clause 8 combines separately supplied components:
 `instrument_class_from_components(probe_class, processor_class)` returns 1
 only when both are class 1, and 2 for every other pairing.
+
+The example fiche, regenerated with `make reports`, is kept rendered in the
+repository. Click the preview to open the PDF:
+
+[![One-page instrument-class-verification fiche: a metadata header, a per-band table listing the class 1 and class 2 minima, the measured residual index, the margin and the class achieved in each one-third-octave band from 50 Hz to 6.3 kHz, the measured index drawn as a step curve over the two Table 2 masks with the 100 Hz band ringed below the class 1 minimum, the boxed Class 2 - COMPLIES (binding margin +4.20 dB) result, the microphone separation and equivalent phase mismatch, and a FAIL verdict against the required class 1](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/reports/iec61043_intensity_example.webp)](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/reports/iec61043_intensity_example.pdf)
 
 ### Reading `δpI0` as a phase error
 
@@ -21749,7 +21756,7 @@ reading the ordinary coherences alone can credit the wrong source. Bendat &
 Piersol, *Random Data* (4th ed., 2010, Chapter 7), resolve this for a
 multiple-input/single-output (MISO) system with the **multiple** and
 **partial** coherence functions. `miso_coherence` computes them from the same
-Welch cross-spectral core as the rest of `phonometry.metrology`, for several
+Welch cross-spectral core as the rest of `phonometry.signal`, for several
 correlated inputs and one output.
 
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/miso_coherence_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/miso_coherence.svg" alt="Two-panel figure. Top: the measured output autospectrum in dB with the coherent output contribution of two inputs shaded underneath; input 1 fills the low band and input 2 the high band, with the residual noise far below. Bottom: for the correlated second input, its ordinary coherence sits around 0.3 across the low band even though it drives no low-frequency path, while its partial coherence collapses to zero there once the first input is conditioned out; the multiple coherence stays near one except at the crossover null" width="82%"></picture>
@@ -34838,7 +34845,7 @@ Source: https://jmrplens.github.io/phonometry/guides/spectral-analysis/
 # Calibrated spectral analysis (Bendat & Piersol)
 
 A spectrum without its uncertainty is half a measurement. This page covers the
-Welch spectral estimators of `phonometry.metrology` that report, next to the
+Welch spectral estimators of `phonometry.signal` that report, next to the
 spectrum itself, the statistical quality of the estimate following Bendat &
 Piersol, *Random Data: Analysis and Measurement Procedures* (4th ed., 2010):
 the **power spectral density** and **cross-spectral density** with the
@@ -36542,7 +36549,7 @@ a function of the excitation frequency with one sweep instead of a
 tone-by-tone stepping. This page covers that separation in
 `phonometry.electroacoustics`, with the phase-coherent **synchronized
 sweep** of Novak, Lotton & Simon (2015) as the default, and the companion
-**phase utilities** in `phonometry.metrology`: minimum phase from $|H|$,
+**phase utilities** in `phonometry.signal`: minimum phase from $|H|$,
 group delay and excess phase.
 
 <picture>
@@ -36708,7 +36715,7 @@ the THD is level-referenced exactly as driven.
 For a causal, stable, minimum-phase system the log-magnitude and phase of
 the frequency response are a Hilbert-transform pair (Bendat & Piersol,
 Sec. 13.1.4): the phase is fully determined by `|H(f)|`. The
-`phonometry.metrology` utilities compute that reconstruction with the real
+`phonometry.signal` utilities compute that reconstruction with the real
 cepstrum and decompose any measured response into its invertible and
 all-pass parts:
 
@@ -37530,7 +37537,7 @@ Source: https://jmrplens.github.io/phonometry/guides/test-signals/
 # Test signals and sample-rate tools (IEC 60268-1)
 
 A measurement is only as trustworthy as its stimulus and its sample-rate
-bookkeeping. This page covers the signal toolbox of `phonometry.metrology`:
+bookkeeping. This page covers the signal toolbox of `phonometry.signal`:
 **tone bursts** with the exact gating IEC 60268-1 prescribes, the
 **colored-noise generators** (detailed in the
 [spectral analysis guide](https://jmrplens.github.io/phonometry/guides/spectral-analysis/#5-colored-noise-generators)),
@@ -39634,7 +39641,7 @@ Source: https://jmrplens.github.io/phonometry/guides/time-frequency/
 
 A stationary spectrum hides everything that happens *in time*: a passing
 siren, an impact, a machine running up. This page covers the two
-time-frequency estimators of `phonometry.metrology`, both with the
+time-frequency estimators of `phonometry.signal`, both with the
 calibration discipline of the
 [spectral-analysis page](https://jmrplens.github.io/phonometry/guides/spectral-analysis/): the
 **calibrated spectrogram** (the short-time Fourier transform view of

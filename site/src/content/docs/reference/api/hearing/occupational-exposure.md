@@ -11,7 +11,7 @@ ISO 9612:2009 is the engineering method (accuracy grade 2) for determining a
 worker's daily noise exposure level `LEX,8h` from measurements of the
 A-weighted equivalent continuous sound pressure level `Lp,A,eqT`. The raw
 levels themselves come from the dosimetry primitives in
-[`phonometry.levels`](/phonometry/reference/api/levels/levels/) ([`leq`](/phonometry/reference/api/levels/levels/#leq)/[`lex_8h`](/phonometry/reference/api/levels/levels/#lex_8h)); this module adds the three
+[`phonometry.levels`](/phonometry/reference/api/signal/levels/) ([`leq`](/phonometry/reference/api/signal/levels/#leq)/[`lex_8h`](/phonometry/reference/api/signal/levels/#lex_8h)); this module adds the three
 **measurement strategies**, the energy combination of their contributions, and
 the normative **Annex C** uncertainty budget.
 

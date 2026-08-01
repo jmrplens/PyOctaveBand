@@ -354,7 +354,7 @@ res.plot()   # empirical exceedance against the Rice mixture (figure below)
 import matplotlib.pyplot as plt
 import numpy as np
 from phonometry import peak_statistics
-from phonometry.metrology.random_data import _rice_peak_exceedance
+from phonometry.metrology.data_qualification import _rice_peak_exceedance
 
 fs = 20480.0
 n = 1 << 19

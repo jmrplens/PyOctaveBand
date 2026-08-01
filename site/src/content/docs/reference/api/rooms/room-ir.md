@@ -60,7 +60,7 @@ complete the family:
   noise-floor-matched, loudspeaker-equalizing, ...). See
   [`shaped_sweep_signal`](/phonometry/reference/api/rooms/room-ir/#shaped_sweep_signal); the recording is deconvolved with the
   ordinary spectral method of [`impulse_response`](/phonometry/reference/api/rooms/room-ir/#impulse_response), or post-equalized
-  with [`phonometry.regularized_inverse_filter`](/phonometry/reference/api/spectra/inversion/#regularized_inverse_filter).
+  with [`phonometry.regularized_inverse_filter`](/phonometry/reference/api/signal/inversion/#regularized_inverse_filter).
 
 The recovered IR is broadband; ISO 18233 6.3.2 requires subsequent
 fractional-octave-band weighting (IEC 61260) before computing levels or

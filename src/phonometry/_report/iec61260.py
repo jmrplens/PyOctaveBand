@@ -2,7 +2,7 @@
 """IEC 61260-1 filter-class-compliance fiche (reportlab renderer).
 
 Renders a
-:class:`~phonometry.metrology.compliance.FilterComplianceResult` to a one-page
+:class:`~phonometry.filters.compliance.FilterComplianceResult` to a one-page
 PDF laid out like an accredited electroacoustic type-test report:
 
 * a title and the standard-basis line (measurement standard + the IEC 61260
@@ -49,7 +49,7 @@ from ._layout import (
 from .metadata import ReportMetadata
 
 if TYPE_CHECKING:
-    from ..metrology.compliance import FilterComplianceResult
+    from ..filters.compliance import FilterComplianceResult
 
 
 def _binding_margin(result: FilterComplianceResult, cls: int) -> float:
@@ -113,7 +113,7 @@ def _band_label(exact_freq: float, fraction: int) -> str:
     base-ten values behind them, so the per-band table is labelled with the
     nominal frequency (125 Hz, not the exact 125.89... Hz).
     """
-    from ..metrology.frequencies import _nominal_freq_for_band
+    from ..filters.frequencies import _nominal_freq_for_band
 
     nominal = _nominal_freq_for_band(exact_freq, float(fraction))
     if nominal >= 1000.0:
@@ -194,7 +194,7 @@ def render_iec61260_report(
     """Render an IEC 61260-1 filter-class-compliance fiche to a PDF at ``path``.
 
     :param result: A
-        :class:`~phonometry.metrology.compliance.FilterComplianceResult`
+        :class:`~phonometry.filters.compliance.FilterComplianceResult`
         carrying the per-band verdicts and the data to redraw the binding
         band's relative attenuation.
     :param path: Destination path of the PDF file.

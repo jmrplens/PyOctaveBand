@@ -1,5 +1,5 @@
 ---
-title: "metrology.compliance"
+title: "filters.compliance"
 description: "IEC 61260-1:2014 filter and IEC 61672-1:2013 weighting class verification."
 sidebar:
   label: "compliance"
@@ -186,7 +186,7 @@ Plot the worst-margin band against its class-limit corridor.
 
 Draws the measured relative attenuation of the binding band over the
 acceptance corridor of the achieved (or, when non-compliant, the
-loosest) class; see `phonometry._plot.metrology.plot_filter_class`.
+loosest) class; see `phonometry._plot.filters.plot_filter_class`.
 Requires matplotlib (`pip install phonometry[plot]`) and returns the
 `Axes`.
 

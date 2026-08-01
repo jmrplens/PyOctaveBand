@@ -27,18 +27,35 @@ La referencia de la API se genera a partir de los docstrings del código (en ing
 | Module | Summary |
 | :--- | :--- |
 | [`phonometry`](/phonometry/reference/api/filters/phonometry/) | Package-level names defined in `phonometry/__init__.py` itself. |
-| [`metrology.core`](/phonometry/reference/api/filters/core/) | Core processing logic and FilterBank class for phonometry. |
-| [`metrology.parametric_filters`](/phonometry/reference/api/filters/parametric-filters/) | Weighting filters (A, B, C, D, G, AU, Z) and time weighting utilities. |
-| [`metrology.equalizer`](/phonometry/reference/api/filters/equalizer/) | Parametric equalizer biquads per the RBJ Audio EQ Cookbook. |
-| [`metrology.frequencies`](/phonometry/reference/api/filters/frequencies/) | Frequency calculation logic according to ANSI/IEC standards. |
-| [`metrology.compliance`](/phonometry/reference/api/filters/compliance/) | IEC 61260-1:2014 filter and IEC 61672-1:2013 weighting class verification. |
+| [`filters.core`](/phonometry/reference/api/filters/core/) | Core processing logic and FilterBank class for phonometry. |
+| [`filters.weighting`](/phonometry/reference/api/filters/weighting/) | Weighting filters (A, B, C, D, G, AU, Z) and time weighting utilities. |
+| [`filters.equalizer`](/phonometry/reference/api/filters/equalizer/) | Parametric equalizer biquads per the RBJ Audio EQ Cookbook. |
+| [`filters.frequencies`](/phonometry/reference/api/filters/frequencies/) | Frequency calculation logic according to ANSI/IEC standards. |
+| [`filters.compliance`](/phonometry/reference/api/filters/compliance/) | IEC 61260-1:2014 filter and IEC 61672-1:2013 weighting class verification. |
 
-## Levels and calibration
+## Signal analysis
 
 | Module | Summary |
 | :--- | :--- |
-| [`metrology.levels`](/phonometry/reference/api/levels/levels/) | Integrated and statistical sound levels (Leq, LAeq, LN percentiles). |
-| [`metrology.calibration`](/phonometry/reference/api/levels/calibration/) | Calibration utilities for mapping digital signals to physical SPL levels. |
+| [`signal.levels`](/phonometry/reference/api/signal/levels/) | Integrated and statistical sound levels (Leq, LAeq, LN percentiles). |
+| [`signal.spectra`](/phonometry/reference/api/signal/spectra/) | Calibrated spectral-density estimation with statistical error analysis. |
+| [`signal.miso`](/phonometry/reference/api/signal/miso/) | Multiple and partial coherence of a multiple-input/single-output system. |
+| [`signal.time_frequency`](/phonometry/reference/api/signal/time-frequency/) | Calibrated time-frequency analysis: STFT spectrogram and zoom FFT. |
+| [`signal.test_signals`](/phonometry/reference/api/signal/test-signals/) | Test signals and sample-rate utilities. |
+| [`signal.phase`](/phonometry/reference/api/signal/phase/) | Phase utilities: minimum phase, group delay and excess phase. |
+| [`signal.cepstrum`](/phonometry/reference/api/signal/cepstrum/) | Cepstral analysis: real/power/complex cepstrum, liftering and echo detection. |
+| [`signal.synchronous_average`](/phonometry/reference/api/signal/synchronous-average/) | Time synchronous averaging (TSA) of a periodic waveform in noise. |
+| [`signal.inversion`](/phonometry/reference/api/signal/inversion/) | Regularized spectral inversion with frequency-dependent regularization. |
+| [`signal.correlation`](/phonometry/reference/api/signal/correlation/) | Correlation analysis and time-delay estimation. |
+| [`signal.envelope`](/phonometry/reference/api/signal/envelope/) | Envelope and instantaneous phase via the Hilbert transform. |
+
+## Calibration and uncertainty
+
+| Module | Summary |
+| :--- | :--- |
+| [`metrology.calibration`](/phonometry/reference/api/metrology/calibration/) | Calibration utilities for mapping digital signals to physical SPL levels. |
+| [`metrology.uncertainty`](/phonometry/reference/api/metrology/uncertainty/) | Measurement uncertainty by the GUM and its Monte Carlo supplement. |
+| [`metrology.data_qualification`](/phonometry/reference/api/metrology/data-qualification/) | Random-data qualification: stationarity tests and Rice crossing statistics. |
 
 ## Psychoacoustics
 
@@ -232,26 +249,6 @@ La referencia de la API se genera a partir de los docstrings del código (en ing
 | :--- | :--- |
 | [`broadcast.program_loudness`](/phonometry/reference/api/broadcast/program-loudness/) | Programme loudness and true-peak level (ITU-R BS.1770-5, EBU R 128). |
 
-## Uncertainty and data quality
-
-| Module | Summary |
-| :--- | :--- |
-| [`metrology.uncertainty`](/phonometry/reference/api/metrology/uncertainty/) | Measurement uncertainty by the GUM and its Monte Carlo supplement. |
-| [`metrology.random_data`](/phonometry/reference/api/metrology/random-data/) | Random-data qualification: stationarity tests and Rice crossing statistics. |
-
-## Spectral analysis
-
-| Module | Summary |
-| :--- | :--- |
-| [`metrology.spectra`](/phonometry/reference/api/spectra/spectra/) | Calibrated spectral-density estimation with statistical error analysis. |
-| [`metrology.miso`](/phonometry/reference/api/spectra/miso/) | Multiple and partial coherence of a multiple-input/single-output system. |
-| [`metrology.time_frequency`](/phonometry/reference/api/spectra/time-frequency/) | Calibrated time-frequency analysis: STFT spectrogram and zoom FFT. |
-| [`metrology.signals`](/phonometry/reference/api/spectra/signals/) | Test signals and sample-rate utilities. |
-| [`metrology.phase`](/phonometry/reference/api/spectra/phase/) | Phase utilities: minimum phase, group delay and excess phase. |
-| [`metrology.cepstrum`](/phonometry/reference/api/spectra/cepstrum/) | Cepstral analysis: real/power/complex cepstrum, liftering and echo detection. |
-| [`metrology.synchronous_average`](/phonometry/reference/api/spectra/synchronous-average/) | Time synchronous averaging (TSA) of a periodic waveform in noise. |
-| [`metrology.inversion`](/phonometry/reference/api/spectra/inversion/) | Regularized spectral inversion with frequency-dependent regularization. |
-
 ## Wave simulation
 
 | Module | Summary |
@@ -259,10 +256,3 @@ La referencia de la API se genera a partir de los docstrings del código (en ing
 | [`simulation.fdtd`](/phonometry/reference/api/simulation/fdtd/) | 2D acoustic finite-difference time-domain (FDTD) simulation. |
 | [`simulation.ntff`](/phonometry/reference/api/simulation/ntff/) | 2D near-to-far-field (NTFF) transformation over a closed contour. |
 | [`simulation.elastic_fdtd`](/phonometry/reference/api/simulation/elastic-fdtd/) | 2D elastic finite-difference time-domain (P-SV) simulation. |
-
-## Correlation & envelope
-
-| Module | Summary |
-| :--- | :--- |
-| [`metrology.correlation`](/phonometry/reference/api/correlation/correlation/) | Correlation analysis and time-delay estimation. |
-| [`metrology.envelope`](/phonometry/reference/api/correlation/envelope/) | Envelope and instantaneous phase via the Hilbert transform. |

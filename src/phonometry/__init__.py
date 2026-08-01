@@ -682,6 +682,40 @@ from .environmental.wind_turbine_noise import (
     slant_distance,
     wind_turbine_tonality,
 )
+from .filters.compliance import (
+    FilterComplianceResult,
+    class_limits,
+    filter_class_compliance,
+    verify_aircraft_noise_system,
+    verify_filter_class,
+    verify_weighting_class,
+    weighting_class_limits,
+)
+from .filters.core import (
+    FilterBankWarning,
+    OctaveFilterBank,
+    octave_filter,
+    octavefilter,
+)
+from .filters.equalizer import (
+    EQResponseResult,
+    EQSection,
+    ParametricEQ,
+    parametric_eq,
+)
+from .filters.frequencies import (
+    getansifrequencies,
+    nominal_frequencies,
+    normalized_frequencies,
+    normalizedfreq,
+)
+from .filters.weighting import (
+    TimeWeighting,
+    WeightingFilter,
+    linkwitz_riley,
+    time_weighting,
+    weighting_filter,
+)
 from .hearing.noise_induced_hearing_loss import (
     HtlanResult,
     NiptsResult,
@@ -933,90 +967,7 @@ from .metrology.calibration import (
     calculate_sensitivity,
     sensitivity,
 )
-from .metrology.cepstrum import (
-    CepstrumResult,
-    EchoDetectionResult,
-    LifterResult,
-    cepstrum,
-    echo_detection,
-    lifter,
-)
-from .metrology.compliance import (
-    FilterComplianceResult,
-    class_limits,
-    filter_class_compliance,
-    verify_aircraft_noise_system,
-    verify_filter_class,
-    verify_weighting_class,
-    weighting_class_limits,
-)
-from .metrology.core import (
-    FilterBankWarning,
-    OctaveFilterBank,
-    octave_filter,
-    octavefilter,
-)
-from .metrology.correlation import (
-    AlignedImpulseResponseResult,
-    CorrelationResult,
-    TimeDelayResult,
-    align_impulse_responses,
-    correlation,
-    correlation_random_error,
-    impulse_response_delay,
-    time_delay,
-)
-from .metrology.envelope import (
-    EnvelopeResult,
-    EnvelopeSpectrumResult,
-    envelope,
-    envelope_spectrum,
-)
-from .metrology.equalizer import (
-    EQResponseResult,
-    EQSection,
-    ParametricEQ,
-    parametric_eq,
-)
-from .metrology.frequencies import (
-    getansifrequencies,
-    nominal_frequencies,
-    normalized_frequencies,
-    normalizedfreq,
-)
-from .metrology.intensity_compliance import (
-    IntensityInstrumentComplianceResult,
-    instrument_class_from_components,
-    intensity_class_compliance,
-    phase_mismatch_from_residual_index,
-    residual_index_from_phase_mismatch,
-    residual_index_limits,
-    verify_intensity_class,
-)
-from .metrology.inversion import (
-    InverseFilterResult,
-    regularized_inverse_filter,
-)
-from .metrology.levels import laeq, lc_peak, leq, lex_8h, ln_levels, sel, sound_exposure
-from .metrology.miso import (
-    MISOCoherenceResult,
-    miso_coherence,
-)
-from .metrology.parametric_filters import (
-    TimeWeighting,
-    WeightingFilter,
-    linkwitz_riley,
-    time_weighting,
-    weighting_filter,
-)
-from .metrology.phase import (
-    PhaseDecompositionResult,
-    excess_phase,
-    group_delay,
-    minimum_phase,
-    phase_decomposition,
-)
-from .metrology.random_data import (
+from .metrology.data_qualification import (
     LevelCrossingResult,
     PeakStatisticsResult,
     StationarityTestResult,
@@ -1026,38 +977,14 @@ from .metrology.random_data import (
     stationarity_test,
     trend_test,
 )
-from .metrology.signals import (
-    ResampledSignalResult,
-    ToneBurstResult,
-    fractional_delay,
-    noise_signal,
-    resample_signal,
-    tone_burst,
-)
-from .metrology.spectra import (
-    CoherentOutputSpectrumResult,
-    CrossSpectralDensityResult,
-    MultitaperSpectralDensityResult,
-    SpectralDensityResult,
-    WindowMetricsResult,
-    coherent_output_spectrum,
-    cross_spectral_density,
-    fractional_octave_smoothing,
-    multitaper_psd,
-    power_spectral_density,
-    resolution_bias_error,
-    window_metrics,
-)
-from .metrology.synchronous_average import (
-    SynchronousAverageResult,
-    comb_filter_response,
-    time_synchronous_average,
-)
-from .metrology.time_frequency import (
-    SpectrogramResult,
-    ZoomFFTResult,
-    spectrogram,
-    zoom_fft,
+from .metrology.intensity_compliance import (
+    IntensityInstrumentComplianceResult,
+    instrument_class_from_components,
+    intensity_class_compliance,
+    phase_mismatch_from_residual_index,
+    residual_index_from_phase_mismatch,
+    residual_index_limits,
+    verify_intensity_class,
 )
 from .metrology.uncertainty import (
     MonteCarloResult,
@@ -1281,6 +1208,79 @@ from .room.steady_field import (
     schroeder_frequency,
     steady_state_field,
     steady_state_spl,
+)
+from .signal.cepstrum import (
+    CepstrumResult,
+    EchoDetectionResult,
+    LifterResult,
+    cepstrum,
+    echo_detection,
+    lifter,
+)
+from .signal.correlation import (
+    AlignedImpulseResponseResult,
+    CorrelationResult,
+    TimeDelayResult,
+    align_impulse_responses,
+    correlation,
+    correlation_random_error,
+    impulse_response_delay,
+    time_delay,
+)
+from .signal.envelope import (
+    EnvelopeResult,
+    EnvelopeSpectrumResult,
+    envelope,
+    envelope_spectrum,
+)
+from .signal.inversion import (
+    InverseFilterResult,
+    regularized_inverse_filter,
+)
+from .signal.levels import laeq, lc_peak, leq, lex_8h, ln_levels, sel, sound_exposure
+from .signal.miso import (
+    MISOCoherenceResult,
+    miso_coherence,
+)
+from .signal.phase import (
+    PhaseDecompositionResult,
+    excess_phase,
+    group_delay,
+    minimum_phase,
+    phase_decomposition,
+)
+from .signal.spectra import (
+    CoherentOutputSpectrumResult,
+    CrossSpectralDensityResult,
+    MultitaperSpectralDensityResult,
+    SpectralDensityResult,
+    WindowMetricsResult,
+    coherent_output_spectrum,
+    cross_spectral_density,
+    fractional_octave_smoothing,
+    multitaper_psd,
+    power_spectral_density,
+    resolution_bias_error,
+    window_metrics,
+)
+from .signal.synchronous_average import (
+    SynchronousAverageResult,
+    comb_filter_response,
+    time_synchronous_average,
+)
+from .signal.test_signals import (
+    ResampledSignalResult,
+    ToneBurstResult,
+    fractional_delay,
+    noise_signal,
+    resample_signal,
+    tone_burst,
+)
+from .signal.time_frequency import (
+    SpectrogramResult,
+    ZoomFFTResult,
+    spectrogram,
+    zoom_fft,
 )
 from .simulation.elastic_fdtd import (
     AIR,

@@ -29,7 +29,7 @@ they come from your microphone.
 
 ```python
 import numpy as np
-from phonometry import metrology
+from phonometry import filters, metrology, signal
 
 fs = 48000
 
@@ -39,7 +39,7 @@ calibrator = np.sqrt(2) * np.sin(2 * np.pi * 1000 * np.arange(3 * fs) / fs)
 
 # "Street" measurement: 10 s of pink background noise plus a 1 s horn-like
 #   1 kHz event, so the statistical levels have something to separate.
-recording = metrology.noise_signal(fs, 10.0, color="pink", rms=0.02, seed=7)
+recording = signal.noise_signal(fs, 10.0, color="pink", rms=0.02, seed=7)
 recording[4 * fs : 5 * fs] += 0.2 * np.sqrt(2) * np.sin(
     2 * np.pi * 1000 * np.arange(fs) / fs
 )
@@ -73,8 +73,8 @@ $L_{AF}(t)$:
 
 ```python
 pressure = cal * recording                                # digital units -> Pa
-weighted = metrology.weighting_filter(pressure, fs, curve="A")
-envelope = metrology.time_weighting(weighted, fs, mode="fast")  # mean-square Pa^2
+weighted = filters.weighting_filter(pressure, fs, curve="A")
+envelope = filters.time_weighting(weighted, fs, mode="fast")  # mean-square Pa^2
 laf_t = 10 * np.log10(np.maximum(envelope, 1e-12) / (2e-5) ** 2)
 # laf_t peaks near 80 dB during the event and settles near 55 dB between.
 ```
@@ -97,12 +97,12 @@ the level fluctuated ($L_{90}$ is the background, $L_{10}$ the events), the
 C-weighted **peak** for impulsive content.
 
 ```python
-la_eq = metrology.laeq(recording, fs, calibration_factor=cal)     # ~70.2 dB
-ln = metrology.ln_levels(
+la_eq = signal.laeq(recording, fs, calibration_factor=cal)     # ~70.2 dB
+ln = signal.ln_levels(
     recording, fs, n=(10, 50, 90), weighting="A", calibration_factor=cal
 )                                                # L10 ~78.0, L50 ~55.1, L90 ~54.9
-lae = metrology.sel(recording, fs, weighting="A", calibration_factor=cal)  # ~80.2
-lc_pk = metrology.lc_peak(recording, fs, calibration_factor=cal)           # ~84.4
+lae = signal.sel(recording, fs, weighting="A", calibration_factor=cal)  # ~80.2
+lc_pk = signal.lc_peak(recording, fs, calibration_factor=cal)           # ~84.4
 
 print(f"LAeq {la_eq:.1f} dB | L10 {ln[10]:.1f} | L90 {ln[90]:.1f} "
       f"| LAE {lae:.1f} | LCpeak {lc_pk:.1f}")
@@ -126,7 +126,7 @@ anchored to the IEC 61260-1 band edges; `nominal=True` labels them with the
 preferred frequencies you would read on an instrument.
 
 ```python
-spl, bands = metrology.octave_filter(
+spl, bands = filters.octave_filter(
     recording, fs, fraction=3, calibration_factor=cal, nominal=True
 )
 # 33 one-third-octave band levels in dB SPL, labeled '12.5' ... '20k'.
@@ -149,11 +149,11 @@ sweeps a `WeightingFilter` against the IEC 61672-1 Table 3 limits, and
 Table 1 limits.
 
 ```python
-wf = metrology.WeightingFilter(fs, curve="A")
-print(metrology.verify_weighting_class(wf)["overall_class"])   # 1
+wf = filters.WeightingFilter(fs, curve="A")
+print(filters.verify_weighting_class(wf)["overall_class"])   # 1
 
-bank = metrology.OctaveFilterBank(fs, fraction=3)
-print(metrology.verify_filter_class(bank)["overall_class"])    # 1
+bank = filters.OctaveFilterBank(fs, fraction=3)
+print(filters.verify_filter_class(bank)["overall_class"])    # 1
 ```
 
 The verdicts also come per band, so you can see exactly where a design would
@@ -179,10 +179,10 @@ The meter built here is the trunk; the rest of the core grows from it.
 ## See also
 
 - API reference: [`metrology.calibration`](https://jmrplens.github.io/phonometry/reference/api/levels/calibration/),
-  [`metrology.parametric_filters`](https://jmrplens.github.io/phonometry/reference/api/filters/parametric-filters/),
-  [`metrology.levels`](https://jmrplens.github.io/phonometry/reference/api/levels/levels/),
+  [`filters.weighting`](https://jmrplens.github.io/phonometry/reference/api/filters/parametric-filters/),
+  [`signal.levels`](https://jmrplens.github.io/phonometry/reference/api/levels/levels/),
   [`phonometry`](https://jmrplens.github.io/phonometry/reference/api/filters/phonometry/) and
-  [`metrology.compliance`](https://jmrplens.github.io/phonometry/reference/api/filters/compliance/).
+  [`filters.compliance`](https://jmrplens.github.io/phonometry/reference/api/filters/compliance/).
 
 ## References
 

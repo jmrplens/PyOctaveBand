@@ -65,7 +65,7 @@ leave `[perf]` out.
 
 ```python
 import numpy as np
-from phonometry import metrology
+from phonometry import filters
 
 fs = 48000
 t = np.linspace(0, 1, fs, endpoint=False)
@@ -73,7 +73,7 @@ t = np.linspace(0, 1, fs, endpoint=False)
 signal = np.sin(2 * np.pi * 100 * t) + np.sin(2 * np.pi * 1000 * t)
 
 # Apply 1/3 octave filter bank
-spl, freq = metrology.octave_filter(signal, fs=fs, fraction=3)
+spl, freq = filters.octave_filter(signal, fs=fs, fraction=3)
 
 print(f"Bands: {freq}")
 print(f"SPL [dB]: {spl}")
@@ -99,7 +99,9 @@ tl = underwater.transmission_loss(...)
 
 | Namespace | Coverage |
 | :--- | :--- |
-| `metrology` | 1/1, 1/3 and arbitrary fractional octave filter banks (stable SOS + multirate decimation) in five architectures with per-band class verdicts (IEC 61260-1 / ANSI S1.11); A/C/Z weighting within IEC 61672-1 class 1 tolerances plus G weighting (ISO 7196); Fast/Slow/Impulse ballistics, Leq, SEL, L10/L50/L90, noise dose (IEC 61252); octave spectrogram and zero-phase filtering; physical SPL calibration with IEC 60942 stability validation and dBFS modes; calibrated Welch PSD/CSD with chi-square confidence intervals, coherent output spectrum, 1/n-octave smoothing and colored-noise generators (Bendat & Piersol); MISO multiple/partial coherence; correlation and GCC time-delay estimation (Knapp & Carter); Hilbert envelope, cepstrum and echoes, time synchronous averaging, calibrated STFT and zoom FFT; Golay/shaped-sweep system measurement with regularized inversion; IEC 60268-1 tone bursts and resampling; GUM uncertainty (ISO/IEC Guide 98-3) and Bendat & Piersol data qualification |
+| `filters` | 1/1, 1/3 and arbitrary fractional octave filter banks (stable SOS + multirate decimation) in five architectures with per-band class verdicts (IEC 61260-1 / ANSI S1.11); A/C/Z weighting within IEC 61672-1 class 1 tolerances plus G weighting (ISO 7196); Fast/Slow/Impulse ballistics; octave spectrogram and zero-phase filtering; RBJ parametric equalizer sections |
+| `signal` | Leq, SEL, L10/L50/L90 and noise dose (IEC 61252); calibrated Welch PSD/CSD with chi-square confidence intervals, coherent output spectrum, 1/n-octave smoothing and colored-noise generators (Bendat & Piersol); MISO multiple/partial coherence; correlation and GCC time-delay estimation (Knapp & Carter); Hilbert envelope, cepstrum and echoes, time synchronous averaging, calibrated STFT and zoom FFT; Golay/shaped-sweep system measurement with regularized inversion; IEC 60268-1 tone bursts and resampling |
+| `metrology` | Physical SPL calibration with IEC 60942 stability validation and dBFS modes; GUM uncertainty with Monte Carlo (ISO/IEC Guide 98-3 and Supplement 1); Bendat & Piersol data qualification (stationarity, trends, level crossings, peak statistics); IEC 61043 intensity-instrument class verification |
 | `psychoacoustics` | Loudness in sones three ways: Zwicker (ISO 532-1 Annex B validated), Moore-Glasberg stationary and time-varying (ISO 532-2/3) and Sottek Hearing Model (ECMA-418-2); DIN 45692 sharpness; ECMA-418-2 tonality, roughness (asper) and fluctuation strength (vacil_HMS); tone prominence TNR/PR (ECMA-418-1); tonal audibility (ISO/PAS 20065); Fastl & Zwicker psychoacoustic annoyance; ISO 226:2023 contours |
 | `hearing` | Speech Transmission Index STI/STIPA with signal generator (IEC 60268-16 Ed. 5); Speech Intelligibility Index (ANSI S3.5-1997); STOI and ESTOI; age-related thresholds (ISO 7029) and reference thresholds (ISO 389-7); noise-induced hearing loss with HTLAN (ISO 1999); daily noise exposure LEX,8h with Annex C uncertainty (ISO 9612) |
 | `room` | Swept-sine/MLS impulse responses (ISO 18233); EDT/T20/T30/C50/C80/Ts (ISO 3382-1/2); open-plan speech metrics (ISO 3382-3); reverberation-room absorption (ISO 354); reverberation-time prediction (Sabine to Arau-Puchades); total absorption of furnished rooms (EN 12354-6); image-source impulse responses and the steady-state field; room-noise criteria NC and RC Mark II (ANSI/ASA S12.2) |

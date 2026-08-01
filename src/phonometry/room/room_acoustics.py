@@ -46,7 +46,7 @@ from typing import TYPE_CHECKING, Any
 import numpy as np
 
 from .._internal.utils import _typesignal
-from ..metrology.core import OctaveFilterBank
+from ..filters.core import OctaveFilterBank
 
 if TYPE_CHECKING:
     from matplotlib.axes import Axes

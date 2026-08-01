@@ -67,7 +67,7 @@ Analyze a signal and get the Sound Pressure Level (SPL) per frequency band.
 
 ```python
 import numpy as np
-from phonometry import metrology
+from phonometry import filters
 
 fs = 48000
 t = np.linspace(0, 1, fs, endpoint=False)
@@ -75,7 +75,7 @@ t = np.linspace(0, 1, fs, endpoint=False)
 signal = np.sin(2 * np.pi * 100 * t) + np.sin(2 * np.pi * 1000 * t)
 
 # Apply 1/3 octave filter bank
-spl, freq = metrology.octave_filter(signal, fs=fs, fraction=3)
+spl, freq = filters.octave_filter(signal, fs=fs, fraction=3)
 
 print(f"Bands: {freq}")
 # Bands: [12.589254117941678, 15.848931924611138, ..., 19952.623149688785]  (33 bands)
@@ -94,14 +94,14 @@ print(f"SPL [dB]: {spl}")
 import matplotlib.pyplot as plt
 import scipy.signal
 import numpy as np
-from phonometry import metrology
+from phonometry import filters
 
 fs = 48000
 t = np.linspace(0, 1, fs, endpoint=False)
 # Composite signal: 100Hz + 1000Hz
 signal = np.sin(2 * np.pi * 100 * t) + np.sin(2 * np.pi * 1000 * t)
 # Apply 1/3 octave filter bank
-spl, freq = metrology.octave_filter(signal, fs=fs, fraction=3)
+spl, freq = filters.octave_filter(signal, fs=fs, fraction=3)
 
 # Gray background: the raw-signal PSD (Welch), shifted to sit just below the
 # band SPLs so both spectral shapes share one axis.
@@ -125,7 +125,7 @@ plt.show()
 
 ```python
 from scipy.io import wavfile
-from phonometry import metrology
+from phonometry import filters
 
 # Load standard WAV file
 fs, signal = wavfile.read("measurement.wav")
@@ -133,7 +133,7 @@ fs, signal = wavfile.read("measurement.wav")
 # Analyze
 # Note: To obtain real-world SPL values, you must calibrate the input.
 # See the Calibration guide.
-spl, freq = metrology.octave_filter(signal, fs=fs, fraction=3)
+spl, freq = filters.octave_filter(signal, fs=fs, fraction=3)
 ```
 
 Integer audio (e.g. int16 WAV data) is converted to float64 internally, so it is
@@ -141,7 +141,7 @@ safe to pass `wavfile.read` output directly.
 
 ## Where to go next
 
-The octave analysis above uses the `metrology` core, one of fifteen domain
+The octave analysis above uses the `filters` core, one of seventeen domain
 namespaces; the documentation index walks through the rest, from
 psychoacoustics and room, building and vibration acoustics to environmental,
 aircraft and underwater noise, electroacoustics and FDTD wave simulation.

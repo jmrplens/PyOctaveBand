@@ -240,7 +240,7 @@ band. This allows for advanced analysis or comparing how different architectures
 
 ```python
 import numpy as np
-from phonometry import metrology
+from phonometry import filters
 
 # 1. Generate a signal (Sum of 250Hz and 1000Hz)
 fs = 48000
@@ -248,8 +248,8 @@ t = np.linspace(0, 0.5, int(fs * 0.5), endpoint=False)
 y = np.sin(2 * np.pi * 250 * t) + np.sin(2 * np.pi * 1000 * t)
 
 # 2. Compare architectures (Butterworth vs Chebyshev II)
-spl_b, freq, xb_butter = metrology.octave_filter(y, fs=fs, fraction=1, sigbands=True, filter_type='butter')
-spl_c2, _, xb_cheby2 = metrology.octave_filter(y, fs=fs, fraction=1, sigbands=True, filter_type='cheby2')
+spl_b, freq, xb_butter = filters.octave_filter(y, fs=fs, fraction=1, sigbands=True, filter_type='butter')
+spl_c2, _, xb_cheby2 = filters.octave_filter(y, fs=fs, fraction=1, sigbands=True, filter_type='cheby2')
 
 # 'xb_butter' and 'xb_cheby2' contain the time-domain signals per band
 ```
@@ -266,14 +266,14 @@ differences in stability and transient decay.*
 ```python
 import matplotlib.pyplot as plt
 import numpy as np
-from phonometry import metrology
+from phonometry import filters
 
 fs = 48000
 t = np.linspace(0, 0.5, int(fs * 0.5), endpoint=False)
 y = np.sin(2 * np.pi * 250 * t) + np.sin(2 * np.pi * 1000 * t)
 
-bank_b = metrology.OctaveFilterBank(fs=fs, fraction=1, order=6, limits=[100.0, 2000.0])
-bank_c = metrology.OctaveFilterBank(fs=fs, fraction=1, order=6, limits=[100.0, 2000.0],
+bank_b = filters.OctaveFilterBank(fs=fs, fraction=1, order=6, limits=[100.0, 2000.0])
+bank_c = filters.OctaveFilterBank(fs=fs, fraction=1, order=6, limits=[100.0, 2000.0],
                           filter_type="cheby2")
 _, freq, xb_butter = bank_b.filter(y, sigbands=True)
 _, _, xb_cheby2 = bank_c.filter(y, sigbands=True)
@@ -318,13 +318,13 @@ their steep roll-off with strong delay peaks at the band edges.
 import matplotlib.pyplot as plt
 import numpy as np
 from scipy.signal import group_delay
-from phonometry import metrology
+from phonometry import filters
 
 fs = 48000
 w = np.logspace(np.log10(500), np.log10(2000), 1024)
 fig, ax = plt.subplots(figsize=(9, 5))
 for ftype in ("butter", "cheby1", "cheby2", "ellip", "bessel"):
-    bank = metrology.OctaveFilterBank(fs, fraction=1, order=6, limits=[800, 1200],
+    bank = filters.OctaveFilterBank(fs, fraction=1, order=6, limits=[800, 1200],
                             filter_type=ftype)
     idx = int(np.argmin(np.abs(np.array(bank.freq) - 1000)))
     fsd = fs / bank.factor[idx]
@@ -353,13 +353,13 @@ decay). The option is incompatible with stateful (block) processing.
 
 ```python
 import numpy as np
-from phonometry import metrology
+from phonometry import filters
 
 fs = 48000
 t = np.linspace(0, 0.5, int(fs * 0.5), endpoint=False)
 y = np.sin(2 * np.pi * 250 * t) + np.sin(2 * np.pi * 1000 * t)
 
-bank = metrology.OctaveFilterBank(fs=48000, fraction=3)
+bank = filters.OctaveFilterBank(fs=48000, fraction=3)
 spl, freq, xb = bank.filter(y, sigbands=True, zero_phase=True)
 ```
 
@@ -374,7 +374,7 @@ filtering keeps it aligned with the input.*
 ```python
 import matplotlib.pyplot as plt
 import numpy as np
-from phonometry import metrology
+from phonometry import filters
 
 fs = 48000
 t = np.linspace(0, 0.15, int(fs * 0.15), endpoint=False)
@@ -382,7 +382,7 @@ x = np.zeros_like(t)                      # 250 Hz tone burst mid-frame
 start, end = int(0.05 * fs), int(0.10 * fs)
 x[start:end] = np.sin(2 * np.pi * 250 * t[start:end]) * np.hanning(end - start)
 
-bank = metrology.OctaveFilterBank(fs=fs, fraction=1, order=6, limits=[200.0, 300.0])
+bank = filters.OctaveFilterBank(fs=fs, fraction=1, order=6, limits=[200.0, 300.0])
 _, _, fwd = bank.filter(x, sigbands=True, calculate_level=False)
 _, _, zp = bank.filter(x, sigbands=True, calculate_level=False,
                        zero_phase=True)
@@ -427,7 +427,7 @@ margin with `verify_filter_class`.
 - [Filter Class Verification (IEC 61260-1)](/phonometry/guides/filter-compliance/):
   the Table 1 acceptance mask, class 0 and the compliance fiche of the banks
   designed here.
-- API reference: [`phonometry`](/phonometry/reference/api/filters/phonometry/), [`metrology.core`](/phonometry/reference/api/filters/core/) and [`metrology.parametric_filters`](/phonometry/reference/api/filters/parametric-filters/).
+- API reference: [`phonometry`](/phonometry/reference/api/filters/phonometry/), [`filters.core`](/phonometry/reference/api/filters/core/) and [`filters.weighting`](/phonometry/reference/api/filters/parametric-filters/).
 
 ## Quick answers
 

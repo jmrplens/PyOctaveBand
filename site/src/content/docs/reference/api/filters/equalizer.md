@@ -1,5 +1,5 @@
 ---
-title: "metrology.equalizer"
+title: "filters.equalizer"
 description: "Parametric equalizer biquads per the RBJ Audio EQ Cookbook."
 sidebar:
   label: "equalizer"
@@ -179,7 +179,7 @@ Cascade of RBJ Audio EQ Cookbook biquads.
 
 Designs one second-order section per [`EQSection`](/phonometry/reference/api/filters/equalizer/#eqsection) and runs them in
 series as a numerically robust SOS cascade, following the house style of
-[`WeightingFilter`](/phonometry/reference/api/filters/parametric-filters/#weightingfilter)
+[`WeightingFilter`](/phonometry/reference/api/filters/weighting/#weightingfilter)
 (reusable coefficients, optional stateful block processing).
 
 **Parameters**

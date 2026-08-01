@@ -205,7 +205,7 @@ def strike_sel_spectrum(
     :return: A :class:`StrikeSelSpectrum`.
     :raises ValueError: If the inputs are invalid.
     """
-    from ..metrology.frequencies import nominal_frequencies
+    from ..filters.frequencies import nominal_frequencies
 
     sig = _validate_pressure(pressure, min_samples=2)
     fs_v = _positive(fs, "fs")

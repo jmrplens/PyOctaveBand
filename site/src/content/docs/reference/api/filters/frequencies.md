@@ -1,5 +1,5 @@
 ---
-title: "metrology.frequencies"
+title: "filters.frequencies"
 description: "Frequency calculation logic according to ANSI/IEC standards."
 sidebar:
   label: "frequencies"

@@ -24,7 +24,7 @@ import numpy as np
 
 from .._internal.utils import _typesignal
 from .._internal.warnings import PhonometryWarning
-from ..metrology.spectra import _welch_autospectrum
+from ..signal.spectra import _welch_autospectrum
 
 if TYPE_CHECKING:
     from matplotlib.axes import Axes

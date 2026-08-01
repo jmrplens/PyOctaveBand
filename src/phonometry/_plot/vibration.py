@@ -658,7 +658,7 @@ def plot_fault_frequencies(
     :param ax: Existing axes, or ``None`` to create a figure.
     :param language: Label language, ``"en"`` (default) or ``"es"``.
     :param spectrum: Measured spectrum to draw underneath: an
-        :class:`~phonometry.metrology.envelope.EnvelopeSpectrumResult`, or any
+        :class:`~phonometry.signal.envelope.EnvelopeSpectrumResult`, or any
         object exposing ``frequencies`` and ``amplitude``. Without it the
         predicted lines are drawn alone.
     :param max_frequency: Upper limit of the frequency axis, in hertz

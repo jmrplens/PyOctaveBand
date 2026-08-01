@@ -66,13 +66,13 @@ export interface HomeContent {
 const DOI = '10.5281/zenodo.21215280';
 
 const SPECTRUM_CODE = `import numpy as np
-from phonometry import metrology
+from phonometry import filters
 
 fs = 48_000
 t = np.linspace(0, 1, fs, endpoint=False)
 signal = np.sin(2 * np.pi * 100 * t) + np.sin(2 * np.pi * 1000 * t)
 
-spl, freq = metrology.octave_filter(signal, fs=fs, fraction=3)`;
+spl, freq = filters.octave_filter(signal, fs=fs, fraction=3)`;
 
 // The call that renders the committed fiche shown beside it
 // (scripts/generate_reports.py), with the metadata block cut to the four

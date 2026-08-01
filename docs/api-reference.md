@@ -2,7 +2,7 @@
 
 # API Reference
 
-All core functionality lives in fifteen domain subpackages; every public name
+All core functionality lives in seventeen domain subpackages; every public name
 is also re-exported by the top-level `phonometry` package.
 
 > **Note.** This page is the curated quick table for the GitHub/PyPI audience:
@@ -13,7 +13,7 @@ is also re-exported by the top-level `phonometry` package.
 
 ## Namespaces
 
-The library is organized into fifteen domain subpackages, and importing the
+The library is organized into seventeen domain subpackages, and importing the
 domain namespace is the primary form used throughout the documentation:
 
 ```python
@@ -24,7 +24,9 @@ contour = aircraft.noise_contour(path, powers, distances, sel, lmax, x=gx, y=gy)
 
 | Subpackage | Scope |
 | :--- | :--- |
-| `phonometry.metrology` | Filter banks, weighting and time weighting, levels, calibration, IEC verifiers, GUM uncertainty |
+| `phonometry.filters` | Octave and fractional-octave filter banks, frequency weightings and time weighting, parametric EQ, IEC 61260-1 and IEC 61672-1 class verification |
+| `phonometry.signal` | Levels (Leq, LAeq, percentiles), Welch and multitaper spectra, coherence, time-frequency, correlation, envelope, cepstrum, phase, synchronous averaging, test signals |
+| `phonometry.metrology` | Calibration, GUM uncertainty and Monte Carlo, data qualification (stationarity, trends, peak statistics), IEC 61043 intensity class |
 | `phonometry.psychoacoustics` | Loudness (Zwicker, ECMA, Moore-Glasberg), sharpness, tonality, roughness, fluctuation strength, annoyance, tonal audibility |
 | `phonometry.hearing` | Hearing threshold, NIHL, occupational exposure, SII, STI |
 | `phonometry.emission` | Sound power (ISO 3740 family), sound intensity, vibration-based power |

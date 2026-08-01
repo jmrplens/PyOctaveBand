@@ -211,7 +211,7 @@ def test_monte_carlo_es() -> None:
 
 
 def test_filter_class_es() -> None:
-    from phonometry.metrology.compliance import filter_class_compliance
+    from phonometry.filters.compliance import filter_class_compliance
 
     bank = ph.OctaveFilterBank(fs=48000, fraction=1, order=6, limits=[500, 2000])
     res = filter_class_compliance(bank)

@@ -18,16 +18,18 @@ import pytest
 
 SRC = Path(__file__).resolve().parent.parent / "src" / "phonometry"
 
+#: The transverse toolbox every domain is allowed to import: normalized
+#: frequency selectivity, general signal analysis and the metrology proper.
+#: One package until 4.0 split it in three; the policy is unchanged.
+TOOLBOX: frozenset[str] = frozenset({"filters", "signal", "metrology"})
+
 #: Cross-package edges allowed IN ADDITION to `pkg -> pkg` (internal),
-#: `* -> _internal` and `* -> metrology`. "root" = modules still at the top
+#: `* -> _internal` and `* -> TOOLBOX`. "root" = modules still at the top
 #: level of the package (shrinks to the facade set as the migration proceeds).
 ALLOWED_EDGES: set[tuple[str, str]] = {
     ("environmental", "materials"),   # air_absorption -> ISO 354 helpers
     ("aircraft", "environmental"),    # atmospheric absorption reuse
     ("vibration", "hearing"),         # multiple-shock SEXES tables
-    ("hearing", "metrology"),         # sti filter reuse
-    ("psychoacoustics", "metrology"),
-    ("room", "metrology"),
     # swept-sine distortion reuses the ISO 18233 sweep / Farina
     # inverse-filter machinery of room_ir
     ("electroacoustics", "room"),
@@ -95,7 +97,7 @@ def test_cross_package_edges_are_whitelisted() -> None:
             # _report are rendering leaves that reference domain classes only
             # under TYPE_CHECKING (see the guarantee test below).
             continue
-        if to == "metrology":
+        if to in TOOLBOX:
             continue
         if to in ("_plot", "_report"):
             # lazy .plot()/.report() imports only; enforced structurally by the

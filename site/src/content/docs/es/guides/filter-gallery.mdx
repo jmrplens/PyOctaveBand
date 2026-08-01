@@ -60,13 +60,13 @@ en el punto de cruce a −3 dB.
 import matplotlib.pyplot as plt
 import numpy as np
 from scipy.signal import sosfreqz
-from phonometry import metrology
+from phonometry import filters
 
 fs = 48000
 fig, ax = plt.subplots(figsize=(9, 5))
 for ftype in ("butter", "cheby1", "cheby2", "ellip", "bessel"):
     # limits selecciona únicamente la banda de octava de 1 kHz
-    bank = metrology.OctaveFilterBank(fs, fraction=1, order=6, limits=[800, 1200],
+    bank = filters.OctaveFilterBank(fs, fraction=1, order=6, limits=[800, 1200],
                             filter_type=ftype)
     idx = int(np.argmin(np.abs(np.array(bank.freq) - 1000)))
     fsd = fs / bank.factor[idx]           # frecuencia real de la banda
@@ -106,14 +106,14 @@ Vista espectral completa de los bancos para octava (1/1) y tercio de octava (1/3
 <summary>Mostrar el código de esta figura</summary>
 
 ```python
-from phonometry import metrology
+from phonometry import filters
 
 # Una figura por arquitectura y fracción: la galería completa de respuestas
 fs = 48000
 for ftype in ("butter", "cheby1", "cheby2", "ellip", "bessel"):
     for fraction in (1, 3):
         # show=True dibuja la respuesta en frecuencia del banco
-        metrology.OctaveFilterBank(fs=fs, fraction=fraction, order=6,
+        filters.OctaveFilterBank(fs=fs, fraction=fraction, order=6,
                                    limits=[12, 20000], filter_type=ftype,
                                    show=True)
 ```
@@ -130,14 +130,14 @@ de las bandas de frecuencia.
 
 ```python
 import numpy as np
-from phonometry import metrology
+from phonometry import filters
 
 # Una señal calibrada en Pa para que la guía funcione por sí sola
 fs = 48000
 x = 0.2 * np.sin(2 * np.pi * 1000 * np.arange(fs) / fs)
 
 # Medición estándar en tercios de octava
-spl, freq = metrology.octave_filter(x, fs, fraction=3, filter_type='butter')
+spl, freq = filters.octave_filter(x, fs, fraction=3, filter_type='butter')
 ```
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/filter_butter_fraction_3_order_6_es.svg" alt="Respuesta en frecuencia del banco Butterworth de tercio de octava" width="60%" />
@@ -146,10 +146,10 @@ spl, freq = metrology.octave_filter(x, fs, fraction=3, filter_type='butter')
 <summary>Mostrar el código de esta figura</summary>
 
 ```python
-from phonometry import metrology
+from phonometry import filters
 
 # Dibuja la respuesta de este banco (1/3 de octava, orden 6, Butterworth)
-metrology.OctaveFilterBank(fs=48000, fraction=3, order=6, limits=[12, 20000],
+filters.OctaveFilterBank(fs=48000, fraction=3, order=6, limits=[12, 20000],
                            filter_type='butter', show=True)
 ```
 
@@ -163,14 +163,14 @@ cerca de las frecuencias de corte.
 
 ```python
 import numpy as np
-from phonometry import metrology
+from phonometry import filters
 
 # Una señal calibrada en Pa para que la guía funcione por sí sola
 fs = 48000
 x = 0.2 * np.sin(2 * np.pi * 1000 * np.arange(fs) / fs)
 
 # Selectividad con 0.1 dB de rizado en la banda de paso
-spl, freq = metrology.octave_filter(x, fs, fraction=3, filter_type='cheby1', ripple=0.1)
+spl, freq = filters.octave_filter(x, fs, fraction=3, filter_type='cheby1', ripple=0.1)
 ```
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/filter_cheby1_fraction_3_order_6_es.svg" alt="Respuesta en frecuencia del banco Chebyshev I de tercio de octava" width="60%" />
@@ -179,10 +179,10 @@ spl, freq = metrology.octave_filter(x, fs, fraction=3, filter_type='cheby1', rip
 <summary>Mostrar el código de esta figura</summary>
 
 ```python
-from phonometry import metrology
+from phonometry import filters
 
 # Dibuja la respuesta de este banco (1/3 de octava, orden 6, Chebyshev I)
-metrology.OctaveFilterBank(fs=48000, fraction=3, order=6, limits=[12, 20000],
+filters.OctaveFilterBank(fs=48000, fraction=3, order=6, limits=[12, 20000],
                            filter_type='cheby1', ripple=0.1, show=True)
 ```
 
@@ -198,14 +198,14 @@ automáticamente para que los puntos de −3 dB caigan en los bordes de banda
 
 ```python
 import numpy as np
-from phonometry import metrology
+from phonometry import filters
 
 # Una señal calibrada en Pa para que la guía funcione por sí sola
 fs = 48000
 x = 0.2 * np.sin(2 * np.pi * 1000 * np.arange(fs) / fs)
 
 # Banda de paso plana, 72 dB de atenuación por defecto (clase 1)
-spl, freq = metrology.octave_filter(x, fs, fraction=3, filter_type='cheby2')
+spl, freq = filters.octave_filter(x, fs, fraction=3, filter_type='cheby2')
 ```
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/filter_cheby2_fraction_3_order_6_es.svg" alt="Respuesta en frecuencia del banco Chebyshev II de tercio de octava" width="60%" />
@@ -214,10 +214,10 @@ spl, freq = metrology.octave_filter(x, fs, fraction=3, filter_type='cheby2')
 <summary>Mostrar el código de esta figura</summary>
 
 ```python
-from phonometry import metrology
+from phonometry import filters
 
 # Dibuja la respuesta de este banco (1/3 de octava, orden 6, Chebyshev II)
-metrology.OctaveFilterBank(fs=48000, fraction=3, order=6, limits=[12, 20000],
+filters.OctaveFilterBank(fs=48000, fraction=3, order=6, limits=[12, 20000],
                            filter_type='cheby2', show=True)
 ```
 
@@ -231,14 +231,14 @@ la atenuada.
 
 ```python
 import numpy as np
-from phonometry import metrology
+from phonometry import filters
 
 # Una señal calibrada en Pa para que la guía funcione por sí sola
 fs = 48000
 x = 0.2 * np.sin(2 * np.pi * 1000 * np.arange(fs) / fs)
 
 # Máxima selectividad para aislamiento extremo entre bandas
-spl, freq = metrology.octave_filter(x, fs, fraction=3, filter_type='ellip', ripple=0.1)
+spl, freq = filters.octave_filter(x, fs, fraction=3, filter_type='ellip', ripple=0.1)
 ```
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/filter_ellip_fraction_3_order_6_es.svg" alt="Respuesta en frecuencia del banco elíptico de tercio de octava" width="60%" />
@@ -247,10 +247,10 @@ spl, freq = metrology.octave_filter(x, fs, fraction=3, filter_type='ellip', ripp
 <summary>Mostrar el código de esta figura</summary>
 
 ```python
-from phonometry import metrology
+from phonometry import filters
 
 # Dibuja la respuesta de este banco (1/3 de octava, orden 6, elíptico)
-metrology.OctaveFilterBank(fs=48000, fraction=3, order=6, limits=[12, 20000],
+filters.OctaveFilterBank(fs=48000, fraction=3, order=6, limits=[12, 20000],
                            filter_type='ellip', ripple=0.1, show=True)
 ```
 
@@ -264,14 +264,14 @@ mejor que ningún otro tipo, pero tienen la caída más lenta.
 
 ```python
 import numpy as np
-from phonometry import metrology
+from phonometry import filters
 
 # Una señal calibrada en Pa para que la guía funcione por sí sola
 fs = 48000
 x = 0.2 * np.sin(2 * np.pi * 1000 * np.arange(fs) / fs)
 
 # Ideal para análisis de pulsos y preservación de transitorios
-spl, freq = metrology.octave_filter(x, fs, fraction=3, filter_type='bessel')
+spl, freq = filters.octave_filter(x, fs, fraction=3, filter_type='bessel')
 ```
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/filter_bessel_fraction_3_order_6_es.svg" alt="Respuesta en frecuencia del banco Bessel de tercio de octava" width="60%" />
@@ -280,10 +280,10 @@ spl, freq = metrology.octave_filter(x, fs, fraction=3, filter_type='bessel')
 <summary>Mostrar el código de esta figura</summary>
 
 ```python
-from phonometry import metrology
+from phonometry import filters
 
 # Dibuja la respuesta de este banco (1/3 de octava, orden 6, Bessel)
-metrology.OctaveFilterBank(fs=48000, fraction=3, order=6, limits=[12, 20000],
+filters.OctaveFilterBank(fs=48000, fraction=3, order=6, limits=[12, 20000],
                            filter_type='bessel', show=True)
 ```
 
@@ -298,14 +298,14 @@ perfectamente plana y sin diferencia de fase entre bandas en el cruce.
 
 ```python
 import numpy as np
-from phonometry import metrology
+from phonometry import filters
 
 # recording: una captura calibrada en Pa para que la guía funcione por sí sola
 fs = 48000
 recording = 0.2 * np.sin(2 * np.pi * 1000 * np.arange(fs) / fs)
 
 # Dividir la grabación en bandas grave y aguda a 1000 Hz
-low, high = metrology.linkwitz_riley(recording, fs, freq=1000, order=4)
+low, high = filters.linkwitz_riley(recording, fs, freq=1000, order=4)
 # Recombinada, low + high tiene una respuesta plana en magnitud (suma paso todo)
 ```
 
@@ -318,13 +318,13 @@ low, high = metrology.linkwitz_riley(recording, fs, freq=1000, order=4)
 import matplotlib.pyplot as plt
 import numpy as np
 from scipy.signal import freqz
-from phonometry import metrology
+from phonometry import filters
 
 # Medimos ambas ramas: dividimos un impulso unitario y tomamos los espectros.
 fs = 48000
 impulse = np.zeros(fs)
 impulse[0] = 1.0
-low, high = metrology.linkwitz_riley(impulse, fs, freq=1000, order=4)
+low, high = filters.linkwitz_riley(impulse, fs, freq=1000, order=4)
 
 w, h_lp = freqz(low, worN=8192, fs=fs)
 _, h_hp = freqz(high, worN=8192, fs=fs)
@@ -369,7 +369,7 @@ alcanza realmente cada una de estas arquitecturas, son
 - [Verificación de clase de filtros (IEC 61260-1)](/phonometry/es/guides/filter-compliance/):
   la máscara de aceptación de la Tabla 1, la clase 0 y la ficha de
   conformidad de estas arquitecturas.
-- Referencia de la API: [`phonometry`](/phonometry/es/reference/api/filters/phonometry/) y [`metrology.core`](/phonometry/es/reference/api/filters/core/).
+- Referencia de la API: [`phonometry`](/phonometry/es/reference/api/filters/phonometry/) y [`filters.core`](/phonometry/es/reference/api/filters/core/).
 
 ## Respuestas rápidas
 

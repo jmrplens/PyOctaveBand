@@ -3,7 +3,7 @@
 # Test signals and sample-rate tools (IEC 60268-1)
 
 A measurement is only as trustworthy as its stimulus and its sample-rate
-bookkeeping. This page covers the signal toolbox of `phonometry.metrology`:
+bookkeeping. This page covers the signal toolbox of `phonometry.signal`:
 **tone bursts** with the exact gating IEC 60268-1 prescribes, the
 **colored-noise generators** (detailed in the
 [spectral analysis guide](spectral-analysis.md#5-colored-noise-generators)),

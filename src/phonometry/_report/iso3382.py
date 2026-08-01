@@ -101,7 +101,7 @@ def _fraction_label(frequency: np.ndarray | None, language: str) -> str:
         return t("Broadband analysis", language)
     if frequency.size < 2:
         return t("Single-band parameters", language)
-    from ..metrology.frequencies import _infer_band_fraction
+    from ..filters.frequencies import _infer_band_fraction
 
     if _infer_band_fraction(frequency) == 1:
         return t("Octave-band parameters", language)
@@ -115,7 +115,7 @@ def _band_label(exact_freq: float, fraction: int) -> str:
     mid-band frequencies (IEC 61260), not the exact base-ten centre, so the
     table is labelled with the nominal frequency (125, not 125.89...).
     """
-    from ..metrology.frequencies import _nominal_freq_for_band
+    from ..filters.frequencies import _nominal_freq_for_band
 
     nominal = _nominal_freq_for_band(exact_freq, float(fraction))
     return f"{nominal:g}"
@@ -193,7 +193,7 @@ def _parameter_table(
     ts = np.asarray(result.ts, dtype=np.float64)
     n = t30.size
 
-    from ..metrology.frequencies import _infer_band_fraction
+    from ..filters.frequencies import _infer_band_fraction
 
     fraction = _infer_band_fraction(freq) if freq is not None else 1
     if freq is None:
@@ -290,7 +290,7 @@ def _band_fraction(frequency: np.ndarray | None) -> int:
     """
     if frequency is None:
         return 1
-    from ..metrology.frequencies import _infer_band_fraction
+    from ..filters.frequencies import _infer_band_fraction
 
     return _infer_band_fraction(np.asarray(frequency, dtype=np.float64))
 

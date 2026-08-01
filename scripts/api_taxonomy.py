@@ -18,13 +18,16 @@ Consistency is enforced at import time (fails loudly):
 - every module appears in exactly one section;
 - each section only contains modules from the subpackages declared for it in
   ``_SECTION_SUBPACKAGES``. Three sections deliberately span more than one
-  parent: ``filters`` adds the package top level next to ``metrology``,
+  parent: ``filters`` adds the package top level next to ``filters``,
   ``aeroacoustics`` includes ``environmental.wind_turbine_noise`` because the
   section groups by audience (aircraft and wind energy) while the module
   lives with the other environmental-rating code, and ``power`` includes
   ``metrology.intensity_compliance`` (the IEC 61043 class checker sits with
   the other instrument-conformance code but documents the intensity chain
   the rest of the section measures with).
+
+Section keys are subpackage names, so a reader who knows where a function
+lives in the code knows where its page lives in the reference.
 
 The generator additionally checks the taxonomy against reality: every module
 that owns a public name must be mapped here, and every mapped module must
@@ -53,20 +56,39 @@ _SECTION_LIST: tuple[Section, ...] = (
         label_es="Filtros y frecuencias",
         modules=(
             "phonometry",
-            "phonometry.metrology.core",
-            "phonometry.metrology.parametric_filters",
-            "phonometry.metrology.equalizer",
-            "phonometry.metrology.frequencies",
-            "phonometry.metrology.compliance",
+            "phonometry.filters.core",
+            "phonometry.filters.weighting",
+            "phonometry.filters.equalizer",
+            "phonometry.filters.frequencies",
+            "phonometry.filters.compliance",
         ),
     ),
     Section(
-        key="levels",
-        label_en="Levels and calibration",
-        label_es="Niveles y calibración",
+        key="signal",
+        label_en="Signal analysis",
+        label_es="Análisis de señal",
         modules=(
-            "phonometry.metrology.levels",
+            "phonometry.signal.levels",
+            "phonometry.signal.spectra",
+            "phonometry.signal.miso",
+            "phonometry.signal.time_frequency",
+            "phonometry.signal.test_signals",
+            "phonometry.signal.phase",
+            "phonometry.signal.cepstrum",
+            "phonometry.signal.synchronous_average",
+            "phonometry.signal.inversion",
+            "phonometry.signal.correlation",
+            "phonometry.signal.envelope",
+        ),
+    ),
+    Section(
+        key="metrology",
+        label_en="Calibration and uncertainty",
+        label_es="Calibración e incertidumbre",
+        modules=(
             "phonometry.metrology.calibration",
+            "phonometry.metrology.uncertainty",
+            "phonometry.metrology.data_qualification",
         ),
     ),
     Section(
@@ -288,30 +310,6 @@ _SECTION_LIST: tuple[Section, ...] = (
         modules=("phonometry.broadcast.program_loudness",),
     ),
     Section(
-        key="metrology",
-        label_en="Uncertainty and data quality",
-        label_es="Incertidumbre y calidad de datos",
-        modules=(
-            "phonometry.metrology.uncertainty",
-            "phonometry.metrology.random_data",
-        ),
-    ),
-    Section(
-        key="spectra",
-        label_en="Spectral analysis",
-        label_es="Análisis espectral",
-        modules=(
-            "phonometry.metrology.spectra",
-            "phonometry.metrology.miso",
-            "phonometry.metrology.time_frequency",
-            "phonometry.metrology.signals",
-            "phonometry.metrology.phase",
-            "phonometry.metrology.cepstrum",
-            "phonometry.metrology.synchronous_average",
-            "phonometry.metrology.inversion",
-        ),
-    ),
-    Section(
         key="simulation",
         label_en="Wave simulation",
         label_es="Simulación de ondas",
@@ -319,15 +317,6 @@ _SECTION_LIST: tuple[Section, ...] = (
             "phonometry.simulation.fdtd",
             "phonometry.simulation.ntff",
             "phonometry.simulation.elastic_fdtd",
-        ),
-    ),
-    Section(
-        key="correlation",
-        label_en="Correlation & envelope",
-        label_es="Correlación y envolvente",
-        modules=(
-            "phonometry.metrology.correlation",
-            "phonometry.metrology.envelope",
         ),
     ),
 )
@@ -340,8 +329,8 @@ SECTIONS: dict[str, Section] = {s.key: s for s in _SECTION_LIST}
 #: spanning more than one parent are deliberate and documented in the module
 #: docstring above.
 _SECTION_SUBPACKAGES: dict[str, tuple[str, ...]] = {
-    "filters": ("", "metrology"),
-    "levels": ("metrology",),
+    "filters": ("", "filters"),
+    "signal": ("signal",),
     "psychoacoustics": ("psychoacoustics",),
     "speech": ("hearing",),
     "hearing": ("hearing",),
@@ -357,9 +346,7 @@ _SECTION_SUBPACKAGES: dict[str, tuple[str, ...]] = {
     "noise_control": ("noise_control",),
     "broadcast": ("broadcast",),
     "metrology": ("metrology",),
-    "spectra": ("metrology",),
     "simulation": ("simulation",),
-    "correlation": ("metrology",),
 }
 
 #: Public names whose home module cannot be derived from ``__module__``:
@@ -419,7 +406,7 @@ OBJECT_MODULE_OVERRIDES: dict[str, str] = {
 def module_section(module: str) -> Section:
     """Return the section that documents ``module`` (full dotted name).
 
-    :param module: Full module name, e.g. ``"phonometry.metrology.levels"``.
+    :param module: Full module name, e.g. ``"phonometry.signal.levels"``.
     :raises KeyError: If the module is not mapped; new public modules must be
         added to a section in ``scripts/api_taxonomy.py``.
     """
@@ -433,7 +420,7 @@ def module_section(module: str) -> Section:
 
 
 def _parent_subpackage(module: str) -> str:
-    """``phonometry.metrology.levels`` -> ``metrology``; top level -> ``""``."""
+    """``phonometry.signal.levels`` -> ``metrology``; top level -> ``""``."""
     parts = module.split(".")
     return parts[1] if len(parts) > 2 else ""
 

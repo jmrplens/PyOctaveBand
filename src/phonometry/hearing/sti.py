@@ -32,8 +32,8 @@ from scipy import signal
 
 from .._internal.utils import _typesignal
 from .._internal.warnings import PhonometryWarning
-from ..metrology.core import OctaveFilterBank
-from ..metrology.frequencies import nominal_frequencies
+from ..filters.core import OctaveFilterBank
+from ..filters.frequencies import nominal_frequencies
 
 
 class STIWarning(PhonometryWarning):

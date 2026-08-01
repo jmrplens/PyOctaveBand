@@ -1,77 +1,17 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""metrology domain of phonometry (see module docstrings)."""
+"""metrology domain of phonometry (see module docstrings).
+
+Narrowed in 4.0 to the transverse metrology: calibration, GUM uncertainty and
+data qualification. The filter banks and weightings moved to
+:mod:`phonometry.filters` and the general signal analysis to
+:mod:`phonometry.signal`; reading either from here still works until 5.0.
+"""
 
 from __future__ import annotations
 
+from .._compat import _namespace_shim
 from .calibration import CalibrationWarning, calculate_sensitivity, sensitivity
-from .cepstrum import (
-    CepstrumResult,
-    EchoDetectionResult,
-    LifterResult,
-    cepstrum,
-    echo_detection,
-    lifter,
-)
-from .compliance import (
-    FilterComplianceResult,
-    class_limits,
-    filter_class_compliance,
-    verify_aircraft_noise_system,
-    verify_filter_class,
-    verify_weighting_class,
-    weighting_class_limits,
-)
-from .core import FilterBankWarning, OctaveFilterBank, octave_filter, octavefilter
-from .correlation import (
-    AlignedImpulseResponseResult,
-    CorrelationResult,
-    TimeDelayResult,
-    align_impulse_responses,
-    correlation,
-    correlation_random_error,
-    impulse_response_delay,
-    time_delay,
-)
-from .envelope import (
-    EnvelopeResult,
-    EnvelopeSpectrumResult,
-    envelope,
-    envelope_spectrum,
-)
-from .equalizer import EQResponseResult, EQSection, ParametricEQ, parametric_eq
-from .frequencies import (
-    getansifrequencies,
-    nominal_frequencies,
-    normalized_frequencies,
-    normalizedfreq,
-)
-from .intensity_compliance import (
-    IntensityInstrumentComplianceResult,
-    instrument_class_from_components,
-    intensity_class_compliance,
-    phase_mismatch_from_residual_index,
-    residual_index_from_phase_mismatch,
-    residual_index_limits,
-    verify_intensity_class,
-)
-from .inversion import InverseFilterResult, regularized_inverse_filter
-from .levels import laeq, lc_peak, leq, lex_8h, ln_levels, sel, sound_exposure
-from .miso import MISOCoherenceResult, miso_coherence
-from .parametric_filters import (
-    TimeWeighting,
-    WeightingFilter,
-    linkwitz_riley,
-    time_weighting,
-    weighting_filter,
-)
-from .phase import (
-    PhaseDecompositionResult,
-    excess_phase,
-    group_delay,
-    minimum_phase,
-    phase_decomposition,
-)
-from .random_data import (
+from .data_qualification import (
     LevelCrossingResult,
     PeakStatisticsResult,
     StationarityTestResult,
@@ -81,38 +21,14 @@ from .random_data import (
     stationarity_test,
     trend_test,
 )
-from .signals import (
-    ResampledSignalResult,
-    ToneBurstResult,
-    fractional_delay,
-    noise_signal,
-    resample_signal,
-    tone_burst,
-)
-from .spectra import (
-    CoherentOutputSpectrumResult,
-    CrossSpectralDensityResult,
-    MultitaperSpectralDensityResult,
-    SpectralDensityResult,
-    WindowMetricsResult,
-    coherent_output_spectrum,
-    cross_spectral_density,
-    fractional_octave_smoothing,
-    multitaper_psd,
-    power_spectral_density,
-    resolution_bias_error,
-    window_metrics,
-)
-from .synchronous_average import (
-    SynchronousAverageResult,
-    comb_filter_response,
-    time_synchronous_average,
-)
-from .time_frequency import (
-    SpectrogramResult,
-    ZoomFFTResult,
-    spectrogram,
-    zoom_fft,
+from .intensity_compliance import (
+    IntensityInstrumentComplianceResult,
+    instrument_class_from_components,
+    intensity_class_compliance,
+    phase_mismatch_from_residual_index,
+    residual_index_from_phase_mismatch,
+    residual_index_limits,
+    verify_intensity_class,
 )
 from .uncertainty import (
     MonteCarloResult,
@@ -126,115 +42,35 @@ from .uncertainty import (
     u_shaped,
 )
 
+#: Names that left this namespace in 4.0 keep resolving from here until 5.0.
+__getattr__ = _namespace_shim(__name__, ("phonometry.filters", "phonometry.signal"))
+
 __all__ = [
-    "AlignedImpulseResponseResult",
     "CalibrationWarning",
-    "CepstrumResult",
-    "CoherentOutputSpectrumResult",
-    "CorrelationResult",
-    "CrossSpectralDensityResult",
-    "EQResponseResult",
-    "EQSection",
-    "EchoDetectionResult",
-    "EnvelopeResult",
-    "EnvelopeSpectrumResult",
-    "FilterBankWarning",
-    "FilterComplianceResult",
     "IntensityInstrumentComplianceResult",
-    "InverseFilterResult",
     "LevelCrossingResult",
-    "LifterResult",
-    "MISOCoherenceResult",
     "MonteCarloResult",
-    "MultitaperSpectralDensityResult",
-    "OctaveFilterBank",
-    "ParametricEQ",
     "PeakStatisticsResult",
-    "PhaseDecompositionResult",
     "Quantity",
-    "ResampledSignalResult",
-    "SpectralDensityResult",
-    "SpectrogramResult",
     "StationarityTestResult",
-    "SynchronousAverageResult",
-    "TimeDelayResult",
-    "TimeWeighting",
-    "ToneBurstResult",
     "TrendTestResult",
     "UncertaintyResult",
     "UncertaintyWarning",
-    "WeightingFilter",
-    "WindowMetricsResult",
-    "ZoomFFTResult",
-    "align_impulse_responses",
     "calculate_sensitivity",
-    "cepstrum",
-    "class_limits",
-    "coherent_output_spectrum",
-    "comb_filter_response",
     "combine_uncertainty",
-    "correlation",
-    "correlation_random_error",
-    "cross_spectral_density",
-    "echo_detection",
-    "envelope",
-    "envelope_spectrum",
-    "excess_phase",
-    "filter_class_compliance",
-    "fractional_delay",
-    "fractional_octave_smoothing",
-    "getansifrequencies",
-    "group_delay",
-    "impulse_response_delay",
     "instrument_class_from_components",
     "intensity_class_compliance",
-    "laeq",
-    "lc_peak",
-    "leq",
     "level_crossing_rate",
-    "lex_8h",
-    "lifter",
-    "linkwitz_riley",
-    "ln_levels",
-    "minimum_phase",
-    "miso_coherence",
     "monte_carlo",
-    "multitaper_psd",
-    "noise_signal",
-    "nominal_frequencies",
-    "normalized_frequencies",
-    "normalizedfreq",
-    "octave_filter",
-    "octavefilter",
-    "parametric_eq",
     "peak_statistics",
-    "phase_decomposition",
     "phase_mismatch_from_residual_index",
-    "power_spectral_density",
     "rectangular",
-    "regularized_inverse_filter",
-    "resample_signal",
     "residual_index_from_phase_mismatch",
     "residual_index_limits",
-    "resolution_bias_error",
-    "sel",
     "sensitivity",
-    "sound_exposure",
-    "spectrogram",
     "stationarity_test",
-    "time_delay",
-    "time_synchronous_average",
-    "time_weighting",
-    "tone_burst",
     "trend_test",
     "triangular",
     "u_shaped",
-    "verify_aircraft_noise_system",
-    "verify_filter_class",
     "verify_intensity_class",
-    "verify_weighting_class",
-    "weighting_class_limits",
-    "weighting_filter",
-    "window_metrics",
-    "zoom_fft",
 ]

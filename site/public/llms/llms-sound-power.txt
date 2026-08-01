@@ -1853,6 +1853,11 @@ EN/IEC text (see the [errata registry](https://jmrplens.github.io/phonometry/ref
 `instrument_class_from_components(probe_class, processor_class)` returns 1
 only when both are class 1, and 2 for every other pairing.
 
+The example fiche, regenerated with `make reports`, is kept rendered in the
+repository. Click the preview to open the PDF:
+
+[![One-page instrument-class-verification fiche: a metadata header, a per-band table listing the class 1 and class 2 minima, the measured residual index, the margin and the class achieved in each one-third-octave band from 50 Hz to 6.3 kHz, the measured index drawn as a step curve over the two Table 2 masks with the 100 Hz band ringed below the class 1 minimum, the boxed Class 2 - COMPLIES (binding margin +4.20 dB) result, the microphone separation and equivalent phase mismatch, and a FAIL verdict against the required class 1](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/reports/iec61043_intensity_example.webp)](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/reports/iec61043_intensity_example.pdf)
+
 ### Reading `δpI0` as a phase error
 
 The requirement is really a phase-matching requirement in disguise. In an

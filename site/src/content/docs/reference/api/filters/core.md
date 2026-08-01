@@ -1,5 +1,5 @@
 ---
-title: "metrology.core"
+title: "filters.core"
 description: "Core processing logic and FilterBank class for phonometry."
 sidebar:
   label: "core"
