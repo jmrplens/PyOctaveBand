@@ -51,7 +51,7 @@ objetivo de 1).
 Dos sonidos pueden ser igual de sonoros y aun así uno se percibe más
 "afilado" (siseante, metálico) porque su sonoridad se sitúa más arriba en la
 escala Bark. La agudeza es el primer momento del patrón de sonoridad
-específica ponderado por g(z):
+específica ponderado por $g(z)$:
 
 $$
 S = k\ \frac{\int_0^{24} N'(z)\ g(z)\ z\ dz}{\int_0^{24} N'(z)\ dz}\ \text{acum}
@@ -119,9 +119,10 @@ Una componente tonal (un silbido, el tono de paso de pala de un ventilador)
 destaca incluso a bajo nivel. ECMA-418-2 la cuantifica a partir de la **función
 de autocorrelación** (ACF) de la señal rectificada de cada banda: una componente
 periódica (tonal) mantiene una ACF alta a retardo no nulo, y la relación entre
-sonoridad tonal y de ruido impulsa la tonalidad específica T′(z). El valor único
-T se da en **tu_HMS**, calibrado de modo que un tono de 1 kHz/40 dB sea
-≈ 1 tu_HMS; el resultado también sigue la frecuencia tonal f_ton por banda.
+sonoridad tonal y de ruido impulsa la tonalidad específica $T'(z)$. El valor
+único $T$ se da en **tu_HMS**, calibrado de modo que un tono de 1 kHz/40 dB
+sea $\approx 1$ tu_HMS; el resultado también sigue la frecuencia tonal
+$f_\text{ton}$ por banda.
 
 ```python
 import numpy as np
@@ -179,7 +180,7 @@ Esa concentración es lo que distingue un sonido tonal de uno de banda ancha
 con la misma sonoridad: la etapa de autocorrelación encuentra una componente
 periódica en una banda y casi nada en las demás. Un ventilador con tono de paso
 de pala y su serie armónica muestra varios picos así; un siseo muestra un
-patrón plano y bajo. Llamar a `.plot()` sin ejes añade el panel de `T(l)`
+patrón plano y bajo. Llamar a `.plot()` sin ejes añade el panel de $T(l)$
 dependiente del tiempo, que es donde aparece un tono intermitente.
 
 ### Parámetros de `tonality_ecma()`
@@ -189,12 +190,13 @@ dependiente del tiempo, que es donde aparece un tono intermitente.
 | `signal_in` | array 1D | Pa | no vacío | Señal de presión calibrada |
 | `fs` | float | Hz | > 0 | Se remuestrea a 48 kHz internamente si es necesario |
 | `field` | str | — | `'free'` (por defecto) / `'diffuse'` | Filtro del oído externo/medio |
-| `f_low` | float, opcional | Hz | por defecto `None` | Borde inferior de una banda de usuario para la búsqueda de T(l) |
+| `f_low` | float, opcional | Hz | por defecto `None` | Borde inferior de una banda de usuario para la búsqueda de $T(l)$ |
 | `f_high` | float, opcional | Hz | por defecto `None` | Borde superior de la banda de usuario |
 
-Devuelve un `EcmaTonality`: `tonality` (T, tu_HMS), `specific_tonality`
-(T′(z), 53 bandas), `bark`, `centre_frequencies`, `tonal_frequencies`
-(f_ton,z), `time`, `tonality_vs_time` (T(l)), `tonal_frequency_vs_time`,
+Devuelve un `EcmaTonality`: `tonality` ($T$, tu_HMS), `specific_tonality`
+($T'(z)$, 53 bandas), `bark`, `centre_frequencies`, `tonal_frequencies`
+($f_{\text{ton},z}$), `time`, `tonality_vs_time` ($T(l)$),
+`tonal_frequency_vs_time`,
 `field`.
 
 ## Aspereza (ECMA-418-2): capacidad nueva
@@ -204,10 +206,10 @@ rápida (aproximadamente 20–300 Hz, con máximo cerca de 70 Hz): la cualidad d
 un ralentí diésel o de un altavoz distorsionado. Es una **métrica nueva** en
 phonometry. ECMA-418-2 extrae la envolvente de cada banda, pondera su espectro
 de modulación por la tasa y la profundidad de modulación, y correlaciona la
-modulación entre bandas; el resultado R se da en **asper**. El sonido de
+modulación entre bandas; el resultado $R$ se da en **asper**. El sonido de
 referencia (portador de 1 kHz, modulado en amplitud al 100 % a 70 Hz, nivel
 global de 60 dB SPL) se define como 1 asper; esta implementación de sala
-limpia devuelve 0,9999 asper con la constante de calibración tabulada c_R
+limpia devuelve 0,9999 asper con la constante de calibración tabulada $c_R$
 (Fórmula 104) usada **sin** reajustarla hacia atrás al objetivo.
 
 ```python
@@ -276,10 +278,10 @@ plt.show()
 | `fs` | float | Hz | > 0 | Se remuestrea a 48 kHz internamente si es necesario |
 | `field` | str | — | `'free'` (por defecto) / `'diffuse'` | Filtro del oído externo/medio |
 
-Devuelve un `EcmaRoughness`: `roughness` (R, asper, el percentil 90 de
-R(l50)), `specific_roughness` (R′(z), 53 bandas), `bark`, `centre_frequencies`,
-`time`, `roughness_vs_time` (R(l50)), `specific_roughness_vs_time`
-(array de (n_times, 53)), `field`.
+Devuelve un `EcmaRoughness`: `roughness` ($R$, asper, el percentil 90 de
+$R(l_{50})$), `specific_roughness` ($R'(z)$, 53 bandas), `bark`,
+`centre_frequencies`, `time`, `roughness_vs_time` ($R(l_{50})$),
+`specific_roughness_vs_time` (array de (n_times, 53)), `field`.
 
 ## Intensidad de fluctuación (ECMA-418-2): nueva capacidad
 
@@ -299,8 +301,8 @@ escala con una sonoridad específica basada en el HSA. El sonido de
 referencia (portadora de 1 kHz, modulada en amplitud al 100 % a 4 Hz, nivel
 global de 60 dB SPL) se define como 1 vacil_HMS; esta implementación de
 sala limpia converge a 0,9958 vacil_HMS a los 12 s con la constante de
-calibración tabulada c_F (fórmula 163) usada **sin** reajustarla al objetivo
-(el ejemplo de 8 s de abajo imprime 0,9957). Una señal cuyo valor único F
+calibración tabulada $c_F$ (fórmula 163) usada **sin** reajustarla al objetivo
+(el ejemplo de 8 s de abajo imprime 0,9957). Una señal cuyo valor único $F$
 supera 0,2 vacil_HMS tiene una intensidad de fluctuación *prominente*
 (cláusula 9.2).
 
@@ -366,11 +368,11 @@ plt.show()
 | `fs` | float | Hz | > 0 | Se remuestrea a 48 kHz internamente si es necesario |
 | `field` | str | — | `'free'` (por defecto) / `'diffuse'` | Filtro del oído externo/medio |
 
-Devuelve un `EcmaFluctuationStrength`: `fluctuation_strength` (F, vacil_HMS, el
-percentil 90 de F(l50)), `specific_fluctuation_strength` (F′(z), 53 bandas),
-`bark`, `centre_frequencies`, `time`, `fluctuation_strength_vs_time`
-(F(l50)), `specific_fluctuation_strength_vs_time` (array de (n_times, 53)),
-`field`.
+Devuelve un `EcmaFluctuationStrength`: `fluctuation_strength` ($F$, vacil_HMS,
+el percentil 90 de $F(l_{50})$), `specific_fluctuation_strength`
+($F'(z)$, 53 bandas), `bark`, `centre_frequencies`, `time`,
+`fluctuation_strength_vs_time` ($F(l_{50})$),
+`specific_fluctuation_strength_vs_time` (array de (n_times, 53)), `field`.
 
 Los modelos de intensidad de fluctuación de Fastl y Zwicker (forma cerrada
 para ruido de banda ancha AM y el modelo de señal de Osses 2016) están en

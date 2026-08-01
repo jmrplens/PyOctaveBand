@@ -70,7 +70,7 @@ ligeramente la potencia radiada a un recinto receptor real, un **índice
 modificado** $R_{I,M} = R_I + K_c$ reproduce el resultado por presión de la
 ISO 10140-2; el término de adaptación $K_c$ (Anexo B) es
 $10 \log_{10}(1 + S_{b2}\lambda/8V_2)$ para una sala bien definida, o el
-independiente de la sala $10 \log_{10}(1 + 61,4/f)$. Para elementos pequeños, la
+independiente de la sala $10 \log_{10}(1 + 61{,}4/f)$. Para elementos pequeños, la
 **diferencia de niveles normalizada por elemento** sustituye $10\lg(S_m/S)$ por
 $10\lg(S_m/A_0) + 10\lg N$ ($A_0 = 10\ \text{m}^2$, $N$ unidades de elemento).
 
@@ -149,11 +149,11 @@ plt.show()
 | :--- | :--- | :--- | :--- | :--- |
 | `lp1` | array 1D o 2D | dB | uno/banda, o `(posiciones, bandas)` | Nivel de presión del recinto emisor |
 | `l_in` | array 1D o 2D | dB | uno/banda, o `(posiciones, bandas)` | Nivel de intensidad normal sobre la superficie |
-| `measurement_area` | float | m² | > 0 | Área de la superficie de medición `Sm` |
-| `area` | float | m² | > 0 | Área del espécimen `S` |
+| `measurement_area` | float | m² | > 0 | Área de la superficie de medición $S_m$ |
+| `area` | float | m² | > 0 | Área del espécimen $S$ |
 | `kc` | array 1D | dB | uno por banda / `None` | Término de adaptación para el índice modificado |
 | `freq` | array 1D | Hz | > 0 | Frecuencias centrales (`adaptation_term_kc`) |
-| `boundary_area` / `volume` | float | m² / m³ | > 0, ambos o ninguno | Sala `Sb2` / `V2` para la Fórmula (B.1) |
+| `boundary_area` / `volume` | float | m² / m³ | > 0, ambos o ninguno | Sala $S_{b2}$ / $V_2$ para la Fórmula (B.1) |
 
 `intensity_sound_reduction()` devuelve un `IntensityReductionResult` (`r_i`,
 `r_i_modified`, `rating`, `rating_modified`);
@@ -355,11 +355,11 @@ campo, pero nada comprueba cómo se adquirieron.
 ## Véase también
 
 - [Medición del aislamiento en laboratorio](/phonometry/es/guides/insulation-lab/):
-  el método por presión de ISO 10140 que la adaptación Kc reproduce.
+  el método por presión de ISO 10140 que la adaptación $K_c$ reproduce.
 - [Medición del aislamiento en campo (ISO 16283)](/phonometry/es/guides/insulation-field/):
   las magnitudes de campo por presión y sus índices globales.
 - [Índices globales de aislamiento (ISO 717)](/phonometry/es/guides/insulation-ratings/):
-  el motor de curva de referencia tras RI,w y DI,n,e,w.
+  el motor de curva de referencia tras $R_{I,w}$ y $D_{I,n,e,w}$.
 - [Intensidad acústica](/phonometry/es/guides/intensity/): la sonda de dos
   micrófonos, sus indicadores de campo y la cualificación por índice
   residual tras cada barrido.

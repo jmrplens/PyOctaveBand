@@ -182,7 +182,7 @@ retícula de salas espejo, coloreadas por orden de reflexión.
 
 *La retícula de la que sale el reflectograma, a escala: cada imagen vive en
 una sala espejo en el plano de altura de la fuente, y solo su distancia al
-receptor fija el tiempo de llegada y la divergencia `1/(4πr)` de esa
+receptor fija el tiempo de llegada y la divergencia $1/(4\pi r)$ de esa
 reflexión.*
 
 <details>
@@ -348,7 +348,7 @@ módulo usa $R$ de modo que $r_c$ es exactamente el cruce de su propio
 $10\lg(\rho c / 400)$ de Bies (unos +0,14 dB a 20 °C).
 
 **Dónde se difumina la estadística.** La **frecuencia de Schroeder**
-$f_s = 2000\sqrt{T/V}$ (V en m³, T en s) marca aproximadamente la transición
+$f_s = 2000\sqrt{T/V}$ ($V$ en m³, $T$ en s) marca aproximadamente la transición
 modal-a-difuso, un cruce heurístico y no un corte abrupto: bastante por debajo
 dominan los modos discretos y los supuestos difusos de $R$ y $r_c$ pierden
 fiabilidad, bastante por encima los modos se solapan y esta imagen estadística
@@ -444,8 +444,8 @@ print(round(float(room.room_modal_density(1000.0, room_dims, speed_of_sound=344.
 
 *La sala de 7 x 5 x 3 m de la tabla 8.1 de Long hasta 200 Hz. Por debajo de
 unos 60 Hz los modos axiales están aislados y cada uno es audible por separado;
-hacia la frecuencia de Schroeder de 175 Hz (T = 0,8 s) la familia oblicua ya ha
-rellenado el espectro y la densidad modal ha superado un modo por hercio, que
+hacia la frecuencia de Schroeder de 175 Hz ($T = 0{,}8$ s) la familia oblicua ya
+ha rellenado el espectro y la densidad modal ha superado un modo por hercio, que
 es donde toma el relevo el campo estadístico del apartado 2.*
 
 ### Parámetros de `room_modes()`

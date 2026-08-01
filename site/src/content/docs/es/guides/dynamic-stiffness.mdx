@@ -24,9 +24,9 @@ import ReportPreview from '../../../../components/ReportPreview.astro';
 Un **suelo flotante** es una losa pesada que descansa sobre una capa resiliente;
 ambos forman un sistema masa-resorte cuya **frecuencia natural** determina cuánto
 mejora el suelo el aislamiento a impacto y aéreo. **EN 29052-1:1992** (idéntica a
-ISO 9052-1:1989) mide la **rigidez dinámica por unidad de área** `s'` de la capa
+ISO 9052-1:1989) mide la **rigidez dinámica por unidad de área** $s'$ de la capa
 resiliente a partir de la resonancia de una placa de carga normalizada sobre una
-probeta de 200 mm × 200 mm. `s'` es la entrada al término de suelo flotante del
+probeta de 200 mm × 200 mm. $s'$ es la entrada al término de suelo flotante del
 modelo de impacto de EN 12354-2 tratado en
 [Predicción del aislamiento acústico (EN 12354)](/phonometry/es/guides/insulation-prediction/). (La
 ISO 16251-1 no aplica aquí: su alcance se limita a revestimientos blandos de
@@ -65,7 +65,7 @@ plt.legend(); plt.show()
 ## 1. Rigidez dinámica y resonancia
 
 La rigidez dinámica por unidad de área es una fuerza dinámica por área dividida
-entre el cambio de espesor resultante (Fórmula 1): `s' = (F/S)/Δd`. El suelo
+entre el cambio de espesor resultante (Fórmula 1): $s' = (F/S)/\Delta d$. El suelo
 soportado resilientemente es un resonador cuya frecuencia natural (Fórmula 2) y,
 en la disposición de laboratorio, la frecuencia de resonancia medida (Fórmula 3)
 son
@@ -131,10 +131,11 @@ plt.show()
 ## 2. El término del gas encerrado y la resistividad al flujo
 
 En un material permeable al aire, el aire de los poros añade una rigidez en
-paralelo por su compresión isoterma (Fórmula 7): `s'a = p₀/(d·ε)`, con `p₀` la
-presión atmosférica, `d` el espesor bajo carga y `ε` la porosidad. La NOTA
-resuelta de la norma (`p₀ = 0,1 MPa`, `ε = 0,9`) es `s'a = 111/d` MN/m³ con `d`
-en milímetros:
+paralelo por su compresión isoterma (Fórmula 7):
+$s'_a = p_0/(d\,\varepsilon)$, con $p_0$ la presión atmosférica, $d$ el
+espesor bajo carga y $\varepsilon$ la porosidad. La NOTA resuelta de la
+norma ($p_0 = 0{,}1\ \text{MPa}$, $\varepsilon = 0{,}9$) es
+$s'_a = 111/d$ MN/m³ con $d$ en milímetros:
 
 ```python
 from phonometry import materials
@@ -144,9 +145,11 @@ print(round(materials.enclosed_gas_stiffness(thickness=0.020, porosity=0.9) / 1e
 ```
 
 La rigidez dinámica del material *instalado* la fija entonces la resistividad
-lateral al flujo `r` (cláusula 8.2): `s' = s't` para `r ≥ 100 kPa·s/m²`,
-`s' = s't + s'a` para `10 ≤ r < 100 kPa·s/m²`, y para `r < 10 kPa·s/m²` el método
-solo resuelve `s' = s't` cuando el término del gas es despreciable.
+lateral al flujo $r$ (cláusula 8.2): $s' = s'_t$ para
+$r \ge 100\ \text{kPa}\cdot\text{s/m}^2$, $s' = s'_t + s'_a$ para
+$10 \le r < 100\ \text{kPa}\cdot\text{s/m}^2$, y para
+$r < 10\ \text{kPa}\cdot\text{s/m}^2$ el método solo resuelve $s' = s'_t$
+cuando el término del gas es despreciable.
 `floating_floor_resonance` encadena toda la determinación:
 
 ```python
@@ -165,7 +168,7 @@ res.plot()   # la curva de diseño f0(s') con esta determinación marcada (requi
 
 El `DynamicStiffnessResult` contiene las rigideces aparente, del gas encerrado e
 instalada, la resonancia del ensayo y la frecuencia natural del suelo instalado,
-y su `.plot()` dibuja la curva de diseño `f₀(s')`.
+y su `.plot()` dibuja la curva de diseño $f_0(s')$.
 
 ### Ficha de informe de ensayo
 
@@ -219,12 +222,12 @@ resonancia interna quede bastante por encima de $f_r$; una capa pesada o muy
 gruesa empieza a comportarse como un sistema distribuido y la lectura simple
 de la Fórmula 4 se degrada. De la precarga se derivan tres trampas prácticas:
 
-* **`s'` es una rigidez *a la precarga normalizada*.** Las capas resilientes
+* **$s'$ es una rigidez *a la precarga normalizada*.** Las capas resilientes
   son visiblemente no lineales con la carga estática: la lana mineral se
   rigidiza al comprimirse, algunas espumas se ablandan. La placa de carga de
-  200 kg/m² fija el punto de trabajo, así que la `s'` tabulada describe en
+  200 kg/m² fija el punto de trabajo, así que la $s'$ tabulada describe en
   rigor suelos próximos a esa masa superficial. Diseñar un recrecido mucho
-  más pesado con la misma `s'` extrapola más allá de la medición.
+  más pesado con la misma $s'$ extrapola más allá de la medición.
 * **Excitar poco.** La rigidez tangente se define para deformaciones
   dinámicas pequeñas; excitar fuerte la placa lleva la capa a su rango no
   lineal y desplaza la resonancia aparente hacia abajo. Mantén la excitación
@@ -236,7 +239,7 @@ de la Fórmula 4 se degrada. De la precarga se derivan tres trampas prácticas:
 
 La frecuencia natural que importa al final no es la $f_r$ del banco sino la
 $f_0$ del suelo instalado según la Fórmula 2: el suelo flotante solo mejora
-el aislamiento bastante por encima de $f_0$, y por eso una `s'` baja (una
+el aislamiento bastante por encima de $f_0$, y por eso una $s'$ baja (una
 capa blanda bajo una losa pesada) es el objetivo de diseño.
 
 ## Qué cubre esta guía
@@ -252,10 +255,10 @@ resistividad al flujo de la cláusula 8.2, Fórmulas 5-6
 de informe de ensayo de la cláusula 9.
 
 **No cubierto.** El procedimiento de medición de la cláusula 7, que extrae
-la frecuencia de resonancia `fr` de la señal bruta de excitación-respuesta
+la frecuencia de resonancia $f_r$ de la señal bruta de excitación-respuesta
 por métodos sinusoidal, de ruido blanco o de impulso y la extrapola a
-amplitud de fuerza nula, no está implementado: pasa una `fr` ya extrapolada.
-La resistividad al flujo lateral `r` de la cláusula 8.2 también se toma como
+amplitud de fuerza nula, no está implementado: pasa una $f_r$ ya extrapolada.
+La resistividad al flujo lateral $r$ de la cláusula 8.2 también se toma como
 entrada en lugar de medirse; los métodos estático y alterno de la ISO 9053
 están implementados aparte, en `materials.airflow_resistance`. El requisito
 de selección de probetas de la cláusula 6 (al menos tres probetas de

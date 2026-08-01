@@ -68,8 +68,8 @@ print(result["bands"][0])
 
 The Table 1 acceptance mask itself is public too: `class_limits(fraction,
 filter_class, omega)` returns the minimum/maximum relative-attenuation
-limits at normalized frequencies Ω = f/fm, the same limits the verifier
-and the figure below use.
+limits at normalized frequencies $\Omega = f/f_m$, the same limits the
+verifier and the figure below use.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/class_mask_overlay.svg" alt="Butterworth band response threading between the forbidden regions of the IEC 61260-1 class 1 acceptance mask" width="80%" />
 
@@ -116,8 +116,9 @@ plt.show()
 With default parameters (order 6), **Butterworth meets class 1**, and so does
 **Chebyshev II**: its `attenuation` default is now `72` dB, clearing the 70 dB
 far-stopband class 1 limit (scipy pins the cheby2 equiripple floor at exactly
-`attenuation`, so any value ≥ 70 dB qualifies; the 72 dB default keeps the same
-+0.400 dB passband margin as Butterworth). Chebyshev I, Elliptic and Bessel do
+`attenuation`, so any value $\ge 70\ \text{dB}$ qualifies; the 72 dB default
+keeps the same +0.400 dB passband margin as Butterworth). Chebyshev I,
+Elliptic and Bessel do
 not meet class limits at order 6: passband ripple (cheby1/ellip) and slow
 roll-off (bessel) violate the mask.
 

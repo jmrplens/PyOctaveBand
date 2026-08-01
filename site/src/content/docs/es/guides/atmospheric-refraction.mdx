@@ -35,7 +35,7 @@ un **modelo de rayos** y un solver de **ecuación parabólica (PE)**.
 
 Que la refracción importe es, sobre todo, cuestión de distancia. Un gradiente
 representativo de la capa superficial de ±0,1 s⁻¹ curva los rayos con un radio
-$R_c = c_0/|g| \approx 3,4$ km, de modo que en los primeros cien metros los
+$R_c = c_0/|g| \approx 3{,}4$ km, de modo que en los primeros cien metros los
 caminos son razonablemente rectos y los modelos homogéneos anteriores son
 precisos. Más allá de unos cientos de metros manda la geometría: a favor del
 viento, o bajo una inversión térmica nocturna, los rayos curvados hacia abajo
@@ -61,17 +61,20 @@ dos oye algo.
 ## 1. Perfil de velocidad efectiva del sonido
 
 Una atmósfera en movimiento (con viento) se aproxima bien por una en reposo con
-la **velocidad efectiva del sonido** `c_eff(z) = c(z) + u(z)`, la velocidad
+la **velocidad efectiva del sonido** $c_\text{eff}(z) = c(z) + u(z)$, la
+velocidad
 adiabática más la componente del viento en la dirección de propagación
 (Salomons Ec. 4.4). Dos formas de perfil cubren la mayoría de los casos de la
 capa superficial:
 
-- un perfil **lineal** `c_eff(z) = c0 + g·z` (`linear_sound_speed_profile`), la
-  atmósfera refractante más sencilla y la de geometría de rayos exacta;
+- un perfil **lineal** $c_\text{eff}(z) = c_0 + g\,z$
+  (`linear_sound_speed_profile`), la atmósfera refractante más sencilla y la
+  de geometría de rayos exacta;
 - el perfil **logarítmico** realista de la capa superficial
-  `c_eff(z) = c0 + b·ln(1 + z/z0)` (`log_linear_sound_speed_profile`, Salomons
-  Ec. 4.5), con `b ≈ +1 m/s` para una atmósfera típica con refracción hacia
-  abajo, `b ≈ -1 m/s` para una con refracción hacia arriba, y `z0` la longitud
+  $c_\text{eff}(z) = c_0 + b\ln(1 + z/z_0)$ (`log_linear_sound_speed_profile`,
+  Salomons Ec. 4.5), con $b \approx +1\ \text{m/s}$ para una atmósfera típica
+  con refracción hacia abajo, $b \approx -1\ \text{m/s}$ para una con
+  refracción hacia arriba, y $z_0$ la longitud
   de rugosidad (unos 0,1 m para pasto).
 
 Un gradiente positivo (velocidad del sonido creciente con la altura) curva los
@@ -109,7 +112,7 @@ plt.show()
 ## 2. Modelo de rayos
 
 En acústica geométrica un rayo sonoro cumple la ley de Snell
-`cos(γ(z))/c(z) = const` (Salomons Ec. 4.3). `atmospheric_ray_paths` la integra
+$\cos(\gamma(z))/c(z) = \text{const}$ (Salomons Ec. 4.3). `atmospheric_ray_paths` la integra
 con un esquema Runge-Kutta de cuarto orden, marchando en distancia y reflejando
 especularmente en el suelo, y devuelve los caminos curvos, los puntos de
 inflexión, los tiempos de propagación y el número de reflexiones en el suelo.
@@ -128,7 +131,7 @@ rayos.plot()              # el abanico de rayos curvados (necesita matplotlib)
 
 La figura de cabecera de la página muestra este abanico con refracción hacia
 arriba abriendo su sombra. El caso favorable es su imagen especular: con
-refracción **hacia abajo** (`b = +1`) los rayos rasantes se curvan de vuelta
+refracción **hacia abajo** ($b = +1$) los rayos rasantes se curvan de vuelta
 al suelo, rebotan y transportan la energía a lo largo de la superficie en vez
 de perderla hacia arriba.
 
@@ -162,9 +165,10 @@ $$
 R_c = \frac{c_0}{|g|\cos\theta_0},
 $$
 
-expuesto como `ray_curvature_radius`. Un rayo lanzado con ángulo `θ0` en
+expuesto como `ray_curvature_radius`. Un rayo lanzado con ángulo $\theta_0$ en
 refracción hacia abajo alcanza su punto de inflexión a la altura
-`Rc(1 - cos θ0)`. Para un perfil lineal con **refracción hacia arriba** el rayo
+$R_c(1 - \cos\theta_0)$. Para un perfil lineal con **refracción hacia arriba**
+el rayo
 que roza el suelo delimita una región más allá de la cual no llega ningún rayo
 directo ni reflejado una vez, a la **distancia de zona de sombra** en forma
 cerrada (`shadow_zone_distance`):
@@ -175,7 +179,7 @@ x_\text{sombra} = \sqrt{2 R_c}\left(\sqrt{h_s} + \sqrt{h_r}\right),
 $$
 
 Estas formas cerradas son el oráculo exacto del trazador de rayos: un ajuste de
-círculo a un rayo trazado recupera `Rc` con precisión de máquina.
+círculo a un rayo trazado recupera $R_c$ con precisión de máquina.
 
 ## 3. Ecuación parabólica (PE de la función de Green)
 
@@ -189,13 +193,14 @@ split-step de Fourier que la
 [`parabolic_equation`](/phonometry/es/guides/underwater-solvers/) oceánica.
 Cada paso en distancia transforma el campo al dominio del número de onda
 vertical, aplica el propagador de espacio libre junto con la reflexión del suelo
-de impedancia finita `R(kz) = (kz Z − k0)/(kz Z + k0)` (Salomons Ec. H.28),
-transforma de vuelta, añade el residuo de onda de superficie del polo de la
-reflexión (el tercer término de la Ec. H.49) y aplica la pantalla de fase de
-refracción `exp(i Δr (k(z) − ka))` (Ec. H.58). La fuente es un **arranque gaussiano** con
-su imagen en el suelo (Ecs. G.64, G.76) y una **capa absorbente** en la parte
-superior de la malla suprime las reflexiones del contorno superior. El resultado
-es el **nivel sonoro relativo** `ΔL(z, r) = 20 lg(|p| R1)` (dB respecto al campo
+de impedancia finita $R(k_z) = (k_z Z - k_0)/(k_z Z + k_0)$ (Salomons
+Ec. H.28), transforma de vuelta, añade el residuo de onda de superficie del
+polo de la reflexión (el tercer término de la Ec. H.49) y aplica la pantalla
+de fase de refracción $\exp(i\,\Delta r\,(k(z) - k_a))$ (Ec. H.58). La fuente
+es un **arranque gaussiano** con su imagen en el suelo (Ecs. G.64, G.76) y una
+**capa absorbente** en la parte superior de la malla suprime las reflexiones
+del contorno superior. El resultado es el **nivel sonoro relativo**
+$\Delta L(z, r) = 20\lg(|p| R_1)$ (dB respecto al campo
 libre) en todo el plano distancia-altura.
 
 ```python
@@ -258,12 +263,13 @@ plt.show()
 </details>
 
 La impedancia del suelo se proporciona directamente (`impedance=`, un valor
-complejo normalizado en el convenio `e^{-iωt}` de Salomons, con `Im(Z) > 0`
-para un suelo pasivo), como un `PorousMediumResult`, o a partir de una
+complejo normalizado en el convenio $e^{-i\omega t}$ de Salomons, con
+$\operatorname{Im}(Z) > 0$ para un suelo pasivo), como un
+`PorousMediumResult`, o a partir de una
 `flow_resistivity` efectiva mediante los
 [modelos porosos](/phonometry/es/guides/porous-absorbers/) del dominio de
-materiales; los modelos porosos trabajan en el convenio opuesto `e^{+jωt}`, así
-que su impedancia se conjuga internamente.
+materiales; los modelos porosos trabajan en el convenio opuesto
+$e^{+j\omega t}$, así que su impedancia se conjuga internamente.
 
 <details>
 <summary>Ver el código de esta figura</summary>
@@ -319,7 +325,7 @@ plt.show()
 El clip de abajo ejecuta la física ondulatoria completa con los dos signos
 del perfil logarítmico: una fuente estacionaria de 50 Hz a 2 m sobre suelo
 rígido en un corte FDTD 2D, con los abanicos de rayos de la biblioteca
-trazados en los mismos perfiles c(z) superpuestos a los campos. A favor del
+trazados en los mismos perfiles $c(z)$ superpuestos a los campos. A favor del
 viento los frentes se curvan de vuelta y avanzan pegados al suelo hasta el
 receptor a 350 m; en contra se despegan de la superficie y el suelo queda en
 silencio más allá de la frontera de sombra del modelo de rayos.
@@ -371,4 +377,4 @@ horizontalmente no homogénea (un gradiente que cambia a lo largo de la
 trayectoria) queda fuera de esta formulación independiente de la distancia,
 descrita en el módulo como la contrapartida de los "solvers oceánicos
 independientes del alcance" a los que refleja. Ambos asumen además un suelo
-plano en `z = 0`; ninguno admite un perfil de elevación del terreno.
+plano en $z = 0$; ninguno admite un perfil de elevación del terreno.

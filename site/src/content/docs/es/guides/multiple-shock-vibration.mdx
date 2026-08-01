@@ -50,19 +50,20 @@ libre), se aplican la cláusula 5 y el Anexo C.
 
 ## 1. Respuesta espinal (cláusula 5.2)
 
-Una función de transferencia asiento-columna `H(f)` (un cero complejo y seis
+Una función de transferencia asiento-columna $H(f)$ (un cero complejo y seis
 polos complejos, transmisibilidad unidad a 0 Hz y una resonancia cerca de 5 Hz)
 transforma la aceleración medida del asiento en la respuesta espinal vertical
-`Az(t)` (Fórmula 1/2):
+$A_z(t)$ (Fórmula 1/2):
 
 $$
 A_z(t) = \mathcal{F}^{-1}\!\left[H(f)\,\mathcal{F}[a_z(t)]\right].
 $$
 
 El registro de entrada debe estar **acondicionado (sin componente continua)**:
-como `H` es unidad a 0 Hz por diseño, un offset de continua (por ejemplo, la
+como $H$ es unidad a 0 Hz por diseño, un offset de continua (por ejemplo, la
 componente de gravedad de 1 g de un acelerómetro acoplado en continua) pasa
-directamente a `Az(t)` y corrompe los picos positivos de respuesta de la dosis.
+directamente a $A_z(t)$ y corrompe los picos positivos de respuesta de la
+dosis.
 Reste la media (o aplique un paso alto) antes de procesar.
 
 ```python
@@ -75,16 +76,17 @@ print(round(abs(vibration.seat_to_spine_transfer([5.0])[0]), 2))  # 1.54
 
 ## 2. Dosis de aceleración (cláusula 5.3)
 
-La **dosis de aceleración** combina los picos positivos de la respuesta `Az,i`
-(cada uno el máximo entre dos cruces por cero consecutivos) con una ley de sexta
-potencia, de modo que dominan los choques mayores (Fórmula 3):
+La **dosis de aceleración** combina los picos positivos de la respuesta
+$A_{z,i}$ (cada uno el máximo entre dos cruces por cero consecutivos) con una
+ley de sexta potencia, de modo que dominan los choques mayores (Fórmula 3):
 
 $$
 D_z = 1{,}07\left(\sum_i A_{z,i}^{\,6}\right)^{1/6}.
 $$
 
-Una dosis diaria escala la dosis medida al tiempo de exposición diario `td` sobre
-el tiempo de medida `tm` (Fórmula 4): `Dzd = Dz * (td/tm)**(1/6)`.
+Una dosis diaria escala la dosis medida al tiempo de exposición diario $t_d$
+sobre el tiempo de medida $t_m$ (Fórmula 4):
+$D_{zd} = D_z\,(t_d/t_m)^{1/6}$.
 
 ```python
 from phonometry import vibration
@@ -96,11 +98,11 @@ print(round(vibration.dose_from_peaks([40.0] * 5), 2))  # 55.97  m/s2
 ## 3. Riesgo de lesión (Anexo C)
 
 La dosis diaria se convierte en una **tensión compresiva** diaria
-`Sd = mz * Dzd` (Fórmula C.1), donde `mz` (0,029 MPa por m/s² para un hombre de
-82 kg, 0,025 para una mujer de 64 kg) convierte la aceleración en tensión
-vertebral. La tensión se acumula sobre los años de exposición frente a la
-resistencia última decreciente de la columna que envejece
-`Su = 6,75 - Sage*(b+i)` (Fórmulas C.3/C.4):
+$S_d = m_z\,D_{zd}$ (Fórmula C.1), donde $m_z$ (0,029 MPa por m/s² para un
+hombre de 82 kg, 0,025 para una mujer de 64 kg) convierte la aceleración en
+tensión vertebral. La tensión se acumula sobre los años de exposición frente a
+la resistencia última decreciente de la columna que envejece
+$S_u = 6{,}75 - S_{\mathrm{age}}\,(b+i)$ (Fórmulas C.3/C.4):
 
 $$
 R = \left[\sum_{i=0}^{n-1}
@@ -174,10 +176,10 @@ plt.show()
 
 </details>
 
-El `MultipleShockResult` lleva la dosis `Dz`, la dosis diaria `Dzd`, la tensión
-compresiva `Sd`, la variable de tensión `R`, la probabilidad de lesión y los
-picos de respuesta, y su `.plot()` dibuja la curva de probabilidad de lesión con
-los umbrales de riesgo del 10/50/90 % de la Tabla C.2. El modelo es solo para el
+El `MultipleShockResult` lleva la dosis $D_z$, la dosis diaria $D_{zd}$, la
+tensión compresiva $S_d$, la variable de tensión $R$, la probabilidad de lesión
+y los picos de respuesta, y su `.plot()` dibuja la curva de probabilidad de
+lesión con los umbrales de riesgo del 10/50/90 % de la Tabla C.2. El modelo es solo para el
 eje vertical: la cláusula 4 desprecia por diseño las contribuciones horizontales
 a la compresión espinal, y el modelo espinal horizontal de la edición de 2004,
 retirada, no se restablece, de modo que la exposición horizontal de cuerpo

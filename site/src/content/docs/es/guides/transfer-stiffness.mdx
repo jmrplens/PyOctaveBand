@@ -38,9 +38,9 @@ import ReportPreview from '../../../../components/ReportPreview.astro';
 
 La propiedad de transferencia vibroacústica de un elemento resiliente (un
 aislador de vibraciones, montura, fuelle o manguera) es su **rigidez dinámica de
-transferencia** `k₂₁`, el cociente dependiente de la frecuencia entre la *fuerza
-de bloqueo* en el lado de salida (receptor) y el desplazamiento en el lado de
-entrada (fuente) (ISO 10846-1, 3.7):
+transferencia** $k_{2,1}$, el cociente dependiente de la frecuencia entre la
+*fuerza de bloqueo* en el lado de salida (receptor) y el desplazamiento en el
+lado de entrada (fuente) (ISO 10846-1, 3.7):
 
 $$
 k_{2,1} = \frac{F_{2,b}}{u_1} \quad [\mathrm{N/m}].
@@ -48,9 +48,9 @@ $$
 
 Como un aislador de vibraciones solo es eficaz entre estructuras de gran rigidez
 en el punto de excitación, la fuerza que entrega al receptor aproxima esta fuerza
-de bloqueo (ISO 10846-1, Ec. 7), de modo que `k₂₁` es la magnitud que caracteriza
-la transmisión del aislador. `k₂₁` alimenta las normas de fuente estructural y
-de predicción en edificación: ISO 9611, EN 15657 y EN 12354-5.
+de bloqueo (ISO 10846-1, Ec. 7), de modo que $k_{2,1}$ es la magnitud que
+caracteriza la transmisión del aislador. $k_{2,1}$ alimenta las normas de fuente
+estructural y de predicción en edificación: ISO 9611, EN 15657 y EN 12354-5.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/transfer_stiffness_es.svg" alt="Nivel de rigidez dinámica de transferencia de un aislador Kelvin-Voigt: el nivel real y la estimación por el método indirecto, que diverge en la resonancia masa/resorte y converge por encima de ella" width="82%" loading="eager" />
 
@@ -95,9 +95,9 @@ plt.show()
 ## 1. El nivel de rigidez de transferencia y el factor de pérdidas
 
 Los resultados se expresan como un **nivel** re la rigidez de referencia
-`k₀ = 1 N/m` (ISO 10846-2 y -3, 3.17) y, en el rango de baja frecuencia donde las
-fuerzas de inercia del elemento son despreciables, el **factor de pérdidas** es
-la tangente del ángulo de fase de `k₂₁` (ISO 10846-1, 3.8):
+$k_0 = 1\ \text{N/m}$ (ISO 10846-2 y -3, 3.17) y, en el rango de baja frecuencia
+donde las fuerzas de inercia del elemento son despreciables, el **factor de
+pérdidas** es la tangente del ángulo de fase de $k_{2,1}$ (ISO 10846-1, 3.8):
 
 $$
 L_k = 10\lg\frac{|k_{2,1}|^2}{k_0^2} = 20\lg\frac{|k_{2,1}|}{k_0}, \qquad
@@ -129,17 +129,17 @@ está o bien bloqueada rígidamente o bien cargada con una masa conocida:
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_transfer_stiffness_rig_es.svg" alt="Bancos de rigidez de transferencia ISO 10846: el aislador bajo ensayo entre una masa de excitación y o bien una salida bloqueada con un transductor de fuerza, el método directo, o bien una masa de bloqueo sobre apoyos resilientes, el método indirecto" width="92%" />
 
 El **método directo** (ISO 10846-2) mide la fuerza de salida bloqueada y el
-desplazamiento de entrada, `k₂₁ = F₂,b/u₁`. El **método indirecto** (ISO 10846-3)
-carga la salida con una masa de bloqueo compacta `m₂` y mide la transmisibilidad
-de vibración `T = u₂/u₁`; la fuerza de bloqueo es entonces la fuerza de inercia de
-la masa (ISO 10846-3, Ec. 1):
+desplazamiento de entrada, $k_{2,1} = F_{2,b}/u_1$. El **método indirecto**
+(ISO 10846-3) carga la salida con una masa de bloqueo compacta $m_2$ y mide la
+transmisibilidad de vibración $T = u_2/u_1$; la fuerza de bloqueo es entonces la
+fuerza de inercia de la masa (ISO 10846-3, Ec. 1):
 
 $$
 k_{2,1} = -(2\pi f)^2\,(m_2 + m_f)\,T \qquad (T \ll 1),
 $$
 
-con `m_f` la masa de la brida de salida. La aproximación es válida bastante por
-encima de la resonancia masa/resorte, donde `T` es pequeña.
+con $m_f$ la masa de la brida de salida. La aproximación es válida bastante por
+encima de la resonancia masa/resorte, donde $T$ es pequeña.
 
 ```python
 import numpy as np
@@ -158,7 +158,7 @@ print(round(float(res.level[-1]), 1))      # ~126  dB re 1 N/m (alta f)
 res.plot()   # el espectro de nivel Lk(f), como en la figura de arriba (requiere matplotlib)
 ```
 
-El `TransferStiffnessResult` transporta el `k₂₁` complejo y expone `.level`,
+El `TransferStiffnessResult` transporta el $k_{2,1}$ complejo y expone `.level`,
 `.loss_factor`, `.magnitude`, `.to("impedance"/"apparent_mass")` y `.plot()`.
 
 Los dos métodos se reparten el eje de frecuencia. El método directo funciona
@@ -173,29 +173,30 @@ datos completo de un aislador suele ser el empalme de ambos.
 
 ## 3. Validez del método indirecto
 
-La ISO 10846-3 (apartado 6) exige que la aproximación `T ≪ 1` sea exacta dentro
+La ISO 10846-3 (apartado 6) exige que la aproximación $T \ll 1$ sea exacta dentro
 de **1 dB** (12 % de la magnitud de la rigidez), lo que acota el rango de
 frecuencia utilizable por ambos lados:
 
 * **Desadaptación de impedancias (Desigualdad 2).** Válido solo donde
-  `ΔL₁,₂ = La₁ − La₂ ≥ 20 dB`, es decir, `|T| ≤ 0,1` (la constante
-  `TRANSMISSIBILITY_LIMIT`). `transfer_stiffness_indirect` calcula el `|T|`
+  $\Delta L_{1,2} = L_{a1} - L_{a2} \ge 20\ \text{dB}$, es decir,
+  $|T| \le 0{,}1$ (la constante `TRANSMISSIBILITY_LIMIT`).
+  `transfer_stiffness_indirect` calcula el $|T|$
   por banda y emite un `PhonometryWarning` cuando alguna banda lo supera
   (habitual cerca o por debajo de la resonancia masa/resorte, como en la
   figura anterior).
 * **Masa de bloqueo rígida (Desigualdad 3).** Por encima de una frecuencia
-  superior `f₃` la masa de bloqueo deja de moverse como cuerpo rígido; los
+  superior $f_3$ la masa de bloqueo deja de moverse como cuerpo rígido; los
   resultados solo son válidos mientras su masa efectiva medida
-  `m₂,eff = 2F₂/(a′₁ + a″₁)` (Ec. 4) se mantenga dentro de 1 dB de la masa
-  rígida: `10 lg(m₂,eff²/m₂²) ≤ 1 dB`.
+  $m_{2,\text{eff}} = 2F_2/(a'_1 + a''_1)$ (Ec. 4) se mantenga dentro de 1 dB de
+  la masa rígida: $10\lg(m_{2,\text{eff}}^2/m_2^2) \le 1\ \text{dB}$.
 * **Linealidad (apartado 7.6).** Dos espectros de entrada separados 10 dB
   deben dar niveles de rigidez de transferencia dentro de 1,5 dB.
 
 La propia idealización de la fuerza de bloqueo la cuantifica la ISO 10846-1,
 Ec. (6): para un aislador con rigidez en el punto de excitación de salida
-`k₂,₂` sobre una terminación de rigidez `k_t`, la fuerza entregada es
-`F₂/F₂,b = 1/(1 + k₂,₂/k_t)`, dentro del 10 % de la fuerza de bloqueo para
-`|k₂,₂| < 0,1 |k_t|` (Ec. 7):
+$k_{2,2}$ sobre una terminación de rigidez $k_t$, la fuerza entregada es
+$F_2/F_{2,b} = 1/(1 + k_{2,2}/k_t)$, dentro del 10 % de la fuerza de bloqueo para
+$|k_{2,2}| < 0{,}1\,|k_t|$ (Ec. 7):
 
 ```python
 import warnings
@@ -215,8 +216,9 @@ print(round(abs(complex(vibration.blocking_force_ratio(1e5, 1e6))), 4))   # 0.90
 
 La rigidez dinámica es un miembro de la familia de funciones de respuesta en
 frecuencia (ISO 10846-1, Anexo A / Tabla A.2): es la recíproca de la receptancia
-y se relaciona con la impedancia mecánica `Z` y la masa efectiva `m_eff` por
-`k = jω·Z = −ω²·m_eff`. Estas conversiones son el mismo pivote `convert_frf` de la
+y se relaciona con la impedancia mecánica $Z$ y la masa efectiva $m_\text{eff}$
+por $k = j\omega Z = -\omega^2 m_\text{eff}$. Estas conversiones son el mismo
+pivote `convert_frf` de la
 [movilidad mecánica](/phonometry/es/guides/mechanical-mobility/):
 
 ```python
@@ -273,7 +275,7 @@ res.report(
 
 ## Qué cubre esta guía
 
-**Cubierto.** La definición `k₂₁ = F₂,b/u₁` de la ISO 10846-1:2008, el nivel
+**Cubierto.** La definición $k_{2,1} = F_{2,b}/u_1$ de la ISO 10846-1:2008, el nivel
 (ISO 10846-2 y -3, 3.17) y el factor de pérdidas (ISO 10846-1, 3.8)
 (`transfer_stiffness_level`, `loss_factor`), el método directo de la
 ISO 10846-2:2008 (`transfer_stiffness_direct`) y el método indirecto de la
@@ -287,7 +289,7 @@ determinación en barrido, y `.report()` genera la ficha de caracterización.
 elementos distintos de los soportes resilientes y el método de punto de
 excitación en baja frecuencia, no están implementadas.
 `transfer_stiffness_indirect` solo comprueba la Desigualdad 2 (el límite de
-transmisibilidad `|T| ≤ 0,1`): la Desigualdad 3, la comprobación de masa de
+transmisibilidad $|T| \le 0{,}1$): la Desigualdad 3, la comprobación de masa de
 bloqueo rígida de la Fórmula 4, se describe pero no se calcula
 automáticamente. El criterio de linealidad del apartado 7.6 (dos espectros
 de entrada separados 10 dB dentro de 1,5 dB) tampoco se comprueba en el

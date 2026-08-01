@@ -6,12 +6,12 @@ A steady tone embedded in broadband noise stands out when it rises audibly above
 the noise that would otherwise mask it, the objective precondition for the tonal
 penalties applied in noise assessment. **ISO/PAS 20065:2016** is the *engineering
 method* that quantifies this audibility: from a narrow-band FFT spectrum it
-derives, for every prominent tone, the **audibility** `ΔL`: how many decibels
-the tone level exceeds the masking threshold of the surrounding noise. (Whether a
-tone is *annoying* is a separate, downstream rating judgement.) It is the
-detailed method that **ISO 1996-2:2017** defers to (the simpler Annex C route
-lives in [environmental measurement](environmental-levels.md)); the mean audibility
-`ΔL` it produces feeds the ISO 1996-2 tonal adjustment `Kt`.
+derives, for every prominent tone, the **audibility** $\Delta L$: how many
+decibels the tone level exceeds the masking threshold of the surrounding noise.
+(Whether a tone is *annoying* is a separate, downstream rating judgement.) It
+is the detailed method that **ISO 1996-2:2017** defers to (the simpler Annex C
+route lives in [environmental measurement](environmental-levels.md)); the mean
+audibility $\Delta L$ it produces feeds the ISO 1996-2 tonal adjustment $K_t$.
 
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/tone_audibility_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/tone_audibility.svg" alt="Per-tone audibility ΔL of the nine tones of the ISO/PAS 20065 Annex E combustion-engine spectrum, with the decisive tone at 137.3 Hz highlighted and the ΔL = 0 dB audibility threshold marked" width="82%"></picture>
 
@@ -38,16 +38,17 @@ plt.show()
 
 ## 1. The critical band about the tone
 
-Each tone of frequency `fT` is evaluated inside a critical band whose width is
-(Formula 2)
+Each tone of frequency $f_T$ is evaluated inside a critical band whose width
+is (Formula 2)
 
 $$
 \Delta f_c = 25.0 + 75.0\left(1.0 + 1.4\left(\tfrac{f_T}{1000}\right)^{2}\right)^{0.69}\ \mathrm{Hz}.
 $$
 
 With a geometric placement of the corner frequencies about the tone
-(Formulae 3–5), `√(f₁·f₂) = fT` and `f₂ − f₁ = Δfc`, so
-`f₁ = −Δfc/2 + √(Δfc² + 4·fT²)/2` and `f₂ = f₁ + Δfc`.
+(Formulae 3–5), $\sqrt{f_1 f_2} = f_T$ and $f_2 - f_1 = \Delta f_c$, so
+$f_1 = -\Delta f_c/2 + \sqrt{\Delta f_c^2 + 4 f_T^2}/2$ and
+$f_2 = f_1 + \Delta f_c$.
 
 ```python
 from phonometry import psychoacoustics
@@ -59,11 +60,11 @@ print(round(f1, 2), round(f2, 2))                            # 95.67 197.04
 
 ## 2. Audibility of a tone
 
-The mean narrow-band level `LS` of the masking noise (Formula 6, an iterative
-energy average of the lines in the critical band) and the tone level `LT`
+The mean narrow-band level $L_S$ of the masking noise (Formula 6, an iterative
+energy average of the lines in the critical band) and the tone level $L_T$
 (Formula 8, the energy sum of the tonal lines) are derived from the narrow-band
 spectrum; `mean_narrowband_level` and `tone_level` do this directly (see §4).
-The critical-band level of the masking noise spreads `LS` over the critical
+The critical-band level of the masking noise spreads $L_S$ over the critical
 bandwidth (Formula 12), the masking index accounts for the ear (Formula 13) and
 the audibility is their difference (Formula 14):
 
@@ -73,11 +74,12 @@ a_v = -2 - \lg\!\Big[1 + \big(\tfrac{f}{502}\big)^{2.5}\Big], \qquad
 \Delta L = L_T - L_G - a_v .
 $$
 
-A supplied tone is *audible* when `ΔL > 0`. `Δf` is the line spacing (frequency
-resolution); the energy sums over `K > 1` lines carry a window correction of
-`10·lg(Δf/Δfe)` (`−1.76 dB` for the recommended Hanning window,
-`Δfe = 1.5·Δf`, Formula (8)), while a single-line tone (`K = 1`) takes its
-level unchanged (Formula (7), no bandwidth correction).
+A supplied tone is *audible* when $\Delta L > 0$. $\Delta f$ is the line
+spacing (frequency resolution); the energy sums over $K > 1$ lines carry a
+window correction of $10\lg(\Delta f/\Delta f_e)$ (−1.76 dB for the
+recommended Hanning window, $\Delta f_e = 1.5\,\Delta f$, Formula (8)), while
+a single-line tone ($K = 1$) takes its level unchanged (Formula (7), no
+bandwidth correction).
 
 ```python
 from phonometry import psychoacoustics
@@ -90,23 +92,23 @@ print(round(psychoacoustics.masking_index(137.3), 2))                        # -
 
 The whole method is one chain from the spectrum to the penalty, and every
 intermediate quantity above is a stop on it. The diagram walks the Annex E
-tone through that chain, down to the Kt the mean audibility earns.
+tone through that chain, down to the $K_t$ the mean audibility earns.
 
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_tone_audibility_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_tone_audibility.svg" alt="Flow diagram of the ISO/PAS 20065 engineering method on the Annex E combustion-engine spectrum: a narrow-band FFT spectrum with 2.7 hertz line spacing yields a tone at 137.3 hertz, its critical band of 101.36 hertz spans 95.67 to 197.04 hertz, the masking noise level of 49.22 decibels and tone level of 67.96 decibels give a masking threshold of 64.97 decibels with a masking index of minus 2.02 decibels, and the audibility is 5.01 decibels, the decisive value of the spectrum; a closing note maps the 6.98 decibel energy-mean audibility of the five spectra to a tonal adjustment Kt of 4 decibels through ISO 1996-2 Table J.1" width="92%"></picture>
 
 ## 3. Decisive and mean audibility
 
 The **decisive** audibility of one narrow-band spectrum is the largest tone
-audibility in it (clause 5.3.8). Over `J` staggered spectra the **mean
+audibility in it (clause 5.3.8). Over $J$ staggered spectra the **mean
 audibility** is their energy mean (Formula 20); a spectrum in which no tone is
-found contributes `ΔLj = −10 dB` (Formula 21). `assess_tones` applies the whole
+found contributes $\Delta L_j = -10\ \text{dB}$ (Formula 21). `assess_tones` applies the whole
 chain to a spectrum's tones and reports the decisive tone.
 
 **How the decisive band is selected.** The method does not scan a fixed set of
 bands: each detected *tone* defines its own critical band (§1), the audibility
 is evaluated tone by tone, and, after Step 3 has merged audible same-band
 tones into `FG` groups rated at their most audible member (§5), the decisive
-audibility is simply the largest `ΔL` left standing (Step 4). The "decisive
+audibility is simply the largest $\Delta L$ left standing (Step 4). The "decisive
 band" is therefore the critical band centred on whichever tone or group wins,
 and it is free to move from spectrum to spectrum as the source runs through
 its operating states; the energy mean of Formula 20 then lets the loudest
@@ -162,43 +164,45 @@ plt.show()
 </details>
 
 Reading it left to right: each horizontal segment is the critical-band
-masking-noise level `LG` drawn across the band it applies to, each marker is
-the tone level `LT`, and the gap between them, less the masking index, is the
+masking-noise level $L_G$ drawn across the band it applies to, each marker is
+the tone level $L_T$, and the gap between them, less the masking index, is the
 audibility. A tone whose marker sits *below* its segment is masked, and no
 amount of level justifies a penalty for it.
 
 ### 3.1 Extended uncertainty of the audibility
 
-Clause 5.4 attaches a 90 % bilateral extended uncertainty `U` to every
+Clause 5.4 attaches a 90 % bilateral extended uncertainty $U$ to every
 audibility, and clause 6 makes it mandatory whenever fewer than 12 spectra
 have been averaged. `assess_tones` computes it per tone
 (`res.extended_uncertainties`), `audibility_uncertainty` evaluates it straight
 from the spectrum lines, and `mean_audibility_uncertainty` propagates it to
 the energy-averaged audibility of a spectrum set. The Annex E example
 reproduces the printed Table E.2 column (for the 137.3 Hz tone,
-`U = 2.80 dB` against the printed 2,79).
+$U = 2.80\ \text{dB}$ against the printed 2,79).
 
-**How to read `U`.** A 90 % *bilateral* interval leaves 5 % in each tail, so
-`ΔL − U` is a one-sided 95 % statement: when the whole interval `ΔL ± U` sits
-above `0 dB` the tone is audible with at least 95 % confidence, and when the
-interval straddles zero the verdict is not statistically secured; the remedy
-is more spectra, since `U` shrinks with the number averaged (which is exactly
-why clause 6 makes reporting it mandatory below 12 spectra). The same logic
-guards the downstream penalty: **ISO 1996-2:2017 Annex J** converts the mean
-audibility into the tonal adjustment `Kt` in 1 dB steps (Table J.1: `Kt = 0`
-for `ΔL ≤ 0`, up to `Kt = 6 dB` for `ΔL > 12 dB`, or the coarser
+**How to read $U$.** A 90 % *bilateral* interval leaves 5 % in each tail, so
+$\Delta L - U$ is a one-sided 95 % statement: when the whole interval
+$\Delta L \pm U$ sits above 0 dB the tone is audible with at least 95 %
+confidence, and when the interval straddles zero the verdict is not
+statistically secured; the remedy is more spectra, since $U$ shrinks with the
+number averaged (which is exactly why clause 6 makes reporting it mandatory
+below 12 spectra). The same logic guards the downstream penalty:
+**ISO 1996-2:2017 Annex J** converts the mean audibility into the tonal
+adjustment $K_t$ in 1 dB steps (Table J.1: $K_t = 0$ for $\Delta L \le 0$, up
+to $K_t = 6\ \text{dB}$ for $\Delta L > 12\ \text{dB}$, or the coarser
 0/3/6 dB ladder of its note), so an uncertainty that spans a table boundary
 propagates straight into a 1–3 dB question mark on the rating level. Quoting
-`ΔL ± U` alongside `Kt` shows whether the adjustment is robust or hinges on
-one borderline spectrum.
+$\Delta L \pm U$ alongside $K_t$ shows whether the adjustment is robust or
+hinges on one borderline spectrum.
 
 ## 4. From the narrow-band spectrum
 
 Given the FFT lines of the critical band about a tone, `mean_narrowband_level`
 runs the iterative Formula 6 procedure (energy average, dropping any line more
-than 6 dB above the running `LS`, until stable within ±0.005 dB or fewer than
+than 6 dB above the running $L_S$, until stable within ±0.005 dB or fewer than
 five lines remain each side, Annex D) and `tone_level` sums the tonal lines
-contiguous with the peak (above both `LS + 6 dB` and `L_peak − 10 dB`). The
+contiguous with the peak (above both $L_S + 6\ \text{dB}$ and
+$L_\text{peak} - 10\ \text{dB}$). The
 mean always carries the −1.76 dB Hanning bandwidth correction; the tone level
 carries it only when the run spans more than one line (Formulae (7)/(8)).
 
@@ -226,14 +230,16 @@ print(round(psychoacoustics.tone_audibility(lt, ls, 137.3, 2.7), 2))   # 5.01 dB
 `analyze_spectrum` runs the full front-end over a spectrum (mean narrow-band
 level per line, peak detection (Clause 5.3.8 Step 1, a tone cannot sit on a
 slope), tone level, the distinctness test (Clause 5.3.4: bandwidth
-`≤ 26·(1 + 0.001·fT)` Hz and edge steepness `≥ 24 dB`), and audibility) and
+$\le 26\,(1 + 0.001 f_T)$ Hz and edge steepness $\ge 24\ \text{dB}$), and
+audibility) and
 returns the distinct, audible tones. It then applies **Step 3**: audible
 tones sharing a critical band have their tone levels energy-summed
 (Formula 17, shared lines counted once, via `combined_tone_level`) into a
 combined "FG" entry rated at the most audible member, unless the
 exactly-two-tones-below-1000-Hz exception of §5.1 keeps them separate. The
-result's `group_sizes` tells individual tones (`1`) from FG entries (`N ≥ 2`),
-and the decisive audibility (Step 4) is the maximum over all entries.
+result's `group_sizes` tells individual tones (`1`) from FG entries
+($N \ge 2$), and the decisive audibility (Step 4) is the maximum over all
+entries.
 
 ```python
 from phonometry import psychoacoustics
@@ -270,22 +276,24 @@ spectrum: Table E.1 is truncated to the 137.3 Hz critical band, so the 158.8 Hz
 tone's mean narrow-band level is under-estimated from it (the algorithm itself
 matches the parent standard DIN 45681:2005-03 reference program). The peak
 detection and FG combination above are verified against the Annex E worked
-example (the three tone frequencies and `LT = 72.15 dB`).
+example (the three tone frequencies and $L_T = 72.15\ \text{dB}$).
 
 ### 5.1 Two tones below 1000 Hz
 
 When **exactly two** tones share a critical band and both lie below 1000 Hz, the
 ear can still tell them apart (so they are rated *separately* rather than
-FG-combined) if their frequency difference `|fT1 − fT2|` (Formula 18) exceeds
+FG-combined) if their frequency difference $|f_{T1} - f_{T2}|$ (Formula 18)
+exceeds
 
-```text
-fD = 21·10^(1.2·|lg(fT/212)|^1.8)  Hz     (Formula 19, 88 Hz < fT < 1000 Hz)
-```
+$$
+f_D = 21 \cdot 10^{\,1.2\,\left|\lg(f_T/212)\right|^{1.8}}\ \text{Hz}
+\qquad (\text{Formula 19},\ 88\ \text{Hz} < f_T < 1000\ \text{Hz})
+$$
 
-evaluated at the more prominent tone `fT` (the larger audibility `ΔL`). The
-threshold bottoms out at `21 Hz` at `fT = 212 Hz` and grows on either side.
-`two_tone_separation_frequency` gives `fD`; `resolve_tones_separately` applies
-the decision.
+evaluated at the more prominent tone $f_T$ (the larger audibility $\Delta L$).
+The threshold bottoms out at 21 Hz at $f_T = 212\ \text{Hz}$ and grows on
+either side. `two_tone_separation_frequency` gives $f_D$;
+`resolve_tones_separately` applies the decision.
 
 ```python
 from phonometry import psychoacoustics
@@ -300,8 +308,8 @@ psychoacoustics.resolve_tones_separately(118.4, 137.3, 4.0, 5.0) # False → com
 > fires there. The formula and decision are implemented clean-room from the text
 > and verified against the **DIN 45681:2005-03** Annex J reference program
 > (`fD = 21 * 10 ^ (1.2 * Abs(Log(fT / 212) / Log(10)) ^ 1.8)`). Reassuringly,
-> evaluated at the Annex E tones the threshold (`≈ 24 Hz` at 137.3 Hz) keeps
-> them combined, consistent with that example's FG grouping.
+> evaluated at the Annex E tones the threshold ($\approx 24\ \text{Hz}$ at
+> 137.3 Hz) keeps them combined, consistent with that example's FG grouping.
 
 ## Tonal assessment report (`.report()`)
 
@@ -309,20 +317,21 @@ psychoacoustics.resolve_tones_separately(118.4, 137.3, 4.0, 5.0) # False → com
 tonal-assessment report of an environmental-noise laboratory, following the
 ISO 1996-2:2017 Annex J engineering method: a standard-basis line, an optional
 metadata header block (source/situation, client, measurement position,
-instrumentation and date, with the analysis line spacing `Δf` read from the
-result), a full-width table of the key quantities for every detected tone (tone
-frequency `fT`, entry type, tone level `Lpt`, critical-band masking-noise level
-`Lpn`, critical bandwidth `Δfc` and the audibility `ΔLta`) above the
-level-versus-frequency analysis plot with the tones and their critical-band
-masking noise marked, the boxed decisive audibility `ΔLta` together with the
-derived tonal adjustment `K` (Table J.1), an optional PASS/FAIL verdict row and a
+instrumentation and date, with the analysis line spacing $\Delta f$ read from
+the result), a full-width table of the key quantities for every detected tone
+(tone frequency $f_T$, entry type, tone level $L_{pt}$, critical-band
+masking-noise level $L_{pn}$, critical bandwidth $\Delta f_c$ and the
+audibility $\Delta L_{ta}$) above the level-versus-frequency analysis plot
+with the tones and their critical-band masking noise marked, the boxed
+decisive audibility $\Delta L_{ta}$ together with the derived tonal
+adjustment $K$ (Table J.1), an optional PASS/FAIL verdict row and a
 prominence note, and a footer with the fixed disclaimer.
 
 It uses the same `ReportMetadata` container
 (documented under [Insulation ratings](insulation-ratings.md#report-metadata-reportmetadata))
 and rendering engine as the [ISO 532-1 loudness fiche](loudness.md#iso-532-1-report-report);
 a supplied `requirement` is read as the maximum acceptable decisive audibility
-`ΔLta` in dB (a quieter tone passes). Rendering needs reportlab and, for the
+$\Delta L_{ta}$ in dB (a quieter tone passes). Rendering needs reportlab and, for the
 figure the fiche embeds, matplotlib (`pip install "phonometry[report,plot]"`);
 only `engine="reportlab"` is supported. The fiche renders in English by default;
 pass `language="es"` for a Spanish fiche (translated fixed strings and a comma
@@ -349,7 +358,7 @@ repository; click the preview to open the PDF.
 
 [![ISO 1996-2 tonal audibility example report: metadata header, a per-tone table of the tone level Lpt, the critical-band masking-noise level Lpn, the critical bandwidth and the audibility, the level-versus-frequency analysis plot with the tones and their masking noise marked, the boxed decisive ΔL_ta = 9.1 dB with the tonal adjustment K = 5 dB (ISO 1996-2:2017 Table J.1) and a FAIL verdict against a 6 dB audibility limit](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/reports/iso1996_tone_audibility_example.webp)](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/reports/iso1996_tone_audibility_example.pdf)
 
-*Tonal audibility fiche (`ToneAudibilityResult.report`), decisive ΔL_ta in dB with the tonal adjustment K.*
+*Tonal audibility fiche (`ToneAudibilityResult.report`), decisive $\Delta L_{ta}$ in dB with the tonal adjustment $K$.*
 
 ## References
 
@@ -373,17 +382,19 @@ repository; click the preview to open the PDF.
 
 ISO/PAS 20065:2016, *Acoustics — Objective method for assessing
 the audibility of tones in noise — Engineering method*: the critical bandwidth
-`Δfc` (Formula 2) and its corner frequencies (Formulae 3–5), the critical-band
-level `LG` (Formula 12), the masking index `av` (Formula 13), the audibility
-`ΔL = LT − LG − av` (Formula 14) and the energy-mean mean audibility
-(Formula 20). The mean narrow-band level `LS` (Formula 6, iterative Annex D) and
-tone level `LT` (Formula 8) are computed from the critical-band spectrum, and
+$\Delta f_c$ (Formula 2) and its corner frequencies (Formulae 3–5), the
+critical-band level $L_G$ (Formula 12), the masking index $a_v$ (Formula 13),
+the audibility $\Delta L = L_T - L_G - a_v$ (Formula 14) and the energy-mean
+mean audibility (Formula 20). The mean narrow-band level $L_S$ (Formula 6,
+iterative Annex D) and
+tone level $L_T$ (Formula 8) are computed from the critical-band spectrum, and
 `analyze_spectrum` adds peak detection (Clause 5.3.8) with the distinctness
 criteria (Clause 5.3.4) and the multi-tone `FG` combination (Formula 17), plus
 the separate evaluation of two tones below 1000 Hz (Formulae 18/19). The
 −1.76 dB Hanning bandwidth correction, the iterative masking-level procedure and
 the detection/combination logic are confirmed against the parent standard
 **DIN 45681:2005-03** (its Annex J reference program). Conformance is anchored on
-the Annex E combustion-engine worked example (Tables E.1/E.2/E.3): `LS` and `LT`
-from the spectrum, tone detection and the `FG` combined level, the per-tone
-audibility, the masking index and the mean audibility of the five spectra.
+the Annex E combustion-engine worked example (Tables E.1/E.2/E.3): $L_S$ and
+$L_T$ from the spectrum, tone detection and the `FG` combined level, the
+per-tone audibility, the masking index and the mean audibility of the five
+spectra.

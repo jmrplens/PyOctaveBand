@@ -20,7 +20,7 @@ $$
 L_{p,\mathrm{pk}} = 20\lg\frac{\max|p|}{p_0},
 $$
 
-with `p₀ = 1 µPa` and `E₀ = 1 µPa²·s`. The sound pressure level is the
+with $p_0 = 1\ \mu\text{Pa}$ and $E_0 = 1\ \mu\text{Pa}^2\,\text{s}$. The sound pressure level is the
 mean-square level (ISO 18406 Formula 7); the sound exposure level integrates the
 squared pressure over the record (Formulae 3–4); the peak level is the
 zero-to-peak value.
@@ -34,10 +34,10 @@ pk = underwater.peak_sound_pressure_level(pressure)     # dB re 1 µPa
 ```
 
 To re-reference a level between the underwater (1 µPa) and airborne (20 µPa)
-conventions (a `20·lg(20) ≈ 26.02` dB shift, **not** an energy/intensity
+conventions (a $20\lg(20) \approx 26.02$ dB shift, **not** an energy/intensity
 equivalence), use `underwater_to_in_air_spl` / `in_air_to_underwater_spl`. For
 background-noise subtraction, reuse the ISO 3744 `background_noise_correction`
-(`K1`) helper.
+($K_1$) helper.
 
 ## 2. Ship radiated noise and source level (ISO 17208-1/-2)
 
@@ -51,14 +51,14 @@ L_s = L_{\mathrm{RN}} + \Delta L,
 $$
 
 where the Lloyd's-mirror surface correction (ISO 17208-2 Formula 3) for a
-nominal source depth `d_s = 0.7·D` (D = mean draught) and `u = k·d_s`,
-`k = 2πf/c`, is
+nominal source depth $d_s = 0.7\,D$ ($D$ = mean draught) and $u = k\,d_s$,
+$k = 2\pi f/c$, is
 
 $$
 \Delta L = -10\lg\frac{2u^4 + 14u^2}{14 + 2u^2 + u^4}\ \mathrm{dB}.
 $$
 
-`ΔL` diverges at low `u` (grazing / low frequency) and tends to `−10·lg(2) =
+$\Delta L$ diverges at low `u` (grazing / low frequency) and tends to `−10·lg(2) =
 −3.01` dB as `u → ∞`. The reported source level is an *equivalent monopole
 broadside* value and must be quoted with its source depth.
 
@@ -100,7 +100,7 @@ past a vertical string of three hydrophones at a closest point of approach of
 100 m or one ship length, whichever is greater, in water at least 150 m or
 1.5 ship lengths deep so the bottom stays out of the picture (Clauses 5.2,
 5.4). Only the **data window** of ±30° about the CPA is scored: the averaging
-runs while the ship crosses a window of length `2·d_CPA·tan 30°` (about
+runs while the ship crosses a window of length $2\,d_{CPA}\tan 30°$ (about
 1.15 CPA distances), centred on the beam aspect the radiated noise level is
 defined for (Clause 3, Figure 3). Four runs are required, two per side; each
 run's three hydrophone levels are power-averaged (Formula 8), the runs are
@@ -119,7 +119,7 @@ and the data window in plan.
 ## 3. Pile-driving sound (ISO 18406)
 
 Percussive pile driving radiates one impulsive pulse per hammer strike. Each
-strike has a **single-strike sound exposure level** `SEL_ss`; over a driving
+strike has a **single-strike sound exposure level** $\mathrm{SEL}_{ss}$; over a driving
 sequence the exposures add to a **cumulative sound exposure level**:
 
 $$
@@ -200,7 +200,7 @@ ISO 17208-1:2016 and ISO 17208-2:2019, *Underwater acoustics — Quantities and
 procedures for description and measurement of underwater sound from ships*: the
 radiated noise level, the deep-water three-hydrophone geometry, the tabulated
 source-level uncertainty and the equivalent monopole source level via the
-Lloyd's-mirror surface correction (Formula 3) for a `0.7·draught` source depth.
+Lloyd's-mirror surface correction (Formula 3) for a 0.7·draught source depth.
 ISO 18406:2017, *Underwater acoustics — Measurement of radiated underwater sound
 from percussive pile driving*: the single-strike (Formulae 3–4), peak and
 cumulative (Formulae 8–9) sound exposure. All quantities are verified against

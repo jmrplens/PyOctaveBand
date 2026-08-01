@@ -168,7 +168,7 @@ Wong & Zhu 1995 ITS-90 form), **Del Grosso** (1974), **Mackenzie** (1981) or
 **Medwin** (1975). The UNESCO and Del Grosso equations use pressure, so depth is
 first converted with the Leroy & Parthiot (1998) formula (`depth_to_pressure`).
 The four agree to within ~2.5 m/s in their common domain; Mackenzie's canonical
-check value is `1550.744 m/s` at 25 °C, 35 ppt, 1000 m.
+check value is 1550.744 m/s at 25 °C, 35 ppt, 1000 m.
 
 Medwin's six-term form is the simplest of the family and the one worth
 remembering, because its partial derivatives are the classic rules of thumb:

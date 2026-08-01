@@ -205,8 +205,8 @@ plt.show()
 | `l1` / `l2` | array 1D o 2D | dB | uno/banda, o `(posiciones, bandas)` | Niveles emisor / receptor (ruido aéreo) |
 | `li` | array 1D o 2D | dB | uno/banda, o `(posiciones, bandas)` | SPL de impactos de la máquina de impactos (impactos) |
 | `t2` | array 1D | s | > 0, uno por banda | Tiempo de reverberación del recinto receptor |
-| `area` | float | m² | > 0 | Área libre de la abertura de ensayo `S` (solo ruido aéreo) |
-| `volume` | float | m³ | > 0 | Volumen del recinto receptor `V` |
+| `area` | float | m² | > 0 | Área libre de la abertura de ensayo $S$ (solo ruido aéreo) |
+| `volume` | float | m³ | > 0 | Volumen del recinto receptor $V$ |
 
 `lab_airborne_insulation()` devuelve un `LabAirborneInsulationResult` (`r`,
 `absorption`, `rating`); `lab_impact_insulation()` un
@@ -336,11 +336,11 @@ suelo (ISO 16251-1) y la transmisión por flancos (ISO 10848).
 - [Aislamiento acústico por intensidad (ISO 15186)](/phonometry/es/guides/insulation-intensity/):
   la alternativa de potencia directa para situaciones con muchos flancos.
 - [Mejora del aislamiento a impacto de suelos (ISO 16251-1)](/phonometry/es/guides/impact-improvement/):
-  la ΔL en maqueta a pequeña escala de revestimientos blandos.
+  la $\Delta L$ en maqueta a pequeña escala de revestimientos blandos.
 - [Transmisión por flancos en laboratorio (ISO 10848)](/phonometry/es/guides/flanking-lab/):
   el índice de reducción de vibraciones de unión medido.
 - [Índices globales de aislamiento (ISO 717)](/phonometry/es/guides/insulation-ratings/):
-  el motor de curva de referencia tras Rw y Ln,w.
-- [Potencia acústica](/phonometry/es/guides/sound-power/): los métodos de `LW`
+  el motor de curva de referencia tras $R_w$ y $L_{n,w}$.
+- [Potencia acústica](/phonometry/es/guides/sound-power/): los métodos de $L_W$
   que comparten la maquinaria de área de absorción del recinto receptor.
 - Referencia de la API: [`building.lab_insulation`](/phonometry/es/reference/api/building/lab-insulation/).

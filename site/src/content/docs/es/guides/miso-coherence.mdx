@@ -86,7 +86,7 @@ res.plot()          # etiquetas en inglés; res.plot(language="es") en español
 
 ## 1. Coherencia ordinaria, múltiple y parcial
 
-Para un sistema con `q` entradas `x1..xq` y salida `y`, `miso_coherence`
+Para un sistema con $q$ entradas $x_1..x_q$ y salida $y$, `miso_coherence`
 estima todos los autoespectros y espectros cruzados por el método de Welch y
 reporta tres funciones de coherencia.
 
@@ -97,7 +97,7 @@ maraña en números por fuente.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_miso_coherence_es.svg" alt="Diagrama de bloques de un sistema MISO de dos entradas: la entrada x1 es ruido blanco y la entrada x2 es 0,7 veces x1 más ruido independiente, x1 excita un camino paso bajo de 400 hercios y x2 uno paso alto de 1,5 kilohercios, y ambos se suman con ruido aditivo en la salida y; la salida alimenta la matriz de espectros cruzados de Welch Gxx y Gxy con nperseg 2048, condicionada por pasos de Schur en orden de coherencia ordinaria descendente, que da por un lado las coherencias múltiple y parciales, donde la entrada 2 en la banda de 100 a 300 hercios cae de una coherencia ordinaria de 0,32 a una parcial de 0,00, y por otro las contribuciones por fuente Gvi que con el ruido residual reconstruyen Gyy exactamente; una nota final registra que cada paso de condicionamiento gasta uno de los 242 promedios efectivos" width="92%" />
 
-La **coherencia ordinaria** de la entrada `i` con la salida, por sí sola
+La **coherencia ordinaria** de la entrada $i$ con la salida, por sí sola
 (Ec. 7.109), es la magnitud clásica de una sola entrada:
 
 $$
@@ -106,21 +106,21 @@ $$
 
 La **coherencia múltiple** (Ec. 7.35) es la fracción del autoespectro de
 salida explicada linealmente por *todas* las entradas conjuntamente. A partir
-de la matriz hermítica de espectros cruzados de entrada `Gxx` y el vector
-entrada-salida `Gxy` es
+de la matriz hermítica de espectros cruzados de entrada $G_{xx}$ y el vector
+entrada-salida $G_{xy}$ es
 
 $$
 \gamma^2_{y:x}(f) = \frac{G_{xy}^H\,G_{xx}^{-1}\,G_{xy}}{G_{yy}}
                   = 1 - \frac{G_{nn}}{G_{yy}} ,
 $$
 
-donde `Gnn` es el espectro de salida residual no correlado con ninguna
+donde $G_{nn}$ es el espectro de salida residual no correlado con ninguna
 entrada. Si la salida lleva ruido aditivo no correlado de relación
-señal-ruido `SNR` por banda, esto vale exactamente
+señal-ruido $\mathrm{SNR}$ por banda, esto vale exactamente
 $\mathrm{SNR}/(1+\mathrm{SNR})$, el oráculo de forma cerrada con que se
 verifica la implementación.
 
-La **coherencia parcial** de la entrada `i` (Ec. 7.87) es su coherencia con la
+La **coherencia parcial** de la entrada $i$ (Ec. 7.87) es su coherencia con la
 salida una vez eliminado el efecto lineal de las entradas *anteriores a ella
 en el orden de condicionamiento*:
 
@@ -129,7 +129,7 @@ $$
    = \frac{|G_{iy\cdot(i-1)!}(f)|^2}{G_{ii\cdot(i-1)!}(f)\,G_{yy}(f)} .
 $$
 
-La definición de la 4.a edición mantiene la salida *total* `Gyy` en el
+La definición de la 4.a edición mantiene la salida *total* $G_{yy}$ en el
 denominador (no la salida condicionada). Esa elección hace que las
 coherencias parciales de las entradas ordenadas sumen la coherencia múltiple,
 $\gamma^2_{y:x} = \sum_i \gamma^2_{iy\cdot(i-1)!}$ (Ec. 7.116), y se reduzcan
@@ -146,8 +146,8 @@ res.partial_coherence    # forma (q, F): condicionada a las entradas previas
 ## 2. Condicionamiento: separar causa de correlación
 
 Las coherencias parciales provienen de los **espectros condicionados**
-`Gij·r!`, calculados por la recursión de eliminación de Gauss de la
-sección 7.3. Eliminar el efecto lineal de una entrada pivote `r` de cada
+$G_{ij\cdot r!}$, calculados por la recursión de eliminación de Gauss de la
+sección 7.3. Eliminar el efecto lineal de una entrada pivote $r$ de cada
 registro restante es un paso de complemento de Schur (Ec. 7.94):
 
 $$
@@ -156,8 +156,9 @@ G_{ij\cdot r!} = G_{ij\cdot(r-1)!}
 $$
 
 aplicado a cada entrada en el orden de condicionamiento hasta que solo queda
-el espectro de salida residual `Gyy·q!`. Este es el sentido del método: en la
-figura anterior la entrada 2 es `0.7·x1 + ruido independiente`, así que
+el espectro de salida residual $G_{yy\cdot q!}$. Este es el sentido del
+método: en la figura anterior la entrada 2 es
+$0{,}7\,x_1 + \text{ruido independiente}$, así que
 *correla* con la entrada 1 pero no excita ningún camino de baja frecuencia. Su
 coherencia ordinaria con la salida marca por ello unos 0,3 en la banda baja,
 prestada por completo a través de la entrada 1, mientras que su coherencia
@@ -172,7 +173,7 @@ res.partial_coherence[1][low].mean()    # ~0.00  (x1 eliminada)
 ## 3. Qué fuente domina cada banda
 
 El condicionamiento también reparte la potencia de salida fuente por fuente.
-El **espectro de salida coherente parcial** de la entrada `i` (Ec. 7.86) es la
+El **espectro de salida coherente parcial** de la entrada $i$ (Ec. 7.86) es la
 porción del autoespectro de salida que aporta, y las porciones más el ruido
 residual reconstruyen la salida exactamente (Ecs. 7.88/7.121):
 
@@ -195,10 +196,10 @@ dominant[np.argmin(abs(f - 2500.0))]   # 1 (la entrada 2 excita la banda alta)
 
 ## 4. Calidad estadística y el orden de condicionamiento
 
-Los errores aleatorios siguen la sección 9.3. Condicionar a las `i-1` entradas
-previas cuesta `i-1` grados de libertad, de modo que la `i`-ésima entrada
-ordenada lleva `nd-(i-1)` promedios efectivos (Ecs. 9.100/9.101) y la
-coherencia múltiple de `q` entradas lleva `nd-(q-1)` (Ec. 9.98). El resultado
+Los errores aleatorios siguen la sección 9.3. Condicionar a las $i-1$ entradas
+previas cuesta $i-1$ grados de libertad, de modo que la $i$-ésima entrada
+ordenada lleva $n_d-(i-1)$ promedios efectivos (Ecs. 9.100/9.101) y la
+coherencia múltiple de $q$ entradas lleva $n_d-(q-1)$ (Ec. 9.98). El resultado
 expone `multiple_coherence_random_error` y `coherent_output_random_error`
 junto al número de promedios efectivos `n_averages`.
 
@@ -244,7 +245,7 @@ sección 9.3 para las estimaciones múltiples y condicionadas (ecuaciones
 9.98-9.101), todo expuesto por `miso_coherence` y `MISOCoherenceResult`.
 
 **No cubierto.** Las estimaciones de respuesta en frecuencia de entradas
-múltiples del capítulo (los factores de ganancia `Liy`), el modelo lineal
+múltiples del capítulo (los factores de ganancia $L_{iy}$), el modelo lineal
 que predice la salida a partir de las entradas condicionadas, se calculan
 internamente para construir los espectros de salida coherente pero no se
 devuelven: `MISOCoherenceResult` solo expone el lado de la coherencia y la

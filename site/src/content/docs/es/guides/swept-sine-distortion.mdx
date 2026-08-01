@@ -45,7 +45,7 @@ import ThemeImage from '../../../../components/ThemeImage.astro';
 Un solo barrido sinusoidal exponencial caracteriza a la vez la respuesta
 lineal y todos los órdenes de distorsión armónica de un sistema débilmente
 no lineal. Tras la deconvolución, los productos de distorsión de
-orden `n` se empaquetan en respuestas al impulso separadas que *preceden* a
+orden $n$ se empaquetan en respuestas al impulso separadas que *preceden* a
 la respuesta lineal con el adelanto fijo (Farina 2000)
 
 $$
@@ -54,25 +54,25 @@ $$
 $$
 
 de modo que ventanear cada llegada produce las **respuestas en frecuencia
-armónicas** `H1(f), H2(f), ..., HN(f)` y, a partir de ellas, la distorsión
+armónicas** $H_1(f), H_2(f), \dots, H_N(f)$ y, a partir de ellas, la distorsión
 armónica total en función de la frecuencia de excitación con un barrido en
 lugar de un recorrido tono a tono. Esta página cubre esa separación en
 `phonometry.electroacoustics`, con el **barrido sincronizado** de Novak,
 Lotton y Simon (2015), coherente en fase, como método por defecto, y las
 **utilidades de fase** que la acompañan en `phonometry.metrology`: fase
-mínima desde `|H|`, retardo de grupo y exceso de fase.
+mínima desde $|H|$, retardo de grupo y exceso de fase.
 
 ## 1. Un barrido, todos los armónicos
 
 En un barrido exponencial la frecuencia instantánea crece como
-`f(t) = f1·e^(t/L)`, así que en el momento en que la excitación pasa por
-`f`, el producto de distorsión del armónico n aparece en `n·f`: exactamente
-donde estará el propio barrido `L·ln(n)` segundos después. Deconvolucionar
+$f(t) = f_1 e^{t/L}$, así que en el momento en que la excitación pasa por
+$f$, el producto de distorsión del armónico n aparece en $n f$: exactamente
+donde estará el propio barrido $L\ln(n)$ segundos después. Deconvolucionar
 la grabación contra el barrido comprime por tanto cada orden en su propia
-respuesta al impulso, `L·ln(n)` *antes* de la lineal.
+respuesta al impulso, $L\ln(n)$ *antes* de la lineal.
 `swept_sine_distortion` ventanea cada llegada (con el alineado exacto de
-fracción de muestra), la transforma en `Hn(f)` y lee la distorsión de orden
-`n` a la frecuencia de excitación `f` de `|Hn(n·f)|`:
+fracción de muestra), la transforma en $H_n(f)$ y lee la distorsión de orden
+$n$ a la frecuencia de excitación $f$ de $|H_n(n f)|$:
 
 $$
 \mathrm{THD}(f) =
@@ -138,17 +138,17 @@ plt.show()
 </details>
 
 El oráculo detrás de la implementación es el polinomio sin memoria: excitar
-`y = x + a2·x² + a3·x³` con un barrido unitario debe devolver, por las
-identidades de Chebyshev, `|H1| = 1 + 3a3/4`, `|H2| = a2/2` (fase `-π/2`),
-`|H3| = a3/4` (fase `π`) y `THD = √((a2/2)² + (a3/4)²)/(1 + 3a3/4)`. Las
+$y = x + a_2 x^2 + a_3 x^3$ con un barrido unitario debe devolver, por las
+identidades de Chebyshev, $|H_1| = 1 + 3a_3/4$, $|H_2| = a_2/2$ (fase $-\pi/2$),
+$|H_3| = a_3/4$ (fase $\pi$) y $\mathrm{THD} = \sqrt{(a_2/2)^2 + (a_3/4)^2}/(1 + 3a_3/4)$. Las
 suites de tests y de conformidad fijan los cuatro valores, y la misma THD
 medida tono a tono con `phonometry.thd` coincide al 0,1 %.
 
 ## 2. El barrido sincronizado (Novak et al. 2015)
 
 El ventaneado separa las *magnitudes* armónicas con cualquier barrido
-exponencial, pero las *fases* de `H2..HN` solo tienen sentido si retrasar
-el barrido `L·ln(n)` equivale exactamente a generar su armónico n. Eso solo
+exponencial, pero las *fases* de $H_2 \dots H_N$ solo tienen sentido si retrasar
+el barrido $L\ln(n)$ equivale exactamente a generar su armónico n. Eso solo
 se cumple para
 
 $$
@@ -157,10 +157,10 @@ x(t) = \sin\!\big[2\pi f_1 L\, e^{t/L}\big],
 L = \frac{1}{f_1}\,\mathrm{round}\!\Big(\frac{f_1\,\tilde T}{\ln(f_2/f_1)}\Big),
 $$
 
-el **barrido sincronizado**: el redondeo hace que `f1·L` sea entero, así
+el **barrido sincronizado**: el redondeo hace que $f_1 L$ sea entero, así
 que el barrido arranca con fase cero y todas las copias armónicas quedan
 alineadas. `synchronized_sweep_signal` lo genera (la duración queda
-ligeramente cuantizada; cuando `f2/f1` es entero el barrido también termina
+ligeramente cuantizada; cuando $f_2/f_1$ es entero el barrido también termina
 con fase cero), y `swept_sine_distortion(..., method="synchronized")`, el
 método por defecto, deconvoluciona con el espectro en forma cerrada del
 filtro inverso,
@@ -171,14 +171,14 @@ e^{-j 2\pi f L\,(1 - \ln(f/f_1)) + j\pi/4},
 $$
 
 en lugar de con una FFT de la señal. Además de exacta, la deconvolución
-analítica extiende la banda útil de cada `Hn` hasta `[n·f1, n·f2]`
+analítica extiende la banda útil de cada $H_n$ hasta $[n f_1, n f_2]$
 (Novak et al., Fig. 6): el segundo armónico de un barrido de 6 kHz se mide
 hasta 12 kHz.
 
 Dos notas prácticas del artículo vienen incorporadas: la media de la
 grabación se resta por defecto (`remove_dc=True`; un offset de continua
 filtra si no una copia escalada del filtro inverso en la respuesta al
-impulso), y la parte no entera de cada llegada `L·ln(n)·fs` se elimina en
+impulso), y la parte no entera de cada llegada $L\ln(n) f_s$ se elimina en
 el dominio de la frecuencia, de modo que las fases armónicas no arrastran
 sesgo sub-muestra residual.
 
@@ -191,9 +191,9 @@ Las grabaciones hechas con el barrido exponencial simple de
 el tiempo y compensado en amplitud de Farina (2000). Las **magnitudes**
 armónicas y la THD son correctas (el oráculo de Chebyshev pasa igual), pero
 el término de fase `-1` del barrido rompe la equivalencia
-desplazamiento-armónico, así que las fases de `H2..HN` dependen de la
-excitación y deben ignorarse; la banda de cada `Hn` queda además limitada a
-`f2` por el filtro inverso.
+desplazamiento-armónico, así que las fases de $H_2 \dots H_N$ dependen de la
+excitación y deben ignorarse; la banda de cada $H_n$ queda además limitada a
+$f_2$ por el filtro inverso.
 
 ```python
 from phonometry import sweep_signal, swept_sine_distortion
@@ -209,13 +209,13 @@ sección 1 se leen idénticos; entre los dos métodos solo cambian las fases de
 los armónicos (y el tope de banda de cada orden).
 
 Reglas de dimensionado para ambos métodos: el par de llegadas más próximo
-dista `L·ln(N/(N-1))` segundos, así que la ventana por orden (`ir_length`,
+dista $L\ln(N/(N-1))$ segundos, así que la ventana por orden (`ir_length`,
 por defecto la mayor potencia de dos que cabe, con tope en 8192 muestras)
 no debe excederlo: alarga el barrido o baja `n_harmonics` en sistemas
 reverberantes cuyas colas necesiten ventanas más largas. Mantén
-`n_harmonics·f2` por debajo de Nyquist: los productos de distorsión por
+`n_harmonics` $\cdot f_2$ por debajo de Nyquist: los productos de distorsión por
 encima se pliegan en cualquier grabación real. El análisis queda referido a
-la `amplitude` de la excitación, así que `H1` es la ganancia lineal y la
+la `amplitude` de la excitación, así que $H_1$ es la ganancia lineal y la
 THD queda referida al nivel exactamente como se excitó.
 
 ## 4. Utilidades de fase: fase mínima, retardo de grupo, exceso de fase
@@ -248,7 +248,7 @@ res.plot()                             # magnitud, fases, retardos de grupo
 *Un ecualizador de campana de +6 dB medido a través de una latencia de
 procesado de 2,5 ms: la parte de fase mínima lleva solo la pequeña ondulación
 de fase que un ecualizador podría invertir, el exceso de fase es la rampa pura
-`−2πf·t₀` del retardo, y el retardo de grupo de exceso lee la latencia
+$-2\pi f t_0$ del retardo, y el retardo de grupo de exceso lee la latencia
 directamente como una línea plana de 2,5 ms.*
 
 <details>
@@ -278,17 +278,17 @@ plt.show()
 
 </details>
 
-La descomposición `H = H_min · H_ap` separa lo que un ecualizador puede
-invertir (`H_min`, fase mínima, causal y causalmente invertible) de lo que
-nunca podrá (`H_ap`, el exceso paso-todo: latencia más ceros de fase no
+La descomposición $H = H_\text{min} H_\text{ap}$ separa lo que un ecualizador puede
+invertir ($H_\text{min}$, fase mínima, causal y causalmente invertible) de lo que
+nunca podrá ($H_\text{ap}$, el exceso paso-todo: latencia más ceros de fase no
 mínima como las reflexiones). El exceso de fase es `0` para una respuesta
-de fase mínima y exactamente `-2πf·t0` para una latencia pura `t0`; su
+de fase mínima y exactamente $-2\pi f t_0$ para una latencia pura $t_0$; su
 retardo de grupo lee la latencia en segundos.
 
 Contrato numérico, fijado por los tests: sobre un biquad estrictamente de
 fase mínima muestreado en una malla densa, la fase reconstruida coincide
 con la real a mejor de `1e-12` rad; el retardo de grupo de un paso-todo de
-primer orden coincide con la forma cerrada `(1-a²)/(1+2a·cosω+a²)` a
+primer orden coincide con la forma cerrada $(1-a^2)/(1+2a\cos\omega+a^2)$ a
 `1e-5` muestras; el exceso de retardo de grupo de un biquad retardado
 devuelve el retardo a `1e-6` muestras. Las precauciones están documentadas
 con la API: la respuesta debe muestrearse uniformemente de DC a Nyquist
@@ -335,6 +335,6 @@ barrido; esta página separa solo los órdenes armónicos. La monografía de
 medición con barridos de Müller y Massarani se cita como contexto de
 práctica (fundidos, técnica del filtro inverso), no como una fórmula
 concreta implementada. Con `method="farina"`, las fases armónicas de
-`H2..HN` se devuelven pero deben ignorarse: el barrido exponencial simple
+$H_2 \dots H_N$ se devuelven pero deben ignorarse: el barrido exponencial simple
 rompe la equivalencia desplazamiento-armónico de la que depende el método
 sincronizado.

@@ -18,14 +18,14 @@ levels over the ten bands from 16 Hz to 8000 Hz.
 The **NC curves** (ANSI/ASA S12.2-2019 Table 1) are a family of octave-band
 limits, each designated by its value at 1000 Hz (NC-15 up to NC-70). Clause
 5.2.2 rates a spectrum in **two steps**. First the **speech interference
-level** `SIL` (clause 3.2, the average of the 500/1000/2000/4000 Hz levels)
-selects the NC-(SIL) curve: if no octave band exceeds it, the spectrum is
-simply designated **NC-(SIL)**. Only when the spectrum pokes above that curve
-does the **tangency method** (clause 5.2.3) take over: for each octave band,
-the NC index whose curve passes through the measured level is found, and the
-rating is the maximum across bands. The band where that maximum occurs, the
-one that pushes the spectrum up against the curves, is reported as the
-**governing band**.
+level** $\mathrm{SIL}$ (clause 3.2, the average of the 500/1000/2000/4000 Hz
+levels) selects the NC-(SIL) curve: if no octave band exceeds it, the
+spectrum is simply designated **NC-(SIL)**. Only when the spectrum pokes
+above that curve does the **tangency method** (clause 5.2.3) take over: for
+each octave band, the NC index whose curve passes through the measured level
+is found, and the rating is the maximum across bands. The band where that
+maximum occurs, the one that pushes the spectrum up against the curves, is
+reported as the **governing band**.
 
 ```python
 import numpy as np
@@ -44,7 +44,7 @@ nc.plot()   # the spectrum over the NC curve family (left panel below)
 ```
 
 Because a tangency rating interpolates between the tabulated curves it is a
-continuous number: an NC rating of `42.5` sits half-way between NC-40 and
+continuous number: an NC rating of $42.5$ sits half-way between NC-40 and
 NC-45 (a SIL designation is always an integer). The tangency rating is kept
 on `tangency_rating` even when the SIL designation applies. A subset of the
 octave bands may be supplied together with their centre frequencies
@@ -63,8 +63,9 @@ with the largest exceedance over NC-70 governs) or `'<NC-15'`; no `NC-71` or
 The **RC Mark II** curves (ANSI/ASA S12.2-2019 Annex D, Table D.1) have a
 constant slope of **−5 dB/octave**, keyed to their value at 1000 Hz, with the
 16 Hz level equal to the 31.5 Hz level and a low-frequency floor of 55 dB.
-The numerical rating is the **mid-frequency average** `LMF`, the mean of the
-500, 1000 and 2000 Hz levels, rounded to the nearest decibel (clause D.4):
+The numerical rating is the **mid-frequency average** $\text{LMF}$, the mean
+of the 500, 1000 and 2000 Hz levels, rounded to the nearest decibel
+(clause D.4):
 
 $$
 \text{LMF} = \tfrac{1}{3}\left(L_{500} + L_{1000} + L_{2000}\right),
@@ -72,10 +73,10 @@ $$
 $$
 
 A **spectral tag** then describes the *character* of the noise by how the
-spectrum deviates from the reference RC curve (clause D.3): **rumble** (`R`)
+spectrum deviates from the reference RC curve (clause D.3): **rumble** ($R$)
 when a band at or below 500 Hz exceeds the curve by more than 5 dB, **hiss**
-(`H`) when a band at or above 1000 Hz exceeds it by more than 3 dB, and
-**neutral** (`N`) when neither happens.
+($H$) when a band at or above 1000 Hz exceeds it by more than 3 dB, and
+**neutral** ($N$) when neither happens.
 
 ```python
 import numpy as np
@@ -91,7 +92,7 @@ rc.plot()   # the spectrum over the RC reference (right panel below)
 ```
 
 The strong low-frequency content of this spectrum lifts the 63–250 Hz bands
-well above the reference curve, so the noise is tagged `R` (rumble): the
+well above the reference curve, so the noise is tagged $R$ (rumble): the
 subjective "throb" of an oversized air handler.
 
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/room_noise_criteria_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/room_noise_criteria.svg" alt="Two panels for the same ventilation-dominated room spectrum. Left: the measured octave-band levels over the NC curve family, with a red diamond marking the tangent point at 250 Hz that sets the NC-42.5 rating. Right: the same spectrum over the reference RC-35 curve, with the low-frequency bands rising through the shaded rumble tolerance (+5 dB below 500 Hz) so the noise is classified RC-35(R), and the hiss tolerance (+3 dB at and above 1000 Hz) shaded for comparison" width="96%"></picture>
@@ -142,7 +143,7 @@ The `NCResult` carries the `rating`, the `sil`, the `tangency_rating`, the
 the `rating`, the `lmf`, the `classification`, the `reference_curve`, an
 `out_of_family` flag (Table D.1 tabulates RC-25 through RC-50 only) and a
 convenience `label` in the `RC-NN(A)` form. Clause D.3.5 admits the tags
-`N`, `R`, `H` or `RV`; when both the rumble and hiss deviations fire, the
+$N$, $R$, $H$ or $RV$; when both the rumble and hiss deviations fire, the
 library reports the combined `RH` as a diagnostic extension. Each result
 exposes a `.plot()` that renders its panel above. Clause D.4 expects at
 least the 31.5 Hz to 4000 Hz octave bands: a spectrum missing any of them
@@ -151,7 +152,7 @@ by the tag deviation tests.
 
 The balanced noise criteria (NCB), the room noise criterion for fluctuating
 low-frequency noise (RNC, which needs a time series rather than a single
-spectrum), the vibration/rattle tag (`RV`, which needs the Table 6 test) and
+spectrum), the vibration/rattle tag ($RV$, which needs the Table 6 test) and
 the numeric quality-assessment index (QAI, which the standard defers to
 external references) are not part of this module.
 

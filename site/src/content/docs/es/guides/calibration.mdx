@@ -182,7 +182,7 @@ plt.show()
 | :--- | :--- | :--- | :--- | :--- |
 | `ref_signal` | array 1D/2D | unidades digitales | no vacío, no silencio | Grabación solo del tono de calibración (recorta el ruido de manipulación) |
 | `target_spl` | float | dB re 20 µPa | defecto `94.0` | Nivel nominal del calibrador (calibradores de 114 dB: pasa `114.0`) |
-| `ref_pressure` | float | Pa | defecto `2e-5` | Presión de referencia p₀; rara vez se cambia |
+| `ref_pressure` | float | Pa | defecto `2e-5` | Presión de referencia $p_0$; rara vez se cambia |
 | `fs` | int, opcional | Hz | > 0; defecto `None` | Necesario para la validación de estabilidad; omítelo para saltarla |
 | `validate` | bool | — | defecto `True` | Emite `CalibrationWarning` con grabaciones inestables/cortas |
 | `max_fluctuation_db` | float, opcional | dB | defecto `None` → Tabla 2 clase 1 | Sobrescritura explícita del límite de estabilidad |
@@ -217,14 +217,14 @@ La calibración vive en tres escalas de tiempo:
   electrónica, con la tensión de la batería. Una cadena de clase 1 sana
   deriva unas centésimas de dB en una sesión, y por eso una diferencia
   antes/después de medio decibelio señala un daño y no el clima. La mayor
-  "deriva" de todas es un mando de ganancia tocado: el factor S solo vale
+  "deriva" de todas es un mando de ganancia tocado: el factor $S$ solo vale
   mientras la cadena permanece exactamente como se calibró.
 
 Una sutileza más sobre clases: las tolerancias se encadenan. Una medición de
 clase 1 exige un calibrador de clase 1 (o LS) *y* un sonómetro de clase 1;
 calibrar una cadena de clase 1 con un calibrador de clase 2 degrada en
 silencio todos los niveles derivados a exactitud de clase 2, porque la
-tolerancia de nivel más ancha del calibrador entra directamente en S.
+tolerancia de nivel más ancha del calibrador entra directamente en $S$.
 
 ## Análisis digital (dBFS)
 

@@ -119,11 +119,11 @@ plt.show()
 | :--- | :--- | :--- | :--- | :--- |
 | `lp1` | 1D or 2D array | dB | one/band, or `(positions, bands)` | Source-room sound pressure level |
 | `l_in` | 1D or 2D array | dB | one/band, or `(positions, bands)` | Normal intensity level over the surface |
-| `measurement_area` | float | m² | > 0 | Measurement-surface area `Sm` |
-| `area` | float | m² | > 0 | Specimen area `S` |
+| `measurement_area` | float | m² | > 0 | Measurement-surface area $S_m$ |
+| `area` | float | m² | > 0 | Specimen area $S$ |
 | `kc` | 1D array | dB | one per band / `None` | Adaptation term for the modified index |
 | `freq` | 1D array | Hz | > 0 | Midband frequencies (`adaptation_term_kc`) |
-| `boundary_area` / `volume` | float | m² / m³ | > 0, both or neither | Room `Sb2` / `V2` for Formula (B.1) |
+| `boundary_area` / `volume` | float | m² / m³ | > 0, both or neither | Room $S_{b2}$ / $V_2$ for Formula (B.1) |
 
 `intensity_sound_reduction()` returns an `IntensityReductionResult` (`r_i`,
 `r_i_modified`, `rating`, `rating_modified`);
@@ -134,19 +134,18 @@ plt.show()
 ## ISO 15186-1 intensity test report (`.report()`)
 
 `IntensityReductionResult.report()` writes the one-page ISO 15186-1:2000 test
-report of the intensity sound reduction index *R*<sub>I</sub>, reusing the same
+report of the intensity sound reduction index $R_I$, reusing the same
 accredited two-panel layout as the ISO 10140 and ISO 16283 fiches. Because
-*R*<sub>I</sub> is an ordinary sound reduction index, its single-number rating
-*R*<sub>I,w</sub> is the ISO 717-1 airborne rating evaluated on the intensity
-spectrum: the fiche names ISO 15186-1 in its basis line, tabulates
-*R*<sub>I</sub> to one decimal place beside the measured-versus-shifted-reference
-curve, boxes `RI,w (C; Ctr)` and prints the statement that the transmitted
-sound power was measured directly over the measurement surface. `verbose=True`
-annexes the *K*<sub>c</sub>-modified index *R*<sub>I,M</sub> (Formula (9))
-beside *R*<sub>I</sub> when an adaptation term was supplied.
+$R_I$ is an ordinary sound reduction index, its single-number rating $R_{I,w}$
+is the ISO 717-1 airborne rating evaluated on the intensity spectrum: the fiche
+names ISO 15186-1 in its basis line, tabulates $R_I$ to one decimal place
+beside the measured-versus-shifted-reference curve, boxes `RI,w (C; Ctr)` and
+prints the statement that the transmitted sound power was measured directly
+over the measurement surface. `verbose=True` annexes the $K_c$-modified index
+$R_{I,M}$ (Formula (9)) beside $R_I$ when an adaptation term was supplied.
 
 The applicable `ReportMetadata` fields describe the intensity measurement:
-`specimen` (the tested element), `area` (specimen area *S*), `client`,
+`specimen` (the tested element), `area` (specimen area $S$), `client`,
 `manufacturer`, `test_room`, `laboratory`, `operator`, `report_id` and
 `test_date`, plus the room/climate fields shared with the other insulation
 fiches. There is no dedicated field for the measurement-surface geometry or the
@@ -185,14 +184,14 @@ repository. Click the preview to open the PDF:
 
 [![Intensity ISO 15186-1 example report: metadata header, one-third-octave RI table beside the measured-versus-shifted-reference curve, boxed RI,w (C; Ctr), the intensity-method statement and a PASS verdict](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/reports/iso15186_intensity_example.webp)](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/reports/iso15186_intensity_example.pdf)
 
-*Intensity fiche (`IntensityReductionResult.report`), RI,w (C; Ctr).*
+*Intensity fiche (`IntensityReductionResult.report`), $R_{I,w}(C; C_{tr})$.*
 
 ## Small building elements: the element-normalized level difference
 
 For a **small building element** (a ventilator, a socket, a small window) the
-intensity method reports the element-normalized level difference
-*D*<sub>I,n,e</sub> (Formula (8)) instead, normalized to the reference
-absorption area *A*<sub>0</sub> = 10 m<sup>2</sup>.
+intensity method reports the element-normalized level difference $D_{I,n,e}$
+(Formula (8)) instead, normalized to the reference absorption area
+$A_0 = 10\ \text{m}^2$.
 `IntensityElementNormalizedResult.report()` writes the same one-page fiche
 through the shared renderer, boxing `DI,n,e,w (C; Ctr)` rated per ISO 717-1;
 `verbose=True` shows the ISO 717 evaluation per band and a `requirement` adds a
@@ -221,9 +220,9 @@ res.report("DIne.pdf", metadata=metadata)               # DI,n,e,w (C; Ctr)
 
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/intensity_element_insulation_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/intensity_element_insulation.svg" alt="Element-normalized level difference DI,n,e of a trickle ventilator per one-third-octave band against the shifted ISO 717-1 reference curve, with the unfavourable deviations shaded and the DI,n,e,w rating annotated" width="80%"></picture>
 
-*The small element is rated exactly like a wall: `DI,n,e` feeds the
+*The small element is rated exactly like a wall: $D_{I,n,e}$ feeds the
 ISO 717-1 engine and the unfavourable deviations (reference above the
-measurement) set `DI,n,e,w`. The `10 lg(Sm/A0)` normalization replaces
+measurement) set $D_{I,n,e,w}$. The $10\lg(S_m/A_0)$ normalization replaces
 the specimen-area term, so the number describes the element irrespective of
 the wall it sits in.*
 
@@ -267,7 +266,7 @@ plt.show()
 
 [![Intensity ISO 15186-1 element example report: metadata header, one-third-octave DI,n,e table beside the measured-versus-shifted-reference curve, boxed DI,n,e,w (C; Ctr), the intensity-method statement and a PASS verdict](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/reports/iso15186_element_example.webp)](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/reports/iso15186_element_example.pdf)
 
-*Element intensity fiche (`IntensityElementNormalizedResult.report`), DI,n,e,w (C; Ctr).*
+*Element intensity fiche (`IntensityElementNormalizedResult.report`), $D_{I,n,e,w}(C; C_{tr})$.*
 
 ## Laboratory or field (ISO 15186-2)
 
@@ -296,13 +295,13 @@ pressure-intensity indicator, and expect the probe's own limits (the
   using sound intensity — Part 1: Laboratory measurements*
   (ISO 15186-1:2000).
   [iso.org catalogue](https://www.iso.org/standard/26097.html).
-  The intensity sound reduction index, the Kc adaptation and the element
+  The intensity sound reduction index, the $K_c$ adaptation and the element
   normalized level difference this page implements.
 - International Organization for Standardization. (2003). *Acoustics —
   Measurement of sound insulation in buildings and of building elements
   using sound intensity — Part 2: Field measurements* (ISO 15186-2:2003).
   [iso.org catalogue](https://www.iso.org/standard/30105.html).
-  The field counterpart, giving the apparent index R'I of the installed
+  The field counterpart, giving the apparent index $R'_I$ of the installed
   element.
 
 ## Standards
@@ -316,11 +315,11 @@ apparent $R'_I$. The single-number ratings reuse ISO 717-1.
 ## See also
 
 - [Laboratory Insulation Measurement](insulation-lab.md): the ISO 10140
-  pressure method that the Kc adaptation reproduces.
+  pressure method that the $K_c$ adaptation reproduces.
 - [Field Insulation Measurement (ISO 16283)](insulation-field.md): the
   pressure-based field quantities and their single-number ratings.
 - [Insulation Ratings (ISO 717)](insulation-ratings.md): the
-  reference-curve engine behind RI,w and DI,n,e,w.
+  reference-curve engine behind $R_{I,w}$ and $D_{I,n,e,w}$.
 - [Sound Intensity](intensity.md): the two-microphone probe, its field
   indicators and the residual-index qualification behind every scan.
 - API reference: [`building.intensity_insulation`](https://jmrplens.github.io/phonometry/reference/api/building/intensity-insulation/).

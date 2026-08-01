@@ -56,22 +56,22 @@ onda esférica** de un suelo de impedancia finita (Weyl-Van der Pol) y la
 **difracción por teoría ondulatoria** de una pantalla, ambos en una atmósfera
 homogénea (sin refracción ni turbulencia). Son el núcleo físico de los modelos
 de suelo y barrera de Nord2000 y CNOSSOS, y resuelven la estructura de
-interferencia dependiente de la frecuencia que los términos `Agr`/`Dz` por
-banda de octava suavizan.
+interferencia dependiente de la frecuencia que los términos $A_{gr}$/$D_z$
+por banda de octava suavizan.
 
 ## 1. Efecto suelo de onda esférica (Weyl-Van der Pol)
 
 El campo sonoro de una fuente puntual sobre un suelo de reacción local es la
 suma de una onda directa y una onda reflejada ponderada por el **coeficiente de
-reflexión de onda esférica** `Q` (Attenborough Ec. 2.40a; Salomons Ec. 3.2):
+reflexión de onda esférica** $Q$ (Attenborough Ec. 2.40a; Salomons Ec. 3.2):
 
 $$
 p = \frac{e^{ikR_1}}{4\pi R_1} + Q\,\frac{e^{ikR_2}}{4\pi R_2},
 $$
 
-con `R1` la distancia fuente-receptor y `R2` la distancia de la fuente imagen.
-El coeficiente (Attenborough Ec. 2.40c; Salomons Ec. D.58) corrige el
-coeficiente de onda plana `Rp` por la curvatura del frente de onda:
+con $R_1$ la distancia fuente-receptor y $R_2$ la distancia de la fuente
+imagen. El coeficiente (Attenborough Ec. 2.40c; Salomons Ec. D.58) corrige el
+coeficiente de onda plana $R_p$ por la curvatura del frente de onda:
 
 $$
 Q = R_p + (1 - R_p)\,F(w), \qquad
@@ -83,13 +83,14 @@ F(w) = 1 + i\sqrt{\pi}\,w\,e^{-w^2}\operatorname{erfc}(-iw), \qquad
 w = \sqrt{\tfrac{i k R_2}{2}}\left(\cos\theta + \tfrac{1}{Z}\right).
 $$
 
-Aquí `Z` es la impedancia superficial del suelo normalizada por `ρc`, `θ` es el
-ángulo de incidencia desde la normal al suelo (`cos θ = (hs + hr)/R2`) y el
-factor de pérdida por frontera `F(w)` se escribe mediante la función de error
-complementaria escalada `e^{-w²} erfc(-iw)`, es decir, la función de Faddeeva
-`scipy.special.wofz`. El segundo término de `Q` es la *onda de suelo* que
-mantiene finito el campo en incidencia rasante, donde `Rp → -1` y un modelo de
-onda plana predeciría silencio (Salomons Ecs. D.57, D.59, D.60).
+Aquí $Z$ es la impedancia superficial del suelo normalizada por $\rho c$,
+$\theta$ es el ángulo de incidencia desde la normal al suelo
+($\cos\theta = (h_s + h_r)/R_2$) y el factor de pérdida por frontera $F(w)$
+se escribe mediante la función de error complementaria escalada
+$e^{-w^2}\operatorname{erfc}(-iw)$, es decir, la función de Faddeeva
+`scipy.special.wofz`. El segundo término de $Q$ es la *onda de suelo* que
+mantiene finito el campo en incidencia rasante, donde $R_p \to -1$ y un
+modelo de onda plana predeciría silencio (Salomons Ecs. D.57, D.59, D.60).
 
 El nivel sonoro relativo (la *atenuación en exceso*, dB respecto al campo libre)
 es (Salomons Ec. 3.4):
@@ -118,10 +119,11 @@ modelo `delany_bazley` o `miki` de
 [`phonometry.materials`](/phonometry/es/guides/porous-absorbers/), que modelan
 un suelo poroso semiinfinito) o se suministra directamente como una `impedance`
 compleja normalizada (un escalar, un vector por banda o un `PorousMediumResult`).
-Un valor de `impedance` directo se toma en el convenio `e^{-iωt}` de Salomons,
-en el que un suelo pasivo tiene `Im(Z) > 0`; los modelos porosos de
-`phonometry.materials` trabajan en el convenio opuesto `e^{+jωt}`
-(`Im(Z) < 0`), así que todo lo obtenido de ellos (una `flow_resistivity` o un
+Un valor de `impedance` directo se toma en el convenio $e^{-i\omega t}$ de
+Salomons, en el que un suelo pasivo tiene $\operatorname{Im}(Z) > 0$; los
+modelos porosos de `phonometry.materials` trabajan en el convenio opuesto
+$e^{+j\omega t}$ ($\operatorname{Im}(Z) < 0$), así que todo lo obtenido de
+ellos (una `flow_resistivity` o un
 `PorousMediumResult`) se conjuga internamente antes de entrar en las fórmulas
 de Weyl-Van der Pol.
 
@@ -158,27 +160,29 @@ plt.show()
 </details>
 
 **Límites que reproduce la implementación** (cada uno un test o ancla de
-conformidad fijados): un suelo acústicamente rígido (`|Z| → ∞`) da `Rp → 1`,
-`|w| → 0`, `F → 1` y `Q → 1`, de modo que `ΔL` alcanza `+6 dB` en fase; la
-resistividad al flujo efectiva `σ → ∞` tiende a ese suelo rígido; la incidencia
-rasante (`hs, hr → 0`) da `Rp → -1`; y el efecto suelo es recíproco al
-intercambiar las alturas de fuente y receptor.
+conformidad fijados): un suelo acústicamente rígido ($|Z| \to \infty$) da
+$R_p \to 1$, $|w| \to 0$, $F \to 1$ y $Q \to 1$, de modo que $\Delta L$
+alcanza +6 dB en fase; la resistividad al flujo efectiva $\sigma \to \infty$
+tiende a ese suelo rígido; la incidencia rasante ($h_s, h_r \to 0$) da
+$R_p \to -1$; y el efecto suelo es recíproco al intercambiar las alturas de
+fuente y receptor.
 
 ## 2. Difracción de barreras avanzada
 
 `barrier_insertion_loss` y sus piezas dan tres niveles de apantallamiento más
-allá del término `Dz` de ISO 9613-2.
+allá del término $D_z$ de ISO 9613-2.
 
 **Forma cerrada de Kurze-Anderson.** La pérdida por inserción de una pantalla
-fina en función del número de Fresnel `N = (2/λ)(A + B − d)` (Bies Ec. 5.134,
-con `A` y `B` los dos tramos del camino más corto fuente-borde-receptor y `d` la
-distancia recta) es (Bies Ec. 5.138; Kurze y Anderson 1971):
+fina en función del número de Fresnel $N = (2/\lambda)(A + B - d)$ (Bies
+Ec. 5.134, con $A$ y $B$ los dos tramos del camino más corto
+fuente-borde-receptor y $d$ la distancia recta) es (Bies Ec. 5.138; Kurze y
+Anderson 1971):
 
 $$
 \Delta = 5 + 20\lg\!\left(\frac{\sqrt{2\pi N}}{\tanh\sqrt{2\pi N}}\right)\;\text{dB},
 $$
 
-que tiende a `5 dB` en el límite de sombra `N → 0` y aproxima la curva de
+que tiende a 5 dB en el límite de sombra $N \to 0$ y aproxima la curva de
 fuente puntual de Maekawa dentro de unos 1,5 dB.
 
 Los métodos de pantalla delgada comparten las mismas tres magnitudes
@@ -203,21 +207,23 @@ il.plot()                           # pérdida por inserción frente a frecuenci
 inserción por teoría ondulatoria de una pantalla fina rígida: la forma compacta
 en integrales de Fresnel de la solución de MacDonald / Hadden y Pierce
 (Attenborough Ecs. 9.19-9.20), construida con las funciones de Fresnel
-auxiliares. Da `6 dB` en el límite de sombra (el campo se reduce a la mitad, el
+auxiliares. Da 6 dB en el límite de sombra (el campo se reduce a la mitad, el
 límite de cuña plana) y sigue a Kurze-Anderson en la zona de sombra.
 
-**Barreras gruesas.** Un `thickness` (ancho superior `e`) alarga el camino
-difractado a `A + e + B`, el número de Fresnel de doble borde
-`N = (2/λ)(A + B + e − d)` de Bies Ec. 5.157, de modo que una barrera gruesa o
+**Barreras gruesas.** Un `thickness` (ancho superior $e$) alarga el camino
+difractado a $A + e + B$, el número de Fresnel de doble borde
+$N = (2/\lambda)(A + B + e - d)$ de Bies Ec. 5.157, de modo que una barrera
+gruesa o
 un caballón atenúa monótonamente más que la pantalla fina de la misma altura.
 
 **Barrera coherente sobre el suelo.** Con una `ground_impedance` (o una
 `ground_flow_resistivity`) se combinan coherentemente los cuatro caminos
 difractados fuente-imagen / receptor-imagen, ponderando cada reflexión en el
-suelo por el coeficiente de onda esférica `Q` anterior (Attenborough cap. 9;
+suelo por el coeficiente de onda esférica $Q$ anterior (Attenborough cap. 9;
 Bies sec. 5.3.5). Esto expone la estructura de interferencia suelo-barrera que
-una suma puramente energética de `Agr` y `Dz` no puede. Como simplificación de
-primer orden, un único `Q` (sobre la geometría global fuente-receptor) pondera
+una suma puramente energética de $A_{gr}$ y $D_z$ no puede. Como
+simplificación de primer orden, un único $Q$ (sobre la geometría global
+fuente-receptor) pondera
 todos los rebotes en lugar de un coeficiente por camino imagen; el modelo es
 coherente y recíproco pero no una solución completa por elementos de contorno.
 
@@ -277,8 +283,8 @@ interferencia de los caminos imagen.
 
 *Dibujada a escala, la pantalla casi desaparece: el camino difractado sobre
 el borde es solo 0,15 m más largo que el directo bloqueado, y esa diferencia
-es la entrada geométrica del número de Fresnel `N = (2/λ)(A + B − d)` del que
-dependen los métodos de pantalla delgada de arriba.*
+es la entrada geométrica del número de Fresnel $N = (2/\lambda)(A + B - d)$
+del que dependen los métodos de pantalla delgada de arriba.*
 
 <details>
 <summary>Ver el código de esta figura</summary>
@@ -300,12 +306,12 @@ plt.show()
 
 ## Relación con ISO 9613-2
 
-Los términos tabulados `Agr` y `Dz` del
+Los términos tabulados $A_{gr}$ y $D_z$ del
 [método ISO 9613-2](/phonometry/es/guides/outdoor-propagation/) son ajustes de
 ingeniería por banda de octava basados en energía; `ground_effect` y
 `barrier_insertion_loss` son sus contrapartes de banda estrecha por acústica
-ondulatoria. Sobre suelo rígido ambos coinciden en el realce de `+6 dB` y en el
-suelo de barrera rasante de `5 dB`, pero solo los modelos ondulatorios resuelven
+ondulatoria. Sobre suelo rígido ambos coinciden en el realce de +6 dB y en el
+suelo de barrera rasante de 5 dB, pero solo los modelos ondulatorios resuelven
 las caídas de interferencia que se mueven con la geometría, la frecuencia y la
 impedancia del suelo, lo que los hace la infraestructura natural de los esquemas
 meteorológicos de Nord2000 y CNOSSOS.
@@ -315,7 +321,7 @@ meteorológicos de Nord2000 y CNOSSOS.
 **Cubierto.** El coeficiente de reflexión de onda esférica de Weyl-Van der
 Pol para el suelo (`ground_effect`, Attenborough Ec. 2.40a/c, Salomons
 Ec. 3.2/D.58, el factor de pérdida por frontera mediante la función de
-Faddeeva), con sus límites de suelo rígido (`+6 dB`), incidencia rasante y
+Faddeeva), con sus límites de suelo rígido (+6 dB), incidencia rasante y
 reciprocidad anclados como tests. La difracción de barrera por teoría
 ondulatoria (`barrier_insertion_loss`): la forma cerrada de Kurze-Anderson
 (`kurze_anderson_attenuation`, Bies Ec. 5.138), el semiplano rígido exacto
@@ -329,7 +335,7 @@ refracción ni turbulencia; un gradiente vertical de velocidad del sonido es
 el objeto de la guía separada de
 [refracción atmosférica](/phonometry/es/guides/atmospheric-refraction/).
 El modelo coherente de barrera sobre suelo pondera los cuatro caminos
-difractados con un único coeficiente de reflexión `Q` calculado sobre la
+difractados con un único coeficiente de reflexión $Q$ calculado sobre la
 geometría global fuente-receptor, en lugar de un coeficiente distinto por
 camino imagen, así que es coherente y recíproco pero no una solución
 completa por elementos de contorno.

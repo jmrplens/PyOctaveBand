@@ -15,7 +15,7 @@ the body responds at each frequency, reduced to a **weighted r.m.s.**
 acceleration (with dose measures for shocks and long records), condensed across
 axes into a single magnitude (the **vibration total value** for hand-arm
 exposure and for comfort; the **highest axis value** for the whole-body health
-assessment), and finally normalised to an **8-hour daily exposure** `A(8)` that
+assessment), and finally normalised to an **8-hour daily exposure** $A(8)$ that
 is compared against the action and limit values of the European directive.
 
 The weightings themselves are defined once, in **ISO 8041-1:2017**, as a cascade
@@ -235,7 +235,7 @@ print(round(a_v, 3))     # 0.882  m/s^2
 value against the Annex B health guidance caution zone, a band based mainly on
 4 h to 8 h exposures below which health effects are not clearly documented,
 inside which caution is indicated and above which risks are likely; Directive
-2002/44/EC turns that guidance into the enforceable `A(8)` action and limit
+2002/44/EC turns that guidance into the enforceable $A(8)$ action and limit
 values used below. The *comfort* assessment of clause 8 instead combines all
 axes (and, where relevant, backrest, feet and rotation) into the vibration
 total value $a_v$ with its own $k$ set and reads it on the Annex C scale for
@@ -267,8 +267,8 @@ print(round(a, 3))    # 0.62  m/s^2 (max of 0.49, 0.392, 0.62; not a_v = 0.882)
 
 `daily_vibration_exposure` builds the partial exposures, combines them and
 assesses the result against **Directive 2002/44/EC**: hand-arm action value
-`A(8) = 2.5` and limit value `5` m/s²; whole-body action `0.5` and limit `1.15`
-m/s² (or a VDV of `9.1` / `21` m/s¹·⁷⁵):
+$A(8) = 2.5$ and limit value 5 m/s²; whole-body action 0.5 and limit 1.15
+m/s² (or a VDV of 9.1 / 21 m/s¹·⁷⁵):
 
 ```python
 from phonometry import vibration
@@ -336,7 +336,7 @@ from phonometry import vibration
 print(round(vibration.hav_vwf_lifetime_years(7.0), 1))   # 4.0 years (Table C.1)
 ```
 
-The standards deliberately define no safe limit; `A(8)` and the directive's
+The standards deliberately define no safe limit; $A(8)$ and the directive's
 action and limit values are the basis for any exposure criterion. For whole-body
 exposure, `energy_equivalent_acceleration` gives the ISO 2631-1 Eq. (B.3)
 energy-equivalent magnitude across periods of different magnitude and duration.
@@ -457,19 +457,19 @@ is quantitative: when the band-limited vertical peak acceleration exceeds
 
 ## 1. Spinal response (clause 5.2)
 
-A seat-to-spine transfer function ``H(f)`` (one complex zero and six complex
+A seat-to-spine transfer function $H(f)$ (one complex zero and six complex
 poles, unity transmissibility at 0 Hz and a resonance near 5 Hz) maps the
-measured seat acceleration to the vertical spinal response ``Az(t)``
+measured seat acceleration to the vertical spinal response $A_z(t)$
 (Formula 1/2):
 
 $$
 A_z(t) = \mathcal{F}^{-1}\!\left[H(f)\,\mathcal{F}[a_z(t)]\right].
 $$
 
-The input record must be **conditioned (DC-removed)**: because `H` is unity at
+The input record must be **conditioned (DC-removed)**: because $H$ is unity at
 0 Hz by design, a DC offset (e.g. the 1 g gravity component of a DC-coupled
-accelerometer) passes straight into `Az(t)` and corrupts the positive response
-peaks of the dose. Subtract the mean (or high-pass) before processing.
+accelerometer) passes straight into $A_z(t)$ and corrupts the positive
+response peaks of the dose. Subtract the mean (or high-pass) before processing.
 
 ```python
 from phonometry import vibration
@@ -481,16 +481,16 @@ print(round(abs(vibration.seat_to_spine_transfer([5.0])[0]), 2))  # 1.54
 
 ## 2. Acceleration dose (clause 5.3)
 
-The **acceleration dose** combines the positive response peaks ``Az,i`` (each
-the maximum between two consecutive zero crossings) with a sixth-power law, so
-the largest shocks dominate (Formula 3):
+The **acceleration dose** combines the positive response peaks $A_{z,i}$
+(each the maximum between two consecutive zero crossings) with a sixth-power
+law, so the largest shocks dominate (Formula 3):
 
 $$
 D_z = 1.07\left(\sum_i A_{z,i}^{\,6}\right)^{1/6}.
 $$
 
-A daily dose scales the measured dose to the daily exposure time ``td`` over the
-measurement time ``tm`` (Formula 4): ``Dzd = Dz * (td/tm)**(1/6)``.
+A daily dose scales the measured dose to the daily exposure time $t_d$ over
+the measurement time $t_m$ (Formula 4): $D_{zd} = D_z\,(t_d/t_m)^{1/6}$.
 
 ```python
 from phonometry import vibration
@@ -501,11 +501,11 @@ print(round(vibration.dose_from_peaks([40.0] * 5), 2))  # 55.97  m/s2
 
 ## 3. Injury risk (Annex C)
 
-The daily dose becomes a daily **compressive stress** ``Sd = mz * Dzd``
-(Formula C.1), where ``mz`` (0.029 MPa per m/s² for an 82 kg male, 0.025 for a
+The daily dose becomes a daily **compressive stress** $S_d = m_z\,D_{zd}$
+(Formula C.1), where $m_z$ (0.029 MPa per m/s² for an 82 kg male, 0.025 for a
 64 kg female) converts acceleration to vertebral stress. The stress accumulates
 over the exposure years against the ageing spine's reducing ultimate strength
-``Su = 6.75 - Sage*(b+i)`` (Formulae C.3/C.4):
+$S_u = 6.75 - S_{\mathrm{age}}\,(b+i)$ (Formulae C.3/C.4):
 
 $$
 R = \left[\sum_{i=0}^{n-1}
@@ -579,10 +579,10 @@ plt.show()
 
 </details>
 
-The `MultipleShockResult` carries the dose ``Dz``, the daily dose ``Dzd``, the
-compressive stress ``Sd``, the stress variable ``R``, the injury probability and
-the response peaks, and its `.plot()` draws the injury-probability curve with the
-10/50/90 % risk thresholds of Table C.2. The model is vertical-axis only:
+The `MultipleShockResult` carries the dose $D_z$, the daily dose $D_{zd}$, the
+compressive stress $S_d$, the stress variable $R$, the injury probability and
+the response peaks, and its `.plot()` draws the injury-probability curve with
+the 10/50/90 % risk thresholds of Table C.2. The model is vertical-axis only:
 clause 4 neglects the horizontal contributions to spinal compression by design,
 and the horizontal spinal model of the withdrawn 2004 edition is not reinstated,
 so horizontal whole-body exposure is assessed instead with the r.m.s.,
@@ -597,19 +597,19 @@ sheet: the standard-basis line (Clause 5 spinal response and the Annex C risk
 model), an optional metadata header (client, subject via `specimen`,
 workplace/vehicle via `test_room`, and the `instrumentation` and `calibration`
 free-text fields of `ReportMetadata`), the exposure-scenario grid (subject sex,
-the age `b` at which the exposure started, the number of exposure years `n`, the
-number of exposure days per year `N` and the number of counted response shocks),
-and the dose-and-stress analysis table with the acceleration dose `Dz`
-(Formula 3), the daily dose `Dzd` (Formula 4), the daily compressive stress `Sd`
-(Formula C.1), the cumulative stress variable `R` (Formula C.3) and the
-probability of lumbar injury `Π` (Formula C.5).
+the age $b$ at which the exposure started, the number of exposure years $n$,
+the number of exposure days per year $N$ and the number of counted response
+shocks), and the dose-and-stress analysis table with the acceleration dose
+$D_z$ (Formula 3), the daily dose $D_{zd}$ (Formula 4), the daily compressive
+stress $S_d$ (Formula C.1), the cumulative stress variable $R$ (Formula C.3)
+and the probability of lumbar injury $\Pi$ (Formula C.5).
 
 Because ISO 2631-5:2018 defines no exposure limit, the fiche carries a risk-band
-zone row rather than a PASS/FAIL verdict: the boxed `R` and `Π` name the Annex C
-risk classification, and a classification table places `R` among the Table C.2
-stress variables for 10 / 50 / 90 % risk of injury (low / moderate / high / very
-high probability of an adverse health effect), with the injury-probability chart
-above it. `language="es"` renders the Spanish fiche (comma decimals). Rendering
+zone row rather than a PASS/FAIL verdict: the boxed $R$ and $\Pi$ name the
+Annex C risk classification, and a classification table places $R$ among the
+Table C.2 stress variables for $10$ / $50$ / $90$ % risk of injury (low /
+moderate / high / very high probability of an adverse health effect), with the
+injury-probability chart above it. `language="es"` renders the Spanish fiche (comma decimals). Rendering
 needs the optional `phonometry[report]` extra (reportlab), plus matplotlib for
 the chart.
 

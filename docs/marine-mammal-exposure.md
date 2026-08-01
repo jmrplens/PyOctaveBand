@@ -274,7 +274,7 @@ piling campaign's weighted exposure falls below a criterion.
 - ISO 18405:2017. *Underwater acoustics — Terminology*.
   [ISO page](https://www.iso.org/standard/62406.html).
   The symbols and references the guidance documents adopt for their criteria
-  (Lp,0-pk and LE,p re 1 µPa and 1 µPa²·s).
+  ($L_{p,\text{0-pk}}$ and $L_{E,p}$ re 1 µPa and 1 µPa²·s).
 
 ## Standards & sources
 

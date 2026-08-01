@@ -35,14 +35,14 @@ references:
 import ThemeImage from '../../../../components/ThemeImage.astro';
 import ReportPreview from '../../../../components/ReportPreview.astro';
 
-De las vías normalizadas hasta el nivel de potencia acústica `LW`, los
+De las vías normalizadas hasta el nivel de potencia acústica $L_W$, los
 métodos de presión son los que no necesitan nada más exótico que un
 sonómetro: muestrear la presión acústica sobre una superficie que envuelve la
 fuente, promediarla en energía, corregirla y sumar el término de superficie.
 Esta guía cubre los tres. Los métodos de **superficie envolvente** de
 ISO 3744 (grado de ingeniería) e ISO 3746 (grado de inspección) funcionan in
 situ, sobre uno o más planos reflectantes, y limpian el nivel superficial
-con la corrección de ruido de fondo `K1` y la corrección de entorno `K2`.
+con la corrección de ruido de fondo $K_1$ y la corrección de entorno $K_2$.
 El **método de precisión** de ISO 3745 traslada la misma idea a una sala
 anecoica o semianecoica cualificada, donde una malla fija de micrófonos
 muestrea directamente el campo libre y las correcciones de grado 1 son
@@ -54,40 +54,40 @@ sopesan en [Potencia acústica](/phonometry/es/guides/sound-power/).
 ## 1. Superficie envolvente, presión acústica (ISO 3744 / ISO 3746)
 
 Coloca la fuente sobre un plano reflectante e imagina una **superficie de
-medición** de área `S` que la envuelve: una semiesfera para una fuente
+medición** de área $S$ que la envuelve: una semiesfera para una fuente
 compacta, una caja (paralelepípedo recto) para una grande o alargada.
 Muestrea el nivel de presión acústica en un conjunto de posiciones de micrófono
 sobre esa superficie, promédialas en energía, y la potencia acústica se obtiene
 porque una superficie suficientemente difusa capta toda la energía radiada:
 
 $$
-\bar{L}_p = 10 \log_{10}\left( \frac{1}{N_M} \sum_i 10^{L_{pi}/10} \right), \qquad
-L_W = \bar{L}_p - K_1 - K_2 + 10 \log_{10}\frac{S}{S_0},\quad S_0 = 1\ \text{m}^2 .
+\bar{L}_p = 10\lg\left( \frac{1}{N_M} \sum_i 10^{L_{pi}/10} \right), \qquad
+L_W = \bar{L}_p - K_1 - K_2 + 10\lg\frac{S}{S_0},\quad S_0 = 1\ \text{m}^2 .
 $$
 
 Dos correcciones depuran el nivel superficial. La **corrección por ruido de
 fondo** elimina la energía que habría estado presente con la fuente apagada, a
-partir del margen `ΔLp` entre los niveles con la fuente encendida y los de
-fondo,
+partir del margen $\Delta L_p$ entre los niveles con la fuente encendida y los
+de fondo,
 
 $$
-K_1 = -10 \log_{10}\left( 1 - 10^{-\Delta L_p/10} \right),
+K_1 = -10\lg\left( 1 - 10^{-\Delta L_p/10} \right),
 $$
 
 y la **corrección ambiental** elimina la acumulación reverberante de la sala
-de ensayo a partir de su área de absorción acústica equivalente `A`,
+de ensayo a partir de su área de absorción acústica equivalente $A$,
 
 $$
-K_2 = 10 \log_{10}\left( 1 + \frac{4 S}{A} \right).
+K_2 = 10\lg\left( 1 + \frac{4 S}{A} \right).
 $$
 
 El área de la superficie es una forma cerrada de la geometría: una semiesfera
-es `S = 2πr²` sobre un plano reflectante (dividida entre dos y entre cuatro
-para dos y tres planos), y una caja de un plano es `S = 4(ab + bc + ca)` con
-`a = 0.5·l1 + d`, `b = 0.5·l2 + d`, `c = l3 + d` para la distancia de medición
-`d`. ISO 3746 (inspección) comparte todas las fórmulas pero es más burda: menos
+es $S = 2\pi r^2$ sobre un plano reflectante (dividida entre dos y entre cuatro
+para dos y tres planos), y una caja de un plano es $S = 4(ab + bc + ca)$ con
+$a = 0{,}5\,l_1 + d$, $b = 0{,}5\,l_2 + d$, $c = l_3 + d$ para la distancia de
+medición $d$. ISO 3746 (inspección) comparte todas las fórmulas pero es más burda: menos
 posiciones de micrófono, un criterio de fondo de 3 dB en lugar de 6 dB, y
-validez hasta `K2 ≤ 7 dB` en lugar de 4 dB.
+validez hasta $K_2 \le 7\ \text{dB}$ en lugar de 4 dB.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_sound_power_surfaces_es.svg" alt="Superficies de medición de ISO 3744: una semiesfera de radio r envolviendo una fuente compacta sobre un plano reflectante, y un paralelepípedo recto (caja) a la distancia de medición d alrededor de una fuente grande, ambas con las posiciones de micrófono marcadas" width="88%" />
 
@@ -124,9 +124,9 @@ res.plot()   # barras de nivel de potencia acústica por banda; LWA en el títul
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sound_power_pressure_result_es.svg" alt="El espectro de nivel de potencia acústica por superficie envolvente del ejemplo de semiesfera de ISO 3744, una barra por banda de octava de 63 Hz a 8 kHz con pico cerca de 500 Hz, con el total ponderado A de 92,4 dB(A) en el título" width="88%" />
 
 *Una barra por banda: la presión superficial promediada en energía menos las
-correcciones de fondo (`K1`) y ambiental (`K2`) más el término de superficie
-`10 lg(S/S0)` dan `LW(f)`, y la suma energética ponderada A entre bandas da el
-número único `LWA` del título.*
+correcciones de fondo ($K_1$) y ambiental ($K_2$) más el término de superficie
+$10\lg(S/S_0)$ dan $L_W(f)$, y la suma energética ponderada A entre bandas da
+el número único $L_{WA}$ del título.*
 
 <details>
 <summary>Mostrar el código de esta figura</summary>
@@ -170,12 +170,14 @@ plt.show()
 
 </details>
 
-El total ponderado A `LWA` se combina a partir de las potencias por banda con
+El total ponderado A $L_{WA}$ se combina a partir de las potencias por banda
+con
 las correcciones de ponderación A del Anexo E de ISO 3744, así que necesita
 `frequencies`. Pasar los datos de sala (`reverberation_time` + `volume`,
 o `absorption_area`, o `mean_absorption_coefficient` + `room_surface`) habilita
-`K2`; omítelos y el campo se trata como libre (`K2 = 0`). Si el margen de fondo
-cae por debajo del criterio del grado o `K2` supera el límite de validez, un
+$K_2$; omítelos y el campo se trata como libre ($K_2 = 0$). Si el margen de
+fondo cae por debajo del criterio del grado o $K_2$ supera el límite de
+validez, un
 `SoundPowerWarning` avisa de que los niveles son cotas superiores; la
 determinación se devuelve igualmente.
 
@@ -186,33 +188,33 @@ cualquiera de las dos subestima la emisión. Por eso las normas las acotan, y
 por eso la mayoría de las disputas sobre un resultado de superficie
 envolvente se remontan a uno de estos hábitos:
 
-- **K1 tiene un precipicio, no una pendiente.** Con 15 dB de margen la
+- **$K_1$ tiene un precipicio, no una pendiente.** Con 15 dB de margen la
   corrección es de tan solo 0,14 dB (despreciable); en el criterio de
   ingeniería de 6 dB ya es 1,26 dB, el mayor valor que acepta el grado. Por
-  debajo del criterio la norma no permite aplicar la fórmula: `K1` se acota
+  debajo del criterio la norma no permite aplicar la fórmula: $K_1$ se acota
   y el resultado se declara cota superior. Nunca extrapoles la resta a un
   margen menor; aumenta el margen (emplazamiento más silencioso, superficie más cercana) o
   pásate al método de intensidad.
-- **K1 supone un fondo estacionario.** La lectura con la fuente apagada debe
+- **$K_1$ supone un fondo estacionario.** La lectura con la fuente apagada debe
   tomarse en las mismas posiciones y con la sala en el mismo estado, y la
   energía de fondo debe ser la misma durante ambas lecturas. Un sistema de
   ventilación que cicla o un vehículo que pasa durante cualquiera de las dos
   invalida la pareja; la resta energética supone además que la fuente y el
   fondo son incoherentes, lo que vale para el ruido ajeno pero no para las
   reflexiones de la propia fuente.
-- **K2 elimina la acumulación media de la sala, no las reflexiones
+- **$K_2$ elimina la acumulación media de la sala, no las reflexiones
   discretas.** Una pared cercana, un carro u otra máquina justo fuera de la
   superficie añaden una contribución especular concentrada en unos pocos
   micrófonos. Ese desequilibrio aflora en el índice de directividad aparente
-  `DIi*`, y ninguna corrección promedio de sala puede eliminarlo: desplaza
+  $DI_i^*$, y ninguna corrección promedio de sala puede eliminarlo: desplaza
   la superficie, retira el reflector o trátalo con absorción.
-- **K2 vale lo que valga `A`.** Con `A` de Sabine (`0.16·V/T`), los errores
-  en el tiempo de reverberación o en el volumen se propagan directamente. En
-  el límite de validez `K2 = 4 dB` cerca del 60 % de la energía medida
-  proviene de la sala, no de la fuente, y un error del 20 % en `A` aún
-  modifica `LW` en unos 0,5 dB.
-  Prefiere un `T60` medido a un coeficiente de absorción estimado, y mantén
-  la distancia de medición lo bastante pequeña para que `K2` quede
+- **$K_2$ vale lo que valga $A$.** Con $A$ de Sabine ($0{,}16\,V/T$), los
+  errores en el tiempo de reverberación o en el volumen se propagan
+  directamente. En el límite de validez $K_2 = 4\ \text{dB}$ cerca del 60 %
+  de la energía medida proviene de la sala, no de la fuente, y un error del
+  20 % en $A$ aún modifica $L_W$ en unos 0,5 dB.
+  Prefiere un $T_{60}$ medido a un coeficiente de absorción estimado, y mantén
+  la distancia de medición lo bastante pequeña para que $K_2$ quede
   holgadamente por debajo del límite.
 
 ### Parámetros de `sound_power_pressure()`
@@ -221,24 +223,24 @@ envolvente se remontan a uno de estos hábitos:
 | :--- | :--- | :--- | :--- | :--- |
 | `levels_positions` | array 2D | dB | `(NM, NB)` | Una fila por posición, una columna por banda (o una única columna ponderada A) |
 | `surface` | str | — | `'hemisphere'` / `'box'` | Forma de la superficie de medición |
-| `radius` | float | m | > 0 (semiesfera) | Radio de la semiesfera `r` |
-| `dimensions` | (float, float, float) | m | > 0 (caja) | `(l1, l2, l3)` del paralelepípedo de referencia |
-| `distance` | float | m | > 0 (caja) | Distancia de medición `d` |
+| `radius` | float | m | > 0 (semiesfera) | Radio de la semiesfera $r$ |
+| `dimensions` | (float, float, float) | m | > 0 (caja) | $(l_1, l_2, l_3)$ del paralelepípedo de referencia |
+| `distance` | float | m | > 0 (caja) | Distancia de medición $d$ |
 | `reflecting_planes` | int | — | `1` / `2` / `3`, por defecto `1` | Divide entre dos/cuatro el área de la semiesfera |
-| `background_levels` | array 2D o espectro | dB | `(NM, NB)`, o `(NB,)` / `(1, NB)` | Habilita `K1`; un espectro único se difunde a todas las posiciones |
-| `frequencies` | array 1D | Hz | centros de banda nominales | Habilita `LWA` (Anexo E) |
-| `absorption_area` | float o array 1D | m² | > 0 | `A` para `K2` (directo); un array por banda → `K2` por banda |
-| `reverberation_time`, `volume` | float/array, float | s, m³ | > 0 | `A = 0.16 V/T` para `K2`; `T` por banda → `K2` por banda |
-| `mean_absorption_coefficient`, `room_surface` | float/array, float | —, m² | `(0,1]`, > 0 | `A = α·Sv` (Ec. A.7); `α` por banda → `K2` por banda |
+| `background_levels` | array 2D o espectro | dB | `(NM, NB)`, o `(NB,)` / `(1, NB)` | Habilita $K_1$; un espectro único se difunde a todas las posiciones |
+| `frequencies` | array 1D | Hz | centros de banda nominales | Habilita $L_{WA}$ (Anexo E) |
+| `absorption_area` | float o array 1D | m² | > 0 | $A$ para $K_2$ (directo); un array por banda → $K_2$ por banda |
+| `reverberation_time`, `volume` | float/array, float | s, m³ | > 0 | $A = 0{,}16\,V/T$ para $K_2$; $T$ por banda → $K_2$ por banda |
+| `mean_absorption_coefficient`, `room_surface` | float/array, float | —, m² | `(0,1]`, > 0 | $A = \alpha\,S_v$ (Ec. A.7); $\alpha$ por banda → $K_2$ por banda |
 | `grade` | str | — | `'engineering'` (por defecto) / `'survey'` | ISO 3744 vs ISO 3746 |
-| `omc_uncertainty` | float | dB | por defecto `0.0` | `σomc`, inestabilidad de operación/montaje, incorporada a `U` |
+| `omc_uncertainty` | float | dB | por defecto `0.0` | $\sigma_\text{omc}$, inestabilidad de operación/montaje, incorporada a $U$ |
 
-Devuelve un `SoundPowerResult`: `sound_power_level` (`LW` por banda),
-`surface_pressure_level` (`Lp` tras K1/K2), `mean_pressure_level`,
-`background_correction`/`environmental_correction` (`K1`/`K2`),
-`directivity_index` (índice de directividad aparente `DIi*` por posición de
+Devuelve un `SoundPowerResult`: `sound_power_level` ($L_W$ por banda),
+`surface_pressure_level` ($L_p$ tras $K_1$/$K_2$), `mean_pressure_level`,
+`background_correction`/`environmental_correction` ($K_1$/$K_2$),
+`directivity_index` (índice de directividad aparente $DI_i^*$ por posición de
 micrófono **y** banda de frecuencia, forma `(NM, NB)`; ISO 3744 cláusula 8.6),
-`surface_area`, `sound_power_level_a` (`LWA`), `uncertainty`
+`surface_area`, `sound_power_level_a` ($L_{WA}$), `uncertainty`
 (expandida, 95 %) y `grade`. `measurement_positions('hemisphere', radius=…,
 reflecting_planes=…, tones=…, grade=…)` devuelve las coordenadas normativas
 `(N, 3)` de micrófono (Tabla B.1 para fuentes tonales, B.2 para banda ancha).
@@ -334,14 +336,14 @@ print(round(mc.c1, 4), round(mc.c2, 4))   # -0.1282 0.0
 print(round(emission.precision_uncertainty(0.5, 2.0, 2.0), 3))   # 4.123
 ```
 
-La `MeteorologicalCorrection` es un par de escalares (más el `C3` por banda
+La `MeteorologicalCorrection` es un par de escalares (más el $C_3$ por banda
 cuando el coeficiente de atenuación se aporta por banda), no un espectro
 dibujable: las correcciones se pliegan en el `PrecisionSoundPowerResult` como
 sus campos `c1`/`c2`/`c3`, y la ficha `.report()` las imprime en su franja de
 base de medición.
 
 Sobre varias bandas `sound_power_anechoic` devuelve un `PrecisionSoundPowerResult`
-representable que lleva el `LW` por banda y el total ponderado A:
+representable que lleva el $L_W$ por banda y el total ponderado A:
 
 ```python
 import numpy as np
@@ -363,8 +365,8 @@ result.plot()   # espectro LW, LWA en el título (requiere matplotlib)
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/precision_anechoic_power_es.svg" alt="El espectro de nivel de potencia acústica de precisión de una máquina con pico en frecuencias medias medida sobre el conjunto hemisférico de ISO 3745, una barra por banda con pico cerca de 1 kHz, con el total ponderado A de 89,3 dB(A) en el título" width="88%" />
 
 *Una barra por banda: la presión promediada en la superficie más las correcciones
-de área, ruido de fondo y meteorológica dan `LW(f)`, y la suma energética ponderada
-A entre bandas da el número único `LWA` del título.*
+de área, ruido de fondo y meteorológica dan $L_W(f)$, y la suma energética
+ponderada A entre bandas da el número único $L_{WA}$ del título.*
 
 <details>
 <summary>Mostrar el código de esta figura</summary>
@@ -409,7 +411,7 @@ plt.show()
 
 Una determinación de potencia acústica termina en un *documento*. Todos los
 resultados de esta página siguen siendo dibujables mientras se trabaja con
-ellos (`res.plot()` traza interactivamente el mismo espectro `LW` que la
+ellos (`res.plot()` traza interactivamente el mismo espectro $L_W$ que la
 ficha compone), y el paso de informe lo envuelve en el entregable. Tanto el
 resultado de superficie envolvente (`SoundPowerResult`, ISO 3744/3746) como el
 resultado de precisión (`PrecisionSoundPowerResult`, ISO 3745) exponen un método
@@ -488,21 +490,21 @@ el repositorio; haz clic en la vista previa para abrir el PDF.
 
 **Cubierto.** La determinación por superficie envolvente de ISO 3744/3746
 (`sound_power_pressure`): las áreas de superficie de semiesfera y caja, las
-correcciones `K1` de fondo y `K2` de entorno con sus límites de validez,
+correcciones $K_1$ de fondo y $K_2$ de entorno con sus límites de validez,
 las posiciones de micrófono del Anexo B (`measurement_positions`,
 `plot_microphone_positions`) y el total ponderado A del Anexo E. La
 determinación de precisión de ISO 3745 (`sound_power_anechoic`): las mallas
 fijas de los Anexos D/E (`precision_positions`), la corrección de fondo por
 posición (`precision_background_correction`, Ec. 11), las correcciones
-meteorológicas `C1`/`C2`/`C3` y la incertidumbre expandida de la
+meteorológicas $C_1$/$C_2$/$C_3$ y la incertidumbre expandida de la
 Cláusula 10.5 (`precision_uncertainty`). Ambos resultados presentan la
 ficha de potencia acústica de estilo acreditado mediante `.report()`.
 
 **No cubierto.** Ninguno de los dos métodos ejecuta el ensayo de
 calificación del recinto: la calificación de campo libre de la sala
 anecoica o semianecoica de ISO 3745 se da por supuesta, no se realiza, y la
-validez de `K2` en ISO 3744 solo emite avisos. La corrección meteorológica
-C3 de ISO 3745 necesita un coeficiente de absorción del aire que aporta
+validez de $K_2$ en ISO 3744 solo emite avisos. La corrección meteorológica
+$C_3$ de ISO 3745 necesita un coeficiente de absorción del aire que aporta
 quien llama (`air_absorption_coefficient=`); este módulo no lo calcula a
 partir de ISO 9613-1. La elección entre las cinco vías, y la declaración
 ISO 4871 que un resultado alimenta, viven en
@@ -520,9 +522,9 @@ ISO 4871 que un resultado alimenta, viven en
   las vías que toleran el ruido de fondo estacionario que un método de
   presión no puede restar.
 - [Acústica de salas](/phonometry/es/guides/room-acoustics/): el tiempo de
-  reverberación y el área de absorción equivalente que alimentan `K2`.
+  reverberación y el área de absorción equivalente que alimentan $K_2$.
 - [Niveles](/phonometry/es/guides/levels/): el promediado en energía y la
-  ponderación A que sustentan `LWA`.
+  ponderación A que sustentan $L_{WA}$.
 - [Teoría](/phonometry/es/reference/theory/environment-transport/): las
-  derivaciones de K1/K2 y C1/C2.
+  derivaciones de $K_1$/$K_2$ y $C_1$/$C_2$.
 - Referencia de la API: [`emission.sound_power`](/phonometry/es/reference/api/power/sound-power/).

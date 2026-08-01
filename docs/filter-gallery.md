@@ -166,7 +166,8 @@ metrology.OctaveFilterBank(fs=48000, fraction=3, order=6, limits=[12, 20000],
 Also known as Inverse Chebyshev, it has a **flat passband** and ripples in the
 stopband. It provides faster roll-off than Butterworth without affecting the
 signal in the passband. The stopband edges are placed automatically so that the
-−3 dB points land on the band edges (`attenuation` must be > 3.01 dB).
+−3 dB points land on the band edges (`attenuation` must be
+$> 3.01\ \text{dB}$).
 
 ```python
 import numpy as np

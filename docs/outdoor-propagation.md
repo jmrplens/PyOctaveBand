@@ -194,7 +194,7 @@ grazing incidence to zero as the clearance deepens, never below zero.
 
 ### The four attenuation terms
 
-* **Geometrical divergence** $A_{div} = 20 \log_{10}(d/d_0) + 11$ dB, $d_0 = 1$ m
+* **Geometrical divergence** $A_{div} = 20 \lg(d/d_0) + 11$ dB, $d_0 = 1$ m
   (Eq. (7)): spherical spreading from a point source. Exactly 51 dB at 100 m,
   +6 dB per distance doubling. The $+11$ ($= 10 \lg 4\pi$) sets the level at the
   1 m reference distance.
@@ -212,7 +212,7 @@ grazing incidence to zero as the clearance deepens, never below zero.
   ground factor $G$ (0 = hard/reflective, 1 = porous/absorbing). A **negative**
   $A_{gr}$ is a net *gain* from constructive ground reflection.
 * **Screening** by a barrier is the diffraction insertion loss
-  $D_z = 10 \log_{10}\big[ 3 + (C_2/\lambda)\ C_3\ z\ K_{met} \big]$ (Eq. (14)),
+  $D_z = 10 \lg\big[ 3 + (C_2/\lambda)\ C_3\ z\ K_{met} \big]$ (Eq. (14)),
   capped at 20 dB (single edge) or 25 dB (double edge). For a top-edge barrier
   the ground effect of the screened path folds into it,
   $A_{bar} = D_z - A_{gr} \ge 0$ (Eq. (12), Note 13); for a lateral barrier
@@ -377,7 +377,8 @@ double (thick-barrier) diffraction with the $C_3$ factor of Eq. (15) and the
 diffraction (Eq. (13), $K_{met}=1$, ground term retained).
 
 The simulation below shows why $D_z$ grows with frequency: against the same
-2.5 m screen, a 100 Hz wavefront (λ ≈ 3.4 m) diffracts over the edge and fills
+2.5 m screen, a 100 Hz wavefront ($\lambda \approx 3.4\ \text{m}$) diffracts
+over the edge and fills
 the shadow zone, while at 500 Hz the shadow is deep and sharp. A barrier only
 works when the wavelength is short next to the path difference.
 
@@ -411,7 +412,7 @@ stacked per-band breakdown with the total overlaid (the figure above).
 | `edge_separation` | float or None | m | `None` | $e$; given ⇒ double diffraction (25 dB cap) |
 | `ground_reflections_by_image` | bool | — | `False` | `True` ⇒ $C_2 = 40$ |
 | `lateral` | bool | — | `False` | `True` ⇒ vertical-edge diffraction (Eq. (13)) |
-| `line_of_sight_clear` | bool | — | `False` | `True` ⇒ the sight line passes above the top edge: the path difference takes a negative sign and Kmet = 1 (text after Eq. (16)) |
+| `line_of_sight_clear` | bool | — | `False` | `True` ⇒ the sight line passes above the top edge: the path difference takes a negative sign and $K_{met} = 1$ (text after Eq. (16)) |
 
 ## 3. Scope, assumptions and pitfalls
 
@@ -524,7 +525,7 @@ diffraction model behind the number.
 `OutdoorAttenuation.report(path)` boxes the octave-band range of the total
 attenuation on its own; pass a `SourceEmission` (the source sound power and
 directivity) to add the source power and downwind level to the table and box the
-A-weighted downwind level `LAT(DW)` at the receiver instead. A limit
+A-weighted downwind level $L_{AT}(\text{DW})$ at the receiver instead. A limit
 level supplied through the metadata `requirement` then adds a PASS/FAIL verdict
 (a lower level is better). Pass `language="es"` for the Spanish fiche.
 

@@ -111,7 +111,7 @@ Filter banks, weighting, levels, spectra, calibration and uncertainty. This is
 the chain that turns a digital signal into a standards-compliant number, and
 every other area consumes it: a loudness model needs calibrated band levels, a
 room parameter needs a filtered impulse response, an environmental rating is an
-adjusted Leq. Implements IEC 61260-1, ANSI S1.11, IEC 61672-1, ISO 7196,
+adjusted $L_{eq}$. Implements IEC 61260-1, ANSI S1.11, IEC 61672-1, ISO 7196,
 IEC 61252, ISO 1996-1, IEC 60942, ISO 18233 and the GUM.
 
 - [Build a sound level meter](/phonometry/guides/sound-level-meter/):
@@ -146,16 +146,16 @@ IEC 61252, ISO 1996-1, IEC 60942, ISO 18233 and the GUM.
   for audible sound in the presence of ultrasound.
 - [Time Weighting](/phonometry/guides/time-weighting/): the Fast, Slow and
   Impulse exponential ballistics of IEC 61672-1.
-- [Integrated and Statistical Levels](/phonometry/guides/levels/): Leq and
-  LAeq, the percentile levels L10/L50/L90, LCpeak and SEL, and the noise
-  dose.
+- [Integrated and Statistical Levels](/phonometry/guides/levels/): $L_{eq}$ and
+  $L_{Aeq}$, the percentile levels $L_{10}$/$L_{50}$/$L_{90}$, $L_{Cpeak}$ and
+  SEL, and the noise dose.
 - [Environmental Levels (ISO 1996-1/-2)](/phonometry/guides/environmental-levels/):
-  Lden, Ldn and the composite rating levels, the tonal adjustment, the
+  $L_{den}$, $L_{dn}$ and the composite rating levels, the tonal adjustment, the
   residual-noise correction and the uncertainty budget.
 - [Spanish Noise Regulation (RD 1367/2007)](/phonometry/guides/spanish-noise-regulation/):
-  the corrected level LKeq with its Kt, Kf and Ki corrections, the evaluation
-  periods and noise phases, the limit tables and the Article 25 compliance
-  check.
+  the corrected level $L_{Keq}$ with its $K_t$, $K_f$ and $K_i$ corrections, the
+  evaluation periods and noise phases, the limit tables and the Article 25
+  compliance check.
 
 **[Signals and spectra](/phonometry/guides/sections/signals-spectra/)**
 
@@ -251,7 +251,7 @@ ANSI S3.5, ISO 7029, ISO 1999 and ISO 9612.
   the permanent threshold shift as a function of level, duration and frequency,
   combined with the age component.
 - [Occupational Noise Exposure (ISO 9612)](/phonometry/guides/occupational-exposure/):
-  the task-based, job-based and full-day strategies for LEX,8h, with the
+  the task-based, job-based and full-day strategies for $L_{EX,8h}$, with the
   uncertainty budget and the upper limit.
 
 ## [Rooms and buildings](/phonometry/guides/sections/rooms-buildings/)
@@ -268,7 +268,8 @@ ISO 717-1/-2, EN 12354-1 to -6, ISO 12999-1, ISO 10052 and ANSI/ASA S12.2.
   the ISO 18233 deterministic acquisition, exponential sweeps with their
   deconvolution, and MLS.
 - [Room Acoustics](/phonometry/guides/room-acoustics/): the room parameters
-  EDT, T20, T30, C50, C80, D50 and Ts derived from that impulse response.
+  EDT, $T_{20}$, $T_{30}$, $C_{50}$, $C_{80}$, $D_{50}$ and $T_s$ derived from
+  that impulse response.
 - [Open-Plan Office Acoustics (ISO 3382-3)](/phonometry/guides/open-plan-acoustics/):
   the spatial decay rate of speech and the distraction and privacy distances
   of an open-plan floor.
@@ -302,14 +303,14 @@ ISO 717-1/-2, EN 12354-1 to -6, ISO 12999-1, ISO 10052 and ANSI/ASA S12.2.
   the junction vibration reduction index and the flanking level differences
   measured on a test facility.
 - [Insulation Ratings (ISO 717)](/phonometry/guides/insulation-ratings/):
-  the airborne and impact reference-curve engines with C, Ctr and CI, the
-  enlarged-range terms and the ISO 717 fiche.
+  the airborne and impact reference-curve engines with $C$, $C_{tr}$ and $C_I$,
+  the enlarged-range terms and the ISO 717 fiche.
 - [Façade Sound Insulation](/phonometry/guides/facade-insulation/): the
   building envelope measured per ISO 16283-3, predicted per EN 12354-3 and
   radiating outwards per EN 12354-4.
 - [Spanish Building Code (CTE DB-HR)](/phonometry/guides/spanish-building-code/):
-  the DB-HR global indices RA, RA,tr, DnT,A and D2m,nT,Atr, the clause 2
-  requirement tables and the window-size correction.
+  the DB-HR global indices $R_A$, $R_{A,tr}$, $D_{nT,A}$ and $D_{2m,nT,Atr}$,
+  the clause 2 requirement tables and the window-size correction.
 
 **[Insulation design](/phonometry/guides/sections/insulation-design/)**
 
@@ -397,7 +398,7 @@ ISO/TS 7849, EN 15657, EN 12354-5, ISO 2631-1/-5, ISO 5349 and ISO 8041.
 
 - [Human Vibration](/phonometry/guides/human-vibration/): whole-body and
   hand-arm exposure with the ISO 8041-1 weightings, the weighted r.m.s. and
-  dose measures, and the daily exposure A(8).
+  dose measures, and the daily exposure $A(8)$.
 - [Multiple-shock whole-body vibration (ISO 2631-5)](/phonometry/guides/multiple-shock-vibration/):
   the seat-to-spine transfer function, the acceleration dose, and the
   cumulative stress variable behind the lumbar injury probability.
@@ -427,7 +428,7 @@ IEC 61400-11.
   distance, and the GFPE relative-level field.
 - [Impulsive-sound prominence (NT ACOU 112)](/phonometry/guides/impulse-prominence/):
   the predicted prominence of each impulse from its onset rate and level
-  difference, and the adjustment added to LAeq.
+  difference, and the adjustment added to $L_{Aeq}$.
 
 **[Aircraft and wind energy](/phonometry/guides/sections/aircraft-wind/)**
 
@@ -489,7 +490,7 @@ IEC 60268-3/-4/-5, ITU-R BS.1770-5 and EBU R 128.
 
 - [Electroacoustics: distortion and frequency response](/phonometry/guides/electroacoustics/):
   harmonic and intermodulation distortion, THD+N and SINAD, dynamic range and
-  the H1/H2 frequency-response estimators.
+  the $H_1$/$H_2$ frequency-response estimators.
 - [Loudspeaker Characterisation (IEC 60268-5)](/phonometry/guides/loudspeakers/):
   the sensitivity conventions, the radiating piston and the characteristics
   fiche.

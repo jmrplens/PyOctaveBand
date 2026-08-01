@@ -33,12 +33,12 @@ forma audible por encima del ruido que de otro modo lo enmascararía, la
 condición objetiva previa a las penalizaciones tonales del análisis de ruido.
 **ISO/PAS 20065:2016** es el *método de ingeniería* que cuantifica esa
 audibilidad: a partir de un espectro de banda estrecha (FFT) obtiene, para cada
-tono prominente, la **audibilidad** `ΔL`: cuántos decibelios supera el nivel
+tono prominente, la **audibilidad** $\Delta L$: cuántos decibelios supera el nivel
 del tono al umbral de enmascaramiento del ruido circundante. (Que un tono sea
 *molesto* es un juicio de valoración posterior e independiente.) Es el método
 detallado al que remite **ISO 1996-2:2017** (la vía simplificada del Anexo C
 está en [medición ambiental](/phonometry/es/guides/environmental-levels/)); la audibilidad
-media `ΔL` que produce alimenta el ajuste tonal `Kt` de ISO 1996-2.
+media $\Delta L$ que produce alimenta el ajuste tonal $K_t$ de ISO 1996-2.
 
 <ThemeImage
   src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/tone_audibility_es.svg"
@@ -70,16 +70,17 @@ plt.show()
 
 ## 1. La banda crítica en torno al tono
 
-Cada tono de frecuencia `fT` se evalúa dentro de una banda crítica cuyo ancho es
-(Fórmula 2)
+Cada tono de frecuencia $f_T$ se evalúa dentro de una banda crítica cuyo ancho
+es (Fórmula 2)
 
 $$
 \Delta f_c = 25{,}0 + 75{,}0\left(1{,}0 + 1{,}4\left(\tfrac{f_T}{1000}\right)^{2}\right)^{0{,}69}\ \mathrm{Hz}.
 $$
 
 Con una posición geométrica de las frecuencias de esquina en torno al tono
-(Fórmulas 3–5), `√(f₁·f₂) = fT` y `f₂ − f₁ = Δfc`, de modo que
-`f₁ = −Δfc/2 + √(Δfc² + 4·fT²)/2` y `f₂ = f₁ + Δfc`.
+(Fórmulas 3–5), $\sqrt{f_1 f_2} = f_T$ y $f_2 - f_1 = \Delta f_c$, de modo que
+$f_1 = -\Delta f_c/2 + \sqrt{\Delta f_c^2 + 4 f_T^2}/2$ y
+$f_2 = f_1 + \Delta f_c$.
 
 ```python
 from phonometry import psychoacoustics
@@ -91,12 +92,12 @@ print(round(f1, 2), round(f2, 2))                            # 95.67 197.04
 
 ## 2. Audibilidad de un tono
 
-El nivel medio de banda estrecha `LS` del ruido enmascarante (Fórmula 6, un
+El nivel medio de banda estrecha $L_S$ del ruido enmascarante (Fórmula 6, un
 promedio energético iterativo de las líneas de la banda crítica) y el nivel del
-tono `LT` (Fórmula 8, la suma energética de las líneas tonales) se derivan del
+tono $L_T$ (Fórmula 8, la suma energética de las líneas tonales) se derivan del
 espectro de banda estrecha; `mean_narrowband_level` y `tone_level` lo hacen
 directamente (ver §4). El nivel de banda crítica del ruido enmascarante
-reparte `LS` sobre el ancho de banda crítico (Fórmula 12), el índice de
+reparte $L_S$ sobre el ancho de banda crítico (Fórmula 12), el índice de
 enmascaramiento tiene en cuenta el oído (Fórmula 13) y la audibilidad es su
 diferencia (Fórmula 14):
 
@@ -106,11 +107,12 @@ a_v = -2 - \lg\!\Big[1 + \big(\tfrac{f}{502}\big)^{2{,}5}\Big], \qquad
 \Delta L = L_T - L_G - a_v .
 $$
 
-Un tono proporcionado es *audible* cuando `ΔL > 0`. `Δf` es el espaciado de líneas
-(resolución en frecuencia); las sumas energéticas sobre `K > 1` líneas llevan
-una corrección de ventana de `10·lg(Δf/Δfe)` (`−1,76 dB` para la ventana de
-Hanning recomendada, `Δfe = 1,5·Δf`, Fórmula (8)), mientras que un tono de una
-sola línea (`K = 1`) toma su nivel sin cambios (Fórmula (7), sin corrección de
+Un tono proporcionado es *audible* cuando $\Delta L > 0$. $\Delta f$ es el
+espaciado de líneas (resolución en frecuencia); las sumas energéticas sobre
+$K > 1$ líneas llevan una corrección de ventana de
+$10\lg(\Delta f/\Delta f_e)$ (−1,76 dB para la ventana de Hanning recomendada,
+$\Delta f_e = 1{,}5\,\Delta f$, Fórmula (8)), mientras que un tono de una sola
+línea ($K = 1$) toma su nivel sin cambios (Fórmula (7), sin corrección de
 ancho de banda).
 
 ```python
@@ -124,24 +126,24 @@ print(round(psychoacoustics.masking_index(137.3), 2))                        # -
 
 Todo el método es una cadena del espectro al ajuste, y cada magnitud
 intermedia de arriba es una parada en ella. El diagrama recorre esa cadena
-con el tono del Anexo E, hasta el Kt que gana la audibilidad media.
+con el tono del Anexo E, hasta el $K_t$ que gana la audibilidad media.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_tone_audibility_es.svg" alt="Diagrama de flujo del método de ingeniería de ISO/PAS 20065 sobre el espectro del motor de combustión del Anexo E: un espectro FFT de banda estrecha con resolución de 2,7 hercios da un tono a 137,3 hercios, su banda crítica de 101,36 hercios abarca de 95,67 a 197,04 hercios, el nivel de ruido enmascarante de 49,22 decibelios y el nivel del tono de 67,96 decibelios dan un umbral de enmascaramiento de 64,97 decibelios con índice de enmascaramiento de menos 2,02 decibelios, y la audibilidad es de 5,01 decibelios, el valor decisivo del espectro; una nota final convierte la audibilidad media energética de 6,98 decibelios de los cinco espectros en un ajuste tonal Kt de 4 decibelios mediante la Tabla J.1 de ISO 1996-2" width="92%" />
 
 ## 3. Audibilidad decisiva y media
 
 La audibilidad **decisiva** de un espectro de banda estrecha es la mayor
-audibilidad de tono en él (apartado 5.3.8). Sobre `J` espectros escalonados en
+audibilidad de tono en él (apartado 5.3.8). Sobre $J$ espectros escalonados en
 el tiempo, la **audibilidad media** es su media energética (Fórmula 20); un
-espectro en el que no se encuentra ningún tono aporta `ΔLj = −10 dB`
-(Fórmula 21). `assess_tones` aplica toda la cadena a los tonos de un espectro e
-informa del tono decisivo.
+espectro en el que no se encuentra ningún tono aporta
+$\Delta L_j = -10\ \text{dB}$ (Fórmula 21). `assess_tones` aplica toda la
+cadena a los tonos de un espectro e informa del tono decisivo.
 
 **Cómo se selecciona la banda decisiva.** El método no barre un conjunto fijo
 de bandas: cada *tono* detectado define su propia banda crítica (§1), la
 audibilidad se evalúa tono a tono y, después de que el Paso 3 haya fusionado
 los tonos audibles de una misma banda en grupos `FG` calificados por su miembro
-más audible (§5), la audibilidad decisiva es simplemente la mayor `ΔL` que
+más audible (§5), la audibilidad decisiva es simplemente la mayor $\Delta L$ que
 queda en pie (Paso 4). La «banda decisiva» es, por tanto, la banda crítica
 centrada en el tono o grupo que gana, y es libre de moverse de un espectro a
 otro conforme la fuente recorre sus estados de funcionamiento; la media
@@ -201,47 +203,49 @@ plt.show()
 </details>
 
 Leída de izquierda a derecha: cada segmento horizontal es el nivel de ruido
-enmascarante de banda crítica `LG` dibujado sobre la banda a la que se aplica,
-cada marcador es el nivel del tono `LT`, y el hueco entre ambos, menos el
+enmascarante de banda crítica $L_G$ dibujado sobre la banda a la que se aplica,
+cada marcador es el nivel del tono $L_T$, y el hueco entre ambos, menos el
 índice de enmascaramiento, es la audibilidad. Un tono cuyo marcador queda *por
 debajo* de su segmento está enmascarado, y ningún nivel justifica una
 penalización por él.
 
 ### 3.1 Incertidumbre extendida de la audibilidad
 
-La cláusula 5.4 asocia a cada audibilidad una incertidumbre extendida `U`
+La cláusula 5.4 asocia a cada audibilidad una incertidumbre extendida $U$
 (bilateral al 90 %), y la cláusula 6 la hace obligatoria cuando se han
 promediado menos de 12 espectros. `assess_tones` la calcula por tono
 (`res.extended_uncertainties`), `audibility_uncertainty` la evalúa
 directamente desde las líneas del espectro y `mean_audibility_uncertainty`
 la propaga a la audibilidad media energética de un conjunto de espectros
-(Anexo E: `U = 2.80 dB` para el tono de 137,3 Hz frente al 2,79 impreso).
+(Anexo E: $U = 2{,}80\ \text{dB}$ para el tono de 137,3 Hz frente al 2,79
+impreso).
 
-**Cómo leer `U`.** Un intervalo *bilateral* al 90 % deja un 5 % en cada cola,
-así que `ΔL − U` es un enunciado unilateral al 95 %: cuando todo el intervalo
-`ΔL ± U` queda por encima de `0 dB`, el tono es audible con al menos un 95 %
-de confianza, y cuando el intervalo cruza el cero el veredicto no está
-asegurado estadísticamente; el remedio son más espectros, porque `U` se
-reduce con el número promediado (que es exactamente la razón de que la
+**Cómo leer $U$.** Un intervalo *bilateral* al 90 % deja un 5 % en cada cola,
+así que $\Delta L - U$ es un enunciado unilateral al 95 %: cuando todo el
+intervalo $\Delta L \pm U$ queda por encima de 0 dB, el tono es audible con al
+menos un 95 % de confianza, y cuando el intervalo cruza el cero el veredicto
+no está asegurado estadísticamente; el remedio son más espectros, porque $U$
+se reduce con el número promediado (que es exactamente la razón de que la
 cláusula 6 obligue a declararla por debajo de 12 espectros). La misma lógica
 protege la penalización aguas abajo: el **Anexo J de la ISO 1996-2:2017**
-convierte la audibilidad media en el ajuste tonal `Kt` en pasos de 1 dB
-(Tabla J.1: `Kt = 0` para `ΔL ≤ 0`, hasta `Kt = 6 dB` para `ΔL > 12 dB`, o la
-escalera más gruesa de 0/3/6 dB de su nota), de modo que una incertidumbre que
-cruza una frontera de la tabla se propaga directamente como una interrogación
-de 1–3 dB sobre el nivel de evaluación. Declarar `ΔL ± U` junto a `Kt` muestra
-si el ajuste es robusto o pende de un espectro al límite.
+convierte la audibilidad media en el ajuste tonal $K_t$ en pasos de 1 dB
+(Tabla J.1: $K_t = 0$ para $\Delta L \le 0$, hasta $K_t = 6\ \text{dB}$ para
+$\Delta L > 12\ \text{dB}$, o la escalera más gruesa de 0/3/6 dB de su nota),
+de modo que una incertidumbre que cruza una frontera de la tabla se propaga
+directamente como una interrogación de 1–3 dB sobre el nivel de evaluación.
+Declarar $\Delta L \pm U$ junto a $K_t$ muestra si el ajuste es robusto o
+pende de un espectro al límite.
 
 ## 4. Desde el espectro de banda estrecha
 
 Dadas las líneas FFT de la banda crítica en torno a un tono,
 `mean_narrowband_level` ejecuta el procedimiento iterativo de la Fórmula 6
-(media energética, descartando toda línea que supere en más de 6 dB la `LS` en
+(media energética, descartando toda línea que supere en más de 6 dB la $L_S$ en
 curso, hasta estabilizarse en ±0,005 dB o quedar menos de cinco líneas por lado,
 Anexo D) y `tone_level` suma las líneas tonales contiguas al pico (por encima
-de `LS + 6 dB` y de `L_pico − 10 dB`). La media lleva siempre la corrección de
-ancho de banda de Hanning de −1,76 dB; el nivel del tono solo cuando el tramo
-abarca más de una línea (Fórmulas (7)/(8)).
+de $L_S + 6\ \text{dB}$ y de $L_\text{pico} - 10\ \text{dB}$). La media lleva
+siempre la corrección de ancho de banda de Hanning de −1,76 dB; el nivel del
+tono solo cuando el tramo abarca más de una línea (Fórmulas (7)/(8)).
 
 ```python
 from phonometry import psychoacoustics
@@ -267,15 +271,16 @@ print(round(psychoacoustics.tone_audibility(lt, ls, 137.3, 2.7), 2))   # 5.01 dB
 `analyze_spectrum` ejecuta todo el front-end sobre un espectro (nivel medio de
 banda estrecha por línea, detección de picos (apartado 5.3.8 Paso 1, un tono no
 puede estar en un flanco), nivel del tono, el criterio de distinción (apartado
-5.3.4: ancho de banda `≤ 26·(1 + 0,001·fT)` Hz y pendiente de flanco `≥ 24 dB`),
-y la audibilidad) y devuelve los tonos distintos y audibles. Después aplica
+5.3.4: ancho de banda $\le 26\,(1 + 0{,}001 f_T)$ Hz y pendiente de flanco
+$\ge 24\ \text{dB}$), y la audibilidad) y devuelve los tonos distintos y
+audibles. Después aplica
 el **Paso 3**: los tonos audibles que comparten una banda crítica suman
 energéticamente sus niveles de tono (Fórmula 17, líneas compartidas contadas
 una sola vez, vía `combined_tone_level`) en una entrada combinada «FG»
 valorada en el miembro más audible, salvo que la excepción de exactamente
 dos tonos por debajo de 1000 Hz de §5.1 los mantenga separados. El
 `group_sizes` del resultado distingue tonos individuales (`1`) de entradas FG
-(`N ≥ 2`), y la audibilidad decisiva (Paso 4) es el máximo sobre todas las
+($N \ge 2$), y la audibilidad decisiva (Paso 4) es el máximo sobre todas las
 entradas.
 
 ```python
@@ -314,22 +319,24 @@ así que el nivel medio de banda estrecha del tono de 158,8 Hz se subestima a
 partir de ella (el algoritmo en sí coincide con el programa de referencia de la
 norma madre DIN 45681:2005-03). La detección de picos y la combinación FG se
 verifican contra el ejemplo resuelto del Anexo E (las tres frecuencias de tono y
-`LT = 72,15 dB`).
+$L_T = 72{,}15\ \text{dB}$).
 
 ### 5.1 Dos tonos por debajo de 1000 Hz
 
 Cuando **exactamente dos** tonos comparten una banda crítica y ambos están por
 debajo de 1000 Hz, el oído todavía puede distinguirlos (y entonces se evalúan
 *por separado* en lugar de combinarse en FG) si su diferencia de frecuencia
-`|fT1 − fT2|` (Fórmula 18) supera
+$|f_{T1} - f_{T2}|$ (Fórmula 18) supera
 
-```text
-fD = 21·10^(1,2·|lg(fT/212)|^1,8)  Hz     (Fórmula 19, 88 Hz < fT < 1000 Hz)
-```
+$$
+f_D = 21 \cdot 10^{\,1{,}2\,\left|\lg(f_T/212)\right|^{1{,}8}}\ \text{Hz}
+\qquad (\text{Fórmula 19},\ 88\ \text{Hz} < f_T < 1000\ \text{Hz})
+$$
 
-evaluada en el tono más prominente `fT` (el de mayor audibilidad `ΔL`). El umbral
-alcanza su mínimo de `21 Hz` en `fT = 212 Hz` y crece a ambos lados.
-`two_tone_separation_frequency` da `fD`; `resolve_tones_separately` aplica la
+evaluada en el tono más prominente $f_T$ (el de mayor audibilidad
+$\Delta L$). El umbral alcanza su mínimo de 21 Hz en
+$f_T = 212\ \text{Hz}$ y crece a ambos lados.
+`two_tone_separation_frequency` da $f_D$; `resolve_tones_separately` aplica la
 decisión.
 
 ```python
@@ -346,8 +353,9 @@ E agrupa *tres* tonos, así que la regla de «exactamente dos tonos» nunca se
 dispara ahí. La fórmula y la decisión se implementan en clean-room desde el texto
 y se verifican contra el programa de referencia del Anexo J de
 **DIN 45681:2005-03** (`fD = 21 * 10 ^ (1.2 * Abs(Log(fT / 212) / Log(10)) ^
-1.8)`). Como refuerzo, evaluado en los tonos del Anexo E el umbral (`≈ 24 Hz` en
-137,3 Hz) los mantiene combinados, coherente con la agrupación FG de ese ejemplo.
+1.8)`). Como refuerzo, evaluado en los tonos del Anexo E el umbral
+($\approx 24\ \text{Hz}$ en 137,3 Hz) los mantiene combinados, coherente con la
+agrupación FG de ese ejemplo.
 :::
 
 ## 6. Informe de evaluación tonal (`.report()`)
@@ -357,20 +365,20 @@ formato de un informe de evaluación tonal de un laboratorio de ruido ambiental,
 siguiendo el método de ingeniería del **Anexo J de la ISO 1996-2:2017**: la
 línea de base normativa, un bloque de metadatos opcional (fuente/situación,
 cliente, posición de medición, instrumentación y fecha, con la resolución del
-análisis `Δf` tomada del resultado), una tabla a todo ancho con las magnitudes
-clave de cada tono detectado (frecuencia `f`<sub>T</sub>, tipo de entrada, nivel
-del tono `L`<sub>pt</sub>, nivel del ruido enmascarante en la banda crítica
-`L`<sub>pn</sub>, ancho de banda crítica `Δf`<sub>c</sub> y la audibilidad
-`ΔL`<sub>ta</sub>) sobre el gráfico de nivel frente a frecuencia con los tonos y
-su ruido enmascarante marcados, la audibilidad decisiva `ΔL`<sub>ta</sub>
-enmarcada junto con el ajuste tonal derivado `K` (Tabla J.1), una fila de
+análisis $\Delta f$ tomada del resultado), una tabla a todo ancho con las
+magnitudes clave de cada tono detectado (frecuencia $f_T$, tipo de entrada,
+nivel del tono $L_{pt}$, nivel del ruido enmascarante en la banda crítica
+$L_{pn}$, ancho de banda crítica $\Delta f_c$ y la audibilidad
+$\Delta L_{ta}$) sobre el gráfico de nivel frente a frecuencia con los tonos y
+su ruido enmascarante marcados, la audibilidad decisiva $\Delta L_{ta}$
+enmarcada junto con el ajuste tonal derivado $K$ (Tabla J.1), una fila de
 veredicto APTO/NO APTO opcional y una nota de prominencia, y un pie con el
 descargo fijo.
 
 Usa el mismo contenedor `ReportMetadata` y el mismo motor de renderizado que la
 [ficha de sonoridad ISO 532-1](/phonometry/es/guides/loudness/#informe-de-iso-532-1-report);
 un `requirement` indicado se interpreta como la audibilidad decisiva
-`ΔL`<sub>ta</sub> máxima admisible en dB (un tono más silencioso es apto). El
+$\Delta L_{ta}$ máxima admisible en dB (un tono más silencioso es apto). El
 renderizado necesita reportlab y, para la figura que incrusta la ficha,
 matplotlib (`pip install "phonometry[report,plot]"`); solo se admite
 `engine="reportlab"`. La ficha se genera en inglés por defecto; pase
@@ -406,17 +414,18 @@ el repositorio; pulse la vista previa para abrir el PDF.
 ## Qué cubre esta guía
 
 **Cubierto.** El método de ingeniería de ISO/PAS 20065:2016 completo: el
-ancho de banda crítico `Δfc` y las frecuencias de esquina (Fórmulas 2 a 5),
-el nivel medio de banda estrecha `LS` y el nivel del tono `LT` (Fórmulas 6 y
-8, Anexo D), el nivel de banda crítica del enmascaramiento `LG`, el índice de
-enmascaramiento `av` y la audibilidad `ΔL` (Fórmulas 12 a 14), la detección de
-picos y el criterio de distinción (apartados 5.3.8 y 5.3.4), la combinación
+ancho de banda crítico $\Delta f_c$ y las frecuencias de esquina (Fórmulas 2 a 5),
+el nivel medio de banda estrecha $L_S$ y el nivel del tono $L_T$ (Fórmulas 6 y
+8, Anexo D), el nivel de banda crítica del enmascaramiento $L_G$, el índice de
+enmascaramiento $a_v$ y la audibilidad $\Delta L$ (Fórmulas 12 a 14), la
+detección de picos y el criterio de distinción (apartados 5.3.8 y 5.3.4), la
+combinación
 multitono FG (Fórmula 17) y la excepción de dos tonos por debajo de 1000 Hz
 (Fórmulas 18/19), la audibilidad decisiva y media energética (Fórmula 20) y la
-incertidumbre extendida `U` de los apartados 5.4/6, todo a través de
+incertidumbre extendida $U$ de los apartados 5.4/6, todo a través de
 `psychoacoustics.analyze_spectrum` y `assess_tones`. El Anexo J de la
 ISO 1996-2:2017 está cubierto en lo que convierte la audibilidad media en el
-ajuste tonal `Kt` (Tabla J.1).
+ajuste tonal $K_t$ (Tabla J.1).
 
 **No cubierto.** El apartado 5.3.2 exige que el espectro de banda estrecha
 esté ponderado A según IEC 61672-1 antes del análisis; este módulo es

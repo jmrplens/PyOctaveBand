@@ -117,14 +117,14 @@ plt.show()
 </details>
 
 La fórmula de plenum de Wells toma solo dos entradas de verdad geométricas,
-la línea de visión entrada-salida `r` y el área de salida, más el área de
+la línea de visión entrada-salida $r$ y el área de salida, más el área de
 pared revestida; `plot_plenum_geometry` dibuja exactamente esas, respetando
-`r` y su ángulo respecto al eje de entrada.
+$r$ y su ángulo respecto al eje de entrada.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/plenum_geometry_es.svg" alt="Sección de una cámara plenum: el conducto de entrada entra abajo a la izquierda, la boca de salida está marcada en la pared derecha, la línea de visión entrada-salida de 1,2 m se dibuja como una diagonal discontinua a 0,35 rad del eje de entrada, y el área de pared de 6 metros cuadrados y el área de salida de 0,09 metros cuadrados se anotan debajo" width="88%" />
 
-*Solo `r` y su ángulo respecto al eje de entrada fijan la caja dibujada;
-`S_out` y `S_w` entran en el método de Wells como áreas a secas, así que
+*Solo $r$ y su ángulo respecto al eje de entrada fijan la caja dibujada;
+$S_\text{out}$ y $S_w$ entran en el método de Wells como áreas a secas, así que
 cualquier plenum que comparta estos cuatro números tiene la misma atenuación
 predicha.*
 
@@ -193,7 +193,7 @@ enc.plot()                                         # panel R, corrección C e IL
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/enclosure_insertion_loss_es.svg" alt="Pérdida por inserción de un encapsulado de máquina por banda de octava: el índice de reducción acústica R medido del panel como línea discontinua, la corrección interior C casi plana cerca de 5 dB para un interior revestido, y la pérdida por inserción neta IL igual a R menos C siguiendo la curva del panel unos 5 dB por debajo" width="88%" />
 
-*Lo que entrega el cerramiento es `R − C`, no el `R` del panel: incluso este
+*Lo que entrega el cerramiento es $R - C$, no el $R$ del panel: incluso este
 interior revestido (absorción media 0,3) cuesta unos 5 dB del índice del panel
 en cada banda, y un interior duro sin revestir costaría mucho más. Presupuesta
 el revestimiento junto con los paneles, no como un añadido posterior.*
@@ -252,7 +252,7 @@ disipativos con revestimiento interior no se modelan a partir de las
 propiedades del revestimiento en ninguna parte: los valores de codo revestido
 y de plenum de esta página son tablas de instalación interpoladas.
 `enclosure_insertion_loss` nunca predice la pérdida de transmisión de panel
-`R`; se aporta medida o de otro modelo, y el módulo solo la combina con la
+$R$; se aporta medida o de otro modelo, y el módulo solo la combina con la
 corrección interior.
 
 ## Véase también
@@ -265,7 +265,7 @@ corrección interior.
 - [Caracterización de altavoces (IEC 60268-5)](/phonometry/es/guides/loudspeakers/):
   el pistón radiante (impedancia de radiación y directividad), el modelo de
   radiador complementario.
-- [Potencia acústica](/phonometry/es/guides/sound-power/): la `Lw` de fuente que
+- [Potencia acústica](/phonometry/es/guides/sound-power/): la $L_W$ de fuente que
   alimenta un conducto o un cerramiento.
 - [Fuentes imagen y campo estacionario](/phonometry/es/guides/room-image-sources/):
   la `room_constant` reutilizada por la corrección interior del cerramiento.

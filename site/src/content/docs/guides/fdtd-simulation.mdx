@@ -63,8 +63,8 @@ frozen result object.
 ## 1. The scheme: a wave equation on a grid
 
 In a non-moving medium the linearised equations of fluid dynamics reduce to a
-first-order system in the acoustic pressure ``p`` and particle velocity ``v``
-(Attenborough & Van Renterghem Eqs. 4.3-4.4):
+first-order system in the acoustic pressure $p$ and particle velocity
+$\mathbf{v}$ (Attenborough & Van Renterghem Eqs. 4.3-4.4):
 
 $$
 \frac{\partial p}{\partial t} + \rho c^2\,\nabla\!\cdot\!\mathbf{v} = 0,
@@ -91,7 +91,7 @@ $$
 
 and `fdtd_simulation` derives the time step from the `cfl` parameter (the
 Courant number, default 0.6) and the largest sound speed in the map; values
-outside ``(0, 1)`` are rejected because the scheme is unconditionally
+outside $(0, 1)$ are rejected because the scheme is unconditionally
 meaningless beyond the bound (Eq. 4.14).
 
 ```python
@@ -158,14 +158,14 @@ face touching a masked cell is closed (Eq. 4.32 again), so walls, barriers
 and scatterers of any shape are just boolean arrays. Each domain side can
 carry its own boundary condition:
 
-- ``"rigid"`` (default): a perfect reflector, ``R = +1``.
+- ``"rigid"`` (default): a perfect reflector, $R = +1$.
 - ``"absorbing"``: a sponge layer of `absorbing_layer_cells` cells whose
   absorption rate ramps quadratically, emulating an open boundary (the
   simple precursor of the perfectly matched layers of section 4.2.3).
-- a **real specific impedance** ``Z`` in Pa·s/m (a scalar or one value per
+- a **real specific impedance** $Z$ in Pa·s/m (a scalar or one value per
   edge cell): the locally reacting boundary of Eqs. 4.33-4.35, updated
   implicitly, with the normal-incidence reflection coefficient
-  ``R = (Z - ρc)/(Z + ρc)``; ``Z = ρc`` is anechoic.
+  $R = (Z - \rho c)/(Z + \rho c)$; $Z = \rho c$ is anechoic.
 
 The stepping engine `FDTD2D` is public too: it exposes `step()`, `run()`,
 the field arrays and the energy, for callers that need frame-by-frame access
@@ -204,7 +204,7 @@ wrong place costs seconds here and a full re-run later.
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/fdtd_domain_geometry.svg" alt="Setup drawing of a 4.5 by 3 metre FDTD domain before any time stepping: pale blue sponge layers along the left and right edges, an orange impedance edge along the top, a grey rectangular obstacle just left of centre, the source star at (0.5, 1.5) and two probe circles at (3, 1.5) and (4, 2), with a legend naming the sponge layer, impedance edge, rigid edge, source and probe" width="88%" />
 
 *Everything the run will see, before it runs: the sponge layers eat the
-left and right boundaries, the top edge carries the anechoic `ρc` impedance,
+left and right boundaries, the top edge carries the anechoic $\rho c$ impedance,
 the untreated bottom stays rigid, and both probes sit clear of the obstacle
 and the sponges.*
 
@@ -249,9 +249,9 @@ pressure and outward normal velocity on a closed rectangle of cell faces
 into complex accumulators (an on-the-fly DFT per point and frequency, so a
 continuous-wave run stores no time histories), and the integral propagates
 those phasors to infinity with the free-space Green function
-`-(j/4) H0⁽²⁾(kR)` — the same construction full-wave FEM solvers use to
+$-(j/4)\,H_0^{(2)}(kR)$ — the same construction full-wave FEM solvers use to
 report scattering patterns from near-field data. Two properties carry the
-scheme: the staggered grid already holds `v_n` exactly on the contour
+scheme: the staggered grid already holds $v_n$ exactly on the contour
 faces, and any field whose sources lie *outside* the contour integrates to
 nothing (extinction), so the total-field phasors of a plane-wave scattering
 run transform directly into the *scattered* far field. In the discrete
@@ -498,8 +498,8 @@ plt.show()
 
 The domain is **two-dimensional**, and that changes the physics, not just
 the cost. A 2D point source is physically an infinite **line source**: its
-amplitude spreads cylindrically as ``1/sqrt(r)`` (3.0 dB per doubling of
-distance) instead of the spherical ``1/r`` (6.0 dB) of a 3D point source,
+amplitude spreads cylindrically as $1/\sqrt{r}$ (3.0 dB per doubling of
+distance) instead of the spherical $1/r$ (6.0 dB) of a 3D point source,
 and the 2D impulse response trails a wake behind the wavefront instead of
 passing cleanly. Interference and diffraction *patterns* are faithful;
 absolute levels and decay rates are not those of a 3D room. Treat 2D runs as
@@ -520,19 +520,19 @@ $$
 $$
 
 with a leading-order relative frequency error of magnitude
-``(1 - S^2) (k dx)^2 / 24`` along the grid axes (the modelled frequency
-under-reads, so the signed error is negative), where ``S = c dt / dx``;
+$(1 - S^2)\,(k\,\Delta x)^2 / 24$ along the grid axes (the modelled frequency
+under-reads, so the signed error is negative), where $S = c\,\Delta t / \Delta x$;
 the error is largest exactly on-axis and vanishes along the cell diagonal
-at the Courant limit ``CN = 1``. The practical rule is to resolve **at
-least 10 cells per shortest wavelength**, ``dx <= c_min / (10 f_max)``
+at the Courant limit $\mathrm{CN} = 1$. The practical rule is to resolve **at
+least 10 cells per shortest wavelength**, $\Delta x \le c_\text{min} / (10 f_\text{max})$
 with the smallest sound speed of the domain: at exactly 10 cells the
-small-Courant bound ``(k dx)^2 / 24`` evaluates to about 1.6 %, reduced
-by the ``1 - S^2`` factor to about 1.4 % at the default ``cfl = 0.6``
+small-Courant bound $(k\,\Delta x)^2 / 24$ evaluates to about 1.6 %, reduced
+by the $1 - S^2$ factor to about 1.4 % at the default ``cfl = 0.6``
 (in a heterogeneous domain the time step follows the fastest cells, so
 slower regions run at a lower local Courant number and sit nearer the
 1.6 % bound), and every finer-resolved or off-axis component is more
-accurate. With ``dx = 1`` cm the 10-cell point in air sits at roughly
-3.4 kHz, and halving ``dx`` quarters the error (the scheme is second
+accurate. With $\Delta x = 1$ cm the 10-cell point in air sits at roughly
+3.4 kHz, and halving $\Delta x$ quarters the error (the scheme is second
 order, and the validation suite measures that observed order under grid
 refinement). The tests pin the
 solver to analytic oracles: box and duct eigenfrequencies, free-field
@@ -574,8 +574,8 @@ meshed QRD and metadiffuser panels against the library's own Fraunhofer
 and TMM far-field models.
 
 **Not covered.** The solver is two-dimensional only: it models a line source
-in cross-section (cylindrical `1/sqrt(r)` spreading), not the spherical
-`1/r` spreading of a 3D point source, so absolute levels and decay rates are
+in cross-section (cylindrical $1/\sqrt{r}$ spreading), not the spherical
+$1/r$ spreading of a 3D point source, so absolute levels and decay rates are
 not those of a 3D room. The open boundary is the quadratic-ramp absorbing
 layer described as "the simple precursor" of a true perfectly matched layer,
 not a PML itself. The governing equations assume a non-moving medium, so
@@ -600,10 +600,11 @@ fluid-solid physics have their own guide,
 ### How do I choose the FDTD grid spacing?
 
 Resolve at least 10 cells per shortest wavelength,
-``dx <= c_min / (10 f_max)``, using the smallest sound speed in the domain.
+$\Delta x \le c_\text{min} / (10 f_\text{max})$, using the smallest sound
+speed in the domain.
 At exactly 10 cells the on-axis dispersion error bound is about 1.6 %,
-reduced to about 1.4 % at the default ``cfl = 0.6``, and halving ``dx``
-quarters the error (the scheme is second order). With ``dx = 1`` cm the
+reduced to about 1.4 % at the default ``cfl = 0.6``, and halving $\Delta x$
+quarters the error (the scheme is second order). With $\Delta x = 1$ cm the
 10-cell point in air sits at roughly 3.4 kHz.
 
 ### What Courant number keeps an FDTD simulation stable?
@@ -618,8 +619,8 @@ speed in the map, rejecting values outside $(0, 1)$.
 ### Can I trust the absolute levels from a 2D FDTD run?
 
 No. A 2D point source is physically an infinite line source: its amplitude
-spreads cylindrically as ``1/sqrt(r)``, 3.0 dB per doubling of distance,
-instead of the spherical ``1/r`` (6.0 dB per doubling) of a 3D point source.
+spreads cylindrically as $1/\sqrt{r}$, 3.0 dB per doubling of distance,
+instead of the spherical $1/r$ (6.0 dB per doubling) of a 3D point source.
 Interference and diffraction patterns are faithful, but absolute levels and
 decay rates are not those of a 3D room; validate any 3D-quantitative claim
 against a closed form or a 3D solver.

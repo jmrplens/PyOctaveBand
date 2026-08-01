@@ -53,9 +53,9 @@ energía que *sale* de la fuente de la energía estacionaria que solo atraviesa
 la superficie; por eso el método de intensidad tolera el ruido de fondo que
 derrotaría a los métodos de presión. Una sonda p-p (véase la
 [guía de Intensidad acústica](/phonometry/es/guides/intensity/)) se barre de forma
-continua sobre cada uno de los `N` segmentos de una superficie que encierra la
+continua sobre cada uno de los $N$ segmentos de una superficie que encierra la
 fuente, informando de la intensidad normal con signo promediada por segmento
-`<In,i>`.
+$\langle I_{n,i} \rangle$.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_pp_probe_es.svg" alt="Una sonda de intensidad acústica p-p de dos micrófonos: dos micrófonos de presión separados por un espaciador, a partir de los cuales se estima el gradiente de presión y, por tanto, la intensidad normal" width="70%" />
 
@@ -74,23 +74,24 @@ $$
   description="Una sonda p-p recorre el barrido en serpentina sobre la cara superior de la caja de medición mientras aparecen detrás las flechas de intensidad normal, y las potencias parciales de las cinco caras se acumulan en el nivel de potencia acústica L_W."
 />
 
-Una banda en la que `P < 0` (flujo neto entrante, de una fuente más fuerte
+Una banda en la que $P < 0$ (flujo neto entrante, de una fuente más fuerte
 fuera de la superficie) es **no determinable** y se informa como `NaN`. Dos
 indicadores de campo normativos cualifican cada banda. El **indicador
-superficial presión-intensidad** `FpI` mide cuán reactivo es el campo, y el
-**indicador de potencia parcial negativa** `F+/-` mide cuánta energía circula
-hacia dentro y hacia fuera:
+superficial presión-intensidad** $F_{pI}$ mide cuán reactivo es el campo, y el
+**indicador de potencia parcial negativa** $F_{+/-}$ mide cuánta energía
+circula hacia dentro y hacia fuera:
 
 $$
 F_{pI} = [L_p] - L_W + 10 \log_{10}\frac{S}{S_0}, \qquad
 F_{+/-} = 10 \log_{10}\frac{\sum_i \lvert P_i \rvert}{\lvert \sum_i P_i \rvert} .
 $$
 
-La **capacidad dinámica** de la sonda `Ld = δpI0 − K` (índice de intensidad
-residual de presión menos el factor de sesgo `K`, 10 dB para el grado 2 y 7 dB
-para el grado 3) debe superar `FpI` (criterio 1); `F+/- ≤ 3 dB` es el criterio
-2 (obligatorio para el grado 2); y los dos barridos repetidos deben coincidir
-dentro del límite `s` de la Tabla 2 por segmento (criterio 3). Una banda es de
+La **capacidad dinámica** de la sonda $L_d = \delta_{pI0} - K$ (índice de
+intensidad residual de presión menos el factor de sesgo $K$, 10 dB para el
+grado 2 y 7 dB para el grado 3) debe superar $F_{pI}$ (criterio 1);
+$F_{+/-} \le 3\ \text{dB}$ es el criterio 2 (obligatorio para el grado 2); y
+los dos barridos repetidos deben coincidir dentro del límite $s$ de la Tabla 2
+por segmento (criterio 3). Una banda es de
 grado **ingeniería** cuando se cumplen los criterios 1, 2 y 3, de **inspección**
 cuando se cumplen 1 y 3, y en caso contrario `none`.
 
@@ -123,10 +124,11 @@ res.plot()   # espectro LW; bandas no positivas (indeterminables) con trama (req
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sound_power_intensity_result_es.svg" alt="El espectro de nivel de potencia acústica por barrido de intensidad del ejemplo de ISO 9614-2, una barra por banda de octava de 125 Hz a 4 kHz todas cerca de 85 dB, con el total ponderado A de 90,9 dB(A) en el título" width="88%" />
 
-*Las potencias parciales `<In,i>·Si` de los seis segmentos suman el `LW` de
-cada banda; aquí todas las bandas tienen potencia neta positiva y superan los
-criterios de indicadores de campo en grado de ingeniería, así que las seis
-barras se sostienen, y el total ponderado A de 90,9 dB(A) encabeza el título.*
+*Las potencias parciales $\langle I_{n,i} \rangle\,S_i$ de los seis segmentos
+suman el $L_W$ de cada banda; aquí todas las bandas tienen potencia neta
+positiva y superan los criterios de indicadores de campo en grado de
+ingeniería, así que las seis barras se sostienen, y el total ponderado A de
+90,9 dB(A) encabeza el título.*
 
 <details>
 <summary>Mostrar el código de esta figura</summary>
@@ -172,8 +174,9 @@ plt.show()
 </details>
 
 Suministrar `normal_intensity_2` (el segundo barrido) promedia ambos para las
-potencias parciales y evalúa el criterio 3; `pressure_levels` habilita `FpI`;
-`pressure_residual_index` (`δpI0`) más un segundo barrido habilita el grado
+potencias parciales y evalúa el criterio 3; `pressure_levels` habilita
+$F_{pI}$; `pressure_residual_index` ($\delta_{pI0}$) más un segundo barrido
+habilita el grado
 alcanzado por banda. La intensidad por diferencias finitas de la sonda tiene un
 sesgo dependiente de la frecuencia que se trata en la
 [guía de intensidad](/phonometry/es/guides/intensity/).
@@ -182,21 +185,21 @@ sesgo dependiente de la frecuencia que se trata en la
 
 | Parámetro | Tipo | Unidades | Rango / valor por defecto | Notas |
 | :--- | :--- | :--- | :--- | :--- |
-| `normal_intensity` | array 2D | W/m² | `(N_seg, N_bands)` | Intensidad normal con signo promediada por segmento `<In,i>` (primer barrido) |
-| `areas` | array 1D | m² | > 0, `(N_seg,)` | Áreas de los segmentos `Si` |
+| `normal_intensity` | array 2D | W/m² | `(N_seg, N_bands)` | Intensidad normal con signo promediada por segmento $\langle I_{n,i} \rangle$ (primer barrido) |
+| `areas` | array 1D | m² | > 0, `(N_seg,)` | Áreas de los segmentos $S_i$ |
 | `normal_intensity_2` | array 2D | W/m² | misma forma | Segundo barrido → criterio 3 y promediado |
-| `pressure_levels` | array 2D | dB | misma forma | SPL por segmento `Lpi` → `FpI` |
-| `pressure_residual_index` | float o array 1D | dB | — | `δpI0` → `Ld` / criterio 1 |
-| `frequencies` | array 1D | Hz | centros nominales | `LWA` y límites de la Tabla 2 |
+| `pressure_levels` | array 2D | dB | misma forma | SPL por segmento $L_{pi}$ → $F_{pI}$ |
+| `pressure_residual_index` | float o array 1D | dB | — | $\delta_{pI0}$ → $L_d$ / criterio 1 |
+| `frequencies` | array 1D | Hz | centros nominales | $L_{WA}$ y límites de la Tabla 2 |
 | `band_type` | str | — | `'third'` (por defecto) / `'octave'` | Consulta de la Tabla 2 |
-| `grade` | str | — | `'engineering'` (por defecto) / `'survey'` | Selecciona `K` |
-| `repeatability_limit` | float o array 1D | dB | por defecto Tabla 2 | Sobrescribe `s` del criterio 3 |
+| `grade` | str | — | `'engineering'` (por defecto) / `'survey'` | Selecciona $K$ |
+| `repeatability_limit` | float o array 1D | dB | por defecto Tabla 2 | Sobrescribe $s$ del criterio 3 |
 
 Devuelve un `SoundPowerIntensityResult`: `partial_power`/`partial_power_level`
 por segmento y banda, `sound_power`/`sound_power_level` (total de banda, `NaN`
-donde `negative_band`), `surface_pressure_intensity_index` (`FpI`),
-`negative_partial_power_index` (`F+/-`), `repeatability`,
-`dynamic_capability_index` (`Ld`), `achieved_grade`, `surface_area`,
+donde `negative_band`), `surface_pressure_intensity_index` ($F_{pI}$),
+`negative_partial_power_index` ($F_{+/-}$), `repeatability`,
+`dynamic_capability_index` ($L_d$), `achieved_grade`, `surface_area`,
 `sound_power_level_a` y `grade`.
 
 ## 2. Barrido de intensidad de precisión (ISO 9614-3)
@@ -230,7 +233,7 @@ print(round(float(res.sound_power[0]), 6))          # 0.0001
 print(round(float(res.sound_power_level[0]), 2))    # 80.0
 ```
 
-A lo largo de varias bandas el resultado lleva el `LW` por banda (`NaN` donde la
+A lo largo de varias bandas el resultado lleva el $L_W$ por banda (`NaN` donde la
 potencia neta es no positiva), marca esas bandas como `not_applicable` y las
 dibuja con la línea única `result.plot()` de la figura de abajo:
 
@@ -371,8 +374,8 @@ el repositorio; haz clic en la vista previa para abrir el PDF.
 
 **Cubierto.** La determinación por barrido de ISO 9614-2
 (`sound_power_intensity`): las potencias parciales, los indicadores de
-campo `FpI` (presión-intensidad superficial) y `F+/-` (potencia parcial
-negativa), la capacidad dinámica `Ld`, el criterio de repetibilidad, el
+campo $F_{pI}$ (presión-intensidad superficial) y $F_{+/-}$ (potencia parcial
+negativa), la capacidad dinámica $L_d$, el criterio de repetibilidad, el
 grado alcanzado por banda y el marcado de no aplicable del apartado 9.2
 para bandas con flujo neto entrante. La determinación de precisión de
 ISO 9614-3 (`sound_power_intensity_precision`) con su propio marcado de no

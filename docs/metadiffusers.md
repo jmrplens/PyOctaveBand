@@ -63,7 +63,7 @@ for a flat rigid strip ($R = 1$), the $+1$ state of ternary designs.
 
 ## 2. The published quadratic-residue metadiffuser
 
-The published design packs a whole N = 5 quadratic-residue diffuser into a
+The published design packs a whole $N = 5$ quadratic-residue diffuser into a
 35 cm x 2 cm panel: five slits, each loaded by two resonators, on a 7 cm
 pitch. Its first slit reaches critical coupling (the reflection zero the
 ternary `0` state is built from), and at the 2 kHz evaluation frequency the

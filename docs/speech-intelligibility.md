@@ -25,9 +25,9 @@ equally-contributing critical-band and octave-band methods of section 5.
 
 All three inputs are **equivalent spectrum levels** (ANSI S3.5-1997 clauses 3.11
 and 3.55) sampled at the 18 one-third-octave band centres: the speech spectrum
-level `Ei'`, the noise spectrum level `Ni'` (both in dB SPL) and the hearing
-threshold `Ti'` (in dB HL). Each band `i` contributes to intelligibility in
-proportion to its **band-importance function** `Ii` (ANSI S3.5-1997 Table 3,
+level $E_i'$, the noise spectrum level $N_i'$ (both in dB SPL) and the hearing
+threshold $T_i'$ (in dB HL). Each band $i$ contributes to intelligibility in
+proportion to its **band-importance function** $I_i$ (ANSI S3.5-1997 Table 3,
 average speech material), which sums to one across the 18 bands.
 
 ```python
@@ -55,7 +55,7 @@ bands from 1250 Hz to 3150 Hz carry about 43 % of intelligibility (the place
 and manner cues of consonants live there), while the five lowest bands, 160 Hz
 to 400 Hz, carry about 11 % even though they hold nearly half of the speech
 power.
-`Ii` from Table 3 is the average-speech compromise; the standard's Annex B
+$I_i$ from Table 3 is the average-speech compromise; the standard's Annex B
 tabulates alternative importance functions for specific test materials
 (nonsense syllables, monosyllabic word lists, short passages), which shift
 weight according to how much redundancy the material offers.
@@ -63,9 +63,9 @@ weight according to how much redundancy the material offers.
 ## 2. Masking and the band-audibility function
 
 The procedure (ANSI S3.5-1997 clause 5) turns the inputs into a per-band
-audibility. Speech masks itself downward from each band (`Vi = Ei' - 24`); the
-larger of that and the external noise, `Bi`, spreads **upward** in frequency
-with a level-dependent slope to give the equivalent masking spectrum level `Zi`
+audibility. Speech masks itself downward from each band ($V_i = E_i' - 24$); the
+larger of that and the external noise, $B_i$, spreads **upward** in frequency
+with a level-dependent slope to give the equivalent masking spectrum level $Z_i$
 (clause 5.4):
 
 $$
@@ -74,9 +74,9 @@ Z_i = 10\log_{10}\!\left(10^{0.1 N_i'} + \sum_{k<i}
 $$
 
 The masking is combined with the equivalent internal noise
-(`Xi' = Xi + Ti'`, the reference internal noise shifted by the hearing loss)
-into the **equivalent disturbance** `Di` (clause 5.6), and the **band-audibility
-function** is the speech-to-disturbance ratio scaled into `[0, 1]` (clause 5.8):
+($X_i' = X_i + T_i'$, the reference internal noise shifted by the hearing loss)
+into the **equivalent disturbance** $D_i$ (clause 5.6), and the **band-audibility
+function** is the speech-to-disturbance ratio scaled into $[0, 1]$ (clause 5.8):
 
 $$
 A_i = \operatorname{clip}\!\left(\frac{E_i' - D_i + 15}{30},\; 0,\; 1\right).
@@ -150,8 +150,9 @@ plt.show()
 
 A raised hearing threshold (`threshold=`) lifts the equivalent internal noise
 and lowers the index, exactly as added masking noise does. The
-`SIIResult` also carries the per-band masking `Zi`, disturbance `Di`, audibility
-`Ai` and importance `Ii`, and its `.plot()` renders the figure above.
+`SIIResult` also carries the per-band masking $Z_i$, disturbance $D_i$,
+audibility $A_i$ and importance $I_i$, and its `.plot()` renders the figure
+above.
 
 The same speech and noise heard by a listener with a sloping high-frequency
 loss shows what that costs, band by band:
@@ -451,7 +452,7 @@ and each is blind to what the other captures:
 | :--- | :--- | :--- |
 | Question answered | Is enough of the speech spectrum *audible* at the listener's ear? | How much of the speech *envelope* does the transmission channel preserve? |
 | Inputs | Speech, noise and hearing-threshold spectra (18 one-third-octave equivalent spectrum levels) | An impulse response (indirect) or a STIPA recording through the channel (direct) |
-| Band machinery | Band-importance weighting `Ii` applied to the band audibility `Ai` | Modulation transfer function m(F) per octave band, converted to an effective SNR |
+| Band machinery | Band-importance weighting $I_i$ applied to the band audibility $A_i$ | Modulation transfer function $m(F)$ per octave band, converted to an effective SNR |
 | Captures | Steady noise, upward spread of masking, hearing loss, vocal effort, level distortion | Reverberation, echoes, noise and (measured directly) non-linear processing |
 | Blind to | Reverberation and any time-domain smearing: a fully audible but hopelessly reverberant channel still scores high | Individual hearing status: hearing-impaired listeners need specific corrections |
 | Typical use | Audiology, hearing aids and protectors, noise-control targets at a listener position | PA systems, intercoms and rooms: rating a transmission channel end to end |
@@ -469,15 +470,15 @@ inputs are cheap once the room and the noise have been measured. See the
 `SIIResult.report(path)` renders a one-page PDF fiche laid out like a
 speech-audibility report: a standard-basis line, an optional metadata header
 block, a per-one-third-octave-band table of the equivalent speech spectrum
-*E*′<sub>i</sub>, the Table 3 band-importance function *I*<sub>i</sub> and the
-band-audibility function *A*<sub>i</sub> beside the audibility and
+$E_i'$, the Table 3 band-importance function $I_i$ and the
+band-audibility function $A_i$ beside the audibility and
 importance-weighted contribution bars (the result's own `.plot()`), the boxed
 `SII = X` single number, an optional verdict row and a footer with the fixed
 disclaimer. It uses the same `ReportMetadata` container (documented under
 [Insulation ratings](insulation-ratings.md#report-metadata-reportmetadata)) and
 rendering engine as the ISO 717 insulation fiche; a supplied `requirement` is
 read as the minimum required SII (a higher SII passes). `verbose=True` adds the
-equivalent disturbance spectrum level *D*<sub>i</sub> column. Rendering needs
+equivalent disturbance spectrum level $D_i$ column. Rendering needs
 reportlab and, for the figure the fiche embeds, matplotlib (`pip install
 "phonometry[report,plot]"`); only `engine="reportlab"` is supported. Pass
 `language="es"` for a Spanish fiche.

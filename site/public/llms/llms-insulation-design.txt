@@ -187,8 +187,8 @@ imp.plot()   # the Formula (21) terms as bars: Ln,w,eq - dLw + K -> L'n,w (needs
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/impact_prediction_terms_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/impact_prediction_terms.svg" alt="The EN 12354-2 Annex E.3 impact prediction as its Formula 21 terms: the bare-floor equivalent level of 76.2 dB, the minus 33 dB floating-floor improvement, the plus 2 dB flanking correction, and the resulting predicted apparent impact level of 45.2 dB" width="80%"></picture>
 
 *The whole EN 12354-2 simplified model is one subtraction: the massive bare
-floor starts at `Ln,w,eq = 76.2 dB`, the floating floor buys back 33 dB,
-and the flanking correction returns 2 dB, landing at `L'n,w = 45 dB`.*
+floor starts at $L_{n,w,eq} = 76.2$ dB, the floating floor buys back 33 dB,
+and the flanking correction returns 2 dB, landing at $L'_{n,w} = 45$ dB.*
 
 <details>
 <summary>Show the code for this figure</summary>
@@ -243,15 +243,15 @@ element.
 | Parameter | Type | Units | Range / default | Notes |
 | :--- | :--- | :--- | :--- | :--- |
 | `junction_type` | str | — | `'rigid_cross'` / `'rigid_t'` / `'flexible_t'` / `'lightweight_facade'` / `'lightweight_double_homogeneous'` / `'lightweight_double_coupled'` / `'corner'` / `'thickness_change'` | Junction geometry (Annex E.3-E.9) |
-| `path` | str | — | `'through'` (K13) / `'corner'` (K12 = K23) / `'double_leaf'` (K24) | Path branch |
-| `mass_ratio` | float | — | > 0 | `m'⊥,i / m'i` (Formula E.2) |
+| `path` | str | — | `'through'` ($K_{13}$) / `'corner'` ($K_{12} = K_{23}$) / `'double_leaf'` ($K_{24}$) | Path branch |
+| `mass_ratio` | float | — | > 0 | $m'_{\perp,i}/m'_i$ (Formula E.2) |
 | `frequency` | float | Hz | default `500` | `flexible_t` and the E.7/E.8 double-leaf junctions are frequency-dependent |
 | `r_flanking` / `r_separating` | float | dB | — | Weighted indices of the flanking / separating element |
-| `k_ff` / `k_fd` / `k_df` | float | dB | — | Junction `Kij` for the three paths |
-| `separating_area` | float | m² | > 0 | Separating-element area `Ss` |
-| `coupling_length` | float | m | > 0 | Junction coupling length `lf` |
+| `k_ff` / `k_fd` / `k_df` | float | dB | — | Junction $K_{ij}$ for the three paths |
+| `separating_area` | float | m² | > 0 | Separating-element area $S_s$ |
+| `coupling_length` | float | m | > 0 | Junction coupling length $l_f$ |
 | `delta_r_ff` / `delta_r_fd` / `delta_r_df` | float | dB | default `0` | Lining improvements per path |
-| `flanking_area` | float | m² | default `None` | Flanking-element area `SF`; enables the automatic `Kij,min` clamp (Clause 4.4.2 / Formula 29) |
+| `flanking_area` | float | m² | default `None` | Flanking-element area $S_F$; enables the automatic $K_{ij,\min}$ clamp (Clause 4.4.2 / Formula 29) |
 
 ### `flanking_path()` parameters
 
@@ -261,8 +261,8 @@ element.
 | `kind` | str | — | `'Ff'` / `'Df'` / `'Fd'` | Which flanking branch the path is |
 | `r_source` / `r_receive` | float | dB | — | Weighted indices of the source-side / receive-side elements |
 | `k_ij` | float | dB | — | Junction vibration-reduction index for this path |
-| `separating_area` | float | m² | > 0 | Separating-element area `Ss` |
-| `coupling_length` | float | m | > 0 | Junction coupling length `lf` |
+| `separating_area` | float | m² | > 0 | Separating-element area $S_s$ |
+| `coupling_length` | float | m | > 0 | Junction coupling length $l_f$ |
 | `delta_r` | float | dB | default `0` | Lining improvement on this path |
 | `kij_min` | float | dB | default `None` | When given, `k_ij` is floored at this Formula (29) minimum |
 
@@ -281,9 +281,9 @@ the flanking transmission across the junctions; the sheet states this
 explicitly and is labelled a prediction, never a measurement.
 `AirbornePredictionResult.report()` renders the predicted apparent sound
 reduction index fiche (the transmission-path table beside the per-path
-share-of-energy plot, the boxed `R'w`); `ImpactPredictionResult.report()`
+share-of-energy plot, the boxed $R'_w$); `ImpactPredictionResult.report()`
 renders the predicted apparent impact-level fiche (the Formula (21) term table
-beside the term plot, the boxed `L'n,w`). Each names EN/ISO 12354-1/-2 and the
+beside the term plot, the boxed $L'_{n,w}$). Each names EN/ISO 12354-1/-2 and the
 ISO 717 rating part in its basis line, prints the model's ~2 dB standard
 deviation and, when a `requirement` is supplied, adds a PASS/FAIL verdict
 (airborne passes at or above it, impact at or below it). `verbose=True` annexes
@@ -358,15 +358,15 @@ member of the family is EN 12354-6.
 - [Field Insulation Measurement (ISO 16283)](https://jmrplens.github.io/phonometry/guides/insulation-field/):
   the measured in-situ quantities the prediction is checked against.
 - [Insulation Ratings (ISO 717)](https://jmrplens.github.io/phonometry/guides/insulation-ratings/): the reference-curve
-  engine behind the predicted R'w and L'n,w.
+  engine behind the predicted $R'_w$ and $L'_{n,w}$.
 - [Laboratory Insulation Measurement](https://jmrplens.github.io/phonometry/guides/insulation-lab/): the
   ISO 10140 ratings the model consumes.
 - [Laboratory Flanking Transmission (ISO 10848)](https://jmrplens.github.io/phonometry/guides/flanking-lab/): the
-  measured junction vibration reduction index Kij the model consumes.
+  measured junction vibration reduction index $K_{ij}$ the model consumes.
 - [Sound absorption in enclosed spaces (EN 12354-6)](https://jmrplens.github.io/phonometry/guides/enclosed-space-absorption/):
   the absorption member of the same EN 12354 family.
 - [Dynamic stiffness of resilient materials (EN 29052-1)](https://jmrplens.github.io/phonometry/guides/dynamic-stiffness/):
-  the s' input to the EN 12354-2 floating-floor term.
+  the $s'$ input to the EN 12354-2 floating-floor term.
 - API reference: [`building.building_prediction`](https://jmrplens.github.io/phonometry/reference/api/building/building-prediction/) and [`building.facade_prediction`](https://jmrplens.github.io/phonometry/reference/api/building/facade-prediction/).
 
 ---
@@ -713,12 +713,12 @@ this module does, a useful sanity target for a new floor build-up.
 
 | Parameter | Type | Units | Range / default | Notes |
 | :--- | :--- | :--- | :--- | :--- |
-| `element` | `HomogeneousElement` | — | — | Area, side lengths, `m'`, `fc`, `ηint`, `Σ lk αk`, and optionally `ρ`/`cL` |
+| `element` | `HomogeneousElement` | — | — | Area, side lengths, $m'$, $f_c$, $\eta_\text{int}$, $\sum l_k \alpha_k$, and optionally $\rho$/$c_L$ |
 | `frequencies` | array | Hz | > 0 | Band centres |
-| `bands` | str | — | `'third'` (default) / `'octave'` | Sets the band that carries the `f ≈ fc` branch |
-| `resonant_only` | bool | — | default `False` | Drops the forced-transmission term below `fc` (Annex B.1, flanking paths) |
+| `bands` | str | — | `'third'` (default) / `'octave'` | Sets the band that carries the $f \approx f_c$ branch |
+| `resonant_only` | bool | — | default `False` | Drops the forced-transmission term below $f_c$ (Annex B.1, flanking paths) |
 | `speed_of_sound` | float | m/s | default `340` | The value ISO 12354-1 Annex A fixes |
-| `air_density` | float | kg/m³ | default `1.29` | `ρo` of the Annex B model |
+| `air_density` | float | kg/m³ | default `1.29` | $\rho_o$ of the Annex B model |
 
 ## `airborne_flanking_path()` / `impact_flanking_path()` parameters
 
@@ -727,9 +727,9 @@ this module does, a useful sanity target for a new floor build-up.
 | `label` | str | — | — | Display name of the path |
 | `kind` | str | — | `'Ff'` / `'Df'` / `'Fd'` | Airborne only; the impact builder is always `Df` |
 | `element_i` / `element_j` | `InSituElementResult` | — | — | Source-room and receiving-room elements (`floor` / `element_j` for impact) |
-| `vibration_reduction_index` | float or array | dB | — | `Kij` of this path |
-| `coupling_length` | float | m | > 0 | Junction coupling length `lij` |
-| `separating_area` | float | m² | > 0 | `Ss` (airborne only) |
+| `vibration_reduction_index` | float or array | dB | — | $K_{ij}$ of this path |
+| `coupling_length` | float | m | > 0 | Junction coupling length $l_{ij}$ |
+| `separating_area` | float | m² | > 0 | $S_s$ (airborne only) |
 | `delta_r_i` / `delta_r_j` | float or array | dB | default `0` | Lining improvements |
 | `delta_l` | float or array | dB | default `0` | Floor-covering improvement (impact only) |
 
@@ -739,7 +739,7 @@ this module does, a useful sanity target for a new floor build-up.
 per-band counterpart of the simplified prediction fiches: the same one-page
 layout, a basis line naming ISO 12354-1/-2:2017 Clause 4.2, the per-path
 share-of-energy table beside the per-band path-contribution figure, the boxed
-`R'w` / `L'n,w`, the detailed model's 1,5 dB to 2,5 dB standard deviation and a
+$R'_w$ / $L'_{n,w}$, the detailed model's 1,5 dB to 2,5 dB standard deviation and a
 PASS/FAIL verdict against a `requirement`. `verbose=True` annexes the band in
 which each path peaks. Both need the ISO 717 rating, so the spectrum must cover
 100 Hz to 3150 Hz (or 125 Hz to 2000 Hz in octaves).
@@ -773,13 +773,13 @@ printed tables are recorded in [Errata](https://jmrplens.github.io/phonometry/re
   simplified single-number model and the Annex E junction catalogue this page
   builds on.
 - [Laboratory Flanking Transmission (ISO 10848)](https://jmrplens.github.io/phonometry/guides/flanking-lab/): where the
-  measured `Kij` and the equivalent absorption length come from.
+  measured $K_{ij}$ and the equivalent absorption length come from.
 - [Insulation Ratings (ISO 717)](https://jmrplens.github.io/phonometry/guides/insulation-ratings/): the reference-curve
-  engine that turns the predicted spectrum into `R'w` / `L'n,w`.
+  engine that turns the predicted spectrum into $R'_w$ / $L'_{n,w}$.
 - [Field Insulation Measurement (ISO 16283)](https://jmrplens.github.io/phonometry/guides/insulation-field/): the built
   result the prediction is checked against.
 - [Dynamic stiffness of resilient materials (EN 29052-1)](https://jmrplens.github.io/phonometry/guides/dynamic-stiffness/):
-  the `s'` behind the floating floor's resonance frequency.
+  the $s'$ behind the floating floor's resonance frequency.
 - API reference: [`building.detailed_prediction`](https://jmrplens.github.io/phonometry/reference/api/building/detailed-prediction/).
 
 ---
@@ -862,9 +862,9 @@ The predicted spectrum plugs straight into the ISO 717-1 rating through
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/single_panel_rating_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/single_panel_rating.svg" alt="Predicted sound reduction index of a 6 mm float glass pane per one-third-octave band against the shifted ISO 717-1 reference curve, with the coincidence dip at about 2100 Hz marked, the unfavourable deviations shaded and the Rw rating annotated" width="80%"></picture>
 
 *The predicted Sharp spectrum rated exactly like a measurement: the
-coincidence dip at `fc ~ 2.1 kHz` collects most of the unfavourable
+coincidence dip at $f_c \approx 2.1$ kHz collects most of the unfavourable
 deviations, and the shifted reference read at 500 Hz gives the catalogue
-`Rw = 32 dB` of 6 mm glass.*
+$R_w = 32$ dB of 6 mm glass.*
 
 <details>
 <summary>Show the code for this figure</summary>
@@ -914,10 +914,11 @@ The clip below watches coincidence happen in a 2D
 [elastic FDTD field](https://jmrplens.github.io/phonometry/guides/elastic-waves/): a 10 mm
 steel plate immersed in air, driven by a sustained plane wave at 45 degrees,
 with both frequencies picked from the library's `coincidence_frequency`. At
-`fc/2` = 603 Hz the measured transmission lands on the oblique mass law; at
-`2 fc` = 2413 Hz the 45-degree trace equals `λB` exactly and the trace-matched
-plate re-radiates a 45-degree beam that grows along the plate, pinning the
-transmitted level at the `fc/2` figure even though the mass law demands 12 dB
+$f_c/2 = 603$ Hz the measured transmission lands on the oblique mass law; at
+$2f_c = 2413$ Hz the 45-degree trace equals $\lambda_B$ exactly and the
+trace-matched plate re-radiates a 45-degree beam that grows along the plate,
+pinning the transmitted level at the $f_c/2$ figure even though the mass law
+demands 12 dB
 more blocking at four times the frequency. The air drives the heavy steel so
 weakly that the resonant bending wave needs tens of metres of illuminated
 plate to build up fully, which is why a real coincidence dip, not total
@@ -941,16 +942,17 @@ hand for decades. The **plateau method** (Norton & Karczub 2003, Section 3.9.1,
 after Watters) approximates the whole field-incidence curve of a single panel
 from three numbers per material, tabulated in `PLATEAU_MATERIALS` from Norton's
 Table 3.1: the surface density per millimetre of thickness, the height of the
-coincidence plateau in decibels, and the frequency ratio `B/A` that sets its
+coincidence plateau in decibels, and the frequency ratio $B/A$ that sets its
 width.
 
 The construction has three parts:
 
-1. the **field-incidence mass law** `TL = 10 lg(1 + (π f m''/ρ₀c₀)²) − 5 dB`
+1. the **field-incidence mass law**
+   $TL = 10\lg(1 + (\pi f m''/\rho_0 c_0)^2) - 5\ \text{dB}$
    (Norton Eqs. 3.104 and 3.106), rising 6 dB per octave;
 2. a horizontal **coincidence plateau** at the tabulated height, with point
    **A** where the mass-law line reaches it;
-3. point **B** at `B/A × f_A`, above which the estimate recovers at
+3. point **B** at $B/A \times f_A$, above which the estimate recovers at
    **10 dB per octave**.
 
 It needs neither the bending stiffness nor the loss factor - the tabulated
@@ -991,7 +993,8 @@ plt.show()
 </details>
 
 A worked check against the book: an 8 m x 3 m solid brick wall 110 mm thick at
-2.1 kg/m² per mm (`m'' = 231 kg/m²`) gives 35.8 dB in the 63 Hz octave, on the
+2.1 kg/m² per mm ($m'' = 231\ \text{kg/m}^2$) gives 35.8 dB in the 63 Hz
+octave, on the
 mass-law line, then the brick plateau of 37 dB across the 125 Hz and 250 Hz
 octaves, then 10 dB per octave above point B - Norton's printed answer to his
 problem 3.11 exactly, band for band, in the two regions the construction fixes
@@ -1009,8 +1012,8 @@ print(res.transmission_loss.round(1))
 
 The physical model has its own Norton-flavoured variant for the region above
 coincidence: `coincidence_model="cremer"` replaces Sharp's Eq. 7.44 with
-Cremer's empirical `TL = TL₀ + 10 lg(f/fc − 1) + 10 lg η − 2 dB`
-(Norton Eq. 3.110), and runs the mass law right up to `fc` with no interpolated
+Cremer's empirical $TL = TL_0 + 10\lg(f/f_c - 1) + 10\lg\eta - 2\ \text{dB}$
+(Norton Eq. 3.110), and runs the mass law right up to $f_c$ with no interpolated
 bridge. Both rise at about 10 dB per octave far above coincidence; they differ
 in how they leave the dip.
 
@@ -1227,7 +1230,7 @@ dw.plot()   # double-wall R(f) with the mass-spring-mass resonance marked (needs
 ```
 
 The classic lightweight case is worth drawing to scale: two 8.8 kg/m²
-plasterboard leaves on a 100 mm empty cavity put `f0` at 90 Hz.
+plasterboard leaves on a 100 mm empty cavity put $f_0$ at 90 Hz.
 `plot_double_wall_geometry` annotates the resonance in the cavity, and a
 `double_wall_transmission_loss` result that retained its geometry redraws its
 own cross-section with `dw.plot_geometry()`.
@@ -1235,7 +1238,7 @@ own cross-section with `dw.plot_geometry()`.
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/double_wall_geometry_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/double_wall_geometry.svg" alt="To-scale cross-section of a lightweight double wall: two grey plasterboard leaves of 8.8 kg/m2 each, drawn 12.6 mm thick, separated by the 100 mm cavity, the incident-sound arrow arriving from the left and the mass-spring-mass resonance f0 = 90 Hz annotated in the cavity" width="80%"></picture>
 
 *The whole model in one section: the two thin leaves are the masses, the
-100 mm air gap is the spring, and `f0` = 90 Hz is where the dip of every
+100 mm air gap is the spring, and $f_0 = 90$ Hz is where the dip of every
 double-wall curve sits.*
 
 <details>
@@ -1421,7 +1424,8 @@ plt.show()
 </details>
 
 The clip below puts the two regimes side by side in a 2D FDTD field: a plane
-front meets a rigid 0.10 m wall with a 25 mm slit (λ/20 at 686 Hz) and with a
+front meets a rigid 0.10 m wall with a 25 mm slit ($\lambda/20$ at 686 Hz)
+and with a
 0.50 m opening (one wavelength). The narrow slit re-radiates what it swallows
 as a cylindrical wave, the Gomperts transmission of the model annotated; the
 wavelength-sized opening lets the front through nearly intact and casts
@@ -1680,9 +1684,10 @@ res.plot()            # the delta-L(f) improvement spectrum above (needs matplot
 
 `FloorCoveringImprovementResult.report()` writes a one-page accredited
 impact-improvement fiche: the ISO 16251-1 basis line, a metadata header, the
-per-band table (frequency and *delta-L*, bands at the 1.3 dB limit prefixed
-`>`) beside the *delta-L(f)* improvement curve, the boxed single-number
-*delta-Lw (CI,delta)* (the ISO 16251-1 Clause 8 e) statement of results, rated
+per-band table (frequency and $\Delta L$, bands at the 1.3 dB limit prefixed
+`>`) beside the $\Delta L(f)$ improvement curve, the boxed single-number
+$\Delta L_w\ (C_{I,\Delta})$ (the ISO 16251-1 Clause 8 e) statement of
+results, rated
 per ISO 717-2) and a footer. The applicable `ReportMetadata` fields are
 `specimen` (the floor covering under test), `client`, `manufacturer`,
 `mounting`, `mass_per_area`, `test_room`, `test_date`, `temperature`,
@@ -1691,7 +1696,7 @@ per ISO 717-2) and a footer. The applicable `ReportMetadata` fields are
 verdict passes at or above it). The bare reference floor is the standardised
 heavyweight floor of ISO 717-2:2020 Table 4, fixed by the standard.
 `verbose=True` adds the reference-floor-with-covering column
-*Ln,r = Ln,r,0 - delta-L*, the derivation basis of *delta-Lw*.
+$L_{n,r} = L_{n,r,0} - \Delta L$, the derivation basis of $\Delta L_w$.
 
 ```python
 from phonometry import building, ReportMetadata
@@ -1781,7 +1786,8 @@ this page, or the full ISO 10140-3 floor, is the reference, and the
   reduction of transmitted impact noise by floor coverings measured using
   ISO 140-8 and ISO/CD 16251-1. *Forum Acusticum 2011, Aalborg* (CSTB).
   The measured textile-carpet improvement spectrum used as the worked
-  example on this page (ΔLw = 29 dB); the per-band ΔL was digitized from its
+  example on this page ($\Delta L_w = 29$ dB); the per-band $\Delta L$ was
+  digitized from its
   Figure 4.
 - International Organization for Standardization. (2014). *Acoustics —
   Laboratory measurement of the reduction of transmitted impact noise by
@@ -1793,8 +1799,8 @@ this page, or the full ISO 10140-3 floor, is the reference, and the
   Rating of sound insulation in buildings and of building elements — Part 2:
   Impact sound insulation* (ISO 717-2:2020).
   [iso.org catalogue](https://www.iso.org/standard/69867.html).
-  The reference floor Ln,r,0 (Table 4) and the rating engine behind ΔLw,
-  with the Formula (A.4) adaptation term CI,Δ.
+  The reference floor $L_{n,r,0}$ (Table 4) and the rating engine behind
+  $\Delta L_w$, with the Formula (A.4) adaptation term $C_{I,\Delta}$.
 
 - International Organization for Standardization. (2017). *Building acoustics
   — Estimation of acoustic performance of buildings from the performance of
@@ -1820,12 +1826,12 @@ not a measurement).
   suite this mock-up replaces for soft coverings, and the full-size
   ISO 10140-3 improvement measurement.
 - [Dynamic stiffness of resilient materials (EN 29052-1)](https://jmrplens.github.io/phonometry/guides/dynamic-stiffness/):
-  the s' measurement that feeds the floating-floor estimate.
+  the $s'$ measurement that feeds the floating-floor estimate.
 - [Predicting Resilient-Layer Performance](https://jmrplens.github.io/phonometry/guides/resilient-layers/): the
   prediction counterpart of this page, from the tapping-machine force model
   to floating floors and wall linings.
 - [Predicting Sound Insulation (EN 12354)](https://jmrplens.github.io/phonometry/guides/insulation-prediction/): the
-  impact model whose Formula (21) consumes ΔLw.
+  impact model whose Formula (21) consumes $\Delta L_w$.
 - [Insulation Ratings (ISO 717)](https://jmrplens.github.io/phonometry/guides/insulation-ratings/): the reference-curve
   engine behind the weighted improvement.
 - API reference: [`building.floor_covering_improvement`](https://jmrplens.github.io/phonometry/reference/api/building/floor-covering-improvement/).
@@ -1841,9 +1847,9 @@ Source: https://jmrplens.github.io/phonometry/guides/dynamic-stiffness/
 A **floating floor** is a heavy floating slab resting on a resilient layer; the
 two form a mass-spring system whose **natural frequency** governs how much the
 floor improves impact and airborne insulation. **EN 29052-1:1992** (identical to
-ISO 9052-1:1989) measures the **dynamic stiffness per unit area** `s'` of the
+ISO 9052-1:1989) measures the **dynamic stiffness per unit area** $s'$ of the
 resilient layer from the resonance of a standard load plate on a
-200 mm × 200 mm specimen. `s'` is the input to the floating-floor term of the
+200 mm × 200 mm specimen. $s'$ is the input to the floating-floor term of the
 EN 12354-2 impact model covered in
 [Predicting Sound Insulation (EN 12354)](https://jmrplens.github.io/phonometry/guides/insulation-prediction/). (ISO 16251-1 does not apply here:
 its scope is limited to soft, locally-reacting floor coverings and explicitly
@@ -1882,7 +1888,7 @@ plt.legend(); plt.show()
 ## 1. Dynamic stiffness and resonance
 
 The dynamic stiffness per unit area is a dynamic force per area divided by the
-resulting change in thickness (Formula 1): `s' = (F/S)/Δd`. The resiliently
+resulting change in thickness (Formula 1): $s' = (F/S)/\Delta d$. The resiliently
 supported floor is a resonator whose natural frequency (Formula 2) and,
 in the laboratory arrangement, measured resonant frequency (Formula 3) are
 
@@ -1925,7 +1931,7 @@ load plate with the exciter and accelerometer in place.
 
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/dynamic_stiffness_rig_geometry_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/dynamic_stiffness_rig_geometry.svg" alt="To-scale section of the dynamic-stiffness rig: the dotted 200 mm resilient specimen, 20 mm thick, on the hatched rigid foundation, the grey 8 kg load plate on top with the accelerometer ball at its edge, and the exciter block above driving the plate through a red vertical arrow, the specimen side and thickness dimensioned" width="92%"></picture>
 
-*The mass-spring system behind `s'` at true scale: 20 mm of resilient layer
+*The mass-spring system behind $s'$ at true scale: 20 mm of resilient layer
 under the 8 kg plate is all it takes to reproduce the 2 kPa preload of a
 floating floor.*
 
@@ -1946,10 +1952,11 @@ plt.show()
 ## 2. The enclosed-gas term and airflow resistivity
 
 For an air-permeable material the enclosed pore air adds a parallel stiffness
-from its isothermal compression (Formula 7): `s'a = p₀/(d·ε)`, with `p₀` the
-atmospheric pressure, `d` the loaded thickness and `ε` the porosity. The
-standard's worked NOTE (`p₀ = 0.1 MPa`, `ε = 0.9`) is `s'a = 111/d` MN/m³ for
-`d` in millimetres:
+from its isothermal compression (Formula 7):
+$s'_a = p_0/(d\,\varepsilon)$, with $p_0$ the atmospheric pressure, $d$ the
+loaded thickness and $\varepsilon$ the porosity. The standard's worked NOTE
+($p_0 = 0.1\ \text{MPa}$, $\varepsilon = 0.9$) is $s'_a = 111/d$ MN/m³ for
+$d$ in millimetres:
 
 ```python
 from phonometry import materials
@@ -1959,9 +1966,11 @@ print(round(materials.enclosed_gas_stiffness(thickness=0.020, porosity=0.9) / 1e
 ```
 
 The dynamic stiffness of the *installed* material is then set by the lateral
-airflow resistivity `r` (clause 8.2): `s' = s't` for `r ≥ 100 kPa·s/m²`,
-`s' = s't + s'a` for `10 ≤ r < 100 kPa·s/m²`, and for `r < 10 kPa·s/m²` the
-method only resolves `s' = s't` when the gas term is negligible. `floating_floor_resonance`
+airflow resistivity $r$ (clause 8.2): $s' = s'_t$ for
+$r \ge 100\ \text{kPa}\cdot\text{s/m}^2$, $s' = s'_t + s'_a$ for
+$10 \le r < 100\ \text{kPa}\cdot\text{s/m}^2$, and for
+$r < 10\ \text{kPa}\cdot\text{s/m}^2$ the method only resolves $s' = s'_t$
+when the gas term is negligible. `floating_floor_resonance`
 chains the whole determination:
 
 ```python
@@ -1980,7 +1989,7 @@ res.plot()   # the f0(s') design curve with this determination marked (needs mat
 
 The `DynamicStiffnessResult` carries the apparent, enclosed-gas and installed
 stiffnesses, the test resonance and the installed-floor natural frequency, and
-its `.plot()` draws the `f₀(s')` design curve.
+its `.plot()` draws the $f_0(s')$ design curve.
 
 **Test-report fiche.** `DynamicStiffnessResult.report(path)` renders a one-page
 accredited dynamic-stiffness test report (EN 29052-1:1992 = ISO 9052-1:1989): a
@@ -2023,11 +2032,11 @@ well above $f_r$; a heavy or very thick layer starts to act as a distributed
 system and the simple Formula 4 reading degrades. Three practical pitfalls
 follow from the preload:
 
-* **`s'` is a stiffness *at the standard preload*.** Resilient layers are
+* **$s'$ is a stiffness *at the standard preload*.** Resilient layers are
   visibly non-linear in static load: mineral wool stiffens as it compresses,
   some foams soften. The 200 kg/m² load plate fixes the operating point, so
-  the tabulated `s'` strictly describes floors near that surface mass.
-  Designing a much heavier screed with the same `s'` extrapolates beyond the
+  the tabulated $s'$ strictly describes floors near that surface mass.
+  Designing a much heavier screed with the same $s'$ extrapolates beyond the
   measurement.
 * **Drive small.** The tangent stiffness is defined for small dynamic
   strains; driving the plate hard pushes the layer into its non-linear range
@@ -2040,7 +2049,7 @@ follow from the preload:
 
 The natural frequency that matters in the end is not the rig's $f_r$ but the
 installed floor's $f_0$ from Formula 2: the floating floor only improves
-insulation well above $f_0$, which is why a low `s'` (a soft layer under a
+insulation well above $f_0$, which is why a low $s'$ (a soft layer under a
 heavy slab) is the design goal.
 
 ## References
@@ -2062,7 +2071,7 @@ EN 29052-1:1992 (= ISO 9052-1:1989), *Acoustics — Determination
 of dynamic stiffness — Part 1: Materials used under floating floors in
 dwellings*: the dynamic stiffness per unit area (Formula 1), the resonance
 relations (Formulae 2-4), the enclosed-gas term (Formula 7, clause 8.2 NOTE
-`s'a = 111/d` MN/m³) and the airflow-resistivity regimes (clause 8.2, Formulae
+$s'_a = 111/d$ MN/m³) and the airflow-resistivity regimes (clause 8.2, Formulae
 5-6). Conformance is anchored on the standard's own numeric NOTE plus
 hand-computed closed-form values of the resonance relations.
 
@@ -2348,8 +2357,8 @@ f_0 = \frac{1}{2\pi}\sqrt{\frac{0.111}{d}\left(\frac{1}{m_1'} + \frac{1}{m_2'}\r
 $$
 
 Both stiffnesses are in MN/m³ and both masses per unit area in kg/m², which is
-how the annex prints them: the cavity term of (D.2) is $s' = 0{,}111/d$ MN/m³
-with $d$ in metres, that is $0{,}111\times10^{6}/d$ in SI units. Substituting
+how the annex prints them: the cavity term of (D.2) is $s' = 0.111/d$ MN/m³
+with $d$ in metres, that is $0.111\times10^{6}/d$ in SI units. Substituting
 the SI value without the conversion gives a resonance about a thousand times
 too low.
 

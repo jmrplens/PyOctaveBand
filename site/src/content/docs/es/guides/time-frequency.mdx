@@ -54,7 +54,7 @@ de promediarlos. Como la calibración es el escalado exacto del módulo de
 Welch sin eliminación de tendencia, se cumplen tres identidades:
 
 * una señal en pascales da Pa²/Hz (`'density'`) o Pa² (`'spectrum'`) por
-  celda, así que `10·lg(power/p₀²)` con escalado `'spectrum'` lee
+  celda, así que $10\lg(\text{power}/p_0^2)$ con escalado `'spectrum'` lee
   directamente el **nivel de presión acústica** de un tono en cualquier
   columna que abarque;
 * la **media de las columnas en el tiempo reproduce
@@ -75,13 +75,15 @@ print(res.resolution_bandwidth)    # Be del segmento con ventana, en Hz
 res.plot(language="es")            # imagen en dB en el plano tiempo-frecuencia
 ```
 
-La longitud del segmento es toda la decisión de diseño: `T_B = nperseg/fs`
-de resolución temporal contra `Bₑ ≈ 1/T_B` de resolución frecuencial, un
+La longitud del segmento es toda la decisión de diseño:
+$T_B = \text{nperseg}/f_s$ de resolución temporal contra
+$B_e \approx 1/T_B$ de resolución frecuencial, un
 producto igual a uno (sección 12.6.4.2). Los segmentos largos fijan las
 frecuencias y emborronan los transitorios; los cortos, lo contrario. Y como
 cada celda es una única estimación *sin promediar*, los datos aleatorios
 llevan un error aleatorio normalizado de 1 por celda (ec. 8.158 con
-`nd = 1`; Bendat y Piersol citan `√2/1,25 ≈ 1,13` para la representación en
+$n_d = 1$; Bendat y Piersol citan $\sqrt{2}/1{,}25 \approx 1{,}13$ para la
+representación en
 magnitud): el espectrograma es una herramienta para la estructura
 determinista (tonos, barridos, transitorios), mientras que la
 [estimación de Welch](/phonometry/es/guides/spectral-analysis/) promediada
@@ -142,7 +144,8 @@ gemelas, zumbido de red contra un armónico de rotor - son invisibles para
 una FFT de 1024 puntos a 8192 Hz: sus bins miden 8 Hz. La solución clásica
 de los analizadores es la **transformada con zoom** de Bendat y Piersol,
 sección 11.5.4: filtrar la banda, bajarla a frecuencia cero por
-demodulación compleja con `exp(-j2πf₁t)` (ecs. 11.123-11.126), decimar por
+demodulación compleja con $\exp(-j 2\pi f_1 t)$ (ecs. 11.123-11.126),
+decimar por
 la razón de anchos de banda y transformar el registro decimado
 (ecs. 11.128-11.130), obteniendo un espaciado fino de bins sobre la banda
 sin un bloque de FFT gigante (ec. 11.127).
@@ -152,8 +155,8 @@ evaluación chirp-Z de la DFT del registro con ventana sobre la malla del
 zoom - que da las mismas muestras de la DFT que la cadena
 demodular-decimar; la batería de tests fija ambas entre sí a precisión de
 máquina. Las amplitudes se calibran con la ganancia coherente de la
-ventana, así que un seno de amplitud de pico `A` sobre una frecuencia de
-análisis lee `amplitude = A` y `power = A²/2` exactamente:
+ventana, así que un seno de amplitud de pico $A$ sobre una frecuencia de
+análisis lee `amplitude` $= A$ y `power` $= A^2/2$ exactamente:
 
 ```python
 from phonometry import zoom_fft
@@ -170,7 +173,8 @@ Una distinción importa y el resultado la declara: la **malla** puede
 hacerse arbitrariamente fina (`n_points`), pero la **resolución** - la
 capacidad de separar dos tonos - la fijan la longitud del registro y la
 ventana, informada como `resolution_bandwidth`
-(`Bₑ = fs·Σw²/(Σw)²`, es decir, `1/T` sin ventana, `1,5/T` con Hann). El
+($B_e = f_s \sum w^2/(\sum w)^2$, es decir, $1/T$ sin ventana, $1{,}5/T$
+con Hann). El
 zoom refina el muestreo del mismo espectro subyacente; solo un registro
 más largo separa tonos más próximos.
 

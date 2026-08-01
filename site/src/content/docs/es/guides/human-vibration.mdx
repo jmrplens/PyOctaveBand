@@ -78,7 +78,7 @@ ponderada** (con medidas de dosis para choques y registros largos), se condensa
 entre ejes en una sola magnitud (el **valor total de vibración** para la
 exposición mano-brazo y para el confort; el **valor del eje más alto** para la
 evaluación de salud de cuerpo completo) y, por último, se normaliza a una
-**exposición diaria de 8 horas** `A(8)` que se compara con los valores de acción
+**exposición diaria de 8 horas** $A(8)$ que se compara con los valores de acción
 y límite de la directiva europea.
 
 Las ponderaciones se definen una sola vez, en **ISO 8041-1:2017**, como una
@@ -303,7 +303,7 @@ banda basada principalmente en exposiciones de 4 h a 8 h por debajo de la cual
 los efectos sobre la salud no están claramente documentados, dentro de la cual
 se indica precaución y por encima de la cual los riesgos son probables; la
 Directiva 2002/44/CE convierte esa guía en los valores de acción y límite
-exigibles de `A(8)` que se usan más abajo. La evaluación de *confort* del
+exigibles de $A(8)$ que se usan más abajo. La evaluación de *confort* del
 apartado 8 combina en cambio todos los ejes (y, cuando procede, respaldo, pies
 y rotación) en el valor total de vibración $a_v$ con su propio juego de $k$ y
 lo lee en la escala del Anexo C para transporte público, cuyas bandas
@@ -337,8 +337,8 @@ print(round(a, 3))    # 0.62  m/s^2 (máximo de 0.49, 0.392, 0.62; no a_v = 0.88
 
 `daily_vibration_exposure` construye las exposiciones parciales, las combina y
 evalúa el resultado frente a la **Directiva 2002/44/CE**: valor de acción de
-mano-brazo `A(8) = 2.5` y valor límite `5` m/s²; acción de cuerpo completo `0.5`
-y límite `1.15` m/s² (o un VDV de `9.1` / `21` m/s¹·⁷⁵):
+mano-brazo $A(8) = 2{,}5$ y valor límite 5 m/s²; acción de cuerpo completo 0,5
+y límite 1,15 m/s² (o un VDV de 9,1 / 21 m/s¹·⁷⁵):
 
 ```python
 from phonometry import vibration
@@ -407,7 +407,7 @@ from phonometry import vibration
 print(round(vibration.hav_vwf_lifetime_years(7.0), 1))   # 4.0 años (Tabla C.1)
 ```
 
-Las normas no definen deliberadamente ningún límite seguro; `A(8)` y los valores
+Las normas no definen deliberadamente ningún límite seguro; $A(8)$ y los valores
 de acción y límite de la directiva son la base de cualquier criterio de
 exposición. Para la exposición de cuerpo completo, `energy_equivalent_acceleration`
 da la magnitud energético-equivalente de ISO 2631-1 ec. (B.3) entre periodos de
@@ -491,12 +491,12 @@ frecuenciales: la cascada de etapas analógicas de la Tabla 3 (fórmulas
 (1)-(5)) que `frequency_weighting` y `apply_weighting` realizan para las
 nueve ponderaciones, reproduciendo las tablas de objetivo de diseño del
 Anexo B. La ISO 2631-1:1997 para la vibración de cuerpo completo, que cubre
-el valor eficaz ponderado `a_w` y el valor total de vibración `a_v`
+el valor eficaz ponderado $a_w$ y el valor total de vibración $a_v$
 (`weighted_acceleration`, `vibration_total_value`), las medidas de dosis
 MTVV, VDV, MSDV y factor de cresta, y la magnitud energético-equivalente del
 Anexo B (`energy_equivalent_acceleration`). La ISO 2631-2:2003 (`Wm`), la
 ISO 2631-4:2001 (`Wb`) y la ISO 5349-1/-2:2001 para la vibración transmitida
-a la mano, cuyo total vectorial, exposición diaria `A(8)`
+a la mano, cuyo total vectorial, exposición diaria $A(8)$
 (`daily_vibration_exposure`, `wbv_exposure_basis`) y relación de dosis de
 dedo blanco por vibración del Anexo C (`hav_vwf_lifetime_years`) también se
 implementan. Los valores de acción y límite de la Directiva 2002/44/CE

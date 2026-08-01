@@ -145,11 +145,11 @@ plt.show()
 | :--- | :--- | :--- | :--- | :--- |
 | `lp1` | 1D or 2D array | dB | one/band, or `(positions, bands)` | Source-room sound pressure level |
 | `l_in` | 1D or 2D array | dB | one/band, or `(positions, bands)` | Normal intensity level over the surface |
-| `measurement_area` | float | m² | > 0 | Measurement-surface area `Sm` |
-| `area` | float | m² | > 0 | Specimen area `S` |
+| `measurement_area` | float | m² | > 0 | Measurement-surface area $S_m$ |
+| `area` | float | m² | > 0 | Specimen area $S$ |
 | `kc` | 1D array | dB | one per band / `None` | Adaptation term for the modified index |
 | `freq` | 1D array | Hz | > 0 | Midband frequencies (`adaptation_term_kc`) |
-| `boundary_area` / `volume` | float | m² / m³ | > 0, both or neither | Room `Sb2` / `V2` for Formula (B.1) |
+| `boundary_area` / `volume` | float | m² / m³ | > 0, both or neither | Room $S_{b2}$ / $V_2$ for Formula (B.1) |
 
 `intensity_sound_reduction()` returns an `IntensityReductionResult` (`r_i`,
 `r_i_modified`, `rating`, `rating_modified`);
@@ -344,11 +344,11 @@ unchanged to field data, but nothing checks how that data was acquired.
 ## See also
 
 - [Laboratory Insulation Measurement](/phonometry/guides/insulation-lab/):
-  the ISO 10140 pressure method that the Kc adaptation reproduces.
+  the ISO 10140 pressure method that the $K_c$ adaptation reproduces.
 - [Field Insulation Measurement (ISO 16283)](/phonometry/guides/insulation-field/):
   the pressure-based field quantities and their single-number ratings.
 - [Insulation Ratings (ISO 717)](/phonometry/guides/insulation-ratings/):
-  the reference-curve engine behind RI,w and DI,n,e,w.
+  the reference-curve engine behind $R_{I,w}$ and $D_{I,n,e,w}$.
 - [Sound Intensity](/phonometry/guides/intensity/): the two-microphone
   probe, its field indicators and the residual-index qualification behind
   every scan.

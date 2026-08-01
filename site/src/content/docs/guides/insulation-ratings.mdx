@@ -52,9 +52,9 @@ consumes the ratings is
 
 Pass the 16 one-third-octave values from 100 Hz to 3150 Hz to
 `building.weighted_rating(R)`. It shifts the ISO 717-1 reference curve and
-returns the rating read at 500 Hz, plus the spectrum adaptation terms C and
+returns the rating read at 500 Hz, plus the spectrum adaptation terms $C$ and
 $C_{tr}$. For the measured spectrum used below, `w.rating, w.c, w.ctr` prints
-`30 -2 -3`: $R_w(C;C_{tr}) = 30(-2;-3)$. The same call rates $R'$, $D_n$ and
+`30 -2 -3`: $R_w\ (C\ ;\ C_{tr}) = 30\ (-2\ ;\ -3)$. The same call rates $R'$, $D_n$ and
 $D_{nT}$.
 
 ## Airborne ratings (ISO 717-1)
@@ -64,8 +64,8 @@ method** of ISO 717-1: a fixed reference curve is shifted in 1 dB steps
 toward the measured curve until the sum of *unfavourable* deviations
 (where the measurement falls below the reference) is as large as possible
 but not more than 32.0 dB (16 one-third-octave bands) or 10.0 dB (5 octave
-bands). The rating (`Rw`, `R'w`, `DnT,w` …) is the shifted reference read at
-500 Hz. The **spectrum adaptation terms** $C$ (pink noise) and $C_{tr}$
+bands). The rating ($R_w$, $R'_w$, $D_{nT,w}$ …) is the shifted reference
+read at 500 Hz. The **spectrum adaptation terms** $C$ (pink noise) and $C_{tr}$
 (urban traffic) add the low-frequency penalty of a real source.
 
 The two terms re-rate the same measured curve against the two source spectra
@@ -140,7 +140,7 @@ plt.show()
 
 | Parameter | Type | Units | Range / default | Notes |
 | :--- | :--- | :--- | :--- | :--- |
-| `values_by_band` | 1D array | dB | 16 (thirds) or 5 (octaves) | Measured `R`, `R'`, `DnT` … per band |
+| `values_by_band` | 1D array | dB | 16 (thirds) or 5 (octaves) | Measured $R$, $R'$, $D_{nT}$ … per band |
 | `bands` | str or `None` | — | `'third-octave'` / `'octave'` / `None` | `None` infers from the count |
 
 `weighted_rating()` returns a `WeightedRatingResult`
@@ -151,8 +151,8 @@ plt.show()
 The single-number rating (ISO 717-2) shifts the same style of reference curve,
 but an **unfavourable deviation now occurs where the measurement *exceeds* the
 reference** (impact noise is worse when higher), the sign opposite to
-ISO 717-1. The rating (`Ln,w`, `L'n,w`, `L'nT,w`) is the shifted reference read
-at 500 Hz; for octave bands it is then reduced by 5 dB. The spectrum
+ISO 717-1. The rating ($L_{n,w}$, $L'_{n,w}$, $L'_{nT,w}$) is the shifted
+reference read at 500 Hz; for octave bands it is then reduced by 5 dB. The spectrum
 adaptation term $C_I = L_{n,\text{sum}} - 15 - L_{n,w}$ uses the energetic sum
 over 100–2500 Hz (the first 15 thirds, excluding 3150 Hz) or 125–2000 Hz
 (octaves).
@@ -223,14 +223,14 @@ plt.show()
 </details>
 
 Feeding the standardized spectrum into `weighted_impact_rating` reproduces
-the ISO 717-2 Annex C values (thirds `L'nT,w = 79`, `CI = −11`; octave `54`,
-`CI = 0`).
+the ISO 717-2 Annex C values (thirds $L'_{nT,w} = 79$, $C_I = -11$; octave
+54, $C_I = 0$).
 
 ### `weighted_impact_rating()` parameters
 
 | Parameter | Type | Units | Range / default | Notes |
 | :--- | :--- | :--- | :--- | :--- |
-| `values_by_band` | 1D array | dB | 16 (thirds) or 5 (octaves) | Measured `Ln`, `L'n` or `L'nT` per band |
+| `values_by_band` | 1D array | dB | 16 (thirds) or 5 (octaves) | Measured $L_n$, $L'_n$ or $L'_{nT}$ per band |
 | `bands` | str or `None` | — | `'third-octave'` / `'octave'` / `None` | `None` infers from the count |
 
 `weighted_impact_rating()` returns an `ImpactRatingResult` (`rating`,
@@ -325,10 +325,11 @@ optional metadata header block, the one-third-octave table beside the
 measured-versus-shifted-reference plot (the result's own `.plot()`), the boxed
 single-number result, an optional verdict row and a footer with the fixed
 disclaimer. `WeightedRatingResult.report()` labels the airborne ISO 717-1 fiche
-(`Rw (C; Ctr)`, deviations where the reference is above the measurement);
-`ImpactRatingResult.report()` labels the impact ISO 717-2 fiche (`Ln,w (CI)`,
-deviations the opposite way). `SoundReductionResult.report()` is a convenience
-that rates the predicted `R(f)` and writes its fiche in one call.
+($R_w\ (C\ ;\ C_{tr})$, deviations where the reference is above the measurement);
+`ImpactRatingResult.report()` labels the impact ISO 717-2 fiche
+($L_{n,w}(C_I)$, deviations the opposite way).
+`SoundReductionResult.report()` is a convenience that rates the predicted
+$R(f)$ and writes its fiche in one call.
 
 The report metadata is supplied as a `ReportMetadata` frozen dataclass (every
 field optional; only the supplied fields are rendered, and the numeric fields
@@ -442,15 +443,16 @@ engines from their own guides rather than duplicating them.
 - [Field Insulation Measurement (ISO 16283)](/phonometry/guides/insulation-field/):
   the airborne, impact and façade spectra these engines rate in the field.
 - [Laboratory Insulation Measurement](/phonometry/guides/insulation-lab/):
-  the laboratory R and Ln behind Rw and Ln,w.
+  the laboratory $R$ and $L_n$ behind $R_w$ and $L_{n,w}$.
 - [Sound Insulation by Intensity (ISO 15186)](/phonometry/guides/insulation-intensity/):
   the intensity indices rated with the same airborne engine.
 - [Sound Insulation Survey Method (ISO 10052)](/phonometry/guides/insulation-survey/):
   the survey quantities and their automatic ratings.
 - [Laboratory Flanking Transmission (ISO 10848)](/phonometry/guides/flanking-lab/):
-  the flanking descriptors Dn,f,w and Ln,f,w.
+  the flanking descriptors $D_{n,f,w}$ and $L_{n,f,w}$.
 - [Floor-Covering Impact Improvement (ISO 16251-1)](/phonometry/guides/impact-improvement/):
-  the weighted improvement ΔLw built on the ISO 717-2 reference floor.
+  the weighted improvement $\Delta L_w$ built on the ISO 717-2 reference
+  floor.
 - [Predicting Sound Insulation (EN 12354)](/phonometry/guides/insulation-prediction/):
   the single-number model that consumes these ratings.
 - [Theory](/phonometry/reference/theory/rooms-buildings/): the

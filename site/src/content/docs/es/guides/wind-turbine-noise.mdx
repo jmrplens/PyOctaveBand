@@ -36,11 +36,12 @@ generador) es audible por encima del ruido de enmascaramiento.
 ## Nivel de potencia acústica aparente
 
 Con el micrófono de referencia sobre una placa en el suelo a la distancia
-horizontal `R0 = H + D/2` (altura de buje `H`, diámetro de rotor `D`), la
-distancia oblicua al centro del rotor es `R1 = √(H² + R0²)` y el nivel de
-potencia acústica aparente es `L_WA,i = L_p,i − 6 + 10·lg(4π R1²/S0)` por banda
-(`S0 = 1 m²`), sumado energéticamente sobre las bandas. Los `−6 dB` dan cuenta de
-la duplicación de presión en la placa del suelo.
+horizontal $R_0 = H + D/2$ (altura de buje $H$, diámetro de rotor $D$), la
+distancia oblicua al centro del rotor es $R_1 = \sqrt{H^2 + R_0^2}$ y el nivel
+de potencia acústica aparente es
+$L_{WA,i} = L_{p,i} - 6 + 10\lg(4\pi R_1^2/S_0)$ por banda
+($S_0 = 1\ \text{m}^2$), sumado energéticamente sobre las bandas. Los −6 dB
+dan cuenta de la duplicación de presión en la placa del suelo.
 
 <ThemeImage loading="eager" src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_wind_turbine_iec61400_es.svg" alt="Alzado de un aerogenerador de eje horizontal con altura de buje H y diámetro de rotor D, un micrófono tumbado sobre una placa plana en el suelo a sotavento a la distancia horizontal R0 = H + D/2 del eje de la torre, la distancia oblicua R1 del centro del rotor al micrófono con el ángulo de inclinación de la placa phi entre 25 y 40 grados, y un mástil meteorológico que mide velocidad y dirección del viento; un recuadro en planta muestra el patrón de la Figura 3 con la posición de referencia a sotavento y tres posiciones opcionales a más y menos 60 grados y a barlovento, y las anotaciones dan R1 igual a la raíz cuadrada de H al cuadrado más R0 al cuadrado y la fórmula de potencia acústica aparente LWA,i = Lp,i menos 6 más 10 lg(4 pi R1 al cuadrado entre S0)" width="94%" />
 
@@ -110,18 +111,20 @@ alcance.
 ## Audibilidad tonal
 
 A partir de un espectro de banda estrecha (resolución 1–2 Hz), las líneas en la
-**banda crítica** alrededor del tono, `CBW = 25 + 75·[1 + 1.4·(fc/1000)²]^0.69`
+**banda crítica** alrededor del tono,
+$\mathrm{CBW} = 25 + 75\,[\,1 + 1{,}4\,(f_c/1000)^2\,]^{0{,}69}$
 Hz, se clasifican en ruido de enmascaramiento y líneas de tono (la media
-energética del 70 % más bajo, los criterios de `+6 dB`; las líneas de tono
+energética del 70 % más bajo, los criterios de +6 dB; las líneas de tono
 deben además quedar a menos de 10 dB de la línea *más alta* por encima del
 umbral, y esa línea más alta es la frecuencia del tono, apartados
 9.5.3/9.5.4). El propio candidato debe superar antes el cribado de *tono
 posible* de 9.5.2: un máximo local más de 6 dB por encima de la media
 energética de la banda excluyendo el máximo y sus líneas adyacentes. El nivel
-de enmascaramiento `L_pn` sigue la Fórmula 31, la tonalidad es
-`ΔL_tn = L_pt − L_pn` y la audibilidad tonal es `ΔL_a = ΔL_tn − L_a` con
-`L_a = −2 − lg[1 + (f/502)^2.5]`, reportada cuando `ΔL_a ≥ −3 dB` y audible
-cuando `ΔL_a > 0`.
+de enmascaramiento $L_{pn}$ sigue la Fórmula 31, la tonalidad es
+$\Delta L_{tn} = L_{pt} - L_{pn}$ y la audibilidad tonal es
+$\Delta L_a = \Delta L_{tn} - L_a$ con
+$L_a = -2 - \lg\!\big[1 + (f/502)^{2{,}5}\big]$, reportada cuando
+$\Delta L_a \ge -3\ \text{dB}$ y audible cuando $\Delta L_a > 0$.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/wind_turbine_tonality_es.svg" alt="Espectro de banda estrecha de un aerogenerador con un tono discreto cerca de 200 Hz sobre un fondo de banda ancha, la banda crítica sombreada, el nivel de ruido de enmascaramiento como línea horizontal y la audibilidad tonal anotada" width="82%" />
 
@@ -162,14 +165,15 @@ res.plot()   # espectro + banda crítica + nivel de enmascaramiento (requiere ma
 `has_identified_tone`. Cuando el candidato no supera el cribado de 9.5.2 o
 ninguna línea se clasifica como «tono», `has_identified_tone` es `False`: los
 campos numéricos son valores de respaldo fuera de la norma y esos espectros
-deben **excluirse** del promediado energético de `ΔL_a` sobre los espectros
-de un intervalo de velocidad de viento (9.5.1); `is_audible` también exige un
-tono identificado. La frecuencia del tono y el criterio `L_a` se anclan a la
+deben **excluirse** del promediado energético de $\Delta L_a$ sobre los
+espectros de un intervalo de velocidad de viento (9.5.1); `is_audible` también
+exige un tono identificado. La frecuencia del tono y el criterio $L_a$ se
+anclan a la
 línea de tono clasificada más alta, no al candidato sondeado. La fórmula de
 audibilidad coincide con la del Anexo C de la ISO 1996-2; lo específico de la
 IEC 61400-11 es la determinación de los niveles de tono y enmascaramiento y la
 banda crítica de Zwicker a partir del espectro. Para un ajuste de valoración
-`K_T`, pasa la audibilidad media al `tonal_adjustment` de la ISO 1996-2.
+$K_T$, pasa la audibilidad media al `tonal_adjustment` de la ISO 1996-2.
 
 ## Véase también
 

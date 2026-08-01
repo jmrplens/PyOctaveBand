@@ -24,9 +24,9 @@ import ReportPreview from '../../../components/ReportPreview.astro';
 A **floating floor** is a heavy floating slab resting on a resilient layer; the
 two form a mass-spring system whose **natural frequency** governs how much the
 floor improves impact and airborne insulation. **EN 29052-1:1992** (identical to
-ISO 9052-1:1989) measures the **dynamic stiffness per unit area** `s'` of the
+ISO 9052-1:1989) measures the **dynamic stiffness per unit area** $s'$ of the
 resilient layer from the resonance of a standard load plate on a
-200 mm × 200 mm specimen. `s'` is the input to the floating-floor term of the
+200 mm × 200 mm specimen. $s'$ is the input to the floating-floor term of the
 EN 12354-2 impact model covered in
 [Predicting Sound Insulation (EN 12354)](/phonometry/guides/insulation-prediction/). (ISO 16251-1 does not apply
 here: its scope is limited to soft, locally-reacting floor coverings and
@@ -65,7 +65,7 @@ plt.legend(); plt.show()
 ## 1. Dynamic stiffness and resonance
 
 The dynamic stiffness per unit area is a dynamic force per area divided by the
-resulting change in thickness (Formula 1): `s' = (F/S)/Δd`. The resiliently
+resulting change in thickness (Formula 1): $s' = (F/S)/\Delta d$. The resiliently
 supported floor is a resonator whose natural frequency (Formula 2) and, in the
 laboratory arrangement, measured resonant frequency (Formula 3) are
 
@@ -129,10 +129,11 @@ plt.show()
 ## 2. The enclosed-gas term and airflow resistivity
 
 For an air-permeable material the enclosed pore air adds a parallel stiffness
-from its isothermal compression (Formula 7): `s'a = p₀/(d·ε)`, with `p₀` the
-atmospheric pressure, `d` the loaded thickness and `ε` the porosity. The
-standard's worked NOTE (`p₀ = 0.1 MPa`, `ε = 0.9`) is `s'a = 111/d` MN/m³ for
-`d` in millimetres:
+from its isothermal compression (Formula 7):
+$s'_a = p_0/(d\,\varepsilon)$, with $p_0$ the atmospheric pressure, $d$ the
+loaded thickness and $\varepsilon$ the porosity. The standard's worked NOTE
+($p_0 = 0.1\ \text{MPa}$, $\varepsilon = 0.9$) is $s'_a = 111/d$ MN/m³ for
+$d$ in millimetres:
 
 ```python
 from phonometry import materials
@@ -142,9 +143,11 @@ print(round(materials.enclosed_gas_stiffness(thickness=0.020, porosity=0.9) / 1e
 ```
 
 The dynamic stiffness of the *installed* material is then set by the lateral
-airflow resistivity `r` (clause 8.2): `s' = s't` for `r ≥ 100 kPa·s/m²`,
-`s' = s't + s'a` for `10 ≤ r < 100 kPa·s/m²`, and for `r < 10 kPa·s/m²` the
-method only resolves `s' = s't` when the gas term is negligible.
+airflow resistivity $r$ (clause 8.2): $s' = s'_t$ for
+$r \ge 100\ \text{kPa}\cdot\text{s/m}^2$, $s' = s'_t + s'_a$ for
+$10 \le r < 100\ \text{kPa}\cdot\text{s/m}^2$, and for
+$r < 10\ \text{kPa}\cdot\text{s/m}^2$ the method only resolves $s' = s'_t$
+when the gas term is negligible.
 `floating_floor_resonance` chains the whole determination:
 
 ```python
@@ -163,7 +166,7 @@ res.plot()   # the f0(s') design curve with this determination marked (needs mat
 
 The `DynamicStiffnessResult` carries the apparent, enclosed-gas and installed
 stiffnesses, the test resonance and the installed-floor natural frequency, and
-its `.plot()` draws the `f₀(s')` design curve.
+its `.plot()` draws the $f_0(s')$ design curve.
 
 ### Test-report fiche
 
@@ -215,11 +218,11 @@ well above $f_r$; a heavy or very thick layer starts to act as a distributed
 system and the simple Formula 4 reading degrades. Three practical pitfalls
 follow from the preload:
 
-* **`s'` is a stiffness *at the standard preload*.** Resilient layers are
+* **$s'$ is a stiffness *at the standard preload*.** Resilient layers are
   visibly non-linear in static load: mineral wool stiffens as it compresses,
   some foams soften. The 200 kg/m² load plate fixes the operating point, so
-  the tabulated `s'` strictly describes floors near that surface mass.
-  Designing a much heavier screed with the same `s'` extrapolates beyond the
+  the tabulated $s'$ strictly describes floors near that surface mass.
+  Designing a much heavier screed with the same $s'$ extrapolates beyond the
   measurement.
 * **Drive small.** The tangent stiffness is defined for small dynamic
   strains; driving the plate hard pushes the layer into its non-linear range
@@ -232,7 +235,7 @@ follow from the preload:
 
 The natural frequency that matters in the end is not the rig's $f_r$ but the
 installed floor's $f_0$ from Formula 2: the floating floor only improves
-insulation well above $f_0$, which is why a low `s'` (a soft layer under a
+insulation well above $f_0$, which is why a low $s'$ (a soft layer under a
 heavy slab) is the design goal.
 
 ## What this guide covers
@@ -247,10 +250,10 @@ Formulae 5-6 (`installed_dynamic_stiffness`), chained end to end by
 clause 9 test-report fiche.
 
 **Not covered.** Clause 7's measurement procedure, extracting the resonant
-frequency `fr` from the raw excitation-response signal by sinusoidal,
+frequency $f_r$ from the raw excitation-response signal by sinusoidal,
 white-noise or pulse methods and extrapolating to zero force amplitude, is
-not implemented: pass an already-extrapolated `fr`. The lateral airflow
-resistivity `r` of clause 8.2 is likewise taken as an input rather than
+not implemented: pass an already-extrapolated $f_r$. The lateral airflow
+resistivity $r$ of clause 8.2 is likewise taken as an input rather than
 measured; ISO 9053's static and alternating methods are implemented
 separately, in `materials.airflow_resistance`. Clause 6's specimen-selection
 requirement (at least three 200 mm × 200 mm specimens) is not enforced.

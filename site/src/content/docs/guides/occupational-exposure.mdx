@@ -51,7 +51,7 @@ to attach the normative uncertainty every occupational-hygiene report needs. The
 
 Describe each activity as a `hearing.Task` with its samples and duration, then
 call `hearing.task_based_exposure(tasks)`. For the Annex D welder's day below
-it returns `lex_8h` = 84.3 dB with an expanded uncertainty $U$ = 2.7 dB, so the
+it returns `lex_8h` = 84.3 dB with an expanded uncertainty $U = 2.7$ dB, so the
 one-sided 95 % `upper_limit` is 87.0 dB. Unstructured days use
 `job_based_exposure()` or `full_day_exposure()` on random samples instead.
 
@@ -204,9 +204,9 @@ derived on the [Theory](/phonometry/reference/theory/environment-transport/) pag
 
 | Parameter | Applies to | Type | Units | Range / default | Notes |
 | :--- | :--- | :--- | :--- | :--- | :--- |
-| `tasks` | task | list of `Task` | — | ≥ 1 | Each `Task` has `samples`, `duration_hours`, optional `duration_range`/`duration_samples`, `label`, `instrument` |
-| `samples` | job / full-day | sequence | dB | ≥ 2 (≥ 5 / ≥ 3 advised) | Random `Lp,A,eqT` samples |
-| `effective_duration_hours` | job / full-day | float | h | > 0 | Effective working-day duration $T_e$ |
+| `tasks` | task | list of `Task` | — | $\ge 1$ | Each `Task` has `samples`, `duration_hours`, optional `duration_range`/`duration_samples`, `label`, `instrument` |
+| `samples` | job / full-day | sequence | dB | $\ge 2$ ($\ge 5$ / $\ge 3$ advised) | Random $L_{p,A,eqT}$ samples |
+| `effective_duration_hours` | job / full-day | float | h | $> 0$ | Effective working-day duration $T_e$ |
 | `instrument` | all | str | — | `'class1'`, `'class2'`, `'personal_exposimeter'` (default) | Selects $u_2$ (Table C.5) |
 | `u3` | all | float | dB | default `1.0` | Microphone-position uncertainty (Clause C.6) |
 | `include_duration_uncertainty` | task | bool | — | default `True` | `False` omits the $(c_{1b}u_{1b})^2$ term (Annex D case a) |
@@ -283,7 +283,7 @@ repository; click the preview to open the PDF.
 ## See also
 
 - [Levels](/phonometry/guides/levels/): the `lex_8h` / `sound_exposure` dose primitives
-  (IEC 61252) and the LCpeak these strategies report alongside.
+  (IEC 61252) and the $L_{Cpeak}$ these strategies report alongside.
 - [Measurement uncertainty](/phonometry/guides/gum-uncertainty/): the GUM machinery behind
   combined and expanded uncertainties.
 - [Theory](/phonometry/reference/theory/environment-transport/): the derivation of the strategy formulas and the

@@ -172,7 +172,7 @@ The library implements four tonality assessments, and they are not
 interchangeable: each belongs to a different standard with its own purpose,
 input and output.
 
-| | TNR / PR | Tone audibility `ΔL` | Psychoacoustic tonality `T` | Wind-turbine tonal audibility |
+| | TNR / PR | Tone audibility $\Delta L$ | Psychoacoustic tonality `T` | Wind-turbine tonal audibility |
 | :--- | :--- | :--- | :--- | :--- |
 | Standard | ECMA-418-1:2024, clauses 11 and 12 | ISO/PAS 20065:2016, adopted by ISO 1996-2:2017 Annex J | ECMA-418-2:2025, clause 6 | IEC 61400-11:2012, clause 9.5 |
 | Question answered | Is this discrete tone prominent in the emission of a device? | Is the tone audible above the noise that masks it, and by how much? | How tonal does the sound feel? | Is a turbine tone audible at the reference position, wind bin by wind bin? |
@@ -183,7 +183,7 @@ input and output.
 Read the table as a decision: the *purpose of the report* picks the metric,
 not the convenience of the input. A device emission declaration is an
 ECMA-418-1 prominence verdict; a complaint about a tone from an installation
-is an ISO 1996-2 rating, so it needs the audibility `ΔL` that maps to `Kt`
+is an ISO 1996-2 rating, so it needs the audibility $\Delta L$ that maps to `Kt`
 ([tone audibility](tone-audibility.md)); a product comparison where nobody is
 being fined is where the ECMA-418-2 tonality earns its place, because it is a
 magnitude rather than a threshold test ([sound quality](sound-quality.md));

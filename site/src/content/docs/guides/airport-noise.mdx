@@ -50,9 +50,9 @@ are [Outdoor sound propagation](/phonometry/guides/outdoor-propagation/).
 ## 1. The noise-power-distance engine
 
 The ECAC Doc 29 airport-noise method describes an aircraft with **noise-power-
-distance (NPD)** tables. `npd_level` reads the event level (`LAmax`/`SEL`) for an
-arbitrary power and distance, interpolating linearly in power (Eq. 4-3) and
-log-linearly in slant distance (Eq. 4-4).
+distance (NPD)** tables. `npd_level` reads the event level ($L_{Amax}$/`SEL`)
+for an arbitrary power and distance, interpolating linearly in power (Eq. 4-3)
+and log-linearly in slant distance (Eq. 4-4).
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/airport_noise.svg" alt="Noise-power-distance curves for two engine power settings, the event level falling log-linearly with slant distance between the tabulated nodes" width="82%" />
 
@@ -99,11 +99,12 @@ This is the NPD engine underneath the method.
 ## 2. The single-event calculation
 
 The full single-event calculation breaks a flight path into segments and
-corrects the NPD baseline per segment (§4.3-4.5): `impedance_adjustment` (T, p),
-`lateral_attenuation` (β,ℓ), `engine_installation_correction` (φ, mounting),
-`duration_correction`, the finite-segment `noise_fraction` and, behind takeoff
-ground-roll segments, `start_of_roll_directivity` (ΔSOR). `event_level`
-assembles and sums them into `SEL`/`LAmax`, and `noise_contour` evaluates it over
+corrects the NPD baseline per segment (§4.3-4.5): `impedance_adjustment`
+($T$, $p$), `lateral_attenuation` ($\beta$,$\ell$),
+`engine_installation_correction` ($\varphi$, mounting), `duration_correction`,
+the finite-segment `noise_fraction` and, behind takeoff ground-roll segments,
+`start_of_roll_directivity` ($\Delta_{\text{SOR}}$). `event_level` assembles
+and sums them into `SEL`/$L_{Amax}$, and `noise_contour` evaluates it over
 a ground grid (mark the ground-roll segments with a `ground_roll` mask).
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/airport_contour.webp" alt="Single-event SEL contour of a departure: an elongated footprint along the flight track, loudest near the ground roll" width="90%" />
@@ -155,8 +156,8 @@ ground and a receiver sitting in an interference dip.
 />
 
 The start-of-roll directivity is the lobed rearward radiation of jet-exhaust
-noise: strongest near an azimuth ψ ≈ 120° from the nose, falling off abeam
-(ψ = 90°) and directly behind (ψ = 180°).
+noise: strongest near an azimuth $\psi \approx 120°$ from the nose, falling
+off abeam ($\psi = 90°$) and directly behind ($\psi = 180°$).
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/airport_sor.svg" alt="Polar diagram of the start-of-roll directivity ΔSOR over the rearward semicircle for turbofan-jet and turboprop aircraft, both showing a lobe near 120° from the nose" width="75%" />
 
@@ -203,13 +204,15 @@ aircraft.noise_contour(path, powers, distances, sel, lmax, ground_roll=ground_ro
 Validated against the ECAC Doc 29 5th ed. Vol 3 Part 1 reference workbook: the
 segment geometry, lateral attenuation, engine installation, noise fraction and
 the start-of-roll directivity (turbofan and turboprop) reproduce the reference
-values to < 0.01 dB, and the segment energy sum matches the reference `SEL`.
+values to $< 0.01\ \text{dB}$, and the segment energy sum matches the
+reference `SEL`.
 
 The model also covers the landing rollout (`landing_roll` mask: reduced noise
 fraction Eq. 4-21b, nearest-end geometry, no directivity term), per-segment
 bank angle (`bank`, positive with the starboard wing up; the depression angle
-is φ = β + ε for observers to starboard of the track and φ = β − ε for
-observers to port, §4.5.2), the §4.5.5 nearest-end lateral
+is $\varphi = \beta + \varepsilon$ for observers to starboard of the track and
+$\varphi = \beta - \varepsilon$ for observers to port, §4.5.2), the §4.5.5
+nearest-end lateral
 geometry behind takeoff roll, the Eq. 4-13b average runway-segment speed and
 the recommended 30 m floor on NPD lookups. Seven branch-covering receptor
 events of the reference workbook are reproduced end-to-end in the test suite.
@@ -221,13 +224,13 @@ interpolation of `npd_level`/`npd_curve` (Eqs. 4-3, 4-4), the per-segment
 corrections `impedance_adjustment`, `lateral_attenuation` (SAE AIR 5662
 soft ground), `engine_installation_correction`, `duration_correction`,
 `noise_fraction` and `start_of_roll_directivity`, their assembly into
-`SEL`/`LAmax` by `event_level` and the ground-grid `noise_contour`,
+`SEL`/$L_{Amax}$ by `event_level` and the ground-grid `noise_contour`,
 including the landing rollout, per-segment bank angle and the nearest-end
 lateral geometry. Validated to under 0.01 dB against the Doc 29 5th ed.
 Vol. 3 Part 1 reference workbook.
 
 **Not covered.** The chain builds single-event contours only: it does not
-assemble the cumulative multi-event indices (an Lden-style sum over a full
+assemble the cumulative multi-event indices (an $L_{den}$-style sum over a full
 flight schedule) that a complete Doc 29 noise-contour study needs on top of
 these single-event levels. NPD tables themselves are an input, not a
 prediction: the library interpolates the tables supplied for an aircraft
@@ -240,8 +243,8 @@ type, it does not synthesise them from engine data.
 - [Outdoor sound propagation](/phonometry/guides/outdoor-propagation/): the
   ISO 9613-2 attenuation terms and the ground effect the lateral attenuation
   condenses into one curve.
-- [Environmental Levels](/phonometry/guides/environmental-levels/): the Lden-style
-  long-term indices that a full airport study accumulates from single
-  events.
+- [Environmental Levels](/phonometry/guides/environmental-levels/): the
+  $L_{den}$-style long-term indices that a full airport study accumulates
+  from single events.
 - API reference:
   [`aircraft.airport_noise`](/phonometry/reference/api/aeroacoustics/airport-noise/).

@@ -49,9 +49,9 @@ $$
 D_{2,S} = -\lg(2)\ b, \qquad L = a + b\ \lg(r/r_0),\ r_0 = 1\ \text{m},
 $$
 
-with **Lp,A,S,4m** read off the same line at 4 m. The **distraction
-distance** rD (STI = 0.50) and **privacy distance** rP (STI = 0.20) come
-from a linear regression of STI against distance. Good offices push rD
+with **$L_{p,A,S,4m}$** read off the same line at 4 m. The **distraction
+distance** $r_D$ (STI = 0.50) and **privacy distance** $r_P$ (STI = 0.20) come
+from a linear regression of STI against distance. Good offices push $r_D$
 below ~5 m; poor ones leave speech distracting past 10 m.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_open_plan.svg" alt="ISO 3382-3 open-plan measurement line from the source at 1 m along positions from 2 m to 16 m, feeding the four single-number quantities D2,S, Lp,A,S,4m, rD and rP" width="86%" />
@@ -168,7 +168,7 @@ plt.show()
 | Parameter | Type | Units | Range / default | Notes |
 | :--- | :--- | :--- | :--- | :--- |
 | `positions_m` | 1D array | m | ≥ 4 positions, all > 0 | Source-to-receiver distances |
-| `spl_a_speech` | 1D array | dB | same length | A-weighted speech level `Lp,A,S,n` per position |
+| `spl_a_speech` | 1D array | dB | same length | A-weighted speech level $L_{p,A,S,n}$ per position |
 | `sti_values` | 1D array | — | same length | STI per position (full IEC 60268-16 method) |
 
 Returns an `OpenPlanResult` with `d2s`, `lp_as_4m`, `rd` and `rp`; its
@@ -359,10 +359,10 @@ plt.show()
 | Parameter | Type | Units | Range / default | Notes |
 | :--- | :--- | :--- | :--- | :--- |
 | `absorption_areas` | float or 1D array | m² | > 0 | Total room absorption areas to compare |
-| `talkers` | 1D array, optional | — | ≥ 1, default 1..20 | Occupancy axis `N` |
-| `distance` | float | m | > 0, default 1.2 | Talker-to-listener distance `r` |
-| `sound_power_level` | float | dB re 1 pW | default 70 | Talker `Lw` |
-| `directivity` | float | — | > 0, default 2 | Talker `Q` |
+| `talkers` | 1D array, optional | — | ≥ 1, default 1..20 | Occupancy axis $N$ |
+| `distance` | float | m | > 0, default 1.2 | Talker-to-listener distance $r$ |
+| `sound_power_level` | float | dB re 1 pW | default 70 | Talker $L_W$ |
+| `directivity` | float | — | > 0, default 2 | Talker $Q$ |
 
 Returns a `CrowdNoiseResult` (`talkers`, `absorption_areas`, `levels`,
 `signal_level`, `communication_level`, `speech_to_noise()`) with `.plot()`.

@@ -112,14 +112,14 @@ plt.show()
 </details>
 
 Wells' plenum formula takes only two truly geometric inputs, the
-inlet-to-outlet line of sight `r` and the outlet area, plus the lined wall
-area; `plot_plenum_geometry` draws exactly those, honouring `r` and its
+inlet-to-outlet line of sight $r$ and the outlet area, plus the lined wall
+area; `plot_plenum_geometry` draws exactly those, honouring $r$ and its
 angle off the inlet axis.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/plenum_geometry.svg" alt="Section of a plenum chamber: the inlet duct enters low on the left, the outlet mouth is marked on the right wall, the 1.2 m inlet-to-outlet line of sight is drawn as a dashed diagonal at 0.35 rad off the inlet axis, and the wall area of 6 square metres and outlet area of 0.09 square metres are annotated below" width="88%" />
 
-*Only `r` and its angle off the inlet axis fix the drawn box; `S_out` and
-`S_w` enter Wells' method as bare areas, so any plenum sharing these four
+*Only $r$ and its angle off the inlet axis fix the drawn box; $S_\text{out}$
+and $S_w$ enter Wells' method as bare areas, so any plenum sharing these four
 numbers has the same predicted attenuation.*
 
 <details>
@@ -188,7 +188,7 @@ enc.plot()                                         # panel R, correction C and I
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/enclosure_insertion_loss.svg" alt="Machine-enclosure insertion loss per octave band: the measured panel sound reduction index R as a dashed line, the flat interior correction C near 5 dB for a lined interior, and the net insertion loss IL equal to R minus C tracking about 5 dB below the panel curve" width="88%" />
 
-*What the enclosure delivers is `R − C`, not the panel `R`: even this lined
+*What the enclosure delivers is $R - C$, not the panel $R$: even this lined
 interior (mean absorption 0.3) costs about 5 dB of the panel's rating in every
 band, and a hard, unlined interior would cost far more. Budget the lining
 together with the panels, not as an afterthought.*
@@ -245,7 +245,7 @@ branches, extended tubes) have moved to
 [Silencers](/phonometry/guides/silencers/), and dissipative duct-lining
 silencers are not modelled from liner properties anywhere: the lined-elbow
 and plenum values here are interpolated installation tables.
-`enclosure_insertion_loss` never predicts the panel transmission loss `R`
+`enclosure_insertion_loss` never predicts the panel transmission loss $R$
 itself; you supply it measured or from another model, and the module only
 combines it with the interior correction.
 
@@ -259,7 +259,7 @@ combines it with the interior correction.
 - [Loudspeaker Characterisation (IEC 60268-5)](/phonometry/guides/loudspeakers/):
   the radiating piston (radiation impedance and directivity), the companion
   radiator model.
-- [Sound Power](/phonometry/guides/sound-power/): the source `Lw` that feeds a
+- [Sound Power](/phonometry/guides/sound-power/): the source $L_W$ that feeds a
   duct or an enclosure.
 - [Room image sources and steady field](/phonometry/guides/room-image-sources/):
   the `room_constant` reused by the enclosure interior correction.

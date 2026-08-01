@@ -71,10 +71,10 @@ batería de tests.
 ## 1. Densidad espectral de potencia con su error estadístico
 
 `power_spectral_density` estima la densidad autoespectral unilateral
-`Gxx(f)` por el método de Welch: el registro se divide en segmentos con
+$G_{xx}(f)$ por el método de Welch: el registro se divide en segmentos con
 ventana (Hann por defecto) y solape del 50 % cuyos periodogramas se
 promedian. No se aplica eliminación de tendencia, así que la calibración
-absoluta se conserva: una señal en pascales da `Pa²/Hz`. Hay dos escalados:
+absoluta se conserva: una señal en pascales da Pa²/Hz. Hay dos escalados:
 `'density'` (unidades²/Hz, integra a la potencia de la señal) y `'spectrum'`
 (unidades², lee directamente la potencia de tonos discretos).
 
@@ -87,7 +87,7 @@ de esta página.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_spectral_analysis_es.svg" alt="Diagrama de bloques de la cadena de la PSD de Welch: un registro de ruido rosa de 20 segundos a 48 kilohercios se divide en segmentos de 4096 muestras con 50 por ciento de solape dando 467 segmentos y una separación de bins de 11,7 hercios, cada segmento se enventana con Hann para un ancho de banda de resolución de 17,6 hercios, los periodogramas unilaterales del cuadrado de la FFT se promedian en 442 promedios efectivos, y el resultado es Gxx de f con intervalo de confianza chi-cuadrado, un error aleatorio de 1 entre la raíz de n d igual al 4,8 por ciento y unos 885 grados de libertad; una nota final enuncia el compromiso de que los segmentos largos compran resolución pero gastan promedios" width="92%" />
 
-Promediar `nd` segmentos independientes da al estimador `2·nd` grados de
+Promediar $n_d$ segmentos independientes da al estimador $2 n_d$ grados de
 libertad chi-cuadrado (ec. 8.162), de donde sale todo lo demás:
 
 $$
@@ -117,11 +117,11 @@ res.plot()                                        # PSD en dB con la banda de IC
 ```
 
 El **sesgo de resolución** es la otra mitad del presupuesto de error: un
-ancho de banda de análisis finito `Be` (expuesto como
+ancho de banda de análisis finito $B_e$ (expuesto como
 `resolution_bandwidth`, el ancho de banda de ruido efectivo de la ventana)
 suaviza los rasgos espectrales abruptos, siempre en la dirección de reducir
 el rango dinámico (ec. 8.139). Para un pico resonante de ancho de banda de
-media potencia `Br`, el sesgo normalizado de primer orden es la forma
+media potencia $B_r$, el sesgo normalizado de primer orden es la forma
 cerrada de la ec. 8.141, expuesta como `resolution_bias_error`:
 
 $$
@@ -134,7 +134,7 @@ from phonometry import resolution_bias_error
 eps_b = resolution_bias_error(res.resolution_bandwidth, 25.0)  # pico de Br = 25 Hz
 ```
 
-Un `Be` estrecho (segmentos largos) suprime el sesgo pero deja menos
+Un $B_e$ estrecho (segmentos largos) suprime el sesgo pero deja menos
 promedios y un error aleatorio mayor; los dos requisitos sobre la longitud
 de segmento tiran en direcciones opuestas, y ese es exactamente el
 compromiso que los números expuestos hacen visible.
@@ -178,9 +178,9 @@ plt.show()
 
 ## 2. Densidad espectral cruzada
 
-`cross_spectral_density` estima la `Gxy(f)` compleja entre dos canales con
+`cross_spectral_density` estima la $G_{xy}(f)$ compleja entre dos canales con
 el mismo núcleo de Welch, e informa de la coherencia ordinaria
-`γ²xy = |Gxy|²/(Gxx·Gyy)` junto a los errores aleatorios de Bendat y Piersol
+$\gamma^2_{xy} = |G_{xy}|^2/(G_{xx}\,G_{yy})$ junto a los errores aleatorios de Bendat y Piersol
 de la magnitud y la fase (ecs. 9.33 y 9.52, con la coherencia medida en
 lugar del valor verdadero desconocido, como recomienda el libro para datos
 medidos):
@@ -194,8 +194,9 @@ $$
 Ambos se reducen cuando la coherencia se acerca a uno: un par fuertemente
 coherente necesita muchos menos promedios para la misma confianza. La fase
 se devuelve desenrollada, así que su pendiente frente a la frecuencia es el
-retardo de grupo `τ_g = -dφ/(2π·df)`; para un camino de retardo puro la fase
-es lineal y esa pendiente lee directamente el retardo de propagación.
+retardo de grupo $\tau_g = -\mathrm{d}\varphi/(2\pi\,\mathrm{d}f)$; para un
+camino de retardo puro la fase es lineal y esa pendiente lee directamente el
+retardo de propagación.
 
 ```python
 from phonometry import cross_spectral_density
@@ -208,7 +209,7 @@ res.plot()   # magnitud, fase con banda ±sigma, coherencia
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/cross_spectral_density_es.svg" alt="Dos paneles para la densidad espectral cruzada de un camino de dos sensores con un retardo de 2 milisegundos: la estimación de magnitud de Welch fluctuando alrededor de un nivel plano, y debajo la fase desenrollada del espectro cruzado cayendo como una línea recta sobre un eje de frecuencia logarítmico, exactamente sobre la referencia discontinua de menos dos pi f tau con una banda estrecha de una sigma a su alrededor" width="86%" />
 
 *La densidad espectral cruzada de un camino con retardo de 2 ms: la fase
-desenrollada es exactamente la recta −2πfτ, así que su pendiente lee el
+desenrollada es exactamente la recta $-2\pi f\tau$, así que su pendiente lee el
 retardo de propagación directamente, y la banda ±1 d.e. de la Ec. 9.52
 cuantifica cuánto fiarse de ella por frecuencia.*
 
@@ -278,7 +279,8 @@ $$
 $$
 
 Para ruido aditivo no correlacionado en la salida con nivel conocido, la
-coherencia tiene la forma cerrada `γ² = SNR/(1+SNR)`, lo que hace toda la
+coherencia tiene la forma cerrada $\gamma^2 = \mathrm{SNR}/(1+\mathrm{SNR})$,
+lo que hace toda la
 cadena verificable con una señal sintética:
 
 ```python
@@ -298,9 +300,10 @@ res.plot()                               # Gyy, Gvv, Gnn y el panel de SNR
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/coherent_output_snr_es.svg" alt="Dos paneles para el espectro de salida coherente de un sistema de ruido blanco con ruido aditivo: el espectro de salida medido con la parte coherente aproximadamente 1,5 decibelios por debajo y el suelo de ruido no correlado unos 6 decibelios más abajo, y debajo la relación señal-ruido espectral fluctuando alrededor de la línea discontinua de forma cerrada en 4,1 decibelios" width="86%" />
 
-*El reparto exacto del modelo del fragmento: `Gvv = γ²·Gyy` explica la
-salida salvo el resto de ruido plano `Gnn`, y la SNR espectral se dispersa
-alrededor de su forma cerrada 10·lg(0,64/0,25) = 4,1 dB en toda frecuencia.*
+*El reparto exacto del modelo del fragmento: $G_{vv} = \gamma^2 G_{yy}$ explica la
+salida salvo el resto de ruido plano $G_{nn}$, y la SNR espectral se dispersa
+alrededor de su forma cerrada $10\lg(0{,}64/0{,}25) = 4{,}1$ dB en toda
+frecuencia.*
 
 <details>
 <summary>Mostrar el código de esta figura</summary>
@@ -342,7 +345,8 @@ plt.show()
 </details>
 
 El campo `coherence_bias` informa del pequeño sesgo positivo del estimador
-de coherencia, `b[γ̂²] ≈ (1-γ²)²/nd` (ec. 9.75): despreciable en cuanto `nd`
+de coherencia, $b[\hat{\gamma}^2] \approx (1-\gamma^2)^2/n_d$ (ec. 9.75):
+despreciable en cuanto $n_d$
 llega a unos cientos, y otra razón para promediar con generosidad antes de
 fiarse de una coherencia baja.
 
@@ -350,8 +354,9 @@ fiarse de una coherencia baja.
 
 `fractional_octave_smoothing` promedia un espectro sobre una ventana
 rectangular de anchura relativa constante: 1/n de octava,
-`[f·2^(-1/2n), f·2^(+1/2n)]` alrededor de cada frecuencia. Es el ancho de
-banda de resolución de porcentaje constante que Bendat y Piersol recomiendan
+$[f\cdot 2^{-1/2n},\ f\cdot 2^{+1/2n}]$ alrededor de cada frecuencia. Es el
+ancho de banda de resolución de porcentaje constante que Bendat y Piersol
+recomiendan
 para espectros de sistemas resonantes (sección 8.5.3), y el estándar de
 facto para presentar respuestas de altavoces y salas. El promedio se calcula
 siempre sobre **potencia** (las amplitudes se elevan al cuadrado primero,
@@ -368,16 +373,18 @@ smooth_mag = fractional_octave_smoothing(freqs, np.abs(response), 6.0,
 smooth_db = fractional_octave_smoothing(freqs, levels, 3.0, domain="db")  # curva en dB
 ```
 
-Una sola línea espectral con ordenada de PSD `P` (unidades²/Hz) en un bin de
-anchura `Δf` se suaviza al nivel en forma cerrada
-`P·Δf / (f₀·(2^{1/2n} - 2^{-1/2n}))` sobre una anchura de núcleo: el oráculo
-fijado en los tests.
+Una sola línea espectral con ordenada de PSD $P$ (unidades²/Hz) en un bin de
+anchura $\Delta f$ se suaviza al nivel en forma cerrada
+$P\,\Delta f / (f_0(2^{1/2n} - 2^{-1/2n}))$ sobre una anchura de núcleo: el
+oráculo fijado en los tests.
 
 ## 5. Generadores de ruido de colores
 
-`noise_signal` produce ruido gaussiano cuya PSD sigue `Gxx(f) ∝ f^α` de
+`noise_signal` produce ruido gaussiano cuya PSD sigue
+$G_{xx}(f) \propto f^\alpha$ de
 forma exacta en esperanza: ruido blanco con semilla se moldea en el dominio
-de la frecuencia con la respuesta en magnitud exacta `(f/f_ref)^{α/2}` bin a
+de la frecuencia con la respuesta en magnitud exacta
+$(f/f_\text{ref})^{\alpha/2}$ bin a
 bin (un filtro de fase cero aplicado de forma circular), así que una
 pendiente medida solo se desvía de la ley de potencias por el error
 aleatorio de la estimación espectral, no como las aproximaciones rosas por
@@ -385,7 +392,7 @@ tramos o de pocos polos cuya pendiente ondula fracciones de dB. El registro
 tiene media cero y se reescala exactamente al RMS pedido, y la misma semilla
 reproduce el mismo registro bit a bit.
 
-| color | α | pendiente de la PSD |
+| color | $\alpha$ | pendiente de la PSD |
 |---|---|---|
 | `white` | 0 | 0 dB/octava |
 | `pink` | -1 | -3,01 dB/octava |
@@ -418,13 +425,14 @@ periódico (DFT-even) exactamente como las aplican los estimadores de Welch:
   que el resultado de la PSD informa como `resolution_bandwidth`
   (`ENBW·fs/nperseg` en Hz), y entra directamente en el balance tono/ruido:
   un suelo de ruido de banda ancha leído de un espectro con ventana queda
-  `10·lg(ENBW)` dB por encima de la densidad verdadera.
-- **Ganancia coherente**: la ganancia en continua `Σw/N` que escala un tono
-  centrado en un bin.
+  $10\lg(\mathrm{ENBW})$ dB por encima de la densidad verdadera.
+- **Ganancia coherente**: la ganancia en continua $\sum w/N$ que escala un
+  tono centrado en un bin.
 - **Pérdida de festoneado**: la atenuación en el peor caso de un tono que
   cae a medio camino entre dos bins (3,92 dB para la rectangular, 1,42 dB
   para Hann).
-- **Pérdida de proceso en el peor caso**: el festoneado más `10·lg(ENBW)`,
+- **Pérdida de proceso en el peor caso**: el festoneado más
+  $10\lg(\mathrm{ENBW})$,
   la reducción de SNR de salida en el peor caso al detectar un tono en
   ruido blanco.
 - **Lóbulo lateral máximo** y **anchura a -3 dB del lóbulo principal**:
@@ -443,7 +451,7 @@ m.plot()                        # ventana + espectro con las métricas
 Las formas cerradas anclan los tests: el ENBW es exactamente 1 para la
 rectangular, 3/2 para Hann, 1987/1458 para Hamming y 1523/882 para Blackman
 (muestreo DFT-even), y la pérdida de festoneado de la rectangular es
-`20·lg(N·sin(π/2N))`, el núcleo de Dirichlet evaluado medio bin fuera del
+$20\lg(N\sin(\pi/2N))$, el núcleo de Dirichlet evaluado medio bin fuera del
 centro.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/window_functions_tradeoff_es.svg" alt="Espectros de las ventanas rectangular, Hann, Hamming y Blackman a lo largo de 16 bins de la DFT, mostrando el compromiso entre anchura del lóbulo principal y nivel de los lóbulos laterales, con el ancho de banda equivalente de ruido y el lóbulo lateral máximo de cada ventana en la leyenda" width="82%" />
@@ -496,10 +504,10 @@ segmento independiente añade dos grados de libertad, así que un registro en
 el que solo caben un par de segmentos deja una estimación apenas mejor que
 un periodograma. `multitaper_psd` implementa la alternativa de Thomson
 (1982), tal y como la desarrollan Percival y Walden (1993, capítulo 7): el
-registro *entero* se multiplica por `K` ventanas ortogonales esferoidales
+registro *entero* se multiplica por $K$ ventanas ortogonales esferoidales
 prolatas discretas (de Slepian) - las secuencias que concentran la mayor
-energía de su ventana espectral dentro de una banda de diseño `[-W, W]`
-elegida - y se promedian los `K` *autoespectros propios* resultantes:
+energía de su ventana espectral dentro de una banda de diseño $[-W, W]$
+elegida - y se promedian los $K$ *autoespectros propios* resultantes:
 
 $$
 \hat{S}^{(mt)}(f) = \frac{1}{K}\sum_{k=0}^{K-1} \hat{S}_k(f), \qquad
@@ -508,16 +516,16 @@ e^{-i 2\pi f t \Delta t}\Bigr|^2 .
 $$
 
 Como las ventanas son ortogonales, los autoespectros están casi
-incorrelados, así que el promedio acarrea unos `2K` grados de libertad
+incorrelados, así que el promedio acarrea unos $2K$ grados de libertad
 chi-cuadrado de un único registro - la misma maquinaria estadística que el
 resultado de Welch (error aleatorio, intervalo de confianza chi-cuadrado),
-sin segmentar. El semiancho `W = NW·fs/N` se fija mediante el producto
-duración x semiancho de banda `NW` (4 por defecto). `2W` es la resolución de
+sin segmentar. El semiancho $W = NW\,f_s/N$ se fija mediante el producto
+duración x semiancho de banda $NW$ (4 por defecto). $2W$ es la resolución de
 la estimación (informada como `resolution_bandwidth`), y solo las ventanas
-por debajo del número de Shannon `2·NW` mantienen la energía de su ventana
-espectral dentro de la banda de diseño - sus concentraciones `λk` se
+por debajo del número de Shannon $2NW$ mantienen la energía de su ventana
+espectral dentro de la banda de diseño - sus concentraciones $\lambda_k$ se
 informan como `eigenvalues`, y el número de ventanas por defecto es
-`K = 2·NW - 1`, todas las de concentración casi unidad. Un `NW` mayor
+$K = 2NW - 1$, todas las de concentración casi unidad. Un $NW$ mayor
 admite más ventanas (menos varianza) a costa de resolución.
 
 ```python
@@ -546,15 +554,17 @@ de modo que las ventanas de orden alto, con más fuga, pierden peso
 exactamente donde el espectro es localmente débil, y no se pierde nada donde
 es localmente blanco (para ruido blanco los pesos son uniformes). El precio
 queda contabilizado con honestidad: los grados de libertad equivalentes
-pasan a depender de la frecuencia, `ν(f) = 2·(Σk dk)²/Σk dk²` con
-`dk = b²k·λk` (P&W Ec. 370b), y el intervalo de confianza se ensancha allí
+pasan a depender de la frecuencia,
+$\nu(f) = 2\left(\sum_k d_k\right)^2/\sum_k d_k^2$ con
+$d_k = b_k^2\lambda_k$ (P&W Ec. 370b), y el intervalo de confianza se ensancha
+allí
 donde la protección contra la fuga los gastó. `adaptive=False` selecciona en
 su lugar el promedio ponderado por autovalores.
 
 La calibración coincide exactamente con los estimadores de Welch: sin
 eliminación de tendencia, `'density'` integra a la potencia de la señal y
-`'spectrum'` lee `A²/2` en el pico de una sinusoide de amplitud `A` (la
-potencia de un tono en escalado `'density'` se reparte sobre la banda `2W`).
+`'spectrum'` lee $A^2/2$ en el pico de una sinusoide de amplitud $A$ (la
+potencia de un tono en escalado `'density'` se reparte sobre la banda $2W$).
 Las propias ventanas de Slepian proceden de `scipy.signal.windows.dpss`;
 sus concentraciones reproducen la tabla en cuádruple precisión de Percival y
 Walden (tabla 382) hasta la precisión de máquina, que es el oráculo ancla de
@@ -598,7 +608,7 @@ segmentar (colas de respuestas al impulso de salas, capturas de transitorios,
 ciclos sueltos de máquina) o cuando un espectro de gran rango dinámico
 necesite una protección contra la fuga que un promedio de Welch con ventana
 Hann no puede dar; quédate con `power_spectral_density` para registros
-largos, donde promediar segmentos es más barato que `K` FFT de longitud
+largos, donde promediar segmentos es más barato que $K$ FFT de longitud
 completa y ambos estimadores coinciden.
 
 ## Relación con los estimadores H1/H2
@@ -608,7 +618,7 @@ Los [estimadores de respuesta en frecuencia](/phonometry/es/guides/electroacoust
 [intensidad acústica](/phonometry/es/guides/intensity/) de dos micrófonos y
 estos estimadores comparten un único núcleo de Welch (misma ventana, misma
 política de solape y calibración sin eliminación de tendencia), así que una
-PSD, una coherencia y una H1 calculadas con la misma longitud de segmento
+PSD, una coherencia y una $H_1$ calculadas con la misma longitud de segmento
 son mutuamente consistentes bin a bin. La misma matriz de espectros cruzados
 sustenta la [coherencia múltiple y parcial](/phonometry/es/guides/miso-coherence/),
 que extiende la coherencia ordinaria a varias entradas correladas y una

@@ -50,10 +50,10 @@ $$
 D_{2,S} = -\lg(2)\ b, \qquad L = a + b\ \lg(r/r_0),\ r_0 = 1\ \text{m},
 $$
 
-con **Lp,A,S,4m** leído en la misma recta a 4 m. La **distancia de
-distracción** rD (STI = 0,50) y la **distancia de privacidad** rP
+con **$L_{p,A,S,4m}$** leído en la misma recta a 4 m. La **distancia de
+distracción** $r_D$ (STI = 0,50) y la **distancia de privacidad** $r_P$
 (STI = 0,20) provienen de una regresión lineal del STI frente a la distancia.
-Las buenas oficinas empujan rD por debajo de ~5 m; las malas dejan el habla
+Las buenas oficinas empujan $r_D$ por debajo de ~5 m; las malas dejan el habla
 molesta más allá de 10 m.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_open_plan_es.svg" alt="Línea de medición de oficina diáfana ISO 3382-3 desde la fuente a 1 m a lo largo de posiciones de 2 m a 16 m, que alimenta las cuatro magnitudes de índice único D2,S, Lp,A,S,4m, rD y rP" width="86%" />
@@ -171,7 +171,7 @@ plt.show()
 | Parámetro | Tipo | Unidades | Rango / valor por defecto | Notas |
 | :--- | :--- | :--- | :--- | :--- |
 | `positions_m` | array 1D | m | ≥ 4 posiciones, todas > 0 | Distancias fuente-receptor |
-| `spl_a_speech` | array 1D | dB | misma longitud | Nivel de habla ponderado A `Lp,A,S,n` por posición |
+| `spl_a_speech` | array 1D | dB | misma longitud | Nivel de habla ponderado A $L_{p,A,S,n}$ por posición |
 | `sti_values` | array 1D | — | misma longitud | STI por posición (método completo de IEC 60268-16) |
 
 Devuelve un `OpenPlanResult` con `d2s`, `lp_as_4m`, `rd` y `rp`; su
@@ -369,10 +369,10 @@ plt.show()
 | Parámetro | Tipo | Unidades | Rango / defecto | Notas |
 | :--- | :--- | :--- | :--- | :--- |
 | `absorption_areas` | float o array 1D | m² | > 0 | Áreas de absorción total de la sala a comparar |
-| `talkers` | array 1D, opcional | — | ≥ 1, defecto 1..20 | Eje de ocupación `N` |
-| `distance` | float | m | > 0, defecto 1,2 | Distancia hablante-oyente `r` |
-| `sound_power_level` | float | dB re 1 pW | defecto 70 | `Lw` del hablante |
-| `directivity` | float | — | > 0, defecto 2 | `Q` del hablante |
+| `talkers` | array 1D, opcional | — | ≥ 1, defecto 1..20 | Eje de ocupación $N$ |
+| `distance` | float | m | > 0, defecto 1,2 | Distancia hablante-oyente $r$ |
+| `sound_power_level` | float | dB re 1 pW | defecto 70 | $L_W$ del hablante |
+| `directivity` | float | — | > 0, defecto 2 | $Q$ del hablante |
 
 Devuelve un `CrowdNoiseResult` (`talkers`, `absorption_areas`, `levels`,
 `signal_level`, `communication_level`, `speech_to_noise()`) con `.plot()`.

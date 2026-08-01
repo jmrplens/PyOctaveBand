@@ -21,21 +21,21 @@ collapses that ripple onto a single quefrency spike.
 
 ## 1. The cepstrum and its three variants
 
-Because the log turns the convolution `x = h * u` into the sum
-`ln X = ln H + ln U`, components that overlap in the spectrum add - and
+Because the log turns the convolution $x = h \ast u$ into the sum
+$\ln X = \ln H + \ln U$, components that overlap in the spectrum add - and
 separate - in the cepstral domain (Havelock Ch. 27, Eqs. (22)-(23)). `cepstrum`
 computes the three standard variants over the quefrency axis:
 
-- `'power'` (default): the inverse DFT of `ln|X|²` (Milner's Fig. 21). Real,
+- `'power'` (default): the inverse DFT of $\ln|X|^2$ (Milner's Fig. 21). Real,
   even and phase-blind - the workhorse for echo and harmonic-family
   detection. This is Milner's *signed* cepstrum of the log-power spectrum;
   Bogert's original 1963 "power cepstrum" squares once more and is
   non-negative - the library follows Milner throughout, so negative
   rahmonics keep their sign;
-- `'real'`: the inverse DFT of `ln|X|` - exactly half the power cepstrum,
+- `'real'`: the inverse DFT of $\ln|X|$ - exactly half the power cepstrum,
   and the quantity whose causal folding is the minimum-phase reconstruction
   (below);
-- `'complex'`: the inverse DFT of `ln|X| + j·arg X` with the phase unwrapped
+- `'complex'`: the inverse DFT of $\ln|X| + j\arg X$ with the phase unwrapped
   and its linear component removed (Havelock Ch. 87, Eq. (14)). It keeps the
   phase, so it is **invertible**: the entry point to homomorphic
   deconvolution.
@@ -56,8 +56,8 @@ res.plot()
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/cepstrum_variants_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/cepstrum_variants.svg" alt="The power, real and complex cepstra of a wavelet with one 8 millisecond echo overlaid against quefrency up to 20 milliseconds: all three carry a sharp positive spike at 8 milliseconds and a small negative one at 16 milliseconds, the source wavelet fills the region below about 2 milliseconds, and an inset zoom on the first rahmonic shows the power and complex spikes reaching 0.5 while the real cepstrum reaches exactly half of that" width="86%"></picture>
 
 *The three variants of one echo-carrying record (a band-limited wavelet
-plus a reflection at 8 ms, a = 0.5). All three carry the rahmonics at 8 and
-16 ms with heights a and −a²/2 (Milner's signed convention); the inset
+plus a reflection at 8 ms, $a = 0.5$). All three carry the rahmonics at 8
+and 16 ms with heights $a$ and $-a^2/2$ (Milner's signed convention); the inset
 shows the real cepstrum at exactly half the power cepstrum, and the source
 wavelet concentrates below 2 ms.*
 
@@ -105,30 +105,30 @@ the `oversample` padding of
 
 ## 2. Echo detection: the rahmonic spike train
 
-A single reflection `x(t) = s(t) + a·s(t-t0)` multiplies the spectrum by
-`1 + a·e^{-j2πft0}` - a ripple of period `1/t0` across the whole band. Its
-logarithm expands, for `|a| < 1`, into the exactly summable series
+A single reflection $x(t) = s(t) + a\,s(t-t_0)$ multiplies the spectrum by
+$1 + a e^{-j 2\pi f t_0}$ - a ripple of period $1/t_0$ across the whole band.
+Its logarithm expands, for $|a| < 1$, into the exactly summable series
 
 $$
 \ln\!\left(1 + a e^{-j\theta}\right)
 = \sum_{n \ge 1} (-1)^{n+1} \frac{a^n}{n}\, e^{-jn\theta},
 $$
 
-so the cepstrum carries a spike train at the **rahmonics** `n·t0` with
-amplitudes `a, -a²/2, a³/3, ...` (their sum is `ln(1+a)`), regardless of the
-spectrum of `s` itself, which concentrates at low quefrencies. On the signed
+so the cepstrum carries a spike train at the **rahmonics** $n t_0$ with
+amplitudes $a, -a^2/2, a^3/3, \dots$ (their sum is $\ln(1+a)$), regardless of
+the spectrum of $s$ itself, which concentrates at low quefrencies. On the signed
 cepstrum of the log-power spectrum (`kind='power'`, Milner's convention) the
-first spike's height is the reflection coefficient `a` - of either
+first spike's height is the reflection coefficient $a$ - of either
 sign - plus whatever the source cepstrum contributes at that quefrency
 (negligible for broadband sources, whose cepstrum concentrates at low
 quefrencies); on an ideal impulse-plus-echo the identity is a closed form
 the tests and the conformance suite pin to 1e-10. `echo_detection` automates the reading: it picks the largest
-`|cepstrum|` peak in the searched band (so an inverting reflection, `a < 0`,
+`|cepstrum|` peak in the searched band (so an inverting reflection, $a < 0$,
 is found at its true delay rather than missed), refines the delay by
 quadratic interpolation through the peak and its neighbours, and reports the
 signed peak value as the reflection coefficient. When the true delay falls
 between samples the rahmonic splits across quefrency bins: the interpolated
-delay still lands on it, but the reported coefficient underestimates `|a|`
+delay still lands on it, but the reported coefficient underestimates $|a|$
 (down to about 65 % of it midway between samples).
 
 ```python
@@ -186,8 +186,8 @@ The searched band starts above the low-quefrency region occupied by the
 source's own spectral envelope (`min_quefrency`, default 16 samples) and ends
 at the unambiguous half of the axis (`max_quefrency`). The seismic
 reverberation spike trains of Havelock Ch. 87 are the same signature at
-geophysical scale. Note the negative second rahmonic at `2·t0` in the figure:
-the `-a²/2` term of the series, a useful confirmation that a peak really is
+geophysical scale. Note the negative second rahmonic at $2 t_0$ in the figure:
+the $-a^2/2$ term of the series, a useful confirmation that a peak really is
 an echo and not an unrelated spectral periodicity.
 
 ## 3. Liftering: envelope versus fine structure
@@ -217,8 +217,8 @@ low.plot()
 
 *The 4 ms lifter split on a pure-echo record: the lowpass side returns the
 smooth spectral envelope, the highpass side isolates the echo's 125 Hz
-ripple, swinging exactly between the closed forms 20·lg(1±a) = +3.5 and
-−6.0 dB.*
+ripple, swinging exactly between the closed forms
+$20\lg(1 \pm a) = +3.5$ and $-6.0$ dB.*
 
 <details>
 <summary>Show the code for this figure</summary>
@@ -265,7 +265,7 @@ plt.show()
 </details>
 
 For the pure-echo signal the highpass ripple swings between the closed forms
-`20·log10(1+a)` and `20·log10(1-a)` dB, another oracle the tests pin. In
+$20\lg(1+a)$ and $20\lg(1-a)$ dB, another oracle the tests pin. In
 speech analysis the identical operation separates the vocal-tract envelope
 (formants) from the excitation harmonics; here it is the general tool for
 "smooth versus periodic" splits of any measured magnitude response.
@@ -298,7 +298,7 @@ homomorphic deconvolution (Havelock Ch. 87, Sec. 3.3): zero the rahmonics to
 remove an echo, keep only the low quefrencies to extract a source wavelet.
 A minimum-phase signal has a causal complex cepstrum, which is why folding
 the real cepstrum onto positive quefrencies reconstructs the minimum phase
-from `|H|` alone: [`minimum_phase`](swept-sine-distortion.md)
+from $|H|$ alone: [`minimum_phase`](swept-sine-distortion.md)
 and `phase_decomposition` run on that same folding core (Bendat & Piersol
 Sec. 13.1.4; Tohyama in Havelock Ch. 75 edits reverberation by manipulating
 exactly these causal/anticausal parts).
@@ -323,13 +323,13 @@ detector (the roll-off of a fourth-order Butterworth applied forward and
 backward; the rejection is finite, and the zero-phase pass leaves small
 transients at the record edges).
 
-For an AM tone `A0·(1 + m·cos(2πfm·t))·cos(2πfc·t)` with `fm` on an
-analysis bin the closed forms are:
+For an AM tone $A_0 (1 + m \cos(2\pi f_m t)) \cos(2\pi f_c t)$ with $f_m$
+on an analysis bin the closed forms are:
 
-| `kind` | mean level | line at `fm` | line at `2fm` |
+| `kind` | mean level | line at $f_m$ | line at $2f_m$ |
 |---|---|---|---|
-| `'magnitude'` | `A0` | `A0·m` | - |
-| `'squared'` | `A0²·(1 + m²/2)` | `2·A0²·m` | `A0²·m²/2` |
+| `'magnitude'` | $A_0$ | $A_0 m$ | - |
+| `'squared'` | $A_0^2 (1 + m^2/2)$ | $2 A_0^2 m$ | $A_0^2 m^2/2$ |
 
 ```python
 import numpy as np

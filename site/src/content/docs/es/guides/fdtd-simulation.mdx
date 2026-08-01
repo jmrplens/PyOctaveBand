@@ -65,8 +65,9 @@ por lado y un objeto de resultado congelado.
 ## 1. El esquema: una ecuación de onda sobre una malla
 
 En un medio en reposo, las ecuaciones linealizadas de la dinámica de fluidos
-se reducen a un sistema de primer orden en la presión acústica ``p`` y la
-velocidad de partícula ``v`` (Attenborough y Van Renterghem, Ecs. 4.3-4.4):
+se reducen a un sistema de primer orden en la presión acústica $p$ y la
+velocidad de partícula $\mathbf{v}$ (Attenborough y Van Renterghem,
+Ecs. 4.3-4.4):
 
 $$
 \frac{\partial p}{\partial t} + \rho c^2\,\nabla\!\cdot\!\mathbf{v} = 0,
@@ -95,7 +96,7 @@ $$
 
 y `fdtd_simulation` deriva el paso temporal del parámetro `cfl` (el número de
 Courant, por defecto 0,6) y de la mayor velocidad del sonido del mapa; los
-valores fuera de ``(0, 1)`` se rechazan porque el esquema carece de sentido
+valores fuera de $(0, 1)$ se rechazan porque el esquema carece de sentido
 más allá del límite (Ec. 4.14).
 
 ```python
@@ -166,15 +167,15 @@ que paredes, barreras y difusores de cualquier forma son simples arrays
 booleanos. Cada lado del dominio puede llevar su propia condición de
 contorno:
 
-- ``"rigid"`` (por defecto): un reflector perfecto, ``R = +1``.
+- ``"rigid"`` (por defecto): un reflector perfecto, $R = +1$.
 - ``"absorbing"``: una capa esponja de `absorbing_layer_cells` celdas cuya
   tasa de absorción crece cuadráticamente, emulando un contorno abierto (el
   precursor sencillo de las capas perfectamente adaptadas de la sección
   4.2.3).
-- una **impedancia específica real** ``Z`` en Pa·s/m (un escalar o un valor
+- una **impedancia específica real** $Z$ en Pa·s/m (un escalar o un valor
   por celda de borde): el contorno de reacción local de las Ecs. 4.33-4.35,
   actualizado implícitamente, con coeficiente de reflexión a incidencia
-  normal ``R = (Z - ρc)/(Z + ρc)``; ``Z = ρc`` es anecoico.
+  normal $R = (Z - \rho c)/(Z + \rho c)$; $Z = \rho c$ es anecoico.
 
 El motor de avance `FDTD2D` también es público: expone `step()`, `run()`,
 los arrays del campo y la energía, para quien necesite acceso fotograma a
@@ -214,7 +215,7 @@ colocada cuesta segundos aquí y una simulación entera después.
 
 *Todo lo que la simulación verá, antes de correrla: las capas de esponja se
 comen los contornos izquierdo y derecho, el borde superior lleva la
-impedancia anecoica `ρc`, el fondo sin tratar queda rígido, y las dos sondas
+impedancia anecoica $\rho c$, el fondo sin tratar queda rígido, y las dos sondas
 quedan libres del obstáculo y de las esponjas.*
 
 <details>
@@ -259,10 +260,10 @@ presión y la velocidad normal saliente del régimen estacionario, sobre un
 rectángulo cerrado de caras de celda, en acumuladores complejos (una DFT al
 vuelo por punto y frecuencia, así que un régimen de onda continua no
 almacena historias temporales), y la integral propaga esos fasores hasta el
-infinito con la función de Green de espacio libre `-(j/4) H0⁽²⁾(kR)`, la
+infinito con la función de Green de espacio libre $-(j/4)\,H_0^{(2)}(kR)$, la
 misma construcción con la que los solucionadores FEM de onda completa
 publican patrones de dispersión desde el campo cercano. Dos propiedades
-sostienen el esquema: la malla escalonada ya guarda `v_n` exactamente en
+sostienen el esquema: la malla escalonada ya guarda $v_n$ exactamente en
 las caras del contorno, y todo campo cuyas fuentes queden *fuera* del
 contorno integra a nada (extinción), de modo que los fasores del campo
 total de una dispersión con onda plana se transforman directamente en el
@@ -515,8 +516,8 @@ plt.show()
 
 El dominio es **bidimensional**, y eso cambia la física, no solo el coste.
 Una fuente puntual 2D es físicamente una **fuente lineal** infinita: su
-amplitud se expande cilíndricamente como ``1/sqrt(r)`` (3,0 dB por
-duplicación de distancia) en lugar del ``1/r`` esférico (6,0 dB) de una
+amplitud se expande cilíndricamente como $1/\sqrt{r}$ (3,0 dB por
+duplicación de distancia) en lugar del $1/r$ esférico (6,0 dB) de una
 fuente puntual 3D, y la respuesta impulsional 2D arrastra una estela tras el
 frente en vez de pasar limpiamente. Los *patrones* de interferencia y
 difracción son fieles; los niveles absolutos y las tasas de caída no son los
@@ -539,21 +540,21 @@ $$
 $$
 
 con un error relativo de frecuencia a primer orden de magnitud
-``(1 - S^2) (k dx)^2 / 24`` sobre los ejes de la malla (la frecuencia
+$(1 - S^2)\,(k\,\Delta x)^2 / 24$ sobre los ejes de la malla (la frecuencia
 modelada queda por debajo de la real, así que el error con signo es
-negativo), con ``S = c dt / dx``; el error es máximo exactamente sobre un
+negativo), con $S = c\,\Delta t / \Delta x$; el error es máximo exactamente sobre un
 eje y se anula a lo largo de la diagonal de las celdas en el límite de
-Courant ``CN = 1``. La regla práctica es resolver **al menos 10 celdas por
-longitud de onda más corta**, ``dx <= c_min / (10 f_max)`` con la velocidad
+Courant $\mathrm{CN} = 1$. La regla práctica es resolver **al menos 10 celdas por
+longitud de onda más corta**, $\Delta x \le c_\text{min} / (10 f_\text{max})$ con la velocidad
 de sonido más baja del dominio: con exactamente 10 celdas la cota de
-Courant pequeño ``(k dx)^2 / 24`` da alrededor del 1,6 %, que el factor
-``1 - S^2`` reduce a en torno al 1,4 % con el ``cfl = 0.6`` por defecto
+Courant pequeño $(k\,\Delta x)^2 / 24$ da alrededor del 1,6 %, que el factor
+$1 - S^2$ reduce a en torno al 1,4 % con el ``cfl = 0.6`` por defecto
 (en un dominio heterogéneo el paso temporal lo fijan las celdas más
 rápidas, así que las regiones lentas trabajan a un número de Courant local
 menor y quedan más cerca de la cota del 1,6 %), y toda componente mejor
 resuelta o fuera de eje es más precisa. Con
-``dx = 1`` cm el punto de 10 celdas en aire queda hacia los 3,4 kHz, y
-reducir ``dx`` a la mitad divide el error entre cuatro (el esquema es de
+$\Delta x = 1$ cm el punto de 10 celdas en aire queda hacia los 3,4 kHz, y
+reducir $\Delta x$ a la mitad divide el error entre cuatro (el esquema es de
 segundo orden, y la batería de validación mide ese orden observado bajo
 refinamiento de malla). Los tests anclan el solucionador a oráculos
 analíticos: autofrecuencias de caja y de conducto, tiempos de llegada en
@@ -600,8 +601,8 @@ mallados frente a los propios modelos de campo lejano Fraunhofer y TMM de
 la librería.
 
 **No cubierto.** El solver es solo bidimensional: modela una fuente lineal en
-sección transversal (propagación cilíndrica `1/sqrt(r)`), no la propagación
-esférica `1/r` de una fuente puntual 3D, así que los niveles absolutos y las
+sección transversal (propagación cilíndrica $1/\sqrt{r}$), no la propagación
+esférica $1/r$ de una fuente puntual 3D, así que los niveles absolutos y las
 tasas de decaimiento no son los de una sala 3D. El contorno abierto es la
 capa absorbente de rampa cuadrática descrita como «el precursor sencillo» de
 una verdadera capa perfectamente adaptada, no una PML en sí. Las ecuaciones
@@ -627,11 +628,12 @@ fluido-sólido tienen su propia guía,
 ### ¿Cómo elijo el paso de malla en FDTD?
 
 Resuelva al menos 10 celdas por longitud de onda más corta,
-``dx <= c_min / (10 f_max)``, con la velocidad de sonido más baja del
+$\Delta x \le c_\text{min} / (10 f_\text{max})$, con la velocidad de sonido
+más baja del
 dominio. Con exactamente 10 celdas la cota del error de dispersión sobre el
 eje es alrededor del 1,6 %, reducida a en torno al 1,4 % con el
-``cfl = 0.6`` por defecto, y reducir ``dx`` a la mitad divide el error entre
-cuatro (el esquema es de segundo orden). Con ``dx = 1`` cm el punto de 10
+``cfl = 0.6`` por defecto, y reducir $\Delta x$ a la mitad divide el error entre
+cuatro (el esquema es de segundo orden). Con $\Delta x = 1$ cm el punto de 10
 celdas en aire queda hacia los 3,4 kHz.
 
 ### ¿Qué número de Courant mantiene estable una simulación FDTD?
@@ -646,8 +648,8 @@ velocidad del sonido del mapa, y rechaza los valores fuera de $(0, 1)$.
 ### ¿Puedo fiarme de los niveles absolutos de una ejecución FDTD 2D?
 
 No. Una fuente puntual 2D es físicamente una fuente lineal infinita: su
-amplitud se expande cilíndricamente como ``1/sqrt(r)``, 3,0 dB por
-duplicación de distancia, en lugar del ``1/r`` esférico (6,0 dB por
+amplitud se expande cilíndricamente como $1/\sqrt{r}$, 3,0 dB por
+duplicación de distancia, en lugar del $1/r$ esférico (6,0 dB por
 duplicación) de una fuente puntual 3D. Los patrones de interferencia y
 difracción son fieles, pero los niveles absolutos y las tasas de caída no
 son los de una sala 3D; valide cualquier afirmación cuantitativa 3D contra

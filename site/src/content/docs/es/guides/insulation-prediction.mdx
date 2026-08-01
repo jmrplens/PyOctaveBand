@@ -282,15 +282,15 @@ ausente, una fuga alrededor del elemento separador.
 | Parámetro | Tipo | Unidades | Rango / valor por defecto | Notas |
 | :--- | :--- | :--- | :--- | :--- |
 | `junction_type` | str | — | `'rigid_cross'` / `'rigid_t'` / `'flexible_t'` / `'lightweight_facade'` / `'lightweight_double_homogeneous'` / `'lightweight_double_coupled'` / `'corner'` / `'thickness_change'` | Geometría de la unión (Anexo E.3-E.9) |
-| `path` | str | — | `'through'` (K13) / `'corner'` (K12 = K23) / `'double_leaf'` (K24) | Rama del camino |
-| `mass_ratio` | float | — | > 0 | `m'⊥,i / m'i` (Fórmula E.2) |
+| `path` | str | — | `'through'` ($K_{13}$) / `'corner'` ($K_{12} = K_{23}$) / `'double_leaf'` ($K_{24}$) | Rama del camino |
+| `mass_ratio` | float | — | > 0 | $m'_{\perp,i}/m'_i$ (Fórmula E.2) |
 | `frequency` | float | Hz | por defecto `500` | `flexible_t` y las uniones de doble hoja E.7/E.8 dependen de la frecuencia |
 | `r_flanking` / `r_separating` | float | dB | — | Índices ponderados del elemento de flanco / separador |
-| `k_ff` / `k_fd` / `k_df` | float | dB | — | `Kij` de la unión para los tres caminos |
-| `separating_area` | float | m² | > 0 | Superficie del elemento separador `Ss` |
-| `coupling_length` | float | m | > 0 | Longitud de acoplamiento de la unión `lf` |
+| `k_ff` / `k_fd` / `k_df` | float | dB | — | $K_{ij}$ de la unión para los tres caminos |
+| `separating_area` | float | m² | > 0 | Superficie del elemento separador $S_s$ |
+| `coupling_length` | float | m | > 0 | Longitud de acoplamiento de la unión $l_f$ |
 | `delta_r_ff` / `delta_r_fd` / `delta_r_df` | float | dB | por defecto `0` | Mejoras del trasdosado por camino |
-| `flanking_area` | float | m² | por defecto `None` | Área del elemento de flanco `SF`; activa la saturación automática a `Kij,min` (Cláusula 4.4.2 / Fórmula 29) |
+| `flanking_area` | float | m² | por defecto `None` | Área del elemento de flanco $S_F$; activa la saturación automática a $K_{ij,\min}$ (Cláusula 4.4.2 / Fórmula 29) |
 
 ### Parámetros de `flanking_path()`
 
@@ -300,8 +300,8 @@ ausente, una fuga alrededor del elemento separador.
 | `kind` | str | — | `'Ff'` / `'Df'` / `'Fd'` | Rama de flanco del camino |
 | `r_source` / `r_receive` | float | dB | — | Índices ponderados de los elementos lado emisor / lado receptor |
 | `k_ij` | float | dB | — | Índice de reducción de vibraciones de la unión para este camino |
-| `separating_area` | float | m² | > 0 | Área del elemento separador `Ss` |
-| `coupling_length` | float | m | > 0 | Longitud de acoplamiento `lf` |
+| `separating_area` | float | m² | > 0 | Área del elemento separador $S_s$ |
+| `coupling_length` | float | m | > 0 | Longitud de acoplamiento $l_f$ |
 | `delta_r` | float | dB | def.: `0` | Mejora por revestimiento en este camino |
 | `kij_min` | float | dB | def.: `None` | Si se da, `k_ij` se acota inferiormente a este mínimo de la Fórmula (29) |
 
@@ -320,10 +320,10 @@ a partir de los datos de laboratorio de los elementos más la transmisión por
 flancos de las uniones; la hoja lo indica de forma explícita y se rotula como
 predicción, nunca como medición. `AirbornePredictionResult.report()` genera la
 ficha del índice de reducción acústica aparente previsto (la tabla de vías de
-transmisión junto al gráfico de fracción de energía por vía, con `R'w` en un
+transmisión junto al gráfico de fracción de energía por vía, con $R'_w$ en un
 recuadro); `ImpactPredictionResult.report()` genera la ficha del nivel de
 impactos aparente previsto (la tabla de términos de la fórmula (21) junto al
-gráfico de términos, con `L'n,w` en un recuadro). Cada una nombra la
+gráfico de términos, con $L'_{n,w}$ en un recuadro). Cada una nombra la
 EN/ISO 12354-1/-2 y la parte de índice ISO 717 en su línea de base, imprime la
 desviación típica del modelo (~2 dB) y, cuando se da un `requirement`, añade un
 veredicto CUMPLE/NO CUMPLE (el índice aéreo cumple igualando o superándolo, y el
@@ -439,13 +439,14 @@ y el modelo de absorción de la EN 12354-6 en
 - [Medición del aislamiento en campo (ISO 16283)](/phonometry/es/guides/insulation-field/):
   las magnitudes in situ medidas con las que se contrasta la predicción.
 - [Índices globales de aislamiento (ISO 717)](/phonometry/es/guides/insulation-ratings/):
-  el motor de curva de referencia tras los R'w y L'n,w previstos.
+  el motor de curva de referencia tras los $R'_w$ y $L'_{n,w}$ previstos.
 - [Medición del aislamiento en laboratorio](/phonometry/es/guides/insulation-lab/):
   los índices de ISO 10140 que consume el modelo.
 - [Transmisión por flancos en laboratorio (ISO 10848)](/phonometry/es/guides/flanking-lab/):
-  el índice de reducción de vibraciones de unión Kij medido que consume el modelo.
+  el índice de reducción de vibraciones de unión $K_{ij}$ medido que consume
+  el modelo.
 - [Absorción acústica en recintos (EN 12354-6)](/phonometry/es/guides/enclosed-space-absorption/):
   el miembro de absorción de la misma familia EN 12354.
 - [Rigidez dinámica de materiales resilientes (EN 29052-1)](/phonometry/es/guides/dynamic-stiffness/):
-  la s' que alimenta el término de suelo flotante de EN 12354-2.
+  la $s'$ que alimenta el término de suelo flotante de EN 12354-2.
 - Referencia de la API: [`building.building_prediction`](/phonometry/es/reference/api/building/building-prediction/) y [`building.facade_prediction`](/phonometry/es/reference/api/building/facade-prediction/).

@@ -53,8 +53,8 @@ los índices es [EN 12354](/phonometry/es/guides/insulation-prediction/).
 Pasa los 16 valores en tercios de octava de 100 Hz a 3150 Hz a
 `building.weighted_rating(R)`. Desplaza la curva de referencia de ISO 717-1 y
 devuelve el índice leído a 500 Hz, junto con los términos de adaptación
-espectral C y $C_{tr}$. Para el espectro medido que se usa abajo,
-`w.rating, w.c, w.ctr` imprime `30 -2 -3`: $R_w(C;C_{tr}) = 30(-2;-3)$. La
+espectral $C$ y $C_{tr}$. Para el espectro medido que se usa abajo,
+`w.rating, w.c, w.ctr` imprime `30 -2 -3`: $R_w\ (C\ ;\ C_{tr}) = 30\ (-2\ ;\ -3)$. La
 misma llamada califica $R'$, $D_n$ y $D_{nT}$.
 
 ## Índices de ruido aéreo (ISO 717-1)
@@ -64,7 +64,7 @@ de referencia** de ISO 717-1: una curva de referencia fija se desplaza en
 pasos de 1 dB hacia la curva medida hasta que la suma de desviaciones
 *desfavorables* (donde la medición cae por debajo de la referencia) es lo más
 grande posible pero no mayor que 32,0 dB (16 bandas de tercio de octava) o
-10,0 dB (5 bandas de octava). El índice (`Rw`, `R'w`, `DnT,w` …) es la
+10,0 dB (5 bandas de octava). El índice ($R_w$, $R'_w$, $D_{nT,w}$ …) es la
 referencia desplazada leída a 500 Hz. Los **términos de adaptación
 espectral** $C$ (ruido rosa) y $C_{tr}$ (tráfico urbano) añaden la
 penalización en baja frecuencia de una fuente real.
@@ -143,7 +143,7 @@ plt.show()
 
 | Parámetro | Tipo | Unidades | Rango / valor por defecto | Notas |
 | :--- | :--- | :--- | :--- | :--- |
-| `values_by_band` | array 1D | dB | 16 (tercios) o 5 (octavas) | `R`, `R'`, `DnT` … medidos por banda |
+| `values_by_band` | array 1D | dB | 16 (tercios) o 5 (octavas) | $R$, $R'$, $D_{nT}$ … medidos por banda |
 | `bands` | str o `None` | — | `'third-octave'` / `'octave'` / `None` | `None` lo infiere del número de bandas |
 
 `weighted_rating()` devuelve un `WeightedRatingResult`
@@ -154,15 +154,16 @@ plt.show()
 El índice de un solo número (ISO 717-2) desplaza el mismo estilo de curva de
 referencia, pero una **desviación desfavorable se produce ahora donde la
 medición *supera* la referencia** (el ruido de impactos es peor cuanto más
-alto), el signo opuesto a ISO 717-1. El índice (`Ln,w`, `L'n,w`, `L'nT,w`) es
-la referencia desplazada leída a 500 Hz; para bandas de octava se reduce además
+alto), el signo opuesto a ISO 717-1. El índice ($L_{n,w}$, $L'_{n,w}$,
+$L'_{nT,w}$) es la referencia desplazada leída a 500 Hz; para bandas de octava se reduce además
 en 5 dB. El término de adaptación espectral $C_I = L_{n,\text{sum}} - 15 - L_{n,w}$
 usa la suma energética sobre 100–2500 Hz (los primeros 15 tercios, excluyendo
 3150 Hz) o 125–2000 Hz (octavas). Para mediciones ampliadas hasta 50 Hz,
 `weighted_impact_rating_extended` devuelve además el término de rango ampliado
 $C_{I,50\text{–}2500}$ (NOTA de A.2.1) y, con `one_decimal=True`, el índice en
 pasos de 0,1 dB usado en las declaraciones de incertidumbre (reproduce los
-valores impresos $L_{n,r,0,w} = 77,6$ dB y $C_{I,r,0} = -10,3$ dB de A.2.2).
+valores impresos $L_{n,r,0,w} = 77{,}6$ dB y $C_{I,r,0} = -10{,}3$ dB de
+A.2.2).
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/impact_rating_es.svg" alt="Nivel de presión acústica de impactos normalizado medido en tercios de octava con la curva de referencia de ISO 717-2 desplazada y el índice ponderado resultante leído a 500 Hz" width="80%" />
 
@@ -225,14 +226,14 @@ plt.show()
 </details>
 
 Alimentar el espectro estandarizado a `weighted_impact_rating` reproduce los
-valores del Anexo C de ISO 717-2 (tercios `L'nT,w = 79`, `CI = −11`; octavas
-`54`, `CI = 0`).
+valores del Anexo C de ISO 717-2 (tercios $L'_{nT,w} = 79$, $C_I = -11$;
+octavas 54, $C_I = 0$).
 
 ### Parámetros de `weighted_impact_rating()`
 
 | Parámetro | Tipo | Unidades | Rango / valor por defecto | Notas |
 | :--- | :--- | :--- | :--- | :--- |
-| `values_by_band` | array 1D | dB | 16 (tercios) o 5 (octavas) | `Ln`, `L'n` o `L'nT` medidos por banda |
+| `values_by_band` | array 1D | dB | 16 (tercios) o 5 (octavas) | $L_n$, $L'_n$ o $L'_{nT}$ medidos por banda |
 | `bands` | str o `None` | — | `'third-octave'` / `'octave'` / `None` | `None` lo infiere del número de bandas |
 
 `weighted_impact_rating()` devuelve un `ImpactRatingResult` (`rating`,
@@ -330,10 +331,11 @@ tabla de tercios de octava junto a la gráfica de la curva medida frente a la
 referencia desplazada (el propio `.plot()` del resultado), el número único en
 un recuadro, una fila de veredicto opcional y un pie con el descargo fijo.
 `WeightedRatingResult.report()` etiqueta la ficha aérea de ISO 717-1
-(`Rw (C; Ctr)`, desviaciones donde la referencia supera a la medida);
+($R_w\ (C\ ;\ C_{tr})$, desviaciones donde la referencia supera a la medida);
 `ImpactRatingResult.report()` etiqueta la ficha de impactos de ISO 717-2
-(`Ln,w (CI)`, con el signo contrario). `SoundReductionResult.report()` es una
-utilidad que califica el `R(f)` predicho y escribe su ficha en una sola llamada.
+($L_{n,w}(C_I)$, con el signo contrario). `SoundReductionResult.report()` es
+una utilidad que califica el $R(f)$ predicho y escribe su ficha en una sola
+llamada.
 
 Los metadatos del informe se pasan como una dataclase congelada `ReportMetadata`
 (todos los campos opcionales; solo se representan los suministrados y los campos
@@ -452,15 +454,15 @@ motores desde sus propias guías en lugar de duplicarlos.
   los espectros aéreos, de impacto y de fachada que estos motores valoran en
   campo.
 - [Medición del aislamiento en laboratorio](/phonometry/es/guides/insulation-lab/):
-  los R y Ln de laboratorio tras Rw y Ln,w.
+  los $R$ y $L_n$ de laboratorio tras $R_w$ y $L_{n,w}$.
 - [Aislamiento acústico por intensidad (ISO 15186)](/phonometry/es/guides/insulation-intensity/):
   los índices por intensidad valorados con el mismo motor aéreo.
 - [Método de control del aislamiento (ISO 10052)](/phonometry/es/guides/insulation-survey/):
   las magnitudes del método de control y sus índices automáticos.
 - [Transmisión por flancos en laboratorio (ISO 10848)](/phonometry/es/guides/flanking-lab/):
-  los descriptores de flanco Dn,f,w y Ln,f,w.
+  los descriptores de flanco $D_{n,f,w}$ y $L_{n,f,w}$.
 - [Mejora del aislamiento a impacto de suelos (ISO 16251-1)](/phonometry/es/guides/impact-improvement/):
-  la mejora ponderada ΔLw construida sobre el suelo de referencia de
+  la mejora ponderada $\Delta L_w$ construida sobre el suelo de referencia de
   ISO 717-2.
 - [Predicción del aislamiento acústico (EN 12354)](/phonometry/es/guides/insulation-prediction/):
   el modelo de número único que consume estos índices.

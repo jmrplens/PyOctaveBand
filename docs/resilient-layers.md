@@ -276,8 +276,8 @@ f_0 = \frac{1}{2\pi}\sqrt{\frac{0.111}{d}\left(\frac{1}{m_1'} + \frac{1}{m_2'}\r
 $$
 
 Both stiffnesses are in MN/m³ and both masses per unit area in kg/m², which is
-how the annex prints them: the cavity term of (D.2) is $s' = 0{,}111/d$ MN/m³
-with $d$ in metres, that is $0{,}111\times10^{6}/d$ in SI units. Substituting
+how the annex prints them: the cavity term of (D.2) is $s' = 0.111/d$ MN/m³
+with $d$ in metres, that is $0.111\times10^{6}/d$ in SI units. Substituting
 the SI value without the conversion gives a resonance about a thousand times
 too low.
 

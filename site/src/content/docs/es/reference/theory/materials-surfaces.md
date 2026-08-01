@@ -143,7 +143,7 @@ la difracción de borde (cláusula 8.2, Fórmula 7):
 $d_{\theta,n} = (d_\theta - d_{\theta,r})/(1 - d_{\theta,r})$. El valor a
 incidencia aleatoria promedia los ángulos de fuente con pesos 1:3:3:3:3 para
 0°, ±30°, ±60° (cláusula 8.4). Anclajes: el arco de 37 receptores predicho
-por el modelo para el QRD N = 7 publicado de seis periodos (Cox & D'Antonio
+por el modelo para el QRD $N = 7$ publicado de seis periodos (Cox & D'Antonio
 3.ª ed., Apéndice B; Hargreaves et al. 2000, Tabla I) a 1000 Hz da
 $d_\theta = 0{,}1099$, su referencia plana $0{,}0049$ y
 $d_{\theta,n} = 0{,}1055$; las predicciones del modelo promediadas por banda
@@ -280,7 +280,8 @@ deliberadamente su propio convenio de signos y sus unidades de temperatura
 (ISO en kelvin, ASTM en Celsius), y las resoluciones de cargas casi singulares
 emiten un aviso. Como ninguna norma imprime un ejemplo numérico, los oráculos
 son identidades físicas: la matriz analítica de una capa de aire
-($\det T = 1$, $T_{11} = T_{22}$, TL = 0 dB, $|R| = 1$ con fondo rígido),
+($\det T = 1$, $T_{11} = T_{22}$, $TL = 0\ \text{dB}$, $|R| = 1$ con fondo
+rígido),
 recorridos de ida y vuelta sintéticos que recuperan una $r$ conocida y la
 recuperación con dos cargas de una muestra recíproca asimétrica.
 

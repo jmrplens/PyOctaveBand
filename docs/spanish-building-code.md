@@ -290,17 +290,17 @@ enlarged-range term $C_{100-5000}$, not the core-range one.
 ## See also
 
 - [Insulation Ratings (ISO 717)](insulation-ratings.md): the reference-curve
-  route with Rw, C, Ctr and the enlarged-range terms that DB-HR calls simply C
-  and Ctr.
+  route with $R_w$, $C$, $C_{tr}$ and the enlarged-range terms that DB-HR
+  calls simply $C$ and $C_{tr}$.
 - [Spanish Noise Regulation (RD 1367/2007)](spanish-noise-regulation.md): where
-  the site's day noise index Ld that Table 2.1 is entered with comes from.
+  the site's day noise index $L_d$ that Table 2.1 is entered with comes from.
 - [Façade Sound Insulation](facade-insulation.md): the ISO 16283-3 measurement
-  of D2m,nT and its EN 12354-3 prediction, which feed the D2m,nT,Atr index of
+  of $D_{2m,nT}$ and its EN 12354-3 prediction, which feed the $D_{2m,nT,Atr}$ index of
   this page.
 - [Predicting Panel Sound Insulation](panel-sound-insulation.md): the
   composite-facade calculation and transmission through openings and slits.
 - [Field Insulation Measurement (ISO 16283)](insulation-field.md): the band
-  spectra of R', DnT and L'nT that these global quantities summarise.
+  spectra of $R'$, $D_{nT}$ and $L'_{nT}$ that these global quantities summarise.
 - API reference: [`building.spanish_building_code`](https://jmrplens.github.io/phonometry/reference/api/building/spanish-building-code/).
 
 ## References
@@ -314,7 +314,7 @@ enlarged-range term $C_{100-5000}$, not the core-range one.
   developing Ley 37/2003 del Ruido on acoustic zoning, quality objectives and
   acoustic emissions* (BOE-A-2007-18397).
   [BOE consolidated text](https://www.boe.es/buscar/act.php?id=BOE-A-2007-18397).
-  The source of the day noise index Ld that Table 2.1 of DB-HR is read
+  The source of the day noise index $L_d$ that Table 2.1 of DB-HR is read
   against.
 
 ## Standards

@@ -37,10 +37,11 @@ pnl = aircraft.perceived_noise_level(spl)      # PNdB
 ## 2. Tone correction
 
 Spectral irregularities (fan/turbine tones) are penalised by a **tone
-correction** `C`, found with the slope ("encircling") method: slopes are
-smoothed to a background spectrum `SPL''`, the tone excess `F = SPL − SPL''`
-above 1.5 dB is mapped to a correction factor (frequency-split at 500 Hz /
-5000 Hz, capped at 6⅔ dB), and the maximum over bands is taken.
+correction** $C$, found with the slope ("encircling") method: slopes are
+smoothed to a background spectrum $\mathrm{SPL}''$, the tone excess
+$F = \mathrm{SPL} - \mathrm{SPL}''$ above 1.5 dB is mapped to a correction
+factor (frequency-split at 500 Hz / 5000 Hz, capped at 6⅔ dB), and the maximum
+over bands is taken.
 
 ```python
 from phonometry import aircraft
@@ -49,21 +50,22 @@ c = aircraft.tone_correction(spl)              # dB; added to PNL to give PNLT
 ```
 
 The implementation reproduces the ICAO Doc 9501 ETM Vol. I **Table 3-7**
-turbofan example exactly, including its `SPL''` background column and the
-resulting `C = 2.0 dB` at 2500 Hz.
+turbofan example exactly, including its $\mathrm{SPL}''$ background column and
+the resulting $C = 2.0\ \text{dB}$ at 2500 Hz.
 
 ## 3. EPNL
 
-Over the flyover, the tone-corrected level is `PNLT = PNL + C`; its maximum is
-`PNLTM`. The metric integrates `PNLT` over the **10 dB-down** window (the
-records nearest to `PNLTM − 10` on each side) and normalises to 10 s:
+Over the flyover, the tone-corrected level is
+$\mathrm{PNLT} = \mathrm{PNL} + C$; its maximum is $\mathrm{PNLTM}$. The metric
+integrates $\mathrm{PNLT}$ over the **10 dB-down** window (the records nearest
+to $\mathrm{PNLTM} - 10$ on each side) and normalises to 10 s:
 
 $$
 \mathrm{EPNL} = 10\lg\!\Big(\sum_{k=k_F}^{k_L} 10^{\mathrm{PNLT}(k)/10}\,\Delta t(k)\Big)
 - 10\lg T_0, \qquad T_0 = 10\ \mathrm{s},
 $$
 
-so `EPNL = PNLTM + D` with the duration correction `D`.
+so $\mathrm{EPNL} = \mathrm{PNLTM} + D$ with the duration correction $D$.
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/epnl_dark.svg">
@@ -83,10 +85,10 @@ res.plot()   # PNL/PNLT time history (needs matplotlib)
 `effective_perceived_noise_level` returns an `EPNLResult` bundling the per-record
 `pnl`, `tone_correction`, `pnlt`, the peak `pnltm`, the `duration_correction`,
 the `epnl` and the 10 dB-down `band_limits`. The reference-condition
-integrated-method example of ETM Vol. I **Table 4-4** (a 31-record `PNLT`
-history with non-uniform durations) is reproduced as `EPNL = 92.6 EPNdB`.
-`epnl_from_pnlt` exposes the duration/limit machinery directly from a `PNLT`
-series.
+integrated-method example of ETM Vol. I **Table 4-4** (a 31-record
+$\mathrm{PNLT}$ history with non-uniform durations) is reproduced as
+$\mathrm{EPNL} = 92.6\ \text{EPNdB}$. `epnl_from_pnlt` exposes the
+duration/limit machinery directly from a $\mathrm{PNLT}$ series.
 
 <details>
 <summary>Show the code for this figure</summary>
@@ -112,10 +114,11 @@ aircraft.effective_perceived_noise_level(spectra, dt).plot()
 aircraft-noise-certification data sheet: a standard-basis line (ICAO Annex 16
 Vol. I Appendix 2), an optional TCDSN-style metadata header (aircraft,
 manufacturer / type-certificate holder, applicant, measurement point), a
-metrics table of the informational intermediate quantities (the peak `PNLTM`,
-the duration correction `D`, the 10 dB-down record window and, when non-zero,
-the bandsharing adjustment) above the full-width landscape `PNLT`-versus-time
-plot (the result's own `.plot()`), the boxed `EPNL = X EPNdB` single number, a
+metrics table of the informational intermediate quantities (the peak
+$\mathrm{PNLTM}$, the duration correction $D$, the 10 dB-down record window
+and, when non-zero, the bandsharing adjustment) above the full-width landscape
+$\mathrm{PNLT}$-versus-time plot (the result's own `.plot()`), the boxed
+$\mathrm{EPNL} = X\ \text{EPNdB}$ single number, a
 Level | Limit | Margin verdict row when a certification limit is supplied, a
 static reference-conditions strip (25 °C, 70 % RH, sea level, zero wind, ISA)
 and a footer with the fixed disclaimer. It uses the same `ReportMetadata`
@@ -183,9 +186,9 @@ needs the one-third-octave-band attenuation over the path. The pure-tone
 coefficient is the ISO 9613-1 one (identical, per ARP 5534 §3.1) already
 provided by `air_attenuation`; `sae_band_attenuation` adds the **SAE Method**
 (ARP 5534 §3.2.2), a regression that maps the pure-tone mid-band path-length
-attenuation `δ_t = α·s` to the band attenuation `δ_B` and stays consistent with
-the ISO/ANSI Exact Method well beyond the 50 dB limit of the older Approximate
-Method.
+attenuation $\delta_t = \alpha\,s$ to the band attenuation $\delta_B$ and stays
+consistent with the ISO/ANSI Exact Method well beyond the 50 dB limit of the
+older Approximate Method.
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/aircraft_atmospheric_absorption_dark.svg">
@@ -230,8 +233,8 @@ att.plot()                    # band vs pure-tone mid-band (needs matplotlib)
 ```
 
 `sae_band_attenuation` returns an `AircraftBandAttenuation` with `band_attenuation`
-(`δ_B`), `midband_attenuation` (`δ_t = α·s`) and the pure-tone `coefficient`
-(`α`, dB/m). The SAE Method is valid roughly 6–32 °C and 20–95 % RH (the 14 CFR
+($\delta_B$), `midband_attenuation` ($\delta_t = \alpha\,s$) and the pure-tone
+`coefficient` ($\alpha$, dB/m). The SAE Method is valid roughly 6–32 °C and 20–95 % RH (the 14 CFR
 Part 36 test window), over path lengths to 7620 m, and is reciprocal
 (source↔receiver).
 

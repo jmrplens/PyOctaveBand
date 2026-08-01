@@ -76,7 +76,7 @@ This page collects the theory behind the measurement chain itself: the standardi
 
 ## Octave Band Frequencies (ANSI S1.11 / IEC 61260)
 
-The mid-band frequencies (fm) and edges (f1, f2) use a base-10 ratio:
+The mid-band frequencies ($f_m$) and edges ($f_1$, $f_2$) use a base-10 ratio:
 
 $$
 G = 10^{0.3}
@@ -88,7 +88,7 @@ $$
 f_m = 1000 \cdot G^{x/b}
 $$
 
-(for odd b)
+(for odd $b$)
 
 **Band edges:**
 
@@ -172,7 +172,7 @@ for f, pxx in zip(freq_bins[in_band], psd[in_band]):
 
 This keeps the two concepts separate: phonometry gives standardized
 fractional-octave levels, while Welch gives narrowband FFT bins. With
-`fs=100000` and `nperseg=2**15`, the Welch bin spacing is about `3.05 Hz`.
+`fs=100000` and `nperseg=2**15`, the Welch bin spacing is about 3.05 Hz.
 Window choice and overlap affect leakage and averaging variance, but they do not
 change the bin spacing of each FFT segment.
 
@@ -246,8 +246,9 @@ critical strategies:
    associated with high-order transfer functions (coefficients a, b).
 2. **Multi-rate Decimation:** Whenever half the sample rate still clears the
    band's upper edge by a factor of 1.25, the signal is automatically
-   downsampled (decimated) by `M = floor[(fs / 2) / (1.25 * f_upper)]` before
-   filtering, which is most bands rather than only the low ones (29 of the 33
+   downsampled (decimated) by
+   $M = \lfloor (f_s/2) / (1.25\,f_\text{upper}) \rfloor$ before filtering,
+   which is most bands rather than only the low ones (29 of the 33
    one-third-octave bands at 48 kHz). This keeps the digital pole locations far
    from the unit circle boundary, preventing oscillation and noise. The band
    level is computed on the decimated signal; only `sigbands=True` brings the
@@ -287,9 +288,9 @@ $$
 \alpha = 1 - e^{-1 / (f_s \cdot \tau)}
 $$
 
-Where `tau` is the time constant (e.g., 125 ms for Fast).
+Where $\tau$ is the time constant (e.g., 125 ms for Fast).
 
-The default initial condition is `y[-1] = 0`. Use `initial_state='first'` to
+The default initial condition is $y[-1] = 0$. Use `initial_state='first'` to
 start from the first input energy, or pass a scalar/array with the previous
 mean-square output state. See [Why phonometry](/phonometry/reference/why-phonometry/) for the
 IEC 61672-1 tone-burst verification of this implementation.
@@ -321,7 +322,7 @@ See the [Special Weightings guide](/phonometry/guides/special-weightings/) for u
 
 ## Event and dose metrics
 
-**Sound exposure level** (SEL; LAE with A-weighting, IEC 61672-1:2013) normalizes the energy of a discrete event (aircraft flyover, train pass) to a 1 s reference duration:
+**Sound exposure level** (SEL; $L_{AE}$ with A-weighting, IEC 61672-1:2013) normalizes the energy of a discrete event (aircraft flyover, train pass) to a 1 s reference duration:
 
 $$
 \mathrm{SEL} = L_{eq,T} + 10 \log_{10}\left(\frac{T}{T_0}\right), \qquad T_0 = 1\ \text{s}
@@ -341,7 +342,7 @@ $$
 
 It is identical to $L_{EP,d}$ of Directive 86/188/EEC and $L_{EX,8h}$ of ISO 1999 (IEC 61252, 3.3 NOTES 5–6). The anchor of IEC 61252 (3.3 NOTE 4): an exposure of **3.2 Pa²h corresponds to $L_{EX,8h}$ of exactly 90 dB**.
 
-**LCpeak** (IEC 61672-1:2013, subclause 5.13) is the absolute maximum of the C-weighted sound pressure expressed in dB, $L_{Cpeak} = 20\log_{10}(\max|p_C(t)|/p_0)$, the quantity behind the 135/137/140 dB(C) occupational action limits. The implementation is verified against the one-cycle and half-cycle reference responses of Table 5.
+**$L_{Cpeak}$** (IEC 61672-1:2013, subclause 5.13) is the absolute maximum of the C-weighted sound pressure expressed in dB, $L_{Cpeak} = 20\log_{10}(\max|p_C(t)|/p_0)$, the quantity behind the 135/137/140 dB(C) occupational action limits. The implementation is verified against the one-cycle and half-cycle reference responses of Table 5.
 
 See the [Levels guide](/phonometry/guides/levels/) for usage and the [Calibration guide](/phonometry/guides/calibration/) for absolute-scale setup.
 
@@ -379,7 +380,7 @@ See the [Sound Intensity guide](/phonometry/guides/intensity/) for usage.
 
 <img class="light-only" src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/intensity_demo.svg" alt="Third-octave pressure and intensity levels for a plane progressive wave versus a standing wave" style="width:92%" loading="lazy"><img class="dark-only" src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/intensity_demo_dark.svg" alt="Third-octave pressure and intensity levels for a plane progressive wave versus a standing wave" style="width:92%" loading="lazy">
 
-*The p-p estimator in the two limiting fields: the gap between Lp and LI is the pressure-intensity index that flags reactive fields.*
+*The p-p estimator in the two limiting fields: the gap between $L_p$ and $L_I$ is the pressure-intensity index that flags reactive fields.*
 
 ## Measurement uncertainty (ISO/IEC Guide 98-3: GUM and Supplement 1)
 

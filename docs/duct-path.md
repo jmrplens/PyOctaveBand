@@ -67,9 +67,10 @@ rows: the table reads like the reference, the arithmetic does not have to.
 
 **Regenerated noise adds on a power basis.** The self-noise of an element
 is a sound power level in its own right, not a correction to the incoming
-level, so it is combined as `10 lg(10^(L/10) + 10^(L_sn/10))` rather than
-added arithmetically. That is why the `Self-noise` row sits between the
-`Sum` and the `Combined` row and never touches the attenuation.
+level, so it is combined as
+$10\log_{10}(10^{L/10} + 10^{L_\text{sn}/10})$ rather than added
+arithmetically. That is why the `Self-noise` row sits between the `Sum` and
+the `Combined` row and never touches the attenuation.
 
 **There is a self-noise floor.** Long's sheet uses a 0 dB sound power level
 wherever an element has no regenerated-noise data, and also as a floor
@@ -82,18 +83,20 @@ off entirely.
 
 The fan is the one element whose spectrum you can build from the operating
 point alone. `fan_sound_power` implements the ASHRAE scaling law printed as
-Long Eq. 13.1:
+Long Eq. 13.1,
 
-```text
-L_W = K_F + 10 lg(Q_F / Q_REF) + 10 lg(P_F / P_REF) + C_EFF + C_BFI ,
-```
+$$
+L_W = K_F + 10\log_{10}\frac{Q_F}{Q_\text{REF}}
+    + 10\log_{10}\frac{P_F}{P_\text{REF}} + C_\text{EFF} + C_\text{BFI},
+$$
 
-with the spectral constant `K_F` of Table 13.5 (one row per fan type), the
-off-peak efficiency correction `C_EFF` of Table 13.6 and the blade
-frequency increment `C_BFI` of Table 13.7 dropped into the single octave
-band that contains the blade passing frequency. In SI the references are
-`Q_REF = 0.472 L/s` and `P_REF = 249 Pa`, so the two logarithmic terms take
-the same values as the foot-pound form in cfm and inches of water gauge.
+with the spectral constant $K_F$ of Table 13.5 (one row per fan type), the
+off-peak efficiency correction $C_\text{EFF}$ of Table 13.6 and the blade
+frequency increment $C_\text{BFI}$ of Table 13.7 dropped into the single
+octave band that contains the blade passing frequency. In SI the references
+are $Q_\text{REF} = 0.472$ L/s and $P_\text{REF} = 249$ Pa, so the two
+logarithmic terms take the same values as the foot-pound form in cfm and
+inches of water gauge.
 
 ```python
 from phonometry import (
@@ -184,7 +187,7 @@ Table 14.4 over length and log diameter. Part of that number is the duct's
 own breakout rather than dissipation, which is exactly why a serpentine run
 of flexible duct in a joist space works as an improvised silencer.
 
-**Elbows and splits.** `elbow_insertion_loss` is keyed by `W / lambda` and
+**Elbows and splits.** `elbow_insertion_loss` is keyed by $W/\lambda$ and
 covers square and round bends, vaned and unvaned, lined and unlined; a
 lined square bend is worth 10 to 11 dB where a round one gives 3.
 `split_loss` handles a duct division: the power is shared between the
@@ -208,12 +211,17 @@ run, for free, before any silencer. `end_reflection_loss` offers both
 published methods and neither replaces the other: `method="bies"` (the
 default) interpolates the ASHRAE table of Bies Table 8.14, and
 `method="long"` evaluates Reynolds' closed form
-`R = 10 lg[1 + (a c / pi f d)^1.88]` with `a = 0.8` for a flush termination
-and `a = 1` for a free one. The two agree within a decibel or so over the
-bands both cover. Use `equivalent_diameter(area)` for a rectangular duct,
-and do not apply the correction at all when the duct terminates in a
-diffuser: the flare smooths the impedance transition, and a manufacturer's
-diffuser rating already contains whatever is left of it.
+
+$$
+R = 10\log_{10}\!\left[1 + \left(\frac{a\,c}{\pi f d}\right)^{1.88}\right],
+$$
+
+with $a = 0.8$ for a flush termination and $a = 1$ for a free one. The two
+agree within a decibel or so over the bands both cover. Use
+`equivalent_diameter(area)` for a rectangular duct, and do not apply the
+correction at all when the duct terminates in a diffuser: the flare smooths
+the impedance transition, and a manufacturer's diffuser rating already
+contains whatever is left of it.
 
 ```python
 from phonometry import end_reflection_loss, equivalent_diameter
@@ -262,10 +270,15 @@ generates noise of its own, and past a certain velocity the silencer bought
 to remove the fan becomes the loudest thing in the duct.
 
 `silencer_self_noise` is Fry's estimate as Long Eq. 14.31,
-`L_W = 55 lg(V / V_0) + 10 lg N + 10 lg(H / H_0) - 45`, spread over the
-octave bands by the corrections of Table 14.8. The exponent is the whole
-message: the fifth-and-a-half power of the airway velocity means that
-*doubling the face velocity of a silencer adds about 17 dB*.
+
+$$
+L_W = 55\log_{10}\frac{V}{V_0} + 10\log_{10} N
+    + 10\log_{10}\frac{H}{H_0} - 45,
+$$
+
+spread over the octave bands by the corrections of Table 14.8. The exponent
+is the whole message: the fifth-and-a-half power of the airway velocity
+means that *doubling the face velocity of a silencer adds about 17 dB*.
 
 ```python
 from phonometry import silencer_self_noise
@@ -292,11 +305,12 @@ downstream can fix, because there is no ductwork left after it. Its sound
 power is normally manufacturer data measured to ASHRAE Standard 70, and
 that is what a real sheet uses. When there is none to hand,
 `diffuser_sound_power` is Reynolds's estimate as Long Eqs. 13.27 to 13.33:
-an overall level `L_W = 10 lg S_G + 30 lg xi + 60 lg U_G - 31.3` from the
-face area, the approach velocity `U_G = Q / S_G` and the normalised
-pressure-drop coefficient `xi`, spread over the octaves by the shape
-function `C_D = -11.82 - 0.15 A - 1.13 A^2` (`-5.82` for a round device)
-about the peak band `f_P = 48.8 U_G`.
+an overall level
+$L_W = 10\log_{10} S_G + 30\log_{10}\xi + 60\log_{10} U_G - 31.3$ from the
+face area, the approach velocity $U_G = Q/S_G$ and the normalised
+pressure-drop coefficient $\xi$, spread over the octaves by the shape
+function $C_D = -11.82 - 0.15 A - 1.13 A^2$ ($-5.82$ for a round device)
+about the peak band $f_P = 48.8\,U_G$.
 
 ```python
 from phonometry import diffuser_sound_power
@@ -338,9 +352,10 @@ the outlet, or balance the system by sizing the ductwork instead.
 
 The last step converts the sound power arriving at the terminal device into
 a sound pressure level where somebody is sitting, through the steady-state
-room relation `L_p = L_W + 10 lg[Q / (4 pi r^2) + 4 / R]`. `room_effect`
+room relation
+$L_p = L_W + 10\log_{10}\left[Q/(4\pi r^2) + 4/R\right]$. `room_effect`
 returns that as a positive attenuation so it drops into the cascade beside
-every other loss, with `Q = 2` by default for a diffuser flush in a
+every other loss, with $Q = 2$ by default for a diffuser flush in a
 ceiling.
 
 ```python
@@ -521,7 +536,7 @@ by band:
 - **The split and the unlined elbow reproduce exactly.** `split_loss` gives
   the 25 per cent branch as 6.0 dB against the printed -6 dB, and
   `elbow_insertion_loss` gives 0/1/2/3/3/3/3/3 dB against the printed row
-  when the elbow is read as round (Table 14.7) at `w = 24 in`.
+  when the elbow is read as round (Table 14.7) at $w = 24$ in.
 - **The supply diffuser row reproduces too.** `diffuser_sound_power` on a
   24 x 24 in rectangular device at 312 cfm and 0.05 in pd returns
   33.4/32.4/29.1/23.6/15.9/5.9 dB against the printed
@@ -552,12 +567,13 @@ a plane-wave prediction quietly stops being right.
 
 `noise_control.duct_modes` implements the cut-on analysis of Norton &
 Karczub, *Fundamentals of Noise and Vibration Analysis for Engineers*
-(2nd ed.), section 7.3: circular ducts by Eq. 7.6 with the `pi alpha_pq`
-eigenvalues of Table 7.1 that solve `J'_p(kappa_pq a_i) = 0`, rectangular
-ducts by Eq. 7.10, and the mean-flow correction of Eqs. 7.8 and 7.9, in
-which a uniform axial flow of Mach number `M` lowers every cut-on frequency
-by `sqrt(1 - M^2)` and moves the cut-on itself from `k_x = 0` to
-`k_x = -M kappa_pq / sqrt(1 - M^2)`.
+(2nd ed.), section 7.3: circular ducts by Eq. 7.6 with the
+$\pi\alpha_{pq}$ eigenvalues of Table 7.1 that solve
+$J'_p(\kappa_{pq} a_i) = 0$, rectangular ducts by Eq. 7.10, and the
+mean-flow correction of Eqs. 7.8 and 7.9, in which a uniform axial flow of
+Mach number $M$ lowers every cut-on frequency by $\sqrt{1 - M^2}$ and
+moves the cut-on itself from $k_x = 0$ to
+$k_x = -M\kappa_{pq}/\sqrt{1 - M^2}$.
 
 ```python
 import numpy as np
@@ -579,11 +595,12 @@ Those ventilation numbers are blunt: in that duct plane waves are the whole
 story only up to the 250 Hz octave, and a 36 x 24 in supply trunk gives up at
 188 Hz.
 
-At 15 m/s the flow correction is invisible: `M = 0.044` gives
-`sqrt(1 - M^2) = 0.999`, which moves the first cut-on by 0.2 Hz. It earns its
-place in high-speed pipework instead. Norton's problem 7.1 is that case, a
-254 mm line carrying steam (`c = 405 m/s`) at 200 m/s, `M = 0.494`, and there
-the two ladders separate by more than a hundred hertz at every rung.
+At 15 m/s the flow correction is invisible: $M = 0.044$ gives
+$\sqrt{1 - M^2} = 0.999$, which moves the first cut-on by 0.2 Hz. It earns
+its place in high-speed pipework instead. Norton's problem 7.1 is that
+case, a 254 mm line carrying steam ($c = 405$ m/s) at 200 m/s, $M = 0.494$,
+and there the two ladders separate by more than a hundred hertz at every
+rung.
 
 ```python
 import numpy as np
@@ -606,7 +623,7 @@ print(np.round(steam.axial_wavenumber, 2))
 
 *Norton's problem 7.1, the case where the mean flow is worth drawing: half
 the speed of sound in the pipe pulls every cut-on down by
-`sqrt(1 - M^2) = 0.870`, so the first higher-order mode appears at 813 Hz
+$\sqrt{1 - M^2} = 0.870$, so the first higher-order mode appears at 813 Hz
 instead of 935 Hz and the plane-wave band, shaded, is 13 per cent narrower
 than the still-air calculation would promise. The axial wavenumber at cut-on
 is negative in every rung: with flow, the mode is already travelling upstream

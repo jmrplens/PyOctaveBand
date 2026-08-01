@@ -5,7 +5,7 @@
 A public-address system, an intercom, a reverberant lecture hall: each is a
 *transmission channel* between a talker's mouth and a listener's ear, and each
 degrades speech in its own way. The **Speech Transmission Index** (STI) of
-IEC 60268-16 rates that channel with a single number in [0, 1] by measuring
+IEC 60268-16 rates that channel with a single number in $[0, 1]$ by measuring
 how much of the speech *envelope* survives the trip. This page covers the
 modulation-transfer physics behind the index, the indirect method from a
 measured room impulse response, and the direct STIPA measurement with its
@@ -23,8 +23,8 @@ standardized test signal.
 Reverberation and noise do not muffle speech uniformly; they blur its
 *envelope*: the slow (0.63–12.5 Hz) intensity modulations that carry
 syllables. STI quantifies how much of that modulation survives from mouth
-to ear, per octave band, as the **modulation transfer function** m(F). A
-delta-like channel keeps m = 1 (STI = 1); reverberation low-passes the
+to ear, per octave band, as the **modulation transfer function** $m(F)$. A
+delta-like channel keeps $m = 1$ (STI = 1); reverberation low-passes the
 envelope following Schroeder's closed form, and steady noise scales it:
 
 $$
@@ -40,11 +40,11 @@ those dips. A reverberant tail fills the dips from behind, since late energy
 smears into the gaps; steady noise raises their floor. In both cases the
 received modulation depth shrinks, and with it the contrast between speech
 sounds, even when the average level barely changes. The full method probes
-m(F) at 14 modulation frequencies (0.63 Hz to 12.5 Hz in one-third-octave
-steps) in each of the 7 octave bands from 125 Hz to 8 kHz, converts each m to
+$m(F)$ at 14 modulation frequencies (0.63 Hz to 12.5 Hz in one-third-octave
+steps) in each of the 7 octave bands from 125 Hz to 8 kHz, converts each $m$ to
 an effective signal-to-noise ratio clipped to ±15 dB, and combines the
 results, band-weighted, into the index: the STI is an effective SNR of the
-*envelope*, mapped onto [0, 1].
+*envelope*, mapped onto $[0, 1]$.
 
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sti_vs_t60_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sti_vs_t60.svg" alt="STI versus reverberation time with the IEC 60268-16 Annex F rating bands shaded" width="80%"></picture>
 
@@ -167,15 +167,15 @@ The implementation follows **Edition 5 (2020)**: Edition 4's normative PDF
 is the base and every Ed. 5 change is source-attributed in the code; the
 only numeric delta is the revised male speech spectrum of clause A.6.1.
 CI checks the standard's own verification vectors: the six weighting-factor
-band pairs to ±0.001 STI, the m ↔ STI mapping table, the level-dependent
-masking control points, and Schroeder-form decays at four T₆₀ values.
+band pairs to ±0.001 STI, the $m$ ↔ STI mapping table, the level-dependent
+masking control points, and Schroeder-form decays at four $T_{60}$ values.
 
 The analyzer is also verified end to end against the **IEC 60268-16 rev 5
 verification test bench** signals from [stipa.info](https://www.stipa.info)
 (Embedded Acoustics BV): the direct-method modulation-depth staircase
 (Annex C.3.2), the indirect-method exponential decays against the closed-form
 Schroeder MTF (C.3.3), the filter-bank slope test with a +41 dB unmodulated
-adjacent-octave tone (C.4.2, m ≥ 0.5), the weighting-factor band pairs (A.2.2)
+adjacent-octave tone (C.4.2, $m \ge 0.5$), the weighting-factor band pairs (A.2.2)
 and the filter-bank phase-distortion test with half-octave edge carriers
 (A.3.1.2, |STI bias| < 0.01 over TI = 0.1–0.9). All five suites pass with the
 level-dependent features disabled, as the bench prescribes. The 49 certified
@@ -196,7 +196,7 @@ Each route has failure modes the standard is explicit about:
 - **Level-dependent effects.** The STI is not level-invariant: auditory
   masking and the reception threshold act on the *absolute* band levels at the
   listener. Play the test signal at the system's operating level (the
-  standard's Annex J practice sets it 3 dB above the L_Aeq of continuous
+  standard's Annex J practice sets it 3 dB above the $L_{Aeq}$ of continuous
   speech at the position) and pass `level=` and `ambient=` so the analysis
   includes them; an impulse response measured loud and rescaled afterwards
   misses these effects entirely.
@@ -222,7 +222,7 @@ Each route has failure modes the standard is explicit about:
 | `snr` | float or 7-vector, optional | dB | default `None` | Adds steady-noise degradation |
 | `level` | 7-vector, optional | dB SPL | default `None` | Enables auditory masking + reception threshold (Tables A.2/A.3) |
 | `ambient` | 7-vector, optional | dB SPL | needs `level` | Ambient noise band levels |
-| `reference` | 1D array, optional (`stipa`) | — | default `None` | Measured source signal instead of the nominal m = 0.55 |
+| `reference` | 1D array, optional (`stipa`) | — | default `None` | Measured source signal instead of the nominal $m = 0.55$ |
 
 Both return `STIResult`: `sti`, `mti` (7 bands), `mtf` (7×14 or 7×2),
 `band_levels`, `rating` (Annex F letter `A+`…`U`).
@@ -276,7 +276,7 @@ repository. Click the preview to open the PDF:
   audibility-based ANSI S3.5 index that complements the STI.
 - [Loudness](loudness.md) and [Sound Quality Metrics](sound-quality.md): loudness,
   sharpness, tonality and roughness of the received sound.
-- [Theory](theory-perception.md): the modulation-transfer derivation and the m ↔ STI
+- [Theory](theory-perception.md): the modulation-transfer derivation and the $m$ ↔ STI
   mapping.
 - API reference: [`hearing.sti`](https://jmrplens.github.io/phonometry/reference/api/speech/sti/).
 
@@ -286,14 +286,14 @@ repository. Click the preview to open the PDF:
   room acoustics and its use for estimating speech intelligibility in
   auditoria. *The Journal of the Acoustical Society of America*, 77(3),
   1069-1077. [doi:10.1121/1.392224](https://doi.org/10.1121/1.392224).
-  The modulation-transfer framework of section 1 and the m ↔ STI mapping the
+  The modulation-transfer framework of section 1 and the $m$ ↔ STI mapping the
   index is built on.
 
 ## Standards
 
 IEC 60268-16:2020 (Edition 5), *Sound system equipment —
 Part 16: Objective rating of speech intelligibility by speech transmission
-index*: the modulation transfer function and the m ↔ STI mapping, the STIPA
+index*: the modulation transfer function and the $m$ ↔ STI mapping, the STIPA
 test signal and direct method, the indirect method from the impulse response,
 auditory masking and the reception threshold (Tables A.2/A.3), the revised
 male speech spectrum (clause A.6.1) and the Annex F rating letters.

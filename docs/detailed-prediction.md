@@ -338,12 +338,12 @@ this module does, a useful sanity target for a new floor build-up.
 
 | Parameter | Type | Units | Range / default | Notes |
 | :--- | :--- | :--- | :--- | :--- |
-| `element` | `HomogeneousElement` | — | — | Area, side lengths, `m'`, `fc`, `ηint`, `Σ lk αk`, and optionally `ρ`/`cL` |
+| `element` | `HomogeneousElement` | — | — | Area, side lengths, $m'$, $f_c$, $\eta_\text{int}$, $\sum l_k \alpha_k$, and optionally $\rho$/$c_L$ |
 | `frequencies` | array | Hz | > 0 | Band centres |
-| `bands` | str | — | `'third'` (default) / `'octave'` | Sets the band that carries the `f ≈ fc` branch |
-| `resonant_only` | bool | — | default `False` | Drops the forced-transmission term below `fc` (Annex B.1, flanking paths) |
+| `bands` | str | — | `'third'` (default) / `'octave'` | Sets the band that carries the $f \approx f_c$ branch |
+| `resonant_only` | bool | — | default `False` | Drops the forced-transmission term below $f_c$ (Annex B.1, flanking paths) |
 | `speed_of_sound` | float | m/s | default `340` | The value ISO 12354-1 Annex A fixes |
-| `air_density` | float | kg/m³ | default `1.29` | `ρo` of the Annex B model |
+| `air_density` | float | kg/m³ | default `1.29` | $\rho_o$ of the Annex B model |
 
 ## `airborne_flanking_path()` / `impact_flanking_path()` parameters
 
@@ -352,9 +352,9 @@ this module does, a useful sanity target for a new floor build-up.
 | `label` | str | — | — | Display name of the path |
 | `kind` | str | — | `'Ff'` / `'Df'` / `'Fd'` | Airborne only; the impact builder is always `Df` |
 | `element_i` / `element_j` | `InSituElementResult` | — | — | Source-room and receiving-room elements (`floor` / `element_j` for impact) |
-| `vibration_reduction_index` | float or array | dB | — | `Kij` of this path |
-| `coupling_length` | float | m | > 0 | Junction coupling length `lij` |
-| `separating_area` | float | m² | > 0 | `Ss` (airborne only) |
+| `vibration_reduction_index` | float or array | dB | — | $K_{ij}$ of this path |
+| `coupling_length` | float | m | > 0 | Junction coupling length $l_{ij}$ |
+| `separating_area` | float | m² | > 0 | $S_s$ (airborne only) |
 | `delta_r_i` / `delta_r_j` | float or array | dB | default `0` | Lining improvements |
 | `delta_l` | float or array | dB | default `0` | Floor-covering improvement (impact only) |
 
@@ -364,7 +364,7 @@ this module does, a useful sanity target for a new floor build-up.
 per-band counterpart of the simplified prediction fiches: the same one-page
 layout, a basis line naming ISO 12354-1/-2:2017 Clause 4.2, the per-path
 share-of-energy table beside the per-band path-contribution figure, the boxed
-`R'w` / `L'n,w`, the detailed model's 1,5 dB to 2,5 dB standard deviation and a
+$R'_w$ / $L'_{n,w}$, the detailed model's 1,5 dB to 2,5 dB standard deviation and a
 PASS/FAIL verdict against a `requirement`. `verbose=True` annexes the band in
 which each path peaks. Both need the ISO 717 rating, so the spectrum must cover
 100 Hz to 3150 Hz (or 125 Hz to 2000 Hz in octaves).
@@ -398,11 +398,11 @@ printed tables are recorded in [Errata](ERRATA.md).
   simplified single-number model and the Annex E junction catalogue this page
   builds on.
 - [Laboratory Flanking Transmission (ISO 10848)](flanking-lab.md): where the
-  measured `Kij` and the equivalent absorption length come from.
+  measured $K_{ij}$ and the equivalent absorption length come from.
 - [Insulation Ratings (ISO 717)](insulation-ratings.md): the reference-curve
-  engine that turns the predicted spectrum into `R'w` / `L'n,w`.
+  engine that turns the predicted spectrum into $R'_w$ / $L'_{n,w}$.
 - [Field Insulation Measurement (ISO 16283)](insulation-field.md): the built
   result the prediction is checked against.
 - [Dynamic stiffness of resilient materials (EN 29052-1)](dynamic-stiffness.md):
-  the `s'` behind the floating floor's resonance frequency.
+  the $s'$ behind the floating floor's resonance frequency.
 - API reference: [`building.detailed_prediction`](https://jmrplens.github.io/phonometry/reference/api/building/detailed-prediction/).

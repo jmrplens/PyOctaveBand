@@ -41,16 +41,16 @@ are mutually consistent bin by bin.
 `correlation` computes the auto- or cross-correlation via zero-padded FFT so
 the circular product never wraps (Bendat & Piersol Section 11.4.2), with the
 sign convention of the book's time-delay model: for
-`y(t) = α·x(t-τ0) + n(t)` the estimate peaks at `τ = +τ0` (Eq. 5.21). Three
-normalizations are available:
+$y(t) = \alpha\,x(t-\tau_0) + n(t)$ the estimate peaks at $\tau = +\tau_0$
+(Eq. 5.21). Three normalizations are available:
 
-- `'biased'`: the lag sums divided by `N`; tapers toward the record ends
-  and stays bounded by `[Rxx(0)·Ryy(0)]^1/2`;
-- `'unbiased'`: divided by `N-|r|` (Eq. 11.96), an unbiased estimate of
-  `Rxy(τ)` whose variance grows toward the ends;
+- `'biased'`: the lag sums divided by $N$; tapers toward the record ends
+  and stays bounded by $[R_{xx}(0)\,R_{yy}(0)]^{1/2}$;
+- `'unbiased'`: divided by $N-|r|$ (Eq. 11.96), an unbiased estimate of
+  $R_{xy}(\tau)$ whose variance grows toward the ends;
 - `'coefficient'`: the correlation coefficient function
-  `ρxy(τ) = Cxy(τ)/(σx·σy)` in [-1, 1] over the mean-removed records
-  (Eq. 5.16).
+  $\rho_{xy}(\tau) = C_{xy}(\tau)/(\sigma_x\,\sigma_y)$ in $[-1, 1]$ over
+  the mean-removed records (Eq. 5.16).
 
 ```python
 import numpy as np
@@ -64,11 +64,11 @@ res.plot()
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/correlation_normalizations.webp" alt="Two panels for a two-sensor delay model. Top: the correlation coefficient function over plus and minus 50 milliseconds of lag, a flat noise floor near zero with one sharp peak of about 0.85 exactly on the dashed true-delay line at plus 12.5 milliseconds. Bottom: the biased and unbiased estimates over the full plus and minus 2 seconds of lag; the biased noise floor tapers toward the record ends while the unbiased one fans out with growing variance there" width="86%" />
 
-*The two-sensor delay model `y(t) = 0.8·x(t−τ0) + n(t)` under the three
-normalizations: the coefficient function is bounded and peaks at +τ0 (top);
-over the full lag range the biased estimate tapers toward the ends while
-the unbiased one pays for its unbiasedness with variance that grows there
-(bottom).*
+*The two-sensor delay model $y(t) = 0.8\,x(t-\tau_0) + n(t)$ under the three
+normalizations: the coefficient function is bounded and peaks at $+\tau_0$
+(top); over the full lag range the biased estimate tapers toward the ends
+while the unbiased one pays for its unbiasedness with variance that grows
+there (bottom).*
 
 <details>
 <summary>Show the code for this figure</summary>
@@ -111,8 +111,8 @@ plt.show()
 
 The result always carries the coefficient function alongside the requested
 normalization, because the coefficient is what the error formulas need. For
-bandwidth-limited Gaussian data of bandwidth `B` observed for `T` seconds
-(Eqs. 8.109/8.112, valid for `T ≥ 10·|τ|` and `BT ≥ 5`):
+bandwidth-limited Gaussian data of bandwidth $B$ observed for $T$ seconds
+(Eqs. 8.109/8.112, valid for $T \ge 10\,|\tau|$ and $BT \ge 5$):
 
 $$
 \varepsilon\!\left[\hat{R}_{xy}(\tau)\right] =
@@ -123,32 +123,34 @@ $$
 
 `res.random_error(signal_bandwidth)` evaluates it per lag with the measured
 coefficient, and the standalone `correlation_random_error` takes an explicit
-coefficient; with `ρ = S/√((S+M)(S+N)) = 1/11`, `B = 100` Hz and `T = 5` s
-it reproduces the `ε ≈ 0.35` of the book's Example 8.5, one of the pinned
-conformance anchors. Two closed forms anchor the estimator itself in the
-tests: the autocorrelation of a sine, `(A²/2)·cos(2πf0τ)`, and the
-`sin(2πBτ)/(2πBτ)` autocorrelation of bandwidth-limited white noise
-(Eq. 8.120).
+coefficient; with $\rho = S/\sqrt{(S+M)(S+N)} = 1/11$, $B = 100\ \text{Hz}$
+and $T = 5\ \text{s}$ it reproduces the $\varepsilon \approx 0.35$ of the
+book's Example 8.5, one of the pinned conformance anchors. Two closed forms
+anchor the estimator itself in the tests: the autocorrelation of a sine,
+$(A^2/2)\cos(2\pi f_0\tau)$, and the $\sin(2\pi B\tau)/(2\pi B\tau)$
+autocorrelation of bandwidth-limited white noise (Eq. 8.120).
 
 ## 2. Time-delay estimation
 
-`time_delay` estimates the delay of `y` relative to `x` in the two-sensor
-model `y(t) = α·x(t-τ0) + n(t)` (B&P Section 5.1.4) by three routes:
+`time_delay` estimates the delay of $y$ relative to $x$ in the two-sensor
+model $y(t) = \alpha\,x(t-\tau_0) + n(t)$ (B&P Section 5.1.4) by three
+routes:
 
 - **`'direct'`**: the peak of the full-record correlation coefficient
   function;
-- **`'phase'`**: the `|Gxy|`-weighted least-squares slope of the
+- **`'phase'`**: the $|G_{xy}|$-weighted least-squares slope of the
   cross-spectrum phase (Eq. 5.101b): a pure delay has an exactly linear
   phase, so this estimator resolves fractional delays to better than 1e-3
   samples without any peak interpolation, as long as the unwrapped phase is
   unambiguous (clean, moderate delays);
 - **`'gcc'`**: the generalized cross-correlation of Knapp & Carter (1976):
-  the Welch-averaged cross-spectrum is weighted by `ψ(f)` before the inverse
+  the Welch-averaged cross-spectrum is weighted by $\psi(f)$ before the
+  inverse
   transform, sharpening the peak that the signal's own autocorrelation would
   otherwise smear (their Eq. 9).
 
 The physical picture is two microphones and one wavefront: the extra path to
-the far microphone is c times the delay, and the whole estimation problem is
+the far microphone is $c$ times the delay, and the whole estimation problem is
 locating one peak on the lag axis.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_correlation_delay.svg" alt="Diagram of correlation-based time-delay estimation: a loudspeaker source radiates toward two microphones on stands, microphone 1 capturing x of t and microphone 2 capturing y of t equal to alpha times x delayed by tau 0 plus noise, with the wavefront through microphone 1 leaving an extra path of c times tau 0, about 0.84 meters at 343 meters per second, and sine theta equal to c tau 0 over the spacing d; below, a correlogram panel shows the direct correlator as a broad hump and GCC-PHAT with weighting 1 over the magnitude of Gxy as a sharp spike, both at tau 0 equal to 20 samples over 8192 hertz, 2.44 milliseconds; the caption notes sub-sample refinement by parabolic peak interpolation with 16 times local upsampling to below 0.002 samples" width="92%" />
@@ -156,13 +158,13 @@ locating one peak on the lag axis.
 The weightings of Knapp & Carter's Table I, with the conditions the paper
 attaches to each:
 
-| `weighting` | `ψ(f)` | Behaviour and conditions |
+| `weighting` | $\psi(f)$ | Behaviour and conditions |
 |---|---|---|
-| `'none'` | 1 | The plain correlator: the delta at the delay is convolved with the signal autocorrelation, giving a broad peak on colored signals. |
-| `'roth'` | `1/Gxx` | Suppresses the bands where the *first* sensor is noisy; still smears unless that noise is spectrally similar to the signal. |
-| `'scot'` | `1/√(Gxx·Gyy)` | Prewhitens both channels symmetrically; equals Roth when the sensors match. |
-| `'phat'` | `1/|Gxy|` | Ideally a delta at the delay for uncorrelated noises (their Eq. 23), but the weight ignores the signal-to-noise ratio, so bands without signal contribute unit-magnitude random phase. It needs signal power across the analysis band. |
-| `'ml'` | `γ²/(|Gxy|·(1-γ²))` | The Hannan-Thomson maximum-likelihood processor: a PHAT weighted down by the phase variance each band actually carries. Attains the Cramér-Rao bound; the safe default when the signal does not fill the band. |
+| `'none'` | $1$ | The plain correlator: the delta at the delay is convolved with the signal autocorrelation, giving a broad peak on colored signals. |
+| `'roth'` | $1/G_{xx}$ | Suppresses the bands where the *first* sensor is noisy; still smears unless that noise is spectrally similar to the signal. |
+| `'scot'` | $1/\sqrt{G_{xx}\,G_{yy}}$ | Prewhitens both channels symmetrically; equals Roth when the sensors match. |
+| `'phat'` | $1/\lvert G_{xy}\rvert$ | Ideally a delta at the delay for uncorrelated noises (their Eq. 23), but the weight ignores the signal-to-noise ratio, so bands without signal contribute unit-magnitude random phase. It needs signal power across the analysis band. |
+| `'ml'` | $\gamma^2/(\lvert G_{xy}\rvert\,(1-\gamma^2))$ | The Hannan-Thomson maximum-likelihood processor: a PHAT weighted down by the phase variance each band actually carries. Attains the Cramér-Rao bound; the safe default when the signal does not fill the band. |
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/gcc_phat_delay.svg" alt="Normalized cross-correlation of a colored two-sensor signal pair against lag in milliseconds: the direct correlator shows a broad peak around the true 20-sample delay while the GCC-PHAT curve collapses to a sharp spike exactly on the dashed true-delay line" width="82%" loading="eager" />
 
@@ -204,13 +206,13 @@ The correlation-peak methods refine the sample peak by three-point parabolic
 interpolation, optionally after **band-limited local upsampling**
 (`upsample=16` resamples a window around the peak sixteenfold before the
 parabola). Sub-sample accuracy presumes the peak is oversampled, i.e. the
-signals are band-limited below Nyquist; on a 0.4·fs band-limited pair the
+signals are band-limited below Nyquist; on a $0.4\,f_s$ band-limited pair the
 tests pin the achievable error at ≲0.1 sample for the parabola alone and
 ≲2e-3 samples with `upsample=16`. For GCC the delay must fit within half a
 Welch segment; raise `nperseg` for longer delays.
 
 With `signal_bandwidth` given, the result also carries the **peak-location
-uncertainty** of B&P Eq. 8.129 and its ±2σ interval (Eq. 8.130):
+uncertainty** of B&P Eq. 8.129 and its $\pm 2\sigma$ interval (Eq. 8.130):
 
 $$
 \sigma(\hat{\tau}_0) \approx
@@ -306,7 +308,7 @@ smooth band-limited pulse: about 1e-2 samples with the parabola alone,
 
 ## 4. Hilbert envelope and instantaneous frequency
 
-`envelope` builds the analytic signal `z(t) = x(t) + j·x̃(t)` by the
+`envelope` builds the analytic signal $z(t) = x(t) + j\,\tilde{x}(t)$ by the
 one-sided spectrum construction that Bendat & Piersol recommend
 (Eq. 13.25) and returns the three Chapter 13 quantities on one time axis:
 
@@ -316,10 +318,10 @@ A(t) = \left[x^2(t) + \tilde{x}^2(t)\right]^{1/2}, \qquad
 f(t) = \frac{1}{2\pi}\frac{d\theta}{dt} .
 $$
 
-For an amplitude-modulated carrier `u(t)·cos(2πf0t)` the envelope recovers
-`u(t)` exactly (Eq. 13.27); the conformance suite pins the recovered AM
-envelope and the Table 13.1 pair `cos → sin` at the 1e-9 level, and the
-instantaneous frequency of a chirp tracks its sweep.
+For an amplitude-modulated carrier $u(t)\cos(2\pi f_0 t)$ the envelope
+recovers $u(t)$ exactly (Eq. 13.27); the conformance suite pins the
+recovered AM envelope and the Table 13.1 pair $\cos \to \sin$ at the
+1e-9 level, and the instantaneous frequency of a chirp tracks its sweep.
 
 ```python
 from phonometry import envelope
@@ -410,8 +412,8 @@ of their Table I; the peak-location uncertainty of Eq. 8.129;
 `envelope` with instantaneous phase and frequency (Chapter 13).
 
 **Not covered.** `correlation` and `time_delay` model a single common-path
-delay between exactly two sensors (the `y(t) = α·x(t-τ0) + n(t)` model of
-Eq. 5.21). A record with several arrivals (multipath, a direct path plus
+delay between exactly two sensors (the $y(t) = \alpha\,x(t-\tau_0) + n(t)$
+model of Eq. 5.21). A record with several arrivals (multipath, a direct path plus
 reflections) is not separated automatically: `time_delay` and the direct
 correlator report only the single largest peak, the same limitation
 `echo_detection` names on the cepstrum in [Cepstrum, echoes and the envelope

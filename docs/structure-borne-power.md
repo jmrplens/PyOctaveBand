@@ -6,11 +6,11 @@ Building service equipment (pumps, fans, boilers, sanitary appliances)
 injects **structure-borne sound power** into the building structure it is fixed
 to, which then re-radiates as airborne noise in adjoining rooms. **EN 15657:2018**
 measures it with the **reception-plate method**: the source is mounted on a
-plate of known mass per unit area `m` and area `S` whose structural loss factor
-`η` is known, and the plate's spatial-average vibratory velocity is measured.
-Formula (14) gives the power *injected into that particular plate*; the
-plate-independent source quantities (the equivalent blocked force,
-Formula 15; the characteristic reception-plate power level `L_Wsn`,
+plate of known mass per unit area $m$ and area $S$ whose structural loss
+factor $\eta$ is known, and the plate's spatial-average vibratory velocity is
+measured. Formula (14) gives the power *injected into that particular plate*;
+the plate-independent source quantities (the equivalent blocked force,
+Formula 15; the characteristic reception-plate power level $L_{Wsn}$,
 Formula 17; and the equivalent free velocity and source mobility,
 Formulae 18/19) are derived from it and are what the EN 12354-5
 installed-equipment prediction consumes.
@@ -65,7 +65,8 @@ velocity replaces the entire force-measurement problem.
 
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_reception_plate_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_reception_plate.svg" alt="EN 15657 reception plate: the source machine standing on a resiliently supported plate, accelerometers averaging the plate velocity, and the plate power balance converting the velocity level into the injected structure-borne power level" width="92%"></picture>
 
-The power a resonant plate dissipates is `P = ω·η·(m·S)·⟨v²⟩`, so the injected
+The power a resonant plate dissipates is
+$P = \omega\,\eta\,(m S)\,\langle v^2 \rangle$, so the injected
 power level in one-third-octave bands is (Formula 14)
 
 $$
@@ -73,11 +74,12 @@ L_{Ws} = 10\lg\!\left(\frac{2\pi f\,\eta\,m\,S}{f_0\,m_0\,S_0}\right)
          + L_v - 60 \;\;[\mathrm{dB\ re\ 1\ pW}],
 $$
 
-with references `f₀ = 1 Hz`, `m₀ = 1 kg`, `S₀ = 1 m²`; the `−60 dB` term is
-`10 lg(v₀²/P₀)` for the EN 15657 velocity reference `v₀ = 10⁻⁹ m/s`. The plate
-velocity is the energetic spatial average over the `N` positions (Formula 12)
-and the loss factor comes from the structural reverberation time `Ts` (Formula
-13, identical to the ISO 10848 total loss factor):
+with references $f_0 = 1\ \text{Hz}$, $m_0 = 1\ \text{kg}$,
+$S_0 = 1\ \text{m}^2$; the $-60\ \text{dB}$ term is $10\lg(v_0^2/P_0)$ for
+the EN 15657 velocity reference $v_0 = 10^{-9}\ \text{m/s}$. The plate
+velocity is the energetic spatial average over the $N$ positions (Formula 12)
+and the loss factor comes from the structural reverberation time $T_s$
+(Formula 13, identical to the ISO 10848 total loss factor):
 
 $$
 L_v = 10\lg\!\Big(\tfrac{1}{N}\textstyle\sum 10^{L_{v,i}/10}\Big), \qquad
@@ -115,10 +117,10 @@ for the EN 12354-5 model through the conversion chain below.
 
 ## 3. From plate power to source quantities (Formulae 15–19)
 
-The plate-injected `L_Ws` is **not** a source descriptor: the same source
+The plate-injected $L_{Ws}$ is **not** a source descriptor: the same source
 injects a different power into a different receiver. EN 15657 derives the
 plate-independent quantities: the **equivalent blocked force level**
-(Formula 15, re `F₀ = 10⁻⁶ N`) from the low-mobility plate,
+(Formula 15, re $F_0 = 10^{-6}\ \text{N}$) from the low-mobility plate,
 
 $$
 L_{Fb,eq} = L_{Ws,\mathrm{low}} - 10\lg\frac{\mathrm{Re}\{Y_{R,\mathrm{low,eq}}\}}{Y_0},
@@ -126,18 +128,20 @@ $$
 
 the **characteristic reception-plate power level** that EN 12354-5 consumes
 (Formula 17), referred to the standard 10 cm concrete plate of characteristic
-mobility `Y_R,∞,low = 5·10⁻⁶ m/(N·s)` (clause 7.2.4),
+mobility $Y_{R,\infty,\text{low}} = 5\times10^{-6}\ \text{m/(N·s)}$
+(clause 7.2.4),
 
 $$
 L_{Wsn} = L_{Fb,eq} + 10\lg\frac{Y_{R,\infty,\mathrm{low}}}{Y_0},
 $$
 
 and, from the high-mobility plate, the **equivalent free velocity level**
-(Formula 18, re `10⁻⁹ m/s`) and the **source mobility** `|Y_S,eq|`
+(Formula 18, re $10^{-9}\ \text{m/s}$) and the **source mobility**
+$|Y_{S,\text{eq}}|$
 (Formula 19). The EN 12354-5 Annex I mobility correction
 (`installed_power_from_reception_plate`, see
 [installed structure-borne sound](installed-structure-borne.md)) then refers
-`L_Wsn` to the actual receiving element.
+$L_{Wsn}$ to the actual receiving element.
 
 ```python
 from phonometry import building
@@ -155,7 +159,8 @@ print(float(building.source_mobility_from_levels(lvf, lfb)))      # |Y_S,eq| in 
 ```
 
 The direct source-side counterpart is the ISO 9611 free velocity level (re
-`v₀ = 5·10⁻⁸ m/s`) measured at the contact points of resiliently mounted
+$v_0 = 5\times10^{-8}\ \text{m/s}$) measured at the contact points of
+resiliently mounted
 machinery; its equation (9) position average is `mean_free_velocity_level()`.
 
 ## 4. The characterization report (`.report()`)
@@ -165,18 +170,18 @@ writes a one-page PDF fiche laid out like a sound-power test sheet: the
 standard-basis line naming the EN 15657:2018 reception-plate method (Formula
 14), an optional metadata header (client, source equipment, test environment,
 instrumentation, climate, date), a per-band table (nominal
-octave/one-third-octave frequency, the spatial mean plate velocity level `Lv`
-and the injected structure-borne sound power level `L_Ws`), the `L_Ws(f)`
-spectrum with a nominal band axis, and a boxed band-summed total `L_Ws` (dB re
-1 pW) with the plate mass per area `m` and area `S`.
+octave/one-third-octave frequency, the spatial mean plate velocity level $L_v$
+and the injected structure-borne sound power level $L_{Ws}$), the $L_{Ws}(f)$
+spectrum with a nominal band axis, and a boxed band-summed total $L_{Ws}$ (dB re
+1 pW) with the plate mass per area $m$ and area $S$.
 
 The relevant `ReportMetadata` fields are `client`, `specimen` (the source
 equipment), `test_room` (the test environment), `instrumentation`,
 `temperature`, `relative_humidity`, `pressure`, `test_date` and the footer
 identity `laboratory`, `operator`, `report_id` and `notes`; the plate mass and
 area come from the result itself. Supplying `requirement` adds a PASS/FAIL
-verdict against a declared upper limit on the total `L_Ws` (lower is better).
-`verbose=True` adds the plate loss factor `eta` column, and `language="es"`
+verdict against a declared upper limit on the total $L_{Ws}$ (lower is better).
+`verbose=True` adds the plate loss factor $\eta$ column, and `language="es"`
 renders the Spanish fiche. The basis strip states Formula 14 and the conversion
 to the plate-independent source quantities (Formulae 15/17) required before
 EN 12354-5. Rendering needs the optional `phonometry[report]` extra (reportlab),
@@ -233,13 +238,14 @@ EN 15657:2018, *Acoustic properties of building elements and
 buildings — Laboratory measurement of structure-borne sound from building
 service equipment for all installation conditions*: the reception-plate method
 (clause 7), the spatial mean velocity level (Formula 12), the plate loss factor
-`η = 2.2/(f·Ts)` (Formula 13), the plate-injected power level `L_Ws`
+$\eta = 2.2/(f\,T_s)$ (Formula 13), the plate-injected power level $L_{Ws}$
 (Formula 14) and the source-quantity chain: equivalent blocked force
 (Formula 15), characteristic reception-plate power level (Formula 17,
-`Y_R,∞,low = 5·10⁻⁶ m/(N·s)`), equivalent free velocity (Formula 18) and
-source mobility (Formula 19). ISO 9611:1996: the free-velocity source
-characterization (equation (9), `v₀ = 5·10⁻⁸ m/s`). The plate velocity levels
-are referred to `v₀ = 10⁻⁹ m/s`. Conformance is anchored on the resonant-plate
-power balance `P = ω·η·(m·S)·⟨v²⟩` (of which Formula 14 is the level), the
-loss-factor identity, and the EN 12354-5 Annex I.3 Table I.8 conversion of the
-flushing-cistern source.
+$Y_{R,\infty,\text{low}} = 5\times10^{-6}\ \text{m/(N·s)}$), equivalent free
+velocity (Formula 18) and source mobility (Formula 19). ISO 9611:1996: the
+free-velocity source characterization (equation (9),
+$v_0 = 5\times10^{-8}\ \text{m/s}$). The plate velocity levels are referred to
+$v_0 = 10^{-9}\ \text{m/s}$. Conformance is anchored on the resonant-plate
+power balance $P = \omega\,\eta\,(m S)\,\langle v^2 \rangle$ (of which
+Formula 14 is the level), the loss-factor identity, and the EN 12354-5
+Annex I.3 Table I.8 conversion of the flushing-cistern source.

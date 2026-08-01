@@ -34,9 +34,9 @@ import ThemeImage from '../../../../components/ThemeImage.astro';
 Lo *molesto* que resulta un sonido depende de algo más que de su sonoridad.
 Fastl y Zwicker, *Psychoacoustics: Facts and Models*, combinan cuatro
 sensaciones psicoacústicas (**sonoridad**, **agudeza**, **aspereza** e
-**intensidad de fluctuación**) en una única **molestia psicoacústica** `PA`, un
+**intensidad de fluctuación**) en una única **molestia psicoacústica** $PA$, un
 escalar que crece con la sonoridad y se eleva aún más cuando el sonido es agudo,
-áspero o fluctúa lentamente. Esta página cubre el modelo exacto de `PA`
+áspero o fluctúa lentamente. Esta página cubre el modelo exacto de $PA$
 (Ecs 16.2–16.4), la **intensidad de fluctuación** que consume, tanto la forma
 cerrada para ruido de banda ancha modulado en amplitud (Ec. 10.2) como el modelo
 de señal de Osses et al. (2016), y la utilidad que deriva las cuatro sensaciones
@@ -78,21 +78,21 @@ plt.show()
 La molestia psicoacústica se apoya en cuatro sensaciones auditivas, cada una con
 su propio modelo y unidad en la biblioteca:
 
-- **Sonoridad**: la sonoridad percentil `N5` (la sonoridad superada el 5 % del
+- **Sonoridad**: la sonoridad percentil $N_5$ (la sonoridad superada el 5 % del
   tiempo), en **sonios**, del modelo Zwicker variable en el tiempo de la ISO
   532-1 (`loudness_zwicker`, véase [Sonoridad](/phonometry/es/guides/loudness/)).
-- **Agudeza** `S`, en **acum**: el balance espectral hacia las altas
+- **Agudeza** $S$, en **acum**: el balance espectral hacia las altas
   frecuencias, DIN 45692 (`sharpness_din`).
-- **Aspereza** `R`, en **asper**: la dureza de la modulación de amplitud rápida
+- **Aspereza** $R$, en **asper**: la dureza de la modulación de amplitud rápida
   (~70 Hz), modelo de Sottek ECMA-418-2 (`roughness_ecma`).
-- **Intensidad de fluctuación** `F`, en **vacil**: la sensación de fluctuación
+- **Intensidad de fluctuación** $F$, en **vacil**: la sensación de fluctuación
   lenta (~4 Hz) de la sonoridad (§3 más abajo).
 
 ## 2. Molestia psicoacústica (Ecs 16.2–16.4)
 
-El modelo exacto (Fastl y Zwicker Ec. 16.2; origen Widmann 1992) escala `N5` por
-un factor que crece con la ponderación de agudeza `wS` y la ponderación combinada
-de aspereza/fluctuación `wFR`:
+El modelo exacto (Fastl y Zwicker Ec. 16.2; origen Widmann 1992) escala $N_5$
+por un factor que crece con la ponderación de agudeza $w_S$ y la ponderación
+combinada de aspereza/fluctuación $w_{FR}$:
 
 $$
 PA = N_5\left(1 + \sqrt{w_S^2 + w_{FR}^2}\right), \qquad
@@ -100,8 +100,9 @@ w_S = (S - 1{,}75)\,0{,}25\,\lg(N_5 + 10)\ \ (S > 1{,}75\ \mathrm{acum}), \qquad
 w_{FR} = \frac{2{,}18}{N_5^{0{,}4}}\,(0{,}4\,F + 0{,}6\,R).
 $$
 
-`wS` es cero para `S ≤ 1,75 acum` (la agudeza solo añade molestia por encima de
-ese umbral); `wFR` pondera la aspereza con más peso que la intensidad de
+$w_S$ es cero para $S \le 1{,}75\ \text{acum}$ (la agudeza solo añade molestia
+por encima de
+ese umbral); $w_{FR}$ pondera la aspereza con más peso que la intensidad de
 fluctuación (0,6 frente a 0,4). `psychoacoustic_annoyance` toma las cuatro
 magnitudes directamente y devuelve la molestia junto con las dos ponderaciones
 intermedias:
@@ -116,8 +117,9 @@ print(round(res.w_s, 4), round(res.w_fr, 4))   # 0.1001 0.2125
 res.plot()   # PA junto a sus ponderaciones wS y wFR (necesita matplotlib)
 ```
 
-La figura de arriba barre `PA` frente a `N5` para tres perfiles: una base neutra
-(`S = 1,75 acum`, `F = R = 0`, de modo que `PA = N5`), un sonido agudo y un
+La figura de arriba barre $PA$ frente a $N_5$ para tres perfiles: una base
+neutra ($S = 1{,}75\ \text{acum}$, $F = R = 0$, de modo que $PA = N_5$), un
+sonido agudo y un
 sonido áspero y fluctuante, ambos elevados sobre la base, con el ejemplo
 resuelto marcado.
 
@@ -130,9 +132,10 @@ sensación.
 ### 2.1 A partir de una señal (estimación de ingeniería)
 
 `psychoacoustic_annoyance_from_signal` es una utilidad que deriva las cuatro
-sensaciones a partir de una señal de presión calibrada y las combina: `N5` de la
-sonoridad Zwicker variable en el tiempo de la ISO 532-1, `S` de la agudeza DIN
-45692, `R` de la aspereza de Sottek ECMA-418-2 y `F` del modelo de señal de
+sensaciones a partir de una señal de presión calibrada y las combina: $N_5$ de
+la sonoridad Zwicker variable en el tiempo de la ISO 532-1, $S$ de la agudeza
+DIN 45692, $R$ de la aspereza de Sottek ECMA-418-2 y $F$ del modelo de señal
+de
 intensidad de fluctuación.
 
 ```python
@@ -146,8 +149,8 @@ res.plot()   # la misma vista PA / wS / wFR, ahora con las cuatro sensaciones de
 
 :::caution
 **Advertencia sobre la mezcla de modelos.** Este compuesto mezcla familias de
-modelos: `N5` y `S` de la familia Zwicker, `R` de Sottek y `F` de Osses. El
-modelo `PA` se calibró con sensaciones de la familia Zwicker, así que trate la
+modelos: $N_5$ y $S$ de la familia Zwicker, $R$ de Sottek y $F$ de Osses. El
+modelo $PA$ se calibró con sensaciones de la familia Zwicker, así que trate la
 utilidad de señal como una *estimación de ingeniería*. Para resultados exactos y
 reproducibles, calcule las cuatro magnitudes con los modelos en los que confíe y
 páselas directamente a `psychoacoustic_annoyance` (la función de cuatro
@@ -156,12 +159,13 @@ argumentos es el modelo exacto).
 
 ## 3. Intensidad de fluctuación
 
-La **intensidad de fluctuación** `F` (vacil) cuantifica la percepción de la
+La **intensidad de fluctuación** $F$ (vacil) cuantifica la percepción de la
 fluctuación *lenta* de la sonoridad. Como la aspereza, es una sensación de paso
 de banda de la frecuencia de modulación, pero su máximo se sitúa aproximadamente
-un orden de magnitud más abajo, en `fmod ≈ 4 Hz` en lugar del máximo de la
+un orden de magnitud más abajo, en $f_{mod} \approx 4\ \text{Hz}$ en lugar del
+máximo de la
 aspereza en ~70 Hz. Por definición, un tono de 1 kHz a 60 dB, modulado en
-amplitud al 100 % a 4 Hz, produce `1 vacil`. Esta página cubre los modelos de
+amplitud al 100 % a 4 Hz, produce 1 vacil. Esta página cubre los modelos de
 Fastl y Zwicker; la intensidad de fluctuación normativa del modelo de Sottek
 (cláusula 9 de ECMA-418-2) está en
 [Métricas de calidad sonora](/phonometry/es/guides/sound-quality/).
@@ -209,17 +213,18 @@ plt.show()
 ### 3.1 Forma cerrada para ruido de banda ancha AM (Ec. 10.2)
 
 Para ruido de banda ancha modulado sinusoidalmente en amplitud, Fastl y Zwicker
-dan una forma cerrada (Ec. 10.2) en función del factor de modulación `m`, el
-nivel `L` y la frecuencia de modulación `fmod`:
+dan una forma cerrada (Ec. 10.2) en función del factor de modulación $m$, el
+nivel $L$ y la frecuencia de modulación $f_{mod}$:
 
 $$
 F = \frac{5{,}8\,(1{,}25\,m - 0{,}25)\,[0{,}05\,(L/\mathrm{dB}) - 1]}
 {(f_{mod}/5\,\mathrm{Hz})^2 + (4\,\mathrm{Hz}/f_{mod}) + 1{,}5}\ \ \mathrm{vacil}.
 $$
 
-El denominador es el paso de banda a `4 Hz`: alcanza su mínimo cerca de
-`fmod ≈ 3,7 Hz` y crece a ambos lados. El resultado se limita a `0` (la sensación
-desaparece por debajo de ~20 dB o `m < 0,2`). Esta forma exacta es el valor a
+El denominador es el paso de banda a 4 Hz: alcanza su mínimo cerca de
+$f_{mod} \approx 3{,}7\ \text{Hz}$ y crece a ambos lados. El resultado se
+limita a 0 (la sensación
+desaparece por debajo de ~20 dB o $m < 0{,}2$). Esta forma exacta es el valor a
 citar para el ruido de banda ancha AM.
 
 ```python
@@ -232,8 +237,9 @@ print(round(psychoacoustics.fluctuation_strength_am_noise(60.0, 1.0, 4.0), 4))  
 
 `fluctuation_strength` implementa el modelo de señal de Osses et al. (2016):
 construye un patrón de excitación sobre 47 filtros auditivos, extrae la
-modulación de envolvente de `~4 Hz` por banda, la pondera y la combina, y devuelve
-la `F` global (vacil) junto con la intensidad de fluctuación específica sobre el
+modulación de envolvente de ~4 Hz por banda, la pondera y la combina, y
+devuelve
+la $F$ global (vacil) junto con la intensidad de fluctuación específica sobre el
 eje de Bark y la traza dependiente del tiempo.
 
 ```python
@@ -291,13 +297,14 @@ que admite la forma cerrada única.
 :::note
 **Sin norma numérica.** La intensidad de fluctuación no tiene norma ISO/IEC. Esta
 es una implementación clean-room a partir del artículo de Osses 2016, calibrada
-para que el tono AM de `1 kHz / 60 dB / m = 1 / 4 Hz` marque `1,00 vacil` por
+para que el tono AM de 1 kHz / 60 dB / $m = 1$ / 4 Hz marque 1,00 vacil por
 construcción, y contrastada con los valores de la literatura de la Tabla 1 de
 Osses 2016 y con la referencia abierta SQAT (usada solo como oráculo numérico).
-En el barrido de tono AM a `70 dB` `fmod ∈ {1, 2, 4, 8, 16, 32} Hz` da
+En el barrido de tono AM a 70 dB
+$f_{mod} \in \{1, 2, 4, 8, 16, 32\}\ \text{Hz}$ da
 `[0,40, 0,79, 1,09, 1,05, 0,17, 0,09]` vacil frente a la literatura
-`[0,39, 0,84, 1,25, 1,30, 0,36, 0,06]` (`r` de Pearson `= 0,98`, máximo correcto a
-`4 Hz`, dentro de ~2,1×). La exactitud para tonos FM no se persigue explícitamente.
+`[0,39, 0,84, 1,25, 1,30, 0,36, 0,06]` ($r$ de Pearson $= 0{,}98$, máximo
+correcto a 4 Hz, dentro de ~2,1×). La exactitud para tonos FM no se persigue explícitamente.
 Para **ruido de banda ancha AM** el modelo de señal sobreestima el nivel absoluto
 (reparte la energía modulada entre las bandas); cite la forma cerrada
 `fluctuation_strength_am_noise` (§3.1) para ese estímulo.
@@ -306,14 +313,14 @@ Para **ruido de banda ancha AM** el modelo de señal sobreestima el nivel absolu
 ## Qué cubre esta guía
 
 **Cubierto.** Fastl y Zwicker, en *Psychoacoustics: Facts and Models*, dan el
-modelo exacto de `PA`, Ecs 16.2-16.4 (origen Widmann 1992), que ejecuta
+modelo exacto de $PA$, Ecs 16.2-16.4 (origen Widmann 1992), que ejecuta
 `psychoacoustic_annoyance`. También dan la forma cerrada para ruido de banda
 ancha AM, Ec. 10.2, que ejecuta `fluctuation_strength_am_noise`. El modelo de
 señal de Osses et al. (2016) para la intensidad de fluctuación se ejecuta
 como `fluctuation_strength`, contrastado con los valores de su Tabla 1 y con
 la referencia SQAT. `psychoacoustic_annoyance_from_signal` deriva las cuatro
-magnitudes a partir de una señal (`N5` Zwicker de la ISO 532-1, `S` de la DIN
-45692, `R` de ECMA-418-2) y las combina con el modelo exacto.
+magnitudes a partir de una señal ($N_5$ Zwicker de la ISO 532-1, $S$ de la DIN
+45692, $R$ de ECMA-418-2) y las combina con el modelo exacto.
 
 **No cubierto.** El modelo de Osses 2016 no persigue explícitamente su
 exactitud para tonos FM. Aquí solo se validan estímulos AM. El front-end

@@ -34,7 +34,7 @@ models end to end, from the fan sound power to the room criterion, is
   (ASHRAE Table 8.14, interpolated over diameter and frequency; it passes
   exactly through the tabulated nodes).
 - `elbow_insertion_loss` — the insertion loss per bend for square/round,
-  vaned/unvaned and lined/unlined elbows keyed by `W / lambda` (ASHRAE
+  vaned/unvaned and lined/unlined elbows keyed by $W/\lambda$ (ASHRAE
   Table 8.11).
 - `plenum_attenuation` — the plenum-chamber transmission loss by Wells' method
   (Eq. (8.275)), whose reverberant term uses the plenum
@@ -91,14 +91,14 @@ plt.show()
 </details>
 
 Wells' plenum formula takes only two truly geometric inputs, the
-inlet-to-outlet line of sight `r` and the outlet area, plus the lined wall
-area; `plot_plenum_geometry` draws exactly those, honouring `r` and its
+inlet-to-outlet line of sight $r$ and the outlet area, plus the lined wall
+area; `plot_plenum_geometry` draws exactly those, honouring $r$ and its
 angle off the inlet axis.
 
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/plenum_geometry_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/plenum_geometry.svg" alt="Section of a plenum chamber: the inlet duct enters low on the left, the outlet mouth is marked on the right wall, the 1.2 m inlet-to-outlet line of sight is drawn as a dashed diagonal at 0.35 rad off the inlet axis, and the wall area of 6 square metres and outlet area of 0.09 square metres are annotated below" width="88%"></picture>
 
-*Only `r` and its angle off the inlet axis fix the drawn box; `S_out` and
-`S_w` enter Wells' method as bare areas, so any plenum sharing these four
+*Only $r$ and its angle off the inlet axis fix the drawn box; $S_\text{out}$
+and $S_w$ enter Wells' method as bare areas, so any plenum sharing these four
 numbers has the same predicted attenuation.*
 
 <details>
@@ -115,28 +115,28 @@ plt.show()
 
 </details>
 
-Rectangular ducts use the equivalent diameter `D = sqrt(4 S / pi)`. Bies 5th
+Rectangular ducts use the equivalent diameter $D = \sqrt{4S/\pi}$. Bies 5th
 ed. gives the duct end reflection only as the ASHRAE table (no closed form in
 that edition); this module reproduces and interpolates it.
 
 ## 2. Machine enclosures
 
 A sealed enclosure reduces the radiated noise by its panel transmission loss
-`R`, minus a penalty `C` for the reverberant build-up inside the small, hard
+$R$, minus a penalty $C$ for the reverberant build-up inside the small, hard
 cavity (Bies Eqs. (7.103), (7.111)):
 
-```text
-IL = R - C ,   C = 10 log10( 0.3 + S_E / R_i ) ,
-```
+$$
+\mathrm{IL} = R - C,\qquad C = 10\log_{10}\!\left(0.3 + \frac{S_E}{R_i}\right),
+$$
 
-with the external area `S_E` and the interior room constant
-`R_i = S_i alpha_i / (1 - alpha_i)` (the same `room_constant` as the
-steady-state room field). A hard interior wastes much of the panel `R`; lining
-it drives `C` toward its floor `10 log10 0.3 = -5.2 dB`.
+with the external area $S_E$ and the interior room constant
+$R_i = S_i \alpha_i/(1-\alpha_i)$ (the same `room_constant` as the
+steady-state room field). A hard interior wastes much of the panel $R$; lining
+it drives $C$ toward its floor $10\log_{10}0.3 = -5.2$ dB.
 
-**The panel transmission loss `R` is supplied by the caller** — measured, or
+**The panel transmission loss $R$ is supplied by the caller** — measured, or
 predicted by a panel model — as a per-band array or a callable of frequency.
-This module never predicts `R` itself; it combines a given `R` with the
+This module never predicts $R$ itself; it combines a given $R$ with the
 interior absorption.
 
 ```python
@@ -153,7 +153,7 @@ enc.plot()
 
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/enclosure_insertion_loss_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/enclosure_insertion_loss.svg" alt="Machine-enclosure insertion loss per octave band: the measured panel sound reduction index R as a dashed line, the flat interior correction C near 5 dB for a lined interior, and the net insertion loss IL equal to R minus C tracking about 5 dB below the panel curve" width="88%"></picture>
 
-*What the enclosure delivers is `R − C`, not the panel `R`: even this lined
+*What the enclosure delivers is $R - C$, not the panel $R$: even this lined
 interior (mean absorption 0.3) costs about 5 dB of the panel's rating in every
 band, and a hard, unlined interior would cost far more. Budget the lining
 together with the panels, not as an afterthought.*

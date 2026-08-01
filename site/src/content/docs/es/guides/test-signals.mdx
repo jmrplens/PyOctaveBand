@@ -65,7 +65,7 @@ conmutación y la contabilidad exacta de muestras (`burst_samples`,
 `onset_sample`, `period_samples`, `duty_cycle`), de modo que un informe de
 ensayo puede declarar su estímulo numéricamente. Como la puerta abarca un
 número entero de períodos completos empezando en un paso por cero, la
-energía de la salva tiene la forma cerrada exacta `A²N/2`, que es como se
+energía de la salva tiene la forma cerrada exacta $A^2 N/2$, que es como se
 verifica el generador.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/tone_burst_train_es.svg" alt="Salvas de tono IEC 60268-1: una salva única de 5 ms de tono de 5 kHz que comienza en un paso por cero con su envolvente rectangular de conmutación, y un tren repetitivo de cuatro salvas a 10 salvas por segundo con un ciclo de trabajo del 5 por ciento" width="82%" loading="eager" />
@@ -124,7 +124,7 @@ ventana de Kaiser, a partir de dos números que controla quien llama:
 - `transition_width` (por defecto 0,05): la fracción de esa frecuencia de
   Nyquist cedida a la banda de transición del filtro, de modo que la banda
   de paso termina en `(1 - transition_width)·f_Nyq` y es plana dentro de la
-  misma cota de rizado de Kaiser `δ = 10^(-A/20)`.
+  misma cota de rizado de Kaiser $\delta = 10^{-A/20}$.
 
 ```python
 from phonometry import noise_signal, resample_signal
@@ -193,7 +193,7 @@ diseño apunta internamente 1 dB más allá de lo pedido, de modo que el filtro
 entregado cumple los números declarados y no una aproximación de la fórmula
 de Kaiser). Un tono en banda de paso remuestreado con la especificación por
 defecto coincide con el tono analítico a la nueva frecuencia dentro de
-`10^(-120/20) = 10^-6`.
+$10^{-120/20} = 10^{-6}$.
 
 Varios estimadores remuestrean internamente a frecuencias fijas (la
 psicoacústica ECMA-418-2 a 48 kHz, STOI a 10 kHz); esta función es la
@@ -204,7 +204,7 @@ cadenas.
 
 `fractional_delay` desplaza un registro cualquier número de muestras,
 incluidas fracciones de muestra, multiplicando el espectro por la rampa de
-fase `e^(-j2πf·D/fs)`: cada componente se retrasa exactamente `D` muestras.
+fase $e^{-j 2\pi f D/f_s}$: cada componente se retrasa exactamente `D` muestras.
 Dos convenciones de frontera cubren los dos casos de uso:
 
 - `mode="linear"` (por defecto) rellena el registro con ceros más allá del
@@ -217,7 +217,7 @@ Dos convenciones de frontera cubren los dos casos de uso:
   vuelta. Para registros periódicos es exacto: un tono centrado en un bin
   de la DFT retrasado `D` muestras es igual al tono retrasado
   analíticamente con precisión de máquina, y su fase cambia exactamente
-  `-2πf·D/fs` radianes.
+  $-2\pi f D/f_s$ radianes.
 
 ```python
 import numpy as np
@@ -276,6 +276,6 @@ exactitud son formas cerradas, no normativas.
 
 - [Ponderación temporal](/phonometry/es/guides/time-weighting/): la balística de detector que ejercitan las salvas de tono (IEC 61672-1, Tabla 4).
 - [Correlación y retardo](/phonometry/es/guides/correlation-delay/): el trabajo de alineación construido sobre el núcleo de retardo fraccionario.
-- [Promediado síncrono](/phonometry/es/guides/synchronous-averaging/): alineación de períodos con el mismo desplazamiento de banda limitada cuando `fs·T` no es entero.
+- [Promediado síncrono](/phonometry/es/guides/synchronous-averaging/): alineación de períodos con el mismo desplazamiento de banda limitada cuando $f_s T$ no es entero.
 - [Análisis espectral](/phonometry/es/guides/spectral-analysis/): la verificación del ruido de colores y las métricas de ventanas.
 - Referencia de la API: [`metrology.signals`](/phonometry/es/reference/api/spectra/signals/).

@@ -150,7 +150,7 @@ repository. Click the preview to open the PDF:
 
 ## 2. Absorption areas from room decay times
 
-The equivalent absorption area `A` that drives `R'`, `L'n`, the ISO 3744 `K2`
+The equivalent absorption area $A$ that drives $R'$, $L'_n$, the ISO 3744 $K_2$
 environmental correction and the ISO 3741 absorption term is itself measured in
 a reverberation room (ISO 354).
 Measure the room's reverberation time **empty** ($T_1$) and again **with the
@@ -186,7 +186,7 @@ alpha = materials.absorption_coefficient(t1, t2, volume=200.0, sample_area=10.8,
 print(np.round(alpha, 3))                      # [0.398 0.448 0.498]
 ```
 
-`T1` and `T2` are exactly the reverberation times
+$T_1$ and $T_2$ are exactly the reverberation times
 [`room_parameters`](room-acoustics.md) returns, so an ISO 3382-2 decay
 measurement of the empty and treated room flows straight into
 `absorption_coefficient`. A room volume below the 150 m³ minimum or a
@@ -198,15 +198,15 @@ still returns.
 | Parameter | Type | Units | Range / default | Notes |
 | :--- | :--- | :--- | :--- | :--- |
 | `t60` / `t1`, `t2` | 1D array | s | > 0 | Reverberation time(s); `t1` empty, `t2` with specimen |
-| `volume` | float | m³ | > 0 | Room volume `V` (advisory below 150 m³) |
-| `sample_area` | float | m² | > 0 | Area `S` the specimen covers (coefficient only) |
-| `temperature` / `temperature1`, `temperature2` | float | °C | default `20.0`, 15–30 | Sets `c` via Eq. (6); `temperature2` defaults to `temperature1` |
-| `speed_of_sound` (`…1`, `…2`) | float, optional | m/s | > 0 | Overrides the temperature-derived `c` |
+| `volume` | float | m³ | > 0 | Room volume $V$ (advisory below 150 m³) |
+| `sample_area` | float | m² | > 0 | Area $S$ the specimen covers (coefficient only) |
+| `temperature` / `temperature1`, `temperature2` | float | °C | default `20.0`, 15–30 | Sets $c$ via Eq. (6); `temperature2` defaults to `temperature1` |
+| `speed_of_sound` (`…1`, `…2`) | float, optional | m/s | > 0 | Overrides the temperature-derived $c$ |
 | `m` (`m1`, `m2`) | float or 1D array | 1/m | ≥ 0, default `0` | Air power attenuation coefficient |
 
-`absorption_area()` returns the equivalent absorption area `A` (m²) with the
-shape of `t60`; `absorption_coefficient()` returns `alpha_s`;
-`attenuation_from_alpha(alpha)` converts an ISO 9613-1 `alpha` (dB/m) to `m`.
+`absorption_area()` returns the equivalent absorption area $A$ (m²) with the
+shape of `t60`; `absorption_coefficient()` returns $\alpha_s$;
+`attenuation_from_alpha(alpha)` converts an ISO 9613-1 $\alpha$ (dB/m) to $m$.
 
 
 ## 3. Weighted rating and absorption class (ISO 11654)
@@ -249,9 +249,9 @@ ranges partition the grid exactly.
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/absorption_rating_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/absorption_rating.svg" alt="ISO 11654 weighted sound absorption rating: the practical absorption spectrum plotted against the shifted reference curve over 250 Hz to 4000 Hz, with the unfavourable deviation at 250 Hz shaded and the weighted coefficient alpha_w read at 500 Hz" width="80%"></picture>
 
 *The Annex A.2 worked example: the reference curve is shifted down by 0.40 until
-the unfavourable deviations sum to 0.05 (≤ 0.10), giving $\alpha_w = 0.60$; the
-500 Hz peak overshoots the shifted curve by ≥ 0.25, adding the `M` indicator, so
-the rating is $0.60(\text{M})$, class C.*
+the unfavourable deviations sum to 0.05 ($\le 0.10$), giving $\alpha_w = 0.60$;
+the 500 Hz peak overshoots the shifted curve by $\ge 0.25$, adding the `M`
+indicator, so the rating is $0.60(\text{M})$, class C.*
 
 <details>
 <summary>Show the code for this figure</summary>
@@ -429,30 +429,32 @@ budget systematically underpredicts the installed absorption.
 ## 4. Sound-absorption measurement uncertainty (ISO 12999-2)
 
 A rated absorption coefficient means little without its uncertainty. ISO
-12999-2:2020 gives the standard uncertainty `u` of the quantities produced by a
+12999-2:2020 gives the standard uncertainty $u$ of the quantities produced by a
 reverberation-room measurement (ISO 354) and its ratings (ISO 11654, EN 1793-1),
 estimated from inter-laboratory tests to ISO 5725. It is the sound-absorption
 companion of the sound-insulation uncertainty of ISO 12999-1
 ([Field Insulation Measurement (ISO 16283)](insulation-field.md)).
 
 **One-third-octave bands (Clause 5).** For the sound-absorption coefficient the
-reproducibility standard deviation is `σR = m·αs + n` (Formula (1)), and for the
-equivalent absorption area `σR = m·AT + n·S` with `S = 10 m²` (Formula (2)), where
-`m` and `n` are the frequency-dependent constants of Table 1 (63–5000 Hz). The
-repeatability value is `σr = 0.6·σR` (Formula (3)).
+reproducibility standard deviation is $\sigma_R = m\,\alpha_s + n$ (Formula (1)),
+and for the equivalent absorption area $\sigma_R = m\,A_T + n\,S$ with
+$S = 10\ \text{m}^2$ (Formula (2)), where $m$ and $n$ are the frequency-dependent
+constants of Table 1 (63–5000 Hz). The repeatability value is
+$\sigma_r = 0.6\,\sigma_R$ (Formula (3)).
 
 **Practical coefficient (Clause 6).** For the ISO 11654 practical coefficient
-`σR = m·αp + n` in octave bands with the constants of Table 2 (250–4000 Hz);
-again `σr = 0.6·σR`.
+$\sigma_R = m\,\alpha_p + n$ in octave bands with the constants of Table 2
+(250–4000 Hz); again $\sigma_r = 0.6\,\sigma_R$.
 
-**Single numbers (Clause 7).** The weighted coefficient `αw` has a constant
-standard uncertainty (`σR = 0.035`, `σr = 0.020`); the EN 1793-1 single-number
-rating `DLα,NRD` scales with the value (`σR = 0.10·DLα`, `σr = 0.02·DLα`).
+**Single numbers (Clause 7).** The weighted coefficient $\alpha_w$ has a constant
+standard uncertainty ($\sigma_R = 0.035$, $\sigma_r = 0.020$); the EN 1793-1
+single-number rating $DL_{\alpha,\text{NRD}}$ scales with the value
+($\sigma_R = 0.10\,DL_\alpha$, $\sigma_r = 0.02\,DL_\alpha$).
 
-**Reporting (Clause 8).** The expanded uncertainty is `U = k·u` (Formula (10))
-with the Table 3 coverage factor `k` (`k = 2.0` at 95 %, Gaussian). The reported
-`U` is rounded to two decimals for absorption coefficients and one decimal for
-the equivalent area and `DLα,NRD`.
+**Reporting (Clause 8).** The expanded uncertainty is $U = k\,u$ (Formula (10))
+with the Table 3 coverage factor $k$ ($k = 2.0$ at 95 %, Gaussian). The reported
+$U$ is rounded to two decimals for absorption coefficients and one decimal for
+the equivalent area and $DL_{\alpha,\text{NRD}}$.
 
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/absorption_uncertainty_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/absorption_uncertainty.svg" alt="ISO 12999-2 sound absorption coefficient uncertainty: the measured alpha_s spectrum over one-third-octave bands from 63 Hz to 5000 Hz with a shaded plus-or-minus U band at coverage factor k = 2, reproducing the standard's worked Table 4 example" width="80%"></picture>
 

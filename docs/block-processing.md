@@ -142,9 +142,10 @@ value the functional API hands back as `initial_state` (see
   the outputs no longer concatenate into the continuous result. This is why
   `detrend` must be `False` in stateful mode.
 - **Not every metric streams.** Energy metrics accumulate cleanly (a
-  running Leq is a running energy sum), but rank statistics do not: the L90
-  of a recording is not any combination of per-block L90 values. Stream the
-  *envelope* and compute percentiles once, on the pooled result.
+  running $L_{eq}$ is a running energy sum), but rank statistics do not: the
+  $L_{90}$ of a recording is not any combination of per-block $L_{90}$
+  values. Stream the *envelope* and compute percentiles once, on the pooled
+  result.
 - **The first block still carries the onset transient.** State starts at
   rest, so the filter settles during the first instants exactly as in a
   single pass. Use `steady_ic=True` to start in step-response steady state,

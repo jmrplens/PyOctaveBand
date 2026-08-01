@@ -105,8 +105,8 @@ one-third-octave or 5 octave values are supplied (`rating` is `None` otherwise).
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/lab_insulation_result_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/lab_insulation_result.svg" alt="The two ISO 10140 laboratory quantities side by side: the measured sound reduction index R against the shifted ISO 717-1 reference on the left, and the normalized impact sound pressure level Ln against the shifted ISO 717-2 reference on the right, each panel annotated with its single-number rating" width="92%"></picture>
 
 *The two laboratory quantities of ISO 10140 with their ISO 717 ratings: the
-airborne `R` is rated where the reference sits **above** the measurement,
-the impact `Ln` where the measurement sits **above** the reference (a
+airborne $R$ is rated where the reference sits **above** the measurement,
+the impact $L_n$ where the measurement sits **above** the reference (a
 higher impact level is worse). `lab.plot()` and `imp.plot()` draw either
 panel on its own.*
 
@@ -161,8 +161,8 @@ plt.show()
 | `l1` / `l2` | 1D or 2D array | dB | one/band, or `(positions, bands)` | Source / receiving levels (airborne) |
 | `li` | 1D or 2D array | dB | one/band, or `(positions, bands)` | Impact SPL from the tapping machine (impact) |
 | `t2` | 1D array | s | > 0, one per band | Receiving-room reverberation time |
-| `area` | float | m² | > 0 | Free test-opening area `S` (airborne only) |
-| `volume` | float | m³ | > 0 | Receiving-room volume `V` |
+| `area` | float | m² | > 0 | Free test-opening area $S$ (airborne only) |
+| `volume` | float | m³ | > 0 | Receiving-room volume $V$ |
 
 `lab_airborne_insulation()` returns a `LabAirborneInsulationResult` (`r`,
 `absorption`, `rating`); `lab_impact_insulation()` a
@@ -174,9 +174,9 @@ levels directly.
 
 Both laboratory results write the one-page ISO 10140 test report directly, laid
 out like the accredited laboratory reports rated per ISO 717.
-`LabAirborneInsulationResult.report()` renders the sound reduction index *R*
+`LabAirborneInsulationResult.report()` renders the sound reduction index $R$
 fiche (ISO 10140-2:2010) and `LabImpactInsulationResult.report()` the
-normalized impact sound pressure level *Ln* fiche (ISO 10140-3:2010). Each
+normalized impact sound pressure level $L_n$ fiche (ISO 10140-3:2010). Each
 fiche names the laboratory standard in its basis line, evaluates the
 ISO 717-1 / ISO 717-2 single-number rating (16 one-third-octave bands from
 100 Hz to 3150 Hz, or the 5 octave bands), states the quantity to one decimal
@@ -184,11 +184,11 @@ place both in tabular form and as a curve against the shifted reference curve,
 boxes the laboratory rating (`Rw (C; Ctr)` or `Ln,w (CI)`) and prints the
 statement that the evaluation is based on laboratory measurement results
 obtained by a precision method. Because a qualified suite suppresses flanking
-transmission, the reported quantity is the *direct* *R* / *Ln*, not the field
-*R'* / *L'n*.
+transmission, the reported quantity is the *direct* $R$ / $L_n$, not the
+field $R'$ / $L'_n$.
 
 `verbose=True` annexes the per-band equivalent sound absorption area
-*A* = 0,16 *V* / *T* (ISO 10140-4:2010) beside the reported quantity, the
+$A = 0.16\,V/T$ (ISO 10140-4:2010) beside the reported quantity, the
 normalization datum the laboratory report carries. Metadata (client, specimen,
 mounting, room volumes, climatic conditions), the requirement verdict (airborne
 passes at or above it, impact at or below it), `language="es"` and the
@@ -269,7 +269,7 @@ junction data the EN 12354 prediction consumes is measured per
 ## Standards
 
 ISO 10140-2:2010, ISO 10140-3:2010 and ISO 10140-4:2010, which provide the
-laboratory R and Ln with the background-noise correction and the measurement
+laboratory $R$ and $L_n$ with the background-noise correction and the measurement
 procedures behind them.
 
 ## See also
@@ -282,11 +282,11 @@ procedures behind them.
 - [Sound Insulation by Intensity (ISO 15186)](insulation-intensity.md): the
   direct-power alternative for high-flanking situations.
 - [Floor-Covering Impact Improvement (ISO 16251-1)](impact-improvement.md):
-  the small-mock-up ΔL of soft floor coverings.
+  the small-mock-up $\Delta L$ of soft floor coverings.
 - [Laboratory Flanking Transmission (ISO 10848)](flanking-lab.md): the
   measured junction vibration reduction index.
 - [Insulation Ratings (ISO 717)](insulation-ratings.md): the reference-curve
-  engine behind Rw and Ln,w.
-- [Sound Power](sound-power.md): the `LW` methods that share the
+  engine behind $R_w$ and $L_{n,w}$.
+- [Sound Power](sound-power.md): the $L_W$ methods that share the
   absorption-area machinery of the receiving room.
 - API reference: [`building.lab_insulation`](https://jmrplens.github.io/phonometry/reference/api/building/lab-insulation/).

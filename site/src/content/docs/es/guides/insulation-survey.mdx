@@ -39,12 +39,14 @@ Los métodos de ingeniería anteriores compran precisión con esfuerzo:
 micrófonos barridos, tiempos de reverberación por banda, corrección de ruido de
 fondo cuidadosa. Para una comprobación rápida en una vivienda, ISO 10052 define
 un **método de control (survey)**: bandas de octava, un sonómetro de mano y una
-sola magnitud, el **índice de reverberación** `k = 10 lg(T/T0)` (`T0 = 0,5 s`),
-que arrastra la corrección del recinto receptor. Cada magnitud del control es
-entonces una simple suma de `k`: la diferencia de niveles estandarizada
-`DnT = D + k`, la normalizada `Dn = D + k + 10 lg(A0 T0 / (0,16 V))`, la aparente
-`R' = D + k + 10 lg(S T0 / (0,16 V))` (usando `V/7,5` como `S` cuando es mayor) y,
-para impactos y fachadas, `L'nT = Li - k` y `D2m,nT = D2m + k`. Las referencias a
+sola magnitud, el **índice de reverberación** $k = 10\lg(T/T_0)$
+($T_0 = 0{,}5\ \text{s}$), que arrastra la corrección del recinto receptor.
+Cada magnitud del control es entonces una simple suma de $k$: la diferencia
+de niveles estandarizada $D_{nT} = D + k$, la normalizada
+$D_n = D + k + 10\lg(A_0 T_0/(0{,}16\,V))$, la aparente
+$R' = D + k + 10\lg(S T_0/(0{,}16\,V))$ (usando $V/7{,}5$ como $S$ cuando es
+mayor) y, para impactos y fachadas, $L'_{nT} = L_i - k$ y
+$D_{2m,nT} = D_{2m} + k$. Las referencias a
 cláusulas siguen ISO 10052:2021; las fórmulas y la tabla del índice de
 reverberación son idénticas en la armonizada EN ISO 10052:2004+A1:2010.
 
@@ -53,7 +55,8 @@ El índice de reverberación se **mide** (pasa el tiempo de reverberación a
 sala y el volumen con `estimate_reverberation_index(V, room)` (Tabla 4:
 amueblada `"kitchen"` / `"bathroom"` / `"furnished"`, o las clases de
 construcción sin amueblar `"a"`–`"h"` y las mixtas `"a+e"`…`"d+h"`). Una cuarta
-magnitud propia de este método es el **ruido de equipos de servicio** `LXY`: la
+magnitud propia de este método es el **ruido de equipos de servicio**
+$L_{XY}$: la
 media energética de tres posiciones ponderadas A o C.
 
 ```python
@@ -83,9 +86,10 @@ res.plot()   # DnT vs curva de referencia ISO 717-1 desplazada (necesita matplot
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/survey_insulation_es.svg" alt="Aislamiento a ruido aéreo por el método de control: la diferencia de niveles bruta D y la estandarizada DnT en las cinco bandas de octava, con la corrección por índice de reverberación k sombreada entre ambas" width="80%" />
 
-*El índice de reverberación `k = 10 lg(T/T0)` desplaza la diferencia de niveles
-bruta `D` hacia la estandarizada `DnT`: hacia arriba donde la sala es viva
-(`T > T0`), hacia abajo donde es apagada. El índice automático solo se forma con
+*El índice de reverberación $k = 10\lg(T/T_0)$ desplaza la diferencia de
+niveles bruta $D$ hacia la estandarizada $D_{nT}$: hacia arriba donde la sala
+es viva ($T > T_0$), hacia abajo donde es apagada. El índice automático solo
+se forma con
 exactamente 5 valores de octava (o 16 de tercio de octava).*
 
 <details>
@@ -123,9 +127,9 @@ plt.show()
 | :--- | :--- | :--- | :--- | :--- |
 | `l1` / `l2` | array 1D o 2D | dB | uno/banda, o `(posiciones, bandas)` | Niveles emisor / receptor (o exterior `l1_2m`) |
 | `li` | array 1D o 2D | dB | uno/banda, o `(posiciones, bandas)` | Niveles de impacto (media energética de posiciones) |
-| `reverberation_index` | escalar o array 1D | dB | uno por banda | `k` de `reverberation_index` o `estimate_reverberation_index`; `survey_service_equipment_level()` también acepta un `k` escalar |
-| `volume` | float | m³ | > 0 | Volumen receptor `V` (para `Dn` / `L'n` / `R'` / normalizadas) |
-| `area` | float | m² | > 0 | Área de partición común `S` (aéreo `R'`; regla `V/7,5`) |
+| `reverberation_index` | escalar o array 1D | dB | uno por banda | $k$ de `reverberation_index` o `estimate_reverberation_index`; `survey_service_equipment_level()` también acepta un $k$ escalar |
+| `volume` | float | m³ | > 0 | Volumen receptor $V$ (para $D_n$ / $L'_n$ / $R'$ / normalizadas) |
+| `area` | float | m² | > 0 | Área de partición común $S$ (aéreo $R'$; regla $V/7{,}5$) |
 | `measurements` | array | dB | exactamente 3 | Posiciones de equipo de servicio (`survey_service_equipment_level`) |
 | `room` | str | — | `"kitchen"`/`"bathroom"`/`"furnished"`/`"a"`–`"h"`/`"a+e"`… | Clase de sala para `estimate_reverberation_index` (Tabla 4) |
 
@@ -143,7 +147,8 @@ uno un `.report(path)` que escribe el informe de campo del método de control
 (survey) ISO 10052 de una página: la línea de base normativa que nombra la
 ISO 10052 (bandas de octava), una cabecera de metadatos opcional, la tabla en
 bandas de octava junto a la curva medida frente a la referencia desplazada, el
-índice de campo en su recuadro (`DnT,w`/`R'w`, `L'nT,w` o `D2m,nT,w`), la
+índice de campo en su recuadro ($D_{nT,w}$/$R'_w$, $L'_{nT,w}$ o
+$D_{2m,nT,w}$), la
 declaración del método de control, un veredicto opcional (las diferencias de
 niveles cumplen si igualan o superan el requisito, y el nivel de impactos si lo
 iguala o queda por debajo) y un pie. El resultado a ruido aéreo informa
@@ -173,7 +178,8 @@ facade.report("D2mnTw_survey.pdf")                       # D2m,nT,w (C; Ctr)
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/survey_impact_insulation_es.svg" alt="Aislamiento a impactos por el método de control: el nivel de impactos medido Li en bandas de octava y el L'nT estandarizado con la corrección por índice de reverberación sombreada entre ambos, el índice L'nT,w anotado y una nota de que una sala viva reduce el nivel de impactos estandarizado" width="80%" />
 
 *El control de impactos aplica el índice de reverberación con el signo
-contrario, `L'nT = Li − k`: un recinto receptor vivo (`T > T0`) **reduce** el
+contrario, $L'_{nT} = L_i - k$: un recinto receptor vivo ($T > T_0$)
+**reduce** el
 nivel de impactos estandarizado. Como en el caso aéreo, el índice automático
 aparece para exactamente 5 valores de octava (o 16 de tercio de octava).*
 

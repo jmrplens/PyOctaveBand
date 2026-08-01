@@ -52,10 +52,11 @@ import ThemeImage from '../../../../components/ThemeImage.astro';
 
 El ruido de los helicópteros es muy directivo, así que el método de **ECAC
 Doc 32** describe la fuente con un **hemisferio de ruido**: niveles de presión
-acústica en bandas de 1/3 de octava sobre una malla esférica de azimut `φ` y ángulo
-polar `θ`, definidos a una distancia de referencia fija de **60 m** en condiciones
-atmosféricas de referencia de la ICAO. Situar esa fuente en un receptor añade el
-ajuste de propagación `ΔLp = ΔLs + ΔLa + ΔLg`.
+acústica en bandas de 1/3 de octava sobre una malla esférica de azimut
+$\varphi$ y ángulo polar $\theta$, definidos a una distancia de referencia
+fija de **60 m** en condiciones atmosféricas de referencia de la ICAO. Situar
+esa fuente en un receptor añade el ajuste de propagación
+$\Delta L_p = \Delta L_s + \Delta L_a + \Delta L_g$.
 
 El EPNL que calcula esta página es la misma magnitud que pide la
 certificación: el Capítulo 8 del Anexo 16 de la OACI hace volar el
@@ -84,8 +85,9 @@ h.plot()                                          # directividad proa-popa
 ## Ajustes de propagación
 
 El nivel del hemisferio a 60 m se lleva al receptor con tres ajustes (§A.4):
-`spherical_spreading_adjustment` (`ΔLs = −20·log10(r/60)`, Ec. 24),
-`atmospheric_adjustment` (`ΔLa = −α(f)·(r − 60)` con el coeficiente de
+`spherical_spreading_adjustment` ($\Delta L_s = -20\lg(r/60)$, Ec. 24),
+`atmospheric_adjustment` ($\Delta L_a = -\alpha(f)\,(r - 60)$ con el
+coeficiente de
 ISO 9613-1, Ec. 26/27) y `ground_effect_adjustment` (interferencia directo/
 reflejado sobre un plano de impedancia, Chien-Soroka Ec. 28-35, con la impedancia
 de Delany-Bazley y las clases de resistividad de flujo CNOSSOS `"A"`-`"H"`).
@@ -141,10 +143,11 @@ hemisferio usa otra distancia polar (`h.distance`, p. ej. anillos de hover a
 ## Condiciones de vuelo: interpolar entre hemisferios
 
 Una base de datos registra un hemisferio por condición de vuelo (velocidad
-aerodinámica `V`, ángulo de trayectoria `γ`). Las condiciones reales rara vez
-coinciden con una medida, así que la guía NORAH2 interpola (Ec. 3-10): ambos
-ejes se normalizan por sus rangos en la base de datos (con el factor empírico
-`Ffc = 2` sobre el ángulo de trayectoria), una triangulación de Delaunay cubre
+aerodinámica $V$, ángulo de trayectoria $\gamma$). Las condiciones reales rara
+vez coinciden con una medida, así que la guía NORAH2 interpola (Ec. 3-10):
+ambos ejes se normalizan por sus rangos en la base de datos (con el factor
+empírico $F_\text{fc} = 2$ sobre el ángulo de trayectoria), una triangulación
+de Delaunay cubre
 las condiciones normalizadas, y una consulta dentro de la envolvente convexa
 mezcla su triángulo envolvente con pesos inversos a la distancia en el dominio
 de energía. Fuera de la envolvente se adopta la condición más cercana sin
@@ -166,18 +169,19 @@ La velocidad aerodinámica, no la de suelo, selecciona el hemisferio; los pesos
 son invariantes a las unidades mientras la consulta use las de la base de
 datos. Puede pasarse una tabla de triangulación de la base de datos como
 `triangles` (la base NORAH incluye una por tipo; las tablas incluidas
-triangulan el plano `(V, γ)` sin normalizar, así que pasarlas reproduce la
-implementación de referencia bin a bin). Los miembros de clase con rotor
-especular sustituyen `h.mirrored()` (Ec. 2, `φ → −φ`) y los desplazamientos por
-nivel de certificación entran como `level_offset`.
+triangulan el plano $(V, \gamma)$ sin normalizar, así que pasarlas reproduce
+la implementación de referencia bin a bin). Los miembros de clase con rotor
+especular sustituyen `h.mirrored()` (Ec. 2, $\varphi \to -\varphi$) y los
+desplazamientos por nivel de certificación entran como `level_offset`.
 
 ## Cinemática de la trayectoria
 
 `flight_path_kinematics` deriva de una trayectoria con marcas de tiempo, por
 diferencias finitas centradas, todo lo que necesita el evento (Ec. 16-21 /
 Doc 32 Ec. 8-10): velocidad respecto al suelo, velocidad aerodinámica (sin
-viento), rumbo, curvatura, ángulo de alabeo `Φ = atan(K·Vg²/g)` y ángulo de
-trayectoria `γ = atan(ΔZ/ΔS)`. La guía recomienda suavizar las trazas radar
+viento), rumbo, curvatura, ángulo de alabeo $\Phi = \arctan(K V_g^2 / g)$ y
+ángulo de trayectoria $\gamma = \arctan(\Delta Z / \Delta S)$. La guía
+recomienda suavizar las trazas radar
 (p. ej. remuestreo con splines a cadencia de 0,5 s) antes de derivar.
 
 ```python
@@ -194,8 +198,9 @@ receptor: por punto de trayectoria la condición de vuelo selecciona (o mezcla)
 los hemisferios, los ángulos de emisión direccionan el nivel de fuente (el
 marco se orienta con el rumbo y se inclina con el alabeo en virajes; la actitud
 de cabeceo está implícita en los hemisferios), y el historial recibido en
-tercios de octava se expresa en tiempo registrado `tr = te + r/c` (Ec. 22,
-`c = 346.1 m/s`) y se integra: `LASmax`, `SEL` sobre el historial completo y
+tercios de octava se expresa en tiempo registrado $t_r = t_e + r/c$ (Ec. 22,
+$c = 346{,}1\ \text{m/s}$) y se integra: `LASmax`, `SEL` sobre el historial
+completo y
 sobre la ventana de certificación de 10 dB de caída (Doc 32 Ec. 27), y `EPNL`
 según ICAO Anexo 16 (Doc 32 Ec. 28).
 
@@ -284,8 +289,9 @@ segmento (Ec. 41).
 Cuando el terreno bloquea la línea de visión, el sonido sigue el camino
 convexo más corto sobre él (la banda elástica de la guía) y cada vértice
 tocado es una **arista de difracción**. La atenuación combina la difracción
-pura de la diferencia de camino `δ` (Ec. 42-44,
-`10·Ch·log10(3 + (40/λ)·C″·δ)`, con tope de 25 dB) con los efectos de suelo
+pura de la diferencia de camino $\delta$ (Ec. 42-44,
+$10 C_h \lg\bigl(3 + (40/\lambda)\,C''\,\delta\bigr)$, con tope de 25 dB) con
+los efectos de suelo
 del lado fuente y del lado receptor, cada uno sobre su propio plano medio y
 ponderado por la difracción de su camino imagen (Ec. 45-47, el esquema
 CNOSSOS-EU que adopta la guía). El efecto de suelo no se evalúa por separado
@@ -365,7 +371,7 @@ inverso al cuadrado de forma cerrada, los límites analíticos de suelo rígido 
 rasante del efecto de suelo, consultas bilineales fuera de nodo sobre los
 hemisferios de referencia de los once tipos de helicóptero, símplices de
 interpolación comprobados a mano, cinemática de forma cerrada y la integral
-lorentziana `SEL − LASmax` del sobrevuelo, y de extremo a extremo contra los
+lorentziana $\mathrm{SEL} - L_{ASmax}$ del sobrevuelo, y de extremo a extremo contra los
 casos ARP de verificación del prototipo NORAH2: ángulos de emisión a 0,01°,
 tiempos retardados a 0,02 s, cada nivel por paso de los eventos sobre suelo
 duro a 0,08 dB(A) hasta 18 km, `LASmax` a 0,03 dB, `SEL` a 0,05 dB sobre suelo
@@ -382,7 +388,7 @@ La maquinaria de terreno está anclada en forma cerrada: el plano medio del
 suelo es exacto en perfiles lineales y simétricos, una sección plana
 reproduce el modelo de suelo plano a precisión de máquina y un plano
 inclinado su rotación analítica, la resistividad media logarítmica recupera
-la media geométrica, la difracción rasante da el clásico `10·log10(3)`, y
+la media geométrica, la difracción rasante da el clásico $10\lg 3$, y
 una colina comprobada a mano fija la diferencia de camino de la banda
 elástica. El tratamiento del suelo por receptor valida de extremo a extremo
 contra el Case 3 ARP del prototipo (187 micrófonos, cada uno sobre su propia

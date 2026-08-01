@@ -383,12 +383,12 @@ constructiva nueva.
 
 | Parámetro | Tipo | Unidades | Rango / por defecto | Notas |
 | :--- | :--- | :--- | :--- | :--- |
-| `element` | `HomogeneousElement` | — | — | Área, longitudes de lado, `m'`, `fc`, `ηint`, `Σ lk αk` y opcionalmente `ρ`/`cL` |
+| `element` | `HomogeneousElement` | — | — | Área, longitudes de lado, $m'$, $f_c$, $\eta_\text{int}$, $\sum l_k \alpha_k$ y opcionalmente $\rho$/$c_L$ |
 | `frequencies` | array | Hz | > 0 | Frecuencias centrales de banda |
-| `bands` | str | — | `'third'` (por defecto) / `'octave'` | Fija la banda que lleva la rama `f ≈ fc` |
-| `resonant_only` | bool | — | por defecto `False` | Elimina el término de transmisión forzada por debajo de `fc` (Anexo B.1, caminos por flancos) |
+| `bands` | str | — | `'third'` (por defecto) / `'octave'` | Fija la banda que lleva la rama $f \approx f_c$ |
+| `resonant_only` | bool | — | por defecto `False` | Elimina el término de transmisión forzada por debajo de $f_c$ (Anexo B.1, caminos por flancos) |
 | `speed_of_sound` | float | m/s | por defecto `340` | El valor que fija el Anexo A de ISO 12354-1 |
-| `air_density` | float | kg/m³ | por defecto `1.29` | `ρo` del modelo del Anexo B |
+| `air_density` | float | kg/m³ | por defecto `1.29` | $\rho_o$ del modelo del Anexo B |
 
 ## Parámetros de `airborne_flanking_path()` / `impact_flanking_path()`
 
@@ -397,9 +397,9 @@ constructiva nueva.
 | `label` | str | — | — | Nombre visible del camino |
 | `kind` | str | — | `'Ff'` / `'Df'` / `'Fd'` | Solo a ruido aéreo; el constructor de impactos es siempre `Df` |
 | `element_i` / `element_j` | `InSituElementResult` | — | — | Elementos del recinto emisor y del receptor (`floor` / `element_j` en impactos) |
-| `vibration_reduction_index` | float o array | dB | — | `Kij` de este camino |
-| `coupling_length` | float | m | > 0 | Longitud de acoplamiento de la unión `lij` |
-| `separating_area` | float | m² | > 0 | `Ss` (solo a ruido aéreo) |
+| `vibration_reduction_index` | float o array | dB | — | $K_{ij}$ de este camino |
+| `coupling_length` | float | m | > 0 | Longitud de acoplamiento de la unión $l_{ij}$ |
+| `separating_area` | float | m² | > 0 | $S_s$ (solo a ruido aéreo) |
 | `delta_r_i` / `delta_r_j` | float o array | dB | por defecto `0` | Mejoras por trasdosados |
 | `delta_l` | float o array | dB | por defecto `0` | Mejora del revestimiento de suelo (solo impactos) |
 
@@ -409,7 +409,7 @@ constructiva nueva.
 versión por bandas de las fichas de predicción simplificada: el mismo formato
 de una página, una línea de base que cita el apartado 4.2 de ISO 12354-1/-2:2017,
 la tabla de cuota de energía por camino junto a la figura de contribución por
-banda, el `R'w` / `L'n,w` recuadrado, la desviación típica de 1,5 dB a 2,5 dB
+banda, el $R'_w$ / $L'_{n,w}$ recuadrado, la desviación típica de 1,5 dB a 2,5 dB
 del modelo detallado y un veredicto CUMPLE/NO CUMPLE frente a un `requirement`.
 `verbose=True` añade la banda en la que cada camino alcanza su máximo. Ambos
 necesitan la valoración ISO 717, así que el espectro debe cubrir de 100 Hz a
@@ -421,12 +421,12 @@ necesitan la valoración ISO 717, así que el espectro debe cubrir de 100 Hz a
   el modelo simplificado de número único y el catálogo de uniones del Anexo E
   sobre el que se apoya esta página.
 - [Transmisión por flancos en laboratorio (ISO 10848)](/phonometry/es/guides/flanking-lab/):
-  de dónde salen el `Kij` medido y la longitud de absorción equivalente.
+  de dónde salen el $K_{ij}$ medido y la longitud de absorción equivalente.
 - [Valoración del aislamiento (ISO 717)](/phonometry/es/guides/insulation-ratings/):
   el motor de curva de referencia que convierte el espectro previsto en
-  `R'w` / `L'n,w`.
+  $R'_w$ / $L'_{n,w}$.
 - [Medición del aislamiento in situ (ISO 16283)](/phonometry/es/guides/insulation-field/):
   el resultado construido frente al que se contrasta la predicción.
 - [Rigidez dinámica de materiales elásticos (EN 29052-1)](/phonometry/es/guides/dynamic-stiffness/):
-  la `s'` que hay detrás de la frecuencia de resonancia del suelo flotante.
+  la $s'$ que hay detrás de la frecuencia de resonancia del suelo flotante.
 - Referencia de la API: [`building.detailed_prediction`](/phonometry/es/reference/api/building/detailed-prediction/).

@@ -28,10 +28,10 @@ Monte Carlo in the test suite.
 ## 1. Power spectral density with its statistical error
 
 `power_spectral_density` estimates the one-sided autospectral density
-`Gxx(f)` by Welch's method: the record is split into tapered (Hann by
+$G_{xx}(f)$ by Welch's method: the record is split into tapered (Hann by
 default), 50 %-overlapped segments whose periodograms are averaged. No
 detrending is applied, so absolute calibration is preserved: a signal in
-pascals yields `Pa²/Hz`. Two scalings are available: `'density'` (units²/Hz,
+pascals yields Pa²/Hz. Two scalings are available: `'density'` (units²/Hz,
 integrates to the signal power) and `'spectrum'` (units², reads the power of
 discrete tones directly).
 
@@ -43,7 +43,7 @@ diagram traces it with the numbers of this page's example.
 
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_spectral_analysis_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_spectral_analysis.svg" alt="Block diagram of the Welch PSD pipeline: a 20 second pink noise record at 48 kilohertz is split into 50 percent overlapped segments of 4096 samples giving 467 segments and an 11.7 hertz bin spacing, each segment is Hann tapered for a resolution bandwidth of 17.6 hertz, the one-sided squared FFT periodograms are averaged into 442 effective averages, and the result is Gxx of f with a chi-square confidence interval, a random error of 1 over the square root of n d equal to 4.8 percent and about 885 degrees of freedom; a final note states the trade-off that longer segments buy resolution but spend averages" width="92%"></picture>
 
-Averaging `nd` independent segments gives the estimate `2·nd` chi-square
+Averaging $n_d$ independent segments gives the estimate $2 n_d$ chi-square
 degrees of freedom (Eq. 8.162), from which everything else follows:
 
 $$
@@ -72,10 +72,10 @@ res.plot()                                        # PSD in dB with the CI band
 ```
 
 The **resolution bias** is the other half of the error budget: a finite
-analysis bandwidth `Be` (reported as `resolution_bandwidth`, the effective
+analysis bandwidth $B_e$ (reported as `resolution_bandwidth`, the effective
 noise bandwidth of the taper) smooths sharp spectral features, always in the
 direction of reduced dynamic range (Eq. 8.139). For a resonance peak of
-half-power bandwidth `Br`, the first-order normalized bias is the closed form
+half-power bandwidth $B_r$, the first-order normalized bias is the closed form
 of Eq. 8.141, exposed as `resolution_bias_error`:
 
 $$
@@ -88,7 +88,7 @@ from phonometry import resolution_bias_error
 eps_b = resolution_bias_error(res.resolution_bandwidth, 25.0)  # Br = 25 Hz peak
 ```
 
-Narrow `Be` (long segments) suppresses the bias but leaves fewer averages and
+Narrow $B_e$ (long segments) suppresses the bias but leaves fewer averages and
 a larger random error; the two requirements on segment length pull in
 opposite directions, which is exactly the trade-off the reported numbers make
 visible.
@@ -132,9 +132,10 @@ plt.show()
 
 ## 2. Cross-spectral density
 
-`cross_spectral_density` estimates the complex `Gxy(f)` between two channels
+`cross_spectral_density` estimates the complex $G_{xy}(f)$ between two channels
 with the same Welch core, and reports the ordinary coherence
-`γ²xy = |Gxy|²/(Gxx·Gyy)` together with the Bendat & Piersol random errors of
+$\gamma^2_{xy} = |G_{xy}|^2/(G_{xx}\,G_{yy})$ together with the Bendat &
+Piersol random errors of
 the magnitude and phase (Eqs. 9.33 and 9.52, with the measured coherence in
 place of the unknown true value, as the book recommends for measured data):
 
@@ -146,7 +147,8 @@ $$
 
 Both shrink as the coherence approaches one: a strongly coherent pair needs
 far fewer averages for the same confidence. The phase is unwrapped, so its
-slope against frequency is the group delay `τ_g = -dφ/(2π·df)`; for a pure
+slope against frequency is the group delay
+$\tau_g = -\mathrm{d}\varphi/(2\pi\,\mathrm{d}f)$; for a pure
 delay path the phase is linear and that slope reads the propagation delay
 directly.
 
@@ -161,7 +163,8 @@ res.plot()   # magnitude, phase with ±sigma band, coherence
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/cross_spectral_density_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/cross_spectral_density.svg" alt="Two panels for the cross-spectral density of a two-sensor path with a 2 millisecond delay: the Welch magnitude estimate fluctuating around a flat level, and below it the unwrapped cross-spectrum phase falling as a straight line on a logarithmic frequency axis, lying exactly on the dashed minus two pi f tau reference with a narrow one-sigma band around it" width="86%"></picture>
 
 *The cross-spectral density of a 2 ms delay path: the unwrapped phase is
-exactly the line −2πfτ, so its slope reads the propagation delay directly,
+exactly the line $-2\pi f\tau$, so its slope reads the propagation delay
+directly,
 and the ±1 s.d. band of Eq. 9.52 quantifies how far to trust it per
 frequency.*
 
@@ -231,7 +234,8 @@ $$
 $$
 
 For additive uncorrelated output noise of known level the coherence has the
-closed form `γ² = SNR/(1+SNR)`, which makes the whole chain verifiable with a
+closed form $\gamma^2 = \mathrm{SNR}/(1+\mathrm{SNR})$, which makes the whole
+chain verifiable with a
 synthetic signal:
 
 ```python
@@ -251,9 +255,10 @@ res.plot()                               # Gyy, Gvv, Gnn and the SNR panel
 
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/coherent_output_snr_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/coherent_output_snr.svg" alt="Two panels for the coherent output spectrum of a white noise system with additive noise: the measured output spectrum with the coherent part about 1.5 decibels below it and the uncorrelated noise floor about 6 decibels lower still, and below them the spectral signal-to-noise ratio fluctuating around the dashed closed-form line at 4.1 decibels" width="86%"></picture>
 
-*The exact split of the snippet's model: `Gvv = γ²·Gyy` explains the output
-except for the flat noise remainder `Gnn`, and the spectral SNR scatters
-around its closed form 10·lg(0.64/0.25) = 4.1 dB at every frequency.*
+*The exact split of the snippet's model: $G_{vv} = \gamma^2 G_{yy}$ explains
+the output except for the flat noise remainder $G_{nn}$, and the spectral SNR
+scatters around its closed form $10\lg(0.64/0.25) = 4.1$ dB at every
+frequency.*
 
 <details>
 <summary>Show the code for this figure</summary>
@@ -295,15 +300,16 @@ plt.show()
 </details>
 
 The `coherence_bias` field reports the small positive bias of the coherence
-estimate, `b[γ̂²] ≈ (1-γ²)²/nd` (Eq. 9.75), negligible once `nd` reaches a
+estimate, $b[\hat{\gamma}^2] \approx (1-\gamma^2)^2/n_d$ (Eq. 9.75),
+negligible once $n_d$ reaches a
 few hundred, and another reason to average generously before trusting a low
 coherence.
 
 ## 4. Fractional-octave smoothing
 
 `fractional_octave_smoothing` averages a spectrum over a rectangular window
-of constant relative width: 1/n octave, `[f·2^(-1/2n), f·2^(+1/2n)]` around
-each frequency. This is the constant-percentage resolution bandwidth that
+of constant relative width: 1/n octave, $[f\cdot 2^{-1/2n},\ f\cdot 2^{+1/2n}]$
+around each frequency. This is the constant-percentage resolution bandwidth that
 Bendat & Piersol recommend for the spectra of resonant systems
 (Section 8.5.3), and the de facto standard for presenting loudspeaker and
 room responses. The average is always computed on **power** (amplitudes are
@@ -319,22 +325,24 @@ smooth_mag = fractional_octave_smoothing(freqs, np.abs(response), 6.0,
 smooth_db = fractional_octave_smoothing(freqs, levels, 3.0, domain="db")  # dB curve
 ```
 
-A single spectral line with PSD ordinate `P` (units²/Hz) in a bin of width
-`Δf` smooths to the closed-form level `P·Δf / (f₀·(2^{1/2n} - 2^{-1/2n}))`
+A single spectral line with PSD ordinate $P$ (units²/Hz) in a bin of width
+$\Delta f$ smooths to the closed-form level
+$P\,\Delta f / (f_0(2^{1/2n} - 2^{-1/2n}))$
 over one kernel width, the oracle pinned in the tests.
 
 ## 5. Colored-noise generators
 
-`noise_signal` produces Gaussian noise whose PSD follows `Gxx(f) ∝ f^α`
-exactly in expectation: seeded white noise is shaped in the frequency domain
-by the exact magnitude response `(f/f_ref)^{α/2}` bin by bin (a zero-phase
-filter applied circularly), so a measured slope deviates from the power law
+`noise_signal` produces Gaussian noise whose PSD follows
+$G_{xx}(f) \propto f^\alpha$ exactly in expectation: seeded white noise is
+shaped in the frequency domain by the exact magnitude response
+$(f/f_\text{ref})^{\alpha/2}$ bin by bin (a zero-phase filter applied
+circularly), so a measured slope deviates from the power law
 only by the random error of the spectral estimate, not by the piecewise or
 few-pole pink approximations whose slope ripples by fractions of a dB. The
 record is zero-mean and rescaled to the requested RMS exactly, and the same
 seed reproduces the same record bit for bit.
 
-| color | α | PSD slope |
+| color | $\alpha$ | PSD slope |
 |---|---|---|
 | `white` | 0 | 0 dB/octave |
 | `pink` | -1 | -3.01 dB/octave |
@@ -366,11 +374,12 @@ it:
   bin the effective analysis bandwidth is. This is the same number the PSD
   result reports as `resolution_bandwidth` (`ENBW·fs/nperseg` in Hz), and
   it enters directly in the tone/noise trade: a broadband noise floor read
-  from a windowed spectrum sits `10·lg(ENBW)` dB above the true density.
-- **Coherent gain**: the DC gain `Σw/N` a bin-centered tone is scaled by.
+  from a windowed spectrum sits $10\lg(\mathrm{ENBW})$ dB above the true
+  density.
+- **Coherent gain**: the DC gain $\sum w/N$ a bin-centered tone is scaled by.
 - **Scalloping loss**: the worst-case attenuation of a tone that falls
   midway between two bins (3.92 dB for rectangular, 1.42 dB for Hann).
-- **Worst-case processing loss**: scalloping plus `10·lg(ENBW)`, the
+- **Worst-case processing loss**: scalloping plus $10\lg(\mathrm{ENBW})$, the
   worst-case reduction in output SNR for tone detection in white noise.
 - **Highest sidelobe** and **main-lobe -3 dB width**: leakage floor versus
   resolution.
@@ -387,7 +396,7 @@ m.plot()                        # window + spectrum with metrics marked
 
 The closed forms anchor the tests: ENBW is exactly 1 for rectangular, 3/2
 for Hann, 1987/1458 for Hamming and 1523/882 for Blackman (DFT-even
-sampling), and the rectangular scalloping loss is `20·lg(N·sin(π/2N))`,
+sampling), and the rectangular scalloping loss is $20\lg(N\sin(\pi/2N))$,
 the Dirichlet kernel evaluated half a bin off center.
 
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/window_functions_tradeoff_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/window_functions_tradeoff.svg" alt="Spectra of the rectangular, Hann, Hamming and Blackman windows over 16 DFT bins, showing the trade-off between main-lobe width and sidelobe level, with each window's equivalent noise bandwidth and highest sidelobe level in the legend" width="82%"></picture>
@@ -407,10 +416,10 @@ Welch's method buys stability with record length: each independent segment
 adds two degrees of freedom, so a record that only fits a couple of segments
 leaves an estimate barely better than a periodogram. `multitaper_psd`
 implements the alternative of Thomson (1982), as developed by Percival &
-Walden (1993, Chapter 7): the *whole* record is multiplied by `K` orthogonal
+Walden (1993, Chapter 7): the *whole* record is multiplied by $K$ orthogonal
 discrete prolate spheroidal (Slepian) tapers - the sequences that concentrate
-the most spectral-window energy inside a chosen design band `[-W, W]` - and
-the `K` resulting *eigenspectra* are averaged:
+the most spectral-window energy inside a chosen design band $[-W, W]$ - and
+the $K$ resulting *eigenspectra* are averaged:
 
 $$
 \hat{S}^{(mt)}(f) = \frac{1}{K}\sum_{k=0}^{K-1} \hat{S}_k(f), \qquad
@@ -419,16 +428,16 @@ e^{-i 2\pi f t \Delta t}\Bigr|^2 .
 $$
 
 Because the tapers are orthogonal the eigenspectra are nearly uncorrelated,
-so the average carries about `2K` chi-square degrees of freedom from a
+so the average carries about $2K$ chi-square degrees of freedom from a
 single record - the same statistical machinery as the Welch result (random
 error, chi-square confidence interval), without segmenting. The
-half-bandwidth `W = NW·fs/N` is set through the duration x half-bandwidth
-product `NW` (default 4). `2W` is the resolution of the estimate (reported
+half-bandwidth $W = NW\,f_s/N$ is set through the duration x half-bandwidth
+product $NW$ (default 4). $2W$ is the resolution of the estimate (reported
 as `resolution_bandwidth`), and only the tapers below the Shannon number
-`2·NW` keep their spectral-window energy inside the design band - their
-concentrations `λk` are reported as `eigenvalues`, and the default taper
-count is `K = 2·NW - 1`, all tapers with near-unity concentration. Larger
-`NW` admits more tapers (lower variance) at the cost of resolution.
+$2NW$ keep their spectral-window energy inside the design band - their
+concentrations $\lambda_k$ are reported as `eigenvalues`, and the default
+taper count is $K = 2NW - 1$, all tapers with near-unity concentration.
+Larger $NW$ admits more tapers (lower variance) at the cost of resolution.
 
 ```python
 from phonometry import multitaper_psd
@@ -456,14 +465,15 @@ so the leakier high-order tapers are downweighted exactly where the spectrum
 is locally weak, and nothing is lost where it is locally white (for white
 noise the weights are uniform). The price is bookkept honestly: the
 equivalent degrees of freedom become frequency dependent,
-`ν(f) = 2·(Σk dk)²/Σk dk²` with `dk = b²k·λk` (P&W Eq. 370b), and the
+$\nu(f) = 2\left(\sum_k d_k\right)^2/\sum_k d_k^2$ with
+$d_k = b_k^2\lambda_k$ (P&W Eq. 370b), and the
 confidence interval widens wherever leakage protection spent them.
 `adaptive=False` selects the plain eigenvalue-weighted average instead.
 
 Calibration matches the Welch estimators exactly: no detrending,
-`'density'` integrates to the signal power, and `'spectrum'` reads `A²/2` at
-the peak of a sinusoid of amplitude `A` (a tone's power in `'density'`
-scaling spreads over the `2W` band). The Slepian tapers themselves come from
+`'density'` integrates to the signal power, and `'spectrum'` reads $A^2/2$ at
+the peak of a sinusoid of amplitude $A$ (a tone's power in `'density'`
+scaling spreads over the $2W$ band). The Slepian tapers themselves come from
 `scipy.signal.windows.dpss`; their concentrations reproduce the
 quadruple-precision table of Percival & Walden (Table 382) to machine
 precision, which is the anchor oracle of the test suite.
@@ -505,7 +515,7 @@ Reach for `multitaper_psd` when the record is too short to segment (room
 impulse response tails, transient captures, single machine cycles) or when
 a high-dynamic-range spectrum needs leakage protection that a Hann-windowed
 Welch average cannot give; stay with `power_spectral_density` for long
-records, where segment averaging is cheaper than `K` full-length FFTs and
+records, where segment averaging is cheaper than $K$ full-length FFTs and
 the two estimators agree.
 
 ## Relation to the H1/H2 estimators
@@ -513,7 +523,7 @@ the two estimators agree.
 The [frequency-response estimators](https://jmrplens.github.io/phonometry/guides/electroacoustics/) `transfer_function`
 and `coherence`, the two-microphone [sound intensity](https://jmrplens.github.io/phonometry/guides/intensity/) probe and
 these estimators all share one Welch core (same taper, overlap policy and
-detrend-off calibration), so a PSD, a coherence and an H1 computed with the
+detrend-off calibration), so a PSD, a coherence and an $H_1$ computed with the
 same segment length are mutually consistent bin by bin. The same cross-spectral
 matrix underlies [multiple and partial coherence](https://jmrplens.github.io/phonometry/guides/miso-coherence/), which
 extends the ordinary coherence to several correlated inputs and one
@@ -625,7 +635,7 @@ The `.plot()` method draws the same two panels in one call (`res.plot()`, or
 
 ## 1. Ordinary, multiple and partial coherence
 
-For a system with `q` inputs `x1..xq` and output `y`, `miso_coherence`
+For a system with $q$ inputs $x_1..x_q$ and output $y$, `miso_coherence`
 estimates every auto- and cross-spectrum by Welch's method and reports three
 coherence functions.
 
@@ -635,22 +645,25 @@ matrix is what turns the tangle into per-source numbers.
 
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_miso_coherence_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_miso_coherence.svg" alt="Block diagram of a two-input MISO system: input x1 is white noise and input x2 equals 0.7 times x1 plus independent noise, x1 drives a 400 hertz low-pass path and x2 a 1.5 kilohertz high-pass path, and both sum with additive noise into the output y; the output feeds the Welch cross-spectral matrix Gxx and Gxy at nperseg 2048, conditioned by Schur steps in descending ordinary coherence order, which yields on one side the multiple and partial coherences, where input 2 in the 100 to 300 hertz band drops from an ordinary coherence of 0.32 to a partial coherence of 0.00, and on the other the per-source contributions Gvi that with the residual noise reconstruct Gyy exactly; a footnote records that each conditioning step spends one of the 242 effective averages" width="92%"></picture>
 
-The **ordinary coherence** of input `i` with the output, on its own
+The **ordinary coherence** of input $i$ with the output, on its own
 (Eq. 7.109), is the familiar single-input quantity
-`γ²iy = |Giy|²/(Gii·Gyy)`.
+$\gamma^2_{iy} = |G_{iy}|^2/(G_{ii}\,G_{yy})$.
 
 The **multiple coherence** (Eq. 7.35) is the fraction of the output
 autospectrum linearly explained by *all* inputs jointly,
-`γ²y:x = GxyᴴGxx⁻¹Gxy/Gyy = 1 - Gnn/Gyy`, where `Gnn` is the residual output
+$\gamma^2_{y:x} = G_{xy}^H\,G_{xx}^{-1}\,G_{xy}/G_{yy} = 1 - G_{nn}/G_{yy}$,
+where $G_{nn}$ is the residual output
 spectrum uncorrelated with every input. If the output carries additive
-uncorrelated noise of per-band signal-to-noise ratio `SNR`, this is exactly
-`SNR/(1+SNR)`, the closed-form oracle used to verify the implementation.
+uncorrelated noise of per-band signal-to-noise ratio $\mathrm{SNR}$, this is
+exactly $\mathrm{SNR}/(1+\mathrm{SNR})$, the closed-form oracle used to verify
+the implementation.
 
-The **partial coherence** of input `i` (Eq. 7.87),
-`γ²iy·(i-1)! = |Giy·(i-1)!|²/(Gii·(i-1)!·Gyy)`, is its coherence with the
+The **partial coherence** of input $i$ (Eq. 7.87),
+$\gamma^2_{iy\cdot(i-1)!} = |G_{iy\cdot(i-1)!}|^2/(G_{ii\cdot(i-1)!}\,G_{yy})$,
+is its coherence with the
 output once the linear effect of the inputs *before it in the conditioning
 order* has been removed. The 4th-edition definition keeps the *total* output
-`Gyy` in the denominator, so the partial coherences of the ordered inputs sum
+$G_{yy}$ in the denominator, so the partial coherences of the ordered inputs sum
 to the multiple coherence (Eq. 7.116) and reduce exactly to the ordinary
 coherences when the inputs are mutually uncorrelated (Eq. 7.117).
 
@@ -663,14 +676,16 @@ res.partial_coherence    # shape (q, F): conditioned on the preceding inputs
 
 ## 2. Conditioning: separating cause from correlation
 
-The partial coherences come from the **conditioned spectra** `Gij·r!`,
+The partial coherences come from the **conditioned spectra** $G_{ij\cdot r!}$,
 computed by the Gaussian-elimination recursion of Section 7.3. Removing the
-linear effect of a pivot input `r` from every remaining record is one Schur
+linear effect of a pivot input $r$ from every remaining record is one Schur
 complement step (Eq. 7.94),
-`Gij·r! = Gij·(r-1)! - Grj·(r-1)!·Gir·(r-1)!/Grr·(r-1)!`, applied for each
+$G_{ij\cdot r!} = G_{ij\cdot(r-1)!} - G_{rj\cdot(r-1)!}\,G_{ir\cdot(r-1)!}/G_{rr\cdot(r-1)!}$,
+applied for each
 input in the conditioning order until only the residual output spectrum
-`Gyy·q!` remains. In the figure above, input 2 is `0.7·x1 + independent
-noise`, so it correlates with input 1 but drives no low-frequency path. Its
+$G_{yy\cdot q!}$ remains. In the figure above, input 2 is
+$0.7\,x_1 + \text{independent noise}$, so it correlates with input 1 but
+drives no low-frequency path. Its
 ordinary coherence with the output therefore reads about 0.3 across the low
 band, borrowed entirely through input 1, while its partial coherence collapses
 to zero there once input 1 is conditioned out.
@@ -684,10 +699,11 @@ res.partial_coherence[1][low].mean()    # ~0.00  (x1 removed)
 ## 3. Which source dominates each band
 
 The conditioning also splits the output power source by source. The **partial
-coherent output spectrum** of input `i` (Eq. 7.86), `Gvi = γ²iy·(i-1)!·Gyy`,
+coherent output spectrum** of input $i$ (Eq. 7.86),
+$G_{v_i} = \gamma^2_{iy\cdot(i-1)!}\,G_{yy}$,
 is the share of the output autospectrum it contributes, and the shares plus
 the residual noise reconstruct the output exactly (Eqs. 7.88/7.121):
-`sum(Gvi) + Gnn = Gyy`. Comparing the shares band by band answers "which
+$\sum_i G_{v_i} + G_{nn} = G_{yy}$. Comparing the shares band by band answers "which
 source dominates here?". `dominant_input()` returns, for every frequency, the
 index of the input with the largest share.
 
@@ -701,10 +717,10 @@ dominant[np.argmin(abs(f - 2500.0))]   # 1 (input 2 drives the high band)
 
 ## 4. Statistical quality and the conditioning order
 
-The random errors follow Section 9.3. Conditioning on the `i-1` preceding
-inputs costs `i-1` degrees of freedom, so the `i`-th ordered input carries
-`nd-(i-1)` effective averages (Eqs. 9.100/9.101) and the `q`-input multiple
-coherence carries `nd-(q-1)` (Eq. 9.98). The result exposes
+The random errors follow Section 9.3. Conditioning on the $i-1$ preceding
+inputs costs $i-1$ degrees of freedom, so the $i$-th ordered input carries
+$n_d-(i-1)$ effective averages (Eqs. 9.100/9.101) and the $q$-input multiple
+coherence carries $n_d-(q-1)$ (Eq. 9.98). The result exposes
 `multiple_coherence_random_error` and `coherent_output_random_error` alongside
 the effective average count `n_averages`.
 
@@ -792,7 +808,7 @@ display instead of averaging them. Because the calibration is the exact
 Welch-module scaling with no detrending, three identities hold:
 
 * a signal in pascals yields Pa²/Hz (`'density'`) or Pa² (`'spectrum'`)
-  per cell, so `10·lg(power/p₀²)` with `'spectrum'` scaling reads a tone's
+  per cell, so $10\lg(\text{power}/p_0^2)$ with `'spectrum'` scaling reads a tone's
   **sound pressure level** directly in any column it spans;
 * the column **mean over time reproduces `power_spectral_density`** bin by
   bin, with the same taper, overlap and scaling;
@@ -811,13 +827,14 @@ print(res.resolution_bandwidth)    # Be of the tapered segment, in Hz
 res.plot()                         # dB image over the time-frequency plane
 ```
 
-The segment length is the whole design decision: `T_B = nperseg/fs` of time
-resolution against `Bₑ ≈ 1/T_B` of frequency resolution, a product of one
+The segment length is the whole design decision: $T_B = \text{nperseg}/f_s$
+of time resolution against $B_e \approx 1/T_B$ of frequency resolution, a
+product of one
 (Section 12.6.4.2). Long segments pin frequencies and smear transients;
 short segments do the opposite. And because each cell is a single
 *unaveraged* estimate, random data carries a per-cell normalized random
-error of 1 (Eq. 8.158 with `nd = 1`; Bendat & Piersol quote
-`√2/1.25 ≈ 1.13` for the magnitude display) - the spectrogram is a tool for
+error of 1 (Eq. 8.158 with $n_d = 1$; Bendat & Piersol quote
+$\sqrt{2}/1.25 \approx 1.13$ for the magnitude display) - the spectrogram is a tool for
 deterministic structure (tones, sweeps, transients), while the averaged
 [Welch estimate](https://jmrplens.github.io/phonometry/guides/spectral-analysis/) is the low-variance
 tool for the stationary background.
@@ -875,7 +892,7 @@ Two tones 3 Hz apart - gear sidebands, twin machines, mains hum against a
 rotor harmonic - are invisible to a 1024-point FFT at 8192 Hz: its bins are
 8 Hz wide. The classical analyzer solution is the **zoom transform** of
 Bendat & Piersol Section 11.5.4: bandpass the record, shift the band down
-to zero frequency by complex demodulation with `exp(-j2πf₁t)`
+to zero frequency by complex demodulation with $\exp(-j 2\pi f_1 t)$
 (Eqs. 11.123-11.126), decimate by the bandwidth ratio and Fourier transform
 the decimated record (Eqs. 11.128-11.130), obtaining a fine bin spacing
 over the band without a giant FFT block (Eq. 11.127).
@@ -884,8 +901,8 @@ over the band without a giant FFT block (Eq. 11.127).
 evaluation of the tapered record's DFT on the zoom grid - which yields the
 same DFT samples as the demodulate-decimate chain; the test suite pins the
 two against each other at machine precision. Amplitudes are calibrated per
-the taper's coherent gain, so a sine of peak amplitude `A` on an analysis
-frequency reads `amplitude = A` and `power = A²/2` exactly:
+the taper's coherent gain, so a sine of peak amplitude $A$ on an analysis
+frequency reads `amplitude` $= A$ and `power` $= A^2/2$ exactly:
 
 ```python
 from phonometry import zoom_fft
@@ -901,8 +918,8 @@ res.plot()                               # power spectrum in dB over the band
 One distinction matters and the result states it: the **grid** can be made
 arbitrarily fine (`n_points`), but the **resolution** - the ability to
 separate two tones - is set by the record length and taper, reported as
-`resolution_bandwidth` (`Bₑ = fs·Σw²/(Σw)²`, i.e. `1/T` untapered, `1.5/T`
-for Hann). Zooming refines the sampling of the same underlying spectrum;
+`resolution_bandwidth` ($B_e = f_s \sum w^2/(\sum w)^2$, i.e. $1/T$
+untapered, $1.5/T$ for Hann). Zooming refines the sampling of the same underlying spectrum;
 only a longer record separates closer tones.
 
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/zoom_fft_resolution_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/zoom_fft_resolution.svg" alt="Zoom FFT of a one-second record containing tones at 997 and 1000 hertz: the coarse 1024-point FFT with 8 hertz bins shows a single broad lump, while the zoom FFT over 980 to 1016 hertz draws two separate mainlobes whose peaks sit exactly on the dotted true-tone frequencies" width="82%"></picture>
@@ -1008,21 +1025,21 @@ collapses that ripple onto a single quefrency spike.
 
 ## 1. The cepstrum and its three variants
 
-Because the log turns the convolution `x = h * u` into the sum
-`ln X = ln H + ln U`, components that overlap in the spectrum add - and
+Because the log turns the convolution $x = h \ast u$ into the sum
+$\ln X = \ln H + \ln U$, components that overlap in the spectrum add - and
 separate - in the cepstral domain (Havelock Ch. 27, Eqs. (22)-(23)). `cepstrum`
 computes the three standard variants over the quefrency axis:
 
-- `'power'` (default): the inverse DFT of `ln|X|²` (Milner's Fig. 21). Real,
+- `'power'` (default): the inverse DFT of $\ln|X|^2$ (Milner's Fig. 21). Real,
   even and phase-blind - the workhorse for echo and harmonic-family
   detection. This is Milner's *signed* cepstrum of the log-power spectrum;
   Bogert's original 1963 "power cepstrum" squares once more and is
   non-negative - the library follows Milner throughout, so negative
   rahmonics keep their sign;
-- `'real'`: the inverse DFT of `ln|X|` - exactly half the power cepstrum,
+- `'real'`: the inverse DFT of $\ln|X|$ - exactly half the power cepstrum,
   and the quantity whose causal folding is the minimum-phase reconstruction
   (below);
-- `'complex'`: the inverse DFT of `ln|X| + j·arg X` with the phase unwrapped
+- `'complex'`: the inverse DFT of $\ln|X| + j\arg X$ with the phase unwrapped
   and its linear component removed (Havelock Ch. 87, Eq. (14)). It keeps the
   phase, so it is **invertible**: the entry point to homomorphic
   deconvolution.
@@ -1043,8 +1060,8 @@ res.plot()
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/cepstrum_variants_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/cepstrum_variants.svg" alt="The power, real and complex cepstra of a wavelet with one 8 millisecond echo overlaid against quefrency up to 20 milliseconds: all three carry a sharp positive spike at 8 milliseconds and a small negative one at 16 milliseconds, the source wavelet fills the region below about 2 milliseconds, and an inset zoom on the first rahmonic shows the power and complex spikes reaching 0.5 while the real cepstrum reaches exactly half of that" width="86%"></picture>
 
 *The three variants of one echo-carrying record (a band-limited wavelet
-plus a reflection at 8 ms, a = 0.5). All three carry the rahmonics at 8 and
-16 ms with heights a and −a²/2 (Milner's signed convention); the inset
+plus a reflection at 8 ms, $a = 0.5$). All three carry the rahmonics at 8
+and 16 ms with heights $a$ and $-a^2/2$ (Milner's signed convention); the inset
 shows the real cepstrum at exactly half the power cepstrum, and the source
 wavelet concentrates below 2 ms.*
 
@@ -1092,30 +1109,30 @@ the `oversample` padding of
 
 ## 2. Echo detection: the rahmonic spike train
 
-A single reflection `x(t) = s(t) + a·s(t-t0)` multiplies the spectrum by
-`1 + a·e^{-j2πft0}` - a ripple of period `1/t0` across the whole band. Its
-logarithm expands, for `|a| < 1`, into the exactly summable series
+A single reflection $x(t) = s(t) + a\,s(t-t_0)$ multiplies the spectrum by
+$1 + a e^{-j 2\pi f t_0}$ - a ripple of period $1/t_0$ across the whole band.
+Its logarithm expands, for $|a| < 1$, into the exactly summable series
 
 $$
 \ln\!\left(1 + a e^{-j\theta}\right)
 = \sum_{n \ge 1} (-1)^{n+1} \frac{a^n}{n}\, e^{-jn\theta},
 $$
 
-so the cepstrum carries a spike train at the **rahmonics** `n·t0` with
-amplitudes `a, -a²/2, a³/3, ...` (their sum is `ln(1+a)`), regardless of the
-spectrum of `s` itself, which concentrates at low quefrencies. On the signed
+so the cepstrum carries a spike train at the **rahmonics** $n t_0$ with
+amplitudes $a, -a^2/2, a^3/3, \dots$ (their sum is $\ln(1+a)$), regardless of
+the spectrum of $s$ itself, which concentrates at low quefrencies. On the signed
 cepstrum of the log-power spectrum (`kind='power'`, Milner's convention) the
-first spike's height is the reflection coefficient `a` - of either
+first spike's height is the reflection coefficient $a$ - of either
 sign - plus whatever the source cepstrum contributes at that quefrency
 (negligible for broadband sources, whose cepstrum concentrates at low
 quefrencies); on an ideal impulse-plus-echo the identity is a closed form
 the tests and the conformance suite pin to 1e-10. `echo_detection` automates the reading: it picks the largest
-`|cepstrum|` peak in the searched band (so an inverting reflection, `a < 0`,
+`|cepstrum|` peak in the searched band (so an inverting reflection, $a < 0$,
 is found at its true delay rather than missed), refines the delay by
 quadratic interpolation through the peak and its neighbours, and reports the
 signed peak value as the reflection coefficient. When the true delay falls
 between samples the rahmonic splits across quefrency bins: the interpolated
-delay still lands on it, but the reported coefficient underestimates `|a|`
+delay still lands on it, but the reported coefficient underestimates $|a|$
 (down to about 65 % of it midway between samples).
 
 ```python
@@ -1173,8 +1190,8 @@ The searched band starts above the low-quefrency region occupied by the
 source's own spectral envelope (`min_quefrency`, default 16 samples) and ends
 at the unambiguous half of the axis (`max_quefrency`). The seismic
 reverberation spike trains of Havelock Ch. 87 are the same signature at
-geophysical scale. Note the negative second rahmonic at `2·t0` in the figure:
-the `-a²/2` term of the series, a useful confirmation that a peak really is
+geophysical scale. Note the negative second rahmonic at $2 t_0$ in the figure:
+the $-a^2/2$ term of the series, a useful confirmation that a peak really is
 an echo and not an unrelated spectral periodicity.
 
 ## 3. Liftering: envelope versus fine structure
@@ -1204,8 +1221,8 @@ low.plot()
 
 *The 4 ms lifter split on a pure-echo record: the lowpass side returns the
 smooth spectral envelope, the highpass side isolates the echo's 125 Hz
-ripple, swinging exactly between the closed forms 20·lg(1±a) = +3.5 and
-−6.0 dB.*
+ripple, swinging exactly between the closed forms
+$20\lg(1 \pm a) = +3.5$ and $-6.0$ dB.*
 
 <details>
 <summary>Show the code for this figure</summary>
@@ -1252,7 +1269,7 @@ plt.show()
 </details>
 
 For the pure-echo signal the highpass ripple swings between the closed forms
-`20·log10(1+a)` and `20·log10(1-a)` dB, another oracle the tests pin. In
+$20\lg(1+a)$ and $20\lg(1-a)$ dB, another oracle the tests pin. In
 speech analysis the identical operation separates the vocal-tract envelope
 (formants) from the excitation harmonics; here it is the general tool for
 "smooth versus periodic" splits of any measured magnitude response.
@@ -1285,7 +1302,7 @@ homomorphic deconvolution (Havelock Ch. 87, Sec. 3.3): zero the rahmonics to
 remove an echo, keep only the low quefrencies to extract a source wavelet.
 A minimum-phase signal has a causal complex cepstrum, which is why folding
 the real cepstrum onto positive quefrencies reconstructs the minimum phase
-from `|H|` alone: [`minimum_phase`](https://jmrplens.github.io/phonometry/guides/swept-sine-distortion/)
+from $|H|$ alone: [`minimum_phase`](https://jmrplens.github.io/phonometry/guides/swept-sine-distortion/)
 and `phase_decomposition` run on that same folding core (Bendat & Piersol
 Sec. 13.1.4; Tohyama in Havelock Ch. 75 edits reverberation by manipulating
 exactly these causal/anticausal parts).
@@ -1310,13 +1327,13 @@ detector (the roll-off of a fourth-order Butterworth applied forward and
 backward; the rejection is finite, and the zero-phase pass leaves small
 transients at the record edges).
 
-For an AM tone `A0·(1 + m·cos(2πfm·t))·cos(2πfc·t)` with `fm` on an
-analysis bin the closed forms are:
+For an AM tone $A_0 (1 + m \cos(2\pi f_m t)) \cos(2\pi f_c t)$ with $f_m$
+on an analysis bin the closed forms are:
 
-| `kind` | mean level | line at `fm` | line at `2fm` |
+| `kind` | mean level | line at $f_m$ | line at $2f_m$ |
 |---|---|---|---|
-| `'magnitude'` | `A0` | `A0·m` | - |
-| `'squared'` | `A0²·(1 + m²/2)` | `2·A0²·m` | `A0²·m²/2` |
+| `'magnitude'` | $A_0$ | $A_0 m$ | - |
+| `'squared'` | $A_0^2 (1 + m^2/2)$ | $2 A_0^2 m$ | $A_0^2 m^2/2$ |
 
 ```python
 import numpy as np
@@ -1413,9 +1430,9 @@ Source: https://jmrplens.github.io/phonometry/guides/synchronous-averaging/
 A rotating machine repeats its signature once per revolution. Buried in
 broadband noise and in the tones of every other shaft, that repetitive
 waveform is hard to read directly. **Time synchronous averaging** (TSA)
-recovers it: given the period `T` of one revolution, it slices the record
-into successive length-`T` blocks and averages them. Every component
-synchronous with `T` reinforces; everything asynchronous, noise and the
+recovers it: given the period $T$ of one revolution, it slices the record
+into successive length-$T$ blocks and averages them. Every component
+synchronous with $T$ reinforces; everything asynchronous, noise and the
 harmonics of unrelated shafts, averages down. `time_synchronous_average`
 implements the model of P. D. McFadden, *A revised model for the extraction
 of periodic waveforms by time domain averaging* (Mechanical Systems and
@@ -1485,15 +1502,23 @@ attenuated.
 
 ## 1. The average is a comb filter
 
-Averaging `N` successive periods (McFadden Eq. 5),
-`a(t) = (1/N) Σ y(t + n·T)`, is, in the frequency domain, the multiplication
-of the signal spectrum by a **comb filter** (Eq. 8). Its magnitude (Eq. 9) is
-the Dirichlet kernel `|C(f)| = |sin(N·π·f·T) / (N·sin(π·f·T))|`.
+Averaging $N$ successive periods (McFadden Eq. 5),
 
-The comb has a **tooth** of unit height at every harmonic `k/T` (the orders
-`f·T = 1, 2, 3, ...`), *independent of `N`*: components synchronous with the
-period pass untouched. Between the teeth it has **nodes** at `j/(N·T)` for
-every `j` that is not a multiple of `N`, where the response is exactly zero.
+$$
+a(t) = \frac{1}{N} \sum_{n=0}^{N-1} y(t + n\,T),
+$$
+
+is, in the frequency domain, the multiplication of the signal spectrum by a
+**comb filter** (Eq. 8). Its magnitude (Eq. 9) is the Dirichlet kernel
+
+$$
+|C(f)| = \left| \frac{\sin(N\pi f T)}{N \sin(\pi f T)} \right| .
+$$
+
+The comb has a **tooth** of unit height at every harmonic $k/T$ (the orders
+$fT = 1, 2, 3, \dots$), *independent of $N$*: components synchronous with the
+period pass untouched. Between the teeth it has **nodes** at $j/(NT)$ for
+every $j$ that is not a multiple of $N$, where the response is exactly zero.
 `comb_filter_response` evaluates this closed form directly:
 
 ```python
@@ -1512,11 +1537,12 @@ the average applied is available alongside the recovered waveform.
 
 ## 2. Noise falls as the square root of the number of averages
 
-Asynchronous noise of variance `σ²` averaged over `N` periods has residual
-variance `σ²/N`: the residual standard deviation falls as `1/√N`, and the
-amplitude signal-to-noise ratio improves by `√N`. That is a power reduction
-of `10·log₁₀ N` dB, reported as `noise_reduction_db`, with the amplitude gain
-`√N` as `amplitude_snr_gain`:
+Asynchronous noise of variance $\sigma^2$ averaged over $N$ periods has
+residual variance $\sigma^2/N$: the residual standard deviation falls as
+$1/\sqrt{N}$, and the amplitude signal-to-noise ratio improves by $\sqrt{N}$.
+That is a power reduction of $10\log_{10} N$ dB, reported as
+`noise_reduction_db`, with the amplitude gain $\sqrt{N}$ as
+`amplitude_snr_gain`:
 
 ```python
 res = time_synchronous_average(recording, fs, period, n_averages=100)
@@ -1527,9 +1553,10 @@ res.plot()                  # averaged waveform + the comb it applied
 
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/tsa_noise_reduction_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/tsa_noise_reduction.svg" alt="Log-log plot of the RMS error of the synchronous average against the number of averages from 1 to 128: the measured error markers fall along the dashed ideal one-over-square-root-of-N line, dropping from about 1 at a single period to below 0.1 at 128 averages" width="82%"></picture>
 
-*The √N law measured end to end: the RMS error of the averaged waveform of
-a three-harmonic gear signature in unit-variance noise falls along the
-ideal σ/√N line as the number of averaged periods grows from 1 to 128.*
+*The $\sqrt{N}$ law measured end to end: the RMS error of the averaged
+waveform of a three-harmonic gear signature in unit-variance noise falls along
+the ideal $\sigma/\sqrt{N}$ line as the number of averaged periods grows from
+1 to 128.*
 
 <details>
 <summary>Show the code for this figure</summary>
@@ -1582,20 +1609,21 @@ the noise actually left once the synchronous component is removed.
 
 Because a tooth sits on *every* integer order, TSA passes the harmonics of
 the target shaft but also any tone that happens to fall on an integer order.
-A tone at a *non-harmonic* order `q = f·T` is only attenuated by the comb,
+A tone at a *non-harmonic* order $q = fT$ is only attenuated by the comb,
 not removed, and how much depends on where the nearest node lands. McFadden's
 revised-model result is that such an interferer is best rejected by choosing
-`N` so that a node falls exactly on it, i.e. the smallest `N` with `N·q` an
+$N$ so that a node falls exactly on it, i.e. the smallest $N$ with $Nq$ an
 integer, rather than by the habitual power-of-two number of averages. An exact
-node exists only when the order `q` is rational, so some finite `N` makes `N·q`
-an integer; for an irrational or merely estimated order, choose the `N` whose
+node exists only when the order $q$ is rational, so some finite $N$ makes $Nq$
+an integer; for an irrational or merely estimated order, choose the $N$ whose
 node falls nearest the interfering order.
 
-His own example is a tone at 32.05 orders. With `N = 20` the product
-`20 · 32.05 = 641` is an integer, so a comb node lands on the tone and rejects
-it by more than 100 dB. The common choice `N = 32` gives `32 · 32.05 = 1025.6`,
-which sits on a side lobe: the tone is barely touched. The figure above shows
-both combs around order 32; the end-to-end average confirms it:
+His own example is a tone at 32.05 orders. With $N = 20$ the product
+$20 \cdot 32.05 = 641$ is an integer, so a comb node lands on the tone and
+rejects it by more than 100 dB. The common choice $N = 32$ gives
+$32 \cdot 32.05 = 1025.6$, which sits on a side lobe: the tone is barely
+touched. The figure above shows both combs around order 32; the end-to-end
+average confirms it:
 
 ```python
 # true 8th-order component plus a strong interferer at 32.05 orders
@@ -1609,13 +1637,13 @@ leak_32 = time_synchronous_average(recording, fs, period, n_averages=32)
 
 So a power-of-two number of averages, convenient as it is, is not in general
 the optimal choice: the interfering orders present in the machine should set
-`N`.
+$N$.
 
 ## 4. Non-integer samples per period
 
-When `fs·T` is an integer, the period boundaries fall on samples, the blocks
+When $f_s T$ is an integer, the period boundaries fall on samples, the blocks
 are sliced directly, and a noiseless periodic signal is recovered to machine
-precision (`interpolated` is `False`). When `fs·T` is not an integer the
+precision (`interpolated` is `False`). When $f_s T$ is not an integer the
 boundaries fall between samples; each block is then aligned to a common
 integer grid by the band-limited fractional delay of
 [`fractional_delay`](https://jmrplens.github.io/phonometry/guides/test-signals/), and the waveform is recovered within
@@ -1633,7 +1661,7 @@ res.samples_per_period                    # integer samples of one period
 
 By default the average uses as many whole periods as the record holds; pass
 `n_averages` to fix the count (for the node-selection choice of §3), and
-`n_harmonics` to set how many harmonics of `1/T` the returned comb response
+`n_harmonics` to set how many harmonics of $1/T$ the returned comb response
 spans.
 
 The band-limited alignment shares its kernel with the sub-sample
@@ -1707,16 +1735,16 @@ are mutually consistent bin by bin.
 `correlation` computes the auto- or cross-correlation via zero-padded FFT so
 the circular product never wraps (Bendat & Piersol Section 11.4.2), with the
 sign convention of the book's time-delay model: for
-`y(t) = α·x(t-τ0) + n(t)` the estimate peaks at `τ = +τ0` (Eq. 5.21). Three
-normalizations are available:
+$y(t) = \alpha\,x(t-\tau_0) + n(t)$ the estimate peaks at $\tau = +\tau_0$
+(Eq. 5.21). Three normalizations are available:
 
-- `'biased'`: the lag sums divided by `N`; tapers toward the record ends
-  and stays bounded by `[Rxx(0)·Ryy(0)]^1/2`;
-- `'unbiased'`: divided by `N-|r|` (Eq. 11.96), an unbiased estimate of
-  `Rxy(τ)` whose variance grows toward the ends;
+- `'biased'`: the lag sums divided by $N$; tapers toward the record ends
+  and stays bounded by $[R_{xx}(0)\,R_{yy}(0)]^{1/2}$;
+- `'unbiased'`: divided by $N-|r|$ (Eq. 11.96), an unbiased estimate of
+  $R_{xy}(\tau)$ whose variance grows toward the ends;
 - `'coefficient'`: the correlation coefficient function
-  `ρxy(τ) = Cxy(τ)/(σx·σy)` in [-1, 1] over the mean-removed records
-  (Eq. 5.16).
+  $\rho_{xy}(\tau) = C_{xy}(\tau)/(\sigma_x\,\sigma_y)$ in $[-1, 1]$ over
+  the mean-removed records (Eq. 5.16).
 
 ```python
 import numpy as np
@@ -1730,11 +1758,11 @@ res.plot()
 
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/correlation_normalizations_dark.webp"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/correlation_normalizations.webp" alt="Two panels for a two-sensor delay model. Top: the correlation coefficient function over plus and minus 50 milliseconds of lag, a flat noise floor near zero with one sharp peak of about 0.85 exactly on the dashed true-delay line at plus 12.5 milliseconds. Bottom: the biased and unbiased estimates over the full plus and minus 2 seconds of lag; the biased noise floor tapers toward the record ends while the unbiased one fans out with growing variance there" width="86%"></picture>
 
-*The two-sensor delay model `y(t) = 0.8·x(t−τ0) + n(t)` under the three
-normalizations: the coefficient function is bounded and peaks at +τ0 (top);
-over the full lag range the biased estimate tapers toward the ends while
-the unbiased one pays for its unbiasedness with variance that grows there
-(bottom).*
+*The two-sensor delay model $y(t) = 0.8\,x(t-\tau_0) + n(t)$ under the three
+normalizations: the coefficient function is bounded and peaks at $+\tau_0$
+(top); over the full lag range the biased estimate tapers toward the ends
+while the unbiased one pays for its unbiasedness with variance that grows
+there (bottom).*
 
 <details>
 <summary>Show the code for this figure</summary>
@@ -1777,8 +1805,8 @@ plt.show()
 
 The result always carries the coefficient function alongside the requested
 normalization, because the coefficient is what the error formulas need. For
-bandwidth-limited Gaussian data of bandwidth `B` observed for `T` seconds
-(Eqs. 8.109/8.112, valid for `T ≥ 10·|τ|` and `BT ≥ 5`):
+bandwidth-limited Gaussian data of bandwidth $B$ observed for $T$ seconds
+(Eqs. 8.109/8.112, valid for $T \ge 10\,|\tau|$ and $BT \ge 5$):
 
 $$
 \varepsilon\!\left[\hat{R}_{xy}(\tau)\right] =
@@ -1789,32 +1817,34 @@ $$
 
 `res.random_error(signal_bandwidth)` evaluates it per lag with the measured
 coefficient, and the standalone `correlation_random_error` takes an explicit
-coefficient; with `ρ = S/√((S+M)(S+N)) = 1/11`, `B = 100` Hz and `T = 5` s
-it reproduces the `ε ≈ 0.35` of the book's Example 8.5, one of the pinned
-conformance anchors. Two closed forms anchor the estimator itself in the
-tests: the autocorrelation of a sine, `(A²/2)·cos(2πf0τ)`, and the
-`sin(2πBτ)/(2πBτ)` autocorrelation of bandwidth-limited white noise
-(Eq. 8.120).
+coefficient; with $\rho = S/\sqrt{(S+M)(S+N)} = 1/11$, $B = 100\ \text{Hz}$
+and $T = 5\ \text{s}$ it reproduces the $\varepsilon \approx 0.35$ of the
+book's Example 8.5, one of the pinned conformance anchors. Two closed forms
+anchor the estimator itself in the tests: the autocorrelation of a sine,
+$(A^2/2)\cos(2\pi f_0\tau)$, and the $\sin(2\pi B\tau)/(2\pi B\tau)$
+autocorrelation of bandwidth-limited white noise (Eq. 8.120).
 
 ## 2. Time-delay estimation
 
-`time_delay` estimates the delay of `y` relative to `x` in the two-sensor
-model `y(t) = α·x(t-τ0) + n(t)` (B&P Section 5.1.4) by three routes:
+`time_delay` estimates the delay of $y$ relative to $x$ in the two-sensor
+model $y(t) = \alpha\,x(t-\tau_0) + n(t)$ (B&P Section 5.1.4) by three
+routes:
 
 - **`'direct'`**: the peak of the full-record correlation coefficient
   function;
-- **`'phase'`**: the `|Gxy|`-weighted least-squares slope of the
+- **`'phase'`**: the $|G_{xy}|$-weighted least-squares slope of the
   cross-spectrum phase (Eq. 5.101b): a pure delay has an exactly linear
   phase, so this estimator resolves fractional delays to better than 1e-3
   samples without any peak interpolation, as long as the unwrapped phase is
   unambiguous (clean, moderate delays);
 - **`'gcc'`**: the generalized cross-correlation of Knapp & Carter (1976):
-  the Welch-averaged cross-spectrum is weighted by `ψ(f)` before the inverse
+  the Welch-averaged cross-spectrum is weighted by $\psi(f)$ before the
+  inverse
   transform, sharpening the peak that the signal's own autocorrelation would
   otherwise smear (their Eq. 9).
 
 The physical picture is two microphones and one wavefront: the extra path to
-the far microphone is c times the delay, and the whole estimation problem is
+the far microphone is $c$ times the delay, and the whole estimation problem is
 locating one peak on the lag axis.
 
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_correlation_delay_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_correlation_delay.svg" alt="Diagram of correlation-based time-delay estimation: a loudspeaker source radiates toward two microphones on stands, microphone 1 capturing x of t and microphone 2 capturing y of t equal to alpha times x delayed by tau 0 plus noise, with the wavefront through microphone 1 leaving an extra path of c times tau 0, about 0.84 meters at 343 meters per second, and sine theta equal to c tau 0 over the spacing d; below, a correlogram panel shows the direct correlator as a broad hump and GCC-PHAT with weighting 1 over the magnitude of Gxy as a sharp spike, both at tau 0 equal to 20 samples over 8192 hertz, 2.44 milliseconds; the caption notes sub-sample refinement by parabolic peak interpolation with 16 times local upsampling to below 0.002 samples" width="92%"></picture>
@@ -1822,13 +1852,13 @@ locating one peak on the lag axis.
 The weightings of Knapp & Carter's Table I, with the conditions the paper
 attaches to each:
 
-| `weighting` | `ψ(f)` | Behaviour and conditions |
+| `weighting` | $\psi(f)$ | Behaviour and conditions |
 |---|---|---|
-| `'none'` | 1 | The plain correlator: the delta at the delay is convolved with the signal autocorrelation, giving a broad peak on colored signals. |
-| `'roth'` | `1/Gxx` | Suppresses the bands where the *first* sensor is noisy; still smears unless that noise is spectrally similar to the signal. |
-| `'scot'` | `1/√(Gxx·Gyy)` | Prewhitens both channels symmetrically; equals Roth when the sensors match. |
-| `'phat'` | `1/|Gxy|` | Ideally a delta at the delay for uncorrelated noises (their Eq. 23), but the weight ignores the signal-to-noise ratio, so bands without signal contribute unit-magnitude random phase. It needs signal power across the analysis band. |
-| `'ml'` | `γ²/(|Gxy|·(1-γ²))` | The Hannan-Thomson maximum-likelihood processor: a PHAT weighted down by the phase variance each band actually carries. Attains the Cramér-Rao bound; the safe default when the signal does not fill the band. |
+| `'none'` | $1$ | The plain correlator: the delta at the delay is convolved with the signal autocorrelation, giving a broad peak on colored signals. |
+| `'roth'` | $1/G_{xx}$ | Suppresses the bands where the *first* sensor is noisy; still smears unless that noise is spectrally similar to the signal. |
+| `'scot'` | $1/\sqrt{G_{xx}\,G_{yy}}$ | Prewhitens both channels symmetrically; equals Roth when the sensors match. |
+| `'phat'` | $1/\lvert G_{xy}\rvert$ | Ideally a delta at the delay for uncorrelated noises (their Eq. 23), but the weight ignores the signal-to-noise ratio, so bands without signal contribute unit-magnitude random phase. It needs signal power across the analysis band. |
+| `'ml'` | $\gamma^2/(\lvert G_{xy}\rvert\,(1-\gamma^2))$ | The Hannan-Thomson maximum-likelihood processor: a PHAT weighted down by the phase variance each band actually carries. Attains the Cramér-Rao bound; the safe default when the signal does not fill the band. |
 
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/gcc_phat_delay_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/gcc_phat_delay.svg" alt="Normalized cross-correlation of a colored two-sensor signal pair against lag in milliseconds: the direct correlator shows a broad peak around the true 20-sample delay while the GCC-PHAT curve collapses to a sharp spike exactly on the dashed true-delay line" width="82%"></picture>
 
@@ -1870,13 +1900,13 @@ The correlation-peak methods refine the sample peak by three-point parabolic
 interpolation, optionally after **band-limited local upsampling**
 (`upsample=16` resamples a window around the peak sixteenfold before the
 parabola). Sub-sample accuracy presumes the peak is oversampled, i.e. the
-signals are band-limited below Nyquist; on a 0.4·fs band-limited pair the
+signals are band-limited below Nyquist; on a $0.4\,f_s$ band-limited pair the
 tests pin the achievable error at ≲0.1 sample for the parabola alone and
 ≲2e-3 samples with `upsample=16`. For GCC the delay must fit within half a
 Welch segment; raise `nperseg` for longer delays.
 
 With `signal_bandwidth` given, the result also carries the **peak-location
-uncertainty** of B&P Eq. 8.129 and its ±2σ interval (Eq. 8.130):
+uncertainty** of B&P Eq. 8.129 and its $\pm 2\sigma$ interval (Eq. 8.130):
 
 $$
 \sigma(\hat{\tau}_0) \approx
@@ -1972,7 +2002,7 @@ smooth band-limited pulse: about 1e-2 samples with the parabola alone,
 
 ## 4. Hilbert envelope and instantaneous frequency
 
-`envelope` builds the analytic signal `z(t) = x(t) + j·x̃(t)` by the
+`envelope` builds the analytic signal $z(t) = x(t) + j\,\tilde{x}(t)$ by the
 one-sided spectrum construction that Bendat & Piersol recommend
 (Eq. 13.25) and returns the three Chapter 13 quantities on one time axis:
 
@@ -1982,10 +2012,10 @@ A(t) = \left[x^2(t) + \tilde{x}^2(t)\right]^{1/2}, \qquad
 f(t) = \frac{1}{2\pi}\frac{d\theta}{dt} .
 $$
 
-For an amplitude-modulated carrier `u(t)·cos(2πf0t)` the envelope recovers
-`u(t)` exactly (Eq. 13.27); the conformance suite pins the recovered AM
-envelope and the Table 13.1 pair `cos → sin` at the 1e-9 level, and the
-instantaneous frequency of a chirp tracks its sweep.
+For an amplitude-modulated carrier $u(t)\cos(2\pi f_0 t)$ the envelope
+recovers $u(t)$ exactly (Eq. 13.27); the conformance suite pins the
+recovered AM envelope and the Table 13.1 pair $\cos \to \sin$ at the
+1e-9 level, and the instantaneous frequency of a chirp tracks its sweep.
 
 ```python
 from phonometry import envelope
@@ -2129,7 +2159,7 @@ The result carries the record, the rectangular gating **envelope** and the
 exact sample bookkeeping (`burst_samples`, `onset_sample`, `period_samples`,
 `duty_cycle`), so a test report can state its stimulus numerically. Because
 the gate spans an integral number of full periods starting at a zero
-crossing, the burst energy has the closed form `A²N/2` exactly, which is how
+crossing, the burst energy has the closed form $A^2 N/2$ exactly, which is how
 the generator is verified.
 
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/tone_burst_train_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/tone_burst_train.svg" alt="IEC 60268-1 tone bursts: a single 5 ms burst of 5 kHz tone starting at a zero crossing with its rectangular gating envelope, and a repetitive train of four bursts at 10 bursts per second with a 5 percent duty cycle" width="82%"></picture>
@@ -2188,7 +2218,7 @@ numbers the caller controls:
 - `transition_width` (default 0.05): the fraction of that Nyquist frequency
   given up to the filter's transition band, so the passband ends at
   `(1 - transition_width)·f_Nyq` and is flat within the same Kaiser ripple
-  bound `δ = 10^(-A/20)`.
+  bound $\delta = 10^{-A/20}$.
 
 ```python
 from phonometry import noise_signal, resample_signal
@@ -2255,7 +2285,7 @@ leakage against the design's own ripple bound (the design internally targets
 1 dB past the request, so the delivered filter meets the stated numbers
 rather than a Kaiser-formula approximation of them). A passband tone
 resampled through the default specification matches the analytic tone at the
-new rate within `10^(-120/20) = 10^-6`.
+new rate within $10^{-120/20} = 10^{-6}$.
 
 Several estimators resample internally at fixed rates (the ECMA-418-2
 psychoacoustics at 48 kHz, STOI at 10 kHz); this function is the public,
@@ -2265,7 +2295,7 @@ documented counterpart for preparing records outside those chains.
 
 `fractional_delay` shifts a record by any number of samples, including
 sub-sample amounts, by multiplying the spectrum with the phase ramp
-`e^(-j2πf·D/fs)`: every component is delayed by exactly `D` samples. Two
+$e^{-j 2\pi f D/f_s}$: every component is delayed by exactly `D` samples. Two
 boundary conventions cover the two use cases:
 
 - `mode="linear"` (default) zero-pads the record past the shift, so samples
@@ -2276,7 +2306,7 @@ boundary conventions cover the two use cases:
 - `mode="circular"` applies the ramp over the record itself and wraps. For
   periodic records it is exact: a tone centered on a DFT bin delayed by
   `D` samples equals the analytically delayed tone to machine precision,
-  and its phase changes by exactly `-2πf·D/fs` radians.
+  and its phase changes by exactly $-2\pi f D/f_s$ radians.
 
 ```python
 import numpy as np
@@ -2316,7 +2346,7 @@ smearing them.
 - [Correlation and delay](https://jmrplens.github.io/phonometry/guides/correlation-delay/): the alignment work built
   on the fractional-delay kernel.
 - [Synchronous averaging](https://jmrplens.github.io/phonometry/guides/synchronous-averaging/): period alignment with
-  the same band-limited shift when `fs·T` is not an integer.
+  the same band-limited shift when $f_s T$ is not an integer.
 - [Spectral analysis](https://jmrplens.github.io/phonometry/guides/spectral-analysis/): the colored-noise verification
   and the window metrics.
 
@@ -2368,8 +2398,8 @@ post-processing step.
 
 ## 1. Complementary Golay pairs
 
-A Golay pair are two binary sequences `a`, `b` of length `L = 2**n`, built by
-a two-line recursion - append `b` to `a`, and `-b` to `a` (Havelock Part I
+A Golay pair are two binary sequences $a$, $b$ of length $L = 2^n$, built by
+a two-line recursion - append $b$ to $a$, and $-b$ to $a$ (Havelock Part I
 Ch. 6, Eq. (1)). Their defining property is *algebraic*, not approximate: the
 two periodic autocorrelations sum to
 
@@ -2378,10 +2408,10 @@ $$
 \begin{cases} 2L & k = 0\\ 0 & k \ne 0, \end{cases}
 $$
 
-an exact delta (Eq. (2)). An MLS autocorrelation has a `-1` residue at every
+an exact delta (Eq. (2)). An MLS autocorrelation has a $-1$ residue at every
 nonzero lag; the Golay sidelobes cancel identically. The measurement runs
-each code in turn - play `a` periodically, record one steady-state period,
-then the same with `b` - and sums the two circular cross-correlations
+each code in turn - play $a$ periodically, record one steady-state period,
+then the same with $b$ - and sums the two circular cross-correlations
 (Eq. (4)): for a noiseless linear time-invariant system the impulse response
 comes back to machine precision, a closed-form identity the tests and the
 [conformance report](https://jmrplens.github.io/phonometry/reference/conformance/) pin at `1e-13`.
@@ -2410,7 +2440,7 @@ ir.plot()
 
 *The Golay recovery of a band-pass system's impulse response: the summed
 complementary correlations land on the true response to machine precision
-(max error 2·10⁻¹⁴ here), the closed-form identity the tests pin.*
+(max error $2\cdot10^{-14}$ here), the closed-form identity the tests pin.*
 
 <details>
 <summary>Show the code for this figure</summary>
@@ -2472,7 +2502,7 @@ variance (Xiang's Sec. 2) - the price of the exact complementarity.
 A sweep's energy at a given frequency can be set two ways: by its amplitude,
 or by *how long it dwells there*. Mueller & Massarani's frequency-domain
 synthesis (Secs. 4.2-4.3) uses the second lever: define the target magnitude
-`|H(f)|`, make the group delay grow in proportion to the target's power,
+$|H(f)|$, make the group delay grow in proportion to the target's power,
 
 $$
 \tau_G(f) = \tau_G(f - df) + C\,|H(f)|^2,\qquad
@@ -2579,7 +2609,7 @@ tail sits at the very end of the full deconvolution buffer - keep
 ## 3. Regularized spectral inversion
 
 Equalizing with a measured response means inverting it, and a plain
-reciprocal `1/H(f)` explodes wherever the system radiates little energy - a
+reciprocal $1/H(f)$ explodes wherever the system radiates little energy - a
 notch in-band, everything out-of-band - turning an equalizer into a noise
 amplifier. Mueller & Massarani confine the inversion with a band-pass
 (Secs. 3.1, 4.5); the general form of that confinement is Kirkeby & Nelson's
@@ -2589,12 +2619,13 @@ $$
 H_{inv}(f) = \frac{H^*(f)}{|H(f)|^2 + \varepsilon(f)},
 $$
 
-with `ε(f)` small inside the band to be equalized and large outside.
-In-band the equalized magnitude `|H·H_inv|` deviates from unity by exactly
-`ε/(|H|² + ε)` - a closed form the conformance suite checks bin by bin -
-and out-of-band the filter gain can never exceed `1/(2·√ε)`, the analytic
-maximum of `x/(x² + ε)`. A modeling delay of half the filter block makes the
-generally anticausal inverse of a mixed-phase response causal
+with $\varepsilon(f)$ small inside the band to be equalized and large outside.
+In-band the equalized magnitude $|H \cdot H_{inv}|$ deviates from unity by
+exactly $\varepsilon/(|H|^2 + \varepsilon)$ - a closed form the conformance
+suite checks bin by bin - and out-of-band the filter gain can never exceed
+$1/(2\sqrt{\varepsilon})$, the analytic maximum of $x/(x^2 + \varepsilon)$. A
+modeling delay of half the filter block makes the generally anticausal inverse
+of a mixed-phase response causal
 (Kirkeby & Nelson Sec. 2.4).
 
 ```python
@@ -2654,7 +2685,7 @@ plt.show()
 
 </details>
 
-Both regularization levels are fractions of the peak of `|H|²`, generalising
+Both regularization levels are fractions of the peak of $|H|^2$, generalising
 the scalar `regularization` of `impulse_response`: `regularization_inside`
 (default `1e-6`) sets how exactly the band is flattened,
 `regularization_outside` (default `1.0`) caps the out-of-band boost 6 dB
@@ -2812,25 +2843,25 @@ plt.show()
 ## 1. Rolling-contact bearings
 
 Norton reproduces the eleven discrete frequencies collected by Shahan and
-Kamperman (Eqs. 8.4 to 8.14). With the shaft speed `N` in r/min, `Z` rolling
-elements of diameter `d` on a pitch diameter `D`, a contact angle `φ`, and
-writing `g = (d/D) cos φ` and `fs = N/60`:
+Kamperman (Eqs. 8.4 to 8.14). With the shaft speed $N$ in r/min, $Z$ rolling
+elements of diameter $d$ on a pitch diameter $D$, a contact angle $\phi$,
+and writing $g = (d/D)\cos\phi$ and $f_s = N/60$:
 
 | Name | Meaning | Expression | Norton eq. |
 |---|---|---|---|
-| `shaft` | shaft rotational frequency | `fs = N/60` | (8.4) |
-| `FTF` | cage (fundamental train) frequency | `(fs/2)(1 - g)` | (8.5) |
-| `FTF_rel` | cage relative to the rotating race | `fs - FTF` | (8.11) |
-| `BSF` | rolling-element rotational frequency | `(fs/2)(D/d)(1 - g²)` | (8.7) |
-| `BDF` | rolling-element spin frequency | `2 BSF` | (8.10) |
-| `BPFO` | element pass frequency, outer race | `Z (fs/2)(1 - g)` | (8.8) |
-| `BPFI` | element pass frequency, inner race | `Z (fs/2)(1 + g)` | (8.9) |
+| `shaft` | shaft rotational frequency | $f_s = N/60$ | (8.4) |
+| `FTF` | cage (fundamental train) frequency | $(f_s/2)(1 - g)$ | (8.5) |
+| `FTF_rel` | cage relative to the rotating race | $f_s - \text{FTF}$ | (8.11) |
+| `BSF` | rolling-element rotational frequency | $(f_s/2)(D/d)(1 - g^2)$ | (8.7) |
+| `BDF` | rolling-element spin frequency | $2\,\text{BSF}$ | (8.10) |
+| `BPFO` | element pass frequency, outer race | $Z(f_s/2)(1 - g)$ | (8.8) |
+| `BPFI` | element pass frequency, inner race | $Z(f_s/2)(1 + g)$ | (8.9) |
 
 Three of them carry the diagnosis: `BPFO` for an outer-race defect, `BPFI` for
 an inner-race defect, and `BDF` for a damaged rolling element or cage. Two
 identities are worth remembering because they are exact and catch data-entry
-errors instantly: `BPFO + BPFI = Z fs` always, and `BPFO = Z × FTF` whenever
-the outer race is stationary.
+errors instantly: $\text{BPFO} + \text{BPFI} = Z f_s$ always, and
+$\text{BPFO} = Z \times \text{FTF}$ whenever the outer race is stationary.
 
 ```python
 from phonometry import bearing_fault_frequencies
@@ -2841,7 +2872,7 @@ print(round(res["BPFO"] + res["BPFI"], 1))            # 500.0 = 15 x 33.33
 print(res.as_dict())
 ```
 
-Only the ratio `d/D` enters, so the two diameters may be given in millimetres,
+Only the ratio $d/D$ enters, so the two diameters may be given in millimetres,
 inches or metres as long as both use the same unit. `rotating_race="outer"`
 moves the cage to Eq. (8.6); `BPFO` and `BPFI` do not move, because Norton's
 Eqs. (8.8) and (8.14), and (8.9) and (8.13), are pairwise identical.
@@ -2853,8 +2884,8 @@ on the line", not "the peak is at the line".
 
 ## 2. Gears
 
-The gear-meshing (tooth-passing) frequency of a wheel with `N` teeth is
-`GMF = N fs` (Eq. 8.3), with integer harmonics. What distinguishes the fault
+The gear-meshing (tooth-passing) frequency of a wheel with $N$ teeth is
+$\text{GMF} = N f_s$ (Eq. 8.3), with integer harmonics. What distinguishes the fault
 types is the **sideband** family around each harmonic: a single chipped tooth
 or an eccentric wheel modulates the mesh once per revolution and produces low,
 flat sidebands spaced by the shaft rate, while distributed wear raises tall
@@ -2881,13 +2912,13 @@ air gap, torque pulses and the winding and rotor-bar electrical faults). Rotor
 defects that produce static or dynamic air-gap eccentricity are read on the
 **rotor-slot harmonics** of Eq. (8.20),
 
-```
-fsh = fe [(2 R / p)(1 - s) ± 2 (n - 1)]
-```
+$$
+f_{sh} = f_e \left[(2R/p)(1 - s) \pm 2(n - 1)\right]
+$$
 
-for `R` rotor bars, `p` magnetic poles (not pole pairs), unit slip `s` and
-`n = 1, 2, …`. Dynamic eccentricity dresses the dominant slot harmonic with
-sidebands at ± the shaft rate and ± the slip frequency.
+for $R$ rotor bars, $p$ magnetic poles (not pole pairs), unit slip $s$ and
+$n = 1, 2, \ldots$. Dynamic eccentricity dresses the dominant slot harmonic
+with sidebands at $\pm$ the shaft rate and $\pm$ the slip frequency.
 
 ```python
 from phonometry import induction_motor_frequencies
@@ -2900,26 +2931,28 @@ print(round(res["1x"]), round(res["2x"]),
 
 Give the slip directly, or give the mains `supply_frequency` and let the slip
 follow from it and the measured shaft speed. The supply frequency is taken as
-`fe = fs p / (2 (1 - s))`; Norton's Eq. (8.19) writes `fe = fs p / 2`, which is
-the same expression at zero slip but does not reduce Eq. (8.20) to the physical
-rotor-bar passing rate `R fs` when the machine is loaded. Under load the result
-also carries the slip frequency and the pole-pass line `FP = p × f_slip`, the
+$f_e = f_s\,p / (2(1 - s))$; Norton's Eq. (8.19) writes $f_e = f_s\,p/2$,
+which is the same expression at zero slip but does not reduce Eq. (8.20) to
+the physical rotor-bar passing rate $R f_s$ when the machine is loaded.
+Under load the result also carries the slip frequency and the pole-pass
+line $\text{FP} = p \times f_\text{slip}$, the
 sideband spacing that a broken rotor bar puts around `1x`.
 
 ## 4. Fans, blowers and pumps
 
-The blade-passing frequency of an impeller with `N` blades is `fb = n N fs`
-(Eq. 8.15); a pump's hydraulic pulsations follow the same form with `N` pumping
-events per revolution (Eq. 8.18), and a rotary positive-displacement blower
-repeats four times per revolution, so it is handled by passing `4 × r/min`.
+The blade-passing frequency of an impeller with $N$ blades is $f_b = n N f_s$
+(Eq. 8.15); a pump's hydraulic pulsations follow the same form with $N$
+pumping events per revolution (Eq. 8.18), and a rotary
+positive-displacement blower repeats four times per revolution, so it is
+handled by passing $4 \times \text{r/min}$.
 
 In a **ducted axial fan** the blades also interact with the stator vanes and set
-up rotating pressure patterns with `mL = n N ± k V` lobes for `V` vanes
-(Eq. 8.16), turning at `n N fs / mL` (Eq. 8.17). A pattern that spins faster
+up rotating pressure patterns with $m_L = nN \pm kV$ lobes for $V$ vanes
+(Eq. 8.16), turning at $n N f_s / m_L$ (Eq. 8.17). A pattern that spins faster
 than the blades themselves radiates far more strongly, which is why the choice
-of `N` and `V` matters, and why those speeds are the ones to check against the
+of $N$ and $V$ matters, and why those speeds are the ones to check against the
 duct cut-on frequencies. Each line is named `lobe n=<n> m=<mL>`: the blade
-harmonic belongs in the name because Eq. (8.17) carries `n`, so the same lobe
+harmonic belongs in the name because Eq. (8.17) carries $n$, so the same lobe
 count reached from a different harmonic is a different pattern turning at a
 different speed.
 
@@ -2997,7 +3030,7 @@ turn a present line into a severity assessment (crest factor and kurtosis
 trends, ISO 10816 / ISO 20816 velocity severity bands) are outside this module;
 Norton's own guidance is qualitative (crest factors of 2.5 to 3.5 for a healthy
 bearing, up to about 11 with impulsive defects; kurtosis near 3 healthy and
-above 4 damaged). The pole-pass frequency `FP = p × f_slip` is standard
+above 4 damaged). The pole-pass frequency $\text{FP} = p \times f_\text{slip}$ is standard
 condition-monitoring practice rather than Norton's: he gives the slip frequency
 itself as the broken-bar sideband spacing and does not multiply it by the pole
 count.

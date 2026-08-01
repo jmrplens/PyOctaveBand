@@ -48,8 +48,8 @@ ondas de flexión reflejadas y transmitidas, sin conversión a ondas en el plano
 y los coeficientes resultantes son **independientes de la frecuencia**. Eso es
 lo que los convierte en entradas convenientes en forma cerrada para el análisis
 estadístico de energía (SEA) y para el modelo de transmisión por flancos de la
-EN 12354, donde alimentan el factor de pérdidas por acoplamiento `etaij` y el
-índice de reducción vibracional `Kij`.
+EN 12354, donde alimentan el factor de pérdidas por acoplamiento $\eta_{ij}$ y
+el índice de reducción vibracional $K_{ij}$.
 
 Primero el objeto en sí: una unión en T donde un forjado de hormigón de 140 mm
 muere contra un muro continuo de 200 mm. Un resultado de `junction_transmission`
@@ -96,19 +96,28 @@ plt.show()
 
 ## 1. Parámetros de onda chi y psi
 
-Con la placa `i` de espesor `h_i`, velocidad de onda cuasi-longitudinal `cL_i` y
-densidad superficial `rho_s,i`, toda la familia de coeficientes depende de solo
-dos razones adimensionales (Cremer et al. 1973):
+Con la placa $i$ de espesor $h_i$, velocidad de onda cuasi-longitudinal
+$c_{L,i}$ y densidad superficial $\rho_{s,i}$, toda la familia de coeficientes
+depende de solo dos razones adimensionales (Cremer et al. 1973):
 
-```
-chi = kB2 / kB1 = (rho_s2 B1 / (rho_s1 B2))**0.25 = sqrt(h1 cL1 / (h2 cL2)) = sqrt(fc2 / fc1)
-psi = B2 kB2**2 / (B1 kB1**2) = (h2 cL2 rho_s2) / (h1 cL1 rho_s1) = (rho_s2 fc1) / (rho_s1 fc2)
-```
+$$
+\chi = \frac{k_{B2}}{k_{B1}}
+     = \left(\frac{\rho_{s2} B_1}{\rho_{s1} B_2}\right)^{1/4}
+     = \sqrt{\frac{h_1 c_{L1}}{h_2 c_{L2}}}
+     = \sqrt{\frac{f_{c2}}{f_{c1}}}
+$$
 
-`chi` es la razón de números de onda de flexión de las placas (equivalente a la
-raíz cuadrada de la razón de sus frecuencias críticas) y fija el ángulo de corte
-por reflexión total interna `theta_co = arcsin(chi)`; `psi` es la razón de sus
-movilidades de momento flector. Para **placas idénticas** ambos valen 1.
+$$
+\psi = \frac{B_2 k_{B2}^2}{B_1 k_{B1}^2}
+     = \frac{h_2 c_{L2} \rho_{s2}}{h_1 c_{L1} \rho_{s1}}
+     = \frac{\rho_{s2} f_{c1}}{\rho_{s1} f_{c2}}
+$$
+
+$\chi$ es la razón de números de onda de flexión de las placas (equivalente a
+la raíz cuadrada de la razón de sus frecuencias críticas) y fija el ángulo de
+corte por reflexión total interna $\theta_\text{co} = \arcsin\chi$; $\psi$ es
+la razón de sus movilidades de momento flector. Para **placas idénticas**
+ambos valen 1.
 
 ```python
 from phonometry import junction_wave_parameters
@@ -120,13 +129,14 @@ chi, psi = junction_wave_parameters(0.1, 3200.0, 240.0, 0.2, 3200.0, 480.0)
 ## 2. Coeficientes de esquina y de tramo recto
 
 Para una onda incidente sobre la placa 1, la transmisión **alrededor de la
-esquina** (hacia la placa perpendicular 2) es `tau12(theta)` (Ec. 5.12), y la
-transmisión **a través del tramo recto** (hacia la placa colineal 3, solo en las
-uniones en X y en T (1)) es `tau13(theta)` (Ec. 5.13). El coeficiente de esquina
-es cero más allá del ángulo de corte, `tau12(theta) = 0` para `chi < sin(theta)`.
-Las constantes de unión `J1`, `J2`, `J3` seleccionan la geometría:
+esquina** (hacia la placa perpendicular 2) es $\tau_{12}(\theta)$ (Ec. 5.12),
+y la transmisión **a través del tramo recto** (hacia la placa colineal 3, solo
+en las uniones en X y en T (1)) es $\tau_{13}(\theta)$ (Ec. 5.13). El
+coeficiente de esquina es cero más allá del ángulo de corte,
+$\tau_{12}(\theta) = 0$ para $\chi < \sin\theta$.
+Las constantes de unión $J_1$, $J_2$, $J_3$ seleccionan la geometría:
 
-| Unión | `J1` | `J2` | `J3` |
+| Unión | $J_1$ | $J_2$ | $J_3$ |
 |---|---|---|---|
 | X | 1 | 1 | 1 |
 | T (1) | 2 | 0,5 | 0,5 |
@@ -152,7 +162,7 @@ El clip de abajo ejecuta este experimento en el dominio del tiempo con el
 librería: un paquete de flexión sobre una placa
 de acero de 10 mm llega a una unión en L con una placa idéntica, y la esquina
 lo divide en las ondas reflejada y transmitida que esta sección tasa en
-`tau12(0 grados) = 0,5`. El precursor rápido de onda en el plano que baja por
+$\tau_{12}(0°) = 0{,}5$. El precursor rápido de onda en el plano que baja por
 la placa receptora es la conversión de modo que el modelo de unión articulada
 deja fuera a propósito.
 
@@ -167,15 +177,18 @@ deja fuera a propósito.
 ## 3. Media angular en campo difuso
 
 En un campo vibracional difuso todos los ángulos de incidencia son igual de
-probables y la intensidad incidente lleva un factor de oblicuidad `cos(theta)`,
-por lo que el coeficiente de transmisión medio es `tau_bar_ij = integral 0..pi/2
-de tau_ij(theta) cos(theta) d(theta)` (Ec. 5.6). Para **placas idénticas** el
-álgebra se reduce a fracciones exactas que sirven de oráculo desde primeros
-principios de la biblioteca:
+probables y la intensidad incidente lleva un factor de oblicuidad
+$\cos\theta$, por lo que el coeficiente de transmisión medio es
+$\bar{\tau}_{ij} = \int_0^{\pi/2} \tau_{ij}(\theta)\cos\theta\,\mathrm{d}\theta$
+(Ec. 5.6). Para **placas idénticas** el álgebra se reduce a fracciones exactas
+que sirven de oráculo desde primeros principios de la biblioteca:
 
-- esquina y recto de la unión en X: `tau_ij(theta) = cos**2(theta) / 8`, luego `tau_bar_ij = 1/12`;
-- esquina de la unión en L: `tau_ij(theta) = cos**2(theta) / 2`, luego `tau_bar_ij = 1/3`;
-- unión en línea: `tau12(0 grados) = 1` (una placa continua transmite por completo).
+- esquina y recto de la unión en X: $\tau_{ij}(\theta) = \cos^2\theta / 8$,
+  luego $\bar{\tau}_{ij} = 1/12$;
+- esquina de la unión en L: $\tau_{ij}(\theta) = \cos^2\theta / 2$, luego
+  $\bar{\tau}_{ij} = 1/3$;
+- unión en línea: $\tau_{12}(0°) = 1$ (una placa continua transmite por
+  completo).
 
 ```python
 from phonometry import angular_average_transmission_coefficient
@@ -185,20 +198,22 @@ angular_average_transmission_coefficient(1.0, 1.0, "L", section="corner")  # 1/3
 ```
 
 Las dos direcciones cumplen la relación de consistencia SEA (Ec. 5.7),
-`tau_bar_12 = chi * tau_bar_21`, de modo que solo hace falta calcular una
-dirección.
+$\bar{\tau}_{12} = \chi\,\bar{\tau}_{21}$, de modo que solo hace falta calcular
+una dirección.
 
 ## 4. Factor de pérdidas por acoplamiento e índice de reducción vibracional
 
 La media angular es el puente hacia los dos descriptores de unión usados en los
 modelos de edificios basados en SEA: el **factor de pérdidas por acoplamiento**
-(Ec. 2.154) `etaij = cg_i L_ij tau_ij / (2 pi**2 f S_i)` y el **índice de
-reducción vibracional** del enfoque ondulatorio (Ec. 5.116)
-`Kij = 10 lg(1 / tau_ij) + 5 lg(fc_j / f_ref)` con `f_ref = 1000 Hz` y `fc_j`
+(Ec. 2.154) $\eta_{ij} = c_{g,i} L_{ij} \tau_{ij} / (2\pi^2 f S_i)$ y el
+**índice de reducción vibracional** del enfoque ondulatorio (Ec. 5.116)
+$K_{ij} = 10\lg(1/\tau_{ij}) + 5\lg(f_{c,j}/f_\text{ref})$ con
+$f_\text{ref} = 1000\ \text{Hz}$ y $f_{c,j}$
 la frecuencia crítica de la placa *receptora*. Combinada con la reciprocidad de
-la Ec. 5.7, esta forma es simétrica, `Kij = Kji`, como exige la EN 12354 al
-descriptor de unión. Para la unión en X idéntica de hormigón de 100 mm
-(`fc ~= 203 Hz`), `Kij = 10 lg 12 + 5 lg(203 / 1000) ~= 7,3 dB`.
+la Ec. 5.7, esta forma es simétrica, $K_{ij} = K_{ji}$, como exige la EN 12354
+al descriptor de unión. Para la unión en X idéntica de hormigón de 100 mm
+($f_c \approx 203\ \text{Hz}$),
+$K_{ij} = 10\lg 12 + 5\lg(203/1000) \approx 7{,}3\ \text{dB}$.
 
 ```python
 from phonometry import (coupling_loss_factor, junction_transmission,
@@ -214,7 +229,7 @@ kij = res.corner_reduction_index  # lo mismo, precalculado en el resultado
 res.plot()   # tau(theta) de los caminos de esquina y recto de esta unión (requiere matplotlib)
 ```
 
-`Kij` es también lo que ISO 10848 mide sobre una unión construida: se excita
+$K_{ij}$ es también lo que ISO 10848 mide sobre una unión construida: se excita
 un elemento, se lee la diferencia de nivel de velocidad en ambos y se
 normaliza por la longitud de unión, de modo que el valor en forma cerrada de
 arriba tiene un homólogo experimental directo.
@@ -262,7 +277,8 @@ plt.show()
 
 El número que predice esta página es exactamente el que consume el modelo de
 flancos de EN 12354-1. Toma la unión en X de hormigón de 100 mm / 200 mm de
-la figura inicial: su camino de esquina da `K12 = 9,8` dB. Entregarlo a
+la figura inicial: su camino de esquina da $K_{12} = 9{,}8\ \text{dB}$.
+Entregarlo a
 `flanking_element` en lugar de un valor tabulado del Anexo E valora los tres
 caminos de flancos de la unión y su efecto sobre el índice aparente:
 
@@ -283,11 +299,12 @@ print(round(pred.r_prime_w, 1))                      # 55.4  (Rw 57 directo)
 print(pred.dominant.label, round(pred.dominant.fraction, 2))   # Dd 0.68
 ```
 
-Una sola unión con un `Kij` moderado ya recorta 1,6 dB al $R_w = 57$ dB
-directo; un edificio completo repite esto para cada unión, que es la
+Una sola unión con un $K_{ij}$ moderado ya recorta 1,6 dB al
+$R_w = 57\ \text{dB}$ directo; un edificio completo repite esto para cada
+unión, que es la
 [guía de predicción EN 12354](/phonometry/es/guides/insulation-prediction/).
 
-La contraparte medida de la EN 12354 de `Kij` (a partir de la diferencia de
+La contraparte medida de la EN 12354 de $K_{ij}$ (a partir de la diferencia de
 niveles de velocidad promediada en dirección) es el `vibration_reduction_index`
 separado de la transmisión por flancos; esta página es el valor *predicho* en
 forma cerrada del enfoque ondulatorio.
@@ -328,22 +345,27 @@ potencia SEA en régimen estacionario a partir de energías *medidas* de los
 subsistemas (Norton y Karczub 2003, secciones 6.3.3 y 6.3.4). Para dos
 subsistemas,
 
-```
-Pi_1 = omega [ (eta_1 + eta_12) E_1 - eta_21 E_2 ]         (6.10)
-0    = omega [ (eta_2 + eta_21) E_2 - eta_12 E_1 ]         (6.11)
-```
+$$
+\Pi_1 = \omega\left[(\eta_1 + \eta_{12})\,E_1 - \eta_{21}\,E_2\right]
+\quad (6.10)
+$$
 
-con `E_i = M_i <v_i²>` la energía en banda del subsistema `i` (su masa por la
-velocidad cuadrática media promediada en espacio y tiempo). Se excita solo el
-subsistema 1, se añade la relación de consistencia (reciprocidad) SEA
-`n_1 eta_12 = n_2 eta_21` (Ec. 6.8) y ambos factores de acoplamiento se deducen
-de las dos energías medidas (Ec. 6.15):
+$$
+0 = \omega\left[(\eta_2 + \eta_{21})\,E_2 - \eta_{12}\,E_1\right]
+\quad (6.11)
+$$
 
-```
-eta_12 = eta_2 E_2 / (E_1 - E_2 n_1/n_2)
-eta_21 = eta_12 n_1 / n_2
-Pi_in  = omega (eta_1 E_1 + eta_2 E_2)
-```
+con $E_i = M_i \langle v_i^2 \rangle$ la energía en banda del subsistema $i$
+(su masa por la velocidad cuadrática media promediada en espacio y tiempo). Se
+excita solo el subsistema 1, se añade la relación de consistencia
+(reciprocidad) SEA $n_1\eta_{12} = n_2\eta_{21}$ (Ec. 6.8) y ambos factores de
+acoplamiento se deducen de las dos energías medidas (Ec. 6.15):
+
+$$
+\eta_{12} = \frac{\eta_2 E_2}{E_1 - E_2\,n_1/n_2}, \qquad
+\eta_{21} = \eta_{12}\,\frac{n_1}{n_2}, \qquad
+\Pi_\text{in} = \omega\,(\eta_1 E_1 + \eta_2 E_2)
+$$
 
 La potencia inyectada se reduce a la potencia total disipada, como debe ser en
 régimen estacionario: sustituir la Ec. (6.11) en la Ec. (6.10) cancela
@@ -356,8 +378,8 @@ densidades modales de la sección 6.4.1 de Norton:
 `beam_modal_density` (6.24) y `cylindrical_shell_modal_density` (6.27 a 6.29,
 las aproximaciones de Szechenyi en tres regímenes en torno a la
 `ring_frequency` de la Ec. 6.26). La expresión de placa plana
-`n(f) = S sqrt(12) / (2 cL t)` es la misma magnitud que la `n = pi S fc / c0²`
-de la EN 12354-4 que usa el
+$n(f) = S\sqrt{12}/(2 c_L t)$ es la misma magnitud que la
+$n = \pi S f_c / c_0^2$ de la EN 12354-4 que usa el
 [modelo de flancos](/phonometry/es/guides/flanking-lab/), solo que
 parametrizada por la propia placa en vez de por su frecuencia crítica.
 
@@ -431,31 +453,31 @@ coeficiente de transmisión de onda de una unión de placas en ángulo recto sin
 ninguna integración angular (Ecs. 6.53 a 6.55, según Bies y Hamid y Cremer et
 al.); pasarlo a `coupling_loss_factor` reproduce idénticamente la Ec. (6.52) de
 Norton, porque esa ecuación y la Ec. (2.154) de Hopkins son la misma expresión
-en cuanto `cg = 2 cB`. Y `point_connection_coupling_loss_factor` cubre las
-placas unidas en `N` puntos discretos en vez de a lo largo de una línea
+en cuanto $c_g = 2 c_B$. Y `point_connection_coupling_loss_factor` cubre las
+placas unidas en $N$ puntos discretos en vez de a lo largo de una línea
 (Ec. 6.56). Cuál de las dos aplica lo decide la longitud de onda de flexión: la
 forma puntual cuando es menor que la longitud de la unión, y la lineal cuando
-es mayor. Las dos difieren en pendiente además de en nivel, `1/f` frente a
-`1/sqrt(f)`, así que atornillar y soldar no son intercambiables a lo largo del
+es mayor. Las dos difieren en pendiente además de en nivel, $1/f$ frente a
+$1/\sqrt{f}$, así que atornillar y soldar no son intercambiables a lo largo del
 espectro.
 
 Cuando no se dispone de un valor independiente de los factores de pérdidas
 internos, la inversión con una sola excitación queda indeterminada, y el
 **método clásico de inyección de potencia** excita cada subsistema por turnos
-midiendo ambas energías en cada caso. Eso da cuatro ecuaciones para `eta_1`,
-`eta_2`, `eta_12` y `eta_21` sin ninguna hipótesis previa, que
+midiendo ambas energías en cada caso. Eso da cuatro ecuaciones para $\eta_1$,
+$\eta_2$, $\eta_{12}$ y $\eta_{21}$ sin ninguna hipótesis previa, que
 `power_injection_matrix` resuelve banda a banda. La reciprocidad pasa entonces a
 ser una *comprobación* de la medida en lugar de un dato de entrada:
-`modal_density_ratio` compara el `eta_21/eta_12` medido con el `n_1/n_2`
+`modal_density_ratio` compara el $\eta_{21}/\eta_{12}$ medido con el $n_1/n_2$
 calculado a partir de la geometría, y una discrepancia grande significa que las
 fronteras de los subsistemas se trazaron en el sitio equivocado.
 
 ## Véase también
 
 - [Predicción del aislamiento acústico (EN 12354)](/phonometry/es/guides/insulation-prediction/):
-  el modelo de flancos que consume `Kij` unión a unión.
+  el modelo de flancos que consume $K_{ij}$ unión a unión.
 - [Transmisión por flancos en laboratorio (ISO 10848)](/phonometry/es/guides/flanking-lab/):
-  la medición de `Kij` a partir de diferencias de niveles de velocidad, la
+  la medición de $K_{ij}$ a partir de diferencias de niveles de velocidad, la
   contraparte empírica de las formas cerradas de esta página.
 - [Potencia de ruido estructural de equipos (EN 15657)](/phonometry/es/guides/structure-borne-power/):
   la potencia de la fuente que estas transmisiones de unión reparten por el

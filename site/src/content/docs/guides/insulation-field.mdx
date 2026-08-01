@@ -148,12 +148,12 @@ ISO 717-1 reference curve.
 | `l1` | 1D or 2D array | dB | one/band, or `(positions, bands)` | Source-room levels (2D is energy-averaged) |
 | `l2` | 1D or 2D array | dB | same band count | Receiving-room levels |
 | `t2` | 1D array | s | > 0, one per band | Receiving-room reverberation time |
-| `area` | float, optional | m² | > 0, with `volume` | Partition area `S` (enables `R'`) |
-| `volume` | float, optional | m³ | > 0, with `area` | Receiving-room volume `V` |
-| `t0` | float | s | default `0.5` | Reference reverberation time `T0` |
+| `area` | float, optional | m² | > 0, with `volume` | Partition area $S$ (enables $R'$) |
+| `volume` | float, optional | m³ | > 0, with `area` | Receiving-room volume $V$ |
+| `t0` | float | s | default `0.5` | Reference reverberation time $T_0$ |
 `airborne_insulation()` returns an `AirborneInsulationResult` (`d`, `dnt`,
 `r_prime` or `None`). The reference-curve engine that turns any of those
-spectra into `Rw`, `R'w` or `DnT,w`, its spectrum adaptation terms and its
+spectra into $R_w$, $R'_w$ or $D_{nT,w}$, its spectrum adaptation terms and its
 enlarged-range variants are in
 [Insulation Ratings (ISO 717)](/phonometry/guides/insulation-ratings/).
 
@@ -204,8 +204,8 @@ print(building.weighted_impact_rating(octave).rating)  # 54
 ```
 
 Feed `impact_insulation`'s `l_n_t` (or `l_n`) straight into
-`weighted_impact_rating`; the rating and `CI` reproduce the ISO 717-2 Annex C
-values (thirds `L'nT,w = 79`, `CI = −11`; octave `54`, `CI = 0`).
+`weighted_impact_rating`; the rating and $C_I$ reproduce the ISO 717-2 Annex C
+values (thirds $L'_{nT,w} = 79$, $C_I = -11$; octave 54, $C_I = 0$).
 
 ### `impact_insulation()` parameters
 
@@ -213,8 +213,8 @@ values (thirds `L'nT,w = 79`, `CI = −11`; octave `54`, `CI = 0`).
 | :--- | :--- | :--- | :--- | :--- |
 | `li` | 1D or 2D array | dB | one/band, or `(positions, bands)` | Energy-average impact SPL (2D is averaged over positions) |
 | `t2` | 1D array | s | > 0, one per band | Receiving-room reverberation time |
-| `volume` | float, optional | m³ | > 0 | Receiving-room `V` (enables `L'n`) |
-| `t0` | float | s | default `0.5` | Reference reverberation time `T0` |
+| `volume` | float, optional | m³ | > 0 | Receiving-room $V$ (enables $L'_n$) |
+| `t0` | float | s | default `0.5` | Reference reverberation time $T_0$ |
 
 `impact_insulation()` returns an `ImpactInsulationResult` (`l_n_t`, `l_n` or
 `None`); the ISO 717-2 side of the chain is in
@@ -429,10 +429,10 @@ plt.show()
 | `measurand` | str | — | `'airborne'` / `'impact'` / `'impact_reduction'` | Selects Table 2 / 4 / 6 |
 | `quantity` | str | — | `'r_w'`, `'ln_w'`, `'delta_lw'` (+ aliases, `+c`/`+ctr` variants) | Single-number descriptor |
 | `situation` | str | — | `'A'` / `'B'` / `'C'` | Measurement situation (Clause 5.2) |
-| `value` | float | dB | — | Best estimate `y` to attach `U` to |
+| `value` | float | dB | — | Best estimate $y$ to attach $U$ to |
 | `coverage` | float | — | default `0.95` | Confidence level (Table 8) |
 | `one_sided` | bool | — | default `False` | One-sided factor for conformity checks |
-| `upper_limit` | bool | — | default `False` | Select the σR95 upper limit (airborne, situation A) |
+| `upper_limit` | bool | — | default `False` | Select the $\sigma_{R95}$ upper limit (airborne, situation A) |
 
 `band_uncertainty()` returns a `BandUncertainty` (`frequencies`,
 `uncertainties`, `.to_arrays()`); `single_number_uncertainty()` a float;

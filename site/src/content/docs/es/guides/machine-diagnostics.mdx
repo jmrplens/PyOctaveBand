@@ -77,26 +77,28 @@ plt.show()
 ## 1. Rodamientos de contacto rodante
 
 Norton reproduce las once frecuencias discretas recopiladas por Shahan y
-Kamperman (Ecs. 8.4 a 8.14). Con la velocidad del eje `N` en r/min, `Z`
-elementos rodantes de diámetro `d` sobre un diámetro primitivo `D`, un ángulo
-de contacto `φ`, y escribiendo `g = (d/D) cos φ` y `fs = N/60`:
+Kamperman (Ecs. 8.4 a 8.14). Con la velocidad del eje $N$ en r/min, $Z$
+elementos rodantes de diámetro $d$ sobre un diámetro primitivo $D$, un
+ángulo de contacto $\phi$, y escribiendo $g = (d/D)\cos\phi$ y
+$f_s = N/60$:
 
 | Nombre | Significado | Expresión | Ec. de Norton |
 |---|---|---|---|
-| `shaft` | frecuencia de giro del eje | `fs = N/60` | (8.4) |
-| `FTF` | frecuencia de la jaula (tren fundamental) | `(fs/2)(1 - g)` | (8.5) |
-| `FTF_rel` | jaula relativa a la pista que gira | `fs - FTF` | (8.11) |
-| `BSF` | frecuencia de rotación del elemento rodante | `(fs/2)(D/d)(1 - g²)` | (8.7) |
-| `BDF` | frecuencia de giro del elemento rodante | `2 BSF` | (8.10) |
-| `BPFO` | frecuencia de paso por la pista exterior | `Z (fs/2)(1 - g)` | (8.8) |
-| `BPFI` | frecuencia de paso por la pista interior | `Z (fs/2)(1 + g)` | (8.9) |
+| `shaft` | frecuencia de giro del eje | $f_s = N/60$ | (8.4) |
+| `FTF` | frecuencia de la jaula (tren fundamental) | $(f_s/2)(1 - g)$ | (8.5) |
+| `FTF_rel` | jaula relativa a la pista que gira | $f_s - \text{FTF}$ | (8.11) |
+| `BSF` | frecuencia de rotación del elemento rodante | $(f_s/2)(D/d)(1 - g^2)$ | (8.7) |
+| `BDF` | frecuencia de giro del elemento rodante | $2\,\text{BSF}$ | (8.10) |
+| `BPFO` | frecuencia de paso por la pista exterior | $Z(f_s/2)(1 - g)$ | (8.8) |
+| `BPFI` | frecuencia de paso por la pista interior | $Z(f_s/2)(1 + g)$ | (8.9) |
 
 Tres de ellas llevan el diagnóstico: `BPFO` para un defecto en la pista
 exterior, `BPFI` para un defecto en la pista interior y `BDF` para un elemento
 rodante o una jaula dañados. Dos identidades conviene recordarlas porque son
 exactas y detectan al instante los errores de introducción de datos:
-`BPFO + BPFI = Z fs` siempre, y `BPFO = Z × FTF` siempre que la pista exterior
-esté quieta.
+$\text{BPFO} + \text{BPFI} = Z f_s$ siempre, y
+$\text{BPFO} = Z \times \text{FTF}$ siempre que la pista exterior esté
+quieta.
 
 ```python
 from phonometry import bearing_fault_frequencies
@@ -107,7 +109,7 @@ print(round(res["BPFO"] + res["BPFI"], 1))            # 500.0 = 15 x 33,33
 print(res.as_dict())
 ```
 
-Solo interviene la relación `d/D`, así que los dos diámetros pueden darse en
+Solo interviene la relación $d/D$, así que los dos diámetros pueden darse en
 milímetros, en pulgadas o en metros mientras ambos usen la misma unidad.
 `rotating_race="outer"` desplaza la jaula a la Ec. (8.6); `BPFO` y `BPFI` no se
 mueven, porque las Ecs. (8.8) y (8.14), y (8.9) y (8.13) de Norton son
@@ -121,8 +123,8 @@ está en la línea».
 
 ## 2. Engranajes
 
-La frecuencia de engrane (paso de dientes) de una rueda de `N` dientes es
-`GMF = N fs` (Ec. 8.3), con armónicos enteros. Lo que distingue los tipos de
+La frecuencia de engrane (paso de dientes) de una rueda de $N$ dientes es
+$\text{GMF} = N f_s$ (Ec. 8.3), con armónicos enteros. Lo que distingue los tipos de
 fallo es la familia de **bandas laterales** en torno a cada armónico: un solo
 diente astillado o una rueda excéntrica modula el engrane una vez por vuelta y
 produce bandas laterales bajas y planas espaciadas la frecuencia de giro del
@@ -151,14 +153,14 @@ de barras del rotor). Los defectos de rotor que producen excentricidad
 estática o dinámica del entrehierro se leen sobre los **armónicos de ranura del
 rotor** de la Ec. (8.20),
 
-```
-fsh = fe [(2 R / p)(1 - s) ± 2 (n - 1)]
-```
+$$
+f_{sh} = f_e \left[(2R/p)(1 - s) \pm 2(n - 1)\right]
+$$
 
-con `R` barras de rotor, `p` polos magnéticos (no pares de polos),
-deslizamiento unitario `s` y `n = 1, 2, …`. La excentricidad dinámica viste el
-armónico de ranura dominante con bandas laterales a ± la frecuencia de giro del
-eje y a ± la frecuencia de deslizamiento.
+con $R$ barras de rotor, $p$ polos magnéticos (no pares de polos),
+deslizamiento unitario $s$ y $n = 1, 2, \ldots$. La excentricidad dinámica
+viste el armónico de ranura dominante con bandas laterales a $\pm$ la
+frecuencia de giro del eje y a $\pm$ la frecuencia de deslizamiento.
 
 ```python
 from phonometry import induction_motor_frequencies
@@ -171,30 +173,31 @@ print(round(res["1x"]), round(res["2x"]),
 
 El deslizamiento se da directamente, o se da la frecuencia de red
 `supply_frequency` y el deslizamiento se deduce de ella y de la velocidad medida
-del eje. La frecuencia de alimentación se toma como `fe = fs p / (2 (1 - s))`;
-la Ec. (8.19) de Norton escribe `fe = fs p / 2`, que es la misma expresión con
-deslizamiento nulo pero no reduce la Ec. (8.20) a la frecuencia física de paso
-de barras `R fs` cuando la máquina está cargada. Con carga, el resultado incluye
-además la frecuencia de deslizamiento y la línea de paso de polos
-`FP = p × f_slip`, el espaciado de bandas laterales que una barra de rotor rota
-coloca alrededor de `1x`.
+del eje. La frecuencia de alimentación se toma como
+$f_e = f_s\,p / (2(1 - s))$; la Ec. (8.19) de Norton escribe
+$f_e = f_s\,p/2$, que es la misma expresión con deslizamiento nulo pero no
+reduce la Ec. (8.20) a la frecuencia física de paso de barras $R f_s$
+cuando la máquina está cargada. Con carga, el resultado incluye además la
+frecuencia de deslizamiento y la línea de paso de polos
+$\text{FP} = p \times f_\text{slip}$, el espaciado de bandas laterales que
+una barra de rotor rota coloca alrededor de `1x`.
 
 ## 4. Ventiladores, soplantes y bombas
 
-La frecuencia de paso de pala de un rodete de `N` palas es `fb = n N fs`
-(Ec. 8.15); las pulsaciones hidráulicas de una bomba siguen la misma forma con
-`N` eventos de bombeo por vuelta (Ec. 8.18), y una soplante volumétrica
-rotativa repite cuatro veces por vuelta, así que se trata pasando
-`4 × r/min`.
+La frecuencia de paso de pala de un rodete de $N$ palas es $f_b = n N f_s$
+(Ec. 8.15); las pulsaciones hidráulicas de una bomba siguen la misma forma
+con $N$ eventos de bombeo por vuelta (Ec. 8.18), y una soplante
+volumétrica rotativa repite cuatro veces por vuelta, así que se trata
+pasando $4 \times \text{r/min}$.
 
 En un **ventilador axial entubado** las palas interaccionan además con los
 álabes del estátor y establecen patrones de presión rotativos con
-`mL = n N ± k V` lóbulos para `V` álabes (Ec. 8.16), que giran a `n N fs / mL`
-(Ec. 8.17). Un patrón que gira más rápido que las propias palas radia mucho más
-fuerte, y por eso importa la elección de `N` y `V`, y por eso esas velocidades
+$m_L = nN \pm kV$ lóbulos para $V$ álabes (Ec. 8.16), que giran a
+$n N f_s / m_L$ (Ec. 8.17). Un patrón que gira más rápido que las propias palas radia mucho más
+fuerte, y por eso importa la elección de $N$ y $V$, y por eso esas velocidades
 son las que hay que contrastar con las frecuencias de corte del conducto. Cada
 línea se llama `lobe n=<n> m=<mL>`: el armónico de pala forma parte del nombre
-porque la Ec. (8.17) lleva `n`, de modo que el mismo número de lóbulos
+porque la Ec. (8.17) lleva $n$, de modo que el mismo número de lóbulos
 alcanzado desde otro armónico es otro patrón, que gira a otra velocidad.
 
 ```python
@@ -279,7 +282,7 @@ ISO 10816 / ISO 20816) quedan fuera de este módulo; la propia orientación de
 Norton es cualitativa (factores de cresta de 2,5 a 3,5 en un rodamiento sano,
 hasta unos 11 con defectos impulsivos; curtosis en torno a 3 en un rodamiento
 sano y por encima de 4 en uno dañado). La frecuencia de paso de polos
-`FP = p × f_slip` es práctica habitual del mantenimiento predictivo, no de
+$\text{FP} = p \times f_\text{slip}$ es práctica habitual del mantenimiento predictivo, no de
 Norton: él da la propia frecuencia de deslizamiento como espaciado de las bandas
 laterales de una barra rota y no la multiplica por el número de polos.
 

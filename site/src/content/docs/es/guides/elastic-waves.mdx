@@ -106,11 +106,11 @@ pieza: mapas de velocidades `c_p` y `c_s` (más `rho`) en lugar de `c`,
 (una fuerza de cuerpo direccional) como fuentes, sondas que registran
 ``p``, ``vx`` o ``vy``, la misma maquinaria de esponjas y obstáculos, y un
 `ElasticFDTDResult` congelado con el mismo `.plot()`. La cota de Courant
-depende solo de la ``c_P`` más rápida del mapa (Virieux, Ecs. 6-7),
+depende solo de la $c_P$ más rápida del mapa (Virieux, Ecs. 6-7),
 mientras que la regla de resolución usa la velocidad de onda más lenta de
-todo el dominio: la ``c_S`` no nula más lenta de las celdas sólidas o, si
-una región fluida lleva una ``c_P`` aún más lenta, esa velocidad del
-fluido: ``dx <= c_min / (10 f)`` (en un mapa completamente sólido la
+todo el dominio: la $c_S$ no nula más lenta de las celdas sólidas o, si
+una región fluida lleva una $c_P$ aún más lenta, esa velocidad del
+fluido: $\Delta x \le c_\text{min} / (10 f)$ (en un mapa completamente sólido la
 longitud de onda S es siempre la más corta; en dominios mixtos la longitud
 de onda P del fluido puede ser más corta, como en agua a 1480 m/s sobre un
 sedimento con cizalla de 2000 m/s).
@@ -148,7 +148,7 @@ de toda interfase interna, contactos fluido-sólido incluidos, emerge de los
 mapas sin más. La batería de validación mide la reflexión a incidencia
 normal de una interfase agua-acero con un error inferior al 2 %
 (típicamente una fracción de punto porcentual) respecto a
-``(Z2 - Z1)/(Z2 + Z1)`` y recupera la ley de masas a incidencia normal de
+$(Z_2 - Z_1)/(Z_2 + Z_1)$ y recupera la ley de masas a incidencia normal de
 una chapa de acero de 3 mm sumergida con un error inferior a 0,3 dB
 respecto a `mass_law_transmission_loss`.
 
@@ -161,7 +161,7 @@ cizalla por encima es su imagen antisimétrica. Esa única condición de
 contorno es la que hace a las superficies portadoras de ondas: golpee
 verticalmente la superficie libre de un bloque de aluminio (el problema de
 Lamb) y, además de los frentes de cuerpo P y S, una **onda de Rayleigh**
-rueda por la superficie a $c_R \approx 0.93\,c_S$, la raíz de la ecuación
+rueda por la superficie a $c_R \approx 0{,}93\,c_S$, la raíz de la ecuación
 característica exacta de Rayleigh (Cremer, Heckl y Petersson, Ec. 3.149).
 Los tests fijan la velocidad de Rayleigh medida a esa raíz dentro del 2 %
 y la onda de flexión de una franja delgada libre-libre a la dispersión de
@@ -208,7 +208,7 @@ Esa onda de flexión merece verse en movimiento: la
 incrusta una animación de este solucionador lanzando un paquete de flexión
 de 4 kHz por una placa de acero de 10 mm hasta una unión en L, donde la
 esquina lo divide en las ondas reflejada y transmitida que la forma cerrada
-tasa en `tau12(0 grados) = 0,5`, más el rápido precursor de onda en el plano que
+tasa en $\tau_{12}(0°) = 0{,}5$, más el rápido precursor de onda en el plano que
 el modelo de unión articulada deja fuera a propósito.
 
 ## 4. Acoplamiento fluido-sólido a incidencia normal
@@ -255,9 +255,9 @@ incidente se refracta en **dos** ondas transmitidas, P y SV (**conversión
 de modo**), cada una con su propio ángulo crítico: para agua sobre acero,
 14,5° (P) y 27,5° (S). Entre ambos la P transmitida es evanescente y la
 onda de cizalla se lleva la potencia transmitida, así que la reflexión baja
-a |V| = 0,918 a 20° en vez de reflejar totalmente como haría un fondo
-fluido con el mismo ``c_P``; más allá del ángulo crítico S la reflexión es
-total, |V| = 1 con fase. La batería de validación lanza haces con portadora
+a $|V| = 0{,}918$ a 20° en vez de reflejar totalmente como haría un fondo
+fluido con el mismo $c_P$; más allá del ángulo crítico S la reflexión es
+total, $|V| = 1$ con fase. La batería de validación lanza haces con portadora
 oblicuos a 10° y 20° y reproduce el coeficiente de reflexión exacto de
 Brekhovskikh y Godin (Ecs. 4.2.22-4.2.26) dentro de una fracción de punto
 porcentual, conversión de modo incluida. Esta es exactamente la física de
@@ -289,7 +289,7 @@ Esos dos números cuentan toda la historia. Sobre un lecho **rígido**
 hasta un 0,03 % y su cola evanescente alcanza ~7 longitudes de onda dentro
 del agua: es en esencia una onda de agua rasante y no puede separarse por
 tiempo de vuelo en ningún dominio razonable (sobre contactos aire-sólido
-el déficit se desploma a ~10⁻¹² de ``c`` y la onda es directamente
+el déficit se desploma a ~$10^{-12}$ de $c$ y la onda es directamente
 inobservable). Sobre un sedimento **blando** la velocidad cae muy por
 debajo de la del agua y la onda se comprime a media longitud de onda del
 contacto, y por eso las ondas de interfase medidas en el lecho marino son
@@ -349,14 +349,14 @@ elástica en agua es exactamente la capa fluida de tres medios de B&G §2.4:
 su transmisión sigue la forma cerrada de la Ec. 2.4.14, que se reduce a la
 conocida ley de masas para placas delgadas y bajas frecuencias y predice
 **transmisión total** en las resonancias de espesor de media onda
-``f_n = n c_P / (2 h)`` (Ec. 2.4.19). Para una placa de acero de 10 mm esa
+$f_n = n c_P / (2 h)$ (Ec. 2.4.19). Para una placa de acero de 10 mm esa
 primera resonancia cae en 295 kHz, y una sola ejecución FDTD de banda ancha
 reproduce toda la curva: 5,8 dB a 10 kHz (donde
 `mass_law_transmission_loss` con agua como fluido ambiente coincide con la
 forma exacta hasta 0,02 dB), 18,1 dB a 50 kHz, y un mínimo de pérdida de
 transmisión dentro del 0,1 % de la resonancia de 295 kHz. La misma batería
 somete a esfuerzo el contraste extremo de un contacto aire-acero (razón de
-impedancias ~10⁵:1): estable durante 10 000 pasos con la amplitud
+impedancias ~$10^5$:1): estable durante 10 000 pasos con la amplitud
 reflejada conservada al 0,5 %.
 
 A incidencia oblicua la física de la placa se enriquece, y la
@@ -388,7 +388,7 @@ sumergido y el test de esfuerzo de contraste extremo aire-acero.
 
 **No cubierto.** Todo lo que el solucionador acústico 2D no puede hacer,
 este tampoco: el dominio es una sección transversal (propagación cilíndrica
-`1/sqrt(r)`, no `1/r`), así que los niveles absolutos y las tasas de
+$1/\sqrt{r}$, no $1/r$), así que los niveles absolutos y las tasas de
 decaimiento no son los de un problema 3D. El sólido es isótropo y puramente
 elástico: sin anisotropía ni amortiguamiento viscoelástico más allá de la
 tasa de decaimiento volumétrica, así que los factores de pérdidas del
@@ -432,7 +432,7 @@ avance temporal.
 Resuelva al menos 10 celdas por longitud de onda más corta con la
 velocidad de onda más lenta del dominio, la de cizalla no nula más lenta o
 una velocidad del sonido de fluido aún más lenta si la hay:
-``dx <= c_min / (10 f)``. Reserve 15-20 celdas por
+$\Delta x \le c_\text{min} / (10 f)$. Reserve 15-20 celdas por
 longitud de onda a lo largo de superficies libres (el contorno de imagen de
 esfuerzos es la parte más dispersiva del esquema), y al menos 15 puntos por
 longitud de onda cuando haya que cronometrar una onda de interfase

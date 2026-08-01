@@ -30,7 +30,7 @@ import ThemeImage from '../../../../components/ThemeImage.astro';
 import ReportPreview from '../../../../components/ReportPreview.astro';
 
 La **movilidad** mecánica es el cociente complejo entre una respuesta en
-velocidad y la fuerza que la produce, `Y = v/F`. Es un miembro de una familia de
+velocidad y la fuerza que la produce, $Y = v/F$. Es un miembro de una familia de
 **funciones de respuesta en frecuencia** (FRF) movimiento-por-fuerza: cuál se usa
 depende solo de si el movimiento es un desplazamiento, una velocidad o una
 aceleración, y cada una tiene una recíproca fuerza-por-movimiento. La
@@ -68,25 +68,25 @@ plt.legend(); plt.show()
 
 ## 1. La familia de funciones de respuesta en frecuencia (Tabla 1)
 
-Para un movimiento armónico `x·e^{jωt}` la velocidad es `jω·x` y la aceleración
-`−ω²·x`, de modo que las tres FRF movimiento-por-fuerza se derivan de la
-receptancia `H` por una potencia de `jω`, y cada una tiene una recíproca
-fuerza-por-movimiento:
+Para un movimiento armónico $x\,e^{j\omega t}$ la velocidad es $j\omega x$ y
+la aceleración $-\omega^2 x$, de modo que las tres FRF movimiento-por-fuerza
+se derivan de la receptancia $H$ por una potencia de $j\omega$, y cada una
+tiene una recíproca fuerza-por-movimiento:
 
 | Movimiento | FRF (movimiento / fuerza) | Unidad | Recíproca (fuerza / movimiento) | Unidad |
 |---|---|---|---|---|
-| desplazamiento | receptancia `H = x/F` | m/N | rigidez dinámica `1/H` | N/m |
-| velocidad | movilidad `Y = jω·H` | m/(N·s) | impedancia `1/Y` | N·s/m |
-| aceleración | acelerancia `A = −ω²·H` | 1/kg | masa aparente `1/A` | kg |
+| desplazamiento | receptancia $H = x/F$ | m/N | rigidez dinámica $1/H$ | N/m |
+| velocidad | movilidad $Y = j\omega H$ | m/(N·s) | impedancia $1/Y$ | N·s/m |
+| aceleración | acelerancia $A = -\omega^2 H$ | 1/kg | masa aparente $1/A$ | kg |
 
 `convert_frf` pasa entre cualquiera de las seis FRF, usando la receptancia como
 pivote. Una FRF de **punto de excitación** tiene la respuesta y la fuerza en el
-mismo punto (`i = j`); una FRF de **transferencia** las tiene en puntos
+mismo punto ($i = j$); una FRF de **transferencia** las tiene en puntos
 distintos. Los tipos fuerza-por-movimiento son recíprocas elemento a elemento,
 es decir, las magnitudes *libres* de la ISO 7626-1, 3.1.4; las magnitudes
 matriciales *bloqueadas* de la Tabla 1 no se invierten elemento a elemento en
 sistemas de varias coordenadas (la Tabla 1 llama además "masa efectiva" a
-`F/a`, la magnitud aquí denominada masa aparente).
+$F/a$, la magnitud aquí denominada masa aparente).
 
 ```python
 from phonometry import vibration
@@ -102,13 +102,14 @@ física: llevan la misma información y `convert_frf` pasa de una a otra de
 forma exacta. La acelerancia es lo que entrega directamente una medición con
 acelerómetros; la movilidad es la moneda natural de las normas de potencia
 estructural (la potencia es fuerza por velocidad, de modo que
-`P = ½·Re{Y}·|F|²` en un contacto); las recíprocas aparecen cuando una fuente
+$P = \tfrac{1}{2}\operatorname{Re}\{Y\}\,|F|^2$ en un contacto); las
+recíprocas aparecen cuando una fuente
 se describe por lo que impone y no por cómo responde. Leer una movilidad de
 punto de excitación es en sí un diagnóstico estructural: por debajo de una
 resonancia la magnitud sube proporcional a la frecuencia por una **línea de
-rigidez** (`|Y| ≈ ω/k`), por encima cae por una **línea de masa**
-(`|Y| ≈ 1/(ωm)`), y la altura del pico entre ambas refleja el
-amortiguamiento: vale `1/c` para el resonador aislado con amortiguamiento
+rigidez** ($|Y| \approx \omega/k$), por encima cae por una **línea de masa**
+($|Y| \approx 1/(\omega m)$), y la altura del pico entre ambas refleja el
+amortiguamiento: vale $1/c$ para el resonador aislado con amortiguamiento
 viscoso de la siguiente sección, mientras que en estructuras reales con
 modos solapados el amortiguamiento se estima con ajuste modal o con el
 ancho de banda de media potencia.
@@ -116,17 +117,18 @@ ancho de banda de media potencia.
 ## 2. El resonador SDOF de referencia (forma cerrada)
 
 La referencia canónica en forma cerrada, expresada en la taxonomía de FRF de la
-Tabla 1 / 3.1.2, es una masa `m`, un amortiguamiento viscoso `c` y una rigidez
-`k`, cuya receptancia es
+Tabla 1 / 3.1.2, es una masa $m$, un amortiguamiento viscoso $c$ y una rigidez
+$k$, cuya receptancia es
 
 $$
 H(\omega) = \frac{1}{k - \omega^2 m + j\,\omega c}, \qquad
 \omega_0 = \sqrt{k/m}.
 $$
 
-En la resonancia `ω0` la movilidad en el punto de excitación es **puramente
-real** e igual a `1/c` (el máximo de movilidad mide el amortiguamiento) mientras
-que la receptancia estática (`ω → 0`) es la flexibilidad `1/k`:
+En la resonancia $\omega_0$ la movilidad en el punto de excitación es
+**puramente real** e igual a $1/c$ (el máximo de movilidad mide el
+amortiguamiento) mientras que la receptancia estática ($\omega \to 0$) es la
+flexibilidad $1/k$:
 
 ```python
 import numpy as np
@@ -162,17 +164,19 @@ y la rigidez de la punta.
 
 El procesado de registros medidos con excitación aleatoria según la
 ISO 7626-2, 8.1.3 (el estimador H1,
-`Ĥ = G(respuesta, fuerza)/G(fuerza, fuerza)`) y la coherencia ordinaria
-`γ² = |Gxy|²/(Gxx·Gyy)` de sus comprobaciones de calidad son los estimadores
+$\hat{H} = G(\text{respuesta}, \text{fuerza})/G(\text{fuerza}, \text{fuerza})$)
+y la coherencia ordinaria $\gamma^2 = |G_{xy}|^2/(G_{xx}\,G_{yy})$ de sus
+comprobaciones de calidad son los estimadores
 espectrales ya existentes de la biblioteca, [`transfer_function` y
 `coherence`](/phonometry/es/guides/electroacoustics/) (H1 es su valor por
 defecto). Sobre ellos se ofrecen dos criterios de aceptación de la ISO 7626-2:
 
 * **Calibración operacional con masa rígida (7.5.2).** La FRF medida de un
   bloque rígido de masa conocida, suspendido libremente, debe coincidir dentro
-  de ±5 % con `|A| = 1/m` (acelerancia) o `|Y| = 1/(2πf·m)` (movilidad).
+  de ±5 % con $|A| = 1/m$ (acelerancia) o $|Y| = 1/(2\pi f m)$ (movilidad).
 * **Error aleatorio (Anexo A + 8.1.3).** Deben promediarse suficientes
-  espectros para que el error aleatorio normalizado `ε = √((1−γ²)/(2nγ²))` en
+  espectros para que el error aleatorio normalizado
+  $\varepsilon = \sqrt{(1-\gamma^2)/(2n\gamma^2)}$ en
   cada resonancia de una movilidad de punto de excitación quede por debajo
   del 5 %.
 
@@ -250,7 +254,7 @@ plt.show()
 
 `sdof_mobility_result` agrupa la FRF en frecuencia en un `MobilityResult`, que
 expone `.magnitude`, `.phase`, `.to(target)` (cualquier tipo de la Tabla 1) y un
-`.plot()` de `|Y(f)|` con la resonancia marcada:
+`.plot()` de $|Y(f)|$ con la resonancia marcada:
 
 ```python
 import numpy as np

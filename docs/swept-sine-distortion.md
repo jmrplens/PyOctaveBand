@@ -4,7 +4,7 @@
 
 A single exponential sine sweep characterises the linear response and
 every harmonic distortion order of a weakly nonlinear system at once.
-After deconvolution, the distortion products of order `n` pack
+After deconvolution, the distortion products of order $n$ pack
 into separate impulse responses that *precede* the linear response by the
 fixed advance (Farina 2000)
 
@@ -14,12 +14,12 @@ $$
 $$
 
 so windowing each arrival yields the **higher harmonic frequency responses**
-`H1(f), H2(f), ..., HN(f)` and, from them, the total harmonic distortion as
+$H_1(f), H_2(f), \dots, H_N(f)$ and, from them, the total harmonic distortion as
 a function of the excitation frequency with one sweep instead of a
 tone-by-tone stepping. This page covers that separation in
 `phonometry.electroacoustics`, with the phase-coherent **synchronized
 sweep** of Novak, Lotton & Simon (2015) as the default, and the companion
-**phase utilities** in `phonometry.metrology`: minimum phase from `|H|`,
+**phase utilities** in `phonometry.metrology`: minimum phase from $|H|$,
 group delay and excess phase.
 
 <picture>
@@ -30,14 +30,14 @@ group delay and excess phase.
 ## 1. One sweep, every harmonic
 
 For an exponential sweep the instantaneous frequency rises as
-`f(t) = f1·e^(t/L)`, so the moment the excitation passes `f`, the n-th
-harmonic distortion product appears at `n·f`: exactly where the sweep
-itself will be `L·ln(n)` seconds later. Deconvolving the recording against
+$f(t) = f_1 e^{t/L}$, so the moment the excitation passes $f$, the n-th
+harmonic distortion product appears at $n f$: exactly where the sweep
+itself will be $L\ln(n)$ seconds later. Deconvolving the recording against
 the sweep therefore time-compresses each order into its own impulse
-response, `L·ln(n)` *before* the linear one. `swept_sine_distortion`
+response, $L\ln(n)$ *before* the linear one. `swept_sine_distortion`
 windows each arrival (with the exact fractional-sample alignment), Fourier
-transforms it into `Hn(f)`, and reads the distortion of order `n` at
-excitation frequency `f` from `|Hn(n·f)|`:
+transforms it into $H_n(f)$, and reads the distortion of order $n$ at
+excitation frequency $f$ from $|H_n(n f)|$:
 
 $$
 \mathrm{THD}(f) =
@@ -103,17 +103,17 @@ plt.show()
 </details>
 
 The oracle behind the implementation is the memoryless polynomial: driving
-`y = x + a2·x² + a3·x³` with a unit sweep must return, by the Chebyshev
-identities, `|H1| = 1 + 3a3/4`, `|H2| = a2/2` (phase `-π/2`), `|H3| = a3/4`
-(phase `π`) and `THD = √((a2/2)² + (a3/4)²)/(1 + 3a3/4)`. The test and
+$y = x + a_2 x^2 + a_3 x^3$ with a unit sweep must return, by the Chebyshev
+identities, $|H_1| = 1 + 3a_3/4$, $|H_2| = a_2/2$ (phase $-\pi/2$), $|H_3| = a_3/4$
+(phase $\pi$) and $\mathrm{THD} = \sqrt{(a_2/2)^2 + (a_3/4)^2}/(1 + 3a_3/4)$. The test and
 conformance suites pin all four, and the same THD measured tone by tone
 with `phonometry.thd` agrees to 0.1 %.
 
 ## 2. The synchronized sweep (Novak et al. 2015)
 
 Windowing separates the harmonic *magnitudes* with any exponential sweep,
-but the *phases* of `H2..HN` are only meaningful if delaying the sweep by
-`L·ln(n)` is exactly equivalent to generating its n-th harmonic. That holds
+but the *phases* of $H_2 \dots H_N$ are only meaningful if delaying the sweep by
+$L\ln(n)$ is exactly equivalent to generating its n-th harmonic. That holds
 only for
 
 $$
@@ -122,10 +122,10 @@ x(t) = \sin\!\big[2\pi f_1 L\, e^{t/L}\big],
 L = \frac{1}{f_1}\,\mathrm{round}\!\Big(\frac{f_1\,\tilde T}{\ln(f_2/f_1)}\Big),
 $$
 
-the **synchronized swept-sine**: the rounding makes `f1·L` an integer, so
+the **synchronized swept-sine**: the rounding makes $f_1 L$ an integer, so
 the sweep starts at zero phase and every harmonic copy lines up.
 `synchronized_sweep_signal` generates it (the duration is quantized
-slightly; when `f2/f1` is an integer the sweep also ends at zero phase),
+slightly; when $f_2/f_1$ is an integer the sweep also ends at zero phase),
 and `swept_sine_distortion(..., method="synchronized")`, the default,
 deconvolves with the closed-form spectrum of the inverse filter,
 
@@ -135,14 +135,14 @@ e^{-j 2\pi f L\,(1 - \ln(f/f_1)) + j\pi/4},
 $$
 
 rather than an FFT of the signal. Besides being exact, the analytic
-deconvolution extends the usable band of each `Hn` to `[n·f1, n·f2]`
+deconvolution extends the usable band of each $H_n$ to $[n f_1, n f_2]$
 (Novak et al., Fig. 6): the second harmonic of a 6 kHz sweep is measured
 up to 12 kHz.
 
 Two practical notes from the paper are built in: the recording mean is
 subtracted by default (`remove_dc=True`; a DC offset otherwise leaks a
 scaled inverse filter into the impulse response), and the non-integer part
-of each arrival `L·ln(n)·fs` is removed in the frequency domain, so the
+of each arrival $L\ln(n) f_s$ is removed in the frequency domain, so the
 harmonic phases carry no residual sub-sample skew.
 
 ## 3. Analysing classical ESS recordings (`method="farina"`)
@@ -154,8 +154,8 @@ Recordings made with the plain exponential sweep of
 amplitude-compensated inverse filter of Farina (2000). The harmonic
 **magnitudes** and the THD are correct (the Chebyshev oracle passes
 identically), but the sweep's `-1` phase term breaks the time-shift
-equivalence, so the phases of `H2..HN` depend on the excitation and should
-be ignored; the band of every `Hn` is also capped at `f2` by the inverse
+equivalence, so the phases of $H_2 \dots H_N$ depend on the excitation and should
+be ignored; the band of every $H_n$ is also capped at $f_2$ by the inverse
 filter.
 
 ```python
@@ -172,12 +172,12 @@ figure read identically; only the harmonic phases (and the top of each
 order's band) differ between the two methods.
 
 Sizing rules for both methods: the closest pair of arrivals is spaced
-`L·ln(N/(N-1))` seconds, so the per-order window (`ir_length`, default the
+$L\ln(N/(N-1))$ seconds, so the per-order window (`ir_length`, default the
 largest power of two that fits, capped at 8192 samples) must not exceed
 it: lengthen the sweep or lower `n_harmonics` for reverberant systems whose
-tails need longer windows. Keep `n_harmonics·f2` below Nyquist: distortion
+tails need longer windows. Keep `n_harmonics` $\cdot f_2$ below Nyquist: distortion
 products above it fold back in any real recording. The analysis is
-referenced to the excitation `amplitude`, so `H1` is the linear gain and
+referenced to the excitation `amplitude`, so $H_1$ is the linear gain and
 the THD is level-referenced exactly as driven.
 
 ## 4. Phase utilities: minimum phase, group delay, excess phase
@@ -209,7 +209,7 @@ res.plot()                             # magnitude, phases, group delays
 
 *A +6 dB peaking equalizer measured through a 2.5 ms processing latency: the
 minimum-phase part carries only the small phase wiggle an equalizer could
-invert, the excess phase is the pure `−2πf·t0` ramp of the delay, and the
+invert, the excess phase is the pure $-2\pi f t_0$ ramp of the delay, and the
 excess group delay reads the latency directly as a flat 2.5 ms line.*
 
 <details>
@@ -239,17 +239,17 @@ plt.show()
 
 </details>
 
-The decomposition `H = H_min · H_ap` splits what an equalizer can invert
-(`H_min`, minimum phase, causal and causally invertible) from what it never
-can (`H_ap`, the all-pass excess: latency plus non-minimum-phase zeros such
+The decomposition $H = H_\text{min} H_\text{ap}$ splits what an equalizer can invert
+($H_\text{min}$, minimum phase, causal and causally invertible) from what it never
+can ($H_\text{ap}$, the all-pass excess: latency plus non-minimum-phase zeros such
 as reflections). The excess phase is `0` for a minimum-phase response and
-exactly `-2πf·t0` for a pure latency `t0`; its group delay reads the
+exactly $-2\pi f t_0$ for a pure latency $t_0$; its group delay reads the
 latency in seconds.
 
 Numerical contract, pinned by the tests: on a strictly minimum-phase biquad
 sampled on a dense grid the reconstructed phase matches the true phase to
 better than `1e-12` rad; the group delay of a first-order allpass matches
-the closed form `(1-a²)/(1+2a·cosω+a²)` to `1e-5` samples; the excess group
+the closed form $(1-a^2)/(1+2a\cos\omega+a^2)$ to `1e-5` samples; the excess group
 delay of a delayed biquad returns the delay to `1e-6` samples. The
 precautions are documented with the API: the response must be sampled
 uniformly from DC to Nyquist inclusive (the `rfft` layout) and densely
@@ -278,7 +278,7 @@ grids.
 
 - Farina, A. (2000). Simultaneous measurement of impulse response and
   distortion with a swept-sine technique. *108th AES Convention*, Paris,
-  preprint 5093. The exponential-sweep deconvolution and the `L·ln(n)`
+  preprint 5093. The exponential-sweep deconvolution and the $L\ln(n)$
   harmonic separation.
 - Novak, A., Lotton, P., & Simon, L. (2015). Synchronized swept-sine:
   Theory, application and implementation. *Journal of the Audio Engineering

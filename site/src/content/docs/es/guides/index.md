@@ -112,7 +112,8 @@ Bancos de filtros, ponderaciones, niveles, espectros, calibración e
 incertidumbre. Esta es la cadena que convierte una señal digital en un número
 conforme con las normas, y todas las demás áreas la consumen: un modelo de
 sonoridad necesita niveles de banda calibrados, un parámetro de sala necesita
-una respuesta al impulso filtrada, una valoración ambiental es un Leq ajustado.
+una respuesta al impulso filtrada, una valoración ambiental es un $L_{eq}$
+ajustado.
 Implementa IEC 61260-1, ANSI S1.11, IEC 61672-1, ISO 7196, IEC 61252,
 ISO 1996-1, IEC 60942, ISO 18233 y la GUM.
 
@@ -150,16 +151,16 @@ ISO 1996-1, IEC 60942, ISO 18233 y la GUM.
   y la AU para sonido audible en presencia de ultrasonidos.
 - [Ponderación temporal](/phonometry/es/guides/time-weighting/): las balísticas
   exponenciales Fast, Slow e Impulse de IEC 61672-1.
-- [Niveles integrados y estadísticos](/phonometry/es/guides/levels/): Leq y
-  LAeq, los niveles percentiles L10/L50/L90, LCpeak y SEL, y la dosis de
-  ruido.
+- [Niveles integrados y estadísticos](/phonometry/es/guides/levels/): $L_{eq}$ y
+  $L_{Aeq}$, los niveles percentiles $L_{10}$/$L_{50}$/$L_{90}$, $L_{Cpeak}$ y
+  SEL, y la dosis de ruido.
 - [Niveles ambientales (ISO 1996-1/-2)](/phonometry/es/guides/environmental-levels/):
-  Lden, Ldn y los niveles de valoración compuestos, el ajuste tonal, la
+  $L_{den}$, $L_{dn}$ y los niveles de valoración compuestos, el ajuste tonal, la
   corrección de ruido residual y el presupuesto de incertidumbre.
 - [Normativa española de ruido (RD 1367/2007)](/phonometry/es/guides/spanish-noise-regulation/):
-  el nivel corregido LKeq con sus correcciones Kt, Kf y Ki, los periodos
-  temporales de evaluación y las fases de ruido, las tablas de valores límite
-  y la comprobación del artículo 25.
+  el nivel corregido $L_{Keq}$ con sus correcciones $K_t$, $K_f$ y $K_i$, los
+  periodos temporales de evaluación y las fases de ruido, las tablas de valores
+  límite y la comprobación del artículo 25.
 
 **[Señales y espectros](/phonometry/es/guides/sections/signals-spectra/)**
 
@@ -262,8 +263,8 @@ DIN 45692, IEC 60268-16, ANSI S3.5, ISO 7029, ISO 1999 e ISO 9612.
   el desplazamiento permanente del umbral en función del nivel, la duración y la
   frecuencia, combinado con la componente de la edad.
 - [Exposición al ruido en el trabajo (ISO 9612)](/phonometry/es/guides/occupational-exposure/):
-  las estrategias por tareas, por puestos y de jornada completa para LEX,8h, con
-  el presupuesto de incertidumbre y el límite superior.
+  las estrategias por tareas, por puestos y de jornada completa para
+  $L_{EX,8h}$, con el presupuesto de incertidumbre y el límite superior.
 
 ## [Salas y edificación](/phonometry/es/guides/sections/rooms-buildings/)
 
@@ -280,7 +281,8 @@ ISO 10052 y ANSI/ASA S12.2.
   la adquisición determinista de ISO 18233, los barridos exponenciales con su
   deconvolución y MLS.
 - [Acústica de salas](/phonometry/es/guides/room-acoustics/): los parámetros de
-  sala EDT, T20, T30, C50, C80, D50 y Ts derivados de esa respuesta al impulso.
+  sala EDT, $T_{20}$, $T_{30}$, $C_{50}$, $C_{80}$, $D_{50}$ y $T_s$ derivados
+  de esa respuesta al impulso.
 - [Acústica de oficinas diáfanas (ISO 3382-3)](/phonometry/es/guides/open-plan-acoustics/):
   la tasa de decaimiento espacial del habla y las distancias de distracción y
   de privacidad de una planta diáfana.
@@ -315,14 +317,15 @@ ISO 10052 y ANSI/ASA S12.2.
   el índice de reducción de vibraciones de unión y las diferencias de niveles de
   flanco medidas en una instalación de ensayo.
 - [Índices globales de aislamiento (ISO 717)](/phonometry/es/guides/insulation-ratings/):
-  los motores de curva de referencia aéreo y de impactos con C, Ctr y CI, los
-  términos de rango ampliado y la ficha de ISO 717.
+  los motores de curva de referencia aéreo y de impactos con $C$, $C_{tr}$ y
+  $C_I$, los términos de rango ampliado y la ficha de ISO 717.
 - [Aislamiento acústico de fachadas](/phonometry/es/guides/facade-insulation/):
   el cerramiento del edificio medido según ISO 16283-3, previsto según
   EN 12354-3 y radiando al exterior según EN 12354-4.
 - [Código Técnico de la Edificación (CTE DB-HR)](/phonometry/es/guides/spanish-building-code/):
-  las magnitudes globales RA, RA,tr, DnT,A y D2m,nT,Atr del DB HR, las tablas de
-  exigencias del apartado 2 y la corrección por tamaño de ventana.
+  las magnitudes globales $R_A$, $R_{A,tr}$, $D_{nT,A}$ y $D_{2m,nT,Atr}$ del
+  DB HR, las tablas de exigencias del apartado 2 y la corrección por tamaño de
+  ventana.
 
 **[Diseño del aislamiento](/phonometry/es/guides/sections/insulation-design/)**
 
@@ -416,7 +419,7 @@ ISO 8041.
 
 - [Vibración en humanos](/phonometry/es/guides/human-vibration/): exposición de
   cuerpo completo y mano-brazo con las ponderaciones de ISO 8041-1, el valor
-  eficaz ponderado y las medidas de dosis, y la exposición diaria A(8).
+  eficaz ponderado y las medidas de dosis, y la exposición diaria $A(8)$.
 - [Vibración con choques múltiples (ISO 2631-5)](/phonometry/es/guides/multiple-shock-vibration/):
   la función de transferencia asiento-columna, la dosis de aceleración y la
   variable de tensión acumulada que hay detrás de la probabilidad de lesión
@@ -448,7 +451,7 @@ SAE ARP 5534, Doc 29/32 CEAC e IEC 61400-11.
   de zona de sombra en forma cerrada y el campo de nivel relativo por GFPE.
 - [Prominencia de sonidos impulsivos (NT ACOU 112)](/phonometry/es/guides/impulse-prominence/):
   la prominencia prevista de cada impulso a partir de su tasa de ataque y su
-  diferencia de nivel, y el ajuste que se suma al LAeq.
+  diferencia de nivel, y el ajuste que se suma al $L_{Aeq}$.
 
 **[Aeronaves y energía eólica](/phonometry/es/guides/sections/aircraft-wind/)**
 
@@ -511,7 +514,7 @@ IEC 60268-3/-4/-5, ITU-R BS.1770-5 y EBU R 128.
 
 - [Electroacústica: distorsión y respuesta en frecuencia](/phonometry/es/guides/electroacoustics/):
   la distorsión armónica y de intermodulación, THD+N y SINAD, el rango dinámico
-  y los estimadores H1/H2 de respuesta en frecuencia.
+  y los estimadores $H_1$/$H_2$ de respuesta en frecuencia.
 - [Caracterización de altavoces (IEC 60268-5)](/phonometry/es/guides/loudspeakers/):
   los convenios de sensibilidad, el pistón radiante y la ficha de
   características.

@@ -67,7 +67,7 @@ $$
 L_{p,\mathrm{pk}} = 20\lg\frac{\max|p|}{p_0},
 $$
 
-con `p₀ = 1 µPa` y `E₀ = 1 µPa²·s`. El nivel de presión acústica es el nivel
+con $p_0 = 1\ \mu\text{Pa}$ y $E_0 = 1\ \mu\text{Pa}^2\,\text{s}$. El nivel de presión acústica es el nivel
 cuadrático medio (ISO 18406 Fórmula 7); el nivel de exposición sonora integra la
 presión al cuadrado sobre el registro (Fórmulas 3–4); el nivel de pico es el
 valor de cero a pico.
@@ -81,10 +81,10 @@ pk = underwater.peak_sound_pressure_level(pressure)     # dB re 1 µPa
 ```
 
 Para re-referenciar un nivel entre las convenciones submarina (1 µPa) y aérea
-(20 µPa), que supone un desplazamiento de `20·lg(20) ≈ 26,02` dB y **no** una
+(20 µPa), que supone un desplazamiento de $20\lg(20) \approx 26{,}02$ dB y **no** una
 equivalencia de energía/intensidad, usa `underwater_to_in_air_spl` /
 `in_air_to_underwater_spl`. Para restar el ruido de fondo, reutiliza el
-`background_noise_correction` (`K1`) de la ISO 3744.
+`background_noise_correction` ($K_1$) de la ISO 3744.
 
 ## 2. Ruido radiado y nivel de fuente de buques (ISO 17208-1/-2)
 
@@ -99,14 +99,14 @@ L_s = L_{\mathrm{RN}} + \Delta L,
 $$
 
 donde la corrección de superficie de Lloyd's mirror (ISO 17208-2 Fórmula 3) para
-una profundidad de fuente nominal `d_s = 0,7·D` (D = calado medio) y `u = k·d_s`,
-`k = 2πf/c`, es
+una profundidad de fuente nominal $d_s = 0{,}7\,D$ ($D$ = calado medio) y $u = k\,d_s$,
+$k = 2\pi f/c$, es
 
 $$
 \Delta L = -10\lg\frac{2u^4 + 14u^2}{14 + 2u^2 + u^4}\ \mathrm{dB}.
 $$
 
-`ΔL` diverge a `u` bajo (rasante / baja frecuencia) y tiende a `−10·lg(2) =
+$\Delta L$ diverge a `u` bajo (rasante / baja frecuencia) y tiende a `−10·lg(2) =
 −3,01` dB cuando `u → ∞`. El nivel de fuente reportado es un valor *monopolar
 equivalente de través* y debe indicarse junto con su profundidad de fuente.
 
@@ -170,7 +170,7 @@ y la ventana de datos en planta.
 ## 3. Sonido del hincado de pilotes (ISO 18406)
 
 El hincado de pilotes por percusión radia un pulso impulsivo por cada golpe de
-martillo. Cada golpe tiene un **nivel de exposición sonora por golpe** `SEL_ss`;
+martillo. Cada golpe tiene un **nivel de exposición sonora por golpe** $\mathrm{SEL}_{ss}$;
 a lo largo de una secuencia de hincado las exposiciones se suman en un **nivel de
 exposición sonora acumulado**:
 

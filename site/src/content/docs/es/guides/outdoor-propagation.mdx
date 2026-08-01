@@ -264,7 +264,7 @@ margen libre, sin bajar nunca de cero.
 
 ### Los cuatro términos de atenuación
 
-* **Divergencia geométrica** $A_{div} = 20 \log_{10}(d/d_0) + 11$ dB, $d_0 = 1$ m
+* **Divergencia geométrica** $A_{div} = 20 \lg(d/d_0) + 11$ dB, $d_0 = 1$ m
   (Ec. (7)): expansión esférica desde una fuente puntual. Exactamente 51 dB a
   100 m, +6 dB por cada duplicación de la distancia. El $+11$ ($= 10 \lg 4\pi$)
   fija el nivel a la distancia de referencia de 1 m.
@@ -284,7 +284,7 @@ margen libre, sin bajar nunca de cero.
   poroso/absorbente). Un $A_{gr}$ **negativo** es una *ganancia* neta por la
   reflexión constructiva en el suelo.
 * **Apantallamiento** por una barrera es la pérdida por inserción por difracción
-  $D_z = 10 \log_{10}\big[ 3 + (C_2/\lambda)\ C_3\ z\ K_{met} \big]$ (Ec. (14)),
+  $D_z = 10 \lg\big[ 3 + (C_2/\lambda)\ C_3\ z\ K_{met} \big]$ (Ec. (14)),
   limitada a 20 dB (un borde) o 25 dB (doble borde). Para una barrera de borde
   superior, el efecto del suelo del recorrido apantallado se integra en él,
   $A_{bar} = D_z - A_{gr} \ge 0$ (Ec. (12), Nota 13); para una barrera lateral
@@ -460,7 +460,8 @@ difracción por borde vertical (Ec. (13), $K_{met}=1$, se conserva el término d
 suelo).
 
 La simulación siguiente muestra por qué $D_z$ crece con la frecuencia: frente a
-la misma pantalla de 2,5 m, un frente de onda de 100 Hz (λ ≈ 3,4 m) se difracta
+la misma pantalla de 2,5 m, un frente de onda de 100 Hz
+($\lambda \approx 3{,}4\ \text{m}$) se difracta
 sobre el borde y rellena la zona de sombra, mientras que a 500 Hz la sombra es
 profunda y nítida. Una barrera solo funciona cuando la longitud de onda es
 corta frente a la diferencia de camino.
@@ -499,7 +500,7 @@ desglose apilado por bandas con el total superpuesto (la figura anterior).
 | `edge_separation` | float o None | m | `None` | $e$; si se da ⇒ difracción doble (límite 25 dB) |
 | `ground_reflections_by_image` | bool | — | `False` | `True` ⇒ $C_2 = 40$ |
 | `lateral` | bool | — | `False` | `True` ⇒ difracción por borde vertical (Ec. (13)) |
-| `line_of_sight_clear` | bool | — | `False` | `True` ⇒ la línea de visión pasa por encima del borde superior: la diferencia de camino toma signo negativo y Kmet = 1 (texto tras la Ec. (16)) |
+| `line_of_sight_clear` | bool | — | `False` | `True` ⇒ la línea de visión pasa por encima del borde superior: la diferencia de camino toma signo negativo y $K_{met} = 1$ (texto tras la Ec. (16)) |
 
 ## 3. Alcance, hipótesis y errores habituales
 

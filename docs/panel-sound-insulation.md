@@ -74,9 +74,9 @@ The predicted spectrum plugs straight into the ISO 717-1 rating through
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/single_panel_rating_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/single_panel_rating.svg" alt="Predicted sound reduction index of a 6 mm float glass pane per one-third-octave band against the shifted ISO 717-1 reference curve, with the coincidence dip at about 2100 Hz marked, the unfavourable deviations shaded and the Rw rating annotated" width="80%"></picture>
 
 *The predicted Sharp spectrum rated exactly like a measurement: the
-coincidence dip at `fc ~ 2.1 kHz` collects most of the unfavourable
+coincidence dip at $f_c \approx 2.1$ kHz collects most of the unfavourable
 deviations, and the shifted reference read at 500 Hz gives the catalogue
-`Rw = 32 dB` of 6 mm glass.*
+$R_w = 32$ dB of 6 mm glass.*
 
 <details>
 <summary>Show the code for this figure</summary>
@@ -126,10 +126,11 @@ The clip below watches coincidence happen in a 2D
 [elastic FDTD field](elastic-waves.md): a 10 mm
 steel plate immersed in air, driven by a sustained plane wave at 45 degrees,
 with both frequencies picked from the library's `coincidence_frequency`. At
-`fc/2` = 603 Hz the measured transmission lands on the oblique mass law; at
-`2 fc` = 2413 Hz the 45-degree trace equals `λB` exactly and the trace-matched
-plate re-radiates a 45-degree beam that grows along the plate, pinning the
-transmitted level at the `fc/2` figure even though the mass law demands 12 dB
+$f_c/2 = 603$ Hz the measured transmission lands on the oblique mass law; at
+$2f_c = 2413$ Hz the 45-degree trace equals $\lambda_B$ exactly and the
+trace-matched plate re-radiates a 45-degree beam that grows along the plate,
+pinning the transmitted level at the $f_c/2$ figure even though the mass law
+demands 12 dB
 more blocking at four times the frequency. The air drives the heavy steel so
 weakly that the resonant bending wave needs tens of metres of illuminated
 plate to build up fully, which is why a real coincidence dip, not total
@@ -153,16 +154,17 @@ hand for decades. The **plateau method** (Norton & Karczub 2003, Section 3.9.1,
 after Watters) approximates the whole field-incidence curve of a single panel
 from three numbers per material, tabulated in `PLATEAU_MATERIALS` from Norton's
 Table 3.1: the surface density per millimetre of thickness, the height of the
-coincidence plateau in decibels, and the frequency ratio `B/A` that sets its
+coincidence plateau in decibels, and the frequency ratio $B/A$ that sets its
 width.
 
 The construction has three parts:
 
-1. the **field-incidence mass law** `TL = 10 lg(1 + (π f m''/ρ₀c₀)²) − 5 dB`
+1. the **field-incidence mass law**
+   $TL = 10\lg(1 + (\pi f m''/\rho_0 c_0)^2) - 5\ \text{dB}$
    (Norton Eqs. 3.104 and 3.106), rising 6 dB per octave;
 2. a horizontal **coincidence plateau** at the tabulated height, with point
    **A** where the mass-law line reaches it;
-3. point **B** at `B/A × f_A`, above which the estimate recovers at
+3. point **B** at $B/A \times f_A$, above which the estimate recovers at
    **10 dB per octave**.
 
 It needs neither the bending stiffness nor the loss factor - the tabulated
@@ -203,7 +205,8 @@ plt.show()
 </details>
 
 A worked check against the book: an 8 m x 3 m solid brick wall 110 mm thick at
-2.1 kg/m² per mm (`m'' = 231 kg/m²`) gives 35.8 dB in the 63 Hz octave, on the
+2.1 kg/m² per mm ($m'' = 231\ \text{kg/m}^2$) gives 35.8 dB in the 63 Hz
+octave, on the
 mass-law line, then the brick plateau of 37 dB across the 125 Hz and 250 Hz
 octaves, then 10 dB per octave above point B - Norton's printed answer to his
 problem 3.11 exactly, band for band, in the two regions the construction fixes
@@ -221,8 +224,8 @@ print(res.transmission_loss.round(1))
 
 The physical model has its own Norton-flavoured variant for the region above
 coincidence: `coincidence_model="cremer"` replaces Sharp's Eq. 7.44 with
-Cremer's empirical `TL = TL₀ + 10 lg(f/fc − 1) + 10 lg η − 2 dB`
-(Norton Eq. 3.110), and runs the mass law right up to `fc` with no interpolated
+Cremer's empirical $TL = TL_0 + 10\lg(f/f_c - 1) + 10\lg\eta - 2\ \text{dB}$
+(Norton Eq. 3.110), and runs the mass law right up to $f_c$ with no interpolated
 bridge. Both rise at about 10 dB per octave far above coincidence; they differ
 in how they leave the dip.
 
@@ -439,7 +442,7 @@ dw.plot()   # double-wall R(f) with the mass-spring-mass resonance marked (needs
 ```
 
 The classic lightweight case is worth drawing to scale: two 8.8 kg/m²
-plasterboard leaves on a 100 mm empty cavity put `f0` at 90 Hz.
+plasterboard leaves on a 100 mm empty cavity put $f_0$ at 90 Hz.
 `plot_double_wall_geometry` annotates the resonance in the cavity, and a
 `double_wall_transmission_loss` result that retained its geometry redraws its
 own cross-section with `dw.plot_geometry()`.
@@ -447,7 +450,7 @@ own cross-section with `dw.plot_geometry()`.
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/double_wall_geometry_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/double_wall_geometry.svg" alt="To-scale cross-section of a lightweight double wall: two grey plasterboard leaves of 8.8 kg/m2 each, drawn 12.6 mm thick, separated by the 100 mm cavity, the incident-sound arrow arriving from the left and the mass-spring-mass resonance f0 = 90 Hz annotated in the cavity" width="80%"></picture>
 
 *The whole model in one section: the two thin leaves are the masses, the
-100 mm air gap is the spring, and `f0` = 90 Hz is where the dip of every
+100 mm air gap is the spring, and $f_0 = 90$ Hz is where the dip of every
 double-wall curve sits.*
 
 <details>
@@ -633,7 +636,8 @@ plt.show()
 </details>
 
 The clip below puts the two regimes side by side in a 2D FDTD field: a plane
-front meets a rigid 0.10 m wall with a 25 mm slit (λ/20 at 686 Hz) and with a
+front meets a rigid 0.10 m wall with a 25 mm slit ($\lambda/20$ at 686 Hz)
+and with a
 0.50 m opening (one wavelength). The narrow slit re-radiates what it swallows
 as a cylindrical wave, the Gomperts transmission of the model annotated; the
 wavelength-sized opening lets the front through nearly intact and casts

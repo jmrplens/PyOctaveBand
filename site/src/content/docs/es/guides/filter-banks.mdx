@@ -149,11 +149,11 @@ ejemplos de uso por arquitectura, hasta el crossover Linkwitz-Riley, es la
 | :--- | :--- | :--- | :--- | :--- |
 | `x` | array 1D o 2D | unidades digitales | no vacío | 2D es `[channels, samples]` |
 | `fs` | int | Hz | > 0 | |
-| `fraction` | int | — | por defecto `1`; habitual `3`; cualquier `b ≥ 1` | Bandas por octava = `b` |
+| `fraction` | int | — | por defecto `1`; habitual `3`; cualquier $b \ge 1$ | Bandas por octava = $b$ |
 | `order` | int | — | por defecto `6` | Orden SOS por banda |
 | `limits` | lista `[lo, hi]` | Hz | por defecto `[12, 20000]` | Rango de análisis |
 | `filter_type` | str | — | `'butter'` (por defecto), `'cheby1'`, `'cheby2'`, `'ellip'`, `'bessel'` | Consulta la [Galería de arquitecturas de filtro](/phonometry/es/guides/filter-gallery/) |
-| `ripple` / `attenuation` | float | dB | `ripple` defecto `0.1`; `attenuation` defecto `72.0` | Rizado de banda de paso / atenuación en banda atenuada (cheby/ellip); `cheby2` necesita `attenuation ≥ 70` para clase 1, ya que scipy fija su suelo equirizado en exactamente este valor |
+| `ripple` / `attenuation` | float | dB | `ripple` defecto `0.1`; `attenuation` defecto `72.0` | Rizado de banda de paso / atenuación en banda atenuada (cheby/ellip); `cheby2` necesita `attenuation` $\ge 70$ para clase 1, ya que scipy fija su suelo equirizado en exactamente este valor |
 | `show` | bool | — | por defecto `False` | Dibuja la respuesta del banco (requiere matplotlib) |
 | `sigbands` | bool | — | por defecto `False` | Devuelve también las señales temporales por banda |
 | `mode` | str | — | `'rms'` (por defecto), `'peak'`, `'sum'` | Estadístico por banda devuelto |

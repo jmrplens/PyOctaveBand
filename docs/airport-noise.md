@@ -23,7 +23,7 @@ barriers) are [Outdoor sound propagation](outdoor-propagation.md).
 ## 1. The noise-power-distance engine
 
 The ECAC Doc 29 airport-noise method describes an aircraft with **noise-power-
-distance (NPD)** tables that give the event level (`LAmax` or `SEL`) of steady straight
+distance (NPD)** tables that give the event level ($L_{Amax}$ or `SEL`) of steady straight
 flight versus engine power and slant distance. `npd_level` reads an event level
 for an arbitrary power and distance, interpolating **linearly in power**
 (Eq. 4-3) and **log-linearly in distance** (Eq. 4-4), extrapolating from the
@@ -81,21 +81,25 @@ The full ECAC Doc 29 single-event calculation places a flight path's noise at a
 receiver by breaking the path into segments and, for each, correcting the NPD
 baseline level (§4.3-4.5):
 
-- **`impedance_adjustment(T, p)`**: corrects the NPD data from their reference
+- **`impedance_adjustment`** ($T$, $p$): corrects the NPD data from their reference
   air impedance (409.81 N·s/m³) to the aerodrome's temperature and pressure
   (Eq. 4-6/4-7; +0.074 dB under the standard atmosphere).
-- **`lateral_attenuation(β, ℓ)`**: excess lateral attenuation over soft ground
+- **`lateral_attenuation`** ($\beta$, $\ell$): excess lateral attenuation over
+  soft ground
   (Eq. 4-18/4-19, AIR-5662).
-- **`engine_installation_correction(φ, mounting)`**: lateral-directivity term
-  for wing/fuselage/propeller installations (Eq. 4-15/4-16).
-- **`duration_correction(Vref, Vseg)`**: the speed/duration adjustment for
+- **`engine_installation_correction`** ($\varphi$, mounting): lateral-
+  directivity term for wing/fuselage/propeller installations (Eq. 4-15/4-16).
+- **`duration_correction`** ($V_{\text{ref}}$, $V_{\text{seg}}$): the
+  speed/duration adjustment for
   exposure levels (Eq. 4-14).
-- **`noise_fraction(q, λ, dλ)`**: the finite-segment energy fraction (Eq. 4-20).
-- **`start_of_roll_directivity(ψ, dSOR, engine)`**: the rearward jet/turboprop
+- **`noise_fraction`** ($q$, $\lambda$, $d_\lambda$): the finite-segment energy
+  fraction (Eq. 4-20).
+- **`start_of_roll_directivity`** ($\psi$, $d_{\text{SOR}}$, engine): the
+  rearward jet/turboprop
   directivity behind takeoff ground-roll segments (Eq. 4-22/4-24/4-25). Pass a
   boolean `ground_roll` mask to `event_level`/`noise_contour` to flag the takeoff
-  ground-roll segments; behind them the reduced (q = 0) noise fraction and `ΔSOR`
-  are applied (Eq. 4-9).
+  ground-roll segments; behind them the reduced ($q = 0$) noise fraction and
+  $\Delta_{\text{SOR}}$ are applied (Eq. 4-9).
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/airport_contour_dark.webp">
@@ -144,10 +148,10 @@ ground and a receiver sitting in an interference dip.
 
 [Watch the high-resolution video (WebM)](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anim_fdtd_ground_effect.webm)
 
-`ΔSOR` is what makes the departure footprint bulge rearward behind the runway:
-jet-exhaust noise radiates a lobed pattern in the rear arc, strongest at an
-azimuth `ψ ≈ 120°` from the nose and falling away both abeam (`ψ = 90°`) and
-directly behind (`ψ = 180°`).
+$\Delta_{\text{SOR}}$ is what makes the departure footprint bulge rearward
+behind the runway: jet-exhaust noise radiates a lobed pattern in the rear arc,
+strongest at an azimuth $\psi \approx 120°$ from the nose and falling away
+both abeam ($\psi = 90°$) and directly behind ($\psi = 180°$).
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/airport_sor_dark.svg">
@@ -180,7 +184,7 @@ plt.show()
 </details>
 
 `event_level` assembles these (Eq. 4-8/4-9) and sums the segments into the exposure
-level `SEL` (Eq. 4-11) or the maximum level `LAmax` (Eq. 4-10); `noise_contour`
+level `SEL` (Eq. 4-11) or the maximum level $L_{Amax}$ (Eq. 4-10); `noise_contour`
 evaluates `event_level` over a ground grid to produce a noise contour. Mark the
 takeoff ground-roll segments with the boolean `ground_roll` mask.
 
@@ -208,10 +212,11 @@ contour.plot()   # SEL contour over the ground (needs matplotlib)
 ```
 
 Validated against the **ECAC Doc 29 5th ed. Vol 3 Part 1 reference workbook**:
-the segment geometry (β, φ), lateral attenuation, engine installation, noise
-fraction and the start-of-roll directivity `ΔSOR` (turbofan and turboprop, all
-124 ground-roll reference rows to < 0.01 dB) reproduce the reference values, and
-the segment energy sum matches the reference `SEL`.
+the segment geometry ($\beta$, $\varphi$), lateral attenuation, engine
+installation, noise fraction and the start-of-roll directivity
+$\Delta_{\text{SOR}}$ (turbofan and turboprop, all 124 ground-roll reference
+rows to $< 0.01\ \text{dB}$) reproduce the reference values, and the segment
+energy sum matches the reference `SEL`.
 
 The model also covers the landing rollout (`landing_roll` mask: reduced noise
 fraction Eq. 4-21b, nearest-end geometry, no directivity term), per-segment
@@ -227,8 +232,8 @@ events of the reference workbook are reproduced end-to-end in the test suite.
 - [Outdoor sound propagation](outdoor-propagation.md): the ISO 9613-2
   attenuation terms and the ground effect the lateral attenuation condenses
   into one curve.
-- [Environmental levels](environmental-levels.md): the Lden-style long-term
-  indices that a full airport study accumulates from single events.
+- [Environmental levels](environmental-levels.md): the $L_{den}$-style
+  long-term indices that a full airport study accumulates from single events.
 - API reference: [`aircraft.airport_noise`](https://jmrplens.github.io/phonometry/reference/api/aeroacoustics/airport-noise/).
 
 ## References

@@ -48,7 +48,7 @@ such as 0.9999 asper and 0.9957 vacil_HMS sit against that target of 1).
 
 Two sounds can be equally loud yet one feels "sharper" (hissy, metallic)
 because its loudness sits higher on the Bark scale. Sharpness is the
-g(z)-weighted first moment of the specific loudness pattern:
+$g(z)$-weighted first moment of the specific loudness pattern:
 
 $$
 S = k\,\frac{\int_0^{24} N'(z)\, g(z)\, z\ dz}{\int_0^{24} N'(z)\ dz}\ \text{acum}
@@ -115,8 +115,9 @@ A tonal component (a whistle, a fan's blade-passing tone) stands out even at
 low level. ECMA-418-2 quantifies it from the **autocorrelation function** (ACF)
 of each band's rectified signal: a periodic (tonal) component keeps a high ACF
 at nonzero lag, and the tonal-to-noise loudness ratio drives the specific
-tonality T′(z). The single value T is in **tu_HMS**, calibrated so a 1 kHz/40 dB
-tone is ≈ 1 tu_HMS; the result also tracks the tonal frequency f_ton per band.
+tonality $T'(z)$. The single value $T$ is in **tu_HMS**, calibrated so a
+1 kHz/40 dB tone is $\approx 1$ tu_HMS; the result also tracks the tonal
+frequency $f_\text{ton}$ per band.
 
 ```python
 import numpy as np
@@ -174,7 +175,7 @@ The concentration is what distinguishes a tonal sound from a broadband one of
 the same loudness: the autocorrelation stage finds a periodic component in one
 band and almost nothing in the others. A fan with a blade-passing tone and a
 harmonic series shows several such peaks; a hiss shows a flat, low pattern.
-Calling `.plot()` without an axes adds the time-dependent `T(l)` panel, which
+Calling `.plot()` without an axes adds the time-dependent $T(l)$ panel, which
 is where an intermittent tone shows up.
 
 ### `tonality_ecma()` parameters
@@ -184,12 +185,13 @@ is where an intermittent tone shows up.
 | `signal_in` | 1D array | Pa | non-empty | Calibrated pressure signal |
 | `fs` | float | Hz | > 0 | Resampled to 48 kHz internally if needed |
 | `field` | str | — | `'free'` (default) / `'diffuse'` | Outer/middle-ear filter |
-| `f_low` | float, optional | Hz | default `None` | Lower edge of a user band for the T(l) search |
+| `f_low` | float, optional | Hz | default `None` | Lower edge of a user band for the $T(l)$ search |
 | `f_high` | float, optional | Hz | default `None` | Upper edge of the user band |
 
-Returns an `EcmaTonality`: `tonality` (T, tu_HMS), `specific_tonality`
-(T′(z), 53 bands), `bark`, `centre_frequencies`, `tonal_frequencies`
-(f_ton,z), `time`, `tonality_vs_time` (T(l)), `tonal_frequency_vs_time`,
+Returns an `EcmaTonality`: `tonality` ($T$, tu_HMS), `specific_tonality`
+($T'(z)$, 53 bands), `bark`, `centre_frequencies`, `tonal_frequencies`
+($f_{\text{ton},z}$), `time`, `tonality_vs_time` ($T(l)$),
+`tonal_frequency_vs_time`,
 `field`.
 
 ## Roughness (ECMA-418-2): new capability
@@ -198,11 +200,11 @@ Roughness is the harsh, buzzing sensation of fast amplitude modulation
 (roughly 20–300 Hz, peaking near 70 Hz): the quality of a diesel idle or a
 distorted loudspeaker. It is a **new metric** for phonometry. ECMA-418-2
 extracts each band's envelope, weights its modulation spectrum by modulation
-rate and depth, and correlates the modulation across bands; the result R is in
-**asper**. The reference sound (1 kHz carrier, 100 % amplitude-modulated at
+rate and depth, and correlates the modulation across bands; the result $R$ is
+in **asper**. The reference sound (1 kHz carrier, 100 % amplitude-modulated at
 70 Hz, overall level 60 dB SPL) is defined as 1 asper; this clean-room
 implementation returns 0.9999 asper with the tabulated calibration constant
-c_R (Formula 104) used **without** reverse-fitting to the target.
+$c_R$ (Formula 104) used **without** reverse-fitting to the target.
 
 ```python
 import numpy as np
@@ -270,10 +272,10 @@ plt.show()
 | `fs` | float | Hz | > 0 | Resampled to 48 kHz internally if needed |
 | `field` | str | — | `'free'` (default) / `'diffuse'` | Outer/middle-ear filter |
 
-Returns an `EcmaRoughness`: `roughness` (R, asper, the 90th percentile of
-R(l50)), `specific_roughness` (R′(z), 53 bands), `bark`, `centre_frequencies`,
-`time`, `roughness_vs_time` (R(l50)), `specific_roughness_vs_time`
-((n_times, 53) array), `field`.
+Returns an `EcmaRoughness`: `roughness` ($R$, asper, the 90th percentile of
+$R(l_{50})$), `specific_roughness` ($R'(z)$, 53 bands), `bark`,
+`centre_frequencies`, `time`, `roughness_vs_time` ($R(l_{50})$),
+`specific_roughness_vs_time` ((n_times, 53) array), `field`.
 
 ## Fluctuation strength (ECMA-418-2): new capability
 
@@ -290,9 +292,9 @@ quieter periods, then weights the dominant harmonic complex and scales it
 with an HSA-based specific loudness. The reference sound (1 kHz carrier,
 100 % amplitude-modulated at 4 Hz, overall level 60 dB SPL) is defined as
 1 vacil_HMS; this clean-room implementation converges to 0.9958 vacil_HMS
-by 12 s with the tabulated calibration constant c_F (Formula 163) used
+by 12 s with the tabulated calibration constant $c_F$ (Formula 163) used
 **without** reverse-fitting to the target (the 8 s example below prints
-0.9957). A signal whose single value F exceeds 0.2 vacil_HMS has a
+0.9957). A signal whose single value $F$ exceeds 0.2 vacil_HMS has a
 *prominent* fluctuation strength (Clause 9.2).
 
 ```python
@@ -357,11 +359,11 @@ plt.show()
 | `fs` | float | Hz | > 0 | Resampled to 48 kHz internally if needed |
 | `field` | str | — | `'free'` (default) / `'diffuse'` | Outer/middle-ear filter |
 
-Returns an `EcmaFluctuationStrength`: `fluctuation_strength` (F, vacil_HMS, the
-90th percentile of F(l50)), `specific_fluctuation_strength` (F′(z), 53
-bands), `bark`, `centre_frequencies`, `time`, `fluctuation_strength_vs_time`
-(F(l50)), `specific_fluctuation_strength_vs_time` ((n_times, 53) array),
-`field`.
+Returns an `EcmaFluctuationStrength`: `fluctuation_strength` ($F$, vacil_HMS,
+the 90th percentile of $F(l_{50})$), `specific_fluctuation_strength`
+($F'(z)$, 53 bands), `bark`, `centre_frequencies`, `time`,
+`fluctuation_strength_vs_time` ($F(l_{50})$),
+`specific_fluctuation_strength_vs_time` ((n_times, 53) array), `field`.
 
 The Fastl & Zwicker fluctuation-strength models (closed form for AM
 broadband noise and the Osses 2016 signal model) live in

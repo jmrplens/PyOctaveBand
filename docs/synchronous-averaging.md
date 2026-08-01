@@ -5,9 +5,9 @@
 A rotating machine repeats its signature once per revolution. Buried in
 broadband noise and in the tones of every other shaft, that repetitive
 waveform is hard to read directly. **Time synchronous averaging** (TSA)
-recovers it: given the period `T` of one revolution, it slices the record
-into successive length-`T` blocks and averages them. Every component
-synchronous with `T` reinforces; everything asynchronous, noise and the
+recovers it: given the period $T$ of one revolution, it slices the record
+into successive length-$T$ blocks and averages them. Every component
+synchronous with $T$ reinforces; everything asynchronous, noise and the
 harmonics of unrelated shafts, averages down. `time_synchronous_average`
 implements the model of P. D. McFadden, *A revised model for the extraction
 of periodic waveforms by time domain averaging* (Mechanical Systems and
@@ -77,15 +77,23 @@ attenuated.
 
 ## 1. The average is a comb filter
 
-Averaging `N` successive periods (McFadden Eq. 5),
-`a(t) = (1/N) Σ y(t + n·T)`, is, in the frequency domain, the multiplication
-of the signal spectrum by a **comb filter** (Eq. 8). Its magnitude (Eq. 9) is
-the Dirichlet kernel `|C(f)| = |sin(N·π·f·T) / (N·sin(π·f·T))|`.
+Averaging $N$ successive periods (McFadden Eq. 5),
 
-The comb has a **tooth** of unit height at every harmonic `k/T` (the orders
-`f·T = 1, 2, 3, ...`), *independent of `N`*: components synchronous with the
-period pass untouched. Between the teeth it has **nodes** at `j/(N·T)` for
-every `j` that is not a multiple of `N`, where the response is exactly zero.
+$$
+a(t) = \frac{1}{N} \sum_{n=0}^{N-1} y(t + n\,T),
+$$
+
+is, in the frequency domain, the multiplication of the signal spectrum by a
+**comb filter** (Eq. 8). Its magnitude (Eq. 9) is the Dirichlet kernel
+
+$$
+|C(f)| = \left| \frac{\sin(N\pi f T)}{N \sin(\pi f T)} \right| .
+$$
+
+The comb has a **tooth** of unit height at every harmonic $k/T$ (the orders
+$fT = 1, 2, 3, \dots$), *independent of $N$*: components synchronous with the
+period pass untouched. Between the teeth it has **nodes** at $j/(NT)$ for
+every $j$ that is not a multiple of $N$, where the response is exactly zero.
 `comb_filter_response` evaluates this closed form directly:
 
 ```python
@@ -104,11 +112,12 @@ the average applied is available alongside the recovered waveform.
 
 ## 2. Noise falls as the square root of the number of averages
 
-Asynchronous noise of variance `σ²` averaged over `N` periods has residual
-variance `σ²/N`: the residual standard deviation falls as `1/√N`, and the
-amplitude signal-to-noise ratio improves by `√N`. That is a power reduction
-of `10·log₁₀ N` dB, reported as `noise_reduction_db`, with the amplitude gain
-`√N` as `amplitude_snr_gain`:
+Asynchronous noise of variance $\sigma^2$ averaged over $N$ periods has
+residual variance $\sigma^2/N$: the residual standard deviation falls as
+$1/\sqrt{N}$, and the amplitude signal-to-noise ratio improves by $\sqrt{N}$.
+That is a power reduction of $10\log_{10} N$ dB, reported as
+`noise_reduction_db`, with the amplitude gain $\sqrt{N}$ as
+`amplitude_snr_gain`:
 
 ```python
 res = time_synchronous_average(recording, fs, period, n_averages=100)
@@ -119,9 +128,10 @@ res.plot()                  # averaged waveform + the comb it applied
 
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/tsa_noise_reduction_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/tsa_noise_reduction.svg" alt="Log-log plot of the RMS error of the synchronous average against the number of averages from 1 to 128: the measured error markers fall along the dashed ideal one-over-square-root-of-N line, dropping from about 1 at a single period to below 0.1 at 128 averages" width="82%"></picture>
 
-*The √N law measured end to end: the RMS error of the averaged waveform of
-a three-harmonic gear signature in unit-variance noise falls along the
-ideal σ/√N line as the number of averaged periods grows from 1 to 128.*
+*The $\sqrt{N}$ law measured end to end: the RMS error of the averaged
+waveform of a three-harmonic gear signature in unit-variance noise falls along
+the ideal $\sigma/\sqrt{N}$ line as the number of averaged periods grows from
+1 to 128.*
 
 <details>
 <summary>Show the code for this figure</summary>
@@ -174,20 +184,21 @@ the noise actually left once the synchronous component is removed.
 
 Because a tooth sits on *every* integer order, TSA passes the harmonics of
 the target shaft but also any tone that happens to fall on an integer order.
-A tone at a *non-harmonic* order `q = f·T` is only attenuated by the comb,
+A tone at a *non-harmonic* order $q = fT$ is only attenuated by the comb,
 not removed, and how much depends on where the nearest node lands. McFadden's
 revised-model result is that such an interferer is best rejected by choosing
-`N` so that a node falls exactly on it, i.e. the smallest `N` with `N·q` an
+$N$ so that a node falls exactly on it, i.e. the smallest $N$ with $Nq$ an
 integer, rather than by the habitual power-of-two number of averages. An exact
-node exists only when the order `q` is rational, so some finite `N` makes `N·q`
-an integer; for an irrational or merely estimated order, choose the `N` whose
+node exists only when the order $q$ is rational, so some finite $N$ makes $Nq$
+an integer; for an irrational or merely estimated order, choose the $N$ whose
 node falls nearest the interfering order.
 
-His own example is a tone at 32.05 orders. With `N = 20` the product
-`20 · 32.05 = 641` is an integer, so a comb node lands on the tone and rejects
-it by more than 100 dB. The common choice `N = 32` gives `32 · 32.05 = 1025.6`,
-which sits on a side lobe: the tone is barely touched. The figure above shows
-both combs around order 32; the end-to-end average confirms it:
+His own example is a tone at 32.05 orders. With $N = 20$ the product
+$20 \cdot 32.05 = 641$ is an integer, so a comb node lands on the tone and
+rejects it by more than 100 dB. The common choice $N = 32$ gives
+$32 \cdot 32.05 = 1025.6$, which sits on a side lobe: the tone is barely
+touched. The figure above shows both combs around order 32; the end-to-end
+average confirms it:
 
 ```python
 # true 8th-order component plus a strong interferer at 32.05 orders
@@ -201,13 +212,13 @@ leak_32 = time_synchronous_average(recording, fs, period, n_averages=32)
 
 So a power-of-two number of averages, convenient as it is, is not in general
 the optimal choice: the interfering orders present in the machine should set
-`N`.
+$N$.
 
 ## 4. Non-integer samples per period
 
-When `fs·T` is an integer, the period boundaries fall on samples, the blocks
+When $f_s T$ is an integer, the period boundaries fall on samples, the blocks
 are sliced directly, and a noiseless periodic signal is recovered to machine
-precision (`interpolated` is `False`). When `fs·T` is not an integer the
+precision (`interpolated` is `False`). When $f_s T$ is not an integer the
 boundaries fall between samples; each block is then aligned to a common
 integer grid by the band-limited fractional delay of
 [`fractional_delay`](test-signals.md), and the waveform is recovered within
@@ -225,7 +236,7 @@ res.samples_per_period                    # integer samples of one period
 
 By default the average uses as many whole periods as the record holds; pass
 `n_averages` to fix the count (for the node-selection choice of §3), and
-`n_harmonics` to set how many harmonics of `1/T` the returned comb response
+`n_harmonics` to set how many harmonics of $1/T$ the returned comb response
 spans.
 
 The band-limited alignment shares its kernel with the sub-sample

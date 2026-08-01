@@ -76,7 +76,7 @@ Esta página reúne la teoría de la propia cadena de medición: las bandas frac
 
 ## Frecuencias de banda de octava (ANSI S1.11 / IEC 61260)
 
-Las frecuencias centrales (fm) y los bordes (f1, f2) usan una razón en base 10:
+Las frecuencias centrales ($f_m$) y los bordes ($f_1$, $f_2$) usan una razón en base 10:
 
 $$
 G = 10^{0{,}3}
@@ -88,7 +88,7 @@ $$
 f_m = 1000 \cdot G^{x/b}
 $$
 
-(para b impar)
+(para $b$ impar)
 
 **Bordes de banda:**
 
@@ -173,7 +173,7 @@ for f, pxx in zip(freq_bins[in_band], psd[in_band]):
 
 Esto mantiene separados los dos conceptos: phonometry da niveles de octava
 fraccional normalizados, mientras Welch da bins FFT de banda estrecha. Con
-`fs=100000` y `nperseg=2**15`, la separación de bins Welch es de unos `3.05 Hz`.
+`fs=100000` y `nperseg=2**15`, la separación de bins Welch es de unos 3,05 Hz.
 La ventana y el solape afectan al leakage y a la varianza del promediado, pero
 no cambian la separación de bins de cada segmento FFT.
 
@@ -250,8 +250,9 @@ emplea dos estrategias fundamentales:
    funciones de transferencia de orden alto.
 2. **Diezmado multitasa:** siempre que la mitad de la frecuencia de muestreo
    siga por encima de 1,25 veces el borde superior de la banda, la señal se
-   diezma automáticamente por `M = floor[(fs / 2) / (1,25 * f_sup)]` antes de
-   filtrar, lo que ocurre en la mayoría de las bandas y no solo en las graves
+   diezma automáticamente por
+   $M = \lfloor (f_s/2) / (1{,}25\,f_\text{sup}) \rfloor$ antes de filtrar, lo
+   que ocurre en la mayoría de las bandas y no solo en las graves
    (29 de las 33 bandas de tercio de octava a 48 kHz). Esto mantiene los polos
    digitales lejos del borde del círculo unidad, evitando oscilaciones y ruido.
    El nivel de banda se calcula sobre la señal diezmada; solo con
@@ -294,9 +295,9 @@ $$
 \alpha = 1 - e^{-1 / (f_s \cdot \tau)}
 $$
 
-donde `tau` es la constante de tiempo (p. ej. 125 ms para Fast).
+donde $\tau$ es la constante de tiempo (p. ej. 125 ms para Fast).
 
-La condición inicial por defecto es `y[-1] = 0`. Usa `initial_state='first'`
+La condición inicial por defecto es $y[-1] = 0$. Usa `initial_state='first'`
 para partir de la energía de la primera muestra, o pasa un escalar/array con el
 estado cuadrático medio anterior. Consulta
 [Por qué phonometry](/phonometry/es/reference/why-phonometry/) para la
@@ -329,7 +330,7 @@ Consulta la [guía de ponderaciones especiales](/phonometry/es/guides/special-we
 
 ## Métricas de evento y de dosis
 
-El **nivel de exposición sonora** (SEL; LAE con ponderación A, IEC 61672-1:2013) normaliza la energía de un evento discreto (sobrevuelo de un avión, paso de un tren) a una duración de referencia de 1 s:
+El **nivel de exposición sonora** (SEL; $L_{AE}$ con ponderación A, IEC 61672-1:2013) normaliza la energía de un evento discreto (sobrevuelo de un avión, paso de un tren) a una duración de referencia de 1 s:
 
 $$
 \mathrm{SEL} = L_{eq,T} + 10 \log_{10}\left(\frac{T}{T_0}\right), \qquad T_0 = 1\ \text{s}
@@ -349,7 +350,7 @@ $$
 
 Es idéntico al $L_{EP,d}$ de la Directiva 86/188/CEE y al $L_{EX,8h}$ de ISO 1999 (IEC 61252, 3.3 NOTAS 5–6). El ancla de IEC 61252 (3.3 NOTA 4): una exposición de **3,2 Pa²h corresponde a un $L_{EX,8h}$ de exactamente 90 dB**.
 
-**LCpeak** (IEC 61672-1:2013, subcláusula 5.13) es el máximo absoluto de la presión acústica ponderada C expresado en dB, $L_{Cpeak} = 20\log_{10}(\max|p_C(t)|/p_0)$, la magnitud detrás de los límites de acción laborales de 135/137/140 dB(C). La implementación se verifica contra las respuestas de referencia de un ciclo y de medio ciclo de la Tabla 5.
+**$L_{Cpeak}$** (IEC 61672-1:2013, subcláusula 5.13) es el máximo absoluto de la presión acústica ponderada C expresado en dB, $L_{Cpeak} = 20\log_{10}(\max|p_C(t)|/p_0)$, la magnitud detrás de los límites de acción laborales de 135/137/140 dB(C). La implementación se verifica contra las respuestas de referencia de un ciclo y de medio ciclo de la Tabla 5.
 
 Consulta la [guía de niveles](/phonometry/es/guides/levels/) para su uso y la [guía de calibración](/phonometry/es/guides/calibration/) para configurar la escala absoluta.
 
@@ -387,7 +388,7 @@ Consulta la [guía de intensidad acústica](/phonometry/es/guides/intensity/) pa
 
 <img class="light-only" src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/intensity_demo_es.svg" alt="Niveles de presión e intensidad en tercios de octava para una onda plana progresiva frente a una onda estacionaria" style="width:92%" loading="lazy"><img class="dark-only" src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/intensity_demo_es_dark.svg" alt="Niveles de presión e intensidad en tercios de octava para una onda plana progresiva frente a una onda estacionaria" style="width:92%" loading="lazy">
 
-*El estimador p-p en los dos campos límite: la separación entre Lp y LI es el índice presión-intensidad que delata los campos reactivos.*
+*El estimador p-p en los dos campos límite: la separación entre $L_p$ y $L_I$ es el índice presión-intensidad que delata los campos reactivos.*
 
 ## Incertidumbre de medida (ISO/IEC Guide 98-3: GUM y Suplemento 1)
 

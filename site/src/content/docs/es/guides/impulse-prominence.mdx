@@ -32,7 +32,7 @@ import ReportPreview from '../../../../components/ReportPreview.astro';
 El ruido con impulsos prominentes (martilleo, remachado, hinca de pilotes) es
 más molesto que un sonido estacionario del mismo nivel equivalente. **NT ACOU
 112:2002** (un método Nordtest) cuantifica cuán *prominente* es un impulso y lo
-convierte en un ajuste graduado `KI` que se suma al `LAeq` medido. La
+convierte en un ajuste graduado $K_I$ que se suma al $L_{Aeq}$ medido. La
 prominencia se lee de dos propiedades del arranque de cada impulso en el
 historial de nivel ponderado A con ponderación temporal F: la rapidez con que
 crece (la **tasa de crecimiento**) y cuánto crece (la **diferencia de nivel**).
@@ -46,7 +46,7 @@ crece (la **tasa de crecimiento**) y cuánto crece (la **diferencia de nivel**).
 
 ## 1. Prominencia prevista (cláusula 7)
 
-Para cada impulso candidato, la **prominencia prevista** `P` combina la tasa de
+Para cada impulso candidato, la **prominencia prevista** $P$ combina la tasa de
 crecimiento (en dB/s) y la diferencia de nivel (en dB) en escala logarítmica
 (Fórmula 1):
 
@@ -54,14 +54,14 @@ $$
 P = 3\,\lg(\text{tasa de crecimiento}) + 2\,\lg(\text{diferencia de nivel}).
 $$
 
-Los coeficientes se ajustaron a partir de ensayos de escucha y `P` está diseñada
-para alcanzar unos 15 en impulsos muy súbitos e intensos. El impulso con la `P`
+Los coeficientes se ajustaron a partir de ensayos de escucha y $P$ está diseñada
+para alcanzar unos 15 en impulsos muy súbitos e intensos. El impulso con la $P$
 **más alta** en un periodo de 30 minutos es el determinante. Una subida de
 nivel solo *cualifica* como impulso cuando su tasa de subida supera 10 dB/s
 (apartado 4.5; el apartado 8 aplica el ajuste únicamente «para sonidos con
 tasas de subida mayores de 10 dB/s»): `impulse_prominence` marca los eventos
 no cualificados en su máscara `qualifies`, avisa de ellos y nunca les permite
-fijar la prominencia determinante ni un `KI` (el ajuste es 0 dB cuando ningún
+fijar la prominencia determinante ni un $K_I$ (el ajuste es 0 dB cuando ningún
 evento cualifica).
 
 <Video
@@ -109,7 +109,7 @@ print(float(environmental.impulse_adjustment(10.0)))  # 9.0 dB
 print(float(environmental.impulse_adjustment(5.0)))   # 0.0 dB (en el umbral)
 ```
 
-El ajuste se aplica al `LAeq,30min` del evento con la prominencia más alta. El
+El ajuste se aplica al $L_{Aeq,30\text{min}}$ del evento con la prominencia más alta. El
 **nivel de evaluación** sobre un tiempo de referencia mayor combina los niveles
 equivalentes ajustados por impulso de los subintervalos (cláusula 8, Nota 1):
 
@@ -127,7 +127,7 @@ print(round(environmental.rating_level([72.0, 66.0], [7.6, 0.0], [30.0, 30.0], 6
 ```
 
 El `ImpulseProminenceResult` lleva las prominencias `per_impulse`, la `prominence`
-determinante y su `adjustment`, y su `.plot()` dibuja la curva `KI(P)` con los
+determinante y su `adjustment`, y su `.plot()` dibuja la curva $K_I(P)$ con los
 impulsos marcados. El método es un complemento a la medida de ruido ambiental de
 [ISO 1996-2](/phonometry/es/guides/environmental-levels/).
 
@@ -165,16 +165,17 @@ La NT ACOU 112 toma la tasa de crecimiento y la diferencia de nivel como
 entradas. La **ISO/PAS 1996-3:2022** conserva las mismas fórmulas de
 prominencia y ajuste, pero añade la *cadena de medida objetiva* que lee esas
 magnitudes directamente de una grabación calibrada. `impulsive_sound_adjustment`
-pondera la señal en A, aplica la ponderación temporal F ($\tau$ = 125 ms),
-muestrea el historial de nivel `LpAF` cada 10-25 ms, detecta cada arranque (el
+pondera la señal en A, aplica la ponderación temporal F
+($\tau = 125\ \text{ms}$),
+muestrea el historial de nivel $L_{pAF}$ cada 10-25 ms, detecta cada arranque (el
 tramo contiguo cuyo gradiente supera 10 dB/s, fusionando eventos separados menos
-de 50 ms), mide su diferencia de nivel `LD = Le − Ls` y su tasa de crecimiento
-`OR` por mínimos cuadrados, y devuelve el ajuste determinante `KI` con la
-categoría de fuente de la cláusula 7: *no impulsiva* (`KI = 0`), *impulsiva
-regular* (`0 < KI ≤ 5`) o *altamente impulsiva* (`KI > 5`).
+de 50 ms), mide su diferencia de nivel $L_D = L_e - L_s$ y su tasa de crecimiento
+$\mathrm{OR}$ por mínimos cuadrados, y devuelve el ajuste determinante $K_I$ con la
+categoría de fuente de la cláusula 7: *no impulsiva* ($K_I = 0$), *impulsiva
+regular* ($0 < K_I \le 5$) o *altamente impulsiva* ($K_I > 5$).
 
 La detección de arranques puede ejecutarse directamente sobre un historial de
-nivel con `detect_onsets`, cómodo para sonómetros que ya registran `LpAF`:
+nivel con `detect_onsets`, cómodo para sonómetros que ya registran $L_{pAF}$:
 
 ```python
 import numpy as np
@@ -249,15 +250,15 @@ mínimos cuadrados sobre el crecimiento detectado, así que un ajuste tendido
 sobre un flanco visiblemente abrupto indica que la historia de nivel se
 registró con demasiada poca resolución. Y la diferencia de nivel se mide desde
 el nivel *justo antes* del inicio, no desde el fondo a largo plazo, por lo que
-un segundo golpe que llega sobre la cola del anterior puntúa un `LD` menor del
+un segundo golpe que llega sobre la cola del anterior puntúa un $L_D$ menor del
 que aparenta merecer.
 
 Como la tasa de crecimiento y la diferencia de nivel son *diferencias* de
 nivel, el ajuste es insensible a la calibración absoluta del sonómetro
-(cláusula 8); solo el `LAeq` reportado y el `LAeq` ajustado dependen de ella. El
+(cláusula 8); solo el $L_{Aeq}$ reportado y el $L_{Aeq}$ ajustado dependen de ella. El
 alcance del documento indica que el ajuste suele quedar entre 0,0 dB y 9,0 dB;
 la propia fórmula no está acotada, así que un impulso muy súbito e intenso puede
-superar ese rango. `ImpulsiveSoundResult.plot()` dibuja el historial `LpAF` con
+superar ese rango. `ImpulsiveSoundResult.plot()` dibuja el historial $L_{pAF}$ con
 los arranques detectados, las rectas de arranque por mínimos cuadrados y la
 diferencia de nivel determinante marcadas.
 
@@ -284,7 +285,7 @@ historia de nivel debe registrarse a la cadencia máxima del sonómetro (no en
 intervalos gruesos); de lo contrario, la tasa de crecimiento, y con ella $P$,
 se subestima. Y
 el método evalúa la *prominencia* de los impulsos, no su energía: $K_I$ se
-añade sobre el `LAeq` medido en el nivel de evaluación, nunca lo sustituye.
+añade sobre el $L_{Aeq}$ medido en el nivel de evaluación, nunca lo sustituye.
 
 ## 5. Informe de evaluación (`.report()`)
 
@@ -295,15 +296,15 @@ ISO/PAS 1996-3:2022): la línea de base normativa, un bloque de metadatos
 opcional (fuente/situación, cliente, posición de medición, instrumentación y
 fecha, con el periodo de evaluación de 30 minutos siempre visible), una tabla a
 todo ancho por impulso (tasa de inicio, diferencia de nivel, prominencia
-prevista `P` y si el inicio se califica como impulso) sobre el gráfico de la
-curva de ajuste `K`<sub>I</sub>`(P)` con los impulsos candidatos marcados, la
-prominencia rectora `P` enmarcada junto con el ajuste de `L`<sub>Aeq</sub>
-derivado `K`<sub>I</sub> (Fórmula 2), una fila de veredicto APTO/NO APTO opcional
+prevista $P$ y si el inicio se califica como impulso) sobre el gráfico de la
+curva de ajuste $K_I(P)$ con los impulsos candidatos marcados, la
+prominencia rectora $P$ enmarcada junto con el ajuste de $L_{Aeq}$
+derivado $K_I$ (Fórmula 2), una fila de veredicto APTO/NO APTO opcional
 y una nota de categoría de prominencia, y un pie con el descargo fijo.
 
 Usa el mismo contenedor `ReportMetadata` y el mismo motor de renderizado que la
 [ficha de sonoridad ISO 532-1](/phonometry/es/guides/loudness/#informe-de-iso-532-1-report);
-un `requirement` indicado se interpreta como la prominencia rectora `P` máxima
+un `requirement` indicado se interpreta como la prominencia rectora $P$ máxima
 admisible (un impulso menos destacado es apto). El renderizado necesita
 reportlab y, para la figura que incrusta la ficha, matplotlib (`pip install
 "phonometry[report,plot]"`); solo se admite `engine="reportlab"`. La ficha se
@@ -341,21 +342,21 @@ el repositorio; pulse la vista previa para abrir el PDF.
 ## Qué cubre esta guía
 
 **Cubierto.** NT ACOU 112:2002: la definición de arranque (apartados 4.5 a
-4.7), la prominencia prevista `P` (apartado 7, Fórmula 1), el ajuste
-graduado `KI` (apartado 8, Fórmula 2) y el nivel de evaluación sobre un
+4.7), la prominencia prevista $P$ (apartado 7, Fórmula 1), el ajuste
+graduado $K_I$ (apartado 8, Fórmula 2) y el nivel de evaluación sobre un
 tiempo de referencia (apartado 8, Nota 1), a través de `impulse_prominence`,
 `predicted_prominence`, `impulse_adjustment` y `rating_level`. La ISO/PAS
 1996-3:2022 está cubierta en la cadena de medida objetiva construida sobre
-la misma fórmula de prominencia: el muestreo de `LpAF`, la detección y
+la misma fórmula de prominencia: el muestreo de $L_{pAF}$, la detección y
 fusión de arranques, y la tasa de crecimiento y diferencia de nivel por
 mínimos cuadrados, a través de `impulsive_sound_adjustment` y
 `detect_onsets`.
 
 **No cubierto.** La Nota 4 (apartado 7) de la NT ACOU 112 recoge una
 directriz nórdica anterior: un ajuste plano de 5 dB basado en el juicio
-subjetivo, recomendado cuando `KI > 3` para ruido característico de
+subjetivo, recomendado cuando $K_I > 3$ para ruido característico de
 operaciones de trabajo, ofrecido como alternativa cuando el método graduado
-no se puede aplicar. Solo está implementado el `KI` graduado de la
+no se puede aplicar. Solo está implementado el $K_I$ graduado de la
 Fórmula 2; la alternativa plana de 5 dB no lo está. Los ajustes por
 categoría de la Tabla A.1 de la ISO 1996-1 (5 dB regular, 12 dB altamente
 impulsiva) están cubiertos solo como la base de juicio del evaluador que

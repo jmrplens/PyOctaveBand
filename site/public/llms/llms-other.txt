@@ -130,10 +130,10 @@ therefore uses
 $$
 L'_{i,F\max,V,T} = L_{i,F\max} + 10\lg\frac{V}{V_0}
 - 10\lg\frac{g(C)}{g(C_0)},\qquad
-C = \frac{T}{1{,}7275},\quad C_0 = \frac{T_0}{1{,}7275},
+C = \frac{T}{1.7275},\quad C_0 = \frac{T_0}{1.7275},
 $$
 
-with $T_0 = 0{,}5$ s, $V_0 = 50\ \text{m}^3$ for dwellings and, writing
+with $T_0 = 0.5$ s, $V_0 = 50\ \text{m}^3$ for dwellings and, writing
 Formula (4) compactly,
 
 $$
@@ -141,7 +141,7 @@ g(C) = \frac{C^{1/(1-C)} - C^{-1/(1-1/C)}}{1 - 1/C}.
 $$
 
 $g$ is the peak of the Fast-weighted response to an exponentially decaying
-burst. It has a removable singularity at $C = 1$ (i.e. $T = 1{,}7275$ s) where
+burst. It has a removable singularity at $C = 1$ (i.e. $T = 1.7275$ s) where
 its value is $1/e$. When $T = T_0$ the bracket collapses to 1 and the whole
 correction reduces to the volume term, as it must.
 

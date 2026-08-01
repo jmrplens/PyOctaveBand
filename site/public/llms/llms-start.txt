@@ -194,9 +194,9 @@ left half-plane ($s = -1/\tau$).
 
 | | phonometry | python-acoustics |
 | :--- | :--- | :--- |
-| Output | Continuous time-weighted envelope (one value per sample) | Stepped output (one value every τ seconds) |
+| Output | Continuous time-weighted envelope (one value per sample) | Stepped output (one value every $\tau$ seconds) |
 | Input units | Raw sound pressure (Pa); squared internally | Energetic quantity (Pa²) expected as input |
-| Filter | Stable exponential averaging (pole at $s=-1/\tau$) | Theoretically unstable design (pole in the right half-plane) stabilized by resetting the filter state every τ seconds |
+| Filter | Stable exponential averaging (pole at $s=-1/\tau$) | Theoretically unstable design (pole in the right half-plane) stabilized by resetting the filter state every $\tau$ seconds |
 | Behavior | True IEC time weighting | Closer to a block integrator ($L_{eq,\tau}$) |
 
 A pole on the negative real axis corresponds to a decaying exponential impulse
@@ -276,7 +276,7 @@ plt.show()
 - If you need **standard-compliant Fast/Slow/Impulse envelopes** (sound level
   meter behavior, one level per sample), use phonometry's
   [`time_weighting`](https://jmrplens.github.io/phonometry/guides/time-weighting/).
-- If you need **block-averaged Leq per interval**, that is a different, equally
+- If you need **block-averaged $L_{eq}$ per interval**, that is a different, equally
   valid metric; you can compute it with [`leq`](https://jmrplens.github.io/phonometry/guides/levels/) over consecutive
   slices.
 - Both approaches are useful; they just answer different questions. The
@@ -293,11 +293,11 @@ sample from the metrology core:
 | Standard | What is verified | Test file |
 | :--- | :--- | :--- |
 | IEC 61672-1:2013 Table 3 | A/C/Z weighting at all 34 nominal frequencies, class 1 limits, at 48 and 96 kHz | `tests/metrology/test_iec_weighting_table3.py` |
-| IEC 61672-1:2013 Table 4 | F/S tone-burst responses (1 s to 1 ms) and the LAE column for `sel()` | `tests/metrology/test_iec_compliance.py` |
+| IEC 61672-1:2013 Table 4 | F/S tone-burst responses (1 s to 1 ms) and the $L_{AE}$ column for `sel()` | `tests/metrology/test_iec_compliance.py` |
 | IEC 61672-1:2013 Table 5 | `lc_peak()` one-cycle/half-cycle peak responses, class 1 limits | `tests/metrology/test_levels.py` |
 | IEC 61260-1:2014 Table 1 | Filter-bank class 1/2 acceptance limits via `verify_filter_class()` | `tests/metrology/test_compliance.py` |
 | ISO 7196:1995 Table 2 | G weighting (infrasound) at every nominal response value, 0.25–315 Hz | `tests/metrology/test_g_weighting.py` |
-| ISO 226:2023 Table 1 and Annex B | Equal-loudness contours and loudness levels against the Annex B tables, hearing threshold against the Table 1 `T_f` parameters | `tests/psychoacoustics/test_loudness_contours.py` |
+| ISO 226:2023 Table 1 and Annex B | Equal-loudness contours and loudness levels against the Annex B tables, hearing threshold against the Table 1 $T_f$ parameters | `tests/psychoacoustics/test_loudness_contours.py` |
 | ECMA-418-1:2024 | TNR/PR tone prominence: critical bandwidths, proximity spacing and prominence criteria against the worked examples in clauses 10–12 | `tests/psychoacoustics/test_tonality.py` |
 | ISO 1996-1:2016 | `lden()`, `ldn()` and `composite_rating_level()` against hand-computed formula values | `tests/environmental/test_environmental.py` |
 | IEC 60942:2017 Table 2 | Calibrator short-term stability limits (frequency-dependent, class 1) in `sensitivity()` | `tests/metrology/test_calibration_validation.py` |
@@ -860,7 +860,7 @@ size removes edge diffraction (clause 8.2, Formula 7):
 $d_{\theta,n} = (d_\theta - d_{\theta,r})/(1 - d_{\theta,r})$. The
 random-incidence value averages the source angles with weights 1:3:3:3:3 for
 0°, ±30°, ±60° (clause 8.4). Anchors: the model-predicted 37-receiver arc of
-the published six-period N = 7 QRD (Cox & D'Antonio 3rd ed., Appendix B;
+the published six-period $N = 7$ QRD (Cox & D'Antonio 3rd ed., Appendix B;
 Hargreaves et al. 2000, Table I) at 1000 Hz gives $d_\theta = 0.1099$, its
 flat reference $0.0049$ and $d_{\theta,n} = 0.1055$; the band-averaged model
 predictions match the published Appendix B BEM normalised diffusion in the
@@ -986,8 +986,9 @@ impedance $\sqrt{T_{12}/T_{21}}$ (Eq. 30). The three standards deliberately
 keep their own sign ansatz and temperature units (ISO in kelvin, ASTM in
 Celsius), and near-singular load solves raise a warning. Since neither
 standard prints a numeric example, the oracles are physics identities: the
-analytic air-layer matrix ($\det T = 1$, $T_{11} = T_{22}$, TL = 0 dB,
-hard-backed $|R| = 1$), synthetic round-trips that recover a known $r$, and
+analytic air-layer matrix ($\det T = 1$, $T_{11} = T_{22}$,
+$TL = 0\ \text{dB}$, hard-backed $|R| = 1$), synthetic round-trips that
+recover a known $r$, and
 two-load recovery of an asymmetric reciprocal specimen.
 
 See the [Impedance Tube guide](https://jmrplens.github.io/phonometry/guides/impedance-tube/) for usage.
@@ -1730,7 +1731,7 @@ This page collects the theory behind the measurement chain itself: the standardi
 
 ## Octave Band Frequencies (ANSI S1.11 / IEC 61260)
 
-The mid-band frequencies (fm) and edges (f1, f2) use a base-10 ratio:
+The mid-band frequencies ($f_m$) and edges ($f_1$, $f_2$) use a base-10 ratio:
 
 $$
 G = 10^{0.3}
@@ -1742,7 +1743,7 @@ $$
 f_m = 1000 \cdot G^{x/b}
 $$
 
-(for odd b)
+(for odd $b$)
 
 **Band edges:**
 
@@ -1826,7 +1827,7 @@ for f, pxx in zip(freq_bins[in_band], psd[in_band]):
 
 This keeps the two concepts separate: phonometry gives standardized
 fractional-octave levels, while Welch gives narrowband FFT bins. With
-`fs=100000` and `nperseg=2**15`, the Welch bin spacing is about `3.05 Hz`.
+`fs=100000` and `nperseg=2**15`, the Welch bin spacing is about 3.05 Hz.
 Window choice and overlap affect leakage and averaging variance, but they do not
 change the bin spacing of each FFT segment.
 
@@ -1900,8 +1901,9 @@ critical strategies:
    associated with high-order transfer functions (coefficients a, b).
 2. **Multi-rate Decimation:** Whenever half the sample rate still clears the
    band's upper edge by a factor of 1.25, the signal is automatically
-   downsampled (decimated) by `M = floor[(fs / 2) / (1.25 * f_upper)]` before
-   filtering, which is most bands rather than only the low ones (29 of the 33
+   downsampled (decimated) by
+   $M = \lfloor (f_s/2) / (1.25\,f_\text{upper}) \rfloor$ before filtering,
+   which is most bands rather than only the low ones (29 of the 33
    one-third-octave bands at 48 kHz). This keeps the digital pole locations far
    from the unit circle boundary, preventing oscillation and noise. The band
    level is computed on the decimated signal; only `sigbands=True` brings the
@@ -1937,9 +1939,9 @@ $$
 \alpha = 1 - e^{-1 / (f_s \cdot \tau)}
 $$
 
-Where `tau` is the time constant (e.g., 125 ms for Fast).
+Where $\tau$ is the time constant (e.g., 125 ms for Fast).
 
-The default initial condition is `y[-1] = 0`. Use `initial_state='first'` to
+The default initial condition is $y[-1] = 0$. Use `initial_state='first'` to
 start from the first input energy, or pass a scalar/array with the previous
 mean-square output state. See [Why phonometry](https://jmrplens.github.io/phonometry/reference/why-phonometry/) for the
 IEC 61672-1 tone-burst verification of this implementation.
@@ -1967,7 +1969,7 @@ See the [Special Weightings guide](https://jmrplens.github.io/phonometry/guides/
 
 ## Event and dose metrics
 
-**Sound exposure level** (SEL; LAE with A-weighting, IEC 61672-1:2013) normalizes the energy of a discrete event (aircraft flyover, train pass) to a 1 s reference duration:
+**Sound exposure level** (SEL; $L_{AE}$ with A-weighting, IEC 61672-1:2013) normalizes the energy of a discrete event (aircraft flyover, train pass) to a 1 s reference duration:
 
 $$
 \mathrm{SEL} = L_{eq,T} + 10 \log_{10}\left(\frac{T}{T_0}\right), \qquad T_0 = 1\ \text{s}
@@ -1987,7 +1989,7 @@ $$
 
 It is identical to $L_{EP,d}$ of Directive 86/188/EEC and $L_{EX,8h}$ of ISO 1999 (IEC 61252, 3.3 NOTES 5–6). The anchor of IEC 61252 (3.3 NOTE 4): an exposure of **3.2 Pa²h corresponds to $L_{EX,8h}$ of exactly 90 dB**.
 
-**LCpeak** (IEC 61672-1:2013, subclause 5.13) is the absolute maximum of the C-weighted sound pressure expressed in dB, $L_{Cpeak} = 20\log_{10}(\max|p_C(t)|/p_0)$, the quantity behind the 135/137/140 dB(C) occupational action limits. The implementation is verified against the one-cycle and half-cycle reference responses of Table 5.
+**$L_{Cpeak}$** (IEC 61672-1:2013, subclause 5.13) is the absolute maximum of the C-weighted sound pressure expressed in dB, $L_{Cpeak} = 20\log_{10}(\max|p_C(t)|/p_0)$, the quantity behind the 135/137/140 dB(C) occupational action limits. The implementation is verified against the one-cycle and half-cycle reference responses of Table 5.
 
 See the [Levels guide](https://jmrplens.github.io/phonometry/guides/levels/) for usage and the [Calibration guide](https://jmrplens.github.io/phonometry/guides/calibration/) for absolute-scale setup.
 

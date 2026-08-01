@@ -330,8 +330,8 @@ ISO 3382-3 open-plan speech metrics, with their fiche, are
 - [Field](insulation-field.md), [laboratory](insulation-lab.md) and
   [predicted](insulation-prediction.md) sound insulation: field,
   laboratory and predicted sound insulation between spaces, and its measurement uncertainty.
-- [Sound Power](sound-power.md): the `LW` methods that consume the
-  ISO 354 absorption area (the ISO 3744 `K2` and the ISO 3741 absorption term).
+- [Sound Power](sound-power.md): the $L_W$ methods that consume the
+  ISO 354 absorption area (the ISO 3744 $K_2$ and the ISO 3741 absorption term).
 - [Loudness](loudness.md) and [Sound Quality Metrics](sound-quality.md): loudness,
   sharpness and the other perception metrics of what the room delivers.
 - [Filter Banks](filter-banks.md): the IEC 61260 fractional-octave filters

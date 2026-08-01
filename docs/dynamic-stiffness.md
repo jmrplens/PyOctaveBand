@@ -5,9 +5,9 @@
 A **floating floor** is a heavy floating slab resting on a resilient layer; the
 two form a mass-spring system whose **natural frequency** governs how much the
 floor improves impact and airborne insulation. **EN 29052-1:1992** (identical to
-ISO 9052-1:1989) measures the **dynamic stiffness per unit area** `s'` of the
+ISO 9052-1:1989) measures the **dynamic stiffness per unit area** $s'$ of the
 resilient layer from the resonance of a standard load plate on a
-200 mm × 200 mm specimen. `s'` is the input to the floating-floor term of the
+200 mm × 200 mm specimen. $s'$ is the input to the floating-floor term of the
 EN 12354-2 impact model covered in
 [Predicting Sound Insulation (EN 12354)](insulation-prediction.md). (ISO 16251-1 does not apply here:
 its scope is limited to soft, locally-reacting floor coverings and explicitly
@@ -46,7 +46,7 @@ plt.legend(); plt.show()
 ## 1. Dynamic stiffness and resonance
 
 The dynamic stiffness per unit area is a dynamic force per area divided by the
-resulting change in thickness (Formula 1): `s' = (F/S)/Δd`. The resiliently
+resulting change in thickness (Formula 1): $s' = (F/S)/\Delta d$. The resiliently
 supported floor is a resonator whose natural frequency (Formula 2) and,
 in the laboratory arrangement, measured resonant frequency (Formula 3) are
 
@@ -89,7 +89,7 @@ load plate with the exciter and accelerometer in place.
 
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/dynamic_stiffness_rig_geometry_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/dynamic_stiffness_rig_geometry.svg" alt="To-scale section of the dynamic-stiffness rig: the dotted 200 mm resilient specimen, 20 mm thick, on the hatched rigid foundation, the grey 8 kg load plate on top with the accelerometer ball at its edge, and the exciter block above driving the plate through a red vertical arrow, the specimen side and thickness dimensioned" width="92%"></picture>
 
-*The mass-spring system behind `s'` at true scale: 20 mm of resilient layer
+*The mass-spring system behind $s'$ at true scale: 20 mm of resilient layer
 under the 8 kg plate is all it takes to reproduce the 2 kPa preload of a
 floating floor.*
 
@@ -110,10 +110,11 @@ plt.show()
 ## 2. The enclosed-gas term and airflow resistivity
 
 For an air-permeable material the enclosed pore air adds a parallel stiffness
-from its isothermal compression (Formula 7): `s'a = p₀/(d·ε)`, with `p₀` the
-atmospheric pressure, `d` the loaded thickness and `ε` the porosity. The
-standard's worked NOTE (`p₀ = 0.1 MPa`, `ε = 0.9`) is `s'a = 111/d` MN/m³ for
-`d` in millimetres:
+from its isothermal compression (Formula 7):
+$s'_a = p_0/(d\,\varepsilon)$, with $p_0$ the atmospheric pressure, $d$ the
+loaded thickness and $\varepsilon$ the porosity. The standard's worked NOTE
+($p_0 = 0.1\ \text{MPa}$, $\varepsilon = 0.9$) is $s'_a = 111/d$ MN/m³ for
+$d$ in millimetres:
 
 ```python
 from phonometry import materials
@@ -123,9 +124,11 @@ print(round(materials.enclosed_gas_stiffness(thickness=0.020, porosity=0.9) / 1e
 ```
 
 The dynamic stiffness of the *installed* material is then set by the lateral
-airflow resistivity `r` (clause 8.2): `s' = s't` for `r ≥ 100 kPa·s/m²`,
-`s' = s't + s'a` for `10 ≤ r < 100 kPa·s/m²`, and for `r < 10 kPa·s/m²` the
-method only resolves `s' = s't` when the gas term is negligible. `floating_floor_resonance`
+airflow resistivity $r$ (clause 8.2): $s' = s'_t$ for
+$r \ge 100\ \text{kPa}\cdot\text{s/m}^2$, $s' = s'_t + s'_a$ for
+$10 \le r < 100\ \text{kPa}\cdot\text{s/m}^2$, and for
+$r < 10\ \text{kPa}\cdot\text{s/m}^2$ the method only resolves $s' = s'_t$
+when the gas term is negligible. `floating_floor_resonance`
 chains the whole determination:
 
 ```python
@@ -144,7 +147,7 @@ res.plot()   # the f0(s') design curve with this determination marked (needs mat
 
 The `DynamicStiffnessResult` carries the apparent, enclosed-gas and installed
 stiffnesses, the test resonance and the installed-floor natural frequency, and
-its `.plot()` draws the `f₀(s')` design curve.
+its `.plot()` draws the $f_0(s')$ design curve.
 
 **Test-report fiche.** `DynamicStiffnessResult.report(path)` renders a one-page
 accredited dynamic-stiffness test report (EN 29052-1:1992 = ISO 9052-1:1989): a
@@ -187,11 +190,11 @@ well above $f_r$; a heavy or very thick layer starts to act as a distributed
 system and the simple Formula 4 reading degrades. Three practical pitfalls
 follow from the preload:
 
-* **`s'` is a stiffness *at the standard preload*.** Resilient layers are
+* **$s'$ is a stiffness *at the standard preload*.** Resilient layers are
   visibly non-linear in static load: mineral wool stiffens as it compresses,
   some foams soften. The 200 kg/m² load plate fixes the operating point, so
-  the tabulated `s'` strictly describes floors near that surface mass.
-  Designing a much heavier screed with the same `s'` extrapolates beyond the
+  the tabulated $s'$ strictly describes floors near that surface mass.
+  Designing a much heavier screed with the same $s'$ extrapolates beyond the
   measurement.
 * **Drive small.** The tangent stiffness is defined for small dynamic
   strains; driving the plate hard pushes the layer into its non-linear range
@@ -204,7 +207,7 @@ follow from the preload:
 
 The natural frequency that matters in the end is not the rig's $f_r$ but the
 installed floor's $f_0$ from Formula 2: the floating floor only improves
-insulation well above $f_0$, which is why a low `s'` (a soft layer under a
+insulation well above $f_0$, which is why a low $s'$ (a soft layer under a
 heavy slab) is the design goal.
 
 ## References
@@ -226,6 +229,6 @@ EN 29052-1:1992 (= ISO 9052-1:1989), *Acoustics — Determination
 of dynamic stiffness — Part 1: Materials used under floating floors in
 dwellings*: the dynamic stiffness per unit area (Formula 1), the resonance
 relations (Formulae 2-4), the enclosed-gas term (Formula 7, clause 8.2 NOTE
-`s'a = 111/d` MN/m³) and the airflow-resistivity regimes (clause 8.2, Formulae
+$s'_a = 111/d$ MN/m³) and the airflow-resistivity regimes (clause 8.2, Formulae
 5-6). Conformance is anchored on the standard's own numeric NOTE plus
 hand-computed closed-form values of the resonance relations.

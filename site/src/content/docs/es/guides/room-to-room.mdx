@@ -68,24 +68,25 @@ que el recinto absorbe más lo que vuelve a filtrarse por la partición.
 Sustituyendo intensidades por presiones cuadráticas medias y tomando
 logaritmos se llega a la Ecuación (4.101),
 
-```text
-NR = TL - 10 lg[ S_w / (S_2 alpha_2 + tau S_w) ] ,
-```
+$$
+\text{NR} = \text{TL}
+- 10\lg\!\left[\frac{S_w}{S_2 \alpha_2 + \tau S_w}\right],
+$$
 
-con `NR = L_p1 - L_p2` la reducción de ruido entre los dos campos
-reverberantes, `TL = 10 lg(1/tau)` la pérdida por transmisión de la partición
-(la magnitud que UNE llama índice de reducción acústica `R`), `S_w` el área
-de la partición y `S_2 alpha_2` el área de absorción sonora equivalente del
-recinto receptor.
+con $\text{NR} = L_{p1} - L_{p2}$ la reducción de ruido entre los dos campos
+reverberantes, $\text{TL} = 10\lg(1/\tau)$ la pérdida por transmisión de la
+partición (la magnitud que UNE llama índice de reducción acústica $R$), $S_w$
+el área de la partición y $S_2 \alpha_2$ el área de absorción sonora
+equivalente del recinto receptor.
 
 Leyendo el logaritmo se entiende toda la página. Una **partición grande hacia
 un recinto duro** entrega *menos* que su pérdida por transmisión: mucha
 superficie radiando hacia un recinto sin nada que lo absorba. Una **partición
 pequeña hacia un recinto bien absorbente** entrega *más*. Los dos recintos y
-el muro no son separables, y por eso citar el `R_w` de un muro y detenerse
+el muro no son separables, y por eso citar el $R_w$ de un muro y detenerse
 ahí no es una respuesta.
 
-El término `tau S_w` es la potencia que la propia partición devuelve al
+El término $\tau S_w$ es la potencia que la propia partición devuelve al
 recinto emisor. Con cualquier pérdida por transmisión realista vale unas
 centésimas de decibelio, así que está desactivado por omisión y
 `include_partition_transmission=True` lo activa.
@@ -144,25 +145,26 @@ que el muro nunca toca.
 El problema 4.18 (pp. impresas 585-586) es el cálculo completo, y arranca un
 paso antes: el nivel del recinto emisor no se da, solo el nivel de potencia
 acústica en campo libre del ventilador. Dos decisiones convierten eso en
-`L_p1`, y las dos son de Norton.
+$L_{p1}$, y las dos son de Norton.
 
 **El campo reverberante es lo que excita la partición.** El receptor que
 importa es el muro, no un punto junto a la máquina, así que el nivel
-relevante es `L_p1 = L_W + 10 lg(4 / R_1)`. Eso es `steady_state_spl` con
-`distance=None`, el límite `r -> infinito` de la misma Ecuación (6.43) de
+relevante es $L_{p1} = L_W + 10\lg(4/R_1)$. Eso es `steady_state_spl` con
+`distance=None`, el límite $r \to \infty$ de la misma Ecuación (6.43) de
 Bies que la biblioteca ha usado siempre para un receptor a una distancia.
 
 **El problema pide una estimación conservadora, y conservadora significa algo
 concreto.** El ventilador se apoya en el suelo, a media pared, en la
-intersección de dos superficies planas grandes, así que `Q = 4`. La Tabla 4.5
+intersección de dos superficies planas grandes, así que $Q = 4$. La Tabla 4.5
 del apartado 4.6 de Norton lista tres modelos de potencia acústica: una
-fuente de *potencia constante* radia la misma `Pi_0` donde quiera que esté,
+fuente de *potencia constante* radia la misma $\Pi_0$ donde quiera que esté,
 una fuente de *volumen constante* queda cargada por las superficies próximas
-y radia `Pi_0 Q`, y una fuente de *presión constante*, un suelo teórico,
-radia `Pi_0 / Q`. Las máquinas reales están entre las dos primeras siempre
+y radia $\Pi_0 Q$, y una fuente de *presión constante*, un suelo teórico,
+radia $\Pi_0 / Q$. Las máquinas reales están entre las dos primeras siempre
 que estén más cerca del contorno que una longitud de onda, y el modelo de
-volumen constante es la cota superior. Aquí vale `10 lg 4 = 6,02 dB`, y sin
-él las respuestas impresas salen 6 dB por debajo.
+volumen constante es la cota superior. Aquí vale
+$10\lg 4 = 6{,}02\ \text{dB}$, y sin él las respuestas impresas salen 6 dB
+por debajo.
 
 ```python
 from phonometry import (
@@ -263,8 +265,8 @@ El resultado se valora a sí mismo. `.rating` es la valoración según
 ANSI/ASA S12.2-2019 del espectro recibido, `.criterion_curve` es la curva de
 diseño muestreada en las bandas de análisis, `.exceedance` es el exceso banda
 a banda y `.meets_target` es el veredicto llano que anota una hoja de diseño.
-`.required_transmission_loss` es la Ecuación (4.101) resuelta para `TL`, que
-es la cifra que va a una especificación.
+`.required_transmission_loss` es la Ecuación (4.101) resuelta para
+$\text{TL}$, que es la cifra que va a una especificación.
 
 ```python
 print(chain.meets_target)                       # False
@@ -298,13 +300,13 @@ una curva NC-45, y las paredes del encapsulado tienen que cubrir la
 diferencia. Norton deduce la ecuación del encapsulado del mismo balance de
 potencia del apartado 4.9 y obtiene la Ecuación (4.115),
 
-```text
-IL = TL - 10 lg( S_E / R_i ) ,
-```
+$$
+\text{IL} = \text{TL} - 10\lg(S_E / R_i),
+$$
 
-con `S_E` el área radiante exterior y `R_i` la constante de recinto del
+con $S_E$ el área radiante exterior y $R_i$ la constante de recinto del
 interior del encapsulado, superficie de la máquina incluida. Resuelta para
-los paneles, `TL = IL + 10 lg(S_E / R_i)`, que es
+los paneles, $\text{TL} = \text{IL} + 10\lg(S_E / R_i)$, que es
 `enclosure_required_transmission_loss`.
 
 ```python
@@ -349,8 +351,9 @@ es el panel correcto aquí.
 Dos notas al pie sobre ese fragmento, las dos acerca de ser fiel a la fuente.
 `model="norton"` importa: el modelo de encapsulado por omisión de la
 biblioteca es la Ecuación (7.111) de Bies, Hansen y Howard, que lleva un
-`0,3` dentro del logaritmo y por tanto limita la pérdida por inserción de un
-encapsulado totalmente revestido a `TL + 5,2 dB`. La Ecuación (4.115) de
+$0{,}3$ dentro del logaritmo y por tanto limita la pérdida por inserción de
+un encapsulado totalmente revestido a $\text{TL} + 5{,}2\ \text{dB}$. La
+Ecuación (4.115) de
 Norton no tiene ese límite. Las dos coinciden en unas décimas mientras el
 interior es duro y divergen cuando el revestimiento domina, y reproducir una
 respuesta publicada exige usar el modelo que usó su autor.

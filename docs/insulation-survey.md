@@ -19,12 +19,13 @@ The [engineering methods](insulation-field.md) buy accuracy with effort: swept m
 per-band reverberation times, careful background correction. For a quick check
 in a dwelling, ISO 10052 defines a **survey (control) method**: octave bands, a
 hand-held meter, and a single quantity, the **reverberation index**
-`k = 10 lg(T/T0)` (`T0 = 0.5 s`), to carry the receiving-room correction. Every
-survey quantity is then just an addition of `k`: the standardized level
-difference `DnT = D + k`, the normalized `Dn = D + k + 10 lg(A0 T0 / (0.16 V))`,
-the apparent `R' = D + k + 10 lg(S T0 / (0.16 V))` (using `V/7.5` for `S` where
-that is larger), and, for impacts and façades, `L'nT = Li - k` and
-`D2m,nT = D2m + k`. The clause references follow ISO 10052:2021; the formulas
+$k = 10\lg(T/T_0)$ ($T_0 = 0.5\ \text{s}$), to carry the receiving-room
+correction. Every survey quantity is then just an addition of $k$: the
+standardized level difference $D_{nT} = D + k$, the normalized
+$D_n = D + k + 10\lg(A_0 T_0/(0.16\,V))$, the apparent
+$R' = D + k + 10\lg(S T_0/(0.16\,V))$ (using $V/7.5$ for $S$ where
+that is larger), and, for impacts and façades, $L'_{nT} = L_i - k$ and
+$D_{2m,nT} = D_{2m} + k$. The clause references follow ISO 10052:2021; the formulas
 and the reverberation-index table are identical in the harmonized
 EN ISO 10052:2004+A1:2010.
 
@@ -33,7 +34,7 @@ The reverberation index is either **measured** (feed the reverberation time to
 type and volume with `estimate_reverberation_index(V, room)` (Table 4:
 furnished `"kitchen"` / `"bathroom"` / `"furnished"`, or the unfurnished
 construction classes `"a"`–`"h"` and the mixed `"a+e"`…`"d+h"`). A fourth
-quantity unique to this method is **service-equipment noise** `LXY`: the
+quantity unique to this method is **service-equipment noise** $L_{XY}$: the
 energy average of three A- or C-weighted positions.
 
 ```python
@@ -63,8 +64,9 @@ res.plot()   # DnT vs shifted ISO 717-1 reference (needs matplotlib)
 
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/survey_insulation_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/survey_insulation.svg" alt="Survey-method airborne insulation: the raw level difference D and the standardized DnT across the five octave bands, with the reverberation-index correction k shaded between them" width="80%"></picture>
 
-*The reverberation index `k = 10 lg(T/T0)` shifts the raw level difference `D`
-into the standardized `DnT`: up where the room is live (`T > T0`), down where
+*The reverberation index $k = 10\lg(T/T_0)$ shifts the raw level difference
+$D$ into the standardized $D_{nT}$: up where the room is live ($T > T_0$),
+down where
 it is dead. The automatic rating is formed only for exactly 5 octave (or 16
 one-third-octave) values.*
 
@@ -103,9 +105,9 @@ plt.show()
 | :--- | :--- | :--- | :--- | :--- |
 | `l1` / `l2` | 1D or 2D array | dB | one/band, or `(positions, bands)` | Source / receiving (or outdoor `l1_2m`) levels |
 | `li` | 1D or 2D array | dB | one/band, or `(positions, bands)` | Impact levels (energy-averaged over positions) |
-| `reverberation_index` | scalar or 1D array | dB | one per band | `k` from `reverberation_index` or `estimate_reverberation_index`; `survey_service_equipment_level()` also accepts a scalar `k` |
-| `volume` | float | m³ | > 0 | Receiving-room `V` (for `Dn` / `L'n` / `R'` / normalized) |
-| `area` | float | m² | > 0 | Common-partition `S` (airborne `R'`; `V/7.5` rule applied) |
+| `reverberation_index` | scalar or 1D array | dB | one per band | $k$ from `reverberation_index` or `estimate_reverberation_index`; `survey_service_equipment_level()` also accepts a scalar $k$ |
+| `volume` | float | m³ | > 0 | Receiving-room $V$ (for $D_n$ / $L'_n$ / $R'$ / normalized) |
+| `area` | float | m² | > 0 | Common-partition $S$ (airborne $R'$; $V/7.5$ rule applied) |
 | `measurements` | array | dB | exactly 3 | Service-equipment positions (`survey_service_equipment_level`) |
 | `room` | str | — | `"kitchen"`/`"bathroom"`/`"furnished"`/`"a"`–`"h"`/`"a+e"`… | `estimate_reverberation_index` room class (Table 4) |
 
@@ -122,7 +124,8 @@ The airborne, impact and façade survey results each carry a `.report(path)` tha
 writes the one-page ISO 10052 survey (control) method field report: the
 standard-basis line naming ISO 10052 (octave bands), an optional metadata
 header, the octave-band table beside the measured-versus-shifted-reference
-curve, the boxed field rating (`DnT,w`/`R'w`, `L'nT,w` or `D2m,nT,w`), the
+curve, the boxed field rating ($D_{nT,w}$/$R'_w$, $L'_{nT,w}$ or
+$D_{2m,nT,w}$), the
 survey-method statement, an optional requirement verdict (level differences pass
 at or above it, the impact level at or below it) and a footer. The airborne
 result reports `quantity="dnt"` (default) or `"r_prime"`; `verbose=True`,
@@ -151,7 +154,7 @@ facade.report("D2mnTw_survey.pdf")                       # D2m,nT,w (C; Ctr)
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/survey_impact_insulation_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/survey_impact_insulation.svg" alt="Survey-method impact insulation: the measured octave-band impact level Li and the standardized L'nT with the reverberation-index correction shaded between them, the L'nT,w rating annotated and a note that a live room lowers the standardized impact level" width="80%"></picture>
 
 *The impact survey applies the reverberation index with the opposite sign,
-`L'nT = Li − k`: a live receiving room (`T > T0`) **lowers** the standardized
+$L'_{nT} = L_i - k$: a live receiving room ($T > T_0$) **lowers** the standardized
 impact level. As in the airborne case, the automatic rating appears for
 exactly 5 octave (or 16 one-third-octave) values.*
 

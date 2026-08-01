@@ -342,8 +342,8 @@ column stating whether each band enters the mean.
 write **measurement** reports of the overall descriptors $D_{n,f}$ (airborne)
 and $L_{n,f}$ (impact, tapping machine), reusing the same two-panel insulation
 layout: the per-band quantity beside the measured-versus-shifted-ISO 717-reference
-curve and the boxed single number `Dn,f,w (C; Ctr)` (ISO 717-1) or `Ln,f,w (CI)`
-(ISO 717-2). `verbose=True` annexes the ISO 717 evaluation per band (the value,
+curve and the boxed single number $D_{n,f,w}$ (C; Ctr) (ISO 717-1) or
+$L_{n,f,w}$ (CI) (ISO 717-2). `verbose=True` annexes the ISO 717 evaluation per band (the value,
 the shifted reference and the unfavourable deviation). A `requirement` supplied
 on the `ReportMetadata` adds a verdict ($D_{n,f,w}$ passes at or above it,
 $L_{n,f,w}$ at or below it), and `language="es"` renders every fiche in Spanish.
@@ -452,11 +452,12 @@ $k'$ of a lined duct is an input here, not a prediction.
   the flanking model that consumes the measured $K_{ij}$, and its empirical
   Annex E junction values.
 - [Bending-wave transmission at plate junctions](/phonometry/guides/junction-transmission/):
-  the wave-theory transmission coefficients behind an ideal junction's Kij.
+  the wave-theory transmission coefficients behind an ideal junction's
+  $K_{ij}$.
 - [Laboratory Insulation Measurement](/phonometry/guides/insulation-lab/):
   the ISO 10140 suite whose direct transmission these flanking paths bypass.
 - [Insulation Ratings (ISO 717)](/phonometry/guides/insulation-ratings/):
-  the reference-curve engines behind Dn,f,w and Ln,f,w.
+  the reference-curve engines behind $D_{n,f,w}$ and $L_{n,f,w}$.
 - [Theory](/phonometry/reference/theory/rooms-buildings/): the flanking
   formulae in the EN 12354 derivation.
 - [Room-to-room and open-plan acoustics](/phonometry/guides/open-plan-acoustics/): the open-plan context

@@ -180,7 +180,8 @@ population's *percentage beyond fence* depends on the fractile spread, not just
 the median, so it must be read from the distribution, never from the median
 threshold alone.
 
-The `NiptsResult` carries the `median` (`N50`), the `spread_upper`/`spread_lower`
+The `NiptsResult` carries the `median` ($N_{50}$), the
+`spread_upper`/`spread_lower`
 and the `value` at the requested fractile; the `HtlanResult` carries `htla`,
 `nipts` and the combined `threshold`. Both expose `.plot()`. The age component
 alone is the subject of the [hearing-threshold](hearing-threshold.md) guide.

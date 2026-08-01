@@ -3,11 +3,11 @@
 # Rotorcraft noise: the hemisphere method (ECAC Doc 32 / NORAH2)
 
 Helicopter noise is strongly directive, so the ECAC Doc 32 method describes the
-source with a **noise hemisphere**: one-third-octave-band sound pressure levels on
-a spherical grid of azimuth `φ` and polar angle `θ`, measured at a fixed **60 m**
-reference distance under ICAO reference atmospheric conditions. Placing that
-source at a receiver adds the propagation adjustment
-`ΔLp = ΔLs + ΔLa + ΔLg (+ ΔLd)`.
+source with a **noise hemisphere**: one-third-octave-band sound pressure levels
+on a spherical grid of azimuth $\varphi$ and polar angle $\theta$, measured at
+a fixed **60 m** reference distance under ICAO reference atmospheric
+conditions. Placing that source at a receiver adds the propagation adjustment
+$\Delta L_p = \Delta L_s + \Delta L_a + \Delta L_g$ ($+\ \Delta L_d$).
 
 This page covers the source and propagation primitives, the flight-condition
 interpolation across a hemisphere database, the flight-path kinematics, and the
@@ -45,8 +45,10 @@ lv = aircraft.hemisphere_source_level(h, 0.0, 90.0)   # level per band abeam-bel
 The hemisphere level at 60 m is carried to the receiver by three adjustments
 (Doc 32 §A.4):
 
-- **`spherical_spreading_adjustment(r)`**: `ΔLs = −20·log10(r/60)` (Eq. 24).
-- **`atmospheric_adjustment(freqs, r)`**: `ΔLa = −α(f)·(r − 60)` with the
+- **`spherical_spreading_adjustment(r)`**: $\Delta L_s = -20\lg(r/60)$
+  (Eq. 24).
+- **`atmospheric_adjustment(freqs, r)`**: $\Delta L_a = -\alpha(f)\,(r - 60)$
+  with the
   ISO 9613-1 pure-tone coefficient at the exact band centre (Eq. 26/27), reusing
   the library's `air_attenuation`; this is what the NORAH2 reference
   implementation computes. The guidance's alternative SAE (Rickley) band mapping,
@@ -111,11 +113,12 @@ distance-dependent adjustments:
 
 ## 3. Flight conditions: interpolating between hemispheres
 
-A database records one hemisphere per flight condition (airspeed `V`, path
-angle `γ`): approaches at several descent angles, level flyovers at several
-speeds, take-off climbs. Real flight conditions rarely coincide with a measured
-one, so the NORAH2 guidance interpolates (Eq. 3-10): both axes are normalised
-by their database spans (with the empirical scaling factor `Ffc = 2` on the
+A database records one hemisphere per flight condition (airspeed $V$, path
+angle $\gamma$): approaches at several descent angles, level flyovers at
+several speeds, take-off climbs. Real flight conditions rarely coincide with a
+measured one, so the NORAH2 guidance interpolates (Eq. 3-10): both axes are
+normalised by their database spans (with the empirical scaling factor
+$F_\text{fc} = 2$ on the
 path angle), a Delaunay triangulation covers the normalised conditions, and a
 query inside the convex hull blends the three hemispheres of its enveloping
 triangle with inverse-distance weights in the energy domain. Outside the hull
@@ -142,18 +145,20 @@ lv = aircraft.interpolated_source_level(
 The airspeed, not the ground speed, selects the hemisphere. The weights are
 unit-invariant (knots or m/s, as long as the query matches the database), and a
 database lookup triangulation can be passed as `triangles` (the NORAH database
-ships one per type; its shipped tables triangulate the raw `(V, γ)` plane, so
-passing them reproduces the reference implementation bin for bin). Types whose
-rotor configuration is mirrored with respect to their class reference substitute
-`h.mirrored()` (Eq. 2, `φ → −φ`), and certification-level offsets enter as
-`level_offset`.
+ships one per type; its shipped tables triangulate the raw $(V, \gamma)$
+plane, so passing them reproduces the reference implementation bin for bin).
+Types whose rotor configuration is mirrored with respect to their class
+reference substitute `h.mirrored()` (Eq. 2, $\varphi \to -\varphi$), and
+certification-level offsets enter as `level_offset`.
 
 ## 4. Flight-path kinematics
 
 `flight_path_kinematics` derives, from a time-stamped track by central finite
 differences, everything the event needs (Eq. 16-21 / Doc 32 Eq. 8-10): ground
-speed `Vg`, airspeed `VA` (zero wind), heading `Θ = atan2(ΔX, ΔY)`, curvature
-`K = ΔΘ/ΔS`, bank angle `Φ = atan(K·Vg²/g)` and path angle `γ = atan(ΔZ/ΔS)`.
+speed $V_g$, airspeed $V_A$ (zero wind), heading
+$\Theta = \operatorname{atan2}(\Delta X, \Delta Y)$, curvature
+$K = \Delta\Theta/\Delta S$, bank angle $\Phi = \arctan(K V_g^2 / g)$ and
+path angle $\gamma = \arctan(\Delta Z / \Delta S)$.
 The guidance recommends smoothing radar tracks (e.g. spline resampling to a
 0.5 s cadence) before differentiating.
 
@@ -171,8 +176,8 @@ Per track point, the flight condition selects (or blends) the hemispheres and
 the emission angles address the source level; the hemisphere frame is oriented
 by the heading and tilted by the bank angle in turns (pitch attitude is
 implicit in the hemispheres). The received one-third-octave history is
-expressed at recorded time `tr = te + r/c` (Eq. 22, `c = 346.1 m/s`) and
-integrated: `LASmax`, `SEL` over the full history and over the certification
+expressed at recorded time $t_r = t_e + r/c$ (Eq. 22, $c = 346.1\ \text{m/s}$)
+and integrated: `LASmax`, `SEL` over the full history and over the certification
 10 dB-down window (Doc 32 Eq. 27), and `EPNL` per ICAO Annex 16 (Doc 32
 Eq. 28), reusing the library's `epnl_from_pnlt`.
 
@@ -258,7 +263,8 @@ resistivity by the logarithm, weighted by segment length (Eq. 41).
 When terrain blocks the line of sight, the sound follows the shortest convex
 path over it (the guidance's rubber band) and every touched vertex is a
 **diffraction edge**. The attenuation combines the pure diffraction of the
-path difference `δ` (Eq. 42-44, `10·Ch·log10(3 + (40/λ)·C″·δ)`, capped at
+path difference $\delta$ (Eq. 42-44,
+$10 C_h \lg\bigl(3 + (40/\lambda)\,C''\,\delta\bigr)$, capped at
 25 dB) with the source-side and receiver-side ground effects, each over its
 own mean ground plane and weighted by its image-path diffraction (Eq. 45-47,
 the CNOSSOS-EU scheme the guidance adopts). The ground effect is not
@@ -335,10 +341,10 @@ res = aircraft.rotorcraft_event_level(
 ## Validation
 
 Validated against the NORAH2 guidance Table 4 (all 31 bands, 10 Hz-10 kHz), the
-closed-form inverse-square spreading, the analytic rigid-ground `+6 dB` and
+closed-form inverse-square spreading, the analytic rigid-ground +6 dB and
 grazing limits of the ground effect, off-node bilinear lookups on the reference
 hemispheres of all eleven rotorcraft types, hand-checked interpolation
-simplices, closed-form kinematics and the Lorentzian `SEL − LASmax` flyover
+simplices, closed-form kinematics and the Lorentzian $\mathrm{SEL} - L_{ASmax}$ flyover
 integral, and end to end against the NORAH2 prototype's ARP verification cases:
 emission angles reproduce to 0.01°, retarded times to 0.02 s, every step level
 of the hard-ground events to 0.08 dB(A) out to 18 km, `LASmax` to 0.03 dB and
@@ -356,7 +362,7 @@ The terrain machinery is anchored in closed form: the mean ground plane is
 exact on linear and symmetric profiles, a flat section reproduces the
 flat-ground model to machine precision and an inclined plane its analytic
 rotation, the log-mean resistivity recovers the geometric mean, the grazing
-diffraction gives the classical `10·log10(3)`, and a hand-checked hill fixes
+diffraction gives the classical $10\lg 3$, and a hand-checked hill fixes
 the rubber-band path difference. Per-receiver ground handling validates end
 to end against the prototype's ARP Case 3 (187 microphones, each on its own
 ground elevation: every step level to 0.08 dB(A), `SEL`/`LASmax` to 0.05 dB,

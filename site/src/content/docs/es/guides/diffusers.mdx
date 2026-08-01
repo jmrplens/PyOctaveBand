@@ -280,9 +280,9 @@ plt.show()
 
 La animación siguiente ejecuta ese experimento de goniómetro numéricamente: el
 mismo frente de onda plano incide sobre un panel rígido plano y sobre un
-difusor de Schroeder (un perfil de residuos cuadráticos con N = 7), y la
+difusor de Schroeder (un perfil de residuos cuadráticos con $N = 7$), y la
 energía dispersada sobre el arco de receptores convierte un haz especular
-colimado (d = 0,32) en un abanico ancho (d = 0,63).
+colimado ($d = 0{,}32$) en un abanico ancho ($d = 0{,}63$).
 
 <Video
   name="anim_fdtd_diffusion"
@@ -296,7 +296,7 @@ La respuesta de un solo plano de abajo es la predicción en campo lejano de una
 geometría de difusor publicada: un difusor de residuos cuadráticos $N = 7$ de
 6 periodos, 3,6 m de anchura total y 0,2 m de profundidad máxima de pozo (la
 fila "N = 7 QRD, 6 periods, 0.2 m deep" de Cox & D'Antonio, *Acoustic
-Absorbers and Diffusers*, 3.ª ed., Apéndice B; el QRD comercial N = 7 medido
+Absorbers and Diffusers*, 3.ª ed., Apéndice B; el QRD comercial $N = 7$ medido
 por Hargreaves, Cox, Lam & D'Antonio, *J. Acoust. Soc. Am.* 108(4), 1710-1720,
 2000, Tabla I) y su panel de referencia plano de igual huella, a 1000 Hz,
 incidencia normal, en el semicírculo estándar de 37 puntos (espaciado de 5°,
@@ -523,7 +523,7 @@ Del propio dibujo se deducen unas cuantas reglas de diseño:
   $N$ grande; reducir $f_0$ a la mitad duplica la profundidad del difusor.
   Este es el coste que ataca el
   [metadifusor](/phonometry/es/guides/metadiffusers/): a 500 Hz un diseño
-  N = 5 ya exige pozos de 27,4 cm.
+  $N = 5$ ya exige pozos de 27,4 cm.
 - **La secuencia repite lo que da el primo.** $s_n$ es simétrica respecto a
   $n = 0$ y periódica en $N$, así que un periodo tiene $N$ pozos y el perfil
   se construye repitiéndolo. La propiedad de fase plana también se cumple en
@@ -600,7 +600,7 @@ print(np.round(flat.normalized, 3))            # [0. 0. 0. 0.]
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diffuser_prediction_es.svg" alt="Coeficiente de difusion predicho sobre las bandas de tercio de octava de 250 a 5000 Hz para un diseno de difusor de residuo cuadratico N = 7 comparado con un panel plano de la misma huella: la curva del QRD queda muy por encima de la curva casi nula del panel plano en toda la banda" width="88%" />
 
-*Predicho solo a partir del diseño: el QRD N = 7 reparte la energía reflejada
+*Predicho solo a partir del diseño: el QRD $N = 7$ reparte la energía reflejada
 mucho más uniformemente que el panel plano de la misma huella, de modo que su
 coeficiente de difusión predicho queda muy por encima de la referencia plana
 casi especular en toda la banda. Se trata de una estimación de diseño en campo

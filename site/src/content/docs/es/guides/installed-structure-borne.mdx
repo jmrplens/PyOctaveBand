@@ -33,7 +33,7 @@ La **EN 12354-5:2009** predice el nivel de presión acústica en un recinto rece
 causado por equipos de servicio del edificio (bombas, ventiladores, ascensores,
 instalaciones de agua) que inyectan **ruido estructural** en el edificio. Cierra
 la cadena de vibroacústica estructural: la fuente se describe por su nivel de
-potencia acústica estructural característica `L_Ws,c`, derivado de la medición
+potencia acústica estructural característica $L_{Ws,c}$, derivado de la medición
 sobre placa receptora de EN 15657 mediante la conversión de las Fórmulas
 (15)/(17) y una corrección de movilidad (**no** el nivel bruto inyectado en la
 placa; véase [EN 15657](/phonometry/es/guides/structure-borne-power/)); las
@@ -41,9 +41,10 @@ movilidades puntuales de fuente y receptor fijan cuánta potencia se acopla
 realmente a la estructura, y la transmisión del edificio la lleva al recinto
 receptor. La corrección de movilidad del Anexo I,
 `installed_power_from_reception_plate`, refiere el nivel característico de
-placa receptora `L_Ws,n` al receptor real,
-`L_Ws,inst = L_Ws,n + 10 lg(Y_∞,i / Y_∞,rec)` con `Y_∞,rec = 5·10⁻⁶ m/(N·s)`;
-con la movilidad de la fuente en su lugar da `L_Ws,c` (Anexo I.3, Tabla I.8).
+placa receptora $L_{Ws,n}$ al receptor real,
+$L_{Ws,\mathrm{inst}} = L_{Ws,n} + 10\lg(Y_{\infty,i} / Y_{\infty,\mathrm{rec}})$
+con $Y_{\infty,\mathrm{rec}} = 5\cdot 10^{-6}\ \text{m/(N·s)}$;
+con la movilidad de la fuente en su lugar da $L_{Ws,c}$ (Anexo I.3, Tabla I.8).
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/installed_structure_borne_es.svg" alt="La cascada de EN 12354-5 por banda de octava: potencia característica, potencia instalada tras el término de acoplamiento, niveles de presión acústica por camino y su total energético" width="82%" loading="eager" />
 
@@ -79,23 +80,23 @@ plt.show()
 ## 1. Acoplamiento y potencia instalada
 
 Solo parte de la potencia característica se inyecta en el elemento soporte; la
-pérdida es el **término de acoplamiento** `D_C` (siempre positivo), fijado para
-una excitación puntual por la movilidad de la fuente `Y_s` y la del receptor
-`Y_i` (Fórmula 19b):
+pérdida es el **término de acoplamiento** $D_C$ (siempre positivo), fijado para
+una excitación puntual por la movilidad de la fuente $Y_s$ y la del receptor
+$Y_i$ (Fórmula 19b):
 
 $$
 D_{C,i} = 10\lg\frac{|Y_s + Y_i|^2}{|Y_s|\,\mathrm{Re}\{Y_i\}},
 $$
 
-que se reduce a `10 lg(|Y_s|/Re{Y_i})` para una **fuente de fuerza** (movilidad
-de fuente alta, Fórmula 19c) y a `−10 lg(|Y_s|·Re{Z_i})` para una **fuente de
+que se reduce a $10\lg(|Y_s|/\mathrm{Re}\{Y_i\})$ para una **fuente de fuerza** (movilidad
+de fuente alta, Fórmula 19c) y a $-10\lg(|Y_s|\,\mathrm{Re}\{Z_i\})$ para una **fuente de
 velocidad** (movilidad de fuente baja, Fórmula 19d); un soporte elástico añade su
-movilidad de transferencia `Y_k` dentro del módulo (Fórmula 19e). El nivel de
-potencia **instalada** es entonces (Fórmula 18b) `L_Ws,inst = L_Ws,c − D_C`.
+movilidad de transferencia $Y_k$ dentro del módulo (Fórmula 19e). El nivel de
+potencia **instalada** es entonces (Fórmula 18b) $L_{Ws,\mathrm{inst}} = L_{Ws,c} - D_C$.
 
-La física detrás de `D_C` es la clásica potencia de entrada de una placa
+La física detrás de $D_C$ es la clásica potencia de entrada de una placa
 excitada en un punto: solo la parte real de la movilidad en el punto de
-excitación del receptor absorbe potencia, y el desajuste entre `Y_s` e `Y_i`
+excitación del receptor absorbe potencia, y el desajuste entre $Y_s$ e $Y_i$
 decide cuánta de la capacidad de la fuente entra realmente en la estructura
 (Hopkins 2007, Sección 2.8). Las propias movilidades vienen de la
 [cadena de movilidad mecánica](/phonometry/es/guides/mechanical-mobility/):
@@ -103,7 +104,7 @@ medidas según ISO 7626, o de las formas cerradas de placa infinita de la
 [teoría de paneles](/phonometry/es/guides/panel-sound-insulation/) cuando no
 hay medición. Una bomba sobre una losa de hormigón es la fuente de fuerza de
 libro: la movilidad de su carcasa queda órdenes de magnitud por encima de la
-de la losa, así que `D_C` se reduce a la Fórmula 19c y la potencia inyectada
+de la losa, así que $D_C$ se reduce a la Fórmula 19c y la potencia inyectada
 deja de depender del receptor.
 
 ```python
@@ -124,14 +125,14 @@ hidromasaje, cisternas y las conducciones que las anclan a paredes y forjados.
 Una vez que la potencia instalada está en la estructura, varios elementos
 radian al recinto receptor: el propio elemento excitado y cada elemento al
 que la vibración llega a través de las uniones. Cada par elemento
-excitado/elemento radiante `i→j` es una vía de transmisión con su propio
+excitado/elemento radiante $i \to j$ es una vía de transmisión con su propio
 término de ajuste y su índice de flancos:
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_installed_paths_es.svg" alt="Vías de instalación EN 12354-5: una bomba sobre apoyos resilientes inyecta potencia estructural en el forjado, el forjado excitado radia al recinto receptor de abajo, una segunda vía recorre el forjado hasta la pared de flanco, y la cascada de predicción va de la potencia característica al nivel de presión acústica normalizado" width="92%" />
 
-Cada camino de transmisión `i→j` da un nivel de presión acústica normalizado a
-partir de la potencia instalada, el término de ajuste estructura-a-aéreo `D_sa`,
-el índice de reducción acústica de flancos `R_ij,ref` (EN 12354-1) y el área del
+Cada camino de transmisión $i \to j$ da un nivel de presión acústica normalizado a
+partir de la potencia instalada, el término de ajuste estructura-a-aéreo $D_{sa}$,
+el índice de reducción acústica de flancos $R_{ij,\mathrm{ref}}$ (EN 12354-1) y el área del
 elemento (Fórmula 18a):
 
 $$
@@ -139,7 +140,7 @@ L_{n,s,ij} = L_{Ws,\mathrm{inst},i} - D_{sa,i} - R_{ij,\mathrm{ref}}
              - 10\lg\frac{S_i}{S_0} - 10\lg\frac{A_0}{4},
 $$
 
-con `S₀ = A₀ = 10 m²`, y los caminos se combinan energéticamente (Fórmula 17):
+con $S_0 = A_0 = 10\ \text{m}^2$, y los caminos se combinan energéticamente (Fórmula 17):
 
 ```python
 import numpy as np
@@ -233,10 +234,10 @@ el repositorio; pulsa la vista previa para abrir el PDF.
 
 ## Qué cubre esta guía
 
-**Cubierto.** La EN 12354-5:2009: el término de acoplamiento `D_C`
+**Cubierto.** La EN 12354-5:2009: el término de acoplamiento $D_C$
 (cláusula 4.4.3, Fórmulas 19b-e, con sus límites de fuente de fuerza y de
 fuente de velocidad) mediante `coupling_term`, el nivel de potencia
-instalada `L_Ws,inst = L_Ws,c − D_C` (Fórmula 18b) mediante
+instalada $L_{Ws,\mathrm{inst}} = L_{Ws,c} - D_C$ (Fórmula 18b) mediante
 `installed_structure_borne_power_level`, y el nivel de presión acústica
 normalizado por camino y su total energético (Fórmulas 18a, 17) mediante
 `installed_source_prediction`. Validado contra los propios ejemplos
@@ -244,18 +245,18 @@ resueltos del Anexo I de la norma, la bañera de hidromasaje (I.2) y la
 cisterna (I.3), dentro del redondeo de ±0,15 dB de los intermedios impresos.
 
 **No cubierto.** Las tablas de valores por defecto de los Anexos D y F para
-el término de ajuste estructura-a-aéreo `D_sa` y el índice de reducción por
-flancos `R_ij,ref` no están implementadas; ambos son entradas que se aportan
+el término de ajuste estructura-a-aéreo $D_{sa}$ y el índice de reducción por
+flancos $R_{ij,\mathrm{ref}}$ no están implementadas; ambos son entradas que se aportan
 a partir de mediciones, de la EN 12354-1 o de los propios anexos de la
 norma. Solo está implementada la edición de 2009, no la revisión de 2023.
 
 ## Véase también
 
 - [Potencia de ruido estructural de equipos (EN 15657)](/phonometry/es/guides/structure-borne-power/):
-  la caracterización sobre placa receptora que aporta `L_Ws,c` y la movilidad
+  la caracterización sobre placa receptora que aporta $L_{Ws,c}$ y la movilidad
   de fuente que consume esta predicción.
 - [Movilidad mecánica y la familia de FRF (ISO 7626-1)](/phonometry/es/guides/mechanical-mobility/):
-  las `Y_s` e `Y_i` medidas tras el término de acoplamiento.
+  las $Y_s$ e $Y_i$ medidas tras el término de acoplamiento.
 - [Transmisión de ondas de flexión en uniones de placas](/phonometry/es/guides/junction-transmission/):
   la física de unión que lleva la potencia instalada a los radiadores por
   flancos.

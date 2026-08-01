@@ -73,7 +73,7 @@ The implementation follows the ISO 7196 Table 1 pole/zero values exactly and is
 verified in CI against every Table 2 nominal response value (0.25 Hz to 315 Hz).
 `WeightingFilter(fs, "G")` supports the same multichannel and stateful block
 processing as A/C. Levels measured with the G curve are reported as
-L<sub>pG</sub> (or L<sub>Geq</sub> for the equivalent level over time).
+$L_{pG}$ (or $L_{Geq}$ for the equivalent level over time).
 
 ## 2. Historical and special-purpose curves: B, D and AU
 
@@ -199,7 +199,7 @@ print(f"LA = {la:.1f} dB   LAU = {lau:.1f} dB   audible alone = {la_ref:.1f} dB"
 Ultrasound only reaches a digital filter when the sample rate captures it,
 so measure at 96 kHz or more (at 48 kHz there is nothing above 24 kHz to
 reject); the AU design internally oversamples toward 288 kHz to keep the
-steep U roll-off accurate. Levels are reported as L<sub>AU</sub>. The
+steep U roll-off accurate. Levels are reported as $L_{AU}$. The
 implementation follows the Table 2 pole locations exactly (they reproduce
 every Table 1 nominal value within 0.05 dB) and is verified in CI against
 the Table 1 tolerances up to 40 kHz.

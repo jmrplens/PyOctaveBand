@@ -144,7 +144,7 @@ print(underwater.orca_audiogram(50e3).threshold[0])   # 51.20 dB re 1 uPa
 Ese valor es el umbral de audición del ejemplo de orca frente a salmón de
 Ainslie: con un nivel de fuente de 198,2 dB re 1 µPa²·m² y una fuerza de blanco
 del salmón de −29,0 dB re m², la cifra de mérito limitada por audición es
-$(SL + TS - HT)/2 = 59,0$ dB re m².
+$(SL + TS - HT)/2 = 59{,}0$ dB re m².
 
 ## Ponderación auditiva y funciones de exposición
 
@@ -212,8 +212,8 @@ print(params.a, params.b, params.f1_khz, params.f2_khz, params.c_db)
 ```
 
 :::note
-NMFS 2024 imprime $C = 1,37$ dB para el grupo de otáridos en agua y afirma en la
-nota al pie de esa misma tabla que el valor debería ser 1,36 dB. La biblioteca
+NMFS 2024 imprime $C = 1{,}37$ dB para el grupo de otáridos en agua y afirma en
+la nota al pie de esa misma tabla que el valor debería ser 1,36 dB. La biblioteca
 implementa 1,36 (recalcular $C$ como el máximo de $W$ da 1,3643) y conserva el
 dígito impreso en `c_db_as_printed`. La Tabla 7 de Southall arrastra cuatro
 erratas de nivel de pico corregidas por la fe de erratas de la propia revista, y

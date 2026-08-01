@@ -186,7 +186,7 @@ m.report(
 
 ## 2. Absorption areas from room decay times
 
-The equivalent absorption area `A` that drives `R'`, `L'n`, the ISO 3744 `K2`
+The equivalent absorption area $A$ that drives $R'$, $L'_n$, the ISO 3744 $K_2$
 environmental correction and the ISO 3741 absorption term is itself measured in
 a reverberation room (ISO 354).
 Measure the room's reverberation time **empty** ($T_1$) and again **with the
@@ -222,7 +222,7 @@ alpha = materials.absorption_coefficient(t1, t2, volume=200.0, sample_area=10.8,
 print(np.round(alpha, 3))                      # [0.398 0.448 0.498]
 ```
 
-`T1` and `T2` are exactly the reverberation times [`room_parameters`](/phonometry/guides/room-acoustics/) returns, so
+$T_1$ and $T_2$ are exactly the reverberation times [`room_parameters`](/phonometry/guides/room-acoustics/) returns, so
 an ISO 3382-2 decay measurement of the empty and treated room flows straight
 into `absorption_coefficient`. A room volume below the 150 m³ minimum or a
 sample area outside 10–12 m² raises an advisory `AbsorptionWarning`; the result
@@ -233,15 +233,15 @@ still returns.
 | Parameter | Type | Units | Range / default | Notes |
 | :--- | :--- | :--- | :--- | :--- |
 | `t60` / `t1`, `t2` | 1D array | s | > 0 | Reverberation time(s); `t1` empty, `t2` with specimen |
-| `volume` | float | m³ | > 0 | Room volume `V` (advisory below 150 m³) |
-| `sample_area` | float | m² | > 0 | Area `S` the specimen covers (coefficient only) |
-| `temperature` / `temperature1`, `temperature2` | float | °C | default `20.0`, 15–30 | Sets `c` via Eq. (6); `temperature2` defaults to `temperature1` |
-| `speed_of_sound` (`…1`, `…2`) | float, optional | m/s | > 0 | Overrides the temperature-derived `c` |
+| `volume` | float | m³ | > 0 | Room volume $V$ (advisory below 150 m³) |
+| `sample_area` | float | m² | > 0 | Area $S$ the specimen covers (coefficient only) |
+| `temperature` / `temperature1`, `temperature2` | float | °C | default `20.0`, 15–30 | Sets $c$ via Eq. (6); `temperature2` defaults to `temperature1` |
+| `speed_of_sound` (`…1`, `…2`) | float, optional | m/s | > 0 | Overrides the temperature-derived $c$ |
 | `m` (`m1`, `m2`) | float or 1D array | 1/m | ≥ 0, default `0` | Air power attenuation coefficient |
 
-`absorption_area()` returns the equivalent absorption area `A` (m²) with the
-shape of `t60`; `absorption_coefficient()` returns `alpha_s`;
-`attenuation_from_alpha(alpha)` converts an ISO 9613-1 `alpha` (dB/m) to `m`.
+`absorption_area()` returns the equivalent absorption area $A$ (m²) with the
+shape of `t60`; `absorption_coefficient()` returns $\alpha_s$;
+`attenuation_from_alpha(alpha)` converts an ISO 9613-1 $\alpha$ (dB/m) to $m$.
 
 
 ## 3. Weighted rating and absorption class (ISO 11654)
@@ -284,9 +284,9 @@ ranges partition the grid exactly.
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/absorption_rating.svg" alt="ISO 11654 weighted sound absorption rating: the practical absorption spectrum plotted against the shifted reference curve over 250 Hz to 4000 Hz, with the unfavourable deviation at 250 Hz shaded and the weighted coefficient alpha_w read at 500 Hz" width="80%" />
 
 *The Annex A.2 worked example: the reference curve is shifted down by 0.40 until
-the unfavourable deviations sum to 0.05 (≤ 0.10), giving $\alpha_w = 0.60$; the
-500 Hz peak overshoots the shifted curve by ≥ 0.25, adding the `M` indicator, so
-the rating is $0.60(\text{M})$, class C.*
+the unfavourable deviations sum to 0.05 ($\le 0.10$), giving $\alpha_w = 0.60$;
+the 500 Hz peak overshoots the shifted curve by $\ge 0.25$, adding the `M`
+indicator, so the rating is $0.60(\text{M})$, class C.*
 
 <details>
 <summary>Show the code for this figure</summary>

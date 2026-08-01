@@ -30,33 +30,34 @@ the same room settles to.
 A rigid or absorbing rectangular room reflects a point source in its walls;
 each reflection is exactly the free-field sound of a **mirror image** of the
 source. Mirroring a coordinate in a wall (Vorländer Equation (11.36),
-`S_n = S − 2 d n`) turns the source into a regular lattice of images, and the
-room impulse response is the sum of the direct sound and one delayed,
+$S_n = S - 2 d\,\mathbf{n}$) turns the source into a regular lattice of images,
+and the room impulse response is the sum of the direct sound and one delayed,
 attenuated impulse per image (Kuttruff Equations (4.4)–(4.5),
-`g(t) = Σ_n A_n δ(t − t_n)`).
+$g(t) = \sum_n A_n\,\delta(t - t_n)$).
 
-Image `i` at distance `r_i` from the receiver arrives at `t_i = r_i / c`
+Image $i$ at distance $r_i$ from the receiver arrives at $t_i = r_i / c$
 (Vorländer Equation (11.38)) with amplitude
 
-```text
-A_i = [ Π_walls R_wall^(reflections there) ] · exp(−m r_i / 2) / (4 π r_i)
-```
+$$
+A_i = \left[ \prod_\text{walls} R_\text{wall}^{\,\text{(reflections there)}}
+\right] \cdot e^{-m r_i / 2} / (4 \pi r_i)
+$$
 
-combining the `1 / (4 π r_i)` spherical spreading, the product of the wall
-**pressure reflection factors** `R = √(1 − α)` (Vorländer Equation (11.39);
-`|R|² = 1 − α` in energy, Kuttruff 4.1) each raised to the number of
-reflections that image made off that wall, and the air pressure attenuation
-`exp(−m r_i / 2)` over the path (Kuttruff 4.1; `m` the *intensity* attenuation
-constant, so intensity falls as `exp(−m r)`).
+combining the $1 / (4 \pi r_i)$ spherical spreading, the product of the wall
+**pressure reflection factors** $R = \sqrt{1 - \alpha}$ (Vorländer Equation
+(11.39); $|R|^2 = 1 - \alpha$ in energy, Kuttruff 4.1) each raised to the
+number of reflections that image made off that wall, and the air pressure
+attenuation $e^{-m r_i / 2}$ over the path (Kuttruff 4.1; $m$ the *intensity*
+attenuation constant, so intensity falls as $e^{-m r}$).
 
 Along one axis the reflection count off the two walls of an image at lattice
-index `n` and mirror parity `p` is `|n − p|` (wall at 0) and `|n|` (wall at
-`L`), so the total reflection order is
-`|2 n_x − p_x| + |2 n_y − p_y| + |2 n_z − p_z|` (Allen & Berkley 1979). A
-shoebox has exactly `(2/3)(2 i₀³ + 3 i₀² + 4 i₀)` audible images up to order
-`i₀` (Kuttruff Equation (9.23), e.g. 1560 at order 10), and the temporal
-density of reflections grows as `dN/dt = 4 π c³ t² / V` (Kuttruff Equation
-(4.6)).
+index $n$ and mirror parity $p$ is $|n - p|$ (wall at 0) and $|n|$ (wall at
+$L$), so the total reflection order is
+$|2 n_x - p_x| + |2 n_y - p_y| + |2 n_z - p_z|$ (Allen & Berkley 1979). A
+shoebox has exactly $\tfrac{2}{3}(2 i_0^3 + 3 i_0^2 + 4 i_0)$ audible images up
+to order $i_0$ (Kuttruff Equation (9.23), e.g. 1560 at order 10), and the
+temporal density of reflections grows as
+$\mathrm{d}N/\mathrm{d}t = 4 \pi c^3 t^2 / V$ (Kuttruff Equation (4.6)).
 
 The construction in one plan: every wall reflection is the straight-line sound
 of an image in a mirror room, so the geometry alone fixes each arrival. In the
@@ -161,7 +162,7 @@ grid, coloured by reflection order.
 
 *The lattice the reflectogram comes from, to scale: each image sits in a
 mirror room at the height plane of the source, and its distance to the
-receiver alone fixes the arrival time and the `1/(4 pi r)` spreading of that
+receiver alone fixes the arrival time and the $1/(4\pi r)$ spreading of that
 reflection.*
 
 <details>
@@ -183,10 +184,10 @@ plt.show()
 
 **Reproducing the statistical decay.** The fitted initial decay slope of the
 reverberant energy density of the synthetic RIR recovers the **Eyring**
-reverberation time `T = −24 V ln 10 / (c S ln(1 − ᾱ))` (Kuttruff Equation
-(5.23)): the mean reflection rate `c S / 4 V` equals
-`(c/2)(1/Lx + 1/Ly + 1/Lz)`, so the specular field's initial decay rate is the
-one that defines that `T`. The match is exact only in the near-cubic
+reverberation time $T = -24 V \ln 10 / (c S \ln(1 - \bar\alpha))$ (Kuttruff
+Equation (5.23)): the mean reflection rate $c S / 4 V$ equals
+$\tfrac{c}{2}(1/L_x + 1/L_y + 1/L_z)$, so the specular field's initial decay
+rate is the one that defines that $T$. The match is exact only in the near-cubic
 limit; an elongated room sustains energy along its long axis, so its pure
 *specular* decay runs slower than Eyring's diffuse-field estimate (the regime
 the [Fitzroy and Arau-Puchades models](reverberation-prediction.md) correct).
@@ -201,33 +202,36 @@ settles to the sum of a **direct field** that falls with distance and a
 **reverberant field** that (to the diffuse approximation) is the same
 everywhere. The **room constant**
 
-```text
-R = S ᾱ / (1 − ᾱ)                       (Bies Equation (6.44))
-```
+$$
+R = S \bar\alpha / (1 - \bar\alpha) \quad \text{(Bies Equation (6.44))}
+$$
 
-with total boundary area `S` and mean Sabine absorption `ᾱ` measures how much
-reverberant field a given power builds up. The **steady-state level** is
+with total boundary area $S$ and mean Sabine absorption $\bar\alpha$ measures
+how much reverberant field a given power builds up. The **steady-state level**
+is
 
-```text
-Lp = Lw + 10 log10( Q / (4 π r²) + 4 / R )   [ + 10 log10(ρc / 400) ]
-                                               (Bies Equation (6.43))
-```
+$$
+L_p = L_W + 10 \lg\!\left( \frac{Q}{4 \pi r^2} + \frac{4}{R} \right)
+\left[ + 10 \lg\frac{\rho c}{400} \right]
+\quad \text{(Bies Equation (6.43))}
+$$
 
-with the source directivity factor `Q` (1 omnidirectional, 2 on a hard floor,
-4 in an edge, 8 in a corner). The optional `10 log10(ρc / 400)` term
+with the source directivity factor $Q$ (1 omnidirectional, 2 on a hard floor,
+4 in an edge, 8 in a corner). The optional $10 \lg(\rho c / 400)$ term
 (about +0.14 dB at 20 °C) corrects for a characteristic impedance differing
 from 400 Pa·s/m and is omitted by default. The **critical distance**
 
-```text
-rc = √( Q R / (16 π) )
-```
+$$
+r_c = \sqrt{Q R / (16 \pi)}
+$$
 
 is where the two fields are equal (the crossover of Equation (6.43)); closer
-than `rc` the direct field dominates, farther the reverberant field does.
-Kuttruff's reverberation distance (Equation (5.44), `rc = √(A / 16 π)` for
-`Q = 1`) uses the Sabine absorption area `A = S ᾱ` instead of the room
-constant `R = A / (1 − ᾱ)`; the two coincide for a small `ᾱ` and this module
-uses `R`, so `rc` is exactly the crossover of its own `steady_state_spl`.
+than $r_c$ the direct field dominates, farther the reverberant field does.
+Kuttruff's reverberation distance (Equation (5.44), $r_c = \sqrt{A / 16 \pi}$
+for $Q = 1$) uses the Sabine absorption area $A = S \bar\alpha$ instead of the
+room constant $R = A / (1 - \bar\alpha)$; the two coincide for a small
+$\bar\alpha$ and this module uses $R$, so $r_c$ is exactly the crossover of its
+own `steady_state_spl`.
 
 ```python
 from phonometry import room
@@ -290,13 +294,13 @@ plt.show()
 
 The **Schroeder frequency**
 
-```text
-f_s = 2000 √(T / V)                       (Kuttruff Equation (3.44))
-```
+$$
+f_s = 2000 \sqrt{T / V} \quad \text{(Kuttruff Equation (3.44))}
+$$
 
-(`V` in m³, `T` in s) roughly marks the modal-to-diffuse transition, a
+($V$ in m³, $T$ in s) roughly marks the modal-to-diffuse transition, a
 heuristic crossover rather than a sharp cutoff: well below it discrete room
-modes dominate and the diffuse assumptions of `R` and `rc` grow unreliable,
+modes dominate and the diffuse assumptions of $R$ and $r_c$ grow unreliable,
 well above it the modes overlap and the statistical field of this section
 holds. In borderline rooms it is worth checking band by band.
 
@@ -311,10 +315,12 @@ Below the Schroeder frequency the statistical picture of section 2 breaks down
 and the room is a handful of discrete standing waves. For the rigid-walled
 shoebox the wave equation separates and the eigenfrequencies are exact:
 
-```text
-f(nx, ny, nz) = (c0 / 2) √( (nx/lx)² + (ny/ly)² + (nz/lz)² )
-                                        (Long Equation (8.43))
-```
+$$
+f(n_x, n_y, n_z) = \frac{c_0}{2}
+\sqrt{\left(\frac{n_x}{l_x}\right)^2 + \left(\frac{n_y}{l_y}\right)^2
+      + \left(\frac{n_z}{l_z}\right)^2}
+\quad \text{(Long Equation (8.43))}
+$$
 
 with non-negative integer orders counting the nodal planes on each axis. How
 many of the three orders are non-zero names the family: **axial** (one, a wave
@@ -338,18 +344,23 @@ modes.plot()                    # mode ladder by family + modal density
 ```
 
 Counting lattice points inside the positive octant of a sphere of radius
-`k = 2 π f / c0`, with the half- and quarter-weight corrections for the points
-on the coordinate planes and axes, gives the smooth **integrated mode count**
-and its derivative the **modal density**:
+$k = 2 \pi f / c_0$, with the half- and quarter-weight corrections for the
+points on the coordinate planes and axes, gives the smooth **integrated mode
+count** and its derivative the **modal density**:
 
-```text
-N(f)     = (4 π / 3) V (f/c0)³ + (π / 4) S (f/c0)² + (L / 8) (f/c0)
-                                        (Long Equation (8.45), after Morse and Pierce)
-dN/df    = 4 π V f² / c0³ + (π / 2) S f / c0² + L / (8 c0)
-                                        (Long Equation (8.46))
-```
+$$
+\begin{aligned}
+N(f) &= \frac{4\pi}{3} V \left(\frac{f}{c_0}\right)^3
+      + \frac{\pi}{4} S \left(\frac{f}{c_0}\right)^2
+      + \frac{L}{8} \frac{f}{c_0}
+      && \text{(Long Equation (8.45), after Morse and Pierce)} \\
+\frac{\mathrm{d}N}{\mathrm{d}f} &= \frac{4\pi V f^2}{c_0^3}
+      + \frac{\pi S f}{2 c_0^2} + \frac{L}{8 c_0}
+      && \text{(Long Equation (8.46))}
+\end{aligned}
+$$
 
-with the volume `V`, the total wall area `S` and the sum `L` of the twelve edge
+with the volume $V$, the total wall area $S$ and the sum $L$ of the twelve edge
 lengths. These are asymptotic estimates: below a few dozen modes the exact
 enumeration of `room_modes` is the honest answer, while high up they are
 accurate and much cheaper.
@@ -368,7 +379,7 @@ print(round(float(room.room_modal_density(1000.0, room_dims, speed_of_sound=344.
 
 *The 7 x 5 x 3 m room of Long's Table 8.1 up to 200 Hz. Below about 60 Hz the
 axial modes stand alone and each is separately audible; by the 175 Hz Schroeder
-frequency (T = 0.8 s) the oblique family has filled in and the modal density
+frequency ($T = 0.8$ s) the oblique family has filled in and the modal density
 has passed one mode per hertz, which is where the statistical field of
 section 2 takes over.*
 
@@ -403,19 +414,19 @@ mesh the room and run the [2D FDTD solver](fdtd-simulation.md).
 The implementations are checked against the closed forms and the source texts'
 own numeric anchors (see [CONFORMANCE.md](CONFORMANCE.md)):
 
-- the direct-sound amplitude `1/(4 π r)` and delay `r / c` (exact geometry),
+- the direct-sound amplitude $1/(4 \pi r)$ and delay $r / c$ (exact geometry),
   the audible image count (Kuttruff Equation (9.23)) and the reflection
   density (Equation (4.6));
 - the Eyring reverberation time recovered from the decay of the synthetic RIR
   in the near-cubic limit (documented ≈ 10 % tolerance), and an independent
   2D FDTD (`phonometry.simulation`) reproducing the rigid-wall echo delay and
-  the uniform-damping `T60`;
+  the uniform-damping $T_{60}$;
 - the room constant, the critical distance as the exact direct/reverberant
-  crossover, the Schroeder frequency (Kuttruff's classroom example, `V = 200`,
-  `T = 1` → 141 Hz) and the steady-state level (Bies Equation (6.43));
+  crossover, the Schroeder frequency (Kuttruff's classroom example, $V = 200$,
+  $T = 1$ → 141 Hz) and the steady-state level (Bies Equation (6.43));
 - the six modes Long prints for his 7 x 5 x 3 m room (Table 8.1: 24.6, 34.5,
   42.4, 49.2, 57.4 and 60.1 Hz, reproduced within one unit of the last printed
-  digit at his `c0 = 344` m/s) and the 34 modes per hertz he states for the
+  digit at his $c_0 = 344$ m/s) and the 34 modes per hertz he states for the
   same room at 1 kHz (Equation (8.46)), plus the mode count matched against
   the exact enumeration and the degeneracy of a cubic room.
 

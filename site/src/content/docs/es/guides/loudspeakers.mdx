@@ -67,15 +67,16 @@ libre, referida a una entrada de 1 W en la impedancia nominal; expresada como
 nivel re 20 µPa (cláusula 20.4) es el familiar «dB @ 1 W/1 m». En esa frase se
 esconden dos normalizaciones:
 
-- *La eléctrica.* La tensión de ensayo es `Up = √(R · 1 W)`, numéricamente
-  `√R`: 2,83 V en una impedancia nominal de 8 Ω. Una hoja de datos que anuncia
+- *La eléctrica.* La tensión de ensayo es $U_p = \sqrt{R \cdot 1\,\text{W}}$,
+  numéricamente $\sqrt{R}$: 2,83 V en una impedancia nominal de 8 Ω. Una hoja de datos que anuncia
   «dB @ 2,83 V/1 m» para un altavoz de 4 Ω le está entregando 2 W, lo que
   infla la cifra en 3 dB frente a una especificación real de 1 W/1 m;
   comprueba la impedancia nominal antes de comparar.
 - *La geométrica.* 1 m es una distancia de **referencia**, no necesariamente
   la de medición. La norma manda medir en campo lejano (a 0,5 m o a un número
   entero de metros, cláusula 7.1) y referir el resultado con la ley de la
-  distancia inversa, `Lp(1 m) = Lp(r) + 20 lg(r / 1 m)`. Ese escalado solo
+  distancia inversa, $L_p(1\ \text{m}) = L_p(r) + 20\lg(r / 1\ \text{m})$.
+  Ese escalado solo
   vale donde el nivel cae de verdad 6 dB por duplicación de distancia, de ahí
   el campo libre del diagrama; a 1 m de una caja multivía grande puede que el
   campo cercano aún no haya terminado, y la cifra «a 1 m» es entonces una
@@ -122,11 +123,11 @@ res.plot()                                      # R1 y X1 vs ka
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/piston_radiation_impedance_es.svg" alt="Resistencia de radiación normalizada R1 y reactancia X1 de un pistón circular con pantalla de 75 mm frente a ka en eje logarítmico: R1 sube desde ka al cuadrado entre dos hasta la unidad con rizados decrecientes, mientras la X1 de tipo masa alcanza su máximo cerca de ka de 1,4 y decae, con el límite de alta frecuencia R1 igual a 1 marcado" width="82%" />
 
 *El `.plot()` del resultado es la figura clásica de impedancia de Beranek y
-Mellow calculada para este pistón: por debajo de `ka ≈ 1` la carga es casi
-puramente de tipo masa (`X₁` domina y `R₁ ∝ (ka)²`, el régimen en el que la
-salida de un altavoz está limitada por rigidez y masa), y por encima la
-resistencia se asienta en `ρcS` con rizados de interferencia mientras la
-reactancia se desvanece.*
+Mellow calculada para este pistón: por debajo de $ka \approx 1$ la carga es
+casi puramente de tipo masa ($X_1$ domina y $R_1 \propto (ka)^2$, el régimen
+en el que la salida de un altavoz está limitada por rigidez y masa), y por
+encima la resistencia se asienta en $\rho c S$ con rizados de interferencia
+mientras la reactancia se desvanece.*
 
 <details>
 <summary>Mostrar el código de esta figura</summary>
@@ -190,7 +191,7 @@ el lado de radiación.
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/piston_baffle_geometry_es.svg" alt="Un pistón rígido de 10 cm de radio dibujado a escala como una placa de 200 mm de diámetro empotrada en una pantalla vertical rayada, con el diámetro del pistón acotado y el lóbulo de directividad de campo lejano normalizado para ka de 7,3 superpuesto en el lado de radiación: un lóbulo principal largo pegado al eje punteado con pequeños lóbulos secundarios replegándose cerca de la placa" width="82%" />
 
 *El pistón que describen las curvas de impedancia y directividad, a escala:
-a 4 kHz esta placa de 10 cm de radio tiene `ka ≈ 7,3`, así que el lóbulo
+a 4 kHz esta placa de 10 cm de radio tiene $ka \approx 7{,}3$, así que el lóbulo
 superpuesto ya es varias veces más estrecho que el hemisferio de baja
 frecuencia y han aparecido los primeros lóbulos secundarios.*
 
@@ -474,11 +475,11 @@ recogido en el [registro de erratas](https://github.com/jmrplens/phonometry/blob
 
 | Parámetro | Tipo | Unidades | Rango / defecto | Notas |
 | :--- | :--- | :--- | :--- | :--- |
-| `open_loop_gain` | float | dB | finito | `Zs = L(H-L) - L(T-M)`; unos -6 dB en un auditorio |
-| `level_loudspeaker_at_microphone` | float | dB | finito | `L(H-M)` |
-| `level_loudspeaker_at_listener` | float | dB | finito | `L(H-L)` |
-| `microphone_directivity` | float | dB | defecto 0 | `DM(theta)`, 0 omni, unos -2 cardioide |
-| `open_microphones` | int | — | ≥ 1, defecto 1 | `Nm` |
+| `open_loop_gain` | float | dB | finito | $Z_S = L_{H\text{-}L} - L_{T\text{-}M}$; unos -6 dB en un auditorio |
+| `level_loudspeaker_at_microphone` | float | dB | finito | $L_{H\text{-}M}$ |
+| `level_loudspeaker_at_listener` | float | dB | finito | $L_{H\text{-}L}$ |
+| `microphone_directivity` | float | dB | defecto 0 | $D_M(\theta)$, 0 omni, unos -2 cardioide |
+| `open_microphones` | int | — | ≥ 1, defecto 1 | $N_m$ |
 | `stability_margin` | float | dB | ≥ 0, defecto 10 | Margen de Long para sistema ecualizado |
 
 Devuelve un `FeedbackStabilityResult` (`open_loop_gain`,
@@ -528,8 +529,8 @@ entra en el diseño por separado.
 
 - [Electroacústica](/phonometry/es/guides/electroacoustics/): el conjunto de
   distorsión de IEC 60268-3, THD+N y SINAD, la intermodulación y los
-  estimadores de respuesta en frecuencia H1/H2 que producen las curvas que
-  esta guía presenta.
+  estimadores de respuesta en frecuencia $H_1$/$H_2$ que producen las curvas
+  que esta guía presenta.
 - [Caracterización de micrófonos (IEC 60268-4)](/phonometry/es/guides/microphones/):
   el informe de características nominales homólogo para el lado de medición
   de la cadena.
