@@ -147,6 +147,10 @@ ci:
   - changed-files:
       - any-glob-to-any-file: ["src/phonometry/environmental/**", "tests/environmental/**"]
 
+"area: filters":
+  - changed-files:
+      - any-glob-to-any-file: ["src/phonometry/filters/**", "tests/filters/**"]
+
 "area: hearing":
   - changed-files:
       - any-glob-to-any-file: ["src/phonometry/hearing/**", "tests/hearing/**"]
@@ -170,6 +174,10 @@ ci:
 "area: room":
   - changed-files:
       - any-glob-to-any-file: ["src/phonometry/room/**", "tests/room/**"]
+
+"area: signal":
+  - changed-files:
+      - any-glob-to-any-file: ["src/phonometry/signal/**", "tests/signal/**"]
 
 "area: simulation":
   - changed-files:
