@@ -143,6 +143,53 @@ def test_rest_blocks_note_and_literal_block() -> None:
     assert "A formula:" in out
 
 
+def test_math_directive_becomes_display_math() -> None:
+    text = (
+        "The level follows:\n"
+        "\n"
+        ".. math::\n"
+        "\n"
+        "   L_p = 10 \\lg\\!\\left( \\frac{S}{S_0} \\right)\n"
+        "   \\tag{Eq. 12}\n"
+        "\n"
+        "   K_2 = 10 \\lg(1 + 4S/A) \\tag{Eq. A.2}\n"
+        "\n"
+        "Trailing prose.\n"
+    )
+    out = gad.render_prose(text, {}, gad.RoleStats())
+    # Blank lines split the directive into one $$ block per equation, and
+    # each equation's physical lines are joined into a single line so
+    # remark-math keeps the whole block in one paragraph.
+    assert (
+        "$$\nL_p = 10 \\lg\\!\\left( \\frac{S}{S_0} \\right)"
+        " \\tag{Eq. 12}\n$$" in out
+    )
+    assert "$$\nK_2 = 10 \\lg(1 + 4S/A) \\tag{Eq. A.2}\n$$" in out
+    assert ".. math::" not in out
+
+
+def test_math_role_becomes_inline_math_untouched_by_escaping() -> None:
+    text = (
+        "Area :math:`S = 2\\pi r^2` and :math:`a = 0.5\\,l_1+d` with "
+        "``S`` in m^2."
+    )
+    out = gad.render_prose(text, {}, gad.RoleStats())
+    # The TeX passes through verbatim: no intraword-asterisk or ``<``
+    # escaping may reach inside the ``$`` span.
+    assert "$S = 2\\pi r^2$" in out
+    assert "$a = 0.5\\,l_1+d$" in out
+    assert ":math:" not in out
+    # Plain prose around it still gets the normal treatment.
+    assert "`S` in m^2" in out
+
+
+def test_math_role_wrapped_across_lines_joins() -> None:
+    out = gad.render_inline(
+        ":math:`L_W = L_p +\n    10 \\lg(S/S_0)`", {}, gad.RoleStats()
+    )
+    assert out == "$L_W = L_p + 10 \\lg(S/S_0)$"
+
+
 # ---------------------------------------------------------------------------
 # Full generation
 # ---------------------------------------------------------------------------

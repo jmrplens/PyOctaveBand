@@ -18,9 +18,12 @@ Regenerate with ``make api-docs``.
 The docstring dialect handled here is the repo's reST field-list style:
 ``:param:``/``:type:``/``:return:``/``:rtype:``/``:raises:``/``:warns:``/
 ``:ivar:``/``:vartype:`` fields, ``:class:``/``:func:``/etc. cross-reference
-roles, ````literal```` double-backtick spans, ``.. note::`` directives and
-``::`` literal blocks. A docstring that does not parse cleanly is degraded to
-a verbatim block and reported, never fatal.
+roles, ````literal```` double-backtick spans, ``.. note::`` directives,
+``::`` literal blocks and math (the ``:math:`` role and the ``.. math::``
+directive, emitted as ``$...$``/``$$...$$`` for the site's KaTeX pipeline;
+blank lines inside one directive separate equations, as in Sphinx). A
+docstring that does not parse cleanly is degraded to a verbatim block and
+reported, never fatal.
 """
 
 from __future__ import annotations
@@ -88,6 +91,8 @@ ROLE_RE = re.compile(
     r"`(~?)([^`<]+?)(?:\s*<([^>]+)>)?`"
 )
 _NOTE_RE = re.compile(r"^(\s*)\.\. note::\s?(.*)$")
+_MATH_DIRECTIVE_RE = re.compile(r"^(\s*)\.\. math::\s?(.*)$")
+_MATH_ROLE_RE = re.compile(r":math:`([^`]+)`")
 _DIRECTIVE_RE = re.compile(r"^\s*\.\. \w+::")
 _HEX_ADDR_RE = re.compile(r"0x[0-9a-fA-F]+")
 
@@ -286,16 +291,35 @@ def _dedent_block(lines: list[str]) -> list[str]:
 def rest_blocks_to_markdown(text: str, code: list[str]) -> str:
     """Convert reST block constructs to Markdown structure.
 
-    ``.. note::`` directives become Starlight ``:::note`` asides and ``::``
-    literal blocks become fenced code blocks. Fenced code is stored in
-    ``code`` and replaced by placeholders so the inline pass (roles, escaping)
-    cannot touch it; ``_restore_code`` swaps it back.
+    ``.. note::`` directives become Starlight ``:::note`` asides, ``::``
+    literal blocks become fenced code blocks and ``.. math::`` directives
+    become ``$$`` display-math blocks (one per blank-line-separated equation,
+    the Sphinx convention). Fenced code and math are stored in ``code`` and
+    replaced by placeholders so the inline pass (roles, escaping) cannot
+    touch them; ``_restore_code`` swaps them back.
     """
     lines = text.splitlines()
     out: list[str] = []
     i = 0
     while i < len(lines):
         line = lines[i]
+        math = _MATH_DIRECTIVE_RE.match(line)
+        if math:
+            indent = len(math.group(1))
+            end = _consume_indented(lines, i + 1, indent)
+            content = _dedent_block(lines[i + 1 : end])
+            if math.group(2).strip():
+                content = [math.group(2).strip(), *content]
+            for chunk in _split_on_blanks(content):
+                # remark-math needs the whole block in one paragraph, so
+                # the equation's physical lines are joined (TeX ignores
+                # source line breaks anyway).
+                tex = " ".join(part.strip() for part in chunk)
+                token = f"\x00CODE{len(code)}\x00"
+                code.append(f"$$\n{tex}\n$$")
+                out.extend(["", token, ""])
+            i = end
+            continue
         note = _NOTE_RE.match(line)
         if note:
             indent = len(note.group(1))
@@ -330,6 +354,21 @@ def rest_blocks_to_markdown(text: str, code: list[str]) -> str:
     return "\n".join(out)
 
 
+def _split_on_blanks(lines: list[str]) -> list[list[str]]:
+    """Split ``lines`` into runs of non-blank lines."""
+    chunks: list[list[str]] = []
+    current: list[str] = []
+    for line in lines:
+        if line.strip():
+            current.append(line)
+        elif current:
+            chunks.append(current)
+            current = []
+    if current:
+        chunks.append(current)
+    return chunks
+
+
 def _restore_code(text: str, code: list[str]) -> str:
     for index, fence in enumerate(code):
         text = text.replace(f"\x00CODE{index}\x00", fence)
@@ -344,21 +383,28 @@ def _inline_markdown(text: str, xref: dict[str, str], stats: RoleStats) -> str:
         tokens.append(rendered)
         return f"\x00T{len(tokens) - 1}\x00"
 
-    # 1. Cross-reference roles (contain backticks; handle before code spans).
+    # 1. Math roles -> KaTeX inline math, protected verbatim (a role wrapped
+    #    across source lines carries interior newlines; TeX ignores them).
+    def math_span(match: re.Match[str]) -> str:
+        tex = re.sub(r"\s+", " ", match.group(1)).strip()
+        return stash(f"${tex}$")
+
+    text = _MATH_ROLE_RE.sub(math_span, text)
+    # 2. Cross-reference roles (contain backticks; handle before code spans).
     text = ROLE_RE.sub(
         lambda m: stash(rest_roles_to_links(m.group(0), xref, stats)), text
     )
-    # 2. reST ``literal`` spans -> Markdown code spans.
+    # 3. reST ``literal`` spans -> Markdown code spans.
     text = re.sub(r"``(.+?)``", r"`\1`", text, flags=re.DOTALL)
-    # 3. Protect code spans from escaping.
+    # 4. Protect code spans from escaping.
     text = re.sub(r"`[^`]+`", lambda m: stash(m.group(0)), text)
-    # 4. Escape characters Markdown/HTML would misread in plain prose.
+    # 5. Escape characters Markdown/HTML would misread in plain prose.
     text = text.replace("<", "\\<")
     # Intraword asterisks (unit notation "Pa*s/m", math "10*lg(x)") would
     # pair up into <em> spans; reST emphasis never sits between word
     # characters, so escaping exactly those is safe.
     text = re.sub(r"(?<=\w)\*(?=\w)", "\\\\*", text)
-    # 5. Restore protected spans.
+    # 6. Restore protected spans.
     return re.sub(r"\x00T(\d+)\x00", lambda m: tokens[int(m.group(1))], text)
 
 
