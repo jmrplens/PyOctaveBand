@@ -895,6 +895,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   from the site's theme tokens and stay in step with each other and with the
   palette under the site's own theme switch.
 
+- Brand wordmark (`.github/brand/wordmark.svg`, `scripts/generate_brand.py`):
+  the word alone, as outlines in `currentColor` and trimmed to its ink, for
+  the one place the name was still live text. The landing hero's H1 set it in
+  whatever sans the reader's system offered while the lockup in the header
+  above it carried the brand face, so the same word appeared twice on the
+  first screen in two different typefaces. The H1 now holds the outlined
+  wordmark with the name behind it as visually hidden text, which keeps the
+  heading a heading for a screen reader, an assistive outline and the search
+  index while the artwork is hidden from the accessibility tree. Still no web
+  font: the type is converted from the committed font file at generation time,
+  so nothing is fetched and nothing reflows once the page has painted.
+
 ### Changed
 
 - The symbols the documentation names as quantities and the relations it

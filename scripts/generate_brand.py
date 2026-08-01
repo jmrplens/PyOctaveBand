@@ -586,6 +586,31 @@ def lockup_svg() -> str:
     )
 
 
+def wordmark_svg() -> str:
+    """The wordmark alone, as outlines in ``currentColor``, trimmed to its ink.
+
+    For the landing hero's H1, the one place the name still rendered as live
+    text: the theme set it in whatever sans the reader's system had, while the
+    header lockup beside it carried the brand face. Outlines close that gap
+    without fetching a web font, for the same reasons as the lockup. The word
+    is set at the banner's size so the letterforms are sampled at the same
+    fidelity, and the viewBox is the ink itself, so the height set in CSS is
+    the height the reader sees.
+    """
+    word = banner_layout().lines[0]
+    ink = text_outline(word.text, word.font, word.size, word.at).get_extents()
+    return (
+        f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0'
+        f' {_fmt(ink.x1 - ink.x0)} {_fmt(ink.y1 - ink.y0)}" role="img"'
+        ' aria-label="phonometry">\n'
+        "  <title>phonometry</title>\n"
+        f'  <g transform="translate({_fmt(-ink.x0)} {_fmt(-ink.y0)})">\n'
+        f"    {text_svg_path(word.text, word.font, word.size, word.at, 'currentColor', css_class='p-word')}\n"
+        "  </g>\n"
+        "</svg>\n"
+    )
+
+
 def card_png(dest: Path, card: Card, art: Path, *, scale: int = 1) -> None:
     """The same card as a raster, composed from the same layout and geometry.
 
@@ -696,6 +721,9 @@ def generate_all() -> None:
         # site: the type is already outlines, so the header needs no web font
         # and cannot reflow while one loads.
         (brand / "lockup.svg", lockup_svg()),
+        # The wordmark alone, for the landing hero's H1: same outlines as the
+        # lockup's type, inheriting the text colour around it.
+        (brand / "wordmark.svg", wordmark_svg()),
     ):
         path.write_text(svg, encoding="utf-8")
         _report(path)
