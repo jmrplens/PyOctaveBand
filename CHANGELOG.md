@@ -40,8 +40,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   in to see.
 
 - Page actions in the right-hand column of every documentation page: a split
-  button that copies the page as markdown, with a menu holding "View as
-  Markdown" and handoffs to ChatGPT and Claude. Each page has published a
+  button that copies the page as markdown, with a menu holding "Copy link to
+  Markdown", "View as Markdown", handoffs to ChatGPT and Claude and, under a
+  rule of its own, "Copy citation". Each page has published a
   clean markdown copy of itself at `<page>/index.md` since the page-markdown
   generator landed, and has advertised it with `<link rel="alternate">`, but
   only something parsing the document head could find it; this is the first
@@ -56,6 +57,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   control is a menu button in the ARIA sense, with `aria-haspopup`,
   `aria-expanded`, arrow-key and Home/End movement between entries, Escape to
   close and focus returned to the button, and it carries both locales.
+  The first menu entry copies the address of the markdown copy rather than its
+  text: pasted into a model that can fetch it, one URL is sturdier and lighter
+  than tens of thousands of characters, and it is the same handle the ChatGPT
+  and Claude prompts already carry. The last one copies a BibTeX `@software`
+  entry, which is what the acousticians and researchers this library is for
+  write their bibliographies in. It is assembled during the build from
+  `CITATION.cff`, the root `VERSION` file and the dated changelog heading for
+  that version, so no author, DOI or release year is written down a second
+  time, and it cites the Zenodo concept DOI that the About page and the site's
+  structured data already publish, with the release pinned in a `version`
+  field. The About page prints that same entry in prose in both locales, so
+  the build now fails if the two ever disagree. Neither new entry fetches
+  anything, and the Content-Security-Policy is untouched.
   It sits above the table of contents, which is where a reader already looks
   for what is *about* a page rather than what is *in* it, and where it costs
   the prose no width; on a phone it is a row under the table-of-contents bar,

@@ -23,11 +23,21 @@
  * the shape both of those plugins settled on and the one readers recognise, so
  * the common action costs one press and the others are one press away.
  *
+ * The menu holds two scales of the same intent. Four entries are about this
+ * page: its address, its text, and the two handoffs that hand a model the
+ * address. The fifth is about the project, a BibTeX entry assembled at build
+ * time in `src/data/citation.mjs` from the repository's own `CITATION.cff`, and
+ * it is set below a separator so it does not read as a fifth way to get the
+ * page. Neither of the two entries that copy fetches anything: both carry what
+ * they copy in the markup.
+ *
  * Behaviour lives in the module script at the bottom, bundled by Astro and
  * served from this origin, so the existing Content-Security-Policy is
  * unchanged: the only network call is a `fetch` of this site's own index.md,
  * which `connect-src 'self'` already allows.
  */
+import { bibtex } from '../data/citation.mjs';
+
 const { lang: routeLang } = Astro.locals.starlightRoute;
 const isEs = routeLang.startsWith('es');
 
@@ -42,6 +52,7 @@ const isHome = rel === '/' || rel === '' || rel === '/es/' || rel === '/es';
 
 const markdownUrl = `${pathname}index.md`;
 const pageUrl = Astro.url.href;
+const markdownHref = new URL(markdownUrl, pageUrl).href;
 
 /**
  * Translations inline, the same way PageTitle.astro and PageChips.astro carry
@@ -54,22 +65,26 @@ const t = isEs
       copied: 'Copiado',
       failed: 'No se pudo copiar',
       more: 'Más acciones para esta página',
+      copyLink: 'Copiar enlace al Markdown',
       view: 'Ver como Markdown',
       chatgpt: 'Abrir en ChatGPT',
       claude: 'Abrir en Claude',
+      cite: 'Copiar cita',
       // The prompt travels in a query string to a third party, so it names the
       // markdown copy rather than the page: that is the version worth reading.
-      prompt: `Lee ${new URL(markdownUrl, pageUrl).href} y responde preguntas sobre esta página.`,
+      prompt: `Lee ${markdownHref} y responde preguntas sobre esta página.`,
     }
   : {
       copy: 'Copy page',
       copied: 'Copied',
       failed: 'Copy failed',
       more: 'More actions for this page',
+      copyLink: 'Copy link to Markdown',
       view: 'View as Markdown',
       chatgpt: 'Open in ChatGPT',
       claude: 'Open in Claude',
-      prompt: `Read ${new URL(markdownUrl, pageUrl).href} so I can ask questions about it.`,
+      cite: 'Copy citation',
+      prompt: `Read ${markdownHref} so I can ask questions about it.`,
     };
 
 const q = encodeURIComponent(t.prompt);
@@ -89,15 +104,14 @@ const menuId = `page-actions-menu-${variant}`;
 
 {
   !isHome && (
-    <div class="page-actions" data-markdown={markdownUrl}>
+    <div
+      class="page-actions"
+      data-markdown={markdownUrl}
+      data-copied={t.copied}
+      data-failed={t.failed}
+    >
       <div class="page-actions-split">
-        <button
-          type="button"
-          class="page-action-copy"
-          data-copy
-          data-copied={t.copied}
-          data-failed={t.failed}
-        >
+        <button type="button" class="page-action-copy" data-copy>
           <svg aria-hidden="true" viewBox="0 0 24 24" width="14" height="14">
             <path
               d="M8 8h12v12H8z M4 16H3a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v1"
@@ -132,6 +146,16 @@ const menuId = `page-actions-menu-${variant}`;
         </button>
       </div>
       <div class="page-actions-menu" id={menuId} role="menu" hidden>
+        {/*
+          The link, not the text. `Copy page` above puts tens of thousands of
+          characters on the clipboard, which is the right thing to hand a model
+          that cannot browse and the wrong thing to hand one that can: a reader
+          pasting into an agent with web access is better served by one URL it
+          fetches itself, and by a paste that still fits in a chat box.
+        */}
+        <button type="button" role="menuitem" tabindex="-1" data-copy-text={markdownHref}>
+          <span data-copy-label>{t.copyLink}</span>
+        </button>
         <a role="menuitem" tabindex="-1" href={markdownUrl}>
           {t.view}
         </a>
@@ -153,6 +177,17 @@ const menuId = `page-actions-menu-${variant}`;
         >
           {t.claude}
         </a>
+        {/*
+          Five entries is where a flat list starts reading as a wall, so the
+          citation is set off by a rule rather than queued behind the others:
+          the four above are all "give me this page", this one is "give me the
+          project", and the separator is what says so without a submenu or a
+          heading nobody would read.
+        */}
+        <div role="separator" />
+        <button type="button" role="menuitem" tabindex="-1" data-copy-text={bibtex}>
+          <span data-copy-label>{t.cite}</span>
+        </button>
       </div>
     </div>
   )
@@ -234,26 +269,40 @@ const menuId = `page-actions-menu-${variant}`;
   }
 
   /* Beats the right-sidebar panel rule that styles every anchor in it as a
-     table-of-contents line. */
-  .page-actions-menu a:where(a) {
+     table-of-contents line. The two entries that copy rather than navigate are
+     buttons, because that is what they do, and they are reset to the same box
+     so the menu reads as one list and not as links with a control among them. */
+  .page-actions-menu :is(a, button):where(a, button) {
     display: block;
+    width: 100%;
     padding: 0.35rem 0.5rem;
+    border: 0;
     border-radius: 0.25rem;
+    background: none;
     color: var(--sl-color-gray-2);
+    font: inherit;
     font-size: var(--sl-text-xs);
     line-height: 1.4;
+    text-align: start;
     text-decoration: none;
+    cursor: pointer;
   }
 
-  .page-actions-menu a:hover,
-  .page-actions-menu a:focus-visible {
+  .page-actions-menu :is(a, button):hover,
+  .page-actions-menu :is(a, button):focus-visible {
     background: var(--sl-color-gray-6);
     color: var(--sl-color-white);
   }
 
-  .page-actions-menu a:focus-visible {
+  .page-actions-menu :is(a, button):focus-visible {
     outline: 2px solid var(--sl-color-text-accent);
     outline-offset: -2px;
+  }
+
+  .page-actions-menu [role='separator'] {
+    height: 1px;
+    margin: 0.25rem;
+    background: var(--sl-color-gray-5);
   }
 
   /* Under the sticky mobile table of contents the actions are a single row in
@@ -285,8 +334,7 @@ const menuId = `page-actions-menu-${variant}`;
     const toggle = root.querySelector<HTMLButtonElement>('[data-toggle]');
     const menu = root.querySelector<HTMLElement>('[role="menu"]');
     const copy = root.querySelector<HTMLButtonElement>('[data-copy]');
-    const label = root.querySelector<HTMLElement>('[data-copy-label]');
-    if (!toggle || !menu || !copy || !label) continue;
+    if (!toggle || !menu || !copy) continue;
 
     const items = () => [...menu.querySelectorAll<HTMLElement>('[role="menuitem"]')];
 
@@ -354,29 +402,62 @@ const menuId = `page-actions-menu-${variant}`;
     document.addEventListener('click', (event) => {
       if (!root.contains(event.target as Node)) close(false);
     });
-    menu.addEventListener('click', () => close(false));
+    // Only the entries that navigate close the menu. The ones that copy report
+    // back by swapping their own label, which nobody would see if the menu shut
+    // underneath them, and closing would also drop focus from the entry the
+    // keyboard is standing on.
+    menu.addEventListener('click', (event) => {
+      if ((event.target as HTMLElement).closest('a')) close(false);
+    });
+
+    /**
+     * Say what happened on the control that was pressed, then put its label
+     * back. The original is remembered per button so a second press during the
+     * two seconds cannot capture "Copied" as the text to restore.
+     */
+    const pending = new WeakMap<HTMLElement, { text: string; timer: number }>();
+    const report = (button: HTMLElement, message: string) => {
+      const target = button.querySelector<HTMLElement>('[data-copy-label]') ?? button;
+      const previous = pending.get(button);
+      if (previous) clearTimeout(previous.timer);
+      const text = previous ? previous.text : (target.textContent ?? '');
+      target.textContent = message;
+      pending.set(button, {
+        text,
+        timer: window.setTimeout(() => {
+          target.textContent = text;
+          pending.delete(button);
+        }, COPIED_MS),
+      });
+    };
+
+    const toClipboard = async (button: HTMLElement, produce: () => Promise<string> | string) => {
+      try {
+        await navigator.clipboard.writeText(await produce());
+        report(button, root.dataset.copied!);
+      } catch (error) {
+        console.error('[page-actions] could not copy:', error);
+        report(button, root.dataset.failed!);
+      }
+    };
 
     copy.addEventListener('click', async () => {
-      const url = root.dataset.markdown;
-      const original = label.textContent ?? '';
-      const done = (text: string) => {
-        label.textContent = text;
-        setTimeout(() => {
-          label.textContent = original;
-        }, COPIED_MS);
-      };
-      try {
-        copy.disabled = true;
-        const response = await fetch(url!);
+      // The only network call in this component, and it is to this origin.
+      copy.disabled = true;
+      await toClipboard(copy, async () => {
+        const response = await fetch(root.dataset.markdown!);
         if (!response.ok) throw new Error(`HTTP ${response.status}`);
-        await navigator.clipboard.writeText(await response.text());
-        done(copy.dataset.copied!);
-      } catch (error) {
-        console.error('[page-actions] could not copy the markdown copy:', error);
-        done(copy.dataset.failed!);
-      } finally {
-        copy.disabled = false;
-      }
+        return response.text();
+      });
+      copy.disabled = false;
     });
+
+    // The markdown URL and the citation are both known at build time and sit in
+    // the markup, so these two fetch nothing at all. They are also never
+    // disabled: a disabled menu item is not focusable, and taking focus off an
+    // entry the reader is standing on would break the roving tab index.
+    for (const entry of menu.querySelectorAll<HTMLElement>('[data-copy-text]')) {
+      entry.addEventListener('click', () => toClipboard(entry, () => entry.dataset.copyText!));
+    }
   }
 </script>
