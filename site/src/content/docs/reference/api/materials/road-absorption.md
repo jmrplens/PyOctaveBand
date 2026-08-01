@@ -17,9 +17,9 @@ opposite ends of the absorption scale and are **not** interchangeable:
   to frequency, and ratioed. The normal-incidence sound absorption coefficient
   is (Clause 4.1):
 
-$$
-\alpha(f) = 1 - Q_W(f) = 1 - \frac{1}{K_r^{2}} \left\lvert \frac{H_r(f)}{H_i(f)} \right\rvert^{2}
-$$
+  $$
+  \alpha(f) = 1 - Q_W(f) = 1 - \frac{1}{K_r^{2}} \left\lvert \frac{H_r(f)}{H_i(f)} \right\rvert^{2}
+  $$
 
   with `Hi`/`Hr` the incident/reflected transfer functions and `Kr` the
   geometrical-spreading factor $K_r = (d_s - d_m) / (d_s + d_m)$ for the

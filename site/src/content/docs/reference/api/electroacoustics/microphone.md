@@ -27,9 +27,9 @@ so the report never merely repeats a manufacturer number:
 * **Sensitivity level** (11.1). The sensitivity `M` is the ratio of the
   output voltage to the sound pressure, in volts per pascal; its level is
 
-$$
-L_M = 20 \lg(M / M_r), \qquad M_r = 1\ \mathrm{V/Pa}
-$$
+  $$
+  L_M = 20 \lg(M / M_r), \qquad M_r = 1\ \mathrm{V/Pa}
+  $$
 
   the rated sensitivity referring to the standard reference frequency of
   1 000 Hz (11.3). This is the first clean-room oracle: 12.5 mV/Pa returns
@@ -47,9 +47,9 @@ $$
   where the diffuse-field sensitivity of a rotationally symmetric pattern
   follows 11.2.2 a):
 
-$$
-M_\text{diff}^2 = \frac{1}{2} \int_0^{\pi} M^2(\theta) \sin(\theta) \, d\theta
-$$
+  $$
+  M_\text{diff}^2 = \frac{1}{2} \int_0^{\pi} M^2(\theta) \sin(\theta) \, d\theta
+  $$
 
   For the ideal cardioid $M(\theta) = M_0 (1 + \cos\theta) / 2$
   the integral is $M_0^2 / 3$, so $D = 10 \lg 3 = 4.77$ dB,

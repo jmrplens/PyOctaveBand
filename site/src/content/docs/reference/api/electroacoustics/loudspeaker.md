@@ -25,9 +25,9 @@ the report never merely repeats a manufacturer number:
   measured at a constant voltage `U` and distance `d`; the sensitivity
   level referred to 1 W into the rated impedance `R` at 1 m is
 
-$$
-L_M = L_\text{band} + 20 \lg(d / d_0) + 20 \lg(U_p / U), \qquad d_0 = 1\ \mathrm{m}
-$$
+  $$
+  L_M = L_\text{band} + 20 \lg(d / d_0) + 20 \lg(U_p / U), \qquad d_0 = 1\ \mathrm{m}
+  $$
 
   where $L_\text{band}$ is the energetic mean of the on-axis level
   over a stated band (20.1.2.4: the r.m.s. of the band pressures) and

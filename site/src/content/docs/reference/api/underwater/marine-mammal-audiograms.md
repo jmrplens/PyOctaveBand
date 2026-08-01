@@ -12,9 +12,9 @@ Two independent published descriptions of how well a marine mammal hears:
 * [`group_audiogram`](/phonometry/reference/api/underwater/marine-mammal-audiograms/#group_audiogram) -- the **group audiogram** of Southall et al. (2019),
   a four-parameter band-pass fit (their Equation 1, after Finneran 2016)
 
-$$
-T(f) = T_0 + A \lg\!\left(1 + \frac{F_1}{f}\right) + (f/F_2)^{B}
-$$
+  $$
+  T(f) = T_0 + A \lg\!\left(1 + \frac{F_1}{f}\right) + (f/F_2)^{B}
+  $$
 
   with the group parameters of their Table 2 (absolute thresholds) and Table 3
   (normalised to 0 dB at best sensitivity).

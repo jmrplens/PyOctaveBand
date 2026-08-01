@@ -59,9 +59,9 @@ $$
   height `z` (Eqs. (5.217) and (5.223) with
   $\epsilon = \sqrt{1 - r^2}$):
 
-$$
-P[\text{peak} > z] = Q(z / \epsilon) + r\, e^{-z^2 / 2} \left[ 1 - Q(rz / \epsilon) \right]
-$$
+  $$
+  P[\text{peak} > z] = Q(z / \epsilon) + r\, e^{-z^2 / 2} \left[ 1 - Q(rz / \epsilon) \right]
+  $$
 
   where `Q` is the standardized normal exceedance (Eq. (5.250)).
 

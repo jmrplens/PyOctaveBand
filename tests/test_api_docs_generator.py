@@ -190,6 +190,66 @@ def test_math_role_wrapped_across_lines_joins() -> None:
     assert out == "$L_W = L_p + 10 \\lg(S/S_0)$"
 
 
+def test_math_in_table_cell_keeps_its_bars_single() -> None:
+    # GFM decodes the ``\|`` cell escape for prose but not inside math, so
+    # escaping a formula's bar would silently typeset ``\|`` (a double bar)
+    # where the standard means a modulus. The bars become TeX commands.
+    out = gad.render_cell(
+        "Magnitude :math:`20 \\lg |H|`, in dB.", {}, gad.RoleStats()
+    )
+    assert "$20 \\lg \\vert H\\vert $" in out
+    assert "\\|" not in out
+    # A norm that was already written ``\|`` keeps both bars.
+    norm = gad.render_cell(":math:`\\|v\\|`", {}, gad.RoleStats())
+    assert norm == "$\\Vert v\\Vert $"
+    assert "\\|" not in norm
+
+
+def test_render_prose_leaves_math_bars_alone() -> None:
+    # Outside a table there is nothing to escape, so the formula is verbatim.
+    out = gad.render_prose(
+        "Magnitude :math:`20 \\lg |H|`.", {}, gad.RoleStats()
+    )
+    assert "$20 \\lg |H|$" in out
+
+
+def test_math_directive_nested_in_a_list_keeps_the_item_indent() -> None:
+    # A ``$$`` block flush left would close the list, ejecting both the
+    # equation and the prose after it from the bullet.
+    text = (
+        "* **Sensitivity**. The level referred to 1 W is\n"
+        "\n"
+        "  .. math::\n"
+        "\n"
+        "     L_M = L + 20 \\lg(d / d_0)\n"
+        "\n"
+        "  where :math:`L` is the band mean.\n"
+        "\n"
+        "* **Second characteristic** follows.\n"
+    )
+    out = gad.render_prose(text, {}, gad.RoleStats())
+    assert "  $$\n  L_M = L + 20 \\lg(d / d_0)\n  $$" in out
+    # A directive that was not nested still starts at column zero.
+    flat = gad.render_prose(".. math::\n\n   a = b\n", {}, gad.RoleStats())
+    assert flat == "$$\na = b\n$$"
+
+
+def test_math_directive_keeps_one_environment_in_one_block() -> None:
+    # A multi-row environment must stay in a single ``$$`` block: splitting
+    # it would leave an orphan ``\begin{aligned}`` that KaTeX cannot close.
+    text = (
+        ".. math::\n"
+        "\n"
+        "   \\begin{aligned}\n"
+        "   a &= b \\\\\n"
+        "   c &= d\n"
+        "   \\end{aligned}\n"
+    )
+    out = gad.render_prose(text, {}, gad.RoleStats())
+    assert out.count("$$") == 2
+    assert out.count("\\begin{aligned}") == out.count("\\end{aligned}") == 1
+
+
 # ---------------------------------------------------------------------------
 # Full generation
 # ---------------------------------------------------------------------------

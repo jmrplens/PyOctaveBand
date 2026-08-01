@@ -29,9 +29,9 @@ spectra are known and the dominant path per band matters.
 2. In-situ conversion (Clause 4.2.2). The total loss factor in situ follows
    from Annex C Formula (C.1),
 
-$$
-\eta_{tot} = \eta_{int} + \frac{2 \rho_o c_o \sigma}{2 \pi f m'} + \frac{c_o}{\pi^2 S \sqrt{f f_c}} \sum_k l_k \alpha_k
-$$
+   $$
+   \eta_{tot} = \eta_{int} + \frac{2 \rho_o c_o \sigma}{2 \pi f m'} + \frac{c_o}{\pi^2 S \sqrt{f f_c}} \sum_k l_k \alpha_k
+   $$
 
    ([`in_situ_total_loss_factor`](/phonometry/reference/api/building/detailed-prediction/#in_situ_total_loss_factor)), with the perimeter absorption
    coefficients deduced from the junctions' vibration reduction indices

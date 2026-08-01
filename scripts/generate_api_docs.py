@@ -93,6 +93,8 @@ ROLE_RE = re.compile(
 _NOTE_RE = re.compile(r"^(\s*)\.\. note::\s?(.*)$")
 _MATH_DIRECTIVE_RE = re.compile(r"^(\s*)\.\. math::\s?(.*)$")
 _MATH_ROLE_RE = re.compile(r":math:`([^`]+)`")
+#: A rendered inline-math span, once the role has become ``$...$``.
+_INLINE_MATH_RE = re.compile(r"\$[^$]+\$")
 _DIRECTIVE_RE = re.compile(r"^\s*\.\. \w+::")
 _HEX_ADDR_RE = re.compile(r"0x[0-9a-fA-F]+")
 
@@ -310,13 +312,17 @@ def rest_blocks_to_markdown(text: str, code: list[str]) -> str:
             content = _dedent_block(lines[i + 1 : end])
             if math.group(2).strip():
                 content = [math.group(2).strip(), *content]
+            # A directive nested in a list item keeps that item's indent, or
+            # the ``$$`` block would close the list and orphan the prose
+            # that follows the equation.
+            pad = " " * indent
             for chunk in _split_on_blanks(content):
                 # remark-math needs the whole block in one paragraph, so
                 # the equation's physical lines are joined (TeX ignores
                 # source line breaks anyway).
                 tex = " ".join(part.strip() for part in chunk)
                 token = f"\x00CODE{len(code)}\x00"
-                code.append(f"$$\n{tex}\n$$")
+                code.append(f"{pad}$$\n{pad}{tex}\n{pad}$$")
                 out.extend(["", token, ""])
             i = end
             continue
@@ -423,14 +429,31 @@ def render_inline(text: str, xref: dict[str, str], stats: RoleStats) -> str:
     return rendered.replace("\n", " ").strip()
 
 
+def _math_bars_to_commands(match: re.Match[str]) -> str:
+    """Spell the vertical bars of a math span as TeX commands.
+
+    GFM decodes the ``\\|`` cell escape for prose and code spans but not
+    inside math, where KaTeX would then read it as ``\\|`` and typeset a
+    double bar. ``\\vert``/``\\Vert`` are the same glyphs written without
+    the character the table syntax claims, so they survive the escape.
+    """
+    span = match.group(0).replace("\\|", "\\Vert ")
+    return span.replace("|", "\\vert ")
+
+
 def render_cell(text: str, xref: dict[str, str], stats: RoleStats) -> str:
     """Inline reST -> Markdown for a table cell (single line, pipes escaped).
 
     The ``|`` escape is GFM table syntax: it is decoded back to a literal
     pipe only inside a table row, so it must never be applied to prose
     outside a table (a code span there would show the backslash literally).
+    Math is exempt: its bars become ``\\vert``/``\\Vert`` first, so the
+    escaping below cannot reach into a formula.
     """
-    return render_inline(text, xref, stats).replace("|", "\\|")
+    rendered = render_inline(text, xref, stats)
+    return _INLINE_MATH_RE.sub(_math_bars_to_commands, rendered).replace(
+        "|", "\\|"
+    )
 
 
 # --------------------------------------------------------------------------

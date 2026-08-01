@@ -16,9 +16,9 @@ in terms of two decibel gains,
   the loudspeaker produces at an average listener minus the level the
   talker produces at the microphone,
 
-$$
-Z_S = L_{H\text{-}L} - L_{T\text{-}M}
-$$
+  $$
+  Z_S = L_{H\text{-}L} - L_{T\text{-}M}
+  $$
 
   so $Z_S = -6$ dB (a typical auditorium or church) means the
   amplified sound at the listener sits 6 dB below what the talker delivers
@@ -28,9 +28,9 @@ $$
 * the **feedback-loop gain** $G_S$ (Equation (18.18)), the part of
   that output that returns to the microphone,
 
-$$
-G_S = L_{H\text{-}M} - L_{H\text{-}L} + D_M(\theta)
-$$
+  $$
+  G_S = L_{H\text{-}M} - L_{H\text{-}L} + D_M(\theta)
+  $$
 
   with $D_M(\theta)$ the directivity index of the microphone toward
   the loudspeaker *relative to* the talker (zero for an omnidirectional
