@@ -34,8 +34,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   and never sees the ones a component emits, so `ThemeImage.astro` wraps its
   own pair; every figure on the site is authored through it, and the EN/ES
   parity check now enforces that, since a figure written as markdown on a
-  Spanish page is the one route to a zoom control nothing translates. Each
-  figure ships a light and a dark
+  Spanish page is the one route to a zoom control nothing translates. The check
+  looks for what opens a markdown image in any of its four forms, so a figure
+  written as a reference (`![alt][label]`) cannot slip past the way one written
+  inline would have; a sample of the markup inside a fence or inside backticks
+  is still just a sample. Each figure ships a light and a dark
   variant and both get wrapped, so `theme-images.css` now hides the wrapper of
   the off-theme half as well; without that the hidden variant left an empty
   full-width box in the flow whose zoom button was still in the tab order and
@@ -65,7 +68,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   this page as markdown" beside the one this site already gets right. The
   control is a menu button in the ARIA sense, with `aria-haspopup`,
   `aria-expanded`, arrow-key and Home/End movement between entries, Escape to
-  close and focus returned to the button, and it carries both locales.
+  close and focus returned to the button, and it carries both locales. Opening
+  it from the keyboard, with Enter, Space or Down, lands on the first entry, and
+  Up lands on the last; the entries are out of the tab order, so a keyboard
+  reader left standing on the button would have an open menu and no way into it
+  that the page ever mentions. A press of the pointer leaves focus alone.
   The first menu entry copies the address of the markdown copy rather than its
   text: pasted into a model that can fetch it, one URL is sturdier and lighter
   than tens of thousands of characters, and it is the same handle the ChatGPT
@@ -76,9 +83,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   that version, so no author, DOI or release year is written down a second
   time, and it cites the Zenodo concept DOI that the About page and the site's
   structured data already publish, with the release pinned in a `version`
-  field. The About page prints that same entry in prose in both locales, so
-  the build now fails if the two ever disagree. Neither new entry fetches
-  anything, and the Content-Security-Policy is untouched. Both halves of the
+  field. The About page publishes the same citation three times over in both
+  locales, as a bold DOI link, an APA reference and that BibTeX entry, and the
+  build now fails if any of the six ever disagrees with what it generates: the
+  DOI on both sides of the link, and the author, title, year, version and DOI
+  the APA reference repeats. Neither new entry fetches anything, and the
+  Content-Security-Policy is untouched. Both halves of the
   split ship disabled and the script enables them once it has wired them up, so
   a press that arrives before it, or without it, is refused rather than
   swallowed; the one entry that is a plain navigation is a plain link in a
@@ -1530,6 +1540,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   now comes from the entry actually being rendered, which on a fallback page is
   the English text the reader has in front of them, and is withheld where the
   generator wrote nothing.
+
+- The build published a markdown copy of the English landing page at
+  `/index/index.md`, a route no page occupies and nothing links to. The
+  generator and the page agree on which pages get a copy, but each worked out
+  the route it was talking about for itself, with the same expression Astro
+  uses (`/\/index$/`). That expression cannot match at the root of the content
+  collection, where the path is `index.mdx` with no directory in front of it,
+  so the generator called the landing page `index` and wrote it out while the
+  page itself, which Starlight gives the empty route, correctly offered
+  nothing. The rule now lives in one place and both sides import it, and the
+  file it used to write is gone; the Spanish landing page, whose id Astro does
+  normalise, was unaffected either way.
 
 - Eleven figures on seven Spanish guides were the English drawing. The pages
   passed the English asset to `ThemeImage`, which derives only the dark
