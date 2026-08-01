@@ -175,6 +175,10 @@ const LATEX_ACCENTS = {
 function toBibtex(value) {
   const escaped = value
     .normalize('NFD')
+    // Before anything else, because the accent pass below writes backslashes
+    // of its own and they must not be escaped in turn. A backslash reaching a
+    // .bib file unescaped would open a command and swallow what follows.
+    .replace(/\\/g, '\\textbackslash{}')
     .replace(/([A-Za-z])([̀-ͯ])/g, (whole, letter, mark) => {
       const accent = LATEX_ACCENTS[mark];
       if (!accent) throw new Error(`No BibTeX spelling for the accent in: ${whole}`);
