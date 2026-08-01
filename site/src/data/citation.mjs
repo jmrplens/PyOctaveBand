@@ -172,6 +172,28 @@ const LATEX_ACCENTS = {
   '̨': 'k ',
 };
 
+/**
+ * The characters LaTeX reads as syntax rather than as text, each with the text
+ * that spells it.
+ *
+ * A table walked character by character below, rather than a pattern with a
+ * replacement template. What every substitution produces is then written next
+ * to the character it stands in for, and the set of characters that get spelled
+ * out is written down once instead of once here and once in a character class
+ * that has to agree with it.
+ *
+ * The backslash is deliberately absent and could not be added: `\\` is a line
+ * break in LaTeX, not a literal backslash, so no entry here would be correct
+ * for one. `toBibtex` refuses it outright instead.
+ */
+const LATEX_SPECIALS = {
+  '&': '\\&',
+  '%': '\\%',
+  $: '\\$',
+  '#': '\\#',
+  _: '\\_',
+};
+
 function toBibtex(value) {
   // Refused rather than escaped. A backslash opens a BibTeX command, and the
   // accent pass below writes backslashes of its own, so escaping the input
@@ -182,19 +204,15 @@ function toBibtex(value) {
   if (value.includes('\\')) {
     throw new Error(`A backslash cannot be spelled in BibTeX metadata: ${value}`);
   }
-  const escaped = value
-    .normalize('NFD')
-    .replace(/([A-Za-z])([̀-ͯ])/g, (whole, letter, mark) => {
-      const accent = LATEX_ACCENTS[mark];
-      if (!accent) throw new Error(`No BibTeX spelling for the accent in: ${whole}`);
-      return `{\\${accent}${letter}}`;
-    })
-    // The backslash is absent from this class on purpose: the guard above
-    // refuses one outright, so there is none left to escape here, and adding
-    // it would write `\\`, which LaTeX reads as a line break rather than as a
-    // literal backslash.
-    // codeql[js/incomplete-sanitization]
-    .replace(/([&%$#_])/g, '\\$1');
+  const accented = value.normalize('NFD').replace(/([A-Za-z])([̀-ͯ])/g, (whole, letter, mark) => {
+    const accent = LATEX_ACCENTS[mark];
+    if (!accent) throw new Error(`No BibTeX spelling for the accent in: ${whole}`);
+    return `{\\${accent}${letter}}`;
+  });
+  // Every character either has a spelling in the table above or stands for
+  // itself, including the backslashes the accents just wrote, which are already
+  // the control sequences they were meant to be.
+  const escaped = [...accented].map((character) => LATEX_SPECIALS[character] ?? character).join('');
   // Anything left outside printable ASCII would reach a .bib file as a raw byte.
   if (/[^\x20-\x7e]/.test(escaped)) {
     throw new Error(`Value does not survive the trip to BibTeX: ${value}`);
