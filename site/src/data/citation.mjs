@@ -173,12 +173,17 @@ const LATEX_ACCENTS = {
 };
 
 function toBibtex(value) {
+  // Refused rather than escaped. A backslash opens a BibTeX command, and the
+  // accent pass below writes backslashes of its own, so escaping the input
+  // would have to happen first and would then be indistinguishable from them.
+  // These values come from CITATION.cff, VERSION and the changelog heading,
+  // where a backslash is a mistake worth stopping the build for, not input to
+  // be sanitised into something plausible.
+  if (value.includes('\\')) {
+    throw new Error(`A backslash cannot be spelled in BibTeX metadata: ${value}`);
+  }
   const escaped = value
     .normalize('NFD')
-    // Before anything else, because the accent pass below writes backslashes
-    // of its own and they must not be escaped in turn. A backslash reaching a
-    // .bib file unescaped would open a command and swallow what follows.
-    .replace(/\\/g, '\\textbackslash{}')
     .replace(/([A-Za-z])([̀-ͯ])/g, (whole, letter, mark) => {
       const accent = LATEX_ACCENTS[mark];
       if (!accent) throw new Error(`No BibTeX spelling for the accent in: ${whole}`);
