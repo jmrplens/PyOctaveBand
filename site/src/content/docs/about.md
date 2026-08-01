@@ -126,7 +126,7 @@ BibTeX:
 
 ```bibtex
 @software{requenaplens_phonometry,
-  author  = {Requena-Plens, Jose M.},
+  author  = {Requena-Plens, Jos{\'e} M.},
   title   = {phonometry: acoustic measurement toolkit for Python
              (formerly PyOctaveBand)},
   year    = {2026},

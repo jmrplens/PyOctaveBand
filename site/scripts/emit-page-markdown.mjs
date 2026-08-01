@@ -17,6 +17,7 @@ import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join, relative } from "node:path";
 import { fileURLToPath } from "node:url";
 import { glob } from "node:fs/promises";
+import { hasMarkdownCopy, routeOf } from "../src/lib/page-markdown.mjs";
 
 const here = dirname(fileURLToPath(import.meta.url));
 const siteRoot = join(here, "..");
@@ -50,13 +51,12 @@ function stripMdx(text) {
     .trim();
 }
 
-/** Route for a content file: `guides/levels.mdx` -> `guides/levels`. */
-function routeOf(file) {
-  return relative(contentDir, file)
-    .replace(/\\/g, "/")
-    .replace(/\.mdx?$/, "")
-    .replace(/\/index$/, "");
-}
+/**
+ * Route for a content file: `guides/levels.mdx` -> `guides/levels`. The rule
+ * itself is in src/lib/page-markdown.mjs, because the page has to reach the
+ * same answer about itself and the two used to be written out separately.
+ */
+const routeOfFile = (file) => routeOf(relative(contentDir, file));
 
 /**
  * Rewrite links that only work inside the docs/ folder.
@@ -90,8 +90,10 @@ if (existsSync(docsDir)) {
 // stem -> route, so the mirrored cross-links can be made absolute.
 const routeForStem = new Map();
 for await (const file of glob("**/*.{md,mdx}", { cwd: contentDir })) {
-  const route = routeOf(join(contentDir, file));
-  if (route.startsWith("es/") || route === "es") continue;
+  const route = routeOfFile(join(contentDir, file));
+  // An English cross-link never means the Spanish subtree, and the splash
+  // pages are not link targets: they have no copy to link to.
+  if (route.startsWith("es/") || !hasMarkdownCopy(route)) continue;
   const stem = file.replace(/\\/g, "/").split("/").pop().replace(/\.mdx?$/, "");
   if (!routeForStem.has(stem)) routeForStem.set(stem, route);
 }
@@ -117,10 +119,11 @@ for (const [stem, route] of [
 let written = 0;
 for await (const file of glob("**/*.{md,mdx}", { cwd: contentDir })) {
   const abs = join(contentDir, file);
-  const route = routeOf(abs);
+  const route = routeOfFile(abs);
   // The two splash pages are a component layout, not prose; there is no
-  // meaningful markdown to serve for them.
-  if (route === "" || route === "es") continue;
+  // meaningful markdown to serve for them. The same test decides what the page
+  // itself advertises (src/lib/page-markdown.mjs).
+  if (!hasMarkdownCopy(route)) continue;
 
   const stem = file.replace(/\\/g, "/").split("/").pop().replace(/\.mdx?$/, "");
   const isSpanish = route === "es" || route.startsWith("es/");

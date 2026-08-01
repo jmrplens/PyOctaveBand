@@ -1,0 +1,54 @@
+---
+/**
+ * Spanish accessible names for the two controls starlight-image-zoom renders
+ * from its own components.
+ *
+ * The plugin hard-codes "Zoom image" and "Unzoom image" and exposes no
+ * translation hook: neither string passes through Starlight's `i18n:setup` or
+ * `Astro.locals.t`, so on a bilingual site the Spanish pages would ship a
+ * control whose accessible name mixes an English verb with a Spanish alt text.
+ * That is a WCAG 3.1.2 (Language of Parts) defect, and not one an automated
+ * audit can see: the name is present and non-empty either way.
+ *
+ * The controls come from the plugin's own components, so the only place left
+ * to correct them is the markup those components render: the slot is rendered
+ * to HTML and the labels substituted. That keeps the plugin as the single
+ * source of the zoom behaviour instead of forking its custom element to change
+ * four words. Every figure on the site is authored through ThemeImage.astro,
+ * which wraps its own pair and renders it inside this component, and the
+ * parity check (scripts/check-i18n-parity.mjs) keeps it that way: a Spanish
+ * page that wrote a figure as markdown instead would get its zoom control from
+ * the plugin's rehype pass, which this never sees and which names it in
+ * English.
+ *
+ * The substitution is asserted rather than attempted. A silent no-op would
+ * look exactly like a page with no figures, and the regression would only ever
+ * be noticed by a screen-reader user, so a plugin upgrade that renames a
+ * control fails the build here instead.
+ */
+const lang = Astro.locals.starlightRoute?.lang ?? Astro.currentLocale ?? 'en';
+const isEs = lang.startsWith('es');
+
+/** Prefixes, not whole values: the zoom label carries the alt text after it. */
+const LABELS = [
+  ['aria-label="Unzoom image"', 'aria-label="Reducir imagen"'],
+  ['aria-label="Zoom image', 'aria-label="Ampliar imagen'],
+];
+
+let html = await Astro.slots.render('default');
+
+if (isEs) {
+  const matched = LABELS.filter(([en]) => html.includes(en));
+  if (matched.length === 0) {
+    throw new Error(
+      '[ZoomI18n] none of the starlight-image-zoom control labels ' +
+        `(${LABELS.map(([en]) => en).join(', ')}) are in the rendered markup. ` +
+        'The plugin changed its components; update src/components/ZoomI18n.astro ' +
+        'so the Spanish pages stay translated.',
+    );
+  }
+  for (const [en, es] of matched) html = html.replaceAll(en, es);
+}
+---
+
+<Fragment set:html={html} />

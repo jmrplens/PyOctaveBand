@@ -3,9 +3,11 @@ import { readFileSync } from 'node:fs';
 import { defineConfig } from 'astro/config';
 import starlight from '@astrojs/starlight';
 import starlightLinksValidator from 'starlight-links-validator';
+import starlightImageZoom from 'starlight-image-zoom';
 import remarkMath from 'remark-math';
 import rehypeKatex from 'rehype-katex';
 import { sidebar } from './src/data/sidebar.mjs';
+import { doi, doiUrl } from './src/data/citation.mjs';
 import { basePath, siteUrl } from './src/data/site.mjs';
 import { isOurMedia, mediaUrl, REMOTE_PREFIXES } from './src/lib/media.mjs';
 import { rehypeWrappableMath } from './src/lib/wrappable-math.mjs';
@@ -20,11 +22,10 @@ import {
 // Rewrites documentation media to this site's own copy.
 //
 // The components (ThemeImage, Video, ReportPreview) call mediaUrl themselves,
-// but around a hundred references are hand-written <img> pairs inside the
-// markdown, mostly on the theory pages, and those never pass through a
-// component. This catches them, plus any <a href> or <video src> pointing at
-// the same files, so nothing is left hotlinking raw.githubusercontent.com
-// whichever way it was authored.
+// and every figure on the site now comes from one of them. This is the net
+// under anything authored another way: an <img>, <video src> or <a href>
+// written straight into the markdown, so nothing can be left hotlinking
+// raw.githubusercontent.com however it got there.
 //
 // The markdown mirror under docs/ is deliberately untouched: GitHub renders it
 // with no build step, so its URLs have to stay absolute.
@@ -361,7 +362,7 @@ const jsonLd = JSON.stringify({
       identifier: {
         '@type': 'PropertyValue',
         propertyID: 'DOI',
-        value: '10.5281/zenodo.21215280',
+        value: doi,
       },
       datePublished,
       dateModified,
@@ -387,11 +388,7 @@ const jsonLd = JSON.stringify({
       // node states one consistent set instead of a partial one per document.
       creator: { '@id': authorId },
       maintainer: { '@id': authorId },
-      sameAs: [
-        'https://pypi.org/project/phonometry/',
-        'https://doi.org/10.5281/zenodo.21215280',
-        `${fullUrl}/`,
-      ],
+      sameAs: ['https://pypi.org/project/phonometry/', doiUrl, `${fullUrl}/`],
     },
     {
       '@type': 'SoftwareSourceCode',
@@ -456,6 +453,15 @@ export default defineConfig({
           errorOnRelativeLinks: false,
           errorOnFallbackPages: false,
         }),
+        // Full-viewport zoom for every figure. The technical plots carry ten
+        // curves and axis labels at the width of the reading column, which is
+        // 720 px at most, and the source SVGs are 1200 px and wider: the
+        // detail is in the file and the page was the only thing hiding it.
+        // Captions are off because this site's alt texts are deliberately
+        // long, sentence-length descriptions of what a plot shows, written
+        // for a reader who cannot see it; painted over the zoomed figure they
+        // would cover the very thing the reader zoomed in to look at.
+        starlightImageZoom({ showCaptions: false }),
       ],
       description: siteDescription,
       lastUpdated: true,
@@ -478,6 +484,9 @@ export default defineConfig({
         PageFrame: './src/components/PageFrame.astro',
         // Default header plus a mobile-visible language selector.
         Header: './src/components/Header.astro',
+        // Default right column plus the page actions, which hand this page's
+        // published markdown copy to a clipboard, a tab or a chat.
+        PageSidebar: './src/components/PageSidebar.astro',
         // Default article body plus the unified APA-7 references section
         // rendered from the typed frontmatter bibliography.
         MarkdownContent: './src/components/MarkdownContent.astro',
@@ -503,6 +512,7 @@ export default defineConfig({
         './src/styles/katex.css',
         './src/styles/containment.css',
         './src/styles/theme-images.css',
+        './src/styles/image-zoom.css',
         './src/styles/theme-tables.css',
         './src/styles/splash-menu.css',
         './src/styles/home.css',

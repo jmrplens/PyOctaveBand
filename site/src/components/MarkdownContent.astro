@@ -4,9 +4,18 @@
  * References render inside the slot so they inherit the .sl-markdown-content
  * typography and land at the very end of the article, after all authored
  * sections. The matching table-of-contents entry comes from src/routeData.ts.
+ *
+ * The image-zoom runtime (custom element, dialog template, icon symbols) is
+ * mounted here by hand. starlight-image-zoom normally installs it by
+ * overriding MarkdownContent itself, and it skips that override when the site
+ * already has one, which this site does; without this the zoom buttons would
+ * render with nothing to open them. ZoomI18n translates the dialog control on
+ * the Spanish pages.
  */
 import Default from '@astrojs/starlight/components/MarkdownContent.astro';
+import ImageZoom from 'starlight-image-zoom/components/ImageZoom.astro';
+import ZoomI18n from './ZoomI18n.astro';
 import References from './References.astro';
 ---
 
-<Default><slot /><References /></Default>
+<Default><ZoomI18n><ImageZoom /></ZoomI18n><slot /><References /></Default>

@@ -48,6 +48,8 @@ interface RouteData {
     data?: { title?: string; description?: string; references?: ReferenceEntry[] };
   };
   lastUpdated?: Date;
+  /** Set in src/routeData.ts; absent on the pages that publish no copy. */
+  markdownCopy?: string;
 }
 const route = (Astro.locals as { starlightRoute?: RouteData }).starlightRoute;
 const data = route?.entry?.data ?? {};
@@ -274,8 +276,13 @@ const jsonLd = graph.length
     merge deduplicates by property, which the frontmatter route goes through. */}
 {/* A clean markdown copy of this page sits beside it (postbuild step
     scripts/emit-page-markdown.mjs). Advertising it lets an agent fetch the
-    prose without parsing ~90% chrome out of the HTML. */}
-{!isHome && <link rel="alternate" type="text/markdown" href={`${pathname}index.md`} />}
+    prose without parsing ~90% chrome out of the HTML. The address comes from
+    src/routeData.ts, which knows which pages the generator wrote one for: it
+    is absent on the splash pages and on the 404, and on a page served as
+    fallback content it is the copy of the entry actually rendered here. */}
+{route?.markdownCopy && (
+  <link rel="alternate" type="text/markdown" href={route.markdownCopy} />
+)}
 <meta property="og:locale" content={lang === 'es' ? 'es_ES' : 'en_US'} />
 <meta property="og:locale:alternate" content={lang === 'es' ? 'en_US' : 'es_ES'} />
 {/* These are the document's only og:image and twitter:image. Starlight's

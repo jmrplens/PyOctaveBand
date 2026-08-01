@@ -1,0 +1,91 @@
+---
+/**
+ * Default Starlight right column plus the page actions above it.
+ *
+ * Placement was the only real decision here. The page header is already three
+ * deep under the H1 (byline, standards chips, and the H1 itself), and a fourth
+ * control there would compete with the one thing a reader came for. The footer
+ * is where nothing gets found. This column, on the other hand, is where a
+ * reader already looks for things *about* the page rather than things *in* it,
+ * it is outside the reading measure so it costs the prose no width, and it is
+ * the placement the docs sites that ship this control have converged on.
+ *
+ * Starlight renders this column twice: a dropdown at the top of the article on
+ * narrow viewports, and the sticky panel on wide ones. The actions go in both,
+ * but not inside the mobile disclosure, which is collapsed by default and would
+ * hide them. On a phone they sit in the flow underneath the sticky table of
+ * contents bar, so they scroll away with the article instead of permanently
+ * spending height from a viewport that has little of it.
+ *
+ * This whole block is behind Starlight's own `toc` test, exactly as the default
+ * is. That gate lines up with the one that matters here: the pages with no
+ * table of contents are the splash layouts, which carry no prose and get no
+ * markdown copy. Lining up is not the same as being the test, though, so
+ * PageActions asks its own question and renders nothing on a page whose
+ * markdown copy was never written.
+ */
+import MobileTableOfContents from 'virtual:starlight/components/MobileTableOfContents';
+import TableOfContents from 'virtual:starlight/components/TableOfContents';
+
+import PageActions from './PageActions.astro';
+---
+
+{
+  Astro.locals.starlightRoute.toc && (
+    <>
+      <div class="lg:sl-hidden">
+        <MobileTableOfContents />
+        <PageActions variant="mobile" />
+      </div>
+      <div class="right-sidebar-panel sl-hidden lg:sl-block">
+        <div class="sl-container">
+          <PageActions variant="sidebar" />
+          <TableOfContents />
+        </div>
+      </div>
+    </>
+  )
+}
+
+<style>
+  /* Verbatim from the Starlight default this replaces: the override has to
+     carry the panel's own layout with it, since scoped styles do not follow a
+     component that is no longer rendering. */
+  @layer starlight.core {
+    .right-sidebar-panel {
+      padding: 1rem var(--sl-sidebar-pad-x);
+    }
+    .sl-container {
+      width: calc(var(--sl-sidebar-width) - 2 * var(--sl-sidebar-pad-x));
+    }
+    .right-sidebar-panel :global(h2) {
+      color: var(--sl-color-white);
+      font-size: var(--sl-text-h5);
+      font-weight: 600;
+      line-height: var(--sl-line-height-headings);
+      margin-bottom: 0.5rem;
+    }
+    .right-sidebar-panel :global(:where(a)) {
+      display: block;
+      font-size: var(--sl-text-xs);
+      text-decoration: none;
+      color: var(--sl-color-gray-3);
+      overflow-wrap: anywhere;
+    }
+    .right-sidebar-panel :global(:where(a):hover) {
+      color: var(--sl-color-white);
+    }
+    @media (min-width: 72rem) {
+      .sl-container {
+        max-width: calc(
+          (
+              (
+                  100vw - var(--sl-sidebar-width) - 2 * var(--sl-content-pad-x) - 2 *
+                    var(--sl-sidebar-pad-x)
+                ) * 0.25 /* MAGIC NUMBER 🥲 */
+            )
+        );
+      }
+    }
+  }
+</style>

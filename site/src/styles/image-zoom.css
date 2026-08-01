@@ -1,0 +1,59 @@
+/* The figure itself is the zoom control.
+ *
+ * starlight-image-zoom ships two affordances: the image, which its own click
+ * handler already opens, and a 44 px round icon that appears over the top-left
+ * corner once it takes focus. The icon is redundant for a reader with a
+ * pointer, and on a page where every figure carries one it reads as clutter
+ * over the drawing, so it is removed here. What the icon also is, though, is
+ * the only way to reach the zoom from the keyboard, so the button stays: it is
+ * stretched over the whole figure, emptied of its icon, and taken out of hit
+ * testing. The mouse then talks to the image underneath exactly as before, and
+ * the button exists purely as the focusable, named control that Tab lands on
+ * and Enter or Space activates.
+ *
+ * Every selector is scoped to `starlight-image-zoom-zoomable`, because the
+ * plugin reuses `.starlight-image-zoom-control` for the close button inside
+ * the zoomed dialog, which is a real visible icon and has to stay one: it is
+ * the only affordance in the overlay that says how to get out, and on a phone
+ * it is the one a thumb can reach.
+ */
+
+starlight-image-zoom-zoomable > .starlight-image-zoom-control,
+/* The plugin visually hides the control until it is focused, with the classic
+   1 px clip. That was for an icon; a control that has nothing to show never
+   needs hiding, and clipping it to a pixel would collapse the focus ring with
+   it. The focused and unfocused states are therefore the same box. */
+starlight-image-zoom-zoomable > .starlight-image-zoom-control:not(:focus):not(:focus-within) {
+  position: absolute;
+  inset: 0;
+  clip: auto;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  overflow: visible;
+  background: none;
+  border: 0;
+  border-radius: 0;
+  /* No ring on the button: it spans the whole reading column, so the browser
+     default would draw a box wider than the figure, around nothing. The ring
+     is drawn on the image instead, by the rule at the bottom of this file. */
+  outline: none;
+  /* The image below is what the pointer interacts with. */
+  pointer-events: none;
+}
+
+/* Nothing left to draw. */
+starlight-image-zoom-zoomable > .starlight-image-zoom-control svg {
+  display: none;
+}
+
+/* The button spans the wrapper, which is the full reading column, while the
+   figure inside it is authored narrower (the `width:NN%` tiers). Outlining the
+   button would therefore draw a box wider than the figure, so the ring is put
+   on the image instead and lands exactly on what is about to open. */
+starlight-image-zoom-zoomable:has(> .starlight-image-zoom-control:focus-visible) > :is(img, svg),
+starlight-image-zoom-zoomable:has(> .starlight-image-zoom-control:focus-visible) > picture img {
+  outline: 2px solid var(--sl-color-text-accent);
+  outline-offset: 3px;
+}

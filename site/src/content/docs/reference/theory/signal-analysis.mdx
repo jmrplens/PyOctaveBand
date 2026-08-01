@@ -72,6 +72,8 @@ references:
     note: "The Monte Carlo propagation of distributions and its coverage-interval construction. The linked PDF is the free download."
 ---
 
+import ThemeImage from '../../../../components/ThemeImage.astro';
+
 This page collects the theory behind the measurement chain itself: the standardized fractional-octave bands and the time-domain filter banks that implement them, the frequency weighting curves, time integration, level, event and exposure metrics, sound intensity, and the GUM uncertainty framework that underpins every measured quantity. It is part of the [theory reference](/phonometry/reference/theory/).
 
 ## Octave Band Frequencies (ANSI S1.11 / IEC 61260)
@@ -239,7 +241,7 @@ To ensure **100% stability** across the entire audible spectrum (even at low
 frequencies like 16 Hz with high sample rates), phonometry employs two
 critical strategies:
 
-<img class="light-only" src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_bank_dataflow.svg" alt="Data flow inside one band of the filter bank: a band with room to decimate, meaning half the sample rate still clears 1.25 times its upper edge, takes the resample_poly branch down to fs over M so its poles stay clear of the unit circle, every band is then a cascade of second-order sections designed on the IEC 61260-1 band edges rather than one high-order transfer function, both branches end in the band level in dB, and sigbands=True additionally returns the band signal brought back to the input rate" style="width:92%" loading="lazy"><img class="dark-only" src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_bank_dataflow_dark.svg" alt="Data flow inside one band of the filter bank: a band with room to decimate, meaning half the sample rate still clears 1.25 times its upper edge, takes the resample_poly branch down to fs over M so its poles stay clear of the unit circle, every band is then a cascade of second-order sections designed on the IEC 61260-1 band edges rather than one high-order transfer function, both branches end in the band level in dB, and sigbands=True additionally returns the band signal brought back to the input rate" style="width:92%" loading="lazy">
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_bank_dataflow.svg" alt="Data flow inside one band of the filter bank: a band with room to decimate, meaning half the sample rate still clears 1.25 times its upper edge, takes the resample_poly branch down to fs over M so its poles stay clear of the unit circle, every band is then a cascade of second-order sections designed on the IEC 61260-1 band edges rather than one high-order transfer function, both branches end in the band level in dB, and sigbands=True additionally returns the band signal brought back to the input rate" width="92%" />
 
 1. **Second-Order Sections (SOS):** All filters are implemented as a series of
    cascaded biquads. This avoids the catastrophic numerical precision loss
@@ -272,7 +274,7 @@ transform. Because the bilinear transform compresses frequencies near Nyquist,
 the default `high_accuracy` mode designs and runs the filter at an internally
 oversampled rate (≥ 144 kHz); see [Frequency Weighting](/phonometry/guides/weighting/).
 
-<img class="light-only" src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/weighting_responses.svg" alt="A, C and Z frequency weighting curves of IEC 61672-1 with a zoom showing the positive region of the A curve (+1.27 dB at 2.5 kHz)" style="width:80%" loading="lazy"><img class="dark-only" src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/weighting_responses_dark.svg" alt="A, C and Z frequency weighting curves of IEC 61672-1 with a zoom showing the positive region of the A curve (+1.27 dB at 2.5 kHz)" style="width:80%" loading="lazy">
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/weighting_responses.svg" alt="A, C and Z frequency weighting curves of IEC 61672-1 with a zoom showing the positive region of the A curve (+1.27 dB at 2.5 kHz)" width="80%" />
 
 *The three IEC 61672-1 weighting curves realized by the library, with the small positive region of the A curve magnified. The special B, D and AU curves are charted in [Special Weightings](/phonometry/guides/special-weightings/).*
 
@@ -295,7 +297,7 @@ start from the first input energy, or pass a scalar/array with the previous
 mean-square output state. See [Why phonometry](/phonometry/reference/why-phonometry/) for the
 IEC 61672-1 tone-burst verification of this implementation.
 
-<img class="light-only" src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/time_weighting_analysis.svg" alt="Fast, Slow and Impulse time weighting responses to a noise burst" style="width:80%" loading="lazy"><img class="dark-only" src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/time_weighting_analysis_dark.svg" alt="Fast, Slow and Impulse time weighting responses to a noise burst" style="width:80%" loading="lazy">
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/time_weighting_analysis.svg" alt="Fast, Slow and Impulse time weighting responses to a noise burst" width="80%" />
 
 *The exponential integrator at the three standard time constants: Fast follows a burst, Slow smooths it and Impulse holds its peak.*
 
@@ -378,7 +380,7 @@ The **pressure-intensity index** $\delta_{pI} = L_p - L_I$ measures how reactive
 
 See the [Sound Intensity guide](/phonometry/guides/intensity/) for usage.
 
-<img class="light-only" src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/intensity_demo.svg" alt="Third-octave pressure and intensity levels for a plane progressive wave versus a standing wave" style="width:92%" loading="lazy"><img class="dark-only" src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/intensity_demo_dark.svg" alt="Third-octave pressure and intensity levels for a plane progressive wave versus a standing wave" style="width:92%" loading="lazy">
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/intensity_demo.svg" alt="Third-octave pressure and intensity levels for a plane progressive wave versus a standing wave" width="92%" />
 
 *The p-p estimator in the two limiting fields: the gap between $L_p$ and $L_I$ is the pressure-intensity index that flags reactive fields.*
 

@@ -9,6 +9,96 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- Every figure on the documentation site opens at the full viewport
+  (`starlight-image-zoom`). The reading column is 720 px at its widest and the
+  source drawings are 1200 px and more, so a 33-band third-octave filter bank
+  or a block diagram with labelled arrows arrived at the page already too
+  small to read: the detail was in the file and the layout was the only thing
+  hiding it. The figure itself is the control, with no icon painted over the
+  drawing; the pointer opens it by clicking anywhere on it, and the plugin's
+  floating button is kept, emptied and stretched over the whole figure so the
+  keyboard still has something to land on, name and press; its own focus ring
+  is suppressed and drawn on the image instead, since the button spans the
+  reading column and the figure inside it is narrower, so a ring on the button
+  would box in white space. The zoomed view is
+  a native `<dialog>`: Escape closes it, so does a click or tap anywhere, and
+  focus returns to the figure it came from. Nothing is fetched from a third
+  party and no script evaluates a string, which is what lets the page keep the
+  existing `script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval'` policy
+  untouched. The plugin hard-codes its two accessible names in English and
+  offers no translation hook, so the site supplies them:
+  `src/components/ZoomI18n.astro` rewrites the names the plugin's own
+  components render and asserts the English text it replaces is still there, so
+  a plugin upgrade fails the build instead of quietly shipping a Spanish page
+  with an English control. The plugin finds images by walking the markdown tree
+  and never sees the ones a component emits, so `ThemeImage.astro` wraps its
+  own pair; every figure on the site is authored through it, and the EN/ES
+  parity check now enforces that, since a figure written as markdown on a
+  Spanish page is the one route to a zoom control nothing translates. The check
+  looks for what opens a markdown image in any of its four forms, so a figure
+  written as a reference (`![alt][label]`) cannot slip past the way one written
+  inline would have; a sample of the markup inside a fence or inside backticks
+  is still just a sample. Each figure ships a light and a dark
+  variant and both get wrapped, so `theme-images.css` now hides the wrapper of
+  the off-theme half as well; without that the hidden variant left an empty
+  full-width box in the flow whose zoom button was still in the tab order and
+  opened on a zero-sized image. Captions are disabled: the alt texts here are
+  sentence-long descriptions written for a reader who cannot see the plot, and
+  painted over the zoomed figure they would cover the thing the reader zoomed
+  in to see.
+
+- Page actions in the right-hand column of every documentation page that has a
+  markdown copy: a split button that copies the page as markdown, with a menu
+  holding "Copy link to Markdown", "View as Markdown", handoffs to ChatGPT and
+  Claude and, under a rule of its own, "Copy citation". Every page written as a
+  file has published a clean markdown copy of itself at `<page>/index.md` since
+  the page-markdown generator landed, and has advertised it with
+  `<link rel="alternate">`, but only something parsing the document head could
+  find it; this is the first visible handle on it. Which pages those are is
+  decided in `src/routeData.ts` from the content collection rather than from
+  the address being viewed, and the whole control is withheld where the answer
+  is none, so no entry in it can offer a page that was never written. Written
+  as a site component rather than installed:
+  the two published Starlight plugins for this both declare Astro 5, one
+  translates nothing and requires a second markdown-emission package it cannot
+  be told to skip, and the other emits its own copy of every page through
+  `tidymd`, unconditionally, which on a site served from a base path doubles
+  that base in every internal link and leaves the MDX component tags standing
+  in the text. Either would have shipped a second, worse answer to "give me
+  this page as markdown" beside the one this site already gets right. The
+  control is a menu button in the ARIA sense, with `aria-haspopup`,
+  `aria-expanded`, arrow-key and Home/End movement between entries, Escape to
+  close and focus returned to the button, and it carries both locales. Opening
+  it from the keyboard, with Enter, Space or Down, lands on the first entry, and
+  Up lands on the last; the entries are out of the tab order, so a keyboard
+  reader left standing on the button would have an open menu and no way into it
+  that the page ever mentions. A press of the pointer leaves focus alone.
+  The first menu entry copies the address of the markdown copy rather than its
+  text: pasted into a model that can fetch it, one URL is sturdier and lighter
+  than tens of thousands of characters, and it is the same handle the ChatGPT
+  and Claude prompts already carry. The last one copies a BibTeX `@software`
+  entry, which is what the acousticians and researchers this library is for
+  write their bibliographies in. It is assembled during the build from
+  `CITATION.cff`, the root `VERSION` file and the dated changelog heading for
+  that version, so no author, DOI or release year is written down a second
+  time, and it cites the Zenodo concept DOI that the About page and the site's
+  structured data already publish, with the release pinned in a `version`
+  field. The About page publishes the same citation three times over in both
+  locales, as a bold DOI link, an APA reference and that BibTeX entry, and the
+  build now fails if any of the six ever disagrees with what it generates: the
+  DOI on both sides of the link, and the author, title, year, version and DOI
+  the APA reference repeats. Neither new entry fetches anything, and the
+  Content-Security-Policy is untouched. Both halves of the
+  split ship disabled and the script enables them once it has wired them up, so
+  a press that arrives before it, or without it, is refused rather than
+  swallowed; the one entry that is a plain navigation is a plain link in a
+  `<noscript>` in that case, rather than being unreachable behind a menu no
+  script can open.
+  It sits above the table of contents, which is where a reader already looks
+  for what is *about* a page rather than what is *in* it, and where it costs
+  the prose no width; on a phone it is a row under the table-of-contents bar,
+  in the flow, so it scrolls away instead of permanently spending height.
+
 - Heavy and soft impact sources (`building/heavy_impact.py`, ISO 16283-2:2020
   Annex A, ISO 10140-5:2010 Annex F, JIS A 1418-2:2019, ISO 717-2:2020
   Annex D): the rubber ball and the bang machine, the two standard sources for
@@ -909,6 +999,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Changed
 
+- The theory pages author their figures through `ThemeImage` like every other
+  page. Thirty-four figures across the six theory pages, in both languages,
+  were still two hand-written `<img>` tags on one line with the alt text typed
+  out twice, the dark URL spelled out by hand and no intrinsic size, which is
+  the markup that component was introduced to replace. They are now one tag
+  each, so the light and dark URLs cannot drift apart, the alt cannot differ
+  between the halves, and the browser reserves the right box before the bytes
+  arrive. The pages become `.mdx` to import the component; the only prose
+  touched is one `<` that markdown reads as a literal and MDX reads as the
+  start of a tag. The markdown mirror under `docs/` is unchanged: GitHub
+  renders it with no build step, so its figures stay hand-written pairs.
+
 - The landing page counts its own numbers. The guide, API-page, figure and
   fiche totals and the release version were typed into the page by hand, and
   every one of them had fallen behind: the page still said version 3.2.0 after
@@ -1424,6 +1526,44 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   carries the year its own designation states, and the Spanish page for
   programme loudness names the AES convention as it is published instead of
   translating it.
+
+### Fixed
+
+- The `<link rel="alternate" type="text/markdown">` in every page's head
+  pointed at a file that does not exist on 147 of them. It was written for
+  `<page>/index.md` on every page but the two splash pages, while the copies
+  are generated from the content collection, and 146 pages do not have an entry
+  of their own: the API reference is generated in English only, and Starlight
+  serves the whole of it under `/es/` as fallback content, so those routes
+  exist without a file behind them. The 404 page was the 147th, its entry being
+  synthesised by Starlight rather than read from the collection. The address
+  now comes from the entry actually being rendered, which on a fallback page is
+  the English text the reader has in front of them, and is withheld where the
+  generator wrote nothing.
+
+- The build published a markdown copy of the English landing page at
+  `/index/index.md`, a route no page occupies and nothing links to. The
+  generator and the page agree on which pages get a copy, but each worked out
+  the route it was talking about for itself, with the same expression Astro
+  uses (`/\/index$/`). That expression cannot match at the root of the content
+  collection, where the path is `index.mdx` with no directory in front of it,
+  so the generator called the landing page `index` and wrote it out while the
+  page itself, which Starlight gives the empty route, correctly offered
+  nothing. The rule now lives in one place and both sides import it, and the
+  file it used to write is gone; the Spanish landing page, whose id Astro does
+  normalise, was unaffected either way.
+
+- Eleven figures on seven Spanish guides were the English drawing. The pages
+  passed the English asset to `ThemeImage`, which derives only the dark
+  variant, so `bearing_fault_envelope.svg` and ten others rendered with
+  English axis labels, legends and annotations to a Spanish reader, in both
+  themes. Nothing had to be drawn: `generate_graphs.py` fans every figure out
+  over language and theme together, so all four variants of all eleven were
+  already sitting in `.github/images/` and the pages simply named the wrong
+  one. Affected: machine diagnostics, porous absorbers (two), junction
+  transmission, resilient layers (two), panel sound insulation (two),
+  detailed prediction and CNOSSOS road emission (two). The Spanish tree now
+  references no English asset at all.
 
 ## [3.3.0] - 2026-07-27
 
