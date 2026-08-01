@@ -517,6 +517,7 @@ export default defineConfig({
         './src/styles/katex.css',
         './src/styles/containment.css',
         './src/styles/theme-images.css',
+        './src/styles/image-zoom.css',
         './src/styles/theme-tables.css',
         './src/styles/splash-menu.css',
         './src/styles/home.css',
