@@ -39,14 +39,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   painted over the zoomed figure they would cover the thing the reader zoomed
   in to see.
 
-- Page actions in the right-hand column of every documentation page: a split
-  button that copies the page as markdown, with a menu holding "Copy link to
-  Markdown", "View as Markdown", handoffs to ChatGPT and Claude and, under a
-  rule of its own, "Copy citation". Each page has published a
-  clean markdown copy of itself at `<page>/index.md` since the page-markdown
-  generator landed, and has advertised it with `<link rel="alternate">`, but
-  only something parsing the document head could find it; this is the first
-  visible handle on it. Written as a site component rather than installed:
+- Page actions in the right-hand column of every documentation page that has a
+  markdown copy: a split button that copies the page as markdown, with a menu
+  holding "Copy link to Markdown", "View as Markdown", handoffs to ChatGPT and
+  Claude and, under a rule of its own, "Copy citation". Every page written as a
+  file has published a clean markdown copy of itself at `<page>/index.md` since
+  the page-markdown generator landed, and has advertised it with
+  `<link rel="alternate">`, but only something parsing the document head could
+  find it; this is the first visible handle on it. Which pages those are is
+  decided in `src/routeData.ts` from the content collection rather than from
+  the address being viewed, and the whole control is withheld where the answer
+  is none, so no entry in it can offer a page that was never written. Written
+  as a site component rather than installed:
   the two published Starlight plugins for this both declare Astro 5, one
   translates nothing and requires a second markdown-emission package it cannot
   be told to skip, and the other emits its own copy of every page through
@@ -69,7 +73,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   structured data already publish, with the release pinned in a `version`
   field. The About page prints that same entry in prose in both locales, so
   the build now fails if the two ever disagree. Neither new entry fetches
-  anything, and the Content-Security-Policy is untouched.
+  anything, and the Content-Security-Policy is untouched. Both halves of the
+  split ship disabled and the script enables them once it has wired them up, so
+  a press that arrives before it, or without it, is refused rather than
+  swallowed; the one entry that is a plain navigation is a plain link in a
+  `<noscript>` in that case, rather than being unreachable behind a menu no
+  script can open.
   It sits above the table of contents, which is where a reader already looks
   for what is *about* a page rather than what is *in* it, and where it costs
   the prose no width; on a phone it is a row under the table-of-contents bar,
@@ -1504,6 +1513,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   translating it.
 
 ### Fixed
+
+- The `<link rel="alternate" type="text/markdown">` in every page's head
+  pointed at a file that does not exist on 147 of them. It was written for
+  `<page>/index.md` on every page but the two splash pages, while the copies
+  are generated from the content collection, and 146 pages do not have an entry
+  of their own: the API reference is generated in English only, and Starlight
+  serves the whole of it under `/es/` as fallback content, so those routes
+  exist without a file behind them. The 404 page was the 147th, its entry being
+  synthesised by Starlight rather than read from the collection. The address
+  now comes from the entry actually being rendered, which on a fallback page is
+  the English text the reader has in front of them, and is withheld where the
+  generator wrote nothing.
 
 - Eleven figures on seven Spanish guides were the English drawing. The pages
   passed the English asset to `ThemeImage`, which derives only the dark

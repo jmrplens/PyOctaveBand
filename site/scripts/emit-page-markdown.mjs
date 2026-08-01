@@ -17,6 +17,7 @@ import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join, relative } from "node:path";
 import { fileURLToPath } from "node:url";
 import { glob } from "node:fs/promises";
+import { hasMarkdownCopy } from "../src/lib/page-markdown.mjs";
 
 const here = dirname(fileURLToPath(import.meta.url));
 const siteRoot = join(here, "..");
@@ -119,8 +120,9 @@ for await (const file of glob("**/*.{md,mdx}", { cwd: contentDir })) {
   const abs = join(contentDir, file);
   const route = routeOf(abs);
   // The two splash pages are a component layout, not prose; there is no
-  // meaningful markdown to serve for them.
-  if (route === "" || route === "es") continue;
+  // meaningful markdown to serve for them. The same test decides what the page
+  // itself advertises (src/lib/page-markdown.mjs).
+  if (!hasMarkdownCopy(route)) continue;
 
   const stem = file.replace(/\\/g, "/").split("/").pop().replace(/\.mdx?$/, "");
   const isSpanish = route === "es" || route.startsWith("es/");

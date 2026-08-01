@@ -2,13 +2,19 @@
 /**
  * Page actions: hand this page to something that reads text.
  *
- * Every page already publishes a clean markdown copy of itself at
+ * Every page written as a file publishes a clean markdown copy of itself at
  * `<page>/index.md` (scripts/emit-page-markdown.mjs) and advertises it in the
  * head with `<link rel="alternate" type="text/markdown">`. That is the right
  * artifact for an agent, a reader pasting a page into a chat, or anyone who
  * wants the prose without ~90% chrome around it, and until now nothing on the
  * page said it existed: only a machine parsing the head could find it. This is
  * the visible handle on it.
+ *
+ * Which page has a copy, and where, is decided in src/routeData.ts from the
+ * content collection rather than from the address being viewed: a route served
+ * as fallback content has no file of its own, and gets the copy of the entry it
+ * is actually rendering. Everything here is behind that address, so no entry in
+ * this control can point at a page that was never written.
  *
  * Written here rather than installed. The two published Starlight plugins for
  * this both fail on this site: one declares `astro ^5` and drags in a second
@@ -38,21 +44,17 @@
  */
 import { bibtex } from '../data/citation.mjs';
 
-const { lang: routeLang } = Astro.locals.starlightRoute;
+// The address of this page's markdown copy, or undefined where the generator
+// wrote none: the two splash pages, which are a component layout rather than
+// prose, and the synthesised 404. Head.astro withholds the `rel="alternate"`
+// link on exactly this test, and the whole control is withheld below.
+const { lang: routeLang, markdownCopy: markdownUrl } = Astro.locals.starlightRoute as {
+  lang: string;
+  markdownCopy?: string;
+};
 const isEs = routeLang.startsWith('es');
 
-const BASE = (import.meta.env.BASE_URL ?? '/').replace(/\/$/, '');
-const pathname = Astro.url.pathname;
-const rel = pathname.startsWith(BASE) ? pathname.slice(BASE.length) : pathname;
-
-// The two splash pages are a component layout, not prose, and
-// emit-page-markdown.mjs skips them, so there is nothing to point at. Head.astro
-// withholds the `rel="alternate"` link on exactly this test.
-const isHome = rel === '/' || rel === '' || rel === '/es/' || rel === '/es';
-
-const markdownUrl = `${pathname}index.md`;
-const pageUrl = Astro.url.href;
-const markdownHref = new URL(markdownUrl, pageUrl).href;
+const markdownHref = markdownUrl ? new URL(markdownUrl, Astro.url.href).href : '';
 
 /**
  * Translations inline, the same way PageTitle.astro and PageChips.astro carry
@@ -103,15 +105,22 @@ const menuId = `page-actions-menu-${variant}`;
 ---
 
 {
-  !isHome && (
+  markdownUrl && (
     <div
       class="page-actions"
       data-markdown={markdownUrl}
       data-copied={t.copied}
       data-failed={t.failed}
     >
+      {/*
+        Both halves ship disabled and the script below enables them once it has
+        wired them up. Everything they do needs it: the clipboard for the two
+        that copy, and opening the popup for the one that opens it. A control
+        that cannot act should say so rather than absorb the press, and with no
+        script at all the state is simply never lifted.
+      */}
       <div class="page-actions-split">
-        <button type="button" class="page-action-copy" data-copy>
+        <button type="button" class="page-action-copy" disabled data-copy>
           <svg aria-hidden="true" viewBox="0 0 24 24" width="14" height="14">
             <path
               d="M8 8h12v12H8z M4 16H3a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v1"
@@ -131,6 +140,7 @@ const menuId = `page-actions-menu-${variant}`;
           aria-expanded="false"
           aria-controls={menuId}
           aria-label={t.more}
+          disabled
           data-toggle
         >
           <svg aria-hidden="true" viewBox="0 0 24 24" width="14" height="14">
@@ -189,6 +199,18 @@ const menuId = `page-actions-menu-${variant}`;
           <span data-copy-label>{t.cite}</span>
         </button>
       </div>
+      {/*
+        One of the five entries is a plain navigation and needs nothing from
+        the browser but a link, so with the popup shut for want of a script it
+        is offered here instead of being unreachable. The other four cannot be:
+        three of them copy, and the two handoffs carry the same address as this
+        one anyway.
+      */}
+      <noscript>
+        <a class="page-action-plain" href={markdownUrl}>
+          {t.view}
+        </a>
+      </noscript>
     </div>
   )
 }
@@ -235,9 +257,16 @@ const menuId = `page-actions-menu-${variant}`;
     flex: 0 0 auto;
   }
 
-  .page-actions-split button:hover {
+  .page-actions-split button:hover:not(:disabled) {
     color: var(--sl-color-white);
     border-color: var(--sl-color-gray-4);
+  }
+
+  /* Only the pointer is told: the colours stay as they are, because a control
+     that is unavailable for the few milliseconds before its script runs must
+     not flash a second appearance at every reader. */
+  .page-actions-split button:disabled {
+    cursor: default;
   }
 
   .page-actions-split button:focus-visible {
@@ -246,6 +275,15 @@ const menuId = `page-actions-menu-${variant}`;
     /* So the ring is not clipped by the neighbour's border. */
     position: relative;
     z-index: 1;
+  }
+
+  /* The no-script way through to the markdown copy. Styled as the plain link
+     it is, since the split button above it is inert in that case. */
+  .page-action-plain {
+    display: inline-block;
+    margin-top: 0.35rem;
+    color: var(--sl-color-text-accent);
+    font-size: var(--sl-text-xs);
   }
 
   .page-action-more[aria-expanded='true'] svg {
@@ -459,5 +497,11 @@ const menuId = `page-actions-menu-${variant}`;
     for (const entry of menu.querySelectorAll<HTMLElement>('[data-copy-text]')) {
       entry.addEventListener('click', () => toClipboard(entry, () => entry.dataset.copyText!));
     }
+
+    // Everything is listening now, so the two halves can be pressed. They ship
+    // disabled: without this script neither of them can do anything, and the
+    // markup says so rather than looking ready and swallowing the press.
+    copy.disabled = false;
+    toggle.disabled = false;
   }
 </script>

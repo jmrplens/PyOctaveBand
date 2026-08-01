@@ -18,11 +18,11 @@
  * spending height from a viewport that has little of it.
  *
  * This whole block is behind Starlight's own `toc` test, exactly as the default
- * is. That is the right gate rather than a coincidence: the pages without a
- * table of contents are the two splash pages, which are a component layout with
- * no prose, and are also the two pages emit-page-markdown.mjs publishes no
- * markdown copy for. PageActions makes the same check itself, so it stays
- * correct if Starlight's ever stops lining up with it.
+ * is. That gate lines up with the one that matters here: the pages with no
+ * table of contents are the splash layouts, which carry no prose and get no
+ * markdown copy. Lining up is not the same as being the test, though, so
+ * PageActions asks its own question and renders nothing on a page whose
+ * markdown copy was never written.
  */
 import MobileTableOfContents from 'virtual:starlight/components/MobileTableOfContents';
 import TableOfContents from 'virtual:starlight/components/TableOfContents';
