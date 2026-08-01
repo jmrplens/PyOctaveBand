@@ -73,7 +73,7 @@ function pagesUnder(dir, what, { skipDirs = [] } = {}) {
   for (const entry of listing(dir, what)) {
     if (entry.isDirectory()) {
       if (!skipDirs.includes(entry.name)) {
-        count += pagesUnder(join(dir, entry.name), what);
+        count += pagesUnder(join(dir, entry.name), what, { skipDirs });
       }
     } else if (/\.mdx?$/.test(entry.name) && !/^index\.mdx?$/.test(entry.name)) {
       count += 1;
