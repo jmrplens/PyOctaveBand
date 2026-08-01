@@ -65,9 +65,18 @@ if (missingEs.length || orphanEs.length) {
 const figures = [];
 for (const page of esPages) {
 	const source = readFileSync(join(esDir, page), "utf8")
-		// Fenced blocks are samples of markup, not markup.
-		.replace(/^```[\s\S]*?^```/gm, "");
-	if (/!\[[^\]]*\]\(/.test(source) || /<img\b/.test(source)) {
+		// Fenced blocks and inline code are samples of markup, not markup.
+		.replace(/^```[\s\S]*?^```/gm, "")
+		.replace(/`[^`\n]*`/g, "");
+	// Every markdown image opens with the same two characters, whatever comes
+	// after them: the inline `![alt](src)`, the two reference forms
+	// `![alt][label]` and `![alt][]`, and the shortcut `![label]` whose target
+	// is a link definition somewhere else in the file. Only the inline form
+	// used to be looked for, so a figure written as a reference walked past
+	// this check and shipped the English zoom control anyway. Matching what
+	// opens all four is both shorter and complete, and Spanish prose has no
+	// other use for the sequence once code has been taken out above.
+	if (source.includes("![") || /<img\b/.test(source)) {
 		figures.push(page);
 	}
 }
