@@ -155,6 +155,7 @@ reports:
 	[ -n "$$(ls -A "$$tmp")" ] || { echo "no fiche was generated" >&2; exit 1; }; \
 	mv .github/reports "$$old"/current; \
 	mv "$$tmp" .github/reports; \
+	mv "$$old"/current "$$old"/replaced; \
 	rm -rf "$$old"
 
 # Regenerate the committed, versioned numerical conformance report, then bring
