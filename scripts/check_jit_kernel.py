@@ -25,11 +25,6 @@ import importlib.util
 import os
 import sys
 
-import numpy as np
-
-from phonometry.metrology import parametric_filters as pf
-from phonometry.metrology.parametric_filters import time_weighting
-
 
 def main() -> int:
     if importlib.util.find_spec("numba") is None:
@@ -44,6 +39,14 @@ def main() -> int:
             "suite would run the interpreted kernel"
         )
         return 1
+
+    # Imported here, not at module level, so the two environment failures above
+    # report themselves rather than dying in an import when the very thing they
+    # diagnose is what broke the environment.
+    import numpy as np
+
+    from phonometry.metrology import parametric_filters as pf
+    from phonometry.metrology.parametric_filters import time_weighting
 
     rng = np.random.default_rng(0)
     # Both shapes the library reaches the kernel with: a single channel (scalar
