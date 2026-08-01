@@ -1,0 +1,382 @@
+---
+/**
+ * Page actions: hand this page to something that reads text.
+ *
+ * Every page already publishes a clean markdown copy of itself at
+ * `<page>/index.md` (scripts/emit-page-markdown.mjs) and advertises it in the
+ * head with `<link rel="alternate" type="text/markdown">`. That is the right
+ * artifact for an agent, a reader pasting a page into a chat, or anyone who
+ * wants the prose without ~90% chrome around it, and until now nothing on the
+ * page said it existed: only a machine parsing the head could find it. This is
+ * the visible handle on it.
+ *
+ * Written here rather than installed. The two published Starlight plugins for
+ * this both fail on this site: one declares `astro ^5` and drags in a second
+ * markdown-emission pipeline it cannot be told to skip, and translates
+ * nothing; the other emits its own copy of every page through `tidymd`,
+ * unconditionally, which on a based site doubles the base path in every
+ * internal link and leaves the MDX component tags in the text. Both would have
+ * meant shipping a second, worse answer to "give me this page as markdown"
+ * beside the one this site already gets right.
+ *
+ * A split button: the left half copies, the right half opens the rest. That is
+ * the shape both of those plugins settled on and the one readers recognise, so
+ * the common action costs one press and the others are one press away.
+ *
+ * Behaviour lives in the module script at the bottom, bundled by Astro and
+ * served from this origin, so the existing Content-Security-Policy is
+ * unchanged: the only network call is a `fetch` of this site's own index.md,
+ * which `connect-src 'self'` already allows.
+ */
+const { lang: routeLang } = Astro.locals.starlightRoute;
+const isEs = routeLang.startsWith('es');
+
+const BASE = (import.meta.env.BASE_URL ?? '/').replace(/\/$/, '');
+const pathname = Astro.url.pathname;
+const rel = pathname.startsWith(BASE) ? pathname.slice(BASE.length) : pathname;
+
+// The two splash pages are a component layout, not prose, and
+// emit-page-markdown.mjs skips them, so there is nothing to point at. Head.astro
+// withholds the `rel="alternate"` link on exactly this test.
+const isHome = rel === '/' || rel === '' || rel === '/es/' || rel === '/es';
+
+const markdownUrl = `${pathname}index.md`;
+const pageUrl = Astro.url.href;
+
+/**
+ * Translations inline, the same way PageTitle.astro and PageChips.astro carry
+ * theirs. Starlight's `injectTranslations` is for plugins shipping their own
+ * UI strings; a site component reads its own two locales directly.
+ */
+const t = isEs
+  ? {
+      copy: 'Copiar página',
+      copied: 'Copiado',
+      failed: 'No se pudo copiar',
+      more: 'Más acciones para esta página',
+      view: 'Ver como Markdown',
+      chatgpt: 'Abrir en ChatGPT',
+      claude: 'Abrir en Claude',
+      // The prompt travels in a query string to a third party, so it names the
+      // markdown copy rather than the page: that is the version worth reading.
+      prompt: `Lee ${new URL(markdownUrl, pageUrl).href} y responde preguntas sobre esta página.`,
+    }
+  : {
+      copy: 'Copy page',
+      copied: 'Copied',
+      failed: 'Copy failed',
+      more: 'More actions for this page',
+      view: 'View as Markdown',
+      chatgpt: 'Open in ChatGPT',
+      claude: 'Open in Claude',
+      prompt: `Read ${new URL(markdownUrl, pageUrl).href} so I can ask questions about it.`,
+    };
+
+const q = encodeURIComponent(t.prompt);
+
+/**
+ * Starlight renders the right column twice, once for each breakpoint, and only
+ * one of the two is ever displayed. Both copies are in the document all the
+ * same, so the popup needs an id per instance: `aria-controls` has to resolve
+ * to one element, and a duplicated id is a validation error besides.
+ */
+interface Props {
+  variant: 'mobile' | 'sidebar';
+}
+const { variant } = Astro.props;
+const menuId = `page-actions-menu-${variant}`;
+---
+
+{
+  !isHome && (
+    <div class="page-actions" data-markdown={markdownUrl}>
+      <div class="page-actions-split">
+        <button
+          type="button"
+          class="page-action-copy"
+          data-copy
+          data-copied={t.copied}
+          data-failed={t.failed}
+        >
+          <svg aria-hidden="true" viewBox="0 0 24 24" width="14" height="14">
+            <path
+              d="M8 8h12v12H8z M4 16H3a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v1"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+          </svg>
+          <span data-copy-label>{t.copy}</span>
+        </button>
+        <button
+          type="button"
+          class="page-action-more"
+          aria-haspopup="true"
+          aria-expanded="false"
+          aria-controls={menuId}
+          aria-label={t.more}
+          data-toggle
+        >
+          <svg aria-hidden="true" viewBox="0 0 24 24" width="14" height="14">
+            <path
+              d="m6 9 6 6 6-6"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+          </svg>
+        </button>
+      </div>
+      <div class="page-actions-menu" id={menuId} role="menu" hidden>
+        <a role="menuitem" tabindex="-1" href={markdownUrl}>
+          {t.view}
+        </a>
+        <a
+          role="menuitem"
+          tabindex="-1"
+          href={`https://chatgpt.com/?q=${q}`}
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          {t.chatgpt}
+        </a>
+        <a
+          role="menuitem"
+          tabindex="-1"
+          href={`https://claude.ai/new?q=${q}`}
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          {t.claude}
+        </a>
+      </div>
+    </div>
+  )
+}
+
+<style>
+  .page-actions {
+    position: relative;
+    margin-bottom: 1rem;
+  }
+
+  .page-actions-split {
+    display: flex;
+    width: 100%;
+  }
+
+  .page-actions-split button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+    min-height: 2rem;
+    padding: 0.25rem 0.5rem;
+    background: var(--sl-color-bg);
+    color: var(--sl-color-gray-2);
+    border: 1px solid var(--sl-color-gray-5);
+    font: inherit;
+    font-size: var(--sl-text-xs);
+    line-height: 1.4;
+    cursor: pointer;
+  }
+
+  .page-action-copy {
+    flex: 1;
+    border-radius: 0.25rem 0 0 0.25rem;
+    border-inline-end-width: 0;
+    /* The label swaps to "Copied" / "Copy failed", which are wider in Spanish;
+       the button must not resize under the reader's cursor. */
+    white-space: nowrap;
+    overflow: hidden;
+  }
+
+  .page-action-more {
+    border-radius: 0 0.25rem 0.25rem 0;
+    flex: 0 0 auto;
+  }
+
+  .page-actions-split button:hover {
+    color: var(--sl-color-white);
+    border-color: var(--sl-color-gray-4);
+  }
+
+  .page-actions-split button:focus-visible {
+    outline: 2px solid var(--sl-color-text-accent);
+    outline-offset: 2px;
+    /* So the ring is not clipped by the neighbour's border. */
+    position: relative;
+    z-index: 1;
+  }
+
+  .page-action-more[aria-expanded='true'] svg {
+    transform: rotate(180deg);
+  }
+
+  .page-actions-menu {
+    position: absolute;
+    z-index: 10;
+    inset-inline: 0;
+    margin-top: 0.25rem;
+    padding: 0.25rem;
+    background: var(--sl-color-bg-nav);
+    border: 1px solid var(--sl-color-gray-5);
+    border-radius: 0.25rem;
+    box-shadow: var(--sl-shadow-md);
+  }
+
+  .page-actions-menu[hidden] {
+    display: none;
+  }
+
+  /* Beats the right-sidebar panel rule that styles every anchor in it as a
+     table-of-contents line. */
+  .page-actions-menu a:where(a) {
+    display: block;
+    padding: 0.35rem 0.5rem;
+    border-radius: 0.25rem;
+    color: var(--sl-color-gray-2);
+    font-size: var(--sl-text-xs);
+    line-height: 1.4;
+    text-decoration: none;
+  }
+
+  .page-actions-menu a:hover,
+  .page-actions-menu a:focus-visible {
+    background: var(--sl-color-gray-6);
+    color: var(--sl-color-white);
+  }
+
+  .page-actions-menu a:focus-visible {
+    outline: 2px solid var(--sl-color-text-accent);
+    outline-offset: -2px;
+  }
+
+  /* Under the sticky mobile table of contents the actions are a single row in
+     the flow, so they scroll away with the article instead of eating height
+     from a viewport that has little to spare. */
+  @media (max-width: 71.9375rem) {
+    .page-actions {
+      margin: 0.75rem var(--sl-content-pad-x) 0;
+    }
+    /* Sized to its text rather than stretched across the article: at the top
+       of every page a full-width bar reads as a banner, not as a tool. */
+    .page-actions-split {
+      width: fit-content;
+    }
+    .page-action-copy {
+      flex: 0 0 auto;
+    }
+    .page-actions-menu {
+      inset-inline: auto 0;
+      min-width: 12rem;
+    }
+  }
+</style>
+
+<script>
+  const COPIED_MS = 2000;
+
+  for (const root of document.querySelectorAll<HTMLElement>('.page-actions')) {
+    const toggle = root.querySelector<HTMLButtonElement>('[data-toggle]');
+    const menu = root.querySelector<HTMLElement>('[role="menu"]');
+    const copy = root.querySelector<HTMLButtonElement>('[data-copy]');
+    const label = root.querySelector<HTMLElement>('[data-copy-label]');
+    if (!toggle || !menu || !copy || !label) continue;
+
+    const items = () => [...menu.querySelectorAll<HTMLElement>('[role="menuitem"]')];
+
+    const open = (focusIndex?: number) => {
+      menu.hidden = false;
+      toggle.setAttribute('aria-expanded', 'true');
+      if (focusIndex !== undefined) items()[focusIndex]?.focus();
+    };
+
+    const close = (returnFocus = true) => {
+      if (menu.hidden) return;
+      menu.hidden = true;
+      toggle.setAttribute('aria-expanded', 'false');
+      if (returnFocus) toggle.focus();
+    };
+
+    toggle.addEventListener('click', () => {
+      if (menu.hidden) open();
+      else close();
+    });
+
+    // Down and Up open the menu onto its first or last entry, the standard
+    // keyboard entry points for a button that owns a popup.
+    toggle.addEventListener('keydown', (event) => {
+      if (event.key === 'ArrowDown') {
+        event.preventDefault();
+        open(0);
+      } else if (event.key === 'ArrowUp') {
+        event.preventDefault();
+        open(items().length - 1);
+      }
+    });
+
+    // Roving focus inside the popup: the entries are out of the tab order
+    // (`tabindex="-1"`) and are reached with the arrow keys, so Tab still steps
+    // past the whole control rather than through every entry.
+    menu.addEventListener('keydown', (event) => {
+      const all = items();
+      const at = all.indexOf(document.activeElement as HTMLElement);
+      if (event.key === 'ArrowDown') {
+        event.preventDefault();
+        all[(at + 1) % all.length]?.focus();
+      } else if (event.key === 'ArrowUp') {
+        event.preventDefault();
+        all[(at - 1 + all.length) % all.length]?.focus();
+      } else if (event.key === 'Home') {
+        event.preventDefault();
+        all[0]?.focus();
+      } else if (event.key === 'End') {
+        event.preventDefault();
+        all.at(-1)?.focus();
+      } else if (event.key === 'Tab') {
+        // Tab leaves the popup, so the popup should not stay open behind it.
+        close(false);
+      }
+    });
+
+    // Escape from anywhere in the control, and a click that lands outside it.
+    root.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape' && !menu.hidden) {
+        event.stopPropagation();
+        close();
+      }
+    });
+    document.addEventListener('click', (event) => {
+      if (!root.contains(event.target as Node)) close(false);
+    });
+    menu.addEventListener('click', () => close(false));
+
+    copy.addEventListener('click', async () => {
+      const url = root.dataset.markdown;
+      const original = label.textContent ?? '';
+      const done = (text: string) => {
+        label.textContent = text;
+        setTimeout(() => {
+          label.textContent = original;
+        }, COPIED_MS);
+      };
+      try {
+        copy.disabled = true;
+        const response = await fetch(url!);
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        await navigator.clipboard.writeText(await response.text());
+        done(copy.dataset.copied!);
+      } catch (error) {
+        console.error('[page-actions] could not copy the markdown copy:', error);
+        done(copy.dataset.failed!);
+      } finally {
+        copy.disabled = false;
+      }
+    });
+  }
+</script>

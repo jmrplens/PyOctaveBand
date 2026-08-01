@@ -492,6 +492,9 @@ export default defineConfig({
         PageFrame: './src/components/PageFrame.astro',
         // Default header plus a mobile-visible language selector.
         Header: './src/components/Header.astro',
+        // Default right column plus the page actions, which hand this page's
+        // published markdown copy to a clipboard, a tab or a chat.
+        PageSidebar: './src/components/PageSidebar.astro',
         // Default article body plus the unified APA-7 references section
         // rendered from the typed frontmatter bibliography.
         MarkdownContent: './src/components/MarkdownContent.astro',
