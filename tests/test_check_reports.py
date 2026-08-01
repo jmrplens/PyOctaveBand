@@ -83,7 +83,8 @@ def test_restyled_fill_fails() -> None:
     old = _page()
     new = _page(fill=(255, 231, 210))
     problem = raster_problem(_encode(old), _encode(new), cr.RASTER_TOL)
-    assert problem is not None and "RMS" in problem
+    assert problem is not None
+    assert "RMS" in problem
 
 
 def test_moved_line_fails() -> None:
@@ -93,13 +94,15 @@ def test_moved_line_fails() -> None:
     new[640:644, 150:900, :3] = 255
     new[660:664, 150:900, :3] = 40
     problem = raster_problem(_encode(old), _encode(new), cr.RASTER_TOL)
-    assert problem is not None and "pixels changed" in problem
+    assert problem is not None
+    assert "pixels changed" in problem
 
 
 def test_resized_preview_fails() -> None:
     old = _page()
     problem = raster_problem(_encode(old), _encode(old[:-1]), cr.RASTER_TOL)
-    assert problem is not None and "dimensions changed" in problem
+    assert problem is not None
+    assert "dimensions changed" in problem
 
 
 # The PDF half of the gate reads its pages through pypdfium2. Without it,
@@ -141,4 +144,5 @@ def test_changed_rating_fails() -> None:
 def test_unreadable_fiche_fails() -> None:
     """A truncated or corrupt PDF is a failure, not a traceback."""
     problem = cr.pdf_problem(_fiche_pdf("Rw = 34 dB"), b"not a pdf at all")
-    assert problem is not None and "could not extract text" in problem
+    assert problem is not None
+    assert "could not extract text" in problem
