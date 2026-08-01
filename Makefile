@@ -149,11 +149,13 @@ lighthouse:
 reports:
 	set -e; \
 	tmp=$$(mktemp -d .github/reports.tmp.XXXXXX); \
-	trap 'rm -rf "$$tmp"' EXIT INT TERM HUP; \
+	old=$$(mktemp -d .github/reports.old.XXXXXX); \
+	trap 'if [ -d "$$old"/current ]; then rm -rf .github/reports; mv "$$old"/current .github/reports; fi; rm -rf "$$tmp" "$$old"' EXIT INT TERM HUP; \
 	$(FIGURE_ENV) $(PYTHON) scripts/generate_reports.py --output-dir "$$tmp"; \
 	[ -n "$$(ls -A "$$tmp")" ] || { echo "no fiche was generated" >&2; exit 1; }; \
-	find .github/reports -maxdepth 1 -type f \( -name '*.pdf' -o -name '*.webp' \) -delete; \
-	mv "$$tmp"/* .github/reports/
+	mv .github/reports "$$old"/current; \
+	mv "$$tmp" .github/reports; \
+	rm -rf "$$old"
 
 # Regenerate the committed, versioned numerical conformance report, then bring
 # every count quoted from it into line. The --file-header flag prepends the

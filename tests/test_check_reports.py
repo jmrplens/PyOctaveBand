@@ -11,6 +11,7 @@ than trusting the thresholds by inspection.
 
 from __future__ import annotations
 
+import importlib.util
 import pathlib
 import sys
 
@@ -18,11 +19,6 @@ import numpy as np
 import pytest
 
 pytest.importorskip("PIL")
-# The PDF half of the gate reads its pages through pypdfium2. Without it,
-# ``pdf_problem`` reports an extraction failure for every input, which is a
-# legitimate answer for a corrupt fiche but turns the text-comparison tests
-# into failures rather than skips.
-pytest.importorskip("pypdfium2")
 from PIL import Image
 
 _SCRIPTS = str(pathlib.Path(__file__).resolve().parent.parent / "scripts")
@@ -106,6 +102,17 @@ def test_resized_preview_fails() -> None:
     assert problem is not None and "dimensions changed" in problem
 
 
+# The PDF half of the gate reads its pages through pypdfium2. Without it,
+# ``pdf_problem`` reports an extraction failure for every input, which is a
+# legitimate answer for a corrupt fiche but turns the text comparisons into
+# failures rather than skips. The raster tests above need none of it, so the
+# skip sits here rather than at module level.
+needs_pdf_engine = pytest.mark.skipif(
+    importlib.util.find_spec("pypdfium2") is None,
+    reason="pypdfium2 is not installed",
+)
+
+
 def _fiche_pdf(text: str) -> bytes:
     """A one-page PDF carrying ``text``, standing in for a rendered fiche."""
     import io
@@ -118,16 +125,19 @@ def _fiche_pdf(text: str) -> bytes:
     return buffer.getvalue()
 
 
+@needs_pdf_engine
 def test_unchanged_text_matches() -> None:
     assert cr.pdf_problem(_fiche_pdf("Rw = 34 dB"), _fiche_pdf("Rw = 34 dB")) is None
 
 
+@needs_pdf_engine
 def test_changed_rating_fails() -> None:
     """The value a reader quotes off the fiche moved: always a failure."""
     problem = cr.pdf_problem(_fiche_pdf("Rw = 34 dB"), _fiche_pdf("Rw = 35 dB"))
     assert problem == "text of page 1 changed"
 
 
+@needs_pdf_engine
 def test_unreadable_fiche_fails() -> None:
     """A truncated or corrupt PDF is a failure, not a traceback."""
     problem = cr.pdf_problem(_fiche_pdf("Rw = 34 dB"), b"not a pdf at all")
