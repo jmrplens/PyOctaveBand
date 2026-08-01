@@ -902,7 +902,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   preview on the same run instead of regenerating the full set twice, the
   conformance checks compute once per test process through a memoized
   registry, the expensive FDTD, elastic-wave and ECMA reference fixtures are
-  computed once and shared across xdist workers via load groups, and the
+  computed once on a single worker because their tests now share load groups
+  instead of scattering and rebuilding the fixture on each one, and the
   heaviest modules dispatch first. No test was removed, no signal shortened
   and no tolerance or oracle touched; coverage is line-for-line identical.
 
