@@ -1029,9 +1029,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   rasterizer, a much quieter thing to compare than a plot raster, and the
   figures' looser bound would have let the restyled fills through. The
   rendering stack the job runs is pinned in `requirements-reports.txt`
-  alongside the existing figure pins, `make reports` now clears the directory
-  before regenerating so a fiche that is no longer produced is actually
-  removed, and the generator pins the numerical thread pools the way the
+  alongside the existing figure pins, `make reports` now renders into a
+  scratch directory and swaps it in only once the whole set is written, so a
+  fiche that is no longer produced is actually removed without a generator
+  that dies halfway leaving the working tree stripped of the committed
+  examples, and the generator pins the numerical thread pools the way the
   figure generator does, so a runner with a different core count cannot
   reorder a floating-point sum into the rendered page. The staleness helpers
   the two checks share moved to `scripts/generated_assets.py`. A unit test also

@@ -137,12 +137,23 @@ lighthouse:
 # is tolerance-aware rather than a byte diff, for the same reason the figures'
 # is: the embedded vector plot differs by ~1 ULP across CPUs. See
 # scripts/check_reports.py.
+#
+# Renders into a scratch directory and swaps it in only once the whole set is
+# written. Clearing the output first, which is how this used to work, means a
+# generator that dies halfway leaves the working tree stripped of the committed
+# examples and the maintainer reaching for `git checkout`. The clearing itself
+# has to stay, because the generator only overwrites and never deletes, so a
+# fiche that is no longer produced would survive as a stale orphan and slip
+# past the staleness check; it just belongs after a successful run rather than
+# before an attempted one. The trap covers the interrupted run the same way.
 reports:
-	# Clear the generated files first so a fiche that is no longer produced is
-	# actually removed (the generator only overwrites, never deletes, so a
-	# stale orphan would otherwise survive and slip past the staleness check).
-	find .github/reports -maxdepth 1 -type f \( -name '*.pdf' -o -name '*.webp' \) -delete
-	$(FIGURE_ENV) $(PYTHON) scripts/generate_reports.py
+	set -e; \
+	tmp=$$(mktemp -d .github/reports.tmp.XXXXXX); \
+	trap 'rm -rf "$$tmp"' EXIT INT TERM HUP; \
+	$(FIGURE_ENV) $(PYTHON) scripts/generate_reports.py --output-dir "$$tmp"; \
+	[ -n "$$(ls -A "$$tmp")" ] || { echo "no fiche was generated" >&2; exit 1; }; \
+	find .github/reports -maxdepth 1 -type f \( -name '*.pdf' -o -name '*.webp' \) -delete; \
+	mv "$$tmp"/* .github/reports/
 
 # Regenerate the committed, versioned numerical conformance report, then bring
 # every count quoted from it into line. The --file-header flag prepends the
