@@ -45,6 +45,10 @@ reports:
           - scripts/check_reports.py
           - scripts/generated_assets.py
           - requirements-reports.txt
+          # The fiche job installs both requirement files, and the embedded
+          # plot comes off the matplotlib/NumPy stack pinned in this one, so a
+          # bump here can move the rendered PDF and its preview.
+          - requirements-figures.txt
 
 conformance:
   - changed-files:
