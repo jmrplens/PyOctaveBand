@@ -15054,23 +15054,36 @@ def _gpu_encode_target() -> dict[str, str] | None:
     """
     import subprocess
 
+    def decline(reason: str) -> None:
+        # Say it out loud: the CPU path writes VP9, which is around 40 % larger
+        # than the AV1 the committed clips use, and a silent downgrade only
+        # shows up as an unexplained size jump in a later diff.
+        print(f"note: encoding on the CPU as VP9, {reason}", file=sys.stderr)
+
     try:
         import fdtd_gpu_remote
 
         fdtd_gpu_remote.load_env()
     except ImportError:
+        decline("fdtd_gpu_remote is not importable")
         return None
     if os.environ.get("PHONO_GPU_ENCODE", "").lower() != "av1":
+        decline(
+            "PHONO_GPU_ENCODE is not 'av1' (a linked worktree has no .env of "
+            "its own, so export the PHONO_GPU_* settings to render there)"
+        )
         return None
     host = os.environ.get("PHONO_GPU_HOST", "")
     user = os.environ.get("PHONO_GPU_USER", "root")
     image = os.environ.get("PHONO_GPU_FFMPEG_IMAGE", "linuxserver/ffmpeg:latest")
     if not host:
+        decline("PHONO_GPU_HOST is not set")
         return None
     probe = subprocess.run(
         ["ssh", "-o", "BatchMode=yes", "-o", "ConnectTimeout=4", "--",
          f"{user}@{host}", "true"], capture_output=True, check=False)
     if probe.returncode != 0:
+        decline(f"{user}@{host} did not answer")
         return None
     workdir = os.environ.get("PHONO_GPU_WORKDIR", "/tmp/phonometry-gpu")
     return {"target": f"{user}@{host}", "image": image, "workdir": workdir}

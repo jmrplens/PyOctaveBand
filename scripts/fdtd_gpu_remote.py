@@ -60,7 +60,32 @@ import fdtd_gpu
 import job_runner
 
 _REPO_ROOT = _SCRIPTS.parent
-_ENV_FILE = _REPO_ROOT / ".env"
+
+
+def _env_file() -> Path:
+    """The ``.env`` holding the GPU settings, from a worktree as well.
+
+    ``.env`` is untracked, so it exists only next to the main checkout. Run
+    from a linked worktree, the copy beside this file is absent and every
+    setting would read as unset, which downgrades an AV1 render to VP9 without
+    saying so. Fall back to the directory holding the common git dir, which is
+    the main checkout for every worktree of the repository.
+    """
+    local = _REPO_ROOT / ".env"
+    if local.is_file():
+        return local
+    git_dir = _REPO_ROOT / ".git"
+    if git_dir.is_file():  # a worktree: the file points at the common git dir
+        pointer = git_dir.read_text(encoding="utf-8").strip()
+        if pointer.startswith("gitdir:"):
+            common = Path(pointer.split(":", 1)[1].strip())
+            for parent in common.parents:
+                if parent.name == ".git":
+                    return parent.parent / ".env"
+    return local
+
+
+_ENV_FILE = _env_file()
 
 _CONNECT_TIMEOUT_S = 8
 _DEFAULT_JOB_TIMEOUT_S = 900.0
