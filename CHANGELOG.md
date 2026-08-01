@@ -909,6 +909,53 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Changed
 
+- The landing page counts its own numbers. The guide, API-page, figure and
+  fiche totals and the release version were typed into the page by hand, and
+  every one of them had fallen behind: the page still said version 3.2.0 after
+  3.3.0 shipped, claimed 32 fiches against the 66 in `.github/reports`, 93
+  guides against 104 and 120 API pages against 145, and counted 506 figures
+  where the tree holds 344 drawings in their four theme and language variants.
+  A new `site/src/data/repo-stats.mjs` counts all five from the tree at build
+  time, the way `conformance-stats.mjs` already parsed the conformance
+  headline, so the only place any of them can now be wrong is the tree itself.
+  The About pages cite version 3.3.0 to match, and the landing links PyPI and
+  the Zenodo DOI where it names them.
+- The standards listed per area on the landing page, checked designation by
+  designation against the modules that implement them. The Spanish column
+  headed its count "normas implementadas" where the English said "standards
+  referenced", which promoted a referenced standard to an implemented one in
+  one language only. Part numbers now state what is actually implemented
+  (`ISO 10534-1/-2`, `ISO 9053-1/-2`, `ISO 13472-1/-2`, `ISO 7626-1/-2`,
+  `ISO 10846-1/-2/-3`, `ISO 2631-1/-2/-4/-5`, `ISO 8041-1`, `EN 29052-1`),
+  ISO 18233 moves to the area whose measurements use it, and ISO 9611,
+  ISO 10848, ISO 15186-1/-2, ISO 16251-1, ISO 12999-2, ISO/PAS 20065,
+  ISO 389-7, DIN 45681 and ASTM E413/E1414 join the areas they are implemented
+  in. The area blurbs on the guides hub carried the same lists, disagreed with
+  the landing on CNOSSOS-EU, and are now identical to it area by area; the
+  Spanish side spells ECAC the way the rest of the Spanish documentation
+  does.
+- The landing page's fiche example is now the call that renders the fiche
+  printed beside it. It showed a hand-written 16-band spectrum for a 200 mm
+  reinforced-concrete wall checked against a 42 dB requirement, three claims
+  the artwork next to it contradicts: those bands rate Rw = 30 dB, so the
+  snippet would have printed FAIL where the caption promised PASS, the curve
+  is a glazing curve and not a concrete one, and the committed fiche is a
+  predicted 6 mm float glass pane rated against 30 dB. The snippet is now the
+  generator's own call with the metadata block cut to the fields the page
+  discusses, and it reproduces the printed Rw (C; Ctr) = 31 (-1; -3) dB and
+  its PASS exactly. The surrounding copy drops "the layout an accredited
+  report uses" for the layout it is, and the Spanish long description no
+  longer tells a screen-reader user the English fiche reads APTO.
+- Wording on the landing page, English and Spanish. The requirement is
+  "Python 3.13 or newer" as `pyproject.toml` says, not "Python 3.13"; the
+  Spanish "dataclass inmutable" is the `frozen` dataclass the English
+  describes, which is not the same claim; the Spanish links to Primeros pasos
+  by the name that page actually carries; the conformance disclaimer drops a
+  gerund that does not modify a noun in Spanish; the Spanish description says
+  "biblioteca" like the rest of the page rather than "toolkit", and reaches CI
+  prepositionally so `CI` cannot be read as the ISO 717-2 spectrum adaptation
+  term of the same name.
+
 - The symbols the documentation names as quantities and the relations it
   states in prose are now typeset as maths rather than left as code spans
   or plain text, across the guides, the reference and the errata registry,

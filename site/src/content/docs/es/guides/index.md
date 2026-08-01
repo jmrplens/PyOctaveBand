@@ -115,7 +115,7 @@ sonoridad necesita niveles de banda calibrados, un parámetro de sala necesita
 una respuesta al impulso filtrada, una valoración ambiental es un $L_{eq}$
 ajustado.
 Implementa IEC 61260-1, ANSI S1.11, IEC 61672-1, ISO 7196, IEC 61252,
-ISO 1996-1, IEC 60942, ISO 18233 y la GUM.
+ISO 1996-1, IEC 60942 y la GUM.
 
 - [Construye un sonómetro](/phonometry/es/guides/sound-level-meter/): el área
   entera montada de principio a fin en una sola página ejecutable, del tono del
@@ -218,7 +218,8 @@ Donde el área del núcleo pregunta cuánto sonido hay, esta pregunta qué hace 
 oyente con él: cuán fuerte le parece, cuán agudo, rugoso o molesto, cuánto
 sobrevive de un locutor tras pasar por la sala, y cuánta audición cuesta una
 vida laboral en ese ruido. Implementa ISO 532-1/-2/-3, ECMA-418-1/-2, ISO 226,
-DIN 45692, IEC 60268-16, ANSI S3.5, ISO 7029, ISO 1999 e ISO 9612.
+DIN 45692, IEC 60268-16, ANSI S3.5, DIN 45681, ISO/PAS 20065, ISO 7029,
+ISO 389-7, ISO 1999 e ISO 9612.
 
 **[Psicoacústica](/phonometry/es/guides/sections/psychoacoustics/)**
 
@@ -272,8 +273,9 @@ Parámetros de sala, ruido de fondo, aislamiento en campo y laboratorio, y
 predicción a partir de datos de elementos. Dos preguntas recorren el área: qué
 hace una sala con el sonido que se produce dentro, y cuánto del sonido que se
 produce al lado consigue pasar. Implementa ISO 3382-1/-2/-3,
-ISO 16283-1/-2/-3, ISO 10140, ISO 717-1/-2, EN 12354-1 a -6, ISO 12999-1,
-ISO 10052 y ANSI/ASA S12.2.
+ISO 16283-1/-2/-3, ISO 10140, ISO 10848, ISO 15186-1/-2, ISO 16251-1,
+ISO 717-1/-2, EN 12354-1 a -6, ISO 18233, ISO 12999-1, ISO 10052,
+ANSI/ASA S12.2 y ASTM E413/E1414.
 
 **[Acústica de salas](/phonometry/es/guides/sections/room-acoustics/)**
 
@@ -351,8 +353,8 @@ ISO 10052 y ANSI/ASA S12.2.
 Absorción, resistencia al flujo de aire, tubo de impedancia, modelos porosos
 y de metamaterial, difusores y dispersión. Qué le hace una superficie al
 sonido que le llega, medido en laboratorio o predicho a partir de los
-parámetros del material. Implementa ISO 354, ISO 11654, ISO 10534-2,
-ISO 9053, ISO 17497-1/-2, ISO 13472 y EN 29052.
+parámetros del material. Implementa ISO 354, ISO 11654, ISO 10534-1/-2,
+ISO 9053-1/-2, ISO 17497-1/-2, ISO 13472-1/-2, EN 29052-1 e ISO 12999-2.
 
 - [Medida y clasificación de la absorción sonora](/phonometry/es/guides/absorption-measurement/):
   la medición en cámara reverberante ISO 354, la valoración ponderada con su
@@ -387,9 +389,9 @@ ISO 9053, ISO 17497-1/-2, ISO 13472 y EN 29052.
 Movilidad y funciones de respuesta en frecuencia, aisladores, potencia radiada,
 uniones y vibración en humanos. El área cubre el camino que sigue una máquina
 al entrar en una estructura y volver a salir como sonido aéreo, y la cuestión
-aparte de qué le hace la vibración a la persona expuesta. Implementa ISO 7626,
-ISO 10846, ISO/TS 7849, EN 15657, EN 12354-5, ISO 2631-1/-5, ISO 5349 e
-ISO 8041.
+aparte de qué le hace la vibración a la persona expuesta. Implementa
+ISO 7626-1/-2, ISO 10846-1/-2/-3, ISO 9611, ISO/TS 7849-1/-2, EN 15657,
+EN 12354-5, ISO 2631-1/-2/-4/-5, ISO 5349-1/-2 e ISO 8041-1.
 
 **[Fuentes de ruido estructural](/phonometry/es/guides/sections/structure-borne/)**
 
@@ -431,8 +433,9 @@ Propagación en exteriores, barreras, refracción, aeronaves, helicópteros y
 aerogeneradores. Todo lo de aquí trata de sonido que tiene que recorrer una
 distancia larga antes de valorarse, así que la atmósfera, el suelo y el propio
 movimiento de la fuente entran en la respuesta. Implementa ISO 9613-1/-2,
-ISO 1996-1/-2, ISO/PAS 1996-3, NT ACOU 112, Anexo 16 OACI, IEC 61265,
-SAE ARP 5534, Doc 29/32 CEAC e IEC 61400-11.
+ISO 1996-1/-2, ISO/PAS 1996-3, NT ACOU 112, CNOSSOS-EU (Directiva 2002/49/CE,
+anexo II), Anexo 16 OACI, IEC 61265, SAE ARP 5534, ECAC Doc 29/32 e
+IEC 61400-11.
 
 **[Sonido en exteriores](/phonometry/es/guides/sections/outdoor-sound/)**
 

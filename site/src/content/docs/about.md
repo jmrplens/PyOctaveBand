@@ -119,7 +119,7 @@ the version you actually ran.
 APA:
 
 > Requena-Plens, J. M. (2026). *phonometry: acoustic measurement toolkit for
-> Python* (Version 3.2.0) [Computer software].
+> Python* (Version 3.3.0) [Computer software].
 > https://doi.org/10.5281/zenodo.21215280
 
 BibTeX:
@@ -130,7 +130,7 @@ BibTeX:
   title   = {phonometry: acoustic measurement toolkit for Python
              (formerly PyOctaveBand)},
   year    = {2026},
-  version = {3.2.0},
+  version = {3.3.0},
   doi     = {10.5281/zenodo.21215280},
   url     = {https://jmrplens.github.io/phonometry/},
   license = {MIT}

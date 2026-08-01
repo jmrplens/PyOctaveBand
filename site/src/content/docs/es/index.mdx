@@ -1,16 +1,22 @@
 ---
 title: phonometry
-description: "Toolkit de medición acústica para Python: niveles, psicoacústica, edificación y acústica submarina; 533 comprobaciones de conformidad frente a 362 normas."
+description: "Biblioteca de medición acústica para Python: niveles, psicoacústica, acústica de la edificación y acústica submarina; 533 comprobaciones de conformidad frente a 362 normas."
+# Starlight titula cada página "<title del frontmatter> | <título del sitio>",
+# que en esta produce "phonometry | phonometry" y gasta el elemento con más
+# peso de la página de entrada sin decir nada. La sustitución también la
+# distingue del nombre común: "phonometry" a secas es un término de
+# lingüística.
 head:
   - tag: title
     content: "phonometry: medición acústica conforme a norma para Python"
+  # Starlight tipa cada página como artículo. Esta es el sitio en sí.
   - tag: meta
     attrs:
       property: og:type
       content: website
 template: splash
 hero:
-  tagline: Medición, análisis y predicción acústica en Python. Cada métrica se implementa a partir del texto de su norma, y CI la comprueba frente a las tablas de tolerancia y los ejemplos resueltos de esa misma norma en cada pull request.
+  tagline: Medición, análisis y predicción acústica en Python. Cada métrica se implementa a partir del texto de su norma, y se comprueba en CI frente a las tablas de tolerancia y los ejemplos resueltos de esa misma norma en cada pull request.
   actions:
     - text: Instalar y primer análisis
       link: /phonometry/es/getting-started/

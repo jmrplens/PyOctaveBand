@@ -112,7 +112,7 @@ the chain that turns a digital signal into a standards-compliant number, and
 every other area consumes it: a loudness model needs calibrated band levels, a
 room parameter needs a filtered impulse response, an environmental rating is an
 adjusted $L_{eq}$. Implements IEC 61260-1, ANSI S1.11, IEC 61672-1, ISO 7196,
-IEC 61252, ISO 1996-1, IEC 60942, ISO 18233 and the GUM.
+IEC 61252, ISO 1996-1, IEC 60942 and the GUM.
 
 - [Build a sound level meter](/phonometry/guides/sound-level-meter/):
   the whole area assembled end to end on one runnable page, from the
@@ -209,7 +209,8 @@ the core area asks how much sound there is, this one asks what a listener makes
 of it: how loud it seems, how sharp or rough or annoying, how much of a talker
 survives the room, and how much hearing a working life in that noise costs.
 Implements ISO 532-1/-2/-3, ECMA-418-1/-2, ISO 226, DIN 45692, IEC 60268-16,
-ANSI S3.5, ISO 7029, ISO 1999 and ISO 9612.
+ANSI S3.5, DIN 45681, ISO/PAS 20065, ISO 7029, ISO 389-7, ISO 1999 and
+ISO 9612.
 
 **[Psychoacoustics](/phonometry/guides/sections/psychoacoustics/)**
 
@@ -259,8 +260,9 @@ ANSI S3.5, ISO 7029, ISO 1999 and ISO 9612.
 Room parameters, background noise, field and laboratory insulation, and
 prediction from element data. Two questions run through the area: how a room
 treats the sound made inside it, and how much of the sound made next door gets
-through. Implements ISO 3382-1/-2/-3, ISO 16283-1/-2/-3, ISO 10140,
-ISO 717-1/-2, EN 12354-1 to -6, ISO 12999-1, ISO 10052 and ANSI/ASA S12.2.
+through. Implements ISO 3382-1/-2/-3, ISO 16283-1/-2/-3, ISO 10140, ISO 10848,
+ISO 15186-1/-2, ISO 16251-1, ISO 717-1/-2, EN 12354-1 to -6, ISO 18233,
+ISO 12999-1, ISO 10052, ANSI/ASA S12.2 and ASTM E413/E1414.
 
 **[Room acoustics](/phonometry/guides/sections/room-acoustics/)**
 
@@ -336,8 +338,8 @@ ISO 717-1/-2, EN 12354-1 to -6, ISO 12999-1, ISO 10052 and ANSI/ASA S12.2.
 Absorption, airflow resistance, the impedance tube, porous and metamaterial
 models, diffusers and scattering. What a surface does to the sound that
 reaches it, measured in a laboratory or predicted from the material
-parameters. Implements ISO 354, ISO 11654, ISO 10534-2, ISO 9053,
-ISO 17497-1/-2, ISO 13472 and EN 29052.
+parameters. Implements ISO 354, ISO 11654, ISO 10534-1/-2, ISO 9053-1/-2,
+ISO 17497-1/-2, ISO 13472-1/-2, EN 29052-1 and ISO 12999-2.
 
 - [Sound Absorption Measurement and Rating](/phonometry/guides/absorption-measurement/):
   the ISO 354 reverberation-room measurement, the weighted rating and its
@@ -369,8 +371,9 @@ ISO 17497-1/-2, ISO 13472 and EN 29052.
 Mobility and frequency-response functions, isolators, radiated power,
 junctions and human vibration. The area covers the path a machine takes into a
 structure and out again as airborne sound, and the separate question of what
-vibration does to the person exposed to it. Implements ISO 7626, ISO 10846,
-ISO/TS 7849, EN 15657, EN 12354-5, ISO 2631-1/-5, ISO 5349 and ISO 8041.
+vibration does to the person exposed to it. Implements ISO 7626-1/-2,
+ISO 10846-1/-2/-3, ISO 9611, ISO/TS 7849-1/-2, EN 15657, EN 12354-5,
+ISO 2631-1/-2/-4/-5, ISO 5349-1/-2 and ISO 8041-1.
 
 **[Structure-borne sources](/phonometry/guides/sections/structure-borne/)**
 
@@ -409,8 +412,8 @@ Outdoor propagation, barriers, refraction, aircraft, rotorcraft and wind
 turbines. Everything here concerns sound that has to travel a long way before
 it is assessed, so the atmosphere, the ground and the source's own motion all
 enter the answer. Implements ISO 9613-1/-2, ISO 1996-1/-2, ISO/PAS 1996-3,
-NT ACOU 112, ICAO Annex 16, IEC 61265, SAE ARP 5534, ECAC Doc 29/32 and
-IEC 61400-11.
+NT ACOU 112, CNOSSOS-EU (2002/49/EC Annex II), ICAO Annex 16, IEC 61265,
+SAE ARP 5534, ECAC Doc 29/32 and IEC 61400-11.
 
 **[Outdoor sound](/phonometry/guides/sections/outdoor-sound/)**
 
