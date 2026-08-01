@@ -10,13 +10,16 @@
  * That is a WCAG 3.1.2 (Language of Parts) defect, and not one an automated
  * audit can see: the name is present and non-empty either way.
  *
- * Where the control comes from decides how it is reached. The buttons the
- * plugin writes into the markdown tree are corrected there, by the rehype pass
- * in src/lib/zoom-labels.mjs. The ones below come from the plugin's own
- * components, so the only place left is the markup those components render:
- * the slot is rendered to HTML and the labels substituted. That keeps the
- * plugin as the single source of the zoom behaviour instead of forking its
- * custom element to change four words.
+ * The controls come from the plugin's own components, so the only place left
+ * to correct them is the markup those components render: the slot is rendered
+ * to HTML and the labels substituted. That keeps the plugin as the single
+ * source of the zoom behaviour instead of forking its custom element to change
+ * four words. Every figure on the site is authored through ThemeImage.astro,
+ * which wraps its own pair and renders it inside this component, and the
+ * parity check (scripts/check-i18n-parity.mjs) keeps it that way: a Spanish
+ * page that wrote a figure as markdown instead would get its zoom control from
+ * the plugin's rehype pass, which this never sees and which names it in
+ * English.
  *
  * The substitution is asserted rather than attempted. A silent no-op would
  * look exactly like a page with no figures, and the regression would only ever

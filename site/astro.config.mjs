@@ -6,7 +6,6 @@ import starlightLinksValidator from 'starlight-links-validator';
 import starlightImageZoom from 'starlight-image-zoom';
 import remarkMath from 'remark-math';
 import rehypeKatex from 'rehype-katex';
-import { starlightZoomLabels } from './src/lib/zoom-labels.mjs';
 import { sidebar } from './src/data/sidebar.mjs';
 import { basePath, siteUrl } from './src/data/site.mjs';
 import { isOurMedia, mediaUrl, REMOTE_PREFIXES } from './src/lib/media.mjs';
@@ -22,11 +21,10 @@ import {
 // Rewrites documentation media to this site's own copy.
 //
 // The components (ThemeImage, Video, ReportPreview) call mediaUrl themselves,
-// but around a hundred references are hand-written <img> pairs inside the
-// markdown, mostly on the theory pages, and those never pass through a
-// component. This catches them, plus any <a href> or <video src> pointing at
-// the same files, so nothing is left hotlinking raw.githubusercontent.com
-// whichever way it was authored.
+// and every figure on the site now comes from one of them. This is the net
+// under anything authored another way: an <img>, <video src> or <a href>
+// written straight into the markdown, so nothing can be left hotlinking
+// raw.githubusercontent.com however it got there.
 //
 // The markdown mirror under docs/ is deliberately untouched: GitHub renders it
 // with no build step, so its URLs have to stay absolute.
@@ -467,9 +465,6 @@ export default defineConfig({
         // for a reader who cannot see it; painted over the zoomed figure they
         // would cover the very thing the reader zoomed in to look at.
         starlightImageZoom({ showCaptions: false }),
-        // Must follow starlightImageZoom: it translates the accessible names
-        // that plugin hard-codes in English. See src/lib/zoom-labels.mjs.
-        starlightZoomLabels(),
       ],
       description: siteDescription,
       lastUpdated: true,

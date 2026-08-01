@@ -26,14 +26,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   party and no script evaluates a string, which is what lets the page keep the
   existing `script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval'` policy
   untouched. The plugin hard-codes its two accessible names in English and
-  offers no translation hook, so the site supplies them: a rehype pass
-  (`src/lib/zoom-labels.mjs`) rewrites the labels the plugin writes into the
-  markdown and `src/components/ZoomI18n.astro` rewrites the ones its own
-  components render, both asserting that the English text they replace is
-  still there so a plugin upgrade fails the build instead of quietly shipping
-  a Spanish page with an English control. The plugin finds images by walking
-  the markdown tree and never sees the ones a component emits, so
-  `ThemeImage.astro` wraps its own pair. Each figure ships a light and a dark
+  offers no translation hook, so the site supplies them:
+  `src/components/ZoomI18n.astro` rewrites the names the plugin's own
+  components render and asserts the English text it replaces is still there, so
+  a plugin upgrade fails the build instead of quietly shipping a Spanish page
+  with an English control. The plugin finds images by walking the markdown tree
+  and never sees the ones a component emits, so `ThemeImage.astro` wraps its
+  own pair; every figure on the site is authored through it, and the EN/ES
+  parity check now enforces that, since a figure written as markdown on a
+  Spanish page is the one route to a zoom control nothing translates. Each
+  figure ships a light and a dark
   variant and both get wrapped, so `theme-images.css` now hides the wrapper of
   the off-theme half as well; without that the hidden variant left an empty
   full-width box in the flow whose zoom button was still in the tab order and
