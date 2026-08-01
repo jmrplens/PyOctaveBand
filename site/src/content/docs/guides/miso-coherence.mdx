@@ -33,7 +33,7 @@ correlated inputs and one output.
 import matplotlib.pyplot as plt
 import numpy as np
 from scipy import signal
-from phonometry import miso_coherence, noise_signal, signal
+from phonometry import miso_coherence, noise_signal
 
 fs = 8192.0
 # Input 1 drives a low-frequency path; input 2 = 0.7*x1 + independent noise
@@ -249,4 +249,4 @@ several correlated outputs needs one `miso_coherence` call per output.
 - [Spectral analysis](/phonometry/guides/spectral-analysis/): the single-input coherent output spectrum this page generalizes, and the shared Welch core.
 - [Correlation and delay](/phonometry/guides/correlation-delay/): estimating and removing the bulk delays that bias coherence low.
 - [Multichannel and Performance](/phonometry/guides/multichannel/): the per-channel path this cross-channel analysis complements.
-- API reference: [`signal.miso`](/phonometry/reference/api/spectra/miso/).
+- API reference: [`signal.miso`](/phonometry/reference/api/signal/miso/).

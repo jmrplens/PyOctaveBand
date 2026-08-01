@@ -34,7 +34,7 @@ y una salida.
 import matplotlib.pyplot as plt
 import numpy as np
 from scipy import signal
-from phonometry import miso_coherence, noise_signal, signal
+from phonometry import miso_coherence, noise_signal
 
 fs = 8192.0
 # La entrada 1 excita un camino de baja frecuencia; la entrada 2 =
@@ -259,4 +259,4 @@ salida.
 - [Análisis espectral](/phonometry/es/guides/spectral-analysis/): el espectro de salida coherente de una entrada que esta página generaliza, y el núcleo de Welch compartido.
 - [Correlación y retardo](/phonometry/es/guides/correlation-delay/): estimar y eliminar los retardos globales que sesgan la coherencia a la baja.
 - [Multicanal y rendimiento](/phonometry/es/guides/multichannel/): la ruta por canal que este análisis cruzado complementa.
-- Referencia de la API: [`signal.miso`](/phonometry/es/reference/api/spectra/miso/).
+- Referencia de la API: [`signal.miso`](/phonometry/es/reference/api/signal/miso/).

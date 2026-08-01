@@ -232,7 +232,7 @@ Use the G frequency weighting of ISO 7196:1995, which rates infrasound the way A
 - [Frequency Weighting](weighting.md): the A, C and Z curves, the
   `high_accuracy` design and the IEC 61672-1 Table 3 class verification
   these curves build on.
-- API reference: [`filters.weighting`](https://jmrplens.github.io/phonometry/reference/api/filters/parametric-filters/) and [`filters.compliance`](https://jmrplens.github.io/phonometry/reference/api/filters/compliance/).
+- API reference: [`filters.weighting`](https://jmrplens.github.io/phonometry/reference/api/filters/weighting/) and [`filters.compliance`](https://jmrplens.github.io/phonometry/reference/api/filters/compliance/).
 
 ## References
 

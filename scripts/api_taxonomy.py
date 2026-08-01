@@ -18,7 +18,7 @@ Consistency is enforced at import time (fails loudly):
 - every module appears in exactly one section;
 - each section only contains modules from the subpackages declared for it in
   ``_SECTION_SUBPACKAGES``. Three sections deliberately span more than one
-  parent: ``filters`` adds the package top level next to ``filters``,
+  parent: ``filters`` adds the package top level (``phonometry`` itself),
   ``aeroacoustics`` includes ``environmental.wind_turbine_noise`` because the
   section groups by audience (aircraft and wind energy) while the module
   lives with the other environmental-rating code, and ``power`` includes
@@ -420,7 +420,7 @@ def module_section(module: str) -> Section:
 
 
 def _parent_subpackage(module: str) -> str:
-    """``phonometry.signal.levels`` -> ``metrology``; top level -> ``""``."""
+    """``phonometry.signal.levels`` -> ``signal``; top level -> ``""``."""
     parts = module.split(".")
     return parts[1] if len(parts) > 2 else ""
 

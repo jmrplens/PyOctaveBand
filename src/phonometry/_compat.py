@@ -240,6 +240,31 @@ def _namespace_shim(
     return __getattr__
 
 
+def _namespace_dir(
+    own: list[str] | tuple[str, ...], targets: tuple[str, ...]
+) -> Callable[[], list[str]]:
+    """Return a ``__dir__`` listing the names a narrowed package still serves.
+
+    ``__getattr__`` is invisible to :func:`dir`, so without this the moved
+    names disappear from tab completion and from anything that introspects the
+    namespace, one release before they stop working. ``__all__`` is left
+    narrow on purpose: ``from phonometry.metrology import *`` gives the 4.0
+    API, not the deprecated names.
+
+    :param own: The package's own ``__all__``.
+    :param targets: Packages the moved names went to.
+    :return: The ``__dir__`` to bind at module level.
+    """
+
+    def __dir__() -> list[str]:
+        names = set(own)
+        for target in targets:
+            names |= set(getattr(import_module(target), "__all__", ()))
+        return sorted(names)
+
+    return __dir__
+
+
 def _install() -> None:
     package = sys.modules["phonometry"]
     for table, since, removed_in in _GENERATIONS:

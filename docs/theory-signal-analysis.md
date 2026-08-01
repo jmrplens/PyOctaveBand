@@ -61,7 +61,7 @@ original signal and use the phonometry band edges as masks:
 ```python
 import numpy as np
 from scipy import signal
-from phonometry import filters, signal
+from phonometry import filters
 
 fs = 100_000
 # any 1D pressure signal in Pa (synthesized here so the example runs)

@@ -8,9 +8,9 @@ The complete public API, one page per module. Import the domain subpackage and c
 > Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
 
 ```python
-from phonometry import metrology, underwater
+from phonometry import filters, underwater
 
-spl, freq = metrology.octave_filter(x, fs)
+spl, freq = filters.octave_filter(x, fs)
 snr = underwater.passive_sonar_equation(185.0, 60.0, 50.0)
 ```
 

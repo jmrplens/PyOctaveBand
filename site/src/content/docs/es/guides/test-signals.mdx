@@ -151,7 +151,7 @@ misma cota de rizado.*
 import matplotlib.pyplot as plt
 import numpy as np
 from scipy import signal
-from phonometry import noise_signal, resample_signal, signal
+from phonometry import noise_signal, resample_signal
 
 x = noise_signal(44100, 5.0, color="pink", seed=1)
 res = resample_signal(x, 44100, 48000)   # 120 dB de rechazo de alias
@@ -278,4 +278,4 @@ exactitud son formas cerradas, no normativas.
 - [Correlación y retardo](/phonometry/es/guides/correlation-delay/): el trabajo de alineación construido sobre el núcleo de retardo fraccionario.
 - [Promediado síncrono](/phonometry/es/guides/synchronous-averaging/): alineación de períodos con el mismo desplazamiento de banda limitada cuando $f_s T$ no es entero.
 - [Análisis espectral](/phonometry/es/guides/spectral-analysis/): la verificación del ruido de colores y las métricas de ventanas.
-- Referencia de la API: [`signal.test_signals`](/phonometry/es/reference/api/spectra/signals/).
+- Referencia de la API: [`signal.test_signals`](/phonometry/es/reference/api/signal/test-signals/).

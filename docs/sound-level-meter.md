@@ -178,9 +178,9 @@ The meter built here is the trunk; the rest of the core grows from it.
 
 ## See also
 
-- API reference: [`metrology.calibration`](https://jmrplens.github.io/phonometry/reference/api/levels/calibration/),
-  [`filters.weighting`](https://jmrplens.github.io/phonometry/reference/api/filters/parametric-filters/),
-  [`signal.levels`](https://jmrplens.github.io/phonometry/reference/api/levels/levels/),
+- API reference: [`metrology.calibration`](https://jmrplens.github.io/phonometry/reference/api/metrology/calibration/),
+  [`filters.weighting`](https://jmrplens.github.io/phonometry/reference/api/filters/weighting/),
+  [`signal.levels`](https://jmrplens.github.io/phonometry/reference/api/signal/levels/),
   [`phonometry`](https://jmrplens.github.io/phonometry/reference/api/filters/phonometry/) and
   [`filters.compliance`](https://jmrplens.github.io/phonometry/reference/api/filters/compliance/).
 

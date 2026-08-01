@@ -147,7 +147,7 @@ it, flat within the same ripple bound.*
 import matplotlib.pyplot as plt
 import numpy as np
 from scipy import signal
-from phonometry import noise_signal, resample_signal, signal
+from phonometry import noise_signal, resample_signal
 
 x = noise_signal(44100, 5.0, color="pink", seed=1)
 res = resample_signal(x, 44100, 48000)   # 120 dB alias rejection
@@ -267,4 +267,4 @@ their own; their accuracy claims are closed-form, not normative.
 - [Correlation and delay](/phonometry/guides/correlation-delay/): the alignment work built on the fractional-delay kernel.
 - [Synchronous averaging](/phonometry/guides/synchronous-averaging/): period alignment with the same band-limited shift when $f_s T$ is not an integer.
 - [Spectral analysis](/phonometry/guides/spectral-analysis/): the colored-noise verification and the window metrics.
-- API reference: [`signal.test_signals`](/phonometry/reference/api/spectra/signals/).
+- API reference: [`signal.test_signals`](/phonometry/reference/api/signal/test-signals/).

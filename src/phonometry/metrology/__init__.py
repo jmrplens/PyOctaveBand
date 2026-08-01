@@ -9,7 +9,7 @@ data qualification. The filter banks and weightings moved to
 
 from __future__ import annotations
 
-from .._compat import _namespace_shim
+from .._compat import _namespace_dir, _namespace_shim
 from .calibration import CalibrationWarning, calculate_sensitivity, sensitivity
 from .data_qualification import (
     LevelCrossingResult,
@@ -43,7 +43,8 @@ from .uncertainty import (
 )
 
 #: Names that left this namespace in 4.0 keep resolving from here until 5.0.
-__getattr__ = _namespace_shim(__name__, ("phonometry.filters", "phonometry.signal"))
+_MOVED_TO = ("phonometry.filters", "phonometry.signal")
+__getattr__ = _namespace_shim(__name__, _MOVED_TO)
 
 __all__ = [
     "CalibrationWarning",
@@ -74,3 +75,7 @@ __all__ = [
     "u_shaped",
     "verify_intensity_class",
 ]
+
+#: ``__getattr__`` is invisible to ``dir()``; keep the moved names listed
+#: while they still resolve.
+__dir__ = _namespace_dir(__all__, _MOVED_TO)

@@ -31,7 +31,7 @@ G curve.*
 ```python
 import matplotlib.pyplot as plt
 import numpy as np
-from phonometry import metrology
+from phonometry import filters
 
 # Measure each curve's response: weight a centered unit impulse and take
 # its spectrum (1 s buffer -> 1 Hz frequency resolution).
@@ -42,7 +42,7 @@ freqs = np.fft.rfftfreq(fs, 1 / fs)
 
 fig, ax = plt.subplots(figsize=(9, 5))
 for curve in ("A", "C", "Z"):
-    spectrum = np.fft.rfft(metrology.weighting_filter(impulse, fs, curve=curve))
+    spectrum = np.fft.rfft(filters.weighting_filter(impulse, fs, curve=curve))
     ax.semilogx(freqs[1:], 20 * np.log10(np.abs(spectrum[1:]) + np.finfo(float).eps),
                 label=curve)
 ax.set(xlim=(10, 22000), ylim=(-72, 15),
@@ -122,7 +122,7 @@ $L_{Ceq} - L_{Aeq}$ is a one-number indicator of low-frequency content:
 
 ```python
 import numpy as np
-from phonometry import metrology
+from phonometry import filters, signal
 
 # A 50 Hz rumble under a light broadband hiss: quiet in A, loud in C.
 fs = 48000
@@ -130,8 +130,8 @@ t = np.arange(10 * fs) / fs
 rng = np.random.default_rng(1)
 x = 0.2 * np.sin(2 * np.pi * 50 * t) + 0.01 * rng.standard_normal(t.size)
 
-la = metrology.leq(metrology.weighting_filter(x, fs, curve="A"))
-lc = metrology.leq(metrology.weighting_filter(x, fs, curve="C"))
+la = signal.leq(filters.weighting_filter(x, fs, curve="A"))
+lc = signal.leq(filters.weighting_filter(x, fs, curve="C"))
 print(f"LAeq = {la:.1f} dB   LCeq = {lc:.1f} dB   C - A = {lc - la:.1f} dB")
 # LAeq = 52.4 dB   LCeq = 75.7 dB   C - A = 23.2 dB
 # C - A above 20 dB: the A-weighted number alone would hide the rumble.
@@ -141,17 +141,17 @@ print(f"LAeq = {la:.1f} dB   LCeq = {lc:.1f} dB   C - A = {lc - la:.1f} dB")
 
 ```python
 import numpy as np
-from phonometry import metrology
+from phonometry import filters
 
 # recording: a calibrated microphone capture (Pa) — recorded through your measurement chain. Synthesized here so the guide runs standalone.
 fs = 48000
 recording = 0.2 * np.sin(2 * np.pi * 1000 * np.arange(fs) / fs)
 
 # Apply A-weighting to the raw recording
-weighted_signal = metrology.weighting_filter(recording, fs, curve='A')
+weighted_signal = filters.weighting_filter(recording, fs, curve='A')
 
 # Apply C-weighting for peak analysis
-c_weighted_signal = metrology.weighting_filter(recording, fs, curve='C')
+c_weighted_signal = filters.weighting_filter(recording, fs, curve='C')
 ```
 
 The special weightings take the same `curve` argument; each is documented,
@@ -174,13 +174,13 @@ If you weight many signals with the same parameters, design the filter once:
 
 ```python
 import numpy as np
-from phonometry import metrology
+from phonometry import filters
 
 # recording: a calibrated microphone capture (Pa) — recorded through your measurement chain. Synthesized here so the guide runs standalone.
 fs = 48000
 recording = 0.2 * np.sin(2 * np.pi * 1000 * np.arange(fs) / fs)
 
-wf = metrology.WeightingFilter(fs, "A")
+wf = filters.WeightingFilter(fs, "A")
 signals = [recording]                # your batch of recordings
 for recording in signals:
     weighted = wf.filter(recording)
@@ -209,7 +209,7 @@ the oversampled design (blue) stays close to the analytic curve.*
 ```python
 import matplotlib.pyplot as plt
 import numpy as np
-from phonometry import metrology
+from phonometry import filters
 
 # Measured response of both designs at fs = 48 kHz: weight a centered
 # unit impulse and take its spectrum...
@@ -230,7 +230,7 @@ fig, ax = plt.subplots(figsize=(9, 5))
 ax.semilogx(freqs, analytic, "k--", label="Analytic (IEC 61672-1)")
 for high_accuracy, label in ((False, "Plain bilinear"),
                              (True, "Oversampled (default)")):
-    weighted = metrology.weighting_filter(impulse, fs, curve="A",
+    weighted = filters.weighting_filter(impulse, fs, curve="A",
                                 high_accuracy=high_accuracy)
     response = 20 * np.log10(np.abs(np.fft.rfft(weighted))
                              + np.finfo(float).eps)[1:]
@@ -253,17 +253,17 @@ plt.show()
 
 ```python
 import numpy as np
-from phonometry import metrology
+from phonometry import filters
 
 # recording: a calibrated microphone capture (Pa) — recorded through your measurement chain. Synthesized here so the guide runs standalone.
 fs = 48000
 recording = 0.2 * np.sin(2 * np.pi * 1000 * np.arange(fs) / fs)
 
 # Explicit legacy behavior
-y = metrology.weighting_filter(recording, fs, curve="A", high_accuracy=False)
+y = filters.weighting_filter(recording, fs, curve="A", high_accuracy=False)
 
 # Stateful block processing (legacy design, state carried between blocks)
-wf = metrology.WeightingFilter(fs, "A", stateful=True)
+wf = filters.WeightingFilter(fs, "A", stateful=True)
 blocks = [recording]                 # your sequence of recording blocks
 for block in blocks:
     weighted = wf.filter(block)
@@ -289,9 +289,9 @@ flagged `range_limited` (it then attests the checked frequencies only, not
 full 10 Hz-20 kHz conformance):
 
 ```python
-from phonometry import metrology
+from phonometry import filters
 
-result = metrology.verify_weighting_class(metrology.WeightingFilter(48000, "A"))
+result = filters.verify_weighting_class(filters.WeightingFilter(48000, "A"))
 print(result["overall_class"])          # 1
 print(result["range_limited"])          # False
 print(result["between_nominals"])       # {'worst_freq': ..., 'margin_class1_db': ...}
@@ -317,10 +317,10 @@ limit applies.*
 ```python
 import matplotlib.pyplot as plt
 import numpy as np
-from phonometry import metrology
+from phonometry import filters
 
-freqs, lower1, upper1 = metrology.weighting_class_limits(1)
-_, lower2, upper2 = metrology.weighting_class_limits(2)
+freqs, lower1, upper1 = filters.weighting_class_limits(1)
+_, lower2, upper2 = filters.weighting_class_limits(2)
 lo1, lo2 = np.clip(lower1, -7, 7), np.clip(lower2, -7, 7)
 
 fig, ax = plt.subplots(figsize=(10, 6.5))
@@ -332,7 +332,7 @@ ax.plot(freqs, upper2, ":", drawstyle="steps-mid", label="Class 2 upper/lower li
 ax.plot(freqs, lo2, ":", drawstyle="steps-mid", color="C2")
 
 for curve, marker in (("A", "o"), ("C", "s")):
-    bands = metrology.verify_weighting_class(metrology.WeightingFilter(48000, curve))["bands"]
+    bands = filters.verify_weighting_class(filters.WeightingFilter(48000, curve))["bands"]
     f = [b["freq"] for b in bands]
     dev = [b["deviation_db"] for b in bands]
     ax.plot(f, dev, marker=marker, label=f"{curve} weighting deviation (48 kHz)")
@@ -417,13 +417,13 @@ sources with significant energy below 20 Hz (wind turbines, HVAC, blasting):
 
 ```python
 import numpy as np
-from phonometry import metrology
+from phonometry import filters
 
 # recording: a calibrated microphone capture (Pa) — recorded through your measurement chain. Synthesized here so the guide runs standalone.
 fs = 48000
 recording = 0.2 * np.sin(2 * np.pi * 1000 * np.arange(fs) / fs)
 
-g_weighted = metrology.weighting_filter(recording, fs, curve='G')
+g_weighted = filters.weighting_filter(recording, fs, curve='G')
 ```
 
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/g_weighting_response_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/g_weighting_response.svg" alt="G-weighting frequency response from 0.1 Hz to 1 kHz with the ISO 7196 Table 2 nominal values overlaid" width="80%"></picture>
@@ -434,7 +434,7 @@ g_weighted = metrology.weighting_filter(recording, fs, curve='G')
 ```python
 import matplotlib.pyplot as plt
 import numpy as np
-from phonometry import metrology
+from phonometry import filters
 
 # Measure the G response: weight a centered unit impulse and take its
 # spectrum. A long buffer gives the resolution the infrasound range
@@ -443,7 +443,7 @@ fs = 4000
 impulse = np.zeros(20 * fs)
 impulse[impulse.size // 2] = 1.0
 freqs = np.fft.rfftfreq(impulse.size, 1 / fs)
-spectrum = np.fft.rfft(metrology.weighting_filter(impulse, fs, curve="G"))
+spectrum = np.fft.rfft(filters.weighting_filter(impulse, fs, curve="G"))
 
 fig, ax = plt.subplots(figsize=(9, 5))
 ax.semilogx(freqs[1:],
@@ -487,7 +487,7 @@ and A, C and Z are in [Frequency Weighting](https://jmrplens.github.io/phonometr
 ```python
 import matplotlib.pyplot as plt
 import numpy as np
-from phonometry import metrology
+from phonometry import filters
 
 # Measure each curve's response: weight a centered unit impulse and take its
 # spectrum. 96 kHz, not 48 kHz: it reaches the 40 kHz top row of the
@@ -500,7 +500,7 @@ freqs = np.fft.rfftfreq(fs, 1 / fs)
 fig, ax = plt.subplots(figsize=(9, 5))
 # A goes first and wide, as the reference the other three are read against.
 for curve, width in (("A", 4.0), ("B", 1.8), ("D", 1.8), ("AU", 1.8)):
-    spectrum = np.fft.rfft(metrology.weighting_filter(impulse, fs, curve=curve))
+    spectrum = np.fft.rfft(filters.weighting_filter(impulse, fs, curve=curve))
     ax.semilogx(freqs[1:], 20 * np.log10(np.abs(spectrum[1:]) + np.finfo(float).eps),
                 label=curve, linewidth=width)
 ax.set(xlim=(10, 40000), ylim=(-90, 18),
@@ -543,7 +543,7 @@ republished in NASA CR-3406.
 
 ```python
 import numpy as np
-from phonometry import metrology
+from phonometry import filters, signal
 
 # A 3.15 kHz whine sits right on the D-weighting hump: D rates it
 # 10 dB *louder* than A does.
@@ -551,8 +551,8 @@ fs = 96000
 t = np.arange(fs) / fs
 whine = 0.1 * np.sin(2 * np.pi * 3150 * t)
 
-ld = metrology.leq(metrology.weighting_filter(whine, fs, curve="D"))
-la = metrology.leq(metrology.weighting_filter(whine, fs, curve="A"))
+ld = signal.leq(filters.weighting_filter(whine, fs, curve="D"))
+la = signal.leq(filters.weighting_filter(whine, fs, curve="A"))
 print(f"LD = {ld:.1f} dB   LA = {la:.1f} dB")
 # LD = 82.5 dB   LA = 72.2 dB
 ```
@@ -569,7 +569,7 @@ high-frequency roll-off and overstate the *audible* exposure:
 
 ```python
 import numpy as np
-from phonometry import metrology
+from phonometry import filters, signal
 
 # 1 kHz tone (audible) buried under a strong 25 kHz ultrasonic component.
 fs = 96000
@@ -577,9 +577,9 @@ t = np.arange(fs) / fs
 audible = 0.1 * np.sin(2 * np.pi * 1000 * t)
 x = audible + 1.0 * np.sin(2 * np.pi * 25000 * t)
 
-la = metrology.leq(metrology.weighting_filter(x, fs, curve="A"))
-lau = metrology.leq(metrology.weighting_filter(x, fs, curve="AU"))
-la_ref = metrology.leq(metrology.weighting_filter(audible, fs, curve="A"))
+la = signal.leq(filters.weighting_filter(x, fs, curve="A"))
+lau = signal.leq(filters.weighting_filter(x, fs, curve="AU"))
+la_ref = signal.leq(filters.weighting_filter(audible, fs, curve="A"))
 print(f"LA = {la:.1f} dB   LAU = {lau:.1f} dB   audible alone = {la_ref:.1f} dB")
 # LA = 78.6 dB   LAU = 71.0 dB   audible alone = 71.0 dB
 # The ultrasound inflates LA by 7.6 dB; AU recovers the audible level.
@@ -621,7 +621,7 @@ Use the G frequency weighting of ISO 7196:1995, which rates infrasound the way A
 - [Frequency Weighting](https://jmrplens.github.io/phonometry/guides/weighting/): the A, C and Z curves, the
   `high_accuracy` design and the IEC 61672-1 Table 3 class verification
   these curves build on.
-- API reference: [`metrology.parametric_filters`](https://jmrplens.github.io/phonometry/reference/api/filters/parametric-filters/) and [`metrology.compliance`](https://jmrplens.github.io/phonometry/reference/api/filters/compliance/).
+- API reference: [`filters.weighting`](https://jmrplens.github.io/phonometry/reference/api/filters/weighting/) and [`filters.compliance`](https://jmrplens.github.io/phonometry/reference/api/filters/compliance/).
 
 ## References
 
@@ -733,7 +733,7 @@ that is why level analyses discard the first instants of a recording.
 ```python
 import numpy as np
 import matplotlib.pyplot as plt
-from phonometry import metrology
+from phonometry import filters
 
 fs = 48000
 t = np.arange(int(fs * 4)) / fs
@@ -744,7 +744,7 @@ burst[fs:int(1.5 * fs)] = 0.2 * rng.standard_normal(int(0.5 * fs))
 p0 = 2e-5
 plt.figure()
 for mode in ('fast', 'slow', 'impulse'):
-    envelope = metrology.time_weighting(burst, fs, mode=mode)
+    envelope = filters.time_weighting(burst, fs, mode=mode)
     plt.plot(t, 10 * np.log10(np.maximum(envelope, 1e-12) / p0**2), label=mode)
 plt.xlabel('Time [s]')
 plt.ylabel('Level [dB SPL]')
@@ -756,14 +756,14 @@ plt.show()
 
 ```python
 import numpy as np
-from phonometry import metrology
+from phonometry import filters
 
 # recording: a calibrated microphone capture (Pa) — recorded through your measurement chain. Synthesized here so the guide runs standalone.
 fs = 48000
 recording = 0.2 * np.sin(2 * np.pi * 1000 * np.arange(fs) / fs)
 
 # Calculate energy envelope (Mean Square)
-energy_envelope = metrology.time_weighting(recording, fs, mode='fast')
+energy_envelope = filters.time_weighting(recording, fs, mode='fast')
 # dB SPL relative to 20 μPa
 spl_t = 10 * np.log10(energy_envelope / (2e-5)**2)
 
@@ -830,19 +830,19 @@ and 1 s down to 2 ms for S, at class 1 acceptance limits:
 ```python
 import numpy as np
 import matplotlib.pyplot as plt
-from phonometry import metrology
+from phonometry import filters
 
 fs = 48000
 t = np.arange(int(fs * 2)) / fs
 tone = np.sin(2 * np.pi * 4000 * t)
 
 # Steady-state Fast reference of the continuous tone
-reference = metrology.time_weighting(tone, fs, mode='fast')[int(1.5 * fs):].mean()
+reference = filters.time_weighting(tone, fs, mode='fast')[int(1.5 * fs):].mean()
 
 # 200 ms burst of the same tone (IEC 61672-1 Table 4 target: -1.0 dB)
 burst = np.zeros_like(t)
 burst[int(0.5 * fs):int(0.7 * fs)] = tone[int(0.5 * fs):int(0.7 * fs)]
-envelope = metrology.time_weighting(burst, fs, mode='fast')
+envelope = filters.time_weighting(burst, fs, mode='fast')
 env_db = 10 * np.log10(np.maximum(envelope / reference, 1e-6))
 
 plt.figure()
@@ -865,13 +865,13 @@ steady signal is already present, you can start from the first sample energy ins
 
 ```python
 import numpy as np
-from phonometry import metrology
+from phonometry import filters
 
 # recording: a calibrated microphone capture (Pa) — recorded through your measurement chain. Synthesized here so the guide runs standalone.
 fs = 48000
 recording = 0.2 * np.sin(2 * np.pi * 1000 * np.arange(fs) / fs)
 
-energy_envelope = metrology.time_weighting(recording, fs, mode='fast', initial_state='first')
+energy_envelope = filters.time_weighting(recording, fs, mode='fast', initial_state='first')
 ```
 
 ## 6. Block processing
@@ -880,14 +880,14 @@ For block processing, pass the last output value from the previous block as the
 next block's `initial_state` instead of resetting each block:
 
 ```python
-from phonometry import metrology
+from phonometry import filters
 
 state = None
 
 # audio_blocks: consecutive frames of your calibrated recording (Pa),
 #   streamed from your sound card or read from a WAV in blocks.
 for block in audio_blocks:
-    energy_envelope = metrology.time_weighting(block, fs, mode='fast', initial_state=state)
+    energy_envelope = filters.time_weighting(block, fs, mode='fast', initial_state=state)
     state = energy_envelope[-1]
 ```
 
@@ -899,9 +899,9 @@ such as `(n_channels,)` for input shaped `(n_channels, n_samples)`.
 Or let the `TimeWeighting` class carry the state for you:
 
 ```python
-from phonometry import metrology
+from phonometry import filters
 
-tw = metrology.TimeWeighting(fs, mode='fast')
+tw = filters.TimeWeighting(fs, mode='fast')
 # audio_blocks: consecutive frames of your calibrated recording (Pa),
 #   streamed from your sound card or read from a WAV in blocks.
 for block in audio_blocks:
@@ -1013,7 +1013,7 @@ time-weighted level distribution.
 
 ```python
 import numpy as np
-from phonometry import metrology
+from phonometry import signal
 
 # recording: a calibrated microphone capture (Pa) — recorded through your measurement chain. Synthesized here so the guide runs standalone.
 fs = 48000
@@ -1021,10 +1021,10 @@ recording = 0.2 * np.sin(2 * np.pi * 1000 * np.arange(fs) / fs)
 sensitivity = 1.0                                    # calibration_factor (see Calibration)
 
 # Equivalent continuous level of the whole recording
-level = metrology.leq(recording, calibration_factor=sensitivity)
+level = signal.leq(recording, calibration_factor=sensitivity)
 
 # A-weighted Leq (the standard environmental noise metric)
-la = metrology.laeq(recording, fs, calibration_factor=sensitivity)
+la = signal.laeq(recording, fs, calibration_factor=sensitivity)
 ```
 
 Both accept 1D signals (returning a scalar) or 2D `[channels, samples]` arrays
@@ -1068,7 +1068,7 @@ everywhere else, energy.
 
 ```python
 import numpy as np
-from phonometry import metrology
+from phonometry import signal
 
 # A steady tone gives L10 = L50 = L90; percentiles only tell a story for a
 # *fluctuating* level. Synthesize 3 s alternating between a quiet and a
@@ -1080,7 +1080,7 @@ quiet = 0.02 * rng.standard_normal(segment)        # background
 loud = 0.06 * rng.standard_normal(segment)         # ~10 dB louder events
 varying = np.tile(np.concatenate([quiet, loud]), 3)
 
-stats = metrology.ln_levels(varying, fs, n=(10, 50, 90), weighting="A")
+stats = signal.ln_levels(varying, fs, n=(10, 50, 90), weighting="A")
 print(f"LA10={stats[10]:.1f}  LA50={stats[50]:.1f}  LA90={stats[90]:.1f} dB")
 # LA10=66.6  LA50=65.2  LA90=58.5 dB  -> L10 (events) > L50 (median) > L90 (background)
 ```
@@ -1096,7 +1096,7 @@ background.*
 ```python
 import numpy as np
 import matplotlib.pyplot as plt
-from phonometry import metrology
+from phonometry import filters, signal
 
 # The fluctuating signal of the ln_levels example: 0.5 s of background
 # alternating with 0.5 s of ~10 dB louder events, repeated 3 times
@@ -1108,9 +1108,9 @@ loud = 0.06 * rng.standard_normal(segment)
 varying = np.tile(np.concatenate([quiet, loud]), 3)
 
 # Fast mean-square envelope -> level vs time, plus the percentile levels
-envelope = metrology.time_weighting(varying, fs, mode="fast")
+envelope = filters.time_weighting(varying, fs, mode="fast")
 level_t = 10 * np.log10(np.maximum(envelope, 1e-12) / (2e-5) ** 2)
-stats = metrology.ln_levels(varying, fs, n=(10, 50, 90))
+stats = signal.ln_levels(varying, fs, n=(10, 50, 90))
 t = np.arange(varying.size) / fs
 
 fig, ax = plt.subplots()
@@ -1182,7 +1182,7 @@ of [Environmental levels](https://jmrplens.github.io/phonometry/guides/environme
 
 ```python
 import numpy as np
-from phonometry import metrology
+from phonometry import signal
 
 # recording: a calibrated microphone capture (Pa) — recorded through your measurement chain. Synthesized here so the guide runs standalone.
 fs = 48000
@@ -1190,18 +1190,18 @@ recording = 0.2 * np.sin(2 * np.pi * 1000 * np.arange(fs) / fs)
 sensitivity = 1.0                                    # calibration_factor (see Calibration)
 
 # C-weighted peak (IEC 61672-1 §5.13) - occupational action limits use this
-peak = metrology.lc_peak(recording, fs, calibration_factor=sensitivity)
+peak = signal.lc_peak(recording, fs, calibration_factor=sensitivity)
 
 # A single noise event and a work-shift sample (slices of a real recording)
 event = recording
 shift_sample = recording
 
 # Sound exposure level: single-event level normalized to 1 s (LAE)
-lae = metrology.sel(event, fs, weighting="A", calibration_factor=sensitivity)
+lae = signal.sel(event, fs, weighting="A", calibration_factor=sensitivity)
 
 # Daily noise dose (IEC 61252): exposure in Pa²·h and LEX,8h / LEP,d
-E = metrology.sound_exposure(shift_sample, fs, duration_hours=8, calibration_factor=sensitivity)
-lex = metrology.lex_8h(shift_sample, fs, duration_hours=8, calibration_factor=sensitivity)
+E = signal.sound_exposure(shift_sample, fs, duration_hours=8, calibration_factor=sensitivity)
+lex = signal.lex_8h(shift_sample, fs, duration_hours=8, calibration_factor=sensitivity)
 ```
 
 `lc_peak` is verified against the one-cycle/half-cycle reference responses of
@@ -1238,7 +1238,7 @@ railway noise models.
 ```python
 import numpy as np
 import matplotlib.pyplot as plt
-from phonometry import metrology
+from phonometry import filters, signal
 
 # A vehicle pass-by: noise under a gaussian energy envelope (dBFS analysis)
 fs = 48000
@@ -1246,9 +1246,9 @@ t = np.arange(int(8.0 * fs)) / fs
 rng = np.random.default_rng(11)
 x = 0.3 * np.exp(-0.5 * ((t - 4.0) / 1.1) ** 2) * rng.standard_normal(t.size)
 
-level = 10 * np.log10(np.maximum(metrology.time_weighting(x, fs, mode="fast"), 1e-12))
-l_sel = float(metrology.sel(x, fs, dbfs=True))
-l_eq = float(metrology.leq(x, dbfs=True))
+level = 10 * np.log10(np.maximum(filters.time_weighting(x, fs, mode="fast"), 1e-12))
+l_sel = float(signal.sel(x, fs, dbfs=True))
+l_eq = float(signal.leq(x, dbfs=True))
 print(f"Leq = {l_eq:.1f} dBFS, SEL = {l_sel:.1f} dBFS")
 # Leq = -16.6 dBFS, SEL = -7.6 dBFS -> the 1 s block carries the event energy
 
@@ -1309,13 +1309,13 @@ time-aligned across bands.
 
 ```python
 import numpy as np
-from phonometry import metrology
+from phonometry import filters
 
 # recording: a calibrated microphone capture (Pa) — recorded through your measurement chain. Synthesized here so the guide runs standalone.
 fs = 48000
 recording = 0.2 * np.sin(2 * np.pi * 1000 * np.arange(fs) / fs)
 
-bank = metrology.OctaveFilterBank(fs=48000, fraction=3)
+bank = filters.OctaveFilterBank(fs=48000, fraction=3)
 levels, freq, times = bank.spectrogram(recording, window_time=0.125, overlap=0.5)
 # levels: (bands, frames) — ready for pcolormesh(times, freq, levels)
 ```
@@ -1332,7 +1332,7 @@ levels, freq, times = bank.spectrogram(recording, window_time=0.125, overlap=0.5
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.signal import chirp
-from phonometry import metrology
+from phonometry import filters
 
 # Log sweep 80 Hz -> 8 kHz plus two tone bursts, in a little noise
 fs = 48000
@@ -1342,7 +1342,7 @@ x[int(1.0 * fs):int(1.3 * fs)] += np.sin(2 * np.pi * 4000 * t[: int(0.3 * fs)])
 x[int(2.5 * fs):int(2.8 * fs)] += np.sin(2 * np.pi * 250 * t[: int(0.3 * fs)])
 x += 0.01 * np.random.default_rng(42).standard_normal(t.size)
 
-bank = metrology.OctaveFilterBank(fs=fs, fraction=12, order=6, limits=[50.0, 12000.0])
+bank = filters.OctaveFilterBank(fs=fs, fraction=12, order=6, limits=[50.0, 12000.0])
 levels, freq, times = bank.spectrogram(x, window_time=0.125, overlap=0.875)
 
 fig, ax = plt.subplots()

@@ -1028,7 +1028,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   removed in 5.0, a release later than the 3.x ones, so the rename notice now
   names the release that removes it instead of assuming 4.0. Resolution goes
   through the public `__all__` of the packages the names moved to, so a name
-  that stops being public stops resolving through the old namespace as well.
+  that stops being public stops resolving through the old namespace as well,
+  and `dir(metrology)` still lists them, since a PEP 562 hook is invisible to
+  it and they would otherwise vanish from tab completion a release before they
+  stop working. The one form the hook cannot serve is
+  `from phonometry.metrology import *`, which now brings the narrowed API
+  rather than everything the package used to re-export; the explicit forms all
+  keep working.
 
 - The generated reference is keyed by subpackage. Its sections were a fourth
   naming of the same material (`levels`, `spectra`, `correlation` for what the

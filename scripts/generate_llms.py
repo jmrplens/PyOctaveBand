@@ -333,7 +333,7 @@ def _summary(version: str) -> list[str]:
         "x = np.random.randn(fs)              # 1 s of signal (pressure units)",
         "spl, freq = filters.octave_filter(x, fs, fraction=3)   # 1/3-octave bands",
         "la = signal.laeq(x, fs)                                  # A-weighted Leq",
-        "stats = metrology.ln_levels(x, fs, n=(10, 50, 90))       # statistical levels",
+        "stats = signal.ln_levels(x, fs, n=(10, 50, 90))          # statistical levels",
         "```",
         "",
         (
