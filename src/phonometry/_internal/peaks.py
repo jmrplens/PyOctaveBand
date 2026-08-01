@@ -4,7 +4,7 @@
 The true peak of a band-limited continuous waveform generally falls between
 samples, so a raw on-grid maximum under-reads it (worst for sustained tones
 near integer submultiples of the sample rate). Both the C-weighted peak
-level (:func:`phonometry.metrology.levels.lc_peak`, IEC 61672-1) and the
+level (:func:`phonometry.signals.levels.lc_peak`, IEC 61672-1) and the
 true-peak programme level (:func:`phonometry.broadcast.true_peak_level`,
 ITU-R BS.1770-5 Annex 2) recover the inter-sample peak the same way:
 polyphase-oversample the signal, then take the absolute maximum. This module

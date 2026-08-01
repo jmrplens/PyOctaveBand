@@ -146,7 +146,7 @@ def test_filter_binding_detail_matches_library_margin() -> None:
     public ``class_limits``; guard that its class-1 margin never diverges from
     the authoritative ``verify_filter_class`` (single source of truth)."""
     from phonometry import OctaveFilterBank
-    from phonometry.metrology.compliance import verify_filter_class
+    from phonometry.filters.compliance import verify_filter_class
 
     for arch in cr._FILTER_ARCHS:
         fc = cr._filter_class(arch, 3)

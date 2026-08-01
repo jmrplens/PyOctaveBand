@@ -34,7 +34,7 @@ const AUDIT_PATHS = [
   `${BASE}/guides/`,
   `${BASE}/guides/calibration/`,
   `${BASE}/guides/insulation-field/`,
-  `${BASE}/reference/api/levels/levels/`,
+  `${BASE}/reference/api/signals/levels/`,
   `${BASE}/reference/conformance/`,
 ];
 

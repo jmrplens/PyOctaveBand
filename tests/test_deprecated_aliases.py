@@ -1,11 +1,14 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""One-cycle deprecation shims introduced by the phonometry 3.1 renames.
+"""One-cycle deprecation shims of the phonometry renames.
 
 One :func:`pytest.warns` test per alias (CONTRIBUTING, "Deprecations"):
 the renamed ``loudness`` module (PEP 562 shim), the legacy snake_case
 function aliases and the renamed keyword arguments (scikit-learn
 ``"deprecated"`` sentinel). Every alias must warn with the NEP 23 message
-and delegate to the canonical name. Remove alongside the aliases in 4.0.
+and delegate to the canonical name.
+
+Two generations coexist, each removed with its own release: the 3.1 renames
+and the 3.2 module moves go in 4.0, the 4.0 taxonomy aliases in 5.0.
 """
 
 from __future__ import annotations
@@ -53,15 +56,15 @@ def test_octavefilter_warns_and_delegates() -> None:
     assert freq == canonical_freq
 
 
-def test_metrology_octavefilter_warns_and_delegates() -> None:
-    """The alias exported by phonometry.metrology keeps the top-level behavior."""
-    from phonometry import metrology
+def test_filters_octavefilter_warns_and_delegates() -> None:
+    """The alias exported by phonometry.filters keeps the top-level behavior."""
+    from phonometry import filters
 
-    assert metrology.octave_filter is ph.octave_filter
-    assert metrology.octavefilter is ph.octavefilter
-    canonical_spl, canonical_freq = metrology.octave_filter(SIGNAL, 48000)
+    assert filters.octave_filter is ph.octave_filter
+    assert filters.octavefilter is ph.octavefilter
+    canonical_spl, canonical_freq = filters.octave_filter(SIGNAL, 48000)
     with pytest.warns(DeprecationWarning, match=r"octave_filter\(\)"):
-        spl, freq = metrology.octavefilter(SIGNAL, 48000)
+        spl, freq = filters.octavefilter(SIGNAL, 48000)
     np.testing.assert_allclose(spl, canonical_spl)
     assert freq == canonical_freq
 
@@ -391,6 +394,100 @@ def test_pre_move_module_path_still_imports(path: str) -> None:
     assert public, f"{path} imports but exposes no public names"
 
 
+# --------------------------------------------------------------------------- #
+# 4.0 taxonomy: metrology split into filters + signal + a narrowed metrology.
+# Frozen snapshot of the pre-split module paths; do NOT regenerate from the
+# live tree. Removed in 5.0 together with the aliases.
+# --------------------------------------------------------------------------- #
+_PRE_SPLIT_MODULE_PATHS = [
+    "phonometry.metrology.cepstrum",
+    "phonometry.metrology.compliance",
+    "phonometry.metrology.core",
+    "phonometry.metrology.correlation",
+    "phonometry.metrology.envelope",
+    "phonometry.metrology.equalizer",
+    "phonometry.metrology.filter_design",
+    "phonometry.metrology.frequencies",
+    "phonometry.metrology.inversion",
+    "phonometry.metrology.levels",
+    "phonometry.metrology.miso",
+    "phonometry.metrology.parametric_filters",
+    "phonometry.metrology.phase",
+    "phonometry.metrology.random_data",
+    "phonometry.metrology.signals",
+    "phonometry.metrology.spectra",
+    "phonometry.metrology.synchronous_average",
+    "phonometry.metrology.time_frequency",
+]
+
+
+@pytest.mark.parametrize("path", _PRE_SPLIT_MODULE_PATHS)
+def test_pre_split_module_path_still_imports(path: str) -> None:
+    import importlib
+    import warnings
+
+    with warnings.catch_warnings():
+        warnings.simplefilter("error", DeprecationWarning)
+        module = importlib.import_module(path)  # import itself must be silent
+    assert module is sys.modules[path]
+    public = [name for name in dir(module) if not name.startswith("_")]
+    assert public, f"{path} imports but exposes no public names"
+
+
+def test_pre_split_module_shim_names_the_5_0_removal() -> None:
+    """The 4.0 aliases outlive the 3.x ones: they go in 5.0, not in 4.0."""
+    shim = sys.modules["phonometry.metrology.levels"]
+    with pytest.warns(DeprecationWarning, match="removed in 5.0") as record:
+        _ = shim.leq
+    assert "phonometry.signals.levels" in str(record[0].message)
+
+
+def test_narrowed_namespace_still_serves_the_names_that_left() -> None:
+    """``metrology.leq`` keeps working: the namespace form is documented."""
+    import warnings
+
+    from phonometry import metrology
+
+    with pytest.warns(DeprecationWarning, match="phonometry.signals.leq"):
+        assert metrology.leq is ph.leq
+    with pytest.warns(DeprecationWarning, match="phonometry.filters.octave_filter"):
+        assert metrology.octave_filter is ph.octave_filter
+    # Names that stayed resolve without a notice.
+    with warnings.catch_warnings():
+        warnings.simplefilter("error", DeprecationWarning)
+        assert metrology.combine_uncertainty is ph.combine_uncertainty
+    with pytest.raises(AttributeError, match="phonometry.metrology"):
+        _ = metrology.not_a_name
+
+
+def test_narrowed_namespace_lists_the_moved_names_in_dir() -> None:
+    """A PEP 562 hook is invisible to dir(); the names must not vanish early."""
+    from phonometry import filters, metrology, signals
+
+    listed = dir(metrology)
+    assert set(metrology.__all__) <= set(listed)
+    assert set(filters.__all__) <= set(listed)
+    assert set(signals.__all__) <= set(listed)
+    assert listed == sorted(listed)
+    # __all__ stays narrow, so `import *` gives the 4.0 API, not the aliases.
+    assert "leq" not in metrology.__all__
+
+
+def test_narrowed_namespace_falls_back_to_the_module_alias() -> None:
+    """``metrology.spectra`` has no public name of its own; it is the module."""
+    import warnings
+
+    from phonometry import metrology
+
+    with warnings.catch_warnings():
+        warnings.simplefilter("error", DeprecationWarning)
+        assert metrology.spectra is sys.modules["phonometry.metrology.spectra"]
+    # A name that is both a module and a public function resolves to the
+    # function, as the pre-split package did.
+    with pytest.warns(DeprecationWarning, match="phonometry.signals.correlation"):
+        assert metrology.correlation is ph.correlation
+
+
 # Frozen snapshot of the ``phonometry._plotting`` re-export surface (the
 # renderers as of the 3.2 move); do NOT regenerate from the live tree.
 _PLOTTING_RENDERERS = [
@@ -495,9 +592,9 @@ def test_plotting_shim_re_exports_every_renderer() -> None:
 def test_moved_module_shims_warn_and_delegate() -> None:
     import importlib
 
-    from phonometry._compat import _MOVED
+    from phonometry._compat import _MOVED_3X, _MOVED_4X
 
-    for old, new in _MOVED.items():
+    for old, new in {**_MOVED_3X, **_MOVED_4X}.items():
         shim = importlib.import_module(old)
         target = importlib.import_module(new)
         public = [n for n in dir(target) if not n.startswith("_")]

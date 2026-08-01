@@ -196,9 +196,9 @@ linealidad y resolución. El filtrado de tercio de octava lo cubre la
 verificación de clase 2 de filtros IEC 61260 de la librería.
 
 ```python
-from phonometry import metrology
+from phonometry import filters
 
-report = metrology.verify_aircraft_noise_system(
+report = filters.verify_aircraft_noise_system(
     directional={4000.0: {30: 0.4, 60: 0.9, 90: 1.9, 120: 2.4, 150: 2.4}},
     frequency_response={1000.0: 1.2},
 )

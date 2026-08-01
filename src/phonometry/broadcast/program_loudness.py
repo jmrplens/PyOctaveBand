@@ -506,7 +506,7 @@ def true_peak_level(
     Estimates the inter-sample peak by oversampling the signal to at least
     192 kHz with a polyphase FIR interpolator before taking the absolute
     maximum (the same machinery behind
-    :func:`phonometry.metrology.levels.lc_peak`). At 48 kHz this is the
+    :func:`phonometry.signals.levels.lc_peak`). At 48 kHz this is the
     4-times oversampling of the Annex 2 block diagram; higher input rates
     need proportionately less. The initial 12.04 dB attenuation of the
     Annex 2 integer pipeline is unnecessary in floating point and omitted.

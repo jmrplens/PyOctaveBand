@@ -15,7 +15,7 @@ Two closed-form quantities of the standard:
   ``ΔL_a`` that decides whether a tone is audible.
 
 The tonal-audibility formula itself is the ISO 1996-2 Annex C one already in
-:mod:`phonometry.environmental_measurement`; what is specific to IEC 61400-11 is
+:mod:`phonometry.environmental.measurement`; what is specific to IEC 61400-11 is
 how the tone and masking-noise levels and the (Zwicker) critical band are
 determined from the narrowband spectrum. The rating adjustment ``K_T`` is the
 ISO 1996-2 :func:`~phonometry.environmental_measurement.tonal_adjustment`. The

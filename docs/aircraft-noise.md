@@ -170,9 +170,9 @@ filtering itself is covered by the library's IEC 61260 class-2 filter
 verification (`verify_filter_class`).
 
 ```python
-from phonometry import metrology
+from phonometry import filters
 
-report = metrology.verify_aircraft_noise_system(
+report = filters.verify_aircraft_noise_system(
     directional={4000.0: {30: 0.4, 60: 0.9, 90: 1.9, 120: 2.4, 150: 2.4}},
     frequency_response={1000.0: 1.2},
 )

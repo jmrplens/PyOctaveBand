@@ -59,10 +59,10 @@ fraccionales y la interpolación logarítmica de la norma) e informa de la clase
 por banda con su margen en dB:
 
 ```python
-from phonometry import metrology
+from phonometry import filters
 
-bank = metrology.OctaveFilterBank(fs=48000, fraction=3, order=6)
-result = metrology.verify_filter_class(bank)
+bank = filters.OctaveFilterBank(fs=48000, fraction=3, order=6)
+result = filters.verify_filter_class(bank)
 print(result["overall_class"])          # 1
 print(result["bands"][0])
 # {'freq': 12.589254117941678, 'class': 1, 'checked_to_omega': 3.8127755266765493, 'margin_class1_db': 0.3999999999999595, 'margin_class2_db': 0.5999999999999595}
@@ -87,10 +87,10 @@ que la morada dentro de ella.*
 import matplotlib.pyplot as plt
 import numpy as np
 from scipy.signal import sosfreqz
-from phonometry import metrology
+from phonometry import filters
 
 fs = 48000
-bank = metrology.OctaveFilterBank(fs, fraction=1, order=6, limits=[800, 1200])
+bank = filters.OctaveFilterBank(fs, fraction=1, order=6, limits=[800, 1200])
 idx = int(np.argmin(np.abs(np.array(bank.freq) - 1000)))
 fm, fsd = bank.freq[idx], fs / bank.factor[idx]
 w, h = sosfreqz(bank.sos[idx], worN=2**15, fs=fsd)
@@ -98,7 +98,7 @@ att = -20 * np.log10(np.abs(h) + 1e-12)
 delta_a = att - np.interp(fm, w, att)     # atenuación relativa
 
 grid = np.logspace(np.log10(0.05), np.log10(8), 2000)
-lo1, hi1 = metrology.class_limits(1.0, 1, grid)     # atenuación mín/máx de clase 1
+lo1, hi1 = filters.class_limits(1.0, 1, grid)     # atenuación mín/máx de clase 1
 
 fig, ax = plt.subplots(figsize=(9, 5.5))
 ax.fill_between(grid, -10, lo1, alpha=0.15, color="tab:red",
@@ -136,12 +136,12 @@ ligeramente de la edición de 2014, así que se selecciona con un conmutador `ed
 lugar de mezclarse con la máscara de 2014:
 
 ```python
-from phonometry import metrology
+from phonometry import filters
 
 fs = 48000
-bank = metrology.OctaveFilterBank(fs, fraction=1, order=6, limits=[800, 1200])
+bank = filters.OctaveFilterBank(fs, fraction=1, order=6, limits=[800, 1200])
 
-result = metrology.verify_filter_class(bank, edition="1995")   # clases 0, 1, 2
+result = filters.verify_filter_class(bank, edition="1995")   # clases 0, 1, 2
 print(result["overall_class"])          # 0  (el Butterworth por defecto la supera)
 print(result["bands"][0]["margin_class0_db"])
 ```
@@ -159,10 +159,10 @@ Butterworth de orden 6 serpentea dentro de la clase 0 en toda la banda de paso.*
 import matplotlib.pyplot as plt
 import numpy as np
 from scipy.signal import sosfreqz
-from phonometry import metrology
+from phonometry import filters
 
 fs = 48000
-bank = metrology.OctaveFilterBank(fs, fraction=1, order=6, limits=[800, 1200])
+bank = filters.OctaveFilterBank(fs, fraction=1, order=6, limits=[800, 1200])
 idx = int(np.argmin(np.abs(np.array(bank.freq) - 1000)))
 fm, fsd = bank.freq[idx], fs / bank.factor[idx]
 w, h = sosfreqz(bank.sos[idx], worN=2**15, fs=fsd)
@@ -176,7 +176,7 @@ pb = (w / fm >= g ** -0.5) & (w / fm <= g ** 0.5)
 
 fig, ax = plt.subplots(figsize=(9, 5.5))
 for cls in (2, 1, 0):            # corredores anidados, clase 0 el más estrecho
-    lo, hi = metrology.class_limits(1.0, cls, grid, edition="1995")
+    lo, hi = filters.class_limits(1.0, cls, grid, edition="1995")
     ax.plot(grid, hi, label=f"Corredor de clase {cls}")
     ax.plot(grid, lo, color=ax.lines[-1].get_color())
 ax.plot(w[pb] / fm, delta_a[pb], "k", lw=2, label="Butterworth de orden 6")
@@ -343,7 +343,7 @@ superior holgadamente por debajo de Nyquist o sube `fs`.
   las configuraciones verificadas detrás de las afirmaciones de clase de esta
   página.
 - Referencia de la API:
-  [`metrology.compliance`](/phonometry/es/reference/api/filters/compliance/).
+  [`filters.compliance`](/phonometry/es/reference/api/filters/compliance/).
 
 ## Respuestas rápidas
 

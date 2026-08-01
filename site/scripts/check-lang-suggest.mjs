@@ -107,8 +107,8 @@ expect(
 // 8. The English-only API subtree opts out entirely.
 expect(
 	'API reference renders no banner at all',
-	await visit('/reference/api/levels/levels/'),
-	{ url: `${BASE_PATH}/reference/api/levels/levels/`, banner: 'absent', stored: null },
+	await visit('/reference/api/signals/levels/'),
+	{ url: `${BASE_PATH}/reference/api/signals/levels/`, banner: 'absent', stored: null },
 );
 
 // 9. Nothing ever navigates on its own: the same first visit that a redirect

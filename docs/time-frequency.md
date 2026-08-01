@@ -4,7 +4,7 @@
 
 A stationary spectrum hides everything that happens *in time*: a passing
 siren, an impact, a machine running up. This page covers the two
-time-frequency estimators of `phonometry.metrology`, both with the
+time-frequency estimators of `phonometry.signals`, both with the
 calibration discipline of the
 [spectral-analysis page](spectral-analysis.md): the
 **calibrated spectrogram** (the short-time Fourier transform view of

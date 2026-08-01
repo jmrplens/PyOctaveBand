@@ -48,9 +48,9 @@ band around 1 kHz is approximately:
 You can inspect the exact bands with:
 
 ```python
-from phonometry import metrology
+from phonometry import filters
 
-fc, fl, fu, labels = metrology.nominal_frequencies(fraction=3, limits=[12, 20000])
+fc, fl, fu, labels = filters.nominal_frequencies(fraction=3, limits=[12, 20000])
 for label, center, lower, upper in zip(labels, fc, fl, fu):
     print(label, center, lower, upper, upper - lower)
 ```
@@ -61,7 +61,7 @@ original signal and use the phonometry band edges as masks:
 ```python
 import numpy as np
 from scipy import signal
-from phonometry import metrology
+from phonometry import filters
 
 fs = 100_000
 # any 1D pressure signal in Pa (synthesized here so the example runs)
@@ -69,7 +69,7 @@ pressure_signal_pa = 0.02 * np.random.default_rng(0).standard_normal(fs)
 x = pressure_signal_pa
 
 # Standardized third-octave levels from phonometry.
-levels, centers = metrology.octave_filter(
+levels, centers = filters.octave_filter(
     x,
     fs=fs,
     fraction=3,
@@ -77,7 +77,7 @@ levels, centers = metrology.octave_filter(
 )
 
 # Same standardized band definitions, including lower/upper edges.
-fc, fl, fu, labels = metrology.nominal_frequencies(fraction=3, limits=[12, 20_000])
+fc, fl, fu, labels = filters.nominal_frequencies(fraction=3, limits=[12, 20_000])
 
 # Narrowband Welch estimate on the original signal.
 nperseg = min(2**15, len(x))

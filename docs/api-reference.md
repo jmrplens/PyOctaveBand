@@ -2,7 +2,7 @@
 
 # API Reference
 
-All core functionality lives in fifteen domain subpackages; every public name
+All core functionality lives in seventeen domain subpackages; every public name
 is also re-exported by the top-level `phonometry` package.
 
 > **Note.** This page is the curated quick table for the GitHub/PyPI audience:
@@ -13,7 +13,7 @@ is also re-exported by the top-level `phonometry` package.
 
 ## Namespaces
 
-The library is organized into fifteen domain subpackages, and importing the
+The library is organized into seventeen domain subpackages, and importing the
 domain namespace is the primary form used throughout the documentation:
 
 ```python
@@ -24,7 +24,9 @@ contour = aircraft.noise_contour(path, powers, distances, sel, lmax, x=gx, y=gy)
 
 | Subpackage | Scope |
 | :--- | :--- |
-| `phonometry.metrology` | Filter banks, weighting and time weighting, levels, calibration, IEC verifiers, GUM uncertainty |
+| `phonometry.filters` | Octave and fractional-octave filter banks, frequency weightings and time weighting, parametric EQ, IEC 61260-1 and IEC 61672-1 class verification |
+| `phonometry.signals` | Levels (Leq, LAeq, percentiles), Welch and multitaper spectra, coherence, time-frequency, correlation, envelope, cepstrum, phase, synchronous averaging, test signals |
+| `phonometry.metrology` | Calibration, GUM uncertainty and Monte Carlo, data qualification (stationarity, trends, peak statistics), IEC 61043 intensity class |
 | `phonometry.psychoacoustics` | Loudness (Zwicker, ECMA, Moore-Glasberg), sharpness, tonality, roughness, fluctuation strength, annoyance, tonal audibility |
 | `phonometry.hearing` | Hearing threshold, NIHL, occupational exposure, SII, STI |
 | `phonometry.emission` | Sound power (ISO 3740 family), sound intensity, vibration-based power |
@@ -41,9 +43,12 @@ contour = aircraft.noise_contour(path, powers, distances, sel, lmax, x=gx, y=gy)
 | `phonometry.simulation` | 2D acoustic FDTD wave simulation (staggered grid, sources, probes, impedance boundaries, obstacles) |
 
 Every name in the table below is also re-exported at the top level, so
-`from phonometry import <name>` works for every row. The pre-3.2 flat module
-paths (for example `phonometry.insulation`) keep importing for one deprecation
-cycle and warn on use; they are removed in 4.0.
+`from phonometry import <name>` works for every row. Two generations of module
+paths are still importable and warn on use: the pre-3.2 flat ones (for example
+`phonometry.insulation`), removed in 4.0, and the pre-4.0 ones that the split
+of `metrology` moved (for example `phonometry.metrology.levels`, now
+`phonometry.signals.levels`), removed in 5.0. Reading a moved name from the
+namespace it left (`metrology.leq`) warns and delegates as well.
 
 | Name | Type | Description (Inputs) | Usage Snippet (Outputs) |
 | :--- | :--- | :--- | :--- |

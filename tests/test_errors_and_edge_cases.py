@@ -14,7 +14,7 @@ from phonometry import (
     time_weighting,
     weighting_filter,
 )
-from phonometry.metrology.frequencies import nominal_frequencies
+from phonometry.filters.frequencies import nominal_frequencies
 
 
 def test_octave_filter_bank_invalid_init() -> None:

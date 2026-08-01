@@ -100,7 +100,7 @@ def band_labels(frequencies: np.ndarray | None, n: int) -> tuple[list[str], int]
     """
     if frequencies is None:
         return [f"Band {i + 1}" for i in range(n)], 0
-    from ..metrology.frequencies import _infer_band_fraction, _nominal_freq_for_band
+    from ..filters.frequencies import _infer_band_fraction, _nominal_freq_for_band
 
     freqs = np.asarray(frequencies, dtype=np.float64)
     fraction = _infer_band_fraction(freqs) if freqs.size >= 2 else 1

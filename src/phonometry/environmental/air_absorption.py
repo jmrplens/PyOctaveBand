@@ -59,7 +59,7 @@ the coefficients are computed at the exact midband frequencies (Note 5)
 ``exact_midband=True`` to snap the requested frequencies onto that grid and
 reproduce Table 1 exactly.
 
-This module closes the loop with :mod:`phonometry.sound_absorption` (ISO 354),
+This module closes the loop with :mod:`phonometry.materials.sound_absorption` (ISO 354),
 whose air power-attenuation coefficient ``m`` (1/m) is defined only through
 the ISO 9613-1 ``alpha`` via :math:`m = \alpha / (10 \log_{10} e)`.
 :func:`air_attenuation_m` returns that ``m`` directly.

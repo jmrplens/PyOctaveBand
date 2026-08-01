@@ -9,8 +9,8 @@ Measurement uncertainty in building acoustics (ISO 12999-1:2020).
 
 This module supplies the **measurement uncertainty** of the sound-insulation
 quantities produced by the field/lab/prediction modules
-([`phonometry.insulation`](/phonometry/reference/api/building/insulation/), [`phonometry.lab_insulation`](/phonometry/reference/api/building/lab-insulation/),
-[`phonometry.building_prediction`](/phonometry/reference/api/building/building-prediction/)). ISO 12999-1 does not re-measure anything;
+([`phonometry.building.insulation`](/phonometry/reference/api/building/insulation/), [`phonometry.building.lab_insulation`](/phonometry/reference/api/building/lab-insulation/),
+[`phonometry.building.building_prediction`](/phonometry/reference/api/building/building-prediction/)). ISO 12999-1 does not re-measure anything;
 it tabulates *standard uncertainties* `u` derived from inter-laboratory tests
 (ISO 5725) and prescribes how to expand and combine them.
 

@@ -453,7 +453,7 @@ True-peak level in dBTP (BS.1770-5 Annex 2).
 Estimates the inter-sample peak by oversampling the signal to at least
 192 kHz with a polyphase FIR interpolator before taking the absolute
 maximum (the same machinery behind
-[`phonometry.metrology.levels.lc_peak`](/phonometry/reference/api/levels/levels/#lc_peak)). At 48 kHz this is the
+[`phonometry.signals.levels.lc_peak`](/phonometry/reference/api/signals/levels/#lc_peak)). At 48 kHz this is the
 4-times oversampling of the Annex 2 block diagram; higher input rates
 need proportionately less. The initial 12.04 dB attenuation of the
 Annex 2 integer pipeline is unnecessary in floating point and omitted.

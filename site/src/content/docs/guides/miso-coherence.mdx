@@ -21,7 +21,7 @@ reading the ordinary coherences alone can credit the wrong source. Bendat &
 Piersol, *Random Data* (4th ed., 2010, Chapter 7), resolve this for a
 multiple-input/single-output (MISO) system with the **multiple** and
 **partial** coherence functions. `miso_coherence` computes them from the same
-Welch cross-spectral core as the rest of `phonometry.metrology`, for several
+Welch cross-spectral core as the rest of `phonometry.signals`, for several
 correlated inputs and one output.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/miso_coherence.svg" alt="Two-panel figure. Top: the measured output autospectrum in dB with the coherent output contribution of two inputs shaded underneath; input 1 fills the low band up to about 400 Hz and input 2 fills the high band above about 1.5 kHz, with the residual noise far below. Bottom: for the correlated second input, its ordinary coherence sits around 0.3 across the low band even though it drives no low-frequency path, while its partial coherence collapses to zero there once the first input is conditioned out; the multiple coherence stays near one except at the crossover null." width="88%" loading="eager" />
@@ -249,4 +249,4 @@ several correlated outputs needs one `miso_coherence` call per output.
 - [Spectral analysis](/phonometry/guides/spectral-analysis/): the single-input coherent output spectrum this page generalizes, and the shared Welch core.
 - [Correlation and delay](/phonometry/guides/correlation-delay/): estimating and removing the bulk delays that bias coherence low.
 - [Multichannel and Performance](/phonometry/guides/multichannel/): the per-channel path this cross-channel analysis complements.
-- API reference: [`metrology.miso`](/phonometry/reference/api/spectra/miso/).
+- API reference: [`signals.miso`](/phonometry/reference/api/signals/miso/).

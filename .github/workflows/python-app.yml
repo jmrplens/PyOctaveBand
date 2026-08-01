@@ -242,6 +242,38 @@ jobs:
       # for the whole set) and needs no rendering stack of its own.
       run: python scripts/check_figure_contrast.py
 
+  # The Python snippets printed in the guides must run. They are the first
+  # thing a reader copies, and nothing executed them until this job existed:
+  # the metrology split shipped seven blocks where `from phonometry import
+  # signals` sat next to `from scipy import signal` and silently rebound the
+  # name, which Python does not warn about and no other gate can see. The
+  # script also holds the English and Spanish pages to the same API and skips,
+  # with a written reason, the pages whose blocks are excerpts of a workflow
+  # rather than a script.
+  doc-snippets:
+    name: Documentation snippets run
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+    - uses: actions/checkout@v7
+      with:
+        persist-credentials: false
+    - name: Set up Python 3.13
+      uses: actions/setup-python@v7
+      with:
+        python-version: "3.13"
+        cache: 'pip'
+    - name: Install dependencies
+      # The guides plot and print fiches, so the snippets need the figure and
+      # report stacks as well as the package itself.
+      run: |
+        python -m pip install --upgrade pip
+        pip install -e .
+        pip install -r requirements-figures.txt -r requirements-reports.txt
+    - name: Run every snippet the guides print
+      run: python scripts/check_doc_snippets.py
+
   # The committed example .report() fiches (.github/reports) must match a fresh
   # `make reports` run. Same drift gate as the figures, one layer further down
   # the pipeline: the fiches are what the documentation links to as worked

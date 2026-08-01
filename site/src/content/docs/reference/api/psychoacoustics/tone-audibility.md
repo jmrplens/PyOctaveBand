@@ -9,7 +9,7 @@ Objective audibility of tones in noise -- engineering method (ISO/PAS 20065:2016
 
 ISO/PAS 20065 is the detailed engineering method that ISO 1996-2:2017 defers to
 for the audibility of prominent tones; the simplified 2007/2009 Annex C method
-lives in [`phonometry.environmental_measurement`](/phonometry/reference/api/environment/measurement/). The audibility of a tone
+lives in [`phonometry.environmental.measurement`](/phonometry/reference/api/environment/measurement/). The audibility of a tone
 is the amount, in decibels, by which its tone level rises above the masking
 threshold of the surrounding noise.
 

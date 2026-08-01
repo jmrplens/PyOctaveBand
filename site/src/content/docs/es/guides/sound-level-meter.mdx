@@ -54,7 +54,7 @@ cualquier parte; en una medición real proceden de tu micrófono.
 
 ```python
 import numpy as np
-from phonometry import metrology
+from phonometry import filters, metrology, signals
 
 fs = 48000
 
@@ -64,7 +64,7 @@ calibrator = np.sqrt(2) * np.sin(2 * np.pi * 1000 * np.arange(3 * fs) / fs)
 
 # Medición "de calle": 10 s de ruido rosa de fondo más un evento de 1 s a
 #   1 kHz, tipo bocina, para que los niveles estadísticos tengan algo que separar.
-recording = metrology.noise_signal(fs, 10.0, color="pink", rms=0.02, seed=7)
+recording = signals.noise_signal(fs, 10.0, color="pink", rms=0.02, seed=7)
 recording[4 * fs : 5 * fs] += 0.2 * np.sqrt(2) * np.sin(
     2 * np.pi * 1000 * np.arange(fs) / fs
 )
@@ -99,8 +99,8 @@ móvil que sigue la pantalla de un sonómetro, $L_{AF}(t)$:
 
 ```python
 pressure = cal * recording                          # unidades digitales -> Pa
-weighted = metrology.weighting_filter(pressure, fs, curve="A")
-envelope = metrology.time_weighting(weighted, fs, mode="fast")  # media cuadrática en Pa^2
+weighted = filters.weighting_filter(pressure, fs, curve="A")
+envelope = filters.time_weighting(weighted, fs, mode="fast")  # media cuadrática en Pa^2
 laf_t = 10 * np.log10(np.maximum(envelope, 1e-12) / (2e-5) ** 2)
 # laf_t alcanza unos 80 dB durante el evento y se asienta cerca de 55 dB entre medias.
 ```
@@ -126,12 +126,12 @@ exposición sonora** que normaliza el evento a un segundo, y el **pico** con
 ponderación C para contenido impulsivo.
 
 ```python
-la_eq = metrology.laeq(recording, fs, calibration_factor=cal)     # ≈70,2 dB
-ln = metrology.ln_levels(
+la_eq = signals.laeq(recording, fs, calibration_factor=cal)     # ≈70,2 dB
+ln = signals.ln_levels(
     recording, fs, n=(10, 50, 90), weighting="A", calibration_factor=cal
 )                                          # L10 ≈78,0, L50 ≈55,1, L90 ≈54,9
-lae = metrology.sel(recording, fs, weighting="A", calibration_factor=cal)  # ≈80,2
-lc_pk = metrology.lc_peak(recording, fs, calibration_factor=cal)           # ≈84,4
+lae = signals.sel(recording, fs, weighting="A", calibration_factor=cal)  # ≈80,2
+lc_pk = signals.lc_peak(recording, fs, calibration_factor=cal)           # ≈84,4
 
 print(f"LAeq {la_eq:.1f} dB | L10 {ln[10]:.1f} | L90 {ln[90]:.1f} "
       f"| LAE {lae:.1f} | LCpeak {lc_pk:.1f}")
@@ -158,7 +158,7 @@ cuyo diseño está anclado a los bordes de banda de IEC 61260-1;
 instrumento.
 
 ```python
-spl, bands = metrology.octave_filter(
+spl, bands = filters.octave_filter(
     recording, fs, fraction=3, calibration_factor=cal, nominal=True
 )
 # 33 niveles de banda de tercio de octava en dB SPL, etiquetados '12.5' ... '20k'.
@@ -182,11 +182,11 @@ Tabla 3 de IEC 61672-1, y `verify_filter_class` barre un `OctaveFilterBank`
 contra los límites de la Tabla 1 de IEC 61260-1.
 
 ```python
-wf = metrology.WeightingFilter(fs, curve="A")
-print(metrology.verify_weighting_class(wf)["overall_class"])   # 1
+wf = filters.WeightingFilter(fs, curve="A")
+print(filters.verify_weighting_class(wf)["overall_class"])   # 1
 
-bank = metrology.OctaveFilterBank(fs, fraction=3)
-print(metrology.verify_filter_class(bank)["overall_class"])    # 1
+bank = filters.OctaveFilterBank(fs, fraction=3)
+print(filters.verify_filter_class(bank)["overall_class"])    # 1
 ```
 
 Los veredictos también llegan por banda, de modo que puedes ver exactamente
@@ -236,8 +236,8 @@ del calibrador de IEC 60942:2017 tampoco se ejecutan aquí; consulta la
 
 ## Véase también
 
-- Referencia de la API: [`metrology.calibration`](/phonometry/es/reference/api/levels/calibration/),
-  [`metrology.parametric_filters`](/phonometry/es/reference/api/filters/parametric-filters/),
-  [`metrology.levels`](/phonometry/es/reference/api/levels/levels/),
+- Referencia de la API: [`metrology.calibration`](/phonometry/es/reference/api/metrology/calibration/),
+  [`filters.weighting`](/phonometry/es/reference/api/filters/weighting/),
+  [`signals.levels`](/phonometry/es/reference/api/signals/levels/),
   [`phonometry`](/phonometry/es/reference/api/filters/phonometry/) y
-  [`metrology.compliance`](/phonometry/es/reference/api/filters/compliance/).
+  [`filters.compliance`](/phonometry/es/reference/api/filters/compliance/).

@@ -8,7 +8,7 @@ sidebar:
 Sound insulation measured with sound intensity (ISO 15186).
 
 This is the sound-**intensity** counterpart of the sound-pressure methods in
-[`phonometry.lab_insulation`](/phonometry/reference/api/building/lab-insulation/) (ISO 10140) and [`phonometry.insulation`](/phonometry/reference/api/building/insulation/)
+[`phonometry.building.lab_insulation`](/phonometry/reference/api/building/lab-insulation/) (ISO 10140) and [`phonometry.building.insulation`](/phonometry/reference/api/building/insulation/)
 (ISO 16283). Instead of an equivalent absorption area in the receiving room,
 the transmitted sound power is measured directly by scanning an intensity
 probe over a measurement surface enclosing the specimen. The main use is when

@@ -170,7 +170,7 @@ def plot_room_acoustics(
         # one-third-octave centres (IEC 61260: 125, 250, 500, 1k, 2k, 4k), not
         # the exact base-ten filter centres (125.89..., 1.99526k...), so the
         # chart matches the nominal frequency table an ISO 3382 report prints.
-        from ..metrology.frequencies import (
+        from ..filters.frequencies import (
             _infer_band_fraction,
             _nominal_freq_for_band,
         )

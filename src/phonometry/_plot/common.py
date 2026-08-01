@@ -13,7 +13,7 @@ matplotlib is a *soft* dependency: importing :mod:`phonometry` and running
 any computation works without it, and only calling ``.plot()`` (or the
 functions here) requires it.  The import is therefore performed lazily and
 raises a clear :class:`ImportError` with installation guidance when the
-package is missing, mirroring :func:`phonometry.filter_design._showfilter`.
+package is missing, mirroring :func:`phonometry.filters.design._showfilter`.
 
 The functions are pure renderers: they never call ``plt.show``; when ``ax``
 is ``None`` they create a fresh figure and axes, and they always *return*

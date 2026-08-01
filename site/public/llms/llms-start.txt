@@ -74,7 +74,7 @@ Analyze a signal and get the Sound Pressure Level (SPL) per frequency band.
 
 ```python
 import numpy as np
-from phonometry import metrology
+from phonometry import filters
 
 fs = 48000
 t = np.linspace(0, 1, fs, endpoint=False)
@@ -82,7 +82,7 @@ t = np.linspace(0, 1, fs, endpoint=False)
 signal = np.sin(2 * np.pi * 100 * t) + np.sin(2 * np.pi * 1000 * t)
 
 # Apply 1/3 octave filter bank
-spl, freq = metrology.octave_filter(signal, fs=fs, fraction=3)
+spl, freq = filters.octave_filter(signal, fs=fs, fraction=3)
 
 print(f"Bands: {freq}")
 # Bands: [12.589254117941678, 15.848931924611138, ..., 19952.623149688785]  (33 bands)
@@ -101,14 +101,14 @@ print(f"SPL [dB]: {spl}")
 import matplotlib.pyplot as plt
 import scipy.signal
 import numpy as np
-from phonometry import metrology
+from phonometry import filters
 
 fs = 48000
 t = np.linspace(0, 1, fs, endpoint=False)
 # Composite signal: 100Hz + 1000Hz
 signal = np.sin(2 * np.pi * 100 * t) + np.sin(2 * np.pi * 1000 * t)
 # Apply 1/3 octave filter bank
-spl, freq = metrology.octave_filter(signal, fs=fs, fraction=3)
+spl, freq = filters.octave_filter(signal, fs=fs, fraction=3)
 
 # Gray background: the raw-signal PSD (Welch), shifted to sit just below the
 # band SPLs so both spectral shapes share one axis.
@@ -132,7 +132,7 @@ plt.show()
 
 ```python
 from scipy.io import wavfile
-from phonometry import metrology
+from phonometry import filters
 
 # Load standard WAV file
 fs, signal = wavfile.read("measurement.wav")
@@ -140,7 +140,7 @@ fs, signal = wavfile.read("measurement.wav")
 # Analyze
 # Note: To obtain real-world SPL values, you must calibrate the input.
 # See the Calibration guide.
-spl, freq = metrology.octave_filter(signal, fs=fs, fraction=3)
+spl, freq = filters.octave_filter(signal, fs=fs, fraction=3)
 ```
 
 Integer audio (e.g. int16 WAV data) is converted to float64 internally, so it is
@@ -148,7 +148,7 @@ safe to pass `wavfile.read` output directly.
 
 ## Where to go next
 
-The octave analysis above uses the `metrology` core, one of fifteen domain
+The octave analysis above uses the `filters` core, one of seventeen domain
 namespaces; the documentation index walks through the rest, from
 psychoacoustics and room, building and vibration acoustics to environmental,
 aircraft and underwater noise, electroacoustics and FDTD wave simulation.
@@ -246,20 +246,20 @@ how the burst aligns with the block boundaries.
 ```python
 import matplotlib.pyplot as plt
 import numpy as np
-from phonometry import metrology
+from phonometry import filters
 
 # 4 kHz tone bursts vs the IEC 61672-1 Table 4 reference maxima (FAST)
 fs = 48000
 t = np.arange(2 * fs) / fs
 steady = np.sin(2 * np.pi * 4000 * t)
-ref = metrology.time_weighting(steady, fs, mode="fast")[int(1.5 * fs):].mean()
+ref = filters.time_weighting(steady, fs, mode="fast")[int(1.5 * fs):].mean()
 
 fig, axes = plt.subplots(1, 3, figsize=(12, 4), sharey=True)
 for ax, (duration, target) in zip(axes, [(0.2, -1.0), (0.05, -4.8), (0.01, -11.1)]):
     burst = np.zeros_like(t)
     start, n = int(0.5 * fs), round(duration * fs)
     burst[start:start + n] = steady[start:start + n]
-    env = metrology.time_weighting(burst, fs, mode="fast")
+    env = filters.time_weighting(burst, fs, mode="fast")
     ax.plot(t, 10 * np.log10(np.maximum(env / ref, 1e-6)), label="FAST envelope")
     ax.axhline(target, linestyle="--", label=f"IEC target {target} dB")
     ax.set(xlim=(0.4, 1.4), ylim=(-30, 3), xlabel="Time [s]",
@@ -292,11 +292,11 @@ sample from the metrology core:
 
 | Standard | What is verified | Test file |
 | :--- | :--- | :--- |
-| IEC 61672-1:2013 Table 3 | A/C/Z weighting at all 34 nominal frequencies, class 1 limits, at 48 and 96 kHz | `tests/metrology/test_iec_weighting_table3.py` |
-| IEC 61672-1:2013 Table 4 | F/S tone-burst responses (1 s to 1 ms) and the $L_{AE}$ column for `sel()` | `tests/metrology/test_iec_compliance.py` |
-| IEC 61672-1:2013 Table 5 | `lc_peak()` one-cycle/half-cycle peak responses, class 1 limits | `tests/metrology/test_levels.py` |
-| IEC 61260-1:2014 Table 1 | Filter-bank class 1/2 acceptance limits via `verify_filter_class()` | `tests/metrology/test_compliance.py` |
-| ISO 7196:1995 Table 2 | G weighting (infrasound) at every nominal response value, 0.25–315 Hz | `tests/metrology/test_g_weighting.py` |
+| IEC 61672-1:2013 Table 3 | A/C/Z weighting at all 34 nominal frequencies, class 1 limits, at 48 and 96 kHz | `tests/filters/test_iec_weighting_table3.py` |
+| IEC 61672-1:2013 Table 4 | F/S tone-burst responses (1 s to 1 ms) and the $L_{AE}$ column for `sel()` | `tests/filters/test_iec_compliance.py` |
+| IEC 61672-1:2013 Table 5 | `lc_peak()` one-cycle/half-cycle peak responses, class 1 limits | `tests/signals/test_levels.py` |
+| IEC 61260-1:2014 Table 1 | Filter-bank class 1/2 acceptance limits via `verify_filter_class()` | `tests/filters/test_compliance.py` |
+| ISO 7196:1995 Table 2 | G weighting (infrasound) at every nominal response value, 0.25–315 Hz | `tests/filters/test_g_weighting.py` |
 | ISO 226:2023 Table 1 and Annex B | Equal-loudness contours and loudness levels against the Annex B tables, hearing threshold against the Table 1 $T_f$ parameters | `tests/psychoacoustics/test_loudness_contours.py` |
 | ECMA-418-1:2024 | TNR/PR tone prominence: critical bandwidths, proximity spacing and prominence criteria against the worked examples in clauses 10–12 | `tests/psychoacoustics/test_tonality.py` |
 | ISO 1996-1:2016 | `lden()`, `ldn()` and `composite_rating_level()` against hand-computed formula values | `tests/environmental/test_environmental.py` |
@@ -1773,9 +1773,9 @@ band around 1 kHz is approximately:
 You can inspect the exact bands with:
 
 ```python
-from phonometry import metrology
+from phonometry import filters
 
-fc, fl, fu, labels = metrology.nominal_frequencies(fraction=3, limits=[12, 20000])
+fc, fl, fu, labels = filters.nominal_frequencies(fraction=3, limits=[12, 20000])
 for label, center, lower, upper in zip(labels, fc, fl, fu):
     print(label, center, lower, upper, upper - lower)
 ```
@@ -1786,7 +1786,7 @@ original signal and use the phonometry band edges as masks:
 ```python
 import numpy as np
 from scipy import signal
-from phonometry import metrology
+from phonometry import filters
 
 fs = 100_000
 # any 1D pressure signal in Pa (synthesized here so the example runs)
@@ -1794,7 +1794,7 @@ pressure_signal_pa = 0.02 * np.random.default_rng(0).standard_normal(fs)
 x = pressure_signal_pa
 
 # Standardized third-octave levels from phonometry.
-levels, centers = metrology.octave_filter(
+levels, centers = filters.octave_filter(
     x,
     fs=fs,
     fraction=3,
@@ -1802,7 +1802,7 @@ levels, centers = metrology.octave_filter(
 )
 
 # Same standardized band definitions, including lower/upper edges.
-fc, fl, fu, labels = metrology.nominal_frequencies(fraction=3, limits=[12, 20_000])
+fc, fl, fu, labels = filters.nominal_frequencies(fraction=3, limits=[12, 20_000])
 
 # Narrowband Welch estimate on the original signal.
 nperseg = min(2**15, len(x))

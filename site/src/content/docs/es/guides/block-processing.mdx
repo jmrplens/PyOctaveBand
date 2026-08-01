@@ -53,7 +53,7 @@ transitorio del filtro.*
 ```python
 import matplotlib.pyplot as plt
 import numpy as np
-from phonometry import metrology
+from phonometry import filters
 
 # Banda de octava de 1 kHz: cuatro bloques con estado frente a una pasada continua
 fs, block = 8000, 1000
@@ -61,14 +61,14 @@ rng = np.random.default_rng(42)
 x = rng.standard_normal(4 * block)
 t = np.arange(x.size) / fs
 
-bank = metrology.OctaveFilterBank(fs, fraction=1, limits=[900, 1100],
+bank = filters.OctaveFilterBank(fs, fraction=1, limits=[900, 1100],
                                   stateful=True, resample=False)
 streamed = np.concatenate([
     bank.filter(x[i * block:(i + 1) * block], sigbands=True,
                 detrend=False, calculate_level=False)[2][0]
     for i in range(4)
 ])
-offline = metrology.OctaveFilterBank(fs, fraction=1, limits=[900, 1100],
+offline = filters.OctaveFilterBank(fs, fraction=1, limits=[900, 1100],
                                      resample=False).filter(
     x, sigbands=True, detrend=False, calculate_level=False)[2][0]
 print(np.max(np.abs(streamed - offline)))     # 0.0 (exacto bit a bit)
@@ -99,11 +99,11 @@ una dependencia opcional (`pip install soundfile`). Sirve cualquier fuente de bl
 
 ```python
 import soundfile as sf
-from phonometry import metrology
+from phonometry import filters
 
 fs = 48000
-octave_filter = metrology.OctaveFilterBank(fs, 1, stateful=True, resample=False)
-afilter = metrology.WeightingFilter(fs, "A", stateful=True)
+octave_filter = filters.OctaveFilterBank(fs, 1, stateful=True, resample=False)
+afilter = filters.WeightingFilter(fs, "A", stateful=True)
 
 for block in sf.blocks("measurement.wav", blocksize=256, overlap=0):
 
@@ -122,9 +122,9 @@ for block in sf.blocks("measurement.wav", blocksize=256, overlap=0):
 Usa la clase `TimeWeighting` (el estado se lleva automáticamente):
 
 ```python
-from phonometry import metrology
+from phonometry import filters
 
-tw = metrology.TimeWeighting(fs, mode="fast")
+tw = filters.TimeWeighting(fs, mode="fast")
 # audio_blocks: fotogramas sucesivos de tu grabación de micrófono (Pa),
 #   p. ej. de sf.blocks("measurement.wav", ...) como en el bloque anterior.
 for block in audio_blocks:
@@ -192,11 +192,11 @@ bloque a bloque conservando todo el estado entre llamadas:
 
 ```python
 import numpy as np
-from phonometry import metrology
+from phonometry import filters
 
 fs, block = 48000, 4800  # bloques de 100 ms
-aw = metrology.WeightingFilter(fs, "A", stateful=True)
-env = metrology.TimeWeighting(fs, mode="fast")  # la clase es inherentemente stateful
+aw = filters.WeightingFilter(fs, "A", stateful=True)
+env = filters.TimeWeighting(fs, mode="fast")  # la clase es inherentemente stateful
 
 for x in audio_stream(block):            # tu callback de captura
     y = env.process(aw.filter(x))
@@ -243,4 +243,4 @@ estadísticos](/phonometry/es/guides/levels/).
 
 ## Véase también
 
-- Referencia de la API: [`metrology.parametric_filters`](/phonometry/es/reference/api/filters/parametric-filters/) y [`metrology.core`](/phonometry/es/reference/api/filters/core/).
+- Referencia de la API: [`filters.weighting`](/phonometry/es/reference/api/filters/weighting/) y [`filters.core`](/phonometry/es/reference/api/filters/core/).

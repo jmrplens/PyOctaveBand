@@ -77,20 +77,20 @@ how the burst aligns with the block boundaries.
 ```python
 import matplotlib.pyplot as plt
 import numpy as np
-from phonometry import metrology
+from phonometry import filters
 
 # 4 kHz tone bursts vs the IEC 61672-1 Table 4 reference maxima (FAST)
 fs = 48000
 t = np.arange(2 * fs) / fs
 steady = np.sin(2 * np.pi * 4000 * t)
-ref = metrology.time_weighting(steady, fs, mode="fast")[int(1.5 * fs):].mean()
+ref = filters.time_weighting(steady, fs, mode="fast")[int(1.5 * fs):].mean()
 
 fig, axes = plt.subplots(1, 3, figsize=(12, 4), sharey=True)
 for ax, (duration, target) in zip(axes, [(0.2, -1.0), (0.05, -4.8), (0.01, -11.1)]):
     burst = np.zeros_like(t)
     start, n = int(0.5 * fs), round(duration * fs)
     burst[start:start + n] = steady[start:start + n]
-    env = metrology.time_weighting(burst, fs, mode="fast")
+    env = filters.time_weighting(burst, fs, mode="fast")
     ax.plot(t, 10 * np.log10(np.maximum(env / ref, 1e-6)), label="FAST envelope")
     ax.axhline(target, linestyle="--", label=f"IEC target {target} dB")
     ax.set(xlim=(0.4, 1.4), ylim=(-30, 3), xlabel="Time [s]",
@@ -123,11 +123,11 @@ sample from the metrology core:
 
 | Standard | What is verified | Test file |
 | :--- | :--- | :--- |
-| IEC 61672-1:2013 Table 3 | A/C/Z weighting at all 34 nominal frequencies, class 1 limits, at 48 and 96 kHz | `tests/metrology/test_iec_weighting_table3.py` |
-| IEC 61672-1:2013 Table 4 | F/S tone-burst responses (1 s to 1 ms) and the $L_{AE}$ column for `sel()` | `tests/metrology/test_iec_compliance.py` |
-| IEC 61672-1:2013 Table 5 | `lc_peak()` one-cycle/half-cycle peak responses, class 1 limits | `tests/metrology/test_levels.py` |
-| IEC 61260-1:2014 Table 1 | Filter-bank class 1/2 acceptance limits via `verify_filter_class()` | `tests/metrology/test_compliance.py` |
-| ISO 7196:1995 Table 2 | G weighting (infrasound) at every nominal response value, 0.25–315 Hz | `tests/metrology/test_g_weighting.py` |
+| IEC 61672-1:2013 Table 3 | A/C/Z weighting at all 34 nominal frequencies, class 1 limits, at 48 and 96 kHz | `tests/filters/test_iec_weighting_table3.py` |
+| IEC 61672-1:2013 Table 4 | F/S tone-burst responses (1 s to 1 ms) and the $L_{AE}$ column for `sel()` | `tests/filters/test_iec_compliance.py` |
+| IEC 61672-1:2013 Table 5 | `lc_peak()` one-cycle/half-cycle peak responses, class 1 limits | `tests/signals/test_levels.py` |
+| IEC 61260-1:2014 Table 1 | Filter-bank class 1/2 acceptance limits via `verify_filter_class()` | `tests/filters/test_compliance.py` |
+| ISO 7196:1995 Table 2 | G weighting (infrasound) at every nominal response value, 0.25–315 Hz | `tests/filters/test_g_weighting.py` |
 | ISO 226:2023 Table 1 and Annex B | Equal-loudness contours and loudness levels against the Annex B tables, hearing threshold against the Table 1 $T_f$ parameters | `tests/psychoacoustics/test_loudness_contours.py` |
 | ECMA-418-1:2024 | TNR/PR tone prominence: critical bandwidths, proximity spacing and prominence criteria against the worked examples in clauses 10–12 | `tests/psychoacoustics/test_tonality.py` |
 | ISO 1996-1:2016 | `lden()`, `ldn()` and `composite_rating_level()` against hand-computed formula values | `tests/environmental/test_environmental.py` |

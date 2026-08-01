@@ -1,14 +1,27 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""Deprecated module-path aliases for the phonometry 3.2 package layout.
+"""Deprecated module-path aliases for the phonometry package layout.
 
-The 3.2 release grouped the flat top-level modules into domain subpackages
-(``phonometry.building``, ``phonometry.underwater``, ...). Every public module
-path that moved stays importable for one deprecation cycle through the shims
-registered here: ``import phonometry.<old>`` and
-``from phonometry.<old> import name`` keep working, warn with the standard
-rename notice on attribute access, and delegate to the relocated module.
-Pickles produced by 3.1 (whose classes carry old ``__module__`` paths) resolve
-the same way. The table and this module are removed in phonometry 4.0.
+Two generations of aliases live here, each with its own removal date:
+
+* :data:`_MOVED_3X` covers the 3.2 modularization, which grouped the flat
+  top-level modules into domain subpackages (``phonometry.building``,
+  ``phonometry.underwater``, ...). Removed in 4.0. Its targets follow the
+  modules wherever they land, so a 3.x path always resolves in one hop.
+* :data:`_MOVED_4X` covers the 4.0 taxonomy, which splits the oversized
+  subpackages into domain ones (``phonometry.metrology`` into
+  ``phonometry.filters``, ``phonometry.signals`` and a narrowed
+  ``phonometry.metrology``). Removed in 5.0.
+
+Every public module path that moved stays importable through the shims
+registered here: ``import phonometry.<old>`` and ``from phonometry.<old>
+import name`` keep working, warn with the standard rename notice on attribute
+access, and delegate to the relocated module. Pickles produced by an earlier
+release (whose classes carry old ``__module__`` paths) resolve the same way.
+
+The 4.0 split also moves names *between* subpackage namespaces, and importing
+the domain namespace (``from phonometry import metrology``) is the form the
+documentation leads with. :func:`_namespace_shim` keeps those attribute reads
+working from the namespace they left, with the same notice.
 
 This generalizes the former ``phonometry.loudness`` PEP 562 shim (that module
 file is gone; its entry lives in the table below with its original 3.1 wording
@@ -19,22 +32,23 @@ from __future__ import annotations
 
 import sys
 import types
+from collections.abc import Callable
 from importlib import import_module
 from typing import Any
 
 from ._internal.warnings import _warn_renamed
 
 #: Old public module path -> relocated module path. One row per moved module.
-_MOVED: dict[str, str] = {
+_MOVED_3X: dict[str, str] = {
     "phonometry.utils": "phonometry._internal.utils",
     "phonometry._warnings": "phonometry._internal.warnings",
     "phonometry.calibration": "phonometry.metrology.calibration",
-    "phonometry.compliance": "phonometry.metrology.compliance",
-    "phonometry.core": "phonometry.metrology.core",
-    "phonometry.filter_design": "phonometry.metrology.filter_design",
-    "phonometry.frequencies": "phonometry.metrology.frequencies",
-    "phonometry.levels": "phonometry.metrology.levels",
-    "phonometry.parametric_filters": "phonometry.metrology.parametric_filters",
+    "phonometry.compliance": "phonometry.filters.compliance",
+    "phonometry.core": "phonometry.filters.core",
+    "phonometry.filter_design": "phonometry.filters.design",
+    "phonometry.frequencies": "phonometry.filters.frequencies",
+    "phonometry.levels": "phonometry.signals.levels",
+    "phonometry.parametric_filters": "phonometry.filters.weighting",
     "phonometry.uncertainty": "phonometry.metrology.uncertainty",
     "phonometry.fluctuation_strength": "phonometry.psychoacoustics.fluctuation_strength",
     "phonometry.loudness_contours": "phonometry.psychoacoustics.loudness_contours",
@@ -117,12 +131,48 @@ _SINCE: dict[str, str] = {
 
 #: Renames that were already shimmed before 3.2 (target differs from a plain
 #: package move). ``phonometry.loudness`` predates the reorganization.
-_MOVED["phonometry.loudness"] = "phonometry.psychoacoustics.loudness_zwicker"
+_MOVED_3X["phonometry.loudness"] = "phonometry.psychoacoustics.loudness_zwicker"
+
+#: Old module path -> relocated module path for the 4.0 taxonomy. The
+#: oversized ``metrology`` catch-all became three packages: the normalized
+#: frequency selectivity in ``filters``, the general signal analysis in
+#: ``signal``, and the transverse metrology that gives the package its name.
+_MOVED_4X: dict[str, str] = {
+    "phonometry.metrology.core": "phonometry.filters.core",
+    "phonometry.metrology.filter_design": "phonometry.filters.design",
+    "phonometry.metrology.frequencies": "phonometry.filters.frequencies",
+    "phonometry.metrology.parametric_filters": "phonometry.filters.weighting",
+    "phonometry.metrology.equalizer": "phonometry.filters.equalizer",
+    "phonometry.metrology.compliance": "phonometry.filters.compliance",
+    "phonometry.metrology.levels": "phonometry.signals.levels",
+    "phonometry.metrology.spectra": "phonometry.signals.spectra",
+    "phonometry.metrology.time_frequency": "phonometry.signals.time_frequency",
+    "phonometry.metrology.cepstrum": "phonometry.signals.cepstrum",
+    "phonometry.metrology.correlation": "phonometry.signals.correlation",
+    "phonometry.metrology.envelope": "phonometry.signals.envelope",
+    "phonometry.metrology.phase": "phonometry.signals.phase",
+    "phonometry.metrology.miso": "phonometry.signals.miso",
+    "phonometry.metrology.inversion": "phonometry.signals.inversion",
+    "phonometry.metrology.synchronous_average":
+        "phonometry.signals.synchronous_average",
+    "phonometry.metrology.signals": "phonometry.signals.test_signals",
+    "phonometry.metrology.random_data":
+        "phonometry.metrology.data_qualification",
+}
+
+#: The two generations, each with the release that deprecated it and the one
+#: that removes it. Order matters only for readability; the paths are disjoint.
+_GENERATIONS: tuple[tuple[dict[str, str], str, str], ...] = (
+    (_MOVED_3X, "3.2", "4.0"),
+    (_MOVED_4X, "4.0", "5.0"),
+)
 
 
-def _make_shim(old: str, new: str) -> types.ModuleType:
+def _make_shim(old: str, new: str, since: str, removed_in: str) -> types.ModuleType:
     shim = types.ModuleType(old)
-    shim.__doc__ = f"Deprecated alias of :mod:`{new}` (removed in phonometry 4.0)."
+    shim.__doc__ = (
+        f"Deprecated alias of :mod:`{new}` (removed in phonometry {removed_in})."
+    )
 
     def __getattr__(name: str) -> Any:
         target = import_module(new)
@@ -133,7 +183,10 @@ def _make_shim(old: str, new: str) -> types.ModuleType:
                 f"module {old!r} has no attribute {name!r}"
             ) from None
         _warn_renamed(
-            f"the '{old}' module", f"'{new}'", since=_SINCE.get(old, "3.2")
+            f"the '{old}' module",
+            f"'{new}'",
+            since=_SINCE.get(old, since),
+            removed_in=removed_in,
         )
         return attr
 
@@ -145,18 +198,94 @@ def _make_shim(old: str, new: str) -> types.ModuleType:
     return shim
 
 
+def _namespace_shim(
+    package: str, targets: tuple[str, ...], *,
+    since: str = "4.0", removed_in: str = "5.0"
+) -> Callable[[str], Any]:
+    """Return a PEP 562 ``__getattr__`` for names that left ``package``.
+
+    The 4.0 taxonomy moves public names between subpackage namespaces, and
+    ``from phonometry import metrology`` followed by ``metrology.leq(...)`` is
+    the form the documentation leads with, so the read has to keep working
+    from the namespace it left. Resolution is by ``__all__`` of the packages
+    the names moved to, which keeps the shim honest: a name that stops being
+    public anywhere stops resolving here too. A name that was both a module
+    and a function resolves to the function, as the pre-split package did:
+    ``metrology.cepstrum`` is :func:`phonometry.signals.cepstrum`.
+
+    Only then does a name fall back to the module alias of the same name,
+    which is what serves the modules with no public name of their own
+    (``metrology.spectra``, ``metrology.levels``). The alias carries its own
+    notice on attribute access, so returning it here is silent.
+
+    :param package: The narrowed package, ``__name__`` of its ``__init__``.
+    :param targets: Packages the names moved to, in search order.
+    :param since: Release that moved the names.
+    :param removed_in: Major release that removes the alias.
+    :return: The ``__getattr__`` to bind at module level.
+    """
+
+    def __getattr__(name: str) -> Any:
+        for target in targets:
+            module = import_module(target)
+            if name in getattr(module, "__all__", ()):
+                _warn_renamed(
+                    f"'{package}.{name}'",
+                    f"'{target}.{name}'",
+                    since=since,
+                    removed_in=removed_in,
+                )
+                return getattr(module, name)
+        alias = sys.modules.get(f"{package}.{name}")
+        if alias is not None:
+            return alias
+        raise AttributeError(f"module {package!r} has no attribute {name!r}")
+
+    return __getattr__
+
+
+def _namespace_dir(
+    own: list[str] | tuple[str, ...], targets: tuple[str, ...]
+) -> Callable[[], list[str]]:
+    """Return a ``__dir__`` listing the names a narrowed package still serves.
+
+    ``__getattr__`` is invisible to :func:`dir`, so without this the moved
+    names disappear from tab completion and from anything that introspects the
+    namespace, one release before they stop working. ``__all__`` is left
+    narrow on purpose: ``from phonometry.metrology import *`` gives the 4.0
+    API, not the deprecated names.
+
+    :param own: The package's own ``__all__``.
+    :param targets: Packages the moved names went to.
+    :return: The ``__dir__`` to bind at module level.
+    """
+
+    def __dir__() -> list[str]:
+        names = set(own)
+        for target in targets:
+            names |= set(getattr(import_module(target), "__all__", ()))
+        return sorted(names)
+
+    return __dir__
+
+
 def _install() -> None:
     package = sys.modules["phonometry"]
-    for old, new in _MOVED.items():
-        if old in sys.modules:  # pragma: no cover - double-import guard
-            continue
-        shim = _make_shim(old, new)
-        sys.modules[old] = shim
-        # `import phonometry.utils` also binds the attribute on the package;
-        # mirror that so `phonometry.utils` resolves without the import.
-        attr = old.rsplit(".", 1)[1]
-        if not hasattr(package, attr):
-            setattr(package, attr, shim)
+    for table, since, removed_in in _GENERATIONS:
+        for old, new in table.items():
+            if old in sys.modules:  # pragma: no cover - double-import guard
+                continue
+            shim = _make_shim(old, new, since, removed_in)
+            sys.modules[old] = shim
+            # `import phonometry.utils` also binds the attribute on the
+            # package; mirror that so `phonometry.utils` resolves without the
+            # import. Aliases below a subpackage are served by that package's
+            # own shim (:func:`_namespace_shim`), which resolves the moved
+            # public names first, so binding them here would shadow a function
+            # with a module.
+            _, _, attr = old.rpartition(".")
+            if old.count(".") == 1 and attr not in vars(package):
+                setattr(package, attr, shim)
 
 
 _install()

@@ -11,7 +11,7 @@ import pytest
 
 import phonometry
 from phonometry import OctaveFilterBank, octave_filter
-from phonometry.metrology import core
+from phonometry.filters import core
 
 
 class _DesignCounter:
@@ -125,7 +125,7 @@ def test_filterbank_reuse_is_not_slower() -> None:
 
     start_func = time.time()
     for _ in range(num_iterations):
-        phonometry.metrology.core._cached_filter_bank.cache_clear()
+        phonometry.filters.core._cached_filter_bank.cache_clear()
         octave_filter(x, fs)
     time_func = time.time() - start_func
 

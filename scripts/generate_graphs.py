@@ -269,7 +269,7 @@ _ES_EXACT = {
         "marcadores: nodos NPD tabulados\nlíneas: interpolación log-lineal",
     "25 °C, 70% RH\nsolid: SAE band, dashed: pure-tone mid-band":
         "25 °C, 70% HR\ncontinuo: banda SAE, discontinuo: tono puro medio de banda",
-    # Emitted by phonometry.metrology.filter_design._showfilter (not by this script);
+    # Emitted by phonometry.filters.design._showfilter (not by this script);
     # do not remove as "orphans".
     "Filter Bank Frequency Response": "Respuesta en frecuencia del banco de filtros",
     "Amplitude [dB]": "Amplitud [dB]",
@@ -2484,7 +2484,7 @@ def generate_filter_responses(output_dir: str) -> None:
             print(f"Generating {filename}...")
             bank = OctaveFilterBank(fs=fs, fraction=fraction, order=order, limits=[12.0, 20000.0], filter_type=f_type)
             
-            from phonometry.metrology.filter_design import _showfilter
+            from phonometry.filters.design import _showfilter
             # Draw first, then save through save_figure so the Spanish
             # translation pass runs on the finished figure (it rewrites the
             # live figure's text artists right before the save).
@@ -3318,7 +3318,7 @@ def generate_class_mask_overlay(output_dir: str) -> None:
     print("Generating class_mask_overlay.png...")
     fs = 48000
 
-    from phonometry.metrology.compliance import class_limits
+    from phonometry.filters.compliance import class_limits
 
     bank = OctaveFilterBank(fs, fraction=1, order=6, limits=[800, 1200], filter_type="butter")
     idx = int(np.argmin(np.abs(np.array(bank.freq) - 1000)))
@@ -3368,7 +3368,7 @@ def generate_filter_class0_mask(output_dir: str) -> None:
     """Pass-band class 0/1/2 maximum corridors (IEC 61260:1995 / ANSI S1.11-2004)."""
     print("Generating filter_class0_mask...")
     fs = 48000
-    from phonometry.metrology.compliance import class_limits
+    from phonometry.filters.compliance import class_limits
 
     bank = OctaveFilterBank(fs, fraction=1, order=6, limits=[800, 1200], filter_type="butter")
     idx = int(np.argmin(np.abs(np.array(bank.freq) - 1000)))
@@ -5917,7 +5917,7 @@ def generate_rice_peak_distribution(output_dir: str) -> None:
     """Peak-height exceedance between the Gaussian and Rayleigh limits."""
     print("Generating rice_peak_distribution...")
     from phonometry import peak_statistics
-    from phonometry.metrology.random_data import _rice_peak_exceedance
+    from phonometry.metrology.data_qualification import _rice_peak_exceedance
 
     fs = 20480.0
     x = _bandlimited_gaussian_figure_record(3, fs, 1 << 19, 0.0, 2000.0)

@@ -39,14 +39,14 @@ def test_import_does_not_override_matplotlib_backend() -> None:
     assert result.returncode == 0, result.stderr
 
 
-def test_filter_design_has_no_toplevel_matplotlib_import() -> None:
+def test_filters_design_has_no_toplevel_matplotlib_import() -> None:
     """matplotlib must be imported lazily so the package works without it."""
     import ast
     import inspect
 
-    from phonometry.metrology import filter_design
+    from phonometry.filters import design
 
-    tree = ast.parse(inspect.getsource(filter_design))
+    tree = ast.parse(inspect.getsource(design))
 
     # Only imports inside a function body are lazy; module-scope imports
     # (even wrapped in try/if blocks) still run at import time.
@@ -62,7 +62,7 @@ def test_filter_design_has_no_toplevel_matplotlib_import() -> None:
             aliases = [a.name for a in node.names]
             if any("matplotlib" in n for n in [module, *aliases]):
                 assert node in inside_functions, (
-                    "matplotlib imported at module scope in filter_design"
+                    "matplotlib imported at module scope in filters.design"
                 )
 
 
@@ -73,7 +73,7 @@ def test_showfilter_raises_helpful_error_without_matplotlib(monkeypatch) -> None
     import numpy as np
     import pytest
 
-    from phonometry.metrology import filter_design
+    from phonometry.filters import design
 
     real_import = builtins.__import__
 
@@ -84,6 +84,6 @@ def test_showfilter_raises_helpful_error_without_matplotlib(monkeypatch) -> None
 
     monkeypatch.setattr(builtins, "__import__", blocked_import)
     with pytest.raises(ImportError, match=r"pip install phonometry\[plot\]"):
-        filter_design._showfilter(
+        design._showfilter(
             [], [1000.0], [1122.0], [891.0], 48000, np.array([1]), show=True, plot_file=None
         )

@@ -999,6 +999,57 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Changed
 
+- `phonometry.metrology` is three packages. It had grown to 21 modules across
+  four unrelated subjects, and every layer above it had already worked around
+  that: the generated reference spread it over six sections, the sidebar over
+  four groups, and the name predicted neither `cepstrum` nor `signals`. The
+  filter banks, the frequency and time weightings, the parametric EQ and the
+  IEC 61260-1 / IEC 61672-1 class verification are now `phonometry.filters`;
+  the general signal analysis (levels, Welch and multitaper spectra, coherence,
+  time-frequency, correlation, envelope, cepstrum, phase, synchronous
+  averaging, test signals) is `phonometry.signals`; and `phonometry.metrology`
+  keeps what gives it its name, the calibration, the GUM uncertainty, the data
+  qualification and the IEC 61043 intensity-instrument class check. Four
+  modules are renamed with the move, each dropping a prefix its package now
+  carries: `filter_design` to `filters.design`,
+  `parametric_filters` to `filters.weighting` (it is the A/C/G and time
+  weightings, which is what people look for), `signals` to
+  `signals.test_signals` and `random_data` to
+  `metrology.data_qualification`, the name its documentation page already had.
+  Nothing moves in the flat API: `from phonometry import leq, octave_filter`
+  is what it always was, and that is how the documentation leads.
+
+- Every 3.x module path still imports, and so does every name read through the
+  namespace it left. `import phonometry.metrology.levels` and
+  `from phonometry.metrology import spectra` resolve to the relocated module
+  and warn on attribute access, the same PEP 562 shim the 3.2 modularization
+  used; `metrology.leq(...)` after `from phonometry import metrology` warns and
+  delegates too, which the module-path shims alone would not have covered, and
+  the namespace form is the one the documentation leads with. The aliases are
+  removed in 5.0, a release later than the 3.x ones, so the rename notice now
+  names the release that removes it instead of assuming 4.0. Resolution goes
+  through the public `__all__` of the packages the names moved to, so a name
+  that stops being public stops resolving through the old namespace as well,
+  and `dir(metrology)` still lists them, since a PEP 562 hook is invisible to
+  it and they would otherwise vanish from tab completion a release before they
+  stop working. The one form the hook cannot serve is
+  `from phonometry.metrology import *`, which now brings the narrowed API
+  rather than everything the package used to re-export; the explicit forms all
+  keep working.
+
+- The generated reference is keyed by subpackage. Its sections were a fourth
+  naming of the same material (`levels`, `spectra`, `correlation` for what the
+  code called `metrology`), so a reader who knew where a function lived could
+  not predict where its page lived. They are now `filters`, `signals` and
+  `metrology`, one per package, and the pages move with them
+  (`reference/api/spectra/cepstrum` becomes `reference/api/signals/cepstrum`).
+  The consistency contract in `scripts/api_taxonomy.py` is what enforces it:
+  five sections drew from `metrology` under four different names and now three
+  draw from three packages under their own. The sections that deliberately
+  span two parents are untouched, and one of them is why the rule is not yet
+  universal: `metrology.intensity_compliance` is still documented with the
+  intensity chain it verifies, in the `power` section.
+
 - CI fails when `.github/reports` no longer matches a fresh `make reports`
   run, which is the reason the fiches were able to drift for weeks in the
   first place: the conformance report, the generated API reference, the
@@ -1588,6 +1639,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   carries the year its own designation states, and the Spanish page for
   programme loudness names the AES convention as it is published instead of
   translating it.
+
+### Deprecated
+
+- The pre-4.0 `phonometry.metrology.*` module paths and the names read from
+  the `metrology` namespace that now live in `filters` or `signals` (see
+  Changed). Both warn on use and are removed in 5.0, one release after the
+  3.x aliases.
 
 ### Fixed
 

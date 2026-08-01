@@ -3,8 +3,8 @@ r"""
 Building acoustic performance prediction (EN 12354-1/-2:2000).
 
 This is the **prediction** counterpart of the measurement modules
-(:mod:`phonometry.lab_insulation` for laboratory ``R``/``Ln`` and
-:mod:`phonometry.insulation` for field ``R'``/``L'n``). EN 12354 estimates the
+(:mod:`phonometry.building.lab_insulation` for laboratory ``R``/``Ln`` and
+:mod:`phonometry.building.insulation` for field ``R'``/``L'n``). EN 12354 estimates the
 *in-situ* apparent performance of a building from the laboratory performance of
 its elements, adding the flanking transmission that a field measurement would
 capture but a laboratory measurement suppresses.
