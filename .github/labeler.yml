@@ -30,6 +30,7 @@ figures:
           - scripts/generate_graphs.py
           - scripts/generate_diagrams.py
           - scripts/check_figures.py
+          - scripts/generated_assets.py
           - src/phonometry/_plot/**
           - src/phonometry/_plotting.py
           - requirements-figures.txt
@@ -41,6 +42,13 @@ reports:
           - .github/reports/**
           - scripts/generate_reports.py
           - scripts/generate_site_reports.py
+          - scripts/check_reports.py
+          - scripts/generated_assets.py
+          - requirements-reports.txt
+          # The fiche job installs both requirement files, and the embedded
+          # plot comes off the matplotlib/NumPy stack pinned in this one, so a
+          # bump here can move the rendered PDF and its preview.
+          - requirements-figures.txt
 
 conformance:
   - changed-files:

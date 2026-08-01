@@ -28,6 +28,7 @@ references:
 
 import Video from '../../../../components/Video.astro';
 import ThemeImage from '../../../../components/ThemeImage.astro';
+import ReportPreview from '../../../../components/ReportPreview.astro';
 
 La *presión* acústica dice cuánto suena un punto; la **intensidad acústica** dice
 hacia dónde *va* la energía. Es el flujo de potencia acústica (W/m²), una
@@ -446,6 +447,16 @@ omite la de tercios de octava; la biblioteca sigue el texto EN/CEI (véase el
 combina componentes suministrados por separado:
 `instrument_class_from_components(probe_class, processor_class)` devuelve 1
 solo cuando ambos son de clase 1, y 2 para cualquier otra combinación.
+
+La ficha de ejemplo se regenera con `make reports` y se mantiene renderizada en
+el repositorio; haz clic en la vista previa para abrir el PDF.
+
+<ReportPreview
+	name="iec61043_intensity_example"
+	title="Informe de ejemplo de verificación de clase de instrumento de intensidad IEC 61043 (PDF)"
+	description="Ficha de verificación de clase de instrumento de una página: una cabecera de metadatos, una tabla por bandas con los mínimos de clase 1 y clase 2, el índice residual medido, el margen y la clase alcanzada en cada banda de tercio de octava de 50 Hz a 6,3 kHz, el índice medido trazado como curva escalonada sobre las dos máscaras de la Tabla 2 con la banda de 100 Hz marcada por debajo del mínimo de clase 1, el resultado encuadrado Class 2 - COMPLIES (binding margin +4.20 dB), la separación entre micrófonos y el desfase equivalente, y un veredicto FAIL frente a la clase 1 exigida."
+	caption="Ficha de verificación de clase de instrumento (IntensityClassResult.report), la clase alcanzada con su margen vinculante y el δpI0 medido sobre los mínimos de la Tabla 2 reescalados al separador de 12 mm."
+/>
 
 ### Leer `δpI0` como un error de fase
 

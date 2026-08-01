@@ -1,0 +1,23 @@
+# Locked fiche-rendering stack for the reports CI check (the "Example report
+# fiches up to date" job in python-app.yml). Install it on top of
+# requirements-figures.txt, which pins the matplotlib/numpy half of the chain.
+#
+# A fiche goes matplotlib -> SVG -> svglib -> reportlab -> PDF -> pypdfium2 ->
+# WebP preview, and the staleness check compares the rendered page. Every link
+# after matplotlib therefore fixes what the check sees: svglib and its CSS/XML
+# parsers decide how the SVG becomes vector graphics, reportlab lays out the
+# page and embeds the fonts, and pypdfium2 rasterizes it. Cross-CPU ~1-ULP
+# coordinate drift is absorbed by the tolerance in scripts/check_reports.py, so
+# the stack does not have to byte-match the runner hardware, but a version bump
+# in any of these moves the rendered pixels well past that tolerance.
+#
+# Bump these together with a fresh `make reports` regeneration (generate the
+# fiches with exactly this stack, then commit both). Generated from the
+# maintainer's venv that produced the committed fiches.
+reportlab==5.0.0
+svglib==2.0.2
+pypdfium2==5.12.1
+lxml==6.1.1
+cssselect2==0.9.0
+tinycss2==1.5.1
+webencodings==0.5.1

@@ -15,8 +15,9 @@
  *
  * The fiche is an opaque white A4 page, so — unlike the theme-aware figures —
  * a single WebP serves both themes; a light frame keeps it legible on the dark
- * ground. The WebP is NOT byte-checked in CI (its embedded vector plot differs
- * by ~1 ULP across CPUs); the maintainer regenerates it with `make reports`.
+ * ground. The WebP is not byte-checked in CI (its embedded vector plot differs
+ * by ~1 ULP across CPUs); the `Example report fiches up to date` job compares
+ * it within a tolerance instead, so a stale preview fails the build.
  */
 interface Props {
 	/** Fiche basename in .github/reports, e.g. "iso717_airborne_example". */

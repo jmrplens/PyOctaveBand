@@ -132,11 +132,31 @@ lighthouse:
 	cd site && pnpm run lighthouse
 
 # Regenerate the committed example .report() fiches under .github/reports/,
-# which the documentation links to as rendered normative-report examples.
-# Not byte-checked in CI (the embedded vector plot differs by ~1 ULP across
-# CPUs); tests/test_generate_reports.py only checks the generator still works.
+# which the documentation links to as rendered normative-report examples. CI
+# fails if this drifts (see the `reports` job in python-app.yml). The compare
+# is tolerance-aware rather than a byte diff, for the same reason the figures'
+# is: the embedded vector plot differs by ~1 ULP across CPUs. See
+# scripts/check_reports.py.
+#
+# Renders into a scratch directory and swaps it in only once the whole set is
+# written. Clearing the output first, which is how this used to work, means a
+# generator that dies halfway leaves the working tree stripped of the committed
+# examples and the maintainer reaching for `git checkout`. The clearing itself
+# has to stay, because the generator only overwrites and never deletes, so a
+# fiche that is no longer produced would survive as a stale orphan and slip
+# past the staleness check; it just belongs after a successful run rather than
+# before an attempted one. The trap covers the interrupted run the same way.
 reports:
-	$(PYTHON) scripts/generate_reports.py
+	set -e; \
+	tmp=$$(mktemp -d .github/reports.tmp.XXXXXX); \
+	old=$$(mktemp -d .github/reports.old.XXXXXX); \
+	trap 'if [ -d "$$old"/current ]; then rm -rf .github/reports; mv "$$old"/current .github/reports; fi; rm -rf "$$tmp" "$$old"' EXIT INT TERM HUP; \
+	$(FIGURE_ENV) $(PYTHON) scripts/generate_reports.py --output-dir "$$tmp"; \
+	[ -n "$$(ls -A "$$tmp")" ] || { echo "no fiche was generated" >&2; exit 1; }; \
+	mv .github/reports "$$old"/current; \
+	mv "$$tmp" .github/reports; \
+	mv "$$old"/current "$$old"/replaced; \
+	rm -rf "$$old"
 
 # Regenerate the committed, versioned numerical conformance report, then bring
 # every count quoted from it into line. The --file-header flag prepends the

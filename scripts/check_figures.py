@@ -17,14 +17,10 @@ committed versions (``git HEAD``) within a tolerance instead:
   must be identical, and every numeric token must agree within an absolute or
   relative tolerance. A moved element, changed label or new path fails; a
   last-bit coordinate wobble passes.
-* **Raster (WebP/PNG)** -- identical dimensions, and *both* (a) at most
-  ``RASTER_MAX_SIG_PIXELS`` pixels whose per-channel difference exceeds
-  ``RASTER_LEVEL_TOL`` and (b) a per-pixel root-mean-square difference below
-  ``RASTER_RMS_TOL``. The pixel count
-  catches a *localised* change (a moved line, a relabelled axis) that a global
-  RMS would dilute in a large image; the RMS catches a *broad* change (a
-  recoloured background) that few-but-everywhere pixels would slip past the
-  count. Cross-CPU sub-ULP coordinate drift changes neither meaningfully.
+* **Raster (WebP/PNG)** -- identical dimensions, at most
+  :data:`RASTER_TOL`\\ ``.max_sig_pixels`` meaningfully changed pixels and a
+  bounded root-mean-square difference (see
+  :class:`~generated_assets.RasterTolerance`).
 * **Anything else** -- exact byte compare.
 
 Added or removed files always fail: a new figure must be committed, and a
@@ -37,14 +33,20 @@ being immune to cross-CPU floating-point non-determinism.
 
 from __future__ import annotations
 
-import io
 import re
-import subprocess
 import sys
 from pathlib import Path
 
-import numpy as np
-from PIL import Image
+_SCRIPTS = Path(__file__).resolve().parent
+if str(_SCRIPTS) not in sys.path:
+    sys.path.insert(0, str(_SCRIPTS))
+
+from generated_assets import (
+    RasterTolerance,
+    committed_bytes,
+    raster_problem,
+    tracked_files,
+)
 
 IMG_DIR = ".github/images"
 
@@ -55,18 +57,12 @@ SVG_ABS_TOL = 1e-2
 SVG_REL_TOL = 1e-4
 
 # A pixel counts as "meaningfully changed" if any channel differs by more than
-# RASTER_LEVEL_TOL (0..255). Cross-CPU drift perturbs a coordinate by ~1e-6 units,
+# ``level`` (0..255). Cross-CPU drift perturbs a coordinate by ~1e-6 units,
 # i.e. a ~1e-5-pixel geometric shift, whose anti-aliasing effect rounds to at
-# most a level or two on a few edge pixels -- far below this threshold.
-RASTER_LEVEL_TOL = 12
-# Allowed number of meaningfully-changed pixels. A real edit moves a plotted
-# line or glyph, changing hundreds to thousands of edge pixels; noise changes
-# a handful at most.
-RASTER_MAX_SIG_PIXELS = 100
-# Broad-change guard: maximum root-mean-square per-channel difference. Catches
-# a change spread thinly over the whole image (e.g. a recoloured background)
-# that stays individually under RASTER_LEVEL_TOL.
-RASTER_RMS_TOL = 2.0
+# most a level or two on a few edge pixels -- far below this threshold. A real
+# edit moves a plotted line or glyph, changing hundreds to thousands of edge
+# pixels, and a restyled fill moves the whole image past the RMS bound.
+RASTER_TOL = RasterTolerance(level=12, max_sig_pixels=100, rms=2.0)
 
 # Integers and decimals, with optional sign and exponent. ``split``/``findall``
 # with this pattern partition a file into fixed text and numeric values.
@@ -82,27 +78,6 @@ _TOKEN = re.compile(rb"-?\d+(?:\.\d+)?(?:[eE][-+]?\d+)?")
 # catching a genuine change (an id added, removed, reordered, or a reference
 # repointed changes the placeholder sequence).
 _IDREF = re.compile(rb'(\bid="|url\(#|xlink:href="#|\bhref="#)([A-Za-z_][\w.:\-]*)')
-
-
-def _committed(path: str) -> bytes | None:
-    """Return the bytes of ``path`` as committed at HEAD, or ``None``."""
-    result = subprocess.run(
-        ["git", "show", f"HEAD:{path}"],
-        capture_output=True,
-        check=False,
-    )
-    return result.stdout if result.returncode == 0 else None
-
-
-def _tracked_files() -> set[str]:
-    """Return the set of ``.github/images`` paths tracked at HEAD."""
-    result = subprocess.run(
-        ["git", "ls-tree", "-r", "--name-only", "HEAD", IMG_DIR],
-        capture_output=True,
-        text=True,
-        check=True,
-    )
-    return {line for line in result.stdout.splitlines() if line}
 
 
 def _canonicalize_ids(data: bytes) -> bytes:
@@ -136,26 +111,9 @@ def _svg_within_tolerance(old: bytes, new: bytes) -> bool:
     return True
 
 
-def _raster_problem(old: bytes, new: bytes) -> str | None:
-    """Describe how two rasters differ beyond tolerance, or ``None`` if within it."""
-    a = np.asarray(Image.open(io.BytesIO(old)).convert("RGBA"), dtype=np.float64)
-    b = np.asarray(Image.open(io.BytesIO(new)).convert("RGBA"), dtype=np.float64)
-    if a.shape != b.shape:
-        return f"dimensions changed {a.shape} != {b.shape}"
-    diff = np.abs(a - b)
-    sig_pixels = int(np.count_nonzero(diff.max(axis=-1) > RASTER_LEVEL_TOL))
-    if sig_pixels > RASTER_MAX_SIG_PIXELS:
-        return (f"{sig_pixels} pixels changed by >{RASTER_LEVEL_TOL} "
-                f"(> {RASTER_MAX_SIG_PIXELS})")
-    rms = float(np.sqrt(np.mean(diff**2)))
-    if rms > RASTER_RMS_TOL:
-        return f"RMS {rms:.3f} > {RASTER_RMS_TOL}"
-    return None
-
-
 def main() -> int:
     disk = {str(p) for p in Path(IMG_DIR).rglob("*") if p.is_file()}
-    tracked = _tracked_files()
+    tracked = tracked_files(IMG_DIR)
     problems: list[str] = []
 
     for path in sorted(disk - tracked):
@@ -165,7 +123,7 @@ def main() -> int:
 
     for path in sorted(disk & tracked):
         new = Path(path).read_bytes()
-        old = _committed(path)
+        old = committed_bytes(path)
         if old is None:
             problems.append(f"cannot read committed {path}")
             continue
@@ -175,7 +133,7 @@ def main() -> int:
             if not _svg_within_tolerance(old, new):
                 problems.append(f"SVG changed beyond tolerance: {path}")
         elif path.endswith((".webp", ".png")):
-            reason = _raster_problem(old, new)
+            reason = raster_problem(old, new, RASTER_TOL)
             if reason is not None:
                 problems.append(f"raster changed beyond tolerance ({reason}): {path}")
         else:
