@@ -72,6 +72,8 @@ references:
     note: "La propagación de distribuciones mediante Monte Carlo y su construcción del intervalo de cobertura. El PDF enlazado es la descarga gratuita."
 ---
 
+import ThemeImage from '../../../../../components/ThemeImage.astro';
+
 Esta página reúne la teoría de la propia cadena de medición: las bandas fraccionales de octava normalizadas y los bancos de filtros en el dominio temporal que las implementan, las curvas de ponderación frecuencial, la integración temporal, las métricas de nivel, de evento y de exposición, la intensidad acústica y el marco de incertidumbre del GUM que sustenta cada magnitud medida. Forma parte de la [referencia de teoría](/phonometry/es/reference/theory/).
 
 ## Frecuencias de banda de octava (ANSI S1.11 / IEC 61260)
@@ -243,7 +245,7 @@ Para garantizar **estabilidad total** en todo el espectro audible (incluso a
 frecuencias bajas como 16 Hz con frecuencias de muestreo altas), phonometry
 emplea dos estrategias fundamentales:
 
-<img class="light-only" src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_bank_dataflow_es.svg" alt="Flujo de datos dentro de una banda del banco de filtros: una banda en la que cabe diezmar, es decir en la que la mitad de la frecuencia de muestreo sigue por encima de 1,25 veces su borde superior, toma la rama de diezmado con resample_poly hasta fs entre M para que sus polos se alejen del círculo unidad, después toda banda es una cascada de secciones de segundo orden diseñada sobre los bordes de banda de IEC 61260-1 en lugar de una función de transferencia de orden alto, ambas ramas terminan en el nivel de banda en dB y sigbands=True devuelve además la señal de banda devuelta a la frecuencia de entrada" style="width:92%" loading="lazy"><img class="dark-only" src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_bank_dataflow_es_dark.svg" alt="Flujo de datos dentro de una banda del banco de filtros: una banda en la que cabe diezmar, es decir en la que la mitad de la frecuencia de muestreo sigue por encima de 1,25 veces su borde superior, toma la rama de diezmado con resample_poly hasta fs entre M para que sus polos se alejen del círculo unidad, después toda banda es una cascada de secciones de segundo orden diseñada sobre los bordes de banda de IEC 61260-1 en lugar de una función de transferencia de orden alto, ambas ramas terminan en el nivel de banda en dB y sigbands=True devuelve además la señal de banda devuelta a la frecuencia de entrada" style="width:92%" loading="lazy">
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_bank_dataflow_es.svg" alt="Flujo de datos dentro de una banda del banco de filtros: una banda en la que cabe diezmar, es decir en la que la mitad de la frecuencia de muestreo sigue por encima de 1,25 veces su borde superior, toma la rama de diezmado con resample_poly hasta fs entre M para que sus polos se alejen del círculo unidad, después toda banda es una cascada de secciones de segundo orden diseñada sobre los bordes de banda de IEC 61260-1 en lugar de una función de transferencia de orden alto, ambas ramas terminan en el nivel de banda en dB y sigbands=True devuelve además la señal de banda devuelta a la frecuencia de entrada" width="92%" />
 
 1. **Secciones de segundo orden (SOS):** todos los filtros se implementan como
    biquads en cascada, evitando la pérdida catastrófica de precisión de las
@@ -279,7 +281,7 @@ modo `high_accuracy` por defecto diseña y ejecuta el filtro a una frecuencia
 interna sobremuestreada (≥ 144 kHz); consulta
 [Ponderación frecuencial](/phonometry/es/guides/weighting/).
 
-<img class="light-only" src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/weighting_responses_es.svg" alt="Curvas de ponderación A, C y Z de IEC 61672-1 con zoom de la región positiva de la curva A (+1,27 dB en 2,5 kHz)" style="width:80%" loading="lazy"><img class="dark-only" src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/weighting_responses_es_dark.svg" alt="Curvas de ponderación A, C y Z de IEC 61672-1 con zoom de la región positiva de la curva A (+1,27 dB en 2,5 kHz)" style="width:80%" loading="lazy">
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/weighting_responses_es.svg" alt="Curvas de ponderación A, C y Z de IEC 61672-1 con zoom de la región positiva de la curva A (+1,27 dB en 2,5 kHz)" width="80%" />
 
 *Las tres curvas de ponderación de IEC 61672-1 que aplica la biblioteca, con la pequeña región positiva de la curva A ampliada. Las curvas especiales B, D y AU están en [Ponderaciones especiales](/phonometry/es/guides/special-weightings/).*
 
@@ -303,7 +305,7 @@ estado cuadrático medio anterior. Consulta
 [Por qué phonometry](/phonometry/es/reference/why-phonometry/) para la
 verificación de esta implementación con ráfagas de tono de IEC 61672-1.
 
-<img class="light-only" src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/time_weighting_analysis_es.svg" alt="Respuestas de las ponderaciones temporales Fast, Slow e Impulse a una ráfaga de ruido" style="width:80%" loading="lazy"><img class="dark-only" src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/time_weighting_analysis_es_dark.svg" alt="Respuestas de las ponderaciones temporales Fast, Slow e Impulse a una ráfaga de ruido" style="width:80%" loading="lazy">
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/time_weighting_analysis_es.svg" alt="Respuestas de las ponderaciones temporales Fast, Slow e Impulse a una ráfaga de ruido" width="80%" />
 
 *El integrador exponencial con las tres constantes de tiempo normalizadas: Fast sigue la ráfaga, Slow la suaviza e Impulse retiene su pico.*
 
@@ -386,7 +388,7 @@ El **índice presión-intensidad** $\delta_{pI} = L_p - L_I$ mide cuán reactivo
 
 Consulta la [guía de intensidad acústica](/phonometry/es/guides/intensity/) para su uso.
 
-<img class="light-only" src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/intensity_demo_es.svg" alt="Niveles de presión e intensidad en tercios de octava para una onda plana progresiva frente a una onda estacionaria" style="width:92%" loading="lazy"><img class="dark-only" src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/intensity_demo_es_dark.svg" alt="Niveles de presión e intensidad en tercios de octava para una onda plana progresiva frente a una onda estacionaria" style="width:92%" loading="lazy">
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/intensity_demo_es.svg" alt="Niveles de presión e intensidad en tercios de octava para una onda plana progresiva frente a una onda estacionaria" width="92%" />
 
 *El estimador p-p en los dos campos límite: la separación entre $L_p$ y $L_I$ es el índice presión-intensidad que delata los campos reactivos.*
 

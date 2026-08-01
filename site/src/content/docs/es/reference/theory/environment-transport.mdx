@@ -107,6 +107,8 @@ references:
     note: "Los indicadores de campo y el criterio de capacidad dinámica compartidos por los métodos de barrido de intensidad."
 ---
 
+import ThemeImage from '../../../../../components/ThemeImage.astro';
+
 Esta página reúne la teoría del ruido ambiental y en exteriores: los descriptores de evaluación de jornada completa y el ajuste por sonidos impulsivos, la absorción atmosférica, el método general de propagación en exteriores, la exposición al ruido en el trabajo con su presupuesto de incertidumbre, y los métodos de determinación de la potencia acústica. Forma parte de la [referencia de teoría](/phonometry/es/reference/theory/).
 
 ## Descriptores ambientales (ISO 1996-1)
@@ -133,7 +135,7 @@ Los ajustes $K_i$ cubren las penalizaciones horarias (ISO 1996-1 Tabla A.1: tard
 
 Consulta la [guía de niveles ambientales](/phonometry/es/guides/environmental-levels/) para su uso.
 
-<img class="light-only" src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/lden_profile_es.svg" alt="Perfil LAeq urbano sintético de 24 horas con las bandas de día, tarde y noche, los niveles por periodo ponderados con +5 y +10 dB y el Lden resultante" style="width:80%" loading="lazy"><img class="dark-only" src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/lden_profile_es_dark.svg" alt="Perfil LAeq urbano sintético de 24 horas con las bandas de día, tarde y noche, los niveles por periodo ponderados con +5 y +10 dB y el Lden resultante" style="width:80%" loading="lazy">
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/lden_profile_es.svg" alt="Perfil LAeq urbano sintético de 24 horas con las bandas de día, tarde y noche, los niveles por periodo ponderados con +5 y +10 dB y el Lden resultante" width="80%" />
 
 *Un perfil $L_{Aeq}$ de 24 horas dividido en día, tarde y noche, las penalizaciones de +5/+10 dB y el $L_{den}$ resultante.*
 
@@ -193,7 +195,7 @@ $f_m = 1000 \cdot 10^{k/10}$ (Nota 5) empleados para calcular esa tabla. El mism
 $\alpha$ es la única vía hacia el coeficiente de atenuación de potencia de la
 ISO 354 $m = \alpha/(10 \log_{10} e)$, expuesto como `air_attenuation_m`.
 
-<img class="light-only" src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/atmospheric_attenuation_es.svg" alt="Coeficiente de atenuación atmosférica de tono puro alfa de la ISO 9613-1 en dB/km frente a la frecuencia, con ordenada lineal en decibelios sobre un eje de frecuencia logarítmico, para la atmósfera de referencia de 20 grados Celsius y 50 por ciento de humedad relativa, producido por el método plot del resultado AtmosphericAttenuation" style="width:80%" loading="lazy"><img class="dark-only" src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/atmospheric_attenuation_es_dark.svg" alt="Coeficiente de atenuación atmosférica de tono puro alfa de la ISO 9613-1 en dB/km frente a la frecuencia, con ordenada lineal en decibelios sobre un eje de frecuencia logarítmico, para la atmósfera de referencia de 20 grados Celsius y 50 por ciento de humedad relativa, producido por el método plot del resultado AtmosphericAttenuation" style="width:80%" loading="lazy">
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/atmospheric_attenuation_es.svg" alt="Coeficiente de atenuación atmosférica de tono puro alfa de la ISO 9613-1 en dB/km frente a la frecuencia, con ordenada lineal en decibelios sobre un eje de frecuencia logarítmico, para la atmósfera de referencia de 20 grados Celsius y 50 por ciento de humedad relativa, producido por el método plot del resultado AtmosphericAttenuation" width="80%" />
 
 *El coeficiente de ISO 9613-1 para la atmósfera de referencia de 20 °C y 50 % de humedad relativa: la subida en $f^2$ abarca dos décadas de 50 Hz a 10 kHz.*
 
@@ -290,7 +292,7 @@ El nivel de potencia acústica $L_W = 10 \log_{10}(P/P_0)$ ($P_0 = 1$ pW) es una
 magnitud de *emisión*: a diferencia de un nivel de presión, no depende de la
 distancia al receptor ni de la sala. Tres familias de métodos lo recuperan.
 
-<img class="light-only" src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sound_power_methods_es.svg" alt="Las tres vías de potencia acústica en paralelo: una superficie envolvente de presión sobre un plano reflectante (ISO 3744/3746), una fuente en una cámara reverberante muestreada por micrófonos (ISO 3741) y una sonda de intensidad barriendo una superficie alrededor de la fuente (ISO 9614-2)" style="width:92%" loading="lazy"><img class="dark-only" src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sound_power_methods_es_dark.svg" alt="Las tres vías de potencia acústica en paralelo: una superficie envolvente de presión sobre un plano reflectante (ISO 3744/3746), una fuente en una cámara reverberante muestreada por micrófonos (ISO 3741) y una sonda de intensidad barriendo una superficie alrededor de la fuente (ISO 9614-2)" style="width:92%" loading="lazy">
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sound_power_methods_es.svg" alt="Las tres vías de potencia acústica en paralelo: una superficie envolvente de presión sobre un plano reflectante (ISO 3744/3746), una fuente en una cámara reverberante muestreada por micrófonos (ISO 3741) y una sonda de intensidad barriendo una superficie alrededor de la fuente (ISO 9614-2)" width="92%" />
 
 *Las tres vías hacia $L_W$: superficie envolvente de presión, cámara reverberante y barrido de intensidad.*
 
