@@ -18,6 +18,11 @@ import numpy as np
 import pytest
 
 pytest.importorskip("PIL")
+# The PDF half of the gate reads its pages through pypdfium2. Without it,
+# ``pdf_problem`` reports an extraction failure for every input, which is a
+# legitimate answer for a corrupt fiche but turns the text-comparison tests
+# into failures rather than skips.
+pytest.importorskip("pypdfium2")
 from PIL import Image
 
 _SCRIPTS = str(pathlib.Path(__file__).resolve().parent.parent / "scripts")
