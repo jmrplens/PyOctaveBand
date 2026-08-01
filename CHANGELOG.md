@@ -897,6 +897,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Changed
 
+- Every editable page now links to its source in the footer, in both
+  languages. The generated API reference opts out through the route
+  middleware, since those pages are written from docstrings and a
+  regeneration would discard any edit made through the web. The head also
+  drops a hand-written favicon link that duplicated the one Starlight emits
+  from its own default, and the web app manifest describes the toolkit
+  instead of the octave-band filter bank it grew out of.
+
 - The test suite runs in about half the wall time. The report generator
   tests render each example fiche exactly once and assert its PDF and WebP
   preview on the same run instead of regenerating the full set twice, the

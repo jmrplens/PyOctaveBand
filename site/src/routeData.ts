@@ -4,6 +4,14 @@ export const onRequest = defineRouteMiddleware(({ locals }) => {
   const { starlightRoute } = locals;
   if (!starlightRoute) return;
 
+  // The API reference is generated from the package docstrings, so its pages
+  // have no hand-editable source: an "Edit page" link there would invite web
+  // edits that the next regeneration silently discards. The prose that a
+  // reader could usefully fix lives in the docstrings, not in these files.
+  if (/^(es\/)?reference\/api(\/|$)/.test(starlightRoute.entry?.id ?? '')) {
+    starlightRoute.editUrl = undefined;
+  }
+
   // Splash (landing) pages don't render a sidebar, which also removes the
   // mobile menu button. Force the sidebar data on so the hamburger menu is
   // available on mobile; desktop hides the sidebar pane via CSS

@@ -1,7 +1,7 @@
 {
   "name": "phonometry Documentation",
   "short_name": "phonometry",
-  "description": "Octave-band and fractional octave-band filter bank for Python. ANSI S1.11 and IEC 61672-1 compliant.",
+  "description": "Acoustic measurement toolkit for Python: sound level metrology, psychoacoustics, rooms and buildings, vibration, environment and transport, underwater acoustics, electroacoustics and wave simulation.",
   "start_url": "/phonometry/",
   "scope": "/phonometry/",
   "display": "standalone",
