@@ -999,6 +999,42 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Changed
 
+- CI fails when `.github/reports` no longer matches a fresh `make reports`
+  run, which is the reason the fiches were able to drift for weeks in the
+  first place: the conformance report, the generated API reference, the
+  evidence pages and the documentation figures all had a staleness gate, and
+  the fiches had none. The new `Example report fiches up to date` job
+  regenerates the whole set and compares it through
+  `scripts/check_reports.py`. A byte diff is not an option, for the same
+  reason it was abandoned for the figures: every fiche embeds its plot as
+  vector geometry, and GitHub's heterogeneous runners compute a few of those
+  coordinates a last bit apart, which rewrites the page for no visible reason.
+  So each fiche is compared on what it says and on what it looks like: the
+  extracted text exactly, page by page, and the committed preview within the
+  same two-criteria pixel tolerance the figures use, recalibrated for a
+  document page. The calibration was measured rather than assumed. matplotlib
+  writes SVG coordinates through `%f`, so one unit in the last emitted decimal
+  is the largest text change a last-bit difference can make; re-rendering five
+  fiches with every plotted coordinate moved by that much, in a random
+  direction, moved at most 8 pixels past the level threshold and the
+  whole-page RMS by 0.074. The two stale fiches moved 28710 and 27629 pixels,
+  and the subtler restyled fills moved the RMS to 0.79 and 1.33. The
+  thresholds sit between the two, at 64 pixels and an RMS of 0.5, which is
+  roughly an order of magnitude clear of the noise and a factor of two under
+  the smallest real change. They are tighter than the figures' on purpose: a
+  fiche preview is a flat document page rasterized by a pinned binary
+  rasterizer, a much quieter thing to compare than a plot raster, and the
+  figures' looser bound would have let the restyled fills through. The
+  rendering stack the job runs is pinned in `requirements-reports.txt`
+  alongside the existing figure pins, `make reports` now clears the directory
+  before regenerating so a fiche that is no longer produced is actually
+  removed, and the generator pins the numerical thread pools the way the
+  figure generator does, so a runner with a different core count cannot
+  reorder a floating-point sum into the rendered page. The staleness helpers
+  the two checks share moved to `scripts/generated_assets.py`. A unit test also
+  asserts every registered fiche has a committed render, which fails in the
+  same second as the commit that forgets one, with no regeneration needed.
+
 - The figures now spell the decimal logarithm the way the pages around them
   do. Every axis label, legend entry, title, annotation box and diagram
   caption the generators write still carried the ISO `lg`, so a guide that
@@ -1549,6 +1585,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   translating it.
 
 ### Fixed
+
+- The committed example `.report()` fiches were not checked against the code
+  that writes them, and two of them had fallen behind it. `iso1999_nipts` and
+  `iso1996_tone_audibility` still carried the shaded regions as they were
+  drawn before fills started being derived from the page they sit on: the
+  fractile band was the old 50 % composite `#ffddbb` instead of the
+  `#ffe7d2` wash, and the decisive tone's critical band was the hard-coded
+  `#eaf0f8` instead of `#c8deed`. Nothing a reader would misread, since every
+  printed value and every verdict was already right, but the two fiches the
+  documentation offers as examples of what the library prints were showing a
+  paler band than the library prints. `ebu_r128_loudness` and the two
+  `iec61260_filter` fiches carried the same kind of drift a shade smaller.
+  All five are regenerated here, together with the `iec61043_intensity`
+  fiche, which had been registered in the generator and documented in the
+  intensity guide without its PDF and preview ever being committed; the guide
+  now embeds it in both languages, like every other worked example.
 
 - The `<link rel="alternate" type="text/markdown">` in every page's head
   pointed at a file that does not exist on 147 of them. It was written for

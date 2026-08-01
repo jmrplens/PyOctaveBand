@@ -41,6 +41,8 @@ reports:
           - .github/reports/**
           - scripts/generate_reports.py
           - scripts/generate_site_reports.py
+          - scripts/check_reports.py
+          - requirements-reports.txt
 
 conformance:
   - changed-files:

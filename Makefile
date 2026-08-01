@@ -132,11 +132,17 @@ lighthouse:
 	cd site && pnpm run lighthouse
 
 # Regenerate the committed example .report() fiches under .github/reports/,
-# which the documentation links to as rendered normative-report examples.
-# Not byte-checked in CI (the embedded vector plot differs by ~1 ULP across
-# CPUs); tests/test_generate_reports.py only checks the generator still works.
+# which the documentation links to as rendered normative-report examples. CI
+# fails if this drifts (see the `reports` job in python-app.yml). The compare
+# is tolerance-aware rather than a byte diff, for the same reason the figures'
+# is: the embedded vector plot differs by ~1 ULP across CPUs. See
+# scripts/check_reports.py.
 reports:
-	$(PYTHON) scripts/generate_reports.py
+	# Clear the generated files first so a fiche that is no longer produced is
+	# actually removed (the generator only overwrites, never deletes, so a
+	# stale orphan would otherwise survive and slip past the staleness check).
+	find .github/reports -maxdepth 1 -type f \( -name '*.pdf' -o -name '*.webp' \) -delete
+	$(FIGURE_ENV) $(PYTHON) scripts/generate_reports.py
 
 # Regenerate the committed, versioned numerical conformance report, then bring
 # every count quoted from it into line. The --file-header flag prepends the

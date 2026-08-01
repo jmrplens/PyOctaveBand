@@ -49,6 +49,28 @@ def test_generator_registers_examples() -> None:
     assert len(set(names)) == len(names)
 
 
+def test_every_registered_fiche_is_committed() -> None:
+    """Registering a fiche and never committing it is a silent hole.
+
+    One example was registered in the generator, documented, and left without
+    its rendered PDF and preview in the tree for months: the documentation
+    linked to files that were not there. The staleness job catches it too, but
+    this needs no regeneration, so it fails in the same second as the commit
+    that forgets it.
+    """
+    committed = pathlib.Path(_MODULE._DEFAULT_DIR)
+    missing = []
+    for factory in _MODULE._EXAMPLES:
+        name = factory()[2]
+        for path in (committed / name, committed / _MODULE.preview_path_for(name)):
+            if not path.is_file():
+                missing.append(path.name)
+    assert not missing, (
+        f"registered fiches with no committed render: {sorted(missing)} - "
+        "run 'make reports' and commit the result"
+    )
+
+
 @pytest.mark.parametrize(
     "factory", _MODULE._EXAMPLES, ids=lambda factory: factory.__name__.strip("_")
 )
