@@ -44,22 +44,41 @@ committed, and one that is no longer generated must be removed from the tree.
 Calibrating :data:`RASTER_TOL`
 ------------------------------
 
-The noise floor was measured rather than guessed. matplotlib writes SVG
-coordinates through ``%f``, so one unit in the last emitted decimal (1e-6 user
-units) is the largest text change a last-bit coordinate difference can
-produce; anything smaller does not reach the file at all. Re-rendering five
-representative fiches with *every* plotted path coordinate moved by that
-amount, in a random direction -- far worse than reality, where a handful of
-coordinates drift -- changed at most **8 pixels** beyond the level threshold
-and moved the whole-page RMS by at most **0.074**.
+matplotlib writes SVG coordinates through ``%f``, so one unit in the last
+emitted decimal (1e-6 user units) is the largest text change a last-bit
+coordinate difference can produce; anything smaller does not reach the file at
+all. Displacing *every* plotted path coordinate by that amount, in a random
+direction, is therefore an upper bound on what a coordinate difference could
+do, and far worse than reality, where at most a handful of coordinates drift.
 
-Against that, the two drifted fiches this check was written for moved 28710
-and 27629 pixels beyond the threshold, and the subtler restyled fills that
-came with them moved the RMS to 0.79 and 1.33. The thresholds below sit
-between the two populations with roughly an order of magnitude of headroom
-over the noise and a factor of two under the smallest real change. A change
-as small as one character of one printed field moves 89 pixels, so the pixel
-count is set just under the smallest localised edit a fiche can carry.
+Measured that way across all 67 fiches, the result is not a clean separation.
+Most sit near zero, but five reach 235 to 1424 pixels and RMS 0.68 to 1.43,
+above the thresholds below. Those are fiches whose plots have vertical bar
+edges landing on a pixel boundary, where moving the whole edge by one unit in
+the last decimal flips entire columns at once.
+
+The thresholds are set anyway, for a reason worth stating plainly: that upper
+bound is not what happens. Displacing a *single* coordinate in the worst of
+those five changed no pixels at all across sixty trials, because a coordinate
+only re-renders differently if its float lands within about one unit in the
+last place of a rounding boundary six decimals down, and the coordinates that
+flip a bar edge come from exact layout arithmetic rather than from libm or
+BLAS. If the SVG text does not change, the PDF and its raster are identical.
+No cross-machine evidence exists either way: everything here was measured by
+simulating displacement on one machine, not by rendering on two.
+
+What the thresholds do catch is the drift this check was written for: 28710
+and 27629 pixels on the two stale fiches, and RMS 0.79 to 1.33 on the subtler
+restyled fills that came with them. Raising the RMS bound far enough to clear
+the simulated worst case would stop catching those fills, which is the failure
+this check exists to prevent, so the bound stays where it is.
+
+The pixel count is the weaker of the two criteria. One character changed in a
+printed field moves 53 to 102 pixels, so most single-character edits pass it
+and only the RMS sees them, by a margin as small as 7 percent. That is
+acceptable because the PDF text is compared exactly: every printed value,
+verdict and margin is covered whatever the raster does, and the raster
+criteria only have to catch a changed plot.
 
 They are tighter than the figures' (100 pixels, RMS 2.0) on purpose: a fiche
 preview is a flat, opaque document page rasterized from a PDF by a pinned

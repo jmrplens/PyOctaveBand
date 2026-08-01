@@ -1012,16 +1012,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   So each fiche is compared on what it says and on what it looks like: the
   extracted text exactly, page by page, and the committed preview within the
   same two-criteria pixel tolerance the figures use, recalibrated for a
-  document page. The calibration was measured rather than assumed. matplotlib
-  writes SVG coordinates through `%f`, so one unit in the last emitted decimal
-  is the largest text change a last-bit difference can make; re-rendering five
-  fiches with every plotted coordinate moved by that much, in a random
-  direction, moved at most 8 pixels past the level threshold and the
-  whole-page RMS by 0.074. The two stale fiches moved 28710 and 27629 pixels,
-  and the subtler restyled fills moved the RMS to 0.79 and 1.33. The
-  thresholds sit between the two, at 64 pixels and an RMS of 0.5, which is
-  roughly an order of magnitude clear of the noise and a factor of two under
-  the smallest real change. They are tighter than the figures' on purpose: a
+  document page. The thresholds are 64 pixels and an RMS of 0.5, and the
+  reasoning behind them is written out in the script rather than summarised
+  here, because it is not the clean separation it first looked like: moving
+  every plotted coordinate by one unit in the last decimal, which is an upper
+  bound rather than a forecast, pushes five of the 67 fiches past those
+  thresholds, all of them plots whose bar edges sit on a pixel boundary.
+  Moving a single coordinate in the worst of them changes nothing at all, and
+  the coordinates in question come from exact layout arithmetic, so the bound
+  is not what a real machine does. Raising the RMS far enough to clear it
+  would stop catching the restyled fills, which is the failure the check
+  exists to prevent. The two stale fiches moved 28710 and 27629 pixels and the
+  subtler fills moved the RMS to 0.79 and 1.33, so those are caught. They are
+  tighter than the figures' on purpose: a
   fiche preview is a flat document page rasterized by a pinned binary
   rasterizer, a much quieter thing to compare than a plot raster, and the
   figures' looser bound would have let the restyled fills through. The
