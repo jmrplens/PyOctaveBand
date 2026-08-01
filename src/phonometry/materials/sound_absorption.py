@@ -34,7 +34,7 @@ coefficient (ISO 354:2003, Eq. (8) and Eq. (9)):
 
    \alpha_s = \frac{A_T}{S}
 
-``alpha_s`` may exceed 1,0 (e.g. from diffraction/edge effects) and is not a
+``alpha_s`` may exceed 1.0 (e.g. from diffraction/edge effects) and is not a
 percentage (ISO 354:2003, Clause 3.7 NOTE 2); it is therefore never clamped.
 
 The air attenuation coefficient ``m`` is defined by ISO 354 only through its
@@ -43,7 +43,7 @@ conversion from the ISO 9613-1 attenuation coefficient ``alpha`` (in dB/m)
 
 .. math::
 
-   m = \frac{\alpha}{10 \lg e}
+   m = \frac{\alpha}{10 \log_{10} e}
 
 ISO 354 otherwise defers the calculation of ``alpha`` entirely to ISO 9613-1.
 ``m`` is therefore a user-supplied per-band parameter here (default 0, i.e. no air
@@ -160,7 +160,7 @@ def attenuation_from_alpha(alpha: ArrayLike) -> NDArray[np.float64]:
     r"""Air power attenuation coefficient ``m`` from ISO 9613-1 ``alpha``.
 
     Applies the ISO 354:2003 (8.1.2.1) conversion
-    :math:`m = \alpha / (10 \lg e)`,
+    :math:`m = \alpha / (10 \log_{10} e)`,
     where ``alpha`` is the attenuation coefficient in decibels per metre used by
     ISO 9613-1 and ``m`` is the power attenuation coefficient in reciprocal
     metres entering Eq. (5)/(7)/(8). ISO 354 itself provides no ``alpha`` table

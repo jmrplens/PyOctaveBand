@@ -35,34 +35,34 @@ spectra are known and the dominant path per band matters.
    (Formula C.4, :func:`perimeter_absorption_coefficient`). From it come the
    structural reverberation time :math:`T_s = 2.2/(f \eta_{tot})`
    (:func:`structural_reverberation_time`), the in-situ index
-   :math:`R_{situ} = R - 10 \lg(T_{s,situ}/T_{s,lab})` (Formula 9,
+   :math:`R_{situ} = R - 10 \log_{10}(T_{s,situ}/T_{s,lab})` (Formula 9,
    :func:`in_situ_reduction_index`) and the equivalent absorption length
    :math:`a_{situ} = 2.2\,\pi^2 S \sqrt{f_{ref}/f}/(c_o T_{s,situ})`
    (Formula 11).
 3. Junctions (Formula 10).
    :math:`D_{v,ij,situ} = K_{ij}
-   - 10 \lg(l_{ij}/\sqrt{a_{i,situ} a_{j,situ}})`,
+   - 10 \log_{10}(l_{ij}/\sqrt{a_{i,situ} a_{j,situ}})`,
    floored at 0 dB (:func:`in_situ_velocity_level_difference`).
 4. Paths. The direct path is
    :math:`R_{Dd} = R_{s,situ} + \Delta R_{D,situ} + \Delta R_{d,situ}`
    (Formula 14) and each flanking path (Formula 15) is
    :math:`R_{ij} = R_{i,situ}/2 + \Delta R_{i,situ} + R_{j,situ}/2
    + \Delta R_{j,situ} + D_{v,ij,situ} + T`
-   with the geometry term :math:`T = 10 \lg(S_s/\sqrt{S_i S_j})`
+   with the geometry term :math:`T = 10 \log_{10}(S_s/\sqrt{S_i S_j})`
    (:func:`flanking_reduction_index`).
-5. Assembly. :math:`R' = -10 \lg(\sum 10^{-R/10})` over the direct path and
+5. Assembly. :math:`R' = -10 \log_{10}(\sum 10^{-R/10})` over the direct path and
    all flanking paths (Formulae 1 to 4), then ``R'w (C; Ctr)`` per ISO 717-1
    (:func:`detailed_airborne_prediction`).
 
 **Chain, impact (ISO 12354-2:2017, Clause 4.2).** The bare floor's normalized
 impact sound pressure level per band follows from Annex B Formula (B.2),
-:math:`L_n = 155 - 30 \lg(m') + 10 \lg(T_s) + 10 \lg(\sigma)
-+ 10 \lg(f/f_{ref})`
+:math:`L_n = 155 - 30 \log_{10}(m') + 10 \log_{10}(T_s) + 10 \log_{10}(\sigma)
++ 10 \log_{10}(f/f_{ref})`
 (:func:`bare_floor_impact_level`); the direct path is
 :math:`L_{n,d} = L_{n,situ} - \Delta L_{situ} - \Delta L_{d,situ}`
 (Formula 11) and each flanking path (Formula 12) is
 :math:`L_{n,ij} = L_{n,situ} - \Delta L_{situ} + (R_{i,situ} - R_{j,situ})/2
-- \Delta R_{j,situ} - D_{v,ij,situ} - 10 \lg(S_i/\sqrt{S_i S_j})`
+- \Delta R_{j,situ} - D_{v,ij,situ} - 10 \log_{10}(S_i/\sqrt{S_i S_j})`
 (:func:`flanking_impact_level`), combined
 energetically into ``L'n`` and rated ``L'n,w (CI)`` per ISO 717-2
 (:func:`detailed_impact_prediction`).
@@ -403,7 +403,7 @@ def calculated_sound_reduction_index(
 ) -> np.ndarray:
     r"""Sound reduction index of a homogeneous element (Formulae B.2, B.10).
 
-    :math:`R = -10 \lg \tau` with the three-branch transmission factor
+    :math:`R = -10 \log_{10} \tau` with the three-branch transmission factor
 
     - :math:`f > f_c`:
       :math:`\tau = (2 \rho_o c_o/(2 \pi f m'))^2
@@ -506,8 +506,8 @@ def bare_floor_impact_level(
 
     .. math::
 
-       L_n = 155 - 30 \lg(m'/1\,\mathrm{kg/m^2}) + 10 \lg(T_s/1\,\mathrm{s})
-       + 10 \lg \sigma + 10 \lg(f/f_{ref})
+       L_n = 155 - 30 \log_{10}(m'/1\,\mathrm{kg/m^2}) + 10 \log_{10}(T_s/1\,\mathrm{s})
+       + 10 \log_{10} \sigma + 10 \log_{10}(f/f_{ref})
 
     with :math:`f_{ref} = 1000` Hz, the closed form obtained with
     the force level of the standard tapping machine on a low-mobility floor.
@@ -515,7 +515,7 @@ def bare_floor_impact_level(
     returns ``Ln,situ`` directly.
 
     The reciprocity relation of Part 2 Formulae (B.3)/(B.4),
-    :math:`R + L_n = 38 + 30 \lg f` in one-third-octave bands (43 in octave
+    :math:`R + L_n = 38 + 30 \log_{10} f` in one-third-octave bands (43 in octave
     bands),
     holds where forced transmission is negligible and gives an independent
     check on the pair.
@@ -692,7 +692,7 @@ def in_situ_reduction_index(
 ) -> np.ndarray:
     r"""In-situ sound reduction index ``Rsitu`` (Formula 9).
 
-    :math:`R_{situ} = R - 10 \lg(T_{s,situ}/T_{s,lab})`: an element that is
+    :math:`R_{situ} = R - 10 \log_{10}(T_{s,situ}/T_{s,lab})`: an element that is
     better damped in
     the building than in the test frame radiates less and gains index. The
     standard notes that :math:`R_{situ} = R` is a usable first approximation,
@@ -720,7 +720,7 @@ def in_situ_impact_level(
 ) -> np.ndarray:
     r"""In-situ normalized impact level ``Ln,situ`` (Part 2, Formula 5).
 
-    :math:`L_{n,situ} = L_n + 10 \lg(T_{s,situ}/T_{s,lab})`, the sign
+    :math:`L_{n,situ} = L_n + 10 \log_{10}(T_{s,situ}/T_{s,lab})`, the sign
     opposite to
     :func:`in_situ_reduction_index`: a floor that rings longer in the building
     than in the laboratory radiates more impact sound.
@@ -786,7 +786,7 @@ def in_situ_velocity_level_difference(
 ) -> np.ndarray:
     r"""In-situ velocity level difference ``Dv,ij,situ`` (Formula 10).
 
-    :math:`D_{v,ij,situ} = K_{ij} - 10 \lg(l_{ij}/\sqrt{a_{i,situ}
+    :math:`D_{v,ij,situ} = K_{ij} - 10 \log_{10}(l_{ij}/\sqrt{a_{i,situ}
     a_{j,situ}})`, floored at 0 dB as
     the formula prescribes. It converts the situation-invariant junction
     descriptor ``Kij`` (ISO 12354-1 Annex E, or measured per ISO 10848) into
@@ -860,7 +860,7 @@ def flanking_reduction_index(
     :math:`R_{ij} = R_{i,situ}/2 + \Delta R_{i,situ} + R_{j,situ}/2
     + \Delta R_{j,situ} + D_{v,ij,situ} + T`
     for ``ij = Ff, Fd, Df``, with the geometry term
-    :math:`T = 10 \lg(S_s/\sqrt{S_i S_j})`. For diagonal transmission the
+    :math:`T = 10 \log_{10}(S_s/\sqrt{S_i S_j})`. For diagonal transmission the
     standard fixes :math:`S_s = 10` m².
 
     The element indices depend on the path: ``Ff`` takes the flanking element
@@ -914,7 +914,7 @@ def flanking_reduction_index_from_normalized_difference(
 
     :math:`R_{ij} = R_{i,situ}/2 + \Delta R_{i,situ} + R_{j,situ}/2
     + \Delta R_{j,situ} + D_{v,ij,n} + T` with
-    the geometry term :math:`T = 10 \lg(S_s/(l_o l_{ij}))` and the reference
+    the geometry term :math:`T = 10 \log_{10}(S_s/(l_o l_{ij}))` and the reference
     length :math:`l_o = 1` m. It is
     Formula (15) with Formula (12) substituted, so the junction is described by
     the *normalized* direction-averaged velocity level difference ``Dv,ij,n``
@@ -962,7 +962,7 @@ def flanking_reduction_index_from_flanking_level(
 ) -> np.ndarray:
     r"""Flanking index from a measured ``Dn,f`` (Formula 16).
 
-    :math:`R_{ij} = D_{n,f,ij,situ} + 10 \lg(S_s l_{lab}/(A_o l_{ij}))` with
+    :math:`R_{ij} = D_{n,f,ij,situ} + 10 \log_{10}(S_s l_{lab}/(A_o l_{ij}))` with
     :math:`A_o = 10` m², the
     route used when the flanking construction is characterised as a whole by a
     laboratory measurement of the flanking normalized level difference
@@ -995,7 +995,7 @@ def resonant_sound_reduction_index(
 ) -> np.ndarray:
     r"""Correct a measured ``R`` to resonant transmission only (Formula B.1).
 
-    :math:`R^* = R + 10 \lg(\sigma_a/\sigma_s)`. No standardized method
+    :math:`R^* = R + 10 \log_{10}(\sigma_a/\sigma_s)`. No standardized method
     exists to measure the
     two radiation factors, so Annex B.2 gives the estimate this function
     applies: no correction for elements separated by one or two cavities, and
@@ -1029,9 +1029,9 @@ def reciprocity_impact_level(
 ) -> np.ndarray:
     r"""Impact level of a homogeneous floor by reciprocity (Part 2, B.3/B.4).
 
-    :math:`R + L_n = 38 + 30 \lg(f/1\,\mathrm{Hz})` in one-third-octave bands
+    :math:`R + L_n = 38 + 30 \log_{10}(f/1\,\mathrm{Hz})` in one-third-octave bands
     and
-    :math:`R + L_n = 43 + 30 \lg(f/1\,\mathrm{Hz})` in octave bands: for a
+    :math:`R + L_n = 43 + 30 \log_{10}(f/1\,\mathrm{Hz})` in octave bands: for a
     homogeneous floor
     the sum of the airborne index and the normalized impact level depends only
     on frequency, provided forced transmission is negligible (normally up to
@@ -1093,7 +1093,7 @@ def flanking_impact_level(
 
     :math:`L_{n,ij} = L_{n,situ} - \Delta L_{situ}
     + (R_{i,situ} - R_{j,situ})/2 - \Delta R_{j,situ} - D_{v,ij,situ} - T`
-    with the geometry term :math:`T = 10 \lg(S_i/\sqrt{S_i S_j})`, ``i`` the
+    with the geometry term :math:`T = 10 \log_{10}(S_i/\sqrt{S_i S_j})`, ``i`` the
     excited floor
     and ``j`` the flanking element radiating in the receiving room.
 
@@ -1140,7 +1140,7 @@ def flanking_impact_level_from_normalized_difference(
     r"""Flanking impact level of a Type B junction (Part 2, Formula 14).
 
     :math:`L_{n,ij} = L_{n,ii} - \Delta L_i + (R_i - R_j)/2 - \Delta R_j
-    - D_{v,ij,n} - 10 \lg(S_i/(l_o l_{ij}))`
+    - D_{v,ij,n} - 10 \log_{10}(S_i/(l_o l_{ij}))`
     with the reference length :math:`l_o = 1` m: Formula (12) with the
     junction described by the
     normalized direction-averaged velocity level difference instead of
@@ -1187,7 +1187,7 @@ def flanking_impact_level_from_flanking_level(
 ) -> np.ndarray:
     r"""Flanking impact level from a measured ``Ln,f`` (Part 2, Formula 13).
 
-    :math:`L_{n,ij} = L_{n,f,ij,situ} - 10 \lg(S_i l_{lab}/(S_{i,lab}
+    :math:`L_{n,ij} = L_{n,f,ij,situ} - 10 \log_{10}(S_i l_{lab}/(S_{i,lab}
     l_{ij}))`, the impact twin of
     the airborne :func:`flanking_reduction_index_from_flanking_level`: the
     route used when the flanking construction is characterised as a whole by a
@@ -1227,9 +1227,9 @@ def floating_floor_improvement(
 ) -> np.ndarray:
     r"""Improvement of a floating floor ``ΔL`` per band (Part 2, Formula C.1).
 
-    :math:`\Delta L = 30 \lg(f/f_o)` for sand/cement or calcium-sulfate
+    :math:`\Delta L = 30 \log_{10}(f/f_o)` for sand/cement or calcium-sulfate
     screeds and
-    :math:`\Delta L = 40 \lg(f/f_o)` (``slope=40``, Formula C.3) for asphalt
+    :math:`\Delta L = 40 \log_{10}(f/f_o)` (``slope=40``, Formula C.3) for asphalt
     or dry
     floating floors, with the system resonance
     :math:`f_o = 160 \sqrt{s'/m'}`
@@ -1716,7 +1716,7 @@ def detailed_airborne_prediction(
 ) -> DetailedAirborneResult:
     r"""Combine direct and flanking paths into ``R'`` per band (F. 1 to 4).
 
-    :math:`R' = -10 \lg(\sum 10^{-R/10})` over the direct path ``RDd`` and
+    :math:`R' = -10 \log_{10}(\sum 10^{-R/10})` over the direct path ``RDd`` and
     every
     flanking path ``Rij``. The result exposes each path's share of the
     transmitted energy in every band, which is what identifies the path to
@@ -1767,7 +1767,7 @@ def detailed_impact_prediction(
 ) -> DetailedImpactResult:
     r"""Combine direct and flanking paths into ``L'n`` per band (Part 2, (1)).
 
-    :math:`L'_n = 10 \lg(\sum 10^{L_n/10})` over the direct impact path
+    :math:`L'_n = 10 \log_{10}(\sum 10^{L_n/10})` over the direct impact path
     ``Ln,d`` and
     every flanking path ``Ln,ij``, with the ISO 717-2 rating of the resulting
     spectrum whenever the bands cover the rating range. For rooms next to each

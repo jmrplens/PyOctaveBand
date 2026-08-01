@@ -135,7 +135,7 @@ __all__ = [
 
 
 def shaft_rate(speed_rpm: float) -> float:
-    """Shaft rotational frequency :math:`f_s = N/60` (Norton Eq. 8.4).
+    r"""Shaft rotational frequency :math:`f_s = N/60` (Norton Eq. 8.4).
 
     :param speed_rpm: Shaft speed ``N``, in r/min (> 0).
     :return: The shaft rotational frequency :math:`f_s`, in hertz.

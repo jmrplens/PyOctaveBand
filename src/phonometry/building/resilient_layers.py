@@ -29,7 +29,7 @@ frequency between :math:`|F_n|_{\text{lower}} = m v_o/T_i` and
 
 **2. Soft floor coverings (Hopkins 4.4.3.1).** A soft covering on a heavyweight
 floor changes nothing but the force input, so its improvement is the force
-ratio :math:`\Delta L = 20 \lg(|F_n|_{\text{without}}/|F_n|_{\text{with}})`
+ratio :math:`\Delta L = 20 \log_{10}(|F_n|_{\text{without}}/|F_n|_{\text{with}})`
 (Eq. 4.114). The covering's contact stiffness :math:`K = E \pi r^{2}/d`
 (Eq. 3.98) sets its cut-off, against the bare plate's
 :math:`K = 2 r E/(1 - \nu^{2})` (Eq. 3.97), which is why a two-line estimate,
@@ -40,10 +40,10 @@ the whole design question (:func:`covering_improvement`).
 the mass-spring resonance :math:`f_o = 160 \sqrt{s'/m'}` (Formula C.2) the
 improvement follows one of three laws
 (:func:`floating_floor_improvement_spectrum`): the infinite-plate result of
-Cremer, :math:`\Delta L = 40 \lg(f/f_o)` (Eq. 4.119, Vigran Eq. 8.40), the
-empirical :math:`\Delta L = 30 \lg(f/f_o)` that EN 12354-2 adopted for
+Cremer, :math:`\Delta L = 40 \log_{10}(f/f_o)` (Eq. 4.119, Vigran Eq. 8.40), the
+empirical :math:`\Delta L = 30 \log_{10}(f/f_o)` that EN 12354-2 adopted for
 sand-cement screeds (Formula C.1, Eq. 4.124), and the same 40 lg law with the
-hammer-impedance term :math:`10 \lg[1 + (f/f_{limit})^{2}]` that a lightweight
+hammer-impedance term :math:`10 \log_{10}[1 + (f/f_{limit})^{2}]` that a lightweight
 walking surface needs (Eq. 4.123, Vigran Eq. 8.48). A floating floor on
 discrete mounts instead of a continuous layer is a two-subsystem SEA problem
 (:func:`resilient_mount_improvement`, Vér's model as Hopkins Eq. 4.118 and
@@ -263,7 +263,7 @@ FloatingFloorModel = Literal["en12354", "cremer", "cremer_hammer"]
 
 
 def _band_factor(band: BandWidth) -> float:
-    """Band-width factor :math:`B/f` of Hopkins Eq. (3.91)."""
+    r"""Band-width factor :math:`B/f` of Hopkins Eq. (3.91)."""
     require_choice(band, "band", ("third", "octave"))
     return _BANDWIDTH_FACTOR[band]
 
@@ -552,7 +552,7 @@ class TappingForceResult:
 
     @property
     def power_input_level(self) -> np.ndarray:
-        r"""Power input level :math:`10 \lg(W_{in}/1~\text{pW})`, in dB
+        r"""Power input level :math:`10 \log_{10}(W_{in}/1~\text{pW})`, in dB
         (Hopkins Fig. 3.33)."""
         return np.asarray(10.0 * np.log10(self.power_input / _POWER_REFERENCE))
 
@@ -663,7 +663,7 @@ class CoveringImprovementResult:
     :ivar frequencies: Band centre frequencies ``f``, in Hz.
     :ivar improvement: Band improvement ``ΔL``, in dB: Eq. (4.114) evaluated
         over the tapping machine's Fourier lines and summed in mean square
-        across each band, :math:`10 \lg(\sum \lvert F_n
+        across each band, :math:`10 \log_{10}(\sum \lvert F_n
         \rvert^{2}_{\text{without}}/\sum \lvert F_n
         \rvert^{2}_{\text{with}})`.
     :ivar two_line: The two-line estimate, in dB: 0 below ``fco`` and
@@ -674,7 +674,7 @@ class CoveringImprovementResult:
     :ivar lines: Fourier line frequencies :math:`n f_i` of the tapping
         machine, in Hz, covering every band in ``frequencies``.
     :ivar line_improvement: The per-line ratio
-        :math:`\Delta L = 20 \lg(\lvert F_n \rvert_{\text{without}}/\lvert
+        :math:`\Delta L = 20 \log_{10}(\lvert F_n \rvert_{\text{without}}/\lvert
         F_n \rvert_{\text{with}})` of Eq. (4.114) at ``lines``, in
         dB. It carries the deep troughs at odd multiples of ``fco`` that
         Hopkins notes below Fig. 4.64, which are an artefact of the undamped
@@ -723,7 +723,7 @@ def covering_improvement(
     mass, bending stiffness and total loss factor of the slab, so it alters
     only the force the hammer injects. The improvement is then the ratio of
     the two force spectra,
-    :math:`\Delta L = 20 \lg(|F_n|_{\text{without}}/|F_n|_{\text{with}})`,
+    :math:`\Delta L = 20 \log_{10}(|F_n|_{\text{without}}/|F_n|_{\text{with}})`,
     computed here from :func:`tapping_force_spectrum` with the covering's
     contact stiffness (Eq. 3.98) and with the plate's (Eq. 3.97).
 
@@ -742,7 +742,7 @@ def covering_improvement(
 
     ``two_line`` is Hopkins's design estimate: :math:`\Delta L \approx 0`
     below the covering's cut-off and a straight 12 dB/octave above it, that
-    is :math:`40 \lg(f/f_{co})`.
+    is :math:`40 \log_{10}(f/f_{co})`.
     Real coverings behave as non-linear springs under the tapping machine's
     high force and show two or three slopes between 5 and 22 dB/octave, so the
     model identifies the general features rather than replacing a measurement.
@@ -920,9 +920,9 @@ def weighted_floating_floor_improvement(
     and C.2 and prints the fits:
 
     * ``floor="screed"`` (sand-cement or calcium-sulfate screeds, Formula C.4):
-      :math:`\Delta L_w = 13 \lg(m') - 14.2 \lg(s') + 20.8`;
+      :math:`\Delta L_w = 13 \log_{10}(m') - 14.2 \log_{10}(s') + 20.8`;
     * ``floor="asphalt"`` (asphalt or dry floating floors, Formula C.5):
-      :math:`\Delta L_w = (-0.21 m' - 5.45) \lg(s') + 0.46 m' + 23.8`.
+      :math:`\Delta L_w = (-0.21 m' - 5.45) \log_{10}(s') + 0.46 m' + 23.8`.
 
     :param mass_per_area: Mass per unit area ``m'`` of the floating floor, in
         kg/m².
@@ -996,19 +996,19 @@ def floating_floor_improvement_spectrum(
     and all give :math:`\Delta L = 0` at and below it (in the band containing
     ``fo``, ``ΔL`` is in practice between −5 dB and 0 dB):
 
-    * ``"cremer"``: :math:`\Delta L = 40 \lg(f/f_o)`, Cremer's 1952 result for
+    * ``"cremer"``: :math:`\Delta L = 40 \log_{10}(f/f_o)`, Cremer's 1952 result for
       two infinite, locally reacting plates coupled by a spring layer (Hopkins
       Eq. 4.119, Vigran Eq. 8.40), i.e. 12 dB per octave. It holds for
       constructions with high internal damping, such as asphalt screeds, and is
       the branch ISO 12354-2 Formula (C.3) prescribes for asphalt and dry
       floating floors.
-    * ``"en12354"`` (default): :math:`\Delta L = 30 \lg(f/f_o)`, the empirical
+    * ``"en12354"`` (default): :math:`\Delta L = 30 \log_{10}(f/f_o)`, the empirical
       law of ISO 12354-2 Formula (C.1) for sand-cement and calcium-sulfate
       screeds (Hopkins Eq. 4.124). Sand-cement screeds have a low internal
       loss factor and act as finite plates with a reverberant bending field,
       for which the 40 lg law overestimates ``ΔL``.
     * ``"cremer_hammer"``:
-      :math:`\Delta L = 40 \lg(f/f_o) + 10 \lg[1 + (f/f_{limit})^{2}]`, the
+      :math:`\Delta L = 40 \log_{10}(f/f_o) + 10 \log_{10}[1 + (f/f_{limit})^{2}]`, the
       40 lg law with the reduction in power input above the limiting frequency
       of the hammer's own impedance (Hopkins Eq. 4.123, Vigran Eq. 8.48). A
       lightweight walking surface such as chipboard needs it, and tends to
@@ -1089,7 +1089,7 @@ def resilient_mount_improvement(
 
     .. math::
 
-       \Delta L \approx 10 \lg\!\left(
+       \Delta L \approx 10 \log_{10}\!\left(
        \frac{2.3 \rho_{s1}^{2} c_{L1} h_1 \eta_1 S_1 \omega^{3}}{N k^{2}}
        \right)
 
@@ -1097,7 +1097,7 @@ def resilient_mount_improvement(
     mounts and ``S1`` the area of the walking surface. Since
     :math:`2.3 \rho_{s1}^{2} c_{L1} h_1 = Z_{dp1} \rho_{s1}` for
     :math:`Z_{dp1} = 2.3 \rho c_L h^{2}` (Eq. 2.190), the same expression
-    reads :math:`10 \lg(Z_{dp1} \rho_{s1} \eta_1 \omega^{3}/(N/S_1 \cdot
+    reads :math:`10 \log_{10}(Z_{dp1} \rho_{s1} \eta_1 \omega^{3}/(N/S_1 \cdot
     k^{2}))`, which is the form evaluated here: this function takes the mount
     **density** ``N/S1``, not the count.
 
@@ -1234,7 +1234,7 @@ def weighted_lining_improvement(
     ISO 12354-1:2017 Table D.1 reads ``ΔRw`` off the lining's resonance
     frequency, rounded to the centre of the one-third-octave band in which it
     falls. Below 200 Hz the improvement also depends on the bare element:
-    :math:`\Delta R_w = 74.4 - 20 \lg(f_o) - R_w/2`, never below 0 dB
+    :math:`\Delta R_w = 74.4 - 20 \log_{10}(f_o) - R_w/2`, never below 0 dB
     (NOTE 1). At and above 200 Hz the lining *degrades* the insulation, by
     1 dB at 200 Hz down to 10 dB from 630 Hz to 1 600 Hz, recovering to 5 dB
     from 1 600 Hz to 5 000 Hz.
@@ -1342,15 +1342,15 @@ def lining_improvement(
 
     * ``system="mineral_wool"`` (Formula D.3), an exterior thermal system on
       mineral wool with 40 % glued area and no anchors:
-      :math:`\Delta R_w = -36 \lg(f_o) + 82.5`,
-      :math:`\Delta R_A = -42 \lg(f_o) + 92.0`,
-      :math:`\Delta R_{A,tr} = -39 \lg(f_o) + 87.7`, each floored at −4 dB.
+      :math:`\Delta R_w = -36 \log_{10}(f_o) + 82.5`,
+      :math:`\Delta R_A = -42 \log_{10}(f_o) + 92.0`,
+      :math:`\Delta R_{A,tr} = -39 \log_{10}(f_o) + 87.7`, each floored at −4 dB.
     * ``system="foam"`` (Formula D.4), the same on PS, EPS or EEPS foams:
-      :math:`-33 \lg(f_o) + 76.0`, :math:`-33 \lg(f_o) + 74.0`,
-      :math:`-36 \lg(f_o) + 77.0`, floored at −3 dB.
+      :math:`-33 \log_{10}(f_o) + 76.0`, :math:`-33 \log_{10}(f_o) + 74.0`,
+      :math:`-36 \log_{10}(f_o) + 77.0`, floored at −3 dB.
     * ``system="studs"`` (Formula D.7), a layer on studs not directly fixed to
-      the basic wall: :math:`-20 \lg(f_o) + 48`, :math:`-22 \lg(f_o) + 51`,
-      :math:`-24 \lg(f_o) + 54`, floored at −4 dB.
+      the basic wall: :math:`-20 \log_{10}(f_o) + 48`, :math:`-22 \log_{10}(f_o) + 51`,
+      :math:`-24 \log_{10}(f_o) + 54`, floored at −4 dB.
 
     ``anchors=True`` applies Formula (D.5) for 4 to 10 anchors or battens per
     m² (:math:`0.66 \Delta R_{w,ref} - 1.2` and its two companions), and
@@ -1436,7 +1436,7 @@ def lining_improvement_in_situ(
     still depends on the basic element it sits on, so ISO 12354-1:2017
     Formula (D.8) shifts the laboratory rating by :math:`a X` with
 
-    :math:`a = 1.35 \lg(f_o) - 3.5`, capped at 0, and
+    :math:`a = 1.35 \log_{10}(f_o) - 3.5`, capped at 0, and
     :math:`X = R_{w,situ} - 53`, clamped to ``[−10, +7]``.
 
     The same formula applies to ``ΔRw``, ``ΔRA`` and ``ΔRA,tr``.

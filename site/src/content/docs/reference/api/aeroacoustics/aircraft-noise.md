@@ -15,7 +15,7 @@ is built from a half-second spectral time history (24 one-third-octave bands,
 * [`perceived_noisiness`](/phonometry/reference/api/aeroacoustics/aircraft-noise/#perceived_noisiness) -- per-band perceived noisiness `n` (noys),
   the analytic piecewise noy law with the Table A2-3 constants.
 * [`perceived_noise_level`](/phonometry/reference/api/aeroacoustics/aircraft-noise/#perceived_noise_level) --
-  $\mathrm{PNL} = 40 + (10/\lg 2) \cdot \lg N$ from the total
+  $\mathrm{PNL} = 40 + (10/\log_{10} 2) \cdot \log_{10} N$ from the total
   noisiness $N = 0.85 \cdot n_{\mathrm{max}} + 0.15 \cdot \sum n$.
 * [`tone_correction`](/phonometry/reference/api/aeroacoustics/aircraft-noise/#tone_correction) -- the tone-correction factor `C` (the slope /
   "encircling" method) that penalises spectral irregularities.
@@ -79,12 +79,12 @@ epnl_from_pnlt(
 EPNL from a tone-corrected perceived-noise-level time history (App. 2 §4.5-4.6).
 
 $$
-\mathrm{EPNL} = 10 \cdot \lg\left( \sum_{k_F..k_L} 10^{\mathrm{PNLT}(k)/10} \cdot \Delta t(k) \right) - 10 \cdot \lg(T_0)
+\mathrm{EPNL} = 10 \cdot \log_{10}\left( \sum_{k_F..k_L} 10^{\mathrm{PNLT}(k)/10} \cdot \Delta t(k) \right) - 10 \cdot \log_{10}(T_0)
 $$
 
 with the
 10 dB-down integration limits about the maximum `PNLTM`. The exact
-$-10 \cdot \lg(T_0)$ form is used rather than the Annex's rounded
+$-10 \cdot \log_{10}(T_0)$ form is used rather than the Annex's rounded
 constant 13 for
 uniform 0.5 s records (difference 0.0103 dB); the ETM Table 4-4 integrated
 reference reproduces the exact form to five decimals.
@@ -218,7 +218,7 @@ perceived_noise_level(spl: NDArray[np.float64] | list[float]) -> float
 Perceived noise level `PNL` (ICAO Annex 16 App. 2 §4.2), in PNdB.
 
 $N = 0.85 \cdot n_{\mathrm{max}} + 0.15 \cdot \sum n$ and
-$\mathrm{PNL} = 40 + (10/\lg 2) \cdot \lg N$. If the total
+$\mathrm{PNL} = 40 + (10/\log_{10} 2) \cdot \log_{10} N$. If the total
 noisiness is not positive the PNL is defined as 0.
 
 **Parameters**

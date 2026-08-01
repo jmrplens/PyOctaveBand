@@ -13,7 +13,7 @@ Two closed-form quantities of the standard:
   level `L_WA` referred to the equivalent point source at the rotor centre,
   from the ground-board sound pressure level and the slant distance
   ([`slant_distance`](/phonometry/reference/api/aeroacoustics/wind-turbine-noise/#slant_distance)),
-  $L_{WA} = L_p - 6 + 10 \cdot \lg(4\pi R_1^2/S_0)$ (Formula 26).
+  $L_{WA} = L_p - 6 + 10 \cdot \log_{10}(4\pi R_1^2/S_0)$ (Formula 26).
 * [`wind_turbine_tonality`](/phonometry/reference/api/aeroacoustics/wind-turbine-noise/#wind_turbine_tonality) -- the tonal-audibility chain (Formulae 30-34):
   the critical bandwidth ([`critical_bandwidth`](/phonometry/reference/api/environment/measurement/#critical_bandwidth)), the masking-noise level,
   the tonality and the audibility criterion, giving the tonal audibility
@@ -40,7 +40,7 @@ apparent_sound_power_level(
 
 A-weighted apparent sound power level `L_WA` (IEC 61400-11 Formula 26).
 
-$L_{WA,i} = L_{p,i} - 6 + 10 \cdot \lg(4\pi R_1^2/S_0)$ per
+$L_{WA,i} = L_{p,i} - 6 + 10 \cdot \log_{10}(4\pi R_1^2/S_0)$ per
 one-third-octave band, energy
 summed over bands (Formula 27). The `−6 dB` accounts for the ground-board
 pressure doubling; $S_0 = 1$ m².

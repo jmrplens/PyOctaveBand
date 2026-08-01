@@ -816,11 +816,11 @@ def _third_octave_components(
     (clause 5.5).
 
     Each band is treated as flat: its spectrum level is
-    :math:`L_T - 10 \lg(W/\text{Hz})`
+    :math:`L_T - 10 \log_{10}(W/\text{Hz})`
     with band width :math:`W = f_T (2^{1/6} - 2^{-1/6})`, and it is replaced
     by components spaced 10 Hz apart (1 Hz for centre frequencies <= 125 Hz)
     with a level of the spectrum level plus
-    :math:`10 \lg(\text{spacing}/\text{Hz})`.
+    :math:`10 \log_{10}(\text{spacing}/\text{Hz})`.
     """
     freqs: list[float] = []
     levels: list[float] = []

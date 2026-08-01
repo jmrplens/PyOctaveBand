@@ -17,7 +17,7 @@ reference curve, DB-HR weights the measured one-third-octave insulation with a
 normalised A-weighted source spectrum and sums it energetically:
 
 $$
-I_x = -10 \lg \sum_i 10^{(L_{x,i} - X_i)/10} \quad [\mathrm{dBA}]
+I_x = -10 \log_{10} \sum_i 10^{(L_{x,i} - X_i)/10} \quad [\mathrm{dBA}]
 $$
 
 where `X_i` is the band insulation (`R`, `R'`, `DnT`, `D2m,nT` ...)
@@ -321,7 +321,7 @@ db_hr_global_index(
 
 A-weighted global insulation index per DB-HR Annex A.
 
-$I_x = -10 \lg \sum_i 10^{(L_{x,i} - X_i)/10}$ over the eighteen
+$I_x = -10 \log_{10} \sum_i 10^{(L_{x,i} - X_i)/10}$ over the eighteen
 one-third-octave bands 100 Hz to 5 kHz (Formulae (A.5) to (A.7)).
 
 **Parameters**

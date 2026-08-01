@@ -46,7 +46,7 @@ the Faddeeva function :func:`scipy.special.wofz`. The relative sound level (the
 
 .. math::
 
-   \Delta L = 20 \lg \left| 1 + Q \, \frac{R_1}{R_2} \,
+   \Delta L = 20 \log_{10} \left| 1 + Q \, \frac{R_1}{R_2} \,
    e^{i k (R_2 - R_1)} \right| \tag{Salomons Eq. 3.4}
 
 Limits reproduced by the implementation: an acoustically hard ground
@@ -76,7 +76,7 @@ Three levels of screening beyond the ISO 9613-2 ``Dz`` term are provided:
 * the Kurze-Anderson closed form in the Fresnel number ``N`` (Bies, Hansen &
   Howard, *Engineering Noise Control* 5e, 2017, Eq. (5.138); Kurze & Anderson,
   1971),
-  :math:`\Delta = 5 + 20 \lg\!\left[ \sqrt{2 \pi N} / \tanh\sqrt{2 \pi N}
+  :math:`\Delta = 5 + 20 \log_{10}\!\left[ \sqrt{2 \pi N} / \tanh\sqrt{2 \pi N}
   \right]`,
   which tends to ``5 dB`` at :math:`N \to 0` and stays within about 1.5 dB of
   Maekawa's point-source curve for all ``N`` (a very good fit for
@@ -316,7 +316,7 @@ def ground_effect(
     with the spherical-wave reflection coefficient ``Q`` of
     :func:`spherical_reflection_coefficient` and reports the relative sound
     level
-    :math:`\Delta L = 20 \lg\left| 1 + Q (R_1/R_2) e^{i k (R_2 - R_1)}
+    :math:`\Delta L = 20 \log_{10}\left| 1 + Q (R_1/R_2) e^{i k (R_2 - R_1)}
     \right|` (Salomons Eq. (3.4)),
     i.e. the level re the free field.
 
@@ -420,7 +420,7 @@ def kurze_anderson_attenuation(fresnel_number: ArrayLike) -> Real:
 
     .. math::
 
-       \Delta = 5 + 20 \lg\!\left[ \frac{\sqrt{2 \pi N}}
+       \Delta = 5 + 20 \log_{10}\!\left[ \frac{\sqrt{2 \pi N}}
        {\tanh\sqrt{2 \pi N}} \right] \qquad \text{dB}
 
     For :math:`N \to 0` the ratio tends to 1 and :math:`\Delta \to 5` dB; for
@@ -549,7 +549,7 @@ class BarrierInsertionLoss:
 
     :ivar frequencies: Frequencies, in hertz.
     :ivar insertion_loss: Insertion loss
-        :math:`\mathrm{IL} = 20 \lg \lvert p_{\text{without}} /
+        :math:`\mathrm{IL} = 20 \log_{10} \lvert p_{\text{without}} /
         p_{\text{with}} \rvert`, in decibels, per frequency.
     :ivar fresnel_number: Fresnel number ``N`` per frequency (single-edge
         geometry; the double-edge ``N`` for a thick barrier).
@@ -727,7 +727,7 @@ def barrier_insertion_loss(
       Bies Eq. (5.157) is used, ``e`` being the top width.
     * ``method="exact"`` without ground: the wave-theoretic insertion loss of the
       rigid thin screen (:func:`_screen_field`, MacDonald / Hadden & Pierce),
-      :math:`\mathrm{IL} = 20 \lg |p_{\text{free}} / p_{\text{diffracted}}|`.
+      :math:`\mathrm{IL} = 20 \log_{10} |p_{\text{free}} / p_{\text{diffracted}}|`.
     * ``method="exact"`` with a ground (``ground_impedance`` or
       ``ground_flow_resistivity``): the coherent four-path model. The field with
       the barrier sums the four source-image / receiver-image diffracted paths,

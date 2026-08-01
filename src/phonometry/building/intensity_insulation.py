@@ -18,7 +18,7 @@ in dB,
 
 .. math::
 
-   R_I = L_{p1} - 6 - \left[ L_{In} + 10 \lg\frac{S_m}{S} \right]
+   R_I = L_{p1} - 6 - \left[ L_{In} + 10 \log_{10}\frac{S_m}{S} \right]
 
 with the measurement-surface area ``Sm`` and the specimen area ``S``. The
 constant ``6`` dB is the diffuse-field relationship between the sound pressure
@@ -32,9 +32,9 @@ the arithmetic.
 ISO 140-3 (now ISO 10140-2) pressure result, which slightly overestimates
 ``R`` because the power radiated into the receiving room is underestimated.
 The adaptation term ``Kc`` (Annex B) is
-:math:`10 \lg(1 + S_{b2} \lambda / (8 V_2))` (Formula (B.1)) for a
+:math:`10 \log_{10}(1 + S_{b2} \lambda / (8 V_2))` (Formula (B.1)) for a
 well-defined receiving room of boundary area ``Sb2`` and volume ``V2``, or
-the room-independent approximation :math:`10 \lg(1 + 61.4 / f)`
+the room-independent approximation :math:`10 \log_{10}(1 + 61.4 / f)`
 (Formula (B.2)); both use the speed of sound :math:`c = 340` m/s so that
 (B.1) with the reference room :math:`S_{b2} = 117` m², :math:`V_2 = 81` m³
 reduces to (B.2).
@@ -44,12 +44,12 @@ For small building elements, in dB,
 
 .. math::
 
-   D_{I,n,e} = L_{p1} - 6 - \left( L_{In} + 10 \lg\frac{S_m}{A_0} \right)
-   + 10 \lg N
+   D_{I,n,e} = L_{p1} - 6 - \left( L_{In} + 10 \log_{10}\frac{S_m}{A_0} \right)
+   + 10 \log_{10} N
 
 with the reference absorption area :math:`A_0 = 10` m² and the number ``N``
 of element units in the measurement surface. The printed Formula (8)
-subtracts its :math:`10 \lg N` term instead of adding it, which is physically
+subtracts its :math:`10 \log_{10} N` term instead of adding it, which is physically
 inconsistent with ISO 10140-2:2010 Formula (6) and ISO 15186-2:2010
 Formula (12); the corrected per-unit form is implemented (see
 ``docs/ERRATA.md``).
@@ -156,7 +156,7 @@ class IntensityReductionResult:
     r"""Per-band intensity sound reduction index (ISO 15186-1:2000).
 
     :ivar r_i: Intensity sound reduction index
-        :math:`R_I = L_{p1} - 6 - [L_{In} + 10 \lg(S_m/S)]` per band, in dB
+        :math:`R_I = L_{p1} - 6 - [L_{In} + 10 \log_{10}(S_m/S)]` per band, in dB
         (Clause 3.8, Formula (7)). In
         the field (ISO 15186-2) this is the apparent index ``R'I``.
     :ivar r_i_modified: Modified index :math:`R_{I,M} = R_I + K_c` per band, in dB
@@ -283,10 +283,10 @@ class IntensityElementNormalizedResult:
     r"""Per-band intensity element normalized level difference (ISO 15186-1).
 
     :ivar d_i_n_e: Intensity element normalized level difference
-        :math:`D_{I,n,e} = L_{p1} - 6 - (L_{In} + 10 \lg(S_m/A_0)) +
-        10 \lg N` per band, in dB
+        :math:`D_{I,n,e} = L_{p1} - 6 - (L_{In} + 10 \log_{10}(S_m/A_0)) +
+        10 \log_{10} N` per band, in dB
         (Clause 3.9, Formula (8) with the corrected sign of its
-        :math:`10 \lg N` term; see ``docs/ERRATA.md``).
+        :math:`10 \log_{10} N` term; see ``docs/ERRATA.md``).
     :ivar rating: Single-number weighted rating ``DI,n,e,w`` with ``C`` /
         ``Ctr`` (ISO 717-1), or ``None`` when the band count is neither 16
         (one-third octave) nor 5 (octave).
@@ -422,10 +422,10 @@ def adaptation_term_kc(
 
     - **Well-defined receiving room (Formula (B.1)):** when both
       ``boundary_area`` (``Sb2``) and ``volume`` (``V2``) are supplied,
-      :math:`K_c = 10 \lg(1 + S_{b2} \lambda / (8 V_2))` with the midband
+      :math:`K_c = 10 \log_{10}(1 + S_{b2} \lambda / (8 V_2))` with the midband
       wavelength :math:`\lambda = c / f` and :math:`c = 340` m/s.
     - **Room-independent approximation (Formula (B.2)):** when neither is
-      supplied, :math:`K_c = 10 \lg(1 + 61.4 / f)`, the exact reduction of
+      supplied, :math:`K_c = 10 \log_{10}(1 + 61.4 / f)`, the exact reduction of
       (B.1) for the reference room :math:`S_{b2} = 117` m²,
       :math:`V_2 = 81` m³.
 
@@ -502,7 +502,7 @@ def combine_subareas(
 
     .. math::
 
-       L_{In} = 10 \lg\!\left[ \frac{1}{S_m}
+       L_{In} = 10 \log_{10}\!\left[ \frac{1}{S_m}
        \sum_i S_{mi}\, 10^{0.1 L_{Ini}} \right]
 
     with the total measured area :math:`S_m = \sum_i |S_{mi}|`
@@ -574,7 +574,7 @@ def intensity_sound_reduction(
 
     .. math::
 
-       R_I = L_{p1} - 6 - \left[ L_{In} + 10 \lg\frac{S_m}{S} \right]
+       R_I = L_{p1} - 6 - \left[ L_{In} + 10 \log_{10}\frac{S_m}{S} \right]
 
     from the average source-room sound pressure level ``Lp1`` and the average
     normal sound intensity level ``LIn`` over the measurement surface of area
@@ -653,8 +653,8 @@ def intensity_element_normalized_difference(
 
     .. math::
 
-       D_{I,n,e} = L_{p1} - 6 - \left( L_{In} + 10 \lg\frac{S_m}{A_0}
-       \right) + 10 \lg N
+       D_{I,n,e} = L_{p1} - 6 - \left( L_{In} + 10 \log_{10}\frac{S_m}{A_0}
+       \right) + 10 \log_{10} N
 
     from the average source-room sound pressure level ``Lp1``, the average
     normal sound intensity level ``LIn`` over the measurement surface of area
@@ -666,12 +666,12 @@ def intensity_element_normalized_difference(
     are supplied.
 
     .. note::
-        The printed Formula (8) *subtracts* its :math:`10 \lg N` term. That
+        The printed Formula (8) *subtracts* its :math:`10 \log_{10} N` term. That
         sign cannot be derived: measuring ``N`` identical units together
-        raises the transmitted power by :math:`10 \lg N`, so recovering the
-        per-unit ``DI,n,e`` requires *adding* :math:`10 \lg N`, exactly as
+        raises the transmitted power by :math:`10 \log_{10} N`, so recovering the
+        per-unit ``DI,n,e`` requires *adding* :math:`10 \log_{10} N`, exactly as
         the pressure-based ISO 10140-2:2010 Formula (6) does with its
-        :math:`10 \lg(n A_0/A)` term (and consistently with ISO 15186-2:2010
+        :math:`10 \log_{10}(n A_0/A)` term (and consistently with ISO 15186-2:2010
         Formula (12), which is Formula (8) without an ``N`` term). This
         function implements the corrected per-unit form and warns when
         ``n > 1`` deviates from the print (see ``docs/ERRATA.md``).

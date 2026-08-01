@@ -427,7 +427,7 @@ class MultipleShockResult:
     risk_thresholds: tuple[float, float, float]
 
     def plot(self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any) -> Axes:
-        """Plot the injury-probability curve with this assessment's
+        r"""Plot the injury-probability curve with this assessment's
         :math:`R`.
 
         Requires matplotlib (``pip install phonometry[plot]``); returns the
@@ -447,7 +447,7 @@ class MultipleShockResult:
         verbose: bool = False,
         language: str = "en",
     ) -> str:
-        """Render a whole-body multiple-shock health-risk fiche to a PDF.
+        r"""Render a whole-body multiple-shock health-risk fiche to a PDF.
 
         Writes a one-page health-risk assessment sheet for whole-body vibration
         containing multiple shocks (ISO 2631-5:2018): the standard-basis line

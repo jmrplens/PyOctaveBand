@@ -94,7 +94,7 @@ constant $R_i = S_i \alpha_i / (1 - \alpha_i)$.
 | `internal_area` | Internal surface area `S_i` (including the machine), m2. |
 | `internal_absorption` | Mean interior absorption `alpha_i` in `(0, 1)` (scalar or per-band). |
 | `frequencies` | Band centre frequencies, Hz; required when `panel_transmission_loss` is a callable, optional otherwise (used to label the result and the plot). |
-| `model` | Interior build-up model, one of [`ENCLOSURE_MODELS`](/phonometry/reference/api/noise_control/enclosures/#enclosure_models): `"bies"` (default) carries the `0.3` floor of Bies Equation (7.111), `"norton"` the bare $C = 10 \lg(S_E / R_i)$ of Norton & Karczub Equation (4.115). |
+| `model` | Interior build-up model, one of [`ENCLOSURE_MODELS`](/phonometry/reference/api/noise_control/enclosures/#enclosure_models): `"bies"` (default) carries the `0.3` floor of Bies Equation (7.111), `"norton"` the bare $C = 10 \log_{10}(S_E / R_i)$ of Norton & Karczub Equation (4.115). |
 
 **Returns:** An [`EnclosureResult`](/phonometry/reference/api/noise_control/enclosures/#enclosureresult).
 
@@ -213,7 +213,7 @@ and `IL` curves, the boxed mean insertion loss over the analysis
 bands with the external and internal surface areas, an optional verdict
 row against a declared minimum, and a method-basis strip stating
 $\mathrm{IL} = R - C$ with
-$C = 10 \lg(0.3 + S_E / R_i)$.
+$C = 10 \log_{10}(0.3 + S_E / R_i)$.
 
 **Parameters**
 

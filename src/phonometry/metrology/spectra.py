@@ -685,7 +685,7 @@ class CoherentOutputSpectrumResult:
     :ivar snr: Spectral signal-to-noise ratio
         :math:`\hat{\gamma}^2/(1 - \hat{\gamma}^2)` (:math:`\infty` at
         :math:`\hat{\gamma}^2 = 1`).
-    :ivar snr_db: :math:`10 \lg` of :attr:`snr`, in dB.
+    :ivar snr_db: :math:`10 \log_{10}` of :attr:`snr`, in dB.
     :ivar random_error: Normalized random error of :math:`\hat{G}_{vv}`,
         :math:`\varepsilon = (2 - \gamma^2_{xy})^{1/2} /
         (\lvert \gamma_{xy} \rvert \sqrt{n_d})` (Eq. 9.73), with the
@@ -987,10 +987,10 @@ class WindowMetricsResult:
         the width of the ideal rectangular filter that would pass the same
         white-noise power (1 rectangular, 1.5 Hann, 1987/1458 Hamming).
     :ivar scalloping_loss_db: Attenuation of a tone midway between two
-        bins, :math:`-20 \lg \lvert W(1/2)/W(0) \rvert`, in dB
+        bins, :math:`-20 \log_{10} \lvert W(1/2)/W(0) \rvert`, in dB
         (positive).
     :ivar worst_case_processing_loss_db: Scalloping loss plus the ENBW
-        processing loss :math:`10 \lg(\mathrm{ENBW})`, in dB: the
+        processing loss :math:`10 \log_{10}(\mathrm{ENBW})`, in dB: the
         worst-case reduction
         in output signal-to-noise ratio for a tone in white noise.
     :ivar highest_sidelobe_db: Level of the highest sidelobe relative to

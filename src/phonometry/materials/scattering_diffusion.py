@@ -190,7 +190,7 @@ def speed_of_sound(temperature: ArrayLike) -> Real:
 def air_attenuation_coefficient(pressure_attenuation_db_per_m: ArrayLike) -> Real:
     r"""Energy attenuation coefficient ``m`` (ISO 17497-1, Clause 8, Eq. (3)).
 
-    :math:`m = \alpha / (10 \lg(e)) \approx \alpha / 4.343` (1/m), where
+    :math:`m = \alpha / (10 \log_{10}(e)) \approx \alpha / 4.343` (1/m), where
     ``alpha`` is
     the sound-*pressure* attenuation coefficient in dB/m obtained from
     ISO 9613-1 using the measured temperature and relative humidity.
@@ -896,7 +896,7 @@ def absorption_coefficient_uncertainty(
 
 @dataclass(frozen=True)
 class ScatteringUncertainty:
-    """Uncertainty of the scattering coefficient (ISO 17497-1, Annex A).
+    r"""Uncertainty of the scattering coefficient (ISO 17497-1, Annex A).
 
     :ivar u_scattering: Combined standard uncertainty ``u_s`` of the scattering
         coefficient (Eq. (A.5)).

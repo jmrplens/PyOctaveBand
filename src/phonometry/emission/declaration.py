@@ -145,7 +145,7 @@ class OperatingModeDeclaration:
 
     @property
     def declared_sound_power_level(self) -> int:
-        """Declared single-number sound power level (ISO 4871 clause 3.15).
+        r"""Declared single-number sound power level (ISO 4871 clause 3.15).
 
         Clause 3.15 defines the declared value
         :math:`L_{WAd} = L_{WA} + K_{WA}` as the *sum* of the measured
@@ -157,7 +157,7 @@ class OperatingModeDeclaration:
 
     @property
     def declared_emission_pressure_level(self) -> int | None:
-        """Declared single-number emission pressure level (clause 3.15).
+        r"""Declared single-number emission pressure level (clause 3.15).
 
         The sum :math:`L_{pAd} = L_{pA} + K_{pA}` rounded once to the nearest
         decibel (clause 3.15); ``None`` when no emission sound pressure level
@@ -216,7 +216,7 @@ class OperatingModeDeclaration:
 
 @dataclass(frozen=True)
 class NoiseEmissionDeclaration:
-    """An ISO 4871:1996 declaration of noise emission values (clauses 4 to 6).
+    r"""An ISO 4871:1996 declaration of noise emission values (clauses 4 to 6).
 
     A declaration is one or more :class:`OperatingModeDeclaration` values (one
     per operating mode, clause 4) plus the accompanying information required by
@@ -279,7 +279,7 @@ class NoiseEmissionDeclaration:
         verbose: bool = False,
         language: str = "en",
     ) -> str:
-        """Render an ISO 4871 noise-emission declaration fiche to a PDF.
+        r"""Render an ISO 4871 noise-emission declaration fiche to a PDF.
 
         Writes a one-page declaration data sheet: the standard-basis line
         (ISO 4871:1996 and the cited basic emission standard), the machine

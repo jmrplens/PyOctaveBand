@@ -89,7 +89,7 @@ screen $\exp\!\left[ i \, dr \left( k(z) - k_a \right) \right]$
 $k_a = k_0$ is taken at the ground.
 
 The relative sound level re the free field is
-$\Delta L(z, r) = 20 \lg(|p(z, r)| \, R_1)$ with $R_1$ the
+$\Delta L(z, r) = 20 \log_{10}(|p(z, r)| \, R_1)$ with $R_1$ the
 direct source-receiver distance (Salomons Eq. (3.6)); in a homogeneous
 atmosphere it reproduces the spherical-wave ground effect of
 [`ground_effect`](/phonometry/reference/api/environment/ground-barriers/#ground_effect).

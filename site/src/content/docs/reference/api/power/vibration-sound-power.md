@@ -22,20 +22,20 @@ the radiating area $S$. The vibratory velocity is reported as a
 **level**, in decibels, re $v_0 = 5 \times 10^{-8}$ m/s (Equation 3):
 
 $$
-L_v = 10 \lg\frac{\langle v^2 \rangle}{v_0^2} = 20 \lg\frac{v}{v_0}
+L_v = 10 \log_{10}\frac{\langle v^2 \rangle}{v_0^2} = 20 \log_{10}\frac{v}{v_0}
 $$
 
 so the A-weighted sound power level follows in logarithmic form, in decibels
 (ISO/TS 7849-1, Equation 12; ISO/TS 7849-2, Equation 15):
 
 $$
-L_W = L_v + 10 \lg\frac{S}{S_0} + 10 \lg \epsilon + 10 \lg\frac{Z_{c,n}}{Z_{c,0}}
+L_W = L_v + 10 \log_{10}\frac{S}{S_0} + 10 \log_{10} \epsilon + 10 \log_{10}\frac{Z_{c,n}}{Z_{c,0}}
 $$
 
 where $S_0 = 1~\text{m}^2$, the normalized characteristic impedance
 $Z_{c,n} = 411~\text{N s/m}^3$ (at 23 degC, 101.3 kPa) and the
 reference acoustic impedance $Z_{c,0} = 400~\text{N s/m}^3$ give the
-fixed $10 \lg(411/400) = 0.118$ dB term.
+fixed $10 \log_{10}(411/400) = 0.118$ dB term.
 
 The two parts differ only in `epsilon`:
 
@@ -123,7 +123,7 @@ radiated_sound_power_level(
 Radiated sound power level (ISO/TS 7849-1 Eq. 12, -2 Eq. 15).
 
 $$
-L_W = L_v + 10 \lg\frac{S}{S_0} + 10 \lg \epsilon + 10 \lg\frac{Z_{c,n}}{Z_{c,0}}
+L_W = L_v + 10 \log_{10}\frac{S}{S_0} + 10 \log_{10} \epsilon + 10 \log_{10}\frac{Z_{c,n}}{Z_{c,0}}
 $$
 
 With the default `radiation_factor = 1` this is the Part 1 *upper limit*
@@ -228,7 +228,7 @@ velocity_level(
 
 Vibratory velocity level (ISO/TS 7849-1, Eq. 3).
 
-$L_v = 20 \lg(v/v_0)$ with `v0` the reference velocity.
+$L_v = 20 \log_{10}(v/v_0)$ with `v0` the reference velocity.
 
 **Parameters**
 
@@ -258,7 +258,7 @@ velocity_level_from_acceleration(
 
 Velocity level from a sinusoidal acceleration (ISO/TS 7849-1, Eq. 8).
 
-$L_v = 20 \lg\!\left( \frac{a_{\text{peak}}}{2\pi f v_0 \sqrt{2}} \right)$, used to convert a calibration acceleration to the equivalent
+$L_v = 20 \log_{10}\!\left( \frac{a_{\text{peak}}}{2\pi f v_0 \sqrt{2}} \right)$, used to convert a calibration acceleration to the equivalent
 r.m.s. velocity level.
 
 **Parameters**
@@ -344,7 +344,7 @@ spectrum `LW(f)` with a nominal band axis, the boxed A-weighted sound
 power level `LWA` (dB re 1 pW) with the total `LW`, the radiating
 area `S` and the applied method, an optional verdict row against a
 declared limit, and a measurement-basis strip stating the sound-power
-relation $L_W = L_v + 10 \lg(S/S_0) + 10 \lg \epsilon + 10 \lg(Z_{c,n}/Z_{c,0})$.
+relation $L_W = L_v + 10 \log_{10}(S/S_0) + 10 \log_{10} \epsilon + 10 \log_{10}(Z_{c,n}/Z_{c,0})$.
 
 **Parameters**
 
@@ -384,4 +384,4 @@ claim, and no A-weighted verdict is drawn).
 *property*
 
 Band-summed sound power level, in dB:
-$10 \lg \sum_j 10^{0.1 L_{Wj}}$.
+$10 \log_{10} \sum_j 10^{0.1 L_{Wj}}$.

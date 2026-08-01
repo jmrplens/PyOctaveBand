@@ -7,13 +7,13 @@ regimes, each with its own power law. The boundaries between them follow from
 the seabed reflectivity alone, which makes the set an inexpensive analytic
 reference for any numerical propagation model:
 
-* **spherical spreading** -- :math:`F = 1/r^2` (:math:`20 \lg r`), while the
+* **spherical spreading** -- :math:`F = 1/r^2` (:math:`20 \log_{10} r`), while the
   sound has not yet felt the boundaries;
-* **cylindrical spreading** -- :math:`F = 2\psi_c/(r H)` (:math:`10 \lg r`),
+* **cylindrical spreading** -- :math:`F = 2\psi_c/(r H)` (:math:`10 \log_{10} r`),
   once the energy is confined to a cylinder of height ``H`` and only rays
   within the critical angle :math:`\psi_c` survive;
 * **mode stripping** -- :math:`F = (\pi/(\eta H))^{1/2} \, r^{-3/2}`
-  (:math:`15 \lg r`), once the accumulated reflection loss has eroded the
+  (:math:`15 \log_{10} r`), once the accumulated reflection loss has eroded the
   steep paths;
 * **single mode** -- an exponential decay dominated by the lowest-order mode.
 
@@ -22,7 +22,7 @@ Performance Modelling* (Springer 2010), §9.1.1.2 (printed pp. 452-458):
 Equations (9.42) to (9.61) and the seabed properties of Table 9.1
 (:data:`WESTON_SEABEDS`). The quantity computed is Ainslie's **propagation
 factor** ``F`` (units m⁻²), reported as the propagation loss
-:math:`\mathrm{PL} = -10 \lg F` dB re 1 m², which equals the usual
+:math:`\mathrm{PL} = -10 \log_{10} F` dB re 1 m², which equals the usual
 transmission loss for a point source in free water.
 
 The regime formulae are energy-flux (incoherent) results: they describe the
@@ -78,7 +78,7 @@ class WestonSeabed:
     :ivar attenuation_db_per_wavelength: :math:`\beta_{\mathrm{sed}}`, in dB
         per wavelength.
     :ivar loss_parameter:
-        :math:`\varepsilon = \beta_{\mathrm{sed}}/(40 \pi \lg e)`
+        :math:`\varepsilon = \beta_{\mathrm{sed}}/(40 \pi \log_{10} e)`
         (Equation 9.23).
     :ivar sound_speed_gradient: ``c'``, the sediment sound-speed gradient, in
         s⁻¹ (0 for sand, 1 for mud).
@@ -151,7 +151,7 @@ def critical_grazing_angle(sound_speed_ratio: float) -> float:
 
 def loss_parameter(attenuation_db_per_wavelength: float) -> float:
     r"""Sediment loss parameter
-    :math:`\varepsilon = \beta_{\mathrm{sed}}/(40 \pi \lg e)`
+    :math:`\varepsilon = \beta_{\mathrm{sed}}/(40 \pi \log_{10} e)`
     (Ainslie Eq. 9.23).
 
     :param attenuation_db_per_wavelength: :math:`\beta_{\mathrm{sed}}`, in dB
@@ -388,7 +388,9 @@ def _angle_and_gradient(
     critical_angle: float | None,
     gradient: float | None,
 ) -> tuple[float, float]:
-    r"""Resolve :math:`(\psi_c, \eta)` from the seabed and the overrides."""
+    r"""Resolve :math:`(\psi_c, \eta)` from the seabed and the optional
+    overrides.
+    """
     if critical_angle is None:
         psi_c = critical_grazing_angle(bed.sound_speed_ratio)
         if psi_c <= 0.0:
@@ -416,11 +418,11 @@ class WestonPropagationResult:
 
     :ivar range_m: Ranges from the source, in metres.
     :ivar propagation_loss: Composite propagation loss
-        :math:`\mathrm{PL} = -10 \lg F` per range, in dB re 1 m².
+        :math:`\mathrm{PL} = -10 \log_{10} F` per range, in dB re 1 m².
     :ivar propagation_factor: The composite propagation factor ``F``, in m⁻².
     :ivar regime: The active regime label at each range (one of
         :data:`WESTON_REGIMES`).
-    :ivar spherical: Spherical-spreading loss :math:`20 \lg r` at every
+    :ivar spherical: Spherical-spreading loss :math:`20 \log_{10} r` at every
         range, in dB.
     :ivar cylindrical: Cylindrical-spreading loss (Eq. 9.42) at every range, dB.
     :ivar mode_stripping: Mode-stripping loss (Eq. 9.49) at every range, dB
@@ -462,7 +464,9 @@ class WestonPropagationResult:
 
 
 def _to_db(factor: NDArray[np.float64]) -> NDArray[np.float64]:
-    r"""Loss :math:`-10 \lg F`; a non-positive factor maps to ``nan``."""
+    r"""Propagation loss :math:`-10 \log_{10} F`; a non-positive factor maps
+    to ``nan``.
+    """
     with np.errstate(divide="ignore"):
         return np.asarray(-10.0 * np.log10(np.where(factor > 0.0, factor, np.nan)),
                           dtype=np.float64)

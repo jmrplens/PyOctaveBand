@@ -17,15 +17,15 @@ background correction $K_1$, the environmental correction $K_2$
 and the surface area (ISO 3744:2010 clause 8.2, equations (12), (16)-(18)):
 
 $$
-\overline{L_p} = 10 \lg\!\left[ \frac{1}{N_M} \sum_i 10^{0.1 L_{pi}} \right] \tag{Eq. 12}
+\overline{L_p} = 10 \log_{10}\!\left[ \frac{1}{N_M} \sum_i 10^{0.1 L_{pi}} \right] \tag{Eq. 12}
 $$
 
 $$
-K_1 = -10 \lg\!\left( 1 - 10^{-0.1 \Delta L_p} \right) \tag{Eq. 16}
+K_1 = -10 \log_{10}\!\left( 1 - 10^{-0.1 \Delta L_p} \right) \tag{Eq. 16}
 $$
 
 $$
-K_2 = 10 \lg\!\left( 1 + \frac{4S}{A} \right) \tag{Eq. A.2}
+K_2 = 10 \log_{10}\!\left( 1 + \frac{4S}{A} \right) \tag{Eq. A.2}
 $$
 
 $$
@@ -33,7 +33,7 @@ L_p = \overline{L_p} - K_1 - K_2 \tag{Eq. 17}
 $$
 
 $$
-L_W = L_p + 10 \lg\frac{S}{S_0}, \qquad S_0 = 1~\text{m}^2 \tag{Eq. 18}
+L_W = L_p + 10 \log_{10}\frac{S}{S_0}, \qquad S_0 = 1~\text{m}^2 \tag{Eq. 18}
 $$
 
 The measurement surface area is a closed form of the source geometry: a full
@@ -48,7 +48,7 @@ A-weighting band corrections $C_k$ of ISO 3744 Annex E (Tables
 E.1/E.2):
 
 $$
-L_{WA} = 10 \lg\!\left[ \sum_k 10^{0.1 (L_{Wk} + C_k)} \right] \tag{Eq. E.1}
+L_{WA} = 10 \log_{10}\!\left[ \sum_k 10^{0.1 (L_{Wk} + C_k)} \right] \tag{Eq. E.1}
 $$
 
 ISO 3746:2010 shares the surfaces, the energy average and the LW/K1/K2 forms
@@ -70,7 +70,7 @@ background_noise_correction(
 
 Background-noise correction `K1` per band (ISO 3744:2010 Eq. 16).
 
-$K_1 = -10 \lg\left( 1 - 10^{-0.1 \Delta L_p} \right)$ with
+$K_1 = -10 \log_{10}\left( 1 - 10^{-0.1 \Delta L_p} \right)$ with
 $\Delta L_p = L_{\text{source}} - L_{\text{background}}$. For
 $\Delta L_p$ strictly above the upper criterion (15 dB engineering,
 10 dB survey) the background is negligible and $K_1 = 0$; at the
@@ -109,7 +109,7 @@ environmental_correction(
 
 Environmental correction `K2` (ISO 3744:2010 Eq. A.2).
 
-$K_2 = 10 \lg\left( 1 + 4 S / A \right)$ where `A` is the
+$K_2 = 10 \log_{10}\left( 1 + 4 S / A \right)$ where `A` is the
 equivalent sound absorption area of the room. `A` is taken directly
 from `absorption_area`, or from
 the Sabine reverberation time $A = 0.16 V / T$ (Eq. A.3,
@@ -192,11 +192,11 @@ Using the measured static pressure $p_s$ (kPa) and air temperature
 $\theta$ (deg C) form:
 
 $$
-C_1 = -10 \lg\frac{p_s}{p_{s,0}} + 5 \lg\frac{273 + \theta}{\theta_0}, \qquad \theta_0 = 314~\text{K}
+C_1 = -10 \log_{10}\frac{p_s}{p_{s,0}} + 5 \log_{10}\frac{273 + \theta}{\theta_0}, \qquad \theta_0 = 314~\text{K}
 $$
 
 $$
-C_2 = -10 \lg\frac{p_s}{p_{s,0}} + 15 \lg\frac{273 + \theta}{\theta_1}, \qquad \theta_1 = 296~\text{K}
+C_2 = -10 \log_{10}\frac{p_s}{p_{s,0}} + 15 \log_{10}\frac{273 + \theta}{\theta_1}, \qquad \theta_1 = 296~\text{K}
 $$
 
 $$
@@ -207,7 +207,7 @@ $p_{s,0} = 101.325$ kPa. This is the $p_s$/$\theta$
 form of C1 (not the characteristic-impedance form), chosen because it
 needs only the measured $p_s$ and $\theta$ and is consistent
 with C2. At the reference conditions (23 deg C, 101.325 kPa)
-$C_2 = 0$ exactly while $C_1 = 5 \lg(296/314) = -0.128$ dB.
+$C_2 = 0$ exactly while $C_1 = 5 \log_{10}(296/314) = -0.128$ dB.
 C3 requires the atmospheric attenuation coefficient $\alpha(f)$
 from ISO 9613-1 (not computed here); without it $C_3 = 0$.
 
@@ -282,7 +282,7 @@ precision_background_correction(
 
 Per-position background correction `K1i` (ISO 3745:2012 Eq. 11).
 
-$K_{1i} = -10 \lg\left( 1 - 10^{-0.1 \Delta L_{pi}} \right)$ with
+$K_{1i} = -10 \log_{10}\left( 1 - 10^{-0.1 \Delta L_{pi}} \right)$ with
 $\Delta L_{pi} = L'_{pi(\mathrm{ST})} - L_{pi(\mathrm{B})}$
 evaluated at each microphone position `i` and band. Above the upper
 criterion ($\Delta L_{pi} \ge 15$ dB) the background is negligible
@@ -320,15 +320,15 @@ ISO 9614-3:2002 Annex B field indicators from segment data.
 Over the `N` segments of the whole measurement surface (per band):
 
 $$
-\overline{L_p} = 10 \lg\!\left[ \frac{1}{N} \sum_j 10^{0.1 L_{pj}} \right] \tag{Eq. B.4}
+\overline{L_p} = 10 \log_{10}\!\left[ \frac{1}{N} \sum_j 10^{0.1 L_{pj}} \right] \tag{Eq. B.4}
 $$
 
 $$
-L_{|I_n|} = 10 \lg\!\left[ \frac{1}{N} \sum_j \frac{|I_{nj}|}{I_0} \right] \tag{Eq. B.5}
+L_{|I_n|} = 10 \log_{10}\!\left[ \frac{1}{N} \sum_j \frac{|I_{nj}|}{I_0} \right] \tag{Eq. B.5}
 $$
 
 $$
-L_{I_n} = 10 \lg\!\left[ \frac{1}{I_0} \left| \frac{1}{N} \sum_j I_{nj} \right| \right] \tag{Eq. B.7}
+L_{I_n} = 10 \log_{10}\!\left[ \frac{1}{I_0} \left| \frac{1}{N} \sum_j I_{nj} \right| \right] \tag{Eq. B.7}
 $$
 
 $$
@@ -522,7 +522,7 @@ Result of an ISO 9614-3:2002 sound-power-by-scanning determination.
 `partial_power` is the signed $P_i = I_{n,i} S_i$ per partial
 surface and band (Eq. 5); `sound_power` the signed band total
 $P = \sum P_i$ (Eq. 8) and `sound_power_level` its level
-$L_W = 10 \lg(P/P_0)$ (Eq. 9), `NaN`
+$L_W = 10 \log_{10}(P/P_0)$ (Eq. 9), `NaN`
 where $P \le 0$ (`not_applicable_band` True, clause 9.2).
 `sound_power_level_normalized` is `LW0` normalized to 23 deg C /
 101 325 Pa (Eq. 10). `sound_power_level_a` is the A-weighted total over
@@ -570,7 +570,7 @@ PrecisionSoundPowerResult(
 Result of an ISO 3745:2012 (precision) sound power determination.
 
 `sound_power_level` is the per-band
-$L_W = \overline{L_p} + 10\lg(S/S_0) + C_1 + C_2 + C_3$
+$L_W = \overline{L_p} + 10\log_{10}(S/S_0) + C_1 + C_2 + C_3$
 (Eq. 14/15). `surface_pressure_level` is the surface time-
 averaged level `Lp_bar` after the per-position background correction
 (Eq. 12/13); `mean_pressure_level` the same energy average of the raw
@@ -676,7 +676,7 @@ when `areas` are given) and combined with the surface area and the
 meteorological corrections:
 
 $$
-L_W = 10 \lg\!\left[ \frac{1}{N_M} \sum_i 10^{0.1 (L'_{pi} - K_{1i})} \right] + 10 \lg\frac{S}{S_0} + C_1 + C_2 + C_3
+L_W = 10 \log_{10}\!\left[ \frac{1}{N_M} \sum_i 10^{0.1 (L'_{pi} - K_{1i})} \right] + 10 \log_{10}\frac{S}{S_0} + C_1 + C_2 + C_3
 $$
 
 $S = 4\pi r^2$ for a `'sphere'` (anechoic, Eq. 14) or
@@ -723,12 +723,12 @@ band) of the signed normal intensity $I_{ni}$ on each of the `N`
 partial surfaces (already the two-scan result), and `areas` the `(N,)`
 partial surface areas $S_i$. The partial powers
 $P_i = I_{ni} S_i$ (Eq. 5) are summed to $P$ (Eq. 8) and
-$L_W = 10 \lg(P/P_0)$ (Eq. 9); a band with net $P \le 0$ is
+$L_W = 10 \log_{10}(P/P_0)$ (Eq. 9); a band with net $P \le 0$ is
 flagged (`not_applicable_band`, clause 9.2) and reported as `NaN`.
 $L_{W0}$ normalizes to reference meteorology:
 
 $$
-L_{W0} = L_W - 15 \lg\!\left( \frac{B}{101325} \cdot \frac{296.15}{273.15 + \theta} \right) \tag{Eq. 10}
+L_{W0} = L_W - 15 \log_{10}\!\left( \frac{B}{101325} \cdot \frac{296.15}{273.15 + \theta} \right) \tag{Eq. 10}
 $$
 
 **Parameters**
@@ -777,7 +777,7 @@ surface-averaged level is corrected for background noise (`K1`, from
 absorption data) and combined with the measurement surface area:
 
 $$
-L_W = 10 \lg\!\left[ \frac{1}{N_M} \sum_i 10^{0.1 L_{pi}} \right] - K_1 - K_2 + 10 \lg\frac{S}{S_0}
+L_W = 10 \log_{10}\!\left[ \frac{1}{N_M} \sum_i 10^{0.1 L_{pi}} \right] - K_1 - K_2 + 10 \log_{10}\frac{S}{S_0}
 $$
 
 The surface area `S` is computed from the geometry: `radius` for a

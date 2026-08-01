@@ -1248,7 +1248,7 @@ def _termination_impedance(
     cos_t: float,
     rc: float,
 ) -> Complex | None:
-    """Impedance :math:`p/v_3` closing the stack, or ``None`` for a hard wall.
+    r"""Impedance :math:`p/v_3` closing the stack, or ``None`` for a hard wall.
 
     The global-matrix assembly of Allard & Atalla Sect. 11.5 needs the
     termination as an impedance (their Eq. (11.84)); the admittance the

@@ -57,7 +57,7 @@ A.3.4.2 b):
 
 .. math::
 
-   L_{Keq,T} = 10 \lg\left[ (1/T) \sum_i T_i \cdot 10^{L_{Keq,Ti}/10} \right]
+   L_{Keq,T} = 10 \log_{10}\left[ (1/T) \sum_i T_i \cdot 10^{L_{Keq,Ti}/10} \right]
 
 The result is
 rounded by adding 0.5 dB and taking the integer part. The long-term index
@@ -340,7 +340,7 @@ def round_reported_level(value: float) -> int:
 # --------------------------------------------------------------------------- #
 @dataclass(frozen=True)
 class TonalCorrectionResult:
-    """Tonal correction ``Kt`` of RD 1367/2007 (Annex IV A.3.3).
+    r"""Tonal correction ``Kt`` of RD 1367/2007 (Annex IV A.3.3).
 
     :ivar frequencies: One-third-octave band centre frequencies, in Hz.
     :ivar levels: Unweighted band sound pressure levels, in dB.
@@ -544,7 +544,8 @@ RD1367_CORRECTION_VALUES: tuple[float, float, float] = (0.0, 3.0, 6.0)
 
 
 def total_correction(kt: float = 0.0, kf: float = 0.0, ki: float = 0.0) -> float:
-    """Summed correction :math:`K = K_t + K_f + K_i`, capped at 9 dB.
+    r"""Summed correction :math:`K = K_t + K_f + K_i`, capped at 9 dB
+    (Annex IV A.3.3).
 
     Each of the three tables of Annex IV A.3.3 grades its parameter 0, 3 or
     6 dB, so any other value is rejected rather than silently accepted: a
@@ -572,7 +573,7 @@ def total_correction(kt: float = 0.0, kf: float = 0.0, ki: float = 0.0) -> float
 def corrected_level(
     laeq: float, *, kt: float = 0.0, kf: float = 0.0, ki: float = 0.0
 ) -> float:
-    """Corrected equivalent continuous level ``LKeq,T`` (Annex I A.2 c).
+    r"""Corrected equivalent continuous level ``LKeq,T`` (Annex I A.2 c).
 
     :math:`L_{Keq,T} = L_{Aeq,T} + K_t + K_f + K_i` with the sum of the
     corrections capped
@@ -630,7 +631,7 @@ class NoisePhase:
 
     @property
     def correction(self) -> float:
-        """Summed correction :math:`K = K_t + K_f + K_i`, capped at 9 dB."""
+        r"""Summed correction :math:`K = K_t + K_f + K_i`, capped at 9 dB."""
         return total_correction(self.kt, self.kf, self.ki)
 
     @property
@@ -644,7 +645,7 @@ def evaluation_period_level(
 ) -> float:
     r"""Evaluation-period level ``LKeq,T`` from its noise phases.
 
-    :math:`L_{Keq,T} = 10 \lg\left[ (1/T) \sum_i T_i \cdot
+    :math:`L_{Keq,T} = 10 \log_{10}\left[ (1/T) \sum_i T_i \cdot
     10^{L_{Keq,Ti}/10} \right]` (Annex IV
     A.3.4.2 b): the duration-weighted energy mean of the phase levels. The
     returned value is **not** rounded; apply :func:`round_reported_level` for the value
@@ -683,7 +684,7 @@ def long_term_corrected_level(
 ) -> float:
     r"""Long-term index ``LK,x`` from the daily period levels (Annex I A.2 d).
 
-    :math:`L_{K,x} = 10 \lg\left[ (1/n) \sum_i 10^{L_{Keq,x,i}/10} \right]`:
+    :math:`L_{K,x} = 10 \log_{10}\left[ (1/n) \sum_i 10^{L_{Keq,x,i}/10} \right]`:
     the energy mean of the
     daily corrected levels of the same evaluation period over a year. With
     ``weights`` the mean is weighted, which lets a whole block of identical

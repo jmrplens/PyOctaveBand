@@ -53,19 +53,19 @@ result that makes the geometry visible:
 
    \tau_{cl} = \frac{\epsilon^2 \tau_S \tau_R L_R}{4 h} \tag{Eq. 9.19}
 
-   R_{cl} = R_S + R_R - 10 \lg\!\left[ \frac{\epsilon^2 L_R}{4 h} \right]
+   R_{cl} = R_S + R_R - 10 \log_{10}\!\left[ \frac{\epsilon^2 L_R}{4 h} \right]
    \tag{Eq. 9.20}
 
 with :math:`\epsilon = 1` for totally absorbing plenum sidewalls and
 :math:`\epsilon = 2` for totally reflecting ones. Referred to the partition
-area instead of the ceiling, :math:`R_{cl,p} = R_{cl} + 10 \lg(H_S/L_S)`
-(Eq. (9.13)). A deep plenum helps (the :math:`-10 \lg` term shrinks), a long
+area instead of the ceiling, :math:`R_{cl,p} = R_{cl} + 10 \log_{10}(H_S/L_S)`
+(Eq. (9.13)). A deep plenum helps (the :math:`-10 \log_{10}` term shrinks), a long
 room hurts, and doubling the tile insulation helps twice over because
 :math:`R_S` and :math:`R_R` both appear.
 
 **The measured quantity (ISO 140-9:1985 clause 3.3, ISO 10848-2).** A ceiling
 is not rated by :math:`R_{cl}` but by the **normalized ceiling attenuation**
-:math:`D_{n,c} = D - 10 \lg(A/A_0)`, with ``A`` the receiving-room equivalent
+:math:`D_{n,c} = D - 10 \log_{10}(A/A_0)`, with ``A`` the receiving-room equivalent
 absorption area and the reference :math:`A_0 = 10` m2. The laboratory has two
 rooms of at least 50 m3 whose volumes differ by at least 10 %, a dividing
 wall tapered to at most 100 mm at the top, and a plenum 650 mm to 760 mm deep
@@ -74,7 +74,7 @@ lining absorption :math:`\alpha_s \ge 0.65` at 125 Hz and :math:`\ge 0.80`
 from 250 Hz to 4000 Hz, and requires :math:`\alpha < 0.10` on the other
 sidewall and on the plenum ceiling. The North American counterpart,
 ASTM E1414, uses :math:`A_0 = 12` m2, so an ASTM value runs about
-:math:`10 \lg(12/10) = 0.79` dB higher than the ISO one.
+:math:`10 \log_{10}(12/10) = 0.79` dB higher than the ISO one.
 
 **Single number.** ISO rates :math:`D_{n,c}` with the ISO 717-1 curve
 (:func:`phonometry.weighted_rating`, giving ``Dn,c,w``); ASTM E1414 rates it
@@ -197,7 +197,7 @@ def normalized_ceiling_attenuation(
 ) -> np.ndarray:
     r"""Normalized ceiling attenuation ``Dn,c`` (ISO 140-9:1985, clause 3.3).
 
-    :math:`D_{n,c} = (L_1 - L_2) - 10 \lg(A/A_0)`, the level difference
+    :math:`D_{n,c} = (L_1 - L_2) - 10 \log_{10}(A/A_0)`, the level difference
     between two rooms sharing a common ceiling plenum, normalized to a
     reference equivalent absorption area. ISO 140-9 and ISO 10848-2 use
     :math:`A_0 = 10` m2; ASTM E1414 uses :math:`A_0 = 12` m2, which makes an
@@ -342,7 +342,7 @@ class PlenumFlankingResult:
     :ivar reduction_index_source: Source-side ceiling ``RS`` per band, in dB.
     :ivar reduction_index_receiving: Receiving-side ceiling ``RR`` per band, in dB.
     :ivar geometry_term: The geometry penalty
-        :math:`10 \lg[\epsilon^2 L_R/(4h)]`, in dB, or ``None`` for the
+        :math:`10 \log_{10}[\epsilon^2 L_R/(4h)]`, in dB, or ``None`` for the
         attenuated model, whose penalty is per band.
     :ivar penalty: The per-band difference :math:`R_S + R_R - R_{cl}`, in dB:
         what the plenum takes off the sum of the two ceilings.
@@ -395,7 +395,7 @@ def plenum_flanking_reduction_index(
     Eqs. (9.18)-(9.20)).
 
     With no attenuation coefficients this is the compact undamped form
-    :math:`R_{cl} = R_S + R_R - 10 \lg[\epsilon^2 L_R/(4h)]` (Eq. (9.20)).
+    :math:`R_{cl} = R_S + R_R - 10 \log_{10}[\epsilon^2 L_R/(4h)]` (Eq. (9.20)).
     Supplying the plenum power attenuation coefficients :math:`m_S` and
     :math:`m_R` (Eq. (9.16), :math:`m = -2 \operatorname{Im}\{k'\}` of the
     lined duct) switches to the full Eq. (9.18), whose receiving side carries
@@ -523,7 +523,7 @@ def partition_referenced_reduction_index(
     r"""Refer ``Rcl`` to the partition area instead of the ceiling
     (Eq. (9.13)).
 
-    :math:`R_{cl,p} = R_{cl} + 10 \lg(H_S/L_S)`, with ``HS`` the height and
+    :math:`R_{cl,p} = R_{cl} + 10 \log_{10}(H_S/L_S)`, with ``HS`` the height and
     ``LS`` the length of the sending room. Referring every path to one common
     area (the partition) is what lets the ceiling path be added to the direct
     path as transmission factors.

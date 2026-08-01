@@ -24,7 +24,7 @@ Results are reported as a **level**, in dB, re the reference stiffness
 $k_0 = 1$ N/m (ISO 10846-2 and -3, 3.17):
 
 $$
-L_k = 10 \lg\!\left( \frac{|k_{2,1}|^2}{k_0^2} \right) = 20 \lg\!\left( \frac{|k_{2,1}|}{k_0} \right)
+L_k = 10 \log_{10}\!\left( \frac{|k_{2,1}|^2}{k_0^2} \right) = 20 \log_{10}\!\left( \frac{|k_{2,1}|}{k_0} \right)
 $$
 
 and, in the low-frequency range where inertial forces in the element are
@@ -45,7 +45,7 @@ Two laboratory methods determine $k_{2,1}$:
   where `mf` is the mass of the output flange of the test element. The
   approximation is valid only where $|T| \le 0.1$ (Inequality (2):
   $\Delta L_{1,2} \ge 20$ dB) and while the blocking mass still
-  behaves rigidly, $10 \lg(m_{2,\mathrm{eff}}^2/m_2^2) \le 1$ dB
+  behaves rigidly, $10 \log_{10}(m_{2,\mathrm{eff}}^2/m_2^2) \le 1$ dB
   (Inequality (3)); see [`transfer_stiffness_indirect`](/phonometry/reference/api/vibration/transfer-stiffness/#transfer_stiffness_indirect).
 
 The dynamic transfer stiffness is a member of the frequency-response-function
@@ -273,7 +273,7 @@ body: results are valid only while its effective mass `m2,eff`,
 measured per Formula (4) as
 $m_{2,\mathrm{eff}} = 2 F_2 / (a'_1 + a''_1)$ (two accelerometers
 spaced $D = \sqrt{S}$ across the contact area), stays within 1 dB
-of the rigid mass, $10 \lg(m_{2,\mathrm{eff}}^2 / m_2^2) \le 1$ dB
+of the rigid mass, $10 \log_{10}(m_{2,\mathrm{eff}}^2 / m_2^2) \le 1$ dB
 (Inequality (3), 6.2.3).
 
 **Parameters**
@@ -311,7 +311,7 @@ transfer_stiffness_level(
 
 Level of the dynamic transfer stiffness (ISO 10846-2/-3, 3.17).
 
-$L_k = 20 \lg(|k_{2,1}| / k_0)$ dB, with `k0` the reference
+$L_k = 20 \log_{10}(|k_{2,1}| / k_0)$ dB, with `k0` the reference
 stiffness.
 
 **Parameters**
@@ -442,7 +442,7 @@ there is no pass/fail verdict.
 TransferStiffnessResult.to(target: str) -> np.ndarray
 ```
 
-Convert $k_{2,1}$ to a related FRF (ISO 10846-1 Annex A).
+Convert $k_{2,1}$ to an FRF (ISO 10846-1 Annex A / Table A.2).
 
 `target` is `"impedance"` ($Z = k/(j\omega)$) or
 `"apparent_mass"` ($m_{\mathrm{eff}} = -k/\omega^2$); see

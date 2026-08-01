@@ -13,16 +13,16 @@ realises the ISO 18405 terminology as the shared level primitives used by the
 ship-radiated-noise and pile-driving modules:
 
 * [`sound_pressure_level`](/phonometry/reference/api/underwater/acoustics/#sound_pressure_level) -- the mean-square sound pressure level,
-  $\mathrm{SPL} = 10 \lg(\langle p^2 \rangle / p_0^2)$ dB re 1 µPa.
+  $\mathrm{SPL} = 10 \log_{10}(\langle p^2 \rangle / p_0^2)$ dB re 1 µPa.
 * [`sound_exposure_level`](/phonometry/reference/api/underwater/acoustics/#sound_exposure_level) -- the time-integrated exposure level,
-  $\mathrm{SEL} = 10 \lg\!\left( \int p^2 \, dt / E_0 \right)$ dB re
+  $\mathrm{SEL} = 10 \log_{10}\!\left( \int p^2 \, dt / E_0 \right)$ dB re
   1 µPa²·s.
 * [`peak_sound_pressure_level`](/phonometry/reference/api/underwater/acoustics/#peak_sound_pressure_level) -- the zero-to-peak level
-  $20 \lg(\max \lvert p \rvert / p_0)$ dB re 1 µPa.
+  $20 \log_{10}(\max \lvert p \rvert / p_0)$ dB re 1 µPa.
 
 [`underwater_to_in_air_spl`](/phonometry/reference/api/underwater/acoustics/#underwater_to_in_air_spl) / [`in_air_to_underwater_spl`](/phonometry/reference/api/underwater/acoustics/#in_air_to_underwater_spl) convert a
 level between the two reference pressures (a
-$20 \lg(20) \approx 26.02$ dB reference
+$20 \log_{10}(20) \approx 26.02$ dB reference
 change, **not** an energy/intensity equivalence, which would additionally
 involve the media impedances). For background-noise subtraction of a measured
 level, reuse the ISO 3744 `background_noise_correction` (`K1`) helper.
@@ -38,7 +38,7 @@ in_air_to_underwater_spl(level: float) -> float
 Re-reference an in-air SPL (re 20 µPa) to the underwater 1 µPa
 reference.
 
-Adds $20 \lg(20) \approx 26.02$ dB (a reference-pressure change
+Adds $20 \log_{10}(20) \approx 26.02$ dB (a reference-pressure change
 only; see [`underwater_to_in_air_spl`](/phonometry/reference/api/underwater/acoustics/#underwater_to_in_air_spl)).
 
 **Parameters**
@@ -61,7 +61,7 @@ peak_sound_pressure_level(
 
 Zero-to-peak sound pressure level (ISO 18406 6.4.2.1.3).
 
-$L_{p,\mathrm{pk}} = 20 \lg(\max \lvert p \rvert / p_0)$ dB re
+$L_{p,\mathrm{pk}} = 20 \log_{10}(\max \lvert p \rvert / p_0)$ dB re
 1 µPa.
 
 **Parameters**
@@ -92,7 +92,7 @@ sound_exposure_level(
 
 Sound exposure level (ISO 18405 / ISO 18406 Formulae 3-4).
 
-$\mathrm{SEL} = 10 \lg(E/E_0)$ dB re 1 µPa²·s, with the sound
+$\mathrm{SEL} = 10 \log_{10}(E/E_0)$ dB re 1 µPa²·s, with the sound
 exposure $E = \int p^2 \, dt \approx (1/f_s) \sum p^2$ over the
 record.
 
@@ -124,7 +124,7 @@ sound_pressure_level(
 
 Mean-square sound pressure level (ISO 18405 / ISO 18406 Formula 7).
 
-$\mathrm{SPL} = 10 \lg(\langle p^2 \rangle / p_0^2)$ dB, with `p`
+$\mathrm{SPL} = 10 \log_{10}(\langle p^2 \rangle / p_0^2)$ dB, with `p`
 in pascals and the underwater reference $p_0 = 1$ µPa by default.
 
 **Parameters**
@@ -167,7 +167,7 @@ underwater_to_in_air_spl(level: float) -> float
 Re-reference an underwater SPL (re 1 µPa) to the in-air 20 µPa
 reference.
 
-Subtracts $20 \lg(20) \approx 26.02$ dB. This is a
+Subtracts $20 \log_{10}(20) \approx 26.02$ dB. This is a
 **reference-pressure change only** -- it is not the in-water/in-air
 intensity equivalence, which also involves the media characteristic
 impedances.

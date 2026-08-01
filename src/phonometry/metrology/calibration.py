@@ -25,7 +25,7 @@ def _class1_fluctuation_limit(frequency: float) -> float:
 
     IEC 60942:2017 Table 2 rows: 31.5-63 Hz -> 0.20 dB; > 63 to < 160 Hz ->
     0.10 dB; 160 Hz and above -> 0.07 dB. Frequencies outside the specified
-    31,5 Hz to 16 kHz span fall back to the strictest limit (0,07 dB).
+    31.5 Hz to 16 kHz span fall back to the strictest limit (0.07 dB).
     """
     if 31.5 <= frequency <= 63.0:
         return 0.20
@@ -83,7 +83,7 @@ def sensitivity(
         near ``frequency`` instead of the full-band RMS. This rejects
         broadband hum/noise in the reference take, which otherwise inflates
         the RMS and shrinks the factor by
-        :math:`-10 \lg(1 + 1/\mathrm{SNR})` (about
+        :math:`-10 \log_{10}(1 + 1/\mathrm{SNR})` (about
         -0.44 dB at 20 dB SNR), silently biasing every subsequent level.
         The default (False) keeps the exact legacy broadband-RMS behaviour;
         enable it for noisy coupler recordings.

@@ -13,7 +13,7 @@ Two independent published descriptions of how well a marine mammal hears:
   a four-parameter band-pass fit (their Equation 1, after Finneran 2016)
 
   $$
-  T(f) = T_0 + A \lg\!\left(1 + \frac{F_1}{f}\right) + (f/F_2)^{B}
+  T(f) = T_0 + A \log_{10}\!\left(1 + \frac{F_1}{f}\right) + (f/F_2)^{B}
   $$
 
   with the group parameters of their Table 2 (absolute thresholds) and Table 3
@@ -172,7 +172,7 @@ group_audiogram(
 
 Marine-mammal group audiogram (Southall et al. 2019, Equation 1).
 
-$T(f) = T_0 + A \lg(1 + F_1/f) + (f/F_2)^B$, with `f` in
+$T(f) = T_0 + A \log_{10}(1 + F_1/f) + (f/F_2)^B$, with `f` in
 kilohertz and the group parameters of Table 2 (`normalized=False`) or
 Table 3 (`normalized=True`).
 

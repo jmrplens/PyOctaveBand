@@ -92,7 +92,7 @@ class FrequencyResponseResult:
 
     :ivar frequencies: Frequency axis, in Hz.
     :ivar response: Complex frequency-response estimate ``H(f)``.
-    :ivar magnitude_db: Magnitude :math:`20 \lg \lvert H \rvert`, in dB.
+    :ivar magnitude_db: Magnitude :math:`20 \log_{10} \lvert H \rvert`, in dB.
     :ivar phase: Phase of ``H``, in radians (unwrapped).
     :ivar coherence: Ordinary coherence :math:`\gamma^2(f) \in [0, 1]`.
     :ivar estimator: Estimator used (``'H1'`` or ``'H2'``).

@@ -124,7 +124,7 @@ def _omega(frequency: ArrayLike) -> NDArray[np.float64]:
 def _to_receptance(
     value: NDArray[np.complex128], omega: NDArray[np.float64], source: str
 ) -> NDArray[np.complex128]:
-    """Reduce any FRF to the receptance :math:`H = x / F`."""
+    r"""Reduce any FRF to the receptance :math:`H = x / F`."""
     power, inverse = _FRF_TYPES[source]
     # Undo the force-per-motion reciprocal, then the (j omega)**power factor.
     motion_per_force = 1.0 / value if inverse else value
@@ -240,7 +240,7 @@ def sdof_mobility(
 def sdof_accelerance(
     frequency: ArrayLike, mass: float, stiffness: float, damping: float
 ) -> np.ndarray:
-    r"""Accelerance of a damped SDOF resonator: :math:`A = -\omega^2 H`.
+    r"""Accelerance of a viscously damped SDOF resonator: :math:`A = -\omega^2 H`.
 
     :param frequency: Frequency ``f``, in hertz.
     :param mass: Mass ``m``, in kg.
@@ -435,7 +435,7 @@ class MobilityResult:
         return np.asarray(np.angle(self.mobility), dtype=np.float64)
 
     def to(self, target: str) -> np.ndarray:
-        """Convert the mobility to another FRF kind (see :func:`convert_frf`).
+        r"""Convert the mobility to another FRF kind (see :func:`convert_frf`).
 
         The force-per-motion kinds are element-wise reciprocals, i.e. the
         *free* quantities of ISO 7626-1, 3.1.4: on a transfer FRF

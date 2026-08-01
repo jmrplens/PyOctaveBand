@@ -35,7 +35,7 @@ and Diffusers* (3rd ed., CRC Press, 2017):
   into the constant `A` of Equation (5.8) and can be switched off to
   recover the plain Fourier form.
 
-The polar levels $L_i = 20 \lg|p(\theta_i)|$ are then passed to the
+The polar levels $L_i = 20 \log_{10}|p(\theta_i)|$ are then passed to the
 ISO 17497-2 autocorrelation diffusion coefficient of
 [`directional_diffusion_coefficient`](/phonometry/reference/api/materials/scattering-diffusion/#directional_diffusion_coefficient),
 and normalised against the same-footprint flat reference with

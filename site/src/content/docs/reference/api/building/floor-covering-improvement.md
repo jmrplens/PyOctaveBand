@@ -19,15 +19,15 @@ locally-reacting coverings this acceleration-level difference equals the ISO
 10140 impact sound reduction (Clause 4).
 
 **Acceleration level (Formula (1)).**
-$L_a = 10 \lg[(1/T_m) \int a(t)^2/a_0^2\,dt]$ dB,
+$L_a = 10 \log_{10}[(1/T_m) \int a(t)^2/a_0^2\,dt]$ dB,
 with the reference acceleration $a_0 = 10^{-6}$ m/s², i.e.
-$L_a = 10 \lg(\overline{a^2}/a_0^2)$.
+$L_a = 10 \log_{10}(\overline{a^2}/a_0^2)$.
 
 **Background correction (Formula (2)).** Each measured level `L'` is
 corrected
 against the background `Lb` per accelerometer position, by the margin
 $L' - L_b$: unchanged for $\ge 15$ dB; energy subtraction
-$10 \lg(10^{L'/10} - 10^{L_b/10})$ for
+$10 \log_{10}(10^{L'/10} - 10^{L_b/10})$ for
 $6 \le \mathrm{margin} < 15$ dB; and the fixed
 $L' - 1.3$ dB limit for $< 6$ dB. Bands hitting the 1.3 dB limit
 are flagged
@@ -43,7 +43,7 @@ their arithmetic mean over all tapping-machine (t) and accelerometer (a)
 positions, $\Delta L = (1/(t \cdot a)) \sum_t \sum_a \Delta L_{t,a}$.
 
 **Octave bands (Formula (5)).**
-$\Delta L_{oct} = -10 \lg[(1/3) \sum 10^{-\Delta L_n/10}]$ dB from
+$\Delta L_{oct} = -10 \log_{10}[(1/3) \sum 10^{-\Delta L_n/10}]$ dB from
 the three one-third-octave values in each octave.
 
 **Weighted improvement.** `ΔLw` is the ISO 717-2 weighted reduction of impact
@@ -69,7 +69,7 @@ acceleration_level(
 
 Vibratory acceleration level `La` (ISO 16251-1 Formula (1)).
 
-$L_a = 10 \lg(a_{rms}^2 / a_0^2) = 20 \lg(a_{rms} / a_0)$ dB.
+$L_a = 10 \log_{10}(a_{rms}^2 / a_0^2) = 20 \log_{10}(a_{rms} / a_0)$ dB.
 
 **Parameters**
 
@@ -262,7 +262,7 @@ improvement_octave_bands(
 
 Convert a one-third-octave improvement spectrum to octaves (F. (5)).
 
-$\Delta L_{oct} = -10 \lg[(1/3) \sum_{n=1}^{3} 10^{-\Delta L_n/10}]$
+$\Delta L_{oct} = -10 \log_{10}[(1/3) \sum_{n=1}^{3} 10^{-\Delta L_n/10}]$
 dB over the three thirds of
 each octave.
 

@@ -117,7 +117,7 @@ class IntensityResult:
     Per-band arrays are ``None`` unless a band ``fraction`` was requested.
     ``intensity`` is signed (positive along the probe axis, from
     microphone 1 towards microphone 2); ``intensity_level`` is computed
-    from the magnitude, :math:`10 \lg(|I|/10^{-12})` dB, with the sign
+    from the magnitude, :math:`10 \log_{10}(|I|/10^{-12})` dB, with the sign
     reported separately in ``direction`` (+1/-1).
     ``pressure_intensity_index`` is
     :math:`L_p - L_I` (the single-position form of the ISO 9614-1:1993 F2
@@ -281,7 +281,7 @@ class FieldIndicators:
 
 
 def _level(value: float, reference: float) -> float:
-    r"""Level :math:`10 \lg(\mathrm{value}/\mathrm{reference})` in dB, with a
+    r"""Level :math:`10 \log_{10}(\mathrm{value}/\mathrm{reference})` in dB, with a
     tiny-floor guard for zero values."""
     return float(10.0 * np.log10(max(value, np.finfo(float).tiny) / reference))
 
@@ -328,7 +328,7 @@ def sound_intensity(
 
     The pressure-intensity index :math:`L_p - L_I` is reported per band and
     broadband; in a free plane progressive wave it equals
-    :math:`10 \lg(\rho c/400) = 0.14` dB (IEC 61043:1993 clause 5 note),
+    :math:`10 \log_{10}(\rho c/400) = 0.14` dB (IEC 61043:1993 clause 5 note),
     while large values flag reactive or noisy fields (compare with the
     instrument dynamic capability, ISO 9614-1:1993 criterion 1).
 

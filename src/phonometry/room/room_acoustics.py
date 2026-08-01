@@ -331,7 +331,7 @@ def _fit_decay_time(
     decay_range: tuple[float, float],
     trust_floor_db: float,
 ) -> float:
-    """Least-squares decay time over an evaluation range (Annex C).
+    r"""Least-squares decay time over an evaluation range (Annex C).
 
     Fits :math:`L = a + b t` to the decay-curve samples between
     ``-decay_range[0]`` and ``-decay_range[1]`` dB and returns

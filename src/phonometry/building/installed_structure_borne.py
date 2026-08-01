@@ -13,22 +13,22 @@ building. The chain closes the structural-vibroacoustics series:
    :mod:`phonometry.building.structure_borne_power`) and then referred to the
    actual receiver with the Annex I mobility correction
    (:func:`installed_power_from_reception_plate`),
-   :math:`L_{Ws,inst,i} = L_{Ws,n} + 10 \lg( Y_{\infty,i} / Y_{\infty,rec} )`
+   :math:`L_{Ws,inst,i} = L_{Ws,n} + 10 \log_{10}( Y_{\infty,i} / Y_{\infty,rec} )`
    with the reference plate mobility
    :math:`Y_{\infty,rec} = 5 \cdot 10^{-6}` m/(N.s), or equivalently to the
    characteristic level
-   :math:`L_{Ws,c} = L_{Ws,n} + 10 \lg( Y_s / Y_{\infty,rec} )` with the
+   :math:`L_{Ws,c} = L_{Ws,n} + 10 \log_{10}( Y_s / Y_{\infty,rec} )` with the
    source mobility (Annex I.3, Table I.8), from which ``D_C`` is subtracted.
 2. Only part of that power is actually injected into the supporting element; the
    loss is the **coupling term** ``D_C`` (clause 4.4.3), positive in the usual
    mobility-mismatched cases (see :func:`coupling_term` for the exception),
    set by the source mobility ``Y_s`` and the receiver mobility ``Y_i``
    (Formula 19b):
-   :math:`D_{C,i} = 10 \lg\left( |Y_s + Y_i|^2 / (|Y_s|
+   :math:`D_{C,i} = 10 \log_{10}\left( |Y_s + Y_i|^2 / (|Y_s|
    \operatorname{Re}\{Y_i\}) \right)`, which reduces to
-   :math:`10 \lg( |Y_s| / \operatorname{Re}\{Y_i\} )` for a force source
+   :math:`10 \log_{10}( |Y_s| / \operatorname{Re}\{Y_i\} )` for a force source
    (high source mobility,
-   Formula 19c) and to :math:`-10 \lg( |Y_s| \operatorname{Re}\{Z_i\} )`
+   Formula 19c) and to :math:`-10 \log_{10}( |Y_s| \operatorname{Re}\{Z_i\} )`
    for a velocity source (low
    source mobility, Formula 19d). An elastic support adds its transfer
    mobility ``Y_k`` inside the modulus (Formula 19e).
@@ -40,7 +40,7 @@ building. The chain closes the structural-vibroacoustics series:
    ``D_sa`` (clause 4.4.4), the flanking sound reduction index ``R_ij,ref`` and
    the element area (Formula 18a):
    :math:`L_{n,s,ij} = L_{Ws,inst,i} - D_{sa,i} - R_{ij,ref}
-   - 10 \lg(S_i/S_0) - 10 \lg(A_0/4)`
+   - 10 \log_{10}(S_i/S_0) - 10 \log_{10}(A_0/4)`
    with :math:`S_0 = A_0 = 10` m²; the paths combine energetically
    (Formula 17).
 
@@ -102,7 +102,7 @@ def coupling_term(
 ) -> np.ndarray:
     r"""Coupling term ``D_C`` for a point excitation (EN 12354-5, Formula 19b/19e).
 
-    :math:`D_C = 10 \lg\left( |Y_s + Y_i + Y_k|^2 / (|Y_s|
+    :math:`D_C = 10 \log_{10}\left( |Y_s + Y_i + Y_k|^2 / (|Y_s|
     \operatorname{Re}\{Y_i\}) \right)` -- the loss between
     the characteristic and the injected structure-borne power. ``Y_k`` is the
     transfer mobility of an elastic support (Formula 19e; 0 for a rigid
@@ -142,7 +142,7 @@ def coupling_term_force_source(
 
     .. math::
 
-       D_C = 10 \lg\frac{|Y_s|}{\operatorname{Re}\{Y_i\}}
+       D_C = 10 \log_{10}\frac{|Y_s|}{\operatorname{Re}\{Y_i\}}
 
     :param source_mobility: Source point mobility ``Y_s`` (complex, non-zero).
     :param receiver_mobility: Receiver point mobility ``Y_i`` (complex,
@@ -163,7 +163,7 @@ def coupling_term_velocity_source(
 
     .. math::
 
-       D_C = -10 \lg\left( |Y_s| \operatorname{Re}\{Z_i\} \right)
+       D_C = -10 \log_{10}\left( |Y_s| \operatorname{Re}\{Z_i\} \right)
 
     :param source_mobility: Source point mobility ``Y_s`` (complex, non-zero).
     :param receiver_impedance: Receiver point impedance ``Z_i`` (complex,
@@ -185,7 +185,7 @@ def installed_power_from_reception_plate(
 ) -> np.ndarray:
     r"""Mobility correction of the reception-plate power (EN 12354-5, Annex I).
 
-    :math:`L_{Ws,inst,i} = L_{Ws,n,i} + 10 \lg( Y_{\infty,i} /
+    :math:`L_{Ws,inst,i} = L_{Ws,n,i} + 10 \log_{10}( Y_{\infty,i} /
     Y_{\infty,rec} )`, which refers the
     characteristic reception-plate power level ``L_Ws,n`` (EN 15657
     Formula (17), re the 10 cm concrete plate
@@ -257,7 +257,7 @@ def structure_borne_pressure_level_path(
     .. math::
 
        L_{n,s,ij} = L_{Ws,inst,i} - D_{sa,i} - R_{ij,ref}
-       - 10 \lg\frac{S_i}{S_0} - 10 \lg\frac{A_0}{4}
+       - 10 \log_{10}\frac{S_i}{S_0} - 10 \log_{10}\frac{A_0}{4}
 
     :param installed_power_level: Installed power level ``L_Ws,inst,i``, in dB.
     :param adjustment_term: Structure-to-airborne adjustment ``D_sa,i`` (clause
@@ -287,7 +287,7 @@ def total_structure_borne_pressure_level(path_levels: ArrayLike) -> np.ndarray:
 
     .. math::
 
-       L_{n,s} = 10 \lg\!\left( \sum_j 10^{L_{n,s,ij}/10} \right)
+       L_{n,s} = 10 \log_{10}\!\left( \sum_j 10^{L_{n,s,ij}/10} \right)
 
     :param path_levels: Path levels ``L_n,s,ij``; sum is over the first axis
         (paths), broadcasting any trailing band axis.
@@ -316,7 +316,7 @@ class InstalledSourceResult:
 
     @property
     def overall_level(self) -> float:
-        r"""Band-summed total level :math:`10 \lg(\sum 10^{0.1 L_{n,s}})`,
+        r"""Band-summed total level :math:`10 \log_{10}(\sum 10^{0.1 L_{n,s}})`,
         in dB."""
         lt = np.atleast_1d(np.asarray(self.total_level, dtype=np.float64))
         return float(10.0 * np.log10(np.sum(10.0 ** (0.1 * lt))))

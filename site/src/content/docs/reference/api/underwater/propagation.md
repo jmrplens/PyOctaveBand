@@ -10,8 +10,8 @@ Underwater sound propagation: transmission loss (closed-form).
 Transmission loss `TL` (dB) is the sum of geometrical spreading and volume
 absorption:
 
-* [`spreading_loss`](/phonometry/reference/api/underwater/propagation/#spreading_loss) -- geometrical spreading, $20 \lg R$
-  (spherical), $10 \lg R$ (cylindrical) or spherical-then-cylindrical
+* [`spreading_loss`](/phonometry/reference/api/underwater/propagation/#spreading_loss) -- geometrical spreading, $20 \log_{10} R$
+  (spherical), $10 \log_{10} R$ (cylindrical) or spherical-then-cylindrical
   (`"practical"`).
 * [`seawater_absorption`](/phonometry/reference/api/underwater/propagation/#seawater_absorption) -- the volume absorption coefficient
   $\alpha$ in
@@ -80,10 +80,10 @@ spreading_loss(
 
 Geometrical spreading loss, in dB.
 
-`"spherical"` gives $20 \lg(R)$ (free field), `"cylindrical"`
-gives $10 \lg(R)$ (perfect waveguide) and `"practical"` is
+`"spherical"` gives $20 \log_{10}(R)$ (free field), `"cylindrical"`
+gives $10 \log_{10}(R)$ (perfect waveguide) and `"practical"` is
 spherical up to `transition_range` `R0` then cylindrical:
-$20 \lg(R_0) + 10 \lg(R/R_0)$ (mode stripping in a channel).
+$20 \log_{10}(R_0) + 10 \log_{10}(R/R_0)$ (mode stripping in a channel).
 
 **Parameters**
 

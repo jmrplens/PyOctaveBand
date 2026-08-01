@@ -321,7 +321,7 @@ def _third_octave_geometry() -> tuple[np.ndarray, np.ndarray]:
 
     The ``6.353`` is deliberately *not* folded into the returned array. The
     standard prints this slope as
-    :math:`-80 + 0.6 (B_i + 10 \lg f_i - 6.353)`, which
+    :math:`-80 + 0.6 (B_i + 10 \log_{10} f_i - 6.353)`, which
     evaluates as ``(Bi + 10 lg fi) - 6.353``; folding the constant in first
     would evaluate ``Bi + (10 lg fi - 6.353)`` instead, and floating-point
     addition is not associative. The two differ in the last bits, so the fold

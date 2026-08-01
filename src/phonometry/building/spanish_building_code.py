@@ -13,7 +13,7 @@ normalised A-weighted source spectrum and sums it energetically:
 
 .. math::
 
-   I_x = -10 \lg \sum_i 10^{(L_{x,i} - X_i)/10} \quad [\mathrm{dBA}]
+   I_x = -10 \log_{10} \sum_i 10^{(L_{x,i} - X_i)/10} \quad [\mathrm{dBA}]
 
 where ``X_i`` is the band insulation (``R``, ``R'``, ``DnT``, ``D2m,nT`` ...)
 and ``L_x,i`` the normalised spectrum of the source. The sum runs over the
@@ -316,7 +316,7 @@ def db_hr_global_index(
 ) -> DbHrGlobalIndexResult:
     r"""A-weighted global insulation index per DB-HR Annex A.
 
-    :math:`I_x = -10 \lg \sum_i 10^{(L_{x,i} - X_i)/10}` over the eighteen
+    :math:`I_x = -10 \log_{10} \sum_i 10^{(L_{x,i} - X_i)/10}` over the eighteen
     one-third-octave bands 100 Hz to 5 kHz (Formulae (A.5) to (A.7)).
 
     :param band_values: The band insulation ``X_i``, in dB. Either exactly the

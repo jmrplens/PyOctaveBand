@@ -57,7 +57,7 @@ reproduce Table 1 exactly.
 
 This module closes the loop with [`phonometry.sound_absorption`](/phonometry/reference/api/materials/sound-absorption/) (ISO 354),
 whose air power-attenuation coefficient `m` (1/m) is defined only through
-the ISO 9613-1 `alpha` via $m = \alpha / (10 \lg e)$.
+the ISO 9613-1 `alpha` via $m = \alpha / (10 \log_{10} e)$.
 [`air_attenuation_m`](/phonometry/reference/api/environment/air-absorption/#air_attenuation_m) returns that `m` directly.
 
 > Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
@@ -97,7 +97,7 @@ scalars.
 
 :::note
 ISO 354:2003 defers its air power-attenuation coefficient `m` (1/m)
-entirely to this `alpha` via $m = \alpha / (10 \lg e)$. Use
+entirely to this `alpha` via $m = \alpha / (10 \log_{10} e)$. Use
 [`air_attenuation_m`](/phonometry/reference/api/environment/air-absorption/#air_attenuation_m) to obtain that `m` for
 [`phonometry.sound_absorption.absorption_area`](/phonometry/reference/api/materials/sound-absorption/#absorption_area) /
 [`absorption_coefficient`](/phonometry/reference/api/materials/sound-absorption/#absorption_coefficient).
@@ -120,7 +120,7 @@ ISO 354 air power-attenuation coefficient `m` (1/m) from conditions.
 
 Convenience composition of [`air_attenuation`](/phonometry/reference/api/environment/air-absorption/#air_attenuation) (ISO 9613-1 `alpha` in
 dB/m) with the ISO 354:2003 (8.1.2.1) conversion
-$m = \alpha / (10 \lg e)$
+$m = \alpha / (10 \log_{10} e)$
 (via [`phonometry.sound_absorption.attenuation_from_alpha`](/phonometry/reference/api/materials/sound-absorption/#attenuation_from_alpha)). It lets an
 ISO 354 caller feed real atmospheric conditions into
 [`absorption_area`](/phonometry/reference/api/materials/sound-absorption/#absorption_area) /

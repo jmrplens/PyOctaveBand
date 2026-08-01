@@ -18,9 +18,9 @@ and :math:`f_2 = f_1 + \Delta f_c` (Formula (5)).
 
 **Audibility of a single tone (Clause 5.3).** From the mean narrow-band level
 ``LS`` of the masking noise (Formula (6)) the critical-band level of the
-masking noise is :math:`L_G = L_S + 10 \lg(\Delta f_c/\Delta f)`
+masking noise is :math:`L_G = L_S + 10 \log_{10}(\Delta f_c/\Delta f)`
 (Formula (12), ``Δf`` the line spacing). The masking index is
-:math:`a_v = -2 - \lg[1 + (f/502)^{2.5}]` dB (Formula (13)) and the
+:math:`a_v = -2 - \log_{10}[1 + (f/502)^{2.5}]` dB (Formula (13)) and the
 audibility of a tone of level ``LT`` (Formula (8)) is
 :math:`\Delta L = L_T - L_G - a_v` dB (Formula (14)). A tone is present when
 :math:`\Delta L > 0`.
@@ -28,7 +28,7 @@ audibility of a tone of level ``LT`` (Formula (8)) is
 **Decisive and mean audibility (Clauses 5.3.8/5.3.9).** The decisive audibility
 of one narrow-band spectrum is the largest tone audibility in it (Step 4). Over
 ``J`` staggered spectra the mean audibility is the energy mean
-:math:`\Delta L = 10 \lg[(1/J) \sum_j 10^{\Delta L_j/10}]` dB (Formula (20));
+:math:`\Delta L = 10 \log_{10}[(1/J) \sum_j 10^{\Delta L_j/10}]` dB (Formula (20));
 a spectrum in which no tone is found contributes :math:`\Delta L_j = -10` dB
 (Formula (21)).
 
@@ -58,7 +58,7 @@ tones near its edges.
 
 **Two tones below 1000 Hz.** When *exactly two* tones share a critical band and
 both lie below 1000 Hz, the ear can still resolve them if their spacing exceeds
-:math:`f_D = 21 \cdot 10^{1.2 |\lg(f_T/212)|^{1.8}}` Hz
+:math:`f_D = 21 \cdot 10^{1.2 |\log_{10}(f_T/212)|^{1.8}}` Hz
 (Formulae (18)/(19)); they are then
 rated separately instead of combined. :func:`two_tone_separation_frequency` and
 :func:`resolve_tones_separately` implement this branch (Clause 5.3.8), which no
@@ -192,7 +192,7 @@ def critical_band_corners(tone_frequency: float) -> tuple[float, float]:
 def masking_index(frequency: float) -> float:
     r"""Masking index ``av`` of the auditory system (Formula (13)).
 
-    :math:`a_v = -2 - \lg[1 + (f/502)^{2.5}]` dB. The value is negative and
+    :math:`a_v = -2 - \log_{10}[1 + (f/502)^{2.5}]` dB. The value is negative and
     grows more
     negative with frequency (see Annex C).
 
@@ -212,7 +212,7 @@ def critical_band_level(
 ) -> float:
     r"""Critical-band level ``LG`` of the masking noise (Formula (12)).
 
-    :math:`L_G = L_S + 10 \lg(\Delta f_c/\Delta f)` dB, spreading the mean
+    :math:`L_G = L_S + 10 \log_{10}(\Delta f_c/\Delta f)` dB, spreading the mean
     narrow-band level ``LS``
     over the critical bandwidth ``Δfc`` relative to the line spacing ``Δf``.
 
@@ -260,9 +260,9 @@ def energy_sum_level(
     For a single line (:math:`K = 1`) the tone level is that line's level with
     *no* bandwidth correction, :math:`L_T = L_1` (Formula (7)). For
     :math:`K > 1` lines,
-    :math:`L_T = 10 \lg[\sum_i 10^{L_i/10}] + 10 \lg(\Delta f/\Delta f_e)` dB
+    :math:`L_T = 10 \log_{10}[\sum_i 10^{L_i/10}] + 10 \log_{10}(\Delta f/\Delta f_e)` dB
     (Formula (8)); the window correction
-    :math:`10 \lg(\Delta f/\Delta f_e)` is ``−1.76 dB`` for a Hanning window
+    :math:`10 \log_{10}(\Delta f/\Delta f_e)` is ``−1.76 dB`` for a Hanning window
     (:math:`\Delta f_e = 1.5 \Delta f`, Annex A) and ``0 dB`` for a
     rectangular window
     (:math:`\Delta f_e = \Delta f`). The DIN 45681:2005-03 Annex J reference
@@ -343,8 +343,8 @@ def mean_narrowband_level(
 
     .. math::
 
-       L_S = 10 \lg\!\left[ \frac{1}{M} \sum_i 10^{L_i/10} \right]
-       + 10 \lg\frac{\Delta f}{\Delta f_e}
+       L_S = 10 \log_{10}\!\left[ \frac{1}{M} \sum_i 10^{L_i/10} \right]
+       + 10 \log_{10}\frac{\Delta f}{\Delta f_e}
 
     in dB, determined iteratively over the lines of the critical band about
     ``tone_frequency`` (Formulae (2)-(5) give the band). The line at the tone
@@ -352,7 +352,7 @@ def mean_narrowband_level(
     drops any line more than ``6 dB`` above the current ``LS`` and repeats until
     ``LS`` is stable within ``±0.005 dB`` or fewer than five lines remain on
     either side of the tone (Annex D). The window correction
-    :math:`10 \lg(\Delta f/\Delta f_e)` is
+    :math:`10 \log_{10}(\Delta f/\Delta f_e)` is
     ``−1.76 dB`` for the recommended Hanning window
     (:math:`\Delta f_e = 1.5 \Delta f`).
 
@@ -740,7 +740,7 @@ def combined_tone_level(
 ) -> float:
     r"""Combined tone level ``LT`` of several tones in one critical band (Formula (17)).
 
-    :math:`L_{Tm} = 10 \lg[\sum_n 10^{L_{Tm,n}/10}]`, the energy sum of the
+    :math:`L_{Tm} = 10 \log_{10}[\sum_n 10^{L_{Tm,n}/10}]`, the energy sum of the
     tonal lines of all
     the tones, each spectral line counted at most once. Use it when more than one
     audible tone falls in a critical band (Clause 5.3.8 Step 3); the group is
@@ -794,7 +794,7 @@ _TWO_TONE_MAX_FREQUENCY = 1000.0
 def two_tone_separation_frequency(tone_frequency: float) -> float:
     r"""Frequency-difference threshold ``fD`` for resolving two tones (Formula (19)).
 
-    :math:`f_D = 21 \cdot 10^{1.2 |\lg(f_T/212)|^{1.8}}` Hz. When *exactly
+    :math:`f_D = 21 \cdot 10^{1.2 |\log_{10}(f_T/212)|^{1.8}}` Hz. When *exactly
     two* tones fall in one
     critical band and both lie below 1000 Hz, the human ear can still tell them
     apart (they are then rated *separately* rather than combined into a
@@ -872,7 +872,7 @@ def resolve_tones_separately(
 def mean_audibility(decisive_audibilities: ArrayLike) -> float:
     r"""Mean audibility ``ΔL`` over a number of spectra (Formula (20)).
 
-    :math:`\Delta L = 10 \lg[(1/J) \sum_j 10^{\Delta L_j/10}]` dB, the energy
+    :math:`\Delta L = 10 \log_{10}[(1/J) \sum_j 10^{\Delta L_j/10}]` dB, the energy
     mean of the decisive
     audibilities ``ΔLj`` of the ``J`` staggered narrow-band spectra. A
     spectrum with no tone found contributes :math:`\Delta L_j = -10` dB

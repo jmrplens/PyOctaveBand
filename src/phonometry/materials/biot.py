@@ -710,7 +710,7 @@ def _porous_porous_matrix(left: float, right: float) -> Complex:
 
 @dataclass(frozen=True)
 class _Block:
-    """One solved layer block of the global assembly.
+    r"""One solved layer block of the global assembly.
 
     ``kind`` is ``"fluid"`` (two field variables :math:`[p, v_3]`) or
     ``"poroelastic"`` (six field variables). ``unknowns`` is the number of
@@ -851,7 +851,7 @@ def _interface(left: _Block | None, right: _Block) -> tuple[Complex, Complex]:
 
 
 def _wall_matrix(block: _Block) -> Complex:
-    """:math:`[Y]` of A&A Eq. (11.81): zero velocity against a hard wall."""
+    r""":math:`[Y]` of A&A Eq. (11.81): zero velocity against a hard wall."""
     if block.kind == "fluid":
         return np.array([[0.0, 1.0]], dtype=np.complex128)
     return np.eye(6, dtype=np.complex128)[:3]

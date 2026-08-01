@@ -14,11 +14,11 @@ the normative **Annex C** uncertainty budget.
 
 - *Task-based* (Clause 9): the nominal day is split into tasks; each task level is
   the energy average of ``I >= 3`` samples (Eq 7), its contribution is
-  :math:`L_{EX,8h,m} = L_{p,A,eqT,m} + 10 \lg(T_m/T_0)` (Eq 8), and the
+  :math:`L_{EX,8h,m} = L_{p,A,eqT,m} + 10 \log_{10}(T_m/T_0)` (Eq 8), and the
   daily level is the energy sum over tasks (Eq 9/10).
 - *Job-based* (Clause 10): ``N >= 5`` random samples over a homogeneous exposure
   group; the effective-day level is their energy average (Eq 11) and
-  :math:`L_{EX,8h} = L_{p,A,eqTe} + 10 \lg(T_e/T_0)` (Eq 12). The minimum
+  :math:`L_{EX,8h} = L_{p,A,eqTe} + 10 \log_{10}(T_e/T_0)` (Eq 12). The minimum
   cumulative measurement duration follows Table 1.
 - *Full-day* (Clause 11): three (or more) whole-day measurements averaged (Eq 11),
   then Eq 13, the same arithmetic as the job method.
@@ -258,7 +258,7 @@ class TaskContribution:
 
 @dataclass(frozen=True)
 class ExposureResult:
-    """
+    r"""
     Daily noise exposure level and its expanded uncertainty (ISO 9612:2009).
 
     :ivar lex_8h: A-weighted daily noise exposure level ``LEX,8h``, dB.
@@ -549,7 +549,7 @@ def job_based_exposure(
     sample_duration_hours: float | None = None,
     warn: bool = True,
 ) -> ExposureResult:
-    """
+    r"""
     Daily noise exposure level from job-based measurements (ISO 9612:2009 Clause 10).
 
     The effective-day level is the energy average of ``N >= 5`` random job samples

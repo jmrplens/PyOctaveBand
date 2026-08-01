@@ -12,9 +12,9 @@ physically grounded components of the Wenz curves:
 
 * [`wind_noise_spectrum`](/phonometry/reference/api/underwater/ocean-ambient-noise/#wind_noise_spectrum) -- wind / sea-surface (Knudsen) noise via Wenz's
   "rule of fives",
-  $\mathrm{NL} = 51.02 - (5/3) \cdot 10 (\lg f - \lg(U/5))$
+  $\mathrm{NL} = 51.02 - (5/3) \cdot 10 (\log_{10} f - \log_{10}(U/5))$
   (`f` in kHz, `U` in knots; the historical 25 dB anchor is re 20 µPa and
-  becomes $25 + 20 \lg(20)$ re 1 µPa), valid over roughly 500 Hz-5 kHz.
+  becomes $25 + 20 \log_{10}(20)$ re 1 µPa), valid over roughly 500 Hz-5 kHz.
 * [`thermal_noise_spectrum`](/phonometry/reference/api/underwater/ocean-ambient-noise/#thermal_noise_spectrum) -- the molecular thermal-noise limit (Mellen
   1952), $\langle p^2(f) \rangle = 4 \pi k T \rho f^2 / c$ (Pa²/Hz),
   dominant above ~50 kHz.
@@ -124,7 +124,7 @@ thermal_noise_spectrum(
 Molecular thermal-noise spectrum level (Mellen 1952), dB re 1 µPa²/Hz.
 
 $\langle p^2(f) \rangle = 4 \pi k T \rho f^2 / c$ (Pa²/Hz); the
-level is $10 \lg(\langle p^2 \rangle / p_0^2)$.
+level is $10 \log_{10}(\langle p^2 \rangle / p_0^2)$.
 
 **Parameters**
 
@@ -155,12 +155,12 @@ wind_noise_spectrum(
 Wind / sea-surface noise spectrum level (Wenz rule of fives), dB re
 1 µPa²/Hz.
 
-$\mathrm{NL}(f, U) = 51.02 - (5/3) \cdot 10 (\lg f - \lg(U/5))$
+$\mathrm{NL}(f, U) = 51.02 - (5/3) \cdot 10 (\log_{10} f - \log_{10}(U/5))$
 with `f` in kHz and `U`
 in knots: −5 dB per octave and +5 dB per doubling of wind speed about the
 canonical anchor, which Wenz/Knudsen state as "25 dB (5 × 5)" at 1 kHz for
 5 knots **re 0.0002 dyn/cm² (20 µPa)**, i.e.
-$25 + 20 \lg(20) \approx 51.02$ dB
+$25 + 20 \log_{10}(20) \approx 51.02$ dB
 once referenced to the ISO 18405 1 µPa. Valid over roughly 500 Hz-5 kHz
 and winds of 2.5-40 knots (the stated range of the wind-doubling law);
 outside both the formula extrapolates.

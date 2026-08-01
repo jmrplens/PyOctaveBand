@@ -31,7 +31,7 @@ and Diffusers* (3rd ed., CRC Press, 2017):
   into the constant ``A`` of Equation (5.8) and can be switched off to
   recover the plain Fourier form.
 
-The polar levels :math:`L_i = 20 \lg|p(\theta_i)|` are then passed to the
+The polar levels :math:`L_i = 20 \log_{10}|p(\theta_i)|` are then passed to the
 ISO 17497-2 autocorrelation diffusion coefficient of
 :func:`~phonometry.materials.scattering_diffusion.directional_diffusion_coefficient`,
 and normalised against the same-footprint flat reference with
@@ -223,7 +223,7 @@ def _scattered_pressure(
 
 
 def _polar_levels(pressure: Complex) -> Real:
-    r"""Reflected levels :math:`L_i = 20 \lg|p_i|` (dB), floored finitely.
+    r"""Reflected levels :math:`L_i = 20 \log_{10}|p_i|` (dB), floored finitely.
 
     The levels are referenced to the peak magnitude so the strongest receiver is
     at 0 dB; the reference is immaterial to the diffusion coefficient, which is a

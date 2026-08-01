@@ -391,7 +391,7 @@ def infinite_beam_point_mobility(
     *,
     location: str = "centre",
 ) -> MobilityResult:
-    """Infinite-beam point mobility bundled as a :class:`MobilityResult`.
+    r"""Infinite-beam point mobility bundled as a :class:`MobilityResult`.
 
     :param frequency: Frequencies ``f``, in hertz (array, > 0).
     :param bending_stiffness: Beam bending stiffness :math:`B = E I`, in N.m^2.

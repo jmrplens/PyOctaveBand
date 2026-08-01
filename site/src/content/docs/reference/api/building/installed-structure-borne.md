@@ -18,21 +18,21 @@ building. The chain closes the structural-vibroacoustics series:
    [`phonometry.building.structure_borne_power`](/phonometry/reference/api/building/structure-borne-power/)) and then referred to the
    actual receiver with the Annex I mobility correction
    ([`installed_power_from_reception_plate`](/phonometry/reference/api/building/installed-structure-borne/#installed_power_from_reception_plate)),
-   $L_{Ws,inst,i} = L_{Ws,n} + 10 \lg( Y_{\infty,i} / Y_{\infty,rec} )$
+   $L_{Ws,inst,i} = L_{Ws,n} + 10 \log_{10}( Y_{\infty,i} / Y_{\infty,rec} )$
    with the reference plate mobility
    $Y_{\infty,rec} = 5 \cdot 10^{-6}$ m/(N.s), or equivalently to the
    characteristic level
-   $L_{Ws,c} = L_{Ws,n} + 10 \lg( Y_s / Y_{\infty,rec} )$ with the
+   $L_{Ws,c} = L_{Ws,n} + 10 \log_{10}( Y_s / Y_{\infty,rec} )$ with the
    source mobility (Annex I.3, Table I.8), from which `D_C` is subtracted.
 2. Only part of that power is actually injected into the supporting element; the
    loss is the **coupling term** `D_C` (clause 4.4.3), positive in the usual
    mobility-mismatched cases (see [`coupling_term`](/phonometry/reference/api/building/installed-structure-borne/#coupling_term) for the exception),
    set by the source mobility `Y_s` and the receiver mobility `Y_i`
    (Formula 19b):
-   $D_{C,i} = 10 \lg\left( |Y_s + Y_i|^2 / (|Y_s| \operatorname{Re}\{Y_i\}) \right)$, which reduces to
-   $10 \lg( |Y_s| / \operatorname{Re}\{Y_i\} )$ for a force source
+   $D_{C,i} = 10 \log_{10}\left( |Y_s + Y_i|^2 / (|Y_s| \operatorname{Re}\{Y_i\}) \right)$, which reduces to
+   $10 \log_{10}( |Y_s| / \operatorname{Re}\{Y_i\} )$ for a force source
    (high source mobility,
-   Formula 19c) and to $-10 \lg( |Y_s| \operatorname{Re}\{Z_i\} )$
+   Formula 19c) and to $-10 \log_{10}( |Y_s| \operatorname{Re}\{Z_i\} )$
    for a velocity source (low
    source mobility, Formula 19d). An elastic support adds its transfer
    mobility `Y_k` inside the modulus (Formula 19e).
@@ -43,7 +43,7 @@ building. The chain closes the structural-vibroacoustics series:
    follows from the installed power, the structure-to-airborne adjustment term
    `D_sa` (clause 4.4.4), the flanking sound reduction index `R_ij,ref` and
    the element area (Formula 18a):
-   $L_{n,s,ij} = L_{Ws,inst,i} - D_{sa,i} - R_{ij,ref} - 10 \lg(S_i/S_0) - 10 \lg(A_0/4)$
+   $L_{n,s,ij} = L_{Ws,inst,i} - D_{sa,i} - R_{ij,ref} - 10 \log_{10}(S_i/S_0) - 10 \log_{10}(A_0/4)$
    with $S_0 = A_0 = 10$ m²; the paths combine energetically
    (Formula 17).
 
@@ -65,7 +65,7 @@ coupling_term(
 
 Coupling term `D_C` for a point excitation (EN 12354-5, Formula 19b/19e).
 
-$D_C = 10 \lg\left( |Y_s + Y_i + Y_k|^2 / (|Y_s| \operatorname{Re}\{Y_i\}) \right)$ -- the loss between
+$D_C = 10 \log_{10}\left( |Y_s + Y_i + Y_k|^2 / (|Y_s| \operatorname{Re}\{Y_i\}) \right)$ -- the loss between
 the characteristic and the injected structure-borne power. `Y_k` is the
 transfer mobility of an elastic support (Formula 19e; 0 for a rigid
 connection, Formula 19b).
@@ -98,7 +98,7 @@ coupling_term_force_source(
 Coupling term for a force source, high source mobility (Formula 19c).
 
 $$
-D_C = 10 \lg\frac{|Y_s|}{\operatorname{Re}\{Y_i\}}
+D_C = 10 \log_{10}\frac{|Y_s|}{\operatorname{Re}\{Y_i\}}
 $$
 
 **Parameters**
@@ -128,7 +128,7 @@ coupling_term_velocity_source(
 Coupling term for a velocity source, low source mobility (Formula 19d).
 
 $$
-D_C = -10 \lg\left( |Y_s| \operatorname{Re}\{Z_i\} \right)
+D_C = -10 \log_{10}\left( |Y_s| \operatorname{Re}\{Z_i\} \right)
 $$
 
 **Parameters**
@@ -159,7 +159,7 @@ installed_power_from_reception_plate(
 
 Mobility correction of the reception-plate power (EN 12354-5, Annex I).
 
-$L_{Ws,inst,i} = L_{Ws,n,i} + 10 \lg( Y_{\infty,i} / Y_{\infty,rec} )$, which refers the
+$L_{Ws,inst,i} = L_{Ws,n,i} + 10 \log_{10}( Y_{\infty,i} / Y_{\infty,rec} )$, which refers the
 characteristic reception-plate power level `L_Ws,n` (EN 15657
 Formula (17), re the 10 cm concrete plate
 $Y_{\infty,rec} = 5 \cdot 10^{-6}$ m/(N.s))
@@ -275,7 +275,7 @@ Installed structure-borne sound prediction (EN 12354-5).
 
 *property*
 
-Band-summed total level $10 \lg(\sum 10^{0.1 L_{n,s}})$,
+Band-summed total level $10 \log_{10}(\sum 10^{0.1 L_{n,s}})$,
 in dB.
 
 ### InstalledSourceResult.plot()
@@ -364,7 +364,7 @@ structure_borne_pressure_level_path(
 Normalised structure-borne SPL for one path i->j (Formula 18a).
 
 $$
-L_{n,s,ij} = L_{Ws,inst,i} - D_{sa,i} - R_{ij,ref} - 10 \lg\frac{S_i}{S_0} - 10 \lg\frac{A_0}{4}
+L_{n,s,ij} = L_{Ws,inst,i} - D_{sa,i} - R_{ij,ref} - 10 \log_{10}\frac{S_i}{S_0} - 10 \log_{10}\frac{A_0}{4}
 $$
 
 **Parameters**
@@ -394,7 +394,7 @@ total_structure_borne_pressure_level(path_levels: ArrayLike) -> np.ndarray
 Combine path sound pressure levels energetically (Formula 17).
 
 $$
-L_{n,s} = 10 \lg\!\left( \sum_j 10^{L_{n,s,ij}/10} \right)
+L_{n,s} = 10 \log_{10}\!\left( \sum_j 10^{L_{n,s,ij}/10} \right)
 $$
 
 **Parameters**

@@ -20,7 +20,7 @@ of 1.2048 kg/m3, is `delta_pI0` (IEC 61043:1993, definition 3.11).
 probe, a processor and a complete instrument, in class 1 and class 2, at the
 nominal microphone separation of 25 mm. The table is transcribed digit for
 digit below. Its Note 1 gives the separation rule: for any other microphone
-separation `x` in millimetres, add $10 \lg(x/25)$ dB to every figure,
+separation `x` in millimetres, add $10 \log_{10}(x/25)$ dB to every figure,
 so a
 wider spacer both earns and demands more low-frequency margin. Note 2 restricts
 the requirement to the octave-band centre frequencies for processors that only
@@ -50,7 +50,7 @@ Two related requirements of the same standard are exposed here as well:
 The index is also the instrument's phase-error floor in disguise. In an axially
 propagating plane progressive wave the true phase difference across the spacer
 is $k d$, so a residual intensity produced by a channel phase mismatch
-$\phi_s$ gives $\delta_{pI0} = 10 \lg(k d / \phi_s)$ (Fahy,
+$\phi_s$ gives $\delta_{pI0} = 10 \log_{10}(k d / \phi_s)$ (Fahy,
 *Sound Intensity*
 2nd ed., equation (7.16)); [`phase_mismatch_from_residual_index`](/phonometry/reference/api/power/intensity-compliance/#phase_mismatch_from_residual_index) and
 [`residual_index_from_phase_mismatch`](/phonometry/reference/api/power/intensity-compliance/#residual_index_from_phase_mismatch) convert between the two. Fahy's
@@ -164,7 +164,7 @@ result can redraw itself and render an accredited fiche.
 | `limit_class2` | Class 2 minimum per band, in dB, likewise rescaled. |
 | `device` | `"probe"`, `"processor"` or `"instrument"`. |
 | `spacing` | Microphone separation the verdict applies to, in metres. |
-| `spacing_offset_db` | The Table 2 Note 1 term $10 \lg(x/25)$ added to the printed 25 mm figures, in dB. |
+| `spacing_offset_db` | The Table 2 Note 1 term $10 \log_{10}(x/25)$ added to the printed 25 mm figures, in dB. |
 | `range_limited` | `True` when the verified bands cover neither the 22 one-third-octave bands nor the 7 octave bands of clause 6.1, so the stated class attests only the bands supplied. |
 
 ### IntensityInstrumentComplianceResult.binding_margin()
@@ -317,7 +317,7 @@ In an axially propagating plane progressive wave the true phase difference
 between the two sensing points is $k d = 2\pi f d / c$, and a
 residual
 intensity produced by a channel phase mismatch $\phi_s$ satisfies
-$\delta_{pI0} = 10 \lg(k d / \phi_s)$ (Fahy, *Sound Intensity*
+$\delta_{pI0} = 10 \log_{10}(k d / \phi_s)$ (Fahy, *Sound Intensity*
 2nd ed., equations (7.4) and (7.16)), so:
 
 $$
@@ -360,7 +360,7 @@ Pressure-residual intensity index of a given channel phase mismatch.
 The inverse of [`phase_mismatch_from_residual_index`](/phonometry/reference/api/power/intensity-compliance/#phase_mismatch_from_residual_index):
 
 $$
-\delta_{pI0} = 10 \lg\frac{k d}{\phi_s}, \qquad k d = \frac{2 \pi f d}{c}
+\delta_{pI0} = 10 \log_{10}\frac{k d}{\phi_s}, \qquad k d = \frac{2 \pi f d}{c}
 $$
 
 with $k d$ and $\phi_s$ both in degrees (the ratio is
@@ -370,7 +370,7 @@ in
 degrees does not, the index rises by 10 dB per decade of frequency: this is
 why a fixed phase-matching quality yields the falling low-frequency
 `delta_pI0` that IEC 61043 Table 2 grades band by band, and why a wider
-spacer buys $10 \lg(x/25)$ dB of index exactly as Note 1 of that
+spacer buys $10 \log_{10}(x/25)$ dB of index exactly as Note 1 of that
 table requires.
 
 **Parameters**
@@ -405,8 +405,8 @@ IEC 61043:1993 Table 2 minimum pressure-residual intensity index.
 
 Returns the class 1 and class 2 minima the standard requires of a device
 kind, already rescaled to the microphone separation in use with the Note 1
-rule $+10 \lg(x/25)$ (`x` in millimetres, i.e.
-$10 \lg(\text{spacing}/0.025)$
+rule $+10 \log_{10}(x/25)$ (`x` in millimetres, i.e.
+$10 \log_{10}(\text{spacing}/0.025)$
 for a spacing in metres).
 
 **Parameters**
@@ -441,7 +441,7 @@ Verify a measured `delta_pI0` spectrum against IEC 61043:1993 Table 2.
 
 Each band's measured pressure-residual intensity index is compared with the
 class 1 and class 2 minima of Table 2 for the device kind, rescaled to the
-microphone separation in use (Note 1, $+10 \lg(x/25)$). A band meets
+microphone separation in use (Note 1, $+10 \log_{10}(x/25)$). A band meets
 a class when its measured index is greater than or equal to that class's
 minimum, so the margin is `measured - minimum` and a band exactly on the
 limit passes. The overall class is the loosest per-band class, or `None`

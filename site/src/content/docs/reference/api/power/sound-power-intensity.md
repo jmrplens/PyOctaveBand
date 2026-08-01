@@ -24,7 +24,7 @@ P = \sum_i P_i \tag{Eq. 6}
 $$
 
 $$
-L_W = 10 \lg\frac{P}{P_0}, \qquad P_0 = 10^{-12}~\text{W} \tag{Eq. 13}
+L_W = 10 \log_{10}\frac{P}{P_0}, \qquad P_0 = 10^{-12}~\text{W} \tag{Eq. 13}
 $$
 
 The method is **not applicable to any band in which** $P < 0$
@@ -36,15 +36,15 @@ $[L_p]$ the area-weighted surface sound pressure level (Annex A,
 normative):
 
 $$
-F_{pI} = [L_p] - L_W + 10 \lg\frac{S}{S_0} \tag{Eq. A.1}
+F_{pI} = [L_p] - L_W + 10 \log_{10}\frac{S}{S_0} \tag{Eq. A.1}
 $$
 
 $$
-[L_p] = 10 \lg\!\left[ \frac{1}{S} \sum_i S_i \, 10^{0.1 L_{pi}} \right]
+[L_p] = 10 \log_{10}\!\left[ \frac{1}{S} \sum_i S_i \, 10^{0.1 L_{pi}} \right]
 $$
 
 $$
-F_{+/-} = 10 \lg\frac{\sum_i |P_i|}{\left| \sum_i P_i \right|} \tag{Eq. A.2}
+F_{+/-} = 10 \log_{10}\frac{\sum_i |P_i|}{\left| \sum_i P_i \right|} \tag{Eq. A.2}
 $$
 
 `FpI` is the surface pressure-intensity indicator (equivalent to ISO 9614-1
@@ -103,7 +103,7 @@ single band) of the signed, segment-averaged normal sound intensity
 $\langle I_{n,i} \rangle$ (W/m^2), and `areas` the `(N_seg,)`
 segment areas `Si` (m^2). The partial powers
 $P_i = \langle I_{n,i} \rangle S_i$ are summed to the band sound
-power `P` and level $L_W = 10 \lg(P/P_0)$ (equations (12), (6),
+power `P` and level $L_W = 10 \log_{10}(P/P_0)$ (equations (12), (6),
 (13)). Bands with $P < 0$ are flagged (`negative_band`) and
 reported as `NaN` (clause 9.2).
 
@@ -162,10 +162,10 @@ Result of an ISO 9614-2:1996 sound-power-by-scanning determination.
 
 `partial_power` is the signed $P_i = \langle I_{n,i} \rangle S_i$
 per segment and band (Eq. 12); `partial_power_level` the magnitude level
-$10 \lg(|P_i|/P_0)$ (Eq. 8), with the sign carried by
+$10 \log_{10}(|P_i|/P_0)$ (Eq. 8), with the sign carried by
 `partial_power`. `sound_power` is the signed band total
 $P = \sum P_i$ (Eq. 6) and `sound_power_level` its level
-$10 \lg(P/P_0)$ (Eq. 13), `NaN` where $P \le 0$
+$10 \log_{10}(P/P_0)$ (Eq. 13), `NaN` where $P \le 0$
 (`negative_band` True, method not applicable, clause 9.2).
 `surface_pressure_intensity_index`
 (FpI, Eq. A.1) and `negative_partial_power_index` (F+/-, Eq. A.2) are

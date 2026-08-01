@@ -79,6 +79,6 @@ integrator attack).
 | `validate` | If True (default) and `fs` is given, warn when the recording's short-term level fluctuation exceeds the limit. |
 | `max_fluctuation_db` | Explicit fluctuation limit in dB. Default (None) resolves the IEC 60942:2017 Table 2 class 1 limit for `frequency`. |
 | `frequency` | Nominal frequency of the calibration tone in Hz (default 1000.0), used to select the Table 2 row. |
-| `narrowband` | If True (requires `fs`), estimate the tone level with a coherent single-frequency (Goertzel) detector locked to the tone near `frequency` instead of the full-band RMS. This rejects broadband hum/noise in the reference take, which otherwise inflates the RMS and shrinks the factor by $-10 \lg(1 + 1/\mathrm{SNR})$ (about -0.44 dB at 20 dB SNR), silently biasing every subsequent level. The default (False) keeps the exact legacy broadband-RMS behaviour; enable it for noisy coupler recordings. |
+| `narrowband` | If True (requires `fs`), estimate the tone level with a coherent single-frequency (Goertzel) detector locked to the tone near `frequency` instead of the full-band RMS. This rejects broadband hum/noise in the reference take, which otherwise inflates the RMS and shrinks the factor by $-10 \log_{10}(1 + 1/\mathrm{SNR})$ (about -0.44 dB at 20 dB SNR), silently biasing every subsequent level. The default (False) keeps the exact legacy broadband-RMS behaviour; enable it for noisy coupler recordings. |
 
 **Returns:** Calibration factor (sensitivity multiplier).

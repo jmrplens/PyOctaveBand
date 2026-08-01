@@ -20,14 +20,14 @@ situation-invariant junction descriptor that feeds straight into the
 averaged* velocity level difference
 $\overline{D}_{v,ij} = \frac{1}{2}(D_{v,ij} + D_{v,ji})$ (Formula (11))
 this module forms, per one-third-octave band,
-$K_{ij} = \overline{D}_{v,ij} + 10 \lg(l_{ij} / \sqrt{a_i a_j})$
+$K_{ij} = \overline{D}_{v,ij} + 10 \log_{10}(l_{ij} / \sqrt{a_i a_j})$
 (Formula (13)) with the common-edge
 junction length `lij` and the equivalent absorption lengths `ai`, `aj` of
 the two elements. For lightweight, well-damped elements the equivalent
 absorption length collapses to the element area ($a_j = S_j / l_0$,
 $l_0 = 1$ m,
 Clause 3.8 Note 3) and Formula (13) reduces to Formula (14),
-$K_{ij} = \overline{D}_{v,ij} + 10 \lg(l_{ij} / \sqrt{S_i S_j})$.
+$K_{ij} = \overline{D}_{v,ij} + 10 \log_{10}(l_{ij} / \sqrt{S_i S_j})$.
 Because it uses the direction average,
 `Kij` is symmetric ($K_{ij} = K_{ji}$).
 
@@ -45,10 +45,10 @@ factor is $\eta = 2.2 / (f \, T_s)$ (Clause 7.3.1).
 
 **Overall flanking descriptors (Part 1, Clauses 3.2/3.3).** With airborne
 excitation the normalized flanking level difference is
-$D_{n,f} = L_1 - L_2 - 10 \lg(A/A_0)$ (Formula (4)); with a tapping
+$D_{n,f} = L_1 - L_2 - 10 \log_{10}(A/A_0)$ (Formula (4)); with a tapping
 machine on the
 source-room floor the normalized flanking impact level is
-$L_{n,f} = L_2 + 10 \lg(A/A_0)$ (Formula (5)), both with the reference
+$L_{n,f} = L_2 + 10 \log_{10}(A/A_0)$ (Formula (5)), both with the reference
 absorption
 area $A_0 = 10$ m². Their single-number ratings `Dn,f,w (C; Ctr)` and
 `Ln,f,w (CI)` follow ISO 717-1/-2 through the verified
@@ -245,7 +245,7 @@ Normalized flanking impact level `Ln,f` (Formula (5)).
 
 | Name | Description |
 | :--- | :--- |
-| `l_n_f` | $L_{n,f} = L_2 + 10 \lg(A/A_0)$ per band, in dB. |
+| `l_n_f` | $L_{n,f} = L_2 + 10 \log_{10}(A/A_0)$ per band, in dB. |
 | `rating` | Single-number `Ln,f,w` with `CI` (ISO 717-2), or `None` when the band count is neither 16 nor 5. |
 
 ### FlankingImpactLevelResult.plot()
@@ -319,7 +319,7 @@ Normalized flanking level difference `Dn,f` (airborne, Formula (4)).
 
 | Name | Description |
 | :--- | :--- |
-| `d_n_f` | $D_{n,f} = L_1 - L_2 - 10 \lg(A/A_0)$ per band, in dB. |
+| `d_n_f` | $D_{n,f} = L_1 - L_2 - 10 \log_{10}(A/A_0)$ per band, in dB. |
 | `rating` | Single-number `Dn,f,w` with `C`/`Ctr` (ISO 717-1), or `None` when the band count is neither 16 nor 5. |
 
 ### FlankingLevelDifferenceResult.plot()
@@ -460,7 +460,7 @@ normalized_flanking_impact_level(
 
 Normalized flanking impact level `Ln,f` (Formula (5)).
 
-$L_{n,f} = L_2 + 10 \lg(A/A_0)$ with the reference absorption
+$L_{n,f} = L_2 + 10 \log_{10}(A/A_0)$ with the reference absorption
 area $A_0 = 10$ m², from the receiving-room impact level with the
 tapping machine on the source-room floor.
 
@@ -496,7 +496,7 @@ normalized_flanking_level_difference(
 
 Normalized flanking level difference `Dn,f` (airborne, Formula (4)).
 
-$D_{n,f} = L_1 - L_2 - 10 \lg(A/A_0)$ with the reference absorption
+$D_{n,f} = L_1 - L_2 - 10 \log_{10}(A/A_0)$ with the reference absorption
 area $A_0 = 10$ m².
 
 **Parameters**
@@ -532,7 +532,7 @@ strong_coupling_satisfied(
 Strong-coupling applicability check (Part 1, Formula (15)).
 
 `Kij` is relevant only where
-$\overline{D}_{v,ij} \ge 3 - 10 \lg\frac{m_i f_{cj}}{m_j f_{ci}}$.
+$\overline{D}_{v,ij} \ge 3 - 10 \log_{10}\frac{m_i f_{cj}}{m_j f_{ci}}$.
 
 **Parameters**
 
@@ -623,13 +623,13 @@ vibration_reduction_index(
 
 Vibration reduction index `Kij` (Formula (13), or simplified (14)).
 
-$K_{ij} = \overline{D}_{v,ij} + 10 \lg(l_{ij} / \sqrt{a_i a_j})$.
+$K_{ij} = \overline{D}_{v,ij} + 10 \log_{10}(l_{ij} / \sqrt{a_i a_j})$.
 When the structural reverberation
 times and the frequencies are supplied, the equivalent absorption lengths
 `ai`, `aj` come from Formula (12) and the full Formula (13) is used.
 Otherwise the lightweight, well-damped simplification
 $a_j = S_j / l_0$ ($l_0 = 1$ m) applies and Formula (14),
-$K_{ij} = \overline{D}_{v,ij} + 10 \lg(l_{ij} / \sqrt{S_i S_j})$,
+$K_{ij} = \overline{D}_{v,ij} + 10 \log_{10}(l_{ij} / \sqrt{S_i S_j})$,
 is used.
 
 **Parameters**
@@ -676,7 +676,7 @@ Indirect `Kij` from the normalized flanking level difference.
 ISO 10848-1:2006, Clause 4.3.1 Note 2 (unnumbered):
 
 $$
-K_{ij} = D_{n,f} - \frac{R_i + R_j}{2} - 10 \lg\frac{\sqrt{a_i a_j}}{l_{ij}} + 10 \lg\frac{\sqrt{S_i S_j}}{A_0}
+K_{ij} = D_{n,f} - \frac{R_i + R_j}{2} - 10 \log_{10}\frac{\sqrt{a_i a_j}}{l_{ij}} + 10 \log_{10}\frac{\sqrt{S_i S_j}}{A_0}
 $$
 
 The standard warns this holds only for resonant-only transmission; measured
@@ -735,7 +735,7 @@ VibrationReductionResult.octave_bands() -> VibrationReductionResult
 
 Combine one-third-octave `Kij` into octave bands.
 
-$K_{ij,\mathrm{oct}} = -10 \lg\!\left[ \tfrac{1}{3} \sum 10^{-K_{ij}/10} \right]$
+$K_{ij,\mathrm{oct}} = -10 \log_{10}\!\left[ \tfrac{1}{3} \sum 10^{-K_{ij}/10} \right]$
 over each group of three
 one-third-octave bands (Part 2/3/4). Requires a band count that is a
 multiple of three and, for the frequency labels, that frequencies were

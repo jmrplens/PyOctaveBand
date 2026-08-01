@@ -8,16 +8,16 @@ realises the ISO 18405 terminology as the shared level primitives used by the
 ship-radiated-noise and pile-driving modules:
 
 * :func:`sound_pressure_level` -- the mean-square sound pressure level,
-  :math:`\mathrm{SPL} = 10 \lg(\langle p^2 \rangle / p_0^2)` dB re 1 µPa.
+  :math:`\mathrm{SPL} = 10 \log_{10}(\langle p^2 \rangle / p_0^2)` dB re 1 µPa.
 * :func:`sound_exposure_level` -- the time-integrated exposure level,
-  :math:`\mathrm{SEL} = 10 \lg\!\left( \int p^2 \, dt / E_0 \right)` dB re
+  :math:`\mathrm{SEL} = 10 \log_{10}\!\left( \int p^2 \, dt / E_0 \right)` dB re
   1 µPa²·s.
 * :func:`peak_sound_pressure_level` -- the zero-to-peak level
-  :math:`20 \lg(\max \lvert p \rvert / p_0)` dB re 1 µPa.
+  :math:`20 \log_{10}(\max \lvert p \rvert / p_0)` dB re 1 µPa.
 
 :func:`underwater_to_in_air_spl` / :func:`in_air_to_underwater_spl` convert a
 level between the two reference pressures (a
-:math:`20 \lg(20) \approx 26.02` dB reference
+:math:`20 \log_{10}(20) \approx 26.02` dB reference
 change, **not** an energy/intensity equivalence, which would additionally
 involve the media impedances). For background-noise subtraction of a measured
 level, reuse the ISO 3744 ``background_noise_correction`` (``K1``) helper.
@@ -70,7 +70,7 @@ def sound_pressure_level(
 ) -> float:
     r"""Mean-square sound pressure level (ISO 18405 / ISO 18406 Formula 7).
 
-    :math:`\mathrm{SPL} = 10 \lg(\langle p^2 \rangle / p_0^2)` dB, with ``p``
+    :math:`\mathrm{SPL} = 10 \log_{10}(\langle p^2 \rangle / p_0^2)` dB, with ``p``
     in pascals and the underwater reference :math:`p_0 = 1` µPa by default.
 
     :param pressure: Sound-pressure time series (1-D), in Pa.
@@ -94,7 +94,7 @@ def sound_exposure_level(
 ) -> float:
     r"""Sound exposure level (ISO 18405 / ISO 18406 Formulae 3-4).
 
-    :math:`\mathrm{SEL} = 10 \lg(E/E_0)` dB re 1 µPa²·s, with the sound
+    :math:`\mathrm{SEL} = 10 \log_{10}(E/E_0)` dB re 1 µPa²·s, with the sound
     exposure :math:`E = \int p^2 \, dt \approx (1/f_s) \sum p^2` over the
     record.
 
@@ -121,7 +121,7 @@ def peak_sound_pressure_level(
 ) -> float:
     r"""Zero-to-peak sound pressure level (ISO 18406 6.4.2.1.3).
 
-    :math:`L_{p,\mathrm{pk}} = 20 \lg(\max \lvert p \rvert / p_0)` dB re
+    :math:`L_{p,\mathrm{pk}} = 20 \log_{10}(\max \lvert p \rvert / p_0)` dB re
     1 µPa.
 
     :param pressure: Sound-pressure time series (1-D), in Pa.
@@ -141,7 +141,7 @@ def underwater_to_in_air_spl(level: float) -> float:
     r"""Re-reference an underwater SPL (re 1 µPa) to the in-air 20 µPa
     reference.
 
-    Subtracts :math:`20 \lg(20) \approx 26.02` dB. This is a
+    Subtracts :math:`20 \log_{10}(20) \approx 26.02` dB. This is a
     **reference-pressure change only** -- it is not the in-water/in-air
     intensity equivalence, which also involves the media characteristic
     impedances.
@@ -156,7 +156,7 @@ def in_air_to_underwater_spl(level: float) -> float:
     r"""Re-reference an in-air SPL (re 20 µPa) to the underwater 1 µPa
     reference.
 
-    Adds :math:`20 \lg(20) \approx 26.02` dB (a reference-pressure change
+    Adds :math:`20 \log_{10}(20) \approx 26.02` dB (a reference-pressure change
     only; see :func:`underwater_to_in_air_spl`).
 
     :param level: Level in dB re 20 µPa.

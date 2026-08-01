@@ -136,7 +136,7 @@ class RadiationEfficiencyResult:
 
     @property
     def radiation_index(self) -> np.ndarray:
-        r"""Radiation index :math:`10 \lg(\sigma)` per band, in dB."""
+        r"""Radiation index :math:`10 \log_{10}(\sigma)` per band, in dB."""
         sigma = np.asarray(self.radiation_efficiency, dtype=np.float64)
         return np.asarray(10.0 * np.log10(sigma), dtype=np.float64)
 

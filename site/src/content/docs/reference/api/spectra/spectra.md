@@ -168,7 +168,7 @@ $G_{yy} = G_{vv} + G_{nn}$
 | `noise_psd` | Noise output spectrum $\hat{G}_{nn} = (1 - \hat{\gamma}^2_{xy}) \hat{G}_{yy}$. |
 | `coherence` | Ordinary coherence $\hat{\gamma}^2_{xy}(f) \in [0, 1]$. |
 | `snr` | Spectral signal-to-noise ratio $\hat{\gamma}^2/(1 - \hat{\gamma}^2)$ ($\infty$ at $\hat{\gamma}^2 = 1$). |
-| `snr_db` | $10 \lg$ of `snr`, in dB. |
+| `snr_db` | $10 \log_{10}$ of `snr`, in dB. |
 | `random_error` | Normalized random error of $\hat{G}_{vv}$, $\varepsilon = (2 - \gamma^2_{xy})^{1/2} / (\lvert \gamma_{xy} \rvert \sqrt{n_d})$ (Eq. 9.73), with the measured coherence in place of the true value. |
 | `snr_random_error` | Normalized random error of the SNR, $\varepsilon = \sqrt{2} / (\lvert \gamma_{xy} \rvert \sqrt{n_d})$, first-order propagation of the coherence random error of Eq. 9.82 through $\gamma^2/(1 - \gamma^2)$. |
 | `coherence_bias` | First-order bias of the coherence estimate, $b[\hat{\gamma}^2] \approx (1 - \gamma^2)^2 / n_d$ (Eq. 9.75). |
@@ -709,8 +709,8 @@ window is sampled DFT-even (periodic), exactly as
 | `taps` | The window samples `w[m]` (DFT-even). |
 | `coherent_gain` | Normalized DC gain $\sum w / n$ (1 for rectangular); the amplitude a bin-centered tone is scaled by before correction. |
 | `enbw_bins` | Equivalent noise bandwidth $n \sum w^2 / \left( \sum w \right)^2$, in bins: the width of the ideal rectangular filter that would pass the same white-noise power (1 rectangular, 1.5 Hann, 1987/1458 Hamming). |
-| `scalloping_loss_db` | Attenuation of a tone midway between two bins, $-20 \lg \lvert W(1/2)/W(0) \rvert$, in dB (positive). |
-| `worst_case_processing_loss_db` | Scalloping loss plus the ENBW processing loss $10 \lg(\mathrm{ENBW})$, in dB: the worst-case reduction in output signal-to-noise ratio for a tone in white noise. |
+| `scalloping_loss_db` | Attenuation of a tone midway between two bins, $-20 \log_{10} \lvert W(1/2)/W(0) \rvert$, in dB (positive). |
+| `worst_case_processing_loss_db` | Scalloping loss plus the ENBW processing loss $10 \log_{10}(\mathrm{ENBW})$, in dB: the worst-case reduction in output signal-to-noise ratio for a tone in white noise. |
 | `highest_sidelobe_db` | Level of the highest sidelobe relative to the main lobe, in dB (negative; -13.3 rectangular, -31.5 Hann). |
 | `mainlobe_width_3db_bins` | Two-sided -3 dB width of the main lobe, in bins. |
 

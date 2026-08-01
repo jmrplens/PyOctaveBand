@@ -12,7 +12,7 @@ level** and then by an **equivalent monopole source level** referred to a point
 source below the sea surface:
 
 * [`radiated_noise_level`](/phonometry/reference/api/underwater/ship-radiated-noise/#radiated_noise_level) --
-  $L_{\mathrm{RN}} = 20 \lg(p_{\mathrm{rms}}/p_0) + 20 \lg(r/r_0)$
+  $L_{\mathrm{RN}} = 20 \log_{10}(p_{\mathrm{rms}}/p_0) + 20 \log_{10}(r/r_0)$
   dB re 1 µPa·m (ISO 17208-1), the level of the product of the far-field RMS
   pressure and the source distance.
 * [`monopole_source_level`](/phonometry/reference/api/underwater/ship-radiated-noise/#monopole_source_level) -- converts `LRN` to the source level
@@ -77,7 +77,7 @@ Equivalent monopole source level from radiated noise level
 $L_s = L_{\mathrm{RN}} + \Delta L$ with the surface correction
 
 $$
-\Delta L = -10 \lg \frac{2 u^4 + 14 u^2}{14 + 2 u^2 + u^4} \tag{Formula 3}
+\Delta L = -10 \log_{10} \frac{2 u^4 + 14 u^2}{14 + 2 u^2 + u^4} \tag{Formula 3}
 $$
 
 where $u = k d_s$, $k = 2 \pi f/c$ and the nominal source
@@ -108,7 +108,7 @@ radiated_noise_level(rms_pressure: float, distance: float) -> float
 
 Radiated noise level `LRN` (ISO 17208-1), dB re 1 µPa·m.
 
-$L_{\mathrm{RN}} = 20 \lg(p_{\mathrm{rms}}/p_0) + 20 \lg(r/r_0)$ --
+$L_{\mathrm{RN}} = 20 \log_{10}(p_{\mathrm{rms}}/p_0) + 20 \log_{10}(r/r_0)$ --
 the level of the product of the far-field RMS sound pressure and the
 source distance, referred to 1 µPa·m.
 

@@ -768,7 +768,7 @@ def fan_sound_power(
 
     .. math::
 
-       L_W = K_F + 10 \lg(Q_F / Q_{REF}) + 10 \lg(P_F / P_{REF})
+       L_W = K_F + 10 \log_{10}(Q_F / Q_{REF}) + 10 \log_{10}(P_F / P_{REF})
        + C_{EFF} + C_{BFI}
 
     with the spectral constant ``K_F`` of Long Table 13.5 (one row per fan
@@ -1095,9 +1095,9 @@ def split_loss(
 
     .. math::
 
-       R = -10 \lg\!\left[ 1
+       R = -10 \log_{10}\!\left[ 1
        - \left( \frac{\sum S_i - S_m}{\sum S_i + S_m} \right)^2 \right]
-       - 10 \lg\!\left( \frac{S_i}{\sum S_i} \right)
+       - 10 \log_{10}\!\left( \frac{S_i}{\sum S_i} \right)
 
     Long prints this as a negative level change (a 25 per cent area split shows
     as -6 dB in his worked sheet); this function returns it as a positive
@@ -1133,8 +1133,8 @@ def end_reflection_loss_closed_form(
 ) -> HvacSpectrumResult:
     r"""Duct end reflection loss in closed form (Long Eqs. 14.14-14.15, Reynolds).
 
-    :math:`R = 10 \lg[1 + (c / (\pi f d))^{1.88}]` for a duct terminated in
-    free space and :math:`R = 10 \lg[1 + (0.8 c / (\pi f d))^{1.88}]` for one
+    :math:`R = 10 \log_{10}[1 + (c / (\pi f d))^{1.88}]` for a duct terminated in
+    free space and :math:`R = 10 \log_{10}[1 + (0.8 c / (\pi f d))^{1.88}]` for one
     terminated flush with
     a wall, ``d`` being the duct diameter (use the equivalent diameter
     :func:`equivalent_diameter` for a rectangular duct, Eq. 14.16). The
@@ -1195,7 +1195,7 @@ def splitter_silencer_insertion_loss(
 
     .. math::
 
-       \mathrm{IL}_{tot} = -10 \lg\!\left[ \frac{1}{N}
+       \mathrm{IL}_{tot} = -10 \log_{10}\!\left[ \frac{1}{N}
        \sum_i 10^{-\mathrm{IL}_i / 10} \right] \tag{8.241}
 
     which is the energy average over the airways: when they are identical the
@@ -1267,7 +1267,7 @@ def silencer_self_noise(
 
     .. math::
 
-       L_W = 55 \lg(V / V_0) + 10 \lg N + 10 \lg(H / H_0) - 45
+       L_W = 55 \log_{10}(V / V_0) + 10 \log_{10} N + 10 \log_{10}(H / H_0) - 45
 
     with ``V`` the velocity in the splitter airway (:math:`V_0 = 1` m/s),
     ``N`` the number of air passages and ``H`` the silencer height or, for a
@@ -1280,7 +1280,7 @@ def silencer_self_noise(
     silencer ends up *making* the noise it was bought to remove.
 
     Manufacturer self-noise data is measured on a 600 x 600 mm face, so a
-    published spectrum has to be corrected by :math:`10 \lg(S / S_0)` for
+    published spectrum has to be corrected by :math:`10 \log_{10}(S / S_0)` for
     the actual face area before it is used; this estimate needs no such
     correction because the face size enters through ``N`` and ``H``.
 
@@ -1333,7 +1333,7 @@ def diffuser_sound_power(
 
     .. math::
 
-       L_W = 10 \lg S_G + 30 \lg \xi + 60 \lg U_G - 31.3
+       L_W = 10 \log_{10} S_G + 30 \log_{10} \xi + 60 \log_{10} U_G - 31.3
 
     with ``S_G`` the face area of the device (ft2),
     :math:`U_G = Q / (60 S_G)` the approach velocity (ft/s) and
@@ -1364,7 +1364,7 @@ def diffuser_sound_power(
     left, which is why the terminal device usually sets the room criterion in
     the mid and high bands.
 
-    Several identical devices serving the same room add :math:`10 \lg n`,
+    Several identical devices serving the same room add :math:`10 \log_{10} n`,
     which is what ``count`` applies.
 
     :param frequencies: Octave-band centres, Hz; ``None`` uses
@@ -1492,10 +1492,10 @@ def room_effect(
     The last step of a duct-path calculation turns the sound power arriving at
     the terminal device into a sound pressure level at the listener, through
     the steady-state room relation
-    :math:`L_p = L_W + 10 \lg[Q / (4 \pi r^2) + 4 / R]` (Long Eq. 14.40; Bies
+    :math:`L_p = L_W + 10 \log_{10}[Q / (4 \pi r^2) + 4 / R]` (Long Eq. 14.40; Bies
     Eq. (6.43), :func:`phonometry.room.steady_state_spl`). This function
     returns the *attenuation*, the positive number
-    :math:`-10 \lg[Q / (4 \pi r^2) + 4 / R]`, so it drops into a duct-path
+    :math:`-10 \log_{10}[Q / (4 \pi r^2) + 4 / R]`, so it drops into a duct-path
     cascade beside every other loss; Long's worked sheets print it as the
     negative level change. A ceiling diffuser radiates into a half space,
     hence the default :math:`Q = 2`.

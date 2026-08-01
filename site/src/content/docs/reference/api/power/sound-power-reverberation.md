@@ -17,7 +17,7 @@ room, with the Sabine absorption area and the speed of sound `c` in m/s
 (ISO 3741:2010 clause 9.1.4, Eq. 20):
 
 $$
-L_p(\text{ST}) = 10 \lg\!\left[ \frac{1}{N_M} \sum_i 10^{0.1 L_{pi}} \right] \tag{Eq. 16}
+L_p(\text{ST}) = 10 \log_{10}\!\left[ \frac{1}{N_M} \sum_i 10^{0.1 L_{pi}} \right] \tag{Eq. 16}
 $$
 
 $$
@@ -29,21 +29,21 @@ c = 20.05 \sqrt{273 + \theta}
 $$
 
 $$
-L_W = L_p(\text{ST}) + 10 \lg\frac{A}{A_0} + 4.34 \frac{A}{S} + 10 \lg\!\left( 1 + \frac{S c}{8 V f} \right) + C_1 + C_2 - 6 \tag{Eq. 20}
+L_W = L_p(\text{ST}) + 10 \log_{10}\frac{A}{A_0} + 4.34 \frac{A}{S} + 10 \log_{10}\!\left( 1 + \frac{S c}{8 V f} \right) + C_1 + C_2 - 6 \tag{Eq. 20}
 $$
 
-$10 \lg(1 + Sc/(8Vf))$ is the Waterhouse boundary correction (energy
+$10 \log_{10}(1 + Sc/(8Vf))$ is the Waterhouse boundary correction (energy
 stored near the room boundaries); it vanishes as the frequency grows. `C1`
 (Eq. 20, reference-quantity correction) and `C2` (radiation-impedance
 correction) carry the result to the reference meteorological conditions of
 clause 4 (23.0 C, 101.325 kPa, 50 %), per clause 9.1.4:
 
 $$
-C_1 = -10 \lg\frac{p_s}{p_{s0}} + 5 \lg\frac{273.15 + \theta}{314}
+C_1 = -10 \log_{10}\frac{p_s}{p_{s0}} + 5 \log_{10}\frac{273.15 + \theta}{314}
 $$
 
 $$
-C_2 = -10 \lg\frac{p_s}{p_{s0}} + 15 \lg\frac{273.15 + \theta}{296}
+C_2 = -10 \log_{10}\frac{p_s}{p_{s0}} + 15 \log_{10}\frac{273.15 + \theta}{296}
 $$
 
 The **comparison method** replaces the absorption-area terms by a reference
@@ -84,7 +84,7 @@ Result of an ISO 3741:2010 reverberation-room sound power determination.
 comparison method). `mean_pressure_level` is the mean corrected room level
 `Lp(ST)` (Eq. 16). For the direct method `absorption_area` is the Sabine
 equivalent absorption area `A` per band and `waterhouse_correction` the
-boundary term $10 \lg(1 + Sc/(8Vf))$; both are `NaN` for the
+boundary term $10 \log_{10}(1 + Sc/(8Vf))$; both are `NaN` for the
 comparison method. `background_correction` is the effective per-band
 background correction `K1`: with per-position input each position is
 corrected by its own `K1i` (Eq. 14/15) before the energy average
@@ -233,13 +233,13 @@ column per band) that is energy-averaged over positions (Eq. 16). The sound
 power level in each band follows Eq. (20):
 
 $$
-L_W = L_p(\text{ST}) + 10 \lg\frac{A}{A_0} + 4.34 \frac{A}{S} + 10 \lg\!\left( 1 + \frac{S c}{8 V f} \right) + C_1 + C_2 - 6
+L_W = L_p(\text{ST}) + 10 \log_{10}\frac{A}{A_0} + 4.34 \frac{A}{S} + 10 \log_{10}\!\left( 1 + \frac{S c}{8 V f} \right) + C_1 + C_2 - 6
 $$
 
 with the Sabine equivalent absorption area
 $A = (55.26/c)(V/T_{60})$ and the speed of sound
 $c = 20.05 \sqrt{273 + \theta}$. The Waterhouse term
-$10 \lg(1 + Sc/(8Vf))$ needs the band mid-frequencies, so
+$10 \log_{10}(1 + Sc/(8Vf))$ needs the band mid-frequencies, so
 `frequencies` is required. `C1` and `C2` carry the result to the
 reference meteorological conditions (clause 4).
 

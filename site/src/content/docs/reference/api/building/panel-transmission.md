@@ -21,7 +21,7 @@ the transmission coefficient of an infinite limp panel gives the normal- and
 field-incidence transmission loss:
 
 $$
-\mathrm{TL}_{\mathrm{normal}} = 10 \lg\!\left[ 1 + \left( \frac{\pi f m''}{\rho_0 c_0} \right)^{2} \right]
+\mathrm{TL}_{\mathrm{normal}} = 10 \log_{10}\!\left[ 1 + \left( \frac{\pi f m''}{\rho_0 c_0} \right)^{2} \right]
 $$
 
 $$
@@ -39,14 +39,14 @@ the field-incidence mass law holds; from the coincidence frequency `fc`
 upwards the loss factor `eta` controls the transmission (Eq. 7.44):
 
 $$
-\mathrm{TL} = 10 \lg\!\left[ 1 + \left( \frac{\pi f m''}{\rho_0 c_0} \right)^{2} \right] + 10 \lg\frac{2 \eta f}{\pi f_c}
+\mathrm{TL} = 10 \log_{10}\!\left[ 1 + \left( \frac{\pi f m''}{\rho_0 c_0} \right)^{2} \right] + 10 \log_{10}\frac{2 \eta f}{\pi f_c}
 $$
 
 and between $f_c/2$ and $f_c$ the curve is a straight line on
 $\mathrm{TL}$ versus $\log_{10} f$. The coincidence dip at
-$f_c$ sits $10 \lg(2\eta/\pi)$ below the extrapolated mass law
+$f_c$ sits $10 \log_{10}(2\eta/\pi)$ below the extrapolated mass law
 (Bies design-chart point B,
-$\mathrm{TL} = 20 \lg(f_c m'') + 10 \lg\eta - 44$).
+$\mathrm{TL} = 20 \log_{10}(f_c m'') + 10 \log_{10}\eta - 44$).
 
 **Double wall (Bies 7.2.6, Eq. 7.62-7.64).** Two leaves `m1`, `m2` separated
 by a gap `d` behave as a mass-spring-mass system. Below the resonance
@@ -59,7 +59,7 @@ $$
 $$
 
 $$
-\mathrm{TL} = \mathrm{TL}_1 + \mathrm{TL}_2 + 20 \lg(2 k d), \qquad f_0 < f < f_l, \quad k = 2 \pi f / c_0
+\mathrm{TL} = \mathrm{TL}_1 + \mathrm{TL}_2 + 20 \log_{10}(2 k d), \qquad f_0 < f < f_l, \quad k = 2 \pi f / c_0
 $$
 
 $$
@@ -215,8 +215,8 @@ Sound reduction index of a double wall (Bies 7.2.6, Eq. 7.64).
 Piecewise Sharp model: below the mass-spring-mass resonance `f0` the pair
 behaves as the mass law of the combined mass; between `f0` and the
 limiting frequency $f_l = c_0/(2 \pi d)$ the two mass laws add plus
-$20 \lg(2 k d)$; above `f_l` they add plus 6 dB. The curve is
-continuous at `f_l` ($20 \lg(2 k d) = 6$ there).
+$20 \log_{10}(2 k d)$; above `f_l` they add plus 6 dB. The curve is
+continuous at `f_l` ($20 \log_{10}(2 k d) = 6$ there).
 
 Ties or mounts bridging the cavity stiffen it (Hopkins Eq. 4.89), pushing
 `f0` up and extending the combined-mass branch; pass their stiffness per
@@ -285,7 +285,7 @@ mass_law_transmission_loss(
 
 Mass-law transmission loss of a limp panel (Bies Eq. 7.40/7.42).
 
-$\mathrm{TL}_{\mathrm{normal}} = 10 \lg[1 + (\pi f m'' / \rho_0 c_0)^{2}]$; the field-incidence value subtracts the
+$\mathrm{TL}_{\mathrm{normal}} = 10 \log_{10}[1 + (\pi f m'' / \rho_0 c_0)^{2}]$; the field-incidence value subtracts the
 band correction of [`field_incidence_correction`](/phonometry/reference/api/building/panel-transmission/#field_incidence_correction),
 or the explicit *field_correction* when one is given (Norton & Karczub
 Eq. 3.106 uses a flat 5 dB, the line [`plateau_transmission_loss`](/phonometry/reference/api/building/panel-transmission/#plateau_transmission_loss)
@@ -584,7 +584,7 @@ material (Norton & Karczub Table 3.1, tabulated in
 [`PLATEAU_MATERIALS`](/phonometry/reference/api/building/panel-transmission/#plateau_materials)):
 
 1. the **field-incidence mass law**
-   $\mathrm{TL} = 10 \lg[1 + (\pi f m''/\rho_0 c_0)^{2}] - 5$
+   $\mathrm{TL} = 10 \log_{10}[1 + (\pi f m''/\rho_0 c_0)^{2}] - 5$
    (Eqs. 3.104/3.106), rising 6 dB per octave;
 2. a horizontal **coincidence plateau** at the material's plateau height;
    point **A** is where the mass-law line reaches it;
@@ -687,7 +687,7 @@ With `coincidence_model="cremer"` the region above `fc` follows Cremer's
 empirical relationship instead (Norton & Karczub Eq. 3.110),
 
 $$
-\mathrm{TL} = \mathrm{TL}_0 + 10 \lg(f/f_c - 1) + 10 \lg\eta - 2~\text{dB}
+\mathrm{TL} = \mathrm{TL}_0 + 10 \log_{10}(f/f_c - 1) + 10 \log_{10}\eta - 2~\text{dB}
 $$
 
 which also rises at 10 dB per octave far above coincidence but starts from

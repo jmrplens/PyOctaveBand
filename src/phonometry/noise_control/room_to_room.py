@@ -25,11 +25,11 @@ back, and arrive at Equation (4.101):
 .. math::
 
    \mathrm{NR} = \mathrm{TL} -
-   10 \lg\!\left[\frac{S_w}{S_2 \alpha_2 + \tau S_w}\right],
+   10 \log_{10}\!\left[\frac{S_w}{S_2 \alpha_2 + \tau S_w}\right],
 
 with :math:`\mathrm{NR} = L_{p1} - L_{p2}` the noise reduction between the two
 reverberant
-fields, :math:`\mathrm{TL} = 10 \lg(1/\tau)` the transmission loss of the
+fields, :math:`\mathrm{TL} = 10 \log_{10}(1/\tau)` the transmission loss of the
 partition, ``S_w``
 the area of the partition and ``S_2 alpha_2`` the equivalent absorption area of
 the receiving room. The ``tau S_w`` term is the power the partition itself
@@ -46,7 +46,7 @@ and air leaks, which ``flanking_penalty`` applies as an explicit debit.
 **The source-room level.** In a plant room the receiver of interest is the
 partition, not a point near the machine, so the level that drives the
 transmission is the reverberant field alone,
-:math:`L_{p1} = L_W + 10 \lg(4 / R_1)`. That is
+:math:`L_{p1} = L_W + 10 \log_{10}(4 / R_1)`. That is
 :func:`phonometry.room.steady_state_spl` at ``distance=None``, and this module
 delegates to it rather than repeating it. Norton's Table 4.5 adds the choice of
 *sound power model*: a machine standing in the intersection of a floor and a
@@ -179,7 +179,7 @@ class RoomToRoomResult:
         .. math::
 
            \mathrm{TL}_{req} = L_{p1} - L_{p2,\mathrm{target}}
-           + 10 \lg(S_w / S_2 \alpha_2) + \text{penalty},
+           + 10 \log_{10}(S_w / S_2 \alpha_2) + \text{penalty},
 
         with :math:`L_{p2,\mathrm{target}}` the design criterion curve. The
         ``tau S_w`` term is
@@ -351,8 +351,8 @@ def room_to_room_transmission(
     :param source_model: Sound power model of Norton Table 4.5:
         ``"constant_power"`` (default, the radiated power does not depend on the
         source position), ``"constant_volume"`` (the conservative upper bound,
-        the power rises by :math:`10 \lg Q`) or ``"constant_pressure"`` (the
-        lower bound, it falls by :math:`10 \lg Q`).
+        the power rises by :math:`10 \log_{10} Q`) or ``"constant_pressure"`` (the
+        lower bound, it falls by :math:`10 \log_{10} Q`).
     :param include_partition_transmission: When ``True`` the ``tau S_w`` term of
         Equation (4.101) is added to the receiving-room absorption, with
         :math:`\tau = 10^{-\mathrm{TL}/10}`. Default ``False``, the form hand

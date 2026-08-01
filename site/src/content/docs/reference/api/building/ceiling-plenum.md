@@ -56,19 +56,19 @@ $$
 $$
 
 $$
-R_{cl} = R_S + R_R - 10 \lg\!\left[ \frac{\epsilon^2 L_R}{4 h} \right] \tag{Eq. 9.20}
+R_{cl} = R_S + R_R - 10 \log_{10}\!\left[ \frac{\epsilon^2 L_R}{4 h} \right] \tag{Eq. 9.20}
 $$
 
 with $\epsilon = 1$ for totally absorbing plenum sidewalls and
 $\epsilon = 2$ for totally reflecting ones. Referred to the partition
-area instead of the ceiling, $R_{cl,p} = R_{cl} + 10 \lg(H_S/L_S)$
-(Eq. (9.13)). A deep plenum helps (the $-10 \lg$ term shrinks), a long
+area instead of the ceiling, $R_{cl,p} = R_{cl} + 10 \log_{10}(H_S/L_S)$
+(Eq. (9.13)). A deep plenum helps (the $-10 \log_{10}$ term shrinks), a long
 room hurts, and doubling the tile insulation helps twice over because
 $R_S$ and $R_R$ both appear.
 
 **The measured quantity (ISO 140-9:1985 clause 3.3, ISO 10848-2).** A ceiling
 is not rated by $R_{cl}$ but by the **normalized ceiling attenuation**
-$D_{n,c} = D - 10 \lg(A/A_0)$, with `A` the receiving-room equivalent
+$D_{n,c} = D - 10 \log_{10}(A/A_0)$, with `A` the receiving-room equivalent
 absorption area and the reference $A_0 = 10$ m2. The laboratory has two
 rooms of at least 50 m3 whose volumes differ by at least 10 %, a dividing
 wall tapered to at most 100 mm at the top, and a plenum 650 mm to 760 mm deep
@@ -77,7 +77,7 @@ lining absorption $\alpha_s \ge 0.65$ at 125 Hz and $\ge 0.80$
 from 250 Hz to 4000 Hz, and requires $\alpha < 0.10$ on the other
 sidewall and on the plenum ceiling. The North American counterpart,
 ASTM E1414, uses $A_0 = 12$ m2, so an ASTM value runs about
-$10 \lg(12/10) = 0.79$ dB higher than the ISO one.
+$10 \log_{10}(12/10) = 0.79$ dB higher than the ISO one.
 
 **Single number.** ISO rates $D_{n,c}$ with the ISO 717-1 curve
 ([`phonometry.weighted_rating`](/phonometry/reference/api/building/insulation/#weighted_rating), giving `Dn,c,w`); ASTM E1414 rates it
@@ -204,7 +204,7 @@ normalized_ceiling_attenuation(
 
 Normalized ceiling attenuation `Dn,c` (ISO 140-9:1985, clause 3.3).
 
-$D_{n,c} = (L_1 - L_2) - 10 \lg(A/A_0)$, the level difference
+$D_{n,c} = (L_1 - L_2) - 10 \log_{10}(A/A_0)$, the level difference
 between two rooms sharing a common ceiling plenum, normalized to a
 reference equivalent absorption area. ISO 140-9 and ISO 10848-2 use
 $A_0 = 10$ m2; ASTM E1414 uses $A_0 = 12$ m2, which makes an
@@ -240,7 +240,7 @@ partition_referenced_reduction_index(
 Refer `Rcl` to the partition area instead of the ceiling
 (Eq. (9.13)).
 
-$R_{cl,p} = R_{cl} + 10 \lg(H_S/L_S)$, with `HS` the height and
+$R_{cl,p} = R_{cl} + 10 \log_{10}(H_S/L_S)$, with `HS` the height and
 `LS` the length of the sending room. Referring every path to one common
 area (the partition) is what lets the ceiling path be added to the direct
 path as transmission factors.
@@ -284,7 +284,7 @@ Ceiling/plenum flanking reduction index `Rcl` (Vigran
 Eqs. (9.18)-(9.20)).
 
 With no attenuation coefficients this is the compact undamped form
-$R_{cl} = R_S + R_R - 10 \lg[\epsilon^2 L_R/(4h)]$ (Eq. (9.20)).
+$R_{cl} = R_S + R_R - 10 \log_{10}[\epsilon^2 L_R/(4h)]$ (Eq. (9.20)).
 Supplying the plenum power attenuation coefficients $m_S$ and
 $m_R$ (Eq. (9.16), $m = -2 \operatorname{Im}\{k'\}$ of the
 lined duct) switches to the full Eq. (9.18), whose receiving side carries
@@ -352,7 +352,7 @@ Ceiling/plenum flanking path of a suspended ceiling (Vigran 9.2.3).
 | `transmission_factor` | The transmission factor `tau_cl` per band. |
 | `reduction_index_source` | Source-side ceiling `RS` per band, in dB. |
 | `reduction_index_receiving` | Receiving-side ceiling `RR` per band, in dB. |
-| `geometry_term` | The geometry penalty $10 \lg[\epsilon^2 L_R/(4h)]$, in dB, or `None` for the attenuated model, whose penalty is per band. |
+| `geometry_term` | The geometry penalty $10 \log_{10}[\epsilon^2 L_R/(4h)]$, in dB, or `None` for the attenuated model, whose penalty is per band. |
 | `penalty` | The per-band difference $R_S + R_R - R_{cl}$, in dB: what the plenum takes off the sum of the two ceilings. |
 | `model` | `"undamped"` (Eq. (9.20)) or `"attenuated"` (Eq. (9.18)). |
 | `epsilon` | The sidewall constant `eps` (1 absorbing, 2 reflecting). |

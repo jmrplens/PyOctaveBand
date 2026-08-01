@@ -10,7 +10,7 @@ difference of the impulse (clause 7):
 
 .. math::
 
-   P = 3 \lg(\text{onset rate}) + 2 \lg(\text{level difference})
+   P = 3 \log_{10}(\text{onset rate}) + 2 \log_{10}(\text{level difference})
    \tag{Formula 1}
 
 From the impulse with the highest prominence over a 30-minute period, a
@@ -174,8 +174,8 @@ def predicted_prominence(
 ) -> np.ndarray:
     r"""Predicted prominence ``P`` of an impulse (NT ACOU 112, clause 7).
 
-    :math:`P = 3 \lg(\text{onset rate}) + 2 \lg(\text{level difference})`
-    (Formula 1), with :math:`\lg`
+    :math:`P = 3 \log_{10}(\text{onset rate}) + 2 \log_{10}(\text{level difference})`
+    (Formula 1), with :math:`\log_{10}`
     the base-10 logarithm. Both quantities are read from the A-weighted,
     time-weighting-F level history: the onset rate is the slope of the onset in
     dB/s and the level difference is the level rise over the onset in dB
@@ -294,7 +294,7 @@ def rating_level(
 
     .. math::
 
-       L_{Ar,T} = 10 \lg\!\left[ \frac{1}{T}
+       L_{Ar,T} = 10 \log_{10}\!\left[ \frac{1}{T}
        \sum_N \Delta t_N \, 10^{(L_{Aeq,N} + K_{I,N})/10} \right]
 
     :param laeq: Equivalent level ``LAeq,N`` of each sub-interval, in dB.

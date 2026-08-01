@@ -21,7 +21,7 @@ with the percentile loudness `N5` in sone and the two loudness-weighted
 terms
 
 $$
-w_S = (S - 1.75) \cdot 0.25 \cdot \lg(N_5 + 10) \quad \text{for } S > 1.75~\text{acum, else } 0 \tag{Eq. 16.3}
+w_S = (S - 1.75) \cdot 0.25 \cdot \log_{10}(N_5 + 10) \quad \text{for } S > 1.75~\text{acum, else } 0 \tag{Eq. 16.3}
 $$
 
 $$

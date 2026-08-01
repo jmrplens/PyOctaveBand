@@ -1,5 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""
+r"""
 Programme loudness and true-peak level (ITU-R BS.1770-5, EBU R 128).
 
 Implements the objective multichannel loudness measurement algorithm of

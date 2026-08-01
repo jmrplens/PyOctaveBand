@@ -23,7 +23,7 @@ octave-band attenuation, itself a sum of physical mechanisms:
 
 Implemented here are the four general terms of clause 7:
 
-* ``Adiv`` geometrical divergence, :math:`20 \lg(d/d_0) + 11` (Eq. (7));
+* ``Adiv`` geometrical divergence, :math:`20 \log_{10}(d/d_0) + 11` (Eq. (7));
 * ``Aatm`` atmospheric absorption, :math:`\alpha d` (Eq. (8)) with ``alpha``
   the ISO 9613-1 coefficient supplied by :mod:`phonometry.air_absorption`;
 * ``Agr`` ground effect, both the general per-region method of 7.3.1 with the
@@ -103,7 +103,7 @@ class Barrier:
         and receiver passes *above* the top edge: ISO 9613-2:1996 (text after
         Eq. (16)) then gives the path difference ``z`` a negative sign, and
         Eq. (14) is still evaluated (with :math:`K_{met} = 1`, Eq. (18)), so
-        ``Dz`` falls continuously from :math:`10 \lg 3 = 4.8` dB at grazing
+        ``Dz`` falls continuously from :math:`10 \log_{10} 3 = 4.8` dB at grazing
         to 0 for deeper geometries. The edge distances stay the unsigned
         geometric lengths; only the sign convention of ``z`` changes.
     """
@@ -282,9 +282,9 @@ def geometric_divergence(distance: float) -> float:
 
     .. math::
 
-       A_{div} = 20 \lg(d/d_0) + 11~\text{dB}, \qquad d_0 = 1~\text{m}
+       A_{div} = 20 \log_{10}(d/d_0) + 11~\text{dB}, \qquad d_0 = 1~\text{m}
 
-    The ``+11`` (:math:`= 10 \lg 4\pi`) sets the sound pressure level at the
+    The ``+11`` (:math:`= 10 \log_{10} 4\pi`) sets the sound pressure level at the
     reference distance :math:`d_0 = 1` m from an omnidirectional point source
     (Note 7).
 
@@ -525,7 +525,7 @@ def directivity_omega(
 
     .. math::
 
-       D_\Omega = 10 \lg\!\left\{ 1 +
+       D_\Omega = 10 \log_{10}\!\left\{ 1 +
        \frac{d_p^2 + (h_s - h_r)^2}{d_p^2 + (h_s + h_r)^2} \right\}
        ~\text{dB}
 
@@ -557,7 +557,7 @@ def barrier_attenuation(
 
     .. math::
 
-       D_z = 10 \lg\!\left[ 3 + \frac{C_2}{\lambda} \, C_3 \, z \, K_{met}
+       D_z = 10 \log_{10}\!\left[ 3 + \frac{C_2}{\lambda} \, C_3 \, z \, K_{met}
        \right] ~\text{dB}
 
     with :math:`C_2 = 20` (or 40 when ground reflections are handled by image
@@ -568,7 +568,7 @@ def barrier_attenuation(
     is limited to 20 dB (single) or 25 dB (double). When the line of sight
     passes above the top edge (``Barrier(line_of_sight_clear=True)``) ``z``
     takes a negative sign (ISO 9613-2:1996, text after Eq. (16)) and Eq. (14)
-    still applies: ``Dz`` falls continuously from :math:`10 \lg 3 = 4.8` dB
+    still applies: ``Dz`` falls continuously from :math:`10 \log_{10} 3 = 4.8` dB
     at grazing (:math:`z = 0`) towards 0 as the clearance deepens, clamped at
     0 (the logarithm's argument is floored at 1 -- a barrier below the sight
     line never amplifies).

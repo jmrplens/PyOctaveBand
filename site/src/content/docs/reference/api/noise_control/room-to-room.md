@@ -28,12 +28,12 @@ partition against the power the receiving room absorbs and the power that leaks
 back, and arrive at Equation (4.101):
 
 $$
-\mathrm{NR} = \mathrm{TL} - 10 \lg\!\left[\frac{S_w}{S_2 \alpha_2 + \tau S_w}\right],
+\mathrm{NR} = \mathrm{TL} - 10 \log_{10}\!\left[\frac{S_w}{S_2 \alpha_2 + \tau S_w}\right],
 $$
 
 with $\mathrm{NR} = L_{p1} - L_{p2}$ the noise reduction between the two
 reverberant
-fields, $\mathrm{TL} = 10 \lg(1/\tau)$ the transmission loss of the
+fields, $\mathrm{TL} = 10 \log_{10}(1/\tau)$ the transmission loss of the
 partition, `S_w`
 the area of the partition and `S_2 alpha_2` the equivalent absorption area of
 the receiving room. The `tau S_w` term is the power the partition itself
@@ -50,7 +50,7 @@ and air leaks, which `flanking_penalty` applies as an explicit debit.
 **The source-room level.** In a plant room the receiver of interest is the
 partition, not a point near the machine, so the level that drives the
 transmission is the reverberant field alone,
-$L_{p1} = L_W + 10 \lg(4 / R_1)$. That is
+$L_{p1} = L_W + 10 \log_{10}(4 / R_1)$. That is
 [`phonometry.room.steady_state_spl`](/phonometry/reference/api/rooms/steady-field/#steady_state_spl) at `distance=None`, and this module
 delegates to it rather than repeating it. Norton's Table 4.5 adds the choice of
 *sound power model*: a machine standing in the intersection of a floor and a
@@ -109,7 +109,7 @@ across the partition.
 | `source_power_level` | Sound power level of the source `L_W`, dB re 1 pW (scalar or per band). Requires `source_room_constant`. |
 | `source_room_constant` | Room constant of the source room `R_1`, m2 (scalar or per band); from [`phonometry.room.room_constant`](/phonometry/reference/api/rooms/steady-field/#room_constant). |
 | `source_directivity` | Directivity factor `Q` of the source in the source room (`1` in free space, `2` on one plane, `4` in an edge, `8` in a corner). Only affects the level through `source_model`, because the reverberant field itself is position-independent. |
-| `source_model` | Sound power model of Norton Table 4.5: `"constant_power"` (default, the radiated power does not depend on the source position), `"constant_volume"` (the conservative upper bound, the power rises by $10 \lg Q$) or `"constant_pressure"` (the lower bound, it falls by $10 \lg Q$). |
+| `source_model` | Sound power model of Norton Table 4.5: `"constant_power"` (default, the radiated power does not depend on the source position), `"constant_volume"` (the conservative upper bound, the power rises by $10 \log_{10} Q$) or `"constant_pressure"` (the lower bound, it falls by $10 \log_{10} Q$). |
 | `include_partition_transmission` | When `True` the `tau S_w` term of Equation (4.101) is added to the receiving-room absorption, with $\tau = 10^{-\mathrm{TL}/10}$. Default `False`, the form hand calculations use. |
 | `flanking_penalty` | Decibels debited from the predicted noise reduction for flanking transmission through mechanical connections and air leaks (Norton's "a few dB"). Default `0`. |
 | `criterion` | Room-criterion family, `"NC"` (default) or `"RC"`. |
@@ -239,7 +239,7 @@ Partition `TL` that would just meet the criterion, per band, dB.
 The chain of Equation (4.101) solved for the transmission loss,
 
 $$
-\mathrm{TL}_{req} = L_{p1} - L_{p2,\mathrm{target}} + 10 \lg(S_w / S_2 \alpha_2) + \text{penalty},
+\mathrm{TL}_{req} = L_{p1} - L_{p2,\mathrm{target}} + 10 \log_{10}(S_w / S_2 \alpha_2) + \text{penalty},
 $$
 
 with $L_{p2,\mathrm{target}}$ the design criterion curve. The

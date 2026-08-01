@@ -16,18 +16,18 @@ The power a resonant plate dissipates equals
 
 .. math::
 
-   L_{Ws} = 10 \lg\frac{2 \pi f \eta\, m S}{f_0 m_0 S_0} + L_v - 60
+   L_{Ws} = 10 \log_{10}\frac{2 \pi f \eta\, m S}{f_0 m_0 S_0} + L_v - 60
    \qquad \text{dB re 1 pW}
 
 with the references :math:`f_0 = 1` Hz, :math:`m_0 = 1` kg,
 :math:`S_0 = 1` m²; the fixed ``-60 dB`` term is
-:math:`10 \lg(v_0^2 / P_0)` for the EN 15657 velocity reference
+:math:`10 \log_{10}(v_0^2 / P_0)` for the EN 15657 velocity reference
 :math:`v_0 = 10^{-9}` m/s and :math:`P_0 = 1` pW. The spatial mean velocity
 level is the energetic average over the ``N`` plate positions (Formula 12):
 
 .. math::
 
-   L_v = 10 \lg\!\left( \frac{1}{N} \sum 10^{L_{v,i}/10} \right)
+   L_v = 10 \log_{10}\!\left( \frac{1}{N} \sum 10^{L_{v,i}/10} \right)
 
 and the plate loss factor follows from its structural reverberation time ``Ts``
 (Formula 13, identical to the ISO 10848 total loss factor):
@@ -47,14 +47,14 @@ source):
 - the **equivalent blocked force level** (Formula 15, dB re
   :math:`F_0 = 10^{-6}` N):
   :math:`L_{Fb,eq} = L_{Ws,low}
-  - 10 \lg( \operatorname{Re}\{Y_{R,low,eq}\} / Y_0 )`
+  - 10 \log_{10}( \operatorname{Re}\{Y_{R,low,eq}\} / Y_0 )`
   with the measured low-mobility-plate mobility and :math:`Y_0 = 1`
   m/(N.s);
 - the **characteristic reception-plate power level** used by EN 12354-5
   (Formula 17), referred to the standard 10 cm concrete plate of
   characteristic mobility :math:`Y_{R,\infty,low} = 5 \cdot 10^{-6}`
   m/(N.s) (clause 7.2.4):
-  :math:`L_{Wsn} = L_{Fb,eq} + 10 \lg( Y_{R,\infty,low} / Y_0 )`;
+  :math:`L_{Wsn} = L_{Fb,eq} + 10 \log_{10}( Y_{R,\infty,low} / Y_0 )`;
 - the **equivalent free velocity level** (Formula 18, dB re ``1e-9 m/s``)
   from the high-mobility plate, and the **source mobility** from both
   (Formula 19). ``L_Wsn`` plus the mobility corrections of EN 12354-5
@@ -103,7 +103,7 @@ FREE_VELOCITY_REFERENCE: float = 5.0e-8
 def spatial_mean_velocity_level(levels: ArrayLike) -> float:
     r"""Spatial-average velocity level over the plate (EN 15657, Formula 12).
 
-    :math:`L_v = 10 \lg\left( \frac{1}{N} \sum 10^{L_{v,i}/10} \right)` --
+    :math:`L_v = 10 \log_{10}\left( \frac{1}{N} \sum 10^{L_{v,i}/10} \right)` --
     the energetic average of the
     per-position velocity levels.
 
@@ -147,8 +147,8 @@ def structure_borne_power_level(
 
     .. math::
 
-       L_{Ws} = 10 \lg\frac{2 \pi f \eta\, m S}{f_0 m_0 S_0} + L_v
-       + 10 \lg\frac{v_0^2}{P_0}
+       L_{Ws} = 10 \log_{10}\frac{2 \pi f \eta\, m S}{f_0 m_0 S_0} + L_v
+       + 10 \log_{10}\frac{v_0^2}{P_0}
 
     With the EN 15657 reference :math:`v_0 = 10^{-9}` m/s the last term is
     -60 dB.
@@ -219,7 +219,7 @@ class StructureBornePowerResult:
 
     @property
     def total_level(self) -> float:
-        r"""Band-summed power level :math:`10 \lg(\sum 10^{0.1 L_{Ws}})`,
+        r"""Band-summed power level :math:`10 \log_{10}(\sum 10^{0.1 L_{Ws}})`,
         in dB."""
         lw = np.asarray(self.power_level, dtype=np.float64)
         return float(10.0 * np.log10(np.sum(10.0 ** (0.1 * lw))))
@@ -356,7 +356,7 @@ def equivalent_blocked_force_level(
     r"""Equivalent blocked force level, squared (EN 15657:2018, Formula 15).
 
     :math:`L_{Fb,eq} = L_{Ws,low}
-    - 10 \lg(\operatorname{Re}\{Y_{R,low,eq}\}/Y_0)`
+    - 10 \log_{10}(\operatorname{Re}\{Y_{R,low,eq}\}/Y_0)`
     in dB re :math:`F_0 = 10^{-6}` N,
     from the power injected into the *low-mobility* reception plate
     (Formula 14) and the equivalent point mobility of that plate (the
@@ -389,7 +389,7 @@ def characteristic_reception_plate_power(
 ) -> np.ndarray:
     r"""Characteristic reception-plate power level (EN 15657:2018, Formula 17).
 
-    :math:`L_{Wsn} = L_{Fb,eq} + 10 \lg(|Y_{R,\infty,low}|/Y_0)` with the
+    :math:`L_{Wsn} = L_{Fb,eq} + 10 \log_{10}(|Y_{R,\infty,low}|/Y_0)` with the
     characteristic
     mobility of the standard 10 cm concrete reception plate
     :math:`Y_{R,\infty,low} = 5 \cdot 10^{-6}` m/(N.s) (clause 7.2.4) and
@@ -423,7 +423,7 @@ def equivalent_free_velocity_level(
 ) -> np.ndarray:
     r"""Equivalent free velocity level of the source (EN 15657:2018, Formula 18).
 
-    :math:`L_{vf,eq} = L_{Ws,high} + 10 \lg\left( |Y_{R,high,eq}|^2 /
+    :math:`L_{vf,eq} = L_{Ws,high} + 10 \log_{10}\left( |Y_{R,high,eq}|^2 /
     (\operatorname{Re}\{Y_{R,high,eq}\}\, Y_0) \right) + 60~\text{dB}`
     in dB re 1e-9 m/s, from the power injected into the
     *high-mobility* reception plate and its equivalent (complex) point
@@ -480,7 +480,7 @@ def source_mobility_from_levels(
 def mean_free_velocity_level(levels: ArrayLike) -> float:
     r"""Mean free velocity level over positions (ISO 9611:1996, equation (9)).
 
-    :math:`\overline{L}_{vx} = 10 \lg\left[ \frac{1}{N} \sum 10^{L_{vxi}/10}
+    :math:`\overline{L}_{vx} = 10 \log_{10}\left[ \frac{1}{N} \sum 10^{L_{vxi}/10}
     \right]`, the energy mean of the
     free-velocity levels measured at the ``N`` contact/attachment points of
     one direction ``x``, each in dB re the ISO 9611 free-velocity reference

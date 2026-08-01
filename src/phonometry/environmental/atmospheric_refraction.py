@@ -75,7 +75,7 @@ _AIR_DENSITY = 1.205
 # ===========================================================================
 @dataclass(frozen=True)
 class EffectiveSoundSpeedProfile:
-    """Vertical profile of the effective sound speed ``c_eff(z)``.
+    r"""Vertical profile of the effective sound speed ``c_eff(z)``.
 
     The profile is sampled on a strictly increasing height grid starting at the
     ground (:math:`z = 0`); intermediate heights are taken as piecewise linear,
@@ -525,7 +525,7 @@ def atmospheric_parabolic_equation(
     :math:`k_a = k_0` is taken at the ground.
 
     The relative sound level re the free field is
-    :math:`\Delta L(z, r) = 20 \lg(|p(z, r)| \, R_1)` with :math:`R_1` the
+    :math:`\Delta L(z, r) = 20 \log_{10}(|p(z, r)| \, R_1)` with :math:`R_1` the
     direct source-receiver distance (Salomons Eq. (3.6)); in a homogeneous
     atmosphere it reproduces the spherical-wave ground effect of
     :func:`ground_effect`.

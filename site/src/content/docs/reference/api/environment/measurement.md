@@ -16,7 +16,7 @@ residual-noise correction, and the measurement-uncertainty budget.
 energy-summed tone level `Lpt` (Formula (C.1)) and the masking-noise level
 `Lpn` in the critical band around the tone, the tonal audibility above the
 masking threshold is
-$\Delta L_{ta} = L_{pt} - L_{pn} + 2 + \lg[1 + (f_c/502)^{2.5}]$ dB
+$\Delta L_{ta} = L_{pt} - L_{pn} + 2 + \log_{10}[1 + (f_c/502)^{2.5}]$ dB
 (Formula (C.3)), and the
 tonal adjustment is the piecewise function $K_t = 0$ for
 $\Delta L_{ta} < 4$,
@@ -37,7 +37,7 @@ neighbours by 15 dB (25–125 Hz), 8 dB (160–400 Hz) or 5 dB (500–10 000 Hz)
 audibility `ΔL` to `Kt` (0–6 dB).
 
 **Residual-noise correction (Clause 10.4).**
-$L = 10 \lg(10^{L'/10} - 10^{L_{res}/10})$ (Formula (16)); with a
+$L = 10 \log_{10}(10^{L'/10} - 10^{L_{res}/10})$ (Formula (16)); with a
 residual
 within 3 dB of the measured level no correction is allowed; the
 *uncorrected* measured level `L'` is then the reportable value, as an upper
@@ -209,8 +209,8 @@ Energy-mean level and its uncertainty from repeats (Formulae (17)–(20)).
 
 | Name | Description |
 | :--- | :--- |
-| `mean_level` | Energy-mean level $L_k = 10 \lg((1/N) \cdot \sum 10^{0.1 \cdot L_i})$, dB (Formula (18)). |
-| `standard_uncertainty` | Standard uncertainty `uk` by the primary route, Formulae (17)+(19): the sample standard deviation `sk` of the energy values $10^{0.1 \cdot L_i}$ mapped back to level, $u_k = 10 \lg(10^{0.1 \cdot L_k} + s_k) - L_k$, in dB. |
+| `mean_level` | Energy-mean level $L_k = 10 \log_{10}((1/N) \cdot \sum 10^{0.1 \cdot L_i})$, dB (Formula (18)). |
+| `standard_uncertainty` | Standard uncertainty `uk` by the primary route, Formulae (17)+(19): the sample standard deviation `sk` of the energy values $10^{0.1 \cdot L_i}$ mapped back to level, $u_k = 10 \log_{10}(10^{0.1 \cdot L_k} + s_k) - L_k$, in dB. |
 | `approximate_uncertainty` | The Note 2 substitute (Formula (20)), $\sqrt{\sum (L_i - L_k)^2/(N - 1)}$, in dB; valid only when the spread of the `Li` is small; it grossly inflates for spread levels. |
 | `n` | Number of measurements. |
 
@@ -260,7 +260,7 @@ residual_sound_correction(
 
 Correct a measured level for residual sound (Formula (16)).
 
-$L = 10 \lg(10^{L'/10} - 10^{L_{res}/10})$. When the residual is
+$L = 10 \log_{10}(10^{L'/10} - 10^{L_{res}/10})$. When the residual is
 within 3 dB
 of the measured level, §10.4 allows **no** correction: the *uncorrected*
 measured level `L'` is the reportable value, as an upper bound of the
@@ -378,7 +378,7 @@ tonal_audibility(
 
 Tonal audibility above the masking threshold (Formula (C.3)).
 
-$\Delta L_{ta} = L_{pt} - L_{pn} + 2 + \lg[1 + (f_c/502)^{2.5}]$
+$\Delta L_{ta} = L_{pt} - L_{pn} + 2 + \log_{10}[1 + (f_c/502)^{2.5}]$
 dB.
 
 **Parameters**
@@ -483,13 +483,13 @@ uncertainty_from_repeated_measurements(
 
 Energy mean and its uncertainty from repeated levels (Formulae (17)–(20)).
 
-$L_k = 10 \lg((1/N) \cdot \sum 10^{0.1 \cdot L_i})$ (Formula (18)).
+$L_k = 10 \log_{10}((1/N) \cdot \sum 10^{0.1 \cdot L_i})$ (Formula (18)).
 The standard
 uncertainty follows the primary §10.5 route: the sample standard
 deviation `sk` of the energy values $10^{0.1 \cdot L_i}$
 (Formula (17))
 propagated back to level,
-$u_k = 10 \lg(10^{0.1 \cdot L_k} + s_k) - L_k$
+$u_k = 10 \log_{10}(10^{0.1 \cdot L_k} + s_k) - L_k$
 (Formula (19)). The Note 2 level-domain approximation
 $\sqrt{\sum (L_i - L_k)^2/(N - 1)}$ (Formula (20)) is also
 reported as

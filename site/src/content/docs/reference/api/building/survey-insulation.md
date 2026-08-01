@@ -20,7 +20,7 @@ EN ISO 10052:2004+A1:2010.
 
 **Reverberation index (Clause 3.3).** The correction for the receiving room is
 carried by a single quantity, the reverberation index
-$k = 10 \lg(T/T_0)$ dB
+$k = 10 \log_{10}(T/T_0)$ dB
 with the reference reverberation time $T_0 = 0.5$ s. It may be
 **measured** (pass
 the reverberation time `T` per band to [`reverberation_index`](/phonometry/reference/api/building/survey-insulation/#reverberation_index)) or,
@@ -32,10 +32,10 @@ receiving-room levels `L1` and `L2` the level difference
 $D = L_1 - L_2$
 (Clause 3.2) gives the standardized level difference $D_{nT} = D + k$
 (Clause 3.4), the normalized level difference
-$D_n = D + k + 10 \lg(A_0 T_0 / (0.16\,V))$ (Clause 3.5,
+$D_n = D + k + 10 \log_{10}(A_0 T_0 / (0.16\,V))$ (Clause 3.5,
 $A_0 = 10$ m²) and, when a common
 partition area `S` is given, the apparent sound reduction index
-$R' = D + k + 10 \lg(S T_0 / (0.16\,V))$ (Clause 3.6). Where
+$R' = D + k + 10 \log_{10}(S T_0 / (0.16\,V))$ (Clause 3.6). Where
 $V/7.5 > S$ the
 value $V/7.5$ is used for `S`, with `V` the smaller room.
 
@@ -45,21 +45,21 @@ admits the heavy/soft impact source of Clause 3.10 with the maximum level
 `Li,Fmax` of Clause 3.11) the standardized impact level
 $L'_{nT} = L_i - k$
 (Clause 3.8) and the normalized impact level
-$L'_n = L_i - k - 10 \lg(A_0 T_0 / (0.16\,V))$ (Clause 3.9).
+$L'_n = L_i - k - 10 \log_{10}(A_0 T_0 / (0.16\,V))$ (Clause 3.9).
 
 **Façade (Clauses 3.13-3.15).** From the outdoor level 2 m in front of the
 façade `L1,2m` and the receiving-room level `L2` the façade level
 difference $D_{2m} = L_{1,2m} - L_2$ (Clause 3.13), the standardized
 $D_{2m,nT} = D_{2m} + k$ (Clause 3.14) and the normalized
-$D_{2m,n} = D_{2m} + k + 10 \lg(A_0 T_0 / (0.16\,V))$ (Clause 3.15).
+$D_{2m,n} = D_{2m} + k + 10 \log_{10}(A_0 T_0 / (0.16\,V))$ (Clause 3.15).
 
 **Service equipment (Clauses 3.16-3.18).** From three A- or C-weighted sound
 pressure levels (one near a room corner, two in the reverberant field) the
 service-equipment level
-$L_{XY} = 10 \lg[(1/3) \sum 10^{0.1 L_{XY,i}}]$
+$L_{XY} = 10 \log_{10}[(1/3) \sum 10^{0.1 L_{XY,i}}]$
 (Clause 3.16), its standardized form $L_{XY,nT} = L_{XY} - k$
 (Clause 3.17) and
-normalized form $L_{XY,n} = L_{XY} - k - 10 \lg(A_0 T_0 / (0.16\,V))$
+normalized form $L_{XY,n} = L_{XY} - k - 10 \log_{10}(A_0 T_0 / (0.16\,V))$
 (Clause 3.18).
 
 **Frequency range (Clause 6.4).** Airborne and tapping-machine impact
@@ -123,7 +123,7 @@ reverberation_index(
 ) -> np.ndarray
 ```
 
-Reverberation index $k = 10 \lg(T/T_0)$ (ISO 10052, Cl. 3.3).
+Reverberation index $k = 10 \log_{10}(T/T_0)$ (ISO 10052, Cl. 3.3).
 
 **Parameters**
 
@@ -158,10 +158,10 @@ Airborne sound insulation between rooms, survey method (ISO 10052:2021).
 Computes, per octave band, the level difference $D = L_1 - L_2$
 (Clause 3.2), the standardized level difference $D_{nT} = D + k$
 (Clause 3.4) and, when `volume` is given, the normalized level
-difference $D_n = D + k + 10 \lg(A_0 T_0 / (0.16\,V))$ (Clause 3.5).
+difference $D_n = D + k + 10 \log_{10}(A_0 T_0 / (0.16\,V))$ (Clause 3.5).
 When a
 common-partition `area` is also given, the apparent sound reduction index
-$R' = D + k + 10 \lg(S T_0 / (0.16\,V))$ (Clause 3.6) is formed,
+$R' = D + k + 10 \log_{10}(S T_0 / (0.16\,V))$ (Clause 3.6) is formed,
 using
 $V/7.5$ for `S` where that exceeds the given area (Clause 3.6).
 The
@@ -209,7 +209,7 @@ level
 difference $D_{2m,nT} = D_{2m} + k$ (Clause 3.14) and, when
 `volume` is
 given, the normalized façade level difference
-$D_{2m,n} = D_{2m} + k + 10 \lg(A_0 T_0 / (0.16\,V))$
+$D_{2m,n} = D_{2m} + k + 10 \log_{10}(A_0 T_0 / (0.16\,V))$
 (Clause 3.15).
 
 **Parameters**
@@ -246,7 +246,7 @@ Computes, per octave band, the energy-average impact sound pressure level
 `Li` (Clause 3.7), the standardized impact level
 $L'_{nT} = L_i - k$
 (Clause 3.8) and, when `volume` is given, the normalized impact level
-$L'_n = L_i - k - 10 \lg(A_0 T_0 / (0.16\,V))$ (Clause 3.9).
+$L'_n = L_i - k - 10 \log_{10}(A_0 T_0 / (0.16\,V))$ (Clause 3.9).
 
 `li` may be one value per band or a two-dimensional
 `(positions, bands)` array (energy-averaged over the tapping-machine
@@ -282,13 +282,13 @@ survey_service_equipment_level(
 Service-equipment sound pressure level, survey method (ISO 10052:2021).
 
 Computes the service-equipment level
-$L_{XY} = 10 \lg[(1/3) \sum 10^{0.1 L_{XY,i}}]$
+$L_{XY} = 10 \log_{10}[(1/3) \sum 10^{0.1 L_{XY,i}}]$
 (Clause 3.16) as the energy average of the three measurement
 positions (one near a corner, two in the reverberant field, Clause 6.3.3),
 the standardized level $L_{XY,nT} = L_{XY} - k$ (Clause 3.17) and,
 when
 `volume` is given, the normalized level
-$L_{XY,n} = L_{XY} - k - 10 \lg(A_0 T_0 / (0.16\,V))$
+$L_{XY,n} = L_{XY} - k - 10 \log_{10}(A_0 T_0 / (0.16\,V))$
 (Clause 3.18). `X` is the frequency weighting
 (A or C) and `Y` the time weighting (F, S or Leq).
 

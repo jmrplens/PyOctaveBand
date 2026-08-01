@@ -28,12 +28,12 @@ so the report never merely repeats a manufacturer number:
   output voltage to the sound pressure, in volts per pascal; its level is
 
   $$
-  L_M = 20 \lg(M / M_r), \qquad M_r = 1\ \mathrm{V/Pa}
+  L_M = 20 \log_{10}(M / M_r), \qquad M_r = 1\ \mathrm{V/Pa}
   $$
 
   the rated sensitivity referring to the standard reference frequency of
   1 000 Hz (11.3). This is the first clean-room oracle: 12.5 mV/Pa returns
-  $20 \lg 0.0125 = -38.06$ dB re 1 V/Pa exactly.
+  $20 \log_{10} 0.0125 = -38.06$ dB re 1 V/Pa exactly.
 
 * **Effective frequency range** (12.2). The range of frequencies over which
   the response does not deviate by more than a specified amount from the ideal
@@ -43,7 +43,7 @@ so the report never merely repeats a manufacturer number:
   the second oracle: a response crossing a limit at chosen frequencies returns
   exactly those frequencies.
 
-* **Directivity index** (13.2.2). $D = 20 \lg(M_0 / M_\text{diff})$
+* **Directivity index** (13.2.2). $D = 20 \log_{10}(M_0 / M_\text{diff})$
   where the diffuse-field sensitivity of a rotationally symmetric pattern
   follows 11.2.2 a):
 
@@ -52,14 +52,14 @@ so the report never merely repeats a manufacturer number:
   $$
 
   For the ideal cardioid $M(\theta) = M_0 (1 + \cos\theta) / 2$
-  the integral is $M_0^2 / 3$, so $D = 10 \lg 3 = 4.77$ dB,
+  the integral is $M_0^2 / 3$, so $D = 10 \log_{10} 3 = 4.77$ dB,
   the third oracle.
 
 * **Equivalent sound pressure level due to inherent noise** (17.2 d/e). The
   equivalent sound pressure is the ratio of the weighted inherent-noise
   output voltage to the rated free-field sensitivity,
   $p_N = U_N / M$, and its level is
-  $L_N = 20 \lg(p_N / p_0)$ with $p_0 = 20$ uPa, the fourth
+  $L_N = 20 \log_{10}(p_N / p_0)$ with $p_0 = 20$ uPa, the fourth
   oracle. The overload sound pressure level (15.2.2) is read from a measured
   distortion-against-level curve as the interpolated sound pressure level
   where the distortion reaches the specified limit.
@@ -180,7 +180,7 @@ standard's definitions (see the module docstring).
 | `response_db` | Free-field frequency response relative to the level at `reference_frequency` (0 dB there), in dB (12.1.1). |
 | `reference_frequency` | Stated reference frequency of the rated sensitivity and the response normalization, in Hz (11.3). |
 | `sensitivity_mv_per_pa` | Rated free-field sensitivity `M` at the reference frequency, in mV/Pa (11.2.1/11.3). |
-| `sensitivity_level_db` | Sensitivity level $20 \lg(M / 1\,\mathrm{V/Pa})$, in dB re 1 V/Pa (11.1). |
+| `sensitivity_level_db` | Sensitivity level $20 \log_{10}(M / 1\,\mathrm{V/Pa})$, in dB re 1 V/Pa (11.1). |
 | `tolerance_db` | Half-width of the response tolerance, in dB (12.1.1). |
 | `effective_range` | Computed effective frequency range `(lo, hi)` against the tolerance limits, in Hz (12.2). |
 | `rated_impedance` | Rated (internal) impedance, in ohm (10.2), or `None`. |
@@ -304,6 +304,6 @@ Signal-to-noise ratio re 1 Pa (94 dB SPL), in dB, or `None`.
 
 The datasheet companion of the equivalent noise level: the level
 of 1 Pa
-($20 \lg(1\,\mathrm{Pa} / 20\,\mathrm{\mu Pa}) = 93.98$ dB
+($20 \log_{10}(1\,\mathrm{Pa} / 20\,\mathrm{\mu Pa}) = 93.98$ dB
 SPL) minus the equivalent sound pressure level due to inherent
 noise (17), carrying the same weighting.

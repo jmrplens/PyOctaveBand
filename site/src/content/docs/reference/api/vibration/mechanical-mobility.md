@@ -399,7 +399,7 @@ sdof_accelerance(
 ) -> np.ndarray
 ```
 
-Accelerance of a damped SDOF resonator: $A = -\omega^2 H$.
+Accelerance of a viscously damped SDOF resonator: $A = -\omega^2 H$.
 
 **Parameters**
 

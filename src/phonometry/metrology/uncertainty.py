@@ -182,7 +182,7 @@ class UncertaintyResult:
 
 @dataclass(frozen=True)
 class MonteCarloResult:
-    """Result of the Monte Carlo method (Guide 98-3-1, Supplement 1).
+    r"""Result of the Monte Carlo method (Guide 98-3-1, Supplement 1).
 
     :ivar value: Estimate ``y`` (the sample mean of the output).
     :ivar standard_uncertainty: :math:`u(y)` (the sample standard

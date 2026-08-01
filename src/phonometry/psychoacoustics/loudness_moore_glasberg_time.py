@@ -1,5 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""
+r"""
 Time-varying loudness per ISO 532-3:2023 (Moore-Glasberg-Schlittenlacher).
 
 Clean-room implementation of the time-varying loudness model of ISO 532-3:2023,
@@ -416,7 +416,7 @@ def _excitation(comp_f: np.ndarray, comp_pow: np.ndarray) -> np.ndarray:
 
 
 def _specific_loudness(excitation: np.ndarray) -> np.ndarray:
-    """Instantaneous specific loudness N'(i) in sone/Cam (clause 7.5).
+    r"""Instantaneous specific loudness N'(i) in sone/Cam (clause 7.5).
 
     Applies the compressive transformation of Formulae (7)-(9) with the
     ISO 532-3 constants (:math:`C = 0.063`, Tables 2-4,

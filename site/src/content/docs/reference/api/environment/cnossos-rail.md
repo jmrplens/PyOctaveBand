@@ -16,10 +16,10 @@ one of the two heights and contributes a directional sound power per metre of
 line
 
 $$
-L'_{W,eq,line,i}(\psi,\phi) = L_{W,0,dir,i}(\psi,\phi) + 10 \lg\left( \frac{Q}{1000 v} \right) \tag{2.3.2}
+L'_{W,eq,line,i}(\psi,\phi) = L_{W,0,dir,i}(\psi,\phi) + 10 \log_{10}\left( \frac{Q}{1000 v} \right) \tag{2.3.2}
 $$
 
-for a running train, or $+\, 10 \lg(T_{idle} / (T_{ref} L))$ (2.3.4)
+for a running train, or $+\, 10 \log_{10}(T_{idle} / (T_{ref} L))$ (2.3.4)
 for an idling
 one. This module implements the whole of 2.3 together with the coefficient
 database of Appendix G, in the twenty-four 1/3-octave bands from 50 Hz to
@@ -97,7 +97,7 @@ aerodynamic_sound_power(
 
 Aerodynamic sound power of (2.3.13) and (2.3.14), in dB.
 
-$L_{W,0,i} = L_{W,0,h,i}(v_0) + \alpha_{h,i} \lg(v/v_0)$ with
+$L_{W,0,i} = L_{W,0,h,i}(v_0) + \alpha_{h,i} \log_{10}(v/v_0)$ with
 $v_0 = 300$ km/h.
 At the reference speed the result is Table G-6 verbatim.
 
@@ -255,10 +255,10 @@ horizontal_directivity(
 
 Horizontal directivity `dL_W,dir,hor,i` of (2.3.15), in dB.
 
-$10 \lg(0.01 + 0.99 \sin^2 \phi)$: a dipole, identical in every
+$10 \log_{10}(0.01 + 0.99 \sin^2 \phi)$: a dipole, identical in every
 band, equal
 to 0 dB broadside ($\phi = 90^\circ$) and to
-$10 \lg 0.01 = -20$ dB along
+$10 \log_{10} 0.01 = -20$ dB along
 the track. The Directive offers it "by default" for rolling, impact,
 squeal, braking, fans and aerodynamic effects; since no other horizontal
 directivity is given and traction noise includes the fans, it is applied
@@ -287,7 +287,7 @@ impact_roughness(single: Any, joint_density: float) -> NDArray[np.float64]
 
 Impact roughness `L_R,IMPACT,i` of (2.3.12), in dB.
 
-$L_{R,IMPACT,i} = L_{R,\text{IMPACT-SINGLE},i} + 10 \lg(n_l/0.01)$, so at the
+$L_{R,IMPACT,i} = L_{R,\text{IMPACT-SINGLE},i} + 10 \log_{10}(n_l/0.01)$, so at the
 tabulated density of one joint per 100 m the table is returned verbatim.
 
 **Parameters**
@@ -590,7 +590,7 @@ rolling_sound_power(
 
 One rolling-noise component of (2.3.8) to (2.3.10), in dB.
 
-$L_{W,0,i} = L_{R,TOT,i} + L_{H,i} + 10 \lg(N_a)$: the same
+$L_{W,0,i} = L_{R,TOT,i} + L_{H,i} + 10 \log_{10}(N_a)$: the same
 addition serves the
 track, the wheel and the freight superstructure, each with its own transfer
 function. All three sit at source A.
@@ -740,7 +740,7 @@ total_effective_roughness(
 
 Total effective roughness `L_R,TOT,i` of (2.3.7), in dB.
 
-$L_{R,TOT,i} = 10 \lg(10^{L_{r,TR,i}/10} + 10^{L_{r,VEH,i}/10}) + A_{3,i}$. All
+$L_{R,TOT,i} = 10 \log_{10}(10^{L_{r,TR,i}/10} + 10^{L_{r,VEH,i}/10}) + A_{3,i}$. All
 three spectra must already be on the frequency grid, that is resampled with
 [`roughness_to_frequency`](/phonometry/reference/api/environment/cnossos-rail/#roughness_to_frequency) at the speed of interest.
 
@@ -989,7 +989,7 @@ Source A (`height = 1`) follows (2.3.16), which (EU) 2021/1226 Annex
 point (4)(d) replaced: the absolute-value bars of the 2015 text are gone
 and the correction is identically zero for $\psi \le 0$. Source B
 (`height = 2`) follows (2.3.17) for the aerodynamic effect only,
-$10 \lg(\cos^2 \psi)$ for $\psi < 0$, and is omni-directional
+$10 \log_{10}(\cos^2 \psi)$ for $\psi < 0$, and is omni-directional
 for every
 other source.
 

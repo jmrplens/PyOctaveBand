@@ -198,7 +198,7 @@ class AbsorptionRatingResult:
     :ivar shift: Downward shift applied to the reference curve, in
         absorption units (Clause 4.2); :math:`\alpha_w = 1.00 - \text{shift}`.
     :ivar unfavourable_sum: Sum of the unfavourable deviations at the final
-        shift (Clause 4.2); at most 0,10.
+        shift (Clause 4.2); at most 0.10.
     :ivar band_centers: Octave rating-band centre frequencies, in Hz
         (250 Hz to 4000 Hz).
     :ivar measured: Practical absorption coefficients ``alpha_p`` used for

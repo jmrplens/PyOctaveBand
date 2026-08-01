@@ -8,7 +8,7 @@ into the hearing threshold level associated with age and noise (HTLAN), over
 the six audiometric frequencies 500 Hz to 6000 Hz.
 
 The median NIPTS for exposure durations of 10 to 40 years is
-:math:`N_{50} = [u + v \lg(t/t_0)] \, (L_{EX,8h} - L_0)^2` (clause 6.3.1,
+:math:`N_{50} = [u + v \log_{10}(t/t_0)] \, (L_{EX,8h} - L_0)^2` (clause 6.3.1,
 Formula 2, with
 the values ``u, v, L0`` of Table 1), extrapolated below 10 years by Formula 3.
 The statistical distribution about the median is two half-Gaussians whose
@@ -226,7 +226,7 @@ class NiptsResult:
 
 @dataclass(frozen=True)
 class HtlanResult:
-    """Hearing threshold level associated with age and noise (clause 6.1).
+    r"""Hearing threshold level associated with age and noise (clause 6.1).
 
     All arrays are in dB and aligned with :data:`NIPTS_FREQUENCIES`.
 
@@ -272,7 +272,7 @@ class HtlanResult:
         verbose: bool = False,
         language: str = "en",
     ) -> str:
-        """Render an HTLAN hearing-threshold prediction fiche to a PDF.
+        r"""Render an HTLAN hearing-threshold prediction fiche to a PDF.
 
         Writes a one-page statistical-prediction report of the hearing
         threshold level associated with age and noise (ISO 1999:2013 clause
@@ -422,7 +422,7 @@ def nipts(
 
 
 def combine_age_and_noise(htla: ArrayLike, nipts_value: ArrayLike) -> np.ndarray:
-    """Combine the age and noise components by Formula (1) (clause 6.1).
+    r"""Combine the age and noise components by Formula (1) (clause 6.1).
 
     :math:`H' = H + N - H N / 120`, the hearing threshold level associated
     with age
@@ -453,7 +453,7 @@ def htlan(
     fractile: float = 0.5,
     frequencies: ArrayLike | None = None,
 ) -> HtlanResult:
-    """Hearing threshold level associated with age and noise (clause 6.1).
+    r"""Hearing threshold level associated with age and noise (clause 6.1).
 
     Combines the age component ``H`` (HTLA from database A, evaluated from
     ISO 7029:2017 - the edition ISO 1999:2013 references undated in 6.2.2 - at

@@ -7,12 +7,12 @@ comparing it with a threshold. The filter is the same band-pass form in all
 current guidance (NMFS 2018 Equation 1, Southall et al. 2019 Equation 2):
 
 .. math::
-    W(f) = C + 10\,\lg\frac{(f/f_1)^{2a}}
+    W(f) = C + 10\,\log_{10}\frac{(f/f_1)^{2a}}
                               {[1+(f/f_1)^2]^{a}\,[1+(f/f_2)^2]^{b}}
 
 with ``f`` in kilohertz. ``C`` is fixed by putting the peak of ``W`` at 0 dB,
 so the companion **exposure function**
-:math:`E(f) = K - 10 \lg(\dots) = K + C - W(f)`
+:math:`E(f) = K - 10 \log_{10}(\dots) = K + C - W(f)`
 has its minimum at the weighted threshold :math:`T_w = K + C`. Only the
 parameter table changes between guidance versions, so the version is explicit
 in the API and is carried on every result object:
@@ -334,7 +334,7 @@ def weighting_parameters(group: str, *, guidance: str = "nmfs-2024") -> Weightin
 
 
 def _band_pass_db(f_khz: NDArray[np.float64], p: WeightingParameters) -> NDArray[np.float64]:
-    r""":math:`10 \lg` of the band-pass ratio shared by ``W(f)`` and
+    r""":math:`10 \log_{10}` of the band-pass ratio shared by ``W(f)`` and
     ``E(f)``."""
     ratio = (f_khz / p.f1_khz) ** (2.0 * p.a) / (
         (1.0 + (f_khz / p.f1_khz) ** 2) ** p.a
@@ -461,7 +461,7 @@ class WeightedExposureResult:
     :ivar weighted_band_sel: ``band_sel + W(f)`` per band, in dB.
     :ivar unweighted_sel: Energy sum of ``band_sel``, in dB.
     :ivar weighted_sel: Energy sum of ``weighted_band_sel``, in dB.
-    :ivar cumulative_sel: ``weighted_sel`` plus :math:`10 \lg(N)` for the
+    :ivar cumulative_sel: ``weighted_sel`` plus :math:`10 \log_{10}(N)` for the
         ``n_events`` accumulated events, in dB.
     :ivar peak_spl: The unweighted peak sound pressure level supplied, in dB
         (``None`` when not given).
@@ -534,7 +534,7 @@ def weighted_exposure(
 
     The per-band single-event sound exposure levels are weighted with
     :func:`auditory_weighting`, summed on an energy basis and accumulated over
-    ``n_events`` identical events (:math:`+10 \lg N`, the ISO 18406 Formula 9
+    ``n_events`` identical events (:math:`+10 \log_{10} N`, the ISO 18406 Formula 9
     identity used by :func:`~phonometry.underwater.cumulative_sel_identical`).
     The result is compared with the group's TTS and injury onset criteria; the
     peak sound pressure level, if supplied, is compared **unweighted**, as the

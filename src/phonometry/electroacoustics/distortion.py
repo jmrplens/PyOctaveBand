@@ -362,7 +362,7 @@ def thd_plus_noise(
     (:math:`1.2 \le Q \le 3`, validated on the applied zero-phase response
     per 5.2.8) and the residual RMS is compared with the total RMS:
     :math:`\mathrm{THD{+}N} = V_\text{residual} / V_\text{total}` (a
-    ratio, or :math:`20 \lg` of it in dB). Both voltages are measured
+    ratio, or :math:`20 \log_{10}` of it in dB). Both voltages are measured
     through the AES17 measurement bandwidth -- a 20 Hz high-pass plus the
     standard low-pass at ``bandwidth`` (5.2.5 / 6.3.1) -- so DC offsets
     and out-of-band noise do not inflate the result.
@@ -376,7 +376,7 @@ def thd_plus_noise(
         ``None`` disables the chain and measures the full Nyquist band
         (20 Hz high-pass included only when the chain is active).
     :param window: FFT window used only for fundamental auto-detection.
-    :param as_db: Return :math:`20 \lg(\text{ratio})` in dB instead of the
+    :param as_db: Return :math:`20 \log_{10}(\text{ratio})` in dB instead of the
         ratio.
     :return: THD+N as a ratio (default) or in dB.
     :raises ValueError: If the inputs are invalid or ``notch_q`` out of range.
@@ -415,7 +415,7 @@ def sinad(
     .. math::
 
        \mathrm{SINAD} = -(\text{THD+N in dB})
-       = 20 \lg(V_\text{total} / V_\text{residual}),
+       = 20 \log_{10}(V_\text{total} / V_\text{residual}),
 
     the reciprocal, in dB, of the THD+N ratio. AES17-2015 does not itself
     define SINAD; this value is derived from the AES17 6.3.1 THD+N
@@ -939,7 +939,7 @@ def dynamic_intermodulation_distortion(
 # --------------------------------------------------------------------------- #
 @dataclass(frozen=True)
 class HarmonicDistortionResult:
-    """Harmonic analysis of a signal (IEC 60268-3 / AES17).
+    r"""Harmonic analysis of a signal (IEC 60268-3 / AES17).
 
     :ivar fundamental: Fundamental frequency :math:`f_1`, in Hz.
     :ivar harmonic_frequencies: Harmonic frequencies :math:`n f_1`
@@ -1101,7 +1101,7 @@ def dynamic_range(
 
     .. math::
 
-       \mathrm{DR} = 20 \lg\left(
+       \mathrm{DR} = 20 \log_{10}\left(
        (\text{full\_scale} / \sqrt{2}) / V_\text{residual,CCIR-RMS}
        \right)
 
@@ -1156,7 +1156,7 @@ def idle_channel_noise(
 
     .. math::
 
-       L_\text{idle} = 20 \lg\left(
+       L_\text{idle} = 20 \log_{10}\left(
        V_\text{idle,CCIR-RMS} / (\text{full\_scale} / \sqrt{2})
        \right)
 

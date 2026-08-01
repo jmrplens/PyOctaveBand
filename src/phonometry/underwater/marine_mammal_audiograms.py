@@ -8,7 +8,7 @@ Two independent published descriptions of how well a marine mammal hears:
   a four-parameter band-pass fit (their Equation 1, after Finneran 2016)
 
   .. math::
-      T(f) = T_0 + A \lg\!\left(1 + \frac{F_1}{f}\right) + (f/F_2)^{B}
+      T(f) = T_0 + A \log_{10}\!\left(1 + \frac{F_1}{f}\right) + (f/F_2)^{B}
 
   with the group parameters of their Table 2 (absolute thresholds) and Table 3
   (normalised to 0 dB at best sensitivity).
@@ -51,7 +51,7 @@ if TYPE_CHECKING:
 
 @dataclass(frozen=True)
 class AudiogramParameters:
-    """Group-audiogram fit parameters (Southall et al. 2019, Tables 2 and 3).
+    r"""Group-audiogram fit parameters (Southall et al. 2019, Tables 2 and 3).
 
     :ivar group: Hearing-group code.
     :ivar t0: Vertical position ``T0``, in dB.
@@ -205,7 +205,7 @@ def group_audiogram(
 ) -> AudiogramResult:
     r"""Marine-mammal group audiogram (Southall et al. 2019, Equation 1).
 
-    :math:`T(f) = T_0 + A \lg(1 + F_1/f) + (f/F_2)^B`, with ``f`` in
+    :math:`T(f) = T_0 + A \log_{10}(1 + F_1/f) + (f/F_2)^B`, with ``f`` in
     kilohertz and the group parameters of Table 2 (``normalized=False``) or
     Table 3 (``normalized=True``).
 

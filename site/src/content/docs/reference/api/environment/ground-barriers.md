@@ -53,7 +53,7 @@ the Faddeeva function `scipy.special.wofz`. The relative sound level (the
 "excess attenuation", dB re free field) is:
 
 $$
-\Delta L = 20 \lg \left| 1 + Q \, \frac{R_1}{R_2} \, e^{i k (R_2 - R_1)} \right| \tag{Salomons Eq. 3.4}
+\Delta L = 20 \log_{10} \left| 1 + Q \, \frac{R_1}{R_2} \, e^{i k (R_2 - R_1)} \right| \tag{Salomons Eq. 3.4}
 $$
 
 Limits reproduced by the implementation: an acoustically hard ground
@@ -83,7 +83,7 @@ Three levels of screening beyond the ISO 9613-2 `Dz` term are provided:
 * the Kurze-Anderson closed form in the Fresnel number `N` (Bies, Hansen &
   Howard, *Engineering Noise Control* 5e, 2017, Eq. (5.138); Kurze & Anderson,
   1971),
-  $\Delta = 5 + 20 \lg\!\left[ \sqrt{2 \pi N} / \tanh\sqrt{2 \pi N} \right]$,
+  $\Delta = 5 + 20 \log_{10}\!\left[ \sqrt{2 \pi N} / \tanh\sqrt{2 \pi N} \right]$,
   which tends to `5 dB` at $N \to 0$ and stays within about 1.5 dB of
   Maekawa's point-source curve for all `N` (a very good fit for
   $N > 0.5$);
@@ -138,7 +138,7 @@ at `(receiver_distance, receiver_height)`. Three models are available:
   Bies Eq. (5.157) is used, `e` being the top width.
 * `method="exact"` without ground: the wave-theoretic insertion loss of the
   rigid thin screen (`_screen_field`, MacDonald / Hadden & Pierce),
-  $\mathrm{IL} = 20 \lg |p_{\text{free}} / p_{\text{diffracted}}|$.
+  $\mathrm{IL} = 20 \log_{10} |p_{\text{free}} / p_{\text{diffracted}}|$.
 * `method="exact"` with a ground (`ground_impedance` or
   `ground_flow_resistivity`): the coherent four-path model. The field with
   the barrier sums the four source-image / receiver-image diffracted paths,
@@ -202,7 +202,7 @@ Per-frequency barrier insertion loss (IL vs frequency).
 | Name | Description |
 | :--- | :--- |
 | `frequencies` | Frequencies, in hertz. |
-| `insertion_loss` | Insertion loss $\mathrm{IL} = 20 \lg \lvert p_{\text{without}} / p_{\text{with}} \rvert$, in decibels, per frequency. |
+| `insertion_loss` | Insertion loss $\mathrm{IL} = 20 \log_{10} \lvert p_{\text{without}} / p_{\text{with}} \rvert$, in decibels, per frequency. |
 | `fresnel_number` | Fresnel number `N` per frequency (single-edge geometry; the double-edge `N` for a thick barrier). |
 | `method` | Diffraction model used (`"kurze_anderson"` or `"exact"`). |
 | `ground` | Whether the coherent four-path ground model was applied. |
@@ -359,7 +359,7 @@ $p = e^{ikR_1}/(4 \pi R_1) + Q \, e^{ikR_2}/(4 \pi R_2)$
 with the spherical-wave reflection coefficient `Q` of
 [`spherical_reflection_coefficient`](/phonometry/reference/api/environment/ground-barriers/#spherical_reflection_coefficient) and reports the relative sound
 level
-$\Delta L = 20 \lg\left| 1 + Q (R_1/R_2) e^{i k (R_2 - R_1)} \right|$ (Salomons Eq. (3.4)),
+$\Delta L = 20 \log_{10}\left| 1 + Q (R_1/R_2) e^{i k (R_2 - R_1)} \right|$ (Salomons Eq. (3.4)),
 i.e. the level re the free field.
 
 The ground surface impedance is either supplied through `impedance` (a
@@ -399,7 +399,7 @@ kurze_anderson_attenuation(fresnel_number: ArrayLike) -> Real
 Kurze-Anderson barrier attenuation (Bies Eq. (5.138); Kurze & Anderson, 1971).
 
 $$
-\Delta = 5 + 20 \lg\!\left[ \frac{\sqrt{2 \pi N}} {\tanh\sqrt{2 \pi N}} \right] \qquad \text{dB}
+\Delta = 5 + 20 \log_{10}\!\left[ \frac{\sqrt{2 \pi N}} {\tanh\sqrt{2 \pi N}} \right] \qquad \text{dB}
 $$
 
 For $N \to 0$ the ratio tends to 1 and $\Delta \to 5$ dB; for

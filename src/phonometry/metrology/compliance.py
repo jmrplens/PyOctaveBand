@@ -7,7 +7,7 @@ official text (BS EN 61260-1:2014, **Table 1**, standard pages 15-16):
 octave-band breakpoint frequencies with class 1 and class 2 minimum/maximum
 limits. Fractional-octave-band breakpoints are derived with Formulas (9) and
 (10) (subclauses 5.10.3-5.10.4) and limits between breakpoints are interpolated
-linearly in :math:`\lg \Omega` per Formula (11) (subclause 5.10.6).
+linearly in :math:`\log_{10} \Omega` per Formula (11) (subclause 5.10.6).
 Relative attenuation is
 :math:`\Delta A(\Omega) = A(\Omega) - A_{\mathrm{ref}}` (Formula 8) with
 :math:`A = L_{\mathrm{in}} - L_{\mathrm{out}}`

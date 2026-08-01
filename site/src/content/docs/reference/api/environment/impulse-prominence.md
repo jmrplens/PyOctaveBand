@@ -14,7 +14,7 @@ prominence** `P`, a logarithmic measure of the onset rate and the level
 difference of the impulse (clause 7):
 
 $$
-P = 3 \lg(\text{onset rate}) + 2 \lg(\text{level difference}) \tag{Formula 1}
+P = 3 \log_{10}(\text{onset rate}) + 2 \log_{10}(\text{level difference}) \tag{Formula 1}
 $$
 
 From the impulse with the highest prominence over a 30-minute period, a
@@ -197,8 +197,8 @@ predicted_prominence(
 
 Predicted prominence `P` of an impulse (NT ACOU 112, clause 7).
 
-$P = 3 \lg(\text{onset rate}) + 2 \lg(\text{level difference})$
-(Formula 1), with $\lg$
+$P = 3 \log_{10}(\text{onset rate}) + 2 \log_{10}(\text{level difference})$
+(Formula 1), with $\log_{10}$
 the base-10 logarithm. Both quantities are read from the A-weighted,
 time-weighting-F level history: the onset rate is the slope of the onset in
 dB/s and the level difference is the level rise over the onset in dB
@@ -237,7 +237,7 @@ Combines the impulse-adjusted equivalent levels of the measurement
 sub-intervals into a single rating level:
 
 $$
-L_{Ar,T} = 10 \lg\!\left[ \frac{1}{T} \sum_N \Delta t_N \, 10^{(L_{Aeq,N} + K_{I,N})/10} \right]
+L_{Ar,T} = 10 \log_{10}\!\left[ \frac{1}{T} \sum_N \Delta t_N \, 10^{(L_{Aeq,N} + K_{I,N})/10} \right]
 $$
 
 **Parameters**

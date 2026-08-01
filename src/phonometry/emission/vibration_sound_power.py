@@ -18,20 +18,20 @@ the radiating area :math:`S`. The vibratory velocity is reported as a
 
 .. math::
 
-   L_v = 10 \lg\frac{\langle v^2 \rangle}{v_0^2} = 20 \lg\frac{v}{v_0}
+   L_v = 10 \log_{10}\frac{\langle v^2 \rangle}{v_0^2} = 20 \log_{10}\frac{v}{v_0}
 
 so the A-weighted sound power level follows in logarithmic form, in decibels
 (ISO/TS 7849-1, Equation 12; ISO/TS 7849-2, Equation 15):
 
 .. math::
 
-   L_W = L_v + 10 \lg\frac{S}{S_0} + 10 \lg \epsilon
-   + 10 \lg\frac{Z_{c,n}}{Z_{c,0}}
+   L_W = L_v + 10 \log_{10}\frac{S}{S_0} + 10 \log_{10} \epsilon
+   + 10 \log_{10}\frac{Z_{c,n}}{Z_{c,0}}
 
 where :math:`S_0 = 1~\text{m}^2`, the normalized characteristic impedance
 :math:`Z_{c,n} = 411~\text{N s/m}^3` (at 23 degC, 101.3 kPa) and the
 reference acoustic impedance :math:`Z_{c,0} = 400~\text{N s/m}^3` give the
-fixed :math:`10 \lg(411/400) = 0.118` dB term.
+fixed :math:`10 \log_{10}(411/400) = 0.118` dB term.
 
 The two parts differ only in ``epsilon``:
 
@@ -84,7 +84,7 @@ def velocity_level(
 ) -> np.ndarray:
     r"""Vibratory velocity level (ISO/TS 7849-1, Eq. 3).
 
-    :math:`L_v = 20 \lg(v/v_0)` with ``v0`` the reference velocity.
+    :math:`L_v = 20 \log_{10}(v/v_0)` with ``v0`` the reference velocity.
 
     :param velocity: R.m.s. vibratory velocity ``v`` (scalar or array), in m/s.
     :param reference: Reference velocity ``v0`` (Default: 5e-8 m/s).
@@ -104,7 +104,7 @@ def velocity_level_from_acceleration(
 ) -> np.ndarray:
     r"""Velocity level from a sinusoidal acceleration (ISO/TS 7849-1, Eq. 8).
 
-    :math:`L_v = 20 \lg\!\left( \frac{a_{\text{peak}}}{2\pi f v_0 \sqrt{2}}
+    :math:`L_v = 20 \log_{10}\!\left( \frac{a_{\text{peak}}}{2\pi f v_0 \sqrt{2}}
     \right)`, used to convert a calibration acceleration to the equivalent
     r.m.s. velocity level.
 
@@ -192,8 +192,8 @@ def radiated_sound_power_level(
 
     .. math::
 
-       L_W = L_v + 10 \lg\frac{S}{S_0} + 10 \lg \epsilon
-       + 10 \lg\frac{Z_{c,n}}{Z_{c,0}}
+       L_W = L_v + 10 \log_{10}\frac{S}{S_0} + 10 \log_{10} \epsilon
+       + 10 \log_{10}\frac{Z_{c,n}}{Z_{c,0}}
 
     With the default ``radiation_factor = 1`` this is the Part 1 *upper limit*
     ``L_W,max``; pass a measured ``epsilon`` for the Part 2 engineering value.
@@ -266,7 +266,7 @@ class VibrationSoundPowerResult:
     @property
     def total_level(self) -> float:
         r"""Band-summed sound power level, in dB:
-        :math:`10 \lg \sum_j 10^{0.1 L_{Wj}}`."""
+        :math:`10 \log_{10} \sum_j 10^{0.1 L_{Wj}}`."""
         lw = np.asarray(self.sound_power_level, dtype=np.float64)
         return float(10.0 * np.log10(np.sum(10.0 ** (0.1 * lw))))
 
@@ -327,8 +327,8 @@ class VibrationSoundPowerResult:
         power level ``LWA`` (dB re 1 pW) with the total ``LW``, the radiating
         area ``S`` and the applied method, an optional verdict row against a
         declared limit, and a measurement-basis strip stating the sound-power
-        relation :math:`L_W = L_v + 10 \lg(S/S_0) + 10 \lg \epsilon
-        + 10 \lg(Z_{c,n}/Z_{c,0})`.
+        relation :math:`L_W = L_v + 10 \log_{10}(S/S_0) + 10 \log_{10} \epsilon
+        + 10 \log_{10}(Z_{c,n}/Z_{c,0})`.
 
         :param path: Destination path of the PDF file.
         :param metadata: Optional :class:`~phonometry.ReportMetadata` supplying

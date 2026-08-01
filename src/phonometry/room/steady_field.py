@@ -218,7 +218,7 @@ def steady_state_spl(
         ``"constant_power"`` (default, :math:`\Pi = \Pi_0`, the position of
         the source does not change its radiated power), ``"constant_volume"``
         (:math:`\Pi = \Pi_0 Q`, reflecting boundaries raise the radiated
-        power by :math:`10 \lg Q`; the conservative upper bound) or
+        power by :math:`10 \log_{10} Q`; the conservative upper bound) or
         ``"constant_pressure"`` (:math:`\Pi = \Pi_0 / Q`, the theoretical
         lower bound). See :data:`SOURCE_POWER_MODELS`.
     :param characteristic_impedance: Air characteristic impedance ``rho c``,

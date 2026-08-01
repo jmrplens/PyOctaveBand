@@ -11,7 +11,7 @@ residual-noise correction, and the measurement-uncertainty budget.
 energy-summed tone level ``Lpt`` (Formula (C.1)) and the masking-noise level
 ``Lpn`` in the critical band around the tone, the tonal audibility above the
 masking threshold is
-:math:`\Delta L_{ta} = L_{pt} - L_{pn} + 2 + \lg[1 + (f_c/502)^{2.5}]` dB
+:math:`\Delta L_{ta} = L_{pt} - L_{pn} + 2 + \log_{10}[1 + (f_c/502)^{2.5}]` dB
 (Formula (C.3)), and the
 tonal adjustment is the piecewise function :math:`K_t = 0` for
 :math:`\Delta L_{ta} < 4`,
@@ -32,7 +32,7 @@ neighbours by 15 dB (25–125 Hz), 8 dB (160–400 Hz) or 5 dB (500–10 000 Hz)
 audibility ``ΔL`` to ``Kt`` (0–6 dB).
 
 **Residual-noise correction (Clause 10.4).**
-:math:`L = 10 \lg(10^{L'/10} - 10^{L_{res}/10})` (Formula (16)); with a
+:math:`L = 10 \log_{10}(10^{L'/10} - 10^{L_{res}/10})` (Formula (16)); with a
 residual
 within 3 dB of the measured level no correction is allowed; the
 *uncorrected* measured level ``L'`` is then the reportable value, as an upper
@@ -128,7 +128,7 @@ def tonal_audibility(
 ) -> float:
     r"""Tonal audibility above the masking threshold (Formula (C.3)).
 
-    :math:`\Delta L_{ta} = L_{pt} - L_{pn} + 2 + \lg[1 + (f_c/502)^{2.5}]`
+    :math:`\Delta L_{ta} = L_{pt} - L_{pn} + 2 + \log_{10}[1 + (f_c/502)^{2.5}]`
     dB.
 
     :param tone_level: Energy-summed tone level ``Lpt`` in the critical band,
@@ -337,7 +337,7 @@ def residual_sound_correction(
 ) -> ResidualCorrectionResult:
     r"""Correct a measured level for residual sound (Formula (16)).
 
-    :math:`L = 10 \lg(10^{L'/10} - 10^{L_{res}/10})`. When the residual is
+    :math:`L = 10 \log_{10}(10^{L'/10} - 10^{L_{res}/10})`. When the residual is
     within 3 dB
     of the measured level, §10.4 allows **no** correction: the *uncorrected*
     measured level ``L'`` is the reportable value, as an upper bound of the
@@ -524,12 +524,12 @@ class RepeatedMeasurementResult:
     r"""Energy-mean level and its uncertainty from repeats (Formulae (17)–(20)).
 
     :ivar mean_level: Energy-mean level
-        :math:`L_k = 10 \lg((1/N) \cdot \sum 10^{0.1 \cdot L_i})`, dB
+        :math:`L_k = 10 \log_{10}((1/N) \cdot \sum 10^{0.1 \cdot L_i})`, dB
         (Formula (18)).
     :ivar standard_uncertainty: Standard uncertainty ``uk`` by the primary
         route, Formulae (17)+(19): the sample standard deviation ``sk`` of the
         energy values :math:`10^{0.1 \cdot L_i}` mapped back to level,
-        :math:`u_k = 10 \lg(10^{0.1 \cdot L_k} + s_k) - L_k`, in dB.
+        :math:`u_k = 10 \log_{10}(10^{0.1 \cdot L_k} + s_k) - L_k`, in dB.
     :ivar approximate_uncertainty: The Note 2 substitute (Formula (20)),
         :math:`\sqrt{\sum (L_i - L_k)^2/(N - 1)}`, in dB; valid only when the
         spread of the
@@ -548,13 +548,13 @@ def uncertainty_from_repeated_measurements(
 ) -> RepeatedMeasurementResult:
     r"""Energy mean and its uncertainty from repeated levels (Formulae (17)–(20)).
 
-    :math:`L_k = 10 \lg((1/N) \cdot \sum 10^{0.1 \cdot L_i})` (Formula (18)).
+    :math:`L_k = 10 \log_{10}((1/N) \cdot \sum 10^{0.1 \cdot L_i})` (Formula (18)).
     The standard
     uncertainty follows the primary §10.5 route: the sample standard
     deviation ``sk`` of the energy values :math:`10^{0.1 \cdot L_i}`
     (Formula (17))
     propagated back to level,
-    :math:`u_k = 10 \lg(10^{0.1 \cdot L_k} + s_k) - L_k`
+    :math:`u_k = 10 \log_{10}(10^{0.1 \cdot L_k} + s_k) - L_k`
     (Formula (19)). The Note 2 level-domain approximation
     :math:`\sqrt{\sum (L_i - L_k)^2/(N - 1)}` (Formula (20)) is also
     reported as

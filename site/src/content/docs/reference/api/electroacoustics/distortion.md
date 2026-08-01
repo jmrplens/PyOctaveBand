@@ -153,7 +153,7 @@ is the ratio of the maximum output level (a full-scale sine, 6.2.6) to
 that weighted residual level:
 
 $$
-\mathrm{DR} = 20 \lg\left( (\text{full\_scale} / \sqrt{2}) / V_\text{residual,CCIR-RMS} \right)
+\mathrm{DR} = 20 \log_{10}\left( (\text{full\_scale} / \sqrt{2}) / V_\text{residual,CCIR-RMS} \right)
 $$
 
 It includes all harmonic, inharmonic and noise components and is also
@@ -324,7 +324,7 @@ idle output is weighted by the CCIR-RMS filter (5.2.7) over the AES17
 measurement band and reported relative to full scale:
 
 $$
-L_\text{idle} = 20 \lg\left( V_\text{idle,CCIR-RMS} / (\text{full\_scale} / \sqrt{2}) \right)
+L_\text{idle} = 20 \log_{10}\left( V_\text{idle,CCIR-RMS} / (\text{full\_scale} / \sqrt{2}) \right)
 $$
 
 **Parameters**
@@ -511,7 +511,7 @@ sinad(
 Signal-to-noise-and-distortion ratio SINAD, in dB.
 
 $$
-\mathrm{SINAD} = -(\text{THD+N in dB}) = 20 \lg(V_\text{total} / V_\text{residual}),
+\mathrm{SINAD} = -(\text{THD+N in dB}) = 20 \log_{10}(V_\text{total} / V_\text{residual}),
 $$
 
 the reciprocal, in dB, of the THD+N ratio. AES17-2015 does not itself
@@ -611,7 +611,7 @@ The fundamental is removed with the standard notch filter
 ($1.2 \le Q \le 3$, validated on the applied zero-phase response
 per 5.2.8) and the residual RMS is compared with the total RMS:
 $\mathrm{THD{+}N} = V_\text{residual} / V_\text{total}$ (a
-ratio, or $20 \lg$ of it in dB). Both voltages are measured
+ratio, or $20 \log_{10}$ of it in dB). Both voltages are measured
 through the AES17 measurement bandwidth -- a 20 Hz high-pass plus the
 standard low-pass at `bandwidth` (5.2.5 / 6.3.1) -- so DC offsets
 and out-of-band noise do not inflate the result.
@@ -626,7 +626,7 @@ and out-of-band noise do not inflate the result.
 | `notch_q` | Effective notch quality factor (AES17: 1.2..3; default 2.0). |
 | `bandwidth` | Upper band-edge frequency of the AES17 chain, in Hz (default 20 kHz, the 5.2.5 standard value; capped at Nyquist). `None` disables the chain and measures the full Nyquist band (20 Hz high-pass included only when the chain is active). |
 | `window` | FFT window used only for fundamental auto-detection. |
-| `as_db` | Return $20 \lg(\text{ratio})$ in dB instead of the ratio. |
+| `as_db` | Return $20 \log_{10}(\text{ratio})$ in dB instead of the ratio. |
 
 **Returns:** THD+N as a ratio (default) or in dB.
 

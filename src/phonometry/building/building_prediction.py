@@ -24,7 +24,7 @@ three flanking paths ``Ff``, ``Df`` and ``Fd``:
 
 .. math::
 
-   R'_w = -10 \lg\!\left[ 10^{-R_{Dd,w}/10} + \sum 10^{-R_{Ff,w}/10}
+   R'_w = -10 \log_{10}\!\left[ 10^{-R_{Dd,w}/10} + \sum 10^{-R_{Ff,w}/10}
    + \sum 10^{-R_{Df,w}/10} + \sum 10^{-R_{Fd,w}/10} \right]
 
 with the direct path :math:`R_{Dd,w} = R_{s,w} + \Delta R_{Dd,w}` (Formula 27)
@@ -33,7 +33,7 @@ and each flanking path (Formula 28a)
 .. math::
 
    R_{ij,w} = \frac{R_{i,w} + R_{j,w}}{2} + \Delta R_{ij,w} + K_{ij}
-   + 10 \lg\frac{S_s}{l_0 l_f}
+   + 10 \log_{10}\frac{S_s}{l_0 l_f}
 
 where :math:`l_0 = 1` m is the reference coupling length.
 
@@ -42,13 +42,13 @@ where :math:`l_0 = 1` m is the reference coupling length.
 lightweight façade junctions (E.6), junctions of lightweight double-leaf walls
 with homogeneous elements (E.7) or with other coupled double-leaf walls (E.8),
 and corners / thickness changes (E.9) are empirical functions of the mass
-ratio :math:`M = \lg(m'_{\perp,i} / m'_i)`. A minimum value ``Kij,min``
+ratio :math:`M = \log_{10}(m'_{\perp,i} / m'_i)`. A minimum value ``Kij,min``
 follows from the Kij,min relation of Clause 4.4.2 (printed as Eq. (23)
 in the BS EN 12354-1:2000 edition).
 
 **Impact, Formula (21).** :math:`L'_{n,w} = L_{n,w,eq} - \Delta L_w + K` with
 the bare-floor equivalent level ``Ln,w,eq`` (Annex B
-:math:`164 - 35 \lg(m'/m'_0)`), the covering improvement ``ΔLw`` (ISO 717-2)
+:math:`164 - 35 \log_{10}(m'/m'_0)`), the covering improvement ``ΔLw`` (ISO 717-2)
 and the flanking correction ``K`` from Table 1.
 
 Clause citations refer to EN 12354-1:2000 (airborne) or EN 12354-2:2000 (impact).
@@ -370,7 +370,7 @@ def junction_vibration_reduction(
     r"""Vibration reduction index ``Kij`` of a junction (EN 12354-1 Annex E).
 
     Empirical ``Kij`` for common junctions as a function of the mass ratio
-    :math:`M = \lg(m'_{\perp,i} / m'_i)` (Formula E.2), where ``mass_ratio``
+    :math:`M = \log_{10}(m'_{\perp,i} / m'_i)` (Formula E.2), where ``mass_ratio``
     is :math:`m'_{\perp,i} / m'_i`, the mass per unit area of the
     perpendicular element over that of the element carrying the path.
     ``path`` selects the *through* branch (in-line elements,
@@ -387,7 +387,7 @@ def junction_vibration_reduction(
     - ``"flexible_t"`` (E.5, wall junction with flexible interlayers): through
       :math:`5.7 + 14.1 M + 5.7 M^2 + 2 \Delta_1`; corner
       :math:`5.7 + 5.7 M^2 + \Delta_1` with
-      :math:`\Delta_1 = 10 \lg(f/f_1)` for :math:`f > f_1` (else 0) and
+      :math:`\Delta_1 = 10 \log_{10}(f/f_1)` for :math:`f > f_1` (else 0) and
       :math:`f_1 = 125` Hz for the typical interlayer
       :math:`E_1/t_1 \approx 100` MN/m³; double-leaf
       :math:`K_{24} = 3.7 + 14.1 M + 5.7 M^2` clamped to
@@ -398,8 +398,8 @@ def junction_vibration_reduction(
       corner :math:`10 + 10 |M|`.
     - ``"lightweight_double_homogeneous"`` (E.7, lightweight double-leaf wall
       joined to homogeneous elements): through
-      :math:`\max(10 + 20 M - 3.3 \lg(f/f_k), 10)`; corner
-      :math:`10 + 10 |M| + 3.3 \lg(f/f_k)`; double-leaf
+      :math:`\max(10 + 20 M - 3.3 \log_{10}(f/f_k), 10)`; corner
+      :math:`10 + 10 |M| + 3.3 \log_{10}(f/f_k)`; double-leaf
       :math:`K_{24} = 3.0 + 14.1 M + 5.7 M^2` with :math:`f_k = 500` Hz.
       The K24 path is
       carried by the homogeneous element crossing the double leaf, so its
@@ -408,14 +408,14 @@ def junction_vibration_reduction(
       validity condition (homogeneous over three times heavier than a leaf)
       reads ``mass_ratio`` :math:`< 1/3`. (The 2000 print states this line as
       :math:`3.0 - 14.1 M + 5.7 M^2` in the *figure-axis* variable
-      :math:`M = \lg(m_2/m_1)` of Figure E.9, contradicting the annex's own
+      :math:`M = \log_{10}(m_2/m_1)` of Figure E.9, contradicting the annex's own
       per-path definition of M; both forms are numerically identical, and
       ISO 12354-1:2017 E.3.5 prints the per-path form implemented here. See
       ``docs/ERRATA.md``.)
     - ``"lightweight_double_coupled"`` (E.8, junction of lightweight coupled
       double-leaf walls): through
-      :math:`\max(10 + 20 M - 3.3 \lg(f/f_k), 10)`;
-      corner :math:`10 + 10 |M| - 3.3 \lg(f/f_k)`; with
+      :math:`\max(10 + 20 M - 3.3 \log_{10}(f/f_k), 10)`;
+      corner :math:`10 + 10 |M| - 3.3 \log_{10}(f/f_k)`; with
       :math:`f_k = 500` Hz.
     - ``"corner"`` (E.9 A, two elements meeting at a corner): corner
       :math:`K_{12} = \max(15 |M| - 3, -2)` (:math:`= K_{21}`); the only
@@ -435,7 +435,7 @@ def junction_vibration_reduction(
         ``"flexible_t"`` (through/corner) and the E.7/E.8 lightweight
         double-leaf junctions are frequency dependent. Defaults to 500 Hz, the
         value used by the simplified model (Clause 4.4.2), at which the
-        E.7/E.8 :math:`\lg(f/f_k)` terms vanish.
+        E.7/E.8 :math:`\log_{10}(f/f_k)` terms vanish.
     :param f1: Interlayer characteristic frequency for ``"flexible_t"``, in Hz.
     :return: ``Kij``, in dB.
     :raises ValueError: If ``mass_ratio`` is not positive, ``frequency``/``f1``
@@ -544,7 +544,7 @@ def junction_min_vibration_reduction(
 
     Printed as Formula (29) in the EN 12354-1:2000 edition.
 
-    :math:`K_{ij,\mathrm{min}} = 10 \lg[l_f \, l_0 \, (1/S_i + 1/S_j)]` with
+    :math:`K_{ij,\mathrm{min}} = 10 \log_{10}[l_f \, l_0 \, (1/S_i + 1/S_j)]` with
     the reference coupling
     length :math:`l_0 = 1` m. When the tabulated ``Kij`` is below this value,
     the minimum is used (Clause 4.4.2).
@@ -589,7 +589,7 @@ def combine_linings(delta_a: float, delta_b: float) -> float:
 
 
 def _coupling_term(separating_area: float, coupling_length: float) -> float:
-    r"""The :math:`10 \lg(S_s/(l_0 l_f))` term of Formula (28a)."""
+    r"""The :math:`10 \log_{10}(S_s/(l_0 l_f))` term of Formula (28a)."""
     ss = _check_finite(separating_area, "separating_area")
     lf = _check_finite(coupling_length, "coupling_length")
     if ss <= 0.0 or lf <= 0.0:
@@ -616,7 +616,7 @@ def flanking_path(
     .. math::
 
        R_{ij,w} = \frac{R_{i,w} + R_{j,w}}{2} + \Delta R_{ij,w} + K_{ij}
-       + 10 \lg\frac{S_s}{l_0 l_f}
+       + 10 \log_{10}\frac{S_s}{l_0 l_f}
 
     with ``r_source`` and ``r_receive`` as :math:`R_{i,w}` / :math:`R_{j,w}`,
     ``delta_r`` as :math:`\Delta R_{ij,w}` and ``k_ij`` as :math:`K_{ij}`.
@@ -684,10 +684,10 @@ def flanking_element(
 
     **Kij,min (Clause 4.4.2).** When ``flanking_area`` is given, the mandatory
     floor :math:`K_{ij} \ge K_{ij,\mathrm{min}}` is applied automatically per
-    path: ``KFf`` is clamped to :math:`10 \lg[l_f l_0 (2/S_F)]` (both
+    path: ``KFf`` is clamped to :math:`10 \log_{10}[l_f l_0 (2/S_F)]` (both
     junction elements are
     the flanking element) and ``KFd``/``KDf`` to
-    :math:`10 \lg[l_f l_0 (1/S_F + 1/S_s)]` (flanking and separating
+    :math:`10 \log_{10}[l_f l_0 (1/S_F + 1/S_s)]` (flanking and separating
     element), via
     :func:`junction_min_vibration_reduction`. Without ``flanking_area`` the
     per-path floors cannot be formed from the available geometry, so the raw
@@ -757,7 +757,7 @@ def predicted_airborne_insulation(
 
     .. math::
 
-       R'_w = -10 \lg\!\left[ 10^{-R_{Dd,w}/10}
+       R'_w = -10 \log_{10}\!\left[ 10^{-R_{Dd,w}/10}
        + \sum 10^{-R_{ij,w}/10} \right]
 
     With no flanking paths the result equals the direct path ``RDd,w``; each
@@ -805,7 +805,7 @@ def predicted_airborne_insulation(
 def equivalent_impact_level(mass_per_area: float) -> float:
     r"""Bare-floor equivalent weighted impact level ``Ln,w,eq`` (Part 2, Annex B).
 
-    :math:`L_{n,w,eq} = 164 - 35 \lg(m'/m'_0)` with :math:`m'_0 = 1` kg/m²,
+    :math:`L_{n,w,eq} = 164 - 35 \log_{10}(m'/m'_0)` with :math:`m'_0 = 1` kg/m²,
     the closed form
     used in the Annex E worked example for a homogeneous concrete floor. The
     Annex B relation is stated for homogeneous floors of 100 kg/m² to
@@ -895,12 +895,12 @@ def standardized_impact_level(l_prime_n_w: float, volume: float) -> float:
 
     .. math::
 
-       L'_{nT,w} = L'_{n,w} - 10 \lg\frac{0.16\,V}{A_0 T_0}
-       = L'_{n,w} - 10 \lg(0.032\,V)
+       L'_{nT,w} = L'_{n,w} - 10 \log_{10}\frac{0.16\,V}{A_0 T_0}
+       = L'_{n,w} - 10 \log_{10}(0.032\,V)
 
     with :math:`A_0 = 10` m² and :math:`T_0 = 0.5` s, the exact Formula (3)
     form. The standard's own Annex E.3 worked example rounds the factor to
-    :math:`10 \lg(V/30)` (:math:`1/0.032 = 31.25 \approx 30`), 0.18 dB below
+    :math:`10 \log_{10}(V/30)` (:math:`1/0.032 = 31.25 \approx 30`), 0.18 dB below
     the exact form; both round to the same integer rating in E.3.
 
     :param l_prime_n_w: Apparent weighted normalized impact level ``L'n,w``, dB.
@@ -922,12 +922,12 @@ def standardized_level_difference(
 
     .. math::
 
-       D_{nT} = R' + 10 \lg\frac{0.16\,V}{T_0 S_s}
-       = R' + 10 \lg\frac{0.32\,V}{S_s}
+       D_{nT} = R' + 10 \log_{10}\frac{0.16\,V}{T_0 S_s}
+       = R' + 10 \log_{10}\frac{0.32\,V}{S_s}
 
     with :math:`T_0 = 0.5` s, the exact Formula (5b) form, applied to the
     weighted single numbers of the simplified model (Clause 4.4). The Annex
-    H.3 worked example rounds the factor to :math:`10 \lg(V/(3 S_s))`
+    H.3 worked example rounds the factor to :math:`10 \log_{10}(V/(3 S_s))`
     (:math:`1/0.32 = 3.125 \approx 3`), printing :math:`52.2 + 1.6 = 53.8` dB
     where the exact form gives 53.6 dB;
     both round to the same :math:`D_{nT,w} = 54` dB.

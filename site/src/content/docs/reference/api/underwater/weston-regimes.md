@@ -12,13 +12,13 @@ regimes, each with its own power law. The boundaries between them follow from
 the seabed reflectivity alone, which makes the set an inexpensive analytic
 reference for any numerical propagation model:
 
-* **spherical spreading** -- $F = 1/r^2$ ($20 \lg r$), while the
+* **spherical spreading** -- $F = 1/r^2$ ($20 \log_{10} r$), while the
   sound has not yet felt the boundaries;
-* **cylindrical spreading** -- $F = 2\psi_c/(r H)$ ($10 \lg r$),
+* **cylindrical spreading** -- $F = 2\psi_c/(r H)$ ($10 \log_{10} r$),
   once the energy is confined to a cylinder of height `H` and only rays
   within the critical angle $\psi_c$ survive;
 * **mode stripping** -- $F = (\pi/(\eta H))^{1/2} \, r^{-3/2}$
-  ($15 \lg r$), once the accumulated reflection loss has eroded the
+  ($15 \log_{10} r$), once the accumulated reflection loss has eroded the
   steep paths;
 * **single mode** -- an exponential decay dominated by the lowest-order mode.
 
@@ -27,7 +27,7 @@ Performance Modelling* (Springer 2010), §9.1.1.2 (printed pp. 452-458):
 Equations (9.42) to (9.61) and the seabed properties of Table 9.1
 ([`WESTON_SEABEDS`](/phonometry/reference/api/underwater/weston-regimes/#weston_seabeds)). The quantity computed is Ainslie's **propagation
 factor** `F` (units m⁻²), reported as the propagation loss
-$\mathrm{PL} = -10 \lg F$ dB re 1 m², which equals the usual
+$\mathrm{PL} = -10 \log_{10} F$ dB re 1 m², which equals the usual
 transmission loss for a point source in free water.
 
 The regime formulae are energy-flux (incoherent) results: they describe the
@@ -126,7 +126,7 @@ loss_parameter(attenuation_db_per_wavelength: float) -> float
 ```
 
 Sediment loss parameter
-$\varepsilon = \beta_{\mathrm{sed}}/(40 \pi \lg e)$
+$\varepsilon = \beta_{\mathrm{sed}}/(40 \pi \log_{10} e)$
 (Ainslie Eq. 9.23).
 
 **Parameters**
@@ -349,10 +349,10 @@ Weston regime propagation loss versus range.
 | Name | Description |
 | :--- | :--- |
 | `range_m` | Ranges from the source, in metres. |
-| `propagation_loss` | Composite propagation loss $\mathrm{PL} = -10 \lg F$ per range, in dB re 1 m². |
+| `propagation_loss` | Composite propagation loss $\mathrm{PL} = -10 \log_{10} F$ per range, in dB re 1 m². |
 | `propagation_factor` | The composite propagation factor `F`, in m⁻². |
 | `regime` | The active regime label at each range (one of [`WESTON_REGIMES`](/phonometry/reference/api/underwater/weston-regimes/#weston_regimes)). |
-| `spherical` | Spherical-spreading loss $20 \lg r$ at every range, in dB. |
+| `spherical` | Spherical-spreading loss $20 \log_{10} r$ at every range, in dB. |
 | `cylindrical` | Cylindrical-spreading loss (Eq. 9.42) at every range, dB. |
 | `mode_stripping` | Mode-stripping loss (Eq. 9.49) at every range, dB (`nan` when the bottom is lossless: without reflection loss there is nothing to strip). |
 | `single_mode` | Single-mode loss (Eq. 9.54) at every range, in dB. |
@@ -432,5 +432,5 @@ Characteristic seabed properties (Ainslie Table 9.1, printed p. 454).
 | `sound_speed_ratio` | $c_{\mathrm{sed}}/c_w$. |
 | `density_ratio` | $\rho_{\mathrm{sed}}/\rho_w$. |
 | `attenuation_db_per_wavelength` | $\beta_{\mathrm{sed}}$, in dB per wavelength. |
-| `loss_parameter` | $\varepsilon = \beta_{\mathrm{sed}}/(40 \pi \lg e)$ (Equation 9.23). |
+| `loss_parameter` | $\varepsilon = \beta_{\mathrm{sed}}/(40 \pi \log_{10} e)$ (Equation 9.23). |
 | `sound_speed_gradient` | `c'`, the sediment sound-speed gradient, in s⁻¹ (0 for sand, 1 for mud). |

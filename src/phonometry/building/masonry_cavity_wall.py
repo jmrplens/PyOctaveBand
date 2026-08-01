@@ -138,7 +138,7 @@ def wall_tie_stiffness(tie: str) -> tuple[float, float]:
 def wall_tie_stiffness_per_area(
     ties_per_area: float, tie: str | float
 ) -> float:
-    """Stiffness per unit area of a tie array, :math:`N k / S` (Hopkins
+    r"""Stiffness per unit area of a tie array, :math:`N k / S` (Hopkins
     Eq. 4.89).
 
     The term that acts in parallel with the cavity air stiffness ``s_a`` in the

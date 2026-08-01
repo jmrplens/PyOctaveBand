@@ -231,4 +231,4 @@ Requires matplotlib (`pip install phonometry[plot]`); returns the
 
 *property*
 
-Radiation index $10 \lg(\sigma)$ per band, in dB.
+Radiation index $10 \log_{10}(\sigma)$ per band, in dB.

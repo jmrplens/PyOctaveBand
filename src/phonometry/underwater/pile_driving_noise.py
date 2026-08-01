@@ -10,7 +10,7 @@ hammer strike. ISO 18406 characterises them with:
 * :func:`cumulative_sel` / :func:`cumulative_sel_identical` -- the cumulative
   sound exposure level over N strikes (Formulae 8-9); for N identical strikes
   :math:`\mathrm{SEL}_{\mathrm{cum}} =
-  \mathrm{SEL}_{\mathrm{ss}} + 10 \lg N`.
+  \mathrm{SEL}_{\mathrm{ss}} + 10 \log_{10} N`.
 * :func:`pile_strike_metrics` -- a :class:`PileStrikeResult` bundling the
   single-strike SEL, the peak sound pressure level, the SPL/Leq and the
   90 %-energy pulse duration for one recorded strike, with a ``.plot()``.
@@ -65,7 +65,7 @@ def cumulative_sel(single_sels: NDArray[np.float64] | list[float]) -> float:
     Formulae 8-9).
 
     :math:`\mathrm{SEL}_{\mathrm{cum}} =
-    10 \lg \sum_n 10^{\mathrm{SEL}_n/10}` -- the energy sum of the per-strike
+    10 \log_{10} \sum_n 10^{\mathrm{SEL}_n/10}` -- the energy sum of the per-strike
     single-strike SELs.
 
     :param single_sels: Per-strike single-strike SELs, in dB re 1 µPa²·s.
@@ -82,7 +82,7 @@ def cumulative_sel(single_sels: NDArray[np.float64] | list[float]) -> float:
 
 def cumulative_sel_identical(sel_ss: float, n_strikes: int) -> float:
     r"""Cumulative SEL of ``n_strikes`` identical strikes:
-    :math:`\mathrm{SEL}_{\mathrm{ss}} + 10 \lg N`.
+    :math:`\mathrm{SEL}_{\mathrm{ss}} + 10 \log_{10} N`.
 
     :param sel_ss: Single-strike SEL, in dB re 1 µPa²·s.
     :param n_strikes: Number of (identical) strikes, :math:`N \ge 1`.

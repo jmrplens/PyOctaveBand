@@ -206,7 +206,7 @@ def envelope(
 
 @dataclass(frozen=True)
 class EnvelopeSpectrumResult:
-    """Amplitude spectrum of a signal's envelope (B&P Section 13.3).
+    r"""Amplitude spectrum of a signal's envelope (B&P Section 13.3).
 
     :ivar frequencies: Frequency axis of the spectrum, in Hz.
     :ivar amplitude: One-sided amplitude spectrum of the (mean-removed)

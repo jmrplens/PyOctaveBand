@@ -8,7 +8,7 @@ From a line of measurement positions across workstations (ISO 3382-3:2012,
 - the spatial decay rate of the A-weighted sound pressure level of speech
   ``D2,S`` and the nominal A-weighted speech level at 4 m ``Lp,A,S,4m``
   (Clause 6.2), obtained by a least-squares fit of the A-weighted speech
-  level against :math:`\lg(r/r_0)` (logarithmic distance axis,
+  level against :math:`\log_{10}(r/r_0)` (logarithmic distance axis,
   :math:`r_0 = 1` m)
   using only positions in the 2 m to 16 m range (Equation (5)); and
 - the distraction distance ``rD`` (STI = 0.50) and privacy distance
@@ -231,7 +231,7 @@ def open_plan_metrics(
     Computes the spatial decay rate ``D2,S`` and the nominal A-weighted
     speech level at 4 m ``Lp,A,S,4m`` (Clause 6.2, Equation (5)) from a
     least-squares fit of the A-weighted speech level against
-    :math:`\lg(r/r_0)` (:math:`r_0 = 1` m) restricted to positions in the
+    :math:`\log_{10}(r/r_0)` (:math:`r_0 = 1` m) restricted to positions in the
     2 m to 16 m range, and
     the distraction distance ``rD`` (STI = 0.50) and privacy distance
     ``rP`` (STI = 0.20) from a linear regression of STI against distance

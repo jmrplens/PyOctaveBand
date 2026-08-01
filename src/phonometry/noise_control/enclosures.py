@@ -144,7 +144,7 @@ class EnclosureResult:
         bands with the external and internal surface areas, an optional verdict
         row against a declared minimum, and a method-basis strip stating
         :math:`\mathrm{IL} = R - C` with
-        :math:`C = 10 \lg(0.3 + S_E / R_i)`.
+        :math:`C = 10 \log_{10}(0.3 + S_E / R_i)`.
 
         :param path: Destination path of the PDF file.
         :param metadata: Optional :class:`~phonometry.ReportMetadata` supplying
@@ -321,7 +321,7 @@ def enclosure_insertion_loss(
         label the result and the plot).
     :param model: Interior build-up model, one of :data:`ENCLOSURE_MODELS`:
         ``"bies"`` (default) carries the ``0.3`` floor of Bies Equation (7.111),
-        ``"norton"`` the bare :math:`C = 10 \lg(S_E / R_i)` of Norton & Karczub
+        ``"norton"`` the bare :math:`C = 10 \log_{10}(S_E / R_i)` of Norton & Karczub
         Equation (4.115).
     :return: An :class:`EnclosureResult`.
     """

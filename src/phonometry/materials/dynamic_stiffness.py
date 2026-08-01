@@ -360,7 +360,7 @@ def floating_floor_resonance(
     porosity: float | None = None,
     atmospheric_pressure: float = STANDARD_ATMOSPHERIC_PRESSURE,
 ) -> DynamicStiffnessResult:
-    """Full EN 29052-1 chain: measured resonance -> installed ``s'`` and ``f0``.
+    r"""Full EN 29052-1 chain: measured resonance -> installed ``s'`` and ``f0``.
 
     Chains the apparent dynamic stiffness (Formula 4), the enclosed-gas term
     (Formula 7, when ``thickness`` and ``porosity`` are given), the airflow

@@ -12,12 +12,12 @@ comparing it with a threshold. The filter is the same band-pass form in all
 current guidance (NMFS 2018 Equation 1, Southall et al. 2019 Equation 2):
 
 $$
-W(f) = C + 10\,\lg\frac{(f/f_1)^{2a}} {[1+(f/f_1)^2]^{a}\,[1+(f/f_2)^2]^{b}}
+W(f) = C + 10\,\log_{10}\frac{(f/f_1)^{2a}} {[1+(f/f_1)^2]^{a}\,[1+(f/f_2)^2]^{b}}
 $$
 
 with `f` in kilohertz. `C` is fixed by putting the peak of `W` at 0 dB,
 so the companion **exposure function**
-$E(f) = K - 10 \lg(\dots) = K + C - W(f)$
+$E(f) = K - 10 \log_{10}(\dots) = K + C - W(f)$
 has its minimum at the weighted threshold $T_w = K + C$. Only the
 parameter table changes between guidance versions, so the version is explicit
 in the API and is carried on every result object:
@@ -244,7 +244,7 @@ criteria.
 
 The per-band single-event sound exposure levels are weighted with
 [`auditory_weighting`](/phonometry/reference/api/underwater/marine-mammal-weighting/#auditory_weighting), summed on an energy basis and accumulated over
-`n_events` identical events ($+10 \lg N$, the ISO 18406 Formula 9
+`n_events` identical events ($+10 \log_{10} N$, the ISO 18406 Formula 9
 identity used by [`cumulative_sel_identical`](/phonometry/reference/api/underwater/pile-driving-noise/#cumulative_sel_identical)).
 The result is compared with the group's TTS and injury onset criteria; the
 peak sound pressure level, if supplied, is compared **unweighted**, as the
@@ -307,7 +307,7 @@ Weighted exposure of a spectrum against a hearing group's criteria.
 | `weighted_band_sel` | `band_sel + W(f)` per band, in dB. |
 | `unweighted_sel` | Energy sum of `band_sel`, in dB. |
 | `weighted_sel` | Energy sum of `weighted_band_sel`, in dB. |
-| `cumulative_sel` | `weighted_sel` plus $10 \lg(N)$ for the `n_events` accumulated events, in dB. |
+| `cumulative_sel` | `weighted_sel` plus $10 \log_{10}(N)$ for the `n_events` accumulated events, in dB. |
 | `peak_spl` | The unweighted peak sound pressure level supplied, in dB (`None` when not given). |
 | `n_events` | Number of accumulated events (e.g. hammer strikes). |
 | `criteria` | The [`ExposureCriteria`](/phonometry/reference/api/underwater/marine-mammal-weighting/#exposurecriteria) compared against. |

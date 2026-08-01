@@ -28,7 +28,7 @@ $$
 
 Implemented here are the four general terms of clause 7:
 
-* `Adiv` geometrical divergence, $20 \lg(d/d_0) + 11$ (Eq. (7));
+* `Adiv` geometrical divergence, $20 \log_{10}(d/d_0) + 11$ (Eq. (7));
 * `Aatm` atmospheric absorption, $\alpha d$ (Eq. (8)) with `alpha`
   the ISO 9613-1 coefficient supplied by [`phonometry.air_absorption`](/phonometry/reference/api/environment/air-absorption/);
 * `Agr` ground effect, both the general per-region method of 7.3.1 with the
@@ -121,7 +121,7 @@ match to the `Dz` formula of Eq. (14).
 | `edge_separation` | Spacing `e` between the two diffraction edges for double (thick-barrier) diffraction, in metres; `None` selects single diffraction (Eq. (16), $C_3 = 1$). When given, Eq. (17) and the `C3` factor of Eq. (15) are used with the 25 dB limit. |
 | `ground_reflections_by_image` | When `True` the ground reflections are assumed to be handled separately by image sources, so $C_2 = 40$; otherwise $C_2 = 20$ (Eq. (14)). |
 | `lateral` | When `True` the diffraction is around a vertical edge (Eq. (13)): $A_{bar} = D_z$ (the ground term is not cancelled) and $K_{met} = 1$. Default `False` selects top-edge diffraction (Eq. (12)). |
-| `line_of_sight_clear` | When `True` the line of sight between source and receiver passes *above* the top edge: ISO 9613-2:1996 (text after Eq. (16)) then gives the path difference `z` a negative sign, and Eq. (14) is still evaluated (with $K_{met} = 1$, Eq. (18)), so `Dz` falls continuously from $10 \lg 3 = 4.8$ dB at grazing to 0 for deeper geometries. The edge distances stay the unsigned geometric lengths; only the sign convention of `z` changes. |
+| `line_of_sight_clear` | When `True` the line of sight between source and receiver passes *above* the top edge: ISO 9613-2:1996 (text after Eq. (16)) then gives the path difference `z` a negative sign, and Eq. (14) is still evaluated (with $K_{met} = 1$, Eq. (18)), so `Dz` falls continuously from $10 \log_{10} 3 = 4.8$ dB at grazing to 0 for deeper geometries. The edge distances stay the unsigned geometric lengths; only the sign convention of `z` changes. |
 
 ### Barrier.is_double
 
@@ -142,7 +142,7 @@ barrier_attenuation(
 Barrier diffraction attenuation `Dz` (ISO 9613-2:1996, Eq. (14)).
 
 $$
-D_z = 10 \lg\!\left[ 3 + \frac{C_2}{\lambda} \, C_3 \, z \, K_{met} \right] ~\text{dB}
+D_z = 10 \log_{10}\!\left[ 3 + \frac{C_2}{\lambda} \, C_3 \, z \, K_{met} \right] ~\text{dB}
 $$
 
 with $C_2 = 20$ (or 40 when ground reflections are handled by image
@@ -153,7 +153,7 @@ meteorological factor `Kmet` (Eq. (18), 1 for $z \le 0$). `Dz`
 is limited to 20 dB (single) or 25 dB (double). When the line of sight
 passes above the top edge (`Barrier(line_of_sight_clear=True)`) `z`
 takes a negative sign (ISO 9613-2:1996, text after Eq. (16)) and Eq. (14)
-still applies: `Dz` falls continuously from $10 \lg 3 = 4.8$ dB
+still applies: `Dz` falls continuously from $10 \log_{10} 3 = 4.8$ dB
 at grazing ($z = 0$) towards 0 as the clearance deepens, clamped at
 0 (the logarithm's argument is floored at 1 -- a barrier below the sight
 line never amplifies).
@@ -198,7 +198,7 @@ Accounts for the apparent increase in source power from ground reflection
 near the source when the alternative ground method (Eq. (10)) is used:
 
 $$
-D_\Omega = 10 \lg\!\left\{ 1 + \frac{d_p^2 + (h_s - h_r)^2}{d_p^2 + (h_s + h_r)^2} \right\} ~\text{dB}
+D_\Omega = 10 \log_{10}\!\left\{ 1 + \frac{d_p^2 + (h_s - h_r)^2}{d_p^2 + (h_s + h_r)^2} \right\} ~\text{dB}
 $$
 
 **Parameters**
@@ -222,10 +222,10 @@ Attenuation due to geometrical divergence (ISO 9613-2:1996, Eq. (7)).
 Spherical spreading in the free field from a point source:
 
 $$
-A_{div} = 20 \lg(d/d_0) + 11~\text{dB}, \qquad d_0 = 1~\text{m}
+A_{div} = 20 \log_{10}(d/d_0) + 11~\text{dB}, \qquad d_0 = 1~\text{m}
 $$
 
-The `+11` ($= 10 \lg 4\pi$) sets the sound pressure level at the
+The `+11` ($= 10 \log_{10} 4\pi$) sets the sound pressure level at the
 reference distance $d_0 = 1$ m from an omnidirectional point source
 (Note 7).
 

@@ -23,9 +23,9 @@ and $f_2 = f_1 + \Delta f_c$ (Formula (5)).
 
 **Audibility of a single tone (Clause 5.3).** From the mean narrow-band level
 `LS` of the masking noise (Formula (6)) the critical-band level of the
-masking noise is $L_G = L_S + 10 \lg(\Delta f_c/\Delta f)$
+masking noise is $L_G = L_S + 10 \log_{10}(\Delta f_c/\Delta f)$
 (Formula (12), `Δf` the line spacing). The masking index is
-$a_v = -2 - \lg[1 + (f/502)^{2.5}]$ dB (Formula (13)) and the
+$a_v = -2 - \log_{10}[1 + (f/502)^{2.5}]$ dB (Formula (13)) and the
 audibility of a tone of level `LT` (Formula (8)) is
 $\Delta L = L_T - L_G - a_v$ dB (Formula (14)). A tone is present when
 $\Delta L > 0$.
@@ -33,7 +33,7 @@ $\Delta L > 0$.
 **Decisive and mean audibility (Clauses 5.3.8/5.3.9).** The decisive audibility
 of one narrow-band spectrum is the largest tone audibility in it (Step 4). Over
 `J` staggered spectra the mean audibility is the energy mean
-$\Delta L = 10 \lg[(1/J) \sum_j 10^{\Delta L_j/10}]$ dB (Formula (20));
+$\Delta L = 10 \log_{10}[(1/J) \sum_j 10^{\Delta L_j/10}]$ dB (Formula (20));
 a spectrum in which no tone is found contributes $\Delta L_j = -10$ dB
 (Formula (21)).
 
@@ -63,7 +63,7 @@ tones near its edges.
 
 **Two tones below 1000 Hz.** When *exactly two* tones share a critical band and
 both lie below 1000 Hz, the ear can still resolve them if their spacing exceeds
-$f_D = 21 \cdot 10^{1.2 |\lg(f_T/212)|^{1.8}}$ Hz
+$f_D = 21 \cdot 10^{1.2 |\log_{10}(f_T/212)|^{1.8}}$ Hz
 (Formulae (18)/(19)); they are then
 rated separately instead of combined. [`two_tone_separation_frequency`](/phonometry/reference/api/psychoacoustics/tone-audibility/#two_tone_separation_frequency) and
 [`resolve_tones_separately`](/phonometry/reference/api/psychoacoustics/tone-audibility/#resolve_tones_separately) implement this branch (Clause 5.3.8), which no
@@ -294,7 +294,7 @@ combined_tone_level(
 
 Combined tone level `LT` of several tones in one critical band (Formula (17)).
 
-$L_{Tm} = 10 \lg[\sum_n 10^{L_{Tm,n}/10}]$, the energy sum of the
+$L_{Tm} = 10 \log_{10}[\sum_n 10^{L_{Tm,n}/10}]$, the energy sum of the
 tonal lines of all
 the tones, each spectral line counted at most once. Use it when more than one
 audible tone falls in a critical band (Clause 5.3.8 Step 3); the group is
@@ -357,7 +357,7 @@ critical_band_level(
 
 Critical-band level `LG` of the masking noise (Formula (12)).
 
-$L_G = L_S + 10 \lg(\Delta f_c/\Delta f)$ dB, spreading the mean
+$L_G = L_S + 10 \log_{10}(\Delta f_c/\Delta f)$ dB, spreading the mean
 narrow-band level `LS`
 over the critical bandwidth `Δfc` relative to the line spacing `Δf`.
 
@@ -419,9 +419,9 @@ Energy sum of the tonal spectral lines with window correction (Formulae (7)/(8))
 For a single line ($K = 1$) the tone level is that line's level with
 *no* bandwidth correction, $L_T = L_1$ (Formula (7)). For
 $K > 1$ lines,
-$L_T = 10 \lg[\sum_i 10^{L_i/10}] + 10 \lg(\Delta f/\Delta f_e)$ dB
+$L_T = 10 \log_{10}[\sum_i 10^{L_i/10}] + 10 \log_{10}(\Delta f/\Delta f_e)$ dB
 (Formula (8)); the window correction
-$10 \lg(\Delta f/\Delta f_e)$ is `−1.76 dB` for a Hanning window
+$10 \log_{10}(\Delta f/\Delta f_e)$ is `−1.76 dB` for a Hanning window
 ($\Delta f_e = 1.5 \Delta f$, Annex A) and `0 dB` for a
 rectangular window
 ($\Delta f_e = \Delta f$). The DIN 45681:2005-03 Annex J reference
@@ -463,7 +463,7 @@ masking_index(frequency: float) -> float
 
 Masking index `av` of the auditory system (Formula (13)).
 
-$a_v = -2 - \lg[1 + (f/502)^{2.5}]$ dB. The value is negative and
+$a_v = -2 - \log_{10}[1 + (f/502)^{2.5}]$ dB. The value is negative and
 grows more
 negative with frequency (see Annex C).
 
@@ -489,7 +489,7 @@ mean_audibility(decisive_audibilities: ArrayLike) -> float
 
 Mean audibility `ΔL` over a number of spectra (Formula (20)).
 
-$\Delta L = 10 \lg[(1/J) \sum_j 10^{\Delta L_j/10}]$ dB, the energy
+$\Delta L = 10 \log_{10}[(1/J) \sum_j 10^{\Delta L_j/10}]$ dB, the energy
 mean of the decisive
 audibilities `ΔLj` of the `J` staggered narrow-band spectra. A
 spectrum with no tone found contributes $\Delta L_j = -10$ dB
@@ -561,7 +561,7 @@ mean_narrowband_level(
 Mean narrow-band level `LS` of the masking noise (Formula (6), Annex D).
 
 $$
-L_S = 10 \lg\!\left[ \frac{1}{M} \sum_i 10^{L_i/10} \right] + 10 \lg\frac{\Delta f}{\Delta f_e}
+L_S = 10 \log_{10}\!\left[ \frac{1}{M} \sum_i 10^{L_i/10} \right] + 10 \log_{10}\frac{\Delta f}{\Delta f_e}
 $$
 
 in dB, determined iteratively over the lines of the critical band about
@@ -570,7 +570,7 @@ frequency is excluded; the average then
 drops any line more than `6 dB` above the current `LS` and repeats until
 `LS` is stable within `±0.005 dB` or fewer than five lines remain on
 either side of the tone (Annex D). The window correction
-$10 \lg(\Delta f/\Delta f_e)$ is
+$10 \log_{10}(\Delta f/\Delta f_e)$ is
 `−1.76 dB` for the recommended Hanning window
 ($\Delta f_e = 1.5 \Delta f$).
 
@@ -857,7 +857,7 @@ two_tone_separation_frequency(tone_frequency: float) -> float
 
 Frequency-difference threshold `fD` for resolving two tones (Formula (19)).
 
-$f_D = 21 \cdot 10^{1.2 |\lg(f_T/212)|^{1.8}}$ Hz. When *exactly
+$f_D = 21 \cdot 10^{1.2 |\log_{10}(f_T/212)|^{1.8}}$ Hz. When *exactly
 two* tones fall in one
 critical band and both lie below 1000 Hz, the human ear can still tell them
 apart (they are then rated *separately* rather than combined into a

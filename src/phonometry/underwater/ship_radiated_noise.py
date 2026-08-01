@@ -7,7 +7,7 @@ level** and then by an **equivalent monopole source level** referred to a point
 source below the sea surface:
 
 * :func:`radiated_noise_level` --
-  :math:`L_{\mathrm{RN}} = 20 \lg(p_{\mathrm{rms}}/p_0) + 20 \lg(r/r_0)`
+  :math:`L_{\mathrm{RN}} = 20 \log_{10}(p_{\mathrm{rms}}/p_0) + 20 \log_{10}(r/r_0)`
   dB re 1 µPa·m (ISO 17208-1), the level of the product of the far-field RMS
   pressure and the source distance.
 * :func:`monopole_source_level` -- converts ``LRN`` to the source level
@@ -48,7 +48,7 @@ _STANDARD_ANGLES = (15.0, 30.0, 45.0)
 def radiated_noise_level(rms_pressure: float, distance: float) -> float:
     r"""Radiated noise level ``LRN`` (ISO 17208-1), dB re 1 µPa·m.
 
-    :math:`L_{\mathrm{RN}} = 20 \lg(p_{\mathrm{rms}}/p_0) + 20 \lg(r/r_0)` --
+    :math:`L_{\mathrm{RN}} = 20 \log_{10}(p_{\mathrm{rms}}/p_0) + 20 \log_{10}(r/r_0)` --
     the level of the product of the far-field RMS sound pressure and the
     source distance, referred to 1 µPa·m.
 
@@ -176,7 +176,7 @@ def monopole_source_level(
 
     .. math::
 
-       \Delta L = -10 \lg \frac{2 u^4 + 14 u^2}{14 + 2 u^2 + u^4}
+       \Delta L = -10 \log_{10} \frac{2 u^4 + 14 u^2}{14 + 2 u^2 + u^4}
        \tag{Formula 3}
 
     where :math:`u = k d_s`, :math:`k = 2 \pi f/c` and the nominal source

@@ -1313,7 +1313,7 @@ def _emission_angles(
 
 @dataclass(frozen=True)
 class RotorcraftEventResult:
-    """A rotorcraft single-event time history at a receiver (Doc 32 §6.1).
+    r"""A rotorcraft single-event time history at a receiver (Doc 32 §6.1).
 
     :ivar frequencies: Band centre frequencies, in Hz, shape ``(F,)``.
     :ivar emission_times: Emission times ``t_e``, in s, shape ``(K,)``.
@@ -1764,7 +1764,7 @@ def _terrain_adjustments(
 def _exposure_level(
     la: NDArray[np.float64], trec: NDArray[np.float64],
 ) -> NDArray[np.float64]:
-    """``SEL`` (Doc 32 Eq. 27, :math:`t_0 = 1` s) per receiver, ``(K, G)``.
+    r"""``SEL`` (Doc 32 Eq. 27, :math:`t_0 = 1` s) per receiver, ``(K, G)``.
 
     Trapezoidal integration of the received A-weighted energy over recorded
     time, the integration the NORAH2 reference implementation applies over the

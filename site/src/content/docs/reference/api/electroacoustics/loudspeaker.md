@@ -26,7 +26,7 @@ the report never merely repeats a manufacturer number:
   level referred to 1 W into the rated impedance `R` at 1 m is
 
   $$
-  L_M = L_\text{band} + 20 \lg(d / d_0) + 20 \lg(U_p / U), \qquad d_0 = 1\ \mathrm{m}
+  L_M = L_\text{band} + 20 \log_{10}(d / d_0) + 20 \log_{10}(U_p / U), \qquad d_0 = 1\ \mathrm{m}
   $$
 
   where $L_\text{band}$ is the energetic mean of the on-axis level

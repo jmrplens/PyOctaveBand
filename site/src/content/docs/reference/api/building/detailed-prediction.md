@@ -38,30 +38,30 @@ spectra are known and the dominant path per band matters.
    (Formula C.4, [`perimeter_absorption_coefficient`](/phonometry/reference/api/building/detailed-prediction/#perimeter_absorption_coefficient)). From it come the
    structural reverberation time $T_s = 2.2/(f \eta_{tot})$
    ([`structural_reverberation_time`](/phonometry/reference/api/building/detailed-prediction/#structural_reverberation_time)), the in-situ index
-   $R_{situ} = R - 10 \lg(T_{s,situ}/T_{s,lab})$ (Formula 9,
+   $R_{situ} = R - 10 \log_{10}(T_{s,situ}/T_{s,lab})$ (Formula 9,
    [`in_situ_reduction_index`](/phonometry/reference/api/building/detailed-prediction/#in_situ_reduction_index)) and the equivalent absorption length
    $a_{situ} = 2.2\,\pi^2 S \sqrt{f_{ref}/f}/(c_o T_{s,situ})$
    (Formula 11).
 3. Junctions (Formula 10).
-   $D_{v,ij,situ} = K_{ij} - 10 \lg(l_{ij}/\sqrt{a_{i,situ} a_{j,situ}})$,
+   $D_{v,ij,situ} = K_{ij} - 10 \log_{10}(l_{ij}/\sqrt{a_{i,situ} a_{j,situ}})$,
    floored at 0 dB ([`in_situ_velocity_level_difference`](/phonometry/reference/api/building/detailed-prediction/#in_situ_velocity_level_difference)).
 4. Paths. The direct path is
    $R_{Dd} = R_{s,situ} + \Delta R_{D,situ} + \Delta R_{d,situ}$
    (Formula 14) and each flanking path (Formula 15) is
    $R_{ij} = R_{i,situ}/2 + \Delta R_{i,situ} + R_{j,situ}/2 + \Delta R_{j,situ} + D_{v,ij,situ} + T$
-   with the geometry term $T = 10 \lg(S_s/\sqrt{S_i S_j})$
+   with the geometry term $T = 10 \log_{10}(S_s/\sqrt{S_i S_j})$
    ([`flanking_reduction_index`](/phonometry/reference/api/building/detailed-prediction/#flanking_reduction_index)).
-5. Assembly. $R' = -10 \lg(\sum 10^{-R/10})$ over the direct path and
+5. Assembly. $R' = -10 \log_{10}(\sum 10^{-R/10})$ over the direct path and
    all flanking paths (Formulae 1 to 4), then `R'w (C; Ctr)` per ISO 717-1
    ([`detailed_airborne_prediction`](/phonometry/reference/api/building/detailed-prediction/#detailed_airborne_prediction)).
 
 **Chain, impact (ISO 12354-2:2017, Clause 4.2).** The bare floor's normalized
 impact sound pressure level per band follows from Annex B Formula (B.2),
-$L_n = 155 - 30 \lg(m') + 10 \lg(T_s) + 10 \lg(\sigma) + 10 \lg(f/f_{ref})$
+$L_n = 155 - 30 \log_{10}(m') + 10 \log_{10}(T_s) + 10 \log_{10}(\sigma) + 10 \log_{10}(f/f_{ref})$
 ([`bare_floor_impact_level`](/phonometry/reference/api/building/detailed-prediction/#bare_floor_impact_level)); the direct path is
 $L_{n,d} = L_{n,situ} - \Delta L_{situ} - \Delta L_{d,situ}$
 (Formula 11) and each flanking path (Formula 12) is
-$L_{n,ij} = L_{n,situ} - \Delta L_{situ} + (R_{i,situ} - R_{j,situ})/2 - \Delta R_{j,situ} - D_{v,ij,situ} - 10 \lg(S_i/\sqrt{S_i S_j})$
+$L_{n,ij} = L_{n,situ} - \Delta L_{situ} + (R_{i,situ} - R_{j,situ})/2 - \Delta R_{j,situ} - D_{v,ij,situ} - 10 \log_{10}(S_i/\sqrt{S_i S_j})$
 ([`flanking_impact_level`](/phonometry/reference/api/building/detailed-prediction/#flanking_impact_level)), combined
 energetically into `L'n` and rated `L'n,w (CI)` per ISO 717-2
 ([`detailed_impact_prediction`](/phonometry/reference/api/building/detailed-prediction/#detailed_impact_prediction)).
@@ -169,7 +169,7 @@ bare_floor_impact_level(
 Normalized impact level of a bare monolithic floor (Part 2, F. B.2).
 
 $$
-L_n = 155 - 30 \lg(m'/1\,\mathrm{kg/m^2}) + 10 \lg(T_s/1\,\mathrm{s}) + 10 \lg \sigma + 10 \lg(f/f_{ref})
+L_n = 155 - 30 \log_{10}(m'/1\,\mathrm{kg/m^2}) + 10 \log_{10}(T_s/1\,\mathrm{s}) + 10 \log_{10} \sigma + 10 \log_{10}(f/f_{ref})
 $$
 
 with $f_{ref} = 1000$ Hz, the closed form obtained with
@@ -178,7 +178,7 @@ Supplying the *in-situ* structural reverberation time and radiation factor
 returns `Ln,situ` directly.
 
 The reciprocity relation of Part 2 Formulae (B.3)/(B.4),
-$R + L_n = 38 + 30 \lg f$ in one-third-octave bands (43 in octave
+$R + L_n = 38 + 30 \log_{10} f$ in one-third-octave bands (43 in octave
 bands),
 holds where forced transmission is negligible and gives an independent
 check on the pair.
@@ -278,7 +278,7 @@ calculated_sound_reduction_index(
 
 Sound reduction index of a homogeneous element (Formulae B.2, B.10).
 
-$R = -10 \lg \tau$ with the three-branch transmission factor
+$R = -10 \log_{10} \tau$ with the three-branch transmission factor
 
 - $f > f_c$:
   $\tau = (2 \rho_o c_o/(2 \pi f m'))^2 \cdot \pi f_c \sigma^2/(2 f \eta_{tot})$,
@@ -348,7 +348,7 @@ detailed_airborne_prediction(
 
 Combine direct and flanking paths into `R'` per band (F. 1 to 4).
 
-$R' = -10 \lg(\sum 10^{-R/10})$ over the direct path `RDd` and
+$R' = -10 \log_{10}(\sum 10^{-R/10})$ over the direct path `RDd` and
 every
 flanking path `Rij`. The result exposes each path's share of the
 transmitted energy in every band, which is what identifies the path to
@@ -389,7 +389,7 @@ detailed_impact_prediction(
 
 Combine direct and flanking paths into `L'n` per band (Part 2, (1)).
 
-$L'_n = 10 \lg(\sum 10^{L_n/10})$ over the direct impact path
+$L'_n = 10 \log_{10}(\sum 10^{L_n/10})$ over the direct impact path
 `Ln,d` and
 every flanking path `Ln,ij`, with the ISO 717-2 rating of the resulting
 spectrum whenever the bands cover the rating range. For rooms next to each
@@ -663,7 +663,7 @@ flanking_impact_level(
 Flanking normalized impact level `Ln,ij` per band (Part 2, F. 12).
 
 $L_{n,ij} = L_{n,situ} - \Delta L_{situ} + (R_{i,situ} - R_{j,situ})/2 - \Delta R_{j,situ} - D_{v,ij,situ} - T$
-with the geometry term $T = 10 \lg(S_i/\sqrt{S_i S_j})$, `i` the
+with the geometry term $T = 10 \log_{10}(S_i/\sqrt{S_i S_j})$, `i` the
 excited floor
 and `j` the flanking element radiating in the receiving room.
 
@@ -703,7 +703,7 @@ flanking_impact_level_from_flanking_level(
 
 Flanking impact level from a measured `Ln,f` (Part 2, Formula 13).
 
-$L_{n,ij} = L_{n,f,ij,situ} - 10 \lg(S_i l_{lab}/(S_{i,lab} l_{ij}))$, the impact twin of
+$L_{n,ij} = L_{n,f,ij,situ} - 10 \log_{10}(S_i l_{lab}/(S_{i,lab} l_{ij}))$, the impact twin of
 the airborne [`flanking_reduction_index_from_flanking_level`](/phonometry/reference/api/building/detailed-prediction/#flanking_reduction_index_from_flanking_level): the
 route used when the flanking construction is characterised as a whole by a
 laboratory measurement of the normalized flanking impact sound pressure
@@ -747,7 +747,7 @@ flanking_impact_level_from_normalized_difference(
 
 Flanking impact level of a Type B junction (Part 2, Formula 14).
 
-$L_{n,ij} = L_{n,ii} - \Delta L_i + (R_i - R_j)/2 - \Delta R_j - D_{v,ij,n} - 10 \lg(S_i/(l_o l_{ij}))$
+$L_{n,ij} = L_{n,ii} - \Delta L_i + (R_i - R_j)/2 - \Delta R_j - D_{v,ij,n} - 10 \log_{10}(S_i/(l_o l_{ij}))$
 with the reference length $l_o = 1$ m: Formula (12) with the
 junction described by the
 normalized direction-averaged velocity level difference instead of
@@ -794,7 +794,7 @@ Flanking sound reduction index `Rij` per band (Formula 15).
 
 $R_{ij} = R_{i,situ}/2 + \Delta R_{i,situ} + R_{j,situ}/2 + \Delta R_{j,situ} + D_{v,ij,situ} + T$
 for `ij = Ff, Fd, Df`, with the geometry term
-$T = 10 \lg(S_s/\sqrt{S_i S_j})$. For diagonal transmission the
+$T = 10 \log_{10}(S_s/\sqrt{S_i S_j})$. For diagonal transmission the
 standard fixes $S_s = 10$ m².
 
 The element indices depend on the path: `Ff` takes the flanking element
@@ -838,7 +838,7 @@ flanking_reduction_index_from_flanking_level(
 
 Flanking index from a measured `Dn,f` (Formula 16).
 
-$R_{ij} = D_{n,f,ij,situ} + 10 \lg(S_s l_{lab}/(A_o l_{ij}))$ with
+$R_{ij} = D_{n,f,ij,situ} + 10 \log_{10}(S_s l_{lab}/(A_o l_{ij}))$ with
 $A_o = 10$ m², the
 route used when the flanking construction is characterised as a whole by a
 laboratory measurement of the flanking normalized level difference
@@ -882,7 +882,7 @@ flanking_reduction_index_from_normalized_difference(
 Flanking index of a Type B junction `Rij` (Formula 17).
 
 $R_{ij} = R_{i,situ}/2 + \Delta R_{i,situ} + R_{j,situ}/2 + \Delta R_{j,situ} + D_{v,ij,n} + T$ with
-the geometry term $T = 10 \lg(S_s/(l_o l_{ij}))$ and the reference
+the geometry term $T = 10 \log_{10}(S_s/(l_o l_{ij}))$ and the reference
 length $l_o = 1$ m. It is
 Formula (15) with Formula (12) substituted, so the junction is described by
 the *normalized* direction-averaged velocity level difference `Dv,ij,n`
@@ -924,9 +924,9 @@ floating_floor_improvement(
 
 Improvement of a floating floor `ΔL` per band (Part 2, Formula C.1).
 
-$\Delta L = 30 \lg(f/f_o)$ for sand/cement or calcium-sulfate
+$\Delta L = 30 \log_{10}(f/f_o)$ for sand/cement or calcium-sulfate
 screeds and
-$\Delta L = 40 \lg(f/f_o)$ (`slope=40`, Formula C.3) for asphalt
+$\Delta L = 40 \log_{10}(f/f_o)$ (`slope=40`, Formula C.3) for asphalt
 or dry
 floating floors, with the system resonance
 $f_o = 160 \sqrt{s'/m'}$
@@ -1166,7 +1166,7 @@ in_situ_impact_level(
 
 In-situ normalized impact level `Ln,situ` (Part 2, Formula 5).
 
-$L_{n,situ} = L_n + 10 \lg(T_{s,situ}/T_{s,lab})$, the sign
+$L_{n,situ} = L_n + 10 \log_{10}(T_{s,situ}/T_{s,lab})$, the sign
 opposite to
 [`in_situ_reduction_index`](/phonometry/reference/api/building/detailed-prediction/#in_situ_reduction_index): a floor that rings longer in the building
 than in the laboratory radiates more impact sound.
@@ -1199,7 +1199,7 @@ in_situ_reduction_index(
 
 In-situ sound reduction index `Rsitu` (Formula 9).
 
-$R_{situ} = R - 10 \lg(T_{s,situ}/T_{s,lab})$: an element that is
+$R_{situ} = R - 10 \log_{10}(T_{s,situ}/T_{s,lab})$: an element that is
 better damped in
 the building than in the test frame radiates less and gains index. The
 standard notes that $R_{situ} = R$ is a usable first approximation,
@@ -1283,7 +1283,7 @@ in_situ_velocity_level_difference(
 
 In-situ velocity level difference `Dv,ij,situ` (Formula 10).
 
-$D_{v,ij,situ} = K_{ij} - 10 \lg(l_{ij}/\sqrt{a_{i,situ} a_{j,situ}})$, floored at 0 dB as
+$D_{v,ij,situ} = K_{ij} - 10 \log_{10}(l_{ij}/\sqrt{a_{i,situ} a_{j,situ}})$, floored at 0 dB as
 the formula prescribes. It converts the situation-invariant junction
 descriptor `Kij` (ISO 12354-1 Annex E, or measured per ISO 10848) into
 the level drop the junction actually produces between the two elements as
@@ -1436,9 +1436,9 @@ reciprocity_impact_level(
 
 Impact level of a homogeneous floor by reciprocity (Part 2, B.3/B.4).
 
-$R + L_n = 38 + 30 \lg(f/1\,\mathrm{Hz})$ in one-third-octave bands
+$R + L_n = 38 + 30 \log_{10}(f/1\,\mathrm{Hz})$ in one-third-octave bands
 and
-$R + L_n = 43 + 30 \lg(f/1\,\mathrm{Hz})$ in octave bands: for a
+$R + L_n = 43 + 30 \log_{10}(f/1\,\mathrm{Hz})$ in octave bands: for a
 homogeneous floor
 the sum of the airborne index and the normalized impact level depends only
 on frequency, provided forced transmission is negligible (normally up to
@@ -1474,7 +1474,7 @@ resonant_sound_reduction_index(
 
 Correct a measured `R` to resonant transmission only (Formula B.1).
 
-$R^* = R + 10 \lg(\sigma_a/\sigma_s)$. No standardized method
+$R^* = R + 10 \log_{10}(\sigma_a/\sigma_s)$. No standardized method
 exists to measure the
 two radiation factors, so Annex B.2 gives the estimate this function
 applies: no correction for elements separated by one or two cavities, and

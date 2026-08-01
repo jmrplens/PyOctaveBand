@@ -24,7 +24,7 @@ The chain follows the standard:
   rate** ``OR`` (the least-squares slope over the onset) are measured
   (Clauses 3.4, 3.5, Figures 1 and 2);
 * the **prominence**
-  :math:`P = 3 \cdot \lg(\mathrm{OR}) + 2 \cdot \lg(\mathrm{LD})` follows
+  :math:`P = 3 \cdot \log_{10}(\mathrm{OR}) + 2 \cdot \log_{10}(\mathrm{LD})` follows
   (Clause 5, Formula 2)
   and the impulse with the highest ``P`` gives the **adjustment**
   :math:`K_I = 1.8 \cdot (P - 5)` dB for :math:`P > 5`, else 0 dB (Clause 6,

@@ -1,5 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""
+r"""
 Psychoacoustic roughness per ECMA-418-2:2025 (4th ed., Sottek Hearing Model).
 
 Clean-room implementation of the roughness signal chain of ECMA-418-2:2025

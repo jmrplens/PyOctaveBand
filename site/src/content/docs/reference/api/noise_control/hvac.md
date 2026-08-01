@@ -200,7 +200,7 @@ manufacturer's ASHRAE Standard 70 data is not to hand. The overall sound
 power level is Eq. 13.27:
 
 $$
-L_W = 10 \lg S_G + 30 \lg \xi + 60 \lg U_G - 31.3
+L_W = 10 \log_{10} S_G + 30 \log_{10} \xi + 60 \log_{10} U_G - 31.3
 $$
 
 with `S_G` the face area of the device (ft2),
@@ -233,7 +233,7 @@ downstream can take that noise back out, because there is no ductwork
 left, which is why the terminal device usually sets the room criterion in
 the mid and high bands.
 
-Several identical devices serving the same room add $10 \lg n$,
+Several identical devices serving the same room add $10 \log_{10} n$,
 which is what `count` applies.
 
 **Parameters**
@@ -344,8 +344,8 @@ end_reflection_loss_closed_form(
 
 Duct end reflection loss in closed form (Long Eqs. 14.14-14.15, Reynolds).
 
-$R = 10 \lg[1 + (c / (\pi f d))^{1.88}]$ for a duct terminated in
-free space and $R = 10 \lg[1 + (0.8 c / (\pi f d))^{1.88}]$ for one
+$R = 10 \log_{10}[1 + (c / (\pi f d))^{1.88}]$ for a duct terminated in
+free space and $R = 10 \log_{10}[1 + (0.8 c / (\pi f d))^{1.88}]$ for one
 terminated flush with
 a wall, `d` being the duct diameter (use the equivalent diameter
 [`equivalent_diameter`](/phonometry/reference/api/noise_control/hvac/#equivalent_diameter) for a rectangular duct, Eq. 14.16). The
@@ -461,7 +461,7 @@ The ASHRAE (1987) scaling law, originally due to Beranek and published by
 Graham (1975):
 
 $$
-L_W = K_F + 10 \lg(Q_F / Q_{REF}) + 10 \lg(P_F / P_{REF}) + C_{EFF} + C_{BFI}
+L_W = K_F + 10 \log_{10}(Q_F / Q_{REF}) + 10 \log_{10}(P_F / P_{REF}) + C_{EFF} + C_{BFI}
 $$
 
 with the spectral constant `K_F` of Long Table 13.5 (one row per fan
@@ -846,10 +846,10 @@ Room effect: the drop from the terminal sound power to the room level.
 The last step of a duct-path calculation turns the sound power arriving at
 the terminal device into a sound pressure level at the listener, through
 the steady-state room relation
-$L_p = L_W + 10 \lg[Q / (4 \pi r^2) + 4 / R]$ (Long Eq. 14.40; Bies
+$L_p = L_W + 10 \log_{10}[Q / (4 \pi r^2) + 4 / R]$ (Long Eq. 14.40; Bies
 Eq. (6.43), [`phonometry.room.steady_state_spl`](/phonometry/reference/api/rooms/steady-field/#steady_state_spl)). This function
 returns the *attenuation*, the positive number
-$-10 \lg[Q / (4 \pi r^2) + 4 / R]$, so it drops into a duct-path
+$-10 \log_{10}[Q / (4 \pi r^2) + 4 / R]$, so it drops into a duct-path
 cascade beside every other loss; Long's worked sheets print it as the
 negative level change. A ceiling diffuser radiates into a half space,
 hence the default $Q = 2$.
@@ -881,7 +881,7 @@ Fry's (1988) estimate, for when manufacturer self-noise data is not
 available:
 
 $$
-L_W = 55 \lg(V / V_0) + 10 \lg N + 10 \lg(H / H_0) - 45
+L_W = 55 \log_{10}(V / V_0) + 10 \log_{10} N + 10 \log_{10}(H / H_0) - 45
 $$
 
 with `V` the velocity in the splitter airway ($V_0 = 1$ m/s),
@@ -895,7 +895,7 @@ doubling the face velocity of a silencer adds about 17 dB, which is how a
 silencer ends up *making* the noise it was bought to remove.
 
 Manufacturer self-noise data is measured on a 600 x 600 mm face, so a
-published spectrum has to be corrected by $10 \lg(S / S_0)$ for
+published spectrum has to be corrected by $10 \log_{10}(S / S_0)$ for
 the actual face area before it is used; this estimate needs no such
 correction because the face size enters through `N` and `H`.
 
@@ -934,7 +934,7 @@ proportion to their areas, and a further reflection occurs when the total
 branch area does not match the feeder area:
 
 $$
-R = -10 \lg\!\left[ 1 - \left( \frac{\sum S_i - S_m}{\sum S_i + S_m} \right)^2 \right] - 10 \lg\!\left( \frac{S_i}{\sum S_i} \right)
+R = -10 \log_{10}\!\left[ 1 - \left( \frac{\sum S_i - S_m}{\sum S_i + S_m} \right)^2 \right] - 10 \log_{10}\!\left( \frac{S_i}{\sum S_i} \right)
 $$
 
 Long prints this as a negative level change (a 25 per cent area split shows
@@ -978,7 +978,7 @@ half the splitter thickness*, because each face of a splitter lines the
 airway beside it, and the insertion losses of the airways combine as
 
 $$
-\mathrm{IL}_{tot} = -10 \lg\!\left[ \frac{1}{N} \sum_i 10^{-\mathrm{IL}_i / 10} \right] \tag{8.241}
+\mathrm{IL}_{tot} = -10 \log_{10}\!\left[ \frac{1}{N} \sum_i 10^{-\mathrm{IL}_i / 10} \right] \tag{8.241}
 $$
 
 which is the energy average over the airways: when they are identical the

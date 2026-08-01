@@ -55,7 +55,7 @@ def lden(
 
     .. math::
 
-       L_{den} = 10 \lg\left\{ (1/24) \left[ t_d \cdot 10^{0.1 L_{day}}
+       L_{den} = 10 \log_{10}\left\{ (1/24) \left[ t_d \cdot 10^{0.1 L_{day}}
        + t_e \cdot 10^{0.1 (L_{evening}+5)}
        + t_n \cdot 10^{0.1 (L_{night}+10)} \right] \right\}
 
@@ -83,7 +83,7 @@ def ldn(
 
     .. math::
 
-       L_{dn} = 10 \lg\left\{ (1/24) \left[ t_d \cdot 10^{0.1 L_{day}}
+       L_{dn} = 10 \log_{10}\left\{ (1/24) \left[ t_d \cdot 10^{0.1 L_{day}}
        + t_n \cdot 10^{0.1 (L_{night}+10)} \right] \right\}
 
     :param lday: LAeq over the day period, in dB.

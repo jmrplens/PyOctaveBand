@@ -359,7 +359,7 @@ def _neighbour_covariance(h_bp: NDArray[np.float64]) -> NDArray[np.float64]:
 
 
 def _analyze(sig: NDArray[np.float64]) -> tuple[NDArray[np.float64], NDArray[np.float64], NDArray[np.float64]]:
-    """Un-calibrated Osses 2016 sum (:math:`C_{FS} = 1`) of a model-rate
+    r"""Un-calibrated Osses 2016 sum (:math:`C_{FS} = 1`) of a model-rate
     signal.
 
     Runs the full front-end -- ear transmission, 47-band excitation filter bank

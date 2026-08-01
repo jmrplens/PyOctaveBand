@@ -13,18 +13,18 @@ room, with the Sabine absorption area and the speed of sound ``c`` in m/s
 
 .. math::
 
-   L_p(\text{ST}) = 10 \lg\!\left[ \frac{1}{N_M} \sum_i 10^{0.1 L_{pi}}
+   L_p(\text{ST}) = 10 \log_{10}\!\left[ \frac{1}{N_M} \sum_i 10^{0.1 L_{pi}}
    \right] \tag{Eq. 16}
 
    A = \frac{55.26}{c} \, \frac{V}{T_{60}}
 
    c = 20.05 \sqrt{273 + \theta}
 
-   L_W = L_p(\text{ST}) + 10 \lg\frac{A}{A_0} + 4.34 \frac{A}{S}
-   + 10 \lg\!\left( 1 + \frac{S c}{8 V f} \right) + C_1 + C_2 - 6
+   L_W = L_p(\text{ST}) + 10 \log_{10}\frac{A}{A_0} + 4.34 \frac{A}{S}
+   + 10 \log_{10}\!\left( 1 + \frac{S c}{8 V f} \right) + C_1 + C_2 - 6
    \tag{Eq. 20}
 
-:math:`10 \lg(1 + Sc/(8Vf))` is the Waterhouse boundary correction (energy
+:math:`10 \log_{10}(1 + Sc/(8Vf))` is the Waterhouse boundary correction (energy
 stored near the room boundaries); it vanishes as the frequency grows. ``C1``
 (Eq. 20, reference-quantity correction) and ``C2`` (radiation-impedance
 correction) carry the result to the reference meteorological conditions of
@@ -32,9 +32,9 @@ clause 4 (23.0 C, 101.325 kPa, 50 %), per clause 9.1.4:
 
 .. math::
 
-   C_1 = -10 \lg\frac{p_s}{p_{s0}} + 5 \lg\frac{273.15 + \theta}{314}
+   C_1 = -10 \log_{10}\frac{p_s}{p_{s0}} + 5 \log_{10}\frac{273.15 + \theta}{314}
 
-   C_2 = -10 \lg\frac{p_s}{p_{s0}} + 15 \lg\frac{273.15 + \theta}{296}
+   C_2 = -10 \log_{10}\frac{p_s}{p_{s0}} + 15 \log_{10}\frac{273.15 + \theta}{296}
 
 The **comparison method** replaces the absorption-area terms by a reference
 sound source (RSS) of known sound power ``LW(RSS)`` measured at the same
@@ -83,7 +83,7 @@ class ReverberationSoundPowerResult:
     comparison method). ``mean_pressure_level`` is the mean corrected room level
     ``Lp(ST)`` (Eq. 16). For the direct method ``absorption_area`` is the Sabine
     equivalent absorption area ``A`` per band and ``waterhouse_correction`` the
-    boundary term :math:`10 \lg(1 + Sc/(8Vf))`; both are ``NaN`` for the
+    boundary term :math:`10 \log_{10}(1 + Sc/(8Vf))`; both are ``NaN`` for the
     comparison method. ``background_correction`` is the effective per-band
     background correction ``K1``: with per-position input each position is
     corrected by its own ``K1i`` (Eq. 14/15) before the energy average
@@ -185,7 +185,7 @@ def _validate_meteorology(temperature: float, static_pressure: float) -> None:
 
     A non-finite or :math:`\le -273` degC temperature makes
     :math:`\sqrt{273 + \theta}` complex/zero, and a non-finite or non-positive
-    static pressure makes :math:`\lg(p_s/p_{s0})` undefined; both are rejected
+    static pressure makes :math:`\log_{10}(p_s/p_{s0})` undefined; both are rejected
     with a clean ``ValueError``."""
     if not np.isfinite(temperature) or temperature <= -273.0:
         raise ValueError(
@@ -232,7 +232,7 @@ def _mean_level(levels: np.ndarray) -> np.ndarray:
 def _k1_eq14(delta: np.ndarray, frequencies: np.ndarray) -> tuple[np.ndarray, bool]:
     r"""Background-noise correction ``K1`` from ``dLp`` (ISO 3741:2010 Eq. 14).
 
-    :math:`K_1 = -10 \lg(1 - 10^{-0.1 \Delta L_p})`. The precision-grade
+    :math:`K_1 = -10 \log_{10}(1 - 10^{-0.1 \Delta L_p})`. The precision-grade
     qualification is frequency dependent (clause 9.1.2):
     :math:`\Delta L_p \ge 15` dB gives :math:`K_1 = 0`; below
     the lower criterion (6 dB for bands <= 200 Hz and >= 6 300 Hz, 10 dB for
@@ -424,13 +424,13 @@ def sound_power_reverberation(
 
     .. math::
 
-       L_W = L_p(\text{ST}) + 10 \lg\frac{A}{A_0} + 4.34 \frac{A}{S}
-       + 10 \lg\!\left( 1 + \frac{S c}{8 V f} \right) + C_1 + C_2 - 6
+       L_W = L_p(\text{ST}) + 10 \log_{10}\frac{A}{A_0} + 4.34 \frac{A}{S}
+       + 10 \log_{10}\!\left( 1 + \frac{S c}{8 V f} \right) + C_1 + C_2 - 6
 
     with the Sabine equivalent absorption area
     :math:`A = (55.26/c)(V/T_{60})` and the speed of sound
     :math:`c = 20.05 \sqrt{273 + \theta}`. The Waterhouse term
-    :math:`10 \lg(1 + Sc/(8Vf))` needs the band mid-frequencies, so
+    :math:`10 \log_{10}(1 + Sc/(8Vf))` needs the band mid-frequencies, so
     ``frequencies`` is required. ``C1`` and ``C2`` carry the result to the
     reference meteorological conditions (clause 4).
 

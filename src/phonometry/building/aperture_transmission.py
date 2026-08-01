@@ -44,10 +44,10 @@ reduction index :math:`R_n` the resultant is the area-weighted energy sum
 
 .. math::
 
-   R = -10 \lg\!\left[ \frac{1}{\sum S_n} \sum S_n \, 10^{-R_n/10} \right]
+   R = -10 \log_{10}\!\left[ \frac{1}{\sum S_n} \sum S_n \, 10^{-R_n/10} \right]
 
 so a bare opening (:math:`R = 0`, :math:`\tau = 1`) of relative area
-:math:`S_a/S` caps the composite at :math:`10 \lg(S / S_a)`. This is the same
+:math:`S_a/S` caps the composite at :math:`10 \log_{10}(S / S_a)`. This is the same
 energetic combination used by the EN 12354-3/-4 facade model of
 :mod:`phonometry.building.facade_prediction`.
 """
@@ -86,7 +86,7 @@ __all__ = [
 
 
 def transmission_loss_from_coefficient(tau: ArrayLike) -> np.ndarray:
-    r"""Sound reduction index :math:`R = -10 \lg(\tau)` from a transmission
+    r"""Sound reduction index :math:`R = -10 \log_{10}(\tau)` from a transmission
     coefficient.
 
     :param tau: Transmission coefficient(s) ``tau`` (> 0). Values above 1 (a
@@ -125,7 +125,7 @@ class ApertureTransmissionResult:
 
     @property
     def transmission_loss(self) -> np.ndarray:
-        r"""Aperture sound reduction index :math:`R = -10 \lg(\tau)` per
+        r"""Aperture sound reduction index :math:`R = -10 \log_{10}(\tau)` per
         band, dB."""
         return transmission_loss_from_coefficient(self.transmission_coefficient)
 
@@ -177,7 +177,7 @@ def slit_transmission_coefficient(
     position: str = "mid",
     speed_of_sound: float = _SPEED_OF_SOUND,
 ) -> ApertureTransmissionResult:
-    """Transmission coefficient of a straight-edged slit (Hopkins Eq. 4.99).
+    r"""Transmission coefficient of a straight-edged slit (Hopkins Eq. 4.99).
 
     :param frequency: Band centre frequencies ``f``, in hertz (array, > 0).
     :param width: Slit width ``w``, in m (> 0).
@@ -337,7 +337,7 @@ def composite_transmission_loss(
 
     .. math::
 
-       R = -10 \lg\!\left[ \frac{1}{\sum S_n} \sum S_n \, 10^{-R_n/10}
+       R = -10 \log_{10}\!\left[ \frac{1}{\sum S_n} \sum S_n \, 10^{-R_n/10}
        \right]
 
     A bare opening enters with :math:`R = 0` (:math:`\tau = 1`).

@@ -70,7 +70,7 @@ __all__ = [
 
 @dataclass(frozen=True)
 class MetadiffuserWell:
-    """One slit of a metadiffuser panel.
+    r"""One slit of a metadiffuser panel.
 
     ``slit_height`` is the slit opening ``h_n`` along the panel face and
     ``resonators`` the Helmholtz resonators loading the slit, ordered from
@@ -183,7 +183,7 @@ def metadiffuser_reflection(
     heat_capacity_ratio: float = _HEAT_CAPACITY_RATIO,
     atmospheric_pressure: float = _ATMOSPHERIC_PRESSURE,
 ) -> MetadiffuserResult:
-    """Per-well reflection spectra of a metadiffuser panel (Sci. Rep. Eq. (6)).
+    r"""Per-well reflection spectra of a metadiffuser panel (Sci. Rep. Eq. (6)).
 
     Runs the rigidly backed slit transfer-matrix chain of
     :func:`~phonometry.materials.slow_sound_absorber.slit_helmholtz_absorber`
@@ -329,7 +329,7 @@ def metadiffuser_diffusion_spectrum(
     heat_capacity_ratio: float = _HEAT_CAPACITY_RATIO,
     atmospheric_pressure: float = _ATMOSPHERIC_PRESSURE,
 ) -> DiffusionSpectrum:
-    """Normalized diffusion-coefficient spectrum ``d_n(f)`` of a metadiffuser.
+    r"""Normalized diffusion-coefficient spectrum ``d_n(f)`` of a metadiffuser.
 
     Evaluates the far-field polar response at each frequency with
     :func:`metadiffuser_polar_response`, forms the ISO 17497-2 directional

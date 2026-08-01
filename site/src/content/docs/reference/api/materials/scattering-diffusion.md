@@ -101,7 +101,7 @@ air_attenuation_coefficient(
 
 Energy attenuation coefficient `m` (ISO 17497-1, Clause 8, Eq. (3)).
 
-$m = \alpha / (10 \lg(e)) \approx \alpha / 4.343$ (1/m), where
+$m = \alpha / (10 \log_{10}(e)) \approx \alpha / 4.343$ (1/m), where
 `alpha` is
 the sound-*pressure* attenuation coefficient in dB/m obtained from
 ISO 9613-1 using the measured temperature and relative humidity.

@@ -25,7 +25,7 @@ Formula (1)).** A heavy source is specified not by its geometry but by the
 octave-band energy of its force pulse:
 
 $$
-L_{FE} = 10 \lg\!\left[ \frac{1}{T_{\text{ref}}} \int_{t_1}^{t_2} \frac{F(t)^{2}}{F_0^{2}} \,dt \right] \qquad \text{dB re 1 N}
+L_{FE} = 10 \log_{10}\!\left[ \frac{1}{T_{\text{ref}}} \int_{t_1}^{t_2} \frac{F(t)^{2}}{F_0^{2}} \,dt \right] \qquad \text{dB re 1 N}
 $$
 
 with $F_0 = 1$ N, $T_{\text{ref}} = 1$ s and
@@ -57,11 +57,11 @@ Octave (Hz)  Rubber ball LFE (dB)  Bang machine LFE (dB)
 **Standardized maximum impact sound pressure level (ISO 16283-2 Formulae (4),
 (5) and (6)).** Because the rated quantity is a *maximum* of a Fast-weighted
 level and not an energy average, the receiving room cannot be corrected with
-the usual $10 \lg(T/T_0)$: the Fast detector only ever sees the first
+the usual $10 \log_{10}(T/T_0)$: the Fast detector only ever sees the first
 `1.7275 s` worth of decay. The standard therefore uses:
 
 $$
-L'_{i,F\text{max},V,T} = L_{i,F\text{max}} + 10 \lg(V/V_0) - 10 \lg\!\left[ \frac{g(C)}{g(C_0)} \right]
+L'_{i,F\text{max},V,T} = L_{i,F\text{max}} + 10 \log_{10}(V/V_0) - 10 \log_{10}\!\left[ \frac{g(C)}{g(C_0)} \right]
 $$
 
 $$
@@ -81,7 +81,7 @@ $$
 
 `g` is the peak of the Fast-weighted response to an exponentially decaying
 burst; for $T = T_0$ the bracket collapses to 1 and the correction
-reduces to the pure volume term $10 \lg(V/V_0)$, as it must. See
+reduces to the pure volume term $10 \log_{10}(V/V_0)$, as it must. See
 [`standardized_maximum_impact_level`](/phonometry/reference/api/building/heavy-impact/#standardized_maximum_impact_level) and
 [`fast_reverberation_correction`](/phonometry/reference/api/building/heavy-impact/#fast_reverberation_correction).
 
@@ -89,7 +89,7 @@ reduces to the pure volume term $10 \lg(V/V_0)$, as it must. See
 not a shifted reference curve but an A-weighted sum (Formula (D.1)):
 
 $$
-X_{iA,F\text{max}} = 10 \lg\!\left( \sum_j 10^{(X_{i,F\text{max},j} + A_j)/10} \right)
+X_{iA,F\text{max}} = 10 \log_{10}\!\left( \sum_j 10^{(X_{i,F\text{max},j} + A_j)/10} \right)
 $$
 
 over the one-third-octave bands 50 Hz to 630 Hz **or** the octave bands 63 Hz to
@@ -115,7 +115,7 @@ a_weighted_maximum_impact_level(
 
 A-weighted maximum impact level `XiA,Fmax` (ISO 717-2:2020, (D.1)).
 
-$X_{iA,Fmax} = 10 \lg( \sum_j 10^{(X_{i,Fmax,j} + A_j)/10} )$,
+$X_{iA,Fmax} = 10 \log_{10}( \sum_j 10^{(X_{i,Fmax,j} + A_j)/10} )$,
 rounded half-up to
 an integer, over the one-third-octave bands 50 Hz to 630 Hz (12 values) or
 the octave bands 63 Hz to 500 Hz (4 values), with the A-weighting
@@ -225,12 +225,12 @@ fast_reverberation_correction(
 
 Fast time-weighting reverberation correction (Formulae (4), (5), (6)).
 
-The term $10 \lg[g(C)/g(C_0)]$ subtracted in ISO 16283-2:2020
+The term $10 \log_{10}[g(C)/g(C_0)]$ subtracted in ISO 16283-2:2020
 Formula (4),
 with $C = T/1.7275$ (Formula (6)) and $C_0 = T_0/1.7275$
 (Formula (5)).
 It is the *maximum-level* counterpart of the energy-average
-$10 \lg(T/T_0)$:
+$10 \log_{10}(T/T_0)$:
 a Fast detector never integrates more than about 1.7 s of decay, so the
 correction saturates instead of growing without bound. It is exactly 0 dB
 when $T = T_0$.
@@ -275,7 +275,7 @@ heavy_impact_octave_levels(level: ArrayLike) -> np.ndarray
 Combine one-third-octave maximum levels into octaves (Formula (20)).
 
 $$
-L'_{i,Fmax,V,T,oct} = 10 \lg\left( \sum_{n=1}^{3} 10^{L'_{i,Fmax,V,T,1/3oct,n} / 10} \right)
+L'_{i,Fmax,V,T,oct} = 10 \log_{10}\left( \sum_{n=1}^{3} 10^{L'_{i,Fmax,V,T,1/3oct,n} / 10} \right)
 $$
 
 (ISO 16283-2:2020, printed p. 19). The input length must be a multiple of
@@ -465,7 +465,7 @@ impact_force_exposure_level(
 
 Impact force exposure level `LFE` of a force pulse (Formula (A.1)).
 
-$L_{FE} = 10 \lg[(1/T_{ref}) \int F(t)^2 / F_0^2\,dt]$ dB re 1 N
+$L_{FE} = 10 \log_{10}[(1/T_{ref}) \int F(t)^2 / F_0^2\,dt]$ dB re 1 N
 (ISO 16283-2:2020 Formula (A.1) = ISO 10140-5:2010 Formula (F.2) =
 JIS A 1418-2:2019 Formula (1)). The integral is taken over the whole
 supplied record with the trapezoidal rule, so pass one isolated impact.
@@ -517,7 +517,7 @@ standardized_maximum_impact_level(
 
 Standardized maximum impact level `L'i,Fmax,V,T` (Formulae (4)-(6)).
 
-$L'_{i,Fmax,V,T} = L_{i,Fmax} + 10 \lg(V/V_0) - 10 \lg[g(C)/g(C_0)]$
+$L'_{i,Fmax,V,T} = L_{i,Fmax} + 10 \log_{10}(V/V_0) - 10 \log_{10}[g(C)/g(C_0)]$
 (ISO 16283-2:2020, definition 3.16), the field quantity used to rate a
 floor excited by the rubber ball. The reverberation term is
 [`fast_reverberation_correction`](/phonometry/reference/api/building/heavy-impact/#fast_reverberation_correction).

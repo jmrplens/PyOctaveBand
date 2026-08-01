@@ -43,11 +43,11 @@ $$
 reduction index $R_n$ the resultant is the area-weighted energy sum
 
 $$
-R = -10 \lg\!\left[ \frac{1}{\sum S_n} \sum S_n \, 10^{-R_n/10} \right]
+R = -10 \log_{10}\!\left[ \frac{1}{\sum S_n} \sum S_n \, 10^{-R_n/10} \right]
 $$
 
 so a bare opening ($R = 0$, $\tau = 1$) of relative area
-$S_a/S$ caps the composite at $10 \lg(S / S_a)$. This is the same
+$S_a/S$ caps the composite at $10 \log_{10}(S / S_a)$. This is the same
 energetic combination used by the EN 12354-3/-4 facade model of
 [`phonometry.building.facade_prediction`](/phonometry/reference/api/building/facade-prediction/).
 
@@ -121,7 +121,7 @@ Requires matplotlib (`pip install phonometry[plot]`); returns the
 
 *property*
 
-Aperture sound reduction index $R = -10 \lg(\tau)$ per
+Aperture sound reduction index $R = -10 \log_{10}(\tau)$ per
 band, dB.
 
 ## circular_aperture_transmission_coefficient
@@ -171,7 +171,7 @@ The area-weighted energy combination of `N` elements (wall, window,
 slit, open aperture ...) sharing a partition:
 
 $$
-R = -10 \lg\!\left[ \frac{1}{\sum S_n} \sum S_n \, 10^{-R_n/10} \right]
+R = -10 \log_{10}\!\left[ \frac{1}{\sum S_n} \sum S_n \, 10^{-R_n/10} \right]
 $$
 
 A bare opening enters with $R = 0$ ($\tau = 1$).
@@ -304,7 +304,7 @@ Transmission coefficient of a straight-edged slit (Hopkins Eq. 4.99).
 transmission_loss_from_coefficient(tau: ArrayLike) -> np.ndarray
 ```
 
-Sound reduction index $R = -10 \lg(\tau)$ from a transmission
+Sound reduction index $R = -10 \log_{10}(\tau)$ from a transmission
 coefficient.
 
 **Parameters**

@@ -5,8 +5,8 @@ Underwater sound propagation: transmission loss (closed-form).
 Transmission loss ``TL`` (dB) is the sum of geometrical spreading and volume
 absorption:
 
-* :func:`spreading_loss` -- geometrical spreading, :math:`20 \lg R`
-  (spherical), :math:`10 \lg R` (cylindrical) or spherical-then-cylindrical
+* :func:`spreading_loss` -- geometrical spreading, :math:`20 \log_{10} R`
+  (spherical), :math:`10 \log_{10} R` (cylindrical) or spherical-then-cylindrical
   (``"practical"``).
 * :func:`seawater_absorption` -- the volume absorption coefficient
   :math:`\alpha` in
@@ -67,10 +67,10 @@ def spreading_loss(
 ) -> NDArray[np.float64]:
     r"""Geometrical spreading loss, in dB.
 
-    ``"spherical"`` gives :math:`20 \lg(R)` (free field), ``"cylindrical"``
-    gives :math:`10 \lg(R)` (perfect waveguide) and ``"practical"`` is
+    ``"spherical"`` gives :math:`20 \log_{10}(R)` (free field), ``"cylindrical"``
+    gives :math:`10 \log_{10}(R)` (perfect waveguide) and ``"practical"`` is
     spherical up to ``transition_range`` ``R0`` then cylindrical:
-    :math:`20 \lg(R_0) + 10 \lg(R/R_0)` (mode stripping in a channel).
+    :math:`20 \log_{10}(R_0) + 10 \log_{10}(R/R_0)` (mode stripping in a channel).
 
     :param range_m: Range ``R`` from the source, in metres (scalar or array,
         strictly positive).

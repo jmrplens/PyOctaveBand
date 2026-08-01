@@ -22,7 +22,7 @@ average normal sound intensity level `LIn` over the measurement surface,
 in dB,
 
 $$
-R_I = L_{p1} - 6 - \left[ L_{In} + 10 \lg\frac{S_m}{S} \right]
+R_I = L_{p1} - 6 - \left[ L_{In} + 10 \log_{10}\frac{S_m}{S} \right]
 $$
 
 with the measurement-surface area `Sm` and the specimen area `S`. The
@@ -37,9 +37,9 @@ $R_{I,M} = R_I + K_c$ corrects `RI` so that it reproduces the
 ISO 140-3 (now ISO 10140-2) pressure result, which slightly overestimates
 `R` because the power radiated into the receiving room is underestimated.
 The adaptation term `Kc` (Annex B) is
-$10 \lg(1 + S_{b2} \lambda / (8 V_2))$ (Formula (B.1)) for a
+$10 \log_{10}(1 + S_{b2} \lambda / (8 V_2))$ (Formula (B.1)) for a
 well-defined receiving room of boundary area `Sb2` and volume `V2`, or
-the room-independent approximation $10 \lg(1 + 61.4 / f)$
+the room-independent approximation $10 \log_{10}(1 + 61.4 / f)$
 (Formula (B.2)); both use the speed of sound $c = 340$ m/s so that
 (B.1) with the reference room $S_{b2} = 117$ m², $V_2 = 81$ m³
 reduces to (B.2).
@@ -48,12 +48,12 @@ reduces to (B.2).
 For small building elements, in dB,
 
 $$
-D_{I,n,e} = L_{p1} - 6 - \left( L_{In} + 10 \lg\frac{S_m}{A_0} \right) + 10 \lg N
+D_{I,n,e} = L_{p1} - 6 - \left( L_{In} + 10 \log_{10}\frac{S_m}{A_0} \right) + 10 \log_{10} N
 $$
 
 with the reference absorption area $A_0 = 10$ m² and the number `N`
 of element units in the measurement surface. The printed Formula (8)
-subtracts its $10 \lg N$ term instead of adding it, which is physically
+subtracts its $10 \log_{10} N$ term instead of adding it, which is physically
 inconsistent with ISO 10140-2:2010 Formula (6) and ISO 15186-2:2010
 Formula (12); the corrected per-unit form is implemented (see
 `docs/ERRATA.md`).
@@ -93,10 +93,10 @@ $R_{I,M} = R_I + K_c$ (Clause 3.10). Two forms are available:
 
 - **Well-defined receiving room (Formula (B.1)):** when both
   `boundary_area` (`Sb2`) and `volume` (`V2`) are supplied,
-  $K_c = 10 \lg(1 + S_{b2} \lambda / (8 V_2))$ with the midband
+  $K_c = 10 \log_{10}(1 + S_{b2} \lambda / (8 V_2))$ with the midband
   wavelength $\lambda = c / f$ and $c = 340$ m/s.
 - **Room-independent approximation (Formula (B.2)):** when neither is
-  supplied, $K_c = 10 \lg(1 + 61.4 / f)$, the exact reduction of
+  supplied, $K_c = 10 \log_{10}(1 + 61.4 / f)$, the exact reduction of
   (B.1) for the reference room $S_{b2} = 117$ m²,
   $V_2 = 81$ m³.
 
@@ -132,7 +132,7 @@ individually, the normal sound intensity level over the whole surface is
 the area-weighted energy average, in dB,
 
 $$
-L_{In} = 10 \lg\!\left[ \frac{1}{S_m} \sum_i S_{mi}\, 10^{0.1 L_{Ini}} \right]
+L_{In} = 10 \log_{10}\!\left[ \frac{1}{S_m} \sum_i S_{mi}\, 10^{0.1 L_{Ini}} \right]
 $$
 
 with the total measured area $S_m = \sum_i |S_{mi}|$
@@ -178,7 +178,7 @@ Computes, per frequency band, the intensity element normalized level
 difference of a single element unit, in dB,
 
 $$
-D_{I,n,e} = L_{p1} - 6 - \left( L_{In} + 10 \lg\frac{S_m}{A_0} \right) + 10 \lg N
+D_{I,n,e} = L_{p1} - 6 - \left( L_{In} + 10 \log_{10}\frac{S_m}{A_0} \right) + 10 \log_{10} N
 $$
 
 from the average source-room sound pressure level `Lp1`, the average
@@ -191,12 +191,12 @@ The weighted rating `DI,n,e,w` is computed via
 are supplied.
 
 :::note
-The printed Formula (8) *subtracts* its $10 \lg N$ term. That
+The printed Formula (8) *subtracts* its $10 \log_{10} N$ term. That
 sign cannot be derived: measuring `N` identical units together
-raises the transmitted power by $10 \lg N$, so recovering the
-per-unit `DI,n,e` requires *adding* $10 \lg N$, exactly as
+raises the transmitted power by $10 \log_{10} N$, so recovering the
+per-unit `DI,n,e` requires *adding* $10 \log_{10} N$, exactly as
 the pressure-based ISO 10140-2:2010 Formula (6) does with its
-$10 \lg(n A_0/A)$ term (and consistently with ISO 15186-2:2010
+$10 \log_{10}(n A_0/A)$ term (and consistently with ISO 15186-2:2010
 Formula (12), which is Formula (8) without an `N` term). This
 function implements the corrected per-unit form and warns when
 `n > 1` deviates from the print (see `docs/ERRATA.md`).
@@ -237,7 +237,7 @@ Intensity sound reduction index per ISO 15186-1:2000 (Formula (7)).
 Computes, per frequency band, the intensity sound reduction index, in dB,
 
 $$
-R_I = L_{p1} - 6 - \left[ L_{In} + 10 \lg\frac{S_m}{S} \right]
+R_I = L_{p1} - 6 - \left[ L_{In} + 10 \log_{10}\frac{S_m}{S} \right]
 $$
 
 from the average source-room sound pressure level `Lp1` and the average
@@ -292,7 +292,7 @@ Per-band intensity element normalized level difference (ISO 15186-1).
 
 | Name | Description |
 | :--- | :--- |
-| `d_i_n_e` | Intensity element normalized level difference $D_{I,n,e} = L_{p1} - 6 - (L_{In} + 10 \lg(S_m/A_0)) + 10 \lg N$ per band, in dB (Clause 3.9, Formula (8) with the corrected sign of its $10 \lg N$ term; see `docs/ERRATA.md`). |
+| `d_i_n_e` | Intensity element normalized level difference $D_{I,n,e} = L_{p1} - 6 - (L_{In} + 10 \log_{10}(S_m/A_0)) + 10 \log_{10} N$ per band, in dB (Clause 3.9, Formula (8) with the corrected sign of its $10 \log_{10} N$ term; see `docs/ERRATA.md`). |
 | `rating` | Single-number weighted rating `DI,n,e,w` with `C` / `Ctr` (ISO 717-1), or `None` when the band count is neither 16 (one-third octave) nor 5 (octave). |
 | `measurement_area` | Measurement-surface area `Sm`, in m², or `None` on a manually built result (Clause 8 g). |
 | `n` | Number `N` of element units within the measurement surface. |
@@ -399,7 +399,7 @@ Per-band intensity sound reduction index (ISO 15186-1:2000).
 
 | Name | Description |
 | :--- | :--- |
-| `r_i` | Intensity sound reduction index $R_I = L_{p1} - 6 - [L_{In} + 10 \lg(S_m/S)]$ per band, in dB (Clause 3.8, Formula (7)). In the field (ISO 15186-2) this is the apparent index `R'I`. |
+| `r_i` | Intensity sound reduction index $R_I = L_{p1} - 6 - [L_{In} + 10 \log_{10}(S_m/S)]$ per band, in dB (Clause 3.8, Formula (7)). In the field (ISO 15186-2) this is the apparent index `R'I`. |
 | `r_i_modified` | Modified index $R_{I,M} = R_I + K_c$ per band, in dB (Clause 3.10, Formula (9)), or `None` when no adaptation term was supplied. |
 | `rating` | Single-number weighted rating `RI,w` with `C` / `Ctr` (ISO 717-1), or `None` when the band count is neither 16 (one-third octave) nor 5 (octave). |
 | `rating_modified` | Weighted rating `RI,M,w` of the modified index, or `None` when unavailable. |

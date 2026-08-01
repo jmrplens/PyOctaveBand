@@ -221,7 +221,7 @@ def transmission_loss(
 
     .. math::
 
-       \mathrm{TL} = 10 \lg\!\left[(Z_n/Z_1) \frac{1}{4}
+       \mathrm{TL} = 10 \log_{10}\!\left[(Z_n/Z_1) \frac{1}{4}
        \lvert T_{11} + T_{12}/Z_n + Z_1 T_{21}
        + (Z_1/Z_n) T_{22} \rvert^2\right]
 
@@ -657,7 +657,7 @@ def quarter_wave_resonator(
     source_impedance: ArrayLike | None = None,
     radiation_impedance: ArrayLike | None = None,
 ) -> ReactiveSilencerResult:
-    """Closed quarter-wave side-branch tube on a duct (Bies Eqs. (8.144), (8.146)).
+    r"""Closed quarter-wave side-branch tube on a duct (Bies Eqs. (8.144), (8.146)).
 
     :param frequencies: Frequencies ``f``, Hz (1-D array).
     :param duct_area: Main-duct cross-sectional area ``S_d``, m2.

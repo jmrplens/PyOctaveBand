@@ -91,7 +91,7 @@ class PlaneWaveWarning(PhonometryWarning):
 
 @dataclass(frozen=True)
 class DuctModeResult:
-    """Cut-on frequencies of the higher-order acoustic modes of a duct.
+    r"""Cut-on frequencies of the higher-order acoustic modes of a duct.
 
     :ivar modes: Mode orders ``(p, q)``, ordered by ascending no-flow cut-on
         frequency.

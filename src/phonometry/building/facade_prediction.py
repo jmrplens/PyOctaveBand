@@ -13,7 +13,7 @@ sound reduction index of a façade for diffuse incidence (Formula 10):
 
 .. math::
 
-   R' = -10 \lg\!\left( \sum \tau_{e,i} \right)
+   R' = -10 \log_{10}\!\left( \sum \tau_{e,i} \right)
 
    \tau_{e,i} = \frac{S_i}{S}\, 10^{-R_i/10} \tag{Formula 15}
 
@@ -27,7 +27,7 @@ and the primary output, the standardized level difference at 2 m
 .. math::
 
    D_{2m,nT} = R' + \Delta L_{fs}
-   + 10 \lg\!\left( \frac{V}{6 T_0 S} \right)
+   + 10 \log_{10}\!\left( \frac{V}{6 T_0 S} \right)
    \qquad T_0 = 0.5~\text{s}
 
 with the façade-shape term ``ΔLfs`` (Annex C; 0 dB for a flat reflecting
@@ -38,11 +38,11 @@ power level radiated by a segment (Formulas 2-3):
 
 .. math::
 
-   R' = -10 \lg\!\left( \sum \frac{S_i}{S}\, 10^{-R_i/10}
+   R' = -10 \log_{10}\!\left( \sum \frac{S_i}{S}\, 10^{-R_i/10}
    + \sum \frac{A_0}{S}\, 10^{-D_{n,e,i}/10} \right)
 
    L_W = L_{p,\text{in}} + C_d - R'
-   + 10 \lg\!\left( \frac{S}{S_0} \right)
+   + 10 \log_{10}\!\left( \frac{S}{S_0} \right)
    \qquad S_0 = 1~\text{m}^2
 
 with the inside-field diffusivity term ``Cd`` (Annex B; -6 dB ideal diffuse,
@@ -171,7 +171,7 @@ class FacadePredictionResult:
     :ivar r_tr_s: :math:`R_{tr,s} = R'` (traffic, Formula 12), in dB.
     :ivar d_2m_nt: Standardized level difference ``D2m,nT`` per band, in dB
         (Formula 13).
-    :ivar element_r: Per-element partial index :math:`R_p = -10 \lg \tau` per
+    :ivar element_r: Per-element partial index :math:`R_p = -10 \log_{10} \tau` per
         band, in dB.
     :ivar r_tr_s_w: Single-number ``Rtr,s,w`` (ISO 717-1); ``None`` if the bands
         are not the ISO 717-1 octave/third-octave set.
@@ -320,7 +320,7 @@ _A_WEIGHT_OCTAVE = {
 def _apparent_reduction(elements: Sequence[FacadeElement], total_area: float) -> tuple[
     np.ndarray, dict[str, np.ndarray]
 ]:
-    r""":math:`R' = -10 \lg(\sum \tau)` (F. 10 / Part 4 F. 3), plus ``Rp``."""
+    r""":math:`R' = -10 \log_{10}(\sum \tau)` (F. 10 / Part 4 F. 3), plus ``Rp``."""
     if not elements:
         raise ValueError("At least one façade element is required.")
     if total_area <= 0:
@@ -420,7 +420,7 @@ def radiated_sound_power(
     r"""Predict the sound power radiated outside by a segment (EN 12354-4).
 
     ``R'`` combines the element transmission factors (Formula 3); the radiated
-    power level is :math:`L_W = L_{p,in} + C_d - R' + 10 \lg(S/S_0)`
+    power level is :math:`L_W = L_{p,in} + C_d - R' + 10 \log_{10}(S/S_0)`
     (Formula 2). Openings
     may be included as :class:`FacadeElement` entries with an ``insertion_loss``
     (0 for a bare opening); see the module docstring for how this differs from
@@ -581,7 +581,7 @@ def outdoor_level(
 ) -> float:
     r"""Exterior level from one or more radiating sides (EN 12354-4 F. E.1).
 
-    :math:`L_p = 10 \lg( \sum 10^{L_{W,k}/10} ) - A_{tot}` for sides sharing
+    :math:`L_p = 10 \log_{10}( \sum 10^{L_{W,k}/10} ) - A_{tot}` for sides sharing
     a reception point,
     or the per-side ``LW - Atot`` energetically summed. Pass matching sequences
     of side power levels and their attenuations, or scalars for a single side; a

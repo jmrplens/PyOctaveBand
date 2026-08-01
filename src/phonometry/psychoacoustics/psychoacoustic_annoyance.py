@@ -17,7 +17,7 @@ terms
 
 .. math::
 
-   w_S = (S - 1.75) \cdot 0.25 \cdot \lg(N_5 + 10)
+   w_S = (S - 1.75) \cdot 0.25 \cdot \log_{10}(N_5 + 10)
    \quad \text{for } S > 1.75~\text{acum, else } 0 \tag{Eq. 16.3}
 
    w_{FR} = \frac{2.18}{N_5^{0.4}} \left( 0.4 F + 0.6 R \right)

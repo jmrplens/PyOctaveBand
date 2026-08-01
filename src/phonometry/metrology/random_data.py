@@ -115,7 +115,7 @@ _MIN_OBSERVATIONS = 10
 
 
 def _reverse_arrangements(values: NDArray[np.float64]) -> int:
-    """Count reverse arrangements ``A``: pairs :math:`i < j` with
+    r"""Count reverse arrangements ``A``: pairs :math:`i < j` with
     :math:`x_i > x_j`.
 
     B&P Eqs. (4.51)-(4.53). Equal values do not count (the inequality is
@@ -574,7 +574,7 @@ def stationarity_test(
     method: str = "reverse_arrangements",
     alpha: float = 0.05,
 ) -> StationarityTestResult:
-    """
+    r"""
     Test a record for stationarity via trends in segment statistics.
 
     The B&P Sec. 10.3.1.1 procedure: (1) divide the record into
@@ -811,9 +811,9 @@ def _rice_peak_exceedance(
     r""":math:`P[\text{peak} > z]` for standardized peak height ``z``
     (B&P Eq. (5.223)).
 
-    ``Q(z/eps) + r exp(-z^2/2) [1 - Q(r z / eps)]`` with
-    :math:`\epsilon = \sqrt{1 - r^2}`: the Rayleigh exceedance
-    ``exp(-z^2/2)`` for narrow bandwidth data (:math:`r \to 1`, B&P
+    :math:`Q(z/\epsilon) + r\, e^{-z^2/2} \left[ 1 - Q(rz/\epsilon) \right]`
+    with :math:`\epsilon = \sqrt{1 - r^2}`: the Rayleigh exceedance
+    :math:`e^{-z^2/2}` for narrow bandwidth data (:math:`r \to 1`, B&P
     Eq. (5.206)) and the Gaussian exceedance for :math:`r \to 0`
     (Eq. (5.221)).
     """
@@ -833,11 +833,11 @@ def _rice_peak_exceedance(
 def _rice_peak_density(
     z: NDArray[np.float64], irregularity: float
 ) -> NDArray[np.float64]:
-    """Peak probability density ``w(z)`` (B&P Eq. (5.217)).
+    r"""Peak probability density ``w(z)`` (B&P Eq. (5.217)).
 
-    ``(eps/sqrt(2 pi)) exp(-z^2/(2 eps^2))
-    + r z exp(-z^2/2) [1 - Q(r z / eps)]`` -- the mixture between the
-    standardized Gaussian (:math:`r = 0`, Eq. (5.221)) and Rayleigh
+    :math:`\frac{\epsilon}{\sqrt{2\pi}} e^{-z^2/(2\epsilon^2)}
+    + r z\, e^{-z^2/2} \left[ 1 - Q(rz/\epsilon) \right]`: the mixture
+    between the standardized Gaussian (:math:`r = 0`, Eq. (5.221)) and Rayleigh
     (:math:`r = 1`, Eq. (5.222)) densities; minus the derivative of
     :func:`_rice_peak_exceedance`.
     """

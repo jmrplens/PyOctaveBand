@@ -17,7 +17,7 @@ field-incidence transmission loss:
 
 .. math::
 
-   \mathrm{TL}_{\mathrm{normal}} = 10 \lg\!\left[ 1 +
+   \mathrm{TL}_{\mathrm{normal}} = 10 \log_{10}\!\left[ 1 +
    \left( \frac{\pi f m''}{\rho_0 c_0} \right)^{2} \right]
 
    \mathrm{TL}_{\mathrm{field}} = \mathrm{TL}_{\mathrm{normal}}
@@ -35,15 +35,15 @@ upwards the loss factor ``eta`` controls the transmission (Eq. 7.44):
 
 .. math::
 
-   \mathrm{TL} = 10 \lg\!\left[ 1 +
+   \mathrm{TL} = 10 \log_{10}\!\left[ 1 +
    \left( \frac{\pi f m''}{\rho_0 c_0} \right)^{2} \right]
-   + 10 \lg\frac{2 \eta f}{\pi f_c}
+   + 10 \log_{10}\frac{2 \eta f}{\pi f_c}
 
 and between :math:`f_c/2` and :math:`f_c` the curve is a straight line on
 :math:`\mathrm{TL}` versus :math:`\log_{10} f`. The coincidence dip at
-:math:`f_c` sits :math:`10 \lg(2\eta/\pi)` below the extrapolated mass law
+:math:`f_c` sits :math:`10 \log_{10}(2\eta/\pi)` below the extrapolated mass law
 (Bies design-chart point B,
-:math:`\mathrm{TL} = 20 \lg(f_c m'') + 10 \lg\eta - 44`).
+:math:`\mathrm{TL} = 20 \log_{10}(f_c m'') + 10 \log_{10}\eta - 44`).
 
 **Double wall (Bies 7.2.6, Eq. 7.62-7.64).** Two leaves ``m1``, ``m2`` separated
 by a gap ``d`` behave as a mass-spring-mass system. Below the resonance
@@ -55,7 +55,7 @@ mass laws add, boosted by the cavity (Eq. 7.64):
 
    \mathrm{TL} = \mathrm{TL}_M, \qquad f \le f_0
 
-   \mathrm{TL} = \mathrm{TL}_1 + \mathrm{TL}_2 + 20 \lg(2 k d),
+   \mathrm{TL} = \mathrm{TL}_1 + \mathrm{TL}_2 + 20 \log_{10}(2 k d),
    \qquad f_0 < f < f_l, \quad k = 2 \pi f / c_0
 
    \mathrm{TL} = \mathrm{TL}_1 + \mathrm{TL}_2 + 6,
@@ -189,7 +189,7 @@ def mass_law_transmission_loss(
 ) -> np.ndarray:
     r"""Mass-law transmission loss of a limp panel (Bies Eq. 7.40/7.42).
 
-    :math:`\mathrm{TL}_{\mathrm{normal}} = 10 \lg[1 +
+    :math:`\mathrm{TL}_{\mathrm{normal}} = 10 \log_{10}[1 +
     (\pi f m'' / \rho_0 c_0)^{2}]`; the field-incidence value subtracts the
     band correction of :func:`field_incidence_correction`,
     or the explicit *field_correction* when one is given (Norton & Karczub
@@ -362,8 +362,8 @@ def single_panel_transmission_loss(
 
     .. math::
 
-       \mathrm{TL} = \mathrm{TL}_0 + 10 \lg(f/f_c - 1)
-       + 10 \lg\eta - 2~\text{dB}
+       \mathrm{TL} = \mathrm{TL}_0 + 10 \log_{10}(f/f_c - 1)
+       + 10 \log_{10}\eta - 2~\text{dB}
 
     which also rises at 10 dB per octave far above coincidence but starts from
     the singularity at ``fc`` itself rather than from a finite value. Norton
@@ -542,7 +542,7 @@ def plateau_transmission_loss(
     :data:`PLATEAU_MATERIALS`):
 
     1. the **field-incidence mass law**
-       :math:`\mathrm{TL} = 10 \lg[1 + (\pi f m''/\rho_0 c_0)^{2}] - 5`
+       :math:`\mathrm{TL} = 10 \log_{10}[1 + (\pi f m''/\rho_0 c_0)^{2}] - 5`
        (Eqs. 3.104/3.106), rising 6 dB per octave;
     2. a horizontal **coincidence plateau** at the material's plateau height;
        point **A** is where the mass-law line reaches it;
@@ -1179,8 +1179,8 @@ def double_wall_transmission_loss(
     Piecewise Sharp model: below the mass-spring-mass resonance ``f0`` the pair
     behaves as the mass law of the combined mass; between ``f0`` and the
     limiting frequency :math:`f_l = c_0/(2 \pi d)` the two mass laws add plus
-    :math:`20 \lg(2 k d)`; above ``f_l`` they add plus 6 dB. The curve is
-    continuous at ``f_l`` (:math:`20 \lg(2 k d) = 6` there).
+    :math:`20 \log_{10}(2 k d)`; above ``f_l`` they add plus 6 dB. The curve is
+    continuous at ``f_l`` (:math:`20 \log_{10}(2 k d) = 6` there).
 
     Ties or mounts bridging the cavity stiffen it (Hopkins Eq. 4.89), pushing
     ``f0`` up and extending the combined-mass branch; pass their stiffness per

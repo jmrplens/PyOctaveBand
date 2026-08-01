@@ -379,7 +379,7 @@ def millington_sette_reverberation_time(
 
 
 def _axial_geometry(dimensions: Sequence[float]) -> tuple[float, float, NDArray[np.float64]]:
-    """Volume ``V``, total surface ``S`` and the three wall-pair areas ``S_i``.
+    r"""Volume ``V``, total surface ``S`` and the three wall-pair areas ``S_i``.
 
     ``S_i`` is the combined area of the two walls perpendicular to axis ``i``:
     :math:`S_x = 2 L_y L_z`, :math:`S_y = 2 L_x L_z`,

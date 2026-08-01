@@ -819,7 +819,7 @@ def impulse_response_delay(
     interpolation: _Interpolation = "parabolic",
     upsample: int = 8,
 ) -> float:
-    """Sub-sample delay of an impulse response, in seconds.
+    r"""Sub-sample delay of an impulse response, in seconds.
 
     Without a reference, the arrival time of the IR itself: the
     cross-correlation of an IR with an ideal unit impulse *is* the IR, so

@@ -1029,7 +1029,7 @@ class FDTD2D:
             probe._accumulate(self.p, self.vx, self.vy, self.n)
 
     def _inject_plane(self, plane: PlaneWaveSource, t_next: float) -> None:
-        """Add the incident plane wave on the injection line (one-way).
+        r"""Add the incident plane wave on the injection line (one-way).
 
         Simultaneous pressure and adjacent-face velocity increments carry
         the incident wave into the domain only along the travel direction;

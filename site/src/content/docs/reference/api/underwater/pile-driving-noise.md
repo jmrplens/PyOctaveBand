@@ -14,7 +14,7 @@ hammer strike. ISO 18406 characterises them with:
   `SEL_ss` of one pulse (Formulae 3-4), reusing the 1 µPa²·s reference.
 * [`cumulative_sel`](/phonometry/reference/api/underwater/pile-driving-noise/#cumulative_sel) / [`cumulative_sel_identical`](/phonometry/reference/api/underwater/pile-driving-noise/#cumulative_sel_identical) -- the cumulative
   sound exposure level over N strikes (Formulae 8-9); for N identical strikes
-  $\mathrm{SEL}_{\mathrm{cum}} = \mathrm{SEL}_{\mathrm{ss}} + 10 \lg N$.
+  $\mathrm{SEL}_{\mathrm{cum}} = \mathrm{SEL}_{\mathrm{ss}} + 10 \log_{10} N$.
 * [`pile_strike_metrics`](/phonometry/reference/api/underwater/pile-driving-noise/#pile_strike_metrics) -- a [`PileStrikeResult`](/phonometry/reference/api/underwater/pile-driving-noise/#pilestrikeresult) bundling the
   single-strike SEL, the peak sound pressure level, the SPL/Leq and the
   90 %-energy pulse duration for one recorded strike, with a `.plot()`.
@@ -36,7 +36,7 @@ cumulative_sel(single_sels: NDArray[np.float64] | list[float]) -> float
 Cumulative sound exposure level over N strikes (ISO 18406
 Formulae 8-9).
 
-$\mathrm{SEL}_{\mathrm{cum}} = 10 \lg \sum_n 10^{\mathrm{SEL}_n/10}$ -- the energy sum of the per-strike
+$\mathrm{SEL}_{\mathrm{cum}} = 10 \log_{10} \sum_n 10^{\mathrm{SEL}_n/10}$ -- the energy sum of the per-strike
 single-strike SELs.
 
 **Parameters**
@@ -60,7 +60,7 @@ cumulative_sel_identical(sel_ss: float, n_strikes: int) -> float
 ```
 
 Cumulative SEL of `n_strikes` identical strikes:
-$\mathrm{SEL}_{\mathrm{ss}} + 10 \lg N$.
+$\mathrm{SEL}_{\mathrm{ss}} + 10 \log_{10} N$.
 
 **Parameters**
 

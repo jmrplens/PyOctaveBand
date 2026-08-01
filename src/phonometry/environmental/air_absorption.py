@@ -61,7 +61,7 @@ reproduce Table 1 exactly.
 
 This module closes the loop with :mod:`phonometry.sound_absorption` (ISO 354),
 whose air power-attenuation coefficient ``m`` (1/m) is defined only through
-the ISO 9613-1 ``alpha`` via :math:`m = \alpha / (10 \lg e)`.
+the ISO 9613-1 ``alpha`` via :math:`m = \alpha / (10 \log_{10} e)`.
 :func:`air_attenuation_m` returns that ``m`` directly.
 """
 
@@ -107,7 +107,7 @@ def _exact_midband(frequencies: NDArray[np.float64]) -> NDArray[np.float64]:
     r"""Snap frequencies to the exact one-third-octave midbands, Eq. (6).
 
     :math:`f_m = 1000 \cdot 10^{k/10}` with
-    :math:`k = \operatorname{round}(10 \lg(f/1000))` the nearest integer band
+    :math:`k = \operatorname{round}(10 \log_{10}(f/1000))` the nearest integer band
     index. Reproduces the frequencies used to compute Table 1
     (ISO 9613-1:1993, clause 6.4, Note 5).
     """
@@ -221,7 +221,7 @@ def air_attenuation(
 
     .. note::
         ISO 354:2003 defers its air power-attenuation coefficient ``m`` (1/m)
-        entirely to this ``alpha`` via :math:`m = \alpha / (10 \lg e)`. Use
+        entirely to this ``alpha`` via :math:`m = \alpha / (10 \log_{10} e)`. Use
         :func:`air_attenuation_m` to obtain that ``m`` for
         :func:`phonometry.sound_absorption.absorption_area` /
         :func:`~phonometry.sound_absorption.absorption_coefficient`.
@@ -265,7 +265,7 @@ def air_attenuation_m(
 
     Convenience composition of :func:`air_attenuation` (ISO 9613-1 ``alpha`` in
     dB/m) with the ISO 354:2003 (8.1.2.1) conversion
-    :math:`m = \alpha / (10 \lg e)`
+    :math:`m = \alpha / (10 \log_{10} e)`
     (via :func:`phonometry.sound_absorption.attenuation_from_alpha`). It lets an
     ISO 354 caller feed real atmospheric conditions into
     :func:`~phonometry.sound_absorption.absorption_area` /

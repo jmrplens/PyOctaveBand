@@ -770,7 +770,7 @@ def loudness_zwicker(
     Input scaling follows the reference implementation's WAV convention:
     ``x * calibration_factor`` must be the instantaneous sound pressure in
     pascals, so that band levels are
-    :math:`10 \lg(p^2 / (20~\mu\text{Pa})^2)` dB SPL.
+    :math:`10 \log_{10}(p^2 / (20~\mu\text{Pa})^2)` dB SPL.
     The reference program reads 32-bit float WAV files as pressure in Pa
     directly (``calibration_factor = 1``), while 16-bit PCM samples are
     divided by 32768 (full scale = +-1) and multiplied by a calibration

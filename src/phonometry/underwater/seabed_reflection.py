@@ -23,7 +23,7 @@ interface), the angle of incidence from the normal is
   bottom loss bundled with the interface parameters into a
   :class:`SeabedReflection` whose ``.plot()`` draws ``|R|`` versus grazing angle.
 * :func:`bottom_reflection_loss` -- the bottom loss
-  :math:`\mathrm{BL} = -20 \lg \lvert R \rvert` (dB), returned as a
+  :math:`\mathrm{BL} = -20 \log_{10} \lvert R \rvert` (dB), returned as a
   :class:`BottomLossResult` with a ``.plot()``.
 
 Lossless fluid-fluid model (real :math:`\rho`/``c``); sediment attenuation is
@@ -117,7 +117,7 @@ class BottomLossResult:
 
     :ivar grazing_angle: Grazing angles, in degrees.
     :ivar reflection_loss: Bottom loss
-        :math:`\mathrm{BL} = -20 \lg \lvert R \rvert` per angle, in dB.
+        :math:`\mathrm{BL} = -20 \log_{10} \lvert R \rvert` per angle, in dB.
     :ivar reflection_coefficient: Complex reflection coefficient per angle.
     :ivar critical_angle: The critical grazing angle, in degrees, or ``None`` if
         the sediment is not faster than the water.
@@ -144,7 +144,7 @@ def bottom_reflection_loss(
     rho2: float,
     c2: float,
 ) -> BottomLossResult:
-    r"""Bottom reflection loss :math:`\mathrm{BL} = -20 \lg \lvert R \rvert`
+    r"""Bottom reflection loss :math:`\mathrm{BL} = -20 \log_{10} \lvert R \rvert`
     versus grazing angle (dB).
 
     At an angle of intromission :math:`R = 0` and the loss is ``inf`` (total
@@ -181,7 +181,7 @@ class SeabedReflection:
 
     Bundles the complex Rayleigh reflection coefficient ``R`` over a
     grazing-angle grid with its magnitude ``|R|``, the bottom loss
-    :math:`\mathrm{BL} = -20 \lg \lvert R \rvert` and the fluid-fluid
+    :math:`\mathrm{BL} = -20 \log_{10} \lvert R \rvert` and the fluid-fluid
     interface parameters, so the classic ``|R|`` versus grazing-angle curve
     can be drawn with :meth:`plot`. Build it with :func:`seabed_reflection`;
     the frozen instance is a thin, plottable wrapper and re-runs none of the
@@ -194,7 +194,7 @@ class SeabedReflection:
     :ivar magnitude: Reflection-coefficient magnitude ``|R|`` per grazing angle
         (``1`` below the critical angle for a faster sediment).
     :ivar bottom_loss: Bottom loss
-        :math:`\mathrm{BL} = -20 \lg \lvert R \rvert` per grazing angle, in
+        :math:`\mathrm{BL} = -20 \log_{10} \lvert R \rvert` per grazing angle, in
         dB.
     :ivar critical_angle: The critical grazing angle, in degrees, or ``None`` if
         the sediment is not faster than the water.
@@ -246,7 +246,7 @@ def seabed_reflection(
 
     Evaluates :func:`reflection_coefficient` at ``grazing_angle`` for the given
     fluid-fluid interface and bundles the complex ``R``, its magnitude ``|R|``,
-    the bottom loss :math:`\mathrm{BL} = -20 \lg \lvert R \rvert` and the
+    the bottom loss :math:`\mathrm{BL} = -20 \log_{10} \lvert R \rvert` and the
     interface parameters into a :class:`SeabedReflection` that exposes
     ``.plot()``. The maths is unchanged; this is a thin, plottable wrapper
     around the existing function (the same ``ValueError`` cases apply). At an

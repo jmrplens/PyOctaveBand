@@ -20,8 +20,8 @@ Results are reported as a **level**, in dB, re the reference stiffness
 
 .. math::
 
-   L_k = 10 \lg\!\left( \frac{|k_{2,1}|^2}{k_0^2} \right)
-   = 20 \lg\!\left( \frac{|k_{2,1}|}{k_0} \right)
+   L_k = 10 \log_{10}\!\left( \frac{|k_{2,1}|^2}{k_0^2} \right)
+   = 20 \log_{10}\!\left( \frac{|k_{2,1}|}{k_0} \right)
 
 and, in the low-frequency range where inertial forces in the element are
 negligible, the **loss factor** is the tangent of the phase angle of
@@ -41,7 +41,7 @@ Two laboratory methods determine :math:`k_{2,1}`:
   where ``mf`` is the mass of the output flange of the test element. The
   approximation is valid only where :math:`|T| \le 0.1` (Inequality (2):
   :math:`\Delta L_{1,2} \ge 20` dB) and while the blocking mass still
-  behaves rigidly, :math:`10 \lg(m_{2,\mathrm{eff}}^2/m_2^2) \le 1` dB
+  behaves rigidly, :math:`10 \log_{10}(m_{2,\mathrm{eff}}^2/m_2^2) \le 1` dB
   (Inequality (3)); see :func:`transfer_stiffness_indirect`.
 
 The dynamic transfer stiffness is a member of the frequency-response-function
@@ -95,7 +95,7 @@ def transfer_stiffness_level(
 ) -> np.ndarray:
     r"""Level of the dynamic transfer stiffness (ISO 10846-2/-3, 3.17).
 
-    :math:`L_k = 20 \lg(|k_{2,1}| / k_0)` dB, with ``k0`` the reference
+    :math:`L_k = 20 \log_{10}(|k_{2,1}| / k_0)` dB, with ``k0`` the reference
     stiffness.
 
     :param stiffness: Dynamic transfer stiffness :math:`k_{2,1}` (complex or
@@ -192,7 +192,7 @@ def transfer_stiffness_indirect(
     measured per Formula (4) as
     :math:`m_{2,\mathrm{eff}} = 2 F_2 / (a'_1 + a''_1)` (two accelerometers
     spaced :math:`D = \sqrt{S}` across the contact area), stays within 1 dB
-    of the rigid mass, :math:`10 \lg(m_{2,\mathrm{eff}}^2 / m_2^2) \le 1` dB
+    of the rigid mass, :math:`10 \log_{10}(m_{2,\mathrm{eff}}^2 / m_2^2) \le 1` dB
     (Inequality (3), 6.2.3).
 
     :param frequency: Frequency ``f``, in hertz (scalar or array).
@@ -301,7 +301,7 @@ def base_transmissibility(
 
 @dataclass(frozen=True)
 class TransferStiffnessResult:
-    """A dynamic transfer stiffness over frequency (ISO 10846).
+    r"""A dynamic transfer stiffness over frequency (ISO 10846).
 
     :ivar frequencies: Frequencies, in hertz.
     :ivar transfer_stiffness: Complex :math:`k_{2,1}` per frequency, in N/m.
@@ -330,7 +330,7 @@ class TransferStiffnessResult:
         return loss_factor(self.transfer_stiffness)
 
     def to(self, target: str) -> np.ndarray:
-        r"""Convert :math:`k_{2,1}` to a related FRF (ISO 10846-1 Annex A).
+        r"""Convert :math:`k_{2,1}` to an FRF (ISO 10846-1 Annex A / Table A.2).
 
         ``target`` is ``"impedance"`` (:math:`Z = k/(j\omega)`) or
         ``"apparent_mass"`` (:math:`m_{\mathrm{eff}} = -k/\omega^2`); see

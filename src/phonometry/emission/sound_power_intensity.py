@@ -16,7 +16,7 @@ sound power follows from the partial powers
 
    P = \sum_i P_i \tag{Eq. 6}
 
-   L_W = 10 \lg\frac{P}{P_0}, \qquad P_0 = 10^{-12}~\text{W} \tag{Eq. 13}
+   L_W = 10 \log_{10}\frac{P}{P_0}, \qquad P_0 = 10^{-12}~\text{W} \tag{Eq. 13}
 
 The method is **not applicable to any band in which** :math:`P < 0`
 (clause 9.2): a strong parasitic source outside the surface makes the net
@@ -28,11 +28,11 @@ normative):
 
 .. math::
 
-   F_{pI} = [L_p] - L_W + 10 \lg\frac{S}{S_0} \tag{Eq. A.1}
+   F_{pI} = [L_p] - L_W + 10 \log_{10}\frac{S}{S_0} \tag{Eq. A.1}
 
-   [L_p] = 10 \lg\!\left[ \frac{1}{S} \sum_i S_i \, 10^{0.1 L_{pi}} \right]
+   [L_p] = 10 \log_{10}\!\left[ \frac{1}{S} \sum_i S_i \, 10^{0.1 L_{pi}} \right]
 
-   F_{+/-} = 10 \lg\frac{\sum_i |P_i|}{\left| \sum_i P_i \right|}
+   F_{+/-} = 10 \log_{10}\frac{\sum_i |P_i|}{\left| \sum_i P_i \right|}
    \tag{Eq. A.2}
 
 ``FpI`` is the surface pressure-intensity indicator (equivalent to ISO 9614-1
@@ -130,10 +130,10 @@ class SoundPowerIntensityResult:
 
     ``partial_power`` is the signed :math:`P_i = \langle I_{n,i} \rangle S_i`
     per segment and band (Eq. 12); ``partial_power_level`` the magnitude level
-    :math:`10 \lg(|P_i|/P_0)` (Eq. 8), with the sign carried by
+    :math:`10 \log_{10}(|P_i|/P_0)` (Eq. 8), with the sign carried by
     ``partial_power``. ``sound_power`` is the signed band total
     :math:`P = \sum P_i` (Eq. 6) and ``sound_power_level`` its level
-    :math:`10 \lg(P/P_0)` (Eq. 13), ``NaN`` where :math:`P \le 0`
+    :math:`10 \log_{10}(P/P_0)` (Eq. 13), ``NaN`` where :math:`P \le 0`
     (``negative_band`` True, method not applicable, clause 9.2).
     ``surface_pressure_intensity_index``
     (FpI, Eq. A.1) and ``negative_partial_power_index`` (F+/-, Eq. A.2) are
@@ -241,7 +241,7 @@ class SoundPowerIntensityResult:
 
 
 def _level_magnitude(values: np.ndarray) -> np.ndarray:
-    r"""Magnitude level :math:`10 \lg(|P_i|/P_0)` in dB, with a tiny-floor
+    r"""Magnitude level :math:`10 \log_{10}(|P_i|/P_0)` in dB, with a tiny-floor
     guard for zeros."""
     guarded = np.maximum(np.abs(values), np.finfo(float).tiny)
     return np.asarray(10.0 * np.log10(guarded / _P0), dtype=np.float64)
@@ -278,7 +278,7 @@ def sound_power_intensity(
     :math:`\langle I_{n,i} \rangle` (W/m^2), and ``areas`` the ``(N_seg,)``
     segment areas ``Si`` (m^2). The partial powers
     :math:`P_i = \langle I_{n,i} \rangle S_i` are summed to the band sound
-    power ``P`` and level :math:`L_W = 10 \lg(P/P_0)` (equations (12), (6),
+    power ``P`` and level :math:`L_W = 10 \log_{10}(P/P_0)` (equations (12), (6),
     (13)). Bands with :math:`P < 0` are flagged (``negative_band``) and
     reported as ``NaN`` (clause 9.2).
 

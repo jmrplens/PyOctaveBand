@@ -12,7 +12,7 @@ with their accuracy stated instead of implied.
   follows :math:`G_{xx}(f) \propto f^\alpha` with :math:`\alpha` = 0,
   -1, -2, +1 and +2 respectively,
   so the level changes by exactly :math:`3.01 \alpha` dB per octave
-  (:math:`10 \lg 2 = 3.0103` dB). The colors are synthesized by filtering
+  (:math:`10 \log_{10} 2 = 3.0103` dB). The colors are synthesized by filtering
   seeded white Gaussian noise in the frequency domain: the DFT of the
   white record is multiplied by the exact magnitude response
   :math:`\lvert H(f) \rvert = (f/f_{\mathrm{ref}})^{\alpha/2}`

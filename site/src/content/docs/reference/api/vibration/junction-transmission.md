@@ -113,7 +113,7 @@ the EN 12354 junction descriptor, with `fc_j` the critical frequency of the
 $f_{\text{ref}} = 1000$ Hz:
 
 $$
-K_{ij} = 10 \lg\!\left( \frac{1}{\tau_{ij}} \right) + 5 \lg\!\left( \frac{f_{cj}}{f_{\text{ref}}} \right) \tag{5.116}
+K_{ij} = 10 \log_{10}\!\left( \frac{1}{\tau_{ij}} \right) + 5 \log_{10}\!\left( \frac{f_{cj}}{f_{\text{ref}}} \right) \tag{5.116}
 $$
 
 Combined with the reciprocity relationship below
@@ -410,7 +410,7 @@ Bending-wave transmission across a rigid plate junction (Hopkins 5.2.1.3).
 
 Wave-approach `K_12` of the corner path, in dB (Hopkins Eq. 5.116).
 
-$K_{12} = 10 \lg(1 / \bar{\tau}_{12}) + 5 \lg(f_{c2} / 1000)$
+$K_{12} = 10 \log_{10}(1 / \bar{\tau}_{12}) + 5 \log_{10}(f_{c2} / 1000)$
 with the receiving
 plate's critical frequency `fc_2`. The value is symmetric: building
 the reverse junction (plates swapped, and for a T-junction the matching
@@ -659,7 +659,7 @@ wave_vibration_reduction_index(
 
 Vibration reduction index from a transmission coefficient (Hopkins 5.116).
 
-$K_{ij} = 10 \lg(1 / \tau_{ij}) + 5 \lg(f_{cj} / f_{\text{ref}})$
+$K_{ij} = 10 \log_{10}(1 / \tau_{ij}) + 5 \log_{10}(f_{cj} / f_{\text{ref}})$
 with `fc_j` the critical frequency of the **receiving** plate and the
 reference frequency $f_{\text{ref}} = 1000$ Hz. Because the
 angular-average transmission coefficients satisfy the reciprocity

@@ -17,7 +17,7 @@ with their accuracy stated instead of implied.
   follows $G_{xx}(f) \propto f^\alpha$ with $\alpha$ = 0,
   -1, -2, +1 and +2 respectively,
   so the level changes by exactly $3.01 \alpha$ dB per octave
-  ($10 \lg 2 = 3.0103$ dB). The colors are synthesized by filtering
+  ($10 \log_{10} 2 = 3.0103$ dB). The colors are synthesized by filtering
   seeded white Gaussian noise in the frequency domain: the DFT of the
   white record is multiplied by the exact magnitude response
   $\lvert H(f) \rvert = (f/f_{\mathrm{ref}})^{\alpha/2}$

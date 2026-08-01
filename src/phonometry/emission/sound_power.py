@@ -13,16 +13,16 @@ and the surface area (ISO 3744:2010 clause 8.2, equations (12), (16)-(18)):
 
 .. math::
 
-   \overline{L_p} = 10 \lg\!\left[ \frac{1}{N_M}
+   \overline{L_p} = 10 \log_{10}\!\left[ \frac{1}{N_M}
    \sum_i 10^{0.1 L_{pi}} \right] \tag{Eq. 12}
 
-   K_1 = -10 \lg\!\left( 1 - 10^{-0.1 \Delta L_p} \right) \tag{Eq. 16}
+   K_1 = -10 \log_{10}\!\left( 1 - 10^{-0.1 \Delta L_p} \right) \tag{Eq. 16}
 
-   K_2 = 10 \lg\!\left( 1 + \frac{4S}{A} \right) \tag{Eq. A.2}
+   K_2 = 10 \log_{10}\!\left( 1 + \frac{4S}{A} \right) \tag{Eq. A.2}
 
    L_p = \overline{L_p} - K_1 - K_2 \tag{Eq. 17}
 
-   L_W = L_p + 10 \lg\frac{S}{S_0}, \qquad S_0 = 1~\text{m}^2 \tag{Eq. 18}
+   L_W = L_p + 10 \log_{10}\frac{S}{S_0}, \qquad S_0 = 1~\text{m}^2 \tag{Eq. 18}
 
 The measurement surface area is a closed form of the source geometry: a full
 hemisphere :math:`S = 2\pi r^2` (half :math:`\pi r^2`, quarter
@@ -37,7 +37,7 @@ E.1/E.2):
 
 .. math::
 
-   L_{WA} = 10 \lg\!\left[ \sum_k 10^{0.1 (L_{Wk} + C_k)} \right]
+   L_{WA} = 10 \log_{10}\!\left[ \sum_k 10^{0.1 (L_{Wk} + C_k)} \right]
    \tag{Eq. E.1}
 
 ISO 3746:2010 shares the surfaces, the energy average and the LW/K1/K2 forms
@@ -268,7 +268,7 @@ class SoundPowerResult:
         basic_standards: str | Sequence[str] = (),
         form: DeclarationForm = "dual-number",
     ) -> NoiseEmissionDeclaration:
-        """Build an ISO 4871:1996 noise-emission declaration from this result.
+        r"""Build an ISO 4871:1996 noise-emission declaration from this result.
 
         Wraps the A-weighted sound power level ``LWA`` of this measurement as the
         declared measured value ``L_WA`` of a single operating mode, with the
@@ -331,7 +331,7 @@ def background_noise_correction(
 ) -> np.ndarray:
     r"""Background-noise correction ``K1`` per band (ISO 3744:2010 Eq. 16).
 
-    :math:`K_1 = -10 \lg\left( 1 - 10^{-0.1 \Delta L_p} \right)` with
+    :math:`K_1 = -10 \log_{10}\left( 1 - 10^{-0.1 \Delta L_p} \right)` with
     :math:`\Delta L_p = L_{\text{source}} - L_{\text{background}}`. For
     :math:`\Delta L_p` strictly above the upper criterion (15 dB engineering,
     10 dB survey) the background is negligible and :math:`K_1 = 0`; at the
@@ -378,7 +378,7 @@ def environmental_correction(
 ) -> float | np.ndarray:
     r"""Environmental correction ``K2`` (ISO 3744:2010 Eq. A.2).
 
-    :math:`K_2 = 10 \lg\left( 1 + 4 S / A \right)` where ``A`` is the
+    :math:`K_2 = 10 \log_{10}\left( 1 + 4 S / A \right)` where ``A`` is the
     equivalent sound absorption area of the room. ``A`` is taken directly
     from ``absorption_area``, or from
     the Sabine reverberation time :math:`A = 0.16 V / T` (Eq. A.3,
@@ -599,8 +599,8 @@ def sound_power_pressure(
 
     .. math::
 
-       L_W = 10 \lg\!\left[ \frac{1}{N_M} \sum_i 10^{0.1 L_{pi}} \right]
-       - K_1 - K_2 + 10 \lg\frac{S}{S_0}
+       L_W = 10 \log_{10}\!\left[ \frac{1}{N_M} \sum_i 10^{0.1 L_{pi}} \right]
+       - K_1 - K_2 + 10 \log_{10}\frac{S}{S_0}
 
     The surface area ``S`` is computed from the geometry: ``radius`` for a
     ``'hemisphere'`` (clause 7.2.3) or ``dimensions`` + ``distance`` for a
@@ -880,7 +880,7 @@ class PrecisionSoundPowerResult:
     r"""Result of an ISO 3745:2012 (precision) sound power determination.
 
     ``sound_power_level`` is the per-band
-    :math:`L_W = \overline{L_p} + 10\lg(S/S_0) + C_1 + C_2 + C_3`
+    :math:`L_W = \overline{L_p} + 10\log_{10}(S/S_0) + C_1 + C_2 + C_3`
     (Eq. 14/15). ``surface_pressure_level`` is the surface time-
     averaged level ``Lp_bar`` after the per-position background correction
     (Eq. 12/13); ``mean_pressure_level`` the same energy average of the raw
@@ -1042,7 +1042,7 @@ def precision_background_correction(
 ) -> np.ndarray:
     r"""Per-position background correction ``K1i`` (ISO 3745:2012 Eq. 11).
 
-    :math:`K_{1i} = -10 \lg\left( 1 - 10^{-0.1 \Delta L_{pi}} \right)` with
+    :math:`K_{1i} = -10 \log_{10}\left( 1 - 10^{-0.1 \Delta L_{pi}} \right)` with
     :math:`\Delta L_{pi} = L'_{pi(\mathrm{ST})} - L_{pi(\mathrm{B})}`
     evaluated at each microphone position ``i`` and band. Above the upper
     criterion (:math:`\Delta L_{pi} \ge 15` dB) the background is negligible
@@ -1101,12 +1101,12 @@ def meteorological_corrections(
 
     .. math::
 
-       C_1 = -10 \lg\frac{p_s}{p_{s,0}}
-       + 5 \lg\frac{273 + \theta}{\theta_0},
+       C_1 = -10 \log_{10}\frac{p_s}{p_{s,0}}
+       + 5 \log_{10}\frac{273 + \theta}{\theta_0},
        \qquad \theta_0 = 314~\text{K}
 
-       C_2 = -10 \lg\frac{p_s}{p_{s,0}}
-       + 15 \lg\frac{273 + \theta}{\theta_1},
+       C_2 = -10 \log_{10}\frac{p_s}{p_{s,0}}
+       + 15 \log_{10}\frac{273 + \theta}{\theta_1},
        \qquad \theta_1 = 296~\text{K}
 
        C_3 = A_0 \left( 1.0053 - 0.0012\,A_0 \right)^{1.6},
@@ -1116,7 +1116,7 @@ def meteorological_corrections(
     form of C1 (not the characteristic-impedance form), chosen because it
     needs only the measured :math:`p_s` and :math:`\theta` and is consistent
     with C2. At the reference conditions (23 deg C, 101.325 kPa)
-    :math:`C_2 = 0` exactly while :math:`C_1 = 5 \lg(296/314) = -0.128` dB.
+    :math:`C_2 = 0` exactly while :math:`C_1 = 5 \log_{10}(296/314) = -0.128` dB.
     C3 requires the atmospheric attenuation coefficient :math:`\alpha(f)`
     from ISO 9613-1 (not computed here); without it :math:`C_3 = 0`.
 
@@ -1219,9 +1219,9 @@ def sound_power_anechoic(
 
     .. math::
 
-       L_W = 10 \lg\!\left[ \frac{1}{N_M}
+       L_W = 10 \log_{10}\!\left[ \frac{1}{N_M}
        \sum_i 10^{0.1 (L'_{pi} - K_{1i})} \right]
-       + 10 \lg\frac{S}{S_0} + C_1 + C_2 + C_3
+       + 10 \log_{10}\frac{S}{S_0} + C_1 + C_2 + C_3
 
     :math:`S = 4\pi r^2` for a ``'sphere'`` (anechoic, Eq. 14) or
     :math:`2\pi r^2` for a ``'hemisphere'`` (hemi-anechoic, Eq. 15). There is
@@ -1437,7 +1437,7 @@ class PrecisionIntensityResult:
     ``partial_power`` is the signed :math:`P_i = I_{n,i} S_i` per partial
     surface and band (Eq. 5); ``sound_power`` the signed band total
     :math:`P = \sum P_i` (Eq. 8) and ``sound_power_level`` its level
-    :math:`L_W = 10 \lg(P/P_0)` (Eq. 9), ``NaN``
+    :math:`L_W = 10 \log_{10}(P/P_0)` (Eq. 9), ``NaN``
     where :math:`P \le 0` (``not_applicable_band`` True, clause 9.2).
     ``sound_power_level_normalized`` is ``LW0`` normalized to 23 deg C /
     101 325 Pa (Eq. 10). ``sound_power_level_a`` is the A-weighted total over
@@ -1477,13 +1477,13 @@ def precision_field_indicators(
 
     .. math::
 
-       \overline{L_p} = 10 \lg\!\left[ \frac{1}{N}
+       \overline{L_p} = 10 \log_{10}\!\left[ \frac{1}{N}
        \sum_j 10^{0.1 L_{pj}} \right] \tag{Eq. B.4}
 
-       L_{|I_n|} = 10 \lg\!\left[ \frac{1}{N}
+       L_{|I_n|} = 10 \log_{10}\!\left[ \frac{1}{N}
        \sum_j \frac{|I_{nj}|}{I_0} \right] \tag{Eq. B.5}
 
-       L_{I_n} = 10 \lg\!\left[ \frac{1}{I_0} \left| \frac{1}{N}
+       L_{I_n} = 10 \log_{10}\!\left[ \frac{1}{I_0} \left| \frac{1}{N}
        \sum_j I_{nj} \right| \right] \tag{Eq. B.7}
 
        F_{pI_n}^{\mathrm{unsigned}} = \overline{L_p} - L_{|I_n|}
@@ -1680,13 +1680,13 @@ def sound_power_intensity_precision(
     partial surfaces (already the two-scan result), and ``areas`` the ``(N,)``
     partial surface areas :math:`S_i`. The partial powers
     :math:`P_i = I_{ni} S_i` (Eq. 5) are summed to :math:`P` (Eq. 8) and
-    :math:`L_W = 10 \lg(P/P_0)` (Eq. 9); a band with net :math:`P \le 0` is
+    :math:`L_W = 10 \log_{10}(P/P_0)` (Eq. 9); a band with net :math:`P \le 0` is
     flagged (``not_applicable_band``, clause 9.2) and reported as ``NaN``.
     :math:`L_{W0}` normalizes to reference meteorology:
 
     .. math::
 
-       L_{W0} = L_W - 15 \lg\!\left( \frac{B}{101325} \cdot
+       L_{W0} = L_W - 15 \log_{10}\!\left( \frac{B}{101325} \cdot
        \frac{296.15}{273.15 + \theta} \right) \tag{Eq. 10}
 
     :param partial_intensity: ``(N, NB)`` signed normal intensity, W/m^2.
