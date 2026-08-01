@@ -1,6 +1,7 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
 r"""
-Weighting filters (A, B, C, D, G, AU, Z) and time weighting utilities.
+Weighting filters (A, B, C, D, G, AU, Z), time weighting utilities and
+the Linkwitz-Riley crossover.
 
 A/C/Z per IEC 61672-1:2013; G (infrasound) per ISO 7196:1995.
 
@@ -53,6 +54,9 @@ from scipy import signal
 
 from .._internal.utils import _sos_initial_state, _sos_state_mismatch, _typesignal
 
+#: Rejection message shared by the three entry points that take ``fs``.
+_FS_POSITIVE = "Sample rate 'fs' must be positive."
+
 try:
     from numba import jit as _numba_jit
 except ImportError:  # pragma: no cover - depends on install extras
@@ -93,7 +97,7 @@ class WeightingFilter:
             processing).
         """
         if fs <= 0:
-            raise ValueError("Sample rate 'fs' must be positive.")
+            raise ValueError(_FS_POSITIVE)
         if high_accuracy is None:
             high_accuracy = not stateful
         if high_accuracy and stateful:
@@ -427,7 +431,7 @@ def time_weighting(
     """
     x_proc = _typesignal(x)
     if fs <= 0:
-        raise ValueError("Sample rate 'fs' must be positive.")
+        raise ValueError(_FS_POSITIVE)
     x_sq = x_proc**2
     initial = _prepare_time_weighting_initial_state(x_sq, initial_state)
     
@@ -480,7 +484,7 @@ class TimeWeighting:
         :param mode: 'fast' (125 ms), 'slow' (1000 ms) or 'impulse' (35 ms / 1.5 s).
         """
         if fs <= 0:
-            raise ValueError("Sample rate 'fs' must be positive.")
+            raise ValueError(_FS_POSITIVE)
         if mode.lower() not in ("fast", "slow", "impulse"):
             raise ValueError("Invalid time weighting mode. Use ['fast', 'slow', 'impulse']")
         self.fs = fs

@@ -34,6 +34,12 @@ from .common import (
     theme_fill,
 )
 
+#: Shared frequency-axis label of the spectral renderers.
+_FREQ_LABEL = "Frequency [Hz]"
+#: Y-axis label of the residual-index plots (identical in both languages,
+#: the symbol carries the meaning).
+_LABEL_RESIDUAL_INDEX = r"$\delta_{pI0}$ [dB]"
+
 #: Spanish translations of the fixed strings rendered by the metrology
 #: ``.plot()`` renderers, keyed by their verbatim English text. ``_t``
 #: returns the English key unchanged for any language other than ``"es"``,
@@ -46,7 +52,7 @@ _STRINGS: dict[str, str] = {
     "Class 2 minimum": "Mínimo clase 2",
     r"Measured $\delta_{pI0}$": r"$\delta_{pI0}$ medido",
     "Below the class {cls} minimum": "Bajo el mínimo de clase {cls}",
-    r"$\delta_{pI0}$ [dB]": r"$\delta_{pI0}$ [dB]",
+    _LABEL_RESIDUAL_INDEX: _LABEL_RESIDUAL_INDEX,
     "IEC 61043 Table 2 — {device}, {spacing} mm separation":
         "Tabla 2 de IEC 61043 — {device}, separación de {spacing} mm",
     "probe": "sonda",
@@ -106,11 +112,6 @@ def _t(text: str, language: str = "en", **fmt: Any) -> str:
     return s.format(**fmt) if fmt else s
 
 
-#: Shared frequency-axis label of the spectral renderers.
-_FREQ_LABEL = "Frequency [Hz]"
-#: Y-axis label of the residual-index plots (identical in both languages,
-#: the symbol carries the meaning).
-_LABEL_RESIDUAL_INDEX = r"$\delta_{pI0}$ [dB]"
 _DEVICE_LABELS = {
     "probe": "probe",
     "processor": "processor",

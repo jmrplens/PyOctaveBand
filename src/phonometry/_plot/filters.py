@@ -30,8 +30,11 @@ from .common import (
 #: returns the English key unchanged for any language other than ``"es"``,
 #: so the English output is byte-for-byte identical to the pre-i18n
 #: renderers.
+#: Axis label shared by the class-corridor and the EQ renderers.
+_FREQ_LABEL = "Frequency [Hz]"
+
 _STRINGS: dict[str, str] = {
-    "Frequency [Hz]": "Frecuencia [Hz]",
+    _FREQ_LABEL: "Frecuencia [Hz]",
     "Magnitude [dB]": "Magnitud [dB]",
     "Phase [deg]": "Fase [grados]",
     "Class {cls} pass corridor": "Corredor de aceptación clase {cls}",
@@ -241,7 +244,7 @@ def plot_parametric_eq(
 
     if ax is not None:
         _magnitude(ax)
-        ax.set_xlabel(_t("Frequency [Hz]", language))
+        ax.set_xlabel(_t(_FREQ_LABEL, language))
         format_frequency_axis(ax, fmin, fmax)
         localize_axes(ax, language)
         return ax
@@ -253,7 +256,7 @@ def plot_parametric_eq(
     )
     axes[1].semilogx(freqs, np.degrees(result.phase_rad), color=color, lw=1.4)
     axes[1].set_ylabel(_t("Phase [deg]", language))
-    axes[1].set_xlabel(_t("Frequency [Hz]", language))
+    axes[1].set_xlabel(_t(_FREQ_LABEL, language))
     axes[1].grid(True, which="both", alpha=0.3)
     for axf in axes:
         format_frequency_axis(axf, fmin, fmax)

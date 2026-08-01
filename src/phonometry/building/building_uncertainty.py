@@ -4,8 +4,8 @@ Measurement uncertainty in building acoustics (ISO 12999-1:2020).
 
 This module supplies the **measurement uncertainty** of the sound-insulation
 quantities produced by the field/lab/prediction modules
-(:mod:`phonometry.insulation`, :mod:`phonometry.lab_insulation`,
-:mod:`phonometry.building_prediction`). ISO 12999-1 does not re-measure anything;
+(:mod:`phonometry.building.insulation`, :mod:`phonometry.building.lab_insulation`,
+:mod:`phonometry.building.building_prediction`). ISO 12999-1 does not re-measure anything;
 it tabulates *standard uncertainties* ``u`` derived from inter-laboratory tests
 (ISO 5725) and prescribes how to expand and combine them.
 
@@ -612,7 +612,8 @@ COVERAGE_FACTORS: Mapping[tuple[float, bool], float] = MappingProxyType(
 
 # --------------------------------------------------------------------------- #
 # Deprecated aliases (the bare names shadowed the GUM functions of
-# :mod:`phonometry.uncertainty` at the package root; remove in the next major).
+# :mod:`phonometry.metrology.uncertainty` at the top level; remove in the next
+# major).
 # --------------------------------------------------------------------------- #
 def _warn_renamed(old: str, new: str) -> None:
     import warnings

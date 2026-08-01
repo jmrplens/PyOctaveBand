@@ -199,7 +199,8 @@ def _make_shim(old: str, new: str, since: str, removed_in: str) -> types.ModuleT
 
 
 def _namespace_shim(
-    package: str, targets: tuple[str, ...], *, removed_in: str = "5.0"
+    package: str, targets: tuple[str, ...], *,
+    since: str = "4.0", removed_in: str = "5.0"
 ) -> Callable[[str], Any]:
     """Return a PEP 562 ``__getattr__`` for names that left ``package``.
 
@@ -208,15 +209,18 @@ def _namespace_shim(
     the form the documentation leads with, so the read has to keep working
     from the namespace it left. Resolution is by ``__all__`` of the packages
     the names moved to, which keeps the shim honest: a name that stops being
-    public anywhere stops resolving here too.
+    public anywhere stops resolving here too. A name that was both a module
+    and a function resolves to the function, as the pre-split package did:
+    ``metrology.cepstrum`` is :func:`phonometry.signal.cepstrum`.
 
-    A name that matches no public name falls back to the module alias of the
-    same name (``signal.cepstrum`` was both a module and a function; the
-    package used to bind the function, and so does this). The alias module
-    carries its own notice, so returning it here is silent.
+    Only then does a name fall back to the module alias of the same name,
+    which is what serves the modules with no public name of their own
+    (``metrology.spectra``, ``metrology.levels``). The alias carries its own
+    notice on attribute access, so returning it here is silent.
 
     :param package: The narrowed package, ``__name__`` of its ``__init__``.
     :param targets: Packages the names moved to, in search order.
+    :param since: Release that moved the names.
     :param removed_in: Major release that removes the alias.
     :return: The ``__getattr__`` to bind at module level.
     """
@@ -228,7 +232,7 @@ def _namespace_shim(
                 _warn_renamed(
                     f"'{package}.{name}'",
                     f"'{target}.{name}'",
-                    since="4.0",
+                    since=since,
                     removed_in=removed_in,
                 )
                 return getattr(module, name)

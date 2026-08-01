@@ -7,7 +7,7 @@ Annex A reference implementation of ISO 532-1:2017 (program "ISO_532-1.c",
 Annex A.4).  The values equal the printed tables A.1 to A.9 of the
 standard.  Do not edit these numbers.
 
-Shared by :mod:`phonometry.loudness_zwicker`.
+Shared by :mod:`phonometry.psychoacoustics.loudness_zwicker`.
 """
 
 from __future__ import annotations

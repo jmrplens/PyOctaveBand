@@ -1,6 +1,7 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
 """
-Filter design and visualization for phonometry.
+Band-filter design and visualization: the SOS designer behind the octave and
+fractional-octave banks, and the response plot the banks draw with it.
 """
 
 from __future__ import annotations

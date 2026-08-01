@@ -45,7 +45,7 @@ building. The chain closes the structural-vibroacoustics series:
    (Formula 17).
 
 The source and receiver mobilities/impedances are those of
-:mod:`phonometry.mechanical_mobility` and :mod:`phonometry.transfer_stiffness`.
+:mod:`phonometry.vibration.mechanical_mobility` and :mod:`phonometry.vibration.transfer_stiffness`.
 """
 
 from __future__ import annotations

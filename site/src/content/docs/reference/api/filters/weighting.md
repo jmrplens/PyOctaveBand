@@ -1,11 +1,12 @@
 ---
 title: "filters.weighting"
-description: "Weighting filters (A, B, C, D, G, AU, Z) and time weighting utilities."
+description: "Weighting filters (A, B, C, D, G, AU, Z), time weighting utilities and the Linkwitz-Riley crossover."
 sidebar:
   label: "weighting"
 ---
 
-Weighting filters (A, B, C, D, G, AU, Z) and time weighting utilities.
+Weighting filters (A, B, C, D, G, AU, Z), time weighting utilities and
+the Linkwitz-Riley crossover.
 
 A/C/Z per IEC 61672-1:2013; G (infrasound) per ISO 7196:1995.
 

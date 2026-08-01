@@ -43,9 +43,12 @@ contour = aircraft.noise_contour(path, powers, distances, sel, lmax, x=gx, y=gy)
 | `phonometry.simulation` | 2D acoustic FDTD wave simulation (staggered grid, sources, probes, impedance boundaries, obstacles) |
 
 Every name in the table below is also re-exported at the top level, so
-`from phonometry import <name>` works for every row. The pre-3.2 flat module
-paths (for example `phonometry.insulation`) keep importing for one deprecation
-cycle and warn on use; they are removed in 4.0.
+`from phonometry import <name>` works for every row. Two generations of module
+paths are still importable and warn on use: the pre-3.2 flat ones (for example
+`phonometry.insulation`), removed in 4.0, and the pre-4.0 ones that the split
+of `metrology` moved (for example `phonometry.metrology.levels`, now
+`phonometry.signal.levels`), removed in 5.0. Reading a moved name from the
+namespace it left (`metrology.leq`) warns and delegates as well.
 
 | Name | Type | Description (Inputs) | Usage Snippet (Outputs) |
 | :--- | :--- | :--- | :--- |

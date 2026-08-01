@@ -460,6 +460,19 @@ def test_narrowed_namespace_still_serves_the_names_that_left() -> None:
         _ = metrology.not_a_name
 
 
+def test_narrowed_namespace_lists_the_moved_names_in_dir() -> None:
+    """A PEP 562 hook is invisible to dir(); the names must not vanish early."""
+    from phonometry import filters, metrology, signal
+
+    listed = dir(metrology)
+    assert set(metrology.__all__) <= set(listed)
+    assert set(filters.__all__) <= set(listed)
+    assert set(signal.__all__) <= set(listed)
+    assert listed == sorted(listed)
+    # __all__ stays narrow, so `import *` gives the 4.0 API, not the aliases.
+    assert "leq" not in metrology.__all__
+
+
 def test_narrowed_namespace_falls_back_to_the_module_alias() -> None:
     """``metrology.spectra`` has no public name of its own; it is the module."""
     import warnings

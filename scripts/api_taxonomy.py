@@ -26,8 +26,10 @@ Consistency is enforced at import time (fails loudly):
   the other instrument-conformance code but documents the intensity chain
   the rest of the section measures with).
 
-Section keys are subpackage names, so a reader who knows where a function
-lives in the code knows where its page lives in the reference.
+Section keys are subpackage names wherever the taxonomy allows it, so a
+reader who knows where a function lives in the code can predict where its
+page lives. The three sections listed above are the exceptions, and they are
+deliberate.
 
 The generator additionally checks the taxonomy against reality: every module
 that owns a public name must be mapped here, and every mapped module must

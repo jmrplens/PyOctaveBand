@@ -1,10 +1,11 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
 """metrology domain of phonometry (see module docstrings).
 
-Narrowed in 4.0 to the transverse metrology: calibration, GUM uncertainty and
-data qualification. The filter banks and weightings moved to
-:mod:`phonometry.filters` and the general signal analysis to
-:mod:`phonometry.signal`; reading either from here still works until 5.0.
+Narrowed in 4.0 to the transverse metrology: calibration, GUM uncertainty,
+data qualification and the IEC 61043 intensity-instrument class check. The
+filter banks and weightings moved to :mod:`phonometry.filters` and the general
+signal analysis to :mod:`phonometry.signal`; reading either from here still
+works until 5.0.
 """
 
 from __future__ import annotations

@@ -2,7 +2,7 @@
 r"""
 Measurement uncertainty for sound absorption (ISO 12999-2:2020).
 
-Companion of the sound-insulation uncertainty of :mod:`phonometry.building_uncertainty`
+Companion of the sound-insulation uncertainty of :mod:`phonometry.building.building_uncertainty`
 (ISO 12999-1). This part gives the standard uncertainty ``u`` of the quantities
 produced by a reverberation-room absorption measurement and its ratings:
 

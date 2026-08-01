@@ -5,7 +5,7 @@ Field survey method for sound insulation and service-equipment noise
 
 This is the **survey (control) method**: a fast, octave-band field procedure
 for dwellings and rooms of comparable size (up to 150 m³). It trades the
-resolution of the ISO 16283 engineering method (:mod:`phonometry.insulation`)
+resolution of the ISO 16283 engineering method (:mod:`phonometry.building.insulation`)
 for speed: a single hand-held integrating sound level meter swept through the
 room. It measures airborne and impact sound insulation between rooms, façade
 sound insulation, and the sound pressure level from building service equipment.

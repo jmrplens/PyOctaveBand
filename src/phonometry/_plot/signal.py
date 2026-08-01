@@ -53,12 +53,22 @@ from .common import (
 #: returns the English key unchanged for any language other than ``"es"``,
 #: so the English output is byte-for-byte identical to the pre-i18n
 #: renderers.
+#: Axis labels and templates the renderers repeat; the Spanish table is keyed
+#: by the same constants, so a label is written once.
+_FREQ_LABEL = "Frequency [Hz]"
+_TIME_LABEL = "Time [s]"
+_LAG_LABEL = "Lag [s]"
+_MAGNITUDE_LABEL = "Magnitude [dB]"
+_QUEFRENCY_LABEL = "Quefrency [ms]"
+_CORRELATION_COEFFICIENT_LABEL = "Correlation coefficient"
+_ENBW_LABEL = "ENBW {enbw} bins"
+
 _STRINGS: dict[str, str] = {
-    "Frequency [Hz]": "Frecuencia [Hz]",
-    "Lag [s]": "Retardo [s]",
-    "Time [s]": "Tiempo [s]",
+    _FREQ_LABEL: "Frecuencia [Hz]",
+    _LAG_LABEL: "Retardo [s]",
+    _TIME_LABEL: "Tiempo [s]",
     "Amplitude": "Amplitud",
-    "Magnitude [dB]": "Magnitud [dB]",
+    _MAGNITUDE_LABEL: "Magnitud [dB]",
     "Phase [deg]": "Fase [grados]",
     "Phase [rad]": "Fase [rad]",
     "Spectral density [dB re 1/Hz]": "Densidad espectral [dB re 1/Hz]",
@@ -89,7 +99,7 @@ _STRINGS: dict[str, str] = {
         "Espectrograma calibrado (Bendat y Piersol 12.6.4.2)",
     "Zoom FFT (Bendat & Piersol 11.5.4)":
         "FFT con zoom (Bendat y Piersol 11.5.4)",
-    "Correlation coefficient": "Coeficiente de correlación",
+    _CORRELATION_COEFFICIENT_LABEL: "Coeficiente de correlación",
     "Correlation ({norm})": "Correlación ({norm})",
     "{kind} estimate (Bendat & Piersol)":
         "Estimación de {kind} (Bendat y Piersol)",
@@ -109,7 +119,7 @@ _STRINGS: dict[str, str] = {
     "Hilbert envelope (Bendat & Piersol Ch. 13)":
         "Envolvente de Hilbert (Bendat y Piersol Cap. 13)",
     "Instantaneous frequency [Hz]": "Frecuencia instantánea [Hz]",
-    "Quefrency [ms]": "Quefrencia [ms]",
+    _QUEFRENCY_LABEL: "Quefrencia [ms]",
     "Cepstrum": "Cepstro",
     "Power cepstrum": "Cepstro de potencia",
     "Real cepstrum": "Cepstro real",
@@ -152,7 +162,7 @@ _STRINGS: dict[str, str] = {
     "Frequency offset [DFT bins]":
         "Desplazamiento en frecuencia [bins de la DFT]",
     "Level re main lobe [dB]": "Nivel re lóbulo principal [dB]",
-    "ENBW {enbw} bins": "ENBW {enbw} bins",
+    _ENBW_LABEL: _ENBW_LABEL,
     "Highest sidelobe {sll} dB": "Lóbulo lateral máximo {sll} dB",
     "Scalloping loss {sl} dB": "Pérdida de festoneado {sl} dB",
     "Window metrics (Harris 1978): {window}":
@@ -252,7 +262,7 @@ def _plot_density_with_band(
     )
     kwargs.setdefault("label", line_label)
     ax.semilogx(freqs[pos], _db10(np.asarray(result.psd)[pos]), color=color, **kwargs)
-    ax.set_xlabel(_t("Frequency [Hz]", language))
+    ax.set_xlabel(_t(_FREQ_LABEL, language))
     ax.set_ylabel(_psd_ylabel(result.scaling, language))
     ax.set_title(title)
     ax.legend(loc=_LEGEND_UPPER_RIGHT, fontsize="small")
@@ -371,7 +381,7 @@ def plot_cross_spectral_density(
     fmin, fmax = float(freqs[pos].min()), float(freqs[pos].max())
     if ax is not None:
         _magnitude(ax)
-        ax.set_xlabel(_t("Frequency [Hz]", language))
+        ax.set_xlabel(_t(_FREQ_LABEL, language))
         format_frequency_axis(ax, fmin, fmax)
         localize_axes(ax, language)
         return ax
@@ -400,7 +410,7 @@ def plot_cross_spectral_density(
     axes[2].semilogx(freqs[pos], result.coherence[pos], color=_C_MUTED)
     axes[2].set_ylabel("$\\gamma^2_{xy}$")
     axes[2].set_ylim(0.0, 1.05)
-    axes[2].set_xlabel(_t("Frequency [Hz]", language))
+    axes[2].set_xlabel(_t(_FREQ_LABEL, language))
     axes[2].grid(True, which="both", alpha=0.3)
     for axf in axes:
         format_frequency_axis(axf, fmin, fmax)
@@ -459,7 +469,7 @@ def plot_coherent_output_spectrum(
     fmin, fmax = float(freqs[pos].min()), float(freqs[pos].max())
     if ax is not None:
         _spectra_panel(ax)
-        ax.set_xlabel(_t("Frequency [Hz]", language))
+        ax.set_xlabel(_t(_FREQ_LABEL, language))
         format_frequency_axis(ax, fmin, fmax)
         localize_axes(ax, language)
         return ax
@@ -470,7 +480,7 @@ def plot_coherent_output_spectrum(
     axes[1].semilogx(freqs[pos], result.snr_db[pos], color=_C_SECONDARY)
     axes[1].axhline(0.0, color=_C_MUTED, ls=":", lw=1.0)
     axes[1].set_ylabel(_t("Spectral SNR [dB]", language))
-    axes[1].set_xlabel(_t("Frequency [Hz]", language))
+    axes[1].set_xlabel(_t(_FREQ_LABEL, language))
     axes[1].grid(True, which="both", alpha=0.3)
     for axf in axes:
         format_frequency_axis(axf, fmin, fmax)
@@ -566,7 +576,7 @@ def plot_miso_coherence(
 
     if ax is not None:
         _miso_spectra_panel(ax, result, freqs, pos, language)
-        ax.set_xlabel(_t("Frequency [Hz]", language))
+        ax.set_xlabel(_t(_FREQ_LABEL, language))
         format_frequency_axis(ax, fmin, fmax)
         localize_axes(ax, language)
         return ax
@@ -577,7 +587,7 @@ def plot_miso_coherence(
         _t("Partial coherent output spectra (Bendat & Piersol 7.3)", language)
     )
     _miso_coherence_panel(axes[1], result, freqs, pos, language)
-    axes[1].set_xlabel(_t("Frequency [Hz]", language))
+    axes[1].set_xlabel(_t(_FREQ_LABEL, language))
     for axf in axes:
         format_frequency_axis(axf, fmin, fmax)
         localize_axes(axf, language)
@@ -632,8 +642,8 @@ def plot_spectrogram(
         },
     )
     ax.figure.colorbar(img, ax=ax, label=_psd_ylabel(result.scaling, language))
-    ax.set_xlabel(_t("Time [s]", language))
-    ax.set_ylabel(_t("Frequency [Hz]", language))
+    ax.set_xlabel(_t(_TIME_LABEL, language))
+    ax.set_ylabel(_t(_FREQ_LABEL, language))
     ax.set_title(_t("Calibrated spectrogram (Bendat & Piersol 12.6.4.2)", language))
     localize_axes(ax, language)
     return ax
@@ -665,7 +675,7 @@ def plot_zoom_fft(
     ax.plot(freqs, _db10(np.asarray(result.power, dtype=np.float64)),
             color=color, **kwargs)
     ax.set_xlim(float(freqs[0]), float(freqs[-1]))
-    ax.set_xlabel(_t("Frequency [Hz]", language))
+    ax.set_xlabel(_t(_FREQ_LABEL, language))
     ax.set_ylabel(_psd_ylabel("spectrum", language))
     ax.set_title(_t("Zoom FFT (Bendat & Piersol 11.5.4)", language))
     ax.legend(loc=_LEGEND_UPPER_RIGHT, fontsize="small")
@@ -673,7 +683,7 @@ def plot_zoom_fft(
     localize_axes(ax, language)
     return ax
 _LAG_LABEL = "Lag [s]"
-_TIME_AXIS_LABEL = "Time [s]"
+_TIME_LABEL = "Time [s]"
 def plot_correlation(
     result: CorrelationResult, ax: Axes | None = None, *,
     language: str = "en", **kwargs: Any
@@ -697,9 +707,9 @@ def plot_correlation(
     kwargs.setdefault("label", f"${symbol}_{{{sub}}}(\\tau)$")
     ax.plot(result.lags, result.values, **kwargs)
     ax.axvline(0.0, color=_C_MUTED, ls=":", lw=1.0)
-    ax.set_xlabel(_t("Lag [s]", language))
+    ax.set_xlabel(_t(_LAG_LABEL, language))
     if result.normalization == "coefficient":
-        ax.set_ylabel(_t("Correlation coefficient", language))
+        ax.set_ylabel(_t(_CORRELATION_COEFFICIENT_LABEL, language))
     else:
         norm = (_t(result.normalization, language)
                 if result.normalization in _STRINGS
@@ -753,9 +763,9 @@ def plot_time_delay(
         ls="--",
         label=f"$\\hat{{\\tau}}_0$ = {tau} ms",
     )
-    ax.set_xlabel(_t("Lag [s]", language))
+    ax.set_xlabel(_t(_LAG_LABEL, language))
     ax.set_ylabel(
-        _t("Correlation coefficient", language)
+        _t(_CORRELATION_COEFFICIENT_LABEL, language)
         if result.method == "direct"
         else _t("Normalized correlation", language)
     )
@@ -792,7 +802,7 @@ def plot_aligned_impulse_response(
     n = decimal_comma(f"{result.delay_samples:+.3f}", language)
     kwargs.setdefault("label", _t("Aligned IR (delay {n} samples)", language, n=n))
     ax.plot(t, result.aligned, lw=1.2, **kwargs)
-    ax.set_xlabel(_t("Time [s]", language))
+    ax.set_xlabel(_t(_TIME_LABEL, language))
     ax.set_ylabel(_t("Amplitude", language))
     ax.set_title(_t("Impulse-response alignment (sub-sample)", language))
     ax.legend(loc=_LEGEND_UPPER_RIGHT, fontsize="small")
@@ -834,7 +844,7 @@ def plot_envelope(
 
     if ax is not None:
         _envelope_panel(ax)
-        ax.set_xlabel(_t("Time [s]", language))
+        ax.set_xlabel(_t(_TIME_LABEL, language))
         localize_axes(ax, language)
         return ax
 
@@ -848,7 +858,7 @@ def plot_envelope(
         lw=1.0,
     )
     axes[1].set_ylabel(_t("Instantaneous frequency [Hz]", language))
-    axes[1].set_xlabel(_t("Time [s]", language))
+    axes[1].set_xlabel(_t(_TIME_LABEL, language))
     axes[1].grid(True, alpha=0.3)
     for axf in axes:
         localize_axes(axf, language)
@@ -896,7 +906,7 @@ def plot_phase_decomposition(
     fmin, fmax = float(freqs[pos].min()), float(freqs[pos].max())
     if ax is not None:
         _phase_panel(ax)
-        ax.set_xlabel(_t("Frequency [Hz]", language))
+        ax.set_xlabel(_t(_FREQ_LABEL, language))
         ax.set_title(_t("Phase decomposition", language))
         format_frequency_axis(ax, fmin, fmax)
         localize_axes(ax, language)
@@ -909,7 +919,7 @@ def plot_phase_decomposition(
         20.0 * np.log10(np.maximum(result.magnitude[pos], tiny)),
         color=_C_PRIMARY,
     )
-    axes[0].set_ylabel(_t("Magnitude [dB]", language))
+    axes[0].set_ylabel(_t(_MAGNITUDE_LABEL, language))
     axes[0].set_title(_t("Minimum-phase / all-pass decomposition", language))
     axes[0].grid(True, which="both", alpha=0.3)
     _phase_panel(axes[1])
@@ -922,7 +932,7 @@ def plot_phase_decomposition(
         label=_t("Excess group delay", language),
     )
     axes[2].set_ylabel(_t("Group delay [ms]", language))
-    axes[2].set_xlabel(_t("Frequency [Hz]", language))
+    axes[2].set_xlabel(_t(_FREQ_LABEL, language))
     axes[2].grid(True, which="both", alpha=0.3)
     axes[2].legend(loc=_LEGEND_UPPER_RIGHT, fontsize="small")
     for axf in axes:
@@ -966,7 +976,7 @@ def plot_tone_burst(
             language, f=f, cycles=result.cycles, rate=rate,
         )
     ax.set_title(title)
-    ax.set_xlabel(_t("Time [s]", language))
+    ax.set_xlabel(_t(_TIME_LABEL, language))
     ax.set_ylabel(_t("Amplitude", language))
     ax.legend(loc=_LEGEND_UPPER_RIGHT, fontsize="small")
     ax.grid(True, alpha=0.3)
@@ -1030,8 +1040,8 @@ def plot_resampled_signal(
                alpha=0.08,
                label=_t("Rejected band (would fold back as aliases)",
                         language))
-    ax.set_xlabel(_t("Frequency [Hz]", language))
-    ax.set_ylabel(_t("Magnitude [dB]", language))
+    ax.set_xlabel(_t(_FREQ_LABEL, language))
+    ax.set_ylabel(_t(_MAGNITUDE_LABEL, language))
     ax.set_ylim(-result.stopband_attenuation_db - 40.0, 10.0)
     fs0 = format_number(result.original_fs, language, decimals=0)
     fs1 = format_number(result.fs, language, decimals=0)
@@ -1078,7 +1088,7 @@ def plot_cepstrum(
     kwargs.setdefault("color", _C_PRIMARY)
     kwargs.setdefault("lw", 1.0)
     ax.plot(1e3 * result.quefrencies[:half], result.cepstrum[:half], **kwargs)
-    ax.set_xlabel(_t("Quefrency [ms]", language))
+    ax.set_xlabel(_t(_QUEFRENCY_LABEL, language))
     ax.set_ylabel(_t("Cepstrum", language))
     ax.grid(True, alpha=0.3)
     localize_axes(ax, language)
@@ -1112,7 +1122,7 @@ def plot_window_metrics(
         shown = bins <= max_bins
         kwargs.setdefault("color", _C_PRIMARY)
         enbw = decimal_comma(f"{result.enbw_bins:.3f}", language)
-        kwargs.setdefault("label", _t("ENBW {enbw} bins", language, enbw=enbw))
+        kwargs.setdefault("label", _t(_ENBW_LABEL, language, enbw=enbw))
         axs.plot(bins[shown], level[shown], **kwargs)
         sll = decimal_comma(f"{result.highest_sidelobe_db:.1f}", language)
         axs.axhline(
@@ -1185,8 +1195,8 @@ def plot_lifter(
                mode=_t(result.mode, language)),
         )
         axe.plot(result.frequencies, result.liftered_db, lw=1.6, **kwargs)
-        axe.set_xlabel(_t("Frequency [Hz]", language))
-        axe.set_ylabel(_t("Magnitude [dB]", language))
+        axe.set_xlabel(_t(_FREQ_LABEL, language))
+        axe.set_ylabel(_t(_MAGNITUDE_LABEL, language))
         axe.grid(True, alpha=0.3)
         axe.legend(loc=_LEGEND_UPPER_RIGHT, fontsize="small")
 
@@ -1205,7 +1215,7 @@ def plot_lifter(
         1e3 * result.cutoff, color=_C_REFERENCE, linestyle="--", lw=1.2,
         label=_t("Lifter cutoff ({q} ms)", language, q=cutoff_ms),
     )
-    axes[0].set_xlabel(_t("Quefrency [ms]", language))
+    axes[0].set_xlabel(_t(_QUEFRENCY_LABEL, language))
     axes[0].set_ylabel(_t("Cepstrum", language))
     axes[0].grid(True, alpha=0.3)
     axes[0].legend(loc=_LEGEND_UPPER_RIGHT, fontsize="small")
@@ -1257,7 +1267,7 @@ def plot_echo_detection(
                             decimals=3, trim=True),
         ),
     )
-    ax.set_xlabel(_t("Quefrency [ms]", language))
+    ax.set_xlabel(_t(_QUEFRENCY_LABEL, language))
     ax.set_ylabel(_t("Cepstrum", language))
     ax.grid(True, alpha=0.3)
     ax.legend(loc=_LEGEND_UPPER_RIGHT, fontsize="small")
@@ -1287,7 +1297,7 @@ def plot_envelope_spectrum(
         kwargs.setdefault("color", _C_PRIMARY)
         kwargs.setdefault("lw", 1.2)
         axe.plot(result.frequencies, result.amplitude, **kwargs)
-        axe.set_xlabel(_t("Frequency [Hz]", language))
+        axe.set_xlabel(_t(_FREQ_LABEL, language))
         axe.set_ylabel(_t("Modulation amplitude", language))
         axe.grid(True, alpha=0.3)
 
@@ -1306,7 +1316,7 @@ def plot_envelope_spectrum(
         result.mean_level, color=_C_REFERENCE, linestyle="--", lw=1.2,
         label=_t("Mean level", language),
     )
-    axes[0].set_xlabel(_t("Time [s]", language))
+    axes[0].set_xlabel(_t(_TIME_LABEL, language))
     axes[0].set_ylabel(_t("Amplitude", language))
     axes[0].grid(True, alpha=0.3)
     axes[0].legend(loc=_LEGEND_UPPER_RIGHT, fontsize="small")
@@ -1366,8 +1376,8 @@ def plot_inverse_filter(
     )
     ax.axvspan(f1, f2, color=color, alpha=0.08,
                label=_t("Equalized band", language))
-    ax.set_xlabel(_t("Frequency [Hz]", language))
-    ax.set_ylabel(_t("Magnitude [dB]", language))
+    ax.set_xlabel(_t(_FREQ_LABEL, language))
+    ax.set_ylabel(_t(_MAGNITUDE_LABEL, language))
     ax.set_ylim(bottom=-60.0, top=20.0)
     flat = format_number(result.flatness_db, language, decimals=2)
     ax.set_title(_t("Regularized inversion (Kirkeby) — flatness {flat} dB",

@@ -1001,16 +1001,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 - `phonometry.metrology` is three packages. It had grown to 21 modules across
   four unrelated subjects, and every layer above it had already worked around
-  that: the generated reference split it into seven sections, the sidebar into
+  that: the generated reference spread it over six sections, the sidebar over
   four groups, and the name predicted neither `cepstrum` nor `signals`. The
   filter banks, the frequency and time weightings, the parametric EQ and the
   IEC 61260-1 / IEC 61672-1 class verification are now `phonometry.filters`;
   the general signal analysis (levels, Welch and multitaper spectra, coherence,
   time-frequency, correlation, envelope, cepstrum, phase, synchronous
   averaging, test signals) is `phonometry.signal`; and `phonometry.metrology`
-  keeps what gives it its name, the calibration, the GUM uncertainty and the
-  data qualification. Four modules are renamed with the move, each dropping a
-  prefix its package now carries: `filter_design` to `filters.design`,
+  keeps what gives it its name, the calibration, the GUM uncertainty, the data
+  qualification and the IEC 61043 intensity-instrument class check. Four
+  modules are renamed with the move, each dropping a prefix its package now
+  carries: `filter_design` to `filters.design`,
   `parametric_filters` to `filters.weighting` (it is the A/C/G and time
   weightings, which is what people look for), `signals` to
   `signal.test_signals` (`signal.signals` says nothing) and `random_data` to
@@ -1042,8 +1043,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   not predict where its page lived. They are now `filters`, `signal` and
   `metrology`, one per package, and the pages move with them
   (`reference/api/spectra/cepstrum` becomes `reference/api/signal/cepstrum`).
-  The consistency contract in `scripts/api_taxonomy.py` is what enforces it,
-  and it loses two of its cross-package exceptions in the process.
+  The consistency contract in `scripts/api_taxonomy.py` is what enforces it:
+  five sections drew from `metrology` under four different names and now three
+  draw from three packages under their own. The sections that deliberately
+  span two parents are untouched, and one of them is why the rule is not yet
+  universal: `metrology.intensity_compliance` is still documented with the
+  intensity chain it verifies, in the `power` section.
 
 - CI fails when `.github/reports` no longer matches a fresh `make reports`
   run, which is the reason the fiches were able to drift for weeks in the

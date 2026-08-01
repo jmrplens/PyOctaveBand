@@ -8,7 +8,7 @@ The report is a rendering feature, so these tests assert only structural facts:
 fiche; unknown engines are rejected; the required-class verdict renders both
 ways; and a non-compliant bank renders its non-compliance fiche. The class
 verification itself is validated against the standard's Table 1 elsewhere
-(tests/metrology/test_compliance.py).
+(tests/filters/test_compliance.py).
 """
 
 from __future__ import annotations
