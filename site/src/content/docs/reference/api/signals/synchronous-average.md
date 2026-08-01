@@ -1,5 +1,5 @@
 ---
-title: "signal.synchronous_average"
+title: "signals.synchronous_average"
 description: "Time synchronous averaging (TSA) of a periodic waveform in noise."
 sidebar:
   label: "synchronous_average"
@@ -68,7 +68,7 @@ averages is not, in general, optimal.
 **Non-integer samples per period.** When $f_s T$ is not an integer
 the period boundaries fall between samples. Each block is then aligned to
 a common integer grid by the band-limited fractional delay of
-[`phonometry.signal.test_signals.fractional_delay`](/phonometry/reference/api/signal/test-signals/#fractional_delay) before averaging, so
+[`phonometry.signals.test_signals.fractional_delay`](/phonometry/reference/api/signals/test-signals/#fractional_delay) before averaging, so
 the periodic waveform is recovered within the interpolation error of that
 band-limited shift. An integer $f_s T$ needs no interpolation and
 the waveform is recovered to machine precision. The averaged samples stay
@@ -202,7 +202,7 @@ $1/\sqrt{N}$. When `fs * period` is an integer the periods are
 sliced
 directly and a noiseless periodic signal is recovered exactly; otherwise
 each period is aligned to a common integer grid by the band-limited
-fractional delay of [`fractional_delay`](/phonometry/reference/api/signal/test-signals/#fractional_delay)
+fractional delay of [`fractional_delay`](/phonometry/reference/api/signals/test-signals/#fractional_delay)
 and recovered within that interpolation error.
 
 **Parameters**
@@ -215,7 +215,7 @@ and recovered within that interpolation error.
 | `n_averages` | Number of whole periods to average (default: as many as the record holds). Choosing `N` so that $N q$ is an integer places a comb node on an interfering tone at order `q` and maximises its rejection (McFadden's revised-model result). |
 | `n_harmonics` | Number of harmonics of `1/T` spanned by the returned comb-filter response (default 8). |
 
-**Returns:** A [`SynchronousAverageResult`](/phonometry/reference/api/signal/synchronous-average/#synchronousaverageresult).
+**Returns:** A [`SynchronousAverageResult`](/phonometry/reference/api/signals/synchronous-average/#synchronousaverageresult).
 
 **Raises**
 

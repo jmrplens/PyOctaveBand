@@ -44,7 +44,7 @@ with their accuracy stated instead of implied.
 * :func:`fractional_delay` - band-limited delay by an arbitrary
   (sub-sample) number of samples via a frequency-domain phase ramp,
   ``linear`` (zero-padded, for transients and impulse responses; the same
-  kernel :func:`~phonometry.signal.correlation.align_impulse_responses`
+  kernel :func:`~phonometry.signals.correlation.align_impulse_responses`
   uses) or ``circular`` (for periodic records, exact to machine precision
   on bin-centered tones).
 """
@@ -221,7 +221,7 @@ class ToneBurstResult:
         :param language: Label language, ``"en"`` (default) or ``"es"``.
         """
         from .._i18n import check_language
-        from .._plot.signal import plot_tone_burst
+        from .._plot.signals import plot_tone_burst
 
         check_language(language)
         return plot_tone_burst(self, ax=ax, language=language, **kwargs)
@@ -464,7 +464,7 @@ class ResampledSignalResult:
         :return: The axes.
         """
         from .._i18n import check_language
-        from .._plot.signal import plot_resampled_signal
+        from .._plot.signals import plot_resampled_signal
 
         check_language(language)
         return plot_resampled_signal(self, ax=ax, language=language, **kwargs)
@@ -596,7 +596,7 @@ def _fractional_advance(
     :math:`e^{+j 2 \pi k \cdot \text{shift} / \text{nfft}}` over a record
     zero-padded past the shift, so the advanced samples leaving one end
     land in the padding instead of wrapping around. This is the alignment
-    kernel of :func:`~phonometry.signal.correlation.align_impulse_responses`.
+    kernel of :func:`~phonometry.signals.correlation.align_impulse_responses`.
     """
     from scipy import fft as sp_fft
 

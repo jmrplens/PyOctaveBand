@@ -457,7 +457,7 @@ def test_single_ir_delay_near_the_record_start() -> None:
 def test_peak_coefficient_guard_for_out_of_record_delays() -> None:
     """The phase-slope delay is not bounded by a search window; a delay
     beyond the record length must yield a zero coefficient, not a crash."""
-    from phonometry.signal.correlation import _delay_error
+    from phonometry.signals.correlation import _delay_error
 
     x = _white(25, n=4096)
     rho, std, interval = _delay_error(x, x, 5000.0, None, FS)

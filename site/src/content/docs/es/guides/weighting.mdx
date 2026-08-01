@@ -91,7 +91,7 @@ para infrasonido (ISO 7196), las históricas `'B'` (ANSI S1.4-1983) y `'D'`
 Llama a `filters.weighting_filter(recording, fs, curve='A')` sobre una señal
 calibrada. Devuelve la señal temporal ponderada A, filtrada con el diseño de
 polos y ceros de IEC 61672-1:2013 dentro de las tolerancias de clase 1, así que
-`signal.leq()` sobre la salida es el $L_{Aeq}$. La misma función aplica las
+`signals.leq()` sobre la salida es el $L_{Aeq}$. La misma función aplica las
 ponderaciones C, Z, B, D, AU y la G de infrasonido mediante `curve`.
 
 ## 1. De dónde vienen las curvas
@@ -155,7 +155,7 @@ baja frecuencia:
 
 ```python
 import numpy as np
-from phonometry import filters, signal
+from phonometry import filters, signals
 
 # Un retumbo de 50 Hz bajo un siseo ligero: débil en A, fuerte en C.
 fs = 48000
@@ -163,8 +163,8 @@ t = np.arange(10 * fs) / fs
 rng = np.random.default_rng(1)
 x = 0.2 * np.sin(2 * np.pi * 50 * t) + 0.01 * rng.standard_normal(t.size)
 
-la = signal.leq(filters.weighting_filter(x, fs, curve="A"))
-lc = signal.leq(filters.weighting_filter(x, fs, curve="C"))
+la = signals.leq(filters.weighting_filter(x, fs, curve="A"))
+lc = signals.leq(filters.weighting_filter(x, fs, curve="C"))
 print(f"LAeq = {la:.1f} dB   LCeq = {lc:.1f} dB   C - A = {lc - la:.1f} dB")
 # LAeq = 52.4 dB   LCeq = 75.7 dB   C - A = 23.2 dB
 # C - A por encima de 20 dB: el número ponderado A ocultaría el retumbo.
@@ -215,8 +215,8 @@ fs = 48000
 recording = 0.2 * np.sin(2 * np.pi * 1000 * np.arange(fs) / fs)
 
 wf = filters.WeightingFilter(fs, "A")
-signals = [recording]                # tu lote de grabaciones
-for recording in signals:
+batch = [recording]                  # tu lote de grabaciones
+for recording in batch:
     weighted = wf.filter(recording)
 ```
 

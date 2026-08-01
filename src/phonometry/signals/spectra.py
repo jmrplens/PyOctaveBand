@@ -414,7 +414,7 @@ class SpectralDensityResult:
         :param language: Label language, ``"en"`` (default) or ``"es"``.
         """
         from .._i18n import check_language
-        from .._plot.signal import plot_spectral_density
+        from .._plot.signals import plot_spectral_density
 
         check_language(language)
         return plot_spectral_density(self, ax=ax, language=language, **kwargs)
@@ -576,7 +576,7 @@ class CrossSpectralDensityResult:
         :param language: Label language, ``"en"`` (default) or ``"es"``.
         """
         from .._i18n import check_language
-        from .._plot.signal import plot_cross_spectral_density
+        from .._plot.signals import plot_cross_spectral_density
 
         check_language(language)
         return plot_cross_spectral_density(self, ax=ax, language=language,
@@ -736,7 +736,7 @@ class CoherentOutputSpectrumResult:
         :param language: Label language, ``"en"`` (default) or ``"es"``.
         """
         from .._i18n import check_language
-        from .._plot.signal import plot_coherent_output_spectrum
+        from .._plot.signals import plot_coherent_output_spectrum
 
         check_language(language)
         return plot_coherent_output_spectrum(self, ax=ax, language=language,
@@ -1025,7 +1025,7 @@ class WindowMetricsResult:
         :param language: Label language, ``"en"`` (default) or ``"es"``.
         """
         from .._i18n import check_language
-        from .._plot.signal import plot_window_metrics
+        from .._plot.signals import plot_window_metrics
 
         check_language(language)
         return plot_window_metrics(self, ax=ax, language=language, **kwargs)
@@ -1219,7 +1219,7 @@ class MultitaperSpectralDensityResult:
         :param language: Label language, ``"en"`` (default) or ``"es"``.
         """
         from .._i18n import check_language
-        from .._plot.signal import plot_multitaper_spectral_density
+        from .._plot.signals import plot_multitaper_spectral_density
 
         check_language(language)
         return plot_multitaper_spectral_density(

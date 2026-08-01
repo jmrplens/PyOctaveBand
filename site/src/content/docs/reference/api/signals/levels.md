@@ -1,5 +1,5 @@
 ---
-title: "signal.levels"
+title: "signals.levels"
 description: "Integrated and statistical sound levels (Leq, LAeq, LN percentiles)."
 sidebar:
   label: "levels"

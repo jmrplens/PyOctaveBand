@@ -1,5 +1,5 @@
 ---
-title: "signal.miso"
+title: "signals.miso"
 description: "Multiple and partial coherence of a multiple-input/single-output system."
 sidebar:
   label: "miso"
@@ -13,7 +13,7 @@ coherence of each source with the output is misleading: a source that only
 Bendat & Piersol, *Random Data: Analysis and Measurement Procedures*
 (4th ed., 2010, Chapter 7), resolve this with the multiple-input/output
 (MISO) coherence functions, computed here from the Welch cross-spectral
-machinery of [`phonometry.signal.spectra`](/phonometry/reference/api/signal/spectra/):
+machinery of [`phonometry.signals.spectra`](/phonometry/reference/api/signals/spectra/):
 
 * the **ordinary coherence**
   $\gamma^2_{iy} = \lvert G_{iy} \rvert^2 / (G_{ii} G_{yy})$
@@ -74,7 +74,7 @@ Multiple and partial coherence of a MISO system (Bendat & Piersol 7).
 
 Estimates every auto- and cross-spectrum of the `q` inputs and the
 output by the shared Welch core of
-[`cross_spectral_density`](/phonometry/reference/api/signal/spectra/#cross_spectral_density) (Hann taper
+[`cross_spectral_density`](/phonometry/reference/api/signals/spectra/#cross_spectral_density) (Hann taper
 and 50 % overlap by default, no detrending), then:
 
 * reports the **ordinary coherence** of each input with the output
@@ -106,7 +106,7 @@ ordering the inputs by descending ordinary coherence with the output.
 | `overlap` | Segment overlap fraction in [0, 1) (default 0.5). |
 | `scaling` | `'density'` (units²/Hz) or `'spectrum'` (units²). |
 
-**Returns:** A [`MISOCoherenceResult`](/phonometry/reference/api/signal/miso/#misocoherenceresult).
+**Returns:** A [`MISOCoherenceResult`](/phonometry/reference/api/signals/miso/#misocoherenceresult).
 
 **Raises**
 

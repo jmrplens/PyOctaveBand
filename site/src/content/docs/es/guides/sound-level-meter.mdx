@@ -54,7 +54,7 @@ cualquier parte; en una medición real proceden de tu micrófono.
 
 ```python
 import numpy as np
-from phonometry import filters, metrology, signal
+from phonometry import filters, metrology, signals
 
 fs = 48000
 
@@ -64,7 +64,7 @@ calibrator = np.sqrt(2) * np.sin(2 * np.pi * 1000 * np.arange(3 * fs) / fs)
 
 # Medición "de calle": 10 s de ruido rosa de fondo más un evento de 1 s a
 #   1 kHz, tipo bocina, para que los niveles estadísticos tengan algo que separar.
-recording = signal.noise_signal(fs, 10.0, color="pink", rms=0.02, seed=7)
+recording = signals.noise_signal(fs, 10.0, color="pink", rms=0.02, seed=7)
 recording[4 * fs : 5 * fs] += 0.2 * np.sqrt(2) * np.sin(
     2 * np.pi * 1000 * np.arange(fs) / fs
 )
@@ -126,12 +126,12 @@ exposición sonora** que normaliza el evento a un segundo, y el **pico** con
 ponderación C para contenido impulsivo.
 
 ```python
-la_eq = signal.laeq(recording, fs, calibration_factor=cal)     # ≈70,2 dB
-ln = signal.ln_levels(
+la_eq = signals.laeq(recording, fs, calibration_factor=cal)     # ≈70,2 dB
+ln = signals.ln_levels(
     recording, fs, n=(10, 50, 90), weighting="A", calibration_factor=cal
 )                                          # L10 ≈78,0, L50 ≈55,1, L90 ≈54,9
-lae = signal.sel(recording, fs, weighting="A", calibration_factor=cal)  # ≈80,2
-lc_pk = signal.lc_peak(recording, fs, calibration_factor=cal)           # ≈84,4
+lae = signals.sel(recording, fs, weighting="A", calibration_factor=cal)  # ≈80,2
+lc_pk = signals.lc_peak(recording, fs, calibration_factor=cal)           # ≈84,4
 
 print(f"LAeq {la_eq:.1f} dB | L10 {ln[10]:.1f} | L90 {ln[90]:.1f} "
       f"| LAE {lae:.1f} | LCpeak {lc_pk:.1f}")
@@ -238,6 +238,6 @@ del calibrador de IEC 60942:2017 tampoco se ejecutan aquí; consulta la
 
 - Referencia de la API: [`metrology.calibration`](/phonometry/es/reference/api/metrology/calibration/),
   [`filters.weighting`](/phonometry/es/reference/api/filters/weighting/),
-  [`signal.levels`](/phonometry/es/reference/api/signal/levels/),
+  [`signals.levels`](/phonometry/es/reference/api/signals/levels/),
   [`phonometry`](/phonometry/es/reference/api/filters/phonometry/) y
   [`filters.compliance`](/phonometry/es/reference/api/filters/compliance/).

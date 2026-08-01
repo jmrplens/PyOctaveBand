@@ -1,5 +1,5 @@
 ---
-title: "signal.correlation"
+title: "signals.correlation"
 description: "Correlation analysis and time-delay estimation."
 sidebar:
   label: "correlation"
@@ -22,10 +22,10 @@ Measurement Procedures* (4th ed., 2010) and Knapp & Carter (1976):
   large-`T` normalized random error of the estimate for bandwidth-limited
   Gaussian data,
   $\varepsilon[\hat{R}_{xy}(\tau)] = [1 + \rho_{xy}^{-2}(\tau)]^{1/2} / \sqrt{2BT}$
-  (Eqs. 8.109/8.112), exposed as [`correlation_random_error`](/phonometry/reference/api/signal/correlation/#correlation_random_error);
+  (Eqs. 8.109/8.112), exposed as [`correlation_random_error`](/phonometry/reference/api/signals/correlation/#correlation_random_error);
 * **time-delay estimation**: the peak of the cross-correlation locates the
   delay of a common signal between two sensors (B&P Section 5.1.4,
-  Eq. 5.21). [`time_delay`](/phonometry/reference/api/signal/correlation/#time_delay) implements the direct correlator, the
+  Eq. 5.21). [`time_delay`](/phonometry/reference/api/signals/correlation/#time_delay) implements the direct correlator, the
   weighted-phase-slope estimator of the cross-spectrum (Eq. 5.101b) and the
   **generalized cross-correlation** of Knapp & Carter (1976): the averaged
   cross-spectrum is weighted by $\psi(f)$ before the inverse
@@ -47,7 +47,7 @@ Measurement Procedures* (4th ed., 2010) and Knapp & Carter (1976):
   fractional shift in the frequency domain.
 
 The GCC estimators run on the same Welch core (segmentation, tapering,
-overlap policy) as [`phonometry.signal.spectra`](/phonometry/reference/api/signal/spectra/), so a GCC and a
+overlap policy) as [`phonometry.signals.spectra`](/phonometry/reference/api/signals/spectra/), so a GCC and a
 cross-spectral density computed with the same segment length are mutually
 consistent bin by bin.
 
@@ -69,7 +69,7 @@ align_impulse_responses(
 Align an impulse response onto a reference by its estimated delay.
 
 Estimates the sub-sample delay of `ir` relative to `reference`
-([`impulse_response_delay`](/phonometry/reference/api/signal/correlation/#impulse_response_delay)) and removes it with an exact
+([`impulse_response_delay`](/phonometry/reference/api/signals/correlation/#impulse_response_delay)) and removes it with an exact
 band-limited fractional shift (frequency-domain phase ramp over a
 zero-padded record). Use it to average IR ensembles or to compare
 measurements taken at slightly different distances.
@@ -84,7 +84,7 @@ measurements taken at slightly different distances.
 | `interpolation` | `'parabolic'` (default) or `'none'`. |
 | `upsample` | Integer local-upsampling factor (default 8). |
 
-**Returns:** An [`AlignedImpulseResponseResult`](/phonometry/reference/api/signal/correlation/#alignedimpulseresponseresult).
+**Returns:** An [`AlignedImpulseResponseResult`](/phonometry/reference/api/signals/correlation/#alignedimpulseresponseresult).
 
 **Raises**
 
@@ -178,7 +178,7 @@ Normalizations:
 | `normalization` | See above (default `'unbiased'`). |
 | `max_lag` | Largest lag magnitude to keep, in seconds (default: the full `N-1` samples). |
 
-**Returns:** A [`CorrelationResult`](/phonometry/reference/api/signal/correlation/#correlationresult).
+**Returns:** A [`CorrelationResult`](/phonometry/reference/api/signals/correlation/#correlationresult).
 
 **Raises**
 
@@ -397,7 +397,7 @@ $y(t) = \alpha x(t - \tau_0) + n(t)$ (B&P Section 5.1.4):
   function (Eq. 5.21);
 * `'gcc'` - the peak of the generalized cross-correlation of
   Knapp & Carter (1976): the Welch-averaged cross-spectrum (shared
-  core with [`cross_spectral_density`](/phonometry/reference/api/signal/spectra/#cross_spectral_density))
+  core with [`cross_spectral_density`](/phonometry/reference/api/signals/spectra/#cross_spectral_density))
   is weighted by $\psi(f)$ before the inverse transform.
   Weightings (Table I): `'none'` (plain correlator), `'roth'`
   ($1/G_{xx}$,
@@ -448,7 +448,7 @@ interval (Eq. 8.130).
 | `upsample` | Integer local-upsampling factor (default 1: off). |
 | `signal_bandwidth` | Signal bandwidth `B` in Hz for the Eq. 8.129 delay uncertainty (`None`: no error reported). |
 
-**Returns:** A [`TimeDelayResult`](/phonometry/reference/api/signal/correlation/#timedelayresult).
+**Returns:** A [`TimeDelayResult`](/phonometry/reference/api/signals/correlation/#timedelayresult).
 
 **Raises**
 
@@ -484,7 +484,7 @@ Time-delay estimate between two records.
 | `delay_samples` | The same delay in (fractional) samples. |
 | `method` | `'direct'`, `'gcc'` or `'phase'`. |
 | `weighting` | GCC weighting name (`None` unless `method='gcc'`). |
-| `lags` | Lag axis of [`correlation`](/phonometry/reference/api/signal/correlation/#correlation), in seconds. |
+| `lags` | Lag axis of [`correlation`](/phonometry/reference/api/signals/correlation/#correlation), in seconds. |
 | `correlation` | The correlation function whose peak was located: the correlation coefficient $\hat{\rho}_{xy}(\tau)$ for `'direct'`, the weighted GCC $\hat{R}_\psi(\tau)$ (normalized to unit peak magnitude) for `'gcc'`, and the unweighted equivalent for `'phase'` (whose estimate comes from Eq. 5.101b, not from this curve). |
 | `peak_correlation` | Plain correlation coefficient $\hat{\rho}_{xy}$ at the estimated delay (rounded to the nearest sample) - the quantity entering the B&P error formulas, whatever the method. |
 | `delay_std` | Standard deviation of the peak-location estimate, $\sigma(\hat{\tau}_0) \approx (3/4)^{1/4} \sqrt{\varepsilon} / (\pi B)$ (Eq. 8.129), in seconds; `None` unless `signal_bandwidth` was given. |

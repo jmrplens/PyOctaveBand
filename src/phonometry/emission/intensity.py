@@ -68,7 +68,7 @@ if TYPE_CHECKING:
 from .._internal.levels_math import energy_mean
 from .._internal.utils import _typesignal
 from ..filters.frequencies import _genfreqs
-from ..signal.spectra import (
+from ..signals.spectra import (
     _default_nperseg,
     _welch_autospectrum,
     _welch_cross_spectrum,

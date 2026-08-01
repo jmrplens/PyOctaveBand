@@ -1,5 +1,5 @@
 ---
-title: "signal.phase"
+title: "signals.phase"
 description: "Phase utilities: minimum phase, group delay and excess phase."
 sidebar:
   label: "phase"
@@ -134,7 +134,7 @@ phase assigns to $\lvert H(f) \rvert$ (Bendat & Piersol
 Sec. 13.1.4) via the real cepstrum: the inverse transform of
 $\ln \lvert H \rvert$ is folded onto positive
 quefrencies (doubling them, keeping the ends; the folding core is
-shared with [`phonometry.signal.cepstrum`](/phonometry/reference/api/signal/cepstrum/)) and transformed
+shared with [`phonometry.signals.cepstrum`](/phonometry/reference/api/signals/cepstrum/)) and transformed
 back, so `exp` of the result is the unique stable, causal, causally
 invertible response with that magnitude. The input phase, if any, is
 ignored: passing a plain magnitude array works.
@@ -173,8 +173,8 @@ phase_decomposition(
 
 Decompose a response into its minimum-phase and all-pass parts.
 
-Bundles [`minimum_phase`](/phonometry/reference/api/signal/phase/#minimum_phase), [`excess_phase`](/phonometry/reference/api/signal/phase/#excess_phase) and
-[`group_delay`](/phonometry/reference/api/signal/phase/#group_delay) on one frequency axis: the minimum phase carries
+Bundles [`minimum_phase`](/phonometry/reference/api/signals/phase/#minimum_phase), [`excess_phase`](/phonometry/reference/api/signals/phase/#excess_phase) and
+[`group_delay`](/phonometry/reference/api/signals/phase/#group_delay) on one frequency axis: the minimum phase carries
 everything an equalizer can invert, the excess phase is the residual
 all-pass (latency plus non-minimum-phase zeros), and the two group
 delays quantify both in seconds.
@@ -187,7 +187,7 @@ delays quantify both in seconds.
 | `fs` | Sample rate of the underlying record, in Hz. |
 | `oversample` | Cepstral anti-aliasing factor (default 8). |
 
-**Returns:** A [`PhaseDecompositionResult`](/phonometry/reference/api/signal/phase/#phasedecompositionresult).
+**Returns:** A [`PhaseDecompositionResult`](/phonometry/reference/api/signals/phase/#phasedecompositionresult).
 
 **Raises**
 

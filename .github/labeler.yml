@@ -175,9 +175,9 @@ ci:
   - changed-files:
       - any-glob-to-any-file: ["src/phonometry/room/**", "tests/room/**"]
 
-"area: signal":
+"area: signals":
   - changed-files:
-      - any-glob-to-any-file: ["src/phonometry/signal/**", "tests/signal/**"]
+      - any-glob-to-any-file: ["src/phonometry/signals/**", "tests/signals/**"]
 
 "area: simulation":
   - changed-files:

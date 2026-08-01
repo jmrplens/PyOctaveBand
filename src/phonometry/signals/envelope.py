@@ -109,7 +109,7 @@ class EnvelopeResult:
         :param language: Label language, ``"en"`` (default) or ``"es"``.
         """
         from .._i18n import check_language
-        from .._plot.signal import plot_envelope
+        from .._plot.signals import plot_envelope
 
         check_language(language)
         return plot_envelope(self, ax=ax, language=language, **kwargs)
@@ -254,7 +254,7 @@ class EnvelopeSpectrumResult:
         :param language: Label language, ``"en"`` (default) or ``"es"``.
         """
         from .._i18n import check_language
-        from .._plot.signal import plot_envelope_spectrum
+        from .._plot.signals import plot_envelope_spectrum
 
         check_language(language)
         return plot_envelope_spectrum(self, ax=ax, language=language, **kwargs)

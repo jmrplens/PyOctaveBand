@@ -17,13 +17,13 @@ This module computes the families set out in M. P. Norton and D. G. Karczub,
 *Fundamentals of Noise and Vibration Analysis for Engineers* (2nd ed., CUP
 2003), Section 8.4 (8.4.1 gears, 8.4.3 bearings, 8.4.4 fans and blowers,
 8.4.7 pumps, 8.4.8 electrical equipment), and hands them to the signal chain
-that already exists in `phonometry.signal`: band-pass the structural
+that already exists in `phonometry.signals`: band-pass the structural
 resonance the defect impacts ring, detect its envelope and transform it
-([`envelope_spectrum`](/phonometry/reference/api/signal/envelope/#envelope_spectrum)), average
+([`envelope_spectrum`](/phonometry/reference/api/signals/envelope/#envelope_spectrum)), average
 synchronously with the shaft
-([`time_synchronous_average`](/phonometry/reference/api/signal/synchronous-average/#time_synchronous_average))
+([`time_synchronous_average`](/phonometry/reference/api/signals/synchronous-average/#time_synchronous_average))
 or collapse the harmonic families in the cepstrum
-([`cepstrum`](/phonometry/reference/api/signal/cepstrum/#cepstrum)). The result object's
+([`cepstrum`](/phonometry/reference/api/signals/cepstrum/#cepstrum)). The result object's
 [`FaultFrequencyResult.plot`](/phonometry/reference/api/vibration/machine-diagnostics/#faultfrequencyresultplot) draws the predicted lines **on top of a
 measured envelope spectrum**, which is the working view.
 
@@ -321,7 +321,7 @@ FaultFrequencyResult.plot(
 Overlay the predicted lines on a measured envelope spectrum.
 
 Pass the measurement as `spectrum=` (an
-[`EnvelopeSpectrumResult`](/phonometry/reference/api/signal/envelope/#envelopespectrumresult), or any
+[`EnvelopeSpectrumResult`](/phonometry/reference/api/signals/envelope/#envelopespectrumresult), or any
 object exposing `frequencies` and `amplitude`); without it the
 predicted lines are drawn alone as a labelled stem plot.
 

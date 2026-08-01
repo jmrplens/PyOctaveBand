@@ -1,5 +1,5 @@
 ---
-title: "signal.cepstrum"
+title: "signals.cepstrum"
 description: "Cepstral analysis: real/power/complex cepstrum, liftering and echo detection."
 sidebar:
   label: "cepstrum"
@@ -28,7 +28,7 @@ at the quefrency of its period. Three variants are standard:
 * the **real cepstrum**, the inverse transform of
   $\ln \lvert X \rvert$ -- exactly half
   the power cepstrum, and the quantity whose causal folding yields the
-  minimum-phase reconstruction of [`phonometry.minimum_phase`](/phonometry/reference/api/signal/phase/#minimum_phase)
+  minimum-phase reconstruction of [`phonometry.minimum_phase`](/phonometry/reference/api/signals/phase/#minimum_phase)
   (Bendat & Piersol, *Random Data*, 4th ed., Sec. 13.1.4; Tohyama in
   Havelock Ch. 75 manipulates minimum-phase and all-pass components the
   same way);
@@ -51,7 +51,7 @@ so the cepstrum carries a spike train at the *rahmonics* $n t_0$ with
 amplitudes $a, -a^2/2, a^3/3, \ldots$ (their sum is
 $\ln(1 + a)$): a peak at
 exactly the echo delay whose height reads out the reflection coefficient.
-[`echo_detection`](/phonometry/reference/api/signal/cepstrum/#echo_detection) automates that reading on the power cepstrum, where
+[`echo_detection`](/phonometry/reference/api/signals/cepstrum/#echo_detection) automates that reading on the power cepstrum, where
 the first rahmonic's height is `a` itself.
 
 **Liftering** -- filtering in the quefrency domain (Milner Sec. 4.3) --
@@ -65,7 +65,7 @@ to it). The discrete cepstrum is the inverse *DFT* of the log of a
 *sampled* spectrum, so it is time-aliased when the log spectrum has
 features sharper than the grid resolves; zero-padding `nfft` is the
 remedy, exactly like the `oversample` padding of
-[`phonometry.minimum_phase`](/phonometry/reference/api/signal/phase/#minimum_phase), whose cepstral folding core
+[`phonometry.minimum_phase`](/phonometry/reference/api/signals/phase/#minimum_phase), whose cepstral folding core
 (`_fold_causal`) this module shares.
 
 > Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
@@ -91,12 +91,12 @@ Cepstrum of a record: power, real or complex.
   delay itself.
 * `"real"`: inverse DFT of `ln|X|` -- exactly half the power
   cepstrum. Folding it causally is the minimum-phase reconstruction
-  (see [`phonometry.minimum_phase`](/phonometry/reference/api/signal/phase/#minimum_phase), which shares this module's
+  (see [`phonometry.minimum_phase`](/phonometry/reference/api/signals/phase/#minimum_phase), which shares this module's
   folding core).
 * `"complex"`: inverse DFT of `ln|X| + j arg X` with the phase
   unwrapped and its linear component removed (Neelamani Eq. (14) in
   Havelock Ch. 87). Real-valued for a real record, and invertible:
-  [`CepstrumResult.invert`](/phonometry/reference/api/signal/cepstrum/#cepstrumresultinvert) returns the signal.
+  [`CepstrumResult.invert`](/phonometry/reference/api/signals/cepstrum/#cepstrumresultinvert) returns the signal.
 
 **Parameters**
 
@@ -107,7 +107,7 @@ Cepstrum of a record: power, real or complex.
 | `kind` | `"power"` (default), `"real"` or `"complex"`. |
 | `nfft` | Even FFT length, at least `x.size` (default: the record length, rounded up to even). Zero-padding reduces the cepstral time-aliasing of sharp log-spectrum features. |
 
-**Returns:** A [`CepstrumResult`](/phonometry/reference/api/signal/cepstrum/#cepstrumresult).
+**Returns:** A [`CepstrumResult`](/phonometry/reference/api/signals/cepstrum/#cepstrumresult).
 
 **Raises**
 
@@ -219,7 +219,7 @@ occupied by the source's spectral envelope: raise `min_quefrency`
 if the source is very reverberant or narrowband.
 
 The delay is refined by quadratic interpolation of `|cepstrum|`
-around the peak; see [`EchoDetectionResult`](/phonometry/reference/api/signal/cepstrum/#echodetectionresult) for the bin-splitting
+around the peak; see [`EchoDetectionResult`](/phonometry/reference/api/signals/cepstrum/#echodetectionresult) for the bin-splitting
 caveat on the coefficient at off-sample delays.
 
 **Parameters**
@@ -232,7 +232,7 @@ caveat on the coefficient at off-sample delays.
 | `max_quefrency` | Upper edge of the searched band, in seconds (default and maximum: half the FFT length, the end of the unambiguous quefrency axis). |
 | `nfft` | Even FFT length, at least `x.size` (default: the record length, rounded up to even). |
 
-**Returns:** An [`EchoDetectionResult`](/phonometry/reference/api/signal/cepstrum/#echodetectionresult).
+**Returns:** An [`EchoDetectionResult`](/phonometry/reference/api/signals/cepstrum/#echodetectionresult).
 
 **Raises**
 
@@ -322,7 +322,7 @@ modes are exactly complementary in dB.
 | `mode` | `"lowpass"` (default) or `"highpass"`. |
 | `nfft` | Even FFT length, at least `x.size` (default: the record length, rounded up to even). |
 
-**Returns:** A [`LifterResult`](/phonometry/reference/api/signal/cepstrum/#lifterresult).
+**Returns:** A [`LifterResult`](/phonometry/reference/api/signals/cepstrum/#lifterresult).
 
 **Raises**
 

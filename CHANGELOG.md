@@ -1007,14 +1007,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   IEC 61260-1 / IEC 61672-1 class verification are now `phonometry.filters`;
   the general signal analysis (levels, Welch and multitaper spectra, coherence,
   time-frequency, correlation, envelope, cepstrum, phase, synchronous
-  averaging, test signals) is `phonometry.signal`; and `phonometry.metrology`
+  averaging, test signals) is `phonometry.signals`; and `phonometry.metrology`
   keeps what gives it its name, the calibration, the GUM uncertainty, the data
   qualification and the IEC 61043 intensity-instrument class check. Four
   modules are renamed with the move, each dropping a prefix its package now
   carries: `filter_design` to `filters.design`,
   `parametric_filters` to `filters.weighting` (it is the A/C/G and time
   weightings, which is what people look for), `signals` to
-  `signal.test_signals` (`signal.signals` says nothing) and `random_data` to
+  `signals.test_signals` and `random_data` to
   `metrology.data_qualification`, the name its documentation page already had.
   Nothing moves in the flat API: `from phonometry import leq, octave_filter`
   is what it always was, and that is how the documentation leads.
@@ -1040,9 +1040,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 - The generated reference is keyed by subpackage. Its sections were a fourth
   naming of the same material (`levels`, `spectra`, `correlation` for what the
   code called `metrology`), so a reader who knew where a function lived could
-  not predict where its page lived. They are now `filters`, `signal` and
+  not predict where its page lived. They are now `filters`, `signals` and
   `metrology`, one per package, and the pages move with them
-  (`reference/api/spectra/cepstrum` becomes `reference/api/signal/cepstrum`).
+  (`reference/api/spectra/cepstrum` becomes `reference/api/signals/cepstrum`).
   The consistency contract in `scripts/api_taxonomy.py` is what enforces it:
   five sections drew from `metrology` under four different names and now three
   draw from three packages under their own. The sections that deliberately
@@ -1643,7 +1643,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 ### Deprecated
 
 - The pre-4.0 `phonometry.metrology.*` module paths and the names read from
-  the `metrology` namespace that now live in `filters` or `signal` (see
+  the `metrology` namespace that now live in `filters` or `signals` (see
   Changed). Both warn on use and are removed in 5.0, one release after the
   3.x aliases.
 

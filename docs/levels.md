@@ -56,7 +56,7 @@ time-weighted level distribution.
 
 ```python
 import numpy as np
-from phonometry import signal
+from phonometry import signals
 
 # recording: a calibrated microphone capture (Pa) — recorded through your measurement chain. Synthesized here so the guide runs standalone.
 fs = 48000
@@ -64,10 +64,10 @@ recording = 0.2 * np.sin(2 * np.pi * 1000 * np.arange(fs) / fs)
 sensitivity = 1.0                                    # calibration_factor (see Calibration)
 
 # Equivalent continuous level of the whole recording
-level = signal.leq(recording, calibration_factor=sensitivity)
+level = signals.leq(recording, calibration_factor=sensitivity)
 
 # A-weighted Leq (the standard environmental noise metric)
-la = signal.laeq(recording, fs, calibration_factor=sensitivity)
+la = signals.laeq(recording, fs, calibration_factor=sensitivity)
 ```
 
 Both accept 1D signals (returning a scalar) or 2D `[channels, samples]` arrays
@@ -111,7 +111,7 @@ everywhere else, energy.
 
 ```python
 import numpy as np
-from phonometry import signal
+from phonometry import signals
 
 # A steady tone gives L10 = L50 = L90; percentiles only tell a story for a
 # *fluctuating* level. Synthesize 3 s alternating between a quiet and a
@@ -123,7 +123,7 @@ quiet = 0.02 * rng.standard_normal(segment)        # background
 loud = 0.06 * rng.standard_normal(segment)         # ~10 dB louder events
 varying = np.tile(np.concatenate([quiet, loud]), 3)
 
-stats = signal.ln_levels(varying, fs, n=(10, 50, 90), weighting="A")
+stats = signals.ln_levels(varying, fs, n=(10, 50, 90), weighting="A")
 print(f"LA10={stats[10]:.1f}  LA50={stats[50]:.1f}  LA90={stats[90]:.1f} dB")
 # LA10=66.6  LA50=65.2  LA90=58.5 dB  -> L10 (events) > L50 (median) > L90 (background)
 ```
@@ -139,7 +139,7 @@ background.*
 ```python
 import numpy as np
 import matplotlib.pyplot as plt
-from phonometry import filters, signal
+from phonometry import filters, signals
 
 # The fluctuating signal of the ln_levels example: 0.5 s of background
 # alternating with 0.5 s of ~10 dB louder events, repeated 3 times
@@ -153,7 +153,7 @@ varying = np.tile(np.concatenate([quiet, loud]), 3)
 # Fast mean-square envelope -> level vs time, plus the percentile levels
 envelope = filters.time_weighting(varying, fs, mode="fast")
 level_t = 10 * np.log10(np.maximum(envelope, 1e-12) / (2e-5) ** 2)
-stats = signal.ln_levels(varying, fs, n=(10, 50, 90))
+stats = signals.ln_levels(varying, fs, n=(10, 50, 90))
 t = np.arange(varying.size) / fs
 
 fig, ax = plt.subplots()
@@ -225,7 +225,7 @@ of [Environmental levels](environmental-levels.md) does.
 
 ```python
 import numpy as np
-from phonometry import signal
+from phonometry import signals
 
 # recording: a calibrated microphone capture (Pa) — recorded through your measurement chain. Synthesized here so the guide runs standalone.
 fs = 48000
@@ -233,18 +233,18 @@ recording = 0.2 * np.sin(2 * np.pi * 1000 * np.arange(fs) / fs)
 sensitivity = 1.0                                    # calibration_factor (see Calibration)
 
 # C-weighted peak (IEC 61672-1 §5.13) - occupational action limits use this
-peak = signal.lc_peak(recording, fs, calibration_factor=sensitivity)
+peak = signals.lc_peak(recording, fs, calibration_factor=sensitivity)
 
 # A single noise event and a work-shift sample (slices of a real recording)
 event = recording
 shift_sample = recording
 
 # Sound exposure level: single-event level normalized to 1 s (LAE)
-lae = signal.sel(event, fs, weighting="A", calibration_factor=sensitivity)
+lae = signals.sel(event, fs, weighting="A", calibration_factor=sensitivity)
 
 # Daily noise dose (IEC 61252): exposure in Pa²·h and LEX,8h / LEP,d
-E = signal.sound_exposure(shift_sample, fs, duration_hours=8, calibration_factor=sensitivity)
-lex = signal.lex_8h(shift_sample, fs, duration_hours=8, calibration_factor=sensitivity)
+E = signals.sound_exposure(shift_sample, fs, duration_hours=8, calibration_factor=sensitivity)
+lex = signals.lex_8h(shift_sample, fs, duration_hours=8, calibration_factor=sensitivity)
 ```
 
 `lc_peak` is verified against the one-cycle/half-cycle reference responses of
@@ -281,7 +281,7 @@ railway noise models.
 ```python
 import numpy as np
 import matplotlib.pyplot as plt
-from phonometry import filters, signal
+from phonometry import filters, signals
 
 # A vehicle pass-by: noise under a gaussian energy envelope (dBFS analysis)
 fs = 48000
@@ -290,8 +290,8 @@ rng = np.random.default_rng(11)
 x = 0.3 * np.exp(-0.5 * ((t - 4.0) / 1.1) ** 2) * rng.standard_normal(t.size)
 
 level = 10 * np.log10(np.maximum(filters.time_weighting(x, fs, mode="fast"), 1e-12))
-l_sel = float(signal.sel(x, fs, dbfs=True))
-l_eq = float(signal.leq(x, dbfs=True))
+l_sel = float(signals.sel(x, fs, dbfs=True))
+l_eq = float(signals.leq(x, dbfs=True))
 print(f"Leq = {l_eq:.1f} dBFS, SEL = {l_sel:.1f} dBFS")
 # Leq = -16.6 dBFS, SEL = -7.6 dBFS -> the 1 s block carries the event energy
 

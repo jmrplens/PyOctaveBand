@@ -29,7 +29,7 @@ they come from your microphone.
 
 ```python
 import numpy as np
-from phonometry import filters, metrology, signal
+from phonometry import filters, metrology, signals
 
 fs = 48000
 
@@ -39,7 +39,7 @@ calibrator = np.sqrt(2) * np.sin(2 * np.pi * 1000 * np.arange(3 * fs) / fs)
 
 # "Street" measurement: 10 s of pink background noise plus a 1 s horn-like
 #   1 kHz event, so the statistical levels have something to separate.
-recording = signal.noise_signal(fs, 10.0, color="pink", rms=0.02, seed=7)
+recording = signals.noise_signal(fs, 10.0, color="pink", rms=0.02, seed=7)
 recording[4 * fs : 5 * fs] += 0.2 * np.sqrt(2) * np.sin(
     2 * np.pi * 1000 * np.arange(fs) / fs
 )
@@ -97,12 +97,12 @@ the level fluctuated ($L_{90}$ is the background, $L_{10}$ the events), the
 C-weighted **peak** for impulsive content.
 
 ```python
-la_eq = signal.laeq(recording, fs, calibration_factor=cal)     # ~70.2 dB
-ln = signal.ln_levels(
+la_eq = signals.laeq(recording, fs, calibration_factor=cal)     # ~70.2 dB
+ln = signals.ln_levels(
     recording, fs, n=(10, 50, 90), weighting="A", calibration_factor=cal
 )                                                # L10 ~78.0, L50 ~55.1, L90 ~54.9
-lae = signal.sel(recording, fs, weighting="A", calibration_factor=cal)  # ~80.2
-lc_pk = signal.lc_peak(recording, fs, calibration_factor=cal)           # ~84.4
+lae = signals.sel(recording, fs, weighting="A", calibration_factor=cal)  # ~80.2
+lc_pk = signals.lc_peak(recording, fs, calibration_factor=cal)           # ~84.4
 
 print(f"LAeq {la_eq:.1f} dB | L10 {ln[10]:.1f} | L90 {ln[90]:.1f} "
       f"| LAE {lae:.1f} | LCpeak {lc_pk:.1f}")
@@ -180,7 +180,7 @@ The meter built here is the trunk; the rest of the core grows from it.
 
 - API reference: [`metrology.calibration`](https://jmrplens.github.io/phonometry/reference/api/metrology/calibration/),
   [`filters.weighting`](https://jmrplens.github.io/phonometry/reference/api/filters/weighting/),
-  [`signal.levels`](https://jmrplens.github.io/phonometry/reference/api/signal/levels/),
+  [`signals.levels`](https://jmrplens.github.io/phonometry/reference/api/signals/levels/),
   [`phonometry`](https://jmrplens.github.io/phonometry/reference/api/filters/phonometry/) and
   [`filters.compliance`](https://jmrplens.github.io/phonometry/reference/api/filters/compliance/).
 

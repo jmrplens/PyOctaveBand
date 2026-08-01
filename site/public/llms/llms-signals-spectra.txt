@@ -10,7 +10,7 @@ Source: https://jmrplens.github.io/phonometry/guides/spectral-analysis/
 # Calibrated spectral analysis (Bendat & Piersol)
 
 A spectrum without its uncertainty is half a measurement. This page covers the
-Welch spectral estimators of `phonometry.signal` that report, next to the
+Welch spectral estimators of `phonometry.signals` that report, next to the
 spectrum itself, the statistical quality of the estimate following Bendat &
 Piersol, *Random Data: Analysis and Measurement Procedures* (4th ed., 2010):
 the **power spectral density** and **cross-spectral density** with the
@@ -575,7 +575,7 @@ reading the ordinary coherences alone can credit the wrong source. Bendat &
 Piersol, *Random Data* (4th ed., 2010, Chapter 7), resolve this for a
 multiple-input/single-output (MISO) system with the **multiple** and
 **partial** coherence functions. `miso_coherence` computes them from the same
-Welch cross-spectral core as the rest of `phonometry.signal`, for several
+Welch cross-spectral core as the rest of `phonometry.signals`, for several
 correlated inputs and one output.
 
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/miso_coherence_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/miso_coherence.svg" alt="Two-panel figure. Top: the measured output autospectrum in dB with the coherent output contribution of two inputs shaded underneath; input 1 fills the low band and input 2 the high band, with the residual noise far below. Bottom: for the correlated second input, its ordinary coherence sits around 0.3 across the low band even though it drives no low-frequency path, while its partial coherence collapses to zero there once the first input is conditioned out; the multiple coherence stays near one except at the crossover null" width="82%"></picture>
@@ -781,7 +781,7 @@ Source: https://jmrplens.github.io/phonometry/guides/time-frequency/
 
 A stationary spectrum hides everything that happens *in time*: a passing
 siren, an impact, a machine running up. This page covers the two
-time-frequency estimators of `phonometry.signal`, both with the
+time-frequency estimators of `phonometry.signals`, both with the
 calibration discipline of the
 [spectral-analysis page](https://jmrplens.github.io/phonometry/guides/spectral-analysis/): the
 **calibrated spectrogram** (the short-time Fourier transform view of
@@ -1009,7 +1009,7 @@ Source: https://jmrplens.github.io/phonometry/guides/cepstrum-echoes/
 The [spectral estimators](https://jmrplens.github.io/phonometry/guides/spectral-analysis/) describe *what
 frequencies* a signal contains; this page covers what hides in the *shape* of
 that spectrum. The **cepstrum** - the inverse Fourier transform of the log
-spectrum - lives in `phonometry.signal` and turns two hard spectral
+spectrum - lives in `phonometry.signals` and turns two hard spectral
 problems into easy peak-picking: periodic spectral ripple (an echo, a harmonic
 family) collapses onto a single spike at the **quefrency** of its period, and
 the smooth spectral envelope separates from the fine structure by plain
@@ -1720,7 +1720,7 @@ Source: https://jmrplens.github.io/phonometry/guides/correlation-delay/
 
 Where the [calibrated spectral estimators](https://jmrplens.github.io/phonometry/guides/spectral-analysis/) describe a
 signal in frequency, this page covers their time-domain counterparts in
-`phonometry.signal`: **auto- and cross-correlation** estimates with the
+`phonometry.signals`: **auto- and cross-correlation** estimates with the
 three standard normalizations and their Bendat & Piersol random errors;
 **time-delay estimation** (TDE) by the direct correlator, the cross-spectrum
 phase slope and the **generalized cross-correlation** (GCC) of Knapp & Carter
@@ -2119,7 +2119,7 @@ Source: https://jmrplens.github.io/phonometry/guides/test-signals/
 # Test signals and sample-rate tools (IEC 60268-1)
 
 A measurement is only as trustworthy as its stimulus and its sample-rate
-bookkeeping. This page covers the signal toolbox of `phonometry.signal`:
+bookkeeping. This page covers the signal toolbox of `phonometry.signals`:
 **tone bursts** with the exact gating IEC 60268-1 prescribes, the
 **colored-noise generators** (detailed in the
 [spectral analysis guide](https://jmrplens.github.io/phonometry/guides/spectral-analysis/#5-colored-noise-generators)),

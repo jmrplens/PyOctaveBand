@@ -439,7 +439,7 @@ def test_pre_split_module_shim_names_the_5_0_removal() -> None:
     shim = sys.modules["phonometry.metrology.levels"]
     with pytest.warns(DeprecationWarning, match="removed in 5.0") as record:
         _ = shim.leq
-    assert "phonometry.signal.levels" in str(record[0].message)
+    assert "phonometry.signals.levels" in str(record[0].message)
 
 
 def test_narrowed_namespace_still_serves_the_names_that_left() -> None:
@@ -448,7 +448,7 @@ def test_narrowed_namespace_still_serves_the_names_that_left() -> None:
 
     from phonometry import metrology
 
-    with pytest.warns(DeprecationWarning, match="phonometry.signal.leq"):
+    with pytest.warns(DeprecationWarning, match="phonometry.signals.leq"):
         assert metrology.leq is ph.leq
     with pytest.warns(DeprecationWarning, match="phonometry.filters.octave_filter"):
         assert metrology.octave_filter is ph.octave_filter
@@ -462,12 +462,12 @@ def test_narrowed_namespace_still_serves_the_names_that_left() -> None:
 
 def test_narrowed_namespace_lists_the_moved_names_in_dir() -> None:
     """A PEP 562 hook is invisible to dir(); the names must not vanish early."""
-    from phonometry import filters, metrology, signal
+    from phonometry import filters, metrology, signals
 
     listed = dir(metrology)
     assert set(metrology.__all__) <= set(listed)
     assert set(filters.__all__) <= set(listed)
-    assert set(signal.__all__) <= set(listed)
+    assert set(signals.__all__) <= set(listed)
     assert listed == sorted(listed)
     # __all__ stays narrow, so `import *` gives the 4.0 API, not the aliases.
     assert "leq" not in metrology.__all__
@@ -484,7 +484,7 @@ def test_narrowed_namespace_falls_back_to_the_module_alias() -> None:
         assert metrology.spectra is sys.modules["phonometry.metrology.spectra"]
     # A name that is both a module and a public function resolves to the
     # function, as the pre-split package did.
-    with pytest.warns(DeprecationWarning, match="phonometry.signal.correlation"):
+    with pytest.warns(DeprecationWarning, match="phonometry.signals.correlation"):
         assert metrology.correlation is ph.correlation
 
 

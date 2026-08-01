@@ -1209,7 +1209,7 @@ from .room.steady_field import (
     steady_state_field,
     steady_state_spl,
 )
-from .signal.cepstrum import (
+from .signals.cepstrum import (
     CepstrumResult,
     EchoDetectionResult,
     LifterResult,
@@ -1217,7 +1217,7 @@ from .signal.cepstrum import (
     echo_detection,
     lifter,
 )
-from .signal.correlation import (
+from .signals.correlation import (
     AlignedImpulseResponseResult,
     CorrelationResult,
     TimeDelayResult,
@@ -1227,29 +1227,29 @@ from .signal.correlation import (
     impulse_response_delay,
     time_delay,
 )
-from .signal.envelope import (
+from .signals.envelope import (
     EnvelopeResult,
     EnvelopeSpectrumResult,
     envelope,
     envelope_spectrum,
 )
-from .signal.inversion import (
+from .signals.inversion import (
     InverseFilterResult,
     regularized_inverse_filter,
 )
-from .signal.levels import laeq, lc_peak, leq, lex_8h, ln_levels, sel, sound_exposure
-from .signal.miso import (
+from .signals.levels import laeq, lc_peak, leq, lex_8h, ln_levels, sel, sound_exposure
+from .signals.miso import (
     MISOCoherenceResult,
     miso_coherence,
 )
-from .signal.phase import (
+from .signals.phase import (
     PhaseDecompositionResult,
     excess_phase,
     group_delay,
     minimum_phase,
     phase_decomposition,
 )
-from .signal.spectra import (
+from .signals.spectra import (
     CoherentOutputSpectrumResult,
     CrossSpectralDensityResult,
     MultitaperSpectralDensityResult,
@@ -1263,12 +1263,12 @@ from .signal.spectra import (
     resolution_bias_error,
     window_metrics,
 )
-from .signal.synchronous_average import (
+from .signals.synchronous_average import (
     SynchronousAverageResult,
     comb_filter_response,
     time_synchronous_average,
 )
-from .signal.test_signals import (
+from .signals.test_signals import (
     ResampledSignalResult,
     ToneBurstResult,
     fractional_delay,
@@ -1276,7 +1276,7 @@ from .signal.test_signals import (
     resample_signal,
     tone_burst,
 )
-from .signal.time_frequency import (
+from .signals.time_frequency import (
     SpectrogramResult,
     ZoomFFTResult,
     spectrogram,

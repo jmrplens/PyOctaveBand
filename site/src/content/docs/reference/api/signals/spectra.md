@@ -1,5 +1,5 @@
 ---
-title: "signal.spectra"
+title: "signals.spectra"
 description: "Calibrated spectral-density estimation with statistical error analysis."
 sidebar:
   label: "spectra"
@@ -33,7 +33,7 @@ Procedures* (4th ed., 2010):
   $B_r$
   becomes $\varepsilon_b \approx -(B_e/B_r)^2/3$ (Eq. 8.141) -
   exposed here as
-  [`resolution_bias_error`](/phonometry/reference/api/signal/spectra/#resolution_bias_error);
+  [`resolution_bias_error`](/phonometry/reference/api/signals/spectra/#resolution_bias_error);
 * the **coherent output spectrum**
   $G_{vv} = \gamma^2_{xy} G_{yy}$ and the noise output
   spectrum $G_{nn} = (1 - \gamma^2_{xy}) G_{yy}$ of the
@@ -55,14 +55,14 @@ Section 8.5.3, recommend for resonant-response spectra), applicable to
 power spectra, magnitude responses and dB curves. A flat spectrum is left
 exactly unchanged.
 
-[`window_metrics`](/phonometry/reference/api/signal/spectra/#window_metrics) characterizes any taper the `window` parameter
+[`window_metrics`](/phonometry/reference/api/signals/spectra/#window_metrics) characterizes any taper the `window` parameter
 accepts with the figures of merit of Harris (1978, *On the use of windows
 for harmonic analysis with the discrete Fourier transform*): equivalent
 noise bandwidth, coherent gain, scalloping loss, worst-case processing
 loss, highest sidelobe level and the -3 dB main-lobe width - the numbers
 that turn "which window should I use?" into a trade-off one can read.
 
-[`multitaper_psd`](/phonometry/reference/api/signal/spectra/#multitaper_psd) adds Thomson's multitaper estimator (Thomson 1982;
+[`multitaper_psd`](/phonometry/reference/api/signals/spectra/#multitaper_psd) adds Thomson's multitaper estimator (Thomson 1982;
 Percival & Walden, *Spectral Analysis for Physical Applications*, 1993,
 Chapter 7) as the whole-record alternative to Welch segment averaging:
 `K` orthogonal discrete prolate spheroidal (Slepian) tapers of
@@ -116,7 +116,7 @@ the implementation.
 | `overlap` | Segment overlap fraction in [0, 1) (default 0.5). |
 | `scaling` | `'density'` or `'spectrum'`. |
 
-**Returns:** A [`CoherentOutputSpectrumResult`](/phonometry/reference/api/signal/spectra/#coherentoutputspectrumresult).
+**Returns:** A [`CoherentOutputSpectrumResult`](/phonometry/reference/api/signals/spectra/#coherentoutputspectrumresult).
 
 **Raises**
 
@@ -236,7 +236,7 @@ with the measured coherence in place of the unknown true value.
 | `overlap` | Segment overlap fraction in [0, 1) (default 0.5). |
 | `scaling` | `'density'` or `'spectrum'`. |
 
-**Returns:** A [`CrossSpectralDensityResult`](/phonometry/reference/api/signal/spectra/#crossspectraldensityresult).
+**Returns:** A [`CrossSpectralDensityResult`](/phonometry/reference/api/signals/spectra/#crossspectraldensityresult).
 
 **Raises**
 
@@ -383,7 +383,7 @@ average has about $2K$ chi-square degrees of freedom and
 $1/K$ of
 the periodogram's variance *without* segmenting the record: the
 estimator of choice for short records, where Welch's method
-([`power_spectral_density`](/phonometry/reference/api/signal/spectra/#power_spectral_density)) would leave too few segments.
+([`power_spectral_density`](/phonometry/reference/api/signals/spectra/#power_spectral_density)) would leave too few segments.
 
 With `adaptive=True` (default) the eigenspectra are combined with
 Thomson's frequency-dependent weights (P&W Eqs. 368a/370a, iterated to
@@ -420,7 +420,7 @@ the resolution bandwidth $2W$).
 | `scaling` | `'density'` (units²/Hz) or `'spectrum'` (units², sinusoid-peak reading). |
 | `confidence` | Confidence level for the chi-square interval. |
 
-**Returns:** A [`MultitaperSpectralDensityResult`](/phonometry/reference/api/signal/spectra/#multitaperspectraldensityresult).
+**Returns:** A [`MultitaperSpectralDensityResult`](/phonometry/reference/api/signals/spectra/#multitaperspectraldensityresult).
 
 **Raises**
 
@@ -456,7 +456,7 @@ the `K` eigenspectra are nearly uncorrelated, so their weighted
 average trades the two chi-square degrees of freedom of a periodogram
 for about $2K$ - without segmenting the record as Welch's
 method does. The chi-square machinery mirrors
-[`SpectralDensityResult`](/phonometry/reference/api/signal/spectra/#spectraldensityresult), but here the degrees of freedom are
+[`SpectralDensityResult`](/phonometry/reference/api/signals/spectra/#spectraldensityresult), but here the degrees of freedom are
 per-frequency: Thomson's adaptive weights (P&W Eq. 368a) downweight
 leakage-prone tapers wherever the spectrum is locally weak, which
 costs degrees of freedom there (P&W Eq. 370b).
@@ -525,7 +525,7 @@ $\varepsilon = 1/\sqrt{n_d}$ (Eq. 8.158) and the chi-square
 confidence interval with
 $2 n_d$ degrees of freedom (Eq. 8.163). For the first-order
 resolution-bias error at a resonance peak see
-[`resolution_bias_error`](/phonometry/reference/api/signal/spectra/#resolution_bias_error).
+[`resolution_bias_error`](/phonometry/reference/api/signals/spectra/#resolution_bias_error).
 
 **Parameters**
 
@@ -534,12 +534,12 @@ resolution-bias error at a resonance peak see
 | `x` | Signal, 1-D. |
 | `fs` | Sample rate, in Hz. |
 | `window` | Segment taper (any scipy window name; default Hann, the B&P Section 11.5.2 recommendation for side-lobe suppression). |
-| `nperseg` | Welch segment length; `None` picks a length giving a bin spacing of at most 4 Hz (the resolution bandwidth $B_e$ further depends on the taper; see [`SpectralDensityResult.resolution_bandwidth`](/phonometry/reference/api/signal/spectra/#spectraldensityresult)). |
+| `nperseg` | Welch segment length; `None` picks a length giving a bin spacing of at most 4 Hz (the resolution bandwidth $B_e$ further depends on the taper; see [`SpectralDensityResult.resolution_bandwidth`](/phonometry/reference/api/signals/spectra/#spectraldensityresult)). |
 | `overlap` | Segment overlap fraction in [0, 1) (default 0.5, which with a Hann taper retrieves most of the stability lost to tapering, B&P Section 11.5.2.2). |
 | `scaling` | `'density'` (units²/Hz) or `'spectrum'` (units² per segment bandwidth). |
 | `confidence` | Confidence level for the chi-square interval. |
 
-**Returns:** A [`SpectralDensityResult`](/phonometry/reference/api/signal/spectra/#spectraldensityresult).
+**Returns:** A [`SpectralDensityResult`](/phonometry/reference/api/signals/spectra/#spectraldensityresult).
 
 **Raises**
 
@@ -569,7 +569,7 @@ approximation assumes $B_e < B_r$.
 
 | Name | Description |
 | :--- | :--- |
-| `resolution_bandwidth` | Analysis resolution bandwidth $B_e$, Hz ([`SpectralDensityResult.resolution_bandwidth`](/phonometry/reference/api/signal/spectra/#spectraldensityresult)). |
+| `resolution_bandwidth` | Analysis resolution bandwidth $B_e$, Hz ([`SpectralDensityResult.resolution_bandwidth`](/phonometry/reference/api/signals/spectra/#spectraldensityresult)). |
 | `half_power_bandwidth` | Half-power (-3 dB) bandwidth $B_r$ of the spectral peak, in Hz. |
 
 **Returns:** Normalized bias error (dimensionless, negative at a peak).
@@ -668,7 +668,7 @@ the Welch estimators apply it.
 | `window` | Window name or `(name, param)` tuple, anything `scipy.signal.get_window` accepts (e.g. `'hann'`, `('kaiser', 8.6)`, `('tukey', 0.5)`). |
 | `n` | Window length, in samples (at least 16). |
 
-**Returns:** A [`WindowMetricsResult`](/phonometry/reference/api/signal/spectra/#windowmetricsresult).
+**Returns:** A [`WindowMetricsResult`](/phonometry/reference/api/signals/spectra/#windowmetricsresult).
 
 **Raises**
 

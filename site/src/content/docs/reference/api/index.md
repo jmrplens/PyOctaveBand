@@ -37,17 +37,17 @@ La referencia de la API se genera a partir de los docstrings del código (en ing
 
 | Module | Summary |
 | :--- | :--- |
-| [`signal.levels`](/phonometry/reference/api/signal/levels/) | Integrated and statistical sound levels (Leq, LAeq, LN percentiles). |
-| [`signal.spectra`](/phonometry/reference/api/signal/spectra/) | Calibrated spectral-density estimation with statistical error analysis. |
-| [`signal.miso`](/phonometry/reference/api/signal/miso/) | Multiple and partial coherence of a multiple-input/single-output system. |
-| [`signal.time_frequency`](/phonometry/reference/api/signal/time-frequency/) | Calibrated time-frequency analysis: STFT spectrogram and zoom FFT. |
-| [`signal.test_signals`](/phonometry/reference/api/signal/test-signals/) | Test signals and sample-rate utilities. |
-| [`signal.phase`](/phonometry/reference/api/signal/phase/) | Phase utilities: minimum phase, group delay and excess phase. |
-| [`signal.cepstrum`](/phonometry/reference/api/signal/cepstrum/) | Cepstral analysis: real/power/complex cepstrum, liftering and echo detection. |
-| [`signal.synchronous_average`](/phonometry/reference/api/signal/synchronous-average/) | Time synchronous averaging (TSA) of a periodic waveform in noise. |
-| [`signal.inversion`](/phonometry/reference/api/signal/inversion/) | Regularized spectral inversion with frequency-dependent regularization. |
-| [`signal.correlation`](/phonometry/reference/api/signal/correlation/) | Correlation analysis and time-delay estimation. |
-| [`signal.envelope`](/phonometry/reference/api/signal/envelope/) | Envelope and instantaneous phase via the Hilbert transform. |
+| [`signals.levels`](/phonometry/reference/api/signals/levels/) | Integrated and statistical sound levels (Leq, LAeq, LN percentiles). |
+| [`signals.spectra`](/phonometry/reference/api/signals/spectra/) | Calibrated spectral-density estimation with statistical error analysis. |
+| [`signals.miso`](/phonometry/reference/api/signals/miso/) | Multiple and partial coherence of a multiple-input/single-output system. |
+| [`signals.time_frequency`](/phonometry/reference/api/signals/time-frequency/) | Calibrated time-frequency analysis: STFT spectrogram and zoom FFT. |
+| [`signals.test_signals`](/phonometry/reference/api/signals/test-signals/) | Test signals and sample-rate utilities. |
+| [`signals.phase`](/phonometry/reference/api/signals/phase/) | Phase utilities: minimum phase, group delay and excess phase. |
+| [`signals.cepstrum`](/phonometry/reference/api/signals/cepstrum/) | Cepstral analysis: real/power/complex cepstrum, liftering and echo detection. |
+| [`signals.synchronous_average`](/phonometry/reference/api/signals/synchronous-average/) | Time synchronous averaging (TSA) of a periodic waveform in noise. |
+| [`signals.inversion`](/phonometry/reference/api/signals/inversion/) | Regularized spectral inversion with frequency-dependent regularization. |
+| [`signals.correlation`](/phonometry/reference/api/signals/correlation/) | Correlation analysis and time-delay estimation. |
+| [`signals.envelope`](/phonometry/reference/api/signals/envelope/) | Envelope and instantaneous phase via the Hilbert transform. |
 
 ## Calibration and uncertainty
 

@@ -4,7 +4,7 @@
 Narrowed in 4.0 to the transverse metrology: calibration, GUM uncertainty,
 data qualification and the IEC 61043 intensity-instrument class check. The
 filter banks and weightings moved to :mod:`phonometry.filters` and the general
-signal analysis to :mod:`phonometry.signal`; reading either from here still
+signal analysis to :mod:`phonometry.signals`; reading either from here still
 works until 5.0.
 """
 
@@ -44,7 +44,7 @@ from .uncertainty import (
 )
 
 #: Names that left this namespace in 4.0 keep resolving from here until 5.0.
-_MOVED_TO = ("phonometry.filters", "phonometry.signal")
+_MOVED_TO = ("phonometry.filters", "phonometry.signals")
 __getattr__ = _namespace_shim(__name__, _MOVED_TO)
 
 __all__ = [

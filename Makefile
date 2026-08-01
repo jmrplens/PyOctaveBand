@@ -111,6 +111,16 @@ llms:
 pypi-readme:
 	$(PYTHON) scripts/generate_pypi_readme.py
 
+# Run every Python snippet the guides print, hold the two languages to the
+# same API and reject a block that shadows a name it imported (see the
+# doc-snippets job in python-app.yml). `make snippets-static` skips the
+# execution pass, which is the slow half.
+snippets:
+	$(PYTHON) scripts/check_doc_snippets.py
+
+snippets-static:
+	$(PYTHON) scripts/check_doc_snippets.py --static
+
 # Regenerate the committed Starlight API reference (site/src/content/docs/
 # reference/api + site/src/generated/api-sidebar.mjs) from the source
 # docstrings. CI fails if this drifts (see the api-docs job in python-app.yml).
@@ -200,4 +210,5 @@ check: lint security test
 
 .PHONY: install lint format security snyk sonar graphs figure-contrast figures reports \
 	animations posters brand lighthouse \
-	llms pypi-readme api-docs site-reports conformance install-hooks test coverage check
+	llms pypi-readme api-docs site-reports conformance install-hooks test coverage check \
+	snippets snippets-static

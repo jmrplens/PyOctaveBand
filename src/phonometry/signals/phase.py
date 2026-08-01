@@ -138,7 +138,7 @@ def minimum_phase(
     Sec. 13.1.4) via the real cepstrum: the inverse transform of
     :math:`\ln \lvert H \rvert` is folded onto positive
     quefrencies (doubling them, keeping the ends; the folding core is
-    shared with :mod:`phonometry.signal.cepstrum`) and transformed
+    shared with :mod:`phonometry.signals.cepstrum`) and transformed
     back, so ``exp`` of the result is the unique stable, causal, causally
     invertible response with that magnitude. The input phase, if any, is
     ignored: passing a plain magnitude array works.
@@ -281,7 +281,7 @@ class PhaseDecompositionResult:
         :param language: Label language, ``"en"`` (default) or ``"es"``.
         """
         from .._i18n import check_language
-        from .._plot.signal import plot_phase_decomposition
+        from .._plot.signals import plot_phase_decomposition
 
         check_language(language)
         return plot_phase_decomposition(self, ax=ax, language=language, **kwargs)

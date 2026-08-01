@@ -1,5 +1,5 @@
 ---
-title: "signal.envelope"
+title: "signals.envelope"
 description: "Envelope and instantaneous phase via the Hilbert transform."
 sidebar:
   label: "envelope"
@@ -38,7 +38,7 @@ decimator for general records, or plain subsampling (`antialias=False`)
 matching the ECMA-internal convention when the input is already
 narrowband.
 
-The **envelope spectrum** ([`envelope_spectrum`](/phonometry/reference/api/signal/envelope/#envelope_spectrum)) transforms the
+The **envelope spectrum** ([`envelope_spectrum`](/phonometry/reference/api/signals/envelope/#envelope_spectrum)) transforms the
 detected envelope itself: Section 13.3 of the book runs a band-pass
 filter and a square-law envelope detector into a DC remover before
 correlating (Figure 13.11), because the spectral content of the envelope
@@ -94,7 +94,7 @@ same time axis.
 | `decimation_factor` | Integer output decimation (default 1: off). |
 | `antialias` | Anti-alias filter the decimated envelope (default `True`). |
 
-**Returns:** An [`EnvelopeResult`](/phonometry/reference/api/signal/envelope/#enveloperesult).
+**Returns:** An [`EnvelopeResult`](/phonometry/reference/api/signals/envelope/#enveloperesult).
 
 **Raises**
 
@@ -127,7 +127,7 @@ Hilbert envelope $A(t) = \lvert z(t) \rvert$
 square-law detector
 $A^2(t) = x^2 + \tilde{x}^2$ (`kind="squared"`); its mean is
 removed
-(kept in [`EnvelopeSpectrumResult.mean_level`](/phonometry/reference/api/signal/envelope/#envelopespectrumresult)) and the remainder
+(kept in [`EnvelopeSpectrumResult.mean_level`](/phonometry/reference/api/signals/envelope/#envelopespectrumresult)) and the remainder
 is tapered and transformed once, scaled by the taper's coherent gain
 so a sinusoidal modulation whose frequency falls on an analysis bin
 reads out as a line at its exact amplitude. An off-bin modulation
@@ -166,7 +166,7 @@ untouched) before the detector, the Figure 13.11 front end.
 | `remove_dc` | Remove the envelope mean before the transform (default `True`, the Figure 13.11 DC remover); the mean is reported either way. |
 | `band` | Optional `(low, high)` band-pass edges, in Hz ($0 < \text{low} < \text{high} < f_s/2$), applied to the record before envelope detection as a zero-phase 4th-order Butterworth (`scipy.signal.sosfiltfilt`, giving an 8th-order magnitude roll-off). Default `None`: detect on the record as given. |
 
-**Returns:** An [`EnvelopeSpectrumResult`](/phonometry/reference/api/signal/envelope/#envelopespectrumresult).
+**Returns:** An [`EnvelopeSpectrumResult`](/phonometry/reference/api/signals/envelope/#envelopespectrumresult).
 
 **Raises**
 
@@ -253,10 +253,10 @@ Amplitude spectrum of a signal's envelope (B&P Section 13.3).
 | Name | Description |
 | :--- | :--- |
 | `frequencies` | Frequency axis of the spectrum, in Hz. |
-| `amplitude` | One-sided amplitude spectrum of the (mean-removed) envelope: the height of a discrete modulation line in the units of the envelope itself, exact when the modulation frequency falls on an analysis bin (off-bin lines read low by the taper's scalloping loss; see [`envelope_spectrum`](/phonometry/reference/api/signal/envelope/#envelope_spectrum)). The zero-frequency bin is not doubled. |
+| `amplitude` | One-sided amplitude spectrum of the (mean-removed) envelope: the height of a discrete modulation line in the units of the envelope itself, exact when the modulation frequency falls on an analysis bin (off-bin lines read low by the taper's scalloping loss; see [`envelope_spectrum`](/phonometry/reference/api/signals/envelope/#envelope_spectrum)). The zero-frequency bin is not doubled. |
 | `mean_level` | Mean of the detected envelope (the DC the remover of Figure 13.11 takes out): the carrier amplitude for `kind="magnitude"`, its mean square for `kind="squared"`. |
 | `kind` | `"magnitude"` (Hilbert envelope $A(t)$) or `"squared"` (the book's square-law detector, $A^2(t)$). |
-| `times` | Time axis of [`envelope`](/phonometry/reference/api/signal/envelope/#envelope), in seconds. |
+| `times` | Time axis of [`envelope`](/phonometry/reference/api/signals/envelope/#envelope), in seconds. |
 | `envelope` | The detector output that was transformed, at full rate (before mean removal and tapering). |
 | `window` | Taper name applied before the transform. |
 | `remove_dc` | Whether the envelope mean was removed first. |

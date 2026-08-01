@@ -30,7 +30,7 @@ import numpy as np
 import pytest
 
 import phonometry as ph
-from phonometry.signal.synchronous_average import comb_filter_response
+from phonometry.signals.synchronous_average import comb_filter_response
 
 FS = 8192.0
 #: One revolution spanning exactly 256 samples (32 revolutions per second).

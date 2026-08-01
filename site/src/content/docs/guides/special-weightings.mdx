@@ -194,7 +194,7 @@ republished in NASA CR-3406.
 
 ```python
 import numpy as np
-from phonometry import filters, signal
+from phonometry import filters, signals
 
 # A 3.15 kHz whine sits right on the D-weighting hump: D rates it
 # 10 dB *louder* than A does.
@@ -202,8 +202,8 @@ fs = 96000
 t = np.arange(fs) / fs
 whine = 0.1 * np.sin(2 * np.pi * 3150 * t)
 
-ld = signal.leq(filters.weighting_filter(whine, fs, curve="D"))
-la = signal.leq(filters.weighting_filter(whine, fs, curve="A"))
+ld = signals.leq(filters.weighting_filter(whine, fs, curve="D"))
+la = signals.leq(filters.weighting_filter(whine, fs, curve="A"))
 print(f"LD = {ld:.1f} dB   LA = {la:.1f} dB")
 # LD = 82.5 dB   LA = 72.2 dB
 ```
@@ -220,7 +220,7 @@ high-frequency roll-off and overstate the *audible* exposure:
 
 ```python
 import numpy as np
-from phonometry import filters, signal
+from phonometry import filters, signals
 
 # 1 kHz tone (audible) buried under a strong 25 kHz ultrasonic component.
 fs = 96000
@@ -228,9 +228,9 @@ t = np.arange(fs) / fs
 audible = 0.1 * np.sin(2 * np.pi * 1000 * t)
 x = audible + 1.0 * np.sin(2 * np.pi * 25000 * t)
 
-la = signal.leq(filters.weighting_filter(x, fs, curve="A"))
-lau = signal.leq(filters.weighting_filter(x, fs, curve="AU"))
-la_ref = signal.leq(filters.weighting_filter(audible, fs, curve="A"))
+la = signals.leq(filters.weighting_filter(x, fs, curve="A"))
+lau = signals.leq(filters.weighting_filter(x, fs, curve="AU"))
+la_ref = signals.leq(filters.weighting_filter(audible, fs, curve="A"))
 print(f"LA = {la:.1f} dB   LAU = {lau:.1f} dB   audible alone = {la_ref:.1f} dB")
 # LA = 78.6 dB   LAU = 71.0 dB   audible alone = 71.0 dB
 # The ultrasound inflates LA by 7.6 dB; AU recovers the audible level.

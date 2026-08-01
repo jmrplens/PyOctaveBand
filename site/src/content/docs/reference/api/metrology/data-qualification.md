@@ -111,7 +111,7 @@ miss crossings between samples.
 | `x` | Signal, 1-D. |
 | `fs` | Sample rate, in Hz. |
 | `levels` | Crossing levels in signal units about the mean (default: 13 levels evenly spaced over +-3 RMS). |
-| `nperseg` | Welch segment length for the spectral moments (default: the [`power_spectral_density`](/phonometry/reference/api/signal/spectra/#power_spectral_density) default). |
+| `nperseg` | Welch segment length for the spectral moments (default: the [`power_spectral_density`](/phonometry/reference/api/signals/spectra/#power_spectral_density) default). |
 
 **Returns:** A [`LevelCrossingResult`](/phonometry/reference/api/metrology/data-qualification/#levelcrossingresult).
 
@@ -214,7 +214,7 @@ record to the physically meaningful band first.
 | :--- | :--- |
 | `x` | Signal, 1-D. |
 | `fs` | Sample rate, in Hz. |
-| `nperseg` | Welch segment length for the spectral moments (default: the [`power_spectral_density`](/phonometry/reference/api/signal/spectra/#power_spectral_density) default). |
+| `nperseg` | Welch segment length for the spectral moments (default: the [`power_spectral_density`](/phonometry/reference/api/signals/spectra/#power_spectral_density) default). |
 
 **Returns:** A [`PeakStatisticsResult`](/phonometry/reference/api/metrology/data-qualification/#peakstatisticsresult).
 

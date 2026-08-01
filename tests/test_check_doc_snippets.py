@@ -1,0 +1,111 @@
+#  Copyright (c) 2026. Jose Manuel Requena Plens
+"""The documentation-snippet gate must fail on the defects it exists for.
+
+A gate that only ever passes proves nothing, so each check is fed the defect
+it was written for and asserted to report it, and then fed the correct page
+and asserted to stay quiet. The shadowing case is the one that motivated the
+script: ``from scipy import signal`` next to ``from phonometry import
+signals`` is fine, but rebinding an imported name is not, and Python says
+nothing either way.
+"""
+
+from __future__ import annotations
+
+import importlib.util
+import pathlib
+import sys
+
+import pytest
+
+_SCRIPT = (
+    pathlib.Path(__file__).resolve().parent.parent / "scripts" / "check_doc_snippets.py"
+)
+_spec = importlib.util.spec_from_file_location("check_doc_snippets", _SCRIPT)
+assert _spec is not None and _spec.loader is not None
+check_doc_snippets = importlib.util.module_from_spec(_spec)
+sys.modules["check_doc_snippets"] = check_doc_snippets
+_spec.loader.exec_module(check_doc_snippets)
+
+
+def _page(tmp_path: pathlib.Path, *blocks: str, name: str = "page.md") -> pathlib.Path:
+    body = "\n".join(f"```python\n{b.strip()}\n```\n" for b in blocks)
+    path = tmp_path / name
+    path.write_text("Prose.\n\n" + body, encoding="utf-8")
+    return path
+
+
+def test_rebinding_an_imported_name_is_reported(tmp_path: pathlib.Path) -> None:
+    page = _page(tmp_path, """
+from phonometry import signals
+
+signals = [1.0, 2.0]
+""")
+    (failure,) = check_doc_snippets.check_shadowing([page])
+    assert "'signals = ...' rebinds" in failure
+
+
+def test_second_import_of_the_same_name_is_reported(tmp_path: pathlib.Path) -> None:
+    page = _page(tmp_path, """
+from phonometry import signals
+from scipy import signals
+""")
+    (failure,) = check_doc_snippets.check_shadowing([page])
+    assert "rebinds the name imported from phonometry" in failure
+
+
+def test_the_rebinding_is_caught_across_blocks(tmp_path: pathlib.Path) -> None:
+    """A page is read top to bottom; the import of block 0 is still in scope."""
+    page = _page(
+        tmp_path,
+        "from phonometry import signals\n\nx = signals.leq([1.0], 48000)",
+        "signals = [1.0, 2.0]\nprint(signals)",
+    )
+    (failure,) = check_doc_snippets.check_shadowing([page])
+    assert "block 1" in failure
+
+
+def test_a_different_name_next_to_scipy_is_fine(tmp_path: pathlib.Path) -> None:
+    """The permitted arrangement: distinct names, so neither is shadowed."""
+    page = _page(tmp_path, """
+from scipy import signal
+from phonometry import signals
+
+b, a = signal.butter(2, 0.2)
+level = signals.leq([1.0], 48000)
+""")
+    assert check_doc_snippets.check_shadowing([page]) == []
+
+
+def test_a_translation_that_drops_an_import_is_reported(tmp_path: pathlib.Path) -> None:
+    en = _page(tmp_path, "from phonometry import leq, sel", name="en.md")
+    es = _page(tmp_path, "from phonometry import leq", name="es.md")
+    (failure,) = check_doc_snippets.check_translations([(en, es)])
+    assert "missing phonometry.sel" in failure
+
+
+def test_a_translation_that_only_changes_its_strings_is_fine(
+    tmp_path: pathlib.Path,
+) -> None:
+    en = _page(tmp_path, 'from phonometry import leq\nprint("Level")', name="en.md")
+    es = _page(
+        tmp_path,
+        'from phonometry import leq\nprint("Nivel")  # traducido',
+        name="es.md",
+    )
+    assert check_doc_snippets.check_translations([(en, es)]) == []
+
+
+def test_a_page_that_does_not_run_is_reported(tmp_path: pathlib.Path) -> None:
+    page = _page(tmp_path, "raise SystemExit('boom')")
+    (failure,) = check_doc_snippets.check_execution([page])
+    assert "boom" in failure
+
+
+def test_a_stale_skip_entry_is_reported(
+    tmp_path: pathlib.Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """A page that starts running must leave the skip list."""
+    page = _page(tmp_path, "print('runs fine')", name="fine.md")
+    monkeypatch.setitem(check_doc_snippets._SKIP, "fine", "reason")
+    (failure,) = check_doc_snippets.check_execution([page])
+    assert "runs now" in failure

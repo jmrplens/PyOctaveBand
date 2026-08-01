@@ -7,7 +7,7 @@ coherence of each source with the output is misleading: a source that only
 Bendat & Piersol, *Random Data: Analysis and Measurement Procedures*
 (4th ed., 2010, Chapter 7), resolve this with the multiple-input/output
 (MISO) coherence functions, computed here from the Welch cross-spectral
-machinery of :mod:`phonometry.signal.spectra`:
+machinery of :mod:`phonometry.signals.spectra`:
 
 * the **ordinary coherence**
   :math:`\gamma^2_{iy} = \lvert G_{iy} \rvert^2 / (G_{ii} G_{yy})`
@@ -419,7 +419,7 @@ class MISOCoherenceResult:
         :param language: Label language, ``"en"`` (default) or ``"es"``.
         """
         from .._i18n import check_language
-        from .._plot.signal import plot_miso_coherence
+        from .._plot.signals import plot_miso_coherence
 
         check_language(language)
         return plot_miso_coherence(self, ax=ax, language=language, **kwargs)
@@ -440,7 +440,7 @@ def miso_coherence(
 
     Estimates every auto- and cross-spectrum of the ``q`` inputs and the
     output by the shared Welch core of
-    :func:`~phonometry.signal.spectra.cross_spectral_density` (Hann taper
+    :func:`~phonometry.signals.spectra.cross_spectral_density` (Hann taper
     and 50 % overlap by default, no detrending), then:
 
     * reports the **ordinary coherence** of each input with the output

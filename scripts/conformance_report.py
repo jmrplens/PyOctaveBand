@@ -5730,7 +5730,7 @@ def _miso_problem_7_2() -> tuple[float, float, float]:
     Returns ``(Gv1, Gv2, gamma2_2y.1)`` computed by the module's
     Gaussian-elimination conditioning on the hand-set augmented matrix.
     """
-    from phonometry.signal.miso import _condition
+    from phonometry.signals.miso import _condition
 
     mat = np.zeros((1, 3, 3), dtype=np.complex128)
     mat[0, 0, 0] = 3.0

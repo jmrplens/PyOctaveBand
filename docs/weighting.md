@@ -115,7 +115,7 @@ $L_{Ceq} - L_{Aeq}$ is a one-number indicator of low-frequency content:
 
 ```python
 import numpy as np
-from phonometry import filters, signal
+from phonometry import filters, signals
 
 # A 50 Hz rumble under a light broadband hiss: quiet in A, loud in C.
 fs = 48000
@@ -123,8 +123,8 @@ t = np.arange(10 * fs) / fs
 rng = np.random.default_rng(1)
 x = 0.2 * np.sin(2 * np.pi * 50 * t) + 0.01 * rng.standard_normal(t.size)
 
-la = signal.leq(filters.weighting_filter(x, fs, curve="A"))
-lc = signal.leq(filters.weighting_filter(x, fs, curve="C"))
+la = signals.leq(filters.weighting_filter(x, fs, curve="A"))
+lc = signals.leq(filters.weighting_filter(x, fs, curve="C"))
 print(f"LAeq = {la:.1f} dB   LCeq = {lc:.1f} dB   C - A = {lc - la:.1f} dB")
 # LAeq = 52.4 dB   LCeq = 75.7 dB   C - A = 23.2 dB
 # C - A above 20 dB: the A-weighted number alone would hide the rumble.
@@ -174,8 +174,8 @@ fs = 48000
 recording = 0.2 * np.sin(2 * np.pi * 1000 * np.arange(fs) / fs)
 
 wf = filters.WeightingFilter(fs, "A")
-signals = [recording]                # your batch of recordings
-for recording in signals:
+batch = [recording]                  # your batch of recordings
+for recording in batch:
     weighted = wf.filter(recording)
 ```
 

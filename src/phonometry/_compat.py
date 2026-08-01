@@ -9,7 +9,7 @@ Two generations of aliases live here, each with its own removal date:
   modules wherever they land, so a 3.x path always resolves in one hop.
 * :data:`_MOVED_4X` covers the 4.0 taxonomy, which splits the oversized
   subpackages into domain ones (``phonometry.metrology`` into
-  ``phonometry.filters``, ``phonometry.signal`` and a narrowed
+  ``phonometry.filters``, ``phonometry.signals`` and a narrowed
   ``phonometry.metrology``). Removed in 5.0.
 
 Every public module path that moved stays importable through the shims
@@ -47,7 +47,7 @@ _MOVED_3X: dict[str, str] = {
     "phonometry.core": "phonometry.filters.core",
     "phonometry.filter_design": "phonometry.filters.design",
     "phonometry.frequencies": "phonometry.filters.frequencies",
-    "phonometry.levels": "phonometry.signal.levels",
+    "phonometry.levels": "phonometry.signals.levels",
     "phonometry.parametric_filters": "phonometry.filters.weighting",
     "phonometry.uncertainty": "phonometry.metrology.uncertainty",
     "phonometry.fluctuation_strength": "phonometry.psychoacoustics.fluctuation_strength",
@@ -144,18 +144,18 @@ _MOVED_4X: dict[str, str] = {
     "phonometry.metrology.parametric_filters": "phonometry.filters.weighting",
     "phonometry.metrology.equalizer": "phonometry.filters.equalizer",
     "phonometry.metrology.compliance": "phonometry.filters.compliance",
-    "phonometry.metrology.levels": "phonometry.signal.levels",
-    "phonometry.metrology.spectra": "phonometry.signal.spectra",
-    "phonometry.metrology.time_frequency": "phonometry.signal.time_frequency",
-    "phonometry.metrology.cepstrum": "phonometry.signal.cepstrum",
-    "phonometry.metrology.correlation": "phonometry.signal.correlation",
-    "phonometry.metrology.envelope": "phonometry.signal.envelope",
-    "phonometry.metrology.phase": "phonometry.signal.phase",
-    "phonometry.metrology.miso": "phonometry.signal.miso",
-    "phonometry.metrology.inversion": "phonometry.signal.inversion",
+    "phonometry.metrology.levels": "phonometry.signals.levels",
+    "phonometry.metrology.spectra": "phonometry.signals.spectra",
+    "phonometry.metrology.time_frequency": "phonometry.signals.time_frequency",
+    "phonometry.metrology.cepstrum": "phonometry.signals.cepstrum",
+    "phonometry.metrology.correlation": "phonometry.signals.correlation",
+    "phonometry.metrology.envelope": "phonometry.signals.envelope",
+    "phonometry.metrology.phase": "phonometry.signals.phase",
+    "phonometry.metrology.miso": "phonometry.signals.miso",
+    "phonometry.metrology.inversion": "phonometry.signals.inversion",
     "phonometry.metrology.synchronous_average":
-        "phonometry.signal.synchronous_average",
-    "phonometry.metrology.signals": "phonometry.signal.test_signals",
+        "phonometry.signals.synchronous_average",
+    "phonometry.metrology.signals": "phonometry.signals.test_signals",
     "phonometry.metrology.random_data":
         "phonometry.metrology.data_qualification",
 }
@@ -211,7 +211,7 @@ def _namespace_shim(
     the names moved to, which keeps the shim honest: a name that stops being
     public anywhere stops resolving here too. A name that was both a module
     and a function resolves to the function, as the pre-split package did:
-    ``metrology.cepstrum`` is :func:`phonometry.signal.cepstrum`.
+    ``metrology.cepstrum`` is :func:`phonometry.signals.cepstrum`.
 
     Only then does a name fall back to the module alias of the same name,
     which is what serves the modules with no public name of their own

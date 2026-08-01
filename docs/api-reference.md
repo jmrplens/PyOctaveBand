@@ -25,7 +25,7 @@ contour = aircraft.noise_contour(path, powers, distances, sel, lmax, x=gx, y=gy)
 | Subpackage | Scope |
 | :--- | :--- |
 | `phonometry.filters` | Octave and fractional-octave filter banks, frequency weightings and time weighting, parametric EQ, IEC 61260-1 and IEC 61672-1 class verification |
-| `phonometry.signal` | Levels (Leq, LAeq, percentiles), Welch and multitaper spectra, coherence, time-frequency, correlation, envelope, cepstrum, phase, synchronous averaging, test signals |
+| `phonometry.signals` | Levels (Leq, LAeq, percentiles), Welch and multitaper spectra, coherence, time-frequency, correlation, envelope, cepstrum, phase, synchronous averaging, test signals |
 | `phonometry.metrology` | Calibration, GUM uncertainty and Monte Carlo, data qualification (stationarity, trends, peak statistics), IEC 61043 intensity class |
 | `phonometry.psychoacoustics` | Loudness (Zwicker, ECMA, Moore-Glasberg), sharpness, tonality, roughness, fluctuation strength, annoyance, tonal audibility |
 | `phonometry.hearing` | Hearing threshold, NIHL, occupational exposure, SII, STI |
@@ -47,7 +47,7 @@ Every name in the table below is also re-exported at the top level, so
 paths are still importable and warn on use: the pre-3.2 flat ones (for example
 `phonometry.insulation`), removed in 4.0, and the pre-4.0 ones that the split
 of `metrology` moved (for example `phonometry.metrology.levels`, now
-`phonometry.signal.levels`), removed in 5.0. Reading a moved name from the
+`phonometry.signals.levels`), removed in 5.0. Reading a moved name from the
 namespace it left (`metrology.leq`) warns and delegates as well.
 
 | Name | Type | Description (Inputs) | Usage Snippet (Outputs) |

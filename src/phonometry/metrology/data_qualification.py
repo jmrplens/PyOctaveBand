@@ -77,7 +77,7 @@ from typing import TYPE_CHECKING, Any
 import numpy as np
 from scipy import special
 
-from ..signal.spectra import _positive, _validate_signal, power_spectral_density
+from ..signals.spectra import _positive, _validate_signal, power_spectral_density
 
 if TYPE_CHECKING:
     from matplotlib.axes import Axes

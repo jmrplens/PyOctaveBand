@@ -59,7 +59,7 @@ a function of the excitation frequency with one sweep instead of a
 tone-by-tone stepping. This page covers that separation in
 `phonometry.electroacoustics`, with the phase-coherent **synchronized
 sweep** of Novak, Lotton & Simon (2015) as the default, and the companion
-**phase utilities** in `phonometry.signal`: minimum phase from $|H|$,
+**phase utilities** in `phonometry.signals`: minimum phase from $|H|$,
 group delay and excess phase.
 
 ## 1. One sweep, every harmonic
@@ -220,7 +220,7 @@ the THD is level-referenced exactly as driven.
 For a causal, stable, minimum-phase system the log-magnitude and phase of
 the frequency response are a Hilbert-transform pair (Bendat & Piersol,
 Sec. 13.1.4): the phase is fully determined by `|H(f)|`. The
-`phonometry.signal` utilities compute that reconstruction with the real
+`phonometry.signals` utilities compute that reconstruction with the real
 cepstrum and decompose any measured response into its invertible and
 all-pass parts:
 

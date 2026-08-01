@@ -5,7 +5,7 @@
 The [spectral estimators](spectral-analysis.md) describe *what
 frequencies* a signal contains; this page covers what hides in the *shape* of
 that spectrum. The **cepstrum** - the inverse Fourier transform of the log
-spectrum - lives in `phonometry.signal` and turns two hard spectral
+spectrum - lives in `phonometry.signals` and turns two hard spectral
 problems into easy peak-picking: periodic spectral ripple (an echo, a harmonic
 family) collapses onto a single spike at the **quefrency** of its period, and
 the smooth spectral envelope separates from the fine structure by plain

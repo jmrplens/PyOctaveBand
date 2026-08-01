@@ -66,21 +66,21 @@ _SECTION_LIST: tuple[Section, ...] = (
         ),
     ),
     Section(
-        key="signal",
+        key="signals",
         label_en="Signal analysis",
         label_es="Análisis de señal",
         modules=(
-            "phonometry.signal.levels",
-            "phonometry.signal.spectra",
-            "phonometry.signal.miso",
-            "phonometry.signal.time_frequency",
-            "phonometry.signal.test_signals",
-            "phonometry.signal.phase",
-            "phonometry.signal.cepstrum",
-            "phonometry.signal.synchronous_average",
-            "phonometry.signal.inversion",
-            "phonometry.signal.correlation",
-            "phonometry.signal.envelope",
+            "phonometry.signals.levels",
+            "phonometry.signals.spectra",
+            "phonometry.signals.miso",
+            "phonometry.signals.time_frequency",
+            "phonometry.signals.test_signals",
+            "phonometry.signals.phase",
+            "phonometry.signals.cepstrum",
+            "phonometry.signals.synchronous_average",
+            "phonometry.signals.inversion",
+            "phonometry.signals.correlation",
+            "phonometry.signals.envelope",
         ),
     ),
     Section(
@@ -332,7 +332,7 @@ SECTIONS: dict[str, Section] = {s.key: s for s in _SECTION_LIST}
 #: docstring above.
 _SECTION_SUBPACKAGES: dict[str, tuple[str, ...]] = {
     "filters": ("", "filters"),
-    "signal": ("signal",),
+    "signals": ("signals",),
     "psychoacoustics": ("psychoacoustics",),
     "speech": ("hearing",),
     "hearing": ("hearing",),
@@ -408,7 +408,7 @@ OBJECT_MODULE_OVERRIDES: dict[str, str] = {
 def module_section(module: str) -> Section:
     """Return the section that documents ``module`` (full dotted name).
 
-    :param module: Full module name, e.g. ``"phonometry.signal.levels"``.
+    :param module: Full module name, e.g. ``"phonometry.signals.levels"``.
     :raises KeyError: If the module is not mapped; new public modules must be
         added to a section in ``scripts/api_taxonomy.py``.
     """
@@ -422,7 +422,7 @@ def module_section(module: str) -> Section:
 
 
 def _parent_subpackage(module: str) -> str:
-    """``phonometry.signal.levels`` -> ``signal``; top level -> ``""``."""
+    """``phonometry.signals.levels`` -> ``signal``; top level -> ``""``."""
     parts = module.split(".")
     return parts[1] if len(parts) > 2 else ""
 

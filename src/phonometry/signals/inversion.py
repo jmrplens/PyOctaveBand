@@ -151,7 +151,7 @@ class InverseFilterResult:
         :param language: Label language, ``"en"`` (default) or ``"es"``.
         """
         from .._i18n import check_language
-        from .._plot.signal import plot_inverse_filter
+        from .._plot.signals import plot_inverse_filter
 
         check_language(language)
         return plot_inverse_filter(self, ax=ax, language=language, **kwargs)

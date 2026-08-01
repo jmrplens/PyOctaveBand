@@ -45,7 +45,7 @@ Measurement Procedures* (4th ed., 2010) and Knapp & Carter (1976):
   fractional shift in the frequency domain.
 
 The GCC estimators run on the same Welch core (segmentation, tapering,
-overlap policy) as :mod:`phonometry.signal.spectra`, so a GCC and a
+overlap policy) as :mod:`phonometry.signals.spectra`, so a GCC and a
 cross-spectral density computed with the same segment length are mutually
 consistent bin by bin.
 """
@@ -206,7 +206,7 @@ class CorrelationResult:
         :param language: Label language, ``"en"`` (default) or ``"es"``.
         """
         from .._i18n import check_language
-        from .._plot.signal import plot_correlation
+        from .._plot.signals import plot_correlation
 
         check_language(language)
         return plot_correlation(self, ax=ax, language=language, **kwargs)
@@ -496,7 +496,7 @@ class TimeDelayResult:
         :param language: Label language, ``"en"`` (default) or ``"es"``.
         """
         from .._i18n import check_language
-        from .._plot.signal import plot_time_delay
+        from .._plot.signals import plot_time_delay
 
         check_language(language)
         return plot_time_delay(self, ax=ax, language=language, **kwargs)
@@ -689,7 +689,7 @@ def time_delay(
       function (Eq. 5.21);
     * ``'gcc'`` - the peak of the generalized cross-correlation of
       Knapp & Carter (1976): the Welch-averaged cross-spectrum (shared
-      core with :func:`~phonometry.signal.spectra.cross_spectral_density`)
+      core with :func:`~phonometry.signals.spectra.cross_spectral_density`)
       is weighted by :math:`\psi(f)` before the inverse transform.
       Weightings (Table I): ``'none'`` (plain correlator), ``'roth'``
       (:math:`1/G_{xx}`,
@@ -888,7 +888,7 @@ class AlignedImpulseResponseResult:
         :param language: Label language, ``"en"`` (default) or ``"es"``.
         """
         from .._i18n import check_language
-        from .._plot.signal import plot_aligned_impulse_response
+        from .._plot.signals import plot_aligned_impulse_response
 
         check_language(language)
         return plot_aligned_impulse_response(self, ax=ax, language=language,

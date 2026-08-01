@@ -320,7 +320,7 @@ def _old_minimum_phase(
     oversampler, both untouched by the refactor) are used from the live
     module; the cepstral folding block is the literal pre-refactor code.
     """
-    from phonometry.signal.phase import (
+    from phonometry.signals.phase import (
         _MAGNITUDE_FLOOR,
         _trig_oversample,
         _validate_oversample,

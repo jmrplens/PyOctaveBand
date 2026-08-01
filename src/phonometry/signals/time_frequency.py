@@ -10,7 +10,7 @@ Fine-band time-frequency views of a record, following Bendat & Piersol,
   time-frequency plane (Eq. 12.173 defines the unweighted magnitude
   version; this module computes the power version with the exact
   ``'density'``/``'spectrum'`` calibration of
-  :func:`~phonometry.signal.spectra.power_spectral_density`, so a
+  :func:`~phonometry.signals.spectra.power_spectral_density`, so a
   signal in pascals reads directly in Pa²/Hz or Pa² and averaging the
   columns reproduces the Welch estimate bin by bin). Each cell trades the
   time resolution :math:`T_B = \text{nperseg}/f_s` against the frequency
@@ -98,7 +98,7 @@ class SpectrogramResult:
         (units²/Hz for ``'density'`` scaling, units² for ``'spectrum'``).
         Each column is the tapered periodogram of one segment, with the
         exact calibration of
-        :func:`~phonometry.signal.spectra.power_spectral_density`:
+        :func:`~phonometry.signals.spectra.power_spectral_density`:
         the column mean over time reproduces the Welch spectrum bin by
         bin. Integrating a ``'density'`` column over frequency gives that
         segment's taper-weighted mean square
@@ -153,7 +153,7 @@ class SpectrogramResult:
         :param language: Label language, ``"en"`` (default) or ``"es"``.
         """
         from .._i18n import check_language
-        from .._plot.signal import plot_spectrogram
+        from .._plot.signals import plot_spectrogram
 
         check_language(language)
         return plot_spectrogram(self, ax=ax, language=language, **kwargs)
@@ -172,7 +172,7 @@ def spectrogram(
 
     The record is split into tapered (Hann by default), overlapped
     segments - exactly the segmentation of
-    :func:`~phonometry.signal.spectra.power_spectral_density` - and
+    :func:`~phonometry.signals.spectra.power_spectral_density` - and
     each segment's one-sided periodogram becomes one column of the
     time-frequency display, without the averaging that the Welch
     estimate applies (averaging the columns reproduces it bin by bin).
@@ -294,7 +294,7 @@ class ZoomFFTResult:
         :param language: Label language, ``"en"`` (default) or ``"es"``.
         """
         from .._i18n import check_language
-        from .._plot.signal import plot_zoom_fft
+        from .._plot.signals import plot_zoom_fft
 
         check_language(language)
         return plot_zoom_fft(self, ax=ax, language=language, **kwargs)

@@ -31,7 +31,7 @@ import numpy as np
 
 # Shared Welch-core defaults and helpers (single source of truth for the
 # segment policy across the spectral estimators).
-from ..signal.spectra import (
+from ..signals.spectra import (
     _DEFAULT_OVERLAP,
     _MIN_SAMPLES,
     _default_nperseg,
@@ -78,7 +78,7 @@ def _spectra(
     """Return ``(freqs, Gxy, Gxx, Gyy)`` from Welch-averaged Hann segments.
 
     Thin adapter over the shared Welch core in
-    :mod:`phonometry.signal.spectra` (same taper, overlap policy and
+    :mod:`phonometry.signals.spectra` (same taper, overlap policy and
     detrend-off calibration; bit-identical to the previous local
     implementation).
     """

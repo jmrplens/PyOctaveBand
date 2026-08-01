@@ -237,7 +237,7 @@ class CepstrumResult:
         :param language: Label language, ``"en"`` (default) or ``"es"``.
         """
         from .._i18n import check_language
-        from .._plot.signal import plot_cepstrum
+        from .._plot.signals import plot_cepstrum
 
         check_language(language)
         return plot_cepstrum(self, ax=ax, language=language, **kwargs)
@@ -339,7 +339,7 @@ class LifterResult:
         :param language: Label language, ``"en"`` (default) or ``"es"``.
         """
         from .._i18n import check_language
-        from .._plot.signal import plot_lifter
+        from .._plot.signals import plot_lifter
 
         check_language(language)
         return plot_lifter(self, ax=ax, language=language, **kwargs)
@@ -479,7 +479,7 @@ class EchoDetectionResult:
         :param language: Label language, ``"en"`` (default) or ``"es"``.
         """
         from .._i18n import check_language
-        from .._plot.signal import plot_echo_detection
+        from .._plot.signals import plot_echo_detection
 
         check_language(language)
         return plot_echo_detection(self, ax=ax, language=language, **kwargs)

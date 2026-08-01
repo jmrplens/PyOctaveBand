@@ -1,5 +1,5 @@
 ---
-title: "signal.inversion"
+title: "signals.inversion"
 description: "Regularized spectral inversion with frequency-dependent regularization."
 sidebar:
   label: "inversion"
@@ -63,7 +63,7 @@ InverseFilterResult(
 
 A regularized inverse filter with its achieved equalization.
 
-Returned by [`regularized_inverse_filter`](/phonometry/reference/api/signal/inversion/#regularized_inverse_filter). The causal filter
+Returned by [`regularized_inverse_filter`](/phonometry/reference/api/signals/inversion/#regularized_inverse_filter). The causal filter
 samples live in `inverse` (the equalized response arrives `delay`
 samples late; `apply` compensates it). `spectrum` is the
 complex inverse spectrum *including* the modeling delay;
@@ -181,11 +181,11 @@ which this generalises): in-band the equalized magnitude deviates from
 unity by at most `regularization_inside * max|H|**2 / min|H|**2` --
 the analytic residue
 $\epsilon/(\lvert H \rvert^2 + \epsilon)$ -- and the achieved
-figure is reported as [`InverseFilterResult.flatness_db`](/phonometry/reference/api/signal/inversion/#inversefilterresult).
+figure is reported as [`InverseFilterResult.flatness_db`](/phonometry/reference/api/signals/inversion/#inversefilterresult).
 
-Use the result's [`InverseFilterResult.apply`](/phonometry/reference/api/signal/inversion/#inversefilterresultapply) to equalize
+Use the result's [`InverseFilterResult.apply`](/phonometry/reference/api/signals/inversion/#inversefilterresultapply) to equalize
 recordings (or the excitation, for pre-emphasis) and read
-[`InverseFilterResult.spectrum`](/phonometry/reference/api/signal/inversion/#inversefilterresult) to apply it spectrally.
+[`InverseFilterResult.spectrum`](/phonometry/reference/api/signals/inversion/#inversefilterresult) to apply it spectrally.
 
 **Parameters**
 
@@ -200,4 +200,4 @@ recordings (or the excitation, for pre-emphasis) and read
 | `n_fft` | FFT block length of the design (also the filter length). Default: the next power of two of `2*len(response)`, so the circular design has room for the anticausal (delayed) part. |
 | `delay` | Modeling delay in samples. Default `n_fft // 2`. |
 
-**Returns:** An [`InverseFilterResult`](/phonometry/reference/api/signal/inversion/#inversefilterresult).
+**Returns:** An [`InverseFilterResult`](/phonometry/reference/api/signals/inversion/#inversefilterresult).

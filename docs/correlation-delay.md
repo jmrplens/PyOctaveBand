@@ -4,7 +4,7 @@
 
 Where the [calibrated spectral estimators](spectral-analysis.md) describe a
 signal in frequency, this page covers their time-domain counterparts in
-`phonometry.signal`: **auto- and cross-correlation** estimates with the
+`phonometry.signals`: **auto- and cross-correlation** estimates with the
 three standard normalizations and their Bendat & Piersol random errors;
 **time-delay estimation** (TDE) by the direct correlator, the cross-spectrum
 phase slope and the **generalized cross-correlation** (GCC) of Knapp & Carter

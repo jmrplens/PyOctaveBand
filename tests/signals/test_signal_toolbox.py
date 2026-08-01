@@ -348,7 +348,7 @@ def test_negative_delay_advances() -> None:
 def test_linear_mode_is_bit_identical_to_alignment_kernel() -> None:
     # align_impulse_responses removes delays with the same kernel; the
     # public function must reproduce it bit for bit (advance = -delay).
-    from phonometry.signal.correlation import _fractional_advance
+    from phonometry.signals.correlation import _fractional_advance
 
     x = ph.noise_signal(FS, 0.1, seed=9)
     shift = 4.6180339887

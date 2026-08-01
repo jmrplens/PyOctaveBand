@@ -35,7 +35,7 @@ import pytest
 from scipy import signal as sp_signal
 
 import phonometry as ph
-from phonometry.signal.miso import _condition, _ordinary_coherences
+from phonometry.signals.miso import _condition, _ordinary_coherences
 
 FS = 8192.0
 N = 1 << 19

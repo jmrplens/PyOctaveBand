@@ -358,17 +358,17 @@ The generated API reference, one page per module. Fetch these only when a specif
 - [rooms/room-modes](https://jmrplens.github.io/phonometry/reference/api/rooms/room-modes/)
 - [rooms/room-noise](https://jmrplens.github.io/phonometry/reference/api/rooms/room-noise/)
 - [rooms/steady-field](https://jmrplens.github.io/phonometry/reference/api/rooms/steady-field/)
-- [signal/cepstrum](https://jmrplens.github.io/phonometry/reference/api/signal/cepstrum/)
-- [signal/correlation](https://jmrplens.github.io/phonometry/reference/api/signal/correlation/)
-- [signal/envelope](https://jmrplens.github.io/phonometry/reference/api/signal/envelope/)
-- [signal/inversion](https://jmrplens.github.io/phonometry/reference/api/signal/inversion/)
-- [signal/levels](https://jmrplens.github.io/phonometry/reference/api/signal/levels/)
-- [signal/miso](https://jmrplens.github.io/phonometry/reference/api/signal/miso/)
-- [signal/phase](https://jmrplens.github.io/phonometry/reference/api/signal/phase/)
-- [signal/spectra](https://jmrplens.github.io/phonometry/reference/api/signal/spectra/)
-- [signal/synchronous-average](https://jmrplens.github.io/phonometry/reference/api/signal/synchronous-average/)
-- [signal/test-signals](https://jmrplens.github.io/phonometry/reference/api/signal/test-signals/)
-- [signal/time-frequency](https://jmrplens.github.io/phonometry/reference/api/signal/time-frequency/)
+- [signals/cepstrum](https://jmrplens.github.io/phonometry/reference/api/signals/cepstrum/)
+- [signals/correlation](https://jmrplens.github.io/phonometry/reference/api/signals/correlation/)
+- [signals/envelope](https://jmrplens.github.io/phonometry/reference/api/signals/envelope/)
+- [signals/inversion](https://jmrplens.github.io/phonometry/reference/api/signals/inversion/)
+- [signals/levels](https://jmrplens.github.io/phonometry/reference/api/signals/levels/)
+- [signals/miso](https://jmrplens.github.io/phonometry/reference/api/signals/miso/)
+- [signals/phase](https://jmrplens.github.io/phonometry/reference/api/signals/phase/)
+- [signals/spectra](https://jmrplens.github.io/phonometry/reference/api/signals/spectra/)
+- [signals/synchronous-average](https://jmrplens.github.io/phonometry/reference/api/signals/synchronous-average/)
+- [signals/test-signals](https://jmrplens.github.io/phonometry/reference/api/signals/test-signals/)
+- [signals/time-frequency](https://jmrplens.github.io/phonometry/reference/api/signals/time-frequency/)
 - [simulation/elastic-fdtd](https://jmrplens.github.io/phonometry/reference/api/simulation/elastic-fdtd/)
 - [simulation/fdtd](https://jmrplens.github.io/phonometry/reference/api/simulation/fdtd/)
 - [simulation/ntff](https://jmrplens.github.io/phonometry/reference/api/simulation/ntff/)
@@ -2238,7 +2238,7 @@ contour = aircraft.noise_contour(path, powers, distances, sel, lmax, x=gx, y=gy)
 | Subpackage | Scope |
 | :--- | :--- |
 | `phonometry.filters` | Octave and fractional-octave filter banks, frequency weightings and time weighting, parametric EQ, IEC 61260-1 and IEC 61672-1 class verification |
-| `phonometry.signal` | Levels (Leq, LAeq, percentiles), Welch and multitaper spectra, coherence, time-frequency, correlation, envelope, cepstrum, phase, synchronous averaging, test signals |
+| `phonometry.signals` | Levels (Leq, LAeq, percentiles), Welch and multitaper spectra, coherence, time-frequency, correlation, envelope, cepstrum, phase, synchronous averaging, test signals |
 | `phonometry.metrology` | Calibration, GUM uncertainty and Monte Carlo, data qualification (stationarity, trends, peak statistics), IEC 61043 intensity class |
 | `phonometry.psychoacoustics` | Loudness (Zwicker, ECMA, Moore-Glasberg), sharpness, tonality, roughness, fluctuation strength, annoyance, tonal audibility |
 | `phonometry.hearing` | Hearing threshold, NIHL, occupational exposure, SII, STI |
@@ -2260,7 +2260,7 @@ Every name in the table below is also re-exported at the top level, so
 paths are still importable and warn on use: the pre-3.2 flat ones (for example
 `phonometry.insulation`), removed in 4.0, and the pre-4.0 ones that the split
 of `metrology` moved (for example `phonometry.metrology.levels`, now
-`phonometry.signal.levels`), removed in 5.0. Reading a moved name from the
+`phonometry.signals.levels`), removed in 5.0. Reading a moved name from the
 namespace it left (`metrology.leq`) warns and delegates as well.
 
 | Name | Type | Description (Inputs) | Usage Snippet (Outputs) |
@@ -4334,7 +4334,7 @@ Source: https://jmrplens.github.io/phonometry/guides/cepstrum-echoes/
 The [spectral estimators](https://jmrplens.github.io/phonometry/guides/spectral-analysis/) describe *what
 frequencies* a signal contains; this page covers what hides in the *shape* of
 that spectrum. The **cepstrum** - the inverse Fourier transform of the log
-spectrum - lives in `phonometry.signal` and turns two hard spectral
+spectrum - lives in `phonometry.signals` and turns two hard spectral
 problems into easy peak-picking: periodic spectral ripple (an echo, a harmonic
 family) collapses onto a single spike at the **quefrency** of its period, and
 the smooth spectral envelope separates from the fine structure by plain
@@ -5528,7 +5528,7 @@ Source: https://jmrplens.github.io/phonometry/guides/correlation-delay/
 
 Where the [calibrated spectral estimators](https://jmrplens.github.io/phonometry/guides/spectral-analysis/) describe a
 signal in frequency, this page covers their time-domain counterparts in
-`phonometry.signal`: **auto- and cross-correlation** estimates with the
+`phonometry.signals`: **auto- and cross-correlation** estimates with the
 three standard normalizations and their Bendat & Piersol random errors;
 **time-delay estimation** (TDE) by the direct correlator, the cross-spectrum
 phase slope and the **generalized cross-correlation** (GCC) of Knapp & Carter
@@ -18641,7 +18641,7 @@ time-weighted level distribution.
 
 ```python
 import numpy as np
-from phonometry import signal
+from phonometry import signals
 
 # recording: a calibrated microphone capture (Pa) — recorded through your measurement chain. Synthesized here so the guide runs standalone.
 fs = 48000
@@ -18649,10 +18649,10 @@ recording = 0.2 * np.sin(2 * np.pi * 1000 * np.arange(fs) / fs)
 sensitivity = 1.0                                    # calibration_factor (see Calibration)
 
 # Equivalent continuous level of the whole recording
-level = signal.leq(recording, calibration_factor=sensitivity)
+level = signals.leq(recording, calibration_factor=sensitivity)
 
 # A-weighted Leq (the standard environmental noise metric)
-la = signal.laeq(recording, fs, calibration_factor=sensitivity)
+la = signals.laeq(recording, fs, calibration_factor=sensitivity)
 ```
 
 Both accept 1D signals (returning a scalar) or 2D `[channels, samples]` arrays
@@ -18696,7 +18696,7 @@ everywhere else, energy.
 
 ```python
 import numpy as np
-from phonometry import signal
+from phonometry import signals
 
 # A steady tone gives L10 = L50 = L90; percentiles only tell a story for a
 # *fluctuating* level. Synthesize 3 s alternating between a quiet and a
@@ -18708,7 +18708,7 @@ quiet = 0.02 * rng.standard_normal(segment)        # background
 loud = 0.06 * rng.standard_normal(segment)         # ~10 dB louder events
 varying = np.tile(np.concatenate([quiet, loud]), 3)
 
-stats = signal.ln_levels(varying, fs, n=(10, 50, 90), weighting="A")
+stats = signals.ln_levels(varying, fs, n=(10, 50, 90), weighting="A")
 print(f"LA10={stats[10]:.1f}  LA50={stats[50]:.1f}  LA90={stats[90]:.1f} dB")
 # LA10=66.6  LA50=65.2  LA90=58.5 dB  -> L10 (events) > L50 (median) > L90 (background)
 ```
@@ -18724,7 +18724,7 @@ background.*
 ```python
 import numpy as np
 import matplotlib.pyplot as plt
-from phonometry import filters, signal
+from phonometry import filters, signals
 
 # The fluctuating signal of the ln_levels example: 0.5 s of background
 # alternating with 0.5 s of ~10 dB louder events, repeated 3 times
@@ -18738,7 +18738,7 @@ varying = np.tile(np.concatenate([quiet, loud]), 3)
 # Fast mean-square envelope -> level vs time, plus the percentile levels
 envelope = filters.time_weighting(varying, fs, mode="fast")
 level_t = 10 * np.log10(np.maximum(envelope, 1e-12) / (2e-5) ** 2)
-stats = signal.ln_levels(varying, fs, n=(10, 50, 90))
+stats = signals.ln_levels(varying, fs, n=(10, 50, 90))
 t = np.arange(varying.size) / fs
 
 fig, ax = plt.subplots()
@@ -18810,7 +18810,7 @@ of [Environmental levels](https://jmrplens.github.io/phonometry/guides/environme
 
 ```python
 import numpy as np
-from phonometry import signal
+from phonometry import signals
 
 # recording: a calibrated microphone capture (Pa) — recorded through your measurement chain. Synthesized here so the guide runs standalone.
 fs = 48000
@@ -18818,18 +18818,18 @@ recording = 0.2 * np.sin(2 * np.pi * 1000 * np.arange(fs) / fs)
 sensitivity = 1.0                                    # calibration_factor (see Calibration)
 
 # C-weighted peak (IEC 61672-1 §5.13) - occupational action limits use this
-peak = signal.lc_peak(recording, fs, calibration_factor=sensitivity)
+peak = signals.lc_peak(recording, fs, calibration_factor=sensitivity)
 
 # A single noise event and a work-shift sample (slices of a real recording)
 event = recording
 shift_sample = recording
 
 # Sound exposure level: single-event level normalized to 1 s (LAE)
-lae = signal.sel(event, fs, weighting="A", calibration_factor=sensitivity)
+lae = signals.sel(event, fs, weighting="A", calibration_factor=sensitivity)
 
 # Daily noise dose (IEC 61252): exposure in Pa²·h and LEX,8h / LEP,d
-E = signal.sound_exposure(shift_sample, fs, duration_hours=8, calibration_factor=sensitivity)
-lex = signal.lex_8h(shift_sample, fs, duration_hours=8, calibration_factor=sensitivity)
+E = signals.sound_exposure(shift_sample, fs, duration_hours=8, calibration_factor=sensitivity)
+lex = signals.lex_8h(shift_sample, fs, duration_hours=8, calibration_factor=sensitivity)
 ```
 
 `lc_peak` is verified against the one-cycle/half-cycle reference responses of
@@ -18866,7 +18866,7 @@ railway noise models.
 ```python
 import numpy as np
 import matplotlib.pyplot as plt
-from phonometry import filters, signal
+from phonometry import filters, signals
 
 # A vehicle pass-by: noise under a gaussian energy envelope (dBFS analysis)
 fs = 48000
@@ -18875,8 +18875,8 @@ rng = np.random.default_rng(11)
 x = 0.3 * np.exp(-0.5 * ((t - 4.0) / 1.1) ** 2) * rng.standard_normal(t.size)
 
 level = 10 * np.log10(np.maximum(filters.time_weighting(x, fs, mode="fast"), 1e-12))
-l_sel = float(signal.sel(x, fs, dbfs=True))
-l_eq = float(signal.leq(x, dbfs=True))
+l_sel = float(signals.sel(x, fs, dbfs=True))
+l_eq = float(signals.leq(x, dbfs=True))
 print(f"Leq = {l_eq:.1f} dBFS, SEL = {l_sel:.1f} dBFS")
 # Leq = -16.6 dBFS, SEL = -7.6 dBFS -> the 1 s block carries the event energy
 
@@ -21759,7 +21759,7 @@ reading the ordinary coherences alone can credit the wrong source. Bendat &
 Piersol, *Random Data* (4th ed., 2010, Chapter 7), resolve this for a
 multiple-input/single-output (MISO) system with the **multiple** and
 **partial** coherence functions. `miso_coherence` computes them from the same
-Welch cross-spectral core as the rest of `phonometry.signal`, for several
+Welch cross-spectral core as the rest of `phonometry.signals`, for several
 correlated inputs and one output.
 
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/miso_coherence_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/miso_coherence.svg" alt="Two-panel figure. Top: the measured output autospectrum in dB with the coherent output contribution of two inputs shaded underneath; input 1 fills the low band and input 2 the high band, with the residual noise far below. Bottom: for the correlated second input, its ordinary coherence sits around 0.3 across the low band even though it drives no low-frequency path, while its partial coherence collapses to zero there once the first input is conditioned out; the multiple coherence stays near one except at the crossover null" width="82%"></picture>
@@ -31904,7 +31904,7 @@ they come from your microphone.
 
 ```python
 import numpy as np
-from phonometry import filters, metrology, signal
+from phonometry import filters, metrology, signals
 
 fs = 48000
 
@@ -31914,7 +31914,7 @@ calibrator = np.sqrt(2) * np.sin(2 * np.pi * 1000 * np.arange(3 * fs) / fs)
 
 # "Street" measurement: 10 s of pink background noise plus a 1 s horn-like
 #   1 kHz event, so the statistical levels have something to separate.
-recording = signal.noise_signal(fs, 10.0, color="pink", rms=0.02, seed=7)
+recording = signals.noise_signal(fs, 10.0, color="pink", rms=0.02, seed=7)
 recording[4 * fs : 5 * fs] += 0.2 * np.sqrt(2) * np.sin(
     2 * np.pi * 1000 * np.arange(fs) / fs
 )
@@ -31972,12 +31972,12 @@ the level fluctuated ($L_{90}$ is the background, $L_{10}$ the events), the
 C-weighted **peak** for impulsive content.
 
 ```python
-la_eq = signal.laeq(recording, fs, calibration_factor=cal)     # ~70.2 dB
-ln = signal.ln_levels(
+la_eq = signals.laeq(recording, fs, calibration_factor=cal)     # ~70.2 dB
+ln = signals.ln_levels(
     recording, fs, n=(10, 50, 90), weighting="A", calibration_factor=cal
 )                                                # L10 ~78.0, L50 ~55.1, L90 ~54.9
-lae = signal.sel(recording, fs, weighting="A", calibration_factor=cal)  # ~80.2
-lc_pk = signal.lc_peak(recording, fs, calibration_factor=cal)           # ~84.4
+lae = signals.sel(recording, fs, weighting="A", calibration_factor=cal)  # ~80.2
+lc_pk = signals.lc_peak(recording, fs, calibration_factor=cal)           # ~84.4
 
 print(f"LAeq {la_eq:.1f} dB | L10 {ln[10]:.1f} | L90 {ln[90]:.1f} "
       f"| LAE {lae:.1f} | LCpeak {lc_pk:.1f}")
@@ -32055,7 +32055,7 @@ The meter built here is the trunk; the rest of the core grows from it.
 
 - API reference: [`metrology.calibration`](https://jmrplens.github.io/phonometry/reference/api/metrology/calibration/),
   [`filters.weighting`](https://jmrplens.github.io/phonometry/reference/api/filters/weighting/),
-  [`signal.levels`](https://jmrplens.github.io/phonometry/reference/api/signal/levels/),
+  [`signals.levels`](https://jmrplens.github.io/phonometry/reference/api/signals/levels/),
   [`phonometry`](https://jmrplens.github.io/phonometry/reference/api/filters/phonometry/) and
   [`filters.compliance`](https://jmrplens.github.io/phonometry/reference/api/filters/compliance/).
 
@@ -34721,7 +34721,7 @@ republished in NASA CR-3406.
 
 ```python
 import numpy as np
-from phonometry import filters, signal
+from phonometry import filters, signals
 
 # A 3.15 kHz whine sits right on the D-weighting hump: D rates it
 # 10 dB *louder* than A does.
@@ -34729,8 +34729,8 @@ fs = 96000
 t = np.arange(fs) / fs
 whine = 0.1 * np.sin(2 * np.pi * 3150 * t)
 
-ld = signal.leq(filters.weighting_filter(whine, fs, curve="D"))
-la = signal.leq(filters.weighting_filter(whine, fs, curve="A"))
+ld = signals.leq(filters.weighting_filter(whine, fs, curve="D"))
+la = signals.leq(filters.weighting_filter(whine, fs, curve="A"))
 print(f"LD = {ld:.1f} dB   LA = {la:.1f} dB")
 # LD = 82.5 dB   LA = 72.2 dB
 ```
@@ -34747,7 +34747,7 @@ high-frequency roll-off and overstate the *audible* exposure:
 
 ```python
 import numpy as np
-from phonometry import filters, signal
+from phonometry import filters, signals
 
 # 1 kHz tone (audible) buried under a strong 25 kHz ultrasonic component.
 fs = 96000
@@ -34755,9 +34755,9 @@ t = np.arange(fs) / fs
 audible = 0.1 * np.sin(2 * np.pi * 1000 * t)
 x = audible + 1.0 * np.sin(2 * np.pi * 25000 * t)
 
-la = signal.leq(filters.weighting_filter(x, fs, curve="A"))
-lau = signal.leq(filters.weighting_filter(x, fs, curve="AU"))
-la_ref = signal.leq(filters.weighting_filter(audible, fs, curve="A"))
+la = signals.leq(filters.weighting_filter(x, fs, curve="A"))
+lau = signals.leq(filters.weighting_filter(x, fs, curve="AU"))
+la_ref = signals.leq(filters.weighting_filter(audible, fs, curve="A"))
 print(f"LA = {la:.1f} dB   LAU = {lau:.1f} dB   audible alone = {la_ref:.1f} dB")
 # LA = 78.6 dB   LAU = 71.0 dB   audible alone = 71.0 dB
 # The ultrasound inflates LA by 7.6 dB; AU recovers the audible level.
@@ -34848,7 +34848,7 @@ Source: https://jmrplens.github.io/phonometry/guides/spectral-analysis/
 # Calibrated spectral analysis (Bendat & Piersol)
 
 A spectrum without its uncertainty is half a measurement. This page covers the
-Welch spectral estimators of `phonometry.signal` that report, next to the
+Welch spectral estimators of `phonometry.signals` that report, next to the
 spectrum itself, the statistical quality of the estimate following Bendat &
 Piersol, *Random Data: Analysis and Measurement Procedures* (4th ed., 2010):
 the **power spectral density** and **cross-spectral density** with the
@@ -36552,7 +36552,7 @@ a function of the excitation frequency with one sweep instead of a
 tone-by-tone stepping. This page covers that separation in
 `phonometry.electroacoustics`, with the phase-coherent **synchronized
 sweep** of Novak, Lotton & Simon (2015) as the default, and the companion
-**phase utilities** in `phonometry.signal`: minimum phase from $|H|$,
+**phase utilities** in `phonometry.signals`: minimum phase from $|H|$,
 group delay and excess phase.
 
 <picture>
@@ -36718,7 +36718,7 @@ the THD is level-referenced exactly as driven.
 For a causal, stable, minimum-phase system the log-magnitude and phase of
 the frequency response are a Hilbert-transform pair (Bendat & Piersol,
 Sec. 13.1.4): the phase is fully determined by `|H(f)|`. The
-`phonometry.signal` utilities compute that reconstruction with the real
+`phonometry.signals` utilities compute that reconstruction with the real
 cepstrum and decompose any measured response into its invertible and
 all-pass parts:
 
@@ -37540,7 +37540,7 @@ Source: https://jmrplens.github.io/phonometry/guides/test-signals/
 # Test signals and sample-rate tools (IEC 60268-1)
 
 A measurement is only as trustworthy as its stimulus and its sample-rate
-bookkeeping. This page covers the signal toolbox of `phonometry.signal`:
+bookkeeping. This page covers the signal toolbox of `phonometry.signals`:
 **tone bursts** with the exact gating IEC 60268-1 prescribes, the
 **colored-noise generators** (detailed in the
 [spectral analysis guide](https://jmrplens.github.io/phonometry/guides/spectral-analysis/#5-colored-noise-generators)),
@@ -39644,7 +39644,7 @@ Source: https://jmrplens.github.io/phonometry/guides/time-frequency/
 
 A stationary spectrum hides everything that happens *in time*: a passing
 siren, an impact, a machine running up. This page covers the two
-time-frequency estimators of `phonometry.signal`, both with the
+time-frequency estimators of `phonometry.signals`, both with the
 calibration discipline of the
 [spectral-analysis page](https://jmrplens.github.io/phonometry/guides/spectral-analysis/): the
 **calibrated spectrogram** (the short-time Fourier transform view of
@@ -42746,7 +42746,7 @@ $L_{Ceq} - L_{Aeq}$ is a one-number indicator of low-frequency content:
 
 ```python
 import numpy as np
-from phonometry import filters, signal
+from phonometry import filters, signals
 
 # A 50 Hz rumble under a light broadband hiss: quiet in A, loud in C.
 fs = 48000
@@ -42754,8 +42754,8 @@ t = np.arange(10 * fs) / fs
 rng = np.random.default_rng(1)
 x = 0.2 * np.sin(2 * np.pi * 50 * t) + 0.01 * rng.standard_normal(t.size)
 
-la = signal.leq(filters.weighting_filter(x, fs, curve="A"))
-lc = signal.leq(filters.weighting_filter(x, fs, curve="C"))
+la = signals.leq(filters.weighting_filter(x, fs, curve="A"))
+lc = signals.leq(filters.weighting_filter(x, fs, curve="C"))
 print(f"LAeq = {la:.1f} dB   LCeq = {lc:.1f} dB   C - A = {lc - la:.1f} dB")
 # LAeq = 52.4 dB   LCeq = 75.7 dB   C - A = 23.2 dB
 # C - A above 20 dB: the A-weighted number alone would hide the rumble.
@@ -42805,8 +42805,8 @@ fs = 48000
 recording = 0.2 * np.sin(2 * np.pi * 1000 * np.arange(fs) / fs)
 
 wf = filters.WeightingFilter(fs, "A")
-signals = [recording]                # your batch of recordings
-for recording in signals:
+batch = [recording]                  # your batch of recordings
+for recording in batch:
     weighted = wf.filter(recording)
 ```
 
@@ -43138,7 +43138,7 @@ sample from the metrology core:
 | :--- | :--- | :--- |
 | IEC 61672-1:2013 Table 3 | A/C/Z weighting at all 34 nominal frequencies, class 1 limits, at 48 and 96 kHz | `tests/filters/test_iec_weighting_table3.py` |
 | IEC 61672-1:2013 Table 4 | F/S tone-burst responses (1 s to 1 ms) and the $L_{AE}$ column for `sel()` | `tests/filters/test_iec_compliance.py` |
-| IEC 61672-1:2013 Table 5 | `lc_peak()` one-cycle/half-cycle peak responses, class 1 limits | `tests/signal/test_levels.py` |
+| IEC 61672-1:2013 Table 5 | `lc_peak()` one-cycle/half-cycle peak responses, class 1 limits | `tests/signals/test_levels.py` |
 | IEC 61260-1:2014 Table 1 | Filter-bank class 1/2 acceptance limits via `verify_filter_class()` | `tests/filters/test_compliance.py` |
 | ISO 7196:1995 Table 2 | G weighting (infrasound) at every nominal response value, 0.25–315 Hz | `tests/filters/test_g_weighting.py` |
 | ISO 226:2023 Table 1 and Annex B | Equal-loudness contours and loudness levels against the Annex B tables, hearing threshold against the Table 1 $T_f$ parameters | `tests/psychoacoustics/test_loudness_contours.py` |

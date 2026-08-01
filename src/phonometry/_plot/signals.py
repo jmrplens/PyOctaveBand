@@ -10,29 +10,29 @@ import numpy as np
 if TYPE_CHECKING:
     from matplotlib.axes import Axes
 
-    from ..signal.cepstrum import (
+    from ..signals.cepstrum import (
         CepstrumResult,
         EchoDetectionResult,
         LifterResult,
     )
-    from ..signal.correlation import (
+    from ..signals.correlation import (
         AlignedImpulseResponseResult,
         CorrelationResult,
         TimeDelayResult,
     )
-    from ..signal.envelope import EnvelopeResult, EnvelopeSpectrumResult
-    from ..signal.miso import MISOCoherenceResult
-    from ..signal.phase import PhaseDecompositionResult
-    from ..signal.spectra import (
+    from ..signals.envelope import EnvelopeResult, EnvelopeSpectrumResult
+    from ..signals.miso import MISOCoherenceResult
+    from ..signals.phase import PhaseDecompositionResult
+    from ..signals.spectra import (
         CoherentOutputSpectrumResult,
         CrossSpectralDensityResult,
         MultitaperSpectralDensityResult,
         SpectralDensityResult,
         WindowMetricsResult,
     )
-    from ..signal.synchronous_average import SynchronousAverageResult
-    from ..signal.test_signals import ResampledSignalResult, ToneBurstResult
-    from ..signal.time_frequency import SpectrogramResult, ZoomFFTResult
+    from ..signals.synchronous_average import SynchronousAverageResult
+    from ..signals.test_signals import ResampledSignalResult, ToneBurstResult
+    from ..signals.time_frequency import SpectrogramResult, ZoomFFTResult
 
 from .common import (
     _C_EDGE,
@@ -276,7 +276,7 @@ def plot_spectral_density(
 ) -> Axes:
     """Spectral density in dB with its chi-square confidence band.
 
-    :param result: A :class:`~phonometry.signal.spectra.SpectralDensityResult`.
+    :param result: A :class:`~phonometry.signals.spectra.SpectralDensityResult`.
     :param ax: Existing axes, or ``None`` to create a figure.
     :param language: Label language, ``"en"`` (default) or ``"es"``.
     :param kwargs: Forwarded to the density ``plot`` call.
@@ -310,7 +310,7 @@ def plot_multitaper_spectral_density(
     (possibly adaptive) estimator and is drawn as a pale opaque fill.
 
     :param result: A
-        :class:`~phonometry.signal.spectra.MultitaperSpectralDensityResult`.
+        :class:`~phonometry.signals.spectra.MultitaperSpectralDensityResult`.
     :param ax: Existing axes, or ``None`` to create a figure.
     :param language: Label language, ``"en"`` (default) or ``"es"``.
     :param kwargs: Forwarded to the density ``plot`` call.
@@ -356,7 +356,7 @@ def plot_cross_spectral_density(
     With ``ax`` given, only the magnitude panel is drawn on it.
 
     :param result: A
-        :class:`~phonometry.signal.spectra.CrossSpectralDensityResult`.
+        :class:`~phonometry.signals.spectra.CrossSpectralDensityResult`.
     :param ax: Existing axes for the magnitude panel, or ``None`` for a
         fresh three-panel figure.
     :param language: Label language, ``"en"`` (default) or ``"es"``.
@@ -430,7 +430,7 @@ def plot_coherent_output_spectrum(
     With ``ax`` given, only the spectra panel is drawn on it.
 
     :param result: A
-        :class:`~phonometry.signal.spectra.CoherentOutputSpectrumResult`.
+        :class:`~phonometry.signals.spectra.CoherentOutputSpectrumResult`.
     :param ax: Existing axes for the spectra panel, or ``None`` for a fresh
         two-panel figure.
     :param language: Label language, ``"en"`` (default) or ``"es"``.
@@ -560,7 +560,7 @@ def plot_miso_coherence(
     lower panel shows the multiple coherence over the per-input partial
     coherences. With ``ax`` given, only the spectra panel is drawn on it.
 
-    :param result: A :class:`~phonometry.signal.miso.MISOCoherenceResult`.
+    :param result: A :class:`~phonometry.signals.miso.MISOCoherenceResult`.
     :param ax: Existing axes for the spectra panel, or ``None`` for a fresh
         two-panel figure.
     :param language: Label language, ``"en"`` (default) or ``"es"``.
@@ -607,7 +607,7 @@ def plot_spectrogram(
     it.
 
     :param result: A
-        :class:`~phonometry.signal.time_frequency.SpectrogramResult`.
+        :class:`~phonometry.signals.time_frequency.SpectrogramResult`.
     :param ax: Existing axes, or ``None`` to create a figure.
     :param language: Label language, ``"en"`` (default) or ``"es"``.
     :param kwargs: Forwarded to ``imshow``.
@@ -656,7 +656,7 @@ def plot_zoom_fft(
     """Zoom power spectrum in dB over the zoom band (linear axis).
 
     :param result: A
-        :class:`~phonometry.signal.time_frequency.ZoomFFTResult`.
+        :class:`~phonometry.signals.time_frequency.ZoomFFTResult`.
     :param ax: Existing axes, or ``None`` to create a figure.
     :param language: Label language, ``"en"`` (default) or ``"es"``.
     :param kwargs: Forwarded to the ``plot`` call.
@@ -690,7 +690,7 @@ def plot_correlation(
 ) -> Axes:
     """Correlation estimate against the lag in seconds.
 
-    :param result: A :class:`~phonometry.signal.correlation.CorrelationResult`.
+    :param result: A :class:`~phonometry.signals.correlation.CorrelationResult`.
     :param ax: Existing axes, or ``None`` to create a figure.
     :param language: Label language, ``"en"`` (default) or ``"es"``.
     :param kwargs: Forwarded to the ``plot`` call.
@@ -730,7 +730,7 @@ def plot_time_delay(
 ) -> Axes:
     """Correlation function with the estimated delay marked.
 
-    :param result: A :class:`~phonometry.signal.correlation.TimeDelayResult`.
+    :param result: A :class:`~phonometry.signals.correlation.TimeDelayResult`.
     :param ax: Existing axes, or ``None`` to create a figure.
     :param language: Label language, ``"en"`` (default) or ``"es"``.
     :param kwargs: Forwarded to the correlation ``plot`` call.
@@ -786,7 +786,7 @@ def plot_aligned_impulse_response(
     """Reference and aligned impulse responses overlaid.
 
     :param result: An
-        :class:`~phonometry.signal.correlation.AlignedImpulseResponseResult`.
+        :class:`~phonometry.signals.correlation.AlignedImpulseResponseResult`.
     :param ax: Existing axes, or ``None`` to create a figure.
     :param language: Label language, ``"en"`` (default) or ``"es"``.
     :param kwargs: Forwarded to the aligned-IR ``plot`` call.
@@ -819,7 +819,7 @@ def plot_envelope(
 
     With ``ax`` given, only the signal/envelope panel is drawn on it.
 
-    :param result: An :class:`~phonometry.signal.envelope.EnvelopeResult`.
+    :param result: An :class:`~phonometry.signals.envelope.EnvelopeResult`.
     :param ax: Existing axes for the envelope panel, or ``None`` for a
         fresh two-panel figure.
     :param language: Label language, ``"en"`` (default) or ``"es"``.
@@ -875,7 +875,7 @@ def plot_phase_decomposition(
     phases in radians, and the total and excess group delays in
     milliseconds. With ``ax`` given, only the phase panel is drawn on it.
 
-    :param result: A :class:`~phonometry.signal.phase.PhaseDecompositionResult`.
+    :param result: A :class:`~phonometry.signals.phase.PhaseDecompositionResult`.
     :param ax: Existing axes for the phase panel, or ``None`` for a fresh
         three-panel figure.
     :param language: Label language, ``"en"`` (default) or ``"es"``.
@@ -947,7 +947,7 @@ def plot_tone_burst(
 ) -> Axes:
     """Burst waveform with its rectangular gating envelope.
 
-    :param result: A :class:`~phonometry.signal.test_signals.ToneBurstResult`.
+    :param result: A :class:`~phonometry.signals.test_signals.ToneBurstResult`.
     :param ax: Existing axes, or ``None`` to create a figure.
     :param language: Label language, ``"en"`` (default) or ``"es"``.
     :param kwargs: Forwarded to the waveform ``plot`` call.
@@ -998,7 +998,7 @@ def plot_resampled_signal(
     anti-alias spec, read off the delivered filter.
 
     :param result: A
-        :class:`~phonometry.signal.test_signals.ResampledSignalResult`.
+        :class:`~phonometry.signals.test_signals.ResampledSignalResult`.
     :param ax: Existing axes, or ``None`` to create a figure.
     :param language: Label language, ``"en"`` (default) or ``"es"``.
     :param kwargs: Forwarded to the magnitude ``plot`` call.
@@ -1073,7 +1073,7 @@ def plot_cepstrum(
 ) -> Axes:
     """Cepstrum against quefrency, over the unambiguous first half-axis.
 
-    :param result: A :class:`~phonometry.signal.cepstrum.CepstrumResult`.
+    :param result: A :class:`~phonometry.signals.cepstrum.CepstrumResult`.
     :param ax: Existing axes, or ``None`` for a fresh figure.
     :param language: Label language, ``"en"`` (default) or ``"es"``.
     :param kwargs: Forwarded to the cepstrum line.
@@ -1104,7 +1104,7 @@ def plot_window_metrics(
     With ``ax`` given, only the spectrum panel is drawn on it.
 
     :param result: A
-        :class:`~phonometry.signal.spectra.WindowMetricsResult`.
+        :class:`~phonometry.signals.spectra.WindowMetricsResult`.
     :param ax: Existing axes for the spectrum panel, or ``None`` for a
         fresh two-panel figure.
     :param language: Label language, ``"en"`` (default) or ``"es"``.
@@ -1112,7 +1112,7 @@ def plot_window_metrics(
     :return: The spectrum axes (``ax`` given) or the array of two axes.
     """
     from .._i18n import decimal_comma, localize_axes
-    from ..signal.spectra import _WINDOW_OVERSAMPLE, _window_spectrum_db
+    from ..signals.spectra import _WINDOW_OVERSAMPLE, _window_spectrum_db
 
     max_bins = 24.0
 
@@ -1171,7 +1171,7 @@ def plot_lifter(
 
     With ``ax`` given, only the spectrum panel is drawn on it.
 
-    :param result: A :class:`~phonometry.signal.cepstrum.LifterResult`.
+    :param result: A :class:`~phonometry.signals.cepstrum.LifterResult`.
     :param ax: Existing axes for the spectrum panel, or ``None`` for a
         fresh two-panel figure.
     :param language: Label language, ``"en"`` (default) or ``"es"``.
@@ -1236,7 +1236,7 @@ def plot_echo_detection(
     """Power cepstrum with the searched band and the detected echo marked.
 
     :param result: An
-        :class:`~phonometry.signal.cepstrum.EchoDetectionResult`.
+        :class:`~phonometry.signals.cepstrum.EchoDetectionResult`.
     :param ax: Existing axes, or ``None`` for a fresh figure.
     :param language: Label language, ``"en"`` (default) or ``"es"``.
     :param kwargs: Forwarded to the cepstrum line.
@@ -1284,7 +1284,7 @@ def plot_envelope_spectrum(
     With ``ax`` given, only the spectrum panel is drawn on it.
 
     :param result: An
-        :class:`~phonometry.signal.envelope.EnvelopeSpectrumResult`.
+        :class:`~phonometry.signals.envelope.EnvelopeSpectrumResult`.
     :param ax: Existing axes for the spectrum panel, or ``None`` for a
         fresh two-panel figure.
     :param language: Label language, ``"en"`` (default) or ``"es"``.
@@ -1340,7 +1340,7 @@ def plot_inverse_filter(
     0 dB across the shaded equalized band and rolls off outside it, where
     the frequency-dependent regularization caps the gain.
 
-    :param result: An :class:`~phonometry.signal.inversion.InverseFilterResult`.
+    :param result: An :class:`~phonometry.signals.inversion.InverseFilterResult`.
     :param ax: Existing axes, or ``None`` to create a figure.
     :param language: Label language, ``"en"`` (default) or ``"es"``.
     :param kwargs: Forwarded to the measured-response ``plot`` call.
@@ -1396,7 +1396,7 @@ def plot_synchronous_average(
     With ``ax`` given, only the averaged-waveform panel is drawn on it.
 
     :param result: A
-        :class:`~phonometry.signal.synchronous_average.SynchronousAverageResult`.
+        :class:`~phonometry.signals.synchronous_average.SynchronousAverageResult`.
     :param ax: Existing axes for the waveform panel, or ``None`` for a fresh
         two-panel (waveform + comb filter) figure.
     :param language: Label language, ``"en"`` (default) or ``"es"``.
