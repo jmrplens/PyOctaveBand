@@ -1024,21 +1024,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   would stop catching the restyled fills, which is the failure the check
   exists to prevent. The two stale fiches moved 28710 and 27629 pixels and the
   subtler fills moved the RMS to 0.79 and 1.33, so those are caught. They are
-  tighter than the figures' on purpose: a
-  fiche preview is a flat document page rasterized by a pinned binary
-  rasterizer, a much quieter thing to compare than a plot raster, and the
-  figures' looser bound would have let the restyled fills through. The
-  rendering stack the job runs is pinned in `requirements-reports.txt`
-  alongside the existing figure pins, `make reports` now renders into a
-  scratch directory and swaps it in only once the whole set is written, so a
-  fiche that is no longer produced is actually removed without a generator
-  that dies halfway leaving the working tree stripped of the committed
-  examples, and the generator pins the numerical thread pools the way the
-  figure generator does, so a runner with a different core count cannot
-  reorder a floating-point sum into the rendered page. The staleness helpers
-  the two checks share moved to `scripts/generated_assets.py`. A unit test also
-  asserts every registered fiche has a committed render, which fails in the
-  same second as the commit that forgets one, with no regeneration needed.
+  tighter than the figures' on purpose: a fiche preview is a flat document
+  page rasterized by a pinned binary rasterizer, a much quieter thing to
+  compare than a plot raster, and the figures' looser bound would have let
+  the restyled fills through. The rendering stack the job runs is pinned in
+  `requirements-reports.txt` alongside the existing figure pins, `make
+  reports` now renders into a scratch directory and swaps it in only once the
+  whole set is written, so a fiche that is no longer produced is actually
+  removed without a generator that dies halfway leaving the working tree
+  stripped of the committed examples, and the generator pins the numerical
+  thread pools the way the figure generator does, so a runner with a
+  different core count cannot reorder a floating-point sum into the rendered
+  page. The staleness helpers the two checks share moved to
+  `scripts/generated_assets.py`. A unit test also asserts every registered
+  fiche has a committed render, which fails in the same second as the commit
+  that forgets one, with no regeneration needed.
 
 - The figures now spell the decimal logarithm the way the pages around them
   do. Every axis label, legend entry, title, annotation box and diagram
