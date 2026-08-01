@@ -311,6 +311,22 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
+    # Declared once for the whole job so the guard below runs under exactly the
+    # environment it vouches for. Split across the two steps, the guard could
+    # stay green on its own NUMBA_DISABLE_JIT while the suite lost its copy and
+    # ran interpreted from end to end.
+    env:
+      # conftest.py disables JIT by default (coverage); override it here, this
+      # is the only job exercising the numba-compiled kernel.
+      NUMBA_DISABLE_JIT: "0"
+      # Pin the numerical thread pools to one thread each so the per-core xdist
+      # workers do not oversubscribe the CPU with nested BLAS/OpenMP pools,
+      # exactly as the main test job does.
+      OMP_NUM_THREADS: "1"
+      MKL_NUM_THREADS: "1"
+      OPENBLAS_NUM_THREADS: "1"
+      NUMEXPR_NUM_THREADS: "1"
+      VECLIB_MAXIMUM_THREADS: "1"
     steps:
     - uses: actions/checkout@v7
       with:
@@ -325,12 +341,18 @@ jobs:
         python -m pip install --upgrade pip
         pip install -r requirements-dev.txt
         pip install -e ".[perf,plot]"
+    # Fails the job if the kernel falls back to the interpreted path, which
+    # would leave this job green while exercising nothing it exists for.
+    # Compiling here also fills numba's on-disk cache next to the module, so
+    # the test workers below load the kernel instead of each compiling a copy.
+    - name: Check the jitted kernel compiles
+      run: python scripts/check_jit_kernel.py
     - name: Run tests (jitted kernel)
-      env:
-        # conftest.py disables JIT by default (coverage); override it here —
-        # this is the only job exercising the numba-compiled kernel.
-        NUMBA_DISABLE_JIT: "0"
-      run: pytest -q
+      # Same fan-out as the main matrix. The compiled kernel is not a reason
+      # to stay serial: the step above compiles it once and the workers that
+      # reach it read the cache in a fraction of a second, against a suite
+      # that takes about twenty minutes to run one test at a time.
+      run: pytest -q -n auto
 
   sonar:
     needs: tests

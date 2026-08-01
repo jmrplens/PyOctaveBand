@@ -983,6 +983,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   heaviest modules dispatch first. No test was removed, no signal shortened
   and no tolerance or oracle touched; coverage is line-for-line identical.
 
+- The CI job that exercises the numba-jitted kernel fans the suite out with
+  `pytest -n auto` like every other test job. It was the one job still running
+  serially, so the load groups and the heavy-first dispatch order did nothing
+  in it and it kept taking about 20 minutes while the parallel jobs halved.
+  Compilation was never the reason to keep it serial: the library jits exactly
+  one kernel, and the two signatures it is called with cost about 5 s to
+  compile from scratch and about 0.6 s to load from numba's on-disk cache
+  against a suite of 7800 tests, and the modules that reach the kernel take
+  the same time with the JIT on as with it off. A new
+  `scripts/check_jit_kernel.py` step compiles both signatures before the
+  workers start, so they read that cache instead of each building its own, and
+  fails the job when the kernel produced no machine code at all (numba missing
+  from the environment, or `NUMBA_DISABLE_JIT` left at the default the rest of
+  the suite runs under), which would otherwise leave this job green while
+  exercising the interpreted path it does not exist for. The job declares that
+  variable once for all of its steps, so the guard runs under exactly the
+  environment it vouches for and cannot stay green on a copy of its own while
+  the suite loses it. On a 12-core host the suite goes from 2312 s serial to
+  789 s on four workers and 574 s on all twelve, with the same 7800 tests
+  passing.
+
 - The eleven documentation clips still encoded as VP9 are now AV1, which is
   what the other fifteen had already moved to, so all 104 WebM files finally
   share one codec. Their 44 files come down from 20.1 MB to 15.5 MB, 23 %
