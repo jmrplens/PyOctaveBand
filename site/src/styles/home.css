@@ -43,9 +43,9 @@
 [data-has-hero] .hero > .stack {
   gap: 1.25rem;
 }
-[data-has-hero] .hero h1 {
-  letter-spacing: -0.02em;
-}
+/* The H1's visible content is the outlined wordmark (Hero.astro, sized in
+   brand.css); the element's own font-size still sets its scale, so the
+   theme's clamp keeps working. */
 [data-has-hero] .hero .tagline {
   max-width: 58ch;
   color: var(--sl-color-gray-2);

@@ -10,17 +10,15 @@
  * repository, not written by hand from memory:
  *   checks/domains/standards   conformance-stats.mjs, parsed from
  *                              docs/CONFORMANCE.md at build time
- *   93 guides        site/src/content/docs/guides/*.md*
- *   120 API pages    site/src/content/docs/reference/api/**
- *   506 figures      distinct basenames in .github/images (x2 themes x2 langs)
- *   32 PDF fiches    .github/reports/*.pdf
- *   3.2.0            VERSION
+ *   guides/apiPages/figures/fiches/version   repo-stats.mjs, counted from the
+ *                              tree at build time (definitions in that module)
  *
- * The three conformance integers used to be typed out here and in the prose of
- * two other pages, and those copies fell a release behind. They are imported
- * now, so there is exactly one place that can be wrong.
+ * All of these used to be typed out here by hand, and every hand-written copy
+ * fell a release behind. They are imported now, so there is exactly one place
+ * that can be wrong.
  */
 import { checksRatio, domains, standards } from './conformance-stats.mjs';
+import { apiPages, fiches, figures, guides, version } from './repo-stats.mjs';
 
 export interface Stat {
 	value: string;
@@ -60,6 +58,13 @@ export interface HomeContent {
 	start: { title: string; lead: string; steps: Step[] };
 }
 
+/**
+ * The concept DOI of the Zenodo archive, the one that always resolves to the
+ * latest release. Stated once here; `astro.config.mjs` and the About page
+ * carry the same value in their own machine-readable and citation contexts.
+ */
+const DOI = '10.5281/zenodo.21215280';
+
 const SPECTRUM_CODE = `import numpy as np
 from phonometry import metrology
 
@@ -69,34 +74,45 @@ signal = np.sin(2 * np.pi * 100 * t) + np.sin(2 * np.pi * 1000 * t)
 
 spl, freq = metrology.octave_filter(signal, fs=fs, fraction=3)`;
 
-const FICHE_CODE = `from phonometry import building, ReportMetadata
+// The call that renders the committed fiche shown beside it
+// (scripts/generate_reports.py), with the metadata block cut to the four
+// fields the page discusses. Same inputs, same Rw (C; Ctr) = 31 (-1; -3) dB
+// and the same PASS against the 30 dB requirement.
+const FICHE_CODE = `import numpy as np
+from phonometry import building, ReportMetadata
 
-R = [20.4, 16.3, 17.7, 22.6, 22.4, 22.7, 24.8, 26.6,
-     28.0, 30.5, 31.8, 32.5, 33.4, 33.0, 31.0, 25.5]
+freqs = np.array([100, 125, 160, 200, 250, 315,
+                  400, 500, 630, 800, 1000, 1250,
+                  1600, 2000, 2500, 3150])
 
-meta = ReportMetadata(
-    specimen="200 mm reinforced-concrete wall",
-    laboratory="Phonometry Reference Laboratory",
-    report_id="PHN-2026-0042",
-    requirement=42.0,  # adds the verdict row
+R = building.single_panel_transmission_loss(
+    freqs, mass_per_area=15.0,
+    critical_frequency=2000.0, loss_factor=0.02,
 )
 
-building.weighted_rating(R).report("Rw_fiche.pdf", metadata=meta)`;
+meta = ReportMetadata(
+    specimen="6 mm float glass pane",
+    laboratory="Phonometry reference example",
+    report_id="EXAMPLE-717-1",
+    requirement=30.0,  # adds the verdict row
+)
+
+R.report("Rw_fiche.pdf", metadata=meta)`;
 
 export const en: HomeContent = {
 	statsLabel: 'The library in four numbers',
 	stats: [
 		{ value: checksRatio, label: 'conformance checks passing', href: '/phonometry/reference/conformance/' },
 		{ value: String(standards), label: `standards referenced, across ${domains} domains` },
-		{ value: '506', label: 'figures, each in light and dark, English and Spanish' },
-		{ value: '32', label: 'normative PDF fiches rendered by .report()' },
+		{ value: String(figures), label: 'figures, each in light and dark, English and Spanish' },
+		{ value: String(fiches), label: 'PDF fiches in the reporting format their standard defines, rendered by .report()' },
 	],
 	what: {
 		title: 'What this is',
 		body: [
 			'phonometry is a Python library for acoustic measurement, analysis and prediction. You give it a signal, a measured spectrum or a set of geometrical and material inputs; it gives you the quantity the standard defines, with the intermediate terms still visible.',
 			'Every result is a typed, frozen dataclass. It carries the inputs it was computed from, it draws its own figure with a one-line <code>.plot()</code> in English or Spanish, and where a standard defines a reporting format it renders a one-page PDF fiche with <code>.report()</code>.',
-			'It is written and maintained by one person, published under the MIT licence on PyPI, archived with a DOI on Zenodo, and currently at version 3.2.0. It needs Python 3.13 with NumPy and SciPy; matplotlib, numba and reportlab are optional extras.',
+			`It is written and maintained by one person, published under the MIT licence on <a href="https://pypi.org/project/phonometry/">PyPI</a>, archived with a <a href="https://doi.org/${DOI}">DOI on Zenodo</a>, and currently at version ${version}. It needs Python 3.13 or newer with NumPy and SciPy; matplotlib, numba and reportlab are optional extras.`,
 		],
 	},
 	who: {
@@ -121,55 +137,55 @@ export const en: HomeContent = {
 		lead: 'Two things the library does that are hard to claim and easy to show: the result of an analysis draws itself, and where a standard prescribes a reporting layout, the same result renders that layout as a PDF.',
 		spectrum: {
 			title: 'An analysis, and the figure it draws',
-			note: 'One-third-octave band levels of a two-tone signal, per IEC 61260-1 band edges, with the raw power spectral density behind them. The figure below is the one committed in the documentation, not a mock-up.',
+			note: 'One-third-octave band levels of a two-tone signal, per IEC 61260-1 band edges, with the raw power spectral density behind them. The figure below is the one committed to the documentation, not a mock-up.',
 			code: SPECTRUM_CODE,
 			alt: 'One-third-octave spectrum of a two-tone signal, with the raw power spectral density in the background',
 			caption: 'From the Getting Started guide: 33 bands from 12.6 Hz to 20 kHz, peaking at 100 Hz and 1 kHz.',
 		},
 		fiche: {
 			title: 'A rating, and the fiche it renders',
-			note: 'The weighted airborne rating of ISO 717-1 from a measured 16-band spectrum, rendered in the layout an accredited report uses: metadata header, band table, measured curve against the shifted reference, the boxed single-number result and the verdict against the requirement.',
+			note: 'The weighted airborne rating of ISO 717-1 over the 16 one-third-octave bands the rating uses, rendered in a laboratory report layout: metadata header, band table, the curve against the shifted reference, the boxed single-number result and the verdict against the requirement. The code is the call that renders the fiche beside it, with the metadata block cut to the fields discussed here.',
 			code: FICHE_CODE,
-			caption: 'Airborne rating fiche (WeightedRatingResult.report), Rw (C; Ctr).',
+			caption: 'Airborne rating fiche (SoundReductionResult.report), Rw (C; Ctr).',
 			linkTitle: 'Airborne ISO 717-1 example report (PDF)',
 			description:
-				'One-page airborne sound insulation fiche: a metadata header, the one-third-octave R table beside the measured-versus-shifted-reference plot, the boxed Rw (C; Ctr) single-number result and a PASS verdict against the requirement.',
+				'One-page airborne sound insulation fiche for a 6 mm float glass pane: a metadata header, the one-third-octave R table beside the plot of that curve against the shifted reference, the boxed result Rw (C; Ctr) = 31 (-1; -3) dB and a PASS verdict against the 30 dB requirement.',
 		},
 	},
 	coverage: {
 		title: 'What it covers',
-		lead: 'Nine areas, 93 guides, 120 API reference pages. Each row links to the area overview; the designations are the standards actually implemented there, not a reading list.',
+		lead: `Nine areas, ${guides} guides, ${apiPages} API reference pages. Each row links to the area overview; the designations are the standards actually implemented there, not a reading list.`,
 		headers: ['Area', 'Standards implemented'],
 		areas: [
 			{
 				name: 'Core signal analysis',
 				href: '/phonometry/guides/sections/core-signal-analysis/',
 				summary: 'Filter banks, weighting, levels, spectra, calibration and uncertainty.',
-				standards: ['IEC 61260-1', 'ANSI S1.11', 'IEC 61672-1', 'ISO 7196', 'IEC 61252', 'ISO 1996-1', 'IEC 60942', 'ISO 18233', 'GUM'],
+				standards: ['IEC 61260-1', 'ANSI S1.11', 'IEC 61672-1', 'ISO 7196', 'IEC 61252', 'ISO 1996-1', 'IEC 60942', 'GUM'],
 			},
 			{
 				name: 'Hearing and perception',
 				href: '/phonometry/guides/sections/hearing-perception/',
 				summary: 'Loudness, sound quality, speech intelligibility, hearing and exposure.',
-				standards: ['ISO 532-1/-2/-3', 'ECMA-418-1/-2', 'ISO 226', 'DIN 45692', 'IEC 60268-16', 'ANSI S3.5', 'ISO 7029', 'ISO 1999', 'ISO 9612'],
+				standards: ['ISO 532-1/-2/-3', 'ECMA-418-1/-2', 'ISO 226', 'DIN 45692', 'IEC 60268-16', 'ANSI S3.5', 'DIN 45681', 'ISO/PAS 20065', 'ISO 7029', 'ISO 389-7', 'ISO 1999', 'ISO 9612'],
 			},
 			{
 				name: 'Rooms and buildings',
 				href: '/phonometry/guides/sections/rooms-buildings/',
 				summary: 'Room parameters, background noise, field and laboratory insulation, prediction.',
-				standards: ['ISO 3382-1/-2/-3', 'ISO 16283-1/-2/-3', 'ISO 10140', 'ISO 717-1/-2', 'EN 12354-1…-6', 'ISO 12999-1', 'ISO 10052', 'ANSI/ASA S12.2'],
+				standards: ['ISO 3382-1/-2/-3', 'ISO 16283-1/-2/-3', 'ISO 10140', 'ISO 10848', 'ISO 15186-1/-2', 'ISO 16251-1', 'ISO 717-1/-2', 'EN 12354-1…-6', 'ISO 18233', 'ISO 12999-1', 'ISO 10052', 'ANSI/ASA S12.2', 'ASTM E413/E1414'],
 			},
 			{
 				name: 'Materials and surfaces',
 				href: '/phonometry/guides/sections/materials-surfaces/',
 				summary: 'Absorption, airflow resistance, impedance tube, porous and metamaterial models, diffusers, scattering.',
-				standards: ['ISO 354', 'ISO 11654', 'ISO 10534-2', 'ISO 9053', 'ISO 17497-1/-2', 'ISO 13472', 'EN 29052'],
+				standards: ['ISO 354', 'ISO 11654', 'ISO 10534-1/-2', 'ISO 9053-1/-2', 'ISO 17497-1/-2', 'ISO 13472-1/-2', 'EN 29052-1', 'ISO 12999-2'],
 			},
 			{
 				name: 'Vibration and structure-borne sound',
 				href: '/phonometry/guides/sections/vibration/',
 				summary: 'Mobility and FRFs, isolators, radiated power, junctions, human vibration.',
-				standards: ['ISO 7626', 'ISO 10846', 'ISO/TS 7849', 'EN 15657', 'EN 12354-5', 'ISO 2631-1/-5', 'ISO 5349', 'ISO 8041'],
+				standards: ['ISO 7626-1/-2', 'ISO 10846-1/-2/-3', 'ISO 9611', 'ISO/TS 7849-1/-2', 'EN 15657', 'EN 12354-5', 'ISO 2631-1/-2/-4/-5', 'ISO 5349-1/-2', 'ISO 8041-1'],
 			},
 			{
 				name: 'Environment and transport',
@@ -228,16 +244,16 @@ export const es: HomeContent = {
 	statsLabel: 'La biblioteca en cuatro cifras',
 	stats: [
 		{ value: checksRatio, label: 'comprobaciones de conformidad superadas', href: '/phonometry/es/reference/conformance/' },
-		{ value: String(standards), label: `normas implementadas, en ${domains} dominios` },
-		{ value: '506', label: 'figuras, cada una en claro y oscuro, en inglés y español' },
-		{ value: '32', label: 'fichas PDF normativas que genera .report()' },
+		{ value: String(standards), label: `normas referenciadas, en ${domains} dominios` },
+		{ value: String(figures), label: 'figuras, cada una en claro y oscuro, en inglés y español' },
+		{ value: String(fiches), label: 'fichas PDF con el formato de informe que define su norma, generadas por .report()' },
 	],
 	what: {
 		title: 'Qué es',
 		body: [
 			'phonometry es una biblioteca de Python para medición, análisis y predicción acústica. Le das una señal, un espectro medido o un conjunto de datos geométricos y de materiales, y te devuelve la magnitud que define la norma, con los términos intermedios a la vista.',
-			'Cada resultado es un dataclass tipado e inmutable. Conserva los datos de entrada con los que se calculó, dibuja su propia figura con un <code>.plot()</code> de una línea en inglés o en español y, cuando una norma define un formato de informe, genera una ficha PDF de una página con <code>.report()</code>.',
-			'La escribe y la mantiene una sola persona, se publica con licencia MIT en PyPI, se archiva con DOI en Zenodo y va por la versión 3.2.0. Necesita Python 3.13 con NumPy y SciPy; matplotlib, numba y reportlab son extras opcionales.',
+			'Cada resultado es un dataclass tipado y congelado (<code>frozen</code>). Conserva los datos de entrada con los que se calculó, dibuja su propia figura con un <code>.plot()</code> de una línea en inglés o en español y, cuando una norma define un formato de informe, genera una ficha PDF de una página con <code>.report()</code>.',
+			`La escribe y la mantiene una sola persona, se publica con licencia MIT en <a href="https://pypi.org/project/phonometry/">PyPI</a>, se archiva con <a href="https://doi.org/${DOI}">DOI en Zenodo</a> y va por la versión ${version}. Necesita Python 3.13 o posterior con NumPy y SciPy; matplotlib, numba y reportlab son extras opcionales.`,
 		],
 	},
 	who: {
@@ -252,71 +268,71 @@ export const es: HomeContent = {
 	honest: {
 		title: 'Qué no es',
 		items: [
-			'No es un instrumento certificado. El informe de conformidad es la biblioteca comprobando su propia salida frente a valores publicados en las normas, no una calibración acreditada por un tercero. Una medición con validez legal sigue necesitando equipo con aprobación de modelo.',
+			'No es un instrumento certificado. El informe de conformidad consiste en que la biblioteca comprueba su propia salida frente a valores publicados en las normas; no es una calibración acreditada por un tercero. Una medición con validez legal sigue necesitando equipo con aprobación de modelo.',
 			'No es un sistema de adquisición de datos. Procesa los arrays y los archivos que le pases; no habla con tarjetas de sonido, micrófonos ni analizadores.',
 			'No implementa por completo todas las normas que cita. Cada guía indica qué apartados, métodos y anexos cubre y cuáles no.',
 		],
 	},
 	proof: {
 		title: 'Cómo se ve en uso',
-		lead: 'Dos cosas difíciles de afirmar y fáciles de enseñar: el resultado de un análisis se dibuja solo y, cuando una norma prescribe un formato de informe, ese mismo resultado lo genera en PDF.',
+		lead: 'Dos cosas que hace la biblioteca, difíciles de afirmar y fáciles de enseñar: el resultado de un análisis se dibuja solo y, cuando una norma prescribe un formato de informe, ese mismo resultado lo genera en PDF.',
 		spectrum: {
 			title: 'Un análisis y la figura que dibuja',
 			note: 'Niveles por bandas de tercio de octava de una señal de dos tonos, con los límites de banda de IEC 61260-1 y la densidad espectral de potencia bruta al fondo. La figura de abajo es la que está publicada en la documentación, no una maqueta.',
 			code: SPECTRUM_CODE,
 			alt: 'Espectro en tercios de octava de una señal de dos tonos, con la densidad espectral de potencia bruta al fondo',
-			caption: 'De la guía de introducción: 33 bandas de 12,6 Hz a 20 kHz, con máximos en 100 Hz y 1 kHz.',
+			caption: 'De la guía Primeros pasos: 33 bandas de 12,6 Hz a 20 kHz, con máximos en 100 Hz y 1 kHz.',
 		},
 		fiche: {
 			title: 'Un índice global y la ficha que genera',
-			note: 'El índice global de aislamiento a ruido aéreo de ISO 717-1 a partir de un espectro medido de 16 bandas, con el formato que usa un informe acreditado: cabecera de metadatos, tabla por bandas, curva medida frente a la curva de referencia desplazada, el resultado de un solo número enmarcado y el veredicto frente al requisito.',
+			note: 'El índice global de aislamiento a ruido aéreo de ISO 717-1 sobre las 16 bandas de tercio de octava que usa el índice, con el formato de un informe de laboratorio: cabecera de metadatos, tabla por bandas, la curva frente a la curva de referencia desplazada, el resultado de un solo número enmarcado y el veredicto frente al requisito. El código es la llamada que genera la ficha de al lado, con el bloque de metadatos reducido a los campos de los que se habla aquí.',
 			code: FICHE_CODE,
-			caption: 'Ficha del índice global a ruido aéreo (WeightedRatingResult.report), Rw (C; Ctr).',
+			caption: 'Ficha del índice global a ruido aéreo (SoundReductionResult.report), Rw (C; Ctr).',
 			linkTitle: 'Informe de ejemplo ISO 717-1 a ruido aéreo (PDF)',
 			description:
-				'Ficha de aislamiento a ruido aéreo de una página: cabecera de metadatos, tabla de R en tercios de octava junto al gráfico de la curva medida frente a la de referencia desplazada, el resultado Rw (C; Ctr) enmarcado y el veredicto APTO frente al requisito.',
+				'Ficha de aislamiento a ruido aéreo de una página para un vidrio flotado de 6 mm: cabecera de metadatos, tabla de R en tercios de octava junto al gráfico de esa curva frente a la de referencia desplazada, el resultado Rw (C; Ctr) = 31 (-1; -3) dB enmarcado y el veredicto (PASS, en inglés como el resto de la ficha) frente al requisito de 30 dB.',
 		},
 	},
 	coverage: {
 		title: 'Qué abarca',
-		lead: 'Nueve áreas, 93 guías y 120 páginas de referencia de la API. Cada fila enlaza al índice del área; las designaciones son las normas realmente implementadas ahí, no una lista de lecturas.',
+		lead: `Nueve áreas, ${guides} guías y ${apiPages} páginas de referencia de la API. Cada fila enlaza al índice del área; las designaciones son las normas realmente implementadas ahí, no una lista de lecturas.`,
 		headers: ['Área', 'Normas implementadas'],
 		areas: [
 			{
 				name: 'Análisis de señal',
 				href: '/phonometry/es/guides/sections/core-signal-analysis/',
 				summary: 'Bancos de filtros, ponderaciones, niveles, espectros, calibración e incertidumbre.',
-				standards: ['IEC 61260-1', 'ANSI S1.11', 'IEC 61672-1', 'ISO 7196', 'IEC 61252', 'ISO 1996-1', 'IEC 60942', 'ISO 18233', 'GUM'],
+				standards: ['IEC 61260-1', 'ANSI S1.11', 'IEC 61672-1', 'ISO 7196', 'IEC 61252', 'ISO 1996-1', 'IEC 60942', 'GUM'],
 			},
 			{
 				name: 'Audición y percepción',
 				href: '/phonometry/es/guides/sections/hearing-perception/',
 				summary: 'Sonoridad, calidad sonora, inteligibilidad del habla, audición y exposición.',
-				standards: ['ISO 532-1/-2/-3', 'ECMA-418-1/-2', 'ISO 226', 'DIN 45692', 'IEC 60268-16', 'ANSI S3.5', 'ISO 7029', 'ISO 1999', 'ISO 9612'],
+				standards: ['ISO 532-1/-2/-3', 'ECMA-418-1/-2', 'ISO 226', 'DIN 45692', 'IEC 60268-16', 'ANSI S3.5', 'DIN 45681', 'ISO/PAS 20065', 'ISO 7029', 'ISO 389-7', 'ISO 1999', 'ISO 9612'],
 			},
 			{
 				name: 'Salas y edificación',
 				href: '/phonometry/es/guides/sections/rooms-buildings/',
 				summary: 'Parámetros de sala, ruido de fondo, aislamiento en campo y laboratorio, predicción.',
-				standards: ['ISO 3382-1/-2/-3', 'ISO 16283-1/-2/-3', 'ISO 10140', 'ISO 717-1/-2', 'EN 12354-1…-6', 'ISO 12999-1', 'ISO 10052', 'ANSI/ASA S12.2'],
+				standards: ['ISO 3382-1/-2/-3', 'ISO 16283-1/-2/-3', 'ISO 10140', 'ISO 10848', 'ISO 15186-1/-2', 'ISO 16251-1', 'ISO 717-1/-2', 'EN 12354-1…-6', 'ISO 18233', 'ISO 12999-1', 'ISO 10052', 'ANSI/ASA S12.2', 'ASTM E413/E1414'],
 			},
 			{
 				name: 'Materiales y superficies',
 				href: '/phonometry/es/guides/sections/materials-surfaces/',
 				summary: 'Absorción, resistencia al flujo de aire, tubo de impedancia, modelos porosos y de metamaterial, difusores, dispersión.',
-				standards: ['ISO 354', 'ISO 11654', 'ISO 10534-2', 'ISO 9053', 'ISO 17497-1/-2', 'ISO 13472', 'EN 29052'],
+				standards: ['ISO 354', 'ISO 11654', 'ISO 10534-1/-2', 'ISO 9053-1/-2', 'ISO 17497-1/-2', 'ISO 13472-1/-2', 'EN 29052-1', 'ISO 12999-2'],
 			},
 			{
 				name: 'Vibración y ruido estructural',
 				href: '/phonometry/es/guides/sections/vibration/',
 				summary: 'Movilidad y FRF, aisladores, potencia radiada, uniones, vibración en humanos.',
-				standards: ['ISO 7626', 'ISO 10846', 'ISO/TS 7849', 'EN 15657', 'EN 12354-5', 'ISO 2631-1/-5', 'ISO 5349', 'ISO 8041'],
+				standards: ['ISO 7626-1/-2', 'ISO 10846-1/-2/-3', 'ISO 9611', 'ISO/TS 7849-1/-2', 'EN 15657', 'EN 12354-5', 'ISO 2631-1/-2/-4/-5', 'ISO 5349-1/-2', 'ISO 8041-1'],
 			},
 			{
 				name: 'Medio ambiente y transporte',
 				href: '/phonometry/es/guides/sections/environment-transport/',
 				summary: 'Propagación en exteriores, barreras, refracción, aeronaves, helicópteros y aerogeneradores.',
-				standards: ['ISO 9613-1/-2', 'ISO 1996-1/-2', 'ISO/PAS 1996-3', 'NT ACOU 112', 'CNOSSOS-EU (Anexo II 2002/49/CE)', 'Anexo 16 OACI', 'IEC 61265', 'SAE ARP 5534', 'Doc 29/32 CEAC', 'IEC 61400-11'],
+				standards: ['ISO 9613-1/-2', 'ISO 1996-1/-2', 'ISO/PAS 1996-3', 'NT ACOU 112', 'CNOSSOS-EU (Directiva 2002/49/CE, anexo II)', 'Anexo 16 OACI', 'IEC 61265', 'SAE ARP 5534', 'ECAC Doc 29/32', 'IEC 61400-11'],
 			},
 			{
 				name: 'Acústica submarina',
@@ -333,14 +349,14 @@ export const es: HomeContent = {
 			{
 				name: 'Simulación de ondas',
 				href: '/phonometry/es/guides/sections/simulation/',
-				summary: 'Solvers FDTD 2D deterministas, acústico y elástico P-SV, validados frente a oráculos analíticos y no frente a una norma.',
-				standards: ['sin norma aplicable'],
+				summary: 'Solvers FDTD 2D deterministas, acústicos y elásticos P-SV, validados frente a oráculos analíticos y no frente a una norma.',
+				standards: ['sin norma que la rija'],
 			},
 		],
 	},
 	start: {
 		title: 'Empezar desde cero',
-		lead: 'Tres pasos, en orden. Los dos primeros son cuestión de minutos; al tercero se vuelve una y otra vez.',
+		lead: 'Tres pasos, en orden. Los dos primeros son cuestión de minutos; al tercero vuelves una y otra vez.',
 		steps: [
 			{
 				title: 'Instálala',
@@ -350,10 +366,10 @@ export const es: HomeContent = {
 				linkText: 'Opciones de instalación',
 			},
 			{
-				title: 'Haz un análisis completo',
-				body: 'La guía de introducción recorre una vez toda la cadena de proceso, primero con una señal sintética y después con un archivo WAV: calibración, ponderación frecuencial, banco de filtros, ponderación temporal y los niveles que salen.',
+				title: 'Haz un análisis de principio a fin',
+				body: 'La guía Primeros pasos recorre una vez toda la cadena de proceso, primero con una señal sintética y después con un archivo WAV: calibración, ponderación frecuencial, banco de filtros, ponderación temporal y los niveles que salen.',
 				href: '/phonometry/es/getting-started/',
-				linkText: 'Introducción',
+				linkText: 'Primeros pasos',
 			},
 			{
 				title: 'Ve a tu dominio',

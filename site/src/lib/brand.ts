@@ -13,8 +13,9 @@
  */
 import lockup from '../../../.github/brand/lockup.svg?raw';
 import mark from '../../../.github/brand/logo.svg?raw';
+import wordmark from '../../../.github/brand/wordmark.svg?raw';
 
-export type BrandAsset = 'lockup' | 'mark';
+export type BrandAsset = 'lockup' | 'mark' | 'wordmark';
 
 /** Exact strings from scripts/generate_brand.py, asserted rather than assumed. */
 const NAMED = ' role="img" aria-label="phonometry"';
@@ -28,8 +29,10 @@ const TITLE = '  <title>phonometry</title>\n';
  */
 const EMBEDDED_STYLE = /\n? *<style>[\s\S]*?<\/style>\n?/;
 
+const SOURCES: Record<BrandAsset, string> = { lockup, mark, wordmark };
+
 export function brandSvg(asset: BrandAsset): string {
-	const source = asset === 'lockup' ? lockup : mark;
+	const source = SOURCES[asset];
 	if (!source.includes(NAMED) || !source.includes(TITLE)) {
 		throw new Error(
 			`brand asset "${asset}" is missing the generator's role/title markup; ` +

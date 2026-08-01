@@ -42,6 +42,22 @@
   width: 100%;
   height: auto;
 }
+
+/* The wordmark as a heading's content (the landing hero's H1). The asset is
+   trimmed to its ink, and its ink stands 56.67 units on the 68-unit type it
+   was set in, so 0.834em renders the word at the same optical size the live
+   text had at the element's font-size, whatever that size is. The cap keeps
+   it inside a narrow column; with only the height declared, the box scales
+   down preserving the aspect ratio. */
+.ph-brand-word {
+  display: block;
+}
+.ph-brand-word svg {
+  display: block;
+  height: 0.834em;
+  width: auto;
+  max-width: 100%;
+}
 @media (min-width: 50rem) {
   .hero .hero-html {
     width: min(100%, 15rem);
