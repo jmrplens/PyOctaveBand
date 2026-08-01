@@ -253,22 +253,79 @@ export const bibtex = `@software{${key},
 }`;
 
 /**
- * The About page publishes this same entry in prose, in both locales, and a
- * reader who copies one and reads the other has to find them identical. The
- * page is markdown and cannot import, so instead the build checks it: a
- * reflowed or edited block there fails here rather than shipping two citations
- * that disagree about the version, the year or the DOI.
+ * The About page publishes this citation three times over, in both locales: as
+ * a bold DOI link, as an APA reference, and as the BibTeX entry above. A reader
+ * who copies one and reads another has to find them saying the same thing, and
+ * the page is markdown and cannot import any of it, so the build checks all
+ * three rather than only the block that is easiest to compare. A reflowed or
+ * edited citation fails here instead of shipping three that disagree about the
+ * version, the year or the DOI.
+ *
+ * What is checked is what this file generates. The APA reference also carries
+ * prose that nothing here produces (the bracketed medium, and the label in
+ * front of the version, both written in the page's own language), and those are
+ * left to the translation-parity check and to review: inventing an APA
+ * renderer here to compare against would be a second citation format to keep
+ * correct, and it would still not be the one on the page.
  */
 const collapse = (text) => text.replace(/\s+/g, ' ').trim();
 
+/** "Requena-Plens, J. M.", one per author, as an APA reference names them. */
+const apaNames = cff.authors.map((author) => {
+  const initials = author['given-names']
+    .split(/\s+/)
+    .map((part) => `${part[0]}.`)
+    .join(' ');
+  return `${author['family-names']}, ${initials}`;
+});
+
 for (const page of ['about.md', 'es/about.md']) {
-  const source = readFileSync(root(`site/src/content/docs/${page}`), 'utf8');
+  const path = `site/src/content/docs/${page}`;
+  const source = readFileSync(root(path), 'utf8');
+  const fail = (problem) => {
+    throw new Error(`${path}: ${problem}`);
+  };
+
   const block = source.match(/```bibtex\n([\s\S]*?)```/);
-  if (!block) throw new Error(`site/src/content/docs/${page}: no bibtex block to check.`);
+  if (!block) fail('no bibtex block to check.');
   if (collapse(block[1]) !== collapse(bibtex)) {
-    throw new Error(
-      `site/src/content/docs/${page}: the BibTeX block has drifted from the one built ` +
-        `from CITATION.cff. Expected, ignoring line breaks and padding:\n\n${bibtex}\n`,
+    fail(
+      'the BibTeX block has drifted from the one built from CITATION.cff. ' +
+        `Expected, ignoring line breaks and padding:\n\n${bibtex}\n`,
     );
+  }
+
+  // The bold link to the archived record. Both halves of it are the DOI, so
+  // one edited in CITATION.cff has to reach both or neither.
+  const doiLink = `**[doi.org/${doi}](${doiUrl})**`;
+  if (!source.includes(doiLink)) fail(`the link to the archived record should read ${doiLink}`);
+
+  // The APA reference, quoted under its own label.
+  const quoted = source.match(/\nAPA:\n+((?:>.*\n)+)/);
+  if (!quoted) fail('no APA reference, quoted under an "APA:" label, to check.');
+  const apa = collapse(quoted[1].replace(/^>\s?/gm, ''));
+
+  for (const name of apaNames) {
+    if (!apa.includes(name)) fail(`the APA reference should name ${name}: ${apa}`);
+  }
+  if (!apa.includes(`(${releaseYear}).`)) {
+    fail(`the APA reference should carry the year ${releaseYear}: ${apa}`);
+  }
+  if (!apa.includes(doiUrl)) fail(`the APA reference should end at ${doiUrl}: ${apa}`);
+
+  // The italicised title, which APA gives without the parenthetical former
+  // name that `CITATION.cff` carries, so it has to open the full title rather
+  // than equal it.
+  const italic = apa.match(/\*([^*]+)\*/);
+  if (!italic) fail(`the APA reference should italicise the title: ${apa}`);
+  if (!cff.title.startsWith(italic[1])) {
+    fail(`the APA title "${italic[1]}" does not open the one in CITATION.cff: ${cff.title}`);
+  }
+
+  // The version, behind the label APA puts in front of it in either language.
+  const cited = apa.match(/\(Versi[oó]n\s+([^)]+)\)/);
+  if (!cited) fail(`the APA reference should give the version in parentheses: ${apa}`);
+  if (cited[1] !== version) {
+    fail(`the APA reference cites version ${cited[1]}, but VERSION says ${version}.`);
   }
 }
