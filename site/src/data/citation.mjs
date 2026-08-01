@@ -189,6 +189,11 @@ function toBibtex(value) {
       if (!accent) throw new Error(`No BibTeX spelling for the accent in: ${whole}`);
       return `{\\${accent}${letter}}`;
     })
+    // The backslash is absent from this class on purpose: the guard above
+    // refuses one outright, so there is none left to escape here, and adding
+    // it would write `\\`, which LaTeX reads as a line break rather than as a
+    // literal backslash.
+    // codeql[js/incomplete-sanitization]
     .replace(/([&%$#_])/g, '\\$1');
   // Anything left outside printable ASCII would reach a .bib file as a raw byte.
   if (/[^\x20-\x7e]/.test(escaped)) {
