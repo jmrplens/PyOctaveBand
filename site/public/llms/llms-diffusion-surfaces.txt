@@ -606,7 +606,7 @@ no longer small against the wavelength; a frequency-blind single number
 - [Outdoor Sound Propagation](https://jmrplens.github.io/phonometry/guides/outdoor-propagation/): the full ISO 9613-1
   atmospheric-absorption model whose pure-tone coefficient the ISO 17497-1
   air-attenuation relations consume.
-- API reference: [`materials.scattering_diffusion`](https://jmrplens.github.io/phonometry/reference/api/materials/scattering-diffusion/) and [`materials.diffuser_design`](https://jmrplens.github.io/phonometry/reference/api/materials/diffuser-design/).
+- API reference: [`materials.diffusers.scattering_diffusion`](https://jmrplens.github.io/phonometry/reference/api/materials/scattering-diffusion/) and [`materials.diffusers.design`](https://jmrplens.github.io/phonometry/reference/api/materials/design/).
 
 ## References
 
@@ -903,7 +903,7 @@ both against the same-footprint flat reference of ISO 17497-2 Formula (7).
   equivalent-fluid and resonant layers the metamaterial cells are built from.
 - [2D FDTD wave simulation](https://jmrplens.github.io/phonometry/guides/fdtd-simulation/): the wave solver behind the
   animation above, meshing the real slit and resonator geometry.
-- API reference: [`materials.metadiffuser`](https://jmrplens.github.io/phonometry/reference/api/materials/metadiffuser/) and [`materials.diffuser_design`](https://jmrplens.github.io/phonometry/reference/api/materials/diffuser-design/).
+- API reference: [`materials.diffusers.metadiffuser`](https://jmrplens.github.io/phonometry/reference/api/materials/metadiffuser/) and [`materials.diffusers.design`](https://jmrplens.github.io/phonometry/reference/api/materials/design/).
 
 ## References
 
@@ -1263,7 +1263,7 @@ few positions.
   materials that can be brought indoors.
 - [Outdoor Sound Propagation](https://jmrplens.github.io/phonometry/guides/outdoor-propagation/): where the absorption
   of the ground surface enters the propagation models.
-- API reference: [`materials.road_absorption`](https://jmrplens.github.io/phonometry/reference/api/materials/road-absorption/).
+- API reference: [`materials.surfaces.road_absorption`](https://jmrplens.github.io/phonometry/reference/api/materials/road-absorption/).
 
 ## References
 

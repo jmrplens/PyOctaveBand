@@ -250,7 +250,7 @@ the model, is $\sigma$.
 - [Sound Absorption Measurement and Rating](absorption-measurement.md): the
   reverberation-room measurement and the ISO 11654 rating of the finished
   absorber.
-- API reference: [`materials.airflow_resistance`](https://jmrplens.github.io/phonometry/reference/api/materials/airflow-resistance/).
+- API reference: [`materials.absorbers.airflow_resistance`](https://jmrplens.github.io/phonometry/reference/api/materials/airflow-resistance/).
 
 ## References
 

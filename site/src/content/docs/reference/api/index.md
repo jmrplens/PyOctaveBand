@@ -135,19 +135,19 @@ La referencia de la API se genera a partir de los docstrings del código (en ing
 
 | Module | Summary |
 | :--- | :--- |
-| [`materials.sound_absorption`](/phonometry/reference/api/materials/sound-absorption/) | Sound absorption in a reverberation room: BS EN ISO 354:2003. |
-| [`materials.absorption_rating`](/phonometry/reference/api/materials/absorption-rating/) | Single-number rating of sound absorption (ISO 11654:1997). |
-| [`materials.absorption_uncertainty`](/phonometry/reference/api/materials/absorption-uncertainty/) | Measurement uncertainty for sound absorption (ISO 12999-2:2020). |
-| [`materials.airflow_resistance`](/phonometry/reference/api/materials/airflow-resistance/) | Airflow resistance of porous materials: ISO 9053-1 and ISO 9053-2. |
-| [`materials.dynamic_stiffness`](/phonometry/reference/api/materials/dynamic-stiffness/) | Dynamic stiffness of resilient materials under floating floors (EN 29052-1:1992). |
-| [`materials.impedance_tube`](/phonometry/reference/api/materials/impedance-tube/) | Impedance-tube material characterisation. |
-| [`materials.porous_absorber`](/phonometry/reference/api/materials/porous-absorber/) | Porous-material models and multilayer absorber prediction. |
-| [`materials.biot`](/phonometry/reference/api/materials/biot/) | Biot poroelastic layers: the three waves and the 6x6 transfer matrix. |
-| [`materials.slow_sound_absorber`](/phonometry/reference/api/materials/slow-sound-absorber/) | Slow-sound slit panels loaded with Helmholtz resonators (perfect absorbers). |
-| [`materials.scattering_diffusion`](/phonometry/reference/api/materials/scattering-diffusion/) | Random-incidence scattering and directional diffusion coefficients. |
-| [`materials.diffuser_design`](/phonometry/reference/api/materials/diffuser-design/) | Far-field polar response and diffusion coefficient predicted from a diffuser design. |
-| [`materials.metadiffuser`](/phonometry/reference/api/materials/metadiffuser/) | Metadiffusers: deep-subwavelength Schroeder-like sound diffusers. |
-| [`materials.road_absorption`](/phonometry/reference/api/materials/road-absorption/) | In-situ sound absorption of road surfaces (ISO 13472-1 / ISO 13472-2). |
+| [`materials.absorbers.sound_absorption`](/phonometry/reference/api/materials/sound-absorption/) | Sound absorption in a reverberation room: BS EN ISO 354:2003. |
+| [`materials.absorbers.rating`](/phonometry/reference/api/materials/rating/) | Single-number rating of sound absorption (ISO 11654:1997). |
+| [`materials.absorbers.uncertainty`](/phonometry/reference/api/materials/uncertainty/) | Measurement uncertainty for sound absorption (ISO 12999-2:2020). |
+| [`materials.absorbers.airflow_resistance`](/phonometry/reference/api/materials/airflow-resistance/) | Airflow resistance of porous materials: ISO 9053-1 and ISO 9053-2. |
+| [`materials.resilient.dynamic_stiffness`](/phonometry/reference/api/materials/dynamic-stiffness/) | Dynamic stiffness of resilient materials under floating floors (EN 29052-1:1992). |
+| [`materials.absorbers.impedance_tube`](/phonometry/reference/api/materials/impedance-tube/) | Impedance-tube material characterisation. |
+| [`materials.absorbers.porous`](/phonometry/reference/api/materials/porous/) | Porous-material models and multilayer absorber prediction. |
+| [`materials.absorbers.biot`](/phonometry/reference/api/materials/biot/) | Biot poroelastic layers: the three waves and the 6x6 transfer matrix. |
+| [`materials.absorbers.slow_sound`](/phonometry/reference/api/materials/slow-sound/) | Slow-sound slit panels loaded with Helmholtz resonators (perfect absorbers). |
+| [`materials.diffusers.scattering_diffusion`](/phonometry/reference/api/materials/scattering-diffusion/) | Random-incidence scattering and directional diffusion coefficients. |
+| [`materials.diffusers.design`](/phonometry/reference/api/materials/design/) | Far-field polar response and diffusion coefficient predicted from a diffuser design. |
+| [`materials.diffusers.metadiffuser`](/phonometry/reference/api/materials/metadiffuser/) | Metadiffusers: deep-subwavelength Schroeder-like sound diffusers. |
+| [`materials.surfaces.road_absorption`](/phonometry/reference/api/materials/road-absorption/) | In-situ sound absorption of road surfaces (ISO 13472-1 / ISO 13472-2). |
 
 ## Vibration and structure-borne
 

@@ -1,5 +1,5 @@
 ---
-title: "materials.impedance_tube"
+title: "materials.absorbers.impedance_tube"
 description: "Impedance-tube material characterisation."
 sidebar:
   label: "impedance_tube"

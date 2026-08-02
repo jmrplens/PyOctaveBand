@@ -305,19 +305,19 @@ The generated API reference, one page per module. Fetch these only when a specif
 - [hearing/noise-induced-hearing-loss](https://jmrplens.github.io/phonometry/reference/api/hearing/noise-induced-hearing-loss/)
 - [hearing/occupational-exposure](https://jmrplens.github.io/phonometry/reference/api/hearing/occupational-exposure/)
 - [hearing/threshold](https://jmrplens.github.io/phonometry/reference/api/hearing/threshold/)
-- [materials/absorption-rating](https://jmrplens.github.io/phonometry/reference/api/materials/absorption-rating/)
-- [materials/absorption-uncertainty](https://jmrplens.github.io/phonometry/reference/api/materials/absorption-uncertainty/)
 - [materials/airflow-resistance](https://jmrplens.github.io/phonometry/reference/api/materials/airflow-resistance/)
 - [materials/biot](https://jmrplens.github.io/phonometry/reference/api/materials/biot/)
-- [materials/diffuser-design](https://jmrplens.github.io/phonometry/reference/api/materials/diffuser-design/)
+- [materials/design](https://jmrplens.github.io/phonometry/reference/api/materials/design/)
 - [materials/dynamic-stiffness](https://jmrplens.github.io/phonometry/reference/api/materials/dynamic-stiffness/)
 - [materials/impedance-tube](https://jmrplens.github.io/phonometry/reference/api/materials/impedance-tube/)
 - [materials/metadiffuser](https://jmrplens.github.io/phonometry/reference/api/materials/metadiffuser/)
-- [materials/porous-absorber](https://jmrplens.github.io/phonometry/reference/api/materials/porous-absorber/)
+- [materials/porous](https://jmrplens.github.io/phonometry/reference/api/materials/porous/)
+- [materials/rating](https://jmrplens.github.io/phonometry/reference/api/materials/rating/)
 - [materials/road-absorption](https://jmrplens.github.io/phonometry/reference/api/materials/road-absorption/)
 - [materials/scattering-diffusion](https://jmrplens.github.io/phonometry/reference/api/materials/scattering-diffusion/)
-- [materials/slow-sound-absorber](https://jmrplens.github.io/phonometry/reference/api/materials/slow-sound-absorber/)
+- [materials/slow-sound](https://jmrplens.github.io/phonometry/reference/api/materials/slow-sound/)
 - [materials/sound-absorption](https://jmrplens.github.io/phonometry/reference/api/materials/sound-absorption/)
+- [materials/uncertainty](https://jmrplens.github.io/phonometry/reference/api/materials/uncertainty/)
 - [metrology/calibration](https://jmrplens.github.io/phonometry/reference/api/metrology/calibration/)
 - [metrology/data-qualification](https://jmrplens.github.io/phonometry/reference/api/metrology/data-qualification/)
 - [metrology/uncertainty](https://jmrplens.github.io/phonometry/reference/api/metrology/uncertainty/)
@@ -913,7 +913,7 @@ print(float(materials.single_number_rating_uncertainty(8.1).reported_expanded_un
   the EN 12354-6 absorption budget these coefficients feed.
 - [Field Insulation Measurement (ISO 16283)](https://jmrplens.github.io/phonometry/guides/insulation-field/): the
   sound-insulation companion uncertainty standard, ISO 12999-1.
-- API reference: [`materials.sound_absorption`](https://jmrplens.github.io/phonometry/reference/api/materials/sound-absorption/), [`materials.absorption_rating`](https://jmrplens.github.io/phonometry/reference/api/materials/absorption-rating/) and [`materials.absorption_uncertainty`](https://jmrplens.github.io/phonometry/reference/api/materials/absorption-uncertainty/).
+- API reference: [`materials.absorbers.sound_absorption`](https://jmrplens.github.io/phonometry/reference/api/materials/sound-absorption/), [`materials.absorbers.rating`](https://jmrplens.github.io/phonometry/reference/api/materials/rating/) and [`materials.absorbers.uncertainty`](https://jmrplens.github.io/phonometry/reference/api/materials/uncertainty/).
 
 ## References
 
@@ -1902,7 +1902,7 @@ the model, is $\sigma$.
 - [Sound Absorption Measurement and Rating](https://jmrplens.github.io/phonometry/guides/absorption-measurement/): the
   reverberation-room measurement and the ISO 11654 rating of the finished
   absorber.
-- API reference: [`materials.airflow_resistance`](https://jmrplens.github.io/phonometry/reference/api/materials/airflow-resistance/).
+- API reference: [`materials.absorbers.airflow_resistance`](https://jmrplens.github.io/phonometry/reference/api/materials/airflow-resistance/).
 
 ## References
 
@@ -2245,8 +2245,8 @@ contour = aircraft.noise_contour(path, powers, distances, sel, lmax, x=gx, y=gy)
 | `phonometry.hearing` | Audiometric thresholds (ISO 7029/389-7), noise-induced hearing loss (ISO 1999), occupational exposure (ISO 9612) |
 | `phonometry.emission` | Sound power (ISO 3740 family), sound intensity, vibration-based power |
 | `phonometry.room` | Room acoustics (ISO 3382), impulse responses, open-plan, room-noise criteria, reverberation prediction, EN 12354-6 |
-| `phonometry.materials` | Absorption (ISO 354/11654), impedance tube, airflow resistance, scattering/diffusion, road absorption, dynamic stiffness |
 | `phonometry.building` | Three subgroups: `measurement` (field, laboratory, survey and intensity methods with their ISO 717 ratings and ISO 12999 uncertainty), `prediction` (EN 12354 global and detailed models, facades, panels, apertures, plenums and resilient layers) and `regulation` (national codes) |
+| `phonometry.materials` | Four families by what the material does: `absorbers` (ISO 354, ISO 11654, ISO 12999-2, impedance tube ISO 10534-2, airflow resistance ISO 9053, porous and multilayer models, Biot, slow-sound metamaterials), `diffusers` (Schroeder design, metadiffusers, scattering and diffusion ISO 17497), `surfaces` (in-situ road absorption ISO 13472) and `resilient` (dynamic stiffness EN 29052-1) |
 | `phonometry.vibration` | Three families: `structural` (mobility ISO 7626, plate junctions, radiation, experimental SEA, transfer stiffness ISO 10846), `human` (ISO 2631/5349/8041 exposure and multiple shocks) and `machinery` (fault frequencies and condition monitoring) |
 | `phonometry.environment` | Three subgroups: `sources` (CNOSSOS road and rail emission, wind-turbine apparent sound power), `propagation` (ISO 9613-1/-2, ground effect and barriers, refraction by ray tracing and the parabolic equation) and `assessment` (ISO 1996-1/-2 rating and measurement, impulsive prominence, RD 1367/2007) |
 | `phonometry.aircraft` | EPNL (ICAO Annex 16), SAE ARP 5534 absorption, airport contours (ECAC Doc 29), rotorcraft (ECAC Doc 32) |
@@ -2270,6 +2270,7 @@ warns and delegates as well.
 | `phonometry.hearing.sti` | `phonometry.speech.sti` | 5.0 |
 | `phonometry.vibration.human_vibration` | `phonometry.vibration.human.exposure` | 5.0 |
 | `phonometry.building.spanish_building_code` | `phonometry.building.regulation.spain` | 5.0 |
+| `phonometry.materials.porous_absorber` | `phonometry.materials.absorbers.porous` | 5.0 |
 | `phonometry.environmental` | `phonometry.environment` | 5.0 |
 
 | Name | Type | Description (Inputs) | Usage Snippet (Outputs) |
@@ -7382,7 +7383,7 @@ no longer small against the wavelength; a frequency-blind single number
 - [Outdoor Sound Propagation](https://jmrplens.github.io/phonometry/guides/outdoor-propagation/): the full ISO 9613-1
   atmospheric-absorption model whose pure-tone coefficient the ISO 17497-1
   air-attenuation relations consume.
-- API reference: [`materials.scattering_diffusion`](https://jmrplens.github.io/phonometry/reference/api/materials/scattering-diffusion/) and [`materials.diffuser_design`](https://jmrplens.github.io/phonometry/reference/api/materials/diffuser-design/).
+- API reference: [`materials.diffusers.scattering_diffusion`](https://jmrplens.github.io/phonometry/reference/api/materials/scattering-diffusion/) and [`materials.diffusers.design`](https://jmrplens.github.io/phonometry/reference/api/materials/design/).
 
 ## References
 
@@ -14833,7 +14834,7 @@ resolve.
   tubes of section 5.
 - [Calibration and dBFS](https://jmrplens.github.io/phonometry/guides/calibration/): microphone calibration ahead of
   the two-microphone transfer function.
-- API reference: [`materials.impedance_tube`](https://jmrplens.github.io/phonometry/reference/api/materials/impedance-tube/).
+- API reference: [`materials.absorbers.impedance_tube`](https://jmrplens.github.io/phonometry/reference/api/materials/impedance-tube/).
 
 ## References
 
@@ -21009,7 +21010,7 @@ both against the same-footprint flat reference of ISO 17497-2 Formula (7).
   equivalent-fluid and resonant layers the metamaterial cells are built from.
 - [2D FDTD wave simulation](https://jmrplens.github.io/phonometry/guides/fdtd-simulation/): the wave solver behind the
   animation above, meshing the real slit and resonator geometry.
-- API reference: [`materials.metadiffuser`](https://jmrplens.github.io/phonometry/reference/api/materials/metadiffuser/) and [`materials.diffuser_design`](https://jmrplens.github.io/phonometry/reference/api/materials/diffuser-design/).
+- API reference: [`materials.diffusers.metadiffuser`](https://jmrplens.github.io/phonometry/reference/api/materials/metadiffuser/) and [`materials.diffusers.design`](https://jmrplens.github.io/phonometry/reference/api/materials/design/).
 
 ## References
 
@@ -21375,7 +21376,7 @@ a loop over cells.
   animation above.
 - [Airflow Resistance](https://jmrplens.github.io/phonometry/guides/airflow-resistance/): the viscous physics of the
   narrow channels, measured on the bulk material.
-- API reference: [`materials.slow_sound_absorber`](https://jmrplens.github.io/phonometry/reference/api/materials/slow-sound-absorber/).
+- API reference: [`materials.absorbers.slow_sound`](https://jmrplens.github.io/phonometry/reference/api/materials/slow-sound/).
 
 ## References
 
@@ -29202,7 +29203,7 @@ few positions.
   materials that can be brought indoors.
 - [Outdoor Sound Propagation](https://jmrplens.github.io/phonometry/guides/outdoor-propagation/): where the absorption
   of the ground surface enters the propagation models.
-- API reference: [`materials.road_absorption`](https://jmrplens.github.io/phonometry/reference/api/materials/road-absorption/).
+- API reference: [`materials.surfaces.road_absorption`](https://jmrplens.github.io/phonometry/reference/api/materials/road-absorption/).
 
 ## References
 

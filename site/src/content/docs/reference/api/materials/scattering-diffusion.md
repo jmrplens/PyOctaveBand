@@ -1,5 +1,5 @@
 ---
-title: "materials.scattering_diffusion"
+title: "materials.diffusers.scattering_diffusion"
 description: "Random-incidence scattering and directional diffusion coefficients."
 sidebar:
   label: "scattering_diffusion"

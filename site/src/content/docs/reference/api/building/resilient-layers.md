@@ -9,7 +9,7 @@ Prediction of resilient-layer performance: tapping force, coverings, floors, lin
 
 The measurement modules of this domain report what a resilient layer *achieved*
 ([`phonometry.building.measurement.floor_covering_improvement`](/phonometry/reference/api/building/floor-covering-improvement/) for the ISO 16251-1
-mock-up, [`phonometry.materials.dynamic_stiffness`](/phonometry/reference/api/materials/dynamic-stiffness/) for the EN 29052-1
+mock-up, [`phonometry.materials.resilient.dynamic_stiffness`](/phonometry/reference/api/materials/dynamic-stiffness/) for the EN 29052-1
 dynamic stiffness). This module is their **prediction** counterpart: it walks
 the physical chain from the material data to the improvement spectrum, so a
 covering or a floating floor can be sized before anything is built.

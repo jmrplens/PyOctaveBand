@@ -107,13 +107,13 @@ from numpy.typing import ArrayLike, NDArray
 from scipy.special import fresnel, wofz
 
 from ..._internal.validation import require_positive, require_positive_array
-from ...materials.porous_absorber import delany_bazley, miki
+from ...materials.absorbers.porous import delany_bazley, miki
 
 if TYPE_CHECKING:
     from matplotlib.axes import Axes
 
     from ..._report.metadata import ReportMetadata
-    from ...materials.porous_absorber import PorousMediumResult
+    from ...materials.absorbers.porous import PorousMediumResult
 
 #: Default speed of sound ``c`` in air, in m/s (matches the materials domain).
 _C_SOUND = 343.0
@@ -155,7 +155,7 @@ def _normalized_ground_impedance(
     scalar/array is taken as already :math:`e^{-i \omega t}` and passed
     through.
     """
-    from ...materials.porous_absorber import PorousMediumResult
+    from ...materials.absorbers.porous import PorousMediumResult
 
     if (impedance is None) == (flow_resistivity is None):
         raise ValueError(

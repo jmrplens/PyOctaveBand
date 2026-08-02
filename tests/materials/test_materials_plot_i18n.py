@@ -21,29 +21,29 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
 from phonometry import sound_absorption_coefficient_uncertainty
-from phonometry.materials.absorption_rating import weighted_absorption
-from phonometry.materials.airflow_resistance import (
+from phonometry.materials.absorbers.airflow_resistance import (
     static_airflow_resistance,
 )
-from phonometry.materials.dynamic_stiffness import (
-    floating_floor_resonance,
-)
-from phonometry.materials.impedance_tube import ImpedanceTubeResult
-from phonometry.materials.porous_absorber import (
+from phonometry.materials.absorbers.impedance_tube import ImpedanceTubeResult
+from phonometry.materials.absorbers.porous import (
     PorousLayer,
     delany_bazley,
     diffuse_field_absorption,
     layered_absorber,
 )
-from phonometry.materials.road_absorption import (
-    InsituAbsorptionResult,
+from phonometry.materials.absorbers.rating import weighted_absorption
+from phonometry.materials.absorbers.sound_absorption import (
+    measure_sound_absorption,
 )
-from phonometry.materials.scattering_diffusion import (
+from phonometry.materials.diffusers.scattering_diffusion import (
     directional_diffusion,
     scattering_coefficient_spectrum,
 )
-from phonometry.materials.sound_absorption import (
-    measure_sound_absorption,
+from phonometry.materials.resilient.dynamic_stiffness import (
+    floating_floor_resonance,
+)
+from phonometry.materials.surfaces.road_absorption import (
+    InsituAbsorptionResult,
 )
 
 _C0 = 343.0

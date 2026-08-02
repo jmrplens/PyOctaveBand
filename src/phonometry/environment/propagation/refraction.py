@@ -61,7 +61,7 @@ if TYPE_CHECKING:
     from matplotlib.axes import Axes
     from numpy.typing import NDArray
 
-    from ...materials.porous_absorber import PorousMediumResult
+    from ...materials.absorbers.porous import PorousMediumResult
 
 #: Default reference speed of sound ``c`` in air at the ground, in m/s (matches
 #: the environmental domain).

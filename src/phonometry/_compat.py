@@ -75,14 +75,22 @@ _MOVED_3X: dict[str, str] = {
     "phonometry.sound_power_intensity": "phonometry.emission.sound_power_intensity",
     "phonometry.sound_power_reverberation": "phonometry.emission.sound_power_reverberation",
     "phonometry.vibration_sound_power": "phonometry.emission.vibration_sound_power",
-    "phonometry.absorption_rating": "phonometry.materials.absorption_rating",
-    "phonometry.absorption_uncertainty": "phonometry.materials.absorption_uncertainty",
-    "phonometry.airflow_resistance": "phonometry.materials.airflow_resistance",
-    "phonometry.dynamic_stiffness": "phonometry.materials.dynamic_stiffness",
-    "phonometry.impedance_tube": "phonometry.materials.impedance_tube",
-    "phonometry.road_absorption": "phonometry.materials.road_absorption",
-    "phonometry.scattering_diffusion": "phonometry.materials.scattering_diffusion",
-    "phonometry.sound_absorption": "phonometry.materials.sound_absorption",
+    "phonometry.absorption_rating":
+        "phonometry.materials.absorbers.rating",
+    "phonometry.absorption_uncertainty":
+        "phonometry.materials.absorbers.uncertainty",
+    "phonometry.airflow_resistance":
+        "phonometry.materials.absorbers.airflow_resistance",
+    "phonometry.dynamic_stiffness":
+        "phonometry.materials.resilient.dynamic_stiffness",
+    "phonometry.impedance_tube":
+        "phonometry.materials.absorbers.impedance_tube",
+    "phonometry.road_absorption":
+        "phonometry.materials.surfaces.road_absorption",
+    "phonometry.scattering_diffusion":
+        "phonometry.materials.diffusers.scattering_diffusion",
+    "phonometry.sound_absorption":
+        "phonometry.materials.absorbers.sound_absorption",
     "phonometry.enclosed_space_absorption": "phonometry.room.enclosed_space_absorption",
     "phonometry.open_plan": "phonometry.room.open_plan",
     "phonometry.reverberation_prediction": "phonometry.room.reverberation_prediction",
@@ -266,6 +274,31 @@ _MOVED_4X: dict[str, str] = {
         "phonometry.building.prediction.resilient_layers",
     "phonometry.building.spanish_building_code":
         "phonometry.building.regulation.spain",
+    "phonometry.materials.sound_absorption":
+        "phonometry.materials.absorbers.sound_absorption",
+    "phonometry.materials.impedance_tube":
+        "phonometry.materials.absorbers.impedance_tube",
+    "phonometry.materials.airflow_resistance":
+        "phonometry.materials.absorbers.airflow_resistance",
+    "phonometry.materials.biot": "phonometry.materials.absorbers.biot",
+    "phonometry.materials.absorption_rating":
+        "phonometry.materials.absorbers.rating",
+    "phonometry.materials.absorption_uncertainty":
+        "phonometry.materials.absorbers.uncertainty",
+    "phonometry.materials.porous_absorber":
+        "phonometry.materials.absorbers.porous",
+    "phonometry.materials.slow_sound_absorber":
+        "phonometry.materials.absorbers.slow_sound",
+    "phonometry.materials.diffuser_design":
+        "phonometry.materials.diffusers.design",
+    "phonometry.materials.metadiffuser":
+        "phonometry.materials.diffusers.metadiffuser",
+    "phonometry.materials.scattering_diffusion":
+        "phonometry.materials.diffusers.scattering_diffusion",
+    "phonometry.materials.road_absorption":
+        "phonometry.materials.surfaces.road_absorption",
+    "phonometry.materials.dynamic_stiffness":
+        "phonometry.materials.resilient.dynamic_stiffness",
 }
 
 #: The two generations, each with the release that deprecated it and the one

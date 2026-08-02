@@ -299,7 +299,7 @@ few positions.
   materials that can be brought indoors.
 - [Outdoor Sound Propagation](outdoor-propagation.md): where the absorption
   of the ground surface enters the propagation models.
-- API reference: [`materials.road_absorption`](https://jmrplens.github.io/phonometry/reference/api/materials/road-absorption/).
+- API reference: [`materials.surfaces.road_absorption`](https://jmrplens.github.io/phonometry/reference/api/materials/road-absorption/).
 
 ## References
 

@@ -68,7 +68,7 @@ $F \to 0$. The ground impedance is taken in
 the $e^{-i \omega t}$ time convention of Salomons, in which a passive
 ground has $\operatorname{Im}(Z) > 0$; it may be supplied directly or
 derived from the porous models of `phonometry.materials`
-([`delany_bazley`](/phonometry/reference/api/materials/porous-absorber/#delany_bazley) / [`miki`](/phonometry/reference/api/materials/porous-absorber/#miki)),
+([`delany_bazley`](/phonometry/reference/api/materials/porous/#delany_bazley) / [`miki`](/phonometry/reference/api/materials/porous/#miki)),
 which model a semi-infinite porous ground whose surface impedance equals the
 characteristic impedance of the medium. The materials domain works in the
 opposite $e^{+j \omega t}$ convention ($\operatorname{Im}(Z) < 0$
@@ -364,7 +364,7 @@ i.e. the level re the free field.
 
 The ground surface impedance is either supplied through `impedance` (a
 normalized complex array/scalar, or a
-[`PorousMediumResult`](/phonometry/reference/api/materials/porous-absorber/#porousmediumresult)) or derived from an
+[`PorousMediumResult`](/phonometry/reference/api/materials/porous/#porousmediumresult)) or derived from an
 effective `flow_resistivity` (in Pa s/m2) via the `model` porous model
 of the materials domain. Exactly one of the two must be given.
 
@@ -377,7 +377,7 @@ of the materials domain. Exactly one of the two must be given.
 | `receiver_height` | Receiver height `hr`, in metres. |
 | `distance` | Horizontal source-receiver distance, in metres. |
 | `impedance` | Normalized ground impedance ($e^{-i \omega t}$ convention, $\operatorname{Im}(Z) > 0$ for a passive ground), or a `PorousMediumResult` (which is conjugated internally from the materials' $e^{+j \omega t}$ convention). |
-| `flow_resistivity` | Effective flow resistivity `sigma` (Pa s/m2); grassland is about `2e5` (Salomons Sec. 3.1). The porous model raises a [`PorousAbsorberWarning`](/phonometry/reference/api/materials/porous-absorber/#porousabsorberwarning) when the lowest bands fall below its published fit range $0.01 < \rho f / \sigma < 1$ (it still extrapolates a value there). |
+| `flow_resistivity` | Effective flow resistivity `sigma` (Pa s/m2); grassland is about `2e5` (Salomons Sec. 3.1). The porous model raises a [`PorousAbsorberWarning`](/phonometry/reference/api/materials/porous/#porousabsorberwarning) when the lowest bands fall below its published fit range $0.01 < \rho f / \sigma < 1$ (it still extrapolates a value there). |
 | `model` | Porous model for `flow_resistivity` (`"delany_bazley"` or `"miki"`). |
 | `speed_of_sound` | Speed of sound `c`, in m/s. |
 | `air_density` | Air density `rho`, in kg/m3. |

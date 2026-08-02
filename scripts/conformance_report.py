@@ -3803,7 +3803,9 @@ def _chk_iso10534_1_swr() -> Outcome:
     alpha = float(ph.standing_wave_absorption(ref.ISO10534_1_SWR))
     # The intermediate |r| = (s-1)/(s+1) (Eq. (13)) must match its shared
     # oracle too, so both steps of the chain are pinned.
-    from phonometry.materials.impedance_tube import standing_wave_reflection_magnitude
+    from phonometry.materials.absorbers.impedance_tube import (
+        standing_wave_reflection_magnitude,
+    )
 
     r_mag = float(standing_wave_reflection_magnitude(ref.ISO10534_1_SWR))
     out = numeric(ref.ISO10534_1_ABSORPTION, alpha, 1e-9, places=4)
@@ -3827,7 +3829,10 @@ def _chk_iso10534_2_roundtrip() -> Outcome:
     # Eq. (17) reduction. Synthesis and reduction share only the plane-wave
     # field model, so this is an algebraic identity: the only residual is
     # float rounding, hence the 1e-9 tolerance.
-    from phonometry.materials.impedance_tube import reflection_factor, tube_wavenumber
+    from phonometry.materials.absorbers.impedance_tube import (
+        reflection_factor,
+        tube_wavenumber,
+    )
 
     f = np.array([500.0, 1000.0, 1800.0])
     x1, spacing, c0 = 0.12, 0.03, 343.2
@@ -7567,7 +7572,7 @@ def _chk_porous_maa_peak_closed_form() -> Outcome:
 # Limp-frame equivalent fluid (Allard & Atalla 2e Sect. 11.3.4). The book
 # publishes no table of computed limp densities (every comparison is a figure),
 # so the anchor is the printed Eq. (11.55) itself, transcribed term by term in
-# tests/materials/test_limp_frame.py. The two limits the book states in prose on
+# tests/materials/absorbers/test_limp_frame.py. The two limits the book states in prose on
 # printed p. 253 and checked below corroborate that transcription without
 # pinning it: a sign-flipped variant of Eq. (11.55) satisfies both. The
 # decoupling frequency on the fully specified Table 6.1 glass wool is pure

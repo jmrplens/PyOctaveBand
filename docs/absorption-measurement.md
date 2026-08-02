@@ -508,7 +508,7 @@ print(float(materials.single_number_rating_uncertainty(8.1).reported_expanded_un
   the EN 12354-6 absorption budget these coefficients feed.
 - [Field Insulation Measurement (ISO 16283)](insulation-field.md): the
   sound-insulation companion uncertainty standard, ISO 12999-1.
-- API reference: [`materials.sound_absorption`](https://jmrplens.github.io/phonometry/reference/api/materials/sound-absorption/), [`materials.absorption_rating`](https://jmrplens.github.io/phonometry/reference/api/materials/absorption-rating/) and [`materials.absorption_uncertainty`](https://jmrplens.github.io/phonometry/reference/api/materials/absorption-uncertainty/).
+- API reference: [`materials.absorbers.sound_absorption`](https://jmrplens.github.io/phonometry/reference/api/materials/sound-absorption/), [`materials.absorbers.rating`](https://jmrplens.github.io/phonometry/reference/api/materials/rating/) and [`materials.absorbers.uncertainty`](https://jmrplens.github.io/phonometry/reference/api/materials/uncertainty/).
 
 ## References
 

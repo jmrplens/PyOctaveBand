@@ -5,7 +5,7 @@ Renders the two sound-scattering surface descriptors of ISO 17497 to one-page
 PDFs laid out like accredited test reports:
 
 * :func:`render_scattering_report` renders a
-  :class:`~phonometry.materials.scattering_diffusion.ScatteringResult` as a
+  :class:`~phonometry.materials.diffusers.scattering_diffusion.ScatteringResult` as a
   random-incidence *scattering* coefficient report (ISO 17497-1:2004+A1:2014):
   the standard-basis line, an optional metadata header block, a two-panel body
   with the per-band table (frequency, the random-incidence absorption
@@ -15,14 +15,14 @@ PDFs laid out like accredited test reports:
   absorption ``alpha_spec`` column.
 
 * :func:`render_diffusion_spectrum_report` renders a
-  :class:`~phonometry.materials.scattering_diffusion.DiffusionSpectrum` as a
+  :class:`~phonometry.materials.diffusers.scattering_diffusion.DiffusionSpectrum` as a
   directional *diffusion* coefficient report (ISO 17497-2:2012, Clause 8.5):
   the per-band table (frequency, the directional diffusion coefficient ``d``
   and, when present, the normalised ``d_n``) beside the ``d(f)`` band-axis
   curve. ``verbose`` adds the normalised ``d_n`` column when it was measured.
 
 * :func:`render_diffusion_polar_report` renders a
-  :class:`~phonometry.materials.scattering_diffusion.DiffusionResult` (the polar
+  :class:`~phonometry.materials.diffusers.scattering_diffusion.DiffusionResult` (the polar
   response of a single source position) as the Clause 8.5 polar-response report:
   the corrected receiver-angle / reflected-level table beside the semicircular
   polar plot, with the directional diffusion coefficient ``d_theta`` boxed.
@@ -64,7 +64,7 @@ from ._layout import (
 from .metadata import ReportMetadata
 
 if TYPE_CHECKING:
-    from ..materials.scattering_diffusion import (
+    from ..materials.diffusers.scattering_diffusion import (
         DiffusionResult,
         DiffusionSpectrum,
         ScatteringResult,
@@ -249,7 +249,7 @@ def render_scattering_report(
     """Render an ISO 17497-1 scattering-coefficient fiche to a PDF at ``path``.
 
     :param result: A
-        :class:`~phonometry.materials.scattering_diffusion.ScatteringResult`.
+        :class:`~phonometry.materials.diffusers.scattering_diffusion.ScatteringResult`.
     :param path: Destination path of the PDF file.
     :param metadata: Optional :class:`ReportMetadata`; ``None`` renders the body
         with only the measured frequency range. The ``requirement`` field is
@@ -387,7 +387,7 @@ def render_diffusion_spectrum_report(
     """Render an ISO 17497-2 diffusion-coefficient fiche to a PDF at ``path``.
 
     :param result: A
-        :class:`~phonometry.materials.scattering_diffusion.DiffusionSpectrum`.
+        :class:`~phonometry.materials.diffusers.scattering_diffusion.DiffusionSpectrum`.
     :param path: Destination path of the PDF file.
     :param metadata: Optional :class:`ReportMetadata`; ``None`` renders the body
         with only the measured frequency range. The ``requirement`` field is
@@ -496,7 +496,7 @@ def render_diffusion_polar_report(
     """Render an ISO 17497-2 polar-response fiche to a PDF at ``path``.
 
     :param result: A
-        :class:`~phonometry.materials.scattering_diffusion.DiffusionResult`.
+        :class:`~phonometry.materials.diffusers.scattering_diffusion.DiffusionResult`.
     :param path: Destination path of the PDF file.
     :param metadata: Optional :class:`ReportMetadata`; ``None`` renders the body
         and disclaimer only. The ``requirement`` field is ignored (ISO 17497-2

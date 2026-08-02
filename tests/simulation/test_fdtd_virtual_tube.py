@@ -23,7 +23,7 @@ from __future__ import annotations
 import numpy as np
 import pytest
 
-from phonometry.materials.impedance_tube import (
+from phonometry.materials.absorbers.impedance_tube import (
     air_layer_transfer_matrix,
     transfer_matrix_one_load,
     two_microphone_impedance,

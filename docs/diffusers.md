@@ -599,7 +599,7 @@ no longer small against the wavelength; a frequency-blind single number
 - [Outdoor Sound Propagation](outdoor-propagation.md): the full ISO 9613-1
   atmospheric-absorption model whose pure-tone coefficient the ISO 17497-1
   air-attenuation relations consume.
-- API reference: [`materials.scattering_diffusion`](https://jmrplens.github.io/phonometry/reference/api/materials/scattering-diffusion/) and [`materials.diffuser_design`](https://jmrplens.github.io/phonometry/reference/api/materials/diffuser-design/).
+- API reference: [`materials.diffusers.scattering_diffusion`](https://jmrplens.github.io/phonometry/reference/api/materials/scattering-diffusion/) and [`materials.diffusers.design`](https://jmrplens.github.io/phonometry/reference/api/materials/design/).
 
 ## References
 

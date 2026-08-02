@@ -55,7 +55,7 @@ $f_m = 1000 \cdot 10^{k/10}$, `k` integer. Pass
 `exact_midband=True` to snap the requested frequencies onto that grid and
 reproduce Table 1 exactly.
 
-This module closes the loop with [`phonometry.materials.sound_absorption`](/phonometry/reference/api/materials/sound-absorption/) (ISO 354),
+This module closes the loop with [`phonometry.materials.absorbers.sound_absorption`](/phonometry/reference/api/materials/sound-absorption/) (ISO 354),
 whose air power-attenuation coefficient `m` (1/m) is defined only through
 the ISO 9613-1 `alpha` via $m = \alpha / (10 \log_{10} e)$.
 [`air_attenuation_m`](/phonometry/reference/api/environment/air-absorption/#air_attenuation_m) returns that `m` directly.

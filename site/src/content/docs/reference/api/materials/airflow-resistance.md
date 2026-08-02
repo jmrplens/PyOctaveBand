@@ -1,5 +1,5 @@
 ---
-title: "materials.airflow_resistance"
+title: "materials.absorbers.airflow_resistance"
 description: "Airflow resistance of porous materials: ISO 9053-1 and ISO 9053-2."
 sidebar:
   label: "airflow_resistance"

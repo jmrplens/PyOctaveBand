@@ -1,5 +1,5 @@
 ---
-title: "materials.road_absorption"
+title: "materials.surfaces.road_absorption"
 description: "In-situ sound absorption of road surfaces (ISO 13472-1 / ISO 13472-2)."
 sidebar:
   label: "road_absorption"

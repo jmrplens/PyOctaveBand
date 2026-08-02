@@ -238,7 +238,7 @@ both against the same-footprint flat reference of ISO 17497-2 Formula (7).
   equivalent-fluid and resonant layers the metamaterial cells are built from.
 - [2D FDTD wave simulation](fdtd-simulation.md): the wave solver behind the
   animation above, meshing the real slit and resonator geometry.
-- API reference: [`materials.metadiffuser`](https://jmrplens.github.io/phonometry/reference/api/materials/metadiffuser/) and [`materials.diffuser_design`](https://jmrplens.github.io/phonometry/reference/api/materials/diffuser-design/).
+- API reference: [`materials.diffusers.metadiffuser`](https://jmrplens.github.io/phonometry/reference/api/materials/metadiffuser/) and [`materials.diffusers.design`](https://jmrplens.github.io/phonometry/reference/api/materials/design/).
 
 ## References
 

@@ -2,7 +2,7 @@
 """ISO 10534-2 impedance-tube sound-absorption and impedance fiche.
 
 Renders an
-:class:`~phonometry.materials.impedance_tube.ImpedanceTubeResult` to a one-page
+:class:`~phonometry.materials.absorbers.impedance_tube.ImpedanceTubeResult` to a one-page
 PDF laid out like an accredited normal-incidence impedance-tube test report
 (BS EN ISO 10534-2:2001, two-microphone transfer-function method):
 
@@ -57,7 +57,7 @@ from ._layout import (
 from .metadata import ReportMetadata
 
 if TYPE_CHECKING:
-    from ..materials.impedance_tube import ImpedanceTubeResult
+    from ..materials.absorbers.impedance_tube import ImpedanceTubeResult
 
 #: Printable label for each accepted ``ReportMetadata.tube_shape`` value.
 _SHAPE_LABELS = {
@@ -280,7 +280,7 @@ def render_iso10534_report(
     """Render an ISO 10534-2 impedance-tube test-report fiche to a PDF at ``path``.
 
     :param result: An
-        :class:`~phonometry.materials.impedance_tube.ImpedanceTubeResult`
+        :class:`~phonometry.materials.absorbers.impedance_tube.ImpedanceTubeResult`
         carrying the ``frequency`` vector, the normal-incidence ``absorption``,
         the complex ``reflection`` factor and the ``normalized_impedance``.
     :param path: Destination path of the PDF file.
