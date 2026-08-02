@@ -1005,6 +1005,30 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   validator says the same thing in the form the whole package uses, rejects
   infinities too, and names the parameter that failed instead of both at once.
 
+- `phonometry.environmental` is `phonometry.environment`, with three
+  subgroups that follow how an environmental study is written: what the source
+  emits (`environment.sources`: CNOSSOS road and rail, wind turbines), what the
+  path does to it (`environment.propagation`: ISO 9613-1 and -2, ground effect
+  and barriers, refraction) and what the law makes of the result at the
+  receiver (`environment.assessment`: ISO 1996-1 and -2, impulsive prominence,
+  RD 1367/2007). Two modules lose a word the subgroup now says:
+  `atmospheric_refraction` is `propagation.refraction` and
+  `spanish_regulation` is `assessment.spain`, which is the shape the next
+  national code will take.
+
+  The name was the last of the three that did not match: the code said
+  `environmental`, the reference said `environment` and the guides said
+  Environment. Now they all say the same thing, and the generated reference
+  loses a cross-package exception: the wind turbine used to be documented
+  under Aircraft and wind energy because that is where its audience was
+  looking, and with the sources subgroup it can be documented where it lives.
+  That section is now Aircraft noise and draws from one package, which leaves
+  two sections in the whole taxonomy that deliberately span two parents.
+
+  Nothing moves in the namespace: `from phonometry import environment` exports
+  the same 165 names, and `environmental` keeps working as a package alias
+  until 5.0, along with all twelve of its module paths.
+
 - `phonometry.vibration` has three families, by who reads them.
   `vibration.structural` is the structural acoustics that feeds building
   prediction: mobility (ISO 7626), plate junctions, radiation efficiency,

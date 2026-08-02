@@ -130,7 +130,7 @@ $c_0 = 343\ \mathrm{m/s}$) y el término de absorción del aire $4mV$.
 
 ```python
 import matplotlib.pyplot as plt
-from phonometry import environmental, room
+from phonometry import environment, room
 
 # Una sala de 10 x 7 x 3.5 m: paredes frontales duras, paredes laterales con
 # tratamiento ligero y un par suelo/techo muy absorbente (moqueta y techo acústico).
@@ -138,7 +138,7 @@ bands = [125.0, 250.0, 500.0, 1000.0, 2000.0, 4000.0]
 alpha_x = [0.06, 0.07, 0.08, 0.09, 0.10, 0.10]
 alpha_y = [0.12, 0.14, 0.16, 0.18, 0.20, 0.20]
 alpha_z = [0.30, 0.50, 0.65, 0.78, 0.82, 0.80]
-m = environmental.air_attenuation_m(bands, 20.0, 50.0)   # aire a 20 C / 50 % HR
+m = environment.air_attenuation_m(bands, 20.0, 50.0)   # aire a 20 C / 50 % HR
 res = room.reverberation_time_models((10.0, 7.0, 3.5),
                                      (alpha_x, alpha_y, alpha_z),
                                      air_attenuation=m, frequencies=bands)
@@ -183,9 +183,9 @@ atenuación de potencia $m$ (en neper por metro, de la
 ISO 9613-1):
 
 ```python
-from phonometry import environmental, room
+from phonometry import environment, room
 
-m = environmental.air_attenuation_m(2000.0, temperature=20.0, relative_humidity=50.0)
+m = environment.air_attenuation_m(2000.0, temperature=20.0, relative_humidity=50.0)
 surfaces = [(40.0, 0.3), (40.0, 0.3), (24.0, 0.3),
             (24.0, 0.3), (15.0, 0.3), (15.0, 0.3)]
 print(round(room.eyring_reverberation_time(120.0, surfaces, air_attenuation=m), 3))
@@ -268,9 +268,9 @@ res.plot()   # las curvas de los cinco modelos por banda (la figura de arriba)
 
 ```python
 import matplotlib.pyplot as plt
-from phonometry import environmental, room
+from phonometry import environment, room
 
-m = environmental.air_attenuation_m([125.0, 250.0, 500.0, 1000.0, 2000.0, 4000.0], 20.0, 50.0)
+m = environment.air_attenuation_m([125.0, 250.0, 500.0, 1000.0, 2000.0, 4000.0], 20.0, 50.0)
 room.reverberation_time_models(
     (10.0, 7.0, 3.5),
     (

@@ -72,10 +72,10 @@ $K_I$ (the adjustment is 0 dB when no event qualifies).
 />
 
 ```python
-from phonometry import environmental
+from phonometry import environment
 
 # Three candidate impulses: (onset rate dB/s, level difference dB).
-result = environmental.impulse_prominence([1200.0, 300.0, 60.0], [32.0, 18.0, 11.0])
+result = environment.impulse_prominence([1200.0, 300.0, 60.0], [32.0, 18.0, 11.0])
 print(result.per_impulse.round(2))  # [12.25  9.94  7.42]
 print(round(result.prominence, 2))  # 12.25  (the governing impulse)
 print(round(result.adjustment, 2))  # 13.05  dB
@@ -86,10 +86,10 @@ result.plot()   # the KI(P) curve of section 2 with these impulses marked
 A single impulse can be evaluated directly with `predicted_prominence`:
 
 ```python
-from phonometry import environmental
+from phonometry import environment
 
 # P = 3*lg(1000) + 2*lg(30) = 9 + 2.95 = 11.95.
-print(round(environmental.predicted_prominence(1000.0, 30.0), 4))  # 11.9542
+print(round(environment.predicted_prominence(1000.0, 30.0), 4))  # 11.9542
 ```
 
 ## 2. Adjustment to LAeq (clause 8)
@@ -102,10 +102,10 @@ K_I = 1.8\,(P - 5)\ \text{dB} \quad (P > 5), \qquad K_I = 0 \quad (P \le 5).
 $$
 
 ```python
-from phonometry import environmental
+from phonometry import environment
 
-print(float(environmental.impulse_adjustment(10.0)))  # 9.0 dB
-print(float(environmental.impulse_adjustment(5.0)))   # 0.0 dB (at the threshold)
+print(float(environment.impulse_adjustment(10.0)))  # 9.0 dB
+print(float(environment.impulse_adjustment(5.0)))   # 0.0 dB (at the threshold)
 ```
 
 The adjustment is applied to $L_{Aeq,30\text{min}}$ from the single event with the
@@ -118,10 +118,10 @@ L_{Ar,T} = 10\,\log_{10}\left(\frac{1}{T}\sum_N \Delta t_N\,
 $$
 
 ```python
-from phonometry import environmental
+from phonometry import environment
 
 # Two 30-min periods: one impulsive (KI = 7.6 dB), one quiet.
-print(round(environmental.rating_level([72.0, 66.0], [7.6, 0.0], [30.0, 30.0], 60.0), 2))
+print(round(environment.rating_level([72.0, 66.0], [7.6, 0.0], [30.0, 30.0], 60.0), 2))
 # 76.78 dB
 ```
 
@@ -142,16 +142,16 @@ measurement of [ISO 1996-2](/phonometry/guides/environmental-levels/).
 ```python
 import numpy as np
 import matplotlib.pyplot as plt
-from phonometry import environmental
+from phonometry import environment
 
 # One line for the adjustment curve with the impulses marked:
-environmental.impulse_prominence([1200.0, 300.0, 60.0], [32.0, 18.0, 11.0]).plot()
+environment.impulse_prominence([1200.0, 300.0, 60.0], [32.0, 18.0, 11.0]).plot()
 plt.show()
 
 # By hand, the left panel — P vs onset rate for three level differences:
 orate = np.logspace(1, 4, 200)
 for ld in (5.0, 15.0, 30.0):
-    plt.plot(orate, environmental.predicted_prominence(orate, np.full_like(orate, ld)),
+    plt.plot(orate, environment.predicted_prominence(orate, np.full_like(orate, ld)),
              label=f"LD = {ld:g} dB")
 plt.xscale("log"); plt.legend(); plt.show()
 ```
@@ -179,7 +179,7 @@ The onset detection can be exercised on a level history directly with
 
 ```python
 import numpy as np
-from phonometry import environmental
+from phonometry import environment
 
 # An LpAF history sampled every 20 ms: quiet, a 30 dB rise over 0.30 s, steady.
 dt = 0.02
@@ -188,7 +188,7 @@ levels = np.concatenate([
     40.0 + 30.0 * np.arange(1, 16) / 15,   # a straight 100 dB/s onset to 70 dB
     np.full(15, 70.0),
 ])
-onset = environmental.detect_onsets(levels, dt)[0]
+onset = environment.detect_onsets(levels, dt)[0]
 print(round(onset.onset_rate), round(onset.level_difference))  # 100 30
 print(round(onset.prominence, 2))                              # 8.95
 ```
@@ -196,7 +196,7 @@ print(round(onset.prominence, 2))                              # 8.95
 From a calibrated time signal (in pascal) the whole chain runs end to end:
 
 ```python
-result = environmental.impulsive_sound_adjustment(signal, fs)
+result = environment.impulsive_sound_adjustment(signal, fs)
 print(result.category)                  # e.g. 'highly impulsive'
 print(round(result.adjustment, 1))      # KI in dB (0.0 to about 9 dB in typical cases)
 print(round(result.adjusted_laeq, 1))   # LAeq + KI
@@ -216,7 +216,7 @@ result.plot()   # the LpAF history with the detected onsets (needs matplotlib)
 ```python
 import numpy as np
 import matplotlib.pyplot as plt
-from phonometry import environmental
+from phonometry import environment
 
 # Three hammer strikes over a 55 dB(A) background, 6 s at 48 kHz.
 fs = 48000
@@ -232,7 +232,7 @@ for onset_time in (1.0, 2.6, 4.2):
     strike *= 2e-5 * 10 ** (95 / 20) / np.sqrt(np.mean(strike[window] ** 2))
     signal += strike
 
-res = environmental.impulsive_sound_adjustment(signal, fs)
+res = environment.impulsive_sound_adjustment(signal, fs)
 print(res.category, round(res.prominence, 2), round(res.adjustment, 2))
 # highly impulsive 11.34 11.42
 
@@ -308,10 +308,10 @@ pass `language="es"` for a Spanish fiche (translated fixed strings and a comma
 decimal separator), e.g. `res.report("impulse_fiche_es.pdf", language="es")`.
 
 ```python
-from phonometry import environmental, ReportMetadata
+from phonometry import environment, ReportMetadata
 
 # The three-impulse pile-driving set from §1 (onset rate dB/s, level diff. dB).
-res = environmental.impulse_prominence([1200.0, 300.0, 60.0], [32.0, 18.0, 11.0])
+res = environment.impulse_prominence([1200.0, 300.0, 60.0], [32.0, 18.0, 11.0])
 res.report(
     "impulse_fiche.pdf",
     metadata=ReportMetadata(
@@ -355,5 +355,5 @@ measurement replaces, not as a function of their own.
 
 ## See also
 
-- API reference: [`environmental.impulse_prominence`](/phonometry/reference/api/environment/impulse-prominence/).
+- API reference: [`environment.impulse_prominence`](/phonometry/reference/api/environment/impulse-prominence/).
 - API reference: [`environmental.impulsive_sound`](/phonometry/reference/api/environment/impulsive-sound/).

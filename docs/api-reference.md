@@ -35,7 +35,7 @@ contour = aircraft.noise_contour(path, powers, distances, sel, lmax, x=gx, y=gy)
 | `phonometry.materials` | Absorption (ISO 354/11654), impedance tube, airflow resistance, scattering/diffusion, road absorption, dynamic stiffness |
 | `phonometry.building` | Sound insulation measurement and prediction (EN 12354, ISO 717/16283/10140/15186/10052/10848), structure-borne sound |
 | `phonometry.vibration` | Three families: `structural` (mobility ISO 7626, plate junctions, radiation, experimental SEA, transfer stiffness ISO 10846), `human` (ISO 2631/5349/8041 exposure and multiple shocks) and `machinery` (fault frequencies and condition monitoring) |
-| `phonometry.environmental` | Rating levels, ISO 1996-2 measurement, outdoor propagation (ISO 9613), atmospheric refraction (ray tracing and the parabolic equation), wind-turbine noise, impulsive prominence |
+| `phonometry.environment` | Three subgroups: `sources` (CNOSSOS road and rail emission, wind-turbine apparent sound power), `propagation` (ISO 9613-1/-2, ground effect and barriers, refraction by ray tracing and the parabolic equation) and `assessment` (ISO 1996-1/-2 rating and measurement, impulsive prominence, RD 1367/2007) |
 | `phonometry.aircraft` | EPNL (ICAO Annex 16), SAE ARP 5534 absorption, airport contours (ECAC Doc 29), rotorcraft (ECAC Doc 32) |
 | `phonometry.underwater` | ISO 18405/17208/18406 levels, propagation and Weston regimes, sound speed, sonar equation and detection range, seabed, ambient and ship-traffic noise, marine-mammal audiograms and regulatory auditory weighting, numerical solvers |
 | `phonometry.electroacoustics` | Distortion (IEC 60268-3 / AES17), transfer function and coherence, radiating piston |
@@ -46,8 +46,8 @@ contour = aircraft.noise_contour(path, powers, distances, sel, lmax, x=gx, y=gy)
 Every name in the table below is also re-exported at the top level, so
 `from phonometry import <name>` works for every row. Two generations of module
 paths are still importable and warn on use: the pre-3.2 flat ones (for example
-`phonometry.insulation`), removed in 4.0, and the pre-4.0 ones that the split
-of `metrology` moved (for example `phonometry.metrology.levels`, now
+`phonometry.building.insulation`), removed in 4.0, and the pre-4.0 ones that the split
+of `metrology` moved (for example `phonometry.signals.levels`, now
 `phonometry.signals.levels`), removed in 5.0. Reading a moved name from the
 namespace it left (`metrology.leq`) warns and delegates as well.
 

@@ -26,26 +26,26 @@ from .common import (
 if TYPE_CHECKING:
     from matplotlib.axes import Axes
 
-    from ..environmental.air_absorption import AtmosphericAttenuation
-    from ..environmental.atmospheric_refraction import (
+    from ..environment.assessment.impulse_prominence import ImpulseProminenceResult
+    from ..environment.assessment.measurement import TonalAssessmentResult
+    from ..environment.assessment.spain import (
+        ActivityAssessment,
+        TonalCorrectionResult,
+    )
+    from ..environment.propagation.air_absorption import AtmosphericAttenuation
+    from ..environment.propagation.ground_barriers import (
+        BarrierInsertionLoss,
+        SphericalGroundResult,
+    )
+    from ..environment.propagation.outdoor_propagation import OutdoorAttenuation
+    from ..environment.propagation.refraction import (
         AtmosphericPEResult,
         AtmosphericRayResult,
         EffectiveSoundSpeedProfile,
     )
-    from ..environmental.cnossos_rail import RailwayEmissionResult
-    from ..environmental.cnossos_road import RoadEmissionResult
-    from ..environmental.ground_barriers import (
-        BarrierInsertionLoss,
-        SphericalGroundResult,
-    )
-    from ..environmental.impulse_prominence import ImpulseProminenceResult
-    from ..environmental.measurement import TonalAssessmentResult
-    from ..environmental.outdoor_propagation import OutdoorAttenuation
-    from ..environmental.spanish_regulation import (
-        ActivityAssessment,
-        TonalCorrectionResult,
-    )
-    from ..environmental.wind_turbine_noise import WindTurbineTonalityResult
+    from ..environment.sources.cnossos_rail import RailwayEmissionResult
+    from ..environment.sources.cnossos_road import RoadEmissionResult
+    from ..environment.sources.wind_turbine import WindTurbineTonalityResult
 
 #: Spanish translations of the fixed strings rendered by the environmental
 #: ``.plot()`` renderers, keyed by their verbatim English text.  ``_t``
@@ -148,7 +148,7 @@ def plot_atmospheric_attenuation(
     humidity-dependent relaxation roll-off.
 
     :param result: An
-        :class:`~phonometry.environmental.air_absorption.AtmosphericAttenuation`.
+        :class:`~phonometry.environment.propagation.air_absorption.AtmosphericAttenuation`.
     :param ax: Existing axes, or ``None`` to create a figure.
     :param language: Label language, ``"en"`` (default) or ``"es"``.
     :param kwargs: Forwarded to the ``alpha`` curve ``plot`` call.
@@ -185,14 +185,14 @@ def plot_wind_turbine_tonality(
 ) -> Axes:
     """Narrowband spectrum with the critical band, masking level and the tone.
 
-    :param result: A :class:`~phonometry.environmental.wind_turbine_noise.WindTurbineTonalityResult`.
+    :param result: A :class:`~phonometry.environment.sources.wind_turbine.WindTurbineTonalityResult`.
     :param ax: Existing axes, or ``None`` to create a figure.
     :param language: Label language, ``"en"`` (default) or ``"es"``.
     :param kwargs: Forwarded to the spectrum ``plot`` call.
     :return: The axes.
     """
     from .._i18n import format_number, localize_axes
-    from ..environmental.wind_turbine_noise import _critical_band_edges
+    from ..environment.sources.wind_turbine import _critical_band_edges
 
     ax = ax if ax is not None else _new_axes()
     freqs = np.asarray(result.frequencies, dtype=np.float64)
@@ -219,14 +219,14 @@ def plot_impulse_prominence(
 ) -> Axes:
     """Adjustment curve ``KI(P)`` with the candidate impulses marked.
 
-    :param result: An :class:`~phonometry.environmental.impulse_prominence.ImpulseProminenceResult`.
+    :param result: An :class:`~phonometry.environment.assessment.impulse_prominence.ImpulseProminenceResult`.
     :param ax: Existing axes, or ``None`` to create a figure.
     :param language: Label language, ``"en"`` (default) or ``"es"``.
     :param kwargs: Forwarded to the impulses ``scatter``.
     :return: The axes.
     """
     from .._i18n import decimal_comma, format_number, localize_axes
-    from ..environmental.impulse_prominence import (
+    from ..environment.assessment.impulse_prominence import (
         ADJUSTMENT_THRESHOLD,
         impulse_adjustment,
     )
@@ -264,14 +264,14 @@ def plot_tonal_adjustment(
     """Tonal adjustment curve ``Kt(ΔLta)`` with the assessed tone marked.
 
     :param result: A
-        :class:`~phonometry.environmental.measurement.TonalAssessmentResult`.
+        :class:`~phonometry.environment.assessment.measurement.TonalAssessmentResult`.
     :param ax: Existing axes, or ``None`` to create a figure.
     :param language: Label language, ``"en"`` (default) or ``"es"``.
     :param kwargs: Forwarded to the assessed-tone ``scatter``.
     :return: The axes.
     """
     from .._i18n import format_number, localize_axes
-    from ..environmental.measurement import tonal_adjustment
+    from ..environment.assessment.measurement import tonal_adjustment
 
     ax = ax if ax is not None else _new_axes()
     top = max(result.audibility, 12.0) + 1.0
@@ -309,7 +309,7 @@ def plot_outdoor_attenuation(
     as the primary marker line on top.
 
     :param result: An
-        :class:`~phonometry.environmental.outdoor_propagation.OutdoorAttenuation`.
+        :class:`~phonometry.environment.propagation.outdoor_propagation.OutdoorAttenuation`.
     :param ax: Existing axes, or ``None`` to create a figure.
     :param language: Label language, ``"en"`` (default) or ``"es"``.
     :param kwargs: Forwarded to the total-attenuation ``plot`` call.
@@ -366,7 +366,7 @@ def plot_cnossos_rail_emission(
     are read directly off the chart.
 
     :param result: A
-        :class:`~phonometry.environmental.cnossos_rail.RailwayEmissionResult`.
+        :class:`~phonometry.environment.sources.cnossos_rail.RailwayEmissionResult`.
     :param ax: Existing axes, or ``None`` to create a figure.
     :param language: Label language, ``"en"`` (default) or ``"es"``.
     :param kwargs: Forwarded to the total-line-power ``bar`` call.
@@ -417,7 +417,7 @@ def plot_spherical_ground(
     ground-effect dip and any surface-wave enhancement are both visible.
 
     :param result: A
-        :class:`~phonometry.environmental.ground_barriers.SphericalGroundResult`.
+        :class:`~phonometry.environment.propagation.ground_barriers.SphericalGroundResult`.
     :param ax: Existing axes, or ``None`` to create a figure.
     :param language: Label language, ``"en"`` (default) or ``"es"``.
     :param kwargs: Forwarded to the ``dL`` ``plot`` call.
@@ -450,7 +450,7 @@ def plot_barrier_insertion_loss(
     """Barrier insertion loss versus frequency.
 
     :param result: A
-        :class:`~phonometry.environmental.ground_barriers.BarrierInsertionLoss`.
+        :class:`~phonometry.environment.propagation.ground_barriers.BarrierInsertionLoss`.
     :param ax: Existing axes, or ``None`` to create a figure.
     :param language: Label language, ``"en"`` (default) or ``"es"``.
     :param kwargs: Forwarded to the insertion-loss ``plot`` call.
@@ -484,7 +484,7 @@ def plot_sound_speed_profile(
     """Effective sound-speed profile ``c_eff(z)`` (height on the vertical axis).
 
     :param profile: An
-        :class:`~phonometry.environmental.atmospheric_refraction.EffectiveSoundSpeedProfile`.
+        :class:`~phonometry.environment.propagation.refraction.EffectiveSoundSpeedProfile`.
     :param ax: Existing axes, or ``None`` to create a figure.
     :param language: Label language, ``"en"`` (default) or ``"es"``.
     :param kwargs: Forwarded to the profile ``plot`` call.
@@ -513,7 +513,7 @@ def plot_atmospheric_rays(
     """Curved sound-ray paths over the ground (height on the vertical axis).
 
     :param result: An
-        :class:`~phonometry.environmental.atmospheric_refraction.AtmosphericRayResult`.
+        :class:`~phonometry.environment.propagation.refraction.AtmosphericRayResult`.
     :param ax: Existing axes, or ``None`` to create a figure.
     :param language: Label language, ``"en"`` (default) or ``"es"``.
     :param kwargs: Forwarded to each ray ``plot`` call.
@@ -552,7 +552,7 @@ def plot_atmospheric_pe(
     ``phonometry_field_dark`` on a dark one -- and ``cmap`` overrides it.
 
     :param result: An
-        :class:`~phonometry.environmental.atmospheric_refraction.AtmosphericPEResult`.
+        :class:`~phonometry.environment.propagation.refraction.AtmosphericPEResult`.
     :param ax: Existing axes, or ``None`` to create a figure.
     :param language: Label language, ``"en"`` (default) or ``"es"``.
     :param kwargs: Forwarded to ``imshow``.
@@ -603,7 +603,7 @@ def plot_tonal_correction_rd1367(
     highlighted.
 
     :param result: A
-        :class:`~phonometry.environmental.spanish_regulation.TonalCorrectionResult`.
+        :class:`~phonometry.environment.assessment.spain.TonalCorrectionResult`.
     :param ax: Existing axes, or ``None`` to create a figure.
     :param language: Label language, ``"en"`` (default) or ``"es"``.
     :param kwargs: Forwarded to the band-level ``bar`` call.
@@ -660,7 +660,7 @@ def plot_activity_assessment(
     that exceeds its own limit is outlined in the exceedance colour.
 
     :param result: An
-        :class:`~phonometry.environmental.spanish_regulation.ActivityAssessment`.
+        :class:`~phonometry.environment.assessment.spain.ActivityAssessment`.
     :param ax: Existing axes, or ``None`` to create a figure.
     :param language: Label language, ``"en"`` (default) or ``"es"``.
     :param kwargs: Forwarded to the ``LKeq,x`` ``bar`` call.
@@ -789,7 +789,7 @@ def plot_cnossos_road_emission(
     governs the source is read directly off the chart.
 
     :param result: A
-        :class:`~phonometry.environmental.cnossos_road.RoadEmissionResult`.
+        :class:`~phonometry.environment.sources.cnossos_road.RoadEmissionResult`.
     :param ax: Existing axes, or ``None`` to create a figure.
     :param language: Label language, ``"en"`` (default) or ``"es"``.
     :param kwargs: Forwarded to the total-line-power ``bar`` call.

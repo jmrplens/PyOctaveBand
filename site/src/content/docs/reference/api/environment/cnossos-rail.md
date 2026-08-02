@@ -1,5 +1,5 @@
 ---
-title: "environmental.cnossos_rail"
+title: "environment.sources.cnossos_rail"
 description: "CNOSSOS-EU railway source emission (Directive 2002/49/EC Annex II, 2.3)."
 sidebar:
   label: "cnossos_rail"

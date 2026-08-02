@@ -75,7 +75,9 @@ def test_atmospheric_low_bands_do_not_warn() -> None:
     assert np.all(la <= 0.0)
     # Above the 10 kHz top of the NORAH grid alpha is large and extrapolated:
     # the advisory warning must still propagate there.
-    from phonometry.environmental.air_absorption import AtmosphericAbsorptionWarning
+    from phonometry.environment.propagation.air_absorption import (
+        AtmosphericAbsorptionWarning,
+    )
 
     with pytest.warns(AtmosphericAbsorptionWarning):
         atmospheric_adjustment([16000.0], 1060.0)

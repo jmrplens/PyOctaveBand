@@ -305,7 +305,7 @@ _PRE_MOVE_MODULE_PATHS = [
     "phonometry.distortion",
     "phonometry.dynamic_stiffness",
     "phonometry.enclosed_space_absorption",
-    "phonometry.environmental",
+    "phonometry.environment",
     "phonometry.environmental_measurement",
     "phonometry.facade_prediction",
     "phonometry.filter_design",
@@ -431,6 +431,20 @@ _PRE_SPLIT_MODULE_PATHS = [
     "phonometry.vibration.point_mobility",
     "phonometry.vibration.radiation_efficiency",
     "phonometry.vibration.transfer_stiffness",
+    # The package itself was renamed, so the prefix is an alias as well.
+    "phonometry.environmental",
+    "phonometry.environmental.air_absorption",
+    "phonometry.environmental.atmospheric_refraction",
+    "phonometry.environmental.cnossos_rail",
+    "phonometry.environmental.cnossos_road",
+    "phonometry.environmental.ground_barriers",
+    "phonometry.environmental.impulse_prominence",
+    "phonometry.environmental.impulsive_sound",
+    "phonometry.environmental.measurement",
+    "phonometry.environmental.outdoor_propagation",
+    "phonometry.environmental.rating",
+    "phonometry.environmental.spanish_regulation",
+    "phonometry.environmental.wind_turbine_noise",
 ]
 
 

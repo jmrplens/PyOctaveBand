@@ -4578,7 +4578,7 @@ def _iso1996_3_ramp_onset() -> Any:
     """Detected onset of a 30 dB LpAF ramp over 0.30 s (dt = 20 ms)."""
     import numpy as _np
 
-    from phonometry.environmental.impulsive_sound import detect_onsets
+    from phonometry.environment.assessment.impulsive_sound import detect_onsets
 
     dt = 0.02
     pre = _np.full(round(0.2 / dt), 40.0)
@@ -7350,7 +7350,7 @@ _WIND_TURBINE = "Wind-turbine noise (IEC 61400-11)"
     "Critical bandwidth about a 500 Hz tone, Hz",
 )
 def _chk_wt_critical_bandwidth() -> Outcome:
-    from phonometry.environmental.wind_turbine_noise import critical_bandwidth
+    from phonometry.environment.sources.wind_turbine import critical_bandwidth
 
     expected = 25.0 + 75.0 * (1.0 + 1.4 * (500.0 / 1000.0) ** 2) ** 0.69
     return numeric(expected, critical_bandwidth(500.0), 1e-6, unit="Hz", places=3)

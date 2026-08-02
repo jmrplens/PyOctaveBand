@@ -1142,7 +1142,7 @@ def _impulse_prominence_example() -> tuple[object, ReportMetadata, str]:
     requirement is a plausible maximum governing prominence the example exceeds,
     so the optional verdict FAILs.
     """
-    result = ph.environmental.impulse_prominence(
+    result = ph.environment.assessment.impulse_prominence(
         [1200.0, 300.0, 60.0], [32.0, 18.0, 11.0]
     )
     metadata = ReportMetadata(

@@ -2,7 +2,7 @@
 """Activity noise inspection fiche (reportlab renderer, RD 1367/2007).
 
 Renders a
-:class:`~phonometry.environmental.spanish_regulation.ActivityAssessment` to a
+:class:`~phonometry.environment.assessment.spain.ActivityAssessment` to a
 one-page PDF laid out like a Spanish *informe de ensayo acustico* / *acta de
 inspeccion acustica* of an activity.
 
@@ -76,7 +76,7 @@ from ._layout import (
 )
 
 if TYPE_CHECKING:
-    from ..environmental.spanish_regulation import (
+    from ..environment.assessment.spain import (
         ActivityAssessment,
         PeriodAssessment,
     )
@@ -363,7 +363,7 @@ def render_activity_report(
     """Render an RD 1367/2007 activity inspection fiche to a PDF at ``path``.
 
     :param result: An
-        :class:`~phonometry.environmental.spanish_regulation.ActivityAssessment`.
+        :class:`~phonometry.environment.assessment.spain.ActivityAssessment`.
     :param path: Destination path of the PDF file.
     :param metadata: Optional :class:`ReportMetadata` supplying the header
         identity (``specimen`` the activity, ``client`` its holder,

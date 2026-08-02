@@ -11,9 +11,10 @@ Two generations of aliases live here, each with its own removal date:
   subpackages into domain ones (``phonometry.metrology`` into
   ``phonometry.filters``, ``phonometry.signals`` and a narrowed
   ``phonometry.metrology``; the speech intelligibility of
-  ``phonometry.hearing`` into ``phonometry.speech``), and gives the large
-  domains a second level (``phonometry.vibration`` into ``structural``,
-  ``human`` and ``machinery``). Removed in 5.0.
+  ``phonometry.hearing`` into ``phonometry.speech``), gives the large domains
+  a second level (``phonometry.vibration`` into ``structural``, ``human`` and
+  ``machinery``) and renames ``phonometry.environmental`` to
+  ``phonometry.environment``. Removed in 5.0.
 
 Every public module path that moved stays importable through the shims
 registered here: ``import phonometry.<old>`` and ``from phonometry.<old>
@@ -106,11 +107,16 @@ _MOVED_3X: dict[str, str] = {
         "phonometry.vibration.human.multiple_shock",
     "phonometry.transfer_stiffness":
         "phonometry.vibration.structural.transfer_stiffness",
-    "phonometry.air_absorption": "phonometry.environmental.air_absorption",
-    "phonometry.environmental_measurement": "phonometry.environmental.measurement",
-    "phonometry.impulse_prominence": "phonometry.environmental.impulse_prominence",
-    "phonometry.outdoor_propagation": "phonometry.environmental.outdoor_propagation",
-    "phonometry.wind_turbine_noise": "phonometry.environmental.wind_turbine_noise",
+    "phonometry.air_absorption":
+        "phonometry.environment.propagation.air_absorption",
+    "phonometry.environmental_measurement":
+        "phonometry.environment.assessment.measurement",
+    "phonometry.impulse_prominence":
+        "phonometry.environment.assessment.impulse_prominence",
+    "phonometry.outdoor_propagation":
+        "phonometry.environment.propagation.outdoor_propagation",
+    "phonometry.wind_turbine_noise":
+        "phonometry.environment.sources.wind_turbine",
     "phonometry.aircraft_atmospheric_absorption": "phonometry.aircraft.atmospheric_absorption",
     "phonometry.aircraft_noise": "phonometry.aircraft.aircraft_noise",
     "phonometry.airport_noise": "phonometry.aircraft.airport_noise",
@@ -185,6 +191,32 @@ _MOVED_4X: dict[str, str] = {
         "phonometry.vibration.human.multiple_shock",
     "phonometry.vibration.machine_diagnostics":
         "phonometry.vibration.machinery.diagnostics",
+    # The package itself was renamed, so the whole prefix is an alias.
+    "phonometry.environmental": "phonometry.environment",
+    "phonometry.environmental.outdoor_propagation":
+        "phonometry.environment.propagation.outdoor_propagation",
+    "phonometry.environmental.air_absorption":
+        "phonometry.environment.propagation.air_absorption",
+    "phonometry.environmental.ground_barriers":
+        "phonometry.environment.propagation.ground_barriers",
+    "phonometry.environmental.atmospheric_refraction":
+        "phonometry.environment.propagation.refraction",
+    "phonometry.environmental.cnossos_road":
+        "phonometry.environment.sources.cnossos_road",
+    "phonometry.environmental.cnossos_rail":
+        "phonometry.environment.sources.cnossos_rail",
+    "phonometry.environmental.wind_turbine_noise":
+        "phonometry.environment.sources.wind_turbine",
+    "phonometry.environmental.rating":
+        "phonometry.environment.assessment.rating",
+    "phonometry.environmental.measurement":
+        "phonometry.environment.assessment.measurement",
+    "phonometry.environmental.impulsive_sound":
+        "phonometry.environment.assessment.impulsive_sound",
+    "phonometry.environmental.impulse_prominence":
+        "phonometry.environment.assessment.impulse_prominence",
+    "phonometry.environmental.spanish_regulation":
+        "phonometry.environment.assessment.spain",
 }
 
 #: The two generations, each with the release that deprecated it and the one
@@ -206,6 +238,13 @@ def _make_shim(old: str, new: str, since: str, removed_in: str) -> types.ModuleT
         try:
             attr = getattr(target, name)
         except AttributeError:
+            # A renamed package keeps serving the modules that moved out of
+            # it: ``environmental.wind_turbine_noise`` is not an attribute of
+            # ``environment`` any more, it is an alias of its own. The alias
+            # carries the notice, so returning it here is silent.
+            alias = sys.modules.get(f"{old}.{name}")
+            if alias is not None:
+                return alias
             raise AttributeError(
                 f"module {old!r} has no attribute {name!r}"
             ) from None
@@ -218,7 +257,8 @@ def _make_shim(old: str, new: str, since: str, removed_in: str) -> types.ModuleT
         return attr
 
     def __dir__() -> list[str]:
-        return dir(import_module(new))
+        names = set(dir(import_module(new))) | set(_alias_modules(old))
+        return sorted(names)
 
     shim.__getattr__ = __getattr__  # type: ignore[method-assign]
     shim.__dir__ = __dir__  # type: ignore[method-assign]

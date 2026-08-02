@@ -6219,7 +6219,7 @@ def generate_wind_turbine_tonality(output_dir: str) -> None:
     """IEC 61400-11 wind-turbine tonal audibility: narrowband spectrum + masking."""
     print("Generating wind_turbine_tonality...")
     from phonometry import wind_turbine_tonality
-    from phonometry.environmental.wind_turbine_noise import _critical_band_edges
+    from phonometry.environment.sources.wind_turbine import _critical_band_edges
 
     # A narrowband spectrum: a shaped broadband floor with a blade-passing-style
     # tone near 200 Hz, at 2 Hz resolution.
@@ -10571,7 +10571,9 @@ def generate_impulse_prominence(output_dir: str) -> None:
         impulse_prominence,
         predicted_prominence,
     )
-    from phonometry.environmental.impulse_prominence import ADJUSTMENT_THRESHOLD
+    from phonometry.environment.assessment.impulse_prominence import (
+        ADJUSTMENT_THRESHOLD,
+    )
 
     _fig, (ax_p, ax_k) = plt.subplots(1, 2, figsize=(12.5, 5.4))
 

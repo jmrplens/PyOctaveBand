@@ -30,12 +30,12 @@ and `composite_rating_level()` the general whole-day composite of clause 6.5
 +6 dB prominent tones):
 
 ```python
-from phonometry import environmental
+from phonometry import environment
 
-l = environmental.lden(63.2, 58.1, 51.4)                      # from LAeq per period
-r = environmental.composite_rating_level([(63.2, 12, 0.0),    # day
+l = environment.lden(63.2, 58.1, 51.4)                      # from LAeq per period
+r = environment.composite_rating_level([(63.2, 12, 0.0),    # day
                             (58.1, 4, 5.0),     # evening (+5)
-                            (51.4, 8, 10.0)])   # night  (+10) == environmental.lden
+                            (51.4, 8, 10.0)])   # night  (+10) == environment.lden
 ```
 
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/lden_profile_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/lden_profile.svg" alt="Synthetic 24-hour urban LAeq profile with day, evening and night bands, the +5 and +10 dB weighted period levels and the resulting Lden" width="80%"></picture>
@@ -46,7 +46,7 @@ r = environmental.composite_rating_level([(63.2, 12, 0.0),    # day
 ```python
 import numpy as np
 import matplotlib.pyplot as plt
-from phonometry import environmental
+from phonometry import environment
 
 # Synthetic hourly LAeq of an urban road (dB), hours 00 to 23
 laeq_h = np.array([48, 46, 45, 45, 46, 50, 56, 64, 66, 65, 63, 63,
@@ -58,7 +58,7 @@ def period_leq(idx):
 ld = period_leq(np.arange(7, 19))                # day 07-19
 le = period_leq(np.arange(19, 23))               # evening 19-23
 ln_ = period_leq(np.r_[23, np.arange(0, 7)])     # night 23-07
-l_den = environmental.lden(ld, le, ln_)
+l_den = environment.lden(ld, le, ln_)
 print(f"Lden = {l_den:.1f} dB")   # Lden = 64.3 dB
 
 fig, ax = plt.subplots()
@@ -124,10 +124,10 @@ $K_t$ (Table J.1).
 
 ```python
 import matplotlib.pyplot as plt
-from phonometry import environmental
+from phonometry import environment
 
 # ISO 1996-2:2007 Annex C.5, Example 2 (two tones near 400 Hz):
-res = environmental.assess_tonal_audibility(tone_level=54.1, masking_noise_level=45.2,
+res = environment.assess_tonal_audibility(tone_level=54.1, masking_noise_level=45.2,
                               centre_frequency=430.0)
 print(res.audibility, res.adjustment)   # ΔLta ≈ 11.1 dB -> Kt = 6 dB
 res.plot()
@@ -154,20 +154,20 @@ reported alongside as `approximate_uncertainty` and a warning when the levels
 spread beyond 3 dB, where the substitute grossly inflates.
 
 ```python
-from phonometry import environmental
+from phonometry import environment
 
 # Tonal adjustment for a prominent tone:
-tonal = environmental.assess_tonal_audibility(54.1, 45.2, 430.0)  # TonalAssessmentResult
+tonal = environment.assess_tonal_audibility(54.1, 45.2, 430.0)  # TonalAssessmentResult
 kt = tonal.adjustment                                             # 6 dB
 tonal.plot()   # this audibility on the Kt curve, as in the figure above
 
 # Subtract residual (background) noise from a measured level:
-corr = environmental.residual_sound_correction(measured_level=58.0, residual_level=50.0)
+corr = environment.residual_sound_correction(measured_level=58.0, residual_level=50.0)
 corr.corrected_level, corr.reliable
 
 # Combine an uncertainty budget and expand to 95 %:
-u = environmental.combined_standard_uncertainty([0.59, 0.3, 2.0, 0.40, 0.38])  # 2.18 dB (G.2)
-environmental.expanded_uncertainty(u)                            # 4.36 dB (k = 2)
+u = environment.combined_standard_uncertainty([0.59, 0.3, 2.0, 0.40, 0.38])  # 2.18 dB (G.2)
+environment.expanded_uncertainty(u)                            # 4.36 dB (k = 2)
 ```
 
 ## Quick answers

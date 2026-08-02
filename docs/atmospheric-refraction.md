@@ -7,7 +7,7 @@ The [ISO 9613-2 method](outdoor-propagation.md) and the
 atmosphere. In reality the sound speed changes with height, because temperature
 and wind change with height, and this **refracts** sound: rays curve, and over a
 few hundred metres the received level can swing by tens of decibels. This page
-covers `phonometry.environmental.atmospheric_refraction`, the
+covers `phonometry.environment.atmospheric_refraction`, the
 refracting-atmosphere counterpart of the ocean solvers in
 [`phonometry.underwater.numerical_propagation`](underwater-solvers.md): a
 **ray model** and a **parabolic-equation (PE)** solver, both clean-room from

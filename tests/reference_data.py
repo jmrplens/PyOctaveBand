@@ -2798,7 +2798,7 @@ ISO12354_2_TABLE_B2: tuple[tuple[str, float, tuple[float, ...], int], ...] = (
 # comment: Commission Delegated Directive (EU) 2021/1226 (OJ L 269, 28.7.2021)
 # where it replaced the table, Commission Directive (EU) 2015/996 (OJ L 168,
 # 1.7.2015) where it did not. These constants pin the tables shipped in
-# ``phonometry.environmental.cnossos_rail``.
+# ``phonometry.environment.sources.cnossos_rail``.
 # ---------------------------------------------------------------------------
 
 #: Wavelength grid of Tables G-1b, G-2 and G-4 as replaced by (EU) 2021/1226, mm.

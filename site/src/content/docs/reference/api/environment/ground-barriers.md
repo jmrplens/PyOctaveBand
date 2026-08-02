@@ -1,5 +1,5 @@
 ---
-title: "environmental.ground_barriers"
+title: "environment.propagation.ground_barriers"
 description: "Spherical-wave ground effect and advanced barrier diffraction."
 sidebar:
   label: "ground_barriers"
@@ -8,7 +8,7 @@ sidebar:
 Spherical-wave ground effect and advanced barrier diffraction.
 
 This module extends the tabulated ground and barrier terms of ISO 9613-2 (see
-[`phonometry.environmental.outdoor_propagation`](/phonometry/reference/api/environment/outdoor-propagation/)) with the underlying wave
+[`phonometry.environment.propagation.outdoor_propagation`](/phonometry/reference/api/environment/outdoor-propagation/)) with the underlying wave
 acoustics: the spherical-wave reflection coefficient of a finite-impedance
 ground and the wave-theoretic diffraction of a screen, both in a homogeneous
 (non-refracting, non-turbulent) atmosphere.

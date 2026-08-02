@@ -143,9 +143,9 @@ ci:
   - changed-files:
       - any-glob-to-any-file: ["src/phonometry/emission/**", "tests/emission/**"]
 
-"area: environmental":
+"area: environment":
   - changed-files:
-      - any-glob-to-any-file: ["src/phonometry/environmental/**", "tests/environmental/**"]
+      - any-glob-to-any-file: ["src/phonometry/environment/**", "tests/environment/**"]
 
 "area: filters":
   - changed-files:

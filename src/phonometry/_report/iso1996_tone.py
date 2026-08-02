@@ -81,7 +81,9 @@ def _tonal_adjustment(audibility: float) -> int:
     Imported lazily from the environmental-measurement domain module (the fiche
     layer references domain code only at call time, never at import time).
     """
-    from ..environmental.measurement import tonal_adjustment_from_mean_audibility
+    from ..environment.assessment.measurement import (
+        tonal_adjustment_from_mean_audibility,
+    )
 
     return tonal_adjustment_from_mean_audibility(audibility)
 

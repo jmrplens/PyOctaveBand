@@ -28,7 +28,7 @@ from typing import TYPE_CHECKING, Any
 import numpy as np
 
 from .._internal.validation import require_non_negative, require_positive_array
-from ..environmental.air_absorption import air_attenuation
+from ..environment.propagation.air_absorption import air_attenuation
 
 if TYPE_CHECKING:
     from matplotlib.axes import Axes

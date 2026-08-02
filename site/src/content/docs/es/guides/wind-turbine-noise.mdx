@@ -46,12 +46,12 @@ dan cuenta de la duplicación de presión en la placa del suelo.
 <ThemeImage loading="eager" src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_wind_turbine_iec61400_es.svg" alt="Alzado de un aerogenerador de eje horizontal con altura de buje H y diámetro de rotor D, un micrófono tumbado sobre una placa plana en el suelo a sotavento a la distancia horizontal R0 = H + D/2 del eje de la torre, la distancia oblicua R1 del centro del rotor al micrófono con el ángulo de inclinación de la placa phi entre 25 y 40 grados, y un mástil meteorológico que mide velocidad y dirección del viento; un recuadro en planta muestra el patrón de la Figura 3 con la posición de referencia a sotavento y tres posiciones opcionales a más y menos 60 grados y a barlovento, y las anotaciones dan R1 igual a la raíz cuadrada de H al cuadrado más R0 al cuadrado y la fórmula de potencia acústica aparente LWA,i = Lp,i menos 6 más 10 lg(4 pi R1 al cuadrado entre S0)" width="94%" />
 
 ```python
-from phonometry import environmental
+from phonometry import environment
 
 # Niveles de banda de tercio de octava ponderados A y corregidos de fondo L_p,i (dB).
 band_levels = [55.0, 58.0, 60.0, 57.0, 54.0]
-r1 = environmental.slant_distance(hub_height=80.0, rotor_diameter=100.0)
-lwa = environmental.apparent_sound_power_level(band_levels, r1)   # dB re 1 pW
+r1 = environment.slant_distance(hub_height=80.0, rotor_diameter=100.0)
+lwa = environment.apparent_sound_power_level(band_levels, r1)   # dB re 1 pW
 ```
 
 ### Por qué "aparente"
@@ -133,20 +133,20 @@ $\Delta L_a \ge -3\ \text{dB}$ y audible cuando $\Delta L_a > 0$.
 
 ```python
 import numpy as np
-from phonometry import environmental
+from phonometry import environment
 
 df = 2.0
 freqs = np.arange(50.0, 400.0 + df, df)
 levels = 42.0 - 6.0 * np.log10(freqs / 100.0)
 levels[int(np.argmin(np.abs(freqs - 200.0)))] += 22.0   # tono estilo paso de pala
-environmental.wind_turbine_tonality(levels, freqs, tone_frequency=200.0).plot(language="es")
+environment.wind_turbine_tonality(levels, freqs, tone_frequency=200.0).plot(language="es")
 ```
 
 </details>
 
 ```python
 import numpy as np
-from phonometry import environmental
+from phonometry import environment
 
 # Un espectro de banda estrecha uniformemente espaciado (resolución de 2 Hz):
 # un suelo plano de 30 dB con un tono discreto de 60 dB en 500 Hz.
@@ -154,7 +154,7 @@ frequencies = np.arange(440.0, 562.0, 2.0)
 levels = np.full(frequencies.size, 30.0)
 levels[np.argmin(np.abs(frequencies - 500.0))] = 60.0
 
-res = environmental.wind_turbine_tonality(levels, frequencies)
+res = environment.wind_turbine_tonality(levels, frequencies)
 print(res.tone_frequency, res.tonality, res.tonal_audibility, res.is_audible)
 res.plot()   # espectro + banda crítica + nivel de enmascaramiento (requiere matplotlib)
 ```
@@ -177,4 +177,4 @@ $K_T$, pasa la audibilidad media al `tonal_adjustment` de la ISO 1996-2.
 
 ## Véase también
 
-- Referencia de la API: [`environmental.wind_turbine_noise`](/phonometry/es/reference/api/aeroacoustics/wind-turbine-noise/).
+- Referencia de la API: [`environmental.wind_turbine_noise`](/phonometry/es/reference/api/environment/wind-turbine/).

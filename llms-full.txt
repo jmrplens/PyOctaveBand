@@ -257,7 +257,6 @@ The generated API reference, one page per module. Fetch these only when a specif
 - [aeroacoustics/anp-fleet](https://jmrplens.github.io/phonometry/reference/api/aeroacoustics/anp-fleet/)
 - [aeroacoustics/atmospheric-absorption](https://jmrplens.github.io/phonometry/reference/api/aeroacoustics/atmospheric-absorption/)
 - [aeroacoustics/rotorcraft-noise](https://jmrplens.github.io/phonometry/reference/api/aeroacoustics/rotorcraft-noise/)
-- [aeroacoustics/wind-turbine-noise](https://jmrplens.github.io/phonometry/reference/api/aeroacoustics/wind-turbine-noise/)
 - [broadcast/program-loudness](https://jmrplens.github.io/phonometry/reference/api/broadcast/program-loudness/)
 - [building/aperture-transmission](https://jmrplens.github.io/phonometry/reference/api/building/aperture-transmission/)
 - [building/building-prediction](https://jmrplens.github.io/phonometry/reference/api/building/building-prediction/)
@@ -286,7 +285,6 @@ The generated API reference, one page per module. Fetch these only when a specif
 - [electroacoustics/sound-reinforcement](https://jmrplens.github.io/phonometry/reference/api/electroacoustics/sound-reinforcement/)
 - [electroacoustics/swept-sine](https://jmrplens.github.io/phonometry/reference/api/electroacoustics/swept-sine/)
 - [environment/air-absorption](https://jmrplens.github.io/phonometry/reference/api/environment/air-absorption/)
-- [environment/atmospheric-refraction](https://jmrplens.github.io/phonometry/reference/api/environment/atmospheric-refraction/)
 - [environment/cnossos-rail](https://jmrplens.github.io/phonometry/reference/api/environment/cnossos-rail/)
 - [environment/cnossos-road](https://jmrplens.github.io/phonometry/reference/api/environment/cnossos-road/)
 - [environment/ground-barriers](https://jmrplens.github.io/phonometry/reference/api/environment/ground-barriers/)
@@ -295,7 +293,9 @@ The generated API reference, one page per module. Fetch these only when a specif
 - [environment/measurement](https://jmrplens.github.io/phonometry/reference/api/environment/measurement/)
 - [environment/outdoor-propagation](https://jmrplens.github.io/phonometry/reference/api/environment/outdoor-propagation/)
 - [environment/rating](https://jmrplens.github.io/phonometry/reference/api/environment/rating/)
-- [environment/spanish-regulation](https://jmrplens.github.io/phonometry/reference/api/environment/spanish-regulation/)
+- [environment/refraction](https://jmrplens.github.io/phonometry/reference/api/environment/refraction/)
+- [environment/spain](https://jmrplens.github.io/phonometry/reference/api/environment/spain/)
+- [environment/wind-turbine](https://jmrplens.github.io/phonometry/reference/api/environment/wind-turbine/)
 - [filters/compliance](https://jmrplens.github.io/phonometry/reference/api/filters/compliance/)
 - [filters/core](https://jmrplens.github.io/phonometry/reference/api/filters/core/)
 - [filters/equalizer](https://jmrplens.github.io/phonometry/reference/api/filters/equalizer/)
@@ -2248,7 +2248,7 @@ contour = aircraft.noise_contour(path, powers, distances, sel, lmax, x=gx, y=gy)
 | `phonometry.materials` | Absorption (ISO 354/11654), impedance tube, airflow resistance, scattering/diffusion, road absorption, dynamic stiffness |
 | `phonometry.building` | Sound insulation measurement and prediction (EN 12354, ISO 717/16283/10140/15186/10052/10848), structure-borne sound |
 | `phonometry.vibration` | Three families: `structural` (mobility ISO 7626, plate junctions, radiation, experimental SEA, transfer stiffness ISO 10846), `human` (ISO 2631/5349/8041 exposure and multiple shocks) and `machinery` (fault frequencies and condition monitoring) |
-| `phonometry.environmental` | Rating levels, ISO 1996-2 measurement, outdoor propagation (ISO 9613), atmospheric refraction (ray tracing and the parabolic equation), wind-turbine noise, impulsive prominence |
+| `phonometry.environment` | Rating levels, ISO 1996-2 measurement, outdoor propagation (ISO 9613), atmospheric refraction (ray tracing and the parabolic equation), wind-turbine noise, impulsive prominence |
 | `phonometry.aircraft` | EPNL (ICAO Annex 16), SAE ARP 5534 absorption, airport contours (ECAC Doc 29), rotorcraft (ECAC Doc 32) |
 | `phonometry.underwater` | ISO 18405/17208/18406 levels, propagation and Weston regimes, sound speed, sonar equation and detection range, seabed, ambient and ship-traffic noise, marine-mammal audiograms and regulatory auditory weighting, numerical solvers |
 | `phonometry.electroacoustics` | Distortion (IEC 60268-3 / AES17), transfer function and coherence, radiating piston |
@@ -2259,8 +2259,8 @@ contour = aircraft.noise_contour(path, powers, distances, sel, lmax, x=gx, y=gy)
 Every name in the table below is also re-exported at the top level, so
 `from phonometry import <name>` works for every row. Two generations of module
 paths are still importable and warn on use: the pre-3.2 flat ones (for example
-`phonometry.insulation`), removed in 4.0, and the pre-4.0 ones that the split
-of `metrology` moved (for example `phonometry.metrology.levels`, now
+`phonometry.building.insulation`), removed in 4.0, and the pre-4.0 ones that the split
+of `metrology` moved (for example `phonometry.signals.levels`, now
 `phonometry.signals.levels`), removed in 5.0. Reading a moved name from the
 namespace it left (`metrology.leq`) warns and delegates as well.
 
@@ -3474,7 +3474,7 @@ The [ISO 9613-2 method](https://jmrplens.github.io/phonometry/guides/outdoor-pro
 atmosphere. In reality the sound speed changes with height, because temperature
 and wind change with height, and this **refracts** sound: rays curve, and over a
 few hundred metres the received level can swing by tens of decibels. This page
-covers `phonometry.environmental.atmospheric_refraction`, the
+covers `phonometry.environment.atmospheric_refraction`, the
 refracting-atmosphere counterpart of the ocean solvers in
 [`phonometry.underwater.numerical_propagation`](https://jmrplens.github.io/phonometry/guides/underwater-solvers/): a
 **ray model** and a **parabolic-equation (PE)** solver, both clean-room from
@@ -12517,7 +12517,7 @@ Source: https://jmrplens.github.io/phonometry/guides/ground-barriers/
 
 The [ISO 9613-2 general method](https://jmrplens.github.io/phonometry/guides/outdoor-propagation/) folds the ground and
 barrier terms into tabulated, energy-based corrections. This page covers the
-underlying wave acoustics in `phonometry.environmental.ground_barriers`: the
+underlying wave acoustics in `phonometry.environment.ground_barriers`: the
 **spherical-wave reflection coefficient** of a finite-impedance ground
 (Weyl-Van der Pol) and the **wave-theoretic diffraction** of a screen, both in
 a homogeneous (non-refracting, non-turbulent) atmosphere. These are the physical
@@ -34531,7 +34531,7 @@ exceeds 9 dB.
 - [Impulsive-sound prominence](https://jmrplens.github.io/phonometry/guides/impulse-prominence/): the ISO/PAS 1996-3
   impulsive adjustment, the relative of $K_i$ that is not interchangeable with
   it.
-- API reference: [`environmental.spanish_regulation`](https://jmrplens.github.io/phonometry/reference/api/environment/spanish-regulation/).
+- API reference: [`environmental.spanish_regulation`](https://jmrplens.github.io/phonometry/reference/api/environment/spain/).
 
 ## References
 

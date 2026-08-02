@@ -497,14 +497,103 @@ from .emission.vibration_sound_power import (
     velocity_level,
     velocity_level_from_acceleration,
 )
-from .environmental.air_absorption import (
+from .environment.assessment.impulse_prominence import (
+    ImpulseProminenceResult,
+    ImpulseProminenceWarning,
+    impulse_adjustment,
+    impulse_prominence,
+    predicted_prominence,
+    rating_level,
+)
+from .environment.assessment.impulsive_sound import (
+    ImpulseOnset,
+    ImpulsiveSoundResult,
+    ImpulsiveSoundWarning,
+    detect_onsets,
+    impulsive_sound_adjustment,
+    sound_pressure_level_history,
+)
+from .environment.assessment.measurement import (
+    RepeatedMeasurementResult,
+    ResidualCorrectionResult,
+    TonalAssessmentResult,
+    assess_tonal_audibility,
+    combined_standard_uncertainty,
+    critical_bandwidth,
+    gaussian_residual_level,
+    residual_correction_uncertainty,
+    residual_sound_correction,
+    tonal_adjustment,
+    tonal_adjustment_from_mean_audibility,
+    tonal_audibility,
+    tonal_seeking_survey,
+    uncertainty_from_repeated_measurements,
+)
+from .environment.assessment.measurement import (
+    expanded_uncertainty as environmental_expanded_uncertainty,
+)
+from .environment.assessment.rating import composite_rating_level, lden, ldn
+from .environment.assessment.spain import (
+    ACOUSTIC_AREA_TYPES,
+    RD1367_CORRECTION_VALUES,
+    RD1367_EVALUATION_PERIODS,
+    RD1367_MAX_CORRECTION,
+    RD1367_PERIOD_CLOCK_LIMITS,
+    RD1367_PERIOD_HOURS,
+    ActivityAssessment,
+    NoisePhase,
+    PeriodAssessment,
+    RegulationLimits,
+    TonalCorrectionResult,
+    activity_limits,
+    adjacent_premises_limits,
+    assess_activity,
+    corrected_level,
+    evaluation_period_level,
+    impulsive_correction,
+    indoor_quality_objectives,
+    infrastructure_limits,
+    long_term_corrected_level,
+    low_frequency_correction,
+    max_infrastructure_limit,
+    outdoor_quality_objectives,
+    round_reported_level,
+    tonal_correction,
+    total_correction,
+    vibration_quality_objective,
+)
+from .environment.propagation.air_absorption import (
     AtmosphericAbsorptionWarning,
     AtmosphericAttenuation,
     air_attenuation,
     air_attenuation_m,
     atmospheric_attenuation,
 )
-from .environmental.atmospheric_refraction import (
+from .environment.propagation.ground_barriers import (
+    BarrierInsertionLoss,
+    SphericalGroundResult,
+    barrier_insertion_loss,
+    fresnel_number,
+    ground_effect,
+    kurze_anderson_attenuation,
+    spherical_reflection_coefficient,
+)
+from .environment.propagation.outdoor_propagation import (
+    DEFAULT_FREQUENCIES,
+    Barrier,
+    OutdoorAttenuation,
+    SourceEmission,
+    atmospheric_absorption,
+    barrier_attenuation,
+    directivity_omega,
+    geometric_divergence,
+    ground_attenuation,
+    ground_attenuation_alternative,
+    meteorological_correction,
+    outdoor_propagation_attenuation,
+    predicted_receiver_level,
+)
+from .environment.propagation.refraction import (
     AtmosphericPEResult,
     AtmosphericRayResult,
     EffectiveSoundSpeedProfile,
@@ -515,7 +604,7 @@ from .environmental.atmospheric_refraction import (
     ray_curvature_radius,
     shadow_zone_distance,
 )
-from .environmental.cnossos_rail import (
+from .environment.sources.cnossos_rail import (
     AERODYNAMIC_REFERENCE_SPEED,
     AERODYNAMIC_THRESHOLD_SPEED,
     RAILWAY_MINIMUM_SPEED,
@@ -565,7 +654,7 @@ from .environmental.cnossos_rail import (
     wheel_roughness,
     wheel_transfer,
 )
-from .environmental.cnossos_road import (
+from .environment.sources.cnossos_road import (
     CNOSSOS_A_WEIGHTING,
     ROAD_COEFFICIENTS,
     ROAD_OCTAVE_BANDS,
@@ -586,96 +675,7 @@ from .environmental.cnossos_road import (
     road_surface_coefficients,
     road_vehicle_sound_power,
 )
-from .environmental.ground_barriers import (
-    BarrierInsertionLoss,
-    SphericalGroundResult,
-    barrier_insertion_loss,
-    fresnel_number,
-    ground_effect,
-    kurze_anderson_attenuation,
-    spherical_reflection_coefficient,
-)
-from .environmental.impulse_prominence import (
-    ImpulseProminenceResult,
-    ImpulseProminenceWarning,
-    impulse_adjustment,
-    impulse_prominence,
-    predicted_prominence,
-    rating_level,
-)
-from .environmental.impulsive_sound import (
-    ImpulseOnset,
-    ImpulsiveSoundResult,
-    ImpulsiveSoundWarning,
-    detect_onsets,
-    impulsive_sound_adjustment,
-    sound_pressure_level_history,
-)
-from .environmental.measurement import (
-    RepeatedMeasurementResult,
-    ResidualCorrectionResult,
-    TonalAssessmentResult,
-    assess_tonal_audibility,
-    combined_standard_uncertainty,
-    critical_bandwidth,
-    gaussian_residual_level,
-    residual_correction_uncertainty,
-    residual_sound_correction,
-    tonal_adjustment,
-    tonal_adjustment_from_mean_audibility,
-    tonal_audibility,
-    tonal_seeking_survey,
-    uncertainty_from_repeated_measurements,
-)
-from .environmental.measurement import (
-    expanded_uncertainty as environmental_expanded_uncertainty,
-)
-from .environmental.outdoor_propagation import (
-    DEFAULT_FREQUENCIES,
-    Barrier,
-    OutdoorAttenuation,
-    SourceEmission,
-    atmospheric_absorption,
-    barrier_attenuation,
-    directivity_omega,
-    geometric_divergence,
-    ground_attenuation,
-    ground_attenuation_alternative,
-    meteorological_correction,
-    outdoor_propagation_attenuation,
-    predicted_receiver_level,
-)
-from .environmental.rating import composite_rating_level, lden, ldn
-from .environmental.spanish_regulation import (
-    ACOUSTIC_AREA_TYPES,
-    RD1367_CORRECTION_VALUES,
-    RD1367_EVALUATION_PERIODS,
-    RD1367_MAX_CORRECTION,
-    RD1367_PERIOD_CLOCK_LIMITS,
-    RD1367_PERIOD_HOURS,
-    ActivityAssessment,
-    NoisePhase,
-    PeriodAssessment,
-    RegulationLimits,
-    TonalCorrectionResult,
-    activity_limits,
-    adjacent_premises_limits,
-    assess_activity,
-    corrected_level,
-    evaluation_period_level,
-    impulsive_correction,
-    indoor_quality_objectives,
-    infrastructure_limits,
-    long_term_corrected_level,
-    low_frequency_correction,
-    max_infrastructure_limit,
-    outdoor_quality_objectives,
-    round_reported_level,
-    tonal_correction,
-    total_correction,
-    vibration_quality_objective,
-)
-from .environmental.wind_turbine_noise import (
+from .environment.sources.wind_turbine import (
     WindTurbineNoiseWarning,
     WindTurbineTonalityResult,
     apparent_sound_power_level,

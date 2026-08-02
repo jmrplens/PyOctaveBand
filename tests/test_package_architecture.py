@@ -27,8 +27,8 @@ TOOLBOX: frozenset[str] = frozenset({"filters", "signals", "metrology"})
 #: `* -> _internal` and `* -> TOOLBOX`. "root" = modules still at the top
 #: level of the package (shrinks to the facade set as the migration proceeds).
 ALLOWED_EDGES: set[tuple[str, str]] = {
-    ("environmental", "materials"),   # air_absorption -> ISO 354 helpers
-    ("aircraft", "environmental"),    # atmospheric absorption reuse
+    ("environment", "materials"),     # air_absorption -> ISO 354 helpers
+    ("aircraft", "environment"),      # atmospheric absorption reuse
     ("vibration", "hearing"),         # multiple-shock SEXES tables
     # swept-sine distortion reuses the ISO 18233 sweep / Farina
     # inverse-filter machinery of room_ir

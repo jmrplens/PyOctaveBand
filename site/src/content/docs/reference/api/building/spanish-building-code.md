@@ -74,7 +74,7 @@ about 1,8 m2 specimens; larger windows insulate less, and the CEC corrects
 
 :::note
 `"sanitary"` does not mean the same thing here as in
-[`phonometry.environmental.spanish_regulation`](/phonometry/reference/api/environment/spanish-regulation/). In Table 2.1 of DB-HR
+[`phonometry.environment.assessment.spain`](/phonometry/reference/api/environment/spain/). In Table 2.1 of DB-HR
 it is the *non-hospital* ambulatory health use of footnote (1) (medical
 practices, consulting rooms), deliberately distinct from `"hospital"`;
 in the RD 1367/2007 tables it is the *hospitalario* use itself. Both names

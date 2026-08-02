@@ -1,5 +1,5 @@
 ---
-title: "environmental.outdoor_propagation"
+title: "environment.propagation.outdoor_propagation"
 description: "Outdoor sound propagation: ISO 9613-2:1996 general method of calculation."
 sidebar:
   label: "outdoor_propagation"
@@ -30,7 +30,7 @@ Implemented here are the four general terms of clause 7:
 
 * `Adiv` geometrical divergence, $20 \log_{10}(d/d_0) + 11$ (Eq. (7));
 * `Aatm` atmospheric absorption, $\alpha d$ (Eq. (8)) with `alpha`
-  the ISO 9613-1 coefficient supplied by [`phonometry.environmental.air_absorption`](/phonometry/reference/api/environment/air-absorption/);
+  the ISO 9613-1 coefficient supplied by [`phonometry.environment.propagation.air_absorption`](/phonometry/reference/api/environment/air-absorption/);
 * `Agr` ground effect, both the general per-region method of 7.3.1 with the
   Table 3 functions `a'/b'/c'/d'` (Eq. (9)) and the alternative simplified
   method of 7.3.2 (Eq. (10));

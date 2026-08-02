@@ -55,12 +55,12 @@ carácter (Tabla A.1: p. ej. +5 dB impulsivo regular, +12 dB altamente
 impulsivo, +3 a +6 dB tonos prominentes):
 
 ```python
-from phonometry import environmental
+from phonometry import environment
 
-l = environmental.lden(63.2, 58.1, 51.4)                      # desde LAeq por periodo
-r = environmental.composite_rating_level([(63.2, 12, 0.0),    # día
+l = environment.lden(63.2, 58.1, 51.4)                      # desde LAeq por periodo
+r = environment.composite_rating_level([(63.2, 12, 0.0),    # día
                             (58.1, 4, 5.0),     # tarde (+5)
-                            (51.4, 8, 10.0)])   # noche (+10) == environmental.lden
+                            (51.4, 8, 10.0)])   # noche (+10) == environment.lden
 ```
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/lden_profile_es.svg" alt="Perfil LAeq urbano sintético de 24 horas con las bandas de día, tarde y noche, los niveles por periodo ponderados con +5 y +10 dB y el Lden resultante" width="80%" />
@@ -71,7 +71,7 @@ r = environmental.composite_rating_level([(63.2, 12, 0.0),    # día
 ```python
 import numpy as np
 import matplotlib.pyplot as plt
-from phonometry import environmental
+from phonometry import environment
 
 # LAeq horario sintético de una vía urbana (dB), horas 00 a 23
 laeq_h = np.array([48, 46, 45, 45, 46, 50, 56, 64, 66, 65, 63, 63,
@@ -83,7 +83,7 @@ def period_leq(idx):
 ld = period_leq(np.arange(7, 19))                # día 07-19
 le = period_leq(np.arange(19, 23))               # tarde 19-23
 ln_ = period_leq(np.r_[23, np.arange(0, 7)])     # noche 23-07
-l_den = environmental.lden(ld, le, ln_)
+l_den = environment.lden(ld, le, ln_)
 print(f"Lden = {l_den:.1f} dB")   # Lden = 64.3 dB
 
 fig, ax = plt.subplots()
@@ -150,10 +150,10 @@ a $K_t$ (Tabla J.1).
 
 ```python
 import matplotlib.pyplot as plt
-from phonometry import environmental
+from phonometry import environment
 
 # ISO 1996-2:2007 Anexo C.5, Ejemplo 2 (dos tonos cerca de 400 Hz):
-res = environmental.assess_tonal_audibility(tone_level=54.1, masking_noise_level=45.2,
+res = environment.assess_tonal_audibility(tone_level=54.1, masking_noise_level=45.2,
                               centre_frequency=430.0)
 print(res.audibility, res.adjustment)   # ΔLta ≈ 11.1 dB -> Kt = 6 dB
 res.plot(language="es")
@@ -182,21 +182,21 @@ cuando los niveles se dispersan más de 3 dB, donde el sustituto se infla
 groseramente.
 
 ```python
-from phonometry import environmental
+from phonometry import environment
 
-tonal = environmental.assess_tonal_audibility(54.1, 45.2, 430.0)  # TonalAssessmentResult
+tonal = environment.assess_tonal_audibility(54.1, 45.2, 430.0)  # TonalAssessmentResult
 kt = tonal.adjustment                                             # 6 dB
 tonal.plot()   # esta audibilidad sobre la curva de Kt, como en la figura de arriba
-corr = environmental.residual_sound_correction(measured_level=58.0, residual_level=50.0)
-u = environmental.combined_standard_uncertainty([0.59, 0.3, 2.0, 0.40, 0.38])  # 2,18 dB (G.2)
-environmental.expanded_uncertainty(u)                            # 4,36 dB (k = 2)
+corr = environment.residual_sound_correction(measured_level=58.0, residual_level=50.0)
+u = environment.combined_standard_uncertainty([0.59, 0.3, 2.0, 0.40, 0.38])  # 2,18 dB (G.2)
+environment.expanded_uncertainty(u)                            # 4,36 dB (k = 2)
 ```
 
 ## Qué cubre esta guía
 
 **Cubierto.** El $L_{den}$, el $L_{dn}$ y el nivel de valoración compuesto de la ISO
 1996-1:2016 (apartado 6.5,
-`environmental.lden`/`ldn`/`composite_rating_level`); y el ajuste tonal
+`environment.lden`/`ldn`/`composite_rating_level`); y el ajuste tonal
 (anexo C), la corrección de ruido residual (apartado 10.4) y el balance de
 incertidumbre de medida (apartado 4, anexo F) de la ISO 1996-2:2017.
 

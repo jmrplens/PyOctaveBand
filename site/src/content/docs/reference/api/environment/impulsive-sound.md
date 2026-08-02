@@ -1,5 +1,5 @@
 ---
-title: "environmental.impulsive_sound"
+title: "environment.assessment.impulsive_sound"
 description: "Objective prominence of impulsive sounds and the LAeq adjustment (ISO/PAS 1996-3:2022)."
 sidebar:
   label: "impulsive_sound"
