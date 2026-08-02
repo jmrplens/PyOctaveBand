@@ -193,7 +193,7 @@ def run_ecma_tonality() -> np.ndarray:
 
 
 def run_vibration_weighting() -> np.ndarray:
-    from phonometry.vibration.human_vibration import apply_weighting
+    from phonometry.vibration.human.exposure import apply_weighting
 
     sig, fs = vibration_signal()
     out = np.asarray(apply_weighting(sig, fs, "Wd"), dtype=np.float64)

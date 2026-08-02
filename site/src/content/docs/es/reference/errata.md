@@ -1844,9 +1844,9 @@ which is the check that enforces the rule; see
   whole 125 Hz to 2 kHz column to better than 0,7 %; with the printed
   (unsquared) denominator the result is not a loss factor at all.
 - **Library behaviour:** `point_connection_coupling_loss_factor` in
-  [`junction_transmission.py`](https://github.com/jmrplens/phonometry/blob/main/src/phonometry/vibration/junction_transmission.py)
+  [`junction_transmission.py`](https://github.com/jmrplens/phonometry/blob/main/src/phonometry/vibration/structural/junction_transmission.py)
   implements the squared form, with the printed column pinned by a regression
-  test ([`tests/vibration/test_junction_transmission.py`](https://github.com/jmrplens/phonometry/blob/main/tests/vibration/test_junction_transmission.py))
+  test ([`tests/vibration/structural/test_junction_transmission.py`](https://github.com/jmrplens/phonometry/blob/main/tests/vibration/structural/test_junction_transmission.py))
   and a note at the formula.
 - **Status:** unreported (textbook rather than a standard).
 
@@ -1871,7 +1871,7 @@ which is the check that enforces the rule; see
   oracle; $\eta_{21}$ is obtained from Eq. (6.8) with the full modal
   densities,
   and a test pins the 2,292 ratio explicitly
-  ([`tests/vibration/test_junction_transmission.py`](https://github.com/jmrplens/phonometry/blob/main/tests/vibration/test_junction_transmission.py)).
+  ([`tests/vibration/structural/test_junction_transmission.py`](https://github.com/jmrplens/phonometry/blob/main/tests/vibration/structural/test_junction_transmission.py)).
 - **Status:** unreported (textbook rather than a standard).
 
 ## Norton & Karczub 2e (2003), problem 6.10 (platform area)
@@ -1897,10 +1897,10 @@ which is the check that enforces the rule; see
   all three printed answers within 0,4 %; the cylinder's own energy and modal
   density come out unchanged either way.
 - **Library behaviour:** `power_injection_clf` in
-  [`experimental_sea.py`](https://github.com/jmrplens/phonometry/blob/main/src/phonometry/vibration/experimental_sea.py)
+  [`experimental_sea.py`](https://github.com/jmrplens/phonometry/blob/main/src/phonometry/vibration/structural/experimental_sea.py)
   implements the inversion as published; the regression test uses the free
   platform area and documents the discrepancy
-  ([`tests/vibration/test_experimental_sea.py`](https://github.com/jmrplens/phonometry/blob/main/tests/vibration/test_experimental_sea.py)).
+  ([`tests/vibration/structural/test_experimental_sea.py`](https://github.com/jmrplens/phonometry/blob/main/tests/vibration/structural/test_experimental_sea.py)).
 - **Status:** unreported (textbook rather than a standard).
 
 ## Norton & Karczub 2e (2003), problem 3.14 (structural loss factor)

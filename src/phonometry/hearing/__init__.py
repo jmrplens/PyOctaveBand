@@ -72,4 +72,4 @@ __all__ = [
 
 #: ``__getattr__`` is invisible to ``dir()``; keep the moved names listed
 #: while they still resolve.
-__dir__ = _namespace_dir(__all__, _MOVED_TO)
+__dir__ = _namespace_dir(__name__, __all__, _MOVED_TO)

@@ -999,6 +999,31 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Changed
 
+- `phonometry.vibration` has three families, by who reads them.
+  `vibration.structural` is the structural acoustics that feeds building
+  prediction: mobility (ISO 7626), plate junctions, radiation efficiency,
+  experimental SEA and transfer stiffness (ISO 10846). `vibration.human` is
+  exposure of people: ISO 2631-1 and ISO 5349 in `human.exposure`, ISO 2631-5
+  in `human.multiple_shock`. `vibration.machinery` is condition monitoring, in
+  `machinery.diagnostics`. Three modules lose a word the package now says:
+  `human_vibration` is `human.exposure`, `multiple_shock_vibration` is
+  `human.multiple_shock` and `machine_diagnostics` is `machinery.diagnostics`.
+
+  Nothing moves in the namespace. `from phonometry import vibration` still
+  exports all 112 names, because the package re-exports its families
+  explicitly, so no notice fires for reading a name that stayed in the domain
+  it always belonged to. What changed is the module path, and the nine
+  pre-split paths still import and delegate with the usual notice until 5.0,
+  including the dotted read that follows the import: registering the alias in
+  `sys.modules` is enough for `import phonometry.vibration.human_vibration`
+  and not for the `phonometry.vibration.human_vibration.daily_exposure` after
+  it, so the package carries the same PEP 562 hook the other splits use, with
+  nothing to redirect but its own modules.
+
+  The renderers stay in one `_plot/vibration.py`. They mirror the domain, and
+  the domain is still vibration: splitting the translation table three ways
+  would have been the riskiest edit in the change for no reader's benefit.
+
 - `phonometry.hearing` is two packages. It held two subjects that share a
   word and nothing else: speech intelligibility, which scores a transmission
   channel and is read by whoever designs a room or a public address system,

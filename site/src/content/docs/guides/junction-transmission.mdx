@@ -391,7 +391,7 @@ from phonometry import (
     power_injection_clf,
     right_angle_transmission_coefficient,
 )
-from phonometry.vibration.point_mobility import plate_bending_wave_speed
+from phonometry.vibration.structural.point_mobility import plate_bending_wave_speed
 
 rho, nu, young = 2700.0, 0.33, 7.1e10                 # aluminium
 cl = math.sqrt(young / (rho * (1.0 - nu**2)))         # 5432 m/s (Eq. 6.25)
@@ -467,4 +467,4 @@ subsystem boundaries were drawn in the wrong place.
   the source power that these junction transmissions carry through a building.
 - [Mechanical mobility and the FRF family (ISO 7626-1)](/phonometry/guides/mechanical-mobility/):
   the plate mobilities behind the wave parameters.
-- API reference: [`vibration.junction_transmission`](/phonometry/reference/api/vibration/junction-transmission/).
+- API reference: [`vibration.structural.junction_transmission`](/phonometry/reference/api/vibration/junction-transmission/).

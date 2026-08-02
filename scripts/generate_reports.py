@@ -1878,7 +1878,7 @@ def _multiple_shock_example() -> tuple[object, ReportMetadata, str]:
     standard states as the spinal response), so the fiche's numbers are the
     published Annex C values.
     """
-    from phonometry.vibration.multiple_shock_vibration import (
+    from phonometry.vibration.human.multiple_shock import (
         MZ_MALE,
         RISK_THRESHOLDS_MALE,
         MultipleShockResult,

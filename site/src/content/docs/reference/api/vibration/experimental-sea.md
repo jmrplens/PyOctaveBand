@@ -1,5 +1,5 @@
 ---
-title: "vibration.experimental_sea"
+title: "vibration.structural.experimental_sea"
 description: "Experimental statistical energy analysis: coupling loss factors from measured energies (Norton & Karczub Ch. 6)."
 sidebar:
   label: "experimental_sea"

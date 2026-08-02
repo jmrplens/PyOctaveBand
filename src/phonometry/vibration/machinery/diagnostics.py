@@ -97,7 +97,7 @@ from typing import TYPE_CHECKING, Any
 
 import numpy as np
 
-from .._internal.validation import (
+from ..._internal.validation import (
     require_choice,
     require_non_negative,
     require_positive,
@@ -281,8 +281,8 @@ class FaultFrequencyResult:
             to the spectrum curve; see
             :func:`phonometry._plot.vibration.plot_fault_frequencies`.
         """
-        from .._i18n import check_language
-        from .._plot.vibration import plot_fault_frequencies
+        from ..._i18n import check_language
+        from ..._plot.vibration import plot_fault_frequencies
 
         check_language(language)
         return plot_fault_frequencies(self, ax=ax, language=language, **kwargs)

@@ -1,5 +1,5 @@
 ---
-title: "vibration.radiation_efficiency"
+title: "vibration.structural.radiation_efficiency"
 description: "Radiation efficiency of a plate in bending (Hopkins 2007, Sound Insulation, Section 2.9; Leppington et al. 1982; Maidanik 1962)."
 sidebar:
   label: "radiation_efficiency"
@@ -82,7 +82,7 @@ $f_c = (c_0^2 / 2\pi) \sqrt{m'' / B'}$ (identical to Bies Eq. 7.3).
 | Name | Description |
 | :--- | :--- |
 | `mass_per_area` | Mass per unit area `m''`, in kg/m^2. |
-| `bending_stiffness` | Bending stiffness per unit width `B'`, in N.m (see [`phonometry.vibration.point_mobility.plate_bending_stiffness`](/phonometry/reference/api/vibration/point-mobility/#plate_bending_stiffness)). |
+| `bending_stiffness` | Bending stiffness per unit width `B'`, in N.m (see [`phonometry.vibration.structural.point_mobility.plate_bending_stiffness`](/phonometry/reference/api/vibration/point-mobility/#plate_bending_stiffness)). |
 | `speed_of_sound` | Speed of sound in air `c0` (Default: 343 m/s). |
 
 **Returns:** The coincidence frequency `fc`, in hertz.

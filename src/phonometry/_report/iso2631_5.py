@@ -2,7 +2,7 @@
 """Whole-body multiple-shock health-risk fiche (reportlab renderer).
 
 Renders a
-:class:`~phonometry.vibration.multiple_shock_vibration.MultipleShockResult` to a
+:class:`~phonometry.vibration.human.multiple_shock.MultipleShockResult` to a
 one-page PDF laid out like a whole-body multiple-shock health-risk assessment
 sheet (ISO 2631-5:2018, the normative Clause 5 spinal-response dose and the
 Annex C assessment of adverse health effects):
@@ -63,7 +63,7 @@ from ._layout import (
 from .metadata import ReportMetadata
 
 if TYPE_CHECKING:
-    from ..vibration.multiple_shock_vibration import MultipleShockResult
+    from ..vibration.human.multiple_shock import MultipleShockResult
 
 #: Display precision of the acceleration dose and compressive stress (two
 #: decimals resolve the Annex C worked example Dz = 55.97 m/s2 and Sd = 1.62
@@ -377,9 +377,9 @@ def render_iso2631_5_report(
     """Render a whole-body multiple-shock health-risk fiche to a PDF at ``path``.
 
     :param result: A
-        :class:`~phonometry.vibration.multiple_shock_vibration.MultipleShockResult`
+        :class:`~phonometry.vibration.human.multiple_shock.MultipleShockResult`
         (from
-        :func:`~phonometry.vibration.multiple_shock_vibration.multiple_shock_assessment`).
+        :func:`~phonometry.vibration.human.multiple_shock.multiple_shock_assessment`).
     :param path: Destination path of the PDF file.
     :param metadata: Optional :class:`ReportMetadata` supplying the header
         identity (``client``, ``specimen`` the subject, ``test_room`` the

@@ -406,7 +406,7 @@ from phonometry import (
     power_injection_clf,
     right_angle_transmission_coefficient,
 )
-from phonometry.vibration.point_mobility import plate_bending_wave_speed
+from phonometry.vibration.structural.point_mobility import plate_bending_wave_speed
 
 rho, nu, young = 2700.0, 0.33, 7.1e10                 # aluminio
 cl = math.sqrt(young / (rho * (1.0 - nu**2)))         # 5432 m/s (Ec. 6.25)
@@ -484,4 +484,4 @@ fronteras de los subsistemas se trazaron en el sitio equivocado.
   edificio.
 - [Movilidad mecánica y la familia de FRF (ISO 7626-1)](/phonometry/es/guides/mechanical-mobility/):
   las movilidades de placa tras los parámetros de onda.
-- Referencia de la API: [`vibration.junction_transmission`](/phonometry/es/reference/api/vibration/junction-transmission/).
+- Referencia de la API: [`vibration.structural.junction_transmission`](/phonometry/es/reference/api/vibration/junction-transmission/).

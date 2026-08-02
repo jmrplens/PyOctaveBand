@@ -35,7 +35,7 @@ import math
 import numpy as np
 import pytest
 
-from phonometry.vibration.machine_diagnostics import (
+from phonometry.vibration.machinery.diagnostics import (
     FaultFrequencyResult,
     bearing_fault_frequencies,
     blade_pass_frequencies,

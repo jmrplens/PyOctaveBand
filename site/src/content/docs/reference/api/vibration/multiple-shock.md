@@ -1,8 +1,8 @@
 ---
-title: "vibration.multiple_shock_vibration"
+title: "vibration.human.multiple_shock"
 description: "Whole-body vibration containing multiple shocks (ISO 2631-5:2018)."
 sidebar:
-  label: "multiple_shock_vibration"
+  label: "multiple_shock"
 ---
 
 Whole-body vibration containing multiple shocks (ISO 2631-5:2018).
@@ -17,8 +17,8 @@ response, and the Annex C stress conversion $m_z$ is the vertical one.
 The horizontal spinal model of the withdrawn 2004 edition is not reproduced.
 Assess horizontal whole-body exposure with the ISO 2631-1 metrics in this
 domain instead: the weighted r.m.s. acceleration
-([`weighted_acceleration`](/phonometry/reference/api/vibration/human-vibration/#weighted_acceleration)) and the vibration dose
-value ([`vibration_dose_value`](/phonometry/reference/api/vibration/human-vibration/#vibration_dose_value)).
+([`weighted_acceleration`](/phonometry/reference/api/vibration/exposure/#weighted_acceleration)) and the vibration dose
+value ([`vibration_dose_value`](/phonometry/reference/api/vibration/exposure/#vibration_dose_value)).
 
 A seat-to-spine transfer function $H(\omega)$ (clause 5.2, Formula 1)
 maps the measured seat acceleration $a_z(t)$ to the spinal response
@@ -78,7 +78,7 @@ Acceleration dose $D_z$ from a seat acceleration time history.
 Filters the acceleration through the seat-to-spine transfer function
 (Formula 2), takes the positive response peaks and combines them by
 Formula 3. The input must be conditioned (DC-removed); see
-[`spinal_response`](/phonometry/reference/api/vibration/multiple-shock-vibration/#spinal_response).
+[`spinal_response`](/phonometry/reference/api/vibration/multiple-shock/#spinal_response).
 
 **Parameters**
 
@@ -183,7 +183,7 @@ Probability of lumbar injury $P(R)$ (Annex C, Formula C.5).
 
 | Name | Description |
 | :--- | :--- |
-| `risk` | The stress variable $R$ (see [`injury_risk`](/phonometry/reference/api/vibration/multiple-shock-vibration/#injury_risk)); scalar or array-like. |
+| `risk` | The stress variable $R$ (see [`injury_risk`](/phonometry/reference/api/vibration/multiple-shock/#injury_risk)); scalar or array-like. |
 | `sex` | `"male"` or `"female"` (sets the Weibull coefficients). |
 
 **Returns:** The injury probability $P = 1 - \exp(-(R/\alpha)^\beta)$ in 0-1; a float for a scalar input, otherwise an array. Negative $R$ gives 0.
@@ -250,12 +250,12 @@ Chains the Clause 5 dose and the Annex C risk: spinal response
 (Formula 2), acceleration dose (Formula 3), daily dose (Formula 4),
 compressive stress (C.1), stress variable $R$ (C.3) and injury
 probability (C.5). The input must be conditioned (DC-removed); see
-[`spinal_response`](/phonometry/reference/api/vibration/multiple-shock-vibration/#spinal_response).
+[`spinal_response`](/phonometry/reference/api/vibration/multiple-shock/#spinal_response).
 
 The model is vertical-axis only (clause 4a of the 2018 edition); for
 horizontal whole-body exposure use the ISO 2631-1 metrics in this domain
-([`weighted_acceleration`](/phonometry/reference/api/vibration/human-vibration/#weighted_acceleration),
-[`vibration_dose_value`](/phonometry/reference/api/vibration/human-vibration/#vibration_dose_value)).
+([`weighted_acceleration`](/phonometry/reference/api/vibration/exposure/#weighted_acceleration),
+[`vibration_dose_value`](/phonometry/reference/api/vibration/exposure/#vibration_dose_value)).
 
 **Parameters**
 
@@ -271,7 +271,7 @@ horizontal whole-body exposure use the ISO 2631-1 metrics in this domain
 | `sex` | `"male"` or `"female"`. |
 | `mz` | Stress conversion $m_z$ (MPa per m/s2); defaults to the sex-specific value. |
 
-**Returns:** The [`MultipleShockResult`](/phonometry/reference/api/vibration/multiple-shock-vibration/#multipleshockresult).
+**Returns:** The [`MultipleShockResult`](/phonometry/reference/api/vibration/multiple-shock/#multipleshockresult).
 
 ## MultipleShockResult
 

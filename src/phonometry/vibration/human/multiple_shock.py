@@ -66,14 +66,14 @@ from typing import TYPE_CHECKING, Any, Literal
 
 import numpy as np
 
-from .._internal.types import as_float_or_array
-from .._internal.validation import require_1d_signal, require_choice, require_positive
-from ..hearing.threshold import SEXES as _SEXES
+from ..._internal.types import as_float_or_array
+from ..._internal.validation import require_1d_signal, require_choice, require_positive
+from ...hearing.threshold import SEXES as _SEXES
 
 if TYPE_CHECKING:
     from matplotlib.axes import Axes
 
-    from .._report.metadata import ReportMetadata
+    from ..._report.metadata import ReportMetadata
 
 from numpy.typing import ArrayLike
 
@@ -205,7 +205,7 @@ def response_peaks(response: ArrayLike) -> np.ndarray:
     positive = np.empty(sig.size + 2, dtype=bool)
     positive[0] = positive[-1] = False
     positive[1:-1] = sig > 0.0
-    starts = np.where(~positive[:-1] & positive[1:])[0]
+    starts = np.nonzero(~positive[:-1] & positive[1:])[0]
     if starts.size == 0:
         return np.array([], dtype=np.float64)
     return np.maximum.reduceat(sig, starts)
@@ -252,7 +252,9 @@ def daily_dose(dose: float, exposure_time: float, measurement_time: float) -> fl
         was measured (same unit as ``exposure_time``).
     :return: The daily dose :math:`D_{zd} = D_z (t_d/t_m)^{1/6}`, m/s2.
     """
-    if not measurement_time > 0.0 or not exposure_time > 0.0:
+    # Negated ">" rather than "<=" on purpose: it rejects NaN as well, which
+    # the opposite operator would let through.
+    if not measurement_time > 0.0 or not exposure_time > 0.0:  # NOSONAR - NaN
         raise ValueError("exposure_time and measurement_time must be positive.")
     return float(dose * (exposure_time / measurement_time) ** (1.0 / DOSE_EXPONENT))
 
@@ -356,7 +358,8 @@ def injury_risk(
     require_choice(sex, "sex", _SEXES)
     if years <= 0:
         raise ValueError("years must be a positive integer.")
-    if not days_per_year > 0.0:
+    # Negated ">" rather than "<=" on purpose: it rejects NaN as well.
+    if not days_per_year > 0.0:  # NOSONAR - NaN
         raise ValueError("days_per_year must be positive.")
     mz = _mz_for_sex(sex) if mz is None else mz
     s_stat = static_stress(mz)
@@ -433,8 +436,8 @@ class MultipleShockResult:
         Requires matplotlib (``pip install phonometry[plot]``); returns the
         :class:`~matplotlib.axes.Axes`.
         """
-        from .._i18n import check_language
-        from .._plot.vibration import plot_multiple_shock
+        from ..._i18n import check_language
+        from ..._plot.vibration import plot_multiple_shock
 
         return plot_multiple_shock(self, ax=ax, language=check_language(language), **kwargs)
 
@@ -490,14 +493,14 @@ class MultipleShockResult:
             fiche always embeds the injury-probability chart, so both are
             required (``pip install "phonometry[report,plot]"``).
         """
-        from .._i18n import check_language
+        from ..._i18n import check_language
 
         check_language(language)
         if engine != "reportlab":
             raise ValueError(
                 f"Unknown report engine {engine!r}; only 'reportlab' is supported."
             )
-        from .._report.iso2631_5 import render_iso2631_5_report
+        from ..._report.iso2631_5 import render_iso2631_5_report
 
         return render_iso2631_5_report(
             self, path, metadata=metadata, verbose=verbose, language=language

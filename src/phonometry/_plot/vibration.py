@@ -33,20 +33,20 @@ _A8_COLOR = _C_EDGE
 if TYPE_CHECKING:
     from matplotlib.axes import Axes
 
-    from ..vibration.experimental_sea import PowerInjectionResult
-    from ..vibration.human_vibration import (
+    from ..vibration.human.exposure import (
         DailyVibrationExposure,
         WeightedSpectrum,
         WeightingResponse,
     )
-    from ..vibration.machine_diagnostics import FaultFrequencyResult
-    from ..vibration.mechanical_mobility import (
+    from ..vibration.human.multiple_shock import MultipleShockResult
+    from ..vibration.machinery.diagnostics import FaultFrequencyResult
+    from ..vibration.structural.experimental_sea import PowerInjectionResult
+    from ..vibration.structural.mechanical_mobility import (
         MobilityResult,
         RigidMassCalibrationResult,
     )
-    from ..vibration.multiple_shock_vibration import MultipleShockResult
-    from ..vibration.radiation_efficiency import RadiationEfficiencyResult
-    from ..vibration.transfer_stiffness import TransferStiffnessResult
+    from ..vibration.structural.radiation_efficiency import RadiationEfficiencyResult
+    from ..vibration.structural.transfer_stiffness import TransferStiffnessResult
 
 #: Spanish translations of the fixed strings rendered by the vibration
 #: ``.plot()`` renderers, keyed by their verbatim English text. ``_t``
@@ -121,7 +121,7 @@ def plot_vibration_weighting(
     """Frequency-weighting factor (dB) versus frequency (ISO 8041-1).
 
     :param result: A
-        :class:`~phonometry.vibration.human_vibration.WeightingResponse` exposing
+        :class:`~phonometry.vibration.human.exposure.WeightingResponse` exposing
         ``name``, ``frequencies`` and ``magnitude_db``.
     :param ax: Existing axes, or ``None`` to create a figure.
     :param language: Label language, ``"en"`` (default) or ``"es"``.
@@ -154,7 +154,7 @@ def plot_weighted_spectrum(
     contributions ``W_i*a_i``; the overall ``a_w`` is annotated in the title.
 
     :param result: A
-        :class:`~phonometry.vibration.human_vibration.WeightedSpectrum` exposing
+        :class:`~phonometry.vibration.human.exposure.WeightedSpectrum` exposing
         ``frequencies``, ``band_accelerations``, ``weighted``, ``overall`` and
         ``weighting_name``.
     :param ax: Existing axes, or ``None`` to create a figure.
@@ -209,7 +209,7 @@ def plot_daily_exposure(
     ``A(8)`` bar, and the exposure action and limit value as horizontal lines.
 
     :param result: A
-        :class:`~phonometry.vibration.human_vibration.DailyVibrationExposure` exposing
+        :class:`~phonometry.vibration.human.exposure.DailyVibrationExposure` exposing
         ``labels``, ``partials``, ``a8`` and ``assessment``.
     :param ax: Existing axes, or ``None`` to create a figure.
     :param language: Label language, ``"en"`` (default) or ``"es"``.
@@ -277,7 +277,7 @@ def plot_mobility(
 ) -> Axes:
     """Mobility magnitude ``|Y(f)|`` on log-log axes (ISO 7626-1).
 
-    :param result: A :class:`~phonometry.vibration.mechanical_mobility.MobilityResult`.
+    :param result: A :class:`~phonometry.vibration.structural.mechanical_mobility.MobilityResult`.
     :param ax: Existing axes, or ``None`` to create a figure.
     :param language: Label language, ``"en"`` (default) or ``"es"``.
     :param kwargs: Forwarded to the magnitude ``plot``.
@@ -325,7 +325,7 @@ def plot_rigid_mass_calibration(
     two-axes array is returned.
 
     :param result: A
-        :class:`~phonometry.vibration.mechanical_mobility.RigidMassCalibrationResult`.
+        :class:`~phonometry.vibration.structural.mechanical_mobility.RigidMassCalibrationResult`.
     :param ax: Existing axes for the deviation panel, or ``None`` for a fresh
         two-panel figure.
     :param language: Label language, ``"en"`` (default) or ``"es"``.
@@ -413,7 +413,7 @@ def plot_transfer_stiffness(
 ) -> Axes:
     """Dynamic transfer stiffness level ``L_k(f)`` on a log-frequency axis.
 
-    :param result: A :class:`~phonometry.vibration.transfer_stiffness.TransferStiffnessResult`.
+    :param result: A :class:`~phonometry.vibration.structural.transfer_stiffness.TransferStiffnessResult`.
     :param ax: Existing axes, or ``None`` to create a figure.
     :param language: Label language, ``"en"`` (default) or ``"es"``.
     :param kwargs: Forwarded to the level ``plot``.
@@ -443,7 +443,7 @@ def plot_radiation_efficiency(
     """Radiation efficiency ``sigma(f)`` on log-log axes (Hopkins 2.9.4).
 
     :param result: A
-        :class:`~phonometry.vibration.radiation_efficiency.RadiationEfficiencyResult`.
+        :class:`~phonometry.vibration.structural.radiation_efficiency.RadiationEfficiencyResult`.
     :param ax: Existing axes, or ``None`` to create a figure.
     :param language: Label language, ``"en"`` (default) or ``"es"``.
     :param kwargs: Forwarded to the ``sigma`` curve ``plot``.
@@ -482,14 +482,14 @@ def plot_multiple_shock(
 ) -> Axes:
     """Injury-probability curve ``P(R)`` with this assessment's ``R`` marked.
 
-    :param result: A :class:`~phonometry.vibration.multiple_shock_vibration.MultipleShockResult`.
+    :param result: A :class:`~phonometry.vibration.human.multiple_shock.MultipleShockResult`.
     :param ax: Existing axes, or ``None`` to create a figure.
     :param language: Label language, ``"en"`` (default) or ``"es"``.
     :param kwargs: Forwarded to the ``R`` marker ``scatter``.
     :return: The axes.
     """
     from .._i18n import format_number, localize_axes
-    from ..vibration.multiple_shock_vibration import injury_probability
+    from ..vibration.human.multiple_shock import injury_probability
 
     ax = ax if ax is not None else _new_axes()
     r10, r50, r90 = result.risk_thresholds
@@ -654,7 +654,7 @@ def plot_fault_frequencies(
     a named line, which is what the overlay makes readable.
 
     :param result: A
-        :class:`~phonometry.vibration.machine_diagnostics.FaultFrequencyResult`.
+        :class:`~phonometry.vibration.machinery.diagnostics.FaultFrequencyResult`.
     :param ax: Existing axes, or ``None`` to create a figure.
     :param language: Label language, ``"en"`` (default) or ``"es"``.
     :param spectrum: Measured spectrum to draw underneath: an
@@ -716,7 +716,7 @@ def plot_power_injection(
     diagnosis.
 
     :param result: A
-        :class:`~phonometry.vibration.experimental_sea.PowerInjectionResult`.
+        :class:`~phonometry.vibration.structural.experimental_sea.PowerInjectionResult`.
     :param ax: Existing axes, or ``None`` to create a figure.
     :param language: Label language, ``"en"`` (default) or ``"es"``.
     :param kwargs: Forwarded to the ``eta_12`` curve.

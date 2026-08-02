@@ -2,7 +2,7 @@
 """ISO 7626 mechanical-mobility fiche (reportlab renderer).
 
 Renders a
-:class:`~phonometry.vibration.mechanical_mobility.MobilityResult` to a one-page
+:class:`~phonometry.vibration.structural.mechanical_mobility.MobilityResult` to a one-page
 PDF laid out like a mechanical-mobility measurement report (ISO 7626-1:2011 for
 the frequency-response-function definitions, ISO 7626-2:2015 for the
 measurement):
@@ -42,7 +42,7 @@ from ._i18n import format_number, t
 from .metadata import ReportMetadata
 
 if TYPE_CHECKING:
-    from ..vibration.mechanical_mobility import MobilityResult
+    from ..vibration.structural.mechanical_mobility import MobilityResult
 
 #: The mobility unit, m/(N.s), as reportlab markup (a middle dot, not a hyphen).
 _MOBILITY_UNIT = "m/(N&#183;s)"
@@ -149,7 +149,7 @@ def render_mobility_report(
     """Render an ISO 7626 mechanical-mobility fiche to a PDF at ``path``.
 
     :param result: A
-        :class:`~phonometry.vibration.mechanical_mobility.MobilityResult`
+        :class:`~phonometry.vibration.structural.mechanical_mobility.MobilityResult`
         carrying the complex mobility ``Y(f)`` and whether it is a driving-point
         FRF.
     :param path: Destination path of the PDF file.

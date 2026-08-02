@@ -142,7 +142,7 @@ i.e. :math:`\bar{\tau}_{12} = \chi \bar{\tau}_{21}`.
 **Two shortcuts for right-angle joints (Norton & Karczub 2003, Section
 6.6.1).** Alongside the angle-resolved wave approach above, the SEA literature
 uses a pair of closed forms that need no integration, which is what the
-experimental SEA of :mod:`phonometry.vibration.experimental_sea` is normally
+experimental SEA of :mod:`phonometry.vibration.structural.experimental_sea` is normally
 compared against:
 
 * :func:`right_angle_transmission_coefficient` (Norton Eqs. 6.53 to 6.55, after
@@ -174,7 +174,7 @@ import numpy as np
 from numpy.typing import ArrayLike, NDArray
 from scipy.integrate import quad
 
-from .._internal.validation import require_choice, require_positive
+from ..._internal.validation import require_choice, require_positive
 
 if TYPE_CHECKING:
     from matplotlib.axes import Axes
@@ -442,7 +442,7 @@ def coupling_loss_factor(
     :param group_velocity: Source-plate bending-wave group velocity ``cg_i``,
         in m/s (> 0). For a thin plate :math:`c_g = 2 c_B` with the bending
         phase speed ``cB`` (see
-        :func:`phonometry.vibration.point_mobility.plate_bending_wave_speed`).
+        :func:`phonometry.vibration.structural.point_mobility.plate_bending_wave_speed`).
     :param junction_length: Junction length ``L_ij``, in m (> 0).
     :param frequency: Frequency ``f``, in hertz (scalar or array, > 0).
     :param plate_area: Source-plate area ``S_i``, in m^2 (> 0).
@@ -687,8 +687,8 @@ class JunctionTransmissionResult:
         Requires matplotlib (``pip install phonometry[plot]``); returns the
         :class:`~matplotlib.axes.Axes`.
         """
-        from .._i18n import check_language
-        from .._plot.junction import plot_junction_transmission
+        from ..._i18n import check_language
+        from ..._plot.junction import plot_junction_transmission
 
         return plot_junction_transmission(
             self, ax=ax, language=check_language(language), **kwargs
@@ -704,8 +704,8 @@ class JunctionTransmissionResult:
 
         :raises ValueError: If the result does not retain its geometry.
         """
-        from .._i18n import check_language
-        from .._plot.geometry import plot_junction_result_geometry
+        from ..._i18n import check_language
+        from ..._plot.geometry import plot_junction_result_geometry
 
         check_language(language)
         return plot_junction_result_geometry(self, ax=ax, language=language, **kwargs)

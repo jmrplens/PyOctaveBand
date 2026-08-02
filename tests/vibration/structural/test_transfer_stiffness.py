@@ -30,7 +30,7 @@ from phonometry import (
     transfer_stiffness_indirect,
     transfer_stiffness_level,
 )
-from phonometry.vibration.transfer_stiffness import TRANSMISSIBILITY_LIMIT
+from phonometry.vibration.structural.transfer_stiffness import TRANSMISSIBILITY_LIMIT
 
 
 # ---------------------------------------------------------------------------

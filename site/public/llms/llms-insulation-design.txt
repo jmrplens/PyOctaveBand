@@ -1572,7 +1572,7 @@ fig.tight_layout(); plt.show()
   the measured counterpart of the theoretical point mobilities.
 - [Porous and multilayer absorbers](https://jmrplens.github.io/phonometry/guides/porous-absorbers/): the cavity-fill models
   a double wall consumes.
-- API reference: [`building.panel_transmission`](https://jmrplens.github.io/phonometry/reference/api/building/panel-transmission/), [`building.masonry_cavity_wall`](https://jmrplens.github.io/phonometry/reference/api/building/masonry-cavity-wall/), [`building.aperture_transmission`](https://jmrplens.github.io/phonometry/reference/api/building/aperture-transmission/), [`vibration.radiation_efficiency`](https://jmrplens.github.io/phonometry/reference/api/vibration/radiation-efficiency/) and [`vibration.point_mobility`](https://jmrplens.github.io/phonometry/reference/api/vibration/point-mobility/).
+- API reference: [`building.panel_transmission`](https://jmrplens.github.io/phonometry/reference/api/building/panel-transmission/), [`building.masonry_cavity_wall`](https://jmrplens.github.io/phonometry/reference/api/building/masonry-cavity-wall/), [`building.aperture_transmission`](https://jmrplens.github.io/phonometry/reference/api/building/aperture-transmission/), [`vibration.structural.radiation_efficiency`](https://jmrplens.github.io/phonometry/reference/api/vibration/radiation-efficiency/) and [`vibration.structural.point_mobility`](https://jmrplens.github.io/phonometry/reference/api/vibration/point-mobility/).
 
 ---
 

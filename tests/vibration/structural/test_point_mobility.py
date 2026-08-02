@@ -27,7 +27,7 @@ from phonometry import (
     longitudinal_rod_impedance,
     plate_bending_stiffness,
 )
-from phonometry.vibration.point_mobility import (
+from phonometry.vibration.structural.point_mobility import (
     beam_bending_wave_speed,
     infinite_beam_impedance,
     longitudinal_rod_mobility,

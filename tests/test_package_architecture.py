@@ -140,7 +140,12 @@ def test_subpackage_imports_in_fresh_interpreter(pkg: str) -> None:
 
 def test_subpackage_reexports_cover_facade_imports() -> None:
     """Every name the facade imports from a domain submodule must also be
-    reachable on the subpackage namespace (the ``env.name`` usage pattern)."""
+    reachable on the subpackage namespace (the ``env.name`` usage pattern).
+
+    The check is on the top-level package of the import, at whatever depth the
+    module sits: ``from .vibration.human.exposure import daily_exposure`` has
+    to leave ``vibration.daily_exposure`` reachable.
+    """
     import importlib
 
     facade = ast.parse((SRC / "__init__.py").read_text(encoding="utf-8"))
@@ -149,7 +154,10 @@ def test_subpackage_reexports_cover_facade_imports() -> None:
         if not isinstance(node, ast.ImportFrom) or node.level != 1 or not node.module:
             continue
         parts = node.module.split(".")
-        if len(parts) != 2 or parts[0].startswith("_"):
+        # A domain module is ``<pkg>.<module>`` or, since the domains grew a
+        # second level, ``<pkg>.<family>.<module>``. Checking only the
+        # two-part form silently stopped covering a domain the day it grew.
+        if len(parts) < 2 or parts[0].startswith("_"):
             continue
         pkg = importlib.import_module(f"phonometry.{parts[0]}")
         for alias in node.names:

@@ -1,5 +1,5 @@
 ---
-title: "vibration.point_mobility"
+title: "vibration.structural.point_mobility"
 description: "Point mobilities and impedances of infinite structures (Cremer, Heckl & Petersson 2005, Chapter 5, Table 5.1)."
 sidebar:
   label: "point_mobility"
@@ -320,7 +320,7 @@ Bending stiffness of a thin plate per unit width (Cremer Eq. 4.22).
 
 $B' = E h^3 / (12 (1 - \nu^2))$, the plate bending stiffness `B'`
 in N.m used throughout this module and by the coincidence frequency of
-[`phonometry.vibration.radiation_efficiency.coincidence_frequency`](/phonometry/reference/api/vibration/radiation-efficiency/#coincidence_frequency).
+[`phonometry.vibration.structural.radiation_efficiency.coincidence_frequency`](/phonometry/reference/api/vibration/radiation-efficiency/#coincidence_frequency).
 
 **Parameters**
 

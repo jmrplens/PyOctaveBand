@@ -2,7 +2,7 @@
 """Daily vibration exposure assessment fiche (reportlab renderer).
 
 Renders a
-:class:`~phonometry.vibration.human_vibration.DailyVibrationExposure` to a
+:class:`~phonometry.vibration.human.exposure.DailyVibrationExposure` to a
 one-page PDF laid out like a hand-arm / whole-body vibration exposure
 assessment sheet (the layout the HSE exposure calculators and the EU Good
 Practice Guides use): each operation's vibration magnitude and daily
@@ -70,7 +70,7 @@ from ._layout import (
 from .metadata import ReportMetadata
 
 if TYPE_CHECKING:
-    from ..vibration.human_vibration import DailyVibrationExposure
+    from ..vibration.human.exposure import DailyVibrationExposure
 
 #: Number of decimal places the fiche displays vibration magnitudes at. Two
 #: decimals resolve the whole-body ELV (1.15 m/s2) and the small whole-body
@@ -246,7 +246,7 @@ def _assessment_rows(
     evaluated on ``A(8)`` rounded exactly as the fiche displays it, so the
     printed numbers can never contradict their own status at a threshold
     boundary; the ``>=`` (reaches or exceeds) direction matches the
-    :class:`~phonometry.vibration.human_vibration.ExposureAssessment`.
+    :class:`~phonometry.vibration.human.exposure.ExposureAssessment`.
     """
     assessment = result.assessment
     metric = str(assessment.metric)
@@ -342,7 +342,7 @@ def _verdict(result: DailyVibrationExposure, language: str = "en") -> tuple[str,
     exposure action value is an obligation trigger reported in the assessment
     table. The comparison uses the displayed value and the same reaches-or-
     exceeds (``>=``) direction as the assessment rows and the
-    :class:`~phonometry.vibration.human_vibration.ExposureAssessment`, so the
+    :class:`~phonometry.vibration.human.exposure.ExposureAssessment`, so the
     verdict never contradicts the ELV row it sits beside.
     """
     assessment = result.assessment
@@ -378,8 +378,8 @@ def render_human_vibration_report(
     """Render a daily vibration exposure assessment fiche to a PDF at ``path``.
 
     :param result: A
-        :class:`~phonometry.vibration.human_vibration.DailyVibrationExposure`
-        (from :func:`~phonometry.vibration.human_vibration.daily_vibration_exposure`).
+        :class:`~phonometry.vibration.human.exposure.DailyVibrationExposure`
+        (from :func:`~phonometry.vibration.human.exposure.daily_vibration_exposure`).
     :param path: Destination path of the PDF file.
     :param metadata: Optional :class:`ReportMetadata` supplying the header
         identity (``client`` is the company, ``specimen`` the operator/worker,

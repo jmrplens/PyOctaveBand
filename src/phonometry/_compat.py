@@ -11,7 +11,9 @@ Two generations of aliases live here, each with its own removal date:
   subpackages into domain ones (``phonometry.metrology`` into
   ``phonometry.filters``, ``phonometry.signals`` and a narrowed
   ``phonometry.metrology``; the speech intelligibility of
-  ``phonometry.hearing`` into ``phonometry.speech``). Removed in 5.0.
+  ``phonometry.hearing`` into ``phonometry.speech``), and gives the large
+  domains a second level (``phonometry.vibration`` into ``structural``,
+  ``human`` and ``machinery``). Removed in 5.0.
 
 Every public module path that moved stays importable through the shims
 registered here: ``import phonometry.<old>`` and ``from phonometry.<old>
@@ -97,10 +99,13 @@ _MOVED_3X: dict[str, str] = {
     "phonometry.lab_insulation": "phonometry.building.lab_insulation",
     "phonometry.structure_borne_power": "phonometry.building.structure_borne_power",
     "phonometry.survey_insulation": "phonometry.building.survey_insulation",
-    "phonometry.human_vibration": "phonometry.vibration.human_vibration",
-    "phonometry.mechanical_mobility": "phonometry.vibration.mechanical_mobility",
-    "phonometry.multiple_shock_vibration": "phonometry.vibration.multiple_shock_vibration",
-    "phonometry.transfer_stiffness": "phonometry.vibration.transfer_stiffness",
+    "phonometry.human_vibration": "phonometry.vibration.human.exposure",
+    "phonometry.mechanical_mobility":
+        "phonometry.vibration.structural.mechanical_mobility",
+    "phonometry.multiple_shock_vibration":
+        "phonometry.vibration.human.multiple_shock",
+    "phonometry.transfer_stiffness":
+        "phonometry.vibration.structural.transfer_stiffness",
     "phonometry.air_absorption": "phonometry.environmental.air_absorption",
     "phonometry.environmental_measurement": "phonometry.environmental.measurement",
     "phonometry.impulse_prominence": "phonometry.environmental.impulse_prominence",
@@ -163,6 +168,23 @@ _MOVED_4X: dict[str, str] = {
     "phonometry.hearing.sii": "phonometry.speech.sii",
     "phonometry.hearing.objective_intelligibility":
         "phonometry.speech.objective_intelligibility",
+    "phonometry.vibration.mechanical_mobility":
+        "phonometry.vibration.structural.mechanical_mobility",
+    "phonometry.vibration.point_mobility":
+        "phonometry.vibration.structural.point_mobility",
+    "phonometry.vibration.junction_transmission":
+        "phonometry.vibration.structural.junction_transmission",
+    "phonometry.vibration.radiation_efficiency":
+        "phonometry.vibration.structural.radiation_efficiency",
+    "phonometry.vibration.experimental_sea":
+        "phonometry.vibration.structural.experimental_sea",
+    "phonometry.vibration.transfer_stiffness":
+        "phonometry.vibration.structural.transfer_stiffness",
+    "phonometry.vibration.human_vibration": "phonometry.vibration.human.exposure",
+    "phonometry.vibration.multiple_shock_vibration":
+        "phonometry.vibration.human.multiple_shock",
+    "phonometry.vibration.machine_diagnostics":
+        "phonometry.vibration.machinery.diagnostics",
 }
 
 #: The two generations, each with the release that deprecated it and the one
@@ -203,11 +225,27 @@ def _make_shim(old: str, new: str, since: str, removed_in: str) -> types.ModuleT
     return shim
 
 
+def _alias_modules(package: str) -> list[str]:
+    """Pre-split module names of ``package`` that only live in the table now.
+
+    ``phonometry.vibration.human_vibration`` is registered in ``sys.modules``
+    by :func:`_install`, which is enough for ``import`` but not for the dotted
+    read that follows it: the attribute is gone from the package. These are
+    the names :func:`_namespace_shim` has to serve and :func:`_namespace_dir`
+    has to list.
+    """
+    prefix = f"{package}."
+    return sorted(
+        old.removeprefix(prefix) for old in _MOVED_4X
+        if old.startswith(prefix) and "." not in old.removeprefix(prefix)
+    )
+
+
 def _namespace_shim(
-    package: str, targets: tuple[str, ...], *,
+    package: str, targets: tuple[str, ...] = (), *,
     since: str = "4.0", removed_in: str = "5.0"
 ) -> Callable[[str], Any]:
-    """Return a PEP 562 ``__getattr__`` for names that left ``package``.
+    """Return a PEP 562 ``__getattr__`` for what left ``package``.
 
     The 4.0 taxonomy moves public names between subpackage namespaces, and
     ``from phonometry import metrology`` followed by ``metrology.leq(...)`` is
@@ -218,13 +256,17 @@ def _namespace_shim(
     and a function resolves to the function, as the pre-split package did:
     ``metrology.cepstrum`` is :func:`phonometry.signals.cepstrum`.
 
-    Only then does a name fall back to the module alias of the same name,
-    which is what serves the modules with no public name of their own
-    (``metrology.spectra``, ``metrology.levels``). The alias carries its own
-    notice on attribute access, so returning it here is silent.
+    Only then does a name fall back to the module alias of the same name.
+    That is what serves the modules with no public name of their own
+    (``metrology.spectra``, ``metrology.levels``) and the whole of a package
+    whose modules moved while its names stayed: ``vibration.human_vibration``
+    is a module and never was a name, so ``targets`` is empty there and the
+    fallback is the only branch that fires. The alias carries its own notice
+    on attribute access, so returning it here is silent.
 
     :param package: The narrowed package, ``__name__`` of its ``__init__``.
-    :param targets: Packages the names moved to, in search order.
+    :param targets: Packages the names moved to, in search order. Empty when
+        only modules moved.
     :param since: Release that moved the names.
     :param removed_in: Major release that removes the alias.
     :return: The ``__getattr__`` to bind at module level.
@@ -250,7 +292,8 @@ def _namespace_shim(
 
 
 def _namespace_dir(
-    own: list[str] | tuple[str, ...], targets: tuple[str, ...]
+    package: str, own: list[str] | tuple[str, ...],
+    targets: tuple[str, ...] = ()
 ) -> Callable[[], list[str]]:
     """Return a ``__dir__`` listing the names a narrowed package still serves.
 
@@ -260,13 +303,14 @@ def _namespace_dir(
     narrow on purpose: ``from phonometry.metrology import *`` gives the 4.0
     API, not the deprecated names.
 
+    :param package: The package, ``__name__`` of its ``__init__``.
     :param own: The package's own ``__all__``.
     :param targets: Packages the moved names went to.
     :return: The ``__dir__`` to bind at module level.
     """
 
     def __dir__() -> list[str]:
-        names = set(own)
+        names = set(own) | set(_alias_modules(package))
         for target in targets:
             names |= set(getattr(import_module(target), "__all__", ()))
         return sorted(names)

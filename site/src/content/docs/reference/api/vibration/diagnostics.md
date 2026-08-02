@@ -1,8 +1,8 @@
 ---
-title: "vibration.machine_diagnostics"
+title: "vibration.machinery.diagnostics"
 description: "Kinematic fault frequencies of rotating machinery (Norton & Karczub Ch. 8)."
 sidebar:
-  label: "machine_diagnostics"
+  label: "diagnostics"
 ---
 
 Kinematic fault frequencies of rotating machinery (Norton & Karczub Ch. 8).
@@ -24,7 +24,7 @@ synchronously with the shaft
 ([`time_synchronous_average`](/phonometry/reference/api/signals/synchronous-average/#time_synchronous_average))
 or collapse the harmonic families in the cepstrum
 ([`cepstrum`](/phonometry/reference/api/signals/cepstrum/#cepstrum)). The result object's
-[`FaultFrequencyResult.plot`](/phonometry/reference/api/vibration/machine-diagnostics/#faultfrequencyresultplot) draws the predicted lines **on top of a
+[`FaultFrequencyResult.plot`](/phonometry/reference/api/vibration/diagnostics/#faultfrequencyresultplot) draws the predicted lines **on top of a
 measured envelope spectrum**, which is the working view.
 
 **Rolling-contact bearings** (Eqs. 8.4 to 8.14, after Shahan & Kamperman).
@@ -148,7 +148,7 @@ both are independent of which race turns (Norton's Eqs. 8.8 and 8.14, and
 | `contact_angle_deg` | Contact angle `phi` between element and raceway, in degrees (Default: 0, a radial ball bearing); `0 <= phi < 90`. |
 | `rotating_race` | Which race turns with the shaft, `"inner"` (Default) or `"outer"`. |
 
-**Returns:** A [`FaultFrequencyResult`](/phonometry/reference/api/vibration/machine-diagnostics/#faultfrequencyresult) (source `"rolling-contact bearing"`).
+**Returns:** A [`FaultFrequencyResult`](/phonometry/reference/api/vibration/diagnostics/#faultfrequencyresult) (source `"rolling-contact bearing"`).
 
 **Raises**
 
@@ -198,7 +198,7 @@ pattern turning at a different speed.
 | `n_vanes` | Number of stator vanes `V` (integer >= 1) to include the lobed interaction patterns (Default: `None`, blade tones only). |
 | `lobe_orders` | Highest `\|k\|` in $m_L = n\, N_{\text{blades}} \pm k\, N_{\text{vanes}}$ (integer >= 1, Default: 1). |
 
-**Returns:** A [`FaultFrequencyResult`](/phonometry/reference/api/vibration/machine-diagnostics/#faultfrequencyresult) (source `"bladed rotor"`).
+**Returns:** A [`FaultFrequencyResult`](/phonometry/reference/api/vibration/diagnostics/#faultfrequencyresult) (source `"bladed rotor"`).
 
 **Raises**
 
@@ -226,10 +226,10 @@ they came from.
 
 | Name | Description |
 | :--- | :--- |
-| `results` | Two or more [`FaultFrequencyResult`](/phonometry/reference/api/vibration/machine-diagnostics/#faultfrequencyresult) objects. |
+| `results` | Two or more [`FaultFrequencyResult`](/phonometry/reference/api/vibration/diagnostics/#faultfrequencyresult) objects. |
 | `source` | Label for the merged family (Default: the sources joined by `" + "`). |
 
-**Returns:** A [`FaultFrequencyResult`](/phonometry/reference/api/vibration/machine-diagnostics/#faultfrequencyresult) holding every line.
+**Returns:** A [`FaultFrequencyResult`](/phonometry/reference/api/vibration/diagnostics/#faultfrequencyresult) holding every line.
 
 **Raises**
 
@@ -253,7 +253,7 @@ A family of predicted fault lines for one machine element.
 
 | Name | Description |
 | :--- | :--- |
-| `lines` | The predicted [`FaultLine`](/phonometry/reference/api/vibration/machine-diagnostics/#faultline) entries, in the order the generating function produced them. |
+| `lines` | The predicted [`FaultLine`](/phonometry/reference/api/vibration/diagnostics/#faultline) entries, in the order the generating function produced them. |
 | `shaft_rate` | Shaft rotational frequency `fs`, in hertz. |
 | `source` | Description of the element (`"rolling-contact bearing"`, `"gear pair"`, ...), used as the plot title. |
 
@@ -354,7 +354,7 @@ much narrower than the highest predicted harmonic.
 | `low` | Lower edge, in hertz (>= 0). |
 | `high` | Upper edge, in hertz (> *low*). |
 
-**Returns:** A [`FaultFrequencyResult`](/phonometry/reference/api/vibration/machine-diagnostics/#faultfrequencyresult) with the surviving lines.
+**Returns:** A [`FaultFrequencyResult`](/phonometry/reference/api/vibration/diagnostics/#faultfrequencyresult) with the surviving lines.
 
 **Raises**
 
@@ -380,7 +380,7 @@ One predicted discrete line of a machine's kinematic signature.
 
 | Name | Description |
 | :--- | :--- |
-| `name` | Short label, unique within a result (`"BPFO"`, `"2xGMF"`, `"GMF-1x"`, ...). Acronyms are language neutral and are what the [`FaultFrequencyResult.plot`](/phonometry/reference/api/vibration/machine-diagnostics/#faultfrequencyresultplot) overlay annotates. |
+| `name` | Short label, unique within a result (`"BPFO"`, `"2xGMF"`, `"GMF-1x"`, ...). Acronyms are language neutral and are what the [`FaultFrequencyResult.plot`](/phonometry/reference/api/vibration/diagnostics/#faultfrequencyresultplot) overlay annotates. |
 | `frequency` | Predicted frequency, in hertz. |
 | `order` | Frequency expressed in shaft orders, `frequency / fs`. |
 | `family` | One of `"shaft"`, `"bearing"`, `"gear"`, `"motor"` or `"blade"`. |
@@ -423,7 +423,7 @@ Only positive sideband frequencies are returned.
 | `sidebands` | Sideband order per harmonic (integer >= 0, Default: 0, no sidebands). |
 | `sideband_rate` | Modulation rate `f_mod`, in hertz (> 0, Default: the wheel's own shaft rate). |
 
-**Returns:** A [`FaultFrequencyResult`](/phonometry/reference/api/vibration/machine-diagnostics/#faultfrequencyresult) (source `"gear pair"`).
+**Returns:** A [`FaultFrequencyResult`](/phonometry/reference/api/vibration/diagnostics/#faultfrequencyresult) (source `"gear pair"`).
 
 **Raises**
 
@@ -486,7 +486,7 @@ it by the pole count.
 | `slot_harmonics` | Number of slot-harmonic orders `n` (integer >= 1, Default: 1, the fundamental `R fs` alone). |
 | `sidebands` | Sideband order around the fundamental slot harmonic at +/- the shaft rate and +/- the slip frequency (integer >= 0, Default: 0). |
 
-**Returns:** A [`FaultFrequencyResult`](/phonometry/reference/api/vibration/machine-diagnostics/#faultfrequencyresult) (source `"induction motor"`).
+**Returns:** A [`FaultFrequencyResult`](/phonometry/reference/api/vibration/diagnostics/#faultfrequencyresult) (source `"induction motor"`).
 
 **Raises**
 

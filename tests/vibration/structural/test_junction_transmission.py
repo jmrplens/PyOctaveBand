@@ -57,8 +57,8 @@ from phonometry import (
     wave_vibration_reduction_index,
 )
 from phonometry.vibration import JunctionTransmissionResult
-from phonometry.vibration.experimental_sea import flat_plate_modal_density
-from phonometry.vibration.point_mobility import plate_bending_wave_speed
+from phonometry.vibration.structural.experimental_sea import flat_plate_modal_density
+from phonometry.vibration.structural.point_mobility import plate_bending_wave_speed
 
 # Junction constants (Hopkins Eq. 5.12/5.13) reproduced here so the oracle never
 # reads them from the module under test.

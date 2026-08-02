@@ -2,7 +2,7 @@
 """ISO 10846 dynamic-transfer-stiffness fiche (reportlab renderer).
 
 Renders a
-:class:`~phonometry.vibration.transfer_stiffness.TransferStiffnessResult` to a
+:class:`~phonometry.vibration.structural.transfer_stiffness.TransferStiffnessResult` to a
 one-page PDF laid out like a dynamic-transfer-stiffness characterisation report
 for a resilient element (a vibration isolator, mount, bellows or hose) per
 ISO 10846-1:2008 (the transfer-stiffness definition, 3.7), determined by either
@@ -44,7 +44,7 @@ from ._i18n import format_number, t
 from .metadata import ReportMetadata
 
 if TYPE_CHECKING:
-    from ..vibration.transfer_stiffness import TransferStiffnessResult
+    from ..vibration.structural.transfer_stiffness import TransferStiffnessResult
 
 
 def _is_indirect(result: TransferStiffnessResult) -> bool:
@@ -168,7 +168,7 @@ def render_transfer_stiffness_report(
     """Render an ISO 10846 dynamic-transfer-stiffness fiche to a PDF at ``path``.
 
     :param result: A
-        :class:`~phonometry.vibration.transfer_stiffness.TransferStiffnessResult`
+        :class:`~phonometry.vibration.structural.transfer_stiffness.TransferStiffnessResult`
         carrying the complex ``k2,1(f)`` and, for the indirect method, the
         blocking mass used.
     :param path: Destination path of the PDF file.

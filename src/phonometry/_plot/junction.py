@@ -17,7 +17,7 @@ from .common import _C_MUTED, _C_PRIMARY, _C_SECONDARY, _new_axes
 if TYPE_CHECKING:
     from matplotlib.axes import Axes
 
-    from ..vibration.junction_transmission import JunctionTransmissionResult
+    from ..vibration.structural.junction_transmission import JunctionTransmissionResult
 
 #: Spanish translations of the fixed strings rendered here, keyed by their
 #: verbatim English text. ``_t`` returns the English key unchanged for any
@@ -54,7 +54,7 @@ def plot_junction_transmission(
     reference lines.
 
     :param result: A
-        :class:`~phonometry.vibration.junction_transmission.JunctionTransmissionResult`.
+        :class:`~phonometry.vibration.structural.junction_transmission.JunctionTransmissionResult`.
     :param ax: Existing axes, or ``None`` to create a figure.
     :param language: Label language, ``"en"`` (default) or ``"es"``.
     :param kwargs: Forwarded to the corner-curve ``plot``.
