@@ -447,6 +447,47 @@ def test_pre_split_module_path_still_imports(path: str) -> None:
     assert public, f"{path} imports but exposes no public names"
 
 
+def test_a_module_only_split_still_serves_the_dotted_read() -> None:
+    """``vibration.human_vibration.x`` after the import, not only the import.
+
+    No public name left ``vibration`` in 4.0, only its modules did, so the
+    package has no names to redirect. The dotted read still has to work: the
+    import registers the alias in ``sys.modules`` and the attribute has to
+    come from somewhere.
+    """
+    import importlib
+
+    from phonometry import vibration
+
+    importlib.import_module("phonometry.vibration.human_vibration")
+    alias = vibration.human_vibration
+    assert alias is sys.modules["phonometry.vibration.human_vibration"]
+    with pytest.warns(DeprecationWarning, match="vibration.human.exposure"):
+        assert alias.daily_exposure is ph.daily_exposure
+    assert "human_vibration" in dir(vibration)
+    assert "human_vibration" not in vibration.__all__
+    with pytest.raises(AttributeError, match="phonometry.vibration"):
+        _ = vibration.not_a_name
+
+
+@pytest.mark.parametrize("path", _PRE_SPLIT_MODULE_PATHS)
+def test_pre_split_dotted_read_resolves(path: str) -> None:
+    """Reading the alias off its parent package, which is how code uses it."""
+    import importlib
+    import warnings
+
+    importlib.import_module(path)
+    parent_name, _, leaf = path.rpartition(".")
+    parent = importlib.import_module(parent_name)
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore", DeprecationWarning)
+        resolved = getattr(parent, leaf)
+    # Either the module alias itself, or the public name that shadowed it
+    # before the split (``metrology.cepstrum`` was the function, not the
+    # module, and stays the function).
+    assert resolved is sys.modules[path] or callable(resolved)
+
+
 def test_pre_split_module_shim_names_the_5_0_removal() -> None:
     """The 4.0 aliases outlive the 3.x ones: they go in 5.0, not in 4.0."""
     shim = sys.modules["phonometry.metrology.levels"]

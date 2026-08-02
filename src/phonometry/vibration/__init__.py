@@ -11,6 +11,7 @@ monitoring. Every public name is still exported here, so
 
 from __future__ import annotations
 
+from .._compat import _namespace_dir, _namespace_shim
 from .._plot.geometry import (
     plot_plate_geometry,
 )
@@ -246,3 +247,9 @@ __all__ = [
     "weighted_acceleration",
     "weighting_factors",
 ]
+
+#: No public name left this namespace in 4.0, but the modules did, so
+#: ``vibration.human_vibration`` has to keep resolving to its alias module
+#: until 5.0: the import registers it, the attribute read needs this.
+__getattr__ = _namespace_shim(__name__)
+__dir__ = _namespace_dir(__name__, __all__)
