@@ -34,7 +34,7 @@ if TYPE_CHECKING:
     from matplotlib.container import BarContainer
     from matplotlib.typing import ColorType
 
-    from ..building.insulation import (
+    from ..building.measurement.insulation import (
         ImpactRatingResult,
         WeightedRatingResult,
     )

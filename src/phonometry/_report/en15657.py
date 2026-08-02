@@ -2,7 +2,7 @@
 """Structure-borne sound power characterization fiche (reportlab, EN 15657).
 
 Renders a
-:class:`~phonometry.building.structure_borne_power.StructureBornePowerResult`
+:class:`~phonometry.building.measurement.structure_borne_power.StructureBornePowerResult`
 (the structure-borne sound power a piece of building service equipment injects
 into a reception plate of known mass per area ``m`` and area ``S`` from the
 spatial-average plate velocity level ``Lv`` and the plate loss factor ``eta``,
@@ -55,7 +55,7 @@ from ._sound_power_fiche import (
 from .metadata import ReportMetadata
 
 if TYPE_CHECKING:
-    from ..building.structure_borne_power import StructureBornePowerResult
+    from ..building.measurement.structure_borne_power import StructureBornePowerResult
 
 
 def _basis(language: str = "en") -> str:
@@ -191,7 +191,7 @@ def render_structure_borne_power_report(
     """Render an EN 15657 structure-borne sound power fiche to a PDF at ``path``.
 
     :param result: A
-        :class:`~phonometry.building.structure_borne_power.StructureBornePowerResult`
+        :class:`~phonometry.building.measurement.structure_borne_power.StructureBornePowerResult`
         carrying the per-band injected ``power_level`` ``L_Ws``, the plate
         ``velocity_level`` ``Lv``, the ``loss_factor`` ``eta``, the plate
         ``mass_per_area`` ``m`` and ``area`` ``S``.

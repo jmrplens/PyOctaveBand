@@ -1,5 +1,5 @@
 ---
-title: "building.structure_borne_power"
+title: "building.measurement.structure_borne_power"
 description: "Structure-borne sound power of building equipment (EN 15657:2018; ISO 9611)."
 sidebar:
   label: "structure_borne_power"
@@ -61,7 +61,7 @@ source):
 - the **equivalent free velocity level** (Formula 18, dB re `1e-9 m/s`)
   from the high-mobility plate, and the **source mobility** from both
   (Formula 19). `L_Wsn` plus the mobility corrections of EN 12354-5
-  Annex I (see [`phonometry.building.installed_structure_borne`](/phonometry/reference/api/building/installed-structure-borne/)) close
+  Annex I (see [`phonometry.building.prediction.installed_structure_borne`](/phonometry/reference/api/building/installed-structure-borne/)) close
   the EN 15657 -> EN 12354-5 chain.
 
 The source-side free velocity of ISO 9611:1996 is the direct-measurement

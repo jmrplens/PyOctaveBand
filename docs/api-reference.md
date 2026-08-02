@@ -33,7 +33,7 @@ contour = aircraft.noise_contour(path, powers, distances, sel, lmax, x=gx, y=gy)
 | `phonometry.emission` | Sound power (ISO 3740 family), sound intensity, vibration-based power |
 | `phonometry.room` | Room acoustics (ISO 3382), impulse responses, open-plan, room-noise criteria, reverberation prediction, EN 12354-6 |
 | `phonometry.materials` | Absorption (ISO 354/11654), impedance tube, airflow resistance, scattering/diffusion, road absorption, dynamic stiffness |
-| `phonometry.building` | Sound insulation measurement and prediction (EN 12354, ISO 717/16283/10140/15186/10052/10848), structure-borne sound |
+| `phonometry.building` | Three subgroups: `measurement` (field, laboratory, survey and intensity methods with their ISO 717 ratings and ISO 12999 uncertainty), `prediction` (EN 12354 global and detailed models, facades, panels, apertures, plenums and resilient layers) and `regulation` (national codes) |
 | `phonometry.vibration` | Three families: `structural` (mobility ISO 7626, plate junctions, radiation, experimental SEA, transfer stiffness ISO 10846), `human` (ISO 2631/5349/8041 exposure and multiple shocks) and `machinery` (fault frequencies and condition monitoring) |
 | `phonometry.environment` | Three subgroups: `sources` (CNOSSOS road and rail emission, wind-turbine apparent sound power), `propagation` (ISO 9613-1/-2, ground effect and barriers, refraction by ray tracing and the parabolic equation) and `assessment` (ISO 1996-1/-2 rating and measurement, impulsive prominence, RD 1367/2007) |
 | `phonometry.aircraft` | EPNL (ICAO Annex 16), SAE ARP 5534 absorption, airport contours (ECAC Doc 29), rotorcraft (ECAC Doc 32) |
@@ -52,10 +52,11 @@ warns and delegates as well.
 
 | Deprecated path | Resolves to | Removed in |
 | :--- | :--- | :--- |
-| `phonometry.insulation` | `phonometry.building.insulation` | 4.0 |
+| `phonometry.insulation` | `phonometry.building.measurement.insulation` | 4.0 |
 | `phonometry.metrology.levels` | `phonometry.signals.levels` | 5.0 |
 | `phonometry.hearing.sti` | `phonometry.speech.sti` | 5.0 |
 | `phonometry.vibration.human_vibration` | `phonometry.vibration.human.exposure` | 5.0 |
+| `phonometry.building.spanish_building_code` | `phonometry.building.regulation.spain` | 5.0 |
 | `phonometry.environmental` | `phonometry.environment` | 5.0 |
 
 | Name | Type | Description (Inputs) | Usage Snippet (Outputs) |

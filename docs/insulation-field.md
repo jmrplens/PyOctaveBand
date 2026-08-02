@@ -460,4 +460,4 @@ ISO 16283 family (ISO 16283-3:2016) has its own page.
   used for the insulation spectra.
 - [Theory](theory-rooms-buildings.md): the reference-curve derivation behind the
   weighted single-number ratings.
-- API reference: [`building.insulation`](https://jmrplens.github.io/phonometry/reference/api/building/insulation/) and [`building.building_uncertainty`](https://jmrplens.github.io/phonometry/reference/api/building/building-uncertainty/).
+- API reference: [`building.measurement.insulation`](https://jmrplens.github.io/phonometry/reference/api/building/insulation/) and [`building.measurement.uncertainty`](https://jmrplens.github.io/phonometry/reference/api/building/uncertainty/).

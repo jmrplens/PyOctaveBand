@@ -263,7 +263,7 @@ of 26 dBA, the whole comes out at 31.5 dBA:
 
 ```python
 from phonometry import building
-from phonometry.building.aperture_transmission import composite_transmission_loss
+from phonometry.building.prediction.aperture_transmission import composite_transmission_loss
 
 building.window_size_correction(4.0)          # -2 dB: 26 dBA catalogued -> 24 dBA
 
@@ -308,7 +308,7 @@ are out of scope as well.
 - [Façade Sound Insulation](/phonometry/guides/facade-insulation/): the ISO 16283-3 measurement of $D_{2m,nT}$ and its EN 12354-3 prediction, which feed the $D_{2m,nT,Atr}$ index of this page.
 - [Predicting Panel Sound Insulation](/phonometry/guides/panel-sound-insulation/): the composite-facade calculation and transmission through openings and slits.
 - [Field Insulation Measurement (ISO 16283)](/phonometry/guides/insulation-field/): the band spectra of $R'$, $D_{nT}$ and $L'_{nT}$ that these global quantities summarise.
-- API reference: [`building.spanish_building_code`](/phonometry/reference/api/building/spanish-building-code/).
+- API reference: [`building.regulation.spain`](/phonometry/reference/api/building/spain/).
 
 ## Quick answers
 

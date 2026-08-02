@@ -1,5 +1,5 @@
 ---
-title: "building.resilient_layers"
+title: "building.prediction.resilient_layers"
 description: "Prediction of resilient-layer performance: tapping force, coverings, floors, linings."
 sidebar:
   label: "resilient_layers"
@@ -8,7 +8,7 @@ sidebar:
 Prediction of resilient-layer performance: tapping force, coverings, floors, linings.
 
 The measurement modules of this domain report what a resilient layer *achieved*
-([`phonometry.building.floor_covering_improvement`](/phonometry/reference/api/building/floor-covering-improvement/) for the ISO 16251-1
+([`phonometry.building.measurement.floor_covering_improvement`](/phonometry/reference/api/building/floor-covering-improvement/) for the ISO 16251-1
 mock-up, [`phonometry.materials.dynamic_stiffness`](/phonometry/reference/api/materials/dynamic-stiffness/) for the EN 29052-1
 dynamic stiffness). This module is their **prediction** counterpart: it walks
 the physical chain from the material data to the improvement spectrum, so a
@@ -1088,7 +1088,7 @@ weighted_floating_floor_improvement(
 Weighted improvement `ΔLw` of a floating floor (Formulae C.4/C.5).
 
 The single number that feeds the simplified prediction
-([`phonometry.predicted_impact_insulation`](/phonometry/reference/api/building/building-prediction/#predicted_impact_insulation)), read directly from the
+([`phonometry.predicted_impact_insulation`](/phonometry/reference/api/building/simplified-model/#predicted_impact_insulation)), read directly from the
 floating floor's mass per unit area and the resilient layer's dynamic
 stiffness. ISO 12354-2:2017 gives it as the two nomograms of Figures C.1
 and C.2 and prints the fits:

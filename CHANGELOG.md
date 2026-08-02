@@ -1013,6 +1013,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   Annex IV A.3.3. No number changes: the conformance report, the fiches and
   the tests are identical either side of the refactor.
 
+- `phonometry.building` has three subgroups, by what the acoustician is
+  doing. `building.measurement` is the building that exists: the ISO 16283,
+  10140, 10052, 15186 and 10848 methods, the heavy impact sources, the
+  floor-covering improvement, the reception-plate power, and the ISO 717
+  ratings and ISO 12999 uncertainty that go with them.
+  `building.prediction` is the building that does not exist yet: EN 12354-1
+  to -5 and the panel theory behind them. `building.regulation` is the code
+  it has to satisfy, which is the Spanish CTE DB-HR today and the shape any
+  other country takes tomorrow.
+
+  Five modules lose a word their subgroup now says: `building_prediction` and
+  `detailed_prediction` become `prediction.simplified_model` and
+  `prediction.detailed_model`, which is what EN 12354 calls the two routes it
+  offers for the same calculation, and what the module's own text has always
+  called them;
+  `facade_prediction` is `prediction.facade`, `building_uncertainty` is
+  `measurement.uncertainty` and `spanish_building_code` is
+  `regulation.spain`.
+
+  Nothing moves in the namespace: `from phonometry import building` exports
+  the same 251 names, and the nineteen pre-split module paths keep working
+  until 5.0.
+
 - `phonometry.environmental` is `phonometry.environment`, with three
   subgroups that follow how an environmental study is written: what the source
   emits (`environment.sources`: CNOSSOS road and rail, wind turbines), what the

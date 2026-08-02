@@ -1030,7 +1030,7 @@ def _page_description(page: ModuleDoc) -> str:
     """The page's meta description, taken from the module docstring.
 
     These pages used to describe themselves as "Public API of
-    phonometry.building.insulation (auto-generated)", which says nothing a URL
+    phonometry.building.measurement.insulation (auto-generated)", which says nothing a URL
     does not already say. The same page's body opens with a precise summary of
     what the module implements and which standards govern it, so that is what
     the description should be: it is what a search result shows and what an AI

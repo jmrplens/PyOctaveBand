@@ -15,7 +15,7 @@ criterion. The answer is a short chain, and every link of it already exists in
 the library: the reverberant level the machine builds up in the source room
 ([`phonometry.room.steady_state_spl`](/phonometry/reference/api/rooms/steady-field/#steady_state_spl) over the room constant of
 [`phonometry.room.room_constant`](/phonometry/reference/api/rooms/steady-field/#room_constant)), the transmission loss of the partition
-(measured, or predicted by [`phonometry.building.panel_transmission`](/phonometry/reference/api/building/panel-transmission/)), the
+(measured, or predicted by [`phonometry.building.prediction.panel_transmission`](/phonometry/reference/api/building/panel-transmission/)), the
 absorption of the receiving room
 ([`phonometry.room.equivalent_absorption_area`](/phonometry/reference/api/rooms/enclosed-space-absorption/#equivalent_absorption_area)) and the rating of what
 arrives ([`phonometry.room.noise_criterion`](/phonometry/reference/api/rooms/room-noise/#noise_criterion)). What this module adds is the
@@ -102,7 +102,7 @@ across the partition.
 | Name | Description |
 | :--- | :--- |
 | `frequencies` | Octave-band centre frequencies, Hz (1-D array). |
-| `transmission_loss` | Transmission loss of the partition `TL`, dB; a scalar or one value per band. Measured, tabulated, or predicted by [`phonometry.building.panel_transmission`](/phonometry/reference/api/building/panel-transmission/). |
+| `transmission_loss` | Transmission loss of the partition `TL`, dB; a scalar or one value per band. Measured, tabulated, or predicted by [`phonometry.building.prediction.panel_transmission`](/phonometry/reference/api/building/panel-transmission/). |
 | `partition_area` | Area of the partition between the rooms `S_w`, m2. |
 | `receiving_absorption` | Equivalent absorption area of the receiving room `S_2 alpha_2` per band, m2; e.g. from [`phonometry.room.equivalent_absorption_area`](/phonometry/reference/api/rooms/enclosed-space-absorption/#equivalent_absorption_area). |
 | `source_level` | Reverberant sound pressure level in the source room `L_p1`, dB (scalar or per band). Mutually exclusive with `source_power_level`. |

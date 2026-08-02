@@ -430,4 +430,4 @@ worked examples.
   single-number model that consumes these ratings.
 - [Theory](theory-rooms-buildings.md): the reference-curve derivation behind
   the weighted single-number ratings.
-- API reference: [`building.insulation`](https://jmrplens.github.io/phonometry/reference/api/building/insulation/).
+- API reference: [`building.measurement.insulation`](https://jmrplens.github.io/phonometry/reference/api/building/insulation/).

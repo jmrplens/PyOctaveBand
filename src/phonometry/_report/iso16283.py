@@ -1,11 +1,11 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
 """ISO 16283 field sound-insulation test report (reportlab renderer).
 
-Renders a :class:`~phonometry.building.insulation.AirborneInsulationResult`
+Renders a :class:`~phonometry.building.measurement.insulation.AirborneInsulationResult`
 (field airborne, ISO 16283-1:2014),
-:class:`~phonometry.building.insulation.ImpactInsulationResult` (field
+:class:`~phonometry.building.measurement.insulation.ImpactInsulationResult` (field
 impact, ISO 16283-2:2020) or
-:class:`~phonometry.building.insulation.FacadeInsulationResult` (field
+:class:`~phonometry.building.measurement.insulation.FacadeInsulationResult` (field
 facade, ISO 16283-3:2016) to the one-page field test report of each
 standard's Clause 14, laid out like the recommended results form (ISO
 16283-1 Annex B / ISO 16283-2 Annex C) and the accredited field reports
@@ -57,7 +57,7 @@ from ._insulation_fiche import (
 from .metadata import ReportMetadata
 
 if TYPE_CHECKING:
-    from ..building.insulation import (
+    from ..building.measurement.insulation import (
         AirborneInsulationResult,
         FacadeInsulationResult,
         ImpactInsulationResult,
@@ -150,13 +150,13 @@ def render_iso16283_report(
     """Render an ISO 16283 field sound-insulation test report to a PDF.
 
     :param result: The field result
-        (:class:`~phonometry.building.insulation.AirborneInsulationResult`
-        or :class:`~phonometry.building.insulation.ImpactInsulationResult`)
+        (:class:`~phonometry.building.measurement.insulation.AirborneInsulationResult`
+        or :class:`~phonometry.building.measurement.insulation.ImpactInsulationResult`)
         carrying the per-band quantities and, when built by the measurement
         functions, the per-band chain (levels and reverberation times).
     :param rating: The ISO 717 rating of the reported 16-band quantity,
         already evaluated by the caller
-        (:meth:`~phonometry.building.insulation.AirborneInsulationResult.report`
+        (:meth:`~phonometry.building.measurement.insulation.AirborneInsulationResult.report`
         validates and computes it); its ``plot`` draws the fiche curve.
     :param path: Destination path of the PDF file.
     :param quantity: ``"dnt"``, ``"r_prime"``, ``"l_n_t"`` or ``"l_n"``
@@ -299,7 +299,7 @@ def render_iso16283_facade_report(
     """Render an ISO 16283-3 field facade sound-insulation report to a PDF.
 
     :param result: The field facade result
-        (:class:`~phonometry.building.insulation.FacadeInsulationResult`)
+        (:class:`~phonometry.building.measurement.insulation.FacadeInsulationResult`)
         carrying the per-band facade quantities.
     :param rating: The ISO 717-1 rating of the reported facade quantity,
         already evaluated by the caller; its ``plot`` draws the fiche curve.

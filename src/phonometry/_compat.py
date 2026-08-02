@@ -89,17 +89,28 @@ _MOVED_3X: dict[str, str] = {
     "phonometry.room_acoustics": "phonometry.room.room_acoustics",
     "phonometry.room_ir": "phonometry.room.room_ir",
     "phonometry.room_noise": "phonometry.room.room_noise",
-    "phonometry.building_prediction": "phonometry.building.building_prediction",
-    "phonometry.building_uncertainty": "phonometry.building.building_uncertainty",
-    "phonometry.facade_prediction": "phonometry.building.facade_prediction",
-    "phonometry.flanking_transmission": "phonometry.building.flanking_transmission",
-    "phonometry.floor_covering_improvement": "phonometry.building.floor_covering_improvement",
-    "phonometry.installed_structure_borne": "phonometry.building.installed_structure_borne",
-    "phonometry.insulation": "phonometry.building.insulation",
-    "phonometry.intensity_insulation": "phonometry.building.intensity_insulation",
-    "phonometry.lab_insulation": "phonometry.building.lab_insulation",
-    "phonometry.structure_borne_power": "phonometry.building.structure_borne_power",
-    "phonometry.survey_insulation": "phonometry.building.survey_insulation",
+    "phonometry.building_prediction":
+        "phonometry.building.prediction.simplified_model",
+    "phonometry.building_uncertainty":
+        "phonometry.building.measurement.uncertainty",
+    "phonometry.facade_prediction":
+        "phonometry.building.prediction.facade",
+    "phonometry.flanking_transmission":
+        "phonometry.building.measurement.flanking_transmission",
+    "phonometry.floor_covering_improvement":
+        "phonometry.building.measurement.floor_covering_improvement",
+    "phonometry.installed_structure_borne":
+        "phonometry.building.prediction.installed_structure_borne",
+    "phonometry.insulation":
+        "phonometry.building.measurement.insulation",
+    "phonometry.intensity_insulation":
+        "phonometry.building.measurement.intensity_insulation",
+    "phonometry.lab_insulation":
+        "phonometry.building.measurement.lab_insulation",
+    "phonometry.structure_borne_power":
+        "phonometry.building.measurement.structure_borne_power",
+    "phonometry.survey_insulation":
+        "phonometry.building.measurement.survey_insulation",
     "phonometry.human_vibration": "phonometry.vibration.human.exposure",
     "phonometry.mechanical_mobility":
         "phonometry.vibration.structural.mechanical_mobility",
@@ -217,6 +228,44 @@ _MOVED_4X: dict[str, str] = {
         "phonometry.environment.assessment.impulse_prominence",
     "phonometry.environmental.spanish_regulation":
         "phonometry.environment.assessment.spain",
+    "phonometry.building.insulation":
+        "phonometry.building.measurement.insulation",
+    "phonometry.building.lab_insulation":
+        "phonometry.building.measurement.lab_insulation",
+    "phonometry.building.survey_insulation":
+        "phonometry.building.measurement.survey_insulation",
+    "phonometry.building.intensity_insulation":
+        "phonometry.building.measurement.intensity_insulation",
+    "phonometry.building.flanking_transmission":
+        "phonometry.building.measurement.flanking_transmission",
+    "phonometry.building.heavy_impact":
+        "phonometry.building.measurement.heavy_impact",
+    "phonometry.building.floor_covering_improvement":
+        "phonometry.building.measurement.floor_covering_improvement",
+    "phonometry.building.structure_borne_power":
+        "phonometry.building.measurement.structure_borne_power",
+    "phonometry.building.building_uncertainty":
+        "phonometry.building.measurement.uncertainty",
+    "phonometry.building.building_prediction":
+        "phonometry.building.prediction.simplified_model",
+    "phonometry.building.detailed_prediction":
+        "phonometry.building.prediction.detailed_model",
+    "phonometry.building.facade_prediction":
+        "phonometry.building.prediction.facade",
+    "phonometry.building.installed_structure_borne":
+        "phonometry.building.prediction.installed_structure_borne",
+    "phonometry.building.panel_transmission":
+        "phonometry.building.prediction.panel_transmission",
+    "phonometry.building.aperture_transmission":
+        "phonometry.building.prediction.aperture_transmission",
+    "phonometry.building.ceiling_plenum":
+        "phonometry.building.prediction.ceiling_plenum",
+    "phonometry.building.masonry_cavity_wall":
+        "phonometry.building.prediction.masonry_cavity_wall",
+    "phonometry.building.resilient_layers":
+        "phonometry.building.prediction.resilient_layers",
+    "phonometry.building.spanish_building_code":
+        "phonometry.building.regulation.spain",
 }
 
 #: The two generations, each with the release that deprecated it and the one
@@ -358,7 +407,12 @@ def _namespace_dir(
     """
 
     def __dir__() -> list[str]:
-        names = set(own) | set(_alias_modules(package))
+        # Extend the default listing rather than replace it: a package's own
+        # dir() carries its dunders and the subpackages it imported, and the
+        # subgroups a split introduces are exactly what a reader is looking
+        # for there.
+        names = set(vars(import_module(package))) | set(own)
+        names |= set(_alias_modules(package))
         for target in targets:
             names |= set(getattr(import_module(target), "__all__", ()))
         return sorted(names)

@@ -13,6 +13,7 @@ and the 3.2 module moves go in 4.0, the 4.0 taxonomy aliases in 5.0.
 
 from __future__ import annotations
 
+import pathlib
 import sys
 
 import numpy as np
@@ -445,6 +446,25 @@ _PRE_SPLIT_MODULE_PATHS = [
     "phonometry.environmental.rating",
     "phonometry.environmental.spanish_regulation",
     "phonometry.environmental.wind_turbine_noise",
+    "phonometry.building.aperture_transmission",
+    "phonometry.building.building_prediction",
+    "phonometry.building.building_uncertainty",
+    "phonometry.building.ceiling_plenum",
+    "phonometry.building.detailed_prediction",
+    "phonometry.building.facade_prediction",
+    "phonometry.building.flanking_transmission",
+    "phonometry.building.floor_covering_improvement",
+    "phonometry.building.heavy_impact",
+    "phonometry.building.installed_structure_borne",
+    "phonometry.building.insulation",
+    "phonometry.building.intensity_insulation",
+    "phonometry.building.lab_insulation",
+    "phonometry.building.masonry_cavity_wall",
+    "phonometry.building.panel_transmission",
+    "phonometry.building.resilient_layers",
+    "phonometry.building.spanish_building_code",
+    "phonometry.building.structure_borne_power",
+    "phonometry.building.survey_insulation",
 ]
 
 
@@ -459,6 +479,37 @@ def test_pre_split_module_path_still_imports(path: str) -> None:
     assert module is sys.modules[path]
     public = [name for name in dir(module) if not name.startswith("_")]
     assert public, f"{path} imports but exposes no public names"
+
+
+def test_the_migration_table_names_real_aliases() -> None:
+    """Every row of the curated table must be a live row of the alias tables.
+
+    A global rename over the documentation has rewritten this table's left
+    column three times, each time turning a deprecated path into the path it
+    resolves to, so the page ended up calling the current path deprecated. The
+    check is cheap and the failure is unmistakable.
+    """
+    import importlib
+    import re
+
+    from phonometry._compat import _MOVED_3X, _MOVED_4X
+
+    table = (
+        pathlib.Path(__file__).resolve().parent.parent
+        / "docs" / "api-reference.md"
+    ).read_text(encoding="utf-8")
+    rows = re.findall(
+        r"^\| `(phonometry[\w.]*)` \| `(phonometry[\w.]*)` \| (\d\.\d) \|$",
+        table, re.MULTILINE,
+    )
+    assert rows, "the migration table is gone from docs/api-reference.md"
+    for old, new, removed_in in rows:
+        generation = _MOVED_3X if removed_in == "4.0" else _MOVED_4X
+        assert old in generation, f"{old} is not a deprecated path of {removed_in}"
+        assert generation[old] == new, (
+            f"{old} resolves to {generation[old]}, not to {new}"
+        )
+        importlib.import_module(new)
 
 
 def test_a_renamed_package_alias_is_not_a_package() -> None:

@@ -1,5 +1,5 @@
 ---
-title: "building.installed_structure_borne"
+title: "building.prediction.installed_structure_borne"
 description: "Installed structure-borne sound from service equipment (EN 12354-5:2009)."
 sidebar:
   label: "installed_structure_borne"
@@ -15,7 +15,7 @@ building. The chain closes the structural-vibroacoustics series:
    `L_Ws,c`. It is **not** the raw reception-plate power of EN 15657
    Formula (14): that plate-injected level must first be converted to the
    plate-independent `L_Ws,n` (EN 15657 Formulae (15)/(17); see
-   [`phonometry.building.structure_borne_power`](/phonometry/reference/api/building/structure-borne-power/)) and then referred to the
+   [`phonometry.building.measurement.structure_borne_power`](/phonometry/reference/api/building/structure-borne-power/)) and then referred to the
    actual receiver with the Annex I mobility correction
    ([`installed_power_from_reception_plate`](/phonometry/reference/api/building/installed-structure-borne/#installed_power_from_reception_plate)),
    $L_{Ws,inst,i} = L_{Ws,n} + 10 \log_{10}( Y_{\infty,i} / Y_{\infty,rec} )$

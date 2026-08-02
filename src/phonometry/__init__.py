@@ -105,32 +105,109 @@ from .broadcast.program_loudness import (
     program_loudness,
     true_peak_level,
 )
-from .building.aperture_transmission import (
-    ApertureTransmissionResult,
-    circular_aperture_transmission_coefficient,
-    composite_transmission_loss,
-    slit_resonance_frequencies,
-    slit_transmission_coefficient,
-    transmission_loss_from_coefficient,
+from .building.measurement.flanking_transmission import (
+    FlankingImpactLevelResult,
+    FlankingLevelDifferenceResult,
+    VibrationReductionResult,
+    band_mode_count,
+    critical_frequency,
+    direction_averaged_level_difference,
+    equivalent_absorption_length,
+    modal_density,
+    modal_overlap_factor,
+    normalized_flanking_impact_level,
+    normalized_flanking_level_difference,
+    strong_coupling_satisfied,
+    total_loss_factor,
+    velocity_level_difference,
+    vibration_reduction_index,
+    vibration_reduction_index_from_flanking,
 )
-from .building.building_prediction import (
-    AirbornePredictionResult,
-    FlankingPath,
-    ImpactPredictionResult,
-    PathContribution,
-    combine_linings,
-    equivalent_impact_level,
-    flanking_element,
-    flanking_path,
-    impact_flanking_correction,
-    junction_min_vibration_reduction,
-    junction_vibration_reduction,
-    predicted_airborne_insulation,
-    predicted_impact_insulation,
-    standardized_impact_level,
-    standardized_level_difference,
+from .building.measurement.floor_covering_improvement import (
+    FloorCoveringImprovementResult,
+    acceleration_level,
+    background_corrected_level,
+    impact_improvement,
+    improvement_octave_bands,
 )
-from .building.building_uncertainty import (
+from .building.measurement.heavy_impact import (
+    HEAVY_IMPACT_A_WEIGHTING,
+    HEAVY_IMPACT_OCTAVE_BANDS,
+    HEAVY_IMPACT_SOURCES,
+    AWeightedMaximumImpactResult,
+    HeavyImpactSourceCheck,
+    HeavyImpactSourceSpec,
+    StandardizedMaximumImpactResult,
+    a_weighted_maximum_impact_level,
+    check_heavy_impact_source,
+    fast_reverberation_correction,
+    heavy_impact_octave_levels,
+    heavy_impact_source_limits,
+    heavy_impact_source_specification,
+    impact_force_exposure_level,
+    standardized_maximum_impact_level,
+)
+from .building.measurement.insulation import (
+    AirborneInsulationResult,
+    ExtendedImpactRatingResult,
+    ExtendedWeightedRatingResult,
+    FacadeInsulationResult,
+    ImpactInsulationResult,
+    ImpactRatingResult,
+    WeightedRatingResult,
+    airborne_insulation,
+    energy_average_level,
+    facade_insulation,
+    impact_improvement_adaptation_term,
+    impact_insulation,
+    weighted_impact_improvement,
+    weighted_impact_rating,
+    weighted_impact_rating_extended,
+    weighted_rating,
+    weighted_rating_extended,
+)
+from .building.measurement.intensity_insulation import (
+    IntensityElementNormalizedResult,
+    IntensityReductionResult,
+    adaptation_term_kc,
+    combine_subareas,
+    intensity_element_normalized_difference,
+    intensity_sound_reduction,
+    surface_pressure_intensity_indicator,
+)
+from .building.measurement.lab_insulation import (
+    LabAirborneInsulationResult,
+    LabImpactInsulationResult,
+    LabInsulationWarning,
+    background_correction,
+    lab_airborne_insulation,
+    lab_impact_insulation,
+)
+from .building.measurement.structure_borne_power import (
+    StructureBornePowerResult,
+    characteristic_reception_plate_power,
+    equivalent_blocked_force_level,
+    equivalent_free_velocity_level,
+    mean_free_velocity_level,
+    plate_loss_factor,
+    reception_plate_power,
+    source_mobility_from_levels,
+    spatial_mean_velocity_level,
+    structure_borne_power_level,
+)
+from .building.measurement.survey_insulation import (
+    SurveyAirborneResult,
+    SurveyFacadeResult,
+    SurveyImpactResult,
+    SurveyServiceEquipmentResult,
+    estimate_reverberation_index,
+    reverberation_index,
+    survey_airborne_insulation,
+    survey_facade_insulation,
+    survey_impact_insulation,
+    survey_service_equipment_level,
+)
+from .building.measurement.uncertainty import (
     COVERAGE_FACTORS,
     BandUncertainty,
     UncertainValue,
@@ -149,7 +226,15 @@ from .building.building_uncertainty import (
     single_number_uncertainty_uncorrelated,
     uncertain_value,
 )
-from .building.ceiling_plenum import (
+from .building.prediction.aperture_transmission import (
+    ApertureTransmissionResult,
+    circular_aperture_transmission_coefficient,
+    composite_transmission_loss,
+    slit_resonance_frequencies,
+    slit_transmission_coefficient,
+    transmission_loss_from_coefficient,
+)
+from .building.prediction.ceiling_plenum import (
     CEILING_ATTENUATION_CONTOUR,
     CeilingAttenuationResult,
     PlenumFlankingResult,
@@ -158,7 +243,7 @@ from .building.ceiling_plenum import (
     partition_referenced_reduction_index,
     plenum_flanking_reduction_index,
 )
-from .building.detailed_prediction import (
+from .building.prediction.detailed_model import (
     BandPath,
     DetailedAirborneResult,
     DetailedImpactResult,
@@ -193,7 +278,7 @@ from .building.detailed_prediction import (
     resonant_sound_reduction_index,
     structural_reverberation_time,
 )
-from .building.facade_prediction import (
+from .building.prediction.facade import (
     FacadeElement,
     FacadePredictionResult,
     RadiatedPowerResult,
@@ -203,49 +288,7 @@ from .building.facade_prediction import (
     outdoor_level,
     radiated_sound_power,
 )
-from .building.flanking_transmission import (
-    FlankingImpactLevelResult,
-    FlankingLevelDifferenceResult,
-    VibrationReductionResult,
-    band_mode_count,
-    critical_frequency,
-    direction_averaged_level_difference,
-    equivalent_absorption_length,
-    modal_density,
-    modal_overlap_factor,
-    normalized_flanking_impact_level,
-    normalized_flanking_level_difference,
-    strong_coupling_satisfied,
-    total_loss_factor,
-    velocity_level_difference,
-    vibration_reduction_index,
-    vibration_reduction_index_from_flanking,
-)
-from .building.floor_covering_improvement import (
-    FloorCoveringImprovementResult,
-    acceleration_level,
-    background_corrected_level,
-    impact_improvement,
-    improvement_octave_bands,
-)
-from .building.heavy_impact import (
-    HEAVY_IMPACT_A_WEIGHTING,
-    HEAVY_IMPACT_OCTAVE_BANDS,
-    HEAVY_IMPACT_SOURCES,
-    AWeightedMaximumImpactResult,
-    HeavyImpactSourceCheck,
-    HeavyImpactSourceSpec,
-    StandardizedMaximumImpactResult,
-    a_weighted_maximum_impact_level,
-    check_heavy_impact_source,
-    fast_reverberation_correction,
-    heavy_impact_octave_levels,
-    heavy_impact_source_limits,
-    heavy_impact_source_specification,
-    impact_force_exposure_level,
-    standardized_maximum_impact_level,
-)
-from .building.installed_structure_borne import (
+from .building.prediction.installed_structure_borne import (
     REFERENCE_AREA,
     InstalledSourceResult,
     coupling_term,
@@ -257,50 +300,14 @@ from .building.installed_structure_borne import (
     structure_borne_pressure_level_path,
     total_structure_borne_pressure_level,
 )
-from .building.insulation import (
-    AirborneInsulationResult,
-    ExtendedImpactRatingResult,
-    ExtendedWeightedRatingResult,
-    FacadeInsulationResult,
-    ImpactInsulationResult,
-    ImpactRatingResult,
-    WeightedRatingResult,
-    airborne_insulation,
-    energy_average_level,
-    facade_insulation,
-    impact_improvement_adaptation_term,
-    impact_insulation,
-    weighted_impact_improvement,
-    weighted_impact_rating,
-    weighted_impact_rating_extended,
-    weighted_rating,
-    weighted_rating_extended,
-)
-from .building.intensity_insulation import (
-    IntensityElementNormalizedResult,
-    IntensityReductionResult,
-    adaptation_term_kc,
-    combine_subareas,
-    intensity_element_normalized_difference,
-    intensity_sound_reduction,
-    surface_pressure_intensity_indicator,
-)
-from .building.lab_insulation import (
-    LabAirborneInsulationResult,
-    LabImpactInsulationResult,
-    LabInsulationWarning,
-    background_correction,
-    lab_airborne_insulation,
-    lab_impact_insulation,
-)
-from .building.masonry_cavity_wall import (
+from .building.prediction.masonry_cavity_wall import (
     WALL_TIE_STIFFNESS,
     WallTieCouplingResult,
     wall_tie_coupling_loss_factor,
     wall_tie_stiffness,
     wall_tie_stiffness_per_area,
 )
-from .building.panel_transmission import (
+from .building.prediction.panel_transmission import (
     PLATEAU_MATERIALS,
     SoundReductionResult,
     corrugated_plate_mass_factor,
@@ -315,7 +322,7 @@ from .building.panel_transmission import (
     plateau_transmission_loss,
     single_panel_transmission_loss,
 )
-from .building.resilient_layers import (
+from .building.prediction.resilient_layers import (
     TAPPING_DROP_HEIGHT,
     TAPPING_HAMMER_MASS,
     TAPPING_HAMMER_RADIUS,
@@ -344,7 +351,24 @@ from .building.resilient_layers import (
     weighted_floating_floor_improvement,
     weighted_lining_improvement,
 )
-from .building.spanish_building_code import (
+from .building.prediction.simplified_model import (
+    AirbornePredictionResult,
+    FlankingPath,
+    ImpactPredictionResult,
+    PathContribution,
+    combine_linings,
+    equivalent_impact_level,
+    flanking_element,
+    flanking_path,
+    impact_flanking_correction,
+    junction_min_vibration_reduction,
+    junction_vibration_reduction,
+    predicted_airborne_insulation,
+    predicted_impact_insulation,
+    standardized_impact_level,
+    standardized_level_difference,
+)
+from .building.regulation.spain import (
     DB_HR_FREQUENCIES,
     DB_HR_NORMALISED_SPECTRA,
     DbHrAssessment,
@@ -365,30 +389,6 @@ from .building.spanish_building_code import (
     ra,
     ra_tr,
     window_size_correction,
-)
-from .building.structure_borne_power import (
-    StructureBornePowerResult,
-    characteristic_reception_plate_power,
-    equivalent_blocked_force_level,
-    equivalent_free_velocity_level,
-    mean_free_velocity_level,
-    plate_loss_factor,
-    reception_plate_power,
-    source_mobility_from_levels,
-    spatial_mean_velocity_level,
-    structure_borne_power_level,
-)
-from .building.survey_insulation import (
-    SurveyAirborneResult,
-    SurveyFacadeResult,
-    SurveyImpactResult,
-    SurveyServiceEquipmentResult,
-    estimate_reverberation_index,
-    reverberation_index,
-    survey_airborne_insulation,
-    survey_facade_insulation,
-    survey_impact_insulation,
-    survey_service_equipment_level,
 )
 from .electroacoustics.distortion import (
     HarmonicDistortionResult,

@@ -2,7 +2,7 @@
 """ISO 16251-1 floor-covering impact-sound-improvement fiche.
 
 Renders a
-:class:`~phonometry.building.floor_covering_improvement.FloorCoveringImprovementResult`
+:class:`~phonometry.building.measurement.floor_covering_improvement.FloorCoveringImprovementResult`
 to a one-page PDF laid out like an accredited impact-improvement test report
 (BS EN ISO 16251-1:2014, the small-mock-up laboratory method for the reduction
 of transmitted impact sound by soft, locally-reacting floor coverings):
@@ -65,7 +65,9 @@ from ._layout import (
 from .metadata import ReportMetadata
 
 if TYPE_CHECKING:
-    from ..building.floor_covering_improvement import FloorCoveringImprovementResult
+    from ..building.measurement.floor_covering_improvement import (
+        FloorCoveringImprovementResult,
+    )
 
 
 def _metadata_pairs(
@@ -131,8 +133,8 @@ def _reference_floor_with_covering(
     those bands. Uses a lazy domain import (the report layer keeps its building
     imports deferred).
     """
-    from ..building.floor_covering_improvement import _RATING_FREQS
-    from ..building.insulation import _IMPACT_REFERENCE_FLOOR
+    from ..building.measurement.floor_covering_improvement import _RATING_FREQS
+    from ..building.measurement.insulation import _IMPACT_REFERENCE_FLOOR
 
     freqs = np.asarray(result.frequencies, dtype=np.float64)
     rating = np.asarray(_RATING_FREQS, dtype=np.float64)
@@ -312,7 +314,7 @@ def render_iso16251_report(
     """Render an ISO 16251-1 floor-covering impact-improvement fiche to a PDF.
 
     :param result: A
-        :class:`~phonometry.building.floor_covering_improvement.FloorCoveringImprovementResult`
+        :class:`~phonometry.building.measurement.floor_covering_improvement.FloorCoveringImprovementResult`
         carrying the ``frequencies``, the improvement ``improvement``
         (``delta-L``), the ``limited`` mask and the weighted ``delta_lw`` /
         ``ci_delta``.

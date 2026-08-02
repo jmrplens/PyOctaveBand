@@ -1,5 +1,5 @@
 ---
-title: "building.floor_covering_improvement"
+title: "building.measurement.floor_covering_improvement"
 description: "Impact-sound improvement of floor coverings on a small mock-up (ISO 16251-1:2014)."
 sidebar:
   label: "floor_covering_improvement"

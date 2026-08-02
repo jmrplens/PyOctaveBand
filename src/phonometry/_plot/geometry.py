@@ -40,9 +40,9 @@ from .common import (
 if TYPE_CHECKING:
     from matplotlib.axes import Axes
 
-    from ..building.aperture_transmission import ApertureTransmissionResult
-    from ..building.facade_prediction import FacadeElement
-    from ..building.panel_transmission import SoundReductionResult
+    from ..building.prediction.aperture_transmission import ApertureTransmissionResult
+    from ..building.prediction.facade import FacadeElement
+    from ..building.prediction.panel_transmission import SoundReductionResult
     from ..electroacoustics.piston import RadiatingPistonResult
     from ..emission.intensity import IntensityResult
     from ..environment.propagation.ground_barriers import BarrierInsertionLoss

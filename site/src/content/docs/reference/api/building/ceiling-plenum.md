@@ -1,5 +1,5 @@
 ---
-title: "building.ceiling_plenum"
+title: "building.prediction.ceiling_plenum"
 description: "Suspended-ceiling plenum flanking path (Vigran 9.2.3 after Mechel 1980; ISO 140-9 / ISO 10848-2; ASTM E1414 / ASTM E413)."
 sidebar:
   label: "ceiling_plenum"

@@ -17,7 +17,7 @@ independent of the implementation:
   incidence, Eq. 4.2.27) with its half-wave thickness resonances
   ``f_n = n c_P / (2 h)`` (Eq. 2.4.19), cross-checked in its thin-plate
   band against
-  :func:`~phonometry.building.panel_transmission.mass_law_transmission_loss`.
+  :func:`~phonometry.building.prediction.panel_transmission.mass_law_transmission_loss`.
 
 The Scholte time-of-flight case runs the fluid-solid benchmark
 configuration of van Vossen, Robertsson & Chapman, "Finite-difference
@@ -40,7 +40,7 @@ import numpy as np
 import pytest
 from scipy.signal import hilbert
 
-from phonometry.building.panel_transmission import mass_law_transmission_loss
+from phonometry.building.prediction.panel_transmission import mass_law_transmission_loss
 from phonometry.simulation import (
     AIR,
     ALUMINIUM,

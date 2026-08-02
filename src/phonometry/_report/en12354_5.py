@@ -2,7 +2,7 @@
 """Installed structure-borne sound prediction fiche (reportlab, EN 12354-5).
 
 Renders an
-:class:`~phonometry.building.installed_structure_borne.InstalledSourceResult`
+:class:`~phonometry.building.prediction.installed_structure_borne.InstalledSourceResult`
 (the normalised structure-borne sound pressure level ``L_n,s`` predicted in a
 receiving room from building service equipment, EN 12354-5:2009) to a one-page
 **prediction** report. Unlike the measurement fiches, the reported result is an
@@ -57,7 +57,7 @@ from ._sound_power_fiche import (
 from .metadata import ReportMetadata
 
 if TYPE_CHECKING:
-    from ..building.installed_structure_borne import InstalledSourceResult
+    from ..building.prediction.installed_structure_borne import InstalledSourceResult
 
 
 def _basis(language: str = "en") -> str:
@@ -195,7 +195,7 @@ def render_installed_structure_borne_report(
     """Render an EN 12354-5 installed structure-borne prediction fiche.
 
     :param result: An
-        :class:`~phonometry.building.installed_structure_borne.InstalledSourceResult`
+        :class:`~phonometry.building.prediction.installed_structure_borne.InstalledSourceResult`
         carrying the per-path ``path_levels`` ``L_n,s,ij``, the combined
         ``total_level`` ``L_n,s`` and the ``installed_power_level``
         ``L_Ws,inst``.

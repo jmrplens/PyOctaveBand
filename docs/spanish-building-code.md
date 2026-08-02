@@ -238,7 +238,7 @@ whole comes out at 31.5 dBA:
 
 ```python
 from phonometry import building
-from phonometry.building.aperture_transmission import composite_transmission_loss
+from phonometry.building.prediction.aperture_transmission import composite_transmission_loss
 
 building.window_size_correction(4.0)          # -2 dB: 26 dBA catalogued -> 24 dBA
 
@@ -301,7 +301,7 @@ enlarged-range term $C_{100-5000}$, not the core-range one.
   composite-facade calculation and transmission through openings and slits.
 - [Field Insulation Measurement (ISO 16283)](insulation-field.md): the band
   spectra of $R'$, $D_{nT}$ and $L'_{nT}$ that these global quantities summarise.
-- API reference: [`building.spanish_building_code`](https://jmrplens.github.io/phonometry/reference/api/building/spanish-building-code/).
+- API reference: [`building.regulation.spain`](https://jmrplens.github.io/phonometry/reference/api/building/spain/).
 
 ## References
 

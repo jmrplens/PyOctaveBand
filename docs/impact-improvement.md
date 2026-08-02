@@ -254,4 +254,4 @@ not a measurement).
   impact model whose Formula (21) consumes $\Delta L_w$.
 - [Insulation Ratings (ISO 717)](insulation-ratings.md): the reference-curve
   engine behind the weighted improvement.
-- API reference: [`building.floor_covering_improvement`](https://jmrplens.github.io/phonometry/reference/api/building/floor-covering-improvement/).
+- API reference: [`building.measurement.floor_covering_improvement`](https://jmrplens.github.io/phonometry/reference/api/building/floor-covering-improvement/).

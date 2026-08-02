@@ -45,7 +45,10 @@ from .iso717 import _Y_TOP_AIRBORNE, _Y_TOP_IMPACT, _metadata_pairs
 from .metadata import ReportMetadata
 
 if TYPE_CHECKING:
-    from ..building.insulation import ImpactRatingResult, WeightedRatingResult
+    from ..building.measurement.insulation import (
+        ImpactRatingResult,
+        WeightedRatingResult,
+    )
 
 #: A per-band table column: header markup, values and decimal places.
 Column = tuple[str, np.ndarray, int]

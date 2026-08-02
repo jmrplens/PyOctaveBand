@@ -2,9 +2,9 @@
 """ISO 10140 laboratory sound-insulation test report (reportlab renderer).
 
 Renders a
-:class:`~phonometry.building.lab_insulation.LabAirborneInsulationResult`
+:class:`~phonometry.building.measurement.lab_insulation.LabAirborneInsulationResult`
 (laboratory airborne, ISO 10140-2:2010) or
-:class:`~phonometry.building.lab_insulation.LabImpactInsulationResult`
+:class:`~phonometry.building.measurement.lab_insulation.LabImpactInsulationResult`
 (laboratory impact, ISO 10140-3:2010) to the one-page laboratory test report
 each standard's Clause 9 prescribes, laid out like the accredited laboratory
 reports rated per ISO 717. The shared two-panel skeleton (title and basis
@@ -33,8 +33,11 @@ from ._insulation_fiche import Column, render_insulation_fiche
 from .metadata import ReportMetadata
 
 if TYPE_CHECKING:
-    from ..building.insulation import ImpactRatingResult, WeightedRatingResult
-    from ..building.lab_insulation import (
+    from ..building.measurement.insulation import (
+        ImpactRatingResult,
+        WeightedRatingResult,
+    )
+    from ..building.measurement.lab_insulation import (
         LabAirborneInsulationResult,
         LabImpactInsulationResult,
     )
@@ -89,9 +92,9 @@ def render_iso10140_report(
     """Render an ISO 10140 laboratory sound-insulation test report to a PDF.
 
     :param result: The laboratory result
-        (:class:`~phonometry.building.lab_insulation.LabAirborneInsulationResult`
+        (:class:`~phonometry.building.measurement.lab_insulation.LabAirborneInsulationResult`
         or
-        :class:`~phonometry.building.lab_insulation.LabImpactInsulationResult`)
+        :class:`~phonometry.building.measurement.lab_insulation.LabImpactInsulationResult`)
         carrying the per-band quantity and the equivalent absorption area.
     :param rating: The ISO 717 rating of the reported quantity (the result's
         own ``rating``); its ``plot`` draws the fiche curve.

@@ -1,5 +1,5 @@
 ---
-title: "building.lab_insulation"
+title: "building.measurement.lab_insulation"
 description: "Laboratory sound insulation of building elements (ISO 10140)."
 sidebar:
   label: "lab_insulation"
@@ -8,7 +8,7 @@ sidebar:
 Laboratory sound insulation of building elements (ISO 10140).
 
 This is the **laboratory** counterpart of the field ISO 16283 family in
-[`phonometry.building.insulation`](/phonometry/reference/api/building/insulation/). In a qualified test facility flanking
+[`phonometry.building.measurement.insulation`](/phonometry/reference/api/building/insulation/). In a qualified test facility flanking
 transmission is suppressed, so the *direct* airborne sound reduction index
 `R` (not the apparent `R'`) is the primary quantity, and the receiving
 room's equivalent absorption area `A` is a property of the known facility.

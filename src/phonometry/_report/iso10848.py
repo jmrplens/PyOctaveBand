@@ -2,21 +2,21 @@
 """ISO 10848 laboratory flanking-transmission fiches (reportlab renderer).
 
 Renders the three results of the laboratory flanking-transmission measurement
-(:mod:`phonometry.building.flanking_transmission`, ISO 10848-1/-2:2006 and
+(:mod:`phonometry.building.measurement.flanking_transmission`, ISO 10848-1/-2:2006 and
 ISO 10848-4:2010) to one-page PDF fiches:
 
-* :class:`~phonometry.building.flanking_transmission.VibrationReductionResult`
+* :class:`~phonometry.building.measurement.flanking_transmission.VibrationReductionResult`
   to a **junction characterization** report of the vibration reduction index
   ``Kij`` (ISO 10848-1:2006): the per-band ``Kij`` beside the ``Kij(f)`` curve,
   the single-number arithmetic-mean ``Kij`` over the Annex A band range and the
   bands bracketed for poor modal overlap (ISO 10848-4:2010 Clause 9), excluded
   from that mean. This report has its own compact layout (a dB junction index
   with a mean, not a shifted-reference insulation curve).
-* :class:`~phonometry.building.flanking_transmission.FlankingLevelDifferenceResult`
+* :class:`~phonometry.building.measurement.flanking_transmission.FlankingLevelDifferenceResult`
   to a **measurement** report of the normalized flanking level difference
   ``Dn,f`` (airborne, ISO 10848-1:2006 Formula (4)), with the ISO 717-1 single
   number ``Dn,f,w (C; Ctr)``.
-* :class:`~phonometry.building.flanking_transmission.FlankingImpactLevelResult`
+* :class:`~phonometry.building.measurement.flanking_transmission.FlankingImpactLevelResult`
   to a **measurement** report of the normalized flanking impact level ``Ln,f``
   (tapping machine, ISO 10848-1:2006 Formula (5)), with the ISO 717-2 single
   number ``Ln,f,w (CI)``.
@@ -65,12 +65,15 @@ from .iso717 import _metadata_pairs
 from .metadata import ReportMetadata
 
 if TYPE_CHECKING:
-    from ..building.flanking_transmission import (
+    from ..building.measurement.flanking_transmission import (
         FlankingImpactLevelResult,
         FlankingLevelDifferenceResult,
         VibrationReductionResult,
     )
-    from ..building.insulation import ImpactRatingResult, WeightedRatingResult
+    from ..building.measurement.insulation import (
+        ImpactRatingResult,
+        WeightedRatingResult,
+    )
 
 #: Designation of each applicable ISO 10848 part. The overall flanking
 #: descriptors ``Dn,f`` / ``Ln,f`` are defined in the Part 1 frame document
@@ -174,7 +177,7 @@ def render_flanking_level_difference_report(
     """Render a normalized flanking level difference ``Dn,f`` fiche (ISO 10848).
 
     :param result: The
-        :class:`~phonometry.building.flanking_transmission.FlankingLevelDifferenceResult`;
+        :class:`~phonometry.building.measurement.flanking_transmission.FlankingLevelDifferenceResult`;
         its ``rating`` (ISO 717-1) carries the per-band data the fiche draws.
     :param path: Destination path of the PDF file.
     :param metadata: Optional :class:`ReportMetadata`; ``None`` produces a
@@ -218,7 +221,7 @@ def render_flanking_impact_level_report(
     """Render a normalized flanking impact level ``Ln,f`` fiche (ISO 10848).
 
     :param result: The
-        :class:`~phonometry.building.flanking_transmission.FlankingImpactLevelResult`;
+        :class:`~phonometry.building.measurement.flanking_transmission.FlankingImpactLevelResult`;
         its ``rating`` (ISO 717-2) carries the per-band data the fiche draws.
     :param path: Destination path of the PDF file.
     :param metadata: Optional :class:`ReportMetadata`; ``None`` produces a
@@ -393,7 +396,7 @@ def render_vibration_reduction_report(
     """Render a vibration reduction index ``Kij`` junction fiche (ISO 10848-1).
 
     :param result: The
-        :class:`~phonometry.building.flanking_transmission.VibrationReductionResult`;
+        :class:`~phonometry.building.measurement.flanking_transmission.VibrationReductionResult`;
         it must carry the band centre frequencies (``result.frequencies``) that
         label the table and drive the single-number band range.
     :param path: Destination path of the PDF file.

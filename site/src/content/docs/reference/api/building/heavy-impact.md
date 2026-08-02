@@ -1,5 +1,5 @@
 ---
-title: "building.heavy_impact"
+title: "building.measurement.heavy_impact"
 description: "Heavy and soft impact sources: rubber ball and bang machine (ISO 16283-2:2020 Annex A, ISO 10140-5:2010 Annex F, JIS A 1418-2:2019, ISO 717-2:2020 Annex D)."
 sidebar:
   label: "heavy_impact"
