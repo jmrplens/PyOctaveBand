@@ -516,6 +516,13 @@ def test_the_migration_table_names_real_aliases() -> None:
         table, re.MULTILINE,
     )
     assert rows, "the migration table is gone from docs/api-reference.md"
+    # One example per split, or a deleted row passes unnoticed: the table was
+    # rebuilt once from a corrupted copy and losing rows is that failure mode.
+    documented = {old.split(".")[1] for old, _, _ in rows}
+    moved_from = {key.split(".")[1] for key in _MOVED_4X}
+    assert moved_from <= documented, (
+        f"no example row for {sorted(moved_from - documented)}"
+    )
     for old, new, removed_in in rows:
         generation = _MOVED_3X if removed_in == "4.0" else _MOVED_4X
         assert old in generation, f"{old} is not a deprecated path of {removed_in}"

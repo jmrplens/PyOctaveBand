@@ -734,7 +734,7 @@ which is the check that enforces the rule; see
   2.pdf`, PDF page 13, printed p. 7, 200 dpi (Tables 4 and 5, one above the other),
   and PDF page 11, printed p. 5, 200 dpi (Table 2).
 - **Library behaviour:** `_TABLE2` in
-  [`absorption_uncertainty.py`](https://github.com/jmrplens/phonometry/blob/main/src/phonometry/materials/absorbers/uncertainty.py)
+  [`uncertainty.py`](https://github.com/jmrplens/phonometry/blob/main/src/phonometry/materials/absorbers/uncertainty.py)
   is keyed by *octave* midband frequency, following Table 2 and the ISO 11654
   definition of $\alpha_p$ rather than the Table 5 header.
 - **Status:** unreported.

@@ -2270,6 +2270,7 @@ warns and delegates as well.
 | `phonometry.hearing.sti` | `phonometry.speech.sti` | 5.0 |
 | `phonometry.vibration.human_vibration` | `phonometry.vibration.human.exposure` | 5.0 |
 | `phonometry.building.spanish_building_code` | `phonometry.building.regulation.spain` | 5.0 |
+| `phonometry.materials.porous_absorber` | `phonometry.materials.absorbers.porous` | 5.0 |
 | `phonometry.environmental` | `phonometry.environment` | 5.0 |
 
 | Name | Type | Description (Inputs) | Usage Snippet (Outputs) |

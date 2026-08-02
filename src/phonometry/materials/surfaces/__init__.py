@@ -1,5 +1,12 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""materials.surfaces family of phonometry: in-situ characterisation of surfaces in place."""
+"""materials.surfaces subdomain of phonometry: surfaces characterised where they are.
+
+The other three families take a specimen: a sample in a tube, a panel in a
+reverberation room, a layer under a load. This one is for a surface that
+cannot be sampled and has to be measured where it lies, which is a discipline
+of its own with its own standards, its own geometry and its own uncertainty.
+ISO 13472 and the road are what it holds today.
+"""
 
 from __future__ import annotations
 

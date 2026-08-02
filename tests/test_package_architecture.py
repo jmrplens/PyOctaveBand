@@ -80,6 +80,47 @@ def _edges() -> set[tuple[str, str, str]]:
     return out
 
 
+#: Family-to-family edges allowed inside a domain. The subgroups exist to
+#: separate audiences, so an import across them is a claim that one audience's
+#: work feeds the other's, and it should be written down rather than noticed.
+ALLOWED_FAMILY_EDGES: set[tuple[str, str, str]] = {
+    # EN 12354 predicts from the ratings the measurement methods define.
+    ("building", "prediction", "measurement"),
+    # A metadiffuser well is a slit absorber: it reuses the porous air state.
+    ("materials", "diffusers", "absorbers"),
+}
+
+
+def _family_edges() -> set[tuple[str, str, str, str]]:
+    """(domain, from_family, to_family, 'file: import') per crossing import."""
+    out: set[tuple[str, str, str, str]] = set()
+    for path in SRC.rglob("*.py"):
+        rel = path.relative_to(SRC).parts
+        if len(rel) < 3 or path.name == "__init__.py":
+            continue
+        domain, family = rel[0], rel[1]
+        tree = ast.parse(path.read_text(encoding="utf-8"))
+        for node in ast.walk(tree):
+            if not isinstance(node, ast.ImportFrom) or node.level != 2:
+                continue
+            target = (node.module or "").split(".")[0]
+            if target and target != family and (SRC / domain / target).is_dir():
+                out.add((domain, family, target, str(path.relative_to(SRC))))
+    return out
+
+
+def test_family_edges_are_whitelisted() -> None:
+    """A subgroup reaching into another one is a decision, not an accident."""
+    violations = [
+        f"{domain}: {frm} -> {to} ({where})"
+        for domain, frm, to, where in _family_edges()
+        if (domain, frm, to) not in ALLOWED_FAMILY_EDGES
+    ]
+    assert not violations, (
+        "unlisted family-to-family imports:\n" + "\n".join(violations)
+    )
+
+
 def test_internal_imports_no_domain_code() -> None:
     for frm, to, where in _edges():
         if frm == "_internal":
@@ -203,3 +244,25 @@ def test_collected_test_modules_have_unique_import_names() -> None:
     counts = collections.Counter(import_name(path) for path in collected)
     duplicates = {name: count for name, count in counts.items() if count > 1}
     assert not duplicates, f"test modules sharing an import name: {duplicates}"
+
+def test_sonar_configuration_names_files_that_exist() -> None:
+    """A path-keyed analyzer exemption is silently lost when the file moves.
+
+    Every entry here was written with a reason next to it: parameter counts
+    that are the physics, and a re-export list that reads as duplication. The
+    taxonomy work moves the files those reasons are attached to, and nothing
+    else notices.
+    """
+    import re
+
+    root = Path(__file__).resolve().parent.parent
+    config = (root / "sonar-project.properties").read_text(encoding="utf-8")
+    keyed = re.findall(r"resourceKey=(\S+)", config)
+    excluded = [
+        path
+        for line in re.findall(r"^sonar\.cpd\.exclusions=(\S+)$", config, re.MULTILINE)
+        for path in line.split(",")
+    ]
+    assert keyed, "no resourceKey entries found; has the file moved?"
+    missing = [path for path in keyed + excluded if not (root / path).exists()]
+    assert not missing, f"sonar-project.properties names missing files: {missing}"

@@ -1,5 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""materials.absorbers family of phonometry: materials that absorb, and the methods that characterise them."""
+"""materials.absorbers subdomain of phonometry: materials that absorb, and the methods that characterise them."""
 
 from __future__ import annotations
 

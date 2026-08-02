@@ -1,11 +1,11 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
 """materials domain of phonometry (see module docstrings).
 
-Four families since 4.0, by what the material does rather than by how it is
-measured: :mod:`~phonometry.materials.absorbers`,
-:mod:`~phonometry.materials.diffusers`,
-:mod:`~phonometry.materials.surfaces` for what is characterised in place, and
-:mod:`~phonometry.materials.resilient` for the layers that isolate. The test
+Four families since 4.0, by what the material does:
+:mod:`~phonometry.materials.absorbers`, :mod:`~phonometry.materials.diffusers`
+and :mod:`~phonometry.materials.resilient` for the layers that isolate, plus
+:mod:`~phonometry.materials.surfaces` for the surfaces that cannot be sampled
+and have to be characterised where they lie. The test
 method lives with the family it characterises, so ISO 354, ISO 10534-2 and
 ISO 9053 sit with the absorbers and ISO 17497 with the diffusers, which is how
 Cox and D'Antonio organise the same material and how the reader thinks: "I

@@ -1034,6 +1034,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
   Nothing moves in the namespace: `from phonometry import building` exports
   the same 251 names, and the nineteen pre-split module paths keep working
+  until 5.0.
+
 - `phonometry.materials` has four families, by what the material does rather
   than by how it is measured. `materials.absorbers` holds everything that
   absorbs and the methods that characterise it: ISO 354 in the reverberation
@@ -1060,7 +1062,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
   Nothing moves in the namespace: `from phonometry import materials` exports
   the same 186 names, and the thirteen pre-split module paths keep working
-  until 5.0.
+  until 5.0. Three test files keep their old basenames: `test_rating.py`,
+  `test_design.py` and `test_uncertainty.py` are already taken elsewhere in
+  the suite, and pytest imports a test module outside a package by its
+  basename.
 
 - `phonometry.environmental` is `phonometry.environment`, with three
   subgroups that follow how an environmental study is written: what the source

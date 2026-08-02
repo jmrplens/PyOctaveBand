@@ -70,7 +70,7 @@ of a 5.6 cm layer sits at 860 Hz (printed p. 129). The third of those is
 reproduced by :math:`\operatorname{Re}(\mu_b)`: the printed sentence calls it
 a modulus, but :math:`\lvert \mu_b \rvert` is 0.939 at 1500 Hz against the
 printed 0.82, and ``docs/ERRATA.md`` records why. See
-``tests/materials/test_biot.py``.
+``tests/materials/absorbers/test_biot.py``.
 """
 
 from __future__ import annotations

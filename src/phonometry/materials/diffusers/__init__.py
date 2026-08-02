@@ -1,5 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""materials.diffusers family of phonometry: surfaces that scatter, and the methods that characterise them."""
+"""materials.diffusers subdomain of phonometry: surfaces that scatter, and the methods that characterise them."""
 
 from __future__ import annotations
 

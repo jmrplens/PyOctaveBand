@@ -1,5 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""materials.resilient family of phonometry: resilient layers under floating floors and linings."""
+"""materials.resilient subdomain of phonometry: resilient layers under floating floors and linings."""
 
 from __future__ import annotations
 
