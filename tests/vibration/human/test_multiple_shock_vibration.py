@@ -21,7 +21,7 @@ from reference_data import (
 )
 from scipy.signal import freqz
 
-from phonometry.vibration import multiple_shock_vibration as v
+from phonometry.vibration.human import multiple_shock as v
 
 # ---------------------------------------------------------------------------
 # Clause 5.2 - seat-to-spine transfer function.

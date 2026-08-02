@@ -114,7 +114,7 @@ area cancels and only the tie density `n` enters.
 | `frequency` | Frequencies `f`, in hertz (array, > 0). |
 | `mass1` | Surface density `rho_s1` of the excited leaf, in kg/m^2 (> 0). |
 | `mass2` | Surface density `rho_s2` of the receiving leaf, in kg/m^2 (> 0). |
-| `bending_stiffness1` | Bending stiffness per unit width `B'` of leaf 1, in N.m (> 0); see [`phonometry.vibration.point_mobility.plate_bending_stiffness`](/phonometry/reference/api/vibration/point-mobility/#plate_bending_stiffness). |
+| `bending_stiffness1` | Bending stiffness per unit width `B'` of leaf 1, in N.m (> 0); see [`phonometry.vibration.structural.point_mobility.plate_bending_stiffness`](/phonometry/reference/api/vibration/point-mobility/#plate_bending_stiffness). |
 | `bending_stiffness2` | Bending stiffness per unit width of leaf 2, in N.m. |
 | `ties_per_area` | Number of ties per unit area `n`, in 1/m^2 (> 0). |
 | `tie` | A name from [`WALL_TIE_STIFFNESS`](/phonometry/reference/api/building/masonry-cavity-wall/#wall_tie_stiffness), an explicit dynamic stiffness `k` in N/m, or `None` for a rigid connection ($Y_c = 0$, the screw/nail/bolt limit). |

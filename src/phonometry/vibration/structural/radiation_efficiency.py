@@ -69,7 +69,7 @@ from typing import TYPE_CHECKING, Any
 import numpy as np
 from numpy.typing import ArrayLike, NDArray
 
-from .._internal.validation import require_choice, require_positive
+from ..._internal.validation import require_choice, require_positive
 
 if TYPE_CHECKING:
     from matplotlib.axes import Axes
@@ -102,7 +102,7 @@ def coincidence_frequency(
 
     :param mass_per_area: Mass per unit area ``m''``, in kg/m^2.
     :param bending_stiffness: Bending stiffness per unit width ``B'``, in N.m
-        (see :func:`phonometry.vibration.point_mobility.plate_bending_stiffness`).
+        (see :func:`phonometry.vibration.structural.point_mobility.plate_bending_stiffness`).
     :param speed_of_sound: Speed of sound in air ``c0`` (Default: 343 m/s).
     :return: The coincidence frequency ``fc``, in hertz.
     :raises ValueError: for a non-positive input.
@@ -146,8 +146,8 @@ class RadiationEfficiencyResult:
         Requires matplotlib (``pip install phonometry[plot]``); returns the
         :class:`~matplotlib.axes.Axes`.
         """
-        from .._i18n import check_language
-        from .._plot.vibration import plot_radiation_efficiency
+        from ..._i18n import check_language
+        from ..._plot.vibration import plot_radiation_efficiency
 
         return plot_radiation_efficiency(self, ax=ax, language=check_language(language), **kwargs)
 
@@ -159,8 +159,8 @@ class RadiationEfficiencyResult:
         Requires matplotlib (``pip install phonometry[plot]``); returns the
         :class:`~matplotlib.axes.Axes`.
         """
-        from .._i18n import check_language
-        from .._plot.geometry import plot_radiation_result_geometry
+        from ..._i18n import check_language
+        from ..._plot.geometry import plot_radiation_result_geometry
 
         check_language(language)
         return plot_radiation_result_geometry(self, ax=ax, language=language, **kwargs)

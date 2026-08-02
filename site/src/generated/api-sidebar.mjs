@@ -161,10 +161,10 @@ export const apiSidebar = {
         'reference/api/vibration/radiation-efficiency',
         'reference/api/vibration/junction-transmission',
         'reference/api/vibration/experimental-sea',
-        'reference/api/vibration/machine-diagnostics',
+        'reference/api/vibration/diagnostics',
         'reference/api/vibration/transfer-stiffness',
-        'reference/api/vibration/human-vibration',
-        'reference/api/vibration/multiple-shock-vibration',
+        'reference/api/vibration/exposure',
+        'reference/api/vibration/multiple-shock',
       ],
     },
     {

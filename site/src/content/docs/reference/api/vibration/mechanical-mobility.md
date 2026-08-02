@@ -1,5 +1,5 @@
 ---
-title: "vibration.mechanical_mobility"
+title: "vibration.structural.mechanical_mobility"
 description: "Mechanical mobility and the frequency-response-function family (ISO 7626-1:2011)."
 sidebar:
   label: "mechanical_mobility"

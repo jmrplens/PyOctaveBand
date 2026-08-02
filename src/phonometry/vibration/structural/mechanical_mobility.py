@@ -79,11 +79,11 @@ import numpy as np
 if TYPE_CHECKING:
     from matplotlib.axes import Axes
 
-    from .._report.metadata import ReportMetadata
+    from ..._report.metadata import ReportMetadata
 
 from numpy.typing import ArrayLike, NDArray
 
-from .._internal.validation import require_non_negative, require_positive
+from ..._internal.validation import require_non_negative, require_positive
 
 # ---------------------------------------------------------------------------
 # FRF taxonomy (ISO 7626-1 Table 1).
@@ -310,8 +310,8 @@ class RigidMassCalibrationResult:
 
         Requires matplotlib (``pip install phonometry[plot]``).
         """
-        from .._i18n import check_language
-        from .._plot.vibration import plot_rigid_mass_calibration
+        from ..._i18n import check_language
+        from ..._plot.vibration import plot_rigid_mass_calibration
 
         return plot_rigid_mass_calibration(
             self, ax=ax, language=check_language(language), **kwargs
@@ -451,8 +451,8 @@ class MobilityResult:
         Requires matplotlib (``pip install phonometry[plot]``); returns the
         :class:`~matplotlib.axes.Axes`.
         """
-        from .._i18n import check_language
-        from .._plot.vibration import plot_mobility
+        from ..._i18n import check_language
+        from ..._plot.vibration import plot_mobility
 
         return plot_mobility(self, ax=ax, language=check_language(language), **kwargs)
 
@@ -497,14 +497,14 @@ class MobilityResult:
             fiche always embeds the mobility spectrum, so both are required
             (``pip install "phonometry[report,plot]"``).
         """
-        from .._i18n import check_language
+        from ..._i18n import check_language
 
         check_language(language)
         if engine != "reportlab":
             raise ValueError(
                 f"Unknown report engine {engine!r}; only 'reportlab' is supported."
             )
-        from .._report.iso7626 import render_mobility_report
+        from ..._report.iso7626 import render_mobility_report
 
         return render_mobility_report(
             self, path, metadata=metadata, verbose=verbose, language=language

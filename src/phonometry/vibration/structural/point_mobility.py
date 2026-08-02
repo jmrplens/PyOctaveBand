@@ -61,7 +61,7 @@ from __future__ import annotations
 import numpy as np
 from numpy.typing import ArrayLike, NDArray
 
-from .._internal.validation import require_positive
+from ..._internal.validation import require_positive
 from .mechanical_mobility import MobilityResult
 
 __all__ = [
@@ -94,7 +94,7 @@ def plate_bending_stiffness(
 
     :math:`B' = E h^3 / (12 (1 - \nu^2))`, the plate bending stiffness ``B'``
     in N.m used throughout this module and by the coincidence frequency of
-    :func:`phonometry.vibration.radiation_efficiency.coincidence_frequency`.
+    :func:`phonometry.vibration.structural.radiation_efficiency.coincidence_frequency`.
 
     :param youngs_modulus: Young's modulus ``E`` of the plate material, in Pa.
     :param thickness: Plate thickness ``h``, in m.

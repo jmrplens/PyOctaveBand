@@ -59,8 +59,8 @@ if TYPE_CHECKING:
     from ..room.image_source import ImageSourceResult
     from ..room.open_plan import OpenPlanResult
     from ..simulation.fdtd import FDTD2D
-    from ..vibration.junction_transmission import JunctionTransmissionResult
-    from ..vibration.radiation_efficiency import RadiationEfficiencyResult
+    from ..vibration.structural.junction_transmission import JunctionTransmissionResult
+    from ..vibration.structural.radiation_efficiency import RadiationEfficiencyResult
 
 #: The ``ReactiveSilencerResult.kind`` strings, shared with the dispatcher.
 _KIND_EXPANSION = "expansion chamber"
@@ -2622,7 +2622,7 @@ def plot_junction_geometry(
     Plate 1 runs horizontally; the perpendicular plate(s) of thickness 2
     form the L, T or X. The incident bending wave arrives on plate 1 and
     the junction type follows
-    :func:`~phonometry.vibration.junction_transmission`.
+    :func:`~phonometry.vibration.structural.junction_transmission`.
 
     :param junction: ``"L"``, ``"T1"``, ``"T2"`` or ``"X"``.
     :param thickness1: Plate 1 thickness, in metres.

@@ -66,14 +66,14 @@ from typing import TYPE_CHECKING, Any, Literal
 
 import numpy as np
 
-from .._internal.types import as_float_or_array
-from .._internal.validation import require_1d_signal, require_choice, require_positive
-from ..hearing.threshold import SEXES as _SEXES
+from ..._internal.types import as_float_or_array
+from ..._internal.validation import require_1d_signal, require_choice, require_positive
+from ...hearing.threshold import SEXES as _SEXES
 
 if TYPE_CHECKING:
     from matplotlib.axes import Axes
 
-    from .._report.metadata import ReportMetadata
+    from ..._report.metadata import ReportMetadata
 
 from numpy.typing import ArrayLike
 
@@ -433,8 +433,8 @@ class MultipleShockResult:
         Requires matplotlib (``pip install phonometry[plot]``); returns the
         :class:`~matplotlib.axes.Axes`.
         """
-        from .._i18n import check_language
-        from .._plot.vibration import plot_multiple_shock
+        from ..._i18n import check_language
+        from ..._plot.vibration import plot_multiple_shock
 
         return plot_multiple_shock(self, ax=ax, language=check_language(language), **kwargs)
 
@@ -490,14 +490,14 @@ class MultipleShockResult:
             fiche always embeds the injury-probability chart, so both are
             required (``pip install "phonometry[report,plot]"``).
         """
-        from .._i18n import check_language
+        from ..._i18n import check_language
 
         check_language(language)
         if engine != "reportlab":
             raise ValueError(
                 f"Unknown report engine {engine!r}; only 'reportlab' is supported."
             )
-        from .._report.iso2631_5 import render_iso2631_5_report
+        from ..._report.iso2631_5 import render_iso2631_5_report
 
         return render_iso2631_5_report(
             self, path, metadata=metadata, verbose=verbose, language=language

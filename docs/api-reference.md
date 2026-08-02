@@ -34,7 +34,7 @@ contour = aircraft.noise_contour(path, powers, distances, sel, lmax, x=gx, y=gy)
 | `phonometry.room` | Room acoustics (ISO 3382), impulse responses, open-plan, room-noise criteria, reverberation prediction, EN 12354-6 |
 | `phonometry.materials` | Absorption (ISO 354/11654), impedance tube, airflow resistance, scattering/diffusion, road absorption, dynamic stiffness |
 | `phonometry.building` | Sound insulation measurement and prediction (EN 12354, ISO 717/16283/10140/15186/10052/10848), structure-borne sound |
-| `phonometry.vibration` | Human vibration (ISO 2631/5349/8041), multiple shocks, mobility (ISO 7626), transfer stiffness (ISO 10846) |
+| `phonometry.vibration` | Three families: `structural` (mobility ISO 7626, plate junctions, radiation, experimental SEA, transfer stiffness ISO 10846), `human` (ISO 2631/5349/8041 exposure and multiple shocks) and `machinery` (fault frequencies and condition monitoring) |
 | `phonometry.environmental` | Rating levels, ISO 1996-2 measurement, outdoor propagation (ISO 9613), atmospheric refraction (ray tracing and the parabolic equation), wind-turbine noise, impulsive prominence |
 | `phonometry.aircraft` | EPNL (ICAO Annex 16), SAE ARP 5534 absorption, airport contours (ECAC Doc 29), rotorcraft (ECAC Doc 32) |
 | `phonometry.underwater` | ISO 18405/17208/18406 levels, propagation and Weston regimes, sound speed, sonar equation and detection range, seabed, ambient and ship-traffic noise, marine-mammal audiograms and regulatory auditory weighting, numerical solvers |
@@ -47,7 +47,7 @@ Every name in the table below is also re-exported at the top level, so
 `from phonometry import <name>` works for every row. Two generations of module
 paths are still importable and warn on use: the pre-3.2 flat ones (for example
 `phonometry.insulation`), removed in 4.0, and the pre-4.0 ones that the split
-of `metrology` moved (for example `phonometry.metrology.levels`, now
+of `metrology` moved (for example `phonometry.signals.levels`, now
 `phonometry.signals.levels`), removed in 5.0. Reading a moved name from the
 namespace it left (`metrology.leq`) warns and delegates as well.
 

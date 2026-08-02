@@ -10674,7 +10674,7 @@ def generate_multiple_shock(output_dir: str) -> None:
         injury_risk,
         seat_to_spine_transfer,
     )
-    from phonometry.vibration.multiple_shock_vibration import (
+    from phonometry.vibration.human.multiple_shock import (
         MZ_MALE,
         RISK_THRESHOLDS_MALE,
     )
@@ -12406,7 +12406,7 @@ def generate_experimental_sea_clf(output_dir: str) -> None:
         power_injection_clf,
         right_angle_transmission_coefficient,
     )
-    from phonometry.vibration.point_mobility import plate_bending_wave_speed
+    from phonometry.vibration.structural.point_mobility import plate_bending_wave_speed
 
     rho, nu, young = 2700.0, 0.33, 7.1e10
     c_l = math.sqrt(young / (rho * (1.0 - nu**2)))

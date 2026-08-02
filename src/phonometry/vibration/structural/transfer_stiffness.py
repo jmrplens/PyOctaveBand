@@ -64,12 +64,12 @@ import numpy as np
 if TYPE_CHECKING:
     from matplotlib.axes import Axes
 
-    from .._report.metadata import ReportMetadata
+    from ..._report.metadata import ReportMetadata
 
 from numpy.typing import ArrayLike, NDArray
 
-from .._internal.validation import require_non_negative, require_positive
-from .._internal.warnings import PhonometryWarning
+from ..._internal.validation import require_non_negative, require_positive
+from ..._internal.warnings import PhonometryWarning
 from .mechanical_mobility import convert_frf
 
 #: Reference dynamic stiffness for the level ``L_k`` (ISO 10846-2/-3, 3.17), N/m.
@@ -346,8 +346,8 @@ class TransferStiffnessResult:
         Requires matplotlib (``pip install phonometry[plot]``); returns the
         :class:`~matplotlib.axes.Axes`.
         """
-        from .._i18n import check_language
-        from .._plot.vibration import plot_transfer_stiffness
+        from ..._i18n import check_language
+        from ..._plot.vibration import plot_transfer_stiffness
 
         return plot_transfer_stiffness(self, ax=ax, language=check_language(language), **kwargs)
 
@@ -397,14 +397,14 @@ class TransferStiffnessResult:
             fiche always embeds the ``L_k(f)`` spectrum, so both are required
             (``pip install "phonometry[report,plot]"``).
         """
-        from .._i18n import check_language
+        from ..._i18n import check_language
 
         check_language(language)
         if engine != "reportlab":
             raise ValueError(
                 f"Unknown report engine {engine!r}; only 'reportlab' is supported."
             )
-        from .._report.iso10846 import render_transfer_stiffness_report
+        from ..._report.iso10846 import render_transfer_stiffness_report
 
         return render_transfer_stiffness_report(
             self, path, metadata=metadata, verbose=verbose, language=language

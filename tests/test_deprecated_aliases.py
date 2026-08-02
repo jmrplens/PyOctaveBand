@@ -422,6 +422,15 @@ _PRE_SPLIT_MODULE_PATHS = [
     "phonometry.metrology.spectra",
     "phonometry.metrology.synchronous_average",
     "phonometry.metrology.time_frequency",
+    "phonometry.vibration.experimental_sea",
+    "phonometry.vibration.human_vibration",
+    "phonometry.vibration.junction_transmission",
+    "phonometry.vibration.machine_diagnostics",
+    "phonometry.vibration.mechanical_mobility",
+    "phonometry.vibration.multiple_shock_vibration",
+    "phonometry.vibration.point_mobility",
+    "phonometry.vibration.radiation_efficiency",
+    "phonometry.vibration.transfer_stiffness",
 ]
 
 

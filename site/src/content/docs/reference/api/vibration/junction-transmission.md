@@ -1,5 +1,5 @@
 ---
-title: "vibration.junction_transmission"
+title: "vibration.structural.junction_transmission"
 description: "Bending-wave transmission coefficients for rigid plate junctions (Hopkins 2007, Sound Insulation, Section 5.2.1.3; Cremer et al. 1973; Craik 1981, 1996)."
 sidebar:
   label: "junction_transmission"
@@ -130,7 +130,7 @@ i.e. $\bar{\tau}_{12} = \chi \bar{\tau}_{21}$.
 **Two shortcuts for right-angle joints (Norton & Karczub 2003, Section
 6.6.1).** Alongside the angle-resolved wave approach above, the SEA literature
 uses a pair of closed forms that need no integration, which is what the
-experimental SEA of [`phonometry.vibration.experimental_sea`](/phonometry/reference/api/vibration/experimental-sea/) is normally
+experimental SEA of [`phonometry.vibration.structural.experimental_sea`](/phonometry/reference/api/vibration/experimental-sea/) is normally
 compared against:
 
 * [`right_angle_transmission_coefficient`](/phonometry/reference/api/vibration/junction-transmission/#right_angle_transmission_coefficient) (Norton Eqs. 6.53 to 6.55, after
@@ -241,7 +241,7 @@ source-plate bending-wave group velocity `cg_i`, the junction length
 | Name | Description |
 | :--- | :--- |
 | `transmission_coefficient` | Angular-average `tau_ij` (scalar/array). |
-| `group_velocity` | Source-plate bending-wave group velocity `cg_i`, in m/s (> 0). For a thin plate $c_g = 2 c_B$ with the bending phase speed `cB` (see [`phonometry.vibration.point_mobility.plate_bending_wave_speed`](/phonometry/reference/api/vibration/point-mobility/)). |
+| `group_velocity` | Source-plate bending-wave group velocity `cg_i`, in m/s (> 0). For a thin plate $c_g = 2 c_B$ with the bending phase speed `cB` (see [`phonometry.vibration.structural.point_mobility.plate_bending_wave_speed`](/phonometry/reference/api/vibration/point-mobility/)). |
 | `junction_length` | Junction length `L_ij`, in m (> 0). |
 | `frequency` | Frequency `f`, in hertz (scalar or array, > 0). |
 | `plate_area` | Source-plate area `S_i`, in m^2 (> 0). |

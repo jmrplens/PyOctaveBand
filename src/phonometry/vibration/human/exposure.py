@@ -62,13 +62,13 @@ import numpy as np
 from numpy.typing import ArrayLike, NDArray
 from scipy import signal as sig
 
-from .._internal.types import Real
-from .._internal.warnings import PhonometryWarning
+from ..._internal.types import Real
+from ..._internal.warnings import PhonometryWarning
 
 if TYPE_CHECKING:  # pragma: no cover - typing only
     from matplotlib.axes import Axes
 
-    from .._report.metadata import ReportMetadata
+    from ..._report.metadata import ReportMetadata
 
 Complex = NDArray[np.complex128]
 
@@ -289,8 +289,8 @@ class WeightingResponse:
         Requires matplotlib (``pip install phonometry[plot]``); returns the
         :class:`~matplotlib.axes.Axes` and never calls ``plt.show``.
         """
-        from .._i18n import check_language
-        from .._plot.vibration import plot_vibration_weighting
+        from ..._i18n import check_language
+        from ..._plot.vibration import plot_vibration_weighting
 
         return plot_vibration_weighting(self, ax=ax, language=check_language(language), **kwargs)
 
@@ -391,8 +391,8 @@ class WeightedSpectrum:
         Requires matplotlib (``pip install phonometry[plot]``); returns the
         :class:`~matplotlib.axes.Axes` and never calls ``plt.show``.
         """
-        from .._i18n import check_language
-        from .._plot.vibration import plot_weighted_spectrum
+        from ..._i18n import check_language
+        from ..._plot.vibration import plot_weighted_spectrum
 
         return plot_weighted_spectrum(self, ax=ax, language=check_language(language), **kwargs)
 
@@ -864,8 +864,8 @@ class DailyVibrationExposure:
         Requires matplotlib (``pip install phonometry[plot]``); returns the
         :class:`~matplotlib.axes.Axes` and never calls ``plt.show``.
         """
-        from .._i18n import check_language
-        from .._plot.vibration import plot_daily_exposure
+        from ..._i18n import check_language
+        from ..._plot.vibration import plot_daily_exposure
 
         return plot_daily_exposure(self, ax=ax, language=check_language(language), **kwargs)
 
@@ -915,14 +915,14 @@ class DailyVibrationExposure:
             fiche always embeds the contribution chart, so both are required
             (``pip install "phonometry[report,plot]"``).
         """
-        from .._i18n import check_language
+        from ..._i18n import check_language
 
         check_language(language)
         if engine != "reportlab":
             raise ValueError(
                 f"Unknown report engine {engine!r}; only 'reportlab' is supported."
             )
-        from .._report.human_vibration import render_human_vibration_report
+        from ..._report.human_vibration import render_human_vibration_report
 
         return render_human_vibration_report(
             self, path, metadata=metadata, verbose=verbose, language=language

@@ -6,9 +6,9 @@ energies (Norton & Karczub Ch. 6).
 Statistical energy analysis (SEA) has two routes to the coupling loss factor
 ``eta_ij``. The **predictive** route derives it from a wave transmission
 coefficient at the junction, which is what
-:func:`~phonometry.vibration.junction_transmission.coupling_loss_factor` does
+:func:`~phonometry.vibration.structural.junction_transmission.coupling_loss_factor` does
 with the closed-form coefficients of
-:func:`~phonometry.vibration.junction_transmission.junction_transmission`. The
+:func:`~phonometry.vibration.structural.junction_transmission.junction_transmission`. The
 **experimental** route, implemented here, inverts the steady-state power
 balance from *measured* subsystem energies: it needs no model of the junction
 at all, and it is the only route open for real joints (welds, bolt rows,
@@ -81,7 +81,7 @@ from typing import TYPE_CHECKING, Any
 import numpy as np
 from numpy.typing import ArrayLike, NDArray
 
-from .._internal.validation import (
+from ..._internal.validation import (
     require_choice,
     require_positive,
     require_positive_array,
@@ -380,8 +380,8 @@ class PowerInjectionResult:
         :param language: Label language, ``"en"`` (default) or ``"es"``.
         :param kwargs: Forwarded to the ``eta_12`` curve.
         """
-        from .._i18n import check_language
-        from .._plot.vibration import plot_power_injection
+        from ..._i18n import check_language
+        from ..._plot.vibration import plot_power_injection
 
         check_language(language)
         return plot_power_injection(self, ax=ax, language=language, **kwargs)

@@ -1,22 +1,20 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""vibration domain of phonometry (see module docstrings)."""
+"""vibration domain of phonometry (see module docstrings).
+
+Three families since 4.0, by who reads them: :mod:`~phonometry.vibration.structural`
+is the structural acoustics that feeds building prediction (mobility, junctions,
+radiation, SEA), :mod:`~phonometry.vibration.human` is exposure of people
+(ISO 2631, ISO 5349) and :mod:`~phonometry.vibration.machinery` is condition
+monitoring. Every public name is still exported here, so
+``from phonometry import vibration`` reads exactly as it did.
+"""
 
 from __future__ import annotations
 
 from .._plot.geometry import (
     plot_plate_geometry,
 )
-from .experimental_sea import (
-    PowerInjectionResult,
-    bar_modal_density,
-    beam_modal_density,
-    cylindrical_shell_modal_density,
-    flat_plate_modal_density,
-    power_injection_clf,
-    power_injection_matrix,
-    ring_frequency,
-)
-from .human_vibration import (
+from .human import (
     HAV_EAV_A8,
     HAV_ELV_A8,
     REFERENCE_ACCELERATION,
@@ -29,42 +27,43 @@ from .human_vibration import (
     DailyVibrationExposure,
     ExposureAssessment,
     HumanVibrationWarning,
+    MultipleShockResult,
     WeightedSpectrum,
     WeightingResponse,
+    acceleration_dose,
     apply_weighting,
     combine_partial_exposures,
+    compression_dose,
     crest_factor,
+    daily_dose,
+    daily_dose_multi,
     daily_exposure,
     daily_vibration_exposure,
+    dose_from_peaks,
     energy_equivalent_acceleration,
     exposure_assessment,
     frequency_weighting,
     hav_daily_exposure,
     hav_vwf_lifetime_years,
+    injury_probability,
+    injury_risk,
     motion_sickness_dose_value,
     mtvv,
+    multiple_shock_assessment,
     partial_exposure,
+    response_peaks,
     running_rms,
+    seat_to_spine_transfer,
+    spinal_response,
+    static_stress,
+    ultimate_strength,
     vibration_dose_value,
     vibration_total_value,
     wbv_exposure_basis,
     weighted_acceleration,
     weighting_factors,
 )
-from .junction_transmission import (
-    JunctionTransmissionResult,
-    angular_average_transmission_coefficient,
-    corner_transmission_coefficient,
-    coupling_loss_factor,
-    inline_transmission_coefficient,
-    junction_transmission,
-    junction_wave_parameters,
-    point_connection_coupling_loss_factor,
-    right_angle_transmission_coefficient,
-    straight_transmission_coefficient,
-    wave_vibration_reduction_index,
-)
-from .machine_diagnostics import (
+from .machinery import (
     FaultFrequencyResult,
     FaultLine,
     bearing_fault_frequencies,
@@ -74,37 +73,29 @@ from .machine_diagnostics import (
     induction_motor_frequencies,
     shaft_rate,
 )
-from .mechanical_mobility import (
+from .structural import (
     FRF_UNITS,
+    REFERENCE_STIFFNESS,
+    TRANSMISSIBILITY_LIMIT,
+    JunctionTransmissionResult,
     MobilityResult,
+    PowerInjectionResult,
+    RadiationEfficiencyResult,
     RigidMassCalibrationResult,
-    convert_frf,
-    random_error_percent,
-    resonance_frequency,
-    rigid_mass_calibration_check,
-    sdof_accelerance,
-    sdof_mobility,
-    sdof_mobility_result,
-    sdof_receptance,
-)
-from .multiple_shock_vibration import (
-    MultipleShockResult,
-    acceleration_dose,
-    compression_dose,
-    daily_dose,
-    daily_dose_multi,
-    dose_from_peaks,
-    injury_probability,
-    injury_risk,
-    multiple_shock_assessment,
-    response_peaks,
-    seat_to_spine_transfer,
-    spinal_response,
-    static_stress,
-    ultimate_strength,
-)
-from .point_mobility import (
+    TransferStiffnessResult,
+    angular_average_transmission_coefficient,
+    bar_modal_density,
+    base_transmissibility,
     beam_bending_wave_speed,
+    beam_modal_density,
+    blocking_force_ratio,
+    coincidence_frequency,
+    convert_frf,
+    corner_transmission_coefficient,
+    coupling_loss_factor,
+    cylindrical_shell_modal_density,
+    flat_plate_modal_density,
+    indirect_transfer_stiffness_result,
     infinite_beam_impedance,
     infinite_beam_mobility,
     infinite_beam_moment_mobility,
@@ -113,27 +104,32 @@ from .point_mobility import (
     infinite_plate_mobility,
     infinite_plate_point_mobility,
     injected_power,
+    inline_transmission_coefficient,
+    junction_transmission,
+    junction_wave_parameters,
     longitudinal_rod_impedance,
     longitudinal_rod_mobility,
+    loss_factor,
     plate_bending_stiffness,
     plate_bending_wave_speed,
-)
-from .radiation_efficiency import (
-    RadiationEfficiencyResult,
-    coincidence_frequency,
+    point_connection_coupling_loss_factor,
+    power_injection_clf,
+    power_injection_matrix,
     radiation_efficiency,
-)
-from .transfer_stiffness import (
-    REFERENCE_STIFFNESS,
-    TRANSMISSIBILITY_LIMIT,
-    TransferStiffnessResult,
-    base_transmissibility,
-    blocking_force_ratio,
-    indirect_transfer_stiffness_result,
-    loss_factor,
+    random_error_percent,
+    resonance_frequency,
+    right_angle_transmission_coefficient,
+    rigid_mass_calibration_check,
+    ring_frequency,
+    sdof_accelerance,
+    sdof_mobility,
+    sdof_mobility_result,
+    sdof_receptance,
+    straight_transmission_coefficient,
     transfer_stiffness_direct,
     transfer_stiffness_indirect,
     transfer_stiffness_level,
+    wave_vibration_reduction_index,
 )
 
 __all__ = [

@@ -1,5 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""Tests for :mod:`phonometry.vibration.human_vibration`.
+"""Tests for :mod:`phonometry.vibration.human.exposure`.
 
 The frequency weightings are validated against the ISO 8041-1:2017 Annex B
 design-goal factors (Tables B.1-B.9) and the Table 1 reference-frequency
@@ -21,7 +21,7 @@ from reference_data import (
     ISO8041_1_TABLE5_TOLERANCES,
 )
 
-from phonometry.vibration import human_vibration as hv
+from phonometry.vibration.human import exposure as hv
 
 
 def _fc(n: int) -> float:

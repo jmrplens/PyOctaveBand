@@ -21,7 +21,7 @@ import pytest
 
 from phonometry import ReportMetadata
 from phonometry.vibration import sdof_mobility_result
-from phonometry.vibration.mechanical_mobility import MobilityResult
+from phonometry.vibration.structural.mechanical_mobility import MobilityResult
 
 _PDF_MAGIC = b"%PDF"
 

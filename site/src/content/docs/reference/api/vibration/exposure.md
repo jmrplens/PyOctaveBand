@@ -1,8 +1,8 @@
 ---
-title: "vibration.human_vibration"
+title: "vibration.human.exposure"
 description: "Human exposure to whole-body and hand-transmitted vibration."
 sidebar:
-  label: "human_vibration"
+  label: "exposure"
 ---
 
 Human exposure to whole-body and hand-transmitted vibration.
@@ -47,12 +47,12 @@ standards' own analog definitions, clean-room:
   ISO 5349-1 vector total `a_hv` (Annex, Part A, point 1); the whole-body
   `A(8)` is based on the *highest* of the frequency-weighted axis values
   $1.4 a_{wx}$, $1.4 a_{wy}$, $a_{wz}$ (Annex, Part B,
-  point 1; see [`wbv_exposure_basis`](/phonometry/reference/api/vibration/human-vibration/#wbv_exposure_basis)), not on the ISO 2631-1 Eq. (10)
+  point 1; see [`wbv_exposure_basis`](/phonometry/reference/api/vibration/exposure/#wbv_exposure_basis)), not on the ISO 2631-1 Eq. (10)
   vector total.
 
 The band (spectrum) method and the exposure arithmetic carry the standards'
 worked-example oracles; the time-domain metrics operate on a weighted
-acceleration signal, which [`apply_weighting`](/phonometry/reference/api/vibration/human-vibration/#apply_weighting) produces from a raw record
+acceleration signal, which [`apply_weighting`](/phonometry/reference/api/vibration/exposure/#apply_weighting) produces from a raw record
 by applying the exact analog response of ISO 8041-1 in the frequency domain.
 
 > Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
@@ -65,7 +65,7 @@ apply_weighting(signal: ArrayLike, fs: float, name: str) -> Real
 
 Apply frequency weighting `name` to a time signal (ISO 8041-1).
 
-The exact analog response [`frequency_weighting`](/phonometry/reference/api/vibration/human-vibration/#frequency_weighting) is applied in the
+The exact analog response [`frequency_weighting`](/phonometry/reference/api/vibration/exposure/#frequency_weighting) is applied in the
 frequency domain (real FFT), so the weighted signal reproduces both the
 magnitude and phase of the standard's cascade without bilinear warping.
 The multiplication is circular, so the record wraps at its ends; apply it
@@ -78,7 +78,7 @@ negligible, as for any block frequency-domain filtering.
 | :--- | :--- |
 | `signal` | Unweighted acceleration time history (1-D), in m/s2. |
 | `fs` | Sampling frequency, in hertz (> 0). |
-| `name` | Weighting name (one of [`WEIGHTING_NAMES`](/phonometry/reference/api/vibration/human-vibration/#weighting_names)). |
+| `name` | Weighting name (one of [`WEIGHTING_NAMES`](/phonometry/reference/api/vibration/exposure/#weighting_names)). |
 
 **Returns:** The frequency-weighted acceleration signal, same length as input.
 
@@ -124,7 +124,7 @@ The modulus of the ratio of the peak weighted acceleration to its r.m.s.
 value.  ISO 2631-1 6.2.2 deems the basic (r.m.s.) method adequate for a
 crest factor up to 9.
 
-Emits a [`HumanVibrationWarning`](/phonometry/reference/api/vibration/human-vibration/#humanvibrationwarning) when the crest factor exceeds 9,
+Emits a [`HumanVibrationWarning`](/phonometry/reference/api/vibration/exposure/#humanvibrationwarning) when the crest factor exceeds 9,
 the threshold above which ISO 2631-1 6.2.2 deems the basic method
 inadequate.
 
@@ -147,7 +147,7 @@ Daily exposure `A(8)` for one operation (ISO 5349-1 Eq. (2)).
 $A(8) = a_{hv} \sqrt{T / T_0}$ with $T_0 = 8$ h.  The
 identical form gives the whole-body `A(8)` of Directive 2002/44/EC,
 whose magnitude is the Annex Part B dominant-axis value (see
-[`wbv_exposure_basis`](/phonometry/reference/api/vibration/human-vibration/#wbv_exposure_basis)) rather than a vector total.
+[`wbv_exposure_basis`](/phonometry/reference/api/vibration/exposure/#wbv_exposure_basis)) rather than a vector total.
 
 **Parameters**
 
@@ -186,19 +186,19 @@ The Directive fixes the per-operation magnitude each kind must be fed
 with (Annex, points 1): for `kind="hav"` the ISO 5349-1 Eq. (1) vector
 total `a_hv` (Part A); for `kind="wbv"` the *highest* frequency-
 weighted axis value `max(1,4*a_wx, 1,4*a_wy, a_wz)` that
-[`wbv_exposure_basis`](/phonometry/reference/api/vibration/human-vibration/#wbv_exposure_basis) returns (Part B), **not** the ISO 2631-1
+[`wbv_exposure_basis`](/phonometry/reference/api/vibration/exposure/#wbv_exposure_basis) returns (Part B), **not** the ISO 2631-1
 Eq. (10) vector total `a_v`.
 
 **Parameters**
 
 | Name | Description |
 | :--- | :--- |
-| `total_values` | Per-operation vibration magnitude, in m/s2: the hand-arm vibration total value `a_hv,i` (`kind="hav"`) or the Directive Part B dominant-axis value of [`wbv_exposure_basis`](/phonometry/reference/api/vibration/human-vibration/#wbv_exposure_basis) (`kind="wbv"`). |
+| `total_values` | Per-operation vibration magnitude, in m/s2: the hand-arm vibration total value `a_hv,i` (`kind="hav"`) or the Directive Part B dominant-axis value of [`wbv_exposure_basis`](/phonometry/reference/api/vibration/exposure/#wbv_exposure_basis) (`kind="wbv"`). |
 | `durations_s` | Duration `T_i` per operation, in seconds. |
 | `kind` | `"hav"` or `"wbv"` (selects the EAV/ELV). |
 | `labels` | Optional operation labels; defaults to `op 1`, `op 2`, ... |
 
-**Returns:** A [`DailyVibrationExposure`](/phonometry/reference/api/vibration/human-vibration/#dailyvibrationexposure) with `.plot()`.
+**Returns:** A [`DailyVibrationExposure`](/phonometry/reference/api/vibration/exposure/#dailyvibrationexposure) with `.plot()`.
 
 **Raises**
 
@@ -230,7 +230,7 @@ A daily exposure built from several operations, with its assessment.
 | `total_values` | Vibration total value `a_hvi` per operation, in m/s2. |
 | `durations_s` | Duration `T_i` per operation, in seconds. |
 | `partials` | Partial exposure `A_i(8)` per operation, in m/s2. |
-| `assessment` | The [`ExposureAssessment`](/phonometry/reference/api/vibration/human-vibration/#exposureassessment) of `a8`. |
+| `assessment` | The [`ExposureAssessment`](/phonometry/reference/api/vibration/exposure/#exposureassessment) of `a8`. |
 
 ### DailyVibrationExposure.plot()
 
@@ -348,7 +348,7 @@ Assess a daily exposure against Directive 2002/44/EC (Article 3).
 | `kind` | `"hav"` (hand-arm) or `"wbv"` (whole-body). |
 | `metric` | `"a8"` (default) or `"vdv"`. |
 
-**Returns:** An [`ExposureAssessment`](/phonometry/reference/api/vibration/human-vibration/#exposureassessment).
+**Returns:** An [`ExposureAssessment`](/phonometry/reference/api/vibration/exposure/#exposureassessment).
 
 **Raises**
 
@@ -401,10 +401,10 @@ transition and upward step - of weighting `name` at `frequencies`.
 
 | Name | Description |
 | :--- | :--- |
-| `name` | Weighting name (one of [`WEIGHTING_NAMES`](/phonometry/reference/api/vibration/human-vibration/#weighting_names)). |
+| `name` | Weighting name (one of [`WEIGHTING_NAMES`](/phonometry/reference/api/vibration/exposure/#weighting_names)). |
 | `frequencies` | Frequencies at which to evaluate, in hertz (> 0). |
 
-**Returns:** A [`WeightingResponse`](/phonometry/reference/api/vibration/human-vibration/#weightingresponse) with `.plot()`.
+**Returns:** A [`WeightingResponse`](/phonometry/reference/api/vibration/exposure/#weightingresponse) with `.plot()`.
 
 **Raises**
 
@@ -547,7 +547,7 @@ Daily exposure `A(8)` for one operation (ISO 5349-1 Eq. (2)).
 $A(8) = a_{hv} \sqrt{T / T_0}$ with $T_0 = 8$ h.  The
 identical form gives the whole-body `A(8)` of Directive 2002/44/EC,
 whose magnitude is the Annex Part B dominant-axis value (see
-[`wbv_exposure_basis`](/phonometry/reference/api/vibration/human-vibration/#wbv_exposure_basis)) rather than a vector total.
+[`wbv_exposure_basis`](/phonometry/reference/api/vibration/exposure/#wbv_exposure_basis)) rather than a vector total.
 
 **Parameters**
 
@@ -716,7 +716,7 @@ $1.4 a_{wy}$, $a_{wz}$ for a seated or standing worker
 (Annex, Part B, point 1, with the ISO 2631-1 clause 7.2.3
 multiplying factors), **not** on the ISO 2631-1 Eq. (10) vector total
 `a_v`.  Feed the returned dominant-axis value to
-[`daily_vibration_exposure`](/phonometry/reference/api/vibration/human-vibration/#daily_vibration_exposure) (`kind="wbv"`) for a
+[`daily_vibration_exposure`](/phonometry/reference/api/vibration/exposure/#daily_vibration_exposure) (`kind="wbv"`) for a
 Directive-conforming whole-body assessment; the hand-arm basis is the
 vector total `a_hv` instead (Annex, Part A, point 1).
 
@@ -770,9 +770,9 @@ comparing against the tabulated factors; a nominal label (e.g.
 | :--- | :--- |
 | `band_accelerations` | r.m.s. acceleration $a_i$ per band, in m/s2. |
 | `frequencies` | Band centre frequencies, in hertz (true one-third-octave centres $10^{n/10}$ for table-conformant band values). |
-| `weighting` | Weighting name (one of [`WEIGHTING_NAMES`](/phonometry/reference/api/vibration/human-vibration/#weighting_names)). |
+| `weighting` | Weighting name (one of [`WEIGHTING_NAMES`](/phonometry/reference/api/vibration/exposure/#weighting_names)). |
 
-**Returns:** A [`WeightedSpectrum`](/phonometry/reference/api/vibration/human-vibration/#weightedspectrum) with `.plot()`.
+**Returns:** A [`WeightedSpectrum`](/phonometry/reference/api/vibration/exposure/#weightedspectrum) with `.plot()`.
 
 **Raises**
 
@@ -801,7 +801,7 @@ A weighted one-third-octave acceleration spectrum and its `a_w`.
 | :--- | :--- |
 | `frequencies` | Band centre frequencies, in hertz. |
 | `band_accelerations` | Unweighted r.m.s. acceleration per band, in m/s2. |
-| `weighting_name` | Weighting applied (one of [`WEIGHTING_NAMES`](/phonometry/reference/api/vibration/human-vibration/#weighting_names)). |
+| `weighting_name` | Weighting applied (one of [`WEIGHTING_NAMES`](/phonometry/reference/api/vibration/exposure/#weighting_names)). |
 | `weighting_factors` | Weighting factor `W_i` per band. |
 | `weighted` | Weighted band contribution `W_i*a_i`, in m/s2. |
 | `overall` | Overall weighted r.m.s. acceleration `a_w`, in m/s2. |
@@ -830,14 +830,14 @@ weighting_factors(name: str, frequencies: ArrayLike) -> Real
 
 Weighting factors `|H(f)|` of weighting `name` (ISO 8041-1).
 
-Convenience wrapper over [`frequency_weighting`](/phonometry/reference/api/vibration/human-vibration/#frequency_weighting) returning only the
+Convenience wrapper over [`frequency_weighting`](/phonometry/reference/api/vibration/exposure/#frequency_weighting) returning only the
 magnitude array (the `W_i` of ISO 2631-1 Eq. (9) / ISO 5349-1 Eq. (A.1)).
 
 **Parameters**
 
 | Name | Description |
 | :--- | :--- |
-| `name` | Weighting name (one of [`WEIGHTING_NAMES`](/phonometry/reference/api/vibration/human-vibration/#weighting_names)). |
+| `name` | Weighting name (one of [`WEIGHTING_NAMES`](/phonometry/reference/api/vibration/exposure/#weighting_names)). |
 | `frequencies` | Band centre frequencies, in hertz. |
 
 **Returns:** Weighting factor per frequency.
@@ -868,7 +868,7 @@ A frequency-weighting magnitude response (ISO 8041-1, Formula (5)).
 
 | Name | Description |
 | :--- | :--- |
-| `name` | Weighting name (one of [`WEIGHTING_NAMES`](/phonometry/reference/api/vibration/human-vibration/#weighting_names)). |
+| `name` | Weighting name (one of [`WEIGHTING_NAMES`](/phonometry/reference/api/vibration/exposure/#weighting_names)). |
 | `frequencies` | Frequencies at which the response was evaluated, in Hz. |
 | `response` | Complex weighting $H(j2\pi f)$ per frequency. |
 | `magnitude` | Weighting factor $\lvert H \rvert$ per frequency. |

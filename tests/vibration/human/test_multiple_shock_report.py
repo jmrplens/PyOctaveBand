@@ -21,7 +21,7 @@ import numpy as np
 import pytest
 
 from phonometry import ReportMetadata
-from phonometry.vibration.multiple_shock_vibration import (
+from phonometry.vibration.human.multiple_shock import (
     MZ_FEMALE,
     MZ_MALE,
     RISK_THRESHOLDS_FEMALE,

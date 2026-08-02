@@ -1798,7 +1798,7 @@ from phonometry import (
     power_injection_clf,
     right_angle_transmission_coefficient,
 )
-from phonometry.vibration.point_mobility import plate_bending_wave_speed
+from phonometry.vibration.structural.point_mobility import plate_bending_wave_speed
 
 rho, nu, young = 2700.0, 0.33, 7.1e10                 # aluminium
 cl = math.sqrt(young / (rho * (1.0 - nu**2)))         # 5432 m/s (Eq. 6.25)

@@ -11,7 +11,9 @@ Two generations of aliases live here, each with its own removal date:
   subpackages into domain ones (``phonometry.metrology`` into
   ``phonometry.filters``, ``phonometry.signals`` and a narrowed
   ``phonometry.metrology``; the speech intelligibility of
-  ``phonometry.hearing`` into ``phonometry.speech``). Removed in 5.0.
+  ``phonometry.hearing`` into ``phonometry.speech``), and gives the large
+  domains a second level (``phonometry.vibration`` into ``structural``,
+  ``human`` and ``machinery``). Removed in 5.0.
 
 Every public module path that moved stays importable through the shims
 registered here: ``import phonometry.<old>`` and ``from phonometry.<old>
@@ -97,10 +99,13 @@ _MOVED_3X: dict[str, str] = {
     "phonometry.lab_insulation": "phonometry.building.lab_insulation",
     "phonometry.structure_borne_power": "phonometry.building.structure_borne_power",
     "phonometry.survey_insulation": "phonometry.building.survey_insulation",
-    "phonometry.human_vibration": "phonometry.vibration.human_vibration",
-    "phonometry.mechanical_mobility": "phonometry.vibration.mechanical_mobility",
-    "phonometry.multiple_shock_vibration": "phonometry.vibration.multiple_shock_vibration",
-    "phonometry.transfer_stiffness": "phonometry.vibration.transfer_stiffness",
+    "phonometry.human_vibration": "phonometry.vibration.human.exposure",
+    "phonometry.mechanical_mobility":
+        "phonometry.vibration.structural.mechanical_mobility",
+    "phonometry.multiple_shock_vibration":
+        "phonometry.vibration.human.multiple_shock",
+    "phonometry.transfer_stiffness":
+        "phonometry.vibration.structural.transfer_stiffness",
     "phonometry.air_absorption": "phonometry.environmental.air_absorption",
     "phonometry.environmental_measurement": "phonometry.environmental.measurement",
     "phonometry.impulse_prominence": "phonometry.environmental.impulse_prominence",
@@ -163,6 +168,23 @@ _MOVED_4X: dict[str, str] = {
     "phonometry.hearing.sii": "phonometry.speech.sii",
     "phonometry.hearing.objective_intelligibility":
         "phonometry.speech.objective_intelligibility",
+    "phonometry.vibration.mechanical_mobility":
+        "phonometry.vibration.structural.mechanical_mobility",
+    "phonometry.vibration.point_mobility":
+        "phonometry.vibration.structural.point_mobility",
+    "phonometry.vibration.junction_transmission":
+        "phonometry.vibration.structural.junction_transmission",
+    "phonometry.vibration.radiation_efficiency":
+        "phonometry.vibration.structural.radiation_efficiency",
+    "phonometry.vibration.experimental_sea":
+        "phonometry.vibration.structural.experimental_sea",
+    "phonometry.vibration.transfer_stiffness":
+        "phonometry.vibration.structural.transfer_stiffness",
+    "phonometry.vibration.human_vibration": "phonometry.vibration.human.exposure",
+    "phonometry.vibration.multiple_shock_vibration":
+        "phonometry.vibration.human.multiple_shock",
+    "phonometry.vibration.machine_diagnostics":
+        "phonometry.vibration.machinery.diagnostics",
 }
 
 #: The two generations, each with the release that deprecated it and the one

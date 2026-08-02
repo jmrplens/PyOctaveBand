@@ -1415,17 +1415,7 @@ from .underwater.weston_regimes import (
     weston_propagation_loss,
     weston_regime_boundaries,
 )
-from .vibration.experimental_sea import (
-    PowerInjectionResult,
-    bar_modal_density,
-    beam_modal_density,
-    cylindrical_shell_modal_density,
-    flat_plate_modal_density,
-    power_injection_clf,
-    power_injection_matrix,
-    ring_frequency,
-)
-from .vibration.human_vibration import (
+from .vibration.human.exposure import (
     HAV_EAV_A8,
     HAV_ELV_A8,
     REFERENCE_ACCELERATION,
@@ -1460,43 +1450,7 @@ from .vibration.human_vibration import (
     weighted_acceleration,
     weighting_factors,
 )
-from .vibration.junction_transmission import (
-    JunctionTransmissionResult,
-    angular_average_transmission_coefficient,
-    corner_transmission_coefficient,
-    coupling_loss_factor,
-    inline_transmission_coefficient,
-    junction_transmission,
-    junction_wave_parameters,
-    point_connection_coupling_loss_factor,
-    right_angle_transmission_coefficient,
-    straight_transmission_coefficient,
-    wave_vibration_reduction_index,
-)
-from .vibration.machine_diagnostics import (
-    FaultFrequencyResult,
-    FaultLine,
-    bearing_fault_frequencies,
-    blade_pass_frequencies,
-    combine_fault_lines,
-    gear_mesh_frequencies,
-    induction_motor_frequencies,
-    shaft_rate,
-)
-from .vibration.mechanical_mobility import (
-    FRF_UNITS,
-    MobilityResult,
-    RigidMassCalibrationResult,
-    convert_frf,
-    random_error_percent,
-    resonance_frequency,
-    rigid_mass_calibration_check,
-    sdof_accelerance,
-    sdof_mobility,
-    sdof_mobility_result,
-    sdof_receptance,
-)
-from .vibration.multiple_shock_vibration import (
+from .vibration.human.multiple_shock import (
     MultipleShockResult,
     acceleration_dose,
     compression_dose,
@@ -1512,7 +1466,53 @@ from .vibration.multiple_shock_vibration import (
     static_stress,
     ultimate_strength,
 )
-from .vibration.point_mobility import (
+from .vibration.machinery.diagnostics import (
+    FaultFrequencyResult,
+    FaultLine,
+    bearing_fault_frequencies,
+    blade_pass_frequencies,
+    combine_fault_lines,
+    gear_mesh_frequencies,
+    induction_motor_frequencies,
+    shaft_rate,
+)
+from .vibration.structural.experimental_sea import (
+    PowerInjectionResult,
+    bar_modal_density,
+    beam_modal_density,
+    cylindrical_shell_modal_density,
+    flat_plate_modal_density,
+    power_injection_clf,
+    power_injection_matrix,
+    ring_frequency,
+)
+from .vibration.structural.junction_transmission import (
+    JunctionTransmissionResult,
+    angular_average_transmission_coefficient,
+    corner_transmission_coefficient,
+    coupling_loss_factor,
+    inline_transmission_coefficient,
+    junction_transmission,
+    junction_wave_parameters,
+    point_connection_coupling_loss_factor,
+    right_angle_transmission_coefficient,
+    straight_transmission_coefficient,
+    wave_vibration_reduction_index,
+)
+from .vibration.structural.mechanical_mobility import (
+    FRF_UNITS,
+    MobilityResult,
+    RigidMassCalibrationResult,
+    convert_frf,
+    random_error_percent,
+    resonance_frequency,
+    rigid_mass_calibration_check,
+    sdof_accelerance,
+    sdof_mobility,
+    sdof_mobility_result,
+    sdof_receptance,
+)
+from .vibration.structural.point_mobility import (
     infinite_beam_mobility,
     infinite_beam_moment_mobility,
     infinite_beam_point_mobility,
@@ -1523,12 +1523,12 @@ from .vibration.point_mobility import (
     longitudinal_rod_impedance,
     plate_bending_stiffness,
 )
-from .vibration.radiation_efficiency import (
+from .vibration.structural.radiation_efficiency import (
     RadiationEfficiencyResult,
     coincidence_frequency,
     radiation_efficiency,
 )
-from .vibration.transfer_stiffness import (
+from .vibration.structural.transfer_stiffness import (
     REFERENCE_STIFFNESS,
     TRANSMISSIBILITY_LIMIT,
     TransferStiffnessResult,

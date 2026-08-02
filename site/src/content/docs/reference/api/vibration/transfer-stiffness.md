@@ -1,5 +1,5 @@
 ---
-title: "vibration.transfer_stiffness"
+title: "vibration.structural.transfer_stiffness"
 description: "Dynamic transfer stiffness of resilient elements (ISO 10846-1/-2/-3)."
 sidebar:
   label: "transfer_stiffness"

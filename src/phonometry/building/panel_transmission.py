@@ -100,7 +100,7 @@ from .._internal.validation import (
     require_non_negative,
     require_positive,
 )
-from ..vibration.radiation_efficiency import coincidence_frequency
+from ..vibration.structural.radiation_efficiency import coincidence_frequency
 
 if TYPE_CHECKING:
     from matplotlib.axes import Axes
@@ -381,7 +381,7 @@ def single_panel_transmission_loss(
 
     Provide the coincidence frequency directly through *critical_frequency*, or
     let it be computed from *bending_stiffness* and *mass_per_area* through
-    :func:`~phonometry.vibration.radiation_efficiency.coincidence_frequency`.
+    :func:`~phonometry.vibration.structural.radiation_efficiency.coincidence_frequency`.
 
     :param frequency: Band centre frequencies ``f``, in hertz (array, > 0).
     :param mass_per_area: Mass per unit area ``m''``, in kg/m^2 (> 0).
@@ -789,7 +789,7 @@ def orthotropic_critical_frequencies(
     :math:`f_c = \frac{c_0^{2}}{2 \pi} \sqrt{m'' / B}` evaluated for both
     principal bending stiffnesses (Vigran Eq. (6.107), printed p. 252; the
     same closed form as the isotropic
-    :func:`~phonometry.vibration.radiation_efficiency.coincidence_frequency`).
+    :func:`~phonometry.vibration.structural.radiation_efficiency.coincidence_frequency`).
     The stiffest direction gives the **lowest** coincidence frequency, so the
     returned pair is sorted: ``fc1`` from the larger stiffness, ``fc2`` from the
     smaller. For a corrugated sheet ``fc1`` can sit at a few hundred hertz while

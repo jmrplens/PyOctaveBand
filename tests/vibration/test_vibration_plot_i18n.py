@@ -54,7 +54,7 @@ def test_multiple_shock_spanish_title_translates_sex() -> None:
     import matplotlib
 
     matplotlib.use("Agg")
-    from phonometry.vibration.multiple_shock_vibration import (
+    from phonometry.vibration.human.multiple_shock import (
         MZ_MALE,
         RISK_THRESHOLDS_MALE,
         MultipleShockResult,

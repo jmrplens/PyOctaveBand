@@ -85,7 +85,7 @@ import numpy as np
 from numpy.typing import ArrayLike
 
 from .._internal.validation import require_finite_array, require_positive
-from ..vibration.point_mobility import infinite_plate_mobility
+from ..vibration.structural.point_mobility import infinite_plate_mobility
 
 if TYPE_CHECKING:
     from matplotlib.axes import Axes
@@ -231,7 +231,7 @@ def wall_tie_coupling_loss_factor(
     :param mass2: Surface density ``rho_s2`` of the receiving leaf, in kg/m^2 (> 0).
     :param bending_stiffness1: Bending stiffness per unit width ``B'`` of leaf 1,
         in N.m (> 0); see
-        :func:`phonometry.vibration.point_mobility.plate_bending_stiffness`.
+        :func:`phonometry.vibration.structural.point_mobility.plate_bending_stiffness`.
     :param bending_stiffness2: Bending stiffness per unit width of leaf 2, in N.m.
     :param ties_per_area: Number of ties per unit area ``n``, in 1/m^2 (> 0).
     :param tie: A name from :data:`WALL_TIE_STIFFNESS`, an explicit dynamic
