@@ -999,6 +999,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Changed
 
+- The multiple-shock time guards go through `require_positive` like the rest
+  of the library. They were written as `not t > 0.0`, which rejects NaN where
+  `t <= 0.0` would accept it, and that reason lived in a comment. The shared
+  validator says the same thing in the form the whole package uses, rejects
+  infinities too, and names the parameter that failed instead of both at once.
+
 - `phonometry.vibration` has three families, by who reads them.
   `vibration.structural` is the structural acoustics that feeds building
   prediction: mobility (ISO 7626), plate junctions, radiation efficiency,
