@@ -165,18 +165,41 @@ def test_subpackage_reexports_cover_facade_imports() -> None:
                 missing.append(f"phonometry.{parts[0]}.{alias.name}")
     assert not missing, "facade imports not re-exported by their subpackage:\n" + "\n".join(missing)
 
-def test_test_module_basenames_are_unique() -> None:
-    """Two test files with the same name break collection of the whole tree.
+def test_collected_test_modules_have_unique_import_names() -> None:
+    """Two test modules that import under one name break the whole collection.
 
-    The suite has no ``__init__.py``, so pytest imports every test module by
-    its basename: a second ``test_spain.py`` anywhere is an import mismatch,
-    and it only shows up when the whole tree is collected at once. The
-    taxonomy work renames test files to follow their modules, which is exactly
-    how the collision gets introduced.
+    With the default import mode pytest names a module by walking up from the
+    file while ``__init__.py`` exists: a file inside a package keeps its dotted
+    path, and a file outside one is imported by its bare basename. The suite
+    has no ``__init__.py``, so every test file there competes for its basename,
+    and a second ``test_spain.py`` anywhere is an import mismatch that only
+    shows up when the whole tree is collected at once. Renaming test files to
+    follow their modules, which is what the taxonomy work does, is exactly how
+    the collision gets introduced.
+
+    ``src`` is scanned too, because pytest collects from the repository root
+    and ``phonometry.signals.test_signals`` matches the default patterns. It
+    sits inside a package, so it imports under its dotted name and cannot
+    collide, and this check knows that rather than assuming it.
     """
     import collections
 
-    tests = Path(__file__).resolve().parent
-    counts = collections.Counter(p.name for p in tests.rglob("test_*.py"))
+    root = Path(__file__).resolve().parent.parent
+
+    def import_name(path: Path) -> str:
+        parts = [path.stem]
+        parent = path.parent
+        while (parent / "__init__.py").exists():
+            parts.append(parent.name)
+            parent = parent.parent
+        return ".".join(reversed(parts))
+
+    collected = [
+        path
+        for directory in ("tests", "src")
+        for pattern in ("test_*.py", "*_test.py")
+        for path in (root / directory).rglob(pattern)
+    ]
+    counts = collections.Counter(import_name(path) for path in collected)
     duplicates = {name: count for name, count in counts.items() if count > 1}
-    assert not duplicates, f"duplicate test module basenames: {duplicates}"
+    assert not duplicates, f"test modules sharing an import name: {duplicates}"

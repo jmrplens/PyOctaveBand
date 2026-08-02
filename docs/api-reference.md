@@ -52,11 +52,12 @@ warns and delegates as well.
 
 | Deprecated path | Resolves to | Removed in |
 | :--- | :--- | :--- |
-| `phonometry.building.measurement.insulation` | `phonometry.building.measurement.insulation` | 4.0 |
-| `phonometry.signals.levels` | `phonometry.signals.levels` | 5.0 |
-| `phonometry.speech.sti` | `phonometry.speech.sti` | 5.0 |
-| `phonometry.vibration.human.exposure` | `phonometry.vibration.human.exposure` | 5.0 |
-| `phonometry.environment` | `phonometry.environment` | 5.0 |
+| `phonometry.insulation` | `phonometry.building.measurement.insulation` | 4.0 |
+| `phonometry.metrology.levels` | `phonometry.signals.levels` | 5.0 |
+| `phonometry.hearing.sti` | `phonometry.speech.sti` | 5.0 |
+| `phonometry.vibration.human_vibration` | `phonometry.vibration.human.exposure` | 5.0 |
+| `phonometry.building.spanish_building_code` | `phonometry.building.regulation.spain` | 5.0 |
+| `phonometry.environmental` | `phonometry.environment` | 5.0 |
 
 | Name | Type | Description (Inputs) | Usage Snippet (Outputs) |
 | :--- | :--- | :--- | :--- |

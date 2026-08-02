@@ -1025,7 +1025,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
   Five modules lose a word their subgroup now says: `building_prediction` is
   `prediction.global_model` and `detailed_prediction` is
-  `prediction.detailed_model`, which is what the two EN 12354 editions are;
+  `prediction.detailed_model`, the single-number and per-band routes the
+  standard offers for the same calculation;
   `facade_prediction` is `prediction.facade`, `building_uncertainty` is
   `measurement.uncertainty` and `spanish_building_code` is
   `regulation.spain`.

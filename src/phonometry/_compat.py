@@ -407,7 +407,12 @@ def _namespace_dir(
     """
 
     def __dir__() -> list[str]:
-        names = set(own) | set(_alias_modules(package))
+        # Extend the default listing rather than replace it: a package's own
+        # dir() carries its dunders and the subpackages it imported, and the
+        # subgroups a split introduces are exactly what a reader is looking
+        # for there.
+        names = set(vars(import_module(package))) | set(own)
+        names |= set(_alias_modules(package))
         for target in targets:
             names |= set(getattr(import_module(target), "__all__", ()))
         return sorted(names)

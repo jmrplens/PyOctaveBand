@@ -57,7 +57,7 @@ Clause citations refer to EN 12354-1:2000 (airborne) or EN 12354-2:2000 (impact)
 from __future__ import annotations
 
 import warnings
-from collections.abc import Sequence
+from collections.abc import Callable, Sequence
 from dataclasses import dataclass
 from math import isfinite, log10
 from typing import TYPE_CHECKING, Any, Literal
@@ -359,6 +359,128 @@ def _check_finite(value: float, name: str) -> float:
     return v
 
 
+@dataclass(frozen=True)
+class _KijTerms:
+    """The terms every Annex E branch is written in.
+
+    :ivar m: :math:`M = \\log_{10}` of the mass ratio (Formula E.2).
+    :ivar ratio: The mass ratio itself, which the E.7 validity test reads.
+    :ivar lg_f_fk: :math:`\\log_{10}(f/f_k)` of the double-leaf branches.
+    :ivar delta1: The E.4/E.5 frequency term, zero below ``f1``.
+    """
+
+    m: float
+    ratio: float
+    lg_f_fk: float
+    delta1: float
+
+
+def _kij_rigid_cross(path: PathKind, t: _KijTerms) -> float | None:
+    """Rigid cross junction (E.3): K13 through, K12 corner."""
+    if path == "through":
+        return 8.7 + 17.1 * t.m + 5.7 * t.m * t.m
+    if path == "corner":
+        return 8.7 + 5.7 * t.m * t.m
+    return None
+
+
+def _kij_rigid_t(path: PathKind, t: _KijTerms) -> float | None:
+    """Rigid T junction (E.4): K13 through, K12 corner."""
+    if path == "through":
+        return 5.7 + 14.1 * t.m + 5.7 * t.m * t.m
+    if path == "corner":
+        return 5.7 + 5.7 * t.m * t.m
+    return None
+
+
+def _kij_flexible_t(path: PathKind, t: _KijTerms) -> float:
+    """Flexible T junction (E.5), the only one with all three paths."""
+    if path == "through":
+        return 5.7 + 14.1 * t.m + 5.7 * t.m * t.m + 2.0 * t.delta1
+    if path == "corner":
+        return 5.7 + 5.7 * t.m * t.m + t.delta1
+    # (E.5) K24, clamped to -4..0 dB (the print's "0 <= K24 <= -4 dB" read
+    # with the bounds in ascending order).
+    return min(max(3.7 + 14.1 * t.m + 5.7 * t.m * t.m, -4.0), 0.0)
+
+
+def _kij_lightweight_facade(path: PathKind, t: _KijTerms) -> float | None:
+    """Lightweight facade junction (E.6)."""
+    if path == "through":
+        return max(5.0 + 10.0 * t.m, 5.0)
+    if path == "corner":
+        return 10.0 + 10.0 * abs(t.m)
+    return None
+
+
+def _kij_lightweight_double_homogeneous(path: PathKind, t: _KijTerms) -> float:
+    """Lightweight double leaf on a homogeneous element (E.7)."""
+    if path == "through":
+        return max(10.0 + 20.0 * t.m - 3.3 * t.lg_f_fk, 10.0)
+    if path == "corner":
+        return 10.0 + 10.0 * abs(t.m) + 3.3 * t.lg_f_fk
+    # (E.7) K24 is given only where the homogeneous elements carrying
+    # the 2-4 path are more than three times heavier than a leaf
+    # (m2/m1 > 3), i.e. for a per-path mass_ratio = m'\u22a5,i/m'i < 1/3.
+    if t.ratio >= 1.0 / 3.0:
+        raise ValueError(
+            "The E.7 double-leaf branch (K24) is given only for "
+            "mass_ratio = m'\u22a5,i/m'i < 1/3 (the homogeneous element "
+            "carries the 2-4 path, so the ratio is leaf mass over "
+            "homogeneous-element mass and the printed condition "
+            "m2/m1 > 3 reads mass_ratio < 1/3)."
+        )
+    # Per-path form (ISO 12354-1:2017 E.3.5); the 2000 print recasts the
+    # same relation as 3,0 - 14,1 M + 5,7 M^2 in the Figure E.9 x-axis
+    # variable lg(m2/m1), against its own Annex E definition of M (see
+    # docs/ERRATA.md).
+    return 3.0 + 14.1 * t.m + 5.7 * t.m * t.m
+
+
+def _kij_lightweight_double_coupled(path: PathKind, t: _KijTerms) -> float | None:
+    """Lightweight double leaf coupled to a double leaf (E.8)."""
+    if path == "through":
+        return max(10.0 + 20.0 * t.m - 3.3 * t.lg_f_fk, 10.0)
+    if path == "corner":
+        return 10.0 + 10.0 * abs(t.m) - 3.3 * t.lg_f_fk
+    return None
+
+
+def _kij_corner(path: PathKind, t: _KijTerms) -> float:
+    """Corner junction (E.9): one path, K12 = K21."""
+    if path == "corner":
+        return max(15.0 * abs(t.m) - 3.0, -2.0)
+    raise ValueError(
+        "A 'corner' junction has the single path K12 = K21; use "
+        "path='corner'."
+    )
+
+
+def _kij_thickness_change(path: PathKind, t: _KijTerms) -> float:
+    """Change of thickness in line (E.10): one path, K12 = K21."""
+    if path == "through":
+        return 5.0 * t.m * t.m - 5.0
+    raise ValueError(
+        "A 'thickness_change' junction has the single in-line path "
+        "K12 = K21; use path='through'."
+    )
+
+
+#: One branch of EN 12354-1 Annex E per junction type. A branch returns
+#: ``None`` for a path the standard does not give it, which the caller turns
+#: into the "no double_leaf branch" error.
+_KIJ_BRANCHES: dict[str, Callable[[PathKind, _KijTerms], float | None]] = {
+    "rigid_cross": _kij_rigid_cross,
+    "rigid_t": _kij_rigid_t,
+    "flexible_t": _kij_flexible_t,
+    "lightweight_facade": _kij_lightweight_facade,
+    "lightweight_double_homogeneous": _kij_lightweight_double_homogeneous,
+    "lightweight_double_coupled": _kij_lightweight_double_coupled,
+    "corner": _kij_corner,
+    "thickness_change": _kij_thickness_change,
+}
+
+
 def junction_vibration_reduction(
     junction_type: JunctionType,
     path: PathKind,
@@ -452,89 +574,28 @@ def junction_vibration_reduction(
         raise ValueError("'f1' must be positive.")
     if path not in ("through", "corner", "double_leaf"):
         raise ValueError("'path' must be 'through', 'corner' or 'double_leaf'.")
-
-    m = log10(ratio)
-    delta1 = 10.0 * log10(frequency / f1) if frequency > f1 else 0.0
-    # Frequency term of the E.7/E.8 lightweight double-leaf junctions.
-    lg_f_fk = log10(frequency / _FK_DOUBLE_LEAF)
-
-    if junction_type == "rigid_cross":
-        if path == "through":
-            return 8.7 + 17.1 * m + 5.7 * m * m
-        if path == "corner":
-            return 8.7 + 5.7 * m * m
-    if junction_type == "rigid_t":
-        if path == "through":
-            return 5.7 + 14.1 * m + 5.7 * m * m
-        if path == "corner":
-            return 5.7 + 5.7 * m * m
-    if junction_type == "flexible_t":
-        if path == "through":
-            return 5.7 + 14.1 * m + 5.7 * m * m + 2.0 * delta1
-        if path == "corner":
-            return 5.7 + 5.7 * m * m + delta1
-        # (E.5) K24, clamped to −4..0 dB (the print's "0 ≤ K24 ≤ −4 dB" read
-        # with the bounds in ascending order).
-        return min(max(3.7 + 14.1 * m + 5.7 * m * m, -4.0), 0.0)
-    if junction_type == "lightweight_facade":
-        if path == "through":
-            return max(5.0 + 10.0 * m, 5.0)
-        if path == "corner":
-            return 10.0 + 10.0 * abs(m)
-    if junction_type == "lightweight_double_homogeneous":
-        if path == "through":
-            return max(10.0 + 20.0 * m - 3.3 * lg_f_fk, 10.0)
-        if path == "corner":
-            return 10.0 + 10.0 * abs(m) + 3.3 * lg_f_fk
-        # (E.7) K24 is given only where the homogeneous elements carrying
-        # the 2-4 path are more than three times heavier than a leaf
-        # (m2/m1 > 3), i.e. for a per-path mass_ratio = m'⊥,i/m'i < 1/3.
-        if ratio >= 1.0 / 3.0:
-            raise ValueError(
-                "The E.7 double-leaf branch (K24) is given only for "
-                "mass_ratio = m'⊥,i/m'i < 1/3 (the homogeneous element "
-                "carries the 2-4 path, so the ratio is leaf mass over "
-                "homogeneous-element mass and the printed condition "
-                "m2/m1 > 3 reads mass_ratio < 1/3)."
-            )
-        # Per-path form (ISO 12354-1:2017 E.3.5); the 2000 print recasts the
-        # same relation as 3,0 - 14,1 M + 5,7 M^2 in the Figure E.9 x-axis
-        # variable lg(m2/m1), against its own Annex E definition of M (see
-        # docs/ERRATA.md).
-        return 3.0 + 14.1 * m + 5.7 * m * m
-    if junction_type == "lightweight_double_coupled":
-        if path == "through":
-            return max(10.0 + 20.0 * m - 3.3 * lg_f_fk, 10.0)
-        if path == "corner":
-            return 10.0 + 10.0 * abs(m) - 3.3 * lg_f_fk
-    if junction_type == "corner":
-        if path == "corner":
-            return max(15.0 * abs(m) - 3.0, -2.0)
+    branch = _KIJ_BRANCHES.get(junction_type)
+    if branch is None:
         raise ValueError(
-            "A 'corner' junction has the single path K12 = K21; use "
-            "path='corner'."
+            "'junction_type' must be one of 'rigid_cross', 'rigid_t', "
+            "'flexible_t', 'lightweight_facade', "
+            "'lightweight_double_homogeneous', 'lightweight_double_coupled', "
+            "'corner', 'thickness_change'."
         )
-    if junction_type == "thickness_change":
-        if path == "through":
-            return 5.0 * m * m - 5.0
-        raise ValueError(
-            "A 'thickness_change' junction has the single in-line path "
-            "K12 = K21; use path='through'."
-        )
-    if junction_type in (
-        "rigid_cross", "rigid_t", "lightweight_facade",
-        "lightweight_double_coupled",
-    ):
+    terms = _KijTerms(
+        m=log10(ratio),
+        ratio=ratio,
+        # Frequency term of the E.7/E.8 lightweight double-leaf junctions.
+        lg_f_fk=log10(frequency / _FK_DOUBLE_LEAF),
+        delta1=10.0 * log10(frequency / f1) if frequency > f1 else 0.0,
+    )
+    kij = branch(path, terms)
+    if kij is None:
         raise ValueError(
             f"Junction type {junction_type!r} has no 'double_leaf' (K24) "
             "branch in EN 12354-1 Annex E."
         )
-    raise ValueError(
-        "'junction_type' must be one of 'rigid_cross', 'rigid_t', "
-        "'flexible_t', 'lightweight_facade', "
-        "'lightweight_double_homogeneous', 'lightweight_double_coupled', "
-        "'corner', 'thickness_change'."
-    )
+    return kij
 
 
 def junction_min_vibration_reduction(

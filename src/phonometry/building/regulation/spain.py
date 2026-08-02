@@ -260,7 +260,7 @@ class DbHrGlobalIndexResult:
         prescribes for intermediate quantities and for product specifications.
     :ivar reported: The index rounded to an integer, the form DB-HR requires
         for the quantities that define the requirements (3.1.3.1 point 4).
-    :ivar name: The index name, e.g. ``"RA"`` or ``"D2m,nT,Atr"``.
+    :ivar name: The index name, e.g. ``"RA"`` or ``_D2M_NT_ATR``.
     :ivar spectrum: Key of the normalised spectrum used.
     :ivar frequencies: Band centre frequencies, in Hz.
     :ivar band_values: The band insulation values ``X_i``, in dB.
@@ -422,10 +422,10 @@ def dnt_a(
 
     :param level_difference: Band standardized level difference ``DnT``, in dB.
     :param frequencies: Band centre frequencies, in Hz (optional).
-    :return: A :class:`DbHrGlobalIndexResult` named ``"DnT,A"``.
+    :return: A :class:`DbHrGlobalIndexResult` named ``_DNT_A``.
     """
     return db_hr_global_index(
-        level_difference, "pink", frequencies=frequencies, name="DnT,A"
+        level_difference, "pink", frequencies=frequencies, name=_DNT_A
     )
 
 
@@ -492,7 +492,7 @@ def d2m_nt_atr(
     :param frequencies: Band centre frequencies, in Hz (optional).
     :param spectrum: ``"traffic"`` (default, Table A.3) or ``"aircraft"``
         (Table A.2), per the dominant outdoor noise.
-    :return: A :class:`DbHrGlobalIndexResult` named ``"D2m,nT,Atr"``.
+    :return: A :class:`DbHrGlobalIndexResult` named ``_D2M_NT_ATR``.
     :raises ValueError: For a spectrum Formula (A.6) does not cover.
     """
     key = str(spectrum).strip().lower()
@@ -504,7 +504,7 @@ def d2m_nt_atr(
             "through Formula (A.5): use d2m_nt_a()."
         )
     return db_hr_global_index(
-        level_difference, key, frequencies=frequencies, name="D2m,nT,Atr"
+        level_difference, key, frequencies=frequencies, name=_D2M_NT_ATR
     )
 
 
@@ -536,7 +536,7 @@ class DbHrRequirement:
     """A single DB-HR performance requirement.
 
     :ivar quantity: The quantity the requirement is stated in, e.g.
-        ``"DnT,A"``, ``"L'nT,w"``, ``"RA"``, ``"T"`` or ``"A/V"``.
+        ``_DNT_A``, ``"L'nT,w"``, ``"RA"``, ``"T"`` or ``"A/V"``.
     :ivar limit: The limit value, in the quantity's own unit.
     :ivar direction: ``"min"`` when the quantity must be at least the limit,
         ``"max"`` when it must be at most the limit.
@@ -684,7 +684,7 @@ def db_hr_facade_requirement(
     # Clause 3.1.3.4 point 1: a railway-dominant site is assessed in
     # D2m,nT,A (Formula (A.5)), road traffic and aircraft in D2m,nT,Atr
     # (Formula (A.6)). Table 2.1 supplies the same numeric limit either way.
-    quantity = "D2m,nT,A" if noise == "railway" else "D2m,nT,Atr"
+    quantity = "D2m,nT,A" if noise == "railway" else _D2M_NT_ATR
     return DbHrRequirement(
         quantity=quantity,
         limit=limit,
@@ -699,6 +699,12 @@ def db_hr_facade_requirement(
     )
 
 
+#: Quantity symbols of DB-HR, spelled as the code spells them.
+_DNT_A = "DnT,A"
+_D2M_NT_ATR = "D2m,nT,Atr"
+#: The clause that governs a habitable room against installations or activity.
+_CLAUSE_HABITABLE_SERVICES = "CTE DB-HR 2.1.1 b) iii"
+
 #: DB-HR 2.1.1 airborne requirements, keyed by (receiving room, source room).
 _AIRBORNE_ROWS: dict[tuple[str, str], tuple[str, float, str, str]] = {
     ("protected", "same_unit"): (
@@ -706,15 +712,15 @@ _AIRBORNE_ROWS: dict[tuple[str, str], tuple[str, float, str, str]] = {
         "partition walls within a dwelling of a private residential building",
     ),
     ("protected", "other_unit"): (
-        "DnT,A", 50.0, "CTE DB-HR 2.1.1 a) ii",
+        _DNT_A, 50.0, "CTE DB-HR 2.1.1 a) ii",
         "protected room against a room of another dwelling or use unit",
     ),
     ("protected", "installations"): (
-        "DnT,A", 55.0, "CTE DB-HR 2.1.1 a) iii",
+        _DNT_A, 55.0, "CTE DB-HR 2.1.1 a) iii",
         "protected room against a services or activity room",
     ),
     ("protected", "activity"): (
-        "DnT,A", 55.0, "CTE DB-HR 2.1.1 a) iii",
+        _DNT_A, 55.0, "CTE DB-HR 2.1.1 a) iii",
         "protected room against a services or activity room",
     ),
     ("habitable", "same_unit"): (
@@ -722,15 +728,15 @@ _AIRBORNE_ROWS: dict[tuple[str, str], tuple[str, float, str, str]] = {
         "partition walls within a dwelling of a private residential building",
     ),
     ("habitable", "other_unit"): (
-        "DnT,A", 45.0, "CTE DB-HR 2.1.1 b) ii",
+        _DNT_A, 45.0, "CTE DB-HR 2.1.1 b) ii",
         "habitable room against a room of another dwelling or use unit",
     ),
     ("habitable", "installations"): (
-        "DnT,A", 45.0, "CTE DB-HR 2.1.1 b) iii",
+        _DNT_A, 45.0, _CLAUSE_HABITABLE_SERVICES,
         "habitable room against a services or activity room",
     ),
     ("habitable", "activity"): (
-        "DnT,A", 45.0, "CTE DB-HR 2.1.1 b) iii",
+        _DNT_A, 45.0, _CLAUSE_HABITABLE_SERVICES,
         "habitable room against a services or activity room",
     ),
 }
@@ -742,8 +748,8 @@ _SHARED_OPENING_ROWS: dict[tuple[str, str], tuple[float, float, str]] = {
     ("habitable", "other_unit"): (20.0, 50.0, "CTE DB-HR 2.1.1 b) ii"),
     # 2.1.1 b) ii states the shared-opening variant only for residential
     # (public or private) and hospital buildings.
-    ("habitable", "installations"): (30.0, 50.0, "CTE DB-HR 2.1.1 b) iii"),
-    ("habitable", "activity"): (30.0, 50.0, "CTE DB-HR 2.1.1 b) iii"),
+    ("habitable", "installations"): (30.0, 50.0, _CLAUSE_HABITABLE_SERVICES),
+    ("habitable", "activity"): (30.0, 50.0, _CLAUSE_HABITABLE_SERVICES),
 }
 
 
@@ -785,7 +791,7 @@ def db_hr_airborne_requirement(
         )
     if not shared_opening:
         quantity, limit, reference, description = _AIRBORNE_ROWS[key]
-        return (
+        requirements = [
             DbHrRequirement(
                 quantity=quantity,
                 limit=limit,
@@ -794,8 +800,9 @@ def db_hr_airborne_requirement(
                 decimals=0,
                 reference=reference,
                 description=description,
-            ),
-        )
+            )
+        ]
+        return tuple(requirements)
     if key not in _SHARED_OPENING_ROWS:
         raise ValueError(
             "DB-HR 2.1.1 states no shared-opening variant for "
@@ -810,7 +817,7 @@ def db_hr_airborne_requirement(
             "hospital building"
         )
     )
-    return (
+    requirements = [
         DbHrRequirement(
             quantity="RA",
             limit=opening_limit,
@@ -829,14 +836,15 @@ def db_hr_airborne_requirement(
             reference=reference,
             description="enclosure surrounding the shared door or window",
         ),
-    )
+    ]
+    return tuple(requirements)
 
 
 #: DB-HR 2.1.1 c): the two alternative routes for a party wall between two
 #: buildings, keyed by the quantity the designer chooses to demonstrate.
 _PARTY_WALL_ROUTES: dict[str, tuple[float, str]] = {
-    "D2m,nT,Atr": (40.0, "each of the two leaves of the party wall"),
-    "DnT,A": (50.0, "the two leaves of the party wall taken together"),
+    _D2M_NT_ATR: (40.0, "each of the two leaves of the party wall"),
+    _DNT_A: (50.0, "the two leaves of the party wall taken together"),
 }
 
 
@@ -849,8 +857,8 @@ def db_hr_party_wall_requirement(quantity: str = "D2m,nT,Atr") -> DbHrRequiremen
     ``DnT,A`` of at least 50 dBA. They are alternatives, not cumulative
     requirements, so this function returns the one route asked for.
 
-    :param quantity: ``"D2m,nT,Atr"`` (default, the per-leaf route) or
-        ``"DnT,A"`` (the combined route).
+    :param quantity: ``_D2M_NT_ATR`` (default, the per-leaf route) or
+        ``_DNT_A`` (the combined route).
     :return: The :class:`DbHrRequirement` of the chosen route.
     :raises ValueError: For an unknown quantity.
     """

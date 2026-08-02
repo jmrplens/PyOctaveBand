@@ -261,7 +261,7 @@ which is the check that enforces the rule; see
   (the 2017 Formulae (4) and (5)).
 - **Library behaviour:** unaffected. No code path implements the reduced form:
   the façade model computes $D_{2m,nT}$ from Formula (13)
-  ([`facade_prediction.py`](../src/phonometry/building/prediction/facade.py)),
+  ([`facade.py`](../src/phonometry/building/prediction/facade.py)),
   and the survey method converts with the unreduced
   $D_{2m,n} = D_{2m} + k + 10\log_{10}[A_0 T_0/(0{,}16 V)]$ of ISO 10052 Clause 3.15
   ([`survey_insulation.py`](../src/phonometry/building/measurement/survey_insulation.py)).
