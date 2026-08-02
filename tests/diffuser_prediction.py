@@ -2,7 +2,7 @@
 """Shared ISO 17497-2 diffuser-prediction helpers (tests + conformance report).
 
 Reproduces, with the library's own Fraunhofer far-field phase-grating model
-(:mod:`phonometry.materials.diffuser_design`), the published geometry behind
+(:mod:`phonometry.materials.diffusers.design`), the published geometry behind
 the ``ISO17497_2_*`` reference levels and the Cox & D'Antonio Appendix B
 external anchor of :mod:`reference_data`: an N = 7 quadratic-residue diffuser,
 6 periods, 3.6 m total width, 0.2 m maximum well depth (Cox & D'Antonio,
@@ -12,7 +12,7 @@ commercial N = 7 QRD of Hargreaves, Cox, Lam & D'Antonio, J. Acoust. Soc. Am.
 reference is the equal-footprint zero-depth panel, exactly as the module's
 ``predicted_diffusion_spectrum`` normalisation pathway models it.
 
-Both ``tests/materials/test_scattering_diffusion.py`` and
+Both ``tests/materials/diffusers/test_scattering_diffusion.py`` and
 ``scripts/conformance_report.py`` import these helpers, so the committed
 reference levels and the Appendix B anchor can never be recomputed two
 different ways.
@@ -23,12 +23,12 @@ from __future__ import annotations
 import numpy as np
 import reference_data as ref
 
-from phonometry.materials.diffuser_design import (
+from phonometry.materials.diffusers.design import (
     DiffuserPolarResponse,
     predict_diffuser_polar_response,
     qrd_well_depths,
 )
-from phonometry.materials.scattering_diffusion import (
+from phonometry.materials.diffusers.scattering_diffusion import (
     directional_diffusion_coefficient,
     normalized_diffusion_coefficient,
 )

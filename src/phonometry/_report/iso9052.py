@@ -2,7 +2,7 @@
 """EN 29052-1 / ISO 9052-1 dynamic-stiffness fiche (reportlab renderer).
 
 Renders a
-:class:`~phonometry.materials.dynamic_stiffness.DynamicStiffnessResult` to a
+:class:`~phonometry.materials.resilient.dynamic_stiffness.DynamicStiffnessResult` to a
 one-page PDF laid out like an accredited dynamic-stiffness test report
 (EN 29052-1:1992, identical to ISO 9052-1:1989):
 
@@ -51,7 +51,7 @@ from ._material_fiche import (
 from .metadata import ReportMetadata
 
 if TYPE_CHECKING:
-    from ..materials.dynamic_stiffness import DynamicStiffnessResult
+    from ..materials.resilient.dynamic_stiffness import DynamicStiffnessResult
 
 
 def _mn(value: float, language: str = "en") -> str:
@@ -186,7 +186,7 @@ def render_dynamic_stiffness_report(
     """Render an EN 29052-1 dynamic-stiffness fiche to a PDF at ``path``.
 
     :param result: A
-        :class:`~phonometry.materials.dynamic_stiffness.DynamicStiffnessResult`
+        :class:`~phonometry.materials.resilient.dynamic_stiffness.DynamicStiffnessResult`
         carrying the apparent, enclosed-gas and installed dynamic stiffnesses,
         the test resonance ``fr`` and the supported-floor natural frequency
         ``f0``.

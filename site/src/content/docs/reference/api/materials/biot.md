@@ -1,5 +1,5 @@
 ---
-title: "materials.biot"
+title: "materials.absorbers.biot"
 description: "Biot poroelastic layers: the three waves and the 6x6 transfer matrix."
 sidebar:
   label: "biot"
@@ -10,7 +10,7 @@ Biot poroelastic layers: the three waves and the 6x6 transfer matrix.
 An equivalent fluid replaces a porous material by a single wave travelling in
 the pores while the skeleton stands still (rigid frame) or is merely dragged
 along by the pore fluid (limp frame, see
-[`limp_frame`](/phonometry/reference/api/materials/porous-absorber/#limp_frame)). Neither can carry a
+[`limp_frame`](/phonometry/reference/api/materials/porous/#limp_frame)). Neither can carry a
 wave in the skeleton itself, so neither can produce a frame resonance. The Biot
 theory can: it treats the frame as an elastic solid coupled to the pore fluid
 through a potential coupling coefficient and an inertial coupling coefficient,
@@ -35,7 +35,7 @@ of the rest of the package, exactly as printed:
   through the identity $\rho_{22} = \phi^2 \rho_{\mathrm{eq}}$ stated
   on printed p. 253, so a
   Biot layer and a rigid-frame layer built from the same
-  [`PorousMediumResult`](/phonometry/reference/api/materials/porous-absorber/#porousmediumresult) share one
+  [`PorousMediumResult`](/phonometry/reference/api/materials/porous/#porousmediumresult) share one
   visco-thermal description by construction.
 * **The two compressional waves** as the eigenvalues of Eq. (6.65)
   (Eqs. (6.67)-(6.69), printed p. 121), the **shear wave** of Eq. (6.83), and
@@ -54,8 +54,8 @@ of the rest of the package, exactly as printed:
   $[T] = [\Gamma(-h)][\Gamma(0)]^{-1}$ (Eq. (11.34)).
 
 The layer is used through
-[`PoroelasticLayer`](/phonometry/reference/api/materials/porous-absorber/#poroelasticlayer) inside
-[`layered_absorber`](/phonometry/reference/api/materials/porous-absorber/#layered_absorber), which switches
+[`PoroelasticLayer`](/phonometry/reference/api/materials/porous/#poroelasticlayer) inside
+[`layered_absorber`](/phonometry/reference/api/materials/porous/#layered_absorber), which switches
 to the global-matrix assembly of Sect. 11.5 as soon as a poroelastic layer is
 present, with the coupling matrices of Sect. 11.4 ($[I_{pf}]$ /
 $[J_{pf}]$ Eq. (11.73), $[I_{pp}]$ Eq. (11.67)) and the hard-wall
@@ -65,7 +65,7 @@ conditions $[Y]$ of Eq. (11.81).
 impedances, so the model is anchored on closed forms and on exact limits: the
 rigid-frame limit reproduces the already-anchored Johnson-Champoux-Allard
 equivalent fluid, the limp limit reproduces
-[`limp_frame`](/phonometry/reference/api/materials/porous-absorber/#limp_frame), and the chapter 11
+[`limp_frame`](/phonometry/reference/api/materials/porous/#limp_frame), and the chapter 11
 assembly reproduces the chapter 6 closed form Eq. (6.107) to machine precision.
 The book does print four *output* numbers for the fully specified glass wool of
 Table 6.1, and all four are reproduced: the airborne branch changes from
@@ -76,7 +76,7 @@ of a 5.6 cm layer sits at 860 Hz (printed p. 129). The third of those is
 reproduced by $\operatorname{Re}(\mu_b)$: the printed sentence calls it
 a modulus, but $\lvert \mu_b \rvert$ is 0.939 at 1500 Hz against the
 printed 0.82, and `docs/ERRATA.md` records why. See
-`tests/materials/test_biot.py`.
+`tests/materials/absorbers/test_biot.py`.
 
 > Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
 
@@ -109,7 +109,7 @@ $Z_i^s = (P + Q \mu_i) \delta_i / \omega$.
 
 This is an independent derivation of the same physics as the chapter 11
 transfer-matrix assembly reached through
-[`PoroelasticLayer`](/phonometry/reference/api/materials/porous-absorber/#poroelasticlayer); the two
+[`PoroelasticLayer`](/phonometry/reference/api/materials/porous/#poroelasticlayer); the two
 agree to machine precision, which is one of the anchors of this module.
 Unlike the transfer matrix, it is restricted to normal incidence, to a
 single layer and to a glued rigid backing.
@@ -150,8 +150,8 @@ the two identities of Allard & Atalla printed p. 253,
 $\rho_{22} = \phi^2 \rho_{\mathrm{eq}}$ and
 $R = \phi^2 K_{\mathrm{eq}}$, where `rho_eq` and
 `K_eq` are the surface-normalised effective density and bulk modulus that
-every model in [`porous_absorber`](/phonometry/reference/api/materials/porous-absorber/) returns. Pass
-the rigid-frame [`johnson_champoux_allard`](/phonometry/reference/api/materials/porous-absorber/#johnson_champoux_allard)
+every model in [`porous`](/phonometry/reference/api/materials/porous/) returns. Pass
+the rigid-frame [`johnson_champoux_allard`](/phonometry/reference/api/materials/porous/#johnson_champoux_allard)
 result: the frame motion is the Biot model's business, not the equivalent
 fluid's, so the *rigid-frame* effective density is the correct input (a
 limp-corrected one would count the frame inertia twice).
@@ -175,7 +175,7 @@ $\rho_a = \phi \rho_0 (\alpha_\infty - 1)$ (Eq. (6.44)):
 
 | Name | Description |
 | :--- | :--- |
-| `medium` | Rigid-frame [`PorousMediumResult`](/phonometry/reference/api/materials/porous-absorber/#porousmediumresult) for the pore fluid, evaluated on the frequency vector of interest. |
+| `medium` | Rigid-frame [`PorousMediumResult`](/phonometry/reference/api/materials/porous/#porousmediumresult) for the pore fluid, evaluated on the frequency vector of interest. |
 | `porosity` | Open porosity `phi` (0 \< phi \<= 1). |
 | `tortuosity` | High-frequency tortuosity `a_inf` (>= 1). |
 | `frame_density` | Bulk density of the frame `rho1`, in kg/m3 (> 0). |
@@ -319,7 +319,7 @@ $K_b = 2 N (\nu + 1) / (3 (1 - 2 \nu))$ (Allard & Atalla 2e,
 Eq. (6.29), printed p. 116). `Kb` is the quantity the jacketed
 "gedanken experiment" of Eq. (6.7) measures, and the one the limp-frame
 rules of thumb of
-[`limp_frame_applicable`](/phonometry/reference/api/materials/porous-absorber/#limp_frame_applicable) compare
+[`limp_frame_applicable`](/phonometry/reference/api/materials/porous/#limp_frame_applicable) compare
 with the bulk modulus of the pore fluid.
 
 **Parameters**
@@ -442,7 +442,7 @@ $V(M) = [T^p] V(M')$. The wave-amplitude matrix $[\Gamma]$ of
 Table 11.1 behind it is built by `_gamma`.
 
 The layer solver of
-[`layered_absorber`](/phonometry/reference/api/materials/porous-absorber/#layered_absorber) does *not*
+[`layered_absorber`](/phonometry/reference/api/materials/porous/#layered_absorber) does *not*
 use this matrix: it assembles the wave amplitudes directly, which avoids
 inverting $[\Gamma(0)]$ and is far better conditioned for a very
 soft or a

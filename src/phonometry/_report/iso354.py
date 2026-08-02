@@ -2,7 +2,7 @@
 """ISO 354 reverberation-room sound-absorption fiche (reportlab renderer).
 
 Renders a
-:class:`~phonometry.materials.sound_absorption.SoundAbsorptionMeasurement` to a
+:class:`~phonometry.materials.absorbers.sound_absorption.SoundAbsorptionMeasurement` to a
 one-page PDF laid out like an accredited reverberation-room absorption test
 report (ISO 354:2003):
 
@@ -57,7 +57,7 @@ from ._layout import (
 from .metadata import ReportMetadata
 
 if TYPE_CHECKING:
-    from ..materials.sound_absorption import SoundAbsorptionMeasurement
+    from ..materials.absorbers.sound_absorption import SoundAbsorptionMeasurement
 
 
 def _a2(value: float, language: str = "en") -> str:
@@ -203,7 +203,7 @@ def render_iso354_report(
     """Render an ISO 354 sound-absorption test-report fiche to a PDF at ``path``.
 
     :param result: A
-        :class:`~phonometry.materials.sound_absorption.SoundAbsorptionMeasurement`
+        :class:`~phonometry.materials.absorbers.sound_absorption.SoundAbsorptionMeasurement`
         carrying the one-third-octave ``frequencies`` and ``alpha_s`` (and, for
         ``verbose``, ``t_empty``/``t_specimen`` and the absorption areas).
     :param path: Destination path of the PDF file.

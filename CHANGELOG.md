@@ -1034,6 +1034,32 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
   Nothing moves in the namespace: `from phonometry import building` exports
   the same 251 names, and the nineteen pre-split module paths keep working
+- `phonometry.materials` has four families, by what the material does rather
+  than by how it is measured. `materials.absorbers` holds everything that
+  absorbs and the methods that characterise it: ISO 354 in the reverberation
+  room, ISO 10534-2 in the tube, ISO 9053 for airflow resistance, the porous
+  and multilayer models, Biot, the slow-sound metamaterials, and the ISO 11654
+  rating and ISO 12999-2 uncertainty. `materials.diffusers` holds what
+  scatters: Schroeder design, metadiffusers, and ISO 17497.
+  `materials.surfaces` is what is characterised in place, which is the ISO
+  13472 road surface today. `materials.resilient` is what isolates, which is
+  the EN 29052-1 dynamic stiffness.
+
+  The test method lives with the family it characterises rather than in a
+  family of its own, which is how Cox and D'Antonio organise the same material
+  and how a reader looks for it: "I have a diffuser" comes before "I have a
+  goniometer". Two families start with one module each, `surfaces` and
+  `resilient`, because both have known growth and a subaudience that already
+  exists.
+
+  Five modules lose a word the family now says: `absorption_rating` and
+  `absorption_uncertainty` become `absorbers.rating` and
+  `absorbers.uncertainty`, `porous_absorber` becomes `absorbers.porous`,
+  `slow_sound_absorber` becomes `absorbers.slow_sound` and `diffuser_design`
+  becomes `diffusers.design`.
+
+  Nothing moves in the namespace: `from phonometry import materials` exports
+  the same 186 names, and the thirteen pre-split module paths keep working
   until 5.0.
 
 - `phonometry.environmental` is `phonometry.environment`, with three

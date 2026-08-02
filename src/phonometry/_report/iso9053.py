@@ -2,7 +2,7 @@
 """ISO 9053-1:2018 static-method airflow-resistance fiche (reportlab renderer).
 
 Renders a
-:class:`~phonometry.materials.airflow_resistance.StaticAirflowResult` to a
+:class:`~phonometry.materials.absorbers.airflow_resistance.StaticAirflowResult` to a
 one-page PDF laid out like an accredited airflow-resistance test report
 (ISO 9053-1:2018, static/direct airflow method):
 
@@ -50,7 +50,7 @@ from ._material_fiche import (
 from .metadata import ReportMetadata
 
 if TYPE_CHECKING:
-    from ..materials.airflow_resistance import StaticAirflowResult
+    from ..materials.absorbers.airflow_resistance import StaticAirflowResult
 
 
 def _pas(value: float, language: str = "en") -> str:
@@ -178,7 +178,7 @@ def render_static_airflow_report(
     """Render an ISO 9053-1 static airflow-resistance fiche to a PDF at ``path``.
 
     :param result: A
-        :class:`~phonometry.materials.airflow_resistance.StaticAirflowResult`
+        :class:`~phonometry.materials.absorbers.airflow_resistance.StaticAirflowResult`
         carrying the airflow resistance ``R``, the specific airflow resistance
         ``R_s``, the airflow resistivity ``sigma`` (when a thickness was
         supplied), the through-origin fit coefficients and the evaluation

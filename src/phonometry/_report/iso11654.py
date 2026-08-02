@@ -2,7 +2,7 @@
 """ISO 11654 sound-absorption rating fiche (reportlab renderer).
 
 Renders a
-:class:`~phonometry.materials.absorption_rating.AbsorptionRatingResult` to a
+:class:`~phonometry.materials.absorbers.rating.AbsorptionRatingResult` to a
 one-page PDF laid out like an accredited absorption test report (a reverberation
 room measurement per ISO 354 rated per ISO 11654):
 
@@ -59,7 +59,7 @@ from ._layout import (
 from .metadata import ReportMetadata
 
 if TYPE_CHECKING:
-    from ..materials.absorption_rating import AbsorptionRatingResult
+    from ..materials.absorbers.rating import AbsorptionRatingResult
 
 #: Threshold below which an unfavourable deviation is shown as an em dash.
 _DEVIATION_EPS = 0.005
@@ -256,7 +256,7 @@ def _statement(result: AbsorptionRatingResult, language: str = "en") -> str:
 
     The shape indicator follows the value without a space, exactly as the
     ISO 11654 clause 5.3 example (``0,70(MH)``) and
-    :attr:`~phonometry.materials.absorption_rating.AbsorptionRatingResult.rating_label`
+    :attr:`~phonometry.materials.absorbers.rating.AbsorptionRatingResult.rating_label`
     write it.
     """
     value = format_number(result.alpha_w, language, decimals=2)
@@ -311,7 +311,7 @@ def render_iso11654_report(
     """Render an ISO 11654 absorption-rating fiche to a PDF at ``path``.
 
     :param result: An
-        :class:`~phonometry.materials.absorption_rating.AbsorptionRatingResult`
+        :class:`~phonometry.materials.absorbers.rating.AbsorptionRatingResult`
         carrying the octave-band ``band_centers``, ``measured`` practical
         coefficients and the fitted ``shifted_reference`` curve.
     :param path: Destination path of the PDF file.

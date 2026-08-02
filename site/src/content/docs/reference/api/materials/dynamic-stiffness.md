@@ -1,5 +1,5 @@
 ---
-title: "materials.dynamic_stiffness"
+title: "materials.resilient.dynamic_stiffness"
 description: "Dynamic stiffness of resilient materials under floating floors (EN 29052-1:1992)."
 sidebar:
   label: "dynamic_stiffness"

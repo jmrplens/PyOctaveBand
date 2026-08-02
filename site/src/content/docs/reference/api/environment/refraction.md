@@ -96,7 +96,7 @@ atmosphere it reproduces the spherical-wave ground effect of
 
 The ground surface impedance is either supplied through `impedance` (a
 normalized complex value/array, or a
-[`PorousMediumResult`](/phonometry/reference/api/materials/porous-absorber/#porousmediumresult)) or derived from an
+[`PorousMediumResult`](/phonometry/reference/api/materials/porous/#porousmediumresult)) or derived from an
 effective `flow_resistivity` (Pa s/m2) via the `model` porous model.
 Exactly one of the two must be given. A plain `impedance` value is taken
 in the $e^{-i \omega t}$ convention ($\operatorname{Im}(Z) > 0$

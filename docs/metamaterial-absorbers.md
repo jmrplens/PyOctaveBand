@@ -305,7 +305,7 @@ a loop over cells.
   animation above.
 - [Airflow Resistance](airflow-resistance.md): the viscous physics of the
   narrow channels, measured on the bulk material.
-- API reference: [`materials.slow_sound_absorber`](https://jmrplens.github.io/phonometry/reference/api/materials/slow-sound-absorber/).
+- API reference: [`materials.absorbers.slow_sound`](https://jmrplens.github.io/phonometry/reference/api/materials/slow-sound/).
 
 ## References
 

@@ -84,7 +84,7 @@ and the reverberation time (Formula 5).
 | `objects` | Equivalent absorption areas of the objects `Aobj`, m2. |
 | `object_fraction` | Object fraction `psi` (0-1). |
 | `air_condition` | A key of `AIR_ATTENUATION` (e.g. `"20C_50-70"`) to include air absorption, or `None` to neglect it. |
-| `frequencies` | Octave-band centre frequencies, in hertz. The built-in `air_condition` profiles require the standard [`OCTAVE_BANDS`](/phonometry/reference/api/materials/absorption-rating/#octave_bands). |
+| `frequencies` | Octave-band centre frequencies, in hertz. The built-in `air_condition` profiles require the standard [`OCTAVE_BANDS`](/phonometry/reference/api/materials/rating/#octave_bands). |
 | `speed_of_sound` | Speed of sound `c0`, m/s. |
 
 **Returns:** The [`ReverberationResult`](/phonometry/reference/api/rooms/enclosed-space-absorption/#reverberationresult).

@@ -1,5 +1,5 @@
 ---
-title: "materials.sound_absorption"
+title: "materials.absorbers.sound_absorption"
 description: "Sound absorption in a reverberation room: BS EN ISO 354:2003."
 sidebar:
   label: "sound_absorption"
@@ -261,7 +261,7 @@ accredited ISO 354 test-report PDF).
 A single-number rating (the practical coefficient `alpha_p` and the
 weighted coefficient `alpha_w`) is defined by ISO 11654, not ISO 354, and
 is therefore not produced here; pass `alpha_s` to
-[`weighted_absorption_from_third_octave`](/phonometry/reference/api/materials/absorption-rating/#weighted_absorption_from_third_octave) for it.
+[`weighted_absorption_from_third_octave`](/phonometry/reference/api/materials/rating/#weighted_absorption_from_third_octave) for it.
 
 **Attributes**
 

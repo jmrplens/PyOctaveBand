@@ -1,5 +1,5 @@
 ---
-title: "materials.metadiffuser"
+title: "materials.diffusers.metadiffuser"
 description: "Metadiffusers: deep-subwavelength Schroeder-like sound diffusers."
 sidebar:
   label: "metadiffuser"
@@ -21,12 +21,12 @@ critical coupling adds the perfectly absorbing `0` state that ternary
 sequences require.
 
 Each slit is modelled with the transfer-matrix chain of
-[`slit_helmholtz_absorber`](/phonometry/reference/api/materials/slow-sound-absorber/#slit_helmholtz_absorber)
+[`slit_helmholtz_absorber`](/phonometry/reference/api/materials/slow-sound/#slit_helmholtz_absorber)
 (visco-thermal effective parameters, resonator end corrections and slit
 radiation correction); the panel is locally reacting, so the wells do not
 couple internally and the far field follows from the Fraunhofer integral of
 the per-well reflection sequence
-([`predict_diffuser_polar_response`](/phonometry/reference/api/materials/diffuser-design/#predict_diffuser_polar_response))
+([`predict_diffuser_polar_response`](/phonometry/reference/api/materials/design/#predict_diffuser_polar_response))
 reduced to the ISO 17497-2 directional diffusion coefficient.
 
 > Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
@@ -112,7 +112,7 @@ Computes the per-well complex reflection sequence at `frequency` with
 slit chains see the incidence angle `source_angle`) and evaluates the
 Fraunhofer far field and ISO 17497-2 directional diffusion coefficient
 with
-[`predict_diffuser_polar_response`](/phonometry/reference/api/materials/diffuser-design/#predict_diffuser_polar_response).
+[`predict_diffuser_polar_response`](/phonometry/reference/api/materials/design/#predict_diffuser_polar_response).
 
 **Parameters**
 
@@ -133,7 +133,7 @@ with
 | `heat_capacity_ratio` | Ratio of specific heats `gamma`. |
 | `atmospheric_pressure` | Static pressure `P0`, in Pa. |
 
-**Returns:** A [`DiffuserPolarResponse`](/phonometry/reference/api/materials/diffuser-design/#diffuserpolarresponse).
+**Returns:** A [`DiffuserPolarResponse`](/phonometry/reference/api/materials/design/#diffuserpolarresponse).
 
 ## metadiffuser_reflection
 
@@ -158,7 +158,7 @@ metadiffuser_reflection(
 Per-well reflection spectra of a metadiffuser panel (Sci. Rep. Eq. (6)).
 
 Runs the rigidly backed slit transfer-matrix chain of
-[`slit_helmholtz_absorber`](/phonometry/reference/api/materials/slow-sound-absorber/#slit_helmholtz_absorber)
+[`slit_helmholtz_absorber`](/phonometry/reference/api/materials/slow-sound/#slit_helmholtz_absorber)
 once per well: each [`MetadiffuserWell`](/phonometry/reference/api/materials/metadiffuser/#metadiffuserwell) becomes a slit of height
 `h_n` and depth `L` loaded by its `M` resonators on the lattice
 $a = L / M$, and `None` wells are flat rigid strips with

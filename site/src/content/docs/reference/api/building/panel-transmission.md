@@ -68,8 +68,8 @@ $$
 
 The cavity stiffness `s''` is $\rho_0 c_0^{2} / d$ for an empty
 (adiabatic) air gap; a porous fill (a
-[`PorousMediumResult`](/phonometry/reference/api/materials/porous-absorber/#porousmediumresult) from
-[`phonometry.materials.porous_absorber`](/phonometry/reference/api/materials/porous-absorber/)) lowers the resonance through its
+[`PorousMediumResult`](/phonometry/reference/api/materials/porous/#porousmediumresult) from
+[`phonometry.materials.absorbers.porous`](/phonometry/reference/api/materials/porous/)) lowers the resonance through its
 softer, near-isothermal effective bulk modulus and damps the cavity so the
 mid-band slope is realised without standing-wave dips.
 
@@ -349,7 +349,7 @@ and Hopkins' Table A4.
 | `mass1` | Surface density of leaf 1 `m1`, in kg/m^2 (> 0). |
 | `mass2` | Surface density of leaf 2 `m2`, in kg/m^2 (> 0). |
 | `gap` | Cavity depth `d`, in m (> 0). |
-| `cavity_medium` | Optional porous fill (a [`PorousMediumResult`](/phonometry/reference/api/materials/porous-absorber/#porousmediumresult)) whose effective bulk modulus sets the cavity stiffness. |
+| `cavity_medium` | Optional porous fill (a [`PorousMediumResult`](/phonometry/reference/api/materials/porous/#porousmediumresult)) whose effective bulk modulus sets the cavity stiffness. |
 | `tie_stiffness_per_area` | Stiffness per unit area $N k / S$ of a connection array bridging the cavity, in N/m^3 (>= 0, Default: 0). |
 | `speed_of_sound` | Speed of sound in air `c0` (Default: 343 m/s). |
 | `air_density` | Air density `rho0` (Default: 1.205 kg/m^3). |

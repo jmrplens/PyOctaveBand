@@ -259,9 +259,11 @@ The generated API reference, one page per module. Fetch these only when a specif
 - [aeroacoustics/rotorcraft-noise](https://jmrplens.github.io/phonometry/reference/api/aeroacoustics/rotorcraft-noise/)
 - [broadcast/program-loudness](https://jmrplens.github.io/phonometry/reference/api/broadcast/program-loudness/)
 - [building/aperture-transmission](https://jmrplens.github.io/phonometry/reference/api/building/aperture-transmission/)
+- [building/building-prediction](https://jmrplens.github.io/phonometry/reference/api/building/building-prediction/)
+- [building/building-uncertainty](https://jmrplens.github.io/phonometry/reference/api/building/building-uncertainty/)
 - [building/ceiling-plenum](https://jmrplens.github.io/phonometry/reference/api/building/ceiling-plenum/)
-- [building/detailed-model](https://jmrplens.github.io/phonometry/reference/api/building/detailed-model/)
-- [building/facade](https://jmrplens.github.io/phonometry/reference/api/building/facade/)
+- [building/detailed-prediction](https://jmrplens.github.io/phonometry/reference/api/building/detailed-prediction/)
+- [building/facade-prediction](https://jmrplens.github.io/phonometry/reference/api/building/facade-prediction/)
 - [building/flanking-transmission](https://jmrplens.github.io/phonometry/reference/api/building/flanking-transmission/)
 - [building/floor-covering-improvement](https://jmrplens.github.io/phonometry/reference/api/building/floor-covering-improvement/)
 - [building/heavy-impact](https://jmrplens.github.io/phonometry/reference/api/building/heavy-impact/)
@@ -272,11 +274,9 @@ The generated API reference, one page per module. Fetch these only when a specif
 - [building/masonry-cavity-wall](https://jmrplens.github.io/phonometry/reference/api/building/masonry-cavity-wall/)
 - [building/panel-transmission](https://jmrplens.github.io/phonometry/reference/api/building/panel-transmission/)
 - [building/resilient-layers](https://jmrplens.github.io/phonometry/reference/api/building/resilient-layers/)
-- [building/simplified-model](https://jmrplens.github.io/phonometry/reference/api/building/simplified-model/)
-- [building/spain](https://jmrplens.github.io/phonometry/reference/api/building/spain/)
+- [building/spanish-building-code](https://jmrplens.github.io/phonometry/reference/api/building/spanish-building-code/)
 - [building/structure-borne-power](https://jmrplens.github.io/phonometry/reference/api/building/structure-borne-power/)
 - [building/survey-insulation](https://jmrplens.github.io/phonometry/reference/api/building/survey-insulation/)
-- [building/uncertainty](https://jmrplens.github.io/phonometry/reference/api/building/uncertainty/)
 - [electroacoustics/distortion](https://jmrplens.github.io/phonometry/reference/api/electroacoustics/distortion/)
 - [electroacoustics/frequency-response](https://jmrplens.github.io/phonometry/reference/api/electroacoustics/frequency-response/)
 - [electroacoustics/loudspeaker](https://jmrplens.github.io/phonometry/reference/api/electroacoustics/loudspeaker/)
@@ -305,19 +305,19 @@ The generated API reference, one page per module. Fetch these only when a specif
 - [hearing/noise-induced-hearing-loss](https://jmrplens.github.io/phonometry/reference/api/hearing/noise-induced-hearing-loss/)
 - [hearing/occupational-exposure](https://jmrplens.github.io/phonometry/reference/api/hearing/occupational-exposure/)
 - [hearing/threshold](https://jmrplens.github.io/phonometry/reference/api/hearing/threshold/)
-- [materials/absorption-rating](https://jmrplens.github.io/phonometry/reference/api/materials/absorption-rating/)
-- [materials/absorption-uncertainty](https://jmrplens.github.io/phonometry/reference/api/materials/absorption-uncertainty/)
 - [materials/airflow-resistance](https://jmrplens.github.io/phonometry/reference/api/materials/airflow-resistance/)
 - [materials/biot](https://jmrplens.github.io/phonometry/reference/api/materials/biot/)
-- [materials/diffuser-design](https://jmrplens.github.io/phonometry/reference/api/materials/diffuser-design/)
+- [materials/design](https://jmrplens.github.io/phonometry/reference/api/materials/design/)
 - [materials/dynamic-stiffness](https://jmrplens.github.io/phonometry/reference/api/materials/dynamic-stiffness/)
 - [materials/impedance-tube](https://jmrplens.github.io/phonometry/reference/api/materials/impedance-tube/)
 - [materials/metadiffuser](https://jmrplens.github.io/phonometry/reference/api/materials/metadiffuser/)
-- [materials/porous-absorber](https://jmrplens.github.io/phonometry/reference/api/materials/porous-absorber/)
+- [materials/porous](https://jmrplens.github.io/phonometry/reference/api/materials/porous/)
+- [materials/rating](https://jmrplens.github.io/phonometry/reference/api/materials/rating/)
 - [materials/road-absorption](https://jmrplens.github.io/phonometry/reference/api/materials/road-absorption/)
 - [materials/scattering-diffusion](https://jmrplens.github.io/phonometry/reference/api/materials/scattering-diffusion/)
-- [materials/slow-sound-absorber](https://jmrplens.github.io/phonometry/reference/api/materials/slow-sound-absorber/)
+- [materials/slow-sound](https://jmrplens.github.io/phonometry/reference/api/materials/slow-sound/)
 - [materials/sound-absorption](https://jmrplens.github.io/phonometry/reference/api/materials/sound-absorption/)
+- [materials/uncertainty](https://jmrplens.github.io/phonometry/reference/api/materials/uncertainty/)
 - [metrology/calibration](https://jmrplens.github.io/phonometry/reference/api/metrology/calibration/)
 - [metrology/data-qualification](https://jmrplens.github.io/phonometry/reference/api/metrology/data-qualification/)
 - [metrology/uncertainty](https://jmrplens.github.io/phonometry/reference/api/metrology/uncertainty/)
@@ -913,7 +913,7 @@ print(float(materials.single_number_rating_uncertainty(8.1).reported_expanded_un
   the EN 12354-6 absorption budget these coefficients feed.
 - [Field Insulation Measurement (ISO 16283)](https://jmrplens.github.io/phonometry/guides/insulation-field/): the
   sound-insulation companion uncertainty standard, ISO 12999-1.
-- API reference: [`materials.sound_absorption`](https://jmrplens.github.io/phonometry/reference/api/materials/sound-absorption/), [`materials.absorption_rating`](https://jmrplens.github.io/phonometry/reference/api/materials/absorption-rating/) and [`materials.absorption_uncertainty`](https://jmrplens.github.io/phonometry/reference/api/materials/absorption-uncertainty/).
+- API reference: [`materials.absorbers.sound_absorption`](https://jmrplens.github.io/phonometry/reference/api/materials/sound-absorption/), [`materials.absorbers.rating`](https://jmrplens.github.io/phonometry/reference/api/materials/rating/) and [`materials.absorbers.uncertainty`](https://jmrplens.github.io/phonometry/reference/api/materials/uncertainty/).
 
 ## References
 
@@ -1902,7 +1902,7 @@ the model, is $\sigma$.
 - [Sound Absorption Measurement and Rating](https://jmrplens.github.io/phonometry/guides/absorption-measurement/): the
   reverberation-room measurement and the ISO 11654 rating of the finished
   absorber.
-- API reference: [`materials.airflow_resistance`](https://jmrplens.github.io/phonometry/reference/api/materials/airflow-resistance/).
+- API reference: [`materials.absorbers.airflow_resistance`](https://jmrplens.github.io/phonometry/reference/api/materials/airflow-resistance/).
 
 ## References
 
@@ -2246,7 +2246,7 @@ contour = aircraft.noise_contour(path, powers, distances, sel, lmax, x=gx, y=gy)
 | `phonometry.emission` | Sound power (ISO 3740 family), sound intensity, vibration-based power |
 | `phonometry.room` | Room acoustics (ISO 3382), impulse responses, open-plan, room-noise criteria, reverberation prediction, EN 12354-6 |
 | `phonometry.materials` | Absorption (ISO 354/11654), impedance tube, airflow resistance, scattering/diffusion, road absorption, dynamic stiffness |
-| `phonometry.building` | Three subgroups: `measurement` (field, laboratory, survey and intensity methods with their ISO 717 ratings and ISO 12999 uncertainty), `prediction` (EN 12354 global and detailed models, facades, panels, apertures, plenums and resilient layers) and `regulation` (national codes) |
+| `phonometry.building` | Sound insulation measurement and prediction (EN 12354, ISO 717/16283/10140/15186/10052/10848), structure-borne sound |
 | `phonometry.vibration` | Three families: `structural` (mobility ISO 7626, plate junctions, radiation, experimental SEA, transfer stiffness ISO 10846), `human` (ISO 2631/5349/8041 exposure and multiple shocks) and `machinery` (fault frequencies and condition monitoring) |
 | `phonometry.environment` | Three subgroups: `sources` (CNOSSOS road and rail emission, wind-turbine apparent sound power), `propagation` (ISO 9613-1/-2, ground effect and barriers, refraction by ray tracing and the parabolic equation) and `assessment` (ISO 1996-1/-2 rating and measurement, impulsive prominence, RD 1367/2007) |
 | `phonometry.aircraft` | EPNL (ICAO Annex 16), SAE ARP 5534 absorption, airport contours (ECAC Doc 29), rotorcraft (ECAC Doc 32) |
@@ -2265,12 +2265,11 @@ warns and delegates as well.
 
 | Deprecated path | Resolves to | Removed in |
 | :--- | :--- | :--- |
-| `phonometry.insulation` | `phonometry.building.measurement.insulation` | 4.0 |
-| `phonometry.metrology.levels` | `phonometry.signals.levels` | 5.0 |
-| `phonometry.hearing.sti` | `phonometry.speech.sti` | 5.0 |
-| `phonometry.vibration.human_vibration` | `phonometry.vibration.human.exposure` | 5.0 |
-| `phonometry.building.spanish_building_code` | `phonometry.building.regulation.spain` | 5.0 |
-| `phonometry.environmental` | `phonometry.environment` | 5.0 |
+| `phonometry.building.insulation` | `phonometry.building.insulation` | 4.0 |
+| `phonometry.signals.levels` | `phonometry.signals.levels` | 5.0 |
+| `phonometry.speech.sti` | `phonometry.speech.sti` | 5.0 |
+| `phonometry.vibration.human.exposure` | `phonometry.vibration.human.exposure` | 5.0 |
+| `phonometry.environment` | `phonometry.environment` | 5.0 |
 
 | Name | Type | Description (Inputs) | Usage Snippet (Outputs) |
 | :--- | :--- | :--- | :--- |
@@ -6775,7 +6774,7 @@ printed tables are recorded in [Errata](https://jmrplens.github.io/phonometry/re
   result the prediction is checked against.
 - [Dynamic stiffness of resilient materials (EN 29052-1)](https://jmrplens.github.io/phonometry/guides/dynamic-stiffness/):
   the $s'$ behind the floating floor's resonance frequency.
-- API reference: [`building.prediction.detailed_model`](https://jmrplens.github.io/phonometry/reference/api/building/detailed-model/).
+- API reference: [`building.detailed_prediction`](https://jmrplens.github.io/phonometry/reference/api/building/detailed-prediction/).
 
 ---
 
@@ -7382,7 +7381,7 @@ no longer small against the wavelength; a frequency-blind single number
 - [Outdoor Sound Propagation](https://jmrplens.github.io/phonometry/guides/outdoor-propagation/): the full ISO 9613-1
   atmospheric-absorption model whose pure-tone coefficient the ISO 17497-1
   air-attenuation relations consume.
-- API reference: [`materials.scattering_diffusion`](https://jmrplens.github.io/phonometry/reference/api/materials/scattering-diffusion/) and [`materials.diffuser_design`](https://jmrplens.github.io/phonometry/reference/api/materials/diffuser-design/).
+- API reference: [`materials.diffusers.scattering_diffusion`](https://jmrplens.github.io/phonometry/reference/api/materials/scattering-diffusion/) and [`materials.diffusers.design`](https://jmrplens.github.io/phonometry/reference/api/materials/design/).
 
 ## References
 
@@ -10223,7 +10222,7 @@ ISO 16283-3 and EN ISO 717-1 for the prediction).
   radiating side of EN 12354-4.
 - [Theory](https://jmrplens.github.io/phonometry/reference/theory/rooms-buildings/): the reference-curve derivation behind
   the weighted single-number ratings.
-- API reference: [`building.prediction.facade`](https://jmrplens.github.io/phonometry/reference/api/building/facade/) and [`building.measurement.insulation`](https://jmrplens.github.io/phonometry/reference/api/building/insulation/).
+- API reference: [`building.facade_prediction`](https://jmrplens.github.io/phonometry/reference/api/building/facade-prediction/) and [`building.insulation`](https://jmrplens.github.io/phonometry/reference/api/building/insulation/).
 
 ---
 
@@ -12350,8 +12349,8 @@ laboratory reports.
   reference-curve engines behind $D_{n,f,w}$ and $L_{n,f,w}$.
 - [Room-to-room and open-plan acoustics](https://jmrplens.github.io/phonometry/guides/open-plan-acoustics/): the
   open-plan context the ceiling flanking path usually appears in.
-- API reference: [`building.measurement.flanking_transmission`](https://jmrplens.github.io/phonometry/reference/api/building/flanking-transmission/)
-  and [`building.prediction.ceiling_plenum`](https://jmrplens.github.io/phonometry/reference/api/building/ceiling-plenum/).
+- API reference: [`building.flanking_transmission`](https://jmrplens.github.io/phonometry/reference/api/building/flanking-transmission/)
+  and [`building.ceiling_plenum`](https://jmrplens.github.io/phonometry/reference/api/building/ceiling-plenum/).
 
 ---
 
@@ -14239,7 +14238,7 @@ not a measurement).
   impact model whose Formula (21) consumes $\Delta L_w$.
 - [Insulation Ratings (ISO 717)](https://jmrplens.github.io/phonometry/guides/insulation-ratings/): the reference-curve
   engine behind the weighted improvement.
-- API reference: [`building.measurement.floor_covering_improvement`](https://jmrplens.github.io/phonometry/reference/api/building/floor-covering-improvement/).
+- API reference: [`building.floor_covering_improvement`](https://jmrplens.github.io/phonometry/reference/api/building/floor-covering-improvement/).
 
 ---
 
@@ -14833,7 +14832,7 @@ resolve.
   tubes of section 5.
 - [Calibration and dBFS](https://jmrplens.github.io/phonometry/guides/calibration/): microphone calibration ahead of
   the two-microphone transfer function.
-- API reference: [`materials.impedance_tube`](https://jmrplens.github.io/phonometry/reference/api/materials/impedance-tube/).
+- API reference: [`materials.absorbers.impedance_tube`](https://jmrplens.github.io/phonometry/reference/api/materials/impedance-tube/).
 
 ## References
 
@@ -15908,7 +15907,7 @@ ISO 16283 family (ISO 16283-3:2016) has its own page.
   used for the insulation spectra.
 - [Theory](https://jmrplens.github.io/phonometry/reference/theory/rooms-buildings/): the reference-curve derivation behind the
   weighted single-number ratings.
-- API reference: [`building.measurement.insulation`](https://jmrplens.github.io/phonometry/reference/api/building/insulation/) and [`building.measurement.uncertainty`](https://jmrplens.github.io/phonometry/reference/api/building/uncertainty/).
+- API reference: [`building.insulation`](https://jmrplens.github.io/phonometry/reference/api/building/insulation/) and [`building.building_uncertainty`](https://jmrplens.github.io/phonometry/reference/api/building/building-uncertainty/).
 
 ---
 
@@ -16238,7 +16237,7 @@ apparent $R'_I$. The single-number ratings reuse ISO 717-1.
   reference-curve engine behind $R_{I,w}$ and $D_{I,n,e,w}$.
 - [Sound Intensity](https://jmrplens.github.io/phonometry/guides/intensity/): the two-microphone probe, its field
   indicators and the residual-index qualification behind every scan.
-- API reference: [`building.measurement.intensity_insulation`](https://jmrplens.github.io/phonometry/reference/api/building/intensity-insulation/).
+- API reference: [`building.intensity_insulation`](https://jmrplens.github.io/phonometry/reference/api/building/intensity-insulation/).
 
 ---
 
@@ -16535,7 +16534,7 @@ procedures behind them.
   engine behind $R_w$ and $L_{n,w}$.
 - [Sound Power](https://jmrplens.github.io/phonometry/guides/sound-power/): the $L_W$ methods that share the
   absorption-area machinery of the receiving room.
-- API reference: [`building.measurement.lab_insulation`](https://jmrplens.github.io/phonometry/reference/api/building/lab-insulation/).
+- API reference: [`building.lab_insulation`](https://jmrplens.github.io/phonometry/reference/api/building/lab-insulation/).
 
 ---
 
@@ -16903,7 +16902,7 @@ member of the family is EN 12354-6.
   the absorption member of the same EN 12354 family.
 - [Dynamic stiffness of resilient materials (EN 29052-1)](https://jmrplens.github.io/phonometry/guides/dynamic-stiffness/):
   the $s'$ input to the EN 12354-2 floating-floor term.
-- API reference: [`building.prediction.simplified_model`](https://jmrplens.github.io/phonometry/reference/api/building/simplified-model/) and [`building.prediction.facade`](https://jmrplens.github.io/phonometry/reference/api/building/facade/).
+- API reference: [`building.building_prediction`](https://jmrplens.github.io/phonometry/reference/api/building/building-prediction/) and [`building.facade_prediction`](https://jmrplens.github.io/phonometry/reference/api/building/facade-prediction/).
 
 ---
 
@@ -17341,7 +17340,7 @@ worked examples.
   single-number model that consumes these ratings.
 - [Theory](https://jmrplens.github.io/phonometry/reference/theory/rooms-buildings/): the reference-curve derivation behind
   the weighted single-number ratings.
-- API reference: [`building.measurement.insulation`](https://jmrplens.github.io/phonometry/reference/api/building/insulation/).
+- API reference: [`building.insulation`](https://jmrplens.github.io/phonometry/reference/api/building/insulation/).
 
 ---
 
@@ -17587,7 +17586,7 @@ ISO 717-2.
 - [Room Acoustics](https://jmrplens.github.io/phonometry/guides/room-acoustics/): the measured reverberation times
   behind the reverberation index.
 - [Levels](https://jmrplens.github.io/phonometry/guides/levels/): the energy averaging behind the octave-band levels.
-- API reference: [`building.measurement.survey_insulation`](https://jmrplens.github.io/phonometry/reference/api/building/survey-insulation/).
+- API reference: [`building.survey_insulation`](https://jmrplens.github.io/phonometry/reference/api/building/survey-insulation/).
 
 ---
 
@@ -21009,7 +21008,7 @@ both against the same-footprint flat reference of ISO 17497-2 Formula (7).
   equivalent-fluid and resonant layers the metamaterial cells are built from.
 - [2D FDTD wave simulation](https://jmrplens.github.io/phonometry/guides/fdtd-simulation/): the wave solver behind the
   animation above, meshing the real slit and resonator geometry.
-- API reference: [`materials.metadiffuser`](https://jmrplens.github.io/phonometry/reference/api/materials/metadiffuser/) and [`materials.diffuser_design`](https://jmrplens.github.io/phonometry/reference/api/materials/diffuser-design/).
+- API reference: [`materials.diffusers.metadiffuser`](https://jmrplens.github.io/phonometry/reference/api/materials/metadiffuser/) and [`materials.diffusers.design`](https://jmrplens.github.io/phonometry/reference/api/materials/design/).
 
 ## References
 
@@ -21375,7 +21374,7 @@ a loop over cells.
   animation above.
 - [Airflow Resistance](https://jmrplens.github.io/phonometry/guides/airflow-resistance/): the viscous physics of the
   narrow channels, measured on the bulk material.
-- API reference: [`materials.slow_sound_absorber`](https://jmrplens.github.io/phonometry/reference/api/materials/slow-sound-absorber/).
+- API reference: [`materials.absorbers.slow_sound`](https://jmrplens.github.io/phonometry/reference/api/materials/slow-sound/).
 
 ## References
 
@@ -25193,7 +25192,7 @@ fig.tight_layout(); plt.show()
   the measured counterpart of the theoretical point mobilities.
 - [Porous and multilayer absorbers](https://jmrplens.github.io/phonometry/guides/porous-absorbers/): the cavity-fill models
   a double wall consumes.
-- API reference: [`building.prediction.panel_transmission`](https://jmrplens.github.io/phonometry/reference/api/building/panel-transmission/), [`building.prediction.masonry_cavity_wall`](https://jmrplens.github.io/phonometry/reference/api/building/masonry-cavity-wall/), [`building.prediction.aperture_transmission`](https://jmrplens.github.io/phonometry/reference/api/building/aperture-transmission/), [`vibration.structural.radiation_efficiency`](https://jmrplens.github.io/phonometry/reference/api/vibration/radiation-efficiency/) and [`vibration.structural.point_mobility`](https://jmrplens.github.io/phonometry/reference/api/vibration/point-mobility/).
+- API reference: [`building.panel_transmission`](https://jmrplens.github.io/phonometry/reference/api/building/panel-transmission/), [`building.masonry_cavity_wall`](https://jmrplens.github.io/phonometry/reference/api/building/masonry-cavity-wall/), [`building.aperture_transmission`](https://jmrplens.github.io/phonometry/reference/api/building/aperture-transmission/), [`vibration.structural.radiation_efficiency`](https://jmrplens.github.io/phonometry/reference/api/vibration/radiation-efficiency/) and [`vibration.structural.point_mobility`](https://jmrplens.github.io/phonometry/reference/api/vibration/point-mobility/).
 
 ---
 
@@ -28527,7 +28526,7 @@ set out in "What is anchored on a published number, and what is not" above.
 - [Predicting Panel Sound Insulation](https://jmrplens.github.io/phonometry/guides/panel-sound-insulation/):
   the mass-spring-mass resonance of a double leaf, the airborne counterpart of
   the lining resonance.
-- API reference: [`building.prediction.resilient_layers`](https://jmrplens.github.io/phonometry/reference/api/building/resilient-layers/).
+- API reference: [`building.resilient_layers`](https://jmrplens.github.io/phonometry/reference/api/building/resilient-layers/).
 
 ---
 
@@ -29202,7 +29201,7 @@ few positions.
   materials that can be brought indoors.
 - [Outdoor Sound Propagation](https://jmrplens.github.io/phonometry/guides/outdoor-propagation/): where the absorption
   of the ground surface enters the propagation models.
-- API reference: [`materials.road_absorption`](https://jmrplens.github.io/phonometry/reference/api/materials/road-absorption/).
+- API reference: [`materials.surfaces.road_absorption`](https://jmrplens.github.io/phonometry/reference/api/materials/road-absorption/).
 
 ## References
 
@@ -34141,7 +34140,7 @@ whole comes out at 31.5 dBA:
 
 ```python
 from phonometry import building
-from phonometry.building.prediction.aperture_transmission import composite_transmission_loss
+from phonometry.building.aperture_transmission import composite_transmission_loss
 
 building.window_size_correction(4.0)          # -2 dB: 26 dBA catalogued -> 24 dBA
 
@@ -34204,7 +34203,7 @@ enlarged-range term $C_{100-5000}$, not the core-range one.
   composite-facade calculation and transmission through openings and slits.
 - [Field Insulation Measurement (ISO 16283)](https://jmrplens.github.io/phonometry/guides/insulation-field/): the band
   spectra of $R'$, $D_{nT}$ and $L'_{nT}$ that these global quantities summarise.
-- API reference: [`building.regulation.spain`](https://jmrplens.github.io/phonometry/reference/api/building/spain/).
+- API reference: [`building.spanish_building_code`](https://jmrplens.github.io/phonometry/reference/api/building/spanish-building-code/).
 
 ## References
 

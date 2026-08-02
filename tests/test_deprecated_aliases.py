@@ -465,6 +465,19 @@ _PRE_SPLIT_MODULE_PATHS = [
     "phonometry.building.spanish_building_code",
     "phonometry.building.structure_borne_power",
     "phonometry.building.survey_insulation",
+    "phonometry.materials.absorption_rating",
+    "phonometry.materials.absorption_uncertainty",
+    "phonometry.materials.airflow_resistance",
+    "phonometry.materials.biot",
+    "phonometry.materials.diffuser_design",
+    "phonometry.materials.dynamic_stiffness",
+    "phonometry.materials.impedance_tube",
+    "phonometry.materials.metadiffuser",
+    "phonometry.materials.porous_absorber",
+    "phonometry.materials.road_absorption",
+    "phonometry.materials.scattering_diffusion",
+    "phonometry.materials.slow_sound_absorber",
+    "phonometry.materials.sound_absorption",
 ]
 
 

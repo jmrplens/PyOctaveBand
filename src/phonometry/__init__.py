@@ -742,26 +742,7 @@ from .hearing.threshold import (
     age_threshold,
     reference_threshold,
 )
-from .materials.absorption_rating import (
-    OCTAVE_BANDS,
-    REFERENCE_CURVE,
-    THIRD_OCTAVE_BANDS,
-    AbsorptionRatingResult,
-    absorption_class,
-    practical_absorption_coefficient,
-    weighted_absorption,
-    weighted_absorption_from_third_octave,
-)
-from .materials.absorption_uncertainty import (
-    AbsorptionUncertaintyResult,
-    absorption_coverage_factor,
-    equivalent_area_uncertainty,
-    practical_coefficient_uncertainty,
-    single_number_rating_uncertainty,
-    sound_absorption_coefficient_uncertainty,
-    weighted_coefficient_uncertainty,
-)
-from .materials.airflow_resistance import (
+from .materials.absorbers.airflow_resistance import (
     AirflowResistanceWarning,
     StaticAirflowResult,
     airflow_resistance,
@@ -774,7 +755,7 @@ from .materials.airflow_resistance import (
     static_airflow_resistance,
     thermal_boundary_layer_thickness,
 )
-from .materials.biot import (
+from .materials.absorbers.biot import (
     BiotWavesResult,
     biot_surface_impedance,
     biot_waves,
@@ -783,24 +764,7 @@ from .materials.biot import (
     frame_quarter_wave_resonance,
     poroelastic_transfer_matrix,
 )
-from .materials.diffuser_design import (
-    DEFAULT_POLAR_ANGLES,
-    DiffuserPolarResponse,
-    predict_diffuser_polar_response,
-    predicted_diffusion_spectrum,
-    qrd_well_depths,
-    quadratic_residue_sequence,
-)
-from .materials.dynamic_stiffness import (
-    DynamicStiffnessResult,
-    DynamicStiffnessWarning,
-    apparent_dynamic_stiffness,
-    enclosed_gas_stiffness,
-    floating_floor_resonance,
-    installed_dynamic_stiffness,
-    natural_frequency,
-)
-from .materials.impedance_tube import (
+from .materials.absorbers.impedance_tube import (
     ImpedanceTubeResult,
     ImpedanceTubeWarning,
     TransferMatrix,
@@ -833,14 +797,7 @@ from .materials.impedance_tube import (
     two_microphone_impedance,
     wave_decomposition,
 )
-from .materials.metadiffuser import (
-    MetadiffuserResult,
-    MetadiffuserWell,
-    metadiffuser_diffusion_spectrum,
-    metadiffuser_polar_response,
-    metadiffuser_reflection,
-)
-from .materials.porous_absorber import (
+from .materials.absorbers.porous import (
     DELANY_BAZLEY_COEFFICIENTS,
     DELANY_BAZLEY_VALIDITY,
     LIMP_FRAME_CRITERIA,
@@ -871,34 +828,60 @@ from .materials.porous_absorber import (
     perforation_end_correction,
     statistical_absorption,
 )
-from .materials.road_absorption import (
-    DEFAULT_MIC_HEIGHT,
-    DEFAULT_SOURCE_HEIGHT,
-    DEFAULT_SPEED_OF_SOUND,
-    PART1_FREQUENCY_RANGE,
-    SPOT_FREQUENCY_RANGE,
-    SPOT_NARROW_BAND_RANGE,
-    InsituAbsorptionResult,
-    RoadAbsorptionWarning,
-    absorption_reference_corrected,
-    adrienne_window,
-    check_spot_frequency_range,
-    geometric_spreading_factor,
-    geometric_spreading_factor_angle,
-    insitu_absorption_coefficient,
-    insitu_absorption_from_reflection,
-    insitu_absorption_spectrum,
-    insitu_reflection_factor,
-    max_sampled_area_radius,
-    msa_major_axis,
-    one_third_octave_absorption,
-    power_reflection_coefficient,
-    reflected_path_delay,
-    spot_internal_loss_correction,
-    spot_microphone_spacing_bounds,
-    spot_tube_upper_frequency,
+from .materials.absorbers.rating import (
+    OCTAVE_BANDS,
+    REFERENCE_CURVE,
+    THIRD_OCTAVE_BANDS,
+    AbsorptionRatingResult,
+    absorption_class,
+    practical_absorption_coefficient,
+    weighted_absorption,
+    weighted_absorption_from_third_octave,
 )
-from .materials.scattering_diffusion import (
+from .materials.absorbers.slow_sound import (
+    CriticalCouplingResult,
+    HelmholtzResonator,
+    SlitResonatorAbsorberResult,
+    SlowSoundAbsorberWarning,
+    critical_coupling_design,
+    helmholtz_resonator_impedance,
+    rectangular_duct_properties,
+    slit_effective_properties,
+    slit_helmholtz_absorber,
+)
+from .materials.absorbers.sound_absorption import (
+    AbsorptionWarning,
+    SoundAbsorptionMeasurement,
+    absorption_area,
+    absorption_coefficient,
+    attenuation_from_alpha,
+    measure_sound_absorption,
+)
+from .materials.absorbers.uncertainty import (
+    AbsorptionUncertaintyResult,
+    absorption_coverage_factor,
+    equivalent_area_uncertainty,
+    practical_coefficient_uncertainty,
+    single_number_rating_uncertainty,
+    sound_absorption_coefficient_uncertainty,
+    weighted_coefficient_uncertainty,
+)
+from .materials.diffusers.design import (
+    DEFAULT_POLAR_ANGLES,
+    DiffuserPolarResponse,
+    predict_diffuser_polar_response,
+    predicted_diffusion_spectrum,
+    qrd_well_depths,
+    quadratic_residue_sequence,
+)
+from .materials.diffusers.metadiffuser import (
+    MetadiffuserResult,
+    MetadiffuserWell,
+    metadiffuser_diffusion_spectrum,
+    metadiffuser_polar_response,
+    metadiffuser_reflection,
+)
+from .materials.diffusers.scattering_diffusion import (
     BASE_PLATE_BANDS,
     BASE_PLATE_MAX_SCATTERING,
     TWO_DIMENSIONAL_SOURCE_WEIGHTS,
@@ -925,24 +908,41 @@ from .materials.scattering_diffusion import (
     specular_absorption_coefficient,
     speed_of_sound,
 )
-from .materials.slow_sound_absorber import (
-    CriticalCouplingResult,
-    HelmholtzResonator,
-    SlitResonatorAbsorberResult,
-    SlowSoundAbsorberWarning,
-    critical_coupling_design,
-    helmholtz_resonator_impedance,
-    rectangular_duct_properties,
-    slit_effective_properties,
-    slit_helmholtz_absorber,
+from .materials.resilient.dynamic_stiffness import (
+    DynamicStiffnessResult,
+    DynamicStiffnessWarning,
+    apparent_dynamic_stiffness,
+    enclosed_gas_stiffness,
+    floating_floor_resonance,
+    installed_dynamic_stiffness,
+    natural_frequency,
 )
-from .materials.sound_absorption import (
-    AbsorptionWarning,
-    SoundAbsorptionMeasurement,
-    absorption_area,
-    absorption_coefficient,
-    attenuation_from_alpha,
-    measure_sound_absorption,
+from .materials.surfaces.road_absorption import (
+    DEFAULT_MIC_HEIGHT,
+    DEFAULT_SOURCE_HEIGHT,
+    DEFAULT_SPEED_OF_SOUND,
+    PART1_FREQUENCY_RANGE,
+    SPOT_FREQUENCY_RANGE,
+    SPOT_NARROW_BAND_RANGE,
+    InsituAbsorptionResult,
+    RoadAbsorptionWarning,
+    absorption_reference_corrected,
+    adrienne_window,
+    check_spot_frequency_range,
+    geometric_spreading_factor,
+    geometric_spreading_factor_angle,
+    insitu_absorption_coefficient,
+    insitu_absorption_from_reflection,
+    insitu_absorption_spectrum,
+    insitu_reflection_factor,
+    max_sampled_area_radius,
+    msa_major_axis,
+    one_third_octave_absorption,
+    power_reflection_coefficient,
+    reflected_path_delay,
+    spot_internal_loss_correction,
+    spot_microphone_spacing_bounds,
+    spot_tube_upper_frequency,
 )
 from .metrology.calibration import (
     CalibrationWarning,

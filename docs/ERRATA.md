@@ -699,7 +699,7 @@ which is the check that enforces the rule; see
   2.pdf`, PDF page 13, printed p. 7, 200 dpi (Tables 4 and 5, one above the other),
   and PDF page 11, printed p. 5, 200 dpi (Table 2).
 - **Library behaviour:** `_TABLE2` in
-  [`absorption_uncertainty.py`](../src/phonometry/materials/absorption_uncertainty.py)
+  [`absorption_uncertainty.py`](../src/phonometry/materials/absorbers/uncertainty.py)
   is keyed by *octave* midband frequency, following Table 2 and the ISO 11654
   definition of $\alpha_p$ rather than the Table 5 header.
 - **Status:** unreported.
@@ -1478,7 +1478,7 @@ which is the check that enforces the rule; see
   the series also only matches the papers' own slit model (Eq. (6)) with 64.
 - **Library behaviour:** implements 64 with a docstring note; the limits are
   pinned in
-  [`tests/materials/test_slow_sound_absorber.py`](../tests/materials/test_slow_sound_absorber.py)
+  [`tests/materials/absorbers/test_slow_sound.py`](../tests/materials/absorbers/test_slow_sound.py)
   and the conformance check "Poiseuille limit (Stinson 1991)".
 - **Status:** unreported (journal paper rather than a standard).
 
@@ -1507,7 +1507,7 @@ which is the check that enforces the rule; see
   exactly as it
   conjugates the papers' Stinson duct series; direction and peak are pinned
   by ``test_slit_radiation_correction_lowers_resonance`` in
-  [`tests/materials/test_slow_sound_absorber.py`](../tests/materials/test_slow_sound_absorber.py).
+  [`tests/materials/absorbers/test_slow_sound.py`](../tests/materials/absorbers/test_slow_sound.py).
 - **Status:** unreported (journal papers rather than standards).
 
 ## Attenborough & Van Renterghem, Predicting Outdoor Sound 2e (2021), Table 5.1

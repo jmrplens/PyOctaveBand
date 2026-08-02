@@ -59,7 +59,7 @@ the coefficients are computed at the exact midband frequencies (Note 5)
 ``exact_midband=True`` to snap the requested frequencies onto that grid and
 reproduce Table 1 exactly.
 
-This module closes the loop with :mod:`phonometry.materials.sound_absorption` (ISO 354),
+This module closes the loop with :mod:`phonometry.materials.absorbers.sound_absorption` (ISO 354),
 whose air power-attenuation coefficient ``m`` (1/m) is defined only through
 the ISO 9613-1 ``alpha`` via :math:`m = \alpha / (10 \log_{10} e)`.
 :func:`air_attenuation_m` returns that ``m`` directly.
@@ -75,7 +75,7 @@ import numpy as np
 from numpy.typing import ArrayLike, NDArray
 
 from ..._internal.warnings import PhonometryWarning
-from ...materials.sound_absorption import attenuation_from_alpha
+from ...materials.absorbers.sound_absorption import attenuation_from_alpha
 
 if TYPE_CHECKING:  # pragma: no cover - typing only
     from matplotlib.axes import Axes

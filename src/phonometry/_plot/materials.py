@@ -25,27 +25,27 @@ from .common import (
 if TYPE_CHECKING:
     from matplotlib.axes import Axes
 
-    from ..materials.absorption_rating import AbsorptionRatingResult
-    from ..materials.absorption_uncertainty import AbsorptionUncertaintyResult
-    from ..materials.airflow_resistance import StaticAirflowResult
-    from ..materials.biot import BiotWavesResult
-    from ..materials.diffuser_design import DiffuserPolarResponse
-    from ..materials.dynamic_stiffness import DynamicStiffnessResult
-    from ..materials.impedance_tube import ImpedanceTubeResult, TransferMatrix
-    from ..materials.metadiffuser import MetadiffuserResult
-    from ..materials.porous_absorber import (
+    from ..materials.absorbers.airflow_resistance import StaticAirflowResult
+    from ..materials.absorbers.biot import BiotWavesResult
+    from ..materials.absorbers.impedance_tube import ImpedanceTubeResult, TransferMatrix
+    from ..materials.absorbers.porous import (
         DiffuseFieldAbsorptionResult,
         LayeredAbsorberResult,
         PorousMediumResult,
     )
-    from ..materials.road_absorption import InsituAbsorptionResult
-    from ..materials.scattering_diffusion import (
+    from ..materials.absorbers.rating import AbsorptionRatingResult
+    from ..materials.absorbers.slow_sound import SlitResonatorAbsorberResult
+    from ..materials.absorbers.sound_absorption import SoundAbsorptionMeasurement
+    from ..materials.absorbers.uncertainty import AbsorptionUncertaintyResult
+    from ..materials.diffusers.design import DiffuserPolarResponse
+    from ..materials.diffusers.metadiffuser import MetadiffuserResult
+    from ..materials.diffusers.scattering_diffusion import (
         DiffusionResult,
         DiffusionSpectrum,
         ScatteringResult,
     )
-    from ..materials.slow_sound_absorber import SlitResonatorAbsorberResult
-    from ..materials.sound_absorption import SoundAbsorptionMeasurement
+    from ..materials.resilient.dynamic_stiffness import DynamicStiffnessResult
+    from ..materials.surfaces.road_absorption import InsituAbsorptionResult
 
 _FREQ_LABEL = "Frequency [Hz]"
 
@@ -151,7 +151,7 @@ def plot_weighted_absorption(
     reference, Clause 4.2) through the shared rating renderer.
 
     :param result: An
-        :class:`~phonometry.materials.absorption_rating.AbsorptionRatingResult`.
+        :class:`~phonometry.materials.absorbers.rating.AbsorptionRatingResult`.
     :param ax: Existing axes, or ``None`` to create a figure.
     :param kwargs: Forwarded to the measured-curve ``plot`` call.
     :return: The axes.
@@ -190,7 +190,7 @@ def plot_sound_absorption(
     axis grows to show them.
 
     :param result: A
-        :class:`~phonometry.materials.sound_absorption.SoundAbsorptionMeasurement`.
+        :class:`~phonometry.materials.absorbers.sound_absorption.SoundAbsorptionMeasurement`.
     :param ax: Existing axes, or ``None`` to create a figure.
     :param kwargs: Forwarded to the ``alpha_s`` curve ``plot`` call.
     :return: The axes.
@@ -219,7 +219,7 @@ def plot_scattering_coefficient(
 ) -> Axes:
     """Random-incidence scattering coefficient ``s`` versus frequency.
 
-    :param result: A :class:`~phonometry.materials.scattering_diffusion.ScatteringResult`
+    :param result: A :class:`~phonometry.materials.diffusers.scattering_diffusion.ScatteringResult`
         exposing ``frequencies`` and ``scattering``.
     :param ax: Existing axes, or ``None`` to create a figure.
     :param kwargs: Forwarded to the coefficient curve ``plot`` call.
@@ -250,7 +250,7 @@ def plot_diffusion_polar(
 ) -> Axes:
     """Polar reflected-level response with the diffusion coefficient annotated.
 
-    :param result: A :class:`~phonometry.materials.scattering_diffusion.DiffusionResult`
+    :param result: A :class:`~phonometry.materials.diffusers.scattering_diffusion.DiffusionResult`
         exposing ``angles`` (degrees), ``levels`` (dB) and ``coefficient``.
     :param ax: Existing (ideally polar) axes, or ``None`` to create a polar one.
     :param kwargs: Forwarded to the reflected-level curve ``plot`` call.
@@ -289,7 +289,7 @@ def plot_scattering_report(
     fill drawn below the curves (svglib drops alpha when it vectorises the SVG,
     so a translucent fill would print as a flat block).
 
-    :param result: A :class:`~phonometry.materials.scattering_diffusion.ScatteringResult`.
+    :param result: A :class:`~phonometry.materials.diffusers.scattering_diffusion.ScatteringResult`.
     :param ax: Existing axes, or ``None`` to create a figure.
     :param kwargs: Forwarded to the scattering-curve ``plot`` call.
     :return: The axes.
@@ -336,7 +336,7 @@ def plot_diffusion_report(
     curves (svglib drops alpha on vectorisation).
 
     :param result: A
-        :class:`~phonometry.materials.scattering_diffusion.DiffusionSpectrum`.
+        :class:`~phonometry.materials.diffusers.scattering_diffusion.DiffusionSpectrum`.
     :param ax: Existing axes, or ``None`` to create a figure.
     :param kwargs: Forwarded to the ``d(f)`` curve ``plot`` call.
     :return: The axes.
@@ -380,7 +380,7 @@ def plot_diffusion_polar_report(
     (svglib drops alpha when it vectorises the SVG). The axes must be polar; the
     fiche renderer creates one for it.
 
-    :param result: A :class:`~phonometry.materials.scattering_diffusion.DiffusionResult`.
+    :param result: A :class:`~phonometry.materials.diffusers.scattering_diffusion.DiffusionResult`.
     :param ax: Existing polar axes, or ``None`` to create one.
     :param kwargs: Forwarded to the reflected-level curve ``plot`` call.
     :return: The polar axes.
@@ -416,7 +416,7 @@ def plot_insitu_absorption(
     """In-situ one-third-octave absorption spectrum ``alpha(f)``.
 
     :param result: An
-        :class:`~phonometry.materials.road_absorption.InsituAbsorptionResult` exposing
+        :class:`~phonometry.materials.surfaces.road_absorption.InsituAbsorptionResult` exposing
         ``frequencies`` and ``absorption``.
     :param ax: Existing axes, or ``None`` to create a figure.
     :param kwargs: Forwarded to the absorption :meth:`~matplotlib.axes.Axes.bar`.
@@ -444,7 +444,7 @@ def plot_dynamic_stiffness(
     """Floating-floor natural frequency ``f0(s')`` with the design point marked.
 
     :param result: A
-        :class:`~phonometry.materials.dynamic_stiffness.DynamicStiffnessResult`.
+        :class:`~phonometry.materials.resilient.dynamic_stiffness.DynamicStiffnessResult`.
     :param ax: Existing axes, or ``None`` to create a figure.
     :param kwargs: Forwarded to the design-point ``scatter``.
     :return: The axes.
@@ -490,7 +490,7 @@ def plot_impedance_tube(
     the magnitude of the reflection factor ``|r|(f)`` as a muted companion
     (both are dimensionless and share the 0..1 axis).
 
-    :param result: An :class:`~phonometry.materials.impedance_tube.ImpedanceTubeResult`.
+    :param result: An :class:`~phonometry.materials.absorbers.impedance_tube.ImpedanceTubeResult`.
     :param ax: Existing axes, or ``None`` to create a figure.
     :param kwargs: Forwarded to the absorption-curve ``plot`` call.
     :return: The axes.
@@ -528,7 +528,7 @@ def plot_static_airflow(
     the evaluation range and marks the reference evaluation point.
 
     :param result: A
-        :class:`~phonometry.materials.airflow_resistance.StaticAirflowResult`.
+        :class:`~phonometry.materials.absorbers.airflow_resistance.StaticAirflowResult`.
     :param ax: Existing axes, or ``None`` to create a figure.
     :param kwargs: Forwarded to the fitted-curve ``plot`` call.
     :return: The axes.
@@ -568,7 +568,7 @@ def plot_absorption_uncertainty(
     with a shaded ``±U`` band using the exact expanded uncertainty ``U = k·u``.
 
     :param result: An
-        :class:`~phonometry.materials.absorption_uncertainty.AbsorptionUncertaintyResult`
+        :class:`~phonometry.materials.absorbers.uncertainty.AbsorptionUncertaintyResult`
         for a band quantity (single-number results have no spectrum to plot).
     :param ax: Existing axes, or ``None`` to create a figure.
     :param kwargs: Forwarded to the value-curve ``plot`` call.
@@ -685,7 +685,7 @@ def plot_porous_medium(
     log-log grid, the classical presentation of the empirical porous models
     (Mechel 2e Sect. G.11; Cox & D'Antonio 3e Figs. 6.19-6.20).
 
-    :param result: A :class:`~phonometry.materials.porous_absorber.PorousMediumResult`.
+    :param result: A :class:`~phonometry.materials.absorbers.porous.PorousMediumResult`.
     :param ax: Existing axes, or ``None`` to create a figure.
     :param kwargs: Forwarded to the ``Re(Zc)`` ``plot`` call.
     :return: The axes.
@@ -734,12 +734,12 @@ def plot_biot_waves(
     attenuation is left out because it tracks its own real part closely enough
     over this range to sit on top of it. The airborne and frame-borne labels follow the
     ``|mu|`` sorting of
-    :attr:`~phonometry.materials.biot.BiotWavesResult.airborne_is_second`,
+    :attr:`~phonometry.materials.absorbers.biot.BiotWavesResult.airborne_is_second`,
     which is the physical labelling of Sect. 6.5.4, not a smoothing: read that
     property before reading a step in these curves as physics, because neither
     labelling of the two compressional roots is continuous in general.
 
-    :param result: A :class:`~phonometry.materials.biot.BiotWavesResult`.
+    :param result: A :class:`~phonometry.materials.absorbers.biot.BiotWavesResult`.
     :param ax: Existing axes, or ``None`` to create a figure.
     :param kwargs: Forwarded to the airborne ``Re`` ``plot`` call.
     :return: The axes.
@@ -788,7 +788,7 @@ def plot_layered_absorber(
     Draws the predicted ``alpha(f)`` of the layer stack as the primary curve
     and the reflection-factor magnitude ``|R|(f)`` as a muted companion.
 
-    :param result: A :class:`~phonometry.materials.porous_absorber.LayeredAbsorberResult`.
+    :param result: A :class:`~phonometry.materials.absorbers.porous.LayeredAbsorberResult`.
     :param ax: Existing axes, or ``None`` to create a figure.
     :param kwargs: Forwarded to the absorption-curve ``plot`` call.
     :return: The axes.
@@ -822,7 +822,7 @@ def plot_slit_resonator_absorber(
     curve and the reflection-factor magnitude ``|R|(f)`` as a muted companion.
 
     :param result: A
-        :class:`~phonometry.materials.slow_sound_absorber.SlitResonatorAbsorberResult`.
+        :class:`~phonometry.materials.absorbers.slow_sound.SlitResonatorAbsorberResult`.
     :param ax: Existing axes, or ``None`` to create a figure.
     :param kwargs: Forwarded to the absorption-curve ``plot`` call.
     :return: The axes.
@@ -853,7 +853,7 @@ def plot_diffuse_field_absorption(
 ) -> Axes:
     """Random-incidence (Paris-integral) absorption spectrum.
 
-    :param result: A :class:`~phonometry.materials.porous_absorber.DiffuseFieldAbsorptionResult`.
+    :param result: A :class:`~phonometry.materials.absorbers.porous.DiffuseFieldAbsorptionResult`.
     :param ax: Existing axes, or ``None`` to create a figure.
     :param kwargs: Forwarded to the absorption-curve ``plot`` call.
     :return: The axes.
@@ -891,7 +891,7 @@ def plot_diffuser_polar_response(
     coefficient and prediction frequency in the title.
 
     :param result: A
-        :class:`~phonometry.materials.diffuser_design.DiffuserPolarResponse`.
+        :class:`~phonometry.materials.diffusers.design.DiffuserPolarResponse`.
     :param ax: Existing polar axes, or ``None`` to create one.
     :param kwargs: Forwarded to the reflected-level curve ``plot`` call.
     :return: The polar axes.
@@ -944,7 +944,7 @@ def plot_transfer_matrix(
     hard-backed absorption coefficient ``alpha(f)`` (Eq. (28)) as a muted
     companion on a 0..1 right axis.
 
-    :param matrix: A :class:`~phonometry.materials.impedance_tube.TransferMatrix`.
+    :param matrix: A :class:`~phonometry.materials.absorbers.impedance_tube.TransferMatrix`.
     :param frequency: Frequency vector ``f``, in hertz, matching the shape of
         the matrix entries.
     :param characteristic_impedance: Characteristic impedance ``rho c`` of the
@@ -994,7 +994,7 @@ def plot_metadiffuser_absorption(
     well to keep the legend compact.
 
     :param result: A
-        :class:`~phonometry.materials.metadiffuser.MetadiffuserResult`.
+        :class:`~phonometry.materials.diffusers.metadiffuser.MetadiffuserResult`.
     :param ax: Existing axes, or ``None`` to create a figure.
     :param kwargs: Forwarded to the face-average ``plot`` call.
     :return: The axes.

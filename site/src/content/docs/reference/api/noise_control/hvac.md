@@ -240,7 +240,7 @@ which is what `count` applies.
 
 | Name | Description |
 | :--- | :--- |
-| `frequencies` | Octave-band centres, Hz; `None` uses [`OCTAVE_BANDS`](/phonometry/reference/api/materials/absorption-rating/#octave_bands). |
+| `frequencies` | Octave-band centres, Hz; `None` uses [`OCTAVE_BANDS`](/phonometry/reference/api/materials/rating/#octave_bands). |
 | `face_area` | Cross-sectional face area `S_G` of one device, m2. |
 | `volume_flow` | Volume flow `Q` through one device, m3/s. |
 | `pressure_drop` | Static pressure drop `dP` across the device, Pa. |
@@ -408,7 +408,7 @@ the housing.
 
 | Name | Description |
 | :--- | :--- |
-| `frequencies` | Octave-band centres, Hz; `None` (default) uses [`OCTAVE_BANDS`](/phonometry/reference/api/materials/absorption-rating/#octave_bands). |
+| `frequencies` | Octave-band centres, Hz; `None` (default) uses [`OCTAVE_BANDS`](/phonometry/reference/api/materials/rating/#octave_bands). |
 
 **Returns:** An [`HvacSpectrumResult`](/phonometry/reference/api/noise_control/hvac/#hvacspectrumresult) of the attenuation, dB.
 
@@ -492,7 +492,7 @@ module warning.
 | `fan_type` | One of `"airfoil_large"` / `"airfoil_small"` (backward-curved or backward-inclined centrifugal wheels above and below 36 in diameter), `"forward_curved"`, `"radial_low"` / `"radial_medium"` / `"radial_high"` (radial blades by total pressure), `"vaneaxial_hub_low"` / `"vaneaxial_hub_medium"` / `"vaneaxial_hub_high"` (hub ratios 0.3-0.4, 0.4-0.6 and 0.6-0.8), `"tubeaxial_large"` / `"tubeaxial_small"` (above and below 40 in wheel diameter) or `"propeller"`. |
 | `relative_efficiency` | Static efficiency as a percentage of the peak (default 80, Long's recommendation when the peak is unknown). |
 | `blade_frequency` | Blade passing frequency `f_bp`, Hz (from [`blade_passing_frequency`](/phonometry/reference/api/noise_control/hvac/#blade_passing_frequency)). `None` (default) places the increment in the octave band Table 13.7 tabulates for the fan type. |
-| `frequencies` | Octave-band centres, Hz; `None` (default) uses the 63 Hz to 8 kHz bands of [`OCTAVE_BANDS`](/phonometry/reference/api/materials/absorption-rating/#octave_bands). |
+| `frequencies` | Octave-band centres, Hz; `None` (default) uses the 63 Hz to 8 kHz bands of [`OCTAVE_BANDS`](/phonometry/reference/api/materials/rating/#octave_bands). |
 
 **Returns:** An [`HvacSpectrumResult`](/phonometry/reference/api/noise_control/hvac/#hvacspectrumresult) of the band sound power level, dB re 1e-12 W.
 
@@ -710,7 +710,7 @@ ignores it.
 
 | Name | Description |
 | :--- | :--- |
-| `frequencies` | Octave-band centres, Hz; `None` uses [`OCTAVE_BANDS`](/phonometry/reference/api/materials/absorption-rating/#octave_bands). |
+| `frequencies` | Octave-band centres, Hz; `None` uses [`OCTAVE_BANDS`](/phonometry/reference/api/materials/rating/#octave_bands). |
 | `diameter` | Internal diameter `d`, m. |
 | `length` | Duct run length `l`, m. |
 | `lining_thickness` | Lining thickness `t`, m. |
@@ -747,7 +747,7 @@ ducts). Flanking limits the total to 40 dB.
 
 | Name | Description |
 | :--- | :--- |
-| `frequencies` | Octave-band centres, Hz; `None` uses [`OCTAVE_BANDS`](/phonometry/reference/api/materials/absorption-rating/#octave_bands). |
+| `frequencies` | Octave-band centres, Hz; `None` uses [`OCTAVE_BANDS`](/phonometry/reference/api/materials/rating/#octave_bands). |
 | `width` | Duct width, m. |
 | `height` | Duct height, m. |
 | `length` | Duct run length `l`, m. |
@@ -903,7 +903,7 @@ correction because the face size enters through `N` and `H`.
 
 | Name | Description |
 | :--- | :--- |
-| `frequencies` | Octave-band centres, Hz; `None` uses [`OCTAVE_BANDS`](/phonometry/reference/api/materials/absorption-rating/#octave_bands). |
+| `frequencies` | Octave-band centres, Hz; `None` uses [`OCTAVE_BANDS`](/phonometry/reference/api/materials/rating/#octave_bands). |
 | `airway_velocity` | Velocity `V` in the splitter airway, m/s. |
 | `passages` | Number of air passages `N` between the splitters. |
 | `height` | Silencer height `H` (or circumference, if round), m. |
@@ -999,7 +999,7 @@ noise is a separate quantity, [`silencer_self_noise`](/phonometry/reference/api/
 
 | Name | Description |
 | :--- | :--- |
-| `frequencies` | Octave-band centres, Hz; `None` (default) uses [`OCTAVE_BANDS`](/phonometry/reference/api/materials/absorption-rating/#octave_bands). |
+| `frequencies` | Octave-band centres, Hz; `None` (default) uses [`OCTAVE_BANDS`](/phonometry/reference/api/materials/rating/#octave_bands). |
 | `height` | Height of the silencer face, m (the airway dimension the splitters do not divide). |
 | `length` | Length of the silencer in the flow direction, m. |
 | `airway_widths` | Free width of each airway between splitters, m (a scalar is taken as a single airway; give one value per airway when they differ). |
@@ -1034,7 +1034,7 @@ up to 250 Hz and 0.05 to 0.07 dB/ft above. The published table stops at
 
 | Name | Description |
 | :--- | :--- |
-| `frequencies` | Octave-band centres, Hz; `None` uses [`OCTAVE_BANDS`](/phonometry/reference/api/materials/absorption-rating/#octave_bands). |
+| `frequencies` | Octave-band centres, Hz; `None` uses [`OCTAVE_BANDS`](/phonometry/reference/api/materials/rating/#octave_bands). |
 | `length` | Duct run length, m. |
 
 **Returns:** An [`HvacSpectrumResult`](/phonometry/reference/api/noise_control/hvac/#hvacspectrumresult) of the attenuation, dB.

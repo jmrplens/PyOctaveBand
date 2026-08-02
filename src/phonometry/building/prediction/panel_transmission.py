@@ -64,7 +64,7 @@ mass laws add, boosted by the cavity (Eq. 7.64):
 The cavity stiffness ``s''`` is :math:`\rho_0 c_0^{2} / d` for an empty
 (adiabatic) air gap; a porous fill (a
 :class:`~phonometry.materials.PorousMediumResult` from
-:mod:`phonometry.materials.porous_absorber`) lowers the resonance through its
+:mod:`phonometry.materials.absorbers.porous`) lowers the resonance through its
 softer, near-isothermal effective bulk modulus and damps the cavity so the
 mid-band slope is realised without standing-wave dips.
 
@@ -105,7 +105,7 @@ from ...vibration.structural.radiation_efficiency import coincidence_frequency
 if TYPE_CHECKING:
     from matplotlib.axes import Axes
 
-    from ...materials.porous_absorber import PorousMediumResult
+    from ...materials.absorbers.porous import PorousMediumResult
     from ..measurement.insulation import WeightedRatingResult
 
 #: Default speed of sound in air ``c0``, m/s (20 degC).

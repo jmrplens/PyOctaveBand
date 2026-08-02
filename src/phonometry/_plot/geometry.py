@@ -46,15 +46,15 @@ if TYPE_CHECKING:
     from ..electroacoustics.piston import RadiatingPistonResult
     from ..emission.intensity import IntensityResult
     from ..environment.propagation.ground_barriers import BarrierInsertionLoss
-    from ..materials.diffuser_design import DiffuserPolarResponse
-    from ..materials.impedance_tube import ImpedanceTubeResult, TransferMatrix
-    from ..materials.metadiffuser import MetadiffuserResult
-    from ..materials.porous_absorber import Layer, LayeredAbsorberResult
-    from ..materials.road_absorption import InsituAbsorptionResult
-    from ..materials.slow_sound_absorber import (
+    from ..materials.absorbers.impedance_tube import ImpedanceTubeResult, TransferMatrix
+    from ..materials.absorbers.porous import Layer, LayeredAbsorberResult
+    from ..materials.absorbers.slow_sound import (
         HelmholtzResonator,
         SlitResonatorAbsorberResult,
     )
+    from ..materials.diffusers.design import DiffuserPolarResponse
+    from ..materials.diffusers.metadiffuser import MetadiffuserResult
+    from ..materials.surfaces.road_absorption import InsituAbsorptionResult
     from ..noise_control.silencers import ReactiveSilencerResult
     from ..room.image_source import ImageSourceResult
     from ..room.open_plan import OpenPlanResult
@@ -633,7 +633,7 @@ def plot_helmholtz_resonator_geometry(
     dimensions (neck side and length, cavity side and length) dimensioned.
 
     :param resonator: A
-        :class:`~phonometry.materials.slow_sound_absorber.HelmholtzResonator`.
+        :class:`~phonometry.materials.absorbers.slow_sound.HelmholtzResonator`.
     :param ax: Existing axes, or ``None`` to create a figure.
     :param language: Label language, ``"en"`` (default) or ``"es"``.
     :param kwargs: Forwarded to the cavity rectangle.
@@ -899,7 +899,7 @@ def plot_impedance_tube_geometry(
     :param kwargs: Forwarded to the tube-bore rectangle.
     :return: The axes.
     """
-    from ..materials.impedance_tube import plane_wave_frequency_range
+    from ..materials.absorbers.impedance_tube import plane_wave_frequency_range
 
     _check_language(language)
     if spacing <= 0.0 or x1 <= spacing:
@@ -992,7 +992,7 @@ def plot_transmission_tube_geometry(
     :param kwargs: Forwarded to the tube-bore rectangle.
     :return: The axes.
     """
-    from ..materials.impedance_tube import plane_wave_frequency_range_astm
+    from ..materials.absorbers.impedance_tube import plane_wave_frequency_range_astm
 
     _check_language(language)
     if min(l1, s1, l2, s2, thickness) <= 0.0:
@@ -1146,8 +1146,8 @@ def plot_metadiffuser_panel_geometry(
     ``None`` wells are flat rigid strips; rigid back wall underneath.
 
     :param wells: The well sequence of
-        :func:`~phonometry.materials.metadiffuser.metadiffuser_reflection`
-        (:class:`~phonometry.materials.metadiffuser.MetadiffuserWell` or
+        :func:`~phonometry.materials.diffusers.metadiffuser.metadiffuser_reflection`
+        (:class:`~phonometry.materials.diffusers.metadiffuser.MetadiffuserWell` or
         ``None`` per well).
     :param ax: Existing axes, or ``None`` to create a figure.
     :param depth: Panel depth ``L``, in metres.

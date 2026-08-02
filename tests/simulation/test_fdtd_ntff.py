@@ -61,7 +61,7 @@ from phonometry.materials import (
     metadiffuser_reflection,
     predict_diffuser_polar_response,
 )
-from phonometry.materials.scattering_diffusion import (
+from phonometry.materials.diffusers.scattering_diffusion import (
     directional_diffusion_coefficient,
 )
 from phonometry.simulation import (

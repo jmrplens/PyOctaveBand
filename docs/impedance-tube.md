@@ -586,7 +586,7 @@ resolve.
   tubes of section 5.
 - [Calibration and dBFS](calibration.md): microphone calibration ahead of
   the two-microphone transfer function.
-- API reference: [`materials.impedance_tube`](https://jmrplens.github.io/phonometry/reference/api/materials/impedance-tube/).
+- API reference: [`materials.absorbers.impedance_tube`](https://jmrplens.github.io/phonometry/reference/api/materials/impedance-tube/).
 
 ## References
 
