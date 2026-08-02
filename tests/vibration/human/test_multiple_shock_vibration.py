@@ -230,11 +230,12 @@ def test_response_peaks_rejects_2d() -> None:
     with pytest.raises(ValueError, match="1-D time series"):
         v.response_peaks(np.zeros((2, 100)))
 
-def test_the_time_guards_reject_nan() -> None:
-    """``not t > 0`` is deliberate: ``t <= 0`` would let NaN through."""
-    with pytest.raises(ValueError, match="must be positive"):
-        v.daily_dose(1.0, exposure_time=math.nan, measurement_time=1.0)
-    with pytest.raises(ValueError, match="must be positive"):
-        v.daily_dose(1.0, exposure_time=1.0, measurement_time=math.nan)
-    with pytest.raises(ValueError, match="days_per_year must be positive"):
-        v.injury_risk(0.5, start_age=20.0, years=20, days_per_year=math.nan)
+def test_the_time_guards_reject_nan_and_infinity() -> None:
+    """The guards go through require_positive, which rejects both."""
+    for bad in (math.nan, math.inf):
+        with pytest.raises(ValueError, match="'exposure_time' must be positive"):
+            v.daily_dose(1.0, exposure_time=bad, measurement_time=1.0)
+        with pytest.raises(ValueError, match="'measurement_time' must be positive"):
+            v.daily_dose(1.0, exposure_time=1.0, measurement_time=bad)
+        with pytest.raises(ValueError, match="'days_per_year' must be positive"):
+            v.injury_risk(0.5, start_age=20.0, years=20, days_per_year=bad)

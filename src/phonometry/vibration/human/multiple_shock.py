@@ -252,10 +252,8 @@ def daily_dose(dose: float, exposure_time: float, measurement_time: float) -> fl
         was measured (same unit as ``exposure_time``).
     :return: The daily dose :math:`D_{zd} = D_z (t_d/t_m)^{1/6}`, m/s2.
     """
-    # Negated ">" rather than "<=" on purpose: it rejects NaN as well, which
-    # the opposite operator would let through.
-    if not measurement_time > 0.0 or not exposure_time > 0.0:  # NOSONAR - NaN
-        raise ValueError("exposure_time and measurement_time must be positive.")
+    exposure_time = require_positive(exposure_time, "exposure_time")
+    measurement_time = require_positive(measurement_time, "measurement_time")
     return float(dose * (exposure_time / measurement_time) ** (1.0 / DOSE_EXPONENT))
 
 
@@ -358,9 +356,7 @@ def injury_risk(
     require_choice(sex, "sex", _SEXES)
     if years <= 0:
         raise ValueError("years must be a positive integer.")
-    # Negated ">" rather than "<=" on purpose: it rejects NaN as well.
-    if not days_per_year > 0.0:  # NOSONAR - NaN
-        raise ValueError("days_per_year must be positive.")
+    days_per_year = require_positive(days_per_year, "days_per_year")
     mz = _mz_for_sex(sex) if mz is None else mz
     s_stat = static_stress(mz)
     ages = start_age + np.arange(years, dtype=np.float64)
