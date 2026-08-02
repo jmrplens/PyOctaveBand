@@ -340,7 +340,7 @@ def plot_weighted_rating(
 ) -> Axes:
     """Airborne rating curve vs shifted reference (ISO 717-1).
 
-    :param result: A :class:`~phonometry.insulation.WeightedRatingResult`.
+    :param result: A :class:`~phonometry.building.insulation.WeightedRatingResult`.
     :param ax: Existing axes, or ``None`` to create a figure.
     :param language: Label language, ``"en"`` (default) or ``"es"``.
     :param kwargs: Forwarded to the measured-curve ``plot`` call.
@@ -381,7 +381,7 @@ def plot_impact_rating(
     the (undistorted) curve and annotates the -5 dB reduction rather than
     pulling the curve down to the rating.
 
-    :param result: An :class:`~phonometry.insulation.ImpactRatingResult`.
+    :param result: An :class:`~phonometry.building.insulation.ImpactRatingResult`.
     :param ax: Existing axes, or ``None`` to create a figure.
     :param language: Label language, ``"en"`` (default) or ``"es"``.
     :param kwargs: Forwarded to the measured-curve ``plot`` call.
@@ -506,7 +506,7 @@ def plot_extended_weighted_rating(
     """Enlarged-range airborne rating curve vs shifted reference (ISO 717-1 Annex B).
 
     :param result: An
-        :class:`~phonometry.insulation.ExtendedWeightedRatingResult`.
+        :class:`~phonometry.building.insulation.ExtendedWeightedRatingResult`.
     :param ax: Existing axes, or ``None`` to create a figure.
     :param language: Label language, ``"en"`` (default) or ``"es"``.
     :param kwargs: Forwarded to the measured-curve ``plot`` call.
@@ -548,7 +548,7 @@ def plot_extended_impact_rating(
     """Enlarged-range impact rating curve vs shifted reference (ISO 717-2 A.2.1).
 
     :param result: An
-        :class:`~phonometry.insulation.ExtendedImpactRatingResult`.
+        :class:`~phonometry.building.insulation.ExtendedImpactRatingResult`.
     :param ax: Existing axes, or ``None`` to create a figure.
     :param language: Label language, ``"en"`` (default) or ``"es"``.
     :param kwargs: Forwarded to the measured-curve ``plot`` call.
@@ -584,7 +584,7 @@ def plot_facade_insulation(
     Draws the standardized level difference ``D2m,nT`` first, then the
     other available quantities (``D2m``, ``D2m,n``, ``R'``) against
     frequency. Works for
-    :class:`~phonometry.insulation.FacadeInsulationResult`.
+    :class:`~phonometry.building.insulation.FacadeInsulationResult`.
 
     :param result: A façade result exposing ``d_2m``, ``d_2m_nt``,
         ``d_2m_n``, ``r_prime`` and (optionally) ``frequencies``.
@@ -635,7 +635,7 @@ def plot_facade_prediction(
     Draws the per-element partial indices ``Rp = -10 log10 τ`` as thin dashed
     lines, then the façade apparent reduction ``R'`` and the standardized
     level difference ``D2m,nT`` as bold curves, against frequency. Works for
-    :class:`~phonometry.facade_prediction.FacadePredictionResult`.
+    :class:`~phonometry.building.facade_prediction.FacadePredictionResult`.
 
     :param result: A façade prediction result exposing ``r_prime``,
         ``d_2m_nt``, ``element_r`` and (optionally) ``frequencies``.
@@ -682,9 +682,9 @@ def plot_radiated_power(
 
     Draws the segment radiated power level as bars, annotating the A-weighted
     single number when available. Works for
-    :class:`~phonometry.facade_prediction.RadiatedPowerResult`.
+    :class:`~phonometry.building.facade_prediction.RadiatedPowerResult`.
 
-    :param result: A :class:`~phonometry.facade_prediction.RadiatedPowerResult`.
+    :param result: A :class:`~phonometry.building.facade_prediction.RadiatedPowerResult`.
     :param ax: Existing axes, or ``None`` to create a figure.
     :param language: Label language, ``"en"`` (default) or ``"es"``.
     :param kwargs: Forwarded to the ``bar`` call.
@@ -733,7 +733,7 @@ def plot_vibration_reduction(
     band-index axis when the result carries no frequencies.
 
     :param result: A
-        :class:`~phonometry.flanking_transmission.VibrationReductionResult`.
+        :class:`~phonometry.building.flanking_transmission.VibrationReductionResult`.
     :param ax: Existing axes, or ``None`` to create a figure.
     :param language: Label language, ``"en"`` (default) or ``"es"``.
     :param kwargs: Forwarded to the ``Kij`` curve ``plot`` call.
@@ -775,7 +775,7 @@ def plot_structure_borne_power(
 ) -> Axes:
     """Characteristic structure-borne sound power level per band (EN 15657).
 
-    :param result: A :class:`~phonometry.structure_borne_power.StructureBornePowerResult`.
+    :param result: A :class:`~phonometry.building.structure_borne_power.StructureBornePowerResult`.
     :param ax: Existing axes, or ``None`` to create a figure.
     :param language: Label language, ``"en"`` (default) or ``"es"``.
     :param kwargs: Forwarded to the bar ``plot``.
@@ -800,7 +800,7 @@ def plot_installed_structure_borne(
 ) -> Axes:
     """Per-path and total normalised structure-borne SPL (EN 12354-5).
 
-    :param result: An :class:`~phonometry.installed_structure_borne.InstalledSourceResult`.
+    :param result: An :class:`~phonometry.building.installed_structure_borne.InstalledSourceResult`.
     :param ax: Existing axes, or ``None`` to create a figure.
     :param language: Label language, ``"en"`` (default) or ``"es"``.
     :param kwargs: Forwarded to the total-level ``plot``.
@@ -845,7 +845,7 @@ def plot_airborne_prediction(
     share of the total transmitted sound energy, largest first.
 
     :param result: An
-        :class:`~phonometry.building_prediction.AirbornePredictionResult`.
+        :class:`~phonometry.building.building_prediction.AirbornePredictionResult`.
     :param ax: Existing axes, or ``None`` to create a figure.
     :param language: Label language, ``"en"`` (default) or ``"es"``.
     :param kwargs: Forwarded to the path :meth:`~matplotlib.axes.Axes.bar`.
@@ -886,7 +886,7 @@ def plot_impact_prediction(
     apparent level ``L'n,w = Ln,w,eq - DLw + K``.
 
     :param result: An
-        :class:`~phonometry.building_prediction.ImpactPredictionResult`.
+        :class:`~phonometry.building.building_prediction.ImpactPredictionResult`.
     :param ax: Existing axes, or ``None`` to create a figure.
     :param language: Label language, ``"en"`` (default) or ``"es"``.
     :param kwargs: Forwarded to the term :meth:`~matplotlib.axes.Axes.bar`.
@@ -1087,7 +1087,7 @@ def plot_airborne_insulation(
     curve), then the level difference ``D`` and, when available, the
     apparent sound reduction index ``R'``.
 
-    :param result: An :class:`~phonometry.insulation.AirborneInsulationResult`.
+    :param result: An :class:`~phonometry.building.insulation.AirborneInsulationResult`.
     :param ax: Existing axes, or ``None`` to create a figure.
     :param language: Label language, ``"en"`` (default) or ``"es"``.
     :param kwargs: Forwarded to the primary ``DnT`` curve ``plot`` call.
@@ -1121,7 +1121,7 @@ def plot_impact_insulation(
     Draws the standardized level ``L'nT`` first (the primary curve) and,
     when available, the normalized level ``L'n``.
 
-    :param result: An :class:`~phonometry.insulation.ImpactInsulationResult`.
+    :param result: An :class:`~phonometry.building.insulation.ImpactInsulationResult`.
     :param ax: Existing axes, or ``None`` to create a figure.
     :param language: Label language, ``"en"`` (default) or ``"es"``.
     :param kwargs: Forwarded to the primary ``L'nT`` curve ``plot`` call.
@@ -1150,7 +1150,7 @@ def plot_band_uncertainty(
     """Per-band standard uncertainty of an insulation quantity (ISO 12999-1).
 
     :param result: A
-        :class:`~phonometry.building_uncertainty.BandUncertainty`.
+        :class:`~phonometry.building.building_uncertainty.BandUncertainty`.
     :param ax: Existing axes, or ``None`` to create a figure.
     :param language: Label language, ``"en"`` (default) or ``"es"``.
     :param kwargs: Forwarded to the uncertainty curve ``plot`` call.
@@ -1183,7 +1183,7 @@ def plot_floor_covering_improvement(
     """Impact-sound improvement spectrum ΔL of a floor covering (ISO 16251-1).
 
     :param result: A
-        :class:`~phonometry.floor_covering_improvement.FloorCoveringImprovementResult`.
+        :class:`~phonometry.building.floor_covering_improvement.FloorCoveringImprovementResult`.
     :param ax: Existing axes, or ``None`` to create a figure.
     :param language: Label language, ``"en"`` (default) or ``"es"``.
     :param kwargs: Forwarded to the improvement-curve ``plot`` call.

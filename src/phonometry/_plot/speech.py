@@ -31,12 +31,19 @@ if TYPE_CHECKING:
 #: returns the English key unchanged for any language other than ``"es"``,
 #: so the English output is byte-for-byte identical to the pre-i18n
 #: renderers.
+#: Axis labels and templates the renderers repeat; the Spanish table is keyed
+#: by the same constants, so a label is written once.
+_FREQ_LABEL = "Frequency [Hz]"
+_THIRD_OCTAVE_LABEL = "One-third-octave band [Hz]"
+_NAME_VALUE_LABEL = "{name} = {v}"
+_SII_TITLE = "ANSI S3.5 SII = {sii}"
+
 _STRINGS: dict[str, str] = {
-    "Frequency [Hz]": "Frecuencia [Hz]",
+    _FREQ_LABEL: "Frecuencia [Hz]",
     "Band": "Banda",
     "Modulation transfer index MTI":
         "Índice de transferencia de modulación MTI",
-    "One-third-octave band [Hz]": "Banda de tercio de octava [Hz]",
+    _THIRD_OCTAVE_LABEL: "Banda de tercio de octava [Hz]",
     "Mean intermediate correlation": "Correlación intermedia media",
     "Spectral correlation $d_m$": "Correlación espectral $d_m$",
     "Analysis segment": "Segmento de análisis",
@@ -46,8 +53,8 @@ _STRINGS: dict[str, str] = {
         "$I_i A_i$ ponderada por importancia (escalada)",
     "IEC 60268-16 STI = {sti}  (rating {rating})":
         "IEC 60268-16 STI = {sti}  (calificación {rating})",
-    "{name} = {v}": "{name} = {v}",
-    "ANSI S3.5 SII = {sii}": "ANSI S3.5 SII = {sii}",
+    _NAME_VALUE_LABEL: _NAME_VALUE_LABEL,
+    _SII_TITLE: _SII_TITLE,
     "Speech spectrum level [dB SPL]": "Nivel del espectro de voz [dB SPL]",
     "ANSI S3.5-1997 standard speech spectrum":
         "ANSI S3.5-1997 espectro de voz estándar",
@@ -76,7 +83,7 @@ def plot_sti(
 ) -> Axes:
     """Per-band modulation transfer index bars with the STI and rating.
 
-    :param result: A :class:`~phonometry.sti.STIResult`.
+    :param result: A :class:`~phonometry.speech.sti.STIResult`.
     :param ax: Existing axes, or ``None`` to create a figure.
     :param language: Label language, ``"en"`` (default) or ``"es"``.
     :param kwargs: Forwarded to :meth:`~matplotlib.axes.Axes.bar`.
@@ -92,7 +99,7 @@ def plot_sti(
     banded = mti.size == len(_STI_BAND_CENTERS)
     if banded:
         _band_axis(ax, np.asarray(_STI_BAND_CENTERS), language=language)
-        ax.set_xlabel(_t("Frequency [Hz]", language))
+        ax.set_xlabel(_t(_FREQ_LABEL, language))
     else:
         ax.set_xticks(positions)
         ax.set_xlabel(_t("Band", language))
@@ -141,7 +148,7 @@ def plot_stoi(
         # resolution: the nominal band, not the generating float.
         ax.set_xticklabels([decimal_comma(f"{f:.0f}", language) for f in freqs],
                            rotation=45, ha="right")
-        ax.set_xlabel(_t("One-third-octave band [Hz]", language))
+        ax.set_xlabel(_t(_THIRD_OCTAVE_LABEL, language))
         ax.set_ylabel(_t("Mean intermediate correlation", language))
     else:
         scores = np.asarray(result.segment_scores, dtype=np.float64)
@@ -153,7 +160,7 @@ def plot_stoi(
     # [-1, 1] (unlike the [0, 1] ratios of plot_sti/plot_sii), so keep room
     # for anti-correlated bands rather than clipping them at zero.
     ax.set_ylim(-1.0, 1.0)
-    ax.set_title(_t("{name} = {v}", language).format(
+    ax.set_title(_t(_NAME_VALUE_LABEL, language).format(
         name=name, v=format_number(result.value, language, decimals=3),
     ))
     ax.grid(True, axis="y", alpha=0.3)
@@ -169,7 +176,7 @@ def plot_sii(
 ) -> Axes:
     """Per-band audibility and its importance-weighted contribution to the SII.
 
-    :param result: A :class:`~phonometry.sii.SIIResult`.
+    :param result: A :class:`~phonometry.speech.sii.SIIResult`.
     :param ax: Existing axes, or ``None`` to create a figure.
     :param language: Label language, ``"en"`` (default) or ``"es"``.
     :param kwargs: Forwarded to the weighted-contribution :meth:`bar`.
@@ -182,7 +189,7 @@ def plot_sii(
     audibility = np.asarray(result.band_audibility, dtype=np.float64)
     contribution = audibility * np.asarray(result.band_importance, dtype=np.float64)
     positions = _band_axis(ax, freqs, language=language)
-    ax.set_xlabel(_t("Frequency [Hz]", language))
+    ax.set_xlabel(_t(_FREQ_LABEL, language))
     ax.bar(positions, audibility, color=_C_PRIMARY_LIGHT,
            label=_t("Band audibility $A_i$", language))
     kwargs.setdefault("color", _C_PRIMARY)
@@ -194,7 +201,7 @@ def plot_sii(
            label=_t("Importance-weighted $I_i A_i$ (scaled)", language), **kwargs)
     ax.set_ylabel(_t("Band audibility", language))
     ax.set_ylim(0.0, 1.0)
-    ax.set_title(_t("ANSI S3.5 SII = {sii}", language).format(
+    ax.set_title(_t(_SII_TITLE, language).format(
         sii=format_number(result.sii, language, decimals=3),
     ))
     ax.legend(loc=_LEGEND_UPPER_RIGHT, fontsize="small")
@@ -254,7 +261,7 @@ def plot_sii_procedure(
     # second procedure that reaches lower or higher relabels the whole axis
     # instead of clipping the ticks to the first one drawn.
     format_frequency_axis(ax)
-    ax.set_xlabel(_t("Frequency [Hz]", language))
+    ax.set_xlabel(_t(_FREQ_LABEL, language))
     ax.legend(loc=_LEGEND_UPPER_RIGHT, fontsize="small")
     ax.grid(True, alpha=0.3)
     localize_axes(ax, language)
@@ -289,7 +296,7 @@ def plot_standard_speech_spectrum(
     freqs = np.asarray(result.frequencies, dtype=np.float64)
     levels = np.asarray(result.levels, dtype=np.float64)
     positions = _band_axis(ax, freqs, xlabel=None, language=language)
-    ax.set_xlabel(_t("One-third-octave band [Hz]", language))
+    ax.set_xlabel(_t(_THIRD_OCTAVE_LABEL, language))
     for i, effort in enumerate(result.vocal_efforts):
         # Explicit per-effort colour and label, but let any user kwargs win so
         # a supplied color=/label= overrides rather than collides.

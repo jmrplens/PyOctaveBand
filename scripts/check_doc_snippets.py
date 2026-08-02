@@ -235,7 +235,8 @@ def _is_sketch(code: str) -> bool:
     """True for a block that calls something with ``...`` in the arguments.
 
     ``building.airborne_insulation(...)`` shows the shape of a call, not a
-    computation, and the README leads with one. Such a block parses, so the
+    computation, and the README leads with one. A keyword placeholder
+    (``f(level=...)``) is the same thing said differently. Such a block parses, so the
     static checks still see it; running it would only assert that Ellipsis is
     not a sound pressure level.
     """
@@ -243,12 +244,12 @@ def _is_sketch(code: str) -> bool:
         tree = ast.parse(code)
     except SyntaxError:
         return False
-    return any(
-        isinstance(node, ast.Call)
-        and any(isinstance(a, ast.Constant) and a.value is Ellipsis
-                for a in node.args)
-        for node in ast.walk(tree)
-    )
+    def placeholder(node: ast.Call) -> bool:
+        args = [*node.args, *(kw.value for kw in node.keywords)]
+        return any(isinstance(a, ast.Constant) and a.value is Ellipsis
+                   for a in args)
+
+    return any(isinstance(n, ast.Call) and placeholder(n) for n in ast.walk(tree))
 
 
 def _run_page(page: pathlib.Path) -> tuple[pathlib.Path, str]:

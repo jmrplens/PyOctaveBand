@@ -1005,7 +1005,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   and hearing conservation, which is about the ear and is read by an
   occupational hygienist. The generated reference and the sidebar had already
   separated them; the code had not, so the `speech` section of the reference
-  drew from a package called something else. STI, SII and STOI are now
+  drew from a package called something else. STI and STIPA with its signal
+  generator, the Speech Intelligibility Index with its four band-importance
+  procedures and the standard speech spectra, and STOI with ESTOI, are now
   `phonometry.speech`; the audiometric thresholds, the ISO 1999 hearing loss
   and the ISO 9612 exposure stay in `phonometry.hearing`. No module is
   renamed and no page moves: the reference had these three under `speech`

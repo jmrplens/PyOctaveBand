@@ -101,3 +101,18 @@ def test_stoi_es() -> None:
     text = _labels(ax)
     assert "Correlación" in text
     plt.close("all")
+
+def test_sti_with_a_non_octave_band_set_es() -> None:
+    """A result whose MTI is not the seven octave bands gets a plain axis."""
+    res = ph.STIResult(
+        sti=0.62,
+        mti=np.linspace(0.4, 0.8, 5),
+        mtf=np.zeros((5, 14)),
+        band_levels=np.full(5, 60.0),
+        rating="good",
+    )
+    ax = res.plot(language="es")
+    assert ax.get_xlabel() == "Banda"
+    assert "calificación" in ax.get_title()
+    plt.close("all")
+

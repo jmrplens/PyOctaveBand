@@ -35,7 +35,7 @@ The Sabine constant is :math:`k = 24 \ln 10 / c_0`
 (:math:`= 55.26 / c_0`); with the
 default :math:`c_0 = 343` m/s it takes the familiar textbook value
 ``0.161``. (The
-:mod:`~phonometry.enclosed_space_absorption` EN 12354-6 model instead rounds
+:mod:`~phonometry.room.enclosed_space_absorption` EN 12354-6 model instead rounds
 ``k`` to ``55.3`` and uses :math:`c_0 = 345.6` to pin the factor at exactly
 ``0.16``.)
 

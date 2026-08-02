@@ -104,7 +104,7 @@ def plot_nipts(
 ) -> Axes:
     """Median NIPTS spectrum with the 10-90 % fractile band (ISO 1999).
 
-    :param result: A :class:`~phonometry.noise_induced_hearing_loss.NiptsResult`.
+    :param result: A :class:`~phonometry.hearing.noise_induced_hearing_loss.NiptsResult`.
     :param ax: Existing axes, or ``None`` to create a figure.
     :param language: Label language, ``"en"`` (default) or ``"es"``.
     :param kwargs: Forwarded to the median line ``plot``.
@@ -147,7 +147,7 @@ def plot_htlan(
 ) -> Axes:
     """Age, noise and combined hearing threshold components (ISO 1999, 6.1).
 
-    :param result: A :class:`~phonometry.noise_induced_hearing_loss.HtlanResult`.
+    :param result: A :class:`~phonometry.hearing.noise_induced_hearing_loss.HtlanResult`.
     :param ax: Existing axes, or ``None`` to create a figure.
     :param language: Label language, ``"en"`` (default) or ``"es"``.
     :param kwargs: Forwarded to the combined-threshold line ``plot``.
@@ -189,7 +189,7 @@ def plot_occupational_exposure(
     lines.
 
     :param result: An
-        :class:`~phonometry.occupational_exposure.ExposureResult` from the
+        :class:`~phonometry.hearing.occupational_exposure.ExposureResult` from the
         task-based strategy (the one that carries per-task contributions).
     :param ax: Existing axes, or ``None`` to create a figure.
     :param language: Label language, ``"en"`` (default) or ``"es"``.

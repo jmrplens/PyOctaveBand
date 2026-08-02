@@ -34,7 +34,7 @@ open SQAT reference implementation.
 directly. :func:`psychoacoustic_annoyance_from_signal` is a convenience that
 derives them from a calibrated pressure signal using the library's existing
 models -- N5/S from ISO 532-1 Zwicker loudness and DIN 45692 sharpness, R from
-ECMA-418-2 roughness and F from :func:`~phonometry.fluctuation_strength.
+ECMA-418-2 roughness and F from :func:`~phonometry.psychoacoustics.fluctuation_strength.
 fluctuation_strength`. That composite mixes model families (Zwicker N5/S,
 Sottek R, Osses F); the original PA model was calibrated with Zwicker-family
 sensations, so the signal convenience is an engineering estimate, while

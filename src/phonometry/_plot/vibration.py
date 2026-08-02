@@ -121,7 +121,7 @@ def plot_vibration_weighting(
     """Frequency-weighting factor (dB) versus frequency (ISO 8041-1).
 
     :param result: A
-        :class:`~phonometry.human_vibration.WeightingResponse` exposing
+        :class:`~phonometry.vibration.human_vibration.WeightingResponse` exposing
         ``name``, ``frequencies`` and ``magnitude_db``.
     :param ax: Existing axes, or ``None`` to create a figure.
     :param language: Label language, ``"en"`` (default) or ``"es"``.
@@ -154,7 +154,7 @@ def plot_weighted_spectrum(
     contributions ``W_i*a_i``; the overall ``a_w`` is annotated in the title.
 
     :param result: A
-        :class:`~phonometry.human_vibration.WeightedSpectrum` exposing
+        :class:`~phonometry.vibration.human_vibration.WeightedSpectrum` exposing
         ``frequencies``, ``band_accelerations``, ``weighted``, ``overall`` and
         ``weighting_name``.
     :param ax: Existing axes, or ``None`` to create a figure.
@@ -209,7 +209,7 @@ def plot_daily_exposure(
     ``A(8)`` bar, and the exposure action and limit value as horizontal lines.
 
     :param result: A
-        :class:`~phonometry.human_vibration.DailyVibrationExposure` exposing
+        :class:`~phonometry.vibration.human_vibration.DailyVibrationExposure` exposing
         ``labels``, ``partials``, ``a8`` and ``assessment``.
     :param ax: Existing axes, or ``None`` to create a figure.
     :param language: Label language, ``"en"`` (default) or ``"es"``.
@@ -277,7 +277,7 @@ def plot_mobility(
 ) -> Axes:
     """Mobility magnitude ``|Y(f)|`` on log-log axes (ISO 7626-1).
 
-    :param result: A :class:`~phonometry.mechanical_mobility.MobilityResult`.
+    :param result: A :class:`~phonometry.vibration.mechanical_mobility.MobilityResult`.
     :param ax: Existing axes, or ``None`` to create a figure.
     :param language: Label language, ``"en"`` (default) or ``"es"``.
     :param kwargs: Forwarded to the magnitude ``plot``.
@@ -413,7 +413,7 @@ def plot_transfer_stiffness(
 ) -> Axes:
     """Dynamic transfer stiffness level ``L_k(f)`` on a log-frequency axis.
 
-    :param result: A :class:`~phonometry.transfer_stiffness.TransferStiffnessResult`.
+    :param result: A :class:`~phonometry.vibration.transfer_stiffness.TransferStiffnessResult`.
     :param ax: Existing axes, or ``None`` to create a figure.
     :param language: Label language, ``"en"`` (default) or ``"es"``.
     :param kwargs: Forwarded to the level ``plot``.
@@ -482,7 +482,7 @@ def plot_multiple_shock(
 ) -> Axes:
     """Injury-probability curve ``P(R)`` with this assessment's ``R`` marked.
 
-    :param result: A :class:`~phonometry.multiple_shock_vibration.MultipleShockResult`.
+    :param result: A :class:`~phonometry.vibration.multiple_shock_vibration.MultipleShockResult`.
     :param ax: Existing axes, or ``None`` to create a figure.
     :param language: Label language, ``"en"`` (default) or ``"es"``.
     :param kwargs: Forwarded to the ``R`` marker ``scatter``.

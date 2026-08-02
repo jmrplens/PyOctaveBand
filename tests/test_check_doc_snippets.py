@@ -120,6 +120,13 @@ def test_a_sketch_of_a_call_is_read_but_not_run(tmp_path: pathlib.Path) -> None:
     """``f(...)`` shows the shape of a call; running it proves nothing."""
     page = _page(tmp_path, "from phonometry import leq\n\nlevel = leq(...)")
     assert check_doc_snippets.check_execution([page]) == []
+    # A keyword placeholder is the same sketch written differently.
+    kw = _page(
+        tmp_path,
+        "from phonometry import leq\n\nlevel = leq(x=...)",
+        name="kw.md",
+    )
+    assert check_doc_snippets.check_execution([kw]) == []
     # It is still read: a rebinding in the same block is still a failure.
     bad = _page(
         tmp_path,

@@ -100,7 +100,7 @@ def plot_epnl(result: EPNLResult, ax: Axes | None = None, *, language: str = "en
     against time; the maximum ``PNLTM`` is marked and the 10 dB-down integration
     band (records ``kF``..``kL``) is shaded, annotated with the EPNL.
 
-    :param result: An :class:`~phonometry.aircraft_noise.EPNLResult`.
+    :param result: An :class:`~phonometry.aircraft.aircraft_noise.EPNLResult`.
     :param ax: Existing axes, or ``None`` to create a figure.
     :param language: Label language, ``"en"`` (default) or ``"es"``.
     :param kwargs: Forwarded to the PNLT ``plot`` call.
@@ -140,7 +140,7 @@ def plot_aircraft_band_attenuation(
     """One-third-octave-band and pure-tone mid-band attenuation versus frequency.
 
     :param result: An
-        :class:`~phonometry.aircraft_atmospheric_absorption.AircraftBandAttenuation`.
+        :class:`~phonometry.aircraft.atmospheric_absorption.AircraftBandAttenuation`.
     :param ax: Existing axes, or ``None`` to create a figure.
     :param language: Label language, ``"en"`` (default) or ``"es"``.
     :param kwargs: Forwarded to the band-attenuation ``plot`` call.
@@ -169,7 +169,7 @@ def plot_npd_level(result: NpdLevelResult, ax: Axes | None = None, *, language: 
                    **kwargs: Any) -> Axes:
     """NPD event level versus slant distance (log axis), with the tabulated nodes.
 
-    :param result: An :class:`~phonometry.airport_noise.NpdLevelResult`.
+    :param result: An :class:`~phonometry.aircraft.airport_noise.NpdLevelResult`.
     :param ax: Existing axes, or ``None`` to create a figure.
     :param language: Label language, ``"en"`` (default) or ``"es"``.
     :param kwargs: Forwarded to the interpolated-curve ``plot`` call.
@@ -201,7 +201,7 @@ def plot_flyover(result: FlyoverResult, ax: Axes | None = None, *, language: str
     Bars show each flight-path segment's event level; the dashed line marks the
     energy-summed total (SEL) or the maximum (LAmax).
 
-    :param result: A :class:`~phonometry.airport_noise.FlyoverResult`.
+    :param result: A :class:`~phonometry.aircraft.airport_noise.FlyoverResult`.
     :param ax: Existing axes, or ``None`` to create a figure.
     :param language: Label language, ``"en"`` (default) or ``"es"``.
     :param kwargs: Forwarded to the bar call.
@@ -267,7 +267,7 @@ def plot_noise_contour(result: NoiseContourResult, ax: Axes | None = None, *,
                        language: str = "en", **kwargs: Any) -> Axes:
     """Filled single-event noise contours over the ground plane (ECAC Doc 29).
 
-    :param result: A :class:`~phonometry.airport_noise.NoiseContourResult`.
+    :param result: A :class:`~phonometry.aircraft.airport_noise.NoiseContourResult`.
     :param ax: Existing axes, or ``None`` to create a figure.
     :param language: Label language, ``"en"`` (default) or ``"es"``.
     :param kwargs: Forwarded to ``contourf``.

@@ -153,7 +153,7 @@ def critical_bandwidth_engineering(tone_frequency: float) -> float:
     :math:`\Delta f_c = 25.0 + 75.0 (1.0 + 1.4 (f_T/1000)^2)^{0.69}` Hz.
     This is the
     continuous ISO/PAS 20065 engineering-method bandwidth, distinct from the
-    stepped ISO 1996-2 Annex C :func:`~phonometry.environmental_measurement.
+    stepped ISO 1996-2 Annex C :func:`~phonometry.environmental.measurement.
     critical_bandwidth` (100 Hz / 20 %).
 
     :param tone_frequency: Tone frequency ``fT``, in Hz.

@@ -185,7 +185,7 @@ def plot_wind_turbine_tonality(
 ) -> Axes:
     """Narrowband spectrum with the critical band, masking level and the tone.
 
-    :param result: A :class:`~phonometry.wind_turbine_noise.WindTurbineTonalityResult`.
+    :param result: A :class:`~phonometry.environmental.wind_turbine_noise.WindTurbineTonalityResult`.
     :param ax: Existing axes, or ``None`` to create a figure.
     :param language: Label language, ``"en"`` (default) or ``"es"``.
     :param kwargs: Forwarded to the spectrum ``plot`` call.
@@ -219,7 +219,7 @@ def plot_impulse_prominence(
 ) -> Axes:
     """Adjustment curve ``KI(P)`` with the candidate impulses marked.
 
-    :param result: An :class:`~phonometry.impulse_prominence.ImpulseProminenceResult`.
+    :param result: An :class:`~phonometry.environmental.impulse_prominence.ImpulseProminenceResult`.
     :param ax: Existing axes, or ``None`` to create a figure.
     :param language: Label language, ``"en"`` (default) or ``"es"``.
     :param kwargs: Forwarded to the impulses ``scatter``.
@@ -264,7 +264,7 @@ def plot_tonal_adjustment(
     """Tonal adjustment curve ``Kt(ΔLta)`` with the assessed tone marked.
 
     :param result: A
-        :class:`~phonometry.environmental_measurement.TonalAssessmentResult`.
+        :class:`~phonometry.environmental.measurement.TonalAssessmentResult`.
     :param ax: Existing axes, or ``None`` to create a figure.
     :param language: Label language, ``"en"`` (default) or ``"es"``.
     :param kwargs: Forwarded to the assessed-tone ``scatter``.
@@ -309,7 +309,7 @@ def plot_outdoor_attenuation(
     as the primary marker line on top.
 
     :param result: An
-        :class:`~phonometry.outdoor_propagation.OutdoorAttenuation`.
+        :class:`~phonometry.environmental.outdoor_propagation.OutdoorAttenuation`.
     :param ax: Existing axes, or ``None`` to create a figure.
     :param language: Label language, ``"en"`` (default) or ``"es"``.
     :param kwargs: Forwarded to the total-attenuation ``plot`` call.
