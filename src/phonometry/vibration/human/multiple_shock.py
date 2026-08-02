@@ -254,7 +254,7 @@ def daily_dose(dose: float, exposure_time: float, measurement_time: float) -> fl
     """
     # Negated ">" rather than "<=" on purpose: it rejects NaN as well, which
     # the opposite operator would let through.
-    if not measurement_time > 0.0 or not exposure_time > 0.0:
+    if not measurement_time > 0.0 or not exposure_time > 0.0:  # NOSONAR - NaN
         raise ValueError("exposure_time and measurement_time must be positive.")
     return float(dose * (exposure_time / measurement_time) ** (1.0 / DOSE_EXPONENT))
 
@@ -359,7 +359,7 @@ def injury_risk(
     if years <= 0:
         raise ValueError("years must be a positive integer.")
     # Negated ">" rather than "<=" on purpose: it rejects NaN as well.
-    if not days_per_year > 0.0:
+    if not days_per_year > 0.0:  # NOSONAR - NaN
         raise ValueError("days_per_year must be positive.")
     mz = _mz_for_sex(sex) if mz is None else mz
     s_stat = static_stress(mz)
