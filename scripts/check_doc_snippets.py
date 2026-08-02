@@ -22,11 +22,14 @@ wrong thing. Three checks, cheapest first:
    is written by hand for GitHub and does not carry the same set of examples,
    so it gets the shadowing check and nothing else.
 
-3. **Execution.** Every English page's blocks are concatenated in reading
+3. **Execution.** Every English page's blocks, plus those of the README and
+   of ``llms.txt``, are concatenated in reading
    order (a guide is a narrative: later blocks use the variables the earlier
    ones bound) and run in a subprocess. Pages that cannot run standalone are
    listed in :data:`_SKIP` with a reason, and the list is checked for
-   staleness: a page that starts passing must leave it.
+   staleness: a page that starts passing must leave it. A block that passes
+   ``...`` to a call is a sketch of a call rather than a computation, so it is
+   read but not run.
 
 Usage::
 
@@ -167,12 +170,16 @@ def _rebindings(tree: ast.AST, names: dict[str, int]) -> list[str]:
     return reports
 
 
-def check_shadowing(pages: list[pathlib.Path]) -> list[str]:
+def check_shadowing(
+    pages: list[pathlib.Path], *, carry: bool = True
+) -> list[str]:
     """Failures for every page that rebinds a name it imported.
 
     A page is read top to bottom, so the imports of an earlier block are still
     in scope in a later one: the check carries them forward instead of looking
-    at each block alone.
+    at each block alone. ``carry=False`` is for the generated dumps, which glue
+    unrelated pages into one file: there the blocks share no scope, and
+    carrying an import across them invents collisions that no reader can hit.
     """
     failures: list[str] = []
     for page in pages:
@@ -194,7 +201,10 @@ def check_shadowing(pages: list[pathlib.Path]) -> list[str]:
                     for target in node.targets:
                         if isinstance(target, ast.Name):
                             carried.pop(target.id, None)
-            carried.update(imported)
+            if carry:
+                carried.update(imported)
+            else:
+                carried = {}
     return failures
 
 
@@ -221,9 +231,30 @@ def check_translations(pairs: list[tuple[pathlib.Path, pathlib.Path]]) -> list[s
     return failures
 
 
+def _is_sketch(code: str) -> bool:
+    """True for a block that calls something with ``...`` in the arguments.
+
+    ``building.airborne_insulation(...)`` shows the shape of a call, not a
+    computation, and the README leads with one. Such a block parses, so the
+    static checks still see it; running it would only assert that Ellipsis is
+    not a sound pressure level.
+    """
+    try:
+        tree = ast.parse(code)
+    except SyntaxError:
+        return False
+    return any(
+        isinstance(node, ast.Call)
+        and any(isinstance(a, ast.Constant) and a.value is Ellipsis
+                for a in node.args)
+        for node in ast.walk(tree)
+    )
+
+
 def _run_page(page: pathlib.Path) -> tuple[pathlib.Path, str]:
     """Run a page's blocks as one script; return its stderr tail on failure."""
-    script = "import matplotlib\nmatplotlib.use('Agg')\n" + "\n".join(_blocks(page))
+    runnable = [b for b in _blocks(page) if not _is_sketch(b)]
+    script = "import matplotlib\nmatplotlib.use('Agg')\n" + "\n".join(runnable)
     with tempfile.TemporaryDirectory() as tmp:
         path = pathlib.Path(tmp) / "snippet.py"
         path.write_text(script, encoding="utf-8")
@@ -267,6 +298,25 @@ def _rel(path: pathlib.Path) -> str:
         return path.as_posix()
 
 
+def _published() -> list[pathlib.Path]:
+    """Surfaces outside the guides that print snippets at the reader.
+
+    The README is the PyPI front page and ``llms.txt`` is what an assistant
+    reads first, so a broken example there is the most expensive kind. They
+    are not guides, so they get the same checks by a different route: the
+    dumps under ``site/public/llms`` and ``llms-full.txt`` restate guide
+    material and only take the static ones (see :func:`main`).
+    """
+    published = [_ROOT / "README.md", _ROOT / "README_PYPI.md", _ROOT / "llms.txt"]
+    return [p for p in published if p.exists()]
+
+
+def _restated() -> list[pathlib.Path]:
+    """Generated dumps that concatenate guide text; static checks only."""
+    out = [_ROOT / "llms-full.txt", *sorted((_ROOT / "site" / "public" / "llms").glob("*.txt"))]
+    return [p for p in out if p.exists()]
+
+
 def _pages() -> tuple[list[pathlib.Path], list[tuple[pathlib.Path, pathlib.Path]]]:
     """Every page with snippets, and the pairs that must carry the same code."""
     site_en = [
@@ -279,7 +329,9 @@ def _pages() -> tuple[list[pathlib.Path], list[tuple[pathlib.Path, pathlib.Path]
         twin = _SITE_ES / page.relative_to(_SITE)
         if twin.exists():
             pairs.append((page, twin))
-    return site_en + mirror + [p for _, p in pairs if p.is_relative_to(_SITE_ES)], pairs
+    everything = (site_en + mirror + _published() + _restated()
+                  + [p for _, p in pairs if p.is_relative_to(_SITE_ES)])
+    return everything, pairs
 
 
 def main() -> int:
@@ -289,12 +341,15 @@ def main() -> int:
     args = parser.parse_args()
 
     pages, pairs = _pages()
-    failures = check_shadowing(pages) + check_translations(pairs)
+    restated = set(_restated())
+    failures = check_shadowing([p for p in pages if p not in restated])
+    failures += check_shadowing(sorted(restated), carry=False)
+    failures += check_translations(pairs)
     stage = "static checks"
     if not args.static:
-        site_en = [p for p in pages if p.is_relative_to(_SITE)
-                   and not p.is_relative_to(_SITE_ES)]
-        failures += check_execution(site_en)
+        runnable = [p for p in pages if p.is_relative_to(_SITE)
+                    and not p.is_relative_to(_SITE_ES)] + _published()
+        failures += check_execution(runnable)
         stage = "checks"
 
     if failures:

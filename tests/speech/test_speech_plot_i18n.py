@@ -48,11 +48,21 @@ def test_standard_speech_spectrum_es_and_bad_language() -> None:
         res.plot(language="xx")
 
 
-def test_sii_procedure_es() -> None:
-    res = ph.sii_procedure("octave")
-    ax = res.plot(language="es")
+@pytest.mark.parametrize(
+    ("method", "label"),
+    [
+        ("critical-band", "Banda crítica (21)"),
+        ("equally-contributing", "Contribución equitativa (17)"),
+        ("one-third-octave", "Tercio de octava (18)"),
+        ("octave", "Octava (6)"),
+    ],
+)
+def test_sii_procedure_es(method: str, label: str) -> None:
+    """All four band-importance labels: each is a key of its own."""
+    ax = ph.sii_procedure(method).plot(language="es")
     assert ax.get_title() == "ANSI S3.5-1997 función de importancia de banda"
     assert ax.get_ylabel() == "Importancia de banda $I_i$"
+    assert [t.get_text() for t in ax.get_legend().get_texts()] == [label]
     plt.close("all")
 
 

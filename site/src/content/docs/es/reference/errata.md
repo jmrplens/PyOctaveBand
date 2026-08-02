@@ -1267,7 +1267,7 @@ which is the check that enforces the rule; see
   `band_importance`, `speech_spectrum` ($U_i$) and `internal_noise` ($X_i$),
   and the
   hearing threshold stays the `threshold=` argument of
-  `speech_intelligibility_index` ([`src/phonometry/hearing/sii.py`](https://github.com/jmrplens/phonometry/blob/main/src/phonometry/hearing/sii.py)).
+  `speech_intelligibility_index` ([`src/phonometry/speech/sii.py`](https://github.com/jmrplens/phonometry/blob/main/src/phonometry/speech/sii.py)).
 - **Status:** published correction by the issuing working group; nothing to
   report upstream.
 

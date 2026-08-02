@@ -65,6 +65,20 @@ def test_the_rebinding_is_caught_across_blocks(tmp_path: pathlib.Path) -> None:
     assert "block 1" in failure
 
 
+def test_a_generated_dump_does_not_carry_imports_across_pages(
+    tmp_path: pathlib.Path,
+) -> None:
+    """A dump glues unrelated pages: their blocks share no scope."""
+    dump = _page(
+        tmp_path,
+        "from phonometry import envelope\n\nenvelope(x, fs)",
+        "envelope = 2.0\nprint(envelope)",
+        name="dump.txt",
+    )
+    assert check_doc_snippets.check_shadowing([dump]) != []
+    assert check_doc_snippets.check_shadowing([dump], carry=False) == []
+
+
 def test_a_different_name_next_to_scipy_is_fine(tmp_path: pathlib.Path) -> None:
     """The permitted arrangement: distinct names, so neither is shadowed."""
     page = _page(tmp_path, """
@@ -100,6 +114,19 @@ def test_a_page_that_does_not_run_is_reported(tmp_path: pathlib.Path) -> None:
     page = _page(tmp_path, "raise SystemExit('boom')")
     (failure,) = check_doc_snippets.check_execution([page])
     assert "boom" in failure
+
+
+def test_a_sketch_of_a_call_is_read_but_not_run(tmp_path: pathlib.Path) -> None:
+    """``f(...)`` shows the shape of a call; running it proves nothing."""
+    page = _page(tmp_path, "from phonometry import leq\n\nlevel = leq(...)")
+    assert check_doc_snippets.check_execution([page]) == []
+    # It is still read: a rebinding in the same block is still a failure.
+    bad = _page(
+        tmp_path,
+        "from phonometry import leq\n\nlevel = leq(...)\nleq = 3.0",
+        name="bad.md",
+    )
+    assert check_doc_snippets.check_shadowing([bad]) != []
 
 
 def test_a_stale_skip_entry_is_reported(
