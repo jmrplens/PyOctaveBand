@@ -47,7 +47,7 @@ Every name in the table below is also re-exported at the top level, so
 `from phonometry import <name>` works for every row. Two generations of module
 paths are still importable and warn on use: the pre-3.2 flat ones (for example
 `phonometry.insulation`), removed in 4.0, and the pre-4.0 ones that the split
-of `metrology` moved (for example `phonometry.signals.levels`, now
+of `metrology` moved (for example `phonometry.metrology.levels`, now
 `phonometry.signals.levels`), removed in 5.0. Reading a moved name from the
 namespace it left (`metrology.leq`) warns and delegates as well.
 

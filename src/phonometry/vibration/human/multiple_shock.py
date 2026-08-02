@@ -205,7 +205,7 @@ def response_peaks(response: ArrayLike) -> np.ndarray:
     positive = np.empty(sig.size + 2, dtype=bool)
     positive[0] = positive[-1] = False
     positive[1:-1] = sig > 0.0
-    starts = np.where(~positive[:-1] & positive[1:])[0]
+    starts = np.nonzero(~positive[:-1] & positive[1:])[0]
     if starts.size == 0:
         return np.array([], dtype=np.float64)
     return np.maximum.reduceat(sig, starts)
@@ -252,6 +252,8 @@ def daily_dose(dose: float, exposure_time: float, measurement_time: float) -> fl
         was measured (same unit as ``exposure_time``).
     :return: The daily dose :math:`D_{zd} = D_z (t_d/t_m)^{1/6}`, m/s2.
     """
+    # Negated ">" rather than "<=" on purpose: it rejects NaN as well, which
+    # the opposite operator would let through.
     if not measurement_time > 0.0 or not exposure_time > 0.0:
         raise ValueError("exposure_time and measurement_time must be positive.")
     return float(dose * (exposure_time / measurement_time) ** (1.0 / DOSE_EXPONENT))
@@ -356,6 +358,7 @@ def injury_risk(
     require_choice(sex, "sex", _SEXES)
     if years <= 0:
         raise ValueError("years must be a positive integer.")
+    # Negated ">" rather than "<=" on purpose: it rejects NaN as well.
     if not days_per_year > 0.0:
         raise ValueError("days_per_year must be positive.")
     mz = _mz_for_sex(sex) if mz is None else mz
