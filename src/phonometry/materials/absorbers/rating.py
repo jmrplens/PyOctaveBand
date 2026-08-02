@@ -428,11 +428,14 @@ def weighted_absorption_from_third_octave(
     values = _coerce(third_octave_alpha_s, THIRD_OCTAVE_BANDS, "third_octave_alpha_s")
     alpha_p = practical_absorption_coefficient(values)
     result = weighted_absorption(alpha_p)
-    return replace(
+    # `replace` is typed as returning a generic dataclass instance, so the
+    # concrete type is restated for the reader and for the analyzers.
+    rated: AbsorptionRatingResult = replace(
         result,
         third_octave_alpha_s=np.asarray(values, dtype=np.float64),
         third_octave_bands=np.asarray(THIRD_OCTAVE_BANDS, dtype=np.float64),
     )
+    return rated
 
 
 def absorption_class(alpha_w: float) -> str:

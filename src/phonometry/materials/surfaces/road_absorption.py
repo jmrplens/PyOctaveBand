@@ -150,6 +150,10 @@ class RoadAbsorptionWarning(PhonometryWarning):
 # --------------------------------------------------------------------------- #
 # Geometry (ISO 13472-1 Clause 4.1 / Annex C / Annex F)
 # --------------------------------------------------------------------------- #
+#: Rejection messages the entry points of this module share.
+_FS_POSITIVE = "'fs' must be positive."
+_SPEED_POSITIVE = "'speed_of_sound' must be positive."
+
 def geometric_spreading_factor(
     source_height: float = DEFAULT_SOURCE_HEIGHT,
     mic_height: float = DEFAULT_MIC_HEIGHT,
@@ -214,7 +218,7 @@ def reflected_path_delay(
     if mic_height <= 0.0:
         raise ValueError("'mic_height' must be positive.")
     if speed_of_sound <= 0.0:
-        raise ValueError("'speed_of_sound' must be positive.")
+        raise ValueError(_SPEED_POSITIVE)
     return float(2.0 * mic_height / speed_of_sound)
 
 
@@ -309,7 +313,7 @@ def adrienne_window(
     if fs is None:
         raise ValueError("adrienne_window() missing required argument: 'fs'.")
     if fs <= 0.0:
-        raise ValueError("'fs' must be positive.")
+        raise ValueError(_FS_POSITIVE)
     if flat_duration <= 0.0:
         raise ValueError("'flat_duration' must be positive.")
     if leading_duration < 0.0 or trailing_duration < 0.0:
@@ -418,7 +422,7 @@ def insitu_reflection_factor(
         if fs is None:
             raise ValueError("'fs' is required to apply 'delay'.")
         if fs <= 0.0:
-            raise ValueError("'fs' must be positive.")
+            raise ValueError(_FS_POSITIVE)
         # ``length`` is the exact time-domain length used for the FFTs, so
         # ``rfftfreq`` is correct for both even and odd inputs.
         freqs = np.fft.rfftfreq(length, d=1.0 / fs)
@@ -701,7 +705,7 @@ def insitu_absorption_spectrum(
             "insitu_absorption_spectrum() missing required argument: 'fs'."
         )
     if fs <= 0.0:
-        raise ValueError("'fs' must be positive.")
+        raise ValueError(_FS_POSITIVE)
     hi_t = np.atleast_1d(np.asarray(incident_ir, dtype=np.float64))
     hr_t = np.atleast_1d(np.asarray(reflected_ir, dtype=np.float64))
     # Fix the FFT length explicitly so ``rfftfreq`` matches the transform used
@@ -763,7 +767,7 @@ def max_sampled_area_radius(
     if window_width <= 0.0:
         raise ValueError("'window_width' must be positive.")
     if speed_of_sound <= 0.0:
-        raise ValueError("'speed_of_sound' must be positive.")
+        raise ValueError(_SPEED_POSITIVE)
     ds, dm, ctw = source_height, mic_height, speed_of_sound * window_width
     numerator = np.sqrt(
         (ds + dm + ctw / 2.0) * (ds + ctw / 2.0) * (2.0 * dm + ctw) * ctw
@@ -797,7 +801,7 @@ def msa_major_axis(
     if window_width <= 0.0:
         raise ValueError("'window_width' must be positive.")
     if speed_of_sound <= 0.0:
-        raise ValueError("'speed_of_sound' must be positive.")
+        raise ValueError(_SPEED_POSITIVE)
     if projected_distance < 0.0:
         raise ValueError("'projected_distance' must be non-negative.")
     if source_height <= 0.0 or mic_height <= 0.0:
@@ -831,7 +835,7 @@ def spot_tube_upper_frequency(
     if diameter <= 0.0:
         raise ValueError("'diameter' must be positive.")
     if speed_of_sound <= 0.0:
-        raise ValueError("'speed_of_sound' must be positive.")
+        raise ValueError(_SPEED_POSITIVE)
     return float(_SPOT_FU_FACTOR * speed_of_sound / diameter)
 
 
@@ -860,7 +864,7 @@ def spot_microphone_spacing_bounds(
     :raises ValueError: On non-positive speed or frequency, or ``f_min >= f_max``.
     """
     if speed_of_sound <= 0.0:
-        raise ValueError("'speed_of_sound' must be positive.")
+        raise ValueError(_SPEED_POSITIVE)
     if f_min <= 0.0 or f_max <= 0.0:
         raise ValueError("Frequencies must be positive.")
     if f_min >= f_max:
