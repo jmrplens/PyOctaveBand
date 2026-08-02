@@ -50,7 +50,7 @@ from __future__ import annotations
 
 import math
 from collections.abc import Mapping, Sequence
-from dataclasses import dataclass, replace
+from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any
 
 import numpy as np
@@ -365,7 +365,20 @@ def weighted_absorption(
         shape indicators, the applied shift, the fitted reference curve and
         the absorption class.
     """
-    measured = _coerce(alpha_p, OCTAVE_BANDS, "alpha_p")
+    return _rate(_coerce(alpha_p, OCTAVE_BANDS, "alpha_p"))
+
+
+def _rate(
+    measured: Sequence[float],
+    third_octave: Sequence[float] | None = None,
+) -> AbsorptionRatingResult:
+    """Rate coerced octave coefficients, optionally carrying their source.
+
+    :param measured: The five octave practical coefficients, already coerced.
+    :param third_octave: The one-third-octave coefficients they were formed
+        from, when the caller has them; retained on the result as given.
+    :returns: The frozen rating of ISO 11654 Clause 4.2.
+    """
     measured_units = [_to_units(v) for v in measured]
 
     # Shift the reference down in 0,05 steps until Clause 4.2 is satisfied.
@@ -395,6 +408,14 @@ def weighted_absorption(
         measured=np.asarray([u / 20.0 for u in measured_units], dtype=np.float64),
         shifted_reference=np.asarray(
             [u / 20.0 for u in shifted_units], dtype=np.float64
+        ),
+        third_octave_alpha_s=(
+            None if third_octave is None else np.asarray(third_octave, dtype=np.float64)
+        ),
+        third_octave_bands=(
+            None
+            if third_octave is None
+            else np.asarray(THIRD_OCTAVE_BANDS, dtype=np.float64)
         ),
     )
 
@@ -427,15 +448,7 @@ def weighted_absorption_from_third_octave(
     """
     values = _coerce(third_octave_alpha_s, THIRD_OCTAVE_BANDS, "third_octave_alpha_s")
     alpha_p = practical_absorption_coefficient(values)
-    result = weighted_absorption(alpha_p)
-    # `replace` is typed as returning a generic dataclass instance, so the
-    # concrete type is restated for the reader and for the analyzers.
-    rated: AbsorptionRatingResult = replace(
-        result,
-        third_octave_alpha_s=np.asarray(values, dtype=np.float64),
-        third_octave_bands=np.asarray(THIRD_OCTAVE_BANDS, dtype=np.float64),
-    )
-    return rated
+    return _rate(_coerce(alpha_p, OCTAVE_BANDS, "alpha_p"), values)
 
 
 def absorption_class(alpha_w: float) -> str:
