@@ -119,9 +119,9 @@ _SECTION_LIST: tuple[Section, ...] = (
         label_en="Speech",
         label_es="Habla",
         modules=(
-            "phonometry.hearing.sti",
-            "phonometry.hearing.sii",
-            "phonometry.hearing.objective_intelligibility",
+            "phonometry.speech.sti",
+            "phonometry.speech.sii",
+            "phonometry.speech.objective_intelligibility",
         ),
     ),
     Section(
@@ -334,7 +334,7 @@ _SECTION_SUBPACKAGES: dict[str, tuple[str, ...]] = {
     "filters": ("", "filters"),
     "signals": ("signals",),
     "psychoacoustics": ("psychoacoustics",),
-    "speech": ("hearing",),
+    "speech": ("speech",),
     "hearing": ("hearing",),
     "rooms": ("room",),
     "building": ("building",),

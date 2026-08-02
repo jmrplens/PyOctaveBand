@@ -59,8 +59,8 @@ from phonometry.filters.compliance import (
     class_limits,
     verify_filter_class,
 )
-from phonometry.hearing.sti import _sti_from_mtf
 from phonometry.psychoacoustics.sharpness import reference_sound
+from phonometry.speech.sti import _sti_from_mtf
 
 
 # ===========================================================================
@@ -4235,7 +4235,7 @@ _SII = "Speech intelligibility (ANSI S3.5-1997)"
 
 @register(_SII, "ANSI S3.5-1997 Table 3", "Band-importance function normalisation")
 def _chk_sii_band_importance_sum() -> Outcome:
-    total = float(ph.hearing.sii.BAND_IMPORTANCE.sum())
+    total = float(ph.speech.sii.BAND_IMPORTANCE.sum())
     return numeric(ref.ANSIS3_5_BAND_IMPORTANCE_SUM, total, 1e-9, places=6)
 
 
@@ -4249,7 +4249,7 @@ def _chk_sii_masking() -> Outcome:
 def _chk_sii_disturbance_quiet() -> Outcome:
     # In quiet Di = max(Zi, Xi') = Xi' = -23.6 dB (Table 3) at 5000 Hz; an
     # energy-sum disturbance would read above the reference internal noise.
-    result = ph.hearing.sii.speech_intelligibility_index("normal")
+    result = ph.speech.sii.speech_intelligibility_index("normal")
     return numeric(
         ref.ANSIS3_5_DISTURBANCE_5000HZ, float(result.disturbance[15]), 1e-2,
         unit="dB", places=2,
@@ -4258,7 +4258,7 @@ def _chk_sii_disturbance_quiet() -> Outcome:
 
 @register(_SII, "ASA WG S3-79 SII.C (clause 6)", "SII, noise 30 dB plus hearing loss 40 dB")
 def _chk_sii_noise_plus_loss() -> Outcome:
-    result = ph.hearing.sii.speech_intelligibility_index(
+    result = ph.speech.sii.speech_intelligibility_index(
         "normal",
         noise_spectrum=np.full(18, 30.0),
         threshold=np.full(18, 40.0),
@@ -4268,7 +4268,7 @@ def _chk_sii_noise_plus_loss() -> Outcome:
 
 @register(_SII, "ANSI S3.5-1997 Annex C.2", "Worked example (SII.C / R CRAN, errata applied)")
 def _chk_sii_annex_c2() -> Outcome:
-    result = ph.hearing.sii.speech_intelligibility_index(
+    result = ph.speech.sii.speech_intelligibility_index(
         np.full(18, 54.0),
         np.array([40.0, 30.0, 20.0] + [0.0] * 15),
         threshold=np.zeros(18),
@@ -4280,7 +4280,7 @@ def _chk_sii_annex_c2() -> Outcome:
 def _chk_sii_annex_c2_masking() -> Outcome:
     # The officially corrected first-row slope Ci = -46.59 (WG S3-79 errata;
     # printed -45.59) is required to reproduce the printed Z2 = 34.66 dB.
-    result = ph.hearing.sii.speech_intelligibility_index(
+    result = ph.speech.sii.speech_intelligibility_index(
         np.full(18, 54.0),
         np.array([40.0, 30.0, 20.0] + [0.0] * 15),
         threshold=np.zeros(18),
@@ -4311,7 +4311,7 @@ def _sii_official_case(
     readme, hence the 5e-4 tolerance; the tests pin the same eight cases to the
     full precision of the committee code.
     """
-    result = ph.hearing.sii.speech_intelligibility_index(
+    result = ph.speech.sii.speech_intelligibility_index(
         np.array(speech), np.array(noise), threshold=np.array(threshold),
         method=method,
         band_importance=None if importance is None else np.array(importance),
@@ -4400,7 +4400,7 @@ def _chk_sii_annex_c1() -> Outcome:
 def _chk_sii_annex_c1_level_distortion() -> Outcome:
     # Table C.1's Li column with the official WG S3-79 erratum applied (the
     # printed 0.10 should be 1.00); clause 5.7 gives 0.99581 for that row.
-    result = ph.hearing.sii.speech_intelligibility_index(
+    result = ph.speech.sii.speech_intelligibility_index(
         np.array(ref.ANSIS3_5_ANNEX_C1_SPEECH),
         np.array(ref.ANSIS3_5_ANNEX_C1_NOISE),
         method="octave",
@@ -4479,7 +4479,7 @@ def _chk_sii_flat_cases() -> Outcome:
     worst = 0.0
     for method, _regime, speech, noise, committee in ref.ANSIS3_5_WG_FLAT_CASES:
         n = ph.sii_procedure(method).frequencies.size
-        result = ph.hearing.sii.speech_intelligibility_index(
+        result = ph.speech.sii.speech_intelligibility_index(
             np.full(n, speech), np.full(n, noise), method=method
         )
         worst = max(worst, abs(result.sii - committee))
@@ -4488,7 +4488,7 @@ def _chk_sii_flat_cases() -> Outcome:
 
 @register(_SII, "ANSI S3.5-1997 Table 3", "Loud-effort speech spectrum level at 1 kHz")
 def _chk_sii_loud_spectrum() -> Outcome:
-    from phonometry.hearing.sii import standard_speech_spectrum
+    from phonometry.speech.sii import standard_speech_spectrum
 
     value = float(standard_speech_spectrum("loud")[8])
     return numeric(ref.ANSIS3_5_LOUD_1KHZ, value, 1e-9, unit="dB", places=2)
@@ -4502,7 +4502,7 @@ _STOI = "Objective intelligibility (STOI / ESTOI)"
 
 def _stoi_speech_like(seed: int) -> np.ndarray:
     """A deterministic speech-like signal at the 10 kHz STOI internal rate."""
-    fs = ph.hearing.objective_intelligibility.SAMPLE_RATE
+    fs = ph.speech.objective_intelligibility.SAMPLE_RATE
     rng = np.random.default_rng(seed)
     t = np.arange(3 * fs) / fs
     sig = np.zeros_like(t)
@@ -4520,7 +4520,7 @@ def _stoi_speech_like(seed: int) -> np.ndarray:
 )
 def _chk_stoi_identity() -> Outcome:
     x = _stoi_speech_like(1)
-    return numeric(1.0, ph.stoi(x, x, ph.hearing.objective_intelligibility.SAMPLE_RATE).value,
+    return numeric(1.0, ph.stoi(x, x, ph.speech.objective_intelligibility.SAMPLE_RATE).value,
                    1e-6, places=6)
 
 
@@ -4531,7 +4531,7 @@ def _chk_stoi_identity() -> Outcome:
 )
 def _chk_estoi_identity() -> Outcome:
     x = _stoi_speech_like(1)
-    fs = ph.hearing.objective_intelligibility.SAMPLE_RATE
+    fs = ph.speech.objective_intelligibility.SAMPLE_RATE
     return numeric(1.0, ph.stoi(x, x, fs, extended=True).value, 1e-6, places=6)
 
 
@@ -4541,7 +4541,7 @@ def _chk_estoi_identity() -> Outcome:
     "STOI rises from -15 dB to +25 dB SNR speech-shaped noise",
 )
 def _chk_stoi_monotonic() -> Outcome:
-    fs = ph.hearing.objective_intelligibility.SAMPLE_RATE
+    fs = ph.speech.objective_intelligibility.SAMPLE_RATE
     x = _stoi_speech_like(2)
     rng = np.random.default_rng(10)
     noise = rng.standard_normal(x.size)

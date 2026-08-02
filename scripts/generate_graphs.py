@@ -3678,7 +3678,7 @@ def generate_sti_curve(output_dir: str) -> None:
     t60_points = [0.3, 0.5, 0.8, 1.2, 2.0, 3.0, 5.0]
 
     # The 14 full-STI modulation frequencies and the male alpha/beta
-    # factors of IEC 60268-16 Ed.5 Table A.1 (phonometry.hearing.sti keeps them
+    # factors of IEC 60268-16 Ed.5 Table A.1 (phonometry.speech.sti keeps them
     # private, so they are restated here for the analytic reference).
     mod_freqs = np.array([0.63, 0.80, 1.00, 1.25, 1.60, 2.00, 2.50,
                           3.15, 4.00, 5.00, 6.30, 8.00, 10.0, 12.5])
@@ -10482,7 +10482,7 @@ def generate_sii_vocal_efforts(output_dir: str) -> None:
     """ANSI S3.5-1997 Table 3 standard speech spectra by vocal effort."""
     print("Generating sii_vocal_efforts.png...")
     from phonometry import speech_intelligibility_index, standard_speech_spectrum
-    from phonometry.hearing.sii import BAND_CENTERS, VOCAL_EFFORTS
+    from phonometry.speech.sii import BAND_CENTERS, VOCAL_EFFORTS
 
     freqs = BAND_CENTERS
     # Distinct hues (not COLOR_GRID, which blends into the gridlines and is

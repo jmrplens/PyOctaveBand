@@ -66,7 +66,7 @@ import pytest
 from scipy.io import wavfile
 
 from phonometry import STIResult, sti_from_impulse_response, stipa
-from phonometry.hearing.sti import _MOD_FREQS, _NUM_BANDS, _sti_from_mtf
+from phonometry.speech.sti import _MOD_FREQS, _NUM_BANDS, _sti_from_mtf
 
 FS = 48000
 _BANDS = (125, 250, 500, 1000, 2000, 4000, 8000)

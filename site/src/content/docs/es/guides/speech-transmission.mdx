@@ -45,11 +45,11 @@ escucha. Para esto último, consulta la
 ## ¿Cómo calculo el índice de transmisión del habla de IEC 60268-16 con Python?
 
 A partir de una respuesta al impulso medida en la sala, llama a
-`hearing.sti_from_impulse_response(ir, fs, snr=25.0)`. El resultado da `sti` en
+`speech.sti_from_impulse_response(ir, fs, snr=25.0)`. El resultado da `sti` en
 la escala de 0 a 1, su letra de valoración `rating` del Anexo F y los siete
 índices de transferencia de modulación por banda de octava. Para la medición
-directa, reproduce `hearing.stipa_signal(fs)` en la sala y pasa la grabación a
-`hearing.stipa(recording, fs)`.
+directa, reproduce `speech.stipa_signal(fs)` en la sala y pasa la grabación a
+`speech.stipa(recording, fs)`.
 
 ## 1. La función de transferencia de modulación
 
@@ -94,11 +94,11 @@ efectiva de la *envolvente*, llevada a $[0, 1]$.
 ```python
 import numpy as np
 import matplotlib.pyplot as plt
-from phonometry import hearing
+from phonometry import speech
 
 fs = 48000
 
-# STI frente al tiempo de reverberación: barre hearing.sti_from_impulse_response sobre
+# STI frente al tiempo de reverberación: barre speech.sti_from_impulse_response sobre
 # decaimientos exponenciales sintéticos (ruido blanco x exp(-6.9077 t / T60))
 # en una rejilla de T60, exactamente la física de la curva de arriba:
 rng = np.random.default_rng(0)
@@ -107,7 +107,7 @@ sti_values = []
 for t60 in t60_grid:
     t = np.arange(int(2 * t60 * fs)) / fs
     ir = rng.standard_normal(t.size) * np.exp(-6.9077 * t / t60)
-    sti_values.append(hearing.sti_from_impulse_response(ir, fs).sti)
+    sti_values.append(speech.sti_from_impulse_response(ir, fs).sti)
 
 fig, ax = plt.subplots()
 ax.semilogx(t60_grid, sti_values, "o-")
@@ -124,20 +124,20 @@ plt.show()
 
 ```python
 import numpy as np
-from phonometry import hearing
+from phonometry import speech
 
 fs = 48000
 # Una respuesta al impulso medida en la sala (decaimiento sintetizado para que el ejemplo funcione)
 ir = np.random.default_rng(0).standard_normal(fs) * np.exp(-6.9 * np.arange(fs) / fs / 0.5)
 
 # Método indirecto: desde una respuesta al impulso medida en la sala
-res = hearing.sti_from_impulse_response(ir, fs, snr=25.0)
+res = speech.sti_from_impulse_response(ir, fs, snr=25.0)
 print(f"STI = {res.sti:.2f}  ({res.rating})")   # p. ej. 0.62 (D)
 
-# Medición STIPA directa: reproduce hearing.stipa_signal() en la sala y grábala
-test = hearing.stipa_signal(fs, seconds=18.0, level_db=80.0)
+# Medición STIPA directa: reproduce speech.stipa_signal() en la sala y grábala
+test = speech.stipa_signal(fs, seconds=18.0, level_db=80.0)
 recording = test                       # en la práctica, la señal del micrófono tras la reproducción
-res = hearing.stipa(recording, fs)
+res = speech.stipa(recording, fs)
 res.plot()   # barras del índice de transferencia de modulación (MTI) por banda; STI y valoración en el título
 ```
 
@@ -158,7 +158,7 @@ parte concreta del espectro, no de forma uniforme.
 ```python
 import numpy as np
 import matplotlib.pyplot as plt
-from phonometry import hearing
+from phonometry import speech
 
 # Una cámara reverberante (T60 = 0,9 s) medida con una relación señal-ruido de
 # habla de 15 dB: una caída exponencial sintetizada hace de RI medida.
@@ -166,7 +166,7 @@ fs = 48000
 rng = np.random.default_rng(0)
 n = np.arange(fs)
 ir = rng.standard_normal(fs) * np.exp(-6.9078 * n / fs / 0.9)
-res = hearing.sti_from_impulse_response(ir, fs, snr=15.0)
+res = speech.sti_from_impulse_response(ir, fs, snr=15.0)
 print(round(res.sti, 3), res.rating)      # 0.583 E
 
 # En una línea: las barras de MTI por banda con el STI y su valoración.
@@ -299,9 +299,9 @@ ficha, matplotlib (`pip install "phonometry[report,plot]"`); solo se admite
 `engine="reportlab"`. Pasa `language="es"` para la ficha en español.
 
 ```python
-from phonometry import hearing, ReportMetadata
+from phonometry import ReportMetadata, speech
 
-res = hearing.sti_from_impulse_response(ir, fs)
+res = speech.sti_from_impulse_response(ir, fs)
 res.report(
     "sti_fiche.pdf",
     metadata=ReportMetadata(
@@ -330,8 +330,8 @@ el repositorio; pulsa la vista previa para abrir el PDF.
 masculina, la única que conserva la Edición 5: la función de transferencia de
 modulación y la correspondencia m a STI (apartados A.5.2 a A.5.6), el método
 indirecto de STI completo desde una respuesta al impulso medida mediante
-`hearing.sti_from_impulse_response()`, el método directo STIPA del Anexo B
-mediante `hearing.stipa_signal()` y `hearing.stipa()`, el espectro de la señal
+`speech.sti_from_impulse_response()`, el método directo STIPA del Anexo B
+mediante `speech.stipa_signal()` y `speech.stipa()`, el espectro de la señal
 de ensayo masculina de la Ed. 5 del apartado A.6.1, las correcciones de
 enmascaramiento auditivo dependiente del nivel y de umbral de recepción de las
 Tablas A.2 y A.3 (`level=` y `ambient=`), y las letras de valoración del
@@ -358,4 +358,4 @@ queda nada por implementar.
   tonalidad y aspereza del sonido recibido.
 - [Teoría](/phonometry/es/reference/theory/perception/): la derivación de la transferencia
   de modulación y la correspondencia $m$ ↔ STI.
-- Referencia de la API: [`hearing.sti`](/phonometry/es/reference/api/speech/sti/).
+- Referencia de la API: [`speech.sti`](/phonometry/es/reference/api/speech/sti/).

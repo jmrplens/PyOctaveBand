@@ -151,7 +151,7 @@ def plot_weighted_absorption(
     reference, Clause 4.2) through the shared rating renderer.
 
     :param result: An
-        :class:`~phonometry.absorption_rating.AbsorptionRatingResult`.
+        :class:`~phonometry.materials.absorption_rating.AbsorptionRatingResult`.
     :param ax: Existing axes, or ``None`` to create a figure.
     :param kwargs: Forwarded to the measured-curve ``plot`` call.
     :return: The axes.
@@ -219,7 +219,7 @@ def plot_scattering_coefficient(
 ) -> Axes:
     """Random-incidence scattering coefficient ``s`` versus frequency.
 
-    :param result: A :class:`~phonometry.scattering_diffusion.ScatteringResult`
+    :param result: A :class:`~phonometry.materials.scattering_diffusion.ScatteringResult`
         exposing ``frequencies`` and ``scattering``.
     :param ax: Existing axes, or ``None`` to create a figure.
     :param kwargs: Forwarded to the coefficient curve ``plot`` call.
@@ -250,7 +250,7 @@ def plot_diffusion_polar(
 ) -> Axes:
     """Polar reflected-level response with the diffusion coefficient annotated.
 
-    :param result: A :class:`~phonometry.scattering_diffusion.DiffusionResult`
+    :param result: A :class:`~phonometry.materials.scattering_diffusion.DiffusionResult`
         exposing ``angles`` (degrees), ``levels`` (dB) and ``coefficient``.
     :param ax: Existing (ideally polar) axes, or ``None`` to create a polar one.
     :param kwargs: Forwarded to the reflected-level curve ``plot`` call.
@@ -289,7 +289,7 @@ def plot_scattering_report(
     fill drawn below the curves (svglib drops alpha when it vectorises the SVG,
     so a translucent fill would print as a flat block).
 
-    :param result: A :class:`~phonometry.scattering_diffusion.ScatteringResult`.
+    :param result: A :class:`~phonometry.materials.scattering_diffusion.ScatteringResult`.
     :param ax: Existing axes, or ``None`` to create a figure.
     :param kwargs: Forwarded to the scattering-curve ``plot`` call.
     :return: The axes.
@@ -336,7 +336,7 @@ def plot_diffusion_report(
     curves (svglib drops alpha on vectorisation).
 
     :param result: A
-        :class:`~phonometry.scattering_diffusion.DiffusionSpectrum`.
+        :class:`~phonometry.materials.scattering_diffusion.DiffusionSpectrum`.
     :param ax: Existing axes, or ``None`` to create a figure.
     :param kwargs: Forwarded to the ``d(f)`` curve ``plot`` call.
     :return: The axes.
@@ -380,7 +380,7 @@ def plot_diffusion_polar_report(
     (svglib drops alpha when it vectorises the SVG). The axes must be polar; the
     fiche renderer creates one for it.
 
-    :param result: A :class:`~phonometry.scattering_diffusion.DiffusionResult`.
+    :param result: A :class:`~phonometry.materials.scattering_diffusion.DiffusionResult`.
     :param ax: Existing polar axes, or ``None`` to create one.
     :param kwargs: Forwarded to the reflected-level curve ``plot`` call.
     :return: The polar axes.
@@ -416,7 +416,7 @@ def plot_insitu_absorption(
     """In-situ one-third-octave absorption spectrum ``alpha(f)``.
 
     :param result: An
-        :class:`~phonometry.road_absorption.InsituAbsorptionResult` exposing
+        :class:`~phonometry.materials.road_absorption.InsituAbsorptionResult` exposing
         ``frequencies`` and ``absorption``.
     :param ax: Existing axes, or ``None`` to create a figure.
     :param kwargs: Forwarded to the absorption :meth:`~matplotlib.axes.Axes.bar`.
@@ -444,7 +444,7 @@ def plot_dynamic_stiffness(
     """Floating-floor natural frequency ``f0(s')`` with the design point marked.
 
     :param result: A
-        :class:`~phonometry.dynamic_stiffness.DynamicStiffnessResult`.
+        :class:`~phonometry.materials.dynamic_stiffness.DynamicStiffnessResult`.
     :param ax: Existing axes, or ``None`` to create a figure.
     :param kwargs: Forwarded to the design-point ``scatter``.
     :return: The axes.
@@ -490,7 +490,7 @@ def plot_impedance_tube(
     the magnitude of the reflection factor ``|r|(f)`` as a muted companion
     (both are dimensionless and share the 0..1 axis).
 
-    :param result: An :class:`~phonometry.impedance_tube.ImpedanceTubeResult`.
+    :param result: An :class:`~phonometry.materials.impedance_tube.ImpedanceTubeResult`.
     :param ax: Existing axes, or ``None`` to create a figure.
     :param kwargs: Forwarded to the absorption-curve ``plot`` call.
     :return: The axes.
@@ -528,7 +528,7 @@ def plot_static_airflow(
     the evaluation range and marks the reference evaluation point.
 
     :param result: A
-        :class:`~phonometry.airflow_resistance.StaticAirflowResult`.
+        :class:`~phonometry.materials.airflow_resistance.StaticAirflowResult`.
     :param ax: Existing axes, or ``None`` to create a figure.
     :param kwargs: Forwarded to the fitted-curve ``plot`` call.
     :return: The axes.
@@ -568,7 +568,7 @@ def plot_absorption_uncertainty(
     with a shaded ``±U`` band using the exact expanded uncertainty ``U = k·u``.
 
     :param result: An
-        :class:`~phonometry.absorption_uncertainty.AbsorptionUncertaintyResult`
+        :class:`~phonometry.materials.absorption_uncertainty.AbsorptionUncertaintyResult`
         for a band quantity (single-number results have no spectrum to plot).
     :param ax: Existing axes, or ``None`` to create a figure.
     :param kwargs: Forwarded to the value-curve ``plot`` call.

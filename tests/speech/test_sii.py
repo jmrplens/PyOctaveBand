@@ -1,5 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""Tests for :mod:`phonometry.hearing.sii` (Speech Intelligibility Index, ANSI S3.5-1997).
+"""Tests for :mod:`phonometry.speech.sii` (Speech Intelligibility Index, ANSI S3.5-1997).
 
 All four band procedures are validated against the reference implementation
 of ASA Working Group S3-79, the committee that maintains ANSI S3.5
@@ -77,7 +77,7 @@ from reference_data import (
     ANSIS3_5_WG_TO_THRESHOLD,
 )
 
-from phonometry.hearing import sii
+from phonometry.speech import sii
 
 
 def test_band_importance_sums_to_one() -> None:

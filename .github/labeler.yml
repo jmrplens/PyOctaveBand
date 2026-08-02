@@ -183,6 +183,10 @@ ci:
   - changed-files:
       - any-glob-to-any-file: ["src/phonometry/simulation/**", "tests/simulation/**", "scripts/fdtd2d.py"]
 
+"area: speech":
+  - changed-files:
+      - any-glob-to-any-file: ["src/phonometry/speech/**", "tests/speech/**"]
+
 "area: underwater":
   - changed-files:
       - any-glob-to-any-file: ["src/phonometry/underwater/**", "tests/underwater/**"]

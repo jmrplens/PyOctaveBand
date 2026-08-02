@@ -724,7 +724,6 @@ from .hearing.noise_induced_hearing_loss import (
     htlan,
     nipts,
 )
-from .hearing.objective_intelligibility import STOIResult, stoi
 from .hearing.occupational_exposure import (
     COVERAGE_FACTOR,
     INSTRUMENT_U2,
@@ -737,23 +736,6 @@ from .hearing.occupational_exposure import (
     minimum_cumulative_duration_hours,
     table_c4_contribution,
     task_based_exposure,
-)
-from .hearing.sii import (
-    SII_METHODS,
-    SIIProcedure,
-    SIIResult,
-    StandardSpeechSpectrum,
-    sii_procedure,
-    speech_intelligibility_index,
-    standard_speech_spectra,
-    standard_speech_spectrum,
-)
-from .hearing.sti import (
-    STIResult,
-    STIWarning,
-    sti_from_impulse_response,
-    stipa,
-    stipa_signal,
 )
 from .hearing.threshold import (
     AgeThresholdResult,
@@ -1307,6 +1289,24 @@ from .simulation.fdtd import (
     fdtd_simulation,
 )
 from .simulation.ntff import ContourPhasors, far_field_from_contour
+from .speech.objective_intelligibility import STOIResult, stoi
+from .speech.sii import (
+    SII_METHODS,
+    SIIProcedure,
+    SIIResult,
+    StandardSpeechSpectrum,
+    sii_procedure,
+    speech_intelligibility_index,
+    standard_speech_spectra,
+    standard_speech_spectrum,
+)
+from .speech.sti import (
+    STIResult,
+    STIWarning,
+    sti_from_impulse_response,
+    stipa,
+    stipa_signal,
+)
 from .underwater.acoustics import (
     UNDERWATER_REFERENCE_EXPOSURE,
     UNDERWATER_REFERENCE_PRESSURE,

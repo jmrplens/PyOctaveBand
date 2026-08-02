@@ -75,9 +75,9 @@ def plot_sound_power(
 ) -> Axes:
     """Sound power level spectrum with the A-weighted total annotated.
 
-    Works for :class:`~phonometry.sound_power.SoundPowerResult`,
-    :class:`~phonometry.sound_power_reverberation.ReverberationSoundPowerResult`
-    and :class:`~phonometry.sound_power_intensity.SoundPowerIntensityResult`;
+    Works for :class:`~phonometry.emission.sound_power.SoundPowerResult`,
+    :class:`~phonometry.emission.sound_power_reverberation.ReverberationSoundPowerResult`
+    and :class:`~phonometry.emission.sound_power_intensity.SoundPowerIntensityResult`;
     for the intensity (scanning) variant the bands where the net power is
     non-positive (``negative_band``) are hatched and greyed as unusable.
 
@@ -150,7 +150,7 @@ def plot_intensity(
     pressure-intensity index ``Lp - LI`` (the reactivity indicator); the
     total index is annotated in the title.
 
-    :param result: An :class:`~phonometry.intensity.IntensityResult` with
+    :param result: An :class:`~phonometry.emission.intensity.IntensityResult` with
         per-band data (obtained by requesting a band ``fraction``).
     :param ax: Existing axes, or ``None`` to create a figure.
     :param language: Label language, ``"en"`` (default) or ``"es"``.
@@ -298,7 +298,7 @@ def plot_vibration_sound_power(
 ) -> Axes:
     """Radiated sound power level per band (ISO/TS 7849).
 
-    :param result: A :class:`~phonometry.vibration_sound_power.VibrationSoundPowerResult`.
+    :param result: A :class:`~phonometry.emission.vibration_sound_power.VibrationSoundPowerResult`.
     :param ax: Existing axes, or ``None`` to create a figure.
     :param language: Label language, ``"en"`` (default) or ``"es"``.
     :param kwargs: Forwarded to the bar ``plot``.

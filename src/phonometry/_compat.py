@@ -10,7 +10,8 @@ Two generations of aliases live here, each with its own removal date:
 * :data:`_MOVED_4X` covers the 4.0 taxonomy, which splits the oversized
   subpackages into domain ones (``phonometry.metrology`` into
   ``phonometry.filters``, ``phonometry.signals`` and a narrowed
-  ``phonometry.metrology``). Removed in 5.0.
+  ``phonometry.metrology``; the speech intelligibility of
+  ``phonometry.hearing`` into ``phonometry.speech``). Removed in 5.0.
 
 Every public module path that moved stays importable through the shims
 registered here: ``import phonometry.<old>`` and ``from phonometry.<old>
@@ -64,8 +65,8 @@ _MOVED_3X: dict[str, str] = {
     "phonometry.tone_audibility": "phonometry.psychoacoustics.tone_audibility",
     "phonometry.noise_induced_hearing_loss": "phonometry.hearing.noise_induced_hearing_loss",
     "phonometry.occupational_exposure": "phonometry.hearing.occupational_exposure",
-    "phonometry.sii": "phonometry.hearing.sii",
-    "phonometry.sti": "phonometry.hearing.sti",
+    "phonometry.sii": "phonometry.speech.sii",
+    "phonometry.sti": "phonometry.speech.sti",
     "phonometry.intensity": "phonometry.emission.intensity",
     "phonometry.sound_power": "phonometry.emission.sound_power",
     "phonometry.sound_power_intensity": "phonometry.emission.sound_power_intensity",
@@ -158,6 +159,10 @@ _MOVED_4X: dict[str, str] = {
     "phonometry.metrology.signals": "phonometry.signals.test_signals",
     "phonometry.metrology.random_data":
         "phonometry.metrology.data_qualification",
+    "phonometry.hearing.sti": "phonometry.speech.sti",
+    "phonometry.hearing.sii": "phonometry.speech.sii",
+    "phonometry.hearing.objective_intelligibility":
+        "phonometry.speech.objective_intelligibility",
 }
 
 #: The two generations, each with the release that deprecated it and the one

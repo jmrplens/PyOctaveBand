@@ -6,7 +6,7 @@
 STIPA verification bench published on [stipa.info](https://www.stipa.info), the
 test signals IEC 60268-16:2020 (rev 5) Annexes A and C prescribe for verifying a
 STIPA implementation. They are consumed by
-`tests/hearing/test_stipa_certified.py`.
+`tests/speech/test_stipa_certified.py`.
 
 | Verification suite | Committed | Of | Why these |
 | :--- | ---: | ---: | :--- |
@@ -81,7 +81,7 @@ python tests/data/stipa/make_extract.py tests/data-local/stipa-verification
 Embedded Acoustics publishes the bench so that STIPA implementations can be
 verified against the criteria of IEC 60268-16 Annexes A and C. The extract in
 this folder serves **exactly that purpose**: it lets
-`tests/hearing/test_stipa_certified.py` demonstrate that this library's
+`tests/speech/test_stipa_certified.py` demonstrate that this library's
 independent implementation meets those criteria on every runner, rather than
 only on a machine that has the full download. The files are **not** part of the
 `phonometry` package, are not installed with it, and are **not covered by this

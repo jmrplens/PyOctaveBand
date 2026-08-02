@@ -4,8 +4,8 @@ Short-Time Objective Intelligibility (STOI and ESTOI).
 
 Implements the two correlation-based objective intelligibility measures that
 predict the intelligibility of time-frequency weighted noisy speech, where the
-speech-transmission index (:mod:`phonometry.hearing.sti`) and the speech
-intelligibility index (:mod:`phonometry.hearing.sii`) are less appropriate:
+speech-transmission index (:mod:`phonometry.speech.sti`) and the speech
+intelligibility index (:mod:`phonometry.speech.sii`) are less appropriate:
 
 * **STOI** (Taal, Hendriks, Heusdens and Jensen 2011, *An Algorithm for
   Intelligibility Prediction of Time-Frequency Weighted Noisy Speech*, IEEE
@@ -116,7 +116,7 @@ class STOIResult:
         returns the :class:`~matplotlib.axes.Axes`.
         """
         from .._i18n import check_language
-        from .._plot.hearing import plot_stoi
+        from .._plot.speech import plot_stoi
 
         return plot_stoi(self, ax=ax, language=check_language(language), **kwargs)
 

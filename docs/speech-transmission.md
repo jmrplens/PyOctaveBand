@@ -54,11 +54,11 @@ results, band-weighted, into the index: the STI is an effective SNR of the
 ```python
 import numpy as np
 import matplotlib.pyplot as plt
-from phonometry import hearing
+from phonometry import speech
 
 fs = 48000
 
-# STI vs reverberation time: sweep hearing.sti_from_impulse_response over synthetic
+# STI vs reverberation time: sweep speech.sti_from_impulse_response over synthetic
 # exponential decays (white noise x exp(-6.9077 t / T60)) at a T60 grid,
 # exactly the physics behind the curve above:
 rng = np.random.default_rng(0)
@@ -67,7 +67,7 @@ sti_values = []
 for t60 in t60_grid:
     t = np.arange(int(2 * t60 * fs)) / fs
     ir = rng.standard_normal(t.size) * np.exp(-6.9077 * t / t60)
-    sti_values.append(hearing.sti_from_impulse_response(ir, fs).sti)
+    sti_values.append(speech.sti_from_impulse_response(ir, fs).sti)
 
 fig, ax = plt.subplots()
 ax.semilogx(t60_grid, sti_values, "o-")
@@ -84,20 +84,20 @@ plt.show()
 
 ```python
 import numpy as np
-from phonometry import hearing
+from phonometry import speech
 
 fs = 48000
 # A measured room impulse response (synthesized decay so the example runs)
 ir = np.random.default_rng(0).standard_normal(fs) * np.exp(-6.9 * np.arange(fs) / fs / 0.5)
 
 # Indirect method: from a measured room impulse response
-res = hearing.sti_from_impulse_response(ir, fs, snr=25.0)
+res = speech.sti_from_impulse_response(ir, fs, snr=25.0)
 print(f"STI = {res.sti:.2f}  ({res.rating})")   # e.g. 0.62 (D)
 
-# Direct STIPA measurement: play hearing.stipa_signal() in the room, record it
-test = hearing.stipa_signal(fs, seconds=18.0, level_db=80.0)
+# Direct STIPA measurement: play speech.stipa_signal() in the room, record it
+test = speech.stipa_signal(fs, seconds=18.0, level_db=80.0)
 recording = test                       # in practice, the microphone signal after playback
-res = hearing.stipa(recording, fs)
+res = speech.stipa(recording, fs)
 res.plot()   # per-band modulation transfer index (MTI) bars, STI + rating in the title
 ```
 
@@ -114,7 +114,7 @@ particular part of the spectrum rather than uniformly.
 ```python
 import numpy as np
 import matplotlib.pyplot as plt
-from phonometry import hearing
+from phonometry import speech
 
 # A reverberant hall (T60 = 0.9 s) measured with a 15 dB speech-to-noise
 # ratio: a synthesized exponential decay stands in for the measured IR.
@@ -122,7 +122,7 @@ fs = 48000
 rng = np.random.default_rng(0)
 n = np.arange(fs)
 ir = rng.standard_normal(fs) * np.exp(-6.9078 * n / fs / 0.9)
-res = hearing.sti_from_impulse_response(ir, fs, snr=15.0)
+res = speech.sti_from_impulse_response(ir, fs, snr=15.0)
 print(round(res.sti, 3), res.rating)      # 0.583 E
 
 # One line: the per-band MTI bars with the STI and its rating in the title.
@@ -246,9 +246,9 @@ reportlab and, for the figure the fiche embeds, matplotlib (`pip install
 `language="es"` for a Spanish fiche.
 
 ```python
-from phonometry import hearing, ReportMetadata
+from phonometry import ReportMetadata, speech
 
-res = hearing.sti_from_impulse_response(ir, fs)
+res = speech.sti_from_impulse_response(ir, fs)
 res.report(
     "sti_fiche.pdf",
     metadata=ReportMetadata(
@@ -278,7 +278,7 @@ repository. Click the preview to open the PDF:
   sharpness, tonality and roughness of the received sound.
 - [Theory](theory-perception.md): the modulation-transfer derivation and the $m$ ↔ STI
   mapping.
-- API reference: [`hearing.sti`](https://jmrplens.github.io/phonometry/reference/api/speech/sti/).
+- API reference: [`speech.sti`](https://jmrplens.github.io/phonometry/reference/api/speech/sti/).
 
 ## References
 

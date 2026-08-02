@@ -1,5 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""Tests for :mod:`phonometry.hearing.objective_intelligibility` (STOI / ESTOI).
+"""Tests for :mod:`phonometry.speech.objective_intelligibility` (STOI / ESTOI).
 
 STOI (Taal et al. 2011) and ESTOI (Jensen & Taal 2016) are validated three
 ways: exact degenerate cases (a degraded signal equal to the clean one scores
@@ -21,7 +21,7 @@ import numpy as np
 import pytest
 
 from phonometry import stoi
-from phonometry.hearing import objective_intelligibility as oi
+from phonometry.speech import objective_intelligibility as oi
 
 FS = oi.SAMPLE_RATE  # 10 kHz: the internal rate, so the contrast skips resampling.
 

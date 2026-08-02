@@ -141,7 +141,7 @@ def transfer_function(
     :param fs: Sample rate, in Hz.
     :param estimator: ``'H1'`` (default) or ``'H2'``.
     :param nperseg: Welch segment length; ``None`` picks a length targeting
-        about 4 Hz resolution (as in :mod:`~phonometry.intensity`).
+        about 4 Hz resolution (as in :mod:`~phonometry.emission.intensity`).
     :param overlap: Segment overlap fraction (default 0.5).
     :return: A :class:`FrequencyResponseResult`.
     :raises ValueError: If the inputs or parameters are invalid.

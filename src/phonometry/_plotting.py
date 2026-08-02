@@ -52,8 +52,6 @@ from ._plot.hearing import (
     plot_htlan,
     plot_nipts,
     plot_occupational_exposure,
-    plot_sii,
-    plot_sti,
 )
 from ._plot.materials import (
     plot_absorption_uncertainty,
@@ -94,6 +92,10 @@ from ._plot.room import (
 from ._plot.simulation import (
     plot_fdtd_probes,
     plot_fdtd_snapshot,
+)
+from ._plot.speech import (
+    plot_sii,
+    plot_sti,
 )
 from ._plot.underwater import (
     plot_ambient_noise,

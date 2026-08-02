@@ -119,7 +119,7 @@ def plot_zwicker_loudness(
     returned; otherwise (a stationary result, or an ``ax`` was supplied) a
     single axes is returned.
 
-    :param result: A :class:`~phonometry.loudness_zwicker.ZwickerLoudness`.
+    :param result: A :class:`~phonometry.psychoacoustics.loudness_zwicker.ZwickerLoudness`.
     :param ax: Existing axes to draw on, or ``None`` to create a figure.
     :param language: Label language, ``"en"`` (default) or ``"es"``.
     :param kwargs: Forwarded to the specific-loudness line ``plot`` call.
@@ -174,7 +174,7 @@ def plot_zwicker_loudness_time(
     the second panel of :func:`plot_zwicker_loudness`.
 
     :param result: A time-varying
-        :class:`~phonometry.loudness_zwicker.ZwickerLoudness` (with
+        :class:`~phonometry.psychoacoustics.loudness_zwicker.ZwickerLoudness` (with
         ``time`` / ``loudness_vs_time``).
     :param ax: Existing axes to draw on, or ``None`` to create a figure.
     :param language: Label language, ``"en"`` (default) or ``"es"``.
@@ -224,7 +224,7 @@ def plot_ecma_loudness(
     two axes is returned; when ``ax`` is supplied only the specific-loudness
     panel is drawn on it and that single axes is returned.
 
-    :param result: An :class:`~phonometry.loudness_ecma.EcmaLoudness`.
+    :param result: An :class:`~phonometry.psychoacoustics.loudness_ecma.EcmaLoudness`.
     :param ax: Existing axes to draw on, or ``None`` to create a figure.
     :param language: Label language, ``"en"`` (default) or ``"es"``.
     :param kwargs: Forwarded to the specific-loudness line ``plot`` call.
@@ -279,7 +279,7 @@ def plot_moore_glasberg_loudness(
     """Specific loudness N'(i) over the ERB-number (Cam) scale (ISO 532-2).
 
     :param result: A
-        :class:`~phonometry.loudness_moore_glasberg.MooreGlasbergLoudness`.
+        :class:`~phonometry.psychoacoustics.loudness_moore_glasberg.MooreGlasbergLoudness`.
     :param ax: Existing axes to draw on, or ``None`` to create a figure.
     :param language: Label language, ``"en"`` (default) or ``"es"``.
     :param kwargs: Forwarded to the specific-loudness line ``plot`` call.
@@ -314,7 +314,7 @@ def plot_moore_glasberg_time_loudness(
     """Short-term and long-term loudness against time (ISO 532-3).
 
     :param result: A
-        :class:`~phonometry.loudness_moore_glasberg_time.MooreGlasbergTimeVaryingLoudness`.
+        :class:`~phonometry.psychoacoustics.loudness_moore_glasberg_time.MooreGlasbergTimeVaryingLoudness`.
     :param ax: Existing axes to draw on, or ``None`` to create a figure.
     :param language: Label language, ``"en"`` (default) or ``"es"``.
     :param kwargs: Forwarded to the long-term-loudness line ``plot`` call.
@@ -359,7 +359,7 @@ def plot_ecma_tonality(
     is returned; when ``ax`` is supplied only the specific-tonality panel is
     drawn on it and that single axes is returned.
 
-    :param result: An :class:`~phonometry.tonality_ecma.EcmaTonality`.
+    :param result: An :class:`~phonometry.psychoacoustics.tonality_ecma.EcmaTonality`.
     :param ax: Existing axes to draw on, or ``None`` to create a figure.
     :param language: Label language, ``"en"`` (default) or ``"es"``.
     :param kwargs: Forwarded to the specific-tonality line ``plot`` call.
@@ -477,7 +477,7 @@ def plot_ecma_roughness(
     and an array of two axes is returned; when ``ax`` is supplied only the
     time-dependent roughness is drawn on it and that single axes is returned.
 
-    :param result: An :class:`~phonometry.roughness_ecma.EcmaRoughness`.
+    :param result: An :class:`~phonometry.psychoacoustics.roughness_ecma.EcmaRoughness`.
     :param ax: Existing axes to draw on, or ``None`` to create a figure.
     :param language: Label language, ``"en"`` (default) or ``"es"``.
     :param kwargs: Forwarded to the roughness-vs-time line ``plot`` call.
@@ -558,7 +558,7 @@ def plot_fluctuation_strength(
     annotated with the overall ``F`` in vacil.
 
     :param result: A
-        :class:`~phonometry.fluctuation_strength.FluctuationStrengthResult`.
+        :class:`~phonometry.psychoacoustics.fluctuation_strength.FluctuationStrengthResult`.
     :param ax: Existing axes, or ``None`` to create a figure.
     :param language: Label language, ``"en"`` (default) or ``"es"``.
     :param kwargs: Forwarded to the ``plot`` call.
@@ -593,7 +593,7 @@ def plot_psychoacoustic_annoyance(
     Draws the PA value alongside the two loudness-weighted terms so the
     sharpness and fluctuation/roughness contributions are visible.
 
-    :param result: A :class:`~phonometry.psychoacoustic_annoyance.
+    :param result: A :class:`~phonometry.psychoacoustics.psychoacoustic_annoyance.
         PsychoacousticAnnoyanceResult`.
     :param ax: Existing axes, or ``None`` to create a figure.
     :param language: Label language, ``"en"`` (default) or ``"es"``.
@@ -716,7 +716,7 @@ def plot_tone_audibility(
     Draws one bar per tone with the decisive (most audible) tone emphasised and
     the ``ΔL = 0`` audibility threshold marked; tones above it are present.
 
-    :param result: A :class:`~phonometry.tone_audibility.ToneAudibilityResult`.
+    :param result: A :class:`~phonometry.psychoacoustics.tone_audibility.ToneAudibilityResult`.
     :param ax: Existing axes, or ``None`` to create a figure.
     :param language: Label language, ``"en"`` (default) or ``"es"``.
     :param kwargs: Forwarded to the bar ``bar`` call.
@@ -767,7 +767,7 @@ def plot_tone_audibility_levels(
     masking threshold is the audibility ``ΔL_ta``. The decisive (most audible)
     tone is emphasised and the frequency axis is continuous and logarithmic.
 
-    :param result: A :class:`~phonometry.tone_audibility.ToneAudibilityResult`.
+    :param result: A :class:`~phonometry.psychoacoustics.tone_audibility.ToneAudibilityResult`.
     :param ax: Existing axes, or ``None`` to create a figure.
     :param language: Label language, ``"en"`` (default) or ``"es"``.
     :param kwargs: Forwarded to the tone-level marker ``plot`` call.
@@ -854,7 +854,7 @@ def plot_equal_loudness_contours(
     is the iconic ISO 226 chart.
 
     :param result: An
-        :class:`~phonometry.loudness_contours.EqualLoudnessContours`.
+        :class:`~phonometry.psychoacoustics.loudness_contours.EqualLoudnessContours`.
     :param ax: Existing axes to draw on, or ``None`` to create a figure.
     :param language: Label language, ``"en"`` (default) or ``"es"``.
     :param kwargs: Forwarded to the contour line ``plot`` calls.

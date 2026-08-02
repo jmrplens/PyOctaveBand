@@ -451,7 +451,7 @@ class SIIResult:
         :class:`~matplotlib.axes.Axes`.
         """
         from .._i18n import check_language
-        from .._plot.hearing import plot_sii
+        from .._plot.speech import plot_sii
 
         return plot_sii(self, ax=ax, language=check_language(language), **kwargs)
 
@@ -565,7 +565,7 @@ class StandardSpeechSpectrum:
         :return: The axes.
         """
         from .._i18n import check_language
-        from .._plot.hearing import plot_standard_speech_spectrum
+        from .._plot.speech import plot_standard_speech_spectrum
 
         return plot_standard_speech_spectrum(
             self, ax=ax, language=check_language(language), **kwargs
@@ -842,7 +842,7 @@ class SIIProcedure:
         :return: The axes.
         """
         from .._i18n import check_language
-        from .._plot.hearing import plot_sii_procedure
+        from .._plot.speech import plot_sii_procedure
 
         return plot_sii_procedure(
             self, ax=ax, language=check_language(language), **kwargs

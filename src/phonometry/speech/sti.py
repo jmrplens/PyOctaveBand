@@ -117,7 +117,7 @@ class STIResult:
         :class:`~matplotlib.axes.Axes`.
         """
         from .._i18n import check_language
-        from .._plot.hearing import plot_sti
+        from .._plot.speech import plot_sti
 
         return plot_sti(self, ax=ax, language=check_language(language), **kwargs)
 

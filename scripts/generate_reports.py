@@ -2990,7 +2990,7 @@ def _sti_example() -> tuple[object, ReportMetadata, str]:
     n = int(2.0 * t60 * fs)
     t = np.arange(n) / fs
     ir = rng.standard_normal(n) * np.exp(-3.0 * np.log(10.0) * t / t60)
-    result = ph.hearing.sti_from_impulse_response(ir, fs)
+    result = ph.speech.sti_from_impulse_response(ir, fs)
     metadata = ReportMetadata(
         specimen="Concourse voice-alarm loudspeaker line",
         client="Example client",
@@ -3017,7 +3017,7 @@ def _sii_example() -> tuple[object, ReportMetadata, str]:
     0.75 (an audibility target for good intelligibility), which the example
     clears.
     """
-    result = ph.hearing.speech_intelligibility_index(
+    result = ph.speech.speech_intelligibility_index(
         np.full(18, 54.0),
         np.array([40.0, 30.0, 20.0] + [0.0] * 15),
         threshold=np.zeros(18),

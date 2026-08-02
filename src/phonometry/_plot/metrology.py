@@ -217,7 +217,7 @@ def plot_uncertainty_budget(
 ) -> Axes:
     """Bar chart of each input's contribution to the combined uncertainty.
 
-    :param result: An :class:`~phonometry.uncertainty.UncertaintyResult`.
+    :param result: An :class:`~phonometry.metrology.uncertainty.UncertaintyResult`.
     :param ax: Existing axes, or ``None`` to create a figure.
     :param language: Label language, ``"en"`` (default) or ``"es"``.
     :param kwargs: Forwarded to :meth:`barh`.
@@ -253,7 +253,7 @@ def plot_monte_carlo(
 ) -> Axes:
     """Histogram of the Monte Carlo output with the coverage interval marked.
 
-    :param result: A :class:`~phonometry.uncertainty.MonteCarloResult`
+    :param result: A :class:`~phonometry.metrology.uncertainty.MonteCarloResult`
         obtained with ``keep_samples=True`` (the histogram needs the raw
         output sample).
     :param ax: Existing axes, or ``None`` to create a figure.

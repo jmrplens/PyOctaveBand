@@ -1,7 +1,7 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
 """ANSI S3.5-1997 speech-intelligibility-index fiche (reportlab renderer).
 
-Renders a :class:`~phonometry.hearing.sii.SIIResult` to a one-page PDF laid out
+Renders a :class:`~phonometry.speech.sii.SIIResult` to a one-page PDF laid out
 like a speech-audibility report:
 
 * a title and the standard-basis line (measurement standard + ANSI S3.5-1997);
@@ -54,7 +54,7 @@ from ._layout import (
 from .metadata import ReportMetadata
 
 if TYPE_CHECKING:
-    from ..hearing.sii import SIIResult
+    from ..speech.sii import SIIResult
 
 #: The band procedure the fiche describes when the result carries no other.
 _DEFAULT_METHOD = "one-third-octave"
@@ -213,7 +213,7 @@ def render_sii_report(
 ) -> str:
     """Render an ANSI S3.5-1997 speech-intelligibility-index fiche to ``path``.
 
-    :param result: A :class:`~phonometry.hearing.sii.SIIResult` carrying the
+    :param result: A :class:`~phonometry.speech.sii.SIIResult` carrying the
         overall SII, the per-band audibility ``Ai`` and importance ``Ii``, the
         equivalent speech spectrum and the disturbance/masking spectra.
     :param path: Destination path of the PDF file.

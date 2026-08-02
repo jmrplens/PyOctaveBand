@@ -250,7 +250,7 @@ RD 286/2006: *nivel de exposición diario equivalente*, *valor límite de
 exposición*, with comma decimals).
 
 ```python
-from phonometry import hearing, ReportMetadata
+from phonometry import ReportMetadata, hearing
 
 # The Annex D welders' day from section 1, with duration uncertainty.
 res = hearing.task_based_exposure(tasks, warn=False)

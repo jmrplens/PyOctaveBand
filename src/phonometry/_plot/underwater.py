@@ -142,7 +142,7 @@ def plot_ship_source_level(
     frequency, with the Lloyd's-mirror correction ``ΔL`` on a twin axis.
 
     :param result: A
-        :class:`~phonometry.ship_radiated_noise.ShipSourceLevelResult`.
+        :class:`~phonometry.underwater.ship_radiated_noise.ShipSourceLevelResult`.
     :param ax: Existing axes, or ``None`` to create a figure.
     :param language: Label language, ``"en"`` (default) or ``"es"``.
     :param kwargs: Forwarded to the source-level ``semilogx`` call.
@@ -193,7 +193,7 @@ def plot_pile_strike(
     the normalised cumulative energy with the 5 %/95 % pulse-duration bounds
     below. With ``ax`` given, only the waveform panel is drawn on it.
 
-    :param result: A :class:`~phonometry.pile_driving_noise.PileStrikeResult`.
+    :param result: A :class:`~phonometry.underwater.pile_driving_noise.PileStrikeResult`.
     :param ax: Existing axes for the waveform panel, or ``None`` for a fresh
         two-panel figure.
     :param language: Label language, ``"en"`` (default) or ``"es"``.
@@ -248,7 +248,7 @@ def plot_sound_speed_profile(
 ) -> Axes:
     """Sound-speed profile: speed vs depth, with depth increasing downward.
 
-    :param result: A :class:`~phonometry.underwater_sound_speed.SoundSpeedProfile`.
+    :param result: A :class:`~phonometry.underwater.sound_speed.SoundSpeedProfile`.
     :param ax: Existing axes, or ``None`` to create a figure.
     :param language: Label language, ``"en"`` (default) or ``"es"``.
     :param kwargs: Forwarded to the profile ``plot`` call.
@@ -279,7 +279,7 @@ def plot_transmission_loss(
 
     Loss increases downward (the usual TL convention).
 
-    :param result: A :class:`~phonometry.underwater_propagation.TransmissionLossResult`.
+    :param result: A :class:`~phonometry.underwater.propagation.TransmissionLossResult`.
     :param ax: Existing axes, or ``None`` to create a figure.
     :param language: Label language, ``"en"`` (default) or ``"es"``.
     :param kwargs: Forwarded to the total-TL ``plot`` call.
@@ -311,7 +311,7 @@ def plot_sonar_equation(
 ) -> Axes:
     """Signal excess versus transmission loss, with the detection limit (SE = 0).
 
-    :param result: A :class:`~phonometry.sonar_equation.SonarEquationResult`.
+    :param result: A :class:`~phonometry.underwater.sonar_equation.SonarEquationResult`.
     :param ax: Existing axes, or ``None`` to create a figure.
     :param language: Label language, ``"en"`` (default) or ``"es"``.
     :param kwargs: Forwarded to the signal-excess ``plot`` call.
@@ -342,7 +342,7 @@ def plot_bottom_loss(
 ) -> Axes:
     """Bottom reflection loss versus grazing angle, marking the critical angle.
 
-    :param result: A :class:`~phonometry.seabed_reflection.BottomLossResult`.
+    :param result: A :class:`~phonometry.underwater.seabed_reflection.BottomLossResult`.
     :param ax: Existing axes, or ``None`` to create a figure.
     :param language: Label language, ``"en"`` (default) or ``"es"``.
     :param kwargs: Forwarded to the bottom-loss ``plot`` call.
@@ -374,7 +374,7 @@ def plot_seabed_reflection(
     Draws ``|R|`` on a linear grazing-angle axis, marking the critical angle
     when the sediment is faster than the water.
 
-    :param result: A :class:`~phonometry.seabed_reflection.SeabedReflection`.
+    :param result: A :class:`~phonometry.underwater.seabed_reflection.SeabedReflection`.
     :param ax: Existing axes, or ``None`` to create a figure.
     :param language: Label language, ``"en"`` (default) or ``"es"``.
     :param kwargs: Forwarded to the magnitude ``plot`` call.
@@ -404,7 +404,7 @@ def plot_ambient_noise(
 ) -> Axes:
     """Composite ambient-noise spectrum and its components versus frequency.
 
-    :param result: An :class:`~phonometry.ocean_ambient_noise.AmbientNoiseResult`.
+    :param result: An :class:`~phonometry.underwater.ocean_ambient_noise.AmbientNoiseResult`.
     :param ax: Existing axes, or ``None`` to create a figure.
     :param language: Label language, ``"en"`` (default) or ``"es"``.
     :param kwargs: Forwarded to the composite-level ``plot`` call.
@@ -438,7 +438,7 @@ def plot_ship_traffic_spectrum(
 ) -> Axes:
     """Predicted ship source spectral-density level versus frequency.
 
-    :param result: A :class:`~phonometry.ship_traffic_noise.ShipTrafficSpectrum`.
+    :param result: A :class:`~phonometry.underwater.ship_traffic_noise.ShipTrafficSpectrum`.
     :param ax: Existing axes, or ``None`` to create a figure.
     :param language: Label language, ``"en"`` (default) or ``"es"``.
     :param kwargs: Forwarded to the source-PSD ``plot`` call.
@@ -470,7 +470,7 @@ def plot_normal_modes(
 ) -> Axes:
     """Normal-mode transmission loss versus range (loss increasing downward).
 
-    :param result: A :class:`~phonometry.numerical_propagation.NormalModeResult`.
+    :param result: A :class:`~phonometry.underwater.numerical_propagation.NormalModeResult`.
     :param ax: Existing axes, or ``None`` to create a figure.
     :param language: Label language, ``"en"`` (default) or ``"es"``.
     :param kwargs: Forwarded to the transmission-loss ``plot`` call.
@@ -497,7 +497,7 @@ def plot_ray_trace(result: RayTraceResult, ax: Axes | None = None, *, language: 
                    **kwargs: Any) -> Axes:
     """Ray paths through the water column (depth increasing downward).
 
-    :param result: A :class:`~phonometry.numerical_propagation.RayTraceResult`.
+    :param result: A :class:`~phonometry.underwater.numerical_propagation.RayTraceResult`.
     :param ax: Existing axes, or ``None`` to create a figure.
     :param language: Label language, ``"en"`` (default) or ``"es"``.
     :param kwargs: Forwarded to each ray ``plot`` call.
@@ -528,7 +528,7 @@ def plot_parabolic_equation(
     """Parabolic-equation transmission-loss field (range x depth).
 
     :param result: A
-        :class:`~phonometry.numerical_propagation.ParabolicEquationResult`.
+        :class:`~phonometry.underwater.numerical_propagation.ParabolicEquationResult`.
     :param ax: Existing axes, or ``None`` to create a figure.
     :param language: Label language, ``"en"`` (default) or ``"es"``.
     :param kwargs: Forwarded to ``imshow``.

@@ -894,7 +894,7 @@ def _sound_power_designation(result: Any) -> str:
 
     Distinguishes the reverberation-room (ISO 3741) and intensity (ISO 9614)
     determinations by their result types; the enveloping-surface pressure
-    methods (:class:`~phonometry.sound_power.SoundPowerResult` and any other
+    methods (:class:`~phonometry.emission.sound_power.SoundPowerResult` and any other
     duck-typed result) fall back to ISO 3744/3746.
     """
     from ..emission.sound_power_intensity import SoundPowerIntensityResult

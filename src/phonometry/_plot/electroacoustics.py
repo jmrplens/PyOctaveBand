@@ -143,7 +143,7 @@ def plot_harmonic_distortion(
     in dB relative to the fundamental, annotated with the THD (both
     conventions) and SINAD.
 
-    :param result: A :class:`~phonometry.distortion.HarmonicDistortionResult`.
+    :param result: A :class:`~phonometry.electroacoustics.distortion.HarmonicDistortionResult`.
     :param ax: Existing axes, or ``None`` to create a figure.
     :param language: Label language, ``"en"`` (default) or ``"es"``.
     :param kwargs: Forwarded to the marker ``plot`` call.
@@ -277,7 +277,7 @@ def plot_frequency_response(
     drawn on it.
 
     :param result: A
-        :class:`~phonometry.frequency_response.FrequencyResponseResult`.
+        :class:`~phonometry.electroacoustics.frequency_response.FrequencyResponseResult`.
     :param ax: Existing axes for the magnitude panel, or ``None`` for a fresh
         three-panel figure.
     :param language: Label language, ``"en"`` (default) or ``"es"``.

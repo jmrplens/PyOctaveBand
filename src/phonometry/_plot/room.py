@@ -153,7 +153,7 @@ def plot_room_acoustics(
     the two series are drawn on that single axes (times only) so the plot
     can be composed.
 
-    :param result: A :class:`~phonometry.room_acoustics.RoomAcousticsResult`.
+    :param result: A :class:`~phonometry.room.room_acoustics.RoomAcousticsResult`.
     :param ax: Existing axes for a single-panel (decay-times only) plot, or
         ``None`` to create the full two-panel figure.
     :return: The axes, or an array of two axes for the default figure.
@@ -237,7 +237,7 @@ def plot_decay_curve(
 ) -> Axes:
     """Schroeder decay curve with optional straight T-fit overlays.
 
-    :param result: A :class:`~phonometry.room_acoustics.DecayCurve`.
+    :param result: A :class:`~phonometry.room.room_acoustics.DecayCurve`.
     :param ax: Existing axes, or ``None`` to create a figure.
     :param fits: Overlay the EDT (0..-10 dB), T20 (-5..-25 dB) and T30
         (-5..-35 dB) straight-line fits computed from the curve's own data.
@@ -290,7 +290,7 @@ def plot_impulse_response(
     backward-integrated energy-decay curve overlaid. With ``ax`` given, only
     the decay panel is drawn on it.
 
-    :param result: An :class:`~phonometry.room_ir.ImpulseResponseResult`.
+    :param result: An :class:`~phonometry.room.room_ir.ImpulseResponseResult`.
     :param ax: Existing axes for the decay panel, or ``None`` for a fresh
         two-panel figure.
     :param kwargs: Forwarded to the waveform / envelope ``plot`` calls.
@@ -349,7 +349,7 @@ def plot_noise_criterion(
 ) -> Axes:
     """Measured spectrum against the NC curve family (ANSI/ASA S12.2-2019).
 
-    :param result: A :class:`~phonometry.room_noise.NCResult`.
+    :param result: A :class:`~phonometry.room.room_noise.NCResult`.
     :param ax: Existing axes, or ``None`` to create a figure.
     :param kwargs: Forwarded to the measured-spectrum :meth:`plot`.
     :return: The axes.
@@ -404,7 +404,7 @@ def plot_room_criterion(
     Shades the rumble tolerance (reference + 5 dB below 500 Hz) and the hiss
     tolerance (reference + 3 dB at and above 1000 Hz).
 
-    :param result: A :class:`~phonometry.room_noise.RCResult`.
+    :param result: A :class:`~phonometry.room.room_noise.RCResult`.
     :param ax: Existing axes, or ``None`` to create a figure.
     :param kwargs: Forwarded to the measured-spectrum :meth:`plot`.
     :return: The axes.
@@ -444,7 +444,7 @@ def plot_enclosed_space_absorption(
 ) -> Axes:
     """Reverberation time over the octave bands (EN 12354-6).
 
-    :param result: A :class:`~phonometry.enclosed_space_absorption.ReverberationResult`.
+    :param result: A :class:`~phonometry.room.enclosed_space_absorption.ReverberationResult`.
     :param ax: Existing axes, or ``None`` to create a figure.
     :param kwargs: Forwarded to the reverberation-time ``plot``.
     :return: The axes.
@@ -476,7 +476,7 @@ def plot_reverberation_models(
     non-uniform absorption distribution.
 
     :param result: A
-        :class:`~phonometry.reverberation_prediction.ReverberationModelResult`.
+        :class:`~phonometry.room.reverberation_prediction.ReverberationModelResult`.
     :param ax: Existing axes, or ``None`` to create a figure.
     :param kwargs: Forwarded to every curve ``plot``.
     :return: The axes.
@@ -526,7 +526,7 @@ def plot_open_plan(
     reach ``rP`` when it lies further out) and marks the distraction
     distance ``rD`` and the privacy distance ``rP`` from the STI regression.
 
-    :param result: An :class:`~phonometry.open_plan.OpenPlanResult`.
+    :param result: An :class:`~phonometry.room.open_plan.OpenPlanResult`.
     :param ax: Existing axes, or ``None`` to create a figure.
     :param kwargs: Forwarded to the decay-line ``plot`` call.
     :return: The axes.

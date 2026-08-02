@@ -50,3 +50,16 @@ def test_unknown_language_raises() -> None:
     result = age_threshold(60.0, "male")
     with pytest.raises(ValueError, match="Unknown language"):
         result.plot(language="xx")
+
+def test_exposure_plot_needs_per_task_contributions() -> None:
+    """The job and full-day strategies carry no tasks, so plot() says so."""
+    pytest.importorskip("matplotlib")
+    import matplotlib
+
+    matplotlib.use("Agg")
+    from phonometry import full_day_exposure
+
+    result = full_day_exposure([85.0, 86.0, 84.0], 8.0)
+    assert result.tasks == ()
+    with pytest.raises(ValueError, match="per-task contributions"):
+        result.plot()
