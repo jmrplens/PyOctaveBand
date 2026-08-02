@@ -15,6 +15,7 @@ from .common import (
     _C_REFERENCE,
     _C_SECONDARY,
     _C_TERTIARY,
+    _LEGEND_UPPER_LEFT,
     _LEGEND_UPPER_RIGHT,
     _band_axis,
     _field_cmap,
@@ -52,12 +53,21 @@ if TYPE_CHECKING:
 #: returns the English key unchanged for any language other than ``"es"``,
 #: so the English output is byte-for-byte identical to the pre-i18n
 #: renderers.
+#: Axis labels the renderers repeat; the Spanish table is keyed by the same
+#: constants, so a label is written once.
+_FREQ_LABEL = "Frequency [Hz]"
+_HEIGHT_LABEL = "Height [m]"
+_RANGE_LABEL = "Range [m]"
+_TOTAL_A_LABEL = r"$A$ — total"
+_FREE_FIELD_LABEL = "Level re free field [dB]"
+_LT_LABEL = r"$L_t$ [dB]"
+
 _STRINGS: dict[str, str] = {
     "Narrowband spectrum": "Espectro de banda estrecha",
     "Critical band": "Banda crítica",
     "Masking level": "Nivel de enmascaramiento",
     "Tone": "Tono",
-    "Frequency [Hz]": "Frecuencia [Hz]",
+    _FREQ_LABEL: "Frecuencia [Hz]",
     "Level [dB]": "Nivel [dB]",
     "IEC 61400-11 tonal audibility": "Audibilidad tonal IEC 61400-11",
     "threshold": "umbral",
@@ -86,7 +96,7 @@ _STRINGS: dict[str, str] = {
     "Excess attenuation $\\Delta L$": "Atenuación en exceso $\\Delta L$",
     "Free field (0 dB)": "Campo libre (0 dB)",
     "Hard-ground limit (+6 dB)": "Límite de suelo duro (+6 dB)",
-    "Level re free field [dB]": "Nivel re campo libre [dB]",
+    _FREE_FIELD_LABEL: "Nivel re campo libre [dB]",
     "Spherical-wave ground effect (Weyl-Van der Pol)": "Efecto de suelo de onda esférica (Weyl-Van der Pol)",
     "Insertion loss": "Pérdida por inserción",
     "ground": "suelo",
@@ -94,8 +104,8 @@ _STRINGS: dict[str, str] = {
     "Insertion loss [dB]": "Pérdida por inserción [dB]",
     "Barrier insertion loss": "Pérdida por inserción de barrera",
     "Effective sound speed [m/s]": "Velocidad efectiva del sonido [m/s]",
-    "Height [m]": "Altura [m]",
-    "Range [m]": "Distancia [m]",
+    _HEIGHT_LABEL: "Altura [m]",
+    _RANGE_LABEL: "Distancia [m]",
     "Effective sound-speed profile": "Perfil de velocidad efectiva del sonido",
     "Source": "Fuente",
     "Atmospheric ray paths": "Trayectorias de rayos atmosféricos",
@@ -170,11 +180,11 @@ def plot_atmospheric_attenuation(
     fmin, fmax = float(freqs.min()), float(freqs.max())
     ax.set_xlim(fmin, fmax)
     format_frequency_axis(ax, fmin, fmax)
-    ax.set_xlabel(_t("Frequency [Hz]", language))
+    ax.set_xlabel(_t(_FREQ_LABEL, language))
     ax.set_ylabel(_t(r"Attenuation coefficient $\alpha$ [dB/km]", language))
     ax.set_title(_t("ISO 9613-1 atmospheric attenuation", language))
     ax.grid(True, which="both", alpha=0.3)
-    ax.legend(loc="upper left", fontsize="small")
+    ax.legend(loc=_LEGEND_UPPER_LEFT, fontsize="small")
     localize_axes(ax, language)
     return ax
 
@@ -205,7 +215,7 @@ def plot_wind_turbine_tonality(
                label=f"{_t('Masking level', language)} ({format_number(result.masking_level, language)} dB)")
     ax.plot([fc], [result.tone_level], "o", color=_C_REFERENCE,
             label=f"{_t('Tone', language)} ({format_number(result.tone_level, language)} dB)")
-    ax.set_xlabel(_t("Frequency [Hz]", language))
+    ax.set_xlabel(_t(_FREQ_LABEL, language))
     ax.set_ylabel(_t("Level [dB]", language))
     ax.set_title(f"{_t('IEC 61400-11 tonal audibility', language)} ΔLₐ = {format_number(result.tonal_audibility, language)} dB")
     ax.grid(True, alpha=0.3)
@@ -252,7 +262,7 @@ def plot_impulse_prominence(
     ax.set_ylabel(_t("Adjustment $K_I$ [dB]", language))
     ax.set_title(_t("NT ACOU 112 — impulse adjustment to $L_{Aeq}$", language))
     ax.set_ylim(bottom=0.0)
-    ax.legend(loc="upper left", fontsize="small")
+    ax.legend(loc=_LEGEND_UPPER_LEFT, fontsize="small")
     ax.grid(True, alpha=0.3)
     localize_axes(ax, language)
     return ax
@@ -292,7 +302,7 @@ def plot_tonal_adjustment(
     ax.set_ylabel(_t("Tonal adjustment $K_t$ [dB]", language))
     ax.set_title(_t("ISO 1996-2 tonal adjustment", language))
     ax.set_ylim(bottom=0.0)
-    ax.legend(loc="upper left", fontsize="small")
+    ax.legend(loc=_LEGEND_UPPER_LEFT, fontsize="small")
     ax.grid(True, alpha=0.3)
     localize_axes(ax, language)
     return ax
@@ -435,7 +445,7 @@ def plot_spherical_ground(
     ax.axhline(6.0, color=_C_REFERENCE, ls="--", lw=0.9,
                label=_t("Hard-ground limit (+6 dB)", language))
     _freq_axis(ax, freqs, language=language)
-    ax.set_ylabel(_t("Level re free field [dB]", language))
+    ax.set_ylabel(_t(_FREE_FIELD_LABEL, language))
     ax.set_title(_t("Spherical-wave ground effect (Weyl-Van der Pol)", language))
     ax.legend(loc="best", fontsize="small")
     ax.grid(True, which="both", alpha=0.3)
@@ -498,7 +508,7 @@ def plot_sound_speed_profile(
     label = profile.description or "c_eff(z)"
     ax.plot(c, z, **{"color": _C_PRIMARY, "lw": 1.4, "label": label, **kwargs})
     ax.set_xlabel(_t("Effective sound speed [m/s]", language))
-    ax.set_ylabel(_t("Height [m]", language))
+    ax.set_ylabel(_t(_HEIGHT_LABEL, language))
     ax.set_title(_t("Effective sound-speed profile", language))
     ax.grid(True, alpha=0.3)
     ax.legend(loc="best", fontsize="small")
@@ -528,12 +538,12 @@ def plot_atmospheric_rays(
         ax.plot(r[i], z[i], **{"color": _C_PRIMARY, "lw": 0.7, "alpha": 0.7, **kwargs})
     ax.plot([0.0], [result.source_height], "o", color=_C_REFERENCE, label=_t("Source", language))
     ax.axhline(0.0, color=_C_MUTED, lw=1.0)
-    ax.set_xlabel(_t("Range [m]", language))
-    ax.set_ylabel(_t("Height [m]", language))
+    ax.set_xlabel(_t(_RANGE_LABEL, language))
+    ax.set_ylabel(_t(_HEIGHT_LABEL, language))
     ax.set_ylim(bottom=0.0)
     ax.set_title(_t("Atmospheric ray paths", language))
     ax.grid(True, alpha=0.3)
-    ax.legend(loc="upper right", fontsize="small")
+    ax.legend(loc=_LEGEND_UPPER_RIGHT, fontsize="small")
     localize_axes(ax, language)
     return ax
 
@@ -581,12 +591,12 @@ def plot_atmospheric_pe(
             **kwargs,
         },
     )
-    ax.figure.colorbar(img, ax=ax, label=_t("Level re free field [dB]", language))
+    ax.figure.colorbar(img, ax=ax, label=_t(_FREE_FIELD_LABEL, language))
     ax.plot([0.0], [result.source_height], "o", color="k", ms=4.0, label=_t("Source", language))
-    ax.set_xlabel(_t("Range [m]", language))
-    ax.set_ylabel(_t("Height [m]", language))
+    ax.set_xlabel(_t(_RANGE_LABEL, language))
+    ax.set_ylabel(_t(_HEIGHT_LABEL, language))
     ax.set_title(f"{_t('GFPE relative sound level', language)} ({format_number(result.frequency, language, decimals=0)} Hz)")
-    ax.legend(loc="upper right", fontsize="small")
+    ax.legend(loc=_LEGEND_UPPER_RIGHT, fontsize="small")
     localize_axes(ax, language)
     return ax
 
@@ -640,7 +650,7 @@ def plot_tonal_correction_rd1367(
     handles, labels = ax.get_legend_handles_labels()
     extra_handles, extra_labels = twin.get_legend_handles_labels()
     ax.legend(handles + extra_handles, labels + extra_labels,
-              loc="upper left", fontsize="small")
+              loc=_LEGEND_UPPER_LEFT, fontsize="small")
     ax.grid(True, axis="y", alpha=0.3)
     localize_axes(ax, language)
     localize_axes(twin, language)
@@ -748,7 +758,7 @@ def plot_activity_assessment(
 
     ax.set_ylabel(_t("Corrected level [dB]", language))
     ax.set_title(_t("RD 1367/2007 assessment vs limit values", language))
-    ax.legend(loc="upper right", fontsize="small", ncol=2)
+    ax.legend(loc=_LEGEND_UPPER_RIGHT, fontsize="small", ncol=2)
     ax.grid(True, axis="y", alpha=0.3)
     localize_axes(ax, language)
     return ax
