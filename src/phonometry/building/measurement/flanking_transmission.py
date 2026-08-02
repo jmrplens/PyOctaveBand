@@ -3,7 +3,7 @@ r"""
 Laboratory measurement of flanking sound transmission (ISO 10848:2006/2010).
 
 This is the **measurement** counterpart of the flanking-transmission
-*prediction* in :mod:`phonometry.building.prediction.global_model`. EN 12354-1 predicts the
+*prediction* in :mod:`phonometry.building.prediction.simplified_model`. EN 12354-1 predicts the
 apparent in-situ performance from, among other inputs, the **vibration
 reduction index** ``Kij`` of each junction; ISO 10848 is the standard that
 *measures* that ``Kij`` (and the overall flanking descriptors ``Dn,f`` /

@@ -65,10 +65,6 @@ if TYPE_CHECKING:
         InSituElementResult,
     )
     from ..building.prediction.facade import FacadePredictionResult, RadiatedPowerResult
-    from ..building.prediction.global_model import (
-        AirbornePredictionResult,
-        ImpactPredictionResult,
-    )
     from ..building.prediction.installed_structure_borne import InstalledSourceResult
     from ..building.prediction.masonry_cavity_wall import WallTieCouplingResult
     from ..building.prediction.panel_transmission import SoundReductionResult
@@ -77,6 +73,10 @@ if TYPE_CHECKING:
         FloatingFloorImprovementResult,
         LiningImprovementResult,
         TappingForceResult,
+    )
+    from ..building.prediction.simplified_model import (
+        AirbornePredictionResult,
+        ImpactPredictionResult,
     )
     from ..building.regulation.spain import (
         DbHrAssessment,
@@ -847,7 +847,7 @@ def plot_airborne_prediction(
     share of the total transmitted sound energy, largest first.
 
     :param result: An
-        :class:`~phonometry.building.prediction.global_model.AirbornePredictionResult`.
+        :class:`~phonometry.building.prediction.simplified_model.AirbornePredictionResult`.
     :param ax: Existing axes, or ``None`` to create a figure.
     :param language: Label language, ``"en"`` (default) or ``"es"``.
     :param kwargs: Forwarded to the path :meth:`~matplotlib.axes.Axes.bar`.
@@ -888,7 +888,7 @@ def plot_impact_prediction(
     apparent level ``L'n,w = Ln,w,eq - DLw + K``.
 
     :param result: An
-        :class:`~phonometry.building.prediction.global_model.ImpactPredictionResult`.
+        :class:`~phonometry.building.prediction.simplified_model.ImpactPredictionResult`.
     :param ax: Existing axes, or ``None`` to create a figure.
     :param language: Label language, ``"en"`` (default) or ``"es"``.
     :param kwargs: Forwarded to the term :meth:`~matplotlib.axes.Axes.bar`.

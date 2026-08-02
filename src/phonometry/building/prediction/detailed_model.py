@@ -4,7 +4,7 @@ Detailed per-band building prediction (EN/ISO 12354-1/-2:2017).
 
 This is the **detailed model** of the building-prediction chain, the per-band
 counterpart of the simplified single-number model implemented in
-:mod:`phonometry.building.prediction.global_model`. Where the simplified model
+:mod:`phonometry.building.prediction.simplified_model`. Where the simplified model
 combines the weighted ratings of the elements (``Rw``, ``ΔRw``, ``Kij``) into a
 single ``R'w`` / ``L'n,w``, the detailed model carries every quantity through
 the one-third-octave (or octave) bands, converts the laboratory element data to

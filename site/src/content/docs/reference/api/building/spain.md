@@ -208,7 +208,7 @@ report are stated in is not the same.
 | `frequencies` | Band centre frequencies, in Hz (optional). |
 | `spectrum` | `"traffic"` (default, Table A.3) or `"aircraft"` (Table A.2), per the dominant outdoor noise. |
 
-**Returns:** A [`DbHrGlobalIndexResult`](/phonometry/reference/api/building/spain/#dbhrglobalindexresult) named `"D2m,nT,Atr"`.
+**Returns:** A [`DbHrGlobalIndexResult`](/phonometry/reference/api/building/spain/#dbhrglobalindexresult) named `_D2M_NT_ATR`.
 
 **Raises**
 
@@ -401,7 +401,7 @@ requirements, so this function returns the one route asked for.
 
 | Name | Description |
 | :--- | :--- |
-| `quantity` | `"D2m,nT,Atr"` (default, the per-leaf route) or `"DnT,A"` (the combined route). |
+| `quantity` | `_D2M_NT_ATR` (default, the per-leaf route) or `_DNT_A` (the combined route). |
 
 **Returns:** The [`DbHrRequirement`](/phonometry/reference/api/building/spain/#dbhrrequirement) of the chosen route.
 
@@ -527,7 +527,7 @@ A DB-HR A-weighted global insulation index.
 | `value` | The index, in dBA, unrounded. |
 | `intermediate` | The index rounded to one decimal, the form DB-HR prescribes for intermediate quantities and for product specifications. |
 | `reported` | The index rounded to an integer, the form DB-HR requires for the quantities that define the requirements (3.1.3.1 point 4). |
-| `name` | The index name, e.g. `"RA"` or `"D2m,nT,Atr"`. |
+| `name` | The index name, e.g. `"RA"` or `_D2M_NT_ATR`. |
 | `spectrum` | Key of the normalised spectrum used. |
 | `frequencies` | Band centre frequencies, in Hz. |
 | `band_values` | The band insulation values `X_i`, in dB. |
@@ -568,7 +568,7 @@ A single DB-HR performance requirement.
 
 | Name | Description |
 | :--- | :--- |
-| `quantity` | The quantity the requirement is stated in, e.g. `"DnT,A"`, `"L'nT,w"`, `"RA"`, `"T"` or `"A/V"`. |
+| `quantity` | The quantity the requirement is stated in, e.g. `_DNT_A`, `"L'nT,w"`, `"RA"`, `"T"` or `"A/V"`. |
 | `limit` | The limit value, in the quantity's own unit. |
 | `direction` | `"min"` when the quantity must be at least the limit, `"max"` when it must be at most the limit. |
 | `unit` | The unit the limit is expressed in. |
@@ -595,7 +595,7 @@ A-weighted standardized level difference `DnT,A` (Formula (A.7)).
 | `level_difference` | Band standardized level difference `DnT`, in dB. |
 | `frequencies` | Band centre frequencies, in Hz (optional). |
 
-**Returns:** A [`DbHrGlobalIndexResult`](/phonometry/reference/api/building/spain/#dbhrglobalindexresult) named `"DnT,A"`.
+**Returns:** A [`DbHrGlobalIndexResult`](/phonometry/reference/api/building/spain/#dbhrglobalindexresult) named `_DNT_A`.
 
 ## ra
 

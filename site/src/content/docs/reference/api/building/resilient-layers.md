@@ -1088,7 +1088,7 @@ weighted_floating_floor_improvement(
 Weighted improvement `ΔLw` of a floating floor (Formulae C.4/C.5).
 
 The single number that feeds the simplified prediction
-([`phonometry.predicted_impact_insulation`](/phonometry/reference/api/building/global-model/#predicted_impact_insulation)), read directly from the
+([`phonometry.predicted_impact_insulation`](/phonometry/reference/api/building/simplified-model/#predicted_impact_insulation)), read directly from the
 floating floor's mass per unit area and the resilient layer's dynamic
 stiffness. ISO 12354-2:2017 gives it as the two nomograms of Figures C.1
 and C.2 and prints the fits:

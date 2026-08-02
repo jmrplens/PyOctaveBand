@@ -121,7 +121,7 @@ export const apiSidebar = {
         'reference/api/building/intensity-insulation',
         'reference/api/building/flanking-transmission',
         'reference/api/building/facade',
-        'reference/api/building/global-model',
+        'reference/api/building/simplified-model',
         'reference/api/building/detailed-model',
         'reference/api/building/uncertainty',
         'reference/api/building/floor-covering-improvement',

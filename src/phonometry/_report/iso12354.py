@@ -2,10 +2,10 @@
 """EN/ISO 12354-1/-2/-3 predicted building sound-insulation fiche (reportlab).
 
 Renders a
-:class:`~phonometry.building.prediction.global_model.AirbornePredictionResult`
+:class:`~phonometry.building.prediction.simplified_model.AirbornePredictionResult`
 (predicted apparent sound reduction index ``R'`` between rooms, EN/ISO 12354-1),
 an
-:class:`~phonometry.building.prediction.global_model.ImpactPredictionResult`
+:class:`~phonometry.building.prediction.simplified_model.ImpactPredictionResult`
 (predicted apparent normalized impact sound pressure level ``L'n``, EN/ISO
 12354-2) or a
 :class:`~phonometry.building.prediction.facade.FacadePredictionResult`
@@ -66,7 +66,7 @@ if TYPE_CHECKING:
         DetailedImpactResult,
     )
     from ..building.prediction.facade import FacadePredictionResult
-    from ..building.prediction.global_model import (
+    from ..building.prediction.simplified_model import (
         AirbornePredictionResult,
         ImpactPredictionResult,
     )
@@ -254,7 +254,7 @@ def render_iso12354_airborne_report(
     """Render a predicted apparent airborne insulation fiche (EN/ISO 12354-1).
 
     :param result: The
-        :class:`~phonometry.building.prediction.global_model.AirbornePredictionResult`
+        :class:`~phonometry.building.prediction.simplified_model.AirbornePredictionResult`
         carrying the predicted apparent weighted index ``R'w``, the direct-path
         index ``RDd,w`` and the per-path contributions.
     :param path: Destination path of the PDF file.
@@ -316,7 +316,7 @@ def render_iso12354_impact_report(
     """Render a predicted apparent impact insulation fiche (EN/ISO 12354-2).
 
     :param result: The
-        :class:`~phonometry.building.prediction.global_model.ImpactPredictionResult`
+        :class:`~phonometry.building.prediction.simplified_model.ImpactPredictionResult`
         carrying the predicted apparent weighted level ``L'n,w`` and the
         Formula (21) terms (the bare-floor equivalent level ``Ln,w,eq``, the
         covering improvement ``ΔLw`` and the flanking correction ``K``).

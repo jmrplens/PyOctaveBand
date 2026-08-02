@@ -1,8 +1,8 @@
 ---
-title: "building.prediction.global_model"
+title: "building.prediction.simplified_model"
 description: "Building acoustic performance prediction (EN 12354-1/-2:2000)."
 sidebar:
-  label: "global_model"
+  label: "simplified_model"
 ---
 
 Building acoustic performance prediction (EN 12354-1/-2:2000).
@@ -233,7 +233,7 @@ flanking_element(
 
 Build the three flanking paths (Ff, Df, Fd) of one flanking element.
 
-Convenience wrapper over [`flanking_path`](/phonometry/reference/api/building/global-model/#flanking_path) for the common case where a
+Convenience wrapper over [`flanking_path`](/phonometry/reference/api/building/simplified-model/#flanking_path) for the common case where a
 flanking element is essentially the same on the source and receiving side
 (Clause 4.4.1). Returns the `Ff`, `Df` and `Fd` paths that this element
 contributes across its junction with the separating element.
@@ -245,10 +245,10 @@ junction elements are
 the flanking element) and `KFd`/`KDf` to
 $10 \log_{10}[l_f l_0 (1/S_F + 1/S_s)]$ (flanking and separating
 element), via
-[`junction_min_vibration_reduction`](/phonometry/reference/api/building/global-model/#junction_min_vibration_reduction). Without `flanking_area` the
+[`junction_min_vibration_reduction`](/phonometry/reference/api/building/simplified-model/#junction_min_vibration_reduction). Without `flanking_area` the
 per-path floors cannot be formed from the available geometry, so the raw
 `k_ff`/`k_fd`/`k_df` are used unchanged; compute the floors
-yourself (or call [`flanking_path`](/phonometry/reference/api/building/global-model/#flanking_path) with `kij_min`) in that case to
+yourself (or call [`flanking_path`](/phonometry/reference/api/building/simplified-model/#flanking_path) with `kij_min`) in that case to
 stay within Clause 4.4.2.
 
 **Parameters**
@@ -268,7 +268,7 @@ stay within Clause 4.4.2.
 | `delta_r_df` | Combined lining improvement for the Df path, in dB. |
 | `flanking_area` | Flanking-element area $S_F = S_f$, in m². Enables the automatic `Kij,min` clamp (Clause 4.4.2); `None` skips it. |
 
-**Returns:** The `(Ff, Df, Fd)` [`FlankingPath`](/phonometry/reference/api/building/global-model/#flankingpath) triple.
+**Returns:** The `(Ff, Df, Fd)` [`FlankingPath`](/phonometry/reference/api/building/simplified-model/#flankingpath) triple.
 
 **Raises**
 
@@ -310,7 +310,7 @@ When `kij_min` is given, `k_ij` is clamped up to it
 (`max(k_ij, kij_min)`) before the path is formed, enforcing the floor
 $K_{ij} \ge K_{ij,\mathrm{min}}$ of Clause 4.4.2 (compute
 `kij_min` with
-[`junction_min_vibration_reduction`](/phonometry/reference/api/building/global-model/#junction_min_vibration_reduction)). Left as `None` the raw `k_ij`
+[`junction_min_vibration_reduction`](/phonometry/reference/api/building/simplified-model/#junction_min_vibration_reduction)). Left as `None` the raw `k_ij`
 is used unchanged.
 
 **Parameters**
@@ -327,7 +327,7 @@ is used unchanged.
 | `delta_r` | Combined lining improvement `ΔRij,w` for this path, in dB. |
 | `kij_min` | Optional `Kij,min` floor (Clause 4.4.2); `k_ij` is raised to it when it lies below. `None` disables the clamp. |
 
-**Returns:** The [`FlankingPath`](/phonometry/reference/api/building/global-model/#flankingpath).
+**Returns:** The [`FlankingPath`](/phonometry/reference/api/building/simplified-model/#flankingpath).
 
 **Raises**
 
@@ -646,10 +646,10 @@ the transmitted energy so the dominant path is visible.
 | Name | Description |
 | :--- | :--- |
 | `r_direct` | Weighted sound reduction index of the separating element `Rs,w`, in dB. |
-| `flanking_paths` | Flanking paths (see [`flanking_element`](/phonometry/reference/api/building/global-model/#flanking_element)). May be empty for the direct-only case. |
+| `flanking_paths` | Flanking paths (see [`flanking_element`](/phonometry/reference/api/building/simplified-model/#flanking_element)). May be empty for the direct-only case. |
 | `delta_r_direct` | Combined lining improvement `ΔRDd,w` on the separating element, in dB. |
 
-**Returns:** The [`AirbornePredictionResult`](/phonometry/reference/api/building/global-model/#airbornepredictionresult).
+**Returns:** The [`AirbornePredictionResult`](/phonometry/reference/api/building/simplified-model/#airbornepredictionresult).
 
 **Raises**
 
@@ -672,8 +672,8 @@ Predict the apparent impact insulation `L'n,w` (EN 12354-2 Formula 21).
 
 $L'_{n,w} = L_{n,w,eq} - \Delta L_w + K$. The bare-floor equivalent
 level may come from
-[`equivalent_impact_level`](/phonometry/reference/api/building/global-model/#equivalent_impact_level) and the flanking correction from
-[`impact_flanking_correction`](/phonometry/reference/api/building/global-model/#impact_flanking_correction).
+[`equivalent_impact_level`](/phonometry/reference/api/building/simplified-model/#equivalent_impact_level) and the flanking correction from
+[`impact_flanking_correction`](/phonometry/reference/api/building/simplified-model/#impact_flanking_correction).
 
 **Parameters**
 
@@ -683,7 +683,7 @@ level may come from
 | `delta_l_w` | Weighted covering improvement `ΔLw` (ISO 717-2), in dB. |
 | `k_correction` | Flanking correction `K` (Table 1), in dB. |
 
-**Returns:** The [`ImpactPredictionResult`](/phonometry/reference/api/building/global-model/#impactpredictionresult).
+**Returns:** The [`ImpactPredictionResult`](/phonometry/reference/api/building/simplified-model/#impactpredictionresult).
 
 **Raises**
 
@@ -750,7 +750,7 @@ both round to the same $D_{nT,w} = 54$ dB.
 
 | Name | Description |
 | :--- | :--- |
-| `r_prime_w` | Apparent weighted sound reduction index `R'w`, in dB (see [`predicted_airborne_insulation`](/phonometry/reference/api/building/global-model/#predicted_airborne_insulation)). |
+| `r_prime_w` | Apparent weighted sound reduction index `R'w`, in dB (see [`predicted_airborne_insulation`](/phonometry/reference/api/building/simplified-model/#predicted_airborne_insulation)). |
 | `volume` | Receiving-room volume `V`, in m³ (must be positive). |
 | `separating_area` | Separating-element area `Ss`, in m² (must be positive). |
 

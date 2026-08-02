@@ -122,7 +122,7 @@ La referencia de la API se genera a partir de los docstrings del código (en ing
 | [`building.measurement.intensity_insulation`](/phonometry/reference/api/building/intensity-insulation/) | Sound insulation measured with sound intensity (ISO 15186). |
 | [`building.measurement.flanking_transmission`](/phonometry/reference/api/building/flanking-transmission/) | Laboratory measurement of flanking sound transmission (ISO 10848:2006/2010). |
 | [`building.prediction.facade`](/phonometry/reference/api/building/facade/) | Façade sound insulation and outdoor radiation prediction (EN 12354-3/-4:2000). |
-| [`building.prediction.global_model`](/phonometry/reference/api/building/global-model/) | Building acoustic performance prediction (EN 12354-1/-2:2000). |
+| [`building.prediction.simplified_model`](/phonometry/reference/api/building/simplified-model/) | Building acoustic performance prediction (EN 12354-1/-2:2000). |
 | [`building.prediction.detailed_model`](/phonometry/reference/api/building/detailed-model/) | Detailed per-band building prediction (EN/ISO 12354-1/-2:2017). |
 | [`building.measurement.uncertainty`](/phonometry/reference/api/building/uncertainty/) | Measurement uncertainty in building acoustics (ISO 12999-1:2020). |
 | [`building.measurement.floor_covering_improvement`](/phonometry/reference/api/building/floor-covering-improvement/) | Impact-sound improvement of floor coverings on a small mock-up (ISO 16251-1:2014). |

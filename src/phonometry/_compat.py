@@ -90,7 +90,7 @@ _MOVED_3X: dict[str, str] = {
     "phonometry.room_ir": "phonometry.room.room_ir",
     "phonometry.room_noise": "phonometry.room.room_noise",
     "phonometry.building_prediction":
-        "phonometry.building.prediction.global_model",
+        "phonometry.building.prediction.simplified_model",
     "phonometry.building_uncertainty":
         "phonometry.building.measurement.uncertainty",
     "phonometry.facade_prediction":
@@ -247,7 +247,7 @@ _MOVED_4X: dict[str, str] = {
     "phonometry.building.building_uncertainty":
         "phonometry.building.measurement.uncertainty",
     "phonometry.building.building_prediction":
-        "phonometry.building.prediction.global_model",
+        "phonometry.building.prediction.simplified_model",
     "phonometry.building.detailed_prediction":
         "phonometry.building.prediction.detailed_model",
     "phonometry.building.facade_prediction":

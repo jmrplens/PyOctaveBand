@@ -63,7 +63,7 @@ applies when $s'_t \gg s'_a$, otherwise `s'` cannot be resolved.
 
 This module is the resilient-layer characterisation feeding the floating-floor
 term of the EN 12354-2 impact model
-([`phonometry.building.prediction.global_model`](/phonometry/reference/api/building/global-model/)). It does **not** feed
+([`phonometry.building.prediction.simplified_model`](/phonometry/reference/api/building/simplified-model/)). It does **not** feed
 ISO 16251-1 ([`phonometry.building.measurement.floor_covering_improvement`](/phonometry/reference/api/building/floor-covering-improvement/)), whose
 scope is limited to soft, locally-reacting floor coverings; floating floors
 are explicitly excluded there.

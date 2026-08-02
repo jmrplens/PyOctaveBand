@@ -1023,10 +1023,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   it has to satisfy, which is the Spanish CTE DB-HR today and the shape any
   other country takes tomorrow.
 
-  Five modules lose a word their subgroup now says: `building_prediction` is
-  `prediction.global_model` and `detailed_prediction` is
-  `prediction.detailed_model`, the single-number and per-band routes the
-  standard offers for the same calculation;
+  Five modules lose a word their subgroup now says: `building_prediction` and
+  `detailed_prediction` become `prediction.simplified_model` and
+  `prediction.detailed_model`, which is what EN 12354 calls the two routes it
+  offers for the same calculation, and what the module's own text has always
+  called them;
   `facade_prediction` is `prediction.facade`, `building_uncertainty` is
   `measurement.uncertainty` and `spanish_building_code` is
   `regulation.spain`.

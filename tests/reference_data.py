@@ -401,7 +401,7 @@ ISO10140_2_REF_AIRBORNE_RW = 54
 # contributes an Ff/Fd/Df triplet (12 flanking paths), which with the direct
 # Dd path make 13 transmission paths. Energy summation (Formula (26)) gives
 # R'w = 52,2 dB -> 52 dB. Row = (label, Rw_flanking, KFf, KFd=KDf, coupling
-# length lf). Mirrors tests/building/prediction/test_global_model.py (_annex_h_paths).
+# length lf). Mirrors tests/building/prediction/test_simplified_model.py (_annex_h_paths).
 # ---------------------------------------------------------------------------
 EN12354_1_ANNEX_H3_R_DIRECT = 57.0
 EN12354_1_ANNEX_H3_SEPARATING_AREA = 11.5

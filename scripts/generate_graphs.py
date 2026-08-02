@@ -6971,7 +6971,7 @@ def generate_moore_glasberg_time_loudness(output_dir: str) -> None:
 def generate_prediction_flanking_demo(output_dir: str) -> None:
     """EN 12354-1 simplified flanking prediction (Annex H.3 worked example)."""
     print("Generating prediction_flanking_demo.png...")
-    from phonometry.building.prediction.global_model import (
+    from phonometry.building.prediction.simplified_model import (
         FlankingPath,
         flanking_element,
         predicted_airborne_insulation,

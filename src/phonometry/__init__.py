@@ -288,23 +288,6 @@ from .building.prediction.facade import (
     outdoor_level,
     radiated_sound_power,
 )
-from .building.prediction.global_model import (
-    AirbornePredictionResult,
-    FlankingPath,
-    ImpactPredictionResult,
-    PathContribution,
-    combine_linings,
-    equivalent_impact_level,
-    flanking_element,
-    flanking_path,
-    impact_flanking_correction,
-    junction_min_vibration_reduction,
-    junction_vibration_reduction,
-    predicted_airborne_insulation,
-    predicted_impact_insulation,
-    standardized_impact_level,
-    standardized_level_difference,
-)
 from .building.prediction.installed_structure_borne import (
     REFERENCE_AREA,
     InstalledSourceResult,
@@ -367,6 +350,23 @@ from .building.prediction.resilient_layers import (
     tapping_force_spectrum,
     weighted_floating_floor_improvement,
     weighted_lining_improvement,
+)
+from .building.prediction.simplified_model import (
+    AirbornePredictionResult,
+    FlankingPath,
+    ImpactPredictionResult,
+    PathContribution,
+    combine_linings,
+    equivalent_impact_level,
+    flanking_element,
+    flanking_path,
+    impact_flanking_correction,
+    junction_min_vibration_reduction,
+    junction_vibration_reduction,
+    predicted_airborne_insulation,
+    predicted_impact_insulation,
+    standardized_impact_level,
+    standardized_level_difference,
 )
 from .building.regulation.spain import (
     DB_HR_FREQUENCIES,

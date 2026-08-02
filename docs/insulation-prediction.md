@@ -360,4 +360,4 @@ member of the family is EN 12354-6.
   the absorption member of the same EN 12354 family.
 - [Dynamic stiffness of resilient materials (EN 29052-1)](dynamic-stiffness.md):
   the $s'$ input to the EN 12354-2 floating-floor term.
-- API reference: [`building.prediction.global_model`](https://jmrplens.github.io/phonometry/reference/api/building/global-model/) and [`building.prediction.facade`](https://jmrplens.github.io/phonometry/reference/api/building/facade/).
+- API reference: [`building.prediction.simplified_model`](https://jmrplens.github.io/phonometry/reference/api/building/simplified-model/) and [`building.prediction.facade`](https://jmrplens.github.io/phonometry/reference/api/building/facade/).

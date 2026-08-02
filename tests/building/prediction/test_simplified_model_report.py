@@ -32,7 +32,7 @@ from phonometry import (
 from phonometry.building.prediction.facade import (
     FacadePredictionResult,
 )
-from phonometry.building.prediction.global_model import (
+from phonometry.building.prediction.simplified_model import (
     AirbornePredictionResult,
     ImpactPredictionResult,
 )
