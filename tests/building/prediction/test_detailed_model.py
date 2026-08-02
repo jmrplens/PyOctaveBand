@@ -775,7 +775,8 @@ def test_detailed_airborne_plot_draws_bars_and_the_total(airborne, language) -> 
     ax = airborne.plot(language=language)
     assert ax.patches, "no stacked path bars drawn"
     twin = [other for other in ax.get_figure().axes if other is not ax]
-    assert twin and twin[0].lines, "the apparent index is not overlaid"
+    assert twin, "no twin axis for the apparent index"
+    assert twin[0].lines, "the apparent index is not overlaid"
     assert ax.get_legend() is not None
     plt.close(ax.get_figure())
 
@@ -787,7 +788,8 @@ def test_detailed_impact_plot_draws_bars_and_the_total(impact, language) -> None
     ax = impact.plot(language=language)
     assert ax.patches
     twin = [other for other in ax.get_figure().axes if other is not ax]
-    assert twin and twin[0].lines
+    assert twin
+    assert twin[0].lines
     plt.close(ax.get_figure())
 
 

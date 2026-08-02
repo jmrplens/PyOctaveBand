@@ -342,26 +342,27 @@ def test_far_field_point_source() -> None:
 
 
 def test_element_requires_exactly_one_quantity() -> None:
+    element = FacadeElement(name="x", area=1.0)
     with pytest.raises(ValueError, match="exactly one"):
-        FacadeElement(name="x", area=1.0).tau(10.0, 1)
+        element.tau(10.0, 1)
+    element = FacadeElement(name="x", area=1.0, r=[40.0], dn_e=[30.0])
     with pytest.raises(ValueError, match="exactly one"):
-        FacadeElement(name="x", area=1.0, r=[40.0], dn_e=[30.0]).tau(10.0, 1)
+        element.tau(10.0, 1)
 
 
 def test_area_element_requires_positive_area() -> None:
+    element = FacadeElement(name="x", r=[40.0])
     with pytest.raises(ValueError, match="area"):
-        FacadeElement(name="x", r=[40.0]).tau(10.0, 1)
+        element.tau(10.0, 1)
 
 
 def test_inconsistent_band_counts_raise() -> None:
-    with pytest.raises(ValueError, match="band count"):
-        facade_sound_reduction(
-            [
+    elements = [
                 FacadeElement(name="a", area=5.0, r=[40.0, 41.0, 42.0]),
                 FacadeElement(name="b", area=5.0, r=[30.0, 31.0]),
-            ],
-            area=10.0, volume=50.0,
-        )
+            ]
+    with pytest.raises(ValueError, match="band count"):
+        facade_sound_reduction(elements, area=10.0, volume=50.0)
 
 
 def test_scalar_broadcasts_to_band_count() -> None:
@@ -377,20 +378,19 @@ def test_scalar_broadcasts_to_band_count() -> None:
 
 
 def test_non_finite_input_rejected() -> None:
+    element = FacadeElement(name="x", area=1.0, r=[np.nan])
     with pytest.raises(ValueError, match="finite"):
-        FacadeElement(name="x", area=1.0, r=[np.nan]).tau(10.0, 1)
+        element.tau(10.0, 1)
 
 
 def test_duplicate_element_names_raise() -> None:
     """Elements are keyed by name in the result, so names must be unique."""
-    with pytest.raises(ValueError, match="unique"):
-        facade_sound_reduction(
-            [
+    elements = [
                 FacadeElement(name="glass", area=5.0, r=[40.0]),
                 FacadeElement(name="glass", area=5.0, r=[30.0]),
-            ],
-            area=10.0, volume=50.0,
-        )
+            ]
+    with pytest.raises(ValueError, match="unique"):
+        facade_sound_reduction(elements, area=10.0, volume=50.0)
 
 
 def test_no_element_silently_dropped_when_names_unique() -> None:
@@ -411,35 +411,40 @@ def test_no_element_silently_dropped_when_names_unique() -> None:
 
 
 def test_frequencies_length_must_match_bands() -> None:
+    elements = [FacadeElement(name="a", area=5.0, r=[40.0, 41.0, 42.0])]
     with pytest.raises(ValueError, match="frequencies"):
         facade_sound_reduction(
-            [FacadeElement(name="a", area=5.0, r=[40.0, 41.0, 42.0])],
-            area=10.0, volume=50.0, frequencies=[125.0, 250.0],
+            elements,
+            area=10.0,
+            volume=50.0,
+            frequencies=[125.0, 250.0],
         )
 
 
 def test_octave_bands_length_must_match() -> None:
+    elements = [FacadeElement(name="w", area=10.0, r=[40.0, 41.0])]
     with pytest.raises(ValueError, match="octave_bands"):
         radiated_sound_power(
-            [FacadeElement(name="w", area=10.0, r=[40.0, 41.0])],
-            lp_in=[70.0, 71.0], area=10.0, octave_bands=[125],
+            elements,
+            lp_in=[70.0, 71.0],
+            area=10.0,
+            octave_bands=[125],
         )
 
 
 def test_tau_rejects_non_positive_total_area() -> None:
+    element = FacadeElement(name="x", area=1.0, r=[40.0])
     with pytest.raises(ValueError, match="total_area"):
-        FacadeElement(name="x", area=1.0, r=[40.0]).tau(0.0, 1)
+        element.tau(0.0, 1)
 
 
 def test_positive_area_and_volume_required() -> None:
+    elements = [FacadeElement(name="a", area=5.0, r=[40.0])]
     with pytest.raises(ValueError, match="volume"):
-        facade_sound_reduction(
-            [FacadeElement(name="a", area=5.0, r=[40.0])], area=10.0, volume=0.0
-        )
+        facade_sound_reduction(elements, area=10.0, volume=0.0)
+    elements = [FacadeElement(name="a", area=5.0, r=[40.0])]
     with pytest.raises(ValueError, match="area"):
-        facade_sound_reduction(
-            [FacadeElement(name="a", area=5.0, r=[40.0])], area=0.0, volume=50.0
-        )
+        facade_sound_reduction(elements, area=0.0, volume=50.0)
 
 
 # ---------------------------------------------------------------------------
