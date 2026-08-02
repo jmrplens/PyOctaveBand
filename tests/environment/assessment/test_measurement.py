@@ -113,7 +113,8 @@ def test_survey_thresholds() -> None:
     flags = tonal_seeking_survey(levels, freqs)
     assert flags[2]        # 125 Hz
     assert flags[6]        # 630 Hz
-    assert not flags[0] and not flags[-1]   # end bands never flagged
+    assert not flags[0]                     # end bands never flagged
+    assert not flags[-1]
 
 
 def test_survey_below_threshold_not_flagged() -> None:

@@ -1795,7 +1795,7 @@ def _chk_iso18233_sweep_deconvolution() -> Outcome:
         20.0 * np.log10(np.abs(h_est[mask])) - 20.0 * np.log10(np.abs(h_true[mask]))
     )))
     # Linear deconvolution is exact in-band up to windowing/regularisation
-    # leakage; 0.1 dB is the demonstrated in-band bound (tests/test_room_ir.py)
+    # leakage; 0.1 dB is the demonstrated in-band bound (tests/room/test_room_ir.py)
     # with the same 300-1500 Hz evaluation band, well inside the sweep edges.
     return numeric(0.0, worst, 0.1, unit="dB", places=4,
                    expected_label="0 dB in-band error (+/-0.1 dB)")

@@ -200,7 +200,7 @@ class OutdoorAttenuation:
         :class:`~matplotlib.axes.Axes`.
         """
         from ..._i18n import check_language
-        from ..._plot.environmental import plot_outdoor_attenuation
+        from ..._plot.environment import plot_outdoor_attenuation
 
         return plot_outdoor_attenuation(self, ax=ax, language=check_language(language), **kwargs)
 

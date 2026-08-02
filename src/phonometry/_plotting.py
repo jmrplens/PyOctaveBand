@@ -41,7 +41,7 @@ from ._plot.emission import (
     plot_sound_power,
     plot_vibration_sound_power,
 )
-from ._plot.environmental import (
+from ._plot.environment import (
     plot_impulse_prominence,
     plot_outdoor_attenuation,
     plot_tonal_adjustment,

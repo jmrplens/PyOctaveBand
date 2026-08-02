@@ -1402,7 +1402,7 @@ class RailwayEmissionResult:
     def plot(self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any) -> Axes:
         """Plot the per-metre line power of the two equivalent source heights."""
         from ..._i18n import check_language
-        from ..._plot.environmental import plot_cnossos_rail_emission
+        from ..._plot.environment import plot_cnossos_rail_emission
 
         return plot_cnossos_rail_emission(
             self, ax=ax, language=check_language(language), **kwargs

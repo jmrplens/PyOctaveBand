@@ -234,6 +234,14 @@ def _make_shim(old: str, new: str, since: str, removed_in: str) -> types.ModuleT
     )
 
     def __getattr__(name: str) -> Any:
+        if name == "__path__":
+            # Never proxy the import machinery's own attribute. A renamed
+            # package would otherwise hand out the real package's search path
+            # and let ``import phonometry.environmental.propagation`` build a
+            # second, independent copy of every submodule: same code, distinct
+            # classes, failing isinstance and pickles. The alias serves the
+            # modules registered for it and nothing else.
+            raise AttributeError(f"module {old!r} has no attribute {name!r}")
         target = import_module(new)
         try:
             attr = getattr(target, name)

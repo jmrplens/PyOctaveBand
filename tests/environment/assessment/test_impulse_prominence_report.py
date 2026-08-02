@@ -8,7 +8,7 @@ languages are rejected, XML specials in metadata do not break reportlab, the
 verdict renders both ways, and the boxed governing prominence ``P``, the derived
 ``LAeq`` adjustment ``KI`` and the metadata appear in the extracted text. The
 prominence and adjustment maths itself is validated against the NT ACOU 112:2002
-formulae elsewhere (tests/environmental/test_impulse_prominence.py); this fiche
+formulae elsewhere (tests/environment/assessment/test_impulse_prominence.py); this fiche
 test anchors its numbers to the documented three-impulse pile-driving set, whose
 governing prominence and adjustment are derived from Formula 1 and Formula 2.
 """

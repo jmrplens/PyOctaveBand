@@ -245,7 +245,7 @@ class SphericalGroundResult:
         :class:`~matplotlib.axes.Axes`.
         """
         from ..._i18n import check_language
-        from ..._plot.environmental import plot_spherical_ground
+        from ..._plot.environment import plot_spherical_ground
 
         return plot_spherical_ground(self, ax=ax, language=check_language(language), **kwargs)
 
@@ -586,7 +586,7 @@ class BarrierInsertionLoss:
         :class:`~matplotlib.axes.Axes`.
         """
         from ..._i18n import check_language
-        from ..._plot.environmental import plot_barrier_insertion_loss
+        from ..._plot.environment import plot_barrier_insertion_loss
 
         return plot_barrier_insertion_loss(self, ax=ax, language=check_language(language), **kwargs)
 

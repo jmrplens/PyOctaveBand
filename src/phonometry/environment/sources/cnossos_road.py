@@ -811,7 +811,7 @@ class RoadEmissionResult:
     def plot(self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any) -> Axes:
         """Plot the per-metre line power spectrum and its category breakdown."""
         from ..._i18n import check_language
-        from ..._plot.environmental import plot_cnossos_road_emission
+        from ..._plot.environment import plot_cnossos_road_emission
 
         return plot_cnossos_road_emission(
             self, ax=ax, language=check_language(language), **kwargs

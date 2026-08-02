@@ -8,7 +8,7 @@ and per-period tables carry the numbers the assessment computed, the verdict
 renders both ways, XML specials in metadata survive reportlab, and a fiche with
 all three evaluation periods still fits one page. The assessment maths itself is
 validated against the regulation and the published worked examples elsewhere
-(tests/environmental/test_spanish_regulation.py).
+(tests/environment/assessment/test_spain.py).
 
 The case rendered here is the worked example of Aviles Lopez & Perera Martin,
 Manual de acustica ambiental y arquitectonica, Ejemplos 3.1 to 3.3: an activity

@@ -192,7 +192,7 @@ class TonalAssessmentResult:
     def plot(self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any) -> Axes:
         """Plot the ``Kt(ΔLta)`` adjustment curve with this tone marked."""
         from ..._i18n import check_language
-        from ..._plot.environmental import plot_tonal_adjustment
+        from ..._plot.environment import plot_tonal_adjustment
 
         return plot_tonal_adjustment(self, ax=ax, language=check_language(language), **kwargs)
 

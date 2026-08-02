@@ -100,7 +100,7 @@ class EffectiveSoundSpeedProfile:
     def plot(self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any) -> Axes:
         """Plot the effective sound-speed profile (height on the vertical axis)."""
         from ..._i18n import check_language
-        from ..._plot.environmental import plot_sound_speed_profile
+        from ..._plot.environment import plot_sound_speed_profile
 
         return plot_sound_speed_profile(self, ax=ax, language=check_language(language), **kwargs)
 
@@ -321,7 +321,7 @@ class AtmosphericRayResult:
     def plot(self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any) -> Axes:
         """Plot the curved ray paths (height on the vertical axis)."""
         from ..._i18n import check_language
-        from ..._plot.environmental import plot_atmospheric_rays
+        from ..._plot.environment import plot_atmospheric_rays
 
         return plot_atmospheric_rays(self, ax=ax, language=check_language(language), **kwargs)
 
@@ -471,7 +471,7 @@ class AtmosphericPEResult:
     def plot(self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any) -> Axes:
         """Plot the relative-level field over the range-height plane."""
         from ..._i18n import check_language
-        from ..._plot.environmental import plot_atmospheric_pe
+        from ..._plot.environment import plot_atmospheric_pe
 
         return plot_atmospheric_pe(self, ax=ax, language=check_language(language), **kwargs)
 

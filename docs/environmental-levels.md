@@ -192,8 +192,8 @@ $L_{dn}$ (3.6.5) keeps only the +10 dB night penalty.
 - [Occupational Noise Exposure](occupational-exposure.md): the workplace
   counterpart, from task samples to the daily exposure level with its
   uncertainty budget.
-- API reference: [`environmental.measurement`](https://jmrplens.github.io/phonometry/reference/api/environment/measurement/)
-  and [`environmental.rating`](https://jmrplens.github.io/phonometry/reference/api/environment/rating/).
+- API reference: [`environment.assessment.measurement`](https://jmrplens.github.io/phonometry/reference/api/environment/measurement/)
+  and [`environment.assessment.rating`](https://jmrplens.github.io/phonometry/reference/api/environment/rating/).
 
 ## References
 

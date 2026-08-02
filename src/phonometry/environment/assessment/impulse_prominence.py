@@ -107,7 +107,7 @@ class ImpulseProminenceResult:
         :class:`~matplotlib.axes.Axes`.
         """
         from ..._i18n import check_language
-        from ..._plot.environmental import plot_impulse_prominence
+        from ..._plot.environment import plot_impulse_prominence
 
         return plot_impulse_prominence(self, ax=ax, language=check_language(language), **kwargs)
 

@@ -367,7 +367,7 @@ class TonalCorrectionResult:
     def plot(self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any) -> Axes:
         """Plot the band spectrum with the emergent-tone differences ``Lt``."""
         from ..._i18n import check_language
-        from ..._plot.environmental import plot_tonal_correction_rd1367
+        from ..._plot.environment import plot_tonal_correction_rd1367
 
         return plot_tonal_correction_rd1367(
             self, ax=ax, language=check_language(language), **kwargs
@@ -383,6 +383,65 @@ def _kt_thresholds(frequency: float) -> tuple[float, float] | None:
         ):
             return lower, upper
     return None
+
+
+def _validate_kt_spectrum(band_levels: np.ndarray, freqs: np.ndarray) -> None:
+    """Reject a spectrum the Annex IV A.3.3 procedure cannot read.
+
+    :param band_levels: Unweighted one-third-octave band levels, dB.
+    :param freqs: Band centre frequencies, Hz, strictly ascending.
+    :raises ValueError: For a shape, a value or an order the procedure needs.
+    """
+    if band_levels.ndim != 1 or freqs.ndim != 1:
+        raise ValueError("'levels' and 'frequencies' must be one-dimensional.")
+    if band_levels.shape != freqs.shape:
+        raise ValueError(
+            "'levels' and 'frequencies' must have the same length; got "
+            f"{band_levels.size} and {freqs.size}."
+        )
+    if band_levels.size < 3:
+        raise ValueError(
+            "At least three one-third-octave bands are needed: the procedure "
+            "compares a band against its two neighbours."
+        )
+    if not np.all(np.isfinite(band_levels)):
+        raise ValueError("'levels' must contain finite values.")
+    if not np.all(np.isfinite(freqs)) or np.any(freqs <= 0.0):
+        raise ValueError("'frequencies' must contain positive, finite values.")
+    if np.any(np.diff(freqs) <= 0.0):
+        raise ValueError("'frequencies' must be strictly ascending.")
+
+
+def _band_tonal_corrections(
+    band_levels: np.ndarray, freqs: np.ndarray
+) -> tuple[np.ndarray, np.ndarray]:
+    """Steps b and c of Annex IV A.3.3, band by band.
+
+    Interior bands only: the first and the last have no pair of neighbours to
+    average, and a band outside the tabulated ranges has no threshold, so both
+    stay ``nan`` in each output.
+
+    :param band_levels: Unweighted one-third-octave band levels, dB.
+    :param freqs: Band centre frequencies, Hz.
+    :return: ``(differences, band_corrections)``, both aligned to the input.
+    """
+    differences = np.full(band_levels.shape, np.nan, dtype=np.float64)
+    band_kt = np.full(band_levels.shape, np.nan, dtype=np.float64)
+    for i in range(1, band_levels.size - 1):
+        thresholds = _kt_thresholds(float(freqs[i]))
+        if thresholds is None:
+            continue
+        neighbour_mean = 0.5 * (band_levels[i - 1] + band_levels[i + 1])
+        lt = float(band_levels[i] - neighbour_mean)
+        differences[i] = lt
+        lower, upper = thresholds
+        if lt < lower:
+            band_kt[i] = 0.0
+        elif lt <= upper:
+            band_kt[i] = 3.0
+        else:
+            band_kt[i] = 6.0
+    return differences, band_kt
 
 
 def tonal_correction(
@@ -420,41 +479,8 @@ def tonal_correction(
     """
     band_levels = np.asarray(levels, dtype=np.float64)
     freqs = np.asarray(frequencies, dtype=np.float64)
-    if band_levels.ndim != 1 or freqs.ndim != 1:
-        raise ValueError("'levels' and 'frequencies' must be one-dimensional.")
-    if band_levels.shape != freqs.shape:
-        raise ValueError(
-            "'levels' and 'frequencies' must have the same length; got "
-            f"{band_levels.size} and {freqs.size}."
-        )
-    if band_levels.size < 3:
-        raise ValueError(
-            "At least three one-third-octave bands are needed: the procedure "
-            "compares a band against its two neighbours."
-        )
-    if not np.all(np.isfinite(band_levels)):
-        raise ValueError("'levels' must contain finite values.")
-    if not np.all(np.isfinite(freqs)) or np.any(freqs <= 0.0):
-        raise ValueError("'frequencies' must contain positive, finite values.")
-    if np.any(np.diff(freqs) <= 0.0):
-        raise ValueError("'frequencies' must be strictly ascending.")
-
-    differences = np.full(band_levels.shape, np.nan, dtype=np.float64)
-    band_kt = np.full(band_levels.shape, np.nan, dtype=np.float64)
-    for i in range(1, band_levels.size - 1):
-        thresholds = _kt_thresholds(float(freqs[i]))
-        if thresholds is None:
-            continue
-        neighbour_mean = 0.5 * (band_levels[i - 1] + band_levels[i + 1])
-        lt = float(band_levels[i] - neighbour_mean)
-        differences[i] = lt
-        lower, upper = thresholds
-        if lt < lower:
-            band_kt[i] = 0.0
-        elif lt <= upper:
-            band_kt[i] = 3.0
-        else:
-            band_kt[i] = 6.0
+    _validate_kt_spectrum(band_levels, freqs)
+    differences, band_kt = _band_tonal_corrections(band_levels, freqs)
 
     if np.all(np.isnan(band_kt)):
         correction = 0.0
@@ -1045,7 +1071,7 @@ class ActivityAssessment:
     def plot(self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any) -> Axes:
         """Plot the per-period indices against their RD 1367/2007 limits."""
         from ..._i18n import check_language
-        from ..._plot.environmental import plot_activity_assessment
+        from ..._plot.environment import plot_activity_assessment
 
         return plot_activity_assessment(
             self, ax=ax, language=check_language(language), **kwargs
@@ -1087,6 +1113,139 @@ class ActivityAssessment:
             verbose=verbose,
             language=check_language(language),
         )
+
+
+def _period_durations(
+    period_hours: Mapping[str, float] | None,
+) -> dict[str, float]:
+    """The period durations ``T``, with any caller override applied.
+
+    :param period_hours: Durations in hours keyed by period, or ``None``.
+    :return: A duration for every RD 1367 evaluation period.
+    :raises ValueError: For an unknown period key or a non-positive duration.
+    """
+    durations = dict(RD1367_PERIOD_HOURS)
+    if period_hours is not None:
+        for name, value in period_hours.items():
+            durations[_check_period(name)] = _positive(value, "period_hours")
+    return durations
+
+
+def _validate_annual_inputs(
+    operating_days: int | None, year_days: int, closed_level: float
+) -> None:
+    """Reject the annual parameters the Article 25.1 b i criterion cannot use.
+
+    :param operating_days: Days a year the activity operates, or ``None``.
+    :param year_days: Days in the year considered.
+    :param closed_level: Level representing a day with no operation, dB.
+    :raises ValueError: For a fractional or out-of-range count of days.
+    """
+    if int(year_days) != year_days or int(year_days) <= 0:
+        raise ValueError(
+            f"'year_days' must be a positive whole number; got {year_days!r}."
+        )
+    if operating_days is None:
+        return
+    if int(operating_days) != operating_days:
+        raise ValueError(
+            "'operating_days' must be a whole number of days; got "
+            f"{operating_days!r}."
+        )
+    if not 0 < int(operating_days) <= int(year_days):
+        raise ValueError(
+            "'operating_days' must be a positive integer no larger than "
+            f"'year_days'; got {operating_days!r} of {year_days!r}."
+        )
+    _finite(closed_level, "closed_level")
+
+
+def _annual_index(
+    reported: int,
+    period: str,
+    *,
+    long_term_levels: Mapping[str, float] | None,
+    operating_days: int | None,
+    year_days: int,
+    closed_level: float,
+) -> float | None:
+    """The annual index ``LK,x`` of a period: given, derived, or unavailable.
+
+    :param reported: The reported daily ``LKeq,x`` of the period, dB.
+    :param period: Evaluation period name.
+    :param long_term_levels: Annual index per period when the caller knows it.
+    :param operating_days: Days a year the activity operates, or ``None``.
+    :param year_days: Days in the year considered.
+    :param closed_level: Level of a day with no operation, dB.
+    :return: The annual index in dB, or ``None`` when neither input is given.
+    """
+    if long_term_levels is not None and period in long_term_levels:
+        return _finite(long_term_levels[period], "long_term_levels")
+    if operating_days is None:
+        return None
+    closed = int(year_days) - int(operating_days)
+    weights = [float(operating_days)] + ([float(closed)] if closed else [])
+    values = [float(reported)] + ([closed_level] if closed else [])
+    return long_term_corrected_level(values, weights=weights)
+
+
+def _assess_period(
+    name: str,
+    phases: tuple[NoisePhase, ...],
+    duration: float,
+    limit: float,
+    *,
+    long_term_levels: Mapping[str, float] | None,
+    operating_days: int | None,
+    year_days: int,
+    closed_level: float,
+    new_activity: bool,
+) -> PeriodAssessment:
+    """One evaluation period against the three criteria of Article 25.1 b.
+
+    :param name: Evaluation period name.
+    :param phases: The noise phases measured in the period.
+    :param duration: Period duration ``T``, hours.
+    :param limit: The applicable limit value, dB.
+    :param long_term_levels: Annual index per period when the caller knows it.
+    :param operating_days: Days a year the activity operates, or ``None``.
+    :param year_days: Days in the year considered.
+    :param closed_level: Level of a day with no operation, dB.
+    :param new_activity: Whether the annual criterion applies.
+    :return: The assessment of the period.
+    :raises ValueError: If the period carries no noise phases.
+    """
+    if not phases:
+        raise ValueError(f"Period {name!r} has no noise phases.")
+    level = evaluation_period_level(phases, hours=duration)
+    reported = round_reported_level(level)
+    annual = _annual_index(
+        reported,
+        name,
+        long_term_levels=long_term_levels,
+        operating_days=operating_days,
+        year_days=year_days,
+        closed_level=closed_level,
+    )
+    max_phase = max(p.lkeq for p in phases)
+    return PeriodAssessment(
+        period=name,
+        phases=phases,
+        duration_hours=duration,
+        evaluation_period_level=level,
+        reported_level=reported,
+        long_term_corrected_level=annual,
+        reported_long_term=None if annual is None else round_reported_level(annual),
+        limit=limit,
+        max_phase_level=max_phase,
+        phase_pass=bool(max_phase <= limit + _PHASE_ALLOWANCE + 1e-9),
+        daily_pass=bool(reported <= limit + _DAILY_ALLOWANCE + 1e-9),
+        long_term_pass=(
+            None
+            if annual is None or not new_activity
+            else bool(round_reported_level(annual) <= limit + 1e-9)
+        ),
+    )
 
 
 def assess_activity(
@@ -1136,71 +1295,24 @@ def assess_activity(
     """
     if not measurements:
         raise ValueError("At least one evaluation period must be supplied.")
-    durations = dict(RD1367_PERIOD_HOURS)
-    if period_hours is not None:
-        for name, value in period_hours.items():
-            durations[_check_period(name)] = _positive(value, "period_hours")
-    if int(year_days) != year_days or int(year_days) <= 0:
-        raise ValueError(
-            f"'year_days' must be a positive whole number; got {year_days!r}."
+    durations = _period_durations(period_hours)
+    _validate_annual_inputs(operating_days, year_days, closed_level)
+
+    assessments = [
+        _assess_period(
+            name,
+            tuple(measurements[name]),
+            durations[name],
+            limits[name],
+            long_term_levels=long_term_levels,
+            operating_days=operating_days,
+            year_days=year_days,
+            closed_level=closed_level,
+            new_activity=new_activity,
         )
-    if operating_days is not None:
-        if int(operating_days) != operating_days:
-            raise ValueError(
-                "'operating_days' must be a whole number of days; got "
-                f"{operating_days!r}."
-            )
-        days = int(operating_days)
-        total_days = int(year_days)
-        if not 0 < days <= total_days:
-            raise ValueError(
-                "'operating_days' must be a positive integer no larger than "
-                f"'year_days'; got {operating_days!r} of {year_days!r}."
-            )
-        _finite(closed_level, "closed_level")
-
-    assessments: list[PeriodAssessment] = []
-    for name in RD1367_EVALUATION_PERIODS:
-        if name not in measurements:
-            continue
-        phases = tuple(measurements[name])
-        if not phases:
-            raise ValueError(f"Period {name!r} has no noise phases.")
-        duration = durations[name]
-        level = evaluation_period_level(phases, hours=duration)
-        reported = round_reported_level(level)
-        limit = limits[name]
-
-        annual: float | None = None
-        if long_term_levels is not None and name in long_term_levels:
-            annual = _finite(long_term_levels[name], "long_term_levels")
-        elif operating_days is not None:
-            closed = int(year_days) - int(operating_days)
-            weights = [float(operating_days)] + ([float(closed)] if closed else [])
-            values = [float(reported)] + ([closed_level] if closed else [])
-            annual = long_term_corrected_level(values, weights=weights)
-
-        max_phase = max(p.lkeq for p in phases)
-        assessments.append(
-            PeriodAssessment(
-                period=name,
-                phases=phases,
-                duration_hours=duration,
-                evaluation_period_level=level,
-                reported_level=reported,
-                long_term_corrected_level=annual,
-                reported_long_term=None if annual is None else round_reported_level(annual),
-                limit=limit,
-                max_phase_level=max_phase,
-                phase_pass=bool(max_phase <= limit + _PHASE_ALLOWANCE + 1e-9),
-                daily_pass=bool(reported <= limit + _DAILY_ALLOWANCE + 1e-9),
-                long_term_pass=(
-                    None
-                    if annual is None or not new_activity
-                    else bool(round_reported_level(annual) <= limit + 1e-9)
-                ),
-            )
-        )
+        for name in RD1367_EVALUATION_PERIODS
+        if name in measurements
+    ]
     if not assessments:
         raise ValueError(
             "None of the supplied keys is an evaluation period; expected "

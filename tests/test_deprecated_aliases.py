@@ -305,7 +305,7 @@ _PRE_MOVE_MODULE_PATHS = [
     "phonometry.distortion",
     "phonometry.dynamic_stiffness",
     "phonometry.enclosed_space_absorption",
-    "phonometry.environment",
+    "phonometry.environmental",
     "phonometry.environmental_measurement",
     "phonometry.facade_prediction",
     "phonometry.filter_design",
@@ -459,6 +459,25 @@ def test_pre_split_module_path_still_imports(path: str) -> None:
     assert module is sys.modules[path]
     public = [name for name in dir(module) if not name.startswith("_")]
     assert public, f"{path} imports but exposes no public names"
+
+
+def test_a_renamed_package_alias_is_not_a_package() -> None:
+    """The alias must not hand out the real package's search path.
+
+    Proxying ``__path__`` would let ``import phonometry.environmental.<sub>``
+    build a second, independent copy of every submodule: same source, distinct
+    classes, failing isinstance and pickles, and with no notice on the way in.
+    """
+    import importlib
+
+    from phonometry import environmental  # noqa: F401 - the alias under test
+
+    assert not hasattr(sys.modules["phonometry.environmental"], "__path__")
+    with pytest.raises(ModuleNotFoundError):
+        importlib.import_module("phonometry.environmental.propagation")
+    # The modules the table names still resolve, and to the same object.
+    alias = importlib.import_module("phonometry.environmental.rating")
+    assert alias is sys.modules["phonometry.environmental.rating"]
 
 
 def test_a_module_only_split_still_serves_the_dotted_read() -> None:

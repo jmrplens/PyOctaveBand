@@ -2915,7 +2915,7 @@ def _outdoor_attenuation_example() -> tuple[object, ReportMetadata, str]:
     (source-edge = edge-receiver = 105 m, so the diffracted path exceeds the
     direct one). The divergence, atmospheric, ground and barrier terms come from
     the tested clause-7 functions (see
-    tests/environmental/test_outdoor_propagation.py).
+    tests/environment/propagation/test_outdoor_propagation.py).
     """
     freqs = np.array([63, 125, 250, 500, 1000, 2000, 4000, 8000], dtype=float)
     lw = np.array([95, 100, 103, 105, 104, 101, 95, 88], dtype=float)
@@ -2952,7 +2952,7 @@ def _barrier_insertion_loss_example() -> tuple[object, ReportMetadata, str]:
     A 4 m thin noise barrier 50 m from a source (1 m high), the receiver 1.5 m
     high at 100 m, in the free field. The per-band insertion loss comes from the
     tested wave-theoretic rigid-screen model (see
-    tests/environmental/test_ground_barriers.py).
+    tests/environment/propagation/test_ground_barriers.py).
     """
     freqs = np.array([63, 125, 250, 500, 1000, 2000, 4000, 8000], dtype=float)
     result = ph.barrier_insertion_loss(freqs, 1.0, 50.0, 4.0, 100.0, 1.5)

@@ -420,7 +420,7 @@ def render_activity_report(
     flow.append(Spacer(1, 6))
 
     def _assessment_plot(ax: Any = None, language: str = "en", **kwargs: Any) -> Any:
-        from .._plot.environmental import plot_activity_assessment
+        from .._plot.environment import plot_activity_assessment
 
         return plot_activity_assessment(result, ax=ax, language=language, **kwargs)
 

@@ -8,7 +8,7 @@ XML specials in metadata do not break reportlab, the verdict renders both ways,
 and the boxed tonal audibility ``ΔL_a``, the tone frequency and the audibility
 decision appear in the extracted text. The tonality algorithm itself is
 validated against the IEC 61400-11 oracle elsewhere
-(tests/environmental/test_wind_turbine_noise.py); this fiche test reuses the
+(tests/environment/sources/test_wind_turbine.py); this fiche test reuses the
 same hand-derived synthetic tone so its numbers are documented.
 """
 

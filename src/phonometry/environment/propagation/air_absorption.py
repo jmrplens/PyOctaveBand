@@ -370,7 +370,7 @@ class AtmosphericAttenuation:
         :return: The axes.
         """
         from ..._i18n import check_language
-        from ..._plot.environmental import plot_atmospheric_attenuation
+        from ..._plot.environment import plot_atmospheric_attenuation
 
         check_language(language)
         return plot_atmospheric_attenuation(self, ax=ax, language=language, **kwargs)

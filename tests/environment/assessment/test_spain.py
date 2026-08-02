@@ -236,8 +236,9 @@ def test_long_term_level_unweighted_is_the_plain_energy_mean() -> None:
 
 def test_evaluation_period_rejects_durations_that_do_not_sum_to_the_period() -> None:
     """Annex IV A.3.4.2 b requires "La suma de los Ti = T"."""
+    phases = [rd.NoisePhase(2.0, 50.0)]
     with pytest.raises(ValueError, match="sum Ti = T"):
-        rd.evaluation_period_level([rd.NoisePhase(2.0, 50.0)], hours=12.0)
+        rd.evaluation_period_level(phases, hours=12.0)
 
 
 # --------------------------------------------------------------------------- #
@@ -273,7 +274,10 @@ def test_outdoor_quality_objectives_annex_ii_table_a(
 ) -> None:
     """Annex II Table A as amended by RD 1038/2012, every area type."""
     limits = rd.outdoor_quality_objectives(area)
-    assert (limits.day, limits.evening, limits.night) == expected
+    day, evening, night = expected
+    assert limits.day == day
+    assert limits.evening == evening
+    assert limits.night == night
     assert limits.index == "Lx"
 
 
@@ -302,7 +306,10 @@ def test_indoor_quality_objectives_annex_ii_table_b(
 ) -> None:
     """Annex II Table B, every row of the indoor quality objectives."""
     limits = rd.indoor_quality_objectives(use, room)
-    assert (limits.day, limits.evening, limits.night) == expected
+    day, evening, night = expected
+    assert limits.day == day
+    assert limits.evening == evening
+    assert limits.night == night
 
 
 @pytest.mark.parametrize(
@@ -331,7 +338,10 @@ def test_infrastructure_limits_annex_iii_table_a1(
 ) -> None:
     """Annex III Table A1: new road, rail and airport infrastructure."""
     limits = rd.infrastructure_limits(area)
-    assert (limits.day, limits.evening, limits.night) == expected
+    day, evening, night = expected
+    assert limits.day == day
+    assert limits.evening == evening
+    assert limits.night == night
 
 
 @pytest.mark.parametrize(
@@ -364,7 +374,10 @@ def test_activity_limits_annex_iii_table_b1(
     its activity against (its Tabla 3.7, printed page 173).
     """
     limits = rd.activity_limits(area)
-    assert (limits.day, limits.evening, limits.night) == expected
+    day, evening, night = expected
+    assert limits.day == day
+    assert limits.evening == evening
+    assert limits.night == night
     assert limits.index == "LK,x"
 
 
@@ -386,7 +399,10 @@ def test_adjacent_premises_limits_annex_iii_table_b2(
 ) -> None:
     """Annex III Table B2, every row of the noise transmitted to adjacent premises."""
     limits = rd.adjacent_premises_limits(use, room)
-    assert (limits.day, limits.evening, limits.night) == expected
+    day, evening, night = expected
+    assert limits.day == day
+    assert limits.evening == evening
+    assert limits.night == night
 
 
 def test_area_type_aliases_and_catalogue() -> None:
@@ -471,8 +487,9 @@ def test_new_activity_without_annual_information_is_refused() -> None:
     would assert something the assessment has not shown, so the missing input
     is an error rather than a silently omitted check.
     """
+    periods, limits = _example_periods(), rd.activity_limits("a")
     with pytest.raises(ValueError, match="annual index"):
-        rd.assess_activity(_example_periods(), rd.activity_limits("a"))
+        rd.assess_activity(periods, limits)
 
 
 def test_operating_activity_without_annual_information_is_allowed() -> None:
@@ -575,8 +592,9 @@ def test_tonal_correction_validation() -> None:
         rd.tonal_correction([60.0, 60.0, 60.0], [160.0, 125.0, 100.0])
     with pytest.raises(ValueError, match="positive"):
         rd.tonal_correction([60.0, 60.0, 60.0], [0.0, 125.0, 160.0])
+    two_dimensional = np.zeros((2, 3))
     with pytest.raises(ValueError, match="one-dimensional"):
-        rd.tonal_correction(np.zeros((2, 3)), np.zeros((2, 3)))
+        rd.tonal_correction(two_dimensional, two_dimensional)
 
 
 def test_limit_lookup_validation() -> None:
@@ -598,33 +616,29 @@ def test_assess_activity_validation() -> None:
     limits = rd.activity_limits("a")
     with pytest.raises(ValueError, match="At least one evaluation period"):
         rd.assess_activity({}, limits)
+    empty_day: dict[str, list[rd.NoisePhase]] = {"day": []}
     with pytest.raises(ValueError, match="no noise phases"):
-        rd.assess_activity({"day": []}, limits)
+        rd.assess_activity(empty_day, limits)
+    afternoon = {"afternoon": [rd.NoisePhase(1.0, 50.0)]}
     with pytest.raises(ValueError, match="evaluation period"):
-        rd.assess_activity({"afternoon": [rd.NoisePhase(1.0, 50.0)]}, limits)
+        rd.assess_activity(afternoon, limits)
+    day = {"day": [rd.NoisePhase(12.0, 50.0)]}
     with pytest.raises(ValueError, match="operating_days"):
-        rd.assess_activity(
-            {"day": [rd.NoisePhase(12.0, 50.0)]}, limits, operating_days=400
-        )
+        rd.assess_activity(day, limits, operating_days=400)
     with pytest.raises(ValueError, match="year_days"):
-        rd.assess_activity(
-            {"day": [rd.NoisePhase(12.0, 50.0)]},
-            limits,
-            operating_days=10,
-            year_days=0,
-        )
+        rd.assess_activity(day, limits, operating_days=10, year_days=0)
     # 'year_days' is validated even when it is the only annual input given,
     # and a fractional count of days is rejected rather than truncated.
     with pytest.raises(ValueError, match="year_days"):
         rd.assess_activity(
-            {"day": [rd.NoisePhase(12.0, 50.0)]},
+            day,
             limits,
             long_term_levels={"day": 50.0},
             year_days=365.5,  # type: ignore[arg-type]
         )
     with pytest.raises(ValueError, match="whole number"):
         rd.assess_activity(
-            {"day": [rd.NoisePhase(12.0, 50.0)]},
+            day,
             limits,
             operating_days=10.5,  # type: ignore[arg-type]
         )

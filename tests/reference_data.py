@@ -388,7 +388,7 @@ ISO16283_3_R45_EXPECTED_DB = 38.5
 # (S = 10 m2, A = 0,16 * 50 / 0,8 = 10 m2), so R = L1 - L2 = the reference. The
 # 32 dB unfavourable-deviation allowance then permits a 2 dB upward shift of the
 # reference (32 dB / 16 bands), giving Rw = curve@500 Hz (52) + 2 = 54 dB - the
-# analytic +2-shift anchor (mirrors tests/test_lab_insulation.py).
+# analytic +2-shift anchor (mirrors tests/building/test_lab_insulation.py).
 # ---------------------------------------------------------------------------
 ISO10140_2_REF_AIRBORNE_R: list[float] = [
     33, 36, 39, 42, 45, 48, 51, 52, 53, 54, 55, 56, 56, 56, 56, 56,
@@ -401,7 +401,7 @@ ISO10140_2_REF_AIRBORNE_RW = 54
 # contributes an Ff/Fd/Df triplet (12 flanking paths), which with the direct
 # Dd path make 13 transmission paths. Energy summation (Formula (26)) gives
 # R'w = 52,2 dB -> 52 dB. Row = (label, Rw_flanking, KFf, KFd=KDf, coupling
-# length lf). Mirrors tests/test_building_prediction.py (_annex_h_paths).
+# length lf). Mirrors tests/building/test_building_prediction.py (_annex_h_paths).
 # ---------------------------------------------------------------------------
 EN12354_1_ANNEX_H3_R_DIRECT = 57.0
 EN12354_1_ANNEX_H3_SEPARATING_AREA = 11.5
@@ -670,7 +670,7 @@ ISO9613_2_TABLE2 = {
 # workers) and F (full-day forklift drivers) use the Table C.4 sampling budget.
 # Task tuples are (samples, duration_hours, duration_range) so the conformance
 # report can rebuild the Task objects (Task is not importable here — this module
-# is stdlib-only). Mirrors tests/test_occupational_exposure.py.
+# is stdlib-only). Mirrors tests/hearing/test_occupational_exposure.py.
 # ---------------------------------------------------------------------------
 ISO9612_ANNEX_D_TASKS: tuple[tuple, ...] = (
     ((70.0,), 1.5, None),
@@ -693,7 +693,7 @@ ISO9612_ANNEX_F_U = 3.4
 # of Annex A. Both use the same practical-coefficient spectrum except at 500 Hz;
 # A.1 gives alpha_w = 0,60 with no shape indicator, A.2 (500 Hz raised to 1,00)
 # gives alpha_w = 0,60(M). Bands are 250/500/1000/2000/4000 Hz. Mirrors
-# tests/test_absorption_rating.py.
+# tests/materials/test_absorption_rating.py.
 # ---------------------------------------------------------------------------
 ISO11654_ANNEX_A1_ALPHA_P: tuple[float, ...] = (0.35, 0.70, 0.65, 0.60, 0.55)
 ISO11654_ANNEX_A1_ALPHA_W = 0.60
@@ -709,7 +709,7 @@ ISO11654_ANNEX_A2_INDICATOR = "M"
 # 100 mm gives V = 7,854e-4 m3 and S = 0,0471 m2; with the IEC 61094-2:2009 air
 # properties at 23 C and f = 2 Hz the standard prints b = 1,83e-3 m and the
 # heat-conduction-corrected kappa' = kappa*0,978 = 1,370. Mirrors
-# tests/test_airflow_resistance.py.
+# tests/materials/test_airflow_resistance.py.
 # ---------------------------------------------------------------------------
 ISO9053_2_ANNEX_A_SURFACE = 0.0471  # S (m2)
 ISO9053_2_ANNEX_A_VOLUME = 7.854e-4  # V (m3)
@@ -731,7 +731,7 @@ ISO10534_1_ABSORPTION = 0.75
 # reference speed of sound c = 343,2 m/s at 20 C. The synthetic worked chain
 # (T1..T4 = 8,0/6,0/7,5/5,0 s, V/S from V = 200 m3, S = 10 m2) exercises the
 # Sabine absorptions Eq (1)/(4) and the scattering Eq (5). Mirrors
-# tests/test_scattering_diffusion.py.
+# tests/materials/test_scattering_diffusion.py.
 # ---------------------------------------------------------------------------
 ISO17497_1_SPEED_OF_SOUND_20C = 343.2  # Eq (2) reference condition (m/s)
 ISO17497_1_CHAIN_V = 200.0  # chamber volume V (m3)
@@ -852,7 +852,7 @@ DIFFUSER_QRD7_NORMALIZED_DIFFUSION_2K = 0.20802829817091092
 # ds = 1,25 m, dm = 0,25 m gives the geometrical-spreading factor Kr = 2/3
 # (Clause 4.2). The Annex A worked example (c = 340 m/s, 5 ms flat window)
 # gives a maximum-sampled-area radius r ~ 1,34 m. Mirrors
-# tests/test_road_absorption.py.
+# tests/materials/test_road_absorption.py.
 # ---------------------------------------------------------------------------
 ISO13472_1_KR = 2.0 / 3.0  # geometrical-spreading factor
 ISO13472_1_MSA_WINDOW = 5.0e-3  # reflected-wave window width Tw (s)
@@ -873,7 +873,7 @@ ISO13472_2_SPOT_FU = 1989.4  # upper usable frequency (Hz)
 # expanded uncertainty U = 4,1 dB. The K1 background correction floors at
 # 1,26 dB (>= 6 dB signal-to-noise edge bands). The meteorological correction
 # C1 at the 23 C, ps0 reference is 5*lg(296/314) = -0,128 dB. Mirrors
-# tests/test_sound_power_precision.py.
+# tests/emission/test_sound_power_precision.py.
 # ---------------------------------------------------------------------------
 ISO3745_U_SIGMA_R0 = 0.5  # reproducibility standard deviation (dB)
 ISO3745_U_SIGMA_OMC = 2.0  # operating/mounting/... std. deviation (dB)

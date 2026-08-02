@@ -1005,6 +1005,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   validator says the same thing in the form the whole package uses, rejects
   infinities too, and names the parameter that failed instead of both at once.
 
+- The RD 1367 assessment reads as the article it implements. Its two longest
+  functions were doing four jobs each: `assess_activity` now validates the
+  annual parameters, resolves the period durations, assesses one period and
+  derives the annual index in four named steps, and `tonal_correction`
+  separates the spectrum it rejects from the band-by-band procedure of
+  Annex IV A.3.3. No number changes: the conformance report, the fiches and
+  the tests are identical either side of the refactor.
+
 - `phonometry.environmental` is `phonometry.environment`, with three
   subgroups that follow how an environmental study is written: what the source
   emits (`environment.sources`: CNOSSOS road and rail, wind turbines), what the

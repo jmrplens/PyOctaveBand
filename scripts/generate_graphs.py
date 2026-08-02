@@ -12738,7 +12738,7 @@ def generate_impulsive_sound_onsets(output_dir: str) -> None:
     print("Generating impulsive_sound_onsets...")
     import warnings as _warnings
 
-    from phonometry import environmental
+    from phonometry import environment
 
     # Three hammer strikes over a 55 dB(A) background, 6 s at 48 kHz: the
     # objective chain samples LpAF, detects the onsets and rates the source.
@@ -12757,7 +12757,7 @@ def generate_impulsive_sound_onsets(output_dir: str) -> None:
     with _warnings.catch_warnings():
         # The synthetic interval is shorter than the assessment period.
         _warnings.simplefilter("ignore")
-        res = environmental.impulsive_sound_adjustment(signal, fs)
+        res = environment.impulsive_sound_adjustment(signal, fs)
 
     _fig, ax = plt.subplots(figsize=(10, 6))
     res.plot(ax=ax, language=_LANG)
