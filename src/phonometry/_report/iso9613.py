@@ -5,7 +5,7 @@ Renders the two outdoor-propagation result types to one-page **prediction**
 reports (clearly labelled predictions, never measurement certificates):
 
 * :func:`render_outdoor_attenuation_report` for an
-  :class:`~phonometry.environmental.outdoor_propagation.OutdoorAttenuation`:
+  :class:`~phonometry.environment.propagation.outdoor_propagation.OutdoorAttenuation`:
   the ISO 9613-2:1996 octave-band attenuation breakdown (geometrical divergence
   ``Adiv``, atmospheric absorption ``Aatm``, ground effect ``Agr`` and
   screening ``Abar``) and, from the source sound power the result was composed
@@ -14,7 +14,7 @@ reports (clearly labelled predictions, never measurement certificates):
   wide per-band term table above the attenuation-breakdown plot.
 
 * :func:`render_barrier_insertion_loss_report` for a
-  :class:`~phonometry.environmental.ground_barriers.BarrierInsertionLoss`: the
+  :class:`~phonometry.environment.propagation.ground_barriers.BarrierInsertionLoss`: the
   per-band barrier insertion loss ``IL`` and its mean over the octave bands. A
   two-panel layout: the per-band table beside the insertion-loss spectrum.
   Its diffraction model is the wave-theoretic rigid-screen solution (``method
@@ -59,8 +59,8 @@ from .metadata import ReportMetadata
 if TYPE_CHECKING:
     from numpy.typing import NDArray
 
-    from ..environmental.ground_barriers import BarrierInsertionLoss
-    from ..environmental.outdoor_propagation import (
+    from ..environment.propagation.ground_barriers import BarrierInsertionLoss
+    from ..environment.propagation.outdoor_propagation import (
         OutdoorAttenuation,
         SourceEmission,
     )
@@ -80,7 +80,7 @@ class _AttenuationLevels(NamedTuple):
     """The per-band source power ``Lw``, downwind level ``LfT`` and A-weighting.
 
     Bundles the display quantities the attenuation fiche derives from a
-    :class:`~phonometry.environmental.outdoor_propagation.SourceEmission`, so
+    :class:`~phonometry.environment.propagation.outdoor_propagation.SourceEmission`, so
     the table and the boxed A-weighted level share one computation.
     """
 
@@ -282,11 +282,11 @@ def _resolve_levels(
     """Compose the per-band levels the fiche boxes from a source emission.
 
     Calls the shared
-    :func:`~phonometry.environmental.outdoor_propagation._compose_receiver_level`
+    :func:`~phonometry.environment.propagation.outdoor_propagation._compose_receiver_level`
     so the report reuses the domain's Eq. (3) composition rather than
     reimplementing it.
     """
-    from ..environmental.outdoor_propagation import _compose_receiver_level
+    from ..environment.propagation.outdoor_propagation import _compose_receiver_level
 
     freqs = np.asarray(result.frequencies, dtype=np.float64)
     lw = np.atleast_1d(np.asarray(emission.sound_power_level, dtype=np.float64))
@@ -318,7 +318,7 @@ def render_outdoor_attenuation_report(
     """Render an ISO 9613-2 outdoor-propagation prediction fiche to ``path``.
 
     :param result: An
-        :class:`~phonometry.environmental.outdoor_propagation.OutdoorAttenuation`
+        :class:`~phonometry.environment.propagation.outdoor_propagation.OutdoorAttenuation`
         (the per-band attenuation breakdown).
     :param path: Destination path of the PDF file.
     :param metadata: Optional :class:`ReportMetadata`; a ``requirement`` is the
@@ -328,7 +328,7 @@ def render_outdoor_attenuation_report(
         table adds the A-weighted band level.
     :param language: ``"en"`` (default) or ``"es"``.
     :param source_emission: Optional
-        :class:`~phonometry.environmental.outdoor_propagation.SourceEmission`;
+        :class:`~phonometry.environment.propagation.outdoor_propagation.SourceEmission`;
         when supplied the fiche boxes the A-weighted downwind level at the
         receiver, otherwise it boxes the range of the total attenuation.
     :return: The written ``path`` as a :class:`str`.
@@ -547,7 +547,7 @@ def render_barrier_insertion_loss_report(
     """Render a barrier insertion-loss prediction fiche to ``path``.
 
     :param result: A
-        :class:`~phonometry.environmental.ground_barriers.BarrierInsertionLoss`.
+        :class:`~phonometry.environment.propagation.ground_barriers.BarrierInsertionLoss`.
     :param path: Destination path of the PDF file.
     :param metadata: Optional :class:`ReportMetadata`; a ``requirement`` is the
         minimum required mean insertion loss (a higher insertion loss is better).

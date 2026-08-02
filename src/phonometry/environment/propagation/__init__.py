@@ -1,0 +1,84 @@
+#  Copyright (c) 2026. Jose Manuel Requena Plens
+"""environment.propagation subdomain of phonometry: outdoor sound propagation (ISO 9613, refraction, barriers)."""
+
+from __future__ import annotations
+
+from .air_absorption import (
+    AtmosphericAbsorptionWarning,
+    AtmosphericAttenuation,
+    air_attenuation,
+    air_attenuation_m,
+    atmospheric_attenuation,
+)
+from .ground_barriers import (
+    BarrierInsertionLoss,
+    SphericalGroundResult,
+    barrier_insertion_loss,
+    fresnel_number,
+    ground_effect,
+    kurze_anderson_attenuation,
+    spherical_reflection_coefficient,
+)
+from .outdoor_propagation import (
+    DEFAULT_FREQUENCIES,
+    Barrier,
+    OutdoorAttenuation,
+    SourceEmission,
+    atmospheric_absorption,
+    barrier_attenuation,
+    directivity_omega,
+    geometric_divergence,
+    ground_attenuation,
+    ground_attenuation_alternative,
+    meteorological_correction,
+    outdoor_propagation_attenuation,
+    predicted_receiver_level,
+)
+from .refraction import (
+    AtmosphericPEResult,
+    AtmosphericRayResult,
+    EffectiveSoundSpeedProfile,
+    atmospheric_parabolic_equation,
+    atmospheric_ray_paths,
+    linear_sound_speed_profile,
+    log_linear_sound_speed_profile,
+    ray_curvature_radius,
+    shadow_zone_distance,
+)
+
+__all__ = [
+    "DEFAULT_FREQUENCIES",
+    "AtmosphericAbsorptionWarning",
+    "AtmosphericAttenuation",
+    "AtmosphericPEResult",
+    "AtmosphericRayResult",
+    "Barrier",
+    "BarrierInsertionLoss",
+    "EffectiveSoundSpeedProfile",
+    "OutdoorAttenuation",
+    "SourceEmission",
+    "SphericalGroundResult",
+    "air_attenuation",
+    "air_attenuation_m",
+    "atmospheric_absorption",
+    "atmospheric_attenuation",
+    "atmospheric_parabolic_equation",
+    "atmospheric_ray_paths",
+    "barrier_attenuation",
+    "barrier_insertion_loss",
+    "directivity_omega",
+    "fresnel_number",
+    "geometric_divergence",
+    "ground_attenuation",
+    "ground_attenuation_alternative",
+    "ground_effect",
+    "kurze_anderson_attenuation",
+    "linear_sound_speed_profile",
+    "log_linear_sound_speed_profile",
+    "meteorological_correction",
+    "outdoor_propagation_attenuation",
+    "predicted_receiver_level",
+    "ray_curvature_radius",
+    "shadow_zone_distance",
+    "spherical_reflection_coefficient",
+]

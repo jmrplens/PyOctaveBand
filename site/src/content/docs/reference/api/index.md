@@ -167,19 +167,20 @@ La referencia de la API se genera a partir de los docstrings del código (en ing
 
 | Module | Summary |
 | :--- | :--- |
-| [`environmental.outdoor_propagation`](/phonometry/reference/api/environment/outdoor-propagation/) | Outdoor sound propagation: ISO 9613-2:1996 general method of calculation. |
-| [`environmental.cnossos_road`](/phonometry/reference/api/environment/cnossos-road/) | CNOSSOS-EU road traffic source emission (Directive 2002/49/EC Annex II, 2.2). |
-| [`environmental.ground_barriers`](/phonometry/reference/api/environment/ground-barriers/) | Spherical-wave ground effect and advanced barrier diffraction. |
-| [`environmental.atmospheric_refraction`](/phonometry/reference/api/environment/atmospheric-refraction/) | Atmospheric refraction: ray tracing and the parabolic equation (PE). |
-| [`environmental.air_absorption`](/phonometry/reference/api/environment/air-absorption/) | Atmospheric absorption of sound: ISO 9613-1:1993. |
-| [`environmental.cnossos_rail`](/phonometry/reference/api/environment/cnossos-rail/) | CNOSSOS-EU railway source emission (Directive 2002/49/EC Annex II, 2.3). |
-| [`environmental.impulse_prominence`](/phonometry/reference/api/environment/impulse-prominence/) | Prominence of impulsive sounds and the LAeq adjustment (NT ACOU 112:2002). |
-| [`environmental.impulsive_sound`](/phonometry/reference/api/environment/impulsive-sound/) | Objective prominence of impulsive sounds and the `LAeq` adjustment (ISO/PAS 1996-3:2022). |
-| [`environmental.rating`](/phonometry/reference/api/environment/rating/) | Environmental noise descriptors per ISO 1996-1:2016. |
-| [`environmental.measurement`](/phonometry/reference/api/environment/measurement/) | Determination of environmental-noise sound pressure levels (ISO 1996-2:2017). |
-| [`environmental.spanish_regulation`](/phonometry/reference/api/environment/spanish-regulation/) | Spanish noise regulation: the corrected level LKeq (Real Decreto 1367/2007). |
+| [`environment.propagation.outdoor_propagation`](/phonometry/reference/api/environment/outdoor-propagation/) | Outdoor sound propagation: ISO 9613-2:1996 general method of calculation. |
+| [`environment.sources.cnossos_road`](/phonometry/reference/api/environment/cnossos-road/) | CNOSSOS-EU road traffic source emission (Directive 2002/49/EC Annex II, 2.2). |
+| [`environment.propagation.ground_barriers`](/phonometry/reference/api/environment/ground-barriers/) | Spherical-wave ground effect and advanced barrier diffraction. |
+| [`environment.propagation.refraction`](/phonometry/reference/api/environment/refraction/) | Atmospheric refraction: ray tracing and the parabolic equation (PE). |
+| [`environment.propagation.air_absorption`](/phonometry/reference/api/environment/air-absorption/) | Atmospheric absorption of sound: ISO 9613-1:1993. |
+| [`environment.sources.cnossos_rail`](/phonometry/reference/api/environment/cnossos-rail/) | CNOSSOS-EU railway source emission (Directive 2002/49/EC Annex II, 2.3). |
+| [`environment.assessment.impulse_prominence`](/phonometry/reference/api/environment/impulse-prominence/) | Prominence of impulsive sounds and the LAeq adjustment (NT ACOU 112:2002). |
+| [`environment.assessment.impulsive_sound`](/phonometry/reference/api/environment/impulsive-sound/) | Objective prominence of impulsive sounds and the `LAeq` adjustment (ISO/PAS 1996-3:2022). |
+| [`environment.assessment.rating`](/phonometry/reference/api/environment/rating/) | Environmental noise descriptors per ISO 1996-1:2016. |
+| [`environment.sources.wind_turbine`](/phonometry/reference/api/environment/wind-turbine/) | Wind-turbine acoustic noise (IEC 61400-11:2012+A1:2018). |
+| [`environment.assessment.measurement`](/phonometry/reference/api/environment/measurement/) | Determination of environmental-noise sound pressure levels (ISO 1996-2:2017). |
+| [`environment.assessment.spain`](/phonometry/reference/api/environment/spain/) | Spanish noise regulation: the corrected level LKeq (Real Decreto 1367/2007). |
 
-## Aircraft and wind energy
+## Aircraft noise
 
 | Module | Summary |
 | :--- | :--- |
@@ -188,7 +189,6 @@ La referencia de la API se genera a partir de los docstrings del código (en ing
 | [`aircraft.airport_noise`](/phonometry/reference/api/aeroacoustics/airport-noise/) | Noise-Power-Distance (NPD) event-level interpolation (ECAC Doc 29). |
 | [`aircraft.anp_fleet`](/phonometry/reference/api/aeroacoustics/anp-fleet/) | EASA ANP fleet database bridge for the ECAC Doc 29 airport-noise chain. |
 | [`aircraft.rotorcraft_noise`](/phonometry/reference/api/aeroacoustics/rotorcraft-noise/) | Rotorcraft noise by the hemisphere method (ECAC Doc 32 / NORAH2). |
-| [`environmental.wind_turbine_noise`](/phonometry/reference/api/aeroacoustics/wind-turbine-noise/) | Wind-turbine acoustic noise (IEC 61400-11:2012+A1:2018). |
 
 ## Underwater acoustics
 

@@ -1,5 +1,5 @@
 ---
-title: "environmental.rating"
+title: "environment.assessment.rating"
 description: "Environmental noise descriptors per ISO 1996-1:2016."
 sidebar:
   label: "rating"

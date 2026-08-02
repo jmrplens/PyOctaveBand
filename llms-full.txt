@@ -257,7 +257,6 @@ The generated API reference, one page per module. Fetch these only when a specif
 - [aeroacoustics/anp-fleet](https://jmrplens.github.io/phonometry/reference/api/aeroacoustics/anp-fleet/)
 - [aeroacoustics/atmospheric-absorption](https://jmrplens.github.io/phonometry/reference/api/aeroacoustics/atmospheric-absorption/)
 - [aeroacoustics/rotorcraft-noise](https://jmrplens.github.io/phonometry/reference/api/aeroacoustics/rotorcraft-noise/)
-- [aeroacoustics/wind-turbine-noise](https://jmrplens.github.io/phonometry/reference/api/aeroacoustics/wind-turbine-noise/)
 - [broadcast/program-loudness](https://jmrplens.github.io/phonometry/reference/api/broadcast/program-loudness/)
 - [building/aperture-transmission](https://jmrplens.github.io/phonometry/reference/api/building/aperture-transmission/)
 - [building/building-prediction](https://jmrplens.github.io/phonometry/reference/api/building/building-prediction/)
@@ -286,7 +285,6 @@ The generated API reference, one page per module. Fetch these only when a specif
 - [electroacoustics/sound-reinforcement](https://jmrplens.github.io/phonometry/reference/api/electroacoustics/sound-reinforcement/)
 - [electroacoustics/swept-sine](https://jmrplens.github.io/phonometry/reference/api/electroacoustics/swept-sine/)
 - [environment/air-absorption](https://jmrplens.github.io/phonometry/reference/api/environment/air-absorption/)
-- [environment/atmospheric-refraction](https://jmrplens.github.io/phonometry/reference/api/environment/atmospheric-refraction/)
 - [environment/cnossos-rail](https://jmrplens.github.io/phonometry/reference/api/environment/cnossos-rail/)
 - [environment/cnossos-road](https://jmrplens.github.io/phonometry/reference/api/environment/cnossos-road/)
 - [environment/ground-barriers](https://jmrplens.github.io/phonometry/reference/api/environment/ground-barriers/)
@@ -295,7 +293,9 @@ The generated API reference, one page per module. Fetch these only when a specif
 - [environment/measurement](https://jmrplens.github.io/phonometry/reference/api/environment/measurement/)
 - [environment/outdoor-propagation](https://jmrplens.github.io/phonometry/reference/api/environment/outdoor-propagation/)
 - [environment/rating](https://jmrplens.github.io/phonometry/reference/api/environment/rating/)
-- [environment/spanish-regulation](https://jmrplens.github.io/phonometry/reference/api/environment/spanish-regulation/)
+- [environment/refraction](https://jmrplens.github.io/phonometry/reference/api/environment/refraction/)
+- [environment/spain](https://jmrplens.github.io/phonometry/reference/api/environment/spain/)
+- [environment/wind-turbine](https://jmrplens.github.io/phonometry/reference/api/environment/wind-turbine/)
 - [filters/compliance](https://jmrplens.github.io/phonometry/reference/api/filters/compliance/)
 - [filters/core](https://jmrplens.github.io/phonometry/reference/api/filters/core/)
 - [filters/equalizer](https://jmrplens.github.io/phonometry/reference/api/filters/equalizer/)
@@ -2248,7 +2248,7 @@ contour = aircraft.noise_contour(path, powers, distances, sel, lmax, x=gx, y=gy)
 | `phonometry.materials` | Absorption (ISO 354/11654), impedance tube, airflow resistance, scattering/diffusion, road absorption, dynamic stiffness |
 | `phonometry.building` | Sound insulation measurement and prediction (EN 12354, ISO 717/16283/10140/15186/10052/10848), structure-borne sound |
 | `phonometry.vibration` | Three families: `structural` (mobility ISO 7626, plate junctions, radiation, experimental SEA, transfer stiffness ISO 10846), `human` (ISO 2631/5349/8041 exposure and multiple shocks) and `machinery` (fault frequencies and condition monitoring) |
-| `phonometry.environmental` | Rating levels, ISO 1996-2 measurement, outdoor propagation (ISO 9613), atmospheric refraction (ray tracing and the parabolic equation), wind-turbine noise, impulsive prominence |
+| `phonometry.environment` | Three subgroups: `sources` (CNOSSOS road and rail emission, wind-turbine apparent sound power), `propagation` (ISO 9613-1/-2, ground effect and barriers, refraction by ray tracing and the parabolic equation) and `assessment` (ISO 1996-1/-2 rating and measurement, impulsive prominence, RD 1367/2007) |
 | `phonometry.aircraft` | EPNL (ICAO Annex 16), SAE ARP 5534 absorption, airport contours (ECAC Doc 29), rotorcraft (ECAC Doc 32) |
 | `phonometry.underwater` | ISO 18405/17208/18406 levels, propagation and Weston regimes, sound speed, sonar equation and detection range, seabed, ambient and ship-traffic noise, marine-mammal audiograms and regulatory auditory weighting, numerical solvers |
 | `phonometry.electroacoustics` | Distortion (IEC 60268-3 / AES17), transfer function and coherence, radiating piston |
@@ -2258,11 +2258,18 @@ contour = aircraft.noise_contour(path, powers, distances, sel, lmax, x=gx, y=gy)
 
 Every name in the table below is also re-exported at the top level, so
 `from phonometry import <name>` works for every row. Two generations of module
-paths are still importable and warn on use: the pre-3.2 flat ones (for example
-`phonometry.insulation`), removed in 4.0, and the pre-4.0 ones that the split
-of `metrology` moved (for example `phonometry.metrology.levels`, now
-`phonometry.signals.levels`), removed in 5.0. Reading a moved name from the
-namespace it left (`metrology.leq`) warns and delegates as well.
+paths are still importable and warn on use. The pre-3.2 flat ones, written
+without a subpackage, are removed in 4.0; the pre-4.0 ones that the taxonomy
+moved are removed in 5.0. Reading a moved name from the namespace it left
+warns and delegates as well.
+
+| Deprecated path | Resolves to | Removed in |
+| :--- | :--- | :--- |
+| `phonometry.insulation` | `phonometry.building.insulation` | 4.0 |
+| `phonometry.metrology.levels` | `phonometry.signals.levels` | 5.0 |
+| `phonometry.hearing.sti` | `phonometry.speech.sti` | 5.0 |
+| `phonometry.vibration.human_vibration` | `phonometry.vibration.human.exposure` | 5.0 |
+| `phonometry.environmental` | `phonometry.environment` | 5.0 |
 
 | Name | Type | Description (Inputs) | Usage Snippet (Outputs) |
 | :--- | :--- | :--- | :--- |
@@ -3474,7 +3481,7 @@ The [ISO 9613-2 method](https://jmrplens.github.io/phonometry/guides/outdoor-pro
 atmosphere. In reality the sound speed changes with height, because temperature
 and wind change with height, and this **refracts** sound: rays curve, and over a
 few hundred metres the received level can swing by tens of decibels. This page
-covers `phonometry.environmental.atmospheric_refraction`, the
+covers `phonometry.environment.propagation.refraction`, the
 refracting-atmosphere counterpart of the ocean solvers in
 [`phonometry.underwater.numerical_propagation`](https://jmrplens.github.io/phonometry/guides/underwater-solvers/): a
 **ray model** and a **parabolic-equation (PE)** solver, both clean-room from
@@ -9442,12 +9449,12 @@ and `composite_rating_level()` the general whole-day composite of clause 6.5
 +6 dB prominent tones):
 
 ```python
-from phonometry import environmental
+from phonometry import environment
 
-l = environmental.lden(63.2, 58.1, 51.4)                      # from LAeq per period
-r = environmental.composite_rating_level([(63.2, 12, 0.0),    # day
+l = environment.lden(63.2, 58.1, 51.4)                      # from LAeq per period
+r = environment.composite_rating_level([(63.2, 12, 0.0),    # day
                             (58.1, 4, 5.0),     # evening (+5)
-                            (51.4, 8, 10.0)])   # night  (+10) == environmental.lden
+                            (51.4, 8, 10.0)])   # night  (+10) == environment.lden
 ```
 
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/lden_profile_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/lden_profile.svg" alt="Synthetic 24-hour urban LAeq profile with day, evening and night bands, the +5 and +10 dB weighted period levels and the resulting Lden" width="80%"></picture>
@@ -9458,7 +9465,7 @@ r = environmental.composite_rating_level([(63.2, 12, 0.0),    # day
 ```python
 import numpy as np
 import matplotlib.pyplot as plt
-from phonometry import environmental
+from phonometry import environment
 
 # Synthetic hourly LAeq of an urban road (dB), hours 00 to 23
 laeq_h = np.array([48, 46, 45, 45, 46, 50, 56, 64, 66, 65, 63, 63,
@@ -9470,7 +9477,7 @@ def period_leq(idx):
 ld = period_leq(np.arange(7, 19))                # day 07-19
 le = period_leq(np.arange(19, 23))               # evening 19-23
 ln_ = period_leq(np.r_[23, np.arange(0, 7)])     # night 23-07
-l_den = environmental.lden(ld, le, ln_)
+l_den = environment.lden(ld, le, ln_)
 print(f"Lden = {l_den:.1f} dB")   # Lden = 64.3 dB
 
 fig, ax = plt.subplots()
@@ -9536,10 +9543,10 @@ $K_t$ (Table J.1).
 
 ```python
 import matplotlib.pyplot as plt
-from phonometry import environmental
+from phonometry import environment
 
 # ISO 1996-2:2007 Annex C.5, Example 2 (two tones near 400 Hz):
-res = environmental.assess_tonal_audibility(tone_level=54.1, masking_noise_level=45.2,
+res = environment.assess_tonal_audibility(tone_level=54.1, masking_noise_level=45.2,
                               centre_frequency=430.0)
 print(res.audibility, res.adjustment)   # ΔLta ≈ 11.1 dB -> Kt = 6 dB
 res.plot()
@@ -9566,20 +9573,20 @@ reported alongside as `approximate_uncertainty` and a warning when the levels
 spread beyond 3 dB, where the substitute grossly inflates.
 
 ```python
-from phonometry import environmental
+from phonometry import environment
 
 # Tonal adjustment for a prominent tone:
-tonal = environmental.assess_tonal_audibility(54.1, 45.2, 430.0)  # TonalAssessmentResult
+tonal = environment.assess_tonal_audibility(54.1, 45.2, 430.0)  # TonalAssessmentResult
 kt = tonal.adjustment                                             # 6 dB
 tonal.plot()   # this audibility on the Kt curve, as in the figure above
 
 # Subtract residual (background) noise from a measured level:
-corr = environmental.residual_sound_correction(measured_level=58.0, residual_level=50.0)
+corr = environment.residual_sound_correction(measured_level=58.0, residual_level=50.0)
 corr.corrected_level, corr.reliable
 
 # Combine an uncertainty budget and expand to 95 %:
-u = environmental.combined_standard_uncertainty([0.59, 0.3, 2.0, 0.40, 0.38])  # 2.18 dB (G.2)
-environmental.expanded_uncertainty(u)                            # 4.36 dB (k = 2)
+u = environment.combined_standard_uncertainty([0.59, 0.3, 2.0, 0.40, 0.38])  # 2.18 dB (G.2)
+environment.expanded_uncertainty(u)                            # 4.36 dB (k = 2)
 ```
 
 ## Quick answers
@@ -9604,8 +9611,8 @@ $L_{dn}$ (3.6.5) keeps only the +10 dB night penalty.
 - [Occupational Noise Exposure](https://jmrplens.github.io/phonometry/guides/occupational-exposure/): the workplace
   counterpart, from task samples to the daily exposure level with its
   uncertainty budget.
-- API reference: [`environmental.measurement`](https://jmrplens.github.io/phonometry/reference/api/environment/measurement/)
-  and [`environmental.rating`](https://jmrplens.github.io/phonometry/reference/api/environment/rating/).
+- API reference: [`environment.assessment.measurement`](https://jmrplens.github.io/phonometry/reference/api/environment/measurement/)
+  and [`environment.assessment.rating`](https://jmrplens.github.io/phonometry/reference/api/environment/rating/).
 
 ## References
 
@@ -12517,7 +12524,7 @@ Source: https://jmrplens.github.io/phonometry/guides/ground-barriers/
 
 The [ISO 9613-2 general method](https://jmrplens.github.io/phonometry/guides/outdoor-propagation/) folds the ground and
 barrier terms into tabulated, energy-based corrections. This page covers the
-underlying wave acoustics in `phonometry.environmental.ground_barriers`: the
+underlying wave acoustics in `phonometry.environment.propagation.ground_barriers`: the
 **spherical-wave reflection coefficient** of a finite-impedance ground
 (Weyl-Van der Pol) and the **wave-theoretic diffraction** of a screen, both in
 a homogeneous (non-refracting, non-turbulent) atmosphere. These are the physical
@@ -14909,10 +14916,10 @@ $K_I$ (the adjustment is 0 dB when no event qualifies).
 [Watch the high-resolution video (WebM)](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anim_onset_detection.webm)
 
 ```python
-from phonometry import environmental
+from phonometry import environment
 
 # Three candidate impulses: (onset rate dB/s, level difference dB).
-result = environmental.impulse_prominence([1200.0, 300.0, 60.0], [32.0, 18.0, 11.0])
+result = environment.impulse_prominence([1200.0, 300.0, 60.0], [32.0, 18.0, 11.0])
 print(result.per_impulse.round(2))  # [12.25  9.94  7.42]
 print(round(result.prominence, 2))  # 12.25  (the governing impulse)
 print(round(result.adjustment, 2))  # 13.05  dB
@@ -14923,10 +14930,10 @@ result.plot()   # the KI(P) curve of section 2 with these impulses marked
 A single impulse can be evaluated directly with `predicted_prominence`:
 
 ```python
-from phonometry import environmental
+from phonometry import environment
 
 # P = 3*lg(1000) + 2*lg(30) = 9 + 2.95 = 11.95.
-print(round(environmental.predicted_prominence(1000.0, 30.0), 4))  # 11.9542
+print(round(environment.predicted_prominence(1000.0, 30.0), 4))  # 11.9542
 ```
 
 ## 2. Adjustment to LAeq (clause 8)
@@ -14939,10 +14946,10 @@ K_I = 1.8\,(P - 5)\ \text{dB} \quad (P > 5), \qquad K_I = 0 \quad (P \le 5).
 $$
 
 ```python
-from phonometry import environmental
+from phonometry import environment
 
-print(float(environmental.impulse_adjustment(10.0)))  # 9.0 dB
-print(float(environmental.impulse_adjustment(5.0)))   # 0.0 dB (at the threshold)
+print(float(environment.impulse_adjustment(10.0)))  # 9.0 dB
+print(float(environment.impulse_adjustment(5.0)))   # 0.0 dB (at the threshold)
 ```
 
 The adjustment is applied to $L_{Aeq,30\text{min}}$ from the single event with the
@@ -14955,10 +14962,10 @@ L_{Ar,T} = 10\,\log_{10}\!\left(\frac{1}{T}\sum_N \Delta t_N\,
 $$
 
 ```python
-from phonometry import environmental
+from phonometry import environment
 
 # Two 30-min periods: one impulsive (KI = 7.6 dB), one quiet.
-print(round(environmental.rating_level([72.0, 66.0], [7.6, 0.0], [30.0, 30.0], 60.0), 2))
+print(round(environment.rating_level([72.0, 66.0], [7.6, 0.0], [30.0, 30.0], 60.0), 2))
 # 76.78 dB
 ```
 
@@ -14975,16 +14982,16 @@ measurement of ISO 1996-2.
 ```python
 import numpy as np
 import matplotlib.pyplot as plt
-from phonometry import environmental
+from phonometry import environment
 
 # One line for the adjustment curve with the impulses marked:
-environmental.impulse_prominence([1200.0, 300.0, 60.0], [32.0, 18.0, 11.0]).plot()
+environment.impulse_prominence([1200.0, 300.0, 60.0], [32.0, 18.0, 11.0]).plot()
 plt.show()
 
 # By hand, the left panel — P vs onset rate for three level differences:
 orate = np.logspace(1, 4, 200)
 for ld in (5.0, 15.0, 30.0):
-    plt.plot(orate, environmental.predicted_prominence(orate, np.full_like(orate, ld)),
+    plt.plot(orate, environment.predicted_prominence(orate, np.full_like(orate, ld)),
              label=f"LD = {ld:g} dB")
 plt.xscale("log"); plt.legend(); plt.show()
 ```
@@ -15012,7 +15019,7 @@ The onset detection can be exercised on a level history directly with
 
 ```python
 import numpy as np
-from phonometry import environmental
+from phonometry import environment
 
 # An LpAF history sampled every 20 ms: quiet, a 30 dB rise over 0.30 s, steady.
 dt = 0.02
@@ -15021,7 +15028,7 @@ levels = np.concatenate([
     40.0 + 30.0 * np.arange(1, 16) / 15,   # a straight 100 dB/s onset to 70 dB
     np.full(15, 70.0),
 ])
-onset = environmental.detect_onsets(levels, dt)[0]
+onset = environment.detect_onsets(levels, dt)[0]
 print(round(onset.onset_rate), round(onset.level_difference))  # 100 30
 print(round(onset.prominence, 2))                              # 8.95
 ```
@@ -15029,7 +15036,7 @@ print(round(onset.prominence, 2))                              # 8.95
 From a calibrated time signal (in pascal) the whole chain runs end to end:
 
 ```python
-result = environmental.impulsive_sound_adjustment(signal, fs)
+result = environment.impulsive_sound_adjustment(signal, fs)
 print(result.category)                  # e.g. 'highly impulsive'
 print(round(result.adjustment, 1))      # KI in dB (0.0 to about 9 dB in typical cases)
 print(round(result.adjusted_laeq, 1))   # LAeq + KI
@@ -15045,7 +15052,7 @@ result.plot()   # the LpAF history with the detected onsets (needs matplotlib)
 ```python
 import numpy as np
 import matplotlib.pyplot as plt
-from phonometry import environmental
+from phonometry import environment
 
 # Three hammer strikes over a 55 dB(A) background, 6 s at 48 kHz.
 fs = 48000
@@ -15061,7 +15068,7 @@ for onset_time in (1.0, 2.6, 4.2):
     strike *= 2e-5 * 10 ** (95 / 20) / np.sqrt(np.mean(strike[window] ** 2))
     signal += strike
 
-res = environmental.impulsive_sound_adjustment(signal, fs)
+res = environment.impulsive_sound_adjustment(signal, fs)
 print(res.category, round(res.prominence, 2), round(res.adjustment, 2))
 # highly impulsive 11.34 11.42
 
@@ -15137,10 +15144,10 @@ pass `language="es"` for a Spanish fiche (translated fixed strings and a comma
 decimal separator), e.g. `res.report("impulse_fiche_es.pdf", language="es")`.
 
 ```python
-from phonometry import environmental, ReportMetadata
+from phonometry import environment, ReportMetadata
 
 # The three-impulse pile-driving set (onset rate dB/s, level difference dB).
-res = environmental.impulse_prominence([1200.0, 300.0, 60.0], [32.0, 18.0, 11.0])
+res = environment.impulse_prominence([1200.0, 300.0, 60.0], [32.0, 18.0, 11.0])
 res.report(
     "impulse_fiche.pdf",
     metadata=ReportMetadata(
@@ -23796,12 +23803,12 @@ curves overtake it below ~200 Hz: the relaxation signature.*
 ```python
 import matplotlib.pyplot as plt
 import numpy as np
-from phonometry import environmental
+from phonometry import environment
 
 freqs = np.geomspace(50.0, 10000.0, 400)
 fig, ax = plt.subplots()
 for temp, rh in [(20.0, 50.0), (20.0, 10.0), (0.0, 70.0), (30.0, 80.0)]:
-    ax.loglog(freqs, environmental.air_attenuation(freqs, temp, rh) * 1000.0,
+    ax.loglog(freqs, environment.air_attenuation(freqs, temp, rh) * 1000.0,
               label=f"{temp:g} °C, {rh:g} % RH")
 ax.set_xlabel("Frequency [Hz]")
 ax.set_ylabel("Attenuation coefficient alpha [dB/km]")
@@ -23813,21 +23820,21 @@ plt.show()
 
 ```python
 import numpy as np
-from phonometry import environmental
+from phonometry import environment
 
 bands = [63, 125, 250, 500, 1000, 2000, 4000, 8000]   # octave-band centres [Hz]
 
 # Pure-tone attenuation coefficient alpha [dB/m] at 20 °C, 50 % RH, one atmosphere
-alpha = environmental.air_attenuation(bands, temperature=20.0, relative_humidity=50.0)
+alpha = environment.air_attenuation(bands, temperature=20.0, relative_humidity=50.0)
 print(np.round(alpha * 1000.0, 2))          # in dB/km, as Table 1 tabulates
 # [  0.12   0.44   1.31   2.73   4.66   9.89  29.67 105.29]
 
 # Reproduce an ISO 9613-1 Table 1 cell exactly (10 °C, 70 %, 1 kHz)
-cell = environmental.air_attenuation(1000.0, 10.0, 70.0, exact_midband=True) * 1000.0
+cell = environment.air_attenuation(1000.0, 10.0, 70.0, exact_midband=True) * 1000.0
 print(round(float(cell), 2))                # 3.66  (dB/km, Table 1)
 
 # Feed real conditions into the ISO 354 power attenuation coefficient m [1/m]
-m = environmental.air_attenuation_m([1000.0, 4000.0], temperature=20.0, relative_humidity=50.0)
+m = environment.air_attenuation_m([1000.0, 4000.0], temperature=20.0, relative_humidity=50.0)
 print(np.round(m, 5))                        # [0.00107 0.00683]
 ```
 
@@ -23870,9 +23877,9 @@ Table 1 unit, on a linear ordinate over a logarithmic frequency axis). Passing a
 that path as `total_attenuation`, the ISO 9613-2 $A_{atm}$ of Eq. (8).
 
 ```python
-from phonometry import environmental
+from phonometry import environment
 
-res = environmental.atmospheric_attenuation(
+res = environment.atmospheric_attenuation(
     [63, 125, 250, 500, 1000, 2000, 4000, 8000],
     temperature=20.0, relative_humidity=50.0,
 )
@@ -23891,10 +23898,10 @@ res.plot()   # alpha in dB/km against frequency (needs matplotlib)
 ```python
 import matplotlib.pyplot as plt
 import numpy as np
-from phonometry import environmental
+from phonometry import environment
 
 # One line: the coefficient curve straight from the result.
-res = environmental.atmospheric_attenuation(
+res = environment.atmospheric_attenuation(
     np.geomspace(50.0, 10000.0, 400), temperature=20.0, relative_humidity=50.0,
 )
 res.plot()
@@ -23903,7 +23910,7 @@ plt.show()
 # Or by hand from air_attenuation (dB/m, so scale by 1000 for dB/km):
 freqs = np.geomspace(50.0, 10000.0, 400)
 fig, ax = plt.subplots()
-ax.semilogx(freqs, environmental.air_attenuation(freqs, 20.0, 50.0) * 1000.0)
+ax.semilogx(freqs, environment.air_attenuation(freqs, 20.0, 50.0) * 1000.0)
 ax.set_xlabel("Frequency [Hz]")
 ax.set_ylabel("Attenuation coefficient alpha [dB/km]")
 plt.show()
@@ -23981,11 +23988,11 @@ mid bands.
 ```python
 import matplotlib.pyplot as plt
 import numpy as np
-from phonometry import environmental
+from phonometry import environment
 
 bands = np.array([63.0, 125.0, 250.0, 500.0, 1000.0, 2000.0, 4000.0, 8000.0])
-barrier = environmental.Barrier(source_to_edge=101.0, edge_to_receiver=101.0)
-att = environmental.outdoor_propagation_attenuation(
+barrier = environment.Barrier(source_to_edge=101.0, edge_to_receiver=101.0)
+att = environment.outdoor_propagation_attenuation(
     200.0, 1.5, 1.5, bands, ground_source=1.0, ground_middle=1.0,
     ground_receiver=1.0, barrier=barrier, temperature=15.0,
     relative_humidity=70.0,
@@ -24022,15 +24029,15 @@ plt.show()
 
 ```python
 import numpy as np
-from phonometry import environmental
+from phonometry import environment
 
 bands = [63, 125, 250, 500, 1000, 2000, 4000, 8000]   # octave-band centres [Hz]
 
 # A point source and receiver 1.5 m high, 200 m apart over porous ground
 # (G = 1), screened midway by a barrier that raises the path over its top edge
 # (dss = dsr ~ 101 m). Geometry feeds the pathlength-difference equations.
-barrier = environmental.Barrier(source_to_edge=101.0, edge_to_receiver=101.0)
-att = environmental.outdoor_propagation_attenuation(
+barrier = environment.Barrier(source_to_edge=101.0, edge_to_receiver=101.0)
+att = environment.outdoor_propagation_attenuation(
     200.0, source_height=1.5, receiver_height=1.5, frequencies=bands,
     ground_source=1.0, ground_middle=1.0, ground_receiver=1.0,
     barrier=barrier, temperature=15.0, relative_humidity=70.0,
@@ -24043,7 +24050,7 @@ att.plot()                        # the stacked breakdown above (needs matplotli
 
 # Predicted receiver level from an octave-band sound power Lw = 95 dB
 lw = np.full(len(bands), 95.0)
-lp = environmental.predicted_receiver_level(
+lp = environment.predicted_receiver_level(
     lw, 200.0, 1.5, 1.5, bands, 1.0, 1.0, 1.0,
     barrier=barrier, temperature=15.0, relative_humidity=70.0,
 )
@@ -24069,14 +24076,14 @@ general per-region method of 7.3.1); combine them by hand when the alternative
 method is appropriate.
 
 ```python
-from phonometry import environmental
+from phonometry import environment
 
 # Alternative ground term (mean path height hm = 2 m, d = 200 m)
-print(round(environmental.ground_attenuation_alternative(200.0, 2.0), 2))          # 4.43 dB
+print(round(environment.ground_attenuation_alternative(200.0, 2.0), 2))          # 4.43 dB
 # Its companion solid-angle index (add to Dc when using Eq. (10))
-print(round(environmental.directivity_omega(1.5, 1.5, 200.0), 2))                  # 3.01 dB
+print(round(environment.directivity_omega(1.5, 1.5, 200.0), 2))                  # 3.01 dB
 # Long-term meteorological correction (C0 = 2 dB) to subtract from LAT(DW)
-print(round(environmental.meteorological_correction(200.0, 1.5, 1.5, 2.0), 2))     # 1.7 dB
+print(round(environment.meteorological_correction(200.0, 1.5, 1.5, 2.0), 2))     # 1.7 dB
 ```
 
 ### The image source behind the ground effect
@@ -27615,7 +27622,7 @@ it; the list grows as guides gain their References sections.
   for adjustment of LAeq* (ISO/PAS 1996-3:2022).
   [iso.org catalogue](https://www.iso.org/standard/77035.html).
   The objective onset-analysis method implemented by
-  `environmental.impulsive_sound`: the level history LpAF (Clause 4), the onset
+  `environment.assessment.impulsive_sound`: the level history LpAF (Clause 4), the onset
   detection and least-squares onset rate (Clauses 3.3-3.5), the prominence
   (Clause 5, Formula 2) and the adjustment KI (Clause 6, Formula 3).
   Cited by [Impulsive-sound prominence](https://jmrplens.github.io/phonometry/guides/impulse-prominence/).
@@ -28559,7 +28566,7 @@ $c_0 = 343\ \mathrm{m/s}$) and the air-absorption term $4mV$.
 
 ```python
 import matplotlib.pyplot as plt
-from phonometry import environmental, room
+from phonometry import environment, room
 
 # A 10 x 7 x 3.5 m room: hard end walls, lightly treated side walls and a
 # very absorptive floor/ceiling pair (carpet plus an acoustic ceiling).
@@ -28567,7 +28574,7 @@ bands = [125.0, 250.0, 500.0, 1000.0, 2000.0, 4000.0]
 alpha_x = [0.06, 0.07, 0.08, 0.09, 0.10, 0.10]
 alpha_y = [0.12, 0.14, 0.16, 0.18, 0.20, 0.20]
 alpha_z = [0.30, 0.50, 0.65, 0.78, 0.82, 0.80]
-m = environmental.air_attenuation_m(bands, 20.0, 50.0)   # air at 20 C / 50 % RH
+m = environment.air_attenuation_m(bands, 20.0, 50.0)   # air at 20 C / 50 % RH
 res = room.reverberation_time_models((10.0, 7.0, 3.5),
                                      (alpha_x, alpha_y, alpha_z),
                                      air_attenuation=m, frequencies=bands)
@@ -28611,9 +28618,9 @@ power-attenuation coefficient $m$ (in neper per metre, from the ISO 9613-1
 [atmospheric absorption](https://jmrplens.github.io/phonometry/guides/outdoor-propagation/)):
 
 ```python
-from phonometry import environmental, room
+from phonometry import environment, room
 
-m = environmental.air_attenuation_m(2000.0, temperature=20.0, relative_humidity=50.0)
+m = environment.air_attenuation_m(2000.0, temperature=20.0, relative_humidity=50.0)
 surfaces = [(40.0, 0.3), (40.0, 0.3), (24.0, 0.3),
             (24.0, 0.3), (15.0, 0.3), (15.0, 0.3)]
 print(round(room.eyring_reverberation_time(120.0, surfaces, air_attenuation=m), 3))
@@ -28690,9 +28697,9 @@ res.plot()   # the five model curves per band (the figure above)
 
 ```python
 import matplotlib.pyplot as plt
-from phonometry import environmental, room
+from phonometry import environment, room
 
-m = environmental.air_attenuation_m([125.0, 250.0, 500.0, 1000.0, 2000.0, 4000.0], 20.0, 50.0)
+m = environment.air_attenuation_m([125.0, 250.0, 500.0, 1000.0, 2000.0, 4000.0], 20.0, 50.0)
 room.reverberation_time_models(
     (10.0, 7.0, 3.5),
     (
@@ -34269,20 +34276,20 @@ $K_t$ is evaluated band by band and, when several emergent tones are present,
 the largest of the resulting $K_t$ governs (step d):
 
 ```python
-from phonometry import environmental
+from phonometry import environment
 
 freqs = [100, 125, 160, 200, 250, 315, 400, 500, 630, 800, 1000]
 levels = [58.0, 60.0, 59.0, 61.0, 72.0, 62.0, 60.0, 58.0, 56.0, 54.0, 52.0]
 
-kt = environmental.tonal_correction(levels, freqs)
+kt = environment.tonal_correction(levels, freqs)
 kt.correction              # 6 dB
 kt.governing_frequency     # 250.0 Hz
 kt.differences[4]          # Lt = 10.5 dB above the mean of the neighbours
 
-environmental.low_frequency_correction(lceq=76.0, laeq=63.0)   # Lf = 13 dB -> Kf = 3 dB
-environmental.impulsive_correction(laieq=68.0, laeq=63.0)      # Li = 5 dB  -> Ki = 0 dB
-environmental.corrected_level(63.0, kt=6, kf=3, ki=0)          # LKeq = 72.0 dB
-environmental.total_correction(kt=6, kf=6, ki=3)               # 9.0 dB: the cap
+environment.low_frequency_correction(lceq=76.0, laeq=63.0)   # Lf = 13 dB -> Kf = 3 dB
+environment.impulsive_correction(laieq=68.0, laeq=63.0)      # Li = 5 dB  -> Ki = 0 dB
+environment.corrected_level(63.0, kt=6, kf=3, ki=0)          # LKeq = 72.0 dB
+environment.total_correction(kt=6, kf=6, ki=3)               # 9.0 dB: the cap
 ```
 
 ## Relationship with the ISO 1996 procedures
@@ -34329,20 +34336,20 @@ own rounding: add 0.5 dB to the result and take the integer part, which is what
 `round_reported_level()` does.
 
 ```python
-from phonometry import environmental
+from phonometry import environment
 
-environmental.RD1367_PERIOD_CLOCK_LIMITS["day"]     # (7, 19)
-environmental.RD1367_PERIOD_HOURS["day"]            # 12.0 h
+environment.RD1367_PERIOD_CLOCK_LIMITS["day"]     # (7, 19)
+environment.RD1367_PERIOD_HOURS["day"]            # 12.0 h
 
-day = [environmental.NoisePhase(2, 0.0, label="cerrada"),
-       environmental.NoisePhase(6, 50.0, kt=6, kf=3),
-       environmental.NoisePhase(4, 48.0, kt=3, kf=3)]
+day = [environment.NoisePhase(2, 0.0, label="cerrada"),
+       environment.NoisePhase(6, 50.0, kt=6, kf=3),
+       environment.NoisePhase(4, 48.0, kt=3, kf=3)]
 
-lkeq_d = environmental.evaluation_period_level(day)   # 56.82 dB, unrounded
-environmental.round_reported_level(lkeq_d)            # 57 dB
+lkeq_d = environment.evaluation_period_level(day)   # 56.82 dB, unrounded
+environment.round_reported_level(lkeq_d)            # 57 dB
 
-lk_d = environmental.long_term_corrected_level([57.0, 0.0], weights=[303, 62])
-environmental.round_reported_level(lk_d)              # 56 dB (303 days open, 62 closed)
+lk_d = environment.long_term_corrected_level([57.0, 0.0], weights=[303, 62])
+environment.round_reported_level(lk_d)              # 56 dB (303 days open, 62 closed)
 ```
 
 ## Acoustic quality objectives and immission limit values
@@ -34370,16 +34377,16 @@ And in areas urbanised after the regulation entered into force (24 October
 `urbanisation="new"` applies.
 
 ```python
-from phonometry import environmental
+from phonometry import environment
 
-environmental.outdoor_quality_objectives("a")                       # 65 / 65 / 55 dB
-environmental.outdoor_quality_objectives("a", urbanisation="new")   # 60 / 60 / 50 dB
-environmental.indoor_quality_objectives("residential", "bedrooms")  # 40 / 40 / 30 dB
-environmental.infrastructure_limits("a")                            # 60 / 60 / 50 dB
-environmental.max_infrastructure_limit("a")                         # 85 dB (LAmax)
-environmental.activity_limits("a")                                  # 55 / 55 / 45 dB
-environmental.adjacent_premises_limits("residential", "bedrooms")   # 35 / 35 / 25 dB
-environmental.vibration_quality_objective("residential")            # 75 dB
+environment.outdoor_quality_objectives("a")                       # 65 / 65 / 55 dB
+environment.outdoor_quality_objectives("a", urbanisation="new")   # 60 / 60 / 50 dB
+environment.indoor_quality_objectives("residential", "bedrooms")  # 40 / 40 / 30 dB
+environment.infrastructure_limits("a")                            # 60 / 60 / 50 dB
+environment.max_infrastructure_limit("a")                         # 85 dB (LAmax)
+environment.activity_limits("a")                                  # 55 / 55 / 45 dB
+environment.adjacent_premises_limits("residential", "bedrooms")   # 35 / 35 / 25 dB
+environment.vibration_quality_objective("residential")            # 75 dB
 ```
 
 Meeting an immission limit value is not simply staying below the number in the
@@ -34412,16 +34419,16 @@ each $L_{Keq,Ti}$, 58 dB on the daily $L_{Keq,x}$ and 55 dB on the annual
 $L_{K,x}$:
 
 ```python
-from phonometry import environmental
+from phonometry import environment
 
-day = [environmental.NoisePhase(2, 0.0, label="cerrada"),
-       environmental.NoisePhase(6, 50.0, kt=6, kf=3),
-       environmental.NoisePhase(4, 48.0, kt=3, kf=3)]
-evening = [environmental.NoisePhase(2, 48.0, kt=3, kf=3),
-           environmental.NoisePhase(2, 0.0, label="cerrada")]
+day = [environment.NoisePhase(2, 0.0, label="cerrada"),
+       environment.NoisePhase(6, 50.0, kt=6, kf=3),
+       environment.NoisePhase(4, 48.0, kt=3, kf=3)]
+evening = [environment.NoisePhase(2, 48.0, kt=3, kf=3),
+           environment.NoisePhase(2, 0.0, label="cerrada")]
 
-limits = environmental.activity_limits("a")          # 55 / 55 / 45 dB
-verdict = environmental.assess_activity(
+limits = environment.activity_limits("a")          # 55 / 55 / 45 dB
+verdict = environment.assess_activity(
     {"day": day, "evening": evening}, limits, operating_days=303)
 
 verdict.periods[0].reported_level        # 57 dB  (LKeq,d)
@@ -34436,17 +34443,17 @@ verdict.complies                         # False: LK,d exceeds 55 dB
 
 ```python
 import matplotlib.pyplot as plt
-from phonometry import environmental
+from phonometry import environment
 
-day = [environmental.NoisePhase(2, 0.0, label="cerrada"),
-       environmental.NoisePhase(6, 50.0, kt=6, kf=3),
-       environmental.NoisePhase(4, 48.0, kt=3, kf=3)]
-evening = [environmental.NoisePhase(2, 48.0, kt=3, kf=3),
-           environmental.NoisePhase(2, 0.0, label="cerrada")]
+day = [environment.NoisePhase(2, 0.0, label="cerrada"),
+       environment.NoisePhase(6, 50.0, kt=6, kf=3),
+       environment.NoisePhase(4, 48.0, kt=3, kf=3)]
+evening = [environment.NoisePhase(2, 48.0, kt=3, kf=3),
+           environment.NoisePhase(2, 0.0, label="cerrada")]
 
-verdict = environmental.assess_activity(
+verdict = environment.assess_activity(
     {"day": day, "evening": evening},
-    environmental.activity_limits("a"),
+    environment.activity_limits("a"),
     operating_days=303,
 )
 verdict.plot()
@@ -34477,15 +34484,15 @@ applicable limit values and the boxed verdict. The default language is Spanish,
 the language of the regulation; `language="en"` translates it.
 
 ```python
-from phonometry import environmental
+from phonometry import environment
 
-verdict = environmental.assess_activity(
-    {"day": [environmental.NoisePhase(2, 0.0, label="cerrada"),
-             environmental.NoisePhase(6, 50.0, kt=6, kf=3),
-             environmental.NoisePhase(4, 48.0, kt=3, kf=3)],
-     "evening": [environmental.NoisePhase(2, 48.0, kt=3, kf=3),
-                 environmental.NoisePhase(2, 0.0, label="cerrada")]},
-    environmental.activity_limits("a"),
+verdict = environment.assess_activity(
+    {"day": [environment.NoisePhase(2, 0.0, label="cerrada"),
+             environment.NoisePhase(6, 50.0, kt=6, kf=3),
+             environment.NoisePhase(4, 48.0, kt=3, kf=3)],
+     "evening": [environment.NoisePhase(2, 48.0, kt=3, kf=3),
+                 environment.NoisePhase(2, 0.0, label="cerrada")]},
+    environment.activity_limits("a"),
     operating_days=303,
 )
 
@@ -34531,7 +34538,7 @@ exceeds 9 dB.
 - [Impulsive-sound prominence](https://jmrplens.github.io/phonometry/guides/impulse-prominence/): the ISO/PAS 1996-3
   impulsive adjustment, the relative of $K_i$ that is not interchangeable with
   it.
-- API reference: [`environmental.spanish_regulation`](https://jmrplens.github.io/phonometry/reference/api/environment/spanish-regulation/).
+- API reference: [`environment.assessment.spain`](https://jmrplens.github.io/phonometry/reference/api/environment/spain/).
 
 ## References
 
@@ -43144,7 +43151,7 @@ sample from the metrology core:
 | ISO 7196:1995 Table 2 | G weighting (infrasound) at every nominal response value, 0.25–315 Hz | `tests/filters/test_g_weighting.py` |
 | ISO 226:2023 Table 1 and Annex B | Equal-loudness contours and loudness levels against the Annex B tables, hearing threshold against the Table 1 $T_f$ parameters | `tests/psychoacoustics/test_loudness_contours.py` |
 | ECMA-418-1:2024 | TNR/PR tone prominence: critical bandwidths, proximity spacing and prominence criteria against the worked examples in clauses 10–12 | `tests/psychoacoustics/test_tonality.py` |
-| ISO 1996-1:2016 | `lden()`, `ldn()` and `composite_rating_level()` against hand-computed formula values | `tests/environmental/test_environmental.py` |
+| ISO 1996-1:2016 | `lden()`, `ldn()` and `composite_rating_level()` against hand-computed formula values | `tests/environment/assessment/test_rating.py` |
 | IEC 60942:2017 Table 2 | Calibrator short-term stability limits (frequency-dependent, class 1) in `sensitivity()` | `tests/metrology/test_calibration_validation.py` |
 
 The same discipline applies far beyond the metrology core: today the suite runs
@@ -43263,12 +43270,12 @@ pressure doubling.
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_wind_turbine_iec61400_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_wind_turbine_iec61400.svg" alt="Side view of a horizontal-axis wind turbine with hub height H and rotor diameter D, a microphone lying on a flat ground board downwind at the horizontal distance R0 = H + D/2 from the tower centreline, the slant distance R1 from the rotor centre to the microphone with the board inclination angle phi between 25 and 40 degrees, and a met mast measuring wind speed and direction; a plan-view inset shows the Figure 3 pattern with the reference position downwind and three optional positions at plus and minus 60 degrees and upwind, and the annotations give R1 equals the square root of H squared plus R0 squared and the apparent sound power formula LWA,i = Lp,i minus 6 plus 10 lg(4 pi R1 squared over S0)" width="94%"></picture>
 
 ```python
-from phonometry import environmental
+from phonometry import environment
 
 # Background-corrected A-weighted one-third-octave band levels L_p,i (dB).
 band_levels = [55.0, 58.0, 60.0, 57.0, 54.0]
-r1 = environmental.slant_distance(hub_height=80.0, rotor_diameter=100.0)
-lwa = environmental.apparent_sound_power_level(band_levels, r1)   # dB re 1 pW
+r1 = environment.slant_distance(hub_height=80.0, rotor_diameter=100.0)
+lwa = environment.apparent_sound_power_level(band_levels, r1)   # dB re 1 pW
 ```
 
 ### Why "apparent"
@@ -43356,20 +43363,20 @@ $\Delta L_a > 0$.
 
 ```python
 import numpy as np
-from phonometry import environmental
+from phonometry import environment
 
 df = 2.0
 freqs = np.arange(50.0, 400.0 + df, df)
 levels = 42.0 - 6.0 * np.log10(freqs / 100.0)
 levels[int(np.argmin(np.abs(freqs - 200.0)))] += 22.0   # blade-passing-style tone
-environmental.wind_turbine_tonality(levels, freqs, tone_frequency=200.0).plot()
+environment.wind_turbine_tonality(levels, freqs, tone_frequency=200.0).plot()
 ```
 
 </details>
 
 ```python
 import numpy as np
-from phonometry import environmental
+from phonometry import environment
 
 # A uniformly-spaced narrowband spectrum (2 Hz resolution): a flat 30 dB floor
 # with a discrete 60 dB tone at 500 Hz.
@@ -43377,7 +43384,7 @@ frequencies = np.arange(440.0, 562.0, 2.0)
 levels = np.full(frequencies.size, 30.0)
 levels[np.argmin(np.abs(frequencies - 500.0))] = 60.0
 
-res = environmental.wind_turbine_tonality(levels, frequencies)
+res = environment.wind_turbine_tonality(levels, frequencies)
 print(res.tone_frequency, res.tonality, res.tonal_audibility, res.is_audible)
 res.plot()   # spectrum + critical band + masking level (needs matplotlib)
 ```

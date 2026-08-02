@@ -19,7 +19,7 @@ from phonometry.aircraft.atmospheric_absorption import (
     AircraftBandAttenuation,
     sae_band_attenuation,
 )
-from phonometry.environmental.air_absorption import air_attenuation
+from phonometry.environment.propagation.air_absorption import air_attenuation
 
 # Published SAE-Method constants (ARP 5534 §3.2.2), for the independent oracle.
 _A, _B, _C, _D, _E, _F, _G = 0.867942, 0.111761, 0.95824, 0.008191, 1.6, 9.2, 0.765

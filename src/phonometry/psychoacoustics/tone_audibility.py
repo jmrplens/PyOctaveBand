@@ -4,7 +4,7 @@ Objective audibility of tones in noise -- engineering method (ISO/PAS 20065:2016
 
 ISO/PAS 20065 is the detailed engineering method that ISO 1996-2:2017 defers to
 for the audibility of prominent tones; the simplified 2007/2009 Annex C method
-lives in :mod:`phonometry.environmental.measurement`. The audibility of a tone
+lives in :mod:`phonometry.environment.assessment.measurement`. The audibility of a tone
 is the amount, in decibels, by which its tone level rises above the masking
 threshold of the surrounding noise.
 
@@ -153,7 +153,7 @@ def critical_bandwidth_engineering(tone_frequency: float) -> float:
     :math:`\Delta f_c = 25.0 + 75.0 (1.0 + 1.4 (f_T/1000)^2)^{0.69}` Hz.
     This is the
     continuous ISO/PAS 20065 engineering-method bandwidth, distinct from the
-    stepped ISO 1996-2 Annex C :func:`~phonometry.environmental.measurement.
+    stepped ISO 1996-2 Annex C :func:`~phonometry.environment.assessment.measurement.
     critical_bandwidth` (100 Hz / 20 %).
 
     :param tone_frequency: Tone frequency ``fT``, in Hz.
@@ -1169,7 +1169,7 @@ class ToneAudibilityResult:
 
 
 # Module named ``tone_audibility`` (distinct from the ISO 1996-2 Annex C
-# ``tonal_audibility`` in :mod:`phonometry.environmental.measurement`).
+# ``tonal_audibility`` in :mod:`phonometry.environment.assessment.measurement`).
 
 
 def tone_audibility(

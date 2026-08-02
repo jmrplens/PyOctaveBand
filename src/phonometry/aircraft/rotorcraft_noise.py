@@ -23,7 +23,7 @@ of ECAC Doc 32):
 * :func:`atmospheric_adjustment` --
   :math:`\Delta L_a = -\alpha(f) \cdot (r - 60)` with the ISO 9613-1
   pure-tone coefficient (Eq. 26/27), reusing
-  :func:`~phonometry.environmental.air_absorption.air_attenuation`.
+  :func:`~phonometry.environment.propagation.air_absorption.air_attenuation`.
 * :func:`ground_effect_adjustment` -- ``ΔLg`` for a point source over an impedance
   plane (Chien-Soroka, Eq. 28-35) with the Delany-Bazley one-parameter impedance
   and the CNOSSOS flow-resistivity classes.
@@ -1444,7 +1444,7 @@ def _absorption_coefficient(
     """
     import warnings
 
-    from ..environmental.air_absorption import (
+    from ..environment.propagation.air_absorption import (
         AtmosphericAbsorptionWarning,
         air_attenuation,
     )

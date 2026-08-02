@@ -1,5 +1,5 @@
 ---
-title: "environmental.cnossos_road"
+title: "environment.sources.cnossos_road"
 description: "CNOSSOS-EU road traffic source emission (Directive 2002/49/EC Annex II, 2.2)."
 sidebar:
   label: "cnossos_road"
@@ -102,7 +102,7 @@ methodology". Only the per-metre line power is defined by the method.
 
 ## ROAD_COEFFICIENTS
 
-*Constant* (`phonometry.environmental.cnossos_road.RoadEmissionCoefficients`).
+*Constant* (`phonometry.environment.sources.cnossos_road.RoadEmissionCoefficients`).
 
 ## ROAD_OCTAVE_BANDS
 

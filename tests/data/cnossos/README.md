@@ -70,7 +70,7 @@ vehicles, 17 280 cases at both source heights, to 0,0055 dB.
 
 ## Purpose and scope of use
 
-`tests/environmental/test_cnossos_rail.py` feeds the shipped equations of
+`tests/environment/sources/test_cnossos_rail.py` feeds the shipped equations of
 Annex II 2.3 the 2015 coefficient set and requires the workbook's levels back,
 band by band, at both source heights. That is the only oracle that pins the
 *equations*: the Directive itself prints no worked example anywhere in 2.3 or
@@ -124,7 +124,7 @@ The coefficients of the current text, Tables F-1 to F-4 as they stand after
 machine-transcribed from the Official Journal, and pin the tables shipped in
 `phonometry.environmental.cnossos_road`.
 
-`tests/environmental/test_cnossos_road.py` feeds the shipped equations of
+`tests/environment/sources/test_cnossos_road.py` feeds the shipped equations of
 Annex II 2.2 the superseded 2015 coefficient set and requires the workbook's
 levels back, band by band. That is the only oracle that pins the *equations*:
 the Directive itself prints no worked example anywhere in 2.2 or Appendix F.

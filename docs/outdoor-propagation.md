@@ -49,12 +49,12 @@ curves overtake it below ~200 Hz: the relaxation signature.*
 ```python
 import matplotlib.pyplot as plt
 import numpy as np
-from phonometry import environmental
+from phonometry import environment
 
 freqs = np.geomspace(50.0, 10000.0, 400)
 fig, ax = plt.subplots()
 for temp, rh in [(20.0, 50.0), (20.0, 10.0), (0.0, 70.0), (30.0, 80.0)]:
-    ax.loglog(freqs, environmental.air_attenuation(freqs, temp, rh) * 1000.0,
+    ax.loglog(freqs, environment.air_attenuation(freqs, temp, rh) * 1000.0,
               label=f"{temp:g} °C, {rh:g} % RH")
 ax.set_xlabel("Frequency [Hz]")
 ax.set_ylabel("Attenuation coefficient alpha [dB/km]")
@@ -66,21 +66,21 @@ plt.show()
 
 ```python
 import numpy as np
-from phonometry import environmental
+from phonometry import environment
 
 bands = [63, 125, 250, 500, 1000, 2000, 4000, 8000]   # octave-band centres [Hz]
 
 # Pure-tone attenuation coefficient alpha [dB/m] at 20 °C, 50 % RH, one atmosphere
-alpha = environmental.air_attenuation(bands, temperature=20.0, relative_humidity=50.0)
+alpha = environment.air_attenuation(bands, temperature=20.0, relative_humidity=50.0)
 print(np.round(alpha * 1000.0, 2))          # in dB/km, as Table 1 tabulates
 # [  0.12   0.44   1.31   2.73   4.66   9.89  29.67 105.29]
 
 # Reproduce an ISO 9613-1 Table 1 cell exactly (10 °C, 70 %, 1 kHz)
-cell = environmental.air_attenuation(1000.0, 10.0, 70.0, exact_midband=True) * 1000.0
+cell = environment.air_attenuation(1000.0, 10.0, 70.0, exact_midband=True) * 1000.0
 print(round(float(cell), 2))                # 3.66  (dB/km, Table 1)
 
 # Feed real conditions into the ISO 354 power attenuation coefficient m [1/m]
-m = environmental.air_attenuation_m([1000.0, 4000.0], temperature=20.0, relative_humidity=50.0)
+m = environment.air_attenuation_m([1000.0, 4000.0], temperature=20.0, relative_humidity=50.0)
 print(np.round(m, 5))                        # [0.00107 0.00683]
 ```
 
@@ -123,9 +123,9 @@ Table 1 unit, on a linear ordinate over a logarithmic frequency axis). Passing a
 that path as `total_attenuation`, the ISO 9613-2 $A_{atm}$ of Eq. (8).
 
 ```python
-from phonometry import environmental
+from phonometry import environment
 
-res = environmental.atmospheric_attenuation(
+res = environment.atmospheric_attenuation(
     [63, 125, 250, 500, 1000, 2000, 4000, 8000],
     temperature=20.0, relative_humidity=50.0,
 )
@@ -144,10 +144,10 @@ res.plot()   # alpha in dB/km against frequency (needs matplotlib)
 ```python
 import matplotlib.pyplot as plt
 import numpy as np
-from phonometry import environmental
+from phonometry import environment
 
 # One line: the coefficient curve straight from the result.
-res = environmental.atmospheric_attenuation(
+res = environment.atmospheric_attenuation(
     np.geomspace(50.0, 10000.0, 400), temperature=20.0, relative_humidity=50.0,
 )
 res.plot()
@@ -156,7 +156,7 @@ plt.show()
 # Or by hand from air_attenuation (dB/m, so scale by 1000 for dB/km):
 freqs = np.geomspace(50.0, 10000.0, 400)
 fig, ax = plt.subplots()
-ax.semilogx(freqs, environmental.air_attenuation(freqs, 20.0, 50.0) * 1000.0)
+ax.semilogx(freqs, environment.air_attenuation(freqs, 20.0, 50.0) * 1000.0)
 ax.set_xlabel("Frequency [Hz]")
 ax.set_ylabel("Attenuation coefficient alpha [dB/km]")
 plt.show()
@@ -234,11 +234,11 @@ mid bands.
 ```python
 import matplotlib.pyplot as plt
 import numpy as np
-from phonometry import environmental
+from phonometry import environment
 
 bands = np.array([63.0, 125.0, 250.0, 500.0, 1000.0, 2000.0, 4000.0, 8000.0])
-barrier = environmental.Barrier(source_to_edge=101.0, edge_to_receiver=101.0)
-att = environmental.outdoor_propagation_attenuation(
+barrier = environment.Barrier(source_to_edge=101.0, edge_to_receiver=101.0)
+att = environment.outdoor_propagation_attenuation(
     200.0, 1.5, 1.5, bands, ground_source=1.0, ground_middle=1.0,
     ground_receiver=1.0, barrier=barrier, temperature=15.0,
     relative_humidity=70.0,
@@ -275,15 +275,15 @@ plt.show()
 
 ```python
 import numpy as np
-from phonometry import environmental
+from phonometry import environment
 
 bands = [63, 125, 250, 500, 1000, 2000, 4000, 8000]   # octave-band centres [Hz]
 
 # A point source and receiver 1.5 m high, 200 m apart over porous ground
 # (G = 1), screened midway by a barrier that raises the path over its top edge
 # (dss = dsr ~ 101 m). Geometry feeds the pathlength-difference equations.
-barrier = environmental.Barrier(source_to_edge=101.0, edge_to_receiver=101.0)
-att = environmental.outdoor_propagation_attenuation(
+barrier = environment.Barrier(source_to_edge=101.0, edge_to_receiver=101.0)
+att = environment.outdoor_propagation_attenuation(
     200.0, source_height=1.5, receiver_height=1.5, frequencies=bands,
     ground_source=1.0, ground_middle=1.0, ground_receiver=1.0,
     barrier=barrier, temperature=15.0, relative_humidity=70.0,
@@ -296,7 +296,7 @@ att.plot()                        # the stacked breakdown above (needs matplotli
 
 # Predicted receiver level from an octave-band sound power Lw = 95 dB
 lw = np.full(len(bands), 95.0)
-lp = environmental.predicted_receiver_level(
+lp = environment.predicted_receiver_level(
     lw, 200.0, 1.5, 1.5, bands, 1.0, 1.0, 1.0,
     barrier=barrier, temperature=15.0, relative_humidity=70.0,
 )
@@ -322,14 +322,14 @@ general per-region method of 7.3.1); combine them by hand when the alternative
 method is appropriate.
 
 ```python
-from phonometry import environmental
+from phonometry import environment
 
 # Alternative ground term (mean path height hm = 2 m, d = 200 m)
-print(round(environmental.ground_attenuation_alternative(200.0, 2.0), 2))          # 4.43 dB
+print(round(environment.ground_attenuation_alternative(200.0, 2.0), 2))          # 4.43 dB
 # Its companion solid-angle index (add to Dc when using Eq. (10))
-print(round(environmental.directivity_omega(1.5, 1.5, 200.0), 2))                  # 3.01 dB
+print(round(environment.directivity_omega(1.5, 1.5, 200.0), 2))                  # 3.01 dB
 # Long-term meteorological correction (C0 = 2 dB) to subtract from LAT(DW)
-print(round(environmental.meteorological_correction(200.0, 1.5, 1.5, 2.0), 2))     # 1.7 dB
+print(round(environment.meteorological_correction(200.0, 1.5, 1.5, 2.0), 2))     # 1.7 dB
 ```
 
 ### The image source behind the ground effect

@@ -51,6 +51,8 @@ _STI_BAND_CENTERS = (125.0, 250.0, 500.0, 1000.0, 2000.0, 4000.0, 8000.0)
 _LEGEND_UPPER_RIGHT: Final = "upper right"
 #: Legend placement for the range-axis figures, whose curves fall to the right.
 _LEGEND_LOWER_LEFT: Final = "lower left"
+#: Legend placement for the figures whose curves fall to the left instead.
+_LEGEND_UPPER_LEFT: Final = "upper left"
 
 # ---------------------------------------------------------------------------
 # Shared artist colors (matplotlib "tab10" hues plus neutral greys).

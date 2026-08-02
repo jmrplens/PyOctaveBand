@@ -2,7 +2,7 @@
 """Wind-turbine tonal audibility assessment fiche (reportlab renderer).
 
 Renders a
-:class:`~phonometry.environmental.wind_turbine_noise.WindTurbineTonalityResult`
+:class:`~phonometry.environment.sources.wind_turbine.WindTurbineTonalityResult`
 to a one-page PDF laid out like a wind-turbine tonality-assessment report of an
 environmental-noise laboratory. IEC 61400-11:2012+A1:2018 decides whether a
 wind turbine emits an audible tone: from the narrow-band spectrum it forms the
@@ -66,7 +66,7 @@ from ._layout import (
 from .metadata import ReportMetadata
 
 if TYPE_CHECKING:
-    from ..environmental.wind_turbine_noise import WindTurbineTonalityResult
+    from ..environment.sources.wind_turbine import WindTurbineTonalityResult
 
 
 def _fmt(value: float, language: str, decimals: int = 1) -> str:
@@ -274,7 +274,7 @@ def render_wind_turbine_tonality_report(
     """Render a wind-turbine tonal audibility assessment fiche to a PDF at ``path``.
 
     :param result: A
-        :class:`~phonometry.environmental.wind_turbine_noise.WindTurbineTonalityResult`
+        :class:`~phonometry.environment.sources.wind_turbine.WindTurbineTonalityResult`
         carrying the tone/masking levels, the critical band and the tonal
         audibility.
     :param path: Destination path of the PDF file.

@@ -17,11 +17,9 @@ Consistency is enforced at import time (fails loudly):
 
 - every module appears in exactly one section;
 - each section only contains modules from the subpackages declared for it in
-  ``_SECTION_SUBPACKAGES``. Three sections deliberately span more than one
+  ``_SECTION_SUBPACKAGES``. Two sections deliberately span more than one
   parent: ``filters`` adds the package top level (``phonometry`` itself),
-  ``aeroacoustics`` includes ``environmental.wind_turbine_noise`` because the
-  section groups by audience (aircraft and wind energy) while the module
-  lives with the other environmental-rating code, and ``power`` includes
+  and ``power`` includes
   ``metrology.intensity_compliance`` (the IEC 61043 class checker sits with
   the other instrument-conformance code but documents the intensity chain
   the rest of the section measures with).
@@ -218,30 +216,30 @@ _SECTION_LIST: tuple[Section, ...] = (
         label_en="Environmental acoustics",
         label_es="Acústica ambiental",
         modules=(
-            "phonometry.environmental.outdoor_propagation",
-            "phonometry.environmental.cnossos_road",
-            "phonometry.environmental.ground_barriers",
-            "phonometry.environmental.atmospheric_refraction",
-            "phonometry.environmental.air_absorption",
-            "phonometry.environmental.cnossos_rail",
-            "phonometry.environmental.impulse_prominence",
-            "phonometry.environmental.impulsive_sound",
-            "phonometry.environmental.rating",
-            "phonometry.environmental.measurement",
-            "phonometry.environmental.spanish_regulation",
+            "phonometry.environment.propagation.outdoor_propagation",
+            "phonometry.environment.sources.cnossos_road",
+            "phonometry.environment.propagation.ground_barriers",
+            "phonometry.environment.propagation.refraction",
+            "phonometry.environment.propagation.air_absorption",
+            "phonometry.environment.sources.cnossos_rail",
+            "phonometry.environment.assessment.impulse_prominence",
+            "phonometry.environment.assessment.impulsive_sound",
+            "phonometry.environment.assessment.rating",
+            "phonometry.environment.sources.wind_turbine",
+            "phonometry.environment.assessment.measurement",
+            "phonometry.environment.assessment.spain",
         ),
     ),
     Section(
         key="aeroacoustics",
-        label_en="Aircraft and wind energy",
-        label_es="Aeronaves y energía eólica",
+        label_en="Aircraft noise",
+        label_es="Ruido de aeronaves",
         modules=(
             "phonometry.aircraft.aircraft_noise",
             "phonometry.aircraft.atmospheric_absorption",
             "phonometry.aircraft.airport_noise",
             "phonometry.aircraft.anp_fleet",
             "phonometry.aircraft.rotorcraft_noise",
-            "phonometry.environmental.wind_turbine_noise",
         ),
     ),
     Section(
@@ -340,8 +338,8 @@ _SECTION_SUBPACKAGES: dict[str, tuple[str, ...]] = {
     "building": ("building",),
     "materials": ("materials",),
     "vibration": ("vibration",),
-    "environment": ("environmental",),
-    "aeroacoustics": ("aircraft", "environmental"),
+    "environment": ("environment",),
+    "aeroacoustics": ("aircraft",),
     "underwater": ("underwater",),
     "power": ("emission", "metrology"),
     "electroacoustics": ("electroacoustics",),
@@ -381,7 +379,7 @@ OBJECT_MODULE_OVERRIDES: dict[str, str] = {
     "plot_transmission_tube_geometry": "phonometry.materials.impedance_tube",
     "plot_silencer_geometry": "phonometry.noise_control.silencers",
     "plot_plenum_geometry": "phonometry.noise_control.hvac",
-    "plot_barrier_geometry": "phonometry.environmental.ground_barriers",
+    "plot_barrier_geometry": "phonometry.environment.propagation.ground_barriers",
     "plot_microphone_positions": "phonometry.emission.sound_power",
     "plot_aperture_geometry": "phonometry.building.aperture_transmission",
     "plot_piston_geometry": "phonometry.electroacoustics.piston",

@@ -40,20 +40,20 @@ $K_t$ is evaluated band by band and, when several emergent tones are present,
 the largest of the resulting $K_t$ governs (step d):
 
 ```python
-from phonometry import environmental
+from phonometry import environment
 
 freqs = [100, 125, 160, 200, 250, 315, 400, 500, 630, 800, 1000]
 levels = [58.0, 60.0, 59.0, 61.0, 72.0, 62.0, 60.0, 58.0, 56.0, 54.0, 52.0]
 
-kt = environmental.tonal_correction(levels, freqs)
+kt = environment.tonal_correction(levels, freqs)
 kt.correction              # 6 dB
 kt.governing_frequency     # 250.0 Hz
 kt.differences[4]          # Lt = 10.5 dB above the mean of the neighbours
 
-environmental.low_frequency_correction(lceq=76.0, laeq=63.0)   # Lf = 13 dB -> Kf = 3 dB
-environmental.impulsive_correction(laieq=68.0, laeq=63.0)      # Li = 5 dB  -> Ki = 0 dB
-environmental.corrected_level(63.0, kt=6, kf=3, ki=0)          # LKeq = 72.0 dB
-environmental.total_correction(kt=6, kf=6, ki=3)               # 9.0 dB: the cap
+environment.low_frequency_correction(lceq=76.0, laeq=63.0)   # Lf = 13 dB -> Kf = 3 dB
+environment.impulsive_correction(laieq=68.0, laeq=63.0)      # Li = 5 dB  -> Ki = 0 dB
+environment.corrected_level(63.0, kt=6, kf=3, ki=0)          # LKeq = 72.0 dB
+environment.total_correction(kt=6, kf=6, ki=3)               # 9.0 dB: the cap
 ```
 
 ## Relationship with the ISO 1996 procedures
@@ -100,20 +100,20 @@ own rounding: add 0.5 dB to the result and take the integer part, which is what
 `round_reported_level()` does.
 
 ```python
-from phonometry import environmental
+from phonometry import environment
 
-environmental.RD1367_PERIOD_CLOCK_LIMITS["day"]     # (7, 19)
-environmental.RD1367_PERIOD_HOURS["day"]            # 12.0 h
+environment.RD1367_PERIOD_CLOCK_LIMITS["day"]     # (7, 19)
+environment.RD1367_PERIOD_HOURS["day"]            # 12.0 h
 
-day = [environmental.NoisePhase(2, 0.0, label="cerrada"),
-       environmental.NoisePhase(6, 50.0, kt=6, kf=3),
-       environmental.NoisePhase(4, 48.0, kt=3, kf=3)]
+day = [environment.NoisePhase(2, 0.0, label="cerrada"),
+       environment.NoisePhase(6, 50.0, kt=6, kf=3),
+       environment.NoisePhase(4, 48.0, kt=3, kf=3)]
 
-lkeq_d = environmental.evaluation_period_level(day)   # 56.82 dB, unrounded
-environmental.round_reported_level(lkeq_d)            # 57 dB
+lkeq_d = environment.evaluation_period_level(day)   # 56.82 dB, unrounded
+environment.round_reported_level(lkeq_d)            # 57 dB
 
-lk_d = environmental.long_term_corrected_level([57.0, 0.0], weights=[303, 62])
-environmental.round_reported_level(lk_d)              # 56 dB (303 days open, 62 closed)
+lk_d = environment.long_term_corrected_level([57.0, 0.0], weights=[303, 62])
+environment.round_reported_level(lk_d)              # 56 dB (303 days open, 62 closed)
 ```
 
 ## Acoustic quality objectives and immission limit values
@@ -141,16 +141,16 @@ And in areas urbanised after the regulation entered into force (24 October
 `urbanisation="new"` applies.
 
 ```python
-from phonometry import environmental
+from phonometry import environment
 
-environmental.outdoor_quality_objectives("a")                       # 65 / 65 / 55 dB
-environmental.outdoor_quality_objectives("a", urbanisation="new")   # 60 / 60 / 50 dB
-environmental.indoor_quality_objectives("residential", "bedrooms")  # 40 / 40 / 30 dB
-environmental.infrastructure_limits("a")                            # 60 / 60 / 50 dB
-environmental.max_infrastructure_limit("a")                         # 85 dB (LAmax)
-environmental.activity_limits("a")                                  # 55 / 55 / 45 dB
-environmental.adjacent_premises_limits("residential", "bedrooms")   # 35 / 35 / 25 dB
-environmental.vibration_quality_objective("residential")            # 75 dB
+environment.outdoor_quality_objectives("a")                       # 65 / 65 / 55 dB
+environment.outdoor_quality_objectives("a", urbanisation="new")   # 60 / 60 / 50 dB
+environment.indoor_quality_objectives("residential", "bedrooms")  # 40 / 40 / 30 dB
+environment.infrastructure_limits("a")                            # 60 / 60 / 50 dB
+environment.max_infrastructure_limit("a")                         # 85 dB (LAmax)
+environment.activity_limits("a")                                  # 55 / 55 / 45 dB
+environment.adjacent_premises_limits("residential", "bedrooms")   # 35 / 35 / 25 dB
+environment.vibration_quality_objective("residential")            # 75 dB
 ```
 
 Meeting an immission limit value is not simply staying below the number in the
@@ -183,16 +183,16 @@ each $L_{Keq,Ti}$, 58 dB on the daily $L_{Keq,x}$ and 55 dB on the annual
 $L_{K,x}$:
 
 ```python
-from phonometry import environmental
+from phonometry import environment
 
-day = [environmental.NoisePhase(2, 0.0, label="cerrada"),
-       environmental.NoisePhase(6, 50.0, kt=6, kf=3),
-       environmental.NoisePhase(4, 48.0, kt=3, kf=3)]
-evening = [environmental.NoisePhase(2, 48.0, kt=3, kf=3),
-           environmental.NoisePhase(2, 0.0, label="cerrada")]
+day = [environment.NoisePhase(2, 0.0, label="cerrada"),
+       environment.NoisePhase(6, 50.0, kt=6, kf=3),
+       environment.NoisePhase(4, 48.0, kt=3, kf=3)]
+evening = [environment.NoisePhase(2, 48.0, kt=3, kf=3),
+           environment.NoisePhase(2, 0.0, label="cerrada")]
 
-limits = environmental.activity_limits("a")          # 55 / 55 / 45 dB
-verdict = environmental.assess_activity(
+limits = environment.activity_limits("a")          # 55 / 55 / 45 dB
+verdict = environment.assess_activity(
     {"day": day, "evening": evening}, limits, operating_days=303)
 
 verdict.periods[0].reported_level        # 57 dB  (LKeq,d)
@@ -207,17 +207,17 @@ verdict.complies                         # False: LK,d exceeds 55 dB
 
 ```python
 import matplotlib.pyplot as plt
-from phonometry import environmental
+from phonometry import environment
 
-day = [environmental.NoisePhase(2, 0.0, label="cerrada"),
-       environmental.NoisePhase(6, 50.0, kt=6, kf=3),
-       environmental.NoisePhase(4, 48.0, kt=3, kf=3)]
-evening = [environmental.NoisePhase(2, 48.0, kt=3, kf=3),
-           environmental.NoisePhase(2, 0.0, label="cerrada")]
+day = [environment.NoisePhase(2, 0.0, label="cerrada"),
+       environment.NoisePhase(6, 50.0, kt=6, kf=3),
+       environment.NoisePhase(4, 48.0, kt=3, kf=3)]
+evening = [environment.NoisePhase(2, 48.0, kt=3, kf=3),
+           environment.NoisePhase(2, 0.0, label="cerrada")]
 
-verdict = environmental.assess_activity(
+verdict = environment.assess_activity(
     {"day": day, "evening": evening},
-    environmental.activity_limits("a"),
+    environment.activity_limits("a"),
     operating_days=303,
 )
 verdict.plot()
@@ -248,15 +248,15 @@ applicable limit values and the boxed verdict. The default language is Spanish,
 the language of the regulation; `language="en"` translates it.
 
 ```python
-from phonometry import environmental
+from phonometry import environment
 
-verdict = environmental.assess_activity(
-    {"day": [environmental.NoisePhase(2, 0.0, label="cerrada"),
-             environmental.NoisePhase(6, 50.0, kt=6, kf=3),
-             environmental.NoisePhase(4, 48.0, kt=3, kf=3)],
-     "evening": [environmental.NoisePhase(2, 48.0, kt=3, kf=3),
-                 environmental.NoisePhase(2, 0.0, label="cerrada")]},
-    environmental.activity_limits("a"),
+verdict = environment.assess_activity(
+    {"day": [environment.NoisePhase(2, 0.0, label="cerrada"),
+             environment.NoisePhase(6, 50.0, kt=6, kf=3),
+             environment.NoisePhase(4, 48.0, kt=3, kf=3)],
+     "evening": [environment.NoisePhase(2, 48.0, kt=3, kf=3),
+                 environment.NoisePhase(2, 0.0, label="cerrada")]},
+    environment.activity_limits("a"),
     operating_days=303,
 )
 
@@ -302,7 +302,7 @@ exceeds 9 dB.
 - [Impulsive-sound prominence](impulse-prominence.md): the ISO/PAS 1996-3
   impulsive adjustment, the relative of $K_i$ that is not interchangeable with
   it.
-- API reference: [`environmental.spanish_regulation`](https://jmrplens.github.io/phonometry/reference/api/environment/spanish-regulation/).
+- API reference: [`environment.assessment.spain`](https://jmrplens.github.io/phonometry/reference/api/environment/spain/).
 
 ## References
 

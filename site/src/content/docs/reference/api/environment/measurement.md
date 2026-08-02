@@ -1,5 +1,5 @@
 ---
-title: "environmental.measurement"
+title: "environment.assessment.measurement"
 description: "Determination of environmental-noise sound pressure levels (ISO 1996-2:2017)."
 sidebar:
   label: "measurement"
@@ -8,7 +8,7 @@ sidebar:
 Determination of environmental-noise sound pressure levels (ISO 1996-2:2017).
 
 The measurement companion of the ISO 1996-1 descriptors in
-`phonometry.environmental`. ISO 1996-2 covers *how* the levels that feed
+`phonometry.environment`. ISO 1996-2 covers *how* the levels that feed
 those descriptors are obtained: the tonal adjustment for prominent tones, the
 residual-noise correction, and the measurement-uncertainty budget.
 

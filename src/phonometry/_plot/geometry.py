@@ -45,7 +45,7 @@ if TYPE_CHECKING:
     from ..building.panel_transmission import SoundReductionResult
     from ..electroacoustics.piston import RadiatingPistonResult
     from ..emission.intensity import IntensityResult
-    from ..environmental.ground_barriers import BarrierInsertionLoss
+    from ..environment.propagation.ground_barriers import BarrierInsertionLoss
     from ..materials.diffuser_design import DiffuserPolarResponse
     from ..materials.impedance_tube import ImpedanceTubeResult, TransferMatrix
     from ..materials.metadiffuser import MetadiffuserResult
@@ -1784,7 +1784,7 @@ def plot_barrier_geometry(
     Ground line, thin (or thick) screen, the direct path cut by the screen
     and the diffracted path over the top edge(s), with the path-length
     difference annotated. Distances follow
-    :func:`~phonometry.environmental.barrier_insertion_loss`:
+    :func:`~phonometry.environment.barrier_insertion_loss`:
     ``receiver_distance`` is horizontal from the source.
 
     :param ax: Existing axes, or ``None`` to create a figure.

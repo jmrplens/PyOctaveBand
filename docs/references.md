@@ -812,7 +812,7 @@ it; the list grows as guides gain their References sections.
   for adjustment of LAeq* (ISO/PAS 1996-3:2022).
   [iso.org catalogue](https://www.iso.org/standard/77035.html).
   The objective onset-analysis method implemented by
-  `environmental.impulsive_sound`: the level history LpAF (Clause 4), the onset
+  `environment.assessment.impulsive_sound`: the level history LpAF (Clause 4), the onset
   detection and least-squares onset rate (Clauses 3.3-3.5), the prominence
   (Clause 5, Formula 2) and the adjustment KI (Clause 6, Formula 3).
   Cited by [Impulsive-sound prominence](impulse-prominence.md).

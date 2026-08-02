@@ -4,7 +4,7 @@
 
 The [ISO 9613-2 general method](outdoor-propagation.md) folds the ground and
 barrier terms into tabulated, energy-based corrections. This page covers the
-underlying wave acoustics in `phonometry.environmental.ground_barriers`: the
+underlying wave acoustics in `phonometry.environment.propagation.ground_barriers`: the
 **spherical-wave reflection coefficient** of a finite-impedance ground
 (Weyl-Van der Pol) and the **wave-theoretic diffraction** of a screen, both in
 a homogeneous (non-refracting, non-turbulent) atmosphere. These are the physical

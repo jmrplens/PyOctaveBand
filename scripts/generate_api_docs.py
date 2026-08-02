@@ -797,7 +797,7 @@ _LEGACY_MODULE_ALIASES = {
         "phonometry.aircraft.atmospheric_absorption"
     ),
     "phonometry.environmental_measurement": (
-        "phonometry.environmental.measurement"
+        "phonometry.environment.assessment.measurement"
     ),
     "phonometry.underwater_acoustics": "phonometry.underwater.acoustics",
     "phonometry.underwater_propagation": "phonometry.underwater.propagation",

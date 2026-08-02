@@ -130,7 +130,7 @@ $c_0 = 343\ \mathrm{m/s}$) and the air-absorption term $4mV$.
 
 ```python
 import matplotlib.pyplot as plt
-from phonometry import environmental, room
+from phonometry import environment, room
 
 # A 10 x 7 x 3.5 m room: hard end walls, lightly treated side walls and a
 # very absorptive floor/ceiling pair (carpet plus an acoustic ceiling).
@@ -138,7 +138,7 @@ bands = [125.0, 250.0, 500.0, 1000.0, 2000.0, 4000.0]
 alpha_x = [0.06, 0.07, 0.08, 0.09, 0.10, 0.10]
 alpha_y = [0.12, 0.14, 0.16, 0.18, 0.20, 0.20]
 alpha_z = [0.30, 0.50, 0.65, 0.78, 0.82, 0.80]
-m = environmental.air_attenuation_m(bands, 20.0, 50.0)   # air at 20 C / 50 % RH
+m = environment.air_attenuation_m(bands, 20.0, 50.0)   # air at 20 C / 50 % RH
 res = room.reverberation_time_models((10.0, 7.0, 3.5),
                                      (alpha_x, alpha_y, alpha_z),
                                      air_attenuation=m, frequencies=bands)
@@ -182,9 +182,9 @@ metre, from the ISO 9613-1
 [atmospheric absorption](/phonometry/guides/outdoor-propagation/)):
 
 ```python
-from phonometry import environmental, room
+from phonometry import environment, room
 
-m = environmental.air_attenuation_m(2000.0, temperature=20.0, relative_humidity=50.0)
+m = environment.air_attenuation_m(2000.0, temperature=20.0, relative_humidity=50.0)
 surfaces = [(40.0, 0.3), (40.0, 0.3), (24.0, 0.3),
             (24.0, 0.3), (15.0, 0.3), (15.0, 0.3)]
 print(round(room.eyring_reverberation_time(120.0, surfaces, air_attenuation=m), 3))
@@ -265,9 +265,9 @@ res.plot()   # the five model curves per band (the figure above)
 
 ```python
 import matplotlib.pyplot as plt
-from phonometry import environmental, room
+from phonometry import environment, room
 
-m = environmental.air_attenuation_m([125.0, 250.0, 500.0, 1000.0, 2000.0, 4000.0], 20.0, 50.0)
+m = environment.air_attenuation_m([125.0, 250.0, 500.0, 1000.0, 2000.0, 4000.0], 20.0, 50.0)
 room.reverberation_time_models(
     (10.0, 7.0, 3.5),
     (
@@ -433,4 +433,4 @@ rather than a statistical prediction.
 
 ## See also
 
-- API reference: [`room.reverberation_prediction`](/phonometry/reference/api/rooms/reverberation-prediction/) and [`environmental.air_absorption`](/phonometry/reference/api/environment/air-absorption/).
+- API reference: [`room.reverberation_prediction`](/phonometry/reference/api/rooms/reverberation-prediction/) and [`environment.propagation.air_absorption`](/phonometry/reference/api/environment/air-absorption/).

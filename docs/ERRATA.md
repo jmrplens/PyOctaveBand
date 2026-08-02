@@ -1114,7 +1114,7 @@ which is the check that enforces the rule; see
   printed with them.
 - **Library behaviour:** implements the spelled-out reading, weighting the
   onset rate by 3 and the level difference by 2 (`predicted_prominence` in
-  [`impulse_prominence.py`](../src/phonometry/environmental/impulse_prominence.py)),
+  [`impulse_prominence.py`](../src/phonometry/environment/assessment/impulse_prominence.py)),
   which is also the NT ACOU 112:2002 form the PAS carries over.
 - **Status:** unreported.
 
@@ -1136,7 +1136,7 @@ which is the check that enforces the rule; see
   1 kHz being both).
 - **Library behaviour:** unaffected. The library never reads Table 2: it
   computes $A_\text{atm}$ from the ISO 9613-1 formula directly
-  ([`air_absorption.py`](../src/phonometry/environmental/air_absorption.py)),
+  ([`air_absorption.py`](../src/phonometry/environment/propagation/air_absorption.py)),
   so it yields 4,15 dB/km for this condition.
 - **Status:** unreported.
 
@@ -1969,7 +1969,7 @@ which is the check that enforces the rule; see
   in the autonomous-community noise regulations that transpose this Annex
   print `10 < Lf <= 15`.
 - **Library behaviour:**
-  [`low_frequency_correction`](../src/phonometry/environmental/spanish_regulation.py)
+  [`low_frequency_correction`](../src/phonometry/environment/assessment/spain.py)
   and `impulsive_correction` implement $10 < L \le 15$, with a regression
   test pinning the three branches at the 10 dB and 15 dB boundaries.
 - **Status:** unreported (national regulation, not a standards body).
@@ -1995,7 +1995,7 @@ which is the check that enforces the rule; see
   from 125 Hz to 4 kHz", read: "each octave band i from 63 Hz to 8 kHz"'. The
   same corrigendum also adds "octave bands" to the frequency range of 2.1.1.
 - **Library behaviour:**
-  [`cnossos_road`](../src/phonometry/environmental/cnossos_road.py) works over
+  [`cnossos_road`](../src/phonometry/environment/sources/cnossos_road.py) works over
   the corrected 63 Hz to 8 kHz grid (`ROAD_OCTAVE_BANDS`), pinned by
   `test_octave_bands_are_the_corrected_range` and by the workbook cases, whose
   published levels cover all eight bands.

@@ -1,5 +1,5 @@
 ---
-title: "environmental.air_absorption"
+title: "environment.propagation.air_absorption"
 description: "Atmospheric absorption of sound: ISO 9613-1:1993."
 sidebar:
   label: "air_absorption"

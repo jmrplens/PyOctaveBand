@@ -65,20 +65,20 @@ Para $K_t$ se evalúa banda a banda y, cuando hay varios tonos emergentes,
 gobierna el mayor de los $K_t$ obtenidos (paso d):
 
 ```python
-from phonometry import environmental
+from phonometry import environment
 
 freqs = [100, 125, 160, 200, 250, 315, 400, 500, 630, 800, 1000]
 levels = [58.0, 60.0, 59.0, 61.0, 72.0, 62.0, 60.0, 58.0, 56.0, 54.0, 52.0]
 
-kt = environmental.tonal_correction(levels, freqs)
+kt = environment.tonal_correction(levels, freqs)
 kt.correction              # 6 dB
 kt.governing_frequency     # 250,0 Hz
 kt.differences[4]          # Lt = 10,5 dB sobre la media de las vecinas
 
-environmental.low_frequency_correction(lceq=76.0, laeq=63.0)   # Lf = 13 dB -> Kf = 3 dB
-environmental.impulsive_correction(laieq=68.0, laeq=63.0)      # Li = 5 dB  -> Ki = 0 dB
-environmental.corrected_level(63.0, kt=6, kf=3, ki=0)          # LKeq = 72,0 dB
-environmental.total_correction(kt=6, kf=6, ki=3)               # 9,0 dB: el tope
+environment.low_frequency_correction(lceq=76.0, laeq=63.0)   # Lf = 13 dB -> Kf = 3 dB
+environment.impulsive_correction(laieq=68.0, laeq=63.0)      # Li = 5 dB  -> Ki = 0 dB
+environment.corrected_level(63.0, kt=6, kf=3, ki=0)          # LKeq = 72,0 dB
+environment.total_correction(kt=6, kf=6, ki=3)               # 9,0 dB: el tope
 ```
 
 ## Relación con los procedimientos de ISO 1996
@@ -125,20 +125,20 @@ fija además su propio redondeo: se incrementa el resultado en 0,5 dB y se toma
 la parte entera, que es lo que hace `round_reported_level()`.
 
 ```python
-from phonometry import environmental
+from phonometry import environment
 
-environmental.RD1367_PERIOD_CLOCK_LIMITS["day"]     # (7, 19)
-environmental.RD1367_PERIOD_HOURS["day"]            # 12,0 h
+environment.RD1367_PERIOD_CLOCK_LIMITS["day"]     # (7, 19)
+environment.RD1367_PERIOD_HOURS["day"]            # 12,0 h
 
-day = [environmental.NoisePhase(2, 0.0, label="cerrada"),
-       environmental.NoisePhase(6, 50.0, kt=6, kf=3),
-       environmental.NoisePhase(4, 48.0, kt=3, kf=3)]
+day = [environment.NoisePhase(2, 0.0, label="cerrada"),
+       environment.NoisePhase(6, 50.0, kt=6, kf=3),
+       environment.NoisePhase(4, 48.0, kt=3, kf=3)]
 
-lkeq_d = environmental.evaluation_period_level(day)   # 56,82 dB sin redondear
-environmental.round_reported_level(lkeq_d)            # 57 dB
+lkeq_d = environment.evaluation_period_level(day)   # 56,82 dB sin redondear
+environment.round_reported_level(lkeq_d)            # 57 dB
 
-lk_d = environmental.long_term_corrected_level([57.0, 0.0], weights=[303, 62])
-environmental.round_reported_level(lk_d)              # 56 dB (303 días abierta, 62 cerrada)
+lk_d = environment.long_term_corrected_level([57.0, 0.0], weights=[303, 62])
+environment.round_reported_level(lk_d)              # 56 dB (303 días abierta, 62 cerrada)
 ```
 
 ## Objetivos de calidad acústica y valores límite de inmisión
@@ -166,16 +166,16 @@ entrada en vigor del reglamento (24 de octubre de 2007) el objetivo es 5 dB más
 estricto (artículo 14.2), que es lo que aplica `urbanisation="new"`.
 
 ```python
-from phonometry import environmental
+from phonometry import environment
 
-environmental.outdoor_quality_objectives("a")                       # 65 / 65 / 55 dB
-environmental.outdoor_quality_objectives("a", urbanisation="new")   # 60 / 60 / 50 dB
-environmental.indoor_quality_objectives("residential", "bedrooms")  # 40 / 40 / 30 dB
-environmental.infrastructure_limits("a")                            # 60 / 60 / 50 dB
-environmental.max_infrastructure_limit("a")                         # 85 dB (LAmax)
-environmental.activity_limits("a")                                  # 55 / 55 / 45 dB
-environmental.adjacent_premises_limits("residential", "bedrooms")   # 35 / 35 / 25 dB
-environmental.vibration_quality_objective("residential")            # 75 dB
+environment.outdoor_quality_objectives("a")                       # 65 / 65 / 55 dB
+environment.outdoor_quality_objectives("a", urbanisation="new")   # 60 / 60 / 50 dB
+environment.indoor_quality_objectives("residential", "bedrooms")  # 40 / 40 / 30 dB
+environment.infrastructure_limits("a")                            # 60 / 60 / 50 dB
+environment.max_infrastructure_limit("a")                         # 85 dB (LAmax)
+environment.activity_limits("a")                                  # 55 / 55 / 45 dB
+environment.adjacent_premises_limits("residential", "bedrooms")   # 35 / 35 / 25 dB
+environment.vibration_quality_objective("residential")            # 75 dB
 ```
 
 Cumplir un valor límite de inmisión no es simplemente quedar por debajo del
@@ -209,16 +209,16 @@ $L_{Keq,Ti}$, 58 dB sobre el $L_{Keq,x}$ diario y 55 dB sobre el $L_{K,x}$
 anual:
 
 ```python
-from phonometry import environmental
+from phonometry import environment
 
-day = [environmental.NoisePhase(2, 0.0, label="cerrada"),
-       environmental.NoisePhase(6, 50.0, kt=6, kf=3),
-       environmental.NoisePhase(4, 48.0, kt=3, kf=3)]
-evening = [environmental.NoisePhase(2, 48.0, kt=3, kf=3),
-           environmental.NoisePhase(2, 0.0, label="cerrada")]
+day = [environment.NoisePhase(2, 0.0, label="cerrada"),
+       environment.NoisePhase(6, 50.0, kt=6, kf=3),
+       environment.NoisePhase(4, 48.0, kt=3, kf=3)]
+evening = [environment.NoisePhase(2, 48.0, kt=3, kf=3),
+           environment.NoisePhase(2, 0.0, label="cerrada")]
 
-limits = environmental.activity_limits("a")          # 55 / 55 / 45 dB
-verdict = environmental.assess_activity(
+limits = environment.activity_limits("a")          # 55 / 55 / 45 dB
+verdict = environment.assess_activity(
     {"day": day, "evening": evening}, limits, operating_days=303)
 
 verdict.periods[0].reported_level        # 57 dB  (LKeq,d)
@@ -233,17 +233,17 @@ verdict.complies                         # False: LK,d supera los 55 dB
 
 ```python
 import matplotlib.pyplot as plt
-from phonometry import environmental
+from phonometry import environment
 
-day = [environmental.NoisePhase(2, 0.0, label="cerrada"),
-       environmental.NoisePhase(6, 50.0, kt=6, kf=3),
-       environmental.NoisePhase(4, 48.0, kt=3, kf=3)]
-evening = [environmental.NoisePhase(2, 48.0, kt=3, kf=3),
-           environmental.NoisePhase(2, 0.0, label="cerrada")]
+day = [environment.NoisePhase(2, 0.0, label="cerrada"),
+       environment.NoisePhase(6, 50.0, kt=6, kf=3),
+       environment.NoisePhase(4, 48.0, kt=3, kf=3)]
+evening = [environment.NoisePhase(2, 48.0, kt=3, kf=3),
+           environment.NoisePhase(2, 0.0, label="cerrada")]
 
-verdict = environmental.assess_activity(
+verdict = environment.assess_activity(
     {"day": day, "evening": evening},
-    environmental.activity_limits("a"),
+    environment.activity_limits("a"),
     operating_days=303,
 )
 verdict.plot(language="es")
@@ -275,15 +275,15 @@ idioma por defecto es el español, el del reglamento; `language="en"` la
 traduce.
 
 ```python
-from phonometry import environmental
+from phonometry import environment
 
-verdict = environmental.assess_activity(
-    {"day": [environmental.NoisePhase(2, 0.0, label="cerrada"),
-             environmental.NoisePhase(6, 50.0, kt=6, kf=3),
-             environmental.NoisePhase(4, 48.0, kt=3, kf=3)],
-     "evening": [environmental.NoisePhase(2, 48.0, kt=3, kf=3),
-                 environmental.NoisePhase(2, 0.0, label="cerrada")]},
-    environmental.activity_limits("a"),
+verdict = environment.assess_activity(
+    {"day": [environment.NoisePhase(2, 0.0, label="cerrada"),
+             environment.NoisePhase(6, 50.0, kt=6, kf=3),
+             environment.NoisePhase(4, 48.0, kt=3, kf=3)],
+     "evening": [environment.NoisePhase(2, 48.0, kt=3, kf=3),
+                 environment.NoisePhase(2, 0.0, label="cerrada")]},
+    environment.activity_limits("a"),
     operating_days=303,
 )
 
@@ -314,7 +314,7 @@ donde termina el sonómetro.
 - [Niveles integrados y estadísticos](/phonometry/es/guides/levels/): los niveles $L_{Aeq}$, $L_{Ceq}$ y $L_{AIeq}$ por fase que alimentan las tres correcciones.
 - [Código Técnico de la Edificación (CTE DB-HR)](/phonometry/es/guides/spanish-building-code/): la otra mitad de la normativa española, que comparte con esta el índice de ruido día $L_d$ del emplazamiento.
 - [Prominencia de sonidos impulsivos](/phonometry/es/guides/impulse-prominence/): el ajuste por impulsividad de ISO/PAS 1996-3, el pariente del $K_i$ que no es intercambiable con él.
-- Referencia de la API: [`environmental.spanish_regulation`](/phonometry/es/reference/api/environment/spanish-regulation/).
+- Referencia de la API: [`environment.assessment.spain`](/phonometry/es/reference/api/environment/spain/).
 
 ## Respuestas rápidas
 
