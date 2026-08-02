@@ -76,7 +76,7 @@ of a 5.6 cm layer sits at 860 Hz (printed p. 129). The third of those is
 reproduced by $\operatorname{Re}(\mu_b)$: the printed sentence calls it
 a modulus, but $\lvert \mu_b \rvert$ is 0.939 at 1500 Hz against the
 printed 0.82, and `docs/ERRATA.md` records why. See
-`tests/materials/absorbers/test_biot.py`.
+`tests/materials/test_biot.py`.
 
 > Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
 
