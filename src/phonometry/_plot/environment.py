@@ -58,9 +58,9 @@ if TYPE_CHECKING:
 _FREQ_LABEL = "Frequency [Hz]"
 _HEIGHT_LABEL = "Height [m]"
 _RANGE_LABEL = "Range [m]"
-_TOTAL_A_LABEL = r"$A$ — total"
+_TOTAL_A_LABEL = "$A$ — total"
 _FREE_FIELD_LABEL = "Level re free field [dB]"
-_LT_LABEL = r"$L_t$ [dB]"
+_LT_LABEL = "$L_t$ [dB]"
 
 _STRINGS: dict[str, str] = {
     "Narrowband spectrum": "Espectro de banda estrecha",
@@ -84,7 +84,7 @@ _STRINGS: dict[str, str] = {
     "$A_{atm}$ — atmospheric": "$A_{atm}$ — atmosférica",
     "$A_{gr}$ — ground": "$A_{gr}$ — suelo",
     "$A_{bar}$ — barrier": "$A_{bar}$ — barrera",
-    "$A$ — total": "$A$ — total",
+    _TOTAL_A_LABEL: _TOTAL_A_LABEL,
     "Attenuation A [dB]": "Atenuación A [dB]",
     "ISO 9613-2 attenuation breakdown": "Desglose de atenuación ISO 9613-2",
     "CNOSSOS-EU railway source line power": (
@@ -116,7 +116,7 @@ _STRINGS: dict[str, str] = {
     "Band level": "Nivel de banda",
     "$L_t$ vs neighbour mean": "$L_t$ frente a la media de contiguas",
     "Band level [dB]": "Nivel de banda [dB]",
-    "$L_t$ [dB]": "$L_t$ [dB]",
+    _LT_LABEL: _LT_LABEL,
     "RD 1367/2007 tonal correction $K_t$ = {kt} dB":
         "Corrección tonal $K_t$ = {kt} dB (RD 1367/2007)",
     "max $L_{Keq,Ti}$": "máx. $L_{Keq,Ti}$",
@@ -352,7 +352,7 @@ def plot_outdoor_attenuation(
 
     kwargs.setdefault("color", _C_REFERENCE)
     kwargs.setdefault("marker", "D")
-    kwargs.setdefault("label", _t("$A$ — total", language))
+    kwargs.setdefault("label", _t(_TOTAL_A_LABEL, language))
     ax.plot(positions, np.asarray(result.a_total, dtype=np.float64),
             zorder=4, **kwargs)
     ax.axhline(0.0, color=_C_MUTED, lw=0.8)
@@ -639,7 +639,7 @@ def plot_tonal_correction_rd1367(
         index = int(np.argmin(np.abs(freqs - result.governing_frequency)))
         twin.plot([positions[index]], [lt[index]], "*", color=_C_REFERENCE,
                   ms=14.0, zorder=5)
-    twin.set_ylabel(_t("$L_t$ [dB]", language))
+    twin.set_ylabel(_t(_LT_LABEL, language))
     twin.axhline(0.0, color=_C_MUTED, lw=0.8)
 
     ax.set_title(
