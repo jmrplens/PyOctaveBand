@@ -435,4 +435,4 @@ set out in "What is anchored on a published number, and what is not" above.
 - [Predicting Panel Sound Insulation](panel-sound-insulation.md):
   the mass-spring-mass resonance of a double leaf, the airborne counterpart of
   the lining resonance.
-- API reference: [`building.resilient_layers`](https://jmrplens.github.io/phonometry/reference/api/building/resilient-layers/).
+- API reference: [`building.prediction.resilient_layers`](https://jmrplens.github.io/phonometry/reference/api/building/resilient-layers/).

@@ -2,13 +2,13 @@
 """EN/ISO 12354-1/-2/-3 predicted building sound-insulation fiche (reportlab).
 
 Renders a
-:class:`~phonometry.building.building_prediction.AirbornePredictionResult`
+:class:`~phonometry.building.prediction.global_model.AirbornePredictionResult`
 (predicted apparent sound reduction index ``R'`` between rooms, EN/ISO 12354-1),
 an
-:class:`~phonometry.building.building_prediction.ImpactPredictionResult`
+:class:`~phonometry.building.prediction.global_model.ImpactPredictionResult`
 (predicted apparent normalized impact sound pressure level ``L'n``, EN/ISO
 12354-2) or a
-:class:`~phonometry.building.facade_prediction.FacadePredictionResult`
+:class:`~phonometry.building.prediction.facade.FacadePredictionResult`
 (predicted standardized level difference of a facade ``D2m,nT``, EN/ISO
 12354-3) to a one-page **prediction** report. Unlike the measurement fiches
 (:mod:`.iso10140`, :mod:`.iso16283`, :mod:`.iso15186`), the reported result is
@@ -61,15 +61,15 @@ from .iso717 import _metadata_pairs
 from .metadata import ReportMetadata
 
 if TYPE_CHECKING:
-    from ..building.building_prediction import (
-        AirbornePredictionResult,
-        ImpactPredictionResult,
-    )
-    from ..building.detailed_prediction import (
+    from ..building.prediction.detailed_model import (
         DetailedAirborneResult,
         DetailedImpactResult,
     )
-    from ..building.facade_prediction import FacadePredictionResult
+    from ..building.prediction.facade import FacadePredictionResult
+    from ..building.prediction.global_model import (
+        AirbornePredictionResult,
+        ImpactPredictionResult,
+    )
 
 #: Model standard deviation of the simplified single-number prediction, stated
 #: for reference in the method statement (EN 12354-1:2000 Clause 5, EN 12354-2
@@ -254,7 +254,7 @@ def render_iso12354_airborne_report(
     """Render a predicted apparent airborne insulation fiche (EN/ISO 12354-1).
 
     :param result: The
-        :class:`~phonometry.building.building_prediction.AirbornePredictionResult`
+        :class:`~phonometry.building.prediction.global_model.AirbornePredictionResult`
         carrying the predicted apparent weighted index ``R'w``, the direct-path
         index ``RDd,w`` and the per-path contributions.
     :param path: Destination path of the PDF file.
@@ -316,7 +316,7 @@ def render_iso12354_impact_report(
     """Render a predicted apparent impact insulation fiche (EN/ISO 12354-2).
 
     :param result: The
-        :class:`~phonometry.building.building_prediction.ImpactPredictionResult`
+        :class:`~phonometry.building.prediction.global_model.ImpactPredictionResult`
         carrying the predicted apparent weighted level ``L'n,w`` and the
         Formula (21) terms (the bare-floor equivalent level ``Ln,w,eq``, the
         covering improvement ``ΔLw`` and the flanking correction ``K``).
@@ -424,7 +424,7 @@ def render_iso12354_detailed_airborne_report(
     """Render a detailed per-band airborne prediction fiche (EN/ISO 12354-1).
 
     :param result: The
-        :class:`~phonometry.building.detailed_prediction.DetailedAirborneResult`
+        :class:`~phonometry.building.prediction.detailed_model.DetailedAirborneResult`
         carrying the per-band ``R'``, the per-band path contributions and the
         ISO 717-1 rating.
     :param path: Destination path of the PDF file.
@@ -472,7 +472,7 @@ def render_iso12354_detailed_impact_report(
     """Render a detailed per-band impact prediction fiche (EN/ISO 12354-2).
 
     :param result: The
-        :class:`~phonometry.building.detailed_prediction.DetailedImpactResult`
+        :class:`~phonometry.building.prediction.detailed_model.DetailedImpactResult`
         carrying the per-band ``L'n``, the per-band path contributions and the
         ISO 717-2 rating.
     :param path: Destination path of the PDF file.
@@ -539,7 +539,7 @@ def render_iso12354_facade_report(
     """Render a predicted facade sound insulation fiche (EN/ISO 12354-3).
 
     :param result: The
-        :class:`~phonometry.building.facade_prediction.FacadePredictionResult`
+        :class:`~phonometry.building.prediction.facade.FacadePredictionResult`
         carrying the predicted standardized level difference ``D2m,nT``, its
         single number ``D2m,nT,w`` (with ``R'tr,s,w`` and ``Ctr``) and the
         per-element partial indices ``Rp``.
@@ -563,7 +563,7 @@ def render_iso12354_facade_report(
             "bands (pass matching per-band element data and 'bands' to "
             "facade_sound_reduction)."
         )
-    from ..building.insulation import weighted_rating
+    from ..building.measurement.insulation import weighted_rating
 
     shares = _facade_energy_shares(result) if verbose else {}
     metric_rows: list[tuple[str, str]] = []

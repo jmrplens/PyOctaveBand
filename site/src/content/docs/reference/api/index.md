@@ -111,25 +111,25 @@ La referencia de la API se genera a partir de los docstrings del código (en ing
 
 | Module | Summary |
 | :--- | :--- |
-| [`building.insulation`](/phonometry/reference/api/building/insulation/) | Field airborne sound insulation (ISO 16283-1:2014) and impact sound insulation (ISO 16283-2), with single-number weighted ratings and spectrum adaptation terms (ISO 717-1 airborne, ISO 717-2 impact). |
-| [`building.panel_transmission`](/phonometry/reference/api/building/panel-transmission/) | Predicted airborne sound reduction index of panels (Bies, Hansen & Howard 2017, Engineering Noise Control 5e, Section 7.2; Sharp 1973). |
-| [`building.masonry_cavity_wall`](/phonometry/reference/api/building/masonry-cavity-wall/) | Wall ties in masonry cavity walls: the structural bridge across the cavity (Hopkins 2007, Sections 3.11.3.2 and 4.3.5.4.1). |
-| [`building.heavy_impact`](/phonometry/reference/api/building/heavy-impact/) | Heavy and soft impact sources: rubber ball and bang machine (ISO 16283-2:2020 Annex A, ISO 10140-5:2010 Annex F, JIS A 1418-2:2019, ISO 717-2:2020 Annex D). |
-| [`building.ceiling_plenum`](/phonometry/reference/api/building/ceiling-plenum/) | Suspended-ceiling plenum flanking path (Vigran 9.2.3 after Mechel 1980; ISO 140-9 / ISO 10848-2; ASTM E1414 / ASTM E413). |
-| [`building.aperture_transmission`](/phonometry/reference/api/building/aperture-transmission/) | Sound transmission through slits, holes and apertures (Hopkins 2007, Sound Insulation, Section 4.3.10; Gomperts 1964; Wilson & Soroka 1965). |
-| [`building.lab_insulation`](/phonometry/reference/api/building/lab-insulation/) | Laboratory sound insulation of building elements (ISO 10140). |
-| [`building.survey_insulation`](/phonometry/reference/api/building/survey-insulation/) | Field survey method for sound insulation and service-equipment noise (ISO 10052:2021). |
-| [`building.intensity_insulation`](/phonometry/reference/api/building/intensity-insulation/) | Sound insulation measured with sound intensity (ISO 15186). |
-| [`building.flanking_transmission`](/phonometry/reference/api/building/flanking-transmission/) | Laboratory measurement of flanking sound transmission (ISO 10848:2006/2010). |
-| [`building.facade_prediction`](/phonometry/reference/api/building/facade-prediction/) | Façade sound insulation and outdoor radiation prediction (EN 12354-3/-4:2000). |
-| [`building.building_prediction`](/phonometry/reference/api/building/building-prediction/) | Building acoustic performance prediction (EN 12354-1/-2:2000). |
-| [`building.detailed_prediction`](/phonometry/reference/api/building/detailed-prediction/) | Detailed per-band building prediction (EN/ISO 12354-1/-2:2017). |
-| [`building.building_uncertainty`](/phonometry/reference/api/building/building-uncertainty/) | Measurement uncertainty in building acoustics (ISO 12999-1:2020). |
-| [`building.floor_covering_improvement`](/phonometry/reference/api/building/floor-covering-improvement/) | Impact-sound improvement of floor coverings on a small mock-up (ISO 16251-1:2014). |
-| [`building.resilient_layers`](/phonometry/reference/api/building/resilient-layers/) | Prediction of resilient-layer performance: tapping force, coverings, floors, linings. |
-| [`building.structure_borne_power`](/phonometry/reference/api/building/structure-borne-power/) | Structure-borne sound power of building equipment (EN 15657:2018; ISO 9611). |
-| [`building.installed_structure_borne`](/phonometry/reference/api/building/installed-structure-borne/) | Installed structure-borne sound from service equipment (EN 12354-5:2009). |
-| [`building.spanish_building_code`](/phonometry/reference/api/building/spanish-building-code/) | Spanish building code CTE DB-HR: global indices and requirement checks. |
+| [`building.measurement.insulation`](/phonometry/reference/api/building/insulation/) | Field airborne sound insulation (ISO 16283-1:2014) and impact sound insulation (ISO 16283-2), with single-number weighted ratings and spectrum adaptation terms (ISO 717-1 airborne, ISO 717-2 impact). |
+| [`building.prediction.panel_transmission`](/phonometry/reference/api/building/panel-transmission/) | Predicted airborne sound reduction index of panels (Bies, Hansen & Howard 2017, Engineering Noise Control 5e, Section 7.2; Sharp 1973). |
+| [`building.prediction.masonry_cavity_wall`](/phonometry/reference/api/building/masonry-cavity-wall/) | Wall ties in masonry cavity walls: the structural bridge across the cavity (Hopkins 2007, Sections 3.11.3.2 and 4.3.5.4.1). |
+| [`building.measurement.heavy_impact`](/phonometry/reference/api/building/heavy-impact/) | Heavy and soft impact sources: rubber ball and bang machine (ISO 16283-2:2020 Annex A, ISO 10140-5:2010 Annex F, JIS A 1418-2:2019, ISO 717-2:2020 Annex D). |
+| [`building.prediction.ceiling_plenum`](/phonometry/reference/api/building/ceiling-plenum/) | Suspended-ceiling plenum flanking path (Vigran 9.2.3 after Mechel 1980; ISO 140-9 / ISO 10848-2; ASTM E1414 / ASTM E413). |
+| [`building.prediction.aperture_transmission`](/phonometry/reference/api/building/aperture-transmission/) | Sound transmission through slits, holes and apertures (Hopkins 2007, Sound Insulation, Section 4.3.10; Gomperts 1964; Wilson & Soroka 1965). |
+| [`building.measurement.lab_insulation`](/phonometry/reference/api/building/lab-insulation/) | Laboratory sound insulation of building elements (ISO 10140). |
+| [`building.measurement.survey_insulation`](/phonometry/reference/api/building/survey-insulation/) | Field survey method for sound insulation and service-equipment noise (ISO 10052:2021). |
+| [`building.measurement.intensity_insulation`](/phonometry/reference/api/building/intensity-insulation/) | Sound insulation measured with sound intensity (ISO 15186). |
+| [`building.measurement.flanking_transmission`](/phonometry/reference/api/building/flanking-transmission/) | Laboratory measurement of flanking sound transmission (ISO 10848:2006/2010). |
+| [`building.prediction.facade`](/phonometry/reference/api/building/facade/) | Façade sound insulation and outdoor radiation prediction (EN 12354-3/-4:2000). |
+| [`building.prediction.global_model`](/phonometry/reference/api/building/global-model/) | Building acoustic performance prediction (EN 12354-1/-2:2000). |
+| [`building.prediction.detailed_model`](/phonometry/reference/api/building/detailed-model/) | Detailed per-band building prediction (EN/ISO 12354-1/-2:2017). |
+| [`building.measurement.uncertainty`](/phonometry/reference/api/building/uncertainty/) | Measurement uncertainty in building acoustics (ISO 12999-1:2020). |
+| [`building.measurement.floor_covering_improvement`](/phonometry/reference/api/building/floor-covering-improvement/) | Impact-sound improvement of floor coverings on a small mock-up (ISO 16251-1:2014). |
+| [`building.prediction.resilient_layers`](/phonometry/reference/api/building/resilient-layers/) | Prediction of resilient-layer performance: tapping force, coverings, floors, linings. |
+| [`building.measurement.structure_borne_power`](/phonometry/reference/api/building/structure-borne-power/) | Structure-borne sound power of building equipment (EN 15657:2018; ISO 9611). |
+| [`building.prediction.installed_structure_borne`](/phonometry/reference/api/building/installed-structure-borne/) | Installed structure-borne sound from service equipment (EN 12354-5:2009). |
+| [`building.regulation.spain`](/phonometry/reference/api/building/spain/) | Spanish building code CTE DB-HR: global indices and requirement checks. |
 
 ## Materials and surfaces
 

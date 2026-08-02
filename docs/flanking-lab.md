@@ -413,5 +413,5 @@ laboratory reports.
   reference-curve engines behind $D_{n,f,w}$ and $L_{n,f,w}$.
 - [Room-to-room and open-plan acoustics](open-plan-acoustics.md): the
   open-plan context the ceiling flanking path usually appears in.
-- API reference: [`building.flanking_transmission`](https://jmrplens.github.io/phonometry/reference/api/building/flanking-transmission/)
-  and [`building.ceiling_plenum`](https://jmrplens.github.io/phonometry/reference/api/building/ceiling-plenum/).
+- API reference: [`building.measurement.flanking_transmission`](https://jmrplens.github.io/phonometry/reference/api/building/flanking-transmission/)
+  and [`building.prediction.ceiling_plenum`](https://jmrplens.github.io/phonometry/reference/api/building/ceiling-plenum/).

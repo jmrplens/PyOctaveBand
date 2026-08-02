@@ -289,4 +289,4 @@ procedures behind them.
   engine behind $R_w$ and $L_{n,w}$.
 - [Sound Power](sound-power.md): the $L_W$ methods that share the
   absorption-area machinery of the receiving room.
-- API reference: [`building.lab_insulation`](https://jmrplens.github.io/phonometry/reference/api/building/lab-insulation/).
+- API reference: [`building.measurement.lab_insulation`](https://jmrplens.github.io/phonometry/reference/api/building/lab-insulation/).

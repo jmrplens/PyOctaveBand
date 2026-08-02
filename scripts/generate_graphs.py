@@ -4014,7 +4014,7 @@ def generate_impulse_response(output_dir: str) -> None:
 def generate_insulation_rating(output_dir: str) -> None:
     """ISO 717-1 weighted rating: measured R', shifted reference, deviations."""
     print("Generating insulation_rating.png...")
-    from phonometry.building.insulation import (
+    from phonometry.building.measurement.insulation import (
         _INDEX_500_THIRD,
         _REF_THIRD_OCTAVE,
         weighted_rating,
@@ -4081,7 +4081,7 @@ def generate_insulation_rating(output_dir: str) -> None:
 def generate_impact_rating(output_dir: str) -> None:
     """ISO 717-2 weighted impact rating: measured Ln, shifted reference, CI."""
     print("Generating impact_rating.png...")
-    from phonometry.building.insulation import (
+    from phonometry.building.measurement.insulation import (
         _INDEX_500_THIRD,
         _REF_IMPACT_THIRD_OCTAVE,
         weighted_impact_rating,
@@ -6971,7 +6971,7 @@ def generate_moore_glasberg_time_loudness(output_dir: str) -> None:
 def generate_prediction_flanking_demo(output_dir: str) -> None:
     """EN 12354-1 simplified flanking prediction (Annex H.3 worked example)."""
     print("Generating prediction_flanking_demo.png...")
-    from phonometry.building.building_prediction import (
+    from phonometry.building.prediction.global_model import (
         FlankingPath,
         flanking_element,
         predicted_airborne_insulation,
@@ -8265,13 +8265,13 @@ def generate_absorption_uncertainty(output_dir: str) -> None:
 def generate_insulation_uncertainty_demo(output_dir: str) -> None:
     """ISO 12999-1 per-band + single-number measurement uncertainty (situation B)."""
     print("Generating insulation_uncertainty_demo.png...")
-    from phonometry.building.building_uncertainty import (
+    from phonometry.building.measurement.insulation import weighted_rating
+    from phonometry.building.measurement.uncertainty import (
         band_uncertainty,
         insulation_coverage_factor,
         insulation_expanded_uncertainty,
         single_number_uncertainty,
     )
-    from phonometry.building.insulation import weighted_rating
 
     # Reuse the ISO 717-1 Annex C measured R' curve (100 Hz .. 3150 Hz); its
     # weighted rating is R'w = 30 dB.

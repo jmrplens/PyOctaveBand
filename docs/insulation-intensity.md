@@ -322,4 +322,4 @@ apparent $R'_I$. The single-number ratings reuse ISO 717-1.
   reference-curve engine behind $R_{I,w}$ and $D_{I,n,e,w}$.
 - [Sound Intensity](intensity.md): the two-microphone probe, its field
   indicators and the residual-index qualification behind every scan.
-- API reference: [`building.intensity_insulation`](https://jmrplens.github.io/phonometry/reference/api/building/intensity-insulation/).
+- API reference: [`building.measurement.intensity_insulation`](https://jmrplens.github.io/phonometry/reference/api/building/intensity-insulation/).

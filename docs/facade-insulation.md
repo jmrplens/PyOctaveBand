@@ -582,4 +582,4 @@ ISO 16283-3 and EN ISO 717-1 for the prediction).
   radiating side of EN 12354-4.
 - [Theory](theory-rooms-buildings.md): the reference-curve derivation behind
   the weighted single-number ratings.
-- API reference: [`building.facade_prediction`](https://jmrplens.github.io/phonometry/reference/api/building/facade-prediction/) and [`building.insulation`](https://jmrplens.github.io/phonometry/reference/api/building/insulation/).
+- API reference: [`building.prediction.facade`](https://jmrplens.github.io/phonometry/reference/api/building/facade/) and [`building.measurement.insulation`](https://jmrplens.github.io/phonometry/reference/api/building/insulation/).

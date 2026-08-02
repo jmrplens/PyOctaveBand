@@ -1,5 +1,5 @@
 ---
-title: "building.insulation"
+title: "building.measurement.insulation"
 description: "Field airborne sound insulation (ISO 16283-1:2014) and impact sound insulation (ISO 16283-2), with single-number weighted ratings and spectrum adaptation terms (ISO 717-1 airborne, ISO 717-2 impact)."
 sidebar:
   label: "insulation"

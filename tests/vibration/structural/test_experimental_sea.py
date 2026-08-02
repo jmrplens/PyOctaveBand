@@ -52,7 +52,9 @@ import math
 import numpy as np
 import pytest
 
-from phonometry.building.flanking_transmission import modal_density as en12354_n
+from phonometry.building.measurement.flanking_transmission import (
+    modal_density as en12354_n,
+)
 from phonometry.vibration.structural.experimental_sea import (
     bar_modal_density,
     beam_modal_density,

@@ -261,10 +261,10 @@ which is the check that enforces the rule; see
   (the 2017 Formulae (4) and (5)).
 - **Library behaviour:** unaffected. No code path implements the reduced form:
   the façade model computes $D_{2m,nT}$ from Formula (13)
-  ([`facade_prediction.py`](../src/phonometry/building/facade_prediction.py)),
+  ([`facade_prediction.py`](../src/phonometry/building/prediction/facade.py)),
   and the survey method converts with the unreduced
   $D_{2m,n} = D_{2m} + k + 10\log_{10}[A_0 T_0/(0{,}16 V)]$ of ISO 10052 Clause 3.15
-  ([`survey_insulation.py`](../src/phonometry/building/survey_insulation.py)).
+  ([`survey_insulation.py`](../src/phonometry/building/measurement/survey_insulation.py)).
   The two standardization constants that *are* pre-folded elsewhere in the
   library are both correct: $0{,}032$ for the Part 2 impact form and $0{,}32$
   for the Part 1 airborne form $D_{nT} = R' + 10\log_{10}(0{,}16 V/(T_0 S_s))$,
@@ -368,7 +368,7 @@ which is the check that enforces the rule; see
 - **Library behaviour:** `in_situ_total_loss_factor` takes $\sum l_k \alpha_k$
   as an input and `perimeter_absorption_coefficient` implements Formula (C.4);
   the Annex L fixture derives all five sums that way rather than using the
-  printed block, and says so ([`tests/building/test_detailed_prediction.py`](../tests/building/test_detailed_prediction.py)).
+  printed block, and says so ([`tests/building/prediction/test_detailed_model.py`](../tests/building/prediction/test_detailed_model.py)).
 - **Status:** unreported.
 
 ## ISO 12354-1:2017 Table L.3 / ISO 12354-2:2017 Table G.3 (external wall ηint)
@@ -564,7 +564,7 @@ which is the check that enforces the rule; see
 - **Library behaviour:** `weighted_lining_improvement` returns the more
   conservative -10 dB at exactly 1 600 Hz and -5 dB above it, the 2000
   reading, with the ambiguity named in the docstring and pinned in
-  [`tests/building/test_resilient_layers.py`](../tests/building/test_resilient_layers.py).
+  [`tests/building/prediction/test_resilient_layers.py`](../tests/building/prediction/test_resilient_layers.py).
 - **Status:** unreported.
 
 - **Related, not an erratum:** NOTE 1 of the same table sets a floor of 0 dB
@@ -625,7 +625,7 @@ which is the check that enforces the rule; see
   12354-1:2017 prints the same $\pi$-free form in its symbol definitions
   ($f_c = c_0^2/(1{,}8 c_L t)$).
 - **Library behaviour:** implements the $\pi$-free form
-  (`phonometry.building.flanking_transmission.critical_frequency`), with a
+  (`phonometry.building.measurement.flanking_transmission.critical_frequency`), with a
   misprint note in the docstring.
 - **Status:** corrected upstream — ISO 10848-1:2017 (second edition) prints
   the $\pi$-free form in its Formula (5), $f_c = c_0^2/(1{,}8 h c_L)$,
@@ -1896,7 +1896,7 @@ which is the check that enforces the rule; see
 - **Library behaviour:** the regression test uses $\eta = 1{,}5 \cdot 10^{-3}$,
   the value
   the printed answers require
-  ([`tests/building/test_panel_transmission.py`](../tests/building/test_panel_transmission.py)).
+  ([`tests/building/prediction/test_panel_transmission.py`](../tests/building/prediction/test_panel_transmission.py)).
 - **Status:** unreported (textbook rather than a standard).
 
 ---
@@ -1940,14 +1940,14 @@ which is the check that enforces the rule; see
   Eq. (9.19) at all: the two equations the book presents as a pair are
   inconsistent with each other.
 - **Library behaviour:** `plenum_flanking_reduction_index` in
-  [`ceiling_plenum.py`](../src/phonometry/building/ceiling_plenum.py)
+  [`ceiling_plenum.py`](../src/phonometry/building/prediction/ceiling_plenum.py)
   implements the derived $m'_R$ in both the exponent and the denominator, with
   the reading documented at the formula, and rejects a transmission factor
   above unity rather than reporting a negative sound reduction index. Tests pin
   the monotonicity, the $\tau_\text{cl} \le 1$ bound, the convergence to
   Eq. (9.20)
   and the size of the Eq. (9.17) leakage term at a realistic ceiling
-  ([`tests/building/test_ceiling_plenum.py`](../tests/building/test_ceiling_plenum.py)).
+  ([`tests/building/prediction/test_ceiling_plenum.py`](../tests/building/prediction/test_ceiling_plenum.py)).
 - **Status:** unreported (textbook rather than a standard). Mechel's original
   1980 paper, which Vigran reproduces, was not available to check whether the
   misprint originates there.

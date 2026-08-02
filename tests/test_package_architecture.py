@@ -164,3 +164,19 @@ def test_subpackage_reexports_cover_facade_imports() -> None:
             if not hasattr(pkg, alias.name):
                 missing.append(f"phonometry.{parts[0]}.{alias.name}")
     assert not missing, "facade imports not re-exported by their subpackage:\n" + "\n".join(missing)
+
+def test_test_module_basenames_are_unique() -> None:
+    """Two test files with the same name break collection of the whole tree.
+
+    The suite has no ``__init__.py``, so pytest imports every test module by
+    its basename: a second ``test_spain.py`` anywhere is an import mismatch,
+    and it only shows up when the whole tree is collected at once. The
+    taxonomy work renames test files to follow their modules, which is exactly
+    how the collision gets introduced.
+    """
+    import collections
+
+    tests = Path(__file__).resolve().parent
+    counts = collections.Counter(p.name for p in tests.rglob("test_*.py"))
+    duplicates = {name: count for name, count in counts.items() if count > 1}
+    assert not duplicates, f"duplicate test module basenames: {duplicates}"

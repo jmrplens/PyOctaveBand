@@ -2,16 +2,16 @@
 """ISO 15186-1 intensity sound-insulation test reports (reportlab renderer).
 
 Renders the two ISO 15186-1:2000 sound-intensity insulation quantities of
-:mod:`phonometry.building.intensity_insulation` to the one-page laboratory
+:mod:`phonometry.building.measurement.intensity_insulation` to the one-page laboratory
 test report of the standard's Clause 8, laid out like the accredited
 laboratory reports rated per ISO 717-1:
 
-* :class:`~phonometry.building.intensity_insulation.IntensityReductionResult`
+* :class:`~phonometry.building.measurement.intensity_insulation.IntensityReductionResult`
   to the intensity sound reduction index ``RI`` (Clause 3.8, Formula (7)); its
   single-number rating ``RI,w`` is the ordinary ISO 717-1 airborne rating
   evaluated on the intensity spectrum. The verbose table annexes the
   Kc-modified index ``RI,M`` (Clause 3.10, Formula (9)) beside ``RI``.
-* :class:`~phonometry.building.intensity_insulation.IntensityElementNormalizedResult`
+* :class:`~phonometry.building.measurement.intensity_insulation.IntensityElementNormalizedResult`
   to the element-normalized level difference ``DI,n,e`` for small building
   elements (Clause 3.9, Formula (8)), rated ``DI,n,e,w`` by the same ISO 717-1
   airborne machinery; its verbose table shows the ISO 717 evaluation per band.
@@ -52,8 +52,8 @@ from ._layout import fmt_num
 from .metadata import ReportMetadata
 
 if TYPE_CHECKING:
-    from ..building.insulation import WeightedRatingResult
-    from ..building.intensity_insulation import (
+    from ..building.measurement.insulation import WeightedRatingResult
+    from ..building.measurement.intensity_insulation import (
         IntensityElementNormalizedResult,
         IntensityReductionResult,
     )
@@ -168,7 +168,7 @@ def render_iso15186_report(
     """Render an ISO 15186-1 intensity sound-insulation test report to a PDF.
 
     :param result: The intensity result
-        (:class:`~phonometry.building.intensity_insulation.IntensityReductionResult`)
+        (:class:`~phonometry.building.measurement.intensity_insulation.IntensityReductionResult`)
         carrying the per-band intensity sound reduction index ``RI`` and,
         optionally, the Kc-modified index ``RI,M``.
     :param rating: The ISO 717-1 rating of the reported ``RI`` (the result's
@@ -311,7 +311,7 @@ def render_iso15186_element_report(
     """Render an ISO 15186-1 element-normalized insulation report to a PDF.
 
     :param result: The element result
-        (:class:`~phonometry.building.intensity_insulation.IntensityElementNormalizedResult`)
+        (:class:`~phonometry.building.measurement.intensity_insulation.IntensityElementNormalizedResult`)
         carrying the per-band element-normalized level difference ``DI,n,e``.
     :param rating: The ISO 717-1 rating of the reported ``DI,n,e`` (the
         result's own ``rating``); its ``plot`` draws the fiche curve.

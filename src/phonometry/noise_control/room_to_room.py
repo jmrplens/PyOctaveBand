@@ -10,7 +10,7 @@ criterion. The answer is a short chain, and every link of it already exists in
 the library: the reverberant level the machine builds up in the source room
 (:func:`phonometry.room.steady_state_spl` over the room constant of
 :func:`phonometry.room.room_constant`), the transmission loss of the partition
-(measured, or predicted by :mod:`phonometry.building.panel_transmission`), the
+(measured, or predicted by :mod:`phonometry.building.prediction.panel_transmission`), the
 absorption of the receiving room
 (:func:`phonometry.room.equivalent_absorption_area`) and the rating of what
 arrives (:func:`phonometry.room.noise_criterion`). What this module adds is the
@@ -332,7 +332,7 @@ def room_to_room_transmission(
     :param frequencies: Octave-band centre frequencies, Hz (1-D array).
     :param transmission_loss: Transmission loss of the partition ``TL``, dB;
         a scalar or one value per band. Measured, tabulated, or predicted by
-        :mod:`phonometry.building.panel_transmission`.
+        :mod:`phonometry.building.prediction.panel_transmission`.
     :param partition_area: Area of the partition between the rooms ``S_w``, m2.
     :param receiving_absorption: Equivalent absorption area of the receiving
         room ``S_2 alpha_2`` per band, m2; e.g. from

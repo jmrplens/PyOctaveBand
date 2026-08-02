@@ -10,7 +10,7 @@ thin free-free strip (with the Timoshenko thickness correction of
 Eq. 3.196b), the normal-incidence fluid-solid reflection and transmission
 coefficients from the characteristic impedances, the normal-incidence mass
 law of a thin immersed steel plate
-(:func:`~phonometry.building.panel_transmission.mass_law_transmission_loss`),
+(:func:`~phonometry.building.prediction.panel_transmission.mass_law_transmission_loss`),
 and the exact (bit-for-bit) reduction to the acoustic solver when
 ``c_s = 0`` everywhere.
 """
@@ -25,7 +25,7 @@ import numpy as np
 import pytest
 from scipy.optimize import brentq
 
-from phonometry.building.panel_transmission import mass_law_transmission_loss
+from phonometry.building.prediction.panel_transmission import mass_law_transmission_loss
 from phonometry.simulation.elastic_fdtd import (
     ElasticFDTD2D,
     ElasticFDTDResult,

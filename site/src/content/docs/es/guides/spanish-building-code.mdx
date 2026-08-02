@@ -274,7 +274,7 @@ Con la fachada de 8 m² del ejemplo 7.5, parte ciega de 40 dBA y ventana de
 
 ```python
 from phonometry import building
-from phonometry.building.aperture_transmission import composite_transmission_loss
+from phonometry.building.prediction.aperture_transmission import composite_transmission_loss
 
 building.window_size_correction(4.0)          # -2 dB: 26 dBA de catálogo -> 24 dBA
 
@@ -321,7 +321,7 @@ mantenimiento del apartado 6.
 - [Aislamiento acústico de fachadas](/phonometry/es/guides/facade-insulation/): la medición de $D_{2m,nT}$ según ISO 16283-3 y su predicción según EN 12354-3, que alimentan el índice $D_{2m,nT,Atr}$ de esta página.
 - [Predicción del aislamiento de paneles](/phonometry/es/guides/panel-sound-insulation/): el cálculo de fachadas mixtas y la transmisión por huecos y rendijas.
 - [Medición del aislamiento en campo (ISO 16283)](/phonometry/es/guides/insulation-field/): los espectros por bandas de $R'$, $D_{nT}$ y $L'_{nT}$ que estas magnitudes globales resumen.
-- Referencia de la API: [`building.spanish_building_code`](/phonometry/es/reference/api/building/spanish-building-code/).
+- Referencia de la API: [`building.regulation.spain`](/phonometry/es/reference/api/building/spain/).
 
 ## Respuestas rápidas
 

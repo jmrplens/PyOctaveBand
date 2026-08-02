@@ -67,7 +67,7 @@ Modal densities for the usual subsystems are provided as well
 Eqs. 6.23-6.29. The flat-plate expression
 :math:`n(f) = S \sqrt{12} / (2 c_L t)` is the same quantity as EN 12354-4's
 :math:`n = \pi S f_c / c_0^2`
-(:func:`~phonometry.building.flanking_transmission.modal_density`), only
+(:func:`~phonometry.building.measurement.flanking_transmission.modal_density`), only
 parametrised by the plate itself rather than by its critical frequency; the
 two agree identically and a regression test pins that.
 """

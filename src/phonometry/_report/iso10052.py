@@ -2,17 +2,17 @@
 """ISO 10052 survey-method field sound-insulation fiches (reportlab renderer).
 
 Renders the survey (control) method results of
-:mod:`phonometry.building.survey_insulation` (ISO 10052:2021, identical in the
+:mod:`phonometry.building.measurement.survey_insulation` (ISO 10052:2021, identical in the
 harmonized EN ISO 10052:2004+A1:2010) to one-page field test reports:
 
-* :class:`~phonometry.building.survey_insulation.SurveyAirborneResult` to a
+* :class:`~phonometry.building.measurement.survey_insulation.SurveyAirborneResult` to a
   field airborne report of the standardized level difference ``DnT`` (Clause
   3.4) with the ISO 717-1 single number ``DnT,w (C; Ctr)``, or the apparent
   sound reduction index ``R'`` (Clause 3.6) with ``R'w (C; Ctr)``;
-* :class:`~phonometry.building.survey_insulation.SurveyImpactResult` to a field
+* :class:`~phonometry.building.measurement.survey_insulation.SurveyImpactResult` to a field
   impact report of the standardized impact level ``L'nT`` (Clause 3.8) with the
   ISO 717-2 single number ``L'nT,w (CI)``;
-* :class:`~phonometry.building.survey_insulation.SurveyFacadeResult` to a field
+* :class:`~phonometry.building.measurement.survey_insulation.SurveyFacadeResult` to a field
   facade report of the standardized facade level difference ``D2m,nT`` (Clause
   3.14) with ``D2m,nT,w (C; Ctr)``.
 
@@ -40,8 +40,11 @@ from ._insulation_fiche import iso717_columns_builder, render_insulation_fiche
 from .metadata import ReportMetadata
 
 if TYPE_CHECKING:
-    from ..building.insulation import ImpactRatingResult, WeightedRatingResult
-    from ..building.survey_insulation import (
+    from ..building.measurement.insulation import (
+        ImpactRatingResult,
+        WeightedRatingResult,
+    )
+    from ..building.measurement.survey_insulation import (
         SurveyAirborneResult,
         SurveyFacadeResult,
         SurveyImpactResult,
@@ -177,7 +180,7 @@ def render_survey_airborne_report(
     """Render a survey-method airborne fiche (ISO 10052) to a PDF.
 
     :param result: The
-        :class:`~phonometry.building.survey_insulation.SurveyAirborneResult`.
+        :class:`~phonometry.building.measurement.survey_insulation.SurveyAirborneResult`.
     :param rating: The ISO 717-1 rating of the reported quantity (the result's
         ``rating`` for ``DnT`` or ``r_prime_rating`` for ``R'``); its ``plot``
         draws the fiche curve.
@@ -212,7 +215,7 @@ def render_survey_impact_report(
     """Render a survey-method impact fiche ``L'nT`` (ISO 10052) to a PDF.
 
     :param result: The
-        :class:`~phonometry.building.survey_insulation.SurveyImpactResult`.
+        :class:`~phonometry.building.measurement.survey_insulation.SurveyImpactResult`.
     :param rating: The ISO 717-2 rating of ``L'nT`` (the result's ``rating``);
         its ``plot`` draws the fiche curve.
     :param path: Destination path of the PDF file.
@@ -243,7 +246,7 @@ def render_survey_facade_report(
     """Render a survey-method facade fiche ``D2m,nT`` (ISO 10052) to a PDF.
 
     :param result: The
-        :class:`~phonometry.building.survey_insulation.SurveyFacadeResult`.
+        :class:`~phonometry.building.measurement.survey_insulation.SurveyFacadeResult`.
     :param rating: The ISO 717-1 rating of ``D2m,nT`` (the result's ``rating``);
         its ``plot`` draws the fiche curve.
     :param path: Destination path of the PDF file.

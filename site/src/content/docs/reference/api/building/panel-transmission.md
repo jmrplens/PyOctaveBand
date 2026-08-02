@@ -1,5 +1,5 @@
 ---
-title: "building.panel_transmission"
+title: "building.prediction.panel_transmission"
 description: "Predicted airborne sound reduction index of panels (Bies, Hansen & Howard 2017, Engineering Noise Control 5e, Section 7.2; Sharp 1973)."
 sidebar:
   label: "panel_transmission"
@@ -8,7 +8,7 @@ sidebar:
 Predicted airborne sound reduction index of panels (Bies, Hansen & Howard
 2017, Engineering Noise Control 5e, Section 7.2; Sharp 1973).
 
-Where EN 12354-1 ([`phonometry.building.building_prediction`](/phonometry/reference/api/building/building-prediction/)) takes the
+Where EN 12354-1 ([`phonometry.building.prediction.global_model`](/phonometry/reference/api/building/global-model/)) takes the
 element sound reduction index `R` as a *measured* input, this module
 **predicts** `R(f)` from the physical properties of the construction: the mass
 per unit area, bending stiffness (through the coincidence frequency) and loss

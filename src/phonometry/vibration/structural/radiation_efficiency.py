@@ -17,7 +17,7 @@ measured input: this module predicts it from the plate geometry and its
 coincidence (critical) frequency, closing the ISO 7849 chain without a power
 measurement, and it supplies the *resonant* transmission path of the single- and
 double-leaf sound-reduction-index predictions in
-:mod:`phonometry.building.panel_transmission`.
+:mod:`phonometry.building.prediction.panel_transmission`.
 
 **Coincidence (critical) frequency (Hopkins Eq. 2.201).** Below it the free
 bending wavelength is shorter than the acoustic wavelength, so the plate

@@ -296,7 +296,7 @@ procedures behind them.
   engine behind $R_w$ and $L_{n,w}$.
 - [Sound Power](https://jmrplens.github.io/phonometry/guides/sound-power/): the $L_W$ methods that share the
   absorption-area machinery of the receiving room.
-- API reference: [`building.lab_insulation`](https://jmrplens.github.io/phonometry/reference/api/building/lab-insulation/).
+- API reference: [`building.measurement.lab_insulation`](https://jmrplens.github.io/phonometry/reference/api/building/lab-insulation/).
 
 ---
 
@@ -626,7 +626,7 @@ apparent $R'_I$. The single-number ratings reuse ISO 717-1.
   reference-curve engine behind $R_{I,w}$ and $D_{I,n,e,w}$.
 - [Sound Intensity](https://jmrplens.github.io/phonometry/guides/intensity/): the two-microphone probe, its field
   indicators and the residual-index qualification behind every scan.
-- API reference: [`building.intensity_insulation`](https://jmrplens.github.io/phonometry/reference/api/building/intensity-insulation/).
+- API reference: [`building.measurement.intensity_insulation`](https://jmrplens.github.io/phonometry/reference/api/building/intensity-insulation/).
 
 ---
 
@@ -1047,8 +1047,8 @@ laboratory reports.
   reference-curve engines behind $D_{n,f,w}$ and $L_{n,f,w}$.
 - [Room-to-room and open-plan acoustics](https://jmrplens.github.io/phonometry/guides/open-plan-acoustics/): the
   open-plan context the ceiling flanking path usually appears in.
-- API reference: [`building.flanking_transmission`](https://jmrplens.github.io/phonometry/reference/api/building/flanking-transmission/)
-  and [`building.ceiling_plenum`](https://jmrplens.github.io/phonometry/reference/api/building/ceiling-plenum/).
+- API reference: [`building.measurement.flanking_transmission`](https://jmrplens.github.io/phonometry/reference/api/building/flanking-transmission/)
+  and [`building.prediction.ceiling_plenum`](https://jmrplens.github.io/phonometry/reference/api/building/ceiling-plenum/).
 
 ---
 
@@ -1516,7 +1516,7 @@ ISO 16283 family (ISO 16283-3:2016) has its own page.
   used for the insulation spectra.
 - [Theory](https://jmrplens.github.io/phonometry/reference/theory/rooms-buildings/): the reference-curve derivation behind the
   weighted single-number ratings.
-- API reference: [`building.insulation`](https://jmrplens.github.io/phonometry/reference/api/building/insulation/) and [`building.building_uncertainty`](https://jmrplens.github.io/phonometry/reference/api/building/building-uncertainty/).
+- API reference: [`building.measurement.insulation`](https://jmrplens.github.io/phonometry/reference/api/building/insulation/) and [`building.measurement.uncertainty`](https://jmrplens.github.io/phonometry/reference/api/building/uncertainty/).
 
 ---
 
@@ -1762,7 +1762,7 @@ ISO 717-2.
 - [Room Acoustics](https://jmrplens.github.io/phonometry/guides/room-acoustics/): the measured reverberation times
   behind the reverberation index.
 - [Levels](https://jmrplens.github.io/phonometry/guides/levels/): the energy averaging behind the octave-band levels.
-- API reference: [`building.survey_insulation`](https://jmrplens.github.io/phonometry/reference/api/building/survey-insulation/).
+- API reference: [`building.measurement.survey_insulation`](https://jmrplens.github.io/phonometry/reference/api/building/survey-insulation/).
 
 ---
 
@@ -2200,7 +2200,7 @@ worked examples.
   single-number model that consumes these ratings.
 - [Theory](https://jmrplens.github.io/phonometry/reference/theory/rooms-buildings/): the reference-curve derivation behind
   the weighted single-number ratings.
-- API reference: [`building.insulation`](https://jmrplens.github.io/phonometry/reference/api/building/insulation/).
+- API reference: [`building.measurement.insulation`](https://jmrplens.github.io/phonometry/reference/api/building/insulation/).
 
 ---
 
@@ -2790,7 +2790,7 @@ ISO 16283-3 and EN ISO 717-1 for the prediction).
   radiating side of EN 12354-4.
 - [Theory](https://jmrplens.github.io/phonometry/reference/theory/rooms-buildings/): the reference-curve derivation behind
   the weighted single-number ratings.
-- API reference: [`building.facade_prediction`](https://jmrplens.github.io/phonometry/reference/api/building/facade-prediction/) and [`building.insulation`](https://jmrplens.github.io/phonometry/reference/api/building/insulation/).
+- API reference: [`building.prediction.facade`](https://jmrplens.github.io/phonometry/reference/api/building/facade/) and [`building.measurement.insulation`](https://jmrplens.github.io/phonometry/reference/api/building/insulation/).
 
 ---
 
@@ -3036,7 +3036,7 @@ whole comes out at 31.5 dBA:
 
 ```python
 from phonometry import building
-from phonometry.building.aperture_transmission import composite_transmission_loss
+from phonometry.building.prediction.aperture_transmission import composite_transmission_loss
 
 building.window_size_correction(4.0)          # -2 dB: 26 dBA catalogued -> 24 dBA
 
@@ -3099,7 +3099,7 @@ enlarged-range term $C_{100-5000}$, not the core-range one.
   composite-facade calculation and transmission through openings and slits.
 - [Field Insulation Measurement (ISO 16283)](https://jmrplens.github.io/phonometry/guides/insulation-field/): the band
   spectra of $R'$, $D_{nT}$ and $L'_{nT}$ that these global quantities summarise.
-- API reference: [`building.spanish_building_code`](https://jmrplens.github.io/phonometry/reference/api/building/spanish-building-code/).
+- API reference: [`building.regulation.spain`](https://jmrplens.github.io/phonometry/reference/api/building/spain/).
 
 ## References
 

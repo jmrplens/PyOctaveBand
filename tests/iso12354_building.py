@@ -19,7 +19,7 @@ Two inputs are taken **corrected**, not as printed (both recorded in
 * the external walls' internal loss factor is 0,012 5 (the element
   specification and Annex B Table B.3), not the 0,013 of the input block.
 
-Both ``tests/building/test_detailed_prediction.py`` and
+Both ``tests/building/prediction/test_detailed_model.py`` and
 ``scripts/conformance_report.py`` import these helpers, so the per-band tables
 the tests assert and the conformance rows the report prints can never be built
 two different ways.

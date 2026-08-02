@@ -388,7 +388,7 @@ ISO16283_3_R45_EXPECTED_DB = 38.5
 # (S = 10 m2, A = 0,16 * 50 / 0,8 = 10 m2), so R = L1 - L2 = the reference. The
 # 32 dB unfavourable-deviation allowance then permits a 2 dB upward shift of the
 # reference (32 dB / 16 bands), giving Rw = curve@500 Hz (52) + 2 = 54 dB - the
-# analytic +2-shift anchor (mirrors tests/building/test_lab_insulation.py).
+# analytic +2-shift anchor (mirrors tests/building/measurement/test_lab_insulation.py).
 # ---------------------------------------------------------------------------
 ISO10140_2_REF_AIRBORNE_R: list[float] = [
     33, 36, 39, 42, 45, 48, 51, 52, 53, 54, 55, 56, 56, 56, 56, 56,
@@ -401,7 +401,7 @@ ISO10140_2_REF_AIRBORNE_RW = 54
 # contributes an Ff/Fd/Df triplet (12 flanking paths), which with the direct
 # Dd path make 13 transmission paths. Energy summation (Formula (26)) gives
 # R'w = 52,2 dB -> 52 dB. Row = (label, Rw_flanking, KFf, KFd=KDf, coupling
-# length lf). Mirrors tests/building/test_building_prediction.py (_annex_h_paths).
+# length lf). Mirrors tests/building/prediction/test_global_model.py (_annex_h_paths).
 # ---------------------------------------------------------------------------
 EN12354_1_ANNEX_H3_R_DIRECT = 57.0
 EN12354_1_ANNEX_H3_SEPARATING_AREA = 11.5

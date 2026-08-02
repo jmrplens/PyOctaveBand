@@ -35,7 +35,7 @@ _FRONTLOADED_MODULES = (
     "tests/test_generate_reports.py",
     "tests/simulation/test_elastic_fluid_solid.py",
     "tests/test_impact_insulation.py",
-    "tests/building/test_insulation.py",
+    "tests/building/measurement/test_insulation.py",
     "tests/psychoacoustics/test_tonality_ecma.py",
     "tests/psychoacoustics/test_loudness_ecma.py",
     "tests/psychoacoustics/test_fluctuation_strength_ecma.py",
