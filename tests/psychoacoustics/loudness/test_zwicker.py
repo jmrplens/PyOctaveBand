@@ -310,7 +310,8 @@ def test_annex_b4_tone_pulses(case: str, num: int, level: float) -> None:
     exp = EXPECTED[case]
     x, fs = _read_wav_pa(DATA / f"iso532_1_test_signal_{num}.wav", level)
     res = loudness_zwicker(x, fs, stationary=False)
-    assert res.n5 is not None and res.loudness_vs_time is not None
+    assert res.n5 is not None
+    assert res.loudness_vs_time is not None
     # Nmax reproduces the workbook header to < 0.01 %; 1e-3 locks that in
     # (was 0.05, ~700x looser than the achieved accuracy).
     assert res.loudness == pytest.approx(exp["Nmax"], rel=1e-3), (
@@ -349,7 +350,8 @@ def test_n5_n10_use_full_rate_series(monkeypatch) -> None:
     monkeypatch.setattr(L, "_percentile", spy)
     x, fs = _read_wav_pa(DATA / "iso532_1_test_signal_10.wav", 70.0)
     res = loudness_zwicker(x, fs, stationary=False)
-    assert res.n5 is not None and res.loudness_vs_time is not None
+    assert res.n5 is not None
+    assert res.loudness_vs_time is not None
 
     full = seen[5]
     dec = _SR_LEVEL // _SR_LOUDNESS
@@ -365,9 +367,12 @@ def test_n5_n10_use_full_rate_series(monkeypatch) -> None:
 def test_time_varying_outputs() -> None:
     x = _tone(1000.0, 70.0, seconds=0.5)
     res = loudness_zwicker(x, FS)
-    assert res.time is not None and res.loudness_vs_time is not None
+    assert res.time is not None
+    assert res.loudness_vs_time is not None
     assert res.time.shape == res.loudness_vs_time.shape
-    assert res.n5 is not None and res.n10 is not None and res.n5 >= res.n10
+    assert res.n5 is not None
+    assert res.n10 is not None
+    assert res.n5 >= res.n10
 
 
 # ---------------------------------------------------------------------------
@@ -406,12 +411,15 @@ def test_annex_b5_technical_signals(num: int) -> None:
 # ---------------------------------------------------------------------------
 
 def test_invalid_inputs() -> None:
+    ten_bands = np.zeros(10)
     with pytest.raises(ValueError, match="28"):
-        loudness_zwicker_from_spectrum(np.zeros(10))
+        loudness_zwicker_from_spectrum(ten_bands)
+    levels = np.full(28, 60.0)
     with pytest.raises(ValueError, match="field"):
-        loudness_zwicker_from_spectrum(np.full(28, 60.0), field="reverberant")
+        loudness_zwicker_from_spectrum(levels, field="reverberant")
+    x = np.ones(1000)
     with pytest.raises(ValueError, match="fs"):
-        loudness_zwicker(np.ones(1000), 0)
+        loudness_zwicker(x, 0)
 
 
 def test_non_finite_inputs_rejected() -> None:
@@ -428,8 +436,9 @@ def test_non_finite_inputs_rejected() -> None:
 def test_pathological_resampling_ratio_rejected() -> None:
     """gcd(48000, 44101) = 1 would demand a 48000/44101 polyphase filter;
     reject instead of hanging."""
+    x = np.ones(1000)
     with pytest.raises(ValueError, match="resampl"):
-        loudness_zwicker(np.ones(1000), 44101)
+        loudness_zwicker(x, 44101)
 
 
 def test_diffuse_field_differs() -> None:
@@ -443,8 +452,9 @@ def test_diffuse_field_differs() -> None:
 def test_minimal_length_validation() -> None:
     """Signals shorter than one 500 Hz output sample raise cleanly instead
     of crashing on an empty percentile buffer."""
+    too_short = np.ones(48)
     with pytest.raises(ValueError, match="too short"):
-        loudness_zwicker(np.ones(48), FS)
+        loudness_zwicker(too_short, FS)
     res = loudness_zwicker(np.ones(96 * 4), FS)  # exactly a few output samples
     assert res.loudness >= 0.0
 

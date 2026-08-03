@@ -244,7 +244,8 @@ def test_free_and_diffuse_fields_differ() -> None:
     x = _tone(1000.0, 60.0, seconds=0.7)
     free = tonality_ecma(x, FS, field="free").tonality
     diffuse = tonality_ecma(x, FS, field="diffuse").tonality
-    assert free > 0.5 and diffuse > 0.5
+    assert free > 0.5
+    assert diffuse > 0.5
     assert free != diffuse
 
 

@@ -85,8 +85,10 @@ def test_pa_rejects_bad_inputs(bad: float) -> None:
 def test_pa_result_fields_and_plot() -> None:
     res = psychoacoustic_annoyance(15.0, 2.2, 0.4, 0.6)
     assert isinstance(res, PsychoacousticAnnoyanceResult)
-    assert res.n5 == 15.0 and res.sharpness == 2.2
-    assert res.fluctuation_strength == 0.4 and res.roughness == 0.6
+    assert res.n5 == 15.0
+    assert res.sharpness == 2.2
+    assert res.fluctuation_strength == 0.4
+    assert res.roughness == 0.6
     ax = res.plot()
     assert ax is not None
 
@@ -100,5 +102,6 @@ def test_pa_from_signal_runs_and_is_positive() -> None:
     x = x / np.sqrt(np.mean(x**2)) * 2e-5 * 10 ** (70.0 / 20)
     res = psychoacoustic_annoyance_from_signal(x, fs)
     assert isinstance(res, PsychoacousticAnnoyanceResult)
-    assert np.isfinite(res.annoyance) and res.annoyance > 0.0
+    assert np.isfinite(res.annoyance)
+    assert res.annoyance > 0.0
     assert res.n5 > 0.0

@@ -161,8 +161,10 @@ _SINCE: dict[str, str] = {
 }
 
 #: Renames that were already shimmed before 3.2 (target differs from a plain
-#: package move). ``phonometry.loudness`` predates the reorganization.
-_MOVED_3X["phonometry.loudness"] = "phonometry.psychoacoustics.loudness.zwicker"
+#: package move). ``phonometry.loudness`` predates the reorganization and
+#: lands wherever the Zwicker module currently lives, so it reads its target
+#: from the row above instead of repeating it.
+_MOVED_3X["phonometry.loudness"] = _MOVED_3X["phonometry.loudness_zwicker"]
 
 #: Old module path -> relocated module path for the 4.0 taxonomy. The
 #: oversized ``metrology`` catch-all became three packages: the normalized

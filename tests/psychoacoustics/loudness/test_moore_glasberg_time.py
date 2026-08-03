@@ -328,7 +328,8 @@ def test_result_fields_and_percentiles() -> None:
     # Higher exceedance fraction -> lower level.
     assert res.percentiles[5.0] >= res.percentiles[50.0] >= res.percentiles[95.0]
     assert res.n_max >= res.percentiles[5.0]
-    assert res.field == "free" and res.presentation == "binaural"
+    assert res.field == "free"
+    assert res.presentation == "binaural"
 
 
 def test_diotic_equals_binaural_and_exceeds_monaural() -> None:
@@ -460,12 +461,14 @@ def test_invalid_inputs_raise() -> None:
         ValueError, match="'fs' must be a positive sampling rate"
     ):
         loudness_moore_glasberg_time(tone, -1.0)
+    empty = np.array([])
     with pytest.raises(ValueError, match="Input signal cannot be empty"):
-        loudness_moore_glasberg_time(np.array([]), FS)
+        loudness_moore_glasberg_time(empty, FS)
+    with_nan = np.array([1.0, np.nan, 2.0])
     with pytest.raises(
         ValueError, match="Input signal must contain only finite values"
     ):
-        loudness_moore_glasberg_time(np.array([1.0, np.nan, 2.0]), FS)
+        loudness_moore_glasberg_time(with_nan, FS)
 
 
 def test_plot_smoke() -> None:
