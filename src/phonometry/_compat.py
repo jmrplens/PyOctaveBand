@@ -12,8 +12,9 @@ second level (``phonometry.vibration`` into ``structural``, ``human`` and
 
 The 3.2 generation, which grouped the flat top-level modules into domain
 subpackages, announced 4.0 as its removal and is gone: ``phonometry.levels``
-and its ninety-odd siblings raise ``ModuleNotFoundError`` now. The flat API
-they were reached through, ``from phonometry import leq``, never moved.
+and its eighty-odd siblings raise ``ModuleNotFoundError`` now. Only the module
+paths went: the names they held are still exported flat, so ``from phonometry
+import leq`` reads as it always has.
 
 Every public module path that moved stays importable through the shims
 registered here: ``import phonometry.<old>`` and ``from phonometry.<old>
@@ -412,9 +413,9 @@ def _install() -> None:
                 continue
             shim = _make_shim(old, new, since, removed_in)
             sys.modules[old] = shim
-            # `import phonometry.utils` also binds the attribute on the
-            # package; mirror that so `phonometry.utils` resolves without the
-            # import. Aliases below a subpackage are served by that package's
+            # `import phonometry.environmental` also binds the attribute on
+            # the package; mirror that so `phonometry.environmental` resolves
+            # without the import. Aliases below a subpackage are served by that package's
             # own shim (:func:`_namespace_shim`), which resolves the moved
             # public names first, so binding them here would shadow a function
             # with a module.

@@ -283,6 +283,20 @@ _REMOVED_FLAT_MODULE_PATHS = [
 ]
 
 
+def test_pre_split_module_alias_rejects_unknown_names() -> None:
+    """A 4.0 alias serves what its target has, and nothing else.
+
+    The alias delegates by ``getattr`` on the relocated module, so a typo has
+    to come back as an ``AttributeError`` naming the path the caller wrote,
+    not as a silent ``None`` or a confusing message about the new module.
+    """
+    import importlib
+
+    shim = importlib.import_module("phonometry.metrology.levels")
+    with pytest.raises(AttributeError, match="phonometry.metrology.levels"):
+        _ = shim.does_not_exist
+
+
 @pytest.mark.parametrize("path", _REMOVED_FLAT_MODULE_PATHS)
 def test_removed_flat_module_path_raises(path: str) -> None:
     import importlib

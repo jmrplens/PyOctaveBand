@@ -6,7 +6,7 @@ Aircraft noise certification (14 CFR Part 36, ICAO Annex 16 Vol. I) works with
 one-third-octave-band spectra, and correcting a measured flyover to reference
 atmospheric conditions requires the band attenuation over the propagation path.
 The pure-tone attenuation coefficient is the ISO 9613-1 one (identical, per ARP
-5534 §3.1) already provided by :func:`phonometry.environment.propagation.air_absorption.air_attenuation`;
+5534 §3.1) already provided by :func:`~phonometry.environment.propagation.air_absorption.air_attenuation`;
 this module adds the **SAE Method** (ARP 5534 §3.2.2), a regression that turns
 the pure-tone mid-band path-length attenuation into the one-third-octave-band
 attenuation and stays consistent with the ISO/ANSI Exact Method well beyond the

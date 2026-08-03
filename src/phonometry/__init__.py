@@ -2851,7 +2851,7 @@ def __getattr__(name: str) -> Any:
     return globals()[canonical]
 
 
-# Deprecated module-path aliases for the 3.2 package reorganization: importing
-# the package installs sys.modules shims for every moved public module (see
-# phonometry/_compat.py; removed in 4.0).
+# Deprecated module-path aliases for the 4.0 taxonomy: importing the package
+# installs sys.modules shims for every moved public module (see
+# phonometry/_compat.py; removed in 5.0).
 from . import _compat as _compat

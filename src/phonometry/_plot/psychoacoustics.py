@@ -519,8 +519,8 @@ def plot_ecma_fluctuation_strength(
     ``ax`` is supplied only the time-dependent fluctuation strength is drawn
     on it and that single axes is returned.
 
-    :param result: An :class:`~phonometry.fluctuation_strength_ecma.
-        EcmaFluctuationStrength`.
+    :param result: An :class:`~phonometry.psychoacoustics.quality.
+        fluctuation_strength_ecma.EcmaFluctuationStrength`.
     :param ax: Existing axes to draw on, or ``None`` to create a figure.
     :param language: Label language, ``"en"`` (default) or ``"es"``.
     :param kwargs: Forwarded to the time-trace line ``plot`` call.
