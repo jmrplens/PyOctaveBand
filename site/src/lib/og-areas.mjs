@@ -7,7 +7,7 @@
  * nothing to keep in step by hand: moving a guide into another group moves its
  * card artwork with it on the next build.
  */
-import { sidebar } from '../data/sidebar.mjs';
+import { navigationTree as sidebar } from '../data/topics.mjs';
 
 /**
  * Sidebar group label to area slug.
@@ -19,12 +19,16 @@ import { sidebar } from '../data/sidebar.mjs';
  * tree carry the generic card.
  */
 const AREA_SLUG = new Map([
-  ['Core signal analysis', 'core-signal-analysis'],
+  ['Signal analysis', 'core-signal-analysis'],
   ['Hearing and perception', 'hearing-perception'],
   ['Rooms and buildings', 'rooms-buildings'],
   ['Materials and surfaces', 'materials-surfaces'],
-  ['Vibration and structure-borne sound', 'vibration'],
+  ['Vibration', 'vibration'],
   ['Environment and transport', 'environment-transport'],
+  // Aircraft noise was part of the environment area when the artwork was
+  // drawn, and it is a topic of its own now. It keeps that card until a
+  // drawing of its own exists; the kicker stays the environment label.
+  ['Aircraft noise', 'environment-transport'],
   ['Underwater acoustics', 'underwater'],
   ['Sources and devices', 'sources-devices'],
   ['Wave simulation', 'simulation'],
@@ -87,7 +91,9 @@ const areaLabel = (() => {
   const map = new Map();
   for (const group of sidebar) {
     const key = AREA_SLUG.get(group?.label);
-    if (!key) continue;
+    // First label wins: two topics may share a card, and the kicker names the
+    // area the drawing was made for.
+    if (!key || map.has(key)) continue;
     map.set(key, { en: group.label, es: group.translations?.es ?? group.label });
   }
   return map;

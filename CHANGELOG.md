@@ -1070,6 +1070,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   the errata registry are written at the repository root and transplanted into
   their site routes, which is a mapping the layout cannot express.
 
+- The sidebar is one tree per topic, through `starlight-sidebar-topics`. A
+  reader in the underwater chapter sees its four guides and its own API branch,
+  not every page in the library folded three levels deep, and the topic list at
+  the top of the sidebar says what the other twelve are. On a guide the tree
+  drops from 222 links to about a hundred; on an API page the current module is
+  finally on screen instead of nine hundred pixels down a shared column.
+
+  The API reference of a domain lives inside that domain's topic, which the
+  package taxonomy is what makes possible: a section of the generated reference
+  is a subpackage is a topic. The last topic is the global index for a reader
+  who wants the whole table rather than one domain. `generate_api_docs.py` emits
+  one group per section instead of a single block, so adding a module still
+  changes nothing by hand.
+
+  The tree is one level shallower as a result, since a topic is what a
+  top-level group used to be, and the styling follows: at the top level of a
+  topic a page and a subgroup read the same, as they already did further down.
+
 - The documentation site is organised by topic rather than by one `guides/`
   drawer. Every page lives under the domain it belongs to, and the URL says so:
   `signal/filters/filter-banks`, `buildings/insulation/insulation-field`,

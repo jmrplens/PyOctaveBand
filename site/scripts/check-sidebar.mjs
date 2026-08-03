@@ -10,13 +10,13 @@
 // press or navigation.
 //
 // Nothing here counts pages. The expectations are built from
-// src/data/sidebar.mjs, the same array astro.config.mjs hands to Starlight, so
+// src/data/topics.mjs, the same array astro.config.mjs hands to the plugin, so
 // adding a guide or a whole group never fails this check, while a configured
 // entry that does not render, renders at the wrong depth, arrives open when it
 // was collapsed, or shows through a closed parent still does.
 //
 // Usage: node scripts/check-sidebar.mjs [--base http://localhost:4321]
-import { sidebar } from '../src/data/sidebar.mjs';
+import { topics } from '../src/data/topics.mjs';
 import { BASE_PATH, baseFrom, createExpect, launchBrowser } from './shared/audit.mjs';
 
 const BASE = baseFrom();
@@ -40,7 +40,7 @@ const labelOf = (item, locale) =>
 /** The URL Starlight gives a sidebar `slug` in `locale`. */
 const hrefOf = (slug, locale) => `${BASE_PATH}/${locale === 'es' ? 'es/' : ''}${slug}/`;
 
-/** src/data/sidebar.mjs, as the shape the rendered tree has to match. */
+/** src/data/topics.mjs, as the shape the rendered tree has to match. */
 function configuredTree(items, locale) {
 	return items.map((item) => {
 		if (typeof item === 'string') return { kind: 'link', href: hrefOf(item, locale) };
@@ -82,10 +82,32 @@ function foldFor(nodes, currentHref, visible = true) {
 }
 
 function expectedTree(locale, currentHref) {
-	const tree = configuredTree(sidebar, locale);
+	const tree = configuredTree(topicOf(currentHref, locale).items ?? [], locale);
 	foldFor(tree, currentHref);
 	return tree;
 }
+
+/**
+ * The topic that owns a page: the one listing it, or the one whose link is its
+ * longest prefix. One sidebar renders per page, and it is that topic's.
+ */
+function topicOf(currentHref, locale) {
+	const owning = topics.find((topic) =>
+		linkHrefs(configuredTree(topic.items ?? [], locale)).includes(currentHref),
+	);
+	if (owning) return owning;
+	const byPrefix = topics
+		.filter((topic) => currentHref.startsWith(`${BASE_PATH}${localeLink(topic.link, locale)}`))
+		.sort((a, b) => b.link.length - a.link.length);
+	if (!byPrefix[0]) throw new Error(`no topic owns ${currentHref}`);
+	return byPrefix[0];
+}
+
+/** Every configured item across the topics, for the closing tally. */
+const allItems = topics.flatMap((topic) => topic.items ?? []);
+
+/** A topic link in one locale, as the plugin renders it. */
+const localeLink = (link, locale) => (locale === 'es' ? `/es${link}` : link);
 
 /** Every configured group label, in tree order. */
 function groupLabels(nodes, out = []) {
@@ -213,7 +235,7 @@ async function open(path, { phone = false } = {}) {
 }
 
 /**
- * The whole tree assertion for one page: what src/data/sidebar.mjs configures
+ * The whole tree assertion for one page: what src/data/topics.mjs configures
  * is what renders, at the configured depth, with only the reader's own branch
  * unfolded.
  */
@@ -286,22 +308,22 @@ const readTypography = () => {
 
 for (const phone of [true, false]) {
 	const where = phone ? 'drawer' : 'column';
-	// The open branch here is Hearing and perception, which holds an Overview
-	// page and three nested groups, so the second level has both kinds of row.
+	// One topic renders per page, so the tree starts one level shallower than
+	// it used to: the topic's own rows are the top level, where an Overview
+	// page sits next to the subgroups, and the pages of a subgroup are the
+	// second. Both kinds of row at a depth must read the same, which is the
+	// property worth checking; the depths themselves moved with the topics.
 	const { context, page } = await open(DEEP_GUIDE, { phone });
 	const type = await page.evaluate(readTypography);
-	expect(`${where}: the top-level headings are one treatment`, type[1], {
-		treatments: 1,
-		kinds: 'group',
-	});
-	expect(`${where}: second-level groups and pages read the same`, type[2], {
+	expect(`${where}: the top-level rows are one treatment`, type[1], {
 		treatments: 1,
 		kinds: 'group+page',
 	});
-	expect(`${where}: third-level pages read the same`, type[3], {
+	expect(`${where}: second-level pages read the same`, type[2], {
 		treatments: 1,
 		kinds: 'page',
 	});
+	expect(`${where}: the tree stops at the second level`, type[3], undefined);
 	await page.close();
 	await context.close();
 }
@@ -310,11 +332,11 @@ for (const phone of [true, false]) {
 {
 	const { context, page } = await open(API_PAGE);
 	const type = await page.evaluate(readTypography);
-	// Second level here is the API's own Overview row next to its category
-	// groups; third level is the module pages of the open category.
-	expect('API branch: its Overview row reads like its category groups', type[2], {
+	// The API branch of a topic is a group of section groups, so its module
+	// pages are the third level and the sections the second.
+	expect('API branch: its section groups are one treatment', type[2], {
 		treatments: 1,
-		kinds: 'group+page',
+		kinds: 'group',
 	});
 	expect('API branch: the module rows read the same', type[3], {
 		treatments: 1,
@@ -441,8 +463,9 @@ for (const phone of [true, false]) {
 // ever renders nothing at all the diff would say so, but state the size of
 // what was checked so a silent shrink is visible in the log.
 console.log(
-	`\nChecked ${groupLabels(configuredTree(sidebar, 'en')).length} configured groups and ` +
-		`${linkHrefs(configuredTree(sidebar, 'en')).length} configured pages per locale.`,
+	`\nChecked ${topics.length} topics, ` +
+		`${groupLabels(configuredTree(allItems, 'en')).length} configured groups and ` +
+		`${linkHrefs(configuredTree(allItems, 'en')).length} configured pages per locale.`,
 );
 await browser.close();
 console.log(`${failures()} failing check(s).`);

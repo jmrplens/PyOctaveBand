@@ -1,36 +1,39 @@
 /**
- * The site's navigation tree, in one place.
+ * The site's navigation, one sidebar per topic.
  *
- * astro.config.mjs hands this array to Starlight and scripts/check-sidebar.mjs
- * reads it to work out what the rendered tree has to look like, so the checks
- * follow the content: adding a guide or a whole group is one edit here and the
- * audit expects it on the next run, with nothing to keep in step by hand.
+ * Every page belongs to a topic, the topic owns the sidebar a reader sees, and
+ * `starlight-sidebar-topics` renders the topic list above it. That is what
+ * makes the tree readable: an underwater page shows four guides and its own
+ * API branch instead of every page in the library folded three deep.
+ *
+ * The API reference of a domain lives inside that domain's topic, which the
+ * taxonomy makes possible: a section of the generated reference is a
+ * subpackage is a topic. `apiSections` comes from
+ * `scripts/generate_api_docs.py`, one group per section, so adding a module
+ * changes nothing here. The last topic is a link to the global index, for a
+ * reader who wants the whole table rather than one domain.
+ *
+ * `astro.config.mjs` hands this array to the plugin and
+ * `scripts/check-sidebar.mjs` reads it to work out what the rendered tree has
+ * to look like, so the checks follow the content.
  */
-import { apiSidebar } from '../generated/api-sidebar.mjs';
+import { apiSections } from '../generated/api-sidebar.mjs';
 
-// Stock Starlight sidebar. Every group is `collapsed: true`, and
-// Starlight forces open the chain of groups that holds the current page,
-// so a reader always lands with their own branch unfolded and everything
-// else closed. A group label is plain text inside a `<summary>` and
-// cannot be a link in stock Starlight (the sidebar schema declares
-// `attrs: z.never()` on groups and gives them no `slug` or `link`), so
-// each group that has a landing page carries it as an explicit
-// `Overview` entry, first in the group. The API reference is its own
-// top-level group, next to Reference rather than inside it.
-//
-// `collapsed` is a server-rendered boolean, so it cannot differ between
-// desktop and phone, and the earlier "expanded on desktop, folded on
-// mobile" idea is superseded: the tree arrives folded on both. Undoing
-// that is a one-word edit, `collapsed: false` on the groups concerned.
-export const sidebar = [
+const apiGroup = (...keys) => ({
+  label: 'API reference',
+  translations: { es: 'Referencia de la API' },
+  collapsed: true,
+  items: keys.map((key) => apiSections[key]),
+});
+
+export const topics = [
   {
-    // The only group without an Overview row, on purpose: "Getting started"
-    // is already its front door, so an overview page here would only restate
-    // the row below it.
-    label: 'Start',
-    translations: { es: 'Inicio' },
-    collapsed: true,
+    id: 'start',
+    label: { en: 'Start', es: 'Inicio' },
+    link: '/start/',
+    icon: 'open-book',
     items: [
+      { slug: 'start', label: 'Overview', translations: { es: 'Resumen' } },
       'start/getting-started',
       // The map of the ten topics. A sibling entry point rather than a parent:
       // the area overviews stay the breadcrumb ancestors of their own guides.
@@ -40,9 +43,10 @@ export const sidebar = [
     ],
   },
   {
-    label: 'Core signal analysis',
-    translations: { es: 'Análisis de señal' },
-    collapsed: true,
+    id: 'signal',
+    label: { en: 'Signal analysis', es: 'Análisis de señal' },
+    link: '/signal/',
+    icon: 'seti:audio',
     items: [
       { slug: 'signal', label: 'Overview', translations: { es: 'Resumen' } },
       'signal/sound-level-meter',
@@ -98,12 +102,14 @@ export const sidebar = [
           'signal/metrology/data-qualification',
         ],
       },
+      apiGroup('filters', 'signals', 'metrology'),
     ],
   },
   {
-    label: 'Hearing and perception',
-    translations: { es: 'Audición y percepción' },
-    collapsed: true,
+    id: 'perception',
+    label: { en: 'Hearing and perception', es: 'Audición y percepción' },
+    link: '/perception/',
+    icon: 'seti:pipeline',
     items: [
       { slug: 'perception', label: 'Overview', translations: { es: 'Resumen' } },
       {
@@ -142,12 +148,14 @@ export const sidebar = [
           'perception/hearing/occupational-exposure',
         ],
       },
+      apiGroup('psychoacoustics', 'speech', 'hearing'),
     ],
   },
   {
-    label: 'Rooms and buildings',
-    translations: { es: 'Salas y edificación' },
-    collapsed: true,
+    id: 'buildings',
+    label: { en: 'Rooms and buildings', es: 'Salas y edificación' },
+    link: '/buildings/',
+    icon: 'seti:home',
     items: [
       { slug: 'buildings', label: 'Overview', translations: { es: 'Resumen' } },
       {
@@ -192,16 +200,19 @@ export const sidebar = [
           'buildings/design/detailed-prediction',
           'buildings/design/panel-sound-insulation',
           'buildings/design/impact-improvement',
+      'buildings/design/resilient-layers',
           'buildings/design/structure-borne-power',
           'buildings/design/installed-structure-borne',
             ],
       },
+      apiGroup('rooms', 'building'),
     ],
   },
   {
-    label: 'Materials and surfaces',
-    translations: { es: 'Materiales y superficies' },
-    collapsed: true,
+    id: 'materials',
+    label: { en: 'Materials and surfaces', es: 'Materiales y superficies' },
+    link: '/materials/',
+    icon: 'seti:crystal',
     items: [
       { slug: 'materials', label: 'Overview', translations: { es: 'Resumen' } },
       {
@@ -225,6 +236,7 @@ export const sidebar = [
           { slug: 'materials/diffusers', label: 'Overview', translations: { es: 'Resumen' } },
           'materials/diffusers/diffusers',
           'materials/diffusers/metadiffusers',
+          { slug: 'materials/surfaces', label: 'Surfaces overview', translations: { es: 'Resumen de superficies' } },
           'materials/surfaces/road-absorption',
         ],
       },
@@ -237,12 +249,14 @@ export const sidebar = [
           'materials/resilient/dynamic-stiffness',
         ],
       },
+      apiGroup('materials'),
     ],
   },
   {
-    label: 'Vibration and structure-borne sound',
-    translations: { es: 'Vibración y ruido estructural' },
-    collapsed: true,
+    id: 'vibration',
+    label: { en: 'Vibration', es: 'Vibración' },
+    link: '/vibration/',
+    icon: 'seti:pipeline',
     items: [
       { slug: 'vibration', label: 'Overview', translations: { es: 'Resumen' } },
       {
@@ -276,12 +290,14 @@ export const sidebar = [
           'vibration/machinery/machine-diagnostics',
         ],
       },
+      apiGroup('vibration'),
     ],
   },
   {
-    label: 'Environment and transport',
-    translations: { es: 'Medio ambiente y transporte' },
-    collapsed: true,
+    id: 'environment',
+    label: { en: 'Environment and transport', es: 'Medio ambiente y transporte' },
+    link: '/environment/',
+    icon: 'seti:folder',
     items: [
       { slug: 'environment', label: 'Overview', translations: { es: 'Resumen' } },
       {
@@ -302,42 +318,56 @@ export const sidebar = [
         items: [
           { slug: 'environment/propagation', label: 'Overview', translations: { es: 'Resumen' } },
           'environment/propagation/outdoor-propagation',
-          'environment/sources/cnossos-rail-emission',
-          'environment/sources/cnossos-road-emission',
           'environment/propagation/ground-barriers',
           'environment/propagation/atmospheric-refraction',
         ],
       },
       {
-        label: 'Aircraft and wind energy',
-        translations: { es: 'Aeronaves y energía eólica' },
+        label: 'Sources',
+        translations: { es: 'Fuentes' },
         collapsed: true,
         items: [
-          { slug: 'aircraft', label: 'Overview', translations: { es: 'Resumen' } },
-          'aircraft/aircraft-noise',
-          'aircraft/airport-noise',
-          'aircraft/rotorcraft-noise',
+          { slug: 'environment/sources', label: 'Overview', translations: { es: 'Resumen' } },
+          'environment/sources/cnossos-road-emission',
+          'environment/sources/cnossos-rail-emission',
           'environment/sources/wind-turbine-noise',
         ],
       },
+      apiGroup('environment'),
     ],
   },
   {
-    label: 'Underwater acoustics',
-    translations: { es: 'Acústica submarina' },
-    collapsed: true,
+    id: 'aircraft',
+    label: { en: 'Aircraft noise', es: 'Ruido de aeronaves' },
+    link: '/aircraft/',
+    icon: 'rocket',
+    items: [
+      { slug: 'aircraft', label: 'Overview', translations: { es: 'Resumen' } },
+      'aircraft/aircraft-noise',
+      'aircraft/airport-noise',
+      'aircraft/rotorcraft-noise',
+      apiGroup('aeroacoustics'),
+    ],
+  },
+  {
+    id: 'underwater',
+    label: { en: 'Underwater acoustics', es: 'Acústica submarina' },
+    link: '/underwater/',
+    icon: 'seti:db',
     items: [
       { slug: 'underwater', label: 'Overview', translations: { es: 'Resumen' } },
       'underwater/underwater-acoustics',
       'underwater/underwater-propagation',
       'underwater/underwater-solvers',
       'underwater/marine-mammal-exposure',
+      apiGroup('underwater'),
     ],
   },
   {
-    label: 'Sources and devices',
-    translations: { es: 'Fuentes y dispositivos' },
-    collapsed: true,
+    id: 'devices',
+    label: { en: 'Sources and devices', es: 'Fuentes y dispositivos' },
+    link: '/devices/',
+    icon: 'laptop',
     items: [
       { slug: 'devices', label: 'Overview', translations: { es: 'Resumen' } },
       {
@@ -363,6 +393,7 @@ export const sidebar = [
           'devices/electroacoustics/loudspeakers',
           'devices/electroacoustics/microphones',
           'devices/electroacoustics/swept-sine-distortion',
+          { slug: 'devices/broadcast', label: 'Broadcast overview', translations: { es: 'Resumen de radiodifusión' } },
           'devices/broadcast/program-loudness',
         ],
       },
@@ -378,22 +409,26 @@ export const sidebar = [
           'devices/noise-control/noise-control',
         ],
       },
+      apiGroup('power', 'electroacoustics', 'broadcast', 'noise_control'),
     ],
   },
   {
-    label: 'Wave simulation',
-    translations: { es: 'Simulación de ondas' },
-    collapsed: true,
+    id: 'simulation',
+    label: { en: 'Wave simulation', es: 'Simulación de ondas' },
+    link: '/simulation/',
+    icon: 'seti:graphql',
     items: [
       { slug: 'simulation', label: 'Overview', translations: { es: 'Resumen' } },
       'simulation/fdtd-simulation',
       'simulation/elastic-waves',
+      apiGroup('simulation'),
     ],
   },
   {
-    label: 'Reference',
-    translations: { es: 'Referencia' },
-    collapsed: true,
+    id: 'reference',
+    label: { en: 'Reference', es: 'Referencia' },
+    link: '/reference/',
+    icon: 'information',
     items: [
       { slug: 'reference', label: 'Overview', translations: { es: 'Resumen' } },
       {
@@ -424,7 +459,28 @@ export const sidebar = [
       'reference/glossary',
     ],
   },
-  // The generated API tree, kept as its own top-level group so the
-  // machine-written half of the site is separated from the written one.
-  apiSidebar,
+  {
+    id: 'api',
+    label: { en: 'API reference', es: 'Referencia de la API' },
+    link: '/reference/api/',
+    icon: 'seti:python',
+    items: [
+      { slug: 'reference/api', label: 'The whole API', translations: { es: 'Toda la API' } },
+    ],
+  },
 ];
+
+/**
+ * The topics as a plain group tree, for everything that reads the navigation
+ * rather than renders it: the breadcrumb trails, the per-area OG artwork and
+ * the sidebar behaviour check. A topic is a top-level group, which is what
+ * those three already assumed when the whole site shared one sidebar.
+ */
+export const navigationTree = topics
+  .filter((topic) => topic.items)
+  .map((topic) => ({
+    label: topic.label.en,
+    translations: { es: topic.label.es },
+    collapsed: true,
+    items: topic.items,
+  }));

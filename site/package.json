@@ -25,7 +25,8 @@
     "satori": "^0.29.0",
     "sharp": "^0.35.3",
     "starlight-image-zoom": "^0.15.0",
-    "starlight-links-validator": "^0.25.2"
+    "starlight-links-validator": "^0.25.2",
+    "starlight-sidebar-topics": "^0.8.0"
   },
   "devDependencies": {
     "html-validate": "^11.5.6",

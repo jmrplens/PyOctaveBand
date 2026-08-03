@@ -7,10 +7,11 @@
    three-level tree needs, because Starlight styles every group label with the
    same `.large` token regardless of depth:
 
-   - top-level groups (Start, Core signal analysis, ..., API reference) become
-     small uppercase "eyebrow" headers with a hairline separator above each
-     group, the pattern large Starlight sites (e.g. the Astro docs) use for
-     long navigation lists;
+   - the top level of a topic (its Overview row, its guides and its subgroups)
+     becomes small uppercase "eyebrow" rows with a hairline separator above
+     each, the pattern large Starlight sites (e.g. the Astro docs) use for long
+     navigation lists. A page and a group at that depth read the same, since
+     with one sidebar per topic both kinds share it;
    - every row below the top level, nested group label or page link, shares one
      type treatment: the small text size, weight 600 and the gray-2 ink, so
      rows at the same depth read as one list instead of two;
@@ -21,7 +22,8 @@
    themes are both covered, and nothing here touches focus styles. */
 
 /* Top-level group labels: uppercase eyebrow headers. */
-#starlight__sidebar .top-level > li > details > summary .large {
+#starlight__sidebar .top-level > li > details > summary .large,
+#starlight__sidebar .top-level > li > a {
   font-size: var(--sl-text-xs);
   text-transform: uppercase;
   letter-spacing: 0.08em;
