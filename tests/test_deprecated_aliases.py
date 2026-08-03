@@ -268,6 +268,33 @@ def test_renamed_attribute_shims_reject_unknown_names() -> None:
 
 
 # --------------------------------------------------------------------------- #
+# 3.2 package reorganization: its flat module paths were removed in 4.0, as
+# announced. A sample of them, frozen; the point is that they stay gone, and
+# that a stale file left on disk would be caught rather than silently served.
+# --------------------------------------------------------------------------- #
+_REMOVED_FLAT_MODULE_PATHS = [
+    "phonometry.core",
+    "phonometry.insulation",
+    "phonometry.levels",
+    "phonometry.loudness",
+    "phonometry.room_ir",
+    "phonometry.underwater_acoustics",
+    "phonometry.utils",
+]
+
+
+@pytest.mark.parametrize("path", _REMOVED_FLAT_MODULE_PATHS)
+def test_removed_flat_module_path_raises(path: str) -> None:
+    import importlib
+
+    with pytest.raises(ModuleNotFoundError):
+        importlib.import_module(path)
+    assert path not in sys.modules
+    # The names themselves never moved: the flat API is what they were for.
+    assert hasattr(ph, "leq")
+
+
+# --------------------------------------------------------------------------- #
 # 4.0 taxonomy: metrology split into filters + signals + a narrowed metrology,
 # and the speech intelligibility of hearing into speech.
 # Frozen snapshot of the pre-split module paths; do NOT regenerate from the
