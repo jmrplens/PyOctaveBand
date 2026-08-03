@@ -19,7 +19,7 @@
   "dependencies": {
     "@astrojs/starlight": "^0.41.5",
     "astro": "^7.1.6",
-    "katex": "^0.16.47",
+    "katex": "^0.18.1",
     "rehype-katex": "^7.0.1",
     "remark-math": "^6.0.0",
     "satori": "^0.29.0",
@@ -28,7 +28,7 @@
     "starlight-links-validator": "^0.25.2"
   },
   "devDependencies": {
-    "html-validate": "^11.5.6",
+    "html-validate": "^11.6.0",
     "lighthouse": "^13.4.1",
     "pa11y-ci": "^4.1.1"
   }
