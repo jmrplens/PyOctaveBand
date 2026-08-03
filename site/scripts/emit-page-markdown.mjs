@@ -112,9 +112,16 @@ for (const [stem, route] of [
   // and are transplanted into these routes on the site.
   ["CONFORMANCE", "reference/conformance"],
   ["ERRATA", "reference/errata"],
+  // Renamed on the way to the site, with the module merge it follows.
+  ["impulse-prominence", "environment/assessment/impulsive-sound"],
 ]) {
   routeForStem.set(stem, route);
 }
+
+// docs/ file stem -> content stem, for the pages the site renamed. Without it
+// the copy served for the renamed page falls back to the stripped MDX and
+// loses the mirror's own prose.
+const MIRROR_ALIASES = new Map([["impulsive-sound", "impulse-prominence"]]);
 
 let written = 0;
 for await (const file of glob("**/*.{md,mdx}", { cwd: contentDir })) {
@@ -127,7 +134,9 @@ for await (const file of glob("**/*.{md,mdx}", { cwd: contentDir })) {
 
   const stem = file.replace(/\\/g, "/").split("/").pop().replace(/\.mdx?$/, "");
   const isSpanish = route === "es" || route.startsWith("es/");
-  const mirror = isSpanish ? undefined : docsMirror.get(stem);
+  const mirror = isSpanish
+    ? undefined
+    : docsMirror.get(stem) ?? docsMirror.get(MIRROR_ALIASES.get(stem));
 
   const raw = mirror
     ? readFileSync(mirror, "utf8")

@@ -66,3 +66,11 @@ risk.
 - [Multiple-shock whole-body vibration (ISO 2631-5)](/phonometry/vibration/human/multiple-shock-vibration/):
   the spinal-response model and the probability of lumbar injury for vibration
   containing multiple shocks.
+
+## Machinery
+
+Turning a vibration spectrum into a diagnosis of the machine that made it.
+
+- [Machine fault frequencies](/phonometry/vibration/machinery/machine-diagnostics/):
+  the characteristic bearing, gear and shaft frequencies, and the envelope
+  analysis that finds them under the broadband noise of a running machine.

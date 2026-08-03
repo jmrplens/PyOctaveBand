@@ -10,7 +10,7 @@
  * one.
  *
  * So the feature list is derived here from `home.ts`, which already holds the
- * nine areas and the standards actually implemented in each and is what the
+ * areas and the standards actually implemented in each and is what the
  * landing page renders. Adding an area to the landing page now adds it to the
  * structured data, with nothing to keep in step by hand.
  */

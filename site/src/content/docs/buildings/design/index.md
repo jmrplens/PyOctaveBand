@@ -65,3 +65,9 @@ floor, and with it the resonance frequency the whole improvement hangs on.
 - [Dynamic stiffness of resilient materials (EN 29052-1)](/phonometry/materials/resilient/dynamic-stiffness/):
   the load-plate resonance measurement, the enclosed-gas term and the
   floating-floor natural frequency.
+- [Structure-borne sound power of equipment (EN 15657)](/phonometry/buildings/design/structure-borne-power/):
+  the characteristic power a machine injects into a building element, measured
+  on a reception plate.
+- [Installed structure-borne sound (EN 12354-5)](/phonometry/buildings/design/installed-structure-borne/):
+  what that power becomes once the machine is mounted on a real element, and
+  the level it produces in the receiving room.

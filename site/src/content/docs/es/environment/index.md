@@ -31,6 +31,17 @@ las páginas de salas y materiales. Empieza por
 introduce la contabilidad fuente-camino-receptor que las páginas de
 transporte reutilizan.
 
+## Evaluación y normativa
+
+Con qué se compara el sonido recibido, una vez ha llegado.
+
+- [Niveles ambientales (ISO 1996-1/-2)](/phonometry/es/environment/environmental-levels/):
+  los indicadores día-tarde-noche, el nivel de evaluación y las correcciones
+  que convierten un LAeq medido en uno evaluado.
+- [Normativa española de ruido (RD 1367/2007)](/phonometry/es/environment/spanish-noise-regulation/):
+  la aplicación nacional de esa cadena, con sus propios límites y sus propias
+  correcciones por tonalidad e impulsividad.
+
 ## [Sonido en exteriores](/phonometry/es/environment/propagation/)
 
 El camino de una fuente exterior a un receptor, y el carácter de lo que

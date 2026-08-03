@@ -83,7 +83,7 @@ async function getMark(): Promise<string> {
  * not decode WebP there. It does not fail, it draws nothing, so the first
  * cards came out as a flat background. Rendering the same tree with a JPEG
  * source and measuring the result is what separated the two.
- * @param key - Area slug, or "generic" for everything outside the nine areas.
+ * @param key - Area slug, or "generic" for everything outside the areas.
  */
 async function getArt(key: string): Promise<string> {
   const cached = artUris.get(key);

@@ -154,7 +154,7 @@ export const en: HomeContent = {
 	},
 	coverage: {
 		title: 'What it covers',
-		lead: `Nine areas, ${guides} guides, ${apiPages} API reference pages. Each row links to the area overview; the designations are the standards actually implemented there, not a reading list.`,
+		lead: `Ten areas, ${guides} guides, ${apiPages} API reference pages. Each row links to the area overview; the designations are the standards actually implemented there, not a reading list.`,
 		headers: ['Area', 'Standards implemented'],
 		areas: [
 			{
@@ -190,8 +190,14 @@ export const en: HomeContent = {
 			{
 				name: 'Environment and transport',
 				href: '/phonometry/environment/',
-				summary: 'Outdoor propagation, barriers, refraction, aircraft, rotorcraft and wind turbines.',
-				standards: ['ISO 9613-1/-2', 'ISO 1996-1/-2', 'ISO/PAS 1996-3', 'NT ACOU 112', 'CNOSSOS-EU (2002/49/EC Annex II)', 'ICAO Annex 16', 'IEC 61265', 'SAE ARP 5534', 'ECAC Doc 29/32', 'IEC 61400-11'],
+				summary: 'Outdoor propagation, barriers, refraction, environmental indicators, traffic and wind-turbine sources.',
+				standards: ['ISO 9613-1/-2', 'ISO 1996-1/-2', 'ISO/PAS 1996-3', 'NT ACOU 112', 'CNOSSOS-EU (2002/49/EC Annex II)', 'IEC 61400-11'],
+			},
+			{
+				name: 'Aircraft noise',
+				href: '/phonometry/aircraft/',
+				summary: 'Certification levels, airport contours and the rotorcraft hemisphere method.',
+				standards: ['ICAO Annex 16', 'IEC 61265', 'SAE ARP 866B/5534', 'ECAC Doc 29', 'ECAC Doc 32'],
 			},
 			{
 				name: 'Underwater acoustics',
@@ -295,7 +301,7 @@ export const es: HomeContent = {
 	},
 	coverage: {
 		title: 'Qué abarca',
-		lead: `Nueve áreas, ${guides} guías y ${apiPages} páginas de referencia de la API. Cada fila enlaza al índice del área; las designaciones son las normas realmente implementadas ahí, no una lista de lecturas.`,
+		lead: `Diez áreas, ${guides} guías y ${apiPages} páginas de referencia de la API. Cada fila enlaza al índice del área; las designaciones son las normas realmente implementadas ahí, no una lista de lecturas.`,
 		headers: ['Área', 'Normas implementadas'],
 		areas: [
 			{
@@ -331,8 +337,14 @@ export const es: HomeContent = {
 			{
 				name: 'Medio ambiente y transporte',
 				href: '/phonometry/es/environment/',
-				summary: 'Propagación en exteriores, barreras, refracción, aeronaves, helicópteros y aerogeneradores.',
-				standards: ['ISO 9613-1/-2', 'ISO 1996-1/-2', 'ISO/PAS 1996-3', 'NT ACOU 112', 'CNOSSOS-EU (Directiva 2002/49/CE, anexo II)', 'Anexo 16 OACI', 'IEC 61265', 'SAE ARP 5534', 'ECAC Doc 29/32', 'IEC 61400-11'],
+				summary: 'Propagación en exteriores, barreras, refracción, indicadores ambientales, tráfico y aerogeneradores.',
+				standards: ['ISO 9613-1/-2', 'ISO 1996-1/-2', 'ISO/PAS 1996-3', 'NT ACOU 112', 'CNOSSOS-EU (Directiva 2002/49/CE, anexo II)', 'IEC 61400-11'],
+			},
+			{
+				name: 'Ruido de aeronaves',
+				href: '/phonometry/es/aircraft/',
+				summary: 'Niveles de certificación, contornos de aeropuerto y el método de hemisferio para helicópteros.',
+				standards: ['Anexo 16 OACI', 'IEC 61265', 'SAE ARP 866B/5534', 'ECAC Doc 29', 'ECAC Doc 32'],
 			},
 			{
 				name: 'Acústica submarina',

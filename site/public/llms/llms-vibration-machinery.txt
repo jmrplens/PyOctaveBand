@@ -1,4 +1,4 @@
-# phonometry: Vibration and structure-borne sound
+# phonometry: vibration machinery
 
 Part of https://jmrplens.github.io/phonometry/llms.txt. Full text of the pages in this area.
 

@@ -32,7 +32,7 @@ export const sidebar = [
     collapsed: true,
     items: [
       'start/getting-started',
-      // The map of the nine areas. A sibling entry point rather than a parent:
+      // The map of the ten topics. A sibling entry point rather than a parent:
       // the area overviews stay the breadcrumb ancestors of their own guides.
       { slug: 'start/guides', label: 'All guides', translations: { es: 'Todas las guías' } },
       'start/why-phonometry',
@@ -69,9 +69,7 @@ export const sidebar = [
           'signal/levels/special-weightings',
           'signal/levels/time-weighting',
           'signal/levels/levels',
-          'environment/environmental-levels',
-          'environment/spanish-noise-regulation',
-        ],
+                ],
       },
       {
         label: 'Signals and spectra',
@@ -84,8 +82,7 @@ export const sidebar = [
           'signal/spectra/time-frequency',
           'signal/spectra/cepstrum-echoes',
           'signal/spectra/synchronous-averaging',
-          'vibration/machinery/machine-diagnostics',
-          'signal/spectra/correlation-delay',
+              'signal/spectra/correlation-delay',
           'signal/spectra/test-signals',
           'signal/spectra/system-measurement',
         ],
@@ -195,8 +192,9 @@ export const sidebar = [
           'buildings/design/detailed-prediction',
           'buildings/design/panel-sound-insulation',
           'buildings/design/impact-improvement',
-          'materials/resilient/dynamic-stiffness',
-        ],
+          'buildings/design/structure-borne-power',
+          'buildings/design/installed-structure-borne',
+            ],
       },
     ],
   },
@@ -230,6 +228,15 @@ export const sidebar = [
           'materials/surfaces/road-absorption',
         ],
       },
+      {
+        label: 'Resilient layers',
+        translations: { es: 'Capas resilientes' },
+        collapsed: true,
+        items: [
+          { slug: 'materials/resilient', label: 'Overview', translations: { es: 'Resumen' } },
+          'materials/resilient/dynamic-stiffness',
+        ],
+      },
     ],
   },
   {
@@ -248,9 +255,7 @@ export const sidebar = [
           'vibration/structural/junction-transmission',
           'vibration/structural/transfer-stiffness',
           'devices/emission/vibration-sound-power',
-          'buildings/design/structure-borne-power',
-          'buildings/design/installed-structure-borne',
-        ],
+                ],
       },
       {
         label: 'Human vibration',
@@ -262,6 +267,15 @@ export const sidebar = [
           'vibration/human/multiple-shock-vibration',
         ],
       },
+      {
+        label: 'Machinery',
+        translations: { es: 'Maquinaria' },
+        collapsed: true,
+        items: [
+          { slug: 'vibration/machinery', label: 'Overview', translations: { es: 'Resumen' } },
+          'vibration/machinery/machine-diagnostics',
+        ],
+      },
     ],
   },
   {
@@ -270,6 +284,17 @@ export const sidebar = [
     collapsed: true,
     items: [
       { slug: 'environment', label: 'Overview', translations: { es: 'Resumen' } },
+      {
+        label: 'Assessment and regulation',
+        translations: { es: 'Evaluación y normativa' },
+        collapsed: true,
+        items: [
+          { slug: 'environment/assessment', label: 'Overview', translations: { es: 'Resumen' } },
+          'environment/environmental-levels',
+          'environment/spanish-noise-regulation',
+          'environment/assessment/impulsive-sound',
+        ],
+      },
       {
         label: 'Outdoor sound',
         translations: { es: 'Sonido en exteriores' },
@@ -281,7 +306,6 @@ export const sidebar = [
           'environment/sources/cnossos-road-emission',
           'environment/propagation/ground-barriers',
           'environment/propagation/atmospheric-refraction',
-          'environment/assessment/impulsive-sound',
         ],
       },
       {

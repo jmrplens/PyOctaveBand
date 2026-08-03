@@ -4,6 +4,374 @@ Part of https://jmrplens.github.io/phonometry/llms.txt. Full text of the pages i
 
 ---
 
+<!-- source: docs/insulation-prediction.md | canonical: https://jmrplens.github.io/phonometry/buildings/design/insulation-prediction/ -->
+Source: https://jmrplens.github.io/phonometry/buildings/design/insulation-prediction/
+
+# Predicting Sound Insulation (EN 12354)
+
+A laboratory rating describes an element in isolation; a building also
+transmits sound along every flanking path. This page covers the EN 12354
+prediction of in-situ performance between rooms from laboratory element data:
+the airborne model of EN 12354-1 with its junction vibration reduction
+indices, the impact model of EN 12354-2 and the prediction fiches of both. The
+third and fourth parts of the same family, which cross the building envelope
+instead of an internal partition, are in
+[Façade Sound Insulation](https://jmrplens.github.io/phonometry/buildings/insulation/facade-insulation/). The measured quantities the
+model is checked against live in
+[Field Insulation Measurement (ISO 16283)](https://jmrplens.github.io/phonometry/buildings/insulation/insulation-field/); the
+laboratory inputs come from
+[Laboratory Insulation Measurement](https://jmrplens.github.io/phonometry/buildings/insulation/insulation-lab/).
+
+## Predicting performance (EN 12354)
+
+A laboratory rating describes an element in isolation, yet the sound a building
+actually transmits also travels *around* the partition (along the floor, up the
+façade, through the flanking walls), re-radiating into the receiving room. This
+**flanking transmission** is the whole difference between the laboratory $R$ and
+the field $R'$. EN 12354 predicts the in-situ apparent rating from the
+laboratory ratings of the elements plus the vibration transmission of their
+junctions.
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_flanking_paths_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_flanking_paths.svg" alt="The direct path Dd through the separating element and the three flanking paths Ff, Df and Fd across each junction between a flanking element and the separating element" width="92%"></picture>
+
+Each junction between a flanking element and the separating element carries
+three paths, $Ff$ (flanking→flanking), $Df$ (direct→flanking) and $Fd$
+(flanking→direct), alongside the single direct path $Dd$.
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anim_flanking_paths_dark.gif"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anim_flanking_paths.gif" alt="Animation: energy pulses leave the source room over the direct Dd path and the flanking Ff, Fd and Df paths, shrinking at each element and junction, and every path label lights up as its pulse re-radiates into the receiving room" width="640" height="360" loading="lazy"></picture>
+
+[Watch the high-resolution video (WebM)](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anim_flanking_paths.webm)
+
+The **simplified single-number model** combines them energetically (Formula 26):
+
+$$
+R'_w = -10 \log_{10}\Big[ 10^{-R_{Dd,w}/10}
+      + \sum 10^{-R_{Ff,w}/10} + \sum 10^{-R_{Df,w}/10}
+      + \sum 10^{-R_{Fd,w}/10} \Big],
+$$
+
+with the direct path $R_{Dd,w} = R_{s,w} + \Delta R_{Dd,w}$ (Formula 27) and each
+flanking path (Formula 28a)
+
+$$
+R_{ij,w} = \tfrac{R_{i,w} + R_{j,w}}{2} + \Delta R_{ij,w} + K_{ij}
+         + 10 \log_{10}\frac{S_s}{l_0\ l_f},
+$$
+
+where $l_0 = 1$ m is the reference coupling length, $l_f$ the junction coupling
+length and $K_{ij}$ the junction's **vibration reduction index** (Annex E,
+empirical in the mass ratio $M = \log_{10}(m'_{\perp,i}/m'_i)$).
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/prediction_flanking_demo_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/prediction_flanking_demo.svg" alt="Per-path sound reduction indices for the EN 12354-1 Annex H.3 example and each path's share of the transmitted energy, showing the direct path dominating at R'w = 52 dB" width="80%"></picture>
+
+```python
+import numpy as np
+from phonometry import building
+
+# EN 12354-1 Annex H.3: a separating wall Rs,w = 57 dB, area Ss = 11.5 m², with
+# four flanking elements. The simplified model reads each junction's Kij at
+# 500 Hz from the mass ratio m'perp / m' (Annex E) — here the floor's rigid
+# cross-junction (the mass ratio is itself rounded, hence 12.5 vs Annex 12.4):
+print(round(building.junction_vibration_reduction("rigid_cross", "through", 1.61), 1))  # 12.5  KFf
+print(round(building.junction_vibration_reduction("rigid_cross", "corner",  1.61), 1))  #  8.9  KFd = KDf
+
+# Build each element's three flanking paths (Ff, Df, Fd) from the Annex H
+# tabulated Kij, then combine the direct path Dd energetically (Formula 26).
+elements = [   # (name, Rw, KFf, KFd = KDf, coupling length lf)
+    ("floor",    49, 12.4,  8.9, 4.50),
+    ("ceiling",  46, 14.4,  9.2, 4.50),
+    ("facade",   42, 12.6,  6.7, 2.55),
+    ("int-wall", 33, 33.5, 15.7, 2.55),
+]
+paths = []
+for name, rw, k_ff, k_fd, lf in elements:
+    paths += building.flanking_element(label=name, r_flanking=rw, r_separating=57,
+                              k_ff=k_ff, k_fd=k_fd, k_df=k_fd,
+                              separating_area=11.5, coupling_length=lf)
+
+res = building.predicted_airborne_insulation(r_direct=57.0, flanking_paths=paths)
+print(round(res.r_prime_w, 1))                          # 52.2  ->  R'w = 52 dB
+print(res.dominant.label, round(res.dominant.fraction, 2))   # Dd 0.33 (direct dominates)
+
+res.plot()   # per-path share of the transmitted energy, largest first (needs matplotlib)
+```
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+from phonometry import building
+
+# Build each element's three flanking paths (Ff, Df, Fd) from the Annex H
+# tabulated Kij, then combine the direct path Dd energetically (Formula 26).
+elements = [   # (name, Rw, KFf, KFd = KDf, coupling length lf)
+    ("floor",    49, 12.4,  8.9, 4.50),
+    ("ceiling",  46, 14.4,  9.2, 4.50),
+    ("facade",   42, 12.6,  6.7, 2.55),
+    ("int-wall", 33, 33.5, 15.7, 2.55),
+]
+paths = []
+for name, rw, k_ff, k_fd, lf in elements:
+    paths += building.flanking_element(label=name, r_flanking=rw, r_separating=57,
+                              k_ff=k_ff, k_fd=k_fd, k_df=k_fd,
+                              separating_area=11.5, coupling_length=lf)
+res = building.predicted_airborne_insulation(r_direct=57.0, flanking_paths=paths)
+
+# Per-path sound reduction index and each path's share of the transmitted
+# energy for the Annex H.3 result computed above.
+labels = [p.label for p in res.paths]
+r_w = [p.r_w for p in res.paths]
+frac = [100.0 * p.fraction for p in res.paths]
+
+fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(9, 6), sharex=True)
+ax1.bar(labels, r_w, color="tab:blue")
+ax1.axhline(res.r_prime_w, ls="--", color="k", label=f"R'w = {res.r_prime_w:.1f} dB")
+ax1.set_ylabel("Path Rij,w [dB]"); ax1.legend()
+ax2.bar(labels, frac, color="tab:orange")
+ax2.set_ylabel("Energy share [%]"); ax2.set_xlabel("Transmission path")
+for ax in (ax1, ax2):
+    ax.tick_params(axis="x", rotation=45)
+fig.suptitle("EN 12354-1 Annex H.3 — flanking transmission")
+fig.tight_layout()
+plt.show()
+```
+
+</details>
+
+Every added flanking path strictly lowers $R'_w$ below the direct $R_{Dd,w} = 57$;
+`res.paths` exposes each path's share of the transmitted energy so the dominant
+path is visible. `flanking_element` is a convenience that builds one junction's
+three paths at once; the single-path constructor behind it, `flanking_path`,
+builds one `Ff`, `Df` or `Fd` path at a time (Formula 28a). Clause 4.4.2 also
+enforces a floor $K_{ij} \ge K_{ij,\min}$ from the junction geometry
+(Formula 29). Pass the flanking-element area to
+`flanking_element(..., flanking_area=...)` and the clamp is applied
+automatically per path; or compute the floor yourself with
+`junction_min_vibration_reduction` and pass it to
+`flanking_path(..., kij_min=...)`, which raises a below-floor $K_{ij}$ to the
+minimum:
+
+```python
+from phonometry import building
+# Kij,min = 10 lg[lf·l0·(1/Si + 1/Sj)]; large elements give a low (here negative)
+# floor, so a realistic tabulated Kij is rarely clamped; but small, light
+# elements can push it above the tabulated value (e.g. lf = 4 m, S = 1.5 m²
+# gives 7.3 dB, over the 5 dB lightweight floor).
+print(round(building.junction_min_vibration_reduction(coupling_length=4.5,
+                                             s_i=11.5, s_j=11.5), 1))     # -1.1
+```
+
+The impact counterpart (EN 12354-2, Formula 21) is a direct subtraction:
+$L'_{n,w} = L_{n,w,eq} - \Delta L_w + K$, with the bare-floor equivalent level
+$L_{n,w,eq} = 164 - 35 \log_{10}(m'/m'_0)$ (Annex B), the covering improvement
+$\Delta L_w$ (ISO 717-2) and the flanking correction $K$ from Table 1.
+
+```python
+from phonometry import building
+
+# EN 12354-2 Annex E.3: a 0.14 m concrete floor (m' = 322 kg/m²) with a floating
+# floor (ΔLw = 33 dB), rooms one above the other, mean flanking mass 145 kg/m².
+ln_eq = building.equivalent_impact_level(322.0)                   # 164 - 35 lg(m')
+k = building.impact_flanking_correction(322.0, 145.0)             # Table 1 (sep 322, flk 145)
+imp = building.predicted_impact_insulation(ln_w_eq=ln_eq, delta_l_w=33.0, k_correction=k)
+print(round(ln_eq, 1), k, round(imp.l_prime_n_w, 1))     # 76.2 2 45.2  ->  L'n,w = 45 dB
+
+# Exact Formula (3): L'nT,w = L'n,w - 10 lg(0.032 V). Annex E.3's own rounding
+# of the factor to 10 lg(V/30) sits 0.18 dB below; both give L'nT,w = 43 dB.
+print(round(building.standardized_impact_level(imp.l_prime_n_w, 50.0), 1))   # 43.2  L'nT,w
+
+imp.plot()   # the Formula (21) terms as bars: Ln,w,eq - dLw + K -> L'n,w (needs matplotlib)
+```
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/impact_prediction_terms_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/impact_prediction_terms.svg" alt="The EN 12354-2 Annex E.3 impact prediction as its Formula 21 terms: the bare-floor equivalent level of 76.2 dB, the minus 33 dB floating-floor improvement, the plus 2 dB flanking correction, and the resulting predicted apparent impact level of 45.2 dB" width="80%"></picture>
+
+*The whole EN 12354-2 simplified model is one subtraction: the massive bare
+floor starts at $L_{n,w,eq} = 76.2$ dB, the floating floor buys back 33 dB,
+and the flanking correction returns 2 dB, landing at $L'_{n,w} = 45$ dB.*
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import building
+
+# EN 12354-2 Annex E.3: 0.14 m concrete floor (m' = 322 kg/m2), floating
+# floor delta-Lw = 33 dB, mean flanking mass 145 kg/m2.
+ln_eq = building.equivalent_impact_level(322.0)
+k = building.impact_flanking_correction(322.0, 145.0)
+imp = building.predicted_impact_insulation(ln_w_eq=ln_eq, delta_l_w=33.0,
+                                           k_correction=k)
+
+# One line — the Formula (21) terms as bars:
+imp.plot()
+plt.show()
+
+# By hand, from the result's fields:
+labels = ["Ln,w,eq", "-dLw", "+K", "L'n,w"]
+values = [imp.ln_w_eq, -imp.delta_l_w, imp.k_correction, imp.l_prime_n_w]
+fig, ax = plt.subplots()
+ax.bar(np.arange(4), values)
+ax.axhline(0.0, color="k", lw=0.8)
+ax.set_xticks(np.arange(4), labels)
+ax.set_ylabel("Level / correction [dB]")
+ax.set_title(f"L'n,w = {imp.l_prime_n_w:.1f} dB (EN 12354-2 Annex E.3)")
+plt.show()
+```
+
+</details>
+
+The airborne counterpart of that closure is Formula (5b),
+$D_{nT} = R' + 10\log_{10}(0.32\,V/S_s)$, exposed as `standardized_level_difference`;
+it closes the Annex H.3 example (`standardized_level_difference(52.2, 50.0,
+11.5)` gives 53.6 dB, the printed $V/(3S)$ chain 53.8 dB, both rounding to
+$D_{nT,w} = 54$ dB).
+
+The three insulation guides close a loop: the
+[laboratory](https://jmrplens.github.io/phonometry/buildings/insulation/insulation-lab/) measures $R$ and $K_{ij}$ element by element
+and junction by junction, this model assembles them into a predicted $R'_w$,
+and the [field measurement](https://jmrplens.github.io/phonometry/buildings/insulation/insulation-field/) checks the built result.
+When the measured value lands well below the prediction, look for a
+construction defect on the dominant path the model reports: a rigid bridge
+across a resilient junction, a missing lining, a leak around the separating
+element.
+
+### `junction_vibration_reduction()` / `flanking_element()` parameters
+
+| Parameter | Type | Units | Range / default | Notes |
+| :--- | :--- | :--- | :--- | :--- |
+| `junction_type` | str | — | `'rigid_cross'` / `'rigid_t'` / `'flexible_t'` / `'lightweight_facade'` / `'lightweight_double_homogeneous'` / `'lightweight_double_coupled'` / `'corner'` / `'thickness_change'` | Junction geometry (Annex E.3-E.9) |
+| `path` | str | — | `'through'` ($K_{13}$) / `'corner'` ($K_{12} = K_{23}$) / `'double_leaf'` ($K_{24}$) | Path branch |
+| `mass_ratio` | float | — | > 0 | $m'_{\perp,i}/m'_i$ (Formula E.2) |
+| `frequency` | float | Hz | default `500` | `flexible_t` and the E.7/E.8 double-leaf junctions are frequency-dependent |
+| `r_flanking` / `r_separating` | float | dB | — | Weighted indices of the flanking / separating element |
+| `k_ff` / `k_fd` / `k_df` | float | dB | — | Junction $K_{ij}$ for the three paths |
+| `separating_area` | float | m² | > 0 | Separating-element area $S_s$ |
+| `coupling_length` | float | m | > 0 | Junction coupling length $l_f$ |
+| `delta_r_ff` / `delta_r_fd` / `delta_r_df` | float | dB | default `0` | Lining improvements per path |
+| `flanking_area` | float | m² | default `None` | Flanking-element area $S_F$; enables the automatic $K_{ij,\min}$ clamp (Clause 4.4.2 / Formula 29) |
+
+### `flanking_path()` parameters
+
+| Parameter | Type | Units | Range / default | Notes |
+| :--- | :--- | :--- | :--- | :--- |
+| `label` | str | — | — | Display name of the path |
+| `kind` | str | — | `'Ff'` / `'Df'` / `'Fd'` | Which flanking branch the path is |
+| `r_source` / `r_receive` | float | dB | — | Weighted indices of the source-side / receive-side elements |
+| `k_ij` | float | dB | — | Junction vibration-reduction index for this path |
+| `separating_area` | float | m² | > 0 | Separating-element area $S_s$ |
+| `coupling_length` | float | m | > 0 | Junction coupling length $l_f$ |
+| `delta_r` | float | dB | default `0` | Lining improvement on this path |
+| `kij_min` | float | dB | default `None` | When given, `k_ij` is floored at this Formula (29) minimum |
+
+`predicted_airborne_insulation()` returns an `AirbornePredictionResult`
+(`r_prime_w`, `r_direct_w`, `paths` of `PathContribution`, `dominant`);
+`predicted_impact_insulation()` an `ImpactPredictionResult` (`l_prime_n_w`,
+`ln_w_eq`, `delta_l_w`, `k_correction`). The simplified model carries a reported
+standard deviation of about 2 dB (Clause 5).
+
+### EN 12354 prediction report (`.report()`)
+
+Both prediction results write a one-page **prediction** report through a
+`report(path)` method. Unlike the measurement fiches, the reported result is an
+*estimate* of the in-situ performance from the elements' laboratory data plus
+the flanking transmission across the junctions; the sheet states this
+explicitly and is labelled a prediction, never a measurement.
+`AirbornePredictionResult.report()` renders the predicted apparent sound
+reduction index fiche (the transmission-path table beside the per-path
+share-of-energy plot, the boxed $R'_w$); `ImpactPredictionResult.report()`
+renders the predicted apparent impact-level fiche (the Formula (21) term table
+beside the term plot, the boxed $L'_{n,w}$). Each names EN/ISO 12354-1/-2 and the
+ISO 717 rating part in its basis line, prints the model's ~2 dB standard
+deviation and, when a `requirement` is supplied, adds a PASS/FAIL verdict
+(airborne passes at or above it, impact at or below it). `verbose=True` annexes
+each transmission path's share of the transmitted energy to the airborne table;
+metadata, `language="es"` and the `phonometry[report]` extra behave as in the
+measurement fiches.
+
+```python
+from phonometry import building, ReportMetadata
+
+# Airborne prediction (EN 12354-1 Annex H.3): a separating wall Rs,w = 57 dB
+# flanked by four elements -> R'w = 52 dB.
+paths = []
+for label, rw, kff, kfd, lf in [
+    ("floor", 49.0, 12.4, 8.9, 4.5), ("ceiling", 46.0, 14.4, 9.2, 4.5),
+    ("facade", 42.0, 12.6, 6.7, 2.55), ("intwall", 33.0, 33.5, 15.7, 2.55),
+]:
+    ff, df, fd = building.flanking_element(
+        label=label, r_flanking=rw, r_separating=57.0,
+        k_ff=kff, k_fd=kfd, k_df=kfd, separating_area=11.5, coupling_length=lf)
+    paths += [ff, df, fd]
+air = building.predicted_airborne_insulation(r_direct=57.0, flanking_paths=paths)
+air.report("Rpw_prediction.pdf", metadata=ReportMetadata(
+    specimen="Separating wall, Rs,w = 57 dB", area=11.5,
+    source_volume=53.0, receiving_volume=50.0, requirement=50.0,
+    notes="Flanking: floor/ceiling/facade/internal wall."))   # R'w = 52 dB
+
+# Impact prediction (EN 12354-2 Annex E.3): a concrete floor (m' = 322 kg/m2)
+# with a floating floor (DLw = 33 dB) -> L'n,w = 45 dB.
+ln_eq = building.equivalent_impact_level(322.0)
+k = building.impact_flanking_correction(322.0, 145.0)
+imp = building.predicted_impact_insulation(ln_w_eq=ln_eq, delta_l_w=33.0, k_correction=k)
+imp.report("Lnw_prediction.pdf",
+           metadata=ReportMetadata(mass_per_area=322.0, requirement=53.0))  # L'n,w = 45 dB
+```
+
+[![Predicted airborne EN 12354-1 example report: metadata header, the transmission-path table beside the per-path share-of-energy chart, boxed predicted R'w = 52 dB, the prediction statement and a PASS verdict](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/reports/iso12354_airborne_prediction_example.webp)](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/reports/iso12354_airborne_prediction_example.pdf)
+
+[![Predicted impact EN 12354-2 example report: metadata header, the Formula (21) term table beside the term chart, boxed predicted L'n,w = 45 dB, the prediction statement and a PASS verdict against the 53 dB requirement](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/reports/iso12354_impact_prediction_example.webp)](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/reports/iso12354_impact_prediction_example.pdf)
+
+## Across the envelope: Parts 3 and 4
+
+The two remaining parts of EN 12354 predict the same way but across the
+building envelope rather than between two rooms: EN 12354-3 the airborne
+insulation against outdoor sound, EN 12354-4 the sound power an indoor source
+radiates outwards. Both are built on the same area-weighted summation of
+element transmission factors used above, and both are covered, beside the
+ISO 16283-3 measurement they are compared against, in
+[Façade Sound Insulation](https://jmrplens.github.io/phonometry/buildings/insulation/facade-insulation/).
+
+## References
+
+- Hopkins, C. (2007). *Sound insulation*. Butterworth-Heinemann.
+  ISBN 978-0-7506-6526-1.
+  [doi:10.4324/9780080550473](https://doi.org/10.4324/9780080550473).
+  The full treatment of flanking transmission and the EN 12354 prediction
+  framework, from the vibration reduction index to its statistical basis.
+
+## Standards
+
+EN 12354-1:2000 and EN 12354-2:2000, which give the simplified
+flanking-transmission predictions between rooms (Annex E junctions, worked
+examples H.3 and E.3). The façade and outdoor-radiation predictions of
+EN 12354-3:2000 and EN 12354-4:2000 have their own page, and the absorption
+member of the family is EN 12354-6.
+
+## See also
+
+- [Façade Sound Insulation](https://jmrplens.github.io/phonometry/buildings/insulation/facade-insulation/): the EN 12354-3 and
+  EN 12354-4 predictions across the building envelope, with the ISO 16283-3
+  measurement they are compared against.
+- [Field Insulation Measurement (ISO 16283)](https://jmrplens.github.io/phonometry/buildings/insulation/insulation-field/):
+  the measured in-situ quantities the prediction is checked against.
+- [Insulation Ratings (ISO 717)](https://jmrplens.github.io/phonometry/buildings/insulation/insulation-ratings/): the reference-curve
+  engine behind the predicted $R'_w$ and $L'_{n,w}$.
+- [Laboratory Insulation Measurement](https://jmrplens.github.io/phonometry/buildings/insulation/insulation-lab/): the
+  ISO 10140 ratings the model consumes.
+- [Laboratory Flanking Transmission (ISO 10848)](https://jmrplens.github.io/phonometry/buildings/insulation/flanking-lab/): the
+  measured junction vibration reduction index $K_{ij}$ the model consumes.
+- [Sound absorption in enclosed spaces (EN 12354-6)](https://jmrplens.github.io/phonometry/buildings/rooms/enclosed-space-absorption/):
+  the absorption member of the same EN 12354 family.
+- [Dynamic stiffness of resilient materials (EN 29052-1)](https://jmrplens.github.io/phonometry/materials/resilient/dynamic-stiffness/):
+  the $s'$ input to the EN 12354-2 floating-floor term.
+- API reference: [`building.prediction.simplified_model`](https://jmrplens.github.io/phonometry/reference/api/building/simplified-model/) and [`building.prediction.facade`](https://jmrplens.github.io/phonometry/reference/api/building/facade/).
+
+---
+
+
 <!-- source: docs/detailed-prediction.md | canonical: https://jmrplens.github.io/phonometry/buildings/design/detailed-prediction/ -->
 Source: https://jmrplens.github.io/phonometry/buildings/design/detailed-prediction/
 
@@ -413,884 +781,6 @@ printed tables are recorded in [Errata](https://jmrplens.github.io/phonometry/re
 - [Dynamic stiffness of resilient materials (EN 29052-1)](https://jmrplens.github.io/phonometry/materials/resilient/dynamic-stiffness/):
   the $s'$ behind the floating floor's resonance frequency.
 - API reference: [`building.prediction.detailed_model`](https://jmrplens.github.io/phonometry/reference/api/building/detailed-model/).
-
----
-
-
-<!-- source: docs/impact-improvement.md | canonical: https://jmrplens.github.io/phonometry/buildings/design/impact-improvement/ -->
-Source: https://jmrplens.github.io/phonometry/buildings/design/impact-improvement/
-
-# Floor-Covering Impact Improvement (ISO 16251-1)
-
-A soft floor covering does not block airborne sound; it cushions footsteps.
-What it improves is the impact level of the floor underneath, and measuring
-that improvement in a full ISO 10140 transmission suite is out of proportion
-to a square metre of carpet. ISO 16251-1 therefore shrinks the laboratory to
-a small heavyweight mock-up: a softly supported concrete plate, a standard
-tapping machine and an accelerometer underneath. This guide covers the
-mock-up measurement of the improvement $\Delta L$ and its weighted
-$\Delta L_w$ against the ISO 717-2 reference floor, the accredited fiche,
-and the ISO 12354-2 engineering estimate that predicts a floating floor's
-improvement from the dynamic stiffness of its resilient layer. The
-full-size laboratory chain lives in
-[Laboratory Insulation Measurement](https://jmrplens.github.io/phonometry/buildings/insulation/insulation-lab/); the $s'$
-measurement behind the estimate is the subject of
-[Dynamic stiffness of resilient materials (EN 29052-1)](https://jmrplens.github.io/phonometry/materials/resilient/dynamic-stiffness/).
-
-## The small-mock-up method
-
-ISO 16251-1:2014 is a laboratory method for the **improvement of impact sound
-insulation** $\Delta L$ of a soft, locally-reacting floor covering (carpet, PVC,
-linoleum). The two ISO 10140 rooms are replaced by a small softly-supported
-concrete plate; a standard tapping machine excites it and the structure-borne
-**acceleration level** on the underside is measured with and without the
-covering. For locally-reacting coverings that acceleration-level difference
-equals the ISO 10140 impact sound reduction.
-
-**Acceleration level (Formula (1)).** $L_a = 10\log_{10}(\langle a^2\rangle / a_0^2)$ dB,
-reference $a_0 = 10^{-6}\ \text{m/s}^2$. **Background correction (Formula (2))**
-follows the ISO 10140 three-branch rule (unchanged ≥ 15 dB; energy subtraction
-for 6 ≤ margin < 15 dB; the 1.3 dB limit below 6 dB, flagged as $> \Delta L$).
-The improvement is the position-averaged difference
-$\Delta L = L_0 - L_1$ (Formulae (3)/(4)); octaves follow
-$\Delta L_\text{oct} = -10\log_{10}[\tfrac{1}{3}\sum 10^{-\Delta L_n/10}]$ (Formula (5)).
-
-**Weighted improvement.** $\Delta L_w$ is the ISO 717-2 weighted reduction: the
-improvement is applied to the heavyweight **reference floor** $L_{n,r,0}$
-(ISO 717-2 Table 4), $L_{n,r} = L_{n,r,0} - \Delta L$, and
-$\Delta L_w = 78 - L_{n,r,w}$, computed by `weighted_impact_improvement()`, which
-reuses the verified ISO 717-2 rating engine. A clause 6.3 measurement spans 18
-bands (100–5000 Hz, optionally extended to 50 Hz); the rating is formed on the
-100–3150 Hz sub-range of whatever spectrum contains it. The statement of
-results (clause 8 e)) also carries the spectrum adaptation term
-$C_{I,\Delta} = C_{I,r,0} - C_{I,r}$ (ISO 717-2:2020 Formula (A.4)), exposed as
-`ci_delta` on the result and standalone as
-`impact_improvement_adaptation_term()`.
-
-The worked example below is a real measurement: the improvement of a textile
-carpet on the CSTB heavyweight mock-up, digitized from Figure 4 of Foret,
-Chéné and Guigou-Carter, "A comparison of the reduction of transmitted impact
-noise by floor coverings measured using ISO 140-8 and ISO/CD 16251-1" (Forum
-Acusticum 2011, Aalborg). Its published ISO 16251-1 weighted improvement is
-$\Delta L_w = 29$ dB, reproduced exactly by the rating engine.
-
-<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/floor_covering_improvement_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/floor_covering_improvement.svg" alt="ISO 16251-1 floor-covering impact sound improvement: the improvement delta-L of a real textile carpet rising with frequency across one-third-octave bands from 100 Hz to 3150 Hz, with the shaded improvement area and the weighted single-number delta-Lw annotated" width="80%"></picture>
-
-<details>
-<summary>Show the code for this figure</summary>
-
-```python
-import matplotlib.pyplot as plt
-import numpy as np
-from phonometry import building
-
-freqs = [100, 125, 160, 200, 250, 315, 400, 500,
-         630, 800, 1000, 1250, 1600, 2000, 2500, 3150]
-bare = np.full(16, 78.0)                       # bare-plate acceleration level
-# A real textile carpet measured on the CSTB mock-up (Foret et al. 2011, Fig. 4).
-covering = bare - np.array([5, 8, 10, 14, 18, 23, 30, 31,
-                            39, 49, 53, 57, 60, 67, 68, 71])
-res = building.impact_improvement(bare, covering, freqs)
-print(res.delta_lw)   # weighted improvement delta-Lw = 29 dB (ISO 717-2)
-res.plot()
-plt.show()
-```
-
-</details>
-
-```python
-from phonometry import building
-
-# delta-Lw straight from an improvement spectrum (16 one-third-octave bands):
-delta_l = [5, 8, 10, 14, 18, 23, 30, 31, 39, 49, 53, 57, 60, 67, 68, 71]
-print(building.weighted_impact_improvement(delta_l))    # 29 dB (carpet)
-
-# From the measured bare/covered acceleration levels, with a background trace:
-freqs = [100, 125, 160, 200, 250, 315, 400, 500, 630, 800,
-         1000, 1250, 1600, 2000, 2500, 3150]
-bare_levels = [72, 73, 74, 74, 75, 75, 76, 76, 77, 77, 78, 78, 79, 79, 80, 80]
-covered_levels = [b - d for b, d in zip(bare_levels, delta_l)]
-bg = [40.0] * 16
-res = building.impact_improvement(bare_levels, covered_levels, freqs, background=bg)
-res.improvement       # delta-L per band
-res.delta_lw          # weighted single number (rated on the 100-3150 Hz sub-range)
-res.ci_delta          # spectrum adaptation term CI,delta (Formula (A.4))
-res.limited           # bands at the 1.3 dB limit of measurement (> delta-L)
-res.octave_bands()    # (octave freqs, delta-L_oct) via Formula (5)
-res.plot()            # the delta-L(f) improvement spectrum above (needs matplotlib)
-```
-
-## ISO 16251-1 impact-improvement report (`.report()`)
-
-`FloorCoveringImprovementResult.report()` writes a one-page accredited
-impact-improvement fiche: the ISO 16251-1 basis line, a metadata header, the
-per-band table (frequency and $\Delta L$, bands at the 1.3 dB limit prefixed
-`>`) beside the $\Delta L(f)$ improvement curve, the boxed single-number
-$\Delta L_w\ (C_{I,\Delta})$ (the ISO 16251-1 Clause 8 e) statement of
-results, rated
-per ISO 717-2) and a footer. The applicable `ReportMetadata` fields are
-`specimen` (the floor covering under test), `client`, `manufacturer`,
-`mounting`, `mass_per_area`, `test_room`, `test_date`, `temperature`,
-`pressure`, `measurement_standard`, `laboratory`, `operator`, `report_id`,
-`notes` and `requirement` (a higher weighted improvement is better, so the
-verdict passes at or above it). The bare reference floor is the standardised
-heavyweight floor of ISO 717-2:2020 Table 4, fixed by the standard.
-`verbose=True` adds the reference-floor-with-covering column
-$L_{n,r} = L_{n,r,0} - \Delta L$, the derivation basis of $\Delta L_w$.
-
-```python
-from phonometry import building, ReportMetadata
-
-freqs = [100, 125, 160, 200, 250, 315, 400, 500,
-         630, 800, 1000, 1250, 1600, 2000, 2500, 3150]
-delta_l = [5, 8, 10, 14, 18, 23, 30, 31, 39, 49, 53, 57, 60, 67, 68, 71]
-bare = [78.0] * 16
-res = building.impact_improvement(bare, [b - d for b, d in zip(bare, delta_l)], freqs)
-res.report("dLw.pdf",
-           metadata=ReportMetadata(
-               specimen="Textile floor covering (carpet), laid loose",
-               measurement_standard="ISO 16251-1",
-               requirement=20.0))  # delta-Lw (CI,delta) = 29 (-13) dB
-```
-
-A rendered example fiche, regenerated with `make reports`, is kept in the
-repository. Click the preview to open the PDF:
-
-[![Floor-covering impact improvement ISO 16251-1 example report: metadata header, one-third-octave delta-L table beside the delta-L(f) improvement curve, boxed delta-Lw (CI,delta) = 29 (-13) dB weighted improvement (ISO 717-2) and a PASS verdict against the 20 dB requirement](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/reports/iso16251_floor_covering_example.webp)](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/reports/iso16251_floor_covering_example.pdf)
-
-## From dynamic stiffness to the improvement: the ISO 12354-2 estimate
-
-The mock-up measures a *covering* that exists; a **floating floor** (a
-screed poured on a resilient layer) is designed the other way round, from
-two numbers known at the drawing stage: the mass per unit area $m'$ of the
-slab and the dynamic stiffness per unit area $s'$ of the resilient layer,
-measured per EN 29052-1 as in the
-[dynamic-stiffness guide](https://jmrplens.github.io/phonometry/materials/resilient/dynamic-stiffness/). Together they set the mass-spring
-resonance of the system (ISO 12354-2:2017, Annex C, Formula (C.2)):
-
-$$
-f_0 = 160 \sqrt{\frac{s'}{m'}}\ \text{Hz}
-\qquad (s'\ \text{in MN/m}^3,\ m'\ \text{in kg/m}^2),
-$$
-
-where 160 is the rounded $1000/2\pi$; `materials.natural_frequency` computes
-the exact $\tfrac{1}{2\pi}\sqrt{s'/m'}$ form. Above the resonance the slab
-decouples from the structural floor and Annex C estimates the improvement as
-a straight slope per Formula (C.1), with the steeper Formula (C.3) for
-constructions whose higher internal losses follow the infinite-plate theory:
-
-$$
-\Delta L = 30 \log_{10} \frac{f}{f_0}\ \text{dB (sand/cement, calcium-sulfate screeds)},
-\qquad
-\Delta L = 40 \log_{10} \frac{f}{f_0}\ \text{dB (asphalt, dry screeds)}.
-$$
-
-```python
-import numpy as np
-from phonometry import building, materials
-
-# The ISO 12354-2:2017 Annex G worked floor: a 73.5 kg/m2 screed on a resilient
-# layer with s' = 8 MN/m3.
-f0 = 160.0 * np.sqrt(8.0 / 73.5)                                 # Formula (C.2)
-print(round(f0, 1))                                              # 52.8  Hz
-print(round(float(materials.natural_frequency(8.0e6, 73.5)), 1))  # 52.5  exact 1/(2 pi) form
-
-# delta-L = 30 lg(f/f0) above the resonance (Formula (C.1)); build the
-# one-third-octave spectrum and rate it with the ISO 717-2 engine.
-freqs = np.array([100, 125, 160, 200, 250, 315, 400, 500, 630, 800,
-                  1000, 1250, 1600, 2000, 2500, 3150], dtype=float)
-delta_l = 30.0 * np.log10(freqs / f0)
-print(building.weighted_impact_improvement(delta_l))             # 32  dB
-
-# The one-line estimate of Formula (C.4) lands right beside it:
-print(round(13.0 * np.log10(73.5) - 14.2 * np.log10(8.0) + 20.8, 1))   # 32.2 dB
-```
-
-The closed-form weighted estimate of Formula (C.4),
-$\Delta L_w = 13\log_{10} m' - 14{,}2\log_{10} s' + 20{,}8$ dB, condenses the same
-physics into one line: heavier slabs and softer layers rate better. Both
-estimates are design aids kept deliberately on the safe side (the 30 lg
-slope undercuts the 40 lg infinite-plate theory where experimental data say
-real screeds fall short); once a specimen exists, the measured mock-up of
-this page, or the full ISO 10140-3 floor, is the reference, and the
-[EN 12354-2 prediction](https://jmrplens.github.io/phonometry/buildings/design/insulation-prediction/) consumes whichever $\Delta L_w$ you have.
-
-## References
-
-- Vigran, T. E. (2008). *Building acoustics*. CRC Press.
-  ISBN 978-0-415-42853-8.
-  [doi:10.1201/9781482266016](https://doi.org/10.1201/9781482266016).
-  The transmission theory of floors and floating floors that the improvement
-  quantifies.
-- Foret, R., Chéné, J.-B., & Guigou-Carter, C. (2011). A comparison of the
-  reduction of transmitted impact noise by floor coverings measured using
-  ISO 140-8 and ISO/CD 16251-1. *Forum Acusticum 2011, Aalborg* (CSTB).
-  The measured textile-carpet improvement spectrum used as the worked
-  example on this page ($\Delta L_w = 29$ dB); the per-band $\Delta L$ was
-  digitized from its
-  Figure 4.
-- International Organization for Standardization. (2014). *Acoustics —
-  Laboratory measurement of the reduction of transmitted impact noise by
-  floor coverings on a small floor mock-up — Part 1: Heavyweight compact
-  floor* (ISO 16251-1:2014).
-  [iso.org catalogue](https://www.iso.org/standard/56017.html).
-  The small-mock-up method this page implements.
-- International Organization for Standardization. (2020). *Acoustics —
-  Rating of sound insulation in buildings and of building elements — Part 2:
-  Impact sound insulation* (ISO 717-2:2020).
-  [iso.org catalogue](https://www.iso.org/standard/69867.html).
-  The reference floor $L_{n,r,0}$ (Table 4) and the rating engine behind
-  $\Delta L_w$, with the Formula (A.4) adaptation term $C_{I,\Delta}$.
-
-- International Organization for Standardization. (2017). *Building acoustics
-  — Estimation of acoustic performance of buildings from the performance of
-  elements — Part 2: Impact sound insulation between rooms*
-  (ISO 12354-2:2017).
-  [iso.org catalogue](https://www.iso.org/standard/70239.html).
-  The informative Annex C floating-floor estimate reproduced above (Formulae
-  C.1 to C.4) and the worked floor of Annex G.
-
-## Standards
-
-ISO 16251-1:2014, which specifies the small-mock-up laboratory method for
-the impact-sound improvement $\Delta L$ of floor coverings; ISO 717-2:2020,
-which supplies the reference floor, the $\Delta L_w$ rating and the
-$C_{I,\Delta}$ adaptation term; and ISO 12354-2:2017 Annex C (informative),
-whose floating-floor estimate this page reproduces from the EN 29052-1
-dynamic stiffness, with the worked floor of its Annex G (context for design,
-not a measurement).
-
-## See also
-
-- [Laboratory Insulation Measurement](https://jmrplens.github.io/phonometry/buildings/insulation/insulation-lab/): the ISO 10140
-  suite this mock-up replaces for soft coverings, and the full-size
-  ISO 10140-3 improvement measurement.
-- [Dynamic stiffness of resilient materials (EN 29052-1)](https://jmrplens.github.io/phonometry/materials/resilient/dynamic-stiffness/):
-  the $s'$ measurement that feeds the floating-floor estimate.
-- [Predicting Resilient-Layer Performance](https://jmrplens.github.io/phonometry/buildings/design/resilient-layers/): the
-  prediction counterpart of this page, from the tapping-machine force model
-  to floating floors and wall linings.
-- [Predicting Sound Insulation (EN 12354)](https://jmrplens.github.io/phonometry/buildings/design/insulation-prediction/): the
-  impact model whose Formula (21) consumes $\Delta L_w$.
-- [Insulation Ratings (ISO 717)](https://jmrplens.github.io/phonometry/buildings/insulation/insulation-ratings/): the reference-curve
-  engine behind the weighted improvement.
-- API reference: [`building.measurement.floor_covering_improvement`](https://jmrplens.github.io/phonometry/reference/api/building/floor-covering-improvement/).
-
----
-
-
-<!-- source: docs/installed-structure-borne.md | canonical: https://jmrplens.github.io/phonometry/buildings/design/installed-structure-borne/ -->
-Source: https://jmrplens.github.io/phonometry/buildings/design/installed-structure-borne/
-
-# Installed structure-borne sound from equipment (EN 12354-5)
-
-**EN 12354-5:2009** predicts the sound pressure level in a receiving room caused
-by building service equipment (pumps, fans, lifts, water installations) that
-injects **structure-borne sound** into the building. It closes the
-structural-vibroacoustics chain: the source is described by its characteristic
-structure-borne sound power level $L_{Ws,c}$, derived from the EN 15657
-reception-plate measurement through the Formula (15)/(17) conversion and a
-mobility correction (**not** the raw plate-injected level;
-see [EN 15657](https://jmrplens.github.io/phonometry/buildings/design/structure-borne-power/)); the source and receiver point
-mobilities set how much power is actually coupled into the structure, and the
-building transmission carries it to the receiving room. The Annex I mobility
-correction `installed_power_from_reception_plate` refers the characteristic
-reception-plate level $L_{Ws,n}$ to the actual receiver,
-$L_{Ws,\mathrm{inst}} = L_{Ws,n} + 10\log_{10}(Y_{\infty,i} / Y_{\infty,\mathrm{rec}})$
-with $Y_{\infty,\mathrm{rec}} = 5\cdot 10^{-6}\ \text{m/(N·s)}$;
-with the source mobility instead it yields $L_{Ws,c}$ (Annex I.3, Table I.8).
-
-<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/installed_structure_borne_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/installed_structure_borne.svg" alt="The EN 12354-5 cascade per octave band: the characteristic structure-borne power level, the installed power level after subtracting the coupling term, the per-path normalised sound pressure levels, and their energetic total" width="82%"></picture>
-
-<details>
-<summary>Show the code for this figure</summary>
-
-```python
-import matplotlib.pyplot as plt
-import numpy as np
-from phonometry import building
-
-# EN 15657 characteristic source power and illustrative point mobilities.
-bands = np.array([63.0, 125.0, 250.0, 500.0, 1000.0, 2000.0, 4000.0])
-lws_c = np.array([78.0, 82.0, 84.0, 81.0, 77.0, 72.0, 66.0])
-ys = (2e-4 + 1e-4j) * (bands / 250.0)        # source mobility
-yi = (3e-5 + 1e-5j) * np.ones_like(bands)    # receiver mobility
-dc = np.array([float(building.coupling_term(a, b)) for a, b in zip(ys, yi)])
-
-# Two transmission paths: the excited floor and a flanking wall.
-paths = [
-    {"adjustment_term": 6.0, "element_area": 12.0,
-     "flanking_reduction_index": np.linspace(44.0, 62.0, 7)},
-    {"adjustment_term": 7.0, "element_area": 9.0,
-     "flanking_reduction_index": np.linspace(46.0, 64.0, 7)},
-]
-res = building.installed_source_prediction(lws_c, dc, paths, frequencies=bands)
-res.plot()   # characteristic and installed power, per-path levels and the total
-plt.show()
-```
-
-</details>
-
-## 1. Coupling and installed power
-
-Only part of the characteristic power is injected into the supporting element;
-the loss is the **coupling term** $D_C$ (always positive), set for a point
-excitation by the source mobility $Y_s$ and the receiver mobility $Y_i$
-(Formula 19b):
-
-$$
-D_{C,i} = 10\log_{10}\frac{|Y_s + Y_i|^2}{|Y_s|\,\mathrm{Re}\{Y_i\}},
-$$
-
-which reduces to $10\log_{10}(|Y_s|/\mathrm{Re}\{Y_i\})$ for a **force source** (high source
-mobility, Formula 19c) and to $-10\log_{10}(|Y_s|\,\mathrm{Re}\{Z_i\})$ for a **velocity source**
-(low source mobility, Formula 19d); an elastic support adds its transfer
-mobility $Y_k$ inside the modulus (Formula 19e). The **installed** power level is
-then (Formula 18b) $L_{Ws,\mathrm{inst}} = L_{Ws,c} - D_C$.
-
-The physics behind $D_C$ is the classical power input of a point-excited
-plate: only the real part of the receiver's driving-point mobility absorbs
-power, and the mismatch between $Y_s$ and $Y_i$ decides how much of the
-source's capability ever enters the structure (Hopkins 2007, Section 2.8).
-The mobilities themselves come from the
-[mechanical-mobility chain](https://jmrplens.github.io/phonometry/vibration/structural/mechanical-mobility/): measured per ISO 7626,
-or from the infinite-plate closed forms of
-[panel theory](https://jmrplens.github.io/phonometry/buildings/design/panel-sound-insulation/) when no measurement exists. A pump
-on a concrete slab is the textbook force source: its casing mobility is
-orders of magnitude above the slab's, so $D_C$ collapses to Formula 19c and
-the injected power no longer depends on the receiver at all.
-
-```python
-from phonometry import building
-
-# A near-force source (Y_s >> Y_i) on a concrete floor:
-dc = building.coupling_term(2e-4 + 1e-4j, 3e-5 + 1e-5j)
-print(round(float(dc), 2))                                          # ~8.5 dB
-print(round(float(building.installed_structure_borne_power_level(82.0, dc)), 1))  # installed L_Ws
-```
-
-## 2. Transmission to the receiving room
-
-EN 12354 parts 1 and 2 handle rooms excited through the air and by the
-standard tapping machine; part 5 covers the sources that shake the building
-*directly*: pumps, fans, lifts, whirlpool baths, cisterns and the pipework
-that ties them into walls and floors. Once the installed power is in the
-structure, several elements radiate into the receiving room: the excited
-element itself and every element the vibration reaches across the junctions.
-Each excited-element/radiating-element pair $i \to j$ is a transmission path with
-its own adjustment term and flanking index:
-
-<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_installed_paths_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_installed_paths.svg" alt="EN 12354-5 installation paths: a pump on resilient mounts injects structure-borne power into the floor slab, the excited floor radiates into the receiving room below, a second path travels along the slab into the flanking wall, and the prediction cascade runs from the characteristic power to the normalised sound pressure level" width="92%"></picture>
-
-Each transmission path $i \to j$ gives a normalised sound pressure level from the
-installed power, the structure-to-airborne adjustment term $D_{sa}$, the flanking
-sound reduction index $R_{ij,\mathrm{ref}}$ (EN 12354-1) and the element area
-(Formula 18a):
-
-$$
-L_{n,s,ij} = L_{Ws,\mathrm{inst},i} - D_{sa,i} - R_{ij,\mathrm{ref}}
-             - 10\log_{10}\frac{S_i}{S_0} - 10\log_{10}\frac{A_0}{4},
-$$
-
-with $S_0 = A_0 = 10\ \text{m}^2$, and the paths combine energetically (Formula 17):
-
-```python
-import numpy as np
-from phonometry import building
-
-bands = np.array([250.0, 500.0, 1000.0])
-res = building.installed_source_prediction(
-    characteristic_power_level=np.array([80.0, 82.0, 78.0]),
-    coupling_term=np.array([9.0, 10.0, 11.0]),
-    paths=[
-        {"adjustment_term": 5.0,
-         "flanking_reduction_index": np.array([50.0, 52.0, 55.0]), "element_area": 12.0},
-        {"adjustment_term": 6.0,
-         "flanking_reduction_index": np.array([52.0, 54.0, 57.0]), "element_area": 8.0},
-    ],
-    frequencies=bands,
-)
-print(np.round(res.total_level, 1))      # total L_n,s per band
-print(round(res.overall_level, 1))       # band-summed level [dB]
-
-res.plot()   # the per-path and total L_n,s cascade, as in the figure above (needs matplotlib)
-```
-
-The `InstalledSourceResult` carries the per-path levels, the total per band, the
-installed power level and `.overall_level`, and its `.plot()` draws the whole
-cascade.
-
-## 3. The prediction report (`.report()`)
-
-A prediction ends as a *document*. `InstalledSourceResult.report(path)` writes a
-one-page PDF fiche, clearly labelled a prediction and not a measurement: a
-prediction-basis line naming EN 12354-5:2009, an optional metadata header
-(client, source equipment, receiving room, instrumentation, climate, date), a
-per-band table (nominal octave/one-third-octave frequency, the installed
-structure-borne power level $L_{Ws,\mathrm{inst}}$, each transmission path's
-normalised SPL
-$L_{n,s,ij}$ and the combined total $L_{n,s}$), the per-path and total
-$L_{n,s}(f)$
-spectra, and a boxed band-summed total $L_{n,s}$ (dB) with the installed power
-total and the path count.
-
-The relevant `ReportMetadata` fields are `client`, `specimen` (the source
-equipment), `test_room` (the receiving room), `instrumentation` and the footer
-identity `laboratory`, `operator`, `report_id` and `notes`. Supplying
-`requirement` adds a PASS/FAIL verdict against a declared upper limit on the
-overall $L_{n,s}$ (lower is better). `verbose=True` adds one column per
-transmission path (up to five); otherwise only the installed power and the
-combined total are shown. `language="es"` renders the Spanish fiche. The basis
-strip states Formulae 18a/17 and the prediction disclaimer. Rendering needs the
-optional `phonometry[report]` extra (reportlab), plus matplotlib for the plot.
-
-```python
-import numpy as np
-from phonometry import ReportMetadata, installed_source_prediction
-
-bands = np.array([63, 125, 250, 500, 1000, 2000], float)
-lwc = np.array([84.4, 82.5, 69.9, 67.6, 61.6, 49.9])   # characteristic power [dB]
-dsa = np.array([-13.6, -17.3, -17.4, -20.0, -26.9, -32.9])
-paths = [
-    {"adjustment_term": dsa,
-     "flanking_reduction_index": np.array([43.0, 46, 50.2, 54.7, 64.6, 73]),
-     "element_area": 12.8},
-    {"adjustment_term": dsa,
-     "flanking_reduction_index": np.array([37.0, 41.2, 35.9, 37.7, 49, 57.8]),
-     "element_area": 12.8},
-]
-res = installed_source_prediction(lwc, 16.2, paths, frequencies=bands)
-res.report(
-    "installed_structure_borne.pdf",
-    metadata=ReportMetadata(
-        client="Example dwelling refurbishment",
-        specimen="WC flushing cistern (wall-fixed)",
-        test_room="Receiving room: adjacent bedroom",
-        report_id="EXAMPLE-12354-5",
-        requirement=45.0,
-    ),
-)   # overall L_n,s ~ 43 dB -> declared limit 45 dB: PASS
-```
-
-The rendered example fiche, regenerated with `make reports`, is kept in the
-repository. Click the preview to open the PDF:
-
-[![EN 12354-5 installed structure-borne prediction example report, clearly labelled a prediction and not a measurement: a header with the client, the source equipment, the receiving room and the identity, the octave-band table (63 Hz to 2 kHz) of the installed structure-borne power level L_Ws,inst, the two flanking paths normalised SPL L_n,s,ij and the combined total L_n,s, the per-path and total L_n,s(f) spectra, and the boxed band-summed total L_n,s with the installed power total and the path count, closed by a basis strip stating Formulae 18a/17 and the prediction disclaimer, with a PASS verdict against the declared 45 dB limit](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/reports/en12354_5_installed_structure_borne_example.webp)](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/reports/en12354_5_installed_structure_borne_example.pdf)
-
-*Installed structure-borne prediction fiche (`InstalledSourceResult.report`), an
-EN 12354-5 estimate of the normalised structure-borne SPL in the receiving
-room.*
-
-## See also
-
-- [Structure-borne sound power of equipment (EN 15657)](https://jmrplens.github.io/phonometry/buildings/design/structure-borne-power/):
-  the reception-plate characterisation that supplies $L_{Ws,c}$ and the source
-  mobility this prediction consumes.
-- [Mechanical mobility and the FRF family (ISO 7626-1)](https://jmrplens.github.io/phonometry/vibration/structural/mechanical-mobility/):
-  the measured $Y_s$ and $Y_i$ behind the coupling term.
-- [Bending-wave transmission at plate junctions](https://jmrplens.github.io/phonometry/vibration/structural/junction-transmission/):
-  the junction physics that carries the installed power to the flanking
-  radiators.
-- [Predicting Sound Insulation (EN 12354)](https://jmrplens.github.io/phonometry/buildings/design/insulation-prediction/): the
-  airborne and impact members of the same prediction family.
-
-## References
-
-- Cremer, L., Heckl, M., & Petersson, B. A. T. (2005). *Structure-borne
-  sound: Structural vibrations and sound radiation at audio frequencies*
-  (3rd ed.). Springer. ISBN 978-3-540-22696-3.
-  [doi:10.1007/b137728](https://doi.org/10.1007/b137728).
-  The source-receiver mobility coupling and the structure-borne transmission
-  across junctions behind the coupling term and the path model.
-- Hopkins, C. (2007). *Sound insulation*. Butterworth-Heinemann.
-  ISBN 978-0-7506-6526-1.
-  [doi:10.4324/9780080550473](https://doi.org/10.4324/9780080550473).
-  Section 2.8 (driving-point impedance and mobility): the power a mechanical
-  source injects into a plate through the source and receiver mobilities.
-
-## Standards
-
-EN 12354-5:2009, *Building acoustics — Estimation of acoustic
-performance of buildings from the performance of elements — Part 5: Sound levels
-due to service equipment*: the coupling term (clause 4.4.3, Formulae 19a-19e),
-the installed structure-borne power level (Formula 18b), the structure-to-
-airborne adjustment term (clause 4.4.4, Formulae 20a/20b), and the normalised
-sound pressure level per path and its energetic combination (Formulae 18a, 17).
-Conformance is anchored on the coupling-term force-source limit and the
-standard's own Annex I worked examples: the whirlpool bath of I.2
-(Table I.6a: mobility correction and path 11) and the flushing cistern of I.3
-(Tables I.8/I.9: source conversion, all four transmission paths, the
-Formula 17 total and its 29 dB(A) closure), within the ±0.15 dB rounding of
-the printed one-decimal intermediates. $D_{sa}$ and $R_{ij,\mathrm{ref}}$ are inputs (from
-measurement / EN 12354-1 / Annexes D and F).
-
----
-
-
-<!-- source: docs/insulation-prediction.md | canonical: https://jmrplens.github.io/phonometry/buildings/design/insulation-prediction/ -->
-Source: https://jmrplens.github.io/phonometry/buildings/design/insulation-prediction/
-
-# Predicting Sound Insulation (EN 12354)
-
-A laboratory rating describes an element in isolation; a building also
-transmits sound along every flanking path. This page covers the EN 12354
-prediction of in-situ performance between rooms from laboratory element data:
-the airborne model of EN 12354-1 with its junction vibration reduction
-indices, the impact model of EN 12354-2 and the prediction fiches of both. The
-third and fourth parts of the same family, which cross the building envelope
-instead of an internal partition, are in
-[Façade Sound Insulation](https://jmrplens.github.io/phonometry/buildings/insulation/facade-insulation/). The measured quantities the
-model is checked against live in
-[Field Insulation Measurement (ISO 16283)](https://jmrplens.github.io/phonometry/buildings/insulation/insulation-field/); the
-laboratory inputs come from
-[Laboratory Insulation Measurement](https://jmrplens.github.io/phonometry/buildings/insulation/insulation-lab/).
-
-## Predicting performance (EN 12354)
-
-A laboratory rating describes an element in isolation, yet the sound a building
-actually transmits also travels *around* the partition (along the floor, up the
-façade, through the flanking walls), re-radiating into the receiving room. This
-**flanking transmission** is the whole difference between the laboratory $R$ and
-the field $R'$. EN 12354 predicts the in-situ apparent rating from the
-laboratory ratings of the elements plus the vibration transmission of their
-junctions.
-
-<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_flanking_paths_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_flanking_paths.svg" alt="The direct path Dd through the separating element and the three flanking paths Ff, Df and Fd across each junction between a flanking element and the separating element" width="92%"></picture>
-
-Each junction between a flanking element and the separating element carries
-three paths, $Ff$ (flanking→flanking), $Df$ (direct→flanking) and $Fd$
-(flanking→direct), alongside the single direct path $Dd$.
-
-<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anim_flanking_paths_dark.gif"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anim_flanking_paths.gif" alt="Animation: energy pulses leave the source room over the direct Dd path and the flanking Ff, Fd and Df paths, shrinking at each element and junction, and every path label lights up as its pulse re-radiates into the receiving room" width="640" height="360" loading="lazy"></picture>
-
-[Watch the high-resolution video (WebM)](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anim_flanking_paths.webm)
-
-The **simplified single-number model** combines them energetically (Formula 26):
-
-$$
-R'_w = -10 \log_{10}\Big[ 10^{-R_{Dd,w}/10}
-      + \sum 10^{-R_{Ff,w}/10} + \sum 10^{-R_{Df,w}/10}
-      + \sum 10^{-R_{Fd,w}/10} \Big],
-$$
-
-with the direct path $R_{Dd,w} = R_{s,w} + \Delta R_{Dd,w}$ (Formula 27) and each
-flanking path (Formula 28a)
-
-$$
-R_{ij,w} = \tfrac{R_{i,w} + R_{j,w}}{2} + \Delta R_{ij,w} + K_{ij}
-         + 10 \log_{10}\frac{S_s}{l_0\ l_f},
-$$
-
-where $l_0 = 1$ m is the reference coupling length, $l_f$ the junction coupling
-length and $K_{ij}$ the junction's **vibration reduction index** (Annex E,
-empirical in the mass ratio $M = \log_{10}(m'_{\perp,i}/m'_i)$).
-
-<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/prediction_flanking_demo_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/prediction_flanking_demo.svg" alt="Per-path sound reduction indices for the EN 12354-1 Annex H.3 example and each path's share of the transmitted energy, showing the direct path dominating at R'w = 52 dB" width="80%"></picture>
-
-```python
-import numpy as np
-from phonometry import building
-
-# EN 12354-1 Annex H.3: a separating wall Rs,w = 57 dB, area Ss = 11.5 m², with
-# four flanking elements. The simplified model reads each junction's Kij at
-# 500 Hz from the mass ratio m'perp / m' (Annex E) — here the floor's rigid
-# cross-junction (the mass ratio is itself rounded, hence 12.5 vs Annex 12.4):
-print(round(building.junction_vibration_reduction("rigid_cross", "through", 1.61), 1))  # 12.5  KFf
-print(round(building.junction_vibration_reduction("rigid_cross", "corner",  1.61), 1))  #  8.9  KFd = KDf
-
-# Build each element's three flanking paths (Ff, Df, Fd) from the Annex H
-# tabulated Kij, then combine the direct path Dd energetically (Formula 26).
-elements = [   # (name, Rw, KFf, KFd = KDf, coupling length lf)
-    ("floor",    49, 12.4,  8.9, 4.50),
-    ("ceiling",  46, 14.4,  9.2, 4.50),
-    ("facade",   42, 12.6,  6.7, 2.55),
-    ("int-wall", 33, 33.5, 15.7, 2.55),
-]
-paths = []
-for name, rw, k_ff, k_fd, lf in elements:
-    paths += building.flanking_element(label=name, r_flanking=rw, r_separating=57,
-                              k_ff=k_ff, k_fd=k_fd, k_df=k_fd,
-                              separating_area=11.5, coupling_length=lf)
-
-res = building.predicted_airborne_insulation(r_direct=57.0, flanking_paths=paths)
-print(round(res.r_prime_w, 1))                          # 52.2  ->  R'w = 52 dB
-print(res.dominant.label, round(res.dominant.fraction, 2))   # Dd 0.33 (direct dominates)
-
-res.plot()   # per-path share of the transmitted energy, largest first (needs matplotlib)
-```
-
-<details>
-<summary>Show the code for this figure</summary>
-
-```python
-import matplotlib.pyplot as plt
-from phonometry import building
-
-# Build each element's three flanking paths (Ff, Df, Fd) from the Annex H
-# tabulated Kij, then combine the direct path Dd energetically (Formula 26).
-elements = [   # (name, Rw, KFf, KFd = KDf, coupling length lf)
-    ("floor",    49, 12.4,  8.9, 4.50),
-    ("ceiling",  46, 14.4,  9.2, 4.50),
-    ("facade",   42, 12.6,  6.7, 2.55),
-    ("int-wall", 33, 33.5, 15.7, 2.55),
-]
-paths = []
-for name, rw, k_ff, k_fd, lf in elements:
-    paths += building.flanking_element(label=name, r_flanking=rw, r_separating=57,
-                              k_ff=k_ff, k_fd=k_fd, k_df=k_fd,
-                              separating_area=11.5, coupling_length=lf)
-res = building.predicted_airborne_insulation(r_direct=57.0, flanking_paths=paths)
-
-# Per-path sound reduction index and each path's share of the transmitted
-# energy for the Annex H.3 result computed above.
-labels = [p.label for p in res.paths]
-r_w = [p.r_w for p in res.paths]
-frac = [100.0 * p.fraction for p in res.paths]
-
-fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(9, 6), sharex=True)
-ax1.bar(labels, r_w, color="tab:blue")
-ax1.axhline(res.r_prime_w, ls="--", color="k", label=f"R'w = {res.r_prime_w:.1f} dB")
-ax1.set_ylabel("Path Rij,w [dB]"); ax1.legend()
-ax2.bar(labels, frac, color="tab:orange")
-ax2.set_ylabel("Energy share [%]"); ax2.set_xlabel("Transmission path")
-for ax in (ax1, ax2):
-    ax.tick_params(axis="x", rotation=45)
-fig.suptitle("EN 12354-1 Annex H.3 — flanking transmission")
-fig.tight_layout()
-plt.show()
-```
-
-</details>
-
-Every added flanking path strictly lowers $R'_w$ below the direct $R_{Dd,w} = 57$;
-`res.paths` exposes each path's share of the transmitted energy so the dominant
-path is visible. `flanking_element` is a convenience that builds one junction's
-three paths at once; the single-path constructor behind it, `flanking_path`,
-builds one `Ff`, `Df` or `Fd` path at a time (Formula 28a). Clause 4.4.2 also
-enforces a floor $K_{ij} \ge K_{ij,\min}$ from the junction geometry
-(Formula 29). Pass the flanking-element area to
-`flanking_element(..., flanking_area=...)` and the clamp is applied
-automatically per path; or compute the floor yourself with
-`junction_min_vibration_reduction` and pass it to
-`flanking_path(..., kij_min=...)`, which raises a below-floor $K_{ij}$ to the
-minimum:
-
-```python
-from phonometry import building
-# Kij,min = 10 lg[lf·l0·(1/Si + 1/Sj)]; large elements give a low (here negative)
-# floor, so a realistic tabulated Kij is rarely clamped; but small, light
-# elements can push it above the tabulated value (e.g. lf = 4 m, S = 1.5 m²
-# gives 7.3 dB, over the 5 dB lightweight floor).
-print(round(building.junction_min_vibration_reduction(coupling_length=4.5,
-                                             s_i=11.5, s_j=11.5), 1))     # -1.1
-```
-
-The impact counterpart (EN 12354-2, Formula 21) is a direct subtraction:
-$L'_{n,w} = L_{n,w,eq} - \Delta L_w + K$, with the bare-floor equivalent level
-$L_{n,w,eq} = 164 - 35 \log_{10}(m'/m'_0)$ (Annex B), the covering improvement
-$\Delta L_w$ (ISO 717-2) and the flanking correction $K$ from Table 1.
-
-```python
-from phonometry import building
-
-# EN 12354-2 Annex E.3: a 0.14 m concrete floor (m' = 322 kg/m²) with a floating
-# floor (ΔLw = 33 dB), rooms one above the other, mean flanking mass 145 kg/m².
-ln_eq = building.equivalent_impact_level(322.0)                   # 164 - 35 lg(m')
-k = building.impact_flanking_correction(322.0, 145.0)             # Table 1 (sep 322, flk 145)
-imp = building.predicted_impact_insulation(ln_w_eq=ln_eq, delta_l_w=33.0, k_correction=k)
-print(round(ln_eq, 1), k, round(imp.l_prime_n_w, 1))     # 76.2 2 45.2  ->  L'n,w = 45 dB
-
-# Exact Formula (3): L'nT,w = L'n,w - 10 lg(0.032 V). Annex E.3's own rounding
-# of the factor to 10 lg(V/30) sits 0.18 dB below; both give L'nT,w = 43 dB.
-print(round(building.standardized_impact_level(imp.l_prime_n_w, 50.0), 1))   # 43.2  L'nT,w
-
-imp.plot()   # the Formula (21) terms as bars: Ln,w,eq - dLw + K -> L'n,w (needs matplotlib)
-```
-
-<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/impact_prediction_terms_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/impact_prediction_terms.svg" alt="The EN 12354-2 Annex E.3 impact prediction as its Formula 21 terms: the bare-floor equivalent level of 76.2 dB, the minus 33 dB floating-floor improvement, the plus 2 dB flanking correction, and the resulting predicted apparent impact level of 45.2 dB" width="80%"></picture>
-
-*The whole EN 12354-2 simplified model is one subtraction: the massive bare
-floor starts at $L_{n,w,eq} = 76.2$ dB, the floating floor buys back 33 dB,
-and the flanking correction returns 2 dB, landing at $L'_{n,w} = 45$ dB.*
-
-<details>
-<summary>Show the code for this figure</summary>
-
-```python
-import matplotlib.pyplot as plt
-import numpy as np
-from phonometry import building
-
-# EN 12354-2 Annex E.3: 0.14 m concrete floor (m' = 322 kg/m2), floating
-# floor delta-Lw = 33 dB, mean flanking mass 145 kg/m2.
-ln_eq = building.equivalent_impact_level(322.0)
-k = building.impact_flanking_correction(322.0, 145.0)
-imp = building.predicted_impact_insulation(ln_w_eq=ln_eq, delta_l_w=33.0,
-                                           k_correction=k)
-
-# One line — the Formula (21) terms as bars:
-imp.plot()
-plt.show()
-
-# By hand, from the result's fields:
-labels = ["Ln,w,eq", "-dLw", "+K", "L'n,w"]
-values = [imp.ln_w_eq, -imp.delta_l_w, imp.k_correction, imp.l_prime_n_w]
-fig, ax = plt.subplots()
-ax.bar(np.arange(4), values)
-ax.axhline(0.0, color="k", lw=0.8)
-ax.set_xticks(np.arange(4), labels)
-ax.set_ylabel("Level / correction [dB]")
-ax.set_title(f"L'n,w = {imp.l_prime_n_w:.1f} dB (EN 12354-2 Annex E.3)")
-plt.show()
-```
-
-</details>
-
-The airborne counterpart of that closure is Formula (5b),
-$D_{nT} = R' + 10\log_{10}(0.32\,V/S_s)$, exposed as `standardized_level_difference`;
-it closes the Annex H.3 example (`standardized_level_difference(52.2, 50.0,
-11.5)` gives 53.6 dB, the printed $V/(3S)$ chain 53.8 dB, both rounding to
-$D_{nT,w} = 54$ dB).
-
-The three insulation guides close a loop: the
-[laboratory](https://jmrplens.github.io/phonometry/buildings/insulation/insulation-lab/) measures $R$ and $K_{ij}$ element by element
-and junction by junction, this model assembles them into a predicted $R'_w$,
-and the [field measurement](https://jmrplens.github.io/phonometry/buildings/insulation/insulation-field/) checks the built result.
-When the measured value lands well below the prediction, look for a
-construction defect on the dominant path the model reports: a rigid bridge
-across a resilient junction, a missing lining, a leak around the separating
-element.
-
-### `junction_vibration_reduction()` / `flanking_element()` parameters
-
-| Parameter | Type | Units | Range / default | Notes |
-| :--- | :--- | :--- | :--- | :--- |
-| `junction_type` | str | — | `'rigid_cross'` / `'rigid_t'` / `'flexible_t'` / `'lightweight_facade'` / `'lightweight_double_homogeneous'` / `'lightweight_double_coupled'` / `'corner'` / `'thickness_change'` | Junction geometry (Annex E.3-E.9) |
-| `path` | str | — | `'through'` ($K_{13}$) / `'corner'` ($K_{12} = K_{23}$) / `'double_leaf'` ($K_{24}$) | Path branch |
-| `mass_ratio` | float | — | > 0 | $m'_{\perp,i}/m'_i$ (Formula E.2) |
-| `frequency` | float | Hz | default `500` | `flexible_t` and the E.7/E.8 double-leaf junctions are frequency-dependent |
-| `r_flanking` / `r_separating` | float | dB | — | Weighted indices of the flanking / separating element |
-| `k_ff` / `k_fd` / `k_df` | float | dB | — | Junction $K_{ij}$ for the three paths |
-| `separating_area` | float | m² | > 0 | Separating-element area $S_s$ |
-| `coupling_length` | float | m | > 0 | Junction coupling length $l_f$ |
-| `delta_r_ff` / `delta_r_fd` / `delta_r_df` | float | dB | default `0` | Lining improvements per path |
-| `flanking_area` | float | m² | default `None` | Flanking-element area $S_F$; enables the automatic $K_{ij,\min}$ clamp (Clause 4.4.2 / Formula 29) |
-
-### `flanking_path()` parameters
-
-| Parameter | Type | Units | Range / default | Notes |
-| :--- | :--- | :--- | :--- | :--- |
-| `label` | str | — | — | Display name of the path |
-| `kind` | str | — | `'Ff'` / `'Df'` / `'Fd'` | Which flanking branch the path is |
-| `r_source` / `r_receive` | float | dB | — | Weighted indices of the source-side / receive-side elements |
-| `k_ij` | float | dB | — | Junction vibration-reduction index for this path |
-| `separating_area` | float | m² | > 0 | Separating-element area $S_s$ |
-| `coupling_length` | float | m | > 0 | Junction coupling length $l_f$ |
-| `delta_r` | float | dB | default `0` | Lining improvement on this path |
-| `kij_min` | float | dB | default `None` | When given, `k_ij` is floored at this Formula (29) minimum |
-
-`predicted_airborne_insulation()` returns an `AirbornePredictionResult`
-(`r_prime_w`, `r_direct_w`, `paths` of `PathContribution`, `dominant`);
-`predicted_impact_insulation()` an `ImpactPredictionResult` (`l_prime_n_w`,
-`ln_w_eq`, `delta_l_w`, `k_correction`). The simplified model carries a reported
-standard deviation of about 2 dB (Clause 5).
-
-### EN 12354 prediction report (`.report()`)
-
-Both prediction results write a one-page **prediction** report through a
-`report(path)` method. Unlike the measurement fiches, the reported result is an
-*estimate* of the in-situ performance from the elements' laboratory data plus
-the flanking transmission across the junctions; the sheet states this
-explicitly and is labelled a prediction, never a measurement.
-`AirbornePredictionResult.report()` renders the predicted apparent sound
-reduction index fiche (the transmission-path table beside the per-path
-share-of-energy plot, the boxed $R'_w$); `ImpactPredictionResult.report()`
-renders the predicted apparent impact-level fiche (the Formula (21) term table
-beside the term plot, the boxed $L'_{n,w}$). Each names EN/ISO 12354-1/-2 and the
-ISO 717 rating part in its basis line, prints the model's ~2 dB standard
-deviation and, when a `requirement` is supplied, adds a PASS/FAIL verdict
-(airborne passes at or above it, impact at or below it). `verbose=True` annexes
-each transmission path's share of the transmitted energy to the airborne table;
-metadata, `language="es"` and the `phonometry[report]` extra behave as in the
-measurement fiches.
-
-```python
-from phonometry import building, ReportMetadata
-
-# Airborne prediction (EN 12354-1 Annex H.3): a separating wall Rs,w = 57 dB
-# flanked by four elements -> R'w = 52 dB.
-paths = []
-for label, rw, kff, kfd, lf in [
-    ("floor", 49.0, 12.4, 8.9, 4.5), ("ceiling", 46.0, 14.4, 9.2, 4.5),
-    ("facade", 42.0, 12.6, 6.7, 2.55), ("intwall", 33.0, 33.5, 15.7, 2.55),
-]:
-    ff, df, fd = building.flanking_element(
-        label=label, r_flanking=rw, r_separating=57.0,
-        k_ff=kff, k_fd=kfd, k_df=kfd, separating_area=11.5, coupling_length=lf)
-    paths += [ff, df, fd]
-air = building.predicted_airborne_insulation(r_direct=57.0, flanking_paths=paths)
-air.report("Rpw_prediction.pdf", metadata=ReportMetadata(
-    specimen="Separating wall, Rs,w = 57 dB", area=11.5,
-    source_volume=53.0, receiving_volume=50.0, requirement=50.0,
-    notes="Flanking: floor/ceiling/facade/internal wall."))   # R'w = 52 dB
-
-# Impact prediction (EN 12354-2 Annex E.3): a concrete floor (m' = 322 kg/m2)
-# with a floating floor (DLw = 33 dB) -> L'n,w = 45 dB.
-ln_eq = building.equivalent_impact_level(322.0)
-k = building.impact_flanking_correction(322.0, 145.0)
-imp = building.predicted_impact_insulation(ln_w_eq=ln_eq, delta_l_w=33.0, k_correction=k)
-imp.report("Lnw_prediction.pdf",
-           metadata=ReportMetadata(mass_per_area=322.0, requirement=53.0))  # L'n,w = 45 dB
-```
-
-[![Predicted airborne EN 12354-1 example report: metadata header, the transmission-path table beside the per-path share-of-energy chart, boxed predicted R'w = 52 dB, the prediction statement and a PASS verdict](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/reports/iso12354_airborne_prediction_example.webp)](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/reports/iso12354_airborne_prediction_example.pdf)
-
-[![Predicted impact EN 12354-2 example report: metadata header, the Formula (21) term table beside the term chart, boxed predicted L'n,w = 45 dB, the prediction statement and a PASS verdict against the 53 dB requirement](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/reports/iso12354_impact_prediction_example.webp)](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/reports/iso12354_impact_prediction_example.pdf)
-
-## Across the envelope: Parts 3 and 4
-
-The two remaining parts of EN 12354 predict the same way but across the
-building envelope rather than between two rooms: EN 12354-3 the airborne
-insulation against outdoor sound, EN 12354-4 the sound power an indoor source
-radiates outwards. Both are built on the same area-weighted summation of
-element transmission factors used above, and both are covered, beside the
-ISO 16283-3 measurement they are compared against, in
-[Façade Sound Insulation](https://jmrplens.github.io/phonometry/buildings/insulation/facade-insulation/).
-
-## References
-
-- Hopkins, C. (2007). *Sound insulation*. Butterworth-Heinemann.
-  ISBN 978-0-7506-6526-1.
-  [doi:10.4324/9780080550473](https://doi.org/10.4324/9780080550473).
-  The full treatment of flanking transmission and the EN 12354 prediction
-  framework, from the vibration reduction index to its statistical basis.
-
-## Standards
-
-EN 12354-1:2000 and EN 12354-2:2000, which give the simplified
-flanking-transmission predictions between rooms (Annex E junctions, worked
-examples H.3 and E.3). The façade and outdoor-radiation predictions of
-EN 12354-3:2000 and EN 12354-4:2000 have their own page, and the absorption
-member of the family is EN 12354-6.
-
-## See also
-
-- [Façade Sound Insulation](https://jmrplens.github.io/phonometry/buildings/insulation/facade-insulation/): the EN 12354-3 and
-  EN 12354-4 predictions across the building envelope, with the ISO 16283-3
-  measurement they are compared against.
-- [Field Insulation Measurement (ISO 16283)](https://jmrplens.github.io/phonometry/buildings/insulation/insulation-field/):
-  the measured in-situ quantities the prediction is checked against.
-- [Insulation Ratings (ISO 717)](https://jmrplens.github.io/phonometry/buildings/insulation/insulation-ratings/): the reference-curve
-  engine behind the predicted $R'_w$ and $L'_{n,w}$.
-- [Laboratory Insulation Measurement](https://jmrplens.github.io/phonometry/buildings/insulation/insulation-lab/): the
-  ISO 10140 ratings the model consumes.
-- [Laboratory Flanking Transmission (ISO 10848)](https://jmrplens.github.io/phonometry/buildings/insulation/flanking-lab/): the
-  measured junction vibration reduction index $K_{ij}$ the model consumes.
-- [Sound absorption in enclosed spaces (EN 12354-6)](https://jmrplens.github.io/phonometry/buildings/rooms/enclosed-space-absorption/):
-  the absorption member of the same EN 12354 family.
-- [Dynamic stiffness of resilient materials (EN 29052-1)](https://jmrplens.github.io/phonometry/materials/resilient/dynamic-stiffness/):
-  the $s'$ input to the EN 12354-2 floating-floor term.
-- API reference: [`building.prediction.simplified_model`](https://jmrplens.github.io/phonometry/reference/api/building/simplified-model/) and [`building.prediction.facade`](https://jmrplens.github.io/phonometry/reference/api/building/facade/).
 
 ---
 
@@ -2087,6 +1577,268 @@ fig.tight_layout(); plt.show()
 ---
 
 
+<!-- source: docs/impact-improvement.md | canonical: https://jmrplens.github.io/phonometry/buildings/design/impact-improvement/ -->
+Source: https://jmrplens.github.io/phonometry/buildings/design/impact-improvement/
+
+# Floor-Covering Impact Improvement (ISO 16251-1)
+
+A soft floor covering does not block airborne sound; it cushions footsteps.
+What it improves is the impact level of the floor underneath, and measuring
+that improvement in a full ISO 10140 transmission suite is out of proportion
+to a square metre of carpet. ISO 16251-1 therefore shrinks the laboratory to
+a small heavyweight mock-up: a softly supported concrete plate, a standard
+tapping machine and an accelerometer underneath. This guide covers the
+mock-up measurement of the improvement $\Delta L$ and its weighted
+$\Delta L_w$ against the ISO 717-2 reference floor, the accredited fiche,
+and the ISO 12354-2 engineering estimate that predicts a floating floor's
+improvement from the dynamic stiffness of its resilient layer. The
+full-size laboratory chain lives in
+[Laboratory Insulation Measurement](https://jmrplens.github.io/phonometry/buildings/insulation/insulation-lab/); the $s'$
+measurement behind the estimate is the subject of
+[Dynamic stiffness of resilient materials (EN 29052-1)](https://jmrplens.github.io/phonometry/materials/resilient/dynamic-stiffness/).
+
+## The small-mock-up method
+
+ISO 16251-1:2014 is a laboratory method for the **improvement of impact sound
+insulation** $\Delta L$ of a soft, locally-reacting floor covering (carpet, PVC,
+linoleum). The two ISO 10140 rooms are replaced by a small softly-supported
+concrete plate; a standard tapping machine excites it and the structure-borne
+**acceleration level** on the underside is measured with and without the
+covering. For locally-reacting coverings that acceleration-level difference
+equals the ISO 10140 impact sound reduction.
+
+**Acceleration level (Formula (1)).** $L_a = 10\log_{10}(\langle a^2\rangle / a_0^2)$ dB,
+reference $a_0 = 10^{-6}\ \text{m/s}^2$. **Background correction (Formula (2))**
+follows the ISO 10140 three-branch rule (unchanged ≥ 15 dB; energy subtraction
+for 6 ≤ margin < 15 dB; the 1.3 dB limit below 6 dB, flagged as $> \Delta L$).
+The improvement is the position-averaged difference
+$\Delta L = L_0 - L_1$ (Formulae (3)/(4)); octaves follow
+$\Delta L_\text{oct} = -10\log_{10}[\tfrac{1}{3}\sum 10^{-\Delta L_n/10}]$ (Formula (5)).
+
+**Weighted improvement.** $\Delta L_w$ is the ISO 717-2 weighted reduction: the
+improvement is applied to the heavyweight **reference floor** $L_{n,r,0}$
+(ISO 717-2 Table 4), $L_{n,r} = L_{n,r,0} - \Delta L$, and
+$\Delta L_w = 78 - L_{n,r,w}$, computed by `weighted_impact_improvement()`, which
+reuses the verified ISO 717-2 rating engine. A clause 6.3 measurement spans 18
+bands (100–5000 Hz, optionally extended to 50 Hz); the rating is formed on the
+100–3150 Hz sub-range of whatever spectrum contains it. The statement of
+results (clause 8 e)) also carries the spectrum adaptation term
+$C_{I,\Delta} = C_{I,r,0} - C_{I,r}$ (ISO 717-2:2020 Formula (A.4)), exposed as
+`ci_delta` on the result and standalone as
+`impact_improvement_adaptation_term()`.
+
+The worked example below is a real measurement: the improvement of a textile
+carpet on the CSTB heavyweight mock-up, digitized from Figure 4 of Foret,
+Chéné and Guigou-Carter, "A comparison of the reduction of transmitted impact
+noise by floor coverings measured using ISO 140-8 and ISO/CD 16251-1" (Forum
+Acusticum 2011, Aalborg). Its published ISO 16251-1 weighted improvement is
+$\Delta L_w = 29$ dB, reproduced exactly by the rating engine.
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/floor_covering_improvement_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/floor_covering_improvement.svg" alt="ISO 16251-1 floor-covering impact sound improvement: the improvement delta-L of a real textile carpet rising with frequency across one-third-octave bands from 100 Hz to 3150 Hz, with the shaded improvement area and the weighted single-number delta-Lw annotated" width="80%"></picture>
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import building
+
+freqs = [100, 125, 160, 200, 250, 315, 400, 500,
+         630, 800, 1000, 1250, 1600, 2000, 2500, 3150]
+bare = np.full(16, 78.0)                       # bare-plate acceleration level
+# A real textile carpet measured on the CSTB mock-up (Foret et al. 2011, Fig. 4).
+covering = bare - np.array([5, 8, 10, 14, 18, 23, 30, 31,
+                            39, 49, 53, 57, 60, 67, 68, 71])
+res = building.impact_improvement(bare, covering, freqs)
+print(res.delta_lw)   # weighted improvement delta-Lw = 29 dB (ISO 717-2)
+res.plot()
+plt.show()
+```
+
+</details>
+
+```python
+from phonometry import building
+
+# delta-Lw straight from an improvement spectrum (16 one-third-octave bands):
+delta_l = [5, 8, 10, 14, 18, 23, 30, 31, 39, 49, 53, 57, 60, 67, 68, 71]
+print(building.weighted_impact_improvement(delta_l))    # 29 dB (carpet)
+
+# From the measured bare/covered acceleration levels, with a background trace:
+freqs = [100, 125, 160, 200, 250, 315, 400, 500, 630, 800,
+         1000, 1250, 1600, 2000, 2500, 3150]
+bare_levels = [72, 73, 74, 74, 75, 75, 76, 76, 77, 77, 78, 78, 79, 79, 80, 80]
+covered_levels = [b - d for b, d in zip(bare_levels, delta_l)]
+bg = [40.0] * 16
+res = building.impact_improvement(bare_levels, covered_levels, freqs, background=bg)
+res.improvement       # delta-L per band
+res.delta_lw          # weighted single number (rated on the 100-3150 Hz sub-range)
+res.ci_delta          # spectrum adaptation term CI,delta (Formula (A.4))
+res.limited           # bands at the 1.3 dB limit of measurement (> delta-L)
+res.octave_bands()    # (octave freqs, delta-L_oct) via Formula (5)
+res.plot()            # the delta-L(f) improvement spectrum above (needs matplotlib)
+```
+
+## ISO 16251-1 impact-improvement report (`.report()`)
+
+`FloorCoveringImprovementResult.report()` writes a one-page accredited
+impact-improvement fiche: the ISO 16251-1 basis line, a metadata header, the
+per-band table (frequency and $\Delta L$, bands at the 1.3 dB limit prefixed
+`>`) beside the $\Delta L(f)$ improvement curve, the boxed single-number
+$\Delta L_w\ (C_{I,\Delta})$ (the ISO 16251-1 Clause 8 e) statement of
+results, rated
+per ISO 717-2) and a footer. The applicable `ReportMetadata` fields are
+`specimen` (the floor covering under test), `client`, `manufacturer`,
+`mounting`, `mass_per_area`, `test_room`, `test_date`, `temperature`,
+`pressure`, `measurement_standard`, `laboratory`, `operator`, `report_id`,
+`notes` and `requirement` (a higher weighted improvement is better, so the
+verdict passes at or above it). The bare reference floor is the standardised
+heavyweight floor of ISO 717-2:2020 Table 4, fixed by the standard.
+`verbose=True` adds the reference-floor-with-covering column
+$L_{n,r} = L_{n,r,0} - \Delta L$, the derivation basis of $\Delta L_w$.
+
+```python
+from phonometry import building, ReportMetadata
+
+freqs = [100, 125, 160, 200, 250, 315, 400, 500,
+         630, 800, 1000, 1250, 1600, 2000, 2500, 3150]
+delta_l = [5, 8, 10, 14, 18, 23, 30, 31, 39, 49, 53, 57, 60, 67, 68, 71]
+bare = [78.0] * 16
+res = building.impact_improvement(bare, [b - d for b, d in zip(bare, delta_l)], freqs)
+res.report("dLw.pdf",
+           metadata=ReportMetadata(
+               specimen="Textile floor covering (carpet), laid loose",
+               measurement_standard="ISO 16251-1",
+               requirement=20.0))  # delta-Lw (CI,delta) = 29 (-13) dB
+```
+
+A rendered example fiche, regenerated with `make reports`, is kept in the
+repository. Click the preview to open the PDF:
+
+[![Floor-covering impact improvement ISO 16251-1 example report: metadata header, one-third-octave delta-L table beside the delta-L(f) improvement curve, boxed delta-Lw (CI,delta) = 29 (-13) dB weighted improvement (ISO 717-2) and a PASS verdict against the 20 dB requirement](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/reports/iso16251_floor_covering_example.webp)](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/reports/iso16251_floor_covering_example.pdf)
+
+## From dynamic stiffness to the improvement: the ISO 12354-2 estimate
+
+The mock-up measures a *covering* that exists; a **floating floor** (a
+screed poured on a resilient layer) is designed the other way round, from
+two numbers known at the drawing stage: the mass per unit area $m'$ of the
+slab and the dynamic stiffness per unit area $s'$ of the resilient layer,
+measured per EN 29052-1 as in the
+[dynamic-stiffness guide](https://jmrplens.github.io/phonometry/materials/resilient/dynamic-stiffness/). Together they set the mass-spring
+resonance of the system (ISO 12354-2:2017, Annex C, Formula (C.2)):
+
+$$
+f_0 = 160 \sqrt{\frac{s'}{m'}}\ \text{Hz}
+\qquad (s'\ \text{in MN/m}^3,\ m'\ \text{in kg/m}^2),
+$$
+
+where 160 is the rounded $1000/2\pi$; `materials.natural_frequency` computes
+the exact $\tfrac{1}{2\pi}\sqrt{s'/m'}$ form. Above the resonance the slab
+decouples from the structural floor and Annex C estimates the improvement as
+a straight slope per Formula (C.1), with the steeper Formula (C.3) for
+constructions whose higher internal losses follow the infinite-plate theory:
+
+$$
+\Delta L = 30 \log_{10} \frac{f}{f_0}\ \text{dB (sand/cement, calcium-sulfate screeds)},
+\qquad
+\Delta L = 40 \log_{10} \frac{f}{f_0}\ \text{dB (asphalt, dry screeds)}.
+$$
+
+```python
+import numpy as np
+from phonometry import building, materials
+
+# The ISO 12354-2:2017 Annex G worked floor: a 73.5 kg/m2 screed on a resilient
+# layer with s' = 8 MN/m3.
+f0 = 160.0 * np.sqrt(8.0 / 73.5)                                 # Formula (C.2)
+print(round(f0, 1))                                              # 52.8  Hz
+print(round(float(materials.natural_frequency(8.0e6, 73.5)), 1))  # 52.5  exact 1/(2 pi) form
+
+# delta-L = 30 lg(f/f0) above the resonance (Formula (C.1)); build the
+# one-third-octave spectrum and rate it with the ISO 717-2 engine.
+freqs = np.array([100, 125, 160, 200, 250, 315, 400, 500, 630, 800,
+                  1000, 1250, 1600, 2000, 2500, 3150], dtype=float)
+delta_l = 30.0 * np.log10(freqs / f0)
+print(building.weighted_impact_improvement(delta_l))             # 32  dB
+
+# The one-line estimate of Formula (C.4) lands right beside it:
+print(round(13.0 * np.log10(73.5) - 14.2 * np.log10(8.0) + 20.8, 1))   # 32.2 dB
+```
+
+The closed-form weighted estimate of Formula (C.4),
+$\Delta L_w = 13\log_{10} m' - 14{,}2\log_{10} s' + 20{,}8$ dB, condenses the same
+physics into one line: heavier slabs and softer layers rate better. Both
+estimates are design aids kept deliberately on the safe side (the 30 lg
+slope undercuts the 40 lg infinite-plate theory where experimental data say
+real screeds fall short); once a specimen exists, the measured mock-up of
+this page, or the full ISO 10140-3 floor, is the reference, and the
+[EN 12354-2 prediction](https://jmrplens.github.io/phonometry/buildings/design/insulation-prediction/) consumes whichever $\Delta L_w$ you have.
+
+## References
+
+- Vigran, T. E. (2008). *Building acoustics*. CRC Press.
+  ISBN 978-0-415-42853-8.
+  [doi:10.1201/9781482266016](https://doi.org/10.1201/9781482266016).
+  The transmission theory of floors and floating floors that the improvement
+  quantifies.
+- Foret, R., Chéné, J.-B., & Guigou-Carter, C. (2011). A comparison of the
+  reduction of transmitted impact noise by floor coverings measured using
+  ISO 140-8 and ISO/CD 16251-1. *Forum Acusticum 2011, Aalborg* (CSTB).
+  The measured textile-carpet improvement spectrum used as the worked
+  example on this page ($\Delta L_w = 29$ dB); the per-band $\Delta L$ was
+  digitized from its
+  Figure 4.
+- International Organization for Standardization. (2014). *Acoustics —
+  Laboratory measurement of the reduction of transmitted impact noise by
+  floor coverings on a small floor mock-up — Part 1: Heavyweight compact
+  floor* (ISO 16251-1:2014).
+  [iso.org catalogue](https://www.iso.org/standard/56017.html).
+  The small-mock-up method this page implements.
+- International Organization for Standardization. (2020). *Acoustics —
+  Rating of sound insulation in buildings and of building elements — Part 2:
+  Impact sound insulation* (ISO 717-2:2020).
+  [iso.org catalogue](https://www.iso.org/standard/69867.html).
+  The reference floor $L_{n,r,0}$ (Table 4) and the rating engine behind
+  $\Delta L_w$, with the Formula (A.4) adaptation term $C_{I,\Delta}$.
+
+- International Organization for Standardization. (2017). *Building acoustics
+  — Estimation of acoustic performance of buildings from the performance of
+  elements — Part 2: Impact sound insulation between rooms*
+  (ISO 12354-2:2017).
+  [iso.org catalogue](https://www.iso.org/standard/70239.html).
+  The informative Annex C floating-floor estimate reproduced above (Formulae
+  C.1 to C.4) and the worked floor of Annex G.
+
+## Standards
+
+ISO 16251-1:2014, which specifies the small-mock-up laboratory method for
+the impact-sound improvement $\Delta L$ of floor coverings; ISO 717-2:2020,
+which supplies the reference floor, the $\Delta L_w$ rating and the
+$C_{I,\Delta}$ adaptation term; and ISO 12354-2:2017 Annex C (informative),
+whose floating-floor estimate this page reproduces from the EN 29052-1
+dynamic stiffness, with the worked floor of its Annex G (context for design,
+not a measurement).
+
+## See also
+
+- [Laboratory Insulation Measurement](https://jmrplens.github.io/phonometry/buildings/insulation/insulation-lab/): the ISO 10140
+  suite this mock-up replaces for soft coverings, and the full-size
+  ISO 10140-3 improvement measurement.
+- [Dynamic stiffness of resilient materials (EN 29052-1)](https://jmrplens.github.io/phonometry/materials/resilient/dynamic-stiffness/):
+  the $s'$ measurement that feeds the floating-floor estimate.
+- [Predicting Resilient-Layer Performance](https://jmrplens.github.io/phonometry/buildings/design/resilient-layers/): the
+  prediction counterpart of this page, from the tapping-machine force model
+  to floating floors and wall linings.
+- [Predicting Sound Insulation (EN 12354)](https://jmrplens.github.io/phonometry/buildings/design/insulation-prediction/): the
+  impact model whose Formula (21) consumes $\Delta L_w$.
+- [Insulation Ratings (ISO 717)](https://jmrplens.github.io/phonometry/buildings/insulation/insulation-ratings/): the reference-curve
+  engine behind the weighted improvement.
+- API reference: [`building.measurement.floor_covering_improvement`](https://jmrplens.github.io/phonometry/reference/api/building/floor-covering-improvement/).
+
+---
+
+
 <!-- source: docs/resilient-layers.md | canonical: https://jmrplens.github.io/phonometry/buildings/design/resilient-layers/ -->
 Source: https://jmrplens.github.io/phonometry/buildings/design/resilient-layers/
 
@@ -2782,5 +2534,253 @@ $v_0 = 10^{-9}\ \text{m/s}$. Conformance is anchored on the resonant-plate
 power balance $P = \omega\,\eta\,(m S)\,\langle v^2 \rangle$ (of which
 Formula 14 is the level), the loss-factor identity, and the EN 12354-5
 Annex I.3 Table I.8 conversion of the flushing-cistern source.
+
+---
+
+
+<!-- source: docs/installed-structure-borne.md | canonical: https://jmrplens.github.io/phonometry/buildings/design/installed-structure-borne/ -->
+Source: https://jmrplens.github.io/phonometry/buildings/design/installed-structure-borne/
+
+# Installed structure-borne sound from equipment (EN 12354-5)
+
+**EN 12354-5:2009** predicts the sound pressure level in a receiving room caused
+by building service equipment (pumps, fans, lifts, water installations) that
+injects **structure-borne sound** into the building. It closes the
+structural-vibroacoustics chain: the source is described by its characteristic
+structure-borne sound power level $L_{Ws,c}$, derived from the EN 15657
+reception-plate measurement through the Formula (15)/(17) conversion and a
+mobility correction (**not** the raw plate-injected level;
+see [EN 15657](https://jmrplens.github.io/phonometry/buildings/design/structure-borne-power/)); the source and receiver point
+mobilities set how much power is actually coupled into the structure, and the
+building transmission carries it to the receiving room. The Annex I mobility
+correction `installed_power_from_reception_plate` refers the characteristic
+reception-plate level $L_{Ws,n}$ to the actual receiver,
+$L_{Ws,\mathrm{inst}} = L_{Ws,n} + 10\log_{10}(Y_{\infty,i} / Y_{\infty,\mathrm{rec}})$
+with $Y_{\infty,\mathrm{rec}} = 5\cdot 10^{-6}\ \text{m/(N·s)}$;
+with the source mobility instead it yields $L_{Ws,c}$ (Annex I.3, Table I.8).
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/installed_structure_borne_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/installed_structure_borne.svg" alt="The EN 12354-5 cascade per octave band: the characteristic structure-borne power level, the installed power level after subtracting the coupling term, the per-path normalised sound pressure levels, and their energetic total" width="82%"></picture>
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import building
+
+# EN 15657 characteristic source power and illustrative point mobilities.
+bands = np.array([63.0, 125.0, 250.0, 500.0, 1000.0, 2000.0, 4000.0])
+lws_c = np.array([78.0, 82.0, 84.0, 81.0, 77.0, 72.0, 66.0])
+ys = (2e-4 + 1e-4j) * (bands / 250.0)        # source mobility
+yi = (3e-5 + 1e-5j) * np.ones_like(bands)    # receiver mobility
+dc = np.array([float(building.coupling_term(a, b)) for a, b in zip(ys, yi)])
+
+# Two transmission paths: the excited floor and a flanking wall.
+paths = [
+    {"adjustment_term": 6.0, "element_area": 12.0,
+     "flanking_reduction_index": np.linspace(44.0, 62.0, 7)},
+    {"adjustment_term": 7.0, "element_area": 9.0,
+     "flanking_reduction_index": np.linspace(46.0, 64.0, 7)},
+]
+res = building.installed_source_prediction(lws_c, dc, paths, frequencies=bands)
+res.plot()   # characteristic and installed power, per-path levels and the total
+plt.show()
+```
+
+</details>
+
+## 1. Coupling and installed power
+
+Only part of the characteristic power is injected into the supporting element;
+the loss is the **coupling term** $D_C$ (always positive), set for a point
+excitation by the source mobility $Y_s$ and the receiver mobility $Y_i$
+(Formula 19b):
+
+$$
+D_{C,i} = 10\log_{10}\frac{|Y_s + Y_i|^2}{|Y_s|\,\mathrm{Re}\{Y_i\}},
+$$
+
+which reduces to $10\log_{10}(|Y_s|/\mathrm{Re}\{Y_i\})$ for a **force source** (high source
+mobility, Formula 19c) and to $-10\log_{10}(|Y_s|\,\mathrm{Re}\{Z_i\})$ for a **velocity source**
+(low source mobility, Formula 19d); an elastic support adds its transfer
+mobility $Y_k$ inside the modulus (Formula 19e). The **installed** power level is
+then (Formula 18b) $L_{Ws,\mathrm{inst}} = L_{Ws,c} - D_C$.
+
+The physics behind $D_C$ is the classical power input of a point-excited
+plate: only the real part of the receiver's driving-point mobility absorbs
+power, and the mismatch between $Y_s$ and $Y_i$ decides how much of the
+source's capability ever enters the structure (Hopkins 2007, Section 2.8).
+The mobilities themselves come from the
+[mechanical-mobility chain](https://jmrplens.github.io/phonometry/vibration/structural/mechanical-mobility/): measured per ISO 7626,
+or from the infinite-plate closed forms of
+[panel theory](https://jmrplens.github.io/phonometry/buildings/design/panel-sound-insulation/) when no measurement exists. A pump
+on a concrete slab is the textbook force source: its casing mobility is
+orders of magnitude above the slab's, so $D_C$ collapses to Formula 19c and
+the injected power no longer depends on the receiver at all.
+
+```python
+from phonometry import building
+
+# A near-force source (Y_s >> Y_i) on a concrete floor:
+dc = building.coupling_term(2e-4 + 1e-4j, 3e-5 + 1e-5j)
+print(round(float(dc), 2))                                          # ~8.5 dB
+print(round(float(building.installed_structure_borne_power_level(82.0, dc)), 1))  # installed L_Ws
+```
+
+## 2. Transmission to the receiving room
+
+EN 12354 parts 1 and 2 handle rooms excited through the air and by the
+standard tapping machine; part 5 covers the sources that shake the building
+*directly*: pumps, fans, lifts, whirlpool baths, cisterns and the pipework
+that ties them into walls and floors. Once the installed power is in the
+structure, several elements radiate into the receiving room: the excited
+element itself and every element the vibration reaches across the junctions.
+Each excited-element/radiating-element pair $i \to j$ is a transmission path with
+its own adjustment term and flanking index:
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_installed_paths_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_installed_paths.svg" alt="EN 12354-5 installation paths: a pump on resilient mounts injects structure-borne power into the floor slab, the excited floor radiates into the receiving room below, a second path travels along the slab into the flanking wall, and the prediction cascade runs from the characteristic power to the normalised sound pressure level" width="92%"></picture>
+
+Each transmission path $i \to j$ gives a normalised sound pressure level from the
+installed power, the structure-to-airborne adjustment term $D_{sa}$, the flanking
+sound reduction index $R_{ij,\mathrm{ref}}$ (EN 12354-1) and the element area
+(Formula 18a):
+
+$$
+L_{n,s,ij} = L_{Ws,\mathrm{inst},i} - D_{sa,i} - R_{ij,\mathrm{ref}}
+             - 10\log_{10}\frac{S_i}{S_0} - 10\log_{10}\frac{A_0}{4},
+$$
+
+with $S_0 = A_0 = 10\ \text{m}^2$, and the paths combine energetically (Formula 17):
+
+```python
+import numpy as np
+from phonometry import building
+
+bands = np.array([250.0, 500.0, 1000.0])
+res = building.installed_source_prediction(
+    characteristic_power_level=np.array([80.0, 82.0, 78.0]),
+    coupling_term=np.array([9.0, 10.0, 11.0]),
+    paths=[
+        {"adjustment_term": 5.0,
+         "flanking_reduction_index": np.array([50.0, 52.0, 55.0]), "element_area": 12.0},
+        {"adjustment_term": 6.0,
+         "flanking_reduction_index": np.array([52.0, 54.0, 57.0]), "element_area": 8.0},
+    ],
+    frequencies=bands,
+)
+print(np.round(res.total_level, 1))      # total L_n,s per band
+print(round(res.overall_level, 1))       # band-summed level [dB]
+
+res.plot()   # the per-path and total L_n,s cascade, as in the figure above (needs matplotlib)
+```
+
+The `InstalledSourceResult` carries the per-path levels, the total per band, the
+installed power level and `.overall_level`, and its `.plot()` draws the whole
+cascade.
+
+## 3. The prediction report (`.report()`)
+
+A prediction ends as a *document*. `InstalledSourceResult.report(path)` writes a
+one-page PDF fiche, clearly labelled a prediction and not a measurement: a
+prediction-basis line naming EN 12354-5:2009, an optional metadata header
+(client, source equipment, receiving room, instrumentation, climate, date), a
+per-band table (nominal octave/one-third-octave frequency, the installed
+structure-borne power level $L_{Ws,\mathrm{inst}}$, each transmission path's
+normalised SPL
+$L_{n,s,ij}$ and the combined total $L_{n,s}$), the per-path and total
+$L_{n,s}(f)$
+spectra, and a boxed band-summed total $L_{n,s}$ (dB) with the installed power
+total and the path count.
+
+The relevant `ReportMetadata` fields are `client`, `specimen` (the source
+equipment), `test_room` (the receiving room), `instrumentation` and the footer
+identity `laboratory`, `operator`, `report_id` and `notes`. Supplying
+`requirement` adds a PASS/FAIL verdict against a declared upper limit on the
+overall $L_{n,s}$ (lower is better). `verbose=True` adds one column per
+transmission path (up to five); otherwise only the installed power and the
+combined total are shown. `language="es"` renders the Spanish fiche. The basis
+strip states Formulae 18a/17 and the prediction disclaimer. Rendering needs the
+optional `phonometry[report]` extra (reportlab), plus matplotlib for the plot.
+
+```python
+import numpy as np
+from phonometry import ReportMetadata, installed_source_prediction
+
+bands = np.array([63, 125, 250, 500, 1000, 2000], float)
+lwc = np.array([84.4, 82.5, 69.9, 67.6, 61.6, 49.9])   # characteristic power [dB]
+dsa = np.array([-13.6, -17.3, -17.4, -20.0, -26.9, -32.9])
+paths = [
+    {"adjustment_term": dsa,
+     "flanking_reduction_index": np.array([43.0, 46, 50.2, 54.7, 64.6, 73]),
+     "element_area": 12.8},
+    {"adjustment_term": dsa,
+     "flanking_reduction_index": np.array([37.0, 41.2, 35.9, 37.7, 49, 57.8]),
+     "element_area": 12.8},
+]
+res = installed_source_prediction(lwc, 16.2, paths, frequencies=bands)
+res.report(
+    "installed_structure_borne.pdf",
+    metadata=ReportMetadata(
+        client="Example dwelling refurbishment",
+        specimen="WC flushing cistern (wall-fixed)",
+        test_room="Receiving room: adjacent bedroom",
+        report_id="EXAMPLE-12354-5",
+        requirement=45.0,
+    ),
+)   # overall L_n,s ~ 43 dB -> declared limit 45 dB: PASS
+```
+
+The rendered example fiche, regenerated with `make reports`, is kept in the
+repository. Click the preview to open the PDF:
+
+[![EN 12354-5 installed structure-borne prediction example report, clearly labelled a prediction and not a measurement: a header with the client, the source equipment, the receiving room and the identity, the octave-band table (63 Hz to 2 kHz) of the installed structure-borne power level L_Ws,inst, the two flanking paths normalised SPL L_n,s,ij and the combined total L_n,s, the per-path and total L_n,s(f) spectra, and the boxed band-summed total L_n,s with the installed power total and the path count, closed by a basis strip stating Formulae 18a/17 and the prediction disclaimer, with a PASS verdict against the declared 45 dB limit](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/reports/en12354_5_installed_structure_borne_example.webp)](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/reports/en12354_5_installed_structure_borne_example.pdf)
+
+*Installed structure-borne prediction fiche (`InstalledSourceResult.report`), an
+EN 12354-5 estimate of the normalised structure-borne SPL in the receiving
+room.*
+
+## See also
+
+- [Structure-borne sound power of equipment (EN 15657)](https://jmrplens.github.io/phonometry/buildings/design/structure-borne-power/):
+  the reception-plate characterisation that supplies $L_{Ws,c}$ and the source
+  mobility this prediction consumes.
+- [Mechanical mobility and the FRF family (ISO 7626-1)](https://jmrplens.github.io/phonometry/vibration/structural/mechanical-mobility/):
+  the measured $Y_s$ and $Y_i$ behind the coupling term.
+- [Bending-wave transmission at plate junctions](https://jmrplens.github.io/phonometry/vibration/structural/junction-transmission/):
+  the junction physics that carries the installed power to the flanking
+  radiators.
+- [Predicting Sound Insulation (EN 12354)](https://jmrplens.github.io/phonometry/buildings/design/insulation-prediction/): the
+  airborne and impact members of the same prediction family.
+
+## References
+
+- Cremer, L., Heckl, M., & Petersson, B. A. T. (2005). *Structure-borne
+  sound: Structural vibrations and sound radiation at audio frequencies*
+  (3rd ed.). Springer. ISBN 978-3-540-22696-3.
+  [doi:10.1007/b137728](https://doi.org/10.1007/b137728).
+  The source-receiver mobility coupling and the structure-borne transmission
+  across junctions behind the coupling term and the path model.
+- Hopkins, C. (2007). *Sound insulation*. Butterworth-Heinemann.
+  ISBN 978-0-7506-6526-1.
+  [doi:10.4324/9780080550473](https://doi.org/10.4324/9780080550473).
+  Section 2.8 (driving-point impedance and mobility): the power a mechanical
+  source injects into a plate through the source and receiver mobilities.
+
+## Standards
+
+EN 12354-5:2009, *Building acoustics — Estimation of acoustic
+performance of buildings from the performance of elements — Part 5: Sound levels
+due to service equipment*: the coupling term (clause 4.4.3, Formulae 19a-19e),
+the installed structure-borne power level (Formula 18b), the structure-to-
+airborne adjustment term (clause 4.4.4, Formulae 20a/20b), and the normalised
+sound pressure level per path and its energetic combination (Formulae 18a, 17).
+Conformance is anchored on the coupling-term force-source limit and the
+standard's own Annex I worked examples: the whirlpool bath of I.2
+(Table I.6a: mobility correction and path 11) and the flushing cistern of I.3
+(Tables I.8/I.9: source conversion, all four transmission paths, the
+Formula 17 total and its 29 dB(A) closure), within the ±0.15 dB rounding of
+the printed one-decimal intermediates. $D_{sa}$ and $R_{ij,\mathrm{ref}}$ are inputs (from
+measurement / EN 12354-1 / Annexes D and F).
 
 ---

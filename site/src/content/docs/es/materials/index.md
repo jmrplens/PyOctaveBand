@@ -97,3 +97,7 @@ sección de
   con resonadores.
 - [Absorción in situ de firmes de carretera](/phonometry/es/materials/surfaces/road-absorption/):
   la absorción in situ de pavimentos de ISO 13472-1/-2.
+- [Rigidez dinámica de materiales resilientes (EN 29052-1)](/phonometry/es/materials/resilient/dynamic-stiffness/):
+  el método de resonancia que mide lo que hace una capa resiliente bajo un
+  suelo flotante, y la rigidez aparente que le pide el capítulo de diseño de
+  aislamiento.

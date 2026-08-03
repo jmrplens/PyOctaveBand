@@ -85,3 +85,7 @@ section.
   Schroeder diffusers from resonator-loaded slits.
 - [In-situ Road-Surface Absorption](/phonometry/materials/surfaces/road-absorption/):
   ISO 13472-1/-2 in-situ road-surface absorption.
+- [Dynamic stiffness of resilient materials (EN 29052-1)](/phonometry/materials/resilient/dynamic-stiffness/):
+  the resonance method that measures what a resilient layer does under a
+  floating floor, and the apparent stiffness the insulation design chapter
+  asks it for.

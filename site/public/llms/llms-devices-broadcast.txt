@@ -1,4 +1,4 @@
-# phonometry: Sources and devices
+# phonometry: devices broadcast
 
 Part of https://jmrplens.github.io/phonometry/llms.txt. Full text of the pages in this area.
 

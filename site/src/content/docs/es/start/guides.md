@@ -1,6 +1,6 @@
 ---
 title: "Guías"
-description: "Las 95 guías de phonometry, agrupadas en las nueve áreas que cubre la biblioteca: para qué sirve cada área, las normas que implementa y un resumen de una línea de cada guía que contiene."
+description: "Las 104 guías de phonometry, agrupadas en los diez temas que cubre la biblioteca: para qué sirve cada área, las normas que implementa y un resumen de una línea de cada guía que contiene."
 head:
   - tag: script
     attrs:
@@ -11,9 +11,9 @@ head:
         "@type": "ItemList",
         "@id": "https://jmrplens.github.io/phonometry/es/start/guides/#areas",
         "name": "Áreas de la documentación de phonometry",
-        "description": "Las nueve áreas documentadas de las guías de phonometry, cada una con las normas que implementa.",
+        "description": "Los diez temas documentados de las guías de phonometry, cada una con las normas que implementa.",
         "inLanguage": "es",
-        "numberOfItems": 9,
+        "numberOfItems": 10,
         "itemListOrder": "https://schema.org/ItemListUnordered",
         "itemListElement": [
           {
@@ -90,7 +90,7 @@ hay ninguna panorámica del campo: cada página es la documentación de trabajo 
 un módulo, escrita para que un resultado se pueda defender apartado por
 apartado en lugar de darlo por bueno.
 
-Esta página es el mapa. Noventa y tres guías repartidas en nueve áreas, y cada
+Esta página es el mapa. Ciento cuatro guías repartidas en diez temas, y cada
 área tiene su propio índice con el relato largo de cómo encajan sus piezas. Si
 llegas sin una pregunta concreta, lee primero la
 [introducción](/phonometry/es/start/getting-started/): recorre una señal por toda la

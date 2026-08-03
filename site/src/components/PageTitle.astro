@@ -28,7 +28,21 @@ const id = route?.entry?.id ?? '';
 const lang = id === 'es' || id.startsWith('es/') ? 'es' : 'en';
 const slug = id.replace(/^es\/?/, '');
 
-const showByline = slug.startsWith('guides/') || slug === 'getting-started';
+// The guides, wherever their topic filed them, and the page that opens them.
+const GUIDE_TOPICS = [
+  'signal',
+  'perception',
+  'buildings',
+  'materials',
+  'vibration',
+  'environment',
+  'aircraft',
+  'underwater',
+  'devices',
+  'simulation',
+];
+const isGuide = GUIDE_TOPICS.some((topic) => slug === topic || slug.startsWith(`${topic}/`));
+const showByline = isGuide || slug === 'start/getting-started';
 
 const BASE = (import.meta.env.BASE_URL ?? '/').replace(/\/$/, '');
 const aboutHref = `${BASE}${lang === 'es' ? '/es' : ''}/start/about/`;

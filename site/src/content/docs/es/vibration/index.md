@@ -72,3 +72,12 @@ de lesión lumbar.
 - [Vibración con choques múltiples (ISO 2631-5)](/phonometry/es/vibration/human/multiple-shock-vibration/):
   el modelo de respuesta espinal y la probabilidad de lesión lumbar para
   vibración con múltiples choques.
+
+## Maquinaria
+
+Convertir un espectro de vibración en un diagnóstico de la máquina que lo produjo.
+
+- [Frecuencias de fallo en máquinas](/phonometry/es/vibration/machinery/machine-diagnostics/):
+  las frecuencias características de rodamientos, engranajes y ejes, y el
+  análisis de envolvente que las encuentra bajo el ruido de banda ancha de una
+  máquina en marcha.

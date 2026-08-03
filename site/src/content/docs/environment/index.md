@@ -27,6 +27,17 @@ the room and materials pages. Start with
 [Outdoor Sound Propagation](/phonometry/environment/propagation/outdoor-propagation/); it
 introduces the source-path-receiver bookkeeping the transport pages reuse.
 
+## Assessment and regulation
+
+What the received sound is rated against, once it has arrived.
+
+- [Environmental Levels (ISO 1996-1/-2)](/phonometry/environment/environmental-levels/):
+  the day-evening-night indicators, the rating level and the adjustments that
+  turn a measured LAeq into an assessed one.
+- [Spanish Noise Regulation (RD 1367/2007)](/phonometry/environment/spanish-noise-regulation/):
+  the national application of that chain, with its own limits and its own
+  tonal and impulsive corrections.
+
 ## [Outdoor sound](/phonometry/environment/propagation/)
 
 The path from an outdoor source to a receiver, and the character of what
