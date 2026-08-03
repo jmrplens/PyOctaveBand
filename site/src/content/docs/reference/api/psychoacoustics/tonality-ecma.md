@@ -72,7 +72,7 @@ EcmaTonality.plot(
 ) -> Axes | np.ndarray
 ```
 
-Plot the average specific tonality T'(z) (see `..._plot.psychoacoustics`).
+Plot the average specific tonality T'(z) (see `phonometry._plot.psychoacoustics`).
 
 Adds a tonality-vs-time panel. Requires matplotlib
 (`pip install phonometry[plot]`).

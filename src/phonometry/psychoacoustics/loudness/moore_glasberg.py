@@ -535,7 +535,7 @@ class MooreGlasbergLoudness:
         """Plot the specific loudness N'(i) over the ERB-number scale.
 
         Requires matplotlib (``pip install phonometry[plot]``); returns the
-        :class:`~matplotlib.axes.Axes`.  See :mod:`..._plot.psychoacoustics`.
+        :class:`~matplotlib.axes.Axes`.  See :mod:`phonometry._plot.psychoacoustics`.
         """
         from ..._i18n import check_language
         from ..._plot.psychoacoustics import plot_moore_glasberg_loudness

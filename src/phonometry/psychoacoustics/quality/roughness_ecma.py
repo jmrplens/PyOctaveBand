@@ -176,7 +176,7 @@ class EcmaRoughness:
     field: str
 
     def plot(self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any) -> Axes | np.ndarray:
-        """Plot the roughness result (see :mod:`..._plot.psychoacoustics`).
+        """Plot the roughness result (see :mod:`phonometry._plot.psychoacoustics`).
 
         Draws the time-dependent roughness R(l50) and a specific-roughness
         heatmap. Requires matplotlib (``pip install phonometry[plot]``).

@@ -2811,65 +2811,30 @@ __all__ = [
 ]
 
 
-#: The domain packages are part of the public surface: ``phonometry.building``
-#: reads the same as ``from phonometry import building``. Importing the flat
-#: API already binds every one of them; naming them here says so, and lets a
-#: type checker follow ``ph.building`` the way the interpreter does.
 # Deprecated module-path aliases for the 4.0 taxonomy: importing the package
 # installs sys.modules shims for every moved public module (see
 # phonometry/_compat.py; removed in 5.0).
 from . import _compat as _compat
-from . import (
-    aircraft as aircraft,
-)
-from . import (
-    broadcast as broadcast,
-)
-from . import (
-    building as building,
-)
-from . import (
-    electroacoustics as electroacoustics,
-)
-from . import (
-    emission as emission,
-)
-from . import (
-    environment as environment,
-)
-from . import (
-    filters as filters,
-)
-from . import (
-    hearing as hearing,
-)
-from . import (
-    materials as materials,
-)
-from . import (
-    metrology as metrology,
-)
-from . import (
-    noise_control as noise_control,
-)
-from . import (
-    psychoacoustics as psychoacoustics,
-)
-from . import (
-    room as room,
-)
-from . import (
-    signals as signals,
-)
-from . import (
-    simulation as simulation,
-)
-from . import (
-    speech as speech,
-)
-from . import (
-    underwater as underwater,
-)
-from . import (
-    vibration as vibration,
-)
+
+# The domain packages are part of the public surface: ``phonometry.building``
+# reads the same as ``from phonometry import building``. Importing the flat API
+# already binds every one of them; naming them here says so, and lets a type
+# checker follow ``ph.building`` the way the interpreter does.
+from . import aircraft as aircraft
+from . import broadcast as broadcast
+from . import building as building
+from . import electroacoustics as electroacoustics
+from . import emission as emission
+from . import environment as environment
+from . import filters as filters
+from . import hearing as hearing
+from . import materials as materials
+from . import metrology as metrology
+from . import noise_control as noise_control
+from . import psychoacoustics as psychoacoustics
+from . import room as room
+from . import signals as signals
+from . import simulation as simulation
+from . import speech as speech
+from . import underwater as underwater
+from . import vibration as vibration

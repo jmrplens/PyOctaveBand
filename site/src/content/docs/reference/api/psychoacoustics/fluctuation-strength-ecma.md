@@ -137,7 +137,7 @@ EcmaFluctuationStrength.plot(
 ) -> Axes | np.ndarray
 ```
 
-Plot the fluctuation-strength result (see `..._plot.psychoacoustics`).
+Plot the fluctuation-strength result (see `phonometry._plot.psychoacoustics`).
 
 Draws the time-dependent fluctuation strength F(l50) and a
 specific-fluctuation-strength heatmap. Requires matplotlib

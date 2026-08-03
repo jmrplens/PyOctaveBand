@@ -296,7 +296,6 @@ def geometric_divergence(distance: float) -> float:
     return float(20.0 * np.log10(distance / _D0) + 11.0)
 
 
-
 def atmospheric_absorption(
     distance: float,
     frequencies: ArrayLike = DEFAULT_FREQUENCIES,

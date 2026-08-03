@@ -3473,7 +3473,8 @@ well. The pre-3.2 flat paths, written without a subpackage, were removed in
   `room_volume` keywords. Use `octave_filter`, `nominal_frequencies`,
   `normalized_frequencies`, `sensitivity`, `insulation_coverage_factor`,
   `insulation_expanded_uncertainty`, `OCTAVE_BANDS`, `THIRD_OCTAVE_BANDS`,
-  `BASE_PLATE_BANDS`, `BAND_CENTERS`, `OccupationalExposureWarning`, `fs`,
+  `BASE_PLATE_BANDS`, `phonometry.speech.sii.BAND_CENTERS`,
+  `OccupationalExposureWarning`, `fs`,
   `relative_humidity` and `volume`.
 
 ---
