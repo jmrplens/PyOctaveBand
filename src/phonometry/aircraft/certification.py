@@ -156,6 +156,9 @@ def perceived_noise_level(spl: NDArray[np.float64] | list[float]) -> float:
 #: First band of the tone-correction routine (band 3 = 80 Hz, 0-based index 2).
 _TONE_START = 2
 
+#: Bands the tone-correction routine works over (Appendix 2 §4.3).
+_TONE_BANDS = 24
+
 
 def _tone_background(
     spl: NDArray[np.float64] | list[float],
@@ -173,47 +176,95 @@ def _tone_background(
         start band are zero.
     """
     sig = _validate_spectrum(spl)
-    n = 24
     start = _TONE_START if start is None else start
 
-    # Step 1: slopes s(i) = SPL(i) − SPL(i−1), starting at band 4 (index 3).
+    slopes, marked = _tone_marked_slopes(sig, start)
+    _, sp, s_imaginary = _tone_adjusted_slopes(sig, slopes, marked, start)
+    return _tone_background_levels(sig, sp, s_imaginary, start)
+
+
+def _tone_marked_slopes(
+    sig: NDArray[np.float64], start: int
+) -> tuple[NDArray[np.float64], NDArray[np.bool_]]:
+    """Steps 1-3: the slopes, the encircled ones and the bands to adjust.
+
+    :param sig: The validated 24-band spectrum.
+    :param start: First participating band index.
+    :return: ``(slopes, marked)``; slopes below the start band are ``NaN``.
+    """
+    n = _TONE_BANDS
+    # Step 1: slopes s(i) = SPL(i) - SPL(i-1), starting at band 4 (index 3).
     s = np.full(n, np.nan)
     for i in range(start + 1, n):
         s[i] = sig[i] - sig[i - 1]
 
-    # Step 2: encircle a slope where |s(i) − s(i−1)| > 5.
+    # Step 2: encircle a slope where |s(i) - s(i-1)| > 5.
     s_enc = np.zeros(n, dtype=bool)
     for i in range(start + 1, n):
         if not np.isnan(s[i]) and not np.isnan(s[i - 1]) and abs(s[i] - s[i - 1]) > 5.0:
             s_enc[i] = True
 
     # Step 3: mark which SPL value to adjust.
-    spl_marked = np.zeros(n, dtype=bool)
+    marked = np.zeros(n, dtype=bool)
     for i in range(start + 1, n):
         if not s_enc[i]:
             continue
         if s[i] > 0.0 and (np.isnan(s[i - 1]) or s[i] > s[i - 1]):
-            spl_marked[i] = True
+            marked[i] = True
         elif s[i] <= 0.0 and not np.isnan(s[i - 1]) and s[i - 1] > 0.0:
-            spl_marked[i - 1] = True
+            marked[i - 1] = True
+    return s, marked
 
+
+def _tone_adjusted_slopes(
+    sig: NDArray[np.float64],
+    slopes: NDArray[np.float64],
+    marked: NDArray[np.bool_],
+    start: int,
+) -> tuple[NDArray[np.float64], NDArray[np.float64], float]:
+    """Steps 4-5: the adjusted spectrum ``SPL'`` and its slopes ``s'``.
+
+    :param sig: The validated 24-band spectrum.
+    :param slopes: The Step 1 slopes.
+    :param marked: The Step 3 bands to adjust.
+    :param start: First participating band index.
+    :return: ``(spl2, sp, s_imaginary)``, the last being the imaginary 25th
+        slope the running mean of Step 6 needs.
+    """
+    n = _TONE_BANDS
     # Step 4: adjusted spectrum SPL'.
     spl2 = sig.copy()
     for i in range(start, n):
-        if spl_marked[i]:
+        if marked[i]:
             if i < n - 1:
                 spl2[i] = 0.5 * (sig[i - 1] + sig[i + 1])
             else:  # last band: SPL'(24) = SPL(23) + s(23)
-                spl2[i] = sig[i - 1] + s[i - 1]
+                spl2[i] = sig[i - 1] + slopes[i - 1]
 
     # Step 5: new slopes s'(i); s'(start) = s'(start+1); imaginary 25th slope.
     sp = np.full(n, np.nan)
     for i in range(start + 1, n):
         sp[i] = spl2[i] - spl2[i - 1]
     sp[start] = sp[start + 1]
-    s_imaginary = sp[n - 1]
+    return spl2, sp, float(sp[n - 1])
 
-    # Step 6: 3-point running mean s̄(i), i = start … n−2.
+
+def _tone_background_levels(
+    sig: NDArray[np.float64],
+    sp: NDArray[np.float64],
+    s_imaginary: float,
+    start: int,
+) -> tuple[NDArray[np.float64], NDArray[np.float64]]:
+    """Steps 6-8: the smoothed background ``SPL''`` and the excess ``F``.
+
+    :param sig: The validated 24-band spectrum.
+    :param sp: The Step 5 adjusted slopes.
+    :param s_imaginary: The imaginary 25th slope.
+    :param start: First participating band index.
+    :return: ``(spl_background, excess_f)``, each length 24.
+    """
+    n = _TONE_BANDS
+    # Step 6: 3-point running mean s-bar(i), i = start ... n-2.
     sbar = np.full(n, np.nan)
     for i in range(start, n - 1):
         third = sp[i + 2] if i + 2 < n else s_imaginary
@@ -225,7 +276,7 @@ def _tone_background(
     for i in range(start + 1, n):
         spl3[i] = spl3[i - 1] + sbar[i - 1]
 
-    # Step 8: tone excess F = SPL − SPL''.
+    # Step 8: tone excess F = SPL - SPL''.
     excess = np.zeros(n)
     for i in range(start, n):
         excess[i] = sig[i] - spl3[i]

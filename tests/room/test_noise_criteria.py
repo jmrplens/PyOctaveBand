@@ -234,8 +234,9 @@ def test_invalid_inputs_raise() -> None:
         rn.noise_criterion([1.0, 2.0], [63.0])
     with pytest.raises(ValueError, match="not one of"):
         rn.noise_criterion([50.0], [777.0])
+    two_dimensional = np.zeros((2, 10))
     with pytest.raises(ValueError, match="1-D vector"):
-        rn.noise_criterion(np.zeros((2, 10)))
+        rn.noise_criterion(two_dimensional)
     with pytest.raises(ValueError, match="no valid"):
         rn.noise_criterion([], [])
 

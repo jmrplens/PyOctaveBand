@@ -32,7 +32,7 @@ than 10 dB/s").
 
 **ISO/PAS 1996-3:2022** is the measurement chain that reads those same two
 quantities from a calibrated time signal, and categorises the source by the
-adjustment it earns:
+adjustment it earns (typically 0.0 dB to 9.0 dB):
 
 * the A frequency-weighted, F time-weighted sound pressure level ``LpAF`` is
   computed from the signal and sampled at 10-25 ms intervals (Clause 4);
@@ -216,6 +216,8 @@ def predicted_prominence(
     """
     orate = np.asarray(onset_rate, dtype=np.float64)
     ld = np.asarray(level_difference, dtype=np.float64)
+    if not (np.all(np.isfinite(orate)) and np.all(np.isfinite(ld))):
+        raise ValueError("onset_rate and level_difference must be finite.")
     if np.any(orate <= 0.0) or np.any(ld <= 0.0):
         raise ValueError("onset_rate and level_difference must be positive.")
     k1, k2 = PROMINENCE_COEFFS
@@ -340,7 +342,9 @@ def rating_level(
         raise ValueError("laeq, adjustment and durations must have equal length.")
     if le.size == 0:
         raise ValueError("at least one sub-interval is required.")
-    if reference_time <= 0.0 or np.any(dt <= 0.0):
+    if not (np.all(np.isfinite(le)) and np.all(np.isfinite(ki)) and np.all(np.isfinite(dt))):
+        raise ValueError("laeq, adjustment and durations must be finite.")
+    if not math.isfinite(reference_time) or reference_time <= 0.0 or np.any(dt <= 0.0):
         raise ValueError("reference_time and durations must be positive.")
     energy = np.sum(dt * 10.0 ** ((le + ki) / 10.0))
     return float(10.0 * np.log10(energy / reference_time))
@@ -495,7 +499,7 @@ def sound_pressure_level_history(
     from ...filters.weighting import time_weighting, weighting_filter
 
     x = np.asarray(signal, dtype=np.float64).ravel()
-    if fs <= 0.0:
+    if not math.isfinite(fs) or fs <= 0.0:
         raise ValueError("fs must be positive.")
     lo, hi = SAMPLE_INTERVAL_RANGE
     if not lo <= dt <= hi:
@@ -637,7 +641,7 @@ def detect_onsets(
     :raises ValueError: for a non-positive ``dt`` or fewer than two samples.
     """
     lev = np.asarray(levels, dtype=np.float64).ravel()
-    if dt <= 0.0:
+    if not math.isfinite(dt) or dt <= 0.0:
         raise ValueError("dt must be positive.")
     if lev.size < 2:
         raise ValueError("at least two level samples are required.")

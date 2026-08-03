@@ -60,7 +60,7 @@ from .rotorcraft_noise import (
 )
 
 __all__ = [
-"NOY_BANDS",
+    "NOY_BANDS",
     "AircraftBandAttenuation",
     "AnpAircraft",
     "AnpDatabase",

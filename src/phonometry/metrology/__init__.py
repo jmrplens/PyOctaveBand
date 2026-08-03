@@ -40,8 +40,24 @@ _MOVED_TO = (
     "phonometry.filters",
     "phonometry.signals",
     "phonometry.emission",
+    "phonometry.aircraft",
 )
-__getattr__ = _namespace_shim(__name__, _MOVED_TO)
+#: ``emission`` is a domain of its own; only the IEC 61043 names came from
+#: here, so it answers to ``metrology.`` for those and nothing else.
+_MOVED_NAMES: dict[str, tuple[str, ...]] = {
+    "phonometry.emission": (
+        "IntensityInstrumentComplianceResult",
+        "instrument_class_from_components",
+        "intensity_class_compliance",
+        "phase_mismatch_from_residual_index",
+        "residual_index_from_phase_mismatch",
+        "residual_index_limits",
+        "verify_intensity_class",
+    ),
+    #: The IEC 61265 check passed through here on its way to ``aircraft``.
+    "phonometry.aircraft": ("verify_aircraft_noise_system",),
+}
+__getattr__ = _namespace_shim(__name__, _MOVED_TO, only=_MOVED_NAMES)
 
 __all__ = [
     "CalibrationWarning",
@@ -68,4 +84,4 @@ __all__ = [
 
 #: ``__getattr__`` is invisible to ``dir()``; keep the moved names listed
 #: while they still resolve.
-__dir__ = _namespace_dir(__name__, __all__, _MOVED_TO)
+__dir__ = _namespace_dir(__name__, __all__, _MOVED_TO, _MOVED_NAMES)

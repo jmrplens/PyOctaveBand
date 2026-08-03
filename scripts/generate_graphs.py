@@ -10574,14 +10574,13 @@ def generate_sii_band_procedures(output_dir: str) -> None:
 def generate_impulse_prominence(output_dir: str) -> None:
     """NT ACOU 112: predicted prominence and the LAeq adjustment."""
     print("Generating impulse_prominence.png...")
-    from phonometry.environment.assessment.impulse_prominence import (
-        ADJUSTMENT_THRESHOLD,
-    )
-
     from phonometry import (
         impulse_adjustment,
         impulse_prominence,
         predicted_prominence,
+    )
+    from phonometry.environment.assessment.impulsive_sound import (
+        ADJUSTMENT_THRESHOLD,
     )
 
     _fig, (ax_p, ax_k) = plt.subplots(1, 2, figsize=(12.5, 5.4))

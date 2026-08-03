@@ -53,6 +53,7 @@ from typing import TYPE_CHECKING, Any
 import numpy as np
 from scipy import signal
 
+from .._compat import _namespace_dir, _namespace_shim
 from .core import OctaveFilterBank
 from .weighting import WeightingFilter
 
@@ -1067,3 +1068,15 @@ def verify_weighting_class(
         "bands": bands,
         "between_nominals": between,
     }
+
+
+#: The IEC 61265 aircraft measurement-system check verifies a certification
+#: chain rather than an instrument of this module's kind, so it moved to
+#: :mod:`phonometry.aircraft.measurement_system` in 4.0. Reading it from here,
+#: and from every alias of this module, still works until 5.0.
+_MOVED_TO = ("phonometry.aircraft",)
+_MOVED_NAMES: dict[str, tuple[str, ...]] = {
+    "phonometry.aircraft": ("verify_aircraft_noise_system",),
+}
+__getattr__ = _namespace_shim(__name__, _MOVED_TO, only=_MOVED_NAMES)
+__dir__ = _namespace_dir(__name__, __all__, _MOVED_TO, _MOVED_NAMES)

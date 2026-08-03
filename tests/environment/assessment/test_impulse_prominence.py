@@ -1,5 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""Tests for :mod:`phonometry.environment.assessment.impulse_prominence` (prominence of impulsive sounds).
+"""Tests for :mod:`phonometry.environment.assessment.impulsive_sound` (prominence of impulsive sounds).
 
 Validated against the formulae of NT ACOU 112:2002: the predicted prominence
 ``P = 3*lg(onset_rate) + 2*lg(level_difference)`` (clause 7, Formula 1), the
@@ -9,16 +9,13 @@ and the rating level of clause 8, Note 1, evaluated by hand.
 
 from __future__ import annotations
 
-import importlib
 import math
 
 import numpy as np
 import pytest
 from reference_data import NTACOU112_ADJUSTMENT_P10, NTACOU112_PROMINENCE
 
-# The module is shadowed in the package namespace by the function of the same
-# name, so it must be imported through the import system directly.
-nt = importlib.import_module("phonometry.environment.assessment.impulse_prominence")
+from phonometry.environment.assessment import impulsive_sound as nt
 
 
 def test_predicted_prominence_formula_1() -> None:

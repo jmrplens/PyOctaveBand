@@ -191,9 +191,9 @@ one-third-octave filtering is covered by the library's IEC 61260 class-2 filter
 verification.
 
 ```python
-from phonometry import filters
+from phonometry import aircraft
 
-report = filters.verify_aircraft_noise_system(
+report = aircraft.verify_aircraft_noise_system(
     directional={4000.0: {30: 0.4, 60: 0.9, 90: 1.9, 120: 2.4, 150: 2.4}},
     frequency_response={1000.0: 1.2},
 )

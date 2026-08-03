@@ -148,8 +148,9 @@ def test_epnl_single_element_dt_treated_as_scalar() -> None:
 
 
 def test_effective_perceived_noise_level_rejects_bad_shape() -> None:
+    two_dimensional = np.zeros((5, 10))
     with pytest.raises(ValueError):
-        effective_perceived_noise_level(np.zeros((5, 10)))
+        effective_perceived_noise_level(two_dimensional)
 
 
 def test_helicopter_procedure_catches_low_frequency_rotor_tone() -> None:

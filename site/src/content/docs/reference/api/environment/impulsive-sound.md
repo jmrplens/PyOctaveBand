@@ -35,7 +35,7 @@ than 10 dB/s").
 
 **ISO/PAS 1996-3:2022** is the measurement chain that reads those same two
 quantities from a calibrated time signal, and categorises the source by the
-adjustment it earns:
+adjustment it earns (typically 0.0 dB to 9.0 dB):
 
 * the A frequency-weighted, F time-weighted sound pressure level `LpAF` is
   computed from the signal and sampled at 10-25 ms intervals (Clause 4);

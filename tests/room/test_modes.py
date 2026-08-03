@@ -278,8 +278,9 @@ def test_other_validation_errors() -> None:
         room_mode_frequency((1, -1, 0), LONG_ROOM)
     with pytest.raises(ValueError, match="non-negative integers"):
         room_mode_frequency((1.5, 0, 0), LONG_ROOM)
+    two_dimensional = np.zeros((2, 4))
     with pytest.raises(ValueError, match="triple"):
-        room_mode_frequency(np.zeros((2, 4)), LONG_ROOM)
+        room_mode_frequency(two_dimensional, LONG_ROOM)
     with pytest.raises(ValueError, match="non-negative and finite"):
         room_mode_count(-1.0, LONG_ROOM)
     with pytest.raises(ValueError, match="non-negative and finite"):
