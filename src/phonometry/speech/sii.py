@@ -877,4 +877,4 @@ def __getattr__(name: str) -> Any:
     if name == "BAND_CENTRES":
         _warn_renamed("BAND_CENTRES", "BAND_CENTERS")
         return BAND_CENTERS
-    raise AttributeError(f"module 'phonometry.sii' has no attribute {name!r}")
+    raise AttributeError(f"module 'phonometry.speech.sii' has no attribute {name!r}")

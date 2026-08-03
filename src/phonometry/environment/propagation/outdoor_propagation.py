@@ -333,7 +333,7 @@ def atmospheric_absorption(
 
     :math:`A_{atm} = \alpha d` with ``alpha`` the ISO 9613-1 atmospheric
     attenuation
-    coefficient (here in dB/m, from :func:`phonometry.air_absorption.air_attenuation`)
+    coefficient (here in dB/m, from :func:`phonometry.environment.propagation.air_absorption.air_attenuation`)
     at each octave-band midband frequency. Eq. (8) writes ``alpha`` in dB/km
     with :math:`A_{atm} = \alpha_{\text{dB/km}} \, d / 1000`; the two forms
     are identical.

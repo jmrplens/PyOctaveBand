@@ -18,7 +18,7 @@ The tonal-audibility formula itself is the ISO 1996-2 Annex C one already in
 :mod:`phonometry.environment.assessment.measurement`; what is specific to IEC 61400-11 is
 how the tone and masking-noise levels and the (Zwicker) critical band are
 determined from the narrowband spectrum. The rating adjustment ``K_T`` is the
-ISO 1996-2 :func:`~phonometry.environmental_measurement.tonal_adjustment`. The
+ISO 1996-2 :func:`~phonometry.environment.assessment.measurement.tonal_adjustment`. The
 full measurement pipeline (binning, regression to standardised wind speeds,
 uncertainty budgets) is out of scope; these are the underlying closed forms.
 """

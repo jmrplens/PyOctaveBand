@@ -69,7 +69,7 @@ integrated impulse response, Clause 6).
 
 | Name | Description |
 | :--- | :--- |
-| `ir` | Measured impulse response (1D), e.g. from [`phonometry.impulse_response`](/phonometry/reference/api/rooms/impulse-response/) (ISO 18233). |
+| `ir` | Measured impulse response (1D), e.g. from [`phonometry.impulse_response`](/phonometry/reference/api/rooms/impulse-response/#impulse_response) (ISO 18233). |
 | `fs` | Sample rate in Hz. |
 | `band` | Optional band centre frequency in Hz. When given, the impulse response is first filtered with the matching IEC 61260 fractional-octave filter; when None the broadband response is integrated directly. |
 | `fraction` | Bandwidth fraction of the band filter (1 = octave, 3 = one-third octave). Only used when `band` is not None. |

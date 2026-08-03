@@ -66,7 +66,7 @@ Attenuation due to atmospheric absorption (ISO 9613-2:1996, Eq. (8)).
 
 $A_{atm} = \alpha d$ with `alpha` the ISO 9613-1 atmospheric
 attenuation
-coefficient (here in dB/m, from [`phonometry.air_absorption.air_attenuation`](/phonometry/reference/api/environment/air-absorption/#air_attenuation))
+coefficient (here in dB/m, from [`phonometry.environment.propagation.air_absorption.air_attenuation`](/phonometry/reference/api/environment/air-absorption/#air_attenuation))
 at each octave-band midband frequency. Eq. (8) writes `alpha` in dB/km
 with $A_{atm} = \alpha_{\text{dB/km}} \, d / 1000$; the two forms
 are identical.

@@ -1187,5 +1187,5 @@ def __getattr__(name: str) -> Any:
         _warn_renamed("BASE_PLATE_BANDS_HZ", "BASE_PLATE_BANDS")
         return BASE_PLATE_BANDS
     raise AttributeError(
-        f"module 'phonometry.scattering_diffusion' has no attribute {name!r}"
+        f"module 'phonometry.materials.diffusers.scattering_diffusion' has no attribute {name!r}"
     )

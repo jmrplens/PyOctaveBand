@@ -144,7 +144,7 @@ reproduces the Eyring reverberation time of the room (Kuttruff Equation
 | `fs` | Sample rate, Hz. |
 | `max_order` | Reflection-order cut-off (total wall reflections). The shoebox has $(2/3)(2 i_0^3 + 3 i_0^2 + 4 i_0)$ audible images up to order `i0` (Kuttruff Equation (9.23)). Default 20. |
 | `speed_of_sound` | Speed of sound `c`, m/s (default [`DEFAULT_SPEED_OF_SOUND`](/phonometry/reference/api/materials/road-absorption/#default_speed_of_sound)). |
-| `air_attenuation` | Air *intensity* attenuation constant `m`, in neper per metre (scalar or per-band); the pressure amplitude of each path is scaled by $e^{-m r / 2}$ (Kuttruff 4.1). Default 0 (air absorption neglected). Obtain a physical `m` from [`phonometry.air_absorption.air_attenuation_m`](/phonometry/reference/api/environment/air-absorption/#air_attenuation_m). |
+| `air_attenuation` | Air *intensity* attenuation constant `m`, in neper per metre (scalar or per-band); the pressure amplitude of each path is scaled by $e^{-m r / 2}$ (Kuttruff 4.1). Default 0 (air absorption neglected). Obtain a physical `m` from [`phonometry.environment.propagation.air_absorption.air_attenuation_m`](/phonometry/reference/api/environment/air-absorption/#air_attenuation_m). |
 | `duration` | RIR length, s; default the latest image arrival rounded up to the next sample. |
 | `frequencies` | Optional band centre frequencies, Hz, labelling a per-band result. When given, its length must match the band count of `absorption` (or broadcast against it). |
 
