@@ -4,7 +4,7 @@ Part of https://jmrplens.github.io/phonometry/llms.txt. Full text of the pages i
 
 ---
 
-<!-- source: docs/spectral-analysis.md | canonical: https://jmrplens.github.io/phonometry/signal/spectra/spectral-analysis/ -->
+<!-- source: docs/signal/spectra/spectral-analysis.md | canonical: https://jmrplens.github.io/phonometry/signal/spectra/spectral-analysis/ -->
 Source: https://jmrplens.github.io/phonometry/signal/spectra/spectral-analysis/
 
 # Calibrated spectral analysis (Bendat & Piersol)
@@ -520,12 +520,12 @@ the two estimators agree.
 
 ## Relation to the H1/H2 estimators
 
-The [frequency-response estimators](https://jmrplens.github.io/phonometry/devices/electroacoustics/electroacoustics/) `transfer_function`
-and `coherence`, the two-microphone [sound intensity](https://jmrplens.github.io/phonometry/devices/emission/intensity/) probe and
+The [frequency-response estimators](../../devices/electroacoustics/electroacoustics.md) `transfer_function`
+and `coherence`, the two-microphone [sound intensity](../../devices/emission/intensity.md) probe and
 these estimators all share one Welch core (same taper, overlap policy and
 detrend-off calibration), so a PSD, a coherence and an $H_1$ computed with the
 same segment length are mutually consistent bin by bin. The same cross-spectral
-matrix underlies [multiple and partial coherence](https://jmrplens.github.io/phonometry/signal/spectra/miso-coherence/), which
+matrix underlies [multiple and partial coherence](miso-coherence.md), which
 extends the ordinary coherence to several correlated inputs and one
 output.
 
@@ -563,7 +563,7 @@ output.
 ---
 
 
-<!-- source: docs/miso-coherence.md | canonical: https://jmrplens.github.io/phonometry/signal/spectra/miso-coherence/ -->
+<!-- source: docs/signal/spectra/miso-coherence.md | canonical: https://jmrplens.github.io/phonometry/signal/spectra/miso-coherence/ -->
 Source: https://jmrplens.github.io/phonometry/signal/spectra/miso-coherence/
 
 # Multiple and partial coherence (Bendat & Piersol)
@@ -743,21 +743,21 @@ the page; average generously before reading a small partial coherence as
 zero. *Delay bias*: like the ordinary coherence, the Welch estimate is
 biased low when a bulk delay between an input and the output becomes a
 noticeable fraction of the segment length; remove known propagation delays
-first (see [Correlation and delay](https://jmrplens.github.io/phonometry/signal/spectra/correlation-delay/)) and keep
+first (see [Correlation and delay](correlation-delay.md)) and keep
 `nperseg` well above the longest remaining delay.
 
 The estimators share the Welch core of the
-[calibrated spectral analysis](https://jmrplens.github.io/phonometry/signal/spectra/spectral-analysis/) page, so a MISO
+[calibrated spectral analysis](spectral-analysis.md) page, so a MISO
 coherence and a `power_spectral_density` computed with the same segment length
 are consistent bin by bin.
 
 ## See also
 
-- [Spectral analysis](https://jmrplens.github.io/phonometry/signal/spectra/spectral-analysis/): the single-input coherent
+- [Spectral analysis](spectral-analysis.md): the single-input coherent
   output spectrum this page generalizes, and the shared Welch core.
-- [Correlation and delay](https://jmrplens.github.io/phonometry/signal/spectra/correlation-delay/): estimating and removing
+- [Correlation and delay](correlation-delay.md): estimating and removing
   the bulk delays that bias coherence low.
-- [Multichannel and Performance](https://jmrplens.github.io/phonometry/signal/filters/multichannel/): the per-channel path
+- [Multichannel and Performance](../filters/multichannel.md): the per-channel path
   this cross-channel analysis complements.
 
 ## References
@@ -774,7 +774,7 @@ are consistent bin by bin.
 ---
 
 
-<!-- source: docs/time-frequency.md | canonical: https://jmrplens.github.io/phonometry/signal/spectra/time-frequency/ -->
+<!-- source: docs/signal/spectra/time-frequency.md | canonical: https://jmrplens.github.io/phonometry/signal/spectra/time-frequency/ -->
 Source: https://jmrplens.github.io/phonometry/signal/spectra/time-frequency/
 
 # Time-frequency analysis
@@ -783,13 +783,13 @@ A stationary spectrum hides everything that happens *in time*: a passing
 siren, an impact, a machine running up. This page covers the two
 time-frequency estimators of `phonometry.signals`, both with the
 calibration discipline of the
-[spectral-analysis page](https://jmrplens.github.io/phonometry/signal/spectra/spectral-analysis/): the
+[spectral-analysis page](spectral-analysis.md): the
 **calibrated spectrogram** (the short-time Fourier transform view of
 Bendat & Piersol Section 12.6.4.2, in absolute units - dB SPL for a signal
 in pascals) and the **zoom FFT** (Section 11.5.4), which computes the
 spectrum of a narrow band on an arbitrarily fine grid to separate tones
 closer than a practical full-band FFT bin. Where the
-[levels page](https://jmrplens.github.io/phonometry/signal/levels/levels/) offers the fractional-octave-band
+[levels page](../levels/levels.md) offers the fractional-octave-band
 spectrogram of a sound level meter, this one is its fine-band,
 constant-bandwidth counterpart.
 
@@ -836,7 +836,7 @@ short segments do the opposite. And because each cell is a single
 error of 1 (Eq. 8.158 with $n_d = 1$; Bendat & Piersol quote
 $\sqrt{2}/1.25 \approx 1.13$ for the magnitude display) - the spectrogram is a tool for
 deterministic structure (tones, sweeps, transients), while the averaged
-[Welch estimate](https://jmrplens.github.io/phonometry/signal/spectra/spectral-analysis/) is the low-variance
+[Welch estimate](spectral-analysis.md) is the low-variance
 tool for the stationary background.
 
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/calibrated_spectrogram_dark.webp"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/calibrated_spectrogram.webp" alt="Calibrated spectrogram in dB SPL of a synthetic four-second outdoor scene: a siren sweeping sinusoidally between 600 and 1200 hertz traces a bright oscillating ridge at 70 decibels, a broadband impact at two and a half seconds draws a vertical stripe, and a pink noise floor at 45 decibels fills the background, with the color bar reading absolute sound pressure level" width="82%"></picture>
@@ -964,23 +964,23 @@ plt.show()
 ## Relation to the rest of the library
 
 The spectrogram shares its taper, segmentation and scaling with
-[`power_spectral_density`](https://jmrplens.github.io/phonometry/signal/spectra/spectral-analysis/), so the
+[`power_spectral_density`](spectral-analysis.md), so the
 two are mutually consistent bin by bin; the
-[octave-band spectrogram](https://jmrplens.github.io/phonometry/signal/levels/levels/) of
+[octave-band spectrogram](../levels/levels.md) of
 `OctaveFilterBank.spectrogram` is the constant-percentage-bandwidth
 counterpart with sound-level-meter ballistics; and for tracking a single
 component's frequency in time, the
-[Hilbert instantaneous frequency](https://jmrplens.github.io/phonometry/signal/spectra/correlation-delay/) of
+[Hilbert instantaneous frequency](correlation-delay.md) of
 `envelope` complements the STFT ridge.
 
 ## See also
 
-- [Spectral analysis](https://jmrplens.github.io/phonometry/signal/spectra/spectral-analysis/): the averaged Welch estimate
+- [Spectral analysis](spectral-analysis.md): the averaged Welch estimate
   for the stationary background, and the window figures of merit behind
   the segment taper.
-- [Levels](https://jmrplens.github.io/phonometry/signal/levels/levels/): the fractional-octave-band spectrogram with
+- [Levels](../levels/levels.md): the fractional-octave-band spectrogram with
   sound-level-meter ballistics.
-- [Correlation and delay](https://jmrplens.github.io/phonometry/signal/spectra/correlation-delay/): the Hilbert instantaneous
+- [Correlation and delay](correlation-delay.md): the Hilbert instantaneous
   frequency for tracking one component.
 
 ## References
@@ -1001,12 +1001,12 @@ component's frequency in time, the
 ---
 
 
-<!-- source: docs/cepstrum-echoes.md | canonical: https://jmrplens.github.io/phonometry/signal/spectra/cepstrum-echoes/ -->
+<!-- source: docs/signal/spectra/cepstrum-echoes.md | canonical: https://jmrplens.github.io/phonometry/signal/spectra/cepstrum-echoes/ -->
 Source: https://jmrplens.github.io/phonometry/signal/spectra/cepstrum-echoes/
 
 # Cepstrum, echoes and the envelope spectrum (Havelock / Bendat & Piersol)
 
-The [spectral estimators](https://jmrplens.github.io/phonometry/signal/spectra/spectral-analysis/) describe *what
+The [spectral estimators](spectral-analysis.md) describe *what
 frequencies* a signal contains; this page covers what hides in the *shape* of
 that spectrum. The **cepstrum** - the inverse Fourier transform of the log
 spectrum - lives in `phonometry.signals` and turns two hard spectral
@@ -1014,7 +1014,7 @@ problems into easy peak-picking: periodic spectral ripple (an echo, a harmonic
 family) collapses onto a single spike at the **quefrency** of its period, and
 the smooth spectral envelope separates from the fine structure by plain
 windowing - **liftering** - in the quefrency domain. The same machinery
-extends the [Hilbert envelope](https://jmrplens.github.io/phonometry/signal/spectra/correlation-delay/) with an
+extends the [Hilbert envelope](correlation-delay.md) with an
 **envelope spectrum** in which amplitude modulations become discrete lines.
 
 The whole trick is a chain of four steps: the logarithm turns a
@@ -1105,7 +1105,7 @@ the even power and real cepstra repeat and the complex cepstrum keeps its
 anticausal (non-minimum-phase) content. Zero-padding via `nfft` reduces
 cepstral time-aliasing when the log spectrum has sharp features, exactly like
 the `oversample` padding of
-[`minimum_phase`](https://jmrplens.github.io/phonometry/devices/electroacoustics/swept-sine-distortion/).
+[`minimum_phase`](../../devices/electroacoustics/swept-sine-distortion.md).
 
 ## 2. Echo detection: the rahmonic spike train
 
@@ -1302,7 +1302,7 @@ homomorphic deconvolution (Havelock Ch. 87, Sec. 3.3): zero the rahmonics to
 remove an echo, keep only the low quefrencies to extract a source wavelet.
 A minimum-phase signal has a causal complex cepstrum, which is why folding
 the real cepstrum onto positive quefrencies reconstructs the minimum phase
-from $|H|$ alone: [`minimum_phase`](https://jmrplens.github.io/phonometry/devices/electroacoustics/swept-sine-distortion/)
+from $|H|$ alone: [`minimum_phase`](../../devices/electroacoustics/swept-sine-distortion.md)
 and `phase_decomposition` run on that same folding core (Bendat & Piersol
 Sec. 13.1.4; Tohyama in Havelock Ch. 75 edits reverberation by manipulating
 exactly these causal/anticausal parts).
@@ -1313,7 +1313,7 @@ Where the cepstrum finds periodicities *of the spectrum*, the **envelope
 spectrum** finds periodicities *of the amplitude*. Bendat & Piersol
 Section 13.3 (Fig. 13.11) formalizes the structure: an envelope detector, a
 DC remover, and a spectral view of what remains. `envelope_spectrum` runs the
-[Hilbert envelope](https://jmrplens.github.io/phonometry/signal/spectra/correlation-delay/) (`kind="magnitude"`,
+[Hilbert envelope](correlation-delay.md) (`kind="magnitude"`,
 the practical default) or the book's square-law detector (`kind="squared"`)
 through exactly that chain, scaled by the taper's coherent gain so a
 sinusoidal modulation whose frequency falls on an analysis bin reads out as
@@ -1390,14 +1390,14 @@ matters.
 ## Relation to the other estimators
 
 The cepstrum starts from the same one-record FFT conventions as the
-[calibrated spectral estimators](https://jmrplens.github.io/phonometry/signal/spectra/spectral-analysis/), and its
+[calibrated spectral estimators](spectral-analysis.md), and its
 folding core is literally the one inside
-[`minimum_phase`](https://jmrplens.github.io/phonometry/devices/electroacoustics/swept-sine-distortion/) - the refactor is
+[`minimum_phase`](../../devices/electroacoustics/swept-sine-distortion.md) - the refactor is
 pinned bit-exact in the tests. The envelope spectrum is the frequency-domain
 view of the same analytic signal the
-[Hilbert envelope](https://jmrplens.github.io/phonometry/signal/spectra/correlation-delay/) returns in time, and a
+[Hilbert envelope](correlation-delay.md) returns in time, and a
 natural pre-analysis before the dedicated
-[wind-turbine amplitude-modulation](https://jmrplens.github.io/phonometry/environment/sources/wind-turbine-noise/)
+[wind-turbine amplitude-modulation](../../environment/sources/wind-turbine-noise.md)
 metrics: the envelope spectrum tells you *whether and at what rate* a signal
 is modulated, the domain metrics quantify it normatively.
 
@@ -1422,7 +1422,7 @@ is modulated, the domain metrics quantify it normatively.
 ---
 
 
-<!-- source: docs/synchronous-averaging.md | canonical: https://jmrplens.github.io/phonometry/signal/spectra/synchronous-averaging/ -->
+<!-- source: docs/signal/spectra/synchronous-averaging.md | canonical: https://jmrplens.github.io/phonometry/signal/spectra/synchronous-averaging/ -->
 Source: https://jmrplens.github.io/phonometry/signal/spectra/synchronous-averaging/
 
 # Time synchronous averaging (McFadden 1987)
@@ -1646,7 +1646,7 @@ are sliced directly, and a noiseless periodic signal is recovered to machine
 precision (`interpolated` is `False`). When $f_s T$ is not an integer the
 boundaries fall between samples; each block is then aligned to a common
 integer grid by the band-limited fractional delay of
-[`fractional_delay`](https://jmrplens.github.io/phonometry/signal/spectra/test-signals/), and the waveform is recovered within
+[`fractional_delay`](test-signals.md), and the waveform is recovered within
 that interpolation error (`interpolated` is `True`):
 
 ```python
@@ -1665,7 +1665,7 @@ By default the average uses as many whole periods as the record holds; pass
 spans.
 
 The band-limited alignment shares its kernel with the sub-sample
-impulse-response alignment of the [test-signals page](https://jmrplens.github.io/phonometry/signal/spectra/test-signals/), and
+impulse-response alignment of the [test-signals page](test-signals.md), and
 the recovered waveform, being exactly one period, can be tiled to reconstruct
 the synchronous part of the signal for subtraction or for order analysis.
 
@@ -1677,11 +1677,11 @@ about a rotating machine, and they compose rather than compete:
 - **TSA** needs the period (a tacho pulse or a trusted shaft speed) and
   returns *the waveform itself*, one revolution of it: the tool when you
   want to see what a specific shaft or gear does per turn, tooth by tooth.
-- **The [cepstrum](https://jmrplens.github.io/phonometry/signal/spectra/cepstrum-echoes/)** needs no reference and detects
+- **The [cepstrum](cepstrum-echoes.md)** needs no reference and detects
   *any* periodic family in the spectrum (harmonics, sidebands): the tool
   when the period is unknown or several families overlap and must be
   separated.
-- **The [envelope spectrum](https://jmrplens.github.io/phonometry/signal/spectra/cepstrum-echoes/#5-the-envelope-spectrum-modulations-as-lines)**
+- **The [envelope spectrum](cepstrum-echoes.md#5-the-envelope-spectrum-modulations-as-lines)**
   finds periodicities of the *amplitude*: the tool for bearing-style
   faults, whose repetition rate modulates a high-frequency resonance
   instead of appearing as a low-frequency tone.
@@ -1693,11 +1693,11 @@ the strong gear components no longer mask the modulation.
 
 ## See also
 
-- [Cepstrum and echoes](https://jmrplens.github.io/phonometry/signal/spectra/cepstrum-echoes/): reference-free detection of
+- [Cepstrum and echoes](cepstrum-echoes.md): reference-free detection of
   harmonic and sideband families, and the envelope spectrum.
-- [Correlation and delay](https://jmrplens.github.io/phonometry/signal/spectra/correlation-delay/): the Hilbert envelope
+- [Correlation and delay](correlation-delay.md): the Hilbert envelope
   behind envelope analysis.
-- [Test signals](https://jmrplens.github.io/phonometry/signal/spectra/test-signals/): the fractional-delay kernel the
+- [Test signals](test-signals.md): the fractional-delay kernel the
   non-integer period alignment uses.
 
 ## References
@@ -1713,12 +1713,12 @@ the strong gear components no longer mask the modulation.
 ---
 
 
-<!-- source: docs/correlation-delay.md | canonical: https://jmrplens.github.io/phonometry/signal/spectra/correlation-delay/ -->
+<!-- source: docs/signal/spectra/correlation-delay.md | canonical: https://jmrplens.github.io/phonometry/signal/spectra/correlation-delay/ -->
 Source: https://jmrplens.github.io/phonometry/signal/spectra/correlation-delay/
 
 # Correlation, time delay and envelope (Bendat & Piersol / Knapp & Carter)
 
-Where the [calibrated spectral estimators](https://jmrplens.github.io/phonometry/signal/spectra/spectral-analysis/) describe a
+Where the [calibrated spectral estimators](spectral-analysis.md) describe a
 signal in frequency, this page covers their time-domain counterparts in
 `phonometry.signals`: **auto- and cross-correlation** estimates with the
 three standard normalizations and their Bendat & Piersol random errors;
@@ -2082,17 +2082,17 @@ narrowband.
 
 `time_delay` (GCC and phase methods) runs on the same Welch core (taper,
 overlap policy, detrend-off calibration, segment defaults) as
-[`cross_spectral_density`](https://jmrplens.github.io/phonometry/signal/spectra/spectral-analysis/) and the H1/H2
-[frequency-response estimators](https://jmrplens.github.io/phonometry/devices/electroacoustics/electroacoustics/), so a GCC, a coherence
+[`cross_spectral_density`](spectral-analysis.md) and the H1/H2
+[frequency-response estimators](../../devices/electroacoustics/electroacoustics.md), so a GCC, a coherence
 and a cross-spectrum computed with the same segment length agree bin by bin;
 the `'phase'` estimator is literally the slope of the
 `CrossSpectralDensityResult` phase, weighted as Eq. 5.101b prescribes.
 
 The Hilbert envelope here is the time-domain companion of the
-[envelope spectrum](https://jmrplens.github.io/phonometry/signal/spectra/cepstrum-echoes/), which reads the same modulations off
+[envelope spectrum](cepstrum-echoes.md), which reads the same modulations off
 as discrete lines in frequency; and the sub-sample alignment shares its
 band-limited kernel with the public
-[fractional-delay and resampling tools](https://jmrplens.github.io/phonometry/signal/spectra/test-signals/).
+[fractional-delay and resampling tools](test-signals.md).
 
 ## References
 
@@ -2113,7 +2113,7 @@ band-limited kernel with the public
 ---
 
 
-<!-- source: docs/test-signals.md | canonical: https://jmrplens.github.io/phonometry/signal/spectra/test-signals/ -->
+<!-- source: docs/signal/spectra/test-signals.md | canonical: https://jmrplens.github.io/phonometry/signal/spectra/test-signals/ -->
 Source: https://jmrplens.github.io/phonometry/signal/spectra/test-signals/
 
 # Test signals and sample-rate tools (IEC 60268-1)
@@ -2122,7 +2122,7 @@ A measurement is only as trustworthy as its stimulus and its sample-rate
 bookkeeping. This page covers the signal toolbox of `phonometry.signals`:
 **tone bursts** with the exact gating IEC 60268-1 prescribes, the
 **colored-noise generators** (detailed in the
-[spectral analysis guide](https://jmrplens.github.io/phonometry/signal/spectra/spectral-analysis/#5-colored-noise-generators)),
+[spectral analysis guide](spectral-analysis.md#5-colored-noise-generators)),
 **resampling** whose anti-alias rejection is a stated, verifiable
 specification rather than a library default, and **fractional delay** that
 shifts a record by any sub-sample amount with band-limited exactness.
@@ -2199,7 +2199,7 @@ plt.show()
 </details>
 
 These are the bursts behind the
-[Fast/Slow/Impulse ballistics](https://jmrplens.github.io/phonometry/signal/levels/time-weighting/) reference responses
+[Fast/Slow/Impulse ballistics](../levels/time-weighting.md) reference responses
 (IEC 61672-1 Table 4 uses 4 kHz tonebursts of 200, 50 and 10 ms) and the
 quasi-peak dynamic tests of IEC 60268-1 itself (5 kHz bursts of 1 to 200 ms,
 Table AII).
@@ -2301,7 +2301,7 @@ boundary conventions cover the two use cases:
 - `mode="linear"` (default) zero-pads the record past the shift, so samples
   leaving one end land in padding instead of wrapping around. Use it for
   transients and impulse responses; it is bit-identical to the alignment
-  kernel inside [`align_impulse_responses`](https://jmrplens.github.io/phonometry/signal/spectra/correlation-delay/). An
+  kernel inside [`align_impulse_responses`](correlation-delay.md). An
   integer delay reduces to an exact sample shift.
 - `mode="circular"` applies the ramp over the record itself and wraps. For
   periodic records it is exact: a tone centered on a DFT bin delayed by
@@ -2327,27 +2327,27 @@ lengths avoid the bin entirely.
 The deterministic colored-noise generators (`noise_signal`: white, pink,
 red, blue, violet with an exact power-law slope and bit-reproducible seeds)
 complete the toolbox; they are documented with their spectral verification
-in the [spectral analysis guide](https://jmrplens.github.io/phonometry/signal/spectra/spectral-analysis/#5-colored-noise-generators).
+in the [spectral analysis guide](spectral-analysis.md#5-colored-noise-generators).
 
 ## Where these tools are used
 
-The [window figures of merit](https://jmrplens.github.io/phonometry/signal/spectra/spectral-analysis/#6-choosing-the-window)
+The [window figures of merit](spectral-analysis.md#6-choosing-the-window)
 quantify the taper every spectral estimate in the library rests on; the
 burst generator feeds ballistics and dynamic-response testing; and the
 resampler and fractional delay are the sample-rate half of
-[correlation and delay work](https://jmrplens.github.io/phonometry/signal/spectra/correlation-delay/), where sub-sample
+[correlation and delay work](correlation-delay.md), where sub-sample
 alignment is the difference between averaging impulse responses and
 smearing them.
 
 ## See also
 
-- [Time Weighting](https://jmrplens.github.io/phonometry/signal/levels/time-weighting/): the detector ballistics the tone
+- [Time Weighting](../levels/time-weighting.md): the detector ballistics the tone
   bursts exercise (IEC 61672-1 Table 4).
-- [Correlation and delay](https://jmrplens.github.io/phonometry/signal/spectra/correlation-delay/): the alignment work built
+- [Correlation and delay](correlation-delay.md): the alignment work built
   on the fractional-delay kernel.
-- [Synchronous averaging](https://jmrplens.github.io/phonometry/signal/spectra/synchronous-averaging/): period alignment with
+- [Synchronous averaging](synchronous-averaging.md): period alignment with
   the same band-limited shift when $f_s T$ is not an integer.
-- [Spectral analysis](https://jmrplens.github.io/phonometry/signal/spectra/spectral-analysis/): the colored-noise verification
+- [Spectral analysis](spectral-analysis.md): the colored-noise verification
   and the window metrics.
 
 ## References
@@ -2368,12 +2368,12 @@ smearing them.
 ---
 
 
-<!-- source: docs/system-measurement.md | canonical: https://jmrplens.github.io/phonometry/signal/spectra/system-measurement/ -->
+<!-- source: docs/signal/spectra/system-measurement.md | canonical: https://jmrplens.github.io/phonometry/signal/spectra/system-measurement/ -->
 Source: https://jmrplens.github.io/phonometry/signal/spectra/system-measurement/
 
 # System measurement: Golay, shaped sweeps, inversion
 
-The [room-acoustics guide](https://jmrplens.github.io/phonometry/buildings/rooms/room-acoustics/) recovers
+The [room-acoustics guide](../../buildings/rooms/room-acoustics.md) recovers
 impulse responses with the two ISO 18233 work-horses - the exponential sweep
 and the MLS. This page adds the measurement-engineering layer around them,
 from the transfer-function literature rather than a standard: **complementary
@@ -2414,7 +2414,7 @@ each code in turn - play $a$ periodically, record one steady-state period,
 then the same with $b$ - and sums the two circular cross-correlations
 (Eq. (4)): for a noiseless linear time-invariant system the impulse response
 comes back to machine precision, a closed-form identity the tests and the
-[conformance report](https://jmrplens.github.io/phonometry/reference/conformance/) pin at `1e-13`.
+[conformance report](../../CONFORMANCE.md) pin at `1e-13`.
 
 ```python
 import numpy as np
@@ -2486,8 +2486,8 @@ plt.show()
 The result is the same
 `ImpulseResponseResult` the sweep
 and MLS front ends return, so everything downstream -
-[room parameters](https://jmrplens.github.io/phonometry/buildings/rooms/room-acoustics/), decay curves,
-[STI](https://jmrplens.github.io/phonometry/perception/speech/speech-transmission/) - consumes it unchanged.
+[room parameters](../../buildings/rooms/room-acoustics.md), decay curves,
+[STI](../../perception/speech/speech-transmission.md) - consumes it unchanged.
 Recordings spanning several periods are synchronously averaged, so
 uncorrelated background noise falls by 3 dB per doubling while the
 deterministic part stays exact. The trade-offs mirror the MLS: the recovery
@@ -2577,7 +2577,7 @@ loudspeaker's power-handling limits) buys a frequency-independent SNR that no
 post-processing can recover (Mueller & Massarani Sec. 3).
 
 Deconvolution needs nothing new - the result acts as its own reference array
-for the [spectral method](https://jmrplens.github.io/phonometry/buildings/rooms/room-acoustics/) of
+for the [spectral method](../../buildings/rooms/room-acoustics.md) of
 `impulse_response`, which divides the sweep's coloration out again:
 
 ```python
@@ -2745,15 +2745,15 @@ sweep.plot()   # waveform and spectrum against the inverted-response target
 ## Relation to the other tools
 
 The Golay pair joins `sweep_signal` and `mls_signal` in the
-[ISO 18233 acquisition family](https://jmrplens.github.io/phonometry/buildings/rooms/room-acoustics/); pick the
+[ISO 18233 acquisition family](../../buildings/rooms/room-acoustics.md); pick the
 sweep for distortion rejection, the MLS for legacy hardware, the pair when
 exact noise-free deconvolution of a time-invariant system matters (HRTF rigs,
 calibration fixtures). Harmonic analysis of what sweeps *discard* lives in
-[swept-sine distortion](https://jmrplens.github.io/phonometry/devices/electroacoustics/swept-sine-distortion/). The Welch
+[swept-sine distortion](../../devices/electroacoustics/swept-sine-distortion.md). The Welch
 machinery used to verify the shaped sweep is the
-[calibrated spectral analysis](https://jmrplens.github.io/phonometry/signal/spectra/spectral-analysis/) page,
+[calibrated spectral analysis](spectral-analysis.md) page,
 and the equalized responses feed the same downstream chain as every
-[impulse response](https://jmrplens.github.io/phonometry/buildings/rooms/room-acoustics/).
+[impulse response](../../buildings/rooms/room-acoustics.md).
 
 ## References
 

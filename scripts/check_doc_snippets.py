@@ -324,7 +324,7 @@ def _pages() -> tuple[list[pathlib.Path], list[tuple[pathlib.Path, pathlib.Path]
         p for p in sorted(_SITE.rglob("*.md*"))
         if "/es/" not in p.as_posix() and "reference/api" not in p.as_posix()
     ]
-    mirror = sorted(_DOCS.glob("*.md"))
+    mirror = sorted(_DOCS.rglob("*.md"))
     pairs: list[tuple[pathlib.Path, pathlib.Path]] = []
     for page in site_en:
         twin = _SITE_ES / page.relative_to(_SITE)

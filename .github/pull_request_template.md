@@ -44,7 +44,7 @@ Regenerated where this change touches them:
 Applies to new API:
 
 - [ ] New modules registered in `scripts/api_taxonomy.py`
-- [ ] `docs/api-reference.md` covers every new `__all__` name
+- [ ] `docs/reference/api/index.md` covers every new `__all__` name
       (`python scripts/check_api_reference.py`)
 - [ ] Result objects expose `.plot()`, with shared plotting code in
       `src/phonometry/_plot/`

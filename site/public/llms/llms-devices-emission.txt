@@ -4,7 +4,7 @@ Part of https://jmrplens.github.io/phonometry/llms.txt. Full text of the pages i
 
 ---
 
-<!-- source: docs/sound-power.md | canonical: https://jmrplens.github.io/phonometry/devices/emission/sound-power/ -->
+<!-- source: docs/devices/emission/sound-power.md | canonical: https://jmrplens.github.io/phonometry/devices/emission/sound-power/ -->
 Source: https://jmrplens.github.io/phonometry/devices/emission/sound-power/
 
 # Sound Power
@@ -17,12 +17,12 @@ feeds a room prediction (EN 12354) or is checked against a noise-emission
 limit. phonometry implements five standardised routes to it, split across
 three method guides: an enveloping *pressure* surface in the field
 (ISO 3744/3746) and the precision grade in an *anechoic room* (ISO 3745),
-covered in [Sound Power by Pressure Methods](https://jmrplens.github.io/phonometry/devices/emission/sound-power-pressure/); the
+covered in [Sound Power by Pressure Methods](sound-power-pressure.md); the
 diffuse field of a *reverberation room* (ISO 3741), covered in
-[Sound Power in the Reverberation Room](https://jmrplens.github.io/phonometry/devices/emission/sound-power-reverberation/); and
+[Sound Power in the Reverberation Room](sound-power-reverberation.md); and
 *intensity* scanning over a surface (ISO 9614-2), with its precision
 counterpart (ISO 9614-3), covered in
-[Sound Power by Intensity Scanning](https://jmrplens.github.io/phonometry/devices/emission/sound-power-intensity/). This page is
+[Sound Power by Intensity Scanning](sound-power-intensity.md). This page is
 the front door: how to choose among them, what the accuracy grades actually
 promise, and how a measured $L_W$ becomes the ISO 4871 noise-emission
 declaration a datasheet prints.
@@ -222,21 +222,21 @@ the clause 6.2 verification verdict.*
 
 ## See also
 
-- [Sound Power by Pressure Methods (ISO 3744 / ISO 3746 / ISO 3745)](https://jmrplens.github.io/phonometry/devices/emission/sound-power-pressure/):
+- [Sound Power by Pressure Methods (ISO 3744 / ISO 3746 / ISO 3745)](sound-power-pressure.md):
   the enveloping surface with its $K_1$/$K_2$ corrections, and the precision
   anechoic array.
-- [Sound Power in the Reverberation Room (ISO 3741)](https://jmrplens.github.io/phonometry/devices/emission/sound-power-reverberation/):
+- [Sound Power in the Reverberation Room (ISO 3741)](sound-power-reverberation.md):
   the precision diffuse-field method with the Waterhouse and meteorological
   corrections.
-- [Sound Power by Intensity Scanning (ISO 9614-2 / ISO 9614-3)](https://jmrplens.github.io/phonometry/devices/emission/sound-power-intensity/):
+- [Sound Power by Intensity Scanning (ISO 9614-2 / ISO 9614-3)](sound-power-intensity.md):
   the routes that tolerate steady background noise, qualified by their field
   indicators.
-- [Sound Intensity (p-p)](https://jmrplens.github.io/phonometry/devices/emission/intensity/): the two-microphone probe behind the
+- [Sound Intensity (p-p)](intensity.md): the two-microphone probe behind the
   scanning methods.
-- [Room Acoustics](https://jmrplens.github.io/phonometry/buildings/rooms/room-acoustics/): the reverberation time and equivalent
+- [Room Acoustics](../../buildings/rooms/room-acoustics.md): the reverberation time and equivalent
   absorption area that feed the room corrections.
-- [Levels](https://jmrplens.github.io/phonometry/signal/levels/levels/): energy averaging and the A-weighting behind $L_{WA}$.
-- [Theory](https://jmrplens.github.io/phonometry/reference/theory/environment-transport/): the Waterhouse, $K_1$/$K_2$ and $C_1$/$C_2$ derivations.
+- [Levels](../../signal/levels/levels.md): energy averaging and the A-weighting behind $L_{WA}$.
+- [Theory](../../reference/theory/environment-transport.md): the Waterhouse, $K_1$/$K_2$ and $C_1$/$C_2$ derivations.
 - API reference: [`emission.sound_power`](https://jmrplens.github.io/phonometry/reference/api/power/sound-power/), [`emission.sound_power_reverberation`](https://jmrplens.github.io/phonometry/reference/api/power/sound-power-reverberation/) and [`emission.sound_power_intensity`](https://jmrplens.github.io/phonometry/reference/api/power/sound-power-intensity/).
 
 ## Quick answers
@@ -304,7 +304,7 @@ ISO 3741, ISO 3745, ISO 9614-2/-3) are covered in their method guides.
 ---
 
 
-<!-- source: docs/sound-power-pressure.md | canonical: https://jmrplens.github.io/phonometry/devices/emission/sound-power-pressure/ -->
+<!-- source: docs/devices/emission/sound-power-pressure.md | canonical: https://jmrplens.github.io/phonometry/devices/emission/sound-power-pressure/ -->
 Source: https://jmrplens.github.io/phonometry/devices/emission/sound-power-pressure/
 
 # Sound Power by Pressure Methods (ISO 3744 / ISO 3746 / ISO 3745)
@@ -322,7 +322,7 @@ fixed microphone array samples the free field directly and the grade-1
 corrections are meteorological rather than environmental. The closing
 section renders the determination as the accredited-style test fiche. Which
 route fits which job, and the reverberation-room and intensity alternatives,
-are weighed in [Sound Power](https://jmrplens.github.io/phonometry/devices/emission/sound-power/).
+are weighed in [Sound Power](sound-power.md).
 
 ## 1. Enveloping surface, sound pressure (ISO 3744 / ISO 3746)
 
@@ -749,19 +749,19 @@ the boxed $L_{WA}$.*
 
 ## See also
 
-- [Sound Power](https://jmrplens.github.io/phonometry/devices/emission/sound-power/): choosing among the five determination
+- [Sound Power](sound-power.md): choosing among the five determination
   routes, what the accuracy grades promise, and the ISO 4871 noise-emission
   declaration a measured $L_{WA}$ feeds.
-- [Sound Power in the Reverberation Room (ISO 3741)](https://jmrplens.github.io/phonometry/devices/emission/sound-power-reverberation/):
+- [Sound Power in the Reverberation Room (ISO 3741)](sound-power-reverberation.md):
   the precision-grade diffuse-field alternative when the source can travel
   to a qualified room.
-- [Sound Power by Intensity Scanning (ISO 9614)](https://jmrplens.github.io/phonometry/devices/emission/sound-power-intensity/):
+- [Sound Power by Intensity Scanning (ISO 9614)](sound-power-intensity.md):
   the routes that tolerate the steady background noise a pressure method
   cannot subtract.
-- [Room Acoustics](https://jmrplens.github.io/phonometry/buildings/rooms/room-acoustics/): the reverberation time and equivalent
+- [Room Acoustics](../../buildings/rooms/room-acoustics.md): the reverberation time and equivalent
   absorption area that feed $K_2$.
-- [Levels](https://jmrplens.github.io/phonometry/signal/levels/levels/): energy averaging and the A-weighting behind $L_{WA}$.
-- [Theory](https://jmrplens.github.io/phonometry/reference/theory/environment-transport/): the $K_1$/$K_2$ and $C_1$/$C_2$
+- [Levels](../../signal/levels/levels.md): energy averaging and the A-weighting behind $L_{WA}$.
+- [Theory](../../reference/theory/environment-transport.md): the $K_1$/$K_2$ and $C_1$/$C_2$
   derivations.
 - API reference: [`emission.sound_power`](https://jmrplens.github.io/phonometry/reference/api/power/sound-power/).
 
@@ -809,7 +809,7 @@ microphone arrays of section 2.
 ---
 
 
-<!-- source: docs/sound-power-reverberation.md | canonical: https://jmrplens.github.io/phonometry/devices/emission/sound-power-reverberation/ -->
+<!-- source: docs/devices/emission/sound-power-reverberation.md | canonical: https://jmrplens.github.io/phonometry/devices/emission/sound-power-reverberation/ -->
 Source: https://jmrplens.github.io/phonometry/devices/emission/sound-power-reverberation/
 
 # Sound Power in the Reverberation Room (ISO 3741)
@@ -825,7 +825,7 @@ Sabine absorption area, the Waterhouse and meteorological corrections, the
 comparison method against a reference sound source, the qualification
 warnings and the accredited-style test fiche. Which route fits which job,
 and the pressure and intensity alternatives, are weighed in
-[Sound Power](https://jmrplens.github.io/phonometry/devices/emission/sound-power/).
+[Sound Power](sound-power.md).
 
 ## 1. Reverberation room, precision grade (ISO 3741)
 
@@ -982,7 +982,7 @@ fields are `NaN` for the comparison method).
 The reverberation-room result (`ReverberationSoundPowerResult`, ISO 3741)
 writes a one-page PDF fiche laid out like a sound-power test sheet through
 its own `.report()`, sharing the layout and the `ReportMetadata` container of
-the [pressure-method fiche](https://jmrplens.github.io/phonometry/devices/emission/sound-power-pressure/#3-the-measurement-report-report).
+the [pressure-method fiche](sound-power-pressure.md#3-the-measurement-report-report).
 The standard-basis line
 names ISO 3741:2010 and the precision accuracy grade (grade 1) and states which
 method was used, the direct method using the room equivalent absorption area
@@ -1035,17 +1035,17 @@ $C_1$/$C_2$ corrections and the boxed $L_{WA}$.*
 
 ## See also
 
-- [Sound Power](https://jmrplens.github.io/phonometry/devices/emission/sound-power/): choosing among the five determination
+- [Sound Power](sound-power.md): choosing among the five determination
   routes, what the accuracy grades promise, and the ISO 4871 noise-emission
   declaration a measured $L_{WA}$ feeds.
-- [Sound Power by Pressure Methods (ISO 3744 / ISO 3746 / ISO 3745)](https://jmrplens.github.io/phonometry/devices/emission/sound-power-pressure/):
+- [Sound Power by Pressure Methods (ISO 3744 / ISO 3746 / ISO 3745)](sound-power-pressure.md):
   the in-situ enveloping surface and the precision anechoic array.
-- [Sound Power by Intensity Scanning (ISO 9614)](https://jmrplens.github.io/phonometry/devices/emission/sound-power-intensity/):
+- [Sound Power by Intensity Scanning (ISO 9614)](sound-power-intensity.md):
   the routes that tolerate steady background noise.
-- [Room Acoustics](https://jmrplens.github.io/phonometry/buildings/rooms/room-acoustics/): measuring the reverberation time
+- [Room Acoustics](../../buildings/rooms/room-acoustics.md): measuring the reverberation time
   $T_{60}$ that sets the Sabine absorption area.
-- [Levels](https://jmrplens.github.io/phonometry/signal/levels/levels/): energy averaging and the A-weighting behind $L_{WA}$.
-- [Theory](https://jmrplens.github.io/phonometry/reference/theory/environment-transport/): the Waterhouse and $C_1$/$C_2$
+- [Levels](../../signal/levels/levels.md): energy averaging and the A-weighting behind $L_{WA}$.
+- [Theory](../../reference/theory/environment-transport.md): the Waterhouse and $C_1$/$C_2$
   derivations.
 - API reference: [`emission.sound_power_reverberation`](https://jmrplens.github.io/phonometry/reference/api/power/sound-power-reverberation/).
 
@@ -1076,7 +1076,7 @@ criteria and the Annex F A-weighting.
 ---
 
 
-<!-- source: docs/sound-power-intensity.md | canonical: https://jmrplens.github.io/phonometry/devices/emission/sound-power-intensity/ -->
+<!-- source: docs/devices/emission/sound-power-intensity.md | canonical: https://jmrplens.github.io/phonometry/devices/emission/sound-power-intensity/ -->
 Source: https://jmrplens.github.io/phonometry/devices/emission/sound-power-intensity/
 
 # Sound Power by Intensity Scanning (ISO 9614-2 / ISO 9614-3)
@@ -1091,8 +1091,8 @@ the two of them: the ISO 9614-2 engineering/survey determination with its
 field indicators and per-band achieved grade, the ISO 9614-3 precision
 (grade 1) scan with its tighter criteria, and the accredited-style test
 fiche. The probe itself, its finite-difference bias and the ISO 9614-1
-discrete-point method live in [Sound Intensity (p-p)](https://jmrplens.github.io/phonometry/devices/emission/intensity/); which
-route fits which job is weighed in [Sound Power](https://jmrplens.github.io/phonometry/devices/emission/sound-power/).
+discrete-point method live in [Sound Intensity (p-p)](intensity.md); which
+route fits which job is weighed in [Sound Power](sound-power.md).
 
 ## 1. Intensity scanning (ISO 9614-2)
 
@@ -1100,7 +1100,7 @@ Sound **intensity** is the net energy flux, so it distinguishes energy
 *leaving* the source from steady energy merely passing through the surface,
 which is why the intensity method tolerates background noise that would
 defeat the pressure methods. A p-p probe (see the
-[Sound Intensity guide](https://jmrplens.github.io/phonometry/devices/emission/intensity/)) is swept continuously over each of
+[Sound Intensity guide](intensity.md)) is swept continuously over each of
 $N$ segments of a surface enclosing the source, reporting the segment-averaged
 signed normal intensity $\langle I_{n,i} \rangle$.
 
@@ -1220,7 +1220,7 @@ partial powers and evaluates criterion 3; `pressure_levels` enables $F_{pI}$;
 `pressure_residual_index` ($\delta_{pI0}$) plus a second sweep enables the
 per-band
 achieved grade. The probe's finite-difference intensity has a
-frequency-dependent bias handled in the [intensity guide](https://jmrplens.github.io/phonometry/devices/emission/intensity/).
+frequency-dependent bias handled in the [intensity guide](intensity.md).
 
 ### `sound_power_intensity()` parameters
 
@@ -1354,7 +1354,7 @@ plt.show()
 The intensity-scanning result (`SoundPowerIntensityResult`, ISO 9614-2)
 writes a one-page PDF fiche laid out like a sound-power test sheet through
 its own `.report()`, sharing the layout and the `ReportMetadata` container of
-the [pressure-method fiche](https://jmrplens.github.io/phonometry/devices/emission/sound-power-pressure/#3-the-measurement-report-report).
+the [pressure-method fiche](sound-power-pressure.md#3-the-measurement-report-report).
 The standard-basis line
 names ISO 9614-2:1996 and the measurement grade, the per-band table lists the
 intensity-derived band sound-power level $L_W$, and the boxed $L_{WA}$ carries
@@ -1408,17 +1408,17 @@ $L_{WA}$.*
 
 ## See also
 
-- [Sound Power](https://jmrplens.github.io/phonometry/devices/emission/sound-power/): choosing among the five determination
+- [Sound Power](sound-power.md): choosing among the five determination
   routes, what the accuracy grades promise, and the ISO 4871 noise-emission
   declaration a measured $L_{WA}$ feeds.
-- [Sound Intensity (p-p)](https://jmrplens.github.io/phonometry/devices/emission/intensity/): the two-microphone probe, its
+- [Sound Intensity (p-p)](intensity.md): the two-microphone probe, its
   finite-difference bias and the ISO 9614-1 field indicators behind the
   scanning methods.
-- [Sound Power by Pressure Methods (ISO 3744 / ISO 3746 / ISO 3745)](https://jmrplens.github.io/phonometry/devices/emission/sound-power-pressure/):
+- [Sound Power by Pressure Methods (ISO 3744 / ISO 3746 / ISO 3745)](sound-power-pressure.md):
   the enveloping-surface and anechoic routes for quiet sites.
-- [Sound Power in the Reverberation Room (ISO 3741)](https://jmrplens.github.io/phonometry/devices/emission/sound-power-reverberation/):
+- [Sound Power in the Reverberation Room (ISO 3741)](sound-power-reverberation.md):
   the precision diffuse-field route in a qualified laboratory room.
-- [Theory](https://jmrplens.github.io/phonometry/reference/theory/environment-transport/): the field-indicator derivations.
+- [Theory](../../reference/theory/environment-transport.md): the field-indicator derivations.
 - API reference: [`emission.sound_power_intensity`](https://jmrplens.github.io/phonometry/reference/api/power/sound-power-intensity/).
 
 ## References
@@ -1456,7 +1456,7 @@ clause 9.2 not-applicable flagging of section 2.
 ---
 
 
-<!-- source: docs/intensity.md | canonical: https://jmrplens.github.io/phonometry/devices/emission/intensity/ -->
+<!-- source: docs/devices/emission/intensity.md | canonical: https://jmrplens.github.io/phonometry/devices/emission/intensity/ -->
 Source: https://jmrplens.github.io/phonometry/devices/emission/intensity/
 
 # Sound Intensity (p-p method)
@@ -1849,7 +1849,7 @@ which is offered to class 2 as an alternative. A verdict computed over fewer
 bands is flagged `range_limited` so it cannot be read as a full-range claim.
 The Spanish translation UNE-EN 61043:1999 records only the octave alternative
 for class 2 and drops the one-third-octave one; the library follows the
-EN/IEC text (see the [errata registry](https://jmrplens.github.io/phonometry/reference/errata/)). Clause 8 combines separately supplied components:
+EN/IEC text (see the [errata registry](../../ERRATA.md)). Clause 8 combines separately supplied components:
 `instrument_class_from_components(probe_class, processor_class)` returns 1
 only when both are class 1, and 2 for every other pairing.
 
@@ -1949,7 +1949,7 @@ the microphones alone.
 | `limits` | list, optional | Hz | default library band range | Band analysis limits |
 | `bias_correct` | bool | — | default `False` | Apply the per-bin $(k\Delta r)/\sin(k\Delta r)$ correction (IEC 61043 §7.3) before summing, so band/broadband totals stop under-reading as $f \to$ `max_valid_frequency`; bins past the first null are left uncorrected. The per-band `bias_correction` factor is reported either way |
 
-See [Theory](https://jmrplens.github.io/phonometry/reference/theory/signal-analysis/) for the derivations and [Calibration](https://jmrplens.github.io/phonometry/signal/metrology/calibration/)
+See [Theory](../../reference/theory/signal-analysis.md) for the derivations and [Calibration](../../signal/metrology/calibration.md)
 for absolute scaling of the two channels.
 
 ## References
@@ -1998,7 +1998,7 @@ temporal-variability limit and the dynamic-capability criterion (Annex B).
 ---
 
 
-<!-- source: docs/vibration-sound-power.md | canonical: https://jmrplens.github.io/phonometry/devices/emission/vibration-sound-power/ -->
+<!-- source: docs/devices/emission/vibration-sound-power.md | canonical: https://jmrplens.github.io/phonometry/devices/emission/vibration-sound-power/ -->
 Source: https://jmrplens.github.io/phonometry/devices/emission/vibration-sound-power/
 
 # Sound power from surface vibration (ISO/TS 7849)

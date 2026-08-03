@@ -9458,8 +9458,8 @@ _DOC_HEADER = """<!--
 > is out of date, so edit the checks in `scripts/conformance_report.py`, not this
 > file. Each row pins a standard and clause to its expected normative value and
 > the value the library computes. Full standards list and methodology:
-> [Theory](https://github.com/jmrplens/phonometry/blob/main/docs/theory.md) -
-> [Why phonometry](https://github.com/jmrplens/phonometry/blob/main/docs/why-phonometry.md).
+> [Theory](https://github.com/jmrplens/phonometry/blob/main/docs/reference/theory.md) -
+> [Why phonometry](https://github.com/jmrplens/phonometry/blob/main/docs/start/why-phonometry.md).
 
 """
 

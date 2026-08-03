@@ -4,7 +4,7 @@ Part of https://jmrplens.github.io/phonometry/llms.txt. Full text of the pages i
 
 ---
 
-<!-- source: docs/aircraft-noise.md | canonical: https://jmrplens.github.io/phonometry/aircraft/aircraft-noise/ -->
+<!-- source: docs/aircraft/aircraft-noise.md | canonical: https://jmrplens.github.io/phonometry/aircraft/aircraft-noise/ -->
 Source: https://jmrplens.github.io/phonometry/aircraft/aircraft-noise/
 
 # Aircraft noise: Effective Perceived Noise Level (ICAO Annex 16 / IEC 61265)
@@ -130,7 +130,7 @@ Level | Limit | Margin verdict row when a certification limit is supplied, a
 static reference-conditions strip (25 °C, 70 % RH, sea level, zero wind, ISA)
 and a footer with the fixed disclaimer. It uses the same `ReportMetadata`
 container (documented under [Insulation
-ratings](https://jmrplens.github.io/phonometry/buildings/insulation/insulation-ratings/#report-metadata-reportmetadata)) and rendering
+ratings](../buildings/insulation/insulation-ratings.md#report-metadata-reportmetadata)) and rendering
 engine as the ISO 717 insulation fiche; a supplied `requirement` is read as the
 certification EPNL limit in EPNdB (the EPNL passes at or below it), and
 `metadata=None` produces a lightweight prediction fiche with no verdict row.
@@ -248,7 +248,7 @@ Part 36 test window), over path lengths to 7620 m, and is reciprocal
 The certification chain ends here. Turning these aeroplanes into noise
 around an airport, the noise-power-distance tables, the per-segment
 corrections of a flight path and the ground contour of a single event, is
-the ECAC Doc 29 method of [Airport noise](https://jmrplens.github.io/phonometry/aircraft/airport-noise/).
+the ECAC Doc 29 method of [Airport noise](airport-noise.md).
 
 ## References
 
@@ -293,12 +293,12 @@ performance tolerances. SAE ARP 5534:2021, *Application of Pure-Tone
 Atmospheric Absorption Losses to One-Third-Octave-Band Data*: the SAE-Method
 band attenuation (Eqs. 7–10), with the pure-tone coefficient from ISO 9613-1.
 The ECAC Doc 29 airport-noise method is documented in
-[Airport noise](https://jmrplens.github.io/phonometry/aircraft/airport-noise/).
+[Airport noise](airport-noise.md).
 
 ---
 
 
-<!-- source: docs/airport-noise.md | canonical: https://jmrplens.github.io/phonometry/aircraft/airport-noise/ -->
+<!-- source: docs/aircraft/airport-noise.md | canonical: https://jmrplens.github.io/phonometry/aircraft/airport-noise/ -->
 Source: https://jmrplens.github.io/phonometry/aircraft/airport-noise/
 
 # Airport noise (ECAC Doc 29)
@@ -317,9 +317,9 @@ mounted, and the rearward lobe of a jet still on the runway.
 This page covers that chain end to end, from the NPD interpolation to the
 ground-grid contour, and it is validated against the reference workbook of
 Doc 29 5th ed. Vol. 3. The certification metric these tables ultimately come
-from, the EPNL of ICAO Annex 16, is [Aircraft noise](https://jmrplens.github.io/phonometry/aircraft/aircraft-noise/); the
+from, the EPNL of ICAO Annex 16, is [Aircraft noise](aircraft-noise.md); the
 physical propagation ingredients (ground effect, atmospheric absorption,
-barriers) are [Outdoor sound propagation](https://jmrplens.github.io/phonometry/environment/propagation/outdoor-propagation/).
+barriers) are [Outdoor sound propagation](../environment/propagation/outdoor-propagation.md).
 
 ## 1. The noise-power-distance engine
 
@@ -528,12 +528,12 @@ events of the reference workbook are reproduced end-to-end in the test suite.
 
 ## See also
 
-- [Aircraft noise](https://jmrplens.github.io/phonometry/aircraft/aircraft-noise/): the ICAO Annex 16 certification
+- [Aircraft noise](aircraft-noise.md): the ICAO Annex 16 certification
   metric behind the aircraft data.
-- [Outdoor sound propagation](https://jmrplens.github.io/phonometry/environment/propagation/outdoor-propagation/): the ISO 9613-2
+- [Outdoor sound propagation](../environment/propagation/outdoor-propagation.md): the ISO 9613-2
   attenuation terms and the ground effect the lateral attenuation condenses
   into one curve.
-- [Environmental levels](https://jmrplens.github.io/phonometry/environment/environmental-levels/): the $L_{den}$-style
+- [Environmental levels](../environment/environmental-levels.md): the $L_{den}$-style
   long-term indices that a full airport study accumulates from single events.
 - API reference: [`aircraft.airport_noise`](https://jmrplens.github.io/phonometry/reference/api/aeroacoustics/airport-noise/).
 
@@ -572,7 +572,7 @@ Vol 3 Part 1 reference workbook.
 ---
 
 
-<!-- source: docs/rotorcraft-noise.md | canonical: https://jmrplens.github.io/phonometry/aircraft/rotorcraft-noise/ -->
+<!-- source: docs/aircraft/rotorcraft-noise.md | canonical: https://jmrplens.github.io/phonometry/aircraft/rotorcraft-noise/ -->
 Source: https://jmrplens.github.io/phonometry/aircraft/rotorcraft-noise/
 
 # Rotorcraft noise: the hemisphere method (ECAC Doc 32 / NORAH2)

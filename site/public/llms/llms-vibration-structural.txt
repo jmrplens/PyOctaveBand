@@ -4,7 +4,7 @@ Part of https://jmrplens.github.io/phonometry/llms.txt. Full text of the pages i
 
 ---
 
-<!-- source: docs/mechanical-mobility.md | canonical: https://jmrplens.github.io/phonometry/vibration/structural/mechanical-mobility/ -->
+<!-- source: docs/vibration/structural/mechanical-mobility.md | canonical: https://jmrplens.github.io/phonometry/vibration/structural/mechanical-mobility/ -->
 Source: https://jmrplens.github.io/phonometry/vibration/structural/mechanical-mobility/
 
 # Mechanical mobility and the FRF family (ISO 7626-1)
@@ -145,7 +145,7 @@ estimator $\hat{H} = G(\text{response}, \text{force})/G(\text{force}, \text{forc
 and the ordinary coherence $\gamma^2 = |G_{xy}|^2/(G_{xx}\,G_{yy})$ used for
 its data-quality checks are the library's
 existing spectral estimators [`transfer_function` and
-`coherence`](https://jmrplens.github.io/phonometry/devices/electroacoustics/electroacoustics/) (H1 is their default). On top of them,
+`coherence`](../../devices/electroacoustics/electroacoustics.md) (H1 is their default). On top of them,
 two ISO 7626-2 acceptance criteria are provided:
 
 * **Operational rigid-mass calibration (7.5.2).** The measured FRF of a freely
@@ -354,7 +354,7 @@ $|Y| = 1.59155 \times 10^{-4}$ m/(N·s) at 100 Hz) and the Annex A example
 ---
 
 
-<!-- source: docs/transfer-stiffness.md | canonical: https://jmrplens.github.io/phonometry/vibration/structural/transfer-stiffness/ -->
+<!-- source: docs/vibration/structural/transfer-stiffness.md | canonical: https://jmrplens.github.io/phonometry/vibration/structural/transfer-stiffness/ -->
 Source: https://jmrplens.github.io/phonometry/vibration/structural/transfer-stiffness/
 
 # Dynamic transfer stiffness of resilient elements (ISO 10846)
@@ -554,7 +554,7 @@ The dynamic stiffness is a member of the frequency-response-function family
 (ISO 10846-1, Annex A / Table A.2): it is the reciprocal of the receptance and
 relates to the mechanical impedance $Z$ and effective mass $m_\text{eff}$ by
 $k = j\omega Z = -\omega^2 m_\text{eff}$. These conversions are the same as the
-[mechanical-mobility](https://jmrplens.github.io/phonometry/vibration/structural/mechanical-mobility/) `convert_frf` pivot:
+[mechanical-mobility](mechanical-mobility.md) `convert_frf` pivot:
 
 ```python
 from phonometry import vibration
@@ -645,7 +645,7 @@ the 7.6 linearity criterion.
 ---
 
 
-<!-- source: docs/junction-transmission.md | canonical: https://jmrplens.github.io/phonometry/vibration/structural/junction-transmission/ -->
+<!-- source: docs/vibration/structural/junction-transmission.md | canonical: https://jmrplens.github.io/phonometry/vibration/structural/junction-transmission/ -->
 Source: https://jmrplens.github.io/phonometry/vibration/structural/junction-transmission/
 
 # Bending-wave transmission at plate junctions (Cremer / Craik / Hopkins)
@@ -787,7 +787,7 @@ tau13 = straight_transmission_coefficient(theta, chi, psi, "X")
 ```
 
 The clip below runs this experiment in the time domain with the library's 2D
-[elastic FDTD solver](https://jmrplens.github.io/phonometry/simulation/elastic-waves/): a bending packet on a 10 mm steel plate reaches an
+[elastic FDTD solver](../../simulation/elastic-waves.md): a bending packet on a 10 mm steel plate reaches an
 L-junction with an identical plate, and the corner splits it into the
 reflected and transmitted waves this section prices at $\tau_{12}(0°) = 0.5$.
 The fast in-plane precursor racing down the receiving plate is the mode
@@ -937,11 +937,11 @@ print(pred.dominant.label, round(pred.dominant.fraction, 2))   # Dd 0.68
 
 One junction with a moderate $K_{ij}$ already trims 1.6 dB off the direct
 $R_w = 57\ \text{dB}$; a full building repeats this for every junction, which
-is the [EN 12354 prediction guide](https://jmrplens.github.io/phonometry/buildings/design/insulation-prediction/).
+is the [EN 12354 prediction guide](../../buildings/design/insulation-prediction.md).
 
 The measured, EN 12354 counterpart of $K_{ij}$ (from the direction-averaged
 velocity level difference) is the separate
-[laboratory flanking-transmission](https://jmrplens.github.io/phonometry/buildings/insulation/flanking-lab/) `vibration_reduction_index`; this
+[laboratory flanking-transmission](../../buildings/insulation/flanking-lab.md) `vibration_reduction_index`; this
 guide is the closed-form *predicted* value from the wave approach.
 
 ## 6. Experimental SEA: coupling loss factors from measured energies
@@ -984,7 +984,7 @@ Norton Section 6.4.1 alongside it: `flat_plate_modal_density` (Eq. 6.25),
 `cylindrical_shell_modal_density` (6.27 to 6.29, the Szechenyi approximations
 in three regimes about the `ring_frequency` of Eq. 6.26). The flat-plate
 expression $n(f) = S\sqrt{12}/(2 c_L t)$ is the same quantity as EN 12354-4's
-$n = \pi S f_c / c_0^2$ used by the [flanking model](https://jmrplens.github.io/phonometry/buildings/insulation/flanking-lab/), only
+$n = \pi S f_c / c_0^2$ used by the [flanking model](../../buildings/insulation/flanking-lab.md), only
 parametrised by the plate itself rather than by its critical frequency.
 
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/experimental_sea_clf_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/experimental_sea_clf.svg" alt="Two-panel figure. Left panel: coupling loss factor on a logarithmic axis against the octave bands from 125 hertz to 2 kilohertz for two aluminium plates at right angles, with the welded line junction falling from about 3 times 10 to the minus 3 to 8 times 10 to the minus 4 as one over the square root of frequency, the twelve-bolt point connection falling twice as steeply from about 1.4 times 10 to the minus 2 to 9 times 10 to the minus 4 as one over frequency, and a dashed horizontal line marking an internal loss factor of 10 to the minus 2. Right panel: a bar chart of the four loss factors of a satellite platform and cylinder in the 500 hertz octave on a logarithmic axis, the internal loss factors 4.40 times 10 to the minus 3 and 2.40 times 10 to the minus 3 clearly above the coupling loss factors 4.26 times 10 to the minus 4 and 3.91 times 10 to the minus 4, with the injected power of 1.31 watts annotated" width="92%"></picture>
@@ -1076,14 +1076,14 @@ means the subsystem boundaries were drawn in the wrong place.
 
 ## See also
 
-- [Predicting Sound Insulation (EN 12354)](https://jmrplens.github.io/phonometry/buildings/design/insulation-prediction/): the
+- [Predicting Sound Insulation (EN 12354)](../../buildings/design/insulation-prediction.md): the
   flanking model that consumes $K_{ij}$ junction by junction.
-- [Laboratory Flanking Transmission (ISO 10848)](https://jmrplens.github.io/phonometry/buildings/insulation/flanking-lab/): the
+- [Laboratory Flanking Transmission (ISO 10848)](../../buildings/insulation/flanking-lab.md): the
   measurement of $K_{ij}$ from velocity level differences, the empirical
   counterpart of this page's closed forms.
-- [Structure-borne sound power of equipment (EN 15657)](https://jmrplens.github.io/phonometry/buildings/design/structure-borne-power/):
+- [Structure-borne sound power of equipment (EN 15657)](../../buildings/design/structure-borne-power.md):
   the source power that these junction transmissions carry through a building.
-- [Mechanical mobility and the FRF family (ISO 7626-1)](https://jmrplens.github.io/phonometry/vibration/structural/mechanical-mobility/):
+- [Mechanical mobility and the FRF family (ISO 7626-1)](mechanical-mobility.md):
   the plate mobilities behind the wave parameters.
 
 ## References
@@ -1097,6 +1097,6 @@ means the subsystem boundaries were drawn in the wrong place.
 - Norton, M. P., & Karczub, D. G. (2003). *Fundamentals of noise and vibration
   analysis for engineers* (2nd ed., Chapter 6). Cambridge University Press.
 
-See the [bibliography](https://jmrplens.github.io/phonometry/reference/bibliography/) for full entries.
+See the [bibliography](../../reference/bibliography.md) for full entries.
 
 ---

@@ -4,7 +4,7 @@ Part of https://jmrplens.github.io/phonometry/llms.txt. Full text of the pages i
 
 ---
 
-<!-- source: docs/silencers.md | canonical: https://jmrplens.github.io/phonometry/devices/noise-control/silencers/ -->
+<!-- source: docs/devices/noise-control/silencers.md | canonical: https://jmrplens.github.io/phonometry/devices/noise-control/silencers/ -->
 Source: https://jmrplens.github.io/phonometry/devices/noise-control/silencers/
 
 # Silencers
@@ -22,7 +22,7 @@ the four-pole method, the closed-form expansion chamber, the Helmholtz,
 quarter-wave and extended-tube resonators, the independent FDTD
 cross-check, and the design trade-offs against dissipative linings. The
 rest of the installation, HVAC duct attenuation, flow noise and machine
-enclosures, lives in [Industrial noise control](https://jmrplens.github.io/phonometry/devices/noise-control/noise-control/).
+enclosures, lives in [Industrial noise control](noise-control.md).
 
 ## 1. Reactive silencers (four-pole method)
 
@@ -45,7 +45,7 @@ $\left[\begin{smallmatrix} 1 & 0 \\ 1/Z_b & 1 \end{smallmatrix}\right]$
 with the port impedances $Z_1 = \rho c/S_\text{in}$ and
 $Z_n = \rho c/S_\text{out}$ (Munjal Eq. (3.27); Bies Eq. (8.141) prints the
 `T11`/`T22` impedance weights of this formula inverted and fails the
-sudden-expansion limit, see the [errata registry](https://jmrplens.github.io/phonometry/reference/errata/))
+sudden-expansion limit, see the [errata registry](../../ERRATA.md))
 
 $$
 \mathrm{TL} = 10\log_{10}\!\left[\frac{Z_n}{Z_1}\,\tfrac{1}{4}\left|\,T_{11}
@@ -304,17 +304,17 @@ matters for selection:
 
 phonometry models the reactive family in closed form on this page. The
 dissipative side enters through the installation data of the
-[HVAC methods](https://jmrplens.github.io/phonometry/devices/noise-control/noise-control/): the lined-elbow insertion loss and the
+[HVAC methods](noise-control.md): the lined-elbow insertion loss and the
 lined plenum attenuation of Wells' method, both from interpolated ASHRAE
 data rather than a liner model. The porous physics that a first-principles
 liner calculation needs, the equivalent-fluid models fed by the airflow
 resistivity, is the same material theory as
-[Porous and Multilayer Absorbers](https://jmrplens.github.io/phonometry/materials/absorbers/porous-absorbers/).
+[Porous and Multilayer Absorbers](../../materials/absorbers/porous-absorbers.md).
 
 ## Cross-check against the FDTD solver
 
 The four-pole expansion chamber is cross-checked against the independent 2D
-[FDTD wave solver](https://jmrplens.github.io/phonometry/simulation/fdtd-simulation/): a plane-wave duct that widens into a
+[FDTD wave solver](../../simulation/fdtd-simulation.md): a plane-wave duct that widens into a
 chamber and narrows back transmits far less at the four-pole TL peak
 ($kL = \pi/2$) than at the transparent trough ($kL = \pi$), and the measured
 amplitude ratio reproduces the closed-form peak transmission loss to a fraction
@@ -323,17 +323,17 @@ of a decibel (test `tests/noise_control/test_fdtd_crosscheck.py`).
 
 ## See also
 
-- [Duct-borne noise: fan to room](https://jmrplens.github.io/phonometry/devices/noise-control/duct-path/): the end-to-end fan-to-room
+- [Duct-borne noise: fan to room](duct-path.md): the end-to-end fan-to-room
   calculation these silencers sit inside, and the higher-order-mode cut-on
   above which the four-pole method describes the plane-wave mode alone.
-- [Industrial noise control](https://jmrplens.github.io/phonometry/devices/noise-control/noise-control/): the rest of the
+- [Industrial noise control](noise-control.md): the rest of the
   installation: HVAC duct attenuation and flow noise, plenums, end
   reflection and machine enclosures.
-- [2D FDTD wave simulation](https://jmrplens.github.io/phonometry/simulation/fdtd-simulation/): the independent solver
+- [2D FDTD wave simulation](../../simulation/fdtd-simulation.md): the independent solver
   behind the expansion-chamber cross-check.
-- [Porous and Multilayer Absorbers](https://jmrplens.github.io/phonometry/materials/absorbers/porous-absorbers/): the
+- [Porous and Multilayer Absorbers](../../materials/absorbers/porous-absorbers.md): the
   equivalent-fluid material theory behind dissipative linings.
-- [Loudspeaker Characterisation (IEC 60268-5)](https://jmrplens.github.io/phonometry/devices/electroacoustics/loudspeakers/): the
+- [Loudspeaker Characterisation (IEC 60268-5)](../electroacoustics/loudspeakers.md): the
   radiating piston, the companion radiator model of a duct's open end.
 - API reference: [`noise_control.silencers`](https://jmrplens.github.io/phonometry/reference/api/noise_control/silencers/).
 
@@ -357,7 +357,7 @@ of a decibel (test `tests/noise_control/test_fdtd_crosscheck.py`).
 ---
 
 
-<!-- source: docs/noise-control.md | canonical: https://jmrplens.github.io/phonometry/devices/noise-control/noise-control/ -->
+<!-- source: docs/devices/noise-control/noise-control.md | canonical: https://jmrplens.github.io/phonometry/devices/noise-control/noise-control/ -->
 Source: https://jmrplens.github.io/phonometry/devices/noise-control/noise-control/
 
 # Industrial noise control: HVAC and enclosures
@@ -368,7 +368,7 @@ Hansen & Howard, *Engineering Noise Control* (5th ed., CRC Press 2017):
 **reactive silencers** in a duct (the four-pole transmission-matrix method),
 the passive attenuations and regenerated noise of an **HVAC** run, and the
 insertion loss of a **machine enclosure**. The radiating piston of the
-[loudspeaker guide](https://jmrplens.github.io/phonometry/devices/electroacoustics/loudspeakers/) is the companion radiator model.
+[loudspeaker guide](../electroacoustics/loudspeakers.md) is the companion radiator model.
 
 The three families in one scene: enclose the source, silence the path,
 shield the receiver. Each measure carries the value its section computes,
@@ -377,14 +377,14 @@ here or in the silencer guide.
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_noise_control_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_noise_control.svg" alt="Noise-control scene split into three zones: at the source a machine inside a lined enclosure rated IL = R − C = 25 dB at 500 Hz, along the path a 113 mm duct with a 0.30 m expansion chamber of area ratio 4 peaking at 6.5 dB of transmission loss at 286 Hz, a lined elbow worth 6 dB at 1 kHz and an open end reflecting 18 dB at 63 Hz, and at the receiver an operator cabin rated by the same formula at 31 dB at 1 kHz, with a person standing inside" width="92%"></picture>
 
 The path measure, the silencer itself, has its own guide:
-[Silencers](https://jmrplens.github.io/phonometry/devices/noise-control/silencers/) covers the reactive four-pole method, the
+[Silencers](silencers.md) covers the reactive four-pole method, the
 closed-form expansion chamber, the Helmholtz, quarter-wave and
 extended-tube resonators, the independent FDTD cross-check and the
 trade-off against dissipative linings. This page keeps the rest of the
 installation: what the duct run adds and removes on its own, and what an
 enclosure around the machine actually delivers. Chaining those element
 models end to end, from the fan sound power to the room criterion, is
-[Duct-borne noise: fan to room](https://jmrplens.github.io/phonometry/devices/noise-control/duct-path/).
+[Duct-borne noise: fan to room](duct-path.md).
 
 ## 1. HVAC duct attenuation and flow noise
 
@@ -398,7 +398,7 @@ models end to end, from the fan sound power to the room criterion, is
   Table 8.11).
 - `plenum_attenuation` — the plenum-chamber transmission loss by Wells' method
   (Eq. (8.275)), whose reverberant term uses the plenum
-  [room constant](https://jmrplens.github.io/phonometry/buildings/rooms/room-image-sources/).
+  [room constant](../../buildings/rooms/room-image-sources.md).
 - `flow_noise_straight_duct`, `flow_noise_bend` — the flow-generated (self)
   noise sound power of straight ducts and mitred bends (VDI 2081, Eqs. (8.251),
   (8.254)).
@@ -568,7 +568,7 @@ the interior `room_constant` and `.plot()`.
 ---
 
 
-<!-- source: docs/duct-path.md | canonical: https://jmrplens.github.io/phonometry/devices/noise-control/duct-path/ -->
+<!-- source: docs/devices/noise-control/duct-path.md | canonical: https://jmrplens.github.io/phonometry/devices/noise-control/duct-path/ -->
 Source: https://jmrplens.github.io/phonometry/devices/noise-control/duct-path/
 
 # Duct-borne noise: fan to room
@@ -591,8 +591,8 @@ and 14, whose Table 14.9 is the worked sheet this guide is built around,
 with the ASHRAE *HVAC Applications Handbook* Chapter 49 for the air
 terminal devices and Bies, Hansen & Howard for the splitter silencers and
 the plenums. The reactive four-pole silencers of
-[Silencers](https://jmrplens.github.io/phonometry/devices/noise-control/silencers/) and the rest of the installation methods in
-[Industrial noise control](https://jmrplens.github.io/phonometry/devices/noise-control/noise-control/) are the companion pages.
+[Silencers](silencers.md) and the rest of the installation methods in
+[Industrial noise control](noise-control.md) are the companion pages.
 
 ## 1. The sheet, and how it adds up
 
@@ -811,7 +811,7 @@ print(round(equivalent_diameter(0.36 * 0.24), 3))    # 0.332 m
 thickness, combined by the energy average of Eq. 8.241 so that the leakiest
 airway dominates. `plenum_attenuation` is Wells' method for a lined plenum
 chamber (Bies Eq. (8.275)), whose reverberant term uses the plenum
-[room constant](https://jmrplens.github.io/phonometry/buildings/rooms/room-image-sources/).
+[room constant](../../buildings/rooms/room-image-sources.md).
 
 ```python
 from phonometry import plenum_attenuation, splitter_silencer_insertion_loss
@@ -1130,7 +1130,7 @@ is the point.
 ## 8. The plane-wave limit
 
 Every element model above, and every four-pole silencer in
-[Silencers](https://jmrplens.github.io/phonometry/devices/noise-control/silencers/), is one-dimensional. It assumes a single sound
+[Silencers](silencers.md), is one-dimensional. It assumes a single sound
 pressure describes the whole duct cross section, which is true only below
 the frequency at which the first higher-order acoustic mode cuts on. Above
 it several modes propagate at once, each with its own axial wavenumber, and
@@ -1258,15 +1258,15 @@ survive past cut-on.
 
 ## See also
 
-- [Silencers](https://jmrplens.github.io/phonometry/devices/noise-control/silencers/): the reactive four-pole elements (expansion
+- [Silencers](silencers.md): the reactive four-pole elements (expansion
   chambers, Helmholtz, quarter-wave and extended-tube resonators) whose
   validity ends at the same cut-on frequency.
-- [Industrial noise control](https://jmrplens.github.io/phonometry/devices/noise-control/noise-control/): the rest of the
+- [Industrial noise control](noise-control.md): the rest of the
   installation, the individual HVAC duct methods and machine-enclosure
   insertion loss.
-- [Room-noise criteria (NC / RC Mark II)](https://jmrplens.github.io/phonometry/buildings/rooms/room-noise/): the ANSI/ASA
+- [Room-noise criteria (NC / RC Mark II)](../../buildings/rooms/room-noise.md): the ANSI/ASA
   S12.2-2019 families the received spectrum is judged against.
-- [Steady-state room field](https://jmrplens.github.io/phonometry/buildings/rooms/room-image-sources/): the room constant
+- [Steady-state room field](../../buildings/rooms/room-image-sources.md): the room constant
   behind the room effect and the plenum reverberant term.
 - API reference:
   [`noise_control.duct_path`](https://jmrplens.github.io/phonometry/reference/api/noise_control/duct-path/),
@@ -1307,7 +1307,7 @@ survive past cut-on.
 ---
 
 
-<!-- source: docs/room-to-room.md | canonical: https://jmrplens.github.io/phonometry/devices/noise-control/room-to-room/ -->
+<!-- source: docs/devices/noise-control/room-to-room.md | canonical: https://jmrplens.github.io/phonometry/devices/noise-control/room-to-room/ -->
 Source: https://jmrplens.github.io/phonometry/devices/noise-control/room-to-room/
 
 # Room to room: partition, receiving room, criterion
@@ -1328,10 +1328,10 @@ Analysis for Engineers* (2nd ed., Cambridge University Press 2003),
 Chapter 4: §4.6 for the sound power models, §4.9 for the room-to-room
 balance and §4.10 for the enclosure. Its problems 4.16, 4.18 and 4.21 carry
 printed octave-band answers, and all three are pinned in the
-[conformance report](https://jmrplens.github.io/phonometry/reference/conformance/).
+[conformance report](../../CONFORMANCE.md).
 
 Where the *partition itself* comes from is a different question, answered by
-[Panel sound insulation](https://jmrplens.github.io/phonometry/buildings/design/panel-sound-insulation/) (mass law, coincidence,
+[Panel sound insulation](../../buildings/design/panel-sound-insulation.md) (mass law, coincidence,
 double leaves, the plateau method) or by measurement. This page takes the
 transmission loss as given, exactly as a hand calculation does.
 
@@ -1554,7 +1554,7 @@ The deficit and the exceedance are the same six numbers, which is the whole
 content of the chain: a decibel too much in the room is a decibel too little
 in the wall. Whether that low-frequency deficit is worth chasing with mass,
 a cavity or a second leaf is what
-[Panel sound insulation](https://jmrplens.github.io/phonometry/buildings/design/panel-sound-insulation/) is for.
+[Panel sound insulation](../../buildings/design/panel-sound-insulation.md) is for.
 
 The verdict is deliberately the band-by-band test, not the rating. A
 spectrum can rate NC-38 and still poke through the NC 45 curve in one band,
@@ -1660,8 +1660,8 @@ print(np.round(honest.received_level, 1))
 
 Where the flanking paths *are* modelled rather than allowed for, the
 prediction models of EN 12354 are the right tool, and those live in
-[Building sound insulation prediction](https://jmrplens.github.io/phonometry/buildings/design/insulation-prediction/) and
-[Flanking transmission](https://jmrplens.github.io/phonometry/buildings/insulation/flanking-lab/).
+[Building sound insulation prediction](../../buildings/design/insulation-prediction.md) and
+[Flanking transmission](../../buildings/insulation/flanking-lab.md).
 
 The other assumption is diffusivity. Equation (4.101) is a diffuse-field
 balance in both rooms, so it has nothing to say below each room's Schroeder

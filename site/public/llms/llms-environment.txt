@@ -4,7 +4,7 @@ Part of https://jmrplens.github.io/phonometry/llms.txt. Full text of the pages i
 
 ---
 
-<!-- source: docs/environmental-levels.md | canonical: https://jmrplens.github.io/phonometry/environment/environmental-levels/ -->
+<!-- source: docs/environment/environmental-levels.md | canonical: https://jmrplens.github.io/phonometry/environment/environmental-levels/ -->
 Source: https://jmrplens.github.io/phonometry/environment/environmental-levels/
 
 # Environmental Levels (ISO 1996-1/-2)
@@ -22,7 +22,7 @@ uncertainty budget.
 The level-computation half of the topic, the $L_{eq}$/$L_{Aeq}$ integrals,
 the percentile levels $L_N$, SEL and the noise dose that produce the period
 levels this page consumes, is
-[Integrated and Statistical Levels](https://jmrplens.github.io/phonometry/signal/levels/levels/); everything here assumes
+[Integrated and Statistical Levels](../signal/levels/levels.md); everything here assumes
 those per-period values are already in hand.
 
 ## Environmental noise: Lden, Ldn and rating levels (ISO 1996-1)
@@ -100,9 +100,9 @@ Where you put the microphone changes the number: ISO 1996-2 fixes the receiver p
 Combine with `laeq()` per time period to go from recordings to $L_{den}$. The
 tonal adjustment itself is justified by the tonal audibility route of the next
 section (fed, for the ISO/PAS 20065 method, by
-[Objective audibility of tones in noise](https://jmrplens.github.io/phonometry/perception/psychoacoustics/tone-audibility/));
+[Objective audibility of tones in noise](../perception/psychoacoustics/tone-audibility.md));
 the `tone_to_noise_ratio()` / `prominence_ratio()` verdicts of
-[Prominent Discrete Tones](https://jmrplens.github.io/phonometry/perception/psychoacoustics/tone-prominence/) are
+[Prominent Discrete Tones](../perception/psychoacoustics/tone-prominence.md) are
 complementary emission screening, not the $K_t$ basis.
 
 ## Determining levels: tonal adjustment, residual noise and uncertainty (ISO 1996-2)
@@ -189,14 +189,14 @@ $L_{dn}$ (3.6.5) keeps only the +10 dB night penalty.
 
 ## See also
 
-- [Integrated and Statistical Levels](https://jmrplens.github.io/phonometry/signal/levels/levels/): the $L_{eq}$/$L_{Aeq}$,
+- [Integrated and Statistical Levels](../signal/levels/levels.md): the $L_{eq}$/$L_{Aeq}$,
   percentile and event levels the indicators of this page are assembled from.
-- [Objective audibility of tones in noise](https://jmrplens.github.io/phonometry/perception/psychoacoustics/tone-audibility/): the tonal
+- [Objective audibility of tones in noise](../perception/psychoacoustics/tone-audibility.md): the tonal
   audibility whose mean value maps to the $K_t$ adjustment (Table J.1).
-- [Prominent Discrete Tones](https://jmrplens.github.io/phonometry/perception/psychoacoustics/tone-prominence/): the ECMA-418-1
+- [Prominent Discrete Tones](../perception/psychoacoustics/tone-prominence.md): the ECMA-418-1
   tone-to-noise and prominence-ratio verdicts, complementary emission
   screening for the tonal question.
-- [Occupational Noise Exposure](https://jmrplens.github.io/phonometry/perception/hearing/occupational-exposure/): the workplace
+- [Occupational Noise Exposure](../perception/hearing/occupational-exposure.md): the workplace
   counterpart, from task samples to the daily exposure level with its
   uncertainty budget.
 - API reference: [`environment.assessment.measurement`](https://jmrplens.github.io/phonometry/reference/api/environment/measurement/)
@@ -225,7 +225,7 @@ Annex F measurement uncertainty budget.
 ---
 
 
-<!-- source: docs/spanish-noise-regulation.md | canonical: https://jmrplens.github.io/phonometry/environment/spanish-noise-regulation/ -->
+<!-- source: docs/environment/spanish-noise-regulation.md | canonical: https://jmrplens.github.io/phonometry/environment/spanish-noise-regulation/ -->
 Source: https://jmrplens.github.io/phonometry/environment/spanish-noise-regulation/
 
 # Spanish Noise Regulation (RD 1367/2007)
@@ -240,9 +240,9 @@ annual value, and that value is compared against three different criteria read
 off the same limit table. This page implements that chain end to end.
 
 The per-period levels that feed it come from
-[Integrated & Statistical Levels](https://jmrplens.github.io/phonometry/signal/levels/levels/), and the European
+[Integrated & Statistical Levels](../signal/levels/levels.md), and the European
 $L_{den}$/$L_{dn}$ indicators they coexist with, from
-[Environmental levels](https://jmrplens.github.io/phonometry/environment/environmental-levels/).
+[Environmental levels](environmental-levels.md).
 
 ## The corrected level LKeq and its three corrections
 
@@ -519,15 +519,15 @@ exceeds 9 dB.
 
 ## See also
 
-- [Environmental levels](https://jmrplens.github.io/phonometry/environment/environmental-levels/): the $L_{den}$ and $L_{dn}$
+- [Environmental levels](environmental-levels.md): the $L_{den}$ and $L_{dn}$
   indicators and the ISO 1996-2 adjustments the corrections of the regulation
   coexist with.
-- [Integrated & Statistical Levels](https://jmrplens.github.io/phonometry/signal/levels/levels/): the per-phase $L_{Aeq}$,
+- [Integrated & Statistical Levels](../signal/levels/levels.md): the per-phase $L_{Aeq}$,
   $L_{Ceq}$ and $L_{AIeq}$ levels that feed the three corrections.
-- [Spanish Building Code (CTE DB-HR)](https://jmrplens.github.io/phonometry/buildings/insulation/spanish-building-code/): the other half
+- [Spanish Building Code (CTE DB-HR)](../buildings/insulation/spanish-building-code.md): the other half
   of the Spanish framework, which shares the site's day noise index $L_d$ with
   this page.
-- [Impulsive-sound prominence](https://jmrplens.github.io/phonometry/environment/assessment/impulsive-sound/): the ISO/PAS 1996-3
+- [Impulsive-sound prominence](assessment/impulsive-sound.md): the ISO/PAS 1996-3
   impulsive adjustment, the relative of $K_i$ that is not interchangeable with
   it.
 - API reference: [`environment.assessment.spain`](https://jmrplens.github.io/phonometry/reference/api/environment/spain/).

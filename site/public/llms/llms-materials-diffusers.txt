@@ -4,7 +4,7 @@ Part of https://jmrplens.github.io/phonometry/llms.txt. Full text of the pages i
 
 ---
 
-<!-- source: docs/diffusers.md | canonical: https://jmrplens.github.io/phonometry/materials/diffusers/diffusers/ -->
+<!-- source: docs/materials/diffusers/diffusers.md | canonical: https://jmrplens.github.io/phonometry/materials/diffusers/diffusers/ -->
 Source: https://jmrplens.github.io/phonometry/materials/diffusers/diffusers/
 
 # Diffusers and Their Coefficients
@@ -27,7 +27,7 @@ scattering is *how much* energy leaves the specular direction; diffusion is
 the distinction precise. The deep-subwavelength relatives of the Schroeder
 designs treated here, panels a few centimetres thick that scatter like wells
 tens of centimetres deep, have their own guide:
-[Metadiffusers](https://jmrplens.github.io/phonometry/materials/diffusers/metadiffusers/).
+[Metadiffusers](metadiffusers.md).
 
 ## 1. Random-incidence scattering coefficient (ISO 17497-1)
 
@@ -427,7 +427,7 @@ A handful of design rules follow directly from the geometry:
 - **The design frequency sets the depth.** The deepest well is
   $d_{max} = \max(s_n)\,\lambda_0/(2N)$, close to half a wavelength for large
   $N$; halve $f_0$ and the diffuser gets twice as deep. This is the cost that
-  the [metadiffuser](https://jmrplens.github.io/phonometry/materials/diffusers/metadiffusers/) attacks: at 500 Hz an $N = 5$ design
+  the [metadiffuser](metadiffusers.md) attacks: at 500 Hz an $N = 5$ design
   already calls for wells 27.4 cm deep.
 - **The sequence repeats what the prime provides.** $s_n$ is symmetric about
   $n = 0$ and periodic in $N$, so one period has $N$ wells and the profile is
@@ -594,16 +594,16 @@ no longer small against the wavelength; a frequency-blind single number
 
 ## See also
 
-- [Metadiffusers](https://jmrplens.github.io/phonometry/materials/diffusers/metadiffusers/): the deep-subwavelength version of the
+- [Metadiffusers](metadiffusers.md): the deep-subwavelength version of the
   Schroeder designs of section 3, slits loaded by Helmholtz resonators that
   reach the same reflection phases from a panel a few centimetres thick.
-- [In-situ Road-Surface Absorption](https://jmrplens.github.io/phonometry/materials/surfaces/road-absorption/): the other surface
+- [In-situ Road-Surface Absorption](../surfaces/road-absorption.md): the other surface
   family measured in the field rather than the laboratory, with the ISO 13472
   subtraction and spot methods.
-- [Sound Absorption Measurement and Rating](https://jmrplens.github.io/phonometry/materials/absorbers/absorption-measurement/): the
+- [Sound Absorption Measurement and Rating](../absorbers/absorption-measurement.md): the
   same reverberation room used by ISO 17497-1, measuring absorption instead of
   scattering.
-- [Outdoor Sound Propagation](https://jmrplens.github.io/phonometry/environment/propagation/outdoor-propagation/): the full ISO 9613-1
+- [Outdoor Sound Propagation](../../environment/propagation/outdoor-propagation.md): the full ISO 9613-1
   atmospheric-absorption model whose pure-tone coefficient the ISO 17497-1
   air-attenuation relations consume.
 - API reference: [`materials.diffusers.scattering_diffusion`](https://jmrplens.github.io/phonometry/reference/api/materials/scattering-diffusion/) and [`materials.diffusers.design`](https://jmrplens.github.io/phonometry/reference/api/materials/design/).
@@ -655,20 +655,20 @@ ISO 17497-1:2004+A1:2014 (scattering coefficient), ISO 17497-2:2012 (diffusion
 coefficient), and ISO 9613-1:1993, from which only the pure-tone attenuation
 coefficient $\alpha$ consumed by the ISO 17497-1 Clause 8 air-attenuation relations
 (Eqs. (2)/(3)); the full atmospheric-absorption model is covered in
-[Outdoor Sound Propagation](https://jmrplens.github.io/phonometry/environment/propagation/outdoor-propagation/). Numerical conformance
+[Outdoor Sound Propagation](../../environment/propagation/outdoor-propagation.md). Numerical conformance
 against the standards' worked examples and closed forms is tracked in
-[CONFORMANCE.md](https://jmrplens.github.io/phonometry/reference/conformance/).
+[CONFORMANCE.md](../../CONFORMANCE.md).
 
 ---
 
 
-<!-- source: docs/metadiffusers.md | canonical: https://jmrplens.github.io/phonometry/materials/diffusers/metadiffusers/ -->
+<!-- source: docs/materials/diffusers/metadiffusers.md | canonical: https://jmrplens.github.io/phonometry/materials/diffusers/metadiffusers/ -->
 Source: https://jmrplens.github.io/phonometry/materials/diffusers/metadiffusers/
 
 # Metadiffusers
 
 A Schroeder diffuser earns its diffusion with depth: the
-[design equations](https://jmrplens.github.io/phonometry/materials/diffusers/diffusers/) turn a phase sequence into wells whose maximum
+[design equations](diffusers.md) turn a phase sequence into wells whose maximum
 depth approaches half the design wavelength, so a diffuser for the low hundreds of hertz
 is tens of centimetres thick, and that thickness is what keeps phase-grating
 diffusers out of small rooms, studios and vehicles. A **metadiffuser**
@@ -683,7 +683,7 @@ that maps any Schroeder sequence onto a deep-subwavelength panel.
 ## 1. Slow sound in a loaded slit
 
 The unit cell is the same one the
-[slow-sound absorber](https://jmrplens.github.io/phonometry/materials/absorbers/metamaterial-absorbers/) is built from: a slit of
+[slow-sound absorber](../absorbers/metamaterial-absorbers.md) is built from: a slit of
 height $h_n$ runs the depth $L$ of the panel and is loaded, along its upper
 wall, by an array of Helmholtz resonators on a lattice step $a$. The slit
 chain is evaluated with the transfer-matrix method,
@@ -713,7 +713,7 @@ absorbers:
   one. A phase profile that a classical grating writes with depth, the
   metadiffuser writes with resonator tuning.
 - **Critical coupling adds a third state.** Driving one slit to
-  [critical coupling](https://jmrplens.github.io/phonometry/materials/absorbers/metamaterial-absorbers/) balances its visco-thermal
+  [critical coupling](../absorbers/metamaterial-absorbers.md) balances its visco-thermal
   loss against its leakage and produces a reflection zero: $R_n \approx 0$.
   Ternary sequences (reflection values $+1$, $-1$, $0$) need exactly that
   perfectly absorbing state, which no rigid well can provide.
@@ -723,7 +723,7 @@ resonators, visco-thermal losses and end corrections included) and returns the
 per-well complex reflection $R_n(f)$; `metadiffuser_polar_response` and
 `metadiffuser_diffusion_spectrum` reduce that spatial profile through the same
 Fraunhofer far field and ISO 17497-2 coefficient used for the
-[classical designs](https://jmrplens.github.io/phonometry/materials/diffusers/diffusers/). A `None` entry in the well sequence stands
+[classical designs](diffusers.md). A `None` entry in the well sequence stands
 for a flat rigid strip ($R = 1$), the $+1$ state of ternary designs.
 
 ## 2. The published quadratic-residue metadiffuser
@@ -838,7 +838,7 @@ necks and cavities included) and lets the same 2 kHz wavefront hit them: the
 ## 3. The design recipe: phases first, geometry second
 
 Designing a metadiffuser is a two-step translation. First pick the Schroeder
-sequence exactly as for a [classical design](https://jmrplens.github.io/phonometry/materials/diffusers/diffusers/): the quadratic
+sequence exactly as for a [classical design](diffusers.md): the quadratic
 residues $s_n = n^2 \bmod N$ give the target well depths
 $d_n = s_n \lambda_0/(2N)$ and hence the target reflection phases
 $\varphi_n = -2 k d_n$ at the evaluation frequency. Second, tune each slit
@@ -893,15 +893,15 @@ both against the same-footprint flat reference of ISO 17497-2 Formula (7).
 
 ## See also
 
-- [Diffusers and Their Coefficients](https://jmrplens.github.io/phonometry/materials/diffusers/diffusers/): the ISO 17497-1/-2
+- [Diffusers and Their Coefficients](diffusers.md): the ISO 17497-1/-2
   coefficients this panel is graded by, and the classical Schroeder designs
   whose phase sequences it borrows.
-- [Metamaterial Absorbers](https://jmrplens.github.io/phonometry/materials/absorbers/metamaterial-absorbers/): the same slit and
+- [Metamaterial Absorbers](../absorbers/metamaterial-absorbers.md): the same slit and
   resonator cell tuned for perfect absorption instead of controlled phase,
   with the critical-coupling theory behind the ternary `0` state.
-- [Porous and Multilayer Absorbers](https://jmrplens.github.io/phonometry/materials/absorbers/porous-absorbers/): the classical
+- [Porous and Multilayer Absorbers](../absorbers/porous-absorbers.md): the classical
   equivalent-fluid and resonant layers the metamaterial cells are built from.
-- [2D FDTD wave simulation](https://jmrplens.github.io/phonometry/simulation/fdtd-simulation/): the wave solver behind the
+- [2D FDTD wave simulation](../../simulation/fdtd-simulation.md): the wave solver behind the
   animation above, meshing the real slit and resonator geometry.
 - API reference: [`materials.diffusers.metadiffuser`](https://jmrplens.github.io/phonometry/reference/api/materials/metadiffuser/) and [`materials.diffusers.design`](https://jmrplens.github.io/phonometry/reference/api/materials/design/).
 
@@ -952,10 +952,10 @@ both against the same-footprint flat reference of ISO 17497-2 Formula (7).
 No standard governs the metadiffuser model itself; it is a journal method
 (Jiménez et al. 2017) implemented clean-room from the cited sources. Its
 output is graded by ISO 17497-2:2012 (diffusion coefficient), covered in
-[Diffusers and Their Coefficients](https://jmrplens.github.io/phonometry/materials/diffusers/diffusers/), and its unit cell is the
+[Diffusers and Their Coefficients](diffusers.md), and its unit cell is the
 slit and Helmholtz-resonator chain of
-[Metamaterial Absorbers](https://jmrplens.github.io/phonometry/materials/absorbers/metamaterial-absorbers/). Numerical conformance
+[Metamaterial Absorbers](../absorbers/metamaterial-absorbers.md). Numerical conformance
 against the published designs and closed forms is tracked in
-[CONFORMANCE.md](https://jmrplens.github.io/phonometry/reference/conformance/).
+[CONFORMANCE.md](../../CONFORMANCE.md).
 
 ---

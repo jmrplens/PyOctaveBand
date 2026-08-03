@@ -4,7 +4,7 @@ Part of https://jmrplens.github.io/phonometry/llms.txt. Full text of the pages i
 
 ---
 
-<!-- source: docs/sound-level-meter.md | canonical: https://jmrplens.github.io/phonometry/signal/sound-level-meter/ -->
+<!-- source: docs/signal/sound-level-meter.md | canonical: https://jmrplens.github.io/phonometry/signal/sound-level-meter/ -->
 Source: https://jmrplens.github.io/phonometry/signal/sound-level-meter/
 
 # Build a sound level meter
@@ -66,7 +66,7 @@ cal = metrology.sensitivity(calibrator, target_spl=94.0, fs=fs)
 # calibration_factor. For this synthetic tone it is ~1.0.
 ```
 
-Deep guide: [Calibration and dBFS](https://jmrplens.github.io/phonometry/signal/metrology/calibration/), which
+Deep guide: [Calibration and dBFS](metrology/calibration.md), which
 also covers calibrating from a known microphone sensitivity and the digital
 dBFS mode used when no physical reference exists.
 
@@ -92,8 +92,8 @@ this Fast envelope for you. The energy metrics ($L_{eq}$, SEL) integrate the
 squared weighted signal directly, with no ballistics, exactly as a meter
 does. The chain is shown here because it *is* the meter's display.
 
-Deep guides: [Frequency Weighting (A, C, Z)](https://jmrplens.github.io/phonometry/signal/levels/weighting/)
-and [Time Weighting](https://jmrplens.github.io/phonometry/signal/levels/time-weighting/).
+Deep guides: [Frequency Weighting (A, C, Z)](levels/weighting.md)
+and [Time Weighting](levels/time-weighting.md).
 
 ## 4. Integrate: the numbers a meter reports
 
@@ -121,9 +121,9 @@ nine-times-longer background gets back in duration), $L_{AE}$ is $L_{Aeq}$
 plus $10\log_{10}$ of the 10 s duration, and $L_{90}$ barely notices the event at
 all.
 
-Deep guide: [Integrated and Statistical Levels](https://jmrplens.github.io/phonometry/signal/levels/levels/),
+Deep guide: [Integrated and Statistical Levels](levels/levels.md),
 which adds noise dose and octave spectrograms; the $L_{den}$ and rating levels
-continue in [Environmental levels](https://jmrplens.github.io/phonometry/environment/environmental-levels/).
+continue in [Environmental levels](../environment/environmental-levels.md).
 
 ## 5. Band-filter: the spectrum view (IEC 61260-1)
 
@@ -141,10 +141,10 @@ spl, bands = filters.octave_filter(
 print(dict(zip(bands, np.round(spl, 1))))
 ```
 
-Deep guides: [Filter Banks](https://jmrplens.github.io/phonometry/signal/filters/filter-banks/) for the filter
+Deep guides: [Filter Banks](filters/filter-banks.md) for the filter
 architectures and zero-phase mode,
-[Block Processing](https://jmrplens.github.io/phonometry/signal/filters/block-processing/) for streaming, and
-[Multichannel and Performance](https://jmrplens.github.io/phonometry/signal/filters/multichannel/) for arrays.
+[Block Processing](filters/block-processing.md) for streaming, and
+[Multichannel and Performance](filters/multichannel.md) for arrays.
 
 ## 6. Verify: is this meter class 1?
 
@@ -165,22 +165,22 @@ print(filters.verify_filter_class(bank)["overall_class"])    # 1
 
 The verdicts also come per band, so you can see exactly where a design would
 leave its class corridor. Deep guides:
-[Frequency Weighting](https://jmrplens.github.io/phonometry/signal/levels/weighting/) (section on class
-verification) and [Filter class verification](https://jmrplens.github.io/phonometry/signal/filters/filter-compliance/) (the
+[Frequency Weighting](levels/weighting.md) (section on class
+verification) and [Filter class verification](filters/filter-compliance.md) (the
 Table 1 mask, class 0 and the compliance fiche).
 
 ## Where to go next
 
 The meter built here is the trunk; the rest of the core grows from it.
 
-- [Measurement uncertainty (GUM and Monte Carlo)](https://jmrplens.github.io/phonometry/signal/metrology/gum-uncertainty/):
+- [Measurement uncertainty (GUM and Monte Carlo)](metrology/gum-uncertainty.md):
   attach an uncertainty to the $L_{Aeq}$ you just computed, calibration term
   included.
-- [Calibrated spectral analysis](https://jmrplens.github.io/phonometry/signal/spectra/spectral-analysis/): when
+- [Calibrated spectral analysis](spectra/spectral-analysis.md): when
   bands are too coarse, the Welch PSD with confidence intervals.
-- [Correlation, time delay and envelope](https://jmrplens.github.io/phonometry/signal/spectra/correlation-delay/):
+- [Correlation, time delay and envelope](spectra/correlation-delay.md):
   two microphones instead of one, and the delay between them.
-- [Block Processing](https://jmrplens.github.io/phonometry/signal/filters/block-processing/): turn this page's
+- [Block Processing](filters/block-processing.md): turn this page's
   offline meter into a streaming one with carried filter state.
 
 ## See also

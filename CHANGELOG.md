@@ -1061,6 +1061,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   from the top level; from `phonometry.filters` it still resolves until 5.0,
   with the usual notice.
 
+- The `docs/` mirror is laid out like the site it mirrors:
+  `docs/signal/filters/filter-banks.md` for `/signal/filters/filter-banks/`,
+  with `docs/README.md` still the index. The pairing that publishes a markdown
+  copy of every page, and the one that builds `llms.txt`, are by route now
+  rather than by file name, so the table of pages whose mirror name differed
+  from their route is gone: there is nothing left for it to hold.
+
 - The documentation site is organised by topic rather than by one `guides/`
   drawer. Every page lives under the domain it belongs to, and the URL says so:
   `signal/filters/filter-banks`, `buildings/insulation/insulation-field`,

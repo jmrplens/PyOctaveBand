@@ -57,22 +57,6 @@ SHARD_LIMIT_BYTES = 200_000
 #: Markdown files under docs/ that are not documentation pages.
 NOT_PAGES = frozenset({"README", "CONFORMANCE", "ERRATA"})
 
-#: The handful of pages whose docs/ filename does not match its site route.
-#: Everything else is matched by filename, so this table only grows when a page
-#: is deliberately renamed on the way to the site.
-ROUTE_OVERRIDES = {
-    "api-reference": "reference/api",
-    "references": "reference/bibliography",
-    "theory": "reference/theory",
-    "theory-signal-analysis": "reference/theory/signal-analysis",
-    "theory-perception": "reference/theory/perception",
-    "theory-rooms-buildings": "reference/theory/rooms-buildings",
-    "theory-materials-surfaces": "reference/theory/materials-surfaces",
-    "theory-environment-transport": "reference/theory/environment-transport",
-    "theory-vibration": "reference/theory/vibration",
-    "impulse-prominence": "environment/assessment/impulsive-sound",
-}
-
 #: The documented topics, in the order the landing page lists them. Each is a
 #: folder of `content/docs/` whose `index` page links the guides inside it, so
 #: the grouping follows the content rather than a second hand-kept list.
@@ -113,45 +97,38 @@ def _conformance_counts() -> tuple[int, int, int]:
     return int(match[1]), int(match[2]), int(match[3])
 
 
-def _site_routes() -> dict[str, str]:
-    """Site page stem -> route, for the English tree, API pages excluded."""
-    routes: dict[str, str] = {}
-    for path in sorted(CONTENT.rglob("*.md*")):
-        rel = path.relative_to(CONTENT)
-        if rel.parts[0] == "es" or rel.parts[:2] == ("reference", "api"):
-            continue
-        if path.stem == "index":
-            # Topic and subgroup overviews. They share their stem with each
-            # other and their route is the folder, so they are matched by the
-            # topic tables below rather than by filename.
-            continue
-        routes[path.stem] = rel.with_suffix("").as_posix()
-    return routes
-
-
 def _routes() -> list[tuple[str, str]]:
-    """Every docs/ page as ``(filename, site route)``.
+    """Every docs/ page as ``(path under docs/, site route)``.
 
-    Raises if a page cannot be placed: an unmapped page would otherwise vanish
-    from llms.txt silently, which is exactly how the hand-kept list rotted.
+    The mirror is laid out like the site, so the route is the path: the page
+    at ``docs/signal/filters/filter-banks.md`` is published at
+    ``/signal/filters/filter-banks/``. Raises if a mirror page has no page on
+    the site, which would otherwise vanish from llms.txt silently, exactly how
+    the hand-kept list rotted.
     """
-    site = _site_routes()
     pages: list[tuple[str, str]] = []
     unmapped: list[str] = []
-    for path in sorted(DOCS.glob("*.md")):
-        if path.stem in NOT_PAGES:
+    for path in sorted(DOCS.rglob("*.md")):
+        if path.parent == DOCS and path.stem in NOT_PAGES:
             continue
-        route = ROUTE_OVERRIDES.get(path.stem) or site.get(path.stem)
-        if route is None:
-            unmapped.append(path.name)
+        route = path.relative_to(DOCS).with_suffix("").as_posix()
+        # A folder's own page is `<folder>/index.md`, as on the site.
+        route = route.removesuffix("/index")
+        published = any(
+            (CONTENT / f"{route}{ext}").exists() for ext in (".md", ".mdx")
+        ) or any(
+            (CONTENT / route / f"index{ext}").exists() for ext in (".md", ".mdx")
+        )
+        if not published:
+            unmapped.append(route)
             continue
-        pages.append((path.name, route))
+        pages.append((path.relative_to(DOCS).as_posix(), route))
     if unmapped:
         raise SystemExit(
-            "generate_llms.py: no site route for "
-            + ", ".join(f"docs/{name}" for name in unmapped)
-            + ". Add it to ROUTE_OVERRIDES if the page is renamed on the way to "
-            "the site, or delete the file if the page is gone."
+            "generate_llms.py: no site page for "
+            + ", ".join(f"docs/{route}.md" for route in unmapped)
+            + ". The mirror mirrors the site: move the file to the route its "
+            "page has, or delete it if the page is gone."
         )
     return pages
 

@@ -68,7 +68,7 @@ def corpus(tmp_path: pathlib.Path) -> pathlib.Path:
     root = tmp_path / "repo"
     _write(root / "docs" / "CONFORMANCE.md", REPORT)
     _write(
-        root / "docs" / "getting-started.md",
+        root / "docs" / "start" / "getting-started.md",
         f"- [Conformance report](CONFORMANCE.md): the value of all "
         f"{OLD_TOTAL} checks\n"
         f"The suite runs {OLD_TOTAL} numerical conformance checks across "
@@ -124,7 +124,7 @@ def test_check_reports_every_stale_claim(corpus, capsys):
     assert _run(corpus) == 1
     errors = capsys.readouterr().err
     for quoted in (
-        "docs/getting-started.md",
+        "docs/start/getting-started.md",
         "site/src/content/docs/index.mdx",
         "site/src/content/docs/es/index.mdx",
         ".zenodo.json",
@@ -140,7 +140,7 @@ def test_write_moves_every_quoted_count(corpus, capsys):
     assert _run(corpus, "--write") == 0
     assert "Rewrote" in capsys.readouterr().out
 
-    started = (corpus / "docs" / "getting-started.md").read_text(encoding="utf8")
+    started = (corpus / "docs" / "start" / "getting-started.md").read_text(encoding="utf8")
     assert f"all {TOTAL} checks" in started
     assert (
         f"{TOTAL} numerical conformance checks across {DOMAINS} domains and "
@@ -175,7 +175,7 @@ def test_write_leaves_the_decoys_alone(corpus):
     """
     assert _run(corpus, "--write") == 0
 
-    started = (corpus / "docs" / "getting-started.md").read_text(encoding="utf8")
+    started = (corpus / "docs" / "start" / "getting-started.md").read_text(encoding="utf8")
     assert started.endswith(DECOY_LINES)
     assert f"one for each of the {OLD_TOTAL} rows of Annex {OLD_DOMAINS}." in started
 

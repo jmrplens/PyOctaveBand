@@ -4,7 +4,7 @@ Part of https://jmrplens.github.io/phonometry/llms.txt. Full text of the pages i
 
 ---
 
-<!-- source: docs/hearing-threshold.md | canonical: https://jmrplens.github.io/phonometry/perception/hearing/hearing-threshold/ -->
+<!-- source: docs/perception/hearing/hearing-threshold.md | canonical: https://jmrplens.github.io/phonometry/perception/hearing/hearing-threshold/ -->
 Source: https://jmrplens.github.io/phonometry/perception/hearing/hearing-threshold/
 
 # Hearing threshold (age and reference zero)
@@ -116,7 +116,7 @@ audiogram would show, $H' = H + N - HN/120$, at the same fractile. In
 practice that means the two guides chain: pick the population and fractile
 here, add the exposure there, and compare the result, never the noise
 component alone, against a measured audiogram.
-[Noise-induced hearing loss](https://jmrplens.github.io/phonometry/perception/hearing/noise-induced-hearing-loss/) picks the chain up
+[Noise-induced hearing loss](noise-induced-hearing-loss.md) picks the chain up
 at that point.
 
 ## 2. Reference threshold of hearing (ISO 389-7)
@@ -172,17 +172,17 @@ The `AgeThresholdResult` carries the `median`, the `spread_upper` and
 `.plot()` draws the median with the 10–90 % band. The noise-induced permanent
 threshold shift of ISO 1999, which adds a noise component on top of this age
 component, is the subject of the
-[noise-induced hearing loss](https://jmrplens.github.io/phonometry/perception/hearing/noise-induced-hearing-loss/) guide.
+[noise-induced hearing loss](noise-induced-hearing-loss.md) guide.
 
 ## See also
 
-- [Noise-induced hearing loss](https://jmrplens.github.io/phonometry/perception/hearing/noise-induced-hearing-loss/): the ISO 1999 model
+- [Noise-induced hearing loss](noise-induced-hearing-loss.md): the ISO 1999 model
   that adds the noise component on top of this age component.
-- [Speech Intelligibility Index](https://jmrplens.github.io/phonometry/perception/speech/speech-intelligibility/): a raised threshold as
+- [Speech Intelligibility Index](../speech/speech-intelligibility.md): a raised threshold as
   an input, and what it costs in speech audibility.
-- [Loudness](https://jmrplens.github.io/phonometry/perception/psychoacoustics/loudness/): the ISO 226:2023 threshold of hearing, the free-field
+- [Loudness](../psychoacoustics/loudness.md): the ISO 226:2023 threshold of hearing, the free-field
   pure-tone counterpart of the audiometric zero of section 2.
-- [Occupational noise exposure](https://jmrplens.github.io/phonometry/perception/hearing/occupational-exposure/): the ISO 9612 daily
+- [Occupational noise exposure](occupational-exposure.md): the ISO 9612 daily
   exposure level that drives the noise component.
 
 ## References
@@ -212,7 +212,7 @@ conditions* (Table 1).
 ---
 
 
-<!-- source: docs/occupational-exposure.md | canonical: https://jmrplens.github.io/phonometry/perception/hearing/occupational-exposure/ -->
+<!-- source: docs/perception/hearing/occupational-exposure.md | canonical: https://jmrplens.github.io/phonometry/perception/hearing/occupational-exposure/ -->
 Source: https://jmrplens.github.io/phonometry/perception/hearing/occupational-exposure/
 
 # Occupational Noise Exposure (ISO 9612)
@@ -220,7 +220,7 @@ Source: https://jmrplens.github.io/phonometry/perception/hearing/occupational-ex
 A working day is rarely measured in one take: the daily exposure level a
 regulation acts on has to be assembled from *samples* of a real shift, and
 reported with an uncertainty a hygienist can defend. `lex_8h` (in
-[Levels](https://jmrplens.github.io/phonometry/signal/levels/levels/)) turns *one* recording into a daily level. ISO 9612:2009,
+[Levels](../../signal/levels/levels.md)) turns *one* recording into a daily level. ISO 9612:2009,
 the engineering method (accuracy grade 2), is the survey design *around* that
 primitive: how to sample a real working day, how to combine the pieces, and how
 to attach the normative uncertainty every occupational-hygiene report needs. The
@@ -368,7 +368,7 @@ levels $L_{p,Cpeak}$ are reported **without** an uncertainty: Annex C gives no
 method for them (Table C.5, Note 1), so peak-uncertainty is out of scope. The
 three Annex D/E/F worked examples above are reproduced to the standard's printed
 precision (Annex E's final rounding is disclosed above), and the theory is
-derived on the [Theory](https://jmrplens.github.io/phonometry/reference/theory/environment-transport/) page.
+derived on the [Theory](../../reference/theory/environment-transport.md) page.
 
 ### `task_based_exposure()` / `job_based_exposure()` / `full_day_exposure()` parameters
 
@@ -441,11 +441,11 @@ Annex D task-based day with the Directive 2003/10/EC assessment.*
 
 ## See also
 
-- [Levels](https://jmrplens.github.io/phonometry/signal/levels/levels/): the `lex_8h` / `sound_exposure` dose primitives
+- [Levels](../../signal/levels/levels.md): the `lex_8h` / `sound_exposure` dose primitives
   (IEC 61252) and the $L_{Cpeak}$ these strategies report alongside.
-- [Measurement uncertainty](https://jmrplens.github.io/phonometry/signal/metrology/gum-uncertainty/): the GUM machinery behind
+- [Measurement uncertainty](../../signal/metrology/gum-uncertainty.md): the GUM machinery behind
   combined and expanded uncertainties.
-- [Theory](https://jmrplens.github.io/phonometry/reference/theory/environment-transport/): the derivation of the strategy formulas and the
+- [Theory](../../reference/theory/environment-transport.md): the derivation of the strategy formulas and the
   Annex C budget.
 - API reference: [`hearing.occupational_exposure`](https://jmrplens.github.io/phonometry/reference/api/hearing/occupational-exposure/).
 
@@ -485,7 +485,7 @@ and F.
 ---
 
 
-<!-- source: docs/noise-induced-hearing-loss.md | canonical: https://jmrplens.github.io/phonometry/perception/hearing/noise-induced-hearing-loss/ -->
+<!-- source: docs/perception/hearing/noise-induced-hearing-loss.md | canonical: https://jmrplens.github.io/phonometry/perception/hearing/noise-induced-hearing-loss/ -->
 Source: https://jmrplens.github.io/phonometry/perception/hearing/noise-induced-hearing-loss/
 
 # Noise-induced hearing loss (ISO 1999)
@@ -640,7 +640,7 @@ symbol means, because they are easy to conflate:
   loss the noise causes, and nothing else. It is what an ideal hearing-
   conservation programme would prevent. On its own it is not an audiogram.
 - **HTLA** ($H$) is the *age* threshold alone (the ISO 7029 component of the
-  [hearing-threshold](https://jmrplens.github.io/phonometry/perception/hearing/hearing-threshold/) guide), the loss the same person
+  [hearing-threshold](hearing-threshold.md) guide), the loss the same person
   would have with no occupational noise.
 - **HTLAN** ($H'$) is the *total* threshold: age **and** noise combined by
   Formula (1). This is what an audiometer measures, and the only one of the
@@ -672,7 +672,7 @@ The `NiptsResult` carries the `median` ($N_{50}$), the
 `spread_upper`/`spread_lower`
 and the `value` at the requested fractile; the `HtlanResult` carries `htla`,
 `nipts` and the combined `threshold`. Both expose `.plot()`. The age component
-alone is the subject of the [hearing-threshold](https://jmrplens.github.io/phonometry/perception/hearing/hearing-threshold/) guide.
+alone is the subject of the [hearing-threshold](hearing-threshold.md) guide.
 
 ## References
 

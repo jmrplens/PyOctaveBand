@@ -4,7 +4,7 @@ Part of https://jmrplens.github.io/phonometry/llms.txt. Full text of the pages i
 
 ---
 
-<!-- source: docs/cnossos-road-emission.md | canonical: https://jmrplens.github.io/phonometry/environment/sources/cnossos-road-emission/ -->
+<!-- source: docs/environment/sources/cnossos-road-emission.md | canonical: https://jmrplens.github.io/phonometry/environment/sources/cnossos-road-emission/ -->
 Source: https://jmrplens.github.io/phonometry/environment/sources/cnossos-road-emission/
 
 # CNOSSOS-EU road traffic source emission
@@ -325,15 +325,15 @@ split into point sources is declared out of scope by the method itself.
 
 ## See also
 
-- [Outdoor Sound Propagation](https://jmrplens.github.io/phonometry/environment/propagation/outdoor-propagation/): the ISO 9613-2 chain that
+- [Outdoor Sound Propagation](../propagation/outdoor-propagation.md): the ISO 9613-2 chain that
   carries a source power to a receiver.
-- [Environmental noise levels](https://jmrplens.github.io/phonometry/environment/environmental-levels/): the $L_{den}$ and
+- [Environmental noise levels](../environmental-levels.md): the $L_{den}$ and
   $L_{night}$ indicators the resulting maps are drawn for.
 
 ---
 
 
-<!-- source: docs/cnossos-rail-emission.md | canonical: https://jmrplens.github.io/phonometry/environment/sources/cnossos-rail-emission/ -->
+<!-- source: docs/environment/sources/cnossos-rail-emission.md | canonical: https://jmrplens.github.io/phonometry/environment/sources/cnossos-rail-emission/ -->
 Source: https://jmrplens.github.io/phonometry/environment/sources/cnossos-rail-emission/
 
 # CNOSSOS-EU railway source emission
@@ -770,15 +770,15 @@ such as depots, stations and loudspeakers, are treated by the industrial method.
 
 ## See also
 
-- [Outdoor Sound Propagation](https://jmrplens.github.io/phonometry/environment/propagation/outdoor-propagation/): the
+- [Outdoor Sound Propagation](../propagation/outdoor-propagation.md): the
   ISO 9613-2 chain that carries a source power to a receiver.
-- [Environmental noise levels](https://jmrplens.github.io/phonometry/environment/environmental-levels/): the
+- [Environmental noise levels](../environmental-levels.md): the
   $L_{den}$ and $L_{night}$ indicators the resulting maps are drawn for.
 
 ---
 
 
-<!-- source: docs/wind-turbine-noise.md | canonical: https://jmrplens.github.io/phonometry/environment/sources/wind-turbine-noise/ -->
+<!-- source: docs/environment/sources/wind-turbine-noise.md | canonical: https://jmrplens.github.io/phonometry/environment/sources/wind-turbine-noise/ -->
 Source: https://jmrplens.github.io/phonometry/environment/sources/wind-turbine-noise/
 
 # Wind-turbine noise: apparent sound power and tonal audibility (IEC 61400-11)
@@ -837,7 +837,7 @@ bias with it. The ground board, in turn, is why the formula subtracts 6 dB:
 a capsule lying on a hard plate receives a perfectly coherent reflection
 (pressure doubling, $+6$ dB) instead of the uncontrolled height-dependent
 interference pattern a tripod microphone would sample (see
-[the image source behind the ground effect](https://jmrplens.github.io/phonometry/environment/propagation/outdoor-propagation/)).
+[the image source behind the ground effect](../propagation/outdoor-propagation.md)).
 
 ### Wind-speed bins and standardized conditions
 
