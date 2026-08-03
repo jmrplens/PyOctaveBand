@@ -1,5 +1,5 @@
 ---
-title: "psychoacoustics.tonality_ecma"
+title: "psychoacoustics.quality.tonality_ecma"
 description: "Psychoacoustic tonality per ECMA-418-2:2025 (4th ed., Sottek Hearing Model)."
 sidebar:
   label: "tonality_ecma"
@@ -10,8 +10,8 @@ Psychoacoustic tonality per ECMA-418-2:2025 (4th ed., Sottek Hearing Model).
 Clean-room implementation of the tonality signal chain of ECMA-418-2:2025
 (Clause 6.2). The shared auditory front-end (Clause 5) and the ACF-based
 tonal/noise decomposition with the full Clause 6.2.3 band averaging
-(Clause 6.2.2-6.2.7, [`loudness_ecma._tonal_noise_split`](/phonometry/reference/api/psychoacoustics/loudness-ecma/#loudness_ecma)) are reused
-from [`.loudness_ecma`](/phonometry/reference/api/psychoacoustics/loudness-ecma/#loudness_ecma) -- loudness and tonality therefore report the
+(Clause 6.2.2-6.2.7, [`loudness_ecma._tonal_noise_split`](/phonometry/reference/api/psychoacoustics/ecma/#loudness_ecma)) are reused
+from [`.loudness_ecma`](/phonometry/reference/api/psychoacoustics/ecma/#loudness_ecma) -- loudness and tonality therefore report the
 same underlying `N'_tonal(l, z)` for the same signal; this module adds
 
 * the tonality output stages (Clause 6.2.8-6.2.11): the overall-SNR gate

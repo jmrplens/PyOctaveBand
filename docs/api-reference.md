@@ -59,6 +59,7 @@ warns and delegates as well.
 | `phonometry.building.spanish_building_code` | `phonometry.building.regulation.spain` | 5.0 |
 | `phonometry.materials.porous_absorber` | `phonometry.materials.absorbers.porous` | 5.0 |
 | `phonometry.environmental` | `phonometry.environment` | 5.0 |
+| `phonometry.psychoacoustics.loudness_zwicker` | `phonometry.psychoacoustics.loudness.zwicker` | 5.0 |
 
 | Name | Type | Description (Inputs) | Usage Snippet (Outputs) |
 | :--- | :--- | :--- | :--- |

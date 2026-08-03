@@ -1,5 +1,5 @@
 ---
-title: "psychoacoustics.tonality"
+title: "psychoacoustics.quality.tonality"
 description: "Prominent discrete tone assessment per ECMA-418-1:2024 (3rd edition)."
 sidebar:
   label: "tonality"

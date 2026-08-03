@@ -61,19 +61,19 @@ La referencia de la API se genera a partir de los docstrings del código (en ing
 
 | Module | Summary |
 | :--- | :--- |
-| [`psychoacoustics.loudness_zwicker`](/phonometry/reference/api/psychoacoustics/loudness-zwicker/) | Zwicker loudness for stationary and time-varying sounds per ISO 532-1:2017. |
-| [`psychoacoustics.loudness_moore_glasberg`](/phonometry/reference/api/psychoacoustics/loudness-moore-glasberg/) | Stationary loudness per ISO 532-2:2017 (Moore-Glasberg method). |
-| [`psychoacoustics.loudness_moore_glasberg_time`](/phonometry/reference/api/psychoacoustics/loudness-moore-glasberg-time/) | Time-varying loudness per ISO 532-3:2023 (Moore-Glasberg-Schlittenlacher). |
-| [`psychoacoustics.loudness_ecma`](/phonometry/reference/api/psychoacoustics/loudness-ecma/) | Psychoacoustic loudness per ECMA-418-2:2025 (4th ed., Sottek Hearing Model). |
-| [`psychoacoustics.loudness_contours`](/phonometry/reference/api/psychoacoustics/loudness-contours/) | Normal equal-loudness-level contours per ISO 226:2023. |
-| [`psychoacoustics.sharpness`](/phonometry/reference/api/psychoacoustics/sharpness/) | Sharpness per DIN 45692:2009-08. |
-| [`psychoacoustics.roughness_ecma`](/phonometry/reference/api/psychoacoustics/roughness-ecma/) | Psychoacoustic roughness per ECMA-418-2:2025 (4th ed., Sottek Hearing Model). |
-| [`psychoacoustics.tonality`](/phonometry/reference/api/psychoacoustics/tonality/) | Prominent discrete tone assessment per ECMA-418-1:2024 (3rd edition). |
-| [`psychoacoustics.tonality_ecma`](/phonometry/reference/api/psychoacoustics/tonality-ecma/) | Psychoacoustic tonality per ECMA-418-2:2025 (4th ed., Sottek Hearing Model). |
-| [`psychoacoustics.tone_audibility`](/phonometry/reference/api/psychoacoustics/tone-audibility/) | Objective audibility of tones in noise -- engineering method (ISO/PAS 20065:2016). |
-| [`psychoacoustics.fluctuation_strength`](/phonometry/reference/api/psychoacoustics/fluctuation-strength/) | Fluctuation strength after Fastl & Zwicker / Osses et al. |
-| [`psychoacoustics.fluctuation_strength_ecma`](/phonometry/reference/api/psychoacoustics/fluctuation-strength-ecma/) | Psychoacoustic fluctuation strength per ECMA-418-2:2025 (4th ed., Clause 9). |
-| [`psychoacoustics.psychoacoustic_annoyance`](/phonometry/reference/api/psychoacoustics/psychoacoustic-annoyance/) | Psychoacoustic annoyance (PA) after Fastl & Zwicker. |
+| [`psychoacoustics.loudness.zwicker`](/phonometry/reference/api/psychoacoustics/zwicker/) | Zwicker loudness for stationary and time-varying sounds per ISO 532-1:2017. |
+| [`psychoacoustics.loudness.moore_glasberg`](/phonometry/reference/api/psychoacoustics/moore-glasberg/) | Stationary loudness per ISO 532-2:2017 (Moore-Glasberg method). |
+| [`psychoacoustics.loudness.moore_glasberg_time`](/phonometry/reference/api/psychoacoustics/moore-glasberg-time/) | Time-varying loudness per ISO 532-3:2023 (Moore-Glasberg-Schlittenlacher). |
+| [`psychoacoustics.loudness.ecma`](/phonometry/reference/api/psychoacoustics/ecma/) | Psychoacoustic loudness per ECMA-418-2:2025 (4th ed., Sottek Hearing Model). |
+| [`psychoacoustics.loudness.contours`](/phonometry/reference/api/psychoacoustics/contours/) | Normal equal-loudness-level contours per ISO 226:2023. |
+| [`psychoacoustics.quality.sharpness`](/phonometry/reference/api/psychoacoustics/sharpness/) | Sharpness per DIN 45692:2009-08. |
+| [`psychoacoustics.quality.roughness_ecma`](/phonometry/reference/api/psychoacoustics/roughness-ecma/) | Psychoacoustic roughness per ECMA-418-2:2025 (4th ed., Sottek Hearing Model). |
+| [`psychoacoustics.quality.tonality`](/phonometry/reference/api/psychoacoustics/tonality/) | Prominent discrete tone assessment per ECMA-418-1:2024 (3rd edition). |
+| [`psychoacoustics.quality.tonality_ecma`](/phonometry/reference/api/psychoacoustics/tonality-ecma/) | Psychoacoustic tonality per ECMA-418-2:2025 (4th ed., Sottek Hearing Model). |
+| [`psychoacoustics.quality.tone_audibility`](/phonometry/reference/api/psychoacoustics/tone-audibility/) | Objective audibility of tones in noise -- engineering method (ISO/PAS 20065:2016). |
+| [`psychoacoustics.quality.fluctuation_strength`](/phonometry/reference/api/psychoacoustics/fluctuation-strength/) | Fluctuation strength after Fastl & Zwicker / Osses et al. |
+| [`psychoacoustics.quality.fluctuation_strength_ecma`](/phonometry/reference/api/psychoacoustics/fluctuation-strength-ecma/) | Psychoacoustic fluctuation strength per ECMA-418-2:2025 (4th ed., Clause 9). |
+| [`psychoacoustics.quality.annoyance`](/phonometry/reference/api/psychoacoustics/annoyance/) | Psychoacoustic annoyance (PA) after Fastl & Zwicker. |
 | [`psychoacoustics.erb_scale`](/phonometry/reference/api/psychoacoustics/erb-scale/) | The ERB_N scale: auditory-filter bandwidth and the Cam frequency scale. |
 
 ## Speech

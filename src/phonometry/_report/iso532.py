@@ -2,7 +2,7 @@
 """ISO 532-1 Zwicker loudness fiche (reportlab renderer).
 
 Renders a
-:class:`~phonometry.psychoacoustics.loudness_zwicker.ZwickerLoudness` to a
+:class:`~phonometry.psychoacoustics.loudness.zwicker.ZwickerLoudness` to a
 one-page PDF laid out like an accredited loudness report:
 
 * a title and the standard-basis line (measurement standard + ISO 532-1),
@@ -55,7 +55,7 @@ from ._layout import (
 from .metadata import ReportMetadata
 
 if TYPE_CHECKING:
-    from ..psychoacoustics.loudness_zwicker import ZwickerLoudness
+    from ..psychoacoustics.loudness.zwicker import ZwickerLoudness
 
 
 def _metadata_pairs(
@@ -203,7 +203,7 @@ def render_iso532_report(
     """Render an ISO 532-1 Zwicker loudness fiche to a PDF at ``path``.
 
     :param result: A
-        :class:`~phonometry.psychoacoustics.loudness_zwicker.ZwickerLoudness`
+        :class:`~phonometry.psychoacoustics.loudness.zwicker.ZwickerLoudness`
         carrying the total loudness, loudness level and specific-loudness
         pattern (and the N5/N10 percentiles for a time-varying result).
     :param path: Destination path of the PDF file.

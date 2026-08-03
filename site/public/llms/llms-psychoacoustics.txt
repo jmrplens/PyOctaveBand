@@ -281,7 +281,7 @@ hearing threshold.
 - [Psychoacoustic annoyance and fluctuation strength](https://jmrplens.github.io/phonometry/guides/psychoacoustic-annoyance/):
   the Zwicker and Fastl model that consumes the percentile loudness $N_5$.
 - [Theory](https://jmrplens.github.io/phonometry/reference/theory/perception/): the equations behind the loudness models.
-- API reference: [`psychoacoustics.loudness_zwicker`](https://jmrplens.github.io/phonometry/reference/api/psychoacoustics/loudness-zwicker/) and [`psychoacoustics.loudness_contours`](https://jmrplens.github.io/phonometry/reference/api/psychoacoustics/loudness-contours/).
+- API reference: [`psychoacoustics.loudness_zwicker`](https://jmrplens.github.io/phonometry/reference/api/psychoacoustics/zwicker/) and [`psychoacoustics.loudness_contours`](https://jmrplens.github.io/phonometry/reference/api/psychoacoustics/contours/).
 
 ---
 
@@ -648,7 +648,7 @@ The Zwicker method (ISO 532-1:2017) is the reference: stationary and time-varyin
 - [Sound Quality Metrics](https://jmrplens.github.io/phonometry/guides/sound-quality/): the tonality, roughness and
   fluctuation strength built on the same ECMA-418-2 front-end.
 - [Theory](https://jmrplens.github.io/phonometry/reference/theory/perception/): the equations behind the loudness models.
-- API reference: [`psychoacoustics.loudness_moore_glasberg`](https://jmrplens.github.io/phonometry/reference/api/psychoacoustics/loudness-moore-glasberg/), [`psychoacoustics.loudness_moore_glasberg_time`](https://jmrplens.github.io/phonometry/reference/api/psychoacoustics/loudness-moore-glasberg-time/) and [`psychoacoustics.loudness_ecma`](https://jmrplens.github.io/phonometry/reference/api/psychoacoustics/loudness-ecma/).
+- API reference: [`psychoacoustics.loudness_moore_glasberg`](https://jmrplens.github.io/phonometry/reference/api/psychoacoustics/moore-glasberg/), [`psychoacoustics.loudness_moore_glasberg_time`](https://jmrplens.github.io/phonometry/reference/api/psychoacoustics/moore-glasberg-time/) and [`psychoacoustics.loudness_ecma`](https://jmrplens.github.io/phonometry/reference/api/psychoacoustics/ecma/).
 
 ## References
 

@@ -3592,7 +3592,10 @@ def generate_tonality_spectrum(output_dir: str) -> None:
     """Annotated spectrum for the tone-to-noise ratio method."""
     print("Generating tonality_spectrum.png...")
     from phonometry import tone_to_noise_ratio
-    from phonometry.psychoacoustics.tonality import _averaged_spectrum, _critical_band
+    from phonometry.psychoacoustics.quality.tonality import (
+        _averaged_spectrum,
+        _critical_band,
+    )
 
     fs = 48000
     rng = np.random.default_rng(21)
@@ -4154,7 +4157,12 @@ def generate_impact_rating(output_dir: str) -> None:
 def generate_sharpness_weighting(output_dir: str) -> None:
     """DIN 45692 sharpness weighting g(z): DIN vs Aures vs von Bismarck."""
     print("Generating sharpness_weighting.png...")
-    from phonometry.psychoacoustics.sharpness import _Z, _g_aures, _g_bismarck, _g_din
+    from phonometry.psychoacoustics.quality.sharpness import (
+        _Z,
+        _g_aures,
+        _g_bismarck,
+        _g_din,
+    )
 
     z = _Z                       # 0.1 .. 24 Bark, 0.1-Bark steps
     total_n = 4.0                # reference loudness for the Aures variant (sone)

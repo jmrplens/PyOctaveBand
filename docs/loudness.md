@@ -274,4 +274,4 @@ hearing threshold.
 - [Psychoacoustic annoyance and fluctuation strength](psychoacoustic-annoyance.md):
   the Zwicker and Fastl model that consumes the percentile loudness $N_5$.
 - [Theory](theory-perception.md): the equations behind the loudness models.
-- API reference: [`psychoacoustics.loudness_zwicker`](https://jmrplens.github.io/phonometry/reference/api/psychoacoustics/loudness-zwicker/) and [`psychoacoustics.loudness_contours`](https://jmrplens.github.io/phonometry/reference/api/psychoacoustics/loudness-contours/).
+- API reference: [`psychoacoustics.loudness_zwicker`](https://jmrplens.github.io/phonometry/reference/api/psychoacoustics/zwicker/) and [`psychoacoustics.loudness_contours`](https://jmrplens.github.io/phonometry/reference/api/psychoacoustics/contours/).

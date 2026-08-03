@@ -33,8 +33,8 @@ def test_loudness_module_attribute_access_warns_and_delegates() -> None:
     import phonometry.loudness  # noqa: F401  (PEP 562 shim; import is silent)
 
     shim = sys.modules["phonometry.loudness"]
-    target = sys.modules["phonometry.psychoacoustics.loudness_zwicker"]
-    with pytest.warns(DeprecationWarning, match="loudness_zwicker"):
+    target = sys.modules["phonometry.psychoacoustics.loudness.zwicker"]
+    with pytest.warns(DeprecationWarning, match=r"loudness\.zwicker"):
         cls = shim.ZwickerLoudness
     assert cls is target.ZwickerLoudness
     with pytest.warns(DeprecationWarning, match="deprecated since phonometry 3.1"):
@@ -478,6 +478,19 @@ _PRE_SPLIT_MODULE_PATHS = [
     "phonometry.materials.scattering_diffusion",
     "phonometry.materials.slow_sound_absorber",
     "phonometry.materials.sound_absorption",
+    "phonometry.psychoacoustics.fluctuation_strength",
+    "phonometry.psychoacoustics.fluctuation_strength_ecma",
+    "phonometry.psychoacoustics.loudness_contours",
+    "phonometry.psychoacoustics.loudness_ecma",
+    "phonometry.psychoacoustics.loudness_moore_glasberg",
+    "phonometry.psychoacoustics.loudness_moore_glasberg_time",
+    "phonometry.psychoacoustics.loudness_zwicker",
+    "phonometry.psychoacoustics.psychoacoustic_annoyance",
+    "phonometry.psychoacoustics.roughness_ecma",
+    "phonometry.psychoacoustics.sharpness",
+    "phonometry.psychoacoustics.tonality",
+    "phonometry.psychoacoustics.tonality_ecma",
+    "phonometry.psychoacoustics.tone_audibility",
 ]
 
 

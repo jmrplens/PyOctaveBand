@@ -1,5 +1,5 @@
 ---
-title: "psychoacoustics.roughness_ecma"
+title: "psychoacoustics.quality.roughness_ecma"
 description: "Psychoacoustic roughness per ECMA-418-2:2025 (4th ed., Sottek Hearing Model)."
 sidebar:
   label: "roughness_ecma"
@@ -11,7 +11,7 @@ Clean-room implementation of the roughness signal chain of ECMA-418-2:2025
 (Clause 7). The shared auditory front-end (Clause 5: outer/middle-ear filter,
 53-band gammatone-like filter bank, half-wave rectification, compressive
 nonlinearity to the specific basis loudness `N'_basis(l, z)` of Formula 25)
-is reused from [`.loudness_ecma`](/phonometry/reference/api/psychoacoustics/loudness-ecma/#loudness_ecma); this module adds the roughness-specific
+is reused from [`.loudness_ecma`](/phonometry/reference/api/psychoacoustics/ecma/#loudness_ecma); this module adds the roughness-specific
 chain:
 
 * roughness-specific zero-padding (Clause 5.1.2.2) and segmentation

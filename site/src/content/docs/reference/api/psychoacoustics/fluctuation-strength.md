@@ -1,5 +1,5 @@
 ---
-title: "psychoacoustics.fluctuation_strength"
+title: "psychoacoustics.quality.fluctuation_strength"
 description: "Fluctuation strength after Fastl & Zwicker / Osses et al."
 sidebar:
   label: "fluctuation_strength"
