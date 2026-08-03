@@ -62,6 +62,9 @@ warns and delegates as well.
 | `phonometry.psychoacoustics.loudness_zwicker` | `phonometry.psychoacoustics.loudness.zwicker` | 5.0 |
 | `phonometry.underwater.ocean_ambient_noise` | `phonometry.underwater.sources.ambient_noise` | 5.0 |
 | `phonometry.metrology.intensity_compliance` | `phonometry.emission.intensity_compliance` | 5.0 |
+| `phonometry.environment.assessment.impulse_prominence` | `phonometry.environment.assessment.impulsive_sound` | 5.0 |
+| `phonometry.room.room_ir` | `phonometry.room.impulse_response` | 5.0 |
+| `phonometry.aircraft.aircraft_noise` | `phonometry.aircraft.certification` | 5.0 |
 
 | Name | Type | Description (Inputs) | Usage Snippet (Outputs) |
 | :--- | :--- | :--- | :--- |

@@ -85,7 +85,7 @@ from ._criterion import (
 if TYPE_CHECKING:
     from matplotlib.axes import Axes
 
-    from ..room.room_noise import NCResult, RCResult
+    from ..room.noise_criteria import NCResult, RCResult
 
 
 @dataclass(frozen=True)
@@ -137,8 +137,8 @@ class RoomToRoomResult:
     def rating(self) -> NCResult | RCResult:
         """The rating of the spectrum arriving in the receiving room.
 
-        An :class:`~phonometry.room.room_noise.NCResult` for the ``"NC"``
-        family, an :class:`~phonometry.room.room_noise.RCResult` for ``"RC"``.
+        An :class:`~phonometry.room.noise_criteria.NCResult` for the ``"NC"``
+        family, an :class:`~phonometry.room.noise_criteria.RCResult` for ``"RC"``.
         """
         return rating_of(self)
 

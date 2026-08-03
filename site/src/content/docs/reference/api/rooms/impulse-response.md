@@ -1,8 +1,8 @@
 ---
-title: "room.room_ir"
+title: "room.impulse_response"
 description: "Impulse-response acquisition per BS EN ISO 18233:2006."
 sidebar:
-  label: "room_ir"
+  label: "impulse_response"
 ---
 
 Impulse-response acquisition per BS EN ISO 18233:2006.
@@ -48,8 +48,8 @@ complete the family:
   summing the two circular cross-correlations recovers the IR with zero
   correlation noise: the deterministic residue of each single-code
   correlation cancels identically, so only uncorrelated background noise
-  remains (Xiang Eq. (4)). See [`golay_pair`](/phonometry/reference/api/rooms/room-ir/#golay_pair) and
-  [`golay_impulse_response`](/phonometry/reference/api/rooms/room-ir/#golay_impulse_response).
+  remains (Xiang Eq. (4)). See [`golay_pair`](/phonometry/reference/api/rooms/impulse-response/#golay_pair) and
+  [`golay_impulse_response`](/phonometry/reference/api/rooms/impulse-response/#golay_impulse_response).
 
 * **Sweep with an arbitrary magnitude spectrum** -- a swept sine synthesized
   in the frequency domain by shaping its group delay so the dwell time at
@@ -58,8 +58,8 @@ complete the family:
   49(6), 2001, Secs. 4.2-4.3). The sweep keeps the near-ideal crest factor
   of a swept sine while following any prescribed emphasis (pink,
   noise-floor-matched, loudspeaker-equalizing, ...). See
-  [`shaped_sweep_signal`](/phonometry/reference/api/rooms/room-ir/#shaped_sweep_signal); the recording is deconvolved with the
-  ordinary spectral method of [`impulse_response`](/phonometry/reference/api/rooms/room-ir/#impulse_response), or post-equalized
+  [`shaped_sweep_signal`](/phonometry/reference/api/rooms/impulse-response/#shaped_sweep_signal); the recording is deconvolved with the
+  ordinary spectral method of [`impulse_response`](/phonometry/reference/api/rooms/impulse-response/#impulse_response), or post-equalized
   with [`phonometry.regularized_inverse_filter`](/phonometry/reference/api/signals/inversion/#regularized_inverse_filter).
 
 The recovered IR is broadband; ISO 18233 6.3.2 requires subsequent
@@ -108,17 +108,17 @@ more exposed to time variance than a single sweep (Xiang, Sec. 2).
 | :--- | :--- |
 | `recorded_a` | Recorded response to the periodic `a` code; its length must be a positive multiple of the code length `L`. |
 | `recorded_b` | Recorded response to the periodic `b` code; its length must be a positive multiple of `L` (the period counts of the two recordings may differ). |
-| `pair` | The complementary pair `(a, b)` from [`golay_pair`](/phonometry/reference/api/rooms/room-ir/#golay_pair). |
+| `pair` | The complementary pair `(a, b)` from [`golay_pair`](/phonometry/reference/api/rooms/impulse-response/#golay_pair). |
 | `length` | Number of IR samples to return. Defaults to `L`; longer requests are periodic extensions. |
-| `fs` | Optional sample rate in Hz, stored on the result so that [`ImpulseResponseResult.plot`](/phonometry/reference/api/rooms/room-ir/#impulseresponseresultplot) can label a time axis in seconds (the recovery itself is sample-rate agnostic). Default `None`. |
+| `fs` | Optional sample rate in Hz, stored on the result so that [`ImpulseResponseResult.plot`](/phonometry/reference/api/rooms/impulse-response/#impulseresponseresultplot) can label a time axis in seconds (the recovery itself is sample-rate agnostic). Default `None`. |
 
-**Returns:** An [`ImpulseResponseResult`](/phonometry/reference/api/rooms/room-ir/#impulseresponseresult) (`method="golay"`). It behaves like the raw IR array for every downstream consumer and adds [`ImpulseResponseResult.plot`](/phonometry/reference/api/rooms/room-ir/#impulseresponseresultplot).
+**Returns:** An [`ImpulseResponseResult`](/phonometry/reference/api/rooms/impulse-response/#impulseresponseresult) (`method="golay"`). It behaves like the raw IR array for every downstream consumer and adds [`ImpulseResponseResult.plot`](/phonometry/reference/api/rooms/impulse-response/#impulseresponseresultplot).
 
 :::note
 As with any periodic (circular) recovery, a system IR longer than
 one code period aliases back into the record; an
-[`ImpulseResponseWarning`](/phonometry/reference/api/rooms/room-ir/#impulseresponsewarning) flags undecayed energy at the end
-of the period (see the note in [`mls_impulse_response`](/phonometry/reference/api/rooms/room-ir/#mls_impulse_response) about
+[`ImpulseResponseWarning`](/phonometry/reference/api/rooms/impulse-response/#impulseresponsewarning) flags undecayed energy at the end
+of the period (see the note in [`mls_impulse_response`](/phonometry/reference/api/rooms/impulse-response/#mls_impulse_response) about
 the heuristic's noise-floor false positives).
 :::
 
@@ -179,13 +179,13 @@ causal part (B.5).
 | `recorded` | Recorded system response to the sweep. |
 | `reference` | The emitted sweep (excitation signal). |
 | `fs` | Sampling frequency in Hz (kept for API symmetry; the deconvolution itself is sample-rate agnostic). |
-| `method` | `"spectral"` for spectral division $H = Y \overline{X} / (\lvert X \rvert^2 + \text{reg})$ (Figure B.3, default) or `"farina"` for convolution with the analytic inverse filter (Figure B.2). The Farina method requires `f_range` and the **exact-length, unpadded** excitation sweep as `reference` (it rebuilds the inverse filter from `reference.size/fs` as the sweep duration); a reference zero-padded to the recording length - the correct input for the spectral method - is rejected with a `ValueError` because it would silently produce a wrong inverse filter. It also assumes the reference sweep was generated with the default `amplitude`/`fade` of [`sweep_signal`](/phonometry/reference/api/rooms/room-ir/#sweep_signal); a non-unit amplitude or custom fade yields a scaled IR, so use the spectral method in that case. |
+| `method` | `"spectral"` for spectral division $H = Y \overline{X} / (\lvert X \rvert^2 + \text{reg})$ (Figure B.3, default) or `"farina"` for convolution with the analytic inverse filter (Figure B.2). The Farina method requires `f_range` and the **exact-length, unpadded** excitation sweep as `reference` (it rebuilds the inverse filter from `reference.size/fs` as the sweep duration); a reference zero-padded to the recording length - the correct input for the spectral method - is rejected with a `ValueError` because it would silently produce a wrong inverse filter. It also assumes the reference sweep was generated with the default `amplitude`/`fade` of [`sweep_signal`](/phonometry/reference/api/rooms/impulse-response/#sweep_signal); a non-unit amplitude or custom fade yields a scaled IR, so use the spectral method in that case. |
 | `f_range` | `(f1, f2)` of the sweep, required for `method="farina"` to rebuild the inverse filter; ignored for the spectral method. |
 | `regularization` | Tikhonov term added to the denominator, expressed as a fraction of the peak spectral energy $\max(\lvert X \rvert^2)$ (spectral method only). Guards against amplifying noise where the sweep has little energy, e.g. outside its frequency range (B.5). Default 1e-6. |
 | `length` | Number of samples of the causal IR to return. Defaults to `len(recorded)`. Ignored when `return_full` is True. |
 | `return_full` | If True, return the full deconvolution sequence (causal IR at index 0, negative-time distortion products in the tail) instead of the trimmed causal IR. Default False. |
 
-**Returns:** An [`ImpulseResponseResult`](/phonometry/reference/api/rooms/room-ir/#impulseresponseresult) wrapping the recovered impulse response. It behaves like the raw IR array (`np.asarray(result)`, indexing, `.size`) for every downstream consumer and adds [`ImpulseResponseResult.plot`](/phonometry/reference/api/rooms/room-ir/#impulseresponseresultplot).
+**Returns:** An [`ImpulseResponseResult`](/phonometry/reference/api/rooms/impulse-response/#impulseresponseresult) wrapping the recovered impulse response. It behaves like the raw IR array (`np.asarray(result)`, indexing, `.size`) for every downstream consumer and adds [`ImpulseResponseResult.plot`](/phonometry/reference/api/rooms/impulse-response/#impulseresponseresultplot).
 
 ## ImpulseResponseResult
 
@@ -195,7 +195,7 @@ ImpulseResponseResult(ir: np.ndarray, fs: int | None, method: str)
 
 Recovered broadband impulse response with its acquisition metadata.
 
-Returned by [`impulse_response`](/phonometry/reference/api/rooms/room-ir/#impulse_response) and [`mls_impulse_response`](/phonometry/reference/api/rooms/room-ir/#mls_impulse_response).
+Returned by [`impulse_response`](/phonometry/reference/api/rooms/impulse-response/#impulse_response) and [`mls_impulse_response`](/phonometry/reference/api/rooms/impulse-response/#mls_impulse_response).
 The impulse response samples live in `ir`; `fs` is the sample rate in
 Hz (or `None` when unknown, e.g. an MLS recovery called without one) and
 `method` records how the IR was obtained (`"spectral"`, `"farina"`
@@ -204,7 +204,7 @@ or `"mls"`).
 The object is a drop-in replacement for the raw array it used to be: it
 implements `__array__`, so `np.asarray(result)` yields the IR and
 the result can be passed straight to array consumers such as
-[`phonometry.room_parameters`](/phonometry/reference/api/rooms/room-acoustics/#room_parameters), [`phonometry.decay_curve`](/phonometry/reference/api/rooms/room-acoustics/#decay_curve) and
+[`phonometry.room_parameters`](/phonometry/reference/api/rooms/acoustics/#room_parameters), [`phonometry.decay_curve`](/phonometry/reference/api/rooms/acoustics/#decay_curve) and
 [`phonometry.sti_from_impulse_response`](/phonometry/reference/api/speech/sti/#sti_from_impulse_response). Indexing, `len(result)`
 and the `size`/`ndim`/`shape`/`dtype` attributes forward to `ir`.
 
@@ -315,14 +315,14 @@ into the record (A.1).
 | Name | Description |
 | :--- | :--- |
 | `recorded` | Recorded response, length a multiple of `2**N - 1`. |
-| `mls` | The excitation sequence returned by [`mls_signal`](/phonometry/reference/api/rooms/room-ir/#mls_signal). |
+| `mls` | The excitation sequence returned by [`mls_signal`](/phonometry/reference/api/rooms/impulse-response/#mls_signal). |
 | `length` | Number of IR samples to return. Defaults to the sequence length `2**N - 1`. |
-| `fs` | Optional sample rate in Hz, stored on the result so that [`ImpulseResponseResult.plot`](/phonometry/reference/api/rooms/room-ir/#impulseresponseresultplot) can label a time axis in seconds (the recovery itself is sample-rate agnostic). Default `None`. |
+| `fs` | Optional sample rate in Hz, stored on the result so that [`ImpulseResponseResult.plot`](/phonometry/reference/api/rooms/impulse-response/#impulseresponseresultplot) can label a time axis in seconds (the recovery itself is sample-rate agnostic). Default `None`. |
 
-**Returns:** An [`ImpulseResponseResult`](/phonometry/reference/api/rooms/room-ir/#impulseresponseresult) wrapping the recovered impulse response. It behaves like the raw IR array for every downstream consumer and adds [`ImpulseResponseResult.plot`](/phonometry/reference/api/rooms/room-ir/#impulseresponseresultplot).
+**Returns:** An [`ImpulseResponseResult`](/phonometry/reference/api/rooms/impulse-response/#impulseresponseresult) wrapping the recovered impulse response. It behaves like the raw IR array for every downstream consumer and adds [`ImpulseResponseResult.plot`](/phonometry/reference/api/rooms/impulse-response/#impulseresponseresultplot).
 
 :::note
-An [`ImpulseResponseWarning`](/phonometry/reference/api/rooms/room-ir/#impulseresponsewarning) is emitted when the recovered IR retains significant
+An [`ImpulseResponseWarning`](/phonometry/reference/api/rooms/impulse-response/#impulseresponsewarning) is emitted when the recovered IR retains significant
 energy at the end of the period (a circular-aliasing symptom). The
 tail-RMS heuristic is advisory: a high ambient noise floor in the
 recording raises the tail RMS on its own and can trigger a
@@ -369,7 +369,7 @@ plot_excitation(
 Plot an ISO 18233 excitation signal (sweep or MLS).
 
 A documented helper for the raw arrays returned by
-[`sweep_signal`](/phonometry/reference/api/rooms/room-ir/#sweep_signal) and [`mls_signal`](/phonometry/reference/api/rooms/room-ir/#mls_signal), which
+[`sweep_signal`](/phonometry/reference/api/rooms/impulse-response/#sweep_signal) and [`mls_signal`](/phonometry/reference/api/rooms/impulse-response/#mls_signal), which
 stay plain `numpy.ndarray` (they are meant for playback). For a
 swept sine the waveform and its spectrogram are drawn; for an MLS the first
 samples of the bipolar sequence and its (flat) magnitude spectrum.
@@ -427,9 +427,9 @@ Nyquist (Eq. (10)), and the sweep is obtained by inverse FFT over a
 block at least double the sweep length so the pre-ringing of the
 band-limited spectrum cannot fold onto the sweep's tail (Sec. 4.2).
 
-Deconvolve the recording with [`impulse_response`](/phonometry/reference/api/rooms/room-ir/#impulse_response)
+Deconvolve the recording with [`impulse_response`](/phonometry/reference/api/rooms/impulse-response/#impulse_response)
 (`method="spectral"`), passing `np.asarray(result)` zero-padded as
-the reference, exactly as with [`sweep_signal`](/phonometry/reference/api/rooms/room-ir/#sweep_signal); the sweep's
+the reference, exactly as with [`sweep_signal`](/phonometry/reference/api/rooms/impulse-response/#sweep_signal); the sweep's
 coloration divides out, so the target emphasis only re-weights the
 measurement's noise floor (that is its purpose: SNR shaping).
 
@@ -446,7 +446,7 @@ measurement's noise floor (that is its purpose: SNR shaping).
 | `start_delay` | Group delay assigned to `f1`, in seconds; the same margin is left after `tau_G(f2)`, so the signal lasts `seconds + 2*start_delay`. The sweep spreads slightly beyond its nominal start (Sec. 4.2: the group delay of the lowest bin "should not be set to zero"), so the default `0.05*seconds` gives the first half-wave room to evolve. |
 | `fade` | Half-Hann fade-in/out length as a fraction of the returned signal, applied to pin the ends to zero (Sec. 4.2). Default 0.01; 0.0 disables. |
 
-**Returns:** A [`ShapedSweepResult`](/phonometry/reference/api/rooms/room-ir/#shapedsweepresult) wrapping the sweep samples and the synthesis metadata (grid, imposed magnitude, group delay, crest factor).
+**Returns:** A [`ShapedSweepResult`](/phonometry/reference/api/rooms/impulse-response/#shapedsweepresult) wrapping the sweep samples and the synthesis metadata (grid, imposed magnitude, group delay, crest factor).
 
 ## ShapedSweepResult
 
@@ -464,10 +464,10 @@ ShapedSweepResult(
 
 A sweep synthesized to follow an arbitrary target magnitude spectrum.
 
-Returned by [`shaped_sweep_signal`](/phonometry/reference/api/rooms/room-ir/#shaped_sweep_signal). The playable samples live in
+Returned by [`shaped_sweep_signal`](/phonometry/reference/api/rooms/impulse-response/#shaped_sweep_signal). The playable samples live in
 `signal`; the object implements `__array__`, so it can be passed
 straight to a sound-card writer or as the `reference` of
-[`impulse_response`](/phonometry/reference/api/rooms/room-ir/#impulse_response) (spectral method). The synthesis metadata --
+[`impulse_response`](/phonometry/reference/api/rooms/impulse-response/#impulse_response) (spectral method). The synthesis metadata --
 the frequency grid, the band-limited magnitude actually imposed on the
 spectrum and the group delay that encodes the sweep's time-frequency
 trajectory (Mueller & Massarani 2001, Secs. 4.2-4.3) -- travels with

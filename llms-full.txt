@@ -252,10 +252,11 @@ Every page above also exists in Spanish under the `/es/` prefix, for example htt
 The generated API reference, one page per module. Fetch these only when a specific signature is needed; the guides above explain the same functions in context.
 
 - [API reference index](https://jmrplens.github.io/phonometry/reference/api/)
-- [aeroacoustics/aircraft-noise](https://jmrplens.github.io/phonometry/reference/api/aeroacoustics/aircraft-noise/)
 - [aeroacoustics/airport-noise](https://jmrplens.github.io/phonometry/reference/api/aeroacoustics/airport-noise/)
 - [aeroacoustics/anp-fleet](https://jmrplens.github.io/phonometry/reference/api/aeroacoustics/anp-fleet/)
 - [aeroacoustics/atmospheric-absorption](https://jmrplens.github.io/phonometry/reference/api/aeroacoustics/atmospheric-absorption/)
+- [aeroacoustics/certification](https://jmrplens.github.io/phonometry/reference/api/aeroacoustics/certification/)
+- [aeroacoustics/measurement-system](https://jmrplens.github.io/phonometry/reference/api/aeroacoustics/measurement-system/)
 - [aeroacoustics/rotorcraft-noise](https://jmrplens.github.io/phonometry/reference/api/aeroacoustics/rotorcraft-noise/)
 - [broadcast/program-loudness](https://jmrplens.github.io/phonometry/reference/api/broadcast/program-loudness/)
 - [building/aperture-transmission](https://jmrplens.github.io/phonometry/reference/api/building/aperture-transmission/)
@@ -288,7 +289,6 @@ The generated API reference, one page per module. Fetch these only when a specif
 - [environment/cnossos-rail](https://jmrplens.github.io/phonometry/reference/api/environment/cnossos-rail/)
 - [environment/cnossos-road](https://jmrplens.github.io/phonometry/reference/api/environment/cnossos-road/)
 - [environment/ground-barriers](https://jmrplens.github.io/phonometry/reference/api/environment/ground-barriers/)
-- [environment/impulse-prominence](https://jmrplens.github.io/phonometry/reference/api/environment/impulse-prominence/)
 - [environment/impulsive-sound](https://jmrplens.github.io/phonometry/reference/api/environment/impulsive-sound/)
 - [environment/measurement](https://jmrplens.github.io/phonometry/reference/api/environment/measurement/)
 - [environment/outdoor-propagation](https://jmrplens.github.io/phonometry/reference/api/environment/outdoor-propagation/)
@@ -348,15 +348,15 @@ The generated API reference, one page per module. Fetch these only when a specif
 - [psychoacoustics/tonality-ecma](https://jmrplens.github.io/phonometry/reference/api/psychoacoustics/tonality-ecma/)
 - [psychoacoustics/tone-audibility](https://jmrplens.github.io/phonometry/reference/api/psychoacoustics/tone-audibility/)
 - [psychoacoustics/zwicker](https://jmrplens.github.io/phonometry/reference/api/psychoacoustics/zwicker/)
+- [rooms/acoustics](https://jmrplens.github.io/phonometry/reference/api/rooms/acoustics/)
 - [rooms/crowd-noise](https://jmrplens.github.io/phonometry/reference/api/rooms/crowd-noise/)
 - [rooms/enclosed-space-absorption](https://jmrplens.github.io/phonometry/reference/api/rooms/enclosed-space-absorption/)
 - [rooms/image-source](https://jmrplens.github.io/phonometry/reference/api/rooms/image-source/)
+- [rooms/impulse-response](https://jmrplens.github.io/phonometry/reference/api/rooms/impulse-response/)
+- [rooms/modes](https://jmrplens.github.io/phonometry/reference/api/rooms/modes/)
+- [rooms/noise-criteria](https://jmrplens.github.io/phonometry/reference/api/rooms/noise-criteria/)
 - [rooms/open-plan](https://jmrplens.github.io/phonometry/reference/api/rooms/open-plan/)
 - [rooms/reverberation-prediction](https://jmrplens.github.io/phonometry/reference/api/rooms/reverberation-prediction/)
-- [rooms/room-acoustics](https://jmrplens.github.io/phonometry/reference/api/rooms/room-acoustics/)
-- [rooms/room-ir](https://jmrplens.github.io/phonometry/reference/api/rooms/room-ir/)
-- [rooms/room-modes](https://jmrplens.github.io/phonometry/reference/api/rooms/room-modes/)
-- [rooms/room-noise](https://jmrplens.github.io/phonometry/reference/api/rooms/room-noise/)
 - [rooms/steady-field](https://jmrplens.github.io/phonometry/reference/api/rooms/steady-field/)
 - [signals/cepstrum](https://jmrplens.github.io/phonometry/reference/api/signals/cepstrum/)
 - [signals/correlation](https://jmrplens.github.io/phonometry/reference/api/signals/correlation/)
@@ -2275,6 +2275,9 @@ warns and delegates as well.
 | `phonometry.psychoacoustics.loudness_zwicker` | `phonometry.psychoacoustics.loudness.zwicker` | 5.0 |
 | `phonometry.underwater.ocean_ambient_noise` | `phonometry.underwater.sources.ambient_noise` | 5.0 |
 | `phonometry.metrology.intensity_compliance` | `phonometry.emission.intensity_compliance` | 5.0 |
+| `phonometry.environment.assessment.impulse_prominence` | `phonometry.environment.assessment.impulsive_sound` | 5.0 |
+| `phonometry.room.room_ir` | `phonometry.room.impulse_response` | 5.0 |
+| `phonometry.aircraft.aircraft_noise` | `phonometry.aircraft.certification` | 5.0 |
 
 | Name | Type | Description (Inputs) | Usage Snippet (Outputs) |
 | :--- | :--- | :--- | :--- |
@@ -29587,7 +29590,7 @@ ISO 3382-3 open-plan speech metrics, with their fiche, are
   used for band decay curves and insulation spectra.
 - [Theory](https://jmrplens.github.io/phonometry/reference/theory/rooms-buildings/): Schroeder integration, regression windows and the
   reference-curve derivation.
-- API reference: [`room.room_acoustics`](https://jmrplens.github.io/phonometry/reference/api/rooms/room-acoustics/).
+- API reference: [`room.acoustics`](https://jmrplens.github.io/phonometry/reference/api/rooms/acoustics/).
 
 ## Quick answers
 
@@ -30424,7 +30427,7 @@ deconvolution identities in the [conformance report](https://jmrplens.github.io/
   measurement either side of a partition.
 - [Image Sources & Steady-State Field](https://jmrplens.github.io/phonometry/guides/room-image-sources/): simulated
   impulse responses to rehearse the processing chain on.
-- API reference: [`room.room_ir`](https://jmrplens.github.io/phonometry/reference/api/rooms/room-ir/).
+- API reference: [`room.impulse_response`](https://jmrplens.github.io/phonometry/reference/api/rooms/impulse-response/).
 
 ---
 
@@ -30545,7 +30548,7 @@ room.room_criterion(spl).plot()
 plt.show()
 
 # By hand, mirroring what NCResult.plot() / RCResult.plot() draw:
-from phonometry.room.room_noise import NC_CURVES, NC_INDICES, OCTAVE_BANDS
+from phonometry.room.noise_criteria import NC_CURVES, NC_INDICES, OCTAVE_BANDS
 nc, rc = room.noise_criterion(spl), room.room_criterion(spl)
 fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 5))
 

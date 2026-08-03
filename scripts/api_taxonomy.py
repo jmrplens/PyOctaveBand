@@ -133,15 +133,15 @@ _SECTION_LIST: tuple[Section, ...] = (
         label_en="Room acoustics",
         label_es="Acústica de salas",
         modules=(
-            "phonometry.room.room_acoustics",
-            "phonometry.room.room_ir",
-            "phonometry.room.room_noise",
+            "phonometry.room.acoustics",
+            "phonometry.room.impulse_response",
+            "phonometry.room.noise_criteria",
             "phonometry.room.open_plan",
             "phonometry.room.reverberation_prediction",
             "phonometry.room.enclosed_space_absorption",
             "phonometry.room.image_source",
             "phonometry.room.steady_field",
-            "phonometry.room.room_modes",
+            "phonometry.room.modes",
             "phonometry.room.crowd_noise",
         ),
     ),
@@ -218,7 +218,6 @@ _SECTION_LIST: tuple[Section, ...] = (
             "phonometry.environment.propagation.refraction",
             "phonometry.environment.propagation.air_absorption",
             "phonometry.environment.sources.cnossos_rail",
-            "phonometry.environment.assessment.impulse_prominence",
             "phonometry.environment.assessment.impulsive_sound",
             "phonometry.environment.assessment.rating",
             "phonometry.environment.sources.wind_turbine",
@@ -231,11 +230,12 @@ _SECTION_LIST: tuple[Section, ...] = (
         label_en="Aircraft noise",
         label_es="Ruido de aeronaves",
         modules=(
-            "phonometry.aircraft.aircraft_noise",
+            "phonometry.aircraft.certification",
             "phonometry.aircraft.atmospheric_absorption",
             "phonometry.aircraft.airport_noise",
             "phonometry.aircraft.anp_fleet",
             "phonometry.aircraft.rotorcraft_noise",
+            "phonometry.aircraft.measurement_system",
         ),
     ),
     Section(
@@ -361,7 +361,7 @@ OBJECT_MODULE_OVERRIDES: dict[str, str] = {
     "PhonometryWarning": "phonometry",
     # Defined in phonometry._plot.room; documented helper for the ISO 18233
     # excitation signals that live in room_ir.
-    "plot_excitation": "phonometry.room.room_ir",
+    "plot_excitation": "phonometry.room.impulse_response",
     # Defined in phonometry._plot.geometry; documented with the materials
     # module whose devices each drawing depicts.
     "plot_absorber_stack": "phonometry.materials.absorbers.porous",

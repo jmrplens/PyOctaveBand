@@ -61,7 +61,7 @@ single
 absorption set or one curve per octave band from per-band coefficients.
 
 The Schroeder backward integral of the synthetic RIR (see
-[`phonometry.room.decay_curve`](/phonometry/reference/api/rooms/room-acoustics/#decay_curve)) reproduces the Eyring reverberation time
+[`phonometry.room.decay_curve`](/phonometry/reference/api/rooms/acoustics/#decay_curve)) reproduces the Eyring reverberation time
 $T = -24 V \ln 10 / (c S \ln(1 - \bar{\alpha}))$ (Kuttruff Equation
 (5.23)) of the
 same room to within a few percent, closing the loop between this deterministic
@@ -130,8 +130,8 @@ With scalar or per-wall `absorption` (and no `frequencies`) the result
 is a broadband RIR; a per-band `absorption` (or a given `frequencies`)
 produces one RIR per band. The Schroeder decay of the synthetic RIR
 reproduces the Eyring reverberation time of the room (Kuttruff Equation
-(5.23)); feed `ir` straight to [`phonometry.room.decay_curve`](/phonometry/reference/api/rooms/room-acoustics/#decay_curve) or
-[`phonometry.room.room_parameters`](/phonometry/reference/api/rooms/room-acoustics/#room_parameters).
+(5.23)); feed `ir` straight to [`phonometry.room.decay_curve`](/phonometry/reference/api/rooms/acoustics/#decay_curve) or
+[`phonometry.room.room_parameters`](/phonometry/reference/api/rooms/acoustics/#room_parameters).
 
 **Parameters**
 

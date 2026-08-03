@@ -10,7 +10,7 @@ from __future__ import annotations
 import pytest
 
 from phonometry import verify_aircraft_noise_system
-from phonometry.filters.compliance import _iec61265_directional_limit
+from phonometry.aircraft.measurement_system import _iec61265_directional_limit
 
 
 def test_directional_limits_table1() -> None:

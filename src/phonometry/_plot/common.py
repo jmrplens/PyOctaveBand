@@ -38,7 +38,7 @@ if TYPE_CHECKING:
         ImpactRatingResult,
         WeightedRatingResult,
     )
-    from ..room.room_acoustics import RoomAcousticsResult
+    from ..room.acoustics import RoomAcousticsResult
 
 _INSTALL_HINT = (
     "Plotting requires matplotlib. Install it with: pip install phonometry[plot]"

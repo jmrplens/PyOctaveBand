@@ -338,7 +338,7 @@ ISO 3382-3 open-plan speech metrics, with their fiche, are
   used for band decay curves and insulation spectra.
 - [Theory](theory-rooms-buildings.md): Schroeder integration, regression windows and the
   reference-curve derivation.
-- API reference: [`room.room_acoustics`](https://jmrplens.github.io/phonometry/reference/api/rooms/room-acoustics/).
+- API reference: [`room.acoustics`](https://jmrplens.github.io/phonometry/reference/api/rooms/acoustics/).
 
 ## Quick answers
 

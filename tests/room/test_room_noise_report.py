@@ -28,7 +28,7 @@ pytest.importorskip("svglib")
 pytest.importorskip("pypdf")
 
 from phonometry import ReportMetadata
-from phonometry.room import room_noise as rn
+from phonometry.room import noise_criteria as rn
 
 _PDF_MAGIC = b"%PDF"
 

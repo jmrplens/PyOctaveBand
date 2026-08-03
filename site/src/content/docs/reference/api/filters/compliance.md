@@ -253,41 +253,6 @@ class-compliance result, an optional verdict row against a supplied
 | ValueError | If `engine` is not `"reportlab"`. |
 | ImportError | If reportlab is not installed (`pip install phonometry[report]`), or matplotlib is missing for the embedded figure (`pip install phonometry[plot]`). |
 
-## verify_aircraft_noise_system
-
-```python
-verify_aircraft_noise_system(
-    *,
-    directional: dict[float, dict[float, float]] | None = None,
-    frequency_response: dict[float, float] | None = None,
-    linearity: dict[str, float] | None = None,
-    resolution: float | None = None,
-) -> dict[str, Any]
-```
-
-Verify measured performance against IEC 61265:1995 tolerances.
-
-Each supplied measurement is checked against the standard's limit; the
-one-third-octave filtering itself is covered by the IEC 61260 class-2
-verification (subclause 4.6) and is not repeated here.
-
-**Parameters**
-
-| Name | Description |
-| :--- | :--- |
-| `directional` | Microphone directional response as `{frequency_hz: {angle_deg: \|Δsensitivity\| dB}}` (Table 1, §4.4.2). |
-| `frequency_response` | System response deviations `{frequency_hz: deviation_db}` against the ±1.5 dB limit (§4.5.1). |
-| `linearity` | Level non-linearity `{"reference": dB, "other": dB}` against the ±0.4/±0.5 dB limits (§4.5.2). |
-| `resolution` | Readout resolution, in dB, against the 0.1 dB limit (§4.7). |
-
-**Returns:** `{"passed": bool, "checks": [{"quantity", "limit", "value", "ok", ...}]}`; `passed` is the conjunction of every check.
-
-**Raises**
-
-| Exception | When |
-| :--- | :--- |
-| ValueError | If a frequency or angle is out of the tabulated range. |
-
 ## verify_filter_class
 
 ```python

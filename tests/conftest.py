@@ -43,7 +43,7 @@ _FRONTLOADED_MODULES = (
     "tests/psychoacoustics/loudness/test_zwicker.py",
     "tests/underwater/propagation/test_numerical.py",
     "tests/filters/test_iec61260_report.py",
-    "tests/room/test_room_ir.py",
+    "tests/room/test_impulse_response.py",
     "tests/test_golden_baseline.py",
 )
 

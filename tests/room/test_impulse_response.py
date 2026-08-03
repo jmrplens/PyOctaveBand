@@ -1,6 +1,6 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
 """
-Tests for ISO 18233:2006 impulse-response acquisition (room_ir).
+Tests for ISO 18233:2006 impulse-response acquisition.
 
 Validation strategy (closed-form, not self-consistency):
 - Ideal chain (recorded == excitation) -> band-limited delta at t=0.
@@ -31,7 +31,7 @@ from phonometry import (
     room_parameters,
     sweep_signal,
 )
-from phonometry.room.room_ir import _MLS_TAPS
+from phonometry.room.impulse_response import _MLS_TAPS
 
 FS = 48000
 

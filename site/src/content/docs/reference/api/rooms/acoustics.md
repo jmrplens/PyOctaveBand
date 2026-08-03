@@ -1,15 +1,15 @@
 ---
-title: "room.room_acoustics"
+title: "room.acoustics"
 description: "Room acoustic parameters from impulse responses per ISO 3382-1:2009 (performance spaces) and ISO 3382-2:2008 (ordinary rooms)."
 sidebar:
-  label: "room_acoustics"
+  label: "acoustics"
 ---
 
 Room acoustic parameters from impulse responses per ISO 3382-1:2009
 (performance spaces) and ISO 3382-2:2008 (ordinary rooms).
 
 The measured impulse response (acquired e.g. with the swept-sine or MLS
-front end of [`phonometry.room.room_ir`](/phonometry/reference/api/rooms/room-ir/), ISO 18233) is filtered into
+front end of [`phonometry.room.impulse_response`](/phonometry/reference/api/rooms/impulse-response/), ISO 18233) is filtered into
 fractional-octave bands (IEC 61260) and converted to a decay curve by
 Schroeder backward integration of the squared impulse response
 (ISO 3382-1:2009, 5.3.3, Equation (1)). To limit the influence of
@@ -69,13 +69,13 @@ integrated impulse response, Clause 6).
 
 | Name | Description |
 | :--- | :--- |
-| `ir` | Measured impulse response (1D), e.g. from [`phonometry.impulse_response`](/phonometry/reference/api/rooms/room-ir/#impulse_response) (ISO 18233). |
+| `ir` | Measured impulse response (1D), e.g. from [`phonometry.impulse_response`](/phonometry/reference/api/rooms/impulse-response/) (ISO 18233). |
 | `fs` | Sample rate in Hz. |
 | `band` | Optional band centre frequency in Hz. When given, the impulse response is first filtered with the matching IEC 61260 fractional-octave filter; when None the broadband response is integrated directly. |
 | `fraction` | Bandwidth fraction of the band filter (1 = octave, 3 = one-third octave). Only used when `band` is not None. |
 | `zero_phase` | If True, filter the band with forward-backward (zero-phase) filtering, removing the octave filter's group delay before the backward integration. ISO 3382-2:2008 Clause 7.3 NOTE permits time-reversed filtering (it relaxes the B\*T > 16 rule to B\*T > 4); it roughly halves the low-frequency short-decay bias at 125 Hz. Only used when `band` is not None. Default False (causal). |
 
-**Returns:** A [`DecayCurve`](/phonometry/reference/api/rooms/room-acoustics/#decaycurve) with `time` in seconds from the direct sound and `level` in dB (0 dB at time zero), up to the noise truncation point. It unpacks as `time, level = decay_curve(...)` for backward compatibility and exposes [`DecayCurve.plot`](/phonometry/reference/api/rooms/room-acoustics/#decaycurveplot).
+**Returns:** A [`DecayCurve`](/phonometry/reference/api/rooms/acoustics/#decaycurve) with `time` in seconds from the direct sound and `level` in dB (0 dB at time zero), up to the noise truncation point. It unpacks as `time, level = decay_curve(...)` for backward compatibility and exposes [`DecayCurve.plot`](/phonometry/reference/api/rooms/acoustics/#decaycurveplot).
 
 ## DecayCurve
 
@@ -91,7 +91,7 @@ truncation point (ISO 3382-1:2009, 5.3.3). `band` is the
 octave/third-octave band centre in Hz, or `None` for a broadband decay.
 
 For backward compatibility with the previous `(time, level)` tuple
-return of [`decay_curve`](/phonometry/reference/api/rooms/room-acoustics/#decay_curve), the dataclass is iterable and unpacks as
+return of [`decay_curve`](/phonometry/reference/api/rooms/acoustics/#decay_curve), the dataclass is iterable and unpacks as
 `time, level = decay_curve(...)`.
 
 ### DecayCurve.plot()
@@ -126,7 +126,7 @@ room_parameters(
 Room acoustic parameters per ISO 3382-1:2009 / ISO 3382-2:2008.
 
 The impulse response (e.g. acquired with the ISO 18233 swept-sine or
-MLS methods of [`phonometry.room.room_ir`](/phonometry/reference/api/rooms/room-ir/)) is filtered into
+MLS methods of [`phonometry.room.impulse_response`](/phonometry/reference/api/rooms/impulse-response/)) is filtered into
 fractional-octave bands (IEC 61260) and each band decay curve is
 obtained by Schroeder backward integration with noise truncation and
 tail compensation (ISO 3382-1:2009, 5.3.3). Least-squares line fits
@@ -155,7 +155,7 @@ Table A.1).
 | `fraction` | Bandwidth fraction (1 = octave, 3 = one-third octave). Default 1. |
 | `zero_phase` | If True, use forward-backward (zero-phase) octave filtering, removing the filter group delay before the backward integration. ISO 3382-2:2008 Clause 7.3 NOTE permits time-reversed filtering (relaxing B\*T > 16 to B\*T > 4); it roughly halves the 125 Hz short-decay T30 bias (about +4.9 % -> +2.4 % at T = 0.2 s). The benefit is small next to the ~10 % measurement variance but is free and standards-sanctioned. Default False (causal filtering). |
 
-**Returns:** [`RoomAcousticsResult`](/phonometry/reference/api/rooms/room-acoustics/#roomacousticsresult) with one entry per band.
+**Returns:** [`RoomAcousticsResult`](/phonometry/reference/api/rooms/acoustics/#roomacousticsresult) with one entry per band.
 
 ## RoomAcousticsResult
 

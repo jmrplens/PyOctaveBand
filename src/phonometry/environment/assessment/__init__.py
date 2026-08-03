@@ -3,20 +3,19 @@
 
 from __future__ import annotations
 
-from .impulse_prominence import (
-    ImpulseProminenceResult,
-    ImpulseProminenceWarning,
-    impulse_adjustment,
-    impulse_prominence,
-    predicted_prominence,
-    rating_level,
-)
+from ..._compat import _namespace_dir, _namespace_shim
 from .impulsive_sound import (
     ImpulseOnset,
+    ImpulseProminenceResult,
+    ImpulseProminenceWarning,
     ImpulsiveSoundResult,
     ImpulsiveSoundWarning,
     detect_onsets,
+    impulse_adjustment,
+    impulse_prominence,
     impulsive_sound_adjustment,
+    predicted_prominence,
+    rating_level,
     sound_pressure_level_history,
 )
 from .measurement import (
@@ -132,3 +131,9 @@ __all__ = [
     "uncertainty_from_repeated_measurements",
     "vibration_quality_objective",
 ]
+
+#: No public name left this namespace in 4.0, but the modules did, so
+#: ``assessment.impulse_prominence`` has to keep resolving to its alias module until 5.0: the
+#: import registers it, the attribute read needs this.
+__getattr__ = _namespace_shim(__name__)
+__dir__ = _namespace_dir(__name__, __all__)

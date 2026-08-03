@@ -3,8 +3,15 @@
 
 from __future__ import annotations
 
+from .._compat import _namespace_dir, _namespace_shim
 from .._plot.geometry import (
     plot_open_plan_geometry,
+)
+from .acoustics import (
+    DecayCurve,
+    RoomAcousticsResult,
+    decay_curve,
+    room_parameters,
 )
 from .crowd_noise import (
     COMMUNICATION_SNR,
@@ -33,24 +40,7 @@ from .image_source import (
     image_source_rir,
     reflection_density,
 )
-from .open_plan import OpenPlanResult, open_plan_metrics
-from .reverberation_prediction import (
-    ReverberationModelResult,
-    arau_puchades_reverberation_time,
-    eyring_reverberation_time,
-    fitzroy_reverberation_time,
-    mean_absorption,
-    millington_sette_reverberation_time,
-    reverberation_time_models,
-    sabine_reverberation_time,
-)
-from .room_acoustics import (
-    DecayCurve,
-    RoomAcousticsResult,
-    decay_curve,
-    room_parameters,
-)
-from .room_ir import (
+from .impulse_response import (
     ImpulseResponseResult,
     ImpulseResponseWarning,
     ShapedSweepResult,
@@ -63,7 +53,7 @@ from .room_ir import (
     shaped_sweep_signal,
     sweep_signal,
 )
-from .room_modes import (
+from .modes import (
     MODE_KINDS,
     RoomModesResult,
     room_modal_density,
@@ -71,13 +61,24 @@ from .room_modes import (
     room_mode_frequency,
     room_modes,
 )
-from .room_noise import (
+from .noise_criteria import (
     NCResult,
     RCResult,
     nc_curve,
     noise_criterion,
     rc_curve,
     room_criterion,
+)
+from .open_plan import OpenPlanResult, open_plan_metrics
+from .reverberation_prediction import (
+    ReverberationModelResult,
+    arau_puchades_reverberation_time,
+    eyring_reverberation_time,
+    fitzroy_reverberation_time,
+    mean_absorption,
+    millington_sette_reverberation_time,
+    reverberation_time_models,
+    sabine_reverberation_time,
 )
 from .steady_field import (
     SOURCE_POWER_MODELS,
@@ -157,3 +158,9 @@ __all__ = [
     "steady_state_spl",
     "sweep_signal",
 ]
+
+#: No public name left this namespace in 4.0, but the modules did, so
+#: ``room.room_ir`` has to keep resolving to its alias module until 5.0: the
+#: import registers it, the attribute read needs this.
+__getattr__ = _namespace_shim(__name__)
+__dir__ = _namespace_dir(__name__, __all__)

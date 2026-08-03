@@ -23,15 +23,15 @@ import matplotlib.pyplot as plt
 from phonometry import decay_curve, room_parameters
 from phonometry._plot.room import plot_excitation
 from phonometry.room import enclosed_space_absorption as esa
-from phonometry.room import room_noise as rn
+from phonometry.room import noise_criteria as rn
 from phonometry.room.crowd_noise import crowd_noise
 from phonometry.room.image_source import image_source_rir
+from phonometry.room.impulse_response import ImpulseResponseResult
+from phonometry.room.modes import room_modes
 from phonometry.room.open_plan import open_plan_metrics
 from phonometry.room.reverberation_prediction import (
     reverberation_time_models,
 )
-from phonometry.room.room_ir import ImpulseResponseResult
-from phonometry.room.room_modes import room_modes
 from phonometry.room.steady_field import steady_state_field
 
 FS = 48000

@@ -369,7 +369,7 @@ def test_problem_4_16_target_column_is_the_book_nc45_curve() -> None:
     test of the required transmission loss therefore uses the book's printed
     column, not the library curve, so the oracle stays the published one.
     """
-    from phonometry.room.room_noise import _criterion_curve_at
+    from phonometry.room.noise_criteria import _criterion_curve_at
 
     ansi = _criterion_curve_at("NC", 45.0, _BANDS_8)
     assert np.allclose(ansi[:-1], _R416_LP2[:-1])

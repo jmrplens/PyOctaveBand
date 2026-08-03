@@ -68,7 +68,7 @@ if TYPE_CHECKING:
     from matplotlib.axes import Axes
 
     from .._report.metadata import ReportMetadata
-    from ..room.room_noise import NCResult, RCResult
+    from ..room.noise_criteria import NCResult, RCResult
 
 #: Default self-noise sound power level, dB re 1 pW, used where an element has
 #: no regenerated-noise data and as the floor for a negative computed level
@@ -175,9 +175,9 @@ class DuctPathResult:
     def rating(self) -> NCResult | RCResult:
         """The room-criterion rating of :attr:`received_level`.
 
-        An :class:`~phonometry.room.room_noise.NCResult` when
+        An :class:`~phonometry.room.noise_criteria.NCResult` when
         :attr:`criterion` is ``"NC"``, otherwise an
-        :class:`~phonometry.room.room_noise.RCResult` (ANSI/ASA S12.2-2019).
+        :class:`~phonometry.room.noise_criteria.RCResult` (ANSI/ASA S12.2-2019).
         """
         return rating_of(self)
 

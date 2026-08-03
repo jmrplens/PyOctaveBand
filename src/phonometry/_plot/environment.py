@@ -27,7 +27,7 @@ from .common import (
 if TYPE_CHECKING:
     from matplotlib.axes import Axes
 
-    from ..environment.assessment.impulse_prominence import ImpulseProminenceResult
+    from ..environment.assessment.impulsive_sound import ImpulseProminenceResult
     from ..environment.assessment.measurement import TonalAssessmentResult
     from ..environment.assessment.spain import (
         ActivityAssessment,
@@ -229,14 +229,14 @@ def plot_impulse_prominence(
 ) -> Axes:
     """Adjustment curve ``KI(P)`` with the candidate impulses marked.
 
-    :param result: An :class:`~phonometry.environment.assessment.impulse_prominence.ImpulseProminenceResult`.
+    :param result: An :class:`~phonometry.environment.assessment.impulsive_sound.ImpulseProminenceResult`.
     :param ax: Existing axes, or ``None`` to create a figure.
     :param language: Label language, ``"en"`` (default) or ``"es"``.
     :param kwargs: Forwarded to the impulses ``scatter``.
     :return: The axes.
     """
     from .._i18n import decimal_comma, format_number, localize_axes
-    from ..environment.assessment.impulse_prominence import (
+    from ..environment.assessment.impulsive_sound import (
         ADJUSTMENT_THRESHOLD,
         impulse_adjustment,
     )

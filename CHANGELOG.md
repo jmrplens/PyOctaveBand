@@ -1036,6 +1036,31 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   the same 251 names, and the nineteen pre-split module paths keep working
   until 5.0.
 
+- Four `room` modules and one `aircraft` module lose the prefix their package
+  already says: `room.room_acoustics`, `room.room_ir`, `room.room_noise` and
+  `room.room_modes` are `room.acoustics`, `room.impulse_response`,
+  `room.noise_criteria` and `room.modes`, and `aircraft.aircraft_noise` is
+  `aircraft.certification`. Two of them say more than the prefix did: `ir` was
+  opaque for the ISO 18233 acquisition, and `noise` alone did not say that the
+  module is the ANSI/ASA S12.2 NC and RC criteria. The certification module is
+  what ICAO Annex 16 calls it.
+
+- The two impulsive-sound methods are one module,
+  `environment.assessment.impulsive_sound`. NT ACOU 112 and ISO/PAS 1996-3
+  share the prominence and adjustment formulae (both take them from Pedersen's
+  method) and differ only in what the caller supplies: the Nordtest closed form
+  takes the onset rate and level difference, the ISO/PAS chain reads them off a
+  calibrated recording. The second module was already importing the first for
+  its formulae, so the split was between a standard and its own dependency
+  rather than between two subjects. Every name is unchanged.
+
+- The IEC 61265 aircraft measurement-system check is
+  `phonometry.aircraft.measurement_system`, next to the certification levels
+  whose chain it qualifies, rather than in `phonometry.filters` with the
+  instrument-conformance code. `verify_aircraft_noise_system` reads the same
+  from the top level; from `phonometry.filters` it still resolves until 5.0,
+  with the usual notice.
+
 - `phonometry.underwater` has three families, along the three questions an
   underwater problem asks. `underwater.sources` is what makes the sound:
   ISO 17208 ship radiated noise, shipping traffic, impact pile driving and the

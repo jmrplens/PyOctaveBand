@@ -31,7 +31,7 @@ ALLOWED_EDGES: set[tuple[str, str]] = {
     ("aircraft", "environment"),      # atmospheric absorption reuse
     ("vibration", "hearing"),         # multiple-shock SEXES tables
     # swept-sine distortion reuses the ISO 18233 sweep / Farina
-    # inverse-filter machinery of room_ir
+    # inverse-filter machinery of room.impulse_response
     ("electroacoustics", "room"),
     # predicted panel R reuses the plate coincidence frequency (radiation)
     ("building", "vibration"),

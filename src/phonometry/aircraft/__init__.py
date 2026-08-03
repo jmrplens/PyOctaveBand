@@ -3,15 +3,7 @@
 
 from __future__ import annotations
 
-from .aircraft_noise import (
-    NOY_BANDS,
-    EPNLResult,
-    effective_perceived_noise_level,
-    epnl_from_pnlt,
-    perceived_noise_level,
-    perceived_noisiness,
-    tone_correction,
-)
+from .._compat import _namespace_dir, _namespace_shim
 from .airport_noise import (
     FlyoverResult,
     NoiseContourResult,
@@ -35,6 +27,16 @@ from .anp_fleet import (
     load_anp_database,
 )
 from .atmospheric_absorption import AircraftBandAttenuation, sae_band_attenuation
+from .certification import (
+    NOY_BANDS,
+    EPNLResult,
+    effective_perceived_noise_level,
+    epnl_from_pnlt,
+    perceived_noise_level,
+    perceived_noisiness,
+    tone_correction,
+)
+from .measurement_system import verify_aircraft_noise_system
 from .rotorcraft_noise import (
     FlightPathKinematics,
     MeanGroundPlaneResult,
@@ -58,7 +60,7 @@ from .rotorcraft_noise import (
 )
 
 __all__ = [
-    "NOY_BANDS",
+"NOY_BANDS",
     "AircraftBandAttenuation",
     "AnpAircraft",
     "AnpDatabase",
@@ -104,4 +106,11 @@ __all__ = [
     "start_of_roll_directivity",
     "terrain_screening_adjustment",
     "tone_correction",
+    "verify_aircraft_noise_system",
 ]
+
+#: No public name left this namespace in 4.0, but the modules did, so
+#: ``aircraft.aircraft_noise`` has to keep resolving to its alias module until 5.0: the
+#: import registers it, the attribute read needs this.
+__getattr__ = _namespace_shim(__name__)
+__dir__ = _namespace_dir(__name__, __all__)

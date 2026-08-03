@@ -36,15 +36,6 @@ from ._plot.geometry import (
 from ._plot.room import plot_excitation
 from ._report import ReportMetadata
 from ._version import __version__
-from .aircraft.aircraft_noise import (
-    NOY_BANDS,
-    EPNLResult,
-    effective_perceived_noise_level,
-    epnl_from_pnlt,
-    perceived_noise_level,
-    perceived_noisiness,
-    tone_correction,
-)
 from .aircraft.airport_noise import (
     FlyoverResult,
     NoiseContourResult,
@@ -71,6 +62,16 @@ from .aircraft.atmospheric_absorption import (
     AircraftBandAttenuation,
     sae_band_attenuation,
 )
+from .aircraft.certification import (
+    NOY_BANDS,
+    EPNLResult,
+    effective_perceived_noise_level,
+    epnl_from_pnlt,
+    perceived_noise_level,
+    perceived_noisiness,
+    tone_correction,
+)
+from .aircraft.measurement_system import verify_aircraft_noise_system
 from .aircraft.rotorcraft_noise import (
     FlightPathKinematics,
     MeanGroundPlaneResult,
@@ -506,20 +507,18 @@ from .emission.vibration_sound_power import (
     velocity_level,
     velocity_level_from_acceleration,
 )
-from .environment.assessment.impulse_prominence import (
-    ImpulseProminenceResult,
-    ImpulseProminenceWarning,
-    impulse_adjustment,
-    impulse_prominence,
-    predicted_prominence,
-    rating_level,
-)
 from .environment.assessment.impulsive_sound import (
     ImpulseOnset,
+    ImpulseProminenceResult,
+    ImpulseProminenceWarning,
     ImpulsiveSoundResult,
     ImpulsiveSoundWarning,
     detect_onsets,
+    impulse_adjustment,
+    impulse_prominence,
     impulsive_sound_adjustment,
+    predicted_prominence,
+    rating_level,
     sound_pressure_level_history,
 )
 from .environment.assessment.measurement import (
@@ -695,7 +694,6 @@ from .filters.compliance import (
     FilterComplianceResult,
     class_limits,
     filter_class_compliance,
-    verify_aircraft_noise_system,
     verify_filter_class,
     verify_weighting_class,
     weighting_class_limits,
@@ -1112,6 +1110,12 @@ from .psychoacoustics.quality.tone_audibility import (
     tone_level,
     two_tone_separation_frequency,
 )
+from .room.acoustics import (
+    DecayCurve,
+    RoomAcousticsResult,
+    decay_curve,
+    room_parameters,
+)
 from .room.crowd_noise import (
     COMMUNICATION_SNR,
     NORMAL_VOICE_POWER_LEVEL,
@@ -1139,24 +1143,7 @@ from .room.image_source import (
     image_source_rir,
     reflection_density,
 )
-from .room.open_plan import OpenPlanResult, open_plan_metrics
-from .room.reverberation_prediction import (
-    ReverberationModelResult,
-    arau_puchades_reverberation_time,
-    eyring_reverberation_time,
-    fitzroy_reverberation_time,
-    mean_absorption,
-    millington_sette_reverberation_time,
-    reverberation_time_models,
-    sabine_reverberation_time,
-)
-from .room.room_acoustics import (
-    DecayCurve,
-    RoomAcousticsResult,
-    decay_curve,
-    room_parameters,
-)
-from .room.room_ir import (
+from .room.impulse_response import (
     ImpulseResponseResult,
     ImpulseResponseWarning,
     ShapedSweepResult,
@@ -1169,7 +1156,7 @@ from .room.room_ir import (
     shaped_sweep_signal,
     sweep_signal,
 )
-from .room.room_modes import (
+from .room.modes import (
     MODE_KINDS,
     RoomModesResult,
     room_modal_density,
@@ -1177,13 +1164,24 @@ from .room.room_modes import (
     room_mode_frequency,
     room_modes,
 )
-from .room.room_noise import (
+from .room.noise_criteria import (
     NCResult,
     RCResult,
     nc_curve,
     noise_criterion,
     rc_curve,
     room_criterion,
+)
+from .room.open_plan import OpenPlanResult, open_plan_metrics
+from .room.reverberation_prediction import (
+    ReverberationModelResult,
+    arau_puchades_reverberation_time,
+    eyring_reverberation_time,
+    fitzroy_reverberation_time,
+    mean_absorption,
+    millington_sette_reverberation_time,
+    reverberation_time_models,
+    sabine_reverberation_time,
 )
 from .room.steady_field import (
     SOURCE_POWER_MODELS,

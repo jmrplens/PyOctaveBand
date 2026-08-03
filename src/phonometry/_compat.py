@@ -94,9 +94,9 @@ _MOVED_3X: dict[str, str] = {
     "phonometry.enclosed_space_absorption": "phonometry.room.enclosed_space_absorption",
     "phonometry.open_plan": "phonometry.room.open_plan",
     "phonometry.reverberation_prediction": "phonometry.room.reverberation_prediction",
-    "phonometry.room_acoustics": "phonometry.room.room_acoustics",
-    "phonometry.room_ir": "phonometry.room.room_ir",
-    "phonometry.room_noise": "phonometry.room.room_noise",
+    "phonometry.room_acoustics": "phonometry.room.acoustics",
+    "phonometry.room_ir": "phonometry.room.impulse_response",
+    "phonometry.room_noise": "phonometry.room.noise_criteria",
     "phonometry.building_prediction":
         "phonometry.building.prediction.simplified_model",
     "phonometry.building_uncertainty":
@@ -131,13 +131,13 @@ _MOVED_3X: dict[str, str] = {
     "phonometry.environmental_measurement":
         "phonometry.environment.assessment.measurement",
     "phonometry.impulse_prominence":
-        "phonometry.environment.assessment.impulse_prominence",
+        "phonometry.environment.assessment.impulsive_sound",
     "phonometry.outdoor_propagation":
         "phonometry.environment.propagation.outdoor_propagation",
     "phonometry.wind_turbine_noise":
         "phonometry.environment.sources.wind_turbine",
     "phonometry.aircraft_atmospheric_absorption": "phonometry.aircraft.atmospheric_absorption",
-    "phonometry.aircraft_noise": "phonometry.aircraft.aircraft_noise",
+    "phonometry.aircraft_noise": "phonometry.aircraft.certification",
     "phonometry.airport_noise": "phonometry.aircraft.airport_noise",
     "phonometry.rotorcraft_noise": "phonometry.aircraft.rotorcraft_noise",
     "phonometry.numerical_propagation": "phonometry.underwater.propagation.numerical",
@@ -238,7 +238,7 @@ _MOVED_4X: dict[str, str] = {
     "phonometry.environmental.impulsive_sound":
         "phonometry.environment.assessment.impulsive_sound",
     "phonometry.environmental.impulse_prominence":
-        "phonometry.environment.assessment.impulse_prominence",
+        "phonometry.environment.assessment.impulsive_sound",
     "phonometry.environmental.spanish_regulation":
         "phonometry.environment.assessment.spain",
     "phonometry.building.insulation":
@@ -330,6 +330,14 @@ _MOVED_4X: dict[str, str] = {
         "phonometry.psychoacoustics.quality.tone_audibility",
     "phonometry.psychoacoustics.psychoacoustic_annoyance":
         "phonometry.psychoacoustics.quality.annoyance",
+    # NT ACOU 112 and ISO/PAS 1996-3 share their formulae and are one module.
+    "phonometry.environment.assessment.impulse_prominence":
+        "phonometry.environment.assessment.impulsive_sound",
+    "phonometry.room.room_acoustics": "phonometry.room.acoustics",
+    "phonometry.room.room_ir": "phonometry.room.impulse_response",
+    "phonometry.room.room_noise": "phonometry.room.noise_criteria",
+    "phonometry.room.room_modes": "phonometry.room.modes",
+    "phonometry.aircraft.aircraft_noise": "phonometry.aircraft.certification",
     "phonometry.underwater.marine_mammal_audiograms":
         "phonometry.underwater.bioacoustics.audiograms",
     "phonometry.underwater.marine_mammal_weighting":
