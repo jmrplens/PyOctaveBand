@@ -4,7 +4,7 @@ Part of https://jmrplens.github.io/phonometry/llms.txt. Full text of the pages i
 
 ---
 
-<!-- source: docs/diffusers.md | canonical: https://jmrplens.github.io/phonometry/materials/diffusers/diffusers/ -->
+<!-- source: docs/materials/diffusers/diffusers.md | canonical: https://jmrplens.github.io/phonometry/materials/diffusers/diffusers/ -->
 Source: https://jmrplens.github.io/phonometry/materials/diffusers/diffusers/
 
 # Diffusers and Their Coefficients
@@ -662,7 +662,7 @@ against the standards' worked examples and closed forms is tracked in
 ---
 
 
-<!-- source: docs/metadiffusers.md | canonical: https://jmrplens.github.io/phonometry/materials/diffusers/metadiffusers/ -->
+<!-- source: docs/materials/diffusers/metadiffusers.md | canonical: https://jmrplens.github.io/phonometry/materials/diffusers/metadiffusers/ -->
 Source: https://jmrplens.github.io/phonometry/materials/diffusers/metadiffusers/
 
 # Metadiffusers

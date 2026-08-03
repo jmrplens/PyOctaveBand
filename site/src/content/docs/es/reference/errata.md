@@ -1124,7 +1124,7 @@ which is the check that enforces the rule; see
   treats the full 22-band one-third-octave set as attesting either class, and
   the 7-band octave set (63 Hz to 4 kHz) as a class 2 alternative that never
   attests class 1, with both branches pinned by regression tests
-  ([`tests/metrology/test_intensity_compliance.py`](https://github.com/jmrplens/phonometry/blob/main/tests/metrology/test_intensity_compliance.py)).
+  ([`tests/emission/test_intensity_compliance.py`](https://github.com/jmrplens/phonometry/blob/main/tests/emission/test_intensity_compliance.py)).
 - **Status:** unreported (national translation, not the issuing body's text).
 
 ## ISO/PAS 1996-3:2022, Clause 5 (cross-references of r and d)
@@ -1149,7 +1149,7 @@ which is the check that enforces the rule; see
   printed with them.
 - **Library behaviour:** implements the spelled-out reading, weighting the
   onset rate by 3 and the level difference by 2 (`predicted_prominence` in
-  [`impulse_prominence.py`](https://github.com/jmrplens/phonometry/blob/main/src/phonometry/environment/assessment/impulse_prominence.py)),
+  [`impulsive_sound.py`](https://github.com/jmrplens/phonometry/blob/main/src/phonometry/environment/assessment/impulsive_sound.py)),
   which is also the NT ACOU 112:2002 form the PAS carries over.
 - **Status:** unreported.
 
@@ -2111,7 +2111,7 @@ which is the check that enforces the rule; see
   rebuilds both angles from the printed equations rather than from the
   implementation, and the shared definition of $\theta_\text{eff}$ by
   `test_composite_loss_and_the_boundary_use_the_same_effective_angle` (both in
-  [`tests/underwater/test_weston_regimes.py`](https://github.com/jmrplens/phonometry/blob/main/tests/underwater/test_weston_regimes.py)).
+  [`tests/underwater/propagation/test_weston_regimes.py`](https://github.com/jmrplens/phonometry/blob/main/tests/underwater/propagation/test_weston_regimes.py)).
 - **Status:** unreported (textbook rather than a standard).
 
 ---

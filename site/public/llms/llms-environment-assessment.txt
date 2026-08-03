@@ -4,7 +4,7 @@ Part of https://jmrplens.github.io/phonometry/llms.txt. Full text of the pages i
 
 ---
 
-<!-- source: docs/impulse-prominence.md | canonical: https://jmrplens.github.io/phonometry/environment/assessment/impulsive-sound/ -->
+<!-- source: docs/environment/assessment/impulsive-sound.md | canonical: https://jmrplens.github.io/phonometry/environment/assessment/impulsive-sound/ -->
 Source: https://jmrplens.github.io/phonometry/environment/assessment/impulsive-sound/
 
 # Impulsive-sound prominence (NT ACOU 112)

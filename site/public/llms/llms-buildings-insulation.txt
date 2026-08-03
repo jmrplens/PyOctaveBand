@@ -4,7 +4,7 @@ Part of https://jmrplens.github.io/phonometry/llms.txt. Full text of the pages i
 
 ---
 
-<!-- source: docs/insulation-lab.md | canonical: https://jmrplens.github.io/phonometry/buildings/insulation/insulation-lab/ -->
+<!-- source: docs/buildings/insulation/insulation-lab.md | canonical: https://jmrplens.github.io/phonometry/buildings/insulation/insulation-lab/ -->
 Source: https://jmrplens.github.io/phonometry/buildings/insulation/insulation-lab/
 
 # Laboratory Insulation Measurement
@@ -301,7 +301,7 @@ procedures behind them.
 ---
 
 
-<!-- source: docs/insulation-intensity.md | canonical: https://jmrplens.github.io/phonometry/buildings/insulation/insulation-intensity/ -->
+<!-- source: docs/buildings/insulation/insulation-intensity.md | canonical: https://jmrplens.github.io/phonometry/buildings/insulation/insulation-intensity/ -->
 Source: https://jmrplens.github.io/phonometry/buildings/insulation/insulation-intensity/
 
 # Sound Insulation by Intensity (ISO 15186)
@@ -631,7 +631,7 @@ apparent $R'_I$. The single-number ratings reuse ISO 717-1.
 ---
 
 
-<!-- source: docs/flanking-lab.md | canonical: https://jmrplens.github.io/phonometry/buildings/insulation/flanking-lab/ -->
+<!-- source: docs/buildings/insulation/flanking-lab.md | canonical: https://jmrplens.github.io/phonometry/buildings/insulation/flanking-lab/ -->
 Source: https://jmrplens.github.io/phonometry/buildings/insulation/flanking-lab/
 
 # Laboratory Flanking Transmission (ISO 10848)
@@ -1053,7 +1053,7 @@ laboratory reports.
 ---
 
 
-<!-- source: docs/insulation-field.md | canonical: https://jmrplens.github.io/phonometry/buildings/insulation/insulation-field/ -->
+<!-- source: docs/buildings/insulation/insulation-field.md | canonical: https://jmrplens.github.io/phonometry/buildings/insulation/insulation-field/ -->
 Source: https://jmrplens.github.io/phonometry/buildings/insulation/insulation-field/
 
 # Field Insulation Measurement (ISO 16283)
@@ -1521,7 +1521,7 @@ ISO 16283 family (ISO 16283-3:2016) has its own page.
 ---
 
 
-<!-- source: docs/insulation-survey.md | canonical: https://jmrplens.github.io/phonometry/buildings/insulation/insulation-survey/ -->
+<!-- source: docs/buildings/insulation/insulation-survey.md | canonical: https://jmrplens.github.io/phonometry/buildings/insulation/insulation-survey/ -->
 Source: https://jmrplens.github.io/phonometry/buildings/insulation/insulation-survey/
 
 # Sound Insulation Survey Method (ISO 10052)
@@ -1767,7 +1767,7 @@ ISO 717-2.
 ---
 
 
-<!-- source: docs/insulation-ratings.md | canonical: https://jmrplens.github.io/phonometry/buildings/insulation/insulation-ratings/ -->
+<!-- source: docs/buildings/insulation/insulation-ratings.md | canonical: https://jmrplens.github.io/phonometry/buildings/insulation/insulation-ratings/ -->
 Source: https://jmrplens.github.io/phonometry/buildings/insulation/insulation-ratings/
 
 # Insulation Ratings (ISO 717)
@@ -2205,7 +2205,7 @@ worked examples.
 ---
 
 
-<!-- source: docs/facade-insulation.md | canonical: https://jmrplens.github.io/phonometry/buildings/insulation/facade-insulation/ -->
+<!-- source: docs/buildings/insulation/facade-insulation.md | canonical: https://jmrplens.github.io/phonometry/buildings/insulation/facade-insulation/ -->
 Source: https://jmrplens.github.io/phonometry/buildings/insulation/facade-insulation/
 
 # Façade Sound Insulation
@@ -2795,7 +2795,7 @@ ISO 16283-3 and EN ISO 717-1 for the prediction).
 ---
 
 
-<!-- source: docs/spanish-building-code.md | canonical: https://jmrplens.github.io/phonometry/buildings/insulation/spanish-building-code/ -->
+<!-- source: docs/buildings/insulation/spanish-building-code.md | canonical: https://jmrplens.github.io/phonometry/buildings/insulation/spanish-building-code/ -->
 Source: https://jmrplens.github.io/phonometry/buildings/insulation/spanish-building-code/
 
 # Spanish Building Code (CTE DB-HR)
@@ -3129,7 +3129,7 @@ and 2.2 for reverberation and absorption.
 ---
 
 
-<!-- source: docs/heavy-impact-sources.md | canonical: https://jmrplens.github.io/phonometry/buildings/insulation/heavy-impact-sources/ -->
+<!-- source: docs/buildings/insulation/heavy-impact-sources.md | canonical: https://jmrplens.github.io/phonometry/buildings/insulation/heavy-impact-sources/ -->
 Source: https://jmrplens.github.io/phonometry/buildings/insulation/heavy-impact-sources/
 
 # Heavy and Soft Impact Sources (ISO 16283-2)

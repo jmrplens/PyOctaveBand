@@ -4,7 +4,7 @@ Part of https://jmrplens.github.io/phonometry/llms.txt. Full text of the pages i
 
 ---
 
-<!-- source: docs/room-impulse-response.md | canonical: https://jmrplens.github.io/phonometry/buildings/rooms/room-impulse-response/ -->
+<!-- source: docs/buildings/rooms/room-impulse-response.md | canonical: https://jmrplens.github.io/phonometry/buildings/rooms/room-impulse-response/ -->
 Source: https://jmrplens.github.io/phonometry/buildings/rooms/room-impulse-response/
 
 # Measuring the Room Impulse Response
@@ -324,7 +324,7 @@ deconvolution identities in the [conformance report](https://jmrplens.github.io/
 ---
 
 
-<!-- source: docs/room-acoustics.md | canonical: https://jmrplens.github.io/phonometry/buildings/rooms/room-acoustics/ -->
+<!-- source: docs/buildings/rooms/room-acoustics.md | canonical: https://jmrplens.github.io/phonometry/buildings/rooms/room-acoustics/ -->
 Source: https://jmrplens.github.io/phonometry/buildings/rooms/room-acoustics/
 
 # Room Acoustics
@@ -722,7 +722,7 @@ closed-form decays and the standards' own parameter definitions in the
 ---
 
 
-<!-- source: docs/open-plan-acoustics.md | canonical: https://jmrplens.github.io/phonometry/buildings/rooms/open-plan-acoustics/ -->
+<!-- source: docs/buildings/rooms/open-plan-acoustics.md | canonical: https://jmrplens.github.io/phonometry/buildings/rooms/open-plan-acoustics/ -->
 Source: https://jmrplens.github.io/phonometry/buildings/rooms/open-plan-acoustics/
 
 # Open-Plan Office Acoustics (ISO 3382-3)
@@ -1081,7 +1081,7 @@ definitions in the [conformance report](https://jmrplens.github.io/phonometry/re
 ---
 
 
-<!-- source: docs/room-image-sources.md | canonical: https://jmrplens.github.io/phonometry/buildings/rooms/room-image-sources/ -->
+<!-- source: docs/buildings/rooms/room-image-sources.md | canonical: https://jmrplens.github.io/phonometry/buildings/rooms/room-image-sources/ -->
 Source: https://jmrplens.github.io/phonometry/buildings/rooms/room-image-sources/
 
 # Image sources and the steady-state room field (Kuttruff / Vorländer / Bies)
@@ -1546,7 +1546,7 @@ own numeric anchors (see [CONFORMANCE.md](https://jmrplens.github.io/phonometry/
 ---
 
 
-<!-- source: docs/reverberation-prediction.md | canonical: https://jmrplens.github.io/phonometry/buildings/rooms/reverberation-prediction/ -->
+<!-- source: docs/buildings/rooms/reverberation-prediction.md | canonical: https://jmrplens.github.io/phonometry/buildings/rooms/reverberation-prediction/ -->
 Source: https://jmrplens.github.io/phonometry/buildings/rooms/reverberation-prediction/
 
 # Reverberation-time prediction (Sabine · Eyring · Fitzroy · Arau-Puchades)
@@ -1914,7 +1914,7 @@ whole family.
 ---
 
 
-<!-- source: docs/enclosed-space-absorption.md | canonical: https://jmrplens.github.io/phonometry/buildings/rooms/enclosed-space-absorption/ -->
+<!-- source: docs/buildings/rooms/enclosed-space-absorption.md | canonical: https://jmrplens.github.io/phonometry/buildings/rooms/enclosed-space-absorption/ -->
 Source: https://jmrplens.github.io/phonometry/buildings/rooms/enclosed-space-absorption/
 
 # Sound absorption in enclosed spaces (EN 12354-6)
@@ -2169,7 +2169,7 @@ Formula 5), validated against the three worked cases of Annex E.
 ---
 
 
-<!-- source: docs/room-noise.md | canonical: https://jmrplens.github.io/phonometry/buildings/rooms/room-noise/ -->
+<!-- source: docs/buildings/rooms/room-noise.md | canonical: https://jmrplens.github.io/phonometry/buildings/rooms/room-noise/ -->
 Source: https://jmrplens.github.io/phonometry/buildings/rooms/room-noise/
 
 # Room-noise criteria (NC / RC Mark II)

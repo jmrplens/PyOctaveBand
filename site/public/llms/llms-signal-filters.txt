@@ -4,7 +4,7 @@ Part of https://jmrplens.github.io/phonometry/llms.txt. Full text of the pages i
 
 ---
 
-<!-- source: docs/filter-banks.md | canonical: https://jmrplens.github.io/phonometry/signal/filters/filter-banks/ -->
+<!-- source: docs/signal/filters/filter-banks.md | canonical: https://jmrplens.github.io/phonometry/signal/filters/filter-banks/ -->
 Source: https://jmrplens.github.io/phonometry/signal/filters/filter-banks/
 
 # Filter Banks
@@ -404,7 +404,7 @@ series behind the nominal band labels reported by `nominal_frequencies`.
 ---
 
 
-<!-- source: docs/filter-gallery.md | canonical: https://jmrplens.github.io/phonometry/signal/filters/filter-gallery/ -->
+<!-- source: docs/signal/filters/filter-gallery.md | canonical: https://jmrplens.github.io/phonometry/signal/filters/filter-gallery/ -->
 Source: https://jmrplens.github.io/phonometry/signal/filters/filter-gallery/
 
 # Filter Architecture Gallery
@@ -779,7 +779,7 @@ convention on which every architecture places its −3 dB points.
 ---
 
 
-<!-- source: docs/filter-compliance.md | canonical: https://jmrplens.github.io/phonometry/signal/filters/filter-compliance/ -->
+<!-- source: docs/signal/filters/filter-compliance.md | canonical: https://jmrplens.github.io/phonometry/signal/filters/filter-compliance/ -->
 Source: https://jmrplens.github.io/phonometry/signal/filters/filter-compliance/
 
 # Filter class verification (IEC 61260-1)
@@ -1117,7 +1117,7 @@ verified in §2.
 ---
 
 
-<!-- source: docs/block-processing.md | canonical: https://jmrplens.github.io/phonometry/signal/filters/block-processing/ -->
+<!-- source: docs/signal/filters/block-processing.md | canonical: https://jmrplens.github.io/phonometry/signal/filters/block-processing/ -->
 Source: https://jmrplens.github.io/phonometry/signal/filters/block-processing/
 
 # Block Processing
@@ -1327,7 +1327,7 @@ tolerance claim of the underlying pages holds unchanged in streaming use.
 ---
 
 
-<!-- source: docs/multichannel.md | canonical: https://jmrplens.github.io/phonometry/signal/filters/multichannel/ -->
+<!-- source: docs/signal/filters/multichannel.md | canonical: https://jmrplens.github.io/phonometry/signal/filters/multichannel/ -->
 Source: https://jmrplens.github.io/phonometry/signal/filters/multichannel/
 
 # Multichannel and Performance

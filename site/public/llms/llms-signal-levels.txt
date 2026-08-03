@@ -4,7 +4,7 @@ Part of https://jmrplens.github.io/phonometry/llms.txt. Full text of the pages i
 
 ---
 
-<!-- source: docs/weighting.md | canonical: https://jmrplens.github.io/phonometry/signal/levels/weighting/ -->
+<!-- source: docs/signal/levels/weighting.md | canonical: https://jmrplens.github.io/phonometry/signal/levels/weighting/ -->
 Source: https://jmrplens.github.io/phonometry/signal/levels/weighting/
 
 # Frequency Weighting (A, C, Z)
@@ -386,7 +386,7 @@ at 1 kHz), the class 1 tolerances the `high_accuracy` design keeps up to
 ---
 
 
-<!-- source: docs/special-weightings.md | canonical: https://jmrplens.github.io/phonometry/signal/levels/special-weightings/ -->
+<!-- source: docs/signal/levels/special-weightings.md | canonical: https://jmrplens.github.io/phonometry/signal/levels/special-weightings/ -->
 Source: https://jmrplens.github.io/phonometry/signal/levels/special-weightings/
 
 # Special Weightings (G, B, D, AU)
@@ -664,7 +664,7 @@ weighting, from its published rational transfer function.
 ---
 
 
-<!-- source: docs/time-weighting.md | canonical: https://jmrplens.github.io/phonometry/signal/levels/time-weighting/ -->
+<!-- source: docs/signal/levels/time-weighting.md | canonical: https://jmrplens.github.io/phonometry/signal/levels/time-weighting/ -->
 Source: https://jmrplens.github.io/phonometry/signal/levels/time-weighting/
 
 # Time Weighting and Integration
@@ -954,7 +954,7 @@ in CI.
 ---
 
 
-<!-- source: docs/levels.md | canonical: https://jmrplens.github.io/phonometry/signal/levels/levels/ -->
+<!-- source: docs/signal/levels/levels.md | canonical: https://jmrplens.github.io/phonometry/signal/levels/levels/ -->
 Source: https://jmrplens.github.io/phonometry/signal/levels/levels/
 
 # Integrated and Statistical Levels

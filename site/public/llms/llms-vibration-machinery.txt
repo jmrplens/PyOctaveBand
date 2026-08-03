@@ -4,7 +4,7 @@ Part of https://jmrplens.github.io/phonometry/llms.txt. Full text of the pages i
 
 ---
 
-<!-- source: docs/machine-diagnostics.md | canonical: https://jmrplens.github.io/phonometry/vibration/machinery/machine-diagnostics/ -->
+<!-- source: docs/vibration/machinery/machine-diagnostics.md | canonical: https://jmrplens.github.io/phonometry/vibration/machinery/machine-diagnostics/ -->
 Source: https://jmrplens.github.io/phonometry/vibration/machinery/machine-diagnostics/
 
 # Machine fault frequencies (Norton & Karczub)

@@ -1,0 +1,351 @@
+← [Documentation index](../../README.md)
+
+# Sound Quality Metrics
+
+Two sounds of equal loudness can still differ in how *sharp*, how *tonal*,
+how *rough* or how strongly *fluctuating* they are. This page covers the
+sound-quality metrics that complement loudness: sharpness (DIN 45692) and the
+ECMA-418-2 tonality, roughness and fluctuation strength of the Sottek Hearing
+Model. Loudness itself lives in [Loudness](loudness.md); the ECMA-418-2
+loudness that shares the same auditory front-end lives in
+[Advanced loudness](advanced-loudness.md).
+
+The four metrics form one family: a single calibrated signal splits across
+two auditory front ends, and every branch is anchored to a reference sound
+whose normative target is exactly 1. The diagram maps the family with the
+values the library actually computes for each reference (rounded results
+such as 0.9999 asper and 0.9957 vacil_HMS sit against that target of 1).
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_sound_quality_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_sound_quality.svg" alt="Block diagram of the sound-quality metric family: a calibrated signal in pascals feeds two auditory front ends, the Zwicker specific loudness pattern over 24 Bark and the ECMA-418-2 Sottek Hearing Model with 53 auditory bands; the first drives the DIN 45692 sharpness whose critical-band-wide noise reference at 1 kHz and 60 dB reads 1.00 acum, the second drives the tonality, roughness and fluctuation strength, whose references, a 1 kHz tone at 40 dB and 1 kHz carriers fully amplitude-modulated at 70 Hz and 4 Hz at 60 dB, read 1.000 tu_HMS, 0.9999 asper and 0.9957 vacil_HMS; a closing note states that N5, sharpness, roughness and fluctuation strength feed the Fastl and Zwicker psychoacoustic annoyance" width="92%"></picture>
+
+## Sharpness in acum (DIN 45692)
+
+Two sounds can be equally loud yet one feels "sharper" (hissy, metallic)
+because its loudness sits higher on the Bark scale. Sharpness is the
+$g(z)$-weighted first moment of the specific loudness pattern:
+
+$$
+S = k\ \frac{\int_0^{24} N'(z)\ g(z)\ z\ dz}{\int_0^{24} N'(z)\ dz}\ \text{acum}
+$$
+
+with $g(z) = 1$ up to 15.8 Bark and rising exponentially beyond, and $k$
+normalized so the reference sound (critical-band-wide noise at 1 kHz,
+60 dB) is exactly **1.00 acum** (DIN 45692 clause 6; the derived
+$k = 0.108$ sits inside the normative window 0.105–0.115).
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sharpness_weighting_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sharpness_weighting.svg" alt="DIN 45692 sharpness weighting g(z) against critical-band rate on a log axis, comparing the DIN, von Bismarck and Aures curves with the 15.8 and 15 Bark knees marked" width="80%"></picture>
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+
+# DIN 45692 sharpness weighting g(z): Eq. (1) plus the informative Annex B variants
+z = np.arange(1, 241) * 0.1                     # Bark bins, 0.1 .. 24.0
+g_din = np.where(z > 15.8, 0.15 * np.exp(0.42 * (z - 15.8)) + 0.85, 1.0)
+g_bis = np.where(z > 15.0, 0.2 * np.exp(0.308 * (z - 15.0)) + 0.8, 1.0)
+n = 4.0                                         # Aures depends on the total loudness (sone)
+g_aures = 0.078 * np.exp(0.171 * z) / z * (n / np.log(n * 0.05 + 1.0))
+
+fig, ax = plt.subplots()
+ax.semilogy(z, g_din, label="DIN 45692 g(z)")
+ax.semilogy(z, g_bis, "--", label="von Bismarck (Annex B)")
+ax.semilogy(z, g_aures, "-.", label="Aures (Annex B, N = 4 sone)")
+ax.axvline(15.8, linestyle=":", color="0.5")    # DIN knee: g rises beyond 15.8 Bark
+ax.set(xlabel="Critical-band rate z [Bark]", ylabel="Weighting g(z)")
+ax.grid(True, which="both", alpha=0.3)
+ax.legend()
+plt.show()
+```
+
+</details>
+
+```python
+import numpy as np
+from phonometry import psychoacoustics
+
+# A raw recording plus its calibration so the guide runs standalone
+fs = 48000
+x = 0.2 * np.sin(2 * np.pi * 1000 * np.arange(fs) / fs)   # any recording (digital units)
+sens = 1.0                                                # calibration_factor to pascals
+
+s = psychoacoustics.sharpness_din(x, fs, calibration_factor=sens)      # acum
+s_aures = psychoacoustics.sharpness_din(x, fs, method="aures")          # Annex B variant
+```
+
+CI verifies the Table A.2 target values (0.38 acum at 250 Hz up to
+2.82 acum at 4 kHz) within the standard's 5 % / 0.05 acum tolerance.
+
+## Tonality (ECMA-418-2)
+
+A tonal component (a whistle, a fan's blade-passing tone) stands out even at
+low level. ECMA-418-2 quantifies it from the **autocorrelation function** (ACF)
+of each band's rectified signal: a periodic (tonal) component keeps a high ACF
+at nonzero lag, and the tonal-to-noise loudness ratio drives the specific
+tonality $T'(z)$. The single value $T$ is in **tu_HMS**, calibrated so a
+1 kHz/40 dB tone is $\approx 1$ tu_HMS; the result also tracks the tonal
+frequency $f_\text{ton}$ per band.
+
+```python
+import numpy as np
+from phonometry import psychoacoustics
+
+fs = 48000
+t = np.arange(int(1.2 * fs)) / fs
+x = np.sqrt(2) * 2e-5 * 10 ** (40 / 20) * np.sin(2 * np.pi * 1000 * t)
+
+res = psychoacoustics.tonality_ecma(x, fs, field="free")
+peak = int(np.argmax(res.specific_tonality))
+print(f"T = {res.tonality:.3f} tu_HMS")                    # 1.000 tu_HMS
+print(f"f_ton = {res.tonal_frequencies[peak]:.0f} Hz")     # 999 Hz
+
+res.plot()   # average specific tonality T'(z) + time-dependent T(l)
+```
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sottek_specific_tonality_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sottek_specific_tonality.svg" alt="ECMA-418-2 average specific tonality over the 53 Bark_HMS bands for a 1 kHz tone at 40 dB SPL: the tonality is concentrated in a single peak at the tone's critical band around 9 Bark_HMS and falls to nearly zero elsewhere, integrating to T = 1.00 tu_HMS" width="80%"></picture>
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import psychoacoustics
+
+# The calibration anchor: a 1 kHz tone at 40 dB SPL is about 1 tu_HMS.
+fs = 48000
+t = np.arange(int(1.2 * fs)) / fs
+x = np.sqrt(2) * 2e-5 * 10 ** (40 / 20) * np.sin(2 * np.pi * 1000 * t)
+res = psychoacoustics.tonality_ecma(x, fs, field="free")
+
+# One line: passing an axes draws the specific-tonality panel alone.
+fig, ax = plt.subplots()
+res.plot(ax=ax)
+plt.show()
+
+# Or draw T'(z) by hand against the critical-band-rate scale:
+fig, ax = plt.subplots()
+ax.fill_between(res.bark, res.specific_tonality, alpha=0.3, color="#d62728")
+ax.plot(res.bark, res.specific_tonality, color="#d62728")
+ax.set_xlabel("Critical-band rate z [Bark_HMS]")
+ax.set_ylabel("Specific tonality T' [tu_HMS]")
+plt.show()
+```
+
+</details>
+
+The concentration is what distinguishes a tonal sound from a broadband one of
+the same loudness: the autocorrelation stage finds a periodic component in one
+band and almost nothing in the others. A fan with a blade-passing tone and a
+harmonic series shows several such peaks; a hiss shows a flat, low pattern.
+Calling `.plot()` without an axes adds the time-dependent $T(l)$ panel, which
+is where an intermittent tone shows up.
+
+### `tonality_ecma()` parameters
+
+| Parameter | Type | Units | Range / default | Notes |
+| :--- | :--- | :--- | :--- | :--- |
+| `signal_in` | 1D array | Pa | non-empty | Calibrated pressure signal |
+| `fs` | float | Hz | > 0 | Resampled to 48 kHz internally if needed |
+| `field` | str | — | `'free'` (default) / `'diffuse'` | Outer/middle-ear filter |
+| `f_low` | float, optional | Hz | default `None` | Lower edge of a user band for the $T(l)$ search |
+| `f_high` | float, optional | Hz | default `None` | Upper edge of the user band |
+
+Returns an `EcmaTonality`: `tonality` ($T$, tu_HMS), `specific_tonality`
+($T'(z)$, 53 bands), `bark`, `centre_frequencies`, `tonal_frequencies`
+($f_{\text{ton},z}$), `time`, `tonality_vs_time` ($T(l)$),
+`tonal_frequency_vs_time`,
+`field`.
+
+## Roughness (ECMA-418-2): new capability
+
+Roughness is the harsh, buzzing sensation of fast amplitude modulation
+(roughly 20–300 Hz, peaking near 70 Hz): the quality of a diesel idle or a
+distorted loudspeaker. It is a **new metric** for phonometry. ECMA-418-2
+extracts each band's envelope, weights its modulation spectrum by modulation
+rate and depth, and correlates the modulation across bands; the result $R$ is
+in **asper**. The reference sound (1 kHz carrier, 100 % amplitude-modulated at
+70 Hz, overall level 60 dB SPL) is defined as 1 asper; this clean-room
+implementation returns 0.9999 asper with the tabulated calibration constant
+$c_R$ (Formula 104) used **without** reverse-fitting to the target.
+
+```python
+import numpy as np
+from phonometry import psychoacoustics
+
+fs = 48000
+t = np.arange(int(2.0 * fs)) / fs
+x = (1.0 + np.cos(2 * np.pi * 70 * t)) * np.sin(2 * np.pi * 1000 * t)
+x *= 2e-5 * 10 ** (60 / 20) / np.sqrt(np.mean(x**2))   # overall 60 dB SPL
+
+res = psychoacoustics.roughness_ecma(x, fs, field="free")
+print(f"R = {res.roughness:.4f} asper")   # 0.9999 asper (reference: 1 asper)
+
+res.plot()   # time-dependent roughness R(l50) + specific-roughness heatmap
+```
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/tonality_roughness_demo_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/tonality_roughness_demo.svg" alt="ECMA-418-2 sound-quality demo: a tonal sound scores high tonality and near-zero roughness, while a 70 Hz amplitude-modulated sound scores high roughness and low tonality" width="80%"></picture>
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import psychoacoustics
+
+fs = 48000
+t = np.arange(int(2.0 * fs)) / fs
+amp = np.sqrt(2) * 2e-5 * 10 ** (60 / 20)
+
+# A pure tone (tonal, smooth) vs a 70 Hz amplitude-modulated tone (rough),
+# both normalized to an overall level of 60 dB SPL:
+tone = amp * np.sin(2 * np.pi * 1000 * t)
+rough = (1.0 + np.cos(2 * np.pi * 70 * t)) * np.sin(2 * np.pi * 1000 * t)
+rough *= 2e-5 * 10 ** (60 / 20) / np.sqrt(np.mean(rough**2))
+
+scores = {
+    "Pure tone": (psychoacoustics.tonality_ecma(tone, fs).tonality, psychoacoustics.roughness_ecma(tone, fs).roughness),
+    "70 Hz AM tone": (psychoacoustics.tonality_ecma(rough, fs).tonality, psychoacoustics.roughness_ecma(rough, fs).roughness),
+}
+labels = list(scores)
+tonal = [scores[k][0] for k in labels]
+rough_v = [scores[k][1] for k in labels]
+xpos = np.arange(len(labels))
+fig, ax = plt.subplots()
+ax.bar(xpos - 0.2, tonal, 0.4, label="Tonality [tu_HMS]")
+ax.bar(xpos + 0.2, rough_v, 0.4, label="Roughness [asper]")
+ax.set_xticks(xpos)
+ax.set_xticklabels(labels)
+ax.legend()
+plt.show()
+```
+
+</details>
+
+### `roughness_ecma()` parameters
+
+| Parameter | Type | Units | Range / default | Notes |
+| :--- | :--- | :--- | :--- | :--- |
+| `signal_in` | 1D array | Pa | non-empty | Calibrated pressure signal |
+| `fs` | float | Hz | > 0 | Resampled to 48 kHz internally if needed |
+| `field` | str | — | `'free'` (default) / `'diffuse'` | Outer/middle-ear filter |
+
+Returns an `EcmaRoughness`: `roughness` ($R$, asper, the 90th percentile of
+$R(l_{50})$), `specific_roughness` ($R'(z)$, 53 bands), `bark`,
+`centre_frequencies`, `time`, `roughness_vs_time` ($R(l_{50})$),
+`specific_roughness_vs_time` ((n_times, 53) array), `field`.
+
+## Fluctuation strength (ECMA-418-2): new capability
+
+Fluctuation strength is the slow, wobbling sensation of amplitude or
+frequency modulation below about 20 Hz: a siren, beating tones, speech at
+syllable rate. It is the slow counterpart of roughness: the same hearing
+model splits envelope modulation into a slow band-pass peaking near 4 Hz
+(fluctuation strength, in **vacil_HMS**) and a fast one peaking near 70 Hz
+(roughness). ECMA-418-2 Clause 9 analyses each band's envelope with
+High-resolution Spectral Analysis (HSA), a least-squares fit of
+window-kernel spectral line pairs that resolves modulation rates far below
+the DFT bin width, using envelope-dependent analysis windows that skip
+quieter periods, then weights the dominant harmonic complex and scales it
+with an HSA-based specific loudness. The reference sound (1 kHz carrier,
+100 % amplitude-modulated at 4 Hz, overall level 60 dB SPL) is defined as
+1 vacil_HMS; this clean-room implementation converges to 0.9958 vacil_HMS
+by 12 s with the tabulated calibration constant $c_F$ (Formula 163) used
+**without** reverse-fitting to the target (the 8 s example below prints
+0.9957). A signal whose single value $F$ exceeds 0.2 vacil_HMS has a
+*prominent* fluctuation strength (Clause 9.2).
+
+```python
+import numpy as np
+from phonometry import psychoacoustics
+
+fs = 48000
+t = np.arange(int(8.0 * fs)) / fs
+x = (1.0 + np.cos(2 * np.pi * 4 * t)) * np.sin(2 * np.pi * 1000 * t)
+x *= 2e-5 * 10 ** (60 / 20) / np.sqrt(np.mean(x**2))   # overall 60 dB SPL
+
+res = psychoacoustics.fluctuation_strength_ecma(x, fs, field="free")
+print(f"F = {res.fluctuation_strength:.4f} vacil_HMS")   # 0.9957 vacil_HMS (reference: 1 vacil_HMS)
+
+res.plot()   # time-dependent F(l50) + specific-fluctuation-strength heatmap
+```
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/hms_modulation_bandpass_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/hms_modulation_bandpass.svg" alt="ECMA-418-2 slow vs fast modulation perception: fluctuation strength forms a band-pass over modulation frequency peaking near 4 to 6 Hz while roughness of the same 1 kHz amplitude-modulated tones peaks near 70 Hz" width="80%"></picture>
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import psychoacoustics
+
+fs = 48000
+t = np.arange(int(3.0 * fs)) / fs
+carrier = np.sin(2 * np.pi * 1000 * t)
+
+def am_tone(fmod):
+    # 100 % AM at an overall level of 60 dB SPL (the Clause 7/9 convention)
+    x = (1.0 + np.sin(2 * np.pi * fmod * t)) * carrier
+    return x * 2e-5 * 10 ** (60 / 20) / np.sqrt(np.mean(x**2))
+
+fm_slow = [0.5, 1, 2, 4, 8, 16, 32]
+fm_fast = [20, 40, 70, 100, 150, 200]
+f_vals = [psychoacoustics.fluctuation_strength_ecma(am_tone(fm), fs).fluctuation_strength
+          for fm in fm_slow]
+r_vals = [psychoacoustics.roughness_ecma(am_tone(fm), fs).roughness for fm in fm_fast]
+
+fig, ax = plt.subplots()
+ax.semilogx(fm_slow, f_vals, "o-", label="Fluctuation strength F [vacil_HMS]")
+ax.semilogx(fm_fast, r_vals, "s-", label="Roughness R [asper]")
+ax.set(xlabel="Modulation frequency [Hz]", ylabel="F [vacil_HMS] / R [asper]")
+ax.legend()
+plt.show()
+```
+
+</details>
+
+### `fluctuation_strength_ecma()` parameters
+
+| Parameter | Type | Units | Range / default | Notes |
+| :--- | :--- | :--- | :--- | :--- |
+| `signal_in` | 1D array | Pa | non-empty | Calibrated pressure signal |
+| `fs` | float | Hz | > 0 | Resampled to 48 kHz internally if needed |
+| `field` | str | — | `'free'` (default) / `'diffuse'` | Outer/middle-ear filter |
+
+Returns an `EcmaFluctuationStrength`: `fluctuation_strength` ($F$, vacil_HMS,
+the 90th percentile of $F(l_{50})$), `specific_fluctuation_strength`
+($F'(z)$, 53 bands), `bark`, `centre_frequencies`, `time`,
+`fluctuation_strength_vs_time` ($F(l_{50})$),
+`specific_fluctuation_strength_vs_time` ((n_times, 53) array), `field`.
+
+The Fastl & Zwicker fluctuation-strength models (closed form for AM
+broadband noise and the Osses 2016 signal model) live in
+[Psychoacoustic Annoyance](psychoacoustic-annoyance.md); this Clause 9
+metric is the normative Sottek-model counterpart.
+
+See [Prominent Discrete Tones](tone-prominence.md) for the ECMA-418-1 TNR/PR
+prominence verdicts, [Speech Transmission Index](../speech/speech-transmission.md) for
+STI/STIPA, and [Theory](../../reference/theory/perception.md) for the underlying math.
+
+## References
+
+- Fastl, H., & Zwicker, E. (2007). *Psychoacoustics: Facts and models*
+  (3rd ed.). Springer.
+  [doi:10.1007/978-3-540-68888-4](https://doi.org/10.1007/978-3-540-68888-4).
+  The psychoacoustics of the sensations quantified on this page: the
+  high-frequency emphasis behind sharpness and the fast-modulation percept
+  behind roughness.
+
+## Standards
+
+DIN 45692:2009, *Messtechnische Simulation der Hörempfindung
+Schärfe*: sharpness in acum (clause 6 weighting, Annex B von Bismarck and
+Aures variants, Table A.2 targets). ECMA-418-2:2025, *Psychoacoustic metrics
+for ITT equipment — Part 2 (methods for describing human perception based on
+the Sottek Hearing Model)*: the Sottek Hearing Model tonality (tu_HMS,
+clause 6), roughness (asper, clause 7) and fluctuation strength (vacil_HMS,
+clause 9, the HSA-based envelope analysis).

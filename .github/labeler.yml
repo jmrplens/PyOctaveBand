@@ -78,7 +78,7 @@ api:
   - changed-files:
       - any-glob-to-any-file:
           - src/phonometry/__init__.py
-          - docs/api-reference.md
+          - docs/reference/api/index.md
           - scripts/api_taxonomy.py
           - scripts/generate_api_docs.py
           - scripts/check_api_reference.py

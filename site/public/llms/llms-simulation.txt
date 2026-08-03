@@ -4,7 +4,7 @@ Part of https://jmrplens.github.io/phonometry/llms.txt. Full text of the pages i
 
 ---
 
-<!-- source: docs/elastic-waves.md | canonical: https://jmrplens.github.io/phonometry/simulation/elastic-waves/ -->
+<!-- source: docs/simulation/elastic-waves.md | canonical: https://jmrplens.github.io/phonometry/simulation/elastic-waves/ -->
 Source: https://jmrplens.github.io/phonometry/simulation/elastic-waves/
 
 # Elastic waves and fluid-solid coupling
@@ -416,7 +416,7 @@ speed and the immersed-plate transmission with its thickness resonance
 ---
 
 
-<!-- source: docs/fdtd-simulation.md | canonical: https://jmrplens.github.io/phonometry/simulation/fdtd-simulation/ -->
+<!-- source: docs/simulation/fdtd-simulation.md | canonical: https://jmrplens.github.io/phonometry/simulation/fdtd-simulation/ -->
 Source: https://jmrplens.github.io/phonometry/simulation/fdtd-simulation/
 
 # 2D FDTD wave simulation

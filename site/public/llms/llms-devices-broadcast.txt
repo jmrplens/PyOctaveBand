@@ -4,7 +4,7 @@ Part of https://jmrplens.github.io/phonometry/llms.txt. Full text of the pages i
 
 ---
 
-<!-- source: docs/program-loudness.md | canonical: https://jmrplens.github.io/phonometry/devices/broadcast/program-loudness/ -->
+<!-- source: docs/devices/broadcast/program-loudness.md | canonical: https://jmrplens.github.io/phonometry/devices/broadcast/program-loudness/ -->
 Source: https://jmrplens.github.io/phonometry/devices/broadcast/program-loudness/
 
 # Programme loudness and true peak (ITU-R BS.1770 / EBU R 128)

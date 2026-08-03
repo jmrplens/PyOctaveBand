@@ -4,7 +4,7 @@ Part of https://jmrplens.github.io/phonometry/llms.txt. Full text of the pages i
 
 ---
 
-<!-- source: docs/cnossos-road-emission.md | canonical: https://jmrplens.github.io/phonometry/environment/sources/cnossos-road-emission/ -->
+<!-- source: docs/environment/sources/cnossos-road-emission.md | canonical: https://jmrplens.github.io/phonometry/environment/sources/cnossos-road-emission/ -->
 Source: https://jmrplens.github.io/phonometry/environment/sources/cnossos-road-emission/
 
 # CNOSSOS-EU road traffic source emission
@@ -333,7 +333,7 @@ split into point sources is declared out of scope by the method itself.
 ---
 
 
-<!-- source: docs/cnossos-rail-emission.md | canonical: https://jmrplens.github.io/phonometry/environment/sources/cnossos-rail-emission/ -->
+<!-- source: docs/environment/sources/cnossos-rail-emission.md | canonical: https://jmrplens.github.io/phonometry/environment/sources/cnossos-rail-emission/ -->
 Source: https://jmrplens.github.io/phonometry/environment/sources/cnossos-rail-emission/
 
 # CNOSSOS-EU railway source emission
@@ -778,7 +778,7 @@ such as depots, stations and loudspeakers, are treated by the industrial method.
 ---
 
 
-<!-- source: docs/wind-turbine-noise.md | canonical: https://jmrplens.github.io/phonometry/environment/sources/wind-turbine-noise/ -->
+<!-- source: docs/environment/sources/wind-turbine-noise.md | canonical: https://jmrplens.github.io/phonometry/environment/sources/wind-turbine-noise/ -->
 Source: https://jmrplens.github.io/phonometry/environment/sources/wind-turbine-noise/
 
 # Wind-turbine noise: apparent sound power and tonal audibility (IEC 61400-11)

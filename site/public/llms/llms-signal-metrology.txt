@@ -4,7 +4,7 @@ Part of https://jmrplens.github.io/phonometry/llms.txt. Full text of the pages i
 
 ---
 
-<!-- source: docs/calibration.md | canonical: https://jmrplens.github.io/phonometry/signal/metrology/calibration/ -->
+<!-- source: docs/signal/metrology/calibration.md | canonical: https://jmrplens.github.io/phonometry/signal/metrology/calibration/ -->
 Source: https://jmrplens.github.io/phonometry/signal/metrology/calibration/
 
 # Calibration and dBFS
@@ -305,7 +305,7 @@ class 1 limits per nominal frequency).
 ---
 
 
-<!-- source: docs/gum-uncertainty.md | canonical: https://jmrplens.github.io/phonometry/signal/metrology/gum-uncertainty/ -->
+<!-- source: docs/signal/metrology/gum-uncertainty.md | canonical: https://jmrplens.github.io/phonometry/signal/metrology/gum-uncertainty/ -->
 Source: https://jmrplens.github.io/phonometry/signal/metrology/gum-uncertainty/
 
 # Measurement uncertainty (GUM and Monte Carlo)
@@ -572,7 +572,7 @@ coverage interval (clause 7).
 ---
 
 
-<!-- source: docs/data-qualification.md | canonical: https://jmrplens.github.io/phonometry/signal/metrology/data-qualification/ -->
+<!-- source: docs/signal/metrology/data-qualification.md | canonical: https://jmrplens.github.io/phonometry/signal/metrology/data-qualification/ -->
 Source: https://jmrplens.github.io/phonometry/signal/metrology/data-qualification/
 
 # Data qualification: stationarity, level crossings and peaks (Bendat & Piersol)

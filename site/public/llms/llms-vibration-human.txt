@@ -4,7 +4,7 @@ Part of https://jmrplens.github.io/phonometry/llms.txt. Full text of the pages i
 
 ---
 
-<!-- source: docs/human-vibration.md | canonical: https://jmrplens.github.io/phonometry/vibration/human/human-vibration/ -->
+<!-- source: docs/vibration/human/human-vibration.md | canonical: https://jmrplens.github.io/phonometry/vibration/human/human-vibration/ -->
 Source: https://jmrplens.github.io/phonometry/vibration/human/human-vibration/
 
 # Human Vibration: Whole-Body and Hand-Arm Exposure
@@ -426,7 +426,7 @@ values).
 ---
 
 
-<!-- source: docs/multiple-shock-vibration.md | canonical: https://jmrplens.github.io/phonometry/vibration/human/multiple-shock-vibration/ -->
+<!-- source: docs/vibration/human/multiple-shock-vibration.md | canonical: https://jmrplens.github.io/phonometry/vibration/human/multiple-shock-vibration/ -->
 Source: https://jmrplens.github.io/phonometry/vibration/human/multiple-shock-vibration/
 
 # Multiple-shock whole-body vibration (ISO 2631-5)

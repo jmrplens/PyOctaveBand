@@ -4,7 +4,7 @@ Part of https://jmrplens.github.io/phonometry/llms.txt. Full text of the pages i
 
 ---
 
-<!-- source: docs/getting-started.md | canonical: https://jmrplens.github.io/phonometry/start/getting-started/ -->
+<!-- source: docs/start/getting-started.md | canonical: https://jmrplens.github.io/phonometry/start/getting-started/ -->
 Source: https://jmrplens.github.io/phonometry/start/getting-started/
 
 # Getting Started
@@ -166,7 +166,7 @@ the normative PDF fiche.
 ---
 
 
-<!-- source: docs/why-phonometry.md | canonical: https://jmrplens.github.io/phonometry/start/why-phonometry/ -->
+<!-- source: docs/start/why-phonometry.md | canonical: https://jmrplens.github.io/phonometry/start/why-phonometry/ -->
 Source: https://jmrplens.github.io/phonometry/start/why-phonometry/
 
 # Why phonometry
@@ -389,7 +389,7 @@ publisher link.
 ---
 
 
-<!-- source: docs/theory.md | canonical: https://jmrplens.github.io/phonometry/reference/theory/ -->
+<!-- source: docs/reference/theory/index.md | canonical: https://jmrplens.github.io/phonometry/reference/theory/ -->
 Source: https://jmrplens.github.io/phonometry/reference/theory/
 
 # Theoretical Background
@@ -445,7 +445,7 @@ The theory reference explains the standards, the mathematics and the design deci
 ---
 
 
-<!-- source: docs/theory-environment-transport.md | canonical: https://jmrplens.github.io/phonometry/reference/theory/environment-transport/ -->
+<!-- source: docs/reference/theory/environment-transport.md | canonical: https://jmrplens.github.io/phonometry/reference/theory/environment-transport/ -->
 Source: https://jmrplens.github.io/phonometry/reference/theory/environment-transport/
 
 # Theory: Environment and Transport
@@ -802,7 +802,7 @@ See the [Sound Power guide](https://jmrplens.github.io/phonometry/devices/emissi
 ---
 
 
-<!-- source: docs/theory-materials-surfaces.md | canonical: https://jmrplens.github.io/phonometry/reference/theory/materials-surfaces/ -->
+<!-- source: docs/reference/theory/materials-surfaces.md | canonical: https://jmrplens.github.io/phonometry/reference/theory/materials-surfaces/ -->
 Source: https://jmrplens.github.io/phonometry/reference/theory/materials-surfaces/
 
 # Theory: Materials and Surfaces
@@ -1044,7 +1044,7 @@ See the [Impedance Tube guide](https://jmrplens.github.io/phonometry/materials/a
 ---
 
 
-<!-- source: docs/theory-perception.md | canonical: https://jmrplens.github.io/phonometry/reference/theory/perception/ -->
+<!-- source: docs/reference/theory/perception.md | canonical: https://jmrplens.github.io/phonometry/reference/theory/perception/ -->
 Source: https://jmrplens.github.io/phonometry/reference/theory/perception/
 
 # Theory: Perception and Hearing
@@ -1342,7 +1342,7 @@ See the [Noise-Induced Hearing Loss guide](https://jmrplens.github.io/phonometry
 ---
 
 
-<!-- source: docs/theory-rooms-buildings.md | canonical: https://jmrplens.github.io/phonometry/reference/theory/rooms-buildings/ -->
+<!-- source: docs/reference/theory/rooms-buildings.md | canonical: https://jmrplens.github.io/phonometry/reference/theory/rooms-buildings/ -->
 Source: https://jmrplens.github.io/phonometry/reference/theory/rooms-buildings/
 
 # Theory: Rooms and Buildings
@@ -1722,7 +1722,7 @@ usage.
 ---
 
 
-<!-- source: docs/theory-signal-analysis.md | canonical: https://jmrplens.github.io/phonometry/reference/theory/signal-analysis/ -->
+<!-- source: docs/reference/theory/signal-analysis.md | canonical: https://jmrplens.github.io/phonometry/reference/theory/signal-analysis/ -->
 Source: https://jmrplens.github.io/phonometry/reference/theory/signal-analysis/
 
 # Theory: Signal Analysis
@@ -2124,7 +2124,7 @@ See the [GUM Uncertainty guide](https://jmrplens.github.io/phonometry/signal/met
 ---
 
 
-<!-- source: docs/theory-vibration.md | canonical: https://jmrplens.github.io/phonometry/reference/theory/vibration/ -->
+<!-- source: docs/reference/theory/vibration.md | canonical: https://jmrplens.github.io/phonometry/reference/theory/vibration/ -->
 Source: https://jmrplens.github.io/phonometry/reference/theory/vibration/
 
 # Theory: Vibration

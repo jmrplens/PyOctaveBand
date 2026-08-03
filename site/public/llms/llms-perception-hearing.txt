@@ -4,7 +4,7 @@ Part of https://jmrplens.github.io/phonometry/llms.txt. Full text of the pages i
 
 ---
 
-<!-- source: docs/hearing-threshold.md | canonical: https://jmrplens.github.io/phonometry/perception/hearing/hearing-threshold/ -->
+<!-- source: docs/perception/hearing/hearing-threshold.md | canonical: https://jmrplens.github.io/phonometry/perception/hearing/hearing-threshold/ -->
 Source: https://jmrplens.github.io/phonometry/perception/hearing/hearing-threshold/
 
 # Hearing threshold (age and reference zero)
@@ -212,7 +212,7 @@ conditions* (Table 1).
 ---
 
 
-<!-- source: docs/occupational-exposure.md | canonical: https://jmrplens.github.io/phonometry/perception/hearing/occupational-exposure/ -->
+<!-- source: docs/perception/hearing/occupational-exposure.md | canonical: https://jmrplens.github.io/phonometry/perception/hearing/occupational-exposure/ -->
 Source: https://jmrplens.github.io/phonometry/perception/hearing/occupational-exposure/
 
 # Occupational Noise Exposure (ISO 9612)
@@ -485,7 +485,7 @@ and F.
 ---
 
 
-<!-- source: docs/noise-induced-hearing-loss.md | canonical: https://jmrplens.github.io/phonometry/perception/hearing/noise-induced-hearing-loss/ -->
+<!-- source: docs/perception/hearing/noise-induced-hearing-loss.md | canonical: https://jmrplens.github.io/phonometry/perception/hearing/noise-induced-hearing-loss/ -->
 Source: https://jmrplens.github.io/phonometry/perception/hearing/noise-induced-hearing-loss/
 
 # Noise-induced hearing loss (ISO 1999)

@@ -171,7 +171,7 @@ jobs:
     - name: Check the errata evidence
       run: python scripts/check_errata_evidence.py
 
-  # Coverage gate for the curated quick table in docs/api-reference.md: every
+  # Coverage gate for the curated quick table in docs/reference/api/index.md: every
   # phonometry.__all__ name must have a table row (extra rows such as methods
   # or namespace entries are fine). See scripts/check_api_reference.py.
   api-reference-table:
@@ -193,7 +193,7 @@ jobs:
         python -m pip install --upgrade pip
         pip install -r requirements.txt
         pip install -e .
-    - name: Check docs/api-reference.md coverage
+    - name: Check docs/reference/api/index.md coverage
       run: python scripts/check_api_reference.py
 
   # The committed documentation figures (.github/images) must match a fresh

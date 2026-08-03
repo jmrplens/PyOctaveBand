@@ -4,7 +4,7 @@ Part of https://jmrplens.github.io/phonometry/llms.txt. Full text of the pages i
 
 ---
 
-<!-- source: docs/road-absorption.md | canonical: https://jmrplens.github.io/phonometry/materials/surfaces/road-absorption/ -->
+<!-- source: docs/materials/surfaces/road-absorption.md | canonical: https://jmrplens.github.io/phonometry/materials/surfaces/road-absorption/ -->
 Source: https://jmrplens.github.io/phonometry/materials/surfaces/road-absorption/
 
 # In-situ Road-Surface Absorption

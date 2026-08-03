@@ -391,7 +391,10 @@ def test_missing_names_orders_by_all_and_allows_extras() -> None:
 
 
 def test_quick_table_covers_public_api() -> None:
-    """The committed docs/api-reference.md never misses an __all__ name."""
-    path = pathlib.Path(__file__).resolve().parent.parent / "docs" / "api-reference.md"
+    """The committed docs/reference/api/index.md never misses an __all__ name."""
+    path = (
+        pathlib.Path(__file__).resolve().parent.parent
+        / "docs" / "reference" / "api" / "index.md"
+    )
     markdown = path.read_text(encoding="utf-8")
     assert car.missing_names(markdown, list(phonometry.__all__)) == []

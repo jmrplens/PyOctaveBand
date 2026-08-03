@@ -4,7 +4,7 @@ Part of https://jmrplens.github.io/phonometry/llms.txt. Full text of the pages i
 
 ---
 
-<!-- source: docs/loudness.md | canonical: https://jmrplens.github.io/phonometry/perception/psychoacoustics/loudness/ -->
+<!-- source: docs/perception/psychoacoustics/loudness.md | canonical: https://jmrplens.github.io/phonometry/perception/psychoacoustics/loudness/ -->
 Source: https://jmrplens.github.io/phonometry/perception/psychoacoustics/loudness/
 
 # Loudness
@@ -286,7 +286,7 @@ hearing threshold.
 ---
 
 
-<!-- source: docs/advanced-loudness.md | canonical: https://jmrplens.github.io/phonometry/perception/psychoacoustics/advanced-loudness/ -->
+<!-- source: docs/perception/psychoacoustics/advanced-loudness.md | canonical: https://jmrplens.github.io/phonometry/perception/psychoacoustics/advanced-loudness/ -->
 Source: https://jmrplens.github.io/phonometry/perception/psychoacoustics/advanced-loudness/
 
 # Advanced Loudness (ISO 532-2/-3, ECMA-418-2)
@@ -688,7 +688,7 @@ based on the Sottek Hearing Model)*: the Sottek Hearing Model loudness
 ---
 
 
-<!-- source: docs/sound-quality.md | canonical: https://jmrplens.github.io/phonometry/perception/psychoacoustics/sound-quality/ -->
+<!-- source: docs/perception/psychoacoustics/sound-quality.md | canonical: https://jmrplens.github.io/phonometry/perception/psychoacoustics/sound-quality/ -->
 Source: https://jmrplens.github.io/phonometry/perception/psychoacoustics/sound-quality/
 
 # Sound Quality Metrics
@@ -1044,7 +1044,7 @@ clause 9, the HSA-based envelope analysis).
 ---
 
 
-<!-- source: docs/tone-prominence.md | canonical: https://jmrplens.github.io/phonometry/perception/psychoacoustics/tone-prominence/ -->
+<!-- source: docs/perception/psychoacoustics/tone-prominence.md | canonical: https://jmrplens.github.io/phonometry/perception/psychoacoustics/tone-prominence/ -->
 Source: https://jmrplens.github.io/phonometry/perception/psychoacoustics/tone-prominence/
 
 # Prominent Discrete Tones (ECMA-418-1)
@@ -1289,7 +1289,7 @@ frequency-dependent prominence criteria.
 ---
 
 
-<!-- source: docs/tone-audibility.md | canonical: https://jmrplens.github.io/phonometry/perception/psychoacoustics/tone-audibility/ -->
+<!-- source: docs/perception/psychoacoustics/tone-audibility.md | canonical: https://jmrplens.github.io/phonometry/perception/psychoacoustics/tone-audibility/ -->
 Source: https://jmrplens.github.io/phonometry/perception/psychoacoustics/tone-audibility/
 
 # Objective audibility of tones in noise (ISO/PAS 20065)
@@ -1694,7 +1694,7 @@ spectra.
 ---
 
 
-<!-- source: docs/psychoacoustic-annoyance.md | canonical: https://jmrplens.github.io/phonometry/perception/psychoacoustics/psychoacoustic-annoyance/ -->
+<!-- source: docs/perception/psychoacoustics/psychoacoustic-annoyance.md | canonical: https://jmrplens.github.io/phonometry/perception/psychoacoustics/psychoacoustic-annoyance/ -->
 Source: https://jmrplens.github.io/phonometry/perception/psychoacoustics/psychoacoustic-annoyance/
 
 # Psychoacoustic annoyance and fluctuation strength (Fastl & Zwicker)

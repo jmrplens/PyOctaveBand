@@ -4,7 +4,7 @@ Part of https://jmrplens.github.io/phonometry/llms.txt. Full text of the pages i
 
 ---
 
-<!-- source: docs/sound-power.md | canonical: https://jmrplens.github.io/phonometry/devices/emission/sound-power/ -->
+<!-- source: docs/devices/emission/sound-power.md | canonical: https://jmrplens.github.io/phonometry/devices/emission/sound-power/ -->
 Source: https://jmrplens.github.io/phonometry/devices/emission/sound-power/
 
 # Sound Power
@@ -304,7 +304,7 @@ ISO 3741, ISO 3745, ISO 9614-2/-3) are covered in their method guides.
 ---
 
 
-<!-- source: docs/sound-power-pressure.md | canonical: https://jmrplens.github.io/phonometry/devices/emission/sound-power-pressure/ -->
+<!-- source: docs/devices/emission/sound-power-pressure.md | canonical: https://jmrplens.github.io/phonometry/devices/emission/sound-power-pressure/ -->
 Source: https://jmrplens.github.io/phonometry/devices/emission/sound-power-pressure/
 
 # Sound Power by Pressure Methods (ISO 3744 / ISO 3746 / ISO 3745)
@@ -809,7 +809,7 @@ microphone arrays of section 2.
 ---
 
 
-<!-- source: docs/sound-power-reverberation.md | canonical: https://jmrplens.github.io/phonometry/devices/emission/sound-power-reverberation/ -->
+<!-- source: docs/devices/emission/sound-power-reverberation.md | canonical: https://jmrplens.github.io/phonometry/devices/emission/sound-power-reverberation/ -->
 Source: https://jmrplens.github.io/phonometry/devices/emission/sound-power-reverberation/
 
 # Sound Power in the Reverberation Room (ISO 3741)
@@ -1076,7 +1076,7 @@ criteria and the Annex F A-weighting.
 ---
 
 
-<!-- source: docs/sound-power-intensity.md | canonical: https://jmrplens.github.io/phonometry/devices/emission/sound-power-intensity/ -->
+<!-- source: docs/devices/emission/sound-power-intensity.md | canonical: https://jmrplens.github.io/phonometry/devices/emission/sound-power-intensity/ -->
 Source: https://jmrplens.github.io/phonometry/devices/emission/sound-power-intensity/
 
 # Sound Power by Intensity Scanning (ISO 9614-2 / ISO 9614-3)
@@ -1456,7 +1456,7 @@ clause 9.2 not-applicable flagging of section 2.
 ---
 
 
-<!-- source: docs/intensity.md | canonical: https://jmrplens.github.io/phonometry/devices/emission/intensity/ -->
+<!-- source: docs/devices/emission/intensity.md | canonical: https://jmrplens.github.io/phonometry/devices/emission/intensity/ -->
 Source: https://jmrplens.github.io/phonometry/devices/emission/intensity/
 
 # Sound Intensity (p-p method)
@@ -1998,7 +1998,7 @@ temporal-variability limit and the dynamic-capability criterion (Annex B).
 ---
 
 
-<!-- source: docs/vibration-sound-power.md | canonical: https://jmrplens.github.io/phonometry/devices/emission/vibration-sound-power/ -->
+<!-- source: docs/devices/emission/vibration-sound-power.md | canonical: https://jmrplens.github.io/phonometry/devices/emission/vibration-sound-power/ -->
 Source: https://jmrplens.github.io/phonometry/devices/emission/vibration-sound-power/
 
 # Sound power from surface vibration (ISO/TS 7849)

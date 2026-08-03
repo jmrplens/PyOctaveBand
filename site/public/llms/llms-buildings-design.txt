@@ -4,7 +4,7 @@ Part of https://jmrplens.github.io/phonometry/llms.txt. Full text of the pages i
 
 ---
 
-<!-- source: docs/insulation-prediction.md | canonical: https://jmrplens.github.io/phonometry/buildings/design/insulation-prediction/ -->
+<!-- source: docs/buildings/design/insulation-prediction.md | canonical: https://jmrplens.github.io/phonometry/buildings/design/insulation-prediction/ -->
 Source: https://jmrplens.github.io/phonometry/buildings/design/insulation-prediction/
 
 # Predicting Sound Insulation (EN 12354)
@@ -372,7 +372,7 @@ member of the family is EN 12354-6.
 ---
 
 
-<!-- source: docs/detailed-prediction.md | canonical: https://jmrplens.github.io/phonometry/buildings/design/detailed-prediction/ -->
+<!-- source: docs/buildings/design/detailed-prediction.md | canonical: https://jmrplens.github.io/phonometry/buildings/design/detailed-prediction/ -->
 Source: https://jmrplens.github.io/phonometry/buildings/design/detailed-prediction/
 
 # Detailed Per-Band Prediction (ISO 12354)
@@ -785,7 +785,7 @@ printed tables are recorded in [Errata](https://jmrplens.github.io/phonometry/re
 ---
 
 
-<!-- source: docs/panel-sound-insulation.md | canonical: https://jmrplens.github.io/phonometry/buildings/design/panel-sound-insulation/ -->
+<!-- source: docs/buildings/design/panel-sound-insulation.md | canonical: https://jmrplens.github.io/phonometry/buildings/design/panel-sound-insulation/ -->
 Source: https://jmrplens.github.io/phonometry/buildings/design/panel-sound-insulation/
 
 # Predicting Panel Sound Insulation (mass law, coincidence, double walls)
@@ -1577,7 +1577,7 @@ fig.tight_layout(); plt.show()
 ---
 
 
-<!-- source: docs/impact-improvement.md | canonical: https://jmrplens.github.io/phonometry/buildings/design/impact-improvement/ -->
+<!-- source: docs/buildings/design/impact-improvement.md | canonical: https://jmrplens.github.io/phonometry/buildings/design/impact-improvement/ -->
 Source: https://jmrplens.github.io/phonometry/buildings/design/impact-improvement/
 
 # Floor-Covering Impact Improvement (ISO 16251-1)
@@ -1839,7 +1839,7 @@ not a measurement).
 ---
 
 
-<!-- source: docs/resilient-layers.md | canonical: https://jmrplens.github.io/phonometry/buildings/design/resilient-layers/ -->
+<!-- source: docs/buildings/design/resilient-layers.md | canonical: https://jmrplens.github.io/phonometry/buildings/design/resilient-layers/ -->
 Source: https://jmrplens.github.io/phonometry/buildings/design/resilient-layers/
 
 # Predicting Resilient-Layer Performance
@@ -2282,7 +2282,7 @@ set out in "What is anchored on a published number, and what is not" above.
 ---
 
 
-<!-- source: docs/structure-borne-power.md | canonical: https://jmrplens.github.io/phonometry/buildings/design/structure-borne-power/ -->
+<!-- source: docs/buildings/design/structure-borne-power.md | canonical: https://jmrplens.github.io/phonometry/buildings/design/structure-borne-power/ -->
 Source: https://jmrplens.github.io/phonometry/buildings/design/structure-borne-power/
 
 # Structure-borne sound power of building equipment (EN 15657)
@@ -2538,7 +2538,7 @@ Annex I.3 Table I.8 conversion of the flushing-cistern source.
 ---
 
 
-<!-- source: docs/installed-structure-borne.md | canonical: https://jmrplens.github.io/phonometry/buildings/design/installed-structure-borne/ -->
+<!-- source: docs/buildings/design/installed-structure-borne.md | canonical: https://jmrplens.github.io/phonometry/buildings/design/installed-structure-borne/ -->
 Source: https://jmrplens.github.io/phonometry/buildings/design/installed-structure-borne/
 
 # Installed structure-borne sound from equipment (EN 12354-5)

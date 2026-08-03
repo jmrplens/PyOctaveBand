@@ -283,13 +283,13 @@ def test_the_migration_table_names_real_aliases() -> None:
 
     table = (
         pathlib.Path(__file__).resolve().parent.parent
-        / "docs" / "api-reference.md"
+        / "docs" / "reference" / "api" / "index.md"
     ).read_text(encoding="utf-8")
     rows = re.findall(
         r"^\| `(phonometry[\w.]*)` \| `(phonometry[\w.]*)` \| (\d\.\d) \|$",
         table, re.MULTILINE,
     )
-    assert rows, "the migration table is gone from docs/api-reference.md"
+    assert rows, "the migration table is gone from docs/reference/api/index.md"
     # One example per split, or a deleted row passes unnoticed: the table was
     # rebuilt once from a corrupted copy and losing rows is that failure mode.
     documented = {old.split(".")[1] for old, _, _ in rows}

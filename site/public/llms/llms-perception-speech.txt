@@ -4,7 +4,7 @@ Part of https://jmrplens.github.io/phonometry/llms.txt. Full text of the pages i
 
 ---
 
-<!-- source: docs/speech-transmission.md | canonical: https://jmrplens.github.io/phonometry/perception/speech/speech-transmission/ -->
+<!-- source: docs/perception/speech/speech-transmission.md | canonical: https://jmrplens.github.io/phonometry/perception/speech/speech-transmission/ -->
 Source: https://jmrplens.github.io/phonometry/perception/speech/speech-transmission/
 
 # Speech Transmission Index (IEC 60268-16)
@@ -308,7 +308,7 @@ male speech spectrum (clause A.6.1) and the Annex F rating letters.
 ---
 
 
-<!-- source: docs/speech-intelligibility.md | canonical: https://jmrplens.github.io/phonometry/perception/speech/speech-intelligibility/ -->
+<!-- source: docs/perception/speech/speech-intelligibility.md | canonical: https://jmrplens.github.io/phonometry/perception/speech/speech-intelligibility/ -->
 Source: https://jmrplens.github.io/phonometry/perception/speech/speech-intelligibility/
 
 # Speech Intelligibility Index (SII)
@@ -877,7 +877,7 @@ band-audibility procedure (clause 5) and the index (clause 6).
 ---
 
 
-<!-- source: docs/objective-intelligibility.md | canonical: https://jmrplens.github.io/phonometry/perception/speech/objective-intelligibility/ -->
+<!-- source: docs/perception/speech/objective-intelligibility.md | canonical: https://jmrplens.github.io/phonometry/perception/speech/objective-intelligibility/ -->
 Source: https://jmrplens.github.io/phonometry/perception/speech/objective-intelligibility/
 
 # Objective intelligibility (STOI & ESTOI)

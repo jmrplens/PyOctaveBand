@@ -4,7 +4,7 @@ Part of https://jmrplens.github.io/phonometry/llms.txt. Full text of the pages i
 
 ---
 
-<!-- source: docs/environmental-levels.md | canonical: https://jmrplens.github.io/phonometry/environment/environmental-levels/ -->
+<!-- source: docs/environment/environmental-levels.md | canonical: https://jmrplens.github.io/phonometry/environment/environmental-levels/ -->
 Source: https://jmrplens.github.io/phonometry/environment/environmental-levels/
 
 # Environmental Levels (ISO 1996-1/-2)
@@ -225,7 +225,7 @@ Annex F measurement uncertainty budget.
 ---
 
 
-<!-- source: docs/spanish-noise-regulation.md | canonical: https://jmrplens.github.io/phonometry/environment/spanish-noise-regulation/ -->
+<!-- source: docs/environment/spanish-noise-regulation.md | canonical: https://jmrplens.github.io/phonometry/environment/spanish-noise-regulation/ -->
 Source: https://jmrplens.github.io/phonometry/environment/spanish-noise-regulation/
 
 # Spanish Noise Regulation (RD 1367/2007)

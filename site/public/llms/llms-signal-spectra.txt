@@ -4,7 +4,7 @@ Part of https://jmrplens.github.io/phonometry/llms.txt. Full text of the pages i
 
 ---
 
-<!-- source: docs/spectral-analysis.md | canonical: https://jmrplens.github.io/phonometry/signal/spectra/spectral-analysis/ -->
+<!-- source: docs/signal/spectra/spectral-analysis.md | canonical: https://jmrplens.github.io/phonometry/signal/spectra/spectral-analysis/ -->
 Source: https://jmrplens.github.io/phonometry/signal/spectra/spectral-analysis/
 
 # Calibrated spectral analysis (Bendat & Piersol)
@@ -563,7 +563,7 @@ output.
 ---
 
 
-<!-- source: docs/miso-coherence.md | canonical: https://jmrplens.github.io/phonometry/signal/spectra/miso-coherence/ -->
+<!-- source: docs/signal/spectra/miso-coherence.md | canonical: https://jmrplens.github.io/phonometry/signal/spectra/miso-coherence/ -->
 Source: https://jmrplens.github.io/phonometry/signal/spectra/miso-coherence/
 
 # Multiple and partial coherence (Bendat & Piersol)
@@ -774,7 +774,7 @@ are consistent bin by bin.
 ---
 
 
-<!-- source: docs/time-frequency.md | canonical: https://jmrplens.github.io/phonometry/signal/spectra/time-frequency/ -->
+<!-- source: docs/signal/spectra/time-frequency.md | canonical: https://jmrplens.github.io/phonometry/signal/spectra/time-frequency/ -->
 Source: https://jmrplens.github.io/phonometry/signal/spectra/time-frequency/
 
 # Time-frequency analysis
@@ -1001,7 +1001,7 @@ component's frequency in time, the
 ---
 
 
-<!-- source: docs/cepstrum-echoes.md | canonical: https://jmrplens.github.io/phonometry/signal/spectra/cepstrum-echoes/ -->
+<!-- source: docs/signal/spectra/cepstrum-echoes.md | canonical: https://jmrplens.github.io/phonometry/signal/spectra/cepstrum-echoes/ -->
 Source: https://jmrplens.github.io/phonometry/signal/spectra/cepstrum-echoes/
 
 # Cepstrum, echoes and the envelope spectrum (Havelock / Bendat & Piersol)
@@ -1422,7 +1422,7 @@ is modulated, the domain metrics quantify it normatively.
 ---
 
 
-<!-- source: docs/synchronous-averaging.md | canonical: https://jmrplens.github.io/phonometry/signal/spectra/synchronous-averaging/ -->
+<!-- source: docs/signal/spectra/synchronous-averaging.md | canonical: https://jmrplens.github.io/phonometry/signal/spectra/synchronous-averaging/ -->
 Source: https://jmrplens.github.io/phonometry/signal/spectra/synchronous-averaging/
 
 # Time synchronous averaging (McFadden 1987)
@@ -1713,7 +1713,7 @@ the strong gear components no longer mask the modulation.
 ---
 
 
-<!-- source: docs/correlation-delay.md | canonical: https://jmrplens.github.io/phonometry/signal/spectra/correlation-delay/ -->
+<!-- source: docs/signal/spectra/correlation-delay.md | canonical: https://jmrplens.github.io/phonometry/signal/spectra/correlation-delay/ -->
 Source: https://jmrplens.github.io/phonometry/signal/spectra/correlation-delay/
 
 # Correlation, time delay and envelope (Bendat & Piersol / Knapp & Carter)
@@ -2113,7 +2113,7 @@ band-limited kernel with the public
 ---
 
 
-<!-- source: docs/test-signals.md | canonical: https://jmrplens.github.io/phonometry/signal/spectra/test-signals/ -->
+<!-- source: docs/signal/spectra/test-signals.md | canonical: https://jmrplens.github.io/phonometry/signal/spectra/test-signals/ -->
 Source: https://jmrplens.github.io/phonometry/signal/spectra/test-signals/
 
 # Test signals and sample-rate tools (IEC 60268-1)
@@ -2368,7 +2368,7 @@ smearing them.
 ---
 
 
-<!-- source: docs/system-measurement.md | canonical: https://jmrplens.github.io/phonometry/signal/spectra/system-measurement/ -->
+<!-- source: docs/signal/spectra/system-measurement.md | canonical: https://jmrplens.github.io/phonometry/signal/spectra/system-measurement/ -->
 Source: https://jmrplens.github.io/phonometry/signal/spectra/system-measurement/
 
 # System measurement: Golay, shaped sweeps, inversion

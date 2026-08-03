@@ -4,7 +4,7 @@ Part of https://jmrplens.github.io/phonometry/llms.txt. Full text of the pages i
 
 ---
 
-<!-- source: docs/mechanical-mobility.md | canonical: https://jmrplens.github.io/phonometry/vibration/structural/mechanical-mobility/ -->
+<!-- source: docs/vibration/structural/mechanical-mobility.md | canonical: https://jmrplens.github.io/phonometry/vibration/structural/mechanical-mobility/ -->
 Source: https://jmrplens.github.io/phonometry/vibration/structural/mechanical-mobility/
 
 # Mechanical mobility and the FRF family (ISO 7626-1)
@@ -354,7 +354,7 @@ $|Y| = 1.59155 \times 10^{-4}$ m/(N·s) at 100 Hz) and the Annex A example
 ---
 
 
-<!-- source: docs/transfer-stiffness.md | canonical: https://jmrplens.github.io/phonometry/vibration/structural/transfer-stiffness/ -->
+<!-- source: docs/vibration/structural/transfer-stiffness.md | canonical: https://jmrplens.github.io/phonometry/vibration/structural/transfer-stiffness/ -->
 Source: https://jmrplens.github.io/phonometry/vibration/structural/transfer-stiffness/
 
 # Dynamic transfer stiffness of resilient elements (ISO 10846)
@@ -645,7 +645,7 @@ the 7.6 linearity criterion.
 ---
 
 
-<!-- source: docs/junction-transmission.md | canonical: https://jmrplens.github.io/phonometry/vibration/structural/junction-transmission/ -->
+<!-- source: docs/vibration/structural/junction-transmission.md | canonical: https://jmrplens.github.io/phonometry/vibration/structural/junction-transmission/ -->
 Source: https://jmrplens.github.io/phonometry/vibration/structural/junction-transmission/
 
 # Bending-wave transmission at plate junctions (Cremer / Craik / Hopkins)

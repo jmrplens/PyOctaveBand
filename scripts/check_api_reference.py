@@ -1,7 +1,7 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""Coverage gate for the curated API quick table (``docs/api-reference.md``).
+"""Coverage gate for the curated API quick table (``docs/reference/api/index.md``).
 
-The hand-written table in ``docs/api-reference.md`` is the quick reference for
+The hand-written table in ``docs/reference/api/index.md`` is the quick reference for
 the GitHub/PyPI audience; the authoritative, generated reference lives on the
 site (``make api-docs``). Being curated, the table can silently miss a newly
 exported name. This gate closes that gap: it parses every backticked name in
@@ -53,7 +53,7 @@ def table_names(markdown: str) -> set[str]:
 def missing_names(markdown: str, public: list[str]) -> list[str]:
     """Public names without a table row, in ``__all__`` order.
 
-    :param markdown: The ``docs/api-reference.md`` source.
+    :param markdown: The ``docs/reference/api/index.md`` source.
     :param public: ``phonometry.__all__``.
     """
     documented = table_names(markdown)
@@ -64,11 +64,14 @@ def main() -> int:
     """Run the gate against the working tree. Returns the exit status."""
     import phonometry
 
-    path = pathlib.Path(__file__).resolve().parent.parent / "docs" / "api-reference.md"
+    path = (
+        pathlib.Path(__file__).resolve().parent.parent
+        / "docs" / "reference" / "api" / "index.md"
+    )
     missing = missing_names(path.read_text(encoding="utf-8"), list(phonometry.__all__))
     if missing:
         print(
-            f"docs/api-reference.md is missing {len(missing)} public "
+            f"docs/reference/api/index.md is missing {len(missing)} public "
             "name(s) from phonometry.__all__:"
         )
         for name in missing:
@@ -76,7 +79,7 @@ def main() -> int:
         print("Add a table row for each name (see the file's existing style).")
         return 1
     print(
-        "docs/api-reference.md covers all "
+        "docs/reference/api/index.md covers all "
         f"{len(phonometry.__all__)} phonometry.__all__ names."
     )
     return 0

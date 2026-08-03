@@ -4,7 +4,7 @@ Part of https://jmrplens.github.io/phonometry/llms.txt. Full text of the pages i
 
 ---
 
-<!-- source: docs/silencers.md | canonical: https://jmrplens.github.io/phonometry/devices/noise-control/silencers/ -->
+<!-- source: docs/devices/noise-control/silencers.md | canonical: https://jmrplens.github.io/phonometry/devices/noise-control/silencers/ -->
 Source: https://jmrplens.github.io/phonometry/devices/noise-control/silencers/
 
 # Silencers
@@ -357,7 +357,7 @@ of a decibel (test `tests/noise_control/test_fdtd_crosscheck.py`).
 ---
 
 
-<!-- source: docs/noise-control.md | canonical: https://jmrplens.github.io/phonometry/devices/noise-control/noise-control/ -->
+<!-- source: docs/devices/noise-control/noise-control.md | canonical: https://jmrplens.github.io/phonometry/devices/noise-control/noise-control/ -->
 Source: https://jmrplens.github.io/phonometry/devices/noise-control/noise-control/
 
 # Industrial noise control: HVAC and enclosures
@@ -568,7 +568,7 @@ the interior `room_constant` and `.plot()`.
 ---
 
 
-<!-- source: docs/duct-path.md | canonical: https://jmrplens.github.io/phonometry/devices/noise-control/duct-path/ -->
+<!-- source: docs/devices/noise-control/duct-path.md | canonical: https://jmrplens.github.io/phonometry/devices/noise-control/duct-path/ -->
 Source: https://jmrplens.github.io/phonometry/devices/noise-control/duct-path/
 
 # Duct-borne noise: fan to room
@@ -1307,7 +1307,7 @@ survive past cut-on.
 ---
 
 
-<!-- source: docs/room-to-room.md | canonical: https://jmrplens.github.io/phonometry/devices/noise-control/room-to-room/ -->
+<!-- source: docs/devices/noise-control/room-to-room.md | canonical: https://jmrplens.github.io/phonometry/devices/noise-control/room-to-room/ -->
 Source: https://jmrplens.github.io/phonometry/devices/noise-control/room-to-room/
 
 # Room to room: partition, receiving room, criterion

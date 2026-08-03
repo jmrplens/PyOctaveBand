@@ -4,7 +4,7 @@ Part of https://jmrplens.github.io/phonometry/llms.txt. Full text of the pages i
 
 ---
 
-<!-- source: docs/aircraft-noise.md | canonical: https://jmrplens.github.io/phonometry/aircraft/aircraft-noise/ -->
+<!-- source: docs/aircraft/aircraft-noise.md | canonical: https://jmrplens.github.io/phonometry/aircraft/aircraft-noise/ -->
 Source: https://jmrplens.github.io/phonometry/aircraft/aircraft-noise/
 
 # Aircraft noise: Effective Perceived Noise Level (ICAO Annex 16 / IEC 61265)
@@ -298,7 +298,7 @@ The ECAC Doc 29 airport-noise method is documented in
 ---
 
 
-<!-- source: docs/airport-noise.md | canonical: https://jmrplens.github.io/phonometry/aircraft/airport-noise/ -->
+<!-- source: docs/aircraft/airport-noise.md | canonical: https://jmrplens.github.io/phonometry/aircraft/airport-noise/ -->
 Source: https://jmrplens.github.io/phonometry/aircraft/airport-noise/
 
 # Airport noise (ECAC Doc 29)
@@ -572,7 +572,7 @@ Vol 3 Part 1 reference workbook.
 ---
 
 
-<!-- source: docs/rotorcraft-noise.md | canonical: https://jmrplens.github.io/phonometry/aircraft/rotorcraft-noise/ -->
+<!-- source: docs/aircraft/rotorcraft-noise.md | canonical: https://jmrplens.github.io/phonometry/aircraft/rotorcraft-noise/ -->
 Source: https://jmrplens.github.io/phonometry/aircraft/rotorcraft-noise/
 
 # Rotorcraft noise: the hemisphere method (ECAC Doc 32 / NORAH2)

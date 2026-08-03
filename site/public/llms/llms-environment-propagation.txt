@@ -4,7 +4,7 @@ Part of https://jmrplens.github.io/phonometry/llms.txt. Full text of the pages i
 
 ---
 
-<!-- source: docs/outdoor-propagation.md | canonical: https://jmrplens.github.io/phonometry/environment/propagation/outdoor-propagation/ -->
+<!-- source: docs/environment/propagation/outdoor-propagation.md | canonical: https://jmrplens.github.io/phonometry/environment/propagation/outdoor-propagation/ -->
 Source: https://jmrplens.github.io/phonometry/environment/propagation/outdoor-propagation/
 
 # Outdoor Sound Propagation
@@ -658,7 +658,7 @@ method itself is covered in the [Room Acoustics guide](https://jmrplens.github.i
 ---
 
 
-<!-- source: docs/ground-barriers.md | canonical: https://jmrplens.github.io/phonometry/environment/propagation/ground-barriers/ -->
+<!-- source: docs/environment/propagation/ground-barriers.md | canonical: https://jmrplens.github.io/phonometry/environment/propagation/ground-barriers/ -->
 Source: https://jmrplens.github.io/phonometry/environment/propagation/ground-barriers/
 
 # Spherical ground effect and advanced barriers (Attenborough / Salomons / Bies)
@@ -953,7 +953,7 @@ infrastructure for the meteorological schemes of Nord2000 and CNOSSOS.
 ---
 
 
-<!-- source: docs/atmospheric-refraction.md | canonical: https://jmrplens.github.io/phonometry/environment/propagation/atmospheric-refraction/ -->
+<!-- source: docs/environment/propagation/atmospheric-refraction.md | canonical: https://jmrplens.github.io/phonometry/environment/propagation/atmospheric-refraction/ -->
 Source: https://jmrplens.github.io/phonometry/environment/propagation/atmospheric-refraction/
 
 # Atmospheric refraction: ray tracing and the parabolic equation (Salomons / Attenborough)
@@ -990,7 +990,7 @@ away on each side, and the wind profile deciding which of them hears anything.
 
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_atmospheric_refraction_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_atmospheric_refraction.svg" alt="Atmospheric refraction scene: a source 2 m above the ground with a receiver 350 m away on each side, wind arrows growing longer with height, and an inset of the effective sound-speed profiles c_eff(z) = c(z) + u(z); on the downwind side the rays curve back toward the ground and the receiver gets a direct plus a ground-bounced arrival, on the upwind side every ray bends upward and an acoustic shadow opens on the ground beyond about 220 m, swallowing the receiver standing inside it" width="92%"></picture>
 
-![Atmospheric refraction: ray bending and the acoustic shadow](../.github/images/atmospheric_refraction.webp)
+![Atmospheric refraction: ray bending and the acoustic shadow](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/atmospheric_refraction.webp)
 
 <details>
 <summary>Show the code for this figure</summary>

@@ -4,7 +4,7 @@ Part of https://jmrplens.github.io/phonometry/llms.txt. Full text of the pages i
 
 ---
 
-<!-- source: docs/marine-mammal-exposure.md | canonical: https://jmrplens.github.io/phonometry/underwater/marine-mammal-exposure/ -->
+<!-- source: docs/underwater/marine-mammal-exposure.md | canonical: https://jmrplens.github.io/phonometry/underwater/marine-mammal-exposure/ -->
 Source: https://jmrplens.github.io/phonometry/underwater/marine-mammal-exposure/
 
 # Marine-mammal noise exposure: audiograms, auditory weighting and injury criteria
@@ -295,7 +295,7 @@ piling campaign's weighted exposure falls below a criterion.
 ---
 
 
-<!-- source: docs/underwater-acoustics.md | canonical: https://jmrplens.github.io/phonometry/underwater/underwater-acoustics/ -->
+<!-- source: docs/underwater/underwater-acoustics.md | canonical: https://jmrplens.github.io/phonometry/underwater/underwater-acoustics/ -->
 Source: https://jmrplens.github.io/phonometry/underwater/underwater-acoustics/
 
 # Underwater acoustics: radiated noise and pile driving (ISO 18405 / 17208 / 18406)
@@ -509,7 +509,7 @@ mode, parabolic equation) is out of scope here: see
 ---
 
 
-<!-- source: docs/underwater-propagation.md | canonical: https://jmrplens.github.io/phonometry/underwater/underwater-propagation/ -->
+<!-- source: docs/underwater/underwater-propagation.md | canonical: https://jmrplens.github.io/phonometry/underwater/underwater-propagation/ -->
 Source: https://jmrplens.github.io/phonometry/underwater/underwater-propagation/
 
 # Underwater sound propagation: transmission loss, sound speed, sonar, seabed and ambient noise
@@ -1159,7 +1159,7 @@ closed forms, have their own guide:
 ---
 
 
-<!-- source: docs/underwater-solvers.md | canonical: https://jmrplens.github.io/phonometry/underwater/underwater-solvers/ -->
+<!-- source: docs/underwater/underwater-solvers.md | canonical: https://jmrplens.github.io/phonometry/underwater/underwater-solvers/ -->
 Source: https://jmrplens.github.io/phonometry/underwater/underwater-solvers/
 
 # Underwater propagation solvers: normal modes, rays and the parabolic equation

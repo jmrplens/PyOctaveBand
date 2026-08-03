@@ -61,67 +61,48 @@ const routeOfFile = (file) => routeOf(relative(contentDir, file));
 /**
  * Rewrite links that only work inside the docs/ folder.
  *
- * The mirrored files link each other as `[x](filter-banks.md)`, which resolves
- * when reading the repository and resolves to nothing when the same text is
- * served as a standalone page copy.
+ * The mirrored files link each other by relative path, as
+ * `[x](../filters/filter-banks.md)`, which resolves when reading the
+ * repository and resolves to nothing when the same text is served as a
+ * standalone page copy. The mirror is laid out like the site, so the link
+ * target resolved against the page's own folder is the route.
  */
-function absolutize(text, routeForStem) {
+function absolutize(text, fromRoute) {
+  const here = fromRoute.includes("/") ? fromRoute.replace(/\/[^/]*$/, "") : "";
   return text
     .split("\n")
     .filter((line) => !line.startsWith("← [Documentation index]"))
     .join("\n")
-    .replace(/\]\((?:\.\.\/)?([\w.-]+)\.md(#[\w-]+)?\)/g, (whole, stem, anchor = "") => {
-      if (stem === "README") return `](${SITE_URL}/${anchor})`;
-      if (stem === "CONTRIBUTING") {
+    .replace(/\]\(((?:\.\.\/)*[\w./-]+)\.md(#[\w-]+)?\)/g, (whole, target, anchor = "") => {
+      const base = target.replace(/^.*\//, "");
+      if (base === "README") return `](${SITE_URL}/${anchor})`;
+      if (base === "CONTRIBUTING") {
         return `](https://github.com/jmrplens/phonometry/blob/main/CONTRIBUTING.md${anchor})`;
       }
-      const route = routeForStem.get(stem);
-      return route ? `](${SITE_URL}/${route}/${anchor})` : whole;
+      const parts = here ? here.split("/") : [];
+      for (const step of target.split("/")) {
+        if (step === "..") parts.pop();
+        else if (step !== ".") parts.push(step);
+      }
+      const resolved = parts.join("/").replace(/\/index$/, "");
+      // The two generated documents live at the repository root in the mirror
+      // and are transplanted into these routes on the site.
+      const route =
+        { CONFORMANCE: "reference/conformance", ERRATA: "reference/errata" }[resolved] ??
+        resolved;
+      return `](${SITE_URL}/${route}/${anchor})`;
     });
 }
 
+// The mirror is laid out like the site, so a page's copy is at the same route:
+// `docs/signal/filters/filter-banks.md` for `/signal/filters/filter-banks/`.
 const docsMirror = new Map();
 if (existsSync(docsDir)) {
-  for (const name of await Array.fromAsync(glob("*.md", { cwd: docsDir }))) {
-    docsMirror.set(name.replace(/\.md$/, ""), join(docsDir, name));
+  for (const name of await Array.fromAsync(glob("**/*.md", { cwd: docsDir }))) {
+    const route = name.replace(/\\/g, "/").replace(/\.md$/, "").replace(/\/index$/, "");
+    docsMirror.set(route, join(docsDir, name));
   }
 }
-
-// stem -> route, so the mirrored cross-links can be made absolute.
-const routeForStem = new Map();
-for await (const file of glob("**/*.{md,mdx}", { cwd: contentDir })) {
-  const route = routeOfFile(join(contentDir, file));
-  // An English cross-link never means the Spanish subtree, and the splash
-  // pages are not link targets: they have no copy to link to.
-  if (route.startsWith("es/") || !hasMarkdownCopy(route)) continue;
-  const stem = file.replace(/\\/g, "/").split("/").pop().replace(/\.mdx?$/, "");
-  if (!routeForStem.has(stem)) routeForStem.set(stem, route);
-}
-// The handful of docs/ files whose name differs from the site route.
-for (const [stem, route] of [
-  ["api-reference", "reference/api"],
-  ["references", "reference/bibliography"],
-  ["theory", "reference/theory"],
-  ["theory-signal-analysis", "reference/theory/signal-analysis"],
-  ["theory-perception", "reference/theory/perception"],
-  ["theory-rooms-buildings", "reference/theory/rooms-buildings"],
-  ["theory-materials-surfaces", "reference/theory/materials-surfaces"],
-  ["theory-environment-transport", "reference/theory/environment-transport"],
-  ["theory-vibration", "reference/theory/vibration"],
-  // The two generated evidence documents live at the repo root in the mirror
-  // and are transplanted into these routes on the site.
-  ["CONFORMANCE", "reference/conformance"],
-  ["ERRATA", "reference/errata"],
-  // Renamed on the way to the site, with the module merge it follows.
-  ["impulse-prominence", "environment/assessment/impulsive-sound"],
-]) {
-  routeForStem.set(stem, route);
-}
-
-// docs/ file stem -> content stem, for the pages the site renamed. Without it
-// the copy served for the renamed page falls back to the stripped MDX and
-// loses the mirror's own prose.
-const MIRROR_ALIASES = new Map([["impulsive-sound", "impulse-prominence"]]);
 
 let written = 0;
 for await (const file of glob("**/*.{md,mdx}", { cwd: contentDir })) {
@@ -132,16 +113,13 @@ for await (const file of glob("**/*.{md,mdx}", { cwd: contentDir })) {
   // itself advertises (src/lib/page-markdown.mjs).
   if (!hasMarkdownCopy(route)) continue;
 
-  const stem = file.replace(/\\/g, "/").split("/").pop().replace(/\.mdx?$/, "");
   const isSpanish = route === "es" || route.startsWith("es/");
-  const mirror = isSpanish
-    ? undefined
-    : docsMirror.get(stem) ?? docsMirror.get(MIRROR_ALIASES.get(stem));
+  const mirror = isSpanish ? undefined : docsMirror.get(route);
 
   const raw = mirror
     ? readFileSync(mirror, "utf8")
     : stripMdx(stripFrontmatter(readFileSync(abs, "utf8")));
-  const body = absolutize(raw, routeForStem);
+  const body = absolutize(raw, route);
 
   const canonical = `${SITE_URL}/${route}/`;
   const text = `<!-- canonical: ${canonical} -->\nSource: ${canonical}\n\n${body.trim()}\n`;

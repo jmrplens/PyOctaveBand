@@ -4,7 +4,7 @@ Part of https://jmrplens.github.io/phonometry/llms.txt. Full text of the pages i
 
 ---
 
-<!-- source: docs/sound-level-meter.md | canonical: https://jmrplens.github.io/phonometry/signal/sound-level-meter/ -->
+<!-- source: docs/signal/sound-level-meter.md | canonical: https://jmrplens.github.io/phonometry/signal/sound-level-meter/ -->
 Source: https://jmrplens.github.io/phonometry/signal/sound-level-meter/
 
 # Build a sound level meter

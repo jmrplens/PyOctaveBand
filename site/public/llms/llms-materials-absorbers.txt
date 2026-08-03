@@ -4,7 +4,7 @@ Part of https://jmrplens.github.io/phonometry/llms.txt. Full text of the pages i
 
 ---
 
-<!-- source: docs/absorption-measurement.md | canonical: https://jmrplens.github.io/phonometry/materials/absorbers/absorption-measurement/ -->
+<!-- source: docs/materials/absorbers/absorption-measurement.md | canonical: https://jmrplens.github.io/phonometry/materials/absorbers/absorption-measurement/ -->
 Source: https://jmrplens.github.io/phonometry/materials/absorbers/absorption-measurement/
 
 # Sound Absorption Measurement and Rating
@@ -555,7 +555,7 @@ and closed-form identities.
 ---
 
 
-<!-- source: docs/airflow-resistance.md | canonical: https://jmrplens.github.io/phonometry/materials/absorbers/airflow-resistance/ -->
+<!-- source: docs/materials/absorbers/airflow-resistance.md | canonical: https://jmrplens.github.io/phonometry/materials/absorbers/airflow-resistance/ -->
 Source: https://jmrplens.github.io/phonometry/materials/absorbers/airflow-resistance/
 
 # Airflow Resistance
@@ -842,7 +842,7 @@ ISO 9053-2 Annex A.3 worked example and closed-form identities.
 ---
 
 
-<!-- source: docs/impedance-tube.md | canonical: https://jmrplens.github.io/phonometry/materials/absorbers/impedance-tube/ -->
+<!-- source: docs/materials/absorbers/impedance-tube.md | canonical: https://jmrplens.github.io/phonometry/materials/absorbers/impedance-tube/ -->
 Source: https://jmrplens.github.io/phonometry/materials/absorbers/impedance-tube/
 
 # Impedance Tube
@@ -1476,7 +1476,7 @@ every commit.
 ---
 
 
-<!-- source: docs/porous-absorbers.md | canonical: https://jmrplens.github.io/phonometry/materials/absorbers/porous-absorbers/ -->
+<!-- source: docs/materials/absorbers/porous-absorbers.md | canonical: https://jmrplens.github.io/phonometry/materials/absorbers/porous-absorbers/ -->
 Source: https://jmrplens.github.io/phonometry/materials/absorbers/porous-absorbers/
 
 # Porous and Multilayer Absorbers
@@ -2316,7 +2316,7 @@ their own guides.
 ---
 
 
-<!-- source: docs/metamaterial-absorbers.md | canonical: https://jmrplens.github.io/phonometry/materials/absorbers/metamaterial-absorbers/ -->
+<!-- source: docs/materials/absorbers/metamaterial-absorbers.md | canonical: https://jmrplens.github.io/phonometry/materials/absorbers/metamaterial-absorbers/ -->
 Source: https://jmrplens.github.io/phonometry/materials/absorbers/metamaterial-absorbers/
 
 # Metamaterial Absorbers

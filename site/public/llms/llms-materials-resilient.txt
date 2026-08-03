@@ -4,7 +4,7 @@ Part of https://jmrplens.github.io/phonometry/llms.txt. Full text of the pages i
 
 ---
 
-<!-- source: docs/dynamic-stiffness.md | canonical: https://jmrplens.github.io/phonometry/materials/resilient/dynamic-stiffness/ -->
+<!-- source: docs/materials/resilient/dynamic-stiffness.md | canonical: https://jmrplens.github.io/phonometry/materials/resilient/dynamic-stiffness/ -->
 Source: https://jmrplens.github.io/phonometry/materials/resilient/dynamic-stiffness/
 
 # Dynamic stiffness of resilient materials (EN 29052-1)
