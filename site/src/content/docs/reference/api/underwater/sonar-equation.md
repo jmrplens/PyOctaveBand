@@ -30,7 +30,7 @@ a transmission-loss law at $\mathrm{TL} = \mathrm{FOM}$ gives the
 range at which the detection probability is 50 %:
 
 * [`detection_range`](/phonometry/reference/api/underwater/sonar-equation/#detection_range) inverts the closed-form loss of
-  `phonometry.underwater.propagation` (spreading plus volume absorption),
+  [`phonometry.underwater.propagation.closed_form`](/phonometry/reference/api/underwater/closed-form/) (spreading plus volume absorption),
   which is strictly increasing with range and therefore has a single crossing;
 * [`detection_range_from_curve`](/phonometry/reference/api/underwater/sonar-equation/#detection_range_from_curve) reads the crossing off any computed loss
   curve -- a normal-mode, parabolic-equation or Weston-regime prediction --

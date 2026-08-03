@@ -4,7 +4,7 @@ Numerical models of underwater sound propagation (range-independent ocean).
 
 Three complementary numerical solvers for the acoustic field in a
 horizontally-stratified ocean waveguide, complementing the closed-form
-transmission loss of :mod:`phonometry.underwater.propagation`:
+transmission loss of :mod:`phonometry.underwater.propagation.closed_form`:
 
 * :func:`normal_modes` -- the normal-mode expansion. Solves the depth-separated
   Sturm-Liouville eigenvalue problem by finite differences and assembles the

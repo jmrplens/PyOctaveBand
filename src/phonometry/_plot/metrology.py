@@ -27,16 +27,12 @@ from .common import (
     _new_axes,
 )
 
-#: Shared frequency-axis label of the spectral renderers.
-_FREQ_LABEL = "Frequency [Hz]"
-
 #: Spanish translations of the fixed strings rendered by the metrology
 #: ``.plot()`` renderers, keyed by their verbatim English text. ``_t``
 #: returns the English key unchanged for any language other than ``"es"``,
 #: so the English output is byte-for-byte identical to the pre-i18n
 #: renderers.
 _STRINGS: dict[str, str] = {
-    "Frequency [Hz]": "Frecuencia [Hz]",
     r"Contribution to combined uncertainty $|c_i|\,u(x_i)$":
         r"Contribución a la incertidumbre combinada $|c_i|\,u(x_i)$",
     "GUM uncertainty budget — y = {value}":

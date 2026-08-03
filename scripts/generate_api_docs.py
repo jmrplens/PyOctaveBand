@@ -800,7 +800,8 @@ _LEGACY_MODULE_ALIASES = {
         "phonometry.environment.assessment.measurement"
     ),
     "phonometry.underwater_acoustics": "phonometry.underwater.acoustics",
-    "phonometry.underwater_propagation": "phonometry.underwater.propagation",
+    "phonometry.underwater_propagation":
+        "phonometry.underwater.propagation.closed_form",
     "phonometry.underwater_sound_speed": "phonometry.underwater.propagation.sound_speed",
 }
 

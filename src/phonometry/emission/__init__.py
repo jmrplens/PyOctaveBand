@@ -71,7 +71,7 @@ from .vibration_sound_power import (
 )
 
 __all__ = [
-"NORMALIZED_IMPEDANCE",
+    "NORMALIZED_IMPEDANCE",
     "REFERENCE_VELOCITY",
     "TEMPORAL_VARIABILITY_LIMIT",
     "DeclarationForm",

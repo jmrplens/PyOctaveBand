@@ -39,7 +39,7 @@ from .uncertainty import (
 _MOVED_TO = (
     "phonometry.filters",
     "phonometry.signals",
-    "phonometry.emission.intensity_compliance",
+    "phonometry.emission",
 )
 __getattr__ = _namespace_shim(__name__, _MOVED_TO)
 

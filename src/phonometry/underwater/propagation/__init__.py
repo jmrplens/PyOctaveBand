@@ -1,9 +1,10 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
 """underwater.propagation subdomain of phonometry: how the sound gets there.
 
-The closed-form transmission loss of ISO 18405 and Weston's regimes, the
-numerical solvers (normal modes, rays, parabolic equation), the seabed
-reflection they bounce off and the sound speed profile they travel through.
+The closed-form transmission loss (spreading plus seawater absorption) and
+Weston's regimes, the numerical solvers (normal modes, rays, parabolic
+equation), the seabed reflection they bounce off and the sound speed profile
+they travel through.
 """
 
 from __future__ import annotations

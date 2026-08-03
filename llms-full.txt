@@ -2274,6 +2274,7 @@ warns and delegates as well.
 | `phonometry.environmental` | `phonometry.environment` | 5.0 |
 | `phonometry.psychoacoustics.loudness_zwicker` | `phonometry.psychoacoustics.loudness.zwicker` | 5.0 |
 | `phonometry.underwater.ocean_ambient_noise` | `phonometry.underwater.sources.ambient_noise` | 5.0 |
+| `phonometry.metrology.intensity_compliance` | `phonometry.emission.intensity_compliance` | 5.0 |
 
 | Name | Type | Description (Inputs) | Usage Snippet (Outputs) |
 | :--- | :--- | :--- | :--- |

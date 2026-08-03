@@ -36,17 +36,17 @@ if TYPE_CHECKING:
     from ..emission.sound_power_reverberation import ReverberationSoundPowerResult
     from ..emission.vibration_sound_power import VibrationSoundPowerResult
 
-#: Spanish translations of the fixed labels/titles/legends rendered by the
-#: emission-domain ``.plot()`` renderers, keyed by their verbatim English
-#: text. ``_t`` returns the English key unchanged for any language other
-#: than ``"es"``, so the English output is byte-for-byte identical to the
-#: pre-i18n renderers.
 #: Shared frequency-axis label of the spectral renderers.
 _FREQ_LABEL = "Frequency [Hz]"
 #: Y-axis label of the residual-index plots (identical in both languages,
 #: the symbol carries the meaning).
 _LABEL_RESIDUAL_INDEX = r"$\delta_{pI0}$ [dB]"
 
+#: Spanish translations of the fixed labels/titles/legends rendered by the
+#: emission-domain ``.plot()`` renderers, keyed by their verbatim English
+#: text. ``_t`` returns the English key unchanged for any language other
+#: than ``"es"``, so the English output is byte-for-byte identical to the
+#: pre-i18n renderers.
 _STRINGS: dict[str, str] = {
     "Band": "Banda",
     "Sound power level LW [dB]": "Nivel de potencia acústica LW [dB]",
