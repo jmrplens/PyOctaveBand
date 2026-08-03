@@ -1038,9 +1038,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 - `phonometry.psychoacoustics` has two families, along the split every text on
   sound quality makes. `psychoacoustics.loudness` holds how loud a sound is:
-  the four models (ISO 532-1 Zwicker, ISO 532-2 Moore-Glasberg and its
-  time-varying form, ECMA-418-2) and the ISO 226 equal-loudness contours they
-  are read against. `psychoacoustics.quality` holds what the sound is like
+  the four models (ISO 532-1 Zwicker, ISO 532-2 Moore-Glasberg, the
+  time-varying Moore-Glasberg of ISO 532-3 and ECMA-418-2) and the ISO 226
+  equal-loudness contours that put a level in phons.
+  `psychoacoustics.quality` holds what the sound is like
   once its loudness is known: sharpness, roughness, fluctuation strength,
   tonality, tone audibility and the annoyance models built on them. The ERB
   scale stays at the root, because both families measure on it.

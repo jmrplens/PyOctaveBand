@@ -38,7 +38,7 @@ result workbooks, not original ISO files.
 ISO publishes this attachment so that implementations of the ISO 532-1 method
 can be validated against the standard's reference signals and tolerances
 (Annex B). The copies in this folder serve **exactly that purpose**: they are
-consumed by `tests/psychoacoustics/test_loudness_zwicker.py` and `scripts/conformance_report.py` to
+consumed by `tests/psychoacoustics/loudness/test_zwicker.py` and `scripts/conformance_report.py` to
 demonstrate conformance of this library's independent implementation. They are
 **not** part of the `phonometry` package, are not installed with it, and are
 not covered by this repository's MIT licence — ISO's terms apply to them.

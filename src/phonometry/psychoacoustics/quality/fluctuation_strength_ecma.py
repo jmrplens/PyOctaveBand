@@ -6,9 +6,10 @@ Clean-room implementation of the fluctuation-strength signal chain of
 ECMA-418-2:2025 (Clause 9, Sottek Hearing Model). The shared auditory
 front-end (Clause 5: outer/middle-ear filter, 53-band auditory filter bank,
 compressive nonlinearity of Formulae 23-25) is reused from
-:mod:`.loudness_ecma`; this module adds the fluctuation-strength chain, which
-mirrors the roughness chain of Clause 7 but replaces the DFT-based envelope
-analysis with High-resolution Spectral Analysis (HSA):
+:mod:`phonometry.psychoacoustics.loudness.ecma`; this module adds the
+fluctuation-strength chain, which mirrors the roughness chain of Clause 7 but
+replaces the DFT-based envelope analysis with High-resolution Spectral
+Analysis (HSA):
 
 * fluctuation-strength zero-padding (Clause 5.1.2.2) and segmentation
   (Clause 5.1.5.2) with the fixed block/hop :math:`s_b = 65536` /

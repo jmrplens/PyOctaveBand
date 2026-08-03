@@ -5,9 +5,11 @@ Psychoacoustic tonality per ECMA-418-2:2025 (4th ed., Sottek Hearing Model).
 Clean-room implementation of the tonality signal chain of ECMA-418-2:2025
 (Clause 6.2). The shared auditory front-end (Clause 5) and the ACF-based
 tonal/noise decomposition with the full Clause 6.2.3 band averaging
-(Clause 6.2.2-6.2.7, :func:`loudness_ecma._tonal_noise_split`) are reused
-from :mod:`.loudness_ecma` -- loudness and tonality therefore report the
-same underlying ``N'_tonal(l, z)`` for the same signal; this module adds
+(Clause 6.2.2-6.2.7,
+:func:`phonometry.psychoacoustics.loudness.ecma._tonal_noise_split`) are
+reused from :mod:`phonometry.psychoacoustics.loudness.ecma` -- loudness and
+tonality therefore report the same underlying ``N'_tonal(l, z)`` for the same
+signal; this module adds
 
 * the tonality output stages (Clause 6.2.8-6.2.11): the overall-SNR gate
   ``q(l)`` (Formulae 49-50), the time-dependent specific tonality

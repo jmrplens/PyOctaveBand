@@ -3,7 +3,7 @@
 
 Two families since 4.0, along the split every textbook on sound quality
 makes: :mod:`~phonometry.psychoacoustics.loudness` for how loud a sound is
-(the four models and the contours they are read against) and
+(the four models and the equal-loudness contours) and
 :mod:`~phonometry.psychoacoustics.quality` for what it is like once its
 loudness is known (sharpness, roughness, fluctuation strength, tonality and
 the annoyance models built on them). The ERB scale stays at the root: both

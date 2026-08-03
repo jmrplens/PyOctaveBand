@@ -9,7 +9,7 @@ verdict renders both ways, and the boxed decisive audibility ``ΔL_ta``, the
 tonal adjustment ``K`` (ISO 1996-2:2017 Table J.1), the decisive tone frequency
 and the metadata appear in the extracted text. The tone-audibility algorithm
 itself is validated against the ISO/PAS 20065 Annex E oracle elsewhere
-(tests/psychoacoustics/test_tone_audibility.py); this fiche test reuses the same
+(tests/psychoacoustics/quality/test_tone_audibility.py); this fiche test reuses the same
 Annex E spectrum so its numbers are documented.
 """
 

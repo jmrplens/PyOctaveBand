@@ -2,8 +2,8 @@
 """psychoacoustics.loudness subdomain of phonometry: how loud a sound is.
 
 The four loudness models (ISO 532-1 Zwicker, ISO 532-2 Moore-Glasberg,
-its time-varying form and ECMA-418-2) and the equal-loudness contours of
-ISO 226 they are all read against.
+ISO 532-3 time-varying Moore-Glasberg and ECMA-418-2) and the ISO 226
+equal-loudness contours that put a level in phons.
 """
 
 from __future__ import annotations

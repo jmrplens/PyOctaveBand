@@ -19,8 +19,8 @@ points are provided:
   Annex A (Tables A.1/A.2), the nonlinear temporal decay and the
   temporal weighting of the total loudness.
 
-All numeric tables live in `phonometry._zwicker_data` and reproduce
-Tables A.1 to A.9 of the standard digit for digit.
+All numeric tables live in `._zwicker_data` and reproduce Tables A.1 to
+A.9 of the standard digit for digit.
 
 > Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
 

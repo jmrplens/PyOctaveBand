@@ -6,8 +6,8 @@ Clean-room implementation of the roughness signal chain of ECMA-418-2:2025
 (Clause 7). The shared auditory front-end (Clause 5: outer/middle-ear filter,
 53-band gammatone-like filter bank, half-wave rectification, compressive
 nonlinearity to the specific basis loudness ``N'_basis(l, z)`` of Formula 25)
-is reused from :mod:`.loudness_ecma`; this module adds the roughness-specific
-chain:
+is reused from :mod:`phonometry.psychoacoustics.loudness.ecma`; this module
+adds the roughness-specific chain:
 
 * roughness-specific zero-padding (Clause 5.1.2.2) and segmentation
   (Clause 5.1.5.2) with the fixed block/hop :math:`s_b = 16384` /
