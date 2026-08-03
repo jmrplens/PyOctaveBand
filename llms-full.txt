@@ -334,20 +334,20 @@ The generated API reference, one page per module. Fetch these only when a specif
 - [power/sound-power-intensity](https://jmrplens.github.io/phonometry/reference/api/power/sound-power-intensity/)
 - [power/sound-power-reverberation](https://jmrplens.github.io/phonometry/reference/api/power/sound-power-reverberation/)
 - [power/vibration-sound-power](https://jmrplens.github.io/phonometry/reference/api/power/vibration-sound-power/)
+- [psychoacoustics/annoyance](https://jmrplens.github.io/phonometry/reference/api/psychoacoustics/annoyance/)
+- [psychoacoustics/contours](https://jmrplens.github.io/phonometry/reference/api/psychoacoustics/contours/)
+- [psychoacoustics/ecma](https://jmrplens.github.io/phonometry/reference/api/psychoacoustics/ecma/)
 - [psychoacoustics/erb-scale](https://jmrplens.github.io/phonometry/reference/api/psychoacoustics/erb-scale/)
 - [psychoacoustics/fluctuation-strength](https://jmrplens.github.io/phonometry/reference/api/psychoacoustics/fluctuation-strength/)
 - [psychoacoustics/fluctuation-strength-ecma](https://jmrplens.github.io/phonometry/reference/api/psychoacoustics/fluctuation-strength-ecma/)
-- [psychoacoustics/loudness-contours](https://jmrplens.github.io/phonometry/reference/api/psychoacoustics/loudness-contours/)
-- [psychoacoustics/loudness-ecma](https://jmrplens.github.io/phonometry/reference/api/psychoacoustics/loudness-ecma/)
-- [psychoacoustics/loudness-moore-glasberg](https://jmrplens.github.io/phonometry/reference/api/psychoacoustics/loudness-moore-glasberg/)
-- [psychoacoustics/loudness-moore-glasberg-time](https://jmrplens.github.io/phonometry/reference/api/psychoacoustics/loudness-moore-glasberg-time/)
-- [psychoacoustics/loudness-zwicker](https://jmrplens.github.io/phonometry/reference/api/psychoacoustics/loudness-zwicker/)
-- [psychoacoustics/psychoacoustic-annoyance](https://jmrplens.github.io/phonometry/reference/api/psychoacoustics/psychoacoustic-annoyance/)
+- [psychoacoustics/moore-glasberg](https://jmrplens.github.io/phonometry/reference/api/psychoacoustics/moore-glasberg/)
+- [psychoacoustics/moore-glasberg-time](https://jmrplens.github.io/phonometry/reference/api/psychoacoustics/moore-glasberg-time/)
 - [psychoacoustics/roughness-ecma](https://jmrplens.github.io/phonometry/reference/api/psychoacoustics/roughness-ecma/)
 - [psychoacoustics/sharpness](https://jmrplens.github.io/phonometry/reference/api/psychoacoustics/sharpness/)
 - [psychoacoustics/tonality](https://jmrplens.github.io/phonometry/reference/api/psychoacoustics/tonality/)
 - [psychoacoustics/tonality-ecma](https://jmrplens.github.io/phonometry/reference/api/psychoacoustics/tonality-ecma/)
 - [psychoacoustics/tone-audibility](https://jmrplens.github.io/phonometry/reference/api/psychoacoustics/tone-audibility/)
+- [psychoacoustics/zwicker](https://jmrplens.github.io/phonometry/reference/api/psychoacoustics/zwicker/)
 - [rooms/crowd-noise](https://jmrplens.github.io/phonometry/reference/api/rooms/crowd-noise/)
 - [rooms/enclosed-space-absorption](https://jmrplens.github.io/phonometry/reference/api/rooms/enclosed-space-absorption/)
 - [rooms/image-source](https://jmrplens.github.io/phonometry/reference/api/rooms/image-source/)
@@ -1315,7 +1315,7 @@ The Zwicker method (ISO 532-1:2017) is the reference: stationary and time-varyin
 - [Sound Quality Metrics](https://jmrplens.github.io/phonometry/guides/sound-quality/): the tonality, roughness and
   fluctuation strength built on the same ECMA-418-2 front-end.
 - [Theory](https://jmrplens.github.io/phonometry/reference/theory/perception/): the equations behind the loudness models.
-- API reference: [`psychoacoustics.loudness_moore_glasberg`](https://jmrplens.github.io/phonometry/reference/api/psychoacoustics/loudness-moore-glasberg/), [`psychoacoustics.loudness_moore_glasberg_time`](https://jmrplens.github.io/phonometry/reference/api/psychoacoustics/loudness-moore-glasberg-time/) and [`psychoacoustics.loudness_ecma`](https://jmrplens.github.io/phonometry/reference/api/psychoacoustics/loudness-ecma/).
+- API reference: [`psychoacoustics.loudness.moore_glasberg`](https://jmrplens.github.io/phonometry/reference/api/psychoacoustics/moore-glasberg/), [`psychoacoustics.loudness.moore_glasberg_time`](https://jmrplens.github.io/phonometry/reference/api/psychoacoustics/moore-glasberg-time/) and [`psychoacoustics.loudness.ecma`](https://jmrplens.github.io/phonometry/reference/api/psychoacoustics/ecma/).
 
 ## References
 
@@ -2240,7 +2240,7 @@ contour = aircraft.noise_contour(path, powers, distances, sel, lmax, x=gx, y=gy)
 | `phonometry.filters` | Octave and fractional-octave filter banks, frequency weightings and time weighting, parametric EQ, IEC 61260-1 and IEC 61672-1 class verification |
 | `phonometry.signals` | Levels (Leq, LAeq, percentiles), Welch and multitaper spectra, coherence, time-frequency, correlation, envelope, cepstrum, phase, synchronous averaging, test signals |
 | `phonometry.metrology` | Calibration, GUM uncertainty and Monte Carlo, data qualification (stationarity, trends, peak statistics), IEC 61043 intensity class |
-| `phonometry.psychoacoustics` | Loudness (Zwicker, ECMA, Moore-Glasberg), sharpness, tonality, roughness, fluctuation strength, annoyance, tonal audibility |
+| `phonometry.psychoacoustics` | Two families: `loudness` (ISO 532-1 Zwicker, ISO 532-2 and ISO 532-3 Moore-Glasberg, ECMA-418-2, ISO 226 equal-loudness contours) and `quality` (sharpness, roughness, fluctuation strength, tonality, tone audibility, annoyance), plus the ERB scale both measure on |
 | `phonometry.speech` | Speech Transmission Index (IEC 60268-16), Speech Intelligibility Index (ANSI S3.5), STOI and ESTOI |
 | `phonometry.hearing` | Audiometric thresholds (ISO 7029/389-7), noise-induced hearing loss (ISO 1999), occupational exposure (ISO 9612) |
 | `phonometry.emission` | Sound power (ISO 3740 family), sound intensity, vibration-based power |
@@ -2272,6 +2272,7 @@ warns and delegates as well.
 | `phonometry.building.spanish_building_code` | `phonometry.building.regulation.spain` | 5.0 |
 | `phonometry.materials.porous_absorber` | `phonometry.materials.absorbers.porous` | 5.0 |
 | `phonometry.environmental` | `phonometry.environment` | 5.0 |
+| `phonometry.psychoacoustics.loudness_zwicker` | `phonometry.psychoacoustics.loudness.zwicker` | 5.0 |
 
 | Name | Type | Description (Inputs) | Usage Snippet (Outputs) |
 | :--- | :--- | :--- | :--- |
@@ -19351,7 +19352,7 @@ hearing threshold.
 - [Psychoacoustic annoyance and fluctuation strength](https://jmrplens.github.io/phonometry/guides/psychoacoustic-annoyance/):
   the Zwicker and Fastl model that consumes the percentile loudness $N_5$.
 - [Theory](https://jmrplens.github.io/phonometry/reference/theory/perception/): the equations behind the loudness models.
-- API reference: [`psychoacoustics.loudness_zwicker`](https://jmrplens.github.io/phonometry/reference/api/psychoacoustics/loudness-zwicker/) and [`psychoacoustics.loudness_contours`](https://jmrplens.github.io/phonometry/reference/api/psychoacoustics/loudness-contours/).
+- API reference: [`psychoacoustics.loudness.zwicker`](https://jmrplens.github.io/phonometry/reference/api/psychoacoustics/zwicker/) and [`psychoacoustics.loudness.contours`](https://jmrplens.github.io/phonometry/reference/api/psychoacoustics/contours/).
 
 ---
 
@@ -40787,7 +40788,7 @@ other only as supporting evidence.
 - [Impulsive-sound prominence](https://jmrplens.github.io/phonometry/guides/impulse-prominence/): the NT ACOU 112
   counterpart for impulsive (rather than tonal) character.
 - [Theory](https://jmrplens.github.io/phonometry/reference/theory/perception/): the critical-band model and criteria derivation.
-- API reference: [`psychoacoustics.tonality`](https://jmrplens.github.io/phonometry/reference/api/psychoacoustics/tonality/).
+- API reference: [`psychoacoustics.quality.tonality`](https://jmrplens.github.io/phonometry/reference/api/psychoacoustics/tonality/).
 
 ## References
 
@@ -43151,8 +43152,8 @@ sample from the metrology core:
 | IEC 61672-1:2013 Table 5 | `lc_peak()` one-cycle/half-cycle peak responses, class 1 limits | `tests/signals/test_levels.py` |
 | IEC 61260-1:2014 Table 1 | Filter-bank class 1/2 acceptance limits via `verify_filter_class()` | `tests/filters/test_compliance.py` |
 | ISO 7196:1995 Table 2 | G weighting (infrasound) at every nominal response value, 0.25–315 Hz | `tests/filters/test_g_weighting.py` |
-| ISO 226:2023 Table 1 and Annex B | Equal-loudness contours and loudness levels against the Annex B tables, hearing threshold against the Table 1 $T_f$ parameters | `tests/psychoacoustics/test_loudness_contours.py` |
-| ECMA-418-1:2024 | TNR/PR tone prominence: critical bandwidths, proximity spacing and prominence criteria against the worked examples in clauses 10–12 | `tests/psychoacoustics/test_tonality.py` |
+| ISO 226:2023 Table 1 and Annex B | Equal-loudness contours and loudness levels against the Annex B tables, hearing threshold against the Table 1 $T_f$ parameters | `tests/psychoacoustics/loudness/test_contours.py` |
+| ECMA-418-1:2024 | TNR/PR tone prominence: critical bandwidths, proximity spacing and prominence criteria against the worked examples in clauses 10–12 | `tests/psychoacoustics/quality/test_tonality.py` |
 | ISO 1996-1:2016 | `lden()`, `ldn()` and `composite_rating_level()` against hand-computed formula values | `tests/environment/assessment/test_rating.py` |
 | IEC 60942:2017 Table 2 | Calibrator short-term stability limits (frequency-dependent, class 1) in `sensitivity()` | `tests/metrology/test_calibration_validation.py` |
 

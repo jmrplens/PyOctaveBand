@@ -1,5 +1,5 @@
 ---
-title: "psychoacoustics.sharpness"
+title: "psychoacoustics.quality.sharpness"
 description: "Sharpness per DIN 45692:2009-08."
 sidebar:
   label: "sharpness"

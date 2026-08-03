@@ -88,6 +88,8 @@ ALLOWED_FAMILY_EDGES: set[tuple[str, str, str]] = {
     ("building", "prediction", "measurement"),
     # A metadiffuser well is a slit absorber: it reuses the porous air state.
     ("materials", "diffusers", "absorbers"),
+    # Every sound quality metric is read off a loudness pattern.
+    ("psychoacoustics", "quality", "loudness"),
 }
 
 

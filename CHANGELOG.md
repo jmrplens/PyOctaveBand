@@ -1036,6 +1036,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   the same 251 names, and the nineteen pre-split module paths keep working
   until 5.0.
 
+- `phonometry.psychoacoustics` has two families, along the split every text on
+  sound quality makes. `psychoacoustics.loudness` holds how loud a sound is:
+  the four models (ISO 532-1 Zwicker, ISO 532-2 Moore-Glasberg, the
+  time-varying Moore-Glasberg of ISO 532-3 and ECMA-418-2) and the ISO 226
+  equal-loudness contours that put a level in phons.
+  `psychoacoustics.quality` holds what the sound is like
+  once its loudness is known: sharpness, roughness, fluctuation strength,
+  tonality, tone audibility and the annoyance models built on them. The ERB
+  scale stays at the root, because both families measure on it.
+
+  Five modules lose the word the family now says: `loudness_zwicker`,
+  `loudness_moore_glasberg`, `loudness_moore_glasberg_time`, `loudness_ecma`
+  and `loudness_contours` become `loudness.zwicker`, `loudness.moore_glasberg`,
+  `loudness.moore_glasberg_time`, `loudness.ecma` and `loudness.contours`;
+  `psychoacoustic_annoyance` becomes `quality.annoyance`.
+
+  Nothing moves in the namespace: `from phonometry import psychoacoustics`
+  exports the same 60 names, and the thirteen pre-split module paths keep
+  working until 5.0.
+
 - `phonometry.materials` has four families, by what the material does rather
   than by how it is measured. `materials.absorbers` holds everything that
   absorbs and the methods that characterise it: ISO 354 in the reverberation

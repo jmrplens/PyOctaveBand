@@ -215,7 +215,7 @@ other only as supporting evidence.
 - [Impulsive-sound prominence](impulse-prominence.md): the NT ACOU 112
   counterpart for impulsive (rather than tonal) character.
 - [Theory](theory-perception.md): the critical-band model and criteria derivation.
-- API reference: [`psychoacoustics.tonality`](https://jmrplens.github.io/phonometry/reference/api/psychoacoustics/tonality/).
+- API reference: [`psychoacoustics.quality.tonality`](https://jmrplens.github.io/phonometry/reference/api/psychoacoustics/tonality/).
 
 ## References
 

@@ -36,7 +36,7 @@ flattens out but direct measurements show `ERB_N` continuing to shrink.
 
 This module states the constants to the precision used by the ISO 532-2
 implementation of the Moore-Glasberg loudness model
-([`phonometry.psychoacoustics.loudness_moore_glasberg`](/phonometry/reference/api/psychoacoustics/loudness-moore-glasberg/)), which shares
+([`phonometry.psychoacoustics.loudness.moore_glasberg`](/phonometry/reference/api/psychoacoustics/moore-glasberg/)), which shares
 them:
 
 $$

@@ -2,7 +2,7 @@
 """Tonal audibility assessment fiche (reportlab renderer, ISO 1996-2:2017).
 
 Renders a
-:class:`~phonometry.psychoacoustics.tone_audibility.ToneAudibilityResult` to a
+:class:`~phonometry.psychoacoustics.quality.tone_audibility.ToneAudibilityResult` to a
 one-page PDF laid out like a tonal-assessment report of an environmental-noise
 laboratory. ISO 1996-2:2017 Annex J assesses the audibility of prominent tones
 by the engineering method of ISO/PAS 20065:2016 (the critical band about a
@@ -67,7 +67,7 @@ from ._layout import (
 from .metadata import ReportMetadata
 
 if TYPE_CHECKING:
-    from ..psychoacoustics.tone_audibility import ToneAudibilityResult
+    from ..psychoacoustics.quality.tone_audibility import ToneAudibilityResult
 
 
 def _fmt(value: float, language: str, decimals: int = 1) -> str:
@@ -286,7 +286,7 @@ def render_tone_audibility_report(
     """Render a tonal audibility assessment fiche to a PDF at ``path``.
 
     :param result: A
-        :class:`~phonometry.psychoacoustics.tone_audibility.ToneAudibilityResult`
+        :class:`~phonometry.psychoacoustics.quality.tone_audibility.ToneAudibilityResult`
         carrying the detected tones, their tone/masking levels and audibilities.
     :param path: Destination path of the PDF file.
     :param metadata: Optional :class:`ReportMetadata` supplying the header

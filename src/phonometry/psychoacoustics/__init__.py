@@ -1,8 +1,19 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""psychoacoustics domain of phonometry (see module docstrings)."""
+"""psychoacoustics domain of phonometry (see module docstrings).
+
+Two families since 4.0, along the split every textbook on sound quality
+makes: :mod:`~phonometry.psychoacoustics.loudness` for how loud a sound is
+(the four models and the equal-loudness contours) and
+:mod:`~phonometry.psychoacoustics.quality` for what it is like once its
+loudness is known (sharpness, roughness, fluctuation strength, tonality and
+the annoyance models built on them). The ERB scale stays at the root: both
+families measure on it. Every public name is still exported here, so
+``from phonometry import psychoacoustics`` reads as it did.
+"""
 
 from __future__ import annotations
 
+from .._compat import _namespace_dir, _namespace_shim
 from .erb_scale import (
     CAM_C,
     ERB_C1,
@@ -11,55 +22,34 @@ from .erb_scale import (
     erb_bandwidth,
     frequency_from_cam,
 )
-from .fluctuation_strength import (
-    FluctuationStrengthResult,
-    fluctuation_strength,
-    fluctuation_strength_am_noise,
-)
-from .fluctuation_strength_ecma import (
-    EcmaFluctuationStrength,
-    fluctuation_strength_ecma,
-)
-from .loudness_contours import (
+from .loudness import (
+    EcmaLoudness,
     EqualLoudnessContours,
+    MooreGlasbergLoudness,
+    MooreGlasbergTimeVaryingLoudness,
+    ZwickerLoudness,
     equal_loudness_contour,
     equal_loudness_contours,
     hearing_threshold,
+    loudness_ecma,
     loudness_level,
-)
-from .loudness_ecma import EcmaLoudness, loudness_ecma
-from .loudness_moore_glasberg import (
-    MooreGlasbergLoudness,
     loudness_moore_glasberg,
     loudness_moore_glasberg_from_spectrum,
     loudness_moore_glasberg_from_third_octave,
-)
-from .loudness_moore_glasberg_time import (
-    MooreGlasbergTimeVaryingLoudness,
     loudness_moore_glasberg_time,
-)
-from .loudness_zwicker import (
-    ZwickerLoudness,
     loudness_zwicker,
     loudness_zwicker_from_spectrum,
 )
-from .psychoacoustic_annoyance import (
-    PsychoacousticAnnoyanceResult,
-    psychoacoustic_annoyance,
-    psychoacoustic_annoyance_from_signal,
-)
-from .roughness_ecma import EcmaRoughness, roughness_ecma
-from .sharpness import sharpness_din, sharpness_din_from_specific
-from .tonality import (
-    TonalityWarning,
-    ToneAssessment,
-    prominence_ratio,
-    tone_to_noise_ratio,
-)
-from .tonality_ecma import EcmaTonality, tonality_ecma
-from .tone_audibility import (
+from .quality import (
     HANNING_BANDWIDTH_FACTOR,
     NO_TONE_AUDIBILITY,
+    EcmaFluctuationStrength,
+    EcmaRoughness,
+    EcmaTonality,
+    FluctuationStrengthResult,
+    PsychoacousticAnnoyanceResult,
+    TonalityWarning,
+    ToneAssessment,
     ToneAudibilityResult,
     analyze_spectrum,
     assess_tones,
@@ -70,13 +60,24 @@ from .tone_audibility import (
     critical_band_level,
     critical_bandwidth_engineering,
     energy_sum_level,
+    fluctuation_strength,
+    fluctuation_strength_am_noise,
+    fluctuation_strength_ecma,
     masking_index,
     mean_audibility,
     mean_audibility_uncertainty,
     mean_narrowband_level,
+    prominence_ratio,
+    psychoacoustic_annoyance,
+    psychoacoustic_annoyance_from_signal,
     resolve_tones_separately,
+    roughness_ecma,
+    sharpness_din,
+    sharpness_din_from_specific,
+    tonality_ecma,
     tone_audibility,
     tone_level,
+    tone_to_noise_ratio,
     two_tone_separation_frequency,
 )
 
@@ -142,3 +143,9 @@ __all__ = [
     "tone_to_noise_ratio",
     "two_tone_separation_frequency",
 ]
+
+#: No public name left this namespace in 4.0, but the modules did, so
+#: ``psychoacoustics.loudness_zwicker`` has to keep resolving to its alias
+#: module until 5.0: the import registers it, the attribute read needs this.
+__getattr__ = _namespace_shim(__name__)
+__dir__ = _namespace_dir(__name__, __all__)

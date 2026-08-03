@@ -7,7 +7,7 @@ a valid single-page PDF is written for a stationary loudness result, unknown
 engines are rejected, XML specials in metadata do not break reportlab, and the
 maximum-loudness verdict renders both ways. The loudness algorithm itself is
 validated against the ISO 532-1 Annex B data elsewhere
-(tests/psychoacoustics/test_loudness_zwicker.py); here a fixed synthetic
+(tests/psychoacoustics/loudness/test_zwicker.py); here a fixed synthetic
 one-third-octave spectrum keeps the fiche test self-contained.
 """
 

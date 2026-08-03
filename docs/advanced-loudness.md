@@ -359,7 +359,7 @@ The Zwicker method (ISO 532-1:2017) is the reference: stationary and time-varyin
 - [Sound Quality Metrics](sound-quality.md): the tonality, roughness and
   fluctuation strength built on the same ECMA-418-2 front-end.
 - [Theory](theory-perception.md): the equations behind the loudness models.
-- API reference: [`psychoacoustics.loudness_moore_glasberg`](https://jmrplens.github.io/phonometry/reference/api/psychoacoustics/loudness-moore-glasberg/), [`psychoacoustics.loudness_moore_glasberg_time`](https://jmrplens.github.io/phonometry/reference/api/psychoacoustics/loudness-moore-glasberg-time/) and [`psychoacoustics.loudness_ecma`](https://jmrplens.github.io/phonometry/reference/api/psychoacoustics/loudness-ecma/).
+- API reference: [`psychoacoustics.loudness.moore_glasberg`](https://jmrplens.github.io/phonometry/reference/api/psychoacoustics/moore-glasberg/), [`psychoacoustics.loudness.moore_glasberg_time`](https://jmrplens.github.io/phonometry/reference/api/psychoacoustics/moore-glasberg-time/) and [`psychoacoustics.loudness.ecma`](https://jmrplens.github.io/phonometry/reference/api/psychoacoustics/ecma/).
 
 ## References
 

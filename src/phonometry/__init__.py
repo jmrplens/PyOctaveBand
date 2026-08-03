@@ -1041,53 +1041,56 @@ from .psychoacoustics.erb_scale import (
     erb_bandwidth,
     frequency_from_cam,
 )
-from .psychoacoustics.fluctuation_strength import (
-    FluctuationStrengthResult,
-    fluctuation_strength,
-    fluctuation_strength_am_noise,
-)
-from .psychoacoustics.fluctuation_strength_ecma import (
-    EcmaFluctuationStrength,
-    fluctuation_strength_ecma,
-)
-from .psychoacoustics.loudness_contours import (
+from .psychoacoustics.loudness.contours import (
     EqualLoudnessContours,
     equal_loudness_contour,
     equal_loudness_contours,
     hearing_threshold,
     loudness_level,
 )
-from .psychoacoustics.loudness_ecma import EcmaLoudness, loudness_ecma
-from .psychoacoustics.loudness_moore_glasberg import (
+from .psychoacoustics.loudness.ecma import EcmaLoudness, loudness_ecma
+from .psychoacoustics.loudness.moore_glasberg import (
     MooreGlasbergLoudness,
     loudness_moore_glasberg,
     loudness_moore_glasberg_from_spectrum,
     loudness_moore_glasberg_from_third_octave,
 )
-from .psychoacoustics.loudness_moore_glasberg_time import (
+from .psychoacoustics.loudness.moore_glasberg_time import (
     MooreGlasbergTimeVaryingLoudness,
     loudness_moore_glasberg_time,
 )
-from .psychoacoustics.loudness_zwicker import (
+from .psychoacoustics.loudness.zwicker import (
     ZwickerLoudness,
     loudness_zwicker,
     loudness_zwicker_from_spectrum,
 )
-from .psychoacoustics.psychoacoustic_annoyance import (
+from .psychoacoustics.quality.annoyance import (
     PsychoacousticAnnoyanceResult,
     psychoacoustic_annoyance,
     psychoacoustic_annoyance_from_signal,
 )
-from .psychoacoustics.roughness_ecma import EcmaRoughness, roughness_ecma
-from .psychoacoustics.sharpness import sharpness_din, sharpness_din_from_specific
-from .psychoacoustics.tonality import (
+from .psychoacoustics.quality.fluctuation_strength import (
+    FluctuationStrengthResult,
+    fluctuation_strength,
+    fluctuation_strength_am_noise,
+)
+from .psychoacoustics.quality.fluctuation_strength_ecma import (
+    EcmaFluctuationStrength,
+    fluctuation_strength_ecma,
+)
+from .psychoacoustics.quality.roughness_ecma import EcmaRoughness, roughness_ecma
+from .psychoacoustics.quality.sharpness import (
+    sharpness_din,
+    sharpness_din_from_specific,
+)
+from .psychoacoustics.quality.tonality import (
     TonalityWarning,
     ToneAssessment,
     prominence_ratio,
     tone_to_noise_ratio,
 )
-from .psychoacoustics.tonality_ecma import EcmaTonality, tonality_ecma
-from .psychoacoustics.tone_audibility import (
+from .psychoacoustics.quality.tonality_ecma import EcmaTonality, tonality_ecma
+from .psychoacoustics.quality.tone_audibility import (
     HANNING_BANDWIDTH_FACTOR,
     NO_TONE_AUDIBILITY,
     ToneAudibilityResult,

@@ -799,7 +799,7 @@ which is the check that enforces the rule; see
   printed p. 20, 220 dpi (Figure 6 and its 11220 tick).
 - **Library behaviour:** uses the internally consistent 89,1 Hz to
   11 200 Hz range (upper end exclusive per the formulas), with a code note
-  in [`tonality.py`](https://github.com/jmrplens/phonometry/blob/main/src/phonometry/psychoacoustics/tonality.py).
+  in [`tonality.py`](https://github.com/jmrplens/phonometry/blob/main/src/phonometry/psychoacoustics/quality/tonality.py).
 - **Status:** unreported.
 
 ## ECMA-418-1:2024 (3rd edition), Formula (21) (repeated constant term)
@@ -821,7 +821,7 @@ which is the check that enforces the rule; see
   Formula (22) as the consistent control. Render: `plan/ECMA-418-1_3rd_edition_december_2024.pdf`, PDF page 25, printed p. 17, 300 dpi.
 - **Library behaviour:** implements the $C_{L,1}$ reading, which is the only one
   that returns a usable band edge, with a code note in
-  [`tonality.py`](https://github.com/jmrplens/phonometry/blob/main/src/phonometry/psychoacoustics/tonality.py).
+  [`tonality.py`](https://github.com/jmrplens/phonometry/blob/main/src/phonometry/psychoacoustics/quality/tonality.py).
 - **Status:** unreported.
 
 ## ECMA-418-1:2024 (3rd edition), clause 11.3 (unresolved field references)
@@ -860,7 +860,7 @@ which is the check that enforces the rule; see
   reading reproduces the Clause 7 roughness calibration (1 asper) to
   0,9999.
 - **Library behaviour:** implements the flush-to-end reading with a code
-  note in [`roughness_ecma.py`](https://github.com/jmrplens/phonometry/blob/main/src/phonometry/psychoacoustics/roughness_ecma.py).
+  note in [`roughness_ecma.py`](https://github.com/jmrplens/phonometry/blob/main/src/phonometry/psychoacoustics/quality/roughness_ecma.py).
 - **Status:** unreported.
 
 ## ECMA-418-2:2025 (4th edition), clause 9.1.4, Formula (127) (HSA kernel phase)
@@ -978,7 +978,7 @@ which is the check that enforces the rule; see
   printed p. 14, 400 dpi.
 - **Library behaviour:** follows the DIN/sqrt(2) reading (it matches the
   only executable reference), with the choice recorded in
-  [`tone_audibility.py`](https://github.com/jmrplens/phonometry/blob/main/src/phonometry/psychoacoustics/tone_audibility.py).
+  [`tone_audibility.py`](https://github.com/jmrplens/phonometry/blob/main/src/phonometry/psychoacoustics/quality/tone_audibility.py).
 - **Status:** unreported.
 
 ## DIN 45681:2005-03, Anhang I, Tabelle I.6, row "6 FG"
@@ -1408,7 +1408,7 @@ which is the check that enforces the rule; see
 - **Library behaviour:** implements $0{,}76 \cdot 10^{-3}$ with a note at the
   formula;
   the carrier-frequency sweep test would catch a regression to the printed
-  value ([`fluctuation_strength.py`](https://github.com/jmrplens/phonometry/blob/main/src/phonometry/psychoacoustics/fluctuation_strength.py)).
+  value ([`fluctuation_strength.py`](https://github.com/jmrplens/phonometry/blob/main/src/phonometry/psychoacoustics/quality/fluctuation_strength.py)).
 - **Status:** unreported (conference paper rather than a standard).
 
 ## Medwin & Clay, Fundamentals of Acoustical Oceanography (1998), Eq. (3.4.30) (boric-acid coefficient)

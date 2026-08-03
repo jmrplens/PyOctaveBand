@@ -27,7 +27,7 @@ contour = aircraft.noise_contour(path, powers, distances, sel, lmax, x=gx, y=gy)
 | `phonometry.filters` | Octave and fractional-octave filter banks, frequency weightings and time weighting, parametric EQ, IEC 61260-1 and IEC 61672-1 class verification |
 | `phonometry.signals` | Levels (Leq, LAeq, percentiles), Welch and multitaper spectra, coherence, time-frequency, correlation, envelope, cepstrum, phase, synchronous averaging, test signals |
 | `phonometry.metrology` | Calibration, GUM uncertainty and Monte Carlo, data qualification (stationarity, trends, peak statistics), IEC 61043 intensity class |
-| `phonometry.psychoacoustics` | Loudness (Zwicker, ECMA, Moore-Glasberg), sharpness, tonality, roughness, fluctuation strength, annoyance, tonal audibility |
+| `phonometry.psychoacoustics` | Two families: `loudness` (ISO 532-1 Zwicker, ISO 532-2 and ISO 532-3 Moore-Glasberg, ECMA-418-2, ISO 226 equal-loudness contours) and `quality` (sharpness, roughness, fluctuation strength, tonality, tone audibility, annoyance), plus the ERB scale both measure on |
 | `phonometry.speech` | Speech Transmission Index (IEC 60268-16), Speech Intelligibility Index (ANSI S3.5), STOI and ESTOI |
 | `phonometry.hearing` | Audiometric thresholds (ISO 7029/389-7), noise-induced hearing loss (ISO 1999), occupational exposure (ISO 9612) |
 | `phonometry.emission` | Sound power (ISO 3740 family), sound intensity, vibration-based power |
@@ -59,6 +59,7 @@ warns and delegates as well.
 | `phonometry.building.spanish_building_code` | `phonometry.building.regulation.spain` | 5.0 |
 | `phonometry.materials.porous_absorber` | `phonometry.materials.absorbers.porous` | 5.0 |
 | `phonometry.environmental` | `phonometry.environment` | 5.0 |
+| `phonometry.psychoacoustics.loudness_zwicker` | `phonometry.psychoacoustics.loudness.zwicker` | 5.0 |
 
 | Name | Type | Description (Inputs) | Usage Snippet (Outputs) |
 | :--- | :--- | :--- | :--- |

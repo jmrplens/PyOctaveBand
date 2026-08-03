@@ -1,5 +1,5 @@
 ---
-title: "psychoacoustics.fluctuation_strength_ecma"
+title: "psychoacoustics.quality.fluctuation_strength_ecma"
 description: "Psychoacoustic fluctuation strength per ECMA-418-2:2025 (4th ed., Clause 9)."
 sidebar:
   label: "fluctuation_strength_ecma"
@@ -11,9 +11,10 @@ Clean-room implementation of the fluctuation-strength signal chain of
 ECMA-418-2:2025 (Clause 9, Sottek Hearing Model). The shared auditory
 front-end (Clause 5: outer/middle-ear filter, 53-band auditory filter bank,
 compressive nonlinearity of Formulae 23-25) is reused from
-[`.loudness_ecma`](/phonometry/reference/api/psychoacoustics/loudness-ecma/#loudness_ecma); this module adds the fluctuation-strength chain, which
-mirrors the roughness chain of Clause 7 but replaces the DFT-based envelope
-analysis with High-resolution Spectral Analysis (HSA):
+[`phonometry.psychoacoustics.loudness.ecma`](/phonometry/reference/api/psychoacoustics/ecma/); this module adds the
+fluctuation-strength chain, which mirrors the roughness chain of Clause 7 but
+replaces the DFT-based envelope analysis with High-resolution Spectral
+Analysis (HSA):
 
 * fluctuation-strength zero-padding (Clause 5.1.2.2) and segmentation
   (Clause 5.1.5.2) with the fixed block/hop $s_b = 65536$ /

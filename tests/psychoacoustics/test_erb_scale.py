@@ -44,7 +44,7 @@ from phonometry import (
 
 #: The ISO 532-2 loudness *module* (the package attribute of that name is the
 #: re-exported function, so it has to be imported explicitly).
-mg = importlib.import_module("phonometry.psychoacoustics.loudness_moore_glasberg")
+mg = importlib.import_module("phonometry.psychoacoustics.loudness.moore_glasberg")
 
 
 def _published_erb(frequency: float) -> float:

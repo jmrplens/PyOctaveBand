@@ -54,18 +54,18 @@ _MOVED_3X: dict[str, str] = {
     "phonometry.levels": "phonometry.signals.levels",
     "phonometry.parametric_filters": "phonometry.filters.weighting",
     "phonometry.uncertainty": "phonometry.metrology.uncertainty",
-    "phonometry.fluctuation_strength": "phonometry.psychoacoustics.fluctuation_strength",
-    "phonometry.loudness_contours": "phonometry.psychoacoustics.loudness_contours",
-    "phonometry.loudness_ecma": "phonometry.psychoacoustics.loudness_ecma",
-    "phonometry.loudness_moore_glasberg": "phonometry.psychoacoustics.loudness_moore_glasberg",
-    "phonometry.loudness_moore_glasberg_time": "phonometry.psychoacoustics.loudness_moore_glasberg_time",
-    "phonometry.loudness_zwicker": "phonometry.psychoacoustics.loudness_zwicker",
-    "phonometry.psychoacoustic_annoyance": "phonometry.psychoacoustics.psychoacoustic_annoyance",
-    "phonometry.roughness_ecma": "phonometry.psychoacoustics.roughness_ecma",
-    "phonometry.sharpness": "phonometry.psychoacoustics.sharpness",
-    "phonometry.tonality": "phonometry.psychoacoustics.tonality",
-    "phonometry.tonality_ecma": "phonometry.psychoacoustics.tonality_ecma",
-    "phonometry.tone_audibility": "phonometry.psychoacoustics.tone_audibility",
+    "phonometry.fluctuation_strength": "phonometry.psychoacoustics.quality.fluctuation_strength",
+    "phonometry.loudness_contours": "phonometry.psychoacoustics.loudness.contours",
+    "phonometry.loudness_ecma": "phonometry.psychoacoustics.loudness.ecma",
+    "phonometry.loudness_moore_glasberg": "phonometry.psychoacoustics.loudness.moore_glasberg",
+    "phonometry.loudness_moore_glasberg_time": "phonometry.psychoacoustics.loudness.moore_glasberg_time",
+    "phonometry.loudness_zwicker": "phonometry.psychoacoustics.loudness.zwicker",
+    "phonometry.psychoacoustic_annoyance": "phonometry.psychoacoustics.quality.annoyance",
+    "phonometry.roughness_ecma": "phonometry.psychoacoustics.quality.roughness_ecma",
+    "phonometry.sharpness": "phonometry.psychoacoustics.quality.sharpness",
+    "phonometry.tonality": "phonometry.psychoacoustics.quality.tonality",
+    "phonometry.tonality_ecma": "phonometry.psychoacoustics.quality.tonality_ecma",
+    "phonometry.tone_audibility": "phonometry.psychoacoustics.quality.tone_audibility",
     "phonometry.noise_induced_hearing_loss": "phonometry.hearing.noise_induced_hearing_loss",
     "phonometry.occupational_exposure": "phonometry.hearing.occupational_exposure",
     "phonometry.sii": "phonometry.speech.sii",
@@ -161,8 +161,10 @@ _SINCE: dict[str, str] = {
 }
 
 #: Renames that were already shimmed before 3.2 (target differs from a plain
-#: package move). ``phonometry.loudness`` predates the reorganization.
-_MOVED_3X["phonometry.loudness"] = "phonometry.psychoacoustics.loudness_zwicker"
+#: package move). ``phonometry.loudness`` predates the reorganization and
+#: lands wherever the Zwicker module currently lives, so it reads its target
+#: from the row above instead of repeating it.
+_MOVED_3X["phonometry.loudness"] = _MOVED_3X["phonometry.loudness_zwicker"]
 
 #: Old module path -> relocated module path for the 4.0 taxonomy. The
 #: oversized ``metrology`` catch-all became three packages: the normalized
@@ -299,6 +301,32 @@ _MOVED_4X: dict[str, str] = {
         "phonometry.materials.surfaces.road_absorption",
     "phonometry.materials.dynamic_stiffness":
         "phonometry.materials.resilient.dynamic_stiffness",
+    "phonometry.psychoacoustics.loudness_zwicker":
+        "phonometry.psychoacoustics.loudness.zwicker",
+    "phonometry.psychoacoustics.loudness_moore_glasberg":
+        "phonometry.psychoacoustics.loudness.moore_glasberg",
+    "phonometry.psychoacoustics.loudness_moore_glasberg_time":
+        "phonometry.psychoacoustics.loudness.moore_glasberg_time",
+    "phonometry.psychoacoustics.loudness_ecma":
+        "phonometry.psychoacoustics.loudness.ecma",
+    "phonometry.psychoacoustics.loudness_contours":
+        "phonometry.psychoacoustics.loudness.contours",
+    "phonometry.psychoacoustics.sharpness":
+        "phonometry.psychoacoustics.quality.sharpness",
+    "phonometry.psychoacoustics.roughness_ecma":
+        "phonometry.psychoacoustics.quality.roughness_ecma",
+    "phonometry.psychoacoustics.fluctuation_strength":
+        "phonometry.psychoacoustics.quality.fluctuation_strength",
+    "phonometry.psychoacoustics.fluctuation_strength_ecma":
+        "phonometry.psychoacoustics.quality.fluctuation_strength_ecma",
+    "phonometry.psychoacoustics.tonality":
+        "phonometry.psychoacoustics.quality.tonality",
+    "phonometry.psychoacoustics.tonality_ecma":
+        "phonometry.psychoacoustics.quality.tonality_ecma",
+    "phonometry.psychoacoustics.tone_audibility":
+        "phonometry.psychoacoustics.quality.tone_audibility",
+    "phonometry.psychoacoustics.psychoacoustic_annoyance":
+        "phonometry.psychoacoustics.quality.annoyance",
 }
 
 #: The two generations, each with the release that deprecated it and the one
