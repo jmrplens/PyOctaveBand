@@ -1,0 +1,282 @@
+# phonometry: vibration machinery
+
+Part of https://jmrplens.github.io/phonometry/llms.txt. Full text of the pages in this area.
+
+---
+
+<!-- source: docs/machine-diagnostics.md | canonical: https://jmrplens.github.io/phonometry/vibration/machinery/machine-diagnostics/ -->
+Source: https://jmrplens.github.io/phonometry/vibration/machinery/machine-diagnostics/
+
+# Machine fault frequencies (Norton & Karczub)
+
+Condition monitoring begins with arithmetic, not with signal processing. Every
+rolling-contact bearing, gear pair, induction motor and bladed rotor excites a
+family of **discrete frequencies fixed by its geometry and its shaft speed**,
+and knowing where those lines fall is what turns a featureless spectrum into a
+diagnosis: a peak is only evidence when it sits on a named line. This page
+covers the kinematics of M. P. Norton and D. G. Karczub, *Fundamentals of Noise
+and Vibration Analysis for Engineers* (2nd ed., Cambridge University Press,
+2003), Section 8.4, and how they combine with the signal chain the library
+already provides - the [envelope spectrum and cepstrum](https://jmrplens.github.io/phonometry/signal/spectra/cepstrum-echoes/) and
+[time synchronous averaging](https://jmrplens.github.io/phonometry/signal/spectra/synchronous-averaging/).
+
+The working view is the two put together: the envelope spectrum of a
+band-passed vibration record with the predicted lines drawn on top and named.
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/bearing_fault_envelope_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/bearing_fault_envelope.svg" alt="Envelope spectrum of a band-passed bearing vibration record, plotted from 0 to about 950 hertz, with a dense low noise floor and four tall isolated lines. Vertical dashed red lines mark the predicted outer-race ball pass frequency at 207 hertz and its second, third and fourth harmonics, and each of the four tall measured lines lands exactly on one of them. A dotted green line marks the predicted inner-race ball pass frequency at 293 hertz and a dotted purple line the predicted ball spin frequency at 92 hertz, and no measured line appears at either, which is what identifies the fault as an outer-race spall. A dash-dotted line at 33.3 hertz marks the shaft rate, where a small line does appear" width="92%"></picture>
+
+*The four tall lines land on BPFO and its harmonics; nothing appears on BPFI or
+BSF. That is the diagnosis: a spall on the outer race.*
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import bearing_fault_frequencies, envelope_spectrum, noise_signal
+
+# The bearing: 15 rollers on a 34 mm pitch diameter, 6 mm rollers,
+# 12.96 degrees contact angle, shaft at 2000 r/min.
+faults = bearing_fault_frequencies(2000.0, 15, 6.0, 34.0,
+                                   contact_angle_deg=12.96)
+bpfo, shaft = faults["BPFO"], faults.shaft_rate    # 207.0 Hz, 33.33 Hz
+
+# A spalled outer race: one impact per BPFO period, each ringing a 3 kHz
+# housing resonance, load-modulated once per revolution, buried in noise.
+fs, seconds = 20000.0, 2.0
+t = np.arange(int(fs * seconds)) / fs
+impacts = np.zeros_like(t)
+for k in range(int(seconds * bpfo)):
+    impacts[round(k / bpfo * fs)] = 1.0 + 0.35 * np.cos(
+        2.0 * np.pi * shaft * k / bpfo)
+tau = np.arange(int(0.004 * fs)) / fs
+ring = np.exp(-tau / 6.0e-4) * np.sin(2.0 * np.pi * 3000.0 * tau)
+x = np.convolve(impacts, ring)[: t.size] * 0.6
+x += 0.35 * np.sin(2.0 * np.pi * shaft * t)          # residual unbalance
+x += noise_signal(fs, seconds, color="white", rms=0.25, seed=17)
+
+# Band-pass the resonance the impacts ring, envelope it, transform it,
+# and let the result draw its own lines on top.
+spectrum = envelope_spectrum(x, fs, band=(2000.0, 4000.0))
+faults.within(1.0, 5.0 * bpfo).plot(spectrum=spectrum)
+plt.show()
+```
+
+</details>
+
+## 1. Rolling-contact bearings
+
+Norton reproduces the eleven discrete frequencies collected by Shahan and
+Kamperman (Eqs. 8.4 to 8.14). With the shaft speed $N$ in r/min, $Z$ rolling
+elements of diameter $d$ on a pitch diameter $D$, a contact angle $\phi$,
+and writing $g = (d/D)\cos\phi$ and $f_s = N/60$:
+
+| Name | Meaning | Expression | Norton eq. |
+|---|---|---|---|
+| `shaft` | shaft rotational frequency | $f_s = N/60$ | (8.4) |
+| `FTF` | cage (fundamental train) frequency | $(f_s/2)(1 - g)$ | (8.5) |
+| `FTF_rel` | cage relative to the rotating race | $f_s - \text{FTF}$ | (8.11) |
+| `BSF` | rolling-element rotational frequency | $(f_s/2)(D/d)(1 - g^2)$ | (8.7) |
+| `BDF` | rolling-element spin frequency | $2\,\text{BSF}$ | (8.10) |
+| `BPFO` | element pass frequency, outer race | $Z(f_s/2)(1 - g)$ | (8.8) |
+| `BPFI` | element pass frequency, inner race | $Z(f_s/2)(1 + g)$ | (8.9) |
+
+Three of them carry the diagnosis: `BPFO` for an outer-race defect, `BPFI` for
+an inner-race defect, and `BDF` for a damaged rolling element or cage. Two
+identities are worth remembering because they are exact and catch data-entry
+errors instantly: $\text{BPFO} + \text{BPFI} = Z f_s$ always, and
+$\text{BPFO} = Z \times \text{FTF}$ whenever the outer race is stationary.
+
+```python
+from phonometry import bearing_fault_frequencies
+
+res = bearing_fault_frequencies(2000.0, 15, 6.0, 34.0, contact_angle_deg=12.96)
+print(round(res["BPFO"], 1), round(res["BPFI"], 1))   # 207.0 293.0
+print(round(res["BPFO"] + res["BPFI"], 1))            # 500.0 = 15 x 33.33
+print(res.as_dict())
+```
+
+Only the ratio $d/D$ enters, so the two diameters may be given in millimetres,
+inches or metres as long as both use the same unit. `rotating_race="outer"`
+moves the cage to Eq. (8.6); `BPFO` and `BPFI` do not move, because Norton's
+Eqs. (8.8) and (8.14), and (8.9) and (8.13), are pairwise identical.
+
+These are the kinematics of a **pure rolling contact**. A real bearing under
+load slips a little, so the measured lines wander by one or two per cent from
+the prediction; that is normal and is why the overlay is read as "the peak is
+on the line", not "the peak is at the line".
+
+## 2. Gears
+
+The gear-meshing (tooth-passing) frequency of a wheel with $N$ teeth is
+$\text{GMF} = N f_s$ (Eq. 8.3), with integer harmonics. What distinguishes the fault
+types is the **sideband** family around each harmonic: a single chipped tooth
+or an eccentric wheel modulates the mesh once per revolution and produces low,
+flat sidebands spaced by the shaft rate, while distributed wear raises tall
+sideband groups and lifts the higher mesh harmonics.
+
+```python
+from phonometry import gear_mesh_frequencies
+
+# A 28-tooth pinion on a 1500 r/min shaft, with two sideband orders.
+res = gear_mesh_frequencies(1500.0, 28, harmonics=3, sidebands=2)
+print(round(res["GMF"], 1))            # 700.0
+print(round(res["GMF+1x"], 1))         # 725.0  (GMF + one shaft order)
+print(res.harmonics("GMF", 3))         # [ 700. 1400. 2100.]
+```
+
+Pass `sideband_rate` to modulate at the *mating* wheel's shaft rate instead,
+which is what a fault on the other wheel of the pair produces.
+
+## 3. Induction motors
+
+Three lines are always present in a motor bearing signal: `1x` (mechanical
+unbalance), `2x` (misalignment with the driven load) and `2fe` (a non-uniform
+air gap, torque pulses and the winding and rotor-bar electrical faults). Rotor
+defects that produce static or dynamic air-gap eccentricity are read on the
+**rotor-slot harmonics** of Eq. (8.20),
+
+$$
+f_{sh} = f_e \left[(2R/p)(1 - s) \pm 2(n - 1)\right]
+$$
+
+for $R$ rotor bars, $p$ magnetic poles (not pole pairs), unit slip $s$ and
+$n = 1, 2, \ldots$. Dynamic eccentricity dresses the dominant slot harmonic
+with sidebands at $\pm$ the shaft rate and $\pm$ the slip frequency.
+
+```python
+from phonometry import induction_motor_frequencies
+
+# Sixty rotor bars, six magnetic poles, 3600 r/min, no slip.
+res = induction_motor_frequencies(3600.0, 6, 60, slip=0.0)
+print(round(res["1x"]), round(res["2x"]),
+      round(res["2fe"]), round(res["fsh"]))     # 60 120 360 3600
+```
+
+Give the slip directly, or give the mains `supply_frequency` and let the slip
+follow from it and the measured shaft speed. The supply frequency is taken as
+$f_e = f_s\,p / (2(1 - s))$; Norton's Eq. (8.19) writes `fe = fs p / 2`,
+which is the same expression at zero slip but does not reduce Eq. (8.20) to
+the physical rotor-bar passing rate $R f_s$ when the machine is loaded.
+Under load the result also carries the slip frequency and the pole-pass
+line $\text{FP} = p \times f_\text{slip}$, the
+sideband spacing that a broken rotor bar puts around `1x`.
+
+## 4. Fans, blowers and pumps
+
+The blade-passing frequency of an impeller with $N$ blades is $f_b = n N f_s$
+(Eq. 8.15); a pump's hydraulic pulsations follow the same form with $N$
+pumping events per revolution (Eq. 8.18), and a rotary
+positive-displacement blower repeats four times per revolution, so it is
+handled by passing $4 \times \text{r/min}$.
+
+In a **ducted axial fan** the blades also interact with the stator vanes and set
+up rotating pressure patterns with $m_L = nN \pm kV$ lobes for $V$ vanes
+(Eq. 8.16), turning at $n N f_s / m_L$ (Eq. 8.17). A pattern that spins faster
+than the blades themselves radiates far more strongly, which is why the choice
+of $N$ and $V$ matters, and why those speeds are the ones to check against the
+duct cut-on frequencies. Each line is named `lobe n=<n> m=<mL>`: the blade
+harmonic belongs in the name because Eq. (8.17) carries $n$, so the same lobe
+count reached from a different harmonic is a different pattern turning at a
+different speed.
+
+```python
+from phonometry import blade_pass_frequencies
+
+# Six blades, four vanes, 3500 r/min.
+res = blade_pass_frequencies(3500.0, 6, harmonics=1, n_vanes=4)
+print(round(res["BPF"]))          # 350
+print(round(res["lobe n=1 m=2"]), round(res["lobe n=1 m=10"]))    # 175 35
+```
+
+## 5. From a raw record to a named line
+
+The kinematics answer *where to look*; the signal chain answers *what is
+there*. For a bearing the classical route has three steps, and the library has
+one function for each:
+
+1. **Isolate the resonance the impacts ring.** A spall excites a
+   high-frequency structural resonance of the housing, far above the shaft
+   harmonics and the gear mesh. Pass its band as `band=(low, high)` to
+   `envelope_spectrum`, which band-passes the record with a zero-phase filter
+   before the detector so the modulation phase is untouched.
+2. **Detect and transform the envelope.** The repetition rate of the impacts
+   is an amplitude modulation of that resonance, so it becomes a *line* in the
+   envelope spectrum, at the fault frequency and its harmonics. See the
+   [cepstrum and envelope-spectrum guide](https://jmrplens.github.io/phonometry/signal/spectra/cepstrum-echoes/).
+3. **Name the lines.** Overlay the kinematic prediction. `.plot(spectrum=…)`
+   accepts any `envelope_spectrum` result (or anything exposing `frequencies`
+   and `amplitude`) and draws the predicted lines over it, coloured by family
+   so shaft harmonics never read as bearing evidence.
+
+Two more tools help when the record is crowded.
+[Time synchronous averaging](https://jmrplens.github.io/phonometry/signal/spectra/synchronous-averaging/) removes everything not
+locked to one shaft, which separates a gearbox's two shafts before the
+sidebands are read; and the [cepstrum](https://jmrplens.github.io/phonometry/signal/spectra/cepstrum-echoes/) collapses a whole
+harmonic or sideband family onto a single quefrency spike, which is the fastest
+way to tell *which* periodicity dominates when several are superimposed.
+
+```python
+from phonometry import (
+    bearing_fault_frequencies,
+    combine_fault_lines,
+    envelope_spectrum,
+    gear_mesh_frequencies,
+)
+
+# A gearbox bearing carries its own lines, the mesh family of the gear it
+# supports, and the shaft harmonics. Put them all on one axes.
+bearing = bearing_fault_frequencies(1500.0, 9, 7.94, 39.0)
+gear = gear_mesh_frequencies(1500.0, 28, harmonics=2, sidebands=1)
+lines = combine_fault_lines(bearing, gear)
+
+spectrum = envelope_spectrum(record, fs, band=(2500.0, 5000.0))
+lines.within(1.0, 1600.0).plot(spectrum=spectrum)
+```
+
+`within(low, high)` trims the family to the span the analysis actually covers,
+which matters because the highest mesh harmonic is usually far above the
+useful part of an envelope spectrum.
+
+## Covered and not covered
+
+**Covered.** The kinematic families of Norton Section 8.4: rolling-contact
+bearings (Eqs. 8.4 to 8.14), gear mesh and sidebands (Eq. 8.3), induction-motor
+supply, slip, pole-pass and rotor-slot lines (Eqs. 8.19 and 8.20), and
+blade-passing frequencies with the lobed interaction patterns of a ducted axial
+fan (Eqs. 8.15 to 8.18), through `bearing_fault_frequencies`,
+`gear_mesh_frequencies`, `induction_motor_frequencies`,
+`blade_pass_frequencies`, `combine_fault_lines` and `shaft_rate`.
+
+**Not covered.** These are *predictions*, not detections: nothing here decides
+whether a line is present, only where it would be. The amplitude criteria that
+turn a present line into a severity assessment (crest factor and kurtosis
+trends, ISO 10816 / ISO 20816 velocity severity bands) are outside this module;
+Norton's own guidance is qualitative (crest factors of 2.5 to 3.5 for a healthy
+bearing, up to about 11 with impulsive defects; kurtosis near 3 healthy and
+above 4 damaged). The pole-pass frequency $\text{FP} = p \times f_\text{slip}$ is standard
+condition-monitoring practice rather than Norton's: he gives the slip frequency
+itself as the broken-bar sideband spacing and does not multiply it by the pole
+count.
+
+## See also
+
+- [Cepstrum, echoes and the envelope spectrum](https://jmrplens.github.io/phonometry/signal/spectra/cepstrum-echoes/): the
+  envelope spectrum these lines are drawn on, and the cepstral collapse of a
+  harmonic family.
+- [Time synchronous averaging](https://jmrplens.github.io/phonometry/signal/spectra/synchronous-averaging/): separating one
+  shaft's signature from everything asynchronous with it.
+- [Mechanical mobility and the FRF family (ISO 7626-1)](https://jmrplens.github.io/phonometry/vibration/structural/mechanical-mobility/):
+  finding the structural resonances a defect impact excites.
+- [Bending-wave transmission at plate junctions](https://jmrplens.github.io/phonometry/vibration/structural/junction-transmission/): what
+  happens to the vibration once it leaves the machine.
+
+## References
+
+- Norton, M. P., & Karczub, D. G. (2003). *Fundamentals of noise and vibration
+  analysis for engineers* (2nd ed., Section 8.4). Cambridge University Press.
+
+See the [bibliography](https://jmrplens.github.io/phonometry/reference/bibliography/) for full entries.
+
+---

@@ -1,0 +1,286 @@
+---
+title: "Ruido de aeronaves: nivel efectivo de ruido percibido"
+description: "El nivel efectivo de ruido percibido (EPNL) del Anexo 16 de la ICAO, Vol. I, Apéndice 2: la molestia percibida y el PNL, la corrección tonal por el método de pendientes, la corrección por duración de 10 dB por debajo, y el verificador de sistema de medida IEC 61265."
+references:
+  - type: standard
+    organization: "International Civil Aviation Organization"
+    year: 2017
+    title: "Annex 16 to the Convention on International Civil Aviation: Environmental protection — Volume I: Aircraft noise"
+    designation: "ICAO Annex 16, Vol. I, 8.ª ed."
+    url: "https://store.icao.int/en/annex-16-environmental-protection-volume-i-aircraft-noise"
+    note: "El procedimiento normativo EPNL del Apéndice 2 implementado en las secciones de molestia percibida, corrección tonal y EPNL."
+  - type: standard
+    organization: "International Civil Aviation Organization"
+    year: 2018
+    title: "Environmental technical manual — Volume I: Procedures for the noise certification of aircraft"
+    designation: "Doc 9501, 3.ª ed."
+    url: "https://store.icao.int/en/environmental-technical-manual-volume-1-procedures-for-the-noise-certification-of-aircraft-doc-9501-1"
+    note: "Los ejemplos trabajados (corrección tonal de la Tabla 3-7, EPNL por el método integrado de la Tabla 4-4) usados como oráculos numéricos."
+  - type: standard
+    organization: "International Electrotechnical Commission"
+    year: 1995
+    title: "Electroacoustics — Instruments for measurement of aircraft noise — Performance requirements for systems to measure one-third-octave-band sound pressure levels in noise certification of transport-category aeroplanes"
+    designation: "IEC 61265:1995"
+    url: "https://webstore.iec.ch/en/publication/5076"
+    note: "Las tolerancias del sistema de medida que comprueba el verificador. Revisada después como IEC 61265:2018 (https://webstore.iec.ch/en/publication/32635); la edición de 1995 es la implementada."
+  - type: standard
+    organization: "SAE International"
+    year: 2013
+    title: "Application of pure-tone atmospheric absorption losses to one-third octave-band data"
+    designation: "SAE ARP 5534, reafirmada en 2021"
+    url: "https://www.sae.org/standards/content/arp5534/"
+    note: "La atenuación de banda por el método SAE de la sección de absorción atmosférica, con el coeficiente de tono puro de ISO 9613-1."
+  - type: standard
+    organization: "SAE International"
+    year: 2012
+    title: "Standard values of atmospheric absorption as a function of temperature and humidity"
+    designation: "SAE ARP 866B, estabilizada en 2012"
+    url: "https://www.sae.org/standards/content/arp866b/"
+    note: "La práctica SAE de absorción atmosférica predecesora, origen del método aproximado limitado a 50 dB con el que se contrasta el método SAE."
+---
+
+import ThemeImage from '../../../../components/ThemeImage.astro';
+import ReportPreview from '../../../../components/ReportPreview.astro';
+
+El **nivel efectivo de ruido percibido (EPNL)** es la métrica de certificación
+acústica de las aeronaves de transporte. Condensa una historia temporal
+espectral de tercio de octava (cada medio segundo) de un sobrevuelo en un único
+número, en EPNdB, mediante cinco pasos del **Anexo 16 de la ICAO, Vol. I,
+Apéndice 2**. Esta página cubre las cuatro primitivas que construyen la métrica
+y el verificador de sistema de medida IEC 61265. Cada magnitud se valida contra
+los ejemplos trabajados del Manual Técnico Ambiental (ETM) Vol. I, ICAO
+Doc 9501.
+
+Cada nivel de certificación de esta página se exige en uno de los tres puntos
+de referencia que el Anexo 16 fija alrededor de la pista, así que conviene
+verlos antes que las matemáticas.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_aircraft_certification_es.svg" alt="Los tres puntos de certificación de ruido del Capítulo 3 del Anexo 16 de la OACI, en planta y alzado con la misma escala de distancias: una línea lateral de referencia paralela a la pista a 450 m donde el ruido de despegue es máximo, con un punto simétrico al otro lado; el punto de sobrevuelo sobre la prolongación del eje a 6 500 m del inicio de rodadura, bajo la subida inicial; y el punto de aproximación a 2 000 m del umbral, 120 m bajo la senda de 3 grados que corta el suelo 300 m más allá del umbral; los micrófonos van a 1,2 m del suelo y la métrica en los tres puntos es el EPNL en EPNdB" width="92%" />
+
+## Molestia percibida y PNL
+
+Cada uno de los 24 niveles de banda de tercio de octava (50 Hz–10 kHz) se
+convierte en una **molestia** percibida en noys mediante la ley analítica a
+trozos de la Tabla A2-3, y se combinan en la molestia total
+$N = 0{,}85\,n_{\max} + 0{,}15\sum n$ y el nivel de ruido percibido
+$\mathrm{PNL} = 40 + (10/\log_{10} 2)\,\log_{10} N$.
+
+```python
+from phonometry import aircraft
+
+noys = aircraft.perceived_noisiness(spl)      # noys por banda (spl = 24 niveles, dB)
+pnl = aircraft.perceived_noise_level(spl)      # PNdB
+```
+
+## Corrección tonal
+
+Las irregularidades espectrales (tonos de ventilador/turbina) se penalizan con
+una **corrección tonal** $C$, hallada con el método de pendientes ("encircling"):
+las pendientes se suavizan a un espectro de fondo $\mathrm{SPL}''$, el exceso
+tonal $F = \mathrm{SPL} - \mathrm{SPL}''$ por encima de 1,5 dB se mapea a un
+factor de corrección (división de frecuencia en 500 Hz / 5000 Hz, con tope de
+6⅔ dB) y se toma el máximo sobre las bandas. La implementación reproduce
+exactamente el ejemplo del turbofán de la Tabla 3-7 del ETM Vol. I
+($C = 2{,}0\ \text{dB}$ en 2500 Hz).
+
+```python
+from phonometry import aircraft
+
+c = aircraft.tone_correction(spl)              # dB; se suma al PNL para dar PNLT
+```
+
+## EPNL
+
+Sobre el sobrevuelo, $\mathrm{PNLT} = \mathrm{PNL} + C$, su máximo es
+$\mathrm{PNLTM}$, y la métrica integra $\mathrm{PNLT}$ sobre la ventana de
+10 dB por debajo (los registros más cercanos a $\mathrm{PNLTM} - 10$ a cada
+lado) normalizada a 10 s, de modo que $\mathrm{EPNL} = \mathrm{PNLTM} + D$ con
+la corrección por duración $D$.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/epnl_es.svg" alt="Historia temporal del nivel de ruido percibido de un sobrevuelo de aeronave: PNL y el PNLT corregido por tonos en función del tiempo, con el máximo PNLTM marcado y la ventana de integración de 10 dB por debajo sombreada, anotada con el EPNL resultante y la corrección por duración" width="82%" loading="eager" />
+
+```python
+from phonometry import aircraft
+
+# spectra: un array (K, 24) de niveles de tercio de octava muestreado cada dt s
+res = aircraft.effective_perceived_noise_level(spectra, dt=0.5)
+print(res.epnl, res.pnltm, res.duration_correction, res.band_limits)
+res.plot()   # historia temporal PNL/PNLT (requiere matplotlib)
+```
+
+`effective_perceived_noise_level` devuelve un `EPNLResult` con el `pnl` por
+registro, la `tone_correction`, el `pnlt`, el máximo `pnltm`, la
+`duration_correction`, el `epnl` y los `band_limits` de 10 dB por debajo. El
+ejemplo del método integrado en condiciones de referencia de la Tabla 4-4 del
+ETM Vol. I se reproduce como $\mathrm{EPNL} = 92{,}6\ \text{EPNdB}$.
+
+<details>
+<summary>Mostrar el código de esta figura</summary>
+
+```python
+import numpy as np
+from phonometry import aircraft
+
+k, dt = 41, 0.5
+idx = np.arange(k)
+shape = 15.0 * np.exp(-((np.log10(aircraft.NOY_BANDS) - np.log10(400.0)) ** 2) / 0.5)
+gain = 30.0 * np.exp(-((idx - 20.0) ** 2) / (2 * 5.0**2)) - 5.0
+spectra = (55.0 + shape)[None, :] + gain[:, None]
+spectra[:, 17] += 12.0 * np.exp(-((idx - 20.0) ** 2) / (2 * 6.0**2))  # tono de ventilador 2500 Hz
+aircraft.effective_perceived_noise_level(spectra, dt).plot(language="es")
+```
+
+</details>
+
+### Informe EPNL de ICAO (`.report()`)
+
+`EPNLResult.report(path)` renderiza una ficha PDF de una página con el formato de
+una hoja de datos de certificación de ruido de aeronaves: la línea de base
+normativa (Anexo 16 de la ICAO, Vol. I, Apéndice 2), un bloque opcional de metadatos de
+cabecera al estilo TCDSN (aeronave, fabricante / titular del certificado de tipo,
+solicitante, punto de medida), una tabla de métricas de las magnitudes
+intermedias informativas (el máximo $\mathrm{PNLTM}$, la corrección por
+duración $D$, la ventana de registros de 10 dB por debajo y, cuando no es cero,
+el ajuste por reparto de bandas) sobre la gráfica apaisada a todo el ancho de
+$\mathrm{PNLT}$ frente al tiempo (el propio `.plot()` del resultado), el número
+único $\mathrm{EPNL} = X\ \text{EPNdB}$ en
+caja, una fila de veredicto Nivel | Límite | Margen cuando se aporta un límite de
+certificación, una franja estática de condiciones de referencia (25 °C, 70 % HR,
+nivel del mar, viento nulo, ISA) y un pie con el descargo fijo. Usa el mismo
+contenedor `ReportMetadata` y el mismo motor de renderizado que la
+[ficha de aislamiento de ISO 717](/phonometry/es/buildings/insulation/insulation-ratings/#informe-de-iso-717-report);
+un `requirement` aportado se lee como el límite de certificación EPNL en EPNdB
+(el EPNL cumple si es igual o inferior), y `metadata=None` produce una ficha de
+predicción ligera sin fila de veredicto. El renderizado necesita reportlab y,
+para la figura que incrusta la ficha, matplotlib (`pip install
+"phonometry[report,plot]"`); solo se admite `engine="reportlab"`. La ficha se
+genera en inglés por defecto; pasa `language="es"` para una ficha en español
+(cadenas fijas traducidas y coma como separador decimal), p. ej.
+`res.report("epnl_fiche_es.pdf", language="es")`. La ficha es un resultado EPNL
+calculado y no es un certificado oficial de ruido de un Estado; no reproduce
+ningún TCDSN.
+
+```python
+from phonometry import effective_perceived_noise_level, ReportMetadata
+
+# spectra: un array (K, 24) de niveles de tercio de octava muestreado cada dt s
+res = effective_perceived_noise_level(spectra, dt=0.5)
+res.report(
+    "ficha_epnl.pdf",
+    metadata=ReportMetadata(
+        specimen="Transporte bimotor turbofán de ejemplo",
+        manufacturer="Empresa Aeronáutica de Ejemplo",
+        measurement_standard="ICAO Annex 16 Vol I Amendment 14 Chapter 4",
+        laboratory="Laboratorio de referencia Phonometry",
+        requirement=101.0,          # límite de certificación EPNL (EPNdB)
+    ),
+)                                   # EPNL (EPNdB) con PNLTM y D
+```
+
+La ficha de ejemplo se regenera con `make reports` y se conserva renderizada en
+el repositorio; pulsa la vista previa para abrir el PDF.
+
+<ReportPreview
+	name="icao_epnl_example"
+	title="Informe de ejemplo EPNL del Anexo 16 de la ICAO (PDF)"
+	description="Ficha de certificación de ruido de aeronaves de una página: una cabecera de metadatos, una franja de condiciones de referencia, una tabla de métricas con el máximo PNLTM y la corrección por duración D y la ventana de registros de 10 dB por debajo, la gráfica temporal PNL/PNLT a todo el ancho con el PNLTM marcado y la ventana de integración sombreada, el resultado de un solo número EPNL = 98,3 EPNdB en caja y una fila de veredicto CUMPLE frente a un límite de certificación de 101 EPNdB."
+	caption="Ficha de certificación EPNL del Anexo 16 de la ICAO (EPNLResult.report), EPNL en EPNdB con PNLTM y la corrección por duración D."
+/>
+
+## Verificación del sistema de medida (IEC 61265)
+
+`verify_aircraft_noise_system` comprueba el rendimiento medido contra las
+tolerancias de la IEC 61265:1995: los límites de respuesta direccional del
+micrófono (Tabla 1) y los límites escalares de respuesta en frecuencia,
+linealidad y resolución. El filtrado de tercio de octava lo cubre la
+verificación de clase 2 de filtros IEC 61260 de la librería.
+
+```python
+from phonometry import aircraft
+
+report = aircraft.verify_aircraft_noise_system(
+    directional={4000.0: {30: 0.4, 60: 0.9, 90: 1.9, 120: 2.4, 150: 2.4}},
+    frequency_response={1000.0: 1.2},
+)
+print(report["passed"], report["checks"])
+```
+
+## Absorción atmosférica (SAE ARP 5534)
+
+Corregir un sobrevuelo medido a condiciones atmosféricas de referencia requiere
+la atenuación en bandas de 1/3 de octava sobre el trayecto. El coeficiente de
+tono puro es el de ISO 9613-1 (idéntico, según ARP 5534 §3.1) que da
+`air_attenuation`; `sae_band_attenuation` añade el **método SAE** (ARP 5534
+§3.2.2) que mapea la atenuación de trayecto de tono puro medio de banda
+$\delta_t = \alpha\,s$ a la atenuación de banda $\delta_B$, consistente con el
+método exacto mucho más allá del límite de 50 dB del método aproximado.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/aircraft_atmospheric_absorption_es.svg" alt="Absorción atmosférica aeronáutica frente a la frecuencia para dos distancias; la atenuación de banda del método SAE queda por debajo del valor de tono puro medio de banda a alta absorción" width="82%" />
+
+<details>
+<summary>Mostrar el código de esta figura</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import aircraft
+
+freqs = 1000.0 * 10.0 ** (np.arange(-13, 11) / 10.0)   # tercios 50 Hz-10 kHz
+fig, ax = plt.subplots()
+# continua: atenuación de banda SAE, discontinua: tono puro medio de banda
+for s in (1000.0, 7620.0):
+    att = aircraft.sae_band_attenuation(freqs, s, temperature=25.0, relative_humidity=70.0)
+    line, = ax.semilogx(att.frequency, att.band_attenuation, marker="o",
+                        markersize=3, label=f"Banda SAE ({s:.0f} m)")
+    ax.semilogx(att.frequency, att.midband_attenuation, "--", alpha=0.6,
+                color=line.get_color())
+ax.set(xlabel="Frecuencia [Hz]", ylabel="Atenuación [dB]",
+       title="Absorción atmosférica aeronáutica a 25 °C, 70% HR")
+ax.grid(True, which="both", alpha=0.3)
+ax.legend()
+plt.show()
+```
+
+</details>
+
+```python
+import numpy as np
+from phonometry import aircraft
+
+freqs = 1000.0 * 10.0 ** (np.arange(-13, 11) / 10.0)   # tercios 50 Hz–10 kHz
+att = aircraft.sae_band_attenuation(freqs, path_length=7620.0,
+                              temperature=25.0, relative_humidity=70.0)
+att.plot()   # banda frente a tono puro medio de banda (requiere matplotlib)
+```
+
+Válido ~6–32 °C, 20–95 % HR (ventana 14 CFR Part 36), hasta 7620 m, recíproco.
+
+La cadena de certificación termina aquí. Convertir estos aviones en ruido
+alrededor de un aeropuerto, las tablas nivel-potencia-distancia, las
+correcciones por segmento de una trayectoria y el contorno en tierra de un
+evento único, es el método de ECAC Doc 29 de
+[Ruido de aeropuertos](/phonometry/es/aircraft/airport-noise/).
+
+## Qué cubre esta guía
+
+**Cubierto.** El Anexo 16 de la ICAO, Vol. I, Apéndice 2: la molestia
+percibida y el PNL de la Tabla A2-3 (`perceived_noisiness`,
+`perceived_noise_level`), la corrección tonal por el método de pendientes
+(`tone_correction`, que reproduce el ejemplo del turbofán de la Tabla 3-7 del
+ETM Vol. I) y la cadena EPNL completa (`effective_perceived_noise_level`, que
+reproduce el ejemplo de la Tabla 4-4 del ETM Vol. I). Las tolerancias del
+sistema de medida de la IEC 61265:1995 mediante `verify_aircraft_noise_system`.
+La absorción atmosférica en banda de la SAE ARP 5534 mediante
+`sae_band_attenuation`.
+
+**No cubierto.** `verify_aircraft_noise_system` comprueba las tolerancias de
+la IEC 61265:1995, no la edición sucesora de 2018. La cadena de ruido de
+aeropuerto de ECAC Doc 29 se ha trasladado a
+[Ruido de aeropuertos](/phonometry/es/aircraft/airport-noise/).
+
+## Véase también
+
+- [Ruido de aeropuertos (ECAC Doc 29)](/phonometry/es/aircraft/airport-noise/):
+  el motor NPD y la cadena de contornos de evento único alrededor de un
+  aeropuerto.
+- Referencia de la API: [`aircraft.certification`](/phonometry/es/reference/api/aeroacoustics/certification/) y [`aircraft.atmospheric_absorption`](/phonometry/es/reference/api/aeroacoustics/atmospheric-absorption/).

@@ -1,0 +1,517 @@
+---
+title: "Vibración en humanos"
+description: "Exposición a vibración de cuerpo completo y mano-brazo: las ponderaciones frecuenciales de ISO 8041-1, el valor eficaz ponderado y las medidas de dosis de ISO 2631-1 (VDV, MTVV, MSDV, factor de cresta), el valor total de vibración y la exposición diaria de 8 horas A(8), con la orientación de exposición de ISO 5349 y los valores de acción y límite de la Directiva 2002/44/CE."
+references:
+  - type: book
+    authors: ["Griffin, M. J."]
+    year: 1996
+    title: "Handbook of human vibration"
+    publisher: "Academic Press"
+    url: "https://shop.elsevier.com/books/handbook-of-human-vibration/griffin/978-0-12-303041-2"
+    note: "ISBN 978-0-12-303041-2. La monografía de referencia sobre vibración de cuerpo completo y transmitida a la mano: la biodinámica, la incomodidad y la evidencia de efectos sobre la salud que sustentan las ponderaciones, las medidas de dosis y la orientación exposición-respuesta de esta página."
+  - type: book
+    authors: ["Mansfield, N. J."]
+    year: 2004
+    title: "Human response to vibration"
+    publisher: "CRC Press"
+    url: "https://www.routledge.com/Human-Response-to-Vibration/Mansfield/p/book/9780415282390"
+    note: "ISBN 978-0-415-28239-0. Un manual moderno y compacto sobre las cadenas de evaluación de ISO 2631-1 e ISO 5349, de la percepción y el confort a los límites de exposición laborales."
+  - type: standard
+    organization: "International Organization for Standardization"
+    year: 2017
+    title: "Human response to vibration — Measuring instrumentation — Part 1: General purpose vibration meters"
+    designation: "ISO 8041-1:2017"
+    url: "https://www.iso.org/standard/70648.html"
+    note: "Las definiciones de las ponderaciones frecuenciales y sus tolerancias, que siguen las ponderaciones implementadas."
+  - type: standard
+    organization: "International Organization for Standardization"
+    year: 1997
+    title: "Mechanical vibration and shock — Evaluation of human exposure to whole-body vibration — Part 1: General requirements"
+    designation: "ISO 2631-1:1997"
+    url: "https://www.iso.org/standard/7612.html"
+    note: "La evaluación de cuerpo completo: el valor eficaz ponderado, las medidas de dosis y el valor total de vibración."
+  - type: standard
+    organization: "International Organization for Standardization"
+    year: 2003
+    title: "Mechanical vibration and shock — Evaluation of human exposure to whole-body vibration — Part 2: Vibration in buildings (1 Hz to 80 Hz)"
+    designation: "ISO 2631-2:2003"
+    url: "https://www.iso.org/standard/23012.html"
+    note: "Vibración en edificios: la ponderación Wm."
+  - type: standard
+    organization: "International Organization for Standardization"
+    year: 2001
+    title: "Mechanical vibration and shock — Evaluation of human exposure to whole-body vibration — Part 4: Guidelines for the evaluation of the effects of vibration and rotational motion on passenger and crew comfort in fixed-guideway transport systems"
+    designation: "ISO 2631-4:2001"
+    url: "https://www.iso.org/standard/32178.html"
+    note: "Confort de marcha ferroviaria: la ponderación Wb."
+  - type: standard
+    organization: "International Organization for Standardization"
+    year: 2001
+    title: "Mechanical vibration — Measurement and evaluation of human exposure to hand-transmitted vibration — Part 1: General requirements"
+    designation: "ISO 5349-1:2001"
+    url: "https://www.iso.org/standard/32355.html"
+    note: "Vibración transmitida a la mano: los requisitos generales de la evaluación."
+  - type: standard
+    organization: "International Organization for Standardization"
+    year: 2001
+    title: "Mechanical vibration — Measurement and evaluation of human exposure to hand-transmitted vibration — Part 2: Practical guidance for measurement at the workplace"
+    designation: "ISO 5349-2:2001"
+    url: "https://www.iso.org/standard/27511.html"
+    note: "Vibración transmitida a la mano: guía práctica para la medición en el puesto de trabajo."
+  - type: report
+    organization: "European Parliament and Council"
+    year: 2002
+    title: "Directive 2002/44/EC on the minimum health and safety requirements regarding the exposure of workers to the risks arising from physical agents (vibration)"
+    number: "Directiva 2002/44/CE"
+    institution: "Official Journal of the European Union"
+    url: "https://eur-lex.europa.eu/eli/dir/2002/44/oj/eng"
+    note: "Los valores de acción y límite de exposición contra los que se evalúa la exposición diaria A(8)."
+---
+
+import ThemeImage from '../../../../../components/ThemeImage.astro';
+import ReportPreview from '../../../../../components/ReportPreview.astro';
+
+La vibración transmitida a una persona se evalúa con la misma cadena de medida
+sea cual sea su origen: la aceleración se **pondera en frecuencia** para reflejar
+cómo responde el cuerpo a cada frecuencia, se reduce a una aceleración **eficaz
+ponderada** (con medidas de dosis para choques y registros largos), se condensa
+entre ejes en una sola magnitud (el **valor total de vibración** para la
+exposición mano-brazo y para el confort; el **valor del eje más alto** para la
+evaluación de salud de cuerpo completo) y, por último, se normaliza a una
+**exposición diaria de 8 horas** $A(8)$ que se compara con los valores de acción
+y límite de la directiva europea.
+
+Las ponderaciones se definen una sola vez, en **ISO 8041-1:2017**, como una
+cascada de filtros analógicos; **ISO 2631-1** las aplica a la vibración de cuerpo
+completo, **ISO 2631-2** a la vibración en edificios, **ISO 2631-4** al confort
+de marcha ferroviaria e **ISO 5349-1/-2** a la vibración transmitida a la mano.
+Esta página recorre toda la cadena.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_human_vibration_es.svg" alt="Cadena de medida de vibración de cuerpo completo: un acelerómetro triaxial en la interfaz asiento/cuerpo de una persona sentada mide la aceleración x, y y z; cada eje se limita en banda y se pondera en frecuencia (Wk vertical, Wd horizontal) según ISO 8041-1, se reduce a un valor eficaz ponderado a_w y VDV según ISO 2631-1, y el mayor valor por eje ponderado en frecuencia max(1,4 a_wx, 1,4 a_wy, a_wz) se normaliza a la exposición diaria A(8) y se evalúa frente al VAE y el VLE de la Directiva 2002/44/CE" width="94%" loading="eager" />
+
+## 1. Ponderaciones frecuenciales (ISO 8041-1)
+
+Toda ponderación de vibración humana es el producto de cuatro etapas analógicas
+evaluadas en $s = j\,2\pi f$ (ISO 8041-1, fórmulas (1)–(5)): un **paso-alto** y un
+**paso-bajo** Butterworth de segundo orden que limitan la banda, una **transición
+aceleración–velocidad** que porta la ganancia global $K$ y un **escalón
+ascendente**:
+
+$$
+H(s) = H_h(s)\,H_l(s)\,H_t(s)\,H_s(s).
+$$
+
+Un único conjunto de parámetros de la Tabla 3 $(f_1, Q_1, f_2, Q_2, f_3, f_4,
+Q_4, f_5, Q_5, f_6, Q_6, K)$ realiza las nueve ponderaciones (`Wb, Wc, Wd, We,
+Wf, Wh, Wj, Wk, Wm`) colapsando su etapa a la unidad cuando un corte se fija en
+infinito. La ponderación principal de cuerpo completo es `Wk` (vertical,
+superficie del asiento); `Wd` es la ponderación horizontal y `Wh` la de
+mano-brazo.
+
+```python
+from phonometry import vibration
+
+# La respuesta de ponderación global a cualquier frecuencia (ISO 8041-1, fórmula (5)).
+resp = vibration.frequency_weighting("Wk", [1.0, 6.3096, 20.0])
+print(resp.magnitude.round(3))      # [0.482 1.054 0.636]  (factores)
+print(resp.magnitude_db.round(2))   # [-6.33  0.46 -3.93]  (dB)
+
+resp.plot()   # la respuesta de la ponderación en dB, como en la figura de abajo (requiere matplotlib)
+```
+
+Los factores reproducen las tablas de objetivo de diseño del Anexo B de
+ISO 8041-1 con sus cuatro cifras significativas: `Wk` presenta una meseta cerca
+de −6 dB por debajo de 2 Hz, alcanza +0,46 dB cerca de 6,3 Hz y decae por encima.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/vibration_weighting_es.svg" alt="La ponderación vertical de cuerpo completo Wk en decibelios de 0,4 a 100 Hz: una meseta cerca de -6 dB por debajo de 2 Hz, un pequeño pico de +0,5 dB cerca de 6 Hz y una caída hasta cerca de -21 dB a 100 Hz" width="88%" />
+
+<details>
+<summary>Ver el código de esta figura</summary>
+
+```python
+import numpy as np
+import matplotlib.pyplot as plt
+from phonometry import vibration
+
+result = vibration.frequency_weighting("Wk", np.geomspace(0.4, 100.0, 240))
+
+# En una línea:
+result.plot(language="es")
+plt.show()
+
+# A mano, a partir de los campos del resultado, replicando lo que dibuja WeightingResponse.plot():
+fig, ax = plt.subplots()
+ax.semilogx(result.frequencies, result.magnitude_db, color="#1f77b4")
+ax.set_xlabel("Frecuencia [Hz]")
+ax.set_ylabel("Factor de ponderación [dB]")
+ax.set_title("Ponderación vertical de cuerpo completo Wk (ISO 8041-1)")
+plt.show()
+```
+
+</details>
+
+Para ponderar una señal temporal, `apply_weighting` aplica la respuesta compleja
+exacta en el dominio de la frecuencia (de modo que coinciden magnitud *y* fase
+con la norma), que luego consumen las métricas de dosis en el tiempo siguientes.
+
+### Qué ponderación en qué eje
+
+La ponderación se elige por postura, punto de medida y eje, no solo por
+aplicación. ISO 2631-1 (Tablas 1 y 2, apartados 7.2.3 y 8.2.2) las asigna
+así; los factores multiplicadores $k$ reaparecen en el valor total de
+vibración de la sección 3:
+
+| Postura, punto de medida | Eje | Ponderación | $k$ salud | $k$ confort |
+| :--- | :--- | :--- | :--- | :--- |
+| Sentado, superficie del asiento | x, y | `Wd` | 1,4 | 1,0 |
+| Sentado, superficie del asiento | z | `Wk` | 1,0 | 1,0 |
+| Sentado, superficie del asiento (rotación) | rx / ry / rz | `We` | — | 0,63 / 0,40 / 0,20 m/rad |
+| Sentado, respaldo | x | `Wc` | (0,8)¹ | 0,8 |
+| Sentado, respaldo | y / z | `Wd` | — | 0,5 / 0,4 |
+| Sentado, pies | x / y / z | `Wk` | — | 0,25 / 0,25 / 0,4 |
+| De pie, suelo | x, y | `Wd` | — | 1,0 |
+| De pie, suelo | z | `Wk` | — | 1,0 |
+| Tumbado, bajo la pelvis | horizontal | `Wd` | — | 1,0 |
+| Tumbado, bajo la pelvis | vertical | `Wk` | — | 1,0 |
+| Tumbado, bajo la cabeza | vertical | `Wj` | — | 1,0 |
+| Mareo (apartado 9) | vertical | `Wf` | — | — |
+
+¹ La evaluación de salud del apartado 7 se define sobre la superficie del
+asiento; la medida en x en el respaldo con `Wc`, $k = 0{,}8$ se recomienda
+pero queda fuera de la evaluación de severidad del Anexo B (7.2.3). Las ponderaciones restantes viven en
+las partes complementarias: `Wm` para ocupantes de edificios en todos los
+ejes (ISO 2631-2), `Wb` para el confort de marcha ferroviaria vertical
+(ISO 2631-4) y `Wh` para la vibración transmitida a la mano en los tres ejes
+de la mano con todo $k = 1$ (ISO 5349-1).
+
+## 2. Aceleración ponderada y medidas de dosis (ISO 2631-1)
+
+La evaluación básica es la **aceleración eficaz ponderada**. A partir de un
+espectro de tercios de octava es (ISO 2631-1, ec. (9); la construcción idéntica
+da la $a_{hw}$ de mano-brazo de ISO 5349-1, ec. (A.1)):
+
+$$
+a_w = \sqrt{\sum_i \left(W_i\,a_i\right)^2},
+$$
+
+con $W_i$ el factor de ponderación en el centro de banda $i$ y $a_i$ la
+aceleración de banda medida. Los factores se evalúan exactamente en las
+frecuencias que se pasan; tenga en cuenta que las tablas ISO (ISO 8041-1
+Anexo B, ISO 2631-1 Tabla 3, ISO 5349-1 Tabla A.2) tabulan $W_i$ en los
+centros de tercio de octava *verdaderos* $10^{n/10}$ Hz (6,31; 7,943; 15,85;
+...), no en las etiquetas nominales de banda (6,3; 8; 16; ...): pase centros
+verdaderos al comparar con los factores tabulados.
+
+```python
+import numpy as np
+from phonometry import vibration
+
+# Un espectro vertical de asiento medido (eficaz por tercio de octava, m/s^2).
+freqs = np.array([1.0, 2.0, 4.0, 8.0, 16.0, 31.5, 63.0])
+accel = np.array([0.20, 0.45, 0.42, 0.25, 0.12, 0.05, 0.02])
+
+result = vibration.weighted_acceleration(accel, freqs, "Wk")
+print(round(result.overall, 3))          # 0.555  m/s^2 (a_w)
+print(result.weighted.round(3))          # W_i * a_i por banda
+
+result.plot()   # bandas sin ponderar frente a ponderadas, como en la figura de abajo (requiere matplotlib)
+```
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/weighted_acceleration_es.svg" alt="Un espectro de aceleración de asiento de vehículo medido (gris) y su contribución ponderada por Wk (azul) sobre los tercios de octava de 1 a 80 Hz: la ponderación atenúa las bandas bajas y altas pero deja el rango de 4 a 8 Hz casi inalterado, dando un valor eficaz ponderado a_w de aproximadamente 1,03 m/s^2" width="90%" />
+
+<details>
+<summary>Ver el código de esta figura</summary>
+
+```python
+import numpy as np
+import matplotlib.pyplot as plt
+from phonometry import vibration
+
+freqs = np.array([1.0, 1.25, 1.6, 2.0, 2.5, 3.15, 4.0, 5.0, 6.3, 8.0, 10.0,
+                  12.5, 16.0, 20.0, 25.0, 31.5, 40.0, 63.0, 80.0])
+accel = np.array([0.18, 0.24, 0.33, 0.46, 0.52, 0.55, 0.48, 0.39, 0.31, 0.26,
+                  0.21, 0.17, 0.13, 0.10, 0.078, 0.060, 0.045, 0.028, 0.020])
+result = vibration.weighted_acceleration(accel, freqs, "Wk")
+
+# En una línea:
+result.plot(language="es")
+plt.show()
+
+# A mano, replicando lo que dibuja WeightedSpectrum.plot():
+pos = np.arange(freqs.size)
+fig, ax = plt.subplots()
+ax.bar(pos - 0.2, result.band_accelerations, 0.4, color="#bbbbbb",
+       label="Sin ponderar $a_i$")
+ax.bar(pos + 0.2, result.weighted, 0.4, color="#1f77b4",
+       label="Ponderada $W_i a_i$ (Wk)")
+ax.set_xticks(pos)
+ax.set_xticklabels([f"{f:g}" for f in freqs], rotation=45, ha="right")
+ax.set_xlabel("Frecuencia [Hz]")
+ax.set_ylabel(r"Aceleración eficaz [m/s$^2$]")
+ax.set_title(f"Aceleración ponderada ($a_w$ = {result.overall:.3f} m/s²)")
+ax.legend()
+plt.show()
+```
+
+</details>
+
+Cuando el valor eficaz subestima una exposición intermitente o cargada de
+choques, ISO 2631-1 añade medidas de dosis calculadas sobre la señal temporal
+ponderada: el **valor eficaz móvil** y su máximo, el **valor máximo de vibración
+transitoria** `MTVV` (ec. (4), un eficaz móvil de 1 s); el **valor de dosis de
+vibración** de cuarta potencia $\text{VDV} = \left(\int a_w^4\,dt\right)^{1/4}$
+(ec. (5)); el **valor de dosis de mareo** $\text{MSDV} = \left(\int a_w^2\,dt
+\right)^{1/2}$; y el **factor de cresta** (pico / eficaz), cuyo valor por encima
+de 9 indica que el método básico es inadecuado.
+
+```python
+import numpy as np
+from phonometry import vibration
+
+fs = 1000.0
+raw = np.random.default_rng(0).standard_normal(int(60 * fs))   # registro de 60 s
+a_w = vibration.apply_weighting(raw, fs, "Wk")                        # señal ponderada
+
+print(round(vibration.vibration_dose_value(a_w, fs), 3))   # 0.744  VDV [m/s^1.75]
+print(round(vibration.mtvv(a_w, fs), 3))                   # 0.265  MTVV [m/s^2]
+print(round(vibration.crest_factor(a_w), 2))               # 3.74   factor de cresta
+```
+
+## 3. Valor total de vibración y exposición diaria `A(8)`
+
+Entre los tres ejes, el **valor total de vibración** combina las aceleraciones
+eficaces ponderadas por eje con los factores multiplicadores de postura $k_j$
+(ISO 2631-1, ec. (10); para mano-brazo, ISO 5349-1, ec. (1), con todo $k = 1$):
+
+$$
+a_v = \sqrt{\sum_j k_j^2\,a_{wj}^2}.
+$$
+
+```python
+from phonometry import vibration
+
+# Salud, sentado: k = 1.4 / 1.4 / 1.0 (ISO 2631-1, 7.2.3).
+a_v = vibration.vibration_total_value([0.35, 0.28, 0.62], k=[1.4, 1.4, 1.0])
+print(round(a_v, 3))     # 0.882  m/s^2
+```
+
+**¿Salud o confort? Dos lecturas distintas de la misma medida.** La evaluación
+de *salud* del apartado 7 se mantiene por eje: cada valor eficaz ponderado por
+eje (con $k$ = 1,4 / 1,4 / 1,0 sentado) se juzga por el valor *más alto* de un
+solo eje frente a la zona de precaución de la guía de salud del Anexo B, una
+banda basada principalmente en exposiciones de 4 h a 8 h por debajo de la cual
+los efectos sobre la salud no están claramente documentados, dentro de la cual
+se indica precaución y por encima de la cual los riesgos son probables; la
+Directiva 2002/44/CE convierte esa guía en los valores de acción y límite
+exigibles de $A(8)$ que se usan más abajo. La evaluación de *confort* del
+apartado 8 combina en cambio todos los ejes (y, cuando procede, respaldo, pies
+y rotación) en el valor total de vibración $a_v$ con su propio juego de $k$ y
+lo lee en la escala del Anexo C para transporte público, cuyas bandas
+deliberadamente solapadas van de "no incómodo" por debajo de 0,315 m/s² a
+"extremadamente incómodo" por encima de 2 m/s²; la norma no define ningún
+límite de confort, porque las magnitudes aceptables dependen de la duración
+del trayecto y de lo que los pasajeros intentan hacer. Como orientación, el
+umbral mediano de percepción de una vibración ponderada con `Wk` es de unos
+0,015 m/s² de pico (Anexo C).
+
+La **exposición diaria** normaliza la magnitud de exposición $a$ a una jornada
+de referencia de 8 horas ($T_0 = 28\,800$ s). Para una sola operación
+$A(8) = a\,\sqrt{T/T_0}$; varias operaciones se combinan mediante sus
+exposiciones parciales $A_i(8) = a_i\,\sqrt{T_i/T_0}$ como
+$A(8) = \sqrt{\sum_i A_i(8)^2}$ (ISO 5349-1, ecs. (2)/(3); ISO 5349-2,
+ecs. (1)–(3)). La Directiva 2002/44/CE fija en qué magnitud $a$ se basa cada
+tipo (anexo, puntos 1): para la vibración mano-brazo el total vectorial
+$a_{hv}$ (parte A), pero para la vibración de cuerpo completo el valor por eje
+ponderado en frecuencia *más alto*
+$\max(1{,}4\,a_{wx},\,1{,}4\,a_{wy},\,a_{wz})$ (parte B), no el total
+vectorial $a_v$ de arriba. `wbv_exposure_basis` devuelve ese valor del eje
+dominante:
+
+```python
+from phonometry import vibration
+
+# Base de cuerpo completo de la Directiva 2002/44/CE (anexo, parte B): el eje dominante.
+a = vibration.wbv_exposure_basis(0.35, 0.28, 0.62)
+print(round(a, 3))    # 0.62  m/s^2 (máximo de 0.49, 0.392, 0.62; no a_v = 0.882)
+```
+
+`daily_vibration_exposure` construye las exposiciones parciales, las combina y
+evalúa el resultado frente a la **Directiva 2002/44/CE**: valor de acción de
+mano-brazo $A(8) = 2{,}5$ y valor límite 5 m/s²; acción de cuerpo completo 0,5
+y límite 1,15 m/s² (o un VDV de 9,1 / 21 m/s¹·⁷⁵):
+
+```python
+from phonometry import vibration
+
+# ISO 5349-2 Anexo E.3: las tres tareas con motosierra de un trabajador forestal.
+result = vibration.daily_vibration_exposure(
+    total_values=[4.6, 6.0, 3.6],                 # a_hv por tarea, m/s^2
+    durations_s=[2 * 3600, 1 * 3600, 2 * 3600],   # tiempo de exposición por tarea
+    kind="hav",
+    labels=["desbrozadora", "tala", "descortezado"],
+)
+print(result.partials.round(2))            # [2.3  2.12 1.8 ]  A_i(8)
+print(round(result.a8, 2))                 # 3.61  m/s^2
+print(result.assessment.zone)             # 'action'  (2.5 <= A(8) < 5.0)
+
+result.plot()   # exposiciones parciales y A(8) frente a los valores EAV/ELV, como en la figura de abajo (requiere matplotlib)
+```
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/daily_vibration_exposure_es.svg" alt="Un diagrama de barras de las tres exposiciones parciales de mano-brazo (cerca de 2,3, 2,1 y 1,8 m/s^2) y la A(8) combinada de 3,61 m/s^2, con el valor de acción de exposición de la Directiva 2002/44/CE en 2,5 y el valor límite de exposición en 5,0 m/s^2 marcados como líneas horizontales; la exposición diaria se sitúa en la zona de acción entre ambos" width="82%" />
+
+<details>
+<summary>Ver el código de esta figura</summary>
+
+```python
+import numpy as np
+import matplotlib.pyplot as plt
+from phonometry import vibration
+
+result = vibration.daily_vibration_exposure(
+    [4.6, 6.0, 3.6], [2 * 3600, 1 * 3600, 2 * 3600], kind="hav",
+    labels=["desbrozadora", "tala", "descortezado"],
+)
+
+# En una línea:
+result.plot(language="es")
+plt.show()
+
+# A mano, replicando lo que dibuja DailyVibrationExposure.plot():
+labels = [*result.labels, "A(8)"]
+values = [*result.partials.tolist(), result.a8]
+a = result.assessment
+fig, ax = plt.subplots()
+ax.bar(range(len(values)), values,
+       color=["#bbbbbb"] * result.partials.size + ["#1f77b4"])
+ax.axhline(a.action_value, color="#2ca02c", ls="--", label=f"VAE = {a.action_value:g}")
+ax.axhline(a.limit_value, color="#d62728", ls="--", label=f"VLE = {a.limit_value:g}")
+ax.set_xticks(range(len(values)))
+ax.set_xticklabels(labels, rotation=30, ha="right")
+ax.set_ylabel(r"Exposición diaria A(8) [m/s$^2$]")
+ax.legend()
+plt.show()
+```
+
+</details>
+
+## 4. Orientación exposición–respuesta
+
+Para la vibración transmitida a la mano, el Anexo C de ISO 5349-1 relaciona la
+exposición diaria con la vida media de grupo $D_y$ (en años) que produce el dedo
+blanco por vibración en el 10 % de un grupo expuesto, $D_y = 31{,}8\,A(8)^{-1{,}06}$
+(ec. (C.1)):
+
+```python
+from phonometry import vibration
+
+print(round(vibration.hav_vwf_lifetime_years(7.0), 1))   # 4.0 años (Tabla C.1)
+```
+
+Las normas no definen deliberadamente ningún límite seguro; $A(8)$ y los valores
+de acción y límite de la directiva son la base de cualquier criterio de
+exposición. Para la exposición de cuerpo completo, `energy_equivalent_acceleration`
+da la magnitud energético-equivalente de ISO 2631-1 ec. (B.3) entre periodos de
+distinta magnitud y duración.
+
+## 5. El informe de evaluación de la exposición
+
+Una exposición diaria rara vez es el final del trabajo: existe para ponerla por
+escrito y compararla con la ley. `DailyVibrationExposure.report()` escribe una
+hoja de evaluación en PDF de una página con la disposición de las calculadoras
+de exposición mano-brazo y de cuerpo completo de la práctica de higiene
+ocupacional (las calculadoras del HSE, las Guías de Buenas Prácticas de la UE):
+la línea de base normativa que nombra el método ISO aplicado (ISO 5349-1/-2 para
+la vibración transmitida a la mano, ISO 2631-1 para la de cuerpo completo) y la
+directiva frente a la que se evalúa, una rejilla de cabecera (empresa,
+operador/trabajador, lugar de trabajo, instrumentación y calibración), el
+análisis de la exposición por operación (la magnitud de vibración de cada
+operación, el total vectorial mano-brazo $a_{hv}$ o el valor del eje dominante
+$a_{w,max}$ de la parte B de la Directiva para cuerpo completo, su tiempo de
+exposición diario $T_i$ y la exposición parcial $A_i(8)$, cerrado por el total
+diario y el $A(8)$ combinado) con el gráfico de aportes, y el $A(8)$ recuadrado
+con su zona de exposición.
+
+Como el número existe para compararse con la ley, la ficha evalúa entonces
+$A(8)$ frente a la **Directiva 2002/44/CE** (artículo 3): el valor de exposición
+que da lugar a una acción (EAV) y el valor límite de exposición (ELV) para el
+tipo de vibración (mano-brazo $2{,}5$ / $5$ m/s²; cuerpo completo $0{,}5$ /
+$1{,}15$ m/s²), cada uno marcado como superado / no superado sobre el valor tal
+como se muestra, con un veredicto CUMPLE/NO CUMPLE frente al valor límite. Una
+nota impresa recoge que las normas ISO no definen ningún límite de exposición
+seguro y que alcanzar el EAV activa las medidas de control del empresario y el
+derecho de los trabajadores a la vigilancia de la salud. `verbose=True` añade el
+aporte de cada operación a la energía diaria de vibración, y `language="es"`
+representa la ficha en español (decimales con coma).
+
+El argumento `metadata` acepta un `ReportMetadata`
+cuyos campos relevantes para un informe de exposición a vibraciones son `client`
+(la empresa), `specimen` (el operador o trabajador cuya exposición se
+determinó), `test_room` (el lugar de trabajo), `test_date`, `instrumentation`,
+`calibration` y la identidad de pie `laboratory`, `operator`, `report_id` y
+`notes`.
+
+```python
+from phonometry import vibration, ReportMetadata
+
+# El trabajador forestal del Anexo E.3 de ISO 5349-2: desbrozadora (2 h,
+# 4,6 m/s²), motosierra en apeo (1 h, 6,0 m/s²) y desramado (2 h, 3,6 m/s²).
+res = vibration.daily_vibration_exposure(
+    [4.6, 6.0, 3.6],
+    [2 * 3600, 1 * 3600, 2 * 3600],
+    kind="hav",
+    labels=["Desbroce con desbrozadora", "Apeo con motosierra", "Desramado con motosierra"],
+)
+
+res.report(
+    "a8.pdf",
+    metadata=ReportMetadata(
+        client="Contratista forestal de ejemplo",
+        specimen="Trabajador forestal (mano derecha)",
+        test_room="Bosque gestionado, parcela 12",
+        instrumentation="Vibrómetro mano-brazo (ISO 8041-1), n/s 0042",
+        report_id="EXAMPLE-5349",
+    ),
+)   # A(8) = 3,61 m/s² -> zona de acción (EAV superado, ELV no), veredicto CUMPLE
+```
+
+La ficha de ejemplo se regenera con `make reports` y se mantiene representada en
+el repositorio; pulsa la vista previa para abrir el PDF.
+
+<ReportPreview
+	name="human_vibration_example"
+	title="Informe de ejemplo de exposición diaria a vibraciones mano-brazo (PDF)"
+	description="Ficha de evaluación de la exposición diaria a vibraciones de una página: una cabecera con el contratista forestal, el trabajador, el bosque como lugar de trabajo y la instrumentación, la tabla de análisis de la exposición por operación (desbroce, apeo y desramado con los valores totales de vibración, los tiempos de exposición diarios y las exposiciones parciales A_i(8) cerradas por la fila de total diario), el gráfico de aportes por operación, el A(8) = 3,61 m/s2 recuadrado en la zona de acción, y la tabla de evaluación de la Directiva 2002/44/CE donde el valor de exposición que da lugar a una acción de 2,5 m/s2 se supera y el valor límite de exposición de 5 m/s2 no, terminando en un veredicto CUMPLE."
+	caption="Ficha de exposición diaria a vibraciones (DailyVibrationExposure.report), la jornada mano-brazo del Anexo E.3 de ISO 5349-2 con el análisis de la exposición y la evaluación de la Directiva 2002/44/CE."
+/>
+
+## Qué cubre esta guía
+
+**Cubierto.** La ISO 8041-1:2017 en lo que define las ponderaciones
+frecuenciales: la cascada de etapas analógicas de la Tabla 3 (fórmulas
+(1)-(5)) que `frequency_weighting` y `apply_weighting` realizan para las
+nueve ponderaciones, reproduciendo las tablas de objetivo de diseño del
+Anexo B. La ISO 2631-1:1997 para la vibración de cuerpo completo, que cubre
+el valor eficaz ponderado $a_w$ y el valor total de vibración $a_v$
+(`weighted_acceleration`, `vibration_total_value`), las medidas de dosis
+MTVV, VDV, MSDV y factor de cresta, y la magnitud energético-equivalente del
+Anexo B (`energy_equivalent_acceleration`). La ISO 2631-2:2003 (`Wm`), la
+ISO 2631-4:2001 (`Wb`) y la ISO 5349-1/-2:2001 para la vibración transmitida
+a la mano, cuyo total vectorial, exposición diaria $A(8)$
+(`daily_vibration_exposure`, `wbv_exposure_basis`) y relación de dosis de
+dedo blanco por vibración del Anexo C (`hav_vwf_lifetime_years`) también se
+implementan. Los valores de acción y límite de la Directiva 2002/44/CE
+cierran la evaluación, redactada por `DailyVibrationExposure.report()`.
+
+**No cubierto.** El objeto propio de la ISO 8041-1, el diseño y los ensayos
+de tipo de los vibrómetros de uso general, no está implementado: de ella
+solo se toman las definiciones de las ponderaciones frecuenciales. La
+ISO 2631-5:2018, el modelo de respuesta espinal y riesgo de lesión por
+choques múltiples para la vibración de cuerpo completo, es una norma
+independiente con su propio módulo: consulta
+[Vibración con choques múltiples](/phonometry/es/vibration/human/multiple-shock-vibration/)
+para registros con choques repetidos, a los que las medidas eficaz y VDV de
+esta página no sustituyen.
+
+## Véase también
+
+- Referencia de la API: [`vibration.human.exposure`](/phonometry/es/reference/api/vibration/exposure/).

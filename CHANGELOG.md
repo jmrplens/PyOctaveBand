@@ -1061,6 +1061,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   from the top level; from `phonometry.filters` it still resolves until 5.0,
   with the usual notice.
 
+- The documentation site is organised by topic rather than by one `guides/`
+  drawer. Every page lives under the domain it belongs to, and the URL says so:
+  `signal/filters/filter-banks`, `buildings/insulation/insulation-field`,
+  `perception/psychoacoustics/loudness`, `materials/absorbers/porous-absorbers`.
+  The area overviews that were `guides/sections/<area>` are the index page of
+  their topic or subgroup, so the address a reader shortens by hand is a real
+  page. Six pages move to the topic that owns their subject rather than the one
+  they were filed under: the environmental levels and the Spanish regulation
+  leave the signal chapter, machine diagnostics joins vibration, dynamic
+  stiffness joins the resilient materials, and the two structure-borne power
+  pages join the insulation design they feed. `guides/impulse-prominence` is
+  `environment/assessment/impulsive-sound`, following the module merge.
+
+  The old addresses are gone rather than redirected: the site has been public
+  for days, is unannounced, and the link validator that fails the build on a
+  dead internal link is a better guarantee than a redirect table nobody reads.
+  The `llms.txt` shards follow the same shape, so `llms-signal-filters.txt`
+  replaces `llms-octave-filtering.txt` and its siblings.
+
 - The eighteen domain packages are named explicitly in `phonometry/__init__.py`
   rather than bound as a side effect of importing the flat API. Nothing changes
   at runtime, where `phonometry.building` already resolved; what changes is

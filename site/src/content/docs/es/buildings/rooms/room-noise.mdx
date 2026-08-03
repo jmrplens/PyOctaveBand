@@ -1,0 +1,310 @@
+---
+title: "Criterios de ruido de salas (NC / RC Mark II)"
+description: "Las calificaciones de ruido de salas de ANSI/ASA S12.2-2019: la calificación de criterios de ruido (NC) sobre las curvas de la Tabla 1 (designación NC-(SIL) con el método de tangencia cuando se supera), y la calificación Room Criteria Mark II (RC) con su etiqueta espectral de retumbo/siseo/neutro (Anexo D)."
+references:
+  - type: article
+    authors: ["Beranek, L. L."]
+    year: 1957
+    title: "Revised criteria for noise in buildings"
+    journal: "Noise Control"
+    volume: 3
+    issue: 1
+    pages: "19-27"
+    doi: "10.1121/1.2369239"
+    note: "El artículo que introdujo las curvas NC y el razonamiento de interferencia con el habla tras ellas."
+  - type: article
+    authors: ["Kosten, C. W.", "van Os, G. J."]
+    year: 1962
+    title: "Community reaction criteria for external noises"
+    journal: "The Control of Noise (National Physical Laboratory Symposium No. 12)"
+    pages: "373-387"
+    url: "https://openlibrary.org/books/OL58781133M"
+    note: "El artículo que introdujo la familia de curvas NR con la que el texto contrasta NC. Publicado por Her Majesty's Stationery Office; la ficha enlazada es la página de Open Library."
+  - type: article
+    authors: ["Blazier, W. E."]
+    year: 1997
+    title: "RC Mark II: A refined procedure for rating the noise of heating, ventilating, and air-conditioning (HVAC) systems in buildings"
+    journal: "Noise Control Engineering Journal"
+    volume: 45
+    issue: 6
+    pages: "243-250"
+    doi: "10.3397/1.2828446"
+    note: "El procedimiento RC refinado, con su razonamiento de espectro neutro y las regiones de retumbo y siseo, que el Anexo D de ANSI/ASA S12.2 codifica."
+  - type: standard
+    organization: "Acoustical Society of America"
+    year: 2019
+    title: "Criteria for evaluating room noise"
+    designation: "ANSI/ASA S12.2-2019"
+    url: "https://webstore.ansi.org/standards/asa/ansiasas122019"
+    note: "Las curvas NC normativas y el método de tangencia (Tabla 1), más, del Anexo D informativo, las curvas RC Mark II (Tabla D.1), la calificación por media de frecuencias medias (cláusula D.4) y la etiqueta espectral neutro/retumbo/siseo (cláusula D.3), que implementa este módulo."
+---
+
+import ThemeImage from '../../../../../components/ThemeImage.astro';
+import ReportPreview from '../../../../../components/ReportPreview.astro';
+
+El ruido de fondo estacionario de una sala ocupada (de la ventilación, los
+difusores o el tráfico lejano) se califica frente a una familia de **curvas de
+criterio por bandas de octava**. **ANSI/ASA S12.2-2019**, *Criteria for
+Evaluating Room Noise*, define dos calificaciones a partir de un espectro que
+phonometry implementa: la calificación **Noise Criteria (NC)** (la designación
+NC-(SIL) de la cláusula 5.2.2, con el método de tangencia cuando el espectro la
+supera), y la calificación **Room Criteria Mark II (RC)** con su etiqueta
+espectral de retumbo/siseo. Ambas trabajan sobre niveles de presión acústica por
+banda de octava en las diez bandas de 16 Hz a 8000 Hz.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_room_noise_es.svg" alt="Los dos métodos de calificación de ANSI S12.2 a partir de un espectro por bandas de octava: a la izquierda el método de tangencia NC (de las curvas de la Tabla 1, el valor NC en cada banda, después NC es la curva más alta tocada, dando NC-NN con una banda determinante); a la derecha el método RC Mark II (la media de frecuencias medias LMF de los niveles de 500, 1000 y 2000 Hz redondeada para dar RC-NN, después la etiqueta espectral R de retumbo, H de siseo o N de neutro por las reglas de desviación de la cláusula D.3)" width="94%" loading="eager" />
+
+## 1. Criterios de ruido: designación SIL y tangencia
+
+Las **curvas NC** (ANSI/ASA S12.2-2019, Tabla 1) son una familia de límites por
+banda de octava, cada una designada por su valor a 1000 Hz (de NC-15 hasta
+NC-70). La cláusula 5.2.2 califica un espectro en **dos pasos**. Primero el
+**nivel de interferencia con el habla** $\mathrm{SIL}$ (cláusula 3.2, la media
+de los niveles de 500/1000/2000/4000 Hz) selecciona la curva NC-(SIL): si
+ninguna banda de octava la supera, el espectro se designa simplemente
+**NC-(SIL)**. Solo cuando el espectro asoma por encima de esa curva entra el
+**método de tangencia** (cláusula 5.2.3): para cada banda de octava se busca el
+índice NC cuya curva pasa por el nivel medido, y la calificación es el máximo
+entre bandas. La banda en la que se alcanza ese máximo, la que empuja el
+espectro contra las curvas, se reporta como **banda determinante**.
+
+```python
+import numpy as np
+from phonometry import room
+
+# SPL en bandas de octava, 16 Hz - 8000 Hz (una sala dominada por la ventilación).
+spl = np.array([62.0, 62.0, 59.0, 57.0, 52.0, 42.0, 35.0, 29.0, 24.0, 19.0])
+
+nc = room.noise_criterion(spl)
+print(round(nc.sil, 1))           # 32.5   (cláusula 3.2)
+print(nc.method)                  # 'tangency'  (se supera la curva NC-32)
+print(round(nc.rating, 1))        # 42.5
+print(nc.governing_frequency)     # 250.0  (la banda tangente)
+print(nc.label)                   # 'NC-42.5 (250 Hz)'
+nc.plot()   # el espectro sobre la familia de curvas NC (panel izquierdo de abajo)
+```
+
+Como la calificación de tangencia interpola entre las curvas tabuladas es un
+número continuo: una calificación NC de $42{,}5$ queda a medio camino entre
+NC-40 y NC-45 (una designación SIL es siempre un entero). La calificación de
+tangencia se conserva en `tangency_rating` incluso cuando se aplica la
+designación SIL. Puede suministrarse un subconjunto de las bandas de octava
+junto con sus frecuencias centrales
+(`room.noise_criterion(levels, frequencies)`); sin las cuatro bandas del SIL la
+designación la fija solo la calificación de tangencia.
+
+La familia de la Tabla 1 termina en NC-70 y NC-15, y la norma no define ninguna
+calificación más allá. Un espectro por encima de la curva NC-70 (o enteramente
+por debajo de la curva NC-15) recibe por tanto `rating = nan` y una marca
+`out_of_range` de `"above"` / `"below"`, con `nc.label` leyendo
+`'>NC-70 (63 Hz)'` (gobierna la banda con mayor exceso sobre NC-70) o
+`'<NC-15'`; nunca se fabrican números del estilo `NC-71` o `NC-14`.
+
+## 2. Room Criteria Mark II: calificación y etiqueta espectral
+
+Las curvas **RC Mark II** (ANSI/ASA S12.2-2019, Anexo D, Tabla D.1) tienen una
+pendiente constante de **−5 dB/octava**, ancladas a su valor a 1000 Hz, con el
+nivel de 16 Hz igual al de 31,5 Hz y un suelo de baja frecuencia de 55 dB. La
+calificación numérica es la **media de frecuencias medias** $\text{LMF}$, la
+media de los niveles de 500, 1000 y 2000 Hz, redondeada al decibelio más
+próximo (cláusula D.4):
+
+$$
+\text{LMF} = \tfrac{1}{3}\left(L_{500} + L_{1000} + L_{2000}\right),
+\qquad \text{RC} = \operatorname{redondeo}(\text{LMF}).
+$$
+
+Una **etiqueta espectral** describe entonces el *carácter* del ruido según cómo
+se desvía el espectro de la curva RC de referencia (cláusula D.3): **retumbo**
+($R$) cuando una banda a 500 Hz o por debajo supera la curva en más de 5 dB,
+**siseo** ($H$) cuando una banda a 1000 Hz o por encima la supera en más de
+3 dB, y **neutro** ($N$) cuando no ocurre ninguna de las dos.
+
+```python
+import numpy as np
+from phonometry import room
+
+spl = np.array([62.0, 62.0, 59.0, 57.0, 52.0, 42.0, 35.0, 29.0, 24.0, 19.0])
+
+rc = room.room_criterion(spl)
+print(rc.label)             # RC-35(R)   -  una sala retumbante
+print(round(rc.lmf, 1))     # 35.3
+print(rc.classification)    # R
+rc.plot()   # el espectro sobre la referencia RC (panel derecho de abajo)
+```
+
+El fuerte contenido de baja frecuencia de este espectro eleva las bandas de
+63–250 Hz muy por encima de la curva de referencia, así que el ruido se etiqueta
+como $R$ (retumbo): el "zumbido" subjetivo de una climatizadora sobredimensionada.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/room_noise_criteria_es.svg" alt="Dos paneles para el mismo espectro de sala dominado por la ventilación. Izquierda: los niveles medidos por banda de octava sobre la familia de curvas NC, con un rombo rojo que marca el punto de tangencia a 250 Hz que fija la calificación NC-42,5. Derecha: el mismo espectro sobre la curva de referencia RC-35, con las bandas de baja frecuencia atravesando la tolerancia de retumbo sombreada (más 5 dB por debajo de 500 Hz) de modo que el ruido se clasifica como RC-35(R), y la tolerancia de siseo (más 3 dB a 1000 Hz y por encima) sombreada para comparar" width="96%" />
+
+<details>
+<summary>Mostrar el código de esta figura</summary>
+
+```python
+import numpy as np
+import matplotlib.pyplot as plt
+from phonometry import room
+
+spl = np.array([62.0, 62.0, 59.0, 57.0, 52.0, 42.0, 35.0, 29.0, 24.0, 19.0])
+
+# En una línea cada uno:
+room.noise_criterion(spl).plot(language="es")
+room.room_criterion(spl).plot(language="es")
+plt.show()
+
+# A mano, reproduciendo lo que dibujan NCResult.plot() / RCResult.plot():
+from phonometry.room.noise_criteria import NC_CURVES, NC_INDICES, OCTAVE_BANDS
+nc, rc = room.noise_criterion(spl), room.room_criterion(spl)
+fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 5))
+
+for row, idx in zip(NC_CURVES, NC_INDICES):
+    ax1.plot(OCTAVE_BANDS, row, color="#bbbbbb", lw=0.8)
+ax1.plot(OCTAVE_BANDS, spl, "o-", label="Measured")
+gov = spl[OCTAVE_BANDS == nc.governing_frequency][0]
+ax1.plot([nc.governing_frequency], [gov], "D", color="#d62728")
+ax1.set_xscale("log"); ax1.set_title(f"NC-{nc.rating:g}")
+
+ref = rc.reference_curve
+low, high = OCTAVE_BANDS <= 500, OCTAVE_BANDS >= 1000
+ax2.plot(OCTAVE_BANDS, ref, "s--", color="#7f7f7f", label=f"Reference RC-{rc.rating}")
+ax2.fill_between(OCTAVE_BANDS[low], ref[low], ref[low] + 5, color="#ffbb78", alpha=0.35)
+ax2.fill_between(OCTAVE_BANDS[high], ref[high], ref[high] + 3, color="#aec7e8", alpha=0.45)
+ax2.plot(OCTAVE_BANDS, spl, "o-", label="Measured")
+ax2.set_xscale("log"); ax2.set_title(rc.label)
+plt.show()
+```
+
+</details>
+
+El `NCResult` lleva la calificación `rating`, el `sil`, la `tangency_rating`,
+el `method` (`'SIL'` o `'tangency'`), la `governing_frequency`, la marca
+`out_of_range` y los `levels` medidos, más una etiqueta `label` de conveniencia
+(`'NC-44'`, `'NC-51 (125 Hz)'`, `'>NC-70 (63 Hz)'`); el `RCResult` lleva la
+calificación `rating`, la `lmf`, la `classification`, la `reference_curve`, una
+marca `out_of_family` (la Tabla D.1 solo tabula de RC-25 a RC-50) y una
+etiqueta `label` de conveniencia en la forma `RC-NN(A)`. La cláusula D.3.5
+admite las etiquetas $N$, $R$, $H$ o $RV$; cuando disparan a la vez las
+desviaciones de retumbo y siseo, la biblioteca informa la combinación `RH` como
+extensión de diagnóstico. Cada resultado expone un `.plot()` que dibuja su
+panel de arriba. La cláusula D.4 espera al menos las bandas de octava de
+31,5 Hz a 4000 Hz: un espectro al que le falte alguna se califica igualmente,
+pero emite un `UserWarning` porque las bandas ausentes se omiten en las pruebas
+de desviación de la etiqueta.
+
+Los criterios de ruido balanceados (NCB), el criterio de ruido de sala para
+ruido de baja frecuencia fluctuante (RNC, que necesita una serie temporal en
+lugar de un único espectro), la etiqueta de vibración y traqueteo ($RV$, que
+necesita la prueba de la Tabla 6) y el índice numérico de evaluación de calidad
+(QAI, que la norma remite a referencias externas) no forman parte de este
+módulo.
+
+## 3. Elegir un criterio: NC, RC Mark II o NR
+
+Las dos calificaciones responden a preguntas distintas, y existe una
+tercera familia que este módulo deliberadamente no implementa:
+
+- **NC** responde a *"¿cumple la sala su límite, y qué banda lo rompe?"*.
+  Es la calificación de conformidad de la práctica norteamericana
+  (especificaciones, códigos, fichas de equipos). El paso SIL de la cláusula
+  5.2.2 ancla la designación a la interferencia con el habla, pero en cuanto
+  alguna banda supera la curva NC-(SIL) toma el relevo el método de tangencia,
+  gobernado por completo por la única banda determinante. Ese es también su
+  punto ciego: dos salas NC-40 pueden sonar completamente distintas, una
+  retumbante y otra siseante, porque la tangencia no dice nada del
+  equilibrio espectral. Usa NC cuando una especificación lo cite, e informa
+  siempre de la banda determinante junto a la calificación, porque nombra
+  la octava que cualquier corrección debe atacar primero.
+- **RC Mark II** responde a *"¿cómo suena la sala, y qué hay que
+  corregir?"*. Su calificación sigue la interferencia con el habla a través
+  de la media de frecuencias medias, y su pendiente de referencia de
+  −5 dB por octava es el espectro que los ocupantes describen como neutro,
+  un fondo de ventilación anodino que no es ni retumbante ni agudo. La
+  etiqueta espectral señala después el rango de frecuencias problemático.
+  Recurre a RC Mark II en la fase de diseño del sistema de climatización, o
+  para diagnosticar una instalación que no cumple su límite NC.
+- **NR (Noise Rating)**, la familia de curvas de Kosten y van Os (1962),
+  es la contraparte europea de NC: la misma lógica de
+  tangencia sobre una familia de curvas algo distinta (más permisiva en
+  baja frecuencia, más estricta en alta), habitual en especificaciones
+  europeas e internacionales de equipos y edificación. phonometry no
+  implementa NR; cuando una especificación cite NR, califica contra las
+  propias curvas NR en lugar de sustituirlas por NC, porque las dos
+  familias divergen varios decibelios lejos de las frecuencias medias.
+
+**Leer la etiqueta.** La etiqueta de RC Mark II es una pista de reparación,
+no solo un rótulo. Una etiqueta de retumbo (`R`, más de 5 dB sobre la
+referencia a 500 Hz o por debajo) apunta a la planta de climatización: un
+ventilador sobredimensionado o estrangulado, retumbo de conductos o
+vibración estructural rerradiada por las paredes, y es la energía de baja
+frecuencia la que hace vibrar la construcción ligera y fatiga a los
+ocupantes. Una etiqueta de siseo (`H`, más de 3 dB por encima a 1000 Hz o
+más) apunta al extremo terminal: velocidades de paso excesivas en difusores
+y rejillas o una compuerta estrangulada cerca de la salida, y es el rango
+que enmascara el habla. Una etiqueta neutra (`N`) significa que el nivel
+aún puede estar mal, pero el carácter es correcto: reduce todo el espectro
+en lugar de remodelarlo.
+
+## 4. Informes de ruido de salas (`.report()`)
+
+Ambas calificaciones generan una ficha PDF de evaluación de ruido de salas de
+una página. `NCResult.report(path)` y `RCResult.report(path)` comparten la misma
+maquetación: una línea de base normativa, un bloque opcional de metadatos de
+cabecera, los niveles medidos por bandas de octava junto al espectro medido
+representado frente a la familia de curvas NC/RC (el propio `.plot()` del
+resultado), la calificación en un recuadro, una fila opcional de veredicto y un
+pie con el descargo de responsabilidad fijo. El recuadro NC muestra la
+designación `NC-nn` con el SIL y, para una calificación de tangencia, su banda
+determinante (`>NC-70` / `<NC-15` cuando el espectro cae fuera de la familia de
+la Tabla 1); el recuadro RC muestra `RC-nn(etiqueta)` con la media de
+frecuencias medias $L_\text{MF}$ y la calidad espectral. Una calificación más
+baja es más silenciosa, por lo que un `requirement` en los metadatos (leído como
+la calificación NC o RC máxima aceptable) cumple si es igual o inferior al
+objetivo. Con `verbose=True` se añade el valor de contorno NC por banda leído por
+el método de tangencia (NC), o la curva de referencia RC Mark II y la desviación
+medida respecto a ella (RC). Ambas usan el mismo contenedor `ReportMetadata` que
+las demás fichas; los campos específicos de sala `room_volume` y `area` rellenan
+la cabecera junto a `client`, `test_room`, `specimen`, `instrumentation`, los
+campos de clima, `measurement_standard`, `test_date`, `laboratory`, `operator` y
+`report_id`. Pasar `metadata=None` produce una ficha de evaluación básica. La
+generación necesita reportlab y, para la figura que incrusta la ficha,
+matplotlib (`pip install "phonometry[report,plot]"`); solo se admite
+`engine="reportlab"`, y `language="es"` genera una ficha en español (cadenas
+fijas traducidas y separador decimal de coma).
+
+```python
+import numpy as np
+from phonometry import room, ReportMetadata
+
+spl = np.array([79.0, 69.0, 59.0, 51.0, 50.0, 39.0, 36.0, 34.0, 33.0, 32.0])
+metadata = ReportMetadata(
+    test_room="Oficina A", room_volume=180.0, area=60.0,
+    measurement_standard="ANSI/ASA S12.2",
+    laboratory="Laboratorio de referencia de Phonometry",
+    requirement=40.0,              # añade un veredicto frente a un objetivo
+)
+room.noise_criterion(spl).report("ficha_nc.pdf", metadata=metadata, language="es")
+room.room_criterion(spl).report("ficha_rc.pdf", metadata=metadata, language="es")
+```
+
+Las fichas de ejemplo se regeneran con `make reports` y se mantienen renderizadas
+en el repositorio; haz clic en una vista previa para abrir el PDF.
+
+<ReportPreview
+	name="ansi_s12_2_noise_criteria_example"
+	title="Informe de ejemplo de Noise Criteria ANSI/ASA S12.2 (PDF)"
+	description="Ficha de evaluación de ruido de salas de una página: una cabecera de metadatos (cliente, sala, descripción, volumen de la sala, superficie del suelo, instrumentación y clima), la tabla de niveles medidos por bandas de octava junto al espectro medido sobre la familia de curvas NC, y la calificación NC-40 en un recuadro con la banda determinante de 250 Hz y un veredicto CUMPLE frente a un objetivo de 40."
+	caption="Ficha de Noise Criteria (NCResult.report), la calificación NC y su banda determinante."
+/>
+
+<ReportPreview
+	name="ansi_s12_2_room_criteria_example"
+	title="Informe de ejemplo de Room Criteria ANSI/ASA S12.2 (PDF)"
+	description="Ficha de evaluación de ruido de salas de una página: una cabecera de metadatos, la tabla de niveles medidos por bandas de octava junto al espectro medido sobre la curva de referencia RC Mark II con las bandas de tolerancia de retumbo y siseo sombreadas, y la calificación RC-35(R) en un recuadro con la media de frecuencias medias LMF y una calidad espectral de retumbo."
+	caption="Ficha de Room Criteria (RCResult.report), la calificación RC y su etiqueta espectral."
+/>
+
+## Véase también
+
+- Referencia de la API: [`room.noise_criteria`](/phonometry/es/reference/api/rooms/noise-criteria/).

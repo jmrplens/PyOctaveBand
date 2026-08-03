@@ -144,7 +144,7 @@ This page collects the theory behind rooms and buildings: impulse-response measu
 
 ANSI/ASA S12.2-2019 rates steady background noise in rooms against families of octave-band curves (16 Hz – 8 kHz). The **NC rating** follows the two-step procedure of clause 5.2.2 on the Table 1 curves (NC-15 to NC-70): the speech interference level $\mathrm{SIL} = \tfrac14(L_{500}+L_{1000}+L_{2000}+L_{4000})$ (clause 3.2) selects the NC-(SIL) curve, and if no band exceeds it the spectrum is designated NC-(SIL); otherwise the tangency method (clause 5.2.3) applies: each measured band is interpolated against the tabulated curve values, the rating is the highest per-band index and the band that sets it is the governing band; the interpolation makes the rating continuous (an NC-42.5 is reported as such, not snapped to a curve). Spectra above NC-70 or below NC-15 fall outside the family and are flagged (>NC-70 with the band of maximum exceedance, or &lt;NC-15) instead of receiving a fabricated number. The **RC Mark II** contour (Annex D) is a pure −5 dB/octave line keyed to its 1000 Hz value with a low-frequency floor of $\max(\mathrm{RC} + 25,\ 55)$ dB at 16/31.5 Hz; the rating is the arithmetic mean of the 500/1000/2000 Hz levels rounded to an integer (clause D.4), and the spectral-quality tag compares the spectrum with the reference contour (clause D.3): rumble "R" when any band at or below 500 Hz exceeds it by more than 5 dB, hiss "H" when any band at or above 1 kHz exceeds it by more than 3 dB (both together "RH"), else neutral "N", reported as e.g. RC-35(N). The generated RC contours reproduce Table D.1 digit for digit, and feeding any Table 1 NC curve back returns its own tangency rating. NCB, RNC (Annex A) and the QAI (clause D.5) are deliberately out of scope.
 
-See the [Room Noise guide](/phonometry/guides/room-noise/) for usage.
+See the [Room Noise guide](/phonometry/buildings/rooms/room-noise/) for usage.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/room_noise_criteria.svg" alt="Two panels for the same ventilation-dominated room spectrum. Left: the measured octave-band levels over the NC curve family, with a red diamond marking the tangent point at 250 Hz that sets the NC-42.5 rating. Right: the same spectrum over the reference RC-35 curve, with the low-frequency bands rising through the shaded rumble tolerance (plus 5 dB below 500 Hz) so the noise is classified RC-35(R), and the hiss tolerance (plus 3 dB at and above 1000 Hz) shaded for comparison" width="96%" />
 
@@ -330,7 +330,7 @@ hard objects ($\psi \approx 0.072$) raises $A$ to 5.03 m² and drops $T$ to
 0.9 s. The informative Annex D method for irregular spaces and unevenly
 distributed absorption is out of scope.
 
-See the [Enclosed-Space Absorption guide](/phonometry/guides/enclosed-space-absorption/) for usage.
+See the [Enclosed-Space Absorption guide](/phonometry/buildings/rooms/enclosed-space-absorption/) for usage.
 
 ### Measurement uncertainty (ISO 12999-1)
 
@@ -355,8 +355,8 @@ Uncorrelated components combine in quadrature $u_c = \sqrt{\sum u_i^2}$
 (Formula A.7), and the uncorrelated single-number uncertainty is the
 energy-weighted quadrature sum of the band uncertainties (Formula B.2).
 
-See the [Room Acoustics](/phonometry/guides/room-acoustics/) and
-[Field Insulation Measurement (ISO 16283)](/phonometry/guides/insulation-field/) guides for usage.
+See the [Room Acoustics](/phonometry/buildings/rooms/room-acoustics/) and
+[Field Insulation Measurement (ISO 16283)](/phonometry/buildings/insulation/insulation-field/) guides for usage.
 
 ### Predicted panel sound insulation (Bies 7.2, Hopkins 2.9/4.3.10, Cremer 5)
 
@@ -383,5 +383,5 @@ transmission path and the double-wall radiation draw on the plate radiation
 efficiency and point mobilities of the
 [vibration theory](/phonometry/reference/theory/vibration/).
 
-See the [Predicting Panel Sound Insulation](/phonometry/guides/panel-sound-insulation/)
+See the [Predicting Panel Sound Insulation](/phonometry/buildings/design/panel-sound-insulation/)
 guide for usage.

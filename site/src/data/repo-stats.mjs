@@ -10,8 +10,8 @@
  *
  * Definitions, so the labels these numbers sit under stay honest:
  *   version   first line of `VERSION`, the released version the tag points at
- *   guides    topic guides under `content/docs/guides/`, excluding the hub
- *             index and the `sections/` area indexes (English side; the
+ *   guides    topic guides under the topic folders of `content/docs/`,
+ *             excluding the topic and subgroup overviews (English side; the
  *             translation-parity check keeps Spanish identical)
  *   apiPages  module pages under `content/docs/reference/api/`, excluding the
  *             hub index
@@ -96,11 +96,27 @@ export const version = (() => {
   }
 })();
 
-/** Topic guides, without the hub index and the per-area section indexes. */
-export const guides = pagesUnder(
-  join(ROOT, 'site', 'src', 'content', 'docs', 'guides'),
-  'the guides',
-  { skipDirs: ['sections'] },
+//: The topics the guides live under. Reference and the API reference are not
+//: guides, and neither is Start, which is the front door to them.
+const GUIDE_TOPICS = [
+  'aircraft',
+  'buildings',
+  'devices',
+  'environment',
+  'materials',
+  'perception',
+  'signal',
+  'simulation',
+  'underwater',
+  'vibration',
+];
+
+/** Topic guides, without the topic and subgroup overviews. */
+export const guides = GUIDE_TOPICS.reduce(
+  (total, topic) =>
+    total +
+    pagesUnder(join(ROOT, 'site', 'src', 'content', 'docs', topic), `the ${topic} guides`),
+  0,
 );
 
 /** API reference pages, one per module. */

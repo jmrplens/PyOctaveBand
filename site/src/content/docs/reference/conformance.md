@@ -55,7 +55,7 @@ drifts.
 
 For the design philosophy behind this approach, and a worked case study on
 IEC 61672-1 time weighting, see
-[Why phonometry](/phonometry/reference/why-phonometry/).
+[Why phonometry](/phonometry/start/why-phonometry/).
 
 Re-deriving the standards this closely also turns up defects in the published
 documents themselves: worked examples that contradict their own normative

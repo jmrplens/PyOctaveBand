@@ -2,8 +2,9 @@
  * Breadcrumb trails derived from the navigation tree.
  *
  * The trails used to be built by accumulating URL path segments, which is a
- * reasonable guess and mostly wrong here: `/guides/`, `/guides/sections/` and
- * `/reference/api/<domain>/` are grouping prefixes, not routes. That produced
+ * reasonable guess and mostly wrong here: the old `/guides/` and
+ * `/guides/sections/` prefixes, and `/reference/api/<domain>/`, are grouping
+ * prefixes rather than routes. That produced
  * 44 distinct `BreadcrumbList` targets that 404, on 414 of 442 pages, and
  * machine-titlecased labels ("Api", "Building") in both locales.
  *

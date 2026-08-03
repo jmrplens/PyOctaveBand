@@ -1,0 +1,346 @@
+# phonometry: materials surfaces
+
+Part of https://jmrplens.github.io/phonometry/llms.txt. Full text of the pages in this area.
+
+---
+
+<!-- source: docs/road-absorption.md | canonical: https://jmrplens.github.io/phonometry/materials/surfaces/road-absorption/ -->
+Source: https://jmrplens.github.io/phonometry/materials/surfaces/road-absorption/
+
+# In-situ Road-Surface Absorption
+
+How much sound a road surface absorbs decides how loud its traffic is, and a
+core cannot be cut out of a motorway and carried to a laboratory. ISO 13472
+measures the absorption *in situ*, on the pavement as built, twice over. The
+**subtraction technique** of Part 1 fires an impulse from a loudspeaker down
+onto an extended surface and separates the incident and reflected components
+of one microphone's impulse response in time; the **spot method** of Part 2
+seals a short tube onto a small patch and hands the mathematics to the
+impedance-tube transfer-function method. This guide covers both, from the
+mandatory geometry and the Adrienne window to the sampled area and the
+plane-wave limits of the tube, and closes with the choice between them.
+
+## 1. Subtraction technique (ISO 13472-1)
+
+Out in the field there is no reverberation room. ISO 13472-1 measures the sound
+absorption of a road surface (or any extended flat surface) *in situ* by firing
+an impulse from a loudspeaker at height $d_s$ down onto the surface and recording
+the impulse response at a microphone at height $d_m$. The **incident** and
+**reflected** components are separated in time with an Adrienne window; their
+transfer function gives the reflection factor and hence the absorption.
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_insitu_subtraction_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_insitu_subtraction.svg" alt="ISO 13472-1 in-situ road absorption by the subtraction technique: a loudspeaker at 1.25 m and a microphone at 0.25 m above the road surface, with the direct and road-reflected ray paths and a free-field reference measurement, the reflected component isolated by an Adrienne time window" width="92%"></picture>
+
+**Geometrical spreading (Clause 4.1).** The reflected wave travels farther than
+the direct wave, so it is attenuated by the geometrical-spreading factor
+
+$$
+K_r = \frac{d_s - d_m}{d_s + d_m},
+$$
+
+which equals $2/3$ for the mandatory geometry $d_s = 1.25$ m, $d_m = 0.25$ m.
+The absorption follows from the windowed incident and reflected spectra
+$H_i$, $H_r$:
+
+$$
+\alpha(f) = 1 - \frac{1}{K_r^2}\left|\frac{H_r(f)}{H_i(f)}\right|^2.
+$$
+
+```python
+import numpy as np
+from phonometry import materials
+
+# A band-limited incident impulse response and a synthetic road reflection
+# hr = Kr * r0 * delayed(hi): a reflection of magnitude r0 = 0.4, delayed by the
+# extra path, and scaled by the geometrical-spreading factor Kr.
+fs, n = 48000.0, 4096
+t = np.arange(n) / fs
+hi = np.zeros(n)
+hi[:64] = np.hanning(64) * np.cos(2.0 * np.pi * 1500.0 * t[:64])
+
+kr = materials.geometric_spreading_factor()          # (ds - dm)/(ds + dm) = 2/3
+hr = kr * 0.4 * np.roll(hi, 96)
+
+# Narrow-band absorption, then reduced to one-third octaves over 250-4000 Hz.
+alpha = materials.insitu_absorption_coefficient(hi, hr)   # 1 - (1/Kr^2)|Hr/Hi|^2
+freq = np.fft.rfftfreq(n, 1.0 / fs)
+centres, band = materials.one_third_octave_absorption(freq, alpha)
+print(round(kr, 4))                # 0.6667
+print(round(float(band[2]), 3))    # 0.84  (alpha = 1 - 0.4^2 = 0.84)
+```
+
+**Adrienne window (Clause 6.4).** The time window that isolates the reflection
+mandates only a sharp leading edge, a 5 ms flat portion and a cosine-squared or
+Blackman-Harris trailing edge; the exact durations are reported per measurement,
+not fixed, so they are configurable here.
+
+```python
+from phonometry import materials
+
+# Default: 0.5 ms leading edge, 5 ms flat top, 5 ms Blackman-Harris trailing.
+w = materials.adrienne_window(48000.0)
+print(w.shape[0])          # 504 samples at 48 kHz
+print(round(float(w.max()), 3))   # 1.0  (flat top and edges meet at unity)
+```
+
+**End-to-end spectrum.** `insitu_absorption_spectrum` runs the whole chain (the
+windowed incident and reflected impulse responses to the narrow-band absorption
+and on to one-third-octave bands) and returns a plottable
+`InsituAbsorptionResult`:
+
+```python
+import numpy as np
+from phonometry import materials
+from scipy.signal import firwin, lfilter
+
+# A synthetic-but-realistic measurement. hi is a unit incident impulse; the road
+# reflection hr = Kr * r0 * roll(hi, shift) uses the geometrical-spreading
+# factor Kr, a mildly frequency-dependent r0 (a gentle low-pass, so a porous
+# surface reflects less as frequency rises) and the reflected-path delay
+# shift = round(2 dm / c * fs).
+fs, n = 48000.0, 8192
+kr = materials.geometric_spreading_factor()           # (ds - dm)/(ds + dm) = 2/3
+hi = np.zeros(n)
+hi[0] = 1.0
+taps = firwin(41, 1200.0, fs=fs)
+taps = taps / taps.sum()
+shift = int(round(2.0 * 0.25 / 340.0 * fs))     # reflected-path delay 2 dm / c
+hr = kr * 0.85 * np.roll(lfilter(taps, 1.0, hi), shift)
+
+result = materials.insitu_absorption_spectrum(hi, hr, fs)
+print(result.frequencies[[0, -1]].astype(int))     # [ 250 4000]
+print(np.round(result.absorption[[0, 6, 12]], 2))  # [0.31 0.65 1.  ]
+result.plot()   # alpha(f) bar chart over 250-4000 Hz (needs matplotlib)
+```
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/insitu_absorption_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/insitu_absorption.svg" alt="An in-situ one-third-octave road-surface absorption spectrum computed by the reflection-factor route from a synthetic road reflection, rising from about 0.3 at 250 Hz to near 1.0 above 2 kHz" width="88%"></picture>
+
+*The absorption rises with frequency because the surface reflects less of the
+high-frequency energy, exactly as the low-pass reflection factor $r_0(f)$
+dictates through $\alpha = 1 - (1/K_r^2)\,|H_r/H_i|^2$.*
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from scipy.signal import firwin, lfilter
+from phonometry import materials
+
+# A synthetic-but-realistic measurement. hi is a unit incident impulse; the road
+# reflection hr = Kr * r0 * roll(hi, shift) uses the geometrical-spreading
+# factor Kr, a mildly frequency-dependent r0 (a gentle low-pass, so a porous
+# surface reflects less as frequency rises) and the reflected-path delay
+# shift = round(2 dm / c * fs).
+fs, n = 48000.0, 8192
+kr = materials.geometric_spreading_factor()           # (ds - dm)/(ds + dm) = 2/3
+hi = np.zeros(n)
+hi[0] = 1.0
+taps = firwin(41, 1200.0, fs=fs)
+taps = taps / taps.sum()
+shift = int(round(2.0 * 0.25 / 340.0 * fs))     # reflected-path delay 2 dm / c
+hr = kr * 0.85 * np.roll(lfilter(taps, 1.0, hi), shift)
+result = materials.insitu_absorption_spectrum(hi, hr, fs)
+
+# result is the InsituAbsorptionResult computed above. One line:
+result.plot()
+plt.show()
+
+# By hand: a bar chart of alpha over the one-third-octave bands.
+freqs = result.frequencies
+positions = np.arange(freqs.size)
+fig, ax = plt.subplots()
+ax.bar(positions, np.nan_to_num(result.absorption), width=0.7, color="#1f77b4")
+ax.set_xticks(positions)
+ax.set_xticklabels([f"{f:g}" for f in freqs], rotation=45, ha="right")
+ax.set_xlabel("Frequency [Hz]")
+ax.set_ylabel("Absorption coefficient alpha")
+ax.set_ylim(0.0, 1.0)
+ax.set_title("In-situ road-surface absorption (ISO 13472-1)")
+plt.show()
+```
+
+</details>
+
+**Maximum sampled area (Annex A).** The finite time window limits how much of the
+surface contributes to the reflection. The maximum sampled area is a circle whose
+radius the library computes from the geometry and window width; the Annex A worked
+example ($d_s = 1.25$ m, $d_m = 0.25$ m, $c = 340$ m/s, 5 ms flat window) gives
+about 1.34 m.
+
+```python
+from phonometry import materials
+print(round(materials.max_sampled_area_radius(5.0e-3), 3))   # 1.343  (metres)
+```
+
+The whole arrangement fits in one to-scale drawing. `plot_insitu_geometry`
+draws the standard set-up with that sampled radius on the surface, and a
+measured `InsituAbsorptionResult` that retained its heights redraws its own
+with `result.plot_geometry()`.
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/insitu_setup_geometry_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/insitu_setup_geometry.svg" alt="To-scale side view of the in-situ absorption set-up: the loudspeaker on its mast 1.25 m above the hatched road surface, the microphone on the same vertical at 0.25 m, the dashed surface-reflected path below it and the 1.34 m radius of the sampled area dimensioned on the surface" width="88%"></picture>
+
+*The standard geometry to scale: source at 1.25 m, microphone at 0.25 m on the
+same vertical, and the 5 ms window turned into the 1.34 m radius of road that
+actually contributes to the reflection.*
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+from phonometry import materials
+
+# The standard geometry: source at 1.25 m, microphone at 0.25 m, and the
+# 1.34 m sampled-area radius of the 5 ms window.
+materials.plot_insitu_geometry()
+plt.show()
+
+# A measured spectrum retains its heights and redraws its own set-up:
+#   result = materials.insitu_absorption_spectrum(hi, hr, fs)
+#   result.plot_geometry()
+```
+
+</details>
+
+## 2. Spot method (ISO 13472-2)
+
+For smaller patches, ISO 13472-2 seals a short circular tube onto the surface and
+measures the absorption with the two-microphone transfer-function method of
+ISO 10534-2. The library provides the spot-method geometry and validity helpers;
+the transfer-function DSP itself is the impedance-tube routine
+`two_microphone_impedance` (see [Impedance Tube](https://jmrplens.github.io/phonometry/materials/absorbers/impedance-tube/)).
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_spot_tube_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_spot_tube.svg" alt="ISO 13472-2 spot method: a short circular tube sealed onto the road surface with a loudspeaker at the top and two microphones flush in the tube wall at spacing s, measuring absorption over 250 to 1600 Hz via the ISO 10534-2 two-microphone transfer-function method" width="92%"></picture>
+
+The apparatus is a portable impedance tube stood on end: a loudspeaker at the
+top, two flush-mounted microphones at spacing $s$ in the tube wall, and the
+road surface itself as the sample. A test fixture with a ring of deformable
+material (a rubber O-ring or similar) makes an airtight seal between the tube
+mouth and the pavement, so the patch under the mouth, not the leak around it,
+terminates the tube; the underside of that sealing device defines the plane
+of reference at which the reflection factor is evaluated. The method is
+written for **reflective** surfaces, dense asphalts and test tracks per
+ISO 10844 rather than open porous layers: the standard declares it unreliable
+once the measured absorption coefficient exceeds 0.15, and no longer calls a
+surface reflective above 0.10, because on an absorbing surface the reflected
+wave the two microphones must resolve all but vanishes. The tube samples only
+the circle under its mouth, so one reading is a spot in the statistical sense
+too: on regular roads the standard spaces measurement positions over the
+area of interest with an emphasis on the wheel tracks (as a guideline, one
+position every 10 m), on a surface that must be smooth, flat, free of debris
+and dry.
+
+**Plane-wave limits (Clause 5.4).** The tube supports only plane waves below
+
+$$
+f_u = 0.58\,\frac{c_0}{d},
+$$
+
+with $d$ the tube diameter, and the microphone spacing $s$ must sit between
+$0.05\,c_0/f_{min}$ and $0.45\,c_0/f_{max}$. The reported range is the
+one-third-octave bands 250–1600 Hz.
+
+```python
+from phonometry import materials
+
+# Upper usable frequency of a 100 mm tube and the valid spacing window.
+print(round(materials.spot_tube_upper_frequency(0.100, 343.0), 1))      # 1989.4 Hz
+s_min, s_max = materials.spot_microphone_spacing_bounds(
+    343.0, f_min=220.0, f_max=1800.0)
+print(round(s_min, 3), round(s_max, 3))    # 0.078 0.086  (metres)
+```
+
+The frequency window is the price of portability: the tube diameter that
+keeps the mouth sealable on real pavement caps the upper bands at 1600 Hz,
+and the tube length caps the lower ones at 250 Hz, a narrower window than the
+250–4000 Hz of the subtraction technique. Within it, the reduction is the
+ISO 10534-2 chain unchanged: the transfer function between the two
+microphones separates incident and reflected waves, and the standard's
+Annex A additionally subtracts the internal losses of the system (measured
+once against a rigid plate) so the tube's own dissipation is not billed to
+the road; that correction is `spot_internal_loss_correction`.
+
+## Subtraction or spot?
+
+The two parts of ISO 13472 are complements, not competitors, and Part 2's own
+introduction says both should give similar results between 315 Hz and
+1600 Hz while their fields of application differ:
+
+- **Surface type.** The subtraction technique handles the full range from
+  reflective to highly absorbing (porous asphalt included); the spot method
+  is scoped to reflective surfaces and declared unreliable above a measured
+  absorption of 0.15, where its confined reflected wave is no longer strong
+  enough to resolve.
+- **Sampled area.** The subtraction technique averages over a patch whose
+  Annex A clear zone extends to the 1.34 m maximum sampled-area radius of
+  section 1 (about 5.6 m² of pavement, with the area actually contributing
+  at each frequency set by the time window), a fair sample of texture and
+  joints; the spot method sees only the patch under
+  the tube mouth, so it trades spatial representativeness for the ability to
+  sit on a narrow strip, a wheel track, or a laboratory core.
+- **Bandwidth.** 250–4000 Hz against 250–1600 Hz, which matters because the
+  tyre-road noise the measurement usually serves peaks around 1 kHz but has
+  content beyond the spot method's ceiling.
+- **Logistics.** The subtraction rig needs a mast, a free-field reference
+  measurement and a pause in traffic; the spot tube needs a flat, sealable
+  patch and minutes per point. Surface types and acceptance criteria aside,
+  that practical difference is usually what decides.
+
+Both methods report the same quantity, the normal-incidence absorption
+coefficient in one-third-octave bands, so a low-absorption lane can be
+surveyed with the spot tube and anchored with a subtraction measurement at a
+few positions.
+
+## See also
+
+- [Impedance Tube](https://jmrplens.github.io/phonometry/materials/absorbers/impedance-tube/): the ISO 10534-2 two-microphone method
+  the spot tube defers its mathematics to, and the laboratory instrument the
+  spot method miniaturises.
+- [Diffusers and Their Coefficients](https://jmrplens.github.io/phonometry/materials/diffusers/diffusers/): the other family of
+  surface measurements, grading where a surface sends its reflection rather
+  than how much it absorbs.
+- [Sound Absorption Measurement and Rating](https://jmrplens.github.io/phonometry/materials/absorbers/absorption-measurement/): the
+  laboratory (reverberation-room) absorption measurement and its rating, for
+  materials that can be brought indoors.
+- [Outdoor Sound Propagation](https://jmrplens.github.io/phonometry/environment/propagation/outdoor-propagation/): where the absorption
+  of the ground surface enters the propagation models.
+- API reference: [`materials.surfaces.road_absorption`](https://jmrplens.github.io/phonometry/reference/api/materials/road-absorption/).
+
+## References
+
+- International Organization for Standardization. (2002). *Acoustics —
+  Measurement of sound absorption properties of road surfaces in situ —
+  Part 1: Extended surface method* (ISO 13472-1:2002, the edition
+  implemented here; since revised as
+  [ISO 13472-1:2022](https://www.iso.org/standard/77032.html)).
+  [iso.org catalogue](https://www.iso.org/standard/35387.html).
+  The subtraction technique of section 1: the mandatory geometry, the
+  Adrienne window and the Annex A sampled-area radius.
+- International Organization for Standardization. (2010). *Acoustics —
+  Measurement of sound absorption properties of road surfaces in situ —
+  Part 2: Spot method for reflective surfaces* (ISO 13472-2:2010, the
+  edition implemented here; since revised as
+  [ISO 13472-2:2025](https://www.iso.org/standard/84925.html)).
+  [iso.org catalogue](https://www.iso.org/standard/32304.html).
+  The spot method of section 2: the plane-wave limits, the microphone
+  spacing window and the deferral to ISO 10534-2.
+- International Organization for Standardization. (1998). *Acoustics —
+  Determination of sound absorption coefficient and impedance in impedance
+  tubes — Part 2: Transfer-function method* (ISO 10534-2:1998).
+  [iso.org catalogue](https://www.iso.org/standard/22851.html).
+  The two-microphone transfer-function reduction the spot method reuses,
+  implemented in the [Impedance Tube](https://jmrplens.github.io/phonometry/materials/absorbers/impedance-tube/) guide.
+
+## Standards
+
+ISO 13472-1:2002 (in-situ absorption, extended surface) and ISO 13472-2:2010
+(in-situ absorption, spot method); the spot method's transfer-function DSP is
+the ISO 10534-2:1998 routine of the [Impedance Tube](https://jmrplens.github.io/phonometry/materials/absorbers/impedance-tube/)
+guide. Both road standards have since been revised (ISO 13472-1:2022,
+ISO 13472-2:2025); the earlier editions are the implemented ones. Numerical
+conformance against the standards' worked examples and closed forms is
+tracked in [CONFORMANCE.md](https://jmrplens.github.io/phonometry/reference/conformance/).
+
+---

@@ -1,0 +1,412 @@
+---
+title: "Potencia acústica por barrido de intensidad"
+description: "El nivel de potencia acústica LW a partir de la intensidad acústica barrida: la determinación de ingeniería y de inspección de ISO 9614-2 con los indicadores de campo FpI y F+/- y el grado alcanzado por banda, el método de barrido de precisión de ISO 9614-3 con su marcado de no aplicable, y la ficha de ensayo de estilo acreditado."
+references:
+  - type: book
+    authors: ["Fahy, F. J."]
+    year: 1995
+    title: "Sound intensity"
+    edition: "2.ª ed."
+    publisher: "E&FN Spon"
+    doi: "10.4324/9780203475386"
+    note: "ISBN 978-0-419-19810-9. La monografía sobre el flujo de energía sonora: por qué la intensidad separa la energía que sale de la fuente de la energía estacionaria que solo pasa, detrás de ambos métodos de barrido."
+  - type: standard
+    organization: "International Organization for Standardization"
+    year: 1996
+    title: "Acoustics — Determination of sound power levels of noise sources using sound intensity — Part 2: Measurement by scanning"
+    designation: "ISO 9614-2:1996"
+    url: "https://www.iso.org/standard/21247.html"
+    note: "El método de barrido de la sección 1: las potencias parciales, los indicadores de campo FpI y F+/- y los criterios de grado."
+  - type: standard
+    organization: "International Organization for Standardization"
+    year: 2002
+    title: "Acoustics — Determination of sound power levels of noise sources using sound intensity — Part 3: Precision method for measurement by scanning"
+    designation: "ISO 9614-3:2002"
+    url: "https://www.iso.org/standard/24012.html"
+    note: "El método de barrido de grado 1 de la sección 2, sus indicadores de campo y el marcado de no aplicable del apartado 9.2."
+---
+
+import Video from '../../../../../components/Video.astro';
+import ThemeImage from '../../../../../components/ThemeImage.astro';
+import ReportPreview from '../../../../../components/ReportPreview.astro';
+
+Las vías de presión hasta el nivel de potencia acústica fallan exactamente
+donde viven las máquinas: en una nave donde las líneas vecinas no se pueden
+apagar. La **intensidad** acústica es el flujo neto de energía, así que
+distingue la energía que *sale* de la fuente de la energía estacionaria que
+solo atraviesa la superficie de medición, y los métodos de barrido
+construidos sobre ella toleran un ruido extraño que derrotaría a cualquier
+método de presión. Esta guía cubre los dos: la determinación de
+ingeniería/inspección de ISO 9614-2 con sus indicadores de campo y su grado
+alcanzado por banda, el barrido de precisión (grado 1) de ISO 9614-3 con
+sus criterios más estrictos, y la ficha de ensayo de estilo acreditado. La
+propia sonda, su sesgo por diferencias finitas y el método de puntos
+discretos de ISO 9614-1 viven en
+[Intensidad acústica (p-p)](/phonometry/es/devices/emission/intensity/); qué vía
+encaja con qué trabajo se sopesa en
+[Potencia acústica](/phonometry/es/devices/emission/sound-power/).
+
+## 1. Barrido de intensidad (ISO 9614-2)
+
+La **intensidad** acústica es el flujo neto de energía, así que distingue la
+energía que *sale* de la fuente de la energía estacionaria que solo atraviesa
+la superficie; por eso el método de intensidad tolera el ruido de fondo que
+derrotaría a los métodos de presión. Una sonda p-p (véase la
+[guía de Intensidad acústica](/phonometry/es/devices/emission/intensity/)) se barre de forma
+continua sobre cada uno de los $N$ segmentos de una superficie que encierra la
+fuente, informando de la intensidad normal con signo promediada por segmento
+$\langle I_{n,i} \rangle$.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_pp_probe_es.svg" alt="Una sonda de intensidad acústica p-p de dos micrófonos: dos micrófonos de presión separados por un espaciador, a partir de los cuales se estima el gradiente de presión y, por tanto, la intensidad normal" width="70%" />
+
+Las potencias parciales suman el total:
+
+$$
+P_i = \langle I_{n,i} \rangle\ S_i, \qquad P = \sum_i P_i, \qquad
+L_W = 10 \log_{10}\frac{P}{P_0},\quad P_0 = 1\ \text{pW} .
+$$
+
+<Video
+  name="anim_intensity_scan_power"
+  width={2400}
+  height={1350}
+  title="Barrido de intensidad sobre una caja de medición"
+  description="Una sonda p-p recorre el barrido en serpentina sobre la cara superior de la caja de medición mientras aparecen detrás las flechas de intensidad normal, y las potencias parciales de las cinco caras se acumulan en el nivel de potencia acústica L_W."
+/>
+
+Una banda en la que $P < 0$ (flujo neto entrante, de una fuente más fuerte
+fuera de la superficie) es **no determinable** y se informa como `NaN`. Dos
+indicadores de campo normativos cualifican cada banda. El **indicador
+superficial presión-intensidad** $F_{pI}$ mide cuán reactivo es el campo, y el
+**indicador de potencia parcial negativa** $F_{+/-}$ mide cuánta energía
+circula hacia dentro y hacia fuera:
+
+$$
+F_{pI} = [L_p] - L_W + 10 \log_{10}\frac{S}{S_0}, \qquad
+F_{+/-} = 10 \log_{10}\frac{\sum_i \lvert P_i \rvert}{\lvert \sum_i P_i \rvert} .
+$$
+
+La **capacidad dinámica** de la sonda $L_d = \delta_{pI0} - K$ (índice de
+intensidad residual de presión menos el factor de sesgo $K$, 10 dB para el
+grado 2 y 7 dB para el grado 3) debe superar $F_{pI}$ (criterio 1);
+$F_{+/-} \le 3\ \text{dB}$ es el criterio 2 (obligatorio para el grado 2); y
+los dos barridos repetidos deben coincidir dentro del límite $s$ de la Tabla 2
+por segmento (criterio 3). Una banda es de
+grado **ingeniería** cuando se cumplen los criterios 1, 2 y 3, de **inspección**
+cuando se cumplen 1 y 3, y en caso contrario `none`.
+
+```python
+import numpy as np
+from phonometry import emission
+
+# 6 segmentos de superficie x 6 bandas de octava: intensidad normal con signo (W/m^2)
+# de dos barridos repetidos, las áreas de los segmentos y el SPL superficial por segmento (dB).
+freqs = np.array([125, 250, 500, 1000, 2000, 4000], dtype=float)
+areas = np.full(6, 0.5)                                 # 0.5 m^2 por segmento
+rng = np.random.default_rng(0)
+scan1 = np.abs(rng.normal(1e-4, 2e-5, size=(6, 6)))     # (segmentos, bandas)
+scan2 = scan1 * (1.0 + rng.normal(0.0, 0.02, size=(6, 6)))
+pressure = np.full((6, 6), 80.0)
+
+res = emission.sound_power_intensity(
+    scan1, areas, normal_intensity_2=scan2, pressure_levels=pressure,
+    pressure_residual_index=12.0, frequencies=freqs,
+    band_type="octave", grade="engineering",
+)
+print(np.round(res.sound_power_level, 1))               # LW por banda
+print(round(res.sound_power_level_a, 1))                # LWA sobre las bandas determinables
+print(round(float(res.dynamic_capability_index[0]), 1)) # Ld = 12 - 10 = 2.0 dB
+print(round(float(res.surface_pressure_intensity_index[0]), 2))   # FpI
+print(list(res.achieved_grade))                         # grado por banda
+
+res.plot()   # espectro LW; bandas no positivas (indeterminables) con trama (requiere matplotlib)
+```
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sound_power_intensity_result_es.svg" alt="El espectro de nivel de potencia acústica por barrido de intensidad del ejemplo de ISO 9614-2, una barra por banda de octava de 125 Hz a 4 kHz todas cerca de 85 dB, con el total ponderado A de 90,9 dB(A) en el título" width="88%" />
+
+*Las potencias parciales $\langle I_{n,i} \rangle\,S_i$ de los seis segmentos
+suman el $L_W$ de cada banda; aquí todas las bandas tienen potencia neta
+positiva y superan los criterios de indicadores de campo en grado de
+ingeniería, así que las seis barras se sostienen, y el total ponderado A de
+90,9 dB(A) encabeza el título.*
+
+<details>
+<summary>Mostrar el código de esta figura</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import emission
+
+# 6 segmentos de superficie x 6 bandas de octava: intensidad normal con signo (W/m^2)
+# de dos barridos repetidos, las áreas de los segmentos y el SPL superficial por segmento (dB).
+freqs = np.array([125, 250, 500, 1000, 2000, 4000], dtype=float)
+areas = np.full(6, 0.5)                                 # 0.5 m^2 por segmento
+rng = np.random.default_rng(0)
+scan1 = np.abs(rng.normal(1e-4, 2e-5, size=(6, 6)))     # (segmentos, bandas)
+scan2 = scan1 * (1.0 + rng.normal(0.0, 0.02, size=(6, 6)))
+pressure = np.full((6, 6), 80.0)
+res = emission.sound_power_intensity(
+    scan1, areas, normal_intensity_2=scan2, pressure_levels=pressure,
+    pressure_residual_index=12.0, frequencies=freqs,
+    band_type="octave", grade="engineering",
+)
+
+# res es el SoundPowerIntensityResult calculado arriba. Una línea:
+res.plot(language="es")
+plt.show()
+
+# A mano: un espectro de barras de LW con el total ponderado A en el título.
+freqs = res.frequencies
+positions = np.arange(freqs.size)
+fig, ax = plt.subplots()
+ax.bar(positions, res.sound_power_level, width=0.7, color="#1f77b4")
+ax.set_xticks(positions)
+ax.set_xticklabels([f"{f:g}" for f in freqs], rotation=45, ha="right")
+ax.set_xlabel("Frecuencia [Hz]")
+ax.set_ylabel("Nivel de potencia acústica LW [dB]")
+ax.set_title(
+    f"Potencia acústica por barrido de intensidad (ISO 9614-2)  "
+    f"LWA = {res.sound_power_level_a:.1f} dB(A)")
+plt.show()
+```
+
+</details>
+
+Suministrar `normal_intensity_2` (el segundo barrido) promedia ambos para las
+potencias parciales y evalúa el criterio 3; `pressure_levels` habilita
+$F_{pI}$; `pressure_residual_index` ($\delta_{pI0}$) más un segundo barrido
+habilita el grado
+alcanzado por banda. La intensidad por diferencias finitas de la sonda tiene un
+sesgo dependiente de la frecuencia que se trata en la
+[guía de intensidad](/phonometry/es/devices/emission/intensity/).
+
+### Parámetros de `sound_power_intensity()`
+
+| Parámetro | Tipo | Unidades | Rango / valor por defecto | Notas |
+| :--- | :--- | :--- | :--- | :--- |
+| `normal_intensity` | array 2D | W/m² | `(N_seg, N_bands)` | Intensidad normal con signo promediada por segmento $\langle I_{n,i} \rangle$ (primer barrido) |
+| `areas` | array 1D | m² | > 0, `(N_seg,)` | Áreas de los segmentos $S_i$ |
+| `normal_intensity_2` | array 2D | W/m² | misma forma | Segundo barrido → criterio 3 y promediado |
+| `pressure_levels` | array 2D | dB | misma forma | SPL por segmento $L_{pi}$ → $F_{pI}$ |
+| `pressure_residual_index` | float o array 1D | dB | — | $\delta_{pI0}$ → $L_d$ / criterio 1 |
+| `frequencies` | array 1D | Hz | centros nominales | $L_{WA}$ y límites de la Tabla 2 |
+| `band_type` | str | — | `'third'` (por defecto) / `'octave'` | Consulta de la Tabla 2 |
+| `grade` | str | — | `'engineering'` (por defecto) / `'survey'` | Selecciona $K$ |
+| `repeatability_limit` | float o array 1D | dB | por defecto Tabla 2 | Sobrescribe $s$ del criterio 3 |
+
+Devuelve un `SoundPowerIntensityResult`: `partial_power`/`partial_power_level`
+por segmento y banda, `sound_power`/`sound_power_level` (total de banda, `NaN`
+donde `negative_band`), `surface_pressure_intensity_index` ($F_{pI}$),
+`negative_partial_power_index` ($F_{+/-}$), `repeatability`,
+`dynamic_capability_index` ($L_d$), `achieved_grade`, `surface_area`,
+`sound_power_level_a` y `grade`.
+
+## 2. Barrido de intensidad de precisión (ISO 9614-3)
+
+ISO 9614-3 es el método de barrido de grado 1: como ISO 9614-2, integra la
+intensidad normal sobre una superficie que encierra la fuente, pero con un barrido
+continuo, criterios de indicadores de campo más estrictos y un presupuesto de
+incertidumbre explícito.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_intensity_scan_es.svg" alt="Barrido de intensidad acústica de precisión de ISO 9614-3: una fuente encerrada por una superficie de medición dividida en segmentos, una sonda de intensidad de dos micrófonos barrida a lo largo de un recorrido en serpentina sobre cada segmento, y la potencia acústica formada sumando la intensidad normal por el área del segmento, sujeta a los criterios de aceptación de los indicadores de campo" width="92%" />
+
+**Potencia y nivel (Cláusula 7).** La potencia parcial de cada segmento es
+$P_i = I_{n,i}\,S_i$; el total $P = \sum_i P_i$ da
+$L_W = 10\log_{10}(P/P_0)$, $P_0 = 1\ \text{pW}$. Una banda cuya intensidad neta es
+negativa (más potencia entrando que saliendo) se marca no aplicable en lugar de
+registrarse. Los indicadores de campo (variabilidad temporal $F_T$, los
+indicadores presión-intensidad con y sin signo, y la no uniformidad $F_S$)
+gobiernan los cinco criterios de aceptación.
+
+```python
+import numpy as np
+from phonometry import emission
+
+# Una superficie totalmente envolvente con una intensidad normal uniforme In = W/S
+# recupera exactamente la potencia de la fuente: LW = 10*lg(W/P0). Aquí W = 100 uW -> 80 dB.
+areas = np.array([0.5, 1.0, 0.25, 2.0])
+w = 1.0e-4
+i_n = np.full(areas.shape, w / float(areas.sum()))
+res = emission.sound_power_intensity_precision(i_n, areas)
+print(round(float(res.sound_power[0]), 6))          # 0.0001
+print(round(float(res.sound_power_level[0]), 2))    # 80.0
+```
+
+A lo largo de varias bandas el resultado lleva el $L_W$ por banda (`NaN` donde la
+potencia neta es no positiva), marca esas bandas como `not_applicable` y las
+dibuja con la línea única `result.plot()` de la figura de abajo:
+
+```python
+import numpy as np
+from phonometry import emission
+
+# Cuatro superficies parciales barridas sobre cinco bandas de tercio de octava. Cada
+# celda de partial_intensity es la intensidad normal con signo In_i (W/m^2); areas son
+# las áreas de las superficies parciales Si. La banda de 250 Hz tiene potencia neta
+# negativa (un campo localmente reactivo), así que ISO 9614-3 la marca no aplicable (cláusula 9.2) -> NaN.
+freqs = np.array([250, 500, 1000, 2000, 4000], float)
+areas = np.array([0.5, 1.0, 0.75, 0.5])
+base_intensity = np.array([2.0e-6, 8.0e-6, 2.0e-5, 1.0e-5, 3.0e-6])
+partial_intensity = base_intensity[None, :] * np.array([1.0, 1.1, 0.9, 1.05])[:, None]
+partial_intensity[:, 0] = [2.0e-6, -3.0e-6, -4.0e-6, -1.0e-6]   # banda de potencia neta negativa
+
+result = emission.sound_power_intensity_precision(partial_intensity, areas, frequencies=freqs)
+print(result.not_applicable_band.tolist())   # [True, False, False, False, False]
+print(round(result.sound_power_level_a, 1))   # 80.6
+result.plot()   # espectro LW; la banda no aplicable con trama (requiere matplotlib)
+```
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/intensity_scan_power_es.svg" alt="El espectro de nivel de potencia acústica del barrido de intensidad de precisión sobre cinco bandas de tercio de octava, cuatro barras determinadas y una banda de 250 Hz con trama y en gris marcada como no aplicable porque su intensidad neta es negativa, con el total ponderado A de 80,6 dB(A) en el título" width="88%" />
+
+*La banda de 250 Hz da un neto negativo (más energía entrando que saliendo), así que
+ISO 9614-3 la declara no aplicable; la figura la trama y la agrisa mientras las
+cuatro bandas determinadas y el total ponderado A se mantienen.*
+
+<details>
+<summary>Mostrar el código de esta figura</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import emission
+
+# Cuatro superficies parciales barridas sobre cinco bandas de tercio de octava. Cada
+# celda de partial_intensity es la intensidad normal con signo In_i (W/m^2); areas son
+# las áreas de las superficies parciales Si. La banda de 250 Hz tiene potencia neta
+# negativa (un campo localmente reactivo), así que ISO 9614-3 la marca no aplicable (cláusula 9.2) -> NaN.
+freqs = np.array([250, 500, 1000, 2000, 4000], float)
+areas = np.array([0.5, 1.0, 0.75, 0.5])
+base_intensity = np.array([2.0e-6, 8.0e-6, 2.0e-5, 1.0e-5, 3.0e-6])
+partial_intensity = base_intensity[None, :] * np.array([1.0, 1.1, 0.9, 1.05])[:, None]
+partial_intensity[:, 0] = [2.0e-6, -3.0e-6, -4.0e-6, -1.0e-6]   # banda de potencia neta negativa
+result = emission.sound_power_intensity_precision(partial_intensity, areas, frequencies=freqs)
+
+# result es el PrecisionIntensityResult calculado arriba. Una línea:
+result.plot(language="es")
+plt.show()
+
+# A mano: bandas determinadas como barras de LW; una banda no aplicable (su LW es NaN)
+# se señala con una franja gris y con trama a plena altura en lugar de una barra de altura cero.
+freqs = result.frequencies
+positions = np.arange(freqs.size)
+neg = result.not_applicable_band
+lw = np.nan_to_num(result.sound_power_level)
+fig, ax = plt.subplots()
+ax.bar(positions[~neg], lw[~neg], width=0.7, color="#1f77b4")
+for pos in positions[neg]:
+    ax.axvspan(pos - 0.35, pos + 0.35, facecolor="#888888", alpha=0.28,
+               hatch="//", edgecolor="#888888")
+ax.set_xticks(positions)
+ax.set_xticklabels([f"{f:g}" for f in freqs], rotation=45, ha="right")
+ax.set_xlabel("Frecuencia [Hz]")
+ax.set_ylabel("Nivel de potencia acústica LW [dB]")
+ax.set_title(
+    f"Barrido de intensidad de precisión (ISO 9614-3)  "
+    f"LWA = {result.sound_power_level_a:.1f} dB(A)")
+plt.show()
+```
+
+</details>
+
+## 3. El informe de medición (`.report()`)
+
+El resultado de barrido por intensidad (`SoundPowerIntensityResult`,
+ISO 9614-2) escribe mediante su propio `.report()` una ficha PDF de una
+página con el formato de una hoja de ensayo de potencia acústica,
+compartiendo el diseño y el contenedor `ReportMetadata` de la
+[ficha de los métodos de presión](/phonometry/es/devices/emission/sound-power-pressure/#informe-de-medicion).
+La línea de base normativa nombra la ISO 9614-2:1996 y el grado de
+medición, la tabla por bandas lista el nivel de potencia acústica de banda
+$L_W$ derivado de la intensidad, y el recuadro del $L_{WA}$ recoge el $L_W$
+total, la superficie de medición $S$ y el grado de determinación (el resultado
+por intensidad no tiene incertidumbre expandida $U$). `verbose=True` añade los
+indicadores de campo $F_{pI}$ (superficial de presión-intensidad) y $F_{+/-}$
+(potencia parcial negativa) y el grado alcanzado por banda; la tira de base
+indica el modelo de potencia parcial (las potencias parciales de segmento
+$P_i = I_{n,i} S_i$ que suman $P$) y los criterios de calificación del Anexo B.
+Una banda cuya potencia neta no es positiva no es determinable (apartado 9.2) y
+se imprime una raya.
+
+```python
+import numpy as np
+from phonometry import ReportMetadata, emission
+
+freqs = np.array([125, 250, 500, 1000, 2000, 4000], float)
+# Seis segmentos iguales de 0,5 m^2 (S = 3,0 m^2); un espectro de intensidad
+# normal uniforme barrido dos veces, con el SPL de superficie y el índice
+# residual del instrumento que califican cada banda en grado de ingeniería.
+intensity = np.array([0.6e-4, 1.0e-4, 1.5e-4, 1.4e-4, 0.9e-4, 0.5e-4])
+scan = np.tile(intensity, (6, 1))
+res = emission.sound_power_intensity(
+    scan, np.full(6, 0.5), normal_intensity_2=scan.copy(),
+    pressure_levels=np.full((6, 6), 80.0), pressure_residual_index=15.0,
+    frequencies=freqs, band_type="octave", grade="engineering",
+)
+
+res.report(
+    "sound_power_intensity.pdf",
+    metadata=ReportMetadata(
+        client="Planta de fabricación de ejemplo",
+        specimen="Grupo hidráulico (de suelo)",
+        test_room="Nave con ruido de fondo estacionario",
+        instrumentation="Sonda de intensidad p-p clase 1 (IEC 61043), n/s 0042",
+        laboratory="Ejemplo de referencia de phonometry",
+        report_id="EXAMPLE-9614",
+        requirement=93.0,
+    ),
+    language="es",
+)   # LWA = 90,9 dB(A) re 1 pW -> límite declarado 93 dB(A): CUMPLE
+```
+
+La ficha de ejemplo se regenera con `make reports` y se mantiene renderizada en
+el repositorio; haz clic en la vista previa para abrir el PDF.
+
+<ReportPreview
+	name="iso9614_sound_power_intensity_example"
+	title="Informe de ejemplo de potencia acústica por intensidad ISO 9614-2 (PDF)"
+	description="Ficha de una página de determinación de potencia acústica por intensidad ISO 9614-2: un encabezado con el cliente, la fuente de ruido, el entorno de ensayo en nave y la sonda de intensidad y el clima, la tabla en bandas de octava (125 Hz a 4 kHz) de niveles de potencia acústica de banda LW derivados de la intensidad, el espectro de potencia acústica LW(f) con eje de bandas nominal, el recuadro con el nivel de potencia acústica ponderado A LWA = 90,9 dB(A) re 1 pW con el LW total = 92,5 dB, la superficie de medición S = 3,00 m2 y el grado de ingeniería, y un veredicto CUMPLE frente al límite declarado de 93 dB(A), cerrada por una tira de base que indica el modelo de potencia parcial, los indicadores de campo FpI y F+/- y los criterios de calificación del Anexo B."
+	caption="Ficha de potencia acústica por intensidad (SoundPowerIntensityResult.report), un barrido ISO 9614-2 de grado de ingeniería con los indicadores de campo y el LWA en recuadro."
+/>
+
+
+## Qué cubre esta guía
+
+**Cubierto.** La determinación por barrido de ISO 9614-2
+(`sound_power_intensity`): las potencias parciales, los indicadores de
+campo $F_{pI}$ (presión-intensidad superficial) y $F_{+/-}$ (potencia parcial
+negativa), la capacidad dinámica $L_d$, el criterio de repetibilidad, el
+grado alcanzado por banda y el marcado de no aplicable del apartado 9.2
+para bandas con flujo neto entrante. La determinación de precisión de
+ISO 9614-3 (`sound_power_intensity_precision`) con su propio marcado de no
+aplicable. Ambos resultados presentan la ficha de potencia acústica de
+estilo acreditado mediante `.report()`.
+
+**No cubierto.** ISO 9614-1, el método de intensidad de puntos fijos
+discretos, no es una de las vías de aquí: solo se reutilizan sus
+indicadores de campo, y la determinación de potencia por puntos discretos
+en sí pertenece a la
+[guía de intensidad acústica](/phonometry/es/devices/emission/intensity/). El sesgo
+por diferencias finitas de la sonda y el índice de intensidad residual de
+presión son propiedades medidas del instrumento, cubiertas en la misma
+guía. La elección entre las cinco vías, y la declaración ISO 4871 que un
+resultado alimenta, viven en
+[Potencia acústica](/phonometry/es/devices/emission/sound-power/).
+
+## Véase también
+
+- [Potencia acústica](/phonometry/es/devices/emission/sound-power/): la elección entre
+  las cinco vías de determinación, los grados de precisión y la declaración
+  de emisión sonora de ISO 4871.
+- [Intensidad acústica (p-p)](/phonometry/es/devices/emission/intensity/): la sonda de
+  dos micrófonos, su sesgo por diferencias finitas y los indicadores de
+  campo de ISO 9614-1 que sustentan los métodos de barrido.
+- [Potencia acústica por métodos de presión (ISO 3744 / ISO 3746 / ISO 3745)](/phonometry/es/devices/emission/sound-power-pressure/):
+  las vías de superficie envolvente y anecoica para emplazamientos
+  silenciosos.
+- [Potencia acústica en cámara reverberante (ISO 3741)](/phonometry/es/devices/emission/sound-power-reverberation/):
+  la vía de precisión en campo difuso en una sala de laboratorio
+  cualificada.
+- [Teoría](/phonometry/es/reference/theory/environment-transport/): las
+  derivaciones de los indicadores de campo.
+- Referencia de la API: [`emission.sound_power_intensity`](/phonometry/es/reference/api/power/sound-power-intensity/).

@@ -1,0 +1,1541 @@
+# phonometry: signal filters
+
+Part of https://jmrplens.github.io/phonometry/llms.txt. Full text of the pages in this area.
+
+---
+
+<!-- source: docs/filter-banks.md | canonical: https://jmrplens.github.io/phonometry/signal/filters/filter-banks/ -->
+Source: https://jmrplens.github.io/phonometry/signal/filters/filter-banks/
+
+# Filter Banks
+
+phonometry supports several filter types, each with its own transfer function
+characteristic. All banks place their **−3 dB points on the ANSI S1.11 band
+edges**, so band levels are comparable across architectures.
+
+## 1. Fractional octave bands: the math
+
+IEC 61260-1:2014 builds every band from the base-10 octave ratio
+$G = 10^{3/10} \approx 1.99526$ (so "one octave" is *not* exactly 2). For
+band fraction $1/b$, the mid frequencies and band edges follow (5.2-5.5):
+
+$$
+f_m = 1000 \cdot G^{x/b} \quad (b\ \text{odd}), \qquad
+f_1 = f_m G^{-1/2b}, \quad f_2 = f_m G^{+1/2b}
+$$
+
+so every 1/3-octave band spans $G^{1/3} \approx 1.2589 \approx 10^{1/10}$:
+ten bands per decade, which is why the nominal frequencies (25, 31.5, 40 …)
+repeat scaled by 10. phonometry designs each band as an SOS cascade whose
+−3 dB points land exactly on $f_1$ and $f_2$ for every architecture; for
+Chebyshev II, Elliptic and Bessel that requires pre-warping the analytic
+band-edge mapping rather than trusting SciPy's default parametrization.
+
+### Poles, zeros and stability
+
+A digital band-pass filter is a constellation of poles and zeros in the
+z-plane: zeros at or near DC and Nyquist pin the response down far from the
+band (to the stopband floor, for equiripple designs), and the poles cluster
+just inside the unit circle at the angles
+$\omega = 2\pi f / f_s$ the passband spans. Two intuitions follow. First,
+selectivity is proximity: the closer the poles sit to the unit circle, the
+sharper the band and the longer the filter rings (the group-delay peaks of
+section 4 are that ringing, measured). Second, stability is a margin, not a
+property of the architecture: an IIR filter is stable only while every pole
+stays strictly inside the unit circle, and a narrow band at a high sample
+rate pushes the poles outward (pole radius $\approx 1 - \pi B / f_s$ for
+bandwidth $B$) and squeezes them together, until double-precision
+coefficients can no longer represent their positions accurately.
+Second-order sections (SOS) defuse half of the problem: each pole pair keeps
+its own coefficients, so rounding errors stay local instead of compounding
+through one high-order polynomial. The other half, the tiny $B / f_s$ ratio
+itself, is what decimation fixes.
+
+### Multirate decimation
+
+A 25 Hz one-third-octave band at 48 kHz spans about 5.8 Hz, 0.024 %
+of Nyquist, with coefficients so stiff they go numerically unstable. The bank
+avoids that by filtering low bands at a decimated rate:
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_multirate_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_multirate.svg" alt="Multirate decimation: high bands filtered at the input rate, low bands after anti-alias low-pass and decimation so the SOS sections stay numerically healthy" width="92%"></picture>
+
+Decimating by $M$ rescales the problem: the same 5.8 Hz bandwidth becomes
+$M$ times larger relative to the new Nyquist, the pole radius pulls away from
+the unit circle, and the SOS coefficients return to a well-conditioned range.
+The price is bookkeeping the bank pays internally: an anti-alias low-pass must
+run before every decimation stage, because a component above the new Nyquist
+that folds down lands *inside* the low bands being measured, and no later
+filter can remove it.
+
+### Aliasing pitfalls
+
+The bank protects its own decimation stages, but it can only analyze what the
+capture chain delivered:
+
+- **Fold-down at the ADC.** Energy above $f_s/2$ that reaches the converter
+  without an analog anti-alias filter folds into the analysis range and is
+  indistinguishable from real in-band sound. Sound cards filter this
+  internally; custom instrumentation chains may not.
+- **Cheap resampling.** Converting a 44.1 kHz recording to 48 kHz with a
+  low-quality resampler leaves images that bias the highest bands. Use a
+  polyphase resampler (`scipy.signal.resample_poly`) or, simpler, analyze at
+  the native rate: every phonometry function takes `fs` directly.
+- **Bands near Nyquist.** A band whose upper edge approaches $f_s/2$ cannot
+  realize its design response: the bilinear transform compresses the
+  frequency axis there (the same effect the weighting filters counter with
+  `high_accuracy`). Keep the top band edge comfortably below Nyquist or raise
+  `fs`, and let `verify_filter_class` report how much margin is left.
+
+The band mathematics above is shared by every architecture. How the
+architectures actually differ, the comparison at the −3 dB crossover, the
+full 1/1 and 1/3 octave response gallery and the usage examples per
+architecture, up to the Linkwitz-Riley crossover, is
+[Filter Architecture Gallery](https://jmrplens.github.io/phonometry/signal/filters/filter-gallery/).
+
+## 2. `octave_filter()` / `OctaveFilterBank` parameters
+
+| Parameter | Type | Units | Range / default | Notes |
+| :--- | :--- | :--- | :--- | :--- |
+| `x` | 1D or 2D array | digital units | non-empty | 2D is `[channels, samples]` |
+| `fs` | int | Hz | > 0 | |
+| `fraction` | int | — | default `1`; common `3`; any $b \ge 1$ | Bands per octave = $b$ |
+| `order` | int | — | default `6` | SOS order per band |
+| `limits` | list `[lo, hi]` | Hz | default `[12, 20000]` | Analysis range |
+| `filter_type` | str | — | `'butter'` (default), `'cheby1'`, `'cheby2'`, `'ellip'`, `'bessel'` | See the [Filter Architecture Gallery](https://jmrplens.github.io/phonometry/signal/filters/filter-gallery/) |
+| `ripple` / `attenuation` | float | dB | `ripple` default `0.1`; `attenuation` default `72.0` | Passband ripple / stopband attenuation (cheby/ellip); `cheby2` needs `attenuation` $\ge 70$ for class 1, since scipy pins its equiripple floor at exactly this value |
+| `show` | bool | — | default `False` | Plot the bank response (needs matplotlib) |
+| `sigbands` | bool | — | default `False` | Also return the per-band time signals |
+| `mode` | str | — | `'rms'` (default), `'peak'`, `'sum'` | Per-band statistic returned |
+| `nominal` | bool | — | default `False` | Return nominal band labels (e.g. `1000`) instead of exact centre frequencies |
+| `detrend` | bool | — | default `True` | Remove each band's DC offset before the level (improves low-frequency accuracy) |
+| `calibration_factor` | float | — | default `1.0` | Scales the input to pascals (see the Calibration guide) |
+| `dbfs` | bool | — | default `False` | Reference levels to digital full scale instead of 20 µPa |
+| `plot_file` | str or `None` | — | default `None` | Save the bank-response plot to this path |
+| `zero_phase` | bool | — | default `False` | Forward-backward filtering (offline) |
+| `stateful` / `steady_ic` (class) | bool | — | default `False` | Streaming state; see [Block Processing](https://jmrplens.github.io/phonometry/signal/filters/block-processing/) |
+
+`verify_filter_class(bank)` checks the designed bank against the IEC 61260-1
+Table 1 acceptance limits and reports the class (`1`, `2` or `None` if outside both) with per-band
+margins.
+
+## 3. Parametric EQ (`ParametricEQ`)
+
+Biquad equalizer sections per the **RBJ Audio EQ Cookbook**
+(Bristow-Johnson): peaking (bell), low/high shelf, low/high-pass, band-pass
+(constant 0 dB peak or constant skirt gain), notch and all-pass, each
+parameterized by `fs`, `f0`, `gain_db` and one of `q`, `bw` (bandwidth in
+octaves) or `slope` exactly as the cookbook defines them. Sections cascade
+as a numerically robust SOS chain, and the design is closed-form exact: a
+peaking section passes exactly `gain_db` at `f0` and exactly 0 dB at DC and
+Nyquist, shelves land exactly on `gain_db` at their shelved end, and the
+all-pass has unit magnitude everywhere (only the phase turns).
+
+```python
+import numpy as np
+from phonometry import EQSection, ParametricEQ
+
+fs = 48000
+rng = np.random.default_rng(1)
+x = rng.standard_normal(fs)                 # one second of noise
+
+eq = ParametricEQ(fs, [
+    EQSection("lowshelf", 100.0, gain_db=4.0),
+    EQSection("peaking", 1000.0, gain_db=-6.0, bw=1.0),  # one-octave cut
+    EQSection("highshelf", 8000.0, gain_db=3.0),
+])
+y = eq.filter(x)              # apply the cascade
+res = eq.response()           # frozen result carrying the SOS cascade
+axes = res.plot()             # magnitude + phase of the cascade
+```
+
+For block processing pass `stateful=True` (the same convention as
+`WeightingFilter`); the one-shot helper is `parametric_eq(x, fs, sections)`.
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/parametric_eq_family_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/parametric_eq_family.svg" alt="Magnitude responses of the RBJ Audio EQ Cookbook biquad family: peaking, shelves, low/high-pass, band-pass and notch" width="80%"></picture>
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+from phonometry import EQSection, ParametricEQ
+
+fs = 48000
+family = [
+    EQSection("peaking", 1000.0, gain_db=6.0, q=1.4),
+    EQSection("lowshelf", 125.0, gain_db=6.0),
+    EQSection("highshelf", 4000.0, gain_db=-6.0),
+    EQSection("lowpass", 10000.0),
+    EQSection("highpass", 50.0),
+    EQSection("bandpass", 500.0, q=2.0),
+    EQSection("notch", 2000.0, q=6.0),
+]
+fig, ax = plt.subplots(figsize=(10, 6))
+for section in family:
+    res = ParametricEQ(fs, [section]).response(f_min=20.0, f_max=20000.0)
+    ax.semilogx(res.frequencies, res.magnitude_db,
+                label=f"{section.filter_type} @ {section.f0:g} Hz")
+ax.set(xlim=(20, 20000), ylim=(-27, 9),
+       xlabel="Frequency [Hz]", ylabel="Magnitude [dB]")
+ax.grid(True, which="both", alpha=0.3)
+ax.legend(loc="lower center", ncols=2, fontsize=9)
+plt.show()
+```
+
+</details>
+
+Everything above is design. Proving that a designed bank meets a
+performance class of IEC 61260-1, band by band and with its margin in
+decibels, is [Filter class verification](https://jmrplens.github.io/phonometry/signal/filters/filter-compliance/): the Table 1
+acceptance mask, the stricter class 0 of the withdrawn 1995 edition, what a
+class buys in a measurement, and the accredited compliance fiche.
+
+## 4. Signal Decomposition and Stability
+
+By setting `sigbands=True`, you can retrieve the time-domain components of each
+band. This allows for advanced analysis or comparing how different architectures
+(e.g., Butterworth vs Chebyshev) affect the signal phase and transient response.
+
+```python
+import numpy as np
+from phonometry import filters
+
+# 1. Generate a signal (Sum of 250Hz and 1000Hz)
+fs = 48000
+t = np.linspace(0, 0.5, int(fs * 0.5), endpoint=False)
+y = np.sin(2 * np.pi * 250 * t) + np.sin(2 * np.pi * 1000 * t)
+
+# 2. Compare architectures (Butterworth vs Chebyshev II)
+spl_b, freq, xb_butter = filters.octave_filter(y, fs=fs, fraction=1, sigbands=True, filter_type='butter')
+spl_c2, _, xb_cheby2 = filters.octave_filter(y, fs=fs, fraction=1, sigbands=True, filter_type='cheby2')
+
+# 'xb_butter' and 'xb_cheby2' contain the time-domain signals per band
+```
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/signal_decomposition_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/signal_decomposition.svg" alt="Time-domain band decomposition comparing Butterworth and Chebyshev II, including the impulse response" width="80%"></picture>
+
+*The plot compares the **Butterworth** (solid blue) and **Chebyshev II** (dashed
+red) responses. The bottom plot shows the **Impulse Response**, highlighting the
+differences in stability and transient decay.*
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import filters
+
+fs = 48000
+t = np.linspace(0, 0.5, int(fs * 0.5), endpoint=False)
+y = np.sin(2 * np.pi * 250 * t) + np.sin(2 * np.pi * 1000 * t)
+
+bank_b = filters.OctaveFilterBank(fs=fs, fraction=1, order=6, limits=[100.0, 2000.0])
+bank_c = filters.OctaveFilterBank(fs=fs, fraction=1, order=6, limits=[100.0, 2000.0],
+                          filter_type="cheby2")
+_, freq, xb_butter = bank_b.filter(y, sigbands=True)
+_, _, xb_cheby2 = bank_c.filter(y, sigbands=True)
+
+fig, axes = plt.subplots(len(freq), 1, figsize=(9, 2 * len(freq)), sharex=True)
+for ax, fc, xb, xc in zip(axes, freq, xb_butter, xb_cheby2):
+    ax.plot(t, xb, label="Butterworth")
+    ax.plot(t, xc, "--", label="Chebyshev II")
+    ax.set_title(f"{fc:.0f} Hz band")
+    ax.set_xlim(0, 0.04)
+axes[0].legend()
+axes[-1].set_xlabel("Time [s]")
+plt.tight_layout()
+plt.show()
+```
+
+</details>
+
+> [!NOTE]
+> **Why do the signals look shifted in time?**
+> Digital IIR filters (like Butterworth or Chebyshev) have **non-linear phase
+> responses**, which results in frequency-dependent **Group Delay**. In the 250 Hz
+> band, you can see that the Chebyshev II filter has a different propagation delay
+> compared to the Butterworth filter. This is a normal physical property of these
+> architectures: more aggressive frequency roll-offs usually come at the cost of
+> higher group delay and phase distortion.
+
+### Group delay, quantified
+
+The group delay $\tau_g(\omega) = -\frac{d\phi(\omega)}{d\omega}$ of the
+1 kHz octave band shows the trade-off directly: Bessel stays nearly flat across
+the passband (transient shapes survive), while Chebyshev I and Elliptic pay for
+their steep roll-off with strong delay peaks at the band edges.
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/group_delay_comparison_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/group_delay_comparison.svg" alt="Group delay of the 1 kHz octave band for the five architectures: Bessel nearly flat, Chebyshev and Elliptic peaking at the band edges" width="80%"></picture>
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from scipy.signal import group_delay
+from phonometry import filters
+
+fs = 48000
+w = np.logspace(np.log10(500), np.log10(2000), 1024)
+fig, ax = plt.subplots(figsize=(9, 5))
+for ftype in ("butter", "cheby1", "cheby2", "ellip", "bessel"):
+    bank = filters.OctaveFilterBank(fs, fraction=1, order=6, limits=[800, 1200],
+                            filter_type=ftype)
+    idx = int(np.argmin(np.abs(np.array(bank.freq) - 1000)))
+    fsd = fs / bank.factor[idx]
+    # Group delay of an SOS cascade = sum of the sections' group delays
+    gd = sum(group_delay((sec[:3], sec[3:]), w=w, fs=fsd)[1]
+             for sec in bank.sos[idx])
+    ax.semilogx(w, gd / fsd * 1000, label=ftype)
+ax.set(xlim=(500, 2000), xlabel="Frequency [Hz]", ylabel="Group delay [ms]")
+ax.grid(True, which="both", alpha=0.3)
+ax.legend()
+plt.show()
+```
+
+</details>
+
+## 5. Zero-phase filtering
+
+For offline analysis you can eliminate group delay entirely: `zero_phase=True`
+filters each band forward-backward (`scipy.signal.sosfiltfilt`), keeping band
+signals time-aligned with the input. The effective attenuation doubles and the
+effective passband narrows, lowering the measured broadband band level by
+~0.2 to 0.3 dB per band (a pure in-band tone is unaffected); prefer forward
+filtering when the absolute band SPL must match single-pass conventions, and
+reserve zero-phase for when the temporal envelope matters (e.g. reverberation
+decay). The option is incompatible with stateful (block) processing.
+
+```python
+import numpy as np
+from phonometry import filters
+
+fs = 48000
+t = np.linspace(0, 0.5, int(fs * 0.5), endpoint=False)
+y = np.sin(2 * np.pi * 250 * t) + np.sin(2 * np.pi * 1000 * t)
+
+bank = filters.OctaveFilterBank(fs=48000, fraction=3)
+spl, freq, xb = bank.filter(y, sigbands=True, zero_phase=True)
+```
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/zero_phase_comparison_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/zero_phase_comparison.svg" alt="Causal versus zero-phase filtering of a tone burst: the zero-phase output stays time-aligned with the input" width="80%"></picture>
+
+*Causal filtering delays the burst by the filter's group delay; zero-phase
+filtering keeps it aligned with the input.*
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import filters
+
+fs = 48000
+t = np.linspace(0, 0.15, int(fs * 0.15), endpoint=False)
+x = np.zeros_like(t)                      # 250 Hz tone burst mid-frame
+start, end = int(0.05 * fs), int(0.10 * fs)
+x[start:end] = np.sin(2 * np.pi * 250 * t[start:end]) * np.hanning(end - start)
+
+bank = filters.OctaveFilterBank(fs=fs, fraction=1, order=6, limits=[200.0, 300.0])
+_, _, fwd = bank.filter(x, sigbands=True, calculate_level=False)
+_, _, zp = bank.filter(x, sigbands=True, calculate_level=False,
+                       zero_phase=True)
+
+fig, ax = plt.subplots(figsize=(9, 4.5))
+ax.plot(t, x, color="gray", alpha=0.5, label="Input burst (250 Hz)")
+ax.plot(t, fwd[0], label="Causal (group delay)")
+ax.plot(t, zp[0], "--", label="zero_phase=True (aligned)")
+ax.set(xlabel="Time [s]", ylabel="Amplitude")
+ax.legend()
+plt.show()
+```
+
+</details>
+
+## Quick answers
+
+### How are fractional-octave centre frequencies and band edges defined?
+
+IEC 61260-1:2014 (clauses 5.2-5.5) builds every band from the base-10
+octave ratio $G = 10^{3/10} \approx 1.99526$, so one octave is not exactly
+2. Mid frequencies follow $f_m = 1000 \cdot G^{x/b}$ (for odd $b$) and the
+edges are $f_1 = f_m G^{-1/2b}$ and $f_2 = f_m G^{+1/2b}$; every
+one-third-octave band spans $G^{1/3} \approx 1.2589$, ten bands per decade.
+
+## References
+
+- International Electrotechnical Commission. (2014). *Electroacoustics —
+  Octave-band and fractional-octave-band filters — Part 1: Specifications*
+  (IEC 61260-1:2014).
+  [IEC webstore](https://webstore.iec.ch/en/publication/5063).
+  The band-edge mathematics of section 1 and the nominal band labels behind
+  every bank designed here.
+- Oppenheim, A. V., & Schafer, R. W. (2010). *Discrete-time signal processing*
+  (3rd ed.). Pearson. ISBN 978-0-13-198842-2.
+  [Open Library record](https://openlibrary.org/isbn/9780131988422).
+  The pole-zero, stability and multirate theory condensed in section 1: SOS
+  cascades, the bilinear transform and decimation.
+- Bristow-Johnson, R. *Audio EQ Cookbook*. Republished as a W3C Working
+  Group Note (ed. R. Toy), 8 June 2021.
+  [w3.org/TR/audio-eq-cookbook](https://www.w3.org/TR/audio-eq-cookbook/).
+  The biquad coefficient recipes and the Q / bandwidth / shelf-slope
+  parameterization behind `ParametricEQ` (section 3).
+- Smith, J. O. *Introduction to digital filters with audio applications*
+  (online book). Center for Computer Research in Music and Acoustics (CCRMA),
+  Stanford University.
+  [ccrma.stanford.edu/~jos/filters](https://ccrma.stanford.edu/~jos/filters/).
+  A free companion treatment of digital-filter design and analysis, from
+  pole-zero geometry to filter stability.
+
+## Standards
+
+IEC 61260-1:2014, *Electroacoustics — Octave-band and
+fractional-octave-band filters — Part 1: Specifications* — the base-10 mid
+frequencies and band edges of §1 (5.2-5.5) and the nominal band labels; its
+Table 1 class acceptance limits are verified in
+[Filter class verification](https://jmrplens.github.io/phonometry/signal/filters/filter-compliance/). ANSI S1.11-2004,
+*Octave-Band and Fractional-Octave-Band … Filters*: the band-edge convention
+on which every bank places its −3 dB points. ISO 266: the preferred-frequency
+series behind the nominal band labels reported by `nominal_frequencies`.
+
+---
+
+
+<!-- source: docs/filter-gallery.md | canonical: https://jmrplens.github.io/phonometry/signal/filters/filter-gallery/ -->
+Source: https://jmrplens.github.io/phonometry/signal/filters/filter-gallery/
+
+# Filter Architecture Gallery
+
+Choosing a filter architecture is a trade-off: selectivity, passband ripple
+and phase behaviour cannot all be optimal at once, and each of the five
+architectures phonometry offers resolves the trade-off differently. Because
+every one of them places its **−3 dB points on the ANSI S1.11 band edges**,
+the choice changes how a band rejects its neighbours and how it treats
+transients, not where the band sits. This page puts the architectures side
+by side: the comparison at the −3 dB crossover, the full 1/1 and 1/3 octave
+response gallery, usage examples per architecture, and the Linkwitz-Riley
+crossover for when the goal is splitting a signal rather than measuring
+bands.
+
+The design mathematics behind these banks (band edges, poles and zeros,
+multirate decimation) and the parameter reference live in
+[Filter Banks](https://jmrplens.github.io/phonometry/signal/filters/filter-banks/); proving that a designed bank meets a
+performance class of IEC 61260-1 is
+[Filter class verification](https://jmrplens.github.io/phonometry/signal/filters/filter-compliance/).
+
+## 1. Filter Comparison and Zoom
+
+We use Second-Order Sections (SOS) for all filters to ensure numerical stability.
+The following plot compares the architectures focusing on the -3 dB crossover point.
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/filter_type_comparison_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/filter_type_comparison.svg" alt="Magnitude response comparison of the five filter architectures for the 1 kHz octave band, with a zoom at the -3 dB crossover" width="80%"></picture>
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from scipy.signal import sosfreqz
+from phonometry import filters
+
+fs = 48000
+fig, ax = plt.subplots(figsize=(9, 5))
+for ftype in ("butter", "cheby1", "cheby2", "ellip", "bessel"):
+    # limits picks out the single 1 kHz octave band
+    bank = filters.OctaveFilterBank(fs, fraction=1, order=6, limits=[800, 1200],
+                            filter_type=ftype)
+    idx = int(np.argmin(np.abs(np.array(bank.freq) - 1000)))
+    fsd = fs / bank.factor[idx]           # rate the band actually runs at
+    w, h = sosfreqz(bank.sos[idx], worN=16384, fs=fsd)
+    ax.semilogx(w, 20 * np.log10(np.abs(h) + 1e-9), label=ftype)
+ax.axhline(-3, color="gray", linestyle=":", label="-3 dB")
+ax.set(xlim=(100, 8000), ylim=(-80, 5),
+       xlabel="Frequency [Hz]", ylabel="Magnitude [dB]")
+ax.grid(True, which="both", alpha=0.3)
+ax.legend()
+plt.show()
+```
+
+</details>
+
+| Type | Name | Usage Example | Best For |
+| :--- | :--- | :--- | :--- |
+| `butter` | **Butterworth** | `octave_filter(x, fs, filter_type='butter')` | General acoustic measurement. |
+| `cheby1` | **Chebyshev I** | `octave_filter(x, fs, filter_type='cheby1', ripple=0.1)` | Sharper roll-off at the cost of ripple. |
+| `cheby2` | **Chebyshev II** | `octave_filter(x, fs, filter_type='cheby2')` | Flat passband with stopband zeros. |
+| `ellip` | **Elliptic** | `octave_filter(x, fs, filter_type='ellip', ripple=0.1)` | Maximum selectivity. |
+| `bessel` | **Bessel** | `octave_filter(x, fs, filter_type='bessel')` | Preserving transient waveform shapes. |
+
+## 2. Gallery of Filter Bank Responses
+
+Full spectral view of the filter banks for Octave (1/1) and 1/3-Octave fractions.
+
+| Architecture | 1/1 Octave (Fraction=1) | 1/3 Octave (Fraction=3) |
+| :--- | :--- | :--- |
+| **Butterworth** | <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/filter_butter_fraction_1_order_6_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/filter_butter_fraction_1_order_6.svg" alt="Butterworth octave-band filter bank frequency response" width="100%"></picture> | <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/filter_butter_fraction_3_order_6_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/filter_butter_fraction_3_order_6.svg" alt="Butterworth one-third-octave filter bank frequency response" width="100%"></picture> |
+| **Chebyshev I** | <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/filter_cheby1_fraction_1_order_6_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/filter_cheby1_fraction_1_order_6.svg" alt="Chebyshev I octave-band filter bank frequency response" width="100%"></picture> | <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/filter_cheby1_fraction_3_order_6_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/filter_cheby1_fraction_3_order_6.svg" alt="Chebyshev I one-third-octave filter bank frequency response" width="100%"></picture> |
+| **Chebyshev II** | <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/filter_cheby2_fraction_1_order_6_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/filter_cheby2_fraction_1_order_6.svg" alt="Chebyshev II octave-band filter bank frequency response" width="100%"></picture> | <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/filter_cheby2_fraction_3_order_6_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/filter_cheby2_fraction_3_order_6.svg" alt="Chebyshev II one-third-octave filter bank frequency response" width="100%"></picture> |
+| **Elliptic** | <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/filter_ellip_fraction_1_order_6_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/filter_ellip_fraction_1_order_6.svg" alt="Elliptic octave-band filter bank frequency response" width="100%"></picture> | <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/filter_ellip_fraction_3_order_6_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/filter_ellip_fraction_3_order_6.svg" alt="Elliptic one-third-octave filter bank frequency response" width="100%"></picture> |
+| **Bessel** | <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/filter_bessel_fraction_1_order_6_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/filter_bessel_fraction_1_order_6.svg" alt="Bessel octave-band filter bank frequency response" width="100%"></picture> | <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/filter_bessel_fraction_3_order_6_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/filter_bessel_fraction_3_order_6.svg" alt="Bessel one-third-octave filter bank frequency response" width="100%"></picture> |
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+from phonometry import filters
+
+# One figure per architecture and fraction: the whole response gallery
+fs = 48000
+for ftype in ("butter", "cheby1", "cheby2", "ellip", "bessel"):
+    for fraction in (1, 3):
+        # show=True draws the bank's frequency response
+        filters.OctaveFilterBank(fs=fs, fraction=fraction, order=6,
+                                   limits=[12, 20000], filter_type=ftype,
+                                   show=True)
+```
+
+</details>
+
+## 3. Filter Usage and Examples
+
+### 1. Butterworth (`butter`)
+
+The Butterworth filter is known for its **maximally flat passband**. It is the
+standard choice for acoustic measurements where no ripple is allowed within the
+frequency bands.
+
+```python
+import numpy as np
+from phonometry import filters
+
+# A calibrated signal in Pa so the guide runs standalone
+fs = 48000
+x = 0.2 * np.sin(2 * np.pi * 1000 * np.arange(fs) / fs)
+
+# Standard one-third-octave measurement
+spl, freq = filters.octave_filter(x, fs, fraction=3, filter_type='butter')
+```
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/filter_butter_fraction_3_order_6_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/filter_butter_fraction_3_order_6.svg" alt="Butterworth one-third-octave filter bank frequency response" width="60%"></picture>
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+from phonometry import filters
+
+# Draw this bank's response (1/3 octave, order 6, Butterworth)
+filters.OctaveFilterBank(fs=48000, fraction=3, order=6, limits=[12, 20000],
+                           filter_type='butter', show=True)
+```
+
+</details>
+
+### 2. Chebyshev I (`cheby1`)
+
+Chebyshev Type I filters provide a **steeper roll-off** than Butterworth at the
+expense of ripples in the passband. Useful when high selectivity is needed near
+the cut-off frequencies.
+
+```python
+import numpy as np
+from phonometry import filters
+
+# A calibrated signal in Pa so the guide runs standalone
+fs = 48000
+x = 0.2 * np.sin(2 * np.pi * 1000 * np.arange(fs) / fs)
+
+# Selectivity with 0.1 dB passband ripple
+spl, freq = filters.octave_filter(x, fs, fraction=3, filter_type='cheby1', ripple=0.1)
+```
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/filter_cheby1_fraction_3_order_6_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/filter_cheby1_fraction_3_order_6.svg" alt="Chebyshev I one-third-octave filter bank frequency response" width="60%"></picture>
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+from phonometry import filters
+
+# Draw this bank's response (1/3 octave, order 6, Chebyshev I)
+filters.OctaveFilterBank(fs=48000, fraction=3, order=6, limits=[12, 20000],
+                           filter_type='cheby1', ripple=0.1, show=True)
+```
+
+</details>
+
+### 3. Chebyshev II (`cheby2`)
+
+Also known as Inverse Chebyshev, it has a **flat passband** and ripples in the
+stopband. It provides faster roll-off than Butterworth without affecting the
+signal in the passband. The stopband edges are placed automatically so that the
+−3 dB points land on the band edges (`attenuation` must be
+$> 3.01\ \text{dB}$).
+
+```python
+import numpy as np
+from phonometry import filters
+
+# A calibrated signal in Pa so the guide runs standalone
+fs = 48000
+x = 0.2 * np.sin(2 * np.pi * 1000 * np.arange(fs) / fs)
+
+# Flat passband, class-1 default 72 dB stopband attenuation
+spl, freq = filters.octave_filter(x, fs, fraction=3, filter_type='cheby2')
+```
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/filter_cheby2_fraction_3_order_6_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/filter_cheby2_fraction_3_order_6.svg" alt="Chebyshev II one-third-octave filter bank frequency response" width="60%"></picture>
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+from phonometry import filters
+
+# Draw this bank's response (1/3 octave, order 6, Chebyshev II)
+filters.OctaveFilterBank(fs=48000, fraction=3, order=6, limits=[12, 20000],
+                           filter_type='cheby2', show=True)
+```
+
+</details>
+
+### 4. Elliptic (`ellip`)
+
+Elliptic (Cauer) filters have the **shortest transition width** (steepest
+roll-off) for a given order. They feature ripples in both the passband and stopband.
+
+```python
+import numpy as np
+from phonometry import filters
+
+# A calibrated signal in Pa so the guide runs standalone
+fs = 48000
+x = 0.2 * np.sin(2 * np.pi * 1000 * np.arange(fs) / fs)
+
+# Maximum selectivity for extreme band isolation
+spl, freq = filters.octave_filter(x, fs, fraction=3, filter_type='ellip', ripple=0.1)
+```
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/filter_ellip_fraction_3_order_6_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/filter_ellip_fraction_3_order_6.svg" alt="Elliptic one-third-octave filter bank frequency response" width="60%"></picture>
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+from phonometry import filters
+
+# Draw this bank's response (1/3 octave, order 6, Elliptic)
+filters.OctaveFilterBank(fs=48000, fraction=3, order=6, limits=[12, 20000],
+                           filter_type='ellip', ripple=0.1, show=True)
+```
+
+</details>
+
+### 5. Bessel (`bessel`)
+
+Bessel filters are optimized for **linear phase response** and minimal group
+delay. They preserve the shape of filtered waveforms (transients) better than
+any other type, but have the slowest roll-off.
+
+```python
+import numpy as np
+from phonometry import filters
+
+# A calibrated signal in Pa so the guide runs standalone
+fs = 48000
+x = 0.2 * np.sin(2 * np.pi * 1000 * np.arange(fs) / fs)
+
+# Best for pulse analysis and transient preservation
+spl, freq = filters.octave_filter(x, fs, fraction=3, filter_type='bessel')
+```
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/filter_bessel_fraction_3_order_6_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/filter_bessel_fraction_3_order_6.svg" alt="Bessel one-third-octave filter bank frequency response" width="60%"></picture>
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+from phonometry import filters
+
+# Draw this bank's response (1/3 octave, order 6, Bessel)
+filters.OctaveFilterBank(fs=48000, fraction=3, order=6, limits=[12, 20000],
+                           filter_type='bessel', show=True)
+```
+
+</details>
+
+### 6. Linkwitz-Riley (`linkwitz_riley`)
+
+Specifically designed for **audio crossovers**. Linkwitz-Riley filters (typically
+4th order, but any even order is supported) allow splitting a signal into bands
+that, when summed, result in a perfectly flat magnitude response and zero phase
+difference between bands at the crossover.
+
+```python
+import numpy as np
+from phonometry import filters
+
+# recording: a calibrated capture in Pa so the guide runs standalone
+fs = 48000
+recording = 0.2 * np.sin(2 * np.pi * 1000 * np.arange(fs) / fs)
+
+# Split the recording into Low and High bands at 1000 Hz
+low, high = filters.linkwitz_riley(recording, fs, freq=1000, order=4)
+# Recombined, low + high has a flat magnitude response (allpass sum)
+```
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/crossover_lr4_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/crossover_lr4.svg" alt="Linkwitz-Riley 4th-order crossover: low-pass, high-pass and their flat sum" width="60%"></picture>
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from scipy.signal import freqz
+from phonometry import filters
+
+# Measure both branches: split a unit impulse and take the spectra.
+fs = 48000
+impulse = np.zeros(fs)
+impulse[0] = 1.0
+low, high = filters.linkwitz_riley(impulse, fs, freq=1000, order=4)
+
+w, h_lp = freqz(low, worN=8192, fs=fs)
+_, h_hp = freqz(high, worN=8192, fs=fs)
+
+fig, ax = plt.subplots(figsize=(9, 5))
+ax.semilogx(w, 20 * np.log10(np.abs(h_lp) + 1e-9), label="Low-pass (LR4)")
+ax.semilogx(w, 20 * np.log10(np.abs(h_hp) + 1e-9), label="High-pass (LR4)")
+ax.semilogx(w, 20 * np.log10(np.abs(h_lp + h_hp) + 1e-9), "--",
+            label="Sum (flat)")
+ax.set(xlim=(20, 20000), ylim=(-60, 5),
+       xlabel="Frequency [Hz]", ylabel="Magnitude [dB]")
+ax.grid(True, which="both", alpha=0.3)
+ax.legend()
+plt.show()
+```
+
+</details>
+
+## Quick answers
+
+### Which filter architecture should I choose?
+
+Butterworth is the standard choice for general acoustic measurement: a
+maximally flat passband with no ripple. Chebyshev I gives a sharper
+roll-off at the cost of passband ripple; Chebyshev II keeps the passband
+flat and puts the ripple in the stopband instead; Elliptic offers maximum
+selectivity, with ripple in both bands; and Bessel preserves transient
+waveform shapes thanks to its linear phase response, but has the slowest
+roll-off. Linkwitz-Riley is for audio crossovers: its bands sum to a
+perfectly flat response.
+
+## See also
+
+- [Filter Banks](https://jmrplens.github.io/phonometry/signal/filters/filter-banks/): the band mathematics, the design
+  machinery and the parameter reference behind every bank shown here.
+- [Filter class verification (IEC 61260-1)](https://jmrplens.github.io/phonometry/signal/filters/filter-compliance/): the
+  Table 1 acceptance mask, class 0 and the compliance fiche of these
+  architectures.
+- API reference: [`phonometry`](https://jmrplens.github.io/phonometry/reference/api/filters/phonometry/) and [`filters.core`](https://jmrplens.github.io/phonometry/reference/api/filters/core/).
+
+## References
+
+- International Electrotechnical Commission. (2014). *Electroacoustics —
+  Octave-band and fractional-octave-band filters — Part 1: Specifications*
+  (IEC 61260-1:2014).
+  [IEC webstore](https://webstore.iec.ch/en/publication/5063).
+  The base-10 mid frequencies and band edges that every bank compared in
+  this gallery is designed to, whichever architecture realizes the band.
+- American National Standards Institute. (2004). *Specification for
+  octave-band and fractional-octave-band analog and digital filters*
+  (ANSI S1.11-2004). Acoustical Society of America.
+  [ANSI webstore](https://webstore.ansi.org/standards/asa/ansis1112004).
+  The band-edge convention on which every architecture of this gallery
+  places its −3 dB points, which is what makes their band levels
+  comparable.
+- Smith, J. O. *Introduction to digital filters with audio applications*
+  (online book). Center for Computer Research in Music and Acoustics (CCRMA),
+  Stanford University.
+  [ccrma.stanford.edu/~jos/filters](https://ccrma.stanford.edu/~jos/filters/).
+  A free companion treatment of digital-filter design and analysis, covering
+  the classical architectures compared in this gallery.
+
+## Standards
+
+IEC 61260-1:2014, *Electroacoustics — Octave-band and
+fractional-octave-band filters — Part 1: Specifications*: the base-10 mid
+frequencies and band edges every bank of this gallery is designed to; the
+Table 1 class acceptance limits are verified in
+[Filter class verification](https://jmrplens.github.io/phonometry/signal/filters/filter-compliance/). ANSI S1.11-2004,
+*Octave-Band and Fractional-Octave-Band … Filters*: the band-edge
+convention on which every architecture places its −3 dB points.
+
+---
+
+
+<!-- source: docs/filter-compliance.md | canonical: https://jmrplens.github.io/phonometry/signal/filters/filter-compliance/ -->
+Source: https://jmrplens.github.io/phonometry/signal/filters/filter-compliance/
+
+# Filter class verification (IEC 61260-1)
+
+A filter bank becomes a measuring instrument only once its bands have been
+proved against a specification. IEC 61260-1:2014 writes that specification
+as an **acceptance mask**: a corridor of relative attenuation around each
+mid frequency, narrow in the passband, opening into a minimum-attenuation
+requirement far outside the band, with one corridor per performance class.
+A bank "is class 1" when every band of it stays inside the class 1 corridor
+at every normalized frequency, and the margin in decibels says by how much.
+
+This page is the verification half of the octave-filtering topic: the 2014
+mask and the per-band verdict, the stricter **class 0** kept alive by the
+withdrawn IEC 61260:1995 and ANSI S1.11-2004 masks, a reading of what a
+class actually buys in a measurement (passband error, stopband leakage,
+uncertainty budget), and the one-page accredited fiche that turns the
+verdict into a document. The design half, the band mathematics and the
+parameter reference, is [Filter Banks](https://jmrplens.github.io/phonometry/signal/filters/filter-banks/), and the five
+architectures with their compared responses are
+[Filter Architecture Gallery](https://jmrplens.github.io/phonometry/signal/filters/filter-gallery/); the same machinery
+applied to the frequency weightings is section 6 of
+[Frequency Weighting](https://jmrplens.github.io/phonometry/signal/levels/weighting/).
+
+## 1. Verifying the class against IEC 61260-1:2014
+
+`verify_filter_class` checks every band of a bank against the acceptance
+limits of **IEC 61260-1:2014** (Table 1, with the fractional-octave breakpoint
+mapping and log-frequency interpolation from the standard) and reports the
+performance class per band with its margin in dB:
+
+```python
+from phonometry import filters
+
+bank = filters.OctaveFilterBank(fs=48000, fraction=3, order=6)
+result = filters.verify_filter_class(bank)
+print(result["overall_class"])          # 1
+print(result["bands"][0])
+# {'freq': 12.589254117941678, 'class': 1, 'checked_to_omega': 3.8127755266765493, 'margin_class1_db': 0.3999999999999595, 'margin_class2_db': 0.5999999999999595}
+```
+
+The Table 1 acceptance mask itself is public too: `class_limits(fraction,
+filter_class, omega)` returns the minimum/maximum relative-attenuation
+limits at normalized frequencies $\Omega = f/f_m$, the same limits the verifier
+and the figure below use.
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/class_mask_overlay_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/class_mask_overlay.svg" alt="Butterworth band response threading between the forbidden regions of the IEC 61260-1 class 1 acceptance mask" width="80%"></picture>
+
+*The order-6 Butterworth response (blue) threads between the forbidden
+regions: it must attenuate at least the red mask outside the band and no more
+than the purple mask inside it.*
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from scipy.signal import sosfreqz
+from phonometry import filters
+
+fs = 48000
+bank = filters.OctaveFilterBank(fs, fraction=1, order=6, limits=[800, 1200])
+idx = int(np.argmin(np.abs(np.array(bank.freq) - 1000)))
+fm, fsd = bank.freq[idx], fs / bank.factor[idx]
+w, h = sosfreqz(bank.sos[idx], worN=2**15, fs=fsd)
+att = -20 * np.log10(np.abs(h) + 1e-12)
+delta_a = att - np.interp(fm, w, att)     # relative attenuation
+
+grid = np.logspace(np.log10(0.05), np.log10(8), 2000)
+lo1, hi1 = filters.class_limits(1.0, 1, grid)     # class 1 min/max attenuation
+
+fig, ax = plt.subplots(figsize=(9, 5.5))
+ax.fill_between(grid, -10, lo1, alpha=0.15, color="tab:red",
+                label="Forbidden: too little attenuation")
+finite = np.isfinite(hi1)
+ax.fill_between(grid[finite], hi1[finite], 90, alpha=0.15, color="tab:purple",
+                label="Forbidden: too much attenuation")
+ax.plot(w / fm, delta_a, label="Butterworth order 6")
+ax.set(xscale="log", xlim=(0.08, 8), ylim=(-6, 90),
+       xlabel="Normalized frequency f / fm",
+       ylabel="Relative attenuation [dB]")
+ax.legend()
+plt.show()
+```
+
+</details>
+
+With default parameters (order 6), **Butterworth meets class 1**, and so does
+**Chebyshev II**: its `attenuation` default is now `72` dB, clearing the 70 dB
+far-stopband class 1 limit (scipy pins the cheby2 equiripple floor at exactly
+`attenuation`, so any value $\ge 70\ \text{dB}$ qualifies; the 72 dB default
+keeps the same +0.400 dB passband margin as Butterworth). Chebyshev I,
+Elliptic and Bessel do
+not meet class limits at order 6: passband ripple (cheby1/ellip) and slow
+roll-off (bessel) violate the mask.
+
+## 2. Class 0 (IEC 61260:1995 / ANSI S1.11-2004)
+
+The tightest performance class, **class 0**, was defined by the earlier
+**IEC 61260:1995** and its US twin **ANSI S1.11-2004** (both withdrawn/superseded
+but still referenced for laboratory-grade instruments); IEC 61260-1:2014 dropped
+it. Its class 1/2 masks differ slightly from the 2014 edition, so it lives behind
+an `edition` switch rather than being mixed into the 2014 mask:
+
+```python
+from phonometry import filters
+
+fs = 48000
+bank = filters.OctaveFilterBank(fs, fraction=1, order=6, limits=[800, 1200])
+
+result = filters.verify_filter_class(bank, edition="1995")   # classes 0, 1, 2
+print(result["overall_class"])          # 0  (the default Butterworth clears it)
+print(result["bands"][0]["margin_class0_db"])
+```
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/filter_class0_mask_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/filter_class0_mask.svg" alt="Nested pass-band acceptance corridors for class 0, 1 and 2 of IEC 61260:1995 with the order-6 Butterworth response sitting inside the tightest class 0 corridor" width="80%"></picture>
+
+*The class 0 corridor (±0.15 dB at mid-band) is the tightest; class 1 (±0.3 dB)
+and class 2 (±0.5 dB) are progressively wider. The order-6 Butterworth threads
+inside class 0 across the whole pass-band.*
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from scipy.signal import sosfreqz
+from phonometry import filters
+
+fs = 48000
+bank = filters.OctaveFilterBank(fs, fraction=1, order=6, limits=[800, 1200])
+idx = int(np.argmin(np.abs(np.array(bank.freq) - 1000)))
+fm, fsd = bank.freq[idx], fs / bank.factor[idx]
+w, h = sosfreqz(bank.sos[idx], worN=2**15, fs=fsd)
+att = -20 * np.log10(np.abs(h) + 1e-12)
+delta_a = att - np.interp(fm, w, att)
+
+# Pass-band only: outside the band edges the maximum limit is +inf.
+g = 10 ** (3 / 10)
+grid = np.linspace(g ** -0.5, g ** 0.5, 1500)
+pb = (w / fm >= g ** -0.5) & (w / fm <= g ** 0.5)
+
+fig, ax = plt.subplots(figsize=(9, 5.5))
+for cls in (2, 1, 0):                      # nested corridors, class 0 tightest
+    lo, hi = filters.class_limits(1.0, cls, grid, edition="1995")
+    ax.plot(grid, hi, label=f"Class {cls} corridor")
+    ax.plot(grid, lo, color=ax.lines[-1].get_color())
+ax.plot(w[pb] / fm, delta_a[pb], "k", lw=2, label="Butterworth order 6")
+ax.set(xscale="log", xlim=(g ** -0.5, g ** 0.5), ylim=(-0.7, 6),
+       xlabel="Normalized frequency f / fm",
+       ylabel="Relative attenuation [dB]")
+ax.legend()
+plt.show()
+```
+
+</details>
+
+## 3. What a class means physically
+
+The masks are worst-case error bounds on a *measurement*, not abstract
+grades:
+
+- **In the passband** the corridor bounds how much the band can mis-read
+  in-band content: a class 1 bank reads a mid-band tone within ±0.4 dB of
+  its true level and a class 2 bank within ±0.6 dB (2014 Table 1; the
+  stricter 1995 masks allowed ±0.3 dB for class 1 and ±0.15 dB for
+  class 0). Toward the band edges the corridor widens, which is the honest
+  admission that a tone sitting exactly on an edge is genuinely ambiguous
+  between two bands (both read it about 3 dB down).
+- **In the stopband** the minimum-attenuation mask bounds leakage from the
+  rest of the spectrum: far from the band, class 1 demands at least 70 dB of
+  relative attenuation (the reason the `cheby2` default is 72 dB). In energy
+  terms, an out-of-band tone must be roughly 70 dB stronger than the band's
+  own content before it doubles the band's energy reading (+3 dB). The
+  practical consequence: measuring bands far below a dominant tone, the
+  reading floors out at the leakage skirt about 70 dB down, and a steeper
+  architecture (or higher order) is the only way to push that floor lower.
+- **For the uncertainty budget**, the class is the filter's contribution to the
+  measurement uncertainty: a class 1 bank adds up to a few tenths of a dB to
+  a band level, comparable to a class 1 sound level meter's other tolerance
+  terms, which is why instrument-grade chains specify the class of every
+  stage rather than a single overall figure.
+
+**Which architecture reaches which class?** The library's **default, Butterworth
+order 6, meets class 0** in the configurations the conformance suite verifies
+(octave and third-octave banks at 48 kHz), so no special setup is needed for
+laboratory-grade banks in that range. The table below reports the best class
+each architecture reaches under that same order-6 / 48 kHz setup; the other
+architectures fall short of class 0 because they trade the IEC mask for a
+different property *by construction*:
+
+| Architecture | Best class (order 6, fs 48 kHz) | Why |
+| :--- | :---: | :--- |
+| `butter` (default) | **0** | Maximally-flat pass-band, monotone roll-off; fits the mask |
+| `cheby2` | 1 | Flat pass-band but the mask relationship binds at class 1 |
+| `cheby1` | — | Pass-band ripple violates the flatness limit |
+| `ellip` | — | Pass- and stop-band ripple |
+| `bessel` | — | Flat group delay bought with a slow roll-off |
+
+So the sensible default is the common one (Butterworth order 6): it clears
+class 0 in the verified configurations, while the alternative architectures are
+deliberate opt-ins whose purpose (steeper roll-off, linear phase) works against
+the class mask. Away from these settings (very high `fraction` or near-Nyquist
+bands), always re-run `verify_filter_class` to confirm the class you need, and
+raise the order if a band needs more margin.
+
+## 4. The compliance fiche (`.report()`)
+
+`filter_class_compliance(bank)` wraps the same verification as a result object
+that exposes `.plot()` and `.report()`, so a type-test verdict can be rendered
+as a one-page accredited fiche: a per-band classification table, the
+worst-margin band's measured relative attenuation overlaid on the class
+corridor, and the boxed overall class-compliance result. Pass a `required_class`
+on the `ReportMetadata` to add a PASS/FAIL verdict row (a bank "meets class N"
+when its achieved class is at least as strict, i.e. a class index of N or
+lower). The fiche renders in English by default; pass `language="es"` for a
+Spanish fiche (translated fixed strings and a comma decimal separator), e.g.
+`result.report("iec61260_es.pdf", language="es")`.
+
+```python
+from phonometry import OctaveFilterBank, ReportMetadata, filter_class_compliance
+
+bank = OctaveFilterBank(fs=48000, fraction=1, order=6, limits=[125, 4000])
+result = filter_class_compliance(bank)   # overall_class == 1
+result.plot()   # the worst-margin band on its class corridor
+
+result.report(
+    "iec61260.pdf",
+    metadata=ReportMetadata(
+        specimen="1/1-octave filter bank",
+        measurement_standard="IEC 61260-1:2014",
+        required_class=1,                # class 1 (or stricter) required
+    ),
+)                                        # -> Class 1 - COMPLIES, PASS
+```
+
+The example fiche, regenerated with `make reports`, is kept rendered in the
+repository. Click the preview to open the PDF:
+
+[![One-page filter-class-compliance fiche: a metadata header, a per-band classification table listing each octave band's achieved class and binding margin, the worst-margin band's measured relative attenuation overlaid on the green class-1 acceptance corridor, the boxed Class 1 - COMPLIES (margin +0.40 dB) result and a PASS verdict against the required class 1](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/reports/iec61260_filter_example.webp)](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/reports/iec61260_filter_example.pdf)
+
+*Filter class compliance fiche (`FilterComplianceResult.report`), the achieved
+class with its binding margin in dB and the measured relative attenuation over
+the IEC 61260-1:2014 Table 1 corridor.*
+
+Passing `edition="1995"` verifies against the older IEC 61260:1995 /
+ANSI S1.11-2004 mask, which keeps the stricter **class 0** that the 2014 edition
+dropped; the default order-6 Butterworth bank can then be certified to class 0:
+
+```python
+bank = OctaveFilterBank(fs=48000, fraction=1, order=6, limits=[250, 4000])
+result = filter_class_compliance(bank, edition="1995")   # overall_class == 0
+result.plot()   # the class-0 corridor of the 1995 edition
+result.report(
+    "iec61260_1995.pdf",
+    metadata=ReportMetadata(
+        measurement_standard="IEC 61260:1995",
+        required_class=0,                # class 0 (1995 edition) required
+    ),
+)                                        # -> Class 0 - COMPLIES, PASS
+```
+
+[![One-page filter-class-compliance fiche under the 1995 edition: a per-band classification table showing every octave band achieving class 0, the measured relative attenuation overlaid on the green class-0 acceptance corridor, the boxed Class 0 - COMPLIES (margin +0.15 dB) result and a PASS verdict against the required class 0](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/reports/iec61260_filter_1995_example.webp)](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/reports/iec61260_filter_1995_example.pdf)
+
+*Class 0 is retained by the IEC 61260:1995 / ANSI S1.11-2004 edition
+(`edition="1995"`); the 2014 edition keeps only classes 1 and 2.*
+
+## Quick answers
+
+### Which filter architecture meets IEC 61260-1 class 1 with default settings?
+
+With the default order 6, Butterworth meets class 1 of the IEC 61260-1:2014
+Table 1 acceptance limits, and so does Chebyshev II: its default
+`attenuation` of 72 dB clears the 70 dB far-stopband class 1 limit.
+Chebyshev I, Elliptic and Bessel do not: passband ripple (cheby1, ellip)
+and slow roll-off (bessel) violate the mask. `verify_filter_class` reports
+the achieved class per band.
+
+### What is class 0 and which standard defines it?
+
+Class 0 is the tightest filter performance class, defined by IEC 61260:1995
+and its US twin ANSI S1.11-2004 and dropped by IEC 61260-1:2014. Its
+passband corridor allows only ±0.15 dB at mid-band, against ±0.3 dB for
+class 1 in the 1995 masks. It stays available through `edition="1995"`, and
+the default order-6 Butterworth bank meets class 0 in the verified 48 kHz
+configurations.
+
+## See also
+
+- [Filter Banks](https://jmrplens.github.io/phonometry/signal/filters/filter-banks/): the band mathematics and the
+  architectures whose class is verified here.
+- [Frequency Weighting](https://jmrplens.github.io/phonometry/signal/levels/weighting/): the companion verification of the A,
+  C and Z curves against the IEC 61672-1 tolerance tables, with the G, B, D and
+  AU curves covered in [Special Weightings](https://jmrplens.github.io/phonometry/signal/levels/special-weightings/).
+- [Sound level meter](https://jmrplens.github.io/phonometry/signal/sound-level-meter/): the instrument chain whose
+  spectrum stage this class applies to.
+- [Conformance report](https://jmrplens.github.io/phonometry/reference/conformance/): the verified configurations behind
+  the class claims of this page.
+- API reference: [`filters.compliance`](https://jmrplens.github.io/phonometry/reference/api/filters/compliance/).
+
+## References
+
+- International Electrotechnical Commission. (2014). *Electroacoustics —
+  Octave-band and fractional-octave-band filters — Part 1: Specifications*
+  (IEC 61260-1:2014).
+  [IEC webstore](https://webstore.iec.ch/en/publication/5063).
+  The Table 1 class 1 / class 2 acceptance limits verified here, with the
+  fractional-octave breakpoint mapping and the log-frequency interpolation
+  of the standard.
+- International Electrotechnical Commission. (1995). *Electroacoustics —
+  Octave-band and fractional-octave-band filters* (IEC 61260:1995).
+  [IEC webstore](https://webstore.iec.ch/en/publication/5065).
+  The withdrawn first edition whose Table 1 supplies the stricter class 0
+  mask offered by `edition="1995"`.
+- American National Standards Institute. (2004). *Specification for
+  octave-band and fractional-octave-band analog and digital filters*
+  (ANSI S1.11-2004). Acoustical Society of America.
+  [ANSI webstore](https://webstore.ansi.org/standards/asa/ansis1112004).
+  Its Table 1 class limits are identical to those of IEC 61260:1995 and back
+  the same class 0 mask.
+
+## Standards
+
+IEC 61260-1:2014, *Electroacoustics — Octave-band and
+fractional-octave-band filters — Part 1: Specifications*: the Table 1
+class 1 / class 2 acceptance limits (with the fractional-octave breakpoint
+mapping and log-frequency interpolation) verified in §1.
+IEC 61260:1995 and ANSI S1.11-2004, *Octave-Band and Fractional-Octave-Band …
+Filters*: the withdrawn edition's Table 1 (identical between the two)
+supplies the stricter class 0 mask offered by ``edition="1995"`` and
+verified in §2.
+
+---
+
+
+<!-- source: docs/block-processing.md | canonical: https://jmrplens.github.io/phonometry/signal/filters/block-processing/ -->
+Source: https://jmrplens.github.io/phonometry/signal/filters/block-processing/
+
+# Block Processing
+
+Some measurements never fit in memory: an hour-long environmental recording,
+a live monitor that must report levels while the microphone is still
+capturing, or an embedded logger that only ever sees one buffer at a time. In
+all of these the signal has to be processed block by block, and the filters
+must behave exactly as if they had seen the whole signal at once.
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_block_processing_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_block_processing.svg" alt="Two lanes comparing block processing with the filter state carried across blocks, giving one continuous envelope, versus reset each block, where the envelope restarts from zero at every seam" width="86%"></picture>
+
+The `OctaveFilterBank`, `WeightingFilter` (for A, C, or Z-weighting) and
+`TimeWeighting` classes support block (streaming) processing: the internal
+filter state is carried between calls, so concatenated block outputs match a
+single full-signal pass.
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/block_processing_continuity_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/block_processing_continuity.svg" alt="Stateful block processing matching the continuous result versus independent blocks restarting the filter transient at each boundary" width="80%"></picture>
+
+*With `stateful=True` the concatenated block outputs match the continuous
+result exactly; without state, every block boundary restarts the filter
+transient.*
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import filters
+
+# 1 kHz octave band: four stateful blocks vs one continuous pass
+fs, block = 8000, 1000
+rng = np.random.default_rng(42)
+x = rng.standard_normal(4 * block)
+t = np.arange(x.size) / fs
+
+bank = filters.OctaveFilterBank(fs, fraction=1, limits=[900, 1100],
+                                  stateful=True, resample=False)
+streamed = np.concatenate([
+    bank.filter(x[i * block:(i + 1) * block], sigbands=True,
+                detrend=False, calculate_level=False)[2][0]
+    for i in range(4)
+])
+offline = filters.OctaveFilterBank(fs, fraction=1, limits=[900, 1100],
+                                     resample=False).filter(
+    x, sigbands=True, detrend=False, calculate_level=False)[2][0]
+print(np.max(np.abs(streamed - offline)))     # 0.0 (bit-exact)
+
+fig, ax = plt.subplots(figsize=(9, 4.5))
+ax.plot(t, offline, linewidth=2.5, alpha=0.35, label="Continuous (whole signal)")
+ax.plot(t, streamed, label="Stateful blocks (state carried)")
+ax.axvline(block / fs, color="gray", linestyle=":", label="Block boundary")
+ax.set(xlim=(0.11, 0.17), xlabel="Time [s]", ylabel="Amplitude")
+ax.legend()
+plt.show()
+```
+
+</details>
+
+Create a stateful filter bank with `stateful=True`. The internal state is
+zero-initialized by default but may be initialized for step-response
+steady-state (like `scipy.signal.sosfilt_zi`) with `steady_ic=True`. The
+options that must be disabled in stateful mode are summarized in the
+[constraints table](#stateful-mode-constraints) at the end of this guide.
+
+## Example
+
+This example streams a WAV file with [`soundfile`](https://pysoundfile.readthedocs.io/),
+an optional dependency (`pip install soundfile`). Any block source works just as
+well: `scipy.io.wavfile` plus manual slicing, or a live capture callback.
+
+```python
+import soundfile as sf
+from phonometry import filters
+
+fs = 48000
+octave_filter = filters.OctaveFilterBank(fs, 1, stateful=True, resample=False)
+afilter = filters.WeightingFilter(fs, "A", stateful=True)
+
+for block in sf.blocks("measurement.wav", blocksize=256, overlap=0):
+
+    # Apply A-filter
+    weighted = afilter.filter(block)
+
+    # Split into octave bands
+    block_spl, _, block_output = octave_filter.filter(weighted, sigbands=True, detrend=False)
+
+    # further signal processing
+    ...
+```
+
+## Time weighting across blocks
+
+Use the `TimeWeighting` class (state carried automatically):
+
+```python
+from phonometry import filters
+
+tw = filters.TimeWeighting(fs, mode="fast")
+# audio_blocks: successive frames of your microphone recording (Pa),
+#   e.g. from sf.blocks("measurement.wav", ...) as in the block above.
+for block in audio_blocks:
+    envelope = tw.process(block)
+```
+
+Or manage the state yourself with the functional API; see
+[Time Weighting](https://jmrplens.github.io/phonometry/signal/levels/time-weighting/#6-block-processing).
+
+## Multichannel state
+
+All stateful classes handle multichannel input `(channels, samples)`: the state
+is allocated lazily on the first call to match the channel count, and reallocated
+if the channel count changes (e.g. switching from stereo to mono resets the state).
+
+## What the carried state is
+
+Every filter in the library runs as a cascade of second-order sections in
+transposed direct form II. For one section with coefficients
+$(b_0, b_1, b_2, a_1, a_2)$:
+
+$$
+y[n] = b_0\,x[n] + z_1[n-1], \qquad
+z_1[n] = b_1\,x[n] - a_1\,y[n] + z_2[n-1], \qquad
+z_2[n] = b_2\,x[n] - a_2\,y[n]
+$$
+
+The pair $(z_1, z_2)$ per section is the filter's *entire* memory of the
+past. `stateful=True` stores these values when a block ends and restores
+them when the next begins, so the recursion cannot tell where one buffer
+stopped and the next started: the concatenated output equals the
+single-pass output exactly, not approximately. The `TimeWeighting` detector
+carries even less, just its last envelope value $y[n-1]$, which is the same
+value the functional API hands back as `initial_state` (see
+[Time Weighting](https://jmrplens.github.io/phonometry/signal/levels/time-weighting/#6-block-processing)).
+
+### Streaming pitfalls
+
+- **Per-block preprocessing creates seams.** Anything computed from a single
+  block that should be global, like detrending (removing the block's own
+  mean) or normalization, gives each block a slightly different operation:
+  the outputs no longer concatenate into the continuous result. This is why
+  `detrend` must be `False` in stateful mode.
+- **Not every metric streams.** Energy metrics accumulate cleanly (a
+  running $L_{eq}$ is a running energy sum), but rank statistics do not: the
+  $L_{90}$ of a recording is not any combination of per-block $L_{90}$
+  values. Stream the *envelope* and compute percentiles once, on the pooled
+  result.
+- **The first block still carries the onset transient.** State starts at
+  rest, so the filter settles during the first instants exactly as in a
+  single pass. Use `steady_ic=True` to start in step-response steady state,
+  or discard the settling time once (not once per block).
+- **One stream per object.** A stateful instance holds the memory of one
+  signal; feeding two interleaved streams through it corrupts both. Create
+  one filter object per stream: the design cost is paid once at
+  construction, not per block.
+
+## Real-time level meter pattern
+
+The canonical streaming loop weights, envelopes and reports block by block,
+carrying all state across calls:
+
+```python
+import numpy as np
+from phonometry import filters
+
+fs, block = 48000, 4800  # 100 ms blocks
+aw = filters.WeightingFilter(fs, "A", stateful=True)
+env = filters.TimeWeighting(fs, mode="fast")  # the class is inherently stateful
+
+for x in audio_stream(block):            # your capture callback
+    y = env.process(aw.filter(x))
+    spl = 10 * np.log10(y[..., -1] / (2e-5) ** 2)  # instantaneous LAF
+    display(spl)
+```
+
+### Stateful-mode constraints
+
+| Option | Stateful behavior | Why |
+| :--- | :--- | :--- |
+| `detrend` | must be `False` | Per-block detrending creates boundary discontinuities |
+| `resample` | must be `False` | The resampler is not stateful |
+| `zero_phase` | unsupported | Forward-backward filtering needs the whole signal |
+| `high_accuracy` (weighting) | resolves to `False` by default (the legacy bilinear design, see [Frequency Weighting](https://jmrplens.github.io/phonometry/signal/levels/weighting/)); explicitly passing `True` raises `ValueError` | The polyphase resampling inside is block-incompatible |
+| `steady_ic` | optional | Starts the filters in step-response steady state |
+
+## References
+
+- Oppenheim, A. V., & Schafer, R. W. (2010). *Discrete-time signal processing*
+  (3rd ed.). Pearson. ISBN 978-0-13-198842-2.
+  [Open Library record](https://openlibrary.org/isbn/9780131988422).
+  The direct-form filter structures and state recursion behind the carried
+  state equation above.
+
+## Standards
+
+IEC 61260-1:2014, *Electroacoustics — Octave-band and
+fractional-octave-band filters — Part 1: Specifications*, and IEC 61672-1:2013,
+*Electroacoustics — Sound level meters — Part 1: Specifications* — block
+processing adds no normative content of its own: the streamed filters are the
+same designs those standards govern (see [Filter Banks](https://jmrplens.github.io/phonometry/signal/filters/filter-banks/),
+[Frequency Weighting](https://jmrplens.github.io/phonometry/signal/levels/weighting/) and [Time Weighting](https://jmrplens.github.io/phonometry/signal/levels/time-weighting/)),
+and carrying the internal filter state across blocks is exactly what makes the
+concatenated output identical to a single full-signal pass, so every class and
+tolerance claim of the underlying pages holds unchanged in streaming use.
+
+---
+
+
+<!-- source: docs/multichannel.md | canonical: https://jmrplens.github.io/phonometry/signal/filters/multichannel/ -->
+Source: https://jmrplens.github.io/phonometry/signal/filters/multichannel/
+
+# Multichannel and Performance
+
+Most real measurement sessions produce more than one channel: the two ears
+of a dummy head, the microphone pair of an intensity probe, the several
+positions of a room survey, the capsules of a beamforming array. The
+convention for all of them is one array of shape `(channels, samples)`
+processed in a single call: every function runs along the last (time) axis
+and preserves the leading channel axis, so each row is analyzed exactly as
+if it were the only one.
+
+That per-channel guarantee is normative, not just convenient. The band
+filters applied to each row are the IEC 61260-1 designs and the weightings
+and detector ballistics are the IEC 61672-1 ones, unchanged from the
+single-channel path; the vectorization batches the arithmetic across rows
+(one filter design, one SciPy call) and never mixes them. This is the
+textbook procedure for multiple data records (Bendat & Piersol 2010,
+§10.4.2): analyze each record individually first, and compute anything
+joint as a separate, explicit step.
+
+Use this page when your channels are parallel recordings on the same clock
+and you want per-channel spectra or levels. When the question is *between*
+channels (what is the delay from A to B, how much of B is explained by A),
+that is cross-channel analysis: see
+[Correlation and delay](https://jmrplens.github.io/phonometry/signal/spectra/correlation-delay/) and
+[Multiple and partial coherence](https://jmrplens.github.io/phonometry/signal/spectra/miso-coherence/), the implementations of
+the Bendat & Piersol cross-correlation and multiple-input models.
+
+## A stereo analysis in one call
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/signal_response_multichannel_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/signal_response_multichannel.svg" alt="Stereo analysis: pink noise and logarithmic sweep resolved per channel in one-third-octave bands" width="80%"></picture>
+
+*Simultaneous analysis of a Stereo signal: Left Channel (Pink Noise) vs Right
+Channel (Log Sine Sweep).*
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from scipy.signal import chirp
+from phonometry import filters
+
+# Stereo test signal: pink noise left, logarithmic sine sweep right
+fs, duration = 48000, 5
+t = np.linspace(0, duration, fs * duration, endpoint=False)
+rng = np.random.default_rng(42)
+spec = np.fft.rfft(rng.standard_normal(t.size))
+spec[1:] /= np.sqrt(np.arange(1, spec.size))   # 1/f shaping: pink noise
+left = np.fft.irfft(spec, t.size)
+right = chirp(t, f0=50, t1=duration, f1=10000, method="logarithmic")
+
+x = np.stack([left, right])                    # (2, n_samples)
+spl, freq = filters.octave_filter(x, fs, fraction=3, limits=[20, 20000])
+
+fig, axes = plt.subplots(2, 1, figsize=(9, 7), sharex=True)
+for ax, levels, name in zip(axes, spl, ["Left: pink noise", "Right: log sweep"]):
+    ax.semilogx(freq, levels, marker="o", label=name)
+    ax.set_ylabel("Level [dB]")
+    ax.grid(True, which="both", alpha=0.3)
+    ax.legend()
+axes[-1].set_xlabel("Frequency [Hz]")
+plt.show()
+```
+
+</details>
+
+The convention is consistent across the whole library: time is always the
+**last axis**. This applies to `octave_filter`, `OctaveFilterBank`,
+`weighting_filter`, `time_weighting`, `leq`, `laeq`, `ln_levels` and
+`spectrogram`.
+
+```python
+import numpy as np
+from phonometry import filters
+
+# Two calibrated channels in Pa so the guide runs standalone
+fs = 48000
+t = np.arange(fs) / fs
+left = 0.2 * np.sin(2 * np.pi * 1000 * t)
+right = 0.1 * np.sin(2 * np.pi * 500 * t)
+
+stereo = np.stack([left, right])          # (2, n_samples)
+spl, freq = filters.octave_filter(stereo, fs, fraction=3)
+# spl has shape (2, n_bands): one row per channel
+```
+
+## Accepted shapes, at a glance
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_multichannel_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_multichannel.svg" alt="Array-shape flow: a 1-D (samples,) input reduces to a scalar and a 2-D (channels, samples) input reduces to (channels,), because the operation runs along the last axis while the channel axis is preserved" width="80%"></picture>
+
+| Input | Interpreted as | Typical output |
+| :--- | :--- | :--- |
+| `(n,)` 1D array | one channel | scalar level / `(bands,)` |
+| `(ch, n)` 2D array | `ch` channels, `n` samples each | `(ch,)` levels / `(ch, bands)` |
+| list of floats | one channel (converted) | as 1D |
+| `(ch, n)` into `spectrogram` | multichannel STFT-style | `(ch, bands, frames)` |
+
+Everything vectorizes across the leading channel axis: one filter design is
+applied to all channels in a single SciPy call, so 8 channels cost far less
+than 8 separate runs. Convention: **channels first**, like most DSP code
+(`soundfile` returns `(n, ch)`: transpose with `x.T`).
+
+## Per-channel semantics
+
+Multichannel processing is strictly per channel: nothing is ever mixed,
+summed or averaged across the channel axis. Three consequences worth
+spelling out:
+
+- **Combining channels is your decision.** Levels come back one per
+  channel. If you need an array-average level (for instance the
+  position-averaged levels of the room-acoustics standards), combine
+  energies yourself: `10 * np.log10(np.mean(10 ** (spl / 10), axis=0))`,
+  never the arithmetic mean of the dB values (see
+  [Levels](https://jmrplens.github.io/phonometry/signal/levels/levels/) for why).
+- **One `calibration_factor` means one sensitivity.** The scalar factor
+  multiplies every channel, which is correct only if all channels share the
+  same sensitivity. For an array of microphones with individual
+  calibrations, scale the rows first, `x * factors[:, None]`, and leave
+  `calibration_factor` at 1.
+- **Stateful classes keep one state per channel.** In block processing the
+  state array matches the channel count and a change of channel count
+  resets it; see [Block Processing](https://jmrplens.github.io/phonometry/signal/filters/block-processing/).
+
+## Performance: Vectorization and caching
+
+`OctaveFilterBank` is the tool for repeated or streaming analysis: one bank
+designs its filters once and applies them to every frame, and NumPy
+broadcasting covers all channels of a frame in one filtering call per band,
+with no Python loop over channels.
+
+```python
+import numpy as np
+from phonometry import filters
+
+# Two calibrated channels in Pa so the guide runs standalone
+fs = 48000
+t = np.arange(fs) / fs
+left = 0.2 * np.sin(2 * np.pi * 1000 * t)
+right = 0.1 * np.sin(2 * np.pi * 500 * t)
+stereo = np.stack([left, right])          # (2, n_samples)
+
+bank = filters.OctaveFilterBank(fs=48000, fraction=3, filter_type='butter')
+
+# Access computed properties
+# bank.freq (center), bank.freq_d (lower), bank.freq_u (upper), bank.sos (coefficients)
+
+# Process multiple signals efficiently
+stream = [stereo]                 # your sequence of multichannel frames
+for frame in stream:
+    # detrend=True (default) removes DC offset to improve low-freq accuracy
+    spl, freq = bank.filter(frame, detrend=True)
+```
+
+Additional performance notes:
+
+- **Design cache**: `octave_filter()` reuses filter bank designs across calls
+  with identical parameters (LRU cache, 32 entries), so calling it in a loop
+  does not redesign the bank each time. `OctaveFilterBank` gives you explicit
+  control over the design lifetime.
+- **Multirate decimation**: low-frequency bands are filtered at a decimated
+  rate, which is both faster and numerically more stable (see
+  [Theory](https://jmrplens.github.io/phonometry/reference/theory/signal-analysis/)).
+- **Optional numba**: the `impulse` time weighting kernel is JIT-compiled when
+  numba is installed (`pip install phonometry[perf]`).
+
+## See also
+
+- [Correlation and delay](https://jmrplens.github.io/phonometry/signal/spectra/correlation-delay/): the cross-channel
+  time-domain questions (delay, alignment) the per-channel path deliberately
+  leaves to you.
+- [Multiple and partial coherence](https://jmrplens.github.io/phonometry/signal/spectra/miso-coherence/): which of several
+  correlated channels actually drives a response (Bendat & Piersol Ch. 7).
+- [Block Processing](https://jmrplens.github.io/phonometry/signal/filters/block-processing/): the streaming counterpart, with
+  one filter state per channel.
+- [Levels](https://jmrplens.github.io/phonometry/signal/levels/levels/): the per-channel level metrics, and why dB values are
+  combined energetically.
+
+## References
+
+- Bendat, J. S., & Piersol, A. G. (2010). *Random data: Analysis and
+  measurement procedures* (4th ed.). Wiley.
+  [doi:10.1002/9781118032428](https://doi.org/10.1002/9781118032428).
+  Section 10.4.2 (the procedure for analyzing multiple data records:
+  individual per-record analysis first, joint cross-record analysis as a
+  separate, deliberate step) and Chapter 7 (the multiple-input/output
+  models that joint step leads to).
+- International Electrotechnical Commission. (2014). *Electroacoustics —
+  Octave-band and fractional-octave-band filters — Part 1: Specifications*
+  (IEC 61260-1:2014).
+  [IEC webstore](https://webstore.iec.ch/en/publication/5063).
+  The band definitions each channel is filtered with; the multichannel path
+  batches them unchanged.
+- International Electrotechnical Commission. (2013). *Electroacoustics —
+  Sound level meters — Part 1: Specifications* (IEC 61672-1:2013).
+  [IEC webstore](https://webstore.iec.ch/en/publication/5708).
+  The weighting and time-integration semantics applied per channel.
+
+## Standards
+
+IEC 61260-1:2014, *Electroacoustics — Octave-band and
+fractional-octave-band filters — Part 1: Specifications*, and IEC 61672-1:2013,
+*Electroacoustics — Sound level meters — Part 1: Specifications* —
+multichannel support adds no normative content of its own: each channel is
+filtered, weighted and time-integrated exactly as the single-channel standards
+prescribe (see [Filter Banks](https://jmrplens.github.io/phonometry/signal/filters/filter-banks/) and [Levels](https://jmrplens.github.io/phonometry/signal/levels/levels/)); the
+vectorization only batches the computation across the channel axis.
+
+---

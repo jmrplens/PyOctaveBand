@@ -1,0 +1,288 @@
+---
+title: "Potencia acústica estructural de equipos (EN 15657)"
+description: "El método de placa receptora de EN 15657:2018 para equipos de servicio del edificio: la potencia inyectada en la placa L_Ws = 10 lg(2πfηmS) + L_v − 60 dB (Fórmula 14) y las magnitudes de fuente independientes de la placa: fuerza bloqueada equivalente (Fórmula 15), nivel de potencia característico de placa receptora (Fórmula 17), velocidad libre y movilidad de la fuente (Fórmulas 18/19)."
+references:
+  - type: book
+    authors: ["Cremer, L.", "Heckl, M.", "Petersson, B. A. T."]
+    year: 2005
+    title: "Structure-borne sound: Structural vibrations and sound radiation at audio frequencies"
+    edition: "3.ª ed."
+    publisher: "Springer"
+    doi: "10.1007/b137728"
+    note: "El balance de potencia de la placa y el marco de movilidades fuente-receptor que sustentan el método de placa receptora y sus magnitudes de fuente de las Fórmulas 15-19. ISBN 978-3-540-22696-3."
+  - type: standard
+    organization: "European Committee for Standardization"
+    year: 2018
+    title: "Acoustic properties of building elements and of buildings — Laboratory measurement of structure-borne sound from building service equipment for all installation conditions"
+    designation: "EN 15657:2018"
+    url: "https://www.une.org/encuentra-tu-norma/busca-tu-norma/norma?c=N0059781"
+    note: "El método de la placa receptora (cláusula 7): el nivel de velocidad medio espacial (Fórmula 12), el factor de pérdida de la placa η = 2,2/(f·Ts) (Fórmula 13), el nivel de potencia inyectada en la placa L_Ws (Fórmula 14, niveles de velocidad de la placa referidos a v₀ = 10⁻⁹ m/s) y la cadena de magnitudes de fuente: fuerza bloqueada equivalente (Fórmula 15), nivel de potencia característico de placa receptora (Fórmula 17, Y_R,∞,baja = 5·10⁻⁶ m/(N·s)), velocidad libre equivalente (Fórmula 18) y movilidad de la fuente (Fórmula 19). La conformidad se ancla en el balance de potencia de la placa resonante P = ω·η·(m·S)·⟨v²⟩ (del cual la Fórmula 14 es el nivel), en la identidad del factor de pérdida y en la conversión de la fuente de la cisterna de la Tabla I.8 del Anexo I.3 de EN 12354-5. La ficha de catálogo enlazada es la página de UNE de UNE-EN 15657:2018."
+  - type: standard
+    organization: "International Organization for Standardization"
+    year: 1996
+    title: "Acoustics — Characterization of sources of structure-borne sound with respect to sound radiation from connected structures — Measurement of velocity at the contact points of machinery when resiliently mounted"
+    designation: "ISO 9611:1996"
+    url: "https://www.iso.org/standard/17424.html"
+    note: "La caracterización de fuente por velocidad libre que complementa las magnitudes de la placa receptora: ecuación (9), velocidad de referencia v₀ = 5·10⁻⁸ m/s."
+---
+
+import ThemeImage from '../../../../../components/ThemeImage.astro';
+import ReportPreview from '../../../../../components/ReportPreview.astro';
+
+Los equipos de servicio del edificio (bombas, ventiladores, calderas, aparatos
+sanitarios) inyectan **potencia acústica estructural** en la estructura del
+edificio a la que están fijados, que luego se radia como ruido aéreo en los
+recintos contiguos. La **EN 15657:2018** la mide con el **método de la placa
+receptora**: la fuente se monta sobre una placa de masa por unidad de
+superficie $m$ y área $S$ conocidas, cuyo factor de pérdida estructural $\eta$
+se conoce, y se mide la velocidad vibratoria media espacial de la placa. La
+Fórmula (14) da la potencia *inyectada en esa placa concreta*; las magnitudes
+de fuente independientes de la placa (la fuerza bloqueada equivalente,
+Fórmula 15; el nivel de potencia característico de placa receptora $L_{Wsn}$,
+Fórmula 17; y la velocidad libre y movilidad equivalentes de la fuente,
+Fórmulas 18/19) se derivan de ella y son lo que consume la predicción de
+equipos instalados de EN 12354-5.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/structure_borne_power_es.svg" alt="Nivel de potencia acústica estructural inyectada en placa receptora por banda de tercio de octava, determinado en una placa de baja movilidad y otra de alta movilidad" width="82%" loading="eager" />
+
+<details>
+<summary>Mostrar el código de esta figura</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import building
+
+# La misma fuente tipo bomba medida sobre una placa receptora pesada y otra ligera.
+bands = np.array([50.0, 100.0, 200.0, 400.0, 800.0, 1600.0, 3150.0])
+lv_low = np.array([88.0, 90.0, 87.0, 84.0, 80.0, 76.0, 71.0])
+
+low = building.reception_plate_power(lv_low, bands, mass_per_area=600.0,
+                                     area=2.0, reverberation_time=0.8)
+high = building.reception_plate_power(lv_low + 6.0, bands, mass_per_area=150.0,
+                                      area=2.0, reverberation_time=0.5)
+
+# Una línea: las barras L_Ws(f) de una determinación con su total sumado en bandas:
+low.plot(language="es")
+plt.show()
+
+# A mano, comparando las dos placas desde los campos de los resultados:
+x = np.arange(bands.size)
+fig, ax = plt.subplots()
+ax.bar(x - 0.2, low.power_level, width=0.4, label="placa de baja movilidad")
+ax.bar(x + 0.2, high.power_level, width=0.4, label="placa de alta movilidad")
+ax.set_xticks(x, [f"{b:g}" for b in bands])
+ax.set(xlabel="Frecuencia [Hz]",
+       ylabel="Nivel de potencia estructural $L_{Ws}$ [dB re 1 pW]")
+ax.legend()
+plt.show()
+```
+
+</details>
+
+## 1. Las relaciones de la placa receptora
+
+¿Por qué una placa? Caracterizar la fuente directamente por sus fuerzas de
+contacto supondría instrumentar cada punto de fijación en hasta seis
+componentes cada uno (tres fuerzas, tres momentos), en una máquina que debe
+seguir funcionando con normalidad. La placa receptora esquiva el problema de
+contacto completo: deja la fuente funcionando sobre una placa resonante cuya
+disipación se conoce, espera al régimen estacionario, y entonces la potencia
+que la placa disipa es igual a la potencia que la fuente inyecta, sumada
+sobre todos los contactos y componentes a la vez. Un promedio espacial de la
+velocidad de la placa sustituye todo el problema de medir fuerzas.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_reception_plate_es.svg" alt="Placa receptora EN 15657: la máquina fuente sobre una placa con apoyos resilientes, acelerómetros que promedian la velocidad de la placa y el balance de potencia de la placa que convierte el nivel de velocidad en el nivel de potencia estructural inyectada" width="92%" />
+
+La potencia que disipa una placa resonante es
+$P = \omega\,\eta\,(m S)\,\langle v^2 \rangle$, de modo que
+el nivel de potencia inyectada en bandas de tercio de octava es (Fórmula 14)
+
+$$
+L_{Ws} = 10\log_{10}\!\left(\frac{2\pi f\,\eta\,m\,S}{f_0\,m_0\,S_0}\right)
+         + L_v - 60 \;\;[\mathrm{dB\ re\ 1\ pW}],
+$$
+
+con las referencias $f_0 = 1\ \text{Hz}$, $m_0 = 1\ \text{kg}$,
+$S_0 = 1\ \text{m}^2$; el término $-60\ \text{dB}$ es $10\log_{10}(v_0^2/P_0)$ para
+la velocidad de referencia de EN 15657 $v_0 = 10^{-9}\ \text{m/s}$. La
+velocidad de la placa es la media energética espacial sobre las $N$ posiciones
+(Fórmula 12) y el factor de pérdida procede del tiempo de reverberación
+estructural $T_s$ (Fórmula 13, idéntica al factor de pérdida total de
+ISO 10848):
+
+$$
+L_v = 10\log_{10}\!\Big(\tfrac{1}{N}\textstyle\sum 10^{L_{v,i}/10}\Big), \qquad
+\eta = \frac{2{,}2}{f\,T_s}.
+$$
+
+```python
+import numpy as np
+from phonometry import building
+
+bands = np.array([100.0, 200.0, 400.0, 800.0])
+lv_i = np.array([88.0, 90.0, 87.0, 89.0, 86.0, 90.0])   # seis posiciones @ 200 Hz
+print(round(building.spatial_mean_velocity_level(lv_i), 2))    # 88.6 dB re 1 nm/s
+
+# Nivel de potencia inyectada en la placa receptora (η desde Ts):
+res = building.reception_plate_power(
+    velocity_level=np.array([90.0, 87.0, 82.0, 77.0]),
+    frequency=bands, mass_per_area=600.0, area=2.0, reverberation_time=0.8,
+)
+print(np.round(res.power_level, 1))     # L_Ws por banda
+print(round(res.total_level, 1))        # nivel sumado en bandas [dB re 1 pW]
+
+res.plot()   # las barras L_Ws(f) con el total sumado en bandas, como en la figura de arriba (requiere matplotlib)
+```
+
+## 2. Placas de baja y alta movilidad
+
+Dos placas receptoras acotan las condiciones de instalación. En la placa de
+*baja movilidad* (pesada) la propia dinámica de la fuente apenas cambia la
+movilidad puntual ni el factor de pérdida de la placa; la placa de *alta
+movilidad* (ligera) se carga dinámicamente por la fuente, de modo que su tiempo
+de reverberación y su movilidad se miden con la fuente fijada. La potencia
+inyectada en la placa junto con su movilidad puntual (véase la
+[movilidad mecánica](/phonometry/es/vibration/structural/mechanical-mobility/)) proporcionan
+la descripción de la fuente para el modelo de EN 12354-5 a través de la cadena
+de conversión siguiente.
+
+## 3. De la potencia de placa a las magnitudes de fuente (Fórmulas 15–19)
+
+La $L_{Ws}$ inyectada en la placa **no** es un descriptor de la fuente: la misma
+fuente inyecta una potencia distinta en un receptor distinto. La EN 15657
+deriva las magnitudes independientes de la placa: el **nivel de fuerza
+bloqueada equivalente** (Fórmula 15, re $F_0 = 10^{-6}\ \text{N}$) desde la
+placa de baja movilidad,
+
+$$
+L_{Fb,eq} = L_{Ws,\mathrm{baja}} - 10\log_{10}\frac{\mathrm{Re}\{Y_{R,\mathrm{baja,eq}}\}}{Y_0},
+$$
+
+el **nivel de potencia característico de placa receptora** que consume
+EN 12354-5 (Fórmula 17), referido a la placa normalizada de hormigón de 10 cm
+de movilidad característica
+$Y_{R,\infty,\text{baja}} = 5\times10^{-6}\ \text{m/(N·s)}$ (apartado 7.2.4),
+
+$$
+L_{Wsn} = L_{Fb,eq} + 10\log_{10}\frac{Y_{R,\infty,\mathrm{baja}}}{Y_0},
+$$
+
+y, desde la placa de alta movilidad, el **nivel de velocidad libre
+equivalente** (Fórmula 18, re $10^{-9}\ \text{m/s}$) y la **movilidad de la
+fuente**
+$|Y_{S,\text{eq}}|$ (Fórmula 19). La corrección de movilidad del Anexo I de EN 12354-5
+(`installed_power_from_reception_plate`, véase el
+[sonido estructural instalado](/phonometry/es/buildings/design/installed-structure-borne/))
+refiere después $L_{Wsn}$ al elemento receptor real.
+
+```python
+from phonometry import building
+
+# EN 12354-5 Anexo I.3 (cisterna, contacto en pared, 63 Hz): medido sobre una
+# placa de Y = 5.34e-6 m/(N·s); la movilidad característica de la pared es 24.1e-6.
+lfb = building.equivalent_blocked_force_level(61.7, 5.34e-6)      # Fórmula (15)
+lwsn = building.characteristic_reception_plate_power(lfb)         # Fórmula (17)
+inst = building.installed_power_from_reception_plate(lwsn, 24.1e-6)  # Anexo I
+print(round(float(lwsn), 1), round(float(inst), 1))         # 61.4 68.2  (Tabla I.8)
+
+# La velocidad libre (Fórmula 18) y la fuerza bloqueada cierran la movilidad (19):
+lvf = building.equivalent_free_velocity_level(70.0, 1.0e-2)
+print(float(building.source_mobility_from_levels(lvf, lfb)))      # |Y_S,eq| en m/(N·s)
+```
+
+El homólogo directo del lado de la fuente es el nivel de velocidad libre de
+ISO 9611 (re $v_0 = 5\times10^{-8}\ \text{m/s}$) medido en los puntos de
+contacto de maquinaria
+montada elásticamente; su media por posiciones de la ecuación (9) es
+`mean_free_velocity_level()`.
+
+## 4. El informe de caracterización (`.report()`)
+
+Una caracterización termina como un *documento*. El
+`StructureBornePowerResult` expone un método `.report()` que escribe una ficha
+PDF de una página con el formato de una hoja de potencia acústica: la línea de
+base normativa que nombra el método de la placa de recepción de la
+EN 15657:2018 (Fórmula 14), una cabecera de metadatos opcional (cliente, equipo
+fuente, entorno de ensayo, instrumentación, clima, fecha), una tabla por bandas
+(frecuencia nominal de octava/tercio de octava, el nivel de velocidad medio
+espacial de la placa $L_v$ y el nivel de potencia acústica estructural inyectado
+$L_{Ws}$), el espectro $L_{Ws}(f)$ con un eje de bandas nominal, y el total
+sumado en bandas $L_{Ws}$ (dB re 1 pW) recuadrado, con la masa por unidad de
+área de la placa $m$ y el área $S$.
+
+Los metadatos se aportan mediante un `ReportMetadata`, cuyos campos aplicables
+aquí son el **equipo fuente** (`specimen`), el **entorno de ensayo**
+(`test_room`), el **cliente**, la **instrumentación**, la **temperatura**, la
+**humedad relativa** y la **presión ambiente**, la **fecha del ensayo**
+(`test_date`) y la identidad del pie (`laboratory`, `operator`, `report_id`,
+`notes`); la masa y el área de la placa provienen del propio resultado. Aportar
+`requirement` añade un veredicto PASS/FAIL frente a un límite superior declarado
+sobre el total $L_{Ws}$ (una emisión de potencia es una magnitud donde menos es
+mejor, así que la fuente cumple en el límite o por debajo). `verbose=True` añade
+la columna del factor de pérdidas de la placa $\eta$ a la tabla.
+`language="es"` genera la ficha en español con comas decimales. La franja de
+base recuerda que el nivel inyectado en la placa debe convertirse a las
+magnitudes de fuente independientes de la placa (Fórmulas 15/17) antes de
+alimentar la EN 12354-5.
+
+```python
+import numpy as np
+from phonometry import ReportMetadata, reception_plate_power
+
+freqs = np.array([125, 250, 500, 1000, 2000, 4000], float)
+lv = np.array([88.0, 90, 86, 82, 78, 73])   # nivel de velocidad medio de la placa [dB]
+res = reception_plate_power(
+    lv, freqs, mass_per_area=25.0, area=1.2, reverberation_time=0.3,
+)
+
+res.report(
+    "structure_borne_power.pdf",
+    metadata=ReportMetadata(
+        client="Example building services contractor",
+        specimen="Circulation pump (wall-mounted)",
+        test_room="Reception-plate test rig (heavy concrete plate)",
+        laboratory="Phonometry reference example",
+        report_id="EXAMPLE-15657",
+    ),
+    language="es",
+)   # total L_Ws ~ 65 dB re 1 pW
+```
+
+La ficha de ejemplo se regenera con `make reports` y se mantiene renderizada en
+el repositorio; pulsa la vista previa para abrir el PDF.
+
+<ReportPreview
+	name="en15657_structure_borne_power_example"
+	title="Informe de ejemplo de potencia acústica estructural EN 15657 (PDF)"
+	description="Ficha de una página de potencia acústica estructural por el método de la placa de recepción de la EN 15657:2018: una cabecera con el cliente, el equipo fuente, el banco de placa de recepción y el acelerómetro y el clima, la tabla en bandas de octava (125 Hz a 4 kHz) de los niveles de velocidad medios de la placa Lv y los niveles de potencia acústica estructural inyectados L_Ws, el espectro L_Ws(f) con un eje de bandas nominal, y el total sumado en bandas L_Ws (dB re 1 pW) recuadrado con la masa por unidad de área de la placa m = 25 kg/m2 y el área S = 1,20 m2, cerrada por una franja de base con la relación de la Fórmula 14 y la conversión a las magnitudes de fuente independientes de la placa requerida antes de la EN 12354-5."
+	caption="Ficha de potencia acústica estructural (StructureBornePowerResult.report), una caracterización por placa de recepción EN 15657 con el total L_Ws recuadrado."
+/>
+
+## Qué cubre esta guía
+
+**Cubierto.** El método de la placa receptora de la EN 15657:2018: el nivel
+de velocidad medio espacial (`spatial_mean_velocity_level`, Fórmula 12), el
+factor de pérdida de la placa (`plate_loss_factor`, Fórmula 13) y el nivel de
+potencia inyectada en la placa (`reception_plate_power`,
+`structure_borne_power_level`, Fórmula 14). También la cadena de magnitudes
+de fuente independientes de la placa: el nivel de fuerza bloqueada
+equivalente (`equivalent_blocked_force_level`, Fórmula 15), el nivel de
+potencia característico de placa receptora
+(`characteristic_reception_plate_power`, Fórmula 17), el nivel de velocidad
+libre equivalente (`equivalent_free_velocity_level`, Fórmula 18) y la
+movilidad de la fuente (`source_mobility_from_levels`, Fórmula 19). También
+se cubre el nivel de velocidad libre promediado por posiciones de la
+ISO 9611:1996, ecuación (9) (`mean_free_velocity_level`).
+
+**No cubierto.** La Fórmula 16, la movilidad puntual equivalente de una
+placa como media aritmética de $\operatorname{Re}(Y)$ en sus puntos de contacto, no está
+implementada: las funciones anteriores toman una `plate_mobility` ya
+conocida como entrada, en lugar de derivarla de medidas punto a punto. De la
+ISO 9611:1996 solo está implementada la media por posiciones de la ecuación
+(9); el resto de la norma se cita como el homólogo del lado de la fuente,
+sin implementar.
+
+## Véase también
+
+- Referencia de la API: [`building.measurement.structure_borne_power`](/phonometry/es/reference/api/building/structure-borne-power/).

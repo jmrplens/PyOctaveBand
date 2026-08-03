@@ -1,0 +1,486 @@
+---
+title: "Transmisión por flancos en laboratorio (ISO 10848)"
+description: "La medición en laboratorio de la transmisión por flancos de ISO 10848: el índice de reducción de vibraciones Kij desde diferencias de nivel de velocidad promediadas por dirección y longitudes de absorción equivalentes, los descriptores globales Dn,f y Ln,f, las comprobaciones de validez por solape modal de la parte 4 y las fichas acreditadas."
+references:
+  - type: book
+    authors: ["Hopkins, C."]
+    year: 2007
+    title: "Sound insulation"
+    publisher: "Butterworth-Heinemann"
+    doi: "10.4324/9780080550473"
+    note: "La monografía de referencia de la transmisión por flancos y el índice de reducción de vibraciones, incluida la base de análisis estadístico de energía de las comprobaciones de validez. ISBN 978-0-7506-6526-1."
+  - type: standard
+    organization: "International Organization for Standardization"
+    year: 2006
+    title: "Acoustics — Laboratory measurement of the flanking transmission of airborne and impact sound between adjoining rooms — Part 1: Frame document"
+    designation: "ISO 10848-1:2006"
+    url: "https://www.iso.org/standard/38284.html"
+    note: "El documento marco de la medición de la transmisión por flancos: definiciones, el índice de reducción de vibraciones Kij, la longitud de absorción equivalente y los descriptores de flanco normalizados D_n,f / L_n,f que alimentan la predicción EN 12354. Como ISO 10848 no contiene ningún ejemplo numérico resuelto, la conformidad se ancla en identidades de forma cerrada."
+  - type: standard
+    organization: "International Organization for Standardization"
+    year: 2006
+    title: "Acoustics — Laboratory measurement of the flanking transmission of airborne and impact sound between adjoining rooms — Part 2: Application to light elements when the junction has a small influence"
+    designation: "ISO 10848-2:2006"
+    url: "https://www.iso.org/standard/35004.html"
+    note: "Aplicación a elementos ligeros cuya unión tiene una influencia pequeña."
+  - type: standard
+    organization: "International Organization for Standardization"
+    year: 2006
+    title: "Acoustics — Laboratory measurement of the flanking transmission of airborne and impact sound between adjoining rooms — Part 3: Application to light elements when the junction has a substantial influence"
+    designation: "ISO 10848-3:2006"
+    url: "https://www.iso.org/standard/35003.html"
+    note: "Aplicación a elementos ligeros cuya unión tiene una influencia sustancial."
+  - type: standard
+    organization: "International Organization for Standardization"
+    year: 2010
+    title: "Acoustics — Laboratory measurement of the flanking transmission of airborne and impact sound between adjoining rooms — Part 4: Application to junctions with at least one heavy element"
+    designation: "ISO 10848-4:2010"
+    url: "https://www.iso.org/standard/45360.html"
+    note: "Aplicación a uniones con al menos un elemento pesado, con las comprobaciones de validez por densidad modal, número de modos por banda y solapamiento modal (bandas con M < 0,25 acotadas, Cláusula 9)."
+  - type: standard
+    organization: "International Organization for Standardization"
+    year: 1985
+    title: "Acoustics — Measurement of sound insulation in buildings and of building elements — Part 9: Laboratory measurement of room-to-room airborne sound insulation of a suspended ceiling with a plenum above it"
+    designation: "ISO 140-9:1985"
+    url: "https://www.iso.org/standard/3944.html"
+    note: "El apartado 3.3 define la diferencia de niveles normalizada del techo suspendido Dn,c con A0 = 10 m2, y los apartados de instalación fijan la profundidad del plenum, los volúmenes de los recintos y la absorción exigida al revestimiento."
+  - type: standard
+    organization: "ASTM International"
+    year: 2022
+    title: "Classification for Rating Sound Insulation"
+    designation: "ASTM E413-22"
+    url: "https://www.astm.org/e0413-22.html"
+    note: "La Tabla 1 es la curva de referencia y el apartado 5 las reglas de ajuste que invoca ASTM E1414 para obtener la clase de atenuación de techo."
+  - type: book
+    authors: ["Vigran, T. E."]
+    year: 2008
+    title: "Building acoustics"
+    publisher: "CRC Press"
+    doi: "10.1201/9781482266016"
+    note: "La Sección 9.2.3 presenta el modelo unidimensional de plenum de Mechel, Ecs. (9.13) a (9.20). ISBN 978-0-415-42853-8."
+---
+
+import ThemeImage from '../../../../../components/ThemeImage.astro';
+import ReportPreview from '../../../../../components/ReportPreview.astro';
+
+EN 12354 predice un edificio a partir de sus uniones, e ISO 10848 es la vía
+por la que una unión consigue su número. Dos elementos estructuralmente
+desacoplados se encuentran en un banco de uniones de laboratorio;
+excitadores y máquinas de impactos accionan uno de ellos, y las diferencias
+de nivel de velocidad a través de la unión se condensan en el **índice de
+reducción de vibraciones** $K_{ij}$, junto con los descriptores globales de
+flanco $D_{n,f}$ (aéreo) y $L_{n,f}$ (impacto). Esta guía cubre esa cadena
+de medición: la diferencia de niveles de velocidad promediada por dirección,
+las longitudes de absorción equivalentes, las comprobaciones de validez SEA
+de la parte 4 y las tres fichas acreditadas. Los valores empíricos de unión
+a los que recurre una predicción cuando no hay medición viven en
+[Predicción del aislamiento acústico (EN 12354)](/phonometry/es/buildings/design/insulation-prediction/);
+el $K_{ij}$ de teoría ondulatoria de uniones ideales de placas se deriva en
+[Transmisión de onda de flexión en uniones de placas](/phonometry/es/vibration/structural/junction-transmission/).
+
+## El índice de reducción de vibraciones y los descriptores de flanco
+
+ISO 10848:2006/2010 es el método de laboratorio que **mide** el **índice de
+reducción de vibraciones** de unión $K_{ij}$ que la [predicción EN 12354](/phonometry/es/buildings/design/insulation-prediction/)
+toma como entrada, junto con los descriptores globales de flanco $D_{n,f}$
+(aéreo) y $L_{n,f}$ (impacto). Es la contraparte de medición de la función
+empírica `junction_vibration_reduction()` de esa predicción.
+
+**Índice de reducción de vibraciones (Fórmula (13)).**
+$K_{ij} = \overline{D}_{v,ij} + 10\log_{10}\!\big(l_{ij} / \sqrt{a_i a_j}\big)$ dB, a
+partir de la diferencia de nivel de velocidad promediada en dirección
+$\overline{D}_{v,ij} = \tfrac{1}{2}(D_{v,ij} + D_{v,ji})$ (Fórmula (11), que hace
+$K_{ij}$ simétrico), la longitud de unión de arista común $l_{ij}$ y las
+**longitudes de absorción equivalentes**
+$a_j = 2{,}2\pi^2 S_j /(T_{s,j} c_0)\sqrt{f_\text{ref}/f}$ (Fórmula (12),
+$f_\text{ref} = 1000$ Hz). Para elementos ligeros y bien amortiguados
+$a_j = S_j / l_0$ ($l_0 = 1$ m) y la Fórmula (13) se reduce a la Fórmula (14)
+simplificada. El **factor de pérdidas total** asociado es $\eta = 2{,}2/(f T_s)$.
+
+**Descriptores globales.** $D_{n,f} = L_1 - L_2 - 10\log_{10}(A/A_0)$ (Fórmula (4),
+aéreo) y $L_{n,f} = L_2 + 10\log_{10}(A/A_0)$ (Fórmula (5), máquina de impactos),
+$A_0 = 10\ \text{m}^2$; sus números únicos $D_{n,f,w}$ / $L_{n,f,w}$ reutilizan
+los motores de ISO 717. El número único $\overline{K}_{ij}$ es la media
+aritmética entre 200 y 1250 Hz en tercios de octava, o entre 125 y 1000 Hz en
+bandas de octava (Anexo A).
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/flanking_transmission_es.svg" alt="Índice de reducción de vibraciones de unión Kij ISO 10848 creciendo entre 100 Hz y 5000 Hz en tercios de octava para una unión rígida en T de dos paredes pesadas, con el Kij medio de un solo número entre 200 y 1250 Hz en línea discontinua" width="80%" />
+
+<details>
+<summary>Mostrar el código de esta figura</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import building
+
+freqs = [100, 125, 160, 200, 250, 315, 400, 500, 630,
+         800, 1000, 1250, 1600, 2000, 2500, 3150, 4000, 5000]
+# Diferencia de nivel de velocidad promediada en dirección de una unión en T (dB):
+dv = np.array([4.5, 4.8, 5.2, 5.6, 6.0, 6.5, 7.0, 7.6, 8.1, 8.7,
+               9.2, 9.8, 10.3, 10.9, 11.4, 11.9, 12.3, 12.7])
+res = building.vibration_reduction_index(
+    dv, junction_length=4.0, area_i=12.0, area_j=10.0, frequency=freqs,
+    structural_reverberation_time_i=0.35, structural_reverberation_time_j=0.40,
+)
+print(res.single_number)   # Kij medio entre 200 y 1250 Hz (Anexo A)
+res.plot(language="es")
+plt.show()
+```
+
+</details>
+
+**Validez.** $K_{ij}$ se apoya en una simplificación de análisis estadístico de
+energía: `strong_coupling_satisfied()` comprueba la desigualdad de la
+Fórmula (15) y, para las uniones pesadas de la Parte 4, `modal_density()`,
+`band_mode_count()` y `modal_overlap_factor()` (Fórmulas (5)/(4)/(6)) cuantifican
+dónde el número de modos es demasiado bajo para que $K_{ij}$ sea fiable. Pasa el
+factor de solapamiento modal por banda a
+`vibration_reduction_index(..., modal_overlap=M)`: las bandas con $M < 0{,}25$ se
+marcan en `result.bracketed` y quedan excluidas del número único
+$\overline{K}_{ij}$, como exige la Cláusula 9 de la Parte 4.
+Como ISO 10848 no contiene ningún ejemplo numérico resuelto, la conformidad se
+ancla en identidades de forma cerrada ($K_{ij}$ simplificado, $a_j$ a
+$f_\text{ref}$, $\eta$).
+
+```python
+import numpy as np
+from phonometry import building
+
+freqs = [200, 250, 315, 400, 500, 630, 800, 1000, 1250]
+lij, s_i, s_j = 4.0, 12.0, 10.0     # longitud de unión (m), áreas de elemento (m^2)
+ts = np.linspace(0.30, 0.10, 9)     # tiempo de reverberación estructural Ts (s)
+dv_ij = [5.6, 6.0, 6.5, 7.0, 7.6, 8.1, 8.7, 9.2, 9.8]    # elemento i excitado (dB)
+dv_ji = [6.4, 6.8, 7.3, 7.8, 8.4, 8.9, 9.5, 10.0, 10.6]  # elemento j excitado (dB)
+
+# Kij desde ambas direcciones de excitación (simétrico por el promedio direccional):
+dbar = building.direction_averaged_level_difference(dv_ij, dv_ji)
+res = building.vibration_reduction_index(dbar, lij, s_i, s_j, frequency=freqs,
+                                structural_reverberation_time_i=ts,
+                                structural_reverberation_time_j=ts)
+res.k_ij           # Kij por banda (Fórmula (13))
+res.single_number  # Kij medio entre 200 y 1250 Hz, o None sin ese conjunto de bandas
+res.octave_bands() # Kij en octavas (su número único promedia 125-1000 Hz)
+
+# Descriptor global aéreo de flanco y una comprobación de validez de la Parte 4:
+dnf = building.normalized_flanking_level_difference(np.full(9, 75.0), np.full(9, 42.0),
+                                           absorption_area=np.full(9, 12.0))
+m = building.modal_overlap_factor(s_i, critical_frequency=85.0,
+                         structural_reverberation_time=ts)
+res_m = building.vibration_reduction_index(dbar, lij, s_i, s_j, frequency=freqs,
+                                  modal_overlap=m)   # bandas con M < 0,25 acotadas
+res_m.bracketed    # marcas por banda; las bandas acotadas salen del número único
+
+# Con 16 bandas de tercio de octava (o 5 de octava), dnf.plot() dibuja Dn,f
+# frente a la referencia ISO 717-1 desplazada con Dn,f,w anotado (requiere matplotlib):
+```
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/flanking_level_difference_es.svg" alt="Diferencia de niveles normalizada de flancos Dn,f por banda de tercio de octava frente a la curva de referencia ISO 717-1 desplazada, con las desviaciones desfavorables sombreadas y el índice Dn,f,w anotado" width="80%" />
+
+*El descriptor global de flancos $D_{n,f}$ es una magnitud aérea, así que su
+número único $D_{n,f,w}$ sale del motor de ISO 717-1 sin cambios; entra
+directamente en el modelo EN 12354-1 como dato del camino de flancos de la
+unión ensayada (el homólogo de impactos $L_{n,f}$ se evalúa igual según
+ISO 717-2).*
+
+<details>
+<summary>Mostrar el código de esta figura</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import building
+
+# Una unión ligera en el laboratorio: nivel del recinto emisor, nivel del
+# recinto receptor por el camino de flancos y el área de absorción receptora.
+l1 = np.full(16, 80.0)
+dnf_target = np.array([48, 49, 50, 51, 52, 54, 55, 57,
+                       58, 59, 60, 61, 62, 63, 64, 65], dtype=float)
+dnf = building.normalized_flanking_level_difference(
+    l1, l1 - dnf_target, absorption_area=np.full(16, 10.0)
+)
+
+# Una línea: Dn,f frente a la referencia ISO 717-1 desplazada:
+dnf.plot(language="es")
+plt.show()
+
+# A mano, desde el índice que porta el resultado:
+w = dnf.rating
+fig, ax = plt.subplots()
+ax.semilogx(w.band_centers, dnf.d_n_f, "o-", label="Dn,f (flancos)")
+ax.semilogx(w.band_centers, w.shifted_reference, "s--",
+            label="referencia desplazada")
+ax.fill_between(w.band_centers, w.measured, w.shifted_reference,
+                where=w.measured < w.shifted_reference, interpolate=True,
+                alpha=0.3, label="desviaciones desfavorables")
+ax.set_xlabel("Frecuencia [Hz]")
+ax.set_ylabel("Diferencia de niveles normalizada de flancos [dB]")
+ax.set_title(f"Dn,f,w = {w.rating} dB  (C={w.c:+d}; Ctr={w.ctr:+d})")
+ax.legend()
+plt.show()
+```
+
+</details>
+
+## Techos suspendidos: el trayecto por el plenum (ISO 140-9, Vigran 9.2.3)
+
+Dos despachos separados por un tabique que se detiene en el techo suspendido
+comparten un único plenum continuo por encima. El sonido sale del recinto
+emisor a través de las placas del techo, viaja lateralmente por encima del
+tabique y vuelve a bajar a través de las placas del recinto receptor. Ese
+trayecto suele ser el eslabón más débil de una distribución de oficinas, y no
+es lo que describe el $R_w$ de un tabique.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/ceiling_plenum_flanking_es.svg" alt="Dos paneles: el índice de reducción del trayecto techo-plenum Rcl por bandas de octava para dos profundidades de plenum frente a la suma de los índices de los dos techos, y la diferencia de niveles normalizada del techo de un informe de ensayo acreditado ASTM E1414 con la curva ASTM E413 ajustada y sus deficiencias sombreadas dando CAC 34" width="92%" />
+
+*Izquierda: el plenum cobra una penalización fija frente a la suma de los dos
+techos, y un plenum más profundo devuelve parte de ella. Derecha: la misma
+magnitud medida, valorada como clase de atenuación de techo.*
+
+**El modelo unidimensional.** La variante unidimensional de Mechel, tal como la
+presenta Vigran en la Sección 9.2.3, trata el plenum como un conducto revestido
+por un lado. El techo de cada lado tiene un factor de transmisión
+$\tau_S = \tau_{S,pl}\tau_{S,a}$ (las placas por el eventual absorbente del
+plenum, Ec. (9.14)); la potencia inyectada se reparte, con una fracción $s_S$
+dirigida hacia el tabique, y decae como $\exp(-mx)$ con el coeficiente de
+atenuación de potencia
+$m = 2\,\mathrm{Re}\{\Gamma\} = -2\,\mathrm{Im}\{k'\}$ (Ecs. (9.15) y (9.16)).
+Integrando sobre la longitud del techo a ambos lados se obtiene la Ec. (9.18),
+cuyo lado receptor incorpora la fuga de vuelta al recinto,
+$m'_R = m_R + s_R\tau_R/h$ (Ec. (9.17)). Vigran imprime el $m_R$ *sin prima* en
+el denominador de esa expresión; es una errata, registrada en
+[el registro de erratas](/phonometry/es/reference/errata/), y aquí se usa el
+$m'_R$ derivado. Leída al pie de la letra, la forma impresa no es monótona con
+el amortiguamiento del plenum (añadir absorbente predeciría un trayecto peor
+que no poner nada) y no está acotada cuando $m_R \to 0$. Para un plenum con poca atenuación y
+$s_S = s_R = 0{,}5$ eso se reduce a la forma compacta que hace visible la
+geometría (Ecs. (9.19) y (9.20)):
+
+$$
+R_{cl} = R_S + R_R - 10\log_{10}\!\left[\frac{\varepsilon^2 L_R}{4h}\right],
+$$
+
+con $\varepsilon = 1$ para paredes laterales del plenum totalmente absorbentes
+y $\varepsilon = 2$ para totalmente reflectantes. Un plenum profundo ayuda, un
+recinto largo perjudica, y duplicar el aislamiento de las placas ayuda el doble
+porque $R_S$ y $R_R$ aparecen los dos. Referido al área del tabique en lugar de
+a la del techo, $R_{cl,p} = R_{cl} + 10\log_{10}(H_S/L_S)$ (Ec. (9.13)), que es lo
+que permite sumar el trayecto por el techo al trayecto directo como factores de
+transmisión.
+
+```python
+from phonometry import (
+    partition_referenced_reduction_index,
+    plenum_flanking_reduction_index,
+)
+
+freqs = [63.0, 125.0, 250.0, 500.0, 1000.0, 2000.0, 4000.0]
+ceiling = [17.0, 21.0, 25.0, 29.0, 32.0, 30.0, 38.0]   # placa de yeso de 9,5 mm
+
+# La geometría del ejemplo de Vigran: LS = LR = 4,75 m, plenum 0,43 m,
+# paredes laterales reflectantes.
+res = plenum_flanking_reduction_index(
+    ceiling, ceiling, ceiling_length=4.75, plenum_height=0.43, frequency=freqs
+)
+print(round(res.geometry_term, 1))    # 10.4 dB cobrados a RS + RR
+res.plot()                            # Rcl frente a los dos techos
+
+# Un plenum revestido atenúa el trayecto lateral (Ec. (9.18) en vez de (9.20)):
+damped = plenum_flanking_reduction_index(
+    ceiling, ceiling, ceiling_length=4.75, plenum_height=0.43,
+    attenuation_source=[0.5] * 7, attenuation_receiving=[0.5] * 7,
+)
+
+# Referido al tabique en lugar de al techo (Ec. (9.13)):
+print(partition_referenced_reduction_index(res.reduction_index, 2.7, 4.75))
+```
+
+**La magnitud medida.** Un techo no se valora por $R_{cl}$ sino por la
+**diferencia de niveles normalizada del techo suspendido** $D_{n,c} = D - 10\log_{10}(A/A_0)$
+(ISO 140-9:1985, apartado 3.3), con $A$ el área de absorción acústica
+equivalente del recinto receptor y la referencia $A_0 = 10\ \text{m}^2$. La
+instalación tiene dos recintos de al menos 50 m³ cuyos volúmenes difieren en al
+menos un 10 %, un tabique divisorio adelgazado a 100 mm como máximo en su parte
+superior y un plenum de 650 mm a 760 mm de profundidad con una pared lateral y
+las dos testeras revestidas; la norma imprime la absorción exigida al
+revestimiento, $\alpha_s \ge 0{,}65$ a 125 Hz y $\ge 0{,}80$ de 250 Hz a
+4000 Hz, y exige $\alpha < 0{,}10$ en la otra pared lateral y en el techo del
+plenum. Su equivalente norteamericana, ASTM E1414, usa
+$A_0 = 12\ \text{m}^2$, de modo que un valor ASTM queda unos
+$10\log_{10}(12/10) = 0{,}79$ dB por encima para los mismos recintos.
+
+ISO valora $D_{n,c}$ con la curva de ISO 717-1, dando $D_{n,c,w}$; ASTM E1414
+lo valora a través de ASTM E413 como **clase de atenuación de techo**. E413
+redondea los datos al entero más próximo (apartado 5.2), eleva su curva de
+referencia en pasos de 1 dB mientras la suma de las deficiencias no supere
+32 dB y ninguna deficiencia individual pase de 8 dB (apartados 5.3 y 5.4), y
+lee la valoración sobre la curva desplazada a 500 Hz (apartado 5.5).
+
+```python
+from phonometry import (
+    ceiling_attenuation_class,
+    normalized_ceiling_attenuation,
+    weighted_rating,
+)
+
+# ASTM E1414 normaliza a A0 = 12 m2, ISO 140-9 a A0 = 10 m2.
+dnc = normalized_ceiling_attenuation(l1, l2, absorption, reference_area=12.0)
+
+# Una placa acústica de yeso perforada de 28 mm, medida según ASTM E1414 (CAC 34).
+dnc = [14.4, 18.6, 21.7, 24.1, 23.4, 30.3, 33.7, 35.2,
+       41.6, 44.2, 42.1, 36.8, 35.7, 36.0, 36.9, 37.9]
+res = ceiling_attenuation_class(dnc)
+print(res.rating, res.deficiency_sum, res.max_deficiency)   # 34, 27.0, 7.0
+res.plot()                                                  # Dn,c frente a la curva
+
+# El número único ISO del mismo espectro, trasladado a A0 = 10 m2:
+iso = [v - 0.79 for v in dnc]
+print(weighted_rating(iso).rating)                          # Dn,c,w
+```
+
+## Informes de transmisión por flancos ISO 10848 (`.report()`)
+
+Cada uno de los tres resultados genera una ficha PDF de una página.
+`VibrationReductionResult.report()` escribe un informe de **caracterización de
+la unión** del índice de reducción de vibraciones $K_{ij}$ (ISO 10848-1:2006):
+la línea de base normativa, una cabecera de metadatos opcional, la tabla de
+$K_{ij}$ por banda junto a la curva $K_{ij}(f)$ y un recuadro con el número
+único (media de $K_{ij}$) sobre el intervalo de bandas del anexo A, con el
+recuento de bandas promediadas y acotadas. Las bandas acotadas por solapamiento
+modal insuficiente ($M < 0{,}25$, ISO 10848-4:2010 apartado 9) imprimen su valor
+entre corchetes y se excluyen de la media; `verbose=True` añade una columna que
+indica si cada banda entra en la media.
+
+`FlankingLevelDifferenceResult.report()` y `FlankingImpactLevelResult.report()`
+escriben informes de **medición** de los descriptores globales $D_{n,f}$
+(aéreo) y $L_{n,f}$ (impactos, máquina de impactos), reutilizando la misma
+disposición de dos paneles del aislamiento: la magnitud por banda junto a la
+curva medida frente a la referencia ISO 717 desplazada y el número único
+$D_{n,f,w}$ (C; Ctr) (ISO 717-1) o $L_{n,f,w}$ (CI) (ISO 717-2).
+`verbose=True` anexa
+la evaluación ISO 717 por banda (el valor, la referencia desplazada y la
+desviación desfavorable). Un `requirement` indicado en `ReportMetadata` añade un
+veredicto ($D_{n,f,w}$ cumple igualando o superándolo, $L_{n,f,w}$ igualándolo o
+por debajo), y `language="es"` genera cada ficha en español. Se necesita
+reportlab y, para la figura que incrusta la ficha, matplotlib
+(`pip install "phonometry[report,plot]"`).
+
+```python
+import numpy as np
+from phonometry import building, ReportMetadata
+
+freqs = [100, 125, 160, 200, 250, 315, 400, 500, 630,
+         800, 1000, 1250, 1600, 2000, 2500, 3150, 4000, 5000]
+dv = np.array([4.5, 4.8, 5.2, 5.6, 6.0, 6.5, 7.0, 7.6, 8.1, 8.7,
+               9.2, 9.8, 10.3, 10.9, 11.4, 11.9, 12.3, 12.7])
+m = np.full(18, 1.0); m[:3] = 0.1                        # acota las bandas bajas
+kij = building.vibration_reduction_index(
+    dv, junction_length=4.0, area_i=12.0, area_j=10.0, frequency=freqs,
+    structural_reverberation_time_i=0.35, structural_reverberation_time_j=0.40,
+    modal_overlap=m,
+)
+kij.report("Kij.pdf", metadata=ReportMetadata(specimen="Unión rígida en T"),
+           language="es")
+
+l1 = np.full(16, 80.0)
+dnf = np.array([48, 49, 50, 51, 52, 54, 55, 57, 58, 59, 60, 61, 62, 63, 64, 65],
+               dtype=float)
+dres = building.normalized_flanking_level_difference(
+    l1, l1 - dnf, absorption_area=np.full(16, 10.0)
+)
+dres.report("Dnf.pdf", metadata=ReportMetadata(requirement=55.0), language="es")
+
+recv = np.array([58, 57, 56, 55, 54, 52, 50, 48, 46, 44, 42, 40, 38, 36, 34, 32],
+                dtype=float)
+lres = building.normalized_flanking_impact_level(recv, absorption_area=np.full(16, 10.0))
+lres.report("Lnf.pdf", metadata=ReportMetadata(requirement=55.0), language="es")
+```
+
+Las fichas de ejemplo se regeneran con `make reports` y se mantienen en el
+repositorio. Pulsa una vista previa para abrir el PDF:
+
+<ReportPreview
+	name="iso10848_kij_example"
+	title="Informe del índice de reducción de vibraciones de unión ISO 10848-1 (PDF)"
+	description="Informe de una página de caracterización de la unión del índice de reducción de vibraciones Kij: la cabecera de metadatos, la tabla de Kij por banda junto a la curva Kij(f) y el recuadro con el número único (media de Kij) sobre el intervalo del anexo A con el recuento de bandas promediadas y acotadas (las tres bandas más bajas acotadas por solapamiento modal insuficiente)."
+	caption="Ficha del índice de reducción de vibraciones (VibrationReductionResult.report), Kij medio."
+/>
+
+<ReportPreview
+	name="iso10848_dnf_example"
+	title="Informe de la diferencia de niveles por flancos aérea ISO 10848-2 (PDF)"
+	description="Informe de una página de transmisión por flancos aérea de la diferencia de niveles por flancos normalizada Dn,f: la cabecera de metadatos, la tabla de Dn,f en tercios de octava junto a la curva medida frente a la referencia desplazada, el recuadro con Dn,f,w (C; Ctr) según ISO 717-1 y un veredicto de CUMPLE frente al requisito de 55 dB."
+	caption="Ficha de la diferencia de niveles por flancos (FlankingLevelDifferenceResult.report), Dn,f,w (C; Ctr)."
+/>
+
+<ReportPreview
+	name="iso10848_lnf_example"
+	title="Informe del nivel de impactos por flancos ISO 10848-2 (PDF)"
+	description="Informe de una página de transmisión por flancos a impactos del nivel de impactos por flancos normalizado Ln,f: la cabecera de metadatos, la tabla de Ln,f en tercios de octava junto a la curva medida frente a la referencia desplazada, el recuadro con Ln,f,w (CI) según ISO 717-2 y un veredicto de CUMPLE frente al requisito de 55 dB."
+	caption="Ficha del nivel de impactos por flancos (FlankingImpactLevelResult.report), Ln,f,w (CI)."
+/>
+
+## Qué cubre esta guía
+
+**Cubierto.** El índice de reducción de vibraciones $K_{ij}$ de
+ISO 10848-1:2006 (Fórmula (13)) desde la diferencia de niveles de velocidad
+promediada por dirección (Fórmula (11)) y las longitudes de absorción
+equivalentes (Fórmula (12)), con la forma simplificada para elementos
+ligeros (Fórmula (14)), el factor de pérdidas total y la media de número
+único del Anexo A, mediante
+`building.direction_averaged_level_difference` y
+`building.vibration_reduction_index`; los descriptores globales $D_{n,f}$
+(Fórmula (4)) y $L_{n,f}$ (Fórmula (5)) con sus números únicos de ISO 717,
+mediante `building.normalized_flanking_level_difference` y
+`building.normalized_flanking_impact_level`; la comprobación de acoplamiento
+fuerte (Fórmula (15)) y las comprobaciones de validez de ISO 10848-4:2010
+por densidad modal, recuento de modos por banda y solape modal que ponen
+entre corchetes las bandas poco fiables
+(`building.strong_coupling_satisfied`, `building.modal_density`,
+`building.band_mode_count`, `building.modal_overlap_factor`); y las tres
+fichas de una página con `.report()`.
+
+**No cubierto.** Las partes 2, 3 y 4 de ISO 10848 difieren en los tipos de
+unión y de probeta a los que se aplican; phonometry implementa solo las
+fórmulas genéricas de $K_{ij}$/$D_{n,f}$/$L_{n,f}$ de la parte 1, más la
+comprobación de solape modal de la parte 4, no los montajes de ensayo
+específicos de instalación que describen las otras partes. Como ISO 10848
+no contiene ejemplo numérico resuelto, la conformidad se ancla en
+identidades de forma cerrada ($K_{ij}$ simplificado, $a_j$ en
+$f_\text{ref}$, $\eta$).
+
+La rama de techos suspendidos cubre la atenuación normalizada del
+techo $D_{n,c}$ del apartado 3.3 de ISO 140-9:1985, la clase de
+atenuación de techo de ASTM E413-22 que invoca ASTM E1414 y el modelo
+unidimensional de plenum de la Sección 9.2.3 de Vigran, con
+`building.normalized_ceiling_attenuation`,
+`building.ceiling_attenuation_class`,
+`building.plenum_flanking_reduction_index` y
+`building.partition_referenced_reduction_index`. El modelo de plenum
+no tiene salida numérica publicada propia, así que se ancla en sus
+formas cerradas y en las propiedades estructurales que una lectura errónea
+rompe: la monotonía con el amortiguamiento del plenum, la cota
+$\tau_{cl} \le 1$ y la convergencia de la Ec. (9.18) a la Ec. (9.20);
+la cadena de medición y la clase se anclan en informes de laboratorio
+acreditados ASTM E1414. La constante de propagación $k'$ de un
+conducto revestido es aquí un dato de entrada, no una predicción.
+
+## Véase también
+
+- [Predicción del aislamiento acústico (EN 12354)](/phonometry/es/buildings/design/insulation-prediction/):
+  el modelo de flancos que consume el $K_{ij}$ medido, y sus valores
+  empíricos de unión del Anexo E.
+- [Transmisión de onda de flexión en uniones de placas](/phonometry/es/vibration/structural/junction-transmission/):
+  los coeficientes de transmisión de teoría ondulatoria tras el $K_{ij}$ de
+  una unión ideal.
+- [Medición del aislamiento en laboratorio](/phonometry/es/buildings/insulation/insulation-lab/):
+  la instalación de ISO 10140 cuya transmisión directa esquivan estas vías
+  de flanco.
+- [Índices globales de aislamiento (ISO 717)](/phonometry/es/buildings/insulation/insulation-ratings/):
+  los motores de curva de referencia tras $D_{n,f,w}$ y $L_{n,f,w}$.
+- [Teoría](/phonometry/es/reference/theory/rooms-buildings/): las fórmulas
+  de flancos en la derivación de EN 12354.
+- [Acústica de recintos y espacios diáfanos](/phonometry/es/buildings/rooms/open-plan-acoustics/): el contexto de oficina
+  diáfana en el que suele aparecer el trayecto por el techo.
+- Referencia de la API: [`building.measurement.flanking_transmission`](/phonometry/es/reference/api/building/flanking-transmission/)
+  y [`building.prediction.ceiling_plenum`](/phonometry/es/reference/api/building/ceiling-plenum/).

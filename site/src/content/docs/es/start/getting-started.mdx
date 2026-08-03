@@ -1,0 +1,170 @@
+---
+title: "Primeros pasos"
+description: "Instala phonometry y ejecuta tu primer análisis de octava fraccional."
+---
+
+import ThemeImage from '../../../../components/ThemeImage.astro';
+import { totalChecks } from '../../../../data/conformance-stats.mjs';
+
+phonometry es una biblioteca de Python para la medida acústica, desde los
+bancos de filtros de octava fraccional y la ponderación frecuencial hasta los
+niveles sonoros y las métricas normalizadas. Cada métrica se verifica frente a
+la norma que la rige, {totalChecks} comprobaciones numéricas en total.
+Instálala con `pip install phonometry`; el primer ejemplo de abajo filtra una
+señal en tercios de octava y devuelve el nivel de presión acústica de cada
+banda.
+
+## Instalación
+
+**Opción 1: Desde PyPI (recomendada)**
+
+```bash
+pip install phonometry
+```
+
+Extras opcionales:
+
+```bash
+pip install phonometry[plot]    # matplotlib, para gráficas de respuesta y métodos .plot() de resultados
+pip install phonometry[perf]    # numba, ponderación temporal 'impulse' más rápida
+pip install phonometry[report]  # reportlab + svglib, para que los métodos .report() generen fichas PDF normativas (su panel de gráfica necesita también [plot])
+pip install phonometry[full]    # todos los anteriores (recomendado)
+```
+
+Recomiendo `pip install phonometry[full]`: instala de una vez matplotlib,
+numba, reportlab y svglib, con lo que quedan habilitadas todas las
+funcionalidades de la biblioteca. La instalación base calcula todas las
+métricas solo con NumPy y SciPy; lo único que no queda disponible son las
+figuras (`.plot()` y las gráficas de respuesta de los filtros), las fichas PDF
+normativas (`.report()`) y el núcleo compilado que acelera la ponderación
+temporal `impulse`.
+
+Un matiz sobre `[full]`: numba declara `numpy<2.5`, así que `phonometry[full]`
+(igual que `phonometry[perf]`) resuelve NumPy por debajo de 2.5 mientras que
+una instalación simple obtiene la última versión. numba solo acelera la
+ponderación temporal `impulse`, de modo que si prefieres mantener NumPy al día,
+instala `phonometry[plot,report]` y deja fuera `[perf]`.
+
+**Opción 2: Clonar e instalar**
+
+```bash
+git clone https://github.com/jmrplens/phonometry.git
+cd phonometry
+pip install .
+```
+
+**Opción 3: Submódulo de git**
+
+```bash
+git submodule add https://github.com/jmrplens/phonometry.git
+# Después, instálalo en modo editable para usarlo desde tu proyecto
+pip install -e ./phonometry
+```
+
+## La cadena de procesado de un vistazo
+
+Todo análisis con phonometry es un subconjunto de una misma cadena: tomar la
+señal cruda, convertirla a unidades físicas, ponderarla en frecuencia, dividirla
+en bandas normalizadas, suavizarla en el tiempo y reducirla a métricas:
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_signal_chain_es.svg" alt="Cadena de procesado de phonometry: señal, calibración, ponderación frecuencial, banco de filtros de octava, ponderación temporal y métricas, con la norma verificada en cada etapa" width="92%" loading="eager" />
+
+Cada etapa es una función o clase independiente que puedes usar por separado;
+las guías las recorren de izquierda a derecha ([Calibración](/phonometry/es/signal/metrology/calibration/) →
+[Ponderación frecuencial](/phonometry/es/signal/levels/weighting/) → [Bancos de filtros](/phonometry/es/signal/filters/filter-banks/) →
+[Ponderación temporal](/phonometry/es/signal/levels/time-weighting/) → [Niveles](/phonometry/es/signal/levels/levels/)).
+
+## Uso básico: análisis en tercios de octava
+
+Analiza una señal y obtén el nivel de presión acústica (SPL) por banda de frecuencia.
+
+```python
+import numpy as np
+from phonometry import filters
+
+fs = 48000
+t = np.linspace(0, 1, fs, endpoint=False)
+# Señal compuesta: 100 Hz + 1000 Hz
+signal = np.sin(2 * np.pi * 100 * t) + np.sin(2 * np.pi * 1000 * t)
+
+# Aplicar el banco de filtros de 1/3 de octava
+spl, freq = filters.octave_filter(signal, fs=fs, fraction=3)
+
+print(f"Bandas: {freq}")
+# Bandas: [12.589254117941678, 15.848931924611138, ..., 19952.623149688785]  (33 bandas)
+print(f"SPL [dB]: {spl}")
+# SPL [dB]: [46.88395351 47.96774897 49.04991279 ...]  — ~90.7 dB en 100 Hz y ~90.9 dB en 1 kHz
+```
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/signal_response_fraction_3_es.svg" alt="Análisis en tercios de octava de una señal multitono con la PSD cruda de fondo" width="80%" />
+
+*Ejemplo de análisis espectral en tercios de octava de una señal compleja.*
+
+<details>
+<summary>Mostrar el código de esta figura</summary>
+
+```python
+import matplotlib.pyplot as plt
+import scipy.signal
+import numpy as np
+from phonometry import filters
+
+fs = 48000
+t = np.linspace(0, 1, fs, endpoint=False)
+# Señal compuesta: 100 Hz + 1000 Hz
+signal = np.sin(2 * np.pi * 100 * t) + np.sin(2 * np.pi * 1000 * t)
+# Aplicar el banco de filtros de 1/3 de octava
+spl, freq = filters.octave_filter(signal, fs=fs, fraction=3)
+
+# Fondo gris: la PSD de la señal cruda (Welch), desplazada justo por debajo
+# de los SPL de banda para comparar ambas formas espectrales en un mismo eje.
+f_psd, psd = scipy.signal.welch(signal, fs, nperseg=8192)
+psd_db = 10 * np.log10(psd + 1e-12)
+psd_db += np.max(spl) - np.max(psd_db) - 5
+
+fig, ax = plt.subplots()
+ax.semilogx(f_psd, psd_db, color="gray", alpha=0.6, label="PSD de la señal cruda")
+ax.semilogx(freq, spl, marker="o", markerfacecolor="white",
+            label="Bandas de 1/3 de octava")
+ax.set_xlabel("Frecuencia [Hz]")
+ax.set_ylabel("SPL [dB]")
+ax.legend()
+plt.show()
+```
+
+</details>
+
+## Analizar un archivo de audio
+
+```python
+from scipy.io import wavfile
+from phonometry import filters
+
+# Cargar un archivo WAV estándar
+fs, signal = wavfile.read("measurement.wav")
+
+# Analizar
+# Nota: para obtener valores SPL reales debes calibrar la entrada.
+# Consulta la guía de calibración.
+spl, freq = filters.octave_filter(signal, fs=fs, fraction=3)
+```
+
+El audio entero (por ejemplo, datos int16 de un WAV) se convierte internamente a
+float64, así que es seguro pasar directamente la salida de `wavfile.read`.
+
+## Siguientes pasos
+
+El análisis en octavas de arriba usa el núcleo `filters`, uno de los dieciocho
+espacios de nombres de dominio; las secciones de la barra lateral recorren el
+resto, desde la psicoacústica y la acústica de salas, edificación y vibraciones
+hasta el ruido ambiental, aeronáutico y submarino, la electroacústica y la
+simulación de ondas FDTD. Cada objeto de resultado expone una figura
+`.plot(language="en"|"es")` de una línea y, cuando una norma define un formato
+de informe, un método `.report()` que genera la ficha PDF normativa.
+
+- [Galería de arquitecturas de filtro](/phonometry/es/signal/filters/filter-gallery/): elige una arquitectura e inspecciona sus respuestas
+- [Calibración y dBFS](/phonometry/es/signal/metrology/calibration/): obtén valores SPL reales
+- [Por qué phonometry](/phonometry/es/start/why-phonometry/): la filosofía de diseño basada en conformidad
+- [Informe de conformidad](/phonometry/es/reference/conformance/): el valor esperado y el calculado de las {totalChecks} comprobaciones
+- [Referencia de la API](/phonometry/es/reference/api/): todos los parámetros de cada función
+- [Bibliografía](/phonometry/es/reference/bibliography/): los libros y artículos que sustentan cada guía, cada uno con un enlace verificado

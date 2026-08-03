@@ -404,7 +404,7 @@ all assume the record is stationary, as does the very idea of *the* $L_{eq}$ of
 a measurement in [Levels](levels.md). When a record fails
 the test, split it at the change (the `segment_values` sequence shows
 where), analyse the pieces, or move to the short-time views - the
-[calibrated spectrogram](https://jmrplens.github.io/phonometry/guides/time-frequency/) - that do not
+[calibrated spectrogram](https://jmrplens.github.io/phonometry/signal/spectra/time-frequency/) - that do not
 assume stationarity. And when it passes, the
 [GUM machinery](gum-uncertainty.md) can propagate the
 *remaining* random error of every averaged estimate with a clean

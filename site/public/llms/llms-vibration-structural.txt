@@ -1,0 +1,1102 @@
+# phonometry: vibration structural
+
+Part of https://jmrplens.github.io/phonometry/llms.txt. Full text of the pages in this area.
+
+---
+
+<!-- source: docs/mechanical-mobility.md | canonical: https://jmrplens.github.io/phonometry/vibration/structural/mechanical-mobility/ -->
+Source: https://jmrplens.github.io/phonometry/vibration/structural/mechanical-mobility/
+
+# Mechanical mobility and the FRF family (ISO 7626-1)
+
+Mechanical **mobility** is the complex ratio of a velocity response to the
+force that produces it, $Y = v/F$. It is one member of a family of
+motion-per-force **frequency-response functions** (FRFs): which one is used
+depends only on whether the motion is a displacement, a velocity or an
+acceleration, and each has a force-per-motion reciprocal. **ISO 7626-1:2011**
+(*Mechanical vibration and shock — Experimental determination of mechanical
+mobility — Part 1: Basic terms and definitions, and transducer specifications*)
+defines the whole family (Table 1, with the 3.1.2 mobility definition), and the
+classic closed-form single-degree-of-freedom (SDOF) resonator serves as the
+reference for those definitions. **ISO 7626-2:2015** adds the measurement side:
+FRF estimation from measured signals and its acceptance criteria. This FRF
+backbone underpins the structure-borne source and transmission standards:
+ISO 9611, ISO 10846, EN 15657 and EN 12354-5.
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/mechanical_mobility_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/mechanical_mobility.svg" alt="Normalized receptance, mobility and accelerance magnitudes of a single-degree-of-freedom resonator on a log-log frequency axis, all peaking at the resonance where the mobility is stiffness-controlled below and mass-controlled above" width="82%"></picture>
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import vibration
+
+m, k, c = 2.0, 8000.0, 5.0
+f = np.logspace(np.log10(0.5), np.log10(200.0), 500)
+w = 2.0 * np.pi * f
+h = vibration.sdof_receptance(f, m, k, c)
+for label, frf in (("receptance |H|", np.abs(h)),
+                   ("mobility |Y|", np.abs(1j * w * h)),
+                   ("accelerance |A|", np.abs(-(w**2) * h))):
+    plt.loglog(f, frf / frf.max(), label=label)
+plt.axvline(vibration.resonance_frequency(m, k), ls="--", color="0.6")
+plt.xlabel("Frequency [Hz]"); plt.ylabel("Normalized magnitude")
+plt.legend(); plt.show()
+```
+
+</details>
+
+## 1. The frequency-response-function family (Table 1)
+
+For a harmonic motion $x\,e^{j\omega t}$ the velocity is $j\omega x$ and the
+acceleration $-\omega^2 x$, so all three motion-per-force FRFs follow from
+the receptance $H$ by a power of $j\omega$, and each has a force-per-motion
+reciprocal:
+
+| Motion | FRF (motion / force) | Unit | Reciprocal (force / motion) | Unit |
+|---|---|---|---|---|
+| displacement | receptance $H = x/F$ | m/N | dynamic stiffness $1/H$ | N/m |
+| velocity | mobility $Y = j\omega H$ | m/(N·s) | impedance $1/Y$ | N·s/m |
+| acceleration | accelerance $A = -\omega^2 H$ | 1/kg | apparent mass $1/A$ | kg |
+
+`convert_frf` moves between any two of the six FRFs, pivoting through the
+receptance. A **driving-point** FRF has the response and force at the same point
+($i = j$); a **transfer** FRF has them at different points. Note that the
+force-per-motion kinds are element-wise reciprocals: the *free* quantities of
+ISO 7626-1, 3.1.4; the *blocked* matrix quantities of Table 1 do not invert
+element-wise for multi-coordinate systems (Table 1 also names $F/a$ the
+"effective mass", the quantity called apparent mass here).
+
+```python
+from phonometry import vibration
+
+# A mobility of 2e-3 m/(N.s) at 80 Hz, expressed as the other FRFs:
+Y = 2e-3
+print(round(abs(vibration.convert_frf(Y, 80.0, "mobility", "impedance")), 1))     # 500.0  N.s/m
+print(f"{abs(vibration.convert_frf(Y, 80.0, 'mobility', 'accelerance')):.3f}")    # 1.005  1/kg
+```
+
+The choice between the three motion FRFs is one of convenience, not physics:
+they carry the same information and `convert_frf` moves between them exactly.
+Accelerance is what an accelerometer-based measurement delivers directly;
+mobility is the natural currency of the structure-borne power standards
+(power is force times velocity, so
+$P = \tfrac{1}{2}\operatorname{Re}\{Y\}\,|F|^2$ at a contact); the
+reciprocals appear whenever a source is described by what it imposes rather
+than by how it responds. Reading a driving-point mobility plot is a
+structural diagnosis in itself: below a resonance the magnitude climbs
+proportionally to frequency along a **stiffness line**
+($|Y| \approx \omega/k$), above it the magnitude falls along a **mass line**
+($|Y| \approx 1/(\omega m)$), and the height
+of the peak between them reflects the damping: it equals $1/c$ for the
+isolated viscously damped resonator of the next section, while on real
+structures with overlapping modes damping is instead estimated by modal
+fitting or from the half-power bandwidth.
+
+## 2. The SDOF reference resonator (closed form)
+
+The canonical closed-form reference, expressed in the Table 1 / 3.1.2 FRF
+taxonomy, is a mass $m$, viscous damping $c$ and stiffness $k$, whose
+receptance is
+
+$$
+H(\omega) = \frac{1}{k - \omega^2 m + j\,\omega c}, \qquad
+\omega_0 = \sqrt{k/m}.
+$$
+
+At the resonance $\omega_0$ the driving-point mobility is **purely real** and
+equal to $1/c$ (the mobility peak measures the damping) while the static
+receptance ($\omega \to 0$) is the compliance $1/k$:
+
+```python
+import numpy as np
+from phonometry import vibration
+
+m, k, c = 2.0, 8000.0, 5.0
+f0 = vibration.resonance_frequency(m, k)             # 10.07 Hz
+
+y0 = complex(vibration.sdof_mobility(f0, m, k, c))
+print(round(y0.real, 4), round(y0.imag, 6))   # 0.2 0.0   -> |Y(f0)| = 1/c
+print(round(complex(vibration.sdof_receptance(1e-6, m, k, c)).real, 7))  # 0.000125 = 1/k
+```
+
+## 3. Measured FRFs and their acceptance criteria (ISO 7626-2)
+
+In the usual ISO 7626-2 arrangement the structure hangs on a suspension soft
+enough that its rigid-body modes fall well below the first elastic resonance
+(the standard admits freely suspended or grounded structures; clause 5 asks
+for a support representative of the intended application), an
+exciter drives one point through an **impedance head** (a transducer stack
+measuring force and acceleration at the same point, which is what gives the
+attached-exciter setup its driving-point FRF), and accelerometers pick up
+the response
+elsewhere for the transfer FRFs. ISO 7626-5 covers the alternative of impact
+excitation with an exciter that is not attached to the structure, in
+practice usually an instrumented hammer: it trades the attached exciter's
+controlled spectrum for speed, with an excitation spectrum set by the
+impactor mass and tip stiffness.
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_mobility_rig_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_mobility_rig.svg" alt="ISO 7626 mobility measurement: a free-free beam on soft suspension driven by an exciter through an impedance head at the driving point, an accelerometer at a transfer point, and an impact hammer as the alternative excitation" width="92%"></picture>
+
+Processing measured random-excitation records per ISO 7626-2, 8.1.3 (the H1
+estimator $\hat{H} = G(\text{response}, \text{force})/G(\text{force}, \text{force})$)
+and the ordinary coherence $\gamma^2 = |G_{xy}|^2/(G_{xx}\,G_{yy})$ used for
+its data-quality checks are the library's
+existing spectral estimators [`transfer_function` and
+`coherence`](https://jmrplens.github.io/phonometry/devices/electroacoustics/electroacoustics/) (H1 is their default). On top of them,
+two ISO 7626-2 acceptance criteria are provided:
+
+* **Operational rigid-mass calibration (7.5.2).** The measured FRF of a freely
+  suspended rigid block of known mass must agree within ±5 % with
+  $|A| = 1/m$ (accelerance) or $|Y| = 1/(2\pi f m)$ (mobility).
+* **Random error (Annex A + 8.1.3).** Enough spectra must be averaged that the
+  normalized random error $\varepsilon = \sqrt{(1-\gamma^2)/(2n\gamma^2)}$ at
+  each resonance of a
+  driving-point mobility is below 5 %.
+
+```python
+import numpy as np
+from phonometry import vibration
+
+# A 10 kg calibration block: |A| must be 1/m = 0.100 1/kg at every frequency.
+f = np.array([20.0, 100.0, 500.0])
+res = vibration.rigid_mass_calibration_check([0.100, 0.102, 0.097], f, mass=10.0)
+print(res.passed, res.within_tolerance.tolist())   # True [True, True, True]
+
+# The Annex A example: coherence 0.8 needs about 75 averages for < 5 %.
+print(round(float(vibration.random_error_percent(0.8, 75)), 2))   # 4.08  %
+```
+
+The calibration check returns a `RigidMassCalibrationResult` carrying the
+per-frequency deviation and pass flags, and a `.plot()`: the measured FRF
+magnitude against the rigid-mass line with its ±5 % tolerance band (upper
+panel) and the relative deviation against the same band (lower panel, where a
+few-percent tolerance is actually readable). A calibration that drifts out of
+the band towards a few kHz points at a transducer or attachment-compliance
+error, exactly what the check is meant to catch:
+
+```python
+import numpy as np
+from phonometry import vibration
+
+m = 10.0                                                  # calibration block mass
+f = np.logspace(np.log10(20.0), np.log10(5000.0), 400)
+drift = 0.05 * (f / 2500.0) ** 2                          # high-frequency drift
+measured = (1.0 / m) * (1.0 + 0.015 * np.sin(2 * np.pi * np.log10(f)) + drift)
+res = vibration.rigid_mass_calibration_check(measured, f, mass=m)
+print(res.passed)                                         # False (drift exceeds 5 %)
+res.plot()
+```
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/rigid_mass_calibration_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/rigid_mass_calibration.svg" alt="Rigid-mass calibration check of a 10 kg block: the measured accelerance magnitude follows the flat rigid-mass line inside the plus-or-minus five percent tolerance band across most of the range, then drifts above the band towards a few kilohertz where the out-of-tolerance points are marked, and the lower panel shows the same deviation in percent crossing the plus five percent limit" width="82%"></picture>
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import vibration
+
+m = 10.0
+f = np.logspace(np.log10(20.0), np.log10(5000.0), 400)
+drift = 0.05 * (f / 2500.0) ** 2
+measured = (1.0 / m) * (1.0 + 0.015 * np.sin(2 * np.pi * np.log10(f)) + drift)
+res = vibration.rigid_mass_calibration_check(measured, f, mass=m)
+bad = ~res.within_tolerance
+
+fig, (top, bot) = plt.subplots(2, 1, sharex=True, figsize=(10, 7),
+                               gridspec_kw={"height_ratios": [1.5, 1.0]})
+top.fill_between(f, res.expected * 0.95, res.expected * 1.05, color="C1",
+                 alpha=0.15, label="±5 % tolerance band")
+top.semilogx(f, res.expected, "--", color="C1", label="expected |A| = 1/m")
+top.semilogx(f, res.measured, color="C0", label="within tolerance")
+top.semilogx(f[bad], res.measured[bad], "o", color="C1", label="out of tolerance")
+top.set_ylabel("Accelerance |A| [1/kg]"); top.legend()
+
+bot.axhspan(-5.0, 5.0, color="C1", alpha=0.15)
+bot.semilogx(f, 100.0 * res.deviation, color="C0")
+bot.semilogx(f[bad], 100.0 * res.deviation[bad], "o", color="C1")
+bot.set_xlabel("Frequency [Hz]"); bot.set_ylabel("Deviation [%]")
+plt.show()
+```
+
+</details>
+
+## 4. The `MobilityResult` bundle
+
+`sdof_mobility_result` bundles the FRF over frequency into a `MobilityResult`,
+which exposes `.magnitude`, `.phase`, `.to(target)` (any Table-1 kind) and a
+`.plot()` of $|Y(f)|$ with the resonance marked:
+
+```python
+import numpy as np
+from phonometry import vibration
+
+f = np.logspace(np.log10(0.5), np.log10(200.0), 400)
+res = vibration.sdof_mobility_result(f, mass=2.0, stiffness=8000.0, damping=5.0)
+z = res.to("impedance")                        # impedance = 1/Y per frequency
+print(res.frequencies[int(np.argmax(res.magnitude))].round(1))   # ~10.1 Hz
+
+res.plot()   # |Y(f)| with the resonance marked (needs matplotlib)
+```
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/mobility_result_lines_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/mobility_result_lines.svg" alt="Driving-point mobility magnitude of a single-degree-of-freedom resonator on log-log axes, climbing along the stiffness line below resonance, falling along the mass line above it, and peaking at one over the damping coefficient at the resonance" width="82%"></picture>
+
+*Reading a driving-point mobility is a structural diagnosis: below the
+resonance the magnitude climbs along the **stiffness line** $\omega/k$,
+above it it falls along the **mass line** $1/(\omega m)$, and the height of
+the peak between them is $1/c$, a direct read of the damping (Section 1).*
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import vibration
+
+m, k, c = 2.0, 8000.0, 5.0
+f = np.logspace(np.log10(0.5), np.log10(200.0), 400)
+res = vibration.sdof_mobility_result(f, mass=m, stiffness=k, damping=c)
+
+# One line — |Y(f)| with the resonance marked:
+res.plot()
+plt.show()
+
+# By hand, adding the stiffness and mass asymptotes the prose describes:
+w = 2.0 * np.pi * f
+fig, ax = plt.subplots()
+ax.loglog(f, res.magnitude, label="driving-point |Y(f)|")
+ax.loglog(f, w / k, ":", label="stiffness line ω/k")
+ax.loglog(f, 1.0 / (w * m), ":", label="mass line 1/(ωm)")
+ax.axhline(1.0 / c, ls="--", color="0.6", label="peak |Y| = 1/c")
+ax.set_xlabel("Frequency [Hz]")
+ax.set_ylabel("Mobility |Y| [m/(N·s)]")
+ax.set_title("Reading a driving-point mobility (ISO 7626-1)")
+ax.legend()
+plt.show()
+```
+
+</details>
+
+**Test-report fiche.** `MobilityResult.report(path)` renders a one-page
+mechanical-mobility measurement report (ISO 7626-1:2011 FRF definitions,
+measurement per ISO 7626-2:2015). Mobility is a continuous frequency-response
+function, not an octave-band quantity, so the sheet presents it honestly as the
+$|Y(f)|$ magnitude spectrum plus a compact table of characteristic points (the
+FRF type, driving-point or transfer, the frequency range, the peak frequency,
+the peak mobility magnitude and the phase there), and a boxed peak mobility
+$|Y|$ at the frequency it occurs at (for a driving-point FRF a resonance, where
+$|Y| = 1/c$ measures the damping). It is a characterisation, so there is no
+pass/fail verdict; `language="es"` renders the Spanish fiche. The fiche always
+embeds the $|Y(f)|$ spectrum, so it needs both the report and plot extras
+(`pip install "phonometry[report,plot]"`).
+
+```python
+from phonometry import ReportMetadata, vibration
+
+res = vibration.sdof_mobility_result(f, mass=2.0, stiffness=8000.0, damping=5.0)
+res.report(
+    "mobility.pdf",
+    metadata=ReportMetadata(
+        specimen="Machine support bracket (driving point)",
+        measurement_standard="ISO 7626-2",
+    ),
+)   # one-page fiche (needs phonometry[report,plot])
+```
+
+[![ISO 7626 mechanical-mobility example report: a metadata header, a table of the FRF characteristic points (type, frequency range, peak frequency, peak mobility and phase) beside the mobility magnitude spectrum, and the boxed peak mobility](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/reports/iso7626_mobility_example.webp)](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/reports/iso7626_mobility_example.pdf)
+
+## References
+
+- Cremer, L., Heckl, M., & Petersson, B. A. T. (2005). *Structure-borne
+  sound: Structural vibrations and sound radiation at audio frequencies*
+  (3rd ed.). Springer. ISBN 978-3-540-22696-3.
+  [doi:10.1007/b137728](https://doi.org/10.1007/b137728).
+  The standard monograph on structural vibration: point and transfer
+  mobilities of beams and plates, and the power flow P = ½·Re{Y}·|F|² that
+  makes mobility the working quantity of this page.
+- International Organization for Standardization. (2011). *Mechanical
+  vibration and shock — Experimental determination of mechanical mobility —
+  Part 1: Basic terms and definitions, and transducer specifications*
+  (ISO 7626-1:2011).
+  [iso.org catalogue](https://www.iso.org/standard/50426.html).
+  The Table 1 FRF family and the free/blocked distinctions implemented here.
+- International Organization for Standardization. (2015). *Mechanical
+  vibration and shock — Experimental determination of mechanical mobility —
+  Part 2: Measurements using single-point translation excitation with an
+  attached vibration exciter* (ISO 7626-2:2015).
+  [iso.org catalogue](https://www.iso.org/standard/62483.html).
+  The measurement side: H1 processing, rigid-mass calibration and the
+  random-error criterion.
+
+## Standards
+
+ISO 7626-1:2011, *Mechanical vibration and shock — Experimental
+determination of mechanical mobility — Part 1: Basic terms and definitions, and
+transducer specifications*: the FRF family and its reciprocals (Table 1, the
+3.1.2 mobility and 3.1.4 free-quantity definitions) and the driving-point /
+transfer distinction. ISO 7626-2:2015, *Part 2: Measurements using single-point
+translation excitation with an attached vibration exciter*: the 8.1.3 H1
+processing of random excitation, the 7.5.2 rigid-mass operational calibration
+(±5 %) and the Annex A random-error criterion (< 5 % at resonances).
+Conformance is anchored on the closed-form SDOF identities (consistent with the
+Table 1 / 3.1.2 definitions): the driving-point mobility peak
+$|Y(\omega_0)| = 1/c$, the static receptance $H(0) = 1/k$, the exact Table-1
+reciprocity $\text{impedance} \cdot \text{mobility} = 1$, the rigid-mass
+calibration values ($|A| = 0.100$ 1/kg for 10 kg;
+$|Y| = 1.59155 \times 10^{-4}$ m/(N·s) at 100 Hz) and the Annex A example
+($\gamma^2 = 0.8$, $n = 75$ → $\varepsilon = 4.08$ %).
+
+---
+
+
+<!-- source: docs/transfer-stiffness.md | canonical: https://jmrplens.github.io/phonometry/vibration/structural/transfer-stiffness/ -->
+Source: https://jmrplens.github.io/phonometry/vibration/structural/transfer-stiffness/
+
+# Dynamic transfer stiffness of resilient elements (ISO 10846)
+
+The vibro-acoustic transfer property of a resilient element (a vibration
+isolator, mount, bellows or hose) is its **dynamic transfer stiffness**
+$k_{2,1}$, the frequency-dependent ratio of the *blocking force* on the output
+(receiver) side to the displacement on the input (source) side
+(ISO 10846-1, 3.7):
+
+$$
+k_{2,1} = \frac{F_{2,b}}{u_1} \quad [\mathrm{N/m}].
+$$
+
+Because a vibration isolator is only effective between structures of large
+driving-point stiffness, the force it delivers to the receiver approximates this
+blocking force (ISO 10846-1, Eq. 7), so $k_{2,1}$ is the quantity that
+characterises the isolator's transmission. $k_{2,1}$ feeds the structure-borne
+source and building prediction standards: ISO 9611, EN 15657 and EN 12354-5.
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/transfer_stiffness_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/transfer_stiffness.svg" alt="Dynamic transfer stiffness level of a Kelvin-Voigt isolator: the true level (flat at 120 dB, rising with the damping term at high frequency) and the indirect-method estimate, which diverges at the mass/spring resonance where the transmissibility is not small and converges to the true level above three times the resonance" width="82%"></picture>
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import vibration
+
+# Kelvin-Voigt isolator k + jwc loaded by an 8 kg blocking mass.
+k, c, m2 = 1.0e6, 120.0, 8.0
+f0 = np.sqrt(k / m2) / (2.0 * np.pi)
+f = np.logspace(np.log10(f0 / 5.0), np.log10(f0 * 40.0), 600)
+
+k_true = k + 1j * 2.0 * np.pi * f * c
+t = vibration.base_transmissibility(f, m2, k, c)
+k_indirect = vibration.transfer_stiffness_indirect(f, t, m2)  # warns where T is not small
+
+# One line — the indirect determination bundled as a result draws its own
+# Lk(f) level spectrum:
+res = vibration.indirect_transfer_stiffness_result(f, t, blocking_mass=m2)
+res.plot()
+plt.show()
+
+# By hand, the true element stiffness against the indirect-method estimate:
+fig, ax = plt.subplots()
+ax.semilogx(f, vibration.transfer_stiffness_level(k_true),
+            label="true $L_k$ of $k+j\\omega c$")
+ax.semilogx(f, vibration.transfer_stiffness_level(k_indirect), "--",
+            label="indirect method $-(2\\pi f)^2 m_2 T$")
+ax.axvline(f0, color="0.6", linestyle=":", label="resonance $f_0$")
+ax.set(xlabel="Frequency [Hz]", ylabel="Transfer stiffness level $L_k$ [dB re 1 N/m]")
+ax.grid(True, which="both", alpha=0.3)
+ax.legend()
+plt.show()
+```
+
+</details>
+
+## 1. The transfer-stiffness level and loss factor
+
+Results are reported as a **level** re the reference stiffness
+$k_0 = 1\ \text{N/m}$ (ISO 10846-2 and -3, 3.17), and in the low-frequency range
+where inertial forces in the element are negligible the **loss factor** is the
+tangent of the phase angle of $k_{2,1}$ (ISO 10846-1, 3.8):
+
+$$
+L_k = 10\log_{10}\frac{|k_{2,1}|^2}{k_0^2} = 20\log_{10}\frac{|k_{2,1}|}{k_0}, \qquad
+\eta = \frac{\mathrm{Im}(k_{2,1})}{\mathrm{Re}(k_{2,1})}.
+$$
+
+```python
+from phonometry import vibration
+
+# A resilient mount with |k2,1| = 1 MN/m and a 5 % loss factor:
+k = 1e6 * (1.0 + 0.05j)
+print(round(float(vibration.transfer_stiffness_level(k)), 2))   # 120.00  dB re 1 N/m
+print(round(float(vibration.loss_factor(k)), 3))                # 0.05
+```
+
+## 2. Direct and indirect determination
+
+Why a *blocked* force rather than, say, the isolator's transmissibility?
+Because a transmissibility is a property of a whole assembly: it changes with
+whatever masses and stiffnesses the isolator happens to connect, so data
+measured on one rig would not transfer to another installation. The blocked
+force per unit input displacement is a property of the element alone, and it
+predicts the force the element delivers to any receiver that is much stiffer
+than the element itself, which is exactly the situation a vibration isolator
+is designed for. ISO 10846 therefore sandwiches the isolator between a driven
+input mass and an output that is either rigidly blocked or loaded with a
+known mass:
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_transfer_stiffness_rig_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_transfer_stiffness_rig.svg" alt="ISO 10846 transfer-stiffness rigs: the isolator under test between a driven excitation mass and either a blocked output with a force transducer, the direct method, or a resiliently supported blocking mass, the indirect method" width="92%"></picture>
+
+The **direct method** (ISO 10846-2) measures the blocked output force and the
+input displacement, $k_{2,1} = F_{2,b}/u_1$. The **indirect method**
+(ISO 10846-3) loads the output with a compact blocking mass $m_2$ and measures
+the vibration transmissibility $T = u_2/u_1$; the blocking force is then the
+inertia force of the mass (ISO 10846-3, Eq. 1):
+
+$$
+k_{2,1} = -(2\pi f)^2\,(m_2 + m_f)\,T \qquad (T \ll 1),
+$$
+
+with $m_f$ the mass of the output flange. The approximation is valid well above
+the mass/spring resonance, where $T$ is small.
+
+```python
+import numpy as np
+from phonometry import vibration
+
+# Indirect method: a 10 kg blocking mass, transmissibility 0.01 at 500 Hz.
+k = vibration.transfer_stiffness_indirect(500.0, 0.01, blocking_mass=10.0)
+print(f"{abs(complex(k)):.3e}")            # 9.870e+05  N/m
+
+# Bundle a swept measurement into a result carrying its level and loss factor:
+f = np.logspace(1.5, 3.3, 200)
+t = vibration.base_transmissibility(f, mass=8.0, stiffness=1e6, damping=120.0)
+res = vibration.indirect_transfer_stiffness_result(f, t, blocking_mass=8.0)
+print(round(float(res.level[-1]), 1))      # ~126  dB re 1 N/m (high-f)
+
+res.plot()   # the Lk(f) level spectrum, as in the figure above (needs matplotlib)
+```
+
+The `TransferStiffnessResult` carries the complex $k_{2,1}$ and exposes `.level`,
+`.loss_factor`, `.magnitude`, `.to("impedance"/"apparent_mass")` and `.plot()`.
+
+**Test-report fiche.** `TransferStiffnessResult.report(path)` renders a one-page
+dynamic-transfer-stiffness characterisation report for a resilient element
+(ISO 10846-1:2008 definition; determined by the direct method, ISO 10846-2:2008,
+or the indirect blocking-mass method, ISO 10846-3:2002). The transfer stiffness
+is a continuous frequency-response function, not an octave-band quantity, so the
+sheet presents it honestly as the $L_k(f)$ level spectrum plus a compact table
+of characteristic points (the determination method, the blocking mass for the
+indirect method, the frequency range, and the low-frequency stiffness plateau
+$|k_{2,1}|$, its level $L_k$ and the loss factor there), and a boxed
+low-frequency $L_k$ (the plateau that characterises the element below its
+internal resonances). It is a characterisation, so there is no pass/fail
+verdict; `language="es"` renders the Spanish fiche. The fiche always embeds the
+$L_k(f)$ spectrum, so it needs both the report and plot extras
+(`pip install "phonometry[report,plot]"`).
+
+[![ISO 10846 dynamic-transfer-stiffness example report: a metadata header, a table of the FRF characteristic points (method, frequency range and low-frequency stiffness, level and loss factor) beside the transfer-stiffness level spectrum, and the boxed low-frequency level](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/reports/iso10846_transfer_stiffness_example.webp)](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/reports/iso10846_transfer_stiffness_example.pdf)
+
+The two methods split the frequency axis between them. The direct method
+works from 1 Hz, the lower bound of the ISO 10846-2 scope (in practice the
+floor is set by the rig and its instrumentation), up to where the test rig's
+own resonances intrude (typically a few hundred hertz for large elements); the
+indirect method only becomes valid well above the blocking-mass/spring
+resonance, where the transmissibility is small, and extends the
+characterisation into the kilohertz range. A full isolator dataset is
+usually the two spliced together.
+
+## 3. Validity of the indirect method
+
+ISO 10846-3 (clause 6) requires the $T \ll 1$ approximation to be accurate
+within **1 dB** (12 % of the stiffness magnitude), which bounds the usable
+frequency range on both sides:
+
+* **Impedance mismatch (Inequality 2).** Valid only where
+  $\Delta L_{1,2} = L_{a1} - L_{a2} \ge 20\ \text{dB}$, i.e. $|T| \le 0.1$, the
+  constant `TRANSMISSIBILITY_LIMIT`. `transfer_stiffness_indirect` computes the
+  per-band $|T|$ and emits a `PhonometryWarning` when any band exceeds it
+  (routine near or below the mass/spring resonance, as in the figure above).
+* **Rigid blocking mass (Inequality 3).** Above an upper frequency $f_3$ the
+  blocking mass no longer moves as a rigid body; results are valid only while
+  its measured effective mass $m_{2,\text{eff}} = 2F_2/(a'_1 + a''_1)$ (Eq. 4)
+  stays within 1 dB of the rigid mass:
+  $10\log_{10}(m_{2,\text{eff}}^2/m_2^2) \le 1\ \text{dB}$.
+* **Linearity (clause 7.6).** Two input spectra 10 dB apart must give
+  transfer-stiffness levels within 1.5 dB.
+
+The blocking-force idealisation itself is quantified by ISO 10846-1, Eq. (6):
+for an isolator of output driving-point stiffness $k_{2,2}$ on a termination of
+stiffness $k_t$, the delivered force is $F_2/F_{2,b} = 1/(1 + k_{2,2}/k_t)$,
+within 10 % of the blocking force for $|k_{2,2}| < 0.1\,|k_t|$ (Eq. 7):
+
+```python
+import warnings
+from phonometry import vibration
+
+# |T| = 0.5 violates Inequality (2): the indirect result is flagged.
+with warnings.catch_warnings(record=True) as caught:
+    warnings.simplefilter("always")
+    vibration.transfer_stiffness_indirect(50.0, 0.5, blocking_mass=10.0)
+print(caught[0].category.__name__)                     # PhonometryWarning
+
+# Blocking-force approximation at the 10 % limit (ISO 10846-1, Eq. 6):
+print(round(abs(complex(vibration.blocking_force_ratio(1e5, 1e6))), 4))   # 0.9091
+```
+
+## 4. Relation to the FRF family
+
+The dynamic stiffness is a member of the frequency-response-function family
+(ISO 10846-1, Annex A / Table A.2): it is the reciprocal of the receptance and
+relates to the mechanical impedance $Z$ and effective mass $m_\text{eff}$ by
+$k = j\omega Z = -\omega^2 m_\text{eff}$. These conversions are the same as the
+[mechanical-mobility](https://jmrplens.github.io/phonometry/vibration/structural/mechanical-mobility/) `convert_frf` pivot:
+
+```python
+from phonometry import vibration
+
+k = 1e6 + 5e4j                                  # N/m, at 250 Hz
+Z = vibration.convert_frf(k, 250.0, "dynamic_stiffness", "impedance")
+print(abs(complex(vibration.convert_frf(Z, 250.0, "impedance", "dynamic_stiffness"))))  # 1.0012e6
+```
+
+## 5. Test-report fiche
+
+`TransferStiffnessResult.report(path)` renders a one-page
+dynamic-transfer-stiffness characterisation report for a resilient element
+(ISO 10846-1:2008 definition; determined by the direct method, ISO 10846-2:2008,
+or the indirect blocking-mass method, ISO 10846-3:2002). The transfer stiffness
+is a continuous frequency-response function, not an octave-band quantity, so the
+sheet presents it honestly as the $L_k(f)$ level spectrum plus a compact table
+of characteristic points (the determination method, the blocking mass for the
+indirect method, the frequency range, and the low-frequency stiffness plateau
+$|k_{2,1}|$, its level $L_k$ and the loss factor there), and a boxed
+low-frequency $L_k$ (the plateau that characterises the element below its
+internal resonances). It is a characterisation, so there is no pass/fail
+verdict; `language="es"` renders the Spanish fiche. The fiche always embeds the
+$L_k(f)$ spectrum, so it needs both the report and plot extras
+(`pip install "phonometry[report,plot]"`).
+
+```python
+import numpy as np
+from phonometry import ReportMetadata, TransferStiffnessResult, transfer_stiffness_direct
+
+freqs = np.array([20, 31.5, 50, 80, 125, 200, 315, 500, 800, 1250, 2000], dtype=float)
+k21 = 1e6 + 1j * (2 * np.pi * freqs) * 80.0     # Kelvin-Voigt element k + jwc
+u1 = 1e-6 + 0j
+k = transfer_stiffness_direct(k21 * u1, u1)     # direct method: k2,1 = F2,b/u1
+res = TransferStiffnessResult(frequencies=freqs, transfer_stiffness=k)
+res.report(
+    "transfer_stiffness.pdf",
+    metadata=ReportMetadata(
+        specimen="Rubber vibration isolator",
+        measurement_standard="ISO 10846-2",
+    ),
+)   # one-page fiche (needs phonometry[report,plot])
+```
+
+The example fiche is regenerated with `make reports` and kept in the
+repository. Click the preview to open the PDF:
+
+[![ISO 10846 dynamic-transfer-stiffness example report: a metadata header, a table of the FRF characteristic points (the determination method, the frequency range and the low-frequency stiffness, level and loss factor) beside the transfer-stiffness level spectrum, and the boxed low-frequency level](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/reports/iso10846_transfer_stiffness_example.webp)](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/reports/iso10846_transfer_stiffness_example.pdf)
+
+*Dynamic-transfer-stiffness fiche (`TransferStiffnessResult.report`): the FRF
+characteristic points and the transfer-stiffness level spectrum.*
+
+## References
+
+- Cremer, L., Heckl, M., & Petersson, B. A. T. (2005). *Structure-borne
+  sound: Structural vibrations and sound radiation at audio frequencies*
+  (3rd ed.). Springer. ISBN 978-3-540-22696-3.
+  [doi:10.1007/b137728](https://doi.org/10.1007/b137728).
+  Vibration isolation theory: why an isolator's performance depends on the
+  source and receiver mobilities, the physics behind the blocked-force
+  characterisation.
+- International Organization for Standardization. (2008). *Acoustics and
+  vibration — Laboratory measurement of vibro-acoustic transfer properties of
+  resilient elements — Part 1: Principles and guidelines* (ISO 10846-1:2008).
+  [iso.org catalogue](https://www.iso.org/standard/38936.html).
+  The principles part of the series: the blocking-force idealisation and the
+  FRF relations this page implements.
+
+## Standards
+
+ISO 10846 (parts 1-5), *Acoustics and vibration — Laboratory
+measurement of vibro-acoustic transfer properties of resilient elements*: the
+dynamic transfer stiffness $k_{2,1} = F_{2,b}/u_1$ and its FRF relations (Part 1,
+clause 5 and Annex A / Table A.2), the level $L_k$ re 1 N/m and the loss factor
+(Parts 2 and 3, clauses 3.8/3.17), the direct method (Part 2) and the indirect
+method $k_{2,1} = -(2\pi f)^2 (m_2 + m_f) T$ (Part 3, Formula 1) with its
+validity
+conditions (Part 3, clause 6: Inequalities 2 and 3; clause 7.6 linearity) and
+the blocking-force approximation (Part 1, Eqs. 6/7). Parts 4 and 5 extend the
+same quantities to elements other than supports and to the driving-point
+low-frequency method. Conformance is anchored on the standard's closed-form
+definitions: the level of a decade of stiffness, the indirect inertia relation,
+the Table-A.2 identity $k = j\omega Z$, the
+$|T| = 0.1 \leftrightarrow \Delta L_{1,2} = 20\ \text{dB}$ validity
+limit and its 1 dB (12 %) accuracy bound, the Eq. (6) force ratio $1/1.1$, and
+the 7.6 linearity criterion.
+
+---
+
+
+<!-- source: docs/junction-transmission.md | canonical: https://jmrplens.github.io/phonometry/vibration/structural/junction-transmission/ -->
+Source: https://jmrplens.github.io/phonometry/vibration/structural/junction-transmission/
+
+# Bending-wave transmission at plate junctions (Cremer / Craik / Hopkins)
+
+When a bending wave travelling on a wall or floor reaches a rigid junction with
+another plate, part of its energy is reflected and part is transmitted into the
+connected plates. The **wave approach** of Cremer et al. (1973), tabulated by
+Craik (1981, 1996) and collected in Hopkins (2007, *Sound Insulation*,
+Section 5.2.1.3), gives the transmission coefficient in closed form for the four
+most common junctions of thin, homogeneous, isotropic plates: the **X**, **T**,
+**L** and **in-line** junctions. Modelling the junction as a simply supported
+(pinned) massless beam forces an incident bending wave to generate only
+reflected and transmitted *bending* waves, with no conversion to in-plane
+waves, and the resulting coefficients are **independent of frequency**. That is
+what makes them convenient closed-form inputs for statistical energy analysis
+(SEA) and for the EN 12354 flanking-transmission model, where they feed the
+coupling loss factor $\eta_{ij}$ and the vibration reduction index $K_{ij}$.
+
+The object itself first: a T-junction where a 140 mm concrete floor runs into
+a continuous 200 mm wall. A `junction_transmission` result retains its plates,
+so `res.plot_geometry()` draws the junction to scale with the incident bending
+wave marked.
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/junction_plate_geometry_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/junction_plate_geometry.svg" alt="To-scale cross-section of a T2 plate junction: a 140 mm concrete floor arrives horizontally from the left with the incident-sound arrow on it and ends against the continuous 200 mm wall drawn vertically, both plate thicknesses dimensioned" width="82%"></picture>
+
+*Drawn to scale: the incident bending wave arrives along the 140 mm floor, and
+everything the closed-form coefficients describe happens where it meets the
+continuous 200 mm wall.*
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+from phonometry import junction_transmission
+
+# A 140 mm concrete floor meeting a 200 mm wall at a T-junction.
+res = junction_transmission("T2", 0.14, 3500.0, 320.0, 0.2, 3500.0, 460.0)
+res.plot_geometry()
+plt.show()
+```
+
+</details>
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/junction_transmission_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/junction_transmission.svg" alt="Transmission coefficient versus incidence angle for a rigid X-junction of a 100 mm and a 200 mm concrete plate, showing the corner coefficient tau12 and the straight-section coefficient tau13 falling from their normal-incidence values to zero at grazing incidence, with their diffuse-field angular averages marked as horizontal lines" width="82%"></picture>
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+from phonometry import junction_transmission
+
+# X-junction between a 100 mm and a 200 mm concrete plate (cL = 3200 m/s).
+res = junction_transmission("X", 0.1, 3200.0, 240.0, 0.2, 3200.0, 480.0)
+res.plot()  # tau(theta) for the corner and straight paths, with averages
+plt.show()
+```
+
+</details>
+
+## 1. Wave parameters χ and ψ (Eqs 5.10, 5.11)
+
+With plate $i$ of thickness $h_i$, quasi-longitudinal wave speed $c_{L,i}$ and
+surface density $\rho_{s,i}$, the whole family of coefficients depends on just
+two dimensionless ratios (Cremer et al. 1973):
+
+$$
+\chi = \frac{k_{B2}}{k_{B1}}
+     = \left(\frac{\rho_{s2} B_1}{\rho_{s1} B_2}\right)^{1/4}
+     = \sqrt{\frac{h_1 c_{L1}}{h_2 c_{L2}}}
+     = \sqrt{\frac{f_{c2}}{f_{c1}}}
+$$
+
+$$
+\psi = \frac{B_2 k_{B2}^2}{B_1 k_{B1}^2}
+     = \frac{h_2 c_{L2} \rho_{s2}}{h_1 c_{L1} \rho_{s1}}
+     = \frac{\rho_{s2} f_{c1}}{\rho_{s1} f_{c2}}
+$$
+
+$\chi$ is the ratio of the plates' bending wavenumbers (equivalently the square
+root of their critical-frequency ratio) and sets the total-internal-reflection
+cut-off angle $\theta_\text{co} = \arcsin\chi$; $\psi$ is the ratio of their
+bending-moment mobilities. For **identical plates** both are 1.
+
+```python
+from phonometry import junction_wave_parameters
+
+chi, psi = junction_wave_parameters(0.1, 3200.0, 240.0, 0.2, 3200.0, 480.0)
+#  -> (sqrt(0.5), 4.0)
+```
+
+## 2. Transmission around a corner and across a straight section
+
+For an incident wave on plate 1, transmission **around the corner** (into the
+perpendicular plate 2) is $\tau_{12}(\theta)$ (Eq. 5.12), and transmission
+**across the straight section** (into the collinear plate 3, X- and
+T-junction (1) only) is $\tau_{13}(\theta)$ (Eq. 5.13):
+
+$$
+\tau_{12}(\theta) =
+\frac{0.5\,J_1 J_2 \psi \cos\theta \sqrt{\chi^2 - \sin^2\theta}}
+     {(J_2\psi)^2 + \chi^2
+      + J_2\psi\left(\sqrt{(1+\sin^2\theta)(\chi^2+\sin^2\theta)}
+      + \sqrt{(1-\sin^2\theta)(\chi^2-\sin^2\theta)}\right)},
+\qquad \chi \ge \sin\theta
+$$
+
+$$
+\tau_{12}(\theta) = 0, \qquad \chi < \sin\theta
+$$
+
+(no propagating transmitted wave beyond the cut-off).
+
+The junction constants $J_1$, $J_2$, $J_3$ select the geometry:
+
+| Junction | $J_1$ | $J_2$ | $J_3$ |
+|---|---|---|---|
+| X | 1 | 1 | 1 |
+| T-junction (1) | 2 | 0.5 | 0.5 |
+| T-junction (2) | 2 | 2 | — |
+| L | 4 | 1 | — |
+
+The straight section is undefined for the T-junction (2) and the L-junction. In
+the assumed symmetry the X-junction has plates 1 and 3 identical and plates 2
+and 4 identical; T-junction (1) has plates 1 and 3 identical; T-junction (2) has
+plates 2 and 4 identical.
+
+```python
+import numpy as np
+from phonometry import (
+    corner_transmission_coefficient,
+    straight_transmission_coefficient,
+)
+
+theta = np.radians(np.linspace(0.0, 90.0, 91))
+tau12 = corner_transmission_coefficient(theta, chi, psi, "X")
+tau13 = straight_transmission_coefficient(theta, chi, psi, "X")
+```
+
+The clip below runs this experiment in the time domain with the library's 2D
+[elastic FDTD solver](https://jmrplens.github.io/phonometry/simulation/elastic-waves/): a bending packet on a 10 mm steel plate reaches an
+L-junction with an identical plate, and the corner splits it into the
+reflected and transmitted waves this section prices at $\tau_{12}(0°) = 0.5$.
+The fast in-plane precursor racing down the receiving plate is the mode
+conversion the pinned-junction model deliberately leaves out.
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anim_elastic_plate_junction_dark.gif"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anim_elastic_plate_junction.gif" alt="Animation: a 4 kHz bending-wave packet travels along a 10 mm steel plate in a 2D elastic FDTD field; on a straight control plate it runs on and nothing returns, while at an L-junction with an identical perpendicular plate it splits into a reflected packet, a transmitted bending wave descending the vertical plate and a faster in-plane precursor, with the closed-form junction transmission coefficient of 0.50 at normal incidence and the diffuse vibration reduction index of 5.2 dB annotated" width="640" height="360" loading="lazy"></picture>
+
+[Watch the high-resolution video (WebM)](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anim_elastic_plate_junction.webm)
+
+## 3. Diffuse-field angular average (Eq. 5.6)
+
+In a diffuse vibration field every angle of incidence is equally probable and
+the incident intensity carries a $\cos\theta$ obliquity factor, so the average
+transmission coefficient is
+
+$$
+\bar{\tau}_{ij} = \int_0^{\pi/2} \tau_{ij}(\theta)\cos\theta\,\mathrm{d}\theta
+$$
+
+(the $\cos\theta$ weight already normalises the average). For **identical
+plates** the algebra collapses to exact fractions that serve as the library's
+first-principles oracle:
+
+* X-junction corner and straight: $\tau_{ij}(\theta) = \cos^2\theta / 8$, so
+  $\bar{\tau}_{ij} = 1/12$;
+* L-junction corner: $\tau_{ij}(\theta) = \cos^2\theta / 2$, so
+  $\bar{\tau}_{ij} = 1/3$;
+* in-line junction: $\tau_{12}(0°) = 1$ (a continuous plate transmits fully).
+
+```python
+from phonometry import angular_average_transmission_coefficient
+
+angular_average_transmission_coefficient(1.0, 1.0, "X", section="corner")  # 1/12
+angular_average_transmission_coefficient(1.0, 1.0, "L", section="corner")  # 1/3
+```
+
+The two directions obey the SEA consistency relationship (Eq. 5.7),
+$\bar{\tau}_{12} = \chi\,\bar{\tau}_{21}$, so only one direction needs to be
+computed.
+
+## 4. Coupling loss factor and vibration reduction index
+
+The angular average is the bridge to the two junction descriptors used in
+SEA-based building models. The **coupling loss factor** (Eq. 2.154) for a
+source plate $i$ of area $S_i$, bending-wave group velocity $c_{g,i}$ and
+junction length $L_{ij}$ is
+
+$$
+\eta_{ij} = \frac{c_{g,i} L_{ij} \tau_{ij}}{2\pi^2 f S_i}
+$$
+
+and the wave-approach **vibration reduction index** (Eq. 5.116) is
+
+$$
+K_{ij} = 10\log_{10}(1/\tau_{ij}) + 5\log_{10}(f_{c,j}/f_\text{ref}),
+\qquad f_\text{ref} = 1000\ \text{Hz}
+$$
+
+with $f_{c,j}$ the critical frequency of the *receiving* plate. Combined with
+the Eq. 5.7 reciprocity this form is symmetric, $K_{ij} = K_{ji}$, as EN 12354
+requires of the junction descriptor. For the identical 100 mm concrete
+X-junction ($f_c \approx 203\ \text{Hz}$),
+$K_{ij} = 10\log_{10} 12 + 5\log_{10}(203/1000) \approx 7.3\ \text{dB}$.
+
+```python
+from phonometry import (coupling_loss_factor, junction_transmission,
+                        wave_vibration_reduction_index)
+
+eta = coupling_loss_factor(1.0 / 12.0, group_velocity=200.0,
+                           junction_length=4.0, frequency=500.0, plate_area=10.0)
+res = junction_transmission("X", 0.1, 3200.0, 240.0, 0.1, 3200.0, 240.0)
+kij = wave_vibration_reduction_index(res.corner_average,
+                                     res.critical_frequency2)  # 7.33 dB
+kij = res.corner_reduction_index  # the same, precomputed on the result
+
+res.plot()   # tau(theta) for this junction's corner and straight paths (needs matplotlib)
+```
+
+$K_{ij}$ is also what ISO 10848 measures on a built junction: excite one
+element, read the velocity level difference on both, and normalize by the
+junction length, so the closed-form value above has a direct experimental
+counterpart.
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_junction_rig_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_junction_rig.svg" alt="ISO 10848 junction measurement rigs for an L-junction and a T-junction of 140 to 200 mm concrete plates: a shaker or hammer excites element i, accelerometers on elements i and j read the velocity level difference Dv,ij, and the junction length of at least 2.3 m runs along the highlighted corner line" width="92%"></picture>
+
+The junction descriptor is a *design* quantity: sweeping the receiving
+plate's thickness shows how much a mass change at the junction buys. The
+corner paths stiffen quickly with a heavier receiving plate, while the
+straight (in-line) path of the X-junction rises fastest of all, since the
+perpendicular plates increasingly pin the junction line:
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/junction_kij_thickness_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/junction_kij_thickness.svg" alt="Wave-approach vibration reduction index Kij versus the thickness ratio of two concrete plates for the X-junction corner and straight paths, the T-junction corner and the L-junction corner, with the identical-plates X-junction value of about 7.3 dB marked" width="82%"></picture>
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import junction_transmission, wave_vibration_reduction_index
+
+# Concrete plates (cL = 3200 m/s, rho = 2400 kg/m3): plate 1 fixed at
+# 100 mm, plate 2 swept from 50 mm to 400 mm.
+h1, cl, rho = 0.1, 3200.0, 2400.0
+ratios = np.linspace(0.5, 4.0, 36)
+kij_corner = []
+for ratio in ratios:
+    h2 = h1 * float(ratio)
+    res = junction_transmission("X", h1, cl, rho * h1, h2, cl, rho * h2)
+    kij_corner.append(res.corner_reduction_index)
+
+fig, ax = plt.subplots()
+ax.plot(ratios, kij_corner, label="X corner")
+ax.set_xlabel("Thickness ratio h2/h1")
+ax.set_ylabel("Vibration reduction index Kij [dB]")
+ax.set_title("Wave-approach junction Kij (Hopkins Eq. 5.116)")
+ax.legend()
+plt.show()
+```
+
+</details>
+
+## 5. Worked example: feeding Kij into EN 12354
+
+The number this page predicts is exactly what the EN 12354-1 flanking model
+consumes. Take the 100 mm / 200 mm concrete X-junction from the figure at
+the top: its corner path gives $K_{12} = 9.8\ \text{dB}$. Handing that to
+`flanking_element` in place of a tabulated Annex E value prices the
+junction's three flanking paths and their effect on the apparent rating:
+
+```python
+from phonometry import building, junction_transmission
+
+# The 100 mm / 200 mm concrete X-junction of the opening figure:
+res = junction_transmission("X", 0.1, 3200.0, 240.0, 0.2, 3200.0, 480.0)
+k12 = res.corner_reduction_index                     # 9.8 dB (corner path)
+
+# Feed it to the EN 12354-1 simplified model as this junction's Kij:
+ff, df, fd = building.flanking_element(
+    label="floor", r_flanking=49.0, r_separating=57.0,
+    k_ff=k12, k_fd=k12, k_df=k12, separating_area=11.5, coupling_length=4.5)
+pred = building.predicted_airborne_insulation(r_direct=57.0,
+                                              flanking_paths=[ff, df, fd])
+print(round(pred.r_prime_w, 1))                      # 55.4  (Rw 57 direct)
+print(pred.dominant.label, round(pred.dominant.fraction, 2))   # Dd 0.68
+```
+
+One junction with a moderate $K_{ij}$ already trims 1.6 dB off the direct
+$R_w = 57\ \text{dB}$; a full building repeats this for every junction, which
+is the [EN 12354 prediction guide](https://jmrplens.github.io/phonometry/buildings/design/insulation-prediction/).
+
+The measured, EN 12354 counterpart of $K_{ij}$ (from the direction-averaged
+velocity level difference) is the separate
+[laboratory flanking-transmission](https://jmrplens.github.io/phonometry/buildings/insulation/flanking-lab/) `vibration_reduction_index`; this
+guide is the closed-form *predicted* value from the wave approach.
+
+## 6. Experimental SEA: coupling loss factors from measured energies
+
+Everything above is the **predictive** route: a coupling loss factor derived
+from a wave model of the junction. Real joints - welds, bolt rows, spot welds,
+adhesives - are not tractable that way, and the **experimental** route inverts
+the steady-state SEA power balance from *measured* subsystem energies instead
+(Norton & Karczub 2003, Sections 6.3.3 and 6.3.4). For two subsystems,
+
+$$
+\Pi_1 = \omega\left[(\eta_1 + \eta_{12})\,E_1 - \eta_{21}\,E_2\right]
+\quad (6.10)
+$$
+
+$$
+0 = \omega\left[(\eta_2 + \eta_{21})\,E_2 - \eta_{12}\,E_1\right]
+\quad (6.11)
+$$
+
+with $E_i = M_i \langle v_i^2 \rangle$ the band energy of subsystem $i$ (its
+mass times the space- and time-averaged mean-square velocity). Drive
+subsystem 1 only, add the SEA consistency (reciprocity) relationship
+$n_1\eta_{12} = n_2\eta_{21}$ (Eq. 6.8), and both coupling loss factors follow
+from the two measured energies (Eq. 6.15):
+
+$$
+\eta_{12} = \frac{\eta_2 E_2}{E_1 - E_2\,n_1/n_2}, \qquad
+\eta_{21} = \eta_{12}\,\frac{n_1}{n_2}, \qquad
+\Pi_\text{in} = \omega\,(\eta_1 E_1 + \eta_2 E_2)
+$$
+
+The input power collapses to the total dissipated power, as it must in the
+steady state: substituting Eq. (6.11) into Eq. (6.10) cancels the two coupling
+terms exactly, which is a free check on any measurement.
+
+`power_injection_clf` performs that inversion, with the modal densities of
+Norton Section 6.4.1 alongside it: `flat_plate_modal_density` (Eq. 6.25),
+`bar_modal_density` (6.23), `beam_modal_density` (6.24) and
+`cylindrical_shell_modal_density` (6.27 to 6.29, the Szechenyi approximations
+in three regimes about the `ring_frequency` of Eq. 6.26). The flat-plate
+expression $n(f) = S\sqrt{12}/(2 c_L t)$ is the same quantity as EN 12354-4's
+$n = \pi S f_c / c_0^2$ used by the [flanking model](https://jmrplens.github.io/phonometry/buildings/insulation/flanking-lab/), only
+parametrised by the plate itself rather than by its critical frequency.
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/experimental_sea_clf_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/experimental_sea_clf.svg" alt="Two-panel figure. Left panel: coupling loss factor on a logarithmic axis against the octave bands from 125 hertz to 2 kilohertz for two aluminium plates at right angles, with the welded line junction falling from about 3 times 10 to the minus 3 to 8 times 10 to the minus 4 as one over the square root of frequency, the twelve-bolt point connection falling twice as steeply from about 1.4 times 10 to the minus 2 to 9 times 10 to the minus 4 as one over frequency, and a dashed horizontal line marking an internal loss factor of 10 to the minus 2. Right panel: a bar chart of the four loss factors of a satellite platform and cylinder in the 500 hertz octave on a logarithmic axis, the internal loss factors 4.40 times 10 to the minus 3 and 2.40 times 10 to the minus 3 clearly above the coupling loss factors 4.26 times 10 to the minus 4 and 3.91 times 10 to the minus 4, with the injected power of 1.31 watts annotated" width="92%"></picture>
+
+*Left: two ways of joining the same two plates. Right: the loss-factor budget
+inverted from a pair of measured velocities; the coupling stays an order of
+magnitude below the damping, which is the condition for a two-subsystem SEA
+model to be trustworthy.*
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import math
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import (
+    coupling_loss_factor,
+    cylindrical_shell_modal_density,
+    flat_plate_modal_density,
+    plate_bending_stiffness,
+    point_connection_coupling_loss_factor,
+    power_injection_clf,
+    right_angle_transmission_coefficient,
+)
+from phonometry.vibration.structural.point_mobility import plate_bending_wave_speed
+
+rho, nu, young = 2700.0, 0.33, 7.1e10                 # aluminium
+cl = math.sqrt(young / (rho * (1.0 - nu**2)))         # 5432 m/s (Eq. 6.25)
+bands = np.array([125.0, 250.0, 500.0, 1000.0, 2000.0])
+
+# Predicted: a 3 mm x 2.5 m x 1.2 m plate meeting a 5.5 mm x 2.0 m x 1.2 m
+# plate at right angles along the 1.2 m edge, welded and then bolted.
+h1, h2, area1, length = 0.003, 0.0055, 2.5 * 1.2, 1.2
+tau = right_angle_transmission_coefficient(h1, h2, density1=rho, density2=rho,
+                                           wave_speed1=cl, wave_speed2=cl)
+cb = plate_bending_wave_speed(bands, plate_bending_stiffness(young, h1, nu),
+                              rho * h1)
+welded = [float(coupling_loss_factor(tau, 2.0 * c, length, f, area1))
+          for c, f in zip(cb, bands, strict=True)]
+bolted = point_connection_coupling_loss_factor(
+    bands, 12, thickness1=h1, thickness2=h2, surface_density1=rho * h1,
+    surface_density2=rho * h2, wave_speed1=cl, wave_speed2=cl,
+    plate_area1=area1)
+
+# Measured: a 5 mm platform driven directly, a 3 mm cylinder driven only
+# through the joints; 27.2 and 13.2 mm/s in the 500 Hz octave.
+t_p, t_c, radius = 0.005, 0.003, 0.75
+area_c = 2.0 * math.pi * radius * 2.0
+area_p = 3.5 * 3.0 - math.pi * radius**2
+sea = power_injection_clf(
+    500.0, rho * t_p * area_p * 0.0272**2, rho * t_c * area_c * 0.0132**2,
+    4.4e-3, 2.4e-3,
+    flat_plate_modal_density(area_p, t_p, cl),
+    float(cylindrical_shell_modal_density(500.0, area_c, t_c, radius, cl)[0]))
+
+print(f"{float(sea.coupling_loss_factor12[0]):.2e}")   # 4.26e-04
+print(f"{float(sea.coupling_loss_factor21[0]):.2e}")   # 3.91e-04
+print(round(float(sea.input_power[0]), 2))             # 1.31 W
+sea.plot()
+plt.show()
+```
+
+</details>
+
+Two closed forms sit between the two routes and are what a measured value is
+normally compared against.
+`right_angle_transmission_coefficient` gives the wave transmission coefficient
+of a right-angle plate junction without any angular integration (Eqs. 6.53 to
+6.55, after Bies & Hamid and Cremer et al.); feeding it to
+`coupling_loss_factor` reproduces Norton Eq. (6.52) identically, because that
+equation and Hopkins Eq. (2.154) are the same expression once $c_g = 2 c_B$.
+And `point_connection_coupling_loss_factor` covers plates joined at $N$
+discrete points instead of along a line (Eq. 6.56). Which one applies is
+decided by the bending wavelength: use the point form when it is shorter than
+the joint length, and the line form when it is longer. The two differ in slope
+as well as in level, $1/f$ against $1/\sqrt{f}$, so bolting and welding are
+not interchangeable across the spectrum.
+
+When no independent value of the internal loss factors is available, the
+single-drive inversion is underdetermined, and the classical **power-injection
+method** drives each subsystem in turn while measuring both energies each time.
+That gives four equations for $\eta_1$, $\eta_2$, $\eta_{12}$ and $\eta_{21}$
+with no prior assumption at all, which `power_injection_matrix` solves band by
+band. Reciprocity then becomes a *check* on the measurement rather than an
+input: `modal_density_ratio` compares the measured $\eta_{21}/\eta_{12}$
+against the $n_1/n_2$ computed from the geometry, and a large disagreement
+means the subsystem boundaries were drawn in the wrong place.
+
+## See also
+
+- [Predicting Sound Insulation (EN 12354)](https://jmrplens.github.io/phonometry/buildings/design/insulation-prediction/): the
+  flanking model that consumes $K_{ij}$ junction by junction.
+- [Laboratory Flanking Transmission (ISO 10848)](https://jmrplens.github.io/phonometry/buildings/insulation/flanking-lab/): the
+  measurement of $K_{ij}$ from velocity level differences, the empirical
+  counterpart of this page's closed forms.
+- [Structure-borne sound power of equipment (EN 15657)](https://jmrplens.github.io/phonometry/buildings/design/structure-borne-power/):
+  the source power that these junction transmissions carry through a building.
+- [Mechanical mobility and the FRF family (ISO 7626-1)](https://jmrplens.github.io/phonometry/vibration/structural/mechanical-mobility/):
+  the plate mobilities behind the wave parameters.
+
+## References
+
+- Cremer, L., Heckl, M., & Ungar, E. E. (1973). *Structure-borne sound* (1st
+  ed.). Springer.
+- Craik, R. J. M. (1996). *Sound transmission through buildings using
+  statistical energy analysis*. Gower.
+- Hopkins, C. (2007). *Sound insulation* (Section 5.2.1.3).
+  Butterworth-Heinemann.
+- Norton, M. P., & Karczub, D. G. (2003). *Fundamentals of noise and vibration
+  analysis for engineers* (2nd ed., Chapter 6). Cambridge University Press.
+
+See the [bibliography](https://jmrplens.github.io/phonometry/reference/bibliography/) for full entries.
+
+---

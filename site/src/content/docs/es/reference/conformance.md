@@ -64,7 +64,7 @@ o esta copia suya se desincronizan.
 
 Para la filosofía de diseño detrás de este enfoque, junto con un caso de estudio
 sobre la ponderación temporal de IEC 61672-1, consulta
-[Por qué phonometry](/phonometry/es/reference/why-phonometry/).
+[Por qué phonometry](/phonometry/es/start/why-phonometry/).
 
 Volver a deducir las normas con este detalle también saca a la luz defectos de
 los propios documentos publicados: ejemplos resueltos que contradicen su

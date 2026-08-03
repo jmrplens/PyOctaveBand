@@ -27,7 +27,7 @@ head:
             "subjectOf": {
               "@type": "TechArticle",
               "name": "Calibración",
-              "url": "https://jmrplens.github.io/phonometry/es/guides/calibration/"
+              "url": "https://jmrplens.github.io/phonometry/es/signal/metrology/calibration/"
             }
           },
           {
@@ -42,7 +42,7 @@ head:
             "subjectOf": {
               "@type": "TechArticle",
               "name": "Niveles",
-              "url": "https://jmrplens.github.io/phonometry/es/guides/levels/"
+              "url": "https://jmrplens.github.io/phonometry/es/signal/levels/levels/"
             }
           },
           {
@@ -57,7 +57,7 @@ head:
             "subjectOf": {
               "@type": "TechArticle",
               "name": "Niveles",
-              "url": "https://jmrplens.github.io/phonometry/es/guides/levels/"
+              "url": "https://jmrplens.github.io/phonometry/es/signal/levels/levels/"
             }
           },
           {
@@ -72,7 +72,7 @@ head:
             "subjectOf": {
               "@type": "TechArticle",
               "name": "Niveles",
-              "url": "https://jmrplens.github.io/phonometry/es/guides/levels/"
+              "url": "https://jmrplens.github.io/phonometry/es/signal/levels/levels/"
             }
           },
           {
@@ -87,7 +87,7 @@ head:
             "subjectOf": {
               "@type": "TechArticle",
               "name": "Niveles",
-              "url": "https://jmrplens.github.io/phonometry/es/guides/levels/"
+              "url": "https://jmrplens.github.io/phonometry/es/signal/levels/levels/"
             }
           },
           {
@@ -102,7 +102,7 @@ head:
             "subjectOf": {
               "@type": "TechArticle",
               "name": "Niveles",
-              "url": "https://jmrplens.github.io/phonometry/es/guides/levels/"
+              "url": "https://jmrplens.github.io/phonometry/es/signal/levels/levels/"
             }
           },
           {
@@ -117,7 +117,7 @@ head:
             "subjectOf": {
               "@type": "TechArticle",
               "name": "Potencia acústica",
-              "url": "https://jmrplens.github.io/phonometry/es/guides/sound-power/"
+              "url": "https://jmrplens.github.io/phonometry/es/devices/emission/sound-power/"
             }
           },
           {
@@ -132,7 +132,7 @@ head:
             "subjectOf": {
               "@type": "TechArticle",
               "name": "Intensidad",
-              "url": "https://jmrplens.github.io/phonometry/es/guides/intensity/"
+              "url": "https://jmrplens.github.io/phonometry/es/devices/emission/intensity/"
             }
           },
           {
@@ -147,7 +147,7 @@ head:
             "subjectOf": {
               "@type": "TechArticle",
               "name": "Intensidad",
-              "url": "https://jmrplens.github.io/phonometry/es/guides/intensity/"
+              "url": "https://jmrplens.github.io/phonometry/es/devices/emission/intensity/"
             }
           },
           {
@@ -162,7 +162,7 @@ head:
             "subjectOf": {
               "@type": "TechArticle",
               "name": "Niveles ambientales",
-              "url": "https://jmrplens.github.io/phonometry/es/guides/environmental-levels/"
+              "url": "https://jmrplens.github.io/phonometry/es/environment/environmental-levels/"
             }
           },
           {
@@ -177,7 +177,7 @@ head:
             "subjectOf": {
               "@type": "TechArticle",
               "name": "Niveles ambientales",
-              "url": "https://jmrplens.github.io/phonometry/es/guides/environmental-levels/"
+              "url": "https://jmrplens.github.io/phonometry/es/environment/environmental-levels/"
             }
           },
           {
@@ -192,7 +192,7 @@ head:
             "subjectOf": {
               "@type": "TechArticle",
               "name": "Niveles ambientales",
-              "url": "https://jmrplens.github.io/phonometry/es/guides/environmental-levels/"
+              "url": "https://jmrplens.github.io/phonometry/es/environment/environmental-levels/"
             }
           },
           {
@@ -207,7 +207,7 @@ head:
             "subjectOf": {
               "@type": "TechArticle",
               "name": "Prominencia de impulsos",
-              "url": "https://jmrplens.github.io/phonometry/es/guides/impulse-prominence/"
+              "url": "https://jmrplens.github.io/phonometry/es/environment/assessment/impulsive-sound/"
             }
           },
           {
@@ -222,7 +222,7 @@ head:
             "subjectOf": {
               "@type": "TechArticle",
               "name": "Prominencia de impulsos",
-              "url": "https://jmrplens.github.io/phonometry/es/guides/impulse-prominence/"
+              "url": "https://jmrplens.github.io/phonometry/es/environment/assessment/impulsive-sound/"
             }
           },
           {
@@ -237,7 +237,7 @@ head:
             "subjectOf": {
               "@type": "TechArticle",
               "name": "Niveles",
-              "url": "https://jmrplens.github.io/phonometry/es/guides/levels/"
+              "url": "https://jmrplens.github.io/phonometry/es/signal/levels/levels/"
             }
           },
           {
@@ -252,7 +252,7 @@ head:
             "subjectOf": {
               "@type": "TechArticle",
               "name": "Exposición laboral",
-              "url": "https://jmrplens.github.io/phonometry/es/guides/occupational-exposure/"
+              "url": "https://jmrplens.github.io/phonometry/es/perception/hearing/occupational-exposure/"
             }
           },
           {
@@ -267,7 +267,7 @@ head:
             "subjectOf": {
               "@type": "TechArticle",
               "name": "Exposición laboral",
-              "url": "https://jmrplens.github.io/phonometry/es/guides/occupational-exposure/"
+              "url": "https://jmrplens.github.io/phonometry/es/perception/hearing/occupational-exposure/"
             }
           },
           {
@@ -282,7 +282,7 @@ head:
             "subjectOf": {
               "@type": "TechArticle",
               "name": "Pérdida auditiva por ruido",
-              "url": "https://jmrplens.github.io/phonometry/es/guides/noise-induced-hearing-loss/"
+              "url": "https://jmrplens.github.io/phonometry/es/perception/hearing/noise-induced-hearing-loss/"
             }
           },
           {
@@ -297,7 +297,7 @@ head:
             "subjectOf": {
               "@type": "TechArticle",
               "name": "Pérdida auditiva por ruido",
-              "url": "https://jmrplens.github.io/phonometry/es/guides/noise-induced-hearing-loss/"
+              "url": "https://jmrplens.github.io/phonometry/es/perception/hearing/noise-induced-hearing-loss/"
             }
           },
           {
@@ -312,7 +312,7 @@ head:
             "subjectOf": {
               "@type": "TechArticle",
               "name": "Ponderación frecuencial",
-              "url": "https://jmrplens.github.io/phonometry/es/guides/weighting/"
+              "url": "https://jmrplens.github.io/phonometry/es/signal/levels/weighting/"
             }
           },
           {
@@ -327,7 +327,7 @@ head:
             "subjectOf": {
               "@type": "TechArticle",
               "name": "Ponderaciones especiales",
-              "url": "https://jmrplens.github.io/phonometry/es/guides/special-weightings/"
+              "url": "https://jmrplens.github.io/phonometry/es/signal/levels/special-weightings/"
             }
           },
           {
@@ -342,7 +342,7 @@ head:
             "subjectOf": {
               "@type": "TechArticle",
               "name": "Ponderaciones especiales",
-              "url": "https://jmrplens.github.io/phonometry/es/guides/special-weightings/"
+              "url": "https://jmrplens.github.io/phonometry/es/signal/levels/special-weightings/"
             }
           },
           {
@@ -357,7 +357,7 @@ head:
             "subjectOf": {
               "@type": "TechArticle",
               "name": "Ponderaciones especiales",
-              "url": "https://jmrplens.github.io/phonometry/es/guides/special-weightings/"
+              "url": "https://jmrplens.github.io/phonometry/es/signal/levels/special-weightings/"
             }
           },
           {
@@ -372,7 +372,7 @@ head:
             "subjectOf": {
               "@type": "TechArticle",
               "name": "Ponderaciones especiales",
-              "url": "https://jmrplens.github.io/phonometry/es/guides/special-weightings/"
+              "url": "https://jmrplens.github.io/phonometry/es/signal/levels/special-weightings/"
             }
           },
           {
@@ -387,7 +387,7 @@ head:
             "subjectOf": {
               "@type": "TechArticle",
               "name": "Ponderación temporal",
-              "url": "https://jmrplens.github.io/phonometry/es/guides/time-weighting/"
+              "url": "https://jmrplens.github.io/phonometry/es/signal/levels/time-weighting/"
             }
           },
           {
@@ -402,7 +402,7 @@ head:
             "subjectOf": {
               "@type": "TechArticle",
               "name": "Acústica de salas",
-              "url": "https://jmrplens.github.io/phonometry/es/guides/room-acoustics/"
+              "url": "https://jmrplens.github.io/phonometry/es/buildings/rooms/room-acoustics/"
             }
           },
           {
@@ -417,7 +417,7 @@ head:
             "subjectOf": {
               "@type": "TechArticle",
               "name": "Acústica de salas",
-              "url": "https://jmrplens.github.io/phonometry/es/guides/room-acoustics/"
+              "url": "https://jmrplens.github.io/phonometry/es/buildings/rooms/room-acoustics/"
             }
           },
           {
@@ -432,7 +432,7 @@ head:
             "subjectOf": {
               "@type": "TechArticle",
               "name": "Acústica de salas",
-              "url": "https://jmrplens.github.io/phonometry/es/guides/room-acoustics/"
+              "url": "https://jmrplens.github.io/phonometry/es/buildings/rooms/room-acoustics/"
             }
           },
           {
@@ -447,7 +447,7 @@ head:
             "subjectOf": {
               "@type": "TechArticle",
               "name": "Acústica de salas",
-              "url": "https://jmrplens.github.io/phonometry/es/guides/room-acoustics/"
+              "url": "https://jmrplens.github.io/phonometry/es/buildings/rooms/room-acoustics/"
             }
           },
           {
@@ -462,7 +462,7 @@ head:
             "subjectOf": {
               "@type": "TechArticle",
               "name": "Acústica de salas",
-              "url": "https://jmrplens.github.io/phonometry/es/guides/room-acoustics/"
+              "url": "https://jmrplens.github.io/phonometry/es/buildings/rooms/room-acoustics/"
             }
           },
           {
@@ -477,7 +477,7 @@ head:
             "subjectOf": {
               "@type": "TechArticle",
               "name": "Acústica de salas",
-              "url": "https://jmrplens.github.io/phonometry/es/guides/room-acoustics/"
+              "url": "https://jmrplens.github.io/phonometry/es/buildings/rooms/room-acoustics/"
             }
           },
           {
@@ -492,7 +492,7 @@ head:
             "subjectOf": {
               "@type": "TechArticle",
               "name": "Acústica de salas",
-              "url": "https://jmrplens.github.io/phonometry/es/guides/room-acoustics/"
+              "url": "https://jmrplens.github.io/phonometry/es/buildings/rooms/room-acoustics/"
             }
           },
           {
@@ -507,7 +507,7 @@ head:
             "subjectOf": {
               "@type": "TechArticle",
               "name": "Acústica de salas",
-              "url": "https://jmrplens.github.io/phonometry/es/guides/room-acoustics/"
+              "url": "https://jmrplens.github.io/phonometry/es/buildings/rooms/room-acoustics/"
             }
           },
           {
@@ -522,7 +522,7 @@ head:
             "subjectOf": {
               "@type": "TechArticle",
               "name": "Materiales acústicos",
-              "url": "https://jmrplens.github.io/phonometry/es/guides/absorption-measurement/"
+              "url": "https://jmrplens.github.io/phonometry/es/materials/absorbers/absorption-measurement/"
             }
           },
           {
@@ -537,7 +537,7 @@ head:
             "subjectOf": {
               "@type": "TechArticle",
               "name": "Ruido de salas",
-              "url": "https://jmrplens.github.io/phonometry/es/guides/room-noise/"
+              "url": "https://jmrplens.github.io/phonometry/es/buildings/rooms/room-noise/"
             }
           },
           {
@@ -552,7 +552,7 @@ head:
             "subjectOf": {
               "@type": "TechArticle",
               "name": "Ruido de salas",
-              "url": "https://jmrplens.github.io/phonometry/es/guides/room-noise/"
+              "url": "https://jmrplens.github.io/phonometry/es/buildings/rooms/room-noise/"
             }
           },
           {
@@ -567,7 +567,7 @@ head:
             "subjectOf": {
               "@type": "TechArticle",
               "name": "Ruido de salas",
-              "url": "https://jmrplens.github.io/phonometry/es/guides/room-noise/"
+              "url": "https://jmrplens.github.io/phonometry/es/buildings/rooms/room-noise/"
             }
           },
           {
@@ -582,7 +582,7 @@ head:
             "subjectOf": {
               "@type": "TechArticle",
               "name": "Ruido de salas",
-              "url": "https://jmrplens.github.io/phonometry/es/guides/room-noise/"
+              "url": "https://jmrplens.github.io/phonometry/es/buildings/rooms/room-noise/"
             }
           },
           {
@@ -597,7 +597,7 @@ head:
             "subjectOf": {
               "@type": "TechArticle",
               "name": "Transmisión del habla",
-              "url": "https://jmrplens.github.io/phonometry/es/guides/speech-transmission/"
+              "url": "https://jmrplens.github.io/phonometry/es/perception/speech/speech-transmission/"
             }
           },
           {
@@ -612,7 +612,7 @@ head:
             "subjectOf": {
               "@type": "TechArticle",
               "name": "Transmisión del habla",
-              "url": "https://jmrplens.github.io/phonometry/es/guides/speech-transmission/"
+              "url": "https://jmrplens.github.io/phonometry/es/perception/speech/speech-transmission/"
             }
           },
           {
@@ -627,7 +627,7 @@ head:
             "subjectOf": {
               "@type": "TechArticle",
               "name": "Transmisión del habla",
-              "url": "https://jmrplens.github.io/phonometry/es/guides/speech-transmission/"
+              "url": "https://jmrplens.github.io/phonometry/es/perception/speech/speech-transmission/"
             }
           },
           {
@@ -642,7 +642,7 @@ head:
             "subjectOf": {
               "@type": "TechArticle",
               "name": "Inteligibilidad del habla",
-              "url": "https://jmrplens.github.io/phonometry/es/guides/speech-intelligibility/"
+              "url": "https://jmrplens.github.io/phonometry/es/perception/speech/speech-intelligibility/"
             }
           },
           {
@@ -657,7 +657,7 @@ head:
             "subjectOf": {
               "@type": "TechArticle",
               "name": "Inteligibilidad objetiva",
-              "url": "https://jmrplens.github.io/phonometry/es/guides/objective-intelligibility/"
+              "url": "https://jmrplens.github.io/phonometry/es/perception/speech/objective-intelligibility/"
             }
           },
           {
@@ -672,7 +672,7 @@ head:
             "subjectOf": {
               "@type": "TechArticle",
               "name": "Inteligibilidad objetiva",
-              "url": "https://jmrplens.github.io/phonometry/es/guides/objective-intelligibility/"
+              "url": "https://jmrplens.github.io/phonometry/es/perception/speech/objective-intelligibility/"
             }
           },
           {
@@ -687,7 +687,7 @@ head:
             "subjectOf": {
               "@type": "TechArticle",
               "name": "Aislamiento en campo",
-              "url": "https://jmrplens.github.io/phonometry/es/guides/insulation-field/"
+              "url": "https://jmrplens.github.io/phonometry/es/buildings/insulation/insulation-field/"
             }
           },
           {
@@ -702,7 +702,7 @@ head:
             "subjectOf": {
               "@type": "TechArticle",
               "name": "Aislamiento en campo",
-              "url": "https://jmrplens.github.io/phonometry/es/guides/insulation-field/"
+              "url": "https://jmrplens.github.io/phonometry/es/buildings/insulation/insulation-field/"
             }
           },
           {
@@ -717,7 +717,7 @@ head:
             "subjectOf": {
               "@type": "TechArticle",
               "name": "Método de control",
-              "url": "https://jmrplens.github.io/phonometry/es/guides/insulation-survey/"
+              "url": "https://jmrplens.github.io/phonometry/es/buildings/insulation/insulation-survey/"
             }
           },
           {
@@ -732,7 +732,7 @@ head:
             "subjectOf": {
               "@type": "TechArticle",
               "name": "Predicción del aislamiento",
-              "url": "https://jmrplens.github.io/phonometry/es/guides/insulation-prediction/"
+              "url": "https://jmrplens.github.io/phonometry/es/buildings/design/insulation-prediction/"
             }
           },
           {
@@ -747,7 +747,7 @@ head:
             "subjectOf": {
               "@type": "TechArticle",
               "name": "Aislamiento en laboratorio",
-              "url": "https://jmrplens.github.io/phonometry/es/guides/insulation-lab/"
+              "url": "https://jmrplens.github.io/phonometry/es/buildings/insulation/insulation-lab/"
             }
           },
           {
@@ -762,7 +762,7 @@ head:
             "subjectOf": {
               "@type": "TechArticle",
               "name": "Aislamiento en campo",
-              "url": "https://jmrplens.github.io/phonometry/es/guides/insulation-field/"
+              "url": "https://jmrplens.github.io/phonometry/es/buildings/insulation/insulation-field/"
             }
           },
           {
@@ -777,7 +777,7 @@ head:
             "subjectOf": {
               "@type": "TechArticle",
               "name": "Aislamiento de paneles",
-              "url": "https://jmrplens.github.io/phonometry/es/guides/panel-sound-insulation/"
+              "url": "https://jmrplens.github.io/phonometry/es/buildings/design/panel-sound-insulation/"
             }
           },
           {
@@ -792,7 +792,7 @@ head:
             "subjectOf": {
               "@type": "TechArticle",
               "name": "Índices de aislamiento",
-              "url": "https://jmrplens.github.io/phonometry/es/guides/insulation-ratings/"
+              "url": "https://jmrplens.github.io/phonometry/es/buildings/insulation/insulation-ratings/"
             }
           },
           {
@@ -807,7 +807,7 @@ head:
             "subjectOf": {
               "@type": "TechArticle",
               "name": "Predicción del aislamiento",
-              "url": "https://jmrplens.github.io/phonometry/es/guides/insulation-prediction/"
+              "url": "https://jmrplens.github.io/phonometry/es/buildings/design/insulation-prediction/"
             }
           },
           {
@@ -822,7 +822,7 @@ head:
             "subjectOf": {
               "@type": "TechArticle",
               "name": "Índices de aislamiento",
-              "url": "https://jmrplens.github.io/phonometry/es/guides/insulation-ratings/"
+              "url": "https://jmrplens.github.io/phonometry/es/buildings/insulation/insulation-ratings/"
             }
           },
           {
@@ -837,7 +837,7 @@ head:
             "subjectOf": {
               "@type": "TechArticle",
               "name": "Aislamiento en laboratorio",
-              "url": "https://jmrplens.github.io/phonometry/es/guides/insulation-lab/"
+              "url": "https://jmrplens.github.io/phonometry/es/buildings/insulation/insulation-lab/"
             }
           },
           {
@@ -852,7 +852,7 @@ head:
             "subjectOf": {
               "@type": "TechArticle",
               "name": "Aislamiento en campo",
-              "url": "https://jmrplens.github.io/phonometry/es/guides/insulation-field/"
+              "url": "https://jmrplens.github.io/phonometry/es/buildings/insulation/insulation-field/"
             }
           },
           {
@@ -867,7 +867,7 @@ head:
             "subjectOf": {
               "@type": "TechArticle",
               "name": "Índices de aislamiento",
-              "url": "https://jmrplens.github.io/phonometry/es/guides/insulation-ratings/"
+              "url": "https://jmrplens.github.io/phonometry/es/buildings/insulation/insulation-ratings/"
             }
           },
           {
@@ -882,7 +882,7 @@ head:
             "subjectOf": {
               "@type": "TechArticle",
               "name": "Índices de aislamiento",
-              "url": "https://jmrplens.github.io/phonometry/es/guides/insulation-ratings/"
+              "url": "https://jmrplens.github.io/phonometry/es/buildings/insulation/insulation-ratings/"
             }
           },
           {
@@ -897,7 +897,7 @@ head:
             "subjectOf": {
               "@type": "TechArticle",
               "name": "Mejora de revestimientos",
-              "url": "https://jmrplens.github.io/phonometry/es/guides/impact-improvement/"
+              "url": "https://jmrplens.github.io/phonometry/es/buildings/design/impact-improvement/"
             }
           },
           {
@@ -912,7 +912,7 @@ head:
             "subjectOf": {
               "@type": "TechArticle",
               "name": "Predicción del aislamiento",
-              "url": "https://jmrplens.github.io/phonometry/es/guides/insulation-prediction/"
+              "url": "https://jmrplens.github.io/phonometry/es/buildings/design/insulation-prediction/"
             }
           },
           {
@@ -927,7 +927,7 @@ head:
             "subjectOf": {
               "@type": "TechArticle",
               "name": "Flancos en laboratorio",
-              "url": "https://jmrplens.github.io/phonometry/es/guides/flanking-lab/"
+              "url": "https://jmrplens.github.io/phonometry/es/buildings/insulation/flanking-lab/"
             }
           },
           {
@@ -942,7 +942,7 @@ head:
             "subjectOf": {
               "@type": "TechArticle",
               "name": "Aislamiento de paneles",
-              "url": "https://jmrplens.github.io/phonometry/es/guides/panel-sound-insulation/"
+              "url": "https://jmrplens.github.io/phonometry/es/buildings/design/panel-sound-insulation/"
             }
           },
           {
@@ -957,7 +957,7 @@ head:
             "subjectOf": {
               "@type": "TechArticle",
               "name": "Aislamiento de paneles",
-              "url": "https://jmrplens.github.io/phonometry/es/guides/panel-sound-insulation/"
+              "url": "https://jmrplens.github.io/phonometry/es/buildings/design/panel-sound-insulation/"
             }
           },
           {
@@ -972,7 +972,7 @@ head:
             "subjectOf": {
               "@type": "TechArticle",
               "name": "Materiales acústicos",
-              "url": "https://jmrplens.github.io/phonometry/es/guides/impedance-tube/"
+              "url": "https://jmrplens.github.io/phonometry/es/materials/absorbers/impedance-tube/"
             }
           },
           {
@@ -987,7 +987,7 @@ head:
             "subjectOf": {
               "@type": "TechArticle",
               "name": "Materiales acústicos",
-              "url": "https://jmrplens.github.io/phonometry/es/guides/absorption-measurement/"
+              "url": "https://jmrplens.github.io/phonometry/es/materials/absorbers/absorption-measurement/"
             }
           },
           {
@@ -1002,7 +1002,7 @@ head:
             "subjectOf": {
               "@type": "TechArticle",
               "name": "Materiales acústicos",
-              "url": "https://jmrplens.github.io/phonometry/es/guides/absorption-measurement/"
+              "url": "https://jmrplens.github.io/phonometry/es/materials/absorbers/absorption-measurement/"
             }
           },
           {
@@ -1017,7 +1017,7 @@ head:
             "subjectOf": {
               "@type": "TechArticle",
               "name": "Materiales acústicos",
-              "url": "https://jmrplens.github.io/phonometry/es/guides/absorption-measurement/"
+              "url": "https://jmrplens.github.io/phonometry/es/materials/absorbers/absorption-measurement/"
             }
           },
           {
@@ -1032,7 +1032,7 @@ head:
             "subjectOf": {
               "@type": "TechArticle",
               "name": "Materiales acústicos",
-              "url": "https://jmrplens.github.io/phonometry/es/guides/absorption-measurement/"
+              "url": "https://jmrplens.github.io/phonometry/es/materials/absorbers/absorption-measurement/"
             }
           },
           {
@@ -1047,7 +1047,7 @@ head:
             "subjectOf": {
               "@type": "TechArticle",
               "name": "Materiales acústicos",
-              "url": "https://jmrplens.github.io/phonometry/es/guides/airflow-resistance/"
+              "url": "https://jmrplens.github.io/phonometry/es/materials/absorbers/airflow-resistance/"
             }
           },
           {
@@ -1062,7 +1062,7 @@ head:
             "subjectOf": {
               "@type": "TechArticle",
               "name": "Materiales acústicos",
-              "url": "https://jmrplens.github.io/phonometry/es/guides/airflow-resistance/"
+              "url": "https://jmrplens.github.io/phonometry/es/materials/absorbers/airflow-resistance/"
             }
           },
           {
@@ -1077,7 +1077,7 @@ head:
             "subjectOf": {
               "@type": "TechArticle",
               "name": "Materiales acústicos",
-              "url": "https://jmrplens.github.io/phonometry/es/guides/airflow-resistance/"
+              "url": "https://jmrplens.github.io/phonometry/es/materials/absorbers/airflow-resistance/"
             }
           },
           {
@@ -1092,7 +1092,7 @@ head:
             "subjectOf": {
               "@type": "TechArticle",
               "name": "Materiales acústicos",
-              "url": "https://jmrplens.github.io/phonometry/es/guides/impedance-tube/"
+              "url": "https://jmrplens.github.io/phonometry/es/materials/absorbers/impedance-tube/"
             }
           },
           {
@@ -1107,7 +1107,7 @@ head:
             "subjectOf": {
               "@type": "TechArticle",
               "name": "Difusores y sus coeficientes",
-              "url": "https://jmrplens.github.io/phonometry/es/guides/diffusers/"
+              "url": "https://jmrplens.github.io/phonometry/es/materials/diffusers/diffusers/"
             }
           },
           {
@@ -1122,7 +1122,7 @@ head:
             "subjectOf": {
               "@type": "TechArticle",
               "name": "Difusores y sus coeficientes",
-              "url": "https://jmrplens.github.io/phonometry/es/guides/diffusers/"
+              "url": "https://jmrplens.github.io/phonometry/es/materials/diffusers/diffusers/"
             }
           },
           {
@@ -1137,7 +1137,7 @@ head:
             "subjectOf": {
               "@type": "TechArticle",
               "name": "Rigidez dinámica",
-              "url": "https://jmrplens.github.io/phonometry/es/guides/dynamic-stiffness/"
+              "url": "https://jmrplens.github.io/phonometry/es/materials/resilient/dynamic-stiffness/"
             }
           },
           {
@@ -1152,7 +1152,7 @@ head:
             "subjectOf": {
               "@type": "TechArticle",
               "name": "Movilidad mecánica",
-              "url": "https://jmrplens.github.io/phonometry/es/guides/mechanical-mobility/"
+              "url": "https://jmrplens.github.io/phonometry/es/vibration/structural/mechanical-mobility/"
             }
           },
           {
@@ -1167,7 +1167,7 @@ head:
             "subjectOf": {
               "@type": "TechArticle",
               "name": "Movilidad mecánica",
-              "url": "https://jmrplens.github.io/phonometry/es/guides/mechanical-mobility/"
+              "url": "https://jmrplens.github.io/phonometry/es/vibration/structural/mechanical-mobility/"
             }
           },
           {
@@ -1182,7 +1182,7 @@ head:
             "subjectOf": {
               "@type": "TechArticle",
               "name": "Movilidad mecánica",
-              "url": "https://jmrplens.github.io/phonometry/es/guides/mechanical-mobility/"
+              "url": "https://jmrplens.github.io/phonometry/es/vibration/structural/mechanical-mobility/"
             }
           },
           {
@@ -1197,7 +1197,7 @@ head:
             "subjectOf": {
               "@type": "TechArticle",
               "name": "Movilidad mecánica",
-              "url": "https://jmrplens.github.io/phonometry/es/guides/mechanical-mobility/"
+              "url": "https://jmrplens.github.io/phonometry/es/vibration/structural/mechanical-mobility/"
             }
           },
           {
@@ -1212,7 +1212,7 @@ head:
             "subjectOf": {
               "@type": "TechArticle",
               "name": "Rigidez de transferencia",
-              "url": "https://jmrplens.github.io/phonometry/es/guides/transfer-stiffness/"
+              "url": "https://jmrplens.github.io/phonometry/es/vibration/structural/transfer-stiffness/"
             }
           },
           {
@@ -1227,7 +1227,7 @@ head:
             "subjectOf": {
               "@type": "TechArticle",
               "name": "Rigidez de transferencia",
-              "url": "https://jmrplens.github.io/phonometry/es/guides/transfer-stiffness/"
+              "url": "https://jmrplens.github.io/phonometry/es/vibration/structural/transfer-stiffness/"
             }
           },
           {
@@ -1242,7 +1242,7 @@ head:
             "subjectOf": {
               "@type": "TechArticle",
               "name": "Rigidez de transferencia",
-              "url": "https://jmrplens.github.io/phonometry/es/guides/transfer-stiffness/"
+              "url": "https://jmrplens.github.io/phonometry/es/vibration/structural/transfer-stiffness/"
             }
           },
           {
@@ -1257,7 +1257,7 @@ head:
             "subjectOf": {
               "@type": "TechArticle",
               "name": "Vibración en humanos",
-              "url": "https://jmrplens.github.io/phonometry/es/guides/human-vibration/"
+              "url": "https://jmrplens.github.io/phonometry/es/vibration/human/human-vibration/"
             }
           },
           {
@@ -1272,7 +1272,7 @@ head:
             "subjectOf": {
               "@type": "TechArticle",
               "name": "Vibración en humanos",
-              "url": "https://jmrplens.github.io/phonometry/es/guides/human-vibration/"
+              "url": "https://jmrplens.github.io/phonometry/es/vibration/human/human-vibration/"
             }
           },
           {
@@ -1287,7 +1287,7 @@ head:
             "subjectOf": {
               "@type": "TechArticle",
               "name": "Vibración en humanos",
-              "url": "https://jmrplens.github.io/phonometry/es/guides/human-vibration/"
+              "url": "https://jmrplens.github.io/phonometry/es/vibration/human/human-vibration/"
             }
           },
           {
@@ -1302,7 +1302,7 @@ head:
             "subjectOf": {
               "@type": "TechArticle",
               "name": "Vibración en humanos",
-              "url": "https://jmrplens.github.io/phonometry/es/guides/human-vibration/"
+              "url": "https://jmrplens.github.io/phonometry/es/vibration/human/human-vibration/"
             }
           },
           {
@@ -1317,7 +1317,7 @@ head:
             "subjectOf": {
               "@type": "TechArticle",
               "name": "Vibración con choques múltiples",
-              "url": "https://jmrplens.github.io/phonometry/es/guides/multiple-shock-vibration/"
+              "url": "https://jmrplens.github.io/phonometry/es/vibration/human/multiple-shock-vibration/"
             }
           },
           {
@@ -1332,7 +1332,7 @@ head:
             "subjectOf": {
               "@type": "TechArticle",
               "name": "Potencia acústica desde vibración",
-              "url": "https://jmrplens.github.io/phonometry/es/guides/vibration-sound-power/"
+              "url": "https://jmrplens.github.io/phonometry/es/devices/emission/vibration-sound-power/"
             }
           },
           {
@@ -1347,7 +1347,7 @@ head:
             "subjectOf": {
               "@type": "TechArticle",
               "name": "Potencia acústica desde vibración",
-              "url": "https://jmrplens.github.io/phonometry/es/guides/vibration-sound-power/"
+              "url": "https://jmrplens.github.io/phonometry/es/devices/emission/vibration-sound-power/"
             }
           },
           {
@@ -1362,7 +1362,7 @@ head:
             "subjectOf": {
               "@type": "TechArticle",
               "name": "Potencia estructural",
-              "url": "https://jmrplens.github.io/phonometry/es/guides/structure-borne-power/"
+              "url": "https://jmrplens.github.io/phonometry/es/buildings/design/structure-borne-power/"
             }
           },
           {
@@ -1377,7 +1377,7 @@ head:
             "subjectOf": {
               "@type": "TechArticle",
               "name": "Transmisión en uniones",
-              "url": "https://jmrplens.github.io/phonometry/es/guides/junction-transmission/"
+              "url": "https://jmrplens.github.io/phonometry/es/vibration/structural/junction-transmission/"
             }
           },
           {
@@ -1392,7 +1392,7 @@ head:
             "subjectOf": {
               "@type": "TechArticle",
               "name": "Sonoridad",
-              "url": "https://jmrplens.github.io/phonometry/es/guides/loudness/"
+              "url": "https://jmrplens.github.io/phonometry/es/perception/psychoacoustics/loudness/"
             }
           },
           {
@@ -1407,7 +1407,7 @@ head:
             "subjectOf": {
               "@type": "TechArticle",
               "name": "Sonoridad",
-              "url": "https://jmrplens.github.io/phonometry/es/guides/loudness/"
+              "url": "https://jmrplens.github.io/phonometry/es/perception/psychoacoustics/loudness/"
             }
           },
           {
@@ -1422,7 +1422,7 @@ head:
             "subjectOf": {
               "@type": "TechArticle",
               "name": "Sonoridad",
-              "url": "https://jmrplens.github.io/phonometry/es/guides/loudness/"
+              "url": "https://jmrplens.github.io/phonometry/es/perception/psychoacoustics/loudness/"
             }
           },
           {
@@ -1437,7 +1437,7 @@ head:
             "subjectOf": {
               "@type": "TechArticle",
               "name": "Calidad sonora",
-              "url": "https://jmrplens.github.io/phonometry/es/guides/sound-quality/"
+              "url": "https://jmrplens.github.io/phonometry/es/perception/psychoacoustics/sound-quality/"
             }
           },
           {
@@ -1452,7 +1452,7 @@ head:
             "subjectOf": {
               "@type": "TechArticle",
               "name": "Calidad sonora",
-              "url": "https://jmrplens.github.io/phonometry/es/guides/sound-quality/"
+              "url": "https://jmrplens.github.io/phonometry/es/perception/psychoacoustics/sound-quality/"
             }
           },
           {
@@ -1467,7 +1467,7 @@ head:
             "subjectOf": {
               "@type": "TechArticle",
               "name": "Calidad sonora",
-              "url": "https://jmrplens.github.io/phonometry/es/guides/sound-quality/"
+              "url": "https://jmrplens.github.io/phonometry/es/perception/psychoacoustics/sound-quality/"
             }
           },
           {
@@ -1482,7 +1482,7 @@ head:
             "subjectOf": {
               "@type": "TechArticle",
               "name": "Calidad sonora",
-              "url": "https://jmrplens.github.io/phonometry/es/guides/sound-quality/"
+              "url": "https://jmrplens.github.io/phonometry/es/perception/psychoacoustics/sound-quality/"
             }
           },
           {
@@ -1497,7 +1497,7 @@ head:
             "subjectOf": {
               "@type": "TechArticle",
               "name": "Tonos prominentes",
-              "url": "https://jmrplens.github.io/phonometry/es/guides/tone-prominence/"
+              "url": "https://jmrplens.github.io/phonometry/es/perception/psychoacoustics/tone-prominence/"
             }
           },
           {
@@ -1512,7 +1512,7 @@ head:
             "subjectOf": {
               "@type": "TechArticle",
               "name": "Tonos prominentes",
-              "url": "https://jmrplens.github.io/phonometry/es/guides/tone-prominence/"
+              "url": "https://jmrplens.github.io/phonometry/es/perception/psychoacoustics/tone-prominence/"
             }
           },
           {
@@ -1527,7 +1527,7 @@ head:
             "subjectOf": {
               "@type": "TechArticle",
               "name": "Audibilidad de tonos",
-              "url": "https://jmrplens.github.io/phonometry/es/guides/tone-audibility/"
+              "url": "https://jmrplens.github.io/phonometry/es/perception/psychoacoustics/tone-audibility/"
             }
           },
           {
@@ -1542,7 +1542,7 @@ head:
             "subjectOf": {
               "@type": "TechArticle",
               "name": "Molestia psicoacústica",
-              "url": "https://jmrplens.github.io/phonometry/es/guides/psychoacoustic-annoyance/"
+              "url": "https://jmrplens.github.io/phonometry/es/perception/psychoacoustics/psychoacoustic-annoyance/"
             }
           },
           {
@@ -1557,7 +1557,7 @@ head:
             "subjectOf": {
               "@type": "TechArticle",
               "name": "Electroacústica",
-              "url": "https://jmrplens.github.io/phonometry/es/guides/electroacoustics/"
+              "url": "https://jmrplens.github.io/phonometry/es/devices/electroacoustics/electroacoustics/"
             }
           },
           {
@@ -1572,7 +1572,7 @@ head:
             "subjectOf": {
               "@type": "TechArticle",
               "name": "Electroacústica",
-              "url": "https://jmrplens.github.io/phonometry/es/guides/electroacoustics/"
+              "url": "https://jmrplens.github.io/phonometry/es/devices/electroacoustics/electroacoustics/"
             }
           },
           {
@@ -1587,7 +1587,7 @@ head:
             "subjectOf": {
               "@type": "TechArticle",
               "name": "Electroacústica",
-              "url": "https://jmrplens.github.io/phonometry/es/guides/electroacoustics/"
+              "url": "https://jmrplens.github.io/phonometry/es/devices/electroacoustics/electroacoustics/"
             }
           },
           {
@@ -1602,7 +1602,7 @@ head:
             "subjectOf": {
               "@type": "TechArticle",
               "name": "Electroacústica",
-              "url": "https://jmrplens.github.io/phonometry/es/guides/electroacoustics/"
+              "url": "https://jmrplens.github.io/phonometry/es/devices/electroacoustics/electroacoustics/"
             }
           },
           {
@@ -1617,7 +1617,7 @@ head:
             "subjectOf": {
               "@type": "TechArticle",
               "name": "Electroacústica",
-              "url": "https://jmrplens.github.io/phonometry/es/guides/electroacoustics/"
+              "url": "https://jmrplens.github.io/phonometry/es/devices/electroacoustics/electroacoustics/"
             }
           },
           {
@@ -1632,7 +1632,7 @@ head:
             "subjectOf": {
               "@type": "TechArticle",
               "name": "Sonoridad de programa",
-              "url": "https://jmrplens.github.io/phonometry/es/guides/program-loudness/"
+              "url": "https://jmrplens.github.io/phonometry/es/devices/broadcast/program-loudness/"
             }
           },
           {
@@ -1647,7 +1647,7 @@ head:
             "subjectOf": {
               "@type": "TechArticle",
               "name": "Sonoridad de programa",
-              "url": "https://jmrplens.github.io/phonometry/es/guides/program-loudness/"
+              "url": "https://jmrplens.github.io/phonometry/es/devices/broadcast/program-loudness/"
             }
           },
           {
@@ -1662,7 +1662,7 @@ head:
             "subjectOf": {
               "@type": "TechArticle",
               "name": "Sonoridad de programa",
-              "url": "https://jmrplens.github.io/phonometry/es/guides/program-loudness/"
+              "url": "https://jmrplens.github.io/phonometry/es/devices/broadcast/program-loudness/"
             }
           },
           {
@@ -1677,7 +1677,7 @@ head:
             "subjectOf": {
               "@type": "TechArticle",
               "name": "Ruido de aeronaves",
-              "url": "https://jmrplens.github.io/phonometry/es/guides/aircraft-noise/"
+              "url": "https://jmrplens.github.io/phonometry/es/aircraft/aircraft-noise/"
             }
           },
           {
@@ -1692,7 +1692,7 @@ head:
             "subjectOf": {
               "@type": "TechArticle",
               "name": "Ruido de aeronaves",
-              "url": "https://jmrplens.github.io/phonometry/es/guides/aircraft-noise/"
+              "url": "https://jmrplens.github.io/phonometry/es/aircraft/aircraft-noise/"
             }
           },
           {
@@ -1707,7 +1707,7 @@ head:
             "subjectOf": {
               "@type": "TechArticle",
               "name": "Ruido de aeronaves",
-              "url": "https://jmrplens.github.io/phonometry/es/guides/aircraft-noise/"
+              "url": "https://jmrplens.github.io/phonometry/es/aircraft/aircraft-noise/"
             }
           },
           {
@@ -1722,7 +1722,7 @@ head:
             "subjectOf": {
               "@type": "TechArticle",
               "name": "Acústica submarina",
-              "url": "https://jmrplens.github.io/phonometry/es/guides/underwater-acoustics/"
+              "url": "https://jmrplens.github.io/phonometry/es/underwater/underwater-acoustics/"
             }
           },
           {
@@ -1737,7 +1737,7 @@ head:
             "subjectOf": {
               "@type": "TechArticle",
               "name": "Acústica submarina",
-              "url": "https://jmrplens.github.io/phonometry/es/guides/underwater-acoustics/"
+              "url": "https://jmrplens.github.io/phonometry/es/underwater/underwater-acoustics/"
             }
           },
           {
@@ -1752,7 +1752,7 @@ head:
             "subjectOf": {
               "@type": "TechArticle",
               "name": "Acústica submarina",
-              "url": "https://jmrplens.github.io/phonometry/es/guides/underwater-acoustics/"
+              "url": "https://jmrplens.github.io/phonometry/es/underwater/underwater-acoustics/"
             }
           },
           {
@@ -1767,7 +1767,7 @@ head:
             "subjectOf": {
               "@type": "TechArticle",
               "name": "Acústica submarina",
-              "url": "https://jmrplens.github.io/phonometry/es/guides/underwater-acoustics/"
+              "url": "https://jmrplens.github.io/phonometry/es/underwater/underwater-acoustics/"
             }
           },
           {
@@ -1782,7 +1782,7 @@ head:
             "subjectOf": {
               "@type": "TechArticle",
               "name": "Incertidumbre GUM",
-              "url": "https://jmrplens.github.io/phonometry/es/guides/gum-uncertainty/"
+              "url": "https://jmrplens.github.io/phonometry/es/signal/metrology/gum-uncertainty/"
             }
           },
           {
@@ -1797,7 +1797,7 @@ head:
             "subjectOf": {
               "@type": "TechArticle",
               "name": "Incertidumbre GUM",
-              "url": "https://jmrplens.github.io/phonometry/es/guides/gum-uncertainty/"
+              "url": "https://jmrplens.github.io/phonometry/es/signal/metrology/gum-uncertainty/"
             }
           },
           {
@@ -1812,7 +1812,7 @@ head:
             "subjectOf": {
               "@type": "TechArticle",
               "name": "Aislamiento en campo",
-              "url": "https://jmrplens.github.io/phonometry/es/guides/insulation-field/"
+              "url": "https://jmrplens.github.io/phonometry/es/buildings/insulation/insulation-field/"
             }
           }
         ]
@@ -1853,178 +1853,178 @@ norma.
 
 | Símbolo | Magnitud | Unidad | Definida en | Guía |
 | --- | --- | --- | --- | --- |
-| $L_p$ | Nivel de presión acústica: veinte veces el logaritmo decimal de la presión acústica eficaz dividida por la presión de referencia. | dB re 20 µPa | IEC 61672-1:2013 | [Calibración](/phonometry/es/guides/calibration/) |
-| $L_{eq}$ | Nivel de presión acústica continuo equivalente: el nivel del sonido estacionario que transporta la misma presión cuadrática media durante el intervalo. | dB | IEC 61672-1:2013 | [Niveles](/phonometry/es/guides/levels/) |
-| $L_{Aeq}$ | La misma integral aplicada a la señal ponderada A, el descriptor por defecto del ruido ambiental y laboral. | dB | IEC 61672-1:2013 | [Niveles](/phonometry/es/guides/levels/) |
-| $L_{AE}$, SEL | Nivel de exposición sonora: toda la energía ponderada A de un suceso único normalizada a un segundo. | dB | IEC 61672-1:2013, Ecuación 8 (Tabla 4) | [Niveles](/phonometry/es/guides/levels/) |
-| $L_{Cpeak}$ | Nivel de pico ponderado C: el máximo absoluto de la presión ponderada C, no un máximo con ponderación temporal. | dB | IEC 61672-1:2013, apartado 5.13 | [Niveles](/phonometry/es/guides/levels/) |
-| $L_N$ ($L_{10}$, $L_{50}$, $L_{90}$) | Nivel percentil: el nivel superado el $N$ % del tiempo de medida, leído en la distribución del nivel con ponderación temporal. | dB | ISO 1996-2:2017 (el Anexo I usa $L_{90}$ como nivel residual) | [Niveles](/phonometry/es/guides/levels/) |
-| $L_W$, SWL | Nivel de potencia acústica: la potencia que radia una fuente, referida a 1 pW. | dB re 1 pW | ISO 3745:2012, apartado 8 | [Potencia acústica](/phonometry/es/guides/sound-power/) |
-| $L_I$ | Nivel de intensidad acústica: el módulo del vector intensidad referido a 1 pW/m², con el sentido del flujo indicado aparte mediante un signo. | dB re 1 pW/m² | IEC 61043:1993 | [Intensidad](/phonometry/es/guides/intensity/) |
-| $L_p - L_I$ | Índice presión-intensidad: la diferencia entre el nivel de presión y el de intensidad en una posición, el indicador de campo que cualifica una medida de intensidad. | dB | ISO 9614-1:1993, Ecuación (A.3) | [Intensidad](/phonometry/es/guides/intensity/) |
+| $L_p$ | Nivel de presión acústica: veinte veces el logaritmo decimal de la presión acústica eficaz dividida por la presión de referencia. | dB re 20 µPa | IEC 61672-1:2013 | [Calibración](/phonometry/es/signal/metrology/calibration/) |
+| $L_{eq}$ | Nivel de presión acústica continuo equivalente: el nivel del sonido estacionario que transporta la misma presión cuadrática media durante el intervalo. | dB | IEC 61672-1:2013 | [Niveles](/phonometry/es/signal/levels/levels/) |
+| $L_{Aeq}$ | La misma integral aplicada a la señal ponderada A, el descriptor por defecto del ruido ambiental y laboral. | dB | IEC 61672-1:2013 | [Niveles](/phonometry/es/signal/levels/levels/) |
+| $L_{AE}$, SEL | Nivel de exposición sonora: toda la energía ponderada A de un suceso único normalizada a un segundo. | dB | IEC 61672-1:2013, Ecuación 8 (Tabla 4) | [Niveles](/phonometry/es/signal/levels/levels/) |
+| $L_{Cpeak}$ | Nivel de pico ponderado C: el máximo absoluto de la presión ponderada C, no un máximo con ponderación temporal. | dB | IEC 61672-1:2013, apartado 5.13 | [Niveles](/phonometry/es/signal/levels/levels/) |
+| $L_N$ ($L_{10}$, $L_{50}$, $L_{90}$) | Nivel percentil: el nivel superado el $N$ % del tiempo de medida, leído en la distribución del nivel con ponderación temporal. | dB | ISO 1996-2:2017 (el Anexo I usa $L_{90}$ como nivel residual) | [Niveles](/phonometry/es/signal/levels/levels/) |
+| $L_W$, SWL | Nivel de potencia acústica: la potencia que radia una fuente, referida a 1 pW. | dB re 1 pW | ISO 3745:2012, apartado 8 | [Potencia acústica](/phonometry/es/devices/emission/sound-power/) |
+| $L_I$ | Nivel de intensidad acústica: el módulo del vector intensidad referido a 1 pW/m², con el sentido del flujo indicado aparte mediante un signo. | dB re 1 pW/m² | IEC 61043:1993 | [Intensidad](/phonometry/es/devices/emission/intensity/) |
+| $L_p - L_I$ | Índice presión-intensidad: la diferencia entre el nivel de presión y el de intensidad en una posición, el indicador de campo que cualifica una medida de intensidad. | dB | ISO 9614-1:1993, Ecuación (A.3) | [Intensidad](/phonometry/es/devices/emission/intensity/) |
 
 ## Descriptores ambientales y laborales
 
 | Símbolo | Magnitud | Unidad | Definida en | Guía |
 | --- | --- | --- | --- | --- |
-| $L_{den}$ | Nivel día-tarde-noche: la media energética de los tres periodos con 5 dB añadidos a la tarde y 10 dB a la noche. | dB | ISO 1996-1:2016, 3.6.4 | [Niveles ambientales](/phonometry/es/guides/environmental-levels/) |
-| $L_{dn}$ | Nivel día-noche: la misma construcción solo con la penalización de 10 dB nocturna. | dB | ISO 1996-1:2016, 3.6.5 | [Niveles ambientales](/phonometry/es/guides/environmental-levels/) |
-| $L_r$ | Nivel de valoración: el nivel compuesto de la jornada completa tras los ajustes por carácter de la fuente y por franja horaria. | dB | ISO 1996-1:2016, apartado 6.5 (Fórmulas 5 y 6) | [Niveles ambientales](/phonometry/es/guides/environmental-levels/) |
-| $L_{Ar,T}$ | Nivel de valoración de una fuente impulsiva en un intervalo de referencia: el $L_{Aeq}$ más el ajuste graduado por impulsos. | dB | NT ACOU 112:2002, apartado 8 | [Prominencia de impulsos](/phonometry/es/guides/impulse-prominence/) |
-| $K_I$ | Ajuste por impulsos que se suma al $L_{Aeq}$, graduado según la prominencia prevista de los impulsos. | dB | NT ACOU 112:2002, apartado 8 | [Prominencia de impulsos](/phonometry/es/guides/impulse-prominence/) |
-| $E$ | Exposición sonora: la integral temporal de la presión acústica ponderada A al cuadrado durante el periodo de exposición. | Pa²h | IEC 61252:1993, 3.1 | [Niveles](/phonometry/es/guides/levels/) |
-| $L_{EX,8h}$, $L_{EP,d}$ | Nivel de exposición diaria al ruido: el nivel estacionario que, mantenido durante una jornada nominal de 8 h, acumula la misma exposición sonora ponderada A que la medida. | dB | IEC 61252:1993, 3.3 | [Exposición laboral](/phonometry/es/guides/occupational-exposure/) |
-| $L_{p,A,eqT}$ | Nivel continuo equivalente ponderado A de una tarea, de una muestra del puesto o de una jornada completa, el ladrillo con el que se construye el $L_{EX,8h}$. | dB | ISO 9612:2009, apartados 9 a 11 | [Exposición laboral](/phonometry/es/guides/occupational-exposure/) |
-| NIPTS | Desplazamiento permanente del umbral inducido por ruido: la pérdida auditiva mediana atribuible a un nivel, una duración y una frecuencia audiométrica dados. | dB | ISO 1999:2013 | [Pérdida auditiva por ruido](/phonometry/es/guides/noise-induced-hearing-loss/) |
-| HTLAN | Nivel de umbral auditivo asociado a la edad y al ruido: el NIPTS combinado con la componente de la edad. | dB | ISO 1999:2013 | [Pérdida auditiva por ruido](/phonometry/es/guides/noise-induced-hearing-loss/) |
+| $L_{den}$ | Nivel día-tarde-noche: la media energética de los tres periodos con 5 dB añadidos a la tarde y 10 dB a la noche. | dB | ISO 1996-1:2016, 3.6.4 | [Niveles ambientales](/phonometry/es/environment/environmental-levels/) |
+| $L_{dn}$ | Nivel día-noche: la misma construcción solo con la penalización de 10 dB nocturna. | dB | ISO 1996-1:2016, 3.6.5 | [Niveles ambientales](/phonometry/es/environment/environmental-levels/) |
+| $L_r$ | Nivel de valoración: el nivel compuesto de la jornada completa tras los ajustes por carácter de la fuente y por franja horaria. | dB | ISO 1996-1:2016, apartado 6.5 (Fórmulas 5 y 6) | [Niveles ambientales](/phonometry/es/environment/environmental-levels/) |
+| $L_{Ar,T}$ | Nivel de valoración de una fuente impulsiva en un intervalo de referencia: el $L_{Aeq}$ más el ajuste graduado por impulsos. | dB | NT ACOU 112:2002, apartado 8 | [Prominencia de impulsos](/phonometry/es/environment/assessment/impulsive-sound/) |
+| $K_I$ | Ajuste por impulsos que se suma al $L_{Aeq}$, graduado según la prominencia prevista de los impulsos. | dB | NT ACOU 112:2002, apartado 8 | [Prominencia de impulsos](/phonometry/es/environment/assessment/impulsive-sound/) |
+| $E$ | Exposición sonora: la integral temporal de la presión acústica ponderada A al cuadrado durante el periodo de exposición. | Pa²h | IEC 61252:1993, 3.1 | [Niveles](/phonometry/es/signal/levels/levels/) |
+| $L_{EX,8h}$, $L_{EP,d}$ | Nivel de exposición diaria al ruido: el nivel estacionario que, mantenido durante una jornada nominal de 8 h, acumula la misma exposición sonora ponderada A que la medida. | dB | IEC 61252:1993, 3.3 | [Exposición laboral](/phonometry/es/perception/hearing/occupational-exposure/) |
+| $L_{p,A,eqT}$ | Nivel continuo equivalente ponderado A de una tarea, de una muestra del puesto o de una jornada completa, el ladrillo con el que se construye el $L_{EX,8h}$. | dB | ISO 9612:2009, apartados 9 a 11 | [Exposición laboral](/phonometry/es/perception/hearing/occupational-exposure/) |
+| NIPTS | Desplazamiento permanente del umbral inducido por ruido: la pérdida auditiva mediana atribuible a un nivel, una duración y una frecuencia audiométrica dados. | dB | ISO 1999:2013 | [Pérdida auditiva por ruido](/phonometry/es/perception/hearing/noise-induced-hearing-loss/) |
+| HTLAN | Nivel de umbral auditivo asociado a la edad y al ruido: el NIPTS combinado con la componente de la edad. | dB | ISO 1999:2013 | [Pérdida auditiva por ruido](/phonometry/es/perception/hearing/noise-induced-hearing-loss/) |
 
 ## Ponderación frecuencial y temporal
 
 | Símbolo | Magnitud | Unidad | Definida en | Guía |
 | --- | --- | --- | --- | --- |
-| A, C, Z | Las ponderaciones frecuenciales normativas: las curvas de respuesta del oído que se aplican antes de integrar, siendo Z la referencia plana. | dB | IEC 61672-1:2013, Anexo E (límites de aceptación en la Tabla 3) | [Ponderación frecuencial](/phonometry/es/guides/weighting/) |
-| G | Ponderación para infrasonido, definida por sus polos y ceros en el intervalo de 0,25 Hz a 315 Hz. | dB | ISO 7196:1995, Tabla 1 (respuestas nominales en la Tabla 2) | [Ponderaciones especiales](/phonometry/es/guides/special-weightings/) |
-| B | Ponderación histórica para niveles medios, retirada de la norma vigente de sonómetros. | dB | ANSI S1.4-1983, Apéndice C (Fórmula C2) | [Ponderaciones especiales](/phonometry/es/guides/special-weightings/) |
-| $D$ | Ponderación histórica para ruido de aeronaves, derivada de la curva de ruidosidad percibida de 40 noys. | dB | IEC 537:1976 (retirada) | [Ponderaciones especiales](/phonometry/es/guides/special-weightings/) |
-| AU | Ponderación para el sonido audible medido en presencia de ultrasonido. | dB | IEC 61012:1990, apartado 2.2 (Tablas 1 y 2) | [Ponderaciones especiales](/phonometry/es/guides/special-weightings/) |
-| F, S, I | Ponderaciones temporales exponenciales Fast, Slow e Impulse: las balísticas del detector que producen el nivel mostrado. | s (constante de tiempo) | IEC 61672-1:2013 | [Ponderación temporal](/phonometry/es/guides/time-weighting/) |
+| A, C, Z | Las ponderaciones frecuenciales normativas: las curvas de respuesta del oído que se aplican antes de integrar, siendo Z la referencia plana. | dB | IEC 61672-1:2013, Anexo E (límites de aceptación en la Tabla 3) | [Ponderación frecuencial](/phonometry/es/signal/levels/weighting/) |
+| G | Ponderación para infrasonido, definida por sus polos y ceros en el intervalo de 0,25 Hz a 315 Hz. | dB | ISO 7196:1995, Tabla 1 (respuestas nominales en la Tabla 2) | [Ponderaciones especiales](/phonometry/es/signal/levels/special-weightings/) |
+| B | Ponderación histórica para niveles medios, retirada de la norma vigente de sonómetros. | dB | ANSI S1.4-1983, Apéndice C (Fórmula C2) | [Ponderaciones especiales](/phonometry/es/signal/levels/special-weightings/) |
+| $D$ | Ponderación histórica para ruido de aeronaves, derivada de la curva de ruidosidad percibida de 40 noys. | dB | IEC 537:1976 (retirada) | [Ponderaciones especiales](/phonometry/es/signal/levels/special-weightings/) |
+| AU | Ponderación para el sonido audible medido en presencia de ultrasonido. | dB | IEC 61012:1990, apartado 2.2 (Tablas 1 y 2) | [Ponderaciones especiales](/phonometry/es/signal/levels/special-weightings/) |
+| F, S, I | Ponderaciones temporales exponenciales Fast, Slow e Impulse: las balísticas del detector que producen el nivel mostrado. | s (constante de tiempo) | IEC 61672-1:2013 | [Ponderación temporal](/phonometry/es/signal/levels/time-weighting/) |
 
 ## Acústica de salas
 
 | Símbolo | Magnitud | Unidad | Definida en | Guía |
 | --- | --- | --- | --- | --- |
-| $T_{20}$ | Tiempo de reverberación extrapolado a una caída de 60 dB desde un ajuste por mínimos cuadrados entre −5 dB y −25 dB de la curva de Schroeder. | s | ISO 3382-2:2008, apartado 6 y Anexo C | [Acústica de salas](/phonometry/es/guides/room-acoustics/) |
-| $T_{30}$ | La misma extrapolación desde un ajuste entre −5 dB y −35 dB, la opción habitual cuando el margen de caída lo permite. | s | ISO 3382-2:2008, apartado 6 y Anexo C | [Acústica de salas](/phonometry/es/guides/room-acoustics/) |
-| $T_{60}$, RT | El tiempo de reverberación propiamente dicho: el que tarda la energía sonora en caer 60 dB. En la práctica se mide como $T_{20}$ o $T_{30}$. | s | ISO 3382-1:2009 | [Acústica de salas](/phonometry/es/guides/room-acoustics/) |
-| EDT | Tiempo de caída inicial: la misma pendiente tomada sobre los primeros 10 dB de caída, que sigue la reverberancia percibida y no la cola. | s | ISO 3382-1:2009 (diferencia apenas perceptible en la Tabla A.1) | [Acústica de salas](/phonometry/es/guides/room-acoustics/) |
-| $C_{50}$ | Claridad para la palabra: la relación energética entre los primeros 50 ms de la respuesta al impulso y todo lo que viene después. | dB | ISO 3382-1:2009 | [Acústica de salas](/phonometry/es/guides/room-acoustics/) |
-| $C_{80}$ | Claridad para la música: la misma relación con la frontera en 80 ms. | dB | ISO 3382-1:2009 (diferencia apenas perceptible en la Tabla A.1) | [Acústica de salas](/phonometry/es/guides/room-acoustics/) |
-| $D_{50}$ | Definición, o Deutlichkeit: la fracción de la energía total que llega en los primeros 50 ms. | adimensional | ISO 3382-1:2009 (diferencia apenas perceptible en la Tabla A.1) | [Acústica de salas](/phonometry/es/guides/room-acoustics/) |
-| $T_s$ | Tiempo central: el centro de gravedad temporal de la respuesta al impulso al cuadrado, una alternativa a los índices de claridad sin frontera arbitraria. | s | ISO 3382-1:2009, Ecuación (A.13) | [Acústica de salas](/phonometry/es/guides/room-acoustics/) |
-| $A$ | Área de absorción acústica equivalente de un recinto: el área de una superficie perfectamente absorbente que daría el mismo tiempo de reverberación. | m² | ISO 354:2003, Ecuaciones (5) y (7) | [Medida de la absorción](/phonometry/es/guides/absorption-measurement/) |
-| NC | Índice de ruido de sala de un espectro de fondo: el nivel de interferencia con la palabra elige la curva, y el método de tangencia valora el espectro cuando alguna banda la supera. | dB (índice) | ANSI/ASA S12.2-2019, 5.2.2 y 5.2.3 (curvas en la Tabla 1) | [Ruido de salas](/phonometry/es/guides/room-noise/) |
-| SIL | Nivel de interferencia con la palabra: la media de los niveles en las bandas de octava de 500, 1000, 2000 y 4000 Hz. | dB | ANSI/ASA S12.2-2019, apartado 3.2 | [Ruido de salas](/phonometry/es/guides/room-noise/) |
-| RC | Índice RC Mark II: la media de los niveles de 500, 1000 y 2000 Hz, con una etiqueta espectral de retumbo, siseo o neutro. | dB (índice) | ANSI/ASA S12.2-2019, Anexo D (apartados D.3 y D.4) | [Ruido de salas](/phonometry/es/guides/room-noise/) |
-| NR | Noise Rating, la familia de curvas europea equivalente a NC. Se comenta a efectos de comparación y no se implementa deliberadamente. | dB (índice) | Kosten y van Os (1962); sin norma aplicable | [Ruido de salas](/phonometry/es/guides/room-noise/) |
+| $T_{20}$ | Tiempo de reverberación extrapolado a una caída de 60 dB desde un ajuste por mínimos cuadrados entre −5 dB y −25 dB de la curva de Schroeder. | s | ISO 3382-2:2008, apartado 6 y Anexo C | [Acústica de salas](/phonometry/es/buildings/rooms/room-acoustics/) |
+| $T_{30}$ | La misma extrapolación desde un ajuste entre −5 dB y −35 dB, la opción habitual cuando el margen de caída lo permite. | s | ISO 3382-2:2008, apartado 6 y Anexo C | [Acústica de salas](/phonometry/es/buildings/rooms/room-acoustics/) |
+| $T_{60}$, RT | El tiempo de reverberación propiamente dicho: el que tarda la energía sonora en caer 60 dB. En la práctica se mide como $T_{20}$ o $T_{30}$. | s | ISO 3382-1:2009 | [Acústica de salas](/phonometry/es/buildings/rooms/room-acoustics/) |
+| EDT | Tiempo de caída inicial: la misma pendiente tomada sobre los primeros 10 dB de caída, que sigue la reverberancia percibida y no la cola. | s | ISO 3382-1:2009 (diferencia apenas perceptible en la Tabla A.1) | [Acústica de salas](/phonometry/es/buildings/rooms/room-acoustics/) |
+| $C_{50}$ | Claridad para la palabra: la relación energética entre los primeros 50 ms de la respuesta al impulso y todo lo que viene después. | dB | ISO 3382-1:2009 | [Acústica de salas](/phonometry/es/buildings/rooms/room-acoustics/) |
+| $C_{80}$ | Claridad para la música: la misma relación con la frontera en 80 ms. | dB | ISO 3382-1:2009 (diferencia apenas perceptible en la Tabla A.1) | [Acústica de salas](/phonometry/es/buildings/rooms/room-acoustics/) |
+| $D_{50}$ | Definición, o Deutlichkeit: la fracción de la energía total que llega en los primeros 50 ms. | adimensional | ISO 3382-1:2009 (diferencia apenas perceptible en la Tabla A.1) | [Acústica de salas](/phonometry/es/buildings/rooms/room-acoustics/) |
+| $T_s$ | Tiempo central: el centro de gravedad temporal de la respuesta al impulso al cuadrado, una alternativa a los índices de claridad sin frontera arbitraria. | s | ISO 3382-1:2009, Ecuación (A.13) | [Acústica de salas](/phonometry/es/buildings/rooms/room-acoustics/) |
+| $A$ | Área de absorción acústica equivalente de un recinto: el área de una superficie perfectamente absorbente que daría el mismo tiempo de reverberación. | m² | ISO 354:2003, Ecuaciones (5) y (7) | [Medida de la absorción](/phonometry/es/materials/absorbers/absorption-measurement/) |
+| NC | Índice de ruido de sala de un espectro de fondo: el nivel de interferencia con la palabra elige la curva, y el método de tangencia valora el espectro cuando alguna banda la supera. | dB (índice) | ANSI/ASA S12.2-2019, 5.2.2 y 5.2.3 (curvas en la Tabla 1) | [Ruido de salas](/phonometry/es/buildings/rooms/room-noise/) |
+| SIL | Nivel de interferencia con la palabra: la media de los niveles en las bandas de octava de 500, 1000, 2000 y 4000 Hz. | dB | ANSI/ASA S12.2-2019, apartado 3.2 | [Ruido de salas](/phonometry/es/buildings/rooms/room-noise/) |
+| RC | Índice RC Mark II: la media de los niveles de 500, 1000 y 2000 Hz, con una etiqueta espectral de retumbo, siseo o neutro. | dB (índice) | ANSI/ASA S12.2-2019, Anexo D (apartados D.3 y D.4) | [Ruido de salas](/phonometry/es/buildings/rooms/room-noise/) |
+| NR | Noise Rating, la familia de curvas europea equivalente a NC. Se comenta a efectos de comparación y no se implementa deliberadamente. | dB (índice) | Kosten y van Os (1962); sin norma aplicable | [Ruido de salas](/phonometry/es/buildings/rooms/room-noise/) |
 
 ## Habla e inteligibilidad
 
 | Símbolo | Magnitud | Unidad | Definida en | Guía |
 | --- | --- | --- | --- | --- |
-| $m(F)$ | Función de transferencia de modulación: la fracción de la profundidad de modulación de la envolvente del habla, a la frecuencia de modulación $F$, que sobrevive al camino de transmisión. | adimensional | IEC 60268-16:2020 | [Transmisión del habla](/phonometry/es/guides/speech-transmission/) |
-| STI | Índice de transmisión del habla: la matriz de transferencia de modulación convertida en relaciones señal-ruido efectivas y ponderada en un único valor entre 0 y 1. | adimensional | IEC 60268-16:2020, A.5.2 a A.5.6 | [Transmisión del habla](/phonometry/es/guides/speech-transmission/) |
-| STIPA | La medida directa del STI, reproduciendo una señal de prueba normalizada con dos modulaciones por banda a través de la cadena real. | adimensional | IEC 60268-16:2020, apartado 6.3 y Tabla 3 (método directo, Anexo B) | [Transmisión del habla](/phonometry/es/guides/speech-transmission/) |
-| SII | Índice de inteligibilidad del habla: la audibilidad del espectro de habla frente al ruido y al umbral del oyente, ponderada por la función de importancia de cada banda. | adimensional | ANSI S3.5-1997, apartado 6 (procedimiento en el apartado 5, función de importancia en la Tabla 3) | [Inteligibilidad del habla](/phonometry/es/guides/speech-intelligibility/) |
-| STOI | Inteligibilidad objetiva de corta duración: la correlación recortada de las envolventes por banda entre el habla limpia y la degradada. | adimensional | Taal et al. (2011), Ecuaciones 5 y 6; sin norma aplicable | [Inteligibilidad objetiva](/phonometry/es/guides/objective-intelligibility/) |
-| ESTOI | La versión extendida, normalizada por filas y por columnas para que siga a los enmascarantes modulados. | adimensional | Jensen y Taal (2016), Ecuación 8; sin norma aplicable | [Inteligibilidad objetiva](/phonometry/es/guides/objective-intelligibility/) |
+| $m(F)$ | Función de transferencia de modulación: la fracción de la profundidad de modulación de la envolvente del habla, a la frecuencia de modulación $F$, que sobrevive al camino de transmisión. | adimensional | IEC 60268-16:2020 | [Transmisión del habla](/phonometry/es/perception/speech/speech-transmission/) |
+| STI | Índice de transmisión del habla: la matriz de transferencia de modulación convertida en relaciones señal-ruido efectivas y ponderada en un único valor entre 0 y 1. | adimensional | IEC 60268-16:2020, A.5.2 a A.5.6 | [Transmisión del habla](/phonometry/es/perception/speech/speech-transmission/) |
+| STIPA | La medida directa del STI, reproduciendo una señal de prueba normalizada con dos modulaciones por banda a través de la cadena real. | adimensional | IEC 60268-16:2020, apartado 6.3 y Tabla 3 (método directo, Anexo B) | [Transmisión del habla](/phonometry/es/perception/speech/speech-transmission/) |
+| SII | Índice de inteligibilidad del habla: la audibilidad del espectro de habla frente al ruido y al umbral del oyente, ponderada por la función de importancia de cada banda. | adimensional | ANSI S3.5-1997, apartado 6 (procedimiento en el apartado 5, función de importancia en la Tabla 3) | [Inteligibilidad del habla](/phonometry/es/perception/speech/speech-intelligibility/) |
+| STOI | Inteligibilidad objetiva de corta duración: la correlación recortada de las envolventes por banda entre el habla limpia y la degradada. | adimensional | Taal et al. (2011), Ecuaciones 5 y 6; sin norma aplicable | [Inteligibilidad objetiva](/phonometry/es/perception/speech/objective-intelligibility/) |
+| ESTOI | La versión extendida, normalizada por filas y por columnas para que siga a los enmascarantes modulados. | adimensional | Jensen y Taal (2016), Ecuación 8; sin norma aplicable | [Inteligibilidad objetiva](/phonometry/es/perception/speech/objective-intelligibility/) |
 
 ## Aislamiento acústico
 
 | Símbolo | Magnitud | Unidad | Definida en | Guía |
 | --- | --- | --- | --- | --- |
-| $D$ | Diferencia de niveles: el nivel promediado energéticamente en el recinto emisor menos el del receptor, sin normalizar. | dB | ISO 16283-1:2014, 3.12 a 3.15 | [Aislamiento en campo](/phonometry/es/guides/insulation-field/) |
-| $D_{nT}$ | Diferencia de niveles estandarizada: la diferencia de niveles referida a un tiempo de reverberación de referencia, 0,5 s en viviendas. | dB | ISO 16283-1:2014, 3.12 a 3.15 | [Aislamiento en campo](/phonometry/es/guides/insulation-field/) |
-| $D_n$ | Diferencia de niveles normalizada: la diferencia de niveles referida a un área de absorción de referencia de 10 m². | dB | ISO 10052:2021 | [Método de control](/phonometry/es/guides/insulation-survey/) |
-| $D_{n,e}$ | Diferencia de niveles normalizada de elemento, para un elemento pequeño o una vía de aire, referida a un área de referencia de 10 m². | dB | EN 12354-3:2000 | [Predicción del aislamiento](/phonometry/es/guides/insulation-prediction/) |
-| $R$ | Índice de reducción acústica: la diferencia de niveles corregida por el área del cerramiento partido por el área de absorción del recinto receptor, medida en laboratorio con los flancos suprimidos. | dB | ISO 10140-2:2010 | [Aislamiento en laboratorio](/phonometry/es/guides/insulation-lab/) |
-| $R'$ | Índice de reducción acústica aparente: la misma construcción medida en el edificio, así que incluye todas las vías de flanco. La prima es la marca que distingue el laboratorio del campo. | dB | ISO 16283-1:2014, 3.12 a 3.15 | [Aislamiento en campo](/phonometry/es/guides/insulation-field/) |
-| TL | Pérdidas por transmisión: el aislamiento a ruido aéreo de un panel predicho a partir de sus propiedades físicas, la misma magnitud que $R$ en un contexto de predicción. | dB | Bies, Hansen y Howard (2017), Sección 7.2; sin norma aplicable | [Aislamiento de paneles](/phonometry/es/guides/panel-sound-insulation/) |
-| $R_w$, $R'_w$, $D_{nT,w}$ | Los índices globales ponderados: una curva de referencia fija se desplaza hacia el espectro medido hasta que las desviaciones desfavorables alcanzan su suma admisible, y la curva desplazada se lee en 500 Hz. | dB | ISO 717-1:2020 | [Índices de aislamiento](/phonometry/es/guides/insulation-ratings/) |
-| $D_{n,e,w}$ | El mismo índice global de curva de referencia aplicado a la diferencia de niveles normalizada de elemento. | dB | ISO 717-1:2020 | [Predicción del aislamiento](/phonometry/es/guides/insulation-prediction/) |
-| $C$, $C_{tr}$ | Términos de adaptación espectral: las correcciones que vuelven a valorar la curva medida frente a ruido rosa ponderado A ($C$) y frente a tráfico rodado urbano ponderado A ($C_{tr}$). | dB | ISO 717-1:2020, Anexo A | [Índices de aislamiento](/phonometry/es/guides/insulation-ratings/) |
-| $L_n$ | Nivel de presión acústica de impactos normalizado: el nivel en el recinto receptor bajo la máquina de impactos normalizada, referido a un área de absorción de 10 m². | dB | ISO 10140-3:2010 | [Aislamiento en laboratorio](/phonometry/es/guides/insulation-lab/) |
-| $L'_{nT}$ | Nivel de presión acústica de impactos estandarizado, referido a un tiempo de reverberación de referencia. Atención al signo: más reverberación lo baja, al revés que el $D_{nT}$. | dB | ISO 16283-2:2015 | [Aislamiento en campo](/phonometry/es/guides/insulation-field/) |
-| $L_{n,w}$, $L'_{nT,w}$ | Los índices globales de impactos. La curva de referencia se desplaza igual, pero ahora una desviación desfavorable es aquella en la que la medida supera a la referencia. | dB | ISO 717-2:2020 | [Índices de aislamiento](/phonometry/es/guides/insulation-ratings/) |
-| $C_I$ | Término de adaptación espectral de impactos, a partir de la suma energética entre 100 Hz y 2500 Hz. El término de rango ampliado $C_{I,50\text{–}2500}$ lo extiende hasta 50 Hz. | dB | ISO 717-2:2020 (rango ampliado en la NOTA de A.2.1) | [Índices de aislamiento](/phonometry/es/guides/insulation-ratings/) |
-| $\Delta L_w$ | Reducción ponderada del nivel de presión acústica de impactos que aporta un revestimiento de suelo, medida como la mejora sobre el forjado desnudo de referencia. | dB | ISO 717-2:2020 (medición en ISO 16251-1:2014, Fórmulas (3) y (4)) | [Mejora de revestimientos](/phonometry/es/guides/impact-improvement/) |
-| $\Delta R_w$ | Mejora ponderada del aislamiento a ruido aéreo que aporta un trasdosado o una capa adicional, que se suma al índice del elemento en la predicción. | dB | EN 12354-1:2000, Fórmulas 27 y 28a | [Predicción del aislamiento](/phonometry/es/guides/insulation-prediction/) |
-| $K_{ij}$ | Índice de reducción vibracional de una unión: la diferencia de niveles de velocidad promediada en ambos sentidos, corregida por la longitud de la unión y las longitudes de absorción equivalentes. | dB | ISO 10848-1:2006, Fórmula (13) | [Flancos en laboratorio](/phonometry/es/guides/flanking-lab/) |
-| $f_c$ | Frecuencia crítica: aquella en la que la longitud de onda de flexión del panel iguala a la del aire, donde aparece la caída por coincidencia. | Hz | Bies, Hansen y Howard (2017), Ecuación 7.3; sin norma aplicable | [Aislamiento de paneles](/phonometry/es/guides/panel-sound-insulation/) |
-| $\sigma$ | Eficiencia de radiación de una placa: la potencia aérea radiada por unidad de velocidad cuadrática media de la superficie, normalizada por el valor de onda plana. | adimensional | Hopkins (2007), Ecuaciones 2.227 a 2.230; sin norma aplicable | [Aislamiento de paneles](/phonometry/es/guides/panel-sound-insulation/) |
+| $D$ | Diferencia de niveles: el nivel promediado energéticamente en el recinto emisor menos el del receptor, sin normalizar. | dB | ISO 16283-1:2014, 3.12 a 3.15 | [Aislamiento en campo](/phonometry/es/buildings/insulation/insulation-field/) |
+| $D_{nT}$ | Diferencia de niveles estandarizada: la diferencia de niveles referida a un tiempo de reverberación de referencia, 0,5 s en viviendas. | dB | ISO 16283-1:2014, 3.12 a 3.15 | [Aislamiento en campo](/phonometry/es/buildings/insulation/insulation-field/) |
+| $D_n$ | Diferencia de niveles normalizada: la diferencia de niveles referida a un área de absorción de referencia de 10 m². | dB | ISO 10052:2021 | [Método de control](/phonometry/es/buildings/insulation/insulation-survey/) |
+| $D_{n,e}$ | Diferencia de niveles normalizada de elemento, para un elemento pequeño o una vía de aire, referida a un área de referencia de 10 m². | dB | EN 12354-3:2000 | [Predicción del aislamiento](/phonometry/es/buildings/design/insulation-prediction/) |
+| $R$ | Índice de reducción acústica: la diferencia de niveles corregida por el área del cerramiento partido por el área de absorción del recinto receptor, medida en laboratorio con los flancos suprimidos. | dB | ISO 10140-2:2010 | [Aislamiento en laboratorio](/phonometry/es/buildings/insulation/insulation-lab/) |
+| $R'$ | Índice de reducción acústica aparente: la misma construcción medida en el edificio, así que incluye todas las vías de flanco. La prima es la marca que distingue el laboratorio del campo. | dB | ISO 16283-1:2014, 3.12 a 3.15 | [Aislamiento en campo](/phonometry/es/buildings/insulation/insulation-field/) |
+| TL | Pérdidas por transmisión: el aislamiento a ruido aéreo de un panel predicho a partir de sus propiedades físicas, la misma magnitud que $R$ en un contexto de predicción. | dB | Bies, Hansen y Howard (2017), Sección 7.2; sin norma aplicable | [Aislamiento de paneles](/phonometry/es/buildings/design/panel-sound-insulation/) |
+| $R_w$, $R'_w$, $D_{nT,w}$ | Los índices globales ponderados: una curva de referencia fija se desplaza hacia el espectro medido hasta que las desviaciones desfavorables alcanzan su suma admisible, y la curva desplazada se lee en 500 Hz. | dB | ISO 717-1:2020 | [Índices de aislamiento](/phonometry/es/buildings/insulation/insulation-ratings/) |
+| $D_{n,e,w}$ | El mismo índice global de curva de referencia aplicado a la diferencia de niveles normalizada de elemento. | dB | ISO 717-1:2020 | [Predicción del aislamiento](/phonometry/es/buildings/design/insulation-prediction/) |
+| $C$, $C_{tr}$ | Términos de adaptación espectral: las correcciones que vuelven a valorar la curva medida frente a ruido rosa ponderado A ($C$) y frente a tráfico rodado urbano ponderado A ($C_{tr}$). | dB | ISO 717-1:2020, Anexo A | [Índices de aislamiento](/phonometry/es/buildings/insulation/insulation-ratings/) |
+| $L_n$ | Nivel de presión acústica de impactos normalizado: el nivel en el recinto receptor bajo la máquina de impactos normalizada, referido a un área de absorción de 10 m². | dB | ISO 10140-3:2010 | [Aislamiento en laboratorio](/phonometry/es/buildings/insulation/insulation-lab/) |
+| $L'_{nT}$ | Nivel de presión acústica de impactos estandarizado, referido a un tiempo de reverberación de referencia. Atención al signo: más reverberación lo baja, al revés que el $D_{nT}$. | dB | ISO 16283-2:2015 | [Aislamiento en campo](/phonometry/es/buildings/insulation/insulation-field/) |
+| $L_{n,w}$, $L'_{nT,w}$ | Los índices globales de impactos. La curva de referencia se desplaza igual, pero ahora una desviación desfavorable es aquella en la que la medida supera a la referencia. | dB | ISO 717-2:2020 | [Índices de aislamiento](/phonometry/es/buildings/insulation/insulation-ratings/) |
+| $C_I$ | Término de adaptación espectral de impactos, a partir de la suma energética entre 100 Hz y 2500 Hz. El término de rango ampliado $C_{I,50\text{–}2500}$ lo extiende hasta 50 Hz. | dB | ISO 717-2:2020 (rango ampliado en la NOTA de A.2.1) | [Índices de aislamiento](/phonometry/es/buildings/insulation/insulation-ratings/) |
+| $\Delta L_w$ | Reducción ponderada del nivel de presión acústica de impactos que aporta un revestimiento de suelo, medida como la mejora sobre el forjado desnudo de referencia. | dB | ISO 717-2:2020 (medición en ISO 16251-1:2014, Fórmulas (3) y (4)) | [Mejora de revestimientos](/phonometry/es/buildings/design/impact-improvement/) |
+| $\Delta R_w$ | Mejora ponderada del aislamiento a ruido aéreo que aporta un trasdosado o una capa adicional, que se suma al índice del elemento en la predicción. | dB | EN 12354-1:2000, Fórmulas 27 y 28a | [Predicción del aislamiento](/phonometry/es/buildings/design/insulation-prediction/) |
+| $K_{ij}$ | Índice de reducción vibracional de una unión: la diferencia de niveles de velocidad promediada en ambos sentidos, corregida por la longitud de la unión y las longitudes de absorción equivalentes. | dB | ISO 10848-1:2006, Fórmula (13) | [Flancos en laboratorio](/phonometry/es/buildings/insulation/flanking-lab/) |
+| $f_c$ | Frecuencia crítica: aquella en la que la longitud de onda de flexión del panel iguala a la del aire, donde aparece la caída por coincidencia. | Hz | Bies, Hansen y Howard (2017), Ecuación 7.3; sin norma aplicable | [Aislamiento de paneles](/phonometry/es/buildings/design/panel-sound-insulation/) |
+| $\sigma$ | Eficiencia de radiación de una placa: la potencia aérea radiada por unidad de velocidad cuadrática media de la superficie, normalizada por el valor de onda plana. | adimensional | Hopkins (2007), Ecuaciones 2.227 a 2.230; sin norma aplicable | [Aislamiento de paneles](/phonometry/es/buildings/design/panel-sound-insulation/) |
 
 ## Materiales y superficies
 
 | Símbolo | Magnitud | Unidad | Definida en | Guía |
 | --- | --- | --- | --- | --- |
-| $\alpha$ | Coeficiente de absorción acústica a incidencia normal: la fracción de energía incidente que la superficie no devuelve, obtenida en el tubo de impedancia a partir del factor de reflexión. | adimensional | ISO 10534-2:1998, Ecuaciones (17) a (19) | [Tubo de impedancia](/phonometry/es/guides/impedance-tube/) |
-| $\alpha_s$ | Coeficiente de absorción acústica a incidencia aleatoria medido en cámara reverberante, a partir del cambio del área de absorción equivalente con y sin la muestra. | adimensional | ISO 354:2003, Ecuaciones (8) y (9) | [Medida de la absorción](/phonometry/es/guides/absorption-measurement/) |
-| $\alpha_p$ | Coeficiente de absorción acústica práctico: los datos en tercios de octava agrupados en bandas de octava y redondeados a pasos de 0,05. | adimensional | ISO 11654:1997, apartado 4.1 | [Medida de la absorción](/phonometry/es/guides/absorption-measurement/) |
-| $\alpha_w$ | Coeficiente de absorción acústica ponderado: la curva de referencia fija desplazada hacia los valores prácticos y leída en 500 Hz. | adimensional | ISO 11654:1997, apartado 4.2 | [Medida de la absorción](/phonometry/es/guides/absorption-measurement/) |
-| Clase de absorción | La clase, de la A a la E, a la que se asigna el coeficiente ponderado, o "sin clasificar". | letra de clase | ISO 11654:1997, Tabla B.1 | [Medida de la absorción](/phonometry/es/guides/absorption-measurement/) |
-| $R$ | Resistencia al flujo de aire: la diferencia de presión a través de una probeta dividida por el caudal volumétrico que la atraviesa. | Pa·s/m³ | ISO 9053-1:2018, apartado 3 | [Resistencia al flujo](/phonometry/es/guides/airflow-resistance/) |
-| $R_s$ | Resistencia específica al flujo de aire: la resistencia al flujo referida al área de la cara de la probeta. | Pa·s/m | ISO 9053-1:2018, apartado 3 | [Resistencia al flujo](/phonometry/es/guides/airflow-resistance/) |
-| $\sigma$ | Resistividad al flujo de aire: la resistencia específica por unidad de espesor, la entrada principal de todo modelo poroso empírico. | Pa·s/m² | ISO 9053-1:2018, apartado 3 | [Resistencia al flujo](/phonometry/es/guides/airflow-resistance/) |
-| $Z$ | Impedancia superficial: la relación compleja entre presión acústica y velocidad de partícula en la cara de la muestra, que suele darse normalizada por la impedancia característica del aire. | Pa·s/m | ISO 10534-2:1998, Ecuaciones (17) a (19) | [Tubo de impedancia](/phonometry/es/guides/impedance-tube/) |
-| $s$ | Coeficiente de dispersión: la fracción de energía reflejada que no vuelve de forma especular, medida a incidencia aleatoria sobre una plataforma giratoria en cámara reverberante. | adimensional | ISO 17497-1:2004+A1:2014, Fórmula (5) | [Difusores](/phonometry/es/guides/diffusers/) |
-| $d$ | Coeficiente de difusión: la uniformidad de la respuesta polar de una superficie, a partir de la autocorrelación de la medida en goniómetro de campo libre. | adimensional | ISO 17497-2:2012, Fórmula (5) (forma normalizada en la Fórmula (7)) | [Difusores](/phonometry/es/guides/diffusers/) |
-| $s'$ | Rigidez dinámica por unidad de superficie de una capa resiliente: una fuerza dinámica por unidad de área dividida por la variación de espesor que provoca. | MN/m³ | EN 29052-1:1992 (ISO 9052-1:1989), Fórmula 1 | [Rigidez dinámica](/phonometry/es/guides/dynamic-stiffness/) |
+| $\alpha$ | Coeficiente de absorción acústica a incidencia normal: la fracción de energía incidente que la superficie no devuelve, obtenida en el tubo de impedancia a partir del factor de reflexión. | adimensional | ISO 10534-2:1998, Ecuaciones (17) a (19) | [Tubo de impedancia](/phonometry/es/materials/absorbers/impedance-tube/) |
+| $\alpha_s$ | Coeficiente de absorción acústica a incidencia aleatoria medido en cámara reverberante, a partir del cambio del área de absorción equivalente con y sin la muestra. | adimensional | ISO 354:2003, Ecuaciones (8) y (9) | [Medida de la absorción](/phonometry/es/materials/absorbers/absorption-measurement/) |
+| $\alpha_p$ | Coeficiente de absorción acústica práctico: los datos en tercios de octava agrupados en bandas de octava y redondeados a pasos de 0,05. | adimensional | ISO 11654:1997, apartado 4.1 | [Medida de la absorción](/phonometry/es/materials/absorbers/absorption-measurement/) |
+| $\alpha_w$ | Coeficiente de absorción acústica ponderado: la curva de referencia fija desplazada hacia los valores prácticos y leída en 500 Hz. | adimensional | ISO 11654:1997, apartado 4.2 | [Medida de la absorción](/phonometry/es/materials/absorbers/absorption-measurement/) |
+| Clase de absorción | La clase, de la A a la E, a la que se asigna el coeficiente ponderado, o "sin clasificar". | letra de clase | ISO 11654:1997, Tabla B.1 | [Medida de la absorción](/phonometry/es/materials/absorbers/absorption-measurement/) |
+| $R$ | Resistencia al flujo de aire: la diferencia de presión a través de una probeta dividida por el caudal volumétrico que la atraviesa. | Pa·s/m³ | ISO 9053-1:2018, apartado 3 | [Resistencia al flujo](/phonometry/es/materials/absorbers/airflow-resistance/) |
+| $R_s$ | Resistencia específica al flujo de aire: la resistencia al flujo referida al área de la cara de la probeta. | Pa·s/m | ISO 9053-1:2018, apartado 3 | [Resistencia al flujo](/phonometry/es/materials/absorbers/airflow-resistance/) |
+| $\sigma$ | Resistividad al flujo de aire: la resistencia específica por unidad de espesor, la entrada principal de todo modelo poroso empírico. | Pa·s/m² | ISO 9053-1:2018, apartado 3 | [Resistencia al flujo](/phonometry/es/materials/absorbers/airflow-resistance/) |
+| $Z$ | Impedancia superficial: la relación compleja entre presión acústica y velocidad de partícula en la cara de la muestra, que suele darse normalizada por la impedancia característica del aire. | Pa·s/m | ISO 10534-2:1998, Ecuaciones (17) a (19) | [Tubo de impedancia](/phonometry/es/materials/absorbers/impedance-tube/) |
+| $s$ | Coeficiente de dispersión: la fracción de energía reflejada que no vuelve de forma especular, medida a incidencia aleatoria sobre una plataforma giratoria en cámara reverberante. | adimensional | ISO 17497-1:2004+A1:2014, Fórmula (5) | [Difusores](/phonometry/es/materials/diffusers/diffusers/) |
+| $d$ | Coeficiente de difusión: la uniformidad de la respuesta polar de una superficie, a partir de la autocorrelación de la medida en goniómetro de campo libre. | adimensional | ISO 17497-2:2012, Fórmula (5) (forma normalizada en la Fórmula (7)) | [Difusores](/phonometry/es/materials/diffusers/diffusers/) |
+| $s'$ | Rigidez dinámica por unidad de superficie de una capa resiliente: una fuerza dinámica por unidad de área dividida por la variación de espesor que provoca. | MN/m³ | EN 29052-1:1992 (ISO 9052-1:1989), Fórmula 1 | [Rigidez dinámica](/phonometry/es/materials/resilient/dynamic-stiffness/) |
 
 ## Vibración y ruido estructural
 
 | Símbolo | Magnitud | Unidad | Definida en | Guía |
 | --- | --- | --- | --- | --- |
-| $Y$ | Movilidad: la relación compleja entre una respuesta en velocidad y la fuerza que la produce. | m/(N·s) | ISO 7626-1:2011, 3.1.2 y Tabla 1 | [Movilidad mecánica](/phonometry/es/guides/mechanical-mobility/) |
-| $Z$ | Impedancia mecánica: la recíproca de la movilidad, fuerza por unidad de velocidad. | N·s/m | ISO 7626-1:2011, Tabla 1 | [Movilidad mecánica](/phonometry/es/guides/mechanical-mobility/) |
-| $H$ | Receptancia, o flexibilidad dinámica: respuesta en desplazamiento por unidad de fuerza, el pivote por el que convierte toda la familia. | m/N | ISO 7626-1:2011, Tabla 1 | [Movilidad mecánica](/phonometry/es/guides/mechanical-mobility/) |
-| $A$ | Acelerancia, o inertancia: respuesta en aceleración por unidad de fuerza. Su recíproca es la masa aparente. | 1/kg | ISO 7626-1:2011, Tabla 1 | [Movilidad mecánica](/phonometry/es/guides/mechanical-mobility/) |
-| $k_{21}$ | Rigidez dinámica de transferencia de un elemento resiliente: la fuerza bloqueada del lado de salida dividida por el desplazamiento del lado de entrada. | N/m | ISO 10846-1:2008, 3.7 | [Rigidez de transferencia](/phonometry/es/guides/transfer-stiffness/) |
-| $L_k$ | Nivel de la rigidez dinámica de transferencia, referido a 1 N/m. | dB re 1 N/m | ISO 10846-2:2008 e ISO 10846-3:2002, 3.17 | [Rigidez de transferencia](/phonometry/es/guides/transfer-stiffness/) |
-| $\eta$ | Factor de pérdidas de un elemento resiliente: la tangente del ángulo de fase de su rigidez dinámica de transferencia. | adimensional | ISO 10846-1:2008, 3.8 | [Rigidez de transferencia](/phonometry/es/guides/transfer-stiffness/) |
-| $a_w$ | Aceleración ponderada en frecuencia: la raíz de la suma de cuadrados de las aceleraciones por banda tras aplicar las ponderaciones de respuesta humana. | m/s² | ISO 2631-1:1997, Ecuación (9) | [Vibración en humanos](/phonometry/es/guides/human-vibration/) |
-| $A(8)$ | Exposición diaria a vibración: la magnitud de exposición normalizada a una jornada de referencia de 8 h, combinada sobre las operaciones del día. | m/s² | ISO 5349-1:2001, Ecuaciones (2) y (3) | [Vibración en humanos](/phonometry/es/guides/human-vibration/) |
-| VDV | Valor de dosis de vibración: la integral temporal de la cuarta potencia de la aceleración ponderada, que pesa los choques mucho más que un valor eficaz. | m/s^1,75 | ISO 2631-1:1997, Ecuación (5) | [Vibración en humanos](/phonometry/es/guides/human-vibration/) |
-| MTVV | Valor máximo de vibración transitoria: el mayor valor eficaz corrido de 1 s de la aceleración ponderada. | m/s² | ISO 2631-1:1997, Ecuación (4) | [Vibración en humanos](/phonometry/es/guides/human-vibration/) |
-| $R$ | Variable de tensión acumulada del modelo de choques múltiples: las tensiones de compresión diarias acumuladas a lo largo de los años de exposición, de la que se lee la probabilidad de lesión lumbar. | adimensional | ISO 2631-5:2018, Anexo C (Fórmulas C.1 y C.3 a C.5) | [Vibración con choques múltiples](/phonometry/es/guides/multiple-shock-vibration/) |
-| $L_v$ | Nivel de velocidad: veinte veces el logaritmo decimal de la velocidad de la superficie dividida por la velocidad de referencia. | dB | ISO/TS 7849-1:2009, Fórmula 3 | [Potencia acústica desde vibración](/phonometry/es/guides/vibration-sound-power/) |
-| $\varepsilon$ | Factor de radiación, o eficiencia de radiación, de la superficie vibrante de una máquina: la potencia aérea radiada por unidad de velocidad cuadrática media y de área. | adimensional | ISO/TS 7849-1:2009 e ISO/TS 7849-2:2009 | [Potencia acústica desde vibración](/phonometry/es/guides/vibration-sound-power/) |
-| $L_{Ws}$ | Nivel de potencia acústica estructural que un equipo inyecta en una placa de recepción. | dB re 1 pW | EN 15657:2018, Fórmula 14 | [Potencia estructural](/phonometry/es/guides/structure-borne-power/) |
-| $\eta_{ij}$ | Factor de pérdidas por acoplamiento: la fracción de energía por radián que un subsistema de análisis estadístico de energía cede al vecino a través de una unión. | adimensional | Hopkins (2007), Ecuación 2.154; sin norma aplicable | [Transmisión en uniones](/phonometry/es/guides/junction-transmission/) |
+| $Y$ | Movilidad: la relación compleja entre una respuesta en velocidad y la fuerza que la produce. | m/(N·s) | ISO 7626-1:2011, 3.1.2 y Tabla 1 | [Movilidad mecánica](/phonometry/es/vibration/structural/mechanical-mobility/) |
+| $Z$ | Impedancia mecánica: la recíproca de la movilidad, fuerza por unidad de velocidad. | N·s/m | ISO 7626-1:2011, Tabla 1 | [Movilidad mecánica](/phonometry/es/vibration/structural/mechanical-mobility/) |
+| $H$ | Receptancia, o flexibilidad dinámica: respuesta en desplazamiento por unidad de fuerza, el pivote por el que convierte toda la familia. | m/N | ISO 7626-1:2011, Tabla 1 | [Movilidad mecánica](/phonometry/es/vibration/structural/mechanical-mobility/) |
+| $A$ | Acelerancia, o inertancia: respuesta en aceleración por unidad de fuerza. Su recíproca es la masa aparente. | 1/kg | ISO 7626-1:2011, Tabla 1 | [Movilidad mecánica](/phonometry/es/vibration/structural/mechanical-mobility/) |
+| $k_{21}$ | Rigidez dinámica de transferencia de un elemento resiliente: la fuerza bloqueada del lado de salida dividida por el desplazamiento del lado de entrada. | N/m | ISO 10846-1:2008, 3.7 | [Rigidez de transferencia](/phonometry/es/vibration/structural/transfer-stiffness/) |
+| $L_k$ | Nivel de la rigidez dinámica de transferencia, referido a 1 N/m. | dB re 1 N/m | ISO 10846-2:2008 e ISO 10846-3:2002, 3.17 | [Rigidez de transferencia](/phonometry/es/vibration/structural/transfer-stiffness/) |
+| $\eta$ | Factor de pérdidas de un elemento resiliente: la tangente del ángulo de fase de su rigidez dinámica de transferencia. | adimensional | ISO 10846-1:2008, 3.8 | [Rigidez de transferencia](/phonometry/es/vibration/structural/transfer-stiffness/) |
+| $a_w$ | Aceleración ponderada en frecuencia: la raíz de la suma de cuadrados de las aceleraciones por banda tras aplicar las ponderaciones de respuesta humana. | m/s² | ISO 2631-1:1997, Ecuación (9) | [Vibración en humanos](/phonometry/es/vibration/human/human-vibration/) |
+| $A(8)$ | Exposición diaria a vibración: la magnitud de exposición normalizada a una jornada de referencia de 8 h, combinada sobre las operaciones del día. | m/s² | ISO 5349-1:2001, Ecuaciones (2) y (3) | [Vibración en humanos](/phonometry/es/vibration/human/human-vibration/) |
+| VDV | Valor de dosis de vibración: la integral temporal de la cuarta potencia de la aceleración ponderada, que pesa los choques mucho más que un valor eficaz. | m/s^1,75 | ISO 2631-1:1997, Ecuación (5) | [Vibración en humanos](/phonometry/es/vibration/human/human-vibration/) |
+| MTVV | Valor máximo de vibración transitoria: el mayor valor eficaz corrido de 1 s de la aceleración ponderada. | m/s² | ISO 2631-1:1997, Ecuación (4) | [Vibración en humanos](/phonometry/es/vibration/human/human-vibration/) |
+| $R$ | Variable de tensión acumulada del modelo de choques múltiples: las tensiones de compresión diarias acumuladas a lo largo de los años de exposición, de la que se lee la probabilidad de lesión lumbar. | adimensional | ISO 2631-5:2018, Anexo C (Fórmulas C.1 y C.3 a C.5) | [Vibración con choques múltiples](/phonometry/es/vibration/human/multiple-shock-vibration/) |
+| $L_v$ | Nivel de velocidad: veinte veces el logaritmo decimal de la velocidad de la superficie dividida por la velocidad de referencia. | dB | ISO/TS 7849-1:2009, Fórmula 3 | [Potencia acústica desde vibración](/phonometry/es/devices/emission/vibration-sound-power/) |
+| $\varepsilon$ | Factor de radiación, o eficiencia de radiación, de la superficie vibrante de una máquina: la potencia aérea radiada por unidad de velocidad cuadrática media y de área. | adimensional | ISO/TS 7849-1:2009 e ISO/TS 7849-2:2009 | [Potencia acústica desde vibración](/phonometry/es/devices/emission/vibration-sound-power/) |
+| $L_{Ws}$ | Nivel de potencia acústica estructural que un equipo inyecta en una placa de recepción. | dB re 1 pW | EN 15657:2018, Fórmula 14 | [Potencia estructural](/phonometry/es/buildings/design/structure-borne-power/) |
+| $\eta_{ij}$ | Factor de pérdidas por acoplamiento: la fracción de energía por radián que un subsistema de análisis estadístico de energía cede al vecino a través de una unión. | adimensional | Hopkins (2007), Ecuación 2.154; sin norma aplicable | [Transmisión en uniones](/phonometry/es/vibration/structural/junction-transmission/) |
 
 ## Psicoacústica
 
 | Símbolo | Magnitud | Unidad | Definida en | Guía |
 | --- | --- | --- | --- | --- |
-| $N$ | Sonoridad: la magnitud percibida de un sonido, anclada de modo que un tono de 1 kHz a 40 dB SPL vale exactamente 1 sonio. | sonio | ISO 532-1:2017, apartado 5 (estacionaria) y apartado 6 (variable en el tiempo) | [Sonoridad](/phonometry/es/guides/loudness/) |
-| $N'$ | Sonoridad específica: la densidad de sonoridad a lo largo de la escala de bandas críticas, cuya integral es $N$. | sonio/Bark | ISO 532-1:2017 (forma en sonio/Cam en ISO 532-2:2017, Fórmula 7) | [Sonoridad](/phonometry/es/guides/loudness/) |
-| $L_N$ | Nivel de sonoridad: el nivel del tono de 1 kHz en campo libre que se juzga igual de fuerte que el sonido. | fonio | ISO 226:2023, Fórmula (2) (curvas en la Fórmula (1)) | [Sonoridad](/phonometry/es/guides/loudness/) |
-| $S$ | Agudeza (sharpness): la posición del centro de gravedad de la sonoridad específica en la escala de bandas críticas, normalizada para que el ruido de banda estrecha de referencia valga exactamente 1,00 acum. | acum | DIN 45692:2009, apartado 6 | [Calidad sonora](/phonometry/es/guides/sound-quality/) |
-| $R$ | Aspereza: la sensación áspera de una modulación de amplitud rápida, en torno a 70 Hz, normalizada para que el tono modulado de referencia valga 1 asper. | asper | ECMA-418-2:2025, apartado 7 (Fórmula 104) | [Calidad sonora](/phonometry/es/guides/sound-quality/) |
-| $F$ | Intensidad de fluctuación: la modulación de amplitud lenta percibida, en torno a 4 Hz, normalizada para que el tono modulado de referencia valga 1 vacil. | vacil | ECMA-418-2:2025, apartado 9 (Fórmula 163) | [Calidad sonora](/phonometry/es/guides/sound-quality/) |
-| $T$ | Tonalidad: el contenido tonal percibido de un sonido, obtenido de la autocorrelación de las envolventes por banda. | tu | ECMA-418-2:2025, apartado 6 | [Calidad sonora](/phonometry/es/guides/sound-quality/) |
-| TNR | Relación tono-ruido: el nivel de un tono discreto sobre el ruido enmascarante de la banda crítica que lo rodea. | dB | ECMA-418-1:2024, apartado 11 (Fórmulas 9 a 11) | [Tonos prominentes](/phonometry/es/guides/tone-prominence/) |
-| PR | Relación de prominencia: el nivel de la banda crítica que contiene el tono sobre la media de las dos bandas contiguas. | dB | ECMA-418-1:2024, apartado 12 (Fórmula 23) | [Tonos prominentes](/phonometry/es/guides/tone-prominence/) |
-| $\Delta L$ | Audibilidad de un tono en ruido: el nivel del tono menos el nivel de enmascaramiento de la banda crítica menos el índice de enmascaramiento. | dB | ISO/PAS 20065:2016, Fórmula 14 | [Audibilidad de tonos](/phonometry/es/guides/tone-audibility/) |
-| PA | Molestia psicoacústica: la sonoridad percentil escalada por la agudeza y por un término que combina fluctuación y aspereza. | adimensional | Fastl y Zwicker (2007), Ecuación 16.2; sin norma aplicable | [Molestia psicoacústica](/phonometry/es/guides/psychoacoustic-annoyance/) |
+| $N$ | Sonoridad: la magnitud percibida de un sonido, anclada de modo que un tono de 1 kHz a 40 dB SPL vale exactamente 1 sonio. | sonio | ISO 532-1:2017, apartado 5 (estacionaria) y apartado 6 (variable en el tiempo) | [Sonoridad](/phonometry/es/perception/psychoacoustics/loudness/) |
+| $N'$ | Sonoridad específica: la densidad de sonoridad a lo largo de la escala de bandas críticas, cuya integral es $N$. | sonio/Bark | ISO 532-1:2017 (forma en sonio/Cam en ISO 532-2:2017, Fórmula 7) | [Sonoridad](/phonometry/es/perception/psychoacoustics/loudness/) |
+| $L_N$ | Nivel de sonoridad: el nivel del tono de 1 kHz en campo libre que se juzga igual de fuerte que el sonido. | fonio | ISO 226:2023, Fórmula (2) (curvas en la Fórmula (1)) | [Sonoridad](/phonometry/es/perception/psychoacoustics/loudness/) |
+| $S$ | Agudeza (sharpness): la posición del centro de gravedad de la sonoridad específica en la escala de bandas críticas, normalizada para que el ruido de banda estrecha de referencia valga exactamente 1,00 acum. | acum | DIN 45692:2009, apartado 6 | [Calidad sonora](/phonometry/es/perception/psychoacoustics/sound-quality/) |
+| $R$ | Aspereza: la sensación áspera de una modulación de amplitud rápida, en torno a 70 Hz, normalizada para que el tono modulado de referencia valga 1 asper. | asper | ECMA-418-2:2025, apartado 7 (Fórmula 104) | [Calidad sonora](/phonometry/es/perception/psychoacoustics/sound-quality/) |
+| $F$ | Intensidad de fluctuación: la modulación de amplitud lenta percibida, en torno a 4 Hz, normalizada para que el tono modulado de referencia valga 1 vacil. | vacil | ECMA-418-2:2025, apartado 9 (Fórmula 163) | [Calidad sonora](/phonometry/es/perception/psychoacoustics/sound-quality/) |
+| $T$ | Tonalidad: el contenido tonal percibido de un sonido, obtenido de la autocorrelación de las envolventes por banda. | tu | ECMA-418-2:2025, apartado 6 | [Calidad sonora](/phonometry/es/perception/psychoacoustics/sound-quality/) |
+| TNR | Relación tono-ruido: el nivel de un tono discreto sobre el ruido enmascarante de la banda crítica que lo rodea. | dB | ECMA-418-1:2024, apartado 11 (Fórmulas 9 a 11) | [Tonos prominentes](/phonometry/es/perception/psychoacoustics/tone-prominence/) |
+| PR | Relación de prominencia: el nivel de la banda crítica que contiene el tono sobre la media de las dos bandas contiguas. | dB | ECMA-418-1:2024, apartado 12 (Fórmula 23) | [Tonos prominentes](/phonometry/es/perception/psychoacoustics/tone-prominence/) |
+| $\Delta L$ | Audibilidad de un tono en ruido: el nivel del tono menos el nivel de enmascaramiento de la banda crítica menos el índice de enmascaramiento. | dB | ISO/PAS 20065:2016, Fórmula 14 | [Audibilidad de tonos](/phonometry/es/perception/psychoacoustics/tone-audibility/) |
+| PA | Molestia psicoacústica: la sonoridad percentil escalada por la agudeza y por un término que combina fluctuación y aspereza. | adimensional | Fastl y Zwicker (2007), Ecuación 16.2; sin norma aplicable | [Molestia psicoacústica](/phonometry/es/perception/psychoacoustics/psychoacoustic-annoyance/) |
 
 ## Electroacústica y sonoridad de programa
 
 | Símbolo | Magnitud | Unidad | Definida en | Guía |
 | --- | --- | --- | --- | --- |
-| THD | Distorsión armónica total: el contenido armónico de la salida respecto al fundamental ($\mathrm{THD}_F$) o respecto a la señal total ($\mathrm{THD}_R$). | % o dB | IEC 60268-3:2013, 14.12.2 a 14.12.11 (la forma R en 14.12.3.2) | [Electroacústica](/phonometry/es/guides/electroacoustics/) |
-| THD+N | Distorsión armónica total más ruido: todo lo que queda tras eliminar el fundamental con el filtro de muesca, dentro del ancho de banda de medida normalizado. | % o dB | AES17-2015, apartado 6.3.1 (muesca y ancho de banda en 5.2.5 y 5.2.8) | [Electroacústica](/phonometry/es/guides/electroacoustics/) |
-| SINAD | Relación entre señal y ruido más distorsión, la expresión recíproca de la THD+N. | dB | AES17-2015, apartado 6.3.1 | [Electroacústica](/phonometry/es/guides/electroacoustics/) |
-| IMD | Distorsión de intermodulación por modulación: las bandas laterales que un tono de baja frecuencia genera alrededor de uno de alta. | % | IEC 60268-3:2013, 14.12.7 | [Electroacústica](/phonometry/es/guides/electroacoustics/) |
-| DIM | Distorsión de intermodulación dinámica, medida con un seno de 15 kHz frente a una onda cuadrada de 3,15 kHz filtrada. | % | IEC 60268-3:2013, 14.12.9 | [Electroacústica](/phonometry/es/guides/electroacoustics/) |
-| $L_K$, LUFS | Sonoridad de programa: la suma ponderada por canales de las potencias cuadráticas medias con ponderación K, con puerta en bloques de 400 ms. LUFS y LKFS nombran la misma unidad. | LUFS | ITU-R BS.1770-5, Fórmula 2 (puerta en las Fórmulas 3 a 7) | [Sonoridad de programa](/phonometry/es/guides/program-loudness/) |
-| LRA | Rango de sonoridad: la separación entre los percentiles 10 y 95 de la distribución de sonoridad de corto plazo tras la puerta. | LU | EBU Tech 3342 | [Sonoridad de programa](/phonometry/es/guides/program-loudness/) |
-| dBTP | Nivel de pico verdadero: el pico de la señal reconstruida por sobremuestreo, que capta los picos entre muestras que un máximo en el dominio de la muestra se pierde. | dBTP | ITU-R BS.1770-5, Anexo 2 | [Sonoridad de programa](/phonometry/es/guides/program-loudness/) |
+| THD | Distorsión armónica total: el contenido armónico de la salida respecto al fundamental ($\mathrm{THD}_F$) o respecto a la señal total ($\mathrm{THD}_R$). | % o dB | IEC 60268-3:2013, 14.12.2 a 14.12.11 (la forma R en 14.12.3.2) | [Electroacústica](/phonometry/es/devices/electroacoustics/electroacoustics/) |
+| THD+N | Distorsión armónica total más ruido: todo lo que queda tras eliminar el fundamental con el filtro de muesca, dentro del ancho de banda de medida normalizado. | % o dB | AES17-2015, apartado 6.3.1 (muesca y ancho de banda en 5.2.5 y 5.2.8) | [Electroacústica](/phonometry/es/devices/electroacoustics/electroacoustics/) |
+| SINAD | Relación entre señal y ruido más distorsión, la expresión recíproca de la THD+N. | dB | AES17-2015, apartado 6.3.1 | [Electroacústica](/phonometry/es/devices/electroacoustics/electroacoustics/) |
+| IMD | Distorsión de intermodulación por modulación: las bandas laterales que un tono de baja frecuencia genera alrededor de uno de alta. | % | IEC 60268-3:2013, 14.12.7 | [Electroacústica](/phonometry/es/devices/electroacoustics/electroacoustics/) |
+| DIM | Distorsión de intermodulación dinámica, medida con un seno de 15 kHz frente a una onda cuadrada de 3,15 kHz filtrada. | % | IEC 60268-3:2013, 14.12.9 | [Electroacústica](/phonometry/es/devices/electroacoustics/electroacoustics/) |
+| $L_K$, LUFS | Sonoridad de programa: la suma ponderada por canales de las potencias cuadráticas medias con ponderación K, con puerta en bloques de 400 ms. LUFS y LKFS nombran la misma unidad. | LUFS | ITU-R BS.1770-5, Fórmula 2 (puerta en las Fórmulas 3 a 7) | [Sonoridad de programa](/phonometry/es/devices/broadcast/program-loudness/) |
+| LRA | Rango de sonoridad: la separación entre los percentiles 10 y 95 de la distribución de sonoridad de corto plazo tras la puerta. | LU | EBU Tech 3342 | [Sonoridad de programa](/phonometry/es/devices/broadcast/program-loudness/) |
+| dBTP | Nivel de pico verdadero: el pico de la señal reconstruida por sobremuestreo, que capta los picos entre muestras que un máximo en el dominio de la muestra se pierde. | dBTP | ITU-R BS.1770-5, Anexo 2 | [Sonoridad de programa](/phonometry/es/devices/broadcast/program-loudness/) |
 
 ## Aeronaves y acústica submarina
 
 | Símbolo | Magnitud | Unidad | Definida en | Guía |
 | --- | --- | --- | --- | --- |
-| PNL | Nivel de ruido percibido: los niveles de las 24 bandas de tercio de octava convertidos a ruidosidad en noys y recombinados. | PNdB | Anexo 16 OACI, Vol. I, Apéndice 2 (ley de ruidosidad en la Tabla A2-3) | [Ruido de aeronaves](/phonometry/es/guides/aircraft-noise/) |
-| PNLT | Nivel de ruido percibido corregido por tonos: el PNL más la penalización por irregularidades espectrales como los tonos de ventilador y turbina. | PNdB | Anexo 16 OACI, Vol. I, Apéndice 2 | [Ruido de aeronaves](/phonometry/es/guides/aircraft-noise/) |
-| EPNL | Nivel efectivo de ruido percibido: el PNLT máximo más la corrección por duración en la ventana de 10 dB, la métrica de certificación acústica. | EPNdB | Anexo 16 OACI, Vol. I, Apéndice 2 | [Ruido de aeronaves](/phonometry/es/guides/aircraft-noise/) |
-| Lp (submarino) | Nivel de presión acústica submarina, referido a 1 µPa y no a 20 µPa. Un nivel aéreo nunca se convierte a él con una simple resta. | dB re 1 µPa | ISO 18405:2017 (nivel cuadrático medio en ISO 18406:2017, Fórmula 7) | [Acústica submarina](/phonometry/es/guides/underwater-acoustics/) |
-| SEL (submarino) | Nivel de exposición sonora submarina: la integral temporal de la presión al cuadrado referida a 1 µPa²·s. | dB re 1 µPa²·s | ISO 18405:2017 | [Acústica submarina](/phonometry/es/guides/underwater-acoustics/) |
-| $L_{RN}$ | Nivel de ruido radiado por un buque: el nivel del producto de la presión eficaz en campo lejano por la distancia a la fuente. | dB re 1 µPa·m | ISO 17208-1:2016 | [Acústica submarina](/phonometry/es/guides/underwater-acoustics/) |
-| $L_s$ | Nivel de fuente monopolar equivalente: el nivel de ruido radiado tras la corrección de superficie de Lloyd, de modo que un solo número describa la fuente en sí. | dB re 1 µPa·m | ISO 17208-2:2019, Fórmula 3 | [Acústica submarina](/phonometry/es/guides/underwater-acoustics/) |
+| PNL | Nivel de ruido percibido: los niveles de las 24 bandas de tercio de octava convertidos a ruidosidad en noys y recombinados. | PNdB | Anexo 16 OACI, Vol. I, Apéndice 2 (ley de ruidosidad en la Tabla A2-3) | [Ruido de aeronaves](/phonometry/es/aircraft/aircraft-noise/) |
+| PNLT | Nivel de ruido percibido corregido por tonos: el PNL más la penalización por irregularidades espectrales como los tonos de ventilador y turbina. | PNdB | Anexo 16 OACI, Vol. I, Apéndice 2 | [Ruido de aeronaves](/phonometry/es/aircraft/aircraft-noise/) |
+| EPNL | Nivel efectivo de ruido percibido: el PNLT máximo más la corrección por duración en la ventana de 10 dB, la métrica de certificación acústica. | EPNdB | Anexo 16 OACI, Vol. I, Apéndice 2 | [Ruido de aeronaves](/phonometry/es/aircraft/aircraft-noise/) |
+| Lp (submarino) | Nivel de presión acústica submarina, referido a 1 µPa y no a 20 µPa. Un nivel aéreo nunca se convierte a él con una simple resta. | dB re 1 µPa | ISO 18405:2017 (nivel cuadrático medio en ISO 18406:2017, Fórmula 7) | [Acústica submarina](/phonometry/es/underwater/underwater-acoustics/) |
+| SEL (submarino) | Nivel de exposición sonora submarina: la integral temporal de la presión al cuadrado referida a 1 µPa²·s. | dB re 1 µPa²·s | ISO 18405:2017 | [Acústica submarina](/phonometry/es/underwater/underwater-acoustics/) |
+| $L_{RN}$ | Nivel de ruido radiado por un buque: el nivel del producto de la presión eficaz en campo lejano por la distancia a la fuente. | dB re 1 µPa·m | ISO 17208-1:2016 | [Acústica submarina](/phonometry/es/underwater/underwater-acoustics/) |
+| $L_s$ | Nivel de fuente monopolar equivalente: el nivel de ruido radiado tras la corrección de superficie de Lloyd, de modo que un solo número describa la fuente en sí. | dB re 1 µPa·m | ISO 17208-2:2019, Fórmula 3 | [Acústica submarina](/phonometry/es/underwater/underwater-acoustics/) |
 
 ## Incertidumbre de medida
 
 | Símbolo | Magnitud | Unidad | Definida en | Guía |
 | --- | --- | --- | --- | --- |
-| $u(y)$ | Incertidumbre típica combinada de un resultado, propagada desde las incertidumbres típicas de sus entradas por la ley de propagación de la incertidumbre. | unidad del resultado | ISO/IEC Guide 98-3:2008 (JCGM 100:2008), apartado 5 | [Incertidumbre GUM](/phonometry/es/guides/gum-uncertainty/) |
-| $U$ | Incertidumbre expandida: la incertidumbre típica combinada multiplicada por un factor de cobertura, que define un intervalo de cobertura. | unidad del resultado | ISO/IEC Guide 98-3:2008 (JCGM 100:2008), apartado 6 y Anexo G | [Incertidumbre GUM](/phonometry/es/guides/gum-uncertainty/) |
-| $\sigma_R$ | Incertidumbre típica de una situación de medida en acústica de la edificación, tabulada por magnitud y por situación. | dB | ISO 12999-1:2020, apartado 5.2 (factores de cobertura en la Tabla 8) | [Aislamiento en campo](/phonometry/es/guides/insulation-field/) |
+| $u(y)$ | Incertidumbre típica combinada de un resultado, propagada desde las incertidumbres típicas de sus entradas por la ley de propagación de la incertidumbre. | unidad del resultado | ISO/IEC Guide 98-3:2008 (JCGM 100:2008), apartado 5 | [Incertidumbre GUM](/phonometry/es/signal/metrology/gum-uncertainty/) |
+| $U$ | Incertidumbre expandida: la incertidumbre típica combinada multiplicada por un factor de cobertura, que define un intervalo de cobertura. | unidad del resultado | ISO/IEC Guide 98-3:2008 (JCGM 100:2008), apartado 6 y Anexo G | [Incertidumbre GUM](/phonometry/es/signal/metrology/gum-uncertainty/) |
+| $\sigma_R$ | Incertidumbre típica de una situación de medida en acústica de la edificación, tabulada por magnitud y por situación. | dB | ISO 12999-1:2020, apartado 5.2 (factores de cobertura en la Tabla 8) | [Aislamiento en campo](/phonometry/es/buildings/insulation/insulation-field/) |

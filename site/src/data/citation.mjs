@@ -279,7 +279,7 @@ const apaNames = cff.authors.map((author) => {
   return `${author['family-names']}, ${initials}`;
 });
 
-for (const page of ['about.md', 'es/about.md']) {
+for (const page of ['start/about.md', 'es/start/about.md']) {
   const path = `site/src/content/docs/${page}`;
   const source = readFileSync(root(path), 'utf8');
   const fail = (problem) => {

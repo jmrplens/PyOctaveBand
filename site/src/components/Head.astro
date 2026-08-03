@@ -56,7 +56,7 @@ const data = route?.entry?.data ?? {};
 const title = data.title ?? 'phonometry';
 const description = data.description ?? '';
 
-const pathname = Astro.url.pathname; // e.g. /phonometry/guides/levels/
+const pathname = Astro.url.pathname; // e.g. /phonometry/signal/levels/levels/
 const canonical = new URL(pathname, SITE).href;
 const rel = pathname.startsWith(BASE) ? pathname.slice(BASE.length) : pathname;
 const lang = rel.startsWith('/es/') || rel === '/es' ? 'es' : 'en';
@@ -92,7 +92,19 @@ const slug = rel.replace(/^\/(es\/)?/, '').replace(/\/$/, '');
 const isApiPage = slug.startsWith('reference/api/');
 // Guides teach a method as well as document it; the dual type is free and adds
 // the learning-resource properties.
-const isGuide = slug.startsWith('guides/');
+const GUIDE_TOPICS = [
+  'signal',
+  'perception',
+  'buildings',
+  'materials',
+  'vibration',
+  'environment',
+  'aircraft',
+  'underwater',
+  'devices',
+  'simulation',
+];
+const isGuide = GUIDE_TOPICS.some((topic) => slug === topic || slug.startsWith(`${topic}/`));
 const isBibliography = slug === 'reference/bibliography';
 
 const bibliographyUrl = `${SITE}${BASE}${lang === 'es' ? '/es' : ''}/reference/bibliography/`;
@@ -108,7 +120,8 @@ const published = firstPublished(route?.entry?.filePath ?? '') ?? modified;
 // The hub pages exist to enumerate their children, and schema.org has a type
 // for exactly that. Dual-typed so nothing consuming the TechArticle reading
 // loses properties it already relied on.
-const isHub = slug === 'guides' || slug === 'reference' || slug === 'reference/api';
+const isHub =
+  slug === 'start/guides' || slug === 'reference' || slug === 'reference/api';
 
 const articleType = isApiPage
   ? 'APIReference'
@@ -121,7 +134,8 @@ const articleType = isApiPage
 // The guides hub already publishes its areas as a hand-authored ItemList in
 // the page frontmatter; CollectionPage.mainEntity is the hook that ties the
 // page node to that list instead of leaving two disconnected nodes.
-const hubMainEntity = slug === 'guides' ? { '@id': `${canonical}#areas` } : undefined;
+const hubMainEntity =
+  slug === 'start/guides' ? { '@id': `${canonical}#areas` } : undefined;
 
 // Word count of the page source, with the machinery that is not prose (MDX
 // imports, component tags, fenced code) stripped first. An approximation, but
@@ -137,7 +151,17 @@ const wordCount = proseBody.split(/\s+/).filter(Boolean).length;
 const sectionNames: Record<string, [string, string]> = {
   'reference/api': ['API reference', 'Referencia de la API'],
   reference: ['Reference', 'Referencia'],
-  guides: ['Guides', 'Guías'],
+  start: ['Start', 'Inicio'],
+  signal: ['Signal analysis', 'Análisis de señal'],
+  perception: ['Hearing and perception', 'Audición y percepción'],
+  buildings: ['Rooms and buildings', 'Salas y edificación'],
+  materials: ['Materials and surfaces', 'Materiales y superficies'],
+  vibration: ['Vibration', 'Vibración'],
+  environment: ['Environment and transport', 'Medio ambiente y transporte'],
+  aircraft: ['Aircraft noise', 'Ruido de aeronaves'],
+  underwater: ['Underwater acoustics', 'Acústica submarina'],
+  devices: ['Sources and devices', 'Fuentes y dispositivos'],
+  simulation: ['Wave simulation', 'Simulación de ondas'],
 };
 const sectionKey = Object.keys(sectionNames).find(
   (k) => slug === k || slug.startsWith(`${k}/`),

@@ -1,7 +1,7 @@
 /**
  * Which documentation area a page belongs to, derived from the sidebar.
  *
- * The nine areas are already declared once, as the sidebar's top-level groups,
+ * The areas are already declared once, as the sidebar's top-level groups,
  * and every page is placed in exactly one of them there. Reading that tree back
  * means the Open Graph cards inherit the same taxonomy the navigation uses, with
  * nothing to keep in step by hand: moving a guide into another group moves its
@@ -12,8 +12,8 @@ import { sidebar } from '../data/sidebar.mjs';
 /**
  * Sidebar group label to area slug.
  *
- * The slugs are the canonical ones from `AREAS` in scripts/generate_llms.py,
- * which already name the per-area `llms-*.txt` files, so the artwork lands on
+ * The slugs are the historical area names of the artwork, kept because the
+ * drawings are named after them, so the artwork lands on
  * the same identifiers rather than on a second set slugified from the labels.
  * A group missing here is simply not an area: Start, Reference and the API
  * tree carry the generic card.
@@ -104,7 +104,7 @@ export function artKeyFor(id) {
 }
 
 /**
- * The area's display label for a page, or undefined outside the nine areas.
+ * The area's display label for a page, or undefined outside the areas.
  * @param {string} id - The page's collection id.
  * @param {'en'|'es'} locale - Which language to label it in.
  */

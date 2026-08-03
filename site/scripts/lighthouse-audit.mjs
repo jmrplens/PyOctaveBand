@@ -30,10 +30,10 @@ const BASE = "/phonometry";
 const AUDIT_PATHS = [
   `${BASE}/`,
   `${BASE}/es/`,
-  `${BASE}/getting-started/`,
-  `${BASE}/guides/`,
-  `${BASE}/guides/calibration/`,
-  `${BASE}/guides/insulation-field/`,
+  `${BASE}/start/getting-started/`,
+  `${BASE}/start/guides/`,
+  `${BASE}/signal/metrology/calibration/`,
+  `${BASE}/buildings/insulation/insulation-field/`,
   `${BASE}/reference/api/signals/levels/`,
   `${BASE}/reference/conformance/`,
 ];

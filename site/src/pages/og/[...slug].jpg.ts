@@ -6,8 +6,8 @@
  * `/og/<slug>.jpg` without a lookup table:
  *
  *   /                      -> og/index.jpg
- *   /guides/filter-banks/  -> og/guides/filter-banks.jpg
- *   /es/guides/filter-banks/ -> og/es/guides/filter-banks.jpg
+ *   /signal/filters/filter-banks/    -> og/signal/filters/filter-banks.jpg
+ *   /es/signal/filters/filter-banks/ -> og/es/signal/filters/filter-banks.jpg
  *
  * The API reference is deliberately excluded. Those 120 pages are generated
  * from docstrings, nobody shares one on social media, and a card each would

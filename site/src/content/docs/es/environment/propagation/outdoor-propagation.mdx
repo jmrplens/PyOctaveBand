@@ -1,0 +1,706 @@
+---
+title: "Propagación del sonido en exteriores"
+description: "Absorción atmosférica del sonido (ISO 9613-1) y método general ISO 9613-2 para la propagación del sonido en exteriores desde una fuente puntual: divergencia geométrica, absorción atmosférica, efecto del suelo, apantallamiento por barreras y corrección meteorológica, con un desglose por términos de la atenuación en bandas de octava."
+references:
+  - type: book
+    authors: ["Salomons, E. M."]
+    year: 2001
+    title: "Computational atmospheric acoustics"
+    publisher: "Kluwer Academic Publishers"
+    doi: "10.1007/978-94-010-0660-6"
+    note: "ISBN 978-1-4020-0390-5. La teoría ondulatoria (ecuación parabólica, fast field program, refracción y turbulencia) que cuantifica lo que aproximan la hipótesis de condiciones favorables y el factor K_met."
+  - type: book
+    authors: ["Attenborough, K.", "Van Renterghem, T."]
+    year: 2021
+    title: "Predicting outdoor sound"
+    edition: "2.ª ed."
+    publisher: "CRC Press"
+    doi: "10.1201/9780429470806"
+    note: "Los modelos de impedancia del suelo, el coeficiente de reflexión de onda esférica que explica el mínimo del suelo de la sección 2 y los efectos meteorológicos sobre las barreras."
+  - type: article
+    authors: ["Maekawa, Z."]
+    year: 1968
+    title: "Noise reduction by screens"
+    journal: "Applied Acoustics"
+    volume: 1
+    issue: 3
+    pages: "157-173"
+    doi: "10.1016/0003-682X(68)90020-0"
+    note: "El ábaco de atenuación de pantallas frente al número de Fresnel del que desciende el término de difracción de la Ec. (14)."
+  - type: report
+    authors: ["Kephalopoulos, S.", "Paviotti, M.", "Anfosso-Lédée, F."]
+    year: 2012
+    title: "Common noise assessment methods in Europe (CNOSSOS-EU)"
+    number: "EUR 25379 EN"
+    institution: "Oficina de Publicaciones de la Unión Europea"
+    doi: "10.2788/31776"
+    url: "https://publications.jrc.ec.europa.eu/repository/handle/JRC72550"
+    note: "El marco común de la UE contrastado con la ISO 9613-2 en la sección 3."
+  - type: standard
+    organization: "International Organization for Standardization"
+    year: 1993
+    title: "Acoustics — Attenuation of sound during propagation outdoors — Part 1: Calculation of the absorption of sound by the atmosphere"
+    designation: "ISO 9613-1:1993"
+    url: "https://www.iso.org/standard/17426.html"
+    note: "El coeficiente de atenuación de tono puro implementado en la sección 1: alfa (Ec. (5)) con las frecuencias de relajación del oxígeno y el nitrógeno (Ec. (3)/(4)), la conversión de humedad del anexo B y las frecuencias centrales exactas de la Tabla 1 (Ec. (6), Nota 5)."
+  - type: standard
+    organization: "International Organization for Standardization"
+    year: 1996
+    title: "Acoustics — Attenuation of sound during propagation outdoors — Part 2: General method of calculation"
+    designation: "ISO 9613-2:1996"
+    url: "https://www.iso.org/standard/20649.html"
+    note: "La cadena de atenuación implementada en la sección 2: el nivel en el receptor a favor del viento (Ec. (3)/(4)) compuesto por la divergencia geométrica (Ec. (7)), la absorción atmosférica (Ec. (8)), el efecto del suelo (Ec. (9), Tabla 3) con su alternativa ponderada A (Ec. (10)/(11)), el apantallamiento por barreras (Ecs. (12)-(17)) y la corrección meteorológica (Ec. (21)/(22)). En 2024 se publicó una edición revisada; este módulo implementa el método de 1996."
+  - type: standard
+    organization: "International Organization for Standardization"
+    year: 2003
+    title: "Acoustics — Measurement of sound absorption in a reverberation room"
+    designation: "ISO 354:2003"
+    url: "https://www.iso.org/standard/34545.html"
+    note: "Solo la conversión m = alfa/(10 lg e) del apartado 8.1.2.1 en que se basa air_attenuation_m; el método en cámara reverberante se trata en la guía de Acústica de salas."
+---
+
+import Video from '../../../../../components/Video.astro';
+import ThemeImage from '../../../../../components/ThemeImage.astro';
+import ReportPreview from '../../../../../components/ReportPreview.astro';
+
+Predecir el ruido que una fuente lejana entrega a un receptor en exteriores es
+un ejercicio de contabilidad: se parte de la **potencia acústica** de la fuente y
+se resta, banda a banda, cada mecanismo que atenúa el sonido en su camino: la
+divergencia esférica, el propio aire, el suelo y cualquier barrera intermedia.
+Esta página cubre las dos partes de la ISO 9613 que proporcionan esos términos:
+la **ISO 9613-1**, el coeficiente de absorción atmosférica de tono puro
+$\alpha$, y la **ISO 9613-2**, el método general que combina $\alpha$ con la
+divergencia, el suelo y el apantallamiento en una predicción por bandas de
+octava. El coeficiente atmosférico también cierra el ciclo con la acústica de
+salas, porque la ISO 354 remite por completo su coeficiente de atenuación de
+potencia del aire $m$ a $\alpha$.
+
+## 1. Absorción atmosférica (ISO 9613-1)
+
+El aire no es un medio sin pérdidas. Un tono en propagación cede energía a la
+viscosidad de cizalla y a la conducción de calor (las pérdidas *clásicas y
+rotacionales*, que crecen como $f^2$) y a la **relajación vibracional** de las
+moléculas de oxígeno y nitrógeno, cada una un depósito de energía que resuena
+cerca de una frecuencia de relajación dependiente de la humedad y la
+temperatura. La ISO 9613-1:1993, Ec. (5) reúne todo esto en el coeficiente de
+atenuación de tono puro $\alpha$, en decibelios por metro:
+
+$$
+\alpha = 8{,}686\ f^2 \Big[ 1{,}84\times10^{-11} \big(p_a/p_r\big)^{-1} \big(T/T_0\big)^{1/2}
+       + \big(T/T_0\big)^{-5/2} \big( 0{,}01275\ \tfrac{e^{-2239{,}1/T}}{f_{rO} + f^2/f_{rO}}
+       + 0{,}1068\ \tfrac{e^{-3352{,}0/T}}{f_{rN} + f^2/f_{rN}} \big) \Big],
+$$
+
+con las frecuencias de relajación del oxígeno y el nitrógeno $f_{rO}$, $f_{rN}$
+(Ec. (3)/(4)), las condiciones de referencia $T_0 = 293{,}15$ K y
+$p_r = 101{,}325$ kPa (apartado 4.2), y la concentración molar de vapor de agua $h$
+obtenida de la humedad relativa mediante la conversión psicrométrica del anexo B.
+Dominan la forma dos rasgos: a baja frecuencia $\alpha \propto f^2$, por lo que
+sube con fuerza; y cerca de cada frecuencia de relajación el término
+correspondiente alcanza un máximo y decae. Entre ambos, $\alpha$ crece unas dos
+décadas de 50 Hz a 10 kHz y, al fijar la humedad la $f_{rO}$, barrer la humedad
+desplaza un pico de relajación por la banda, así que el aire más seco no siempre
+es el que menos absorbe.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/air_absorption_alpha_es.svg" alt="Coeficiente de atenuación atmosférica de tono puro alfa de la ISO 9613-1 en dB/km frente a la frecuencia en ejes log-log, para cuatro combinaciones de temperatura y humedad, mostrando el crecimiento f-cuadrado en baja frecuencia y el decaimiento de relajación dependiente de la humedad" width="80%" loading="eager" />
+
+*La curva seca de 20 °C / 10 % absorbe más a frecuencias medias, pero las curvas
+húmedas la superan por debajo de ~200 Hz: la firma de la relajación.*
+
+<details>
+<summary>Mostrar el código de esta figura</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import environment
+
+freqs = np.geomspace(50.0, 10000.0, 400)
+fig, ax = plt.subplots()
+for temp, rh in [(20.0, 50.0), (20.0, 10.0), (0.0, 70.0), (30.0, 80.0)]:
+    ax.loglog(freqs, environment.air_attenuation(freqs, temp, rh) * 1000.0,
+              label=f"{temp:g} °C, {rh:g} % HR")
+ax.set_xlabel("Frecuencia [Hz]")
+ax.set_ylabel("Coeficiente de atenuación alpha [dB/km]")
+ax.legend()
+plt.show()
+```
+
+</details>
+
+```python
+import numpy as np
+from phonometry import environment
+
+bands = [63, 125, 250, 500, 1000, 2000, 4000, 8000]   # centros de banda de octava [Hz]
+
+# Coeficiente de atenuación de tono puro alpha [dB/m] a 20 °C, 50 % HR, una atmósfera
+alpha = environment.air_attenuation(bands, temperature=20.0, relative_humidity=50.0)
+print(np.round(alpha * 1000.0, 2))          # en dB/km, como tabula la Tabla 1
+# [  0.12   0.44   1.31   2.73   4.66   9.89  29.67 105.29]
+
+# Reproduce exactamente una celda de la Tabla 1 de la ISO 9613-1 (10 °C, 70 %, 1 kHz)
+cell = environment.air_attenuation(1000.0, 10.0, 70.0, exact_midband=True) * 1000.0
+print(round(float(cell), 2))                # 3.66  (dB/km, Tabla 1)
+
+# Alimenta condiciones reales al coeficiente de atenuación de potencia m [1/m] de la ISO 354
+m = environment.air_attenuation_m([1000.0, 4000.0], temperature=20.0, relative_humidity=50.0)
+print(np.round(m, 5))                        # [0.00107 0.00683]
+```
+
+`air_attenuation` devuelve dB/m (la Tabla 1 imprime dB/km, es decir $\times 1000$);
+está totalmente vectorizada sobre `frequencies`, con temperatura, humedad y
+presión escalares. Pasar `exact_midband=True` ajusta cada frecuencia solicitada a
+la frecuencia central exacta de tercio de octava $f_m = 1000 \cdot 10^{k/10}$
+(Ec. (6), Nota 5) empleada para calcular la Tabla 1, de modo que la biblioteca
+reproduce cada punto tabulado con menos del 0,4 %, la propia precisión de tres
+cifras significativas del estándar, muy dentro de su exactitud declarada de
+$\pm 10$ % (apartado 7.1). Las entradas fuera de los rangos tabulados
+(−20…+50 °C, 10…100 % HR, 50…10 000 Hz, o por encima de la envolvente de validez
+de 200 kPa) siguen calculándose pero emiten una `AtmosphericAbsorptionWarning`;
+las entradas no físicas (frecuencia no positiva, humedad fuera de 0…100 %,
+temperatura bajo el cero absoluto) lanzan `ValueError`. `air_attenuation_m`
+compone $\alpha$ con la conversión de la ISO 354 $m = \alpha/(10 \log_{10} e)$, de modo
+que quien use la ISO 354 puede alimentar condiciones atmosféricas reales
+directamente a `absorption_area` / `absorption_coefficient` en vez de introducir
+$m$ a mano.
+
+### Parámetros de `air_attenuation()` / `air_attenuation_m()`
+
+| Parámetro | Tipo / forma | Unidades | Rango / def. | Notas |
+| :--- | :--- | :--- | :--- | :--- |
+| `frequencies` | escalar o array 1D | Hz | > 0 | Vectorizado; 50–10 000 Hz tabulado |
+| `temperature` | float | °C | def. `20.0` | −20…+50 tabulado; fuera avisa |
+| `relative_humidity` | float | % | def. `50.0` | 10…100 tabulado; se admite `[0, 100]` |
+| `pressure` | float | kPa | def. `101.325` | ≤ 200 válido (apartado 7); por encima avisa |
+| `exact_midband` | bool | — | def. `False` | Ajusta a $f_m = 1000\cdot10^{k/10}$ (reproduce la Tabla 1) |
+
+`air_attenuation` devuelve $\alpha$ en dB/m; `air_attenuation_m` devuelve
+$m = \alpha/(10 \log_{10} e)$ en 1/m para la ISO 354.
+
+### Un resultado representable: `atmospheric_attenuation()`
+
+Para una figura o un vistazo rápido, `atmospheric_attenuation()` envuelve el
+mismo coeficiente en un pequeño resultado `AtmosphericAttenuation`. Lleva la
+rejilla de frecuencias, el coeficiente $\alpha$ y las condiciones atmosféricas, y
+expone `.plot()` para la clásica curva de $\alpha$ frente a la frecuencia
+(dibujada en dB/km, la unidad de la Tabla 1, con ordenada lineal sobre un eje de
+frecuencia logarítmico). Pasar una `distance` también registra la atenuación
+total $A = \alpha\,d$, en decibelios, sobre ese trayecto como `total_attenuation`,
+el $A_{atm}$ de la ISO 9613-2 (Ec. (8)).
+
+```python
+from phonometry import environment
+
+res = environment.atmospheric_attenuation(
+    [63, 125, 250, 500, 1000, 2000, 4000, 8000],
+    temperature=20.0, relative_humidity=50.0,
+)
+res.plot(language="es")   # alpha en dB/km frente a la frecuencia (requiere matplotlib)
+```
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/atmospheric_attenuation_es.svg" alt="Coeficiente de atenuación atmosférica de tono puro alfa de la ISO 9613-1 en dB/km frente a la frecuencia, con ordenada lineal en decibelios sobre un eje de frecuencia logarítmico, para la atmósfera de referencia de 20 grados Celsius y 50 por ciento de humedad relativa, producido por el método plot del resultado AtmosphericAttenuation" width="80%" loading="lazy" />
+
+*En una ordenada lineal de decibelios el coeficiente permanece cerca de cero
+hasta alrededor de 1 kHz y luego sube con fuerza, superando 20 dB/km cerca de
+3 kHz y alcanzando más de 150 dB/km a 10 kHz en la atmósfera de referencia de
+20 °C / 50 % HR.*
+
+<details>
+<summary>Mostrar el código de esta figura</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import environment
+
+# Una línea: la curva del coeficiente directamente desde el resultado.
+res = environment.atmospheric_attenuation(
+    np.geomspace(50.0, 10000.0, 400), temperature=20.0, relative_humidity=50.0,
+)
+res.plot(language="es")
+plt.show()
+
+# O a mano desde air_attenuation (dB/m, escala por 1000 para dB/km):
+freqs = np.geomspace(50.0, 10000.0, 400)
+fig, ax = plt.subplots()
+ax.semilogx(freqs, environment.air_attenuation(freqs, 20.0, 50.0) * 1000.0)
+ax.set_xlabel("Frecuencia [Hz]")
+ax.set_ylabel("Coeficiente de atenuación alpha [dB/km]")
+plt.show()
+```
+
+</details>
+
+## 2. Método general de cálculo (ISO 9613-2)
+
+La ISO 9613-2:1996 predice el nivel por bandas de octava en un receptor situado
+**a favor del viento** respecto de una fuente puntual (o bajo la inversión
+térmica moderada equivalente, apartado 5). El nivel continuo equivalente a favor
+del viento es
+
+$$
+L_{fT}(DW) = L_W + D_c - A, \qquad A = A_{div} + A_{atm} + A_{gr} + A_{bar} + A_{misc},
+$$
+
+(Ec. (3)/(4)) donde $L_W$ es el nivel de potencia acústica por bandas de octava,
+$D_c$ la corrección de directividad (índice de directividad más un índice de
+ángulo sólido $D_\Omega$) y $A$ la atenuación total. La biblioteca implementa los
+cuatro términos generales del apartado 7; el $A_{misc}$ informativo (vegetación,
+zonas industriales, edificación; anexo A) y las reflexiones en obstáculos
+verticales (apartado 7.5) **no están implementados**: el estándar los trata como
+informativos y se dejan a criterio del usuario.
+
+La geometría del término de apantallamiento fija el vocabulario: el borde de
+difracción divide la distancia fuente-receptor en $d_{ss}$ y $d_{sr}$, y el
+exceso de recorrido sobre el borde es $z = d_{ss} + d_{sr} - d$. Cuando la
+línea de visión pasa *por encima* del borde superior, la norma da a $z$ signo
+negativo (`Barrier(line_of_sight_clear=True)`) y la Ec. (14) sigue
+aplicándose con $K_{met} = 1$: $D_z$ cae de forma continua desde
+$10 \log_{10} 3 \approx 4{,}8$ dB en incidencia rasante hasta cero al aumentar el
+margen libre, sin bajar nunca de cero.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_outdoor_geometry_es.svg" alt="Geometría fuente-barrera-receptor de la ISO 9613-2: una fuente puntual a altura hs, una barrera cuyo borde superior divide el recorrido en dss y dsr, y un receptor a altura hr, con el rayo directo bloqueado y el rayo difractado sobre el borde, la diferencia de camino z y la fórmula de Dz" width="92%" />
+
+### Los cuatro términos de atenuación
+
+* **Divergencia geométrica** $A_{div} = 20 \log_{10}(d/d_0) + 11$ dB, $d_0 = 1$ m
+  (Ec. (7)): expansión esférica desde una fuente puntual. Exactamente 51 dB a
+  100 m, +6 dB por cada duplicación de la distancia. El $+11$ ($= 10 \log_{10} 4\pi$)
+  fija el nivel a la distancia de referencia de 1 m.
+* **Absorción atmosférica** $A_{atm} = \alpha\ d$ (Ec. (8)) con $\alpha$ el
+  coeficiente de la ISO 9613-1, despreciable a baja frecuencia y dominante a 8 kHz
+  en recorridos largos. $\alpha$ se evalúa en la frecuencia central *exacta*
+  en base 10 de cada banda nominal (7 943,3 Hz para «8 kHz»), la convención de
+  los coeficientes de la Tabla 2 de la ISO 9613-2 (la evaluación en la
+  frecuencia nominal queda ~1,3 % alta a 8 kHz). Las funciones de la ISO
+  9613-2 usan por defecto 20 °C y
+  una humedad relativa del 70 % (una de las atmósferas de referencia que la norma
+  tabula en su Tabla 2), mientras que `air_attenuation` usa por defecto el 50 %
+  habitual de la ISO 9613-1.
+* **Efecto del suelo** $A_{gr} = A_s + A_r + A_m$ (Ec. (9)) suma una región
+  fuente, receptor y media, cada una a partir de las funciones $a'/b'/c'/d'$ de
+  la Tabla 3 y su factor de suelo $G$ (0 = duro/reflectante, 1 =
+  poroso/absorbente). Un $A_{gr}$ **negativo** es una *ganancia* neta por la
+  reflexión constructiva en el suelo.
+* **Apantallamiento** por una barrera es la pérdida por inserción por difracción
+  $D_z = 10 \log_{10}\big[ 3 + (C_2/\lambda)\ C_3\ z\ K_{met} \big]$ (Ec. (14)),
+  limitada a 20 dB (un borde) o 25 dB (doble borde). Para una barrera de borde
+  superior, el efecto del suelo del recorrido apantallado se integra en él,
+  $A_{bar} = D_z - A_{gr} \ge 0$ (Ec. (12), Nota 13); para una barrera lateral
+  $A_{bar} = D_z$ y se conserva el término del suelo (Ec. (13)).
+
+`outdoor_propagation_attenuation` ensambla los cuatro términos en un resultado
+`OutdoorAttenuation` cuyos arrays por banda suman, banda a banda, a `a_total`, de
+modo que las contribuciones de divergencia, atmosférica, suelo y barrera quedan
+separables. El desglose apilado hace evidente el carácter frecuencial: la barrera
+ayuda más a alta frecuencia (longitud de onda corta) hasta saturar en el límite,
+la absorción atmosférica solo muerde a 8 kHz y la caída del suelo vive en las
+bandas medias.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/outdoor_attenuation_breakdown_es.svg" alt="Desglose por bandas de octava de la atenuación ISO 9613-2 como barra apilada de Adiv, Aatm, Agr y Abar con el total A superpuesto, para un recorrido de 200 m sobre suelo poroso con una barrera de 4 m" width="80%" />
+
+<details>
+<summary>Mostrar el código de esta figura</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import environment
+
+bands = np.array([63.0, 125.0, 250.0, 500.0, 1000.0, 2000.0, 4000.0, 8000.0])
+barrier = environment.Barrier(source_to_edge=101.0, edge_to_receiver=101.0)
+att = environment.outdoor_propagation_attenuation(
+    200.0, 1.5, 1.5, bands, ground_source=1.0, ground_middle=1.0,
+    ground_receiver=1.0, barrier=barrier, temperature=15.0,
+    relative_humidity=70.0,
+)
+
+# En una línea — el mismo desglose apilado con el total superpuesto:
+att.plot(language="es")
+
+# A mano:
+x = np.arange(len(bands))
+fig, ax = plt.subplots()
+# Líneas base positiva y negativa separadas: un término negativo (Agr es una
+# ganancia neta en 63 Hz aquí) se apila bajo cero, y las alturas con signo
+# suman a_total.
+pos_bottom = np.zeros(len(bands))
+neg_bottom = np.zeros(len(bands))
+for term, label in [(att.a_div, "Adiv — divergencia"),
+                    (att.a_atm, "Aatm — atmosférica"),
+                    (att.a_gr, "Agr — suelo"),
+                    (att.a_bar, "Abar — barrera")]:
+    ax.bar(x, term, bottom=np.where(term >= 0.0, pos_bottom, neg_bottom),
+           label=label)
+    pos_bottom += np.maximum(term, 0.0)
+    neg_bottom += np.minimum(term, 0.0)
+ax.plot(x, att.a_total, "D-", color="black", label="A — total")
+ax.set_xticks(x)
+ax.set_xticklabels([f"{b:g}" for b in bands])
+ax.set_xlabel("Frecuencia central de banda de octava [Hz]")
+ax.set_ylabel("Atenuación A [dB]")
+ax.legend()
+plt.show()
+```
+
+</details>
+
+```python
+import numpy as np
+from phonometry import environment
+
+bands = [63, 125, 250, 500, 1000, 2000, 4000, 8000]   # centros de banda de octava [Hz]
+
+# Fuente y receptor a 1.5 m de altura, separados 200 m sobre suelo poroso
+# (G = 1), apantallados a media distancia por una barrera que eleva el recorrido
+# sobre su borde superior (dss = dsr ~ 101 m). La geometría alimenta las
+# ecuaciones de diferencia de recorrido.
+barrier = environment.Barrier(source_to_edge=101.0, edge_to_receiver=101.0)
+att = environment.outdoor_propagation_attenuation(
+    200.0, source_height=1.5, receiver_height=1.5, frequencies=bands,
+    ground_source=1.0, ground_middle=1.0, ground_receiver=1.0,
+    barrier=barrier, temperature=15.0, relative_humidity=70.0,
+)
+print(np.round(att.a_div, 1))     # [57. 57. 57. 57. 57. 57. 57. 57.]  divergencia
+print(np.round(att.a_gr, 2))      # [-4.65  2.34 13.79  9.76  1.3  -0.   -0.   -0.  ]
+print(np.round(att.a_bar, 2))     # [13.78  8.89  0.    6.69 18.01 20.   20.   20.  ]
+print(np.round(att.a_total, 1))   # [66.2 68.3 71.  73.9 77.1 78.8 82.3 96. ]
+att.plot()                        # el desglose apilado de arriba (necesita matplotlib)
+
+# Nivel predicho en el receptor a partir de una potencia acústica por bandas Lw = 95 dB
+lw = np.full(len(bands), 95.0)
+lp = environment.predicted_receiver_level(
+    lw, 200.0, 1.5, 1.5, bands, 1.0, 1.0, 1.0,
+    barrier=barrier, temperature=15.0, relative_humidity=70.0,
+)
+print(np.round(lp, 1))            # [28.8 26.7 24.  21.1 17.9 16.2 12.7 -1. ]
+```
+
+`predicted_receiver_level` compone $L_{fT}(DW) = L_W + D_c - A$ con
+$D_c = $ `directivity_index` $+ $ `d_omega`. Pasa `c0=` para restar la corrección
+meteorológica $C_{met}$ (Ec. (21)/(22)) banda a banda y obtener una media a largo
+plazo; ten en cuenta que el estándar aplica $C_{met}$ al nivel ponderado A, así
+que la forma por bandas aquí es una **comodidad**, no una lectura literal del
+apartado 8.
+
+### Suelo: el método alternativo ponderado A
+
+Cuando solo importa el nivel ponderado A en el receptor y el sonido viaja sobre
+suelo poroso o mayoritariamente poroso (y no es un tono puro), el 7.3.2 ofrece
+una forma cerrada más simple $A_{gr} = 4{,}8 - \frac{2 h_m}{d}\left(17 + \frac{300}{d}\right) \ge 0$
+(Ec. (10), los resultados negativos se recortan a cero), acompañada del índice de
+ángulo sólido $D_\Omega$ (Ec. (11)) que debe entonces sumarse a $D_c$. Se exponen
+como `ground_attenuation_alternative` y `directivity_omega`, pero **no se conectan
+automáticamente** en `outdoor_propagation_attenuation` (que siempre usa el método
+general por regiones del 7.3.1); combínalos a mano cuando proceda el método
+alternativo.
+
+```python
+from phonometry import environment
+
+# Término de suelo alternativo (altura media del recorrido hm = 2 m, d = 200 m)
+print(round(environment.ground_attenuation_alternative(200.0, 2.0), 2))          # 4.43 dB
+# Su índice de ángulo sólido asociado (súmalo a Dc al usar la Ec. (10))
+print(round(environment.directivity_omega(1.5, 1.5, 200.0), 2))                  # 3.01 dB
+# Corrección meteorológica a largo plazo (C0 = 2 dB) a restar de LAT(DW)
+print(round(environment.meteorological_correction(200.0, 1.5, 1.5, 2.0), 2))     # 1.7 dB
+```
+
+### La fuente imagen que explica el efecto del suelo
+
+Cada entrada de la Tabla 3 es un ajuste de ingeniería a una única imagen
+física: el receptor oye dos copias de la fuente, el rayo directo $r_1$ y una
+reflexión que llega exactamente como si la radiara una **fuente imagen**
+reflejada bajo el plano del suelo. Las dos copias interfieren según la
+diferencia de camino $\delta = r_2 - r_1$ (aproximadamente $2 h_s h_r / d$
+para un recorrido rasante en campo lejano): en fase suman hasta $+6$ dB; con
+$\delta = \lambda/2$ sobre un plano rígido se cancelan en un mínimo abrupto.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_ground_reflection_es.svg" alt="Una fuente puntual a altura hs y un micrófono receptor a altura hr sobre un plano de suelo rayado; un rayo directo r1 los conecta y un rayo reflejado rebota en el punto especular con ángulos rasantes iguales; la reflexión se despliega como un rayo recto discontinuo r2 desde una fuente imagen fantasma reflejada bajo el suelo, y las anotaciones dan la diferencia de camino delta = r2 menos r1, la fase de interferencia 2 pi delta entre lambda más la fase de la reflexión, la ganancia en fase de hasta +6 dB y el mínimo profundo a media longitud de onda sobre suelo duro" width="92%" />
+
+Sobre suelo acústicamente duro ($G = 0$) el coeficiente de reflexión se
+mantiene próximo a $+1$ en todas las octavas, la suma a longitudes de onda
+largas es totalmente constructiva y el método general devuelve, como debe,
+$A_{gr} = -3$ dB en cada banda. El suelo poroso vuelve el coeficiente de
+reflexión complejo y dependiente del ángulo (para una fuente puntual en
+incidencia casi rasante, el coeficiente de onda esférica de la solución de
+Chien-Soroka, con un término de onda de suelo que ninguna imagen de onda plana
+captura): parte de la reflexión invierte su fase y el mínimo destructivo cae
+en las octavas de 250 a 1000 Hz. Ese mínimo es precisamente lo que
+parametrizan las funciones $a'$ a $d'$ de altura y distancia de la Tabla 3,
+con $G$ mezclando los comportamientos duro y poroso. La misma geometría de dos
+rayos reaparece en la atenuación lateral aeronáutica y en cualquier modelo
+exterior basado en rayos; Salomons y Attenborough & Van Renterghem desarrollan
+la teoría completa que el ajuste de ingeniería comprime.
+
+Un $A_{gr}$ negativo (una ganancia neta) es pura interferencia: la onda
+reflejada en el suelo se suma a la directa. Abajo, una fuente de 400 Hz a
+1,5 m sobre suelo rígido construye el patrón de lóbulos de esa interferencia,
+y el nivel muestreado sobre un arco converge al modelo de fuente imagen de dos
+caminos, con sus mínimos incluidos.
+
+<Video
+  name="anim_fdtd_ground_effect"
+  width={2400}
+  height={1350}
+  title="Interferencia por efecto del suelo sobre suelo rígido (FDTD 2D)"
+  description="Simulación FDTD 2D de una fuente puntual de 400 Hz a 1,5 metros sobre suelo rígido. Los frentes de onda directo y reflejado en el suelo interfieren y se forma un patrón de lóbulos, la fuente imagen fantasma bajo el suelo explica la geometría y el nivel muestreado sobre un arco de 8 metros converge al modelo de fuente imagen de dos caminos con sus mínimos previstos."
+/>
+
+### `Barrier` y el término de apantallamiento
+
+La clase `Barrier` describe la geometría de difracción directamente, que es el
+ajuste más limpio a las Ec. (14)/(16)/(17). La difracción simple (una pantalla
+delgada) deja `edge_separation=None` ($C_3 = 1$); dar la separación de bordes `e`
+selecciona la difracción doble (barrera gruesa) con el factor $C_3$ de la
+Ec. (15) y el límite de 25 dB. `ground_reflections_by_image=True` cambia $C_2$ de
+20 a 40 (reflexiones tratadas por fuentes imagen) y `lateral=True` selecciona la
+difracción por borde vertical (Ec. (13), $K_{met}=1$, se conserva el término del
+suelo).
+
+La simulación siguiente muestra por qué $D_z$ crece con la frecuencia: frente a
+la misma pantalla de 2,5 m, un frente de onda de 100 Hz
+($\lambda \approx 3{,}4\ \text{m}$) se difracta
+sobre el borde y rellena la zona de sombra, mientras que a 500 Hz la sombra es
+profunda y nítida. Una barrera solo funciona cuando la longitud de onda es
+corta frente a la diferencia de camino.
+
+<Video
+  name="anim_fdtd_barrier"
+  width={2400}
+  height={1350}
+  title="Difracción en una barrera a 100 Hz y 500 Hz (FDTD 2D)"
+  description="Simulación FDTD 2D de una fuente puntual tras una barrera rígida delgada de 2,5 metros sobre suelo reflectante, a 100 Hz y 500 Hz lado a lado. La longitud de onda larga se difracta sobre el borde y rellena la zona de sombra con una pérdida por inserción de unos 8 dB, mientras que la corta produce una sombra profunda y limpia de unos 17 dB."
+/>
+
+### Parámetros de `outdoor_propagation_attenuation()`
+
+| Parámetro | Tipo / forma | Unidades | Rango / def. | Notas |
+| :--- | :--- | :--- | :--- | :--- |
+| `distance` | float | m | > 0 | Distancia fuente–receptor en línea recta $d$ |
+| `source_height` / `receiver_height` | float | m | ≥ 0 | $h_s$, $h_r$ sobre el suelo |
+| `frequencies` | array 1D | Hz | def. 8 octavas 63–8000 | `DEFAULT_FREQUENCIES` |
+| `ground_source` / `ground_middle` / `ground_receiver` | float | — | `[0, 1]`, def. `0.0` | Factor de suelo $G$ (0 duro, 1 poroso) |
+| `barrier` | `Barrier` o None | — | def. `None` | Obstáculo de apantallamiento |
+| `temperature` / `relative_humidity` / `pressure` | float | °C / % / kPa | 20 / 70 / 101.325 | Pasados a $A_{atm}$ |
+| `projected_distance` | float o None | m | def. $\sqrt{d^2-(h_s-h_r)^2}$ | $d_p$ proyectada sobre el suelo |
+
+Devuelve un `OutdoorAttenuation` con `a_div`, `a_atm`, `a_gr`, `a_bar`,
+`a_total` y `d_omega`, todos un valor por banda; su `.plot()` dibuja el
+desglose apilado por bandas con el total superpuesto (la figura anterior).
+
+### Campos de `Barrier`
+
+| Campo | Tipo | Unidades | Def. | Notas |
+| :--- | :--- | :--- | :--- | :--- |
+| `source_to_edge` | float | m | — | $d_{ss}$, fuente al primer borde |
+| `edge_to_receiver` | float | m | — | $d_{sr}$, (último) borde al receptor |
+| `parallel_distance` | float | m | `0.0` | Componente $a$ paralela al borde |
+| `edge_separation` | float o None | m | `None` | $e$; si se da ⇒ difracción doble (límite 25 dB) |
+| `ground_reflections_by_image` | bool | — | `False` | `True` ⇒ $C_2 = 40$ |
+| `lateral` | bool | — | `False` | `True` ⇒ difracción por borde vertical (Ec. (13)) |
+| `line_of_sight_clear` | bool | — | `False` | `True` ⇒ la línea de visión pasa por encima del borde superior: la diferencia de camino toma signo negativo y $K_{met} = 1$ (texto tras la Ec. (16)) |
+
+## 3. Alcance, hipótesis y errores habituales
+
+### Qué significan las "condiciones favorables a la propagación"
+
+La ISO 9613-2 no predice el nivel con la meteorología del momento. Todas sus
+ecuaciones suponen condiciones **favorables a la propagación** (apartado 5):
+viento soplando de la fuente al receptor (dentro de unos 45° de la línea que
+los une, a entre 1 y 5 m/s medidos de 3 a 11 m sobre el suelo), o la inversión
+térmica moderada junto al suelo de una noche despejada y en calma, que curva
+los rayos sonoros hacia abajo de la misma manera. La refracción descendente
+cierra las zonas de sombra acústica que formarían las atmósferas neutras o con
+viento en contra, de modo que el $L_{fT}(DW)$ predicho está cerca del nivel
+más alto que la geometría puede producir: a lo largo de un año el nivel real
+suele ser menor y rara vez es apreciablemente mayor. La elección es
+deliberada. Las quejas llegan en las noches tranquilas en las que una planta
+lejana se oye con claridad, no en las tardes ventosas en las que desaparece, y
+un método que predice el caso audible protege la evaluación. El promedio a
+largo plazo se recupera restando $C_{met}$ (Ec. (21)/(22)), cuyo $C_0$
+codifica con qué frecuencia el viento favorece de verdad el camino (unos
+$+3$ dB cuando la mitad del tiempo es favorable; valores por encima de 2 dB ya
+son excepcionales, Notas 20/22). La exactitud declarada de $\pm 1$ a $\pm 3$ dB
+(Tabla 5) vale en condiciones favorables, para fuentes de banda ancha y hasta
+1000 m; más allá la norma no declara exactitud alguna.
+
+### Errores habituales con barreras, más allá de la animación
+
+El término de apantallamiento es el más fácil de sobrevalorar; cuatro detalles
+deciden si una barrera real entrega su $D_z$ calculado:
+
+* **Los topes son físicos, no editoriales.** $D_z$ se limita a 20 dB en
+  difracción simple y 25 dB en difracción doble por alta que sea la pared,
+  porque la turbulencia atmosférica dispersa sonido hacia la zona de sombra y
+  fija un techo que la altura extra no puede compensar. Una pérdida por
+  inserción por encima de unos 20 dB es territorio de encapsulamientos, no de
+  pantallas. La propia Ec. (14) es una curva de ingeniería suavizada en la
+  tradición del ábaco de pantallas de Maekawa, un ajuste empírico sobre tres
+  décadas del número de Fresnel $N = 2z/\lambda$.
+* **$K_{met}$ merma en silencio las barreras lejanas.** El factor
+  meteorológico (Ec. (18)) descuenta el apantallamiento porque los mismos
+  rayos curvados hacia abajo que hacen favorables las condiciones también
+  pasan por encima del borde superior. A menos de 100 m de distancia
+  fuente-receptor $K_{met} \approx 1$ (Nota 17), pero en un camino largo con
+  poca diferencia de recorrido puede quitar varios decibelios a una barrera
+  que parecía generosa en el alzado.
+* **La difracción doble es una bonificación modesta.** Un obstáculo grueso
+  (dos bordes separados $e$) eleva $C_3$ de 1 hacia 3 (Ec. (15)), que vale
+  como mucho unos $10 \log_{10} 3 \approx 4{,}8$ dB extra más el tope superior de
+  25 dB. Un edificio modelado como doble borde solo gana esa bonificación si
+  ambos bordes son realmente continuos y la cubierta entre ellos está
+  cerrada.
+* **El efecto del suelo se gasta, no se conserva.** Para una barrera de borde
+  superior la norma pliega el efecto del suelo del camino apantallado dentro
+  de la difracción: $A_{bar} = D_z - A_{gr}$ (Ec. (12), Nota 13). Sobre suelo
+  poroso que ya aportaba de 5 a 10 dB de $A_{gr}$ en las bandas medias, la
+  ganancia *neta* de construir la barrera es proporcionalmente menor que su
+  $D_z$ nominal; los dos efectos no se apilan.
+
+Además, un obstáculo tiene que cumplir los requisitos para considerarse
+barrera (apartado 7.4):
+densidad superficial de al menos 10 kg/m², superficie cerrada sin huecos
+grandes y una extensión horizontal normal al camino mayor que la longitud de
+onda. Una valla de lamas o un contenedor corto apantallan bastante menos de lo
+que promete la Ec. (14).
+
+### ¿ISO 9613-2 o CNOSSOS-EU?
+
+Dos marcos dominan la predicción del ruido exterior en Europa, y responden a
+preguntas distintas:
+
+* **ISO 9613-2** es un método general de *atenuación* de ingeniería: dada la
+  potencia acústica por octavas de cualquier fuente que puedas descomponer en
+  fuentes puntuales, devuelve el nivel en el receptor en condiciones
+  favorables. La emisión queda fuera de su alcance; la potencia acústica viene
+  de la medición (la familia ISO 3740) o del fabricante del equipo. Es la
+  herramienta principal de las predicciones de plantas industriales y de
+  impacto ambiental evaluadas con la ISO 1996-2.
+* **CNOSSOS-EU** (métodos comunes de evaluación del ruido en Europa) es el
+  marco común obligatorio para los mapas estratégicos de ruido de la
+  Directiva 2002/49/CE sobre ruido ambiental, adoptado como su anexo II por la
+  [Directiva (UE) 2015/996 de la Comisión](https://eur-lex.europa.eu/eli/dir/2015/996/oj/eng).
+  Agrupa modelos de *emisión* para fuentes viarias, ferroviarias e
+  industriales (y delega las aeronaves en el Doc 29 de la CEAC) con su propia
+  parte de propagación derivada del método francés NMPB 2008, produciendo los
+  indicadores $L_{den}$/$L_{night}$ que la Directiva exige.
+
+Las partes de propagación discrepan por diseño, no por accidente. CNOSSOS-EU
+evalúa cada camino dos veces, una con atmósfera homogénea y otra en
+condiciones favorables (refracción descendente), y las combina a largo plazo
+con la probabilidad local de condiciones favorables por dirección de camino;
+la ISO 9613-2 calcula solo el caso favorable y resta un $C_{met}$ escalar. El
+efecto del suelo en CNOSSOS-EU se construye con un factor de suelo promediado
+sobre un plano medio ajustado, con expresiones que cambian entre las dos
+atmósferas, mientras que la ISO 9613-2 usa la Tabla 3 fija de tres regiones.
+La difracción también sigue una formulación distinta que acopla el efecto del
+suelo a cada lado del borde. Ejecuta ambos sobre la misma geometría y los
+resultados por octavas pueden diferir varios decibelios, cada uno
+internamente consistente. La regla práctica: los mapas estratégicos END y
+todo lo que deba ser comparable entre Estados miembros usan CNOSSOS-EU; la
+autorización de una instalación, una predicción de conformidad frente a una
+potencia acústica medida o el trabajo bajo normativas que citan la ISO 9613
+usan este módulo.
+(ISO publicó una revisión de la ISO 9613-2 en 2024; esta biblioteca implementa
+la edición de 1996, la que la mayoría de reglamentos nacionales y la
+literatura de validación siguen citando.)
+
+Consulta la página de [Teoría](/phonometry/es/reference/theory/environment-transport/)
+para la derivación completa, la [guía de Acústica de salas](/phonometry/es/buildings/rooms/room-acoustics/)
+para cómo $\alpha$ alimenta la ISO 354, y la
+[guía de exposición al ruido en el trabajo](/phonometry/es/perception/hearing/occupational-exposure/)
+para la exposición ocupacional (ISO 9612) que consume niveles
+ponderados A.
+
+## 4. Informes de predicción (`.report()`)
+
+Ambos resultados de propagación al aire libre generan una ficha PDF de una
+página de **predicción**. Se etiquetan claramente como predicciones, no como
+mediciones: la hoja indica las hipótesis meteorológicas y de suelo y, para la
+barrera, nombra el modelo de difracción real que hay detrás del número.
+
+`OutdoorAttenuation.report(path)` destaca por sí solo el intervalo de la
+atenuación total por bandas de octava; pasa un `SourceEmission` (la potencia
+acústica de la fuente y su directividad) para añadir la potencia de la fuente y
+el nivel a favor del viento a la tabla y destacar en su lugar el nivel a favor
+del viento con ponderación A $L_{AT}(\text{DW})$ en el receptor. Un nivel límite
+indicado mediante el `requirement` de los metadatos añade entonces un veredicto
+CUMPLE/NO CUMPLE (un nivel más bajo es mejor). Usa `language="es"` para la ficha
+en español.
+
+```python
+import numpy as np
+from phonometry import (
+    Barrier,
+    ReportMetadata,
+    SourceEmission,
+    outdoor_propagation_attenuation,
+)
+
+freqs = np.array([63, 125, 250, 500, 1000, 2000, 4000, 8000], dtype=float)
+lw = np.array([95, 100, 103, 105, 104, 101, 95, 88], dtype=float)
+result = outdoor_propagation_attenuation(
+    200.0, 4.0, 2.0, freqs, 1.0, 1.0, 1.0,
+    barrier=Barrier(source_to_edge=105.0, edge_to_receiver=105.0),
+    temperature=10.0, relative_humidity=70.0,
+)
+result.report(
+    "outdoor_attenuation.pdf",
+    metadata=ReportMetadata(
+        specimen="Ventilador industrial (fuente puntual)",
+        test_room="Fachada de la vivienda más próxima",
+        requirement=50.0,  # nivel máximo aceptable a favor del viento
+    ),
+    source_emission=SourceEmission(sound_power_level=lw),
+    language="es",
+)
+```
+
+<ReportPreview
+	name="iso9613_outdoor_attenuation_example"
+	title="Informe de ejemplo de propagación ISO 9613-2 (PDF)"
+	description="Ficha de predicción ISO 9613-2 de una página: un encabezado de metadatos con la distancia de propagación, una tabla por banda del nivel de potencia acústica Lw y de los términos de atenuación por divergencia, atmósfera, suelo y barrera con el total A y el nivel a favor del viento LfT(DW), el gráfico del desglose de la atenuación y el nivel a favor del viento con ponderación A destacado LAT(DW) = 29,9 dB con veredicto CUMPLE frente a un límite de 50 dB."
+	caption="Ficha de propagación al aire libre (OutdoorAttenuation.report), el nivel a favor del viento con ponderación A en el receptor."
+/>
+
+Antes de emitir la ficha, `result.plot()` dibuja de forma interactiva el mismo
+desglose de atenuación por banda (la figura apilada de la sección 2).
+
+`BarrierInsertionLoss.report(path)` destaca la pérdida por inserción media sobre
+las bandas de octava; una pérdida por inserción mínima requerida indicada
+mediante `requirement` añade un veredicto CUMPLE/NO CUMPLE (una pérdida por
+inserción más alta es mejor).
+
+```python
+import numpy as np
+from phonometry import ReportMetadata, barrier_insertion_loss
+
+freqs = np.array([63, 125, 250, 500, 1000, 2000, 4000, 8000], dtype=float)
+result = barrier_insertion_loss(freqs, 1.0, 50.0, 4.0, 100.0, 1.5)
+result.report(
+    "barrier_insertion_loss.pdf",
+    metadata=ReportMetadata(
+        specimen="Barrera acústica junto a la carretera, 4 m de altura",
+        requirement=8.0,  # pérdida por inserción media mínima requerida
+    ),
+    language="es",
+)
+```
+
+<ReportPreview
+	name="iso9613_barrier_insertion_loss_example"
+	title="Informe de ejemplo de pérdida por inserción de barrera (PDF)"
+	description="Ficha de predicción de pérdida por inserción de barrera de una página: un encabezado de metadatos con el modelo de suelo, una tabla por banda de la pérdida por inserción, el gráfico del espectro de pérdida por inserción y la pérdida por inserción media destacada IL = 12,9 dB con veredicto CUMPLE frente a un mínimo de 8 dB. La línea de base nombra el modelo ondulatorio de difracción en pantalla rígida, un complemento del término de apantallamiento de la ISO 9613-2."
+	caption="Ficha de pérdida por inserción de barrera (BarrierInsertionLoss.report), la pérdida por inserción media sobre las bandas de octava."
+/>
+
+También aquí `result.plot()` previsualiza el espectro de pérdida por inserción
+de la ficha; la [guía de suelo y barreras](/phonometry/es/environment/propagation/ground-barriers/)
+dibuja el mismo resultado frente a los modelos de semiplano exacto y suelo
+coherente.
+
+## Véase también
+
+- Referencia de la API: [`environment.propagation.outdoor_propagation`](/phonometry/es/reference/api/environment/outdoor-propagation/) y [`environment.propagation.air_absorption`](/phonometry/es/reference/api/environment/air-absorption/).

@@ -21,9 +21,9 @@ import { BASE_PATH, baseFrom, createExpect, launchBrowser } from './shared/audit
 
 const BASE = baseFrom();
 
-const GUIDE = '/guides/levels/';
-const DEEP_GUIDE = '/guides/loudness/';
-const SECTION = '/guides/sections/psychoacoustics/';
+const GUIDE = '/signal/levels/levels/';
+const DEEP_GUIDE = '/perception/psychoacoustics/loudness/';
+const SECTION = '/perception/psychoacoustics/';
 const API_PAGE = '/reference/api/psychoacoustics/sharpness/';
 const API_PAGE_ES = '/es/reference/api/psychoacoustics/sharpness/';
 

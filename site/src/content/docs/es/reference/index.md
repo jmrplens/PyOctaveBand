@@ -29,7 +29,7 @@ edificación, materiales y superficies, medio ambiente y transporte, y
 vibración. Empieza aquí cuando una guía enuncia un resultado y quieres la
 deducción, el apartado que implementa o el motivo por el que se eligió una
 formulación y no otra. La teoría de los módulos submarinos es la excepción:
-está junto a [sus guías](/phonometry/es/guides/sections/underwater/).
+está junto a [sus guías](/phonometry/es/underwater/).
 
 ## [Informe de conformidad](/phonometry/es/reference/conformance/)
 

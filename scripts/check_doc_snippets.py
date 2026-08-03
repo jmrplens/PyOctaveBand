@@ -75,7 +75,7 @@ _SKIP: dict[str, str] = {
     "electroacoustics": "excerpt: starts from the captured signal of the prose",
     "flanking-lab": "excerpt: starts from the measured levels of the prose",
     "impedance-tube": "excerpt: starts from the measured spectrum of the prose",
-    "impulse-prominence": "excerpt: starts from the recording of the prose",
+    "impulsive-sound": "excerpt: starts from the recording of the prose",
     "intensity": "excerpt: starts from the band levels of the prose",
     "machine-diagnostics": "excerpt: starts from the record of the prose",
     "miso-coherence": "excerpt: starts from the third input of the prose",

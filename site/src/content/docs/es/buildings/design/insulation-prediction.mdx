@@ -1,0 +1,452 @@
+---
+title: "Predicción del aislamiento acústico (EN 12354)"
+description: "Predicción EN 12354 del aislamiento acústico in situ entre recintos a partir de datos de elemento: los modelos de flancos aéreos y de impacto de EN 12354-1/2 con sus índices de reducción de vibraciones de unión y sus fichas de predicción."
+references:
+  - type: book
+    authors: ["Hopkins, C."]
+    year: 2007
+    title: "Sound insulation"
+    publisher: "Butterworth-Heinemann"
+    doi: "10.4324/9780080550473"
+    note: "El tratamiento completo de la transmisión por flancos y del marco de predicción EN 12354, del índice de reducción de vibraciones a su base estadística. ISBN 978-0-7506-6526-1."
+  - type: standard
+    organization: "European Committee for Standardization"
+    year: 2000
+    title: "Building acoustics — Estimation of acoustic performance of buildings from the performance of elements — Part 1: Airborne sound insulation between rooms"
+    designation: "EN 12354-1:2000"
+    url: "https://knowledge.bsigroup.com/products/building-acoustics-estimation-of-acoustic-performance-in-buildings-from-the-performance-of-elements-airborne-sound-insulation-between-rooms"
+    note: "La predicción simplificada de transmisión por flancos aérea (uniones del Anexo E, ejemplo resuelto H.3). La ficha de catálogo enlazada es la página de BSI Knowledge de BS EN 12354-1:2000."
+  - type: standard
+    organization: "European Committee for Standardization"
+    year: 2000
+    title: "Building acoustics — Estimation of acoustic performance of buildings from the performance of elements — Part 2: Impact sound insulation between rooms"
+    designation: "EN 12354-2:2000"
+    url: "https://knowledge.bsigroup.com/products/building-acoustics-estimation-of-acoustic-performance-in-buildings-from-the-performance-of-elements-impact-sound-insulation-between-rooms"
+    note: "La predicción simplificada de transmisión por flancos de impactos (ejemplo resuelto E.3). La ficha de catálogo enlazada es la página de BSI Knowledge de BS EN 12354-2:2000."
+---
+
+import Video from '../../../../../components/Video.astro';
+import ThemeImage from '../../../../../components/ThemeImage.astro';
+import ReportPreview from '../../../../../components/ReportPreview.astro';
+
+Un índice de laboratorio describe un elemento aislado; un edificio también
+transmite sonido por todas las vías de flancos. Esta página cubre la
+predicción EN 12354 del comportamiento in situ entre recintos a partir de datos
+de elemento de laboratorio: el modelo aéreo de EN 12354-1 con sus índices de
+reducción de vibraciones de unión, el modelo de impactos de EN 12354-2 y las
+fichas de predicción de ambos. Las partes tercera y cuarta de la misma
+familia, que cruzan el cerramiento del edificio en lugar de un tabique
+interior, están en
+[Aislamiento acústico de fachadas](/phonometry/es/buildings/insulation/facade-insulation/).
+Las magnitudes medidas con las que se contrasta el modelo viven en
+[Medición del aislamiento en campo (ISO 16283)](/phonometry/es/buildings/insulation/insulation-field/);
+los datos de entrada de laboratorio vienen de
+[Medición del aislamiento en laboratorio](/phonometry/es/buildings/insulation/insulation-lab/).
+
+## ¿Cómo predigo el aislamiento acústico con EN 12354 en Python?
+
+Construye los tres caminos de flanco de cada unión con
+`building.flanking_element()` y combínalos con
+`building.predicted_airborne_insulation(r_direct=57.0, flanking_paths=paths)`.
+Para el ejemplo del anexo H.3 de EN 12354-1 que se usa abajo devuelve
+`r_prime_w` = 52,2 dB, es decir $R'_w$ = 52 dB, y nombra el camino dominante.
+El aislamiento a impactos pasa por `predicted_impact_insulation()`.
+
+## Predicción del comportamiento (EN 12354)
+
+Un índice de laboratorio describe un elemento de forma aislada, pero el sonido
+que un edificio transmite realmente también viaja *alrededor* del cerramiento
+(por el suelo, por la fachada, a través de las paredes de flanco) y se vuelve a
+radiar en el recinto receptor. Esta **transmisión por flancos** es toda la
+diferencia entre el $R$ de laboratorio y el $R'$ de campo. EN 12354 predice el
+índice aparente in situ a partir de los índices de laboratorio de los elementos
+más la transmisión vibratoria de sus uniones.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_flanking_paths_es.svg" alt="El camino directo Dd a través del elemento separador y los tres caminos de flanco Ff, Df y Fd en cada unión entre un elemento de flanco y el elemento separador" width="92%" loading="eager" />
+
+Cada unión entre un elemento de flanco y el elemento separador lleva tres
+caminos, $Ff$ (flanco→flanco), $Df$ (directo→flanco) y $Fd$ (flanco→directo),
+junto al único camino directo $Dd$.
+
+<Video
+  name="anim_flanking_paths"
+  width={2400}
+  height={1350}
+  title="Pulsos de energía por los caminos directo y de flancos"
+  description="Los pulsos de energía salen del recinto emisor por el camino directo Dd y los caminos de flanco Ff, Fd y Df, encogiéndose en cada elemento y unión, y la etiqueta de cada camino se ilumina cuando su pulso vuelve a radiar en el recinto receptor."
+/>
+
+El **modelo simplificado de un solo número**
+los combina energéticamente (Fórmula 26):
+
+$$
+R'_w = -10 \log_{10}\Big[ 10^{-R_{Dd,w}/10}
+      + \sum 10^{-R_{Ff,w}/10} + \sum 10^{-R_{Df,w}/10}
+      + \sum 10^{-R_{Fd,w}/10} \Big],
+$$
+
+con el camino directo $R_{Dd,w} = R_{s,w} + \Delta R_{Dd,w}$ (Fórmula 27) y cada
+camino de flanco (Fórmula 28a)
+
+$$
+R_{ij,w} = \tfrac{R_{i,w} + R_{j,w}}{2} + \Delta R_{ij,w} + K_{ij}
+         + 10 \log_{10}\frac{S_s}{l_0\ l_f},
+$$
+
+donde $l_0 = 1$ m es la longitud de acoplamiento de referencia, $l_f$ la longitud
+de acoplamiento de la unión y $K_{ij}$ el **índice de reducción de vibraciones** de
+la unión (Anexo E, empírico en la relación de masas
+$M = \log_{10}(m'_{\perp,i}/m'_i)$).
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/prediction_flanking_demo_es.svg" alt="Índices de reducción acústica por camino para el ejemplo del Anexo H.3 de EN 12354-1 y la fracción de energía transmitida de cada camino, mostrando el camino directo dominando en R'w = 52 dB" width="80%" />
+
+```python
+import numpy as np
+from phonometry import building
+
+# EN 12354-1 Anexo H.3: una pared separadora Rs,w = 57 dB, área Ss = 11.5 m², con
+# cuatro elementos de flanco. El modelo simplificado lee el Kij de cada unión a
+# 500 Hz a partir de la relación de masas m'perp / m' (Anexo E); aquí la unión
+# rígida en cruz del suelo (la relación de masas está redondeada, de ahí 12.5 vs Anexo 12.4):
+print(round(building.junction_vibration_reduction("rigid_cross", "through", 1.61), 1))  # 12.5  KFf
+print(round(building.junction_vibration_reduction("rigid_cross", "corner",  1.61), 1))  #  8.9  KFd = KDf
+
+# Construye los tres caminos de flanco (Ff, Df, Fd) de cada elemento a partir del
+# Kij tabulado del Anexo H, luego combina el camino directo Dd energéticamente (Fórmula 26).
+elements = [   # (nombre, Rw, KFf, KFd = KDf, longitud de acoplamiento lf)
+    ("floor",    49, 12.4,  8.9, 4.50),
+    ("ceiling",  46, 14.4,  9.2, 4.50),
+    ("facade",   42, 12.6,  6.7, 2.55),
+    ("int-wall", 33, 33.5, 15.7, 2.55),
+]
+paths = []
+for name, rw, k_ff, k_fd, lf in elements:
+    paths += building.flanking_element(label=name, r_flanking=rw, r_separating=57,
+                              k_ff=k_ff, k_fd=k_fd, k_df=k_fd,
+                              separating_area=11.5, coupling_length=lf)
+
+res = building.predicted_airborne_insulation(r_direct=57.0, flanking_paths=paths)
+print(round(res.r_prime_w, 1))                          # 52.2  ->  R'w = 52 dB
+print(res.dominant.label, round(res.dominant.fraction, 2))   # Dd 0.33 (domina el directo)
+
+res.plot()   # fracción de energía transmitida por camino, de mayor a menor (requiere matplotlib)
+```
+
+<details>
+<summary>Ver el código de esta figura</summary>
+
+```python
+import matplotlib.pyplot as plt
+from phonometry import building
+
+# Construye los tres caminos de flanco (Ff, Df, Fd) de cada elemento a partir del
+# Kij tabulado del Anexo H, luego combina el camino directo Dd energéticamente (Fórmula 26).
+elements = [   # (nombre, Rw, KFf, KFd = KDf, longitud de acoplamiento lf)
+    ("floor",    49, 12.4,  8.9, 4.50),
+    ("ceiling",  46, 14.4,  9.2, 4.50),
+    ("facade",   42, 12.6,  6.7, 2.55),
+    ("int-wall", 33, 33.5, 15.7, 2.55),
+]
+paths = []
+for name, rw, k_ff, k_fd, lf in elements:
+    paths += building.flanking_element(label=name, r_flanking=rw, r_separating=57,
+                              k_ff=k_ff, k_fd=k_fd, k_df=k_fd,
+                              separating_area=11.5, coupling_length=lf)
+res = building.predicted_airborne_insulation(r_direct=57.0, flanking_paths=paths)
+
+# Índice de reducción acústica por camino y fracción de energía transmitida de cada
+# camino para el resultado del Anexo H.3 calculado arriba.
+labels = [p.label for p in res.paths]
+r_w = [p.r_w for p in res.paths]
+frac = [100.0 * p.fraction for p in res.paths]
+
+fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(9, 6), sharex=True)
+ax1.bar(labels, r_w, color="tab:blue")
+ax1.axhline(res.r_prime_w, ls="--", color="k", label=f"R'w = {res.r_prime_w:.1f} dB")
+ax1.set_ylabel("Rij,w del camino [dB]"); ax1.legend()
+ax2.bar(labels, frac, color="tab:orange")
+ax2.set_ylabel("Fracción de energía [%]"); ax2.set_xlabel("Camino de transmisión")
+for ax in (ax1, ax2):
+    ax.tick_params(axis="x", rotation=45)
+fig.suptitle("EN 12354-1 Anexo H.3 — transmisión por flancos")
+fig.tight_layout()
+plt.show()
+```
+
+</details>
+
+Cada camino de flanco añadido rebaja estrictamente $R'_w$ por debajo del directo
+$R_{Dd,w} = 57$; `res.paths` expone la fracción de energía transmitida de cada
+camino, de modo que el camino dominante queda visible. `flanking_element` es una
+función de conveniencia que construye de una vez los tres caminos de una unión; el constructor
+de camino único que hay detrás, `flanking_path`, construye un camino `Ff`, `Df`
+o `Fd` cada vez (Fórmula 28a). La Cláusula 4.4.2 también
+impone un límite inferior $K_{ij} \ge K_{ij,\min}$ a partir de la geometría de
+la unión (Fórmula 29). Pasa el área del elemento de flanco a
+`flanking_element(..., flanking_area=...)` y la saturación se aplica
+automáticamente camino a camino; o calcula el límite con
+`junction_min_vibration_reduction` y pásalo a
+`flanking_path(..., kij_min=...)`, que eleva un $K_{ij}$ por debajo del límite
+hasta el mínimo:
+
+```python
+from phonometry import building
+# Kij,min = 10 lg[lf·l0·(1/Si + 1/Sj)]; los elementos grandes dan un límite bajo
+# (aquí negativo), así que un Kij tabulado realista rara vez se satura; pero
+# los elementos pequeños y ligeros pueden superarlo (p. ej. lf = 4 m,
+# S = 1.5 m² da 7.3 dB, por encima del suelo de 5 dB de las uniones ligeras).
+print(round(building.junction_min_vibration_reduction(coupling_length=4.5,
+                                             s_i=11.5, s_j=11.5), 1))     # -1.1
+```
+
+La contrapartida a impactos (EN 12354-2, Fórmula 21) es una resta directa:
+$L'_{n,w} = L_{n,w,eq} - \Delta L_w + K$, con el nivel equivalente del suelo
+desnudo $L_{n,w,eq} = 164 - 35 \log_{10}(m'/m'_0)$ (Anexo B), la mejora del
+revestimiento $\Delta L_w$ (ISO 717-2) y la corrección por flancos $K$ de la
+Tabla 1.
+
+```python
+from phonometry import building
+
+# EN 12354-2 Anexo E.3: un forjado de hormigón de 0.14 m (m' = 322 kg/m²) con un
+# suelo flotante (ΔLw = 33 dB), salas una sobre otra, masa media de flanco 145 kg/m².
+ln_eq = building.equivalent_impact_level(322.0)                   # 164 - 35 lg(m')
+k = building.impact_flanking_correction(322.0, 145.0)             # Tabla 1 (sep 322, flk 145)
+imp = building.predicted_impact_insulation(ln_w_eq=ln_eq, delta_l_w=33.0, k_correction=k)
+print(round(ln_eq, 1), k, round(imp.l_prime_n_w, 1))     # 76.2 2 45.2  ->  L'n,w = 45 dB
+
+# Fórmula (3) exacta: L'nT,w = L'n,w - 10 lg(0.032 V). El redondeo del propio
+# Anexo E.3 a 10 lg(V/30) queda 0.18 dB por debajo; ambos dan L'nT,w = 43 dB.
+print(round(building.standardized_impact_level(imp.l_prime_n_w, 50.0), 1))   # 43.2  L'nT,w
+
+imp.plot()   # los términos de la Fórmula (21) como barras: Ln,w,eq - dLw + K -> L'n,w (requiere matplotlib)
+```
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/impact_prediction_terms_es.svg" alt="La predicción de impactos del Anexo E.3 de EN 12354-2 como sus términos de la Fórmula 21: el nivel equivalente del forjado desnudo de 76,2 dB, la mejora de menos 33 dB del suelo flotante, la corrección de flancos de más 2 dB y el nivel de impactos aparente previsto resultante de 45,2 dB" width="80%" />
+
+*Todo el modelo simplificado de EN 12354-2 es una resta: el forjado masivo
+desnudo parte de $L_{n,w,eq} = 76{,}2$ dB, el suelo flotante recupera 33 dB
+y la corrección de flancos devuelve 2 dB, quedando en $L'_{n,w} = 45$ dB.*
+
+<details>
+<summary>Mostrar el código de esta figura</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import building
+
+# EN 12354-2 Anexo E.3: forjado de hormigón de 0,14 m (m' = 322 kg/m2),
+# suelo flotante con delta-Lw = 33 dB, masa media de flancos de 145 kg/m2.
+ln_eq = building.equivalent_impact_level(322.0)
+k = building.impact_flanking_correction(322.0, 145.0)
+imp = building.predicted_impact_insulation(ln_w_eq=ln_eq, delta_l_w=33.0,
+                                           k_correction=k)
+
+# Una línea: los términos de la Fórmula (21) como barras:
+imp.plot(language="es")
+plt.show()
+
+# A mano, desde los campos del resultado:
+labels = ["Ln,w,eq", "-dLw", "+K", "L'n,w"]
+values = [imp.ln_w_eq, -imp.delta_l_w, imp.k_correction, imp.l_prime_n_w]
+fig, ax = plt.subplots()
+ax.bar(np.arange(4), values)
+ax.axhline(0.0, color="k", lw=0.8)
+ax.set_xticks(np.arange(4), labels)
+ax.set_ylabel("Nivel / corrección [dB]")
+ax.set_title(f"L'n,w = {imp.l_prime_n_w:.1f} dB (EN 12354-2 Anexo E.3)")
+plt.show()
+```
+
+</details>
+
+La contrapartida aérea de ese cierre es la Fórmula (5b),
+$D_{nT} = R' + 10\log_{10}(0{,}32\,V/S_s)$, expuesta como
+`standardized_level_difference`: cierra el ejemplo del Anexo H.3
+(`standardized_level_difference(52.2, 50.0, 11.5)` da 53,6 dB, la cadena
+impresa con $V/(3S)$ 53,8 dB, y ambas redondean a $D_{nT,w} = 54$ dB).
+
+Las tres guías de aislamiento cierran un bucle: el
+[laboratorio](/phonometry/es/buildings/insulation/insulation-lab/) mide $R$ y $K_{ij}$
+elemento a elemento y unión a unión, este modelo los ensambla en un $R'_w$
+predicho, y la
+[medición en campo](/phonometry/es/buildings/insulation/insulation-field/) comprueba el
+resultado construido. Cuando el valor medido queda muy por debajo de la
+predicción, busca un defecto de ejecución en la vía dominante que informa el
+modelo: un puente rígido a través de una unión resiliente, un trasdosado
+ausente, una fuga alrededor del elemento separador.
+
+### Parámetros de `junction_vibration_reduction()` / `flanking_element()`
+
+| Parámetro | Tipo | Unidades | Rango / valor por defecto | Notas |
+| :--- | :--- | :--- | :--- | :--- |
+| `junction_type` | str | — | `'rigid_cross'` / `'rigid_t'` / `'flexible_t'` / `'lightweight_facade'` / `'lightweight_double_homogeneous'` / `'lightweight_double_coupled'` / `'corner'` / `'thickness_change'` | Geometría de la unión (Anexo E.3-E.9) |
+| `path` | str | — | `'through'` ($K_{13}$) / `'corner'` ($K_{12} = K_{23}$) / `'double_leaf'` ($K_{24}$) | Rama del camino |
+| `mass_ratio` | float | — | > 0 | $m'_{\perp,i}/m'_i$ (Fórmula E.2) |
+| `frequency` | float | Hz | por defecto `500` | `flexible_t` y las uniones de doble hoja E.7/E.8 dependen de la frecuencia |
+| `r_flanking` / `r_separating` | float | dB | — | Índices ponderados del elemento de flanco / separador |
+| `k_ff` / `k_fd` / `k_df` | float | dB | — | $K_{ij}$ de la unión para los tres caminos |
+| `separating_area` | float | m² | > 0 | Superficie del elemento separador $S_s$ |
+| `coupling_length` | float | m | > 0 | Longitud de acoplamiento de la unión $l_f$ |
+| `delta_r_ff` / `delta_r_fd` / `delta_r_df` | float | dB | por defecto `0` | Mejoras del trasdosado por camino |
+| `flanking_area` | float | m² | por defecto `None` | Área del elemento de flanco $S_F$; activa la saturación automática a $K_{ij,\min}$ (Cláusula 4.4.2 / Fórmula 29) |
+
+### Parámetros de `flanking_path()`
+
+| Parámetro | Tipo | Unidades | Rango / defecto | Notas |
+| :--- | :--- | :--- | :--- | :--- |
+| `label` | str | — | — | Nombre visible del camino |
+| `kind` | str | — | `'Ff'` / `'Df'` / `'Fd'` | Rama de flanco del camino |
+| `r_source` / `r_receive` | float | dB | — | Índices ponderados de los elementos lado emisor / lado receptor |
+| `k_ij` | float | dB | — | Índice de reducción de vibraciones de la unión para este camino |
+| `separating_area` | float | m² | > 0 | Área del elemento separador $S_s$ |
+| `coupling_length` | float | m | > 0 | Longitud de acoplamiento $l_f$ |
+| `delta_r` | float | dB | def.: `0` | Mejora por revestimiento en este camino |
+| `kij_min` | float | dB | def.: `None` | Si se da, `k_ij` se acota inferiormente a este mínimo de la Fórmula (29) |
+
+`predicted_airborne_insulation()` devuelve un `AirbornePredictionResult`
+(`r_prime_w`, `r_direct_w`, `paths` de `PathContribution`, `dominant`);
+`predicted_impact_insulation()` un `ImpactPredictionResult` (`l_prime_n_w`,
+`ln_w_eq`, `delta_l_w`, `k_correction`). El modelo simplificado lleva una
+desviación típica declarada de unos 2 dB (Cláusula 5).
+
+### Informe de predicción EN 12354 (`.report()`)
+
+Ambos resultados de predicción generan un informe de **predicción** de una
+página mediante el método `report(path)`. A diferencia de las fichas de
+medición, el resultado informado es una *estimación* del comportamiento in situ
+a partir de los datos de laboratorio de los elementos más la transmisión por
+flancos de las uniones; la hoja lo indica de forma explícita y se rotula como
+predicción, nunca como medición. `AirbornePredictionResult.report()` genera la
+ficha del índice de reducción acústica aparente previsto (la tabla de vías de
+transmisión junto al gráfico de fracción de energía por vía, con $R'_w$ en un
+recuadro); `ImpactPredictionResult.report()` genera la ficha del nivel de
+impactos aparente previsto (la tabla de términos de la fórmula (21) junto al
+gráfico de términos, con $L'_{n,w}$ en un recuadro). Cada una nombra la
+EN/ISO 12354-1/-2 y la parte de índice ISO 717 en su línea de base, imprime la
+desviación típica del modelo (~2 dB) y, cuando se da un `requirement`, añade un
+veredicto CUMPLE/NO CUMPLE (el índice aéreo cumple igualando o superándolo, y el
+de impactos igualándolo o quedando por debajo).
+
+`verbose=True` añade a la tabla aérea la fracción de energía transmitida de cada
+vía. Los metadatos, `language="es"` y el extra `phonometry[report]` se comportan
+igual que en las fichas de medición; los campos aplicables de `ReportMetadata`
+son el elemento separador (`specimen`), la superficie del separador o el suelo
+(`area`), la geometría de los recintos (`source_volume`, `receiving_volume`), la
+masa del suelo desnudo (`mass_per_area`, impactos), el fabricante
+(`manufacturer`), el recinto o la instalación de ensayo (`test_room`), la
+identidad del calculista/laboratorio (`client`, `laboratory`, `operator`,
+`report_id`, `test_date`) y un resumen en texto libre de la construcción de
+flancos y las hipótesis del modelo (`notes`).
+
+```python
+from phonometry import building, ReportMetadata
+
+# Predicción aérea (EN 12354-1 Anexo H.3): un tabique separador Rs,w = 57 dB
+# flanqueado por cuatro elementos -> R'w = 52 dB.
+paths = []
+for label, rw, kff, kfd, lf in [
+    ("suelo", 49.0, 12.4, 8.9, 4.5), ("techo", 46.0, 14.4, 9.2, 4.5),
+    ("fachada", 42.0, 12.6, 6.7, 2.55), ("tabique interior", 33.0, 33.5, 15.7, 2.55),
+]:
+    ff, df, fd = building.flanking_element(
+        label=label, r_flanking=rw, r_separating=57.0,
+        k_ff=kff, k_fd=kfd, k_df=kfd, separating_area=11.5, coupling_length=lf)
+    paths += [ff, df, fd]
+air = building.predicted_airborne_insulation(r_direct=57.0, flanking_paths=paths)
+air.report("Rpw_prediccion.pdf", language="es", metadata=ReportMetadata(
+    specimen="Tabique separador, Rs,w = 57 dB", area=11.5,
+    source_volume=53.0, receiving_volume=50.0, requirement=50.0,
+    notes="Flancos: suelo/techo/fachada/tabique interior."))   # R'w = 52 dB
+air.report("Rpw_prediccion_vias.pdf", verbose=True, language="es")
+
+# Predicción de impactos (EN 12354-2 Anexo E.3): un forjado de hormigón
+# (m' = 322 kg/m²) con suelo flotante (ΔLw = 33 dB) -> L'n,w = 45 dB.
+ln_eq = building.equivalent_impact_level(322.0)
+k = building.impact_flanking_correction(322.0, 145.0)
+imp = building.predicted_impact_insulation(ln_w_eq=ln_eq, delta_l_w=33.0, k_correction=k)
+imp.report("Lnw_prediccion.pdf", language="es",
+           metadata=ReportMetadata(mass_per_area=322.0, requirement=53.0))  # L'n,w = 45 dB
+```
+
+Ambas fichas de ejemplo se regeneran con `make reports` y se mantienen
+renderizadas en el repositorio; haz clic en cualquier vista previa para abrir el
+PDF.
+
+<ReportPreview
+	name="iso12354_airborne_prediction_example"
+	title="Informe de ejemplo de predicción aérea EN 12354-1 (PDF)"
+	description="Informe de predicción de aislamiento acústico a ruido aéreo entre recintos de una página (EN 12354-1 Anexo H.3): la cabecera de metadatos (elemento separador, superficie, volúmenes de los recintos), la tabla de vías de transmisión (la vía directa y el índice ponderado Rij,w de cada vía de flanco) junto al gráfico de barras de fracción de energía por vía, el R'w previsto = 52 dB en un recuadro, el enunciado de predicción con la desviación típica del modelo (~2 dB) y un veredicto CUMPLE frente al requisito de 50 dB."
+	caption="Ficha aérea prevista (AirbornePredictionResult.report), R'w."
+/>
+
+<ReportPreview
+	name="iso12354_impact_prediction_example"
+	title="Informe de ejemplo de predicción de impactos EN 12354-2 (PDF)"
+	description="Informe de predicción de aislamiento acústico a ruido de impactos de un suelo de una página (EN 12354-2 Anexo E.3): la cabecera de metadatos, la tabla de términos de la fórmula (21) (el nivel equivalente del suelo desnudo Ln,w,eq, la mejora del revestimiento ΔLw y la corrección por flancos K) junto al gráfico de barras de términos, el L'n,w previsto = 45 dB en un recuadro, el enunciado de predicción y un veredicto CUMPLE frente al requisito de 53 dB (un nivel de impactos menor es mejor)."
+	caption="Ficha de impactos prevista (ImpactPredictionResult.report), L'n,w."
+/>
+
+## A través del cerramiento: partes 3 y 4
+
+Las dos partes restantes de EN 12354 predicen del mismo modo, pero a través
+del cerramiento del edificio en lugar de entre dos recintos: la EN 12354-3, el
+aislamiento a ruido aéreo frente al sonido exterior, y la EN 12354-4, la
+potencia acústica que una fuente interior radia al exterior. Ambas se
+construyen sobre la misma suma de factores de transmisión ponderada por
+superficie usada arriba, y ambas están cubiertas, junto a la medición de
+ISO 16283-3 con la que se contrastan, en
+[Aislamiento acústico de fachadas](/phonometry/es/buildings/insulation/facade-insulation/).
+
+## Qué cubre esta guía
+
+**Cubierto.** Los modelos simplificados de índice global de la
+EN 12354-1:2000 (apartado 4.4) y la EN 12354-2:2000 (apartado 4.3). Aéreo: la
+suma energética de la Fórmula (26) del camino directo y los caminos de
+flancos mediante `building.flanking_path`, `building.flanking_element` y
+`building.predicted_airborne_insulation`, con los índices de reducción
+vibracional $K_{ij}$ del Anexo E (uniones rígidas en cruz y en T, capas
+intermedias flexibles, fachadas ligeras y muros de doble hoja, esquinas y
+cambios de espesor) y el límite inferior $K_{ij,\min}$ del apartado 4.4.2 mediante
+`building.junction_vibration_reduction` y
+`building.junction_min_vibration_reduction`. Impactos: la resta de la
+Fórmula (21) $L'_{n,w} = L_{n,w,eq} - \Delta L_w + K$ mediante
+`building.equivalent_impact_level`, `building.impact_flanking_correction`,
+`building.predicted_impact_insulation` y
+`building.standardized_impact_level`. Ambos resultados escriben una ficha de
+predicción con `.report()`.
+
+**No cubierto.** Los modelos *detallados* por banda de ambas partes; las
+predicciones de aquí se quedan en los índices globales ponderados. Los
+propios datos de los elementos ($R_w$, $\Delta R_w$, $\Delta L_w$, masa por
+unidad de superficie) se toman como dados, de datos de laboratorio o de las
+estimaciones de ley de masas de
+[Predicción del aislamiento de paneles](/phonometry/es/buildings/design/panel-sound-insulation/).
+El resto de la familia está cubierto por sus propias guías: la EN 12354-3 y
+la EN 12354-4 a través del cerramiento del edificio en
+[Aislamiento acústico de fachadas](/phonometry/es/buildings/insulation/facade-insulation/),
+los equipos de servicio de la EN 12354-5 en
+[Ruido estructural instalado](/phonometry/es/buildings/design/installed-structure-borne/)
+y el modelo de absorción de la EN 12354-6 en
+[Absorción acústica en recintos](/phonometry/es/buildings/rooms/enclosed-space-absorption/).
+
+## Véase también
+
+- [Aislamiento acústico de fachadas](/phonometry/es/buildings/insulation/facade-insulation/):
+  las predicciones de EN 12354-3 y EN 12354-4 a través del cerramiento del
+  edificio, con la medición de ISO 16283-3 con la que se contrastan.
+- [Medición del aislamiento en campo (ISO 16283)](/phonometry/es/buildings/insulation/insulation-field/):
+  las magnitudes in situ medidas con las que se contrasta la predicción.
+- [Índices globales de aislamiento (ISO 717)](/phonometry/es/buildings/insulation/insulation-ratings/):
+  el motor de curva de referencia tras los $R'_w$ y $L'_{n,w}$ previstos.
+- [Medición del aislamiento en laboratorio](/phonometry/es/buildings/insulation/insulation-lab/):
+  los índices de ISO 10140 que consume el modelo.
+- [Transmisión por flancos en laboratorio (ISO 10848)](/phonometry/es/buildings/insulation/flanking-lab/):
+  el índice de reducción de vibraciones de unión $K_{ij}$ medido que consume
+  el modelo.
+- [Absorción acústica en recintos (EN 12354-6)](/phonometry/es/buildings/rooms/enclosed-space-absorption/):
+  el miembro de absorción de la misma familia EN 12354.
+- [Rigidez dinámica de materiales resilientes (EN 29052-1)](/phonometry/es/materials/resilient/dynamic-stiffness/):
+  la $s'$ que alimenta el término de suelo flotante de EN 12354-2.
+- Referencia de la API: [`building.prediction.simplified_model`](/phonometry/es/reference/api/building/simplified-model/) y [`building.prediction.facade`](/phonometry/es/reference/api/building/facade/).

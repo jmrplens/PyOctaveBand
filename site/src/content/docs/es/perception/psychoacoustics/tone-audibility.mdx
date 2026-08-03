@@ -1,0 +1,443 @@
+---
+title: "Audibilidad objetiva de tonos en ruido (ISO/PAS 20065)"
+description: "El método de ingeniería de ISO/PAS 20065:2016 para la audibilidad ΔL de un tono por encima del umbral de enmascaramiento: la banda crítica en torno al tono (Δfc, Fórmula 2), el nivel de banda crítica del enmascaramiento LG = LS + 10 lg(Δfc/Δf) (Fórmula 12), el índice de enmascaramiento av = −2 − lg[1 + (f/502)²·⁵] (Fórmula 13), la audibilidad ΔL = LT − LG − av (Fórmula 14) y la audibilidad decisiva y media energética (Fórmula 20)."
+references:
+  - type: standard
+    organization: "International Organization for Standardization"
+    year: 2016
+    title: "Acoustics — Objective method for assessing the audibility of tones in noise — Engineering method"
+    designation: "ISO/PAS 20065:2016"
+    url: "https://www.iso.org/standard/66941.html"
+    note: "El método de ingeniería implementado: todas las fórmulas de esta página siguen la edición PAS de 2016. El ancho de banda crítico Δfc (Fórmula 2) y sus frecuencias de esquina (Fórmulas 3–5), el nivel de banda crítica LG (Fórmula 12), el índice de enmascaramiento av (Fórmula 13), la audibilidad ΔL = LT − LG − av (Fórmula 14) y la audibilidad media energética (Fórmula 20); el nivel medio de banda estrecha LS (Fórmula 6, iterativa Anexo D) y el nivel del tono LT (Fórmula 8) se calculan desde el espectro de banda crítica, y analyze_spectrum añade la detección de picos (apartado 5.3.8) con los criterios de distinción (apartado 5.3.4), la combinación multitono FG (Fórmula 17) y la evaluación separada de dos tonos por debajo de 1000 Hz (Fórmulas 18/19). La conformidad se ancla en el ejemplo resuelto del motor de combustión del Anexo E (Tablas E.1/E.2/E.3). Retirada, sustituida por ISO/TS 20065:2022 (https://www.iso.org/standard/81518.html)."
+  - type: standard
+    organization: "International Organization for Standardization"
+    year: 2017
+    title: "Acoustics — Description, measurement and assessment of environmental noise — Part 2: Determination of sound pressure levels"
+    designation: "ISO 1996-2:2017"
+    url: "https://www.iso.org/standard/59766.html"
+    note: "La norma de ruido ambiental a la que sirve este método: su Anexo J adopta el método de ingeniería y convierte la audibilidad media en el ajuste tonal Kt (Tabla J.1) tratado en §3.1."
+  - type: standard
+    organization: "Deutsches Institut für Normung"
+    year: 2005
+    title: "Akustik — Bestimmung der Tonhaltigkeit von Geräuschen und Ermittlung eines Tonzuschlages für die Beurteilung von Geräuschimmissionen"
+    designation: "DIN 45681:2005-03"
+    url: "https://www.dinmedia.de/en/standard/din-45681/76463232"
+    note: "La norma madre frente a la que se confirman la corrección de ancho de banda de Hanning de −1,76 dB, el procedimiento iterativo del nivel de enmascaramiento y la lógica de detección/combinación (su programa de referencia del Anexo J)."
+---
+
+import ThemeImage from '../../../../../components/ThemeImage.astro';
+import ReportPreview from '../../../../../components/ReportPreview.astro';
+
+Un tono estacionario inmerso en ruido de banda ancha resalta cuando emerge de
+forma audible por encima del ruido que de otro modo lo enmascararía, la
+condición objetiva previa a las penalizaciones tonales del análisis de ruido.
+**ISO/PAS 20065:2016** es el *método de ingeniería* que cuantifica esa
+audibilidad: a partir de un espectro de banda estrecha (FFT) obtiene, para cada
+tono prominente, la **audibilidad** $\Delta L$: cuántos decibelios supera el nivel
+del tono al umbral de enmascaramiento del ruido circundante. (Que un tono sea
+*molesto* es un juicio de valoración posterior e independiente.) Es el método
+detallado al que remite **ISO 1996-2:2017** (la vía simplificada del Anexo C
+está en [medición ambiental](/phonometry/es/environment/environmental-levels/)); la audibilidad
+media $\Delta L$ que produce alimenta el ajuste tonal $K_t$ de ISO 1996-2.
+
+<ThemeImage
+  src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/tone_audibility_es.svg"
+  alt="Audibilidad ΔL por tono de los nueve tonos del espectro del motor de combustión del Anexo E de ISO/PAS 20065, con el tono decisivo a 137,3 Hz resaltado y el umbral ΔL = 0 dB marcado"
+  width="82%"
+  loading="eager"
+/>
+
+<details>
+<summary>Mostrar el código de esta figura</summary>
+
+```python
+import matplotlib.pyplot as plt
+from phonometry import psychoacoustics
+
+# Espectro 1 del motor de combustión (Anexo E de ISO/PAS 20065): nueve tonos
+# (fT, LT, LS) de un espectro de banda estrecha con separación de líneas de 2.7 Hz
+fT = [118.4, 137.3, 158.8, 314.9, 433.4, 592.2, 629.8, 643.3, 1582.7]
+LT = [64.56, 67.96, 68.63, 68.50, 73.17, 78.31, 75.00, 79.75, 71.07]
+LS = [48.91, 49.22, 50.50, 52.85, 58.29, 59.53, 59.71, 61.98, 54.16]
+
+res = psychoacoustics.assess_tones(fT, LT, LS, 2.7)
+print(round(res.decisive_audibility, 2), res.decisive_frequency)  # 5.01 137.3
+res.plot(language="es")   # barras de audibilidad por tono, con el tono decisivo resaltado
+plt.show()
+```
+
+</details>
+
+## 1. La banda crítica en torno al tono
+
+Cada tono de frecuencia $f_T$ se evalúa dentro de una banda crítica cuyo ancho
+es (Fórmula 2)
+
+$$
+\Delta f_c = 25{,}0 + 75{,}0\left(1{,}0 + 1{,}4\left(\tfrac{f_T}{1000}\right)^{2}\right)^{0{,}69}\ \mathrm{Hz}.
+$$
+
+Con una posición geométrica de las frecuencias de esquina en torno al tono
+(Fórmulas 3–5), $\sqrt{f_1 f_2} = f_T$ y $f_2 - f_1 = \Delta f_c$, de modo que
+$f_1 = -\Delta f_c/2 + \sqrt{\Delta f_c^2 + 4 f_T^2}/2$ y
+$f_2 = f_1 + \Delta f_c$.
+
+```python
+from phonometry import psychoacoustics
+
+print(round(psychoacoustics.critical_bandwidth_engineering(137.3), 2))   # 101.36 Hz
+f1, f2 = psychoacoustics.critical_band_corners(137.3)
+print(round(f1, 2), round(f2, 2))                            # 95.67 197.04
+```
+
+## 2. Audibilidad de un tono
+
+El nivel medio de banda estrecha $L_S$ del ruido enmascarante (Fórmula 6, un
+promedio energético iterativo de las líneas de la banda crítica) y el nivel del
+tono $L_T$ (Fórmula 8, la suma energética de las líneas tonales) se derivan del
+espectro de banda estrecha; `mean_narrowband_level` y `tone_level` lo hacen
+directamente (ver §4). El nivel de banda crítica del ruido enmascarante
+reparte $L_S$ sobre el ancho de banda crítico (Fórmula 12), el índice de
+enmascaramiento tiene en cuenta el oído (Fórmula 13) y la audibilidad es su
+diferencia (Fórmula 14):
+
+$$
+L_G = L_S + 10\log_{10}\!\frac{\Delta f_c}{\Delta f}, \qquad
+a_v = -2 - \log_{10}\!\Big[1 + \big(\tfrac{f}{502}\big)^{2{,}5}\Big], \qquad
+\Delta L = L_T - L_G - a_v .
+$$
+
+Un tono proporcionado es *audible* cuando $\Delta L > 0$. $\Delta f$ es el
+espaciado de líneas (resolución en frecuencia); las sumas energéticas sobre
+$K > 1$ líneas llevan una corrección de ventana de
+$10\log_{10}(\Delta f/\Delta f_e)$ (−1,76 dB para la ventana de Hanning recomendada,
+$\Delta f_e = 1{,}5\,\Delta f$, Fórmula (8)), mientras que un tono de una sola
+línea ($K = 1$) toma su nivel sin cambios (Fórmula (7), sin corrección de
+ancho de banda).
+
+```python
+from phonometry import psychoacoustics
+
+# ISO/PAS 20065 Anexo E, tono a 137,3 Hz (Δf = 2,7 Hz):
+#   LS = 49,22 dB (Fórmula 6), LT = 67,96 dB (Fórmula 8).
+print(round(psychoacoustics.tone_audibility(67.96, 49.22, 137.3, 2.7), 2))   # 5.01 dB
+print(round(psychoacoustics.masking_index(137.3), 2))                        # -2.02 dB
+```
+
+Todo el método es una cadena del espectro al ajuste, y cada magnitud
+intermedia de arriba es una parada en ella. El diagrama recorre esa cadena
+con el tono del Anexo E, hasta el $K_t$ que gana la audibilidad media.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_tone_audibility_es.svg" alt="Diagrama de flujo del método de ingeniería de ISO/PAS 20065 sobre el espectro del motor de combustión del Anexo E: un espectro FFT de banda estrecha con resolución de 2,7 hercios da un tono a 137,3 hercios, su banda crítica de 101,36 hercios abarca de 95,67 a 197,04 hercios, el nivel de ruido enmascarante de 49,22 decibelios y el nivel del tono de 67,96 decibelios dan un umbral de enmascaramiento de 64,97 decibelios con índice de enmascaramiento de menos 2,02 decibelios, y la audibilidad es de 5,01 decibelios, el valor decisivo del espectro; una nota final convierte la audibilidad media energética de 6,98 decibelios de los cinco espectros en un ajuste tonal Kt de 4 decibelios mediante la Tabla J.1 de ISO 1996-2" width="92%" />
+
+## 3. Audibilidad decisiva y media
+
+La audibilidad **decisiva** de un espectro de banda estrecha es la mayor
+audibilidad de tono en él (apartado 5.3.8). Sobre $J$ espectros escalonados en
+el tiempo, la **audibilidad media** es su media energética (Fórmula 20); un
+espectro en el que no se encuentra ningún tono aporta
+$\Delta L_j = -10\ \text{dB}$ (Fórmula 21). `assess_tones` aplica toda la
+cadena a los tonos de un espectro e informa del tono decisivo.
+
+**Cómo se selecciona la banda decisiva.** El método no barre un conjunto fijo
+de bandas: cada *tono* detectado define su propia banda crítica (§1), la
+audibilidad se evalúa tono a tono y, después de que el Paso 3 haya fusionado
+los tonos audibles de una misma banda en grupos `FG` calificados por su miembro
+más audible (§5), la audibilidad decisiva es simplemente la mayor $\Delta L$ que
+queda en pie (Paso 4). La «banda decisiva» es, por tanto, la banda crítica
+centrada en el tono o grupo que gana, y es libre de moverse de un espectro a
+otro conforme la fuente recorre sus estados de funcionamiento; la media
+energética de la Fórmula 20 deja después que dominen los espectros más
+ruidosos (más audibles), lo cual es deliberado: a un tono claramente audible
+parte del tiempo no lo disculpan los intervalos en los que desaparece.
+
+```python
+from phonometry import psychoacoustics
+
+# Espectro 1 del motor de combustión (Anexo E): nueve tonos (fT, LT, LS), Δf = 2,7 Hz.
+fT = [118.4, 137.3, 158.8, 314.9, 433.4, 592.2, 629.8, 643.3, 1582.7]
+LT = [64.56, 67.96, 68.63, 68.50, 73.17, 78.31, 75.00, 79.75, 71.07]
+LS = [48.91, 49.22, 50.50, 52.85, 58.29, 59.53, 59.71, 61.98, 54.16]
+res = psychoacoustics.assess_tones(fT, LT, LS, 2.7)
+print(round(res.decisive_audibility, 2), res.decisive_frequency)  # 5.01 137.3
+
+# Audibilidad media de los cinco espectros medidos (valores decisivos, Tabla E.3):
+print(round(psychoacoustics.mean_audibility([9.18, 6.04, 7.46, 2.67, 7.17]), 2))  # 6.98 dB
+
+res.plot(view="levels")   # niveles de tono sobre el ruido enmascarante de su banda crítica
+```
+
+La misma evaluación se lee de dos maneras. Las barras de audibilidad del
+principio de esta página responden a «cuánto supera cada tono el umbral de
+enmascaramiento»; la vista de niveles responde a «qué vio el analizador», que
+es la vista que un informe de evaluación tiene que defender:
+
+<ThemeImage
+  src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/tone_audibility_levels_es.svg"
+  alt="Niveles de tono y ruido enmascarante de banda crítica del espectro de motor de combustión del Anexo E de ISO/PAS 20065 sobre un eje logarítmico de frecuencia de unos 96 Hz a 1,8 kHz: cada tono es un vástago desde el nivel de enmascaramiento de su banda crítica hasta su nivel de tono, con el tono decisivo de 137,3 Hz destacado y su banda crítica sombreada"
+  width="88%"
+/>
+
+<details>
+<summary>Mostrar el código de esta figura</summary>
+
+```python
+import matplotlib.pyplot as plt
+from phonometry import psychoacoustics
+
+# El espectro de motor de combustión del Anexo E del fragmento anterior.
+fT = [118.4, 137.3, 158.8, 314.9, 433.4, 592.2, 629.8, 643.3, 1582.7]
+LT = [64.56, 67.96, 68.63, 68.50, 73.17, 78.31, 75.00, 79.75, 71.07]
+LS = [48.91, 49.22, 50.50, 52.85, 58.29, 59.53, 59.71, 61.98, 54.16]
+res = psychoacoustics.assess_tones(fT, LT, LS, 2.7)
+
+# En una línea: la vista de niveles, la misma que incrusta la ficha .report().
+res.plot(view="levels", language="es")
+plt.show()
+
+# La vista por defecto es la audibilidad por tono:
+res.plot(language="es")      # o res.plot(view="audibility")
+plt.show()
+```
+
+</details>
+
+Leída de izquierda a derecha: cada segmento horizontal es el nivel de ruido
+enmascarante de banda crítica $L_G$ dibujado sobre la banda a la que se aplica,
+cada marcador es el nivel del tono $L_T$, y el hueco entre ambos, menos el
+índice de enmascaramiento, es la audibilidad. Un tono cuyo marcador queda *por
+debajo* de su segmento está enmascarado, y ningún nivel justifica una
+penalización por él.
+
+### 3.1 Incertidumbre extendida de la audibilidad
+
+La cláusula 5.4 asocia a cada audibilidad una incertidumbre extendida $U$
+(bilateral al 90 %), y la cláusula 6 la hace obligatoria cuando se han
+promediado menos de 12 espectros. `assess_tones` la calcula por tono
+(`res.extended_uncertainties`), `audibility_uncertainty` la evalúa
+directamente desde las líneas del espectro y `mean_audibility_uncertainty`
+la propaga a la audibilidad media energética de un conjunto de espectros
+(Anexo E: $U = 2{,}80\ \text{dB}$ para el tono de 137,3 Hz frente al 2,79
+impreso).
+
+**Cómo leer $U$.** Un intervalo *bilateral* al 90 % deja un 5 % en cada cola,
+así que $\Delta L - U$ es un enunciado unilateral al 95 %: cuando todo el
+intervalo $\Delta L \pm U$ queda por encima de 0 dB, el tono es audible con al
+menos un 95 % de confianza, y cuando el intervalo cruza el cero el veredicto
+no está asegurado estadísticamente; el remedio son más espectros, porque $U$
+se reduce con el número promediado (que es exactamente la razón de que la
+cláusula 6 obligue a declararla por debajo de 12 espectros). La misma lógica
+protege la penalización aguas abajo: el **Anexo J de la ISO 1996-2:2017**
+convierte la audibilidad media en el ajuste tonal $K_t$ en pasos de 1 dB
+(Tabla J.1: $K_t = 0$ para $\Delta L \le 0$, hasta $K_t = 6\ \text{dB}$ para
+$\Delta L > 12\ \text{dB}$, o la escalera más gruesa de 0/3/6 dB de su nota),
+de modo que una incertidumbre que cruza una frontera de la tabla se propaga
+directamente como una interrogación de 1–3 dB sobre el nivel de evaluación.
+Declarar $\Delta L \pm U$ junto a $K_t$ muestra si el ajuste es robusto o
+pende de un espectro al límite.
+
+## 4. Desde el espectro de banda estrecha
+
+Dadas las líneas FFT de la banda crítica en torno a un tono,
+`mean_narrowband_level` ejecuta el procedimiento iterativo de la Fórmula 6
+(media energética, descartando toda línea que supere en más de 6 dB la $L_S$ en
+curso, hasta estabilizarse en ±0,005 dB o quedar menos de cinco líneas por lado,
+Anexo D) y `tone_level` suma las líneas tonales contiguas al pico (por encima
+de $L_S + 6\ \text{dB}$ y de $L_\text{pico} - 10\ \text{dB}$). La media lleva
+siempre la corrección de ancho de banda de Hanning de −1,76 dB; el nivel del
+tono solo cuando el tramo abarca más de una línea (Fórmulas (7)/(8)).
+
+```python
+from phonometry import psychoacoustics
+
+# Anexo E Tabla E.1: las 38 líneas de la banda crítica de 137,3 Hz (Δf = 2,7 Hz).
+freqs = [96.9, 99.6, 102.3, 105.0, 107.7, 110.4, 113.0, 115.7, 118.4, 121.1,
+         123.8, 126.5, 129.2, 131.9, 134.6, 137.3, 140.0, 142.7, 145.3, 148.0,
+         150.7, 153.4, 156.1, 158.8, 161.5, 164.2, 166.9, 169.6, 172.3, 175.0,
+         177.6, 180.3, 183.0, 185.7, 188.4, 191.1, 193.8, 196.5]
+levels = [49.40, 50.68, 50.09, 53.37, 44.47, 50.91, 51.41, 59.40, 64.54, 57.57,
+          51.02, 50.76, 59.93, 62.94, 58.49, 65.87, 62.66, 50.25, 51.32, 52.30,
+          52.58, 53.15, 67.04, 67.27, 57.40, 57.17, 52.56, 51.39, 52.49, 47.68,
+          51.26, 49.03, 61.42, 59.52, 48.43, 50.84, 48.20, 55.95]
+
+ls = psychoacoustics.mean_narrowband_level(levels, freqs, 137.3)
+lt = psychoacoustics.tone_level(levels, freqs, 137.3, ls)
+print(round(ls, 2), round(lt, 2))                         # 49.22 67.96
+print(round(psychoacoustics.tone_audibility(lt, ls, 137.3, 2.7), 2))   # 5.01 dB
+```
+
+## 5. Detección sobre el espectro completo
+
+`analyze_spectrum` ejecuta todo el front-end sobre un espectro (nivel medio de
+banda estrecha por línea, detección de picos (apartado 5.3.8 Paso 1, un tono no
+puede estar en un flanco), nivel del tono, el criterio de distinción (apartado
+5.3.4: ancho de banda $\le 26\,(1 + 0{,}001 f_T)$ Hz y pendiente de flanco
+$\ge 24\ \text{dB}$), y la audibilidad) y devuelve los tonos distintos y
+audibles. Después aplica
+el **Paso 3**: los tonos audibles que comparten una banda crítica suman
+energéticamente sus niveles de tono (Fórmula 17, líneas compartidas contadas
+una sola vez, vía `combined_tone_level`) en una entrada combinada «FG»
+valorada en el miembro más audible, salvo que la excepción de exactamente
+dos tonos por debajo de 1000 Hz de §5.1 los mantenga separados. El
+`group_sizes` del resultado distingue tonos individuales (`1`) de entradas FG
+($N \ge 2$), y la audibilidad decisiva (Paso 4) es el máximo sobre todas las
+entradas.
+
+```python
+from phonometry import psychoacoustics
+
+# Anexo E Tabla E.1: las 38 líneas de la banda crítica de 137,3 Hz (Δf = 2,7 Hz).
+freqs = [96.9, 99.6, 102.3, 105.0, 107.7, 110.4, 113.0, 115.7, 118.4, 121.1,
+         123.8, 126.5, 129.2, 131.9, 134.6, 137.3, 140.0, 142.7, 145.3, 148.0,
+         150.7, 153.4, 156.1, 158.8, 161.5, 164.2, 166.9, 169.6, 172.3, 175.0,
+         177.6, 180.3, 183.0, 185.7, 188.4, 191.1, 193.8, 196.5]
+levels = [49.40, 50.68, 50.09, 53.37, 44.47, 50.91, 51.41, 59.40, 64.54, 57.57,
+          51.02, 50.76, 59.93, 62.94, 58.49, 65.87, 62.66, 50.25, 51.32, 52.30,
+          52.58, 53.15, 67.04, 67.27, 57.40, 57.17, 52.56, 51.39, 52.49, 47.68,
+          51.26, 49.03, 61.42, 59.52, 48.43, 50.84, 48.20, 55.95]
+
+# El mismo espectro de la Tabla E.1 de arriba.
+res = psychoacoustics.analyze_spectrum(levels, freqs, 2.7)
+singles = res.group_sizes == 1
+print([round(f, 1) for f in res.tone_frequencies[singles]])  # [118.4, 137.3, 158.8]
+
+# El Paso 3 ya combinó los tres tonos de la misma banda en una entrada FG:
+fg = res.group_sizes > 1
+print(int(res.group_sizes[fg][0]), round(float(res.tone_levels[fg][0]), 2))  # 3 72.15
+
+# La misma combinación de la Fórmula 17, llamada directamente (LS de la Tabla E.2):
+lt_fg = psychoacoustics.combined_tone_level(levels, freqs, [118.4, 137.3, 158.8],
+                               [48.91, 49.22, 50.50])
+print(round(lt_fg, 2))                                # 72.15
+
+res.plot()   # las entradas detectadas, grupos FG incluidos, como barras de audibilidad
+```
+
+Reproducir una audibilidad *decisiva* exacta requiere el espectro de banda
+estrecha **completo**: la Tabla E.1 está truncada a la banda crítica de 137,3 Hz,
+así que el nivel medio de banda estrecha del tono de 158,8 Hz se subestima a
+partir de ella (el algoritmo en sí coincide con el programa de referencia de la
+norma madre DIN 45681:2005-03). La detección de picos y la combinación FG se
+verifican contra el ejemplo resuelto del Anexo E (las tres frecuencias de tono y
+$L_T = 72{,}15\ \text{dB}$).
+
+### 5.1 Dos tonos por debajo de 1000 Hz
+
+Cuando **exactamente dos** tonos comparten una banda crítica y ambos están por
+debajo de 1000 Hz, el oído todavía puede distinguirlos (y entonces se evalúan
+*por separado* en lugar de combinarse en FG) si su diferencia de frecuencia
+$|f_{T1} - f_{T2}|$ (Fórmula 18) supera
+
+$$
+f_D = 21 \cdot 10^{\,1{,}2\,\left|\log_{10}(f_T/212)\right|^{1{,}8}}\ \text{Hz}
+\qquad (\text{Fórmula 19},\ 88\ \text{Hz} < f_T < 1000\ \text{Hz})
+$$
+
+evaluada en el tono más prominente $f_T$ (el de mayor audibilidad
+$\Delta L$). El umbral alcanza su mínimo de 21 Hz en
+$f_T = 212\ \text{Hz}$ y crece a ambos lados.
+`two_tone_separation_frequency` da $f_D$; `resolve_tones_separately` aplica la
+decisión.
+
+```python
+from phonometry import psychoacoustics
+
+psychoacoustics.two_tone_separation_frequency(212.0)             # 21,0 Hz (mínimo)
+psychoacoustics.resolve_tones_separately(200.0, 260.0, 3.0, 2.0) # True  → evaluar por separado
+psychoacoustics.resolve_tones_separately(118.4, 137.3, 4.0, 5.0) # False → combinar (Δf < fD)
+```
+
+:::note
+Ningún ejemplo resuelto de ISO/PAS 20065 ejercita esta rama; la banda del Anexo
+E agrupa *tres* tonos, así que la regla de «exactamente dos tonos» nunca se
+dispara ahí. La fórmula y la decisión se implementan en clean-room desde el texto
+y se verifican contra el programa de referencia del Anexo J de
+**DIN 45681:2005-03** (`fD = 21 * 10 ^ (1.2 * Abs(Log(fT / 212) / Log(10)) ^
+1.8)`). Como refuerzo, evaluado en los tonos del Anexo E el umbral
+($\approx 24\ \text{Hz}$ en 137,3 Hz) los mantiene combinados, coherente con la
+agrupación FG de ese ejemplo.
+:::
+
+## 6. Informe de evaluación tonal (`.report()`)
+
+`ToneAudibilityResult.report(path)` genera una ficha PDF de una página con el
+formato de un informe de evaluación tonal de un laboratorio de ruido ambiental,
+siguiendo el método de ingeniería del **Anexo J de la ISO 1996-2:2017**: la
+línea de base normativa, un bloque de metadatos opcional (fuente/situación,
+cliente, posición de medición, instrumentación y fecha, con la resolución del
+análisis $\Delta f$ tomada del resultado), una tabla a todo ancho con las
+magnitudes clave de cada tono detectado (frecuencia $f_T$, tipo de entrada,
+nivel del tono $L_{pt}$, nivel del ruido enmascarante en la banda crítica
+$L_{pn}$, ancho de banda crítica $\Delta f_c$ y la audibilidad
+$\Delta L_{ta}$) sobre el gráfico de nivel frente a frecuencia con los tonos y
+su ruido enmascarante marcados, la audibilidad decisiva $\Delta L_{ta}$
+enmarcada junto con el ajuste tonal derivado $K$ (Tabla J.1), una fila de
+veredicto APTO/NO APTO opcional y una nota de prominencia, y un pie con el
+descargo fijo.
+
+Usa el mismo contenedor `ReportMetadata` y el mismo motor de renderizado que la
+[ficha de sonoridad ISO 532-1](/phonometry/es/perception/psychoacoustics/loudness/#informe-de-iso-532-1-report);
+un `requirement` indicado se interpreta como la audibilidad decisiva
+$\Delta L_{ta}$ máxima admisible en dB (un tono más silencioso es apto). El
+renderizado necesita reportlab y, para la figura que incrusta la ficha,
+matplotlib (`pip install "phonometry[report,plot]"`); solo se admite
+`engine="reportlab"`. La ficha se genera en inglés por defecto; pase
+`language="es"` para una ficha en español (cadenas fijas traducidas y separador
+decimal de coma), p. ej. `res.report("tone_fiche_es.pdf", language="es")`.
+
+```python
+from phonometry import psychoacoustics, ReportMetadata
+
+# El espectro del motor de combustión del §4/§5 (analyze_spectrum).
+res = psychoacoustics.analyze_spectrum(levels, freqs, 2.7)
+res.report(
+    "tone_fiche.pdf",
+    metadata=ReportMetadata(
+        specimen="Motor de combustión, funcionamiento estable",
+        measurement_standard="ISO 1996-2",
+        laboratory="Laboratorio de referencia Phonometry",
+        requirement=6.0,            # ΔL_ta máxima admisible (dB)
+    ),
+)                                   # ΔL_ta decisiva (dB) y K (dB, Tabla J.1)
+```
+
+La ficha de ejemplo se regenera con `make reports` y se mantiene renderizada en
+el repositorio; pulse la vista previa para abrir el PDF.
+
+<ReportPreview
+	name="iso1996_tone_audibility_example"
+	title="Informe de ejemplo de audibilidad tonal ISO 1996-2 (PDF)"
+	description="Ficha de evaluación tonal de una página: un encabezado de metadatos, una tabla por tono con el nivel del tono Lpt, el nivel del ruido enmascarante en la banda crítica Lpn, el ancho de banda crítica y la audibilidad, el gráfico de nivel frente a frecuencia con los tonos y su ruido enmascarante marcados, la audibilidad decisiva ΔL_ta = 9,1 dB enmarcada con el ajuste tonal K = 5 dB (Tabla J.1 de la ISO 1996-2:2017) y un veredicto NO APTO frente a un límite de audibilidad de 6 dB."
+	caption="Ficha de audibilidad tonal (ToneAudibilityResult.report), ΔL_ta decisiva en dB con el ajuste tonal K."
+/>
+
+## Qué cubre esta guía
+
+**Cubierto.** El método de ingeniería de ISO/PAS 20065:2016 completo: el
+ancho de banda crítico $\Delta f_c$ y las frecuencias de esquina (Fórmulas 2 a 5),
+el nivel medio de banda estrecha $L_S$ y el nivel del tono $L_T$ (Fórmulas 6 y
+8, Anexo D), el nivel de banda crítica del enmascaramiento $L_G$, el índice de
+enmascaramiento $a_v$ y la audibilidad $\Delta L$ (Fórmulas 12 a 14), la
+detección de picos y el criterio de distinción (apartados 5.3.8 y 5.3.4), la
+combinación
+multitono FG (Fórmula 17) y la excepción de dos tonos por debajo de 1000 Hz
+(Fórmulas 18/19), la audibilidad decisiva y media energética (Fórmula 20) y la
+incertidumbre extendida $U$ de los apartados 5.4/6, todo a través de
+`psychoacoustics.analyze_spectrum` y `assess_tones`. El Anexo J de la
+ISO 1996-2:2017 está cubierto en lo que convierte la audibilidad media en el
+ajuste tonal $K_t$ (Tabla J.1).
+
+**No cubierto.** El apartado 5.3.2 exige que el espectro de banda estrecha
+esté ponderado A según IEC 61672-1 antes del análisis; este módulo es
+agnóstico a la ponderación y no la aplica, así que quien llama debe ponderar
+A el espectro antes. El criterio de distinción de pendiente de flanco sigue
+la lectura de DIN 45681:2005-03 (su programa de referencia ejecutable), no
+las fórmulas asimétricas impresas en el texto de ISO/PAS 20065, que la
+contradicen (ver `docs/ERRATA.md`). Construir el propio espectro FFT de
+banda estrecha a partir de una grabación en el dominio temporal no forma
+parte de este módulo: todas las funciones aquí parten de un espectro ya
+calculado (niveles y frecuencias).
+
+## Véase también
+
+- Referencia de la API: [`psychoacoustics.quality.tone_audibility`](/phonometry/es/reference/api/psychoacoustics/tone-audibility/).

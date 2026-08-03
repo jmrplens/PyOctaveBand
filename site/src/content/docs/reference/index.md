@@ -29,7 +29,7 @@ buildings, materials and surfaces, environment and transport, and vibration.
 Start here when a guide states a result and you want the derivation, the
 clause it implements, or the reason one formulation was chosen over another.
 The theory for the underwater modules is the exception: it lives inline with
-[its guides](/phonometry/guides/sections/underwater/).
+[its guides](/phonometry/underwater/).
 
 ## [Conformance report](/phonometry/reference/conformance/)
 

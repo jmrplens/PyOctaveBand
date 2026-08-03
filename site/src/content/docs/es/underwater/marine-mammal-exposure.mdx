@@ -1,0 +1,323 @@
+---
+title: "Exposición a ruido de mamíferos marinos"
+description: "La cara auditiva del ruido submarino: los audiogramas de grupo de Southall et al. (2019) y el audiograma de orca de Ainslie, las funciones de ponderación auditiva regulatorias con la versión de guía seleccionable (NMFS 2024 v3.0, NMFS 2018 v2.0, Southall et al. 2019), los criterios de inicio de TTS y de lesión con su métrica dual para impulsivos, y la exposición acumulada ponderada de una campaña de hincado de pilotes frente a ellos."
+references:
+  - type: report
+    organization: "National Marine Fisheries Service"
+    year: 2018
+    title: "2018 Revision to: Technical Guidance for Assessing the Effects of Anthropogenic Sound on Marine Mammal Hearing (Version 2.0)"
+    number: "NOAA Technical Memorandum NMFS-OPR-59"
+    institution: "National Oceanic and Atmospheric Administration"
+    url: "https://www.fisheries.noaa.gov/s3/2023-05/TECHMEMOGuidance508.pdf"
+    note: "Los parámetros de ponderación de la Tabla 3, los umbrales de inicio de PTS de la Tabla ES3 y el ejemplo trabajado del Apéndice D (W a 1 kHz para los cinco grupos auditivos), usado como oráculo numérico de la sección de ponderación."
+  - type: report
+    organization: "National Marine Fisheries Service"
+    year: 2024
+    title: "2024 Update to: Technical Guidance for Assessing the Effects of Anthropogenic Sound on Marine Mammal Hearing (Version 3.0)"
+    number: "NOAA Technical Memorandum NMFS-OPR-71"
+    institution: "National Oceanic and Atmospheric Administration"
+    url: "https://www.fisheries.noaa.gov/s3/2024-11/Tech_Memo-Guidance_-3.0-_OCT-2024-508_OPR1.pdf"
+    primary: true
+    note: "La guía vigente y el valor por defecto de la biblioteca: parámetros de ponderación de la Tabla 5, criterios AUD INJ de la Tabla ES3 y umbrales de TTS impulsivo de la Tabla A.E-2 (Navy Phase 4)."
+  - type: article
+    authors: ["Southall, B. L.", "Finneran, J. J.", "Reichmuth, C.", "Nachtigall, P. E.", "Ketten, D. R.", "Bowles, A. E.", "Ellison, W. T.", "Nowacek, D. P.", "Tyack, P. L."]
+    year: 2019
+    title: "Marine mammal noise exposure criteria: Updated scientific recommendations for residual hearing effects"
+    journal: "Aquatic Mammals"
+    volume: 45
+    issue: 2
+    pages: "125-232"
+    doi: "10.1578/AM.45.2.2019.125"
+    primary: true
+    note: "Los audiogramas de grupo (Ecuación 1 con las Tablas 2 a 4) y las tablas de ponderación y umbrales (Tablas 5 a 7); su fe de erratas en 45(5), 569-572 corrige cuatro valores de nivel de pico de la Tabla 7."
+  - type: report
+    authors: ["Finneran, J. J."]
+    year: 2016
+    title: "Auditory weighting functions and TTS/PTS exposure functions for marine mammals exposed to underwater noise"
+    number: "Technical Report 3026"
+    institution: "SSC Pacific"
+    url: "https://apps.dtic.mil/sti/citations/AD1026445"
+    note: "La forma del filtro paso banda y la ecuación del audiograma que adoptan ambos conjuntos de criterios."
+  - type: book
+    authors: ["Ainslie, M. A."]
+    year: 2010
+    title: "Principles of Sonar Performance Modelling"
+    publisher: "Springer/Praxis"
+    doi: "10.1007/978-3-540-87662-5"
+    note: "El audiograma de orca (Ecuación 11.159, según Wensveen y Van Roij 2007) y el ejemplo trabajado de orca frente a salmón."
+  - type: standard
+    organization: "International Organization for Standardization"
+    year: 2017
+    title: "Underwater acoustics — Terminology"
+    designation: "ISO 18405:2017"
+    url: "https://www.iso.org/standard/62406.html"
+    note: "Los símbolos y referencias que los documentos de guía adoptan para sus criterios (Lp,0-pk y LE,p re 1 µPa y 1 µPa²·s)."
+---
+
+import ThemeImage from '../../../../components/ThemeImage.astro';
+
+Un mamífero marino no oye todas las frecuencias por igual, así que una
+evaluación de ruido submarino no puede comparar un nivel de banda ancha contra
+un único número. La práctica regulatoria **pondera** el espectro con un filtro
+con la forma de la sensibilidad del grupo auditivo, suma la energía ponderada,
+la acumula sobre toda la actividad y compara el resultado con un criterio de
+inicio publicado. Esta página cubre las tres piezas que la biblioteca aporta
+para esa cadena: las curvas de audición, las funciones de ponderación y los
+criterios de la guía vigente, y la evaluación de extremo a extremo de una
+campaña de hincado.
+
+Los niveles van en dB re 1 µPa (presión sonora), dB re 1 µPa²·s (exposición
+sonora) o, para los dos grupos de carnívoros en aire, dB re 20 µPa y
+dB re (20 µPa)²·s. Las convenciones de referencia submarinas están en
+[Acústica submarina](/phonometry/es/underwater/underwater-acoustics/).
+
+## Grupos auditivos (y por qué chocan los nombres)
+
+Todos los conjuntos de criterios vigentes clasifican a los mamíferos marinos en
+grupos auditivos y asignan un filtro a cada uno. Los **códigos de grupo no son
+portables entre versiones de guía**, y la colisión es una trampa real:
+
+| Southall et al. (2019) / NMFS 2024 | NMFS 2018 | Géneros típicos |
+|---|---|---|
+| Cetáceos LF | LF | ballenas barbadas |
+| Cetáceos HF | **MF** | cachalote, zifios y la mayoría de delfínidos |
+| Cetáceos VHF | **HF** | marsopas, *Cephalorhynchus*, *Kogia* |
+| PCW / PW | PW | focas fócidas en agua |
+| OCW / OW | OW | otáridos, en agua |
+| SI, PCA, OCA | — | sirenios y carnívoros en aire |
+
+`hearing_groups(guidance)` lista los códigos que define cada versión, y pasar un
+código de la versión equivocada lanza un error en vez de devolver en silencio el
+filtro incorrecto.
+
+```python
+from phonometry import underwater
+
+print(underwater.hearing_groups("nmfs-2024"))
+# ('LF', 'HF', 'VHF', 'PW', 'OW', 'PA', 'OA')
+print(underwater.hearing_groups("nmfs-2018"))
+# ('LF', 'MF', 'HF', 'PW', 'OW')
+```
+
+## Audiogramas de grupo
+
+`group_audiogram` evalúa el ajuste paso banda de Southall et al. (2019),
+Ecuación (1), según Finneran (2016):
+
+$$
+T(f) = T_0 + A \log_{10}\!\left(1 + \frac{F_1}{f}\right) + (f/F_2)^{B},
+$$
+
+con $f$ en kilohercios. `normalized=False` (por defecto) usa los parámetros de
+la Tabla 2, ajustados a los umbrales conductuales medianos absolutos;
+`normalized=True` usa el reajuste de la Tabla 3 sobre umbrales normalizados al
+mejor valor de cada individuo. El artículo **no publica un audiograma ajustado
+para los cetáceos LF** (no existen datos audiométricos y $F_1$ nunca se imprime),
+así que ese grupo se omite deliberadamente en vez de reconstruirlo a ojo.
+
+```python
+import numpy as np
+from phonometry import underwater
+
+freqs = np.logspace(2, 5.3, 400)
+audiogram = underwater.group_audiogram(freqs, "VHF")
+print(audiogram.best_frequency, audiogram.best_threshold)
+audiogram.plot(language="es")   # umbral frente a frecuencia (necesita matplotlib)
+
+print(underwater.AUDIOGRAM_GROUPS)
+# ('HF', 'VHF', 'SI', 'PCW', 'OCW', 'PCA', 'OCA')
+```
+
+Para una especie en vez de un grupo, `orca_audiogram` implementa la curva de
+orca de Wensveen y Van Roij (2007) tal como la imprime Ainslie (2010),
+Ecuación (11.159), una ley de potencias de tres tramos entre 0,5 y 80 kHz. Su
+mínimo es 39,0 dB re 1 µPa a 22,6 kHz, y 51,2 dB re 1 µPa a 50 kHz: este último
+exige el **tercer** tramo; evaluar allí el segundo devuelve 50,5 dB, y por eso
+los dos puntos publicados están fijados por los tests.
+
+```python
+from phonometry import underwater
+
+print(underwater.orca_audiogram(50e3).threshold[0])   # 51.20 dB re 1 uPa
+```
+
+Ese valor es el umbral de audición del ejemplo de orca frente a salmón de
+Ainslie: con un nivel de fuente de 198,2 dB re 1 µPa²·m² y una fuerza de blanco
+del salmón de −29,0 dB re m², la cifra de mérito limitada por audición es
+$(SL + TS - HT)/2 = 59{,}0$ dB re m².
+
+## Ponderación auditiva y funciones de exposición
+
+Los tres conjuntos de criterios vigentes usan el mismo filtro paso banda
+genérico (NMFS 2018 Ecuación 1, Southall et al. Ecuación 2):
+
+$$
+W(f) = C + 10 \log_{10} \frac{(f/f_1)^{2a}}
+                       {\left[1+(f/f_1)^2\right]^{a}\left[1+(f/f_2)^2\right]^{b}} ,
+$$
+
+con $f$ en kilohercios. $C$ se fija poniendo el máximo de $W$ en 0 dB, de modo
+que la **función de exposición** asociada $E(f) = K + C - W(f)$ tiene su mínimo
+en el umbral ponderado de inicio de TTS $T_w = K + C$. Por debajo de $f_1$ el
+filtro cae a $20a$ dB/década y por encima de $f_2$ a $20b$ dB/década.
+
+Entre versiones solo cambia la tabla de parámetros, así que la versión es un
+argumento explícito y viaja con el resultado:
+
+- **`"nmfs-2024"`** (por defecto): NOAA Fisheries *Updated Technical Guidance*
+  v3.0, octubre de 2024. Sustituye a la revisión de 2018, fija $b = 5$ para
+  todos los grupos, adopta los nombres de grupo de Southall y reemplaza el
+  "inicio de PTS" por el "inicio de lesión auditiva (AUD INJ)".
+- **`"nmfs-2018"`**: la revisión de 2018 v2.0, todavía citada por evaluaciones
+  en curso.
+- **`"southall-2019"`**: los criterios revisados por pares; numéricamente
+  idénticos a NMFS 2018 en los cinco grupos comunes y añaden los sirenios y los
+  dos grupos de carnívoros en aire.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/marine_mammal_weighting_es.svg" alt="Funciones de ponderación auditiva de los cinco grupos auditivos en agua de NMFS 2024: los cetáceos de baja frecuencia tienen su máximo cerca de 1,4 kHz, los de alta frecuencia cerca de 11 kHz, los de muy alta frecuencia cerca de 27 kHz, los pinnípedos fócidos cerca de 5,6 kHz y los otáridos cerca de 7,8 kHz, cayendo cada uno bruscamente fuera de su banda de paso" width="82%" loading="eager" />
+
+<details>
+<summary>Mostrar el código de esta figura</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import underwater
+
+freqs = np.logspace(1, 5.4, 700)
+fig, ax = plt.subplots()
+for group in ("LF", "HF", "VHF", "PW", "OW"):
+    res = underwater.auditory_weighting(freqs, group, guidance="nmfs-2024")
+    crit = underwater.exposure_criteria(group, guidance="nmfs-2024", impulsive=True)
+    ax.semilogx(res.frequencies, res.weighting,
+                label=f"{group} (AUD INJ {crit.injury_sel:.0f} dB)")
+ax.set(xlabel="Frecuencia [Hz]", ylabel="Amplitud de ponderación W(f) [dB]",
+       ylim=(-75, 5))
+ax.legend()
+ax.grid(True, which="both", alpha=0.3)
+plt.show()
+```
+
+</details>
+
+```python
+from phonometry import underwater
+
+res = underwater.auditory_weighting(1000.0, "LF", guidance="nmfs-2018")
+print(res.weighting[0])           # -0.06 dB, el valor publicado del Apéndice D
+print(res.weighted_tts_onset)     # Tw = K + C
+
+params = underwater.weighting_parameters("OW", guidance="nmfs-2024")
+print(params.a, params.b, params.f1_khz, params.f2_khz, params.c_db)
+```
+
+:::note
+NMFS 2024 imprime $C = 1{,}37$ dB para el grupo de otáridos en agua y afirma en
+la nota al pie de esa misma tabla que el valor debería ser 1,36 dB. La biblioteca
+implementa 1,36 (recalcular $C$ como el máximo de $W$ da 1,3643) y conserva el
+dígito impreso en `c_db_as_printed`. La Tabla 7 de Southall arrastra cuatro
+erratas de nivel de pico corregidas por la fe de erratas de la propia revista, y
+los valores corregidos son los implementados. Ambas quedan registradas en
+[Erratas encontradas en fuentes publicadas](/phonometry/es/reference/errata/).
+:::
+
+## Criterios de inicio
+
+`exposure_criteria` devuelve los criterios publicados de inicio de TTS y de
+lesión de un grupo. El ruido impulsivo lleva una **métrica dual**: un nivel de
+exposición sonora ponderado *y* un nivel de pico sin ponderar ("plano"), y
+gobierna el criterio que produzca la isopleta mayor.
+
+```python
+from phonometry import underwater
+
+crit = underwater.exposure_criteria("VHF", guidance="nmfs-2024", impulsive=True)
+print(crit.injury_label)        # 'AUD INJ'
+print(crit.tts_sel, crit.injury_sel)          # 144, 159 dB re 1 uPa2 s (ponderado)
+print(crit.tts_peak_spl, crit.injury_peak_spl)  # 196, 202 dB re 1 uPa (plano)
+print(crit.source)
+```
+
+Las tablas son internamente consistentes de maneras que la biblioteca fija como
+tests: el nivel de lesión no impulsivo es siempre TTS + 20 dB, el inicio de TTS
+ponderado publicado es siempre el $K + C$ redondeado, y en la tabla impulsiva de
+Southall los criterios de SEL van a TTS + 15 dB y los de pico a TTS + 6 dB.
+
+## Una evaluación trabajada de hincado de pilotes
+
+El hincado percusivo de pilotes es el caso impulsivo canónico. La cadena va del
+golpe registrado al veredicto:
+
+1. `strike_sel_spectrum` reparte la exposición sonora de un golpe del registro
+   en bandas de octava fraccionaria (las energías por banda vuelven a sumar el
+   `single_strike_sel` de banda ancha de
+   [Acústica submarina](/phonometry/es/underwater/underwater-acoustics/), por
+   Parseval);
+2. `weighted_exposure` aplica $W(f)$ banda a banda, suma la energía ponderada,
+   la acumula sobre el número de golpes (el $+10\log_{10} N$ de la ISO 18406) y
+   compara el resultado con los criterios, nivel de pico sin ponderar incluido.
+
+```python
+import numpy as np
+from phonometry import underwater
+
+# Un golpe registrado (aquí una ráfaga sintética de 200 Hz con caída).
+fs = 48_000
+t = np.arange(int(0.2 * fs)) / fs
+strike = 50.0 * np.exp(-t / 0.06) * np.sin(2 * np.pi * 200.0 * t)
+
+spectrum = underwater.strike_sel_spectrum(strike, fs, fraction=3)
+peak = underwater.peak_sound_pressure_level(strike)
+
+res = underwater.weighted_exposure(
+    spectrum.frequencies, spectrum.band_sel, "LF",
+    guidance="nmfs-2024", impulsive=True, n_events=3000, peak_spl=peak,
+)
+print(res.unweighted_sel, res.weighted_sel, res.cumulative_sel)
+print(res.sel_margin, res.peak_margin)   # positivo significa criterio superado
+print(res.exceeds_injury, res.exceeds_tts)
+res.plot(language="es")   # espectro ponderado frente a los criterios
+```
+
+Un martillo de 200 Hz cae dentro de la banda de paso de los cetáceos de baja
+frecuencia y muy fuera de la de muy alta frecuencia, así que la misma campaña
+pondera decenas de decibelios más bajo para una marsopa que para una ballena
+barbada: justo el sentido de ponderar, y la razón por la que un único SEL
+acumulado sin ponderar no es una evaluación.
+
+## Qué cubre esta guía
+
+**Cubierto.** `group_audiogram` y `audiogram_parameters` implementan el
+audiograma de grupo de Southall et al. (2019) (Ecuación 1) con los ajustes
+absoluto de la Tabla 2 y normalizado de la Tabla 3; `orca_audiogram` implementa
+el audiograma de orca de tres tramos de Ainslie (2010) Ecuación (11.159).
+`auditory_weighting` implementa las funciones de ponderación y de exposición
+paso banda para las tres versiones de guía seleccionables (NMFS 2024 v3.0, por
+defecto; NMFS 2018 v2.0; Southall et al. 2019), con las tablas de parámetros
+accesibles mediante `weighting_parameters`. `exposure_criteria` devuelve los
+criterios publicados de inicio de TTS y de lesión (PTS / AUD INJ), impulsivos y
+no impulsivos, incluida la mitad de nivel de pico sin ponderar de la métrica
+dual. `weighted_exposure` ejecuta la evaluación: pondera un espectro por bandas,
+lo acumula sobre eventos e informa del margen frente a cada criterio aplicable.
+`strike_sel_spectrum` aporta ese espectro por bandas a partir de un golpe de
+pilote registrado.
+
+**No cubierto.** No hay audiograma para los cetáceos LF, porque Southall et al.
+nunca imprimen su parámetro $F_1$. Los criterios de perturbación conductual (los
+umbrales de escalón y de dosis-respuesta usados en las estimaciones de
+hostigamiento) quedan fuera de alcance: solo se implementan los criterios de
+efecto auditivo. La biblioteca no elige por el usuario ni el grupo auditivo ni
+el periodo de acumulación, y no modela el movimiento del animal respecto a la
+fuente, de modo que el SEL acumulado que informa es el caso peor de receptor
+estático. La propagación de la fuente al receptor pertenece a
+[Propagación del sonido submarino](/phonometry/es/underwater/underwater-propagation/).
+
+## Véase también
+
+- [Acústica submarina: ruido radiado e hincado de pilotes](/phonometry/es/underwater/underwater-acoustics/):
+  los niveles de referencia de la ISO 18405 y la exposición por hincado de la
+  ISO 18406 que alimentan esta página.
+- [Propagación del sonido submarino](/phonometry/es/underwater/underwater-propagation/):
+  la pérdida por transmisión y la maquinaria de cifra de mérito que convierte un
+  criterio en una distancia.
+- Referencia de API: [`underwater.bioacoustics.weighting`](/phonometry/es/reference/api/underwater/weighting/) y [`underwater.bioacoustics.audiograms`](/phonometry/es/reference/api/underwater/audiograms/).

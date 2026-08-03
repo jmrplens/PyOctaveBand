@@ -70,25 +70,27 @@ ROUTE_OVERRIDES = {
     "theory-materials-surfaces": "reference/theory/materials-surfaces",
     "theory-environment-transport": "reference/theory/environment-transport",
     "theory-vibration": "reference/theory/vibration",
+    "impulse-prominence": "environment/assessment/impulsive-sound",
 }
 
-#: The nine documented areas, in the order the landing page lists them. Each is
-#: a section overview page whose prose links every guide in that area, so the
-#: grouping follows the content rather than a second hand-kept list.
+#: The documented topics, in the order the landing page lists them. Each is a
+#: folder of `content/docs/` whose `index` page links the guides inside it, so
+#: the grouping follows the content rather than a second hand-kept list.
 AREAS: tuple[tuple[str, str], ...] = (
-    ("core-signal-analysis", "Core signal analysis"),
-    ("hearing-perception", "Hearing and perception"),
-    ("rooms-buildings", "Rooms and buildings"),
-    ("materials-surfaces", "Materials and surfaces"),
+    ("signal", "Signal analysis"),
+    ("perception", "Hearing and perception"),
+    ("buildings", "Rooms and buildings"),
+    ("materials", "Materials and surfaces"),
     ("vibration", "Vibration and structure-borne sound"),
-    ("environment-transport", "Environment and transport"),
+    ("environment", "Environment and transport"),
+    ("aircraft", "Aircraft noise"),
     ("underwater", "Underwater acoustics"),
-    ("sources-devices", "Sources and devices"),
+    ("devices", "Sources and devices"),
     ("simulation", "Wave simulation"),
 )
 
-#: Pages that open the documentation rather than belonging to an area.
-START_ROUTES = ("getting-started", "reference/why-phonometry", "about")
+#: Pages that open the documentation rather than belonging to a topic.
+START_ROUTES = ("start/getting-started", "start/why-phonometry", "start/about")
 
 
 def _version() -> str:
@@ -118,9 +120,10 @@ def _site_routes() -> dict[str, str]:
         rel = path.relative_to(CONTENT)
         if rel.parts[0] == "es" or rel.parts[:2] == ("reference", "api"):
             continue
-        if "sections" in rel.parts:
-            # Area overviews share their stem with a guide (room-acoustics,
-            # human-vibration); the guide is the docs/ page's counterpart.
+        if path.stem == "index":
+            # Topic and subgroup overviews. They share their stem with each
+            # other and their route is the folder, so they are matched by the
+            # topic tables below rather than by filename.
             continue
         routes[path.stem] = rel.with_suffix("").as_posix()
     return routes
@@ -165,90 +168,154 @@ def _api_routes() -> list[str]:
     )
 
 
-def _area_members() -> dict[str, list[str]]:
-    """Area slug -> guide routes, read from each area overview page.
-
-    Each overview page introduces the guides in its area by linking them, so
-    membership is taken from the prose. A guide reachable from two areas is
-    filed under the first one in :data:`AREAS`, and anything no overview links
-    lands in a trailing group, so the partition is total either way.
-    """
-    sections = CONTENT / "guides" / "sections"
-    guides = {
-        path.stem
-        for path in (CONTENT / "guides").glob("*.md*")
-        if path.stem != "index"  # the guides landing page, linked from Start here
+def _guide_routes() -> set[str]:
+    """Every guide route: the pages of a topic folder, overviews excluded."""
+    topics = {slug for slug, _ in AREAS}
+    return {
+        path.relative_to(CONTENT).with_suffix("").as_posix()
+        for topic in topics
+        for path in (CONTENT / topic).rglob("*.md*")
+        if path.stem != "index"
     }
+
+
+def _overview(folder: pathlib.Path) -> pathlib.Path:
+    """The overview page of a topic or subgroup folder, whatever it is called."""
+    for name in ("index.md", "index.mdx"):
+        if (folder / name).exists():
+            return folder / name
+    return folder / "index.md"
+
+
+def _linked_guides(
+    overview: pathlib.Path, guides: set[str], folder: str
+) -> list[str]:
+    """Guide routes an overview links, in order, restricted to its own folder.
+
+    The prose gives the reading order, which is the point of reading it, but an
+    overview also cross-references guides that live elsewhere. Membership is
+    structural: a page belongs to the folder it is in, and only its own
+    overview can order it.
+    """
+    text = overview.read_text(encoding="utf-8") if overview.exists() else ""
+    return [
+        route
+        for route in dict.fromkeys(
+            re.findall(r"/phonometry/([a-z0-9-]+(?:/[a-z0-9-]+)*)/", text)
+        )
+        if route in guides and route.rsplit("/", 1)[0] == folder
+    ]
+
+
+def _folder_order(folder: str, guides: set[str]) -> list[str]:
+    """The guides of one folder, in the order its own overview teaches them."""
+    ordered = _linked_guides(_overview(CONTENT / folder), guides, folder)
+    ordered += [
+        route
+        for route in sorted(guides)
+        if route.rsplit("/", 1)[0] == folder and route not in ordered
+    ]
+    return ordered
+
+
+def _subgroups(topic: str) -> list[str]:
+    """Subgroup folders of a topic, in the order the topic overview links them."""
+    folders = sorted(
+        path.parent.relative_to(CONTENT).as_posix()
+        for path in (CONTENT / topic).rglob("index.md*")
+        if path.parent != CONTENT / topic
+    )
+    text = _overview(CONTENT / topic).read_text(encoding="utf-8")
+    mentioned = [
+        folder
+        for folder in dict.fromkeys(
+            re.findall(r"/phonometry/([a-z0-9-]+(?:/[a-z0-9-]+)*)/", text)
+        )
+        if folder in folders
+    ]
+    return mentioned + [folder for folder in folders if folder not in mentioned]
+
+
+def _area_members() -> dict[str, list[str]]:
+    """Topic slug -> guide routes, in the order the overviews teach them.
+
+    A page belongs to the folder it is in, which is the taxonomy the tree
+    already states; the prose of each overview only decides the order, since
+    that is what a reader is being led through. Anything an overview does not
+    mention still appears, alphabetically, after what it does.
+    """
+    guides = _guide_routes()
     members: dict[str, list[str]] = {}
     claimed: set[str] = set()
     for slug, _label in AREAS:
-        page = sections / f"{slug}.md"
-        text = page.read_text(encoding="utf-8") if page.exists() else ""
-        found = [
-            name
-            for name in dict.fromkeys(
-                re.findall(r"/phonometry/guides/([a-z0-9-]+)/", text)
-            )
-            if name in guides and name not in claimed
-        ]
+        routes = _folder_order(slug, guides)
+        for folder in _subgroups(slug):
+            routes += _folder_order(folder, guides)
+        found = [route for route in routes if route not in claimed]
         claimed.update(found)
-        members[slug] = [f"guides/{name}" for name in found]
+        members[slug] = found
     leftover = sorted(guides - claimed)
     if leftover:
-        members["other"] = [f"guides/{name}" for name in leftover]
+        members["other"] = leftover
     return members
 
 
 def _shard_members() -> dict[str, list[str]]:
     """Shard slug -> guide routes, at the finest grouping the tree offers.
 
-    The index groups by the nine areas a reader recognises, but several of
-    those areas are large enough that a whole-area shard blows the fetch
-    budget on its own. Several areas are already subdivided in the navigation
-    (octave filtering, levels and weighting, and so on), each with its own
-    overview page, so sharding follows those subdivisions where they exist
-    and falls back to the area where they do not.
+    The index groups by the ten topics a reader recognises, but several of
+    those are large enough that a whole-topic shard blows the fetch budget on
+    its own. Most topics are already subdivided in the tree (octave filtering,
+    levels and weighting, and so on), each subgroup with its own overview page,
+    so sharding follows those subdivisions where they exist and falls back to
+    the topic where they do not. The shard slug is the folder path with slashes
+    turned into dashes, so ``signal/filters`` publishes as
+    ``llms-signal-filters.txt``.
     """
-    sections = CONTENT / "guides" / "sections"
-    areas = {slug for slug, _ in AREAS}
-    subsections = sorted(
-        path.stem for path in sections.glob("*.md*") if path.stem not in areas
-    )
-    guides = {
-        path.stem
-        for path in (CONTENT / "guides").glob("*.md*")
-        if path.stem != "index"  # the guides landing page, linked from Start here
-    }
-
-    def linked(slug: str) -> list[str]:
-        page = sections / f"{slug}.md"
-        text = page.read_text(encoding="utf-8") if page.exists() else ""
-        return [
-            name
-            for name in dict.fromkeys(
-                re.findall(r"/phonometry/guides/([a-z0-9-]+)/", text)
-            )
-            if name in guides
-        ]
-
+    guides = _guide_routes()
     shards: dict[str, list[str]] = {}
     claimed: set[str] = set()
-    # Subsections first: they are the finer grain, and claiming there keeps the
-    # parent area shard down to whatever it holds directly.
-    for slug in subsections:
-        found = [name for name in linked(slug) if name not in claimed]
+
+    def slug_of(folder: str) -> str:
+        return folder.replace("/", "-")
+
+    # Subgroups first: they are the finer grain, and claiming there keeps the
+    # parent topic shard down to whatever it holds directly.
+    subgroups = sorted(
+        path.parent.relative_to(CONTENT).as_posix()
+        for topic, _ in AREAS
+        for path in (CONTENT / topic).rglob("index.md*")
+        if path.parent != CONTENT / topic
+    )
+    for folder in subgroups:
+        found = [
+            route
+            for route in _linked_guides(_overview(CONTENT / folder), guides, folder)
+            if route not in claimed
+        ]
+        found += [
+            route
+            for route in sorted(guides)
+            if route.rsplit("/", 1)[0] == folder
+            and route not in claimed
+            and route not in found
+        ]
         if not found:
             continue
         claimed.update(found)
-        shards[slug] = [f"guides/{name}" for name in found]
-    for slug, _label in AREAS:
-        found = [name for name in linked(slug) if name not in claimed]
-        claimed.update(found)
+        shards[slug_of(folder)] = found
+    for topic, _label in AREAS:
+        found = [
+            route
+            for route in sorted(guides)
+            if route.split("/")[0] == topic and route not in claimed
+        ]
         if found:
-            shards[slug] = [f"guides/{name}" for name in found]
+            claimed.update(found)
+            shards[slug_of(topic)] = found
     leftover = sorted(guides - claimed)
     if leftover:
-        shards["other"] = [f"guides/{name}" for name in leftover]
+        shards["other"] = leftover
     return shards
 
 
@@ -365,7 +432,7 @@ def build_llms_txt(version: str) -> str:
     lines += ["## Start here", ""]
     lines += [entry for route in START_ROUTES if (entry := link(route))]
     lines += [
-        f"- [Guides index]({SITE_URL}/guides/)",
+        f"- [Guides index]({SITE_URL}/start/guides/)",
         f"- [Glossary of quantities]({SITE_URL}/reference/glossary/)",
         "",
     ]
@@ -373,7 +440,7 @@ def build_llms_txt(version: str) -> str:
     for slug, routes in members.items():
         lines += [f"## {labels.get(slug, 'Other guides')}", ""]
         if slug != "other":
-            lines.append(f"- [Overview]({SITE_URL}/guides/sections/{slug}/)")
+            lines.append(f"- [Overview]({SITE_URL}/{slug}/)")
         lines += [entry for route in routes if (entry := link(route))]
         lines.append("")
 
@@ -401,7 +468,7 @@ def build_llms_txt(version: str) -> str:
             "normative clauses"
         ),
         f"- [Bibliography]({SITE_URL}/reference/bibliography/)",
-        f"- [About the author and the method]({SITE_URL}/about/)",
+        f"- [About the author and the method]({SITE_URL}/start/about/)",
         "",
         "## Source and metadata",
         "",
@@ -432,7 +499,7 @@ def build_llms_txt(version: str) -> str:
         "",
         (
             "Every page above also exists in Spanish under the `/es/` prefix, for "
-            f"example {SITE_URL}/es/getting-started/. The two trees are kept at "
+            f"example {SITE_URL}/es/start/getting-started/. The two trees are kept at "
             "parity by a build check."
         ),
         "",
@@ -523,7 +590,7 @@ def build_shards() -> dict[str, str]:
     theory = [route for route in pages.values() if route.startswith("reference/theory")]
     shards = {"start": emit("start here", [*START_ROUTES, *sorted(theory)])}
     for slug, routes in members.items():
-        overview = f"guides/sections/{slug}"
+        overview = slug.replace("-", "/", 1) if "-" in slug else slug
         shards[slug] = emit(
             labels.get(slug, slug.replace("-", " ")),
             ([overview] if overview in route_to_file else []) + routes,

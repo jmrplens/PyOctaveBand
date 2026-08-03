@@ -113,7 +113,7 @@ Los tres parámetros provienen de la Tabla 1 (p. 4), tabulados en las 29 frecuen
 
 La norma **no especifica interpolación** entre las frecuencias tabuladas. La Fórmula (1) está especificada para **20 fonios a 90 fonios** entre 20 Hz y 4 kHz, y solo hasta **80 fonios entre 5 kHz y 12,5 kHz**; por encima de 80 fonios la línea isofónica se detiene, por tanto, en 4 kHz. Los valores fuera de estos límites obtenidos con la Fórmula (2) son extrapolaciones que la norma califica de meramente informativas.
 
-Consulta la [guía de sonoridad](/phonometry/es/guides/loudness/) para su uso.
+Consulta la [guía de sonoridad](/phonometry/es/perception/psychoacoustics/loudness/) para su uso.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/equal_loudness_contours_es.svg" alt="Curvas isofónicas normales de ISO 226:2023 de 20 a 90 fonios con la curva del umbral de audición" width="80%" />
 
@@ -137,7 +137,7 @@ $$
 
 **PR** (cláusula 12) compara el nivel de la banda crítica centrada en el tono, $L_M$, con la potencia media de las dos bandas críticas **contiguas** $L_L$, $L_U$ (bordes según las Fórmulas ajustadas 21–22 con las Tablas 2–3): $\mathrm{PR} = 10\log_{10} P_M - 10\log_{10}\left[(P_L + P_U)/2\right]$ (Fórmula 23). Para $f_t \le 171{,}4$ Hz la banda inferior se trunca en 20 Hz y su potencia se reescala a un **ancho de banda de 100 Hz** (Fórmula 24). El criterio (Fórmulas 25–26) es 9,0 dB para $f_t \ge 1$ kHz, y crece como $9{,}0 + 10{,}0\log_{10}(1000/f_t)$ por debajo. Los tonos se evalúan dentro del rango de interés de 89,1 Hz – 11,2 kHz (cláusulas 11.5 / 12.6).
 
-Consulta la [guía de tonos discretos prominentes](/phonometry/es/guides/tone-prominence/) para su uso.
+Consulta la [guía de tonos discretos prominentes](/phonometry/es/perception/psychoacoustics/tone-prominence/) para su uso.
 
 ## Sonoridad de Zwicker (ISO 532-1)
 
@@ -170,7 +170,7 @@ $$
 
 por debajo de 1 sono el programa de referencia usa $L_N = 40 (N + 0{,}0005)^{0{,}35}$, con suelo en 3 fonios.
 
-Consulta la [guía de sonoridad](/phonometry/es/guides/loudness/) para su uso.
+Consulta la [guía de sonoridad](/phonometry/es/perception/psychoacoustics/loudness/) para su uso.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/loudness_pattern_es.svg" alt="Patrones de sonoridad específica sobre la escala Bark para un sonido de banda estrecha de 1 kHz y un sonido de banda ancha con el mismo nivel de banda" width="80%" />
 
@@ -251,7 +251,7 @@ $$
 
 evaluado sobre la misma malla de 240 puntos a 0,1 Bark. La constante $k$ no está codificada a mano, sino que se deriva del requisito de calibración (cláusula 6): un ruido de banda estrecha de una banda crítica de ancho, 920–1080 Hz a 60 dB SPL, puntúa exactamente 1 acum, y la $k = 0{,}108$ derivada cae dentro de la ventana normativa $0{,}105 \le k < 0{,}115$ (cláusula 5.2). Las ponderaciones informativas del Anexo B se ofrecen bajo el mismo anclaje de 1 acum: von Bismarck (codo en 15 Bark, $0{,}2\ e^{0{,}308(z-15)} + 0{,}8$) y Aures (dependiente de la sonoridad, $g(z) = 0{,}078\ (e^{0{,}171 z}/z)\ N/\ln(0{,}05 N + 1)$). Los objetivos de banda estrecha de la Tabla A.2 se reproducen dentro de la tolerancia de la cláusula 6 (5 % o 0,05 acum): 0,38 acum a 250 Hz, 1,00 a 1 kHz, 1,78 a 2,5 kHz, 2,82 a 4 kHz.
 
-Consulta la [guía de métricas de calidad sonora](/phonometry/es/guides/sound-quality/) para su uso.
+Consulta la [guía de métricas de calidad sonora](/phonometry/es/perception/psychoacoustics/sound-quality/) para su uso.
 
 ## Transferencia de modulación y STI (IEC 60268-16)
 
@@ -285,7 +285,7 @@ $$
 m_{dr} = \frac{2 \sqrt{\left( \sum_t I_k(t) \sin 2 \pi f_m t \right)^2 + \left( \sum_t I_k(t) \cos 2 \pi f_m t \right)^2}}{\sum_t I_k(t)}, \qquad m = \frac{m_{dr}}{0{,}55}
 $$
 
-Consulta la [guía del índice de transmisión del habla](/phonometry/es/guides/speech-transmission/) para su uso.
+Consulta la [guía del índice de transmisión del habla](/phonometry/es/perception/speech/speech-transmission/) para su uso.
 
 ## Índice de inteligibilidad del habla (ANSI S3.5)
 
@@ -299,7 +299,7 @@ $$
 
 La misma cadena recorre las otras tres tablas de bandas de la norma, seleccionadas con `method=`: las 21 bandas críticas de la Tabla 1, las 17 bandas críticas de contribución equitativa de la Tabla 2 y las 6 bandas de octava de la Tabla 4. Esas tres expresan la pendiente de enmascaramiento mediante el ancho de banda tabulado, $C_i = -80 + 0{,}6\,(B_i + 10 \log_{10} W_i)$, que es la misma fórmula que el $10 \log_{10} f_i - 6{,}353$ de arriba abrevia para una banda de tercio de octava; el procedimiento por bandas de octava prescinde por completo de la propagación del enmascaramiento, ya que una banda de octava ya es más ancha que la propagación que se modela. Los espectros normalizados de habla de la Tabla 3 para los esfuerzos vocales normal, elevado, fuerte y grito están incorporados (25,01 / 33,86 / 42,16 / 51,31 dB a 1 kHz); el $U_i$ del factor de distorsión de nivel es siempre el espectro de esfuerzo normal. Los anclajes: el espectro de esfuerzo normal en silencio con audición normal puntúa SII ≈ 0,996, los valores de referencia del espectro de enmascaramiento se reproducen a $10^{-4}$, y los espectros por esfuerzo vocal están verificados de forma cruzada frente a las implementaciones de referencia de Google y CRAN.
 
-Consulta la [guía de inteligibilidad del habla](/phonometry/es/guides/speech-intelligibility/) para su uso.
+Consulta la [guía de inteligibilidad del habla](/phonometry/es/perception/speech/speech-intelligibility/) para su uso.
 
 ## Umbrales de audición y presbiacusia (ISO 389-7, ISO 7029)
 
@@ -311,7 +311,7 @@ $$
 
 y cualquier fractil sigue un modelo gaussiano bilateral (cláusula 4.4), $\Delta H_Q = \Delta H_{md} + z(Q)\ s$, usando la dispersión superior $s_u$ para $z \ge 0$ (peor que la mediana) y la inferior $s_l$ en caso contrario, cada una un polinomio de grado 5 en $Y - 18$ por sexo y frecuencia (cláusula 4.3, Tablas 2–5). A los 18 años toda desviación es cero por construcción. Las fórmulas están establecidas hasta los 80 años a 2 kHz y por debajo, y hasta los 70 años por encima; más allá la evaluación es una extrapolación. Anclajes: a los 60 años las medianas evalúan a 7,85 dB (hombre, 1 kHz), 20,21 dB (hombre, 4 kHz) y 15,32 dB (mujer, 4 kHz), reproduciendo la fórmula de la Tabla 1 a $10^{-3}$.
 
-Consulta la [guía de umbral de audición](/phonometry/es/guides/hearing-threshold/) para su uso.
+Consulta la [guía de umbral de audición](/phonometry/es/perception/hearing/hearing-threshold/) para su uso.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/hearing_threshold_es.svg" alt="Dos paneles. Izquierda: la desviación mediana del umbral de audición de ISO 7029 para hombres a los 20, 40, 60 y 80 años en un eje de audiograma invertido, con la banda del 10 al 90 por ciento en torno a la curva de 70 años; la pérdida se acentúa hacia las altas frecuencias y con la edad. Derecha: el umbral de referencia de campo libre y campo difuso de ISO 389-7, que coinciden por debajo de 1 kHz y divergen por encima, con un mínimo cerca de 3 a 4 kHz" width="96%" />
 
@@ -333,4 +333,4 @@ $$
 
 Los ejemplos resueltos del Anexo D (Tablas D.1–D.4; p. ej. 100 dB / 40 años a 3 kHz: 29/38/60 dB en los fractiles 0,10/0,50/0,90) se reproducen exactamente con el redondeo a enteros de la norma, y el valor a mano de la Fórmula 2 a 4 kHz / 20 años / 90 dB es $N_{50} = 12{,}94$ dB.
 
-Consulta la [guía de pérdida auditiva inducida por ruido](/phonometry/es/guides/noise-induced-hearing-loss/) para su uso.
+Consulta la [guía de pérdida auditiva inducida por ruido](/phonometry/es/perception/hearing/noise-induced-hearing-loss/) para su uso.

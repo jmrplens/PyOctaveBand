@@ -411,15 +411,19 @@ const jsonLd = JSON.stringify({
 export default defineConfig({
   site: siteUrl,
   base: basePath,
+  // Four pages that were split before the site was published. Each now lands
+  // on the overview of the subsection its content became, which is a better
+  // answer than one of the pages it was split into. Nothing new is added here:
+  // the taxonomy move drops its old addresses outright.
   redirects: {
-    '/guides/building-acoustics/': `${basePath}/guides/insulation-field/`,
-    '/es/guides/building-acoustics/': `${basePath}/es/guides/insulation-field/`,
-    '/guides/psychoacoustics/': `${basePath}/guides/loudness/`,
-    '/es/guides/psychoacoustics/': `${basePath}/es/guides/loudness/`,
-    '/guides/materials/': `${basePath}/guides/absorption-measurement/`,
-    '/es/guides/materials/': `${basePath}/es/guides/absorption-measurement/`,
-    '/guides/surface-scattering/': `${basePath}/guides/diffusers/`,
-    '/es/guides/surface-scattering/': `${basePath}/es/guides/diffusers/`,
+    '/guides/building-acoustics/': `${basePath}/buildings/insulation/`,
+    '/es/guides/building-acoustics/': `${basePath}/es/buildings/insulation/`,
+    '/guides/psychoacoustics/': `${basePath}/perception/psychoacoustics/`,
+    '/es/guides/psychoacoustics/': `${basePath}/es/perception/psychoacoustics/`,
+    '/guides/materials/': `${basePath}/materials/absorbers/`,
+    '/es/guides/materials/': `${basePath}/es/materials/absorbers/`,
+    '/guides/surface-scattering/': `${basePath}/materials/diffusers/`,
+    '/es/guides/surface-scattering/': `${basePath}/es/materials/diffusers/`,
   },
   build: {
     // Render prerendered pages in parallel batches (default is 1 at a time).

@@ -1,0 +1,270 @@
+---
+title: "Vibración con choques múltiples (ISO 2631-5)"
+description: "El modelo de respuesta espinal de ISO 2631-5:2018 para la vibración de cuerpo completo con choques múltiples: la función de transferencia asiento-columna y la dosis de aceleración de la cláusula 5, y la tensión compresiva, la variable de tensión acumulada R y la probabilidad de lesión lumbar de Weibull del Anexo C."
+references:
+  - type: book
+    authors: ["Griffin, M. J."]
+    year: 1996
+    title: "Handbook of human vibration"
+    publisher: "Academic Press"
+    url: "https://shop.elsevier.com/books/handbook-of-human-vibration/griffin/978-0-12-303041-2"
+    note: "ISBN 978-0-12-303041-2. Contexto sobre la exposición a choques de cuerpo completo, la biodinámica espinal y los efectos lumbares sobre la salud que cuantifica el modelo de dosis de ISO 2631-5."
+  - type: standard
+    organization: "International Organization for Standardization"
+    year: 2018
+    title: "Mechanical vibration and shock — Evaluation of human exposure to whole-body vibration — Part 5: Method for evaluation of vibration containing multiple shocks"
+    designation: "ISO 2631-5:2018"
+    url: "https://www.iso.org/standard/50905.html"
+    note: "La función de transferencia asiento-columna (cláusula 5.2, Fórmula 1), la dosis de aceleración y diaria (cláusula 5.3, Fórmulas 3-5) y la evaluación de efectos sobre la salud del Anexo C (Fórmulas C.1, C.3-C.5, Tablas C.1/C.2)."
+---
+
+import ThemeImage from '../../../../../components/ThemeImage.astro';
+import ReportPreview from '../../../../../components/ReportPreview.astro';
+
+La vibración que contiene **choques mecánicos** repetidos (vehículos todoterreno,
+embarcaciones rápidas, maquinaria de movimiento de tierras) carga la columna
+lumbar mucho más de lo que sugiere su nivel eficaz equivalente. **ISO
+2631-5:2018** predice la respuesta espinal resultante y el riesgo de lesión
+lumbar a partir de la aceleración vertical medida en el asiento. phonometry
+implementa el modelo normativo de respuesta espinal de la **cláusula 5** y la
+evaluación de efectos sobre la salud del **Anexo C**. (El modelo de elementos
+finitos de los Anexos A / E lo distribuye ISO como software aparte y queda fuera
+de alcance aquí.)
+
+La frontera con el método básico es explícita. ISO 2631-1 declara su
+evaluación eficaz normalmente suficiente hasta un factor de cresta de 9, y
+ofrece el eficaz móvil/MTVV y el VDV más allá; ISO 2631-5 es el método
+adicional para el régimen posterior, cuando el registro contiene choques
+repetidos. Su cláusula 4 divide después ese régimen en dos: las condiciones
+*severas*, con posible caída libre o pérdida de contacto con el asiento y un
+eje z dominante (vehículos militares todoterreno, embarcaciones rápidas),
+usan el modelo de la cláusula 5 implementado aquí, mientras que las
+condiciones *menos severas*, en las que el ocupante permanece sentado en todo
+momento (tractores, maquinaria forestal y de movimiento de tierras sobre
+terreno irregular), corresponden al modelo de elementos finitos del Anexo A.
+En caso de duda, la delimitación es cuantitativa: cuando la aceleración de
+pico vertical limitada en banda supera 9,81 m/s² (1 g, el umbral de caída
+libre), se aplican la cláusula 5 y el Anexo C.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_iso2631_5_es.svg" alt="Flujo desde la aceleración vertical del asiento az(t) hasta la respuesta espinal, la dosis de aceleración Dz y la dosis diaria Dzd, la tensión compresiva Sd, la variable de tensión R acumulada con la edad, y la probabilidad de lesión lumbar de Weibull" width="86%" loading="eager" />
+
+## 1. Respuesta espinal (cláusula 5.2)
+
+Una función de transferencia asiento-columna $H(f)$ (un cero complejo y seis
+polos complejos, transmisibilidad unidad a 0 Hz y una resonancia cerca de 5 Hz)
+transforma la aceleración medida del asiento en la respuesta espinal vertical
+$A_z(t)$ (Fórmula 1/2):
+
+$$
+A_z(t) = \mathcal{F}^{-1}\!\left[H(f)\,\mathcal{F}[a_z(t)]\right].
+$$
+
+El registro de entrada debe estar **acondicionado (sin componente continua)**:
+como $H$ es unidad a 0 Hz por diseño, un offset de continua (por ejemplo, la
+componente de gravedad de 1 g de un acelerómetro acoplado en continua) pasa
+directamente a $A_z(t)$ y corrompe los picos positivos de respuesta de la
+dosis.
+Reste la media (o aplique un paso alto) antes de procesar.
+
+```python
+from phonometry import vibration
+
+# La transmisibilidad alcanza el máximo cerca de la resonancia espinal de ~5 Hz.
+print(round(abs(vibration.seat_to_spine_transfer([2.0])[0]), 2))  # 1.06
+print(round(abs(vibration.seat_to_spine_transfer([5.0])[0]), 2))  # 1.54
+```
+
+## 2. Dosis de aceleración (cláusula 5.3)
+
+La **dosis de aceleración** combina los picos positivos de la respuesta
+$A_{z,i}$ (cada uno el máximo entre dos cruces por cero consecutivos) con una
+ley de sexta potencia, de modo que dominan los choques mayores (Fórmula 3):
+
+$$
+D_z = 1{,}07\left(\sum_i A_{z,i}^{\,6}\right)^{1/6}.
+$$
+
+Una dosis diaria escala la dosis medida al tiempo de exposición diario $t_d$
+sobre el tiempo de medida $t_m$ (Fórmula 4):
+$D_{zd} = D_z\,(t_d/t_m)^{1/6}$.
+
+```python
+from phonometry import vibration
+
+# Cinco picos de respuesta de 40 m/s2 al día (el ejemplo del Anexo C).
+print(round(vibration.dose_from_peaks([40.0] * 5), 2))  # 55.97  m/s2
+```
+
+## 3. Riesgo de lesión (Anexo C)
+
+La dosis diaria se convierte en una **tensión compresiva** diaria
+$S_d = m_z\,D_{zd}$ (Fórmula C.1), donde $m_z$ (0,029 MPa por m/s² para un
+hombre de 82 kg, 0,025 para una mujer de 64 kg) convierte la aceleración en
+tensión vertebral. La tensión se acumula sobre los años de exposición frente a
+la resistencia última decreciente de la columna que envejece
+$S_u = 6{,}75 - S_{\mathrm{age}}\,(b+i)$ (Fórmulas C.3/C.4):
+
+$$
+R = \left[\sum_{i=0}^{n-1}
+\left(\frac{S_d\,N^{1/6}}{S_{u,i} - S_{\mathrm{stat}}}\right)^{6}\right]^{1/6},
+$$
+
+y un modelo de Weibull da la probabilidad de lesión lumbar (Fórmula C.5):
+
+$$
+\Pi(R) = 1 - \exp\!\left[-\left(\frac{R}{\alpha}\right)^{\beta}\right].
+$$
+
+```python
+from phonometry import vibration
+
+# Ejemplo del Anexo C: 5 x 40 m/s2/día, hombre de 82 kg, edad 20 durante 20
+# años, 120 días/año.
+dz = vibration.dose_from_peaks([40.0] * 5)
+sd = vibration.compression_dose(dz)                     # 1.62 MPa
+r = vibration.injury_risk(sd, start_age=20, years=20, days_per_year=120)
+print(round(r, 2))                               # 1.22
+print(round(100 * vibration.injury_probability(r)))     # 37  % de riesgo de lesión
+```
+
+Desde un registro temporal medido, toda la cadena es una sola llamada:
+
+```python
+import numpy as np
+from phonometry import vibration
+
+# Un registro sintético de asiento de 10 s a 256 Hz con cinco choques de
+# 60 m/s2 (sustituto de un az(t) medido).
+fs = 256.0
+az = np.zeros(2560)
+az[256::512] = 60.0
+result = vibration.multiple_shock_assessment(
+    az, fs, start_age=20, years=20, days_per_year=120, sex="male",
+)
+print(round(result.acceleration_dose, 2))  # 20.94  m/s2
+print(round(result.risk, 2))               # 0.46
+print(round(result.probability, 2))        # 0.03
+
+result.plot()   # la curva de probabilidad de lesión con la R de esta evaluación marcada (requiere matplotlib)
+```
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/multiple_shock_es.svg" alt="Izquierda: la transmisibilidad asiento-columna sube hasta cerca de 1,6 en una resonancia de 5 Hz y luego cae casi a cero en 80 Hz. Derecha: la probabilidad de lesión lumbar de Weibull frente a la variable de tensión R para hombre y mujer, con los niveles de riesgo del 10, 50 y 90 por ciento y el ejemplo masculino del Anexo C en R = 1,22, en torno al 37 por ciento" width="96%" />
+
+<details>
+<summary>Mostrar el código de esta figura</summary>
+
+```python
+import numpy as np
+import matplotlib.pyplot as plt
+from phonometry import vibration
+
+# Izquierda: la magnitud de la función de transferencia asiento-columna.
+f = np.logspace(np.log10(0.5), np.log10(80.0), 400)
+plt.plot(f, np.abs(vibration.seat_to_spine_transfer(f)))
+plt.xscale("log"); plt.show()
+
+# Derecha: la curva de probabilidad de lesión con la R de esta evaluación
+# (az/fs como en el snippet anterior).
+fs = 256.0
+az = np.zeros(2560)
+az[256::512] = 60.0
+vibration.multiple_shock_assessment(
+    az, fs, start_age=20, years=20, days_per_year=120,
+).plot(language="es")
+plt.show()
+```
+
+</details>
+
+El `MultipleShockResult` lleva la dosis $D_z$, la dosis diaria $D_{zd}$, la
+tensión compresiva $S_d$, la variable de tensión $R$, la probabilidad de lesión
+y los picos de respuesta, y su `.plot()` dibuja la curva de probabilidad de
+lesión con los umbrales de riesgo del 10/50/90 % de la Tabla C.2. El modelo es solo para el
+eje vertical: la cláusula 4 desprecia por diseño las contribuciones horizontales
+a la compresión espinal, y el modelo espinal horizontal de la edición de 2004,
+retirada, no se restablece, de modo que la exposición horizontal de cuerpo
+completo se evalúa con las métricas eficaz, eficaz móvil/MTVV y VDV de
+[Vibración en humanos](/phonometry/es/vibration/human/human-vibration/) (ISO 2631-1).
+
+## 4. El informe de riesgo para la salud
+
+La cadena de dosis existe para ponerla por escrito y leerla frente a la
+orientación del anexo C. `MultipleShockResult.report()` escribe una hoja de
+evaluación del riesgo para la salud en PDF de una página: la línea de base
+normativa (respuesta espinal de la cláusula 5 y modelo de riesgo del anexo C),
+una cabecera de metadatos opcional (cliente, sujeto, puesto de trabajo/vehículo,
+instrumentación, calibración), la rejilla del escenario de exposición (sexo del
+sujeto, la edad $b$ al inicio de la exposición, el número de años de exposición
+$n$, el número de días de exposición por año $N$ y el número de choques de
+respuesta contabilizados) y la tabla de análisis de dosis y tensión con la dosis
+de aceleración $D_z$ (Fórmula 3), la dosis diaria $D_{zd}$ (Fórmula 4), la
+tensión compresiva diaria $S_d$ (Fórmula C.1), la variable de tensión acumulada
+$R$ (Fórmula C.3) y la probabilidad de lesión lumbar $\Pi$ (Fórmula C.5).
+
+Como la ISO 2631-5:2018 no define ningún límite de exposición, la ficha lleva
+una **fila de zona** de banda de riesgo en lugar de un veredicto CUMPLE/NO
+CUMPLE: el $R$ y el $\Pi$ recuadrados nombran la clasificación del riesgo del
+anexo C, y una tabla de clasificación sitúa $R$ entre las variables de tensión
+de la Tabla C.2 para un riesgo de lesión del $10$ / $50$ / $90$ %
+(probabilidad baja / moderada / alta / muy alta de un efecto adverso para la
+salud), con la curva de probabilidad de lesión encima. `language="es"`
+representa la ficha en español (decimales con coma).
+
+El argumento `metadata` acepta un `ReportMetadata` cuyos campos relevantes para
+un informe de choques múltiples son `client`, `specimen` (el sujeto),
+`test_room` (el puesto de trabajo o vehículo), `test_date`, `instrumentation`,
+`calibration` y la identidad de pie `laboratory`, `operator`, `report_id` y
+`notes`.
+
+```python
+import numpy as np
+from phonometry import vibration, ReportMetadata
+
+# El ejemplo resuelto del anexo C: cinco choques de respuesta espinal de
+# 40 m/s2 al día, hombre de 82 kg, expuesto desde los 20 años durante 20 años a
+# 120 días/año. El registro se reconstruye a partir de esos picos de respuesta
+# (la norma plantea el ejemplo en términos de los picos), de modo que la ficha
+# imprime los valores publicados del anexo C.
+peaks = np.array([40.0] * 5)
+dz = vibration.dose_from_peaks(peaks)
+sd = vibration.compression_dose(dz)
+r = vibration.injury_risk(sd, start_age=20, years=20, days_per_year=120)
+result = vibration.MultipleShockResult(
+    sex="male",
+    acceleration_dose=dz,
+    daily_dose=dz,
+    compression_dose=sd,
+    risk=r,
+    probability=float(vibration.injury_probability(r)),
+    start_age=20.0,
+    years=20,
+    days_per_year=120.0,
+    peaks=peaks,
+    risk_thresholds=vibration.RISK_THRESHOLDS_MALE,
+)
+
+result.report(
+    "multiple_shock.pdf",
+    metadata=ReportMetadata(
+        client="Operador de transporte de ejemplo",
+        specimen="Operador varón de 82 kg (sentado)",
+        test_room="Vehículo todoterreno, asiento del conductor",
+        report_id="EXAMPLE-2631-5",
+    ),
+    language="es",
+)   # R = 1,22, Pi = 37 % -> probabilidad moderada de un efecto adverso para la salud
+```
+
+La ficha de ejemplo se regenera con `make reports` y se mantiene representada en
+el repositorio; pulsa la vista previa para abrir el PDF.
+
+<ReportPreview
+	name="iso2631_5_multiple_shock_example"
+	title="Informe de ejemplo de riesgo para la salud por choques múltiples de cuerpo completo (PDF)"
+	description="Ficha de evaluación del riesgo para la salud por choques múltiples de cuerpo completo de una página: una cabecera con el operador de transporte, el sujeto y el vehículo todoterreno, la rejilla del escenario de exposición (hombre de 82 kg, edad 20, 20 años, 120 días por año, cinco choques contabilizados), la tabla de análisis de dosis y tensión con la dosis de aceleración Dz = 55,97 m/s2, la tensión compresiva diaria Sd = 1,62 MPa, la variable de tensión acumulada R = 1,22 y la probabilidad de lesión lumbar 37 por ciento, la curva de probabilidad de lesión con los niveles de riesgo de la Tabla C.2 y esta evaluación marcada, el R = 1,22 y el 37 por ciento recuadrados clasificados como probabilidad moderada de un efecto adverso para la salud, y la tabla de clasificación del anexo C donde la banda moderada (riesgo de lesión del 10 al 50 por ciento) es la banda de la evaluación."
+	caption="Ficha de riesgo para la salud por choques múltiples (MultipleShockResult.report), el ejemplo resuelto del anexo C de la ISO 2631-5:2018 con el análisis de dosis y tensión y la clasificación del riesgo de la Tabla C.2."
+/>
+
+## Véase también
+
+- Referencia de la API: [`vibration.human.multiple_shock`](/phonometry/es/reference/api/vibration/multiple-shock/).

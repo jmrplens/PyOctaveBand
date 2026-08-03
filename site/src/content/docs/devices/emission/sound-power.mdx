@@ -1,0 +1,320 @@
+---
+title: "Sound Power"
+description: "The sound power level LW as the device-independent emission descriptor: choosing among the five standardised determination routes (ISO 3744/3746, ISO 3741, ISO 9614-2, ISO 3745, ISO 9614-3), what the accuracy grades promise, and the ISO 4871 noise-emission declaration with its dual- and single-number forms and verification."
+references:
+  - type: book
+    authors: ["Beranek, L. L.", "Mellow, T. J."]
+    year: 2012
+    title: "Acoustics: Sound fields and transducers"
+    publisher: "Academic Press"
+    doi: "10.1016/C2011-0-05897-0"
+    note: "ISBN 978-0-12-391421-7. Radiation and sound fields: the free-field and diffuse-field relations between pressure and power that the whole method family rests on."
+  - type: standard
+    organization: "International Organization for Standardization"
+    year: 2019
+    title: "Acoustics — Determination of sound power levels of noise sources — Guidelines for the use of basic standards"
+    designation: "ISO 3740:2019"
+    url: "https://www.iso.org/standard/45107.html"
+    note: "The selection guide behind 'Choosing a method': grades, environments, source-size and background criteria for the whole family."
+  - type: standard
+    organization: "International Organization for Standardization"
+    year: 1996
+    title: "Acoustics — Declaration and verification of noise emission values of machinery and equipment"
+    designation: "ISO 4871:1996"
+    url: "https://www.iso.org/standard/10868.html"
+    note: "The declaration section: the dual/single-number forms, L_WAd = L_WA + K_WA (clause 3.15) and the clause 6.2 verification."
+---
+
+import Video from '../../../../components/Video.astro';
+import ThemeImage from '../../../../components/ThemeImage.astro';
+import ReportPreview from '../../../../components/ReportPreview.astro';
+
+Sound *pressure* depends on where you stand and on the room you stand in;
+sound **power** does not. The sound power level $L_W$ is the total acoustic
+energy per second a source radiates, referenced to $P_0 = 1\ \text{pW}$, and it is
+the device-independent **emission** descriptor that goes on a datasheet,
+feeds a room prediction (EN 12354) or is checked against a noise-emission
+limit. phonometry implements five standardised routes to it, split across
+three method guides: an enveloping *pressure* surface in the field
+(ISO 3744/3746) and the precision grade in an *anechoic room* (ISO 3745),
+covered in
+[Sound Power by Pressure Methods](/phonometry/devices/emission/sound-power-pressure/);
+the diffuse field of a *reverberation room* (ISO 3741), covered in
+[Sound Power in the Reverberation Room](/phonometry/devices/emission/sound-power-reverberation/);
+and *intensity* scanning over a surface (ISO 9614-2), with its precision
+counterpart (ISO 9614-3), covered in
+[Sound Power by Intensity Scanning](/phonometry/devices/emission/sound-power-intensity/).
+This page is the front door: how to choose among them, what the accuracy
+grades actually promise, and how a measured $L_W$ becomes the ISO 4871
+noise-emission declaration a datasheet prints.
+
+<Video
+  name="anim_power_two_rooms"
+  width={2400}
+  height={1350}
+  title="Same source, two rooms, one sound power"
+  description="The same source in an anechoic room and in a reverberation room produces different microphone pressures, and the free-field and diffuse-field formulas converge to the same sound power level L_W."
+/>
+
+## Choosing a method
+
+All deliver the same quantity, a per-band $L_W$ and an A-weighted total
+$L_{WA}$, but under different environments, accuracy grades and practical
+constraints.
+
+| Method | Standard | Measured quantity | Environment | Accuracy grade | Use when |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| Enveloping surface | **ISO 3744** (engineering) / **ISO 3746** (survey) | Sound pressure on a hemisphere or box | Essentially free field over one or more reflecting planes | Grade 2 ($\sigma_{R0} \approx 1.5\ \text{dB}$) / grade 3 ($\approx 3.0\ \text{dB}$) | In situ or a large room; no special test facility available |
+| Reverberation room | **ISO 3741** | Sound pressure in the diffuse field | Qualified hard-walled reverberation room | Grade 1 (precision) | Highest accuracy for steady, broadband sources in a lab |
+| Intensity scanning | **ISO 9614-2** | Normal sound intensity scanned over a surface | Almost any, tolerant of steady extraneous noise | Grade 2 / 3 (from per-band field indicators) | On-site with background noise, or one machine among many |
+| Anechoic room | **ISO 3745** | Sound pressure on a fixed microphone array | Qualified anechoic or hemi-anechoic room | Grade 1 (precision) | Reference-grade emission in a free-field laboratory |
+| Precision intensity scanning | **ISO 9614-3** | Scanned normal intensity, tighter criteria | Almost any, tolerant of steady extraneous noise | Grade 1 (precision) | Precision on-site, with the ISO 9614-3 field-indicator checks |
+
+The pressure methods correct the surface level for the room ($K_2$) and for
+background noise ($K_1$); the reverberation method needs a *qualified* room
+but reaches precision grade; intensity rejects steady background energy at
+the cost of a two-microphone probe and a per-band validity check. Each
+method guide walks its routes in turn.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sound_power_methods.svg" alt="The three sound power routes side by side: an enveloping pressure surface over a reflecting plane (ISO 3744/3746), a source in a reverberation room sampled by microphones (ISO 3741) and an intensity probe scanning a surface around the source (ISO 9614-2)" width="92%" loading="eager" />
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import emission
+
+# One steady source (octave-band LW below) determined by three routes.
+freqs = np.array([125.0, 250.0, 500.0, 1000.0, 2000.0, 4000.0])
+lw_true = np.array([85.0, 88.0, 90.0, 89.0, 86.0, 82.0])
+
+# ISO 3744: SPL at 10 positions on a hemisphere, r = 2 m (10 lg(S/S0) = 14 dB).
+pres = emission.sound_power_pressure(np.tile(lw_true - 14.0, (10, 1)),
+                                     "hemisphere", radius=2.0,
+                                     frequencies=freqs)
+# ISO 9614-2: uniform normal intensity scanned over six 0.5 m2 segments.
+i_n = np.tile(10.0 ** (lw_true / 10.0) * 1e-12 / 3.0, (6, 1))
+inten = emission.sound_power_intensity(i_n, np.full(6, 0.5),
+                                       frequencies=freqs, band_type="octave")
+# ISO 3741: comparison against a reference source of known LW = 84 dB per band.
+comp = emission.sound_power_comparison(lw_true - 20.0, np.full(6, 64.0),
+                                       np.full(6, 84.0), frequencies=freqs)
+
+fig, ax = plt.subplots()
+for res, style, ms, label in ((pres, "-o", 11, "pressure (ISO 3744)"),
+                              (inten, "--s", 8, "intensity (ISO 9614-2)"),
+                              (comp, ":^", 5, "reference source (ISO 3741)")):
+    ax.semilogx(freqs, res.sound_power_level, style, markersize=ms,
+                label=f"{label}: LWA = {res.sound_power_level_a:.1f} dB")
+ax.set(xlabel="Frequency [Hz]", ylabel="Sound power level LW [dB]")
+ax.legend()
+plt.show()
+```
+
+</details>
+
+### A decision path
+
+The table compresses into a short sequence of questions (ISO 3740 dedicates
+its Table 3 and Annex D to exactly this decision). Work through them in
+order; the first match names the standard.
+
+1. **What is the number for?** A datasheet declaration or a limit check
+   normally asks for engineering grade (grade 2, the preferred grade for
+   noise declarations); a reference source, a product ranking or a dispute
+   calls for precision (grade 1); a first walk-through of a noisy plant
+   tolerates survey grade (grade 3). Grade 1 exists only in a qualified
+   laboratory room (ISO 3741, ISO 3745) or via the precision intensity
+   methods (ISO 9614-1 at discrete points, ISO 9614-3 by scanning).
+2. **Can the source travel to a laboratory?** ISO 3741 wants the source
+   small next to the room (volume no more than about 2 % of the room volume)
+   and its noise steady; ISO 3745 wants it inside a qualified anechoic or
+   hemi-anechoic room with a characteristic dimension below half the
+   measurement radius, and it is the route that also yields directivity. A
+   machine bolted to its foundation rules both out and leaves the in-situ
+   methods.
+3. **How quiet and how dry is the site?** ISO 3744 needs the background at
+   least 6 dB below the source (preferably more than 15 dB) and
+   $K_2 \le 4\ \text{dB}$. If only a
+   3 dB margin or $K_2 \le 7\ \text{dB}$ can be met, the same microphones and formulae
+   degrade gracefully to ISO 3746 at survey grade.
+4. **Is the background the problem?** When neighbouring machines cannot be
+   switched off, or the margin is outright negative, the pressure methods
+   are out. Intensity scanning (ISO 9614-2, or ISO 9614-3 for grade 1)
+   tolerates steady extraneous noise even some 10 dB *above* the source,
+   because only the net energy flux through the surface counts; the
+   per-band field indicators then decide the grade actually achieved.
+
+### What the accuracy grades mean
+
+The grade is a claim about **reproducibility**: $\sigma_{R0}$ is the standard
+deviation you would see if different laboratories measured the same source,
+each following the standard correctly. Typical A-weighted values are
+$\sigma_{R0} \approx 0.5\ \text{dB}$ for grade 1 (ISO 3741), 1.5 dB for grade 2 (ISO 3744,
+ISO 9614-2) and 3 dB or more for grade 3 (larger still when $K_2$ is
+large or the spectrum is tonal). Per-band values are larger at the
+spectrum edges. The `uncertainty` field of the pressure-method results
+(enveloping surface and anechoic) is the expanded uncertainty
+$U = 2\sigma_\text{tot}$ (95 % coverage), where
+$\sigma_\text{tot} = \sqrt{\sigma_{R0}^2 + \sigma_\text{omc}^2}$ also folds
+in the operating/mounting instability
+$\sigma_\text{omc}$ that you estimate and pass in; the grade only bounds the method's
+share of the budget.
+
+In practice: a grade-2 $L_{WA}$ of 92.4 dB carries $U \approx 3\ \text{dB}$, so two grade-2
+results 2 dB apart are statistically indistinguishable, and checking that
+same source against a 93 dB limit is a coin flip. Choose the grade from the
+decision the number has to support, not from the facility that happens to
+be free.
+
+## Declaring the noise emission (ISO 4871)
+
+A measured sound power level is not yet a *declaration*. ISO 4871:1996 is the
+standard for the noise-emission declaration a manufacturer prints in technical
+documents: which quantities are stated, in which form, and how a declared value
+is verified. The preferred quantity is the A-weighted sound power level
+$L_{WA}$, optionally accompanied by the A-weighted emission sound pressure level
+$L_{pA}$ at a work station.
+
+A declaration takes one of two alternative forms (clause 4):
+
+- the **dual-number** form (clause 3.16): the measured value $L_{WA}$ and its
+  uncertainty $K_{WA}$ stated together but separately; and
+- the **single-number** form (clause 3.15): the derived declared value
+  $L_{WAd} = L_{WA} + K_{WA}$, an upper limit that repeated measurements are unlikely
+  to exceed at the stated confidence level.
+
+$K_{WA}$ combines the measurement (reproducibility) and, for a batch, the
+production spread; for a single machine $K = 1.645\,\sigma_R$ (Annex A.2.2). A
+[`NoiseEmissionDeclaration`](/phonometry/reference/api/power/sound-power/)
+holds one or more per-operating-mode declarations and renders the ISO 4871
+fiche through `.report()`. The quickest route is to `declare()` straight from a
+measured sound power:
+
+```python
+import numpy as np
+import phonometry as ph
+from phonometry import ReportMetadata
+
+# ... a measured LWA from ISO 3744 ...
+result = ph.sound_power_pressure(levels, "hemisphere", radius=1.0,
+                                 frequencies=freqs)
+
+declaration = result.declare(
+    uncertainty=2.0,                 # K_WA in dB (defaults to the expanded U)
+    machine="Type 990, Model 11-TC",
+    operating_conditions="50 Hz, 230 V, rated load",
+    basic_standards="ISO 3744",
+    verification_level=result.sound_power_level_a,  # L_1 for clause 6.2
+)
+declaration.report(
+    "iso4871.pdf",
+    metadata=ReportMetadata(measurement_standard="ISO 3744"),
+)   # -> L_WAd = L_WA + K_WA, verified when L_1 <= L_WAd
+```
+
+Or build the declaration directly, reproducing the ISO 4871 Annex B example
+(two operating modes, $L_{WA} = 88$ and 95 dB with $K_{WA} = 2$ dB, giving
+declared $L_{WAd} = 90$ and 97 dB):
+
+```python
+mode1 = ph.OperatingModeDeclaration(
+    "Operating mode 1", sound_power_level=88.0, sound_power_uncertainty=2.0,
+    emission_pressure_level=78.0, emission_pressure_uncertainty=2.0,
+    verification_level=89.0,          # passes: 89 <= 90
+)
+mode2 = ph.OperatingModeDeclaration(
+    "Operating mode 2", sound_power_level=95.0, sound_power_uncertainty=2.0,
+    emission_pressure_level=86.0, emission_pressure_uncertainty=2.0,
+    verification_level=98.0,          # fails: 98 > 97
+)
+ph.NoiseEmissionDeclaration(
+    (mode1, mode2), machine="Type 990, Model 11-TC",
+    basic_standards=("ISO 3744", "ISO 11202"), form="dual-number",
+).report("iso4871.pdf")
+```
+
+The example fiche is regenerated with `make reports` and kept rendered in the
+repository; click the preview to open the PDF.
+
+<ReportPreview
+	name="iso4871_declaration_example"
+	title="ISO 4871 noise emission declaration example report (PDF)"
+	description="One-page ISO 4871 noise-emission declaration fiche: a header with the machine identification and operating conditions, the declared dual-number table across two operating-mode columns listing the measured A-weighted sound power level L_WA, its uncertainty K_WA, the emission sound pressure level L_pA and the derived declared value L_WAd = L_WA + K_WA (90 and 97 dB), the noise-test-code and basic-standards footnote, and a clause 6.2 verification table where mode 1 passes and mode 2 fails."
+	caption="Noise emission declaration fiche (NoiseEmissionDeclaration.report), the ISO 4871 Annex B dual-number table with the declared L_WAd = L_WA + K_WA and the clause 6.2 verification verdict."
+/>
+
+
+## What this guide covers
+
+**Covered.** The ISO 3740 decision guidance condensed into the method table
+and the decision path, what the accuracy grades claim about
+reproducibility, and the ISO 4871 noise-emission declaration
+(`NoiseEmissionDeclaration`, `OperatingModeDeclaration`, `declare()`): the
+dual- and single-number forms, $L_{WAd} = L_{WA} + K_{WA}$ and the clause 6.2
+verification, rendered as the declaration fiche through `.report()`.
+
+**Not covered.** The five determinations themselves live in their method
+guides: the enveloping surface and the anechoic array in
+[Sound Power by Pressure Methods](/phonometry/devices/emission/sound-power-pressure/),
+the diffuse-field method in
+[Sound Power in the Reverberation Room](/phonometry/devices/emission/sound-power-reverberation/)
+and both scanning methods in
+[Sound Power by Intensity Scanning](/phonometry/devices/emission/sound-power-intensity/).
+ISO 4871's batch statistics beyond the single-machine
+$K = 1.645\,\sigma_R$ case (Annex A.2.2) are stated, not derived.
+
+## See also
+
+- [Sound Power by Pressure Methods (ISO 3744 / ISO 3746 / ISO 3745)](/phonometry/devices/emission/sound-power-pressure/):
+  the enveloping surface with its $K_1$/$K_2$ corrections, and the precision
+  anechoic array.
+- [Sound Power in the Reverberation Room (ISO 3741)](/phonometry/devices/emission/sound-power-reverberation/):
+  the precision diffuse-field method with the Waterhouse and meteorological
+  corrections.
+- [Sound Power by Intensity Scanning (ISO 9614-2 / ISO 9614-3)](/phonometry/devices/emission/sound-power-intensity/):
+  the routes that tolerate steady background noise, qualified by their field
+  indicators.
+- [Sound Intensity (p-p)](/phonometry/devices/emission/intensity/): the two-microphone
+  probe behind the scanning methods.
+- [Room Acoustics](/phonometry/buildings/rooms/room-acoustics/): the reverberation
+  time and equivalent absorption area that feed the room corrections.
+- [Predicting Sound Insulation (EN 12354)](/phonometry/buildings/design/insulation-prediction/): the
+  airborne and impact insulation ratings and the EN 12354 emission predictions
+  that consume a source $L_W$.
+- [Levels](/phonometry/signal/levels/levels/): energy averaging and the A-weighting behind $L_{WA}$.
+- [Theory](/phonometry/reference/theory/environment-transport/): the Waterhouse, $K_1$/$K_2$ and $C_1$/$C_2$ derivations.
+- API reference: [`emission.sound_power`](/phonometry/reference/api/power/sound-power/), [`emission.sound_power_reverberation`](/phonometry/reference/api/power/sound-power-reverberation/) and [`emission.sound_power_intensity`](/phonometry/reference/api/power/sound-power-intensity/).
+
+## Quick answers
+
+### What is the difference between sound power and sound pressure?
+
+Sound pressure depends on where you stand and on the room; sound power does
+not. The sound power level $L_W$ is the total acoustic energy per second a
+source radiates, referenced to $P_0 = 1\ \text{pW}$, and it is the device-independent
+emission descriptor that goes on a datasheet or is checked against a
+noise-emission limit; ISO 3744, ISO 3741, ISO 9614-2, ISO 3745 and
+ISO 9614-3 all determine it.
+
+### What do the accuracy grades in sound power measurement mean?
+
+The grade is a claim about reproducibility: $\sigma_{R0}$ is the standard deviation
+you would see if different laboratories measured the same source, each
+following the standard correctly. Typical A-weighted values are
+$\sigma_{R0} \approx 0.5\ \text{dB}$ for grade 1 (ISO 3741), 1.5 dB for grade 2 (ISO 3744,
+ISO 9614-2) and 3 dB or more for grade 3. A grade-2 $L_{WA}$ carries
+$U \approx 3\ \text{dB}$, so two grade-2 results 2 dB apart are statistically
+indistinguishable.
+
+### How do I measure sound power when background noise cannot be switched off?
+
+Use intensity scanning: ISO 9614-2 (grade 2 or 3) or ISO 9614-3 (grade 1,
+precision). Because sound intensity is the net energy flux through the
+measurement surface, steady extraneous noise even some 10 dB above the
+source is tolerated, whereas the ISO 3744 pressure method needs the
+background at least 6 dB below the source. The per-band field indicators
+then decide the grade actually achieved.
+

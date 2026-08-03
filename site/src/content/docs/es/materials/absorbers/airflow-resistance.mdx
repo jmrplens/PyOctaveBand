@@ -1,0 +1,312 @@
+---
+title: "Resistencia al flujo de aire"
+description: "Determinar la resistencia al flujo de aire, la resistencia específica y la resistividad de materiales porosos por el método estático de ISO 9053-1 y el método alterno de ISO 9053-2, con la ficha de ensayo de estilo acreditado y el papel de la resistividad como ancla de los modelos de absorbente poroso."
+references:
+  - type: book
+    authors: ["Allard, J. F.", "Atalla, N."]
+    year: 2009
+    title: "Propagation of sound in porous media: Modelling sound absorbing materials"
+    edition: "2.ª ed."
+    publisher: "Wiley"
+    doi: "10.1002/9780470747339"
+    note: "La teoría del material poroso que consume la resistividad medida: la disipación viscosa y térmica en los poros, y los modelos de fluido equivalente de la sección 4. ISBN 978-0-470-74661-5."
+  - type: standard
+    organization: "International Organization for Standardization"
+    year: 2018
+    title: "Acoustics — Determination of airflow resistance — Part 1: Static airflow method"
+    designation: "ISO 9053-1:2018"
+    url: "https://www.iso.org/standard/69869.html"
+    note: "El método estático de la sección 2, con la regresión por el origen y la velocidad de referencia de 0,5 mm/s."
+  - type: standard
+    organization: "International Organization for Standardization"
+    year: 2020
+    title: "Acoustics — Determination of airflow resistance — Part 2: Alternating airflow method"
+    designation: "ISO 9053-2:2020"
+    url: "https://www.iso.org/standard/76744.html"
+    note: "El método alterno de la sección 3, con la relación efectiva de calores específicos del Anexo A, validado frente al ejemplo resuelto del propio Anexo A.3 de la norma."
+---
+
+import ThemeImage from '../../../../../components/ThemeImage.astro';
+import ReportPreview from '../../../../../components/ReportPreview.astro';
+
+Empuja aire despacio a través de un absorbente poroso y el material devuelve
+el empuje. Ese arrastre viscoso, ejercido por las paredes de los poros sobre
+el aire que las atraviesa, es el número más informativo que tiene un material
+poroso: fija cuánto sonido disipa el material a baja frecuencia, es la
+primera entrada de todos los modelos de fluido equivalente y se mide con poco
+más que una bomba y un manómetro. ISO 9053 normaliza la medida por partida
+doble: el **método estático** de la parte 1 hace pasar un flujo laminar
+estacionario por la probeta y lee la caída de presión, y el **método
+alterno** de la parte 2 sustituye el flujo estacionario por un pistón a 2 Hz
+para poder medir acústicamente probetas demasiado permeables o delicadas para
+una lectura estática estable. Esta guía cubre las tres magnitudes y sus
+unidades, ambos métodos, la ficha de ensayo de estilo acreditado y qué
+alimenta después la resistividad medida.
+
+## 1. Las tres magnitudes (ISO 9053)
+
+La resistencia al flujo de aire cuantifica con qué fuerza un material poroso se
+opone a un flujo estacionario o lentamente oscilante. Ambas partes comparten las
+mismas tres magnitudes y unidades (ISO 9053-1:2018, cláusula 3):
+
+$$
+R = \frac{\Delta p}{q_v}\ \left[\text{Pa·s/m}^3\right], \qquad
+R_s = R\,A\ \left[\text{Pa·s/m}\right], \qquad
+\sigma = \frac{R_s}{d}\ \left[\text{Pa·s/m}^2\right],
+$$
+
+con $\Delta p$ la diferencia de presión a través de la probeta, $q_v$ el flujo
+volumétrico, $A$ la sección transversal y $d$ el espesor. Nótese que la
+resistencia específica al flujo de aire $R_s$ está en **Pa·s/m** (no Pa·s/m²); la
+resistividad al flujo de aire $\sigma$ es $R_s$ por metro de espesor.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_airflow_resistance_es.svg" alt="Bancos de medición de la resistencia al flujo de aire: el método estático de ISO 9053-1 con una probeta en un portamuestras, un flujo laminar estacionario q_v y un manómetro diferencial que lee la caída de presión; y el método alterno de ISO 9053-2 con un pistón oscilante que acciona una cavidad terminada por la probeta o por un tapón hermético, y un micrófono que lee el nivel de la cavidad" width="92%" />
+
+
+## 2. Método estático (ISO 9053-1)
+
+En el método estático (ISO 9053-1:2018) un flujo laminar estacionario se aumenta
+por escalones y la diferencia de presión se traza frente a la velocidad lineal
+$u = q_v/A$. Se ajusta una regresión de al menos segundo orden **forzada a pasar
+por el origen**, $\Delta p = a\,u + b\,u^2$, y $\Delta p$ y $R_s$ se leen a la
+velocidad de referencia $u = 0{,}5\ \text{mm/s}$ (cláusula 7.5); la velocidad más
+alta no debe superar los 15 mm/s. Como $R_s = \Delta p/u = a + b\,u$, el término
+lineal $a$ es la resistencia específica al flujo de aire a velocidad nula.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/airflow_resistance_es.svg" alt="Resistencia al flujo de aire por el método estático de ISO 9053-1: la caída de presión medida frente a la velocidad lineal del flujo, ajustada con una cuadrática que pasa por el origen, con la resistencia específica al flujo de aire evaluada a la velocidad de referencia de 0,5 mm/s" width="80%" />
+
+*La caída de presión, ligeramente superlineal, se ajusta pasando por el origen;
+la resistencia específica al flujo de aire es el ajuste leído a 0,5 mm/s.*
+
+<details>
+<summary>Mostrar el código de esta figura</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import materials
+
+area = np.pi * 0.05**2                      # celda de 100 mm de diámetro [m^2]
+u = np.array([0.5, 1, 2, 4, 8, 12]) * 1e-3  # velocidad lineal [m/s]
+dp = 1.6e4 * u + 4.0e5 * u**2               # caída de presión medida [Pa]
+r = materials.static_airflow_resistance(u, dp, area=area, thickness=0.05)
+
+u_fit = np.linspace(0.0, 13e-3, 200)
+dp_fit = r.linear_coefficient * u_fit + r.quadratic_coefficient * u_fit**2
+fig, ax = plt.subplots()
+ax.plot(u_fit * 1e3, dp_fit, label="Ajuste por el origen  dp = a u + b u^2")
+ax.plot(u * 1e3, dp, "o", label="Caída de presión medida")
+ax.plot(r.evaluation_velocity * 1e3, r.pressure_drop, "D",
+        label="Evaluación a 0.5 mm/s")
+ax.set_xlabel("Velocidad lineal del flujo u [mm/s]")
+ax.set_ylabel("Caída de presión dp [Pa]")
+ax.set_title(f"R_s = {r.specific_resistance:.0f} Pa·s/m")
+ax.legend()
+plt.show()
+```
+
+</details>
+
+```python
+import numpy as np
+from phonometry import materials
+
+area = np.pi * 0.05**2            # celda de 100 mm de diámetro [m^2]
+u = np.array([0.5, 1, 2, 4, 8, 12]) * 1e-3      # velocidad lineal [m/s]
+dp = 1.6e4 * u + 4.0e5 * u**2                    # caída de presión medida [Pa]
+
+r = materials.static_airflow_resistance(u, dp, area=area, thickness=0.05)
+print(round(r.specific_resistance))   # 16200   R_s [Pa*s/m]
+print(round(r.resistivity))           # 324000  sigma [Pa*s/m^2]
+print(round(r.linear_coefficient))    # 16000   a = R_s cuando u -> 0
+r.plot()   # la figura de arriba: dp(u) ajustada con el punto de evaluación
+```
+
+
+### Informe de ISO 9053-1 (`.report()`)
+
+`StaticAirflowResult.report(path)` genera una ficha PDF de una página con el
+formato de un informe de ensayo de resistencia al flujo de aire acreditado
+(ISO 9053-1:2018, método estático): una línea de norma de base, un bloque de
+cabecera de metadatos opcional, un cuerpo de dos paneles con una tabla de
+resultados (la velocidad de evaluación, la diferencia de presión ajustada, la
+resistencia al flujo de aire $R$, la resistencia específica al flujo de aire
+$R_s$, la resistividad al flujo de aire $\sigma$ cuando hay espesor disponible,
+y los coeficientes del ajuste por el origen $a$ y $b$) junto a la curva ajustada
+$\Delta p(u)$ (el propio `.plot()` del resultado), la resistencia específica al
+flujo de aire $R_s$ en un recuadro con $R$ y $\sigma$ al lado, y un pie con el
+descargo de responsabilidad fijo. La ISO 9053-1 es una caracterización del
+material, por lo que la ficha no lleva veredicto de conformidad.
+
+Usa el mismo contenedor `ReportMetadata` y el mismo motor de renderizado que las
+demás fichas. Los campos descriptivos que aplican aquí son `client`,
+`manufacturer`, `specimen`, `thickness` (el espesor de la probeta $d$, en metros,
+mostrado en milímetros), `test_room`, `test_date`, `temperature`,
+`relative_humidity`, `measurement_standard`, `laboratory`, `operator`,
+`report_id` y `notes`. El campo `requirement` se ignora (la ISO 9053-1 no tiene
+veredicto). La ficha incrusta la curva ajustada, por lo que la generación
+necesita tanto reportlab como matplotlib
+(`pip install "phonometry[report,plot]"`); solo se admite `engine="reportlab"`.
+La ficha se genera en inglés por defecto; pasa `language="es"` para una ficha en
+español (cadenas fijas traducidas y coma como separador decimal).
+
+```python
+from phonometry import materials, ReportMetadata
+
+r = materials.static_airflow_resistance(u, dp, area=area, thickness=0.05)
+r.report(
+    "airflow_fiche.pdf",
+    metadata=ReportMetadata(
+        specimen="50 mm porous absorber (open-cell)",
+        thickness=0.050,
+        measurement_standard="ISO 9053-1",
+        test_room="Static airflow rig, 100 mm cell",
+        laboratory="Phonometry Reference Laboratory",
+    ),
+)                                  # R_s, R y sigma a u = 0.5 mm/s
+```
+
+<ReportPreview
+	name="iso9053_airflow_resistance_example"
+	title="Informe de ejemplo de resistencia al flujo de aire (ISO 9053-1, PDF)"
+	description="Ficha de una página de resistencia al flujo de aire por el método estático: una cabecera de metadatos (cliente, fabricante, probeta, espesor de la probeta, instalación de ensayo, temperatura y humedad), una tabla de resultados con la velocidad de evaluación, la diferencia de presión ajustada, la resistencia al flujo de aire R, la resistencia específica al flujo de aire R_s, la resistividad al flujo de aire sigma y los coeficientes del ajuste por el origen a y b junto a la curva ajustada de caída de presión, y la resistencia específica al flujo de aire R_s en un recuadro con R y sigma al lado, evaluadas a la velocidad de referencia de 0,5 mm/s."
+	caption="Ficha de resistencia al flujo de aire por el método estático (StaticAirflowResult.report), R_s, R y sigma a 0,5 mm/s."
+/>
+
+
+## 3. Método alterno (ISO 9053-2)
+
+En el método alterno (ISO 9053-2:2020) un pistón que oscila a 1–4 Hz acciona un
+flujo alterno hacia una cavidad terminada por la probeta o por un tapón
+hermético; la resistencia se obtiene de la diferencia de nivel de presión acústica
+entre las dos terminaciones (Fórmula (2)):
+
+$$
+R = \frac{\kappa'\,P_S}{2\pi f\,V}\cdot\frac{h_t}{h_s}\cdot
+    10^{(L_{p,s} - L_{p,t})/20},
+$$
+
+donde $\kappa'$ es la razón **efectiva** de calores específicos. La conducción de
+calor entre el aire oscilante y las paredes de la cavidad hace que la compresión
+no sea plenamente adiabática; el Anexo A normativo corrige $\kappa$ a la baja
+hasta
+
+$$
+\kappa' = \frac{\kappa}{\sqrt{1 + (\kappa-1)\tfrac{S}{V}b
+          + \tfrac{1}{2}\big((\kappa-1)\tfrac{S}{V}b\big)^2}},
+\qquad b = \sqrt{\frac{2 c_0 l_h}{\omega}},\quad
+l_h = \frac{k_a}{\rho_0 c_0 C_P},
+$$
+
+con $S$ y $V$ la superficie y el volumen de la cavidad y $b$ el espesor de la
+capa límite térmica. Para la cavidad de ejemplo del Anexo A.3 esto da
+$\kappa' = 1{,}370$, cerca de un 2 % por debajo del adiabático 1,4008.
+
+```python
+from phonometry import materials
+
+# Cavidad del Anexo A.3: cilindro cerrado de 100 mm x 100 mm, pistón a 2 Hz
+kp = materials.effective_kappa(cavity_surface=0.0471, cavity_volume=7.854e-4, frequency=2.0)
+print(round(kp, 3))               # 1.37   razón efectiva de calores específicos
+
+R = materials.alternating_airflow_resistance(
+    level_specimen=74.0, level_termination=90.0,
+    piston_stroke_specimen=14e-3, piston_stroke_termination=1.4e-3,
+    frequency=2.0, cavity_volume=7.854e-4, kappa_prime=kp,
+)
+print(round(R))                   # 222956  resistencia al flujo de aire R [Pa*s/m^3]
+```
+
+Pasa el resultado de `effective_kappa` a `alternating_airflow_resistance` para
+una cifra conforme al Anexo A; en caso contrario, su argumento `kappa_prime`
+adopta por defecto el adiabático sin corregir 1,4. La llamada avisa (mediante
+`AirflowResistanceWarning`) cuando la frecuencia del pistón sale de 1–4 Hz o
+fallan los criterios de validez de las Fórmulas (3)/(4).
+
+
+## 4. Qué alimenta la resistividad
+
+La resistividad al flujo no es un fin en sí misma: casi todos los
+consumidores del número son **modelos de material poroso**. Las regresiones
+empíricas de Delany-Bazley y Miki predicen la impedancia característica y el
+número de onda complejos de un material poroso a partir de $\sigma$ *a
+solas*, mediante el cociente adimensional $X = \rho_0 f/\sigma$; el modelo
+físico de Johnson-Champoux-Allard conserva $\sigma$ como el primero de sus
+cinco parámetros. Ajustados una vez a una medida de tubo o de cámara
+reverberante, esos modelos predicen después la capa a cualquier espesor,
+respaldo o ángulo de incidencia. Toda la familia de modelos, y el solver
+multicapa que apila las capas, vive en
+[Absorbentes porosos y multicapa](/phonometry/es/materials/absorbers/porous-absorbers/);
+la ventana de validez de la regresión de Delany-Bazley ($0{,}01 < X < 1$) se
+enuncia allí en el mismo $X$ que define $\sigma$.
+
+Como $\sigma$ entra en los modelos como un cociente, su rango útil está
+acotado por los dos lados. Una capa con demasiado poca resistividad apenas se
+acopla al campo sonoro: el aire la atraviesa libremente y se disipa poca
+energía. Con demasiada resistividad la capa se comporta como una pared: la
+onda se refleja en la cara frontal antes de que los poros puedan absorberla.
+Entre ambos extremos queda la ventana de diseño clásica para la resistencia
+al flujo total de una capa de espesor $d$,
+
+$$
+\rho_0 c_0 \;\lesssim\; R_s = \sigma\,d \;\lesssim\; 4\,\rho_0 c_0,
+$$
+
+es decir, una resistencia específica al flujo de una a cuatro veces la
+impedancia característica del aire ($\rho_0 c_0 \approx 410$ Pa·s/m). Una
+manta de 50 mm quiere por tanto una resistividad de entre unos 8 kPa·s/m² y
+33 kPa·s/m², que es exactamente donde se agrupan los productos absorbentes
+comerciales.
+
+Órdenes de magnitud típicos, como orientación más que como diseño: las lanas
+de vidrio van desde unos pocos kPa·s/m² en calidades térmicas ligeras hasta
+algunas decenas de kPa·s/m² en paneles acústicos densos; las lanas de roca
+quedan algo más arriba a igual densidad; las espumas de celda abierta
+(melamina, poliuretano) abarcan aproximadamente de 5 kPa·s/m² a 30 kPa·s/m²;
+y los fieltros fibrosos y paneles comprimidos pueden superar los
+100 kPa·s/m², punto en el que actúan más como velos resistivos que como
+absorbentes de volumen. Dentro de una misma familia de producto la
+resistividad sube con fuerza con la densidad aparente y baja con el diámetro
+de fibra, razón por la que productos nominalmente idénticos de dos lotes de
+producción pueden diferir en decenas de por ciento, y por la que cualquier
+ajuste de modelo que vaya a fiarse cuantitativamente debe anclarse en una
+$\sigma$ medida, no en un valor de catálogo.
+
+El número también viaja más allá de los modelos porosos. Las impedancias del
+panel perforado y del microperforado contienen la misma física viscosa
+evaluada en un solo orificio; el
+[absorbedor de rendija](/phonometry/es/materials/absorbers/metamaterial-absorbers/) la hereda
+por rendija; y cuando una medida en
+[tubo de impedancia](/phonometry/es/materials/absorbers/impedance-tube/) discrepa de una
+predicción de modelo, el primer parámetro que conviene volver a medir, antes
+de tocar el modelo, es $\sigma$.
+
+## Qué cubre esta guía
+
+**Cubierto.** Las dos partes de ISO 9053: el método estático de la
+cláusula 7.5 (`static_airflow_resistance`, la regresión por el origen y la
+velocidad de evaluación de 0,5 mm/s) y el método alterno de la Fórmula (2) de
+ISO 9053-2 con la relación efectiva de calores específicos del Anexo A
+(`effective_kappa`, `alternating_airflow_resistance`), incluidos los avisos
+de validez de 1-4 Hz y de las Fórmulas (3)/(4), y la ficha de estilo
+acreditado de ISO 9053-1.
+
+**No cubierto.** Los modelos de fluido equivalente que consumen la
+resistividad (Delany-Bazley, Miki, Johnson-Champoux-Allard) viven en
+[Absorbentes porosos y multicapa](/phonometry/es/materials/absorbers/porous-absorbers/), y
+la ventana de diseño $\sigma d$ de la sección 4 es una guía de ingeniería, no
+parte de ninguna de las dos normas. ISO 9053-1 no define veredicto ni
+valoración de número único, así que la ficha no lleva ninguno de los dos.
+
+## Véase también
+
+- [Absorbentes porosos y multicapa](/phonometry/es/materials/absorbers/porous-absorbers/):
+  los modelos de Delany-Bazley, Miki y Johnson-Champoux-Allard que consumen
+  la resistividad, y el solver multicapa por matrices de transferencia.
+- [Tubo de impedancia](/phonometry/es/materials/absorbers/impedance-tube/): la medida a
+  incidencia normal contra la que suele ajustarse un modelo anclado en
+  $\sigma$.
+- [Medida y clasificación de la absorción sonora](/phonometry/es/materials/absorbers/absorption-measurement/):
+  la medición en cámara reverberante y la valoración ISO 11654 del absorbente
+  terminado.
+- Referencia de la API: [`materials.absorbers.airflow_resistance`](/phonometry/es/reference/api/materials/airflow-resistance/).

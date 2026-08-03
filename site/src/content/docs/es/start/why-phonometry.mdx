@@ -1,0 +1,203 @@
+---
+title: "Por qué phonometry"
+description: "La filosofía de diseño basada en conformidad: un caso de estudio de ponderación temporal IEC 61672-1, la batería numérica de conformidad y comparación con otras librerías."
+---
+
+import ThemeImage from '../../../../components/ThemeImage.astro';
+import { totalChecks, domains, standards } from '../../../../data/conformance-stats.mjs';
+
+phonometry es un conjunto de herramientas de medición acústica basado en
+normas. Su elemento diferenciador no es la lista de funcionalidades, sino cómo
+están construidas: cada métrica se implementa a partir del texto de la norma
+que la rige, y los valores de referencia y límites de aceptación de la propia
+norma se transcriben a la batería de tests y se exigen en CI. Esta página
+explica ese enfoque con un caso de estudio concreto (la ponderación temporal
+según **IEC 61672-1:2013**) y resume qué está verificado por conformidad hoy.
+El análisis de la ponderación temporal se publicó originalmente en la
+[incidencia #38](https://github.com/jmrplens/phonometry/issues/38).
+
+## Filosofía de diseño: un caso de estudio en ponderación temporal
+
+La ponderación temporal estándar se define como una **función continua del
+tiempo** mediante la ecuación diferencial
+
+$$
+\tau \frac{dy(t)}{dt} + y(t) = x^2(t)
+$$
+
+que corresponde a un filtro paso-bajo de primer orden estable con un polo en el
+semiplano izquierdo ($s = -1/\tau$).
+
+| | phonometry | python-acoustics |
+| :--- | :--- | :--- |
+| Salida | Envolvente continua con ponderación temporal (un valor por muestra) | Salida escalonada (un valor cada $\tau$ segundos) |
+| Unidades de entrada | Presión acústica cruda (Pa); se eleva al cuadrado internamente | Se espera la magnitud energética (Pa²) como entrada |
+| Filtro | Promediado exponencial estable (polo en $s=-1/\tau$) | Diseño teóricamente inestable (polo en el semiplano derecho) estabilizado reiniciando el estado cada $\tau$ segundos |
+| Comportamiento | Ponderación temporal IEC verdadera | Más cercano a un integrador por bloques ($L_{eq,\tau}$) |
+
+Un polo en el eje real negativo corresponde a una respuesta al impulso
+exponencial decreciente ($h(t) \propto e^{-t/\tau}$), exactamente lo que
+significa "ponderación temporal exponencial": los eventos pasados se olvidan
+exponencialmente. Un polo en el eje real positivo crece sin límite; el reinicio
+por bloques lo oculta, pero cambia la naturaleza de la medición.
+
+## Verificación frente a IEC 61672-1 (ráfagas de tono)
+
+La prueba rigurosa para la ponderación temporal es la **respuesta a ráfaga de
+tono** (IEC 61672-1, Tabla 4), usando una ráfaga senoidal de 4 kHz referida al
+nivel de régimen estacionario.
+
+**Resultados de phonometry (FAST):**
+
+| Duración de la ráfaga | Objetivo IEC (dB) | phonometry (dB) | Error (dB) | Estado |
+| :--- | :--- | :--- | :--- | :--- |
+| 200 ms | −1,0 | −0,98 | +0,02 | ✅ PASA |
+| 50 ms | −4,8 | −4,82 | −0,02 | ✅ PASA |
+| 10 ms | −11,1 | −11,14 | −0,04 | ✅ PASA |
+| 1 ms | −21,0 | −20,99 | +0,01 | ✅ PASA |
+
+**Resultados de python-acoustics (FAST, pasando la señal al cuadrado como
+requiere esa librería):**
+
+| Duración de la ráfaga | Objetivo IEC (dB) | python-acoustics (dB) | Error (dB) | Estado |
+| :--- | :--- | :--- | :--- | :--- |
+| 200 ms | −1,0 | −0,97 | +0,03 | ✅ PASA |
+| 50 ms | −4,8 | −3,93 | **+0,87** | ⚠️ FALLA |
+| 10 ms | −11,1 | −10,90 | +0,20 | ✅ PASA |
+| 1 ms | −21,0 | −20,90 | +0,10 | ✅ PASA |
+
+phonometry mantiene alta precisión en todos los casos. El enfoque por bloques
+se desvía significativamente (más de 0,8 dB) en la ráfaga de 50 ms porque los
+bloques de 125 ms no pueden resolver con precisión eventos transitorios cortos;
+el resultado depende de cómo se alinee la ráfaga con los límites de los
+bloques.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/tone_burst_iec_es.svg" alt="Respuestas de la envolvente Fast a ráfagas de 200, 50 y 10 ms alcanzando exactamente los valores de referencia de la Tabla 4 de IEC 61672-1" width="80%" loading="eager" />
+
+*Envolventes Fast medidas (azul) coincidiendo con los valores de referencia
+de la Tabla 4 (discontinua) dentro de 0,1 dB para ráfagas de 200/50/10 ms.*
+
+## Qué significa esto en la práctica
+
+- Si necesitas **envolventes Fast/Slow/Impulse conformes con la norma**
+  (comportamiento de sonómetro, un nivel por muestra), usa
+  [`time_weighting`](/phonometry/es/signal/levels/time-weighting/) de phonometry.
+- Si necesitas un **$L_{eq}$ promediado por bloques por intervalo**, esa es una
+  métrica distinta e igualmente válida; puedes calcularla con
+  [`leq`](/phonometry/es/signal/levels/levels/) sobre segmentos consecutivos.
+- Ambos enfoques son útiles; simplemente responden preguntas distintas. La
+  discrepancia reportada en la incidencia #38 proviene de comparar una
+  envolvente continua con un integrador por bloques, no de un error de
+  implementación.
+
+## Verificación por conformidad en toda la librería
+
+El caso de las ráfagas de tono de arriba no es una comprobación aislada. Para
+cada norma que la librería implementa, los valores de referencia y los límites
+de aceptación se transcriben del texto oficial a la batería de tests, de modo
+que cualquier regresión hace fallar la CI. Una muestra del núcleo de
+metrología:
+
+| Norma | Qué se verifica | Archivo de test |
+| :--- | :--- | :--- |
+| IEC 61672-1:2013 Tabla 3 | Ponderación A/C/Z en las 34 frecuencias nominales, límites de clase 1, a 48 y 96 kHz | `tests/filters/test_iec_weighting_table3.py` |
+| IEC 61672-1:2013 Tabla 4 | Respuestas F/S a ráfagas de tono (de 1 s a 1 ms) y la columna $L_{AE}$ para `sel()` | `tests/filters/test_iec_compliance.py` |
+| IEC 61672-1:2013 Tabla 5 | Respuestas de pico de un ciclo/medio ciclo de `lc_peak()`, límites de clase 1 | `tests/signals/test_levels.py` |
+| IEC 61260-1:2014 Tabla 1 | Límites de aceptación de clase 1/2 del banco de filtros mediante `verify_filter_class()` | `tests/filters/test_compliance.py` |
+| ISO 7196:1995 Tabla 2 | Ponderación G (infrasonidos) en todos los valores nominales de respuesta, 0,25–315 Hz | `tests/filters/test_g_weighting.py` |
+| ISO 226:2023 Tabla 1 y Anexo B | Líneas isofónicas y niveles de sonoridad frente a las tablas del Anexo B, umbral de audición frente a los parámetros $T_f$ de la Tabla 1 | `tests/psychoacoustics/loudness/test_contours.py` |
+| ECMA-418-1:2024 | Prominencia tonal TNR/PR: anchos de banda críticos, separación de proximidad y criterios de prominencia frente a los ejemplos resueltos de los apartados 10–12 | `tests/psychoacoustics/quality/test_tonality.py` |
+| ISO 1996-1:2016 | `lden()`, `ldn()` y `composite_rating_level()` frente a valores de las fórmulas calculados a mano | `tests/environment/assessment/test_rating.py` |
+| IEC 60942:2017 Tabla 2 | Límites de estabilidad a corto plazo del calibrador (dependientes de la frecuencia, clase 1) en `sensitivity()` | `tests/metrology/test_calibration_validation.py` |
+
+La misma disciplina se aplica mucho más allá del núcleo de metrología: hoy la
+batería ejecuta {totalChecks} comprobaciones numéricas de conformidad en {domains} dominios y
+{standards} normas, que abarcan la psicoacústica y la inteligibilidad del
+habla, la acústica de salas, edificación y materiales, la vibración humana y de
+máquinas, el ruido ambiental, el de aeronaves y helicópteros y el submarino, la
+electroacústica, la sonoridad de programa, el control de ruido industrial, el
+análisis espectral calibrado y el solver FDTD de ondas. El informe numérico
+completo (el valor esperado y el valor que calcula la librería para cada
+comprobación, regenerado en cada pull request) está publicado como
+[informe de conformidad](/phonometry/es/reference/conformance/).
+
+Más allá de la dosis de ruido al estilo IEC 61252 (`sound_exposure()`,
+`lex_8h()`), la misma mentalidad de "primero la norma" se refleja en la parte
+numérica: los bancos de filtros sitúan sus puntos de −3 dB en los bordes de
+banda de **ANSI S1.11 / IEC 61260-1** para todas las arquitecturas (incluidos
+Chebyshev II y Bessel, donde la parametrización cruda de scipy no lo haría),
+el banco Butterworth por defecto se verifica también frente a la clase 0, más
+estricta, de la edición retirada IEC 61260:1995 / ANSI S1.11-2004 además de
+frente a la clase 1 vigente, y la ponderación A/C se mantiene dentro de las
+tolerancias de clase 1 hasta 16 kHz a las frecuencias de muestreo habituales
+gracias al sobremuestreo interno (consulta
+[Ponderación frecuencial](/phonometry/es/signal/levels/weighting/)).
+
+## Cuando lo que está mal es la fuente
+
+Transcribir una norma en lugar de portar el código de otra persona tiene una
+consecuencia que solo aparece a gran escala: antes o después el valor
+recalculado y el impreso no coinciden, y a veces es el impreso el que no puede
+ser correcto. Un ejemplo resuelto que contradice su propio articulado, una
+constante a la que la composición tipográfica le comió un dígito, una
+referencia cruzada que apunta a la ecuación equivocada.
+
+Esos casos no se parchean en silencio. Cada caso confirmado queda registrado en
+las [erratas de las fuentes publicadas](/phonometry/es/reference/errata/) con
+la edición impresa y el punto exacto, lo que dice el documento, por qué no
+puede ser correcto, la evidencia independiente y la lectura que implementa la
+librería. Cuando esa lectura cambia algún número que la librería reporta, la
+entrada nombra la comprobación o el test que lo fija; cuando no lo cambia,
+porque el defecto es una etiqueta, una referencia cruzada o una tabla que la
+librería nunca lee, la entrada lo dice así. Ya son decenas, entre
+normas, documentos de guía, libros y artículos de revista, cada uno marcado
+como reportado al organismo emisor o no. Un defecto listado ahí nunca es un
+defecto del método: en todos los casos la lectura pretendida se ha podido
+establecer a partir del propio documento o de la física.
+
+Ese registro es la parte del enfoque más difícil de fingir. El código portado
+desde otra implementación hereda lo que la errata le hiciera hacer, y nada en
+él llega a notarlo nunca.
+
+## Dónde encaja phonometry en el ecosistema Python
+
+- **python-acoustics** se archivó en febrero de 2024 y ya no se mantiene. Su
+  comparación de arriba refleja el último código publicado.
+- **acoustic-toolbox**, el sucesor comunitario de python-acoustics, construye
+  sus ponderaciones temporal y frecuencial de IEC 61672-1 sobre `pyoctaveband`,
+  el nombre anterior de esta biblioteca, que desde la 2.1.0 es un envoltorio
+  sobre phonometry. Solo toma de aquí los filtros: su propio `weighting.py`
+  sigue llevando tablas de ponderación A y C por tercios de octava escritas a
+  mano.
+- **MoSQITo** se centra en métricas psicoacústicas de calidad sonora y ya
+  cubre buena parte de ese terreno: sonoridad de Zwicker, sonoridad y aspereza
+  de ECMA-418-2, agudeza de DIN 45692, relaciones tono-ruido y de prominencia
+  de ECMA-74 y el índice de inteligibilidad del habla de ANSI S3.5. phonometry
+  implementa esa misma familia y añade la sonoridad de ISO 532-2 e ISO 532-3,
+  la tonalidad de ECMA-418-2, la intensidad de fluctuación y el modelo de
+  molestia psicoacústica de Fastl y Zwicker, que MoSQITo no expone. Lo que más
+  cambia es el entorno. Aquí esas métricas viven en la misma batería de
+  conformidad que el núcleo de metrología y se componen directamente con los
+  filtros de ponderación, la ponderación temporal, el filtrado por bandas y la
+  calibración que las alimentan.
+- **pyroomacoustics** simula respuestas al impulso de salas para cadenas de
+  audio y aprendizaje automático (fuentes imagen, trazado de rayos,
+  conformación de haz, estimación de la dirección de llegada), y también llega
+  al lado de la medición, con adquisición de la respuesta al impulso por barrido
+  y un estimador de RT60. Lo que no lleva es el juego de parámetros de
+  ISO 3382. Los solvers de fuentes imagen y FDTD de phonometry están fijados a
+  formas cerradas publicadas, y la respuesta al impulso de fuentes imagen pasa
+  por el mismo análisis de `room_parameters` (EDT, T20, T30, C50, C80, D50, Ts,
+  por bandas, con los indicadores de validez del rango de decaimiento de
+  ISO 3382) que una medida.
+
+Si tu trabajo necesita números que puedas defender frente a la tabla de
+tolerancias de una norma, ya sea para informes de medición, evaluaciones
+ambientales o contrastes con instrumentos, esa capa de verificación es la razón
+de ser de phonometry. Y cuando la norma fija además cómo debe presentarse el
+resultado, el propio objeto de resultado renderiza esa ficha de una página con
+`.report()`, en inglés o en español, de modo que el documento que entregas
+lleva los mismos números que la comprobación. Las fuentes que sustentan todo
+ello están reunidas en la
+[Bibliografía](/phonometry/es/reference/bibliography/), cada entrada con un
+DOI verificado o un enlace oficial del editor.
