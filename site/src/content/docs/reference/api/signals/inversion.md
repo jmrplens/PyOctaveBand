@@ -176,7 +176,7 @@ Sec. 2.4).
 
 Both regularization levels are *relative* to the peak of
 $\lvert H \rvert^2$
-(like the scalar `regularization` of [`phonometry.impulse_response`](/phonometry/reference/api/rooms/room-ir/#impulse_response),
+(like the scalar `regularization` of [`phonometry.impulse_response`](/phonometry/reference/api/rooms/impulse-response/),
 which this generalises): in-band the equalized magnitude deviates from
 unity by at most `regularization_inside * max|H|**2 / min|H|**2` --
 the analytic residue
@@ -191,7 +191,7 @@ recordings (or the excitation, for pre-emphasis) and read
 
 | Name | Description |
 | :--- | :--- |
-| `response` | Measured impulse response (1-D array), or an [`phonometry.ImpulseResponseResult`](/phonometry/reference/api/rooms/room-ir/#impulseresponseresult) from the sweep/MLS/Golay front ends (its sample rate is used when `fs` is omitted). |
+| `response` | Measured impulse response (1-D array), or an [`phonometry.ImpulseResponseResult`](/phonometry/reference/api/rooms/impulse-response/#impulseresponseresult) from the sweep/MLS/Golay front ends (its sample rate is used when `fs` is omitted). |
 | `fs` | Sample rate in Hz. Optional when `response` carries one. |
 | `f_range` | `(f1, f2)` band, in Hz, over which the response is equalized to unity. Choose it inside the band actually excited and radiated; inverting unexcited regions only amplifies noise. |
 | `regularization_inside` | In-band regularization, as a fraction of the peak spectral power $\max \lvert H \rvert^2$. Default 1e-6. |

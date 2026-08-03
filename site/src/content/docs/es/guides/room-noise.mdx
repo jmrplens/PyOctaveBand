@@ -155,7 +155,7 @@ room.room_criterion(spl).plot(language="es")
 plt.show()
 
 # A mano, reproduciendo lo que dibujan NCResult.plot() / RCResult.plot():
-from phonometry.room.room_noise import NC_CURVES, NC_INDICES, OCTAVE_BANDS
+from phonometry.room.noise_criteria import NC_CURVES, NC_INDICES, OCTAVE_BANDS
 nc, rc = room.noise_criterion(spl), room.room_criterion(spl)
 fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 5))
 
@@ -307,4 +307,4 @@ en el repositorio; haz clic en una vista previa para abrir el PDF.
 
 ## Véase también
 
-- Referencia de la API: [`room.room_noise`](/phonometry/es/reference/api/rooms/room-noise/).
+- Referencia de la API: [`room.noise_criteria`](/phonometry/es/reference/api/rooms/noise-criteria/).

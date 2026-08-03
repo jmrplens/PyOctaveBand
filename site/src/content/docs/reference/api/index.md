@@ -96,15 +96,15 @@ La referencia de la API se genera a partir de los docstrings del código (en ing
 
 | Module | Summary |
 | :--- | :--- |
-| [`room.room_acoustics`](/phonometry/reference/api/rooms/room-acoustics/) | Room acoustic parameters from impulse responses per ISO 3382-1:2009 (performance spaces) and ISO 3382-2:2008 (ordinary rooms). |
-| [`room.room_ir`](/phonometry/reference/api/rooms/room-ir/) | Impulse-response acquisition per BS EN ISO 18233:2006. |
-| [`room.room_noise`](/phonometry/reference/api/rooms/room-noise/) | Room-noise rating curves per ANSI/ASA S12.2-2019. |
+| [`room.acoustics`](/phonometry/reference/api/rooms/acoustics/) | Room acoustic parameters from impulse responses per ISO 3382-1:2009 (performance spaces) and ISO 3382-2:2008 (ordinary rooms). |
+| [`room.impulse_response`](/phonometry/reference/api/rooms/impulse-response/) | Impulse-response acquisition per BS EN ISO 18233:2006. |
+| [`room.noise_criteria`](/phonometry/reference/api/rooms/noise-criteria/) | Room-noise rating curves per ANSI/ASA S12.2-2019. |
 | [`room.open_plan`](/phonometry/reference/api/rooms/open-plan/) | Open-plan-office spatial metrics per ISO 3382-3:2012. |
 | [`room.reverberation_prediction`](/phonometry/reference/api/rooms/reverberation-prediction/) | Reverberation-time prediction from room geometry and absorption. |
 | [`room.enclosed_space_absorption`](/phonometry/reference/api/rooms/enclosed-space-absorption/) | Sound absorption in enclosed spaces (EN 12354-6:2003). |
 | [`room.image_source`](/phonometry/reference/api/rooms/image-source/) | Synthetic room impulse response by the image-source method (rectangular room). |
 | [`room.steady_field`](/phonometry/reference/api/rooms/steady-field/) | Steady-state sound field in a room: room constant, critical distance, level. |
-| [`room.room_modes`](/phonometry/reference/api/rooms/room-modes/) | Normal modes of a rectangular room: frequencies, kinds, count and density. |
+| [`room.modes`](/phonometry/reference/api/rooms/modes/) | Normal modes of a rectangular room: frequencies, kinds, count and density. |
 | [`room.crowd_noise`](/phonometry/reference/api/rooms/crowd-noise/) | Crowd self-noise in a restaurant: the cocktail-party equilibrium. |
 
 ## Building acoustics
@@ -173,8 +173,7 @@ La referencia de la API se genera a partir de los docstrings del código (en ing
 | [`environment.propagation.refraction`](/phonometry/reference/api/environment/refraction/) | Atmospheric refraction: ray tracing and the parabolic equation (PE). |
 | [`environment.propagation.air_absorption`](/phonometry/reference/api/environment/air-absorption/) | Atmospheric absorption of sound: ISO 9613-1:1993. |
 | [`environment.sources.cnossos_rail`](/phonometry/reference/api/environment/cnossos-rail/) | CNOSSOS-EU railway source emission (Directive 2002/49/EC Annex II, 2.3). |
-| [`environment.assessment.impulse_prominence`](/phonometry/reference/api/environment/impulse-prominence/) | Prominence of impulsive sounds and the LAeq adjustment (NT ACOU 112:2002). |
-| [`environment.assessment.impulsive_sound`](/phonometry/reference/api/environment/impulsive-sound/) | Objective prominence of impulsive sounds and the `LAeq` adjustment (ISO/PAS 1996-3:2022). |
+| [`environment.assessment.impulsive_sound`](/phonometry/reference/api/environment/impulsive-sound/) | Prominence of impulsive sounds and the `LAeq` adjustment (NT ACOU 112:2002, ISO/PAS 1996-3:2022). |
 | [`environment.assessment.rating`](/phonometry/reference/api/environment/rating/) | Environmental noise descriptors per ISO 1996-1:2016. |
 | [`environment.sources.wind_turbine`](/phonometry/reference/api/environment/wind-turbine/) | Wind-turbine acoustic noise (IEC 61400-11:2012+A1:2018). |
 | [`environment.assessment.measurement`](/phonometry/reference/api/environment/measurement/) | Determination of environmental-noise sound pressure levels (ISO 1996-2:2017). |
@@ -184,11 +183,12 @@ La referencia de la API se genera a partir de los docstrings del código (en ing
 
 | Module | Summary |
 | :--- | :--- |
-| [`aircraft.aircraft_noise`](/phonometry/reference/api/aeroacoustics/aircraft-noise/) | Aircraft noise certification: Effective Perceived Noise Level (ICAO Annex 16). |
+| [`aircraft.certification`](/phonometry/reference/api/aeroacoustics/certification/) | Aircraft noise certification: Effective Perceived Noise Level (ICAO Annex 16). |
 | [`aircraft.atmospheric_absorption`](/phonometry/reference/api/aeroacoustics/atmospheric-absorption/) | One-third-octave-band atmospheric absorption for aircraft noise (SAE ARP 5534). |
 | [`aircraft.airport_noise`](/phonometry/reference/api/aeroacoustics/airport-noise/) | Noise-Power-Distance (NPD) event-level interpolation (ECAC Doc 29). |
 | [`aircraft.anp_fleet`](/phonometry/reference/api/aeroacoustics/anp-fleet/) | EASA ANP fleet database bridge for the ECAC Doc 29 airport-noise chain. |
 | [`aircraft.rotorcraft_noise`](/phonometry/reference/api/aeroacoustics/rotorcraft-noise/) | Rotorcraft noise by the hemisphere method (ECAC Doc 32 / NORAH2). |
+| [`aircraft.measurement_system`](/phonometry/reference/api/aeroacoustics/measurement-system/) | Aircraft-noise measurement-system tolerances (IEC 61265:1995). |
 
 ## Underwater acoustics
 

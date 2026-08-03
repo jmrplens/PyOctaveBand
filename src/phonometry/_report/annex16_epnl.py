@@ -1,7 +1,7 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
 """ICAO Annex 16 EPNL aircraft-noise-certification fiche (reportlab renderer).
 
-Renders an :class:`~phonometry.aircraft.aircraft_noise.EPNLResult` to a
+Renders an :class:`~phonometry.aircraft.certification.EPNLResult` to a
 one-page PDF laid out like an aircraft-noise-certification data sheet:
 
 * a title and the standard-basis line (measurement standard + ICAO Annex 16
@@ -57,7 +57,7 @@ from ._layout import (
 from .metadata import ReportMetadata
 
 if TYPE_CHECKING:
-    from ..aircraft.aircraft_noise import EPNLResult
+    from ..aircraft.certification import EPNLResult
 
 
 def _metadata_pairs(
@@ -165,7 +165,7 @@ def render_annex16_epnl_report(
     """Render an ICAO Annex 16 EPNL certification fiche to a PDF at ``path``.
 
     :param result: An
-        :class:`~phonometry.aircraft.aircraft_noise.EPNLResult` carrying the
+        :class:`~phonometry.aircraft.certification.EPNLResult` carrying the
         PNL/PNLT time histories, the peak PNLTM, the duration correction, the
         bandsharing adjustment, the EPNL and the 10 dB-down window.
     :param path: Destination path of the PDF file.

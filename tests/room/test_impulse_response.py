@@ -1,6 +1,6 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
 """
-Tests for ISO 18233:2006 impulse-response acquisition (room_ir).
+Tests for ISO 18233:2006 impulse-response acquisition.
 
 Validation strategy (closed-form, not self-consistency):
 - Ideal chain (recorded == excitation) -> band-limited delta at t=0.
@@ -31,7 +31,7 @@ from phonometry import (
     room_parameters,
     sweep_signal,
 )
-from phonometry.room.room_ir import _MLS_TAPS
+from phonometry.room.impulse_response import _MLS_TAPS
 
 FS = 48000
 
@@ -353,15 +353,17 @@ def test_invalid_arguments() -> None:
         mls_signal(1)  # order too small
     with pytest.raises(ValueError, match="order must be one of"):
         mls_signal(99)  # unsupported order
+    ten = np.zeros(10)
     with pytest.raises(ValueError, match="unknown method"):
-        impulse_response(np.zeros(10), np.zeros(10), FS, method="bogus")
+        impulse_response(ten, ten, FS, method="bogus")
     with pytest.raises(ValueError, match="requires f_range"):
-        impulse_response(np.zeros(10), np.zeros(10), FS, method="farina")  # no f_range
+        impulse_response(ten, ten, FS, method="farina")  # no f_range
+    seq = mls_signal(4)
     with pytest.raises(
         ValueError,
         match="recorded length must be a positive multiple of the MLS length",
     ):
-        mls_impulse_response(np.zeros(10), mls_signal(4))  # not a multiple of L
+        mls_impulse_response(ten, seq)  # not a multiple of L
 
 
 def test_inverse_filter_empty_band_raises() -> None:
@@ -373,54 +375,58 @@ def test_inverse_filter_empty_band_raises() -> None:
         inverse_filter(FS, 1000.0, 1000.5, 0.001)
     # The error must propagate through the Farina deconvolution path too.
     # The reference must be non-zero, or the zero-padding guard fires first.
+    silence, tone = np.zeros(48), np.ones(48)
     with pytest.raises(
         ValueError, match="no frequency bin falls within the sweep band"
     ):
         impulse_response(
-            np.zeros(48), np.ones(48), FS,
-            method="farina", f_range=(1000.0, 1000.5),
+            silence, tone, FS, method="farina", f_range=(1000.0, 1000.5),
         )
 
 
 def test_impulse_response_rejects_bad_shapes() -> None:
     good = np.zeros(10)
+    two_dimensional = np.zeros((2, 5))
+    empty = np.zeros(0)
     with pytest.raises(
         ValueError, match="'recorded' and 'reference' must be one-dimensional"
     ):
-        impulse_response(np.zeros((2, 5)), good, FS)  # 2-D recorded
+        impulse_response(two_dimensional, good, FS)  # 2-D recorded
     with pytest.raises(
         ValueError, match="'recorded' and 'reference' must be one-dimensional"
     ):
-        impulse_response(good, np.zeros((2, 5)), FS)  # 2-D reference
+        impulse_response(good, two_dimensional, FS)  # 2-D reference
     with pytest.raises(
         ValueError, match="'recorded' and 'reference' must be non-empty"
     ):
-        impulse_response(np.zeros(0), good, FS)  # empty recorded
+        impulse_response(empty, good, FS)  # empty recorded
     with pytest.raises(
         ValueError, match="'recorded' and 'reference' must be non-empty"
     ):
-        impulse_response(good, np.zeros(0), FS)  # empty reference
+        impulse_response(good, empty, FS)  # empty reference
 
 
 def test_mls_impulse_response_rejects_bad_shapes() -> None:
     seq = mls_signal(4)
     good = np.tile(seq, 2)
+    two_dimensional = np.zeros((2, seq.size))
+    empty = np.zeros(0)
     with pytest.raises(
         ValueError, match="'recorded' and 'mls' must be one-dimensional"
     ):
-        mls_impulse_response(np.zeros((2, seq.size)), seq)  # 2-D recorded
+        mls_impulse_response(two_dimensional, seq)  # 2-D recorded
     with pytest.raises(
         ValueError, match="'recorded' and 'mls' must be one-dimensional"
     ):
-        mls_impulse_response(good, np.zeros((2, seq.size)))  # 2-D mls
+        mls_impulse_response(good, two_dimensional)  # 2-D mls
     with pytest.raises(
         ValueError, match="'recorded' and 'mls' must be non-empty"
     ):
-        mls_impulse_response(np.zeros(0), seq)  # empty recorded
+        mls_impulse_response(empty, seq)  # empty recorded
     with pytest.raises(
         ValueError, match="'recorded' and 'mls' must be non-empty"
     ):
-        mls_impulse_response(good, np.zeros(0))  # empty mls
+        mls_impulse_response(good, empty)  # empty mls
 
 
 # --------------------------------------------------------------------------
@@ -496,7 +502,8 @@ def test_impulse_response_plot_returns_axes() -> None:
     rec, sweep = _synthetic_recording()
     ir = impulse_response(rec, sweep, FS)
     axes = ir.plot()
-    assert isinstance(axes, np.ndarray) and axes.size == 2
+    assert isinstance(axes, np.ndarray)
+    assert axes.size == 2
     assert all(isinstance(a, Axes) for a in axes)
 
     _, single = matplotlib.pyplot.subplots()
@@ -512,11 +519,13 @@ def test_plot_excitation_returns_axes() -> None:
 
     sweep = sweep_signal(FS, 20.0, 20000.0, 0.5)
     axes = plot_excitation(sweep, FS, kind="sweep")
-    assert isinstance(axes, np.ndarray) and axes.size == 2
+    assert isinstance(axes, np.ndarray)
+    assert axes.size == 2
 
     mls = mls_signal(12).astype(float)
     axes_m = plot_excitation(mls, FS, kind="mls")
-    assert isinstance(axes_m, np.ndarray) and axes_m.size == 2
+    assert isinstance(axes_m, np.ndarray)
+    assert axes_m.size == 2
     assert all(isinstance(a, Axes) for a in axes_m)
     matplotlib.pyplot.close("all")
 
@@ -533,7 +542,9 @@ def test_plot_excitation_short_and_empty_guards() -> None:
     plt.close("all")
 
     # Empty inputs raise a clear error rather than a cryptic reduction failure.
+    empty = np.array([])
     with pytest.raises(ValueError, match="empty"):
-        plot_excitation(np.array([]), FS, kind="mls")
+        plot_excitation(empty, FS, kind="mls")
+    empty_result = ImpulseResponseResult(ir=empty, fs=FS, method="spectral")
     with pytest.raises(ValueError, match="empty"):
-        ImpulseResponseResult(ir=np.array([]), fs=FS, method="spectral").plot()
+        empty_result.plot()

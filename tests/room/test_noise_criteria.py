@@ -1,5 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""Tests for :mod:`phonometry.room.room_noise` (ANSI/ASA S12.2-2019 NC and RC Mark II).
+"""Tests for :mod:`phonometry.room.noise_criteria` (ANSI/ASA S12.2-2019 NC and RC Mark II).
 
 The methods are validated against the standard's own tabulated curves: feeding
 an NC curve of Table 1 back through the rating returns its NC value (the
@@ -21,7 +21,7 @@ from reference_data import (
     ANSIS12_2_RC35_LMF,
 )
 
-from phonometry.room import room_noise as rn
+from phonometry.room import noise_criteria as rn
 
 
 def test_octave_band_layout() -> None:
@@ -234,8 +234,9 @@ def test_invalid_inputs_raise() -> None:
         rn.noise_criterion([1.0, 2.0], [63.0])
     with pytest.raises(ValueError, match="not one of"):
         rn.noise_criterion([50.0], [777.0])
+    two_dimensional = np.zeros((2, 10))
     with pytest.raises(ValueError, match="1-D vector"):
-        rn.noise_criterion(np.zeros((2, 10)))
+        rn.noise_criterion(two_dimensional)
     with pytest.raises(ValueError, match="no valid"):
         rn.noise_criterion([], [])
 

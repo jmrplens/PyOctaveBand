@@ -7,7 +7,7 @@ a valid single-page PDF is written for a computed flyover, unknown engines are
 rejected, a passing and a failing certification limit both render, and a
 no-metadata prediction fiche renders. The EPNL algorithm itself is validated
 against the ICAO Doc 9501 ETM worked examples elsewhere
-(tests/aircraft/test_aircraft_noise.py); here a small self-contained synthetic
+(tests/aircraft/test_certification.py); here a small self-contained synthetic
 flyover keeps the fiche test independent.
 """
 

@@ -502,6 +502,12 @@ _PRE_SPLIT_MODULE_PATHS = [
     "phonometry.underwater.sound_speed",
     "phonometry.underwater.weston_regimes",
     "phonometry.metrology.intensity_compliance",
+    "phonometry.aircraft.aircraft_noise",
+    "phonometry.environment.assessment.impulse_prominence",
+    "phonometry.room.room_acoustics",
+    "phonometry.room.room_ir",
+    "phonometry.room.room_modes",
+    "phonometry.room.room_noise",
 ]
 
 

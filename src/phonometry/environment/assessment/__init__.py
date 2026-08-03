@@ -3,20 +3,18 @@
 
 from __future__ import annotations
 
-from .impulse_prominence import (
-    ImpulseProminenceResult,
-    ImpulseProminenceWarning,
-    impulse_adjustment,
-    impulse_prominence,
-    predicted_prominence,
-    rating_level,
-)
 from .impulsive_sound import (
     ImpulseOnset,
+    ImpulseProminenceResult,
+    ImpulseProminenceWarning,
     ImpulsiveSoundResult,
     ImpulsiveSoundWarning,
     detect_onsets,
+    impulse_adjustment,
+    impulse_prominence,
     impulsive_sound_adjustment,
+    predicted_prominence,
+    rating_level,
     sound_pressure_level_history,
 )
 from .measurement import (

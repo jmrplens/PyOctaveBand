@@ -25,7 +25,7 @@ from phonometry import (
     golay_impulse_response,
     golay_pair,
 )
-from phonometry.room.room_ir import ImpulseResponseWarning
+from phonometry.room.impulse_response import ImpulseResponseWarning
 
 
 def _periodic_response(code: np.ndarray, b: np.ndarray, a: np.ndarray,

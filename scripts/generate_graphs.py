@@ -3809,7 +3809,7 @@ def generate_schroeder_decay(output_dir: str) -> None:
     """Schroeder backward integration with T20/T30/EDT regressions (ISO 3382)."""
     print("Generating schroeder_decay.png...")
     from phonometry import decay_curve, room_parameters
-    from phonometry.room.room_acoustics import (
+    from phonometry.room.acoustics import (
         _EDT_RANGE,
         _T20_RANGE,
         _T30_RANGE,
@@ -10579,7 +10579,7 @@ def generate_impulse_prominence(output_dir: str) -> None:
         impulse_prominence,
         predicted_prominence,
     )
-    from phonometry.environment.assessment.impulse_prominence import (
+    from phonometry.environment.assessment.impulsive_sound import (
         ADJUSTMENT_THRESHOLD,
     )
 
@@ -10786,7 +10786,7 @@ def generate_room_noise_criteria(output_dir: str) -> None:
     """ANSI S12.2-2019: NC tangency rating and RC Mark II classification."""
     print("Generating room_noise_criteria.png...")
     from phonometry import noise_criterion, room_criterion
-    from phonometry.room.room_noise import NC_CURVES, NC_INDICES, OCTAVE_BANDS
+    from phonometry.room.noise_criteria import NC_CURVES, NC_INDICES, OCTAVE_BANDS
 
     # A ventilation-dominated room spectrum: the low-frequency bands rise well
     # above the sloped RC reference (a rumble tag under RC Mark II) while the
@@ -15654,7 +15654,7 @@ def animate_schroeder(output_dir: str) -> None:
     from matplotlib.patches import Patch
 
     from phonometry import decay_curve, room_parameters
-    from phonometry.room.room_acoustics import _T20_RANGE, _T30_RANGE, _onset_index
+    from phonometry.room.acoustics import _T20_RANGE, _T30_RANGE, _onset_index
 
     T = _translate_str
     fs, reverb_t = 48000, 1.2

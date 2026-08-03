@@ -1,7 +1,7 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
 """Room acoustic parameters fiche (reportlab renderer, ISO 3382-1/-2).
 
-Renders a :class:`~phonometry.room.room_acoustics.RoomAcousticsResult` to a
+Renders a :class:`~phonometry.room.acoustics.RoomAcousticsResult` to a
 one-page PDF laid out like a room-acoustics measurement report (a performance
 space per ISO 3382-1:2009 or an ordinary room per ISO 3382-2:2008, both
 evaluated by the integrated impulse-response method of ISO 3382-1:2009, 5.3.3):
@@ -63,7 +63,7 @@ from ._layout import (
 from .metadata import ReportMetadata
 
 if TYPE_CHECKING:
-    from ..room.room_acoustics import RoomAcousticsResult
+    from ..room.acoustics import RoomAcousticsResult
 
 #: Band centres whose T30 mean is the mid-frequency reverberation-time
 #: descriptor T_mid quoted for rooms: the 500 Hz and 1000 Hz bands at the
@@ -449,7 +449,7 @@ def render_iso3382_report(
     """Render a room-acoustics parameters fiche to a PDF at ``path``.
 
     :param result: A
-        :class:`~phonometry.room.room_acoustics.RoomAcousticsResult` carrying
+        :class:`~phonometry.room.acoustics.RoomAcousticsResult` carrying
         the per-band reverberation times and energy parameters.
     :param path: Destination path of the PDF file.
     :param metadata: Optional :class:`ReportMetadata`; ``None`` produces a

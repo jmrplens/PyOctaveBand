@@ -612,7 +612,7 @@ recorded time $t_r = t_e + r/c$ (Eq. 22) and integrated into
 `LASmax`,
 `SEL` (Doc 32 Eq. 27) and `EPNL` (Doc 32 Eq. 28, ICAO Annex 16 App. 2,
 reusing
-[`epnl_from_pnlt`](/phonometry/reference/api/aeroacoustics/aircraft-noise/#epnl_from_pnlt)).
+[`epnl_from_pnlt`](/phonometry/reference/api/aeroacoustics/certification/#epnl_from_pnlt)).
 
 The flight condition per point comes from the `airspeed`/`path_angle`
 overrides when given (e.g. the smoothed values of a radar-track workflow),

@@ -42,6 +42,10 @@ from typing import Any
 
 from ._internal.warnings import _warn_renamed
 
+#: The one module NT ACOU 112 and ISO/PAS 1996-3 share since 4.0. Four old
+#: paths land on it, from both generations of the table.
+_IMPULSIVE_SOUND = "phonometry.environment.assessment.impulsive_sound"
+
 #: Old public module path -> relocated module path. One row per moved module.
 _MOVED_3X: dict[str, str] = {
     "phonometry.utils": "phonometry._internal.utils",
@@ -94,9 +98,9 @@ _MOVED_3X: dict[str, str] = {
     "phonometry.enclosed_space_absorption": "phonometry.room.enclosed_space_absorption",
     "phonometry.open_plan": "phonometry.room.open_plan",
     "phonometry.reverberation_prediction": "phonometry.room.reverberation_prediction",
-    "phonometry.room_acoustics": "phonometry.room.room_acoustics",
-    "phonometry.room_ir": "phonometry.room.room_ir",
-    "phonometry.room_noise": "phonometry.room.room_noise",
+    "phonometry.room_acoustics": "phonometry.room.acoustics",
+    "phonometry.room_ir": "phonometry.room.impulse_response",
+    "phonometry.room_noise": "phonometry.room.noise_criteria",
     "phonometry.building_prediction":
         "phonometry.building.prediction.simplified_model",
     "phonometry.building_uncertainty":
@@ -130,14 +134,13 @@ _MOVED_3X: dict[str, str] = {
         "phonometry.environment.propagation.air_absorption",
     "phonometry.environmental_measurement":
         "phonometry.environment.assessment.measurement",
-    "phonometry.impulse_prominence":
-        "phonometry.environment.assessment.impulse_prominence",
+    "phonometry.impulse_prominence": _IMPULSIVE_SOUND,
     "phonometry.outdoor_propagation":
         "phonometry.environment.propagation.outdoor_propagation",
     "phonometry.wind_turbine_noise":
         "phonometry.environment.sources.wind_turbine",
     "phonometry.aircraft_atmospheric_absorption": "phonometry.aircraft.atmospheric_absorption",
-    "phonometry.aircraft_noise": "phonometry.aircraft.aircraft_noise",
+    "phonometry.aircraft_noise": "phonometry.aircraft.certification",
     "phonometry.airport_noise": "phonometry.aircraft.airport_noise",
     "phonometry.rotorcraft_noise": "phonometry.aircraft.rotorcraft_noise",
     "phonometry.numerical_propagation": "phonometry.underwater.propagation.numerical",
@@ -235,10 +238,8 @@ _MOVED_4X: dict[str, str] = {
         "phonometry.environment.assessment.rating",
     "phonometry.environmental.measurement":
         "phonometry.environment.assessment.measurement",
-    "phonometry.environmental.impulsive_sound":
-        "phonometry.environment.assessment.impulsive_sound",
-    "phonometry.environmental.impulse_prominence":
-        "phonometry.environment.assessment.impulse_prominence",
+    "phonometry.environmental.impulsive_sound": _IMPULSIVE_SOUND,
+    "phonometry.environmental.impulse_prominence": _IMPULSIVE_SOUND,
     "phonometry.environmental.spanish_regulation":
         "phonometry.environment.assessment.spain",
     "phonometry.building.insulation":
@@ -330,6 +331,13 @@ _MOVED_4X: dict[str, str] = {
         "phonometry.psychoacoustics.quality.tone_audibility",
     "phonometry.psychoacoustics.psychoacoustic_annoyance":
         "phonometry.psychoacoustics.quality.annoyance",
+    # NT ACOU 112 and ISO/PAS 1996-3 share their formulae and are one module.
+    "phonometry.environment.assessment.impulse_prominence": _IMPULSIVE_SOUND,
+    "phonometry.room.room_acoustics": "phonometry.room.acoustics",
+    "phonometry.room.room_ir": "phonometry.room.impulse_response",
+    "phonometry.room.room_noise": "phonometry.room.noise_criteria",
+    "phonometry.room.room_modes": "phonometry.room.modes",
+    "phonometry.aircraft.aircraft_noise": "phonometry.aircraft.certification",
     "phonometry.underwater.marine_mammal_audiograms":
         "phonometry.underwater.bioacoustics.audiograms",
     "phonometry.underwater.marine_mammal_weighting":
@@ -428,6 +436,7 @@ def _alias_modules(package: str) -> list[str]:
 
 def _namespace_shim(
     package: str, targets: tuple[str, ...] = (), *,
+    only: dict[str, tuple[str, ...]] | None = None,
     since: str = "4.0", removed_in: str = "5.0"
 ) -> Callable[[str], Any]:
     """Return a PEP 562 ``__getattr__`` for what left ``package``.
@@ -449,9 +458,16 @@ def _namespace_shim(
     fallback is the only branch that fires. The alias carries its own notice
     on attribute access, so returning it here is silent.
 
+    A target that took only part of what it holds is listed in ``only``: the
+    IEC 61265 check went from ``filters`` to ``aircraft``, and without that
+    restriction the whole of ``aircraft`` would answer to ``filters.``, with a
+    notice claiming names had moved that were never there.
+
     :param package: The narrowed package, ``__name__`` of its ``__init__``.
     :param targets: Packages the names moved to, in search order. Empty when
         only modules moved.
+    :param only: Per target, the names that actually left this package. A
+        target absent from the mapping serves its whole ``__all__``.
     :param since: Release that moved the names.
     :param removed_in: Major release that removes the alias.
     :return: The ``__getattr__`` to bind at module level.
@@ -459,6 +475,9 @@ def _namespace_shim(
 
     def __getattr__(name: str) -> Any:
         for target in targets:
+            allowed = (only or {}).get(target)
+            if allowed is not None and name not in allowed:
+                continue
             module = import_module(target)
             if name in getattr(module, "__all__", ()):
                 _warn_renamed(
@@ -478,7 +497,8 @@ def _namespace_shim(
 
 def _namespace_dir(
     package: str, own: list[str] | tuple[str, ...],
-    targets: tuple[str, ...] = ()
+    targets: tuple[str, ...] = (),
+    only: dict[str, tuple[str, ...]] | None = None,
 ) -> Callable[[], list[str]]:
     """Return a ``__dir__`` listing the names a narrowed package still serves.
 
@@ -491,6 +511,9 @@ def _namespace_dir(
     :param package: The package, ``__name__`` of its ``__init__``.
     :param own: The package's own ``__all__``.
     :param targets: Packages the moved names went to.
+    :param only: Per target, the names that actually left this package, as in
+        :func:`_namespace_shim`. Listing more would advertise names this
+        package never served.
     :return: The ``__dir__`` to bind at module level.
     """
 
@@ -502,7 +525,9 @@ def _namespace_dir(
         names = set(vars(import_module(package))) | set(own)
         names |= set(_alias_modules(package))
         for target in targets:
-            names |= set(getattr(import_module(target), "__all__", ()))
+            moved = set(getattr(import_module(target), "__all__", ()))
+            allowed = (only or {}).get(target)
+            names |= moved if allowed is None else moved & set(allowed)
         return sorted(names)
 
     return __dir__

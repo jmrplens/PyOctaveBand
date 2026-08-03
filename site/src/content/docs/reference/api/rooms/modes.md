@@ -1,8 +1,8 @@
 ---
-title: "room.room_modes"
+title: "room.modes"
 description: "Normal modes of a rectangular room: frequencies, kinds, count and density."
 sidebar:
-  label: "room_modes"
+  label: "modes"
 ---
 
 Normal modes of a rectangular room: frequencies, kinds, count and density.
@@ -47,12 +47,12 @@ $$
 $$
 
 The smooth count is an asymptotic estimate: at low frequency, where only a few
-modes exist, the exact enumeration of [`room_modes`](/phonometry/reference/api/rooms/room-modes/#room_modes) is the honest answer,
+modes exist, the exact enumeration of [`room_modes`](/phonometry/reference/api/rooms/modes/#room_modes) is the honest answer,
 while above the **Schroeder frequency**
 ([`phonometry.room.schroeder_frequency`](/phonometry/reference/api/rooms/steady-field/#schroeder_frequency)) the modes overlap so densely
 that only the statistical description of
 [`phonometry.room.steady_field`](/phonometry/reference/api/rooms/steady-field/) remains useful. Marking that frequency on
-the mode ladder is the point of [`RoomModesResult.plot`](/phonometry/reference/api/rooms/room-modes/#roommodesresultplot).
+the mode ladder is the point of [`RoomModesResult.plot`](/phonometry/reference/api/rooms/modes/#roommodesresultplot).
 
 This module describes the *eigenfrequencies* of an empty rectangular box. It is
 not a prediction of the level at a receiver: for that, use the image-source
@@ -87,7 +87,7 @@ $$
 $$
 
 This is the
-derivative of [`room_mode_count`](/phonometry/reference/api/rooms/room-modes/#room_mode_count). Its reciprocal is the mean spacing
+derivative of [`room_mode_count`](/phonometry/reference/api/rooms/modes/#room_mode_count). Its reciprocal is the mean spacing
 between adjacent eigenfrequencies.
 
 **Parameters**
@@ -120,7 +120,7 @@ $$
 This is the
 Morse/Pierce lattice count with its wall-plane and axis corrections. It is
 a smooth asymptotic estimate, so it is only meaningful once several modes
-fit below `f`; the exact enumeration is [`room_modes`](/phonometry/reference/api/rooms/room-modes/#room_modes).
+fit below `f`; the exact enumeration is [`room_modes`](/phonometry/reference/api/rooms/modes/#room_modes).
 
 **Parameters**
 
@@ -187,9 +187,9 @@ solution) is excluded.
 | `dimensions` | Room dimensions `(lx, ly, lz)`, m. |
 | `max_frequency` | Highest modal frequency to enumerate, Hz. |
 | `speed_of_sound` | Speed of sound `c0`, m/s (default [`DEFAULT_SPEED_OF_SOUND`](/phonometry/reference/api/materials/road-absorption/#default_speed_of_sound)). |
-| `reverberation_time` | Optional reverberation time `T`, s. When given, the Schroeder frequency $2000 \sqrt{T/V}$ is computed and carried in the result (and marked by [`RoomModesResult.plot`](/phonometry/reference/api/rooms/room-modes/#roommodesresultplot)). |
+| `reverberation_time` | Optional reverberation time `T`, s. When given, the Schroeder frequency $2000 \sqrt{T/V}$ is computed and carried in the result (and marked by [`RoomModesResult.plot`](/phonometry/reference/api/rooms/modes/#roommodesresultplot)). |
 
-**Returns:** A [`RoomModesResult`](/phonometry/reference/api/rooms/room-modes/#roommodesresult).
+**Returns:** A [`RoomModesResult`](/phonometry/reference/api/rooms/modes/#roommodesresult).
 
 ## RoomModesResult
 
@@ -213,7 +213,7 @@ The normal modes of a rectangular room up to a frequency limit.
 | :--- | :--- |
 | `orders` | Mode orders, an `(N, 3)` integer array of `(nx, ny, nz)` sorted by frequency. |
 | `frequencies` | Modal frequencies in ascending order, Hz. |
-| `kinds` | Mode kind per row, one of [`MODE_KINDS`](/phonometry/reference/api/rooms/room-modes/#mode_kinds). |
+| `kinds` | Mode kind per row, one of [`MODE_KINDS`](/phonometry/reference/api/rooms/modes/#mode_kinds). |
 | `dimensions` | Room dimensions `(lx, ly, lz)`, m. |
 | `speed_of_sound` | Speed of sound `c0` used, m/s. |
 | `max_frequency` | Frequency limit of the enumeration, Hz. |
@@ -225,7 +225,7 @@ The normal modes of a rectangular room up to a frequency limit.
 RoomModesResult.count_by_kind() -> dict[str, int]
 ```
 
-Number of enumerated modes of each kind, keyed by [`MODE_KINDS`](/phonometry/reference/api/rooms/room-modes/#mode_kinds).
+Number of enumerated modes of each kind, keyed by [`MODE_KINDS`](/phonometry/reference/api/rooms/modes/#mode_kinds).
 
 ### RoomModesResult.density()
 

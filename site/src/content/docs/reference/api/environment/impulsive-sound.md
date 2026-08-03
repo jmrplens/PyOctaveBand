@@ -1,22 +1,41 @@
 ---
 title: "environment.assessment.impulsive_sound"
-description: "Objective prominence of impulsive sounds and the LAeq adjustment (ISO/PAS 1996-3:2022)."
+description: "Prominence of impulsive sounds and the LAeq adjustment (NT ACOU 112:2002, ISO/PAS 1996-3:2022)."
 sidebar:
   label: "impulsive_sound"
 ---
 
-Objective prominence of impulsive sounds and the `LAeq` adjustment
-(ISO/PAS 1996-3:2022).
+Prominence of impulsive sounds and the `LAeq` adjustment (NT ACOU 112:2002,
+ISO/PAS 1996-3:2022).
 
-ISO/PAS 1996-3 objectively categorises a source by how prominently its
-impulsive sound is perceived and derives an adjustment `KI` (typically in the
-range 0.0 dB to 9.0 dB) that is added to `LAeq`. Unlike the closed-form
-[`impulse_prominence`](/phonometry/reference/api/environment/impulse-prominence/) helpers (NT ACOU 112, which
-take the onset rate and level difference as inputs), this module implements the
-*objective measurement chain* that reads those quantities directly from a
-calibrated time signal.
+Noise with prominent impulses is more annoying than a steady sound of the same
+equivalent level, so both methods add an adjustment `KI` to the measured
+`LAeq`. They share the prominence and adjustment formulae, which both take
+from Pedersen's method, and differ in what the caller supplies.
 
-The chain follows the standard:
+**NT ACOU 112:2002** is the closed form: the caller brings the onset rate and
+the level difference of the impulse, and the **predicted prominence**
+
+$$
+P = 3 \log_{10}(\text{onset rate}) + 2 \log_{10}(\text{level difference}) \tag{Formula 1}
+$$
+
+follows (clause 7). From the impulse with the highest prominence over a
+30-minute period, a graduated adjustment follows (clause 8):
+
+$$
+K_I = 1.8 \, (P - 5)~\text{dB} \quad \text{for } P > 5, \text{ else } 0 \tag{Formula 2}
+$$
+
+and the rating level over a reference time interval combines the adjusted
+sub-interval levels (clause 8, Note 1). An impulse qualifies when its onset
+rate exceeds 10 dB/s (clauses 4.5-4.7); non-qualifying level rises receive
+no adjustment (clause 8 applies only "for sounds with onset rates larger
+than 10 dB/s").
+
+**ISO/PAS 1996-3:2022** is the measurement chain that reads those same two
+quantities from a calibrated time signal, and categorises the source by the
+adjustment it earns (typically 0.0 dB to 9.0 dB):
 
 * the A frequency-weighted, F time-weighted sound pressure level `LpAF` is
   computed from the signal and sampled at 10-25 ms intervals (Clause 4);
@@ -25,26 +44,19 @@ The chain follows the standard:
   procedures a) to d) of Clause 4, merging events separated by less than 50 ms
   (Clause 3.3, Figure 2);
 * for each onset the **level difference** $\mathrm{LD} = L_e - L_s$
-  and the **onset
-  rate** `OR` (the least-squares slope over the onset) are measured
-  (Clauses 3.4, 3.5, Figures 1 and 2);
-* the **prominence**
-  $P = 3 \cdot \log_{10}(\mathrm{OR}) + 2 \cdot \log_{10}(\mathrm{LD})$ follows
-  (Clause 5, Formula 2)
-  and the impulse with the highest `P` gives the **adjustment**
-  $K_I = 1.8 \cdot (P - 5)$ dB for $P > 5$, else 0 dB (Clause 6,
-  Formula 3);
+  and the **onset rate** `OR` (the least-squares slope over the onset) are
+  measured (Clauses 3.4, 3.5, Figures 1 and 2);
+* the prominence (Clause 5, Formula 2) and the adjustment
+  $K_I = 1.8 \cdot (P - 5)$ dB for $P > 5$ (Clause 6, Formula 3)
+  are the NT ACOU 112 formulae above;
 * the source is categorised (Clause 7) as *not impulsive* ($K_I = 0$),
   *regular impulsive* ($0 < K_I \le 5$) or *highly impulsive*
   ($K_I > 5$).
 
-The prominence and adjustment formulae are shared with NT ACOU 112 (both derive
-from Pedersen's method) and are reused from
-[`impulse_prominence`](/phonometry/reference/api/environment/impulse-prominence/). The method for determining
-`KI` is not sensitive to the absolute calibration of the equipment
-(Clause 8): onset rate and level difference are level *differences*, so the
-adjustment is unchanged by a constant offset. Only the reported `LAeq` and the
-adjusted `LAeq` depend on calibration.
+The ISO/PAS method for determining `KI` is not sensitive to the absolute
+calibration of the equipment (Clause 8): onset rate and level difference are
+level *differences*, so the adjustment is unchanged by a constant offset. Only
+the reported `LAeq` and the adjusted `LAeq` depend on calibration.
 
 > Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
 
@@ -84,6 +96,67 @@ prominence `P`.
 | :--- | :--- |
 | ValueError | for a non-positive `dt` or fewer than two samples. |
 
+## impulse_adjustment
+
+```python
+impulse_adjustment(prominence: ArrayLike) -> np.ndarray
+```
+
+Adjustment `KI` to `LAeq` from the prominence (clause 8, Formula 2).
+
+$K_I = 1.8 \, (P - 5)$ dB for $P > 5$, else 0 dB. The
+adjustment is made
+to `LAeq,30min` on the basis of the single impulse with the highest `P`.
+This helper applies the bare Formula 2; the clause 8 onset-rate
+qualification (> 10 dB/s, clause 4.5) is enforced by
+[`impulse_prominence`](/phonometry/reference/api/environment/impulsive-sound/#impulse_prominence).
+
+**Parameters**
+
+| Name | Description |
+| :--- | :--- |
+| `prominence` | Predicted prominence `P`. |
+
+**Returns:** The adjustment `KI`, in dB, clamped at zero.
+
+## impulse_prominence
+
+```python
+impulse_prominence(
+    onset_rates: ArrayLike,
+    level_differences: ArrayLike,
+    *,
+    assessment_period_min: float = 30.0,
+) -> ImpulseProminenceResult
+```
+
+Governing prominence and adjustment of a set of impulses (clauses 7-8).
+
+Evaluates the predicted prominence of each candidate impulse (Formula 1),
+takes the highest among the *qualifying* impulses as the governing
+prominence (clause 7) and derives its `LAeq` adjustment (Formula 2).
+An event qualifies as an impulse only when its onset rate exceeds
+10 dB/s (clause 4.5); clause 8 applies the adjustment "for sounds with
+onset rates larger than 10 dB/s" only, so non-qualifying events cannot
+produce a `KI` (an [`ImpulseProminenceWarning`](/phonometry/reference/api/environment/impulsive-sound/#impulseprominencewarning) reports them and
+the adjustment is 0 dB when no event qualifies).
+
+**Parameters**
+
+| Name | Description |
+| :--- | :--- |
+| `onset_rates` | Onset rate of each impulse, in dB/s (> 0). |
+| `level_differences` | Level difference of each impulse, in dB (> 0). |
+| `assessment_period_min` | The assessment time interval the impulses were selected over, in minutes; the standard's default is 30 min (Clause 5), and the value is carried through to the fiche. |
+
+**Returns:** An [`ImpulseProminenceResult`](/phonometry/reference/api/environment/impulsive-sound/#impulseprominenceresult) with the per-impulse and governing values and `.plot()`.
+
+**Raises**
+
+| Exception | When |
+| :--- | :--- |
+| ValueError | for empty input, mismatched lengths, a non-positive onset rate or level difference, or an assessment period that is not positive and finite. |
+
 ## ImpulseOnset
 
 ```python
@@ -117,6 +190,99 @@ A single detected onset of `LpAF` (ISO/PAS 1996-3, Clause 3).
 | `onset_rate` | Onset rate `OR`, in dB/s, the least-squares slope over the onset (3.5). |
 | `prominence` | Predicted prominence `P` of this onset (Formula 2). |
 | `qualifies` | Whether the onset rate exceeds 10 dB/s, so the onset can contribute an adjustment (Clause 6). |
+
+## ImpulseProminenceResult
+
+```python
+ImpulseProminenceResult(
+    onset_rates: np.ndarray,
+    level_differences: np.ndarray,
+    per_impulse: np.ndarray,
+    qualifies: np.ndarray,
+    prominence: float,
+    adjustment: float,
+    assessment_period_min: float = 30.0,
+)
+```
+
+Prominence of a set of candidate impulses (NT ACOU 112:2002).
+
+**Attributes**
+
+| Name | Description |
+| :--- | :--- |
+| `onset_rates` | Onset rate of each impulse, in dB/s. |
+| `level_differences` | Level difference of each impulse, in dB. |
+| `per_impulse` | Predicted prominence `P` of each impulse (Formula 1). |
+| `qualifies` | Whether each event qualifies as an impulse: onset rate above 10 dB/s (clause 4.5; clause 8 applies the adjustment "for sounds with onset rates larger than 10 dB/s" only). |
+| `prominence` | The governing prominence: the highest `P` among the qualifying impulses (clause 7), or the highest overall (informational) when none qualifies. |
+| `adjustment` | The LAeq adjustment `KI`, in dB, of the governing qualifying impulse (Formula 2); 0 dB when no event qualifies. |
+| `assessment_period_min` | The assessment time interval the impulses were selected over, in minutes (Clause 5; 30 min by default). |
+
+### ImpulseProminenceResult.plot()
+
+```python
+ImpulseProminenceResult.plot(
+    ax: Axes | None = None,
+    *,
+    language: str = 'en',
+    **kwargs: Any,
+) -> Axes
+```
+
+Plot the adjustment curve `KI(P)` with the impulses marked.
+
+Requires matplotlib (`pip install phonometry[plot]`); returns the
+`Axes`.
+
+### ImpulseProminenceResult.report()
+
+```python
+ImpulseProminenceResult.report(
+    path: str,
+    *,
+    metadata: ReportMetadata | None = None,
+    engine: str = 'reportlab',
+    verbose: bool = False,
+    language: str = 'en',
+) -> str
+```
+
+Render an impulsive-sound prominence assessment fiche to a PDF.
+
+Writes a one-page assessment report following NT ACOU 112:2002 (carried
+into ISO/PAS 1996-3:2022): the standard-basis line, an optional metadata
+header (source/situation, client, measurement position, instrumentation
+and date, always followed by this result's `assessment_period_min`), a
+full-width per-impulse table (onset rate, level difference, predicted
+prominence `P` and whether the onset qualifies as an impulse) above the
+adjustment-curve plot `KI(P)` with the candidate impulses marked, the
+boxed governing prominence `P` and the derived `LAeq` adjustment
+`KI` (Formula 2), an optional verdict row and a prominence-category
+note, and a footer with the fixed disclaimer.
+
+**Parameters**
+
+| Name | Description |
+| :--- | :--- |
+| `path` | Destination path of the PDF file. |
+| `metadata` | Optional [`ReportMetadata`](/phonometry/reference/api/building/insulation/#reportmetadata); `None` produces a bare assessment fiche (body, result and disclaimer only). A supplied `requirement` is read as the maximum acceptable governing prominence `P` (a lower prominence passes). |
+| `engine` | Rendering back end; only `"reportlab"` is supported. |
+| `verbose` | Accepted for signature parity with the other fiches; the per-impulse table already shows every candidate, so it has no effect. |
+| `language` | Fiche language: `"en"` (default, English) or `"es"` (Spanish, with a comma decimal separator). |
+
+**Returns:** The written `path` as a `str`.
+
+**Raises**
+
+| Exception | When |
+| :--- | :--- |
+| ValueError | If `language` is not one of the supported languages, or if `engine` is not `"reportlab"`. |
+| ImportError | If reportlab is not installed (`pip install phonometry[report]`), or matplotlib is missing for the embedded figure (`pip install phonometry[plot]`). |
+
+## ImpulseProminenceWarning
+
+A supplied level rise does not qualify as an impulse (clause 4.5).
 
 ## impulsive_sound_adjustment
 
@@ -221,6 +387,77 @@ Requires matplotlib (`pip install phonometry[plot]`); returns the
 ## ImpulsiveSoundWarning
 
 No qualifying onset (gradient > 10 dB/s) was found in the interval.
+
+## predicted_prominence
+
+```python
+predicted_prominence(
+    onset_rate: ArrayLike,
+    level_difference: ArrayLike,
+) -> np.ndarray
+```
+
+Predicted prominence `P` of an impulse (NT ACOU 112, clause 7).
+
+$P = 3 \log_{10}(\text{onset rate}) + 2 \log_{10}(\text{level difference})$
+(Formula 1), with $\log_{10}$
+the base-10 logarithm. Both quantities are read from the A-weighted,
+time-weighting-F level history: the onset rate is the slope of the onset in
+dB/s and the level difference is the level rise over the onset in dB
+(clauses 4.6-4.7). An impulse qualifies when its onset rate exceeds
+`ONSET_RATE_LIMIT` (10 dB/s).
+
+**Parameters**
+
+| Name | Description |
+| :--- | :--- |
+| `onset_rate` | Onset rate(s), in dB/s (> 0). |
+| `level_difference` | Level difference(s), in dB (> 0). |
+
+**Returns:** The predicted prominence `P` (scalar inputs give a 0-d array).
+
+**Raises**
+
+| Exception | When |
+| :--- | :--- |
+| ValueError | for a non-positive onset rate or level difference. |
+
+## rating_level
+
+```python
+rating_level(
+    laeq: ArrayLike,
+    adjustment: ArrayLike,
+    durations: ArrayLike,
+    reference_time: float,
+) -> float
+```
+
+Rating level over a reference time interval (clause 8, Note 1).
+
+Combines the impulse-adjusted equivalent levels of the measurement
+sub-intervals into a single rating level:
+
+$$
+L_{Ar,T} = 10 \log_{10}\!\left[ \frac{1}{T} \sum_N \Delta t_N \, 10^{(L_{Aeq,N} + K_{I,N})/10} \right]
+$$
+
+**Parameters**
+
+| Name | Description |
+| :--- | :--- |
+| `laeq` | Equivalent level `LAeq,N` of each sub-interval, in dB. |
+| `adjustment` | Adjustment `KI,N` of each sub-interval, in dB. |
+| `durations` | Duration `dt_N` of each sub-interval (any time unit, consistent with `reference_time`). |
+| `reference_time` | Reference time interval `T` (same unit as `durations`); commonly the sum of the durations. |
+
+**Returns:** The rating level `LAr,T`, in dB.
+
+**Raises**
+
+| Exception | When |
+| :--- | :--- |
+| ValueError | for mismatched lengths or a non-positive time. |
 
 ## sound_pressure_level_history
 

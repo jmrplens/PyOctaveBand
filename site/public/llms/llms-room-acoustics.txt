@@ -319,7 +319,7 @@ deconvolution identities in the [conformance report](https://jmrplens.github.io/
   measurement either side of a partition.
 - [Image Sources & Steady-State Field](https://jmrplens.github.io/phonometry/guides/room-image-sources/): simulated
   impulse responses to rehearse the processing chain on.
-- API reference: [`room.room_ir`](https://jmrplens.github.io/phonometry/reference/api/rooms/room-ir/).
+- API reference: [`room.impulse_response`](https://jmrplens.github.io/phonometry/reference/api/rooms/impulse-response/).
 
 ---
 
@@ -665,7 +665,7 @@ ISO 3382-3 open-plan speech metrics, with their fiche, are
   used for band decay curves and insulation spectra.
 - [Theory](https://jmrplens.github.io/phonometry/reference/theory/rooms-buildings/): Schroeder integration, regression windows and the
   reference-curve derivation.
-- API reference: [`room.room_acoustics`](https://jmrplens.github.io/phonometry/reference/api/rooms/room-acoustics/).
+- API reference: [`room.acoustics`](https://jmrplens.github.io/phonometry/reference/api/rooms/acoustics/).
 
 ## Quick answers
 
@@ -2285,7 +2285,7 @@ room.room_criterion(spl).plot()
 plt.show()
 
 # By hand, mirroring what NCResult.plot() / RCResult.plot() draw:
-from phonometry.room.room_noise import NC_CURVES, NC_INDICES, OCTAVE_BANDS
+from phonometry.room.noise_criteria import NC_CURVES, NC_INDICES, OCTAVE_BANDS
 nc, rc = room.noise_criterion(spl), room.room_criterion(spl)
 fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 5))
 

@@ -24,7 +24,7 @@ from numpy.typing import NDArray
 from .._internal.validation import require_choice
 
 if TYPE_CHECKING:
-    from ..room.room_noise import NCResult, RCResult
+    from ..room.noise_criteria import NCResult, RCResult
 
 #: The room-criterion families a composed workflow can be rated against:
 #: the NC curves of ANSI/ASA S12.2-2019 Table 1 and the RC Mark II curves of
@@ -109,7 +109,7 @@ class CriterionCarrier(Protocol):
 
 def rating_of(result: CriterionCarrier) -> NCResult | RCResult:
     """Rate the received spectrum against its criterion family."""
-    from ..room.room_noise import noise_criterion, room_criterion
+    from ..room.noise_criteria import noise_criterion, room_criterion
 
     if result.criterion == "NC":
         return noise_criterion(result.received_level, result.frequencies)
@@ -120,7 +120,7 @@ def curve_of(result: CriterionCarrier) -> np.ndarray | None:
     """The design criterion curve at the analysis bands, or ``None``."""
     if result.target is None:
         return None
-    from ..room.room_noise import _criterion_curve_at
+    from ..room.noise_criteria import _criterion_curve_at
 
     return _criterion_curve_at(result.criterion, result.target, result.frequencies)
 

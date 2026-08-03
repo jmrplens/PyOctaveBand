@@ -32,15 +32,15 @@ from .common import (
 if TYPE_CHECKING:
     from matplotlib.axes import Axes
 
+    from ..room.acoustics import DecayCurve, RoomAcousticsResult
     from ..room.crowd_noise import CrowdNoiseResult
     from ..room.enclosed_space_absorption import ReverberationResult
     from ..room.image_source import ImageSourceResult
+    from ..room.impulse_response import ImpulseResponseResult
+    from ..room.modes import RoomModesResult
+    from ..room.noise_criteria import NCResult, RCResult
     from ..room.open_plan import OpenPlanResult
     from ..room.reverberation_prediction import ReverberationModelResult
-    from ..room.room_acoustics import DecayCurve, RoomAcousticsResult
-    from ..room.room_ir import ImpulseResponseResult
-    from ..room.room_modes import RoomModesResult
-    from ..room.room_noise import NCResult, RCResult
     from ..room.steady_field import SteadyFieldResult
 
 #: Spanish translations of the fixed strings rendered by the room ``.plot()``
@@ -153,7 +153,7 @@ def plot_room_acoustics(
     the two series are drawn on that single axes (times only) so the plot
     can be composed.
 
-    :param result: A :class:`~phonometry.room.room_acoustics.RoomAcousticsResult`.
+    :param result: A :class:`~phonometry.room.acoustics.RoomAcousticsResult`.
     :param ax: Existing axes for a single-panel (decay-times only) plot, or
         ``None`` to create the full two-panel figure.
     :return: The axes, or an array of two axes for the default figure.
@@ -237,7 +237,7 @@ def plot_decay_curve(
 ) -> Axes:
     """Schroeder decay curve with optional straight T-fit overlays.
 
-    :param result: A :class:`~phonometry.room.room_acoustics.DecayCurve`.
+    :param result: A :class:`~phonometry.room.acoustics.DecayCurve`.
     :param ax: Existing axes, or ``None`` to create a figure.
     :param fits: Overlay the EDT (0..-10 dB), T20 (-5..-25 dB) and T30
         (-5..-35 dB) straight-line fits computed from the curve's own data.
@@ -290,7 +290,7 @@ def plot_impulse_response(
     backward-integrated energy-decay curve overlaid. With ``ax`` given, only
     the decay panel is drawn on it.
 
-    :param result: An :class:`~phonometry.room.room_ir.ImpulseResponseResult`.
+    :param result: An :class:`~phonometry.room.impulse_response.ImpulseResponseResult`.
     :param ax: Existing axes for the decay panel, or ``None`` for a fresh
         two-panel figure.
     :param kwargs: Forwarded to the waveform / envelope ``plot`` calls.
@@ -349,13 +349,13 @@ def plot_noise_criterion(
 ) -> Axes:
     """Measured spectrum against the NC curve family (ANSI/ASA S12.2-2019).
 
-    :param result: A :class:`~phonometry.room.room_noise.NCResult`.
+    :param result: A :class:`~phonometry.room.noise_criteria.NCResult`.
     :param ax: Existing axes, or ``None`` to create a figure.
     :param kwargs: Forwarded to the measured-spectrum :meth:`plot`.
     :return: The axes.
     """
     from .._i18n import localize_axes
-    from ..room.room_noise import NC_CURVES, NC_INDICES, OCTAVE_BANDS
+    from ..room.noise_criteria import NC_CURVES, NC_INDICES, OCTAVE_BANDS
 
     ax = ax if ax is not None else _new_axes()
     freqs = np.asarray(result.frequencies, dtype=np.float64)
@@ -404,7 +404,7 @@ def plot_room_criterion(
     Shades the rumble tolerance (reference + 5 dB below 500 Hz) and the hiss
     tolerance (reference + 3 dB at and above 1000 Hz).
 
-    :param result: A :class:`~phonometry.room.room_noise.RCResult`.
+    :param result: A :class:`~phonometry.room.noise_criteria.RCResult`.
     :param ax: Existing axes, or ``None`` to create a figure.
     :param kwargs: Forwarded to the measured-spectrum :meth:`plot`.
     :return: The axes.
@@ -824,7 +824,7 @@ def plot_shaped_sweep(
     in dB re their in-band maximum, so the match is read directly). With
     ``ax`` given, only the spectrum panel is drawn on it.
 
-    :param result: A :class:`~phonometry.room.room_ir.ShapedSweepResult`.
+    :param result: A :class:`~phonometry.room.impulse_response.ShapedSweepResult`.
     :param ax: Existing axes for the spectrum panel, or ``None`` for a
         fresh two-panel figure.
     :param kwargs: Forwarded to the waveform ``plot`` call.
@@ -918,7 +918,7 @@ def plot_room_modes(
     it is marked on both panels, separating the modal regime on its left from
     the statistical regime on its right.
 
-    :param result: A :class:`~phonometry.room.room_modes.RoomModesResult`.
+    :param result: A :class:`~phonometry.room.modes.RoomModesResult`.
     :param ax: Existing axes for the mode ladder alone, or ``None`` to create
         the two-panel figure.
     :param language: Label language, ``"en"`` (default) or ``"es"``.

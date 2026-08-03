@@ -240,7 +240,8 @@ def sweep_signal(
     t = np.arange(n) / fs
     ts = n / fs
     ratio = f2 / f1
-    # phi(t) = 2*pi*f1*T/ln(f2/f1) * ((f2/f1)^(t/T) - 1)
+    # Instantaneous phase of the exponential sweep: the integral of a rate
+    # that multiplies by f2/f1 over the sweep time.
     k = 2.0 * np.pi * f1 * ts / np.log(ratio)
     phase = k * (ratio ** (t / ts) - 1.0)
     sweep: np.ndarray = amplitude * np.sin(phase)

@@ -18,7 +18,7 @@ the library: the reverberant level the machine builds up in the source room
 (measured, or predicted by [`phonometry.building.prediction.panel_transmission`](/phonometry/reference/api/building/panel-transmission/)), the
 absorption of the receiving room
 ([`phonometry.room.equivalent_absorption_area`](/phonometry/reference/api/rooms/enclosed-space-absorption/#equivalent_absorption_area)) and the rating of what
-arrives ([`phonometry.room.noise_criterion`](/phonometry/reference/api/rooms/room-noise/#noise_criterion)). What this module adds is the
+arrives ([`phonometry.room.noise_criterion`](/phonometry/reference/api/rooms/noise-criteria/#noise_criterion)). What this module adds is the
 one step that lives nowhere else, and the result object that carries the whole
 path.
 
@@ -227,8 +227,8 @@ Requires matplotlib (`pip install phonometry[plot]`).
 
 The rating of the spectrum arriving in the receiving room.
 
-An [`NCResult`](/phonometry/reference/api/rooms/room-noise/#ncresult) for the `"NC"`
-family, an [`RCResult`](/phonometry/reference/api/rooms/room-noise/#rcresult) for `"RC"`.
+An [`NCResult`](/phonometry/reference/api/rooms/noise-criteria/#ncresult) for the `"NC"`
+family, an [`RCResult`](/phonometry/reference/api/rooms/noise-criteria/#rcresult) for `"RC"`.
 
 ### RoomToRoomResult.required_transmission_loss
 

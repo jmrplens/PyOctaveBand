@@ -113,7 +113,7 @@ room.room_criterion(spl).plot()
 plt.show()
 
 # By hand, mirroring what NCResult.plot() / RCResult.plot() draw:
-from phonometry.room.room_noise import NC_CURVES, NC_INDICES, OCTAVE_BANDS
+from phonometry.room.noise_criteria import NC_CURVES, NC_INDICES, OCTAVE_BANDS
 nc, rc = room.noise_criterion(spl), room.room_criterion(spl)
 fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 5))
 

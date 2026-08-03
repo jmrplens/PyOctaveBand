@@ -96,7 +96,8 @@ def test_rt_exponential_broadband(t60: float) -> None:
     assert res.edt[0] == pytest.approx(t60, rel=0.01)
     assert res.t20[0] == pytest.approx(t60, rel=0.01)
     assert res.t30[0] == pytest.approx(t60, rel=0.01)
-    assert bool(res.edt_valid[0]) and bool(res.t20_valid[0])
+    assert bool(res.edt_valid[0])
+    assert bool(res.t20_valid[0])
     assert bool(res.t30_valid[0])
     # Perfectly straight decay: curvature ~ 0 % (ISO 3382-2, B.3).
     assert abs(res.curvature[0]) < 2.0
@@ -199,7 +200,8 @@ def test_double_slope_edt_below_t30() -> None:
     p2 = np.exp(-A60 * t / 0.4) + 1e-2 * np.exp(-A60 * t / 2.0)
     ir = np.sqrt(p2)
     res = room_parameters(ir, fs, limits=None)
-    assert np.isfinite(res.edt[0]) and np.isfinite(res.t30[0])
+    assert np.isfinite(res.edt[0])
+    assert np.isfinite(res.t30[0])
     assert res.edt[0] < res.t20[0] < res.t30[0]
     # Strong curvature indicator (ISO 3382-2, B.3: C > 10 % is suspicious).
     assert res.curvature[0] > 10.0
@@ -304,14 +306,17 @@ def test_default_bands_are_octaves_125_to_4k() -> None:
 
 
 def test_rejects_bad_input() -> None:
+    two_dimensional = np.zeros((2, 100))
+    silent = np.zeros(100)
+    decaying = exponential_ir(1.0, 1.0)
     with pytest.raises(ValueError):
-        room_parameters(np.zeros((2, 100)), FS)  # 2D
+        room_parameters(two_dimensional, FS)  # 2D
     with pytest.raises(ValueError):
-        room_parameters(np.zeros(100), FS)  # silent
+        room_parameters(silent, FS)  # silent
     with pytest.raises(ValueError):
-        room_parameters(exponential_ir(1.0, 1.0), 0)  # bad fs
+        room_parameters(decaying, 0)  # bad fs
     with pytest.raises(ValueError):
-        decay_curve(np.zeros(100), FS)  # silent
+        decay_curve(silent, FS)  # silent
 
 
 def test_constant_noise_no_decay_is_finite_and_invalid() -> None:

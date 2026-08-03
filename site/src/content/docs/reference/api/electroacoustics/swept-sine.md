@@ -40,9 +40,9 @@ Two excitation/deconvolution pairs are implemented:
   `method="synchronized"` (the default).
 
 * **Exponential sweep with the Farina inverse filter** -- the classical
-  ESS of [`phonometry.sweep_signal`](/phonometry/reference/api/rooms/room-ir/#sweep_signal) deconvolved by the time-reversed,
+  ESS of [`phonometry.sweep_signal`](/phonometry/reference/api/rooms/impulse-response/#sweep_signal) deconvolved by the time-reversed,
   amplitude-compensated sweep (Farina 2000; ISO 18233:2006 Figure B.2,
-  the machinery of [`phonometry.impulse_response`](/phonometry/reference/api/rooms/room-ir/#impulse_response)). The harmonic
+  the machinery of [`phonometry.impulse_response`](/phonometry/reference/api/rooms/impulse-response/)). The harmonic
   *magnitudes* are correct, but the sweep is not synchronized: its `-1`
   phase term breaks the time-shift/harmonic equivalence, so the phases of
   `H_n` for $n \ge 2$ depend on the excitation and are not
@@ -92,7 +92,7 @@ The excitation must be the matching generator with the *same*
 parameters: [`synchronized_sweep_signal`](/phonometry/reference/api/electroacoustics/swept-sine/#synchronized_sweep_signal) for
 `method="synchronized"` (the default; harmonic phases are meaningful,
 and the closed-form deconvolution extends each `H_n` to
-$[n f_1, n f_2]$), or [`phonometry.sweep_signal`](/phonometry/reference/api/rooms/room-ir/#sweep_signal) for
+$[n f_1, n f_2]$), or [`phonometry.sweep_signal`](/phonometry/reference/api/rooms/impulse-response/#sweep_signal) for
 `method="farina"` (magnitudes only; the band of every `H_n` is
 capped at `f2` by the inverse filter).
 

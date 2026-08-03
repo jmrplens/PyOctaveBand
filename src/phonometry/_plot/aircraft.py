@@ -22,13 +22,13 @@ from .common import (
 if TYPE_CHECKING:
     from matplotlib.axes import Axes
 
-    from ..aircraft.aircraft_noise import EPNLResult
     from ..aircraft.airport_noise import (
         FlyoverResult,
         NoiseContourResult,
         NpdLevelResult,
     )
     from ..aircraft.atmospheric_absorption import AircraftBandAttenuation
+    from ..aircraft.certification import EPNLResult
     from ..aircraft.rotorcraft_noise import (
         FlightPathKinematics,
         MeanGroundPlaneResult,
@@ -100,7 +100,7 @@ def plot_epnl(result: EPNLResult, ax: Axes | None = None, *, language: str = "en
     against time; the maximum ``PNLTM`` is marked and the 10 dB-down integration
     band (records ``kF``..``kL``) is shaded, annotated with the EPNL.
 
-    :param result: An :class:`~phonometry.aircraft.aircraft_noise.EPNLResult`.
+    :param result: An :class:`~phonometry.aircraft.certification.EPNLResult`.
     :param ax: Existing axes, or ``None`` to create a figure.
     :param language: Label language, ``"en"`` (default) or ``"es"``.
     :param kwargs: Forwarded to the PNLT ``plot`` call.

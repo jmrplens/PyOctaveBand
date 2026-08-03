@@ -1,8 +1,8 @@
 ---
-title: "aircraft.aircraft_noise"
+title: "aircraft.certification"
 description: "Aircraft noise certification: Effective Perceived Noise Level (ICAO Annex 16)."
 sidebar:
-  label: "aircraft_noise"
+  label: "certification"
 ---
 
 Aircraft noise certification: Effective Perceived Noise Level (ICAO Annex 16).
@@ -12,14 +12,14 @@ is built from a half-second spectral time history (24 one-third-octave bands,
 50 Hz-10 kHz) in five steps, implementing **ICAO Annex 16 Vol. I, Appendix 2**
 (the analytic formulation):
 
-* [`perceived_noisiness`](/phonometry/reference/api/aeroacoustics/aircraft-noise/#perceived_noisiness) -- per-band perceived noisiness `n` (noys),
+* [`perceived_noisiness`](/phonometry/reference/api/aeroacoustics/certification/#perceived_noisiness) -- per-band perceived noisiness `n` (noys),
   the analytic piecewise noy law with the Table A2-3 constants.
-* [`perceived_noise_level`](/phonometry/reference/api/aeroacoustics/aircraft-noise/#perceived_noise_level) --
+* [`perceived_noise_level`](/phonometry/reference/api/aeroacoustics/certification/#perceived_noise_level) --
   $\mathrm{PNL} = 40 + (10/\log_{10} 2) \cdot \log_{10} N$ from the total
   noisiness $N = 0.85 \cdot n_{\mathrm{max}} + 0.15 \cdot \sum n$.
-* [`tone_correction`](/phonometry/reference/api/aeroacoustics/aircraft-noise/#tone_correction) -- the tone-correction factor `C` (the slope /
+* [`tone_correction`](/phonometry/reference/api/aeroacoustics/certification/#tone_correction) -- the tone-correction factor `C` (the slope /
   "encircling" method) that penalises spectral irregularities.
-* [`effective_perceived_noise_level`](/phonometry/reference/api/aeroacoustics/aircraft-noise/#effective_perceived_noise_level) -- the end-to-end metric: per-record
+* [`effective_perceived_noise_level`](/phonometry/reference/api/aeroacoustics/certification/#effective_perceived_noise_level) -- the end-to-end metric: per-record
   $\mathrm{PNLT} = \mathrm{PNL} + C$, the maximum `PNLTM`, the
   10 dB-down integration limits
   and the duration correction, giving
@@ -56,7 +56,7 @@ the 10 dB-down window give $\mathrm{EPNL} = \mathrm{PNLTM} + D$.
 | `reference_time` | Normalising time `T0`, in s (default 10). |
 | `procedure` | Tone-correction procedure of App. 2 §4.3.1 Step 1: `"aeroplane"` (default) starts the slope analysis at the 80 Hz band (band 3), `"helicopter"` (helicopters and tilt-rotors) at the 50 Hz band (band 1), so rotor tones in the 50-80 Hz bands are not missed. |
 
-**Returns:** An [`EPNLResult`](/phonometry/reference/api/aeroacoustics/aircraft-noise/#epnlresult).
+**Returns:** An [`EPNLResult`](/phonometry/reference/api/aeroacoustics/certification/#epnlresult).
 
 **Raises**
 

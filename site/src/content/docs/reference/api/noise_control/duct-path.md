@@ -265,9 +265,9 @@ bottom, with the design criterion curve overlaid. Requires matplotlib
 
 The room-criterion rating of `received_level`.
 
-An [`NCResult`](/phonometry/reference/api/rooms/room-noise/#ncresult) when
+An [`NCResult`](/phonometry/reference/api/rooms/noise-criteria/#ncresult) when
 `criterion` is `"NC"`, otherwise an
-[`RCResult`](/phonometry/reference/api/rooms/room-noise/#rcresult) (ANSI/ASA S12.2-2019).
+[`RCResult`](/phonometry/reference/api/rooms/noise-criteria/#rcresult) (ANSI/ASA S12.2-2019).
 
 ### DuctPathResult.report()
 

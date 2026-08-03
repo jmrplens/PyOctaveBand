@@ -1782,7 +1782,7 @@ def _event_metrics(
     spectra: NDArray[np.float64],
 ) -> tuple[float, float, float, NDArray[np.float64], float, float]:
     """The single-receiver metrics ``(LASmax, SEL, SEL_10dB, PNLT, PNLTM, EPNL)``."""
-    from .aircraft_noise import (
+    from .certification import (
         _ten_db_down_limits,
         epnl_from_pnlt,
         perceived_noise_level,
@@ -1824,7 +1824,7 @@ def _event_metrics(
 
 def _noy_band_indices(frequencies: NDArray[np.float64]) -> NDArray[np.intp] | None:
     """Indices of the 24 noy bands (50 Hz-10 kHz) in a band grid, or ``None``."""
-    from .aircraft_noise import NOY_BANDS
+    from .certification import NOY_BANDS
 
     idx = []
     for band in NOY_BANDS:
@@ -1895,7 +1895,7 @@ def rotorcraft_event_level(
     ``LASmax``,
     ``SEL`` (Doc 32 Eq. 27) and ``EPNL`` (Doc 32 Eq. 28, ICAO Annex 16 App. 2,
     reusing
-    :func:`~phonometry.aircraft.aircraft_noise.epnl_from_pnlt`).
+    :func:`~phonometry.aircraft.certification.epnl_from_pnlt`).
 
     The flight condition per point comes from the ``airspeed``/``path_angle``
     overrides when given (e.g. the smoothed values of a radar-track workflow),

@@ -4,7 +4,7 @@ Room acoustic parameters from impulse responses per ISO 3382-1:2009
 (performance spaces) and ISO 3382-2:2008 (ordinary rooms).
 
 The measured impulse response (acquired e.g. with the swept-sine or MLS
-front end of :mod:`phonometry.room.room_ir`, ISO 18233) is filtered into
+front end of :mod:`phonometry.room.impulse_response`, ISO 18233) is filtered into
 fractional-octave bands (IEC 61260) and converted to a decay curve by
 Schroeder backward integration of the squared impulse response
 (ISO 3382-1:2009, 5.3.3, Equation (1)). To limit the influence of
@@ -512,7 +512,7 @@ def room_parameters(
     Room acoustic parameters per ISO 3382-1:2009 / ISO 3382-2:2008.
 
     The impulse response (e.g. acquired with the ISO 18233 swept-sine or
-    MLS methods of :mod:`phonometry.room.room_ir`) is filtered into
+    MLS methods of :mod:`phonometry.room.impulse_response`) is filtered into
     fractional-octave bands (IEC 61260) and each band decay curve is
     obtained by Schroeder backward integration with noise truncation and
     tail compensation (ISO 3382-1:2009, 5.3.3). Least-squares line fits

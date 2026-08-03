@@ -1,8 +1,8 @@
 ---
-title: "room.room_noise"
+title: "room.noise_criteria"
 description: "Room-noise rating curves per ANSI/ASA S12.2-2019."
 sidebar:
-  label: "room_noise"
+  label: "noise_criteria"
 ---
 
 Room-noise rating curves per ANSI/ASA S12.2-2019.
@@ -194,7 +194,7 @@ reads `">NC-70"` / `"<NC-15"`.
 | `levels` | Octave-band sound pressure levels, in dB. Without `frequencies` this must be the 10 bands from 16 Hz to 8000 Hz. |
 | `frequencies` | Optional band centre frequencies, in hertz, matching `levels`; a subset of the ANSI S12.2 octave bands may be supplied. |
 
-**Returns:** An [`NCResult`](/phonometry/reference/api/rooms/room-noise/#ncresult) with the designation and its `.plot()`.
+**Returns:** An [`NCResult`](/phonometry/reference/api/rooms/noise-criteria/#ncresult) with the designation and its `.plot()`.
 
 **Raises**
 
@@ -347,14 +347,14 @@ above 1000 Hz do not exceed it by more than 3 dB; rumble (`"R"`) when a
 low band exceeds by more than 5 dB; hiss (`"H"`) when a high band
 exceeds by more than 3 dB (clause D.3). When both deviations fire, the
 library tags the spectrum `"RH"`, a diagnostic extension beyond the
-clause D.3.5 letters (see [`RCResult`](/phonometry/reference/api/rooms/room-noise/#rcresult)).
+clause D.3.5 letters (see [`RCResult`](/phonometry/reference/api/rooms/noise-criteria/#rcresult)).
 
 Clause D.4 evaluates a spectrum that includes at least the octave bands
 from 31.5 Hz through 4000 Hz; when any of those bands is missing a
 `UserWarning` is emitted, since the absent bands are silently
 skipped by the spectral-tag deviation tests. A rating outside the
 tabulated RC-25 to RC-50 family is flagged by
-[`RCResult.out_of_family`](/phonometry/reference/api/rooms/room-noise/#rcresultout_of_family).
+[`RCResult.out_of_family`](/phonometry/reference/api/rooms/noise-criteria/#rcresultout_of_family).
 
 **Parameters**
 
@@ -363,7 +363,7 @@ tabulated RC-25 to RC-50 family is flagged by
 | `levels` | Octave-band sound pressure levels, in dB. Without `frequencies` this must be the 10 bands from 16 Hz to 8000 Hz. |
 | `frequencies` | Optional band centre frequencies, in hertz, matching `levels`. |
 
-**Returns:** An [`RCResult`](/phonometry/reference/api/rooms/room-noise/#rcresult) with the rating, tag and its `.plot()`.
+**Returns:** An [`RCResult`](/phonometry/reference/api/rooms/noise-criteria/#rcresult) with the rating, tag and its `.plot()`.
 
 **Raises**
 

@@ -15,7 +15,6 @@ governing prominence and adjustment are derived from Formula 1 and Formula 2.
 
 from __future__ import annotations
 
-import importlib
 import math
 
 import pytest
@@ -23,10 +22,7 @@ import pytest
 pytest.importorskip("reportlab")
 
 from phonometry import ReportMetadata
-
-# The module is shadowed in the package namespace by the function of the same
-# name, so it must be imported through the import system directly.
-nt = importlib.import_module("phonometry.environment.assessment.impulse_prominence")
+from phonometry.environment.assessment import impulsive_sound as nt
 
 _PDF_MAGIC = b"%PDF"
 

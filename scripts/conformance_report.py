@@ -1795,7 +1795,7 @@ def _chk_iso18233_sweep_deconvolution() -> Outcome:
         20.0 * np.log10(np.abs(h_est[mask])) - 20.0 * np.log10(np.abs(h_true[mask]))
     )))
     # Linear deconvolution is exact in-band up to windowing/regularisation
-    # leakage; 0.1 dB is the demonstrated in-band bound (tests/room/test_room_ir.py)
+    # leakage; 0.1 dB is the demonstrated in-band bound (tests/room/test_impulse_response.py)
     # with the same 300-1500 Hz evaluation band, well inside the sweep edges.
     return numeric(0.0, worst, 0.1, unit="dB", places=4,
                    expected_label="0 dB in-band error (+/-0.1 dB)")
@@ -7188,7 +7188,9 @@ def _chk_ac_epnl() -> Outcome:
     "Directional-response tolerance at 4 kHz / 90°, dB",
 )
 def _chk_ac_iec61265() -> Outcome:
-    from phonometry.filters.compliance import _iec61265_directional_limit
+    from phonometry.aircraft.measurement_system import (
+        _iec61265_directional_limit,
+    )
 
     return numeric(2.0, _iec61265_directional_limit(4000.0, 90.0), 1e-9, unit="dB", places=1)
 

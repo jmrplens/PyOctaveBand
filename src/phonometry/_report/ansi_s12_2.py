@@ -4,11 +4,11 @@
 Renders the two room-noise ratings of ANSI/ASA S12.2-2019 to a one-page PDF
 laid out like a room-noise assessment report:
 
-* a :class:`~phonometry.room.room_noise.NCResult` (Noise Criteria, clause
+* a :class:`~phonometry.room.noise_criteria.NCResult` (Noise Criteria, clause
   5.2.2): the NC designation (NC-(SIL), or the tangency rating with its
   governing octave band; ``">NC-70"`` / ``"<NC-15"`` outside the Table 1
   family); and
-* a :class:`~phonometry.room.room_noise.RCResult` (Room Criteria Mark II,
+* a :class:`~phonometry.room.noise_criteria.RCResult` (Room Criteria Mark II,
   Annex D): the RC rating and its spectral-quality tag (neutral / rumble /
   hiss).
 
@@ -67,7 +67,7 @@ from ._layout import (
 from .metadata import ReportMetadata
 
 if TYPE_CHECKING:
-    from ..room.room_noise import NCResult, RCResult
+    from ..room.noise_criteria import NCResult, RCResult
 
 #: Shared title for both room-noise rating fiches.
 _TITLE = "Room noise rating"
@@ -119,7 +119,7 @@ def _metadata_pairs(
 
 def _band_labels() -> list[str]:
     """Nominal octave-band labels (16 ... 8000 Hz), aligned with the levels."""
-    from ..room.room_noise import OCTAVE_BANDS
+    from ..room.noise_criteria import OCTAVE_BANDS
 
     return [f"{f:g}" for f in np.asarray(OCTAVE_BANDS, dtype=np.float64)]
 
@@ -181,12 +181,12 @@ def _nc_contour_column(levels: np.ndarray, language: str) -> list[str]:
 
     For each band the NC index whose Table 1 curve passes through the measured
     level is found by interpolation, exactly as
-    :func:`~phonometry.room.room_noise.noise_criterion` does; the tangency
+    :func:`~phonometry.room.noise_criteria.noise_criterion` does; the tangency
     rating is the maximum of these values. A band with no measured level shows
     an em dash; a band outside the Table 1 family shows ``"<15"`` / ``">70"``
     (no NC contour passes through it), never a fabricated number.
     """
-    from ..room.room_noise import NC_CURVES, NC_INDICES
+    from ..room.noise_criteria import NC_CURVES, NC_INDICES
 
     cells: list[str] = []
     for k, level in enumerate(levels):
@@ -532,7 +532,7 @@ def render_nc_report(
 ) -> str:
     """Render a Noise Criteria (NC) assessment fiche to a PDF at ``path``.
 
-    :param result: An :class:`~phonometry.room.room_noise.NCResult`.
+    :param result: An :class:`~phonometry.room.noise_criteria.NCResult`.
     :param path: Destination path of the PDF file.
     :param metadata: Optional :class:`ReportMetadata`; ``None`` produces a bare
         assessment fiche (body + result + disclaimer, no header). A supplied
@@ -571,7 +571,7 @@ def render_rc_report(
 ) -> str:
     """Render a Room Criteria Mark II (RC) assessment fiche to a PDF at ``path``.
 
-    :param result: An :class:`~phonometry.room.room_noise.RCResult`.
+    :param result: An :class:`~phonometry.room.noise_criteria.RCResult`.
     :param path: Destination path of the PDF file.
     :param metadata: Optional :class:`ReportMetadata`; ``None`` produces a bare
         assessment fiche (body + result + disclaimer, no header). A supplied

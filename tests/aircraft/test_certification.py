@@ -15,7 +15,7 @@ matplotlib.use("Agg")
 import numpy as np
 import pytest
 
-from phonometry.aircraft.aircraft_noise import (
+from phonometry.aircraft.certification import (
     NOY_BANDS,
     _tone_background,
     effective_perceived_noise_level,
@@ -148,8 +148,9 @@ def test_epnl_single_element_dt_treated_as_scalar() -> None:
 
 
 def test_effective_perceived_noise_level_rejects_bad_shape() -> None:
+    two_dimensional = np.zeros((5, 10))
     with pytest.raises(ValueError):
-        effective_perceived_noise_level(np.zeros((5, 10)))
+        effective_perceived_noise_level(two_dimensional)
 
 
 def test_helicopter_procedure_catches_low_frequency_rotor_tone() -> None:
@@ -199,7 +200,7 @@ def test_bandsharing_adjustment_applied() -> None:
     # records within one second of it, Delta_B is the shortfall, added to
     # PNLTM before the 10 dB-down window and included in EPNL. Hand-built
     # case: C = [2, 2, 0, 2, 2] around the peak -> Delta_B = 1.6.
-    from phonometry.aircraft.aircraft_noise import epnl_from_pnlt
+    from phonometry.aircraft.certification import epnl_from_pnlt
 
     pnlt = np.array([80.0, 90.0, 95.0, 100.0, 95.0, 90.0, 80.0])
     c = np.array([0.0, 2.0, 2.0, 0.0, 2.0, 2.0, 0.0])
@@ -217,7 +218,7 @@ def test_bandsharing_adjustment_applied() -> None:
 def test_bandsharing_window_scales_with_record_duration() -> None:
     # The one-second window is time-based, not a fixed five-record slice:
     # with 1 s records only the immediate neighbours fall within +/- 1 s.
-    from phonometry.aircraft.aircraft_noise import epnl_from_pnlt
+    from phonometry.aircraft.certification import epnl_from_pnlt
 
     pnlt = np.array([80.0, 90.0, 95.0, 100.0, 95.0, 90.0, 80.0])
     c = np.array([0.0, 2.0, 2.0, 0.0, 2.0, 2.0, 0.0])

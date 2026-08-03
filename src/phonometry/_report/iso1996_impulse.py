@@ -2,7 +2,7 @@
 """Impulsive-sound prominence assessment fiche (reportlab renderer).
 
 Renders a
-:class:`~phonometry.environment.assessment.impulse_prominence.ImpulseProminenceResult`
+:class:`~phonometry.environment.assessment.impulsive_sound.ImpulseProminenceResult`
 to a one-page PDF laid out like an impulsive-sound assessment report of an
 environmental-noise laboratory. NT ACOU 112:2002 (carried into
 ISO/PAS 1996-3:2022) measures how *prominent* an impulse is from its onset rate
@@ -66,7 +66,7 @@ from ._layout import (
 from .metadata import ReportMetadata
 
 if TYPE_CHECKING:
-    from ..environment.assessment.impulse_prominence import ImpulseProminenceResult
+    from ..environment.assessment.impulsive_sound import ImpulseProminenceResult
 
 #: Minimum onset rate, in dB/s, for a level rise to qualify as an impulse
 #: (NT ACOU 112:2002, clause 4.5). Kept here so the renderer does not import
@@ -362,7 +362,7 @@ def render_impulse_prominence_report(
     """Render an impulsive-sound prominence assessment fiche to a PDF at ``path``.
 
     :param result: An
-        :class:`~phonometry.environment.assessment.impulse_prominence.ImpulseProminenceResult`
+        :class:`~phonometry.environment.assessment.impulsive_sound.ImpulseProminenceResult`
         carrying the per-impulse onset rates, level differences and prominences.
     :param path: Destination path of the PDF file.
     :param metadata: Optional :class:`ReportMetadata` supplying the header
