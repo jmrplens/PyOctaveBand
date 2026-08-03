@@ -337,15 +337,21 @@ def test_xref_anchors_point_to_emitted_headings(
 
 
 def test_sidebar_fragment_lists_every_page(generated: pathlib.Path) -> None:
+    """One group per section, every page in it, and nothing else.
+
+    The topics of the site mount these groups by section, so a page missing
+    here is a page missing from the sidebar of its own domain.
+    """
     sidebar = (generated / "api-sidebar.mjs").read_text(encoding="utf-8")
     pages, _, _ = gad.build_model()
-    assert (
-        "{ slug: 'reference/api', label: 'Overview', translations: { es: 'Resumen' } }"
-        in sidebar
-    )
-    assert sidebar.count("collapsed: true") == len(gad.SECTIONS) + 1
+    assert "export const apiSections = {" in sidebar
+    assert sidebar.count("collapsed: true") == len(gad.SECTIONS)
+    for key in gad.SECTIONS:
+        assert f"  '{key}': {{" in sidebar, key
     for page in pages:
         assert f"'reference/api/{page.section.key}/{page.slug}'" in sidebar
+    listed = sidebar.count("      'reference/api/")
+    assert listed == len(pages), (listed, len(pages))
 
 
 # ---------------------------------------------------------------------------

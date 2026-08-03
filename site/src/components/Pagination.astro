@@ -3,7 +3,7 @@
  * Custom Starlight <Pagination> override: previous/next links that say which
  * section they lead to.
  *
- * Thirty-one of the sidebar's entries are called "Overview", one per group,
+ * Thirty-five of the sidebar's entries are called "Overview", one per group,
  * because a group label cannot itself be a link in Starlight and each group
  * carries its landing page as a first row instead (see src/data/topics.mjs).
  * Every page next to one of them therefore had a card reading "Next: Overview":
@@ -20,7 +20,11 @@
  * only its last two, which is as much as the card can hold on a phone.
  *
  * The trail is looked up in the same sidebar the page renders, so it follows
- * the tree without a second list to maintain.
+ * the tree without a second list to maintain. That sidebar is the current
+ * topic's, which is also what decides whether a neighbour is offered at all:
+ * Starlight paginates over the whole tree and the plugin's own trimming does
+ * not survive a configured `base`, so a card that would send the reader out of
+ * the topic, swapping the sidebar under them, is dropped here instead.
  */
 import { Icon } from '@astrojs/starlight/components';
 
@@ -52,15 +56,20 @@ function context(href: string): string {
 	return trail.slice(-2).join(' / ');
 }
 
+/** Whether a neighbour is inside the topic the reader is in. */
+function inThisTopic(href: string): boolean {
+	return groupTrail(sidebar as Entry[], href) !== null;
+}
+
 const links = [
 	{
-		link: prev,
+		link: prev && inThisTopic(prev.href) ? prev : undefined,
 		rel: 'prev',
 		relation: Astro.locals.t('page.previousLink'),
 		icon: isRtl ? 'right-arrow' : 'left-arrow',
 	},
 	{
-		link: next,
+		link: next && inThisTopic(next.href) ? next : undefined,
 		rel: 'next',
 		relation: Astro.locals.t('page.nextLink'),
 		icon: isRtl ? 'left-arrow' : 'right-arrow',

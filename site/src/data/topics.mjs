@@ -23,7 +23,13 @@ const apiGroup = (...keys) => ({
   label: 'API reference',
   translations: { es: 'Referencia de la API' },
   collapsed: true,
-  items: keys.map((key) => apiSections[key]),
+  items: [
+    // The landing row of the group, as every other group has one: it is what
+    // the breadcrumb trail of a module page hangs from, and the way back to
+    // the whole table from inside one domain.
+    { slug: 'reference/api', label: 'Overview', translations: { es: 'Resumen' } },
+    ...keys.map((key) => apiSections[key]),
+  ],
 });
 
 export const topics = [

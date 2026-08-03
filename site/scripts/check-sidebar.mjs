@@ -200,8 +200,21 @@ const readTree = () => {
 	};
 	const top = sidebarEl.querySelector('ul.top-level');
 	if (!top) return { error: 'no ul.top-level inside #starlight__sidebar' };
+	// The topic list the plugin renders above the tree: the control that says
+	// which chapter the reader is in and what the others are. It is the whole
+	// point of the topics, so it is asserted rather than assumed.
+	const topicLinks = [...sidebarEl.querySelectorAll('a')]
+		// Outside the tree, and internal: the social icons of the mobile menu
+		// share this container and are not topics.
+		.filter((a) => !top.contains(a) && a.getAttribute('href')?.startsWith('/'))
+		.map((a) => ({
+			href: a.getAttribute('href'),
+			label: a.textContent.trim(),
+			current: a.getAttribute('aria-current') === 'true' || a.dataset.current === 'true',
+		}));
 	return {
 		tree: walk(top),
+		topics: topicLinks,
 		// Nothing here is a custom widget: every disclosure is a summary inside
 		// a details, which makes the keyboard and screen reader behaviour the
 		// user agent's problem rather than ours.
@@ -248,6 +261,23 @@ async function checkTree(page, path, where) {
 	}
 	const wanted = expectedTree(locale, `${BASE_PATH}${path}`);
 	expect(`${where}: the rendered tree is the configured tree`, diffTree(wanted, rendered.tree), []);
+	// Every topic is offered, in the reader's own language, and the one they
+	// are in leads its own list.
+	expect(
+		`${where}: every topic is listed`,
+		rendered.topics.map((t) => t.href).sort(),
+		topics.map((topic) => `${BASE_PATH}${localeLink(topic.link, locale)}`).sort(),
+	);
+	expect(
+		`${where}: the topic list is in the page's language`,
+		rendered.topics.map((t) => t.label).sort(),
+		topics.map((topic) => topic.label[locale]).sort(),
+	);
+	expect(
+		`${where}: the reader's own topic leads the list`,
+		rendered.topics.some((t) => t.href === `${BASE_PATH}${localeLink(topicOf(`${BASE_PATH}${path}`, locale).link, locale)}`),
+		true,
+	);
 	expect(`${where}: no hand-built disclosure anywhere`, rendered.customToggles, 0);
 	expect(`${where}: exactly one row carries the current-page marker`, rendered.currentMarkers, 1);
 	return rendered.tree;
@@ -332,11 +362,12 @@ for (const phone of [true, false]) {
 {
 	const { context, page } = await open(API_PAGE);
 	const type = await page.evaluate(readTypography);
-	// The API branch of a topic is a group of section groups, so its module
-	// pages are the third level and the sections the second.
-	expect('API branch: its section groups are one treatment', type[2], {
+	// The API branch of a topic is a group holding its own landing row and the
+	// section groups, so the second level carries both kinds and the module
+	// pages are the third.
+	expect('API branch: its landing row reads like its section groups', type[2], {
 		treatments: 1,
-		kinds: 'group',
+		kinds: 'group+page',
 	});
 	expect('API branch: the module rows read the same', type[3], {
 		treatments: 1,

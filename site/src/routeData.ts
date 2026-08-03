@@ -1,6 +1,7 @@
 import { defineRouteMiddleware } from '@astrojs/starlight/route-data';
 import { getCollection } from 'astro:content';
 import { hasMarkdownCopy, markdownCopyPath, routeOf } from './lib/page-markdown.mjs';
+import { topics } from './data/topics.mjs';
 
 const BASE = (import.meta.env.BASE_URL ?? '/').replace(/\/$/, '');
 
@@ -51,8 +52,23 @@ export const onRequest = defineRouteMiddleware(({ locals }) => {
   // mobile menu button. Force the sidebar data on so the hamburger menu is
   // available on mobile; desktop hides the sidebar pane via CSS
   // (src/styles/splash-menu.css) to keep the splash layout clean.
+  //
+  // The topics plugin only swaps its own tree in for pages that have a
+  // sidebar at the time its middleware runs, and a splash page has none, so
+  // what would render here is the plugin's internal array: one group per
+  // topic, labelled by its index. The drawer gets the topic list instead,
+  // which is the right menu for a landing page anyway.
   if (starlightRoute.entry?.data?.template === 'splash') {
     starlightRoute.hasSidebar = true;
+    const locale = starlightRoute.entry?.id?.startsWith('es') ? 'es' : 'en';
+    starlightRoute.sidebar = topics.map((topic) => ({
+      type: 'link' as const,
+      label: typeof topic.label === 'string' ? topic.label : topic.label[locale],
+      href: `${BASE}${locale === 'es' ? '/es' : ''}${topic.link}`,
+      isCurrent: false,
+      badge: undefined,
+      attrs: {},
+    }));
   }
 
   // The unified bibliography (frontmatter `references`, rendered by the
