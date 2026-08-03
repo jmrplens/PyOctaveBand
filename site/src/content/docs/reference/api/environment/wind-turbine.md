@@ -20,7 +20,7 @@ Two closed-form quantities of the standard:
   `ΔL_a` that decides whether a tone is audible.
 
 The tonal-audibility formula itself is the ISO 1996-2 Annex C one already in
-[`phonometry.environment.assessment.measurement`](/phonometry/reference/api/environment/measurement/); what is specific to IEC 61400-11 is
+[`measurement`](/phonometry/reference/api/environment/measurement/); what is specific to IEC 61400-11 is
 how the tone and masking-noise levels and the (Zwicker) critical band are
 determined from the narrowband spectrum. The rating adjustment `K_T` is the
 ISO 1996-2 [`tonal_adjustment`](/phonometry/reference/api/environment/measurement/#tonal_adjustment). The
@@ -49,7 +49,7 @@ pressure doubling; $S_0 = 1$ m².
 
 | Name | Description |
 | :--- | :--- |
-| `band_levels` | Background-corrected A-weighted band sound pressure levels `L_p,i`, in dB (scalar or per band). The 61400-11-specific background correction (Formula 23 subtraction with the 3-6 dB asterisk marking and the \<= 3 dB not-reported rule, subclause 9.3) is out of scope here and must be applied beforehand; note its rule set differs from the ISO 1996-2 correction in [`phonometry.environment.assessment.measurement.residual_sound_correction`](/phonometry/reference/api/environment/measurement/#residual_sound_correction). |
+| `band_levels` | Background-corrected A-weighted band sound pressure levels `L_p,i`, in dB (scalar or per band). The 61400-11-specific background correction (Formula 23 subtraction with the 3-6 dB asterisk marking and the \<= 3 dB not-reported rule, subclause 9.3) is out of scope here and must be applied beforehand; note its rule set differs from the ISO 1996-2 correction in [`residual_sound_correction`](/phonometry/reference/api/environment/measurement/#residual_sound_correction). |
 | `r1` | Slant distance `R1` to the rotor centre, in m. |
 
 **Returns:** The apparent sound power level `L_WA`, in dB re 1 pW.

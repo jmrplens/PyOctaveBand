@@ -42,7 +42,7 @@ Two excitation/deconvolution pairs are implemented:
 * **Exponential sweep with the Farina inverse filter** -- the classical
   ESS of [`phonometry.sweep_signal`](/phonometry/reference/api/rooms/impulse-response/#sweep_signal) deconvolved by the time-reversed,
   amplitude-compensated sweep (Farina 2000; ISO 18233:2006 Figure B.2,
-  the machinery of [`phonometry.impulse_response`](/phonometry/reference/api/rooms/impulse-response/)). The harmonic
+  the machinery of [`phonometry.impulse_response`](/phonometry/reference/api/rooms/impulse-response/#impulse_response)). The harmonic
   *magnitudes* are correct, but the sweep is not synchronized: its `-1`
   phase term breaks the time-shift/harmonic equivalence, so the phases of
   `H_n` for $n \ge 2$ depend on the excitation and are not

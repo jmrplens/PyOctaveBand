@@ -621,7 +621,7 @@ def _warn_renamed(old: str, new: str) -> None:
     warnings.warn(
         f"phonometry {old} (ISO 12999-1) is deprecated since phonometry 3.1 "
         f"and will be removed in 4.0; use {new}. For the GUM function use "
-        f"phonometry.uncertainty.{old}.",
+        f"phonometry.metrology.uncertainty.{old}.",
         DeprecationWarning,
         stacklevel=3,
     )

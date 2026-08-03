@@ -44,15 +44,14 @@ contour = aircraft.noise_contour(path, powers, distances, sel, lmax, x=gx, y=gy)
 | `phonometry.simulation` | 2D acoustic FDTD wave simulation (staggered grid, sources, probes, impedance boundaries, obstacles) |
 
 Every name in the table below is also re-exported at the top level, so
-`from phonometry import <name>` works for every row. Two generations of module
-paths are still importable and warn on use. The pre-3.2 flat ones, written
-without a subpackage, are removed in 4.0; the pre-4.0 ones that the taxonomy
-moved are removed in 5.0. Reading a moved name from the namespace it left
-warns and delegates as well.
+`from phonometry import <name>` works for every row. The pre-4.0 module paths
+that the taxonomy moved are still importable and warn on use; they are removed
+in 5.0. Reading a moved name from the namespace it left warns and delegates as
+well. The pre-3.2 flat paths, written without a subpackage, were removed in
+4.0 as announced.
 
 | Deprecated path | Resolves to | Removed in |
 | :--- | :--- | :--- |
-| `phonometry.insulation` | `phonometry.building.measurement.insulation` | 4.0 |
 | `phonometry.metrology.levels` | `phonometry.signals.levels` | 5.0 |
 | `phonometry.hearing.sti` | `phonometry.speech.sti` | 5.0 |
 | `phonometry.vibration.human_vibration` | `phonometry.vibration.human.exposure` | 5.0 |

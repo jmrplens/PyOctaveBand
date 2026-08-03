@@ -1864,6 +1864,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   Changed). Both warn on use and are removed in 5.0, one release after the
   3.x aliases.
 
+### Removed
+
+- The flat pre-3.2 module paths, as 3.2 announced when it deprecated them:
+  `phonometry.levels`, `phonometry.insulation`, `phonometry.room_ir` and the
+  eighty-odd siblings that the modularization grouped into domain subpackages
+  raise `ModuleNotFoundError` now, as does `phonometry.loudness`, deprecated
+  since 3.1. Only the module paths went. The names they held are still
+  exported flat, so `from phonometry import leq` reads as it always has, and
+  so does every other name in `phonometry.__all__`. The 4.0 taxonomy aliases
+  are untouched and stay until 5.0.
+
+  A pickle written by a 3.x release carries a flat path in the `__module__` of
+  its classes, and those no longer resolve; one written by 3.2 or later
+  through a subpackage path still does, until 5.0.
+
+  With one generation left, `_compat.py` keeps one table, and the alias
+  machinery no longer carries the per-entry wording overrides that the 3.1
+  deprecations needed.
+
 ### Fixed
 
 - The committed example `.report()` fiches were not checked against the code

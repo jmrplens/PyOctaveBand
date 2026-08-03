@@ -59,7 +59,7 @@ the coefficients are computed at the exact midband frequencies (Note 5)
 ``exact_midband=True`` to snap the requested frequencies onto that grid and
 reproduce Table 1 exactly.
 
-This module closes the loop with :mod:`phonometry.materials.absorbers.sound_absorption` (ISO 354),
+This module closes the loop with :mod:`~phonometry.materials.absorbers.sound_absorption` (ISO 354),
 whose air power-attenuation coefficient ``m`` (1/m) is defined only through
 the ISO 9613-1 ``alpha`` via :math:`m = \alpha / (10 \log_{10} e)`.
 :func:`air_attenuation_m` returns that ``m`` directly.
@@ -223,8 +223,8 @@ def air_attenuation(
         ISO 354:2003 defers its air power-attenuation coefficient ``m`` (1/m)
         entirely to this ``alpha`` via :math:`m = \alpha / (10 \log_{10} e)`. Use
         :func:`air_attenuation_m` to obtain that ``m`` for
-        :func:`phonometry.sound_absorption.absorption_area` /
-        :func:`~phonometry.sound_absorption.absorption_coefficient`.
+        :func:`~phonometry.materials.absorbers.sound_absorption.absorption_area` /
+        :func:`~phonometry.materials.absorbers.sound_absorption.absorption_coefficient`.
     """
     freqs = np.asarray(frequencies, dtype=np.float64)
     _validate(freqs, temperature, relative_humidity, pressure)
@@ -266,10 +266,10 @@ def air_attenuation_m(
     Convenience composition of :func:`air_attenuation` (ISO 9613-1 ``alpha`` in
     dB/m) with the ISO 354:2003 (8.1.2.1) conversion
     :math:`m = \alpha / (10 \log_{10} e)`
-    (via :func:`phonometry.sound_absorption.attenuation_from_alpha`). It lets an
+    (via :func:`~phonometry.materials.absorbers.sound_absorption.attenuation_from_alpha`). It lets an
     ISO 354 caller feed real atmospheric conditions into
-    :func:`~phonometry.sound_absorption.absorption_area` /
-    :func:`~phonometry.sound_absorption.absorption_coefficient` instead of
+    :func:`~phonometry.materials.absorbers.sound_absorption.absorption_area` /
+    :func:`~phonometry.materials.absorbers.sound_absorption.absorption_coefficient` instead of
     hand-entering ``m``.
 
     :param frequencies: Frequency or frequencies ``f``, in hertz (array-like).

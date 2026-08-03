@@ -176,7 +176,7 @@ Sec. 2.4).
 
 Both regularization levels are *relative* to the peak of
 $\lvert H \rvert^2$
-(like the scalar `regularization` of [`phonometry.impulse_response`](/phonometry/reference/api/rooms/impulse-response/),
+(like the scalar `regularization` of [`phonometry.impulse_response`](/phonometry/reference/api/rooms/impulse-response/#impulse_response),
 which this generalises): in-band the equalized magnitude deviates from
 unity by at most `regularization_inside * max|H|**2 / min|H|**2` --
 the analytic residue

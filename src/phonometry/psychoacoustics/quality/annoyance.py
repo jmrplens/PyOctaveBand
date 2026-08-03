@@ -173,7 +173,7 @@ def psychoacoustic_annoyance_from_signal(
     with :func:`psychoacoustic_annoyance`: ``N5`` from the ISO 532-1 Zwicker
     time-varying loudness, ``S`` from DIN 45692 sharpness, ``R`` from
     ECMA-418-2 roughness and ``F`` from
-    :func:`~phonometry.fluctuation_strength.fluctuation_strength`.
+    :func:`~phonometry.psychoacoustics.quality.fluctuation_strength.fluctuation_strength`.
 
     .. note::
         This composite mixes model families (Zwicker ``N5``/``S``, Sottek
@@ -185,7 +185,7 @@ def psychoacoustic_annoyance_from_signal(
         ``field`` selects the sound field for the loudness, sharpness and
         roughness front-ends; the fluctuation strength ``F`` is always computed
         in the free field, because the Osses 2016 model has no diffuse-field
-        variant (see :func:`~phonometry.fluctuation_strength.fluctuation_strength`).
+        variant (see :func:`~phonometry.psychoacoustics.quality.fluctuation_strength.fluctuation_strength`).
 
     :param x: Calibrated sound-pressure signal (1-D), in Pa after
         ``calibration_factor``.

@@ -1,20 +1,20 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
 """Deprecated module-path aliases for the phonometry package layout.
 
-Two generations of aliases live here, each with its own removal date:
+:data:`_MOVED_4X` covers the 4.0 taxonomy, which splits the oversized
+subpackages into domain ones (``phonometry.metrology`` into
+``phonometry.filters``, ``phonometry.signals`` and a narrowed
+``phonometry.metrology``; the speech intelligibility of
+``phonometry.hearing`` into ``phonometry.speech``), gives the large domains a
+second level (``phonometry.vibration`` into ``structural``, ``human`` and
+``machinery``) and renames ``phonometry.environmental`` to
+``phonometry.environment``. Removed in 5.0.
 
-* :data:`_MOVED_3X` covers the 3.2 modularization, which grouped the flat
-  top-level modules into domain subpackages (``phonometry.building``,
-  ``phonometry.underwater``, ...). Removed in 4.0. Its targets follow the
-  modules wherever they land, so a 3.x path always resolves in one hop.
-* :data:`_MOVED_4X` covers the 4.0 taxonomy, which splits the oversized
-  subpackages into domain ones (``phonometry.metrology`` into
-  ``phonometry.filters``, ``phonometry.signals`` and a narrowed
-  ``phonometry.metrology``; the speech intelligibility of
-  ``phonometry.hearing`` into ``phonometry.speech``), gives the large domains
-  a second level (``phonometry.vibration`` into ``structural``, ``human`` and
-  ``machinery``) and renames ``phonometry.environmental`` to
-  ``phonometry.environment``. Removed in 5.0.
+The 3.2 generation, which grouped the flat top-level modules into domain
+subpackages, announced 4.0 as its removal and is gone: ``phonometry.levels``
+and its eighty-odd siblings raise ``ModuleNotFoundError`` now. Only the module
+paths went: the names they held are still exported flat, so ``from phonometry
+import leq`` reads as it always has.
 
 Every public module path that moved stays importable through the shims
 registered here: ``import phonometry.<old>`` and ``from phonometry.<old>
@@ -27,9 +27,6 @@ the domain namespace (``from phonometry import metrology``) is the form the
 documentation leads with. :func:`_namespace_shim` keeps those attribute reads
 working from the namespace they left, with the same notice.
 
-This generalizes the former ``phonometry.loudness`` PEP 562 shim (that module
-file is gone; its entry lives in the table below with its original 3.1 wording
-preserved).
 """
 
 from __future__ import annotations
@@ -42,133 +39,9 @@ from typing import Any
 
 from ._internal.warnings import _warn_renamed
 
-#: The one module NT ACOU 112 and ISO/PAS 1996-3 share since 4.0. Four old
-#: paths land on it, from both generations of the table.
+#: The one module NT ACOU 112 and ISO/PAS 1996-3 share since 4.0. Three old
+#: paths land on it.
 _IMPULSIVE_SOUND = "phonometry.environment.assessment.impulsive_sound"
-
-#: Old public module path -> relocated module path. One row per moved module.
-_MOVED_3X: dict[str, str] = {
-    "phonometry.utils": "phonometry._internal.utils",
-    "phonometry._warnings": "phonometry._internal.warnings",
-    "phonometry.calibration": "phonometry.metrology.calibration",
-    "phonometry.compliance": "phonometry.filters.compliance",
-    "phonometry.core": "phonometry.filters.core",
-    "phonometry.filter_design": "phonometry.filters.design",
-    "phonometry.frequencies": "phonometry.filters.frequencies",
-    "phonometry.levels": "phonometry.signals.levels",
-    "phonometry.parametric_filters": "phonometry.filters.weighting",
-    "phonometry.uncertainty": "phonometry.metrology.uncertainty",
-    "phonometry.fluctuation_strength": "phonometry.psychoacoustics.quality.fluctuation_strength",
-    "phonometry.loudness_contours": "phonometry.psychoacoustics.loudness.contours",
-    "phonometry.loudness_ecma": "phonometry.psychoacoustics.loudness.ecma",
-    "phonometry.loudness_moore_glasberg": "phonometry.psychoacoustics.loudness.moore_glasberg",
-    "phonometry.loudness_moore_glasberg_time": "phonometry.psychoacoustics.loudness.moore_glasberg_time",
-    "phonometry.loudness_zwicker": "phonometry.psychoacoustics.loudness.zwicker",
-    "phonometry.psychoacoustic_annoyance": "phonometry.psychoacoustics.quality.annoyance",
-    "phonometry.roughness_ecma": "phonometry.psychoacoustics.quality.roughness_ecma",
-    "phonometry.sharpness": "phonometry.psychoacoustics.quality.sharpness",
-    "phonometry.tonality": "phonometry.psychoacoustics.quality.tonality",
-    "phonometry.tonality_ecma": "phonometry.psychoacoustics.quality.tonality_ecma",
-    "phonometry.tone_audibility": "phonometry.psychoacoustics.quality.tone_audibility",
-    "phonometry.noise_induced_hearing_loss": "phonometry.hearing.noise_induced_hearing_loss",
-    "phonometry.occupational_exposure": "phonometry.hearing.occupational_exposure",
-    "phonometry.sii": "phonometry.speech.sii",
-    "phonometry.sti": "phonometry.speech.sti",
-    "phonometry.intensity": "phonometry.emission.intensity",
-    "phonometry.sound_power": "phonometry.emission.sound_power",
-    "phonometry.sound_power_intensity": "phonometry.emission.sound_power_intensity",
-    "phonometry.sound_power_reverberation": "phonometry.emission.sound_power_reverberation",
-    "phonometry.vibration_sound_power": "phonometry.emission.vibration_sound_power",
-    "phonometry.absorption_rating":
-        "phonometry.materials.absorbers.rating",
-    "phonometry.absorption_uncertainty":
-        "phonometry.materials.absorbers.uncertainty",
-    "phonometry.airflow_resistance":
-        "phonometry.materials.absorbers.airflow_resistance",
-    "phonometry.dynamic_stiffness":
-        "phonometry.materials.resilient.dynamic_stiffness",
-    "phonometry.impedance_tube":
-        "phonometry.materials.absorbers.impedance_tube",
-    "phonometry.road_absorption":
-        "phonometry.materials.surfaces.road_absorption",
-    "phonometry.scattering_diffusion":
-        "phonometry.materials.diffusers.scattering_diffusion",
-    "phonometry.sound_absorption":
-        "phonometry.materials.absorbers.sound_absorption",
-    "phonometry.enclosed_space_absorption": "phonometry.room.enclosed_space_absorption",
-    "phonometry.open_plan": "phonometry.room.open_plan",
-    "phonometry.reverberation_prediction": "phonometry.room.reverberation_prediction",
-    "phonometry.room_acoustics": "phonometry.room.acoustics",
-    "phonometry.room_ir": "phonometry.room.impulse_response",
-    "phonometry.room_noise": "phonometry.room.noise_criteria",
-    "phonometry.building_prediction":
-        "phonometry.building.prediction.simplified_model",
-    "phonometry.building_uncertainty":
-        "phonometry.building.measurement.uncertainty",
-    "phonometry.facade_prediction":
-        "phonometry.building.prediction.facade",
-    "phonometry.flanking_transmission":
-        "phonometry.building.measurement.flanking_transmission",
-    "phonometry.floor_covering_improvement":
-        "phonometry.building.measurement.floor_covering_improvement",
-    "phonometry.installed_structure_borne":
-        "phonometry.building.prediction.installed_structure_borne",
-    "phonometry.insulation":
-        "phonometry.building.measurement.insulation",
-    "phonometry.intensity_insulation":
-        "phonometry.building.measurement.intensity_insulation",
-    "phonometry.lab_insulation":
-        "phonometry.building.measurement.lab_insulation",
-    "phonometry.structure_borne_power":
-        "phonometry.building.measurement.structure_borne_power",
-    "phonometry.survey_insulation":
-        "phonometry.building.measurement.survey_insulation",
-    "phonometry.human_vibration": "phonometry.vibration.human.exposure",
-    "phonometry.mechanical_mobility":
-        "phonometry.vibration.structural.mechanical_mobility",
-    "phonometry.multiple_shock_vibration":
-        "phonometry.vibration.human.multiple_shock",
-    "phonometry.transfer_stiffness":
-        "phonometry.vibration.structural.transfer_stiffness",
-    "phonometry.air_absorption":
-        "phonometry.environment.propagation.air_absorption",
-    "phonometry.environmental_measurement":
-        "phonometry.environment.assessment.measurement",
-    "phonometry.impulse_prominence": _IMPULSIVE_SOUND,
-    "phonometry.outdoor_propagation":
-        "phonometry.environment.propagation.outdoor_propagation",
-    "phonometry.wind_turbine_noise":
-        "phonometry.environment.sources.wind_turbine",
-    "phonometry.aircraft_atmospheric_absorption": "phonometry.aircraft.atmospheric_absorption",
-    "phonometry.aircraft_noise": "phonometry.aircraft.certification",
-    "phonometry.airport_noise": "phonometry.aircraft.airport_noise",
-    "phonometry.rotorcraft_noise": "phonometry.aircraft.rotorcraft_noise",
-    "phonometry.numerical_propagation": "phonometry.underwater.propagation.numerical",
-    "phonometry.ocean_ambient_noise": "phonometry.underwater.sources.ambient_noise",
-    "phonometry.pile_driving_noise": "phonometry.underwater.sources.pile_driving_noise",
-    "phonometry.seabed_reflection": "phonometry.underwater.propagation.seabed_reflection",
-    "phonometry.ship_radiated_noise": "phonometry.underwater.sources.ship_radiated_noise",
-    "phonometry.ship_traffic_noise": "phonometry.underwater.sources.ship_traffic_noise",
-    "phonometry.sonar_equation": "phonometry.underwater.sonar_equation",
-    "phonometry.underwater_acoustics": "phonometry.underwater.acoustics",
-    "phonometry.underwater_propagation":
-        "phonometry.underwater.propagation.closed_form",
-    "phonometry.underwater_sound_speed": "phonometry.underwater.propagation.sound_speed",
-    "phonometry.distortion": "phonometry.electroacoustics.distortion",
-    "phonometry.frequency_response": "phonometry.electroacoustics.frequency_response",
-    # <migrate:auto>
-}
-
-#: Entries whose deprecation predates 3.2 keep their original wording.
-_SINCE: dict[str, str] = {
-    "phonometry.loudness": "3.1",
-}
-
-#: Renames that were already shimmed before 3.2 (target differs from a plain
-#: package move). ``phonometry.loudness`` predates the reorganization and
-#: lands wherever the Zwicker module currently lives, so it reads its target
-#: from the row above instead of repeating it.
-_MOVED_3X["phonometry.loudness"] = _MOVED_3X["phonometry.loudness_zwicker"]
 
 #: Old module path -> relocated module path for the 4.0 taxonomy. The
 #: oversized ``metrology`` catch-all became three packages: the normalized
@@ -364,10 +237,9 @@ _MOVED_4X: dict[str, str] = {
     # shadowing it is exactly what must not happen.
 }
 
-#: The two generations, each with the release that deprecated it and the one
-#: that removes it. Order matters only for readability; the paths are disjoint.
+#: The generations in force, each with the release that deprecated it and the
+#: one that removes it. The 3.2 generation was removed in 4.0, as announced.
 _GENERATIONS: tuple[tuple[dict[str, str], str, str], ...] = (
-    (_MOVED_3X, "3.2", "4.0"),
     (_MOVED_4X, "4.0", "5.0"),
 )
 
@@ -404,7 +276,7 @@ def _make_shim(old: str, new: str, since: str, removed_in: str) -> types.ModuleT
         _warn_renamed(
             f"the '{old}' module",
             f"'{new}'",
-            since=_SINCE.get(old, since),
+            since=since,
             removed_in=removed_in,
         )
         return attr
@@ -541,9 +413,9 @@ def _install() -> None:
                 continue
             shim = _make_shim(old, new, since, removed_in)
             sys.modules[old] = shim
-            # `import phonometry.utils` also binds the attribute on the
-            # package; mirror that so `phonometry.utils` resolves without the
-            # import. Aliases below a subpackage are served by that package's
+            # `import phonometry.environmental` also binds the attribute on
+            # the package; mirror that so `phonometry.environmental` resolves
+            # without the import. Aliases below a subpackage are served by that package's
             # own shim (:func:`_namespace_shim`), which resolves the moved
             # public names first, so binding them here would shadow a function
             # with a module.

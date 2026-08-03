@@ -7,8 +7,9 @@ function aliases and the renamed keyword arguments (scikit-learn
 ``"deprecated"`` sentinel). Every alias must warn with the NEP 23 message
 and delegate to the canonical name.
 
-Two generations coexist, each removed with its own release: the 3.1 renames
-and the 3.2 module moves go in 4.0, the 4.0 taxonomy aliases in 5.0.
+The 3.2 module moves were removed in 4.0, as announced; what is left here is
+the 3.1 function and keyword renames and the 4.0 taxonomy aliases, which go in
+5.0.
 """
 
 from __future__ import annotations
@@ -24,26 +25,6 @@ import phonometry as ph
 RNG = np.random.default_rng(1234)
 SIGNAL = RNG.standard_normal(4800)
 FS = 48_000.0
-
-
-# --------------------------------------------------------------------------- #
-# Renamed module: phonometry.loudness -> phonometry.loudness_zwicker
-# --------------------------------------------------------------------------- #
-def test_loudness_module_attribute_access_warns_and_delegates() -> None:
-    import phonometry.loudness  # noqa: F401  (PEP 562 shim; import is silent)
-
-    shim = sys.modules["phonometry.loudness"]
-    target = sys.modules["phonometry.psychoacoustics.loudness.zwicker"]
-    with pytest.warns(DeprecationWarning, match=r"loudness\.zwicker"):
-        cls = shim.ZwickerLoudness
-    assert cls is target.ZwickerLoudness
-    with pytest.warns(DeprecationWarning, match="deprecated since phonometry 3.1"):
-        func = shim.loudness_zwicker
-    assert func is ph.loudness_zwicker
-    # __dir__ delegates (and does not warn).
-    assert "loudness_zwicker_from_spectrum" in dir(shim)
-    with pytest.raises(AttributeError, match="phonometry.loudness"):
-        _ = shim.does_not_exist
 
 
 # --------------------------------------------------------------------------- #
@@ -222,7 +203,7 @@ def test_room_volume_explicit_none_stays_silent() -> None:
 # the package root.
 # --------------------------------------------------------------------------- #
 def test_octave_bands_hz_warns_and_delegates() -> None:
-    from phonometry import absorption_rating
+    from phonometry.materials.absorbers import rating as absorption_rating
 
     with pytest.warns(DeprecationWarning, match="use OCTAVE_BANDS"):
         legacy = ph.OCTAVE_BANDS_HZ
@@ -233,7 +214,7 @@ def test_octave_bands_hz_warns_and_delegates() -> None:
 
 
 def test_third_octave_bands_hz_warns_and_delegates() -> None:
-    from phonometry import absorption_rating
+    from phonometry.materials.absorbers import rating as absorption_rating
 
     with pytest.warns(DeprecationWarning, match="use THIRD_OCTAVE_BANDS"):
         legacy = ph.THIRD_OCTAVE_BANDS_HZ
@@ -244,7 +225,7 @@ def test_third_octave_bands_hz_warns_and_delegates() -> None:
 
 
 def test_base_plate_bands_hz_warns_and_delegates() -> None:
-    from phonometry import scattering_diffusion
+    from phonometry.materials.diffusers import scattering_diffusion
 
     with pytest.warns(DeprecationWarning, match="use BASE_PLATE_BANDS"):
         legacy = ph.BASE_PLATE_BANDS_HZ
@@ -255,7 +236,7 @@ def test_base_plate_bands_hz_warns_and_delegates() -> None:
 
 
 def test_band_centres_warns_and_delegates() -> None:
-    from phonometry import sii
+    from phonometry.speech import sii
 
     with pytest.warns(DeprecationWarning, match="use BAND_CENTERS"):
         legacy = sii.BAND_CENTRES
@@ -263,7 +244,7 @@ def test_band_centres_warns_and_delegates() -> None:
 
 
 def test_exposure_warning_warns_and_delegates() -> None:
-    from phonometry import occupational_exposure
+    from phonometry.hearing import occupational_exposure
 
     with pytest.warns(DeprecationWarning, match="use OccupationalExposureWarning"):
         legacy = ph.ExposureWarning
@@ -275,124 +256,56 @@ def test_exposure_warning_warns_and_delegates() -> None:
 
 
 def test_renamed_attribute_shims_reject_unknown_names() -> None:
-    from phonometry import absorption_rating, occupational_exposure
+    from phonometry.hearing import occupational_exposure
+    from phonometry.materials.absorbers import rating as absorption_rating
 
     with pytest.raises(AttributeError, match="phonometry"):
         _ = ph.does_not_exist
-    with pytest.raises(AttributeError, match="absorption_rating"):
+    with pytest.raises(AttributeError, match="absorbers.rating"):
         _ = absorption_rating.does_not_exist
     with pytest.raises(AttributeError, match="occupational_exposure"):
         _ = occupational_exposure.does_not_exist
 
 
 # --------------------------------------------------------------------------- #
-# 3.2 package reorganization: every pre-move public module path must remain
-# importable (silently) for one deprecation cycle. Frozen snapshot; do NOT
-# regenerate from the live tree (that would defeat its purpose).
+# 3.2 package reorganization: its flat module paths were removed in 4.0, as
+# announced. A sample of them, frozen; the point is that they stay gone, and
+# that a stale file left on disk would be caught rather than silently served.
 # --------------------------------------------------------------------------- #
-_PRE_MOVE_MODULE_PATHS = [
-    "phonometry.absorption_rating",
-    "phonometry.absorption_uncertainty",
-    "phonometry.air_absorption",
-    "phonometry.aircraft_atmospheric_absorption",
-    "phonometry.aircraft_noise",
-    "phonometry.airflow_resistance",
-    "phonometry.airport_noise",
-    "phonometry.building_prediction",
-    "phonometry.building_uncertainty",
-    "phonometry.calibration",
-    "phonometry.compliance",
+_REMOVED_FLAT_MODULE_PATHS = [
     "phonometry.core",
-    "phonometry.distortion",
-    "phonometry.dynamic_stiffness",
-    "phonometry.enclosed_space_absorption",
-    "phonometry.environmental",
-    "phonometry.environmental_measurement",
-    "phonometry.facade_prediction",
-    "phonometry.filter_design",
-    "phonometry.flanking_transmission",
-    "phonometry.floor_covering_improvement",
-    "phonometry.fluctuation_strength",
-    "phonometry.frequencies",
-    "phonometry.frequency_response",
-    "phonometry.hearing",
-    "phonometry.human_vibration",
-    "phonometry.impedance_tube",
-    "phonometry.impulse_prominence",
-    "phonometry.installed_structure_borne",
     "phonometry.insulation",
-    "phonometry.intensity",
-    "phonometry.intensity_insulation",
-    "phonometry.lab_insulation",
     "phonometry.levels",
     "phonometry.loudness",
-    "phonometry.loudness_contours",
-    "phonometry.loudness_ecma",
-    "phonometry.loudness_moore_glasberg",
-    "phonometry.loudness_moore_glasberg_time",
-    "phonometry.loudness_zwicker",
-    "phonometry.mechanical_mobility",
-    "phonometry.multiple_shock_vibration",
-    "phonometry.noise_induced_hearing_loss",
-    "phonometry.numerical_propagation",
-    "phonometry.occupational_exposure",
-    "phonometry.ocean_ambient_noise",
-    "phonometry.open_plan",
-    "phonometry.outdoor_propagation",
-    "phonometry.parametric_filters",
-    "phonometry.pile_driving_noise",
-    "phonometry._plotting",
-    "phonometry.psychoacoustic_annoyance",
-    "phonometry.reverberation_prediction",
-    "phonometry.road_absorption",
-    "phonometry.room_acoustics",
     "phonometry.room_ir",
-    "phonometry.room_noise",
-    "phonometry.rotorcraft_noise",
-    "phonometry.roughness_ecma",
-    "phonometry.scattering_diffusion",
-    "phonometry.seabed_reflection",
-    "phonometry.sharpness",
-    "phonometry.ship_radiated_noise",
-    "phonometry.ship_traffic_noise",
-    "phonometry.sii",
-    "phonometry.sonar_equation",
-    "phonometry.sound_absorption",
-    "phonometry.sound_power",
-    "phonometry.sound_power_intensity",
-    "phonometry.sound_power_reverberation",
-    "phonometry.sti",
-    "phonometry.structure_borne_power",
-    "phonometry.survey_insulation",
-    "phonometry.tonality",
-    "phonometry.tonality_ecma",
-    "phonometry.tone_audibility",
-    "phonometry.transfer_stiffness",
-    "phonometry.uncertainty",
     "phonometry.underwater_acoustics",
-    "phonometry.underwater_propagation",
-    "phonometry.underwater_sound_speed",
     "phonometry.utils",
-    "phonometry.vibration_sound_power",
-    "phonometry._warnings",
-    "phonometry.wind_turbine_noise",
 ]
 
 
-@pytest.mark.parametrize("path", _PRE_MOVE_MODULE_PATHS)
-def test_pre_move_module_path_still_imports(path: str) -> None:
-    import importlib
-    import warnings
+def test_pre_split_module_alias_rejects_unknown_names() -> None:
+    """A 4.0 alias serves what its target has, and nothing else.
 
-    with warnings.catch_warnings():
-        warnings.simplefilter("error", DeprecationWarning)
-        module = importlib.import_module(path)  # import itself must be silent
-    assert module is sys.modules[path]
-    # A shim that imports but exposes nothing is as broken as an ImportError:
-    # every pre-move path must still surface its public names. ``dir()`` is
-    # silent on the PEP 562 shims, so this stays warning-free.
-    public = [name for name in dir(module) if not name.startswith("_")]
-    assert public, f"{path} imports but exposes no public names"
+    The alias delegates by ``getattr`` on the relocated module, so a typo has
+    to come back as an ``AttributeError`` naming the path the caller wrote,
+    not as a silent ``None`` or a confusing message about the new module.
+    """
+    import importlib
+
+    shim = importlib.import_module("phonometry.metrology.levels")
+    with pytest.raises(AttributeError, match="phonometry.metrology.levels"):
+        _ = shim.does_not_exist
+
+
+@pytest.mark.parametrize("path", _REMOVED_FLAT_MODULE_PATHS)
+def test_removed_flat_module_path_raises(path: str) -> None:
+    import importlib
+
+    with pytest.raises(ModuleNotFoundError):
+        importlib.import_module(path)
+    assert path not in sys.modules
+    # The names themselves never moved: the flat API is what they were for.
+    assert hasattr(ph, "leq")
 
 
 # --------------------------------------------------------------------------- #
@@ -535,7 +448,7 @@ def test_the_migration_table_names_real_aliases() -> None:
     import importlib
     import re
 
-    from phonometry._compat import _MOVED_3X, _MOVED_4X
+    from phonometry._compat import _MOVED_4X
 
     table = (
         pathlib.Path(__file__).resolve().parent.parent
@@ -554,10 +467,10 @@ def test_the_migration_table_names_real_aliases() -> None:
         f"no example row for {sorted(moved_from - documented)}"
     )
     for old, new, removed_in in rows:
-        generation = _MOVED_3X if removed_in == "4.0" else _MOVED_4X
-        assert old in generation, f"{old} is not a deprecated path of {removed_in}"
-        assert generation[old] == new, (
-            f"{old} resolves to {generation[old]}, not to {new}"
+        assert removed_in == "5.0", f"{old} names a removal that already happened"
+        assert old in _MOVED_4X, f"{old} is not a deprecated path"
+        assert _MOVED_4X[old] == new, (
+            f"{old} resolves to {_MOVED_4X[old]}, not to {new}"
         )
         importlib.import_module(new)
 
@@ -797,9 +710,9 @@ def test_plotting_shim_re_exports_every_renderer() -> None:
 def test_moved_module_shims_warn_and_delegate() -> None:
     import importlib
 
-    from phonometry._compat import _MOVED_3X, _MOVED_4X
+    from phonometry._compat import _MOVED_4X
 
-    for old, new in {**_MOVED_3X, **_MOVED_4X}.items():
+    for old, new in _MOVED_4X.items():
         shim = importlib.import_module(old)
         target = importlib.import_module(new)
         public = [n for n in dir(target) if not n.startswith("_")]

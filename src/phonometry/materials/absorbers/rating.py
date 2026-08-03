@@ -481,7 +481,7 @@ def __getattr__(name: str) -> Any:
         canonical = _RENAMED_CONSTANTS[name]
     except KeyError:
         raise AttributeError(
-            f"module 'phonometry.absorption_rating' has no attribute {name!r}"
+            f"module 'phonometry.materials.absorbers.rating' has no attribute {name!r}"
         ) from None
     _warn_renamed(name, canonical)
     return globals()[canonical]

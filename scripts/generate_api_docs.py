@@ -774,36 +774,7 @@ def build_model() -> tuple[list[ModuleDoc], dict[str, str], list[str]]:
     if len(slugs) != len(pages):
         raise ValueError("slug collision between module pages")
 
-    # Docstrings still reference the flat pre-modularization module names
-    # (":mod:`phonometry.insulation`"); alias them to the current pages.
-    labels: dict[str, list[str]] = {}
-    for page in pages:
-        if page.module != "phonometry":
-            labels.setdefault(page.label, []).append(page.url)
-    for label, urls in labels.items():
-        alias = f"phonometry.{label}"
-        if alias not in xref and len(urls) == 1:
-            xref[alias] = urls[0]
-    for old, new in _LEGACY_MODULE_ALIASES.items():
-        if old not in xref and new in xref:
-            xref[old] = xref[new]
     return pages, xref, issues
-
-
-#: Flat pre-modularization module names whose basename also changed; the
-#: unchanged ones are aliased automatically from the page basenames above.
-_LEGACY_MODULE_ALIASES = {
-    "phonometry.aircraft_atmospheric_absorption": (
-        "phonometry.aircraft.atmospheric_absorption"
-    ),
-    "phonometry.environmental_measurement": (
-        "phonometry.environment.assessment.measurement"
-    ),
-    "phonometry.underwater_acoustics": "phonometry.underwater.acoustics",
-    "phonometry.underwater_propagation":
-        "phonometry.underwater.propagation.closed_form",
-    "phonometry.underwater_sound_speed": "phonometry.underwater.propagation.sound_speed",
-}
 
 
 _TOP_LEVEL_INTRO = (

@@ -647,5 +647,5 @@ def __getattr__(name: str) -> Any:
         _warn_renamed("ExposureWarning", "OccupationalExposureWarning")
         return OccupationalExposureWarning
     raise AttributeError(
-        f"module 'phonometry.occupational_exposure' has no attribute {name!r}"
+        f"module 'phonometry.hearing.occupational_exposure' has no attribute {name!r}"
     )

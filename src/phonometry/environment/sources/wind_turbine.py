@@ -15,10 +15,10 @@ Two closed-form quantities of the standard:
   ``ΔL_a`` that decides whether a tone is audible.
 
 The tonal-audibility formula itself is the ISO 1996-2 Annex C one already in
-:mod:`phonometry.environment.assessment.measurement`; what is specific to IEC 61400-11 is
+:mod:`~phonometry.environment.assessment.measurement`; what is specific to IEC 61400-11 is
 how the tone and masking-noise levels and the (Zwicker) critical band are
 determined from the narrowband spectrum. The rating adjustment ``K_T`` is the
-ISO 1996-2 :func:`~phonometry.environmental_measurement.tonal_adjustment`. The
+ISO 1996-2 :func:`~phonometry.environment.assessment.measurement.tonal_adjustment`. The
 full measurement pipeline (binning, regression to standardised wind speeds,
 uncertainty budgets) is out of scope; these are the underlying closed forms.
 """
@@ -109,7 +109,7 @@ def apparent_sound_power_level(
         asterisk marking and the <= 3 dB not-reported rule, subclause 9.3) is
         out of scope here and must be applied beforehand; note its rule set
         differs from the ISO 1996-2 correction in
-        :func:`phonometry.environment.assessment.measurement.residual_sound_correction`.
+        :func:`~phonometry.environment.assessment.measurement.residual_sound_correction`.
     :param r1: Slant distance ``R1`` to the rotor centre, in m.
     :return: The apparent sound power level ``L_WA``, in dB re 1 pW.
     :raises ValueError: If the inputs are invalid.

@@ -34,7 +34,7 @@ opposite ends of the absorption scale and are **not** interchangeable:
   (measured ``alpha`` below ~0.15). Part 2 does not restate the
   transfer-function / reflection-factor / absorption mathematics; Clauses 4,
   5.7 and 6.6 defer it to ISO 10534-2. The core computation therefore lives in
-  :func:`phonometry.impedance_tube.two_microphone_impedance` and is **not**
+  :func:`~phonometry.materials.absorbers.impedance_tube.two_microphone_impedance` and is **not**
   reimplemented here. This module contributes only the Part-2 tube
   geometry/validity helpers (upper usable frequency, microphone-spacing bounds,
   the 250-1600 Hz one-third-octave working range) and the Annex A internal-loss
@@ -815,7 +815,7 @@ def msa_major_axis(
 # --------------------------------------------------------------------------- #
 # ISO 13472-2 spot method: tube geometry / validity helpers.
 # The core two-microphone DSP is NOT here: see
-# phonometry.impedance_tube.two_microphone_impedance (ISO 10534-2, Clause 7).
+# phonometry.materials.absorbers.impedance_tube.two_microphone_impedance (ISO 10534-2, Clause 7).
 # --------------------------------------------------------------------------- #
 def spot_tube_upper_frequency(
     diameter: float, speed_of_sound: float = DEFAULT_SPEED_OF_SOUND
