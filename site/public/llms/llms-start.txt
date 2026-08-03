@@ -4,8 +4,8 @@ Part of https://jmrplens.github.io/phonometry/llms.txt. Full text of the pages i
 
 ---
 
-<!-- source: docs/getting-started.md | canonical: https://jmrplens.github.io/phonometry/getting-started/ -->
-Source: https://jmrplens.github.io/phonometry/getting-started/
+<!-- source: docs/getting-started.md | canonical: https://jmrplens.github.io/phonometry/start/getting-started/ -->
+Source: https://jmrplens.github.io/phonometry/start/getting-started/
 
 # Getting Started
 
@@ -64,9 +64,9 @@ standardized bands, smooth it in time and reduce it to metrics:
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_signal_chain_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_signal_chain.svg" alt="phonometry processing chain: signal, calibration, frequency weighting, octave filter bank, time weighting and metrics, with the standard verified at each stage" width="92%"></picture>
 
 Each stage is an independent function or class you can use on its own; the
-guides cover them left to right ([Calibration](https://jmrplens.github.io/phonometry/guides/calibration/) →
-[Frequency Weighting](https://jmrplens.github.io/phonometry/guides/weighting/) → [Filter Banks](https://jmrplens.github.io/phonometry/guides/filter-banks/) →
-[Time Weighting](https://jmrplens.github.io/phonometry/guides/time-weighting/) → [Levels](https://jmrplens.github.io/phonometry/guides/levels/)).
+guides cover them left to right ([Calibration](https://jmrplens.github.io/phonometry/signal/metrology/calibration/) →
+[Frequency Weighting](https://jmrplens.github.io/phonometry/signal/levels/weighting/) → [Filter Banks](https://jmrplens.github.io/phonometry/signal/filters/filter-banks/) →
+[Time Weighting](https://jmrplens.github.io/phonometry/signal/levels/time-weighting/) → [Levels](https://jmrplens.github.io/phonometry/signal/levels/levels/)).
 
 ## Basic Usage: 1/3 Octave Analysis
 
@@ -156,9 +156,9 @@ Every result object exposes a one-line `.plot(language="en"|"es")` figure and,
 where a standard defines a reporting format, a `.report()` method that renders
 the normative PDF fiche.
 
-- [Filter Architecture Gallery](https://jmrplens.github.io/phonometry/guides/filter-gallery/): choose an architecture and inspect responses
-- [Calibration and dBFS](https://jmrplens.github.io/phonometry/guides/calibration/): get real-world SPL values
-- [Why phonometry](https://jmrplens.github.io/phonometry/reference/why-phonometry/): the conformance-first design philosophy
+- [Filter Architecture Gallery](https://jmrplens.github.io/phonometry/signal/filters/filter-gallery/): choose an architecture and inspect responses
+- [Calibration and dBFS](https://jmrplens.github.io/phonometry/signal/metrology/calibration/): get real-world SPL values
+- [Why phonometry](https://jmrplens.github.io/phonometry/start/why-phonometry/): the conformance-first design philosophy
 - [Conformance report](https://jmrplens.github.io/phonometry/reference/conformance/): the expected and computed value of all 533 checks
 - [API Reference](https://jmrplens.github.io/phonometry/reference/api/): every parameter of every function
 - [Bibliography](https://jmrplens.github.io/phonometry/reference/bibliography/): the books and papers behind every guide, each with a verified link
@@ -166,8 +166,8 @@ the normative PDF fiche.
 ---
 
 
-<!-- source: docs/why-phonometry.md | canonical: https://jmrplens.github.io/phonometry/reference/why-phonometry/ -->
-Source: https://jmrplens.github.io/phonometry/reference/why-phonometry/
+<!-- source: docs/why-phonometry.md | canonical: https://jmrplens.github.io/phonometry/start/why-phonometry/ -->
+Source: https://jmrplens.github.io/phonometry/start/why-phonometry/
 
 # Why phonometry
 
@@ -275,9 +275,9 @@ plt.show()
 
 - If you need **standard-compliant Fast/Slow/Impulse envelopes** (sound level
   meter behavior, one level per sample), use phonometry's
-  [`time_weighting`](https://jmrplens.github.io/phonometry/guides/time-weighting/).
+  [`time_weighting`](https://jmrplens.github.io/phonometry/signal/levels/time-weighting/).
 - If you need **block-averaged $L_{eq}$ per interval**, that is a different, equally
-  valid metric; you can compute it with [`leq`](https://jmrplens.github.io/phonometry/guides/levels/) over consecutive
+  valid metric; you can compute it with [`leq`](https://jmrplens.github.io/phonometry/signal/levels/levels/) over consecutive
   slices.
 - Both approaches are useful; they just answer different questions. The
   discrepancy reported in issue #38 comes from comparing a continuous envelope
@@ -320,7 +320,7 @@ parametrization would not), the default Butterworth bank is checked against
 the stricter class 0 of the withdrawn IEC 61260:1995 / ANSI S1.11-2004 edition
 as well as the current class 1, and A/C weighting stays within class 1
 tolerances up to 16 kHz at common audio rates via internal oversampling (see
-[Frequency Weighting](https://jmrplens.github.io/phonometry/guides/weighting/)).
+[Frequency Weighting](https://jmrplens.github.io/phonometry/signal/levels/weighting/)).
 
 ## When the source is what is wrong
 
@@ -394,7 +394,7 @@ Source: https://jmrplens.github.io/phonometry/reference/theory/
 
 # Theoretical Background
 
-The theory reference explains the standards, the mathematics and the design decisions behind every phonometry module. It is split into six domain pages, listed below with the sections each one hosts. Theory for the underwater modules lives with its guides: [Underwater Acoustics](https://jmrplens.github.io/phonometry/guides/underwater-acoustics/), [Underwater Propagation](https://jmrplens.github.io/phonometry/guides/underwater-propagation/) and [Underwater Propagation Solvers](https://jmrplens.github.io/phonometry/guides/underwater-solvers/).
+The theory reference explains the standards, the mathematics and the design decisions behind every phonometry module. It is split into six domain pages, listed below with the sections each one hosts. Theory for the underwater modules lives with its guides: [Underwater Acoustics](https://jmrplens.github.io/phonometry/underwater/underwater-acoustics/), [Underwater Propagation](https://jmrplens.github.io/phonometry/underwater/underwater-propagation/) and [Underwater Propagation Solvers](https://jmrplens.github.io/phonometry/underwater/underwater-solvers/).
 
 ## [Signal Analysis](https://jmrplens.github.io/phonometry/reference/theory/signal-analysis/)
 
@@ -474,7 +474,7 @@ $$
 
 The adjustments $K_i$ cover time-of-day penalties (ISO 1996-1 Table A.1: evening 5 dB, night 10 dB) as well as source-character adjustments (e.g. tonal penalties), which the ECMA-418-1 TNR/PR assessments can justify objectively.
 
-See the [Environmental levels guide](https://jmrplens.github.io/phonometry/guides/environmental-levels/) for usage.
+See the [Environmental levels guide](https://jmrplens.github.io/phonometry/environment/environmental-levels/) for usage.
 
 ## Impulsive-sound prominence (NT ACOU 112)
 
@@ -498,7 +498,7 @@ $$
 
 $K_I$ is exactly the kind of source-character adjustment that enters the ISO 1996-1 composite rating level above. The anchors $P(1000\ \text{dB/s}, 30\ \text{dB}) = 9 + 2\log_{10} 30 = 11.95$ and $K_I(P{=}10) = 9.0$ dB are reproduced exactly.
 
-See the [Impulse Prominence guide](https://jmrplens.github.io/phonometry/guides/impulse-prominence/) for usage.
+See the [Impulse Prominence guide](https://jmrplens.github.io/phonometry/environment/assessment/impulsive-sound/) for usage.
 
 ## Outdoor propagation and occupational exposure (ISO 9613-1/2, ISO 9612)
 
@@ -605,10 +605,10 @@ examples of Annexes D (task, $L_{EX,8h} = 84.3$ dB, $U = 2.7$ dB), E (job,
 $88.1$ dB, $3.8$ dB) and F (full-day, $90.1$ dB, $3.4$ dB) are reproduced to
 the standard's printed precision: every intermediate of Annex E is digit-exact,
 and its final level differs only by the standard's own pre-rounding of the
-effective-day level (see the [Occupational Noise Exposure guide](https://jmrplens.github.io/phonometry/guides/occupational-exposure/)).
+effective-day level (see the [Occupational Noise Exposure guide](https://jmrplens.github.io/phonometry/perception/hearing/occupational-exposure/)).
 
-See the [Outdoor Propagation guide](https://jmrplens.github.io/phonometry/guides/outdoor-propagation/) and the
-[Occupational Noise Exposure guide](https://jmrplens.github.io/phonometry/guides/occupational-exposure/) for usage.
+See the [Outdoor Propagation guide](https://jmrplens.github.io/phonometry/environment/propagation/outdoor-propagation/) and the
+[Occupational Noise Exposure guide](https://jmrplens.github.io/phonometry/perception/hearing/occupational-exposure/) for usage.
 
 ## Sound power determination (ISO 3744/3745/3746, ISO 3741, ISO 9614-2/3)
 
@@ -713,7 +713,7 @@ net power is negative are not determinable (clause 9.2) and are flagged. A
 uniform normal intensity recovers the power exactly (100 µW over 3.75 m² →
 80.0 dB re 1 pW), independent of how the surface is segmented.
 
-See the [Sound Power guide](https://jmrplens.github.io/phonometry/guides/sound-power/) for usage.
+See the [Sound Power guide](https://jmrplens.github.io/phonometry/devices/emission/sound-power/) for usage.
 
 ## References
 
@@ -867,7 +867,7 @@ predictions match the published Appendix B BEM normalised diffusion in the
 200-400 Hz bands within 0.01 (a low-band anchor: the broadband 100-5000 Hz
 mean absolute deviation is about 0.09); zenith area factor 1.5710.
 
-See the [Diffusers guide](https://jmrplens.github.io/phonometry/guides/diffusers/) for usage.
+See the [Diffusers guide](https://jmrplens.github.io/phonometry/materials/diffusers/diffusers/) for usage.
 
 ## In-situ road surface absorption (ISO 13472-1, ISO 13472-2)
 
@@ -897,7 +897,7 @@ geometry and validity limits ($f_u = 0.58\ c_0/d$; microphone spacing bounds
 $0.45\ c_0/f_{max}$ and $0.05\ c_0/f_{min}$, clause 5.4) and the Annex A
 subtractive correction for internal system losses.
 
-See the [In-situ Road-Surface Absorption guide](https://jmrplens.github.io/phonometry/guides/road-absorption/) for usage.
+See the [In-situ Road-Surface Absorption guide](https://jmrplens.github.io/phonometry/materials/surfaces/road-absorption/) for usage.
 
 ## Acoustic material characterisation (ISO 11654, ISO 9053-1/2, ISO 10534-1/2, ASTM E2611)
 
@@ -919,7 +919,7 @@ float-safe. The two Annex A worked examples are reproduced:
 $\alpha_p = (0.35, 0.70, 0.65, 0.60, 0.55)$ → $\alpha_w = 0.60$, class C; and
 raising 500 Hz to 1.00 keeps $\alpha_w = 0.60$ but adds the indicator, "0.60(M)".
 
-See the [Sound Absorption Measurement and Rating guide](https://jmrplens.github.io/phonometry/guides/absorption-measurement/) for usage.
+See the [Sound Absorption Measurement and Rating guide](https://jmrplens.github.io/phonometry/materials/absorbers/absorption-measurement/) for usage.
 
 ### Airflow resistance (ISO 9053-1/2)
 
@@ -945,7 +945,7 @@ $\kappa' = 1.370 = 0.978\,\kappa$) is reproduced, and the validity guards of
 Formula 3 (transfer ratio < 0.3) and Formula 4 (10 dB background margin) are
 enforced.
 
-See the [Airflow Resistance guide](https://jmrplens.github.io/phonometry/guides/airflow-resistance/) for usage.
+See the [Airflow Resistance guide](https://jmrplens.github.io/phonometry/materials/absorbers/airflow-resistance/) for usage.
 
 ### Impedance tube (ISO 10534-1, ISO 10534-2, ASTM E2611)
 
@@ -991,7 +991,7 @@ $TL = 0\ \text{dB}$, hard-backed $|R| = 1$), synthetic round-trips that
 recover a known $r$, and
 two-load recovery of an asymmetric reciprocal specimen.
 
-See the [Impedance Tube guide](https://jmrplens.github.io/phonometry/guides/impedance-tube/) for usage.
+See the [Impedance Tube guide](https://jmrplens.github.io/phonometry/materials/absorbers/impedance-tube/) for usage.
 
 ## References
 
@@ -1073,7 +1073,7 @@ The three parameters come from Table 1 (p. 4), tabulated at the 29 preferred thi
 
 The standard specifies **no interpolation** between the tabulated frequencies. Formula (1) is specified for **20 phon to 90 phon** between 20 Hz and 4 kHz, and only up to **80 phon between 5 kHz and 12.5 kHz**; above 80 phon the contour therefore stops at 4 kHz. Values outside these limits from Formula (2) are extrapolations the standard labels as informative only.
 
-See the [Loudness guide](https://jmrplens.github.io/phonometry/guides/loudness/) for usage.
+See the [Loudness guide](https://jmrplens.github.io/phonometry/perception/psychoacoustics/loudness/) for usage.
 
 ## Tone prominence: TNR and PR (ECMA-418-1)
 
@@ -1093,7 +1093,7 @@ $$
 
 **PR** (clause 12) compares the level of the critical band centred on the tone, $L_M$, with the mean power of the two **contiguous** critical bands $L_L$, $L_U$ (edges from the fitted Formulae 21–22 with Tables 2–3): $\mathrm{PR} = 10\log_{10} P_M - 10\log_{10}\left[(P_L + P_U)/2\right]$ (Formula 23). For $f_t \le 171.4$ Hz the lower band is truncated at 20 Hz and its power rescaled to a **100 Hz bandwidth** (Formula 24). The criterion (Formulae 25–26) is 9.0 dB at $f_t \ge 1$ kHz, rising as $9.0 + 10.0\log_{10}(1000/f_t)$ below. Tones are assessed within the 89.1 Hz – 11.2 kHz range of interest (clauses 11.5 / 12.6).
 
-See the [Prominent Discrete Tones guide](https://jmrplens.github.io/phonometry/guides/tone-prominence/) for usage.
+See the [Prominent Discrete Tones guide](https://jmrplens.github.io/phonometry/perception/psychoacoustics/tone-prominence/) for usage.
 
 ## Zwicker loudness (ISO 532-1)
 
@@ -1126,7 +1126,7 @@ $$
 
 below 1 sone the reference program uses $L_N = 40 (N + 0.0005)^{0.35}$, floored at 3 phon.
 
-See the [Loudness guide](https://jmrplens.github.io/phonometry/guides/loudness/) for usage.
+See the [Loudness guide](https://jmrplens.github.io/phonometry/perception/psychoacoustics/loudness/) for usage.
 
 ## Advanced loudness models & sound quality
 
@@ -1203,7 +1203,7 @@ $$
 
 evaluated on the same 240-bin, 0.1-Bark grid. The constant $k$ is not hard-coded but derived from the calibration requirement (clause 6): a critical-band-wide narrowband noise 920–1080 Hz at 60 dB SPL scores exactly 1 acum, and the derived $k = 0.108$ lands inside the normative window $0.105 \le k < 0.115$ (clause 5.2). The informative Annex B weightings are provided under the same 1-acum anchor: von Bismarck (knee at 15 Bark, $0.2\ e^{0.308(z-15)} + 0.8$) and Aures (loudness-dependent, $g(z) = 0.078\ (e^{0.171 z}/z)\ N/\ln(0.05 N + 1)$). The Table A.2 narrow-band targets are reproduced within the clause 6 tolerance (5 % or 0.05 acum): 0.38 acum at 250 Hz, 1.00 at 1 kHz, 1.78 at 2.5 kHz, 2.82 at 4 kHz.
 
-See the [Sound Quality Metrics guide](https://jmrplens.github.io/phonometry/guides/sound-quality/) for usage.
+See the [Sound Quality Metrics guide](https://jmrplens.github.io/phonometry/perception/psychoacoustics/sound-quality/) for usage.
 
 ## Modulation transfer and STI (IEC 60268-16)
 
@@ -1237,7 +1237,7 @@ $$
 m_{dr} = \frac{2 \sqrt{\left( \sum_t I_k(t) \sin 2 \pi f_m t \right)^2 + \left( \sum_t I_k(t) \cos 2 \pi f_m t \right)^2}}{\sum_t I_k(t)}, \qquad m = \frac{m_{dr}}{0.55}
 $$
 
-See the [Speech Transmission Index guide](https://jmrplens.github.io/phonometry/guides/speech-transmission/) for usage.
+See the [Speech Transmission Index guide](https://jmrplens.github.io/phonometry/perception/speech/speech-transmission/) for usage.
 
 ## Speech Intelligibility Index (ANSI S3.5)
 
@@ -1251,7 +1251,7 @@ $$
 
 The same chain runs over the standard's other three band tables, selected with `method=`: the 21 critical bands of Table 1, the 17 equally-contributing critical bands of Table 2 and the 6 octave bands of Table 4. Those three express the masking slope through the tabulated band width, $C_i = -80 + 0.6\,(B_i + 10 \log_{10} W_i)$, which is the same formula the $10 \log_{10} f_i - 6.353$ above abbreviates for a one-third-octave band; the octave-band procedure omits the spread of masking altogether, since an octave band is already wider than the spread being modelled. The Table 3 standard speech spectra for the normal, raised, loud and shout vocal efforts are built in (25.01 / 33.86 / 42.16 / 51.31 dB at 1 kHz); $U_i$ in the level-distortion factor is always the normal-effort spectrum. The anchor values: the normal-effort spectrum in quiet with normal hearing scores SII ≈ 0.996, the masking-spectrum reference values are matched to $10^{-4}$, and the vocal-effort spectra are cross-verified against the Google and CRAN reference implementations.
 
-See the [Speech Intelligibility guide](https://jmrplens.github.io/phonometry/guides/speech-intelligibility/) for usage.
+See the [Speech Intelligibility guide](https://jmrplens.github.io/phonometry/perception/speech/speech-intelligibility/) for usage.
 
 ## Hearing thresholds and presbycusis (ISO 389-7, ISO 7029)
 
@@ -1263,7 +1263,7 @@ $$
 
 and any fractile follows a two-sided Gaussian model (clause 4.4), $\Delta H_Q = \Delta H_{md} + z(Q)\ s$, using the upper spread $s_u$ for $z \ge 0$ (worse than median) and the lower spread $s_l$ otherwise, each a degree-5 polynomial in $Y - 18$ per sex and frequency (clause 4.3, Tables 2–5). At age 18 every deviation is zero by construction. The formulae are established to 80 years at and below 2 kHz and to 70 years above; beyond that the evaluation is an extrapolation. Anchors: at 60 years the medians evaluate to 7.85 dB (male, 1 kHz), 20.21 dB (male, 4 kHz) and 15.32 dB (female, 4 kHz), matching the Table 1 formula to $10^{-3}$.
 
-See the [Hearing Threshold guide](https://jmrplens.github.io/phonometry/guides/hearing-threshold/) for usage.
+See the [Hearing Threshold guide](https://jmrplens.github.io/phonometry/perception/hearing/hearing-threshold/) for usage.
 
 ## Noise-induced hearing loss (ISO 1999)
 
@@ -1281,7 +1281,7 @@ $$
 
 The Annex D worked examples (Tables D.1–D.4; e.g. 100 dB / 40 yr at 3 kHz: 29/38/60 dB at the 0.10/0.50/0.90 fractiles) are reproduced exactly at the standard's integer rounding, and the Formula 2 hand value at 4 kHz / 20 yr / 90 dB is $N_{50} = 12.94$ dB.
 
-See the [Noise-Induced Hearing Loss guide](https://jmrplens.github.io/phonometry/guides/noise-induced-hearing-loss/) for usage.
+See the [Noise-Induced Hearing Loss guide](https://jmrplens.github.io/phonometry/perception/hearing/noise-induced-hearing-loss/) for usage.
 
 ## References
 
@@ -1353,7 +1353,7 @@ This page collects the theory behind rooms and buildings: impulse-response measu
 
 ANSI/ASA S12.2-2019 rates steady background noise in rooms against families of octave-band curves (16 Hz – 8 kHz). The **NC rating** follows the two-step procedure of clause 5.2.2 on the Table 1 curves (NC-15 to NC-70): the speech interference level $\mathrm{SIL} = \tfrac14(L_{500}+L_{1000}+L_{2000}+L_{4000})$ (clause 3.2) selects the NC-(SIL) curve, and if no band exceeds it the spectrum is designated NC-(SIL); otherwise the tangency method (clause 5.2.3) applies: each measured band is interpolated against the tabulated curve values, the rating is the highest per-band index and the band that sets it is the governing band; the interpolation makes the rating continuous (an NC-42.5 is reported as such, not snapped to a curve). Spectra above NC-70 or below NC-15 fall outside the family and are flagged (>NC-70 with the band of maximum exceedance, or <NC-15) instead of receiving a fabricated number. The **RC Mark II** contour (Annex D) is a pure −5 dB/octave line keyed to its 1000 Hz value with a low-frequency floor of $\max(\mathrm{RC} + 25,\ 55)$ dB at 16/31.5 Hz; the rating is the arithmetic mean of the 500/1000/2000 Hz levels rounded to an integer (clause D.4), and the spectral-quality tag compares the spectrum with the reference contour (clause D.3): rumble "R" when any band at or below 500 Hz exceeds it by more than 5 dB, hiss "H" when any band at or above 1 kHz exceeds it by more than 3 dB (both together "RH"), else neutral "N", reported as e.g. RC-35(N). The generated RC contours reproduce Table D.1 digit for digit, and feeding any Table 1 NC curve back returns its own tangency rating. NCB, RNC (Annex A) and the QAI (clause D.5) are deliberately out of scope.
 
-See the [Room Noise guide](https://jmrplens.github.io/phonometry/guides/room-noise/) for usage.
+See the [Room Noise guide](https://jmrplens.github.io/phonometry/buildings/rooms/room-noise/) for usage.
 
 ## Room and building acoustics (ISO 18233, ISO 3382, ISO 16283, ISO 10140, EN 12354, ISO 12999, ISO 717, ISO 354)
 
@@ -1423,7 +1423,7 @@ $$
 L_p = L_W + 10 \log_{10}\!\left( \frac{Q}{4\pi r^2} + \frac{4}{R} \right) \left[ + 10 \log_{10}\frac{\rho c}{400} \right] \quad \text{(Bies Eq. 6.43)},
 $$
 
-the optional last term (about $+0.14$ dB at 20 °C) correcting a characteristic impedance away from 400 Pa·s/m. The **critical distance** $r_c = \sqrt{Q R / 16\pi}$ is where the two fields cross; Kuttruff's reverberation distance (Eq. 5.44, $r_c = \sqrt{A/16\pi}$ for $Q=1$) uses the Sabine area $A = S\bar\alpha$ instead of $R = A/(1-\bar\alpha)$, the two coinciding for small $\bar\alpha$. The **Schroeder frequency** $f_s = 2000\sqrt{T/V}$ (Kuttruff Eq. 3.44) roughly marks the modal-to-diffuse transition, a heuristic crossover rather than a sharp cutoff: well below it discrete room modes dominate and these diffuse-field relations grow unreliable, well above it the modes overlap and the relations hold. Borderline rooms still warrant a band-by-band check. See the [Image sources and steady-state field guide](https://jmrplens.github.io/phonometry/guides/room-image-sources/).
+the optional last term (about $+0.14$ dB at 20 °C) correcting a characteristic impedance away from 400 Pa·s/m. The **critical distance** $r_c = \sqrt{Q R / 16\pi}$ is where the two fields cross; Kuttruff's reverberation distance (Eq. 5.44, $r_c = \sqrt{A/16\pi}$ for $Q=1$) uses the Sabine area $A = S\bar\alpha$ instead of $R = A/(1-\bar\alpha)$, the two coinciding for small $\bar\alpha$. The **Schroeder frequency** $f_s = 2000\sqrt{T/V}$ (Kuttruff Eq. 3.44) roughly marks the modal-to-diffuse transition, a heuristic crossover rather than a sharp cutoff: well below it discrete room modes dominate and these diffuse-field relations grow unreliable, well above it the modes overlap and the relations hold. Borderline rooms still warrant a band-by-band check. See the [Image sources and steady-state field guide](https://jmrplens.github.io/phonometry/buildings/rooms/room-image-sources/).
 
 ### Field insulation and weighted rating (ISO 16283-1, ISO 717-1)
 
@@ -1551,7 +1551,7 @@ hard objects ($\psi \approx 0.072$) raises $A$ to 5.03 m² and drops $T$ to
 0.9 s. The informative Annex D method for irregular spaces and unevenly
 distributed absorption is out of scope.
 
-See the [Enclosed-Space Absorption guide](https://jmrplens.github.io/phonometry/guides/enclosed-space-absorption/) for usage.
+See the [Enclosed-Space Absorption guide](https://jmrplens.github.io/phonometry/buildings/rooms/enclosed-space-absorption/) for usage.
 
 ### Measurement uncertainty (ISO 12999-1)
 
@@ -1576,8 +1576,8 @@ Uncorrelated components combine in quadrature $u_c = \sqrt{\sum u_i^2}$
 (Formula A.7), and the uncorrelated single-number uncertainty is the
 energy-weighted quadrature sum of the band uncertainties (Formula B.2).
 
-See the [Room Acoustics](https://jmrplens.github.io/phonometry/guides/room-acoustics/) and
-[Field Insulation Measurement (ISO 16283)](https://jmrplens.github.io/phonometry/guides/insulation-field/) guides for usage.
+See the [Room Acoustics](https://jmrplens.github.io/phonometry/buildings/rooms/room-acoustics/) and
+[Field Insulation Measurement (ISO 16283)](https://jmrplens.github.io/phonometry/buildings/insulation/insulation-field/) guides for usage.
 
 ### Predicted panel sound insulation (Bies 7.2, Hopkins 2.9/4.3.10, Cremer 5)
 
@@ -1605,7 +1605,7 @@ efficiency and point mobilities of the
 [vibration theory](https://jmrplens.github.io/phonometry/reference/theory/vibration/). The prediction is clean-room from Bies,
 Hansen & Howard (2017), Hopkins (2007) and Cremer, Heckl & Petersson (2005).
 
-See the [Predicting Panel Sound Insulation](https://jmrplens.github.io/phonometry/guides/panel-sound-insulation/) guide for
+See the [Predicting Panel Sound Insulation](https://jmrplens.github.io/phonometry/buildings/design/panel-sound-insulation/) guide for
 usage.
 
 ## References
@@ -1925,7 +1925,7 @@ $$
 The digital filter is obtained from the analog poles/zeros via the bilinear
 transform. Because the bilinear transform compresses frequencies near Nyquist,
 the default `high_accuracy` mode designs and runs the filter at an internally
-oversampled rate (≥ 144 kHz); see [Frequency Weighting](https://jmrplens.github.io/phonometry/guides/weighting/).
+oversampled rate (≥ 144 kHz); see [Frequency Weighting](https://jmrplens.github.io/phonometry/signal/levels/weighting/).
 
 ## Time Integration
 
@@ -1943,7 +1943,7 @@ Where $\tau$ is the time constant (e.g., 125 ms for Fast).
 
 The default initial condition is $y[-1] = 0$. Use `initial_state='first'` to
 start from the first input energy, or pass a scalar/array with the previous
-mean-square output state. See [Why phonometry](https://jmrplens.github.io/phonometry/reference/why-phonometry/) for the
+mean-square output state. See [Why phonometry](https://jmrplens.github.io/phonometry/start/why-phonometry/) for the
 IEC 61672-1 tone-burst verification of this implementation.
 
 ## G-weighting (ISO 7196)
@@ -1965,7 +1965,7 @@ The four zeros against eight poles shape the characteristic response: a rise of 
 
 Since G acts on 0.25 Hz – 315 Hz, far below the Nyquist frequency at audio rates, the frequency warping of the plain bilinear transform (applied without prewarping) is negligible there: about 0.014 % at 315 Hz for $f_s = 48$ kHz, under 0.01 dB on the response. The internal oversampling used for the A/C designs (whose action extends to 16 kHz) is therefore not applied.
 
-See the [Special Weightings guide](https://jmrplens.github.io/phonometry/guides/special-weightings/) for usage.
+See the [Special Weightings guide](https://jmrplens.github.io/phonometry/signal/levels/special-weightings/) for usage.
 
 ## Event and dose metrics
 
@@ -1991,7 +1991,7 @@ It is identical to $L_{EP,d}$ of Directive 86/188/EEC and $L_{EX,8h}$ of ISO 199
 
 **$L_{Cpeak}$** (IEC 61672-1:2013, subclause 5.13) is the absolute maximum of the C-weighted sound pressure expressed in dB, $L_{Cpeak} = 20\log_{10}(\max|p_C(t)|/p_0)$, the quantity behind the 135/137/140 dB(C) occupational action limits. The implementation is verified against the one-cycle and half-cycle reference responses of Table 5.
 
-See the [Levels guide](https://jmrplens.github.io/phonometry/guides/levels/) for usage and the [Calibration guide](https://jmrplens.github.io/phonometry/guides/calibration/) for absolute-scale setup.
+See the [Levels guide](https://jmrplens.github.io/phonometry/signal/levels/levels/) for usage and the [Calibration guide](https://jmrplens.github.io/phonometry/signal/metrology/calibration/) for absolute-scale setup.
 
 ## Sound intensity (IEC 61043)
 
@@ -2023,7 +2023,7 @@ IEC 61043 clause 7.3 specifies the probe intensity response with exactly this ar
 
 The **pressure-intensity index** $\delta_{pI} = L_p - L_I$ measures how reactive the field is: in a free plane progressive wave it equals $10 \log_{10}(\rho_0 c / 400) = 0.14$ dB, while large values flag reactive or noisy fields in which the inter-channel phase error dominates. ISO 9614-1:1993 Annex A generalizes it over a measurement surface as the indicator F2 (with F3 for negative partial power and F4 for field non-uniformity), and the instrument's **dynamic capability** $L_d = \delta_{pI0} - K$ (pressure-residual intensity index minus the bias error factor: 10 dB for grades 1/2, 7 dB for grade 3) must exceed F2 for the measurement to be valid (criterion 1).
 
-See the [Sound Intensity guide](https://jmrplens.github.io/phonometry/guides/intensity/) for usage.
+See the [Sound Intensity guide](https://jmrplens.github.io/phonometry/devices/emission/intensity/) for usage.
 
 ## Measurement uncertainty (ISO/IEC Guide 98-3: GUM and Supplement 1)
 
@@ -2061,7 +2061,7 @@ inputs; the output is nearly trapezoidal, not Gaussian, so the interval is
 narrower than $\pm 1.96\,u$), and the GUM Annex H.1 end-gauge example gives
 $k = t_{0.99}(\nu_{\mathrm{eff}} = 16) = 2.92$ and $U_{99} = 93$ nm.
 
-See the [GUM Uncertainty guide](https://jmrplens.github.io/phonometry/guides/gum-uncertainty/) for usage.
+See the [GUM Uncertainty guide](https://jmrplens.github.io/phonometry/signal/metrology/gum-uncertainty/) for usage.
 
 ## References
 
@@ -2191,8 +2191,8 @@ over 20 years) is reproduced: $D_{zd} = 55.97$ m/s², $R = 1.22$,
 $\Pi = 0.37$. The Annex A finite-element spinal model (distributed by ISO as
 separate software) is out of scope.
 
-See the [Human Vibration guide](https://jmrplens.github.io/phonometry/guides/human-vibration/) and the
-[Multiple-Shock Vibration guide](https://jmrplens.github.io/phonometry/guides/multiple-shock-vibration/) for usage.
+See the [Human Vibration guide](https://jmrplens.github.io/phonometry/vibration/human/human-vibration/) and the
+[Multiple-Shock Vibration guide](https://jmrplens.github.io/phonometry/vibration/human/multiple-shock-vibration/) for usage.
 
 ## Point mobilities and radiation efficiency (Cremer 5, Hopkins 2.9)
 
@@ -2217,7 +2217,7 @@ transmission path of the
 [panel sound insulation theory](https://jmrplens.github.io/phonometry/reference/theory/rooms-buildings/). Both are clean-room
 from Cremer, Heckl & Petersson (2005) and Hopkins (2007).
 
-See the [Predicting Panel Sound Insulation guide](https://jmrplens.github.io/phonometry/guides/panel-sound-insulation/) for
+See the [Predicting Panel Sound Insulation guide](https://jmrplens.github.io/phonometry/buildings/design/panel-sound-insulation/) for
 usage.
 
 ## References

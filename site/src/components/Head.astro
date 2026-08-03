@@ -56,7 +56,7 @@ const data = route?.entry?.data ?? {};
 const title = data.title ?? 'phonometry';
 const description = data.description ?? '';
 
-const pathname = Astro.url.pathname; // e.g. /phonometry/guides/levels/
+const pathname = Astro.url.pathname; // e.g. /phonometry/signal/levels/levels/
 const canonical = new URL(pathname, SITE).href;
 const rel = pathname.startsWith(BASE) ? pathname.slice(BASE.length) : pathname;
 const lang = rel.startsWith('/es/') || rel === '/es' ? 'es' : 'en';

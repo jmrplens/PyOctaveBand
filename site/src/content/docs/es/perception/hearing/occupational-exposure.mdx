@@ -1,0 +1,310 @@
+---
+title: "Exposición al ruido en el trabajo (ISO 9612)"
+description: "Las estrategias de medición basada en tareas, basada en la función y de jornada completa de la ISO 9612 para el nivel de exposición diario LEX,8h, con el presupuesto de incertidumbre del anexo C y el límite superior unilateral al 95 %."
+references:
+  - type: standard
+    organization: "International Organization for Standardization"
+    year: 2009
+    title: "Acoustics — Determination of occupational noise exposure — Engineering method"
+    designation: "ISO 9612:2009"
+    url: "https://www.iso.org/standard/41718.html"
+    note: "El método implementado: las estrategias basadas en tareas (apartado 9), basadas en la función (apartado 10) y de jornada completa (apartado 11), la colocación del micrófono del apartado 12.3, el presupuesto de incertidumbre del anexo C (Ecuaciones C.6, C.9 y C.12, Tablas C.4/C.5) y el factor de cobertura unilateral k = 1,65 (apartado 14), validado frente a los ejemplos resueltos de los anexos D, E y F; el informe de medición del apartado 15 lo escribe ExposureResult.report()."
+  - type: report
+    organization: "European Parliament and Council"
+    year: 2003
+    title: "Directive 2003/10/EC on the minimum health and safety requirements regarding the exposure of workers to the risks arising from physical agents (noise)"
+    number: "Directive 2003/10/EC"
+    institution: "Diario Oficial de la Unión Europea"
+    url: "https://eur-lex.europa.eu/eli/dir/2003/10/oj/eng"
+    note: "Los valores de exposición que dan lugar a una acción (80/85 dB) y el valor límite (87 dB) frente a los que se evalúan el LEX,8h y su límite superior."
+  - type: report
+    organization: "National Institute for Occupational Safety and Health"
+    year: 1998
+    title: "Criteria for a recommended standard: Occupational noise exposure — Revised criteria 1998"
+    number: "DHHS/NIOSH Publication No. 98-126"
+    doi: "10.26616/NIOSHPUB98126"
+    url: "https://www.cdc.gov/niosh/docs/98-126/pdfs/98-126.pdf"
+    note: "El documento de criterios de libre acceso (el PDF enlazado es la descarga gratuita) que sustenta el límite de exposición recomendado de 85 dB(A) y la justificación de conservación auditiva para medir la dosis diaria."
+---
+
+import ThemeImage from '../../../../../components/ThemeImage.astro';
+import ReportPreview from '../../../../../components/ReportPreview.astro';
+
+Una jornada laboral rara vez se mide de una sola toma: el nivel de exposición
+diario sobre el que actúa la normativa hay que componerlo a partir de
+*muestras* de un turno real, y declararlo con una incertidumbre que un
+higienista pueda defender. `lex_8h` (en
+[Niveles](/phonometry/es/signal/levels/levels/)) convierte *una* grabación en un nivel
+diario. La ISO 9612:2009, el método de ingeniería (clase de exactitud 2), es el
+diseño de la medición *en torno* a esa primitiva: cómo muestrear una jornada
+laboral real, cómo combinar las partes y cómo adjuntar la incertidumbre
+normativa que necesita todo informe de higiene laboral. El módulo
+`occupational_exposure` añade las tres **estrategias de medición** y el
+presupuesto de incertidumbre del **anexo C** sobre la maquinaria del promediado
+en energía.
+
+<ThemeImage
+  src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_dosimeter_iso9612_es.svg"
+  alt="Izquierda: un trabajador con un exposímetro sonoro personal (IEC 61252), con el micrófono montado unos 0,04 m por encima del hombro y a al menos 0,1 m de la entrada del canal auditivo del oído más expuesto, según el apartado 12.3 de la ISO 9612. Derecha: las tres estrategias de medición dibujadas como líneas de tiempo sobre una jornada de ocho horas: basada en tareas (la jornada dividida en tareas etiquetadas, al menos tres muestras y una duración por tarea), basada en la función (cinco o más muestras aleatorias repartidas sobre el grupo de exposición homogéneo) y jornada completa (todo el turno medido al menos tres veces), que desembocan todas en el LEX,8h y su incertidumbre del anexo C, eligiendo por patrón de trabajo según la Tabla B.1"
+  width="94%"
+  loading="eager"
+/>
+
+## ¿Cómo calculo el nivel de exposición diario LEX,8h de ISO 9612 con Python?
+
+Describe cada actividad como una `hearing.Task` con sus muestras y su duración
+y llama a `hearing.task_based_exposure(tasks)`. Para la jornada del soldador
+del anexo D que se usa abajo devuelve `lex_8h` = 84,3 dB con una incertidumbre
+expandida $U = 2{,}7$ dB, así que el `upper_limit` unilateral al 95 % es 87,0 dB.
+Las jornadas sin estructura usan `job_based_exposure()` o `full_day_exposure()`
+sobre muestras aleatorias.
+
+## 1. Las tres estrategias de medición (apartados 9-11)
+
+La estrategia *basada en tareas* (apartado 9) divide la jornada nominal en
+tareas, toma $I \ge 3$ muestras por tarea y suma en energía las contribuciones de
+cada tarea
+
+$$
+L_{EX,8h,m} = L_{p,A,eqT,m} + 10 \log_{10}(T_m/T_0), \qquad T_0 = 8\ \text{h},
+$$
+
+de modo que una tarea ruidosa pero corta contribuye poco. Las estrategias
+*basadas en la función* (apartado 10) y *de jornada completa* (apartado 11) toman
+en cambio $N \ge 5$ (o tres jornadas completas) muestras aleatorias sobre un grupo
+de exposición homogéneo y normalizan la duración efectiva de la jornada. El nivel
+diario es el mismo en ambos casos; las estrategias difieren en cómo se construye
+la **incertidumbre**.
+
+**Elegir estrategia.** La Tabla B.1 de la ISO 9612 elige la estrategia según el
+*patrón de trabajo*, no por conveniencia, y el compromiso es cobertura frente a
+esfuerzo. La estrategia **basada en tareas** es el valor por defecto
+recomendado cuando la jornada se descompone en un número pequeño de tareas bien
+definidas: como mide cada tarea por separado, explica *de dónde* sale la dosis
+(el desglose por tarea de más arriba) y permite muestrear bien una tarea corta
+y ruidosa sin alargar toda la campaña, pero necesita un análisis del trabajo
+fiable, y su incertidumbre crece si las duraciones de las tareas son a su vez
+inciertas. La estrategia **basada en la función** conviene al trabajador móvil
+con patrón impredecible o a un grupo homogéneo que hace «el mismo trabajo»: las
+muestras aleatorias sobre el grupo promedian la variabilidad en lugar de
+resolverla, lo que resulta robusto cuando la jornada no puede cortarse
+limpiamente en tareas, pero ciego a qué actividad domina. La estrategia de
+**jornada completa** (un dosímetro portado que captura todo el turno, repetido
+varios días) exige el mínimo análisis y lo captura todo, incluido lo
+inesperado, a costa del mayor número de días de porte y del menor valor
+diagnóstico (un número por día, sin desglose, y las contribuciones falsas, como
+golpes al micrófono, son difíciles de detectar). Como regla: resuelve la dosis
+con la estrategia por tareas cuando puedas, recurre a la basada en la función
+para trabajo irregular y usa la jornada completa cuando el patrón desafíe toda
+descripción o se quiera una comprobación independiente de todo el turno.
+
+```python
+from phonometry import hearing
+
+# ISO 9612 anexo D — la jornada de un soldador dividida en tres tareas. El nivel
+# de cada tarea es el promedio en energía de sus muestras Lp,A,eqT; las
+# duraciones llevan un rango medido.
+tasks = [
+    hearing.Task(samples=(70.0,), duration_hours=1.5, label="planning/breaks"),
+    hearing.Task(samples=(80.1, 82.2, 79.6), duration_hours=5.0,
+         duration_range=(4.0, 6.0), label="welding"),
+    hearing.Task(samples=(86.5, 92.4, 89.3, 93.2, 87.8, 86.2), duration_hours=1.5,
+         duration_range=(1.0, 2.0), label="cutting/grinding"),
+]
+res = hearing.task_based_exposure(tasks, include_duration_uncertainty=False, warn=False)
+print(f"LEX,8h = {res.lex_8h:.1f} dB   U = {res.expanded_uncertainty:.1f} dB")
+# LEX,8h = 84.3 dB   U = 2.7 dB
+print(f"límite superior unilateral 95 % LEX,8h + U = {res.upper_limit:.1f} dB")   # 87.0 dB
+for t in res.tasks:
+    print(f"  {t.label:<16} Lp,A,eqT = {t.lp_aeqt:5.1f}   aporta {t.lex_8h_contribution:5.1f} dB")
+#   planning/breaks  Lp,A,eqT =  70.0   aporta  62.7 dB
+#   welding          Lp,A,eqT =  80.8   aporta  78.7 dB
+#   cutting/grinding Lp,A,eqT =  90.1   aporta  82.8 dB
+
+# La misma jornada medida basada en la función (anexo E) y de jornada completa
+# (anexo F): ambas usan el presupuesto de muestreo Ec C.9 / Tabla C.4 con
+# k = 1.65 (unilateral 95 %).
+job = hearing.job_based_exposure([88.1, 86.1, 89.7, 86.5, 91.1, 86.7], effective_duration_hours=7.5)
+full = hearing.full_day_exposure([88.0, 91.9, 87.6, 90.4, 89.0, 88.4], effective_duration_hours=9.25)
+print(f"función          LEX,8h = {job.lex_8h:.1f} dB   U = {job.expanded_uncertainty:.1f} dB")
+# función          LEX,8h = 88.2 dB   U = 3.8 dB
+print(f"jornada completa LEX,8h = {full.lex_8h:.1f} dB   U = {full.expanded_uncertainty:.1f} dB")
+# jornada completa LEX,8h = 90.1 dB   U = 3.4 dB
+
+res.plot()   # la figura de abajo: contribuciones por tarea con LEX,8h y LEX,8h + U
+```
+
+<ThemeImage
+  src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/exposure_uncertainty_es.svg"
+  alt="Exposición por tareas del anexo D de la ISO 9612: las tres contribuciones de tarea a LEX,8h como barras, la línea del LEX,8h diario sumado en energía y la banda del límite superior unilateral al 95 % LEX,8h + U por encima"
+  width="80%"
+/>
+
+<details>
+<summary>Mostrar el código de esta figura</summary>
+
+```python
+import matplotlib.pyplot as plt
+from phonometry import hearing
+
+# La jornada del soldador del anexo D de la ISO 9612 del fragmento anterior.
+tasks = [
+    hearing.Task(samples=(70.0,), duration_hours=1.5, label="planning/breaks"),
+    hearing.Task(samples=(80.1, 82.2, 79.6), duration_hours=5.0,
+         duration_range=(4.0, 6.0), label="welding"),
+    hearing.Task(samples=(86.5, 92.4, 89.3, 93.2, 87.8, 86.2), duration_hours=1.5,
+         duration_range=(1.0, 2.0), label="cutting/grinding"),
+]
+res = hearing.task_based_exposure(tasks, include_duration_uncertainty=False, warn=False)
+
+# En una línea: barras de contribución por tarea más las líneas de
+# LEX,8h y LEX,8h + U.
+res.plot(language="es")
+plt.show()
+```
+
+</details>
+
+## 2. El presupuesto de incertidumbre del anexo C
+
+Conviene detallar dos sutilezas. Primero, el factor de cobertura es $k = 1{,}65$
+para un intervalo **unilateral** al 95 % (apartado 14), porque al higienista solo
+le importa la cota *superior*: `res.upper_limit` = $L_{EX,8h} + U$ es el valor por
+debajo del cual queda el 95 % de las mediciones, el número que se compara con un
+valor de acción. Segundo, los métodos por tareas y por función ponderan de forma
+distinta la *misma* dispersión de muestras. La incertidumbre de muestreo de la
+tarea $u_{1a}$ (Ec. C.6) divide la suma de desviaciones al cuadrado entre
+$I(I-1)$ (el error típico de la media, menor en un factor $\sqrt{I}$), mientras
+que la incertidumbre de muestreo por función/jornada completa $u_1$ (Ec. C.12) es
+la desviación típica muestral simple con denominador $N-1$, cuya contribución
+$c_1 u_1$ se lee luego de la **Tabla C.4** en función de $(N, u_1)$. La misma
+dispersión bruta infla, por tanto, más la estimación por función, que es la
+penalización que el estándar impone a un muestreo más grueso y con menos
+muestras. (El $L_{EX,8h}$ por función impreso es $88{,}2$ dB donde el anexo E
+declara $88{,}1$: el estándar redondea el nivel de jornada efectiva a $88{,}4$ antes
+de la normalización de la duración; la biblioteca lo mantiene sin redondear.)
+
+**Qué domina el presupuesto.** El anexo C combina cuatro fuentes en cuadratura
+(Tabla C.1): la incertidumbre de **muestreo** ($u_{1a}$/$u_1$), la de
+**duración** ($u_{1b}$, solo por tareas), la del **instrumento** ($u_2$,
+Tabla C.5) y la de la **posición del micrófono** ($u_3$, apartado C.6). Las dos
+últimas son pequeñas y aproximadamente fijas ($u_2 = 0{,}7$ dB para un
+sonómetro de clase 1, 1,5 dB para uno de clase 2 o un exposímetro personal, y
+$u_3 = 1{,}0$ dB por defecto), así que en la práctica **casi siempre domina el
+término de muestreo**: escala con la dispersión de los niveles medidos, que en
+un puesto real alcanza con facilidad varios decibelios y, entrando en
+cuadratura, arrasa con los términos subdecibélicos de instrumento y posición.
+La consecuencia práctica: un presupuesto en cuadratura
+lo fija su término mayor, así que subir de clase de instrumento
+aporta poco una vez que la dispersión de muestreo es grande; la jugada
+productiva son *más muestras* (el error típico cae como $1/\sqrt{I}$ o
+$1/\sqrt{N}$), que es exactamente hacia donde empujan los avisos de los
+apartados 9.3 / 10.4. Como el pico $L_{p,Cpeak}$ no tiene modelo de muestreo en
+el anexo C (Tabla C.5, Nota 1), se declara sin incertidumbre, no con una
+incertidumbre nula.
+
+Cuando las muestras de una tarea abarcan **3 dB o más** (apartado 9.3), o la
+contribución por función $c_1 u_1$ supera 3,5 dB (apartado 10.4), o se cubren
+demasiado pocos trabajadores (duración acumulada de la Tabla 1), el resultado fija
+`sampling_advisory=True` y, con `warn=True`, emite una `OccupationalExposureWarning` que
+recomienda más mediciones. Los niveles de pico $L_{p,Cpeak}$ se declaran **sin**
+incertidumbre (el anexo C no da método para ellos, Tabla C.5, Nota 1), así que
+la incertidumbre de pico queda fuera del alcance. Los tres ejemplos resueltos de
+los anexos D/E/F anteriores se reproducen con la precisión impresa de la norma
+(el redondeo final del anexo E se explica más arriba), y la teoría se deriva
+en la página de [Teoría](/phonometry/es/reference/theory/environment-transport/).
+
+### Parámetros de `task_based_exposure()` / `job_based_exposure()` / `full_day_exposure()`
+
+| Parámetro | Se aplica a | Tipo | Unidades | Rango / def. | Notas |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| `tasks` | tarea | lista de `Task` | — | $\ge 1$ | Cada `Task` tiene `samples`, `duration_hours`, `duration_range`/`duration_samples` opcionales, `label`, `instrument` |
+| `samples` | función / jornada | secuencia | dB | $\ge 2$ ($\ge 5$ / $\ge 3$ recomendado) | Muestras aleatorias $L_{p,A,eqT}$ |
+| `effective_duration_hours` | función / jornada | float | h | $> 0$ | Duración efectiva de la jornada $T_e$ |
+| `instrument` | todas | str | — | `'class1'`, `'class2'`, `'personal_exposimeter'` (def.) | Selecciona $u_2$ (Tabla C.5) |
+| `u3` | todas | float | dB | def. `1.0` | Incertidumbre de posición del micrófono (apartado C.6) |
+| `include_duration_uncertainty` | tarea | bool | — | def. `True` | `False` omite el término $(c_{1b}u_{1b})^2$ (anexo D caso a) |
+| `n_workers` / `sample_duration_hours` | función | int / float | — / h | def. `None` | Comprobación de duración acumulada de la Tabla 1 |
+| `warn` | todas | bool | — | def. `True` | Emitir `OccupationalExposureWarning` para los avisos de muestreo |
+
+Las tres devuelven un `ExposureResult` con `lex_8h`, `combined_standard_uncertainty`
+$u$, `expanded_uncertainty` $U = 1{,}65\ u$, `upper_limit` = $L_{EX,8h} + U$,
+`sampling_advisory` y (basada en tareas) el desglose por tarea en `tasks`; el
+`.plot()` del resultado dibuja las barras de contribución por tarea con las
+líneas de $L_{EX,8h}$ y del límite superior (solo resultados por tareas: las
+otras estrategias no llevan desglose por tarea).
+
+## 3. El informe de medición (apartado 15)
+
+Una determinación de la exposición termina en un *documento*: el apartado 15
+de la ISO 9612 enumera lo que debe declarar el informe de medición, desde la
+estrategia aplicada y el análisis del trabajo hasta el requisito de que el
+nivel de exposición al ruido y la incertidumbre de medición se declaren *como
+valores separados*, cada uno redondeado a un decimal.
+`ExposureResult.report()` escribe ese informe como una ficha PDF de una página
+con el formato de un servicio de prevención: la línea de base normativa con la
+estrategia aplicada, una cabecera (empresa, trabajador(es)/puesto, lugar de
+trabajo, y la instrumentación y la trazabilidad de calibración del
+apartado 15 c), el análisis del trabajo (la tabla por tareas con duraciones,
+niveles $L_{p,A,eqT,m}$ y contribuciones $L_{EX,8h,m}$ para un resultado por
+tareas (con su gráfica de contribuciones), o el resumen del muestreo con el
+presupuesto de la fórmula C.9 para los resultados por puesto o de jornada
+completa) y el $L_{EX,8h}$ en caja con $U$, $k$ y el límite superior
+unilateral al 95 %.
+
+Como el número existe para compararse con la ley, la ficha evalúa después el
+resultado frente a la **Directiva 2003/10/CE** (artículo 3; en España,
+RD 286/2006): los valores inferior y superior de exposición que dan lugar a
+una acción (80 y 85 dB(A)) y el valor límite de exposición (87 dB(A)), cada
+uno marcado superado / no superado sobre el valor tal como se muestra, con un
+veredicto CUMPLE/NO CUMPLE frente al valor límite. Una nota impresa recuerda
+que el valor límite se aplica a la exposición *efectiva*, teniendo en cuenta
+la atenuación de los protectores auditivos utilizados, que el $L_{EX,8h}$
+medido no incluye. `verbose=True` añade las columnas de incertidumbre por
+tarea del anexo C ($u_{1a}$, $u_{1b}$, $u_2$), y `language="es"` produce la
+ficha en español (*nivel de exposición diario equivalente*, *valor límite de
+exposición*, con coma decimal).
+
+```python
+from phonometry import ReportMetadata, hearing
+
+# La jornada de los soldadores del anexo D de la sección 1, con
+# incertidumbre de duración.
+res = hearing.task_based_exposure(tasks, warn=False)
+
+res.report(
+    "lex8h.pdf",
+    language="es",
+    metadata=ReportMetadata(
+        client="Taller de calderería de ejemplo",
+        specimen="Soldadores (grupo homogéneo de exposición, 4 trabajadores)",
+        test_room="Nave de montaje de acero, línea 2",
+        instrumentation="Dosímetro personal (IEC 61252), n/s 0042",
+        calibration="Calibrador IEC 60942 clase 1; verificaciones de campo dentro de 0,3 dB",
+        test_date="2026-07-20",
+        laboratory="Ejemplo de referencia de phonometry",
+        report_id="EXAMPLE-9612",
+    ),
+)   # LEX,8h = 84,3 dB, U = 3,2 dB -> valor inferior de acción superado, límite CUMPLE
+```
+
+La ficha de ejemplo se regenera con `make reports` y se conserva renderizada en
+el repositorio; pulsa en la vista previa para abrir el PDF.
+
+<ReportPreview
+	name="iso9612_exposure_example"
+	title="Informe de ejemplo de exposición al ruido en el trabajo ISO 9612 (PDF)"
+	description="Ficha de exposición al ruido en el trabajo ISO 9612 de una página: una cabecera con la empresa, el grupo de exposición de soldadores, el lugar de trabajo y la instrumentación con su trazabilidad de calibración, la tabla de análisis del trabajo por tareas (planificación/descansos, soldadura, corte/amolado con duraciones, número de muestras, niveles de tarea y contribuciones LEX,8h cerrada por la fila de totales de la jornada nominal), la gráfica de contribuciones por tarea, el LEX,8h = 84,3 dB en caja con U = 3,2 dB, k = 1,65 y el límite superior de 87,5 dB, y la tabla de evaluación de la Directiva 2003/10/CE donde el valor inferior de acción de 80 dB(A) se supera, el valor superior de 85 dB(A) y el valor límite de 87 dB(A) no, terminando en un veredicto CUMPLE."
+	caption="Ficha de exposición al ruido en el trabajo (ExposureResult.report), la jornada por tareas del anexo D de ISO 9612 con el análisis del trabajo del apartado 15 y la evaluación de la Directiva 2003/10/CE."
+/>
+
+## Véase también
+
+- [Niveles](/phonometry/es/signal/levels/levels/): las primitivas de dosis `lex_8h` /
+  `sound_exposure` (IEC 61252) y el $L_{Cpeak}$ que estas estrategias declaran al
+  lado.
+- [Incertidumbre de medición](/phonometry/es/signal/metrology/gum-uncertainty/): la
+  maquinaria GUM que sustenta las incertidumbres combinadas y expandidas.
+- [Teoría](/phonometry/es/reference/theory/environment-transport/): la derivación de las fórmulas de
+  las estrategias y del presupuesto del anexo C.
+- Referencia de la API: [`hearing.occupational_exposure`](/phonometry/es/reference/api/hearing/occupational-exposure/).

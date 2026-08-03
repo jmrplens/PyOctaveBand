@@ -4,360 +4,420 @@ Part of https://jmrplens.github.io/phonometry/llms.txt. Full text of the pages i
 
 ---
 
-<!-- source: docs/atmospheric-refraction.md | canonical: https://jmrplens.github.io/phonometry/guides/atmospheric-refraction/ -->
-Source: https://jmrplens.github.io/phonometry/guides/atmospheric-refraction/
+<!-- source: docs/elastic-waves.md | canonical: https://jmrplens.github.io/phonometry/simulation/elastic-waves/ -->
+Source: https://jmrplens.github.io/phonometry/simulation/elastic-waves/
 
-# Atmospheric refraction: ray tracing and the parabolic equation (Salomons / Attenborough)
+# Elastic waves and fluid-solid coupling
 
-The [ISO 9613-2 method](https://jmrplens.github.io/phonometry/guides/outdoor-propagation/) and the
-[spherical-wave ground effect](https://jmrplens.github.io/phonometry/guides/ground-barriers/) both assume a **homogeneous**
-atmosphere. In reality the sound speed changes with height, because temperature
-and wind change with height, and this **refracts** sound: rays curve, and over a
-few hundred metres the received level can swing by tens of decibels. This page
-covers `phonometry.environment.propagation.refraction`, the
-refracting-atmosphere counterpart of the ocean solvers in
-[`phonometry.underwater.propagation.numerical`](https://jmrplens.github.io/phonometry/guides/underwater-solvers/): a
-**ray model** and a **parabolic-equation (PE)** solver, both clean-room from
-Salomons, *Computational Atmospheric Acoustics* (2001) and Attenborough & Van
-Renterghem, *Predicting Outdoor Sound* 2e (2021, Ch. 11).
+A fluid carries one wave; a solid carries a family of them. This guide covers
+the elastic companion of the [2D FDTD wave simulation](https://jmrplens.github.io/phonometry/simulation/fdtd-simulation/):
+`elastic_fdtd_simulation` integrates the plane-strain velocity-stress system
+of Virieux (1986) on the same staggered grid as the acoustic solver, and with
+it the compressional **P wave**, the shear **S wave**, the **Rayleigh wave**
+of a free surface and the **Scholte wave** of a fluid-solid contact all
+emerge from the same update. Because a fluid is just the shear-free limit of
+the elastic equations, one pair of material maps couples water, air,
+sediment and steel in a single run: oblique reflection with **mode
+conversion**, seabed interface waves and the transmission of immersed plates
+come out of the maps alone, each pinned to its exact closed form by the
+validation suite.
 
-Whether refraction matters is mostly a question of range. A representative
-surface-layer gradient of ±0.1 s⁻¹ curves rays with a radius
-$R_c = c_0/|g| \approx 3.4$ km, so over the first hundred metres the paths are
-sensibly straight and the homogeneous models above are accurate. Beyond a few
-hundred metres the geometry takes over: downwind, or under a nocturnal
-temperature inversion, the downward-curved rays close over the ground and hold
-the level near (or even above) the homogeneous prediction, while upwind the
-same wind profile opens an acoustic shadow into which the level collapses by
-20 dB or more (Attenborough & Van Renterghem 2021, Ch. 11). That is the
-familiar upwind/downwind asymmetry of any steady outdoor source: the same
-machine at the same distance, tens of decibels apart depending on which side
-you stand. It is also why ISO 9613-2 fixes its "favourable" downwind
-atmosphere by decree, and what its scalar $C_{met}$ compresses; the models on
-this page compute the physics that decides both.
+The guide assumes the acoustic solver's vocabulary (sources, probes,
+obstacle masks, sponges and the Courant bound); read
+[2D FDTD wave simulation](https://jmrplens.github.io/phonometry/simulation/fdtd-simulation/) first if those are new. The
+closed forms this solver cross-checks live in the building, vibration and
+underwater guides: the mass law of
+[panel sound insulation](https://jmrplens.github.io/phonometry/buildings/design/panel-sound-insulation/), the flexural waves of
+[bending-wave transmission at plate junctions](https://jmrplens.github.io/phonometry/vibration/structural/junction-transmission/),
+and the shear-supporting seabed that the fluid-bottom reflection model of
+[underwater sound propagation](https://jmrplens.github.io/phonometry/underwater/underwater-propagation/) cannot represent.
 
-The sketch below puts both sides in one scene: one source, a receiver 350 m
-away on each side, and the wind profile deciding which of them hears anything.
+## 1. The P-SV velocity-stress scheme
 
-<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_atmospheric_refraction_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_atmospheric_refraction.svg" alt="Atmospheric refraction scene: a source 2 m above the ground with a receiver 350 m away on each side, wind arrows growing longer with height, and an inset of the effective sound-speed profiles c_eff(z) = c(z) + u(z); on the downwind side the rays curve back toward the ground and the receiver gets a direct plus a ground-bounced arrival, on the upwind side every ray bends upward and an acoustic shadow opens on the ground beyond about 220 m, swallowing the receiver standing inside it" width="92%"></picture>
+A solid carries more than one wave. Alongside the compressional **P wave**
+at $c_P = \sqrt{(\lambda + 2\mu)/\rho}$ a shear **S wave** propagates at
+$c_S = \sqrt{\mu/\rho}$, and every traction-free surface guides a
+**Rayleigh wave** just below $c_S$. `elastic_fdtd_simulation` integrates
+the 2D plane-strain velocity-stress system of Virieux (1986, Eq. 2),
 
-![Atmospheric refraction: ray bending and the acoustic shadow](../.github/images/atmospheric_refraction.webp)
+$$
+\rho\,\frac{\partial \mathbf{v}}{\partial t}
+  = \nabla\!\cdot\!\boldsymbol{\tau},
+\qquad
+\frac{\partial \boldsymbol{\tau}}{\partial t}
+  = \lambda\,(\nabla\!\cdot\!\mathbf{v})\,\mathbf{I}
+  + \mu\left(\nabla\mathbf{v} + \nabla\mathbf{v}^{\mathsf T}\right),
+$$
 
-<details>
-<summary>Show the code for this figure</summary>
+on the same staggered layout as the acoustic solver: the normal stresses
+``txx``/``tyy`` share the cell centres where the acoustic pressure lives,
+the velocities sit on the faces and the shear stress ``txy`` on the
+corners (Virieux's fully staggered cell, shifted half a cell). The API
+mirrors `fdtd_simulation` piece by piece: wave-speed maps `c_p` and `c_s`
+(plus `rho`) instead of `c`, `ExplosionSource` (an isotropic stress
+injection) and `ForceSource` (a directional body force) as sources, probes
+that record ``p``, ``vx`` or ``vy``, the same sponge and obstacle
+machinery, and a frozen `ElasticFDTDResult` with the same `.plot()`. The
+Courant bound depends only on the fastest $c_P$ in the map (Virieux
+Eqs. 6-7), while the resolution rule uses the slowest wave speed anywhere
+in the domain -- the slowest non-zero $c_S$ of the solid cells or, if a
+fluid region carries a still slower $c_P$, that fluid speed:
+$\Delta x \le c_\text{min} / (10 f)$ (in a wholly solid map the S wavelength is always
+the shortest; in mixed domains the fluid P wavelength can be shorter, as
+in water at 1480 m/s over a 2000 m/s-shear sediment).
 
 ```python
-import warnings
-
-import matplotlib.pyplot as plt
 import numpy as np
+from phonometry import simulation
 
-from phonometry import (
-    atmospheric_parabolic_equation,
-    atmospheric_ray_paths,
-    log_linear_sound_speed_profile,
-    shadow_zone_distance,
+# An aluminium block hit by a tiny explosion: the P front reaches two
+# probes 100 and 220 cells away; c_P falls out of the differential delay.
+w = 8e-6
+res = simulation.elastic_fdtd_simulation(
+    6320.0, 3130.0, 0.002, 1.1e-4, rho=2700.0, shape=(501, 501),
+    sources=[simulation.ExplosionSource(
+        ix=250, iy=250,
+        waveform=simulation.GaussianPulse(0, 0, width=w).value)],
+    probes=[(350, 250), (470, 250)], probe_fields=("p",),
 )
-
-c0 = 340.0
-profile = log_linear_sound_speed_profile(-1.0, ground_speed=c0, max_height=60.0)
-zs = 2.0
-fig, axes = plt.subplots(2, 1, figsize=(11, 8.2), sharex=True)
-
-rays = atmospheric_ray_paths(profile, source_height=zs,
-                             launch_angles_deg=np.linspace(-8.0, 8.0, 17),
-                             max_range=600.0, n_steps=3000)
-for i in range(rays.heights.shape[0]):
-    axes[0].plot(rays.ranges[i], rays.heights[i], color="#1f77b4", lw=0.8, alpha=0.7)
-axes[0].plot([0.0], [zs], "o", color="#d62728", label="Source")
-grad = (profile.speed_at(10.0) - c0) / 10.0
-x_sh = shadow_zone_distance(float(grad), zs, zs, ground_speed=c0)
-axes[0].axvline(x_sh, color="#d62728", ls="--", label="Shadow-zone boundary")
-axes[0].set(ylabel="Height [m]", ylim=(0, 40), title="Sound rays (upward refraction)")
-axes[0].legend()
-
-with warnings.catch_warnings():
-    warnings.simplefilter("ignore")
-    pe = atmospheric_parabolic_equation(400.0, profile, source_height=zs,
-                                        flow_resistivity=200e3,
-                                        max_range=600.0, max_height=40.0)
-img = axes[1].imshow(pe.relative_level, cmap="RdBu_r", vmin=-30, vmax=6,
-                     aspect="auto", origin="lower", interpolation="bilinear",
-                     extent=(pe.ranges[0], pe.ranges[-1], pe.heights[0], pe.heights[-1]))
-axes[1].axvline(x_sh, color="k", ls="--")
-axes[1].set(ylabel="Height [m]", xlabel="Range [m]", ylim=(0, 40),
-            title="GFPE relative sound level")
-fig.colorbar(img, ax=axes[1], label="Level re free field [dB]")
-plt.tight_layout()
-plt.show()
+t = res.times[1:]
+t1, t2 = (t[np.abs(res.signals[k, 0, 1:]).argmax()] for k in range(2))
+print(round(0.24 / (t2 - t1)))    # 6316  c_P = sqrt((lambda+2mu)/rho) = 6320
 ```
 
-</details>
+## 2. Fluids inside the elastic solver
 
-## 1. Effective sound-speed profile
+Setting ``c_s = 0`` marks a **fluid** cell: the shear modulus vanishes,
+the system degenerates to the acoustic equations, and with a uniform
+``c_s = 0`` map the elastic solver reproduces the acoustic one **bit for
+bit** (the regression suite asserts exact equality). A water column over a
+steel half-space is therefore just two bands of the material maps: with
+the density averaged arithmetically onto the faces and the shear modulus
+harmonically onto the corners (Moczo et al. 2007, Eqs. 7.37-7.39), the
+traction continuity of every internal interface, fluid-solid contacts
+included, emerges from the maps alone. The validation suite measures the
+normal-incidence reflection of a water-steel interface within 2 % of
+$(Z_2 - Z_1)/(Z_2 + Z_1)$ (typically a fraction of a percent) and recovers
+the normal-incidence mass law of a 3 mm immersed steel plate within
+0.3 dB of `mass_law_transmission_loss`.
 
-A moving (windy) atmosphere is well approximated by a non-moving one with the
-**effective sound speed** $c_\text{eff}(z) = c(z) + u(z)$, the adiabatic sound
-speed
-plus the component of the wind in the propagation direction (Salomons Eq. 4.4).
-Two profile shapes cover most surface-layer cases:
+## 3. Free surfaces and Rayleigh waves
 
-- a **linear** profile $c_\text{eff}(z) = c_0 + g\,z$
-  (`linear_sound_speed_profile`), the simplest refracting atmosphere and the
-  one with exact ray geometry;
-- the realistic **logarithmic** surface-layer profile
-  $c_\text{eff}(z) = c_0 + b\ln(1 + z/z_0)$ (`log_linear_sound_speed_profile`,
-  Salomons Eq. 4.5), with $b \approx +1\ \text{m/s}$ for a typical
-  downward-refracting atmosphere, $b \approx -1\ \text{m/s}$ for an
-  upward-refracting one, and $z_0$ the roughness length
-  (about 0.1 m for grassland).
+A side declared ``"free"`` becomes a traction-free surface through
+**stress imaging** (Moczo et al. Eq. 9.9): the normal stress is pinned to
+zero on the surface plane and the shear stress above it is its
+antisymmetric image. That single boundary condition is what makes surfaces
+wave-bearing: strike the free surface of an aluminium block vertically
+(Lamb's problem) and, besides the P and S body fronts, a **Rayleigh wave**
+rolls along the surface at $c_R \approx 0.93\,c_S$, the root of the exact
+Rayleigh characteristic equation (Cremer, Heckl & Petersson Eq. 3.149).
+The tests pin the measured Rayleigh speed to that root within 2 % and the
+flexural wave of a thin free-free strip to the Kirchhoff plate dispersion
+$c_B \propto \sqrt{\omega}$ in its thin-plate domain. Free surfaces ride
+the Rayleigh sampling rule: allow 15-20 cells per wavelength there, the
+second-order imaging surface being the most dispersive part of the scheme.
 
-A positive gradient (sound speed increasing upward) bends rays **down** toward
-the receiver (favourable propagation); a negative gradient bends them **up** and
-opens an acoustic **shadow** near the ground.
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/elastic_halfspace_waves_dark.webp"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/elastic_halfspace_waves.webp" alt="Snapshot of the vertical particle velocity in a 0.6 by 0.3 metre aluminium block a few hundredths of a millisecond after a vertical hit on its free upper surface: the compressional P front is the outer arc, the shear S front the inner arc at about half its radius, and the strongest lobes hug the surface just behind the S front, labelled as the Rayleigh wave; dotted arcs mark the exact P and S radii" width="96%"></picture>
 
-```python
-from phonometry import log_linear_sound_speed_profile
-
-profile = log_linear_sound_speed_profile(-1.0, ground_speed=340.0)  # upward
-profile.speed_at(10.0)   # effective sound speed 10 m above the ground
-profile.plot()           # c_eff(z) with height on the vertical axis
-```
-
-<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/atmospheric_sound_speed_profiles_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/atmospheric_sound_speed_profiles.svg" alt="Two logarithmic effective sound-speed profiles over the first 60 metres of atmosphere, height on the vertical axis: the downward-refracting profile (b = +1 m/s) bends right of the 340 m/s ground value and the upward-refracting one (b = -1 m/s) bends left, both with their steepest change concentrated in the first few metres above the roughness length" width="62%"></picture>
+*One snapshot, three speeds: the P front has covered twice the distance of
+the S front (dotted arcs at the exact $c_P t$ and $c_S t$ radii), and the
+strongest motion travels along the free surface as the Rayleigh wave, a
+whisker slower than S.*
 
 <details>
 <summary>Show the code for this figure</summary>
-
-```python
-import matplotlib.pyplot as plt
-from phonometry import log_linear_sound_speed_profile
-
-# The two canonical surface layers of Salomons Eq. 4.5 over grassland.
-down = log_linear_sound_speed_profile(+1.0, ground_speed=340.0, max_height=60.0)
-up = log_linear_sound_speed_profile(-1.0, ground_speed=340.0, max_height=60.0)
-ax = down.plot(color="#1f77b4")
-up.plot(ax=ax, color="#d62728")
-plt.show()
-```
-
-</details>
-
-## 2. Ray model
-
-In geometrical acoustics a sound ray obeys Snell's law
-$\cos(\gamma(z))/c(z) = \text{const}$ (Salomons Eq. 4.3). `atmospheric_ray_paths` integrates
-it with a fourth-order Runge-Kutta scheme, marching in range and reflecting
-specularly at the ground, and returns the curved paths, the turning points, the
-travel times and the number of ground reflections.
 
 ```python
 import numpy as np
-from phonometry import atmospheric_ray_paths, log_linear_sound_speed_profile
-
-profile = log_linear_sound_speed_profile(-1.0, ground_speed=340.0)
-rays = atmospheric_ray_paths(profile, source_height=2.0,
-                             launch_angles_deg=np.linspace(-8.0, 8.0, 17),
-                             max_range=600.0)
-rays.plot()   # curved ray fan with the acoustic shadow near the ground
-```
-
-The page-top figure shows this upward-refracting fan opening its shadow. The
-favourable case is its mirror image: under **downward** refraction ($b = +1$)
-the shallow rays are bent back to the ground, bounce, and carry energy along
-the surface instead of losing it upward.
-
-<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/atmospheric_ray_fan_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/atmospheric_ray_fan.svg" alt="A fan of sound rays traced from a source 2 m above the ground through a downward-refracting logarithmic atmosphere: the shallow launch angles curve back down, reflect off the ground and arch onward in repeated hops out to 600 m, while the steepest rays climb out of the 40 m frame" width="88%"></picture>
-
-<details>
-<summary>Show the code for this figure</summary>
-
-```python
 import matplotlib.pyplot as plt
-import numpy as np
-from phonometry import atmospheric_ray_paths, log_linear_sound_speed_profile
+from phonometry import simulation
 
-# Downward refraction: the favourable-propagation mirror of the shadow case.
-profile = log_linear_sound_speed_profile(+1.0, ground_speed=340.0)
-rays = atmospheric_ray_paths(profile, source_height=2.0,
-                             launch_angles_deg=np.linspace(-8.0, 8.0, 17),
-                             max_range=600.0, n_steps=600)
-rays.plot()   # shallow rays return to the ground and bounce on down-range
-plt.show()
-```
-
-</details>
-
-### Closed-form geometry (linear gradient)
-
-For a **linear** profile every ray is an exact **circular arc**. Its radius of
-curvature is (Salomons Sec. 4.4; Attenborough Ch. 11):
-
-$$
-R_c = \frac{1}{|g|\,\xi}, \qquad \xi = \frac{\cos\theta_0}{c(\text{launch})},
-\qquad\Rightarrow\qquad
-R_c = \frac{c_0}{|g|\cos\theta_0},
-$$
-
-exposed as `ray_curvature_radius`. A ray launched at angle $\theta_0$ in
-downward refraction turns at the height $R_c(1 - \cos\theta_0)$. For an
-**upward-refracting**
-linear profile the ground-grazing ray bounds a region beyond which no direct or
-once-reflected ray arrives, at the closed-form **shadow-zone distance**
-(`shadow_zone_distance`):
-
-$$
-x_\text{shadow} = \sqrt{2 R_c}\left(\sqrt{h_s} + \sqrt{h_r}\right),
-\qquad R_c = \frac{c_0}{|g|}.
-$$
-
-These closed forms are the exact oracle for the ray tracer: a circle fit of a
-traced ray recovers $R_c$ to machine precision.
-
-## 3. Parabolic equation (Green's Function PE)
-
-The **parabolic equation** is the reference method for refraction and shadow
-zones at long range. It replaces the wave equation with a one-way (outgoing)
-equation valid within a limiting elevation angle, and marches it in range on a
-range-height grid. `atmospheric_parabolic_equation` implements the **Green's
-Function PE** (GFPE, Salomons Appendix H), the atmospheric member of the same
-split-step Fourier family as the ocean
-[`parabolic_equation`](https://jmrplens.github.io/phonometry/guides/underwater-solvers/). Each range step:
-
-1. transforms the field to the vertical-wavenumber domain (FFT);
-2. applies the free-space propagator
-   $\exp(i\,\Delta r\,(\sqrt{k_a^2 - k_z^2} - k_a))$ together
-   with the finite-impedance ground reflection
-   $R(k_z) = (k_z Z - k_0)/(k_z Z + k_0)$ (Salomons Eq. H.28);
-3. transforms back and adds the surface-wave residue of the reflection pole
-   at $k_z = -k_0/Z$ (the third term of Eq. H.49, present for a passive
-   ground, $\operatorname{Im}(Z) > 0$);
-4. applies the refraction phase screen $\exp(i\,\Delta r\,(k(z) - k_a))$
-   (Eq. H.58).
-
-The source is a **Gaussian starter** with its ground image (Eqs. G.64, G.76)
-and an **absorbing layer** at the top of the grid (Sec. G.9) suppresses
-top-boundary reflections. The result is the **relative sound level**
-$\Delta L(z, r) = 20\log_{10}(|p| R_1)$ (dB re free field, Salomons Eq. 3.6) over
-the whole range-height plane.
-
-```python
-from phonometry import atmospheric_parabolic_equation, log_linear_sound_speed_profile
-
-profile = log_linear_sound_speed_profile(-1.0, ground_speed=340.0)  # upward
-pe = atmospheric_parabolic_equation(400.0, profile, source_height=2.0,
-                                    flow_resistivity=200e3,  # grassland
-                                    max_range=600.0, max_height=40.0)
-pe.level_at_height(2.0)   # relative level vs range at 2 m
-pe.plot()                 # the range-height relative-level field
-```
-
-Cut the field at the receiver height and the whole story of this page is one
-figure: with everything else identical, the sign of the gradient alone moves
-the 400 Hz level at 600 m by more than 30 dB.
-
-<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/atmospheric_pe_range_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/atmospheric_pe_range.svg" alt="GFPE relative sound level against range at a 2 m receiver height over grassland at 400 Hz for three atmospheres. The downward-refracting curve recovers from the ground dip back toward 0 dB re free field, the homogeneous dashed curve decays gently to about minus 27 dB at 600 m, and the upward-refracting curve plunges past minus 40 dB beyond the dotted closed-form shadow-zone boundary near 110 m" width="88%"></picture>
-
-<details>
-<summary>Show the code for this figure</summary>
-
-```python
-import warnings
-
-import matplotlib.pyplot as plt
-
-from phonometry import (
-    atmospheric_parabolic_equation,
-    linear_sound_speed_profile,
-    log_linear_sound_speed_profile,
-    shadow_zone_distance,
+# A 0.6 x 0.3 m aluminium block, struck vertically at its free surface.
+dx, w = 0.001, 8e-6
+dt = 0.6 * dx / (6320.0 * np.sqrt(2.0))
+steps = round(7.3e-5 / dt)
+res = simulation.elastic_fdtd_simulation(
+    6320.0, 3130.0, dx, 7.3e-5, rho=2700.0, shape=(300, 600),
+    sources=[simulation.ForceSource(
+        ix=300, iy=0, direction="y", amplitude=1e6,
+        waveform=simulation.GaussianPulse(0, 0, width=w).value)],
+    boundaries={"top": "free"},
+    snapshot_every=steps, snapshot_field="vy",
 )
-
-cases = [
-    (log_linear_sound_speed_profile(+1.0, ground_speed=340.0), "Downward (b = +1 m/s)"),
-    (linear_sound_speed_profile(0.0, ground_speed=340.0), "Homogeneous (b = 0)"),
-    (log_linear_sound_speed_profile(-1.0, ground_speed=340.0), "Upward (b = -1 m/s)"),
-]
-fig, ax = plt.subplots(figsize=(11, 6.2))
-with warnings.catch_warnings():
-    warnings.simplefilter("ignore")
-    for profile, label in cases:
-        pe = atmospheric_parabolic_equation(400.0, profile, source_height=2.0,
-                                            flow_resistivity=200e3,
-                                            max_range=600.0, max_height=40.0)
-        ax.plot(pe.ranges, pe.level_at_height(2.0), label=label)
-# The closed-form boundary of the equivalent linear upward gradient (its
-# 10 m mean), the dotted line of the figure.
-up = cases[2][0]
-grad = float(up.speed_at(10.0) - 340.0) / 10.0
-ax.axvline(shadow_zone_distance(grad, 2.0, 2.0, ground_speed=340.0),
-           color="k", ls=":", label="Shadow-zone boundary")
-ax.set(xlabel="Range [m]", ylabel="Level re free field [dB]", ylim=(-40, 10))
-ax.legend()
+res.plot(kind="snapshot")
 plt.show()
 ```
 
 </details>
 
-The ground impedance is supplied directly (`impedance=`, a normalized complex
-value in the $e^{-i\omega t}$ convention of Salomons, with
-$\operatorname{Im}(Z) > 0$ for a passive ground), as a `PorousMediumResult`,
-or from an effective `flow_resistivity` via
-the [porous models](https://jmrplens.github.io/phonometry/guides/porous-absorbers/) of the materials domain; the porous
-models work in the opposite $e^{+j\omega t}$ convention, so their impedance is
-conjugated internally.
+That flexural wave is worth watching in motion: the
+[bending-wave transmission guide](https://jmrplens.github.io/phonometry/vibration/structural/junction-transmission/) embeds an
+animation of this solver launching a 4 kHz bending packet along a 10 mm
+steel plate into an L-junction, where the corner splits it into the
+reflected and transmitted waves the closed form prices at
+$\tau_{12}(0°) = 0.5$, plus the fast in-plane precursor the pinned-junction
+model deliberately leaves out.
 
-The clip below runs the full wave physics through both signs of the
-logarithmic profile: a steady 50 Hz source 2 m over rigid ground in a 2D FDTD
-slice, with the library's ray fans traced through the same $c(z)$ profiles laid
-over the fields. Downwind the fronts bend back and stream along the ground to
-the 350 m receiver; upwind they lift off the surface and the ground goes
-quiet beyond the ray-model shadow boundary.
+## 4. Fluid-solid coupling at normal incidence
 
-<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anim_fdtd_refraction_dark.gif"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anim_fdtd_refraction.gif" alt="Animation: a steady 50 Hz source 2 m above rigid ground in a 2D FDTD slice, downwind and upwind panels with their logarithmic effective sound-speed profiles drawn beside them; downwind the wavefronts curve back to the ground and keep the 350 m receiver loud, upwind they lift away and an acoustic shadow opens beyond the annotated 109 m ray-model boundary, with the library ray fans overlaid and a closing spreading-compensated RMS map showing the bright ground duct against the dark shadow wedge" width="640" height="360" loading="lazy"></picture>
+Because the fluid is just the ``c_s = 0`` limit of the elastic scheme, a
+water-steel contact is **one solver, two bands of the material maps**, and
+the whole physics of fluid-solid coupling comes out of the same update. The
+`Material` constants and `ElasticFDTD2D.from_regions` build those layered
+maps without manual array surgery: a background material and a list of
+painted regions.
 
-[Watch the high-resolution video (WebM)](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anim_fdtd_refraction.webm)
+```python
+import numpy as np
+from phonometry.simulation import ElasticFDTD2D, STEEL, WATER
 
-## 4. Validation
+# A 12 m water column over a steel half-space, as a 1D-like strip.
+dx = 0.005
+sim = ElasticFDTD2D.from_regions(
+    (2400, 3), dx, background=WATER, regions=[(np.s_[1200:, :], STEEL)])
+y = (np.arange(2400) + 0.5) * dx
+p0 = np.exp(-(((y - 3.0) / 0.15) ** 2))[:, None]     # plane pulse
+sim.txx[:] = -p0
+sim.tyy[:] = -p0
+y_face = np.arange(1, 2400) * dx + 0.5 * WATER.c_p * sim.dt
+sim.vy += (np.exp(-(((y_face - 3.0) / 0.15) ** 2))
+           / (WATER.rho * WATER.c_p))[:, None]       # one-way, leapfrog-consistent
+trace = []
+for _ in range(round(3.4e-3 / sim.dt)):
+    sim.step()
+    trace.append(sim.p[900, 1])
+trace = np.asarray(trace)
+t = (np.arange(trace.size) + 1) * sim.dt
+incident = trace[t < 1.8e-3].max()
+echo = trace[t > 2.6e-3]
+print(round(float(echo[np.abs(echo).argmax()] / incident), 3))   # 0.938
+# (Z2 - Z1)/(Z2 + Z1) = 0.938: at normal incidence no shear is excited
+# and the steel behaves as a liquid of its rho and c_P (B&G Eq. 4.2.27)
+```
 
-The models are anchored by independent oracles:
+## 5. Oblique incidence: mode conversion
 
-- **Homogeneous limit → spherical ground effect.** With a zero gradient the
-  GFPE field must reproduce the exact Weyl-Van der Pol
-  [`ground_effect`](https://jmrplens.github.io/phonometry/guides/ground-barriers/) at every range. It does so to a few
-  tenths of a dB over grassland on the default grid (source and receiver near
-  the ground, 50 m to 1 km), and to the coherent **+6 dB** two-ray enhancement
-  over a rigid ground.
-- **Exact ray geometry.** For a linear profile the traced ray is a circular arc
-  whose fitted radius matches the closed-form `ray_curvature_radius` to machine
-  precision, and the turning height matches $R_c(1 - \cos\theta_0)$.
-- **Reciprocity.** Swapping the source and receiver heights leaves the PE level.
-- **Shadow zone.** Over an upward-refracting profile the PE level collapses far
-  inside the closed-form shadow distance.
+Away from normal incidence the solid stops being a liquid. The incident
+sound refracts into **two** transmitted waves, P and SV (**mode
+conversion**), each with its own critical angle: for water over steel,
+14.5° (P) and 27.5° (S). Between them the transmitted P is evanescent and
+the shear wave carries the transmitted power, so the reflection dips to
+$|V| = 0.918$ at 20° instead of reflecting totally as a fluid bottom of the
+same $c_P$ would; beyond the S critical angle the reflection is total,
+$|V| = 1$ with a phase. The validation suite launches oblique carrier beams
+at 10° and 20° and matches the exact reflection coefficient of
+Brekhovskikh & Godin (Eqs. 4.2.22-4.2.26) within a fraction of a percent,
+mode conversion included. This is exactly the shear physics that the
+fluid-bottom `reflection_coefficient` of the
+[underwater module](https://jmrplens.github.io/phonometry/underwater/underwater-propagation/) cannot represent, and the
+reason a shear-supporting seabed loses more energy than its
+equivalent-fluid model.
 
-These checks are pinned numerically in the
-[conformance report](https://jmrplens.github.io/phonometry/reference/conformance/) (section "Atmospheric refraction").
+## 6. The Scholte interface wave
+
+Total reflection beyond the S critical angle leaves both media carrying
+only evanescent fields, and those fields can lock together into a true
+interface wave: the **Scholte wave**, the fluid-solid analogue of the
+Rayleigh wave. It travels slower than both the fluid sound speed and the
+solid shear speed, has no low-frequency cut-off and does not disperse over
+homogeneous half-spaces; `scholte_speed` solves its exact characteristic
+equation (B&G Eq. 4.4.20).
+
+```python
+from phonometry.simulation import Material, STEEL, WATER, scholte_speed
+
+print(round(scholte_speed(WATER, STEEL), 1))       # 1479.6, 0.03 % below water
+seabed = Material(c_p=3500.0, c_s=2000.0, rho=2500.0)
+print(round(scholte_speed(Material(1500.0, 0.0, 1000.0), seabed), 1))  # 1436.0
+```
+
+Those two numbers tell the whole story. Over a **stiff** bed (steel) the
+Scholte wave hugs the water speed (1480 m/s) to within 0.03 % and its
+evanescent tail reaches ~7 wavelengths up into the water: it is essentially
+a grazing water wave and cannot be separated by time of flight in any
+reasonable domain
+(over air-solid contacts the deficit collapses to ~$10^{-12}$ of $c$ and the
+wave is unobservable outright). Over a **soft** sediment the speed drops
+well below the water speed and the wave squeezes to within half a
+wavelength of the contact, which is why measured seabed interface waves are
+a standard probe of sediment shear speed. The snapshot below runs that soft
+case: an explosive shot just above the bottom, and the strongest late
+feature is the interface-hugging Scholte train, timed by the test suite at
+1436 m/s within 2 % between two contact probes.
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/scholte_interface_wave_dark.webp"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/scholte_interface_wave.webp" alt="Snapshot of the vertical particle velocity in a 500 by 200 metre domain of water over a soft sediment half-space, 0.2 seconds after an explosive shot 10 metres above the contact: the direct water wavefront arcs up and to the right, oblique wavefronts radiate into the sediment, and the strongest lobes form a compact train hugging the dotted interface line, labelled as the Scholte wave, evanescent on both sides" width="96%"></picture>
+
+*The van Vossen benchmark media (water over a 3500/2000/2500 sediment):
+the Scholte train crawls along the contact at 1436 m/s, evanescent into
+both media, while the direct water wave runs ahead at 1500 m/s.*
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import numpy as np
+import matplotlib.pyplot as plt
+from phonometry import simulation
+
+# Water over a soft seabed; explosive 50 Hz Ricker 10 m above the contact.
+ny, nx, dx = 200, 500, 1.0
+c_p = np.full((ny, nx), 1500.0)
+c_s = np.zeros((ny, nx))
+rho = np.full((ny, nx), 1000.0)
+c_p[100:], c_s[100:], rho[100:] = 3500.0, 2000.0, 2500.0
+f0, t0 = 50.0, 0.030
+dt = 0.6 * dx / (3500.0 * np.sqrt(2.0))
+steps = round(0.232 / dt)
+
+def ricker(t):
+    a = (np.pi * f0 * (t - t0)) ** 2
+    return (1.0 - 2.0 * a) * np.exp(-a)
+
+res = simulation.elastic_fdtd_simulation(
+    c_p, c_s, dx, 0.232, rho=rho,
+    sources=[simulation.ExplosionSource(ix=60, iy=89, waveform=ricker,
+                                        amplitude=1e3)],
+    boundaries="absorbing", absorbing_layer_cells=20,
+    snapshot_every=steps, snapshot_field="vy",
+)
+res.plot(kind="snapshot")
+plt.show()
+```
+
+</details>
+
+## 7. Immersed plates and the mass law
+
+An **immersed plate** closes the loop with the building-acoustics module.
+At normal incidence no shear is excited, so an elastic plate in water is
+exactly the three-media fluid layer of B&G §2.4: its transmission follows
+the closed form of Eq. 2.4.14, which reduces to the familiar mass law for
+thin plates and low frequencies and predicts **total transmission** at the
+half-wave thickness resonances $f_n = n c_P / (2 h)$ (Eq. 2.4.19). For a
+10 mm steel plate that first resonance sits at 295 kHz, and one broadband
+FDTD run reproduces the whole curve: 5.8 dB at 10 kHz (where
+`mass_law_transmission_loss` with water as the ambient fluid agrees with
+the exact form to 0.02 dB), 18.1 dB at 50 kHz, and a transmission-loss
+dip within 0.1 % of the 295 kHz resonance. The same suite stress-tests the
+extreme contrast of an air-steel contact (impedance ratio ~$10^5$:1): stable
+over 10 000 steps with the reflected amplitude conserved to 0.5 %.
+
+At oblique incidence the plate physics gets richer, and the
+[panel sound insulation guide](https://jmrplens.github.io/phonometry/buildings/design/panel-sound-insulation/) embeds the
+animation: this solver driving the same 10 mm steel plate, lying in air,
+with a sustained 45° plane wave below and above its coincidence frequency,
+where the trace-matched bending wave re-radiates a growing beam and holds
+the transmitted level at the point where the mass law demands 12 dB more
+blocking.
+
+## Quick answers
+
+### When do I need the elastic solver instead of the acoustic one?
+
+Whenever any part of the domain supports shear: mode conversion at oblique
+incidence, Rayleigh waves on free surfaces, Scholte waves at fluid-solid
+contacts and plate transmission all need the elastic equations. If every
+cell is fluid, use the acoustic solver: with a uniform ``c_s = 0`` map the
+elastic solver reproduces it bit for bit, at roughly twice the memory and
+stepping cost.
+
+### What grid resolution does an elastic simulation need?
+
+Resolve at least 10 cells per shortest wavelength using the slowest wave
+speed in the domain -- the slowest non-zero shear speed or a slower fluid
+sound speed if one is present -- $\Delta x \le c_\text{min} / (10 f)$.
+Allow 15-20 cells per wavelength along free
+surfaces (the stress-imaging boundary is the most dispersive part of the
+scheme), and at least 15 points per wavelength when an interface wave has
+to be timed (van Vossen et al. 2002).
+
+### What is a Scholte wave and how fast does it travel?
+
+The Scholte wave is the true interface wave of a fluid-solid contact:
+evanescent into both media, elliptical particle motion, no low-frequency
+cut-off and non-dispersive over homogeneous half-spaces. Its speed solves
+the exact characteristic equation (Brekhovskikh & Godin Eq. 4.4.20,
+`scholte_speed`) and always lies below both the fluid sound speed and the
+solid shear speed: 0.03 % below the water speed (1480 m/s) over steel
+(1479.6 m/s),
+but 4 % below the 1500 m/s ocean water of the sediment example (1436 m/s
+for that water over a 3500/2000/2500 bed), which is why seabed interface
+waves probe the sediment shear stiffness.
+
+## See also
+
+- [2D FDTD wave simulation](https://jmrplens.github.io/phonometry/simulation/fdtd-simulation/): the acoustic solver this
+  guide extends, with the staggered grid, the Courant bound, the sources,
+  probes and boundary machinery shared by both.
+- [Predicting Panel Sound Insulation](https://jmrplens.github.io/phonometry/buildings/design/panel-sound-insulation/): the mass
+  law and coincidence closed forms; the immersed-plate run of section 7 is
+  their full-wave cross-check.
+- [Bending-wave transmission at plate junctions](https://jmrplens.github.io/phonometry/vibration/structural/junction-transmission/):
+  the flexural-wave closed forms of the building model; the Kirchhoff
+  dispersion validated in section 3 is the wave they transport.
+- [Underwater sound propagation](https://jmrplens.github.io/phonometry/underwater/underwater-propagation/): the
+  fluid-bottom Rayleigh reflection model whose missing shear physics
+  section 5 quantifies.
+- API reference: [`simulation.elastic-fdtd`](https://jmrplens.github.io/phonometry/reference/api/simulation/elastic-fdtd/).
 
 ## References
 
-- Salomons, E. M. (2001). *Computational Atmospheric Acoustics*. Kluwer /
-  Springer. Chapter 4 (ray model, PE examples), Appendix G (CNPE), Appendix H
-  (GFPE).
-- Attenborough, K., & Van Renterghem, T. (2021). *Predicting Outdoor Sound*
-  (2nd ed.). CRC Press. Chapter 11 (refraction and ray models).
+- Virieux, J. (1986). P-SV wave propagation in heterogeneous media:
+  velocity-stress finite-difference method. *Geophysics*, 51(4), 889-901.
+  [doi:10.1190/1.1442147](https://doi.org/10.1190/1.1442147). The elastic
+  solver of section 1: the velocity-stress system (Eq. 2), the fully
+  staggered cell and update (Fig. 1, Eq. 5), the P-only Courant bound
+  (Eqs. 6-7), the dispersion relations (Eqs. 13-14) and the liquid as the
+  shear-free limit.
+- Moczo, P., Kristek, J., Galis, M., Pazak, P., & Balazovjech, M. (2007).
+  The finite-difference and finite-element modeling of seismic wave
+  propagation and earthquake motion. *Acta Physica Slovaca*, 57(2),
+  177-406. The heterogeneous effective parameters of section 2 (harmonic
+  shear modulus, arithmetic density; Eqs. 7.37-7.39) and the stress-imaging
+  free surface of section 3 (Eq. 9.9).
+- Cremer, L., Heckl, M., & Petersson, B. A. T. (2005). *Structure-borne
+  sound* (3rd ed.). Springer.
+  [doi:10.1007/b137728](https://doi.org/10.1007/b137728). The analytic
+  oracles of the elastic solver: the exact Rayleigh characteristic
+  equation (Eq. 3.149) and the Kirchhoff flexural dispersion with its
+  thickness correction (Eqs. 3.83-3.89, 3.196b).
+- Brekhovskikh, L. M., & Godin, O. A. (1990). *Acoustics of layered media
+  I: Plane and quasi-plane waves*. Springer.
+  [doi:10.1007/978-3-642-52369-4](https://doi.org/10.1007/978-3-642-52369-4).
+  The fluid-solid oracles of sections 4-7: the oblique reflection
+  coefficient with mode conversion (Eqs. 4.2.22-4.2.26) and its
+  critical-angle limits (Eqs. 4.2.27-4.2.31), the exact Scholte
+  characteristic equation (Eqs. 4.4.18-4.4.20) with the light-fluid
+  asymptotics (Eqs. 4.4.21-4.4.24), and the three-media layer transmission
+  (Eqs. 2.4.10-2.4.19).
+- van Vossen, R., Robertsson, J. O. A., & Chapman, C. H. (2002).
+  Finite-difference modeling of wave propagation in a fluid-solid
+  configuration. *Geophysics*, 67(2), 618-624.
+  [doi:10.1190/1.1468623](https://doi.org/10.1190/1.1468623). The
+  fluid-solid benchmark of the same staggered scheme: the harmonic shear
+  modulus and arithmetic density averages (Eqs. 9-10) that satisfy the
+  interface conditions implicitly, the soft-bed configuration of the
+  Scholte test of section 6 and the >= 15 points-per-wavelength rule for
+  the O(2,2) scheme with an interface wave.
+
+## Standards and sources
+
+No measurement standard governs the elastic solver: it implements the
+textbook velocity-stress method of Virieux (1986) with the
+heterogeneous-medium and free-surface treatments of Moczo et al. (2007).
+Validation is anchored to closed forms: the P and S body-wave speeds, the
+exact Rayleigh root and the Kirchhoff flexural dispersion (Cremer, Heckl &
+Petersson), the bit-exact acoustic limit, the fluid-solid reflection at
+normal and oblique incidence with mode conversion, the exact Scholte-wave
+speed and the immersed-plate transmission with its thickness resonance
+(Brekhovskikh & Godin), the immersed-panel mass law, and the van Vossen
+(2002) soft-bed interface-wave benchmark.
 
 ---
 
-← [Spherical ground and barriers](https://jmrplens.github.io/phonometry/guides/ground-barriers/) ·
-[Outdoor propagation (ISO 9613-2)](https://jmrplens.github.io/phonometry/guides/outdoor-propagation/) ·
-[Underwater propagation solvers](https://jmrplens.github.io/phonometry/guides/underwater-solvers/) ·
-[Documentation index](https://jmrplens.github.io/phonometry/)
 
----
-
-
-<!-- source: docs/fdtd-simulation.md | canonical: https://jmrplens.github.io/phonometry/guides/fdtd-simulation/ -->
-Source: https://jmrplens.github.io/phonometry/guides/fdtd-simulation/
+<!-- source: docs/fdtd-simulation.md | canonical: https://jmrplens.github.io/phonometry/simulation/fdtd-simulation/ -->
+Source: https://jmrplens.github.io/phonometry/simulation/fdtd-simulation/
 
 # 2D FDTD wave simulation
 
@@ -556,7 +616,7 @@ plt.show()
 A three-row rigid-walled domain is a plane-wave tube, and with the per-cell
 `damping` map a porous sample becomes an equivalent fluid, which turns the
 solver itself into a measurable specimen: the
-[impedance-tube guide](https://jmrplens.github.io/phonometry/guides/impedance-tube/) runs the ISO 10534-2 and
+[impedance-tube guide](https://jmrplens.github.io/phonometry/materials/absorbers/impedance-tube/) runs the ISO 10534-2 and
 ASTM E2611 measurements virtually on exactly that domain, animations
 included, and recovers the analytic absorption and transmission loss of the
 modelled sample through the library's own reduction chains (the
@@ -873,7 +933,7 @@ Virieux (1986) on the same grid, adding shear waves, stress-imaging free
 surfaces with Rayleigh waves, and fluid-solid coupling with mode
 conversion, Scholte interface waves and immersed-plate transmission. That
 solver has its own guide,
-[Elastic waves and fluid-solid coupling](https://jmrplens.github.io/phonometry/guides/elastic-waves/).
+[Elastic waves and fluid-solid coupling](https://jmrplens.github.io/phonometry/simulation/elastic-waves/).
 
 ## Quick answers
 
@@ -944,418 +1004,6 @@ normal-incidence reflection coefficient and the scheme's dispersion
 relation); two of those anchors run in the
 [conformance report](https://jmrplens.github.io/phonometry/reference/conformance/). The elastic P-SV companion solver
 and its own oracles are covered in
-[Elastic waves and fluid-solid coupling](https://jmrplens.github.io/phonometry/guides/elastic-waves/).
-
----
-
-
-<!-- source: docs/elastic-waves.md | canonical: https://jmrplens.github.io/phonometry/guides/elastic-waves/ -->
-Source: https://jmrplens.github.io/phonometry/guides/elastic-waves/
-
-# Elastic waves and fluid-solid coupling
-
-A fluid carries one wave; a solid carries a family of them. This guide covers
-the elastic companion of the [2D FDTD wave simulation](https://jmrplens.github.io/phonometry/guides/fdtd-simulation/):
-`elastic_fdtd_simulation` integrates the plane-strain velocity-stress system
-of Virieux (1986) on the same staggered grid as the acoustic solver, and with
-it the compressional **P wave**, the shear **S wave**, the **Rayleigh wave**
-of a free surface and the **Scholte wave** of a fluid-solid contact all
-emerge from the same update. Because a fluid is just the shear-free limit of
-the elastic equations, one pair of material maps couples water, air,
-sediment and steel in a single run: oblique reflection with **mode
-conversion**, seabed interface waves and the transmission of immersed plates
-come out of the maps alone, each pinned to its exact closed form by the
-validation suite.
-
-The guide assumes the acoustic solver's vocabulary (sources, probes,
-obstacle masks, sponges and the Courant bound); read
-[2D FDTD wave simulation](https://jmrplens.github.io/phonometry/guides/fdtd-simulation/) first if those are new. The
-closed forms this solver cross-checks live in the building, vibration and
-underwater guides: the mass law of
-[panel sound insulation](https://jmrplens.github.io/phonometry/guides/panel-sound-insulation/), the flexural waves of
-[bending-wave transmission at plate junctions](https://jmrplens.github.io/phonometry/guides/junction-transmission/),
-and the shear-supporting seabed that the fluid-bottom reflection model of
-[underwater sound propagation](https://jmrplens.github.io/phonometry/guides/underwater-propagation/) cannot represent.
-
-## 1. The P-SV velocity-stress scheme
-
-A solid carries more than one wave. Alongside the compressional **P wave**
-at $c_P = \sqrt{(\lambda + 2\mu)/\rho}$ a shear **S wave** propagates at
-$c_S = \sqrt{\mu/\rho}$, and every traction-free surface guides a
-**Rayleigh wave** just below $c_S$. `elastic_fdtd_simulation` integrates
-the 2D plane-strain velocity-stress system of Virieux (1986, Eq. 2),
-
-$$
-\rho\,\frac{\partial \mathbf{v}}{\partial t}
-  = \nabla\!\cdot\!\boldsymbol{\tau},
-\qquad
-\frac{\partial \boldsymbol{\tau}}{\partial t}
-  = \lambda\,(\nabla\!\cdot\!\mathbf{v})\,\mathbf{I}
-  + \mu\left(\nabla\mathbf{v} + \nabla\mathbf{v}^{\mathsf T}\right),
-$$
-
-on the same staggered layout as the acoustic solver: the normal stresses
-``txx``/``tyy`` share the cell centres where the acoustic pressure lives,
-the velocities sit on the faces and the shear stress ``txy`` on the
-corners (Virieux's fully staggered cell, shifted half a cell). The API
-mirrors `fdtd_simulation` piece by piece: wave-speed maps `c_p` and `c_s`
-(plus `rho`) instead of `c`, `ExplosionSource` (an isotropic stress
-injection) and `ForceSource` (a directional body force) as sources, probes
-that record ``p``, ``vx`` or ``vy``, the same sponge and obstacle
-machinery, and a frozen `ElasticFDTDResult` with the same `.plot()`. The
-Courant bound depends only on the fastest $c_P$ in the map (Virieux
-Eqs. 6-7), while the resolution rule uses the slowest wave speed anywhere
-in the domain -- the slowest non-zero $c_S$ of the solid cells or, if a
-fluid region carries a still slower $c_P$, that fluid speed:
-$\Delta x \le c_\text{min} / (10 f)$ (in a wholly solid map the S wavelength is always
-the shortest; in mixed domains the fluid P wavelength can be shorter, as
-in water at 1480 m/s over a 2000 m/s-shear sediment).
-
-```python
-import numpy as np
-from phonometry import simulation
-
-# An aluminium block hit by a tiny explosion: the P front reaches two
-# probes 100 and 220 cells away; c_P falls out of the differential delay.
-w = 8e-6
-res = simulation.elastic_fdtd_simulation(
-    6320.0, 3130.0, 0.002, 1.1e-4, rho=2700.0, shape=(501, 501),
-    sources=[simulation.ExplosionSource(
-        ix=250, iy=250,
-        waveform=simulation.GaussianPulse(0, 0, width=w).value)],
-    probes=[(350, 250), (470, 250)], probe_fields=("p",),
-)
-t = res.times[1:]
-t1, t2 = (t[np.abs(res.signals[k, 0, 1:]).argmax()] for k in range(2))
-print(round(0.24 / (t2 - t1)))    # 6316  c_P = sqrt((lambda+2mu)/rho) = 6320
-```
-
-## 2. Fluids inside the elastic solver
-
-Setting ``c_s = 0`` marks a **fluid** cell: the shear modulus vanishes,
-the system degenerates to the acoustic equations, and with a uniform
-``c_s = 0`` map the elastic solver reproduces the acoustic one **bit for
-bit** (the regression suite asserts exact equality). A water column over a
-steel half-space is therefore just two bands of the material maps: with
-the density averaged arithmetically onto the faces and the shear modulus
-harmonically onto the corners (Moczo et al. 2007, Eqs. 7.37-7.39), the
-traction continuity of every internal interface, fluid-solid contacts
-included, emerges from the maps alone. The validation suite measures the
-normal-incidence reflection of a water-steel interface within 2 % of
-$(Z_2 - Z_1)/(Z_2 + Z_1)$ (typically a fraction of a percent) and recovers
-the normal-incidence mass law of a 3 mm immersed steel plate within
-0.3 dB of `mass_law_transmission_loss`.
-
-## 3. Free surfaces and Rayleigh waves
-
-A side declared ``"free"`` becomes a traction-free surface through
-**stress imaging** (Moczo et al. Eq. 9.9): the normal stress is pinned to
-zero on the surface plane and the shear stress above it is its
-antisymmetric image. That single boundary condition is what makes surfaces
-wave-bearing: strike the free surface of an aluminium block vertically
-(Lamb's problem) and, besides the P and S body fronts, a **Rayleigh wave**
-rolls along the surface at $c_R \approx 0.93\,c_S$, the root of the exact
-Rayleigh characteristic equation (Cremer, Heckl & Petersson Eq. 3.149).
-The tests pin the measured Rayleigh speed to that root within 2 % and the
-flexural wave of a thin free-free strip to the Kirchhoff plate dispersion
-$c_B \propto \sqrt{\omega}$ in its thin-plate domain. Free surfaces ride
-the Rayleigh sampling rule: allow 15-20 cells per wavelength there, the
-second-order imaging surface being the most dispersive part of the scheme.
-
-<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/elastic_halfspace_waves_dark.webp"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/elastic_halfspace_waves.webp" alt="Snapshot of the vertical particle velocity in a 0.6 by 0.3 metre aluminium block a few hundredths of a millisecond after a vertical hit on its free upper surface: the compressional P front is the outer arc, the shear S front the inner arc at about half its radius, and the strongest lobes hug the surface just behind the S front, labelled as the Rayleigh wave; dotted arcs mark the exact P and S radii" width="96%"></picture>
-
-*One snapshot, three speeds: the P front has covered twice the distance of
-the S front (dotted arcs at the exact $c_P t$ and $c_S t$ radii), and the
-strongest motion travels along the free surface as the Rayleigh wave, a
-whisker slower than S.*
-
-<details>
-<summary>Show the code for this figure</summary>
-
-```python
-import numpy as np
-import matplotlib.pyplot as plt
-from phonometry import simulation
-
-# A 0.6 x 0.3 m aluminium block, struck vertically at its free surface.
-dx, w = 0.001, 8e-6
-dt = 0.6 * dx / (6320.0 * np.sqrt(2.0))
-steps = round(7.3e-5 / dt)
-res = simulation.elastic_fdtd_simulation(
-    6320.0, 3130.0, dx, 7.3e-5, rho=2700.0, shape=(300, 600),
-    sources=[simulation.ForceSource(
-        ix=300, iy=0, direction="y", amplitude=1e6,
-        waveform=simulation.GaussianPulse(0, 0, width=w).value)],
-    boundaries={"top": "free"},
-    snapshot_every=steps, snapshot_field="vy",
-)
-res.plot(kind="snapshot")
-plt.show()
-```
-
-</details>
-
-That flexural wave is worth watching in motion: the
-[bending-wave transmission guide](https://jmrplens.github.io/phonometry/guides/junction-transmission/) embeds an
-animation of this solver launching a 4 kHz bending packet along a 10 mm
-steel plate into an L-junction, where the corner splits it into the
-reflected and transmitted waves the closed form prices at
-$\tau_{12}(0°) = 0.5$, plus the fast in-plane precursor the pinned-junction
-model deliberately leaves out.
-
-## 4. Fluid-solid coupling at normal incidence
-
-Because the fluid is just the ``c_s = 0`` limit of the elastic scheme, a
-water-steel contact is **one solver, two bands of the material maps**, and
-the whole physics of fluid-solid coupling comes out of the same update. The
-`Material` constants and `ElasticFDTD2D.from_regions` build those layered
-maps without manual array surgery: a background material and a list of
-painted regions.
-
-```python
-import numpy as np
-from phonometry.simulation import ElasticFDTD2D, STEEL, WATER
-
-# A 12 m water column over a steel half-space, as a 1D-like strip.
-dx = 0.005
-sim = ElasticFDTD2D.from_regions(
-    (2400, 3), dx, background=WATER, regions=[(np.s_[1200:, :], STEEL)])
-y = (np.arange(2400) + 0.5) * dx
-p0 = np.exp(-(((y - 3.0) / 0.15) ** 2))[:, None]     # plane pulse
-sim.txx[:] = -p0
-sim.tyy[:] = -p0
-y_face = np.arange(1, 2400) * dx + 0.5 * WATER.c_p * sim.dt
-sim.vy += (np.exp(-(((y_face - 3.0) / 0.15) ** 2))
-           / (WATER.rho * WATER.c_p))[:, None]       # one-way, leapfrog-consistent
-trace = []
-for _ in range(round(3.4e-3 / sim.dt)):
-    sim.step()
-    trace.append(sim.p[900, 1])
-trace = np.asarray(trace)
-t = (np.arange(trace.size) + 1) * sim.dt
-incident = trace[t < 1.8e-3].max()
-echo = trace[t > 2.6e-3]
-print(round(float(echo[np.abs(echo).argmax()] / incident), 3))   # 0.938
-# (Z2 - Z1)/(Z2 + Z1) = 0.938: at normal incidence no shear is excited
-# and the steel behaves as a liquid of its rho and c_P (B&G Eq. 4.2.27)
-```
-
-## 5. Oblique incidence: mode conversion
-
-Away from normal incidence the solid stops being a liquid. The incident
-sound refracts into **two** transmitted waves, P and SV (**mode
-conversion**), each with its own critical angle: for water over steel,
-14.5° (P) and 27.5° (S). Between them the transmitted P is evanescent and
-the shear wave carries the transmitted power, so the reflection dips to
-$|V| = 0.918$ at 20° instead of reflecting totally as a fluid bottom of the
-same $c_P$ would; beyond the S critical angle the reflection is total,
-$|V| = 1$ with a phase. The validation suite launches oblique carrier beams
-at 10° and 20° and matches the exact reflection coefficient of
-Brekhovskikh & Godin (Eqs. 4.2.22-4.2.26) within a fraction of a percent,
-mode conversion included. This is exactly the shear physics that the
-fluid-bottom `reflection_coefficient` of the
-[underwater module](https://jmrplens.github.io/phonometry/guides/underwater-propagation/) cannot represent, and the
-reason a shear-supporting seabed loses more energy than its
-equivalent-fluid model.
-
-## 6. The Scholte interface wave
-
-Total reflection beyond the S critical angle leaves both media carrying
-only evanescent fields, and those fields can lock together into a true
-interface wave: the **Scholte wave**, the fluid-solid analogue of the
-Rayleigh wave. It travels slower than both the fluid sound speed and the
-solid shear speed, has no low-frequency cut-off and does not disperse over
-homogeneous half-spaces; `scholte_speed` solves its exact characteristic
-equation (B&G Eq. 4.4.20).
-
-```python
-from phonometry.simulation import Material, STEEL, WATER, scholte_speed
-
-print(round(scholte_speed(WATER, STEEL), 1))       # 1479.6, 0.03 % below water
-seabed = Material(c_p=3500.0, c_s=2000.0, rho=2500.0)
-print(round(scholte_speed(Material(1500.0, 0.0, 1000.0), seabed), 1))  # 1436.0
-```
-
-Those two numbers tell the whole story. Over a **stiff** bed (steel) the
-Scholte wave hugs the water speed (1480 m/s) to within 0.03 % and its
-evanescent tail reaches ~7 wavelengths up into the water: it is essentially
-a grazing water wave and cannot be separated by time of flight in any
-reasonable domain
-(over air-solid contacts the deficit collapses to ~$10^{-12}$ of $c$ and the
-wave is unobservable outright). Over a **soft** sediment the speed drops
-well below the water speed and the wave squeezes to within half a
-wavelength of the contact, which is why measured seabed interface waves are
-a standard probe of sediment shear speed. The snapshot below runs that soft
-case: an explosive shot just above the bottom, and the strongest late
-feature is the interface-hugging Scholte train, timed by the test suite at
-1436 m/s within 2 % between two contact probes.
-
-<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/scholte_interface_wave_dark.webp"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/scholte_interface_wave.webp" alt="Snapshot of the vertical particle velocity in a 500 by 200 metre domain of water over a soft sediment half-space, 0.2 seconds after an explosive shot 10 metres above the contact: the direct water wavefront arcs up and to the right, oblique wavefronts radiate into the sediment, and the strongest lobes form a compact train hugging the dotted interface line, labelled as the Scholte wave, evanescent on both sides" width="96%"></picture>
-
-*The van Vossen benchmark media (water over a 3500/2000/2500 sediment):
-the Scholte train crawls along the contact at 1436 m/s, evanescent into
-both media, while the direct water wave runs ahead at 1500 m/s.*
-
-<details>
-<summary>Show the code for this figure</summary>
-
-```python
-import numpy as np
-import matplotlib.pyplot as plt
-from phonometry import simulation
-
-# Water over a soft seabed; explosive 50 Hz Ricker 10 m above the contact.
-ny, nx, dx = 200, 500, 1.0
-c_p = np.full((ny, nx), 1500.0)
-c_s = np.zeros((ny, nx))
-rho = np.full((ny, nx), 1000.0)
-c_p[100:], c_s[100:], rho[100:] = 3500.0, 2000.0, 2500.0
-f0, t0 = 50.0, 0.030
-dt = 0.6 * dx / (3500.0 * np.sqrt(2.0))
-steps = round(0.232 / dt)
-
-def ricker(t):
-    a = (np.pi * f0 * (t - t0)) ** 2
-    return (1.0 - 2.0 * a) * np.exp(-a)
-
-res = simulation.elastic_fdtd_simulation(
-    c_p, c_s, dx, 0.232, rho=rho,
-    sources=[simulation.ExplosionSource(ix=60, iy=89, waveform=ricker,
-                                        amplitude=1e3)],
-    boundaries="absorbing", absorbing_layer_cells=20,
-    snapshot_every=steps, snapshot_field="vy",
-)
-res.plot(kind="snapshot")
-plt.show()
-```
-
-</details>
-
-## 7. Immersed plates and the mass law
-
-An **immersed plate** closes the loop with the building-acoustics module.
-At normal incidence no shear is excited, so an elastic plate in water is
-exactly the three-media fluid layer of B&G §2.4: its transmission follows
-the closed form of Eq. 2.4.14, which reduces to the familiar mass law for
-thin plates and low frequencies and predicts **total transmission** at the
-half-wave thickness resonances $f_n = n c_P / (2 h)$ (Eq. 2.4.19). For a
-10 mm steel plate that first resonance sits at 295 kHz, and one broadband
-FDTD run reproduces the whole curve: 5.8 dB at 10 kHz (where
-`mass_law_transmission_loss` with water as the ambient fluid agrees with
-the exact form to 0.02 dB), 18.1 dB at 50 kHz, and a transmission-loss
-dip within 0.1 % of the 295 kHz resonance. The same suite stress-tests the
-extreme contrast of an air-steel contact (impedance ratio ~$10^5$:1): stable
-over 10 000 steps with the reflected amplitude conserved to 0.5 %.
-
-At oblique incidence the plate physics gets richer, and the
-[panel sound insulation guide](https://jmrplens.github.io/phonometry/guides/panel-sound-insulation/) embeds the
-animation: this solver driving the same 10 mm steel plate, lying in air,
-with a sustained 45° plane wave below and above its coincidence frequency,
-where the trace-matched bending wave re-radiates a growing beam and holds
-the transmitted level at the point where the mass law demands 12 dB more
-blocking.
-
-## Quick answers
-
-### When do I need the elastic solver instead of the acoustic one?
-
-Whenever any part of the domain supports shear: mode conversion at oblique
-incidence, Rayleigh waves on free surfaces, Scholte waves at fluid-solid
-contacts and plate transmission all need the elastic equations. If every
-cell is fluid, use the acoustic solver: with a uniform ``c_s = 0`` map the
-elastic solver reproduces it bit for bit, at roughly twice the memory and
-stepping cost.
-
-### What grid resolution does an elastic simulation need?
-
-Resolve at least 10 cells per shortest wavelength using the slowest wave
-speed in the domain -- the slowest non-zero shear speed or a slower fluid
-sound speed if one is present -- $\Delta x \le c_\text{min} / (10 f)$.
-Allow 15-20 cells per wavelength along free
-surfaces (the stress-imaging boundary is the most dispersive part of the
-scheme), and at least 15 points per wavelength when an interface wave has
-to be timed (van Vossen et al. 2002).
-
-### What is a Scholte wave and how fast does it travel?
-
-The Scholte wave is the true interface wave of a fluid-solid contact:
-evanescent into both media, elliptical particle motion, no low-frequency
-cut-off and non-dispersive over homogeneous half-spaces. Its speed solves
-the exact characteristic equation (Brekhovskikh & Godin Eq. 4.4.20,
-`scholte_speed`) and always lies below both the fluid sound speed and the
-solid shear speed: 0.03 % below the water speed (1480 m/s) over steel
-(1479.6 m/s),
-but 4 % below the 1500 m/s ocean water of the sediment example (1436 m/s
-for that water over a 3500/2000/2500 bed), which is why seabed interface
-waves probe the sediment shear stiffness.
-
-## See also
-
-- [2D FDTD wave simulation](https://jmrplens.github.io/phonometry/guides/fdtd-simulation/): the acoustic solver this
-  guide extends, with the staggered grid, the Courant bound, the sources,
-  probes and boundary machinery shared by both.
-- [Predicting Panel Sound Insulation](https://jmrplens.github.io/phonometry/guides/panel-sound-insulation/): the mass
-  law and coincidence closed forms; the immersed-plate run of section 7 is
-  their full-wave cross-check.
-- [Bending-wave transmission at plate junctions](https://jmrplens.github.io/phonometry/guides/junction-transmission/):
-  the flexural-wave closed forms of the building model; the Kirchhoff
-  dispersion validated in section 3 is the wave they transport.
-- [Underwater sound propagation](https://jmrplens.github.io/phonometry/guides/underwater-propagation/): the
-  fluid-bottom Rayleigh reflection model whose missing shear physics
-  section 5 quantifies.
-- API reference: [`simulation.elastic-fdtd`](https://jmrplens.github.io/phonometry/reference/api/simulation/elastic-fdtd/).
-
-## References
-
-- Virieux, J. (1986). P-SV wave propagation in heterogeneous media:
-  velocity-stress finite-difference method. *Geophysics*, 51(4), 889-901.
-  [doi:10.1190/1.1442147](https://doi.org/10.1190/1.1442147). The elastic
-  solver of section 1: the velocity-stress system (Eq. 2), the fully
-  staggered cell and update (Fig. 1, Eq. 5), the P-only Courant bound
-  (Eqs. 6-7), the dispersion relations (Eqs. 13-14) and the liquid as the
-  shear-free limit.
-- Moczo, P., Kristek, J., Galis, M., Pazak, P., & Balazovjech, M. (2007).
-  The finite-difference and finite-element modeling of seismic wave
-  propagation and earthquake motion. *Acta Physica Slovaca*, 57(2),
-  177-406. The heterogeneous effective parameters of section 2 (harmonic
-  shear modulus, arithmetic density; Eqs. 7.37-7.39) and the stress-imaging
-  free surface of section 3 (Eq. 9.9).
-- Cremer, L., Heckl, M., & Petersson, B. A. T. (2005). *Structure-borne
-  sound* (3rd ed.). Springer.
-  [doi:10.1007/b137728](https://doi.org/10.1007/b137728). The analytic
-  oracles of the elastic solver: the exact Rayleigh characteristic
-  equation (Eq. 3.149) and the Kirchhoff flexural dispersion with its
-  thickness correction (Eqs. 3.83-3.89, 3.196b).
-- Brekhovskikh, L. M., & Godin, O. A. (1990). *Acoustics of layered media
-  I: Plane and quasi-plane waves*. Springer.
-  [doi:10.1007/978-3-642-52369-4](https://doi.org/10.1007/978-3-642-52369-4).
-  The fluid-solid oracles of sections 4-7: the oblique reflection
-  coefficient with mode conversion (Eqs. 4.2.22-4.2.26) and its
-  critical-angle limits (Eqs. 4.2.27-4.2.31), the exact Scholte
-  characteristic equation (Eqs. 4.4.18-4.4.20) with the light-fluid
-  asymptotics (Eqs. 4.4.21-4.4.24), and the three-media layer transmission
-  (Eqs. 2.4.10-2.4.19).
-- van Vossen, R., Robertsson, J. O. A., & Chapman, C. H. (2002).
-  Finite-difference modeling of wave propagation in a fluid-solid
-  configuration. *Geophysics*, 67(2), 618-624.
-  [doi:10.1190/1.1468623](https://doi.org/10.1190/1.1468623). The
-  fluid-solid benchmark of the same staggered scheme: the harmonic shear
-  modulus and arithmetic density averages (Eqs. 9-10) that satisfy the
-  interface conditions implicitly, the soft-bed configuration of the
-  Scholte test of section 6 and the >= 15 points-per-wavelength rule for
-  the O(2,2) scheme with an interface wave.
-
-## Standards and sources
-
-No measurement standard governs the elastic solver: it implements the
-textbook velocity-stress method of Virieux (1986) with the
-heterogeneous-medium and free-surface treatments of Moczo et al. (2007).
-Validation is anchored to closed forms: the P and S body-wave speeds, the
-exact Rayleigh root and the Kirchhoff flexural dispersion (Cremer, Heckl &
-Petersson), the bit-exact acoustic limit, the fluid-solid reflection at
-normal and oblique incidence with mode conversion, the exact Scholte-wave
-speed and the immersed-plate transmission with its thickness resonance
-(Brekhovskikh & Godin), the immersed-panel mass law, and the van Vossen
-(2002) soft-bed interface-wave benchmark.
+[Elastic waves and fluid-solid coupling](https://jmrplens.github.io/phonometry/simulation/elastic-waves/).
 
 ---

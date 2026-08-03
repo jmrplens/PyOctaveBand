@@ -279,11 +279,11 @@ El filtro digital se obtiene de los polos/ceros analógicos mediante la
 transformación bilineal. Como esta comprime las frecuencias cerca de Nyquist, el
 modo `high_accuracy` por defecto diseña y ejecuta el filtro a una frecuencia
 interna sobremuestreada (≥ 144 kHz); consulta
-[Ponderación frecuencial](/phonometry/es/guides/weighting/).
+[Ponderación frecuencial](/phonometry/es/signal/levels/weighting/).
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/weighting_responses_es.svg" alt="Curvas de ponderación A, C y Z de IEC 61672-1 con zoom de la región positiva de la curva A (+1,27 dB en 2,5 kHz)" width="80%" />
 
-*Las tres curvas de ponderación de IEC 61672-1 que aplica la biblioteca, con la pequeña región positiva de la curva A ampliada. Las curvas especiales B, D y AU están en [Ponderaciones especiales](/phonometry/es/guides/special-weightings/).*
+*Las tres curvas de ponderación de IEC 61672-1 que aplica la biblioteca, con la pequeña región positiva de la curva A ampliada. Las curvas especiales B, D y AU están en [Ponderaciones especiales](/phonometry/es/signal/levels/special-weightings/).*
 
 ## Integración temporal
 
@@ -302,7 +302,7 @@ donde $\tau$ es la constante de tiempo (p. ej. 125 ms para Fast).
 La condición inicial por defecto es $y[-1] = 0$. Usa `initial_state='first'`
 para partir de la energía de la primera muestra, o pasa un escalar/array con el
 estado cuadrático medio anterior. Consulta
-[Por qué phonometry](/phonometry/es/reference/why-phonometry/) para la
+[Por qué phonometry](/phonometry/es/start/why-phonometry/) para la
 verificación de esta implementación con ráfagas de tono de IEC 61672-1.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/time_weighting_analysis_es.svg" alt="Respuestas de las ponderaciones temporales Fast, Slow e Impulse a una ráfaga de ruido" width="80%" />
@@ -328,7 +328,7 @@ Los cuatro ceros frente a ocho polos dan forma a la respuesta característica: u
 
 Como G actúa sobre 0,25 Hz – 315 Hz, muy por debajo de la frecuencia de Nyquist a tasas de audio, la deformación en frecuencia de la transformación bilineal simple (aplicada sin precompensación) es despreciable en ese rango: en torno al 0,014 % a 315 Hz con $f_s = 48$ kHz, menos de 0,01 dB en la respuesta. Por eso no se aplica el sobremuestreo interno usado en los diseños A/C (cuya acción se extiende hasta 16 kHz).
 
-Consulta la [guía de ponderaciones especiales](/phonometry/es/guides/special-weightings/) para su uso.
+Consulta la [guía de ponderaciones especiales](/phonometry/es/signal/levels/special-weightings/) para su uso.
 
 ## Métricas de evento y de dosis
 
@@ -354,7 +354,7 @@ Es idéntico al $L_{EP,d}$ de la Directiva 86/188/CEE y al $L_{EX,8h}$ de ISO 19
 
 **$L_{Cpeak}$** (IEC 61672-1:2013, subcláusula 5.13) es el máximo absoluto de la presión acústica ponderada C expresado en dB, $L_{Cpeak} = 20\log_{10}(\max|p_C(t)|/p_0)$, la magnitud detrás de los límites de acción laborales de 135/137/140 dB(C). La implementación se verifica contra las respuestas de referencia de un ciclo y de medio ciclo de la Tabla 5.
 
-Consulta la [guía de niveles](/phonometry/es/guides/levels/) para su uso y la [guía de calibración](/phonometry/es/guides/calibration/) para configurar la escala absoluta.
+Consulta la [guía de niveles](/phonometry/es/signal/levels/levels/) para su uso y la [guía de calibración](/phonometry/es/signal/metrology/calibration/) para configurar la escala absoluta.
 
 ## Intensidad acústica (IEC 61043)
 
@@ -386,7 +386,7 @@ La cláusula 7.3 de IEC 61043 especifica la respuesta en intensidad de la sonda 
 
 El **índice presión-intensidad** $\delta_{pI} = L_p - L_I$ mide cuán reactivo es el campo: en una onda plana progresiva libre vale $10 \log_{10}(\rho_0 c / 400) = 0{,}14$ dB, mientras que valores grandes delatan campos reactivos o ruidosos en los que domina el error de fase entre canales. El Anexo A de ISO 9614-1:1993 lo generaliza sobre una superficie de medición como el indicador F2 (con F3 para la potencia parcial negativa y F4 para la no uniformidad del campo), y la **capacidad dinámica** del instrumento $L_d = \delta_{pI0} - K$ (índice presión-intensidad residual menos el factor de error de sesgo: 10 dB para los grados 1/2, 7 dB para el grado 3) debe superar F2 para que la medición sea válida (criterio 1).
 
-Consulta la [guía de intensidad acústica](/phonometry/es/guides/intensity/) para su uso.
+Consulta la [guía de intensidad acústica](/phonometry/es/devices/emission/intensity/) para su uso.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/intensity_demo_es.svg" alt="Niveles de presión e intensidad en tercios de octava para una onda plana progresiva frente a una onda estacionaria" width="92%" />
 
@@ -430,4 +430,4 @@ no gaussiana, así que el intervalo es más estrecho que $\pm 1{,}96\,u$), y el
 ejemplo del bloque patrón del Anexo H.1 de la GUM da
 $k = t_{0{,}99}(\nu_{\mathrm{eff}} = 16) = 2{,}92$ y $U_{99} = 93$ nm.
 
-Consulta la [guía de incertidumbre de medida](/phonometry/es/guides/gum-uncertainty/) para su uso.
+Consulta la [guía de incertidumbre de medida](/phonometry/es/signal/metrology/gum-uncertainty/) para su uso.

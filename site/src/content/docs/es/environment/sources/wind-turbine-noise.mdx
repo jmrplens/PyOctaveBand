@@ -1,0 +1,180 @@
+---
+title: "Ruido de aerogeneradores: potencia y audibilidad tonal"
+description: "La emisión acústica de aerogeneradores de la IEC 61400-11: el nivel de potencia acústica aparente referido al centro del rotor y la cadena de audibilidad tonal (banda crítica de Zwicker, nivel de ruido de enmascaramiento y criterio de audibilidad) que decide si un tono discreto es audible."
+references:
+  - type: standard
+    organization: "International Electrotechnical Commission"
+    year: 2018
+    title: "Wind turbines — Part 11: Acoustic noise measurement techniques"
+    designation: "IEC 61400-11:2012+AMD1:2018 CSV"
+    url: "https://webstore.iec.ch/en/publication/63367"
+    note: "La edición implementada: la geometría de medida, la clasificación por velocidades de viento y la cadena de audibilidad tonal (potencia acústica aparente Fórmula 26, banda crítica Fórmula 30, nivel de enmascaramiento Fórmula 31, tonalidad/audibilidad Fórmulas 32-34). El flujo completo de medición queda fuera del alcance aquí."
+  - type: standard
+    organization: "International Electrotechnical Commission"
+    year: 2005
+    title: "Wind turbines — Part 14: Declaration of apparent sound power level and tonality values"
+    designation: "IEC TS 61400-14:2005"
+    url: "https://webstore.iec.ch/en/publication/5432"
+    note: "Cómo un fabricante convierte las medidas IEC 61400-11 de un lote de aerogeneradores en valores declarados con su incertidumbre, el número que recibe realmente una autoridad de planificación."
+  - type: standard
+    organization: "International Organization for Standardization"
+    year: 2017
+    title: "Acoustics — Description, measurement and assessment of environmental noise — Part 2: Determination of sound pressure levels"
+    designation: "ISO 1996-2:2017"
+    url: "https://www.iso.org/standard/59766.html"
+    note: "El criterio de audibilidad tonal que reutiliza el método IEC procede del anexo C de su edición de 2007 (la edición de 2017 lleva los métodos tonales en los anexos J y K), y su tonal_adjustment consume la audibilidad media."
+---
+
+import ThemeImage from '../../../../../components/ThemeImage.astro';
+
+La IEC 61400-11 mide la emisión acústica de un aerogenerador. Esta página cubre
+sus dos magnitudes en forma cerrada: el **nivel de potencia acústica aparente**
+referido a una fuente puntual equivalente en el centro del rotor, y la
+**audibilidad tonal** que decide si un tono discreto (paso de pala, multiplicadora,
+generador) es audible por encima del ruido de enmascaramiento.
+
+## Nivel de potencia acústica aparente
+
+Con el micrófono de referencia sobre una placa en el suelo a la distancia
+horizontal $R_0 = H + D/2$ (altura de buje $H$, diámetro de rotor $D$), la
+distancia oblicua al centro del rotor es $R_1 = \sqrt{H^2 + R_0^2}$ y el nivel
+de potencia acústica aparente es
+$L_{WA,i} = L_{p,i} - 6 + 10\log_{10}(4\pi R_1^2/S_0)$ por banda
+($S_0 = 1\ \text{m}^2$), sumado energéticamente sobre las bandas. Los −6 dB
+dan cuenta de la duplicación de presión en la placa del suelo.
+
+<ThemeImage loading="eager" src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_wind_turbine_iec61400_es.svg" alt="Alzado de un aerogenerador de eje horizontal con altura de buje H y diámetro de rotor D, un micrófono tumbado sobre una placa plana en el suelo a sotavento a la distancia horizontal R0 = H + D/2 del eje de la torre, la distancia oblicua R1 del centro del rotor al micrófono con el ángulo de inclinación de la placa phi entre 25 y 40 grados, y un mástil meteorológico que mide velocidad y dirección del viento; un recuadro en planta muestra el patrón de la Figura 3 con la posición de referencia a sotavento y tres posiciones opcionales a más y menos 60 grados y a barlovento, y las anotaciones dan R1 igual a la raíz cuadrada de H al cuadrado más R0 al cuadrado y la fórmula de potencia acústica aparente LWA,i = Lp,i menos 6 más 10 lg(4 pi R1 al cuadrado entre S0)" width="94%" />
+
+```python
+from phonometry import environment
+
+# Niveles de banda de tercio de octava ponderados A y corregidos de fondo L_p,i (dB).
+band_levels = [55.0, 58.0, 60.0, 57.0, 54.0]
+r1 = environment.slant_distance(hub_height=80.0, rotor_diameter=100.0)
+lwa = environment.apparent_sound_power_level(band_levels, r1)   # dB re 1 pW
+```
+
+### Por qué "aparente"
+
+$L_{WA}$ se escribe como un nivel de potencia acústica, pero no lo es en el
+sentido de la ISO 3744 de muestrear el campo de presión sobre una
+superficie envolvente. La norma reduce toda la máquina a una fuente puntual
+equivalente en el centro del rotor y pregunta qué potencia necesitaría esa
+fuente, radiando esféricamente, para reproducir el nivel medido en una única
+posición sobre placa a sotavento: por definición es la potencia "que produce
+la misma emisión sonora en la dirección de sotavento que el aerogenerador".
+Todo lo que un rotor de 150 m hace y una fuente puntual no, la directividad
+vertical y lateral y el silbido al paso de pala, queda englobado en el valor
+y evaluado en una sola dirección; las posiciones opcionales 2 a 4
+del patrón en planta existen precisamente para documentar cómo varía la
+emisión alrededor de la máquina. Las potencias aparentes de aerogeneradores
+distintos son comparables porque la geometría escala con la máquina
+($R_0 = H + D/2$, de modo que todo rotor se ve bajo un ángulo parecido), que
+es el objetivo de la definición, pero un $L_{WA}$ introducido en una
+predicción ISO 9613-2 arrastra consigo su sesgo de sotavento. La placa en el
+suelo, a su vez, es la razón de los 6 dB restados: una cápsula tumbada sobre
+una placa dura recibe una reflexión perfectamente coherente (duplicación de
+presión, $+6$ dB) en lugar del patrón de interferencia dependiente de la
+altura que muestrearía un micrófono en trípode (véase
+[la fuente imagen que explica el efecto del suelo](/phonometry/es/environment/propagation/outdoor-propagation/)).
+
+### Clases de viento y condiciones estandarizadas
+
+La emisión de ruido de un aerogenerador crece con la velocidad del viento
+hacia la potencia nominal, así que un número único no significaría nada sin
+su punto de operación: la IEC 61400-11 reporta $L_{WA}$ *en función de la
+velocidad del viento*. Sonido y viento se registran en promedios
+sincronizados de 10 s, y cada periodo se clasifica en una **clase de
+velocidad de viento de 0,5 m/s de ancho centrada en velocidades enteras y
+semienteras a altura de buje**, con al menos 10 periodos de ruido total y 10
+de fondo (turbina parada) por clase. La propia velocidad a altura de buje
+preferiblemente no es una lectura de anemómetro: se deriva de la potencia
+eléctrica medida a través de la curva de potencia de la turbina (apartado
+8.2.1), el sustituto más repetible del viento que el rotor ve de verdad, con
+el anemómetro de góndola y el mástil meteorológico como alternativas. El
+rango medido debe cubrir al menos de 0,8 a 1,3 veces la velocidad de viento
+al 85 % de la potencia máxima (aproximadamente de 6 a 10 m/s a 10 m de
+altura para una máquina grande). Dentro de cada clase los espectros se
+promedian, se interpolan al centro de la clase y se corrigen por fondo; un
+margen total-menos-fondo de 3 dB o menos anula la clase, y entre 3 y 6 dB
+la marca con un asterisco. Por comparabilidad con condiciones de licencia y
+ediciones anteriores, la Fórmula (29) también convierte cada resultado a la
+velocidad de viento a 10 m de altura sobre una **longitud de rugosidad de
+referencia** $z_{0ref} = 0{,}05$ m (un perfil de viento logarítmico), dando
+$L_{WA,10m}$ a velocidades enteras a 10 m sea cual sea el terreno real del
+emplazamiento. La biblioteca implementa las magnitudes en forma cerrada de
+esta cadena (distancia oblicua, potencia aparente por banda, audibilidad
+tonal); la clasificación en clases, el promediado y la maquinaria de
+incertidumbre operan sobre campañas de medida completas y quedan fuera de
+alcance.
+
+## Audibilidad tonal
+
+A partir de un espectro de banda estrecha (resolución 1–2 Hz), las líneas en la
+**banda crítica** alrededor del tono,
+$\mathrm{CBW} = 25 + 75\,[\,1 + 1{,}4\,(f_c/1000)^2\,]^{0{,}69}$
+Hz, se clasifican en ruido de enmascaramiento y líneas de tono (la media
+energética del 70 % más bajo, los criterios de +6 dB; las líneas de tono
+deben además quedar a menos de 10 dB de la línea *más alta* por encima del
+umbral, y esa línea más alta es la frecuencia del tono, apartados
+9.5.3/9.5.4). El propio candidato debe superar antes el cribado de *tono
+posible* de 9.5.2: un máximo local más de 6 dB por encima de la media
+energética de la banda excluyendo el máximo y sus líneas adyacentes. El nivel
+de enmascaramiento $L_{pn}$ sigue la Fórmula 31, la tonalidad es
+$\Delta L_{tn} = L_{pt} - L_{pn}$ y la audibilidad tonal es
+$\Delta L_a = \Delta L_{tn} - L_a$ con
+$L_a = -2 - \log_{10}\!\big[1 + (f/502)^{2{,}5}\big]$, reportada cuando
+$\Delta L_a \ge -3\ \text{dB}$ y audible cuando $\Delta L_a > 0$.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/wind_turbine_tonality_es.svg" alt="Espectro de banda estrecha de un aerogenerador con un tono discreto cerca de 200 Hz sobre un fondo de banda ancha, la banda crítica sombreada, el nivel de ruido de enmascaramiento como línea horizontal y la audibilidad tonal anotada" width="82%" />
+
+<details>
+<summary>Mostrar el código de esta figura</summary>
+
+```python
+import numpy as np
+from phonometry import environment
+
+df = 2.0
+freqs = np.arange(50.0, 400.0 + df, df)
+levels = 42.0 - 6.0 * np.log10(freqs / 100.0)
+levels[int(np.argmin(np.abs(freqs - 200.0)))] += 22.0   # tono estilo paso de pala
+environment.wind_turbine_tonality(levels, freqs, tone_frequency=200.0).plot(language="es")
+```
+
+</details>
+
+```python
+import numpy as np
+from phonometry import environment
+
+# Un espectro de banda estrecha uniformemente espaciado (resolución de 2 Hz):
+# un suelo plano de 30 dB con un tono discreto de 60 dB en 500 Hz.
+frequencies = np.arange(440.0, 562.0, 2.0)
+levels = np.full(frequencies.size, 30.0)
+levels[np.argmin(np.abs(frequencies - 500.0))] = 60.0
+
+res = environment.wind_turbine_tonality(levels, frequencies)
+print(res.tone_frequency, res.tonality, res.tonal_audibility, res.is_audible)
+res.plot()   # espectro + banda crítica + nivel de enmascaramiento (requiere matplotlib)
+```
+
+`wind_turbine_tonality` devuelve un `WindTurbineTonalityResult` con
+`critical_bandwidth`, `tone_level`, `masking_level`, `tonality`,
+`audibility_criterion`, `tonal_audibility`, `is_audible` y
+`has_identified_tone`. Cuando el candidato no supera el cribado de 9.5.2 o
+ninguna línea se clasifica como «tono», `has_identified_tone` es `False`: los
+campos numéricos son valores de respaldo fuera de la norma y esos espectros
+deben **excluirse** del promediado energético de $\Delta L_a$ sobre los
+espectros de un intervalo de velocidad de viento (9.5.1); `is_audible` también
+exige un tono identificado. La frecuencia del tono y el criterio $L_a$ se
+anclan a la
+línea de tono clasificada más alta, no al candidato sondeado. La fórmula de
+audibilidad coincide con la del Anexo C de la ISO 1996-2; lo específico de la
+IEC 61400-11 es la determinación de los niveles de tono y enmascaramiento y la
+banda crítica de Zwicker a partir del espectro. Para un ajuste de valoración
+$K_T$, pasa la audibilidad media al `tonal_adjustment` de la ISO 1996-2.
+
+## Véase también
+
+- Referencia de la API: [`environment.sources.wind_turbine`](/phonometry/es/reference/api/environment/wind-turbine/).

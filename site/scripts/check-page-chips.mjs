@@ -37,13 +37,13 @@ const { expect, failures } = createExpect({ quiet: true });
 // Pages picked for their bibliographies: past the cap, exactly at it, and
 // comfortably under it, in both locales.
 const CAP_PAGES = [
-	'/guides/underwater-propagation/',
-	'/guides/porous-absorbers/',
-	'/guides/reverberation-prediction/',
-	'/guides/insulation-lab/',
-	'/guides/room-acoustics/',
-	'/es/guides/underwater-propagation/',
-	'/es/guides/insulation-lab/',
+	'/underwater/underwater-propagation/',
+	'/materials/absorbers/porous-absorbers/',
+	'/buildings/rooms/reverberation-prediction/',
+	'/buildings/insulation/insulation-lab/',
+	'/buildings/rooms/room-acoustics/',
+	'/es/underwater/underwater-propagation/',
+	'/es/buildings/insulation/insulation-lab/',
 ];
 
 {
@@ -155,22 +155,22 @@ async function landing({ path, viewport, theme, banner }) {
 }
 
 const LANDINGS = [
-	{ path: '/guides/underwater-propagation/', viewport: { width: 1440, height: 900 }, theme: 'light' },
-	{ path: '/guides/underwater-propagation/', viewport: { width: 1440, height: 1400 }, theme: 'dark' },
-	{ path: '/guides/underwater-propagation/', viewport: { width: 390, height: 844 }, theme: 'dark' },
-	{ path: '/guides/underwater-propagation/', viewport: { width: 390, height: 640 }, theme: 'light' },
-	{ path: '/es/guides/underwater-propagation/', viewport: { width: 390, height: 844 }, theme: 'dark' },
-	{ path: '/es/guides/underwater-propagation/', viewport: { width: 1440, height: 900 }, theme: 'light' },
+	{ path: '/underwater/underwater-propagation/', viewport: { width: 1440, height: 900 }, theme: 'light' },
+	{ path: '/underwater/underwater-propagation/', viewport: { width: 1440, height: 1400 }, theme: 'dark' },
+	{ path: '/underwater/underwater-propagation/', viewport: { width: 390, height: 844 }, theme: 'dark' },
+	{ path: '/underwater/underwater-propagation/', viewport: { width: 390, height: 640 }, theme: 'light' },
+	{ path: '/es/underwater/underwater-propagation/', viewport: { width: 390, height: 844 }, theme: 'dark' },
+	{ path: '/es/underwater/underwater-propagation/', viewport: { width: 1440, height: 900 }, theme: 'light' },
 	// The language bar is on screen, which is the case that changes how much
 	// of the viewport the reader actually has.
 	{
-		path: '/guides/underwater-propagation/',
+		path: '/underwater/underwater-propagation/',
 		viewport: { width: 390, height: 844 },
 		theme: 'dark',
 		banner: true,
 	},
 	{
-		path: '/es/guides/underwater-propagation/',
+		path: '/es/underwater/underwater-propagation/',
 		viewport: { width: 1440, height: 900 },
 		theme: 'light',
 		banner: true,

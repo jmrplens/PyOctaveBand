@@ -1,0 +1,365 @@
+---
+title: "Medición de la respuesta al impulso"
+description: "La adquisición de la respuesta al impulso de la sala con las excitaciones deterministas de ISO 18233: el barrido sinusoidal exponencial y su deconvolución, el método de correlación con MLS, y las reglas de colocación de fuentes y micrófonos que mantienen honesto el resultado promediado."
+references:
+  - type: standard
+    organization: "International Organization for Standardization"
+    year: 2006
+    title: "Acoustics — Application of new measurement methods in building and room acoustics"
+    designation: "ISO 18233:2006"
+    url: "https://www.iso.org/standard/40408.html"
+    note: "La adquisición por barrido sinusoidal y MLS que esta página implementa."
+  - type: standard
+    organization: "International Organization for Standardization"
+    year: 2009
+    title: "Acoustics — Measurement of room acoustic parameters — Part 1: Performance spaces"
+    designation: "ISO 3382-1:2009"
+    url: "https://www.iso.org/standard/40979.html"
+    note: "Los requisitos de posiciones de fuente y micrófono citados en las reglas de dónde medir."
+  - type: standard
+    organization: "International Organization for Standardization"
+    year: 2008
+    title: "Acoustics — Measurement of room acoustic parameters — Part 2: Reverberation time in ordinary rooms"
+    designation: "ISO 3382-2:2008"
+    url: "https://www.iso.org/standard/36201.html"
+    note: "Los grados de exactitud, los recuentos de posiciones y la distancia mínima a la fuente tras la discusión sobre promediado de posiciones."
+---
+
+import Video from '../../../../../components/Video.astro';
+import ThemeImage from '../../../../../components/ThemeImage.astro';
+
+Toda magnitud de acústica de salas de este sitio parte de la misma medición:
+la **respuesta al impulso** (RI) entre una fuente y un receptor. Hazla bien
+y todo lo que viene después (tiempo de reverberación, claridad, aislamiento,
+métricas del habla) es cuestión de aritmética; hazla mal y ningún
+procesamiento posterior recupera lo que la excitación o la posición del
+micrófono tiraron. Esta guía cubre la propia adquisición, según ISO 18233:
+el barrido sinusoidal exponencial y su deconvolución, el método de
+correlación con MLS, y dónde colocar fuentes y micrófonos para que el
+resultado promediado signifique algo. Convertir la RI medida en parámetros
+de sala vive en [Acústica de salas](/phonometry/es/buildings/rooms/room-acoustics/);
+la misma RI medida a ambos lados de un cerramiento se convierte en
+aislamiento acústico en
+[Medición del aislamiento en campo (ISO 16283)](/phonometry/es/buildings/insulation/insulation-field/).
+
+## Dos excitaciones deterministas (ISO 18233)
+
+Una sala se comporta, con buena aproximación, como un sistema **lineal e
+invariante en el tiempo**, así que todo sobre ella está contenido en su RI.
+Podrías disparar una pistola y grabar la cola, pero una excitación
+determinista reproducida por un altavoz y *deconvolucionada* recupera la
+misma RI con 20–30 dB más de relación señal-ruido efectiva (ISO 18233). Se
+proporcionan dos excitaciones.
+
+**Barrido sinusoidal exponencial (ESS, Anexo B).** La frecuencia
+instantánea crece exponencialmente,
+
+$$
+f(t) = f_1 \left( \frac{f_2}{f_1} \right)^{t/T},
+$$
+
+de modo que el tiempo invertido por octava es constante y la excitación
+imita al ruido rosa (energía constante por banda de octava fraccionaria).
+La RI se recupera mediante división espectral lineal (con relleno de ceros,
+no circular),
+
+$$
+H = \frac{Y\ \overline{X}}{|X|^2 + \varepsilon},
+$$
+
+con un pequeño término de Tikhonov $\varepsilon$ que protege los extremos de
+banda donde el barrido tiene poca energía. Como un barrido de grave a agudo
+sitúa la distorsión armónica en tiempos de llegada *negativos*, la distorsión
+se separa limpiamente de la RI lineal y se descarta conservando solo la parte
+causal. El método `"farina"` llega al mismo resultado convolucionando la
+grabación con el filtro inverso analítico; supone que el barrido de
+referencia se generó con la amplitud y el fundido por defecto, así
+que usa el método espectral con un barrido de amplitud distinta de la unidad
+o con fundido personalizado.
+
+**Secuencia de longitud máxima (MLS, Anexo A).** Una secuencia binaria de
+orden $N$ y longitud $2^N-1$ cuya autocorrelación circular es una delta casi
+perfecta; la RI se obtiene de la correlación cruzada circular del periodo
+grabado con la secuencia. La MLS excita con amplitud constante y es rápida de
+promediar, pero es más sensible a la varianza temporal (corrientes de aire,
+deriva de temperatura) y no admite tanta potencia como un barrido.
+**Prefiere el barrido** para salas y cerramientos; recurre a la MLS cuando la
+excitación deba ser periódica o el hardware favorezca una señal de dos
+niveles.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_ir_measurement_es.svg" alt="Cadena de medición indirecta ISO 18233: una excitación (barrido ESS o MLS) alimenta un altavoz en la sala, un micrófono capta la respuesta y la deconvolución (correlación o filtro inverso) recupera la respuesta al impulso" width="92%" loading="eager" />
+
+```python
+import numpy as np
+from scipy.signal import fftconvolve
+from phonometry import room
+
+fs = 48000
+# Un barrido de 3 s, 20 Hz - 20 kHz es una buena excitación de sala de banda ancha
+# sweep: excitación que reproduces por el altavoz
+sweep = room.sweep_signal(fs, 20.0, 20000.0, 3.0)
+
+# Deconvoluciona la respuesta grabada para recuperar la respuesta al impulso
+system = np.zeros(fs); system[100] = 1.0; system[2000] = 0.4   # directo + reflexión
+# recorded: captura de micrófono del barrido reproducido (aquí simulada por convolución con una sala sintética)
+recorded = fftconvolve(sweep, system)
+ir = room.impulse_response(recorded, sweep, fs, method="spectral")
+print(int(np.argmax(np.abs(ir))))                    # 100: sonido directo recuperado
+ir.plot()                # forma de onda + envolvente de Schroeder (figura de abajo)
+
+# Variante de filtro inverso de Farina (necesita la banda del barrido)
+ir_f = room.impulse_response(recorded, sweep, fs, method="farina", f_range=(20.0, 20000.0))
+
+# MLS periódica: excita con >= 2 periodos, promedia, correlaciona
+mls = room.mls_signal(16)                                 # longitud 2**16 - 1 = 65535
+rec = fftconvolve(np.tile(mls, 2), system)[: 2 * mls.size]
+ir_m = room.mls_impulse_response(rec, mls)
+print(int(np.argmax(np.abs(ir_m))))                  # 100
+```
+
+`sweep_signal`/`mls_signal` devuelven arrays simples, listos para escribir en
+un WAV y reproducir. `impulse_response`/`mls_impulse_response` devuelven ahora
+un `ImpulseResponseResult`, un sustituto directo del array de la RI
+(`np.asarray(ir)`, la indexación y `ir.size` siguen funcionando, de modo que
+`room_parameters(ir, fs)` no cambia) que además guarda la frecuencia de
+muestreo y el método y añade un `.plot()`.
+Dos excitaciones más de la literatura de medición de funciones de
+transferencia - los pares complementarios de Golay con deconvolución
+exactamente libre de ruido, y los barridos conformados a un espectro
+objetivo arbitrario - viven en la
+[guía de medición de sistemas](/phonometry/es/signal/spectra/system-measurement/) y
+devuelven los mismos tipos de resultado.
+
+**Las dos excitaciones.** El barrido exponencial desplaza su energía hacia
+frecuencias altas a lo largo de toda la señal, mientras que la MLS es una
+secuencia de dos niveles con espectro plano, visible como la magnitud
+casi constante de la derecha.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/excitation_signals_es.webp" alt="Señales de excitación ISO 18233: la forma de onda del barrido sinusoidal exponencial y su espectrograma con el ascenso exponencial de frecuencia, y una secuencia de longitud máxima con su espectro de magnitud plano" width="96%" />
+
+<details>
+<summary>Ver el código de esta figura</summary>
+
+```python
+from phonometry import room
+from phonometry import plot_excitation
+
+fs = 48000
+sweep = room.sweep_signal(fs, 50.0, 20000.0, 1.0)   # excitación ESS
+mls = room.mls_signal(12).astype(float)             # longitud 2**12 - 1
+
+# Una línea: forma de onda + espectrograma (barrido), secuencia + espectro (MLS)
+plot_excitation(sweep, fs, kind="sweep")
+plot_excitation(mls, fs, kind="mls")
+
+# A mano: el espectrograma del barrido y el espectro de magnitud de la MLS
+import numpy as np
+import matplotlib.pyplot as plt
+
+fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 4))
+ax1.specgram(sweep, NFFT=1024, Fs=fs, noverlap=512)
+ax1.set(xlabel="Tiempo [s]", ylabel="Frecuencia [Hz]", title="Espectrograma del barrido")
+spec = np.abs(np.fft.rfft(mls))
+freqs = np.fft.rfftfreq(mls.size, d=1.0 / fs)
+ax2.semilogx(freqs[1:], 20 * np.log10(spec[1:] / np.median(spec[1:])))
+ax2.set(xlabel="Frecuencia [Hz]", ylabel="Magnitud [dB]", title="Espectro de la MLS (plano)")
+```
+
+</details>
+
+## La respuesta al impulso recuperada
+
+Deconvolucionar la grabación da la RI
+de banda ancha: el sonido directo, las reflexiones tempranas discretas y la
+cola difusa que decae. Su `.plot()` muestra la forma de onda arriba y la
+envolvente log-magnitud con la curva de decaimiento de energía de Schroeder
+abajo: el decaimiento recto cuya pendiente se convierte en el tiempo de
+reverberación en la
+[guía de acústica de salas](/phonometry/es/buildings/rooms/room-acoustics/).
+
+<Video
+  name="anim_sweep_deconvolution"
+  width={2400}
+  height={1350}
+  title="Medición con barrido y deconvolución a la respuesta al impulso"
+  description="Un barrido exponencial cruza una sala dibujada mientras se construye el espectrograma de la grabación, con las reflexiones discretas apareciendo como copias retardadas de la cresta principal; después el filtro inverso colapsa toda la grabación en la respuesta al impulso."
+/>
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/impulse_response_es.webp" alt="Respuesta al impulso de la sala recuperada: la forma de onda normalizada con el sonido directo y las reflexiones etiquetadas, y debajo la envolvente log-magnitud en dB con la curva de decaimiento de energía de Schroeder" width="88%" />
+
+<details>
+<summary>Ver el código de esta figura</summary>
+
+```python
+import numpy as np
+from scipy.signal import fftconvolve
+from phonometry import room
+
+fs = 48000
+sweep = room.sweep_signal(fs, 20.0, 20000.0, 1.5)
+# Una sala sintética: sonido directo + dos reflexiones + cola difusa que decae
+system = np.zeros(int(0.7 * fs))
+system[80], system[1400], system[3100] = 1.0, 0.5, 0.32
+ir = room.impulse_response(fftconvolve(sweep, system), sweep, fs, length=system.size)
+
+# Una línea: forma de onda + log-magnitud / decaimiento de Schroeder
+ir.plot(language="es")
+
+# A mano: la envolvente log-magnitud normalizada en dB
+import matplotlib.pyplot as plt
+h = np.asarray(ir)
+t = np.arange(h.size) / fs
+plt.plot(t, 20 * np.log10(np.abs(h) / np.max(np.abs(h))))
+plt.ylim(-80, 5)
+plt.xlabel("Tiempo [s]"); plt.ylabel("Nivel re pico [dB]")
+```
+
+</details>
+
+### Parámetros de `sweep_signal()` / `inverse_filter()`
+
+| Parámetro | Tipo | Unidades | Rango / valor por defecto | Notas |
+| :--- | :--- | :--- | :--- | :--- |
+| `fs` | int | Hz | > 0 | Frecuencia de muestreo |
+| `f1` | float | Hz | > 0, en/por debajo de la banda más baja | Frecuencia inicial del barrido |
+| `f2` | float | Hz | `f1 < f2 <= fs/2` | Frecuencia final del barrido |
+| `seconds` | float | s | cualquiera; mayor ⇒ más SNR | Duración del barrido |
+| `amplitude` | float | — | por defecto `1.0` | Amplitud de pico |
+| `fade` | float | — | `[0, 0.5)`, por defecto `0.01` | Fracción de fundido medio Hann (elimina transitorios de inicio/fin) |
+
+### Parámetros de `impulse_response()`
+
+| Parámetro | Tipo | Unidades | Rango / valor por defecto | Notas |
+| :--- | :--- | :--- | :--- | :--- |
+| `recorded` | array 1D | cualquiera | no vacío | Respuesta del sistema grabada |
+| `reference` | array 1D | cualquiera | no vacío | El barrido emitido |
+| `fs` | int | Hz | > 0 | Frecuencia de muestreo |
+| `method` | str | — | `'spectral'` (por defecto) / `'farina'` | `'farina'` requiere `f_range` |
+| `f_range` | (float, float) | Hz | por defecto `None` | `(f1, f2)` del barrido (solo Farina) |
+| `regularization` | float | — | por defecto `1e-6` | Término de Tikhonov como fracción de la energía espectral de pico |
+| `length` | int, opcional | muestras | por defecto `len(recorded)` | Muestras de RI causal a devolver |
+| `return_full` | bool | — | por defecto `False` | Devuelve la secuencia completa (distorsión en la cola) |
+
+`mls_signal(order)` toma un entero `order` en 2–20 (longitud de secuencia
+$2^{\text{order}}-1$); `mls_impulse_response(recorded, mls, length=None)`
+necesita que `recorded` abarque un número entero de periodos de MLS.
+
+## Dónde medir
+
+Una RI caracteriza un único par fuente–receptor; un parámetro
+de sala se obtiene promediando sobre varios. ISO 3382-1 (espacios para
+interpretación) pide al menos dos posiciones de fuente y micrófonos separados
+$\geq 2$ m entre sí, $\geq 1$ m de cualquier superficie, a $1{,}2$ m
+(altura de oído sentado); ISO 3382-2 fija el número mínimo de posiciones de
+fuente, de micrófono y de combinaciones fuente–micrófono según el grado de
+exactitud (control / ingeniería / precisión) y pide posiciones de micrófono
+que eviten las colocaciones simétricas.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_room_measurement_es.svg" alt="Configuración de medición de acústica de salas: una planta de la sala en vista superior con dos posiciones de fuente (altavoz) y seis posiciones de micrófono con las reglas de separación de ISO 3382-1, y la tabla de ISO 3382-2 con el número mínimo de posiciones para los grados de control, ingeniería y precisión" width="94%" />
+
+**Promediar entre posiciones.** El parámetro por banda que se informa es la
+media aritmética sobre todas las combinaciones fuente-micrófono, y la
+dispersión entre posiciones es parte de la respuesta, no ruido: indícala
+junto a la media siempre que supere la diferencia apenas perceptible (DAP)
+del parámetro (Tabla A.1 de ISO 3382-1), porque una
+sala puede cumplir un objetivo en promedio mientras butacas concretas
+quedan muy fuera de él. Cuatro errores de colocación sesgan la propia
+media:
+
+- **Posiciones correlacionadas.** Micrófonos a menos de 2 m entre sí muestrean
+  casi el mismo campo sonoro dos veces, así que el promedio parece más
+  estable de lo que es. El mínimo de 1 m a cualquier superficie evita, a
+  su vez, el refuerzo de presión junto a un contorno (y el filtro en peine
+  de la animación de más abajo) que colorea todo lo que graba un micrófono
+  demasiado cercano.
+
+<Video
+  name="anim_comb_filtering"
+  width={2400}
+  height={1350}
+  title="Filtro en peine por una única reflexión del suelo"
+  description="El sonido directo y una reflexión del suelo llegan al micrófono; al cambiar la altura del micrófono varía el retardo entre los dos caminos y el filtro en peine de la respuesta en frecuencia se mueve con él, y por eso importa la posición de medición cerca de superficies reflectantes."
+/>
+
+- **Colocaciones simétricas.** En una sala geométricamente simétrica, las
+  posiciones especulares reciben patrones de reflexión especulares;
+  promediarlas no añade información nueva. Por eso la ISO 3382-2 pide
+  posiciones que no caigan sobre líneas de simetría.
+- **Demasiado cerca de la fuente.** Dentro del campo directo el EDT se
+  desploma y el C80 se satura hacia arriba haga lo que haga la sala. La
+  ISO 3382-2 mantiene por ello cada micrófono al menos a
+  $d_{min} = 2\sqrt{V/(c\,\hat T)}$ de la fuente, con $\hat T$ una
+  estimación del tiempo de reverberación esperado (unos 2,2 m para un aula
+  de 200 m³ con 0,5 s esperados).
+- **La lotería de baja frecuencia.** Por debajo de la frecuencia de
+  Schroeder (véase la [guía de acústica de salas](/phonometry/es/buildings/rooms/room-acoustics/)) cada banda contiene solo un puñado de modos propios, y un
+  micrófono sobre un nodo de uno de ellos ve un decaimiento distinto que
+  otro sobre un antinodo. La dispersión de las bandas de 63-125 Hz entre
+  posiciones es estructuralmente mayor; el remedio son más posiciones, no
+  una excitación más larga.
+
+## De la respuesta al impulso en adelante
+
+La RI sale de esta página en varias direcciones. Filtrada en bandas e
+integrada hacia atrás se convierte en la curva de decaimiento cuya pendiente
+es el tiempo de reverberación: la
+[guía de acústica de salas](/phonometry/es/buildings/rooms/room-acoustics/) arranca
+exactamente ahí, y su hermana de oficinas diáfanas recorre la
+[línea de puestos de trabajo de ISO 3382-3](/phonometry/es/buildings/rooms/open-plan-acoustics/).
+Medidos a ambos lados de un cerramiento, los mismos barridos alimentan las
+diferencias de nivel del
+[aislamiento acústico en campo](/phonometry/es/buildings/insulation/insulation-field/). Y
+la distorsión armónica que el barrido exponencial empuja a tiempos de
+llegada negativos no siempre se descarta: leída a propósito, se convierte en
+el análisis de THD de la
+[guía de distorsión por barrido sinusoidal](/phonometry/es/devices/electroacoustics/swept-sine-distortion/).
+
+## Qué cubre esta guía
+
+**Cubierto.** La adquisición determinista de la respuesta al impulso de sala
+de ISO 18233:2006: el barrido sinusoidal exponencial del Anexo B
+(`room.sweep_signal`, `room.inverse_filter`) con deconvolución espectral
+lineal (regularizada con Tikhonov) y la variante de filtro inverso de Farina
+(`room.impulse_response`, métodos `"spectral"` y `"farina"`), y las
+secuencias de longitud máxima del Anexo A (`room.mls_signal`, órdenes 2-20,
+`room.mls_impulse_response` por correlación cruzada circular). Los
+resultados son objetos `ImpulseResponseResult` que encajan sin cambios en
+`room.room_parameters`. Las reglas de colocación de ISO 3382-1/-2
+(separación, distancia a superficies, la distancia mínima a la fuente y los
+grados de exactitud) se citan para la planificación.
+
+**No cubierto.** La reproducción y la grabación en sí (la E/S de la tarjeta
+de sonido, la calibración de nivel de la cadena) quedan fuera de la
+biblioteca. Los diagnósticos de varianza temporal y de distorsión de
+ISO 18233 no están implementados: la guía explica cómo el barrido separa la
+distorsión, pero ningún ayudante la cuantifica (esa lectura vive en la
+[guía de distorsión por barrido sinusoidal](/phonometry/es/devices/electroacoustics/swept-sine-distortion/)).
+Las reglas de posiciones son prosa de orientación: nada comprueba cuántas
+posiciones se midieron ni dónde.
+
+## Véase también
+
+- [Acústica de salas](/phonometry/es/buildings/rooms/room-acoustics/): el análisis
+  del decaimiento y los parámetros ISO 3382 calculados a partir de la RI que
+  esta página adquiere.
+- [Acústica de oficinas diáfanas (ISO 3382-3)](/phonometry/es/buildings/rooms/open-plan-acoustics/):
+  la línea de privacidad del habla medida con la misma adquisición.
+- [Medición de sistemas](/phonometry/es/signal/spectra/system-measurement/): pares
+  de Golay complementarios y barridos con espectro conformado, que devuelven
+  los mismos tipos de resultado.
+- [Distorsión y fase con barrido sinusoidal](/phonometry/es/devices/electroacoustics/swept-sine-distortion/):
+  la lectura de Farina de la distorsión que el barrido separa.
+- [Medición del aislamiento en campo (ISO 16283)](/phonometry/es/buildings/insulation/insulation-field/):
+  la misma medición a ambos lados de un cerramiento.
+- [Fuentes imagen y campo estacionario](/phonometry/es/buildings/rooms/room-image-sources/):
+  respuestas al impulso simuladas sobre las que ensayar la cadena de
+  procesamiento.
+- [Teoría](/phonometry/es/reference/theory/rooms-buildings/): la integración
+  de Schroeder que el análisis del decaimiento aplica a esta RI.
+- Referencia de la API: [`room.impulse_response`](/phonometry/es/reference/api/rooms/impulse-response/).
+
+## Respuestas rápidas
+
+### ¿Mido la respuesta al impulso de la sala con un barrido sinusoidal o con una MLS?
+
+Ambos son métodos de deconvolución de ISO 18233 que recuperan la respuesta al impulso con 20–30 dB más de relación señal-ruido efectiva que una fuente impulsiva. Prefiere el barrido sinusoidal exponencial (Anexo B): sitúa la distorsión armónica en tiempos de llegada negativos, donde se descarta. Usa la MLS (Anexo A) cuando la excitación deba ser periódica o el hardware favorezca una señal de dos niveles; es más sensible a la varianza temporal.

@@ -7,7 +7,7 @@
 // kilobytes of inline attributes to the deepest guides, and each KaTeX formula
 // is still markup-heavy even now that it serialises as text once. The only clean
 // alternative used to be llms-full.txt, which is far too large for a single
-// fetch. Now `/guides/levels/index.md` sits beside `/guides/levels/`, and
+// fetch. Now `/signal/levels/levels/index.md` sits beside `/signal/levels/levels/`, and
 // Head.astro advertises it with <link rel="alternate" type="text/markdown">.
 //
 // Source preference: docs/<page>.md where it exists (already plain markdown,

@@ -1,0 +1,368 @@
+---
+title: "Aislamiento acústico por intensidad (ISO 15186)"
+description: "La vía de la intensidad acústica hacia el aislamiento (ISO 15186): el índice de reducción acústica por intensidad RI leído barriendo la cara radiante, la adaptación Kc que reproduce el resultado por presión de ISO 10140, la diferencia de niveles normalizada de elemento para elementos pequeños y las fichas de ensayo acreditadas."
+references:
+  - type: book
+    authors: ["Hopkins, C."]
+    year: 2007
+    title: "Sound insulation"
+    publisher: "Butterworth-Heinemann"
+    doi: "10.4324/9780080550473"
+    note: "La monografía de referencia de la medición del aislamiento acústico en laboratorio, incluida la vía por intensidad y su relación con los métodos por presión. ISBN 978-0-7506-6526-1."
+  - type: standard
+    organization: "International Organization for Standardization"
+    year: 2000
+    title: "Acoustics — Measurement of sound insulation in buildings and of building elements using sound intensity — Part 1: Laboratory measurements"
+    designation: "ISO 15186-1:2000"
+    url: "https://www.iso.org/standard/26097.html"
+    note: "El índice de reducción acústica por intensidad R_I, su forma modificada por Kc y la diferencia de niveles normalizada por elemento (laboratorio); la herramienta preferida cuando la transmisión por flancos es alta (cláusula 1)."
+  - type: standard
+    organization: "International Organization for Standardization"
+    year: 2003
+    title: "Acoustics — Measurement of sound insulation in buildings and of building elements using sound intensity — Part 2: Field measurements"
+    designation: "ISO 15186-2:2003"
+    url: "https://www.iso.org/standard/30105.html"
+    note: "La contraparte en campo del método por intensidad, que da el índice aparente R'_I."
+---
+
+import ThemeImage from '../../../../../components/ThemeImage.astro';
+import ReportPreview from '../../../../../components/ReportPreview.astro';
+
+Una cámara reverberante lee la potencia acústica transmitida de forma
+*indirecta*: el recinto receptor integra cada vatio que llega, lo traiga la vía
+que lo traiga, y el área de absorción convierte el nivel de la sala de nuevo
+en potencia. El método por **intensidad acústica** de ISO 15186 sustituye esa
+inferencia por una lectura directa: una sonda de intensidad p-p barre una
+superficie de medición que envuelve el espécimen y mide la potencia radiada
+solo por el elemento ensayado, así que la transmisión por flancos queda fuera
+del número. Esta guía cubre el índice de reducción acústica por intensidad
+$R_I$ y su forma modificada con $K_c$, la diferencia de niveles normalizada
+de elemento para elementos constructivos pequeños, el indicador de
+cualificación de la superficie y las fichas de ensayo acreditadas. La cadena
+de laboratorio por presión vive en
+[Medición del aislamiento en laboratorio](/phonometry/es/buildings/insulation/insulation-lab/);
+la física de la sonda y sus indicadores de campo son el tema de la
+[guía de intensidad acústica](/phonometry/es/devices/emission/intensity/).
+
+## Medir la potencia transmitida directamente (ISO 15186-1)
+
+
+El [método de laboratorio de ISO 10140](/phonometry/es/buildings/insulation/insulation-lab/)
+lee la potencia transmitida de forma
+*indirecta*, a partir del nivel del recinto receptor y de su área de absorción,
+lo que falla cuando los flancos filtran una potencia que la sala integra
+igualmente. El método por **intensidad acústica** (ISO 15186) lo evita: una sonda
+de intensidad barre una superficie de medición que envuelve el espécimen y mide
+la potencia radiada de forma *directa*, así que solo contribuye el elemento
+ensayado. Es la herramienta preferida cuando la transmisión por flancos es alta
+(ISO 15186-1:2000, cláusula 1). A partir del nivel del recinto emisor $L_{p1}$ y
+del nivel medio de intensidad normal $L_{In}$ sobre la superficie (área $S_m$),
+para un espécimen de área $S$,
+
+$$
+R_I = L_{p1} - 6 - \left[ L_{In} + 10 \log_{10}\frac{S_m}{S} \right],
+$$
+
+donde los $6$ dB son el desfase de campo difuso entre el nivel de presión acústica
+y el nivel de intensidad incidente. La misma fórmula da el índice aparente
+$R'_I$ en campo (ISO 15186-2). Como el método por intensidad *subestima*
+ligeramente la potencia radiada a un recinto receptor real, un **índice
+modificado** $R_{I,M} = R_I + K_c$ reproduce el resultado por presión de la
+ISO 10140-2; el término de adaptación $K_c$ (Anexo B) es
+$10 \log_{10}(1 + S_{b2}\lambda/8V_2)$ para una sala bien definida, o el
+independiente de la sala $10 \log_{10}(1 + 61{,}4/f)$. Para elementos pequeños, la
+**diferencia de niveles normalizada por elemento** sustituye $10\log_{10}(S_m/S)$ por
+$10\log_{10}(S_m/A_0) + 10\log_{10} N$ ($A_0 = 10\ \text{m}^2$, $N$ unidades de elemento).
+
+```python
+import numpy as np
+from phonometry import building
+
+# Nivel del recinto emisor Lp1 y nivel medio de intensidad normal LIn sobre la
+# superficie de medición (Sm), para un espécimen de área S; 16 bandas 1/3 octava.
+lp1 = np.full(16, 85.0)
+l_in = np.full(16, 40.0)
+freqs = [100, 125, 160, 200, 250, 315, 400, 500, 630, 800,
+         1000, 1250, 1600, 2000, 2500, 3150]   # centros nominales 1/3 octava
+kc = building.adaptation_term_kc(freqs)                  # Anexo B (B.2)
+res = building.intensity_sound_reduction(lp1, l_in, measurement_area=12.0, area=10.0, kc=kc)
+print(round(float(res.r_i[0]), 2))          # 38.21  RI = Lp1 - 6 - [LIn + 10 lg(Sm/S)]
+print(round(float(res.r_i_modified[0]), 2)) # 40.29  RI,M = RI + Kc
+print(res.rating.rating)                     # 38  ->  RI,w (motor ISO 717-1)
+
+# Cualifica la superficie de medición: FpI = Lp - LIn debe quedar < 10 dB (< 6 dB
+# si el lado receptor es absorbente); el índice residual de la sonda > FpI+10.
+fpi = building.surface_pressure_intensity_indicator(np.full(16, 46.0), l_in)
+print(round(float(fpi[0]), 1))               # 6.0
+
+res.plot()   # RI medido vs curva de referencia ISO 717-1 desplazada (necesita matplotlib)
+```
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/intensity_insulation_es.svg" alt="Índice de reducción acústica por intensidad RI y el índice modificado RI,M a lo largo de las bandas de tercio de octava, con el aumento de adaptación del Anexo B sombreado entre las dos curvas" width="80%" loading="eager" />
+
+*El índice modificado $R_{I,M} = R_I + K_c$ eleva $R_I$ (más en las bandas
+bajas, donde $K_c$ es mayor), de modo que una medición por intensidad reproduce
+el resultado por presión de la ISO 10140-2. El índice automático solo se forma
+con exactamente 16 valores de tercio de octava o 5 de octava
+(`rating`/`rating_modified` son `None` en otro caso). Las subáreas barridas por
+separado se combinan primero con `combine_subareas` (Fórmulas (11)-(12)); una
+subárea cuya energía neta fluye de vuelta hacia el espécimen se introduce con
+área negativa, aplicando la regla del signo menos de la Cláusula 6.4.6
+mientras $S_m$ conserva la suma de áreas sin signo.*
+
+<details>
+<summary>Mostrar el código de esta figura</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import building
+
+# Una pared ligera: SPL del recinto emisor Lp1 = 85 dB y el nivel de intensidad
+# normal medido LIn sobre la superficie Sm = 12 m2, 16 bandas de tercio de octava.
+freqs = [100, 125, 160, 200, 250, 315, 400, 500, 630, 800,
+         1000, 1250, 1600, 2000, 2500, 3150]
+l_in = np.array([57.8, 61.9, 60.5, 55.6, 55.8, 55.5, 53.4, 51.6,
+                 50.2, 47.7, 46.4, 45.7, 44.8, 45.2, 47.2, 52.7])
+kc = building.adaptation_term_kc(freqs)           # término de adaptación del Anexo B
+res = building.intensity_sound_reduction(np.full(16, 85.0), l_in,
+                                         measurement_area=12.0, area=10.0,
+                                         kc=kc)
+
+x = np.arange(len(freqs))
+fig, ax = plt.subplots()
+ax.fill_between(x, res.r_i, res.r_i_modified, alpha=0.2, label="Adaptación Kc")
+ax.plot(x, res.r_i, "-o", label="RI (intensidad)")
+ax.plot(x, res.r_i_modified, "--s", label="RI,M = RI + Kc")
+ax.set_xticks(x, [str(f) for f in freqs], rotation=45)
+ax.set(xlabel="Frecuencia [Hz]", ylabel="Índice de reducción acústica [dB]",
+       title=f"RI,w = {res.rating.rating} dB, RI,M,w = {res.rating_modified.rating} dB")
+ax.legend()
+plt.show()
+```
+
+</details>
+
+### Parámetros de `intensity_sound_reduction()` / `adaptation_term_kc()`
+
+| Parámetro | Tipo | Unidades | Rango / def. | Notas |
+| :--- | :--- | :--- | :--- | :--- |
+| `lp1` | array 1D o 2D | dB | uno/banda, o `(posiciones, bandas)` | Nivel de presión del recinto emisor |
+| `l_in` | array 1D o 2D | dB | uno/banda, o `(posiciones, bandas)` | Nivel de intensidad normal sobre la superficie |
+| `measurement_area` | float | m² | > 0 | Área de la superficie de medición $S_m$ |
+| `area` | float | m² | > 0 | Área del espécimen $S$ |
+| `kc` | array 1D | dB | uno por banda / `None` | Término de adaptación para el índice modificado |
+| `freq` | array 1D | Hz | > 0 | Frecuencias centrales (`adaptation_term_kc`) |
+| `boundary_area` / `volume` | float | m² / m³ | > 0, ambos o ninguno | Sala $S_{b2}$ / $V_2$ para la Fórmula (B.1) |
+
+`intensity_sound_reduction()` devuelve un `IntensityReductionResult` (`r_i`,
+`r_i_modified`, `rating`, `rating_modified`);
+`intensity_element_normalized_difference()` un
+`IntensityElementNormalizedResult` (`d_i_n_e`, `rating`);
+`surface_pressure_intensity_indicator()` y `combine_subareas()` devuelven arrays.
+
+
+## Informe de ensayo por intensidad de ISO 15186-1 (`.report()`)
+
+`IntensityReductionResult.report()` escribe el informe de ensayo de una página
+de ISO 15186-1:2000 del índice de reducción acústica por intensidad $R_I$,
+reutilizando la misma disposición acreditada de dos paneles que las fichas de
+ISO 10140 e ISO 16283. Como $R_I$ es un índice de reducción acústica ordinario,
+su valor único $R_{I,w}$ es el índice a ruido aéreo de ISO 717-1 evaluado sobre
+el espectro por intensidad: la ficha nombra ISO 15186-1 en su línea de base,
+tabula $R_I$ con un decimal junto a la curva medida frente a la referencia
+desplazada, encajona `RI,w (C; Ctr)` e imprime la declaración de que la potencia
+acústica transmitida se midió directamente sobre la superficie de medición. Con
+`verbose=True` se anexa el índice modificado por $K_c$, $R_{I,M}$ (Fórmula (9)),
+junto a $R_I$ cuando se suministró un término de adaptación.
+
+Los campos aplicables de `ReportMetadata` describen la medición por intensidad:
+`specimen` (el elemento ensayado), `area` (superficie de la muestra $S$),
+`client`, `manufacturer`, `test_room`, `laboratory`, `operator`, `report_id` y
+`test_date`, además de los campos de sala/clima compartidos con las demás
+fichas de aislamiento. No hay un campo específico para la geometría de la
+superficie de medición ni para el método de adquisición por barrido o por
+puntos discretos; anótalos en `notes` y nombra la norma en
+`measurement_standard` (`"ISO 15186-1"`). El veredicto frente al requisito,
+`language="es"` y el extra `phonometry[report]` se comportan igual que en las
+fichas hermanas.
+
+```python
+import numpy as np
+from phonometry import building, ReportMetadata
+
+freqs = np.array([100, 125, 160, 200, 250, 315, 400, 500, 630, 800,
+                  1000, 1250, 1600, 2000, 2500, 3150], dtype=float)
+lp1, sm, s = 85.0, 12.0, 10.0
+l_in = np.array([57.8, 61.9, 60.5, 55.6, 55.8, 55.5, 53.4, 51.6,
+                 50.2, 47.7, 46.4, 45.7, 44.8, 45.2, 47.2, 52.7])
+kc = building.adaptation_term_kc(freqs)                 # Anexo B, Fórmula (B.2)
+res = building.intensity_sound_reduction(
+    np.full(16, lp1), l_in, measurement_area=sm, area=s, kc=kc
+)
+metadata = ReportMetadata(
+    specimen="Muro de bloque de hormigón celular curado en autoclave de 100 mm",
+    area=10.0, measurement_standard="ISO 15186-1",
+    test_room="Suite de transmisión (ejemplo)",
+    laboratory="Phonometry Reference Laboratory",
+    report_id="PHN-2026-0150",
+    requirement=30.0,                                   # RI,w >= 30 dB -> CUMPLE
+)
+res.report("RIw.pdf", metadata=metadata)                # RI,w (C; Ctr)
+res.report("RIw_kc.pdf", metadata=metadata, verbose=True)  # f | RI | RI,M
+```
+
+La ficha de ejemplo se regenera con `make reports` y se conserva en el
+repositorio. Haz clic en la vista previa para abrir el PDF:
+
+<ReportPreview
+	name="iso15186_intensity_example"
+	title="Informe de ejemplo por intensidad ISO 15186-1 (PDF)"
+	description="Informe de ensayo de aislamiento acústico por intensidad en laboratorio de un elemento constructivo de una página: la cabecera de metadatos (cliente, descripción de la muestra, montaje, superficie de la muestra, volúmenes de las salas, clima), la tabla de RI en tercios de octava junto a la curva medida frente a la referencia desplazada, el índice RI,w (C; Ctr) en caja evaluado según ISO 717-1, la declaración del método por intensidad y un veredicto CUMPLE frente al requisito de 30 dB."
+	caption="Ficha por intensidad (IntensityReductionResult.report), RI,w (C; Ctr)."
+/>
+
+## Elementos constructivos pequeños: la diferencia de niveles normalizada de elemento
+
+Para un **elemento constructivo pequeño** (un aireador, una caja de enchufe, una
+ventana pequeña) el método por intensidad informa en su lugar la diferencia de
+niveles normalizada de elementos $D_{I,n,e}$ (Fórmula (8)), normalizada al área
+de absorción de referencia $A_0 = 10\ \text{m}^2$.
+`IntensityElementNormalizedResult.report()` escribe la misma ficha de una página
+a través del renderizador compartido, con `DI,n,e,w (C; Ctr)` en caja evaluado
+según ISO 717-1; `verbose=True` muestra la evaluación ISO 717 por banda y un
+`requirement` añade un veredicto CUMPLE/NO CUMPLE (el aislamiento del elemento
+cumple igualando o superando el objetivo).
+
+```python
+import numpy as np
+from phonometry import building, ReportMetadata
+
+lp1, sm, n = 85.0, 12.0, 1                              # NPS fuente, superficie, unidades
+l_in = np.array([57.9, 62.0, 60.6, 55.7, 55.9, 55.6, 53.5, 51.7,
+                 50.3, 47.8, 46.5, 45.8, 44.9, 45.3, 47.3, 52.8])
+res = building.intensity_element_normalized_difference(
+    np.full(16, lp1), l_in, measurement_area=sm, n=n
+)
+metadata = ReportMetadata(
+    specimen="Aireador en un muro de fábrica de 100 mm",
+    measurement_standard="ISO 15186-1",
+    laboratory="Phonometry Reference Laboratory",
+    report_id="PHN-2026-0151",
+    requirement=30.0,                                   # DI,n,e,w >= 30 dB -> CUMPLE
+)
+res.plot()   # DI,n,e frente a la referencia ISO 717-1 desplazada (requiere matplotlib)
+res.report("DIne.pdf", metadata=metadata)               # DI,n,e,w (C; Ctr)
+```
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/intensity_element_insulation_es.svg" alt="Diferencia de niveles normalizada de elemento DI,n,e de un aireador por banda de tercio de octava frente a la curva de referencia ISO 717-1 desplazada, con las desviaciones desfavorables sombreadas y el índice DI,n,e,w anotado" width="80%" />
+
+*El elemento pequeño se evalúa exactamente como un muro: $D_{I,n,e}$
+alimenta el motor de ISO 717-1 y las desviaciones desfavorables (referencia
+por encima de la medición) fijan $D_{I,n,e,w}$. La normalización
+$10\log_{10}(S_m/A_0)$ sustituye al término de superficie de la muestra, de modo
+que el número describe el elemento con independencia del muro en el que se
+monte.*
+
+<details>
+<summary>Mostrar el código de esta figura</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import building
+
+# Un aireador en un muro de fábrica: NPS del recinto emisor de 85 dB y el
+# nivel de intensidad normal sobre la superficie de medición Sm = 12 m2.
+l_in = np.array([57.9, 62.0, 60.6, 55.7, 55.9, 55.6, 53.5, 51.7,
+                 50.3, 47.8, 46.5, 45.8, 44.9, 45.3, 47.3, 52.8])
+res = building.intensity_element_normalized_difference(
+    np.full(16, 85.0), l_in, measurement_area=12.0, n=1
+)
+
+# Una línea: DI,n,e frente a la referencia ISO 717-1 desplazada:
+res.plot(language="es")
+plt.show()
+
+# A mano, desde el índice que porta el resultado:
+w = res.rating
+fig, ax = plt.subplots()
+ax.semilogx(w.band_centers, res.d_i_n_e, "o-", label="DI,n,e (elemento)")
+ax.semilogx(w.band_centers, w.shifted_reference, "s--",
+            label="referencia desplazada")
+ax.fill_between(w.band_centers, w.measured, w.shifted_reference,
+                where=w.measured < w.shifted_reference, interpolate=True,
+                alpha=0.3, label="desviaciones desfavorables")
+ax.set_xlabel("Frecuencia [Hz]")
+ax.set_ylabel("Diferencia de niveles normalizada de elemento [dB]")
+ax.set_title(f"DI,n,e,w = {w.rating} dB  (C={w.c:+d}; Ctr={w.ctr:+d})")
+ax.legend()
+plt.show()
+```
+
+</details>
+
+<ReportPreview
+	name="iso15186_element_example"
+	title="Informe de ejemplo de elementos por intensidad ISO 15186-1 (PDF)"
+	description="Informe de ensayo de aislamiento acústico por intensidad normalizado de elementos en laboratorio de un elemento constructivo pequeño de una página: la cabecera de metadatos (cliente, descripción de la muestra, montaje, superficie del elemento), la tabla de DI,n,e en tercios de octava junto a la curva medida frente a la referencia desplazada, el índice DI,n,e,w (C; Ctr) en caja evaluado según ISO 717-1, la declaración del método por intensidad y un veredicto CUMPLE frente al requisito de 30 dB."
+	caption="Ficha de elementos por intensidad (IntensityElementNormalizedResult.report), DI,n,e,w (C; Ctr)."
+/>
+
+
+## ¿Laboratorio o campo? (ISO 15186-2)
+
+La parte 1 es un método de laboratorio: el espécimen ocupa una abertura de
+ensayo entre dos recintos, y los flancos suprimidos de la instalación hacen de
+$R_I$ una propiedad del elemento. ISO 15186-2 lleva la misma sonda, el mismo
+barrido de superficie y la misma fórmula al edificio terminado, donde el
+resultado es el índice aparente $R'_I$ del elemento instalado, con su
+radiación por flancos incluida. La selectividad que motivó el método en el
+laboratorio se duplica en campo: como la sonda lee solo lo que radia su
+superficie de medición, las superficies parciales aíslan qué elemento (la
+propia pared, una ventana, una unión con fugas) transporta la potencia
+transmitida, algo que ningún método de campo por presión puede resolver.
+Cualifica cada barrido con el mismo indicador presión-intensidad, y cuenta
+con que los límites de la propia sonda (el
+[error de fase del espaciador](/phonometry/es/devices/emission/intensity/)) fijen el
+rango útil en baja frecuencia.
+
+## Qué cubre esta guía
+
+**Cubierto.** El índice de reducción acústica por intensidad $R_I$ de
+ISO 15186-1:2000 (cláusula 3.8), su $R_{I,M}$ modificado con $K_c$ (Anexo B)
+y la $D_{I,n,e}$ normalizada de elemento (cláusula 3.9), con la combinación
+de subáreas de las Fórmulas (11)-(12) y el indicador presión-intensidad de
+la superficie, mediante `building.intensity_sound_reduction`,
+`building.adaptation_term_kc`,
+`building.intensity_element_normalized_difference`,
+`building.surface_pressure_intensity_indicator` y
+`building.combine_subareas`; los índices globales reutilizan el motor
+verificado de ISO 717-1, y ambos resultados escriben la ficha de ensayo de
+una página con `.report()`.
+
+**No cubierto.** La propia medición de intensidad acústica (la sonda de
+barrido, la adquisición con dos micrófonos y la calibración del desajuste de
+fase tras $L_{p1}$ y $L_{In}$) no está implementada: ambos niveles se toman
+como entradas ya medidas, y la ficha de ISO 15186-1 declara explícitamente
+que no tiene campo para la geometría de la superficie de medición ni para el
+método de adquisición por barrido o por puntos discretos. Tampoco están
+implementados el procedimiento de campo propio de ISO 15186-2 (posiciones
+de altavoz, los casos de fachada) ni la variante de baja frecuencia de la
+parte 3: las fórmulas de esta página se aplican sin cambios a datos de
+campo, pero nada comprueba cómo se adquirieron.
+
+## Véase también
+
+- [Medición del aislamiento en laboratorio](/phonometry/es/buildings/insulation/insulation-lab/):
+  el método por presión de ISO 10140 que la adaptación $K_c$ reproduce.
+- [Medición del aislamiento en campo (ISO 16283)](/phonometry/es/buildings/insulation/insulation-field/):
+  las magnitudes de campo por presión y sus índices globales.
+- [Índices globales de aislamiento (ISO 717)](/phonometry/es/buildings/insulation/insulation-ratings/):
+  el motor de curva de referencia tras $R_{I,w}$ y $D_{I,n,e,w}$.
+- [Intensidad acústica](/phonometry/es/devices/emission/intensity/): la sonda de dos
+  micrófonos, sus indicadores de campo y la cualificación por índice
+  residual tras cada barrido.
+- [Teoría](/phonometry/es/reference/theory/rooms-buildings/): la derivación
+  de la curva de referencia tras los índices globales ponderados.
+- Referencia de la API: [`building.measurement.intensity_insulation`](/phonometry/es/reference/api/building/intensity-insulation/).

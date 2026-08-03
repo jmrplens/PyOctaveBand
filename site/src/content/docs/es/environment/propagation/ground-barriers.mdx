@@ -1,0 +1,341 @@
+---
+title: "Efecto suelo esférico y barreras avanzadas"
+description: "El coeficiente de reflexión de onda esférica de Weyl-Van der Pol sobre un suelo de impedancia finita, y la difracción de barreras por teoría ondulatoria: el número de Fresnel de Kurze-Anderson, el semiplano rígido exacto (MacDonald / Hadden y Pierce), las barreras gruesas y la barrera coherente de cuatro caminos sobre el suelo."
+references:
+  - type: book
+    authors: ["Attenborough, K.", "Van Renterghem, T."]
+    year: 2021
+    title: "Predicting outdoor sound"
+    edition: "2.ª ed."
+    publisher: "CRC Press"
+    doi: "10.1201/9780429470141"
+    note: "Capítulo 2 (reflexión de onda esférica sobre suelo de impedancia, la ecuación de Weyl-Van der Pol y el factor de pérdida por frontera) y capítulo 9 (barreras acústicas al aire libre, las soluciones de difracción de MacDonald y de Hadden y Pierce). ISBN 978-1-138-30655-2."
+  - type: book
+    authors: ["Salomons, E. M."]
+    year: 2001
+    title: "Computational atmospheric acoustics"
+    publisher: "Kluwer Academic"
+    doi: "10.1007/978-94-010-0660-6"
+    note: "Capítulo 3 y apéndice D: el campo de dos rayos, los coeficientes de reflexión de onda plana y esférica, y la distancia numérica (Ecs. D.57-D.60). ISBN 978-1-4020-0390-5."
+  - type: book
+    authors: ["Bies, D. A.", "Hansen, C. H.", "Howard, C. Q."]
+    year: 2017
+    title: "Engineering noise control"
+    edition: "5.ª ed."
+    publisher: "CRC Press"
+    note: "Secciones 5.2.3 (reflexión de onda esférica en el suelo) y 5.3.5-5.3.7 (número de Fresnel, Kurze-Anderson, difracción por barrera fina y gruesa). ISBN 978-1-4987-2405-0."
+  - type: article
+    authors: ["Kurze, U. J.", "Anderson, G. S."]
+    year: 1971
+    title: "Sound attenuation by barriers"
+    journal: "Applied Acoustics"
+    volume: 4
+    issue: 1
+    pages: "35-53"
+    doi: "10.1016/0003-682X(71)90024-7"
+    note: "El ajuste en forma cerrada de la carta de Maekawa en el número de Fresnel."
+  - type: article
+    authors: ["Hadden, W. J.", "Pierce, A. D."]
+    year: 1981
+    title: "Sound diffraction around screens and wedges for arbitrary point source locations"
+    journal: "The Journal of the Acoustical Society of America"
+    volume: 69
+    issue: 5
+    pages: "1266-1276"
+    doi: "10.1121/1.385809"
+    note: "La solución exacta de difracción por cuña cuyo límite de cuña plana (semiplano fino) usa la pérdida por inserción de la barrera."
+---
+
+import ThemeImage from '../../../../../components/ThemeImage.astro';
+
+El [método general ISO 9613-2](/phonometry/es/environment/propagation/outdoor-propagation/)
+pliega los términos de suelo y barrera en correcciones tabuladas basadas en
+energía. Esta página cubre la acústica ondulatoria subyacente en
+`phonometry.environment.propagation.ground_barriers`: el **coeficiente de reflexión de
+onda esférica** de un suelo de impedancia finita (Weyl-Van der Pol) y la
+**difracción por teoría ondulatoria** de una pantalla, ambos en una atmósfera
+homogénea (sin refracción ni turbulencia). Son el núcleo físico de los modelos
+de suelo y barrera de Nord2000 y CNOSSOS, y resuelven la estructura de
+interferencia dependiente de la frecuencia que los términos $A_{gr}$/$D_z$
+por banda de octava suavizan.
+
+## 1. Efecto suelo de onda esférica (Weyl-Van der Pol)
+
+El campo sonoro de una fuente puntual sobre un suelo de reacción local es la
+suma de una onda directa y una onda reflejada ponderada por el **coeficiente de
+reflexión de onda esférica** $Q$ (Attenborough Ec. 2.40a; Salomons Ec. 3.2):
+
+$$
+p = \frac{e^{ikR_1}}{4\pi R_1} + Q\,\frac{e^{ikR_2}}{4\pi R_2},
+$$
+
+con $R_1$ la distancia fuente-receptor y $R_2$ la distancia de la fuente
+imagen. El coeficiente (Attenborough Ec. 2.40c; Salomons Ec. D.58) corrige el
+coeficiente de onda plana $R_p$ por la curvatura del frente de onda:
+
+$$
+Q = R_p + (1 - R_p)\,F(w), \qquad
+R_p = \frac{Z\cos\theta - 1}{Z\cos\theta + 1},
+$$
+
+$$
+F(w) = 1 + i\sqrt{\pi}\,w\,e^{-w^2}\operatorname{erfc}(-iw), \qquad
+w = \sqrt{\tfrac{i k R_2}{2}}\left(\cos\theta + \tfrac{1}{Z}\right).
+$$
+
+Aquí $Z$ es la impedancia superficial del suelo normalizada por $\rho c$,
+$\theta$ es el ángulo de incidencia desde la normal al suelo
+($\cos\theta = (h_s + h_r)/R_2$) y el factor de pérdida por frontera $F(w)$
+se escribe mediante la función de error complementaria escalada
+$e^{-w^2}\operatorname{erfc}(-iw)$, es decir, la función de Faddeeva
+`scipy.special.wofz`. El segundo término de $Q$ es la *onda de suelo* que
+mantiene finito el campo en incidencia rasante, donde $R_p \to -1$ y un
+modelo de onda plana predeciría silencio (Salomons Ecs. D.57, D.59, D.60).
+
+El nivel sonoro relativo (la *atenuación en exceso*, dB respecto al campo libre)
+es (Salomons Ec. 3.4):
+
+$$
+\Delta L = 20\log_{10}\!\left|\,1 + Q\,\frac{R_1}{R_2}\,e^{i k (R_2 - R_1)}\,\right|.
+$$
+
+```python
+import numpy as np
+from phonometry import ground_effect
+
+bands = np.array([63., 125., 250., 500., 1000., 2000., 4000., 8000.])
+
+# Pradera (resistividad al flujo efectiva sigma = 200 kPa.s/m^2), fuente a 1 m y
+# receptor a 1.5 m de altura, separados 50 m. La impedancia procede del modelo
+# poroso de Delany-Bazley de phonometry.materials (suelo semiinfinito).
+res = ground_effect(bands, 1.0, 1.5, 50.0, flow_resistivity=2e5)
+print(res.excess_attenuation)     # la caída del suelo (dB re campo libre)
+print(res.reflection_coefficient) # Q complejo por banda
+res.plot()                        # atenuación en exceso frente a frecuencia
+```
+
+La impedancia del suelo se deriva de una `flow_resistivity` efectiva (con el
+modelo `delany_bazley` o `miki` de
+[`phonometry.materials`](/phonometry/es/materials/absorbers/porous-absorbers/), que modelan
+un suelo poroso semiinfinito) o se suministra directamente como una `impedance`
+compleja normalizada (un escalar, un vector por banda o un `PorousMediumResult`).
+Un valor de `impedance` directo se toma en el convenio $e^{-i\omega t}$ de
+Salomons, en el que un suelo pasivo tiene $\operatorname{Im}(Z) > 0$; los
+modelos porosos de `phonometry.materials` trabajan en el convenio opuesto
+$e^{+j\omega t}$ ($\operatorname{Im}(Z) < 0$), así que todo lo obtenido de
+ellos (una `flow_resistivity` o un
+`PorousMediumResult`) se conjuga internamente antes de entrar en las fórmulas
+de Weyl-Van der Pol.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/ground_effect_spherical_es.svg" alt="Atenuación en exceso (nivel respecto al campo libre) frente a la frecuencia en eje logarítmico para cuatro tipos de suelo. La nieve reciente (10 kPa) cae más profundo y a menor frecuencia, cerca de menos 18 dB alrededor de 150 Hz; el suelo forestal (50 kPa) llega a unos menos 15 dB cerca de 290 Hz y la pradera (200 kPa) a unos menos 12 dB cerca de 540 Hz; el asfalto (20000 kPa) se ciñe al límite de realce de suelo rígido de más 6 dB hasta una caída profunda cerca de 2,4 kHz. Una línea de puntos marca el límite de suelo rígido de más 6 dB y una línea continua el campo libre de 0 dB" width="90%" loading="eager" />
+
+<details>
+<summary>Ver el código de esta figura</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import ground_effect
+
+freqs = np.geomspace(50.0, 4000.0, 400)
+grounds = [
+    ("Nieve reciente (10 kPa)", 10e3, "#2ca02c"),
+    ("Suelo forestal (50 kPa)", 50e3, "#9467bd"),
+    ("Pradera (200 kPa)", 200e3, "#1f77b4"),
+    ("Asfalto (20000 kPa)", 20000e3, "#d62728"),
+]
+fig, ax = plt.subplots(figsize=(11, 6.4))
+for label, sigma, color in grounds:
+    res = ground_effect(freqs, 1.0, 1.5, 50.0, flow_resistivity=sigma)
+    ax.plot(freqs, res.excess_attenuation, color=color, label=label)
+ax.axhline(6.0, color="k", ls=":", label="Límite de suelo rígido (+6 dB)")
+ax.axhline(0.0, color="k", lw=0.8)
+ax.set_xscale("log")
+ax.set_xlabel("Frecuencia [Hz]")
+ax.set_ylabel("Nivel respecto al campo libre [dB]")
+ax.legend()
+plt.show()
+```
+
+</details>
+
+**Límites que reproduce la implementación** (cada uno un test o ancla de
+conformidad fijados): un suelo acústicamente rígido ($|Z| \to \infty$) da
+$R_p \to 1$, $|w| \to 0$, $F \to 1$ y $Q \to 1$, de modo que $\Delta L$
+alcanza +6 dB en fase; la resistividad al flujo efectiva $\sigma \to \infty$
+tiende a ese suelo rígido; la incidencia rasante ($h_s, h_r \to 0$) da
+$R_p \to -1$; y el efecto suelo es recíproco al intercambiar las alturas de
+fuente y receptor.
+
+## 2. Difracción de barreras avanzada
+
+`barrier_insertion_loss` y sus piezas dan tres niveles de apantallamiento más
+allá del término $D_z$ de ISO 9613-2.
+
+**Forma cerrada de Kurze-Anderson.** La pérdida por inserción de una pantalla
+fina en función del número de Fresnel $N = (2/\lambda)(A + B - d)$ (Bies
+Ec. 5.134, con $A$ y $B$ los dos tramos del camino más corto
+fuente-borde-receptor y $d$ la distancia recta) es (Bies Ec. 5.138; Kurze y
+Anderson 1971):
+
+$$
+\Delta = 5 + 20\log_{10}\!\left(\frac{\sqrt{2\pi N}}{\tanh\sqrt{2\pi N}}\right)\;\text{dB},
+$$
+
+que tiende a 5 dB en el límite de sombra $N \to 0$ y aproxima la curva de
+fuente puntual de Maekawa dentro de unos 1,5 dB.
+
+Los métodos de pantalla delgada comparten las mismas tres magnitudes
+geométricas: los dos segmentos difractados sobre el borde y el camino recto
+al que sustituyen. Dibujados sobre la pantalla de 4 m de los ejemplos,
+difieren en solo 0,15 m.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_ground_barrier_es.svg" alt="Sección de la geometría de barrera: una fuente altavoz a 1 m del suelo, una pantalla delgada de 4 m a 50 m y un receptor micrófono a 1,5 m de altura a 100 m, el camino directo bloqueado de 100,00 m dibujado a trazos a través de la pantalla y el camino difractado doblado sobre el borde en dos segmentos A = 50,09 m y B = 50,06 m, con una diferencia de caminos de 0,15 m que da un número de Fresnel de 0,44 y una pérdida por inserción de Kurze-Anderson de 10,0 dB a 500 Hz, que sube a 15,5 dB a 2 kHz" width="92%" />
+
+```python
+from phonometry import barrier_insertion_loss, kurze_anderson_attenuation
+
+kurze_anderson_attenuation(0.0)     # 5.0 dB en el límite de sombra
+
+# Una barrera de 4 m a 50 m de una fuente a 1 m, receptor a 1.5 m y 100 m.
+il = barrier_insertion_loss(bands, 1.0, 50.0, 4.0, 100.0, 1.5,
+                            method="kurze_anderson")
+il.plot()                           # pérdida por inserción frente a frecuencia
+```
+
+**Semiplano rígido exacto.** Con `method="exact"` se usa la pérdida por
+inserción por teoría ondulatoria de una pantalla fina rígida: la forma compacta
+en integrales de Fresnel de la solución de MacDonald / Hadden y Pierce
+(Attenborough Ecs. 9.19-9.20), construida con las funciones de Fresnel
+auxiliares. Da 6 dB en el límite de sombra (el campo se reduce a la mitad, el
+límite de cuña plana) y sigue a Kurze-Anderson en la zona de sombra.
+
+**Barreras gruesas.** Un `thickness` (ancho superior $e$) alarga el camino
+difractado a $A + e + B$, el número de Fresnel de doble borde
+$N = (2/\lambda)(A + B + e - d)$ de Bies Ec. 5.157, de modo que una barrera
+gruesa o
+un caballón atenúa monótonamente más que la pantalla fina de la misma altura.
+
+**Barrera coherente sobre el suelo.** Con una `ground_impedance` (o una
+`ground_flow_resistivity`) se combinan coherentemente los cuatro caminos
+difractados fuente-imagen / receptor-imagen, ponderando cada reflexión en el
+suelo por el coeficiente de onda esférica $Q$ anterior (Attenborough cap. 9;
+Bies sec. 5.3.5). Esto expone la estructura de interferencia suelo-barrera que
+una suma puramente energética de $A_{gr}$ y $D_z$ no puede. Como
+simplificación de primer orden, un único $Q$ (sobre la geometría global
+fuente-receptor) pondera
+todos los rebotes en lugar de un coeficiente por camino imagen; el modelo es
+coherente y recíproco pero no una solución completa por elementos de contorno.
+
+```python
+il = barrier_insertion_loss(bands, 1.0, 50.0, 4.0, 100.0, 1.5,
+                            method="exact", ground_flow_resistivity=2e5)
+il.ground        # True: se aplicó el modelo coherente de cuatro caminos
+il.plot()
+```
+
+Los tres modelos lado a lado sobre la misma geometría cuentan toda la
+historia: el ajuste de Kurze-Anderson y el semiplano exacto se siguen a menos
+de 1,5 dB a lo largo de dos décadas de número de Fresnel, mientras que el
+modelo coherente con suelo oscila decenas de decibelios alrededor de ellos,
+hacia arriba donde la barrera elimina el valle del efecto suelo del camino sin
+apantallar, hacia abajo donde los cuatro caminos difractados interfieren
+destructivamente.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/barrier_insertion_loss_methods_es.svg" alt="Pérdida por inserción de barrera frente a la frecuencia en eje logarítmico para una pantalla de 4 m entre una fuente a 1 m de altura a 50 m y un receptor a 1,5 m a 100 m. La curva a trazos de Kurze-Anderson y la curva continua del semiplano rígido exacto suben juntas desde unos 6 dB a 50 Hz hasta 19 dB a 5 kHz, sin separarse más de 1,5 dB; la curva coherente de cuatro caminos con suelo oscila alrededor de ellas, superando 45 dB cerca de 230 Hz donde desaparece el valle del efecto suelo sin barrera y cayendo por debajo de -10 dB cerca de 550 Hz, con la línea punteada del límite rasante de Kurze-Anderson de 5 dB por debajo" width="90%" />
+
+<details>
+<summary>Ver el código de esta figura</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import barrier_insertion_loss
+
+# La barrera de 4 m de los fragmentos anteriores, en una malla fina de frecuencia.
+freqs = np.geomspace(50.0, 5000.0, 240)
+il_ka = barrier_insertion_loss(freqs, 1.0, 50.0, 4.0, 100.0, 1.5,
+                               method="kurze_anderson")
+il_ex = barrier_insertion_loss(freqs, 1.0, 50.0, 4.0, 100.0, 1.5,
+                               method="exact")
+il_gr = barrier_insertion_loss(freqs, 1.0, 50.0, 4.0, 100.0, 1.5,
+                               method="exact", ground_flow_resistivity=2e5)
+fig, ax = plt.subplots(figsize=(11, 6.4))
+ax.semilogx(freqs, il_ka.insertion_loss, "--", label="Kurze-Anderson (pantalla delgada)")
+ax.semilogx(freqs, il_ex.insertion_loss, label="Semiplano rígido exacto")
+ax.semilogx(freqs, il_gr.insertion_loss, label="Exacto + suelo coherente (cuatro caminos)")
+ax.axhline(5.0, color="k", ls=":", label="Límite rasante de Kurze-Anderson (5 dB)")
+ax.set(xlabel="Frecuencia [Hz]", ylabel="Pérdida por inserción [dB]")
+ax.legend()
+plt.show()
+```
+
+</details>
+
+Las tres curvas comparten la misma geometría base, y `.plot_geometry()` la
+dibuja a escala: a estas distancias de tráfico rodado la pantalla de 4 m es
+una lámina. En las curvas de pantalla delgada la diferencia de caminos de
+0,15 m se combina con la longitud de onda en el número de Fresnel; la curva
+de suelo coherente depende además de la impedancia del suelo y de la
+interferencia de los caminos imagen.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/barrier_geometry_es.svg" alt="Sección a escala de la geometría de barrera de las curvas de pérdida por inserción: una estrella de fuente a 1 m sobre el suelo rayado, una pantalla delgada de 4 m a 50 m, y un triángulo de receptor a 1,5 m de altura a 100 m, con el camino directo a trazos cortado por la pantalla, el camino difractado continuo doblado sobre su borde superior, la diferencia de caminos de 0,15 m anotada y las distancias de 50 m y 100 m acotadas" width="90%" />
+
+*Dibujada a escala, la pantalla casi desaparece: el camino difractado sobre
+el borde es solo 0,15 m más largo que el directo bloqueado, y esa diferencia
+es la entrada geométrica del número de Fresnel $N = (2/\lambda)(A + B - d)$
+del que dependen los métodos de pantalla delgada de arriba.*
+
+<details>
+<summary>Ver el código de esta figura</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import barrier_insertion_loss
+
+freqs = np.geomspace(50.0, 5000.0, 240)
+il = barrier_insertion_loss(freqs, 1.0, 50.0, 4.0, 100.0, 1.5)
+
+# Una línea: la sección a escala, con la diferencia de caminos anotada.
+il.plot_geometry(language="es")
+plt.show()
+```
+
+</details>
+
+## Relación con ISO 9613-2
+
+Los términos tabulados $A_{gr}$ y $D_z$ del
+[método ISO 9613-2](/phonometry/es/environment/propagation/outdoor-propagation/) son ajustes de
+ingeniería por banda de octava basados en energía; `ground_effect` y
+`barrier_insertion_loss` son sus contrapartes de banda estrecha por acústica
+ondulatoria. Sobre suelo rígido ambos coinciden en el realce de +6 dB y en el
+suelo de barrera rasante de 5 dB, pero solo los modelos ondulatorios resuelven
+las caídas de interferencia que se mueven con la geometría, la frecuencia y la
+impedancia del suelo, lo que los hace la infraestructura natural de los esquemas
+meteorológicos de Nord2000 y CNOSSOS.
+
+## Qué cubre esta guía
+
+**Cubierto.** El coeficiente de reflexión de onda esférica de Weyl-Van der
+Pol para el suelo (`ground_effect`, Attenborough Ec. 2.40a/c, Salomons
+Ec. 3.2/D.58, el factor de pérdida por frontera mediante la función de
+Faddeeva), con sus límites de suelo rígido (+6 dB), incidencia rasante y
+reciprocidad anclados como tests. La difracción de barrera por teoría
+ondulatoria (`barrier_insertion_loss`): la forma cerrada de Kurze-Anderson
+(`kurze_anderson_attenuation`, Bies Ec. 5.138), el semiplano rígido exacto
+(MacDonald / Hadden y Pierce, Attenborough Ecs. 9.19-9.20), las barreras
+gruesas mediante el número de Fresnel de doble arista (Bies Ec. 5.157), y el
+modelo coherente de barrera sobre suelo de cuatro caminos ponderado por el
+coeficiente de reflexión de `ground_effect`.
+
+**No cubierto.** Ambos modelos asumen una atmósfera homogénea, sin
+refracción ni turbulencia; un gradiente vertical de velocidad del sonido es
+el objeto de la guía separada de
+[refracción atmosférica](/phonometry/es/environment/propagation/atmospheric-refraction/).
+El modelo coherente de barrera sobre suelo pondera los cuatro caminos
+difractados con un único coeficiente de reflexión $Q$ calculado sobre la
+geometría global fuente-receptor, en lugar de un coeficiente distinto por
+camino imagen, así que es coherente y recíproco pero no una solución
+completa por elementos de contorno.

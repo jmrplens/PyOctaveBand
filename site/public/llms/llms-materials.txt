@@ -1,0 +1,585 @@
+# phonometry: Materials and surfaces
+
+Part of https://jmrplens.github.io/phonometry/llms.txt. Full text of the pages in this area.
+
+---
+
+<!-- source: docs/dynamic-stiffness.md | canonical: https://jmrplens.github.io/phonometry/materials/resilient/dynamic-stiffness/ -->
+Source: https://jmrplens.github.io/phonometry/materials/resilient/dynamic-stiffness/
+
+# Dynamic stiffness of resilient materials (EN 29052-1)
+
+A **floating floor** is a heavy floating slab resting on a resilient layer; the
+two form a mass-spring system whose **natural frequency** governs how much the
+floor improves impact and airborne insulation. **EN 29052-1:1992** (identical to
+ISO 9052-1:1989) measures the **dynamic stiffness per unit area** $s'$ of the
+resilient layer from the resonance of a standard load plate on a
+200 mm × 200 mm specimen. $s'$ is the input to the floating-floor term of the
+EN 12354-2 impact model covered in
+[Predicting Sound Insulation (EN 12354)](https://jmrplens.github.io/phonometry/buildings/design/insulation-prediction/). (ISO 16251-1 does not apply here:
+its scope is limited to soft, locally-reacting floor coverings and explicitly
+excludes floating floors.)
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/dynamic_stiffness_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/dynamic_stiffness.svg" alt="Floating-floor natural frequency as a function of the resilient layer's dynamic stiffness per unit area, for a light 40 kg/m² and a heavy 120 kg/m² floating floor, on a logarithmic stiffness axis, with a worked design point at 10 MN/m³ marked" width="82%"></picture>
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import materials
+
+# One line — from a measured resonance, the result draws its own f0(s')
+# design curve with the determination marked:
+res = materials.floating_floor_resonance(
+    resonant_frequency=25.0, total_mass_per_area=200.0,
+    floor_mass_per_area=120.0,
+    airflow_resistivity=50.0, thickness=0.020, porosity=0.9,
+)
+res.plot()
+plt.show()
+
+# By hand, the same design curve for a light and a heavy floating floor:
+s = np.logspace(np.log10(2.0), np.log10(100.0), 300)   # MN/m3
+for m in (40.0, 120.0):
+    plt.semilogx(s, materials.natural_frequency(s * 1e6, m), label=f"m' = {m:g} kg/m²")
+plt.xlabel("Dynamic stiffness s' [MN/m³]"); plt.ylabel("Natural frequency f₀ [Hz]")
+plt.legend(); plt.show()
+```
+
+</details>
+
+## 1. Dynamic stiffness and resonance
+
+The dynamic stiffness per unit area is a dynamic force per area divided by the
+resulting change in thickness (Formula 1): $s' = (F/S)/\Delta d$. The resiliently
+supported floor is a resonator whose natural frequency (Formula 2) and,
+in the laboratory arrangement, measured resonant frequency (Formula 3) are
+
+$$
+f_0 = \frac{1}{2\pi}\sqrt{\frac{s'}{m'}}, \qquad
+f_r = \frac{1}{2\pi}\sqrt{\frac{s'_t}{m'_t}},
+$$
+
+so the **apparent** dynamic stiffness follows from the resonance (Formula 4):
+
+$$
+s'_t = 4\pi^2\,m'_t\,f_r^2 .
+$$
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_dynamic_stiffness_rig_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_dynamic_stiffness_rig.svg" alt="ISO 9052-1 resonance rig: a vertical exciter and an accelerometer on the load plate over the 200 mm by 200 mm resilient specimen, read as a mass-spring system whose response peak gives the resonant frequency and the apparent dynamic stiffness" width="92%"></picture>
+
+In the test arrangement the specimen lies between the rigid foundation and a
+load plate whose total mass per unit area, plate plus added load, is
+200 kg/m² (8 kg on the 0.04 m² specimen). That load reproduces the static
+preload of a typical floating floor, about 2 kPa. A vertical exciter drives
+the plate, an accelerometer picks up its response, and the fundamental
+vertical resonance $f_r$ of the plate-on-specimen system is read from the
+response peak; Formula 4 turns it into $s'_t$.
+
+```python
+from phonometry import materials
+
+# Standard 8 kg load plate on the 0.04 m2 specimen -> m't = 200 kg/m2;
+# the fundamental resonance is measured at 25 Hz.
+s_t = materials.apparent_dynamic_stiffness(resonant_frequency=25.0, total_mass_per_area=200.0)
+print(round(s_t / 1e6, 3))                              # 4.935  MN/m3
+
+# Installed on a 120 kg/m2 floating screed with s' = 10 MN/m3:
+print(round(materials.natural_frequency(10e6, 120.0), 1))      # 45.9  Hz
+```
+
+That little oscillator is small enough to draw at true scale.
+`plot_dynamic_stiffness_rig` puts the standard 200 mm specimen under the 8 kg
+load plate with the exciter and accelerometer in place.
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/dynamic_stiffness_rig_geometry_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/dynamic_stiffness_rig_geometry.svg" alt="To-scale section of the dynamic-stiffness rig: the dotted 200 mm resilient specimen, 20 mm thick, on the hatched rigid foundation, the grey 8 kg load plate on top with the accelerometer ball at its edge, and the exciter block above driving the plate through a red vertical arrow, the specimen side and thickness dimensioned" width="92%"></picture>
+
+*The mass-spring system behind $s'$ at true scale: 20 mm of resilient layer
+under the 8 kg plate is all it takes to reproduce the 2 kPa preload of a
+floating floor.*
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+from phonometry import materials
+
+# The standard rig: a 200 mm square specimen under the 8 kg load plate.
+materials.plot_dynamic_stiffness_rig()
+plt.show()
+```
+
+</details>
+
+## 2. The enclosed-gas term and airflow resistivity
+
+For an air-permeable material the enclosed pore air adds a parallel stiffness
+from its isothermal compression (Formula 7):
+$s'_a = p_0/(d\,\varepsilon)$, with $p_0$ the atmospheric pressure, $d$ the
+loaded thickness and $\varepsilon$ the porosity. The standard's worked NOTE
+($p_0 = 0.1\ \text{MPa}$, $\varepsilon = 0.9$) is $s'_a = 111/d$ MN/m³ for
+$d$ in millimetres:
+
+```python
+from phonometry import materials
+
+print(round(materials.enclosed_gas_stiffness(thickness=0.020, porosity=0.9) / 1e6, 2))
+# 5.56  MN/m3   (the NOTE's 111/20 = 5.55 MN/m3)
+```
+
+The dynamic stiffness of the *installed* material is then set by the lateral
+airflow resistivity $r$ (clause 8.2): $s' = s'_t$ for
+$r \ge 100\ \text{kPa}\cdot\text{s/m}^2$, $s' = s'_t + s'_a$ for
+$10 \le r < 100\ \text{kPa}\cdot\text{s/m}^2$, and for
+$r < 10\ \text{kPa}\cdot\text{s/m}^2$ the method only resolves $s' = s'_t$
+when the gas term is negligible. `floating_floor_resonance`
+chains the whole determination:
+
+```python
+from phonometry import materials
+
+res = materials.floating_floor_resonance(
+    resonant_frequency=25.0, total_mass_per_area=200.0,
+    floor_mass_per_area=120.0,
+    airflow_resistivity=50.0, thickness=0.020, porosity=0.9,
+)
+print(round(res.dynamic_stiffness / 1e6, 2), round(res.natural_frequency, 1))
+# 10.49 47.1
+
+res.plot()   # the f0(s') design curve with this determination marked (needs matplotlib)
+```
+
+The `DynamicStiffnessResult` carries the apparent, enclosed-gas and installed
+stiffnesses, the test resonance and the installed-floor natural frequency, and
+its `.plot()` draws the $f_0(s')$ design curve.
+
+**Test-report fiche.** `DynamicStiffnessResult.report(path)` renders a one-page
+accredited dynamic-stiffness test report (EN 29052-1:1992 = ISO 9052-1:1989): a
+metadata header (specimen, the total mass per unit area $m'_t$, the loaded
+thickness $d$ in metres shown in mm, test facility, climate), a metrics table (the resonant frequency
+$f_r$, the apparent stiffness $s'_t$ of Formula 4, the enclosed-gas term $s'_a$
+when it applies, the installed $s'$ of clause 8.2 and the natural frequency
+$f_0$ of Formula 2) beside the $f_0(s')$ design curve, and a boxed apparent
+dynamic stiffness $s'_t$ (no pass/fail). Clause 9 rounds every stiffness to the
+nearest MN/m³; `language="es"` renders the Spanish fiche. The fiche always
+embeds the $f_0(s')$ design curve, so it needs both the report and plot extras
+(`pip install "phonometry[report,plot]"`).
+
+```python
+from phonometry import ReportMetadata, materials
+
+res = materials.floating_floor_resonance(
+    resonant_frequency=45.0, total_mass_per_area=200.0,
+    floor_mass_per_area=110.0,
+    airflow_resistivity=50.0, thickness=0.020, porosity=0.9,
+)
+res.report(
+    "dynamic_stiffness.pdf",
+    metadata=ReportMetadata(
+        specimen="20 mm mineral-wool resilient layer",
+        mass_per_area=200.0, thickness=0.020,   # thickness d in metres (20 mm)
+        measurement_standard="EN 29052-1",
+    ),
+)   # one-page fiche (needs phonometry[report,plot])
+```
+
+[![EN 29052-1 dynamic-stiffness example report: a metadata header with the total mass per unit area and the loaded thickness, a metrics table of the resonant frequency, the apparent, enclosed-gas and installed dynamic stiffnesses and the natural frequency beside the f0(s') design curve, and the boxed apparent dynamic stiffness s't](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/reports/en29052_dynamic_stiffness_example.webp)](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/reports/en29052_dynamic_stiffness_example.pdf)
+
+## 3. What the resonance method assumes, and where it bites
+
+The evaluation treats the rig as a single-degree-of-freedom system: the load
+plate moves as a rigid piston on a massless spring. That holds while the
+specimen is light against the plate and its first internal resonance sits
+well above $f_r$; a heavy or very thick layer starts to act as a distributed
+system and the simple Formula 4 reading degrades. Three practical pitfalls
+follow from the preload:
+
+* **$s'$ is a stiffness *at the standard preload*.** Resilient layers are
+  visibly non-linear in static load: mineral wool stiffens as it compresses,
+  some foams soften. The 200 kg/m² load plate fixes the operating point, so
+  the tabulated $s'$ strictly describes floors near that surface mass.
+  Designing a much heavier screed with the same $s'$ extrapolates beyond the
+  measurement.
+* **Drive small.** The tangent stiffness is defined for small dynamic
+  strains; driving the plate hard pushes the layer into its non-linear range
+  and shifts the apparent resonance downward. Keep the excitation at the
+  lowest level that gives a clean peak.
+* **Respect the contact.** The standard seats the load plate on a thin
+  bonding layer (a plaster paste) so the full specimen area carries the
+  load. A dry, uneven contact concentrates the force, stiffens the response
+  locally and biases $f_r$ upward.
+
+The natural frequency that matters in the end is not the rig's $f_r$ but the
+installed floor's $f_0$ from Formula 2: the floating floor only improves
+insulation well above $f_0$, which is why a low $s'$ (a soft layer under a
+heavy slab) is the design goal.
+
+## References
+
+- Vigran, T. E. (2008). *Building acoustics*. CRC Press.
+  ISBN 978-0-415-42853-8.
+  [doi:10.1201/9781482266016](https://doi.org/10.1201/9781482266016).
+  Floating-floor design and the role of the resilient layer's dynamic
+  stiffness in the impact-sound improvement.
+- International Organization for Standardization. (1989). *Acoustics —
+  Determination of dynamic stiffness — Part 1: Materials used under floating
+  floors in dwellings* (ISO 9052-1:1989).
+  [iso.org catalogue](https://www.iso.org/standard/16620.html).
+  The international original of EN 29052-1, the method this page implements.
+
+## Standards
+
+EN 29052-1:1992 (= ISO 9052-1:1989), *Acoustics — Determination
+of dynamic stiffness — Part 1: Materials used under floating floors in
+dwellings*: the dynamic stiffness per unit area (Formula 1), the resonance
+relations (Formulae 2-4), the enclosed-gas term (Formula 7, clause 8.2 NOTE
+$s'_a = 111/d$ MN/m³) and the airflow-resistivity regimes (clause 8.2, Formulae
+5-6). Conformance is anchored on the standard's own numeric NOTE plus
+hand-computed closed-form values of the resonance relations.
+
+---
+
+
+<!-- source: docs/road-absorption.md | canonical: https://jmrplens.github.io/phonometry/materials/surfaces/road-absorption/ -->
+Source: https://jmrplens.github.io/phonometry/materials/surfaces/road-absorption/
+
+# In-situ Road-Surface Absorption
+
+How much sound a road surface absorbs decides how loud its traffic is, and a
+core cannot be cut out of a motorway and carried to a laboratory. ISO 13472
+measures the absorption *in situ*, on the pavement as built, twice over. The
+**subtraction technique** of Part 1 fires an impulse from a loudspeaker down
+onto an extended surface and separates the incident and reflected components
+of one microphone's impulse response in time; the **spot method** of Part 2
+seals a short tube onto a small patch and hands the mathematics to the
+impedance-tube transfer-function method. This guide covers both, from the
+mandatory geometry and the Adrienne window to the sampled area and the
+plane-wave limits of the tube, and closes with the choice between them.
+
+## 1. Subtraction technique (ISO 13472-1)
+
+Out in the field there is no reverberation room. ISO 13472-1 measures the sound
+absorption of a road surface (or any extended flat surface) *in situ* by firing
+an impulse from a loudspeaker at height $d_s$ down onto the surface and recording
+the impulse response at a microphone at height $d_m$. The **incident** and
+**reflected** components are separated in time with an Adrienne window; their
+transfer function gives the reflection factor and hence the absorption.
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_insitu_subtraction_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_insitu_subtraction.svg" alt="ISO 13472-1 in-situ road absorption by the subtraction technique: a loudspeaker at 1.25 m and a microphone at 0.25 m above the road surface, with the direct and road-reflected ray paths and a free-field reference measurement, the reflected component isolated by an Adrienne time window" width="92%"></picture>
+
+**Geometrical spreading (Clause 4.1).** The reflected wave travels farther than
+the direct wave, so it is attenuated by the geometrical-spreading factor
+
+$$
+K_r = \frac{d_s - d_m}{d_s + d_m},
+$$
+
+which equals $2/3$ for the mandatory geometry $d_s = 1.25$ m, $d_m = 0.25$ m.
+The absorption follows from the windowed incident and reflected spectra
+$H_i$, $H_r$:
+
+$$
+\alpha(f) = 1 - \frac{1}{K_r^2}\left|\frac{H_r(f)}{H_i(f)}\right|^2.
+$$
+
+```python
+import numpy as np
+from phonometry import materials
+
+# A band-limited incident impulse response and a synthetic road reflection
+# hr = Kr * r0 * delayed(hi): a reflection of magnitude r0 = 0.4, delayed by the
+# extra path, and scaled by the geometrical-spreading factor Kr.
+fs, n = 48000.0, 4096
+t = np.arange(n) / fs
+hi = np.zeros(n)
+hi[:64] = np.hanning(64) * np.cos(2.0 * np.pi * 1500.0 * t[:64])
+
+kr = materials.geometric_spreading_factor()          # (ds - dm)/(ds + dm) = 2/3
+hr = kr * 0.4 * np.roll(hi, 96)
+
+# Narrow-band absorption, then reduced to one-third octaves over 250-4000 Hz.
+alpha = materials.insitu_absorption_coefficient(hi, hr)   # 1 - (1/Kr^2)|Hr/Hi|^2
+freq = np.fft.rfftfreq(n, 1.0 / fs)
+centres, band = materials.one_third_octave_absorption(freq, alpha)
+print(round(kr, 4))                # 0.6667
+print(round(float(band[2]), 3))    # 0.84  (alpha = 1 - 0.4^2 = 0.84)
+```
+
+**Adrienne window (Clause 6.4).** The time window that isolates the reflection
+mandates only a sharp leading edge, a 5 ms flat portion and a cosine-squared or
+Blackman-Harris trailing edge; the exact durations are reported per measurement,
+not fixed, so they are configurable here.
+
+```python
+from phonometry import materials
+
+# Default: 0.5 ms leading edge, 5 ms flat top, 5 ms Blackman-Harris trailing.
+w = materials.adrienne_window(48000.0)
+print(w.shape[0])          # 504 samples at 48 kHz
+print(round(float(w.max()), 3))   # 1.0  (flat top and edges meet at unity)
+```
+
+**End-to-end spectrum.** `insitu_absorption_spectrum` runs the whole chain (the
+windowed incident and reflected impulse responses to the narrow-band absorption
+and on to one-third-octave bands) and returns a plottable
+`InsituAbsorptionResult`:
+
+```python
+import numpy as np
+from phonometry import materials
+from scipy.signal import firwin, lfilter
+
+# A synthetic-but-realistic measurement. hi is a unit incident impulse; the road
+# reflection hr = Kr * r0 * roll(hi, shift) uses the geometrical-spreading
+# factor Kr, a mildly frequency-dependent r0 (a gentle low-pass, so a porous
+# surface reflects less as frequency rises) and the reflected-path delay
+# shift = round(2 dm / c * fs).
+fs, n = 48000.0, 8192
+kr = materials.geometric_spreading_factor()           # (ds - dm)/(ds + dm) = 2/3
+hi = np.zeros(n)
+hi[0] = 1.0
+taps = firwin(41, 1200.0, fs=fs)
+taps = taps / taps.sum()
+shift = int(round(2.0 * 0.25 / 340.0 * fs))     # reflected-path delay 2 dm / c
+hr = kr * 0.85 * np.roll(lfilter(taps, 1.0, hi), shift)
+
+result = materials.insitu_absorption_spectrum(hi, hr, fs)
+print(result.frequencies[[0, -1]].astype(int))     # [ 250 4000]
+print(np.round(result.absorption[[0, 6, 12]], 2))  # [0.31 0.65 1.  ]
+result.plot()   # alpha(f) bar chart over 250-4000 Hz (needs matplotlib)
+```
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/insitu_absorption_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/insitu_absorption.svg" alt="An in-situ one-third-octave road-surface absorption spectrum computed by the reflection-factor route from a synthetic road reflection, rising from about 0.3 at 250 Hz to near 1.0 above 2 kHz" width="88%"></picture>
+
+*The absorption rises with frequency because the surface reflects less of the
+high-frequency energy, exactly as the low-pass reflection factor $r_0(f)$
+dictates through $\alpha = 1 - (1/K_r^2)\,|H_r/H_i|^2$.*
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from scipy.signal import firwin, lfilter
+from phonometry import materials
+
+# A synthetic-but-realistic measurement. hi is a unit incident impulse; the road
+# reflection hr = Kr * r0 * roll(hi, shift) uses the geometrical-spreading
+# factor Kr, a mildly frequency-dependent r0 (a gentle low-pass, so a porous
+# surface reflects less as frequency rises) and the reflected-path delay
+# shift = round(2 dm / c * fs).
+fs, n = 48000.0, 8192
+kr = materials.geometric_spreading_factor()           # (ds - dm)/(ds + dm) = 2/3
+hi = np.zeros(n)
+hi[0] = 1.0
+taps = firwin(41, 1200.0, fs=fs)
+taps = taps / taps.sum()
+shift = int(round(2.0 * 0.25 / 340.0 * fs))     # reflected-path delay 2 dm / c
+hr = kr * 0.85 * np.roll(lfilter(taps, 1.0, hi), shift)
+result = materials.insitu_absorption_spectrum(hi, hr, fs)
+
+# result is the InsituAbsorptionResult computed above. One line:
+result.plot()
+plt.show()
+
+# By hand: a bar chart of alpha over the one-third-octave bands.
+freqs = result.frequencies
+positions = np.arange(freqs.size)
+fig, ax = plt.subplots()
+ax.bar(positions, np.nan_to_num(result.absorption), width=0.7, color="#1f77b4")
+ax.set_xticks(positions)
+ax.set_xticklabels([f"{f:g}" for f in freqs], rotation=45, ha="right")
+ax.set_xlabel("Frequency [Hz]")
+ax.set_ylabel("Absorption coefficient alpha")
+ax.set_ylim(0.0, 1.0)
+ax.set_title("In-situ road-surface absorption (ISO 13472-1)")
+plt.show()
+```
+
+</details>
+
+**Maximum sampled area (Annex A).** The finite time window limits how much of the
+surface contributes to the reflection. The maximum sampled area is a circle whose
+radius the library computes from the geometry and window width; the Annex A worked
+example ($d_s = 1.25$ m, $d_m = 0.25$ m, $c = 340$ m/s, 5 ms flat window) gives
+about 1.34 m.
+
+```python
+from phonometry import materials
+print(round(materials.max_sampled_area_radius(5.0e-3), 3))   # 1.343  (metres)
+```
+
+The whole arrangement fits in one to-scale drawing. `plot_insitu_geometry`
+draws the standard set-up with that sampled radius on the surface, and a
+measured `InsituAbsorptionResult` that retained its heights redraws its own
+with `result.plot_geometry()`.
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/insitu_setup_geometry_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/insitu_setup_geometry.svg" alt="To-scale side view of the in-situ absorption set-up: the loudspeaker on its mast 1.25 m above the hatched road surface, the microphone on the same vertical at 0.25 m, the dashed surface-reflected path below it and the 1.34 m radius of the sampled area dimensioned on the surface" width="88%"></picture>
+
+*The standard geometry to scale: source at 1.25 m, microphone at 0.25 m on the
+same vertical, and the 5 ms window turned into the 1.34 m radius of road that
+actually contributes to the reflection.*
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+from phonometry import materials
+
+# The standard geometry: source at 1.25 m, microphone at 0.25 m, and the
+# 1.34 m sampled-area radius of the 5 ms window.
+materials.plot_insitu_geometry()
+plt.show()
+
+# A measured spectrum retains its heights and redraws its own set-up:
+#   result = materials.insitu_absorption_spectrum(hi, hr, fs)
+#   result.plot_geometry()
+```
+
+</details>
+
+## 2. Spot method (ISO 13472-2)
+
+For smaller patches, ISO 13472-2 seals a short circular tube onto the surface and
+measures the absorption with the two-microphone transfer-function method of
+ISO 10534-2. The library provides the spot-method geometry and validity helpers;
+the transfer-function DSP itself is the impedance-tube routine
+`two_microphone_impedance` (see [Impedance Tube](https://jmrplens.github.io/phonometry/materials/absorbers/impedance-tube/)).
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_spot_tube_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_spot_tube.svg" alt="ISO 13472-2 spot method: a short circular tube sealed onto the road surface with a loudspeaker at the top and two microphones flush in the tube wall at spacing s, measuring absorption over 250 to 1600 Hz via the ISO 10534-2 two-microphone transfer-function method" width="92%"></picture>
+
+The apparatus is a portable impedance tube stood on end: a loudspeaker at the
+top, two flush-mounted microphones at spacing $s$ in the tube wall, and the
+road surface itself as the sample. A test fixture with a ring of deformable
+material (a rubber O-ring or similar) makes an airtight seal between the tube
+mouth and the pavement, so the patch under the mouth, not the leak around it,
+terminates the tube; the underside of that sealing device defines the plane
+of reference at which the reflection factor is evaluated. The method is
+written for **reflective** surfaces, dense asphalts and test tracks per
+ISO 10844 rather than open porous layers: the standard declares it unreliable
+once the measured absorption coefficient exceeds 0.15, and no longer calls a
+surface reflective above 0.10, because on an absorbing surface the reflected
+wave the two microphones must resolve all but vanishes. The tube samples only
+the circle under its mouth, so one reading is a spot in the statistical sense
+too: on regular roads the standard spaces measurement positions over the
+area of interest with an emphasis on the wheel tracks (as a guideline, one
+position every 10 m), on a surface that must be smooth, flat, free of debris
+and dry.
+
+**Plane-wave limits (Clause 5.4).** The tube supports only plane waves below
+
+$$
+f_u = 0.58\,\frac{c_0}{d},
+$$
+
+with $d$ the tube diameter, and the microphone spacing $s$ must sit between
+$0.05\,c_0/f_{min}$ and $0.45\,c_0/f_{max}$. The reported range is the
+one-third-octave bands 250–1600 Hz.
+
+```python
+from phonometry import materials
+
+# Upper usable frequency of a 100 mm tube and the valid spacing window.
+print(round(materials.spot_tube_upper_frequency(0.100, 343.0), 1))      # 1989.4 Hz
+s_min, s_max = materials.spot_microphone_spacing_bounds(
+    343.0, f_min=220.0, f_max=1800.0)
+print(round(s_min, 3), round(s_max, 3))    # 0.078 0.086  (metres)
+```
+
+The frequency window is the price of portability: the tube diameter that
+keeps the mouth sealable on real pavement caps the upper bands at 1600 Hz,
+and the tube length caps the lower ones at 250 Hz, a narrower window than the
+250–4000 Hz of the subtraction technique. Within it, the reduction is the
+ISO 10534-2 chain unchanged: the transfer function between the two
+microphones separates incident and reflected waves, and the standard's
+Annex A additionally subtracts the internal losses of the system (measured
+once against a rigid plate) so the tube's own dissipation is not billed to
+the road; that correction is `spot_internal_loss_correction`.
+
+## Subtraction or spot?
+
+The two parts of ISO 13472 are complements, not competitors, and Part 2's own
+introduction says both should give similar results between 315 Hz and
+1600 Hz while their fields of application differ:
+
+- **Surface type.** The subtraction technique handles the full range from
+  reflective to highly absorbing (porous asphalt included); the spot method
+  is scoped to reflective surfaces and declared unreliable above a measured
+  absorption of 0.15, where its confined reflected wave is no longer strong
+  enough to resolve.
+- **Sampled area.** The subtraction technique averages over a patch whose
+  Annex A clear zone extends to the 1.34 m maximum sampled-area radius of
+  section 1 (about 5.6 m² of pavement, with the area actually contributing
+  at each frequency set by the time window), a fair sample of texture and
+  joints; the spot method sees only the patch under
+  the tube mouth, so it trades spatial representativeness for the ability to
+  sit on a narrow strip, a wheel track, or a laboratory core.
+- **Bandwidth.** 250–4000 Hz against 250–1600 Hz, which matters because the
+  tyre-road noise the measurement usually serves peaks around 1 kHz but has
+  content beyond the spot method's ceiling.
+- **Logistics.** The subtraction rig needs a mast, a free-field reference
+  measurement and a pause in traffic; the spot tube needs a flat, sealable
+  patch and minutes per point. Surface types and acceptance criteria aside,
+  that practical difference is usually what decides.
+
+Both methods report the same quantity, the normal-incidence absorption
+coefficient in one-third-octave bands, so a low-absorption lane can be
+surveyed with the spot tube and anchored with a subtraction measurement at a
+few positions.
+
+## See also
+
+- [Impedance Tube](https://jmrplens.github.io/phonometry/materials/absorbers/impedance-tube/): the ISO 10534-2 two-microphone method
+  the spot tube defers its mathematics to, and the laboratory instrument the
+  spot method miniaturises.
+- [Diffusers and Their Coefficients](https://jmrplens.github.io/phonometry/materials/diffusers/diffusers/): the other family of
+  surface measurements, grading where a surface sends its reflection rather
+  than how much it absorbs.
+- [Sound Absorption Measurement and Rating](https://jmrplens.github.io/phonometry/materials/absorbers/absorption-measurement/): the
+  laboratory (reverberation-room) absorption measurement and its rating, for
+  materials that can be brought indoors.
+- [Outdoor Sound Propagation](https://jmrplens.github.io/phonometry/environment/propagation/outdoor-propagation/): where the absorption
+  of the ground surface enters the propagation models.
+- API reference: [`materials.surfaces.road_absorption`](https://jmrplens.github.io/phonometry/reference/api/materials/road-absorption/).
+
+## References
+
+- International Organization for Standardization. (2002). *Acoustics —
+  Measurement of sound absorption properties of road surfaces in situ —
+  Part 1: Extended surface method* (ISO 13472-1:2002, the edition
+  implemented here; since revised as
+  [ISO 13472-1:2022](https://www.iso.org/standard/77032.html)).
+  [iso.org catalogue](https://www.iso.org/standard/35387.html).
+  The subtraction technique of section 1: the mandatory geometry, the
+  Adrienne window and the Annex A sampled-area radius.
+- International Organization for Standardization. (2010). *Acoustics —
+  Measurement of sound absorption properties of road surfaces in situ —
+  Part 2: Spot method for reflective surfaces* (ISO 13472-2:2010, the
+  edition implemented here; since revised as
+  [ISO 13472-2:2025](https://www.iso.org/standard/84925.html)).
+  [iso.org catalogue](https://www.iso.org/standard/32304.html).
+  The spot method of section 2: the plane-wave limits, the microphone
+  spacing window and the deferral to ISO 10534-2.
+- International Organization for Standardization. (1998). *Acoustics —
+  Determination of sound absorption coefficient and impedance in impedance
+  tubes — Part 2: Transfer-function method* (ISO 10534-2:1998).
+  [iso.org catalogue](https://www.iso.org/standard/22851.html).
+  The two-microphone transfer-function reduction the spot method reuses,
+  implemented in the [Impedance Tube](https://jmrplens.github.io/phonometry/materials/absorbers/impedance-tube/) guide.
+
+## Standards
+
+ISO 13472-1:2002 (in-situ absorption, extended surface) and ISO 13472-2:2010
+(in-situ absorption, spot method); the spot method's transfer-function DSP is
+the ISO 10534-2:1998 routine of the [Impedance Tube](https://jmrplens.github.io/phonometry/materials/absorbers/impedance-tube/)
+guide. Both road standards have since been revised (ISO 13472-1:2022,
+ISO 13472-2:2025); the earlier editions are the implemented ones. Numerical
+conformance against the standards' worked examples and closed forms is
+tracked in [CONFORMANCE.md](https://jmrplens.github.io/phonometry/reference/conformance/).
+
+---

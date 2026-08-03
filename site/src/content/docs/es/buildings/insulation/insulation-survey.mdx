@@ -1,0 +1,278 @@
+---
+title: "Método de control del aislamiento (ISO 10052)"
+description: "El método de control (survey) del aislamiento acústico de ISO 10052: bandas de octava, un sonómetro de mano y el índice de reverberación en lugar de tiempos de reverberación por banda, con las magnitudes aéreas, de impacto, de fachada y de equipamiento y sus fichas."
+references:
+  - type: book
+    authors: ["Vigran, T. E."]
+    year: 2008
+    title: "Building acoustics"
+    publisher: "CRC Press"
+    doi: "10.1201/9781482266016"
+    note: "El contexto de acústica de la edificación de las magnitudes de campo que el método de control aproxima. ISBN 978-0-415-42853-8."
+  - type: standard
+    organization: "International Organization for Standardization"
+    year: 2021
+    title: "Acoustics — Field measurements of airborne and impact sound insulation and of service equipment sound — Survey method"
+    designation: "ISO 10052:2021"
+    url: "https://www.iso.org/standard/76560.html"
+    note: "El método de control en campo: la corrección por índice de reverberación, las magnitudes aérea, de impacto y de fachada estandarizadas/normalizadas, y el ruido de equipos de servicio. Las fórmulas y la tabla del índice de reverberación son idénticas en la armonizada EN ISO 10052:2004+A1:2010."
+---
+
+import ThemeImage from '../../../../../components/ThemeImage.astro';
+import ReportPreview from '../../../../../components/ReportPreview.astro';
+
+No toda pregunta merece una medición de ingeniería completa. Cuando una
+disputa necesita un número esta misma tarde, ISO 10052 cambia exactitud por
+rapidez: bandas de octava, un sonómetro de mano y un único índice de
+corrección en lugar de tiempos de reverberación por banda. Esta guía cubre
+el método de control (survey): el índice de reverberación y su estimación
+por clase de recinto, las magnitudes aéreas, de impacto, de fachada y de
+equipamiento, y las fichas del método. Los métodos de grado de ingeniería
+viven en
+[Medición del aislamiento en campo (ISO 16283)](/phonometry/es/buildings/insulation/insulation-field/);
+los motores de número único tras los índices del método de control en
+[Índices globales de aislamiento (ISO 717)](/phonometry/es/buildings/insulation/insulation-ratings/).
+
+## Bandas de octava y el índice de reverberación
+
+Los métodos de ingeniería anteriores compran precisión con esfuerzo:
+micrófonos barridos, tiempos de reverberación por banda, corrección de ruido de
+fondo cuidadosa. Para una comprobación rápida en una vivienda, ISO 10052 define
+un **método de control (survey)**: bandas de octava, un sonómetro de mano y una
+sola magnitud, el **índice de reverberación** $k = 10\log_{10}(T/T_0)$
+($T_0 = 0{,}5\ \text{s}$), que arrastra la corrección del recinto receptor.
+Cada magnitud del control es entonces una simple suma de $k$: la diferencia
+de niveles estandarizada $D_{nT} = D + k$, la normalizada
+$D_n = D + k + 10\log_{10}(A_0 T_0/(0{,}16\,V))$, la aparente
+$R' = D + k + 10\log_{10}(S T_0/(0{,}16\,V))$ (usando $V/7{,}5$ como $S$ cuando es
+mayor) y, para impactos y fachadas, $L'_{nT} = L_i - k$ y
+$D_{2m,nT} = D_{2m} + k$. Las referencias a
+cláusulas siguen ISO 10052:2021; las fórmulas y la tabla del índice de
+reverberación son idénticas en la armonizada EN ISO 10052:2004+A1:2010.
+
+El índice de reverberación se **mide** (pasa el tiempo de reverberación a
+`reverberation_index(T)`) o, en un control, se **estima** a partir del tipo de
+sala y el volumen con `estimate_reverberation_index(V, room)` (Tabla 4:
+amueblada `"kitchen"` / `"bathroom"` / `"furnished"`, o las clases de
+construcción sin amueblar `"a"`–`"h"` y las mixtas `"a+e"`…`"d+h"`). Una cuarta
+magnitud propia de este método es el **ruido de equipos de servicio**
+$L_{XY}$: la
+media energética de tres posiciones ponderadas A o C.
+
+```python
+import numpy as np
+from phonometry import building
+
+# Niveles por banda de octava (125-2000 Hz) y el T medido del recinto receptor.
+l1 = np.array([88.0, 90.0, 92.0, 92.0, 90.0])
+l2 = np.array([55.0, 51.0, 47.0, 41.0, 35.0])
+k = building.reverberation_index([0.70, 0.60, 0.50, 0.45, 0.40])   # k = 10 lg(T/0.5)
+res = building.survey_airborne_insulation(l1, l2, k, volume=50.0, area=12.0)
+print(np.round(res.d_nt, 1))          # [34.5 39.8 45.  50.5 54. ]  DnT = D + k
+print(res.rating.rating, res.rating.c)        # 49 -1  ->  DnT,w (C)
+print(res.r_prime_rating.rating)               # 48  ->  R'w
+
+# ¿Sin T medido? Estima k con la Tabla 4 (paredes pesadas, suelo duro,
+# 35-60 m³ -> clase "g").
+k_est = building.estimate_reverberation_index(50.0, "g")
+print(k_est)                                   # [4.5 5.  5.5 5.5 5.5]
+
+# Ruido de equipos de servicio: media energética de tres posiciones (dB(A)).
+se = building.survey_service_equipment_level([35.0, 30.0, 32.0], 3.0, volume=50.0)
+print(round(float(se.l_xy), 1), round(float(se.l_xy_nt), 1))   # 32.8 29.8
+
+res.plot()   # DnT vs curva de referencia ISO 717-1 desplazada (necesita matplotlib)
+```
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/survey_insulation_es.svg" alt="Aislamiento a ruido aéreo por el método de control: la diferencia de niveles bruta D y la estandarizada DnT en las cinco bandas de octava, con la corrección por índice de reverberación k sombreada entre ambas" width="80%" />
+
+*El índice de reverberación $k = 10\log_{10}(T/T_0)$ desplaza la diferencia de
+niveles bruta $D$ hacia la estandarizada $D_{nT}$: hacia arriba donde la sala
+es viva ($T > T_0$), hacia abajo donde es apagada. El índice automático solo
+se forma con
+exactamente 5 valores de octava (o 16 de tercio de octava).*
+
+<details>
+<summary>Mostrar el código de esta figura</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import building
+
+# Niveles por bandas de octava (125-2000 Hz) y el T medido del recinto receptor.
+bands = [125, 250, 500, 1000, 2000]
+l1 = np.array([88.0, 90.0, 92.0, 92.0, 90.0])
+l2 = np.array([55.0, 51.0, 47.0, 41.0, 35.0])
+k = building.reverberation_index([0.70, 0.60, 0.50, 0.45, 0.40])   # k = 10 lg(T/0.5)
+res = building.survey_airborne_insulation(l1, l2, k, volume=50.0)
+
+x = np.arange(len(bands))
+fig, ax = plt.subplots()
+ax.fill_between(x, res.d, res.d_nt, alpha=0.2, label="k = 10 log10(T/T0)")
+ax.plot(x, res.d, "--o", label="D (diferencia de niveles)")
+ax.plot(x, res.d_nt, "-s", label="DnT (estandarizada)")
+ax.set_xticks(x, [str(b) for b in bands])
+ax.set(xlabel="Frecuencia [Hz]", ylabel="Diferencia de niveles [dB]",
+       title=f"Método de control ISO 10052: DnT,w = {res.rating.rating} dB")
+ax.legend()
+plt.show()
+```
+
+</details>
+
+### Parámetros de `survey_airborne_insulation()` y afines
+
+| Parámetro | Tipo | Unidades | Rango / def. | Notas |
+| :--- | :--- | :--- | :--- | :--- |
+| `l1` / `l2` | array 1D o 2D | dB | uno/banda, o `(posiciones, bandas)` | Niveles emisor / receptor (o exterior `l1_2m`) |
+| `li` | array 1D o 2D | dB | uno/banda, o `(posiciones, bandas)` | Niveles de impacto (media energética de posiciones) |
+| `reverberation_index` | escalar o array 1D | dB | uno por banda | $k$ de `reverberation_index` o `estimate_reverberation_index`; `survey_service_equipment_level()` también acepta un $k$ escalar |
+| `volume` | float | m³ | > 0 | Volumen receptor $V$ (para $D_n$ / $L'_n$ / $R'$ / normalizadas) |
+| `area` | float | m² | > 0 | Área de partición común $S$ (aéreo $R'$; regla $V/7{,}5$) |
+| `measurements` | array | dB | exactamente 3 | Posiciones de equipo de servicio (`survey_service_equipment_level`) |
+| `room` | str | — | `"kitchen"`/`"bathroom"`/`"furnished"`/`"a"`–`"h"`/`"a+e"`… | Clase de sala para `estimate_reverberation_index` (Tabla 4) |
+
+`survey_airborne_insulation()` devuelve un `SurveyAirborneResult` (`d`, `d_nt`,
+`d_n`, `r_prime`, `rating`, `r_prime_rating`); `survey_impact_insulation()` un
+`SurveyImpactResult` (`l_i`, `l_nt`, `l_n`, `rating`);
+`survey_facade_insulation()` un `SurveyFacadeResult`;
+`survey_service_equipment_level()` un `SurveyServiceEquipmentResult` (`l_xy`,
+`l_xy_nt`, `l_xy_n`).
+
+## Informes del método de control ISO 10052 (`.report()`)
+
+Los resultados de control a ruido aéreo, de impactos y de fachada llevan cada
+uno un `.report(path)` que escribe el informe de campo del método de control
+(survey) ISO 10052 de una página: la línea de base normativa que nombra la
+ISO 10052 (bandas de octava), una cabecera de metadatos opcional, la tabla en
+bandas de octava junto a la curva medida frente a la referencia desplazada, el
+índice de campo en su recuadro ($D_{nT,w}$/$R'_w$, $L'_{nT,w}$ o
+$D_{2m,nT,w}$), la
+declaración del método de control, un veredicto opcional (las diferencias de
+niveles cumplen si igualan o superan el requisito, y el nivel de impactos si lo
+iguala o queda por debajo) y un pie. El resultado a ruido aéreo informa
+`quantity="dnt"` (por defecto) o `"r_prime"`; `verbose=True`, `metadata` y
+`language="es"` se comportan igual que en las fichas anteriores.
+
+```python
+import numpy as np
+
+from phonometry import building, ReportMetadata
+
+res.report("DnTw_survey.pdf",
+           metadata=ReportMetadata(requirement=40.0))   # DnT,w (C; Ctr)
+
+# Los controles de impactos y fachada reutilizan la misma k; li es el nivel de
+# la máquina de impactos en la sala inferior, l1_2m el nivel a 2 m de la fachada.
+li = np.array([66.0, 64.0, 62.0, 60.0, 55.0])
+impact = building.survey_impact_insulation(li, k, volume=50.0)
+impact.plot()   # L'nT frente a la referencia ISO 717-2 desplazada (requiere matplotlib)
+impact.report("LnTw_survey.pdf")                         # L'nT,w (CI)
+
+l1_2m = np.array([76.0, 78.0, 79.0, 79.0, 77.0])
+facade = building.survey_facade_insulation(l1_2m, l2, k, volume=40.0)
+facade.report("D2mnTw_survey.pdf")                       # D2m,nT,w (C; Ctr)
+```
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/survey_impact_insulation_es.svg" alt="Aislamiento a impactos por el método de control: el nivel de impactos medido Li en bandas de octava y el L'nT estandarizado con la corrección por índice de reverberación sombreada entre ambos, el índice L'nT,w anotado y una nota de que una sala viva reduce el nivel de impactos estandarizado" width="80%" />
+
+*El control de impactos aplica el índice de reverberación con el signo
+contrario, $L'_{nT} = L_i - k$: un recinto receptor vivo ($T > T_0$)
+**reduce** el
+nivel de impactos estandarizado. Como en el caso aéreo, el índice automático
+aparece para exactamente 5 valores de octava (o 16 de tercio de octava).*
+
+<details>
+<summary>Mostrar el código de esta figura</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import building
+
+# Niveles de la máquina de impactos bajo el suelo, en octavas, y la T medida.
+bands = [125, 250, 500, 1000, 2000]
+li = np.array([66.0, 64.0, 62.0, 60.0, 55.0])
+k = building.reverberation_index([0.70, 0.60, 0.50, 0.45, 0.40])
+impact = building.survey_impact_insulation(li, k, volume=50.0)
+
+# Una línea: L'nT frente a la referencia ISO 717-2 desplazada:
+impact.plot(language="es")
+plt.show()
+
+# A mano, mostrando el cambio de signo de la corrección:
+x = np.arange(len(bands))
+fig, ax = plt.subplots()
+ax.fill_between(x, impact.l_i, impact.l_nt, alpha=0.2, label="-k = -10 log10(T/T0)")
+ax.plot(x, impact.l_i, "--o", label="Li (nivel de impactos)")
+ax.plot(x, impact.l_nt, "-s", label="L'nT (estandarizado)")
+ax.set_xticks(x, [str(b) for b in bands])
+ax.set(xlabel="Frecuencia [Hz]",
+       ylabel="Nivel de presión acústica de impactos [dB]",
+       title=f"Método de control ISO 10052: L'nT,w = {impact.rating.rating} dB")
+ax.legend()
+plt.show()
+```
+
+</details>
+
+<ReportPreview
+	name="iso10052_airborne_example"
+	title="Informe de ejemplo a ruido aéreo del control ISO 10052 (PDF)"
+	description="Informe de campo de aislamiento a ruido aéreo por el método de control entre viviendas de una página: la cabecera de metadatos, la tabla DnT en bandas de octava junto a la curva medida frente a la referencia desplazada, el índice DnT,w (C; Ctr) en su recuadro, la declaración del método de control y un veredicto CUMPLE."
+	caption="Ficha a ruido aéreo de control (SurveyAirborneResult.report), DnT,w (C; Ctr)."
+/>
+
+<ReportPreview
+	name="iso10052_impact_example"
+	title="Informe de ejemplo a impactos del control ISO 10052 (PDF)"
+	description="Informe de campo de aislamiento a ruido de impactos por el método de control para un suelo bajo la máquina de impactos: la cabecera de metadatos, la tabla L'nT en bandas de octava junto a la curva medida frente a la referencia desplazada, el índice L'nT,w (CI) en su recuadro, la declaración del método de control y un veredicto CUMPLE (un nivel de impactos menor es mejor)."
+	caption="Ficha a impactos de control (SurveyImpactResult.report), L'nT,w (CI)."
+/>
+
+<ReportPreview
+	name="iso10052_facade_example"
+	title="Informe de ejemplo de fachada del control ISO 10052 (PDF)"
+	description="Informe de campo de aislamiento acústico de fachada por el método de control de una página: la cabecera de metadatos, la tabla D2m,nT en bandas de octava junto a la curva medida frente a la referencia desplazada, el índice D2m,nT,w (C; Ctr) en su recuadro, la declaración del método de control y un veredicto CUMPLE."
+	caption="Ficha de fachada de control (SurveyFacadeResult.report), D2m,nT,w (C; Ctr)."
+/>
+
+## Qué cubre esta guía
+
+**Cubierto.** El método de control de ISO 10052:2021: el índice de
+reverberación $k = 10\log_{10}(T/T_0)$ medido con
+`building.reverberation_index` o estimado desde las clases de recinto de la
+Tabla 4 con `building.estimate_reverberation_index`; las magnitudes de
+control aéreas, de impacto y de fachada ($D_{nT}$, $D_n$, $R'$ con la regla
+$V/7,5$, $L'_{nT}$, $L'_n$, $D_{2m,nT}$) mediante
+`building.survey_airborne_insulation`, `building.survey_impact_insulation`
+y `building.survey_facade_insulation`; el ruido de equipamiento $L_{XY}$
+desde exactamente tres posiciones mediante
+`building.survey_service_equipment_level`; los índices ISO 717 automáticos
+sobre espectros de 5 octavas o 16 tercios; y las fichas del método con
+`.report()`.
+
+**No cubierto.** El propio procedimiento de control (dónde sostener el
+sonómetro, las alturas de medición fijas, la colocación de la máquina de
+impactos del método) no se comprueba: las funciones consumen niveles por
+banda vengan de donde vengan. La corrección de ruido de fondo es tarea de
+quien llama, como en los métodos de ingeniería. La declaración de exactitud
+del método frente a ISO 16283 se cita de la norma, no se modela; cuando
+sube lo que hay en juego, pasa a
+[Medición del aislamiento en campo (ISO 16283)](/phonometry/es/buildings/insulation/insulation-field/).
+
+## Véase también
+
+- [Medición del aislamiento en campo (ISO 16283)](/phonometry/es/buildings/insulation/insulation-field/):
+  las mediciones de grado de ingeniería aéreas, de impacto y de fachada que
+  este método aproxima, y su incertidumbre ISO 12999-1.
+- [Índices globales de aislamiento (ISO 717)](/phonometry/es/buildings/insulation/insulation-ratings/):
+  los motores de curva de referencia tras los índices del método de control.
+- [Acústica de salas](/phonometry/es/buildings/rooms/room-acoustics/): los tiempos de
+  reverberación medidos tras el índice de reverberación.
+- [Niveles](/phonometry/es/signal/levels/levels/): el promediado en energía tras
+  los niveles en bandas de octava.
+- [Teoría](/phonometry/es/reference/theory/rooms-buildings/): la derivación
+  de la curva de referencia tras los índices globales ponderados.
+- Referencia de la API: [`building.measurement.survey_insulation`](/phonometry/es/reference/api/building/survey-insulation/).

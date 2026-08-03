@@ -28,7 +28,7 @@ body:
     attributes:
       label: Page
       description: Link to the page on the documentation site, or the file under docs/.
-      placeholder: "https://jmrplens.github.io/phonometry/guides/filter-banks/"
+      placeholder: "https://jmrplens.github.io/phonometry/signal/filters/filter-banks/"
     validations:
       required: false
 

@@ -1,0 +1,340 @@
+---
+title: "Distorsión con barridos y utilidades de fase"
+description: "Separación de la distorsión armónica con un solo barrido exponencial (el método de Farina con el barrido sincronizado de Novak et al. para fases armónicas coherentes), THD en función de la frecuencia de excitación, y las utilidades de fase: fase mínima desde la magnitud vía cepstrum real, retardo de grupo y exceso de fase."
+references:
+  - type: report
+    authors: ["Farina, A."]
+    year: 2000
+    title: "Simultaneous measurement of impulse response and distortion with a swept-sine technique"
+    organization: "Audio Engineering Society"
+    number: "108th AES Convention, Paris, preprint 5093"
+    url: "https://www.aes.org/e-lib/browse.cfm?elib=10211"
+    note: "La deconvolución del barrido exponencial y el empaquetado L·ln(n) de cada orden de distorsión por delante de la respuesta al impulso lineal."
+  - type: article
+    authors: ["Novak, A.", "Lotton, P.", "Simon, L."]
+    year: 2015
+    title: "Synchronized swept-sine: Theory, application and implementation"
+    journal: "Journal of the Audio Engineering Society"
+    volume: 63
+    issue: 10
+    pages: "786-798"
+    doi: "10.17743/jaes.2015.0071"
+    note: "La condición de sincronización que convierte las fases armónicas en propiedades del sistema, el espectro en forma cerrada del filtro inverso usado en la deconvolución y la separación con precisión sub-muestra."
+  - type: article
+    authors: ["Müller, S.", "Massarani, P."]
+    year: 2001
+    title: "Transfer-function measurement with sweeps"
+    journal: "Journal of the Audio Engineering Society"
+    volume: 49
+    issue: 6
+    pages: "443-471"
+    url: "https://www.aes.org/e-lib/browse.cfm?elib=10189"
+    note: "La monografía de medición con barridos detrás de las notas de práctica: filtros inversos, fundidos y el rechazo de la distorsión en la respuesta al impulso lineal."
+  - type: book
+    authors: ["Bendat, J. S.", "Piersol, A. G."]
+    year: 2010
+    title: "Random data: Analysis and measurement procedures"
+    edition: "4.ª ed."
+    publisher: "Wiley"
+    doi: "10.1002/9781118032428"
+    note: "Sección 13.1.4: la relación de transformada de Hilbert entre log-magnitud y fase detrás de la reconstrucción de fase mínima. ISBN 978-0-470-24877-5."
+---
+
+import ThemeImage from '../../../../../components/ThemeImage.astro';
+
+Un solo barrido sinusoidal exponencial caracteriza a la vez la respuesta
+lineal y todos los órdenes de distorsión armónica de un sistema débilmente
+no lineal. Tras la deconvolución, los productos de distorsión de
+orden $n$ se empaquetan en respuestas al impulso separadas que *preceden* a
+la respuesta lineal con el adelanto fijo (Farina 2000)
+
+$$
+\Delta t_n = T\,\frac{\ln n}{\ln (f_2/f_1)} = L \ln n ,
+\qquad L = \frac{T}{\ln(f_2/f_1)} ,
+$$
+
+de modo que ventanear cada llegada produce las **respuestas en frecuencia
+armónicas** $H_1(f), H_2(f), \dots, H_N(f)$ y, a partir de ellas, la distorsión
+armónica total en función de la frecuencia de excitación con un barrido en
+lugar de un recorrido tono a tono. Esta página cubre esa separación en
+`phonometry.electroacoustics`, con el **barrido sincronizado** de Novak,
+Lotton y Simon (2015), coherente en fase, como método por defecto, y las
+**utilidades de fase** que la acompañan en `phonometry.signals`: fase
+mínima desde $|H|$, retardo de grupo y exceso de fase.
+
+## 1. Un barrido, todos los armónicos
+
+En un barrido exponencial la frecuencia instantánea crece como
+$f(t) = f_1 e^{t/L}$, así que en el momento en que la excitación pasa por
+$f$, el producto de distorsión del armónico n aparece en $n f$: exactamente
+donde estará el propio barrido $L\ln(n)$ segundos después. Deconvolucionar
+la grabación contra el barrido comprime por tanto cada orden en su propia
+respuesta al impulso, $L\ln(n)$ *antes* de la lineal.
+`swept_sine_distortion` ventanea cada llegada (con el alineado exacto de
+fracción de muestra), la transforma en $H_n(f)$ y lee la distorsión de orden
+$n$ a la frecuencia de excitación $f$ de $|H_n(n f)|$:
+
+$$
+\mathrm{THD}(f) =
+\frac{\sqrt{\sum_{n\ge 2} |H_n(nf)|^2}}{|H_1(f)|} .
+$$
+
+La cadena es exactamente el esquema siguiente: reproducir el barrido, grabar,
+convolucionar con el filtro inverso, y los armónicos caen por delante de la
+respuesta lineal con sus adelantos fijos.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_swept_sine_es.svg" alt="Cadena de medición de distorsión con barrido senoidal: un barrido exponencial de 20 Hz a 6 kHz en T igual a 4 s excita el dispositivo débilmente no lineal, la grabación se deconvoluciona con el filtro inverso invertido en el tiempo con su pendiente de +6 dB por octava, y en el eje temporal resultante la respuesta al impulso lineal h1 queda en t igual a cero mientras las respuestas de los armónicos segundo, tercero y cuarto aparecen como prellegadas menores en sus propias ventanas discontinuas, adelantadas L por ln n, 0,49 s para h2 y 0,77 s para h3 con L igual a 0,70 s" width="92%" />
+
+```python
+import numpy as np
+from phonometry import swept_sine_distortion, synchronized_sweep_signal
+
+fs, f1, f2, seconds = 48000, 20.0, 6000.0, 4.0
+x = synchronized_sweep_signal(fs, f1, f2, seconds)   # reproducir esto...
+# ... grabar la respuesta del dispositivo en `y` (con su cola de caída) ...
+res = swept_sine_distortion(y, fs, f1, f2, seconds, n_harmonics=3)
+
+res.harmonic_responses    # H1..H3 complejas sobre res.frequencies
+res.thd, res.thd_frequencies
+res.distortion_ratios     # |Hn(n f)| / |H1(f)| por orden
+res.plot()                # magnitudes |Hn| + THD(f)
+```
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/swept_sine_thd_es.svg" alt="Distorsión armónica total y razones del segundo y tercer armónico de un polinomio cúbico seguido de un paso bajo de 3 kHz, frente a la frecuencia de excitación: cada orden se asienta exactamente en su nivel de Chebyshev a baja frecuencia y cae donde su propio producto cruza el corte del filtro" width="82%" loading="eager" />
+
+<details>
+<summary>Mostrar el código de esta figura</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from scipy import signal as sp_signal
+from phonometry import swept_sine_distortion, synchronized_sweep_signal
+
+fs, f1, f2, seconds = 48000, 20.0, 6000.0, 4.0
+a2, a3 = 0.12, 0.08
+x = synchronized_sweep_signal(fs, f1, f2, seconds)
+b, a = sp_signal.butter(2, 3000.0, fs=fs)             # postfiltro de 3 kHz
+y = sp_signal.lfilter(b, a, x + a2 * x**2 + a3 * x**3)
+res = swept_sine_distortion(y, fs, f1, f2, seconds, n_harmonics=3)
+
+h1 = 1.0 + 3.0 * a3 / 4.0                              # ganancia de Chebyshev
+fig, ax = plt.subplots(figsize=(10, 6))
+ax.loglog(res.thd_frequencies, 100.0 * res.thd, label="THD(f) total")
+ax.loglog(res.thd_frequencies, 100.0 * res.distortion_ratios[0],
+          ls="--", label="2º armónico d2(f)")
+ax.loglog(res.thd_frequencies, 100.0 * res.distortion_ratios[1],
+          ls="--", label="3er armónico d3(f)")
+ax.axhline(100.0 * (a2 / 2.0) / h1, ls=":",
+           label="Asíntota de Chebyshev (a2/2)/H1")
+ax.axhline(100.0 * (a3 / 4.0) / h1, ls=":",
+           label="Asíntota de Chebyshev (a3/4)/H1")
+ax.set_xlabel("Frecuencia de excitación [Hz]")
+ax.set_ylabel("Distorsión respecto al fundamental [%]")
+ax.legend()
+plt.show()
+```
+
+</details>
+
+El oráculo detrás de la implementación es el polinomio sin memoria: excitar
+$y = x + a_2 x^2 + a_3 x^3$ con un barrido unitario debe devolver, por las
+identidades de Chebyshev, $|H_1| = 1 + 3a_3/4$, $|H_2| = a_2/2$ (fase $-\pi/2$),
+$|H_3| = a_3/4$ (fase $\pi$) y $\mathrm{THD} = \sqrt{(a_2/2)^2 + (a_3/4)^2}/(1 + 3a_3/4)$. Las
+suites de tests y de conformidad fijan los cuatro valores, y la misma THD
+medida tono a tono con `phonometry.thd` coincide al 0,1 %.
+
+## 2. El barrido sincronizado (Novak et al. 2015)
+
+El ventaneado separa las *magnitudes* armónicas con cualquier barrido
+exponencial, pero las *fases* de $H_2 \dots H_N$ solo tienen sentido si retrasar
+el barrido $L\ln(n)$ equivale exactamente a generar su armónico n. Eso solo
+se cumple para
+
+$$
+x(t) = \sin\!\big[2\pi f_1 L\, e^{t/L}\big],
+\qquad
+L = \frac{1}{f_1}\,\mathrm{round}\!\Big(\frac{f_1\,\tilde T}{\ln(f_2/f_1)}\Big),
+$$
+
+el **barrido sincronizado**: el redondeo hace que $f_1 L$ sea entero, así
+que el barrido arranca con fase cero y todas las copias armónicas quedan
+alineadas. `synchronized_sweep_signal` lo genera (la duración queda
+ligeramente cuantizada; cuando $f_2/f_1$ es entero el barrido también termina
+con fase cero), y `swept_sine_distortion(..., method="synchronized")`, el
+método por defecto, deconvoluciona con el espectro en forma cerrada del
+filtro inverso,
+
+$$
+\tilde X(f) = 2\sqrt{f/L}\;
+e^{-j 2\pi f L\,(1 - \ln(f/f_1)) + j\pi/4},
+$$
+
+en lugar de con una FFT de la señal. Además de exacta, la deconvolución
+analítica extiende la banda útil de cada $H_n$ hasta $[n f_1, n f_2]$
+(Novak et al., Fig. 6): el segundo armónico de un barrido de 6 kHz se mide
+hasta 12 kHz.
+
+Dos notas prácticas del artículo vienen incorporadas: la media de la
+grabación se resta por defecto (`remove_dc=True`; un offset de continua
+filtra si no una copia escalada del filtro inverso en la respuesta al
+impulso), y la parte no entera de cada llegada $L\ln(n) f_s$ se elimina en
+el dominio de la frecuencia, de modo que las fases armónicas no arrastran
+sesgo sub-muestra residual.
+
+## 3. Analizar grabaciones con el ESS clásico (`method="farina"`)
+
+Las grabaciones hechas con el barrido exponencial simple de
+`phonometry.sweep_signal` (la excitación de ISO 18233 que usa
+[`impulse_response`](/phonometry/es/buildings/rooms/room-acoustics/)) se analizan con
+`method="farina"`: el mismo ventaneado sobre el filtro inverso invertido en
+el tiempo y compensado en amplitud de Farina (2000). Las **magnitudes**
+armónicas y la THD son correctas (el oráculo de Chebyshev pasa igual), pero
+el término de fase `-1` del barrido rompe la equivalencia
+desplazamiento-armónico, así que las fases de $H_2 \dots H_N$ dependen de la
+excitación y deben ignorarse; la banda de cada $H_n$ queda además limitada a
+$f_2$ por el filtro inverso.
+
+```python
+from phonometry import sweep_signal, swept_sine_distortion
+
+x = sweep_signal(fs, f1, f2, seconds)          # el ESS de ISO 18233
+res = swept_sine_distortion(y, fs, f1, f2, seconds, method="farina")
+res.plot()   # los mismos paneles |Hn| + THD(f) que el método sincronizado (necesita matplotlib)
+```
+
+El resultado es el mismo `SweptSineDistortionResult` dibujable que el del
+método sincronizado, así que los paneles `|Hn|` y `THD(f)` de la figura de la
+sección 1 se leen idénticos; entre los dos métodos solo cambian las fases de
+los armónicos (y el tope de banda de cada orden).
+
+Reglas de dimensionado para ambos métodos: el par de llegadas más próximo
+dista $L\ln(N/(N-1))$ segundos, así que la ventana por orden (`ir_length`,
+por defecto la mayor potencia de dos que cabe, con tope en 8192 muestras)
+no debe excederlo: alarga el barrido o baja `n_harmonics` en sistemas
+reverberantes cuyas colas necesiten ventanas más largas. Mantén
+`n_harmonics` $\cdot f_2$ por debajo de Nyquist: los productos de distorsión por
+encima se pliegan en cualquier grabación real. El análisis queda referido a
+la `amplitude` de la excitación, así que $H_1$ es la ganancia lineal y la
+THD queda referida al nivel exactamente como se excitó.
+
+## 4. Utilidades de fase: fase mínima, retardo de grupo, exceso de fase
+
+En un sistema causal, estable y de fase mínima, la log-magnitud y la fase
+de la respuesta en frecuencia forman un par de transformadas de Hilbert
+(Bendat y Piersol, Sec. 13.1.4): la fase queda totalmente determinada por
+`|H(f)|`. Las utilidades de `phonometry.signals` calculan esa
+reconstrucción con el cepstrum real y descomponen cualquier respuesta
+medida en su parte invertible y su parte paso-todo:
+
+```python
+import numpy as np
+from phonometry import (
+    excess_phase, group_delay, minimum_phase, phase_decomposition,
+)
+
+H = np.fft.rfft(ir)                    # respuesta unilateral, DC..Nyquist
+h_min = minimum_phase(np.abs(H))       # la fase solo desde la magnitud
+tau_g = group_delay(H, fs)             # -(1/2pi) dphi/df, en segundos
+phi_x = excess_phase(H)                # unwrap(arg H) - phi_min
+
+res = phase_decomposition(H, fs)       # todo sobre un mismo eje
+res.excess_group_delay                 # la parte paso-todo, en s
+res.plot()                             # magnitud, fases, retardos de grupo
+```
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/phase_decomposition_es.svg" alt="Tres paneles apilados de la descomposición fase mínima / paso-todo de un ecualizador de campana de +6 dB medido a través de una latencia de 2,5 ms: la joroba de magnitud en 1 kHz, la fase medida cayendo con la frecuencia mientras la fase mínima se mantiene pequeña y el exceso de fase lleva la rampa lineal del retardo, y los retardos de grupo donde el retardo de grupo de exceso lee 2,5 ms planos" width="82%" />
+
+*Un ecualizador de campana de +6 dB medido a través de una latencia de
+procesado de 2,5 ms: la parte de fase mínima lleva solo la pequeña ondulación
+de fase que un ecualizador podría invertir, el exceso de fase es la rampa pura
+$-2\pi f t_0$ del retardo, y el retardo de grupo de exceso lee la latencia
+directamente como una línea plana de 2,5 ms.*
+
+<details>
+<summary>Mostrar el código de esta figura</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from scipy import signal as sp_signal
+from phonometry import phase_decomposition
+
+fs = 48000.0
+delay = int(0.0025 * fs)                      # una latencia de procesado de 2,5 ms
+gain_a = 10.0 ** (6.0 / 40.0)                 # EQ de campana +6 dB en 1 kHz, Q = 1
+w0 = 2.0 * np.pi * 1000.0 / fs
+alpha = np.sin(w0) / 2.0
+b = np.array([1 + alpha * gain_a, -2 * np.cos(w0), 1 - alpha * gain_a])
+a = np.array([1 + alpha / gain_a, -2 * np.cos(w0), 1 - alpha / gain_a])
+imp = np.zeros(16384)
+imp[delay] = 1.0
+ir = sp_signal.lfilter(b / a[0], a / a[0], imp)
+
+res = phase_decomposition(np.fft.rfft(ir), fs)
+res.plot(language="es")   # |H|, las tres fases y los retardos de grupo
+plt.show()
+```
+
+</details>
+
+La descomposición $H = H_\text{min} H_\text{ap}$ separa lo que un ecualizador puede
+invertir ($H_\text{min}$, fase mínima, causal y causalmente invertible) de lo que
+nunca podrá ($H_\text{ap}$, el exceso paso-todo: latencia más ceros de fase no
+mínima como las reflexiones). El exceso de fase es `0` para una respuesta
+de fase mínima y exactamente $-2\pi f t_0$ para una latencia pura $t_0$; su
+retardo de grupo lee la latencia en segundos.
+
+Contrato numérico, fijado por los tests: sobre un biquad estrictamente de
+fase mínima muestreado en una malla densa, la fase reconstruida coincide
+con la real a mejor de `1e-12` rad; el retardo de grupo de un paso-todo de
+primer orden coincide con la forma cerrada $(1-a^2)/(1+2a\cos\omega+a^2)$ a
+`1e-5` muestras; el exceso de retardo de grupo de un biquad retardado
+devuelve el retardo a `1e-6` muestras. Las precauciones están documentadas
+con la API: la respuesta debe muestrearse uniformemente de DC a Nyquist
+inclusive (la disposición `rfft`) y con densidad suficiente para que la
+respuesta al impulso subyacente quepa en el registro implícito; los ceros
+de magnitud (bordes de un paso banda, fondos de notch) se acotan y no son
+representables por un sistema de fase mínima; el factor `oversample`
+(interpolación trigonométrica de la magnitud antes del cepstrum) mitiga el
+aliasing cepstral que los ceros casi sobre el círculo causan en mallas
+gruesas.
+
+## Relación con otras herramientas
+
+- [`impulse_response`](/phonometry/es/buildings/rooms/room-acoustics/) recupera la
+  RI *lineal* de la misma grabación de barrido y simplemente descarta los
+  productos de distorsión a tiempos negativos; `swept_sine_distortion` es
+  la herramienta que los lee.
+- [`thd` / `harmonic_analysis`](/phonometry/es/devices/electroacoustics/electroacoustics/)
+  miden la distorsión de un tono estacionario a una frecuencia; el
+  separador por barrido devuelve las mismas razones como función continua
+  de la frecuencia, con una sola medición.
+- Las utilidades de fase operan sobre cualquier respuesta unilateral
+  *compleja*: una `rfft` de una RI medida, o la `response` de una estimación con
+  [`transfer_function`](/phonometry/es/devices/electroacoustics/electroacoustics/) sobre una
+  malla uniforme. Solo `minimum_phase` acepta además un array de magnitud
+  a secas, p. ej. una magnitud objetivo de diseño para ecualización.
+
+## Qué cubre esta guía
+
+**Cubierto.** La deconvolución de barrido exponencial de Farina (preprint
+AES 5093, 2000) y el barrido sincronizado coherente en fase de Novak,
+Lotton y Simon (2015): la separación armónica, el espectro en forma
+cerrada del filtro inverso y la corrección de sesgo sub-muestra,
+implementadas por `swept_sine_distortion` y `synchronized_sweep_signal`.
+Las utilidades de fase `minimum_phase`, `group_delay`, `excess_phase` y
+`phase_decomposition` implementan la relación de transformada de Hilbert
+de la sección 13.1.4 de Bendat y Piersol mediante el cepstrum real.
+
+**No cubierto.** La distorsión de intermodulación y la intermodulación
+dinámica (IEC 60268-3, cláusulas 14.12.7-10) se miden a partir de tonos
+estacionarios en la página de
+[electroacústica](/phonometry/es/devices/electroacoustics/electroacoustics/), no con un
+barrido; esta página separa solo los órdenes armónicos. La monografía de
+medición con barridos de Müller y Massarani se cita como contexto de
+práctica (fundidos, técnica del filtro inverso), no como una fórmula
+concreta implementada. Con `method="farina"`, las fases armónicas de
+$H_2 \dots H_N$ se devuelven pero deben ignorarse: el barrido exponencial simple
+rompe la equivalencia desplazamiento-armónico de la que depende el método
+sincronizado.

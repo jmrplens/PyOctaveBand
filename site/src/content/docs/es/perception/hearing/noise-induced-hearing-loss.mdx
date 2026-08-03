@@ -1,0 +1,255 @@
+---
+title: "Pérdida auditiva inducida por ruido (ISO 1999)"
+description: "El desplazamiento permanente del umbral inducido por ruido (NIPTS) de ISO 1999:2013 en función del nivel de exposición, la duración y la frecuencia audiométrica con su distribución poblacional, y su combinación con la componente por edad (ISO 7029) en el umbral de audición asociado a la edad y al ruido (HTLAN), de 500 Hz a 6000 Hz."
+references:
+  - type: standard
+    organization: "International Organization for Standardization"
+    year: 2013
+    title: "Acoustics — Estimation of noise-induced hearing loss"
+    designation: "ISO 1999:2013"
+    url: "https://www.iso.org/standard/45103.html"
+    note: "El modelo implementado: la combinación HTLAN (cláusula 6.1, Fórmula 1), el NIPTS mediano (cláusula 6.3.1, Fórmulas 2-3, Tabla 1) y su distribución estadística (cláusula 6.3.2, Fórmulas 4-7, Tablas 2-3), validado frente a los ejemplos resueltos del Anexo D. La componente de edad (base de datos A) es ISO 7029:2017."
+  - type: article
+    authors: ["Passchier-Vermeer, W."]
+    year: 1974
+    title: "Hearing loss due to continuous exposure to steady-state broad-band noise"
+    journal: "The Journal of the Acoustical Society of America"
+    volume: 56
+    issue: 5
+    pages: "1585-1593"
+    doi: "10.1121/1.1903482"
+    note: "Uno de los estudios de campo cuyos datos de exposición-respuesta sustentan las relaciones de NIPTS codificadas después en la ISO 1999."
+  - type: report
+    organization: "National Institute for Occupational Safety and Health"
+    year: 1998
+    title: "Criteria for a recommended standard: Occupational noise exposure — Revised criteria 1998"
+    number: "DHHS/NIOSH Publication No. 98-126"
+    doi: "10.26616/NIOSHPUB98126"
+    url: "https://www.cdc.gov/niosh/docs/98-126/pdfs/98-126.pdf"
+    note: "Un documento de criterios de libre acceso (el PDF enlazado es la descarga gratuita) que repasa la misma evidencia de exposición-respuesta y las cuestiones de *fence* y conservación auditiva tratadas en esta página."
+---
+
+import ThemeImage from '../../../../../components/ThemeImage.astro';
+
+**ISO 1999:2013** estima la pérdida auditiva que sufre una población por el
+ruido laboral. Da el **desplazamiento permanente del umbral inducido por ruido**
+(NIPTS), la pérdida auditiva adicional causada por el ruido, sobre la del
+envejecimiento, en función del nivel de exposición, la duración de la
+exposición y la frecuencia audiométrica, junto con su dispersión en la
+población. Después combina la componente de ruido con la componente de edad (el
+umbral de ISO 7029, «base de datos A») en el **umbral de audición asociado a la
+edad y al ruido** (HTLAN). Ambos se definen en las seis frecuencias
+audiométricas de 500 Hz a 6000 Hz, donde se concentra el daño por ruido (la
+muesca característica a 4 kHz).
+
+<ThemeImage
+  src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_nihl_es.svg"
+  alt="Dos vías que convergen: la edad, el sexo y un fractil dan el umbral por edad H (HTLA, ISO 7029); el nivel normalizado a 8 h y la duración dan el NIPTS mediano N50 y luego el NIPTS del fractil N; ambos se combinan en HTLAN = H + N - H*N/120"
+  width="86%"
+  loading="eager"
+/>
+
+## 1. Desplazamiento permanente del umbral por ruido (cláusula 6.3)
+
+El NIPTS mediano para duraciones de exposición de 10 a 40 años crece con el
+cuadrado del exceso del nivel de exposición sobre un umbral de corte $L_0$
+dependiente de la frecuencia (ISO 1999, cláusula 6.3.1, Fórmula 2, Tabla 1):
+
+$$
+N_{50} = \left[u + v\,\log_{10}\frac{t}{t_0}\right](L_{EX,8h} - L_0)^2,
+$$
+
+con $t$ la exposición en años y $t_0 = 1$ año; por debajo de $L_0$ el efecto es
+nulo. Un **fractil** poblacional se obtiene de dos semi-gaussianas cuyas
+dispersiones $d_u$ (peor que la mediana) y $d_l$ (mejor) se dan en las Fórmulas
+6/7 y la Tabla 3: $N_Q = N_{50} + z\,d$ con $z$ el cuantil normal estándar,
+recortado a cero (cláusula 6.3.2).
+
+```python
+from phonometry import hearing
+
+# NIPTS mediano tras 20 años a un nivel normalizado a 8 h de 90 dB(A).
+r = hearing.nipts(90.0, 20.0, fractile=0.5)
+print(r.frequencies.astype(int))  # [ 500 1000 2000 3000 4000 6000]
+print(r.median.round(1))          # [ 0.   0.1  4.1 10.2 12.9  8.5]
+
+# El décimo más susceptible de la población (percentil 90):
+print(hearing.nipts(90.0, 20.0, fractile=0.9).value.round(1))
+# [ 0.   0.1  7.7 16.2 17.8 13.6]
+
+r.plot()   # el espectro de NIPTS con su banda de fractiles (necesita matplotlib)
+```
+
+El desplazamiento alcanza su máximo cerca de 4 kHz y se acentúa con el nivel y
+la duración. Por debajo del corte (aquí 500 Hz, $L_0 = 93$ dB, y 1000 Hz,
+$L_0 = 89$ dB, a 90 dB) el ruido no produce desplazamiento permanente. Para
+duraciones menores de 10 años la mediana se extrapola del valor a 10 años
+(Fórmula 3); puede pedirse un subconjunto de frecuencias con `frequencies=`.
+
+Una carrera más larga y más ruidosa hace inconfundible la forma:
+
+<ThemeImage
+  src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/nipts_audiogram_es.svg"
+  alt="Desplazamiento permanente del umbral inducido por ruido según ISO 1999 tras 40 años a 95 dB(A) normalizados a 8 h, sobre un eje de audiograma invertido de 500 Hz a 6000 Hz: la mediana es casi nula a 500 Hz y se hunde hasta unos 26 dB a 4000 Hz antes de recuperarse a 6000 Hz, y la banda de fractiles del 10 al 90 por ciento a su alrededor llega a casi 37 dB para el décimo más susceptible"
+  width="88%"
+/>
+
+<details>
+<summary>Mostrar el código de esta figura</summary>
+
+```python
+import matplotlib.pyplot as plt
+from phonometry import hearing
+
+# 40 años a 95 dB(A) normalizados a 8 h, décimo más susceptible.
+res = hearing.nipts(95.0, 40.0, fractile=0.9)
+print(res.median.round(1))    # la mediana N50
+print(res.value.round(1))     # el fractil 90 %
+
+# En una línea: la mediana, el fractil y la banda 10-90 %.
+res.plot(language="es")
+plt.show()
+```
+
+</details>
+
+La muesca de 3 kHz a 4 kHz, con recuperación parcial a 6 kHz, es la firma del
+daño por ruido y la razón de que la vigilancia audiométrica ensaye esas
+frecuencias. Sale del modelo en lugar de imponérsele: el nivel de corte $L_0$
+y los coeficientes $u$, $v$ de la Tabla 1 son mínimos donde el oído es más
+vulnerable, de modo que el mismo $L_{EX,8h}$ compra mucho más desplazamiento a
+4 kHz que a 500 Hz.
+
+## 2. Edad y ruido combinados: HTLAN (cláusula 6.1)
+
+La componente de ruido no se suma sin más a la de edad: la Fórmula (1) de
+ISO 1999 las combina con un término de compresión que importa cuando el total
+supera unos 40 dB:
+
+$$
+H' = H + N - \frac{H\,N}{120},
+$$
+
+donde $H$ es el umbral por edad (HTLA, de ISO 7029 al mismo fractil) y $N$ el
+NIPTS. `htlan` evalúa ambas componentes y su combinación.
+
+```python
+from phonometry import hearing
+
+# Un hombre de 60 años, 30 años a 95 dB(A), mediana.
+h = hearing.htlan(60, "male", 95.0, 30.0, fractile=0.5)
+print(h.htla.round(1))       # [ 6.   7.8 12.5 16.6 20.2 25.9]  solo edad
+print(h.nipts.round(1))      # [ 0.5  3.  11.8 21.6 24.8 17.6]  solo ruido
+print(h.threshold.round(1))  # [ 6.5 10.7 23.  35.2 40.8 39.8]  edad + ruido
+
+h.plot()   # las tres curvas de la figura de abajo: HTLA, NIPTS y HTLAN
+```
+
+A 4 kHz la componente de edad (20,2 dB) y la de ruido (24,8 dB) se combinan en
+40,8 dB en lugar de su suma de 45,0 dB: el término de compresión quita 4,2 dB.
+
+<ThemeImage
+  src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/noise_induced_hearing_loss_es.svg"
+  alt="Dos paneles. Izquierda: el NIPTS mediano a 95 dB para 10, 20, 30 y 40 años en un eje de audiograma invertido con la banda del 10 al 90 por ciento en torno a la curva de 40 años, que se acentúa hacia 4 kHz. Derecha: para un hombre de 60 años expuesto 30 años a 95 dB, las curvas de edad (HTLA), ruido (NIPTS) y HTLAN combinada, que queda por debajo de la suma simple"
+  width="96%"
+/>
+
+<details>
+<summary>Mostrar el código de esta figura</summary>
+
+```python
+import matplotlib.pyplot as plt
+from phonometry import hearing
+from phonometry.hearing.noise_induced_hearing_loss import NIPTS_FREQUENCIES as f
+
+# En una línea, el espectro NIPTS con su banda de fractiles:
+hearing.nipts(95.0, 40.0, 0.9).plot(language="es")
+plt.show()
+
+# A mano, ambos paneles:
+fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12.5, 5.6))
+for yr in (10, 20, 30, 40):
+    ax1.plot(f, hearing.nipts(95.0, yr, 0.5).median, "o-", label=f"{yr} yr")
+ax1.set_xscale("log"); ax1.invert_yaxis(); ax1.legend()
+
+h = hearing.htlan(60, "male", 95.0, 30.0, 0.5)
+ax2.plot(f, h.htla, "o-", label="Age (HTLA)")
+ax2.plot(f, h.nipts, "^-", label="Noise (NIPTS)")
+ax2.plot(f, h.threshold, "s--", label="Age + noise (HTLAN)")
+ax2.set_xscale("log"); ax2.invert_yaxis(); ax2.legend()
+plt.show()
+```
+
+</details>
+
+**Tres magnitudes, bien separadas.** Merece la pena ser preciso con lo que
+significa cada símbolo, porque es fácil confundirlos:
+
+- El **NIPTS** ($N$) es el *desplazamiento permanente del umbral inducido por
+  ruido*: la pérdida extra que causa el ruido, y nada más. Es lo que un
+  programa ideal de conservación auditiva evitaría. Por sí solo no es un
+  audiograma.
+- El **HTLA** ($H$) es el umbral por *edad* en solitario (la componente
+  ISO 7029 de la guía de
+  [umbral de audición](/phonometry/es/perception/hearing/hearing-threshold/)), la pérdida
+  que tendría la misma persona sin ruido laboral.
+- El **HTLAN** ($H'$) es el umbral *total*: edad **y** ruido combinados por la
+  Fórmula (1). Es lo que mide un audiómetro, y el único de los tres comparable
+  con un audiograma real.
+
+La combinación no lineal $H' = H + N - HN/120$ es la razón de que no se pueda
+leer el NIPTS de un audiograma medido restando una tabla de edad sin más: las
+pérdidas casi totales superarían de otro modo el techo fisiológico de
+~120 dB, así que la norma comprime la suma. Como la corrección $HN/120$ escala
+con el *producto* de las dos componentes, ya puede restar algunos dB mientras
+$H + N$ está por debajo de 40 dB; 40 dB es solo un marcador aproximado de dónde
+el efecto se vuelve apreciable, no una frontera estricta, y la corrección crece
+de forma sostenida en el régimen de una exposición larga y ruidosa donde ambos
+términos son grandes.
+
+**Cautelas con el umbral de compensación (*fence*).** La ISO 1999 da umbrales
+y su distribución; *no* define una «discapacidad auditiva» ni un umbral
+indemnizable. Un ***fence*** es una línea de política (habitualmente una media
+de 25 dB sobre unas frecuencias elegidas) por encima de la cual la audición se
+considera dañada, y vive en la reglamentación nacional, no en esta norma. De
+ahí siguen dos cautelas. Primera: las frecuencias del *fence* importan:
+promediar sobre 0,5/1/2 kHz (el clásico *fence* de habla) apenas ve la muesca
+de ruido de 3–6 kHz, así que infravalora el daño temprano por ruido que sí
+detectaría una media de 3/4/6 kHz. Segunda: el NIPTS y el HTLAN responden a
+preguntas de *fence* distintas: el NIPTS pregunta «cuánto añadió el ruido», el
+HTLAN «este oído, edad incluida, ¿supera la línea?»; y el *porcentaje de la
+población más allá del fence* depende de la dispersión de fractiles, no solo de
+la mediana, así que debe leerse de la distribución, nunca del umbral mediano en
+solitario.
+
+El `NiptsResult` lleva la `median` ($N_{50}$), las
+`spread_upper`/`spread_lower` y
+el `value` en el fractil pedido; el `HtlanResult` lleva `htla`, `nipts` y el
+`threshold` combinado. Ambos exponen `.plot()`. La componente de edad por sí
+sola es el tema de la guía de
+[umbral de audición](/phonometry/es/perception/hearing/hearing-threshold/).
+
+## Qué cubre esta guía
+
+**Cubierto.** La ISO 1999:2013 tal como la implementan `nipts` y `htlan`: el
+NIPTS mediano de la cláusula 6.3.1 (Fórmula 2, extrapolada por debajo de 10
+años con la Fórmula 3, Tabla 1) y su fractil poblacional de la cláusula 6.3.2
+(Fórmulas 4-7, Tablas 2-3), junto con la combinación HTLAN de la cláusula 6.1
+(Fórmula 1) que ejecuta `combine_age_and_noise`, todo ello validado frente a
+los ejemplos resueltos del Anexo D. La componente de edad es la base de datos
+A, evaluada a partir de ISO 7029:2017, la edición que la cláusula 6.2.2 cita
+sin fecha.
+
+**No cubierto.** Las cláusulas 6.2.3 y 6.2.4 permiten sustituir la base de
+datos A por una base de datos B: un umbral por edad medido en una población de
+control del país correspondiente. Solo está implementada la base de datos A,
+así que `htlan` toma siempre su componente de edad de ISO 7029:2017.
+`combine_age_and_noise` acepta un array de HTLA externo para ese caso, pero
+calcular la base de datos B no es cosa de phonometry. La ISO 1999 no define
+una «discapacidad auditiva» ni un umbral indemnizable: esa línea la fija la
+reglamentación nacional, y aquí no se aplica ninguna, así que hay que
+aportarla y comprobarla uno mismo.
+
+## Véase también
+
+- Referencia de la API: [`hearing.noise_induced_hearing_loss`](/phonometry/es/reference/api/hearing/noise-induced-hearing-loss/).

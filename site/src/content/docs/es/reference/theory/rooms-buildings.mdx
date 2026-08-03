@@ -144,7 +144,7 @@ Esta página reúne la teoría de salas y edificación: la medición de respuest
 
 ANSI/ASA S12.2-2019 valora el ruido de fondo estacionario de una sala frente a familias de curvas por bandas de octava (16 Hz – 8 kHz). El **índice NC** sigue el procedimiento en dos pasos de la cláusula 5.2.2 sobre las curvas de la Tabla 1 (NC-15 a NC-70): el nivel de interferencia con el habla $\mathrm{SIL} = \tfrac14(L_{500}+L_{1000}+L_{2000}+L_{4000})$ (cláusula 3.2) selecciona la curva NC-(SIL) y, si ninguna banda la supera, el espectro se designa NC-(SIL); en caso contrario se aplica el método de tangencia (cláusula 5.2.3): cada banda medida se interpola frente a los valores tabulados de las curvas, el índice es el mayor valor por banda y la banda que lo fija es la banda determinante; la interpolación hace el índice continuo (un NC-42,5 se informa como tal, sin ajustarlo a una curva). Los espectros por encima de NC-70 o por debajo de NC-15 quedan fuera de la familia y se marcan (>NC-70 con la banda de mayor exceso, o &lt;NC-15) en lugar de recibir un número fabricado. El contorno **RC Mark II** (Anexo D) es una recta pura de −5 dB/octava anclada a su valor a 1000 Hz con un suelo en baja frecuencia de $\max(\mathrm{RC} + 25,\ 55)$ dB a 16/31,5 Hz; el índice es la media aritmética de los niveles a 500/1000/2000 Hz redondeada a un entero (cláusula D.4), y la etiqueta de calidad espectral compara el espectro con el contorno de referencia (cláusula D.3): retumbo "R" cuando alguna banda a 500 Hz o por debajo lo supera en más de 5 dB, siseo "H" cuando alguna banda a 1 kHz o por encima lo supera en más de 3 dB (ambos a la vez, "RH"), y neutro "N" en otro caso, informado como p. ej. RC-35(N). Los contornos RC generados reproducen la Tabla D.1 dígito a dígito, y realimentar cualquier curva NC de la Tabla 1 devuelve su propio índice de tangencia. NCB, RNC (Anexo A) y el QAI (cláusula D.5) quedan deliberadamente fuera de alcance.
 
-Consulta la [guía de criterios de ruido de salas](/phonometry/es/guides/room-noise/) para su uso.
+Consulta la [guía de criterios de ruido de salas](/phonometry/es/buildings/rooms/room-noise/) para su uso.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/room_noise_criteria_es.svg" alt="Dos paneles para el mismo espectro de sala dominado por la ventilación. Izquierda: los niveles medidos por banda de octava sobre la familia de curvas NC, con un rombo rojo que marca el punto de tangencia a 250 Hz que fija la calificación NC-42,5. Derecha: el mismo espectro sobre la curva de referencia RC-35, con las bandas de baja frecuencia atravesando la tolerancia de retumbo sombreada (más 5 dB por debajo de 500 Hz) de modo que el ruido se clasifica como RC-35(R), y la tolerancia de siseo (más 3 dB a 1000 Hz y por encima) sombreada para comparar" width="96%" />
 
@@ -335,7 +335,7 @@ reproducen: la sala desnuda de 29,75 m³ da $A = 2{,}26$ m² y $T = 2{,}1$ s a
 baja $T$ a 0,9 s. El método informativo del Anexo D para espacios irregulares
 y absorción distribuida de forma no uniforme queda fuera de alcance.
 
-Consulta la [guía de absorción acústica en recintos](/phonometry/es/guides/enclosed-space-absorption/) para su uso.
+Consulta la [guía de absorción acústica en recintos](/phonometry/es/buildings/rooms/enclosed-space-absorption/) para su uso.
 
 ### Incertidumbre de medición (ISO 12999-1)
 
@@ -361,8 +361,8 @@ a $u/\sqrt{m}$ (Fórmula A.7), y la incertidumbre de un solo número no
 correlacionada es la suma en cuadratura ponderada en energía de las
 incertidumbres por banda (Fórmula B.2).
 
-Consulta las guías de [acústica de salas](/phonometry/es/guides/room-acoustics/) y de
-[medición del aislamiento en campo](/phonometry/es/guides/insulation-field/) para su uso.
+Consulta las guías de [acústica de salas](/phonometry/es/buildings/rooms/room-acoustics/) y de
+[medición del aislamiento en campo](/phonometry/es/buildings/insulation/insulation-field/) para su uso.
 
 ### Predicción del aislamiento de paneles (Bies 7.2, Hopkins 2.9/4.3.10, Cremer 5)
 
@@ -392,5 +392,5 @@ $10\log_{10}(S/S_a)$. El camino de transmisión resonante y la radiación de la 
 doble se apoyan en la eficiencia de radiación de placa y las movilidades
 puntuales de la [teoría de vibración](/phonometry/es/reference/theory/vibration/).
 
-Consulta la guía [Predicción del aislamiento de paneles](/phonometry/es/guides/panel-sound-insulation/)
+Consulta la guía [Predicción del aislamiento de paneles](/phonometry/es/buildings/design/panel-sound-insulation/)
 para su uso.
