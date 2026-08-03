@@ -288,8 +288,8 @@ class SoundSpeedProfile:
 
     def plot(self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any) -> Axes:
         """Plot the sound-speed profile (speed vs depth, depth increasing down)."""
-        from .._i18n import check_language
-        from .._plot.underwater import plot_sound_speed_profile
+        from ..._i18n import check_language
+        from ..._plot.underwater import plot_sound_speed_profile
 
         return plot_sound_speed_profile(self, ax=ax, language=check_language(language), **kwargs)
 

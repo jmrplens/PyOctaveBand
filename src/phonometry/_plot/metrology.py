@@ -16,9 +16,6 @@ if TYPE_CHECKING:
         StationarityTestResult,
         TrendTestResult,
     )
-    from ..metrology.intensity_compliance import (
-        IntensityInstrumentComplianceResult,
-    )
     from ..metrology.uncertainty import MonteCarloResult, UncertaintyResult
 
 from .common import (
@@ -26,19 +23,12 @@ from .common import (
     _C_PRIMARY,
     _C_PRIMARY_LIGHT,
     _C_REFERENCE,
-    _C_SECONDARY,
-    _C_TERTIARY,
     _LEGEND_UPPER_RIGHT,
     _new_axes,
-    format_frequency_axis,
-    theme_fill,
 )
 
 #: Shared frequency-axis label of the spectral renderers.
 _FREQ_LABEL = "Frequency [Hz]"
-#: Y-axis label of the residual-index plots (identical in both languages,
-#: the symbol carries the meaning).
-_LABEL_RESIDUAL_INDEX = r"$\delta_{pI0}$ [dB]"
 
 #: Spanish translations of the fixed strings rendered by the metrology
 #: ``.plot()`` renderers, keyed by their verbatim English text. ``_t``
@@ -47,17 +37,6 @@ _LABEL_RESIDUAL_INDEX = r"$\delta_{pI0}$ [dB]"
 #: renderers.
 _STRINGS: dict[str, str] = {
     "Frequency [Hz]": "Frecuencia [Hz]",
-    "Class {cls} pass region": "Región de aceptación clase {cls}",
-    "Class 1 minimum": "Mínimo clase 1",
-    "Class 2 minimum": "Mínimo clase 2",
-    r"Measured $\delta_{pI0}$": r"$\delta_{pI0}$ medido",
-    "Below the class {cls} minimum": "Bajo el mínimo de clase {cls}",
-    _LABEL_RESIDUAL_INDEX: _LABEL_RESIDUAL_INDEX,
-    "IEC 61043 Table 2 — {device}, {spacing} mm separation":
-        "Tabla 2 de IEC 61043 — {device}, separación de {spacing} mm",
-    "probe": "sonda",
-    "processor": "procesador",
-    "complete instrument": "instrumento completo",
     r"Contribution to combined uncertainty $|c_i|\,u(x_i)$":
         r"Contribución a la incertidumbre combinada $|c_i|\,u(x_i)$",
     "GUM uncertainty budget — y = {value}":
@@ -112,105 +91,6 @@ def _t(text: str, language: str = "en", **fmt: Any) -> str:
     return s.format(**fmt) if fmt else s
 
 
-_DEVICE_LABELS = {
-    "probe": "probe",
-    "processor": "processor",
-    "instrument": "complete instrument",
-}
-
-
-def plot_intensity_class(
-    result: IntensityInstrumentComplianceResult, ax: Axes | None = None, *,
-    language: str = "en", **kwargs: Any
-) -> Axes:
-    """Measured pressure-residual intensity index over the IEC 61043 masks.
-
-    Draws the measured ``delta_pI0`` per one-third-octave band against the
-    Table 2 class 1 and class 2 *minima* for the device kind, already rescaled
-    to the microphone separation in use. Because the requirement is a floor,
-    the pass region of the reference class (the achieved class, or class 2 when
-    the chain complies with neither) lies *above* its mask and is shaded,
-    following the same convention as :func:`plot_filter_class`.
-
-    The bands that cost the chain the *next* class up are ringed: for a class 2
-    chain those are the bands under the class 1 minimum, and for a chain that
-    meets no class those are the bands under the class 2 minimum. A class 1
-    chain clears everything, so nothing is ringed.
-
-    :param result: An
-        :class:`~phonometry.metrology.intensity_compliance.IntensityInstrumentComplianceResult`.
-    :param ax: Existing axes, or ``None`` to create a figure.
-    :param language: Label language, ``"en"`` (default) or ``"es"``.
-    :param kwargs: Forwarded to the measured-curve ``plot`` call.
-    :return: The axes.
-    """
-    from .._i18n import localize_axes
-
-    ax = ax if ax is not None else _new_axes()
-    freqs = np.asarray(result.frequency, dtype=np.float64)
-    measured = np.asarray(result.residual_index, dtype=np.float64)
-    class1 = np.asarray(result.limit_class1, dtype=np.float64)
-    class2 = np.asarray(result.limit_class2, dtype=np.float64)
-    cls = result.reference_class()
-    mask = class1 if cls == 1 else class2
-
-    y_bot = float(np.floor(min(measured.min(), class2.min()) - 2.0))
-    y_top = float(np.ceil(max(measured.max(), class1.max()) + 3.0))
-
-    # Opaque, because the fiche renders this plot through svglib, which drops
-    # alpha: a translucent fill would come out as a solid block over the
-    # measured curve. theme_fill mixes the page towards the hue instead, so the
-    # region reads the same way on either background.
-    ax.fill_between(
-        freqs, mask, y_top, step="mid", facecolor=theme_fill(_C_TERTIARY, ax),
-        edgecolor="none", zorder=0,
-        label=_t("Class {cls} pass region", language, cls=cls),
-    )
-    # Both Table 2 masks in the same amber, class 1 solid and class 2 dashed,
-    # as the published intensity-analyser displays draw them.
-    ax.plot(freqs, class1, drawstyle="steps-mid", color=_C_SECONDARY, lw=1.3,
-            label=_t("Class 1 minimum", language))
-    ax.plot(freqs, class2, drawstyle="steps-mid", color=_C_SECONDARY, lw=1.3,
-            ls="--", label=_t("Class 2 minimum", language))
-
-    kwargs.setdefault("color", _C_PRIMARY)
-    kwargs.setdefault("lw", 1.6)
-    kwargs.setdefault("marker", "o")
-    kwargs.setdefault("ms", 3.0)
-    kwargs.setdefault("drawstyle", "steps-mid")
-    kwargs.setdefault("label", _t(r"Measured $\delta_{pI0}$", language))
-    ax.plot(freqs, measured, **kwargs)
-
-    # Ring the bands that block the next class up: class 1 for a class 2 chain,
-    # class 2 for a chain that meets neither. A class 1 chain has none.
-    marked_cls = 1 if result.overall_class == 2 else 2
-    marked_mask = class1 if marked_cls == 1 else class2
-    failing = (
-        np.zeros(freqs.shape, dtype=bool)
-        if result.overall_class == 1
-        else measured < marked_mask - 1e-9
-    )
-    if np.any(failing):
-        ax.plot(
-            freqs[failing], measured[failing], ls="", marker="o", ms=6.0,
-            mfc="none", mew=1.6, color=_C_REFERENCE,
-            label=_t("Below the class {cls} minimum", language, cls=marked_cls),
-        )
-
-    format_frequency_axis(ax, float(freqs.min()), float(freqs.max()))
-    ax.set_xlim(float(freqs.min()) / 1.15, float(freqs.max()) * 1.15)
-    ax.set_ylim(y_bot, y_top)
-    ax.set_xlabel(_t(_FREQ_LABEL, language))
-    ax.set_ylabel(_t(_LABEL_RESIDUAL_INDEX, language))
-    ax.set_title(
-        _t("IEC 61043 Table 2 — {device}, {spacing} mm separation", language,
-           device=_t(_DEVICE_LABELS[result.device], language),
-           spacing=f"{result.spacing * 1000.0:g}")
-    )
-    ax.legend(loc="lower right", fontsize="small")
-    ax.grid(True, which="both", alpha=0.3)
-    localize_axes(ax, language)
-    return ax
 def plot_uncertainty_budget(
     result: UncertaintyResult, ax: Axes | None = None, *,
     language: str = "en", **kwargs: Any

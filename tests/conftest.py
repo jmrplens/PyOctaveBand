@@ -41,7 +41,7 @@ _FRONTLOADED_MODULES = (
     "tests/psychoacoustics/quality/test_fluctuation_strength_ecma.py",
     "tests/psychoacoustics/loudness/test_moore_glasberg_time.py",
     "tests/psychoacoustics/loudness/test_zwicker.py",
-    "tests/underwater/test_numerical_propagation.py",
+    "tests/underwater/propagation/test_numerical.py",
     "tests/filters/test_iec61260_report.py",
     "tests/room/test_room_ir.py",
     "tests/test_golden_baseline.py",

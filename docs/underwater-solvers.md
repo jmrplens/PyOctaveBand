@@ -345,7 +345,7 @@ compute the field.
   Green's-function PE marched over ground impedance instead of a seabed.
 - [2D FDTD wave simulation](fdtd-simulation.md): the time-domain
   alternative behind the SOFAR ducting animation of the propagation guide.
-- API reference: [`underwater.numerical_propagation`](https://jmrplens.github.io/phonometry/reference/api/underwater/numerical-propagation/).
+- API reference: [`underwater.propagation.numerical`](https://jmrplens.github.io/phonometry/reference/api/underwater/numerical/).
 
 ## References
 

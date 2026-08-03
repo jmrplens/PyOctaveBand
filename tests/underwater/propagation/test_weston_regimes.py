@@ -5,7 +5,7 @@ Oracles: Ainslie, *Principles of Sonar Performance Modelling* (Springer 2010),
 §9.1.1.2, printed pp. 452-458 -- the closed forms of Equations (9.42) to
 (9.61), the seabed properties of Table 9.1 (printed p. 454) and the exact
 energy-flux limit of an ideal waveguide, used here to cross-check the numerical
-solvers of ``phonometry.underwater.numerical_propagation``.
+solvers of ``phonometry.underwater.propagation.numerical``.
 """
 
 from __future__ import annotations
@@ -18,8 +18,8 @@ import numpy as np
 import pytest
 from scipy.special import erf
 
-from phonometry.underwater.numerical_propagation import normal_modes, parabolic_equation
-from phonometry.underwater.weston_regimes import (
+from phonometry.underwater.propagation.numerical import normal_modes, parabolic_equation
+from phonometry.underwater.propagation.weston_regimes import (
     WESTON_REGIMES,
     WESTON_SEABEDS,
     WestonPropagationResult,

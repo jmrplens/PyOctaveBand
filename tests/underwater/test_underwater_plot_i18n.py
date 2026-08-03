@@ -10,8 +10,8 @@ import matplotlib.pyplot as plt
 import pytest
 
 from phonometry.underwater import seabed_reflection
-from phonometry.underwater.ocean_ambient_noise import ocean_ambient_noise
 from phonometry.underwater.sonar_equation import passive_sonar_equation
+from phonometry.underwater.sources.ambient_noise import ocean_ambient_noise
 
 
 def _result() -> object:
@@ -66,7 +66,7 @@ def test_seabed_reflection_plot_labels() -> None:
 def test_weston_regime_plot_labels() -> None:
     import numpy as np
 
-    from phonometry.underwater.weston_regimes import weston_propagation_loss
+    from phonometry.underwater.propagation.weston_regimes import weston_propagation_loss
 
     res = weston_propagation_loss(np.logspace(1.0, 5.0, 60), 250.0, 50.0, seabed="sand")
     ax = res.plot()
@@ -87,8 +87,8 @@ def test_weston_regime_plot_labels() -> None:
 def test_marine_mammal_plot_labels() -> None:
     import numpy as np
 
-    from phonometry.underwater.marine_mammal_audiograms import group_audiogram
-    from phonometry.underwater.marine_mammal_weighting import (
+    from phonometry.underwater.bioacoustics.audiograms import group_audiogram
+    from phonometry.underwater.bioacoustics.weighting import (
         auditory_weighting,
         weighted_exposure,
     )

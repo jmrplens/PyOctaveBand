@@ -1,22 +1,22 @@
 ---
-title: "underwater.numerical_propagation"
+title: "underwater.propagation.numerical"
 description: "Numerical models of underwater sound propagation (range-independent ocean)."
 sidebar:
-  label: "numerical_propagation"
+  label: "numerical"
 ---
 
 Numerical models of underwater sound propagation (range-independent ocean).
 
 Three complementary numerical solvers for the acoustic field in a
 horizontally-stratified ocean waveguide, complementing the closed-form
-transmission loss of [`phonometry.underwater.propagation`](/phonometry/reference/api/underwater/propagation/):
+transmission loss of `phonometry.underwater.propagation`:
 
-* [`normal_modes`](/phonometry/reference/api/underwater/numerical-propagation/#normal_modes) -- the normal-mode expansion. Solves the depth-separated
+* [`normal_modes`](/phonometry/reference/api/underwater/numerical/#normal_modes) -- the normal-mode expansion. Solves the depth-separated
   Sturm-Liouville eigenvalue problem by finite differences and assembles the
   transmission loss from the propagating modes.
-* [`ray_trace`](/phonometry/reference/api/underwater/numerical-propagation/#ray_trace) -- ray tracing. Integrates the ray-trajectory equations
+* [`ray_trace`](/phonometry/reference/api/underwater/numerical/#ray_trace) -- ray tracing. Integrates the ray-trajectory equations
   through a sound-speed profile (Runge-Kutta), returning the ray paths.
-* [`parabolic_equation`](/phonometry/reference/api/underwater/numerical-propagation/#parabolic_equation) -- the standard (Tappert) parabolic equation, solved
+* [`parabolic_equation`](/phonometry/reference/api/underwater/numerical/#parabolic_equation) -- the standard (Tappert) parabolic equation, solved
   with the split-step Fourier algorithm, returning the transmission-loss field.
 
 All three are implemented clean-room from Jensen, Kuperman, Porter & Schmidt,
@@ -78,7 +78,7 @@ to resolve it).
 | `bottom` | `"pressure-release"` (default) or `"rigid"`. |
 | `n_depth_points` | Number of finite-difference depth points. Default (`None`): derived from the physics as $\max(400, \operatorname{ceil}(60 D f / c_{\mathrm{min}}))$, which keeps the near-cutoff eigenvalue error small at any frequency/depth combination, capped at 20 000 points (very high $f D$ products exceed the cap; the near-cutoff warning then indicates whether the capped grid suffices, and an explicit `n_depth_points` overrides the cap). |
 
-**Returns:** A [`NormalModeResult`](/phonometry/reference/api/underwater/numerical-propagation/#normalmoderesult).
+**Returns:** A [`NormalModeResult`](/phonometry/reference/api/underwater/numerical/#normalmoderesult).
 
 **Raises**
 
@@ -173,7 +173,7 @@ calibration itself is exact to ~1e-4 dB at the default `range_step`.
 | `range_step` | Range marching step $\Delta r$, in metres. |
 | `n_depth_points` | Number of depth points (interior sine-transform grid). |
 
-**Returns:** A [`ParabolicEquationResult`](/phonometry/reference/api/underwater/numerical-propagation/#parabolicequationresult).
+**Returns:** A [`ParabolicEquationResult`](/phonometry/reference/api/underwater/numerical/#parabolicequationresult).
 
 **Raises**
 
@@ -249,7 +249,7 @@ surface (`z = 0`) and the bottom (`z = water_depth`).
 | `max_range` | Maximum horizontal range to trace, in metres. |
 | `n_steps` | Number of integration steps per ray. |
 
-**Returns:** A [`RayTraceResult`](/phonometry/reference/api/underwater/numerical-propagation/#raytraceresult).
+**Returns:** A [`RayTraceResult`](/phonometry/reference/api/underwater/numerical/#raytraceresult).
 
 **Raises**
 

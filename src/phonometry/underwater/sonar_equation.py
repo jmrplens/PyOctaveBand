@@ -286,7 +286,7 @@ def detection_range(
     """
     from scipy.optimize import brentq
 
-    from .propagation import transmission_loss
+    from .propagation.closed_form import transmission_loss
 
     fom = _finite(figure_of_merit, "figure_of_merit")
     rmax = _finite(max_range, "max_range")

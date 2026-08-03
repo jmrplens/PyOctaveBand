@@ -1,8 +1,18 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""underwater domain of phonometry (see module docstrings)."""
+"""underwater domain of phonometry (see module docstrings).
+
+Three families since 4.0, along the three questions an underwater problem
+asks: :mod:`~phonometry.underwater.sources` for what makes the sound,
+:mod:`~phonometry.underwater.propagation` for how it gets there, and
+:mod:`~phonometry.underwater.bioacoustics` for who hears it. The ISO 18405
+quantities and the sonar equation stay at the root, because all three
+families are written in their terms. Every public name is still exported
+here, so ``from phonometry import underwater`` reads as it did.
+"""
 
 from __future__ import annotations
 
+from .._compat import _namespace_dir, _namespace_shim
 from .acoustics import (
     UNDERWATER_REFERENCE_EXPOSURE,
     UNDERWATER_REFERENCE_PRESSURE,
@@ -12,76 +22,59 @@ from .acoustics import (
     sound_pressure_level,
     underwater_to_in_air_spl,
 )
-from .marine_mammal_audiograms import (
+from .bioacoustics import (
     AUDIOGRAM_GROUPS,
     BEST_HEARING_FREQUENCY_KHZ,
     ORCA_AUDIOGRAM_RANGE_KHZ,
+    WEIGHTING_GUIDANCE,
     AudiogramParameters,
     AudiogramResult,
-    audiogram_parameters,
-    group_audiogram,
-    orca_audiogram,
-)
-from .marine_mammal_weighting import (
-    WEIGHTING_GUIDANCE,
     AuditoryWeightingResult,
     ExposureCriteria,
     WeightedExposureResult,
     WeightingParameters,
+    audiogram_parameters,
     auditory_weighting,
     exposure_criteria,
+    group_audiogram,
     hearing_groups,
+    orca_audiogram,
     weighted_exposure,
     weighting_parameters,
 )
-from .numerical_propagation import (
+from .propagation import (
+    WESTON_REGIMES,
+    WESTON_SEABEDS,
+    BottomLossResult,
     NormalModeResult,
     ParabolicEquationResult,
     RayTraceResult,
+    SeabedReflection,
+    SoundSpeedProfile,
+    TransmissionLossResult,
+    WestonPropagationResult,
+    WestonRegimeBoundaries,
+    WestonSeabed,
+    bottom_reflection_loss,
+    critical_angle,
+    critical_grazing_angle,
+    depth_to_pressure,
+    effective_depth,
+    loss_parameter,
     normal_modes,
     parabolic_equation,
     ray_trace,
-)
-from .ocean_ambient_noise import (
-    AmbientNoiseResult,
-    ocean_ambient_noise,
-    thermal_noise_spectrum,
-    wind_noise_spectrum,
-)
-from .pile_driving_noise import (
-    PileStrikeResult,
-    StrikeSelSpectrum,
-    cumulative_sel,
-    cumulative_sel_identical,
-    pile_strike_metrics,
-    single_strike_sel,
-    strike_sel_spectrum,
-)
-from .propagation import (
-    TransmissionLossResult,
+    reflection_coefficient,
+    reflection_loss_gradient,
+    sea_water_sound_speed,
+    seabed_reflection,
     seawater_absorption,
+    sound_speed_profile,
     spreading_loss,
     transmission_loss,
-)
-from .seabed_reflection import (
-    BottomLossResult,
-    SeabedReflection,
-    bottom_reflection_loss,
-    critical_angle,
-    reflection_coefficient,
-    seabed_reflection,
-)
-from .ship_radiated_noise import (
-    ShipSourceLevelResult,
-    hydrophone_depths,
-    monopole_source_level,
-    radiated_noise_level,
-    source_level_uncertainty,
-)
-from .ship_traffic_noise import (
-    VESSEL_CLASSES,
-    ShipTrafficSpectrum,
-    ship_source_spectrum,
+    waveguide_cutoff_frequency,
+    weston_propagation_loss,
+    weston_regime_boundaries,
 )
 from .sonar_equation import (
     DetectionRangeResult,
@@ -91,25 +84,26 @@ from .sonar_equation import (
     detection_range_from_curve,
     passive_sonar_equation,
 )
-from .sound_speed import (
-    SoundSpeedProfile,
-    depth_to_pressure,
-    sea_water_sound_speed,
-    sound_speed_profile,
-)
-from .weston_regimes import (
-    WESTON_REGIMES,
-    WESTON_SEABEDS,
-    WestonPropagationResult,
-    WestonRegimeBoundaries,
-    WestonSeabed,
-    critical_grazing_angle,
-    effective_depth,
-    loss_parameter,
-    reflection_loss_gradient,
-    waveguide_cutoff_frequency,
-    weston_propagation_loss,
-    weston_regime_boundaries,
+from .sources import (
+    VESSEL_CLASSES,
+    AmbientNoiseResult,
+    PileStrikeResult,
+    ShipSourceLevelResult,
+    ShipTrafficSpectrum,
+    StrikeSelSpectrum,
+    cumulative_sel,
+    cumulative_sel_identical,
+    hydrophone_depths,
+    monopole_source_level,
+    ocean_ambient_noise,
+    pile_strike_metrics,
+    radiated_noise_level,
+    ship_source_spectrum,
+    single_strike_sel,
+    source_level_uncertainty,
+    strike_sel_spectrum,
+    thermal_noise_spectrum,
+    wind_noise_spectrum,
 )
 
 __all__ = [
@@ -196,3 +190,9 @@ __all__ = [
     "weston_regime_boundaries",
     "wind_noise_spectrum",
 ]
+
+#: No public name left this namespace in 4.0, but the modules did, so
+#: ``underwater.seabed_reflection`` has to keep resolving to its alias module
+#: until 5.0: the import registers it, the attribute read needs this.
+__getattr__ = _namespace_shim(__name__)
+__dir__ = _namespace_dir(__name__, __all__)

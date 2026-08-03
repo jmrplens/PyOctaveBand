@@ -455,6 +455,15 @@ from .emission.intensity import (
     sound_intensity,
     temporal_variability_indicator,
 )
+from .emission.intensity_compliance import (
+    IntensityInstrumentComplianceResult,
+    instrument_class_from_components,
+    intensity_class_compliance,
+    phase_mismatch_from_residual_index,
+    residual_index_from_phase_mismatch,
+    residual_index_limits,
+    verify_intensity_class,
+)
 from .emission.sound_power import (
     MeteorologicalCorrection,
     PrecisionCriteria,
@@ -959,15 +968,6 @@ from .metrology.data_qualification import (
     stationarity_test,
     trend_test,
 )
-from .metrology.intensity_compliance import (
-    IntensityInstrumentComplianceResult,
-    instrument_class_from_components,
-    intensity_class_compliance,
-    phase_mismatch_from_residual_index,
-    residual_index_from_phase_mismatch,
-    residual_index_limits,
-    verify_intensity_class,
-)
 from .metrology.uncertainty import (
     MonteCarloResult,
     Quantity,
@@ -1319,7 +1319,7 @@ from .underwater.acoustics import (
     sound_pressure_level,
     underwater_to_in_air_spl,
 )
-from .underwater.marine_mammal_audiograms import (
+from .underwater.bioacoustics.audiograms import (
     AUDIOGRAM_GROUPS,
     BEST_HEARING_FREQUENCY_KHZ,
     ORCA_AUDIOGRAM_RANGE_KHZ,
@@ -1329,7 +1329,7 @@ from .underwater.marine_mammal_audiograms import (
     group_audiogram,
     orca_audiogram,
 )
-from .underwater.marine_mammal_weighting import (
+from .underwater.bioacoustics.weighting import (
     WEIGHTING_GUIDANCE,
     AuditoryWeightingResult,
     ExposureCriteria,
@@ -1341,7 +1341,13 @@ from .underwater.marine_mammal_weighting import (
     weighted_exposure,
     weighting_parameters,
 )
-from .underwater.numerical_propagation import (
+from .underwater.propagation.closed_form import (
+    TransmissionLossResult,
+    seawater_absorption,
+    spreading_loss,
+    transmission_loss,
+)
+from .underwater.propagation.numerical import (
     NormalModeResult,
     ParabolicEquationResult,
     RayTraceResult,
@@ -1349,28 +1355,7 @@ from .underwater.numerical_propagation import (
     parabolic_equation,
     ray_trace,
 )
-from .underwater.ocean_ambient_noise import (
-    AmbientNoiseResult,
-    ocean_ambient_noise,
-    thermal_noise_spectrum,
-    wind_noise_spectrum,
-)
-from .underwater.pile_driving_noise import (
-    PileStrikeResult,
-    StrikeSelSpectrum,
-    cumulative_sel,
-    cumulative_sel_identical,
-    pile_strike_metrics,
-    single_strike_sel,
-    strike_sel_spectrum,
-)
-from .underwater.propagation import (
-    TransmissionLossResult,
-    seawater_absorption,
-    spreading_loss,
-    transmission_loss,
-)
-from .underwater.seabed_reflection import (
+from .underwater.propagation.seabed_reflection import (
     BottomLossResult,
     SeabedReflection,
     bottom_reflection_loss,
@@ -1378,33 +1363,13 @@ from .underwater.seabed_reflection import (
     reflection_coefficient,
     seabed_reflection,
 )
-from .underwater.ship_radiated_noise import (
-    ShipSourceLevelResult,
-    hydrophone_depths,
-    monopole_source_level,
-    radiated_noise_level,
-    source_level_uncertainty,
-)
-from .underwater.ship_traffic_noise import (
-    VESSEL_CLASSES,
-    ShipTrafficSpectrum,
-    ship_source_spectrum,
-)
-from .underwater.sonar_equation import (
-    DetectionRangeResult,
-    SonarEquationResult,
-    active_sonar_equation,
-    detection_range,
-    detection_range_from_curve,
-    passive_sonar_equation,
-)
-from .underwater.sound_speed import (
+from .underwater.propagation.sound_speed import (
     SoundSpeedProfile,
     depth_to_pressure,
     sea_water_sound_speed,
     sound_speed_profile,
 )
-from .underwater.weston_regimes import (
+from .underwater.propagation.weston_regimes import (
     WESTON_REGIMES,
     WESTON_SEABEDS,
     WestonPropagationResult,
@@ -1417,6 +1382,41 @@ from .underwater.weston_regimes import (
     waveguide_cutoff_frequency,
     weston_propagation_loss,
     weston_regime_boundaries,
+)
+from .underwater.sonar_equation import (
+    DetectionRangeResult,
+    SonarEquationResult,
+    active_sonar_equation,
+    detection_range,
+    detection_range_from_curve,
+    passive_sonar_equation,
+)
+from .underwater.sources.ambient_noise import (
+    AmbientNoiseResult,
+    ocean_ambient_noise,
+    thermal_noise_spectrum,
+    wind_noise_spectrum,
+)
+from .underwater.sources.pile_driving_noise import (
+    PileStrikeResult,
+    StrikeSelSpectrum,
+    cumulative_sel,
+    cumulative_sel_identical,
+    pile_strike_metrics,
+    single_strike_sel,
+    strike_sel_spectrum,
+)
+from .underwater.sources.ship_radiated_noise import (
+    ShipSourceLevelResult,
+    hydrophone_depths,
+    monopole_source_level,
+    radiated_noise_level,
+    source_level_uncertainty,
+)
+from .underwater.sources.ship_traffic_noise import (
+    VESSEL_CLASSES,
+    ShipTrafficSpectrum,
+    ship_source_spectrum,
 )
 from .vibration.human.exposure import (
     HAV_EAV_A8,

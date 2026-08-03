@@ -16,7 +16,7 @@ and wind change with height, and this **refracts** sound: rays curve, and over a
 few hundred metres the received level can swing by tens of decibels. This page
 covers `phonometry.environment.propagation.refraction`, the
 refracting-atmosphere counterpart of the ocean solvers in
-[`phonometry.underwater.numerical_propagation`](https://jmrplens.github.io/phonometry/guides/underwater-solvers/): a
+[`phonometry.underwater.propagation.numerical`](https://jmrplens.github.io/phonometry/guides/underwater-solvers/): a
 **ray model** and a **parabolic-equation (PE)** solver, both clean-room from
 Salomons, *Computational Atmospheric Acoustics* (2001) and Attenborough & Van
 Renterghem, *Predicting Outdoor Sound* 2e (2021, Ch. 11).

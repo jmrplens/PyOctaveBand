@@ -369,8 +369,8 @@ class AuditoryWeightingResult:
 
     def plot(self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any) -> Axes:
         """Plot the weighting function versus frequency."""
-        from .._i18n import check_language
-        from .._plot.underwater import plot_auditory_weighting
+        from ..._i18n import check_language
+        from ..._plot.underwater import plot_auditory_weighting
 
         return plot_auditory_weighting(self, ax=ax, language=check_language(language), **kwargs)
 
@@ -504,8 +504,8 @@ class WeightedExposureResult:
 
     def plot(self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any) -> Axes:
         """Plot the unweighted and weighted band spectra with the criteria."""
-        from .._i18n import check_language
-        from .._plot.underwater import plot_weighted_exposure
+        from ..._i18n import check_language
+        from ..._plot.underwater import plot_weighted_exposure
 
         return plot_weighted_exposure(self, ax=ax, language=check_language(language), **kwargs)
 
@@ -543,7 +543,7 @@ def weighted_exposure(
     :param band_sel: Per-band single-event SEL, in dB re 1 µPa²·s (or
         dB re (20 µPa)²·s for an in-air group); same length. ``-inf`` is
         accepted for a band that carries no energy, which is what
-        :func:`~phonometry.underwater.pile_driving_noise.strike_sel_spectrum`
+        :func:`~phonometry.underwater.sources.pile_driving_noise.strike_sel_spectrum`
         returns for bands narrower than its FFT bin spacing; such a band adds
         nothing to the energy sum. Both input arrays are copied, so the result
         never aliases the caller's data.

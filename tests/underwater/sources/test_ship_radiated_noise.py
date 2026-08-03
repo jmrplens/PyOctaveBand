@@ -21,7 +21,7 @@ from phonometry import (
     radiated_noise_level,
     source_level_uncertainty,
 )
-from phonometry.underwater.ship_radiated_noise import _surface_correction
+from phonometry.underwater.sources.ship_radiated_noise import _surface_correction
 
 
 def _delta_l(u: float) -> float:

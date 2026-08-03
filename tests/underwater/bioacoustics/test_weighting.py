@@ -25,7 +25,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pytest
 
-from phonometry.underwater.marine_mammal_weighting import (
+from phonometry.underwater.bioacoustics.weighting import (
     WEIGHTING_GUIDANCE,
     AuditoryWeightingResult,
     auditory_weighting,
@@ -192,7 +192,7 @@ def test_southall_impulsive_peak_spl_is_threshold_at_f0_plus_159_db(group: str) 
     the in-water groups the sentence names, which is where the rule is
     validated against published values.
     """
-    from phonometry.underwater.marine_mammal_audiograms import (
+    from phonometry.underwater.bioacoustics.audiograms import (
         BEST_HEARING_FREQUENCY_KHZ,
         group_audiogram,
     )
@@ -217,7 +217,7 @@ def test_the_plus_159_rule_rejects_the_printed_in_air_peak_values() -> None:
     so it corroborates the errata without depending on it. Note that 154.4
     rounds to 154, not to the corrected 155; see docs/ERRATA.md.
     """
-    from phonometry.underwater.marine_mammal_audiograms import (
+    from phonometry.underwater.bioacoustics.audiograms import (
         BEST_HEARING_FREQUENCY_KHZ,
         group_audiogram,
     )

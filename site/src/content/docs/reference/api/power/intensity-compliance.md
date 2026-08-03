@@ -1,5 +1,5 @@
 ---
-title: "metrology.intensity_compliance"
+title: "emission.intensity_compliance"
 description: "IEC 61043:1993 sound-intensity instrument class verification."
 sidebar:
   label: "intensity_compliance"
@@ -239,7 +239,7 @@ IntensityInstrumentComplianceResult.plot(
 
 Plot the measured `delta_pI0` over the Table 2 class masks.
 
-See `phonometry._plot.metrology.plot_intensity_class`. Requires
+See `phonometry._plot.emission.plot_intensity_class`. Requires
 matplotlib (`pip install phonometry[plot]`) and returns the
 `Axes`.
 

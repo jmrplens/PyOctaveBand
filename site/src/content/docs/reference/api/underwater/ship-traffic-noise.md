@@ -1,5 +1,5 @@
 ---
-title: "underwater.ship_traffic_noise"
+title: "underwater.sources.ship_traffic_noise"
 description: "Predicted source-level spectrum of shipping traffic (semi-empirical models)."
 sidebar:
   label: "ship_traffic_noise"
@@ -23,8 +23,8 @@ implements three, selectable through `model`:
 All three return an equivalent-monopole source spectral-density level (dB re
 1 µPa²/Hz at 1 m, source depth 6 m) and the decidecade-band source level
 (dB re 1 µPa m). The predicted spectrum can be used as the `shipping` input of
-[`phonometry.underwater.ocean_ambient_noise.ocean_ambient_noise`](/phonometry/reference/api/underwater/ocean-ambient-noise/#ocean_ambient_noise) or placed at range
-with [`phonometry.underwater.propagation.transmission_loss`](/phonometry/reference/api/underwater/propagation/#transmission_loss).
+[`phonometry.underwater.sources.ambient_noise.ocean_ambient_noise`](/phonometry/reference/api/underwater/ambient-noise/#ocean_ambient_noise) or placed at range
+with [`phonometry.underwater.propagation.transmission_loss`](/phonometry/reference/api/underwater/closed-form/#transmission_loss).
 
 Source (clean-room, implemented from the equations, validated against the
 authors' own Excel reference implementation, File S1): MacGillivray, A.;

@@ -33,7 +33,7 @@ from typing import TYPE_CHECKING, Any
 
 import numpy as np
 
-from .._internal.validation import (
+from ..._internal.validation import (
     require_non_negative,
     require_positive,
     require_positive_array,
@@ -140,8 +140,8 @@ class AmbientNoiseResult:
 
     def plot(self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any) -> Axes:
         """Plot the composite spectrum and its components versus frequency."""
-        from .._i18n import check_language
-        from .._plot.underwater import plot_ambient_noise
+        from ..._i18n import check_language
+        from ..._plot.underwater import plot_ambient_noise
 
         return plot_ambient_noise(self, ax=ax, language=check_language(language), **kwargs)
 

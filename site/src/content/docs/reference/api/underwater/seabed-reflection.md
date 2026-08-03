@@ -1,5 +1,5 @@
 ---
-title: "underwater.seabed_reflection"
+title: "underwater.propagation.seabed_reflection"
 description: "Plane-wave reflection at the seabed (fluid-fluid Rayleigh model)."
 sidebar:
   label: "seabed_reflection"

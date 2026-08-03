@@ -34,7 +34,7 @@ Group codes follow Southall et al.: ``HF`` and ``VHF`` cetaceans, ``SI``
 sirenians, ``PCW``/``OCW`` phocid and otariid carnivores in water and
 ``PCA``/``OCA`` the same in air. Beware that NMFS (2018) calls the Southall
 ``HF`` group ``MF`` and the Southall ``VHF`` group ``HF``; see
-:mod:`phonometry.underwater.marine_mammal_weighting`.
+:mod:`phonometry.underwater.bioacoustics.weighting`.
 """
 
 from __future__ import annotations
@@ -166,8 +166,8 @@ class AudiogramResult:
 
     def plot(self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any) -> Axes:
         """Plot the hearing threshold versus frequency."""
-        from .._i18n import check_language
-        from .._plot.underwater import plot_marine_mammal_audiogram
+        from ..._i18n import check_language
+        from ..._plot.underwater import plot_marine_mammal_audiogram
 
         return plot_marine_mammal_audiogram(self, ax=ax, language=check_language(language), **kwargs)
 

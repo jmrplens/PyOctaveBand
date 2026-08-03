@@ -16,7 +16,7 @@ matplotlib.use("Agg")
 import numpy as np
 import pytest
 
-from phonometry.underwater.ship_traffic_noise import (
+from phonometry.underwater.sources.ship_traffic_noise import (
     VESSEL_CLASSES,
     ShipTrafficSpectrum,
     ship_source_spectrum,
@@ -171,7 +171,7 @@ _RANDI_TABLE2 = [
 def test_randi_reproduces_report_table_2(
     length_ft: float, speed_kn: float, levels: dict[float, float],
 ) -> None:
-    from phonometry.underwater.ship_traffic_noise import _randi
+    from phonometry.underwater.sources.ship_traffic_noise import _randi
 
     f = np.array(sorted(levels))
     got = _randi(f, speed_kn, length_ft * 0.3048)

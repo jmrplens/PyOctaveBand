@@ -1,15 +1,15 @@
 ---
-title: "underwater.marine_mammal_audiograms"
+title: "underwater.bioacoustics.audiograms"
 description: "Marine-mammal hearing thresholds (group audiograms and the orca audiogram)."
 sidebar:
-  label: "marine_mammal_audiograms"
+  label: "audiograms"
 ---
 
 Marine-mammal hearing thresholds (group audiograms and the orca audiogram).
 
 Two independent published descriptions of how well a marine mammal hears:
 
-* [`group_audiogram`](/phonometry/reference/api/underwater/marine-mammal-audiograms/#group_audiogram) -- the **group audiogram** of Southall et al. (2019),
+* [`group_audiogram`](/phonometry/reference/api/underwater/audiograms/#group_audiogram) -- the **group audiogram** of Southall et al. (2019),
   a four-parameter band-pass fit (their Equation 1, after Finneran 2016)
 
   $$
@@ -18,7 +18,7 @@ Two independent published descriptions of how well a marine mammal hears:
 
   with the group parameters of their Table 2 (absolute thresholds) and Table 3
   (normalised to 0 dB at best sensitivity).
-* [`orca_audiogram`](/phonometry/reference/api/underwater/marine-mammal-audiograms/#orca_audiogram) -- the killer-whale (*Orcinus orca*) audiogram of
+* [`orca_audiogram`](/phonometry/reference/api/underwater/audiograms/#orca_audiogram) -- the killer-whale (*Orcinus orca*) audiogram of
   Wensveen & Van Roij (2007) as printed in Ainslie, *Principles of Sonar
   Performance Modelling* (Springer 2010), Equation (11.159), a **three-branch**
   power law over 0.5 to 80 kHz fitted to the measurements of Hall & Johnson
@@ -34,14 +34,14 @@ $A = 20$ dB/decade, $B = 3.2$, $F_2 = 9.4$ kHz and
 $T_0 = 53.2$ dB (0.8 dB normalised) in prose but never prints
 $F_1$, only the criterion used to choose it. The group is
 therefore absent from
-[`AUDIOGRAM_GROUPS`](/phonometry/reference/api/underwater/marine-mammal-audiograms/#audiogram_groups) rather than reconstructed by guesswork.
+[`AUDIOGRAM_GROUPS`](/phonometry/reference/api/underwater/audiograms/#audiogram_groups) rather than reconstructed by guesswork.
 :::
 
 Group codes follow Southall et al.: `HF` and `VHF` cetaceans, `SI`
 sirenians, `PCW`/`OCW` phocid and otariid carnivores in water and
 `PCA`/`OCA` the same in air. Beware that NMFS (2018) calls the Southall
 `HF` group `MF` and the Southall `VHF` group `HF`; see
-[`phonometry.underwater.marine_mammal_weighting`](/phonometry/reference/api/underwater/marine-mammal-weighting/).
+[`phonometry.underwater.bioacoustics.weighting`](/phonometry/reference/api/underwater/weighting/).
 
 > Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
 
@@ -69,10 +69,10 @@ Fit parameters of a published group audiogram.
 
 | Name | Description |
 | :--- | :--- |
-| `group` | Hearing-group code, one of [`AUDIOGRAM_GROUPS`](/phonometry/reference/api/underwater/marine-mammal-audiograms/#audiogram_groups) (case-insensitive). |
+| `group` | Hearing-group code, one of [`AUDIOGRAM_GROUPS`](/phonometry/reference/api/underwater/audiograms/#audiogram_groups) (case-insensitive). |
 | `normalized` | Return the Table 3 normalised fit instead of the Table 2 absolute one. |
 
-**Returns:** The [`AudiogramParameters`](/phonometry/reference/api/underwater/marine-mammal-audiograms/#audiogramparameters) for that group.
+**Returns:** The [`AudiogramParameters`](/phonometry/reference/api/underwater/audiograms/#audiogramparameters) for that group.
 
 **Raises**
 
@@ -181,10 +181,10 @@ Table 3 (`normalized=True`).
 | Name | Description |
 | :--- | :--- |
 | `frequency_hz` | Frequency or frequencies, in Hz (strictly positive). |
-| `group` | Hearing-group code, one of [`AUDIOGRAM_GROUPS`](/phonometry/reference/api/underwater/marine-mammal-audiograms/#audiogram_groups). |
+| `group` | Hearing-group code, one of [`AUDIOGRAM_GROUPS`](/phonometry/reference/api/underwater/audiograms/#audiogram_groups). |
 | `normalized` | Use the normalised fit (0 dB at best sensitivity). |
 
-**Returns:** An [`AudiogramResult`](/phonometry/reference/api/underwater/marine-mammal-audiograms/#audiogramresult).
+**Returns:** An [`AudiogramResult`](/phonometry/reference/api/underwater/audiograms/#audiogramresult).
 
 **Raises**
 
@@ -218,9 +218,9 @@ third branch**; evaluating the second one there returns 50.5 dB instead.
 
 | Name | Description |
 | :--- | :--- |
-| `frequency_hz` | Frequency or frequencies, in Hz, within [`ORCA_AUDIOGRAM_RANGE_KHZ`](/phonometry/reference/api/underwater/marine-mammal-audiograms/#orca_audiogram_range_khz) scaled to hertz. |
+| `frequency_hz` | Frequency or frequencies, in Hz, within [`ORCA_AUDIOGRAM_RANGE_KHZ`](/phonometry/reference/api/underwater/audiograms/#orca_audiogram_range_khz) scaled to hertz. |
 
-**Returns:** An [`AudiogramResult`](/phonometry/reference/api/underwater/marine-mammal-audiograms/#audiogramresult) in dB re 1 µPa.
+**Returns:** An [`AudiogramResult`](/phonometry/reference/api/underwater/audiograms/#audiogramresult) in dB re 1 µPa.
 
 **Raises**
 

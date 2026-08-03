@@ -1,8 +1,8 @@
 ---
-title: "underwater.ocean_ambient_noise"
+title: "underwater.sources.ambient_noise"
 description: "Ocean ambient-noise spectrum levels (Wenz framework)."
 sidebar:
-  label: "ocean_ambient_noise"
+  label: "ambient_noise"
 ---
 
 Ocean ambient-noise spectrum levels (Wenz framework).
@@ -10,17 +10,17 @@ Ocean ambient-noise spectrum levels (Wenz framework).
 Deep-water ambient-noise **spectrum levels** (dB re 1 µPa²/Hz) from the two
 physically grounded components of the Wenz curves:
 
-* [`wind_noise_spectrum`](/phonometry/reference/api/underwater/ocean-ambient-noise/#wind_noise_spectrum) -- wind / sea-surface (Knudsen) noise via Wenz's
+* [`wind_noise_spectrum`](/phonometry/reference/api/underwater/ambient-noise/#wind_noise_spectrum) -- wind / sea-surface (Knudsen) noise via Wenz's
   "rule of fives",
   $\mathrm{NL} = 51.02 - (5/3) \cdot 10 (\log_{10} f - \log_{10}(U/5))$
   (`f` in kHz, `U` in knots; the historical 25 dB anchor is re 20 µPa and
   becomes $25 + 20 \log_{10}(20)$ re 1 µPa), valid over roughly 500 Hz-5 kHz.
-* [`thermal_noise_spectrum`](/phonometry/reference/api/underwater/ocean-ambient-noise/#thermal_noise_spectrum) -- the molecular thermal-noise limit (Mellen
+* [`thermal_noise_spectrum`](/phonometry/reference/api/underwater/ambient-noise/#thermal_noise_spectrum) -- the molecular thermal-noise limit (Mellen
   1952), $\langle p^2(f) \rangle = 4 \pi k T \rho f^2 / c$ (Pa²/Hz),
   dominant above ~50 kHz.
 
-[`ocean_ambient_noise`](/phonometry/reference/api/underwater/ocean-ambient-noise/#ocean_ambient_noise) energy-sums the enabled components (and an optional
-caller-supplied shipping spectrum) into a composite [`AmbientNoiseResult`](/phonometry/reference/api/underwater/ocean-ambient-noise/#ambientnoiseresult)
+[`ocean_ambient_noise`](/phonometry/reference/api/underwater/ambient-noise/#ocean_ambient_noise) energy-sums the enabled components (and an optional
+caller-supplied shipping spectrum) into a composite [`AmbientNoiseResult`](/phonometry/reference/api/underwater/ambient-noise/#ambientnoiseresult)
 with a `.plot()` of the Wenz-style curves.
 
 The low-frequency turbulence band and a built-in distant-shipping model are out
@@ -101,7 +101,7 @@ components, plus an optional caller-supplied shipping spectrum.
 | `density` | Water density, in kg/m³. |
 | `sound_speed` | Sound speed, in m/s. |
 
-**Returns:** An [`AmbientNoiseResult`](/phonometry/reference/api/underwater/ocean-ambient-noise/#ambientnoiseresult).
+**Returns:** An [`AmbientNoiseResult`](/phonometry/reference/api/underwater/ambient-noise/#ambientnoiseresult).
 
 **Raises**
 

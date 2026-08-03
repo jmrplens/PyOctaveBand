@@ -1,8 +1,8 @@
 ---
-title: "underwater.marine_mammal_weighting"
+title: "underwater.bioacoustics.weighting"
 description: "Regulatory auditory weighting and exposure criteria for marine mammals."
 sidebar:
-  label: "marine_mammal_weighting"
+  label: "weighting"
 ---
 
 Regulatory auditory weighting and exposure criteria for marine mammals.
@@ -39,9 +39,9 @@ mid-frequency cetaceans `MF` and the porpoise-type group `HF`; NMFS 2024
 and Southall call the same two `HF` and `VHF`. Each guidance version only
 accepts its own codes.
 
-The module exposes the weighting itself ([`auditory_weighting`](/phonometry/reference/api/underwater/marine-mammal-weighting/#auditory_weighting)), the
-published thresholds ([`exposure_criteria`](/phonometry/reference/api/underwater/marine-mammal-weighting/#exposure_criteria)) and the assessment chain
-([`weighted_exposure`](/phonometry/reference/api/underwater/marine-mammal-weighting/#weighted_exposure)), which weights a band spectrum, accumulates it over
+The module exposes the weighting itself ([`auditory_weighting`](/phonometry/reference/api/underwater/weighting/#auditory_weighting)), the
+published thresholds ([`exposure_criteria`](/phonometry/reference/api/underwater/weighting/#exposure_criteria)) and the assessment chain
+([`weighted_exposure`](/phonometry/reference/api/underwater/weighting/#weighted_exposure)), which weights a band spectrum, accumulates it over
 a number of events and reports the exceedance of each applicable criterion.
 
 Implemented clean-room from the three documents; validated against the worked
@@ -83,7 +83,7 @@ Auditory weighting function `W(f)` of a marine-mammal hearing group.
 | `group` | Hearing-group code as used by `guidance`. |
 | `guidance` | `"nmfs-2024"` (default, current), `"nmfs-2018"` or `"southall-2019"`. |
 
-**Returns:** An [`AuditoryWeightingResult`](/phonometry/reference/api/underwater/marine-mammal-weighting/#auditoryweightingresult).
+**Returns:** An [`AuditoryWeightingResult`](/phonometry/reference/api/underwater/weighting/#auditoryweightingresult).
 
 **Raises**
 
@@ -114,7 +114,7 @@ Auditory weighting and exposure functions of one hearing group.
 | `frequencies` | Frequencies, in Hz. |
 | `weighting` | Weighting-function amplitude `W(f)`, in dB ($\le 0$). |
 | `exposure_function` | Exposure function $E(f) = K + C - W(f)$, in dB (the frequency-dependent TTS-onset level). |
-| `parameters` | The [`WeightingParameters`](/phonometry/reference/api/underwater/marine-mammal-weighting/#weightingparameters) used. |
+| `parameters` | The [`WeightingParameters`](/phonometry/reference/api/underwater/weighting/#weightingparameters) used. |
 | `guidance` | The guidance version. |
 | `group` | Hearing-group code. |
 | `weighted_tts_onset` | $T_w = K + C$, the minimum of the exposure function, in dB. |
@@ -153,7 +153,7 @@ Published TTS and injury onset criteria of a hearing group.
 | `guidance` | `"nmfs-2024"` (default), `"nmfs-2018"` or `"southall-2019"`. |
 | `impulsive` | Return the impulsive-noise criteria (dual metric: a weighted SEL and an unweighted peak SPL) instead of the non-impulsive ones. |
 
-**Returns:** An [`ExposureCriteria`](/phonometry/reference/api/underwater/marine-mammal-weighting/#exposurecriteria).
+**Returns:** An [`ExposureCriteria`](/phonometry/reference/api/underwater/weighting/#exposurecriteria).
 
 **Raises**
 
@@ -213,7 +213,7 @@ Hearing-group codes defined by a guidance version.
 
 | Name | Description |
 | :--- | :--- |
-| `guidance` | One of [`WEIGHTING_GUIDANCE`](/phonometry/reference/api/underwater/marine-mammal-weighting/#weighting_guidance). |
+| `guidance` | One of [`WEIGHTING_GUIDANCE`](/phonometry/reference/api/underwater/weighting/#weighting_guidance). |
 
 **Returns:** The group codes, in the order the source tabulates them.
 
@@ -242,7 +242,7 @@ Weight a band spectrum, accumulate it and compare it with the
 criteria.
 
 The per-band single-event sound exposure levels are weighted with
-[`auditory_weighting`](/phonometry/reference/api/underwater/marine-mammal-weighting/#auditory_weighting), summed on an energy basis and accumulated over
+[`auditory_weighting`](/phonometry/reference/api/underwater/weighting/#auditory_weighting), summed on an energy basis and accumulated over
 `n_events` identical events ($+10 \log_{10} N$, the ISO 18406 Formula 9
 identity used by [`cumulative_sel_identical`](/phonometry/reference/api/underwater/pile-driving-noise/#cumulative_sel_identical)).
 The result is compared with the group's TTS and injury onset criteria; the
@@ -261,7 +261,7 @@ dual-metric rule requires.
 | `n_events` | Number of identical accumulated events, $\ge 1$. |
 | `peak_spl` | Unweighted zero-to-peak sound pressure level of the loudest single event, in dB; enables the peak-SPL half of the dual metric. |
 
-**Returns:** A [`WeightedExposureResult`](/phonometry/reference/api/underwater/marine-mammal-weighting/#weightedexposureresult).
+**Returns:** A [`WeightedExposureResult`](/phonometry/reference/api/underwater/weighting/#weightedexposureresult).
 
 **Raises**
 
@@ -309,7 +309,7 @@ Weighted exposure of a spectrum against a hearing group's criteria.
 | `cumulative_sel` | `weighted_sel` plus $10 \log_{10}(N)$ for the `n_events` accumulated events, in dB. |
 | `peak_spl` | The unweighted peak sound pressure level supplied, in dB (`None` when not given). |
 | `n_events` | Number of accumulated events (e.g. hammer strikes). |
-| `criteria` | The [`ExposureCriteria`](/phonometry/reference/api/underwater/marine-mammal-weighting/#exposurecriteria) compared against. |
+| `criteria` | The [`ExposureCriteria`](/phonometry/reference/api/underwater/weighting/#exposurecriteria) compared against. |
 | `sel_margin` | `cumulative_sel - injury_sel`, in dB (`None` when the criterion is not published); positive means the criterion is exceeded. |
 | `tts_margin` | `cumulative_sel - tts_sel`, in dB (or `None`). |
 | `peak_margin` | `peak_spl - injury_peak_spl`, in dB (or `None`). |
@@ -357,9 +357,9 @@ Weighting/exposure parameters of one hearing group.
 | Name | Description |
 | :--- | :--- |
 | `group` | Hearing-group code as used by `guidance` (case-insensitive). |
-| `guidance` | One of [`WEIGHTING_GUIDANCE`](/phonometry/reference/api/underwater/marine-mammal-weighting/#weighting_guidance). |
+| `guidance` | One of [`WEIGHTING_GUIDANCE`](/phonometry/reference/api/underwater/weighting/#weighting_guidance). |
 
-**Returns:** The [`WeightingParameters`](/phonometry/reference/api/underwater/marine-mammal-weighting/#weightingparameters) row.
+**Returns:** The [`WeightingParameters`](/phonometry/reference/api/underwater/weighting/#weightingparameters) row.
 
 **Raises**
 

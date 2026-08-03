@@ -16,7 +16,7 @@ matplotlib.use("Agg")
 import numpy as np
 import pytest
 
-from phonometry.underwater.seabed_reflection import (
+from phonometry.underwater.propagation.seabed_reflection import (
     BottomLossResult,
     SeabedReflection,
     bottom_reflection_loss,

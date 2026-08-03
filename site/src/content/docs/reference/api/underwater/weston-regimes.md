@@ -1,5 +1,5 @@
 ---
-title: "underwater.weston_regimes"
+title: "underwater.propagation.weston_regimes"
 description: "Weston's shallow-water propagation regimes (flux theory)."
 sidebar:
   label: "weston_regimes"
@@ -32,7 +32,7 @@ transmission loss for a point source in free water.
 
 The regime formulae are energy-flux (incoherent) results: they describe the
 range-averaged field, not its modal interference. That is exactly what makes
-them a usable cross-check for [`phonometry.underwater.numerical_propagation`](/phonometry/reference/api/underwater/numerical-propagation/)
+them a usable cross-check for [`phonometry.underwater.propagation.numerical`](/phonometry/reference/api/underwater/numerical/)
 -- the range average of a normal-mode or parabolic-equation field over many
 interference cycles converges on the cylindrical-spreading law, with
 $\psi_c = \pi/2$ for a totally reflecting (pressure-release) bottom.

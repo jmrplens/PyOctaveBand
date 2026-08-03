@@ -33,7 +33,7 @@ from typing import TYPE_CHECKING, Any
 
 import numpy as np
 
-from .._internal.validation import require_positive
+from ..._internal.validation import require_positive
 
 if TYPE_CHECKING:
     from matplotlib.axes import Axes
@@ -96,8 +96,8 @@ class NormalModeResult:
 
     def plot(self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any) -> Axes:
         """Plot the transmission loss versus range (loss increasing downward)."""
-        from .._i18n import check_language
-        from .._plot.underwater import plot_normal_modes
+        from ..._i18n import check_language
+        from ..._plot.underwater import plot_normal_modes
 
         return plot_normal_modes(self, ax=ax, language=check_language(language), **kwargs)
 
@@ -118,7 +118,7 @@ def _propagating_band(
     if np.any(prop & (eigvals <= 10.0 * fd_floor)):
         import warnings
 
-        from .._internal.warnings import PhonometryWarning
+        from ..._internal.warnings import PhonometryWarning
 
         warnings.warn(
             "normal_modes: retained near-cutoff mode(s) lie within 10x the"
@@ -306,8 +306,8 @@ class RayTraceResult:
 
     def plot(self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any) -> Axes:
         """Plot the ray paths (depth increasing downward)."""
-        from .._i18n import check_language
-        from .._plot.underwater import plot_ray_trace
+        from ..._i18n import check_language
+        from ..._plot.underwater import plot_ray_trace
 
         return plot_ray_trace(self, ax=ax, language=check_language(language), **kwargs)
 
@@ -431,8 +431,8 @@ class ParabolicEquationResult:
 
     def plot(self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any) -> Axes:
         """Plot the transmission-loss field (depth increasing downward)."""
-        from .._i18n import check_language
-        from .._plot.underwater import plot_parabolic_equation
+        from ..._i18n import check_language
+        from ..._plot.underwater import plot_parabolic_equation
 
         return plot_parabolic_equation(self, ax=ax, language=check_language(language), **kwargs)
 

@@ -472,14 +472,14 @@ class IntensityInstrumentComplianceResult:
     ) -> Axes:
         """Plot the measured ``delta_pI0`` over the Table 2 class masks.
 
-        See :func:`phonometry._plot.metrology.plot_intensity_class`. Requires
+        See :func:`phonometry._plot.emission.plot_intensity_class`. Requires
         matplotlib (``pip install phonometry[plot]``) and returns the
         :class:`~matplotlib.axes.Axes`.
 
         :param language: Label language, ``"en"`` (default) or ``"es"``.
         """
         from .._i18n import check_language
-        from .._plot.metrology import plot_intensity_class
+        from .._plot.emission import plot_intensity_class
 
         check_language(language)
         return plot_intensity_class(self, ax=ax, language=language, **kwargs)
