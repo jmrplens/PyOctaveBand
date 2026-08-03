@@ -32,7 +32,7 @@ tabulated by the standard (0.0617 sone/Cam); a 1 kHz tone at 40 dB SPL
 presented binaurally in a free field yields 1.000 sone by definition of the
 sone (clause 3.17), which this implementation reproduces without tuning.
 
-The stationary method is spectrum based.  [`loudness_moore_glasberg_from_spectrum`](/phonometry/reference/api/psychoacoustics/moore-glasberg/#loudness_moore_glasberg_from_spectrum)
+The stationary method is spectrum-based.  [`loudness_moore_glasberg_from_spectrum`](/phonometry/reference/api/psychoacoustics/moore-glasberg/#loudness_moore_glasberg_from_spectrum)
 takes the exact sinusoidal-component representation of clauses 5.2/5.4,
 [`loudness_moore_glasberg_from_third_octave`](/phonometry/reference/api/psychoacoustics/moore-glasberg/#loudness_moore_glasberg_from_third_octave) takes the 29 one-third-octave
 band levels of clause 5.5, and [`loudness_moore_glasberg`](/phonometry/reference/api/psychoacoustics/moore-glasberg/#loudness_moore_glasberg) forms the
