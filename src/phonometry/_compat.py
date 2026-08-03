@@ -140,16 +140,17 @@ _MOVED_3X: dict[str, str] = {
     "phonometry.aircraft_noise": "phonometry.aircraft.aircraft_noise",
     "phonometry.airport_noise": "phonometry.aircraft.airport_noise",
     "phonometry.rotorcraft_noise": "phonometry.aircraft.rotorcraft_noise",
-    "phonometry.numerical_propagation": "phonometry.underwater.numerical_propagation",
-    "phonometry.ocean_ambient_noise": "phonometry.underwater.ocean_ambient_noise",
-    "phonometry.pile_driving_noise": "phonometry.underwater.pile_driving_noise",
-    "phonometry.seabed_reflection": "phonometry.underwater.seabed_reflection",
-    "phonometry.ship_radiated_noise": "phonometry.underwater.ship_radiated_noise",
-    "phonometry.ship_traffic_noise": "phonometry.underwater.ship_traffic_noise",
+    "phonometry.numerical_propagation": "phonometry.underwater.propagation.numerical",
+    "phonometry.ocean_ambient_noise": "phonometry.underwater.sources.ambient_noise",
+    "phonometry.pile_driving_noise": "phonometry.underwater.sources.pile_driving_noise",
+    "phonometry.seabed_reflection": "phonometry.underwater.propagation.seabed_reflection",
+    "phonometry.ship_radiated_noise": "phonometry.underwater.sources.ship_radiated_noise",
+    "phonometry.ship_traffic_noise": "phonometry.underwater.sources.ship_traffic_noise",
     "phonometry.sonar_equation": "phonometry.underwater.sonar_equation",
     "phonometry.underwater_acoustics": "phonometry.underwater.acoustics",
-    "phonometry.underwater_propagation": "phonometry.underwater.propagation",
-    "phonometry.underwater_sound_speed": "phonometry.underwater.sound_speed",
+    "phonometry.underwater_propagation":
+        "phonometry.underwater.propagation.closed_form",
+    "phonometry.underwater_sound_speed": "phonometry.underwater.propagation.sound_speed",
     "phonometry.distortion": "phonometry.electroacoustics.distortion",
     "phonometry.frequency_response": "phonometry.electroacoustics.frequency_response",
     # <migrate:auto>
@@ -191,6 +192,8 @@ _MOVED_4X: dict[str, str] = {
     "phonometry.metrology.signals": "phonometry.signals.test_signals",
     "phonometry.metrology.random_data":
         "phonometry.metrology.data_qualification",
+    "phonometry.metrology.intensity_compliance":
+        "phonometry.emission.intensity_compliance",
     "phonometry.hearing.sti": "phonometry.speech.sti",
     "phonometry.hearing.sii": "phonometry.speech.sii",
     "phonometry.hearing.objective_intelligibility":
@@ -327,6 +330,30 @@ _MOVED_4X: dict[str, str] = {
         "phonometry.psychoacoustics.quality.tone_audibility",
     "phonometry.psychoacoustics.psychoacoustic_annoyance":
         "phonometry.psychoacoustics.quality.annoyance",
+    "phonometry.underwater.marine_mammal_audiograms":
+        "phonometry.underwater.bioacoustics.audiograms",
+    "phonometry.underwater.marine_mammal_weighting":
+        "phonometry.underwater.bioacoustics.weighting",
+    "phonometry.underwater.numerical_propagation":
+        "phonometry.underwater.propagation.numerical",
+    "phonometry.underwater.weston_regimes":
+        "phonometry.underwater.propagation.weston_regimes",
+    "phonometry.underwater.seabed_reflection":
+        "phonometry.underwater.propagation.seabed_reflection",
+    "phonometry.underwater.sound_speed":
+        "phonometry.underwater.propagation.sound_speed",
+    "phonometry.underwater.ship_radiated_noise":
+        "phonometry.underwater.sources.ship_radiated_noise",
+    "phonometry.underwater.ship_traffic_noise":
+        "phonometry.underwater.sources.ship_traffic_noise",
+    "phonometry.underwater.pile_driving_noise":
+        "phonometry.underwater.sources.pile_driving_noise",
+    "phonometry.underwater.ocean_ambient_noise":
+        "phonometry.underwater.sources.ambient_noise",
+    # ``underwater.propagation`` is not in this table: the name now belongs to
+    # the family package, which re-exports everything the module of that name
+    # exported. An alias would have to shadow a real package to warn, and
+    # shadowing it is exactly what must not happen.
 }
 
 #: The two generations, each with the release that deprecated it and the one

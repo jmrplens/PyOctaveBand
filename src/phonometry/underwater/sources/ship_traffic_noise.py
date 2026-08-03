@@ -18,7 +18,7 @@ implements three, selectable through ``model``:
 All three return an equivalent-monopole source spectral-density level (dB re
 1 µPa²/Hz at 1 m, source depth 6 m) and the decidecade-band source level
 (dB re 1 µPa m). The predicted spectrum can be used as the ``shipping`` input of
-:func:`phonometry.underwater.ocean_ambient_noise.ocean_ambient_noise` or placed at range
+:func:`phonometry.underwater.sources.ambient_noise.ocean_ambient_noise` or placed at range
 with :func:`phonometry.underwater.propagation.transmission_loss`.
 
 Source (clean-room, implemented from the equations, validated against the
@@ -36,7 +36,7 @@ from typing import TYPE_CHECKING, Any
 
 import numpy as np
 
-from .._internal.validation import require_positive, require_positive_array
+from ..._internal.validation import require_positive, require_positive_array
 
 if TYPE_CHECKING:
     from matplotlib.axes import Axes
@@ -154,8 +154,8 @@ class ShipTrafficSpectrum:
 
     def plot(self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any) -> Axes:
         """Plot the predicted source spectral-density level versus frequency."""
-        from .._i18n import check_language
-        from .._plot.underwater import plot_ship_traffic_spectrum
+        from ..._i18n import check_language
+        from ..._plot.underwater import plot_ship_traffic_spectrum
 
         return plot_ship_traffic_spectrum(self, ax=ax, language=check_language(language), **kwargs)
 

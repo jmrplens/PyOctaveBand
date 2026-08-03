@@ -23,7 +23,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pytest
 
-from phonometry.underwater.marine_mammal_audiograms import (
+from phonometry.underwater.bioacoustics.audiograms import (
     AUDIOGRAM_GROUPS,
     BEST_HEARING_FREQUENCY_KHZ,
     AudiogramResult,

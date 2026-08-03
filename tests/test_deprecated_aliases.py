@@ -491,6 +491,17 @@ _PRE_SPLIT_MODULE_PATHS = [
     "phonometry.psychoacoustics.tonality",
     "phonometry.psychoacoustics.tonality_ecma",
     "phonometry.psychoacoustics.tone_audibility",
+    "phonometry.underwater.marine_mammal_audiograms",
+    "phonometry.underwater.marine_mammal_weighting",
+    "phonometry.underwater.numerical_propagation",
+    "phonometry.underwater.ocean_ambient_noise",
+    "phonometry.underwater.pile_driving_noise",
+    "phonometry.underwater.seabed_reflection",
+    "phonometry.underwater.ship_radiated_noise",
+    "phonometry.underwater.ship_traffic_noise",
+    "phonometry.underwater.sound_speed",
+    "phonometry.underwater.weston_regimes",
+    "phonometry.metrology.intensity_compliance",
 ]
 
 

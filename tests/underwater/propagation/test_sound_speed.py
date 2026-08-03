@@ -18,7 +18,7 @@ matplotlib.use("Agg")
 import numpy as np
 import pytest
 
-from phonometry.underwater.sound_speed import (
+from phonometry.underwater.propagation.sound_speed import (
     _KGCM2_PER_BAR,
     SoundSpeedProfile,
     _del_grosso,

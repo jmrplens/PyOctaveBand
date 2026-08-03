@@ -1,5 +1,5 @@
 ---
-title: "underwater.ship_radiated_noise"
+title: "underwater.sources.ship_radiated_noise"
 description: "Ship radiated noise and equivalent monopole source level (ISO 17208-1/-2)."
 sidebar:
   label: "ship_radiated_noise"

@@ -25,7 +25,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pytest
 
-from phonometry.underwater.marine_mammal_weighting import (
+from phonometry.underwater.bioacoustics.weighting import (
     WEIGHTING_GUIDANCE,
     AuditoryWeightingResult,
     auditory_weighting,
@@ -145,7 +145,8 @@ def test_southall_impulsive_sel_offset_from_the_non_impulsive_table() -> None:
     """"181 dB re 1 µPa²s for non-impulsive TTS onset −11 dB" (printed p. 155)."""
     cont = exposure_criteria("PCW", guidance="southall-2019")
     imp = exposure_criteria("PCW", guidance="southall-2019", impulsive=True)
-    assert cont.tts_sel is not None and imp.tts_sel is not None
+    assert cont.tts_sel is not None
+    assert imp.tts_sel is not None
     assert imp.tts_sel - cont.tts_sel == pytest.approx(-11.0, abs=1e-9)
 
 
@@ -161,9 +162,11 @@ def test_impulsive_injury_offsets_are_15_db_sel_and_6_db_peak(guidance: str) -> 
     """
     for group in hearing_groups(guidance):
         row = exposure_criteria(group, guidance=guidance, impulsive=True)
-        assert row.tts_sel is not None and row.injury_sel is not None
+        assert row.tts_sel is not None
+        assert row.injury_sel is not None
         assert row.injury_sel - row.tts_sel == pytest.approx(15.0, abs=1e-9)
-        assert row.tts_peak_spl is not None and row.injury_peak_spl is not None
+        assert row.tts_peak_spl is not None
+        assert row.injury_peak_spl is not None
         assert row.injury_peak_spl - row.tts_peak_spl == pytest.approx(6.0, abs=1e-9)
 
 
@@ -192,7 +195,7 @@ def test_southall_impulsive_peak_spl_is_threshold_at_f0_plus_159_db(group: str) 
     the in-water groups the sentence names, which is where the rule is
     validated against published values.
     """
-    from phonometry.underwater.marine_mammal_audiograms import (
+    from phonometry.underwater.bioacoustics.audiograms import (
         BEST_HEARING_FREQUENCY_KHZ,
         group_audiogram,
     )
@@ -217,7 +220,7 @@ def test_the_plus_159_rule_rejects_the_printed_in_air_peak_values() -> None:
     so it corroborates the errata without depending on it. Note that 154.4
     rounds to 154, not to the corrected 155; see docs/ERRATA.md.
     """
-    from phonometry.underwater.marine_mammal_audiograms import (
+    from phonometry.underwater.bioacoustics.audiograms import (
         BEST_HEARING_FREQUENCY_KHZ,
         group_audiogram,
     )
@@ -336,7 +339,8 @@ def test_peak_spl_criterion_is_compared_unweighted() -> None:
     res = weighted_exposure([1000.0], [100.0], "VHF", impulsive=True, peak_spl=210.0)
     assert res.peak_margin == pytest.approx(8.0, abs=1e-9)
     assert res.exceeds_injury is True
-    assert res.sel_margin is not None and res.sel_margin < 0.0
+    assert res.sel_margin is not None
+    assert res.sel_margin < 0.0
 
 
 def test_an_exposure_exactly_at_the_criterion_counts_as_exceeding_it() -> None:
@@ -359,7 +363,8 @@ def test_peak_spl_can_trip_tts_alone_and_the_margin_says_so() -> None:
     res = weighted_exposure([1000.0], [100.0], "VHF", impulsive=True, peak_spl=199.0)
     assert res.tts_peak_margin == pytest.approx(3.0, abs=1e-9)
     assert res.peak_margin == pytest.approx(-3.0, abs=1e-9)
-    assert res.tts_margin is not None and res.tts_margin < 0.0
+    assert res.tts_margin is not None
+    assert res.tts_margin < 0.0
     assert res.exceeds_tts is True
     assert res.exceeds_injury is False
 

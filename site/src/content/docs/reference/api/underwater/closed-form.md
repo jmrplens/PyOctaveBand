@@ -1,8 +1,8 @@
 ---
-title: "underwater.propagation"
+title: "underwater.propagation.closed_form"
 description: "Underwater sound propagation: transmission loss (closed-form)."
 sidebar:
-  label: "propagation"
+  label: "closed_form"
 ---
 
 Underwater sound propagation: transmission loss (closed-form).
@@ -10,17 +10,17 @@ Underwater sound propagation: transmission loss (closed-form).
 Transmission loss `TL` (dB) is the sum of geometrical spreading and volume
 absorption:
 
-* [`spreading_loss`](/phonometry/reference/api/underwater/propagation/#spreading_loss) -- geometrical spreading, $20 \log_{10} R$
+* [`spreading_loss`](/phonometry/reference/api/underwater/closed-form/#spreading_loss) -- geometrical spreading, $20 \log_{10} R$
   (spherical), $10 \log_{10} R$ (cylindrical) or spherical-then-cylindrical
   (`"practical"`).
-* [`seawater_absorption`](/phonometry/reference/api/underwater/propagation/#seawater_absorption) -- the volume absorption coefficient
+* [`seawater_absorption`](/phonometry/reference/api/underwater/closed-form/#seawater_absorption) -- the volume absorption coefficient
   $\alpha$ in
   dB/km, from three coexisting formulations selectable through `model`:
   Francois & Garrison (1982, the default and reference), Ainslie & McColm (1998,
   a legible simplification of it) and Thorp (1967, a frequency-only form).
-* [`transmission_loss`](/phonometry/reference/api/underwater/propagation/#transmission_loss) -- the total
+* [`transmission_loss`](/phonometry/reference/api/underwater/closed-form/#transmission_loss) -- the total
   $\mathrm{TL} = \text{spreading} + \alpha R$ versus range,
-  returned as a [`TransmissionLossResult`](/phonometry/reference/api/underwater/propagation/#transmissionlossresult) with a `.plot()`.
+  returned as a [`TransmissionLossResult`](/phonometry/reference/api/underwater/closed-form/#transmissionlossresult) with a `.plot()`.
 
 Sources (clean-room, implemented from the published equations): Francois &
 Garrison, JASA 72 (1982) via Medwin & Clay; Ainslie & McColm, JASA 103 (1998);
@@ -127,15 +127,15 @@ $\mathrm{TL} = \text{spreading} + \alpha R$ versus range.
 | :--- | :--- |
 | `range_m` | Range(s) from the source, in metres (scalar or array). |
 | `frequency_hz` | Acoustic frequency, in Hz. |
-| `law` | Spreading law (see [`spreading_loss`](/phonometry/reference/api/underwater/propagation/#spreading_loss)). |
+| `law` | Spreading law (see [`spreading_loss`](/phonometry/reference/api/underwater/closed-form/#spreading_loss)). |
 | `temperature` | Temperature `T`, in degrees Celsius. |
 | `salinity` | Salinity `S`, in parts per thousand. |
 | `depth` | Depth, in metres. |
 | `ph` | Acidity (default 8). |
-| `model` | Absorption model (see [`seawater_absorption`](/phonometry/reference/api/underwater/propagation/#seawater_absorption)). |
+| `model` | Absorption model (see [`seawater_absorption`](/phonometry/reference/api/underwater/closed-form/#seawater_absorption)). |
 | `transition_range` | Transition range for the `"practical"` law, in m. |
 
-**Returns:** A [`TransmissionLossResult`](/phonometry/reference/api/underwater/propagation/#transmissionlossresult).
+**Returns:** A [`TransmissionLossResult`](/phonometry/reference/api/underwater/closed-form/#transmissionlossresult).
 
 **Raises**
 

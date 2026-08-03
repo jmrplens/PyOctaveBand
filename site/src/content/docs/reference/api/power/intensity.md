@@ -59,7 +59,7 @@ the instrument is adequate for a measurement when $L_d > F_2$
 (criterion 1, Annex B equation (B.1)). The residual index
 $\delta_{pI0}$ that feeds it is classified against
 IEC 61043:1993 Table 2 by
-[`phonometry.metrology.intensity_compliance.intensity_class_compliance`](/phonometry/reference/api/power/intensity-compliance/#intensity_class_compliance).
+[`phonometry.emission.intensity_compliance.intensity_class_compliance`](/phonometry/reference/api/power/intensity-compliance/#intensity_class_compliance).
 
 > Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
 

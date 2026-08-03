@@ -2,7 +2,7 @@
 """IEC 61043 residual-index class-verification fiche (reportlab renderer).
 
 Renders an
-:class:`~phonometry.metrology.intensity_compliance.IntensityInstrumentComplianceResult`
+:class:`~phonometry.emission.intensity_compliance.IntensityInstrumentComplianceResult`
 to a one-page PDF laid out like an accredited electroacoustic verification
 certificate. The section order is the one published accredited acoustic
 calibration certificates use: identification of the item calibrated, customer,
@@ -70,7 +70,7 @@ from ._layout import (
 from .metadata import ReportMetadata
 
 if TYPE_CHECKING:
-    from ..metrology.intensity_compliance import (
+    from ..emission.intensity_compliance import (
         IntensityInstrumentComplianceResult,
     )
 
@@ -285,7 +285,7 @@ def render_iec61043_report(
     """Render an IEC 61043 class-verification fiche to a PDF at ``path``.
 
     :param result: An
-        :class:`~phonometry.metrology.intensity_compliance.IntensityInstrumentComplianceResult`
+        :class:`~phonometry.emission.intensity_compliance.IntensityInstrumentComplianceResult`
         carrying the per-band verdicts and the masks they were judged against.
     :param path: Destination path of the PDF file.
     :param metadata: Optional :class:`ReportMetadata`; ``None`` produces a bare

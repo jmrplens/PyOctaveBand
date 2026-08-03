@@ -24,25 +24,31 @@ from .common import (
 if TYPE_CHECKING:
     from matplotlib.axes import Axes
 
-    from ..underwater.marine_mammal_audiograms import AudiogramResult
-    from ..underwater.marine_mammal_weighting import (
+    from ..underwater.bioacoustics.audiograms import AudiogramResult
+    from ..underwater.bioacoustics.weighting import (
         AuditoryWeightingResult,
         WeightedExposureResult,
     )
-    from ..underwater.numerical_propagation import (
+    from ..underwater.propagation.closed_form import TransmissionLossResult
+    from ..underwater.propagation.numerical import (
         NormalModeResult,
         ParabolicEquationResult,
         RayTraceResult,
     )
-    from ..underwater.ocean_ambient_noise import AmbientNoiseResult
-    from ..underwater.pile_driving_noise import PileStrikeResult, StrikeSelSpectrum
-    from ..underwater.propagation import TransmissionLossResult
-    from ..underwater.seabed_reflection import BottomLossResult, SeabedReflection
-    from ..underwater.ship_radiated_noise import ShipSourceLevelResult
-    from ..underwater.ship_traffic_noise import ShipTrafficSpectrum
+    from ..underwater.propagation.seabed_reflection import (
+        BottomLossResult,
+        SeabedReflection,
+    )
+    from ..underwater.propagation.sound_speed import SoundSpeedProfile
+    from ..underwater.propagation.weston_regimes import WestonPropagationResult
     from ..underwater.sonar_equation import DetectionRangeResult, SonarEquationResult
-    from ..underwater.sound_speed import SoundSpeedProfile
-    from ..underwater.weston_regimes import WestonPropagationResult
+    from ..underwater.sources.ambient_noise import AmbientNoiseResult
+    from ..underwater.sources.pile_driving_noise import (
+        PileStrikeResult,
+        StrikeSelSpectrum,
+    )
+    from ..underwater.sources.ship_radiated_noise import ShipSourceLevelResult
+    from ..underwater.sources.ship_traffic_noise import ShipTrafficSpectrum
 
 #: Axis label and legend placement reused by several renderers in this module
 #: (kept as named constants so the literal appears once).
@@ -142,7 +148,7 @@ def plot_ship_source_level(
     frequency, with the Lloyd's-mirror correction ``ΔL`` on a twin axis.
 
     :param result: A
-        :class:`~phonometry.underwater.ship_radiated_noise.ShipSourceLevelResult`.
+        :class:`~phonometry.underwater.sources.ship_radiated_noise.ShipSourceLevelResult`.
     :param ax: Existing axes, or ``None`` to create a figure.
     :param language: Label language, ``"en"`` (default) or ``"es"``.
     :param kwargs: Forwarded to the source-level ``semilogx`` call.
@@ -193,7 +199,7 @@ def plot_pile_strike(
     the normalised cumulative energy with the 5 %/95 % pulse-duration bounds
     below. With ``ax`` given, only the waveform panel is drawn on it.
 
-    :param result: A :class:`~phonometry.underwater.pile_driving_noise.PileStrikeResult`.
+    :param result: A :class:`~phonometry.underwater.sources.pile_driving_noise.PileStrikeResult`.
     :param ax: Existing axes for the waveform panel, or ``None`` for a fresh
         two-panel figure.
     :param language: Label language, ``"en"`` (default) or ``"es"``.
@@ -248,7 +254,7 @@ def plot_sound_speed_profile(
 ) -> Axes:
     """Sound-speed profile: speed vs depth, with depth increasing downward.
 
-    :param result: A :class:`~phonometry.underwater.sound_speed.SoundSpeedProfile`.
+    :param result: A :class:`~phonometry.underwater.propagation.sound_speed.SoundSpeedProfile`.
     :param ax: Existing axes, or ``None`` to create a figure.
     :param language: Label language, ``"en"`` (default) or ``"es"``.
     :param kwargs: Forwarded to the profile ``plot`` call.
@@ -342,7 +348,7 @@ def plot_bottom_loss(
 ) -> Axes:
     """Bottom reflection loss versus grazing angle, marking the critical angle.
 
-    :param result: A :class:`~phonometry.underwater.seabed_reflection.BottomLossResult`.
+    :param result: A :class:`~phonometry.underwater.propagation.seabed_reflection.BottomLossResult`.
     :param ax: Existing axes, or ``None`` to create a figure.
     :param language: Label language, ``"en"`` (default) or ``"es"``.
     :param kwargs: Forwarded to the bottom-loss ``plot`` call.
@@ -374,7 +380,7 @@ def plot_seabed_reflection(
     Draws ``|R|`` on a linear grazing-angle axis, marking the critical angle
     when the sediment is faster than the water.
 
-    :param result: A :class:`~phonometry.underwater.seabed_reflection.SeabedReflection`.
+    :param result: A :class:`~phonometry.underwater.propagation.seabed_reflection.SeabedReflection`.
     :param ax: Existing axes, or ``None`` to create a figure.
     :param language: Label language, ``"en"`` (default) or ``"es"``.
     :param kwargs: Forwarded to the magnitude ``plot`` call.
@@ -404,7 +410,7 @@ def plot_ambient_noise(
 ) -> Axes:
     """Composite ambient-noise spectrum and its components versus frequency.
 
-    :param result: An :class:`~phonometry.underwater.ocean_ambient_noise.AmbientNoiseResult`.
+    :param result: An :class:`~phonometry.underwater.sources.ambient_noise.AmbientNoiseResult`.
     :param ax: Existing axes, or ``None`` to create a figure.
     :param language: Label language, ``"en"`` (default) or ``"es"``.
     :param kwargs: Forwarded to the composite-level ``plot`` call.
@@ -438,7 +444,7 @@ def plot_ship_traffic_spectrum(
 ) -> Axes:
     """Predicted ship source spectral-density level versus frequency.
 
-    :param result: A :class:`~phonometry.underwater.ship_traffic_noise.ShipTrafficSpectrum`.
+    :param result: A :class:`~phonometry.underwater.sources.ship_traffic_noise.ShipTrafficSpectrum`.
     :param ax: Existing axes, or ``None`` to create a figure.
     :param language: Label language, ``"en"`` (default) or ``"es"``.
     :param kwargs: Forwarded to the source-PSD ``plot`` call.
@@ -470,7 +476,7 @@ def plot_normal_modes(
 ) -> Axes:
     """Normal-mode transmission loss versus range (loss increasing downward).
 
-    :param result: A :class:`~phonometry.underwater.numerical_propagation.NormalModeResult`.
+    :param result: A :class:`~phonometry.underwater.propagation.numerical.NormalModeResult`.
     :param ax: Existing axes, or ``None`` to create a figure.
     :param language: Label language, ``"en"`` (default) or ``"es"``.
     :param kwargs: Forwarded to the transmission-loss ``plot`` call.
@@ -497,7 +503,7 @@ def plot_ray_trace(result: RayTraceResult, ax: Axes | None = None, *, language: 
                    **kwargs: Any) -> Axes:
     """Ray paths through the water column (depth increasing downward).
 
-    :param result: A :class:`~phonometry.underwater.numerical_propagation.RayTraceResult`.
+    :param result: A :class:`~phonometry.underwater.propagation.numerical.RayTraceResult`.
     :param ax: Existing axes, or ``None`` to create a figure.
     :param language: Label language, ``"en"`` (default) or ``"es"``.
     :param kwargs: Forwarded to each ray ``plot`` call.
@@ -528,7 +534,7 @@ def plot_parabolic_equation(
     """Parabolic-equation transmission-loss field (range x depth).
 
     :param result: A
-        :class:`~phonometry.underwater.numerical_propagation.ParabolicEquationResult`.
+        :class:`~phonometry.underwater.propagation.numerical.ParabolicEquationResult`.
     :param ax: Existing axes, or ``None`` to create a figure.
     :param language: Label language, ``"en"`` (default) or ``"es"``.
     :param kwargs: Forwarded to ``imshow``.
@@ -600,7 +606,7 @@ def plot_weston_regimes(
     """Composite Weston propagation loss with each regime's law and boundaries.
 
     :param result: A
-        :class:`~phonometry.underwater.weston_regimes.WestonPropagationResult`.
+        :class:`~phonometry.underwater.propagation.weston_regimes.WestonPropagationResult`.
     :param ax: Existing axes, or ``None`` to create a figure.
     :param language: Label language, ``"en"`` (default) or ``"es"``.
     :param kwargs: Forwarded to the composite-loss ``plot`` call.
@@ -652,7 +658,7 @@ def plot_marine_mammal_audiogram(
     """Hearing threshold versus frequency with the point of best sensitivity.
 
     :param result: An
-        :class:`~phonometry.underwater.marine_mammal_audiograms.AudiogramResult`.
+        :class:`~phonometry.underwater.bioacoustics.audiograms.AudiogramResult`.
     :param ax: Existing axes, or ``None`` to create a figure.
     :param language: Label language, ``"en"`` (default) or ``"es"``.
     :param kwargs: Forwarded to the threshold ``plot`` call.
@@ -681,7 +687,7 @@ def plot_auditory_weighting(
     """Auditory weighting function of a marine-mammal hearing group.
 
     :param result: An
-        :class:`~phonometry.underwater.marine_mammal_weighting.AuditoryWeightingResult`.
+        :class:`~phonometry.underwater.bioacoustics.weighting.AuditoryWeightingResult`.
     :param ax: Existing axes, or ``None`` to create a figure.
     :param language: Label language, ``"en"`` (default) or ``"es"``.
     :param kwargs: Forwarded to the weighting ``plot`` call.
@@ -708,7 +714,7 @@ def plot_weighted_exposure(
     """Unweighted and weighted band spectra against the exposure criteria.
 
     :param result: A
-        :class:`~phonometry.underwater.marine_mammal_weighting.WeightedExposureResult`.
+        :class:`~phonometry.underwater.bioacoustics.weighting.WeightedExposureResult`.
     :param ax: Existing axes, or ``None`` to create a figure.
     :param language: Label language, ``"en"`` (default) or ``"es"``.
     :param kwargs: Forwarded to the weighted-spectrum ``plot`` call.
@@ -747,7 +753,7 @@ def plot_strike_sel_spectrum(
     """Per-band single-strike sound exposure level of a pile strike.
 
     :param result: A
-        :class:`~phonometry.underwater.pile_driving_noise.StrikeSelSpectrum`.
+        :class:`~phonometry.underwater.sources.pile_driving_noise.StrikeSelSpectrum`.
     :param ax: Existing axes, or ``None`` to create a figure.
     :param language: Label language, ``"en"`` (default) or ``"es"``.
     :param kwargs: Forwarded to the band-level ``plot`` call.

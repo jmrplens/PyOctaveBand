@@ -28,7 +28,7 @@ a transmission-loss law at :math:`\mathrm{TL} = \mathrm{FOM}` gives the
 range at which the detection probability is 50 %:
 
 * :func:`detection_range` inverts the closed-form loss of
-  :mod:`phonometry.underwater.propagation` (spreading plus volume absorption),
+  :mod:`phonometry.underwater.propagation.closed_form` (spreading plus volume absorption),
   which is strictly increasing with range and therefore has a single crossing;
 * :func:`detection_range_from_curve` reads the crossing off any computed loss
   curve -- a normal-mode, parabolic-equation or Weston-regime prediction --
@@ -286,7 +286,7 @@ def detection_range(
     """
     from scipy.optimize import brentq
 
-    from .propagation import transmission_loss
+    from .propagation.closed_form import transmission_loss
 
     fom = _finite(figure_of_merit, "figure_of_merit")
     rmax = _finite(max_range, "max_range")

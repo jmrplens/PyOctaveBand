@@ -1120,7 +1120,7 @@ which is the check that enforces the rule; see
   de las bandas de octava") carves out octave-only processors as a special
   case. Both are redundant if every class 2 processor is an octave-band one.
 - **Library behaviour:** implements the EN/IEC reading.
-  [`verify_intensity_class`](https://github.com/jmrplens/phonometry/blob/main/src/phonometry/metrology/intensity_compliance.py)
+  [`verify_intensity_class`](https://github.com/jmrplens/phonometry/blob/main/src/phonometry/emission/intensity_compliance.py)
   treats the full 22-band one-third-octave set as attesting either class, and
   the 7-band octave set (63 Hz to 4 kHz) as a class 2 alternative that never
   attests class 1, with both branches pinned by regression tests
@@ -2102,7 +2102,7 @@ which is the check that enforces the rule; see
   (Eqs. (9.42) to (9.47)), and PDF page 487, printed p. 457, 250 dpi
   (Eqs. (9.54) to (9.57)).
 - **Library behaviour:** `weston_regime_boundaries` in
-  [`weston_regimes.py`](https://github.com/jmrplens/phonometry/blob/main/src/phonometry/underwater/weston_regimes.py)
+  [`propagation/weston_regimes.py`](https://github.com/jmrplens/phonometry/blob/main/src/phonometry/underwater/propagation/weston_regimes.py)
   implements the derivation-consistent $k^2H_e^2H/(9\pi\eta)$, which is also
   what keeps $\theta_\text{eff}$ defined with $H$ everywhere the module
   evaluates Eq. (9.47). The
@@ -2137,7 +2137,7 @@ which is the check that enforces the rule; see
   published weighted TTS onset of the same row
   ($179\ \text{dB} = K + C$ with $K = 178$) is unaffected by the third digit.
 - **Library behaviour:**
-  [`marine_mammal_weighting.py`](https://github.com/jmrplens/phonometry/blob/main/src/phonometry/underwater/marine_mammal_weighting.py)
+  [`bioacoustics/weighting.py`](https://github.com/jmrplens/phonometry/blob/main/src/phonometry/underwater/bioacoustics/weighting.py)
   implements 1,36 and keeps the printed 1,37 available as
   `WeightingParameters.c_db_as_printed`, so an assessment that must reproduce
   the published table verbatim still can. Pinned by
@@ -2206,7 +2206,7 @@ which is the check that enforces the rule; see
   printed p. 570, 250 dpi (the errata's reprinted Table 7, with PCA
   123 / 155 / 138 / 161 and OCA 146 / 170 / 161 / 176).
 - **Library behaviour:** the errata-corrected values are the ones implemented
-  in [`marine_mammal_weighting.py`](https://github.com/jmrplens/phonometry/blob/main/src/phonometry/underwater/marine_mammal_weighting.py),
+  in [`bioacoustics/weighting.py`](https://github.com/jmrplens/phonometry/blob/main/src/phonometry/underwater/bioacoustics/weighting.py),
   pinned by `test_southall_table_7_errata_values_are_implemented`, with the
   +159 dB rule itself checked against the audiogram in
   `test_southall_impulsive_peak_spl_is_threshold_at_f0_plus_159_db` for the

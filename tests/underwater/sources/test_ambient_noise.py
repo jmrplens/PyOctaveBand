@@ -16,7 +16,7 @@ matplotlib.use("Agg")
 import numpy as np
 import pytest
 
-from phonometry.underwater.ocean_ambient_noise import (
+from phonometry.underwater.sources.ambient_noise import (
     AmbientNoiseResult,
     ocean_ambient_noise,
     thermal_noise_spectrum,

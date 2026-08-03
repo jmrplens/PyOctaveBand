@@ -195,18 +195,18 @@ La referencia de la API se genera a partir de los docstrings del código (en ing
 | Module | Summary |
 | :--- | :--- |
 | [`underwater.acoustics`](/phonometry/reference/api/underwater/acoustics/) | Underwater-acoustics reference levels (ISO 18405:2017). |
-| [`underwater.propagation`](/phonometry/reference/api/underwater/propagation/) | Underwater sound propagation: transmission loss (closed-form). |
-| [`underwater.weston_regimes`](/phonometry/reference/api/underwater/weston-regimes/) | Weston's shallow-water propagation regimes (flux theory). |
-| [`underwater.sound_speed`](/phonometry/reference/api/underwater/sound-speed/) | Speed of sound in sea water (empirical equations). |
+| [`underwater.propagation.closed_form`](/phonometry/reference/api/underwater/closed-form/) | Underwater sound propagation: transmission loss (closed-form). |
+| [`underwater.propagation.weston_regimes`](/phonometry/reference/api/underwater/weston-regimes/) | Weston's shallow-water propagation regimes (flux theory). |
+| [`underwater.propagation.sound_speed`](/phonometry/reference/api/underwater/sound-speed/) | Speed of sound in sea water (empirical equations). |
 | [`underwater.sonar_equation`](/phonometry/reference/api/underwater/sonar-equation/) | The sonar equation (passive and active), in decibels. |
-| [`underwater.ocean_ambient_noise`](/phonometry/reference/api/underwater/ocean-ambient-noise/) | Ocean ambient-noise spectrum levels (Wenz framework). |
-| [`underwater.seabed_reflection`](/phonometry/reference/api/underwater/seabed-reflection/) | Plane-wave reflection at the seabed (fluid-fluid Rayleigh model). |
-| [`underwater.ship_radiated_noise`](/phonometry/reference/api/underwater/ship-radiated-noise/) | Ship radiated noise and equivalent monopole source level (ISO 17208-1/-2). |
-| [`underwater.ship_traffic_noise`](/phonometry/reference/api/underwater/ship-traffic-noise/) | Predicted source-level spectrum of shipping traffic (semi-empirical models). |
-| [`underwater.pile_driving_noise`](/phonometry/reference/api/underwater/pile-driving-noise/) | Radiated underwater sound from percussive pile driving (ISO 18406:2017). |
-| [`underwater.marine_mammal_audiograms`](/phonometry/reference/api/underwater/marine-mammal-audiograms/) | Marine-mammal hearing thresholds (group audiograms and the orca audiogram). |
-| [`underwater.marine_mammal_weighting`](/phonometry/reference/api/underwater/marine-mammal-weighting/) | Regulatory auditory weighting and exposure criteria for marine mammals. |
-| [`underwater.numerical_propagation`](/phonometry/reference/api/underwater/numerical-propagation/) | Numerical models of underwater sound propagation (range-independent ocean). |
+| [`underwater.sources.ambient_noise`](/phonometry/reference/api/underwater/ambient-noise/) | Ocean ambient-noise spectrum levels (Wenz framework). |
+| [`underwater.propagation.seabed_reflection`](/phonometry/reference/api/underwater/seabed-reflection/) | Plane-wave reflection at the seabed (fluid-fluid Rayleigh model). |
+| [`underwater.sources.ship_radiated_noise`](/phonometry/reference/api/underwater/ship-radiated-noise/) | Ship radiated noise and equivalent monopole source level (ISO 17208-1/-2). |
+| [`underwater.sources.ship_traffic_noise`](/phonometry/reference/api/underwater/ship-traffic-noise/) | Predicted source-level spectrum of shipping traffic (semi-empirical models). |
+| [`underwater.sources.pile_driving_noise`](/phonometry/reference/api/underwater/pile-driving-noise/) | Radiated underwater sound from percussive pile driving (ISO 18406:2017). |
+| [`underwater.bioacoustics.audiograms`](/phonometry/reference/api/underwater/audiograms/) | Marine-mammal hearing thresholds (group audiograms and the orca audiogram). |
+| [`underwater.bioacoustics.weighting`](/phonometry/reference/api/underwater/weighting/) | Regulatory auditory weighting and exposure criteria for marine mammals. |
+| [`underwater.propagation.numerical`](/phonometry/reference/api/underwater/numerical/) | Numerical models of underwater sound propagation (range-independent ocean). |
 
 ## Sound power and intensity
 
@@ -216,7 +216,7 @@ La referencia de la API se genera a partir de los docstrings del código (en ing
 | [`emission.sound_power_intensity`](/phonometry/reference/api/power/sound-power-intensity/) | Sound power level of a noise source by sound-intensity **scanning**: ISO 9614-2:1996 (engineering, grade 2; survey/control, grade 3). |
 | [`emission.sound_power_reverberation`](/phonometry/reference/api/power/sound-power-reverberation/) | Sound power level of a noise source measured in a reverberation test room: ISO 3741:2010 (precision method, accuracy grade 1). |
 | [`emission.intensity`](/phonometry/reference/api/power/intensity/) | Two-microphone (p-p) sound intensity per IEC 61043:1993 and the ISO 9614-1:1993 field indicators. |
-| [`metrology.intensity_compliance`](/phonometry/reference/api/power/intensity-compliance/) | IEC 61043:1993 sound-intensity instrument class verification. |
+| [`emission.intensity_compliance`](/phonometry/reference/api/power/intensity-compliance/) | IEC 61043:1993 sound-intensity instrument class verification. |
 | [`emission.vibration_sound_power`](/phonometry/reference/api/power/vibration-sound-power/) | Airborne sound power from surface vibration (ISO/TS 7849-1/-2:2009). |
 | [`emission.declaration`](/phonometry/reference/api/power/declaration/) | ISO 4871:1996 declaration of noise emission values of machinery and equipment. |
 

@@ -10,7 +10,7 @@ predicts that refraction with two complementary models, clean-room from
 Salomons, *Computational Atmospheric Acoustics* (Springer, 2001) and
 Attenborough & Van Renterghem, *Predicting Outdoor Sound* (2e, CRC, 2021,
 Ch. 11), and it is the refracting-atmosphere counterpart of the range-independent
-ocean solvers in :mod:`phonometry.underwater.numerical_propagation`:
+ocean solvers in :mod:`phonometry.underwater.propagation.numerical`:
 
 * :func:`atmospheric_ray_paths` -- geometrical acoustics. Integrates Snell's law
   for sound rays (Salomons Eq. (4.3)) with a fixed-step Runge-Kutta scheme,
@@ -344,7 +344,7 @@ def atmospheric_ray_paths(
     :math:`\xi = \cos(\gamma_0)/c(z_s)` the equations are
     :math:`dz/dr = \zeta/\xi` and
     :math:`d\zeta/dr = -(dc/dz)/(c^3 \xi)`, the same ray core as the ocean
-    :func:`~phonometry.underwater.numerical_propagation.ray_trace` (with a ground
+    :func:`~phonometry.underwater.propagation.numerical.ray_trace` (with a ground
     reflection in place of the sea surface). The travel time accumulates
     :math:`dt/dr = 1/(\xi c^2)`.
 

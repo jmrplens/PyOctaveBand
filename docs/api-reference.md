@@ -26,18 +26,18 @@ contour = aircraft.noise_contour(path, powers, distances, sel, lmax, x=gx, y=gy)
 | :--- | :--- |
 | `phonometry.filters` | Octave and fractional-octave filter banks, frequency weightings and time weighting, parametric EQ, IEC 61260-1 and IEC 61672-1 class verification |
 | `phonometry.signals` | Levels (Leq, LAeq, percentiles), Welch and multitaper spectra, coherence, time-frequency, correlation, envelope, cepstrum, phase, synchronous averaging, test signals |
-| `phonometry.metrology` | Calibration, GUM uncertainty and Monte Carlo, data qualification (stationarity, trends, peak statistics), IEC 61043 intensity class |
+| `phonometry.metrology` | Calibration, GUM uncertainty and Monte Carlo, data qualification (stationarity, trends, peak statistics) |
 | `phonometry.psychoacoustics` | Two families: `loudness` (ISO 532-1 Zwicker, ISO 532-2 and ISO 532-3 Moore-Glasberg, ECMA-418-2, ISO 226 equal-loudness contours) and `quality` (sharpness, roughness, fluctuation strength, tonality, tone audibility, annoyance), plus the ERB scale both measure on |
 | `phonometry.speech` | Speech Transmission Index (IEC 60268-16), Speech Intelligibility Index (ANSI S3.5), STOI and ESTOI |
 | `phonometry.hearing` | Audiometric thresholds (ISO 7029/389-7), noise-induced hearing loss (ISO 1999), occupational exposure (ISO 9612) |
-| `phonometry.emission` | Sound power (ISO 3740 family), sound intensity, vibration-based power |
+| `phonometry.emission` | Sound power (ISO 3740 family), sound intensity and the IEC 61043 instrument class it is measured with, vibration-based power |
 | `phonometry.room` | Room acoustics (ISO 3382), impulse responses, open-plan, room-noise criteria, reverberation prediction, EN 12354-6 |
 | `phonometry.building` | Three subgroups: `measurement` (field, laboratory, survey and intensity methods with their ISO 717 ratings and ISO 12999 uncertainty), `prediction` (EN 12354 global and detailed models, facades, panels, apertures, plenums and resilient layers) and `regulation` (national codes) |
 | `phonometry.materials` | Four families by what the material does: `absorbers` (ISO 354, ISO 11654, ISO 12999-2, impedance tube ISO 10534-2, airflow resistance ISO 9053, porous and multilayer models, Biot, slow-sound metamaterials), `diffusers` (Schroeder design, metadiffusers, scattering and diffusion ISO 17497), `surfaces` (in-situ road absorption ISO 13472) and `resilient` (dynamic stiffness EN 29052-1) |
 | `phonometry.vibration` | Three families: `structural` (mobility ISO 7626, plate junctions, radiation, experimental SEA, transfer stiffness ISO 10846), `human` (ISO 2631/5349/8041 exposure and multiple shocks) and `machinery` (fault frequencies and condition monitoring) |
 | `phonometry.environment` | Three subgroups: `sources` (CNOSSOS road and rail emission, wind-turbine apparent sound power), `propagation` (ISO 9613-1/-2, ground effect and barriers, refraction by ray tracing and the parabolic equation) and `assessment` (ISO 1996-1/-2 rating and measurement, impulsive prominence, RD 1367/2007) |
 | `phonometry.aircraft` | EPNL (ICAO Annex 16), SAE ARP 5534 absorption, airport contours (ECAC Doc 29), rotorcraft (ECAC Doc 32) |
-| `phonometry.underwater` | ISO 18405/17208/18406 levels, propagation and Weston regimes, sound speed, sonar equation and detection range, seabed, ambient and ship-traffic noise, marine-mammal audiograms and regulatory auditory weighting, numerical solvers |
+| `phonometry.underwater` | Three families: `sources` (ISO 17208 ship radiated noise, traffic, pile driving, wind and thermal ambient noise), `propagation` (closed-form and Weston transmission loss, normal modes, rays and the parabolic equation, seabed reflection, sound speed) and `bioacoustics` (marine-mammal audiograms and regulatory auditory weighting), over the ISO 18405 quantities and the sonar equation at the root |
 | `phonometry.electroacoustics` | Distortion (IEC 60268-3 / AES17), transfer function and coherence, radiating piston |
 | `phonometry.noise_control` | Reactive silencers (four-pole method), HVAC duct attenuation, machine-enclosure insertion loss |
 | `phonometry.broadcast` | Programme loudness and true peak (ITU-R BS.1770-5, EBU R 128 with Tech 3341/3342) |
@@ -60,6 +60,8 @@ warns and delegates as well.
 | `phonometry.materials.porous_absorber` | `phonometry.materials.absorbers.porous` | 5.0 |
 | `phonometry.environmental` | `phonometry.environment` | 5.0 |
 | `phonometry.psychoacoustics.loudness_zwicker` | `phonometry.psychoacoustics.loudness.zwicker` | 5.0 |
+| `phonometry.underwater.ocean_ambient_noise` | `phonometry.underwater.sources.ambient_noise` | 5.0 |
+| `phonometry.metrology.intensity_compliance` | `phonometry.emission.intensity_compliance` | 5.0 |
 
 | Name | Type | Description (Inputs) | Usage Snippet (Outputs) |
 | :--- | :--- | :--- | :--- |

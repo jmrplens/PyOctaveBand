@@ -1,5 +1,5 @@
 ---
-title: "underwater.sound_speed"
+title: "underwater.propagation.sound_speed"
 description: "Speed of sound in sea water (empirical equations)."
 sidebar:
   label: "sound_speed"

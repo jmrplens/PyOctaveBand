@@ -15,7 +15,7 @@ predicts that refraction with two complementary models, clean-room from
 Salomons, *Computational Atmospheric Acoustics* (Springer, 2001) and
 Attenborough & Van Renterghem, *Predicting Outdoor Sound* (2e, CRC, 2021,
 Ch. 11), and it is the refracting-atmosphere counterpart of the range-independent
-ocean solvers in [`phonometry.underwater.numerical_propagation`](/phonometry/reference/api/underwater/numerical-propagation/):
+ocean solvers in [`phonometry.underwater.propagation.numerical`](/phonometry/reference/api/underwater/numerical/):
 
 * [`atmospheric_ray_paths`](/phonometry/reference/api/environment/refraction/#atmospheric_ray_paths) -- geometrical acoustics. Integrates Snell's law
   for sound rays (Salomons Eq. (4.3)) with a fixed-step Runge-Kutta scheme,
@@ -151,7 +151,7 @@ slowness $\zeta = \sin(\gamma)/c$; with the range-invariant
 $\xi = \cos(\gamma_0)/c(z_s)$ the equations are
 $dz/dr = \zeta/\xi$ and
 $d\zeta/dr = -(dc/dz)/(c^3 \xi)$, the same ray core as the ocean
-[`ray_trace`](/phonometry/reference/api/underwater/numerical-propagation/#ray_trace) (with a ground
+[`ray_trace`](/phonometry/reference/api/underwater/numerical/#ray_trace) (with a ground
 reflection in place of the sea surface). The travel time accumulates
 $dt/dr = 1/(\xi c^2)$.
 

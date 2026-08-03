@@ -69,24 +69,6 @@ def test_monte_carlo_es() -> None:
     plt.close("all")
 
 
-def test_intensity_class_es() -> None:
-    from phonometry.metrology.intensity_compliance import (
-        intensity_class_compliance,
-        residual_index_limits,
-    )
-
-    freqs, class1, _ = residual_index_limits("probe")
-    res = intensity_class_compliance(class1 + 1.0, freqs, device="probe")
-    ax = res.plot(language="es")
-    assert "Tabla 2 de IEC 61043" in ax.get_title()
-    assert "sonda" in ax.get_title()
-    assert "Mínimo clase 1" in _labels(ax)
-    assert "Región de aceptación clase 1" in _labels(ax)
-    plt.close("all")
-    with pytest.raises(ValueError):
-        res.plot(language="xx")
-
-
 def test_trend_test_es_and_bad_language() -> None:
     values = [5.2, 6.2, 3.7, 6.4, 3.9, 4.0, 3.9, 5.3, 4.0, 4.6,
               5.9, 6.5, 4.3, 5.7, 3.1, 5.6, 5.2, 3.9, 6.2, 5.0]

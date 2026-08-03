@@ -30,7 +30,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pytest
 
-from phonometry.underwater.marine_mammal_audiograms import orca_audiogram
+from phonometry.underwater.bioacoustics.audiograms import orca_audiogram
 from phonometry.underwater.sonar_equation import (
     DetectionRangeResult,
     active_sonar_equation,
@@ -266,7 +266,7 @@ def test_both_solvers_return_zero_when_the_target_is_undetectable_everywhere() -
 
 def test_detection_range_from_curve_bridges_a_numerical_model() -> None:
     """The solver reads a detection range off a normal-mode transmission loss."""
-    from phonometry.underwater.numerical_propagation import normal_modes
+    from phonometry.underwater.propagation.numerical import normal_modes
 
     depths = np.array([0.0, 100.0])
     speeds = np.array([1500.0, 1500.0])

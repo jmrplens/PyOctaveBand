@@ -15,7 +15,7 @@ matplotlib.use("Agg")
 import numpy as np
 import pytest
 
-from phonometry.underwater.numerical_propagation import (
+from phonometry.underwater.propagation.numerical import (
     NormalModeResult,
     ParabolicEquationResult,
     RayTraceResult,

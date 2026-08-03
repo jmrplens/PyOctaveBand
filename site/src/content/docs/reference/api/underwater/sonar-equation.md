@@ -30,7 +30,7 @@ a transmission-loss law at $\mathrm{TL} = \mathrm{FOM}$ gives the
 range at which the detection probability is 50 %:
 
 * [`detection_range`](/phonometry/reference/api/underwater/sonar-equation/#detection_range) inverts the closed-form loss of
-  [`phonometry.underwater.propagation`](/phonometry/reference/api/underwater/propagation/) (spreading plus volume absorption),
+  [`phonometry.underwater.propagation.closed_form`](/phonometry/reference/api/underwater/closed-form/) (spreading plus volume absorption),
   which is strictly increasing with range and therefore has a single crossing;
 * [`detection_range_from_curve`](/phonometry/reference/api/underwater/sonar-equation/#detection_range_from_curve) reads the crossing off any computed loss
   curve -- a normal-mode, parabolic-equation or Weston-regime prediction --
@@ -104,7 +104,7 @@ Range at which the closed-form transmission loss equals the figure of
 merit.
 
 Solves $\mathrm{TL}(r) = \mathrm{FOM}$ for the loss of
-[`transmission_loss`](/phonometry/reference/api/underwater/propagation/#transmission_loss), which is
+[`transmission_loss`](/phonometry/reference/api/underwater/closed-form/#transmission_loss), which is
 strictly increasing in range, so the root is unique. A **one-way** figure of
 merit works for both sonar modes: the active figure of merit returned by
 [`active_sonar_equation`](/phonometry/reference/api/underwater/sonar-equation/#active_sonar_equation) is already the maximum allowable one-way loss.
@@ -115,13 +115,13 @@ merit works for both sonar modes: the active figure of merit returned by
 | :--- | :--- |
 | `figure_of_merit` | Maximum allowable one-way transmission loss, in dB. |
 | `frequency_hz` | Acoustic frequency, in Hz. |
-| `law` | Spreading law (see [`spreading_loss`](/phonometry/reference/api/underwater/propagation/#spreading_loss)). |
+| `law` | Spreading law (see [`spreading_loss`](/phonometry/reference/api/underwater/closed-form/#spreading_loss)). |
 | `transition_range` | Transition range for the `"practical"` law, in m. |
 | `temperature` | Temperature `T`, in degrees Celsius. |
 | `salinity` | Salinity `S`, in parts per thousand. |
 | `depth` | Depth, in metres. |
 | `ph` | Acidity (default 8). |
-| `model` | Absorption model (see [`seawater_absorption`](/phonometry/reference/api/underwater/propagation/#seawater_absorption)). |
+| `model` | Absorption model (see [`seawater_absorption`](/phonometry/reference/api/underwater/closed-form/#seawater_absorption)). |
 | `max_range` | Upper bound of the search, in metres. |
 | `n_points` | Number of ranges kept on the returned loss curve. |
 

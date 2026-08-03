@@ -6471,7 +6471,7 @@ def _chk_uwp_del_grosso_printed_check() -> Outcome:
     # Oracle: the printed ITS-90 check table of the refit the module
     # implements (J. Acoust. Soc. Am. 97(3), 1995); the table lists pressure
     # in bars, Del Grosso's polynomial takes kg/cm² (1 bar = 1.019716 kg/cm²).
-    from phonometry.underwater.sound_speed import _del_grosso
+    from phonometry.underwater.propagation.sound_speed import _del_grosso
 
     got = float(_del_grosso(20.0, 35.0, 500.0 * 1.019716))
     return numeric(1603.679, got, 1e-3, unit="m/s", places=3)
@@ -6562,7 +6562,7 @@ def _chk_uwp_unesco_canonical() -> Outcome:
     # Published canonical check of the UNESCO algorithm; the module implements
     # the Wong-Zhu ITS-90 refit, so T90 = T68/1.00024 and the tolerance covers
     # the published refit residual.
-    from phonometry.underwater.sound_speed import _unesco
+    from phonometry.underwater.propagation.sound_speed import _unesco
 
     got = float(_unesco(40.0 / 1.00024, 40.0, 1000.0))
     return numeric(1731.995, got, 0.02, unit="m/s", places=3)
@@ -6577,7 +6577,7 @@ def _chk_uwp_medwin_derivative() -> Outcome:
     # Oracle: Ainslie prints "∂c/∂T ≈ 4.6 − 0.110·T", i.e. 3.5 m/s per °C at
     # 10 °C (printed p. 20). The cubic term sits inside the brackets the
     # published derivative excludes, so it is removed before comparing.
-    from phonometry.underwater.sound_speed import sea_water_sound_speed
+    from phonometry.underwater.propagation.sound_speed import sea_water_sound_speed
 
     h = 1e-5
     grad = (sea_water_sound_speed(10.0 + h, 35.0, 0.0, model="medwin")

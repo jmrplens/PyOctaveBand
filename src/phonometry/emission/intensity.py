@@ -52,7 +52,7 @@ the instrument is adequate for a measurement when :math:`L_d > F_2`
 (criterion 1, Annex B equation (B.1)). The residual index
 :math:`\delta_{pI0}` that feeds it is classified against
 IEC 61043:1993 Table 2 by
-:func:`phonometry.metrology.intensity_compliance.intensity_class_compliance`.
+:func:`phonometry.emission.intensity_compliance.intensity_class_compliance`.
 """
 
 from __future__ import annotations

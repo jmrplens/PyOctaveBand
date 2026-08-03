@@ -38,7 +38,7 @@ from typing import TYPE_CHECKING, Any
 
 import numpy as np
 
-from .._internal.validation import require_positive
+from ..._internal.validation import require_positive
 
 if TYPE_CHECKING:
     from matplotlib.axes import Axes
@@ -130,8 +130,8 @@ class BottomLossResult:
 
     def plot(self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any) -> Axes:
         """Plot the bottom loss versus grazing angle with the critical angle."""
-        from .._i18n import check_language
-        from .._plot.underwater import plot_bottom_loss
+        from ..._i18n import check_language
+        from ..._plot.underwater import plot_bottom_loss
 
         return plot_bottom_loss(self, ax=ax, language=check_language(language), **kwargs)
 
@@ -227,8 +227,8 @@ class SeabedReflection:
         :param kwargs: Forwarded to the ``|R|`` curve ``plot`` call.
         :return: The axes.
         """
-        from .._i18n import check_language
-        from .._plot.underwater import plot_seabed_reflection
+        from ..._i18n import check_language
+        from ..._plot.underwater import plot_seabed_reflection
 
         return plot_seabed_reflection(self, ax=ax, language=check_language(language), **kwargs)
 

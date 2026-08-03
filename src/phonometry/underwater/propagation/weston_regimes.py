@@ -27,7 +27,7 @@ transmission loss for a point source in free water.
 
 The regime formulae are energy-flux (incoherent) results: they describe the
 range-averaged field, not its modal interference. That is exactly what makes
-them a usable cross-check for :mod:`phonometry.underwater.numerical_propagation`
+them a usable cross-check for :mod:`phonometry.underwater.propagation.numerical`
 -- the range average of a normal-mode or parabolic-equation field over many
 interference cycles converges on the cylindrical-spreading law, with
 :math:`\psi_c = \pi/2` for a totally reflecting (pressure-release) bottom.
@@ -57,7 +57,7 @@ from typing import TYPE_CHECKING, Any
 import numpy as np
 from scipy.special import erf
 
-from .._internal.validation import require_positive
+from ..._internal.validation import require_positive
 
 if TYPE_CHECKING:
     from matplotlib.axes import Axes
@@ -457,8 +457,8 @@ class WestonPropagationResult:
 
     def plot(self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any) -> Axes:
         """Plot the composite loss with each regime's law and the boundaries."""
-        from .._i18n import check_language
-        from .._plot.underwater import plot_weston_regimes
+        from ..._i18n import check_language
+        from ..._plot.underwater import plot_weston_regimes
 
         return plot_weston_regimes(self, ax=ax, language=check_language(language), **kwargs)
 

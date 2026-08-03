@@ -17,7 +17,7 @@ hammer strike. ISO 18406 characterises them with:
 * :func:`strike_sel_spectrum` -- the same single-strike SEL resolved into
   fractional-octave bands (ISO 18406 6.4.2.2), the input a marine-mammal
   assessment needs: feed it to
-  :func:`~phonometry.underwater.marine_mammal_weighting.weighted_exposure` to
+  :func:`~phonometry.underwater.bioacoustics.weighting.weighted_exposure` to
   obtain the weighted cumulative SEL of a piling campaign and its margin
   against the regulatory injury and TTS criteria.
 """
@@ -29,7 +29,7 @@ from typing import TYPE_CHECKING, Any
 
 import numpy as np
 
-from .acoustics import (
+from ..acoustics import (
     _positive,
     _validate_pressure,
     peak_sound_pressure_level,
@@ -134,8 +134,8 @@ class PileStrikeResult:
 
     def plot(self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any) -> Axes | NDArray[Any]:
         """Plot the strike waveform and its cumulative energy."""
-        from .._i18n import check_language
-        from .._plot.underwater import plot_pile_strike
+        from ..._i18n import check_language
+        from ..._plot.underwater import plot_pile_strike
 
         return plot_pile_strike(self, ax=ax, language=check_language(language), **kwargs)
 
@@ -151,7 +151,7 @@ class StrikeSelSpectrum:
         a short record -- holds no energy at all and is reported as ``-inf``,
         the level of zero exposure. That is the neutral element of an energy
         sum, so such bands pass straight through
-        :func:`~phonometry.underwater.marine_mammal_weighting.weighted_exposure`
+        :func:`~phonometry.underwater.bioacoustics.weighting.weighted_exposure`
         without contributing.
     :ivar total_sel: Energy sum of ``band_sel`` over the covered bands, in dB
         re 1 µPa²·s.
@@ -171,8 +171,8 @@ class StrikeSelSpectrum:
 
     def plot(self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any) -> Axes:
         """Plot the per-band single-strike SEL."""
-        from .._i18n import check_language
-        from .._plot.underwater import plot_strike_sel_spectrum
+        from ..._i18n import check_language
+        from ..._plot.underwater import plot_strike_sel_spectrum
 
         return plot_strike_sel_spectrum(self, ax=ax, language=check_language(language), **kwargs)
 
@@ -196,7 +196,7 @@ def strike_sel_spectrum(
     Bands narrower than the FFT bin spacing ``fs/n`` contain no bin and are
     reported as ``-inf`` dB (see :class:`StrikeSelSpectrum`); the result can be
     handed straight to
-    :func:`~phonometry.underwater.marine_mammal_weighting.weighted_exposure`.
+    :func:`~phonometry.underwater.bioacoustics.weighting.weighted_exposure`.
 
     :param pressure: Sound-pressure time series of one strike (1-D), in Pa.
     :param fs: Sample rate, in Hz.
@@ -205,7 +205,7 @@ def strike_sel_spectrum(
     :return: A :class:`StrikeSelSpectrum`.
     :raises ValueError: If the inputs are invalid.
     """
-    from ..filters.frequencies import nominal_frequencies
+    from ...filters.frequencies import nominal_frequencies
 
     sig = _validate_pressure(pressure, min_samples=2)
     fs_v = _positive(fs, "fs")

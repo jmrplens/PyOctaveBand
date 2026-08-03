@@ -17,16 +17,12 @@ Consistency is enforced at import time (fails loudly):
 
 - every module appears in exactly one section;
 - each section only contains modules from the subpackages declared for it in
-  ``_SECTION_SUBPACKAGES``. Two sections deliberately span more than one
-  parent: ``filters`` adds the package top level (``phonometry`` itself),
-  and ``power`` includes
-  ``metrology.intensity_compliance`` (the IEC 61043 class checker sits with
-  the other instrument-conformance code but documents the intensity chain
-  the rest of the section measures with).
+  ``_SECTION_SUBPACKAGES``. One section deliberately spans more than one
+  parent: ``filters`` adds the package top level (``phonometry`` itself).
 
 Section keys are subpackage names wherever the taxonomy allows it, so a
 reader who knows where a function lives in the code can predict where its
-page lives. The three sections listed above are the exceptions, and they are
+page lives. The section listed above is the exception, and it is
 deliberate.
 
 The generator additionally checks the taxonomy against reality: every module
@@ -248,18 +244,18 @@ _SECTION_LIST: tuple[Section, ...] = (
         label_es="Acústica submarina",
         modules=(
             "phonometry.underwater.acoustics",
-            "phonometry.underwater.propagation",
-            "phonometry.underwater.weston_regimes",
-            "phonometry.underwater.sound_speed",
+            "phonometry.underwater.propagation.closed_form",
+            "phonometry.underwater.propagation.weston_regimes",
+            "phonometry.underwater.propagation.sound_speed",
             "phonometry.underwater.sonar_equation",
-            "phonometry.underwater.ocean_ambient_noise",
-            "phonometry.underwater.seabed_reflection",
-            "phonometry.underwater.ship_radiated_noise",
-            "phonometry.underwater.ship_traffic_noise",
-            "phonometry.underwater.pile_driving_noise",
-            "phonometry.underwater.marine_mammal_audiograms",
-            "phonometry.underwater.marine_mammal_weighting",
-            "phonometry.underwater.numerical_propagation",
+            "phonometry.underwater.sources.ambient_noise",
+            "phonometry.underwater.propagation.seabed_reflection",
+            "phonometry.underwater.sources.ship_radiated_noise",
+            "phonometry.underwater.sources.ship_traffic_noise",
+            "phonometry.underwater.sources.pile_driving_noise",
+            "phonometry.underwater.bioacoustics.audiograms",
+            "phonometry.underwater.bioacoustics.weighting",
+            "phonometry.underwater.propagation.numerical",
         ),
     ),
     Section(
@@ -271,7 +267,7 @@ _SECTION_LIST: tuple[Section, ...] = (
             "phonometry.emission.sound_power_intensity",
             "phonometry.emission.sound_power_reverberation",
             "phonometry.emission.intensity",
-            "phonometry.metrology.intensity_compliance",
+            "phonometry.emission.intensity_compliance",
             "phonometry.emission.vibration_sound_power",
             "phonometry.emission.declaration",
         ),
@@ -341,7 +337,7 @@ _SECTION_SUBPACKAGES: dict[str, tuple[str, ...]] = {
     "environment": ("environment",),
     "aeroacoustics": ("aircraft",),
     "underwater": ("underwater",),
-    "power": ("emission", "metrology"),
+    "power": ("emission",),
     "electroacoustics": ("electroacoustics",),
     "noise_control": ("noise_control",),
     "broadcast": ("broadcast",),

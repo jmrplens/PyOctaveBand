@@ -21,6 +21,15 @@ from .intensity import (
     sound_intensity,
     temporal_variability_indicator,
 )
+from .intensity_compliance import (
+    IntensityInstrumentComplianceResult,
+    instrument_class_from_components,
+    intensity_class_compliance,
+    phase_mismatch_from_residual_index,
+    residual_index_from_phase_mismatch,
+    residual_index_limits,
+    verify_intensity_class,
+)
 from .sound_power import (
     MeteorologicalCorrection,
     PrecisionCriteria,
@@ -67,6 +76,7 @@ __all__ = [
     "TEMPORAL_VARIABILITY_LIMIT",
     "DeclarationForm",
     "FieldIndicators",
+    "IntensityInstrumentComplianceResult",
     "IntensityResult",
     "MeteorologicalCorrection",
     "NoiseEmissionDeclaration",
@@ -85,9 +95,12 @@ __all__ = [
     "environmental_correction",
     "extraneous_velocity_correction",
     "field_indicators",
+    "instrument_class_from_components",
+    "intensity_class_compliance",
     "mean_velocity_level",
     "measurement_positions",
     "meteorological_corrections",
+    "phase_mismatch_from_residual_index",
     "plot_microphone_positions",
     "plot_pp_probe_geometry",
     "precision_background_correction",
@@ -97,6 +110,8 @@ __all__ = [
     "precision_uncertainty",
     "radiated_sound_power_level",
     "radiation_factor",
+    "residual_index_from_phase_mismatch",
+    "residual_index_limits",
     "sound_intensity",
     "sound_power_anechoic",
     "sound_power_comparison",
@@ -108,4 +123,5 @@ __all__ = [
     "temporal_variability_indicator",
     "velocity_level",
     "velocity_level_from_acceleration",
+    "verify_intensity_class",
 ]

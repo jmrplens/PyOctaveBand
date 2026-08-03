@@ -1036,6 +1036,37 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   the same 251 names, and the nineteen pre-split module paths keep working
   until 5.0.
 
+- `phonometry.underwater` has three families, along the three questions an
+  underwater problem asks. `underwater.sources` is what makes the sound:
+  ISO 17208 ship radiated noise, shipping traffic, impact pile driving and the
+  wind and thermal noise the sea makes on its own. `underwater.propagation` is
+  how it gets there: closed-form transmission loss, Weston's regimes, the
+  numerical solvers (normal modes, rays, parabolic equation), the seabed it
+  reflects off and the sound speed profile it travels through.
+  `underwater.bioacoustics` is who hears it: marine mammal audiograms and the
+  regulatory auditory weighting and exposure criteria built on them. The
+  ISO 18405 quantities and the sonar equation stay at the root, because all
+  three families are written in their terms.
+
+  Four modules lose a word the family now says: `ocean_ambient_noise`,
+  `marine_mammal_audiograms`, `marine_mammal_weighting` and
+  `numerical_propagation` become `sources.ambient_noise`,
+  `bioacoustics.audiograms`, `bioacoustics.weighting` and
+  `propagation.numerical`. The module that was `underwater.propagation` is
+  `propagation.closed_form`, and the name it vacated is the family package,
+  which exports everything the module did: that path keeps working without a
+  notice, since a package cannot be shadowed by an alias that warns.
+
+  Nothing moves in the namespace: `from phonometry import underwater` exports
+  the same 82 names, and the ten pre-split module paths keep working until 5.0.
+
+- The IEC 61043 intensity-instrument class check is
+  `phonometry.emission.intensity_compliance`, next to the intensity chain it
+  verifies, rather than in `phonometry.metrology`. It was the one section of
+  the API reference that had to reach into a second package to stay coherent,
+  and now no section does. Reading the names from `metrology` still works
+  until 5.0, with the usual notice.
+
 - `phonometry.psychoacoustics` has two families, along the split every text on
   sound quality makes. `psychoacoustics.loudness` holds how loud a sound is:
   the four models (ISO 532-1 Zwicker, ISO 532-2 Moore-Glasberg, the
