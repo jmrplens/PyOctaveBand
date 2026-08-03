@@ -374,7 +374,7 @@ class MooreGlasbergTimeVaryingLoudness:
         """Plot the short-term and long-term loudness against time.
 
         Requires matplotlib (``pip install phonometry[plot]``); returns the
-        :class:`~matplotlib.axes.Axes`.  See :mod:`._plotting`.
+        :class:`~matplotlib.axes.Axes`.  See :mod:`phonometry._plot.psychoacoustics`.
         """
         from ..._i18n import check_language
         from ..._plot.psychoacoustics import plot_moore_glasberg_time_loudness

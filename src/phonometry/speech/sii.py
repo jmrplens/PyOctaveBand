@@ -55,8 +55,6 @@ if TYPE_CHECKING:
 
 from numpy.typing import ArrayLike
 
-from .._internal.warnings import _warn_renamed
-
 #: The four band procedures of ANSI S3.5-1997, in the order of its Tables 1
 #: to 4: the critical-band procedure (21 bands), the equally-contributing
 #: critical-band procedure (17 bands), the one-third-octave-band procedure
@@ -868,13 +866,3 @@ def sii_procedure(method: str = "one-third-octave") -> SIIProcedure:
         internal_noise=proc.internal_noise.copy(),
         speech_spectrum=proc.speech_spectrum.copy(),
     )
-
-
-# --- Deprecated alias (phonometry 3.1 rename; remove in 4.0) -------------
-
-def __getattr__(name: str) -> Any:
-    """PEP 562 shim warning for the renamed band-center constant."""
-    if name == "BAND_CENTRES":
-        _warn_renamed("BAND_CENTRES", "BAND_CENTERS")
-        return BAND_CENTERS
-    raise AttributeError(f"module 'phonometry.speech.sii' has no attribute {name!r}")

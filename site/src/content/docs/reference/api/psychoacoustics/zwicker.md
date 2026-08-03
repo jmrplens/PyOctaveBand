@@ -144,7 +144,7 @@ ZwickerLoudness.plot(
 ) -> Axes | np.ndarray
 ```
 
-Plot the specific loudness N'(z) over Bark (see `._plotting`).
+Plot the specific loudness N'(z) over Bark (see `phonometry._plot.psychoacoustics`).
 
 Adds a loudness-vs-time panel when the time-varying trace is
 present.  Requires matplotlib (`pip install phonometry[plot]`);

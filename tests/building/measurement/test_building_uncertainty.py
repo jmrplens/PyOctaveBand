@@ -415,15 +415,16 @@ def test_prediction_input_rejects_bad_n():
         prediction_input_uncertainty(1.2, 1.0, 0)
 
 
-def test_deprecated_bare_names_warn_and_delegate():
-    # The bare names shadowed the GUM pair at the package root; they now warn
-    # and delegate to the insulation_* canonical functions.
+def test_the_bare_names_are_gone():
+    # The bare names shadowed the GUM pair at the package root. They were
+    # deprecated in 3.1 and removed in 4.0; only the insulation_* names remain.
     import phonometry.building.measurement.uncertainty as bu
 
-    with pytest.warns(DeprecationWarning, match="insulation_coverage_factor"):
-        assert bu.coverage_factor(0.95) == insulation_coverage_factor(0.95)
-    with pytest.warns(DeprecationWarning, match="insulation_expanded_uncertainty"):
-        assert bu.expanded_uncertainty(1.2) == insulation_expanded_uncertainty(1.2)
+    for name in ("coverage_factor", "expanded_uncertainty"):
+        with pytest.raises(AttributeError):
+            getattr(bu, name)
+    assert bu.insulation_coverage_factor(0.95) == insulation_coverage_factor(0.95)
+    assert bu.insulation_expanded_uncertainty(1.2) == insulation_expanded_uncertainty(1.2)
 
 
 # ---------------------------------------------------------------------------

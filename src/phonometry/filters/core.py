@@ -7,13 +7,13 @@ from __future__ import annotations
 
 import warnings
 from functools import lru_cache
-from typing import Any, Literal, cast, overload
+from typing import Literal, cast, overload
 
 import numpy as np
 from scipy import signal
 
 from .._internal.utils import _downsamplingfactor, _resample_to_length, _typesignal
-from .._internal.warnings import PhonometryWarning, _warn_renamed
+from .._internal.warnings import PhonometryWarning
 from .design import _cheby2_headroom, _design_sos_filter
 from .frequencies import _genfreqs
 
@@ -693,9 +693,3 @@ def octave_filter(
         )
 
     return filter_bank.filter(x, sigbands=sigbands, mode=mode, detrend=detrend, nominal=nominal)  # type: ignore[call-overload,no-any-return]
-
-
-def octavefilter(*args: Any, **kwargs: Any) -> Any:
-    """Deprecated alias of :func:`octave_filter`."""
-    _warn_renamed("octavefilter()", "octave_filter()")
-    return octave_filter(*args, **kwargs)

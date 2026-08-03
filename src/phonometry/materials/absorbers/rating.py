@@ -56,8 +56,6 @@ from typing import TYPE_CHECKING, Any
 import numpy as np
 from numpy.typing import ArrayLike, NDArray
 
-from ..._internal.warnings import _warn_renamed
-
 if TYPE_CHECKING:  # pragma: no cover - typing only
     from matplotlib.axes import Axes
 
@@ -464,24 +462,3 @@ def absorption_class(alpha_w: float) -> str:
         if units >= lowest:
             return letter
     return _NOT_CLASSIFIED
-
-
-# --- Deprecated aliases (phonometry 3.1 renames; remove in 4.0) ----------
-
-#: Old constant name -> canonical name (units moved to the docstring).
-_RENAMED_CONSTANTS: dict[str, str] = {
-    "OCTAVE_BANDS_HZ": "OCTAVE_BANDS",
-    "THIRD_OCTAVE_BANDS_HZ": "THIRD_OCTAVE_BANDS",
-}
-
-
-def __getattr__(name: str) -> Any:
-    """PEP 562 shim warning for the renamed band constants."""
-    try:
-        canonical = _RENAMED_CONSTANTS[name]
-    except KeyError:
-        raise AttributeError(
-            f"module 'phonometry.materials.absorbers.rating' has no attribute {name!r}"
-        ) from None
-    _warn_renamed(name, canonical)
-    return globals()[canonical]

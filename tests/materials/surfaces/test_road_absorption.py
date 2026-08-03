@@ -375,6 +375,20 @@ def test_insitu_absorption_spectrum_rejects_nonpositive_fs() -> None:
         insitu_absorption_spectrum(hi, hr, -48000.0)
 
 
+def test_the_functions_that_took_a_deprecated_fs_alias_still_require_fs() -> None:
+    """``fs`` is keyword-optional in the signature and required in fact.
+
+    It reads as optional because it once shared the slot with the
+    ``sample_rate`` alias that 4.0 removed. Leaving it out has to say so.
+    """
+    hi = _incident_ir()
+    hr = 0.4 * np.roll(hi, 96)
+    with pytest.raises(ValueError, match="missing required argument: 'fs'"):
+        adrienne_window(flat_duration=0.005)
+    with pytest.raises(ValueError, match="missing required argument: 'fs'"):
+        insitu_absorption_spectrum(hi, hr)
+
+
 def test_insitu_absorption_spectrum_plot_returns_axes() -> None:
     import matplotlib
 

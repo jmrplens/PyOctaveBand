@@ -93,7 +93,7 @@ class EcmaTonality:
     field: str
 
     def plot(self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any) -> Axes | np.ndarray:
-        """Plot the average specific tonality T'(z) (see :mod:`._plotting`).
+        """Plot the average specific tonality T'(z) (see :mod:`phonometry._plot.psychoacoustics`).
 
         Adds a tonality-vs-time panel. Requires matplotlib
         (``pip install phonometry[plot]``).

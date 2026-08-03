@@ -12,7 +12,7 @@ reading any of them from here still works until 5.0.
 from __future__ import annotations
 
 from .._compat import _namespace_dir, _namespace_shim
-from .calibration import CalibrationWarning, calculate_sensitivity, sensitivity
+from .calibration import CalibrationWarning, sensitivity
 from .data_qualification import (
     LevelCrossingResult,
     PeakStatisticsResult,
@@ -69,7 +69,6 @@ __all__ = [
     "TrendTestResult",
     "UncertaintyResult",
     "UncertaintyWarning",
-    "calculate_sensitivity",
     "combine_uncertainty",
     "level_crossing_rate",
     "monte_carlo",

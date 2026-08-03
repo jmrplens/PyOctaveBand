@@ -32,7 +32,6 @@ figures:
           - scripts/check_figures.py
           - scripts/generated_assets.py
           - src/phonometry/_plot/**
-          - src/phonometry/_plotting.py
           - requirements-figures.txt
 
 reports:

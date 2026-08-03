@@ -84,7 +84,7 @@ EcmaLoudness.plot(
 ) -> Axes | np.ndarray
 ```
 
-Plot the average specific loudness N'(z) (see `._plotting`).
+Plot the average specific loudness N'(z) (see `phonometry._plot.psychoacoustics`).
 
 Adds a loudness-vs-time panel.  Requires matplotlib
 (`pip install phonometry[plot]`).

@@ -70,7 +70,7 @@ from __future__ import annotations
 
 from collections.abc import Sequence
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, Literal, overload
 
 import numpy as np
 
@@ -245,6 +245,18 @@ def reverberation_index(
     if np.any(tt <= 0.0):
         raise ValueError("'t' must contain positive values.")
     return 10.0 * np.log10(tt / _positive(t0, "t0"))
+
+
+@overload
+def estimate_reverberation_index(
+    volume: float, room: str, *, weighted: Literal[False] = False
+) -> np.ndarray: ...
+
+
+@overload
+def estimate_reverberation_index(
+    volume: float, room: str, *, weighted: Literal[True]
+) -> float: ...
 
 
 def estimate_reverberation_index(

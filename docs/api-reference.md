@@ -1234,7 +1234,6 @@ well. The pre-3.2 flat paths, written without a subpackage, were removed in
 | `FilterBankWarning` | `warning class` | **Fractional-octave filter-bank advisory.**<br>Emitted for filter-bank processing pitfalls | `warnings.simplefilter('error', FilterBankWarning)` |
 | `TonalityWarning` | `warning class` | **Tonality advisory.**<br>Emitted for biased tonality estimates (e.g. coarse FFT resolution) | `warnings.simplefilter('error', TonalityWarning)` |
 | `STIWarning` | `warning class` | **STI/STIPA advisory.**<br>Emitted for suspect speech-intelligibility measurements or inputs | `warnings.simplefilter('error', STIWarning)` |
-| `octavefilter` / `getansifrequencies` / `normalizedfreq` / `calculate_sensitivity` / `coverage_factor` / `expanded_uncertainty` | `function` | **Deprecated aliases (warn on use; removal in 4.0).**<br>New names: `octave_filter`, `nominal_frequencies`, `normalized_frequencies`, `sensitivity`, `insulation_coverage_factor`, `insulation_expanded_uncertainty` | `octave_filter(x, fs)  # not octavefilter` |
 | `__version__` | `str` | **Package version string.**<br>(no parameters) | `phonometry.__version__  # '3.2.0'` |
 | `.plot()` | `method` | **One-line canonical figure on every result object (soft matplotlib dependency).**<br>Available on `ZwickerLoudness`, `MooreGlasbergLoudness`, `MooreGlasbergTimeVaryingLoudness`, `EcmaLoudness`, `EcmaTonality`, `EcmaRoughness`, `PsychoacousticAnnoyanceResult`, `FluctuationStrengthResult`, `ProgramLoudnessResult`, `KWeightingResponse`, `STIResult`, `SIIResult`, `SIIProcedure`, `StandardSpeechSpectrum`, `NCResult`, `RCResult`, `AgeThresholdResult`, `NiptsResult`, `HtlanResult`, `ImpulseProminenceResult`, `ImpulsiveSoundResult`, `MultipleShockResult`, `ImpulseResponseResult`, `DecayCurve`, `RoomAcousticsResult`, `ReverberationResult`, `ReverberationModelResult`, `DynamicStiffnessResult`, `MobilityResult`, `TransferStiffnessResult`, `VibrationSoundPowerResult`, `StructureBornePowerResult`, `InstalledSourceResult`, `WeightedRatingResult`, `ImpactRatingResult`, `FacadeInsulationResult`, `LabAirborneInsulationResult`, `LabImpactInsulationResult`, `SoundPowerResult`, `ReverberationSoundPowerResult`, `SoundPowerIntensityResult`, `PrecisionSoundPowerResult`, `PrecisionIntensityResult`, `IntensityResult`, `UncertaintyResult`, `AbsorptionRatingResult`, `ScatteringResult`, `DiffusionResult`, `DiffusionSpectrum`, `InsituAbsorptionResult`, `WeightingResponse`, `WeightedSpectrum` and `DailyVibrationExposure`.<br>• `ax`: existing Axes, or None to build a fresh figure (Default: None)<br>• returns the Matplotlib `Axes` (an array of Axes for multi-panel figures); never calls `plt.show()`<br>• needs matplotlib (`pip install phonometry[plot]`) | `res.plot()`<br>`decay_curve(ir, fs).plot()` |
 
@@ -1252,12 +1251,15 @@ well. The pre-3.2 flat paths, written without a subpackage, were removed in
 - `octave_filter()` caches filter bank designs internally (32 entries), so
   repeated calls with the same parameters skip the design phase. For explicit
   control use `OctaveFilterBank`.
-- Deprecated aliases (kept for one cycle, warn on use, removal in 4.0):
-  `octavefilter` → `octave_filter`, `getansifrequencies` →
-  `nominal_frequencies`, `normalizedfreq` → `normalized_frequencies`,
-  `calculate_sensitivity` → `sensitivity`, `coverage_factor` →
-  `insulation_coverage_factor`, `expanded_uncertainty` →
-  `insulation_expanded_uncertainty`, plus the renamed names
-  `OCTAVE_BANDS_HZ` → `OCTAVE_BANDS`, `THIRD_OCTAVE_BANDS_HZ` →
-  `THIRD_OCTAVE_BANDS`, `BASE_PLATE_BANDS_HZ` → `BASE_PLATE_BANDS` and
-  `ExposureWarning` → `OccupationalExposureWarning`.
+- The 3.1 aliases are gone, as their notices said they would be in 4.0:
+  `octavefilter`, `getansifrequencies`, `normalizedfreq`,
+  `calculate_sensitivity`, the bare `coverage_factor` and
+  `expanded_uncertainty` of ISO 12999-1, the `OCTAVE_BANDS_HZ`,
+  `THIRD_OCTAVE_BANDS_HZ` and `BASE_PLATE_BANDS_HZ` constants,
+  `BAND_CENTRES`, `ExposureWarning`, and the `sample_rate`, `humidity` and
+  `room_volume` keywords. Use `octave_filter`, `nominal_frequencies`,
+  `normalized_frequencies`, `sensitivity`, `insulation_coverage_factor`,
+  `insulation_expanded_uncertainty`, `OCTAVE_BANDS`, `THIRD_OCTAVE_BANDS`,
+  `BASE_PLATE_BANDS`, `phonometry.speech.sii.BAND_CENTERS`,
+  `OccupationalExposureWarning`, `fs`,
+  `relative_humidity` and `volume`.

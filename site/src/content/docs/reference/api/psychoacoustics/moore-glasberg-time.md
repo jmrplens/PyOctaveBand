@@ -145,4 +145,4 @@ MooreGlasbergTimeVaryingLoudness.plot(
 Plot the short-term and long-term loudness against time.
 
 Requires matplotlib (`pip install phonometry[plot]`); returns the
-`Axes`.  See `._plotting`.
+`Axes`.  See `phonometry._plot.psychoacoustics`.

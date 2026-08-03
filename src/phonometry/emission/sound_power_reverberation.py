@@ -406,7 +406,7 @@ def _a_weighted_total(
 
 def sound_power_reverberation(
     levels: np.ndarray,
-    t60: np.ndarray,
+    t60: float | np.ndarray,
     volume: float,
     surface_area: float,
     frequencies: np.ndarray,
