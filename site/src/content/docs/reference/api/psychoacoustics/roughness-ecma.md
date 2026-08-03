@@ -91,7 +91,7 @@ EcmaRoughness.plot(
 ) -> Axes | np.ndarray
 ```
 
-Plot the roughness result (see `._plotting`).
+Plot the roughness result (see `..._plot.psychoacoustics`).
 
 Draws the time-dependent roughness R(l50) and a specific-roughness
 heatmap. Requires matplotlib (`pip install phonometry[plot]`).

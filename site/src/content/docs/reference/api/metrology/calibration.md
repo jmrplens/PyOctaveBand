@@ -9,23 +9,6 @@ Calibration utilities for mapping digital signals to physical SPL levels.
 
 > Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
 
-## calculate_sensitivity
-
-```python
-calculate_sensitivity(
-    ref_signal: list[float] | np.ndarray,
-    target_spl: float = 94.0,
-    ref_pressure: float = 2e-05,
-    fs: int | None = None,
-    validate: bool = True,
-    max_fluctuation_db: float | None = None,
-    frequency: float = 1000.0,
-    narrowband: bool = False,
-) -> float
-```
-
-Deprecated alias of [`sensitivity`](/phonometry/reference/api/metrology/calibration/#sensitivity).
-
 ## CalibrationWarning
 
 The calibration reference recording looks unreliable.

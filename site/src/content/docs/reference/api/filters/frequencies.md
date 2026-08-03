@@ -9,17 +9,6 @@ Frequency calculation logic according to ANSI/IEC standards.
 
 > Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
 
-## getansifrequencies
-
-```python
-getansifrequencies(
-    fraction: float,
-    limits: list[float] | None = None,
-) -> tuple[list[float], list[float], list[float], list[str]]
-```
-
-Deprecated alias of [`nominal_frequencies`](/phonometry/reference/api/filters/frequencies/#nominal_frequencies).
-
 ## nominal_frequencies
 
 ```python
@@ -55,11 +44,3 @@ Get standardized IEC center frequencies.
 | `fraction` | 1 or 3 (Octave or 1/3 Octave). |
 
 **Returns:** List of standard frequencies.
-
-## normalizedfreq
-
-```python
-normalizedfreq(fraction: int) -> list[float]
-```
-
-Deprecated alias of [`normalized_frequencies`](/phonometry/reference/api/filters/frequencies/#normalized_frequencies).

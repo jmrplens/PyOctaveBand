@@ -153,14 +153,6 @@ coefficients, also the model/reality combination of Formula (A.2).
 | :--- | :--- |
 | ValueError | No components, or a negative component. |
 
-## coverage_factor
-
-```python
-coverage_factor(confidence: float = 0.95, one_sided: bool = False) -> float
-```
-
-Deprecated alias of [`insulation_coverage_factor`](/phonometry/reference/api/building/uncertainty/#insulation_coverage_factor).
-
 ## COVERAGE_FACTORS
 
 *Constant* (`mappingproxy`).
@@ -168,18 +160,6 @@ Deprecated alias of [`insulation_coverage_factor`](/phonometry/reference/api/bui
 ```python
 COVERAGE_FACTORS = {(0.68, False): 1.0, (0.8, False): 1.28, (0.9, False): 1.65, (0.95, False): 1.96, (0.99, False): 2.58, (0.999, False): 3.29, (0.84, True): 1.0, (0.9, True): 1.28, (0.95, True): 1.65, (0.975, True): 1.96, (0.995, True): 2.58, (0.9995, True): 3.29}
 ```
-
-## expanded_uncertainty
-
-```python
-expanded_uncertainty(
-    u: float,
-    coverage: float = 0.95,
-    one_sided: bool = False,
-) -> float
-```
-
-Deprecated alias of [`insulation_expanded_uncertainty`](/phonometry/reference/api/building/uncertainty/#insulation_expanded_uncertainty).
 
 ## insulation_coverage_factor
 

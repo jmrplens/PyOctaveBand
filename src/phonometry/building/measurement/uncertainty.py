@@ -608,36 +608,3 @@ COVERAGE_FACTORS: Mapping[tuple[float, bool], float] = MappingProxyType(
         **{(level, True): k for level, k in _COVERAGE_ONE_SIDED.items()},
     }
 )
-
-
-# --------------------------------------------------------------------------- #
-# Deprecated aliases (the bare names shadowed the GUM functions of
-# :mod:`phonometry.metrology.uncertainty` at the top level; remove in the next
-# major).
-# --------------------------------------------------------------------------- #
-def _warn_renamed(old: str, new: str) -> None:
-    import warnings
-
-    warnings.warn(
-        f"phonometry {old} (ISO 12999-1) is deprecated since phonometry 3.1 "
-        f"and will be removed in 4.0; use {new}. For the GUM function use "
-        f"phonometry.metrology.uncertainty.{old}.",
-        DeprecationWarning,
-        stacklevel=3,
-    )
-
-
-def coverage_factor(confidence: float = 0.95, one_sided: bool = False) -> float:
-    """Deprecated alias of :func:`insulation_coverage_factor`."""
-    _warn_renamed("coverage_factor", "insulation_coverage_factor")
-    return insulation_coverage_factor(confidence, one_sided)
-
-
-def expanded_uncertainty(
-    u: float,
-    coverage: float = 0.95,
-    one_sided: bool = False,
-) -> float:
-    """Deprecated alias of :func:`insulation_expanded_uncertainty`."""
-    _warn_renamed("expanded_uncertainty", "insulation_expanded_uncertainty")
-    return insulation_expanded_uncertainty(u, coverage, one_sided)

@@ -12,13 +12,11 @@ from .compliance import (
     verify_weighting_class,
     weighting_class_limits,
 )
-from .core import FilterBankWarning, OctaveFilterBank, octave_filter, octavefilter
+from .core import FilterBankWarning, OctaveFilterBank, octave_filter
 from .equalizer import EQResponseResult, EQSection, ParametricEQ, parametric_eq
 from .frequencies import (
-    getansifrequencies,
     nominal_frequencies,
     normalized_frequencies,
-    normalizedfreq,
 )
 from .weighting import (
     TimeWeighting,
@@ -39,13 +37,10 @@ __all__ = [
     "WeightingFilter",
     "class_limits",
     "filter_class_compliance",
-    "getansifrequencies",
     "linkwitz_riley",
     "nominal_frequencies",
     "normalized_frequencies",
-    "normalizedfreq",
     "octave_filter",
-    "octavefilter",
     "parametric_eq",
     "time_weighting",
     "verify_filter_class",

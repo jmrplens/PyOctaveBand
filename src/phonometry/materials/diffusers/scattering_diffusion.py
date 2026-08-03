@@ -52,7 +52,7 @@ import numpy as np
 from numpy.typing import ArrayLike
 
 from ..._internal.types import Real
-from ..._internal.warnings import PhonometryWarning, _warn_renamed
+from ..._internal.warnings import PhonometryWarning
 
 if TYPE_CHECKING:  # pragma: no cover - typing only
     from matplotlib.axes import Axes
@@ -1177,15 +1177,3 @@ def random_incidence_diffusion(
     if total <= 0.0:
         raise ValueError("The total source weight must be positive.")
     return float(np.sum(w * d) / total)
-
-
-# --- Deprecated alias (phonometry 3.1 rename; remove in 4.0) -------------
-
-def __getattr__(name: str) -> Any:
-    """PEP 562 shim warning for the renamed band constant."""
-    if name == "BASE_PLATE_BANDS_HZ":
-        _warn_renamed("BASE_PLATE_BANDS_HZ", "BASE_PLATE_BANDS")
-        return BASE_PLATE_BANDS
-    raise AttributeError(
-        f"module 'phonometry.materials.diffusers.scattering_diffusion' has no attribute {name!r}"
-    )

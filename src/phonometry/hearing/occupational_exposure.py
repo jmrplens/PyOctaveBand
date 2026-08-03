@@ -54,7 +54,7 @@ from typing import TYPE_CHECKING, Any, Literal
 import numpy as np
 
 from .._internal.levels_math import energy_mean
-from .._internal.warnings import PhonometryWarning, _warn_renamed
+from .._internal.warnings import PhonometryWarning
 
 if TYPE_CHECKING:
     from matplotlib.axes import Axes
@@ -633,19 +633,3 @@ def full_day_exposure(
 def _with_advisory(result: ExposureResult) -> ExposureResult:
     """Return a copy of ``result`` with the sampling advisory flag set."""
     return replace(result, sampling_advisory=True)
-
-
-# --- Deprecated alias (phonometry 3.1 rename; remove in 4.0) -------------
-
-def __getattr__(name: str) -> Any:
-    """PEP 562 shim warning for the renamed warning class.
-
-    Returns the class object itself, so ``isinstance``/``except`` checks and
-    warning filters against the old name keep matching the new one.
-    """
-    if name == "ExposureWarning":
-        _warn_renamed("ExposureWarning", "OccupationalExposureWarning")
-        return OccupationalExposureWarning
-    raise AttributeError(
-        f"module 'phonometry.hearing.occupational_exposure' has no attribute {name!r}"
-    )

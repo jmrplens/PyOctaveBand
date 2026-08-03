@@ -103,7 +103,6 @@ environmental_correction(
     volume: float | None = None,
     mean_absorption_coefficient: float | np.ndarray | None = None,
     room_surface: float | None = None,
-    room_volume: float | str | None = 'deprecated',
 ) -> float | np.ndarray
 ```
 
@@ -135,7 +134,6 @@ with that shape; scalar inputs return a scalar, unchanged.
 | `volume` | Room volume `V` (m^3), with `reverberation_time`. |
 | `mean_absorption_coefficient` | `alpha` in (0, 1], scalar or per band, with `room_surface` (Eq. A.7). |
 | `room_surface` | Room boundary area `Sv` (m^2), with `alpha`. |
-| `room_volume` | Deprecated alias of `volume` (remove in 4.0). |
 
 **Returns:** `K2` in decibels; a scalar for scalar inputs, otherwise an array per band.
 
@@ -763,7 +761,6 @@ sound_power_pressure(
     room_surface: float | None = None,
     grade: Grade = 'engineering',
     omc_uncertainty: float = 0.0,
-    room_volume: float | str | None = 'deprecated',
 ) -> SoundPowerResult
 ```
 
@@ -804,7 +801,6 @@ sound power level is combined via ISO 3744 Annex E.
 | `room_surface` | Room boundary area `Sv` (m^2), with `alpha`. |
 | `grade` | `'engineering'` (ISO 3744) or `'survey'` (ISO 3746). |
 | `omc_uncertainty` | `sigma_omc` (dB), operating/mounting instability. |
-| `room_volume` | Deprecated alias of `volume` (remove in 4.0). |
 
 **Returns:** [`SoundPowerResult`](/phonometry/reference/api/power/sound-power/#soundpowerresult).
 

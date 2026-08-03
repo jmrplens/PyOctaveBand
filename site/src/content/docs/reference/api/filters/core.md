@@ -67,14 +67,6 @@ Multichannel support: If x is 2D (channels, samples), each channel is filtered.
 
 **Returns:** A tuple containing (SPL_array, Frequencies_list) or (SPL_array, Frequencies_list, signals). When *nominal=True*, the frequency list contains `List[str]` labels instead of floats. (*Union[Tuple[np.ndarray, List[float]], Tuple[np.ndarray, List[str]], Tuple[np.ndarray, List[float], List[np.ndarray]], Tuple[np.ndarray, List[str], List[np.ndarray]]]*)
 
-## octavefilter
-
-```python
-octavefilter(*args: Any, **kwargs: Any) -> Any
-```
-
-Deprecated alias of [`octave_filter`](/phonometry/reference/api/filters/core/#octave_filter).
-
 ## OctaveFilterBank
 
 ```python

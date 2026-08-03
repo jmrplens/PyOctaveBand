@@ -70,7 +70,7 @@ import numpy as np
 from numpy.typing import ArrayLike, NDArray
 
 from ..._internal.types import Real
-from ..._internal.warnings import PhonometryWarning, _warn_renamed
+from ..._internal.warnings import PhonometryWarning
 
 if TYPE_CHECKING:  # pragma: no cover - typing only
     from matplotlib.axes import Axes
@@ -266,7 +266,6 @@ def adrienne_window(
     trailing_duration: float = _ADRIENNE_TRAILING,
     leading_edge: str = "blackman-harris",
     trailing_edge: str = "blackman-harris",
-    sample_rate: float | str = "deprecated",
 ) -> Real:
     """Adrienne-type temporal window (ISO 13472-1:2002, Clause 6.4).
 
@@ -295,21 +294,12 @@ def adrienne_window(
         ``"cosine-squared"``.
     :param trailing_edge: Trailing-edge shape, ``"blackman-harris"`` or
         ``"cosine-squared"``.
-    :param sample_rate: Deprecated alias of ``fs`` (remove in 4.0).
     :return: The time-domain window, one sample per ``1 / fs`` (length
         ``round((leading + flat + trailing) * fs)`` samples).
     :raises ValueError: If ``fs`` is missing or not positive, a duration is
         negative, the flat duration is not positive, or an edge shape is
         unknown.
     """
-    if not isinstance(sample_rate, str):
-        _warn_renamed("the 'sample_rate' keyword of adrienne_window()", "'fs'")
-        if fs is not None:
-            raise ValueError(
-                "adrienne_window() got both 'fs' and its deprecated alias "
-                "'sample_rate'; pass only 'fs'."
-            )
-        fs = sample_rate
     if fs is None:
         raise ValueError("adrienne_window() missing required argument: 'fs'.")
     if fs <= 0.0:
@@ -371,7 +361,6 @@ def insitu_reflection_factor(
     fs: float | None = None,
     delay: float | None = None,
     n: int | None = None,
-    sample_rate: float | str = "deprecated",
 ) -> Complex:
     r"""Complex pressure reflection factor ``r(f)`` (ISO 13472-1, Clause 4.1).
 
@@ -398,21 +387,10 @@ def insitu_reflection_factor(
     :param delay: Reflected-path delay ``dtau`` to undo, in seconds; ``None``
         returns the raw spectral ratio.
     :param n: FFT length; defaults to the longer of the two impulse responses.
-    :param sample_rate: Deprecated alias of ``fs`` (remove in 4.0).
     :return: Complex reflection factor ``r(f)`` at the ``rfft`` frequency bins.
     :raises ValueError: On empty inputs, invalid geometry, or ``delay`` given
         without ``fs``.
     """
-    if not isinstance(sample_rate, str):
-        _warn_renamed(
-            "the 'sample_rate' keyword of insitu_reflection_factor()", "'fs'"
-        )
-        if fs is not None:
-            raise ValueError(
-                "insitu_reflection_factor() got both 'fs' and its deprecated "
-                "alias 'sample_rate'; pass only 'fs'."
-            )
-        fs = sample_rate
     kr = geometric_spreading_factor_angle(
         incidence_angle, source_height, mic_height
     )
@@ -665,7 +643,6 @@ def insitu_absorption_spectrum(
     f_min: float = PART1_FREQUENCY_RANGE[0],
     f_max: float = PART1_FREQUENCY_RANGE[1],
     clip_negative: bool = True,
-    sample_rate: float | str = "deprecated",
 ) -> InsituAbsorptionResult:
     """In-situ one-third-octave absorption spectrum (ISO 13472-1, Clause 4.1).
 
@@ -685,21 +662,10 @@ def insitu_absorption_spectrum(
     :param f_min: Lowest band centre to report, in hertz (default 250 Hz).
     :param f_max: Highest band centre to report, in hertz (default 4000 Hz).
     :param clip_negative: Clip negative band results to zero (default ``True``).
-    :param sample_rate: Deprecated alias of ``fs`` (remove in 4.0).
     :return: An :class:`InsituAbsorptionResult` with ``.plot()``.
     :raises ValueError: On empty inputs, invalid geometry, or a missing or
         non-positive ``fs``.
     """
-    if not isinstance(sample_rate, str):
-        _warn_renamed(
-            "the 'sample_rate' keyword of insitu_absorption_spectrum()", "'fs'"
-        )
-        if fs is not None:
-            raise ValueError(
-                "insitu_absorption_spectrum() got both 'fs' and its deprecated "
-                "alias 'sample_rate'; pass only 'fs'."
-            )
-        fs = sample_rate
     if fs is None:
         raise ValueError(
             "insitu_absorption_spectrum() missing required argument: 'fs'."

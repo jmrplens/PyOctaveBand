@@ -584,7 +584,9 @@ class SurveyServiceEquipmentResult:
     l_xy_n: np.ndarray | None
 
 
-def _validate_index(k: Sequence[float] | np.ndarray, n_bands: int) -> np.ndarray:
+def _validate_index(
+    k: float | Sequence[float] | np.ndarray, n_bands: int
+) -> np.ndarray:
     """Coerce the reverberation index to a finite per-band array."""
     kk = _finite_bands(k, "reverberation_index")
     if kk.shape != (n_bands,):
@@ -598,7 +600,7 @@ def _validate_index(k: Sequence[float] | np.ndarray, n_bands: int) -> np.ndarray
 def survey_airborne_insulation(
     l1: Sequence[float] | np.ndarray,
     l2: Sequence[float] | np.ndarray,
-    reverberation_index: Sequence[float] | np.ndarray,
+    reverberation_index: float | Sequence[float] | np.ndarray,
     *,
     volume: float | None = None,
     area: float | None = None,
@@ -666,7 +668,7 @@ def survey_airborne_insulation(
 
 def survey_impact_insulation(
     li: Sequence[float] | np.ndarray,
-    reverberation_index: Sequence[float] | np.ndarray,
+    reverberation_index: float | Sequence[float] | np.ndarray,
     *,
     volume: float | None = None,
 ) -> SurveyImpactResult:
@@ -703,7 +705,7 @@ def survey_impact_insulation(
 def survey_facade_insulation(
     l1_2m: Sequence[float] | np.ndarray,
     l2: Sequence[float] | np.ndarray,
-    reverberation_index: Sequence[float] | np.ndarray,
+    reverberation_index: float | Sequence[float] | np.ndarray,
     *,
     volume: float | None = None,
 ) -> SurveyFacadeResult:

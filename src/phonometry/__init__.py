@@ -6,9 +6,7 @@ Implementation according to ANSI s1.11-2004 and IEC 61260-1-2014.
 
 from __future__ import annotations
 
-from typing import Any
-
-from ._internal.warnings import PhonometryWarning, _warn_renamed
+from ._internal.warnings import PhonometryWarning
 from ._plot.geometry import (
     plot_absorber_stack,
     plot_aperture_geometry,
@@ -214,8 +212,6 @@ from .building.measurement.uncertainty import (
     UncertainValue,
     band_uncertainty,
     combine_uncertainties,
-    coverage_factor,
-    expanded_uncertainty,
     insulation_coverage_factor,
     insulation_expanded_uncertainty,
     maximum_repeatability_standard_deviation,
@@ -702,7 +698,6 @@ from .filters.core import (
     FilterBankWarning,
     OctaveFilterBank,
     octave_filter,
-    octavefilter,
 )
 from .filters.equalizer import (
     EQResponseResult,
@@ -711,10 +706,8 @@ from .filters.equalizer import (
     parametric_eq,
 )
 from .filters.frequencies import (
-    getansifrequencies,
     nominal_frequencies,
     normalized_frequencies,
-    normalizedfreq,
 )
 from .filters.weighting import (
     TimeWeighting,
@@ -953,7 +946,6 @@ from .materials.surfaces.road_absorption import (
 )
 from .metrology.calibration import (
     CalibrationWarning,
-    calculate_sensitivity,
     sensitivity,
 )
 from .metrology.data_qualification import (
@@ -2047,7 +2039,6 @@ __all__ = [
     "blocking_force_ratio",
     "bottom_reflection_loss",
     "bridge_transfer",
-    "calculate_sensitivity",
     "calculated_sound_reduction_index",
     "cam_from_frequency",
     "ceiling_attenuation_class",
@@ -2092,7 +2083,6 @@ __all__ = [
     "coupling_term",
     "coupling_term_force_source",
     "coupling_term_velocity_source",
-    "coverage_factor",
     "covering_contact_stiffness",
     "covering_improvement",
     "crest_factor",
@@ -2188,7 +2178,6 @@ __all__ = [
     "evaluation_period_level",
     "event_level",
     "excess_phase",
-    "expanded_uncertainty",
     "expansion_chamber",
     "exposure_assessment",
     "exposure_criteria",
@@ -2248,7 +2237,6 @@ __all__ = [
     "geometric_divergence",
     "geometric_spreading_factor",
     "geometric_spreading_factor_angle",
-    "getansifrequencies",
     "golay_impulse_response",
     "golay_pair",
     "ground_attenuation",
@@ -2445,14 +2433,12 @@ __all__ = [
     "normalized_frequencies",
     "normalized_surface_admittance",
     "normalized_surface_impedance",
-    "normalizedfreq",
     "npd_curve",
     "npd_level",
     "object_fraction",
     "ocean_ambient_noise",
     "octave_bands_from_third_octaves",
     "octave_filter",
-    "octavefilter",
     "one_third_octave_absorption",
     "open_microphone_correction",
     "open_plan_metrics",
@@ -2825,33 +2811,65 @@ __all__ = [
 ]
 
 
-#: Deprecated root-level name -> canonical name (phonometry 3.1 renames).
-_RENAMED_ATTRIBUTES: dict[str, str] = {
-    "OCTAVE_BANDS_HZ": "OCTAVE_BANDS",
-    "THIRD_OCTAVE_BANDS_HZ": "THIRD_OCTAVE_BANDS",
-    "BASE_PLATE_BANDS_HZ": "BASE_PLATE_BANDS",
-    "ExposureWarning": "OccupationalExposureWarning",
-}
-
-
-def __getattr__(name: str) -> Any:
-    """PEP 562 shim warning for names renamed in phonometry 3.1.
-
-    Constants cannot warn through a wrapper, so the deprecated names live
-    here (and in their home modules) as module ``__getattr__`` aliases.
-    Remove in 4.0.
-    """
-    try:
-        canonical = _RENAMED_ATTRIBUTES[name]
-    except KeyError:
-        raise AttributeError(
-            f"module 'phonometry' has no attribute {name!r}"
-        ) from None
-    _warn_renamed(name, canonical)
-    return globals()[canonical]
-
-
+#: The domain packages are part of the public surface: ``phonometry.building``
+#: reads the same as ``from phonometry import building``. Importing the flat
+#: API already binds every one of them; naming them here says so, and lets a
+#: type checker follow ``ph.building`` the way the interpreter does.
 # Deprecated module-path aliases for the 4.0 taxonomy: importing the package
 # installs sys.modules shims for every moved public module (see
 # phonometry/_compat.py; removed in 5.0).
 from . import _compat as _compat
+from . import (
+    aircraft as aircraft,
+)
+from . import (
+    broadcast as broadcast,
+)
+from . import (
+    building as building,
+)
+from . import (
+    electroacoustics as electroacoustics,
+)
+from . import (
+    emission as emission,
+)
+from . import (
+    environment as environment,
+)
+from . import (
+    filters as filters,
+)
+from . import (
+    hearing as hearing,
+)
+from . import (
+    materials as materials,
+)
+from . import (
+    metrology as metrology,
+)
+from . import (
+    noise_control as noise_control,
+)
+from . import (
+    psychoacoustics as psychoacoustics,
+)
+from . import (
+    room as room,
+)
+from . import (
+    signals as signals,
+)
+from . import (
+    simulation as simulation,
+)
+from . import (
+    speech as speech,
+)
+from . import (
+    underwater as underwater,
+)
+from . import (
+    vibration as vibration,
+)

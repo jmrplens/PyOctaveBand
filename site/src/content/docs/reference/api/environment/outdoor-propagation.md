@@ -57,8 +57,6 @@ atmospheric_absorption(
     temperature: float = 20.0,
     relative_humidity: float | None = None,
     pressure: float = 101.325,
-    *,
-    humidity: float | str = 'deprecated',
 ) -> NDArray[np.float64]
 ```
 
@@ -87,7 +85,6 @@ the nearest exact midband.
 | `temperature` | Air temperature, in degrees Celsius. |
 | `relative_humidity` | Relative humidity, in percent (default 70). |
 | `pressure` | Atmospheric pressure, in kilopascals. |
-| `humidity` | Deprecated alias of `relative_humidity` (remove in 4.0). |
 
 **Returns:** `Aatm` per band, in decibels.
 
@@ -385,8 +382,6 @@ outdoor_propagation_attenuation(
     relative_humidity: float | None = None,
     pressure: float = 101.325,
     projected_distance: float | None = None,
-    *,
-    humidity: float | str = 'deprecated',
 ) -> OutdoorAttenuation
 ```
 
@@ -417,7 +412,6 @@ barrier $A_{bar} = D_z$
 | `relative_humidity` | Relative humidity, in percent (default 70). |
 | `pressure` | Atmospheric pressure, in kilopascals. |
 | `projected_distance` | Ground-plane projected distance `dp`, in metres; defaults to $\sqrt{d^2 - (h_s - h_r)^2}$. |
-| `humidity` | Deprecated alias of `relative_humidity` (remove in 4.0). |
 
 **Returns:** [`OutdoorAttenuation`](/phonometry/reference/api/environment/outdoor-propagation/#outdoorattenuation) with the per-band term breakdown.
 
@@ -549,8 +543,6 @@ predicted_receiver_level(
     d_omega: float = 0.0,
     c0: float | None = None,
     projected_distance: float | None = None,
-    *,
-    humidity: float | str = 'deprecated',
 ) -> NDArray[np.float64]
 ```
 
@@ -588,7 +580,6 @@ convenience.
 | `d_omega` | Solid-angle index `DOmega`, in decibels (see [`directivity_omega`](/phonometry/reference/api/environment/outdoor-propagation/#directivity_omega) for the alternative ground method). |
 | `c0` | Meteorological factor `C0`, in decibels; `None` returns the downwind level `LfT(DW)` ($C_{met} = 0$). |
 | `projected_distance` | Ground-plane projected distance `dp`, in metres. |
-| `humidity` | Deprecated alias of `relative_humidity` (remove in 4.0). |
 
 **Returns:** Predicted octave-band level per frequency, in decibels.
 

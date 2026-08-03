@@ -10,7 +10,7 @@ from functools import lru_cache
 
 import numpy as np
 
-from .._internal.warnings import PhonometryWarning, _warn_renamed
+from .._internal.warnings import PhonometryWarning
 
 
 def nominal_frequencies(
@@ -204,21 +204,3 @@ def normalized_frequencies(fraction: int) -> list[float]:
     if fraction not in predefined:
         raise ValueError("Normalized frequencies only available for fraction=1 or 3")
     return predefined[fraction]
-
-
-# --------------------------------------------------------------------------- #
-# Deprecated aliases (pre-3.1 names; remove in the next major).
-# --------------------------------------------------------------------------- #
-def getansifrequencies(
-    fraction: float,
-    limits: list[float] | None = None,
-) -> tuple[list[float], list[float], list[float], list[str]]:
-    """Deprecated alias of :func:`nominal_frequencies`."""
-    _warn_renamed("getansifrequencies()", "nominal_frequencies()")
-    return nominal_frequencies(fraction, limits)
-
-
-def normalizedfreq(fraction: int) -> list[float]:
-    """Deprecated alias of :func:`normalized_frequencies`."""
-    _warn_renamed("normalizedfreq()", "normalized_frequencies()")
-    return normalized_frequencies(fraction)

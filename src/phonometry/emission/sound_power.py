@@ -56,7 +56,7 @@ import numpy as np
 
 from .._internal.levels_math import energy_mean, energy_sum, weighted_energy_mean
 from .._internal.types import as_float_or_array
-from .._internal.warnings import PhonometryWarning, _warn_renamed
+from .._internal.warnings import PhonometryWarning
 
 if TYPE_CHECKING:
     from collections.abc import Sequence
@@ -374,7 +374,6 @@ def environmental_correction(
     volume: float | None = None,
     mean_absorption_coefficient: float | np.ndarray | None = None,
     room_surface: float | None = None,
-    room_volume: float | str | None = "deprecated",
 ) -> float | np.ndarray:
     r"""Environmental correction ``K2`` (ISO 3744:2010 Eq. A.2).
 
@@ -403,23 +402,9 @@ def environmental_correction(
     :param mean_absorption_coefficient: ``alpha`` in (0, 1], scalar or per band,
         with ``room_surface`` (Eq. A.7).
     :param room_surface: Room boundary area ``Sv`` (m^2), with ``alpha``.
-    :param room_volume: Deprecated alias of ``volume`` (remove in 4.0).
     :return: ``K2`` in decibels; a scalar for scalar inputs, otherwise an array
         per band.
     """
-    # An explicit None matches the old default and stays silent; only a real
-    # value through the deprecated alias warns.
-    if not isinstance(room_volume, str) and room_volume is not None:
-        _warn_renamed(
-            "the 'room_volume' keyword of environmental_correction()",
-            "'volume'",
-        )
-        if volume is not None:
-            raise ValueError(
-                "environmental_correction() got both 'volume' and its "
-                "deprecated alias 'room_volume'; pass only 'volume'."
-            )
-        volume = room_volume
     if absorption_area is None:
         # A half-specified room pair must never be read as free field: naming
         # only one member of a pair is a mistake, not a K2 = 0 request.
@@ -586,7 +571,6 @@ def sound_power_pressure(
     room_surface: float | None = None,
     grade: Grade = "engineering",
     omc_uncertainty: float = 0.0,
-    room_volume: float | str | None = "deprecated",
 ) -> SoundPowerResult:
     r"""Sound power level from surface pressure levels (ISO 3744/3746:2010).
 
@@ -623,19 +607,8 @@ def sound_power_pressure(
     :param room_surface: Room boundary area ``Sv`` (m^2), with ``alpha``.
     :param grade: ``'engineering'`` (ISO 3744) or ``'survey'`` (ISO 3746).
     :param omc_uncertainty: ``sigma_omc`` (dB), operating/mounting instability.
-    :param room_volume: Deprecated alias of ``volume`` (remove in 4.0).
     :return: :class:`SoundPowerResult`.
     """
-    if not isinstance(room_volume, str) and room_volume is not None:
-        _warn_renamed(
-            "the 'room_volume' keyword of sound_power_pressure()", "'volume'"
-        )
-        if volume is not None:
-            raise ValueError(
-                "sound_power_pressure() got both 'volume' and its deprecated "
-                "alias 'room_volume'; pass only 'volume'."
-            )
-        volume = room_volume
     grade = _check_grade(grade)
     levels = np.atleast_2d(np.asarray(levels_positions, dtype=np.float64))
     if levels.ndim != 2:

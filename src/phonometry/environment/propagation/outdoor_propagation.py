@@ -50,7 +50,6 @@ from typing import TYPE_CHECKING, Any
 import numpy as np
 from numpy.typing import ArrayLike, NDArray
 
-from ..._internal.warnings import _warn_renamed
 from .air_absorption import air_attenuation
 
 if TYPE_CHECKING:
@@ -297,28 +296,6 @@ def geometric_divergence(distance: float) -> float:
     return float(20.0 * np.log10(distance / _D0) + 11.0)
 
 
-def _resolve_humidity(
-    func: str, relative_humidity: float | None, humidity: float | str
-) -> float:
-    """Resolve the deprecated ``humidity`` alias onto ``relative_humidity``.
-
-    ``stacklevel=4`` skips this helper *and* the public function so the
-    :class:`DeprecationWarning` points at the caller's line.
-    """
-    if not isinstance(humidity, str):
-        _warn_renamed(
-            f"the 'humidity' keyword of {func}()",
-            "'relative_humidity'",
-            stacklevel=4,
-        )
-        if relative_humidity is not None:
-            raise ValueError(
-                f"{func}() got both 'relative_humidity' and its deprecated "
-                "alias 'humidity'; pass only 'relative_humidity'."
-            )
-        relative_humidity = humidity
-    return 70.0 if relative_humidity is None else relative_humidity
-
 
 def atmospheric_absorption(
     distance: float,
@@ -326,8 +303,6 @@ def atmospheric_absorption(
     temperature: float = 20.0,
     relative_humidity: float | None = None,
     pressure: float = 101.325,
-    *,
-    humidity: float | str = "deprecated",
 ) -> NDArray[np.float64]:
     r"""Attenuation due to atmospheric absorption (ISO 9613-2:1996, Eq. (8)).
 
@@ -350,12 +325,9 @@ def atmospheric_absorption(
     :param temperature: Air temperature, in degrees Celsius.
     :param relative_humidity: Relative humidity, in percent (default 70).
     :param pressure: Atmospheric pressure, in kilopascals.
-    :param humidity: Deprecated alias of ``relative_humidity`` (remove in 4.0).
     :return: ``Aatm`` per band, in decibels.
     """
-    relative_humidity = _resolve_humidity(
-        "atmospheric_absorption", relative_humidity, humidity
-    )
+    relative_humidity = 70.0 if relative_humidity is None else relative_humidity
     alpha = air_attenuation(
         frequencies, temperature, relative_humidity, pressure, exact_midband=True
     )
@@ -704,8 +676,6 @@ def outdoor_propagation_attenuation(
     relative_humidity: float | None = None,
     pressure: float = 101.325,
     projected_distance: float | None = None,
-    *,
-    humidity: float | str = "deprecated",
 ) -> OutdoorAttenuation:
     r"""Total octave-band outdoor attenuation (ISO 9613-2:1996, Eq. (4)).
 
@@ -735,13 +705,10 @@ def outdoor_propagation_attenuation(
     :param pressure: Atmospheric pressure, in kilopascals.
     :param projected_distance: Ground-plane projected distance ``dp``, in metres;
         defaults to :math:`\sqrt{d^2 - (h_s - h_r)^2}`.
-    :param humidity: Deprecated alias of ``relative_humidity`` (remove in 4.0).
     :return: :class:`OutdoorAttenuation` with the per-band term breakdown.
     :raises ValueError: If ``distance`` is not positive.
     """
-    relative_humidity = _resolve_humidity(
-        "outdoor_propagation_attenuation", relative_humidity, humidity
-    )
+    relative_humidity = 70.0 if relative_humidity is None else relative_humidity
     if distance <= 0.0:
         raise ValueError("'distance' must be positive.")
     freqs = np.atleast_1d(np.asarray(frequencies, dtype=np.float64))
@@ -791,8 +758,6 @@ def predicted_receiver_level(
     d_omega: float = 0.0,
     c0: float | None = None,
     projected_distance: float | None = None,
-    *,
-    humidity: float | str = "deprecated",
 ) -> NDArray[np.float64]:
     r"""Predicted octave-band receiver level (ISO 9613-2:1996, Eq. (3)/(6)).
 
@@ -827,12 +792,9 @@ def predicted_receiver_level(
     :param c0: Meteorological factor ``C0``, in decibels; ``None`` returns the
         downwind level ``LfT(DW)`` (:math:`C_{met} = 0`).
     :param projected_distance: Ground-plane projected distance ``dp``, in metres.
-    :param humidity: Deprecated alias of ``relative_humidity`` (remove in 4.0).
     :return: Predicted octave-band level per frequency, in decibels.
     """
-    relative_humidity = _resolve_humidity(
-        "predicted_receiver_level", relative_humidity, humidity
-    )
+    relative_humidity = 70.0 if relative_humidity is None else relative_humidity
     lw = np.atleast_1d(np.asarray(sound_power_level, dtype=np.float64))
     attenuation = outdoor_propagation_attenuation(
         distance, source_height, receiver_height, frequencies,

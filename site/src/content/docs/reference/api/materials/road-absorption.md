@@ -111,7 +111,6 @@ adrienne_window(
     trailing_duration: float = 0.005,
     leading_edge: str = 'blackman-harris',
     trailing_edge: str = 'blackman-harris',
-    sample_rate: float | str = 'deprecated',
 ) -> Real
 ```
 
@@ -144,7 +143,6 @@ normative fixed set of timings. The lower usable frequency scales as
 | `trailing_duration` | Trailing-edge (fall) duration, in seconds. |
 | `leading_edge` | Leading-edge shape, `"blackman-harris"` or `"cosine-squared"`. |
 | `trailing_edge` | Trailing-edge shape, `"blackman-harris"` or `"cosine-squared"`. |
-| `sample_rate` | Deprecated alias of `fs` (remove in 4.0). |
 
 **Returns:** The time-domain window, one sample per `1 / fs` (length `round((leading + flat + trailing) * fs)` samples).
 
@@ -333,7 +331,6 @@ insitu_absorption_spectrum(
     f_min: float = 250.0,
     f_max: float = 4000.0,
     clip_negative: bool = True,
-    sample_rate: float | str = 'deprecated',
 ) -> InsituAbsorptionResult
 ```
 
@@ -359,7 +356,6 @@ in a plottable [`InsituAbsorptionResult`](/phonometry/reference/api/materials/ro
 | `f_min` | Lowest band centre to report, in hertz (default 250 Hz). |
 | `f_max` | Highest band centre to report, in hertz (default 4000 Hz). |
 | `clip_negative` | Clip negative band results to zero (default `True`). |
-| `sample_rate` | Deprecated alias of `fs` (remove in 4.0). |
 
 **Returns:** An [`InsituAbsorptionResult`](/phonometry/reference/api/materials/road-absorption/#insituabsorptionresult) with `.plot()`.
 
@@ -382,7 +378,6 @@ insitu_reflection_factor(
     fs: float | None = None,
     delay: float | None = None,
     n: int | None = None,
-    sample_rate: float | str = 'deprecated',
 ) -> Complex
 ```
 
@@ -411,7 +406,6 @@ Annex C; the frequency-dependent form of Annex G).
 | `fs` | Sampling frequency, in hertz; required with `delay` for phase restoration. |
 | `delay` | Reflected-path delay `dtau` to undo, in seconds; `None` returns the raw spectral ratio. |
 | `n` | FFT length; defaults to the longer of the two impulse responses. |
-| `sample_rate` | Deprecated alias of `fs` (remove in 4.0). |
 
 **Returns:** Complex reflection factor `r(f)` at the `rfft` frequency bins.
 

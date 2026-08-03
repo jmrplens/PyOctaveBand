@@ -9,7 +9,7 @@ import warnings
 
 import numpy as np
 
-from .._internal.warnings import PhonometryWarning, _warn_renamed
+from .._internal.warnings import PhonometryWarning
 
 
 class CalibrationWarning(PhonometryWarning):
@@ -116,30 +116,6 @@ def sensitivity(
 
     factor = (ref_pressure * 10 ** (target_spl / 20)) / rms_ref
     return float(factor)
-
-
-def calculate_sensitivity(
-    ref_signal: list[float] | np.ndarray,
-    target_spl: float = 94.0,
-    ref_pressure: float = 2e-5,
-    fs: int | None = None,
-    validate: bool = True,
-    max_fluctuation_db: float | None = None,
-    frequency: float = 1000.0,
-    narrowband: bool = False,
-) -> float:
-    """Deprecated alias of :func:`sensitivity`."""
-    _warn_renamed("calculate_sensitivity()", "sensitivity()")
-    return sensitivity(
-        ref_signal,
-        target_spl=target_spl,
-        ref_pressure=ref_pressure,
-        fs=fs,
-        validate=validate,
-        max_fluctuation_db=max_fluctuation_db,
-        frequency=frequency,
-        narrowband=narrowband,
-    )
 
 
 def _validate_reference_stability(

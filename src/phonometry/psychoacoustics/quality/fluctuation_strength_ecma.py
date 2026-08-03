@@ -216,7 +216,7 @@ class EcmaFluctuationStrength:
     field: str
 
     def plot(self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any) -> Axes | np.ndarray:
-        """Plot the fluctuation-strength result (see :mod:`._plotting`).
+        """Plot the fluctuation-strength result (see :mod:`..._plot.psychoacoustics`).
 
         Draws the time-dependent fluctuation strength F(l50) and a
         specific-fluctuation-strength heatmap. Requires matplotlib

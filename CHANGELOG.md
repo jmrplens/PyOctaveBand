@@ -1061,6 +1061,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   from the top level; from `phonometry.filters` it still resolves until 5.0,
   with the usual notice.
 
+- The eighteen domain packages are named explicitly in `phonometry/__init__.py`
+  rather than bound as a side effect of importing the flat API. Nothing changes
+  at runtime, where `phonometry.building` already resolved; what changes is
+  that a type checker can follow it, which the removal of the package-level
+  `__getattr__` shim would otherwise have taken away.
+
 - `phonometry.underwater` has three families, along the three questions an
   underwater problem asks. `underwater.sources` is what makes the sound:
   ISO 17208 ship radiated noise, shipping traffic, impact pile driving and the
@@ -1865,6 +1871,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   3.x aliases.
 
 ### Removed
+
+- The 3.1 renames, at the release their notices named. The function aliases
+  `octavefilter`, `getansifrequencies`, `normalizedfreq` and
+  `calculate_sensitivity` are gone; use `octave_filter`, `nominal_frequencies`,
+  `normalized_frequencies` and `sensitivity`. The ISO 12999-1 pair that
+  shadowed the GUM functions at the package root, the bare `coverage_factor`
+  and `expanded_uncertainty`, are gone; use `insulation_coverage_factor` and
+  `insulation_expanded_uncertainty`, and read the GUM pair from
+  `phonometry.metrology.uncertainty`. The renamed constants
+  `OCTAVE_BANDS_HZ`, `THIRD_OCTAVE_BANDS_HZ`, `BASE_PLATE_BANDS_HZ`,
+  `BAND_CENTRES` and `ExposureWarning` are gone; use `OCTAVE_BANDS`,
+  `THIRD_OCTAVE_BANDS`, `BASE_PLATE_BANDS`, `BAND_CENTERS` and
+  `OccupationalExposureWarning`. The deprecated keywords are gone too:
+  `sample_rate` is `fs` in the ISO 13472 functions, `humidity` is
+  `relative_humidity` in the ISO 9613 ones, and `room_volume` is `volume` in
+  the ISO 3744 pair.
+
+  `phonometry._plotting`, the 3.2 re-export of the renderers that moved to
+  `phonometry._plot`, is gone with them.
 
 - The flat pre-3.2 module paths, as 3.2 announced when it deprecated them:
   `phonometry.levels`, `phonometry.insulation`, `phonometry.room_ir` and the
