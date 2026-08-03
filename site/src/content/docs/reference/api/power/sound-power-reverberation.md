@@ -214,7 +214,7 @@ the two sources, so the room absorption need not be known.
 ```python
 sound_power_reverberation(
     levels: np.ndarray,
-    t60: np.ndarray,
+    t60: float | np.ndarray,
     volume: float,
     surface_area: float,
     frequencies: np.ndarray,

@@ -146,7 +146,7 @@ Reverberation index $k = 10 \log_{10}(T/T_0)$ (ISO 10052, Cl. 3.3).
 survey_airborne_insulation(
     l1: Sequence[float] | np.ndarray,
     l2: Sequence[float] | np.ndarray,
-    reverberation_index: Sequence[float] | np.ndarray,
+    reverberation_index: float | Sequence[float] | np.ndarray,
     *,
     volume: float | None = None,
     area: float | None = None,
@@ -195,7 +195,7 @@ reverberation index `k` comes from [`reverberation_index`](/phonometry/reference
 survey_facade_insulation(
     l1_2m: Sequence[float] | np.ndarray,
     l2: Sequence[float] | np.ndarray,
-    reverberation_index: Sequence[float] | np.ndarray,
+    reverberation_index: float | Sequence[float] | np.ndarray,
     *,
     volume: float | None = None,
 ) -> SurveyFacadeResult
@@ -234,7 +234,7 @@ $D_{2m,n} = D_{2m} + k + 10 \log_{10}(A_0 T_0 / (0.16\,V))$
 ```python
 survey_impact_insulation(
     li: Sequence[float] | np.ndarray,
-    reverberation_index: Sequence[float] | np.ndarray,
+    reverberation_index: float | Sequence[float] | np.ndarray,
     *,
     volume: float | None = None,
 ) -> SurveyImpactResult
