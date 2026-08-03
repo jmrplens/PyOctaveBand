@@ -14,7 +14,7 @@ covers **A**, **C** and **Z**, the curves specified by **IEC 61672-1:2013**:
 where they come from, how to apply them, the `high_accuracy` design and the
 Table 3 class verification. The rest of the family, the infrasound G curve,
 the historical B and D and the AU curve, is
-[Special Weightings](special-weightings.md).
+[Special Weightings](https://jmrplens.github.io/phonometry/signal/levels/special-weightings/).
 
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/weighting_responses_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/weighting_responses.svg" alt="A, C and Z frequency weighting curves of IEC 61672-1 with a zoom showing the positive region of the A curve (+1.27 dB at 2.5 kHz)" width="80%"></picture>
 
@@ -22,7 +22,7 @@ the historical B and D and the AU curve, is
 at 48 kHz: A, which discards the bass; C, which keeps it; and Z, which
 weights nothing at all. The inset magnifies the small positive region of A
 around 2.5 kHz. The special B, D and AU curves have their own chart in
-[Special Weightings](special-weightings.md), together with the infrasound
+[Special Weightings](https://jmrplens.github.io/phonometry/signal/levels/special-weightings/), together with the infrasound
 G curve.*
 
 <details>
@@ -59,7 +59,7 @@ plt.show()
 * **Z-Weighting (`Z`):** Zero weighting, completely flat response.
 
 The `curve` argument also accepts the four special weightings, charted and
-documented in [Special Weightings](special-weightings.md): `'G'` for
+documented in [Special Weightings](https://jmrplens.github.io/phonometry/signal/levels/special-weightings/): `'G'` for
 infrasound (ISO 7196), the historical `'B'` (ANSI S1.4-1983) and `'D'`
 (IEC 537), and `'AU'` for audible sound in the presence of ultrasound
 (IEC 61012).
@@ -81,7 +81,7 @@ C is a band-pass with double poles at $f_1$ and $f_4$ (2 zeros at the origin);
 A adds the $f_2$ and $f_3$ poles (4 zeros), which is why it keeps falling
 through the low-mids. Both are normalized to exactly 0 dB at 1 kHz. Z is the
 absence of weighting. The full pole/zero derivation is in the
-[Theory](../../reference/theory/signal-analysis.md) page.
+[Theory](https://jmrplens.github.io/phonometry/reference/theory/signal-analysis/) page.
 
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_equal_loudness_weighting_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_equal_loudness_weighting.svg" alt="Equal-loudness contours per ISO 226 on the left, with the 40-phon contour highlighted; on the right the A-weighting curve overlaid on the inverted 40-phon contour, showing that A is the flipped contour frozen into a realizable filter" width="92%"></picture>
 
@@ -102,7 +102,7 @@ B was dropped, A and C were kept with tightened tolerances, and **Z** was
 introduced to replace the vaguely specified "linear" of older meters, which
 varied by manufacturer. The B curve (and the aircraft-noise D curve that met
 the same fate) remains available for historical data; see
-[Special Weightings](special-weightings.md).
+[Special Weightings](https://jmrplens.github.io/phonometry/signal/levels/special-weightings/).
 
 ### When C − A matters
 
@@ -155,7 +155,7 @@ c_weighted_signal = filters.weighting_filter(recording, fs, curve='C')
 ```
 
 The special weightings take the same `curve` argument; each is documented,
-with its own response chart, in [Special Weightings](special-weightings.md).
+with its own response chart, in [Special Weightings](https://jmrplens.github.io/phonometry/signal/levels/special-weightings/).
 
 ## 3. `weighting_filter()` / `WeightingFilter` parameters
 
@@ -163,7 +163,7 @@ with its own response chart, in [Special Weightings](special-weightings.md).
 | :--- | :--- | :--- | :--- | :--- |
 | `x` | 1D or 2D array | any | non-empty | 2D is `[channels, samples]` |
 | `fs` | int | Hz | > 0 | |
-| `curve` | str | — | `'A'` (default), `'B'`, `'C'`, `'D'`, `'G'`, `'AU'`, `'Z'` | `'G'` per ISO 7196 (infrasound), `'B'`/`'D'` historical and `'AU'` per IEC 61012 are covered in [Special Weightings](special-weightings.md); `'Z'` is a bypass |
+| `curve` | str | — | `'A'` (default), `'B'`, `'C'`, `'D'`, `'G'`, `'AU'`, `'Z'` | `'G'` per ISO 7196 (infrasound), `'B'`/`'D'` historical and `'AU'` per IEC 61012 are covered in [Special Weightings](https://jmrplens.github.io/phonometry/signal/levels/special-weightings/); `'Z'` is a bypass |
 | `high_accuracy` | bool | — | default `True` (function); class default `None` resolves to `not stateful` | Internal oversampling keeps A/C in class 1 up to 16 kHz; details in §5 |
 | `stateful` | bool (class only) | — | default `False` | Carries filter state across blocks (streaming) |
 | `steady_ic` | bool (class only) | — | default `False` | Steady-state initial conditions (no onset transient) |
@@ -269,8 +269,8 @@ for block in blocks:
     weighted = wf.filter(block)
 ```
 
-See [Block Processing](../filters/block-processing.md) for the streaming workflow and
-[Theory](../../reference/theory/signal-analysis.md) for the analytic curve definitions.
+See [Block Processing](https://jmrplens.github.io/phonometry/signal/filters/block-processing/) for the streaming workflow and
+[Theory](https://jmrplens.github.io/phonometry/reference/theory/signal-analysis/) for the analytic curve definitions.
 
 ## 6. Verifying against the tolerance tables (IEC 61672-1)
 
@@ -381,7 +381,7 @@ Annex E analytic definition from four corner frequencies, normalized to 0 dB
 at 1 kHz), the class 1 tolerances the `high_accuracy` design keeps up to
 16 kHz, and the Table 3 class 1/class 2 acceptance limits checked by
 `verify_weighting_class`; the special G, B, D and AU curves are covered in
-[Special Weightings](special-weightings.md).
+[Special Weightings](https://jmrplens.github.io/phonometry/signal/levels/special-weightings/).
 
 ---
 
@@ -405,7 +405,7 @@ take the `high_accuracy` oversampling; G ignores that flag, because its
 0.25 Hz to 315 Hz range is already exact with the plain design, and, as with
 A/C/Z, `high_accuracy` cannot be combined with stateful processing. The A, C and Z curves themselves, where they come from, the
 `high_accuracy` design and the class verification against IEC 61672-1
-Table 3 are the subject of [Frequency Weighting](weighting.md).
+Table 3 are the subject of [Frequency Weighting](https://jmrplens.github.io/phonometry/signal/levels/weighting/).
 
 ## 1. Infrasound: G-weighting (ISO 7196)
 
@@ -479,7 +479,7 @@ B (green, dashed) discards less bass than A; D (purple) carries the +11.5 dB
 hump at 3.15 kHz where jet turbomachinery whine annoys most; AU (orange) runs
 inside the A reference up to 10 kHz and then falls away with U, reaching 13 dB
 below A at 16 kHz. The infrasound G curve keeps its own chart in section 1,
-and A, C and Z are in [Frequency Weighting](weighting.md).*
+and A, C and Z are in [Frequency Weighting](https://jmrplens.github.io/phonometry/signal/levels/weighting/).*
 
 <details>
 <summary>Show the code for this figure</summary>
@@ -596,7 +596,7 @@ the Table 1 tolerances up to 40 kHz.
 ## 3. Verifying B and AU against their tolerance tables
 
 The `verify_weighting_class` verifier, described in section 6 of
-[Frequency Weighting](weighting.md), also covers the curves
+[Frequency Weighting](https://jmrplens.github.io/phonometry/signal/levels/weighting/), also covers the curves
 of this guide that have published tolerance tables. For `B` it uses
 ANSI S1.4-1983 (Table IV design goals, Table V
 limits) and the "class" verdicts read as the standard's instrument **Types**
@@ -618,7 +618,7 @@ Use the G frequency weighting of ISO 7196:1995, which rates infrasound the way A
 
 ## See also
 
-- [Frequency Weighting](weighting.md): the A, C and Z curves, the
+- [Frequency Weighting](https://jmrplens.github.io/phonometry/signal/levels/weighting/): the A, C and Z curves, the
   `high_accuracy` design and the IEC 61672-1 Table 3 class verification
   these curves build on.
 - API reference: [`filters.weighting`](https://jmrplens.github.io/phonometry/reference/api/filters/weighting/) and [`filters.compliance`](https://jmrplens.github.io/phonometry/reference/api/filters/compliance/).
@@ -688,11 +688,11 @@ when each is defensible; Bies, Hansen & Howard 2017, §3.6 covers the
 instrument practice).
 
 Two sibling pages complete the chain. The detector output is the level
-track that the percentile levels $L_N$ of [Levels](levels.md) are defined
+track that the percentile levels $L_N$ of [Levels](https://jmrplens.github.io/phonometry/signal/levels/levels/) are defined
 on, while the integrated metrics ($L_{eq}$, SEL) bypass the detector
 entirely; and the full IEC 61672-1 instrument chain that wraps this
 detector (weighting, ranges, periodic tests) is the subject of
-[Build a sound level meter](../sound-level-meter.md).
+[Build a sound level meter](https://jmrplens.github.io/phonometry/signal/sound-level-meter/).
 
 ## 1. The exponential detector
 
@@ -800,7 +800,7 @@ $$
   for continuity with older national requirements. Modern practice rates
   impulsiveness with
   $L_{Aeq}$ plus an adjustment (ISO 1996-1 Table A.1, or the onset analysis
-  of [Impulsive-sound prominence](../../environment/assessment/impulsive-sound.md)) and assesses
+  of [Impulsive-sound prominence](https://jmrplens.github.io/phonometry/environment/assessment/impulsive-sound/)) and assesses
   hearing-damage risk with $L_{Cpeak}$, never with I-weighted levels.
 
 ## 3. `time_weighting()` / `TimeWeighting` parameters
@@ -918,8 +918,8 @@ The `impulse` mode uses an asymmetric kernel that is JIT-compiled when
 [numba](https://numba.pydata.org/) is installed (`pip install phonometry[perf]`).
 Without numba a pure-Python fallback produces identical results, just slower.
 
-See [Integrated & Statistical Levels](levels.md) for $L_{eq}$/$L_N$ metrics
-built on these envelopes, and [Why phonometry](../../start/why-phonometry.md) for the IEC
+See [Integrated & Statistical Levels](https://jmrplens.github.io/phonometry/signal/levels/levels/) for $L_{eq}$/$L_N$ metrics
+built on these envelopes, and [Why phonometry](https://jmrplens.github.io/phonometry/start/why-phonometry/) for the IEC
 61672-1 tone-burst verification.
 
 ## References
@@ -984,19 +984,19 @@ Bies, Hansen & Howard 2017, §2.5 surveys them side by side):
   event's whole energy normalized to one second.
 - **Hearing-risk screening**: $L_{Cpeak}$ and the dose measures, which
   feed the occupational workflow of
-  [Occupational Noise Exposure](../../perception/hearing/occupational-exposure.md).
+  [Occupational Noise Exposure](https://jmrplens.github.io/phonometry/perception/hearing/occupational-exposure/).
 - **Long-term community annoyance**: $L_{den}$/$L_{dn}$ and the ISO
   1996-1 rating levels, which weight evening and night energy before
   averaging the day: the subject of
-  [Environmental levels](../../environment/environmental-levels.md).
+  [Environmental levels](https://jmrplens.github.io/phonometry/environment/environmental-levels/).
 
 Two boundaries with the sibling pages are worth keeping sharp. The
 integrated metrics here deliberately bypass the exponential detector:
 $L_{eq}$ and SEL have no time constant, and Fast/Slow ballistics enter
 only through the percentile levels, which are defined on the time-weighted
-level track (see [Time Weighting](time-weighting.md)). And everything on
+level track (see [Time Weighting](https://jmrplens.github.io/phonometry/signal/levels/time-weighting/)). And everything on
 this page assumes the signal is already in pascals: the sensitivity factor
-that gets it there is the subject of [Calibration](../metrology/calibration.md).
+that gets it there is the subject of [Calibration](https://jmrplens.github.io/phonometry/signal/metrology/calibration/).
 
 ## Leq and LAeq
 
@@ -1048,7 +1048,7 @@ spread over 10 dB it already costs a couple of decibels. The few normative
 formulas that do average decibels directly are deliberate approximations and
 say so (ISO 1996-2 offers one as a substitute for repeated-measurement
 uncertainty and warns it inflates once levels spread beyond 3 dB, see the
-uncertainty section of [Environmental levels](../../environment/environmental-levels.md));
+uncertainty section of [Environmental levels](https://jmrplens.github.io/phonometry/environment/environmental-levels/));
 everywhere else, energy.
 
 ### `leq()` / `laeq()` parameters
@@ -1165,7 +1165,7 @@ One caution: percentiles do not combine. Two hours with known $L_{90}$
 values do not yield the two-hour $L_{90}$ by any formula; recompute it from
 the pooled envelope. $L_{eq}$ values, by contrast, combine exactly by
 time-weighted energy averaging, which is what the `composite_rating_level`
-of [Environmental levels](../../environment/environmental-levels.md) does.
+of [Environmental levels](https://jmrplens.github.io/phonometry/environment/environmental-levels/) does.
 
 ### `ln_levels()` parameters
 
@@ -1293,11 +1293,11 @@ is +3 dB.
 
 `lex_8h` rates *one* recording; assembling a full working day from task or
 job samples, with the normative ISO 9612 uncertainty budget, continues in
-[Occupational Noise Exposure](../../perception/hearing/occupational-exposure.md).
+[Occupational Noise Exposure](https://jmrplens.github.io/phonometry/perception/hearing/occupational-exposure/).
 
 Turning these levels into the regulatory day-evening-night indicators and
 reporting them defensibly is
-[Environmental levels](../../environment/environmental-levels.md): the $L_{den}$ and $L_{dn}$
+[Environmental levels](https://jmrplens.github.io/phonometry/environment/environmental-levels/): the $L_{den}$ and $L_{dn}$
 descriptors, the composite rating levels of ISO 1996-1 with their character
 adjustments, and the ISO 1996-2 determination chain of tonal adjustment,
 residual-noise correction and the measurement uncertainty budget.
@@ -1373,13 +1373,13 @@ plt.show()
 | `zero_phase` | bool | — | default `False` | Forward-backward filtering (offline only) |
 | `calibration_factor` / `dbfs` | — | — | constructor-only | Set on `OctaveFilterBank(...)`, not per call |
 
-See [Calibration and dBFS](../metrology/calibration.md) to convert digital units to physical
-SPL, and [Time Weighting](time-weighting.md) for the envelope details. The
+See [Calibration and dBFS](https://jmrplens.github.io/phonometry/signal/metrology/calibration/) to convert digital units to physical
+SPL, and [Time Weighting](https://jmrplens.github.io/phonometry/signal/levels/time-weighting/) for the envelope details. The
 ISO 9612 occupational strategies continue in
-[Occupational Noise Exposure](../../perception/hearing/occupational-exposure.md), the ECMA-418-1
-tonal-prominence verdicts in [Prominent Discrete Tones](../../perception/psychoacoustics/tone-prominence.md),
+[Occupational Noise Exposure](https://jmrplens.github.io/phonometry/perception/hearing/occupational-exposure/), the ECMA-418-1
+tonal-prominence verdicts in [Prominent Discrete Tones](https://jmrplens.github.io/phonometry/perception/psychoacoustics/tone-prominence/),
 and the ISO 226 equal-loudness contours live with the perception metrics in
-[Loudness](../../perception/psychoacoustics/loudness.md).
+[Loudness](https://jmrplens.github.io/phonometry/perception/psychoacoustics/loudness/).
 
 ## Quick answers
 
@@ -1431,6 +1431,6 @@ IEC 61252, *Electroacoustics — Specifications for personal sound exposure
 meters*: the sound exposure E in Pa²h and the normalized 8 h level LEX,8h
 (≡ LEP,d), anchored at 3.2 Pa²h ⇔ exactly 90 dB. The ISO 1996-1/-2
 environmental indicators and determination procedures are covered in
-[Environmental levels](../../environment/environmental-levels.md).
+[Environmental levels](https://jmrplens.github.io/phonometry/environment/environmental-levels/).
 
 ---

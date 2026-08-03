@@ -16,21 +16,21 @@ ISO 10140 laboratory chain: the sound reduction index $R$, the normalized
 impact level $L_n$, the background-noise correction and the accredited test
 fiches. Three sibling laboratory methods have guides of their own: the
 sound-intensity route in
-[Sound Insulation by Intensity (ISO 15186)](insulation-intensity.md), the
+[Sound Insulation by Intensity (ISO 15186)](https://jmrplens.github.io/phonometry/buildings/insulation/insulation-intensity/), the
 floor-covering improvement in
-[Floor-Covering Impact Improvement (ISO 16251-1)](../design/impact-improvement.md) and
+[Floor-Covering Impact Improvement (ISO 16251-1)](https://jmrplens.github.io/phonometry/buildings/design/impact-improvement/) and
 the junction measurement in
-[Laboratory Flanking Transmission (ISO 10848)](flanking-lab.md). Field
+[Laboratory Flanking Transmission (ISO 10848)](https://jmrplens.github.io/phonometry/buildings/insulation/flanking-lab/). Field
 measurement lives in
-[Field Insulation Measurement (ISO 16283)](insulation-field.md), the
+[Field Insulation Measurement (ISO 16283)](https://jmrplens.github.io/phonometry/buildings/insulation/insulation-field/), the
 single-number ratings in
-[Insulation Ratings (ISO 717)](insulation-ratings.md), and the
+[Insulation Ratings (ISO 717)](https://jmrplens.github.io/phonometry/buildings/insulation/insulation-ratings/), and the
 prediction that consumes these laboratory ratings in
-[Predicting Sound Insulation (EN 12354)](../design/insulation-prediction.md).
+[Predicting Sound Insulation (EN 12354)](https://jmrplens.github.io/phonometry/buildings/design/insulation-prediction/).
 
 ## Laboratory measurement (ISO 10140)
 
-An [ISO 16283 field measurement](insulation-field.md) yields the primed
+An [ISO 16283 field measurement](https://jmrplens.github.io/phonometry/buildings/insulation/insulation-field/) yields the primed
 quantities ($R'$, $L'_n$): the number a real building achieves, flanking
 transmission and all. To rate an
 element on its own (a wall type, a floating floor, a window), you take it to a
@@ -66,7 +66,7 @@ $D_{nT}$ and $D_n$ carry no prime because they describe the room pair rather
 than an element, so there is no flanking-free counterpart to mark. In a
 well-built construction $R'_w$ lands a few dB below the laboratory $R_w$ of
 the same partition; a much larger gap says flanking dominates, and the
-[EN 12354 model](../design/insulation-prediction.md) tells you which path carries it.
+[EN 12354 model](https://jmrplens.github.io/phonometry/buildings/design/insulation-prediction/) tells you which path carries it.
 
 The single-number ratings reuse the very same ISO 717-1/2 engines
 (`weighted_rating`, `weighted_impact_rating`): an $R$ spectrum rates to $R_w$
@@ -253,12 +253,12 @@ are kept in the repository. Click either preview to open the PDF:
 
 Three sibling laboratory measurements used to share this page and now have
 guides of their own. When flanking is too high for the pressure method,
-[Sound Insulation by Intensity (ISO 15186)](insulation-intensity.md) reads
+[Sound Insulation by Intensity (ISO 15186)](https://jmrplens.github.io/phonometry/buildings/insulation/insulation-intensity/) reads
 the transmitted power directly off the radiating face. For a soft floor
-covering, [Floor-Covering Impact Improvement (ISO 16251-1)](../design/impact-improvement.md)
+covering, [Floor-Covering Impact Improvement (ISO 16251-1)](https://jmrplens.github.io/phonometry/buildings/design/impact-improvement/)
 replaces the two-room suite with a small heavyweight mock-up. And the
 junction data the EN 12354 prediction consumes is measured per
-[Laboratory Flanking Transmission (ISO 10848)](flanking-lab.md).
+[Laboratory Flanking Transmission (ISO 10848)](https://jmrplens.github.io/phonometry/buildings/insulation/flanking-lab/).
 
 ## References
 
@@ -281,20 +281,20 @@ procedures behind them.
 
 ## See also
 
-- [Field Insulation Measurement (ISO 16283)](insulation-field.md):
+- [Field Insulation Measurement (ISO 16283)](https://jmrplens.github.io/phonometry/buildings/insulation/insulation-field/):
   the in-building airborne, impact and façade measurements, their single-number
   ratings and their uncertainty.
-- [Predicting Sound Insulation (EN 12354)](../design/insulation-prediction.md):
+- [Predicting Sound Insulation (EN 12354)](https://jmrplens.github.io/phonometry/buildings/design/insulation-prediction/):
   the flanking model that consumes the laboratory $R$, $L_n$ and $K_{ij}$.
-- [Sound Insulation by Intensity (ISO 15186)](insulation-intensity.md): the
+- [Sound Insulation by Intensity (ISO 15186)](https://jmrplens.github.io/phonometry/buildings/insulation/insulation-intensity/): the
   direct-power alternative for high-flanking situations.
-- [Floor-Covering Impact Improvement (ISO 16251-1)](../design/impact-improvement.md):
+- [Floor-Covering Impact Improvement (ISO 16251-1)](https://jmrplens.github.io/phonometry/buildings/design/impact-improvement/):
   the small-mock-up $\Delta L$ of soft floor coverings.
-- [Laboratory Flanking Transmission (ISO 10848)](flanking-lab.md): the
+- [Laboratory Flanking Transmission (ISO 10848)](https://jmrplens.github.io/phonometry/buildings/insulation/flanking-lab/): the
   measured junction vibration reduction index.
-- [Insulation Ratings (ISO 717)](insulation-ratings.md): the reference-curve
+- [Insulation Ratings (ISO 717)](https://jmrplens.github.io/phonometry/buildings/insulation/insulation-ratings/): the reference-curve
   engine behind $R_w$ and $L_{n,w}$.
-- [Sound Power](../../devices/emission/sound-power.md): the $L_W$ methods that share the
+- [Sound Power](https://jmrplens.github.io/phonometry/devices/emission/sound-power/): the $L_W$ methods that share the
   absorption-area machinery of the receiving room.
 - API reference: [`building.measurement.lab_insulation`](https://jmrplens.github.io/phonometry/reference/api/building/lab-insulation/).
 
@@ -317,14 +317,14 @@ the intensity sound reduction index $R_I$ and its $K_c$-modified form, the
 element-normalized level difference of small building elements, the surface
 qualification indicator and the accredited test fiches. The pressure-based
 laboratory chain lives in
-[Laboratory Insulation Measurement](insulation-lab.md); the probe physics
+[Laboratory Insulation Measurement](https://jmrplens.github.io/phonometry/buildings/insulation/insulation-lab/); the probe physics
 and its field indicators are the subject of the
-[Sound Intensity guide](../../devices/emission/intensity.md).
+[Sound Intensity guide](https://jmrplens.github.io/phonometry/devices/emission/intensity/).
 
 ## Measuring the transmitted power directly (ISO 15186-1)
 
 
-The [ISO 10140 laboratory method](insulation-lab.md) reads the transmitted
+The [ISO 10140 laboratory method](https://jmrplens.github.io/phonometry/buildings/insulation/insulation-lab/) reads the transmitted
 power *indirectly*, from the
 receiving-room level and its absorption area; this breaks down when flanking
 paths leak power the room integrates in anyway. The **sound-intensity** method
@@ -585,7 +585,7 @@ radiates, partial surfaces isolate which element (the wall itself, a window,
 a leaky junction) carries the transmitted power, which no pressure-based
 field method can resolve. Qualify each scan with the same
 pressure-intensity indicator, and expect the probe's own limits (the
-[spacer phase error](../../devices/emission/intensity.md)) to set the usable low-frequency range.
+[spacer phase error](https://jmrplens.github.io/phonometry/devices/emission/intensity/)) to set the usable low-frequency range.
 
 ## References
 
@@ -618,13 +618,13 @@ apparent $R'_I$. The single-number ratings reuse ISO 717-1.
 
 ## See also
 
-- [Laboratory Insulation Measurement](insulation-lab.md): the ISO 10140
+- [Laboratory Insulation Measurement](https://jmrplens.github.io/phonometry/buildings/insulation/insulation-lab/): the ISO 10140
   pressure method that the $K_c$ adaptation reproduces.
-- [Field Insulation Measurement (ISO 16283)](insulation-field.md): the
+- [Field Insulation Measurement (ISO 16283)](https://jmrplens.github.io/phonometry/buildings/insulation/insulation-field/): the
   pressure-based field quantities and their single-number ratings.
-- [Insulation Ratings (ISO 717)](insulation-ratings.md): the
+- [Insulation Ratings (ISO 717)](https://jmrplens.github.io/phonometry/buildings/insulation/insulation-ratings/): the
   reference-curve engine behind $R_{I,w}$ and $D_{I,n,e,w}$.
-- [Sound Intensity](../../devices/emission/intensity.md): the two-microphone probe, its field
+- [Sound Intensity](https://jmrplens.github.io/phonometry/devices/emission/intensity/): the two-microphone probe, its field
   indicators and the residual-index qualification behind every scan.
 - API reference: [`building.measurement.intensity_insulation`](https://jmrplens.github.io/phonometry/reference/api/building/intensity-insulation/).
 
@@ -646,14 +646,14 @@ that measurement chain: the direction-averaged velocity level difference,
 the equivalent absorption lengths, the SEA validity checks of Part 4 and
 the three accredited fiches. The empirical junction values a prediction
 falls back on when no measurement exists live in
-[Predicting Sound Insulation (EN 12354)](../design/insulation-prediction.md); the
+[Predicting Sound Insulation (EN 12354)](https://jmrplens.github.io/phonometry/buildings/design/insulation-prediction/); the
 wave-theory $K_{ij}$ of ideal plate junctions is derived in
-[Bending-wave transmission at plate junctions](../../vibration/structural/junction-transmission.md).
+[Bending-wave transmission at plate junctions](https://jmrplens.github.io/phonometry/vibration/structural/junction-transmission/).
 
 ## The vibration reduction index and the flanking descriptors
 
 ISO 10848:2006/2010 is the laboratory method that **measures** the junction
-**vibration reduction index** $K_{ij}$ that the [EN 12354 prediction](../design/insulation-prediction.md) takes
+**vibration reduction index** $K_{ij}$ that the [EN 12354 prediction](https://jmrplens.github.io/phonometry/buildings/design/insulation-prediction/) takes
 as an input, together with the overall flanking descriptors $D_{n,f}$
 (airborne) and $L_{n,f}$ (impact). It is the measurement counterpart of the
 empirical `junction_vibration_reduction()` of that prediction.
@@ -815,7 +815,7 @@ power attenuation coefficient $m = 2\,\mathrm{Re}\{\Gamma\} = -2\,\mathrm{Im}\{k
 gives Eq. (9.18), whose receiving side carries the leakage back into the room,
 $m'_R = m_R + s_R\tau_R/h$ (Eq. (9.17)). Vigran prints the *unprimed* $m_R$ in
 that expression's denominator; that is a misprint, recorded in
-[the errata register](../../ERRATA.md), and the derived $m'_R$ is used here. Read
+[the errata register](https://jmrplens.github.io/phonometry/reference/errata/), and the derived $m'_R$ is used here. Read
 literally, the printed form is non-monotonic in the plenum damping (adding
 absorber would predict a worse path than none) and unbounded as $m_R \to 0$. For a plenum with little
 attenuation and $s_S = s_R = 0{,}5$ that collapses to the compact form that
@@ -1035,17 +1035,17 @@ laboratory reports.
 
 ## See also
 
-- [Predicting Sound Insulation (EN 12354)](../design/insulation-prediction.md): the
+- [Predicting Sound Insulation (EN 12354)](https://jmrplens.github.io/phonometry/buildings/design/insulation-prediction/): the
   flanking model that consumes the measured $K_{ij}$, and its empirical
   Annex E junction values.
-- [Bending-wave transmission at plate junctions](../../vibration/structural/junction-transmission.md):
+- [Bending-wave transmission at plate junctions](https://jmrplens.github.io/phonometry/vibration/structural/junction-transmission/):
   the wave-theory transmission coefficients behind an ideal junction's
   $K_{ij}$.
-- [Laboratory Insulation Measurement](insulation-lab.md): the ISO 10140
+- [Laboratory Insulation Measurement](https://jmrplens.github.io/phonometry/buildings/insulation/insulation-lab/): the ISO 10140
   suite whose direct transmission these flanking paths bypass.
-- [Insulation Ratings (ISO 717)](insulation-ratings.md): the
+- [Insulation Ratings (ISO 717)](https://jmrplens.github.io/phonometry/buildings/insulation/insulation-ratings/): the
   reference-curve engines behind $D_{n,f,w}$ and $L_{n,f,w}$.
-- [Room-to-room and open-plan acoustics](../rooms/open-plan-acoustics.md): the
+- [Room-to-room and open-plan acoustics](https://jmrplens.github.io/phonometry/buildings/rooms/open-plan-acoustics/): the
   open-plan context the ceiling flanking path usually appears in.
 - API reference: [`building.measurement.flanking_transmission`](https://jmrplens.github.io/phonometry/reference/api/building/flanking-transmission/)
   and [`building.prediction.ceiling_plenum`](https://jmrplens.github.io/phonometry/reference/api/building/ceiling-plenum/).
@@ -1058,21 +1058,21 @@ Source: https://jmrplens.github.io/phonometry/buildings/insulation/insulation-fi
 
 # Field Insulation Measurement (ISO 16283)
 
-This guide continues from the [Room Acoustics guide](../rooms/room-acoustics.md): the
+This guide continues from the [Room Acoustics guide](https://jmrplens.github.io/phonometry/buildings/rooms/room-acoustics/): the
 same impulse response, measured either side of a partition, yields its sound
 insulation. This page covers the engineering-grade measurement of ISO 16283
 in the finished building: the airborne level differences $D$, $D_{nT}$ and
 $R'$, the impact levels $L'_{nT}$ and $L'_n$, the field test report, and the
 ISO 12999-1 uncertainty that qualifies every field value. Three close
 relatives have guides of their own: the reference-curve engine behind every
-single number in [Insulation Ratings (ISO 717)](insulation-ratings.md), the
-building envelope in [Façade Sound Insulation](facade-insulation.md), and the
+single number in [Insulation Ratings (ISO 717)](https://jmrplens.github.io/phonometry/buildings/insulation/insulation-ratings/), the
+building envelope in [Façade Sound Insulation](https://jmrplens.github.io/phonometry/buildings/insulation/facade-insulation/), and the
 quick octave-band route in
-[Sound Insulation Survey Method (ISO 10052)](insulation-survey.md). The
+[Sound Insulation Survey Method (ISO 10052)](https://jmrplens.github.io/phonometry/buildings/insulation/insulation-survey/). The
 laboratory characterisation of an element lives in
-[Laboratory Insulation Measurement](insulation-lab.md) and the prediction of
+[Laboratory Insulation Measurement](https://jmrplens.github.io/phonometry/buildings/insulation/insulation-lab/) and the prediction of
 in-situ performance in
-[Predicting Sound Insulation (EN 12354)](../design/insulation-prediction.md).
+[Predicting Sound Insulation (EN 12354)](https://jmrplens.github.io/phonometry/buildings/design/insulation-prediction/).
 
 ## Field airborne insulation (ISO 16283-1)
 
@@ -1099,9 +1099,9 @@ The prime on $R'$ is a convention, not decoration: primed quantities ($R'$,
 $L'_n$, $L'_{nT}$) are measured **in the building** and include every
 flanking path, while the unprimed $R$ and $L_n$ are laboratory properties of
 the element alone, measured with flanking suppressed. The full lab-to-field
-map lives in [Laboratory Insulation Measurement](insulation-lab.md); the
+map lives in [Laboratory Insulation Measurement](https://jmrplens.github.io/phonometry/buildings/insulation/insulation-lab/); the
 prediction that bridges the two is
-[EN 12354](../design/insulation-prediction.md).
+[EN 12354](https://jmrplens.github.io/phonometry/buildings/design/insulation-prediction/).
 
 ```python
 import numpy as np
@@ -1145,7 +1145,7 @@ ISO 717-1 reference curve.
 `r_prime` or `None`). The reference-curve engine that turns any of those
 spectra into $R_w$, $R'_w$ or $D_{nT,w}$, its spectrum adaptation terms and its
 enlarged-range variants are in
-[Insulation Ratings (ISO 717)](insulation-ratings.md).
+[Insulation Ratings (ISO 717)](https://jmrplens.github.io/phonometry/buildings/insulation/insulation-ratings/).
 
 ## Field impact insulation (ISO 16283-2)
 
@@ -1208,7 +1208,7 @@ values (thirds $L'_{nT,w} = 79$, $C_I = -11$; octave 54, $C_I = 0$).
 
 `impact_insulation()` returns an `ImpactInsulationResult` (`l_n_t`, `l_n` or
 `None`); the ISO 717-2 side of the chain is in
-[Insulation Ratings (ISO 717)](insulation-ratings.md).
+[Insulation Ratings (ISO 717)](https://jmrplens.github.io/phonometry/buildings/insulation/insulation-ratings/).
 
 ## ISO 16283 field test report (`.report()`)
 
@@ -1429,14 +1429,14 @@ plt.show()
 Three measurements that used to share this page now have guides of their own,
 and a fourth sits alongside them. The building envelope, measured against the
 level 2 m in front of it and predicted from its elements, is
-[Façade Sound Insulation](facade-insulation.md). When a full engineering
+[Façade Sound Insulation](https://jmrplens.github.io/phonometry/buildings/insulation/facade-insulation/). When a full engineering
 measurement is more than the question deserves, the octave-band control method
-is [Sound Insulation Survey Method (ISO 10052)](insulation-survey.md). Every
+is [Sound Insulation Survey Method (ISO 10052)](https://jmrplens.github.io/phonometry/buildings/insulation/insulation-survey/). Every
 single number quoted above comes from the reference curves of
-[Insulation Ratings (ISO 717)](insulation-ratings.md). And the sound-intensity
+[Insulation Ratings (ISO 717)](https://jmrplens.github.io/phonometry/buildings/insulation/insulation-ratings/). And the sound-intensity
 route to the same quantities, which reads the transmitted power off the
 radiating face instead of the receiving-room level, is
-[Sound Insulation by Intensity (ISO 15186)](insulation-intensity.md).
+[Sound Insulation by Intensity (ISO 15186)](https://jmrplens.github.io/phonometry/buildings/insulation/insulation-intensity/).
 
 ## Quick answers
 
@@ -1495,26 +1495,26 @@ ISO 16283 family (ISO 16283-3:2016) has its own page.
 
 ## See also
 
-- [Insulation Ratings (ISO 717)](insulation-ratings.md): the reference-curve
+- [Insulation Ratings (ISO 717)](https://jmrplens.github.io/phonometry/buildings/insulation/insulation-ratings/): the reference-curve
   engine behind every weighted single number on this page.
-- [Façade Sound Insulation](facade-insulation.md): the third part of
+- [Façade Sound Insulation](https://jmrplens.github.io/phonometry/buildings/insulation/facade-insulation/): the third part of
   ISO 16283, measured and predicted.
-- [Sound Insulation Survey Method (ISO 10052)](insulation-survey.md): the
+- [Sound Insulation Survey Method (ISO 10052)](https://jmrplens.github.io/phonometry/buildings/insulation/insulation-survey/): the
   octave-band control method these engineering methods are the reference for.
-- [Laboratory Insulation Measurement](insulation-lab.md): the
+- [Laboratory Insulation Measurement](https://jmrplens.github.io/phonometry/buildings/insulation/insulation-lab/): the
   ISO 10140 element characterisation these field quantities are compared
   against.
-- [Sound Insulation by Intensity (ISO 15186)](insulation-intensity.md): the
+- [Sound Insulation by Intensity (ISO 15186)](https://jmrplens.github.io/phonometry/buildings/insulation/insulation-intensity/): the
   direct-power route to the same field and laboratory indices.
-- [Predicting Sound Insulation (EN 12354)](../design/insulation-prediction.md):
+- [Predicting Sound Insulation (EN 12354)](https://jmrplens.github.io/phonometry/buildings/design/insulation-prediction/):
   the in-situ performance predicted from laboratory element data.
-- [Room Acoustics](../rooms/room-acoustics.md): the room parameters and reverberation
+- [Room Acoustics](https://jmrplens.github.io/phonometry/buildings/rooms/room-acoustics/): the room parameters and reverberation
   times this guide's insulation chain builds on.
-- [Levels](../../signal/levels/levels.md): energy averaging and the level metrics behind
+- [Levels](https://jmrplens.github.io/phonometry/signal/levels/levels/): energy averaging and the level metrics behind
   source/receiving-room levels.
-- [Filter Banks](../../signal/filters/filter-banks.md): the IEC 61260 fractional-octave filters
+- [Filter Banks](https://jmrplens.github.io/phonometry/signal/filters/filter-banks/): the IEC 61260 fractional-octave filters
   used for the insulation spectra.
-- [Theory](../../reference/theory/rooms-buildings.md): the reference-curve derivation behind the
+- [Theory](https://jmrplens.github.io/phonometry/reference/theory/rooms-buildings/): the reference-curve derivation behind the
   weighted single-number ratings.
 - API reference: [`building.measurement.insulation`](https://jmrplens.github.io/phonometry/reference/api/building/insulation/) and [`building.measurement.uncertainty`](https://jmrplens.github.io/phonometry/reference/api/building/uncertainty/).
 
@@ -1533,13 +1533,13 @@ reverberation times. This guide covers the survey (control) method: the
 reverberation index and its room-class estimate, the airborne, impact,
 façade and service-equipment quantities, and the survey fiches. The
 engineering-grade methods live in
-[Field Insulation Measurement (ISO 16283)](insulation-field.md); the
+[Field Insulation Measurement (ISO 16283)](https://jmrplens.github.io/phonometry/buildings/insulation/insulation-field/); the
 single-number engines behind the survey ratings in
-[Insulation Ratings (ISO 717)](insulation-ratings.md).
+[Insulation Ratings (ISO 717)](https://jmrplens.github.io/phonometry/buildings/insulation/insulation-ratings/).
 
 ## Octave bands and the reverberation index
 
-The [engineering methods](insulation-field.md) buy accuracy with effort: swept microphones,
+The [engineering methods](https://jmrplens.github.io/phonometry/buildings/insulation/insulation-field/) buy accuracy with effort: swept microphones,
 per-band reverberation times, careful background correction. For a quick check
 in a dwelling, ISO 10052 defines a **survey (control) method**: octave bands, a
 hand-held meter, and a single quantity, the **reverberation index**
@@ -1754,14 +1754,14 @@ ISO 717-2.
 
 ## See also
 
-- [Field Insulation Measurement (ISO 16283)](insulation-field.md): the
+- [Field Insulation Measurement (ISO 16283)](https://jmrplens.github.io/phonometry/buildings/insulation/insulation-field/): the
   engineering-grade airborne, impact and façade measurements this method
   approximates, and their ISO 12999-1 uncertainty.
-- [Insulation Ratings (ISO 717)](insulation-ratings.md): the reference-curve
+- [Insulation Ratings (ISO 717)](https://jmrplens.github.io/phonometry/buildings/insulation/insulation-ratings/): the reference-curve
   engines behind the survey ratings.
-- [Room Acoustics](../rooms/room-acoustics.md): the measured reverberation times
+- [Room Acoustics](https://jmrplens.github.io/phonometry/buildings/rooms/room-acoustics/): the measured reverberation times
   behind the reverberation index.
-- [Levels](../../signal/levels/levels.md): the energy averaging behind the octave-band levels.
+- [Levels](https://jmrplens.github.io/phonometry/signal/levels/levels/): the energy averaging behind the octave-band levels.
 - API reference: [`building.measurement.survey_insulation`](https://jmrplens.github.io/phonometry/reference/api/building/survey-insulation/).
 
 ---
@@ -1784,10 +1784,10 @@ because a higher impact level is worse. This guide covers the engines
 themselves: the shifting rule, the spectrum adaptation terms $C$, $C_{tr}$
 and $C_I$, the enlarged-range and one-decimal variants, and the ISO 717
 fiche. The measurements that produce the spectra live in the
-[field](insulation-field.md), [laboratory](insulation-lab.md),
-[intensity](insulation-intensity.md), [survey](insulation-survey.md) and
-[flanking](flanking-lab.md) guides; the prediction that consumes the
-ratings is [EN 12354](../design/insulation-prediction.md).
+[field](https://jmrplens.github.io/phonometry/buildings/insulation/insulation-field/), [laboratory](https://jmrplens.github.io/phonometry/buildings/insulation/insulation-lab/),
+[intensity](https://jmrplens.github.io/phonometry/buildings/insulation/insulation-intensity/), [survey](https://jmrplens.github.io/phonometry/buildings/insulation/insulation-survey/) and
+[flanking](https://jmrplens.github.io/phonometry/buildings/insulation/flanking-lab/) guides; the prediction that consumes the
+ratings is [EN 12354](https://jmrplens.github.io/phonometry/buildings/design/insulation-prediction/).
 
 ## Airborne ratings (ISO 717-1)
 
@@ -1806,7 +1806,7 @@ living activities (speech, music, radio, television), and $C_{tr}$ against
 A-weighted urban road traffic, whose energy sits at low frequency. They are
 defined so that the rating plus the term ($R_w + C$ for a laboratory index,
 $R'_w + C$ or $D_{nT,w} + C$ for the quantities of the
-  [field guide](insulation-field.md), and
+  [field guide](https://jmrplens.github.io/phonometry/buildings/insulation/insulation-field/), and
 likewise with $C_{tr}$) is the A-weighted level difference achieved against
 that source. Reading them:
 
@@ -2183,22 +2183,22 @@ worked examples.
 
 ## See also
 
-- [Field Insulation Measurement (ISO 16283)](insulation-field.md): the
+- [Field Insulation Measurement (ISO 16283)](https://jmrplens.github.io/phonometry/buildings/insulation/insulation-field/): the
   airborne, impact and façade spectra these engines rate in the field.
-- [Laboratory Insulation Measurement](insulation-lab.md): the laboratory
+- [Laboratory Insulation Measurement](https://jmrplens.github.io/phonometry/buildings/insulation/insulation-lab/): the laboratory
   $R$ and $L_n$ behind $R_w$ and $L_{n,w}$.
-- [Sound Insulation by Intensity (ISO 15186)](insulation-intensity.md): the
+- [Sound Insulation by Intensity (ISO 15186)](https://jmrplens.github.io/phonometry/buildings/insulation/insulation-intensity/): the
   intensity indices rated with the same airborne engine.
-- [Sound Insulation Survey Method (ISO 10052)](insulation-survey.md): the
+- [Sound Insulation Survey Method (ISO 10052)](https://jmrplens.github.io/phonometry/buildings/insulation/insulation-survey/): the
   survey quantities and their automatic ratings.
-- [Laboratory Flanking Transmission (ISO 10848)](flanking-lab.md): the
+- [Laboratory Flanking Transmission (ISO 10848)](https://jmrplens.github.io/phonometry/buildings/insulation/flanking-lab/): the
   flanking descriptors $D_{n,f,w}$ and $L_{n,f,w}$.
-- [Floor-Covering Impact Improvement (ISO 16251-1)](../design/impact-improvement.md):
+- [Floor-Covering Impact Improvement (ISO 16251-1)](https://jmrplens.github.io/phonometry/buildings/design/impact-improvement/):
   the weighted improvement $\Delta L_w$ built on the ISO 717-2 reference
   floor.
-- [Predicting Sound Insulation (EN 12354)](../design/insulation-prediction.md): the
+- [Predicting Sound Insulation (EN 12354)](https://jmrplens.github.io/phonometry/buildings/design/insulation-prediction/): the
   single-number model that consumes these ratings.
-- [Theory](../../reference/theory/rooms-buildings.md): the reference-curve derivation behind
+- [Theory](https://jmrplens.github.io/phonometry/reference/theory/rooms-buildings/): the reference-curve derivation behind
   the weighted single-number ratings.
 - API reference: [`building.measurement.insulation`](https://jmrplens.github.io/phonometry/reference/api/building/insulation/).
 
@@ -2222,10 +2222,10 @@ is installed, and EN 12354-4 turns the envelope round to radiate an indoor
 source outwards. A closing section puts the measured and the predicted
 $D_{2m,nT}$ side by side and shows what does, and does not, separate them. The
 reference curves behind every single number live in
-[Insulation Ratings (ISO 717)](insulation-ratings.md); the internal partitions
+[Insulation Ratings (ISO 717)](https://jmrplens.github.io/phonometry/buildings/insulation/insulation-ratings/); the internal partitions
 of the same building in
-[Field Insulation Measurement (ISO 16283)](insulation-field.md) and
-[Predicting Sound Insulation (EN 12354)](../design/insulation-prediction.md).
+[Field Insulation Measurement (ISO 16283)](https://jmrplens.github.io/phonometry/buildings/insulation/insulation-field/) and
+[Predicting Sound Insulation (EN 12354)](https://jmrplens.github.io/phonometry/buildings/design/insulation-prediction/).
 
 ## Field measurement (ISO 16283-3)
 
@@ -2726,7 +2726,7 @@ The practical reading: size the glazing and the air inlets with the
 prediction, accept the finished façade with the measurement, and do not treat
 a couple of decibels between the two as an error in either. A prediction built
 on laboratory indices and a field measurement of the finished envelope each
-carry an uncertainty of that order on their own; the [ISO 12999-1 uncertainty section](insulation-field.md#measurement-uncertainty-iso-12999-1) puts a number on the
+carry an uncertainty of that order on their own; the [ISO 12999-1 uncertainty section](https://jmrplens.github.io/phonometry/buildings/insulation/insulation-field/#measurement-uncertainty-iso-12999-1) puts a number on the
 measurement half. And when the two disagree by much more than that, the
 per-element share of the transmitted energy in the prediction report is the
 place to look first: on this façade it is the air inlet, not the wall, that
@@ -2771,24 +2771,24 @@ ISO 16283-3 and EN ISO 717-1 for the prediction).
 
 ## See also
 
-- [Field Insulation Measurement (ISO 16283)](insulation-field.md): the
+- [Field Insulation Measurement (ISO 16283)](https://jmrplens.github.io/phonometry/buildings/insulation/insulation-field/): the
   airborne and impact field measurements of the internal partitions, and the
   ISO 12999-1 uncertainty that qualifies every field rating.
-- [Predicting Sound Insulation (EN 12354)](../design/insulation-prediction.md): the
+- [Predicting Sound Insulation (EN 12354)](https://jmrplens.github.io/phonometry/buildings/design/insulation-prediction/): the
   airborne and impact flanking models of EN 12354-1/2 that share the
   transmission-factor summation used here.
-- [Insulation Ratings (ISO 717)](insulation-ratings.md): the reference-curve
+- [Insulation Ratings (ISO 717)](https://jmrplens.github.io/phonometry/buildings/insulation/insulation-ratings/): the reference-curve
   engine behind the $D_{2m,nT,w}$, $R'_{45,w}$ and $R'_{tr,s,w}$ single
   numbers.
-- [Sound Insulation Survey Method (ISO 10052)](insulation-survey.md): the
+- [Sound Insulation Survey Method (ISO 10052)](https://jmrplens.github.io/phonometry/buildings/insulation/insulation-survey/): the
   octave-band façade quantity of the quick survey method.
-- [Predicting Panel Sound Insulation](../design/panel-sound-insulation.md): the mass
+- [Predicting Panel Sound Insulation](https://jmrplens.github.io/phonometry/buildings/design/panel-sound-insulation/): the mass
   law, coincidence dip and aperture models behind the element $R$ values the
   prediction consumes.
-- [Outdoor Sound Propagation](../../environment/propagation/outdoor-propagation.md): the propagation from
+- [Outdoor Sound Propagation](https://jmrplens.github.io/phonometry/environment/propagation/outdoor-propagation/): the propagation from
   the source to the 2 m position in front of the façade, and onwards from the
   radiating side of EN 12354-4.
-- [Theory](../../reference/theory/rooms-buildings.md): the reference-curve derivation behind
+- [Theory](https://jmrplens.github.io/phonometry/reference/theory/rooms-buildings/): the reference-curve derivation behind
   the weighted single-number ratings.
 - API reference: [`building.prediction.facade`](https://jmrplens.github.io/phonometry/reference/api/building/facade/) and [`building.measurement.insulation`](https://jmrplens.github.io/phonometry/reference/api/building/insulation/).
 
@@ -2810,7 +2810,7 @@ window-size correction and the insulation of a composite facade.
 
 The band spectra it consumes come from field measurement or from prediction;
 the ISO 717 reference-curve engine, which it is worth not confusing this with,
-is in [Insulation Ratings (ISO 717)](insulation-ratings.md).
+is in [Insulation Ratings (ISO 717)](https://jmrplens.github.io/phonometry/buildings/insulation/insulation-ratings/).
 
 ## The global index of Annex A
 
@@ -3030,7 +3030,7 @@ A real facade is not a homogeneous element: it has a blind part and one or more
 openings. The sound reduction index of the whole follows from the
 area-weighted sum of the transmittances, which is what
 `composite_transmission_loss()` does in
-[Predicting Panel Sound Insulation](../design/panel-sound-insulation.md). With the 8 m²
+[Predicting Panel Sound Insulation](https://jmrplens.github.io/phonometry/buildings/design/panel-sound-insulation/). With the 8 m²
 facade of Ejemplo 7.5, a blind part of 40 dBA and a 2 m² window of 26 dBA, the
 whole comes out at 31.5 dBA:
 
@@ -3070,7 +3070,7 @@ de Elementos Constructivos*.
 **Not covered.** The design options of clause 3 (the simplified option with its
 solution tables, and the general option, which is the EN 12354 prediction) are
 not implemented here: the calculation route of the general option lives in
-[Predicting Sound Insulation (EN 12354)](../design/insulation-prediction.md). The
+[Predicting Sound Insulation (EN 12354)](https://jmrplens.github.io/phonometry/buildings/design/insulation-prediction/). The
 execution conditions of clause 5 and the maintenance conditions of clause 6
 are out of scope as well.
 
@@ -3087,17 +3087,17 @@ enlarged-range term $C_{100-5000}$, not the core-range one.
 
 ## See also
 
-- [Insulation Ratings (ISO 717)](insulation-ratings.md): the reference-curve
+- [Insulation Ratings (ISO 717)](https://jmrplens.github.io/phonometry/buildings/insulation/insulation-ratings/): the reference-curve
   route with $R_w$, $C$, $C_{tr}$ and the enlarged-range terms that DB-HR
   calls simply $C$ and $C_{tr}$.
-- [Spanish Noise Regulation (RD 1367/2007)](../../environment/spanish-noise-regulation.md): where
+- [Spanish Noise Regulation (RD 1367/2007)](https://jmrplens.github.io/phonometry/environment/spanish-noise-regulation/): where
   the site's day noise index $L_d$ that Table 2.1 is entered with comes from.
-- [Façade Sound Insulation](facade-insulation.md): the ISO 16283-3 measurement
+- [Façade Sound Insulation](https://jmrplens.github.io/phonometry/buildings/insulation/facade-insulation/): the ISO 16283-3 measurement
   of $D_{2m,nT}$ and its EN 12354-3 prediction, which feed the $D_{2m,nT,Atr}$ index of
   this page.
-- [Predicting Panel Sound Insulation](../design/panel-sound-insulation.md): the
+- [Predicting Panel Sound Insulation](https://jmrplens.github.io/phonometry/buildings/design/panel-sound-insulation/): the
   composite-facade calculation and transmission through openings and slits.
-- [Field Insulation Measurement (ISO 16283)](insulation-field.md): the band
+- [Field Insulation Measurement (ISO 16283)](https://jmrplens.github.io/phonometry/buildings/insulation/insulation-field/): the band
   spectra of $R'$, $D_{nT}$ and $L'_{nT}$ that these global quantities summarise.
 - API reference: [`building.regulation.spain`](https://jmrplens.github.io/phonometry/reference/api/building/spain/).
 
@@ -3146,8 +3146,8 @@ dropped from 85 cm. This guide covers their normative specification, the
 laboratory verification of a source against it, the standardization of the
 maximum level in the receiving room, and the A-weighted single number. The
 tapping-machine chain lives in
-[Field Insulation Measurement (ISO 16283)](insulation-field.md) and
-[Laboratory Insulation Measurement](insulation-lab.md).
+[Field Insulation Measurement (ISO 16283)](https://jmrplens.github.io/phonometry/buildings/insulation/insulation-field/) and
+[Laboratory Insulation Measurement](https://jmrplens.github.io/phonometry/buildings/insulation/insulation-lab/).
 
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/heavy_impact_sources_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/heavy_impact_sources.svg" alt="Two panels: the octave-band impact force exposure levels of the rubber ball and the bang machine with their printed tolerance bands from 31.5 Hz to 500 Hz, and the ISO 717-2 Annex D rating of a field measurement showing the measured octave levels, their A-weighted contributions and the resulting single number" width="92%"></picture>
 
@@ -3389,13 +3389,13 @@ published 25-band reproduction of Formula (4).
 
 ## See also
 
-- [Field Insulation Measurement (ISO 16283)](insulation-field.md): the
+- [Field Insulation Measurement (ISO 16283)](https://jmrplens.github.io/phonometry/buildings/insulation/insulation-field/): the
   tapping-machine chain of the same standard.
-- [Laboratory Insulation Measurement](insulation-lab.md): the ISO 10140
+- [Laboratory Insulation Measurement](https://jmrplens.github.io/phonometry/buildings/insulation/insulation-lab/): the ISO 10140
   laboratory suite the heavy sources extend.
-- [Insulation Ratings (ISO 717)](insulation-ratings.md): the reference-curve
+- [Insulation Ratings (ISO 717)](https://jmrplens.github.io/phonometry/buildings/insulation/insulation-ratings/): the reference-curve
   engine that rates the tapping-machine quantities.
-- [Floor-Covering Impact Improvement (ISO 16251-1)](../design/impact-improvement.md):
+- [Floor-Covering Impact Improvement (ISO 16251-1)](https://jmrplens.github.io/phonometry/buildings/design/impact-improvement/):
   the improvement a soft covering gives against the light source.
 
 ---

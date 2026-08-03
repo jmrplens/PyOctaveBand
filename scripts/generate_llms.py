@@ -498,28 +498,41 @@ def build_llms_txt(version: str) -> str:
     return "\n".join(lines)
 
 
-def _absolutize_links(content: str, pages: dict[str, str]) -> str:
-    """Rewrite docs-relative markdown links to canonical absolute URLs.
+def _absolutize_links(content: str, md_name: str) -> str:
+    """Rewrite mirror-relative markdown links to canonical absolute URLs.
 
-    The shards are served as flat text, so a link relative to docs/ (for
-    example ``[x](filter-banks.md#anchor)``) would not resolve.
+    The shards are served as flat text, so a link relative to the page that
+    holds it (``[x](../filters/filter-banks.md#anchor)``) would not resolve.
+    The mirror is laid out like the site, so the target resolved against the
+    page's own folder is the route, with the two generated documents at the
+    repository root transplanted into the routes that publish them.
     """
-    route_for = dict(pages)
-    route_for["README.md"] = ""
-    route_for["CONFORMANCE.md"] = "reference/conformance"
-    route_for["ERRATA.md"] = "reference/errata"
+    here = pathlib.PurePosixPath(md_name).parent
+    #: Mirror page at the repository root -> the route that publishes it.
+    transplanted = {
+        "README": "",
+        "CONFORMANCE": "reference/conformance",
+        "ERRATA": "reference/errata",
+    }
 
     def repl(match: re.Match[str]) -> str:
         target, anchor = match.group(1), match.group(2) or ""
-        if target == "../CONTRIBUTING.md":
+        resolved = (here / target).as_posix()
+        parts: list[str] = []
+        for step in resolved.split("/"):
+            if step == "..":
+                if parts:
+                    parts.pop()
+            elif step not in (".", ""):
+                parts.append(step)
+        route = "/".join(parts).removesuffix(".md").removesuffix("/index")
+        if route == "CONTRIBUTING":
             return f"]({REPO_URL}/blob/main/CONTRIBUTING.md{anchor})"
-        route = route_for.get(target)
-        if route is None:
-            return match.group(0)
+        route = transplanted.get(route, route)
         suffix = f"{route}/" if route else ""
         return f"]({SITE_URL}/{suffix}{anchor})"
 
-    return re.sub(r"\]\(((?:\.\./)?[\w.-]+\.md)(#[\w-]+)?\)", repl, content)
+    return re.sub(r"\]\(((?:\.\./)*[\w./-]+\.md)(#[\w-]+)?\)", repl, content)
 
 
 def _body(md_name: str, route: str, pages: dict[str, str]) -> str:
@@ -531,7 +544,7 @@ def _body(md_name: str, route: str, pages: dict[str, str]) -> str:
         for line in content.splitlines()
         if not line.startswith("← [Documentation index]")
     ).strip()
-    content = _absolutize_links(content, pages)
+    content = _absolutize_links(content, md_name)
     # A plain "Source:" line as well as the HTML comment: markdown-to-text
     # pipelines routinely strip comments, and a passage extracted with its
     # attribution stripped is a passage that cannot be cited back.

@@ -210,7 +210,7 @@ For smaller patches, ISO 13472-2 seals a short circular tube onto the surface an
 measures the absorption with the two-microphone transfer-function method of
 ISO 10534-2. The library provides the spot-method geometry and validity helpers;
 the transfer-function DSP itself is the impedance-tube routine
-`two_microphone_impedance` (see [Impedance Tube](../absorbers/impedance-tube.md)).
+`two_microphone_impedance` (see [Impedance Tube](https://jmrplens.github.io/phonometry/materials/absorbers/impedance-tube/)).
 
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_spot_tube_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_spot_tube.svg" alt="ISO 13472-2 spot method: a short circular tube sealed onto the road surface with a loudspeaker at the top and two microphones flush in the tube wall at spacing s, measuring absorption over 250 to 1600 Hz via the ISO 10534-2 two-microphone transfer-function method" width="92%"></picture>
 
@@ -295,16 +295,16 @@ few positions.
 
 ## See also
 
-- [Impedance Tube](../absorbers/impedance-tube.md): the ISO 10534-2 two-microphone method
+- [Impedance Tube](https://jmrplens.github.io/phonometry/materials/absorbers/impedance-tube/): the ISO 10534-2 two-microphone method
   the spot tube defers its mathematics to, and the laboratory instrument the
   spot method miniaturises.
-- [Diffusers and Their Coefficients](../diffusers/diffusers.md): the other family of
+- [Diffusers and Their Coefficients](https://jmrplens.github.io/phonometry/materials/diffusers/diffusers/): the other family of
   surface measurements, grading where a surface sends its reflection rather
   than how much it absorbs.
-- [Sound Absorption Measurement and Rating](../absorbers/absorption-measurement.md): the
+- [Sound Absorption Measurement and Rating](https://jmrplens.github.io/phonometry/materials/absorbers/absorption-measurement/): the
   laboratory (reverberation-room) absorption measurement and its rating, for
   materials that can be brought indoors.
-- [Outdoor Sound Propagation](../../environment/propagation/outdoor-propagation.md): where the absorption
+- [Outdoor Sound Propagation](https://jmrplens.github.io/phonometry/environment/propagation/outdoor-propagation/): where the absorption
   of the ground surface enters the propagation models.
 - API reference: [`materials.surfaces.road_absorption`](https://jmrplens.github.io/phonometry/reference/api/materials/road-absorption/).
 
@@ -331,16 +331,16 @@ few positions.
   tubes — Part 2: Transfer-function method* (ISO 10534-2:1998).
   [iso.org catalogue](https://www.iso.org/standard/22851.html).
   The two-microphone transfer-function reduction the spot method reuses,
-  implemented in the [Impedance Tube](../absorbers/impedance-tube.md) guide.
+  implemented in the [Impedance Tube](https://jmrplens.github.io/phonometry/materials/absorbers/impedance-tube/) guide.
 
 ## Standards
 
 ISO 13472-1:2002 (in-situ absorption, extended surface) and ISO 13472-2:2010
 (in-situ absorption, spot method); the spot method's transfer-function DSP is
-the ISO 10534-2:1998 routine of the [Impedance Tube](../absorbers/impedance-tube.md)
+the ISO 10534-2:1998 routine of the [Impedance Tube](https://jmrplens.github.io/phonometry/materials/absorbers/impedance-tube/)
 guide. Both road standards have since been revised (ISO 13472-1:2022,
 ISO 13472-2:2025); the earlier editions are the implemented ones. Numerical
 conformance against the standards' worked examples and closed forms is
-tracked in [CONFORMANCE.md](../../CONFORMANCE.md).
+tracked in [CONFORMANCE.md](https://jmrplens.github.io/phonometry/reference/conformance/).
 
 ---

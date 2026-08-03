@@ -23,7 +23,7 @@ standardized test signal.
 > the speech modulation a room or sound system preserves) while the SII
 > predicts intelligibility from *audibility*: how much of the speech spectrum
 > clears the noise and the hearing threshold at the listener's ear. For the
-> latter, see the [Speech Intelligibility Index guide](speech-intelligibility.md).
+> latter, see the [Speech Intelligibility Index guide](https://jmrplens.github.io/phonometry/perception/speech/speech-intelligibility/).
 
 ## 1. The modulation transfer function
 
@@ -245,7 +245,7 @@ transfer index table beside the per-band MTI bars (the result's own `.plot()`),
 the boxed `STI = X` single number with the Annex F qualification band, an
 optional verdict row and a footer with the fixed disclaimer. It uses the same
 `ReportMetadata` container (documented under
-[Insulation ratings](../../buildings/insulation/insulation-ratings.md#report-metadata-reportmetadata)) and
+[Insulation ratings](https://jmrplens.github.io/phonometry/buildings/insulation/insulation-ratings/#report-metadata-reportmetadata)) and
 rendering engine as the ISO 717 insulation fiche; a supplied `requirement` is
 read as the minimum required STI (a higher STI passes). Rendering needs
 reportlab and, for the figure the fiche embeds, matplotlib (`pip install
@@ -276,14 +276,14 @@ repository. Click the preview to open the PDF:
 
 ## See also
 
-- [Room Acoustics](../../buildings/rooms/room-acoustics.md): the measured impulse response the
+- [Room Acoustics](https://jmrplens.github.io/phonometry/buildings/rooms/room-acoustics/): the measured impulse response the
   indirect method consumes, and the open-plan metrics (ISO 3382-3) built on
   per-position STI.
-- [Speech Intelligibility Index](speech-intelligibility.md): the
+- [Speech Intelligibility Index](https://jmrplens.github.io/phonometry/perception/speech/speech-intelligibility/): the
   audibility-based ANSI S3.5 index that complements the STI.
-- [Loudness](../psychoacoustics/loudness.md) and [Sound Quality Metrics](../psychoacoustics/sound-quality.md): loudness,
+- [Loudness](https://jmrplens.github.io/phonometry/perception/psychoacoustics/loudness/) and [Sound Quality Metrics](https://jmrplens.github.io/phonometry/perception/psychoacoustics/sound-quality/): loudness,
   sharpness, tonality and roughness of the received sound.
-- [Theory](../../reference/theory/perception.md): the modulation-transfer derivation and the $m$ ↔ STI
+- [Theory](https://jmrplens.github.io/phonometry/reference/theory/perception/): the modulation-transfer derivation and the $m$ ↔ STI
   mapping.
 - API reference: [`speech.sti`](https://jmrplens.github.io/phonometry/reference/api/speech/sti/).
 
@@ -328,7 +328,7 @@ equally-contributing critical-band and octave-band methods of section 5.
 > of the speech spectrum clears the noise and the hearing threshold at the
 > listener's ear) while the STI characterises a *transmission channel*: how
 > much of the speech modulation a room or sound system preserves. For the
-> latter, see the [Speech Transmission Index guide](speech-transmission.md).
+> latter, see the [Speech Transmission Index guide](https://jmrplens.github.io/phonometry/perception/speech/speech-transmission/).
 
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_speech_intelligibility_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_speech_intelligibility.svg" alt="The SII computation flow: three equivalent-spectrum-level inputs (speech Ei', noise Ni', hearing threshold Ti') feed the self-speech masking and spread-of-masking stage (equivalent masking spectrum level Zi), then the equivalent disturbance Di, then the band-audibility function Ai clipped to [0, 1], and finally the band-importance-weighted sum SII = sum of Ii*Ai over the 18 one-third-octave bands" width="94%"></picture>
 
@@ -501,7 +501,7 @@ This is the practical use of the SII in audiology and in noise control for
 occupied spaces: a target index can be met either by lowering the noise or by
 restoring audibility (amplification), and the band profile says which bands
 the effort has to go into. The age-related thresholds of ISO 7029 make a
-convenient population input, see [hearing threshold](../hearing/hearing-threshold.md).
+convenient population input, see [hearing threshold](https://jmrplens.github.io/phonometry/perception/hearing/hearing-threshold/).
 
 ## 4. Vocal effort
 
@@ -774,7 +774,7 @@ noise can rate an acceptable STI from its impulse response while the SII (and
 the noise-aware STI, via `snr=` or `level=`) reveals that little of the speech
 spectrum clears the noise. When both mechanisms are in play, compute both; the
 inputs are cheap once the room and the noise have been measured. See the
-[Speech Transmission Index guide](speech-transmission.md) for the STI side.
+[Speech Transmission Index guide](https://jmrplens.github.io/phonometry/perception/speech/speech-transmission/) for the STI side.
 
 ## 7. ANSI S3.5-1997 report (`.report()`)
 
@@ -786,7 +786,7 @@ band-audibility function $A_i$ beside the audibility and
 importance-weighted contribution bars (the result's own `.plot()`), the boxed
 `SII = X` single number, an optional verdict row and a footer with the fixed
 disclaimer. It uses the same `ReportMetadata` container (documented under
-[Insulation ratings](../../buildings/insulation/insulation-ratings.md#report-metadata-reportmetadata)) and
+[Insulation ratings](https://jmrplens.github.io/phonometry/buildings/insulation/insulation-ratings/#report-metadata-reportmetadata)) and
 rendering engine as the ISO 717 insulation fiche; a supplied `requirement` is
 read as the minimum required SII (a higher SII passes). `verbose=True` adds the
 equivalent disturbance spectrum level $D_i$ column. Rendering needs
@@ -887,8 +887,8 @@ Each compares a clean reference to a degraded or processed version of the same
 speech and returns a scalar with a monotonic relation to the fraction of words
 a listener would understand: `1` when the degraded signal equals the clean one,
 and near `0` for uncorrelated noise. Unlike the
-[Speech Transmission Index](speech-transmission.md), which characterises a
-transmission channel, and the [Speech Intelligibility Index](speech-intelligibility.md),
+[Speech Transmission Index](https://jmrplens.github.io/phonometry/perception/speech/speech-transmission/), which characterises a
+transmission channel, and the [Speech Intelligibility Index](https://jmrplens.github.io/phonometry/perception/speech/speech-intelligibility/),
 which predicts audibility from spectra, STOI and ESTOI work directly on the two
 waveforms, which makes them the standard yardstick for **time-frequency
 weighted** speech: noise reduction, source separation and binary-mask
@@ -1111,9 +1111,9 @@ the library, and the choice between the three families is really a choice of
 what you can measure. STOI and ESTOI need a *clean reference* and the
 degraded signal, so they belong to processing work: noise reduction, source
 separation, codecs, hearing-aid algorithms. The
-[STI](speech-transmission.md) (IEC 60268-16) needs no clean reference, only
+[STI](https://jmrplens.github.io/phonometry/perception/speech/speech-transmission/) (IEC 60268-16) needs no clean reference, only
 the channel, so it is what rates a room or a public-address system. The
-[SII](speech-intelligibility.md) (ANSI S3.5-1997) needs neither signal, only
+[SII](https://jmrplens.github.io/phonometry/perception/speech/speech-intelligibility/) (ANSI S3.5-1997) needs neither signal, only
 spectra, so it is what predicts audibility for a listener with a given
 hearing threshold. When more than one is available, they answer different
 questions rather than confirming each other: a processor can raise STOI while
@@ -1121,11 +1121,11 @@ the room keeps the STI poor.
 
 ## See also
 
-- [Speech Transmission Index](speech-transmission.md): rates a transmission
+- [Speech Transmission Index](https://jmrplens.github.io/phonometry/perception/speech/speech-transmission/): rates a transmission
   channel from its impulse response or a STIPA recording.
-- [Speech Intelligibility Index](speech-intelligibility.md): predicts
+- [Speech Intelligibility Index](https://jmrplens.github.io/phonometry/perception/speech/speech-intelligibility/): predicts
   intelligibility from speech, noise and hearing-threshold spectra.
-- [Filter banks](../../signal/filters/filter-banks.md): the one-third-octave bands the front end
+- [Filter banks](https://jmrplens.github.io/phonometry/signal/filters/filter-banks/): the one-third-octave bands the front end
   groups the DFT into.
 
 ---

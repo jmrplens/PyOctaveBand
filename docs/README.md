@@ -110,9 +110,9 @@ Full documentation for phonometry. Also available as a website:
 
 ## Reference
 
-- [API Reference](reference/api.md): curated quick table of every public function and class
+- [API Reference](reference/api/index.md): curated quick table of every public function and class
 - [Generated API reference](https://jmrplens.github.io/phonometry/reference/api/): one page per public module, generated from the source docstrings (`make api-docs`). English only; the Spanish site serves it via locale fallback
-- [Theory](reference/theory.md): standards, math and design decisions, split by domain
+- [Theory](reference/theory/index.md): standards, math and design decisions, split by domain
   - [Signal analysis](reference/theory/signal-analysis.md): filter banks, weightings, time integration, level and exposure metrics, sound intensity, GUM uncertainty
   - [Perception and hearing](reference/theory/perception.md): equal-loudness contours, loudness models, sound quality, tone prominence, STI/SII, hearing statistics
   - [Rooms and buildings](reference/theory/rooms-buildings.md): room acoustics, noise criteria, insulation and ratings, flanking prediction

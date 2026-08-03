@@ -1066,7 +1066,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   with `docs/README.md` still the index. The pairing that publishes a markdown
   copy of every page, and the one that builds `llms.txt`, are by route now
   rather than by file name, so the table of pages whose mirror name differed
-  from their route is gone: there is nothing left for it to hold.
+  from their route is gone. What it also held stays: the conformance report and
+  the errata registry are written at the repository root and transplanted into
+  their site routes, which is a mapping the layout cannot express.
 
 - The documentation site is organised by topic rather than by one `guides/`
   drawer. Every page lives under the domain it belongs to, and the URL says so:

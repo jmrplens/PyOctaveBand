@@ -2,7 +2,7 @@
 
 # Theory: Materials and Surfaces
 
-This page collects the theory behind materials and surfaces: surface scattering and diffusion, in-situ road-surface absorption, and acoustic material characterisation from the weighted absorption rating to airflow resistance and the impedance tube. It is part of the [theory reference](../theory.md). The ISO 354 reverberation-room measurement that feeds the ISO 11654 rating is covered in [Theory: Rooms and Buildings](rooms-buildings.md).
+This page collects the theory behind materials and surfaces: surface scattering and diffusion, in-situ road-surface absorption, and acoustic material characterisation from the weighted absorption rating to airflow resistance and the impedance tube. It is part of the [theory reference](index.md). The ISO 354 reverberation-room measurement that feeds the ISO 11654 rating is covered in [Theory: Rooms and Buildings](rooms-buildings.md).
 
 ## Surface scattering and diffusion (ISO 17497-1, ISO 17497-2)
 

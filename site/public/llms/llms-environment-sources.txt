@@ -325,9 +325,9 @@ split into point sources is declared out of scope by the method itself.
 
 ## See also
 
-- [Outdoor Sound Propagation](../propagation/outdoor-propagation.md): the ISO 9613-2 chain that
+- [Outdoor Sound Propagation](https://jmrplens.github.io/phonometry/environment/propagation/outdoor-propagation/): the ISO 9613-2 chain that
   carries a source power to a receiver.
-- [Environmental noise levels](../environmental-levels.md): the $L_{den}$ and
+- [Environmental noise levels](https://jmrplens.github.io/phonometry/environment/environmental-levels/): the $L_{den}$ and
   $L_{night}$ indicators the resulting maps are drawn for.
 
 ---
@@ -770,9 +770,9 @@ such as depots, stations and loudspeakers, are treated by the industrial method.
 
 ## See also
 
-- [Outdoor Sound Propagation](../propagation/outdoor-propagation.md): the
+- [Outdoor Sound Propagation](https://jmrplens.github.io/phonometry/environment/propagation/outdoor-propagation/): the
   ISO 9613-2 chain that carries a source power to a receiver.
-- [Environmental noise levels](../environmental-levels.md): the
+- [Environmental noise levels](https://jmrplens.github.io/phonometry/environment/environmental-levels/): the
   $L_{den}$ and $L_{night}$ indicators the resulting maps are drawn for.
 
 ---
@@ -837,7 +837,7 @@ bias with it. The ground board, in turn, is why the formula subtracts 6 dB:
 a capsule lying on a hard plate receives a perfectly coherent reflection
 (pressure doubling, $+6$ dB) instead of the uncontrolled height-dependent
 interference pattern a tripod microphone would sample (see
-[the image source behind the ground effect](../propagation/outdoor-propagation.md)).
+[the image source behind the ground effect](https://jmrplens.github.io/phonometry/environment/propagation/outdoor-propagation/)).
 
 ### Wind-speed bins and standardized conditions
 

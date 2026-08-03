@@ -261,8 +261,8 @@ governing prominence $P$ together with the derived $L_{Aeq}$ adjustment $K_I$
 and a footer with the fixed disclaimer.
 
 It uses the same `ReportMetadata` container
-(documented under [Insulation ratings](../../buildings/insulation/insulation-ratings.md#report-metadata-reportmetadata))
-and rendering engine as the [ISO 532-1 loudness fiche](../../perception/psychoacoustics/loudness.md#iso-532-1-report-report);
+(documented under [Insulation ratings](https://jmrplens.github.io/phonometry/buildings/insulation/insulation-ratings/#report-metadata-reportmetadata))
+and rendering engine as the [ISO 532-1 loudness fiche](https://jmrplens.github.io/phonometry/perception/psychoacoustics/loudness/#iso-532-1-report-report);
 a supplied `requirement` is read as the maximum acceptable governing prominence
 $P$ (a less prominent impulse passes). Rendering needs reportlab and, for the
 figure the fiche embeds, matplotlib (`pip install "phonometry[report,plot]"`);

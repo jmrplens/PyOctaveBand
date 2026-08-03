@@ -586,7 +586,7 @@ the 10/50/90 % risk thresholds of Table C.2. The model is vertical-axis only:
 clause 4 neglects the horizontal contributions to spinal compression by design,
 and the horizontal spinal model of the withdrawn 2004 edition is not reinstated,
 so horizontal whole-body exposure is assessed instead with the r.m.s.,
-running-r.m.s./MTVV and VDV metrics of [Human Vibration](human-vibration.md)
+running-r.m.s./MTVV and VDV metrics of [Human Vibration](https://jmrplens.github.io/phonometry/vibration/human/human-vibration/)
 (ISO 2631-1).
 
 ## 4. The health-risk report (`.report()`)

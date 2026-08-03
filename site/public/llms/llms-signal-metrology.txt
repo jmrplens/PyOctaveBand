@@ -30,7 +30,7 @@ before and re-check it after each session, verify meter and calibrator
 periodically in the laboratory (IEC 61672-3 and IEC 60942; Bies, Hansen &
 Howard 2017, §3.4), and treat the pre/post difference as your drift bound.
 The field, laboratory and drift section below turns that into concrete
-rules, and the [Build a sound level meter](../sound-level-meter.md)
+rules, and the [Build a sound level meter](https://jmrplens.github.io/phonometry/signal/sound-level-meter/)
 walkthrough starts from exactly this step before any level is computed.
 
 ## Why calibrate? The theory
@@ -501,7 +501,7 @@ of ISO 12999-1, which combines reproducibility terms for a single-number
 rating, is a separate, domain-specific budget.
 
 A budget is only as honest as the record behind it: every averaged input
-assumes stationarity, and [Data qualification](data-qualification.md)
+assumes stationarity, and [Data qualification](https://jmrplens.github.io/phonometry/signal/metrology/data-qualification/)
 provides the Bendat & Piersol tests that check it before the propagation
 starts.
 
@@ -513,23 +513,23 @@ general form; use this page whenever your measurement model is not one of
 those standardized cases:
 
 - **Calibration.** The calibrator's class tolerance and the pre/post drift
-  bound of [Calibration](calibration.md) are textbook Type B inputs:
+  bound of [Calibration](https://jmrplens.github.io/phonometry/signal/metrology/calibration/) are textbook Type B inputs:
   propagate them (`Quantity(..., "rectangular")`) through the level model
   rather than quoting the tolerance alone.
 - **Environmental levels.** The ISO 1996-2 combined uncertainty of the
-  [Environmental levels](../../environment/environmental-levels.md) page is Formula (2) of
+  [Environmental levels](https://jmrplens.github.io/phonometry/environment/environmental-levels/) page is Formula (2) of
   that standard: the same quadrature sum with the standard's own
   sensitivity coefficients.
 - **Building acoustics.** The per-band and single-number uncertainties of
-  [field insulation measurements](../../buildings/insulation/insulation-field.md) apply the tabulated
+  [field insulation measurements](https://jmrplens.github.io/phonometry/buildings/insulation/insulation-field/) apply the tabulated
   reproducibility terms of ISO 12999-1, a standardized budget for one
   specific model.
 - **Absorption.** The
-  [absorption-measurement page](../../materials/absorbers/absorption-measurement.md) carries the
+  [absorption-measurement page](https://jmrplens.github.io/phonometry/materials/absorbers/absorption-measurement/) carries the
   ISO 12999-2 absorption uncertainty, the same construction for the
   reverberation-room method.
 - **Occupational exposure.** The ISO 9612 uncertainty of
-  [occupational measurements](../../perception/hearing/occupational-exposure.md) budgets sampling,
+  [occupational measurements](https://jmrplens.github.io/phonometry/perception/hearing/occupational-exposure/) budgets sampling,
   instrument and position contributions in exactly this way.
 
 ## References
@@ -577,9 +577,9 @@ Source: https://jmrplens.github.io/phonometry/signal/metrology/data-qualificatio
 
 # Data qualification: stationarity, level crossings and peaks (Bendat & Piersol)
 
-Every average in this documentation - a [PSD](../spectra/spectral-analysis.md), a
-[Leq](../levels/levels.md), a
-[GUM budget](gum-uncertainty.md) - assumes the record is
+Every average in this documentation - a [PSD](https://jmrplens.github.io/phonometry/signal/spectra/spectral-analysis/), a
+[Leq](https://jmrplens.github.io/phonometry/signal/levels/levels/), a
+[GUM budget](https://jmrplens.github.io/phonometry/signal/metrology/gum-uncertainty/) - assumes the record is
 **stationary**: that the process generating it did not drift while it was
 being measured. Bendat & Piersol devote Section 10.3 of *Random Data* to
 qualifying records before analysis, and `phonometry.metrology` implements its
@@ -831,7 +831,7 @@ apparent frequency of $0.58B$, Example 5.12) and a band centred on $f_c$
 gives $N_0 = 2\sqrt{f_c^2 + B^2/12}$ (Example 5.13).
 `level_crossing_rate` counts the actual crossings of each level and puts
 the Rice curve next to them, taking the moments from the record's own
-[Welch autospectrum](../spectra/spectral-analysis.md):
+[Welch autospectrum](https://jmrplens.github.io/phonometry/signal/spectra/spectral-analysis/):
 
 ```python
 import numpy as np
@@ -973,15 +973,15 @@ record to the physically meaningful range first.
 
 Qualification comes *before* the statistics this section's other pages
 compute: the chi-square confidence interval of a
-[Welch PSD](../spectra/spectral-analysis.md) and the random-error
-formulas of the [correlation estimators](../spectra/correlation-delay.md)
+[Welch PSD](https://jmrplens.github.io/phonometry/signal/spectra/spectral-analysis/) and the random-error
+formulas of the [correlation estimators](https://jmrplens.github.io/phonometry/signal/spectra/correlation-delay/)
 all assume the record is stationary, as does the very idea of *the* $L_{eq}$ of
-a measurement in [Levels](../levels/levels.md). When a record fails
+a measurement in [Levels](https://jmrplens.github.io/phonometry/signal/levels/levels/). When a record fails
 the test, split it at the change (the `segment_values` sequence shows
 where), analyse the pieces, or move to the short-time views - the
 [calibrated spectrogram](https://jmrplens.github.io/phonometry/signal/spectra/time-frequency/) - that do not
 assume stationarity. And when it passes, the
-[GUM machinery](gum-uncertainty.md) can propagate the
+[GUM machinery](https://jmrplens.github.io/phonometry/signal/metrology/gum-uncertainty/) can propagate the
 *remaining* random error of every averaged estimate with a clean
 conscience.
 

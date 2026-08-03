@@ -2,7 +2,7 @@
 
 # Theory: Perception and Hearing
 
-This page collects the theory behind hearing and psychoacoustics: the equal-loudness contours, the Zwicker, Moore-Glasberg and Sottek loudness models, the sound-quality metrics tonality, roughness and sharpness, tone prominence, the speech metrics STI and SII, and the statistics of hearing thresholds and hearing loss. It is part of the [theory reference](../theory.md).
+This page collects the theory behind hearing and psychoacoustics: the equal-loudness contours, the Zwicker, Moore-Glasberg and Sottek loudness models, the sound-quality metrics tonality, roughness and sharpness, tone prominence, the speech metrics STI and SII, and the statistics of hearing thresholds and hearing loss. It is part of the [theory reference](index.md).
 
 ## Equal-loudness contours (ISO 226:2023)
 

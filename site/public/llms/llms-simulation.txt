@@ -10,7 +10,7 @@ Source: https://jmrplens.github.io/phonometry/simulation/elastic-waves/
 # Elastic waves and fluid-solid coupling
 
 A fluid carries one wave; a solid carries a family of them. This guide covers
-the elastic companion of the [2D FDTD wave simulation](fdtd-simulation.md):
+the elastic companion of the [2D FDTD wave simulation](https://jmrplens.github.io/phonometry/simulation/fdtd-simulation/):
 `elastic_fdtd_simulation` integrates the plane-strain velocity-stress system
 of Virieux (1986) on the same staggered grid as the acoustic solver, and with
 it the compressional **P wave**, the shear **S wave**, the **Rayleigh wave**
@@ -24,13 +24,13 @@ validation suite.
 
 The guide assumes the acoustic solver's vocabulary (sources, probes,
 obstacle masks, sponges and the Courant bound); read
-[2D FDTD wave simulation](fdtd-simulation.md) first if those are new. The
+[2D FDTD wave simulation](https://jmrplens.github.io/phonometry/simulation/fdtd-simulation/) first if those are new. The
 closed forms this solver cross-checks live in the building, vibration and
 underwater guides: the mass law of
-[panel sound insulation](../buildings/design/panel-sound-insulation.md), the flexural waves of
-[bending-wave transmission at plate junctions](../vibration/structural/junction-transmission.md),
+[panel sound insulation](https://jmrplens.github.io/phonometry/buildings/design/panel-sound-insulation/), the flexural waves of
+[bending-wave transmission at plate junctions](https://jmrplens.github.io/phonometry/vibration/structural/junction-transmission/),
 and the shear-supporting seabed that the fluid-bottom reflection model of
-[underwater sound propagation](../underwater/underwater-propagation.md) cannot represent.
+[underwater sound propagation](https://jmrplens.github.io/phonometry/underwater/underwater-propagation/) cannot represent.
 
 ## 1. The P-SV velocity-stress scheme
 
@@ -151,7 +151,7 @@ plt.show()
 </details>
 
 That flexural wave is worth watching in motion: the
-[bending-wave transmission guide](../vibration/structural/junction-transmission.md) embeds an
+[bending-wave transmission guide](https://jmrplens.github.io/phonometry/vibration/structural/junction-transmission/) embeds an
 animation of this solver launching a 4 kHz bending packet along a 10 mm
 steel plate into an L-junction, where the corner splits it into the
 reflected and transmitted waves the closed form prices at
@@ -209,7 +209,7 @@ at 10° and 20° and matches the exact reflection coefficient of
 Brekhovskikh & Godin (Eqs. 4.2.22-4.2.26) within a fraction of a percent,
 mode conversion included. This is exactly the shear physics that the
 fluid-bottom `reflection_coefficient` of the
-[underwater module](../underwater/underwater-propagation.md) cannot represent, and the
+[underwater module](https://jmrplens.github.io/phonometry/underwater/underwater-propagation/) cannot represent, and the
 reason a shear-supporting seabed loses more energy than its
 equivalent-fluid model.
 
@@ -303,7 +303,7 @@ extreme contrast of an air-steel contact (impedance ratio ~$10^5$:1): stable
 over 10 000 steps with the reflected amplitude conserved to 0.5 %.
 
 At oblique incidence the plate physics gets richer, and the
-[panel sound insulation guide](../buildings/design/panel-sound-insulation.md) embeds the
+[panel sound insulation guide](https://jmrplens.github.io/phonometry/buildings/design/panel-sound-insulation/) embeds the
 animation: this solver driving the same 10 mm steel plate, lying in air,
 with a sustained 45° plane wave below and above its coincidence frequency,
 where the trace-matched bending wave re-radiates a growing beam and holds
@@ -346,16 +346,16 @@ waves probe the sediment shear stiffness.
 
 ## See also
 
-- [2D FDTD wave simulation](fdtd-simulation.md): the acoustic solver this
+- [2D FDTD wave simulation](https://jmrplens.github.io/phonometry/simulation/fdtd-simulation/): the acoustic solver this
   guide extends, with the staggered grid, the Courant bound, the sources,
   probes and boundary machinery shared by both.
-- [Predicting Panel Sound Insulation](../buildings/design/panel-sound-insulation.md): the mass
+- [Predicting Panel Sound Insulation](https://jmrplens.github.io/phonometry/buildings/design/panel-sound-insulation/): the mass
   law and coincidence closed forms; the immersed-plate run of section 7 is
   their full-wave cross-check.
-- [Bending-wave transmission at plate junctions](../vibration/structural/junction-transmission.md):
+- [Bending-wave transmission at plate junctions](https://jmrplens.github.io/phonometry/vibration/structural/junction-transmission/):
   the flexural-wave closed forms of the building model; the Kirchhoff
   dispersion validated in section 3 is the wave they transport.
-- [Underwater sound propagation](../underwater/underwater-propagation.md): the
+- [Underwater sound propagation](https://jmrplens.github.io/phonometry/underwater/underwater-propagation/): the
   fluid-bottom Rayleigh reflection model whose missing shear physics
   section 5 quantifies.
 - API reference: [`simulation.elastic-fdtd`](https://jmrplens.github.io/phonometry/reference/api/simulation/elastic-fdtd/).
@@ -616,7 +616,7 @@ plt.show()
 A three-row rigid-walled domain is a plane-wave tube, and with the per-cell
 `damping` map a porous sample becomes an equivalent fluid, which turns the
 solver itself into a measurable specimen: the
-[impedance-tube guide](../materials/absorbers/impedance-tube.md) runs the ISO 10534-2 and
+[impedance-tube guide](https://jmrplens.github.io/phonometry/materials/absorbers/impedance-tube/) runs the ISO 10534-2 and
 ASTM E2611 measurements virtually on exactly that domain, animations
 included, and recovers the analytic absorption and transmission loss of the
 modelled sample through the library's own reduction chains (the
@@ -933,7 +933,7 @@ Virieux (1986) on the same grid, adding shear waves, stress-imaging free
 surfaces with Rayleigh waves, and fluid-solid coupling with mode
 conversion, Scholte interface waves and immersed-plate transmission. That
 solver has its own guide,
-[Elastic waves and fluid-solid coupling](elastic-waves.md).
+[Elastic waves and fluid-solid coupling](https://jmrplens.github.io/phonometry/simulation/elastic-waves/).
 
 ## Quick answers
 
@@ -1002,8 +1002,8 @@ formulation. Validation is anchored to closed forms (rigid-box
 eigenfrequencies, cylindrical spreading, image sources, the
 normal-incidence reflection coefficient and the scheme's dispersion
 relation); two of those anchors run in the
-[conformance report](../CONFORMANCE.md). The elastic P-SV companion solver
+[conformance report](https://jmrplens.github.io/phonometry/reference/conformance/). The elastic P-SV companion solver
 and its own oracles are covered in
-[Elastic waves and fluid-solid coupling](elastic-waves.md).
+[Elastic waves and fluid-solid coupling](https://jmrplens.github.io/phonometry/simulation/elastic-waves/).
 
 ---

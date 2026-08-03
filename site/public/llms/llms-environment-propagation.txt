@@ -517,9 +517,9 @@ under regulations that cite ISO 9613 use this module. (ISO published a
 revised ISO 9613-2 in 2024; this library implements the 1996 edition, the one
 most national regulations and the validation literature still reference.)
 
-See the [Theory](../../reference/theory/environment-transport.md) page for the full derivation, the
-[Room Acoustics guide](../../buildings/rooms/room-acoustics.md) for how $\alpha$ feeds
-ISO 354, and the [Occupational Noise Exposure guide](../../perception/hearing/occupational-exposure.md) for the ISO 9612 occupational
+See the [Theory](https://jmrplens.github.io/phonometry/reference/theory/environment-transport/) page for the full derivation, the
+[Room Acoustics guide](https://jmrplens.github.io/phonometry/buildings/rooms/room-acoustics/) for how $\alpha$ feeds
+ISO 354, and the [Occupational Noise Exposure guide](https://jmrplens.github.io/phonometry/perception/hearing/occupational-exposure/) for the ISO 9612 occupational
 exposure that consumes A-weighted levels.
 
 ## 4. Prediction reports (`.report()`)
@@ -599,7 +599,7 @@ result.report(
 insertion loss over the octave bands.*
 
 Here too `result.plot()` previews the insertion-loss spectrum of the fiche;
-the [ground and barriers guide](ground-barriers.md) draws the same result
+the [ground and barriers guide](https://jmrplens.github.io/phonometry/environment/propagation/ground-barriers/) draws the same result
 against the exact half-plane and coherent-ground models.
 
 ## References
@@ -653,7 +653,7 @@ ground effect (Eq. (9), Table 3) with its A-weighted alternative
 correction (Eq. (21)/(22)). ISO 354:2003, *Acoustics — Measurement of sound
 absorption in a reverberation room*: only the clause 8.1.2.1 conversion
 $m = \alpha/(10 \log_{10} e)$ behind `air_attenuation_m`; the reverberation-room
-method itself is covered in the [Room Acoustics guide](../../buildings/rooms/room-acoustics.md).
+method itself is covered in the [Room Acoustics guide](https://jmrplens.github.io/phonometry/buildings/rooms/room-acoustics/).
 
 ---
 
@@ -663,7 +663,7 @@ Source: https://jmrplens.github.io/phonometry/environment/propagation/ground-bar
 
 # Spherical ground effect and advanced barriers (Attenborough / Salomons / Bies)
 
-The [ISO 9613-2 general method](outdoor-propagation.md) folds the ground and
+The [ISO 9613-2 general method](https://jmrplens.github.io/phonometry/environment/propagation/outdoor-propagation/) folds the ground and
 barrier terms into tabulated, energy-based corrections. This page covers the
 underlying wave acoustics in `phonometry.environment.propagation.ground_barriers`: the
 **spherical-wave reflection coefficient** of a finite-impedance ground
@@ -731,7 +731,7 @@ res.plot()                        # excess attenuation vs frequency
 
 The ground impedance is either derived from an effective `flow_resistivity`
 (via the `delany_bazley` or `miki` model of
-[`phonometry.materials`](../../materials/absorbers/porous-absorbers.md), which model a semi-infinite porous
+[`phonometry.materials`](https://jmrplens.github.io/phonometry/materials/absorbers/porous-absorbers/), which model a semi-infinite porous
 ground) or supplied directly as a normalized complex `impedance` (a scalar,
 per-band array, or a `PorousMediumResult`). A plain `impedance` value is taken
 in the $e^{-i\omega t}$ convention of Salomons, in which a passive ground has
@@ -916,7 +916,7 @@ plt.show()
 ## Relation to ISO 9613-2
 
 The tabulated $A_{gr}$ and $D_z$ of the
-[ISO 9613-2 method](outdoor-propagation.md)
+[ISO 9613-2 method](https://jmrplens.github.io/phonometry/environment/propagation/outdoor-propagation/)
 are octave-band, energy-based engineering fits; `ground_effect` and
 `barrier_insertion_loss` are their narrowband wave-acoustic counterparts. Over
 hard ground both agree on the +6 dB enhancement and the 5 dB grazing barrier
@@ -958,14 +958,14 @@ Source: https://jmrplens.github.io/phonometry/environment/propagation/atmospheri
 
 # Atmospheric refraction: ray tracing and the parabolic equation (Salomons / Attenborough)
 
-The [ISO 9613-2 method](outdoor-propagation.md) and the
-[spherical-wave ground effect](ground-barriers.md) both assume a **homogeneous**
+The [ISO 9613-2 method](https://jmrplens.github.io/phonometry/environment/propagation/outdoor-propagation/) and the
+[spherical-wave ground effect](https://jmrplens.github.io/phonometry/environment/propagation/ground-barriers/) both assume a **homogeneous**
 atmosphere. In reality the sound speed changes with height, because temperature
 and wind change with height, and this **refracts** sound: rays curve, and over a
 few hundred metres the received level can swing by tens of decibels. This page
 covers `phonometry.environment.propagation.refraction`, the
 refracting-atmosphere counterpart of the ocean solvers in
-[`phonometry.underwater.propagation.numerical`](../../underwater/underwater-solvers.md): a
+[`phonometry.underwater.propagation.numerical`](https://jmrplens.github.io/phonometry/underwater/underwater-solvers/): a
 **ray model** and a **parabolic-equation (PE)** solver, both clean-room from
 Salomons, *Computational Atmospheric Acoustics* (2001) and Attenborough & Van
 Renterghem, *Predicting Outdoor Sound* 2e (2021, Ch. 11).
@@ -990,7 +990,7 @@ away on each side, and the wind profile deciding which of them hears anything.
 
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_atmospheric_refraction_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_atmospheric_refraction.svg" alt="Atmospheric refraction scene: a source 2 m above the ground with a receiver 350 m away on each side, wind arrows growing longer with height, and an inset of the effective sound-speed profiles c_eff(z) = c(z) + u(z); on the downwind side the rays curve back toward the ground and the receiver gets a direct plus a ground-bounced arrival, on the upwind side every ray bends upward and an acoustic shadow opens on the ground beyond about 220 m, swallowing the receiver standing inside it" width="92%"></picture>
 
-![Atmospheric refraction: ray bending and the acoustic shadow](../.github/images/atmospheric_refraction.webp)
+![Atmospheric refraction: ray bending and the acoustic shadow](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/atmospheric_refraction.webp)
 
 <details>
 <summary>Show the code for this figure</summary>
@@ -1171,7 +1171,7 @@ equation valid within a limiting elevation angle, and marches it in range on a
 range-height grid. `atmospheric_parabolic_equation` implements the **Green's
 Function PE** (GFPE, Salomons Appendix H), the atmospheric member of the same
 split-step Fourier family as the ocean
-[`parabolic_equation`](../../underwater/underwater-solvers.md). Each range step:
+[`parabolic_equation`](https://jmrplens.github.io/phonometry/underwater/underwater-solvers/). Each range step:
 
 1. transforms the field to the vertical-wavenumber domain (FFT);
 2. applies the free-space propagator
@@ -1252,7 +1252,7 @@ The ground impedance is supplied directly (`impedance=`, a normalized complex
 value in the $e^{-i\omega t}$ convention of Salomons, with
 $\operatorname{Im}(Z) > 0$ for a passive ground), as a `PorousMediumResult`,
 or from an effective `flow_resistivity` via
-the [porous models](../../materials/absorbers/porous-absorbers.md) of the materials domain; the porous
+the [porous models](https://jmrplens.github.io/phonometry/materials/absorbers/porous-absorbers/) of the materials domain; the porous
 models work in the opposite $e^{+j\omega t}$ convention, so their impedance is
 conjugated internally.
 
@@ -1273,7 +1273,7 @@ The models are anchored by independent oracles:
 
 - **Homogeneous limit → spherical ground effect.** With a zero gradient the
   GFPE field must reproduce the exact Weyl-Van der Pol
-  [`ground_effect`](ground-barriers.md) at every range. It does so to a few
+  [`ground_effect`](https://jmrplens.github.io/phonometry/environment/propagation/ground-barriers/) at every range. It does so to a few
   tenths of a dB over grassland on the default grid (source and receiver near
   the ground, 50 m to 1 km), and to the coherent **+6 dB** two-ray enhancement
   over a rigid ground.
@@ -1285,7 +1285,7 @@ The models are anchored by independent oracles:
   inside the closed-form shadow distance.
 
 These checks are pinned numerically in the
-[conformance report](../../CONFORMANCE.md) (section "Atmospheric refraction").
+[conformance report](https://jmrplens.github.io/phonometry/reference/conformance/) (section "Atmospheric refraction").
 
 ## References
 
@@ -1297,9 +1297,9 @@ These checks are pinned numerically in the
 
 ---
 
-← [Spherical ground and barriers](ground-barriers.md) ·
-[Outdoor propagation (ISO 9613-2)](outdoor-propagation.md) ·
-[Underwater propagation solvers](../../underwater/underwater-solvers.md) ·
-[Documentation index](../../README.md)
+← [Spherical ground and barriers](https://jmrplens.github.io/phonometry/environment/propagation/ground-barriers/) ·
+[Outdoor propagation (ISO 9613-2)](https://jmrplens.github.io/phonometry/environment/propagation/outdoor-propagation/) ·
+[Underwater propagation solvers](https://jmrplens.github.io/phonometry/underwater/underwater-solvers/) ·
+[Documentation index](https://jmrplens.github.io/phonometry/)
 
 ---

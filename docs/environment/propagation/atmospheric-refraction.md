@@ -34,7 +34,7 @@ away on each side, and the wind profile deciding which of them hears anything.
 
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_atmospheric_refraction_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_atmospheric_refraction.svg" alt="Atmospheric refraction scene: a source 2 m above the ground with a receiver 350 m away on each side, wind arrows growing longer with height, and an inset of the effective sound-speed profiles c_eff(z) = c(z) + u(z); on the downwind side the rays curve back toward the ground and the receiver gets a direct plus a ground-bounced arrival, on the upwind side every ray bends upward and an acoustic shadow opens on the ground beyond about 220 m, swallowing the receiver standing inside it" width="92%"></picture>
 
-![Atmospheric refraction: ray bending and the acoustic shadow](../.github/images/atmospheric_refraction.webp)
+![Atmospheric refraction: ray bending and the acoustic shadow](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/atmospheric_refraction.webp)
 
 <details>
 <summary>Show the code for this figure</summary>

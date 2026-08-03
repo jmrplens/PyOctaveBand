@@ -1,4 +1,4 @@
-← [Documentation index](../README.md)
+← [Documentation index](../../README.md)
 
 # API Reference
 
@@ -1247,7 +1247,7 @@ well. The pre-3.2 flat paths, written without a subpackage, were removed in
   when the absolute band SPL must match single-pass conventions, and reserve
   zero-phase for when the temporal envelope matters (e.g. reverberation decay).
 - `mode='peak'` includes the filter's onset transient; a tone that starts
-  abruptly can overshoot by ~1 dB. See [Calibration and dBFS](../signal/metrology/calibration.md).
+  abruptly can overshoot by ~1 dB. See [Calibration and dBFS](../../signal/metrology/calibration.md).
 - `octave_filter()` caches filter bank designs internally (32 entries), so
   repeated calls with the same parameters skip the design phase. For explicit
   control use `OctaveFilterBank`.

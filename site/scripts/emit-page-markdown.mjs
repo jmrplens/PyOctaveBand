@@ -84,7 +84,12 @@ function absolutize(text, fromRoute) {
         if (step === "..") parts.pop();
         else if (step !== ".") parts.push(step);
       }
-      const route = parts.join("/").replace(/\/index$/, "");
+      const resolved = parts.join("/").replace(/\/index$/, "");
+      // The two generated documents live at the repository root in the mirror
+      // and are transplanted into these routes on the site.
+      const route =
+        { CONFORMANCE: "reference/conformance", ERRATA: "reference/errata" }[resolved] ??
+        resolved;
       return `](${SITE_URL}/${route}/${anchor})`;
     });
 }

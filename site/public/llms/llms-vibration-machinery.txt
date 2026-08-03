@@ -17,8 +17,8 @@ diagnosis: a peak is only evidence when it sits on a named line. This page
 covers the kinematics of M. P. Norton and D. G. Karczub, *Fundamentals of Noise
 and Vibration Analysis for Engineers* (2nd ed., Cambridge University Press,
 2003), Section 8.4, and how they combine with the signal chain the library
-already provides - the [envelope spectrum and cepstrum](../../signal/spectra/cepstrum-echoes.md) and
-[time synchronous averaging](../../signal/spectra/synchronous-averaging.md).
+already provides - the [envelope spectrum and cepstrum](https://jmrplens.github.io/phonometry/signal/spectra/cepstrum-echoes/) and
+[time synchronous averaging](https://jmrplens.github.io/phonometry/signal/spectra/synchronous-averaging/).
 
 The working view is the two put together: the envelope spectrum of a
 band-passed vibration record with the predicted lines drawn on top and named.
@@ -204,16 +204,16 @@ one function for each:
 2. **Detect and transform the envelope.** The repetition rate of the impacts
    is an amplitude modulation of that resonance, so it becomes a *line* in the
    envelope spectrum, at the fault frequency and its harmonics. See the
-   [cepstrum and envelope-spectrum guide](../../signal/spectra/cepstrum-echoes.md).
+   [cepstrum and envelope-spectrum guide](https://jmrplens.github.io/phonometry/signal/spectra/cepstrum-echoes/).
 3. **Name the lines.** Overlay the kinematic prediction. `.plot(spectrum=…)`
    accepts any `envelope_spectrum` result (or anything exposing `frequencies`
    and `amplitude`) and draws the predicted lines over it, coloured by family
    so shaft harmonics never read as bearing evidence.
 
 Two more tools help when the record is crowded.
-[Time synchronous averaging](../../signal/spectra/synchronous-averaging.md) removes everything not
+[Time synchronous averaging](https://jmrplens.github.io/phonometry/signal/spectra/synchronous-averaging/) removes everything not
 locked to one shaft, which separates a gearbox's two shafts before the
-sidebands are read; and the [cepstrum](../../signal/spectra/cepstrum-echoes.md) collapses a whole
+sidebands are read; and the [cepstrum](https://jmrplens.github.io/phonometry/signal/spectra/cepstrum-echoes/) collapses a whole
 harmonic or sideband family onto a single quefrency spike, which is the fastest
 way to tell *which* periodicity dominates when several are superimposed.
 
@@ -262,14 +262,14 @@ count.
 
 ## See also
 
-- [Cepstrum, echoes and the envelope spectrum](../../signal/spectra/cepstrum-echoes.md): the
+- [Cepstrum, echoes and the envelope spectrum](https://jmrplens.github.io/phonometry/signal/spectra/cepstrum-echoes/): the
   envelope spectrum these lines are drawn on, and the cepstral collapse of a
   harmonic family.
-- [Time synchronous averaging](../../signal/spectra/synchronous-averaging.md): separating one
+- [Time synchronous averaging](https://jmrplens.github.io/phonometry/signal/spectra/synchronous-averaging/): separating one
   shaft's signature from everything asynchronous with it.
-- [Mechanical mobility and the FRF family (ISO 7626-1)](../structural/mechanical-mobility.md):
+- [Mechanical mobility and the FRF family (ISO 7626-1)](https://jmrplens.github.io/phonometry/vibration/structural/mechanical-mobility/):
   finding the structural resonances a defect impact excites.
-- [Bending-wave transmission at plate junctions](../structural/junction-transmission.md): what
+- [Bending-wave transmission at plate junctions](https://jmrplens.github.io/phonometry/vibration/structural/junction-transmission/): what
   happens to the vibration once it leaves the machine.
 
 ## References
@@ -277,6 +277,6 @@ count.
 - Norton, M. P., & Karczub, D. G. (2003). *Fundamentals of noise and vibration
   analysis for engineers* (2nd ed., Section 8.4). Cambridge University Press.
 
-See the [bibliography](../../reference/bibliography.md) for full entries.
+See the [bibliography](https://jmrplens.github.io/phonometry/reference/bibliography/) for full entries.
 
 ---

@@ -320,7 +320,7 @@ The interpolator recovers the inter-sample excursion the sample grid missed
 inside the +0.2/−0.4 dB tolerance that EBU Mode meters must meet).
 EBU R 128 caps production at **−1 dBTP**; distribution codecs often need
 more headroom. This is the same oversampled-peak machinery behind the
-C-weighted `lc_peak` of [Integrated & Statistical Levels](../../signal/levels/levels.md).
+C-weighted `lc_peak` of [Integrated & Statistical Levels](https://jmrplens.github.io/phonometry/signal/levels/levels/).
 
 ## 6. Multichannel programmes and Annex 3
 
@@ -363,7 +363,7 @@ The stacked layout (compliance table on top, plot below) differs from the
 narrow two-panel body of the other fiches because the compliance table needs
 four columns and the loudness-vs-time trace is landscape. It uses the same
 `ReportMetadata` container and rendering engine as the
-[ISO 717 insulation fiche](../../buildings/insulation/insulation-ratings.md#report-metadata-reportmetadata);
+[ISO 717 insulation fiche](https://jmrplens.github.io/phonometry/buildings/insulation/insulation-ratings/#report-metadata-reportmetadata);
 a supplied `requirement` is read as the target programme loudness in LUFS
 (defaulting to the EBU R 128 −23.0 LUFS), and the fiche passes when the
 integrated loudness is within the selected R 128 tolerance of it and the true

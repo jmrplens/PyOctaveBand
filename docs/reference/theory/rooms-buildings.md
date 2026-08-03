@@ -2,7 +2,7 @@
 
 # Theory: Rooms and Buildings
 
-This page collects the theory behind rooms and buildings: impulse-response measurement and the room-acoustic parameters, background-noise criteria, airborne and impact insulation with their single-number ratings and uncertainty, and flanking and absorption prediction. It is part of the [theory reference](../theory.md); surface scattering and acoustic material characterisation live on [Materials and Surfaces](materials-surfaces.md).
+This page collects the theory behind rooms and buildings: impulse-response measurement and the room-acoustic parameters, background-noise criteria, airborne and impact insulation with their single-number ratings and uncertainty, and flanking and absorption prediction. It is part of the [theory reference](index.md); surface scattering and acoustic material characterisation live on [Materials and Surfaces](materials-surfaces.md).
 
 ## Room noise criteria (ANSI S12.2)
 
