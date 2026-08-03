@@ -66,8 +66,9 @@ _REMOVED_KEYWORDS = [
 def test_removed_3_1_alias_is_gone(module: str, name: str) -> None:
     import importlib
 
+    home = importlib.import_module(module)
     with pytest.raises(AttributeError):
-        getattr(importlib.import_module(module), name)
+        getattr(home, name)
 
 
 @pytest.mark.parametrize(("func", "keyword"), _REMOVED_KEYWORDS)
