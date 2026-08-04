@@ -255,7 +255,16 @@ def _is_sketch(code: str) -> bool:
 def _run_page(page: pathlib.Path) -> tuple[pathlib.Path, str]:
     """Run a page's blocks as one script; return its stderr tail on failure."""
     runnable = [b for b in _blocks(page) if not _is_sketch(b)]
-    script = "import matplotlib\nmatplotlib.use('Agg')\n" + "\n".join(runnable)
+    # A deprecated phonometry name in a snippet is an error, exactly as it is
+    # in the test suite (pyproject filterwarnings): the guides teach the
+    # canonical API, and a page that teaches an alias teaches a path that the
+    # next major release removes.
+    script = (
+        "import warnings\n"
+        "warnings.filterwarnings('error', message='.*is deprecated since phonometry.*',"
+        " category=DeprecationWarning)\n"
+        "import matplotlib\nmatplotlib.use('Agg')\n" + "\n".join(runnable)
+    )
     with tempfile.TemporaryDirectory() as tmp:
         path = pathlib.Path(tmp) / "snippet.py"
         path.write_text(script, encoding="utf-8")

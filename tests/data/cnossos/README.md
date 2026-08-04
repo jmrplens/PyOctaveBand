@@ -16,7 +16,7 @@ workbook was computed in 2014 with the database that Commission Directive
 Delegated Directive (EU) 2021/1226 replaced Tables G-1b, G-2, G-3a, G-4 and
 G-7. The coefficients of the current text live in `tests/reference_data.py`,
 transcribed from the Official Journal, and pin the tables shipped in
-`phonometry.environmental.cnossos_rail`.
+`phonometry.environment.sources.cnossos_rail`.
 
 Only the running conditions the Directive models are transcribed. The
 catalogue carries four (constant, accelerating, decelerating, idling) where
@@ -122,7 +122,7 @@ without the reconstruction.
 The coefficients of the current text, Tables F-1 to F-4 as they stand after
 (EU) 2021/1226, are *not* here: they live in `tests/reference_data.py`, also
 machine-transcribed from the Official Journal, and pin the tables shipped in
-`phonometry.environmental.cnossos_road`.
+`phonometry.environment.sources.cnossos_road`.
 
 `tests/environment/sources/test_cnossos_road.py` feeds the shipped equations of
 Annex II 2.2 the superseded 2015 coefficient set and requires the workbook's

@@ -32,7 +32,7 @@ three tiers, each independent of the code under test:
   (Sci. Rep. 7, 5389, 2017) is meshed at ``dx = 0.5 mm`` (slits, necks and
   cavities all resolved by at least four cells) and its 2 kHz NTFF polar
   response is compared against the library's TMM + Fraunhofer chain
-  (:func:`~phonometry.materials.metadiffuser_polar_response`), the
+  (:func:`~phonometry.materials.diffusers.metadiffuser_polar_response`), the
   end-to-end counterpart of the paper's TMM-vs-FEM comparison (their
   Fig. 3g), which the paper itself reports agreeing up to "small
   discrepancies". Grid convergence of the pattern was verified against a
