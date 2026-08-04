@@ -1,0 +1,146 @@
+---
+/**
+ * What a topic contains, on the landing page of that topic, on a phone.
+ *
+ * On a wide screen the sidebar answers this before the reader asks: opening
+ * `/signals/` shows its seven rows down the left. On a narrow one the sidebar
+ * is behind the menu button, so the same page opens with a title and prose and
+ * nothing that names the sections at all; the reader has to know to press the
+ * hamburger to find out what the topic holds. The authored list of sections is
+ * further down every landing page, but measured against the built site it
+ * starts between 1.1 and 2.7 screens below the fold.
+ *
+ * So this puts the topic's own sidebar tree at the top of its landing page,
+ * and only there: `md:sl-hidden` hides it the moment the real sidebar appears,
+ * and the component renders nothing on any page that is not a landing page,
+ * which is where the sidebar is a level deeper than the reader's position.
+ *
+ * The tree comes from `Astro.locals.starlightRoute.sidebar`, which by the time
+ * components render is already the current topic's own tree (the topics plugin
+ * registers its middleware first; see src/routeData.ts). Groups contribute
+ * their label with the count of what is inside, links contribute themselves,
+ * and the entry pointing at the page the reader is on is dropped, since a link
+ * to here is not a section of anything.
+ */
+import { topics } from '../data/topics.mjs';
+
+type Entry =
+	| { type: 'link'; href: string; label: string; isCurrent?: boolean }
+	| { type: 'group'; label: string; entries: Entry[] };
+
+const route = Astro.locals.starlightRoute;
+const sidebar = (route.sidebar ?? []) as Entry[];
+const here = Astro.url.pathname;
+const lang = route.lang?.startsWith('es') ? 'es' : 'en';
+
+const BASE = (import.meta.env.BASE_URL ?? '/').replace(/\/$/, '');
+const localeLink = (link: string) => (lang === 'es' ? `/es${link}` : link);
+const isLanding = topics.some((topic) => `${BASE}${localeLink(topic.link)}` === here);
+
+/** The first link inside a group, so its label can lead somewhere. */
+function firstLink(entries: Entry[]): { href: string; label: string } | undefined {
+	for (const entry of entries) {
+		if (entry.type === 'link') return entry;
+		const nested = firstLink(entry.entries);
+		if (nested) return nested;
+	}
+	return undefined;
+}
+
+function countLinks(entries: Entry[]): number {
+	return entries.reduce(
+		(total, entry) => total + (entry.type === 'link' ? 1 : countLinks(entry.entries)),
+		0,
+	);
+}
+
+const rows = sidebar
+	.map((entry) => {
+		if (entry.type === 'link') {
+			return entry.href === here ? undefined : { href: entry.href, label: entry.label, count: 0 };
+		}
+		const target = firstLink(entry.entries);
+		if (!target) return undefined;
+		return { href: target.href, label: entry.label, count: countLinks(entry.entries) };
+	})
+	.filter((row): row is { href: string; label: string; count: number } => row !== undefined);
+
+const t =
+	lang === 'es'
+		? { heading: 'En este tema', pages: (n: number) => `${n} páginas` }
+		: { heading: 'In this topic', pages: (n: number) => `${n} pages` };
+---
+
+{
+	isLanding && rows.length > 0 && (
+		<nav class="topic-sections md:sl-hidden" aria-labelledby="topic-sections-heading">
+			<h2 id="topic-sections-heading">{t.heading}</h2>
+			<ul>
+				{rows.map((row) => (
+					<li>
+						<a href={row.href}>
+							<span class="label">{row.label}</span>
+							{row.count > 1 && <span class="count">{t.pages(row.count)}</span>}
+						</a>
+					</li>
+				))}
+			</ul>
+		</nav>
+	)
+}
+
+<style>
+	/* A navigation block, not prose: it sits above the introduction and has to
+	   read as the map of the page rather than as its first paragraph. */
+	.topic-sections {
+		border: 1px solid var(--sl-color-gray-5);
+		border-radius: 0.5rem;
+		margin-block: 1rem 1.5rem;
+		padding: 0.75rem 0.9rem;
+	}
+
+	.topic-sections h2 {
+		font-size: var(--sl-text-xs);
+		font-weight: 600;
+		letter-spacing: 0.08em;
+		text-transform: uppercase;
+		color: var(--sl-color-gray-3);
+		margin: 0 0 0.5rem;
+		border: 0;
+		padding: 0;
+	}
+
+	.topic-sections ul {
+		list-style: none;
+		margin: 0;
+		padding: 0;
+	}
+
+	.topic-sections li + li {
+		border-top: 1px solid var(--sl-color-gray-6);
+	}
+
+	/* The whole row is the target, so a thumb does not have to find the words. */
+	.topic-sections a {
+		display: flex;
+		align-items: baseline;
+		gap: 0.6rem;
+		justify-content: space-between;
+		padding: 0.5rem 0;
+		text-decoration: none;
+		color: var(--sl-color-white);
+	}
+
+	.topic-sections a:hover .label,
+	.topic-sections a:focus-visible .label {
+		color: var(--sl-color-text-accent);
+		text-decoration: underline;
+	}
+
+	.topic-sections .count {
+		flex-shrink: 0;
+		font-size: var(--sl-text-xs);
+		color: var(--sl-color-gray-3);
+		font-variant-numeric: tabular-nums;
+	}
+</style>
