@@ -176,7 +176,14 @@ for (const c of CASES) {
 	}
 	await page.setViewport({ width: c.width, height: c.height, deviceScaleFactor: SHOTS ? 2 : 1 });
 	await page.goto(`${BASE}${BASE_PATH}${c.path}`, { waitUntil: 'domcontentloaded', timeout: 90000 });
-	await page.addStyleTag({ content: 'astro-dev-toolbar{display:none !important}' });
+	// Only the dev server renders this toolbar, so against a preview of `dist`
+	// the rule matches nothing. The call itself is not free of consequence: the
+	// execution context can be replaced between the navigation and it, and the
+	// rejection failed a whole run once for a style rule that had nothing to
+	// hide. Losing it costs nothing, so it is allowed to fail.
+	await page
+		.addStyleTag({ content: 'astro-dev-toolbar{display:none !important}' })
+		.catch(() => {});
 	await new Promise((r) => setTimeout(r, 500));
 
 	const { problems, root, wrapped } = await page.evaluate(audit);

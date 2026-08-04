@@ -318,6 +318,10 @@ ANSI/ASA S12.2 y ASTM E413/E1414.
 - [Transmisión por flancos en laboratorio (ISO 10848)](/phonometry/es/buildings/insulation/flanking-lab/):
   el índice de reducción de vibraciones de unión y las diferencias de niveles de
   flanco medidas en una instalación de ensayo.
+- [Fuentes de impacto pesadas y blandas (ISO 16283-2)](/phonometry/es/buildings/insulation/heavy-impact-sources/):
+  la pelota de caucho y la máquina de neumático: el nivel de exposición a la
+  fuerza de impacto que las especifica, la comprobación de laboratorio que tienen
+  que pasar y el número único del anexo D de ISO 717-2.
 - [Índices globales de aislamiento (ISO 717)](/phonometry/es/buildings/insulation/insulation-ratings/):
   los motores de curva de referencia aéreo y de impactos con $C$, $C_{tr}$ y
   $C_I$, los términos de rango ampliado y la ficha de ISO 717.
@@ -334,6 +338,10 @@ ANSI/ASA S12.2 y ASTM E413/E1414.
 - [Predicción del aislamiento acústico (EN 12354)](/phonometry/es/buildings/design/insulation-prediction/):
   el aislamiento in situ a ruido aéreo y de impactos entre recintos a partir de
   datos de elementos, con sus caminos de flancos.
+- [Predicción detallada por bandas (ISO 12354)](/phonometry/es/buildings/design/detailed-prediction/):
+  la misma predicción banda a banda en vez de como un solo número: datos in situ
+  de elemento y de unión, el índice por flancos y el nivel de impactos, y la
+  contribución de cada camino a R'w y L'n,w.
 - [Predicción del aislamiento de paneles](/phonometry/es/buildings/design/panel-sound-insulation/):
   la ley de masa y la caída de coincidencia, las paredes dobles, rendijas y
   aberturas, la eficiencia de radiación de placas y las movilidades puntuales.
@@ -467,6 +475,10 @@ IEC 61400-11.
 - [Ruido de rotorcraft: el método del hemisferio](/phonometry/es/aircraft/rotorcraft-noise/):
   el modelo de fuente en hemisferio con sus ajustes de propagación, la
   interpolación de condiciones de vuelo y los contornos de suceso único.
+- [Emisión de la fuente ferroviaria CNOSSOS-EU](/phonometry/es/environment/sources/cnossos-rail-emission/):
+  la fuente ferroviaria del anexo II 2.3: rugosidad y filtro de contacto, ruido
+  de impacto, chirrido en curva, tracción y ruido aerodinámico, y las dos líneas
+  de fuente equivalentes.
 - [Ruido de aerogeneradores: potencia y audibilidad tonal](/phonometry/es/environment/sources/wind-turbine-noise/):
   el nivel de potencia acústica aparente referido al centro del rotor y la cadena
   de audibilidad tonal que decide si un tono se oye.
@@ -490,6 +502,11 @@ ISO 17208-1/-2, ISO 18406 y JOMOPANS-ECHO.
 - [Solvers numéricos de propagación submarina](/phonometry/es/underwater/underwater-solvers/):
   los solvers de modos normales, trazado de rayos y ecuación parabólica de la
   guía de ondas estratificada, y cómo elegir modelo de propagación.
+
+- [Exposición a ruido de mamíferos marinos](/phonometry/es/underwater/marine-mammal-exposure/):
+  la cara auditiva de ese ruido: los audiogramas de grupo, las funciones de
+  ponderación reglamentarias con su versión de guía, y la exposición de una
+  campaña de hincado frente a los criterios de lesión.
 
 ## [Fuentes y dispositivos](/phonometry/es/devices/)
 

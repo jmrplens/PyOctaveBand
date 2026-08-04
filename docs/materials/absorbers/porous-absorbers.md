@@ -425,7 +425,7 @@ $|\mu_a| > 40$ above 50 Hz, and $\mu_b$ falls from 1.0 at 50 Hz to 0.82 at
 even though the printed sentence says "the ratio modulus": the model gives
 $\mu_b(1500) = 0.811 + 0.473j$, whose real part is 1.1 % from the printed
 value while its modulus, 0.939, is 14.5 % away. That is recorded in
-[Errata](/phonometry/reference/errata/), along with the parameter sweep that
+[Errata](../../ERRATA.md), along with the parameter sweep that
 fails to bring $|\mu_b|$ anywhere near 0.82. The impedance peak of the book's
 thinner sample is printed as 860 Hz and comes out at 863.5 Hz under the
 $\mathrm{Im}(Z_s)$ peak rule. Everything else, including the whole

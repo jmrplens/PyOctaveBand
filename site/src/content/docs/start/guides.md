@@ -304,6 +304,10 @@ ISO 12999-1, ISO 10052, ANSI/ASA S12.2 and ASTM E413/E1414.
 - [Laboratory Flanking Transmission (ISO 10848)](/phonometry/buildings/insulation/flanking-lab/):
   the junction vibration reduction index and the flanking level differences
   measured on a test facility.
+- [Heavy and Soft Impact Sources (ISO 16283-2)](/phonometry/buildings/insulation/heavy-impact-sources/):
+  the rubber ball and the bang machine: the impact force exposure level that
+  specifies them, the laboratory check they have to pass, and the single number
+  of ISO 717-2 Annex D.
 - [Insulation Ratings (ISO 717)](/phonometry/buildings/insulation/insulation-ratings/):
   the airborne and impact reference-curve engines with $C$, $C_{tr}$ and $C_I$,
   the enlarged-range terms and the ISO 717 fiche.
@@ -319,6 +323,10 @@ ISO 12999-1, ISO 10052, ANSI/ASA S12.2 and ASTM E413/E1414.
 - [Predicting Sound Insulation (EN 12354)](/phonometry/buildings/design/insulation-prediction/):
   in-situ airborne and impact insulation between rooms from element data, with
   their flanking paths.
+- [Detailed Per-Band Prediction (ISO 12354)](/phonometry/buildings/design/detailed-prediction/):
+  the same prediction band by band rather than as one number: in-situ element and
+  junction data, the flanking index and impact level, and the per-path
+  contributions behind R'w and L'n,w.
 - [Predicting Panel Sound Insulation](/phonometry/buildings/design/panel-sound-insulation/):
   the mass law and coincidence dip, double walls, slits and apertures, plate
   radiation efficiency and point mobilities.
@@ -444,6 +452,10 @@ SAE ARP 5534, ECAC Doc 29/32 and IEC 61400-11.
 - [Rotorcraft noise: the hemisphere method](/phonometry/aircraft/rotorcraft-noise/):
   the hemisphere source model with its propagation adjustments, flight-condition
   interpolation, and the single-event contours.
+- [CNOSSOS-EU railway source emission](/phonometry/environment/sources/cnossos-rail-emission/):
+  the rail source of Annex II 2.3: roughness and the contact filter, impact
+  noise, curve squeal, traction and aerodynamic noise, and the two equivalent
+  source lines.
 - [Wind-turbine noise: sound power and tonal audibility](/phonometry/environment/sources/wind-turbine-noise/):
   the apparent sound power level referred to the rotor centre, and the tonal
   audibility chain that decides whether a tone is audible.
@@ -466,6 +478,11 @@ JOMOPANS-ECHO.
 - [Underwater propagation solvers](/phonometry/underwater/underwater-solvers/):
   the normal-mode, ray-tracing and parabolic-equation solvers of the
   stratified waveguide, and how to choose a propagation model.
+
+- [Marine-mammal noise exposure](/phonometry/underwater/marine-mammal-exposure/):
+  the hearing side of that noise: the group audiograms, the regulatory weighting
+  functions with their guidance version, and the exposure of a pile-driving
+  campaign against the injury criteria.
 
 ## [Sources and devices](/phonometry/devices/)
 

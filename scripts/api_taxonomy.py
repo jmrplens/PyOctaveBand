@@ -416,7 +416,7 @@ def module_section(module: str) -> Section:
 
 
 def _parent_subpackage(module: str) -> str:
-    """``phonometry.signals.levels`` -> ``signal``; top level -> ``""``."""
+    """``phonometry.signals.levels`` -> ``signals``; top level -> ``""``."""
     parts = module.split(".")
     return parts[1] if len(parts) > 2 else ""
 

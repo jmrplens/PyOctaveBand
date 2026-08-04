@@ -24,11 +24,12 @@ export const BASE_PATH = basePath;
 /**
  * The puppeteer package.
  *
- * It is in the tree because pa11y-ci depends on it, not because we declare it,
- * so under pnpm's default layout it is not linked into site/node_modules and a
- * plain import does not find it. Normal resolution first (which is what works
- * under `node-linker=hoisted`, npm and yarn), then the virtual store, then one
- * actionable error.
+ * It is a declared dev dependency now. It used to be in the tree only because
+ * pa11y-ci depends on it, which under pnpm's default layout does not link it
+ * into site/node_modules at all: a plain import did not find it, and five
+ * checks rested on a package that a pa11y-ci upgrade could have taken away
+ * without a word. The store lookup below is kept because it costs nothing and
+ * still answers the case where the declared copy is not linked.
  */
 export function loadPuppeteer() {
 	const require = createRequire(import.meta.url);

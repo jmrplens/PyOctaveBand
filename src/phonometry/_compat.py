@@ -46,7 +46,7 @@ _IMPULSIVE_SOUND = "phonometry.environment.assessment.impulsive_sound"
 #: Old module path -> relocated module path for the 4.0 taxonomy. The
 #: oversized ``metrology`` catch-all became three packages: the normalized
 #: frequency selectivity in ``filters``, the general signal analysis in
-#: ``signal``, and the transverse metrology that gives the package its name.
+#: ``signals``, and the transverse metrology that gives the package its name.
 _MOVED_4X: dict[str, str] = {
     "phonometry.metrology.core": "phonometry.filters.core",
     "phonometry.metrology.filter_design": "phonometry.filters.design",
