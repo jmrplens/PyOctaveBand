@@ -104,13 +104,18 @@ export const topicIcons = {
     <path d="M3 21h9" />
   `,
 
-  // A fish. The abstractions all failed: wavefronts under a surface drew a
-  // face, and a hydrophone on its cable drew a pair of horns. This one is read
-  // correctly at any size, and the topic is propagation in water, ship noise
-  // and what both do to the animals living in it.
+  // A ship radiating down through the surface it floats on. The topic is
+  // propagation in water, ship radiated noise and what it does to the animals
+  // living in it, and the vessel names the source rather than the fauna. The
+  // abstractions all failed first: wavefronts under a surface drew a face, a
+  // hydrophone on its cable drew a pair of horns, and the waveguide, which is
+  // the figure the topic actually turns on, closed into a blob.
   underwater: `
-    <path d="M2.8 12c2.6-4.2 6-6.3 9.5-6.3 2.8 0 5.2 1.2 6.7 3.2l2.9-2.4v11l-2.9-2.4c-1.5 2-3.9 3.2-6.7 3.2-3.5 0-6.9-2.1-9.5-6.3z" />
-    <circle cx="7.6" cy="10.4" r="1.05" fill="currentColor" stroke="none" />
+    <path d="M2.2 9.6h19.6" />
+    <path d="M4.8 5.2h14.4l-2.6 4.2H7.4z" />
+    <path d="M12 2.2v3" />
+    <path d="M7.2 14a5.9 5.9 0 0 0 9.6 0" />
+    <path d="M4 18.4a10.6 10.6 0 0 0 16 0" />
   `,
 
   // A measurement microphone on its stand: the instrument the topic is about,
