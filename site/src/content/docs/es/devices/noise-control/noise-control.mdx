@@ -22,6 +22,7 @@ references:
 
 import ThemeImage from '../../../../../components/ThemeImage.astro';
 import Video from '../../../../../components/Video.astro';
+import ReportPreview from '../../../../../components/ReportPreview.astro';
 
 Tres medidas pasivas dominan el control de ruido aplicado: los **silenciadores**
 en un conducto, las atenuaciones pasivas y el ruido autogenerado de una
@@ -156,6 +157,44 @@ de ASHRAE; no hay forma cerrada en esa edición. Este módulo reproduce e
 interpola la tabla.
 :::
 
+Un `HvacSpectrumResult` también se archiva solo: `.report()` genera una ficha de
+una página con el ruido del conducto, la tabla por banda junto al espectro, el
+resultado de número único en su recuadro — el nivel de potencia acústica
+ponderado A para un espectro de ruido regenerado, la atenuación media para uno
+de atenuación — y, cuando se declara un `requirement`, el veredicto frente a él
+(un $L_{WA}$ máximo para el ruido regenerado, una atenuación media mínima para
+una atenuación).
+
+```python
+from phonometry import ReportMetadata
+from phonometry.noise_control import hvac
+
+octaves = [63.0, 125.0, 250.0, 500.0, 1000.0, 2000.0, 4000.0]
+
+# El ruido de flujo de un conducto de impulsión recto con aire a 12 m/s.
+duct = hvac.flow_noise_straight_duct(octaves, flow_velocity=12.0, area=0.04)
+duct.report(
+    "ruido-conducto-hvac.pdf",          # necesita phonometry[report]
+    metadata=ReportMetadata(
+        specimen="Conducto de impulsión recto, sección de 0,04 m2",
+        test_room="Sala de climatización (caso de diseño)",
+        measurement_standard="Modelo de predicción VDI 2081-1",
+        requirement=45.0,               # L_WA máximo admisible, dB(A)
+    ),
+    language="es",                      # ficha en español
+)
+```
+
+La ficha de ejemplo se regenera con `make reports` y se mantiene renderizada en
+el repositorio; pulse la vista previa para abrir el PDF.
+
+<ReportPreview
+	name="hvac_duct_noise_example"
+	title="Informe de ejemplo del espectro de ruido de un conducto HVAC (PDF)"
+	description="Ficha de ruido de conducto HVAC de una página: una cabecera de metadatos con el conducto de impulsión recto y la sala de climatización, una tabla por bandas de octava del nivel de potencia acústica generado por el flujo, que cae de 42,5 dB en 63 Hz a 21,8 dB en 4 kHz, el mismo espectro representado al lado, el nivel de potencia acústica ponderado A LWA = 38,8 dB(A) re 1 pW enmarcado con el nivel global sin ponderar LW = 47,0 dB re 1 pW, y un veredicto APTO frente a un máximo declarado de 45,0 dB(A)."
+	caption="Ficha de ruido de conducto HVAC (HvacSpectrumResult.report), la potencia acústica generada por el flujo en un conducto recto a 12 m/s con sección de 0,04 m2."
+/>
+
 ## 2. Cerramientos de máquina
 
 Un cerramiento sellado reduce el ruido radiado en la pérdida de transmisión del
@@ -233,7 +272,44 @@ plt.show()
 
 `enclosure_insertion_loss` devuelve un `EnclosureResult` con la
 `panel_transmission_loss` del panel, la `correction` interior, la `insertion_loss`
-neta, la `room_constant` interior y `.plot()`.
+neta, la `room_constant` interior y `.plot()`. También se archiva solo:
+`.report()` genera una ficha de cerramiento de una página con la tabla por banda
+de $R$, $C$ e $\mathrm{IL}$ junto a las tres curvas, la pérdida de inserción
+media en su recuadro con las áreas de las que sale y, cuando se declara un
+`requirement`, el veredicto frente a esa pérdida de inserción media mínima.
+
+```python
+import numpy as np
+from phonometry import ReportMetadata, enclosure_insertion_loss
+
+octaves = np.array([63.0, 125.0, 250.0, 500.0, 1000.0, 2000.0, 4000.0])
+sheet_steel_R = np.array([18.0, 22.0, 28.0, 33.0, 38.0, 42.0, 45.0])
+
+case = enclosure_insertion_loss(
+    sheet_steel_R, external_area=24.0, internal_area=30.0,
+    internal_absorption=0.30, frequencies=octaves,
+)
+case.report(
+    "cerramiento.pdf",                  # necesita phonometry[report]
+    metadata=ReportMetadata(
+        specimen="Cerramiento de máquina ajustado de chapa de acero",
+        test_room="Nave de máquinas, línea 3 (caso de diseño)",
+        measurement_standard="Modelo de predicción Bies y Hansen 7.4.2",
+        requirement=20.0,               # IL media mínima admisible, dB
+    ),
+    language="es",                      # ficha en español
+)
+```
+
+La ficha de ejemplo se regenera con `make reports` y se mantiene renderizada en
+el repositorio; pulse la vista previa para abrir el PDF.
+
+<ReportPreview
+	name="enclosure_insertion_loss_example"
+	title="Informe de ejemplo de pérdida por inserción de un cerramiento de máquina (PDF)"
+	description="Ficha de cerramiento de máquina de una página: una cabecera de metadatos con el cerramiento ajustado de chapa de acero y la nave de máquinas, una tabla por bandas de octava con la pérdida de transmisión del panel R aportada, la corrección interior C y la pérdida por inserción neta IL (18,0, 3,4 y 14,6 dB en 63 Hz hasta 45,0, 3,4 y 41,6 dB en 4 kHz), las curvas de R, C e IL representadas al lado, la pérdida por inserción media IL = 28,9 dB enmarcada con la R media del panel de 32,3 dB y las áreas externa e interna SE = 24,00 m2 y Si = 30,00 m2, y un veredicto APTO frente a un mínimo declarado de 20,0 dB."
+	caption="Ficha de cerramiento de máquina (EnclosureResult.report), la pérdida por inserción neta IL = R - C que entrega el caso de diseño de chapa de acero."
+/>
 
 ## Qué cubre esta guía
 

@@ -22,6 +22,7 @@ references:
 
 import ThemeImage from '../../../../components/ThemeImage.astro';
 import Video from '../../../../components/Video.astro';
+import ReportPreview from '../../../../components/ReportPreview.astro';
 
 Three passive measures dominate applied noise control: **silencers** in a duct,
 the passive attenuations and regenerated noise of an **HVAC** run, and a
@@ -150,6 +151,42 @@ look-up; there is no closed form in that edition. This module reproduces and
 interpolates the table.
 :::
 
+An `HvacSpectrumResult` also files itself: `.report()` renders a one-page
+duct-noise fiche with the per-band table beside the spectrum, the boxed
+single-number result — the A-weighted sound power level for a regenerated-noise
+spectrum, the mean attenuation for an attenuation one — and, when a
+`requirement` is declared, the verdict against it (a maximum $L_{WA}$ for
+regenerated noise, a minimum mean attenuation for an attenuation).
+
+```python
+from phonometry import ReportMetadata
+from phonometry.noise_control import hvac
+
+octaves = [63.0, 125.0, 250.0, 500.0, 1000.0, 2000.0, 4000.0]
+
+# The flow noise of a straight supply duct carrying air at 12 m/s.
+duct = hvac.flow_noise_straight_duct(octaves, flow_velocity=12.0, area=0.04)
+duct.report(
+    "hvac-duct-noise.pdf",              # needs phonometry[report]
+    metadata=ReportMetadata(
+        specimen="Straight supply duct, 0.04 m2 cross-section (design case)",
+        test_room="Air-handling plant room (design case)",
+        measurement_standard="VDI 2081-1 prediction model",
+        requirement=45.0,               # maximum acceptable L_WA, dB(A)
+    ),
+)
+```
+
+The example fiche is regenerated with `make reports` and kept rendered in the
+repository; click the preview to open the PDF.
+
+<ReportPreview
+	name="hvac_duct_noise_example"
+	title="HVAC duct noise spectrum example report (PDF)"
+	description="One-page HVAC duct-noise fiche: a metadata header naming the straight supply duct and the air-handling plant room, an octave-band table of the flow-generated sound power level falling from 42.5 dB at 63 Hz to 21.8 dB at 4 kHz, the same spectrum plotted beside it, the boxed A-weighted sound power level LWA = 38.8 dB(A) re 1 pW with the overall unweighted LW = 47.0 dB re 1 pW, and a PASS verdict against a declared maximum of 45.0 dB(A)."
+	caption="HVAC duct-noise fiche (HvacSpectrumResult.report), the flow-generated sound power of a straight duct at 12 m/s in a 0.04 m2 cross-section."
+/>
+
 ## 2. Machine enclosures
 
 A sealed enclosure reduces the radiated noise by its panel transmission loss
@@ -228,7 +265,43 @@ plt.show()
 
 `enclosure_insertion_loss` returns an `EnclosureResult` with the panel
 `panel_transmission_loss`, the interior `correction`, the net `insertion_loss`,
-the interior `room_constant`, and `.plot()`.
+the interior `room_constant`, and `.plot()`. It also files itself: `.report()`
+renders a one-page enclosure fiche with the per-band $R$, $C$ and
+$\mathrm{IL}$ table beside the three curves, the boxed mean insertion loss with
+the surface areas it was computed from, and, when a `requirement` is declared,
+the verdict against that minimum mean insertion loss.
+
+```python
+import numpy as np
+from phonometry import ReportMetadata, enclosure_insertion_loss
+
+octaves = np.array([63.0, 125.0, 250.0, 500.0, 1000.0, 2000.0, 4000.0])
+sheet_steel_R = np.array([18.0, 22.0, 28.0, 33.0, 38.0, 42.0, 45.0])
+
+case = enclosure_insertion_loss(
+    sheet_steel_R, external_area=24.0, internal_area=30.0,
+    internal_absorption=0.30, frequencies=octaves,
+)
+case.report(
+    "enclosure.pdf",                    # needs phonometry[report]
+    metadata=ReportMetadata(
+        specimen="Sheet-steel close-fitting machine enclosure (design case)",
+        test_room="Machine hall, line 3 (design case)",
+        measurement_standard="Bies & Hansen 7.4.2 prediction model",
+        requirement=20.0,               # minimum acceptable mean IL, dB
+    ),
+)
+```
+
+The example fiche is regenerated with `make reports` and kept rendered in the
+repository; click the preview to open the PDF.
+
+<ReportPreview
+	name="enclosure_insertion_loss_example"
+	title="Machine enclosure insertion loss example report (PDF)"
+	description="One-page machine-enclosure fiche: a metadata header naming the sheet-steel close-fitting enclosure and the machine hall, an octave-band table of the supplied panel transmission loss R, the interior correction C and the net insertion loss IL (18.0, 3.4 and 14.6 dB at 63 Hz up to 45.0, 3.4 and 41.6 dB at 4 kHz), the R, C and IL curves plotted beside it, the boxed mean insertion loss IL = 28.9 dB with the mean panel R = 32.3 dB and the external and internal surface areas SE = 24.00 m2 and Si = 30.00 m2, and a PASS verdict against a declared minimum of 20.0 dB."
+	caption="Machine-enclosure fiche (EnclosureResult.report), the net insertion loss IL = R - C the sheet-steel design case delivers."
+/>
 
 ## What this guide covers
 

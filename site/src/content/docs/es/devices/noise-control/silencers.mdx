@@ -30,6 +30,7 @@ references:
 
 import ThemeImage from '../../../../../components/ThemeImage.astro';
 import Video from '../../../../../components/Video.astro';
+import ReportPreview from '../../../../../components/ReportPreview.astro';
 
 Un silenciador se gana el sueldo dentro de un conducto: entre un motor y su
 escape, entre un ventilador y la sala a la que sirve. Dos principios de
@@ -331,6 +332,48 @@ Cada uno devuelve un `ReactiveSilencerResult` con `transmission_loss`,
 `transfer_matrix` y `.plot()`. Las configuraciones avanzadas encadenan elementos
 directamente con `duct_matrix`, `shunt_matrix`, `cascade`, `transmission_loss` e
 `insertion_loss`.
+
+`ReactiveSilencerResult` también se archiva solo: `.report()` genera un PDF de
+una página con la disposición de una hoja de prestaciones de silenciador, con
+la línea de base metodológica que nombra el método de cuatro polos de onda
+plana (Munjal Ec. (3.27); Bies §8.8-8.9), una cabecera de metadatos opcional
+(cliente, dispositivo, entorno de ensayo, instrumentación, clima, fecha), la
+tabla por bandas de la pérdida de transmisión (y de la de inserción cuando se
+dieron las impedancias) junto a esas mismas curvas, la pérdida de transmisión
+media sobre las bandas de análisis en su recuadro con el valor de pico y el
+tipo de dispositivo, y un veredicto opcional frente a una pérdida de
+transmisión media mínima declarada. El renderizado necesita reportlab y, para
+la figura que incrusta la ficha, matplotlib (`pip install
+"phonometry[report,plot]"`); pase `language="es"` para una ficha en español.
+
+```python
+import numpy as np
+from phonometry import ReportMetadata, expansion_chamber
+
+# Una cámara de 0,5 m con relación de áreas m = 8, en los centros de octava.
+freqs = np.array([63.0, 125.0, 250.0, 500.0, 1000.0, 2000.0, 4000.0])
+res = expansion_chamber(freqs, length=0.5, chamber_area=0.08, pipe_area=0.01)
+res.report(
+    "ficha_silenciador.pdf",
+    metadata=ReportMetadata(
+        specimen="Silenciador de cámara de expansión simple (m = 8, diseño)",
+        measurement_standard="Modelo de cuatro polos, Munjal Ec. (3.27)",
+        laboratory="Laboratorio de referencia Phonometry",
+        requirement=6.0,            # pérdida de transmisión media mínima
+    ),
+    language="es",                  # ficha en español (separador decimal coma)
+)                                   # pérdida de transmisión media y de pico (dB)
+```
+
+La ficha de ejemplo se regenera con `make reports` y se mantiene renderizada en
+el repositorio; pulse la vista previa para abrir el PDF.
+
+<ReportPreview
+	name="reactive_silencer_example"
+	title="Informe de ejemplo de pérdida de transmisión de un silenciador reactivo (PDF)"
+	description="Ficha de silenciador reactivo de una página: una cabecera de metadatos con el cliente, el silenciador de cámara de expansión con relación de áreas m = 8 como fuente de ruido, el estudio de diseño del sistema de conductos y la fecha de ensayo, la tabla de pérdida de transmisión por bandas de octava con 7,5, 11,4, 9,9, 12,1, 3,2, 7,0 y 11,1 dB de 63 Hz a 4 kHz junto a esa misma curva frente a la frecuencia, la pérdida de transmisión media TL = 8,9 dB enmarcada con el valor de pico de 12,1 dB y el dispositivo identificado como cámara de expansión, un veredicto APTO frente al mínimo exigido de 6,0 dB, y la nota de que el resultado es una predicción de onda plana a partir de la geometría declarada y no una medida."
+	caption="Ficha de silenciador reactivo (ReactiveSilencerResult.report), la pérdida de transmisión media sobre las bandas de análisis con su valor de pico."
+/>
 
 ## 2. ¿Reactivo o disipativo?
 

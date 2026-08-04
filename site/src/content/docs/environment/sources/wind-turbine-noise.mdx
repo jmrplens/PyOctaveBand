@@ -26,6 +26,7 @@ references:
 ---
 
 import ThemeImage from '../../../../components/ThemeImage.astro';
+import ReportPreview from '../../../../components/ReportPreview.astro';
 
 IEC 61400-11 measures the acoustic emission of a wind turbine. This page covers
 its two closed-form quantities: the **apparent sound power level** referred to
@@ -166,6 +167,57 @@ candidate. The audibility formula coincides with ISO 1996-2 Annex C; what is
 specific to IEC 61400-11 is the determination of the tone and masking levels
 and the Zwicker critical band from the spectrum. For a rating adjustment
 $K_T$, pass the mean audibility to the ISO 1996-2 `tonal_adjustment`.
+
+### Assessment report (`.report()`)
+
+`WindTurbineTonalityResult.report(path)` renders a one-page PDF fiche laid out
+like the tonality assessment of an environmental-noise laboratory, following
+**IEC 61400-11:2012+A1:2018** (subclauses 9.5.2 to 9.5.8): a standard-basis
+line, an optional metadata header block (source/situation, client, measurement
+position, instrumentation and date), a critical-band analysis table (tone
+frequency, critical bandwidth, tone level $L_{pt}$, masking-noise level
+$L_{pn}$, tonality $\Delta L_{tn}$, audibility criterion $L_a$ and tonal
+audibility $\Delta L_a$) beside the narrowband-spectrum plot with the critical
+band, the masking level and the tone marked, the boxed tonal audibility
+$\Delta L_a$ together with the tone frequency and the audibility decision, an
+optional PASS/FAIL verdict row and a note on how $\Delta L_a$ is built, and a
+footer with the fixed disclaimer.
+
+It uses the same `ReportMetadata` container and rendering engine as the
+[ISO 532-1 loudness fiche](/phonometry/perception/psychoacoustics/loudness/#iso-532-1-report-report);
+a supplied `requirement` is read as the maximum acceptable tonal audibility
+$\Delta L_a$ in dB (a less audible tone passes). Rendering needs reportlab and,
+for the figure the fiche embeds, matplotlib (`pip install
+"phonometry[report,plot]"`); only `engine="reportlab"` is supported. The fiche
+renders in English by default; pass `language="es"` for a Spanish fiche
+(translated fixed strings and a comma decimal separator), e.g.
+`res.report("tonality_fiche_es.pdf", language="es")`.
+
+```python
+from phonometry import environment, ReportMetadata
+
+# The 500 Hz gearbox tone over the flat 30 dB floor of the snippet above.
+res = environment.wind_turbine_tonality(levels, frequencies)
+res.report(
+    "tonality_fiche.pdf",
+    metadata=ReportMetadata(
+        specimen="Horizontal-axis wind turbine, gearbox tone",
+        measurement_standard="IEC 61400-11",
+        laboratory="Phonometry Reference Laboratory",
+        requirement=6.0,            # maximum acceptable tonal audibility (dB)
+    ),
+)                                   # tonal audibility (dB) and the decision
+```
+
+The example fiche is regenerated with `make reports` and kept rendered in the
+repository; click the preview to open the PDF.
+
+<ReportPreview
+	name="iec61400_wind_turbine_tonality_example"
+	title="IEC 61400-11 wind-turbine tonal audibility example report (PDF)"
+	description="One-page wind-turbine tonal-audibility fiche: a metadata header, a critical-band analysis table (tone frequency 500.0 Hz, critical bandwidth 117.3 Hz, tone level Lpt = 60.0 dB, masking-noise level Lpn = 45.9 dB, tonality ΔL_tn = 14.1 dB, audibility criterion La = -2.3 dB) beside the narrowband-spectrum plot with the critical band shaded and the masking level drawn, the boxed tonal audibility ΔL_a = 16.4 dB at the 500.0 Hz tone with the decision that the tone is audible, and a FAIL verdict against a maximum acceptable audibility of 6.0 dB."
+	caption="Wind-turbine tonal-audibility fiche (WindTurbineTonalityResult.report), tonal audibility ΔL_a in dB with the audibility decision."
+/>
 
 ## See also
 
