@@ -104,7 +104,11 @@ for (const { lang, root, word } of LOCALES) {
 	const routes = guideRoutes(root);
 	const index = readFileSync(join(root, 'start', 'guides.md'), 'utf8');
 
-	const missing = routes.filter((route) => !index.includes(`${route}/`));
+	// The route has to appear as a link destination, not merely as text: a slug
+	// in a code block or a comment would satisfy a plain substring while giving
+	// the reader nothing to select.
+	const prefix = lang === 'es' ? '/phonometry/es/' : '/phonometry/';
+	const missing = routes.filter((route) => !index.includes(`](${prefix}${route}/)`));
 	if (missing.length > 0) {
 		fail(`${lang}: ${missing.length} guide(s) the index does not link: ${missing.join(', ')}`);
 	} else {

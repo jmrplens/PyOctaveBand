@@ -454,6 +454,10 @@ IEC 61400-11.
   la fuente viaria común europea del Anexo II 2.2: potencia acústica de rodadura
   y propulsión por categoría de vehículo y potencia direccional por metro de
   línea fuente.
+- [Emisión de la fuente ferroviaria CNOSSOS-EU](/phonometry/es/environment/sources/cnossos-rail-emission/):
+  la fuente ferroviaria del anexo II 2.3: rugosidad y filtro de contacto, ruido
+  de impacto, chirrido en curva, tracción y ruido aerodinámico, y las dos líneas
+  de fuente equivalentes.
 - [Efecto suelo esférico y barreras avanzadas](/phonometry/es/environment/propagation/ground-barriers/):
   el coeficiente de reflexión de Weyl-Van der Pol sobre suelo de impedancia
   finita y la difracción en barreras desde la teoría ondulatoria.
@@ -475,10 +479,6 @@ IEC 61400-11.
 - [Ruido de rotorcraft: el método del hemisferio](/phonometry/es/aircraft/rotorcraft-noise/):
   el modelo de fuente en hemisferio con sus ajustes de propagación, la
   interpolación de condiciones de vuelo y los contornos de suceso único.
-- [Emisión de la fuente ferroviaria CNOSSOS-EU](/phonometry/es/environment/sources/cnossos-rail-emission/):
-  la fuente ferroviaria del anexo II 2.3: rugosidad y filtro de contacto, ruido
-  de impacto, chirrido en curva, tracción y ruido aerodinámico, y las dos líneas
-  de fuente equivalentes.
 - [Ruido de aerogeneradores: potencia y audibilidad tonal](/phonometry/es/environment/sources/wind-turbine-noise/):
   el nivel de potencia acústica aparente referido al centro del rotor y la cadena
   de audibilidad tonal que decide si un tono se oye.

@@ -431,6 +431,10 @@ SAE ARP 5534, ECAC Doc 29/32 and IEC 61400-11.
 - [CNOSSOS-EU road traffic source emission](/phonometry/environment/sources/cnossos-road-emission/):
   the common EU road source of Annex II 2.2: rolling and propulsion sound power
   per vehicle category and the directional power per metre of source line.
+- [CNOSSOS-EU railway source emission](/phonometry/environment/sources/cnossos-rail-emission/):
+  the rail source of Annex II 2.3: roughness and the contact filter, impact
+  noise, curve squeal, traction and aerodynamic noise, and the two equivalent
+  source lines.
 - [Spherical ground effect and advanced barriers](/phonometry/environment/propagation/ground-barriers/):
   the Weyl-Van der Pol reflection coefficient over finite-impedance ground, and
   wave-theoretic barrier diffraction.
@@ -452,10 +456,6 @@ SAE ARP 5534, ECAC Doc 29/32 and IEC 61400-11.
 - [Rotorcraft noise: the hemisphere method](/phonometry/aircraft/rotorcraft-noise/):
   the hemisphere source model with its propagation adjustments, flight-condition
   interpolation, and the single-event contours.
-- [CNOSSOS-EU railway source emission](/phonometry/environment/sources/cnossos-rail-emission/):
-  the rail source of Annex II 2.3: roughness and the contact filter, impact
-  noise, curve squeal, traction and aerodynamic noise, and the two equivalent
-  source lines.
 - [Wind-turbine noise: sound power and tonal audibility](/phonometry/environment/sources/wind-turbine-noise/):
   the apparent sound power level referred to the rotor centre, and the tonal
   audibility chain that decides whether a tone is audible.
