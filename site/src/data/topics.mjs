@@ -275,8 +275,7 @@ export const topics = [
           'vibration/structural/mechanical-mobility',
           'vibration/structural/junction-transmission',
           'vibration/structural/transfer-stiffness',
-          'devices/emission/vibration-sound-power',
-                ],
+        ],
       },
       {
         label: 'Human vibration',
@@ -383,6 +382,7 @@ export const topics = [
           'devices/emission/sound-power',
           'devices/emission/sound-power-pressure',
           'devices/emission/sound-power-reverberation',
+          'devices/emission/vibration-sound-power',
           'devices/emission/sound-power-intensity',
         ],
       },

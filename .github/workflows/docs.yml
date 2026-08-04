@@ -103,6 +103,13 @@ jobs:
         # step and is worthless once it is not.
         run: pnpm run check:icons
         working-directory: site
+      - name: Check the guides index lists every guide
+        # The page the Start topic offers as the map of the library is written
+        # by hand, and it had drifted to 100 of 104 links while stating 104 in
+        # the prose and in its own meta description, in both languages. Cheap,
+        # so it runs before the build rather than after it.
+        run: pnpm run check:guides
+        working-directory: site
       - name: Check EN/ES translation parity
         run: node scripts/check-i18n-parity.mjs
         working-directory: site
@@ -134,6 +141,13 @@ jobs:
         # leaves the build, the HTML validation and the accessibility audit
         # all green.
         run: pnpm run check:sidebar
+        working-directory: site
+      - name: Check the landing, the contrast and the language bar
+        # Three audits that existed and ran for nobody: the colour tokens of
+        # both themes against the contrast floor, the landing page's headings
+        # and grid at ten viewport and font-size combinations, and the
+        # behaviour of the language suggestion bar. They share one preview.
+        run: pnpm run check:visual
         working-directory: site
       # Only the branch that publishes needs the tarball. A pull request has
       # already got what it came for once the checks above have run.

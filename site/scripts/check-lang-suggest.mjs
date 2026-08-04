@@ -139,7 +139,14 @@ expect(
 	await new Promise((r) => setTimeout(r, 400));
 	// The dev server parks its toolbar in the middle of the bottom edge, and
 	// it hit-tests. It is not part of the site.
-	await page.addStyleTag({ content: 'astro-dev-toolbar{display:none !important}' });
+	// Only the dev server renders this toolbar, so against a preview of `dist`
+	// the rule matches nothing. The call itself is not free of consequence: the
+	// execution context can be replaced between the navigation and it, and the
+	// rejection failed a whole run once for a style rule that had nothing to
+	// hide. Losing it costs nothing, so it is allowed to fail.
+	await page
+		.addStyleTag({ content: 'astro-dev-toolbar{display:none !important}' })
+		.catch(() => {});
 	const hits = await page.evaluate(() => {
 		// A regression that keeps the bar off screen is exactly what this check
 		// is for, so report it as a failed hit test rather than throwing a raw

@@ -262,7 +262,14 @@ async function open(path, { phone = false } = {}) {
 	const page = await context.newPage();
 	await page.setViewport(phone ? { width: 390, height: 844 } : { width: 1440, height: 900 });
 	await page.goto(`${BASE}${BASE_PATH}${path}`, { waitUntil: 'networkidle0', timeout: 90000 });
-	await page.addStyleTag({ content: 'astro-dev-toolbar{display:none !important}' });
+	// Only the dev server renders this toolbar, so against a preview of `dist`
+	// the rule matches nothing. The call itself is not free of consequence: the
+	// execution context can be replaced between the navigation and it, and the
+	// rejection failed a whole run once for a style rule that had nothing to
+	// hide. Losing it costs nothing, so it is allowed to fail.
+	await page
+		.addStyleTag({ content: 'astro-dev-toolbar{display:none !important}' })
+		.catch(() => {});
 	if (phone) {
 		await page.evaluate(() => document.querySelector('starlight-menu-button button')?.click());
 		await new Promise((r) => setTimeout(r, 300));

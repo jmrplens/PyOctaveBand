@@ -113,7 +113,14 @@ async function landing({ path, viewport, theme, banner }) {
 		banner ? (path.startsWith('/es/') ? ['en-US', 'en'] : ['es-ES', 'es']) : null,
 	);
 	await page.goto(`${BASE}${BASE_PATH}${path}`, { waitUntil: 'networkidle0', timeout: 90000 });
-	await page.addStyleTag({ content: 'astro-dev-toolbar{display:none !important}' });
+	// Only the dev server renders this toolbar, so against a preview of `dist`
+	// the rule matches nothing. The call itself is not free of consequence: the
+	// execution context can be replaced between the navigation and it, and the
+	// rejection failed a whole run once for a style rule that had nothing to
+	// hide. Losing it costs nothing, so it is allowed to fail.
+	await page
+		.addStyleTag({ content: 'astro-dev-toolbar{display:none !important}' })
+		.catch(() => {});
 	const out = await page.evaluate(async (wantBanner) => {
 		const wait = (ms) => new Promise((r) => setTimeout(r, ms));
 		const bar = document.getElementById('lang-suggest');
