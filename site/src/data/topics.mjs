@@ -79,7 +79,7 @@ export const topics = [
           'signal/levels/special-weightings',
           'signal/levels/time-weighting',
           'signal/levels/levels',
-                ],
+        ],
       },
       {
         label: 'Signals and spectra',
@@ -92,7 +92,7 @@ export const topics = [
           'signal/spectra/time-frequency',
           'signal/spectra/cepstrum-echoes',
           'signal/spectra/synchronous-averaging',
-              'signal/spectra/correlation-delay',
+          'signal/spectra/correlation-delay',
           'signal/spectra/test-signals',
           'signal/spectra/system-measurement',
         ],
@@ -115,7 +115,7 @@ export const topics = [
     id: 'perception',
     label: { en: 'Hearing and perception', es: 'Audición y percepción' },
     link: '/perception/',
-    icon: 'seti:pipeline',
+    icon: 'comment',
     items: [
       { slug: 'perception', label: 'Overview', translations: { es: 'Resumen' } },
       {
@@ -161,7 +161,7 @@ export const topics = [
     id: 'buildings',
     label: { en: 'Rooms and buildings', es: 'Salas y edificación' },
     link: '/buildings/',
-    icon: 'seti:home',
+    icon: 'seti:plan',
     items: [
       { slug: 'buildings', label: 'Overview', translations: { es: 'Resumen' } },
       {
@@ -470,8 +470,13 @@ export const topics = [
     label: { en: 'API reference', es: 'Referencia de la API' },
     link: '/reference/api/',
     icon: 'seti:python',
+    // Every section, in the generated order. This is the destination of the
+    // "Overview" row inside each domain's API group, so it has to be worth the
+    // sidebar it swaps in: the whole table, not a single row pointing at the
+    // page the reader is already on.
     items: [
       { slug: 'reference/api', label: 'The whole API', translations: { es: 'Toda la API' } },
+      ...Object.values(apiSections),
     ],
   },
 ];

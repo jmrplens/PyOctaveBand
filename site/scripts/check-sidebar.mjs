@@ -26,6 +26,12 @@ const DEEP_GUIDE = '/perception/psychoacoustics/loudness/';
 const SECTION = '/perception/psychoacoustics/';
 const API_PAGE = '/reference/api/psychoacoustics/sharpness/';
 const API_PAGE_ES = '/es/reference/api/psychoacoustics/sharpness/';
+// The reference index, which is the landing page of the API topic and a listed
+// row of every domain's API group. Starlight marks the first entry of the whole
+// sidebar that matches a page and stops, so this is the one page where the mark
+// lands in a topic the reader is not in unless something puts it right.
+const API_INDEX = '/reference/api/';
+const API_INDEX_ES = '/es/reference/api/';
 
 const browser = await launchBrowser();
 
@@ -88,10 +94,21 @@ function expectedTree(locale, currentHref) {
 }
 
 /**
- * The topic that owns a page: the one listing it, or the one whose link is its
- * longest prefix. One sidebar renders per page, and it is that topic's.
+ * The topic that owns a page: its own landing page first, then the one listing
+ * it, then the one whose link is its longest prefix. One sidebar renders per
+ * page, and it is that topic's.
+ *
+ * The landing page comes first because the plugin resolves it first
+ * (libs/sidebar.ts, `getTopicFromSlug` before `getCurrentSidebarTopic`), and
+ * the two rules disagree on a page that is a topic's landing page and is also
+ * listed inside another topic: the reference index is the landing page of the
+ * API topic and the way back to the whole table from inside every domain.
  */
 function topicOf(currentHref, locale) {
+	const landing = topics.find(
+		(topic) => `${BASE_PATH}${localeLink(topic.link, locale)}` === currentHref,
+	);
+	if (landing) return landing;
 	const owning = topics.find((topic) =>
 		linkHrefs(configuredTree(topic.items ?? [], locale)).includes(currentHref),
 	);
@@ -200,9 +217,10 @@ const readTree = () => {
 	};
 	const top = sidebarEl.querySelector('ul.top-level');
 	if (!top) return { error: 'no ul.top-level inside #starlight__sidebar' };
-	// The topic list the plugin renders above the tree: the control that says
-	// which chapter the reader is in and what the others are. It is the whole
-	// point of the topics, so it is asserted rather than assumed.
+	// The topic list above the tree: the control that says which chapter the
+	// reader is in and what the others are. It is the whole point of the
+	// topics, so it is asserted rather than assumed.
+	const switcher = sidebarEl.querySelector('.ph-topic-switcher > summary');
 	const topicLinks = [...sidebarEl.querySelectorAll('a')]
 		// Outside the tree, and internal: the social icons of the mobile menu
 		// share this container and are not topics.
@@ -215,6 +233,11 @@ const readTree = () => {
 	return {
 		tree: walk(top),
 		topics: topicLinks,
+		// The rows above are read out of the document, which a display rule can
+		// empty without emptying: a switcher hidden by CSS would leave every
+		// assertion about the list green.
+		switcherVisible: switcher ? seen(switcher) : false,
+		switcherName: switcher?.textContent.replace(/\s+/g, ' ').trim() ?? '',
 		// Nothing here is a custom widget: every disclosure is a summary inside
 		// a details, which makes the keyboard and screen reader behaviour the
 		// user agent's problem rather than ours.
@@ -261,8 +284,8 @@ async function checkTree(page, path, where) {
 	}
 	const wanted = expectedTree(locale, `${BASE_PATH}${path}`);
 	expect(`${where}: the rendered tree is the configured tree`, diffTree(wanted, rendered.tree), []);
-	// Every topic is offered, in the reader's own language, and the one they
-	// are in leads its own list.
+	// Every topic is offered, in the reader's own language, and the one the
+	// reader is in is the one marked.
 	expect(
 		`${where}: every topic is listed`,
 		rendered.topics.map((t) => t.href).sort(),
@@ -273,12 +296,25 @@ async function checkTree(page, path, where) {
 		rendered.topics.map((t) => t.label).sort(),
 		topics.map((topic) => topic.label[locale]).sort(),
 	);
+	// Colour alone does not say which topic the reader is in, so the row also
+	// carries `aria-current`. `true` rather than `page`: the link goes to the
+	// topic's landing page, which is not the page being read.
 	expect(
-		`${where}: the reader's own topic leads the list`,
-		rendered.topics.some((t) => t.href === `${BASE_PATH}${localeLink(topicOf(`${BASE_PATH}${path}`, locale).link, locale)}`),
-		true,
+		`${where}: the reader's own topic is the one marked current`,
+		rendered.topics.filter((t) => t.current).map((t) => t.href),
+		[`${BASE_PATH}${localeLink(topicOf(`${BASE_PATH}${path}`, locale).link, locale)}`],
 	);
-	expect(`${where}: no hand-built disclosure anywhere`, rendered.customToggles, 0);
+	// The switcher is the only thing naming the topic once the list is closed,
+	// and a reader who cannot see it cannot open the list either.
+	expect(
+		`${where}: the switcher is on screen and names the topic`,
+		{
+			visible: rendered.switcherVisible,
+			names: rendered.switcherName.includes(topicOf(`${BASE_PATH}${path}`, locale).label[locale]),
+		},
+		{ visible: true, names: true },
+	);
+	expect(`${where}: no custom toggle widget anywhere`, rendered.customToggles, 0);
 	expect(`${where}: exactly one row carries the current-page marker`, rendered.currentMarkers, 1);
 	return rendered.tree;
 }
@@ -490,13 +526,27 @@ for (const phone of [true, false]) {
 	await context.close();
 }
 
+// --- The reference index, in both locales ---------------------------------
+for (const [path, where] of [
+	[API_INDEX, 'the reference index'],
+	[API_INDEX_ES, 'the Spanish reference index'],
+]) {
+	const { context, page } = await open(path);
+	await checkTree(page, path, where);
+	await page.close();
+	await context.close();
+}
+
 // Every configured label and href had to match something above; if the tree
 // ever renders nothing at all the diff would say so, but state the size of
 // what was checked so a silent shrink is visible in the log.
+// Distinct hrefs, not rows: the generated API sections are listed twice, once
+// in the domain topic and once in the API topic, and counting rows would say
+// the site grew by 145 pages it does not have.
 console.log(
 	`\nChecked ${topics.length} topics, ` +
 		`${groupLabels(configuredTree(allItems, 'en')).length} configured groups and ` +
-		`${linkHrefs(configuredTree(allItems, 'en')).length} configured pages per locale.`,
+		`${new Set(linkHrefs(configuredTree(allItems, 'en'))).size} configured pages per locale.`,
 );
 await browser.close();
 console.log(`${failures()} failing check(s).`);

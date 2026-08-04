@@ -1,22 +1,15 @@
 /* Landing-page layout.
-   The splash page hides the sidebar on desktop (splash-menu.css), so the
-   reading column can be wider than the 45rem the guides use: the landing has
-   a four-column readout, a two-column table and a three-column start path,
-   none of which work at guide width. Scoped to [data-has-hero] so no other
-   page is affected. */
+   The landing has a four-column readout, a two-column table and a three-column
+   start path, none of which work at the 45rem the guides use, so the reading
+   column is wider. It shares the page with the topic list, which is the
+   navigation a reader arriving at the site meets, so the width is what is left
+   beside that column rather than the whole viewport. Scoped to [data-has-hero]
+   so no other page is affected. */
 :root[data-has-hero] {
-  --sl-content-width: 62rem;
+  --sl-content-width: 52rem;
 }
 
-/* Starlight reserves the sidebar gutter on every page that reports a sidebar,
-   and the route middleware reports one on splash pages so the mobile menu
-   button exists. With the sidebar pane hidden on desktop that gutter is dead
-   space, and at 62rem it pushed the whole landing off-centre. */
 @media (min-width: 50rem) {
-  :root[data-has-hero] {
-    --sl-content-inline-start: 0rem;
-  }
-
   /* Starlight's hero grid is 7fr 4fr, which caps the copy at 62 % of a column
      that is now wide, and it did that whether or not there was an image to put
      in the second track. The mark is in that track now (Hero.astro), so the

@@ -8,6 +8,7 @@
     "postbuild": "node scripts/add-sitemap-lastmod.mjs && node scripts/fix-redirect-doctype.mjs && node scripts/optimize-images.mjs && node scripts/emit-page-markdown.mjs",
     "check:i18n": "node scripts/check-i18n-parity.mjs",
     "check:math": "node scripts/check-math-render.mjs",
+    "check:sidebar": "astro preview & PREVIEW_PID=$!; sleep 3 && node scripts/check-sidebar.mjs; EXIT=$?; kill $PREVIEW_PID 2>/dev/null; exit $EXIT",
     "dev": "astro dev",
     "build": "astro build",
     "identity:sync": "node scripts/sync-identity.mjs",

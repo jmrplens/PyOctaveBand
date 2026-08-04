@@ -505,6 +505,12 @@ export default defineConfig({
         // Default right column plus the page actions, which hand this page's
         // published markdown copy to a clipboard, a tab or a chat.
         PageSidebar: './src/components/PageSidebar.astro',
+        // Default left column with the topic switcher above it. The topics
+        // plugin overrides `Sidebar` too, and its own hook spreads our
+        // components last, so this wins and its override never runs: the
+        // switcher renders the topic list itself, from the route data the
+        // plugin publishes for exactly that.
+        Sidebar: './src/components/Sidebar.astro',
         // Default article body plus the unified APA-7 references section
         // rendered from the typed frontmatter bibliography.
         MarkdownContent: './src/components/MarkdownContent.astro',
