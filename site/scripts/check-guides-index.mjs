@@ -128,6 +128,24 @@ for (const { lang, root, word } of LOCALES) {
 		ok(`${lang}: every count it states in figures says ${routes.length}`);
 	}
 
+	// The structured data has to agree with itself and with the page: the list
+	// declared ten items over nine entries once, while the description said
+	// nine and the frontmatter said ten, all in one file.
+	const ld = index.match(/\{\s*\n\s*"@context": "https:\/\/schema\.org"[\s\S]*?\n {6}\}/);
+	if (ld) {
+		const data = JSON.parse(ld[0]);
+		const declared = data.numberOfItems;
+		const listed = (data.itemListElement ?? []).length;
+		const headings = (index.match(/^## \[/gm) ?? []).length;
+		if (declared === listed && listed === headings) {
+			ok(`${lang}: the JSON-LD declares ${declared} areas, lists ${listed}, and the page has ${headings} sections`);
+		} else {
+			fail(`${lang}: numberOfItems ${declared}, itemListElement ${listed}, ## headings ${headings}`);
+		}
+	} else {
+		fail(`${lang}: no ItemList JSON-LD found in the index`);
+	}
+
 	// And the same number in words, which is the half nobody updates.
 	// `spell` returns a pattern rather than one spelling, since a number has more
 	// than one correct wording and the check is about the arithmetic.

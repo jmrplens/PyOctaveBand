@@ -11,7 +11,7 @@ head:
         "@type": "ItemList",
         "@id": "https://jmrplens.github.io/phonometry/es/start/guides/#areas",
         "name": "Áreas de la documentación de phonometry",
-        "description": "Los diez temas documentados de las guías de phonometry, cada una con las normas que implementa.",
+        "description": "Las diez áreas documentadas de las guías de phonometry, cada una con las normas que implementa.",
         "inLanguage": "es",
         "numberOfItems": 10,
         "itemListOrder": "https://schema.org/ItemListUnordered",
@@ -61,20 +61,27 @@ head:
           {
             "@type": "ListItem",
             "position": 7,
+            "name": "Ruido de aeronaves",
+            "description": "Niveles de certificación, contornos de aeropuerto y el método del hemisferio.",
+            "url": "https://jmrplens.github.io/phonometry/es/aircraft/"
+          },
+          {
+            "@type": "ListItem",
+            "position": 8,
             "name": "Acústica submarina",
             "description": "Niveles re 1 microPa, ruido radiado por buques, hincado de pilotes, ruido ambiente, pérdidas por transmisión.",
             "url": "https://jmrplens.github.io/phonometry/es/underwater/"
           },
           {
             "@type": "ListItem",
-            "position": 8,
+            "position": 9,
             "name": "Fuentes y dispositivos",
             "description": "Potencia acústica, intensidad, declaraciones de emisión, electroacústica, sonoridad de programa.",
             "url": "https://jmrplens.github.io/phonometry/es/devices/"
           },
           {
             "@type": "ListItem",
-            "position": 9,
+            "position": 10,
             "name": "Simulación de ondas",
             "description": "Un solver FDTD 2D determinista, validado frente a oráculos analíticos y no frente a una norma.",
             "url": "https://jmrplens.github.io/phonometry/es/simulation/"
@@ -437,12 +444,12 @@ EN 12354-5, ISO 2631-1/-2/-4/-5, ISO 5349-1/-2 e ISO 8041-1.
 
 ## [Medio ambiente y transporte](/phonometry/es/environment/)
 
-Propagación en exteriores, barreras, refracción, aeronaves, helicópteros y
-aerogeneradores. Todo lo de aquí trata de sonido que tiene que recorrer una
-distancia larga antes de valorarse, así que la atmósfera, el suelo y el propio
-movimiento de la fuente entran en la respuesta. Implementa ISO 9613-1/-2,
-ISO 1996-1/-2, ISO/PAS 1996-3, NT ACOU 112, CNOSSOS-EU (Directiva 2002/49/CE,
-anexo II), Anexo 16 OACI, IEC 61265, SAE ARP 5534, ECAC Doc 29/32 e
+Propagación en exteriores, barreras, refracción, fuentes viarias,
+ferroviarias y de aerogenerador, y la valoración construida sobre ellas. Todo
+lo de aquí trata de sonido que tiene que recorrer una distancia larga antes de
+valorarse, así que la atmósfera, el suelo y el propio movimiento de la fuente
+entran en la respuesta. Implementa ISO 9613-1/-2, ISO 1996-1/-2,
+ISO/PAS 1996-3, NT ACOU 112, CNOSSOS-EU (Directiva 2002/49/CE, anexo II) e
 IEC 61400-11.
 
 **[Sonido en exteriores](/phonometry/es/environment/propagation/)**
@@ -458,6 +465,9 @@ IEC 61400-11.
   la fuente ferroviaria del anexo II 2.3: rugosidad y filtro de contacto, ruido
   de impacto, chirrido en curva, tracción y ruido aerodinámico, y las dos líneas
   de fuente equivalentes.
+- [Ruido de aerogeneradores: potencia y audibilidad tonal](/phonometry/es/environment/sources/wind-turbine-noise/):
+  el nivel de potencia acústica aparente referido al centro del rotor y la cadena
+  de audibilidad tonal que decide si un tono se oye.
 - [Efecto suelo esférico y barreras avanzadas](/phonometry/es/environment/propagation/ground-barriers/):
   el coeficiente de reflexión de Weyl-Van der Pol sobre suelo de impedancia
   finita y la difracción en barreras desde la teoría ondulatoria.
@@ -468,7 +478,13 @@ IEC 61400-11.
   la prominencia prevista de cada impulso a partir de su tasa de ataque y su
   diferencia de nivel, y el ajuste que se suma al $L_{Aeq}$.
 
-**[Aeronaves y energía eólica](/phonometry/es/aircraft/)**
+## [Ruido de aeronaves](/phonometry/es/aircraft/)
+
+Niveles de certificación, contornos de aeropuerto y el método del
+hemisferio para helicópteros: el ruido del vuelo medido como lo prescriben
+los documentos de certificación y de planificación aeroportuaria.
+Implementa el Anexo 16 de la OACI, IEC 61265, SAE ARP 866B/5534 y
+ECAC Doc 29/32.
 
 - [Ruido de aeronaves: nivel efectivo de ruido percibido](/phonometry/es/aircraft/aircraft-noise/):
   la ruidosidad percibida y el PNL, la corrección por tonos, la corrección por
@@ -479,9 +495,6 @@ IEC 61400-11.
 - [Ruido de rotorcraft: el método del hemisferio](/phonometry/es/aircraft/rotorcraft-noise/):
   el modelo de fuente en hemisferio con sus ajustes de propagación, la
   interpolación de condiciones de vuelo y los contornos de suceso único.
-- [Ruido de aerogeneradores: potencia y audibilidad tonal](/phonometry/es/environment/sources/wind-turbine-noise/):
-  el nivel de potencia acústica aparente referido al centro del rotor y la cadena
-  de audibilidad tonal que decide si un tono se oye.
 
 ## [Acústica submarina](/phonometry/es/underwater/)
 

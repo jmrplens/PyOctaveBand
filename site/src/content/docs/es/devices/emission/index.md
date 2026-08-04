@@ -49,3 +49,6 @@ referencia contra la que se juzgan las medidas correctoras de las páginas de
   los métodos directo y de comparación de ISO 3741.
 - [Potencia acústica por barrido de intensidad](/phonometry/es/devices/emission/sound-power-intensity/):
   el barrido in situ de ISO 9614-2 y el grado de precisión ISO 9614-3.
+- [Potencia acústica desde la vibración superficial (ISO/TS 7849)](/phonometry/es/devices/emission/vibration-sound-power/):
+  la potencia aérea estimada desde la velocidad de la propia superficie de la
+  máquina, con el factor de radiación decidiendo cuánto vale la estimación.
