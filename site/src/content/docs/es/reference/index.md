@@ -56,8 +56,8 @@ hecho que el error es de la librería.
 
 Cada magnitud acústica que calculan las guías, con su símbolo, una definición
 de una frase, su unidad, la norma y cláusula que la define y la guía que la
-implementa. Para cuando un símbolo de una fórmula necesita nombre, o un nombre
-necesita la cláusula de la que viene.
+implementa. Léelo cuando un símbolo de una fórmula necesite nombre, o un
+nombre necesite la cláusula de la que viene.
 
 ## [Bibliografía](/phonometry/es/reference/bibliography/)
 
