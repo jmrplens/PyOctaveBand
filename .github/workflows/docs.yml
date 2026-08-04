@@ -25,6 +25,14 @@ on:
       # the first entry already.)
       - ".github/brand/**"
       - "scripts/generate_llms.py"
+      # The release commit. site/src/data/citation.mjs reads all three of these
+      # from the repository root, and repo-stats.mjs reads VERSION: without
+      # them here, publishing a release rebuilt nothing, and the site kept
+      # citing the previous version until something under site/ happened to
+      # change.
+      - "VERSION"
+      - "CHANGELOG.md"
+      - "CITATION.cff"
       - ".github/workflows/docs.yml"
   pull_request:
     branches: ["main"]
@@ -37,6 +45,9 @@ on:
       - "docs/**"
       - ".github/brand/**"
       - "scripts/generate_llms.py"
+      - "VERSION"
+      - "CHANGELOG.md"
+      - "CITATION.cff"
       - ".github/workflows/docs.yml"
   workflow_dispatch:
 
