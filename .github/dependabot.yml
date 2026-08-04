@@ -43,6 +43,19 @@ updates:
       - "dependencies"
       - "javascript"
     open-pull-requests-limit: 5
+    # katex is not ours to choose: rehype-katex renders the markup and ships
+    # its own katex dependency, so the stylesheet we load has to come from the
+    # 0.16 line it resolves or every formula on the site loses its rules.
+    # KaTeX 0.18 prefixed nineteen internal class names (base -> katex-base and
+    # so on), which is a breaking change carried in a minor bump because the
+    # package is still 0.x, so both update types are held. rehype-katex 7, the
+    # current release, asks for katex ^0.16, and `pnpm check:math` fails the
+    # build when the two disagree. Lift this the day rehype-katex moves.
+    ignore:
+      - dependency-name: "katex"
+        update-types:
+          - "version-update:semver-major"
+          - "version-update:semver-minor"
     groups:
       site:
         patterns:
