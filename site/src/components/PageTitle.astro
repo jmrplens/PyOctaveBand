@@ -31,18 +31,13 @@ const lang = id === 'es' || id.startsWith('es/') ? 'es' : 'en';
 const slug = id.replace(/^es\/?/, '');
 
 // The guides, wherever their topic filed them, and the page that opens them.
-const GUIDE_TOPICS = [
-  'signal',
-  'perception',
-  'buildings',
-  'materials',
-  'vibration',
-  'environment',
-  'aircraft',
-  'underwater',
-  'devices',
-  'simulation',
-];
+// Derived rather than listed: the ten domains are every topic that is not one
+// of the three carrying no teaching prose, so renaming or adding a domain
+// keeps the byline without a second list to remember.
+const NOT_A_DOMAIN = ['start', 'reference', 'api'];
+const GUIDE_TOPICS = topics
+  .map((topic) => topic.id)
+  .filter((id) => id !== undefined && !NOT_A_DOMAIN.includes(id));
 const isGuide = GUIDE_TOPICS.some((topic) => slug === topic || slug.startsWith(`${topic}/`));
 
 // A topic's own overview page. It gets the drawing the sidebar gives that
