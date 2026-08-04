@@ -15,6 +15,9 @@ on:
 
 permissions:
   contents: write
+  # Reading the conclusion of the CI run on this commit, which is what the
+  # first step of the job refuses to publish without.
+  actions: read
 
 jobs:
   release:
@@ -43,6 +46,57 @@ jobs:
           echo "skip=false" >> "$GITHUB_OUTPUT"
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
           echo "tag=v$VERSION" >> "$GITHUB_OUTPUT"
+
+      - name: Require a green Python CI on this commit
+        if: steps.version.outputs.skip != 'true'
+        # Publishing consulted no test result at all: a push to VERSION on a
+        # semantically broken main went to PyPI, and a version number cannot be
+        # re-uploaded once it is burned. `needs:` cannot cross workflow files,
+        # and branch protection would not cover the manual trigger below, so the
+        # job asks the API directly.
+        #
+        # Python CI runs on every push to main, which means it is in flight
+        # beside this job rather than finished before it: the loop waits for the
+        # run on this exact commit and then insists that it succeeded. A run
+        # that has not been registered yet is tolerated briefly, since the two
+        # workflows start together; one that never appears is a failure, because
+        # publishing on no evidence is the thing this step exists to stop.
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          appear_deadline=$(( SECONDS + 300 ))
+          finish_deadline=$(( SECONDS + 2700 ))
+          while :; do
+            read -r status conclusion <<<"$(gh run list \
+              --repo "$GITHUB_REPOSITORY" --commit "$GITHUB_SHA" \
+              --workflow python-app.yml --limit 1 \
+              --json status,conclusion \
+              --jq '.[0] | "\(.status // "missing") \(.conclusion // "none")"')"
+            case "$status" in
+              completed)
+                if [ "$conclusion" = success ]; then
+                  echo "Python CI succeeded on $GITHUB_SHA."
+                  break
+                fi
+                echo "::error::Python CI concluded '$conclusion' on $GITHUB_SHA. Not publishing."
+                exit 1
+                ;;
+              missing)
+                if [ "$SECONDS" -ge "$appear_deadline" ]; then
+                  echo "::error::No Python CI run for $GITHUB_SHA after five minutes. Not publishing."
+                  exit 1
+                fi
+                ;;
+              *)
+                if [ "$SECONDS" -ge "$finish_deadline" ]; then
+                  echo "::error::Python CI still '$status' on $GITHUB_SHA after 45 minutes. Not publishing."
+                  exit 1
+                fi
+                ;;
+            esac
+            sleep 30
+          done
 
       - name: Set up Python
         if: steps.version.outputs.skip != 'true'
