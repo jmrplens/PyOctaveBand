@@ -204,8 +204,12 @@ Practical notes:
   <designation>:<year>.` Cite the document, never a file path: the registry is
   a public statement about a published source, and a path pins it to one
   machine. Two checks read that sentence.
+- Keep the procedure out of the entry. The resolution you rendered at is on
+  this page because you need it; in the registry it reads as a machine's
+  account of itself rather than a finding a maintainer stands behind, and a
+  third check rejects it.
 
-Two checks run in CI over the registry
+Three checks run in CI over the registry
 ([`scripts/check_errata_evidence.py`](scripts/check_errata_evidence.py)):
 
 ```bash
@@ -222,7 +226,11 @@ python scripts/check_errata_evidence.py --ratios # only the irrational-ratio lin
 2. **The page-citation check** requires every entry to cite the page it quotes,
    or to be listed, with a reason, in the allowlist at the top of the script.
    The allowlist is meant to shrink: do not add to it to get a new entry
-   through.
+   through, and a line whose entry now cites its page fails the build until it
+   is deleted.
+3. **The procedure check** rejects an entry that says how its page was read:
+   a dpi figure, or the word render. That belongs here, not in a public
+   statement about someone else's document.
 
 A third script is a contributor tool rather than a gate:
 
