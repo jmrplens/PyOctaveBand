@@ -531,15 +531,16 @@ which is the check that enforces the rule; see
   266 band edges), lands on it. Every other boundary in the table is a
   distinct band centre (200, 250, 315, 400, 500 Hz), and no other pair of rows
   overlaps.
-- **Evidence:** the printed table itself, on PDF page 45 (printed p. 39): the
-  two rows are separately ruled and share the endpoint verbatim, "630 to
-  1 600" and "1 600 <= f0 <= 5 000". Neither row can be discarded, because 630
-  Hz to 1 250 Hz has no other entry and 2 000 Hz to 5 000 Hz has none either.
-  The predecessor edition settles which reading was intended: EN 12354-1:2000
-  Table D.3 prints the same pair of rows as "630 - 1 600 -> -10" and "> 1 600
-  -> -5", strictly greater, so in 2000 exactly 1 600 Hz unambiguously took -10
-  dB. The 2017 rewrite replaced "> 1 600" with "1 600 <= f0 <= 5 000" while
-  leaving "630 to 1 600" untouched, which is what creates the overlap.
+- **Evidence:** the printed table itself, on PDF page 45 (printed p. 39) of
+  ISO 12354-1:2017: the two rows are separately ruled and share the endpoint
+  verbatim, "630 to 1 600" and "1 600 <= f0 <= 5 000". Neither row can be
+  discarded, because 630 Hz to 1 250 Hz has no other entry and 2 000 Hz to
+  5 000 Hz has none either. The predecessor edition settles which reading was
+  intended: EN 12354-1:2000 Table D.3 prints the same pair of rows as "630 -
+  1 600 -> -10" and "> 1 600 -> -5", strictly greater, so in 2000 exactly
+  1 600 Hz unambiguously took -10 dB. The 2017 rewrite replaced "> 1 600" with
+  "1 600 <= f0 <= 5 000" while leaving "630 to 1 600" untouched, which is what
+  creates the overlap.
 - **Library behaviour:** `weighted_lining_improvement` returns the more
   conservative -10 dB at exactly 1 600 Hz and -5 dB above it, the 2000
   reading, with the ambiguity named in the docstring and pinned in

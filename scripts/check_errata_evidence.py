@@ -125,9 +125,27 @@ PAGE_CITATION = re.compile(
     re.IGNORECASE,
 )
 
-#: How a page was read: a resolution, or the act of rendering it. The registry
-#: says what the document prints, not how it was put on screen.
-_PROCEDURE = re.compile(r"\b\d+\s*dpi\b|\brender(?:ed|s|ing)?\b", re.IGNORECASE)
+#: The edition the page belongs to, which follows the page group. A page index
+#: alone resolves in no library: "PDF page 45 (printed p. 39)" of *what*? The
+#: designation is what a reader takes to a standards catalogue, so the citation
+#: is only complete once it names one. Further page groups may sit in between,
+#: because an entry that reads two pages of the same edition names it once.
+_CITED_EDITION = re.compile(r"\bof\s+(?:the\s+)?[A-Z0-9(\u201c\"']", re.UNICODE)
+
+#: How far after the page group the edition may sit: long enough for the second
+#: and third page group of an entry that reads a table across a spread.
+_EDITION_WINDOW = 200
+
+#: How a page was read: a resolution, or the act of rendering one. A bare
+#: resolution has no other meaning in this registry, so it is rejected wherever
+#: it appears; "render" is an ordinary English verb an entry may need ("the
+#: dropped exponent renders Formula (7) inconsistent"), so only the procedural
+#: sense counts, and only in the Evidence bullet.
+_RESOLUTION = re.compile(r"\b\d+\s*dpi\b", re.IGNORECASE)
+_RENDERING = re.compile(
+    r"\brender(?:ed|ing|s)?\s+(?:of|at|from|the\s+)?(?:page|image|crop|scan)?",
+    re.IGNORECASE,
+)
 
 #: Ratios that are the signature of a lost glyph rather than an author's error.
 _NAMED_RATIOS: dict[str, float] = {
@@ -151,9 +169,10 @@ _TIMES = re.compile(
     r"(?:small|large|big|high|low|greater|smaller|more|less)",
     re.IGNORECASE,
 )
-#: "a factor of 1,73", "by a factor 10", "a factor-16 error".
+#: "a factor of 1,73", "by a factor 10", "a factor-16 error". The word boundary
+#: keeps "prefactor 4 N h" out: that is a term of a formula, not a ratio claim.
 _FACTOR = re.compile(
-    r"factor[\s-]+(?:of\s+)?(?P<value>\d+[.,]\d+|\d+)",
+    r"\bfactor[\s-]+(?:of\s+)?(?P<value>\d+[.,]\d+|\d+)",
     re.IGNORECASE,
 )
 #: "a fixed 2,4 dB offset", "2,4 dB too high", "off by 2,4 dB".
@@ -188,7 +207,13 @@ class Entry:
 
     @property
     def cites_page(self) -> bool:
-        return PAGE_CITATION.search(self.evidence) is not None
+        """A page group followed, within the same sentence run, by an edition."""
+        return any(
+            _CITED_EDITION.search(
+                self.evidence[match.end() : match.end() + _EDITION_WINDOW]
+            )
+            for match in PAGE_CITATION.finditer(self.evidence)
+        )
 
 
 @dataclass(frozen=True)
@@ -241,8 +266,28 @@ def _match_named(ratio: float) -> str | None:
     return None
 
 
+#: LaTeX that hides a number from the patterns below. ``$1{,}73$ times too
+#: small`` states the same claim as ``1,73 times too small``, and the registry
+#: writes its mathematics in LaTeX, so the linter has to read both.
+_LATEX_NOISE = (
+    (re.compile(r"\{,\}"), ","),
+    (re.compile(r"\\text\{([^}]*)\}"), r"\1"),
+    (re.compile(r"\\mathrm\{([^}]*)\}"), r"\1"),
+    (re.compile(r"\\[ ,;]"), " "),
+    (re.compile(r"[$]"), " "),
+)
+
+
+def _plain(text: str) -> str:
+    """The entry as prose, so a claim typeset as maths still reads as a claim."""
+    for pattern, replacement in _LATEX_NOISE:
+        text = pattern.sub(replacement, text)
+    return text
+
+
 def _candidate_ratios(body: str) -> list[tuple[str, float]]:
     """Multiplicative claims stated in an entry, as (quotation, ratio)."""
+    body = _plain(body)
     found: list[tuple[str, float]] = []
     for pattern in (_TIMES, _FACTOR):
         for match in pattern.finditer(body):
@@ -280,13 +325,17 @@ def check_procedure_is_not_cited(entries: list[Entry]) -> list[str]:
     reads as a machine's account of itself rather than as a finding someone
     stands behind, which is the opposite of what the entry is for.
     """
-    problems = [
-        f"{REGISTRY.name}:{entry.line}: entry '{entry.title}' describes how "
-        f"the page was read ({found.group(0)!r}). Cite the document, the PDF "
-        "page and the printed folio; leave the method to CONTRIBUTING.md."
-        for entry in entries
-        if (found := _PROCEDURE.search(entry.body)) is not None
-    ]
+    problems: list[str] = []
+    for entry in entries:
+        found = _RESOLUTION.search(entry.body) or _RENDERING.search(entry.evidence)
+        if found is None:
+            continue
+        problems.append(
+            f"{REGISTRY.name}:{entry.line}: entry '{entry.title}' describes how "
+            f"the page was read ({found.group(0).strip()!r}). Cite the document, "
+            "the PDF page and the printed folio; leave the method to "
+            "CONTRIBUTING.md."
+        )
     return problems
 
 

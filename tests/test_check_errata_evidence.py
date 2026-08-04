@@ -120,15 +120,16 @@ def test_a_page_run_is_a_citation_too() -> None:
     [
         ("the PDF page index", "Verified on printed p. 6 of Some standard:2020."),
         ("the printed folio", "Verified on PDF page 8 of Some standard:2020."),
+        ("the edition", "Verified on PDF page 8 (printed p. 6)."),
         ("both", "Verified against the source document."),
     ],
 )
 def test_an_incomplete_citation_does_not_satisfy_the_check(
     field: str, without: str
 ) -> None:
-    """Both halves are required: the page index resolves in any copy of the
-    edition, and the printed folio is what a reader holding the paper looks
-    for."""
+    """All three parts are required: the page index resolves in any copy of the
+    edition, the printed folio is what a reader holding the paper looks for,
+    and without the designation neither resolves in any library."""
     incomplete = _WITH_PAGE.replace(
         "Verified on PDF page 8 (printed p. 6) of Some standard:2020.", without
     )
@@ -169,7 +170,13 @@ def test_the_procedure_is_rejected() -> None:
 
 @pytest.mark.parametrize(
     "procedure",
-    ["a 1200 dpi render", "rendered at 600 DPI", "the rendering of page 8", "300dpi"],
+    [
+        "a 1200 dpi render",
+        "rendered at 600 DPI",
+        "the rendering of page 8",
+        "300dpi",
+        "a rendered page image",
+    ],
 )
 def test_every_wording_of_the_procedure_is_rejected(procedure: str) -> None:
     markdown = f"""
@@ -179,6 +186,23 @@ def test_every_wording_of_the_procedure_is_rejected(procedure: str) -> None:
 - **Status:** unreported.
 """
     assert cee.check_procedure_is_not_cited(_entries(markdown))
+
+
+def test_the_ordinary_verb_is_not_the_procedure() -> None:
+    """"Renders" is a word an entry may need for what a misprint does.
+
+    The check exists to keep an account of the reading out of the registry, not
+    to ban an English verb: an entry that says a dropped exponent renders a
+    formula inconsistent is describing the defect, which is its whole job.
+    """
+    markdown = """
+## Probe
+
+- **The problem:** the dropped exponent renders Formula (7) inconsistent.
+- **Evidence:** Verified on PDF page 8 (printed p. 6) of X:2020.
+- **Status:** unreported.
+"""
+    assert cee.check_procedure_is_not_cited(_entries(markdown)) == []
 
 
 def test_a_clean_citation_carries_no_procedure() -> None:
@@ -216,6 +240,42 @@ def test_each_lost_glyph_signature_is_recognised(claim: str, expected: str) -> N
 """
     hits = cee.check_ratios(_entries(markdown))
     assert expected in [hit.name for hit in hits], claim
+
+
+@pytest.mark.parametrize(
+    "claim",
+    [
+        "$1{,}73$ times too small",
+        "a fixed $2{,}4\\ \\text{dB}$ offset",
+        "off by $4{,}77\\ \\text{dB}$",
+    ],
+)
+def test_a_claim_typeset_as_maths_is_still_a_claim(claim: str) -> None:
+    """The registry writes its mathematics in LaTeX, and the linter reads it.
+
+    `$1{,}73$ times too small` states exactly what `1,73 times too small`
+    states, so typesetting a claim must not be a way to hide it from the check
+    that exists to catch a lost glyph.
+    """
+    markdown = f"""
+## Probe
+
+- **The problem:** the printed value is {claim}.
+- **Status:** unreported.
+"""
+    assert cee.check_ratios(_entries(markdown)), claim
+
+
+def test_a_formula_term_is_not_a_ratio_claim() -> None:
+    """"The prefactor 4 N h" is a term of an equation, not a factor of four."""
+    markdown = """
+## Probe
+
+- **The problem:** the prefactor $4 N h_1 c_{L1}/(\\sqrt{3}\\,\\omega S_1)$ is
+  already dimensionless.
+- **Status:** unreported.
+"""
+    assert cee.check_ratios(_entries(markdown)) == []
 
 
 def test_an_honest_ratio_is_not_flagged() -> None:
