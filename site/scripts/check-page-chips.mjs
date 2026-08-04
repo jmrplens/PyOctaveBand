@@ -146,7 +146,9 @@ async function landing({ path, viewport, theme, banner }) {
 			const target = document.getElementById(decodeURIComponent(href.slice(1)));
 			if (!target) return { error: `the chip pointing at ${href} has no target on the page` };
 			const r = target.getBoundingClientRect();
-			tops.push({ top: Math.round(r.top), clears: r.top >= chrome - 1, hidden: r.bottom < chrome });
+			// Unrounded: a target at innerHeight - 0.4 is on screen, and rounding
+			// it to innerHeight would fail an audit the reader's eye passes.
+			tops.push({ top: r.top, clears: r.top >= chrome - 1, hidden: r.bottom < chrome });
 		}
 		const [entry, moreTop] = tops;
 		return {
