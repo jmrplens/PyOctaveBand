@@ -10,7 +10,9 @@
  * because that component never renders: our `Sidebar` override replaces the
  * one it would have rendered inside, so Astro never emits its scoped stylesheet.
  */
-import { Badge, Icon } from '@astrojs/starlight/components';
+import { Badge } from '@astrojs/starlight/components';
+import PhIcon from './PhIcon.astro';
+import { topics as configured } from '../data/topics.mjs';
 
 interface Props {
   topics: {
@@ -24,11 +26,17 @@ interface Props {
 }
 
 const { topics } = Astro.props;
+
+// The route data the plugin publishes carries no id, and the icon is keyed by
+// one. The plugin builds its array with `config.map`, so it is this array in
+// this order (libs/config.ts, middleware.ts); check-sidebar.mjs asserts that
+// the rendered list is the configured one, which is what keeps the two in step.
+const idAt = (index) => configured[index]?.id ?? '';
 ---
 
 <ul class="starlight-sidebar-topics">
   {
-    topics.map((topic) => {
+    topics.map((topic, index) => {
       const { class: className, ...attrs } = (topic.attrs || {}) as Record<string, string>;
       return (
         <li>
@@ -41,11 +49,9 @@ const { topics } = Astro.props;
             aria-current={topic.isCurrent ? 'true' : undefined}
             class:list={[{ 'starlight-sidebar-topics-current': topic.isCurrent }, className]}
           >
-            {topic.icon && (
-              <div class="starlight-sidebar-topics-icon">
-                <Icon name={topic.icon} />
-              </div>
-            )}
+            <div class="starlight-sidebar-topics-icon">
+              <PhIcon name={idAt(index)} />
+            </div>
             <div>
               {topic.label}
               {topic.badge && (

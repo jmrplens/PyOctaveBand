@@ -37,7 +37,6 @@ export const topics = [
     id: 'start',
     label: { en: 'Start', es: 'Inicio' },
     link: '/start/',
-    icon: 'open-book',
     items: [
       { slug: 'start', label: 'Overview', translations: { es: 'Resumen' } },
       'start/getting-started',
@@ -52,7 +51,6 @@ export const topics = [
     id: 'signal',
     label: { en: 'Signal analysis', es: 'Análisis de señal' },
     link: '/signal/',
-    icon: 'seti:audio',
     items: [
       { slug: 'signal', label: 'Overview', translations: { es: 'Resumen' } },
       'signal/sound-level-meter',
@@ -115,7 +113,6 @@ export const topics = [
     id: 'perception',
     label: { en: 'Hearing and perception', es: 'Audición y percepción' },
     link: '/perception/',
-    icon: 'comment',
     items: [
       { slug: 'perception', label: 'Overview', translations: { es: 'Resumen' } },
       {
@@ -161,7 +158,6 @@ export const topics = [
     id: 'buildings',
     label: { en: 'Rooms and buildings', es: 'Salas y edificación' },
     link: '/buildings/',
-    icon: 'seti:plan',
     items: [
       { slug: 'buildings', label: 'Overview', translations: { es: 'Resumen' } },
       {
@@ -218,7 +214,6 @@ export const topics = [
     id: 'materials',
     label: { en: 'Materials and surfaces', es: 'Materiales y superficies' },
     link: '/materials/',
-    icon: 'seti:crystal',
     items: [
       { slug: 'materials', label: 'Overview', translations: { es: 'Resumen' } },
       {
@@ -262,7 +257,6 @@ export const topics = [
     id: 'vibration',
     label: { en: 'Vibration', es: 'Vibración' },
     link: '/vibration/',
-    icon: 'seti:pipeline',
     items: [
       { slug: 'vibration', label: 'Overview', translations: { es: 'Resumen' } },
       {
@@ -303,7 +297,6 @@ export const topics = [
     id: 'environment',
     label: { en: 'Environment and transport', es: 'Medio ambiente y transporte' },
     link: '/environment/',
-    icon: 'seti:folder',
     items: [
       { slug: 'environment', label: 'Overview', translations: { es: 'Resumen' } },
       {
@@ -346,7 +339,6 @@ export const topics = [
     id: 'aircraft',
     label: { en: 'Aircraft noise', es: 'Ruido de aeronaves' },
     link: '/aircraft/',
-    icon: 'rocket',
     items: [
       { slug: 'aircraft', label: 'Overview', translations: { es: 'Resumen' } },
       'aircraft/aircraft-noise',
@@ -359,7 +351,6 @@ export const topics = [
     id: 'underwater',
     label: { en: 'Underwater acoustics', es: 'Acústica submarina' },
     link: '/underwater/',
-    icon: 'seti:db',
     items: [
       { slug: 'underwater', label: 'Overview', translations: { es: 'Resumen' } },
       'underwater/underwater-acoustics',
@@ -373,7 +364,6 @@ export const topics = [
     id: 'devices',
     label: { en: 'Sources and devices', es: 'Fuentes y dispositivos' },
     link: '/devices/',
-    icon: 'laptop',
     items: [
       { slug: 'devices', label: 'Overview', translations: { es: 'Resumen' } },
       {
@@ -422,7 +412,6 @@ export const topics = [
     id: 'simulation',
     label: { en: 'Wave simulation', es: 'Simulación de ondas' },
     link: '/simulation/',
-    icon: 'seti:graphql',
     items: [
       { slug: 'simulation', label: 'Overview', translations: { es: 'Resumen' } },
       'simulation/fdtd-simulation',
@@ -434,7 +423,6 @@ export const topics = [
     id: 'reference',
     label: { en: 'Reference', es: 'Referencia' },
     link: '/reference/',
-    icon: 'information',
     items: [
       { slug: 'reference', label: 'Overview', translations: { es: 'Resumen' } },
       {
@@ -469,7 +457,6 @@ export const topics = [
     id: 'api',
     label: { en: 'API reference', es: 'Referencia de la API' },
     link: '/reference/api/',
-    icon: 'seti:python',
     // Every section, in the generated order. This is the destination of the
     // "Overview" row inside each domain's API group, so it has to be worth the
     // sidebar it swaps in: the whole table, not a single row pointing at the

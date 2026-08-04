@@ -86,6 +86,12 @@ jobs:
           restore-keys: pnpm-store-${{ runner.os }}-
       - name: Regenerate llms.txt from docs (freshness guarantee)
         run: python3 scripts/generate_llms.py
+      - name: Check the icon sheet is not stale
+        # The sheet is the index of the site's own icons and the only place a
+        # changed drawing is visible in a diff. It costs nothing to keep in
+        # step and is worthless once it is not.
+        run: pnpm run check:icons
+        working-directory: site
       - name: Check EN/ES translation parity
         run: node scripts/check-i18n-parity.mjs
         working-directory: site

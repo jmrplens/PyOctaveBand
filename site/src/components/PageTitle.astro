@@ -17,6 +17,8 @@
  */
 import Default from '@astrojs/starlight/components/PageTitle.astro';
 import PageChips from './PageChips.astro';
+import PhIcon from './PhIcon.astro';
+import { topics } from '../data/topics.mjs';
 import { firstPublished } from '../lib/page-dates.mjs';
 
 interface RouteData {
@@ -42,6 +44,12 @@ const GUIDE_TOPICS = [
   'simulation',
 ];
 const isGuide = GUIDE_TOPICS.some((topic) => slug === topic || slug.startsWith(`${topic}/`));
+
+// A topic's own overview page. It gets the drawing the sidebar gives that
+// topic, beside the heading: the row a reader clicked and the page they landed
+// on then carry the same mark. The heading itself is still Starlight's, so it
+// keeps its own type scale and colour; the wrapper only lays the two out.
+const topicId = topics.find((topic) => topic.link === `/${slug}/`)?.id;
 const showByline = isGuide || slug === 'start/getting-started';
 
 const BASE = (import.meta.env.BASE_URL ?? '/').replace(/\/$/, '');
@@ -64,7 +72,20 @@ const t =
     : { by: 'By', published: 'Published', updated: 'updated' };
 ---
 
-<Default><slot /></Default>
+{
+  topicId ? (
+    <div class="ph-title-row">
+      <PhIcon name={topicId} class="ph-title-icon" />
+      <Default>
+        <slot />
+      </Default>
+    </div>
+  ) : (
+    <Default>
+      <slot />
+    </Default>
+  )
+}
 {
   showByline && (publishedText || modifiedText) && (
     <p class="page-byline">
@@ -88,6 +109,19 @@ const t =
 <PageChips />
 
 <style>
+  .ph-title-row {
+    align-items: center;
+    display: flex;
+    gap: 0.6rem;
+  }
+
+  .ph-title-icon {
+    color: var(--sl-color-gray-3);
+    flex-shrink: 0;
+    width: 1.5rem;
+    height: 1.5rem;
+  }
+
   .page-byline {
     margin: 0.35rem 0 0;
     font-size: var(--sl-text-sm);

@@ -28,10 +28,13 @@
  */
 import Default from '@astrojs/starlight/components/Sidebar.astro';
 import { Icon } from '@astrojs/starlight/components';
+import PhIcon from './PhIcon.astro';
 import TopicList from './TopicList.astro';
+import { topics as configured } from '../data/topics.mjs';
 
 const { topics = [], isPageWithTopic = false } = Astro.locals.starlightSidebarTopics ?? {};
-const current = topics.find((topic) => topic.isCurrent);
+const currentIndex = topics.findIndex((topic) => topic.isCurrent);
+const current = currentIndex === -1 ? undefined : topics[currentIndex];
 const lang = Astro.currentLocale === 'es' ? 'es' : 'en';
 const eyebrow = lang === 'es' ? 'Tema' : 'Topic';
 const allTopics = lang === 'es' ? 'Temas' : 'Topics';
@@ -48,7 +51,7 @@ const allTopics = lang === 'es' ? 'Temas' : 'Topics';
         <summary>
           <span class="ph-topic-eyebrow">{eyebrow}</span>
           <span class="ph-topic-current">
-            {current?.icon && <Icon name={current.icon} />}
+            <PhIcon name={configured[currentIndex]?.id ?? ''} />
             <span class="ph-topic-name">{current?.label}</span>
             {/* The row is a control, and a control that looks like a label does
                 not get clicked. The caret is the affordance; it turns on open,

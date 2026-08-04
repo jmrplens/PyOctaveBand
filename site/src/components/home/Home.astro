@@ -12,6 +12,19 @@
  * the PDF fiche are the ones already committed for the guides; nothing here is
  * a mock-up.
  */
+import PhIcon from '../PhIcon.astro';
+import { topics } from '../../data/topics.mjs';
+
+/**
+ * The area rows carry the same drawing the sidebar gives that topic, matched
+ * on the route the row links to: the landing names ten of the thirteen topics,
+ * and a reader who meets a drawing here meets it again in the tree.
+ */
+const topicIdOf = (href) => {
+  const route = href.replace(/^\/phonometry/, '');
+  return topics.find((topic) => topic.link === route)?.id ?? '';
+};
+
 import { Code } from '@astrojs/starlight/components';
 import ThemeImage from '../ThemeImage.astro';
 import ReportPreview from '../ReportPreview.astro';
@@ -142,7 +155,10 @@ const spectrum = lang === 'es'
 						content.coverage.areas.map((a) => (
 							<tr role="row">
 								<th scope="row" role="rowheader">
-									<a href={a.href}>{a.name}</a>
+									<a href={a.href}>
+										<PhIcon name={topicIdOf(a.href)} class="area-icon" />
+										{a.name}
+									</a>
 									<span class="area-summary">{a.summary}</span>
 								</th>
 								<td role="cell">
@@ -448,6 +464,26 @@ const spectrum = lang === 'es'
 		width: 40%;
 		padding-inline-start: 0;
 	}
+	/* The drawing sits on the row's first line, with the name beside it, and the
+	   summary keeps the whole width under both. */
+	table.coverage th a {
+		align-items: center;
+		display: flex;
+		gap: 0.45rem;
+	}
+
+	.area-icon {
+		color: var(--sl-color-gray-3);
+		flex-shrink: 0;
+		width: 1.15em;
+		height: 1.15em;
+	}
+
+	table.coverage th a:hover .area-icon,
+	table.coverage th a:focus-visible .area-icon {
+		color: inherit;
+	}
+
 	.area-summary {
 		display: block;
 		font-weight: 400;

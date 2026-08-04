@@ -1,0 +1,45 @@
+---
+/**
+ * One of the site's own icons (src/data/icons.mjs).
+ *
+ * Every place that draws one goes through here, so the stroke weight, the caps
+ * and the joins are stated once: a drawing that carried its own would be the
+ * first step towards thirteen drawings that no longer look like one set.
+ *
+ * Decorative by default, because in every current use the label sits next to
+ * it and a screen reader that read both would say the topic twice. Pass
+ * `label` where the icon stands alone.
+ */
+import { topicIcons } from '../data/icons.mjs';
+
+interface Props {
+  /** Topic id, as in src/data/topics.mjs. */
+  name: string;
+  /** CSS length. The list renders at 1em, which is 16 px there. */
+  size?: string;
+  label?: string;
+  class?: string;
+}
+
+const { name, size = '1em', label, class: className } = Astro.props;
+const glyph = topicIcons[name as keyof typeof topicIcons];
+const a11y = label ? { 'aria-label': label, role: 'img' } : { 'aria-hidden': 'true' };
+---
+
+{
+  glyph && (
+    <svg
+      {...a11y}
+      class={className}
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="1.7"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      set:html={glyph}
+    />
+  )
+}
