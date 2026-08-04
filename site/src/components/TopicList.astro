@@ -1,0 +1,125 @@
+---
+/**
+ * The list of topics, as one row each.
+ *
+ * Rendered in two places and identical in both, which is the point: inside the
+ * switcher on a page that belongs to a topic (src/components/Sidebar.astro),
+ * and on its own on the two landing pages, which belong to none. The markup and
+ * class names are the ones `starlight-sidebar-topics` uses in its own
+ * `Topics.astro`, so the two can be read side by side, but the styles are here
+ * because that component never renders: our `Sidebar` override replaces the
+ * one it would have rendered inside, so Astro never emits its scoped stylesheet.
+ */
+import { Badge } from '@astrojs/starlight/components';
+import PhIcon from './PhIcon.astro';
+import { topics as configured } from '../data/topics.mjs';
+
+interface Props {
+  topics: {
+    attrs?: Record<string, unknown>;
+    badge?: { text: string; variant: 'note' | 'danger' | 'success' | 'caution' | 'tip' | 'default' };
+    icon?: string;
+    isCurrent: boolean;
+    label: string;
+    link: string;
+  }[];
+}
+
+const { topics } = Astro.props;
+
+// The route data the plugin publishes carries no id, and the icon is keyed by
+// one. The plugin builds its array with `config.map`, so it is this array in
+// this order (libs/config.ts, middleware.ts); check-sidebar.mjs asserts that
+// the rendered list is the configured one, which is what keeps the two in step.
+const idAt = (index: number) => configured[index]?.id ?? '';
+---
+
+<ul class="starlight-sidebar-topics">
+  {
+    topics.map((topic, index) => {
+      const { class: className, ...attrs } = (topic.attrs || {}) as Record<string, string>;
+      return (
+        <li>
+          <a
+            {...attrs}
+            href={topic.link}
+            /* Colour alone does not say which row is the reader's, and `true`
+               rather than `page` because the link goes to the topic's landing
+               page, which is not the page being viewed. */
+            aria-current={topic.isCurrent ? 'true' : undefined}
+            class:list={[{ 'starlight-sidebar-topics-current': topic.isCurrent }, className]}
+          >
+            <div class="starlight-sidebar-topics-icon">
+              <PhIcon name={idAt(index)} />
+            </div>
+            <div>
+              {topic.label}
+              {topic.badge && (
+                <Badge
+                  class="starlight-sidebar-topics-badge"
+                  text={topic.badge.text}
+                  variant={topic.badge.variant}
+                />
+              )}
+            </div>
+          </a>
+        </li>
+      );
+    })
+  }
+</ul>
+
+<style>
+  ul.starlight-sidebar-topics {
+    list-style: none;
+    margin-top: 0.5rem;
+    padding: 0;
+  }
+
+  li {
+    /* Topic labels are two and three words long and the column is narrow. */
+    overflow-wrap: anywhere;
+  }
+
+  li + li {
+    margin-top: 0.1rem;
+  }
+
+  a {
+    align-items: center;
+    color: var(--sl-color-white);
+    display: flex;
+    font-size: var(--sl-text-sm);
+    gap: 0.5rem;
+    line-height: 1.5;
+    padding: 0.2em 0.4rem;
+    text-decoration: none;
+  }
+
+  a:is(.starlight-sidebar-topics-current, :hover, :focus-visible) {
+    color: var(--sl-color-accent-high);
+  }
+
+  :global([data-theme='light']) a.starlight-sidebar-topics-current {
+    color: var(--sl-color-accent);
+  }
+
+  .starlight-sidebar-topics-icon {
+    align-items: center;
+    border-radius: 0.25rem;
+    border: 1px solid var(--sl-color-gray-4);
+    display: flex;
+    justify-content: center;
+    padding: 0.15rem;
+  }
+
+  a:is(.starlight-sidebar-topics-current, :hover, :focus-visible) .starlight-sidebar-topics-icon {
+    background-color: var(--sl-color-text-accent);
+    border-color: var(--sl-color-text-accent);
+    color: var(--sl-color-text-invert);
+  }
+
+  .starlight-sidebar-topics-badge {
+    margin-inline-start: 0.25em;
+  }
+</style>

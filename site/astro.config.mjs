@@ -6,7 +6,9 @@ import starlightLinksValidator from 'starlight-links-validator';
 import starlightImageZoom from 'starlight-image-zoom';
 import remarkMath from 'remark-math';
 import rehypeKatex from 'rehype-katex';
-import { sidebar } from './src/data/sidebar.mjs';
+import starlightSidebarTopics from 'starlight-sidebar-topics';
+
+import { topics } from './src/data/topics.mjs';
 import { doi, doiUrl } from './src/data/citation.mjs';
 import { basePath, siteUrl } from './src/data/site.mjs';
 import { isOurMedia, mediaUrl, REMOTE_PREFIXES } from './src/lib/media.mjs';
@@ -466,6 +468,18 @@ export default defineConfig({
         // for a reader who cannot see it; painted over the zoomed figure they
         // would cover the very thing the reader zoomed in to look at.
         starlightImageZoom({ showCaptions: false }),
+        // One sidebar per topic. The tree a reader sees is the domain they
+        // are in, with its own API branch, instead of every page in the
+        // library folded three deep: on a guide the sidebar drops from 222
+        // links to about a hundred, and an API page finally shows its own
+        // entry on screen. The plugin forbids Starlight's `sidebar` key and
+        // owns the `Sidebar` component, which is why there is no override of
+        // it here: its own renders the topic list and then defers to the
+        // default tree.
+        starlightSidebarTopics(topics, {
+          // The two splash pages are the site's front doors, not a topic.
+          exclude: ['/', '/es/'],
+        }),
       ],
       description: siteDescription,
       lastUpdated: true,
@@ -491,6 +505,12 @@ export default defineConfig({
         // Default right column plus the page actions, which hand this page's
         // published markdown copy to a clipboard, a tab or a chat.
         PageSidebar: './src/components/PageSidebar.astro',
+        // Default left column with the topic switcher above it. The topics
+        // plugin overrides `Sidebar` too, and its own hook spreads our
+        // components last, so this wins and its override never runs: the
+        // switcher renders the topic list itself, from the route data the
+        // plugin publishes for exactly that.
+        Sidebar: './src/components/Sidebar.astro',
         // Default article body plus the unified APA-7 references section
         // rendered from the typed frontmatter bibliography.
         MarkdownContent: './src/components/MarkdownContent.astro',
@@ -633,7 +653,6 @@ export default defineConfig({
         // JSON-LD structured data
         { tag: 'script', attrs: { type: 'application/ld+json' }, content: jsonLd },
       ],
-      sidebar,
     }),
   ],
 });

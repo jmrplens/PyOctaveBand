@@ -8,13 +8,13 @@
  * 44 distinct `BreadcrumbList` targets that 404, on 414 of 442 pages, and
  * machine-titlecased labels ("Api", "Building") in both locales.
  *
- * `src/data/sidebar.mjs` already describes the real hierarchy, with a
+ * `src/data/topics.mjs` already describes the real hierarchy, with a
  * translated label on every group and an explicit `Overview` entry on each
  * group that has a landing page. Reading the trail from there means a crumb
  * exists only where a page exists, the labels are the ones a reader sees in
  * the sidebar, and adding a section keeps the two in step automatically.
  */
-import { sidebar } from '../data/sidebar.mjs';
+import { navigationTree as sidebar } from '../data/topics.mjs';
 
 /** Slug of a sidebar entry, whichever of the two shapes it uses. */
 function slugOf(item) {

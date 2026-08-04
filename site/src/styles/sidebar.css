@@ -7,10 +7,11 @@
    three-level tree needs, because Starlight styles every group label with the
    same `.large` token regardless of depth:
 
-   - top-level groups (Start, Core signal analysis, ..., API reference) become
-     small uppercase "eyebrow" headers with a hairline separator above each
-     group, the pattern large Starlight sites (e.g. the Astro docs) use for
-     long navigation lists;
+   - the top level of a topic (its Overview row, its guides and its subgroups)
+     becomes small uppercase "eyebrow" rows with a hairline separator above
+     each, the pattern large Starlight sites (e.g. the Astro docs) use for long
+     navigation lists. A page and a group at that depth read the same, since
+     with one sidebar per topic both kinds share it;
    - every row below the top level, nested group label or page link, shares one
      type treatment: the small text size, weight 600 and the gray-2 ink, so
      rows at the same depth read as one list instead of two;
@@ -21,11 +22,17 @@
    themes are both covered, and nothing here touches focus styles. */
 
 /* Top-level group labels: uppercase eyebrow headers. */
-#starlight__sidebar .top-level > li > details > summary .large {
+#starlight__sidebar .top-level > li > details > summary .large,
+#starlight__sidebar .top-level > li > a:not([aria-current='page']) {
   font-size: var(--sl-text-xs);
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  color: var(--sl-color-gray-1);
+  /* gray-2 rather than gray-1: at this size the dimmer ink reads at 2.75:1 on
+     the sidebar background, under the 4.5:1 the accessibility audit enforces.
+     Both kinds of row take it, so the depth still reads as one list, and the
+     current page is excluded from the selector: its ink belongs to the accent
+     pill Starlight paints, and an id selector here would win against it. */
+  color: var(--sl-color-gray-2);
 }
 
 /* A hairline plus breathing room between the top-level groups. */
@@ -43,7 +50,10 @@
    difference passed for a different typeface. The two now share weight, size
    and ink; what tells a group from a page is the caret and the indent rule.
    Nothing here touches `[aria-current]`, so the current page keeps its stock
-   accent pill, which is the only strong colour left in the tree. */
+   accent pill, which is the only strong colour left in the tree. The top-level
+   rule above excludes it by hand for the same reason: it carries an id, so it
+   would otherwise beat Starlight's own rule and repaint the current row's ink
+   over its pill. */
 #starlight__sidebar ul ul summary .large,
 #starlight__sidebar ul ul a {
   font-size: var(--sl-text-sm);

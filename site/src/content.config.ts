@@ -1,6 +1,7 @@
 import { defineCollection, z } from 'astro:content';
 import { docsLoader, i18nLoader } from '@astrojs/starlight/loaders';
 import { docsSchema, i18nSchema } from '@astrojs/starlight/schema';
+import { topicSchema } from 'starlight-sidebar-topics/schema';
 
 // Typed bibliography declared in each page's frontmatter and rendered as a
 // single APA-7 "References" section by src/components/References.astro (wired
@@ -108,9 +109,14 @@ export const collections = {
   docs: defineCollection({
     loader: docsLoader(),
     schema: docsSchema({
+      // `topic` is the topics plugin's escape hatch: a page that no topic
+      // lists names its own. Nothing uses it today, because every page is
+      // listed and the plugin fails the build on one that is not, but the
+      // frontmatter has to accept it or the escape hatch would be a silent
+      // no-op the day it is reached for.
       extend: z.object({
         references: references.optional(),
-      }),
+      }).merge(topicSchema),
     }),
   }),
   i18n: defineCollection({

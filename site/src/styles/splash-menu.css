@@ -1,12 +1,10 @@
-/* The route middleware (src/routeData.ts) enables the sidebar on splash
-   pages so the mobile menu button exists. On desktop, hide the sidebar pane
-   to preserve the clean hero layout. */
-@media (min-width: 50rem) {
-  [data-has-hero] .sidebar-pane {
-    display: none;
-  }
-
-  [data-has-hero] .main-frame {
-    --sl-sidebar-width: 0rem;
-  }
+/* The route middleware (src/routeData.ts) turns the sidebar on for the two
+   landing pages, which Starlight builds without one. The pane holds the topic
+   list and nothing else there (src/components/Sidebar.astro), so a reader
+   arriving at the site meets the same thirteen rows a reader inside it does,
+   and the mobile menu button exists to reach them. The tree itself is empty on
+   those pages, so the rule below keeps its container from taking space above
+   the list. */
+#starlight__sidebar .top-level:empty {
+  display: none;
 }

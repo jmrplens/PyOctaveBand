@@ -17,6 +17,8 @@
  */
 import Default from '@astrojs/starlight/components/PageTitle.astro';
 import PageChips from './PageChips.astro';
+import PhIcon from './PhIcon.astro';
+import { topics } from '../data/topics.mjs';
 import { firstPublished } from '../lib/page-dates.mjs';
 
 interface RouteData {
@@ -29,19 +31,20 @@ const lang = id === 'es' || id.startsWith('es/') ? 'es' : 'en';
 const slug = id.replace(/^es\/?/, '');
 
 // The guides, wherever their topic filed them, and the page that opens them.
-const GUIDE_TOPICS = [
-  'signal',
-  'perception',
-  'buildings',
-  'materials',
-  'vibration',
-  'environment',
-  'aircraft',
-  'underwater',
-  'devices',
-  'simulation',
-];
+// Derived rather than listed: the ten domains are every topic that is not one
+// of the three carrying no teaching prose, so renaming or adding a domain
+// keeps the byline without a second list to remember.
+const NOT_A_DOMAIN = ['start', 'reference', 'api'];
+const GUIDE_TOPICS = topics
+  .map((topic) => topic.id)
+  .filter((id) => id !== undefined && !NOT_A_DOMAIN.includes(id));
 const isGuide = GUIDE_TOPICS.some((topic) => slug === topic || slug.startsWith(`${topic}/`));
+
+// A topic's own overview page. It gets the drawing the sidebar gives that
+// topic, beside the heading: the row a reader clicked and the page they landed
+// on then carry the same mark. The heading itself is still Starlight's, so it
+// keeps its own type scale and colour; the wrapper only lays the two out.
+const topicId = topics.find((topic) => topic.link === `/${slug}/`)?.id;
 const showByline = isGuide || slug === 'start/getting-started';
 
 const BASE = (import.meta.env.BASE_URL ?? '/').replace(/\/$/, '');
@@ -64,7 +67,20 @@ const t =
     : { by: 'By', published: 'Published', updated: 'updated' };
 ---
 
-<Default><slot /></Default>
+{
+  topicId ? (
+    <div class="ph-title-row">
+      <PhIcon name={topicId} class="ph-title-icon" />
+      <Default>
+        <slot />
+      </Default>
+    </div>
+  ) : (
+    <Default>
+      <slot />
+    </Default>
+  )
+}
 {
   showByline && (publishedText || modifiedText) && (
     <p class="page-byline">
@@ -88,6 +104,28 @@ const t =
 <PageChips />
 
 <style>
+  /* The heading's own top margin sat inside the row and pushed the h1 half of
+     it below the icon. It belongs to the row now, so the two centre on each
+     other, and the drawing is a fraction of the heading rather than a fixed
+     size, so it keeps its proportion when the type scale drops on a phone. */
+  .ph-title-row {
+    align-items: center;
+    display: flex;
+    gap: 0.5em;
+    margin-top: 1rem;
+  }
+
+  .ph-title-row :global(h1) {
+    margin-top: 0;
+  }
+
+  .ph-title-icon {
+    color: var(--sl-color-gray-3);
+    flex-shrink: 0;
+    width: calc(var(--sl-text-h1) * 0.82);
+    height: calc(var(--sl-text-h1) * 0.82);
+  }
+
   .page-byline {
     margin: 0.35rem 0 0;
     font-size: var(--sl-text-sm);

@@ -1070,6 +1070,33 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   the errata registry are written at the repository root and transplanted into
   their site routes, which is a mapping the layout cannot express.
 
+- The sidebar is one tree per topic, through `starlight-sidebar-topics`. A
+  reader in the underwater chapter sees its four guides and its own API branch,
+  not every page in the library folded three levels deep, and the topic list at
+  the top of the sidebar says what the other twelve are. The tree a page ships
+  drops from the 286 links every page carried to between 17 and 72, the size of
+  the topic the reader is in.
+
+  The API reference of a domain lives inside that domain's topic, which the
+  package taxonomy is what makes possible: every section of the generated
+  reference is the API of one subpackage, so each section mounts under the
+  topic that documents it. The last topic is the global index, for a reader who
+  wants the whole table rather than one domain. `generate_api_docs.py` emits one
+  group per section instead of a single block, so adding a module still changes
+  nothing by hand.
+
+  Pagination stops at the edge of a topic. Starlight paginates over the whole
+  tree, and the plugin's own trimming does not survive a configured base path,
+  so a card that would have sent the reader into another chapter, swapping the
+  sidebar under them, is dropped instead.
+
+  The tree is one level shallower as a result, since a topic is what a
+  top-level group used to be, and the styling follows: at the top level of a
+  topic a page and a subgroup read the same, as they already did further down.
+  The landing page of each language keeps a menu on a phone, and it is the
+  topic list, which is the right menu for a page whose job is to send the
+  reader into a chapter.
+
 - The documentation site is organised by topic rather than by one `guides/`
   drawer. Every page lives under the domain it belongs to, and the URL says so:
   `signal/filters/filter-banks`, `buildings/insulation/insulation-field`,

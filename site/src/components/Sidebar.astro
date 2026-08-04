@@ -1,0 +1,167 @@
+---
+/**
+ * Default Starlight sidebar with the topic switcher above it.
+ *
+ * The topics plugin ships its own `Sidebar` override that stacks the full
+ * topic list on top of the tree. Thirteen rows at the base type size with an
+ * icon box each is 528 px of an 836 px column, which pushed the reader's own
+ * page below the fold on about two pages in five, on a pane that is
+ * `position: fixed` and arrives at the top on every navigation. The list is
+ * worth one row, not half the column: the reader is in one topic and wants to
+ * see where they are in it.
+ *
+ * So the switcher is a disclosure that names the current topic and opens the
+ * full list on demand, and the tree starts where it used to. Every topic link
+ * is still in the document, closed or open, so a crawler and the behaviour
+ * check both see the whole list.
+ *
+ * Overriding `Sidebar` is what the plugin's own hook does, and its spread puts
+ * our override last, so ours wins and the plugin's never runs. The list below
+ * is therefore ours, and so are its styles: the plugin's component is never
+ * rendered, so Astro never emits its scoped stylesheet and nothing of it
+ * survives. The markup and class names are kept the same anyway, so that the
+ * two can be read side by side. What is added is `aria-current` on the row the
+ * reader is in, since the plugin marks it by colour alone, which a reader who
+ * cannot tell the two accent colours apart has no way to read; `true` rather
+ * than `page` because the link goes to the topic's landing page, which is not
+ * the page being viewed.
+ */
+import Default from '@astrojs/starlight/components/Sidebar.astro';
+import { Icon } from '@astrojs/starlight/components';
+import PhIcon from './PhIcon.astro';
+import TopicList from './TopicList.astro';
+import { topics as configured } from '../data/topics.mjs';
+
+const { topics = [], isPageWithTopic = false } = Astro.locals.starlightSidebarTopics ?? {};
+const currentIndex = topics.findIndex((topic) => topic.isCurrent);
+const current = currentIndex === -1 ? undefined : topics[currentIndex];
+const lang = Astro.currentLocale === 'es' ? 'es' : 'en';
+const eyebrow = lang === 'es' ? 'Tema' : 'Topic';
+const allTopics = lang === 'es' ? 'Temas' : 'Topics';
+---
+
+{
+  topics.length > 0 &&
+    (isPageWithTopic ? (
+      <details class="ph-topic-switcher">
+        {/* No `aria-label` here. It would replace the accessible name with a
+            verb and drop the topic, which is the one thing the row exists to
+            say, and it would leave a reader driving the page by voice with no
+            spoken label matching the visible one. */}
+        <summary>
+          <span class="ph-topic-eyebrow">{eyebrow}</span>
+          <span class="ph-topic-current">
+            <PhIcon name={configured[currentIndex]?.id ?? ''} />
+            <span class="ph-topic-name">{current?.label}</span>
+            {/* The row is a control, and a control that looks like a label does
+                not get clicked. The caret is the affordance; it turns on open,
+                the way every other disclosure in this sidebar does. */}
+            <Icon name="right-caret" class="ph-topic-caret" />
+          </span>
+        </summary>
+        <TopicList topics={topics} />
+      </details>
+    ) : (
+      /* A landing page belongs to no topic, so there is nothing to switch from
+         and nothing to fold away: the list is the whole navigation the page
+         has, and it is what a reader arriving at the site should meet. */
+      <div class="ph-topic-list">
+        <span class="ph-topic-eyebrow">{allTopics}</span>
+        <TopicList topics={topics} />
+      </div>
+    ))
+}
+
+<Default><slot /></Default>
+
+<style>
+  .ph-topic-switcher,
+  .ph-topic-list {
+    margin-bottom: 1rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid var(--sl-color-hairline-light);
+  }
+
+  /* The row reads like the tree's own top level: an eyebrow above the name of
+     the chapter the reader is in, with the caret the disclosure gives it. */
+  summary {
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+    padding: 0.25rem 0;
+  }
+
+  /* The default marker would sit outside the two-line layout above; the caret
+     inside the second line is the one a reader sees. */
+  summary::marker,
+  summary::-webkit-details-marker {
+    content: '';
+    display: none;
+  }
+
+  .ph-topic-name {
+    flex: 1;
+  }
+
+  .ph-topic-caret {
+    color: var(--sl-color-gray-3);
+    flex-shrink: 0;
+    transition: transform 0.2s ease-in-out;
+  }
+
+  [open] > summary .ph-topic-caret {
+    transform: rotate(90deg);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .ph-topic-caret {
+      transition: none;
+    }
+  }
+
+  .ph-topic-eyebrow {
+    font-size: var(--sl-text-xs);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--sl-color-gray-2);
+  }
+
+  .ph-topic-current {
+    align-items: center;
+    color: var(--sl-color-white);
+    display: flex;
+    font-size: var(--sl-text-sm);
+    font-weight: 600;
+    gap: 0.4rem;
+  }
+
+</style>
+
+<script>
+  // The sidebar is a fixed pane that arrives at its own top on every
+  // navigation, so a reader deep in a long tree lands looking at rows they did
+  // not ask for. Bring their own row into view, without moving the article.
+  //
+  // `#starlight__sidebar` is the scroller: `.sidebar-content` inside it is a
+  // flex child with `min-height: max-content` and no overflow, so its box is
+  // the whole content and setting `scrollTop` on it does nothing. Starlight's
+  // own scroll restore reads the same element (SidebarPersister.astro).
+  (() => {
+    const pane = document.getElementById('starlight__sidebar');
+    if (!pane) return;
+    // Below this width the pane is the mobile drawer, closed and off screen:
+    // scrolling it moves nothing a reader can see. Starlight's restore takes
+    // the same width as its own cut-off.
+    if (!matchMedia('(min-width: 50em)').matches) return;
+    // A restored position is the reader's own, from the page they came from,
+    // and it is already correct. Ours runs after theirs, so it has to yield.
+    if (pane.scrollTop !== 0) return;
+    const current = pane.querySelector('[aria-current="page"]');
+    if (!current) return;
+    const row = current.getBoundingClientRect();
+    const view = pane.getBoundingClientRect();
+    if (row.top >= view.top && row.bottom <= view.bottom) return;
+    pane.scrollTop += row.top - view.top - view.height / 3;
+  })();
+</script>
