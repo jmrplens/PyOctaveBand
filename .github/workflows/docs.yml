@@ -95,7 +95,7 @@ jobs:
           path: ${{ env.PNPM_STORE }}
           key: pnpm-store-${{ runner.os }}-${{ hashFiles('site/pnpm-lock.yaml') }}
           restore-keys: pnpm-store-${{ runner.os }}-
-      - name: Regenerate llms.txt from docs (freshness guarantee)
+      - name: Check the overview mirrors, then regenerate llms.txt
         run: |
           python3 scripts/mirror_overviews.py --check
           python3 scripts/generate_llms.py

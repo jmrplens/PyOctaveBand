@@ -42,13 +42,19 @@ SITE_ONLY_PREFIXES = ("reference/api",)
 SITE_BASE = "https://jmrplens.github.io/phonometry"
 
 
-def _frontmatter(text: str) -> tuple[dict[str, str], str]:
-    """The title and description of a page, and its body."""
+def _frontmatter(text: str, page: Path) -> tuple[dict[str, str], str]:
+    """The title of a page, and its body."""
     match = re.match(r"---\n(.*?)\n---\n", text, re.DOTALL)
     if not match:
-        raise SystemExit("overview without frontmatter")
-    found = re.search(r'^title:\s*"((?:[^"\\]|\\.)*)"\s*$', match.group(1), re.MULTILINE)
-    title = found.group(1).replace('\\"', '"') if found else ""
+        raise SystemExit(f"{page}: overview without frontmatter")
+    found = re.search(
+        r"""^title:\s*(?:"((?:[^"\\]|\\.)*)"|'([^']*)'|(\S.*?))\s*$""",
+        match.group(1),
+        re.MULTILINE,
+    )
+    if not found:
+        raise SystemExit(f"{page}: overview without a title")
+    title = (found.group(1) or found.group(2) or found.group(3)).replace('\\"', '"')
     return {"title": title}, text[match.end() :]
 
 
@@ -62,7 +68,7 @@ def _overviews() -> list[Path]:
     return [
         p
         for p in pages
-        if not str(p.relative_to(SITE)).startswith(("es/", "reference/"))
+        if not p.relative_to(SITE).as_posix().startswith(("es/", "reference/"))
     ]
 
 
@@ -70,13 +76,19 @@ def _mirror_path(route: str) -> Path:
     return DOCS / route / "index.md"
 
 
+#: The mirror index files this run will produce, whether or not they exist
+#: yet: resolving against the disk instead made the output depend on what a
+#: previous run had left behind, so a cold tree and a warm tree disagreed.
+PLANNED: set[Path] = set()
+
+
 def _relative_link(from_route: str, to_route: str) -> str | None:
     """The mirror-relative path from one route's index to another page, if
-    that page has a mirror file."""
+    that page has, or will have, a mirror file."""
     target = DOCS / f"{to_route}.md"
     if not target.exists():
         target = DOCS / to_route / "index.md"
-    if not target.exists():
+    if not target.exists() and target not in PLANNED:
         return None
     here = (DOCS / from_route / "index.md").parent
     # The shortest relative path, so a link inside the folder reads as the
@@ -98,8 +110,8 @@ def _rewrite_links(body: str, route: str) -> str:
 
 
 def render(page: Path) -> tuple[Path, str]:
-    route = str(page.parent.relative_to(SITE))
-    fields, body = _frontmatter(page.read_text())
+    route = page.parent.relative_to(SITE).as_posix()
+    fields, body = _frontmatter(page.read_text(encoding="utf-8"), page)
     title = fields.get("title")
     if not title:
         raise SystemExit(f"{page}: overview without a title")
@@ -114,15 +126,18 @@ def main() -> int:
     parser.add_argument("--check", action="store_true", help="fail on drift instead of writing")
     args = parser.parse_args()
 
+    PLANNED.update(
+        _mirror_path(page.parent.relative_to(SITE).as_posix()) for page in _overviews()
+    )
     stale: list[str] = []
     for page in _overviews():
         path, text = render(page)
         if args.check:
-            if not path.exists() or path.read_text() != text:
+            if not path.exists() or path.read_text(encoding="utf-8") != text:
                 stale.append(str(path.relative_to(ROOT)))
         else:
             path.parent.mkdir(parents=True, exist_ok=True)
-            path.write_text(text)
+            path.write_text(text, encoding="utf-8")
 
     count = len(_overviews())
     if args.check:

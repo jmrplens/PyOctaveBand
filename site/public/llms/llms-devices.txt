@@ -1,0 +1,82 @@
+# phonometry: Sources and devices
+
+Part of https://jmrplens.github.io/phonometry/llms.txt. Full text of the pages in this area.
+
+---
+
+<!-- source: docs/devices/index.md | canonical: https://jmrplens.github.io/phonometry/devices/ -->
+Source: https://jmrplens.github.io/phonometry/devices/
+
+# Sources and devices
+
+Every prediction elsewhere in this documentation starts from a source
+descriptor, and this section is where those descriptors are measured. Its
+common thread is **emission**: numbers that belong to the device rather than
+to the room or the distance it is heard at.
+
+The **sound power and intensity** pages determine the central emission
+quantity, the sound power level: the figure that goes on a datasheet, feeds a
+room or outdoor prediction and is checked against noise-emission limits. The
+**electroacoustics** pages turn to devices that are *supposed* to make sound
+(amplifiers, loudspeakers and microphones) and to the broadcast programme
+they carry, and the **noise control** pages hold the path measures that quiet
+a machine once its emission is known.
+
+If you are here to measure a machine, start with
+[Sound Power](https://jmrplens.github.io/phonometry/devices/emission/sound-power/) and let its decision guidance
+pick the route; read [Sound Intensity (p-p)](https://jmrplens.github.io/phonometry/devices/emission/intensity/)
+when that route involves an intensity probe. If you are here to bench-test
+audio gear, go straight to
+[Electroacoustics](https://jmrplens.github.io/phonometry/devices/electroacoustics/electroacoustics/); if you are here to
+level a programme, go to
+[Programme loudness](https://jmrplens.github.io/phonometry/devices/broadcast/program-loudness/).
+
+## [Sound power and intensity](https://jmrplens.github.io/phonometry/devices/emission/)
+
+The total acoustic emission of a source, and the power flux it is built on.
+
+- [Sound Intensity (p-p)](https://jmrplens.github.io/phonometry/devices/emission/intensity/): two-microphone
+  sound intensity per IEC 61043 with the ISO 9614-1 field indicators.
+- [Sound Power](https://jmrplens.github.io/phonometry/devices/emission/sound-power/): choosing the determination
+  method and declaring the noise emission per ISO 4871.
+- [Sound Power by Pressure Methods](https://jmrplens.github.io/phonometry/devices/emission/sound-power-pressure/):
+  the enveloping surface of ISO 3744/3746 and the precision anechoic grade of
+  ISO 3745.
+- [Sound Power in the Reverberation Room](https://jmrplens.github.io/phonometry/devices/emission/sound-power-reverberation/):
+  the direct and comparison methods of ISO 3741.
+- [Sound Power by Intensity Scanning](https://jmrplens.github.io/phonometry/devices/emission/sound-power-intensity/):
+  the on-site scanning of ISO 9614-2 and the ISO 9614-3 precision grade.
+
+## [Electroacoustics](https://jmrplens.github.io/phonometry/devices/electroacoustics/)
+
+Amplifiers, loudspeakers and microphones on the bench, and the programme
+signal they carry.
+
+- [Electroacoustics: distortion and frequency response](https://jmrplens.github.io/phonometry/devices/electroacoustics/electroacoustics/):
+  the IEC 60268-3 distortion metrics and frequency-response estimation with
+  coherence.
+- [Loudspeaker Characterisation (IEC 60268-5)](https://jmrplens.github.io/phonometry/devices/electroacoustics/loudspeakers/):
+  the sensitivity conventions, the radiating piston and the IEC 60268-5
+  characteristics fiche.
+- [Microphone Characterisation (IEC 60268-4)](https://jmrplens.github.io/phonometry/devices/electroacoustics/microphones/):
+  the sensitivity references, directional patterns and inherent noise of the
+  IEC 60268-4 fiche.
+- [Swept-sine distortion and phase utilities](https://jmrplens.github.io/phonometry/devices/electroacoustics/swept-sine-distortion/):
+  harmonic separation and THD(f) from one exponential sweep (Farina /
+  Novak synchronized swept-sine), and minimum phase, group delay and
+  excess phase from a measured response.
+- [Programme loudness and true peak](https://jmrplens.github.io/phonometry/devices/broadcast/program-loudness/):
+  the ITU-R BS.1770-5 programme loudness and true-peak level with the
+  EBU R 128 normalisation practice, EBU Mode metering and loudness range.
+
+## [Noise control](https://jmrplens.github.io/phonometry/devices/noise-control/)
+
+Industrial noise control on the path, between the machine and whoever hears
+it.
+
+- [Silencers](https://jmrplens.github.io/phonometry/devices/noise-control/silencers/): reactive silencers by the
+  four-pole method and the reactive-versus-dissipative choice.
+- [Industrial Noise Control: HVAC and Enclosures](https://jmrplens.github.io/phonometry/devices/noise-control/noise-control/):
+  duct attenuation, flow noise and machine-enclosure insertion loss.
+
+---

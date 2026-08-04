@@ -1,0 +1,101 @@
+# phonometry: Rooms and buildings
+
+Part of https://jmrplens.github.io/phonometry/llms.txt. Full text of the pages in this area.
+
+---
+
+<!-- source: docs/buildings/index.md | canonical: https://jmrplens.github.io/phonometry/buildings/ -->
+Source: https://jmrplens.github.io/phonometry/buildings/
+
+# Rooms and buildings
+
+This section covers sound in the built environment, and it splits along a
+natural line: what happens **inside** one room, and what passes **between**
+rooms. Inside a room, the governing quantity is absorption: it sets the
+reverberation time and the clarity that room acoustics measures (ISO 3382)
+and predicts (Sabine and its refinements, EN 12354-6), while the background
+noise the room settles into is rated against criterion curves
+(ANSI/ASA S12.2). Between rooms, the governing quantity is insulation: how much
+airborne and impact sound a partition and its flanking paths transmit, measured
+in the field (ISO 16283) or the laboratory (ISO 10140) and predicted from
+element data (EN 12354).
+
+Both halves consume coefficients measured elsewhere: the
+[Materials and surfaces](https://jmrplens.github.io/phonometry/materials/)
+section characterises the absorption, impedance and scattering data that the
+room and insulation predictions here rely on.
+
+Start with
+[Measuring the Room Impulse Response](https://jmrplens.github.io/phonometry/buildings/rooms/room-impulse-response/)
+and [Room Acoustics](https://jmrplens.github.io/phonometry/buildings/rooms/room-acoustics/): the impulse response
+the first acquires and the parameters the second derives are the vocabulary
+the rest of the section speaks. If your interest is insulation, read
+[Field Insulation Measurement (ISO 16283)](https://jmrplens.github.io/phonometry/buildings/insulation/insulation-field/)
+next; if it is design-stage prediction, go to
+[Reverberation-time prediction (Sabine, Eyring, Arau)](https://jmrplens.github.io/phonometry/buildings/rooms/reverberation-prediction/)
+and [Predicting Sound Insulation (EN 12354)](https://jmrplens.github.io/phonometry/buildings/design/insulation-prediction/).
+
+## [Room acoustics](https://jmrplens.github.io/phonometry/buildings/rooms/)
+
+The sound field inside a single room: measured from an impulse response, rated
+against criterion curves, and predicted from volume and absorption.
+
+- [Measuring the Room Impulse Response](https://jmrplens.github.io/phonometry/buildings/rooms/room-impulse-response/):
+  the ISO 18233 deterministic acquisition, sweep deconvolution and MLS.
+- [Room Acoustics](https://jmrplens.github.io/phonometry/buildings/rooms/room-acoustics/): the ISO 3382-1/2 room
+  parameters derived from that impulse response.
+- [Open-Plan Office Acoustics (ISO 3382-3)](https://jmrplens.github.io/phonometry/buildings/rooms/open-plan-acoustics/):
+  the speech-privacy quantities of an open-plan floor.
+- [Image sources and the steady-state room field](https://jmrplens.github.io/phonometry/buildings/rooms/room-image-sources/):
+  the deterministic image-source impulse response and the statistical
+  steady-state level.
+- [Room-noise criteria (NC / RC Mark II)](https://jmrplens.github.io/phonometry/buildings/rooms/room-noise/): the
+  ANSI/ASA S12.2-2019 room-noise ratings with their spectral tags.
+- [Reverberation-time prediction (Sabine, Eyring, Arau)](https://jmrplens.github.io/phonometry/buildings/rooms/reverberation-prediction/):
+  Sabine, Eyring, Millington-Sette, Fitzroy and Arau-Puchades models with the
+  air-absorption term.
+- [Sound absorption in enclosed spaces (EN 12354-6)](https://jmrplens.github.io/phonometry/buildings/rooms/enclosed-space-absorption/):
+  the normative prediction of a room's total equivalent absorption area and
+  reverberation time.
+
+## [Sound insulation](https://jmrplens.github.io/phonometry/buildings/insulation/)
+
+Airborne and impact insulation: measured in the building, characterised in the
+laboratory, and predicted from element data.
+
+- [Field Insulation Measurement (ISO 16283)](https://jmrplens.github.io/phonometry/buildings/insulation/insulation-field/):
+  ISO 16283-1/2 field measurement, the Clause 14 report and the ISO 12999-1
+  uncertainty that qualifies it.
+- [Laboratory Insulation Measurement](https://jmrplens.github.io/phonometry/buildings/insulation/insulation-lab/):
+  the ISO 10140 laboratory characterisation of an element.
+- [Sound Insulation by Intensity (ISO 15186)](https://jmrplens.github.io/phonometry/buildings/insulation/insulation-intensity/):
+  the direct-power route to the same indices when flanking is high.
+- [Sound Insulation Survey Method (ISO 10052)](https://jmrplens.github.io/phonometry/buildings/insulation/insulation-survey/):
+  the octave-band control method and its reverberation index.
+- [Laboratory Flanking Transmission (ISO 10848)](https://jmrplens.github.io/phonometry/buildings/insulation/flanking-lab/):
+  the measured junction vibration reduction index and the flanking descriptors.
+- [Insulation Ratings (ISO 717)](https://jmrplens.github.io/phonometry/buildings/insulation/insulation-ratings/): the
+  reference-curve engines behind Rw, DnT,w, Ln,w and their adaptation terms.
+- [Façade Sound Insulation](https://jmrplens.github.io/phonometry/buildings/insulation/facade-insulation/): the
+  building envelope measured (ISO 16283-3) and predicted (EN 12354-3/4).
+- [Spanish Building Code (CTE DB-HR)](https://jmrplens.github.io/phonometry/buildings/insulation/spanish-building-code/):
+  the DB-HR global indices, the clause 2 requirements and the window-size
+  correction.
+
+## [Insulation design](https://jmrplens.github.io/phonometry/buildings/design/)
+
+The same quantities before the building exists: predicted from element data,
+and from the physics of the element itself.
+
+- [Predicting Sound Insulation (EN 12354)](https://jmrplens.github.io/phonometry/buildings/design/insulation-prediction/):
+  airborne and impact flanking transmission between rooms (EN 12354-1/2).
+- [Predicting Panel Sound Insulation](https://jmrplens.github.io/phonometry/buildings/design/panel-sound-insulation/):
+  the mass law, coincidence dip, double walls and apertures.
+- [Floor-Covering Impact Improvement (ISO 16251-1)](https://jmrplens.github.io/phonometry/buildings/design/impact-improvement/):
+  the weighted improvement of a soft covering on a small heavyweight mock-up.
+- [Predicting Resilient-Layer Performance](https://jmrplens.github.io/phonometry/buildings/design/resilient-layers/):
+  the prediction side of coverings, floating floors and wall linings.
+- [Dynamic stiffness of resilient materials (EN 29052-1)](https://jmrplens.github.io/phonometry/materials/resilient/dynamic-stiffness/):
+  the load-plate resonance measurement behind every floating-floor prediction.
+
+---

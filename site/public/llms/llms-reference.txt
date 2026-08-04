@@ -1,4 +1,4 @@
-# phonometry: reference
+# phonometry: Reference
 
 Part of https://jmrplens.github.io/phonometry/llms.txt. Full text of the pages in this area.
 
