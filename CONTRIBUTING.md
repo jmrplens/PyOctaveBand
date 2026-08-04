@@ -177,7 +177,7 @@ it carries a higher evidential bar than the rest of the documentation.
 > author's error.
 
 The rule exists because text extraction silently deletes glyphs. Of the
-twenty-five source documents whose pages the registry cites, twenty-two emit
+twenty-five source documents the glyph census covers, twenty-two emit
 no `√` (U+221A) at all over their whole text layer, so every radical in them
 extracts as if it were not there: `f_T/√2` becomes `f_T/2`. Eleven of the
 twenty-five emit no `−` (U+2212) either, while emitting ASCII hyphens, and
@@ -213,7 +213,7 @@ Three checks run in CI over the registry
 ([`scripts/check_errata_evidence.py`](scripts/check_errata_evidence.py)):
 
 ```bash
-python scripts/check_errata_evidence.py          # both checks
+python scripts/check_errata_evidence.py          # all three checks
 python scripts/check_errata_evidence.py --ratios # only the irrational-ratio linter
 ```
 
@@ -232,7 +232,7 @@ python scripts/check_errata_evidence.py --ratios # only the irrational-ratio lin
    a dpi figure, or the word render. That belongs here, not in a public
    statement about someone else's document.
 
-A third script is a contributor tool rather than a gate:
+A second script is a contributor tool rather than a gate:
 
 ```bash
 python scripts/glyph_census.py plan/some-standard.pdf ...

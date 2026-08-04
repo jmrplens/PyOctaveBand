@@ -1931,8 +1931,9 @@ which is the check that enforces the rule; see
   $\tau_\text{cl} = 4.45$ at $R_S = R_R = 6\ \text{dB}$, $m_R = 0.01$ and
   $\tau_\text{cl} = 829$ at $R_S = R_R = 0\ \text{dB}$, $m_R = 10^{-3}$.
 - **Evidence:** with $m'_R$ in the denominator every one of those pathologies
-  disappears: $\tau_\text{cl}$ is monotonically decreasing in the damping, is
-  bounded above by 1 because
+  disappears: $\tau_\text{cl}$ flattens onto the leak-limited value as the
+  damping vanishes, where the printed form keeps growing, and is bounded above
+  by 1 because
   $(1 - \exp(-\varepsilon m'_R L_R))/(\varepsilon m'_R L_R) \le 1$, and
   reduces to Vigran's own small-attenuation result, Eq. (9.19)
   $\tau_\text{cl} = \varepsilon^2 \tau_S \tau_R L_R/(4h)$, whenever $m_S L_S$
@@ -1948,9 +1949,10 @@ which is the check that enforces the rule; see
   implements the derived $m'_R$ in both the exponent and the denominator, with
   the reading documented at the formula, and rejects a transmission factor
   above unity rather than reporting a negative sound reduction index. Tests
-  pin the monotonicity, the $\tau_\text{cl} \le 1$ bound, the convergence to
-  Eq. (9.20) and the size of the Eq. (9.17) leakage term at a realistic
-  ceiling
+  pin the physics the model owes (monotonicity in the damping, the
+  $\tau_\text{cl} \le 1$ bound, the size of the Eq. (9.17) leakage term at a
+  realistic ceiling) and the one property that separates the two readings: a
+  bare plenum no worse than the undamped Eq. (9.20) value
   ([`tests/building/prediction/test_ceiling_plenum.py`](https://github.com/jmrplens/phonometry/blob/main/tests/building/prediction/test_ceiling_plenum.py)).
 - **Status:** unreported (textbook rather than a standard). Mechel's original
   1980 paper, which Vigran reproduces, was not available to check whether the
@@ -2177,15 +2179,16 @@ which is the check that enforces the rule; see
     and OCA. The errata resolves the conflict in favour of values consistent
     with the +159 dB rule, so it supersedes the sentence as well as the table;
     the sentence is left standing in the article.
-  Verified on PDF page 31 (printed p. 155), PDF page 32 (printed p. 156), PDF
-  page 109 (printed p. 569) and PDF page 110 (printed p. 570) of Southall et
-  al. (2019), Aquatic Mammals 45(2), bundled with its published errata. They
-  carry, in that order: the "in water (LF, SI, PCW, and OCW)" restriction, the
-  15 dB in-air offset in the same paragraph and both statements of the +6 dB
-  rule; the article's Table 7, with the PCA row 123 / 138 / 138 / 144 and the
-  OCA row 146 / 161 / 161 / 167; the errata's prose, naming all four values
-  and their replacements; and the errata's reprinted Table 7, with PCA 123 /
-  155 / 138 / 161 and OCA 146 / 170 / 161 / 176.
+  Verified on PDF page 31 (printed p. 155) and PDF page 32 (printed p. 156) of
+  Southall et al. (2019), Aquatic Mammals 45(2), which carry the "in water
+  (LF, SI, PCW, and OCW)" restriction, the 15 dB in-air offset in the same
+  paragraph, both statements of the +6 dB rule, and the article's Table 7 with
+  the PCA row 123 / 138 / 138 / 144 and the OCA row 146 / 161 / 161 / 167. The
+  errata is a separate publication: verified on PDF page 1 (printed p. 569)
+  and PDF page 2 (printed p. 570) of Southall et al. (2019), Aquatic Mammals
+  45(5), 569-572, which carry its prose, naming all four values and their
+  replacements, and its reprinted Table 7, with PCA 123 / 155 / 138 / 161 and
+  OCA 146 / 170 / 161 / 176.
 - **Library behaviour:** the errata-corrected values are the ones implemented
   in
   [`bioacoustics/weighting.py`](https://github.com/jmrplens/phonometry/blob/main/src/phonometry/underwater/bioacoustics/weighting.py),
@@ -2569,7 +2572,7 @@ published sources:
   Eq. (17.50) as printed, so it returns 52.5 dB there; do not "correct" it
   toward 54 dB.
 - **ICAO Annex 16 EPNL constant:** the Annex's rounded constant 13 for uniform
-  0,5 s records differs from the exact $-10\log_{10}(T_0)$ form by 0,0103 dB;
+  0.5 s records differs from the exact $-10\log_{10}(T_0)$ form by 0.0103 dB;
   the library uses the exact form, which the ETM's integrated reference
   reproduces to five decimals.
 - **Long Table 14.9 element rows:** the worked duct-borne sheet of Chapter 14

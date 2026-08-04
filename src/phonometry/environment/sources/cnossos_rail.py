@@ -173,8 +173,9 @@ _WAVELENGTHS_STANDARD: tuple[float, ...] = (
     200.0, 160.0, 125.0, 100.0, 80.0, 63.0, 50.0, 40.0, 31.5, 25.0, 20.0, 16.0,
     12.5, 10.0, 8.0, 6.3, 5.0, 4.0, 3.15, 2.5, 2.0, 1.6, 1.25, 1.0, 0.8,
 )
-#: Wavelength grid of Table G-1a, the first table of G-1, which (EU) 2021/1226
-#: did not replace: its point (20)(a) replaces "the second table" only, in mm.
+#: Wavelength grid, in mm, of Table G-1a, the first table of G-1, which
+#: (EU) 2021/1226 did not replace: point (20)(a) replaces "the second table"
+#: only.
 #: It stops at 1 000 mm and keeps the non-standard steps 120, 12 and 3,2 mm
 #: where the amended tables read 125, 12,5 and 3,15 mm. Each table is therefore
 #: resampled on its own grid rather than forced onto a common one, which is how
