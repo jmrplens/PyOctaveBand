@@ -517,6 +517,7 @@ export default defineConfig({
         // Default H1 plus the page header chips run derived from the page's
         // own `references` frontmatter (see TOC-REDESIGN-NOTES.md).
         PageTitle: './src/components/PageTitle.astro',
+        LastUpdated: './src/components/LastUpdated.astro',
         // The generated brand lockup (mark plus wordmark) in place of the
         // plain text site title.
         SiteTitle: './src/components/SiteTitle.astro',
