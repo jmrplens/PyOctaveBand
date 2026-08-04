@@ -6,8 +6,9 @@ description: "From weighted signal to reported number: the IEC 61672-1 frequency
 A sound level meter does three things to a calibrated signal, in order: it
 **weights it in frequency** to mimic the ear's sensitivity, it **smooths it in
 time** with a standardised ballistic, and it **integrates it into a level**.
-The pages of this section implement exactly that chain, one page per
-stage, following **IEC 61672-1:2013** closely enough that the weightings are
+The pages of this section implement that chain stage by stage for the
+displayed level: the A/C/Z curves and the Fast/Slow/Impulse ballistics
+follow **IEC 61672-1:2013** closely enough that the weightings are
 verified against the standard's own tolerance tables in CI.
 
 [Frequency Weighting (A, C, Z)](/phonometry/signal/levels/weighting/) covers the

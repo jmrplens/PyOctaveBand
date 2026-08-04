@@ -58,6 +58,9 @@ signal they carry.
   harmonic separation and THD(f) from one exponential sweep (Farina /
   Novak synchronized swept-sine), and minimum phase, group delay and
   excess phase from a measured response.
+- [Broadcast](broadcast/index.md): the loudness problem solved
+  with a measurement rather than a compressor, one gated number per programme
+  and the range that says how much it moves.
 - [Programme loudness and true peak](broadcast/program-loudness.md):
   the ITU-R BS.1770-5 programme loudness and true-peak level with the
   EBU R 128 normalisation practice, EBU Mode metering and loudness range.
@@ -69,5 +72,11 @@ it.
 
 - [Silencers](noise-control/silencers.md): reactive silencers by the
   four-pole method and the reactive-versus-dissipative choice.
+- [Duct-Borne Noise: Fan to Room](noise-control/duct-path.md): the
+  end-to-end fan-to-room calculation against a room criterion, and the
+  higher-order-mode cut-on that limits every plane-wave method.
+- [Room to Room: Partition, Receiving Room, Criterion](noise-control/room-to-room.md):
+  the composed source-room to receiving-room chain and the transmission loss a
+  partition or an enclosure needs to meet a noise criterion.
 - [Industrial Noise Control: HVAC and Enclosures](noise-control/noise-control.md):
   duct attenuation, flow noise and machine-enclosure insertion loss.

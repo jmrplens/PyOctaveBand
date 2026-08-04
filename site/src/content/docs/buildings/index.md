@@ -83,11 +83,19 @@ and from the physics of the element itself.
 
 - [Predicting Sound Insulation (EN 12354)](/phonometry/buildings/design/insulation-prediction/):
   airborne and impact flanking transmission between rooms (EN 12354-1/2).
+- [Detailed Per-Band Prediction (ISO 12354)](/phonometry/buildings/design/detailed-prediction/):
+  the same prediction band by band, with the per-path contributions behind
+  R'w and L'n,w.
 - [Predicting Panel Sound Insulation](/phonometry/buildings/design/panel-sound-insulation/):
   the mass law, coincidence dip, double walls and apertures.
 - [Floor-Covering Impact Improvement (ISO 16251-1)](/phonometry/buildings/design/impact-improvement/):
   the weighted improvement of a soft covering on a small heavyweight mock-up.
 - [Predicting Resilient-Layer Performance](/phonometry/buildings/design/resilient-layers/):
   the prediction side of coverings, floating floors and wall linings.
+- [Structure-borne sound power of equipment (EN 15657)](/phonometry/buildings/design/structure-borne-power/):
+  the reception-plate method and the plate-independent source quantities.
+- [Installed structure-borne sound (EN 12354-5)](/phonometry/buildings/design/installed-structure-borne/):
+  the receiving-room sound pressure level predicted from source and receiver
+  mobilities.
 - [Dynamic stiffness of resilient materials (EN 29052-1)](/phonometry/materials/resilient/dynamic-stiffness/):
   the load-plate resonance measurement behind every floating-floor prediction.

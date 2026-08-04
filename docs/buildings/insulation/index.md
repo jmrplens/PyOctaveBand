@@ -70,6 +70,10 @@ related EN 12354-5, lives in
 - [Laboratory Flanking Transmission (ISO 10848)](flanking-lab.md):
   the measured vibration reduction index Kij and the flanking descriptors
   Dn,f and Ln,f.
+- [Heavy and Soft Impact Sources (ISO 16283-2)](heavy-impact-sources.md):
+  the rubber ball and the bang machine, the impact force exposure levels that
+  specify them, the Fast-weighted maximum level and the ISO 717-2 Annex D
+  single number.
 - [Insulation Ratings (ISO 717)](insulation-ratings.md):
   the ISO 717-1/-2 reference-curve engines, C, Ctr and CI, the enlarged-range
   terms and the ISO 717 fiche.

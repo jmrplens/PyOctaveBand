@@ -6,9 +6,9 @@ description: "La cadena desde una máquina vibrante hasta el ruido oído varias 
 Una máquina fijada a un edificio radia sonido dos veces: directamente desde
 su propia superficie vibrante, e indirectamente inyectando **potencia
 estructural** en la estructura, que la transporta y la vuelve a radiar en
-salas lejanas. Las cinco páginas de esta sección cubren ambos caminos: una
+salas lejanas. Las seis páginas de esta sección cubren ambos caminos: una
 estima la radiación directa desde la propia vibración superficial, y las
-otras cuatro caracterizan de extremo a extremo ese segundo camino
+otras cinco caracterizan de extremo a extremo ese segundo camino
 estructural, el más escurridizo, desde describir la vibración y caracterizar
 los aisladores hasta cuantificar la potencia y predecir el nivel que
 finalmente oye un oyente.
@@ -23,7 +23,13 @@ como referencia y los criterios de aceptación de medida de ISO 7626-2. Las
 acopla realmente a través de una interfaz, y por eso importa este
 vocabulario.
 
-Dos páginas caracterizan después los elementos del camino.
+Tres páginas caracterizan después los elementos del camino.
+[Transmisión de onda de flexión en uniones de placas (Cremer/Craik/Hopkins)](/phonometry/es/vibration/structural/junction-transmission/)
+sigue la potencia a través de la propia estructura, con los coeficientes de
+transmisión del enfoque ondulatorio para uniones rígidas en X, T, L y en
+línea, su media angular de campo difuso, y el factor de pérdidas por
+acoplamiento y el índice de reducción vibracional Kij que se derivan de
+ellos.
 [Rigidez dinámica de transferencia (ISO 10846)](/phonometry/es/vibration/structural/transfer-stiffness/)
 mide la rigidez de transferencia dinámica de los aisladores, soportes y
 mangueras que se insertan precisamente para romper el camino de transmisión,

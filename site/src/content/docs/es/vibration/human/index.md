@@ -31,8 +31,11 @@ sobre los platillos vertebrales y en una probabilidad de lesión lumbar a lo
 largo de una vida laboral.
 
 Usa primero las métricas de ISO 2631-1; cuando el factor de cresta o el VDV
-avisen de que dominan los choques, el modelo de ISO 2631-5 es la continuación
-dedicada. El frontal de medida (filtros de ponderación, análisis en bandas)
+avisen de que dominan los choques, ISO 2631-5 es la continuación dedicada: su
+modelo de la cláusula 5, implementado aquí, cubre los choques severos con
+posible pérdida de contacto con el asiento, mientras que las exposiciones
+menos severas en las que el ocupante permanece sentado corresponden a su
+modelo de elementos finitos del Anexo A. El frontal de medida (filtros de ponderación, análisis en bandas)
 se comparte con la sección de
 [análisis de señal](/phonometry/es/signal/).
 

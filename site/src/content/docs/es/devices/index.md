@@ -64,6 +64,9 @@ programa que transportan.
   separación armónica y THD(f) con un solo barrido exponencial (barrido
   sincronizado de Farina / Novak), y fase mínima, retardo de grupo y exceso
   de fase de una respuesta medida.
+- [Radiodifusión](/phonometry/es/devices/broadcast/): el problema de la
+  sonoridad resuelto con una medición y no con un compresor, un número por
+  programa con puerta y el rango que dice cuánto se mueve.
 - [Sonoridad de programa y pico verdadero](/phonometry/es/devices/broadcast/program-loudness/):
   la sonoridad de programa y el nivel de pico verdadero de UIT-R BS.1770-5
   con la práctica de normalización de EBU R 128, la medición en modo EBU y
@@ -75,6 +78,13 @@ Control de ruido industrial en el camino, entre la máquina y quien la oye.
 
 - [Silenciadores](/phonometry/es/devices/noise-control/silencers/): silenciadores reactivos
   por el método de cuatro polos y la elección entre reactivo y disipativo.
+- [Ruido por conductos: del ventilador a la sala](/phonometry/es/devices/noise-control/duct-path/):
+  el cálculo completo del ventilador a la sala frente a un criterio de ruido de
+  fondo, y el corte de modos superiores que limita todo método de onda plana.
+- [Entre recintos: partición, receptor y criterio](/phonometry/es/devices/noise-control/room-to-room/):
+  la cadena compuesta del recinto emisor al recinto receptor y la pérdida por
+  transmisión que necesita una partición o un encapsulado para cumplir un
+  criterio de ruido de fondo.
 - [Control de ruido industrial: HVAC y cerramientos](/phonometry/es/devices/noise-control/noise-control/):
   atenuación en conductos, ruido de flujo y pérdida de inserción de
   cerramientos de máquina.

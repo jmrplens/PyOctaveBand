@@ -43,5 +43,9 @@ against.
   ISO 3745.
 - [Sound Power in the Reverberation Room](sound-power-reverberation.md):
   the direct and comparison methods of ISO 3741.
+- [Sound power from surface vibration (ISO/TS 7849)](vibration-sound-power.md):
+  the radiated power from the surface-averaged velocity level and the
+  radiation factor, with the Part 1 upper limit and the Part 2 engineering
+  value.
 - [Sound Power by Intensity Scanning](sound-power-intensity.md):
   the on-site scanning of ISO 9614-2 and the ISO 9614-3 precision grade.

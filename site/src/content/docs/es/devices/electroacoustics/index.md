@@ -55,7 +55,3 @@ partida son las páginas de
   separación armónica y THD(f) con un solo barrido exponencial (barrido
   sincronizado de Farina / Novak), y fase mínima, retardo de grupo y exceso
   de fase de una respuesta medida.
-- [Sonoridad de programa y pico verdadero](/phonometry/es/devices/broadcast/program-loudness/):
-  la sonoridad de programa y el nivel de pico verdadero de UIT-R BS.1770-5
-  con la práctica de normalización de EBU R 128, la medición en modo EBU y
-  el rango de sonoridad.

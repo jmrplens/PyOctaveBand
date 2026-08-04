@@ -89,12 +89,20 @@ and from the physics of the element itself.
 
 - [Predicting Sound Insulation (EN 12354)](https://jmrplens.github.io/phonometry/buildings/design/insulation-prediction/):
   airborne and impact flanking transmission between rooms (EN 12354-1/2).
+- [Detailed Per-Band Prediction (ISO 12354)](https://jmrplens.github.io/phonometry/buildings/design/detailed-prediction/):
+  the same prediction band by band, with the per-path contributions behind
+  R'w and L'n,w.
 - [Predicting Panel Sound Insulation](https://jmrplens.github.io/phonometry/buildings/design/panel-sound-insulation/):
   the mass law, coincidence dip, double walls and apertures.
 - [Floor-Covering Impact Improvement (ISO 16251-1)](https://jmrplens.github.io/phonometry/buildings/design/impact-improvement/):
   the weighted improvement of a soft covering on a small heavyweight mock-up.
 - [Predicting Resilient-Layer Performance](https://jmrplens.github.io/phonometry/buildings/design/resilient-layers/):
   the prediction side of coverings, floating floors and wall linings.
+- [Structure-borne sound power of equipment (EN 15657)](https://jmrplens.github.io/phonometry/buildings/design/structure-borne-power/):
+  the reception-plate method and the plate-independent source quantities.
+- [Installed structure-borne sound (EN 12354-5)](https://jmrplens.github.io/phonometry/buildings/design/installed-structure-borne/):
+  the receiving-room sound pressure level predicted from source and receiver
+  mobilities.
 - [Dynamic stiffness of resilient materials (EN 29052-1)](https://jmrplens.github.io/phonometry/materials/resilient/dynamic-stiffness/):
   the load-plate resonance measurement behind every floating-floor prediction.
 

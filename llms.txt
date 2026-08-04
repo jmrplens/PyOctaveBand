@@ -169,15 +169,15 @@ If you are an AI assistant setting this up for a user: install from PyPI (no sys
 - [Diffusers and Their Coefficients](https://jmrplens.github.io/phonometry/materials/diffusers/diffusers/)
 - [Metadiffusers](https://jmrplens.github.io/phonometry/materials/diffusers/metadiffusers/)
 
-### Resilient layers
-
-- [Overview](https://jmrplens.github.io/phonometry/materials/resilient/) · [full text](https://jmrplens.github.io/phonometry/llms/llms-materials-resilient.txt)
-- [Dynamic stiffness of resilient materials (EN 29052-1)](https://jmrplens.github.io/phonometry/materials/resilient/dynamic-stiffness/)
-
 ### Surfaces measured in place
 
 - [Overview](https://jmrplens.github.io/phonometry/materials/surfaces/) · [full text](https://jmrplens.github.io/phonometry/llms/llms-materials-surfaces.txt)
 - [In-situ Road-Surface Absorption](https://jmrplens.github.io/phonometry/materials/surfaces/road-absorption/)
+
+### Resilient layers
+
+- [Overview](https://jmrplens.github.io/phonometry/materials/resilient/) · [full text](https://jmrplens.github.io/phonometry/llms/llms-materials-resilient.txt)
+- [Dynamic stiffness of resilient materials (EN 29052-1)](https://jmrplens.github.io/phonometry/materials/resilient/dynamic-stiffness/)
 
 ## Vibration and structure-borne sound
 
@@ -187,8 +187,8 @@ If you are an AI assistant setting this up for a user: install from PyPI (no sys
 
 - [Overview](https://jmrplens.github.io/phonometry/vibration/structural/) · [full text](https://jmrplens.github.io/phonometry/llms/llms-vibration-structural.txt)
 - [Mechanical mobility and the FRF family (ISO 7626-1)](https://jmrplens.github.io/phonometry/vibration/structural/mechanical-mobility/)
-- [Dynamic transfer stiffness of resilient elements (ISO 10846)](https://jmrplens.github.io/phonometry/vibration/structural/transfer-stiffness/)
 - [Bending-wave transmission at plate junctions (Cremer / Craik / Hopkins)](https://jmrplens.github.io/phonometry/vibration/structural/junction-transmission/)
+- [Dynamic transfer stiffness of resilient elements (ISO 10846)](https://jmrplens.github.io/phonometry/vibration/structural/transfer-stiffness/)
 
 ### Human vibration
 
@@ -207,17 +207,17 @@ If you are an AI assistant setting this up for a user: install from PyPI (no sys
 - [Environmental Levels (ISO 1996-1/-2)](https://jmrplens.github.io/phonometry/environment/environmental-levels/)
 - [Spanish Noise Regulation (RD 1367/2007)](https://jmrplens.github.io/phonometry/environment/spanish-noise-regulation/)
 
+### Assessment and regulation
+
+- [Overview](https://jmrplens.github.io/phonometry/environment/assessment/) · [full text](https://jmrplens.github.io/phonometry/llms/llms-environment-assessment.txt)
+- [Impulsive-sound prominence (NT ACOU 112)](https://jmrplens.github.io/phonometry/environment/assessment/impulsive-sound/)
+
 ### Outdoor sound
 
 - [Overview](https://jmrplens.github.io/phonometry/environment/propagation/) · [full text](https://jmrplens.github.io/phonometry/llms/llms-environment-propagation.txt)
 - [Outdoor Sound Propagation](https://jmrplens.github.io/phonometry/environment/propagation/outdoor-propagation/)
 - [Spherical ground effect and advanced barriers (Attenborough / Salomons / Bies)](https://jmrplens.github.io/phonometry/environment/propagation/ground-barriers/)
 - [Atmospheric refraction: ray tracing and the parabolic equation (Salomons / Attenborough)](https://jmrplens.github.io/phonometry/environment/propagation/atmospheric-refraction/)
-
-### Assessment and regulation
-
-- [Overview](https://jmrplens.github.io/phonometry/environment/assessment/) · [full text](https://jmrplens.github.io/phonometry/llms/llms-environment-assessment.txt)
-- [Impulsive-sound prominence (NT ACOU 112)](https://jmrplens.github.io/phonometry/environment/assessment/impulsive-sound/)
 
 ### Environmental sources
 
@@ -263,6 +263,11 @@ If you are an AI assistant setting this up for a user: install from PyPI (no sys
 - [Microphone Characterisation (IEC 60268-4)](https://jmrplens.github.io/phonometry/devices/electroacoustics/microphones/)
 - [Swept-sine distortion and phase utilities (Farina / Novak)](https://jmrplens.github.io/phonometry/devices/electroacoustics/swept-sine-distortion/)
 
+### Broadcast
+
+- [Overview](https://jmrplens.github.io/phonometry/devices/broadcast/) · [full text](https://jmrplens.github.io/phonometry/llms/llms-devices-broadcast.txt)
+- [Programme loudness and true peak (ITU-R BS.1770 / EBU R 128)](https://jmrplens.github.io/phonometry/devices/broadcast/program-loudness/)
+
 ### Noise control
 
 - [Overview](https://jmrplens.github.io/phonometry/devices/noise-control/) · [full text](https://jmrplens.github.io/phonometry/llms/llms-devices-noise-control.txt)
@@ -271,11 +276,6 @@ If you are an AI assistant setting this up for a user: install from PyPI (no sys
 - [Duct-borne noise: fan to room](https://jmrplens.github.io/phonometry/devices/noise-control/duct-path/)
 - [Room to room: partition, receiving room, criterion](https://jmrplens.github.io/phonometry/devices/noise-control/room-to-room/)
 
-### Broadcast
-
-- [Overview](https://jmrplens.github.io/phonometry/devices/broadcast/) · [full text](https://jmrplens.github.io/phonometry/llms/llms-devices-broadcast.txt)
-- [Programme loudness and true peak (ITU-R BS.1770 / EBU R 128)](https://jmrplens.github.io/phonometry/devices/broadcast/program-loudness/)
-
 ## Wave simulation
 
 - [Overview](https://jmrplens.github.io/phonometry/simulation/)
@@ -283,6 +283,8 @@ If you are an AI assistant setting this up for a user: install from PyPI (no sys
 - [Elastic waves and fluid-solid coupling](https://jmrplens.github.io/phonometry/simulation/elastic-waves/)
 
 ## Theory and reference
+
+The theory pages travel in the Start shard (https://jmrplens.github.io/phonometry/llms/llms-start.txt); the rest of the reference in https://jmrplens.github.io/phonometry/llms/llms-reference.txt.
 
 - [API Reference](https://jmrplens.github.io/phonometry/reference/api/)
 - [Bibliography](https://jmrplens.github.io/phonometry/reference/bibliography/)
@@ -318,25 +320,25 @@ One file per area, each small enough to fetch whole. `llms-full.txt` is the comp
 - [Signal analysis](https://jmrplens.github.io/phonometry/llms/llms-signal.txt)
 - [Octave filtering](https://jmrplens.github.io/phonometry/llms/llms-signal-filters.txt)
 - [Levels and weighting](https://jmrplens.github.io/phonometry/llms/llms-signal-levels.txt)
-- [Calibration and uncertainty](https://jmrplens.github.io/phonometry/llms/llms-signal-metrology.txt)
 - [Signals and spectra](https://jmrplens.github.io/phonometry/llms/llms-signal-spectra.txt)
+- [Calibration and uncertainty](https://jmrplens.github.io/phonometry/llms/llms-signal-metrology.txt)
 - [Hearing and perception](https://jmrplens.github.io/phonometry/llms/llms-perception.txt)
-- [Hearing and exposure](https://jmrplens.github.io/phonometry/llms/llms-perception-hearing.txt)
 - [Psychoacoustics](https://jmrplens.github.io/phonometry/llms/llms-perception-psychoacoustics.txt)
 - [Speech](https://jmrplens.github.io/phonometry/llms/llms-perception-speech.txt)
+- [Hearing and exposure](https://jmrplens.github.io/phonometry/llms/llms-perception-hearing.txt)
 - [Rooms and buildings](https://jmrplens.github.io/phonometry/llms/llms-buildings.txt)
-- [Insulation design](https://jmrplens.github.io/phonometry/llms/llms-buildings-design.txt)
-- [Sound insulation](https://jmrplens.github.io/phonometry/llms/llms-buildings-insulation.txt)
 - [Room acoustics](https://jmrplens.github.io/phonometry/llms/llms-buildings-rooms.txt)
+- [Sound insulation](https://jmrplens.github.io/phonometry/llms/llms-buildings-insulation.txt)
+- [Insulation design](https://jmrplens.github.io/phonometry/llms/llms-buildings-design.txt)
 - [Materials and surfaces](https://jmrplens.github.io/phonometry/llms/llms-materials.txt)
 - [Absorbers](https://jmrplens.github.io/phonometry/llms/llms-materials-absorbers.txt)
 - [Diffusers and surfaces](https://jmrplens.github.io/phonometry/llms/llms-materials-diffusers.txt)
-- [Resilient layers](https://jmrplens.github.io/phonometry/llms/llms-materials-resilient.txt)
 - [Surfaces measured in place](https://jmrplens.github.io/phonometry/llms/llms-materials-surfaces.txt)
+- [Resilient layers](https://jmrplens.github.io/phonometry/llms/llms-materials-resilient.txt)
 - [Vibration and structure-borne sound](https://jmrplens.github.io/phonometry/llms/llms-vibration.txt)
+- [Structure-borne sources](https://jmrplens.github.io/phonometry/llms/llms-vibration-structural.txt)
 - [Human vibration](https://jmrplens.github.io/phonometry/llms/llms-vibration-human.txt)
 - [Machinery](https://jmrplens.github.io/phonometry/llms/llms-vibration-machinery.txt)
-- [Structure-borne sources](https://jmrplens.github.io/phonometry/llms/llms-vibration-structural.txt)
 - [Environment and transport](https://jmrplens.github.io/phonometry/llms/llms-environment.txt)
 - [Assessment and regulation](https://jmrplens.github.io/phonometry/llms/llms-environment-assessment.txt)
 - [Outdoor sound](https://jmrplens.github.io/phonometry/llms/llms-environment-propagation.txt)
@@ -344,9 +346,9 @@ One file per area, each small enough to fetch whole. `llms-full.txt` is the comp
 - [Aircraft noise](https://jmrplens.github.io/phonometry/llms/llms-aircraft.txt)
 - [Underwater acoustics](https://jmrplens.github.io/phonometry/llms/llms-underwater.txt)
 - [Sources and devices](https://jmrplens.github.io/phonometry/llms/llms-devices.txt)
-- [Broadcast](https://jmrplens.github.io/phonometry/llms/llms-devices-broadcast.txt)
-- [Electroacoustics](https://jmrplens.github.io/phonometry/llms/llms-devices-electroacoustics.txt)
 - [Sound power and intensity](https://jmrplens.github.io/phonometry/llms/llms-devices-emission.txt)
+- [Electroacoustics](https://jmrplens.github.io/phonometry/llms/llms-devices-electroacoustics.txt)
+- [Broadcast](https://jmrplens.github.io/phonometry/llms/llms-devices-broadcast.txt)
 - [Noise control](https://jmrplens.github.io/phonometry/llms/llms-devices-noise-control.txt)
 - [Wave simulation](https://jmrplens.github.io/phonometry/llms/llms-simulation.txt)
 - [Reference](https://jmrplens.github.io/phonometry/llms/llms-reference.txt)

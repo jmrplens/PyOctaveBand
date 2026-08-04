@@ -9,7 +9,7 @@ Source: https://jmrplens.github.io/phonometry/perception/speech/
 
 # Speech
 
-Both pages in this section reduce speech intelligibility to a number in
+All three pages in this section reduce speech intelligibility to a number in
 [0, 1], and the art is knowing which number answers your question. The
 **Speech Transmission Index** (STI) rates a *transmission channel*: a room, a
 public-address system, an intercom. The **Speech Intelligibility Index** (SII)

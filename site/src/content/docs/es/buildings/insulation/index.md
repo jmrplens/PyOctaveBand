@@ -75,9 +75,9 @@ emparentada EN 12354-5, vive en
   el índice de reducción de vibraciones Kij medido y los descriptores de
   flanco Dn,f y Ln,f.
 - [Fuentes de impacto pesadas y blandas (ISO 16283-2)](/phonometry/es/buildings/insulation/heavy-impact-sources/):
-  la pelota de caucho y la máquina de neumático, el nivel de exposición a la
-  fuerza de impacto que las especifica y el número único ponderado A del
-  anexo D de ISO 717-2.
+  la pelota de caucho y la máquina de neumático, los niveles de exposición a
+  la fuerza de impacto que las especifican, el nivel máximo con ponderación
+  Fast y el número único del anexo D de ISO 717-2.
 - [Índices globales de aislamiento (ISO 717)](/phonometry/es/buildings/insulation/insulation-ratings/):
   los motores de curva de referencia de ISO 717-1/-2, C, Ctr y CI, los
   términos de rango ampliado y la ficha de ISO 717.

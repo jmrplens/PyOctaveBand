@@ -31,7 +31,7 @@ las páginas de salas y materiales. Empieza por
 introduce la contabilidad fuente-camino-receptor que las páginas de
 transporte reutilizan.
 
-## Evaluación y normativa
+## [Evaluación y normativa](/phonometry/es/environment/assessment/)
 
 Con qué se compara el sonido recibido, una vez ha llegado.
 
@@ -56,7 +56,10 @@ llega.
 
 ## [Aeronaves y energía eólica](/phonometry/es/aircraft/)
 
-Fuentes de transporte y energía con métricas de certificación propias.
+Fuentes de transporte y energía con métricas de certificación propias. La
+página de aerogeneradores vive con los modelos de emisión de carretera y
+ferrocarril de CNOSSOS en
+[Fuentes ambientales](/phonometry/es/environment/sources/).
 
 - [Ruido de aeronaves: nivel efectivo de ruido percibido](/phonometry/es/aircraft/aircraft-noise/):
   el EPNL del Anexo 16 de la ICAO, el verificador de sistemas de medida

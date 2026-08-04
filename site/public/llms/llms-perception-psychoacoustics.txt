@@ -15,8 +15,8 @@ in sones, computed by auditory models that account for the ear's filtering,
 masking and compression. On top of loudness sit the **sound quality**
 sensations that distinguish two equally loud sounds: sharpness (high-frequency
 emphasis), tonality (audible discrete tones), roughness (fast modulation)
-and fluctuation strength (slow modulation). And on top of those sits a combined **annoyance** metric that weighs them into
-a single scalar.
+and fluctuation strength (slow modulation). And on top sits a combined **annoyance** metric that weighs loudness,
+sharpness, roughness and fluctuation strength into a single scalar.
 
 [Loudness](https://jmrplens.github.io/phonometry/perception/psychoacoustics/loudness/) is the foundation page: the Zwicker
 reference method of ISO 532-1 with its one-page fiche, together with the
@@ -43,8 +43,8 @@ ISO 1996-2.
 [Psychoacoustic annoyance and fluctuation strength](https://jmrplens.github.io/phonometry/perception/psychoacoustics/psychoacoustic-annoyance/)
 closes the chain with the Fastl & Zwicker model, which combines loudness,
 sharpness, roughness and the slow-modulation sensation of fluctuation strength
-into a single annoyance value. Read it last: it consumes everything the other
-pages define.
+into a single annoyance value. Read it last: its four inputs all come from
+the earlier pages.
 
 ## Pages in this section
 

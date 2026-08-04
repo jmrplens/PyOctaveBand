@@ -26,7 +26,7 @@ the room and materials pages. Start with
 [Outdoor Sound Propagation](propagation/outdoor-propagation.md); it
 introduces the source-path-receiver bookkeeping the transport pages reuse.
 
-## Assessment and regulation
+## [Assessment and regulation](assessment/index.md)
 
 What the received sound is rated against, once it has arrived.
 
@@ -51,7 +51,9 @@ arrives.
 
 ## [Aircraft and wind energy](../aircraft/index.md)
 
-Transport and energy sources with their own certification metrics.
+Transport and energy sources with their own certification metrics. The
+wind-turbine page lives with the CNOSSOS road and railway emission models in
+[Environmental sources](sources/index.md).
 
 - [Aircraft noise: Effective Perceived Noise Level](../aircraft/aircraft-noise.md):
   the ICAO Annex 16 EPNL, the IEC 61265 measurement-system verifier and the

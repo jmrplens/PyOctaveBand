@@ -82,8 +82,13 @@ section.
   the far-field prediction.
 - [Metadiffusers](diffusers/metadiffusers.md): deep-subwavelength
   Schroeder diffusers from resonator-loaded slits.
+- [Surfaces measured in place overview](surfaces/index.md):
+  surfaces that cannot be taken to a laboratory, characterised where they lie.
 - [In-situ Road-Surface Absorption](surfaces/road-absorption.md):
   ISO 13472-1/-2 in-situ road-surface absorption.
+- [Resilient layers overview](resilient/index.md):
+  what a resilient layer does under a floating floor, and the dynamic
+  stiffness that sets it.
 - [Dynamic stiffness of resilient materials (EN 29052-1)](resilient/dynamic-stiffness.md):
   the resonance method that measures what a resilient layer does under a
   floating floor, and the apparent stiffness the insulation design chapter

@@ -52,6 +52,3 @@ are the place to start.
   harmonic separation and THD(f) from one exponential sweep (Farina /
   Novak synchronized swept-sine), and minimum phase, group delay and
   excess phase from a measured response.
-- [Programme loudness and true peak](/phonometry/devices/broadcast/program-loudness/):
-  the ITU-R BS.1770-5 programme loudness and true-peak level with the
-  EBU R 128 normalisation practice, EBU Mode metering and loudness range.

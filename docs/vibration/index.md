@@ -66,7 +66,7 @@ risk.
   the spinal-response model and the probability of lumbar injury for vibration
   containing multiple shocks.
 
-## Machinery
+## [Machinery](machinery/index.md)
 
 Turning a vibration spectrum into a diagnosis of the machine that made it.
 

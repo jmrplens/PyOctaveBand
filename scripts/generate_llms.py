@@ -526,7 +526,16 @@ def build_llms_txt(version: str, shard_slugs: tuple[str, ...]) -> str:
                 lines.append(entry)
         lines.append("")
 
-    lines += ["## Theory and reference", ""]
+    lines += [
+        "## Theory and reference",
+        "",
+        (
+            "The theory pages travel in the Start shard "
+            f"({SITE_URL}/llms/llms-start.txt); the rest of the reference in "
+            f"{SITE_URL}/llms/llms-reference.txt."
+        ),
+        "",
+    ]
     for route in sorted(
         route
         for route in pages.values()
@@ -576,9 +585,15 @@ def build_llms_txt(version: str, shard_slugs: tuple[str, ...]) -> str:
     # The slugs are the shards actually built this run: a hand-kept list here
     # published a link to a shard that a content move could stop producing.
     listed: set[str] = {"start"}
+    folders = _shard_folders()
     for topic, _label in AREAS:
+        # Subgroups in the order the topic overview teaches them, matching the
+        # navigation above; alphabetical-by-slug put Calibration before Spectra
+        # in a topic whose overview teaches them the other way round.
+        nav_order = {folder: rank for rank, folder in enumerate(_subgroups(topic))}
         for slug in [t for t in shard_slugs if t == topic] + sorted(
-            t for t in shard_slugs if t.startswith(f"{topic}-")
+            (t for t in shard_slugs if t.startswith(f"{topic}-")),
+            key=lambda t: (nav_order.get(folders.get(t, ""), len(nav_order)), t),
         ):
             listed.add(slug)
             lines.append(f"- [{_shard_label(slug)}]({SITE_URL}/llms/llms-{slug}.txt)")

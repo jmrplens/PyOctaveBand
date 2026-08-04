@@ -17,7 +17,7 @@ The three build on each other in one direction: the psychoacoustic models
 consume calibrated signals or band spectra from the
 [core analysis](/phonometry/signal/); the speech
 indices consume band levels and, in the SII's case, the hearing thresholds
-that the exposure pages quantify; and the exposure metrics feed the
+that the hearing pages quantify; and the exposure metrics feed the
 hearing-damage model of ISO 1999.
 
 A good entry point is [Loudness](/phonometry/perception/psychoacoustics/loudness/): it introduces

@@ -1007,6 +1007,29 @@ que las guías incorporan sus secciones de Referencias.
   Los experimentos por bandas de articulación que sustentan la función de importancia
   de banda del índice de inteligibilidad del habla.
   Citado por [Índice de inteligibilidad del habla](/phonometry/es/perception/speech/speech-intelligibility/).
+- Taal, C. H., Hendriks, R. C., Heusdens, R., & Jensen, J. (2011). An
+  algorithm for intelligibility prediction of time-frequency weighted noisy
+  speech. *IEEE Transactions on Audio, Speech, and Language Processing*,
+  19(7), 2125-2136.
+  [doi:10.1109/TASL.2011.2114881](https://doi.org/10.1109/TASL.2011.2114881).
+  STOI: el frontal común de tercios de octava, la normalización y el recorte
+  señal-distorsión, y la correlación de envolventes por banda que promedia el
+  índice.
+  Citado por [Inteligibilidad objetiva (STOI y ESTOI)](/phonometry/es/perception/speech/objective-intelligibility/).
+- Taal, C. H., Hendriks, R. C., Heusdens, R., & Jensen, J. (2010). A
+  short-time objective intelligibility measure for time-frequency weighted
+  noisy speech. *2010 IEEE International Conference on Acoustics, Speech and
+  Signal Processing (ICASSP)*, 4214-4217.
+  [doi:10.1109/ICASSP.2010.5495701](https://doi.org/10.1109/ICASSP.2010.5495701).
+  La versión corta de congreso del STOI.
+  Citado por [Inteligibilidad objetiva (STOI y ESTOI)](/phonometry/es/perception/speech/objective-intelligibility/).
+- Jensen, J., & Taal, C. H. (2016). An algorithm for predicting the
+  intelligibility of speech masked by modulated noise maskers. *IEEE/ACM
+  Transactions on Audio, Speech, and Language Processing*, 24(11), 2009-2022.
+  [doi:10.1109/TASLP.2016.2585878](https://doi.org/10.1109/TASLP.2016.2585878).
+  ESTOI: el espectrograma de tiempo corto normalizado por filas y columnas y
+  su índice intermedio de correlación espectral.
+  Citado por [Inteligibilidad objetiva (STOI y ESTOI)](/phonometry/es/perception/speech/objective-intelligibility/).
 
 ## Psicoacústica
 
