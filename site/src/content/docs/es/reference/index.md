@@ -19,7 +19,9 @@ fuente de un modelo, la bibliografía tiene el DOI.
 
 Si solo buscas la firma de una función, lo que quieres es la
 [referencia de la API](/phonometry/es/reference/api/): se genera a partir de
-los docstrings del código y ocupa su propia sección de la barra lateral.
+los docstrings del código y ocupa su propia sección de la barra lateral. Esa
+sección está en inglés en los dos idiomas, porque su texto es el del propio
+código; todo lo demás del sitio está traducido.
 
 ## [Teoría](/phonometry/es/reference/theory/)
 

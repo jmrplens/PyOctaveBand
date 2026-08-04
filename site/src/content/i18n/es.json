@@ -2,5 +2,6 @@
   "phonometry.references.title": "Referencias",
   "phonometry.report.download": "Descargar el informe (PDF)",
   "phonometry.video.download": "Descargar la animación (WebM)",
-  "phonometry.video.fallback": "Tu navegador no puede reproducir vídeo incrustado. Descarga la animación:"
+  "phonometry.video.fallback": "Tu navegador no puede reproducir vídeo incrustado. Descarga la animación:",
+  "i18n.untranslatedContent": "La referencia de la API se publica en inglés en los dos idiomas: se genera a partir de los docstrings del código, que son su texto original."
 }
