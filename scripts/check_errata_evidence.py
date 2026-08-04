@@ -139,9 +139,9 @@ _EDITION_WINDOW = 200
 #: it appears; "render" is an ordinary English verb an entry may need ("the
 #: dropped exponent renders Formula (7) inconsistent"), so only the procedural
 #: sense counts, and only in the Evidence bullet.
-_RESOLUTION = re.compile(r"\b\d+\s*dpi\b", re.IGNORECASE)
+_RESOLUTION = re.compile(r"\b\d+[\s\u2010-\u2015-]*dpi\b", re.IGNORECASE)
 _RENDERING = re.compile(
-    r"\brender(?:ed|ing|s)?\s+(?:of|at|from|the\s+)?(?:page|image|crop|scan)?",
+    r"\brender(?:ed|ing|s)?\s+(?:(?:of|at|from)\b|(?:the\s+)?(?:page|image|crop|scan)\b)",
     re.IGNORECASE,
 )
 

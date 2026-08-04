@@ -176,6 +176,10 @@ def test_the_procedure_is_rejected() -> None:
         "the rendering of page 8",
         "300dpi",
         "a rendered page image",
+        # The resolution is the tell whatever punctuation joins it to its
+        # number, and a hyphenated adjective is the natural way to write it.
+        "a 900-dpi image",
+        "a 900\u2013dpi crop",
     ],
 )
 def test_every_wording_of_the_procedure_is_rejected(procedure: str) -> None:
@@ -200,6 +204,24 @@ def test_the_ordinary_verb_is_not_the_procedure() -> None:
 
 - **The problem:** the dropped exponent renders Formula (7) inconsistent.
 - **Evidence:** Verified on PDF page 8 (printed p. 6) of X:2020.
+- **Status:** unreported.
+"""
+    assert cee.check_procedure_is_not_cited(_entries(markdown)) == []
+
+
+def test_the_ordinary_verb_is_allowed_in_the_evidence_bullet_too() -> None:
+    """The Evidence bullet is prose as well, and may need the same verb.
+
+    Only the procedural sense is the tell: "rendered at", "the rendering of
+    page 8", "a rendered page image". A verb followed by its own object is
+    what an entry writes when it is explaining a defect.
+    """
+    markdown = """
+## Probe
+
+- **Evidence:** the dropped exponent renders Formula (7) inconsistent, which
+  no reading of the page can excuse. Verified on PDF page 8 (printed p. 6) of
+  X:2020.
 - **Status:** unreported.
 """
     assert cee.check_procedure_is_not_cited(_entries(markdown)) == []

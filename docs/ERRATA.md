@@ -547,12 +547,14 @@ which is the check that enforces the rule; see
   ISO 12354-1:2017: the two rows are separately ruled and share the endpoint
   verbatim, "630 to 1 600" and "1 600 <= f0 <= 5 000". Neither row can be
   discarded, because 630 Hz to 1 250 Hz has no other entry and 2 000 Hz to
-  5 000 Hz has none either. The predecessor edition settles which reading was
-  intended: EN 12354-1:2000 Table D.3 prints the same pair of rows as "630 -
+  5 000 Hz has none either. The predecessor edition gives the earlier,
+  unambiguous reading: EN 12354-1:2000 Table D.3, verified on PDF page 43
+  (printed p. 41) of that edition, prints the same pair of rows as "630 -
   1 600 -> -10" and "> 1 600 -> -5", strictly greater, so in 2000 exactly
-  1 600 Hz unambiguously took -10 dB. The 2017 rewrite replaced "> 1 600" with
-  "1 600 <= f0 <= 5 000" while leaving "630 to 1 600" untouched, which is what
-  creates the overlap.
+  1 600 Hz took -10 dB with nothing to decide. The 2017 rewrite replaced ">
+  1 600" with "1 600 <= f0 <= 5 000" while leaving "630 to 1 600" untouched,
+  which is what creates the overlap; what the rewrite intended at the shared
+  endpoint the text does not say.
 - **Library behaviour:** `weighted_lining_improvement` returns the more
   conservative -10 dB at exactly 1 600 Hz and -5 dB above it, the 2000
   reading, with the ambiguity named in the docstring and pinned in
