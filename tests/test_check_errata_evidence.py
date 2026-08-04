@@ -4,9 +4,9 @@
 ``scripts/check_errata_evidence.py`` exists because an entry was drafted that
 accused an author of printing ``2/(3 pi)`` where the page prints
 ``2/(sqrt(3) pi)``: three text extractors had eaten the radical and agreed with
-each other. It cited no page render and stated its own ratio twice, as
-"1,73 times too small" and as "a fixed 2,4 dB offset". Both tells are
-reproduced below, together with the shapes a passing entry has to have.
+each other. It cited no page and stated its own ratio twice, as "1,73 times
+too small" and as "a fixed 2,4 dB offset". Both tells are reproduced below,
+together with the shapes a passing entry has to have.
 """
 
 from __future__ import annotations
@@ -36,27 +36,37 @@ _WITHDRAWN = """
 - **Status:** unreported.
 """
 
-_WITH_RENDER = """
+_WITH_PAGE = """
 ## Some standard, Formula (1)
 
 - **Location:** Formula (1).
 - **The print:** `A = 0,32 V`.
 - **The problem:** the constant is a factor of 10 out.
-- **Evidence:** direct algebra. Render: `plan/some-standard.pdf`, PDF page 8, printed p. 6, 600 dpi.
+- **Evidence:** direct algebra. Verified on PDF page 8 (printed p. 6) of Some standard:2020.
 - **Status:** unreported.
 """
 
-#: A render-shaped string outside the Evidence bullet is not evidence.
-_RENDER_IN_THE_WRONG_BULLET = """
+#: A citation-shaped string outside the Evidence bullet is not evidence.
+_PAGE_IN_THE_WRONG_BULLET = """
 ## Some standard, Formula (1)
 
 - **Location:** Formula (1).
-- **The print:** `A = 0,32 V`, as `plan/some-standard.pdf`, PDF page 8, printed p. 6, 600 dpi shows.
+- **The print:** `A = 0,32 V`, on PDF page 8 (printed p. 6) of Some standard:2020.
 - **Evidence:** direct algebra.
 - **Status:** unreported.
 """
 
-_NO_RATIO_NO_RENDER = """
+#: The procedure, which the registry does not carry.
+_WITH_PROCEDURE = """
+## Some standard, Formula (1)
+
+- **Location:** Formula (1).
+- **The print:** `A = 0,32 V`.
+- **Evidence:** verified on a 900 dpi render of PDF page 8 (printed p. 6) of Some standard:2020.
+- **Status:** unreported.
+"""
+
+_NO_RATIO_NO_PAGE = """
 ## Some standard, Clause 4 (a broken cross-reference)
 
 - **Location:** Clause 4.
@@ -75,7 +85,7 @@ def test_the_withdrawn_entry_trips_both_tells() -> None:
     """"1,73 times too small" and "2,4 dB offset" are sqrt(3) twice over."""
     entries = _entries(_WITHDRAWN)
     assert len(entries) == 1
-    assert not entries[0].cites_render
+    assert not entries[0].cites_page
     hits = cee.check_ratios(entries)
     names = sorted({hit.name for hit in hits})
     assert names == ["sqrt(3)"]
@@ -85,54 +95,98 @@ def test_the_withdrawn_entry_trips_both_tells() -> None:
     assert "2,4 dB offset" in quoted
 
 
-def test_the_withdrawn_entry_fails_the_render_check() -> None:
-    problems = cee.check_renders(_entries(_WITHDRAWN))
+def test_the_withdrawn_entry_fails_the_page_check() -> None:
+    problems = cee.check_pages(_entries(_WITHDRAWN))
     assert len(problems) == 1
-    assert "cites no page render" in problems[0]
+    assert "cites no page" in problems[0]
 
 
-def test_a_complete_render_citation_satisfies_the_check() -> None:
-    entries = _entries(_WITH_RENDER)
-    assert entries[0].cites_render
-    assert cee.check_renders(entries) == []
+def test_a_complete_page_citation_satisfies_the_check() -> None:
+    entries = _entries(_WITH_PAGE)
+    assert entries[0].cites_page
+    assert cee.check_pages(entries) == []
+
+
+def test_a_page_run_is_a_citation_too() -> None:
+    """Several entries quote a table that spans two pages."""
+    spanning = _WITH_PAGE.replace(
+        "PDF page 8 (printed p. 6)", "PDF pages 8 and 9 (printed pp. 6 and 7)"
+    )
+    assert _entries(spanning)[0].cites_page
 
 
 @pytest.mark.parametrize(
-    "missing",
+    ("field", "without"),
     [
-        "`plan/some-standard.pdf`, ",  # no file
-        "PDF page 8, ",  # no PDF page index
-        "printed p. 6, ",  # no printed folio
-        ", 600 dpi",  # no resolution
+        ("the PDF page index", "Verified on printed p. 6 of Some standard:2020."),
+        ("the printed folio", "Verified on PDF page 8 of Some standard:2020."),
+        ("both", "Verified against the source document."),
     ],
 )
-def test_an_incomplete_render_citation_does_not_satisfy_the_check(
-    missing: str,
+def test_an_incomplete_citation_does_not_satisfy_the_check(
+    field: str, without: str
 ) -> None:
-    """All four fields are required; three of four is not a citation."""
-    incomplete = _WITH_RENDER.replace(missing, "")
-    assert incomplete != _WITH_RENDER, "the fixture no longer contains that field"
-    assert not _entries(incomplete)[0].cites_render
+    """Both halves are required: the page index resolves in any copy of the
+    edition, and the printed folio is what a reader holding the paper looks
+    for."""
+    incomplete = _WITH_PAGE.replace(
+        "Verified on PDF page 8 (printed p. 6) of Some standard:2020.", without
+    )
+    assert incomplete != _WITH_PAGE, "the fixture no longer contains that sentence"
+    assert not _entries(incomplete)[0].cites_page, field
 
 
-def test_a_render_outside_the_evidence_bullet_does_not_count() -> None:
+def test_a_citation_outside_the_evidence_bullet_does_not_count() -> None:
     """Only the Evidence bullet is read.
 
-    A render-shaped string quoted in "The print" or narrated in "The problem"
+    A citation-shaped string quoted in "The print" or narrated in "The problem"
     would otherwise let an entry through with an Evidence bullet that still
     rests on an extraction.
     """
-    entries = _entries(_RENDER_IN_THE_WRONG_BULLET)
+    entries = _entries(_PAGE_IN_THE_WRONG_BULLET)
     assert "PDF page 8" in entries[0].body
     assert "PDF page 8" not in entries[0].evidence
-    assert not entries[0].cites_render
-    problems = cee.check_renders(entries)
+    assert not entries[0].cites_page
+    problems = cee.check_pages(entries)
     assert len(problems) == 1
-    assert "cites no page render in its Evidence bullet" in problems[0]
+    assert "cites no page in its Evidence bullet" in problems[0]
+
+
+def test_the_procedure_is_rejected() -> None:
+    """How the page was read belongs in CONTRIBUTING.md, not in the registry.
+
+    The entry is otherwise perfect: it cites the document, the PDF page and the
+    printed folio, so every other check passes and this one has to be what
+    fails.
+    """
+    entries = _entries(_WITH_PROCEDURE)
+    assert entries[0].cites_page
+    assert cee.check_pages(entries) == []
+    problems = cee.check_procedure_is_not_cited(entries)
+    assert len(problems) == 1
+    assert "900 dpi" in problems[0]
+
+
+@pytest.mark.parametrize(
+    "procedure",
+    ["a 1200 dpi render", "rendered at 600 DPI", "the rendering of page 8", "300dpi"],
+)
+def test_every_wording_of_the_procedure_is_rejected(procedure: str) -> None:
+    markdown = f"""
+## Probe
+
+- **Evidence:** read on {procedure}, PDF page 8 (printed p. 6) of X:2020.
+- **Status:** unreported.
+"""
+    assert cee.check_procedure_is_not_cited(_entries(markdown))
+
+
+def test_a_clean_citation_carries_no_procedure() -> None:
+    assert cee.check_procedure_is_not_cited(_entries(_WITH_PAGE)) == []
 
 
 def test_an_entry_with_no_multiplicative_claim_is_not_flagged() -> None:
-    assert cee.check_ratios(_entries(_NO_RATIO_NO_RENDER)) == []
+    assert cee.check_ratios(_entries(_NO_RATIO_NO_PAGE)) == []
 
 
 @pytest.mark.parametrize(
@@ -189,7 +243,7 @@ def test_a_blank_allowlist_reason_is_rejected(monkeypatch: pytest.MonkeyPatch) -
     """An excuse nobody wrote down is not an excuse.
 
     Every other check passes for a whitespace-only reason: the title is real,
-    the entry cites no render, and nothing compares the value. That is the
+    the entry cites no page, and nothing compares the value. That is the
     whole point of the allowlist, so it has to be the one thing that fails.
 
     The fixture is local rather than borrowed from the shipped allowlist,
@@ -204,7 +258,7 @@ def test_a_blank_allowlist_reason_is_rejected(monkeypatch: pytest.MonkeyPatch) -
 """
     entries = _entries(markdown)
     title = entries[0].title
-    monkeypatch.setattr(cee, "RENDER_ALLOWLIST", {title: "   "})
+    monkeypatch.setattr(cee, "PAGE_CITATION_ALLOWLIST", {title: "   "})
     problems = cee.check_allowlist(entries)
     assert any("blank reason" in problem for problem in problems), problems
     assert any(title in problem for problem in problems), problems
@@ -221,6 +275,8 @@ def test_a_stated_allowlist_reason_passes(monkeypatch: pytest.MonkeyPatch) -> No
 """
     entries = _entries(markdown)
     monkeypatch.setattr(
-        cee, "RENDER_ALLOWLIST", {entries[0].title: "the claim is a recomputation"}
+        cee,
+        "PAGE_CITATION_ALLOWLIST",
+        {entries[0].title: "the claim is a recomputation"},
     )
     assert cee.check_allowlist(entries) == []
