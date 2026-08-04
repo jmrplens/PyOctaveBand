@@ -105,8 +105,6 @@ PAGE_CITATION_ALLOWLIST: dict[str, str] = {
         "filed before the page rule",
     "Jiménez et al. (2017), Appl. Sci. 7(6), 618 / Sci. Rep. 7, 5389, slit-radiation term":
         "filed before the page rule",
-    "Attenborough & Van Renterghem, Predicting Outdoor Sound 2e (2021), Table 5.1":
-        "filed before the page rule",
     "Bies, Hansen & Howard, Engineering Noise Control 5e (2017), Eq. (8.141)":
         "filed before the page rule",
 }

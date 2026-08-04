@@ -86,7 +86,7 @@ which is the check that enforces the rule; see
   to 76,059 29 dB, reproducing every printed digit. Neither (a) nor (b)
   changes the rounded 84 dB, so only (a) moves $C_I$.
 - **Evidence:** independent recomputation of both sums from the printed
-  per-band levels (16 bands 83,523 37 dB, 15 bands 83,261 27 dB, with-covering
+  per-band levels (16 bands 83,523 38 dB, 15 bands 83,261 27 dB, with-covering
   16 bands 76,059 29 dB); the 2013 edition of the same example prints
   $C_I = -11$. Verified on PDF page 23 (printed p. 17) and PDF page 17
   (printed p. 11) of ISO 717-2:2020, and of PDF page 22 (printed p. 14) of ISO
@@ -146,8 +146,15 @@ which is the check that enforces the rule; see
   $m_z = 0{,}029\ \text{MPa}/(\text{m/s}^2)$, printed p. 19) and NOTE 5 (64 kg
   female, $m_z = 0{,}025\ \text{MPa}/(\text{m/s}^2)$, printed p. 20).
 - **The print:** (a) the male example is displayed as
-  $R = \{ \sum_{i=0}^{20-1} [\, 1{,}62\ \text{MPa}\,(120)^{1/6} / (6{,}75\ \text{MPa} - 0{,}052\ \text{MPa}\,(20+i)) \,]^{6} \}^{1/6} \approx 1{,}22$;
-  (b) NOTE 5 states $R = 0{,}97$ for the female case.
+
+  $$
+  R = \left\{ \sum_{i=0}^{20-1}
+  \left[ \frac{1{,}62\ \text{MPa}\,(120)^{1/6}}
+  {6{,}75\ \text{MPa} - 0{,}052\ \text{MPa}\,(20+i)} \right]^{6}
+  \right\}^{1/6} \approx 1{,}22
+  $$
+
+  and (b) NOTE 5 states $R = 0{,}97$ for the female case.
 - **The problem:** two independent defects. (a) The displayed male formula
   omits the $-S_{\text{stat},i}$ term that normative Formula (C.3) puts in the
   denominator, and that the same annex fixes at
@@ -252,8 +259,8 @@ which is the check that enforces the rule; see
 
 - **Location:** clause 3.1.5 "Relations between quantities", Formula (5)
   (printed p. 6).
-- **The print:** $D_{2m,n} = D_{2m,nT} - 10 \lg[0{,}16\,V/(T_0 A_0)]$
-  $= D_{2m,nT} - 10 \lg 0{,}32\,V\ \text{dB}$.
+- **The print:**
+  $D_{2m,n} = D_{2m,nT} - 10 \lg[0{,}16\,V/(T_0 A_0)] = D_{2m,nT} - 10 \lg 0{,}32\,V\ \text{dB}$.
 - **The problem:** the reduced form is off by a factor of ten. Six lines above
   it, the where-list of clause 3.1.4 defines $A_0$ as "the reference
   equivalent sound absorption area, in square metres, for dwellings given as
@@ -263,15 +270,17 @@ which is the check that enforces the rule; see
   printed, the reduced form shifts every normalized façade level difference by
   exactly $10\log_{10} 10 = 10\ \text{dB}$. The exact analogue in the
   companion part, EN 12354-2:2000 Formula (3), prints the same algebra
-  correctly: $L'_{nT} = L'_n - 10 \lg[0{,}16\,V/(A_0 T_0)]$
-  $= L'_n - 10 \lg 0{,}032\,V\ \text{dB}$. ISO 12354-3:2017 dropped the
-  reduced form altogether: its Formula (5) prints only
-  $D_{2m,n} = D_{2m,nT} - 10 \lg[C_\text{sab} V/(A_0 T_0)]$ with
+  correctly:
+  $L'_{nT} = L'_n - 10 \lg[0{,}16\,V/(A_0 T_0)] = L'_n - 10 \lg 0{,}032\,V\ \text{dB}$.
+  ISO 12354-3:2017 dropped the reduced form altogether: its Formula (5) prints
+  only $D_{2m,n} = D_{2m,nT} - 10 \lg[C_\text{sab} V/(A_0 T_0)]$ with
   $C_\text{sab} = 0{,}16\ \text{s/m}$.
 - **Evidence:** direct algebra with the standard's own $A_0$ and $T_0$, and
   the side-by-side comparison with the correctly reduced Formula (3) of Part
   2. Verified on PDF page 8 (printed p. 6) and PDF page 7 (printed p. 5) of EN
-  12354-3:2000, and of PDF page 7 (printed p. 5) of EN 12354-2:2000.
+  12354-3:2000, on PDF page 7 (printed p. 5) of EN 12354-2:2000 for its
+  Formula (3), and on PDF page 12 (printed p. 6) of ISO 12354-3:2017 for the
+  2017 Formulae (4) and (5).
 - **Library behaviour:** unaffected. No code path implements the reduced form:
   the façade model computes $D_{2m,nT}$ from Formula (13)
   ([`facade.py`](https://github.com/jmrplens/phonometry/blob/main/src/phonometry/building/prediction/facade.py)), and the
@@ -296,8 +305,11 @@ which is the check that enforces the rule; see
   $R' + 1{,}5\ \text{dB}$ in all five octave bands and in the single-number
   column (25,9/23,0/26,4/36,9/39,0 against 24,4/21,5/24,9/35,4/37,5, and 29,3
   against 27,8).
-- **The problem:** the *example* is self-consistent and the *formula* is the
-  outlier. With the example's own inputs ($V = 50\ \text{m}^3$,
+- **The problem:** on this constant the *example* is self-consistent and the
+  *formula* is the outlier. (Two cells of the same annex table do not follow
+  from its element rows, which is the subject of the next entry; the printed
+  $+1,5$ dB row holds in every band regardless, so the two defects are
+  independent.) With the example's own inputs ($V = 50\ \text{m}^3$,
   $S = 11{,}3\ \text{m}^2$, $T_0 = 0{,}5\ \text{s}$,
   $\Delta L_\text{fs} = 0$), the Sabine form gives
   $10\log_{10}[0{,}16 \cdot 50/(0{,}5 \cdot 11{,}3)] = 1{,}5104\ \text{dB}$,
@@ -1049,7 +1061,9 @@ which is the check that enforces the rule; see
 - **Evidence:** Table 2, item d) and item f) read together in both language
   columns of the bilingual edition; the historical DIM literature (Otala)
   defines the ratio to the sine amplitude. Verified on PDF page 41 (printed p.
-  39) of IEC 60268-3:2013.
+  39), PDF page 40 (printed p. 38), which carries Table 2, and PDF page 102
+  (printed p. 100), which carries the same item f) in the French column, of
+  IEC 60268-3:2013.
 - **Library behaviour:** follows the 14.12.9.1 definition (reference = the
   output amplitude at $f_s$), with a code comment at the reference measurement
   in [`distortion.py`](https://github.com/jmrplens/phonometry/blob/main/src/phonometry/electroacoustics/distortion.py).
@@ -1531,6 +1545,9 @@ which is the check that enforces the rule; see
   and with the "modified Miki" row the book itself derives from it.
 - **Evidence:** digit check against the original Miki (1990) paper (Eqs.
   (30)–(34)) and cross-computation of both variants at the fit-range edge.
+  Verified on PDF page 168 (printed p. 149) of Attenborough & Van Renterghem,
+  Predicting Outdoor Sound 2e:2021, and on PDF page 4 (printed p. 22) of Miki,
+  J. Acoust. Soc. Jpn (E) 11(1):1990.
 - **Library behaviour:** implements Miki's original 0.109; the digitization
   point $f/\sigma = 0.1$ is pinned in ``tests/reference_data.py`` and in the
   conformance check "Miki 1990 Eqs. (30)-(34)".
@@ -1564,7 +1581,11 @@ which is the check that enforces the rule; see
 - **Location:** Section 8.9.1, Eq. (8.141) (printed p. 461), the transmission
   loss of a muffler from the elements of its total four-pole matrix.
 - **The print:**
-  $$TL = 10 \lg[((1+M_n)/(1+M_1))^2 \cdot \tfrac{1}{4} \cdot |(Z_{A1}/Z_{An}) \cdot T_{11} + T_{12}/Z_{An} + Z_{A1} \cdot T_{21} + (Z_{An}/Z_{A1}) \cdot T_{22}|^2],$$
+  $$
+  TL = 10 \lg\left[ \left(\frac{1+M_n}{1+M_1}\right)^2 \cdot \tfrac{1}{4} \cdot
+  \left| \frac{Z_{A1}}{Z_{An}} T_{11} + \frac{T_{12}}{Z_{An}}
+  + Z_{A1} T_{21} + \frac{Z_{An}}{Z_{A1}} T_{22} \right|^2 \right],
+  $$
   i.e. with the impedance ratio $Z_{A1}/Z_{An}$ weighting $T_{11}$ and its
   inverse weighting $T_{22}$.
 - **The problem:** the source the equation itself cites (Munjal, *Acoustics of
@@ -1601,13 +1622,13 @@ which is the check that enforces the rule; see
   p. 699), the gain-before-feedback stability criterion generalised to several
   open microphones.
 - **The print:**
-  $Z_S + L_{H-M} + \Delta L_\text{nom} \le L_{H-L} \boldsymbol{+} D_M(\theta) - 10$,
+  $Z_S + L_{H-M} + \Delta L_\text{nom} \le L_{H-L} \mathbin{\boldsymbol{+}} D_M(\theta) - 10$,
   with the microphone directivity index entering the right-hand side with a
   plus sign.
 - **The problem:** Eq. (18.24) is the number-of-open-microphones
   generalisation of Eq. (18.20) (printed p. 698), which reads
-  $Z_S + L_{H-M} \le L_{H-L} \boldsymbol{-} D_M(\theta) - 10$ and which
-  follows in turn from the oscillation condition Eq. (18.19),
+  $Z_S + L_{H-M} \le L_{H-L} \mathbin{\boldsymbol{-}} D_M(\theta) - 10$ and
+  which follows in turn from the oscillation condition Eq. (18.19),
   $Z_S + L_{H-M} = L_{H-L} - D_M(\theta)$, obtained by substituting the
   feedback-loop gain $G_S = L_{H-M} - L_{H-L} + D_M(\theta)$ (Eq. (18.18))
   into $Z_S + G_S = 0$ (Eq. (18.16)). Setting $N_m = 1$ makes
