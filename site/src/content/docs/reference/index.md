@@ -50,6 +50,13 @@ recorded with the printed edition, the evidence, the reading the library
 implements and the test that pins it. Read it when a printed expected value
 and the library disagree, before assuming the library is at fault.
 
+## [Glossary of quantities](/phonometry/reference/glossary/)
+
+Every acoustic quantity the guides compute, with its symbol, a one-sentence
+definition, its unit, the standard and clause that defines it, and the guide
+that implements it. Read it when a symbol in a formula needs a name, or a name
+needs the clause it came from.
+
 ## [Bibliography](/phonometry/reference/bibliography/)
 
 Every book and paper cited by the guides, in one list grouped by domain, each

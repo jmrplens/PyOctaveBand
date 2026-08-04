@@ -11,7 +11,7 @@ head:
         "@type": "ItemList",
         "@id": "https://jmrplens.github.io/phonometry/start/guides/#areas",
         "name": "phonometry documentation areas",
-        "description": "The nine documented areas of the phonometry guides, each with the standards it implements.",
+        "description": "The ten documented areas of the phonometry guides, each with the standards it implements.",
         "inLanguage": "en",
         "numberOfItems": 10,
         "itemListOrder": "https://schema.org/ItemListUnordered",
@@ -61,20 +61,27 @@ head:
           {
             "@type": "ListItem",
             "position": 7,
+            "name": "Aircraft noise",
+            "description": "Certification levels, airport contours and the rotorcraft hemisphere method.",
+            "url": "https://jmrplens.github.io/phonometry/aircraft/"
+          },
+          {
+            "@type": "ListItem",
+            "position": 8,
             "name": "Underwater acoustics",
             "description": "Levels re 1 microPa, ship radiated noise, pile driving, ambient noise, transmission loss.",
             "url": "https://jmrplens.github.io/phonometry/underwater/"
           },
           {
             "@type": "ListItem",
-            "position": 8,
+            "position": 9,
             "name": "Sources and devices",
             "description": "Sound power, intensity, emission declarations, electroacoustics, programme loudness.",
             "url": "https://jmrplens.github.io/phonometry/devices/"
           },
           {
             "@type": "ListItem",
-            "position": 9,
+            "position": 10,
             "name": "Wave simulation",
             "description": "A deterministic 2D FDTD solver, validated against analytic oracles rather than a standard.",
             "url": "https://jmrplens.github.io/phonometry/simulation/"
@@ -416,12 +423,12 @@ ISO 2631-1/-2/-4/-5, ISO 5349-1/-2 and ISO 8041-1.
 
 ## [Environment and transport](/phonometry/environment/)
 
-Outdoor propagation, barriers, refraction, aircraft, rotorcraft and wind
-turbines. Everything here concerns sound that has to travel a long way before
-it is assessed, so the atmosphere, the ground and the source's own motion all
-enter the answer. Implements ISO 9613-1/-2, ISO 1996-1/-2, ISO/PAS 1996-3,
-NT ACOU 112, CNOSSOS-EU (2002/49/EC Annex II), ICAO Annex 16, IEC 61265,
-SAE ARP 5534, ECAC Doc 29/32 and IEC 61400-11.
+Outdoor propagation, barriers, refraction, road, rail and wind-turbine
+sources, and the assessment built on them. Everything here concerns sound that
+has to travel a long way before it is assessed, so the atmosphere, the ground
+and the source's own motion all enter the answer. Implements ISO 9613-1/-2,
+ISO 1996-1/-2, ISO/PAS 1996-3, NT ACOU 112, CNOSSOS-EU (2002/49/EC Annex II)
+and IEC 61400-11.
 
 **[Outdoor sound](/phonometry/environment/propagation/)**
 
@@ -435,6 +442,9 @@ SAE ARP 5534, ECAC Doc 29/32 and IEC 61400-11.
   the rail source of Annex II 2.3: roughness and the contact filter, impact
   noise, curve squeal, traction and aerodynamic noise, and the two equivalent
   source lines.
+- [Wind-turbine noise: sound power and tonal audibility](/phonometry/environment/sources/wind-turbine-noise/):
+  the apparent sound power level referred to the rotor centre, and the tonal
+  audibility chain that decides whether a tone is audible.
 - [Spherical ground effect and advanced barriers](/phonometry/environment/propagation/ground-barriers/):
   the Weyl-Van der Pol reflection coefficient over finite-impedance ground, and
   wave-theoretic barrier diffraction.
@@ -445,7 +455,12 @@ SAE ARP 5534, ECAC Doc 29/32 and IEC 61400-11.
   the predicted prominence of each impulse from its onset rate and level
   difference, and the adjustment added to $L_{Aeq}$.
 
-**[Aircraft and wind energy](/phonometry/aircraft/)**
+## [Aircraft noise](/phonometry/aircraft/)
+
+Certification levels, airport contours and the rotorcraft hemisphere
+method: the noise of flight measured the way the certification and
+airport-planning documents prescribe. Implements ICAO Annex 16, IEC 61265,
+SAE ARP 866B/5534 and ECAC Doc 29/32.
 
 - [Aircraft noise: Effective Perceived Noise Level](/phonometry/aircraft/aircraft-noise/):
   perceived noisiness and PNL, the tone correction, the duration correction and
@@ -456,9 +471,6 @@ SAE ARP 5534, ECAC Doc 29/32 and IEC 61400-11.
 - [Rotorcraft noise: the hemisphere method](/phonometry/aircraft/rotorcraft-noise/):
   the hemisphere source model with its propagation adjustments, flight-condition
   interpolation, and the single-event contours.
-- [Wind-turbine noise: sound power and tonal audibility](/phonometry/environment/sources/wind-turbine-noise/):
-  the apparent sound power level referred to the rotor centre, and the tonal
-  audibility chain that decides whether a tone is audible.
 
 ## [Underwater acoustics](/phonometry/underwater/)
 

@@ -81,6 +81,10 @@ y las fuentes que alimentan un cálculo de propagación en las secciones de
   la reflexión de onda esférica de Weyl-Van der Pol en el suelo y la difracción
   de barreras por teoría ondulatoria (Kurze-Anderson, semiplano rígido exacto,
   barreras gruesas y la barrera coherente de cuatro caminos sobre el suelo).
+- [Refracción atmosférica: rayos y GFPE](/phonometry/es/environment/propagation/atmospheric-refraction/):
+  la propia atmósfera refractante: perfiles efectivos de velocidad del sonido,
+  rayos curvados con sus zonas de sombra, y la ecuación parabólica de función
+  de Green.
 - [Prominencia de sonidos impulsivos (NT ACOU 112)](/phonometry/es/environment/assessment/impulsive-sound/):
   la prominencia predicha de los sonidos impulsivos y el ajuste graduado KI
   del LAeq.

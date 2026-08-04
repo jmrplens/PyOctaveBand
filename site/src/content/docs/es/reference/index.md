@@ -52,6 +52,13 @@ evidencia, la lectura que implementa la librería y el test que la fija. Léelo
 cuando un valor esperado impreso y la librería no coincidan, antes de dar por
 hecho que el error es de la librería.
 
+## [Glosario de magnitudes](/phonometry/es/reference/glossary/)
+
+Cada magnitud acústica que calculan las guías, con su símbolo, una definición
+de una frase, su unidad, la norma y cláusula que la define y la guía que la
+implementa. Para cuando un símbolo de una fórmula necesita nombre, o un nombre
+necesita la cláusula de la que viene.
+
 ## [Bibliografía](/phonometry/es/reference/bibliography/)
 
 Todos los libros y artículos que citan las guías, en una sola lista agrupada
