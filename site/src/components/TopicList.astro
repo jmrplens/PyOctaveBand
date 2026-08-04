@@ -31,7 +31,7 @@ const { topics } = Astro.props;
 // one. The plugin builds its array with `config.map`, so it is this array in
 // this order (libs/config.ts, middleware.ts); check-sidebar.mjs asserts that
 // the rendered list is the configured one, which is what keeps the two in step.
-const idAt = (index) => configured[index]?.id ?? '';
+const idAt = (index: number) => configured[index]?.id ?? '';
 ---
 
 <ul class="starlight-sidebar-topics">

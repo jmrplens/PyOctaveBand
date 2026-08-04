@@ -1191,6 +1191,14 @@ def render_sidebar(pages: list[ModuleDoc]) -> str:
     for page in pages:
         by_section.setdefault(page.section.key, []).append(page)
     for section in SECTIONS.values():
+        # A section of the taxonomy with no module in it yet. Emitting the group
+        # anyway would crash here on the missing key, and emitting it empty
+        # would put a disclosure in the sidebar that opens on nothing; leaving
+        # it out makes any topic still asking for it fail by name, in
+        # site/src/data/topics.mjs.
+        section_pages = by_section.get(section.key)
+        if not section_pages:
+            continue
         lines.extend(
             [
                 f"  {js(section.key)}: {{",
@@ -1202,7 +1210,7 @@ def render_sidebar(pages: list[ModuleDoc]) -> str:
         )
         lines.extend(
             f"      {js(f'reference/api/{section.key}/{page.slug}')},"
-            for page in by_section[section.key]
+            for page in section_pages
         )
         lines.extend(["    ],", "  },"])
     lines.extend(["};", ""])

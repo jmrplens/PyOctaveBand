@@ -28,7 +28,14 @@ const apiGroup = (...keys) => ({
     // the breadcrumb trail of a module page hangs from, and the way back to
     // the whole table from inside one domain.
     { slug: 'reference/api', label: 'Overview', translations: { es: 'Resumen' } },
-    ...keys.map((key) => apiSections[key]),
+    // A key that names no section means this file and the generator have
+    // drifted apart. Without this the group takes an `undefined` where a
+    // subtree should be, which Starlight renders as nothing at all.
+    ...keys.map((key) => {
+      const section = apiSections[key];
+      if (!section) throw new Error(`apiGroup: no API section named "${key}"`);
+      return section;
+    }),
   ],
 });
 
