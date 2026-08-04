@@ -75,11 +75,19 @@ jobs:
           appear_deadline=$(( SECONDS + 300 ))
           finish_deadline=$(( SECONDS + 2700 ))
           while :; do
+            # A failed call leaves the substitution empty rather than killing
+            # the step: a here-string discards the substitution's exit status,
+            # so `set -e` never sees it. Name that state, so the log shows the
+            # retries and the deadline message says what it was waiting on.
             read -r status conclusion <<<"$(gh run list \
               --repo "$GITHUB_REPOSITORY" --commit "$GITHUB_SHA" \
               --workflow python-app.yml --limit 1 \
               --json status,conclusion \
               --jq '.[0] | "\(.status // "missing") \(.conclusion // "none")"')"
+            if [ -z "$status" ]; then
+              status=unreachable
+              echo "::warning::gh run list failed; retrying."
+            fi
             case "$status" in
               completed)
                 if [ "$conclusion" = success ]; then
