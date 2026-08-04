@@ -999,6 +999,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Changed
 
+- Every entry of `docs/ERRATA.md` was checked again against the page it
+  quotes, and the registry now cites the document rather than a file. A
+  citation is the edition, the PDF page index and the printed folio, which any
+  copy of that edition resolves; a filesystem path pinned the claim to one
+  machine and told a reader nothing. The check that enforces it
+  (`scripts/check_errata_evidence.py`) reads the same form, and its allowlist,
+  which excuses an entry from citing its page, falls from forty-four entries
+  to twenty-five because those pages have now been read.
+
+  The pass corrected three of our own arithmetic slips inside accusations that
+  were otherwise right: the two EN 12354-3 Annex F deficits are 1,5104 dB and
+  1,6877 dB; Miki against Attenborough gives 2,88 from the printed exponent
+  and 3,10 from the paper's own coefficients; and reading a speed in km/h into
+  `f = v/lambda` places the CNOSSOS roughness spectrum a factor 3,6 too high
+  in frequency, not too low. Three more entries claimed more than the page
+  supports and now say what it does: the Southall table duplication follows
+  from the article's own in-air 15 dB offset rather than from a column slip,
+  the printed Vigran plenum model is monotonic in the damping and what it
+  breaks is the finite bare-plenum limit, and no Official Journal text names a
+  "Table G-1a", which was our shorthand for the first table of G-1.
+
 - The multiple-shock time guards go through `require_positive` like the rest
   of the library. They were written as `not t > 0.0`, which rejects NaN where
   `t <= 0.0` would accept it, and that reason lived in a comment. The shared
