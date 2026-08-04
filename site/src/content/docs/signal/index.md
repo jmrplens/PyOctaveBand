@@ -1,5 +1,5 @@
 ---
-title: "Core signal analysis"
+title: "Signal analysis"
 description: "The measurement core of phonometry: fractional octave filter banks, frequency and time weighting, integrated and statistical levels, calibrated spectral and correlation analysis, physical calibration and measurement uncertainty, and how those pieces chain into a sound level meter in code."
 ---
 

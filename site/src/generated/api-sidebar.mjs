@@ -147,7 +147,7 @@ export const apiSections = {
     ],
   },
   'vibration': {
-    label: 'Vibration and structure-borne',
+    label: 'Vibration and structure-borne sound',
     translations: { es: 'Vibración y ruido estructural' },
     collapsed: true,
     items: [
