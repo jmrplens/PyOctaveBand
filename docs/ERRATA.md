@@ -1596,13 +1596,13 @@ which is the check that enforces the rule; see
   p. 699), the gain-before-feedback stability criterion generalised to several
   open microphones.
 - **The print:**
-  $Z_S + L_{H-M} + \Delta L_\text{nom} \le L_{H-L} \mathbin{\boldsymbol{+}} D_M(\theta) - 10$,
+  $Z_S + L_{H-M} + \Delta L_\text{nom} \le L_{H-L} \boldsymbol{+} D_M(\theta) - 10$,
   with the microphone directivity index entering the right-hand side with a
   plus sign.
 - **The problem:** Eq. (18.24) is the number-of-open-microphones
   generalisation of Eq. (18.20) (printed p. 698), which reads
-  $Z_S + L_{H-M} \le L_{H-L} \mathbin{\boldsymbol{-}} D_M(\theta) - 10$ and
-  which follows in turn from the oscillation condition Eq. (18.19),
+  $Z_S + L_{H-M} \le L_{H-L} \boldsymbol{-} D_M(\theta) - 10$ and which
+  follows in turn from the oscillation condition Eq. (18.19),
   $Z_S + L_{H-M} = L_{H-L} - D_M(\theta)$, obtained by substituting the
   feedback-loop gain $G_S = L_{H-M} - L_{H-L} + D_M(\theta)$ (Eq. (18.18))
   into $Z_S + G_S = 0$ (Eq. (18.16)). Setting $N_m = 1$ makes
@@ -2179,11 +2179,11 @@ which is the check that enforces the rule; see
   (LF, SI, PCW, and OCW)" restriction, the 15 dB in-air offset in the same
   paragraph, both statements of the +6 dB rule, and the article's Table 7 with
   the PCA row 123 / 138 / 138 / 144 and the OCA row 146 / 161 / 161 / 167. The
-  errata is a separate publication: verified on PDF page 1 (printed p. 569)
-  and PDF page 2 (printed p. 570) of Southall et al. (2019), Aquatic Mammals
-  45(5), 569-572, which carry its prose, naming all four values and their
-  replacements, and its reprinted Table 7, with PCA 123 / 155 / 138 / 161 and
-  OCA 146 / 170 / 161 / 176.
+  errata is a publication of its own, *Aquatic Mammals* 45(5), 569-572, bound
+  at the end of the copy the authors distribute: verified there on PDF page
+  109 (printed p. 569), which names all four values and their replacements,
+  and PDF page 110 (printed p. 570), which reprints Table 7 with PCA 123 / 155
+  / 138 / 161 and OCA 146 / 170 / 161 / 176.
 - **Library behaviour:** the errata-corrected values are the ones implemented
   in
   [`bioacoustics/weighting.py`](../src/phonometry/underwater/bioacoustics/weighting.py),
