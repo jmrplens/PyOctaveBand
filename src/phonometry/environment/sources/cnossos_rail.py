@@ -36,7 +36,9 @@ and every shipped table records the instrument it comes from:
 * the whole of Appendix G is the corrigendum's replacement text, with Tables
   G-1b, G-2, G-3a, G-4 and G-7 as **replaced** by (EU) 2021/1226 and Tables
   G-1a, G-3b, G-3c, G-5 and G-6 as re-issued in 2018 with the band labels
-  corrected in 2021;
+  corrected in 2021. The letter suffixes are this module's shorthand: the
+  Official Journal prints two tables under the number G-1 (wheel then rail
+  roughness) and three sections under G-3, and names neither set;
 * curve squeal follows the 2021 rule (5 dB / 8 dB by radius, with a separate
   tram rule and a turnout rule), not the 2015 one;
 * bridge noise is a **separate source** built on the transfer function
@@ -171,7 +173,9 @@ _WAVELENGTHS_STANDARD: tuple[float, ...] = (
     200.0, 160.0, 125.0, 100.0, 80.0, 63.0, 50.0, 40.0, 31.5, 25.0, 20.0, 16.0,
     12.5, 10.0, 8.0, 6.3, 5.0, 4.0, 3.15, 2.5, 2.0, 1.6, 1.25, 1.0, 0.8,
 )
-#: Wavelength grid of Table G-1a, which (EU) 2021/1226 did not replace, in mm.
+#: Wavelength grid, in mm, of Table G-1a, the first table of G-1, which
+#: (EU) 2021/1226 did not replace: point (20)(a) replaces "the second table"
+#: only.
 #: It stops at 1 000 mm and keeps the non-standard steps 120, 12 and 3,2 mm
 #: where the amended tables read 125, 12,5 and 3,15 mm. Each table is therefore
 #: resampled on its own grid rather than forced onto a common one, which is how

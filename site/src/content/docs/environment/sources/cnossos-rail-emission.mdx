@@ -160,8 +160,9 @@ Rolling noise is the wheel and the rail exciting each other through the
 roughness of the two running surfaces. The method separates the cause from the
 radiation:
 
-- **cause**: the rail roughness $L_{r,TR}$ (Table G-1b, selected by digit 2 of
-  the track descriptor) and the wheel roughness $L_{r,VEH}$ (Table G-1a,
+- **cause**: the rail roughness $L_{r,TR}$ (the second table of G-1, called
+  G-1b here, selected by digit 2 of
+  the track descriptor) and the wheel roughness $L_{r,VEH}$ (the first, G-1a,
   selected by the brake type, digit 3 of the vehicle descriptor), energy-summed
   and then filtered by the **contact filter** $A_3$ (Table G-2), which accounts
   for the
@@ -263,8 +264,9 @@ single largest interpretation risk in the railway model, and any implementation
 that does not say which rule it uses is not comparable with another one.
 
 A third, smaller ambiguity is handled without a switch. The 2021 amendment put
-the tables it replaced on the standard 1/3-octave wavelength series but left
-Table G-1a alone, so the wheel roughness is still printed at 120, 12, 3,2 and
+the tables it replaced on the standard 1/3-octave wavelength series, but its
+point (20)(a) replaces "the second table" of G-1 only, so the wheel roughness
+of the first is still printed at 120, 12, 3,2 and
 1,2 mm where every other table now reads 125, 12,5, 3,15 and 1,25 mm. Rather
 than forcing the two onto a common grid, each table is resampled on the grid the
 Directive prints for it.

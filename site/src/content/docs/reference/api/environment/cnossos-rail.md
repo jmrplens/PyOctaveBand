@@ -40,7 +40,9 @@ and every shipped table records the instrument it comes from:
 * the whole of Appendix G is the corrigendum's replacement text, with Tables
   G-1b, G-2, G-3a, G-4 and G-7 as **replaced** by (EU) 2021/1226 and Tables
   G-1a, G-3b, G-3c, G-5 and G-6 as re-issued in 2018 with the band labels
-  corrected in 2021;
+  corrected in 2021. The letter suffixes are this module's shorthand: the
+  Official Journal prints two tables under the number G-1 (wheel then rail
+  roughness) and three sections under G-3, and names neither set;
 * curve squeal follows the 2021 rule (5 dB / 8 dB by radius, with a separate
   tram rule and a turnout rule), not the 2015 one;
 * bridge noise is a **separate source** built on the transfer function

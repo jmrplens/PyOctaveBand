@@ -39,9 +39,9 @@ so the factor is the same :math:`\epsilon` that the compact form carries.
    :math:`\int_0^{L_R} \exp(-\epsilon m'_R x) \, dx =
    (1 - \exp(-\epsilon m'_R L_R))/(\epsilon m'_R)` carries :math:`m'_R`,
    exactly as the source-side one carries :math:`m_S`, and the printed
-   reading makes :math:`\tau_{cl}` non-monotonic in the plenum damping and
-   unbounded as :math:`m_R \to 0`. This module implements the derived
-   :math:`m'_R`.
+   reading leaves :math:`\tau_{cl}` unbounded as :math:`m_R \to 0`, where the
+   derived reading stays bounded by the leakage term. This module implements
+   the derived :math:`m'_R`.
 
 For a plenum with little attenuation on both sides (:math:`m_S L_S \ll 1`
 **and** :math:`m'_R L_R \ll 1`, which needs a fairly insulating ceiling as
@@ -91,9 +91,9 @@ the shifted contour at 500 Hz (clause 5.5). See
    result in Vigran (Figs. 9.11 to 9.13) and in Mechel's *Formulas of Acoustics*
    (Sections I.21 and I.22) is a figure. The functions here are anchored on the
    closed forms, on the derivation of Eq. (9.18) from the two side integrals,
-   and on structural properties that a wrong reading breaks: monotonicity in
-   the plenum damping, the bound :math:`\tau_{cl} \le 1`, and the
-   small-attenuation limit Eq. (9.20) taken where it genuinely applies
+   and on structural properties that a wrong reading breaks: the bound
+   :math:`\tau_{cl} \le 1`, a bare plenum no worse than the undamped
+   Eq. (9.20) value, and the small-attenuation limit taken where it applies
    rather than only where the Eq. (9.17) leakage term happens to vanish.
    The measurement chain
    (:func:`normalized_ceiling_attenuation`, :func:`ceiling_attenuation_class`)
@@ -492,9 +492,9 @@ def plenum_flanking_reduction_index(
     # receiving-side integral is int_0^LR exp(-eps m'R x) dx =
     # (1 - exp(-eps m'R LR))/(eps m'R), exactly as the source-side one is in
     # mS. Taken literally the printed form is not a transmission factor at
-    # all: it is non-monotonic in the plenum damping (adding absorber makes
-    # the predicted path worse) and unbounded as mR -> 0, exceeding unity for
-    # ordinary inputs. See docs/ERRATA.md, "Vigran (2008), Eq. (9.18)".
+    # all: it diverges as mR -> 0, where the derived reading stays bounded by
+    # the leakage term, and it exceeds unity for ordinary inputs. See
+    # docs/ERRATA.md, "Vigran (2008), Eq. (9.18)".
     tau = (
         ss * sr * tau_s * tau_r * lr / (ms * ls * mr_eff * lr * h)
         * (1.0 - np.exp(-eps * ms * ls))

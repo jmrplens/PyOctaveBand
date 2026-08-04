@@ -362,14 +362,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   about a constant, coefficient, exponent or symbol may rest on text extracted
   from a PDF: extraction drops radicals silently, so the page is rendered as
   an image at 600 dpi and read.
-- Two checks over `docs/ERRATA.md`, and a contributor tool for the sources it
-  cites. `scripts/check_errata_evidence.py` requires every entry to name the
-  page render its claim rests on (file, PDF page, printed folio, dpi) or to sit
-  on an explicit, shrinking allowlist with a reason, and separately flags any
+- Three checks over `docs/ERRATA.md`, and a contributor tool for the sources
+  it cites. `scripts/check_errata_evidence.py` requires every entry to cite the
+  page its claim rests on (the edition, the PDF page index and the printed
+  folio) or to sit
+  on an explicit, shrinking allowlist with a reason; rejects an entry that
+  describes how that page was read, which is method rather than evidence; and
+  separately flags any
   multiplicative claim whose ratio lands within 0,5 % of `√2`, `√3`, `π`, `2π`,
   `1/√2`, `ln 2` or a small integer, which is the arithmetic signature of a
   glyph lost in extraction rather than an author's error. A flagged entry has
-  to cite a render; the allowlist does not excuse it. It runs in CI as the
+  to cite its page; the allowlist does not excuse it. It runs in CI as the
   `errata-evidence` job. `scripts/glyph_census.py` is the companion tool, not a
   gate: it reports whether a document's text layer emits any `√` or `−` at all,
   and counts the C0 control characters and Latin-1 ligature stand-ins that mark
@@ -998,6 +1001,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   so nothing is fetched and nothing reflows once the page has painted.
 
 ### Changed
+
+- Every entry of `docs/ERRATA.md` was checked again against the page it
+  quotes, and the registry now cites the document rather than a file. A
+  citation is the edition, the PDF page index and the printed folio, which any
+  copy of that edition resolves; a filesystem path pinned the claim to one
+  machine and told a reader nothing. The check that enforces it
+  (`scripts/check_errata_evidence.py`) reads the same form, and its allowlist,
+  which excuses an entry from citing its page, falls from forty-five entries
+  to twenty-five because those pages have now been read.
+
+  The pass corrected three of our own arithmetic slips inside accusations that
+  were otherwise right: EN 12354-3 Formula (13) against its own Annex F
+  example gives 1,5104 dB for the Sabine form and 1,6877 dB for the printed
+  formula; Miki against Attenborough gives 1,19 from the coefficient the
+  table prints, where Miki's own 0,109 gives 2,88 and the table's own
+  Delany-Bazley row gives 3,10; and reading a speed in km/h into
+  `f = v/lambda` places the CNOSSOS roughness spectrum a factor 3,6 too high
+  in frequency, not too low. Three more entries claimed more than the page
+  supports and now say what it does: the Southall table duplication follows
+  from the article's own in-air 15 dB offset rather than from a column slip,
+  the printed Vigran plenum model is monotonic in the damping and what it
+  breaks is the finite bare-plenum limit, and no Official Journal text names a
+  "Table G-1a", which was our shorthand for the first table of G-1.
 
 - The multiple-shock time guards go through `require_positive` like the rest
   of the library. They were written as `not t > 0.0`, which rejects NaN where
@@ -1741,12 +1767,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   hold, so the citation form and the name record are meant to differ and
   neither needs changing.
 
-- `docs/ERRATA.md` is now anchored on page renders. Every claim that turns on
-  the exact characters of a formula, constant, symbol, inequality or table cell
-  has been re-read from a rendered image of the cited page, and each Evidence
-  bullet records the render it rests on: source file, PDF page index, printed
-  folio and dpi. The reason is that PDF text extraction deletes glyphs without
-  saying so. Of the twenty-five source documents the registry cites, twenty-two
+- `docs/ERRATA.md` is now anchored on the printed page. Every claim that turns
+  on the exact characters of a formula, constant, symbol, inequality or table
+  cell has been read from an image of the cited page rather than from its text
+  layer, and each Evidence bullet cites that page by edition, PDF page index
+  and printed folio. The reason is that PDF text extraction deletes glyphs
+  without saying so. Of the twenty-five source documents the glyph census
+  covers, twenty-two
   emit no `√` at all over their whole text layer, so `f_T/√2` extracts as
   `f_T/2`; eleven emit no `−` either, and one textbook returns every `+` as
   `þ`. Eight further defects were found in the process and registered:

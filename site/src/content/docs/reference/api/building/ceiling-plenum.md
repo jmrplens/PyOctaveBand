@@ -41,9 +41,9 @@ so the factor is the same $\epsilon$ that the compact form carries.
    misprint (see `docs/ERRATA.md`): the receiving-side integral
    $\int_0^{L_R} \exp(-\epsilon m'_R x) \, dx = (1 - \exp(-\epsilon m'_R L_R))/(\epsilon m'_R)$ carries $m'_R$,
    exactly as the source-side one carries $m_S$, and the printed
-   reading makes $\tau_{cl}$ non-monotonic in the plenum damping and
-   unbounded as $m_R \to 0$. This module implements the derived
-   $m'_R$.
+   reading leaves $\tau_{cl}$ unbounded as $m_R \to 0$, where the
+   derived reading stays bounded by the leakage term. This module implements
+   the derived $m'_R$.
 
 For a plenum with little attenuation on both sides ($m_S L_S \ll 1$
 **and** $m'_R L_R \ll 1$, which needs a fairly insulating ceiling as
@@ -93,9 +93,9 @@ The one-dimensional plenum model has **no published numeric output**: every
 result in Vigran (Figs. 9.11 to 9.13) and in Mechel's *Formulas of Acoustics*
 (Sections I.21 and I.22) is a figure. The functions here are anchored on the
 closed forms, on the derivation of Eq. (9.18) from the two side integrals,
-and on structural properties that a wrong reading breaks: monotonicity in
-the plenum damping, the bound $\tau_{cl} \le 1$, and the
-small-attenuation limit Eq. (9.20) taken where it genuinely applies
+and on structural properties that a wrong reading breaks: the bound
+$\tau_{cl} \le 1$, a bare plenum no worse than the undamped
+Eq. (9.20) value, and the small-attenuation limit taken where it applies
 rather than only where the Eq. (9.17) leakage term happens to vanish.
 The measurement chain
 ([`normalized_ceiling_attenuation`](/phonometry/reference/api/building/ceiling-plenum/#normalized_ceiling_attenuation), [`ceiling_attenuation_class`](/phonometry/reference/api/building/ceiling-plenum/#ceiling_attenuation_class))

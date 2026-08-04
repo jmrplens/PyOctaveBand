@@ -162,10 +162,11 @@ El ruido de rodadura es la rueda y el carril excitándose mutuamente a través d
 la rugosidad de las dos superficies de rodadura. El método separa la causa de la
 radiación:
 
-- **causa**: la rugosidad del carril $L_{r,TR}$ (Tabla G-1b, que selecciona el
+- **causa**: la rugosidad del carril $L_{r,TR}$ (la segunda tabla de la G-1,
+  aquí G-1b, que selecciona el
   dígito 2 del descriptor de vía) y la rugosidad de la rueda $L_{r,VEH}$
-  (Tabla G-1a, que selecciona el tipo de freno, dígito 3 del descriptor de
-  vehículo), sumadas energéticamente y filtradas después por el **filtro de
+  (la primera, G-1a, que selecciona el tipo de freno, dígito 3 del descriptor
+  de vehículo), sumadas energéticamente y filtradas después por el **filtro de
   contacto** $A_3$ (Tabla G-2), que da cuenta del tamaño finito de la huella de
   contacto:
 
@@ -270,8 +271,9 @@ implementación que no diga qué regla usa no es comparable con otra.
 
 Una tercera ambigüedad, menor, se resuelve sin conmutador. La modificación de
 2021 puso las tablas que sustituyó en la serie normalizada de tercios de octava
-de longitud de onda, pero dejó la Tabla G-1a como estaba, así que la rugosidad de
-rueda se sigue imprimiendo en 120, 12, 3,2 y 1,2 mm donde el resto de tablas ya
+de longitud de onda, pero su punto (20)(a) sustituye solo «la segunda tabla» de
+la G-1, así que la rugosidad de rueda de la primera se sigue imprimiendo en
+120, 12, 3,2 y 1,2 mm donde el resto de tablas ya
 dice 125, 12,5, 3,15 y 1,25 mm. En lugar de forzar ambas a una rejilla común,
 cada tabla se remuestrea en la rejilla que la Directiva imprime para ella.
 

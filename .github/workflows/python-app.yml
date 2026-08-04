@@ -181,14 +181,14 @@ jobs:
 
   # Evidence gate for docs/ERRATA.md. Each entry there is a permanent public
   # statement that a named body or author printed something wrong, so it must
-  # cite a render of the page it quotes rather than an extraction: PDF text
-  # layers delete radicals and minus signs silently, and one entry was
-  # published on an extraction that had eaten a square root. The same script
+  # cite the page it quotes rather than an extraction: PDF text layers delete
+  # radicals and minus signs silently, and one entry was drafted on an
+  # extraction that had eaten a square root, and caught in review. The script
   # flags any multiplicative claim whose ratio sits on sqrt(2), sqrt(3), pi,
   # 2 pi, 1/sqrt(2), ln 2 or a small integer, which is the signature of a lost
   # glyph. See scripts/check_errata_evidence.py and CONTRIBUTING.md.
   errata-evidence:
-    name: Errata entries cite a page render
+    name: Errata entries cite their page
     runs-on: ubuntu-latest
     permissions:
       contents: read
