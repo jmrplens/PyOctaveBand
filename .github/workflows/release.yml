@@ -49,6 +49,13 @@ jobs:
 
       - name: Require a green Python CI on this commit
         if: steps.version.outputs.skip != 'true'
+        # Fifty, just above the loop's own forty-five, so the message the loop
+        # writes is the one a reader gets in the ordinary case. The ceiling is
+        # not redundant with it: the loop only tests its deadline between
+        # iterations, so a `gh` call that hangs on a stalled connection never
+        # reaches the test, and without this the job would sit on a runner
+        # until the six-hour default.
+        timeout-minutes: 50
         # Publishing consulted no test result at all: a push to VERSION on a
         # semantically broken main went to PyPI, and a version number cannot be
         # re-uploaded once it is burned. `needs:` cannot cross workflow files,
