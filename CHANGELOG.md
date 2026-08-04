@@ -1009,8 +1009,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   to twenty-five because those pages have now been read.
 
   The pass corrected three of our own arithmetic slips inside accusations that
-  were otherwise right: the two EN 12354-3 Annex F deficits are 1,5104 dB and
-  1,6877 dB; Miki against Attenborough gives 2,88 from the printed exponent
+  were otherwise right: EN 12354-3 Formula (13) against its own Annex F
+  example gives 1,5104 dB for the Sabine form and 1,6877 dB for the printed
+  formula; Miki against Attenborough gives 2,88 from the printed exponent
   and 3,10 from the paper's own coefficients; and reading a speed in km/h into
   `f = v/lambda` places the CNOSSOS roughness spectrum a factor 3,6 too high
   in frequency, not too low. Three more entries claimed more than the page
