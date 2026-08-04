@@ -164,11 +164,11 @@ published standard, guidance document, textbook or paper. Each entry is a
 permanent, public statement about a named issuing body or a living author, so
 it carries a higher evidential bar than the rest of the documentation.
 
-> **The render rule.** Every errata entry whose claim depends on the exact
+> **The page rule.** Every errata entry whose claim depends on the exact
 > characters of a formula, constant, coefficient, symbol, inequality or table
-> cell must be verified against a **rendered image** of the cited page, and its
-> Evidence bullet must record that render: source file, PDF page index,
-> printed folio, and dpi. Extracted text may locate a page; it may never be
+> cell must be verified against the **page as printed**, read as an image, and
+> its Evidence bullet must cite that page by PDF page index and printed folio.
+> Extracted text may locate a page; it may never be
 > quoted as "the print". Establish the page offset empirically. Before filing,
 > run the entry's own arithmetic against the familiar irrationals: if the ratio
 > between printed and derived is within 0,5 % of √2, √3, π, 2π, 1/√2, ln 2 or a
@@ -177,7 +177,7 @@ it carries a higher evidential bar than the rest of the documentation.
 > author's error.
 
 The rule exists because text extraction silently deletes glyphs. Of the
-twenty-five source documents whose renders the registry cites, twenty-two emit
+twenty-five source documents whose pages the registry cites, twenty-two emit
 no `√` (U+221A) at all over their whole text layer, so every radical in them
 extracts as if it were not there: `f_T/√2` becomes `f_T/2`. Eleven of the
 twenty-five emit no `−` (U+2212) either, while emitting ASCII hyphens, and
@@ -200,8 +200,10 @@ Practical notes:
 - The page offset differs per document and drifts inside one document
   (books omit blank versos), so confirm the printed folio on the render itself
   rather than assuming a constant offset.
-- Write the render as `Render: \`plan/<file>.pdf\`, PDF page N, printed p. M,
-  D dpi.` at the end of the Evidence bullet. Two checks read that line.
+- Close the Evidence bullet with `Verified on PDF page N (printed p. M) of
+  <designation>:<year>.` Cite the document, never a file path: the registry is
+  a public statement about a published source, and a path pins it to one
+  machine. Two checks read that sentence.
 
 Two checks run in CI over the registry
 ([`scripts/check_errata_evidence.py`](scripts/check_errata_evidence.py)):
@@ -217,9 +219,10 @@ python scripts/check_errata_evidence.py --ratios # only the irrational-ratio lin
    factor-of-ten misprint trips it too), but it must then say, in the same
    entry, that the page was read as an image. The withdrawn entry above tripped
    it twice on its own text.
-2. **The render-evidence check** requires every entry to name a render or to be
-   listed, with a reason, in the allowlist at the top of the script. The
-   allowlist is meant to shrink: do not add to it to get a new entry through.
+2. **The page-citation check** requires every entry to cite the page it quotes,
+   or to be listed, with a reason, in the allowlist at the top of the script.
+   The allowlist is meant to shrink: do not add to it to get a new entry
+   through.
 
 A third script is a contributor tool rather than a gate:
 

@@ -422,9 +422,11 @@ def test_leakage_term_bites_at_a_realistic_ceiling() -> None:
 def test_attenuated_model_is_monotonic_in_the_plenum_damping() -> None:
     """More absorption in the plenum can only attenuate the sideways path.
 
-    The structural property that the printed reading of Eq. (9.18) breaks: with
-    the unprimed mR in the denominator, Rcl *falls* as the damping falls below
-    the leakage term, so adding absorber would predict a worse path than none.
+    Both readings of Eq. (9.18) are monotonic here, so this pins the physics
+    rather than the reading; what separates them is where the two curves end.
+    The derived reading flattens onto the leak-limited bare-plenum value,
+    while the printed one keeps falling without bound, which is the property
+    ``test_attenuated_model_never_exceeds_the_undamped_path`` pins.
     """
     values = [
         float(
