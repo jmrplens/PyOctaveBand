@@ -105,7 +105,7 @@ const GUIDE_TOPICS = [
   'environment',
   'materials',
   'perception',
-  'signal',
+  'signals',
   'simulation',
   'underwater',
   'vibration',

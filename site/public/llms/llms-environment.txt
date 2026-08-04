@@ -27,7 +27,7 @@ propagation adjustments.
 
 This section leans on the core toolkit more than any other: the rating levels
 and Lden that environmental assessment ends in live in
-[Integrated and Statistical Levels](https://jmrplens.github.io/phonometry/signal/levels/levels/), and the
+[Integrated and Statistical Levels](https://jmrplens.github.io/phonometry/signals/levels/levels/), and the
 atmospheric absorption that every propagation model consumes is shared with
 the room and materials pages. Start with
 [Outdoor Sound Propagation](https://jmrplens.github.io/phonometry/environment/propagation/outdoor-propagation/); it
@@ -95,7 +95,7 @@ uncertainty budget.
 The level-computation half of the topic, the $L_{eq}$/$L_{Aeq}$ integrals,
 the percentile levels $L_N$, SEL and the noise dose that produce the period
 levels this page consumes, is
-[Integrated and Statistical Levels](https://jmrplens.github.io/phonometry/signal/levels/levels/); everything here assumes
+[Integrated and Statistical Levels](https://jmrplens.github.io/phonometry/signals/levels/levels/); everything here assumes
 those per-period values are already in hand.
 
 ## Environmental noise: Lden, Ldn and rating levels (ISO 1996-1)
@@ -262,7 +262,7 @@ $L_{dn}$ (3.6.5) keeps only the +10 dB night penalty.
 
 ## See also
 
-- [Integrated and Statistical Levels](https://jmrplens.github.io/phonometry/signal/levels/levels/): the $L_{eq}$/$L_{Aeq}$,
+- [Integrated and Statistical Levels](https://jmrplens.github.io/phonometry/signals/levels/levels/): the $L_{eq}$/$L_{Aeq}$,
   percentile and event levels the indicators of this page are assembled from.
 - [Objective audibility of tones in noise](https://jmrplens.github.io/phonometry/perception/psychoacoustics/tone-audibility/): the tonal
   audibility whose mean value maps to the $K_t$ adjustment (Table J.1).
@@ -313,7 +313,7 @@ annual value, and that value is compared against three different criteria read
 off the same limit table. This page implements that chain end to end.
 
 The per-period levels that feed it come from
-[Integrated & Statistical Levels](https://jmrplens.github.io/phonometry/signal/levels/levels/), and the European
+[Integrated & Statistical Levels](https://jmrplens.github.io/phonometry/signals/levels/levels/), and the European
 $L_{den}$/$L_{dn}$ indicators they coexist with, from
 [Environmental levels](https://jmrplens.github.io/phonometry/environment/environmental-levels/).
 
@@ -595,7 +595,7 @@ exceeds 9 dB.
 - [Environmental levels](https://jmrplens.github.io/phonometry/environment/environmental-levels/): the $L_{den}$ and $L_{dn}$
   indicators and the ISO 1996-2 adjustments the corrections of the regulation
   coexist with.
-- [Integrated & Statistical Levels](https://jmrplens.github.io/phonometry/signal/levels/levels/): the per-phase $L_{Aeq}$,
+- [Integrated & Statistical Levels](https://jmrplens.github.io/phonometry/signals/levels/levels/): the per-phase $L_{Aeq}$,
   $L_{Ceq}$ and $L_{AIeq}$ levels that feed the three corrections.
 - [Spanish Building Code (CTE DB-HR)](https://jmrplens.github.io/phonometry/buildings/insulation/spanish-building-code/): the other half
   of the Spanish framework, which shares the site's day noise index $L_d$ with

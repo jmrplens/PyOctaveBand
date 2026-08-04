@@ -39,7 +39,7 @@ implemented here, covers severe shocks with possible loss of contact with
 the seat, while less severe exposures in which the occupant stays seated
 belong to its Annex A finite-element model. The
 measurement front-end (weighting filters, band analysis) is shared with the
-[core signal analysis](https://jmrplens.github.io/phonometry/signal/)
+[core signal analysis](https://jmrplens.github.io/phonometry/signals/)
 section.
 
 ## Pages in this section

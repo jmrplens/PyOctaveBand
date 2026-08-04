@@ -70,9 +70,9 @@ en bandas normalizadas, suavizarla en el tiempo y reducirla a métricas:
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_signal_chain_es.svg" alt="Cadena de procesado de phonometry: señal, calibración, ponderación frecuencial, banco de filtros de octava, ponderación temporal y métricas, con la norma verificada en cada etapa" width="92%" loading="eager" />
 
 Cada etapa es una función o clase independiente que puedes usar por separado;
-las guías las recorren de izquierda a derecha ([Calibración](/phonometry/es/signal/metrology/calibration/) →
-[Ponderación frecuencial](/phonometry/es/signal/levels/weighting/) → [Bancos de filtros](/phonometry/es/signal/filters/filter-banks/) →
-[Ponderación temporal](/phonometry/es/signal/levels/time-weighting/) → [Niveles](/phonometry/es/signal/levels/levels/)).
+las guías las recorren de izquierda a derecha ([Calibración](/phonometry/es/signals/metrology/calibration/) →
+[Ponderación frecuencial](/phonometry/es/signals/levels/weighting/) → [Bancos de filtros](/phonometry/es/signals/filters/filter-banks/) →
+[Ponderación temporal](/phonometry/es/signals/levels/time-weighting/) → [Niveles](/phonometry/es/signals/levels/levels/)).
 
 ## Uso básico: análisis en tercios de octava
 
@@ -162,8 +162,8 @@ simulación de ondas FDTD. Cada objeto de resultado expone una figura
 `.plot(language="en"|"es")` de una línea y, cuando una norma define un formato
 de informe, un método `.report()` que genera la ficha PDF normativa.
 
-- [Galería de arquitecturas de filtro](/phonometry/es/signal/filters/filter-gallery/): elige una arquitectura e inspecciona sus respuestas
-- [Calibración y dBFS](/phonometry/es/signal/metrology/calibration/): obtén valores SPL reales
+- [Galería de arquitecturas de filtro](/phonometry/es/signals/filters/filter-gallery/): elige una arquitectura e inspecciona sus respuestas
+- [Calibración y dBFS](/phonometry/es/signals/metrology/calibration/): obtén valores SPL reales
 - [Por qué phonometry](/phonometry/es/start/why-phonometry/): la filosofía de diseño basada en conformidad
 - [Informe de conformidad](/phonometry/es/reference/conformance/): el valor esperado y el calculado de las {totalChecks} comprobaciones
 - [Referencia de la API](/phonometry/es/reference/api/): todos los parámetros de cada función

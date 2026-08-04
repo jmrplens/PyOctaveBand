@@ -20,7 +20,7 @@ list grows as guides gain their References sections.
   [Publisher page](https://www.wiley.com/en-us/Fundamentals+of+Acoustics%2C+4th+Edition-p-9780471847892).
   The standard first course in acoustics: plane and spherical waves, acoustic
   impedance and the level definitions assumed throughout the guides.
-  Cited by [Integrated and Statistical Levels](/phonometry/signal/levels/levels/).
+  Cited by [Integrated and Statistical Levels](/phonometry/signals/levels/levels/).
 - Rossing, T. D. (Ed.). (2014). *Springer handbook of acoustics* (2nd ed.).
   Springer. ISBN 978-1-4939-0754-0.
   [doi:10.1007/978-1-4939-0755-7](https://doi.org/10.1007/978-1-4939-0755-7).
@@ -43,16 +43,16 @@ list grows as guides gain their References sections.
   [Open Library record](https://openlibrary.org/isbn/9780131988422).
   The digital-filter theory behind the SOS cascades, the bilinear transform
   and the multirate decimation used by the filter banks.
-  Cited by [Filter Banks](/phonometry/signal/filters/filter-banks/) and
-  [Block Processing](/phonometry/signal/filters/block-processing/).
+  Cited by [Filter Banks](/phonometry/signals/filters/filter-banks/) and
+  [Block Processing](/phonometry/signals/filters/block-processing/).
 - Smith, J. O. *Introduction to digital filters with audio applications*
   (online book). Center for Computer Research in Music and Acoustics (CCRMA),
   Stanford University.
   [ccrma.stanford.edu/~jos/filters](https://ccrma.stanford.edu/~jos/filters/).
   Free companion treatment of digital-filter design and analysis, a good next
   step after the filter-bank guides.
-  Cited by [Filter Banks](/phonometry/signal/filters/filter-banks/) and
-  [Filter Architecture Gallery](/phonometry/signal/filters/filter-gallery/).
+  Cited by [Filter Banks](/phonometry/signals/filters/filter-banks/) and
+  [Filter Architecture Gallery](/phonometry/signals/filters/filter-gallery/).
 - Bendat, J. S., & Piersol, A. G. (2010). *Random data: Analysis and
   measurement procedures* (4th ed.). Wiley. ISBN 978-0-470-24877-5.
   [doi:10.1002/9781118032428](https://doi.org/10.1002/9781118032428).
@@ -60,21 +60,21 @@ list grows as guides gain their References sections.
   quality, and for the multiple-input/output coherence functions of
   Chapter 7 (multiple and partial coherence, conditioned spectra) with the
   Section 9.3 error formulas implemented by `miso_coherence`.
-  Cited by [Calibrated spectral analysis](/phonometry/signal/spectra/spectral-analysis/)
-  and [Multiple and partial coherence](/phonometry/signal/spectra/miso-coherence/).
+  Cited by [Calibrated spectral analysis](/phonometry/signals/spectra/spectral-analysis/)
+  and [Multiple and partial coherence](/phonometry/signals/spectra/miso-coherence/).
 - Thomson, D. J. (1982). Spectrum estimation and harmonic analysis.
   *Proceedings of the IEEE*, 70(9), 1055-1096.
   [doi:10.1109/PROC.1982.12433](https://doi.org/10.1109/PROC.1982.12433).
   The multitaper method: Slepian tapers, eigenspectra and the adaptive
   weights implemented by `multitaper_psd`.
-  Cited by [Calibrated spectral analysis](/phonometry/signal/spectra/spectral-analysis/).
+  Cited by [Calibrated spectral analysis](/phonometry/signals/spectra/spectral-analysis/).
 - Percival, D. B., & Walden, A. T. (1993). *Spectral analysis for physical
   applications: Multitaper and conventional univariate techniques*.
   Cambridge University Press. ISBN 978-0-521-43541-3.
   [doi:10.1017/CBO9780511622762](https://doi.org/10.1017/CBO9780511622762).
   The multitaper development (Chapter 7) behind `multitaper_psd` and the
   Slepian-sequence eigenvalue tables that anchor its test oracle.
-  Cited by [Calibrated spectral analysis](/phonometry/signal/spectra/spectral-analysis/).
+  Cited by [Calibrated spectral analysis](/phonometry/signals/spectra/spectral-analysis/).
 
 ## Measurement instrumentation
 
@@ -84,31 +84,31 @@ list grows as guides gain their References sections.
   [IEC webstore](https://webstore.iec.ch/en/publication/5063).
   The base-10 band edges and the class acceptance masks of the fractional
   octave banks.
-  Cited by [Filter Banks](/phonometry/signal/filters/filter-banks/),
-  [Filter Architecture Gallery](/phonometry/signal/filters/filter-gallery/),
-  [Filter Class Verification](/phonometry/signal/filters/filter-compliance/) and
-  [Multichannel and Performance](/phonometry/signal/filters/multichannel/).
+  Cited by [Filter Banks](/phonometry/signals/filters/filter-banks/),
+  [Filter Architecture Gallery](/phonometry/signals/filters/filter-gallery/),
+  [Filter Class Verification](/phonometry/signals/filters/filter-compliance/) and
+  [Multichannel and Performance](/phonometry/signals/filters/multichannel/).
 - International Electrotechnical Commission. (2013). *Electroacoustics —
   Sound level meters — Part 1: Specifications* (IEC 61672-1:2013).
   [IEC webstore](https://webstore.iec.ch/en/publication/5708).
   The A/C/Z weightings, the exponential time weightings and the level
   metrics of the sound level meter, with the tolerance tables used for
   verification.
-  Cited by [Integrated and Statistical Levels](/phonometry/signal/levels/levels/),
-  [Frequency Weighting (A, C, Z)](/phonometry/signal/levels/weighting/),
-  [Time Weighting and Integration](/phonometry/signal/levels/time-weighting/) and
-  [Multichannel and Performance](/phonometry/signal/filters/multichannel/).
+  Cited by [Integrated and Statistical Levels](/phonometry/signals/levels/levels/),
+  [Frequency Weighting (A, C, Z)](/phonometry/signals/levels/weighting/),
+  [Time Weighting and Integration](/phonometry/signals/levels/time-weighting/) and
+  [Multichannel and Performance](/phonometry/signals/filters/multichannel/).
 - International Electrotechnical Commission. (2013). *Electroacoustics —
   Sound level meters — Part 3: Periodic tests* (IEC 61672-3:2013).
   [IEC webstore](https://webstore.iec.ch/en/publication/5710).
   The periodic laboratory verification of a sound level meter.
-  Cited by [Calibration and dBFS](/phonometry/signal/metrology/calibration/).
+  Cited by [Calibration and dBFS](/phonometry/signals/metrology/calibration/).
 - International Electrotechnical Commission. (2017). *Electroacoustics —
   Sound calibrators* (IEC 60942:2017).
   [IEC webstore](https://webstore.iec.ch/en/publication/30045).
   The calibrator classes, level tolerances and the short-term stability
   criterion applied to calibration recordings.
-  Cited by [Calibration and dBFS](/phonometry/signal/metrology/calibration/).
+  Cited by [Calibration and dBFS](/phonometry/signals/metrology/calibration/).
 - International Electrotechnical Commission. (2014). *Sound system equipment —
   Part 4: Microphones* (IEC 60268-4:2014).
   [IEC webstore](https://webstore.iec.ch/en/publication/32039).
@@ -1009,14 +1009,14 @@ list grows as guides gain their References sections.
   82-108. [doi:10.1121/1.1915637](https://doi.org/10.1121/1.1915637).
   The original equal-loudness measurements whose 40-phon contour became the
   A-weighting curve.
-  Cited by [Frequency Weighting (A, C, Z)](/phonometry/signal/levels/weighting/)
+  Cited by [Frequency Weighting (A, C, Z)](/phonometry/signals/levels/weighting/)
   and [Loudness](/phonometry/perception/psychoacoustics/loudness/).
 - International Organization for Standardization. (2023). *Acoustics —
   Normal equal-loudness-level contours* (ISO 226:2023).
   [iso.org catalogue](https://www.iso.org/standard/83117.html).
   The modern equal-loudness contours, successors of the Fletcher-Munson
   curves.
-  Cited by [Frequency Weighting (A, C, Z)](/phonometry/signal/levels/weighting/)
+  Cited by [Frequency Weighting (A, C, Z)](/phonometry/signals/levels/weighting/)
   and [Loudness](/phonometry/perception/psychoacoustics/loudness/).
 - Fastl, H., & Zwicker, E. (2007). *Psychoacoustics: Facts and models*
   (3rd ed.). Springer.
@@ -1129,7 +1129,7 @@ list grows as guides gain their References sections.
   [doi:10.59161/JCGM100-2008E](https://doi.org/10.59161/JCGM100-2008E),
   [free PDF](https://www.bipm.org/documents/20126/2071204/JCGM_100_2008_E.pdf).
   The law of propagation of uncertainty implemented by the uncertainty module.
-  Cited by [Measurement uncertainty](/phonometry/signal/metrology/gum-uncertainty/).
+  Cited by [Measurement uncertainty](/phonometry/signals/metrology/gum-uncertainty/).
 - Joint Committee for Guides in Metrology. (2008). *Evaluation of measurement
   data — Supplement 1 to the "Guide to the expression of uncertainty in
   measurement" — Propagation of distributions using a Monte Carlo method*
@@ -1138,11 +1138,11 @@ list grows as guides gain their References sections.
   [free PDF](https://www.bipm.org/documents/20126/2071204/JCGM_101_2008_E.pdf).
   The Monte Carlo propagation of distributions implemented by the Monte Carlo
   uncertainty engine.
-  Cited by [Measurement uncertainty](/phonometry/signal/metrology/gum-uncertainty/).
+  Cited by [Measurement uncertainty](/phonometry/signals/metrology/gum-uncertainty/).
 - International Organization for Standardization. (2020). *Acoustics —
   Determination and application of measurement uncertainties in building
   acoustics — Part 1: Sound insulation* (ISO 12999-1:2020).
   [iso.org catalogue](https://www.iso.org/standard/73930.html).
   The domain-specific reproducibility budget for building-acoustics
   single-number ratings, the companion to the general GUM machinery.
-  Cited by [Measurement uncertainty](/phonometry/signal/metrology/gum-uncertainty/).
+  Cited by [Measurement uncertainty](/phonometry/signals/metrology/gum-uncertainty/).

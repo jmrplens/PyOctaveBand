@@ -56,7 +56,7 @@ const data = route?.entry?.data ?? {};
 const title = data.title ?? 'phonometry';
 const description = data.description ?? '';
 
-const pathname = Astro.url.pathname; // e.g. /phonometry/signal/levels/levels/
+const pathname = Astro.url.pathname; // e.g. /phonometry/signals/levels/levels/
 const canonical = new URL(pathname, SITE).href;
 const rel = pathname.startsWith(BASE) ? pathname.slice(BASE.length) : pathname;
 const lang = rel.startsWith('/es/') || rel === '/es' ? 'es' : 'en';
@@ -93,7 +93,7 @@ const isApiPage = slug.startsWith('reference/api/');
 // Guides teach a method as well as document it; the dual type is free and adds
 // the learning-resource properties.
 const GUIDE_TOPICS = [
-  'signal',
+  'signals',
   'perception',
   'buildings',
   'materials',

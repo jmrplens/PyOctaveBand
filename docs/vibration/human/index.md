@@ -32,7 +32,7 @@ implemented here, covers severe shocks with possible loss of contact with
 the seat, while less severe exposures in which the occupant stays seated
 belong to its Annex A finite-element model. The
 measurement front-end (weighting filters, band analysis) is shared with the
-[core signal analysis](../../signal/index.md)
+[core signal analysis](../../signals/index.md)
 section.
 
 ## Pages in this section

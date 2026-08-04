@@ -1,0 +1,243 @@
+---
+title: "Construye un sonómetro"
+description: "Un recorrido de principio a fin que compone la API del núcleo en un sonómetro funcional: calibra con un tono IEC 60942, aplica las ponderaciones frecuencial y temporal de IEC 61672-1, integra en Leq, SEL y niveles percentiles, descompone en bandas de octava IEC 61260-1 y verifica la clase de cada etapa."
+references:
+  - type: standard
+    organization: "International Electrotechnical Commission"
+    year: 2013
+    title: "Electroacoustics — Sound level meters — Part 1: Specifications"
+    designation: "IEC 61672-1:2013"
+    url: "https://webstore.iec.ch/en/publication/5708"
+    note: "El plano del instrumento montado en esta página: la ponderación frecuencial A y la ponderación temporal exponencial Fast de la cadena de niveles, el pico con ponderación C y el nivel de exposición sonora, y los límites de aceptación de clase de la Tabla 3 que comprueba verify_weighting_class."
+  - type: standard
+    organization: "International Electrotechnical Commission"
+    year: 2014
+    title: "Electroacoustics — Octave-band and fractional-octave-band filters — Part 1: Specifications"
+    designation: "IEC 61260-1:2014"
+    url: "https://webstore.iec.ch/en/publication/5063"
+    note: "Los filtros de bandas de octava fraccional de la etapa de espectro, y los límites de aceptación de clase de la Tabla 1 que comprueba verify_filter_class."
+  - type: standard
+    organization: "International Electrotechnical Commission"
+    year: 2017
+    title: "Electroacoustics — Sound calibrators"
+    designation: "IEC 60942:2017"
+    url: "https://webstore.iec.ch/en/publication/30045"
+    note: "El calibrador acústico que asume la etapa de sensibilidad: el nivel principal de 94 dB y la comprobación de estabilidad a corto plazo aplicada a la grabación de referencia."
+---
+
+import ThemeImage from '../../../../components/ThemeImage.astro';
+
+Un sonómetro no es un algoritmo, sino una breve cadena de ellos, e
+IEC 61672-1 especifica cada etapa. phonometry implementa cada etapa como una
+función independiente y componible; esta página las ensambla, en orden, en un
+sonómetro funcional. Todos los fragmentos se ejecutan tal cual (las señales
+se sintetizan para que la página sea autocontenida), y cada etapa enlaza con
+la guía de fondo que la explica por completo.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_slm_pipeline_es.svg" alt="La cadena del sonómetro de esta página: el tono del calibrador alimenta a sensitivity() para obtener el factor en pascales por unidad digital, la grabación de medición se une a él como presión calibrada y de ahí salen tres ramas de lectura, weighting_filter con time_weighting para el LAF(t) de pantalla y los niveles percentiles, laeq, sel y lc_peak para los niveles integrados, y octave_filter para el espectro en tercios de octava, cerradas por verify_weighting_class y verify_filter_class frente a los límites de aceptación de la Tabla 3 de IEC 61672-1 y la Tabla 1 de IEC 61260-1" width="92%" loading="eager" />
+
+Es la misma cadena que IEC 61672-1 dibuja para el instrumento físico: el
+calibrador de clase 1 ancla el micrófono a 94 dB a 1 kHz, y cada etapa
+posterior es una función de esta página.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_slm_chain_es.svg" alt="Cadena del sonómetro según IEC 61672-1: un calibrador acústico de clase 1 a 94 dB y 1 kHz acoplado al micrófono de medición con su pantalla antiviento, seguido de las cuatro etapas del instrumento: micrófono y preamplificador, ponderación frecuencial A, C o Z, cuadrado con la ponderación temporal exponencial F o S de 125 ms o 1 s, y la pantalla con LAF(t) en dB re 20 µPa" width="92%" />
+
+Los fragmentos de esta página se apoyan unos en otros: ejecútalos de arriba
+abajo en una misma sesión (o pega la página entera en un script).
+
+## 1. El escenario
+
+Un sonómetro necesita dos grabaciones de la *misma* cadena de entrada: el
+tono de calibrador que ancla los números digitales a pascales, y la propia
+medición. Aquí ambas se sintetizan para que puedas ejecutar la página en
+cualquier parte; en una medición real proceden de tu micrófono.
+
+```python
+import numpy as np
+from phonometry import filters, metrology, signals
+
+fs = 48000
+
+# Tono de calibrador: 94 dB SPL = 1 Pa RMS a 1 kHz (IEC 60942).
+#   Sintetizado aquí; en campo, graba unos segundos de tu calibrador.
+calibrator = np.sqrt(2) * np.sin(2 * np.pi * 1000 * np.arange(3 * fs) / fs)
+
+# Medición "de calle": 10 s de ruido rosa de fondo más un evento de 1 s a
+#   1 kHz, tipo bocina, para que los niveles estadísticos tengan algo que separar.
+recording = signals.noise_signal(fs, 10.0, color="pink", rms=0.02, seed=7)
+recording[4 * fs : 5 * fs] += 0.2 * np.sqrt(2) * np.sin(
+    2 * np.pi * 1000 * np.arange(fs) / fs
+)
+```
+
+## 2. Calibra: da significado físico a las muestras
+
+Las muestras digitales son adimensionales; el **factor de sensibilidad** las
+convierte a pascales. `sensitivity()` lo calcula a partir de la grabación del
+calibrador y, de paso, valida la estabilidad a corto plazo de la grabación
+igual que IEC 60942 cualifica el propio calibrador, de modo que un micrófono
+mal acoplado se detecta aquí en lugar de corromper todos los niveles
+posteriores.
+
+```python
+cal = metrology.sensitivity(calibrator, target_spl=94.0, fs=fs)
+# cal está en Pa por unidad digital; todas las funciones de nivel lo aceptan
+# como calibration_factor. Para este tono sintético vale ≈1,0.
+```
+
+Guía de fondo: [Calibración y dBFS](/phonometry/es/signals/metrology/calibration/), que
+cubre también la calibración desde una sensibilidad de micrófono conocida y
+el modo digital dBFS que se usa cuando no existe referencia física.
+
+## 3. Pondera: frecuencia y tiempo (IEC 61672-1)
+
+El sonómetro nunca muestra la presión en bruto. La señal pasa primero por la
+**ponderación frecuencial A** (la curva de respuesta del oído de
+IEC 61672-1), se eleva al cuadrado y se suaviza con el **detector
+exponencial Fast** (constante de tiempo de 125 ms). El resultado es el nivel
+móvil que sigue la pantalla de un sonómetro, $L_{AF}(t)$:
+
+```python
+pressure = cal * recording                          # unidades digitales -> Pa
+weighted = filters.weighting_filter(pressure, fs, curve="A")
+envelope = filters.time_weighting(weighted, fs, mode="fast")  # media cuadrática en Pa^2
+laf_t = 10 * np.log10(np.maximum(envelope, 1e-12) / (2e-5) ** 2)
+# laf_t alcanza unos 80 dB durante el evento y se asienta cerca de 55 dB entre medias.
+```
+
+Rara vez escribirás esta cadena a mano: todas las funciones de nivel del paso
+siguiente aplican la ponderación frecuencial internamente, y los niveles
+percentiles reconstruyen por ti esta envolvente Fast. Las métricas de energía
+($L_{eq}$, SEL) integran directamente la señal ponderada al cuadrado, sin
+balística, exactamente como hace un sonómetro. La cadena se muestra aquí
+porque *es* la pantalla del sonómetro.
+
+Guías de fondo:
+[Ponderación frecuencial (A, C, Z)](/phonometry/es/signals/levels/weighting/) y
+[Ponderación temporal](/phonometry/es/signals/levels/time-weighting/).
+
+## 4. Integra: los números que reporta un sonómetro
+
+Una sola pasada sobre la grabación calibrada produce las lecturas estándar:
+el **$L_{Aeq}$** equivalente en energía, los **niveles percentiles** que
+describen cómo fluctuó el nivel ($L_{90}$ es el fondo, $L_{10}$ los eventos),
+el **nivel de
+exposición sonora** que normaliza el evento a un segundo, y el **pico** con
+ponderación C para contenido impulsivo.
+
+```python
+la_eq = signals.laeq(recording, fs, calibration_factor=cal)     # ≈70,2 dB
+ln = signals.ln_levels(
+    recording, fs, n=(10, 50, 90), weighting="A", calibration_factor=cal
+)                                          # L10 ≈78,0, L50 ≈55,1, L90 ≈54,9
+lae = signals.sel(recording, fs, weighting="A", calibration_factor=cal)  # ≈80,2
+lc_pk = signals.lc_peak(recording, fs, calibration_factor=cal)           # ≈84,4
+
+print(f"LAeq {la_eq:.1f} dB | L10 {ln[10]:.1f} | L90 {ln[90]:.1f} "
+      f"| LAE {lae:.1f} | LCpeak {lc_pk:.1f}")
+```
+
+Fíjate en la aritmética que codifican los números: el evento de 1 s domina
+el $L_{Aeq}$ (está 25 dB por encima del fondo, mucho más de los 10 dB que el
+fondo, nueve veces más largo, recupera por duración), el $L_{AE}$ es el
+$L_{Aeq}$ más $10\log_{10}$ de los 10 s de duración, y el $L_{90}$ apenas nota el
+evento.
+
+Guía de fondo:
+[Niveles integrados y estadísticos](/phonometry/es/signals/levels/levels/), que añade
+dosis de ruido y espectrogramas de octava; el $L_{den}$ y los niveles de
+valoración continúan en
+[Niveles ambientales](/phonometry/es/environment/environmental-levels/).
+
+## 5. Filtra en bandas: la vista de espectro (IEC 61260-1)
+
+Un sonómetro de clase 1 con juego de filtros reporta niveles por banda.
+`octave_filter` descompone la señal calibrada en bandas de octava fraccional
+cuyo diseño está anclado a los bordes de banda de IEC 61260-1;
+`nominal=True` las etiqueta con las frecuencias preferentes que leerías en un
+instrumento.
+
+```python
+spl, bands = filters.octave_filter(
+    recording, fs, fraction=3, calibration_factor=cal, nominal=True
+)
+# 33 niveles de banda de tercio de octava en dB SPL, etiquetados '12.5' ... '20k'.
+# La banda '1k' contiene el evento: ≈70 dB, con sus vecinas ≈25 dB por debajo.
+print(dict(zip(bands, np.round(spl, 1))))
+```
+
+Guías de fondo: [Bancos de filtros](/phonometry/es/signals/filters/filter-banks/) para
+las arquitecturas de filtro y el modo de fase cero,
+[Procesado por bloques](/phonometry/es/signals/filters/block-processing/) para
+streaming, y [Multicanal y rendimiento](/phonometry/es/signals/filters/multichannel/)
+para arrays.
+
+## 6. Verifica: ¿es este sonómetro de clase 1?
+
+Un instrumento real solo es un "sonómetro de clase 1" cuando sus
+ponderaciones y filtros superan los límites de aceptación de las normas. La
+biblioteca incluye los mismos verificadores que se aplica a sí misma en CI:
+`verify_weighting_class` barre un `WeightingFilter` contra los límites de la
+Tabla 3 de IEC 61672-1, y `verify_filter_class` barre un `OctaveFilterBank`
+contra los límites de la Tabla 1 de IEC 61260-1.
+
+```python
+wf = filters.WeightingFilter(fs, curve="A")
+print(filters.verify_weighting_class(wf)["overall_class"])   # 1
+
+bank = filters.OctaveFilterBank(fs, fraction=3)
+print(filters.verify_filter_class(bank)["overall_class"])    # 1
+```
+
+Los veredictos también llegan por banda, de modo que puedes ver exactamente
+dónde un diseño se saldría de su pasillo de clase. Guías de fondo:
+[Ponderación frecuencial](/phonometry/es/signals/levels/weighting/) (sección de
+verificación de clase) y
+[Verificación de clase de filtros](/phonometry/es/signals/filters/filter-compliance/)
+(la máscara de la Tabla 1, la clase 0 y la ficha de conformidad).
+
+## Adónde ir después
+
+El sonómetro construido aquí es el tronco; el resto del núcleo crece de él.
+
+- [Incertidumbre de medida (GUM y Monte Carlo)](/phonometry/es/signals/metrology/gum-uncertainty/):
+  acompaña de una incertidumbre el $L_{Aeq}$ que acabas de calcular, término de
+  calibración incluido.
+- [Análisis espectral calibrado](/phonometry/es/signals/spectra/spectral-analysis/):
+  cuando las bandas se quedan cortas, la PSD de Welch con intervalos de
+  confianza.
+- [Correlación, retardo y envolvente](/phonometry/es/signals/spectra/correlation-delay/):
+  dos micrófonos en lugar de uno, y el retardo entre ellos.
+- [Procesado por bloques](/phonometry/es/signals/filters/block-processing/): convierte
+  el sonómetro fuera de línea de esta página en uno en streaming con estado
+  de filtro arrastrado.
+
+## Qué cubre esta guía
+
+**Cubierto.** Esta página compone etapas ya implementadas en otras guías en
+la cadena que describe IEC 61672-1:2013: la ponderación frecuencial A y la
+ponderación temporal exponencial Fast, el $L_{Aeq}$, los niveles percentiles, el
+nivel de exposición sonora y el pico con ponderación C, los filtros de banda
+de octava de IEC 61260-1:2014 de `octave_filter`, y los límites de
+aceptación de clase de la Tabla 3 (ponderación) y la Tabla 1 (filtro) que
+comprueban `verify_weighting_class` y `verify_filter_class`. Cada guía de
+fondo indica su propia cobertura en detalle.
+
+**No cubierto.** `verify_weighting_class` y `verify_filter_class` comprueban
+el diseño de respuesta en frecuencia de los filtros digitales frente a las
+tablas de las normas; no realizan los ensayos de evaluación de patrón de
+IEC 61672-3 que necesita un instrumento físico para su aprobación de tipo,
+como el ruido autogenerado, el rango de linealidad, la indicación de
+sobrecarga o la respuesta direccional. Un veredicto de clase de esta página
+describe el algoritmo, no un aparato construido. Los ensayos de conformidad
+del calibrador de IEC 60942:2017 tampoco se ejecutan aquí; consulta la
+[guía de calibración](/phonometry/es/signals/metrology/calibration/) para lo que
+`sensitivity()` comprueba y lo que no.
+
+## Véase también
+
+- Referencia de la API: [`metrology.calibration`](/phonometry/es/reference/api/metrology/calibration/),
+  [`filters.weighting`](/phonometry/es/reference/api/filters/weighting/),
+  [`signals.levels`](/phonometry/es/reference/api/signals/levels/),
+  [`phonometry`](/phonometry/es/reference/api/filters/phonometry/) y
+  [`filters.compliance`](/phonometry/es/reference/api/filters/compliance/).

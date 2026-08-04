@@ -237,5 +237,5 @@ ISO 717-2.
   engines behind the survey ratings.
 - [Room Acoustics](../rooms/room-acoustics.md): the measured reverberation times
   behind the reverberation index.
-- [Levels](../../signal/levels/levels.md): the energy averaging behind the octave-band levels.
+- [Levels](../../signals/levels/levels.md): the energy averaging behind the octave-band levels.
 - API reference: [`building.measurement.survey_insulation`](https://jmrplens.github.io/phonometry/reference/api/building/survey-insulation/).

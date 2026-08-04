@@ -1,0 +1,246 @@
+---
+title: "Procesado por bloques"
+description: "Flujos de streaming con estado de filtro conservado entre bloques."
+references:
+  - type: book
+    authors: ["Oppenheim, A. V.", "Schafer, R. W."]
+    year: 2010
+    title: "Discrete-time signal processing"
+    edition: "3.ª ed."
+    publisher: "Pearson"
+    url: "https://openlibrary.org/isbn/9780131988422"
+    note: "Las estructuras de filtro en forma directa y la recursión de estado que sustentan la ecuación del estado transportado (ISBN 978-0-13-198842-2)."
+  - type: standard
+    organization: "International Electrotechnical Commission"
+    year: 2014
+    title: "Electroacoustics — Octave-band and fractional-octave-band filters — Part 1: Specifications"
+    designation: "IEC 61260-1:2014"
+    url: "https://webstore.iec.ch/en/publication/5063"
+    note: "El procesado por bloques no añade contenido normativo propio: los filtros de octava y de octava fraccional en streaming son los mismos diseños que rige esta norma, y conservar el estado interno del filtro entre bloques es exactamente lo que hace que la salida concatenada sea idéntica a una pasada única, por lo que toda afirmación de clase y tolerancia de la página de bancos de filtros se mantiene sin cambios en uso streaming."
+  - type: standard
+    organization: "International Electrotechnical Commission"
+    year: 2013
+    title: "Electroacoustics — Sound level meters — Part 1: Specifications"
+    designation: "IEC 61672-1:2013"
+    url: "https://webstore.iec.ch/en/publication/5708"
+    note: "Las ponderaciones frecuenciales y temporales en streaming son los mismos diseños que rige esta norma; el estado transportado mantiene válidas en streaming las afirmaciones de clase y tolerancia de las páginas de ponderación frecuencial y temporal."
+---
+
+import ThemeImage from '../../../../../components/ThemeImage.astro';
+
+Algunas mediciones nunca caben en memoria: una grabación ambiental de una hora,
+un monitor en vivo que debe informar niveles mientras el micrófono sigue
+capturando, o un registrador embebido que solo ve un búfer cada vez. En todos
+esos casos la señal tiene que procesarse bloque a bloque, y los filtros deben
+comportarse exactamente como si hubieran visto la señal completa de una vez.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_block_processing_es.svg" alt="Dos carriles que comparan el procesado por bloques conservando el estado del filtro entre bloques, con una envolvente continua, frente a reiniciarlo en cada bloque, donde la envolvente arranca desde cero en cada unión" width="86%" loading="eager" />
+
+Las clases `OctaveFilterBank`, `WeightingFilter` (para ponderación A, C o Z) y
+`TimeWeighting` admiten procesado por bloques (streaming): el estado interno del
+filtro se conserva entre llamadas, de modo que las salidas concatenadas por
+bloques coinciden con una única pasada sobre la señal completa.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/block_processing_continuity_es.svg" alt="Procesado por bloques con estado igual al resultado continuo frente a bloques independientes que reinician el transitorio" width="80%" />
+
+*Con `stateful=True` las salidas concatenadas por bloques coinciden exactamente
+con el resultado continuo; sin estado, cada frontera de bloque reinicia el
+transitorio del filtro.*
+
+<details>
+<summary>Mostrar el código de esta figura</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import filters
+
+# Banda de octava de 1 kHz: cuatro bloques con estado frente a una pasada continua
+fs, block = 8000, 1000
+rng = np.random.default_rng(42)
+x = rng.standard_normal(4 * block)
+t = np.arange(x.size) / fs
+
+bank = filters.OctaveFilterBank(fs, fraction=1, limits=[900, 1100],
+                                  stateful=True, resample=False)
+streamed = np.concatenate([
+    bank.filter(x[i * block:(i + 1) * block], sigbands=True,
+                detrend=False, calculate_level=False)[2][0]
+    for i in range(4)
+])
+offline = filters.OctaveFilterBank(fs, fraction=1, limits=[900, 1100],
+                                     resample=False).filter(
+    x, sigbands=True, detrend=False, calculate_level=False)[2][0]
+print(np.max(np.abs(streamed - offline)))     # 0.0 (exacto bit a bit)
+
+fig, ax = plt.subplots(figsize=(9, 4.5))
+ax.plot(t, offline, linewidth=2.5, alpha=0.35, label="Continuo (señal completa)")
+ax.plot(t, streamed, label="Bloques con estado (estado conservado)")
+ax.axvline(block / fs, color="gray", linestyle=":", label="Frontera de bloque")
+ax.set(xlim=(0.11, 0.17), xlabel="Tiempo [s]", ylabel="Amplitud")
+ax.legend()
+plt.show()
+```
+
+</details>
+
+Crea un banco con estado usando `stateful=True`. El estado interno se inicializa
+a cero por defecto, pero puede inicializarse al régimen permanente de la
+respuesta al escalón (como `scipy.signal.sosfilt_zi`) con `steady_ic=True`.
+Las opciones que deben desactivarse en modo stateful se resumen en la
+[tabla de restricciones](#restricciones-del-modo-con-estado) al final de esta
+guía.
+
+## Ejemplo
+
+Este ejemplo procesa un WAV por bloques con [`soundfile`](https://pysoundfile.readthedocs.io/),
+una dependencia opcional (`pip install soundfile`). Sirve cualquier fuente de bloques:
+`scipy.io.wavfile` con troceado manual, o una función de captura en vivo.
+
+```python
+import soundfile as sf
+from phonometry import filters
+
+fs = 48000
+octave_filter = filters.OctaveFilterBank(fs, 1, stateful=True, resample=False)
+afilter = filters.WeightingFilter(fs, "A", stateful=True)
+
+for block in sf.blocks("measurement.wav", blocksize=256, overlap=0):
+
+    # Aplicar el filtro A
+    weighted = afilter.filter(block)
+
+    # Dividir en bandas de octava
+    block_spl, _, block_output = octave_filter.filter(weighted, sigbands=True, detrend=False)
+
+    # procesado posterior de la señal
+    ...
+```
+
+## Ponderación temporal entre bloques
+
+Usa la clase `TimeWeighting` (el estado se lleva automáticamente):
+
+```python
+from phonometry import filters
+
+tw = filters.TimeWeighting(fs, mode="fast")
+# audio_blocks: fotogramas sucesivos de tu grabación de micrófono (Pa),
+#   p. ej. de sf.blocks("measurement.wav", ...) como en el bloque anterior.
+for block in audio_blocks:
+    envelope = tw.process(block)
+```
+
+O gestiona el estado tú mismo con la API funcional; consulta
+[Ponderación temporal](/phonometry/es/signals/levels/time-weighting/#6-procesado-por-bloques).
+
+## Estado multicanal
+
+Todas las clases con estado gestionan entrada multicanal `(channels, samples)`:
+el estado se reserva de forma perezosa en la primera llamada para ajustarse al
+número de canales, y se realoja si este cambia (p. ej. pasar de estéreo a mono
+reinicia el estado).
+
+## Qué es el estado que se transporta
+
+Todos los filtros de la biblioteca se ejecutan como una cascada de secciones
+de segundo orden en forma directa II transpuesta. Para una sección con
+coeficientes $(b_0, b_1, b_2, a_1, a_2)$:
+
+$$
+y[n] = b_0\,x[n] + z_1[n-1], \qquad
+z_1[n] = b_1\,x[n] - a_1\,y[n] + z_2[n-1], \qquad
+z_2[n] = b_2\,x[n] - a_2\,y[n]
+$$
+
+El par $(z_1, z_2)$ por sección es *toda* la memoria del pasado que tiene el
+filtro. `stateful=True` guarda esos valores cuando termina un bloque y los
+restaura cuando empieza el siguiente, de modo que la recursión no puede saber
+dónde acabó un búfer y empezó el siguiente: la salida concatenada es igual a
+la de una sola pasada exactamente, no de forma aproximada. El detector
+`TimeWeighting` transporta aún menos, solo su último valor de envolvente
+$y[n-1]$, que es el mismo valor que la API funcional devuelve como
+`initial_state` (ver
+[Ponderación temporal](/phonometry/es/signals/levels/time-weighting/#6-procesado-por-bloques)).
+
+### Trampas del streaming
+
+- **El preprocesado por bloque crea costuras.** Cualquier cosa calculada a
+  partir de un solo bloque que debería ser global, como el detrending
+  (restar la media del propio bloque) o la normalización, da a cada bloque
+  una operación ligeramente distinta: las salidas ya no se concatenan en el
+  resultado continuo. Por eso `detrend` debe ser `False` en modo con estado.
+- **No toda métrica admite streaming.** Las métricas de energía se acumulan
+  limpiamente (un $L_{eq}$ acumulado es una suma de energía acumulada), pero
+  los estadísticos de rango no: el $L_{90}$ de una grabación no es ninguna
+  combinación de los $L_{90}$ por bloque. Transmite la *envolvente* y
+  calcula los percentiles una vez, sobre el resultado conjunto.
+- **El primer bloque sigue llevando el transitorio de arranque.** El estado
+  empieza en reposo, así que el filtro se asienta durante los primeros
+  instantes igual que en una sola pasada. Usa `steady_ic=True` para arrancar
+  en el estado estacionario de la respuesta al escalón, o descarta el tiempo
+  de asentamiento una vez (no una por bloque).
+- **Un flujo por objeto.** Una instancia con estado guarda la memoria de una
+  señal; pasarle dos flujos intercalados corrompe ambos. Crea un objeto de
+  filtro por flujo: el coste de diseño se paga una vez al construir, no por
+  bloque.
+
+## Patrón de sonómetro en tiempo real
+
+El bucle de streaming canónico pondera, obtiene la envolvente e informa
+bloque a bloque conservando todo el estado entre llamadas:
+
+```python
+import numpy as np
+from phonometry import filters
+
+fs, block = 48000, 4800  # bloques de 100 ms
+aw = filters.WeightingFilter(fs, "A", stateful=True)
+env = filters.TimeWeighting(fs, mode="fast")  # la clase es inherentemente stateful
+
+for x in audio_stream(block):            # tu callback de captura
+    y = env.process(aw.filter(x))
+    spl = 10 * np.log10(y[..., -1] / (2e-5) ** 2)  # LAF instantáneo
+    display(spl)
+```
+
+### Restricciones del modo con estado
+
+| Opción | Comportamiento con estado | Motivo |
+| :--- | :--- | :--- |
+| `detrend` | debe ser `False` | El detrending por bloque crea discontinuidades en las fronteras |
+| `resample` | debe ser `False` | El remuestreador no conserva estado |
+| `zero_phase` | no soportado | El filtrado bidireccional necesita la señal completa |
+| `high_accuracy` (ponderación) | por defecto se resuelve a `False` (el diseño bilineal clásico, consulta [Ponderación frecuencial](/phonometry/es/signals/levels/weighting/)); pasar `True` explícito lanza `ValueError` | El remuestreo polifásico interno es incompatible con bloques |
+| `steady_ic` | opcional | Arranca los filtros en el régimen permanente de la respuesta al escalón |
+
+## Qué cubre esta guía
+
+**Cubierto.** La IEC 61260-1:2014 y la IEC 61672-1:2013 exactamente en la
+medida en que ya las implementan [Bancos de
+filtros](/phonometry/es/signals/filters/filter-banks/), [Ponderación
+frecuencial](/phonometry/es/signals/levels/weighting/) y [Ponderación
+temporal](/phonometry/es/signals/levels/time-weighting/): `stateful=True` en
+`OctaveFilterBank`, `WeightingFilter` y `TimeWeighting` conserva el estado
+de sección en forma directa II transpuesta ($z_1$, $z_2$), o el último valor
+de la envolvente en `TimeWeighting`, entre fronteras de bloque, de modo que
+la salida en streaming concatenada es exactamente igual, bit a bit, a una
+sola pasada sobre la señal completa. Esta página no añade contenido
+normativo propio; solo demuestra y documenta esa equivalencia.
+
+**No cubierto.** El filtrado bidireccional `zero_phase` necesita la señal
+completa, así que no está soportado en modo con estado; usa la vía offline
+de [Bancos de filtros](/phonometry/es/signals/filters/filter-banks/) en su lugar. El
+diseño `high_accuracy` de ponderación se resuelve al filtro bilineal
+clásico en modo con estado (pasar `True` explícitamente lanza
+`ValueError`), porque su etapa de remuestreo polifásico no es compatible
+con bloques; consulta [Ponderación
+frecuencial](/phonometry/es/signals/levels/weighting/) para el diseño de alta
+precisión offline. Los estadísticos de rango como $L_{90}$ tampoco admiten
+streaming: transmite la envolvente y calcula los percentiles una vez sobre
+el resultado conjunto, como describe [Niveles integrados y
+estadísticos](/phonometry/es/signals/levels/levels/).
+
+## Véase también
+
+- Referencia de la API: [`filters.weighting`](/phonometry/es/reference/api/filters/weighting/) y [`filters.core`](/phonometry/es/reference/api/filters/core/).

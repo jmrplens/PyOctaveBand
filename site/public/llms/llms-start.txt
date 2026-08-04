@@ -84,9 +84,9 @@ standardized bands, smooth it in time and reduce it to metrics:
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_signal_chain_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_signal_chain.svg" alt="phonometry processing chain: signal, calibration, frequency weighting, octave filter bank, time weighting and metrics, with the standard verified at each stage" width="92%"></picture>
 
 Each stage is an independent function or class you can use on its own; the
-guides cover them left to right ([Calibration](https://jmrplens.github.io/phonometry/signal/metrology/calibration/) →
-[Frequency Weighting](https://jmrplens.github.io/phonometry/signal/levels/weighting/) → [Filter Banks](https://jmrplens.github.io/phonometry/signal/filters/filter-banks/) →
-[Time Weighting](https://jmrplens.github.io/phonometry/signal/levels/time-weighting/) → [Levels](https://jmrplens.github.io/phonometry/signal/levels/levels/)).
+guides cover them left to right ([Calibration](https://jmrplens.github.io/phonometry/signals/metrology/calibration/) →
+[Frequency Weighting](https://jmrplens.github.io/phonometry/signals/levels/weighting/) → [Filter Banks](https://jmrplens.github.io/phonometry/signals/filters/filter-banks/) →
+[Time Weighting](https://jmrplens.github.io/phonometry/signals/levels/time-weighting/) → [Levels](https://jmrplens.github.io/phonometry/signals/levels/levels/)).
 
 ## Basic Usage: 1/3 Octave Analysis
 
@@ -176,8 +176,8 @@ Every result object exposes a one-line `.plot(language="en"|"es")` figure and,
 where a standard defines a reporting format, a `.report()` method that renders
 the normative PDF fiche.
 
-- [Filter Architecture Gallery](https://jmrplens.github.io/phonometry/signal/filters/filter-gallery/): choose an architecture and inspect responses
-- [Calibration and dBFS](https://jmrplens.github.io/phonometry/signal/metrology/calibration/): get real-world SPL values
+- [Filter Architecture Gallery](https://jmrplens.github.io/phonometry/signals/filters/filter-gallery/): choose an architecture and inspect responses
+- [Calibration and dBFS](https://jmrplens.github.io/phonometry/signals/metrology/calibration/): get real-world SPL values
 - [Why phonometry](https://jmrplens.github.io/phonometry/start/why-phonometry/): the conformance-first design philosophy
 - [Conformance report](https://jmrplens.github.io/phonometry/reference/conformance/): the expected and computed value of all 533 checks
 - [API Reference](https://jmrplens.github.io/phonometry/reference/api/): every parameter of every function
@@ -295,9 +295,9 @@ plt.show()
 
 - If you need **standard-compliant Fast/Slow/Impulse envelopes** (sound level
   meter behavior, one level per sample), use phonometry's
-  [`time_weighting`](https://jmrplens.github.io/phonometry/signal/levels/time-weighting/).
+  [`time_weighting`](https://jmrplens.github.io/phonometry/signals/levels/time-weighting/).
 - If you need **block-averaged $L_{eq}$ per interval**, that is a different, equally
-  valid metric; you can compute it with [`leq`](https://jmrplens.github.io/phonometry/signal/levels/levels/) over consecutive
+  valid metric; you can compute it with [`leq`](https://jmrplens.github.io/phonometry/signals/levels/levels/) over consecutive
   slices.
 - Both approaches are useful; they just answer different questions. The
   discrepancy reported in issue #38 comes from comparing a continuous envelope
@@ -340,7 +340,7 @@ parametrization would not), the default Butterworth bank is checked against
 the stricter class 0 of the withdrawn IEC 61260:1995 / ANSI S1.11-2004 edition
 as well as the current class 1, and A/C weighting stays within class 1
 tolerances up to 16 kHz at common audio rates via internal oversampling (see
-[Frequency Weighting](https://jmrplens.github.io/phonometry/signal/levels/weighting/)).
+[Frequency Weighting](https://jmrplens.github.io/phonometry/signals/levels/weighting/)).
 
 ## When the source is what is wrong
 
@@ -1945,7 +1945,7 @@ $$
 The digital filter is obtained from the analog poles/zeros via the bilinear
 transform. Because the bilinear transform compresses frequencies near Nyquist,
 the default `high_accuracy` mode designs and runs the filter at an internally
-oversampled rate (≥ 144 kHz); see [Frequency Weighting](https://jmrplens.github.io/phonometry/signal/levels/weighting/).
+oversampled rate (≥ 144 kHz); see [Frequency Weighting](https://jmrplens.github.io/phonometry/signals/levels/weighting/).
 
 ## Time Integration
 
@@ -1985,7 +1985,7 @@ The four zeros against eight poles shape the characteristic response: a rise of 
 
 Since G acts on 0.25 Hz – 315 Hz, far below the Nyquist frequency at audio rates, the frequency warping of the plain bilinear transform (applied without prewarping) is negligible there: about 0.014 % at 315 Hz for $f_s = 48$ kHz, under 0.01 dB on the response. The internal oversampling used for the A/C designs (whose action extends to 16 kHz) is therefore not applied.
 
-See the [Special Weightings guide](https://jmrplens.github.io/phonometry/signal/levels/special-weightings/) for usage.
+See the [Special Weightings guide](https://jmrplens.github.io/phonometry/signals/levels/special-weightings/) for usage.
 
 ## Event and dose metrics
 
@@ -2011,7 +2011,7 @@ It is identical to $L_{EP,d}$ of Directive 86/188/EEC and $L_{EX,8h}$ of ISO 199
 
 **$L_{Cpeak}$** (IEC 61672-1:2013, subclause 5.13) is the absolute maximum of the C-weighted sound pressure expressed in dB, $L_{Cpeak} = 20\log_{10}(\max|p_C(t)|/p_0)$, the quantity behind the 135/137/140 dB(C) occupational action limits. The implementation is verified against the one-cycle and half-cycle reference responses of Table 5.
 
-See the [Levels guide](https://jmrplens.github.io/phonometry/signal/levels/levels/) for usage and the [Calibration guide](https://jmrplens.github.io/phonometry/signal/metrology/calibration/) for absolute-scale setup.
+See the [Levels guide](https://jmrplens.github.io/phonometry/signals/levels/levels/) for usage and the [Calibration guide](https://jmrplens.github.io/phonometry/signals/metrology/calibration/) for absolute-scale setup.
 
 ## Sound intensity (IEC 61043)
 
@@ -2081,7 +2081,7 @@ inputs; the output is nearly trapezoidal, not Gaussian, so the interval is
 narrower than $\pm 1.96\,u$), and the GUM Annex H.1 end-gauge example gives
 $k = t_{0.99}(\nu_{\mathrm{eff}} = 16) = 2.92$ and $U_{99} = 93$ nm.
 
-See the [GUM Uncertainty guide](https://jmrplens.github.io/phonometry/signal/metrology/gum-uncertainty/) for usage.
+See the [GUM Uncertainty guide](https://jmrplens.github.io/phonometry/signals/metrology/gum-uncertainty/) for usage.
 
 ## References
 

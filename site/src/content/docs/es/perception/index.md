@@ -16,7 +16,7 @@ reporta la exposición de una jornada laboral.
 
 Las tres se apoyan mutuamente en una dirección: los modelos psicoacústicos
 consumen señales calibradas o espectros de banda del
-[análisis de señal](/phonometry/es/signal/); los
+[análisis de señal](/phonometry/es/signals/); los
 índices de habla consumen niveles de banda y, en el caso del SII, los umbrales
 de audición que cuantifican las páginas de audición; y las métricas de
 exposición alimentan el modelo de daño auditivo de ISO 1999.

@@ -334,7 +334,7 @@ ISO 3382-3 open-plan speech metrics, with their fiche, are
   ISO 354 absorption area (the ISO 3744 $K_2$ and the ISO 3741 absorption term).
 - [Loudness](../../perception/psychoacoustics/loudness.md) and [Sound Quality Metrics](../../perception/psychoacoustics/sound-quality.md): loudness,
   sharpness and the other perception metrics of what the room delivers.
-- [Filter Banks](../../signal/filters/filter-banks.md): the IEC 61260 fractional-octave filters
+- [Filter Banks](../../signals/filters/filter-banks.md): the IEC 61260 fractional-octave filters
   used for band decay curves and insulation spectra.
 - [Theory](../../reference/theory/rooms-buildings.md): Schroeder integration, regression windows and the
   reference-curve derivation.

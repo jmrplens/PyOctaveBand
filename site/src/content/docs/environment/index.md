@@ -21,7 +21,7 @@ propagation adjustments.
 
 This section leans on the core toolkit more than any other: the rating levels
 and Lden that environmental assessment ends in live in
-[Integrated and Statistical Levels](/phonometry/signal/levels/levels/), and the
+[Integrated and Statistical Levels](/phonometry/signals/levels/levels/), and the
 atmospheric absorption that every propagation model consumes is shared with
 the room and materials pages. Start with
 [Outdoor Sound Propagation](/phonometry/environment/propagation/outdoor-propagation/); it

@@ -21,7 +21,7 @@ head:
             "position": 1,
             "name": "Signal analysis",
             "description": "Filter banks, weighting, levels, spectra, calibration and uncertainty.",
-            "url": "https://jmrplens.github.io/phonometry/signal/"
+            "url": "https://jmrplens.github.io/phonometry/signals/"
           },
           {
             "@type": "ListItem",
@@ -112,7 +112,7 @@ numerical evidence live in [Reference](/phonometry/reference/): the theory
 pages explain why a formula is the one it is, and the conformance report shows
 the standard's own expected value next to the computed one.
 
-## [Signal analysis](/phonometry/signal/)
+## [Signal analysis](/phonometry/signals/)
 
 Filter banks, weighting, levels, spectra, calibration and uncertainty. This is
 the chain that turns a digital signal into a standards-compliant number, and
@@ -121,39 +121,39 @@ room parameter needs a filtered impulse response, an environmental rating is an
 adjusted $L_{eq}$. Implements IEC 61260-1, ANSI S1.11, IEC 61672-1, ISO 7196,
 IEC 61252, ISO 1996-1, IEC 60942 and the GUM.
 
-- [Build a sound level meter](/phonometry/signal/sound-level-meter/):
+- [Build a sound level meter](/phonometry/signals/sound-level-meter/):
   the whole area assembled end to end on one runnable page, from the
   calibrator tone to the reported levels.
 
-**[Octave filtering](/phonometry/signal/filters/)**
+**[Octave filtering](/phonometry/signals/filters/)**
 
-- [Filter Banks](/phonometry/signal/filters/filter-banks/): the fractional-octave band
+- [Filter Banks](/phonometry/signals/filters/filter-banks/): the fractional-octave band
   mathematics, the bank parameters, the parametric EQ, band decomposition and
   zero-phase offline filtering.
-- [Filter Architecture Gallery](/phonometry/signal/filters/filter-gallery/): the five
+- [Filter Architecture Gallery](/phonometry/signals/filters/filter-gallery/): the five
   filter architectures compared at the band edges, the full response gallery
   and per-architecture usage, with the Linkwitz-Riley crossover.
-- [Filter Class Verification (IEC 61260-1)](/phonometry/signal/filters/filter-compliance/):
+- [Filter Class Verification (IEC 61260-1)](/phonometry/signals/filters/filter-compliance/):
   the Table 1 acceptance mask band by band, the class 0 of the withdrawn 1995
   edition and the compliance fiche.
-- [Block Processing](/phonometry/signal/filters/block-processing/): stateful streaming
+- [Block Processing](/phonometry/signals/filters/block-processing/): stateful streaming
   analysis that carries filter state across buffers, for signals that never fit
   in memory.
-- [Multichannel and Performance](/phonometry/signal/filters/multichannel/): vectorized
+- [Multichannel and Performance](/phonometry/signals/filters/multichannel/): vectorized
   analysis of many channels at once, with the (channels, samples) convention
   and performance notes.
 
-**[Levels and weighting](/phonometry/signal/levels/)**
+**[Levels and weighting](/phonometry/signals/levels/)**
 
-- [Frequency Weighting (A, C, Z)](/phonometry/signal/levels/weighting/):
+- [Frequency Weighting (A, C, Z)](/phonometry/signals/levels/weighting/):
   the IEC 61672-1 ear-response curves, the high-frequency accuracy mode and
   the Table 3 class verification.
-- [Special Weightings (G, B, D, AU)](/phonometry/signal/levels/special-weightings/):
+- [Special Weightings (G, B, D, AU)](/phonometry/signals/levels/special-weightings/):
   ISO 7196 G-weighting for infrasound, the historical B and D curves and AU
   for audible sound in the presence of ultrasound.
-- [Time Weighting](/phonometry/signal/levels/time-weighting/): the Fast, Slow and
+- [Time Weighting](/phonometry/signals/levels/time-weighting/): the Fast, Slow and
   Impulse exponential ballistics of IEC 61672-1.
-- [Integrated and Statistical Levels](/phonometry/signal/levels/levels/): $L_{eq}$ and
+- [Integrated and Statistical Levels](/phonometry/signals/levels/levels/): $L_{eq}$ and
   $L_{Aeq}$, the percentile levels $L_{10}$/$L_{50}$/$L_{90}$, $L_{Cpeak}$ and
   SEL, and the noise dose.
 - [Environmental Levels (ISO 1996-1/-2)](/phonometry/environment/environmental-levels/):
@@ -164,21 +164,21 @@ IEC 61252, ISO 1996-1, IEC 60942 and the GUM.
   evaluation periods and noise phases, the limit tables and the Article 25
   compliance check.
 
-**[Signals and spectra](/phonometry/signal/spectra/)**
+**[Signals and spectra](/phonometry/signals/spectra/)**
 
-- [Calibrated spectral analysis](/phonometry/signal/spectra/spectral-analysis/): the
+- [Calibrated spectral analysis](/phonometry/signals/spectra/spectral-analysis/): the
   Welch power and cross-spectral estimators with their random errors,
   chi-square confidence intervals and fractional-octave smoothing.
-- [Multiple and partial coherence](/phonometry/signal/spectra/miso-coherence/): the
+- [Multiple and partial coherence](/phonometry/signals/spectra/miso-coherence/): the
   ordinary, multiple and partial coherence of several correlated sources
   driving one response, and which source dominates each band.
-- [Time-frequency analysis](/phonometry/signal/spectra/time-frequency/): the calibrated
+- [Time-frequency analysis](/phonometry/signals/spectra/time-frequency/): the calibrated
   STFT spectrogram in absolute dB SPL, and the zoom FFT that resolves tones
   closer than a practical FFT bin.
-- [Cepstrum, echoes and the envelope spectrum](/phonometry/signal/spectra/cepstrum-echoes/):
+- [Cepstrum, echoes and the envelope spectrum](/phonometry/signals/spectra/cepstrum-echoes/):
   quefrency analysis, echo detection with the reflection coefficient read off
   the cepstral peak, liftering and the envelope spectrum.
-- [Time synchronous averaging](/phonometry/signal/spectra/synchronous-averaging/):
+- [Time synchronous averaging](/phonometry/signals/spectra/synchronous-averaging/):
   extraction of a periodic waveform of known period, the comb filter that
   describes it and the choice of the number of averages.
 - [Machine fault frequencies](/phonometry/vibration/machinery/machine-diagnostics/):
@@ -186,26 +186,26 @@ IEC 61252, ISO 1996-1, IEC 60942 and the GUM.
   Karczub Section 8.4) drawn on top of a measured envelope spectrum: bearing
   BPFO, BPFI, BSF and cage frequencies, gear-mesh sidebands, induction-motor
   slip, pole-pass and rotor-slot harmonics, and blade-passing tones.
-- [Correlation, time delay and envelope](/phonometry/signal/spectra/correlation-delay/):
+- [Correlation, time delay and envelope](/phonometry/signals/spectra/correlation-delay/):
   correlation with its random errors, time-delay estimation by direct
   correlation and the GCC weightings, and the Hilbert envelope.
-- [Test signals and sample-rate tools](/phonometry/signal/spectra/test-signals/):
+- [Test signals and sample-rate tools](/phonometry/signals/spectra/test-signals/):
   IEC 60268-1 tone bursts with exact gating, colored noise with an exact
   slope, resampling with a stated anti-alias specification and fractional
   delay.
-- [System measurement](/phonometry/signal/spectra/system-measurement/): complementary
+- [System measurement](/phonometry/signals/spectra/system-measurement/): complementary
   Golay pairs, sweeps shaped to an arbitrary target magnitude spectrum, and
   Kirkeby-regularized inversion of a measured response.
 
-**[Calibration and uncertainty](/phonometry/signal/metrology/)**
+**[Calibration and uncertainty](/phonometry/signals/metrology/)**
 
-- [Calibration and dBFS](/phonometry/signal/metrology/calibration/): physical SPL
+- [Calibration and dBFS](/phonometry/signals/metrology/calibration/): physical SPL
   calibration from a calibrator tone or a known sensitivity, and the digital
   full-scale mode.
-- [Measurement uncertainty (GUM and Monte Carlo)](/phonometry/signal/metrology/gum-uncertainty/):
+- [Measurement uncertainty (GUM and Monte Carlo)](/phonometry/signals/metrology/gum-uncertainty/):
   the law of propagation of uncertainty and the Monte Carlo method, with
   expanded uncertainty and coverage intervals.
-- [Data qualification](/phonometry/signal/metrology/data-qualification/): the reverse
+- [Data qualification](/phonometry/signals/metrology/data-qualification/): the reverse
   arrangement and runs tests for stationarity, and the Rice level-crossing and
   peak statistics with the irregularity factor.
 

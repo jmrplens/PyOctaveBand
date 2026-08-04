@@ -336,7 +336,7 @@ The interpolator recovers the inter-sample excursion the sample grid missed
 inside the +0.2/−0.4 dB tolerance that EBU Mode meters must meet).
 EBU R 128 caps production at **−1 dBTP**; distribution codecs often need
 more headroom. This is the same oversampled-peak machinery behind the
-C-weighted `lc_peak` of [Integrated & Statistical Levels](https://jmrplens.github.io/phonometry/signal/levels/levels/).
+C-weighted `lc_peak` of [Integrated & Statistical Levels](https://jmrplens.github.io/phonometry/signals/levels/levels/).
 
 ## 6. Multichannel programmes and Annex 3
 

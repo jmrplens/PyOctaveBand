@@ -57,9 +57,9 @@ standardized bands, smooth it in time and reduce it to metrics:
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_signal_chain_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_signal_chain.svg" alt="phonometry processing chain: signal, calibration, frequency weighting, octave filter bank, time weighting and metrics, with the standard verified at each stage" width="92%"></picture>
 
 Each stage is an independent function or class you can use on its own; the
-guides cover them left to right ([Calibration](../signal/metrology/calibration.md) →
-[Frequency Weighting](../signal/levels/weighting.md) → [Filter Banks](../signal/filters/filter-banks.md) →
-[Time Weighting](../signal/levels/time-weighting.md) → [Levels](../signal/levels/levels.md)).
+guides cover them left to right ([Calibration](../signals/metrology/calibration.md) →
+[Frequency Weighting](../signals/levels/weighting.md) → [Filter Banks](../signals/filters/filter-banks.md) →
+[Time Weighting](../signals/levels/time-weighting.md) → [Levels](../signals/levels/levels.md)).
 
 ## Basic Usage: 1/3 Octave Analysis
 
@@ -149,8 +149,8 @@ Every result object exposes a one-line `.plot(language="en"|"es")` figure and,
 where a standard defines a reporting format, a `.report()` method that renders
 the normative PDF fiche.
 
-- [Filter Architecture Gallery](../signal/filters/filter-gallery.md): choose an architecture and inspect responses
-- [Calibration and dBFS](../signal/metrology/calibration.md): get real-world SPL values
+- [Filter Architecture Gallery](../signals/filters/filter-gallery.md): choose an architecture and inspect responses
+- [Calibration and dBFS](../signals/metrology/calibration.md): get real-world SPL values
 - [Why phonometry](why-phonometry.md): the conformance-first design philosophy
 - [Conformance report](../CONFORMANCE.md): the expected and computed value of all 533 checks
 - [API Reference](../reference/api/index.md): every parameter of every function

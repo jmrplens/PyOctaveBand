@@ -490,7 +490,7 @@ the microphones alone.
 | `limits` | list, optional | Hz | default library band range | Band analysis limits |
 | `bias_correct` | bool | — | default `False` | Apply the per-bin $(k\Delta r)/\sin(k\Delta r)$ correction (IEC 61043 §7.3) before summing, so band/broadband totals stop under-reading as $f \to$ `max_valid_frequency`; bins past the first null are left uncorrected. The per-band `bias_correction` factor is reported either way |
 
-See [Theory](../../reference/theory/signal-analysis.md) for the derivations and [Calibration](../../signal/metrology/calibration.md)
+See [Theory](../../reference/theory/signal-analysis.md) for the derivations and [Calibration](../../signals/metrology/calibration.md)
 for absolute scaling of the two channels.
 
 ## References

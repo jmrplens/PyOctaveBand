@@ -15,7 +15,7 @@ uncertainty budget.
 The level-computation half of the topic, the $L_{eq}$/$L_{Aeq}$ integrals,
 the percentile levels $L_N$, SEL and the noise dose that produce the period
 levels this page consumes, is
-[Integrated and Statistical Levels](../signal/levels/levels.md); everything here assumes
+[Integrated and Statistical Levels](../signals/levels/levels.md); everything here assumes
 those per-period values are already in hand.
 
 ## Environmental noise: Lden, Ldn and rating levels (ISO 1996-1)
@@ -182,7 +182,7 @@ $L_{dn}$ (3.6.5) keeps only the +10 dB night penalty.
 
 ## See also
 
-- [Integrated and Statistical Levels](../signal/levels/levels.md): the $L_{eq}$/$L_{Aeq}$,
+- [Integrated and Statistical Levels](../signals/levels/levels.md): the $L_{eq}$/$L_{Aeq}$,
   percentile and event levels the indicators of this page are assembled from.
 - [Objective audibility of tones in noise](../perception/psychoacoustics/tone-audibility.md): the tonal
   audibility whose mean value maps to the $K_t$ adjustment (Table J.1).

@@ -453,7 +453,7 @@ the boxed $L_{WA}$.*
   cannot subtract.
 - [Room Acoustics](../../buildings/rooms/room-acoustics.md): the reverberation time and equivalent
   absorption area that feed $K_2$.
-- [Levels](../../signal/levels/levels.md): energy averaging and the A-weighting behind $L_{WA}$.
+- [Levels](../../signals/levels/levels.md): energy averaging and the A-weighting behind $L_{WA}$.
 - [Theory](../../reference/theory/environment-transport.md): the $K_1$/$K_2$ and $C_1$/$C_2$
   derivations.
 - API reference: [`emission.sound_power`](https://jmrplens.github.io/phonometry/reference/api/power/sound-power/).

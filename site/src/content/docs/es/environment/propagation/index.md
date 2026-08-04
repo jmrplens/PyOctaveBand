@@ -57,7 +57,7 @@ al LAeq medido en un nivel de valoración.
 
 La maquinaria que lo rodea vive cerca: los niveles de valoración y el Lden en
 que terminan las evaluaciones se cubren en
-[Niveles integrados y estadísticos](/phonometry/es/signal/levels/levels/), la
+[Niveles integrados y estadísticos](/phonometry/es/signals/levels/levels/), la
 contraparte tonal del ajuste impulsivo en
 [Audibilidad objetiva de tonos en ruido](/phonometry/es/perception/psychoacoustics/tone-audibility/),
 y las fuentes que alimentan un cálculo de propagación en las secciones de

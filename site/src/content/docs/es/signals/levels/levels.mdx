@@ -1,0 +1,523 @@
+---
+title: "Niveles integrados y estadísticos"
+description: "Leq, LAeq, percentiles L10/L50/L90, LCpeak/SEL y dosis de ruido (IEC 61252), y espectrogramas de octava, con los indicadores ambientales de ISO 1996 en su propia guía."
+references:
+  - type: standard
+    organization: "International Electrotechnical Commission"
+    year: 2013
+    title: "Electroacoustics — Sound level meters — Part 1: Specifications"
+    designation: "IEC 61672-1:2013"
+    url: "https://webstore.iec.ch/en/publication/5708"
+    note: "La balística de envolvente Fast/Slow/Impulse que sustenta los niveles percentiles, el pico ponderado C del apartado 5.13 (verificado contra las ráfagas de tono de la Tabla 5) y el nivel de exposición sonora verificado contra la columna LAE de la Tabla 4."
+  - type: standard
+    organization: "International Electrotechnical Commission"
+    year: 1993
+    title: "Electroacoustics — Specifications for personal sound exposure meters"
+    designation: "IEC 61252:1993"
+    url: "https://webstore.iec.ch/en/publication/5054"
+    note: "La exposición sonora E en Pa²h y el nivel normalizado a 8 h LEX,8h (≡ LEP,d), anclados en 3,2 Pa²h ⇔ exactamente 90 dB. Revisada después como IEC 61252:2025 (https://webstore.iec.ch/en/publication/68929); la primera edición es la implementada."
+  - type: book
+    authors: ["Kinsler, L. E.", "Frey, A. R.", "Coppens, A. B.", "Sanders, J. V."]
+    year: 2000
+    title: "Fundamentals of acoustics"
+    edition: "4.ª ed."
+    publisher: "Wiley"
+    url: "https://www.wiley.com/en-us/Fundamentals+of+Acoustics%2C+4th+Edition-p-9780471847892"
+    note: "Las definiciones de presión acústica, energía y nivel que sostienen Leq, SEL y las medidas de dosis (ISBN 978-0-471-84789-2)."
+  - type: book
+    authors: ["Bies, D. A.", "Hansen, C. H.", "Howard, C. Q."]
+    year: 2017
+    title: "Engineering noise control"
+    edition: "5th ed."
+    publisher: "CRC Press"
+    doi: "10.1201/9781351228152"
+    note: "La sección 2.5 (las medidas de ruido: Leq, L10/L90 y sus usos previstos) y la sección 2.15 (campañas de ruido ambiental). ISBN 978-1-4987-2405-0."
+---
+
+import ThemeImage from '../../../../../components/ThemeImage.astro';
+
+Una medición de ruido rara vez termina en una forma de onda: termina en un
+puñado de números únicos que se pueden contrastar con un límite, un
+reglamento o un informe. Esta página es esa cadena de reducción, calculada
+directamente sobre la señal calibrada en pascales y no sobre lecturas de un
+sonómetro: el nivel continuo equivalente $L_{eq}$/$L_{Aeq}$, los niveles
+percentiles $L_N$, las medidas de sucesos y de pico ($L_{AE}$/SEL,
+$L_{Cpeak}$) y la dosis de ruido de IEC 61252. Trabajar desde la señal
+significa aplicar cada definición (una integral, un percentil, una suma de
+energías) de forma exacta, sin aproximaciones de detector ni de pantalla
+por medio.
+
+Qué descriptor encaja con qué pregunta sigue las familias de magnitudes de
+ISO 1996-1 (BS 7445-1 es la guía de práctica de medición sobre esa misma
+elección, y Bies, Hansen y Howard 2017, §2.5 las repasa en paralelo):
+
+- **Exposición acumulada en un intervalo**: $L_{eq}$/$L_{Aeq}$, la media
+  energética. Responde a "cuánto sonido llegó en total", sin importar cómo
+  se repartió en el tiempo.
+- **Cómo se distribuyó el nivel fluctuante**: los percentiles $L_N$:
+  $L_{90}$ como nivel de fondo, $L_{10}$ como indicador de intrusión de
+  tráfico, $L_{50}$ como mediana. Dos señales con el mismo $L_{Aeq}$ pueden
+  tener dispersiones $L_{10} - L_{90}$ muy distintas.
+- **Sucesos aislados de duraciones distintas, comparados con justicia**:
+  SEL, toda la energía del suceso normalizada a un segundo.
+- **Cribado de riesgo auditivo**: $L_{Cpeak}$ y las medidas de dosis, que
+  alimentan el flujo laboral de
+  [Exposición laboral (ISO 9612)](/phonometry/es/perception/hearing/occupational-exposure/).
+- **Molestia comunitaria a largo plazo**: $L_{den}$/$L_{dn}$ y los niveles
+  de evaluación de ISO 1996-1, que penalizan la energía de tarde y noche
+  antes de promediar el día: el asunto de
+  [Niveles ambientales](/phonometry/es/environment/environmental-levels/).
+
+Conviene mantener nítidas dos fronteras con las páginas hermanas. Las
+métricas integradas de esta página evitan deliberadamente el detector
+exponencial: $L_{eq}$ y SEL no tienen constante de tiempo, y las balísticas
+Fast/Slow solo entran por los niveles percentiles, definidos sobre la traza
+de nivel con ponderación temporal (ver
+[Ponderación temporal](/phonometry/es/signals/levels/time-weighting/)). Y todo lo
+de esta página asume la señal ya en pascales: el factor de sensibilidad que
+la lleva ahí es el asunto de
+[Calibración](/phonometry/es/signals/metrology/calibration/).
+
+## Leq y LAeq
+
+El nivel continuo equivalente integra la presión al cuadrado durante el tiempo
+de medición:
+
+$$
+L_{eq} = 10\log_{10}\left(\frac{1}{T}\int_0^T \frac{p^2(t)}{p_0^2}\ dt\right) \text{ dB}, \qquad p_0 = 20\ \mu\text{Pa}
+$$
+
+y $L_{Aeq}$ es la misma integral tras ponderar A la señal. $L_N$ es el nivel
+superado el $N\ \%$ del tiempo: el percentil $(100-N)$ de la distribución del
+nivel con ponderación temporal.
+
+```python
+import numpy as np
+from phonometry import signals
+
+# recording: una captura de micrófono calibrada (Pa) — grabada con tu cadena de medición. Sintetizada aquí para que la guía funcione por sí sola.
+fs = 48000
+recording = 0.2 * np.sin(2 * np.pi * 1000 * np.arange(fs) / fs)
+sensitivity = 1.0                                    # calibration_factor (ver Calibración)
+
+# Nivel continuo equivalente de toda la grabación
+level = signals.leq(recording, calibration_factor=sensitivity)
+
+# Leq ponderado A (la métrica estándar de ruido ambiental)
+la = signals.laeq(recording, fs, calibration_factor=sensitivity)
+```
+
+Ambas aceptan señales 1D (devuelven un escalar) o arrays 2D
+`[channels, samples]` (devuelven un nivel por canal), y admiten `dbfs=True` para
+análisis digital a fondo de escala (la calibración no aplica en modo dBFS).
+
+¿Por qué la media *energética* y no la media aritmética de los valores en dB?
+Porque las dosis sonoras se suman como energía: dos periodos a 60 dB y 80 dB no
+promedian 70 dB; la mitad a 80 dB domina y $L_{eq} = 77$ dB. Promediar
+decibelios directamente subestima cualquier ruido fluctuante. $L_{eq}$ es el
+nivel del sonido *estacionario* que transporta la misma energía que el real,
+fluctuante, y por eso las normativas se redactan en términos de él.
+
+La misma regla gobierna cualquier combinación de niveles: niveles de periodo
+en un valor de día completo, posiciones de micrófono en un promedio de sala,
+mediciones repetidas en una media. Combina energías,
+`10 * np.log10(np.mean(10 ** (L / 10)))`, nunca los valores en dB. El error
+de la media aritmética es unilateral (siempre lee de menos) y crece con la
+dispersión, así que no se cancela con muchas mediciones: con valores
+repartidos en 10 dB ya cuesta un par de decibelios. Las pocas fórmulas
+normativas que sí promedian decibelios directamente son aproximaciones
+deliberadas y lo declaran (ISO 1996-2 ofrece una como sustituto de la
+incertidumbre por mediciones repetidas y avisa de que se infla cuando los
+niveles se dispersan más de 3 dB, ver la sección de incertidumbre de
+[Niveles ambientales](/phonometry/es/environment/environmental-levels/));
+en todo lo demás, energía.
+
+### Parámetros de `leq()` / `laeq()`
+
+| Parámetro | Tipo / forma | Unidades | Rango / valor por defecto | Notas |
+| :--- | :--- | :--- | :--- | :--- |
+| `x` | array 1D o 2D | unidades digitales (o Pa si está calibrada) | no vacío | 2D es `[channels, samples]`; devuelve un nivel por canal |
+| `fs` | int | Hz | > 0 (solo `laeq`) | `leq` no necesita frecuencia de muestreo (integral RMS pura) |
+| `calibration_factor` | float | Pa por unidad digital | por defecto `1.0` | De `sensitivity()` |
+| `dbfs` | bool | — | por defecto `False` | `True`: 0 dBFS = seno RMS a fondo de escala; ignora la calibración |
+
+## Niveles percentiles (LN)
+
+`ln_levels` calcula niveles estadísticos a partir de la envolvente con
+ponderación temporal: **$L_{10}$** es el nivel superado el 10 % del tiempo
+(picos de eventos), **$L_{50}$** la mediana y **$L_{90}$** el nivel de fondo.
+
+```python
+import numpy as np
+from phonometry import signals
+
+# Un tono constante da L10 = L50 = L90; los percentiles solo cuentan algo con un
+# nivel *fluctuante*. Sintetizamos 3 s alternando entre medio segundo tranquilo
+# y otro ~10 dB más fuerte para que los estadísticos se separen.
+fs = 48000
+rng = np.random.default_rng(0)
+segment = fs // 2                                  # 0.5 s por nivel
+quiet = 0.02 * rng.standard_normal(segment)        # fondo
+loud = 0.06 * rng.standard_normal(segment)         # eventos ~10 dB más fuertes
+varying = np.tile(np.concatenate([quiet, loud]), 3)
+
+stats = signals.ln_levels(varying, fs, n=(10, 50, 90), weighting="A")
+print(f"LA10={stats[10]:.1f}  LA50={stats[50]:.1f}  LA90={stats[90]:.1f} dB")
+# LA10=66.6  LA50=65.2  LA90=58.5 dB  -> L10 (eventos) > L50 (mediana) > L90 (fondo)
+```
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/ln_levels_example_es.svg" alt="Historia del nivel Fast de un ruido fluctuante con los niveles estadísticos L10, L50 y L90 marcados" width="80%" loading="eager" />
+
+*$L_{10}$ sigue los picos de los eventos, $L_{50}$ el nivel mediano y
+$L_{90}$ el fondo.*
+
+<details>
+<summary>Mostrar el código de esta figura</summary>
+
+```python
+import numpy as np
+import matplotlib.pyplot as plt
+from phonometry import filters, signals
+
+# La señal fluctuante del ejemplo de ln_levels: 0.5 s de fondo alternando
+# con 0.5 s de eventos ~10 dB más fuertes, repetido 3 veces
+fs = 48000
+rng = np.random.default_rng(0)
+segment = fs // 2
+quiet = 0.02 * rng.standard_normal(segment)
+loud = 0.06 * rng.standard_normal(segment)
+varying = np.tile(np.concatenate([quiet, loud]), 3)
+
+# Envolvente cuadrática media Fast -> nivel frente al tiempo, y los percentiles
+envelope = filters.time_weighting(varying, fs, mode="fast")
+level_t = 10 * np.log10(np.maximum(envelope, 1e-12) / (2e-5) ** 2)
+stats = signals.ln_levels(varying, fs, n=(10, 50, 90))
+t = np.arange(varying.size) / fs
+
+fig, ax = plt.subplots()
+ax.plot(t, level_t, linewidth=0.8, label="Nivel Fast Lp(t)")
+for i, (n_value, style) in enumerate([(10, "--"), (50, "-"), (90, "-.")], 1):
+    ax.axhline(float(stats[n_value]), color=f"C{i}", linestyle=style,
+               label=f"L{n_value} = {stats[n_value]:.1f} dB")
+ax.set(xlabel="Tiempo [s]", ylabel="Nivel [dB]")
+ax.legend(loc="lower right")
+plt.show()
+```
+
+</details>
+
+Opciones: `mode` selecciona la ponderación temporal de la envolvente (`'fast'`, `'slow'`,
+`'impulse'`), `weighting` aplica antes la ponderación A/C, y
+`calibration_factor`/`dbfs` se comportan como en `leq`. El transitorio de ataque
+del integrador (~5τ) se descarta antes de calcular los percentiles, de modo que
+la rampa inicial de asentamiento no cuenta en los percentiles bajos.
+
+Formalmente, $L_N$ es el percentil $(100-N)$ de la distribución del nivel con
+ponderación temporal: la grabación se convierte primero en una envolvente de
+nivel frente a tiempo (Fast por defecto), y $L_{10}$ es el valor de la
+envolvente superado el 10 % del tiempo. Eso hace que la *elección de la
+ponderación temporal forme parte de la métrica*: un $L_{10}$ con envolvente
+Slow es sistemáticamente más bajo que con una Fast en ruido impulsivo, por lo
+que las normativas siempre indican la ponderación temporal.
+
+### Leer Leq frente a los percentiles
+
+$L_{eq}$ y la familia $L_N$ responden preguntas distintas sobre el mismo
+historial de niveles. $L_{eq}$ es una media energética, así que los momentos más
+ruidosos la dominan: un solo segundo a 100 dB eleva el $L_{eq}$ de una hora
+por lo demás estable a 60 dB hasta unos 66 dB, mientras que $L_{90}$,
+$L_{50}$ e incluso $L_{10}$ apenas se mueven (un evento de un segundo ocupa
+mucho menos del 10 % de la hora). Los percentiles son estadísticos de rango,
+robustos frente a eventos raros por construcción. En la práctica:
+
+- **$L_{eq}$ (y $L_{Aeq}$)** es la métrica de dosis: las normativas, la
+  exposición y los modelos de molestia se escriben con ella precisamente
+  *porque* se niega a ignorar los eventos ruidosos raros.
+- **$L_{90}$** estima el nivel residual (de fondo) bajo una fuente
+  intermitente, que es como lo usa el Anexo I de ISO 1996-2.
+- **$L_{10}$** sigue los picos de los eventos; la separación
+  $L_{10} - L_{90}$ es un indicador rápido de intermitencia.
+- **$L_{eq} - L_{50}$** mide lo "picudo" que es el historial: en ruido
+  estacionario casi coinciden, y cuanto más fluctúa el nivel más sube
+  $L_{eq}$ por encima de la mediana (para una distribución gaussiana de
+  niveles con desviación típica $\sigma$ dB,
+  $L_{eq} \approx L_{50} + 0{,}115\,\sigma^2$).
+
+Una precaución: los percentiles no se combinan. Dos horas con $L_{90}$
+conocidos no dan el $L_{90}$ de las dos horas con ninguna fórmula;
+recalcúlalo sobre la envolvente conjunta. Los valores de $L_{eq}$, en cambio,
+se combinan exactamente promediando energías ponderadas por el tiempo, que es
+lo que hace el `composite_rating_level` de
+[Niveles ambientales](/phonometry/es/environment/environmental-levels/).
+
+### Parámetros de `ln_levels()`
+
+| Parámetro | Tipo / forma | Unidades | Rango / valor por defecto | Notas |
+| :--- | :--- | :--- | :--- | :--- |
+| `x` | array 1D o 2D | unidades digitales | no vacío | 2D devuelve diccionarios por canal |
+| `fs` | int | Hz | > 0 | Lo necesita el detector de envolvente |
+| `n` | tupla de ints | % | por defecto `(10, 50, 90)` | Cualquier porcentaje de excedencia, p. ej. `(1, 5, 95)` |
+| `mode` | str | — | `'fast'` (por defecto), `'slow'`, `'impulse'` | Ponderación temporal IEC 61672-1 de la envolvente |
+| `weighting` | str o None | — | `'A'`, `'C'`, `'G'`, `'Z'`, `None` (por defecto) | Ponderación frecuencial previa a la envolvente |
+| `calibration_factor` / `dbfs` | float / bool | — | como `leq` | Misma semántica que en `leq()` |
+
+## Métricas de pico, evento y ocupacionales
+
+```python
+import numpy as np
+from phonometry import signals
+
+# recording: una captura de micrófono calibrada (Pa) — grabada con tu cadena de medición. Sintetizada aquí para que la guía funcione por sí sola.
+fs = 48000
+recording = 0.2 * np.sin(2 * np.pi * 1000 * np.arange(fs) / fs)
+sensitivity = 1.0                                    # calibration_factor (ver Calibración)
+
+# Pico ponderado C (IEC 61672-1 §5.13): los límites de acción laborales usan esto
+peak = signals.lc_peak(recording, fs, calibration_factor=sensitivity)
+
+# Un único evento de ruido y una muestra de jornada (fragmentos de una grabación real)
+event = recording
+shift_sample = recording
+
+# Nivel de exposición sonora: nivel del evento normalizado a 1 s (LAE)
+lae = signals.sel(event, fs, weighting="A", calibration_factor=sensitivity)
+
+# Dosis diaria de ruido (IEC 61252): exposición en Pa²·h y LEX,8h / LEP,d
+E = signals.sound_exposure(shift_sample, fs, duration_hours=8, calibration_factor=sensitivity)
+lex = signals.lex_8h(shift_sample, fs, duration_hours=8, calibration_factor=sensitivity)
+```
+
+`lc_peak` está verificado contra las respuestas de referencia de ciclo
+único/semiciclo de la Tabla 5 de IEC 61672-1:2013, `sel` contra la columna
+$L_{AE}$ de la Tabla 4, y las funciones de dosis contra las anclas de IEC 61252
+(3,2 Pa²h ↔ exactamente 90 dB). `lc_peak` sobremuestrea (polifásico) la señal
+ponderada C por `oversample` (por defecto `8`) antes de tomar el máximo,
+recuperando el verdadero pico inter-muestra: un máximo en rejilla subestima los
+tonos de HF sostenidos hasta ~1,15 dB (un tono de 8 kHz a 48 kHz tiene solo
+6 muestras/ciclo). Usa `oversample=1` para detectar el pico en la rejilla
+original. Con `duration_hours`, la entrada se trata como muestra representativa
+de ese periodo de exposición; sin él, la entrada es el evento completo.
+
+### SEL: comparar eventos de distinta duración
+
+Un paso de tren de 4 s y otro de 30 s no pueden compararse solo por su
+$L_{Aeq}$: el evento más largo entrega más energía al mismo nivel. El **nivel
+de exposición sonora** comprime la energía del evento *completo* en
+exactamente un segundo:
+
+$$
+L_E = L_{eq,T} + 10\log_{10}\frac{T}{T_0}, \qquad T_0 = 1\ \text{s}
+$$
+
+de modo que los eventos de cualquier duración resultan directamente
+comparables, y $N$ eventos idénticos se suman como $+10\log_{10}N$. Es el
+bloque básico de los modelos de ruido aeroportuario y ferroviario.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sel_concept_es.svg" alt="Historia del nivel del paso de un vehículo con su Leq sobre el evento completo y el bloque SEL de un segundo con la misma energía" width="80%" />
+
+<details>
+<summary>Mostrar el código de esta figura</summary>
+
+```python
+import numpy as np
+import matplotlib.pyplot as plt
+from phonometry import filters, signals
+
+# El paso de un vehículo: ruido bajo una envolvente de energía gaussiana (análisis en dBFS)
+fs = 48000
+t = np.arange(int(8.0 * fs)) / fs
+rng = np.random.default_rng(11)
+x = 0.3 * np.exp(-0.5 * ((t - 4.0) / 1.1) ** 2) * rng.standard_normal(t.size)
+
+level = 10 * np.log10(np.maximum(filters.time_weighting(x, fs, mode="fast"), 1e-12))
+l_sel = float(signals.sel(x, fs, dbfs=True))
+l_eq = float(signals.leq(x, dbfs=True))
+print(f"Leq = {l_eq:.1f} dBFS, SEL = {l_sel:.1f} dBFS")
+# Leq = -16.6 dBFS, SEL = -7.6 dBFS -> el bloque de 1 s lleva la energía del evento
+
+fig, ax = plt.subplots()
+ax.plot(t, level, linewidth=1.0, label="Nivel Fast del evento")
+ax.hlines(l_eq, 0, 8, color="C2", linestyle="--",
+          label=f"Leq sobre el evento completo = {l_eq:.1f} dBFS")
+ax.fill_between([3.5, 4.5], -55, l_sel, color="C1", alpha=0.25)
+ax.hlines(l_sel, 3.5, 4.5, color="C1", linewidth=2,
+          label=f"SEL = {l_sel:.1f} dBFS: la misma energía en 1 s")
+ax.set(xlabel="Tiempo [s]", ylabel="Nivel [dBFS]", ylim=(-55, l_sel + 6))
+ax.legend(loc="lower left")
+plt.show()
+```
+
+</details>
+
+### Dosis de ruido: exposición sonora y LEX,8h
+
+Las normativas laborales limitan la *dosis* diaria, no el nivel. IEC 61252 la
+expresa como **exposición sonora** $E$ en pascales al cuadrado por hora (la
+integral temporal de la presión ponderada A al cuadrado) y el **nivel
+normalizado a 8 h** equivalente:
+
+$$
+E = \int_0^T p_A^2(t)\ dt \quad [\text{Pa}^2\text{h}], \qquad
+L_{EX,8h} = 10\log_{10}\frac{E}{8\ \text{h} \cdot p_0^2}
+$$
+
+El ancla que conviene memorizar: **3,2 Pa²h ⇔ exactamente 90 dB durante 8 h**
+(la suite de CI lo verifica). La mitad de dosis son −3 dB; el doble de
+duración al mismo nivel son +3 dB.
+
+### Parámetros de pico / evento / dosis
+
+| Función | Parámetros clave | Devuelve | Ancla normativa |
+| :--- | :--- | :--- | :--- |
+| `lc_peak(x, fs, calibration_factor=1.0, dbfs=False)` | `dbfs=True` referencia el *pico* a fondo de escala (`1.0`), no el RMS | $L_{Cpeak}$ [dB] | IEC 61672-1 §5.13, ráfagas de tono de la Tabla 5 |
+| `sel(x, fs, weighting=None, ...)` | `weighting='A'` da el $L_{AE}$ | SEL [dB] | IEC 61672-1 Tabla 4 (columna $L_{AE}$) |
+| `sound_exposure(x, fs, duration_hours=None, ...)` | `duration_hours` trata `x` como muestra de ese periodo | $E$ [Pa²h] | IEC 61252 |
+| `lex_8h(x, fs, duration_hours=None, ...)` | misma semántica de muestreo | $L_{EX,8h}$ [dB] | IEC 61252 ($\equiv L_{EP,d}$) |
+
+`lex_8h` califica *una* grabación; componer una jornada laboral completa a
+partir de muestras por tarea o por función, con el presupuesto normativo de
+incertidumbre de la ISO 9612, continúa en
+[Exposición al ruido en el trabajo](/phonometry/es/perception/hearing/occupational-exposure/).
+
+Convertir estos niveles en los indicadores regulatorios día-tarde-noche y
+reportarlos con garantías es
+[Niveles ambientales](/phonometry/es/environment/environmental-levels/): los
+descriptores $L_{den}$ y $L_{dn}$, los niveles de evaluación compuestos de
+ISO 1996-1
+con sus ajustes por carácter, y la cadena de determinación de ISO 1996-2 con
+el ajuste tonal, la corrección de ruido residual y el balance de
+incertidumbre de medida.
+
+## Espectrograma de octavas (niveles vs tiempo)
+
+Análisis de octava fraccional en tiempo corto: un nivel por banda y ventana,
+alineado en el tiempo entre bandas.
+
+```python
+import numpy as np
+from phonometry import filters
+
+# recording: una captura de micrófono calibrada (Pa) — grabada con tu cadena de medición. Sintetizada aquí para que la guía funcione por sí sola.
+fs = 48000
+recording = 0.2 * np.sin(2 * np.pi * 1000 * np.arange(fs) / fs)
+
+bank = filters.OctaveFilterBank(fs=48000, fraction=3)
+levels, freq, times = bank.spectrogram(recording, window_time=0.125, overlap=0.5)
+# levels: (bandas, ventanas) — listo para pcolormesh(times, freq, levels)
+```
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/spectrogram_example_es.webp" alt="Espectrograma en doceavos de octava de un barrido logarítmico con dos ráfagas de tono" width="80%" />
+
+*Un barrido logarítmico y dos ráfagas de tono, resueltos en el tiempo y en
+bandas normalizadas de doceavo de octava.*
+
+<details>
+<summary>Mostrar el código de esta figura</summary>
+
+```python
+import numpy as np
+import matplotlib.pyplot as plt
+from scipy.signal import chirp
+from phonometry import filters
+
+# Barrido logarítmico de 80 Hz -> 8 kHz más dos ráfagas de tono, con algo de ruido
+fs = 48000
+t = np.arange(int(4.0 * fs)) / fs
+x = 0.5 * chirp(t, f0=80, t1=4.0, f1=8000, method="logarithmic")
+x[int(1.0 * fs):int(1.3 * fs)] += np.sin(2 * np.pi * 4000 * t[: int(0.3 * fs)])
+x[int(2.5 * fs):int(2.8 * fs)] += np.sin(2 * np.pi * 250 * t[: int(0.3 * fs)])
+x += 0.01 * np.random.default_rng(42).standard_normal(t.size)
+
+bank = filters.OctaveFilterBank(fs=fs, fraction=12, order=6, limits=[50.0, 12000.0])
+levels, freq, times = bank.spectrogram(x, window_time=0.125, overlap=0.875)
+
+fig, ax = plt.subplots()
+mesh = ax.pcolormesh(times, freq, levels, shading="auto")
+ax.set_yscale("log")
+ax.set(xlabel="Tiempo [s]", ylabel="Frecuencia [Hz]")
+fig.colorbar(mesh, label="Nivel [dB]")
+plt.show()
+```
+
+</details>
+
+- Una entrada multicanal `(channels, samples)` devuelve `(channels, bands, frames)`.
+- `times` contiene el centro de cada ventana en segundos.
+- `mode='peak'` da niveles de pico por ventana en lugar de RMS.
+- `zero_phase=True` filtra las bandas hacia delante y atrás para que el retardo
+  de grupo por banda no desplace las ventanas (solo análisis offline).
+
+### Parámetros de `OctaveFilterBank.spectrogram()`
+
+| Parámetro | Tipo | Unidades | Rango / valor por defecto | Notas |
+| :--- | :--- | :--- | :--- | :--- |
+| `x` | array 1D o 2D | unidades digitales | no vacío | 2D devuelve `(channels, bands, frames)` |
+| `window_time` | float | s | > 0; por defecto `0.125` | Longitud de la ventana (0,125 s replica Fast) |
+| `overlap` | float | — | 0 ≤ overlap < 1; por defecto `0.5` | Fracción de solape entre ventanas (0 = sin solape) |
+| `mode` | str | — | `'rms'` (por defecto) o `'peak'` | Detector por ventana |
+| `detrend` | bool | — | por defecto `True` | Elimina el offset DC de cada banda antes del nivel (mejora la precisión en graves) |
+| `zero_phase` | bool | — | por defecto `False` | Filtrado hacia delante y atrás (solo offline) |
+| `calibration_factor` / `dbfs` | — | — | solo constructor | Se fijan en `OctaveFilterBank(...)`, no por llamada |
+
+Consulta [Calibración y dBFS](/phonometry/es/signals/metrology/calibration/) para
+convertir unidades digitales a SPL físico, y
+[Ponderación temporal](/phonometry/es/signals/levels/time-weighting/) para los
+detalles de la envolvente. Las estrategias ocupacionales de la ISO 9612
+continúan en
+[Exposición al ruido en el trabajo](/phonometry/es/perception/hearing/occupational-exposure/),
+los veredictos de prominencia tonal de ECMA-418-1 en
+[Tonos discretos prominentes](/phonometry/es/perception/psychoacoustics/tone-prominence/), y las
+curvas isofónicas de ISO 226 viven con las métricas de percepción en
+[Sonoridad](/phonometry/es/perception/psychoacoustics/loudness/). Que un único $L_{eq}$ sea un
+resumen justo de una medición es, de entrada, una cuestión de
+estacionariedad: los tests de
+[calificación de datos](/phonometry/es/signals/metrology/data-qualification/) la
+responden objetivamente a partir de medias cuadráticas por segmento.
+
+## Qué cubre esta guía
+
+**Cubierto.** La balística de envolvente Fast/Slow/Impulse de la IEC
+61672-1:2013 que hay tras los niveles percentiles, el pico ponderado C del
+apartado 5.13 (`lc_peak`, verificado frente a la Tabla 5) y el nivel de
+exposición sonora (`sel`, verificado frente a la columna $L_{AE}$ de la Tabla
+4); la exposición sonora y el LEX,8h de la IEC 61252:1993
+(`sound_exposure`, `lex_8h`); y el espectrograma en bandas de octava
+fraccional de `OctaveFilterBank.spectrogram`.
+
+**No cubierto.** Los indicadores de jornada completa de la ISO 1996-1
+($L_{den}$, $L_{dn}$, niveles de evaluación) y los procedimientos de
+determinación de
+la ISO 1996-2 se han trasladado a
+[Niveles ambientales](/phonometry/es/environment/environmental-levels/). La IEC
+61252 se revisó en 2025; aquí solo están las fórmulas de la primera edición
+implementada (1993), no las de la más reciente.
+
+## Véase también
+
+- [Niveles ambientales (ISO 1996-1/-2)](/phonometry/es/environment/environmental-levels/): los indicadores $L_{den}$/$L_{dn}$, los niveles de evaluación y la cadena de determinación de ISO 1996-2 construidos sobre los niveles de esta página.
+- [Ponderación temporal](/phonometry/es/signals/levels/time-weighting/): el detector Fast/Slow/Impulse sobre el que se definen los niveles percentiles.
+- [Calibración](/phonometry/es/signals/metrology/calibration/): el factor de sensibilidad que convierte unidades digitales en los pascales que todo nivel de esta página asume.
+- [Exposición laboral (ISO 9612)](/phonometry/es/perception/hearing/occupational-exposure/): las estrategias de medición en el puesto de trabajo que alimentan las medidas de dosis.
+- [Multicanal y rendimiento](/phonometry/es/signals/filters/multichannel/): niveles por canal y cómo combinarlos energéticamente.
+- Referencia de la API: [`signals.levels`](/phonometry/es/reference/api/signals/levels/).
+
+## Respuestas rápidas
+
+### ¿Cuál es la diferencia entre Leq y SEL?
+
+$L_{eq}$ es el nivel continuo equivalente: la media energética de la presión
+al cuadrado durante el tiempo de medición $T$, referida a
+$p_0 = 20\ \mu\text{Pa}$. El SEL, el nivel de exposición sonora ($L_{AE}$ si
+está ponderado A), comprime la energía del evento completo en exactamente un
+segundo: $L_E = L_{eq,T} + 10\log_{10}(T/T_0)$ con $T_0 = 1\ \text{s}$, de
+modo que los eventos de cualquier duración resultan directamente comparables
+y $N$ eventos idénticos se suman como $+10\log_{10}N$.
+
+### ¿Qué exposición sonora corresponde a 90 dB en una jornada de 8 horas?
+
+Según IEC 61252:1993, la exposición sonora $E$ es la integral temporal de la
+presión ponderada A al cuadrado, expresada en pascales al cuadrado por hora,
+y $L_{EX,8h}$ (equivalente a $L_{EP,d}$) es el nivel correspondiente
+normalizado a 8 h. El ancla que conviene memorizar: 3,2 Pa²h corresponde a
+exactamente 90 dB durante 8 h. La mitad de dosis son -3 dB, y el doble de
+duración al mismo nivel son +3 dB.

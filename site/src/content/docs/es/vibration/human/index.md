@@ -37,7 +37,7 @@ posible pérdida de contacto con el asiento, mientras que las exposiciones
 menos severas en las que el ocupante permanece sentado corresponden a su
 modelo de elementos finitos del Anexo A. El frontal de medida (filtros de ponderación, análisis en bandas)
 se comparte con la sección de
-[análisis de señal](/phonometry/es/signal/).
+[análisis de señal](/phonometry/es/signals/).
 
 ## Páginas de esta sección
 

@@ -228,7 +228,7 @@ the clause 6.2 verification verdict.*
   scanning methods.
 - [Room Acoustics](../../buildings/rooms/room-acoustics.md): the reverberation time and equivalent
   absorption area that feed the room corrections.
-- [Levels](../../signal/levels/levels.md): energy averaging and the A-weighting behind $L_{WA}$.
+- [Levels](../../signals/levels/levels.md): energy averaging and the A-weighting behind $L_{WA}$.
 - [Theory](../../reference/theory/environment-transport.md): the Waterhouse, $K_1$/$K_2$ and $C_1$/$C_2$ derivations.
 - API reference: [`emission.sound_power`](https://jmrplens.github.io/phonometry/reference/api/power/sound-power/), [`emission.sound_power_reverberation`](https://jmrplens.github.io/phonometry/reference/api/power/sound-power-reverberation/) and [`emission.sound_power_intensity`](https://jmrplens.github.io/phonometry/reference/api/power/sound-power-intensity/).
 

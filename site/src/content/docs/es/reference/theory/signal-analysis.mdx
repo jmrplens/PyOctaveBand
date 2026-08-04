@@ -279,11 +279,11 @@ El filtro digital se obtiene de los polos/ceros analógicos mediante la
 transformación bilineal. Como esta comprime las frecuencias cerca de Nyquist, el
 modo `high_accuracy` por defecto diseña y ejecuta el filtro a una frecuencia
 interna sobremuestreada (≥ 144 kHz); consulta
-[Ponderación frecuencial](/phonometry/es/signal/levels/weighting/).
+[Ponderación frecuencial](/phonometry/es/signals/levels/weighting/).
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/weighting_responses_es.svg" alt="Curvas de ponderación A, C y Z de IEC 61672-1 con zoom de la región positiva de la curva A (+1,27 dB en 2,5 kHz)" width="80%" />
 
-*Las tres curvas de ponderación de IEC 61672-1 que aplica la biblioteca, con la pequeña región positiva de la curva A ampliada. Las curvas especiales B, D y AU están en [Ponderaciones especiales](/phonometry/es/signal/levels/special-weightings/).*
+*Las tres curvas de ponderación de IEC 61672-1 que aplica la biblioteca, con la pequeña región positiva de la curva A ampliada. Las curvas especiales B, D y AU están en [Ponderaciones especiales](/phonometry/es/signals/levels/special-weightings/).*
 
 ## Integración temporal
 
@@ -328,7 +328,7 @@ Los cuatro ceros frente a ocho polos dan forma a la respuesta característica: u
 
 Como G actúa sobre 0,25 Hz – 315 Hz, muy por debajo de la frecuencia de Nyquist a tasas de audio, la deformación en frecuencia de la transformación bilineal simple (aplicada sin precompensación) es despreciable en ese rango: en torno al 0,014 % a 315 Hz con $f_s = 48$ kHz, menos de 0,01 dB en la respuesta. Por eso no se aplica el sobremuestreo interno usado en los diseños A/C (cuya acción se extiende hasta 16 kHz).
 
-Consulta la [guía de ponderaciones especiales](/phonometry/es/signal/levels/special-weightings/) para su uso.
+Consulta la [guía de ponderaciones especiales](/phonometry/es/signals/levels/special-weightings/) para su uso.
 
 ## Métricas de evento y de dosis
 
@@ -354,7 +354,7 @@ Es idéntico al $L_{EP,d}$ de la Directiva 86/188/CEE y al $L_{EX,8h}$ de ISO 19
 
 **$L_{Cpeak}$** (IEC 61672-1:2013, subcláusula 5.13) es el máximo absoluto de la presión acústica ponderada C expresado en dB, $L_{Cpeak} = 20\log_{10}(\max|p_C(t)|/p_0)$, la magnitud detrás de los límites de acción laborales de 135/137/140 dB(C). La implementación se verifica contra las respuestas de referencia de un ciclo y de medio ciclo de la Tabla 5.
 
-Consulta la [guía de niveles](/phonometry/es/signal/levels/levels/) para su uso y la [guía de calibración](/phonometry/es/signal/metrology/calibration/) para configurar la escala absoluta.
+Consulta la [guía de niveles](/phonometry/es/signals/levels/levels/) para su uso y la [guía de calibración](/phonometry/es/signals/metrology/calibration/) para configurar la escala absoluta.
 
 ## Intensidad acústica (IEC 61043)
 
@@ -430,4 +430,4 @@ no gaussiana, así que el intervalo es más estrecho que $\pm 1{,}96\,u$), y el
 ejemplo del bloque patrón del Anexo H.1 de la GUM da
 $k = t_{0{,}99}(\nu_{\mathrm{eff}} = 16) = 2{,}92$ y $U_{99} = 93$ nm.
 
-Consulta la [guía de incertidumbre de medida](/phonometry/es/signal/metrology/gum-uncertainty/) para su uso.
+Consulta la [guía de incertidumbre de medida](/phonometry/es/signals/metrology/gum-uncertainty/) para su uso.

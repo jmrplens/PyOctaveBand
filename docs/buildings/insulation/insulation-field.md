@@ -454,9 +454,9 @@ ISO 16283 family (ISO 16283-3:2016) has its own page.
   the in-situ performance predicted from laboratory element data.
 - [Room Acoustics](../rooms/room-acoustics.md): the room parameters and reverberation
   times this guide's insulation chain builds on.
-- [Levels](../../signal/levels/levels.md): energy averaging and the level metrics behind
+- [Levels](../../signals/levels/levels.md): energy averaging and the level metrics behind
   source/receiving-room levels.
-- [Filter Banks](../../signal/filters/filter-banks.md): the IEC 61260 fractional-octave filters
+- [Filter Banks](../../signals/filters/filter-banks.md): the IEC 61260 fractional-octave filters
   used for the insulation spectra.
 - [Theory](../../reference/theory/rooms-buildings.md): the reference-curve derivation behind the
   weighted single-number ratings.
