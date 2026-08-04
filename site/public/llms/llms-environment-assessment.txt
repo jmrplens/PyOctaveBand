@@ -1,8 +1,29 @@
-# phonometry: environment assessment
+# phonometry: Assessment and regulation
 
 Part of https://jmrplens.github.io/phonometry/llms.txt. Full text of the pages in this area.
 
 ---
+
+<!-- source: docs/environment/assessment/index.md | canonical: https://jmrplens.github.io/phonometry/environment/assessment/ -->
+Source: https://jmrplens.github.io/phonometry/environment/assessment/
+
+# Assessment and regulation
+
+Propagation says what arrives at the receiver. Assessment says what it counts
+as, which is a separate question with its own standards: an indicator averaged
+over the right period, adjustments for the character of the sound, and a limit
+to compare the result against.
+
+[Impulsive-sound prominence (NT ACOU 112)](https://jmrplens.github.io/phonometry/environment/assessment/impulsive-sound/)
+is the adjustment for sound whose impulses make it more annoying than its LAeq
+suggests, in both the Nordtest closed form and the ISO/PAS 1996-3 measurement
+chain. The indicators it adjusts are in
+[Environmental Levels](https://jmrplens.github.io/phonometry/environment/environmental-levels/), and the
+national application of the whole chain is in
+[the Spanish regulation](https://jmrplens.github.io/phonometry/environment/spanish-noise-regulation/).
+
+---
+
 
 <!-- source: docs/environment/assessment/impulsive-sound.md | canonical: https://jmrplens.github.io/phonometry/environment/assessment/impulsive-sound/ -->
 Source: https://jmrplens.github.io/phonometry/environment/assessment/impulsive-sound/

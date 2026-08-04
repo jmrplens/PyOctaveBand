@@ -1,8 +1,25 @@
-# phonometry: vibration machinery
+# phonometry: Machinery
 
 Part of https://jmrplens.github.io/phonometry/llms.txt. Full text of the pages in this area.
 
 ---
+
+<!-- source: docs/vibration/machinery/index.md | canonical: https://jmrplens.github.io/phonometry/vibration/machinery/ -->
+Source: https://jmrplens.github.io/phonometry/vibration/machinery/
+
+# Machinery
+
+A rotating machine writes its own state into its vibration spectrum. Each
+defect has a frequency that follows from the geometry, and finding one under
+the broadband noise of a running machine is a signal-processing problem with a
+standard answer.
+
+[Machine fault frequencies](https://jmrplens.github.io/phonometry/vibration/machinery/machine-diagnostics/)
+computes the bearing, gear and shaft frequencies from the geometry and runs the
+envelope analysis that brings a bearing defect out of the noise floor.
+
+---
+
 
 <!-- source: docs/vibration/machinery/machine-diagnostics.md | canonical: https://jmrplens.github.io/phonometry/vibration/machinery/machine-diagnostics/ -->
 Source: https://jmrplens.github.io/phonometry/vibration/machinery/machine-diagnostics/

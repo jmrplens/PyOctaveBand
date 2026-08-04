@@ -96,7 +96,9 @@ jobs:
           key: pnpm-store-${{ runner.os }}-${{ hashFiles('site/pnpm-lock.yaml') }}
           restore-keys: pnpm-store-${{ runner.os }}-
       - name: Regenerate llms.txt from docs (freshness guarantee)
-        run: python3 scripts/generate_llms.py
+        run: |
+          python3 scripts/mirror_overviews.py --check
+          python3 scripts/generate_llms.py
       - name: Check the icon sheet is not stale
         # The sheet is the index of the site's own icons and the only place a
         # changed drawing is visible in a diff. It costs nothing to keep in
