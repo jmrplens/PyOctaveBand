@@ -262,7 +262,7 @@ export const topics = [
   },
   {
     id: 'vibration',
-    label: { en: 'Vibration', es: 'Vibración' },
+    label: { en: 'Vibration and structure-borne sound', es: 'Vibración y ruido estructural' },
     link: '/vibration/',
     items: [
       { slug: 'vibration', label: 'Overview', translations: { es: 'Resumen' } },

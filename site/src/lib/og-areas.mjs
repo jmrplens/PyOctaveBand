@@ -23,7 +23,7 @@ const AREA_SLUG = new Map([
   ['Hearing and perception', 'hearing-perception'],
   ['Rooms and buildings', 'rooms-buildings'],
   ['Materials and surfaces', 'materials-surfaces'],
-  ['Vibration', 'vibration'],
+  ['Vibration and structure-borne sound', 'vibration'],
   ['Environment and transport', 'environment-transport'],
   // Aircraft noise was part of the environment area when the artwork was
   // drawn, and it is a topic of its own now. It keeps that card until a

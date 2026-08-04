@@ -193,7 +193,7 @@ _SECTION_LIST: tuple[Section, ...] = (
     ),
     Section(
         key="vibration",
-        label_en="Vibration and structure-borne",
+        label_en="Vibration and structure-borne sound",
         label_es="Vibración y ruido estructural",
         modules=(
             "phonometry.vibration.structural.mechanical_mobility",

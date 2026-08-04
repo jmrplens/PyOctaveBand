@@ -158,7 +158,7 @@ export const en: HomeContent = {
 		headers: ['Area', 'Standards implemented'],
 		areas: [
 			{
-				name: 'Core signal analysis',
+				name: 'Signal analysis',
 				href: '/phonometry/signal/',
 				summary: 'Filter banks, weighting, levels, spectra, calibration and uncertainty.',
 				standards: ['IEC 61260-1', 'ANSI S1.11', 'IEC 61672-1', 'ISO 7196', 'IEC 61252', 'ISO 1996-1', 'IEC 60942', 'GUM'],

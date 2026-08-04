@@ -149,7 +149,7 @@ La referencia de la API se genera a partir de los docstrings del código (en ing
 | [`materials.diffusers.metadiffuser`](/phonometry/reference/api/materials/metadiffuser/) | Metadiffusers: deep-subwavelength Schroeder-like sound diffusers. |
 | [`materials.surfaces.road_absorption`](/phonometry/reference/api/materials/road-absorption/) | In-situ sound absorption of road surfaces (ISO 13472-1 / ISO 13472-2). |
 
-## Vibration and structure-borne
+## Vibration and structure-borne sound
 
 | Module | Summary |
 | :--- | :--- |

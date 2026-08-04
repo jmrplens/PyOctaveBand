@@ -19,7 +19,7 @@ head:
           {
             "@type": "ListItem",
             "position": 1,
-            "name": "Core signal analysis",
+            "name": "Signal analysis",
             "description": "Filter banks, weighting, levels, spectra, calibration and uncertainty.",
             "url": "https://jmrplens.github.io/phonometry/signal/"
           },
@@ -105,7 +105,7 @@ numerical evidence live in [Reference](/phonometry/reference/): the theory
 pages explain why a formula is the one it is, and the conformance report shows
 the standard's own expected value next to the computed one.
 
-## [Core signal analysis](/phonometry/signal/)
+## [Signal analysis](/phonometry/signal/)
 
 Filter banks, weighting, levels, spectra, calibration and uncertainty. This is
 the chain that turns a digital signal into a standards-compliant number, and
