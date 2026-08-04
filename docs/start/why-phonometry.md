@@ -106,9 +106,9 @@ plt.show()
 
 - If you need **standard-compliant Fast/Slow/Impulse envelopes** (sound level
   meter behavior, one level per sample), use phonometry's
-  [`time_weighting`](../signal/levels/time-weighting.md).
+  [`time_weighting`](../signals/levels/time-weighting.md).
 - If you need **block-averaged $L_{eq}$ per interval**, that is a different, equally
-  valid metric; you can compute it with [`leq`](../signal/levels/levels.md) over consecutive
+  valid metric; you can compute it with [`leq`](../signals/levels/levels.md) over consecutive
   slices.
 - Both approaches are useful; they just answer different questions. The
   discrepancy reported in issue #38 comes from comparing a continuous envelope
@@ -151,7 +151,7 @@ parametrization would not), the default Butterworth bank is checked against
 the stricter class 0 of the withdrawn IEC 61260:1995 / ANSI S1.11-2004 edition
 as well as the current class 1, and A/C weighting stays within class 1
 tolerances up to 16 kHz at common audio rates via internal oversampling (see
-[Frequency Weighting](../signal/levels/weighting.md)).
+[Frequency Weighting](../signals/levels/weighting.md)).
 
 ## When the source is what is wrong
 

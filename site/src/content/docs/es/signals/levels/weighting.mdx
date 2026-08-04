@@ -1,0 +1,415 @@
+---
+title: "Ponderación frecuencial (A, C, Z)"
+description: "Ponderación frecuencial A/C/Z según IEC 61672-1 (clase 1, con modo de precisión en alta frecuencia) y la verificación frente a las tablas de tolerancias de la Tabla 3, con las curvas especiales G, B, D y AU en su propia guía."
+references:
+  - type: article
+    authors: ["Fletcher, H.", "Munson, W. A."]
+    year: 1933
+    title: "Loudness, its definition, measurement and calculation"
+    journal: "The Journal of the Acoustical Society of America"
+    volume: 5
+    issue: 2
+    pages: "82-108"
+    doi: "10.1121/1.1915637"
+    note: "Las mediciones originales de igual sonoridad; la curva A invierte su isófona de 40 fonios (sección 1)."
+  - type: standard
+    organization: "International Organization for Standardization"
+    year: 2023
+    title: "Acoustics — Normal equal-loudness-level contours"
+    designation: "ISO 226:2023"
+    url: "https://www.iso.org/standard/83117.html"
+    note: "Las sucesoras modernas de las curvas de Fletcher y Munson, dibujadas en el diagrama de la sección 1."
+  - type: standard
+    organization: "International Electrotechnical Commission"
+    year: 2013
+    title: "Electroacoustics — Sound level meters — Part 1: Specifications"
+    designation: "IEC 61672-1:2013"
+    url: "https://webstore.iec.ch/en/publication/5708"
+    note: "Las curvas de ponderación frecuencial A, C y Z normativas (la definición analítica del Anexo E a partir de cuatro frecuencias de esquina, normalizadas a 0 dB en 1 kHz), las tolerancias de clase 1 que el diseño high_accuracy mantiene hasta 16 kHz y los límites de aceptación de clase 1 y clase 2 de la Tabla 3 que comprueba verify_weighting_class en la sección 6."
+---
+
+import ThemeImage from '../../../../../components/ThemeImage.astro';
+
+Las curvas de ponderación frecuencial simulan la sensibilidad del oído humano.
+Esta guía cubre **A**, **C** y **Z**, las curvas especificadas en
+**IEC 61672-1:2013**: de dónde vienen, cómo aplicarlas, el diseño
+`high_accuracy` y la verificación de clase frente a la Tabla 3. El resto de
+la familia, la curva G de infrasonido, las históricas B y D y la curva AU, es
+[Ponderaciones especiales](/phonometry/es/signals/levels/special-weightings/).
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/weighting_responses_es.svg" alt="Curvas de ponderación A, C y Z de IEC 61672-1 con zoom de la región positiva de la curva A (+1,27 dB en 2,5 kHz)" width="80%" loading="eager" />
+
+*Las tres curvas de IEC 61672-1, medidas con los filtros de la propia
+biblioteca a 48 kHz: A, que descarta los graves; C, que los conserva; y Z,
+que no pondera nada. El recuadro amplía la pequeña región positiva de A en
+torno a 2,5 kHz. Las curvas especiales B, D y AU tienen su propia gráfica en
+[Ponderaciones especiales](/phonometry/es/signals/levels/special-weightings/), junto
+con la curva G de infrasonido.*
+
+<details>
+<summary>Mostrar el código de esta figura</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import filters
+
+# Medimos la respuesta de cada curva: ponderamos un impulso unitario
+# centrado y tomamos su espectro (búfer de 1 s -> resolución de 1 Hz).
+fs = 48000
+impulse = np.zeros(fs)
+impulse[fs // 2] = 1.0
+freqs = np.fft.rfftfreq(fs, 1 / fs)
+
+fig, ax = plt.subplots(figsize=(9, 5))
+for curve in ("A", "C", "Z"):
+    spectrum = np.fft.rfft(filters.weighting_filter(impulse, fs, curve=curve))
+    ax.semilogx(freqs[1:], 20 * np.log10(np.abs(spectrum[1:]) + np.finfo(float).eps),
+                label=curve)
+ax.set(xlim=(10, 22000), ylim=(-72, 15),
+       xlabel="Frecuencia [Hz]", ylabel="Respuesta [dB]")
+ax.grid(True, which="both", alpha=0.3)
+ax.legend()
+plt.show()
+```
+
+</details>
+
+* **Ponderación A (`A`):** estándar para ruido ambiental (IEC 61672-1).
+* **Ponderación C (`C`):** para presión acústica de pico y ruido de alto nivel.
+* **Ponderación Z (`Z`):** ponderación cero, respuesta completamente plana.
+
+El argumento `curve` acepta además las cuatro ponderaciones especiales, con
+gráfica y documentación en
+[Ponderaciones especiales](/phonometry/es/signals/levels/special-weightings/): `'G'`
+para infrasonido (ISO 7196), las históricas `'B'` (ANSI S1.4-1983) y `'D'`
+(IEC 537), y `'AU'` para sonido audible en presencia de ultrasonidos
+(IEC 61012).
+
+## ¿Cómo aplico la ponderación A a una señal con Python?
+
+Llama a `filters.weighting_filter(recording, fs, curve='A')` sobre una señal
+calibrada. Devuelve la señal temporal ponderada A, filtrada con el diseño de
+polos y ceros de IEC 61672-1:2013 dentro de las tolerancias de clase 1, así que
+`signals.leq()` sobre la salida es el $L_{Aeq}$. La misma función aplica las
+ponderaciones C, Z, B, D, AU y la G de infrasonido mediante `curve`.
+
+## 1. De dónde vienen las curvas
+
+Las curvas A y C son líneas isofónicas invertidas, congeladas en filtros:
+**A** aproxima la inversa de la histórica línea isofónica de 40 fonios (niveles
+bajos, donde el oído descarta los graves con más agresividad) y **C** la más
+plana de ~100 fonios (niveles altos). IEC 61672-1:2013 (Anexo E) define ambas
+analíticamente a partir de cuatro frecuencias de esquina:
+
+$$
+f_1 = 20{,}599\ \text{Hz}, \quad f_2 = 107{,}653\ \text{Hz}, \quad
+f_3 = 737{,}862\ \text{Hz}, \quad f_4 = 12194{,}217\ \text{Hz}
+$$
+
+C es un paso-banda con polos dobles en $f_1$ y $f_4$ (2 ceros en el origen);
+A añade los polos $f_2$ y $f_3$ (4 ceros), y por eso sigue cayendo en los
+medios-graves. Ambas se normalizan a exactamente 0 dB en 1 kHz. Z es la
+ausencia de ponderación. La derivación completa de polos y ceros está en la
+página de [Teoría](/phonometry/es/reference/theory/signal-analysis/).
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_equal_loudness_weighting_es.svg" alt="Líneas isofónicas según ISO 226 a la izquierda, con la isófona de 40 fonios resaltada; a la derecha la curva de ponderación A superpuesta a la isófona de 40 fonios invertida, mostrando que A es la isófona volteada congelada en un filtro realizable" width="92%" />
+
+### Una breve historia: A, B, C y Z
+
+La cadena va de las mediciones de igual sonoridad de Fletcher y Munson en
+1933 a la primera norma estadounidense de sonómetros (1936), que dio a los
+medidores respuestas conmutables para que la lectura aproximara la
+sonoridad a distintos niveles: **A** de la isófona de 40 fonios para sonidos
+débiles, **B** de la de ~70 fonios para los moderados y una respuesta plana
+para los fuertes (la curva **C** propiamente dicha, reflejo de la isófona
+más plana de ~100 fonios, llegó con la revisión de 1944). Conmutar curvas
+según el nivel murió en la práctica (las
+lecturas saltaban en los puntos de cambio y las mediciones de campo dejaban
+de ser comparables), pero A sobrevivió sola: décadas de datos de daño
+auditivo y de molestia comunitaria se habían recogido con ella, y
+correlaciona con ambos casi tan bien como métricas mucho más elaboradas.
+IEC 61672-1 (primera edición, 2002) remató la limpieza: B se eliminó, A y C
+se conservaron con tolerancias más estrictas y **Z** se introdujo para
+sustituir el "lineal" mal especificado de los sonómetros antiguos, que
+variaba según el fabricante. La curva B (y la curva D de ruido de aeronaves,
+que corrió la misma suerte) sigue disponible para datos históricos; véase
+[Ponderaciones especiales](/phonometry/es/signals/levels/special-weightings/).
+
+### Cuándo importa C − A
+
+Como A descarta los graves y C los conserva, la diferencia
+$L_{Ceq} - L_{Aeq}$ es un indicador de un solo número del contenido en
+baja frecuencia:
+
+- **Por debajo de unos 10 dB**: espectro de banda ancha ordinario; el nivel
+  ponderado A lo califica con justicia.
+- **En torno a 15 a 20 dB o más**: la energía se concentra en las bajas
+  frecuencias (retumbo de climatización, compresores, graves de música a
+  través de una pared). El nivel ponderado A entonces subestima el problema;
+  mira el espectro de octavas y, por debajo de 20 Hz, pasa a la curva G.
+- **La selección de protectores auditivos**: el método HML de ISO 4869-2 se
+  apoya exactamente en esta diferencia C menos A para decidir cuánta
+  atenuación en baja frecuencia debe aportar el protector (el método SNR,
+  más simple, la esquiva trabajando directamente con el nivel ponderado C).
+
+```python
+import numpy as np
+from phonometry import filters, signals
+
+# Un retumbo de 50 Hz bajo un siseo ligero: débil en A, fuerte en C.
+fs = 48000
+t = np.arange(10 * fs) / fs
+rng = np.random.default_rng(1)
+x = 0.2 * np.sin(2 * np.pi * 50 * t) + 0.01 * rng.standard_normal(t.size)
+
+la = signals.leq(filters.weighting_filter(x, fs, curve="A"))
+lc = signals.leq(filters.weighting_filter(x, fs, curve="C"))
+print(f"LAeq = {la:.1f} dB   LCeq = {lc:.1f} dB   C - A = {lc - la:.1f} dB")
+# LAeq = 52.4 dB   LCeq = 75.7 dB   C - A = 23.2 dB
+# C - A por encima de 20 dB: el número ponderado A ocultaría el retumbo.
+```
+
+## 2. Uso básico
+
+```python
+import numpy as np
+from phonometry import filters
+
+# recording: una captura de micrófono calibrada (Pa) — grabada con tu cadena de medición. Sintetizada aquí para que la guía funcione por sí sola.
+fs = 48000
+recording = 0.2 * np.sin(2 * np.pi * 1000 * np.arange(fs) / fs)
+
+# Aplicar ponderación A a la señal cruda
+weighted_signal = filters.weighting_filter(recording, fs, curve='A')
+
+# Aplicar ponderación C para análisis de picos
+c_weighted_signal = filters.weighting_filter(recording, fs, curve='C')
+```
+
+Las ponderaciones especiales usan el mismo argumento `curve`; cada una está
+documentada, con su propia gráfica de respuesta, en
+[Ponderaciones especiales](/phonometry/es/signals/levels/special-weightings/).
+
+## 3. Parámetros de `weighting_filter()` / `WeightingFilter`
+
+| Parámetro | Tipo | Unidades | Rango / por defecto | Notas |
+| :--- | :--- | :--- | :--- | :--- |
+| `x` | array 1D o 2D | cualquiera | no vacío | 2D es `[channels, samples]` |
+| `fs` | int | Hz | > 0 | |
+| `curve` | str | — | `'A'` (por defecto), `'B'`, `'C'`, `'D'`, `'G'`, `'AU'`, `'Z'` | `'G'` según ISO 7196 (infrasonido), `'B'`/`'D'` históricas y `'AU'` según IEC 61012 se tratan en [Ponderaciones especiales](/phonometry/es/signals/levels/special-weightings/); `'Z'` es un bypass |
+| `high_accuracy` | bool | — | por defecto `True` (función); en la clase, `None` se resuelve a `not stateful` | Sobremuestreo interno que mantiene A/C en clase 1 hasta 16 kHz; detalles en el §5 |
+| `stateful` | bool (solo clase) | — | por defecto `False` | Conserva el estado del filtro entre bloques (streaming) |
+| `steady_ic` | bool (solo clase) | — | por defecto `False` | Condiciones iniciales estacionarias (sin transitorio de arranque) |
+
+## 4. Objeto de filtro reutilizable
+
+Si ponderas muchas señales con los mismos parámetros, diseña el filtro una sola vez:
+
+```python
+import numpy as np
+from phonometry import filters
+
+# recording: una captura de micrófono calibrada (Pa) — grabada con tu cadena de medición. Sintetizada aquí para que la guía funcione por sí sola.
+fs = 48000
+recording = 0.2 * np.sin(2 * np.pi * 1000 * np.arange(fs) / fs)
+
+wf = filters.WeightingFilter(fs, "A")
+batch = [recording]                  # tu lote de grabaciones
+for recording in batch:
+    weighted = wf.filter(recording)
+```
+
+## 5. Precisión en alta frecuencia (`high_accuracy`)
+
+Un diseño con transformación bilineal simple comprime la respuesta cerca de
+Nyquist: a $f_s = 48$ kHz el error de la curva A a 12,5 kHz alcanza −2,7 dB,
+fuera
+de la tolerancia **clase 1** de IEC 61672-1 (+2,0/−2,5 dB).
+
+Por defecto (`high_accuracy=True`), phonometry diseña y ejecuta el filtro de
+ponderación a una frecuencia interna sobremuestreada (hasta 8×, alcanzando
+≥ 144 kHz a frecuencias de audio habituales; una entrada de 96 kHz funciona
+a ×2) y diezma de vuelta, manteniendo la respuesta dentro de las tolerancias
+de clase 1 hasta 16 kHz (error ≈ −0,5 dB a 12,5 kHz para $f_s = 48$ kHz).
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/weighting_accuracy_hf_es.svg" alt="Precisión en alta frecuencia de la ponderación A a 48 kHz: curva analítica frente a bilineal simple y diseño sobremuestreado, con error" width="80%" />
+
+*El diseño bilineal simple (rojo) cruza la tolerancia de clase 1 cerca de
+12,5 kHz; el diseño sobremuestreado (azul) se mantiene junto a la curva analítica.*
+
+<details>
+<summary>Mostrar el código de esta figura</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import filters
+
+# Respuesta medida de ambos diseños a fs = 48 kHz: ponderamos un impulso
+# unitario centrado y tomamos su espectro...
+fs = 48000
+impulse = np.zeros(fs)
+impulse[fs // 2] = 1.0
+freqs = np.fft.rfftfreq(fs, 1 / fs)[1:]
+
+# ...frente a la curva A analítica de IEC 61672-1 construida con las
+# cuatro frecuencias de esquina de la sección 1, normalizada a 0 dB en 1 kHz.
+f1, f2, f3, f4 = 20.599, 107.653, 737.862, 12194.217
+gain = (f4**2 * freqs**4) / ((freqs**2 + f1**2)
+        * np.sqrt((freqs**2 + f2**2) * (freqs**2 + f3**2))
+        * (freqs**2 + f4**2))
+analytic = 20 * np.log10(gain / gain[np.argmin(np.abs(freqs - 1000))])
+
+fig, ax = plt.subplots(figsize=(9, 5))
+ax.semilogx(freqs, analytic, "k--", label="Analítica (IEC 61672-1)")
+for high_accuracy, label in ((False, "Bilineal simple"),
+                             (True, "Sobremuestreado (por defecto)")):
+    weighted = filters.weighting_filter(impulse, fs, curve="A",
+                                high_accuracy=high_accuracy)
+    response = 20 * np.log10(np.abs(np.fft.rfft(weighted))
+                             + np.finfo(float).eps)[1:]
+    ax.semilogx(freqs, response, label=label)
+ax.set(xlim=(1000, 20000), ylim=(-12, 3),
+       xlabel="Frecuencia [Hz]", ylabel="Respuesta de la ponderación A [dB]")
+ax.grid(True, which="both", alpha=0.3)
+ax.legend()
+plt.show()
+```
+
+</details>
+
+- `high_accuracy=False` restaura el comportamiento bilineal clásico.
+- Con `'G'` el indicador se ignora en silencio: su rango de 0,25–315 Hz ya es
+  exacto con el diseño simple.
+- El **procesado por bloques (stateful)** usa siempre el diseño clásico: el
+  remuestreo FIR interno es incompatible con la continuidad entre bloques. Pasar
+  `high_accuracy=True` junto con `stateful=True` lanza un `ValueError`.
+
+```python
+import numpy as np
+from phonometry import filters
+
+# recording: una captura de micrófono calibrada (Pa) — grabada con tu cadena de medición. Sintetizada aquí para que la guía funcione por sí sola.
+fs = 48000
+recording = 0.2 * np.sin(2 * np.pi * 1000 * np.arange(fs) / fs)
+
+# Comportamiento clásico explícito
+y = filters.weighting_filter(recording, fs, curve="A", high_accuracy=False)
+
+# Procesado por bloques con estado (diseño clásico, estado entre bloques)
+wf = filters.WeightingFilter(fs, "A", stateful=True)
+blocks = [recording]                 # tu secuencia de bloques de señal
+for block in blocks:
+    weighted = wf.filter(block)
+```
+
+Consulta [Procesado por bloques](/phonometry/es/signals/filters/block-processing/) para
+el flujo en streaming y [Teoría](/phonometry/es/reference/theory/signal-analysis/) para las
+definiciones analíticas de las curvas.
+
+## 6. Verificación frente a las tablas de tolerancias (IEC 61672-1)
+
+`verify_weighting_class` comprueba un filtro de ponderación frente a los
+límites de aceptación de **IEC 61672-1:2013** (Tabla 3). Evalúa la respuesta
+relativa del filtro en la frecuencia *exacta* en base 10 que hay detrás de
+cada etiqueta nominal por debajo de Nyquist (los objetivos de diseño de la
+Tabla 3 se calculan en $f = 1000 \cdot 10^{n/10}$, p. ej. 15 848,9 Hz para
+«16 kHz»; la IEC 61672-3 ensaya en esas mismas frecuencias), resta la
+ponderación objetivo de diseño e informa de la clase de prestaciones por
+frecuencia con su margen en dB. Un barrido logarítmico denso impone además el
+apartado 5.5.7 *entre* las frecuencias nominales (la desviación respecto al
+objetivo analítico del anexo E debe mantenerse dentro del mayor de los dos
+límites adyacentes, de modo que una resonancia o un notch entre nominales no
+puede pasar) y, cuando filas de la Tabla 3 con límite inferior finito quedan
+por encima de Nyquist, el veredicto se marca `range_limited` (atestigua solo
+las frecuencias comprobadas, no la conformidad completa de 10 Hz a 20 kHz):
+
+```python
+from phonometry import filters
+
+result = filters.verify_weighting_class(filters.WeightingFilter(48000, "A"))
+print(result["overall_class"])          # 1
+print(result["range_limited"])          # False
+print(result["between_nominals"])       # {'worst_freq': ..., 'margin_class1_db': ...}
+print(result["bands"][20])
+# {'freq': 1000.0, 'class': 1, 'deviation_db': 0.0, 'margin_class1_db': 0.7, 'margin_class2_db': 1.0}
+```
+
+La máscara de aceptación de la Tabla 3 también es pública:
+`weighting_class_limits(1)` devuelve las 34 frecuencias nominales con los
+límites de desviación inferior/superior (un límite inferior de `-inf` significa
+que solo se aplica el superior). Los límites cualifican la *desviación* respecto
+al objetivo de diseño, por lo que son idénticos para A, C y Z.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/weighting_class_mask_es.svg" alt="Desviaciones de las ponderaciones A y C a 48 kHz dentro del corredor de aceptación de clase 1 de la Tabla 3 de IEC 61672-1, con los límites más amplios de clase 2 punteados" width="80%" />
+
+*Los diseños sobremuestreados A y C (azul, morado) se mantienen cerca de
+desviación cero, holgadamente dentro del corredor de clase 1 (sombreado); los
+límites más amplios de clase 2 se muestran punteados. El corredor se ensancha
+en los extremos de banda donde solo se aplica un límite unilateral.*
+
+<details>
+<summary>Mostrar el código de esta figura</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import filters
+
+freqs, lower1, upper1 = filters.weighting_class_limits(1)
+_, lower2, upper2 = filters.weighting_class_limits(2)
+lo1, lo2 = np.clip(lower1, -7, 7), np.clip(lower2, -7, 7)
+
+fig, ax = plt.subplots(figsize=(10, 6.5))
+ax.fill_between(freqs, lo1, upper1, step="mid", alpha=0.10,
+                label="Región de aceptación de clase 1")
+ax.plot(freqs, upper1, drawstyle="steps-mid", label="Límite superior/inferior de clase 1")
+ax.plot(freqs, lo1, drawstyle="steps-mid", color="C1")
+ax.plot(freqs, upper2, ":", drawstyle="steps-mid", label="Límite superior/inferior de clase 2")
+ax.plot(freqs, lo2, ":", drawstyle="steps-mid", color="C2")
+
+for curve, marker in (("A", "o"), ("C", "s")):
+    bands = filters.verify_weighting_class(filters.WeightingFilter(48000, curve))["bands"]
+    f = [b["freq"] for b in bands]
+    dev = [b["deviation_db"] for b in bands]
+    ax.plot(f, dev, marker=marker, label=f"Desviación de la ponderación {curve} (48 kHz)")
+
+ax.set(xscale="log", xlim=(10, 20000), ylim=(-7, 7),
+       xlabel="Frecuencia [Hz]", ylabel="Desviación respecto al objetivo de diseño [dB]")
+ax.legend(fontsize=8, ncol=2)
+plt.show()
+```
+
+</details>
+
+## Qué cubre esta guía
+
+**Cubierto.** IEC 61672-1:2013 para las curvas A, C y Z: la definición
+analítica del Anexo E a partir de cuatro frecuencias de esquina, el diseño
+`high_accuracy` que mantiene las tolerancias de clase 1 hasta 16 kHz, y los
+límites de aceptación de clase 1/clase 2 de la Tabla 3 que comprueba
+`verify_weighting_class`.
+
+**No cubierto.** Las curvas especiales, la G de infrasonido de ISO 7196,
+las históricas B (ANSI S1.4-1983) y D (IEC 537) y la AU de IEC 61012, junto
+con la verificación de B y AU frente a sus tablas de tolerancias, tienen su
+propia guía:
+[Ponderaciones especiales](/phonometry/es/signals/levels/special-weightings/).
+
+## Véase también
+
+- [Ponderaciones especiales (G, B, D, AU)](/phonometry/es/signals/levels/special-weightings/):
+  la curva G de infrasonido, las históricas B y D, y la AU para sonido
+  audible en presencia de ultrasonidos.
+- Referencia de la API: [`filters.weighting`](/phonometry/es/reference/api/filters/weighting/) y [`filters.compliance`](/phonometry/es/reference/api/filters/compliance/).
+
+## Respuestas rápidas
+
+### ¿Cuándo debo usar la ponderación C en lugar de la ponderación A?
+
+Usa la ponderación C para presión acústica de pico y ruido de alto nivel, y usa la diferencia $L_{Ceq} - L_{Aeq}$ como indicador del contenido en baja frecuencia: por debajo de unos 10 dB el nivel ponderado A califica el espectro con justicia, mientras que en torno a 15 a 20 dB o más la energía se concentra en las bajas frecuencias y el nivel ponderado A subestima el problema. El método HML de ISO 4869-2 se apoya exactamente en esta diferencia C menos A para la selección de protectores auditivos.
+
+### ¿Es precisa la ponderación A cerca de 16 kHz con una frecuencia de muestreo de 48 kHz?
+
+No con un diseño bilineal simple: a $f_s = 48$ kHz el error de la curva A alcanza −2,7 dB a 12,5 kHz, fuera de la tolerancia de clase 1 de IEC 61672-1 (+2,0/−2,5 dB). El `high_accuracy=True` por defecto sobremuestrea internamente (hasta 8×, alcanzando 144 kHz o más a frecuencias de audio habituales) y mantiene la respuesta dentro de las tolerancias de clase 1 hasta 16 kHz, con un error de aproximadamente −0,5 dB a 12,5 kHz.

@@ -27,7 +27,7 @@ head:
             "subjectOf": {
               "@type": "TechArticle",
               "name": "Calibración",
-              "url": "https://jmrplens.github.io/phonometry/es/signal/metrology/calibration/"
+              "url": "https://jmrplens.github.io/phonometry/es/signals/metrology/calibration/"
             }
           },
           {
@@ -42,7 +42,7 @@ head:
             "subjectOf": {
               "@type": "TechArticle",
               "name": "Niveles",
-              "url": "https://jmrplens.github.io/phonometry/es/signal/levels/levels/"
+              "url": "https://jmrplens.github.io/phonometry/es/signals/levels/levels/"
             }
           },
           {
@@ -57,7 +57,7 @@ head:
             "subjectOf": {
               "@type": "TechArticle",
               "name": "Niveles",
-              "url": "https://jmrplens.github.io/phonometry/es/signal/levels/levels/"
+              "url": "https://jmrplens.github.io/phonometry/es/signals/levels/levels/"
             }
           },
           {
@@ -72,7 +72,7 @@ head:
             "subjectOf": {
               "@type": "TechArticle",
               "name": "Niveles",
-              "url": "https://jmrplens.github.io/phonometry/es/signal/levels/levels/"
+              "url": "https://jmrplens.github.io/phonometry/es/signals/levels/levels/"
             }
           },
           {
@@ -87,7 +87,7 @@ head:
             "subjectOf": {
               "@type": "TechArticle",
               "name": "Niveles",
-              "url": "https://jmrplens.github.io/phonometry/es/signal/levels/levels/"
+              "url": "https://jmrplens.github.io/phonometry/es/signals/levels/levels/"
             }
           },
           {
@@ -102,7 +102,7 @@ head:
             "subjectOf": {
               "@type": "TechArticle",
               "name": "Niveles",
-              "url": "https://jmrplens.github.io/phonometry/es/signal/levels/levels/"
+              "url": "https://jmrplens.github.io/phonometry/es/signals/levels/levels/"
             }
           },
           {
@@ -237,7 +237,7 @@ head:
             "subjectOf": {
               "@type": "TechArticle",
               "name": "Niveles",
-              "url": "https://jmrplens.github.io/phonometry/es/signal/levels/levels/"
+              "url": "https://jmrplens.github.io/phonometry/es/signals/levels/levels/"
             }
           },
           {
@@ -312,7 +312,7 @@ head:
             "subjectOf": {
               "@type": "TechArticle",
               "name": "Ponderación frecuencial",
-              "url": "https://jmrplens.github.io/phonometry/es/signal/levels/weighting/"
+              "url": "https://jmrplens.github.io/phonometry/es/signals/levels/weighting/"
             }
           },
           {
@@ -327,7 +327,7 @@ head:
             "subjectOf": {
               "@type": "TechArticle",
               "name": "Ponderaciones especiales",
-              "url": "https://jmrplens.github.io/phonometry/es/signal/levels/special-weightings/"
+              "url": "https://jmrplens.github.io/phonometry/es/signals/levels/special-weightings/"
             }
           },
           {
@@ -342,7 +342,7 @@ head:
             "subjectOf": {
               "@type": "TechArticle",
               "name": "Ponderaciones especiales",
-              "url": "https://jmrplens.github.io/phonometry/es/signal/levels/special-weightings/"
+              "url": "https://jmrplens.github.io/phonometry/es/signals/levels/special-weightings/"
             }
           },
           {
@@ -357,7 +357,7 @@ head:
             "subjectOf": {
               "@type": "TechArticle",
               "name": "Ponderaciones especiales",
-              "url": "https://jmrplens.github.io/phonometry/es/signal/levels/special-weightings/"
+              "url": "https://jmrplens.github.io/phonometry/es/signals/levels/special-weightings/"
             }
           },
           {
@@ -372,7 +372,7 @@ head:
             "subjectOf": {
               "@type": "TechArticle",
               "name": "Ponderaciones especiales",
-              "url": "https://jmrplens.github.io/phonometry/es/signal/levels/special-weightings/"
+              "url": "https://jmrplens.github.io/phonometry/es/signals/levels/special-weightings/"
             }
           },
           {
@@ -387,7 +387,7 @@ head:
             "subjectOf": {
               "@type": "TechArticle",
               "name": "Ponderación temporal",
-              "url": "https://jmrplens.github.io/phonometry/es/signal/levels/time-weighting/"
+              "url": "https://jmrplens.github.io/phonometry/es/signals/levels/time-weighting/"
             }
           },
           {
@@ -1782,7 +1782,7 @@ head:
             "subjectOf": {
               "@type": "TechArticle",
               "name": "Incertidumbre GUM",
-              "url": "https://jmrplens.github.io/phonometry/es/signal/metrology/gum-uncertainty/"
+              "url": "https://jmrplens.github.io/phonometry/es/signals/metrology/gum-uncertainty/"
             }
           },
           {
@@ -1797,7 +1797,7 @@ head:
             "subjectOf": {
               "@type": "TechArticle",
               "name": "Incertidumbre GUM",
-              "url": "https://jmrplens.github.io/phonometry/es/signal/metrology/gum-uncertainty/"
+              "url": "https://jmrplens.github.io/phonometry/es/signals/metrology/gum-uncertainty/"
             }
           },
           {
@@ -1853,12 +1853,12 @@ norma.
 
 | Símbolo | Magnitud | Unidad | Definida en | Guía |
 | --- | --- | --- | --- | --- |
-| $L_p$ | Nivel de presión acústica: veinte veces el logaritmo decimal de la presión acústica eficaz dividida por la presión de referencia. | dB re 20 µPa | IEC 61672-1:2013 | [Calibración](/phonometry/es/signal/metrology/calibration/) |
-| $L_{eq}$ | Nivel de presión acústica continuo equivalente: el nivel del sonido estacionario que transporta la misma presión cuadrática media durante el intervalo. | dB | IEC 61672-1:2013 | [Niveles](/phonometry/es/signal/levels/levels/) |
-| $L_{Aeq}$ | La misma integral aplicada a la señal ponderada A, el descriptor por defecto del ruido ambiental y laboral. | dB | IEC 61672-1:2013 | [Niveles](/phonometry/es/signal/levels/levels/) |
-| $L_{AE}$, SEL | Nivel de exposición sonora: toda la energía ponderada A de un suceso único normalizada a un segundo. | dB | IEC 61672-1:2013, Ecuación 8 (Tabla 4) | [Niveles](/phonometry/es/signal/levels/levels/) |
-| $L_{Cpeak}$ | Nivel de pico ponderado C: el máximo absoluto de la presión ponderada C, no un máximo con ponderación temporal. | dB | IEC 61672-1:2013, apartado 5.13 | [Niveles](/phonometry/es/signal/levels/levels/) |
-| $L_N$ ($L_{10}$, $L_{50}$, $L_{90}$) | Nivel percentil: el nivel superado el $N$ % del tiempo de medida, leído en la distribución del nivel con ponderación temporal. | dB | ISO 1996-2:2017 (el Anexo I usa $L_{90}$ como nivel residual) | [Niveles](/phonometry/es/signal/levels/levels/) |
+| $L_p$ | Nivel de presión acústica: veinte veces el logaritmo decimal de la presión acústica eficaz dividida por la presión de referencia. | dB re 20 µPa | IEC 61672-1:2013 | [Calibración](/phonometry/es/signals/metrology/calibration/) |
+| $L_{eq}$ | Nivel de presión acústica continuo equivalente: el nivel del sonido estacionario que transporta la misma presión cuadrática media durante el intervalo. | dB | IEC 61672-1:2013 | [Niveles](/phonometry/es/signals/levels/levels/) |
+| $L_{Aeq}$ | La misma integral aplicada a la señal ponderada A, el descriptor por defecto del ruido ambiental y laboral. | dB | IEC 61672-1:2013 | [Niveles](/phonometry/es/signals/levels/levels/) |
+| $L_{AE}$, SEL | Nivel de exposición sonora: toda la energía ponderada A de un suceso único normalizada a un segundo. | dB | IEC 61672-1:2013, Ecuación 8 (Tabla 4) | [Niveles](/phonometry/es/signals/levels/levels/) |
+| $L_{Cpeak}$ | Nivel de pico ponderado C: el máximo absoluto de la presión ponderada C, no un máximo con ponderación temporal. | dB | IEC 61672-1:2013, apartado 5.13 | [Niveles](/phonometry/es/signals/levels/levels/) |
+| $L_N$ ($L_{10}$, $L_{50}$, $L_{90}$) | Nivel percentil: el nivel superado el $N$ % del tiempo de medida, leído en la distribución del nivel con ponderación temporal. | dB | ISO 1996-2:2017 (el Anexo I usa $L_{90}$ como nivel residual) | [Niveles](/phonometry/es/signals/levels/levels/) |
 | $L_W$, SWL | Nivel de potencia acústica: la potencia que radia una fuente, referida a 1 pW. | dB re 1 pW | ISO 3745:2012, apartado 8 | [Potencia acústica](/phonometry/es/devices/emission/sound-power/) |
 | $L_I$ | Nivel de intensidad acústica: el módulo del vector intensidad referido a 1 pW/m², con el sentido del flujo indicado aparte mediante un signo. | dB re 1 pW/m² | IEC 61043:1993 | [Intensidad](/phonometry/es/devices/emission/intensity/) |
 | $L_p - L_I$ | Índice presión-intensidad: la diferencia entre el nivel de presión y el de intensidad en una posición, el indicador de campo que cualifica una medida de intensidad. | dB | ISO 9614-1:1993, Ecuación (A.3) | [Intensidad](/phonometry/es/devices/emission/intensity/) |
@@ -1872,7 +1872,7 @@ norma.
 | $L_r$ | Nivel de valoración: el nivel compuesto de la jornada completa tras los ajustes por carácter de la fuente y por franja horaria. | dB | ISO 1996-1:2016, apartado 6.5 (Fórmulas 5 y 6) | [Niveles ambientales](/phonometry/es/environment/environmental-levels/) |
 | $L_{Ar,T}$ | Nivel de valoración de una fuente impulsiva en un intervalo de referencia: el $L_{Aeq}$ más el ajuste graduado por impulsos. | dB | NT ACOU 112:2002, apartado 8 | [Prominencia de impulsos](/phonometry/es/environment/assessment/impulsive-sound/) |
 | $K_I$ | Ajuste por impulsos que se suma al $L_{Aeq}$, graduado según la prominencia prevista de los impulsos. | dB | NT ACOU 112:2002, apartado 8 | [Prominencia de impulsos](/phonometry/es/environment/assessment/impulsive-sound/) |
-| $E$ | Exposición sonora: la integral temporal de la presión acústica ponderada A al cuadrado durante el periodo de exposición. | Pa²h | IEC 61252:1993, 3.1 | [Niveles](/phonometry/es/signal/levels/levels/) |
+| $E$ | Exposición sonora: la integral temporal de la presión acústica ponderada A al cuadrado durante el periodo de exposición. | Pa²h | IEC 61252:1993, 3.1 | [Niveles](/phonometry/es/signals/levels/levels/) |
 | $L_{EX,8h}$, $L_{EP,d}$ | Nivel de exposición diaria al ruido: el nivel estacionario que, mantenido durante una jornada nominal de 8 h, acumula la misma exposición sonora ponderada A que la medida. | dB | IEC 61252:1993, 3.3 | [Exposición laboral](/phonometry/es/perception/hearing/occupational-exposure/) |
 | $L_{p,A,eqT}$ | Nivel continuo equivalente ponderado A de una tarea, de una muestra del puesto o de una jornada completa, el ladrillo con el que se construye el $L_{EX,8h}$. | dB | ISO 9612:2009, apartados 9 a 11 | [Exposición laboral](/phonometry/es/perception/hearing/occupational-exposure/) |
 | NIPTS | Desplazamiento permanente del umbral inducido por ruido: la pérdida auditiva mediana atribuible a un nivel, una duración y una frecuencia audiométrica dados. | dB | ISO 1999:2013 | [Pérdida auditiva por ruido](/phonometry/es/perception/hearing/noise-induced-hearing-loss/) |
@@ -1882,12 +1882,12 @@ norma.
 
 | Símbolo | Magnitud | Unidad | Definida en | Guía |
 | --- | --- | --- | --- | --- |
-| A, C, Z | Las ponderaciones frecuenciales normativas: las curvas de respuesta del oído que se aplican antes de integrar, siendo Z la referencia plana. | dB | IEC 61672-1:2013, Anexo E (límites de aceptación en la Tabla 3) | [Ponderación frecuencial](/phonometry/es/signal/levels/weighting/) |
-| G | Ponderación para infrasonido, definida por sus polos y ceros en el intervalo de 0,25 Hz a 315 Hz. | dB | ISO 7196:1995, Tabla 1 (respuestas nominales en la Tabla 2) | [Ponderaciones especiales](/phonometry/es/signal/levels/special-weightings/) |
-| B | Ponderación histórica para niveles medios, retirada de la norma vigente de sonómetros. | dB | ANSI S1.4-1983, Apéndice C (Fórmula C2) | [Ponderaciones especiales](/phonometry/es/signal/levels/special-weightings/) |
-| $D$ | Ponderación histórica para ruido de aeronaves, derivada de la curva de ruidosidad percibida de 40 noys. | dB | IEC 537:1976 (retirada) | [Ponderaciones especiales](/phonometry/es/signal/levels/special-weightings/) |
-| AU | Ponderación para el sonido audible medido en presencia de ultrasonido. | dB | IEC 61012:1990, apartado 2.2 (Tablas 1 y 2) | [Ponderaciones especiales](/phonometry/es/signal/levels/special-weightings/) |
-| F, S, I | Ponderaciones temporales exponenciales Fast, Slow e Impulse: las balísticas del detector que producen el nivel mostrado. | s (constante de tiempo) | IEC 61672-1:2013 | [Ponderación temporal](/phonometry/es/signal/levels/time-weighting/) |
+| A, C, Z | Las ponderaciones frecuenciales normativas: las curvas de respuesta del oído que se aplican antes de integrar, siendo Z la referencia plana. | dB | IEC 61672-1:2013, Anexo E (límites de aceptación en la Tabla 3) | [Ponderación frecuencial](/phonometry/es/signals/levels/weighting/) |
+| G | Ponderación para infrasonido, definida por sus polos y ceros en el intervalo de 0,25 Hz a 315 Hz. | dB | ISO 7196:1995, Tabla 1 (respuestas nominales en la Tabla 2) | [Ponderaciones especiales](/phonometry/es/signals/levels/special-weightings/) |
+| B | Ponderación histórica para niveles medios, retirada de la norma vigente de sonómetros. | dB | ANSI S1.4-1983, Apéndice C (Fórmula C2) | [Ponderaciones especiales](/phonometry/es/signals/levels/special-weightings/) |
+| $D$ | Ponderación histórica para ruido de aeronaves, derivada de la curva de ruidosidad percibida de 40 noys. | dB | IEC 537:1976 (retirada) | [Ponderaciones especiales](/phonometry/es/signals/levels/special-weightings/) |
+| AU | Ponderación para el sonido audible medido en presencia de ultrasonido. | dB | IEC 61012:1990, apartado 2.2 (Tablas 1 y 2) | [Ponderaciones especiales](/phonometry/es/signals/levels/special-weightings/) |
+| F, S, I | Ponderaciones temporales exponenciales Fast, Slow e Impulse: las balísticas del detector que producen el nivel mostrado. | s (constante de tiempo) | IEC 61672-1:2013 | [Ponderación temporal](/phonometry/es/signals/levels/time-weighting/) |
 
 ## Acústica de salas
 
@@ -2025,6 +2025,6 @@ norma.
 
 | Símbolo | Magnitud | Unidad | Definida en | Guía |
 | --- | --- | --- | --- | --- |
-| $u(y)$ | Incertidumbre típica combinada de un resultado, propagada desde las incertidumbres típicas de sus entradas por la ley de propagación de la incertidumbre. | unidad del resultado | ISO/IEC Guide 98-3:2008 (JCGM 100:2008), apartado 5 | [Incertidumbre GUM](/phonometry/es/signal/metrology/gum-uncertainty/) |
-| $U$ | Incertidumbre expandida: la incertidumbre típica combinada multiplicada por un factor de cobertura, que define un intervalo de cobertura. | unidad del resultado | ISO/IEC Guide 98-3:2008 (JCGM 100:2008), apartado 6 y Anexo G | [Incertidumbre GUM](/phonometry/es/signal/metrology/gum-uncertainty/) |
+| $u(y)$ | Incertidumbre típica combinada de un resultado, propagada desde las incertidumbres típicas de sus entradas por la ley de propagación de la incertidumbre. | unidad del resultado | ISO/IEC Guide 98-3:2008 (JCGM 100:2008), apartado 5 | [Incertidumbre GUM](/phonometry/es/signals/metrology/gum-uncertainty/) |
+| $U$ | Incertidumbre expandida: la incertidumbre típica combinada multiplicada por un factor de cobertura, que define un intervalo de cobertura. | unidad del resultado | ISO/IEC Guide 98-3:2008 (JCGM 100:2008), apartado 6 y Anexo G | [Incertidumbre GUM](/phonometry/es/signals/metrology/gum-uncertainty/) |
 | $\sigma_R$ | Incertidumbre típica de una situación de medida en acústica de la edificación, tabulada por magnitud y por situación. | dB | ISO 12999-1:2020, apartado 5.2 (factores de cobertura en la Tabla 8) | [Aislamiento en campo](/phonometry/es/buildings/insulation/insulation-field/) |

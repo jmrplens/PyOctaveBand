@@ -291,7 +291,7 @@ the clause 6.2 verification verdict.*
   scanning methods.
 - [Room Acoustics](https://jmrplens.github.io/phonometry/buildings/rooms/room-acoustics/): the reverberation time and equivalent
   absorption area that feed the room corrections.
-- [Levels](https://jmrplens.github.io/phonometry/signal/levels/levels/): energy averaging and the A-weighting behind $L_{WA}$.
+- [Levels](https://jmrplens.github.io/phonometry/signals/levels/levels/): energy averaging and the A-weighting behind $L_{WA}$.
 - [Theory](https://jmrplens.github.io/phonometry/reference/theory/environment-transport/): the Waterhouse, $K_1$/$K_2$ and $C_1$/$C_2$ derivations.
 - API reference: [`emission.sound_power`](https://jmrplens.github.io/phonometry/reference/api/power/sound-power/), [`emission.sound_power_reverberation`](https://jmrplens.github.io/phonometry/reference/api/power/sound-power-reverberation/) and [`emission.sound_power_intensity`](https://jmrplens.github.io/phonometry/reference/api/power/sound-power-intensity/).
 
@@ -816,7 +816,7 @@ the boxed $L_{WA}$.*
   cannot subtract.
 - [Room Acoustics](https://jmrplens.github.io/phonometry/buildings/rooms/room-acoustics/): the reverberation time and equivalent
   absorption area that feed $K_2$.
-- [Levels](https://jmrplens.github.io/phonometry/signal/levels/levels/): energy averaging and the A-weighting behind $L_{WA}$.
+- [Levels](https://jmrplens.github.io/phonometry/signals/levels/levels/): energy averaging and the A-weighting behind $L_{WA}$.
 - [Theory](https://jmrplens.github.io/phonometry/reference/theory/environment-transport/): the $K_1$/$K_2$ and $C_1$/$C_2$
   derivations.
 - API reference: [`emission.sound_power`](https://jmrplens.github.io/phonometry/reference/api/power/sound-power/).
@@ -1100,7 +1100,7 @@ $C_1$/$C_2$ corrections and the boxed $L_{WA}$.*
   the routes that tolerate steady background noise.
 - [Room Acoustics](https://jmrplens.github.io/phonometry/buildings/rooms/room-acoustics/): measuring the reverberation time
   $T_{60}$ that sets the Sabine absorption area.
-- [Levels](https://jmrplens.github.io/phonometry/signal/levels/levels/): energy averaging and the A-weighting behind $L_{WA}$.
+- [Levels](https://jmrplens.github.io/phonometry/signals/levels/levels/): energy averaging and the A-weighting behind $L_{WA}$.
 - [Theory](https://jmrplens.github.io/phonometry/reference/theory/environment-transport/): the Waterhouse and $C_1$/$C_2$
   derivations.
 - API reference: [`emission.sound_power_reverberation`](https://jmrplens.github.io/phonometry/reference/api/power/sound-power-reverberation/).
@@ -2005,7 +2005,7 @@ the microphones alone.
 | `limits` | list, optional | Hz | default library band range | Band analysis limits |
 | `bias_correct` | bool | — | default `False` | Apply the per-bin $(k\Delta r)/\sin(k\Delta r)$ correction (IEC 61043 §7.3) before summing, so band/broadband totals stop under-reading as $f \to$ `max_valid_frequency`; bins past the first null are left uncorrected. The per-band `bias_correction` factor is reported either way |
 
-See [Theory](https://jmrplens.github.io/phonometry/reference/theory/signal-analysis/) for the derivations and [Calibration](https://jmrplens.github.io/phonometry/signal/metrology/calibration/)
+See [Theory](https://jmrplens.github.io/phonometry/reference/theory/signal-analysis/) for the derivations and [Calibration](https://jmrplens.github.io/phonometry/signals/metrology/calibration/)
 for absolute scaling of the two channels.
 
 ## References

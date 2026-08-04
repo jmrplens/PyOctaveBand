@@ -1,0 +1,319 @@
+---
+title: "Time Weighting"
+description: "Fast, Slow and Impulse ballistics per IEC 61672-1."
+references:
+  - type: standard
+    organization: "International Electrotechnical Commission"
+    year: 2013
+    title: "Electroacoustics — Sound level meters — Part 1: Specifications"
+    designation: "IEC 61672-1:2013"
+    url: "https://webstore.iec.ch/en/publication/5708"
+    note: "The exponential time-weighting detector (clause 3.8) with the F and S time constants (clause 5.7), and the 4 kHz toneburst reference responses of Table 4 (class 1 acceptance limits) the ballistics are verified against in CI."
+  - type: standard
+    organization: "American National Standards Institute"
+    year: 1983
+    title: "Specification for sound level meters"
+    designation: "ANSI S1.4-1983"
+    url: "https://webstore.ansi.org/standards/asa/ansiasas11983"
+    note: "The classic analog meter specification: the FAST/SLOW dynamic characteristics the F and S constants descend from, and the IMPULSE characteristic (35 ms rise, slow decay) that IEC 61672-1 no longer specifies."
+  - type: book
+    authors: ["Bies, D. A.", "Hansen, C. H.", "Howard, C. Q."]
+    year: 2017
+    title: "Engineering noise control"
+    edition: "5th ed."
+    publisher: "CRC Press"
+    doi: "10.1201/9781351228152"
+    note: "Sections 3.2 and 3.6 (sound level meters and the measurement of time-varying sound: what the F/S/I readouts mean in instrument practice). ISBN 978-1-4987-2405-0."
+---
+
+import Video from '../../../../components/Video.astro';
+import ThemeImage from '../../../../components/ThemeImage.astro';
+
+A displayed sound level is always a *time-weighted* level: before anything
+reaches the readout, the squared, frequency-weighted pressure passes
+through an exponential detector whose time constant sets how quickly the
+level follows the signal. This page is that detector, implemented as a
+sample-exact recursive filter: the Fast and Slow characteristics of
+IEC 61672-1:2013 (clause 5.7), the legacy asymmetric Impulse ballistics,
+streaming state for block processing, and the toneburst verification
+against the standard's Table 4.
+
+The names are older than the mathematics. FAST and SLOW were literal
+descriptions of a needle movement, standardized for analog meters in
+ANSI S1.4-1983 and IEC 60651 and carried into IEC 61672-1 as the F and S
+exponential constants; IMPULSE was added in the same era for impact noise
+and has since been dropped from the requirements, surviving in instruments
+only for legacy procedures (the [choosing guidance](#choosing-f-s-or-i)
+below says when each is defensible; Bies, Hansen & Howard 2017, §3.6
+covers the instrument practice).
+
+Two sibling pages complete the chain. The detector output is the level
+track that the percentile levels $L_N$ of
+[Levels](/phonometry/signals/levels/levels/) are defined on, while the integrated
+metrics ($L_{eq}$, SEL) bypass the detector entirely; and the full
+IEC 61672-1 instrument chain that wraps this detector (weighting, ranges,
+periodic tests) is the subject of
+[Build a sound level meter](/phonometry/signals/sound-level-meter/).
+
+## 1. The exponential detector
+
+A sound level meter's needle cannot follow the pressure waveform: it shows a
+running *mean square* with an exponential memory. Formally (IEC 61672-1, 3.8):
+
+$$
+\tau\ \frac{dy}{dt} + y = x^2(t)
+\quad\Longleftrightarrow\quad
+y(t) = \frac{1}{\tau} \int_{-\infty}^{t} x^2(\xi)\ e^{-(t-\xi)/\tau}\ d\xi
+$$
+
+a first-order low-pass on the squared signal. The time constant $\tau$ sets the
+trade-off: **Fast** (125 ms) follows speech-like fluctuations, **Slow** (1 s)
+steadies the readout for quasi-stationary noise. After a step onset the
+envelope reaches 63 % of its final value in one $\tau$ and ~99.97 % after
+$8\tau$;
+that is why level analyses discard the first instants of a recording.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_time_weighting.svg" alt="The exponential-detector chain: the band pressure is squared, smoothed by a one-pole RC low-pass with time constant tau, and converted to decibels, with the Fast, Slow and Impulse time constants listed" width="88%" loading="eager" />
+
+## 2. The three time weightings
+
+* **Fast (`fast`):** $\tau = 125\ \text{ms}$. Standard for noise fluctuations.
+* **Slow (`slow`):** $\tau = 1000\ \text{ms}$. Standard for steady noise.
+* **Impulse (`impulse`):** **Asymmetric** ballistics. 35 ms rise time for rapid
+  onset capture, 1500 ms decay for readability.
+
+<Video
+  name="anim_time_weighting"
+  width={2400}
+  height={1350}
+  title="The Fast, Slow and Impulse detector ballistics"
+  description="A tone burst drives the RC exponential detector: the capacitor charges and drains while the Fast, Slow and Impulse meter needles follow their own ballistics, and the three level traces build up below to show the fast attack, the slow average and the asymmetric impulse hold."
+/>
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/time_weighting_analysis.svg" alt="Fast, Slow and Impulse time weighting responses to a noise burst" width="80%" />
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import numpy as np
+import matplotlib.pyplot as plt
+from phonometry import filters
+
+fs = 48000
+t = np.arange(int(fs * 4)) / fs
+burst = np.zeros_like(t)  # 0.5 s noise burst (Pa) starting at t = 1 s
+rng = np.random.default_rng(42)
+burst[fs:int(1.5 * fs)] = 0.2 * rng.standard_normal(int(0.5 * fs))
+
+p0 = 2e-5
+plt.figure()
+for mode in ('fast', 'slow', 'impulse'):
+    envelope = filters.time_weighting(burst, fs, mode=mode)
+    plt.plot(t, 10 * np.log10(np.maximum(envelope, 1e-12) / p0**2), label=mode)
+plt.xlabel('Time [s]')
+plt.ylabel('Level [dB SPL]')
+plt.legend()
+plt.show()
+```
+
+</details>
+
+```python
+import numpy as np
+from phonometry import filters
+
+# recording: a calibrated microphone capture (Pa) — recorded through your measurement chain. Synthesized here so the guide runs standalone.
+fs = 48000
+recording = 0.2 * np.sin(2 * np.pi * 1000 * np.arange(fs) / fs)
+
+# Calculate energy envelope (Mean Square)
+energy_envelope = filters.time_weighting(recording, fs, mode='fast')
+# dB SPL relative to 20 μPa
+spl_t = 10 * np.log10(energy_envelope / (2e-5)**2)
+
+print(f"Steady-state Fast level: {spl_t[-1]:.1f} dB SPL")
+# Steady-state Fast level: 77.0 dB SPL
+```
+
+The asymmetric Impulse ballistics use two constants, a fast attack and a slow
+decay, switching per sample on the sign of the change:
+
+$$
+y[n] = y[n-1] + \alpha \ (x^2[n] - y[n-1]), \qquad
+\alpha = \begin{cases}1 - e^{-1/(f_s \cdot 0.035)} & x^2[n] > y[n-1]\\[2pt] 1 - e^{-1/(f_s \cdot 1.5)} & \text{otherwise}\end{cases}
+$$
+
+### Choosing F, S or I
+
+- **Fast** is the default of nearly every modern method: percentile levels,
+  impulsive-event detection, community noise, the general "level vs time"
+  plot. Its 125 ms constant is of the same order as the ear's own loudness
+  integration time, so an $L_{AF}$ trace roughly tracks what a listener notices.
+- **Slow** suits quasi-stationary sources and any procedure that needs a
+  steady readout: it averages away the flicker of a fluctuating source at
+  the price of missing short events (a 100 ms burst peaks about 7.5 dB lower
+  on S than on F). Some legacy methods prescribe it outright, most famously
+  aircraft-certification levels, which are built from Slow-weighted samples.
+- **Impulse** is legacy, and deprecated for rating. It was a 1960s attempt
+  to make a meter needle track the perceived loudness of impacts; it does
+  not (the 35 ms attack still misses very short impulses, and the 1.5 s hold
+  exaggerates duration). It entered the international standards with
+  IEC 60651 and was dropped from the requirements of its successor
+  IEC 61672-1, whose first edition (2002) explains why: I-weighted levels
+  are not suitable for rating impulsive sounds. It survives in meters only
+  for continuity with older national requirements. Modern practice rates
+  impulsiveness with
+  $L_{Aeq}$ plus an adjustment (ISO 1996-1 Table A.1, or the onset analysis
+  of [Impulsive-sound prominence](/phonometry/environment/assessment/impulsive-sound/)) and assesses
+  hearing-damage risk with $L_{Cpeak}$, never with I-weighted levels.
+
+## 3. `time_weighting()` / `TimeWeighting` parameters
+
+| Parameter | Type | Units | Range / default | Notes |
+| :--- | :--- | :--- | :--- | :--- |
+| `x` | 1D or 2D array | pressure (any scale) | non-empty | Squared internally; output is a mean-square envelope |
+| `fs` | int | Hz | > 0 | |
+| `mode` | str | — | `'fast'` (default), `'slow'`, `'impulse'` | $\tau$ = 125 ms / 1 s / 35 ms attack + 1.5 s decay |
+| `TimeWeighting(fs, mode)` (class) | — | — | — | Stateful variant for streaming: `process(x)` carries the integrator state between blocks |
+
+The output has the units of $x^2$: take `10*log10(y / p0**2)` for SPL or use
+the level functions, which do it for you.
+
+## 4. Verified ballistics (IEC 61672-1 Table 4)
+
+The Fast envelope's response to 4 kHz tonebursts lands exactly on the
+standard's reference values: the example below verifies the 200 ms Fast
+burst row; the CI suite covers the full Table 4, from 1 s down to 1 ms for F
+and 1 s down to 2 ms for S, at class 1 acceptance limits:
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/tone_burst_iec.svg" alt="Fast envelope responses to 200, 50 and 10 ms tone bursts peaking exactly at the IEC 61672-1 Table 4 reference values" width="80%" />
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import numpy as np
+import matplotlib.pyplot as plt
+from phonometry import filters
+
+fs = 48000
+t = np.arange(int(fs * 2)) / fs
+tone = np.sin(2 * np.pi * 4000 * t)
+
+# Steady-state Fast reference of the continuous tone
+reference = filters.time_weighting(tone, fs, mode='fast')[int(1.5 * fs):].mean()
+
+# 200 ms burst of the same tone (IEC 61672-1 Table 4 target: -1.0 dB)
+burst = np.zeros_like(t)
+burst[int(0.5 * fs):int(0.7 * fs)] = tone[int(0.5 * fs):int(0.7 * fs)]
+envelope = filters.time_weighting(burst, fs, mode='fast')
+env_db = 10 * np.log10(np.maximum(envelope / reference, 1e-6))
+
+plt.figure()
+plt.plot(t, env_db, label='Fast envelope')
+plt.axhline(-1.0, linestyle='--', label='IEC target −1.0 dB')
+plt.xlabel('Time [s]')
+plt.ylabel('Level re steady state [dB]')
+plt.legend()
+plt.show()
+```
+
+</details>
+
+## 5. Initial state
+
+By default, the exponential integrator starts from rest (`y[-1] = 0`). Passing
+`initial_state=None` leaves this default unspecified, while `initial_state='zero'`
+requests the same zero state explicitly. If the recorded segment begins after a
+steady signal is already present, you can start from the first sample energy instead:
+
+```python
+import numpy as np
+from phonometry import filters
+
+# recording: a calibrated microphone capture (Pa) — recorded through your measurement chain. Synthesized here so the guide runs standalone.
+fs = 48000
+recording = 0.2 * np.sin(2 * np.pi * 1000 * np.arange(fs) / fs)
+
+energy_envelope = filters.time_weighting(recording, fs, mode='fast', initial_state='first')
+```
+
+## 6. Block processing
+
+For block processing, pass the last output value from the previous block as the
+next block's `initial_state` instead of resetting each block:
+
+```python
+from phonometry import filters
+
+state = None
+
+# audio_blocks: consecutive frames of your calibrated recording (Pa),
+#   streamed from your sound card or read from a WAV in blocks.
+for block in audio_blocks:
+    energy_envelope = filters.time_weighting(block, fs, mode='fast', initial_state=state)
+    state = energy_envelope[-1]
+```
+
+For multichannel blocks with time on the last axis, carry one state per channel:
+use `state = energy_envelope[..., -1]`. A scalar `initial_state` is applied to
+every channel, while an array must match or broadcast to the non-time shape,
+such as `(n_channels,)` for input shaped `(n_channels, n_samples)`.
+
+Or let the `TimeWeighting` class carry the state for you:
+
+```python
+from phonometry import filters
+
+tw = filters.TimeWeighting(fs, mode='fast')
+# audio_blocks: consecutive frames of your calibrated recording (Pa),
+#   streamed from your sound card or read from a WAV in blocks.
+for block in audio_blocks:
+    energy_envelope = tw.process(block)
+```
+
+Concatenated block outputs are exactly equal to a single continuous call
+(verified for all three modes, mono and multichannel). Call `tw.reset()` to
+start from rest again.
+
+## 7. Performance note
+
+The `impulse` mode uses an asymmetric kernel that is JIT-compiled when
+[numba](https://numba.pydata.org/) is installed (`pip install phonometry[perf]`).
+Without numba a pure-Python fallback produces identical results, just slower.
+
+See [Integrated & Statistical Levels](/phonometry/signals/levels/levels/) for
+$L_{eq}$/$L_N$ metrics built on these envelopes, and
+[Why phonometry](/phonometry/start/why-phonometry/) for the IEC
+61672-1 tone-burst verification.
+
+## What this guide covers
+
+**Covered.** IEC 61672-1:2013's exponential time-weighting detector
+(clause 3.8) with the Fast and Slow time constants (clause 5.7),
+implemented as the recursive filter of `time_weighting` and the streaming
+`TimeWeighting` class, verified in CI against the class 1 tone-burst
+references of Table 4. The legacy asymmetric Impulse ballistics (35 ms
+attack, 1.5 s decay), carried into the international standards from the
+FAST/SLOW/IMPULSE characteristics of ANSI S1.4-1983.
+
+**Not covered.** IEC 61672-1's wider instrument chain (frequency
+weighting, level ranges, periodic tests) is not on this page; it is the
+subject of
+[Build a sound level meter](/phonometry/signals/sound-level-meter/). ANSI
+S1.4-1983 is cited only for the historical origin of the F and S
+constants, not implemented as its own instrument specification. Modern
+impulsiveness rating ($L_{Aeq}$ plus an adjustment, or onset analysis) is
+on the
+[Impulsive-sound prominence](/phonometry/environment/assessment/impulsive-sound/) page,
+not built on the Impulse weighting here.
+
+## See also
+
+- [Levels](/phonometry/signals/levels/levels/): the percentile levels defined on the detector's output, and the integrated metrics that bypass it.
+- [Build a sound level meter](/phonometry/signals/sound-level-meter/): the complete IEC 61672-1 instrument chain around this detector.
+- [Frequency Weighting](/phonometry/signals/levels/weighting/): the A/C/Z filters applied before the detector.
+- [Block Processing](/phonometry/signals/filters/block-processing/): streaming the detector over frames without state discontinuities.
+- [Impulsive-sound prominence](/phonometry/environment/assessment/impulsive-sound/): the modern onset-based rating of impulses that replaced the I weighting.
+- API reference: [`filters.weighting`](/phonometry/reference/api/filters/weighting/).

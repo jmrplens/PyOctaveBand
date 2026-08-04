@@ -94,7 +94,7 @@ unchanged) that also carries the sample rate and method and adds an `.plot()`.
 Two more excitations from the transfer-function literature - complementary
 Golay pairs with exactly noise-free deconvolution, and sweeps shaped to an
 arbitrary target spectrum - live in the
-[system-measurement guide](../../signal/spectra/system-measurement.md) and return the same
+[system-measurement guide](../../signals/spectra/system-measurement.md) and return the same
 result types.
 
 **The two excitations.** The exponential sweep sweeps its energy up the
@@ -304,7 +304,7 @@ deconvolution identities in the [conformance report](../../CONFORMANCE.md).
   parameters computed from the IR this page acquires.
 - [Open-Plan Office Acoustics (ISO 3382-3)](open-plan-acoustics.md): the
   speech-privacy line measured with the same acquisition.
-- [System Measurement](../../signal/spectra/system-measurement.md): complementary Golay pairs and
+- [System Measurement](../../signals/spectra/system-measurement.md): complementary Golay pairs and
   spectrally shaped sweeps, returning the same result types.
 - [Swept-Sine Distortion & Phase](../../devices/electroacoustics/swept-sine-distortion.md): the Farina
   reading of the distortion the sweep separates.

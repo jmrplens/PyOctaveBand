@@ -1113,8 +1113,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   The old addresses are gone rather than redirected: the site has been public
   for days, is unannounced, and the link validator that fails the build on a
   dead internal link is a better guarantee than a redirect table nobody reads.
-  The `llms.txt` shards follow the same shape, so `llms-signal-filters.txt`
+  The `llms.txt` shards follow the same shape, so `llms-signals-filters.txt`
   replaces `llms-octave-filtering.txt` and its siblings.
+
+  The signal chapter itself is `/signals/`, plural, matching the
+  `phonometry.signals` package, whose own plural exists to keep it apart from
+  `scipy.signal` in the code a reader writes. One name for the folder, the
+  package, the topic and the shards, with the same clean break as the rest of
+  the move.
 
 - The eighteen domain packages are named explicitly in `phonometry/__init__.py`
   rather than bound as a side effect of importing the flat API. Nothing changes

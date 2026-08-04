@@ -24,7 +24,7 @@ ajustes de propagación normalizados.
 
 Esta sección se apoya en el núcleo de la biblioteca más que ninguna otra: los
 niveles de valoración y el Lden en que termina la evaluación ambiental viven
-en [Niveles integrados y estadísticos](/phonometry/es/signal/levels/levels/), y la
+en [Niveles integrados y estadísticos](/phonometry/es/signals/levels/levels/), y la
 absorción atmosférica que consume todo modelo de propagación se comparte con
 las páginas de salas y materiales. Empieza por
 [Propagación del sonido en exteriores](/phonometry/es/environment/propagation/outdoor-propagation/):

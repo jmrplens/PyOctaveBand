@@ -62,7 +62,7 @@ NOT_PAGES = frozenset({"README", "CONFORMANCE", "ERRATA"})
 #: folder of `content/docs/` whose `index` page links the guides inside it, so
 #: the grouping follows the content rather than a second hand-kept list.
 AREAS: tuple[tuple[str, str], ...] = (
-    ("signal", "Signal analysis"),
+    ("signals", "Signal analysis"),
     ("perception", "Hearing and perception"),
     ("buildings", "Rooms and buildings"),
     ("materials", "Materials and surfaces"),
@@ -133,8 +133,8 @@ def _routes() -> list[tuple[str, str]]:
     """Every docs/ page as ``(path under docs/, site route)``.
 
     The mirror is laid out like the site, so the route is the path: the page
-    at ``docs/signal/filters/filter-banks.md`` is published at
-    ``/signal/filters/filter-banks/``. Raises if a mirror page has no page on
+    at ``docs/signals/filters/filter-banks.md`` is published at
+    ``/signals/filters/filter-banks/``. Raises if a mirror page has no page on
     the site, which would otherwise vanish from llms.txt silently, exactly how
     the hand-kept list rotted.
     """

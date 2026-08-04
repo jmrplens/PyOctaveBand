@@ -1,0 +1,315 @@
+---
+title: "Promediado síncrono en el tiempo"
+description: "Extracción de una forma de onda repetitiva de período conocido del ruido asíncrono mediante promediado en el dominio del tiempo (McFadden 1987): el filtro peine que describe la operación en el dominio de la frecuencia, la ley de reducción de ruido en raíz cuadrada, la elección del número de promedios que sitúa un nodo del peine sobre un orden interferente, y la alineación de banda limitada usada cuando el período no cae en un número entero de muestras."
+references:
+  - type: article
+    authors: ["McFadden, P. D."]
+    year: 1987
+    title: "A revised model for the extraction of periodic waveforms by time domain averaging"
+    journal: "Mechanical Systems and Signal Processing"
+    volume: 1
+    issue: 1
+    pages: "83-95"
+    doi: "10.1016/0888-3270(87)90043-2"
+    note: "El modelo de filtro peine del promediado síncrono (Ec. 8, magnitud Ec. 9), el modelo revisado de registro finito que produce un resultado exactamente periódico, y la observación de que un orden interferente no armónico se rechaza mejor eligiendo el número de promedios de modo que un nodo del peine caiga sobre él, no con la potencia de dos habitual."
+---
+
+import ThemeImage from '../../../../../components/ThemeImage.astro';
+
+Una máquina rotativa repite su firma una vez por revolución. Enterrada en el
+ruido de banda ancha y en los tonos del resto de los ejes, esa forma de onda
+repetitiva es difícil de leer directamente. El **promediado síncrono en el
+tiempo** (TSA) la recupera: dado el período $T$ de una revolución, trocea el
+registro en bloques sucesivos de longitud $T$ y los promedia. Toda componente
+síncrona con $T$ se refuerza; todo lo asíncrono, el ruido y los armónicos de
+ejes no relacionados, se promedia hasta desaparecer. `time_synchronous_average`
+implementa el modelo de P. D. McFadden, *A revised model for the extraction of
+periodic waveforms by time domain averaging* (1987).
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/synchronous_average_es.svg" alt="Figura de dos paneles. Izquierda: un período ruidoso de una señal en gris tenue oscila muy por encima y por debajo de una curva suave; el promedio de cuarenta períodos, en azul, se sitúa casi exactamente sobre la forma de onda verdadera en rojo discontinuo, de modo que el ruido asíncrono se ha eliminado. Derecha: la magnitud del filtro peine entre los órdenes 31 y 33, con dientes de altura unidad en los órdenes enteros; para N = 20 un nodo profundo cae exactamente sobre el tono interferente marcado en 32,05 órdenes, mientras que la potencia de dos N = 32 deja allí un lóbulo lateral y deja pasar el tono." width="92%" loading="eager" />
+
+<details>
+<summary>Ver el código de esta figura</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import (
+    comb_filter_response,
+    noise_signal,
+    time_synchronous_average,
+)
+
+fs = 8192.0
+period = 1.0 / 32.0        # una revolución: 256 muestras a esta frecuencia
+m, n_avg = 256, 40
+phase = np.arange((n_avg + 1) * m) / m
+periodic = (
+    np.cos(2.0 * np.pi * phase)
+    + 0.5 * np.cos(2.0 * np.pi * 3.0 * phase + 0.4)
+    - 0.3 * np.cos(2.0 * np.pi * 6.0 * phase)
+)
+recording = periodic + noise_signal(fs, phase.size / fs, rms=0.9, seed=11)
+res = time_synchronous_average(recording, fs, period, n_averages=n_avg)
+
+fig, (ax0, ax1) = plt.subplots(1, 2, figsize=(11, 4.6))
+t_ms = 1e3 * res.times
+ax0.plot(t_ms, recording[:m], color="#cccccc", label="Un período ruidoso")
+ax0.plot(t_ms, res.period_waveform, color="#1f77b4", lw=1.8,
+         label=f"Promedio de N = {n_avg} períodos")
+ax0.plot(t_ms, periodic[:m], "--", color="#d62728", label="Forma verdadera")
+ax0.set_xlabel("Tiempo [ms]"); ax0.set_ylabel("Amplitud"); ax0.legend()
+
+orders = np.linspace(31.0, 33.0, 4000)
+freqs = orders / period
+ax1.plot(orders, comb_filter_response(freqs, period, 32), color="#2ca02c",
+         label="N = 32 (potencia de dos)")
+ax1.plot(orders, comb_filter_response(freqs, period, 20), color="#1f77b4",
+         label="N = 20 (nodo en 32,05)")
+ax1.axvline(32.05, color="#d62728", ls=":", label="Tono interferente")
+ax1.set_xlabel("Frecuencia [órdenes]"); ax1.set_ylabel("Magnitud del filtro peine")
+ax1.set_ylim(0, 1.05); ax1.legend()
+plt.show()
+```
+
+</details>
+
+El método `.plot()` dibuja la forma de onda promediada y el filtro peine en una
+sola llamada:
+
+```python
+res.plot()          # etiquetas en inglés; res.plot(language="es") en español
+```
+
+Antes del álgebra, el procedimiento en sí: un disparo marca cada revolución,
+el registro se trocea en cada disparo, y los bloques alineados se promedian:
+lo que se repite con el periodo sobrevive intacto mientras el contenido
+asíncrono se atenúa.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_synchronous_averaging_es.svg" alt="Diagrama de bloques del promediado síncrono temporal: un tacómetro entrega un pulso de disparo por revolución con periodo T igual a 1 entre 32 segundos, 256 muestras a 8192 hercios, el registro ruidoso se trocea en cada disparo en N bloques alineados de un periodo, y su promedio coherente, aquí N igual a 40, conserva la parte periódica con ganancia unidad del filtro peine en cada orden k entre T; una nota discontinua cuantifica que la potencia del ruido asíncrono cae 10 log N igual a 16 decibelios con N igual a 40, una ganancia en amplitud de 6,3, mientras una caja de residual guarda el registro menos el promedio repetido; el pie recuerda la regla de McFadden de que N igual a 20 pone un nodo del peine exactamente sobre un tono interferente de orden 32,05 mientras el habitual N igual a 32 no" width="92%" />
+
+## 1. El promedio es un filtro peine
+
+Promediar $N$ períodos sucesivos (McFadden Ec. 5),
+
+$$
+a(t) = \frac{1}{N} \sum_{n=0}^{N-1} y(t + n\,T),
+$$
+
+es, en el dominio de la frecuencia, la multiplicación del espectro de la señal
+por un **filtro peine** (Ec. 8). Su magnitud (Ec. 9) es el núcleo de Dirichlet
+
+$$
+|C(f)| = \left| \frac{\sin(N\pi f T)}{N \sin(\pi f T)} \right| .
+$$
+
+El peine tiene un **diente** de altura unidad en cada armónico $k/T$ (los
+órdenes $fT = 1, 2, 3, \dots$), *independiente de $N$*: las componentes
+síncronas con el período pasan intactas. Entre los dientes tiene **nodos** en
+$j/(NT)$ para todo $j$ que no sea múltiplo de $N$, donde la respuesta es
+exactamente cero. `comb_filter_response` evalúa esta forma cerrada
+directamente:
+
+```python
+import numpy as np
+from phonometry import comb_filter_response
+
+period = 1.0 / 32.0
+comb_filter_response(np.array([16.0 / period]), period, 8)   # 1.0 en un diente
+comb_filter_response(np.array([0.25 / period]), period, 2)   # 1/sqrt(2)
+comb_filter_response(np.array([0.5 / period]), period, 2)    # 0.0 en un nodo
+```
+
+`SynchronousAverageResult` lleva la respuesta sobre los primeros armónicos en
+`comb_frequencies` y `comb_response`, de modo que la forma del filtro que el
+promedio aplicó está disponible junto a la forma de onda recuperada.
+
+## 2. El ruido cae como la raíz cuadrada del número de promedios
+
+El ruido asíncrono de varianza $\sigma^2$ promediado sobre $N$ períodos tiene
+varianza residual $\sigma^2/N$: la desviación típica residual cae como
+$1/\sqrt{N}$, y la relación señal-ruido en amplitud mejora en $\sqrt{N}$. Eso
+es una reducción de potencia de $10\log_{10} N$ dB, reportada como
+`noise_reduction_db`, con la ganancia en amplitud $\sqrt{N}$ como
+`amplitude_snr_gain`:
+
+```python
+res = time_synchronous_average(recording, fs, period, n_averages=100)
+res.noise_reduction_db      # 20.0 dB = 10*log10(100)
+res.amplitude_snr_gain      # 10.0   = sqrt(100)
+res.plot(language="es")     # forma de onda promediada + el peine aplicado
+```
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/tsa_noise_reduction_es.svg" alt="Gráfica log-log del error RMS del promedio síncrono frente al número de promedios de 1 a 128: los marcadores del error medido caen a lo largo de la línea discontinua ideal de uno entre raíz de N, bajando desde aproximadamente 1 con un solo período hasta menos de 0,1 con 128 promedios" width="82%" />
+
+*La ley $\sqrt{N}$ medida de principio a fin: el error RMS de la forma de onda
+promediada de una firma de engranaje de tres armónicos en ruido de varianza
+unidad cae a lo largo de la línea ideal $\sigma/\sqrt{N}$ a medida que el
+número de períodos promediados crece de 1 a 128.*
+
+<details>
+<summary>Mostrar el código de esta figura</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import time_synchronous_average
+
+fs = 8192.0
+samples = 256
+period = samples / fs
+m = np.arange(samples) / fs
+true = (np.cos(2 * np.pi * m / period)
+        + 0.5 * np.cos(2 * np.pi * 3 * m / period + 0.7)
+        + 0.25 * np.cos(2 * np.pi * 5 * m / period + 1.1))
+rng = np.random.default_rng(5)
+recording = np.tile(true, 128) + rng.standard_normal(128 * samples)
+
+counts = [1, 2, 4, 8, 16, 32, 64, 128]
+errors = []
+for n in counts:
+    res = time_synchronous_average(recording[:n * samples], fs, period,
+                                   n_averages=n)
+    errors.append(np.sqrt(np.mean((res.period_waveform - true) ** 2)))
+
+# Una línea: la forma de onda promediada y el peine que aplicó:
+res.plot(language="es")
+plt.show()
+
+# La ley sqrt(N) a mano: error medido contra la línea ideal:
+fig, ax = plt.subplots()
+ax.loglog(counts, errors, "o-", label="error RMS medido")
+ax.loglog(counts, 1 / np.sqrt(np.array(counts)), "r--",
+          label="sigma/sqrt(N) ideal")
+ax.set(xlabel="Número de promedios N", ylabel="Error RMS")
+ax.legend()
+plt.show()
+```
+
+</details>
+
+Esta ley es la ideal: se cumple cuando el ruido no está correlado de un período
+al siguiente, de modo que el ruido de color o síncrono correlado entre períodos
+no tiene por qué seguirla. El `residual` (entrada menos la reconstrucción
+periódica sobre el tramo analizado) y su `residual_rms` reportan, por tanto, el
+ruido realmente restante una vez eliminada la componente síncrona.
+
+## 3. Elegir N para rechazar un orden interferente
+
+Como hay un diente sobre *todos* los órdenes enteros, el TSA deja pasar los
+armónicos del eje objetivo pero también cualquier tono que caiga en un orden
+entero. Un tono en un orden *no armónico* $q = fT$ solo es atenuado por el
+peine, no eliminado, y cuánto depende de dónde caiga el nodo más cercano. El
+resultado del modelo revisado de McFadden es que tal interferente se rechaza
+mejor eligiendo $N$ de modo que un nodo caiga exactamente sobre él, es decir,
+el menor $N$ con $Nq$ entero, en vez de con el número de promedios potencia
+de dos habitual. Un nodo exacto solo existe cuando el orden $q$ es racional, de
+modo que algún $N$ finito hace $Nq$ entero; para un orden irracional o solo
+estimado, elige el $N$ cuyo nodo caiga más cerca del orden interferente.
+
+Su propio ejemplo es un tono en 32,05 órdenes. Con $N = 20$ el producto
+$20 \cdot 32{,}05 = 641$ es entero, así que un nodo del peine cae sobre el tono
+y lo rechaza en más de 100 dB. La elección común $N = 32$ da
+$32 \cdot 32{,}05 = 1025{,}6$, que se sitúa en un lóbulo lateral: el tono
+apenas se toca. La figura de arriba muestra ambos peines en torno al orden 32; el
+promedio de extremo a extremo lo confirma:
+
+```python
+# 8.o orden verdadero más un interferente fuerte en 32,05 órdenes
+phase = np.arange(41 * 256) / 256
+recording = np.cos(2 * np.pi * 8.0 * phase) + 0.7 * np.cos(2 * np.pi * 32.05 * phase)
+
+leak_20 = time_synchronous_average(recording, fs, period, n_averages=20)
+leak_32 = time_synchronous_average(recording, fs, period, n_averages=32)
+# leak_20.period_waveform coincide con el 8.o orden limpio; leak_32 no
+```
+
+Así que un número de promedios potencia de dos, por conveniente que sea, no es
+en general la elección óptima: los órdenes interferentes presentes en la
+máquina deberían fijar $N$.
+
+## 4. Muestras por período no enteras
+
+Cuando $f_s T$ es entero, las fronteras de período caen sobre muestras, los
+bloques se trocean directamente y una señal periódica sin ruido se recupera
+con precisión de máquina (`interpolated` es `False`). Cuando $f_s T$ no es
+entero las fronteras caen entre muestras; cada bloque se alinea entonces a una
+malla entera común mediante el retardo fraccionario de banda limitada de
+[`fractional_delay`](/phonometry/es/signals/spectra/test-signals/), y la forma de onda
+se recupera dentro de ese error de interpolación (`interpolated` es `True`):
+
+```python
+fs = 8192.0
+period = 1.0 / 31.7                       # fs * period no es entero
+t = np.arange(int(40 * period * fs)) / fs
+recording = np.cos(2.0 * np.pi * t / period)  # un ciclo por revolución
+res = time_synchronous_average(recording, fs, period)
+res.interpolated                          # True: alineación por retardo fraccionario
+res.samples_per_period                    # muestras enteras de un período
+```
+
+Por defecto el promedio usa tantos períodos completos como contenga el
+registro; pasa `n_averages` para fijar el número (para la elección de nodo del
+§3), y `n_harmonics` para fijar cuántos armónicos de $1/T$ abarca la respuesta
+del peine devuelta.
+
+La alineación de banda limitada comparte su núcleo con la alineación
+submuestral de respuestas al impulso de la
+[página de señales de prueba](/phonometry/es/signals/spectra/test-signals/), y la forma
+de onda recuperada, al ser exactamente un período, puede repetirse para
+reconstruir la parte síncrona de la señal, para restarla o para análisis de
+órdenes.
+
+## Qué herramienta de diagnóstico, y cuándo
+
+El promediado síncrono, el cepstro y el espectro de la envolvente responden
+preguntas distintas sobre una máquina rotativa, y se componen en lugar de
+competir:
+
+- **El promediado síncrono** necesita el período (un pulso de tacómetro o
+  una velocidad de eje fiable) y devuelve *la forma de onda misma*, una
+  revolución completa: la herramienta cuando quieres ver qué hace un eje o
+  un engranaje concreto por vuelta, diente a diente.
+- **El [cepstro](/phonometry/es/signals/spectra/cepstrum-echoes/)** no necesita
+  referencia y detecta *cualquier* familia periódica del espectro
+  (armónicos, bandas laterales): la herramienta cuando el período es
+  desconocido o varias familias se solapan y hay que separarlas.
+- **El [espectro de la envolvente](/phonometry/es/signals/spectra/cepstrum-echoes/#5-el-espectro-de-la-envolvente-modulaciones-como-líneas)**
+  encuentra periodicidades de la *amplitud*: la herramienta para los fallos
+  de rodamiento, cuya tasa de repetición modula una resonancia de alta
+  frecuencia en lugar de aparecer como un tono grave.
+
+La composición es práctica habitual: promedia síncronamente primero y
+resta después; el campo `residual` es el registro con la parte síncrona
+eliminada, exactamente sobre lo que conviene ejecutar el espectro de la
+envolvente cuando las componentes fuertes del engranaje ya no enmascaran la
+modulación.
+
+## Qué cubre esta guía
+
+**Cubierto.** El modelo revisado de McFadden para el promediado en el
+dominio del tiempo (*Mechanical Systems and Signal Processing*, 1987): la
+descripción por filtro peine del promedio (Ec. 8, magnitud Ec. 9)
+implementada por `comb_filter_response`, la ley de reducción de ruido en
+raíz cuadrada expuesta como `noise_reduction_db` y `amplitude_snr_gain`, y
+la elección de $N$ que sitúa un nodo del peine sobre un orden interferente,
+siguiendo el propio ejemplo del artículo con el orden 32,05.
+`time_synchronous_average` también implementa la alineación de banda
+limitada por retardo fraccionario usada cuando $f_s T$ no es entero.
+
+**No cubierto.** El TSA necesita un período conocido; encontrar ese
+período, o detectar familias periódicas sin conocerlo, es tarea del
+[cepstro](/phonometry/es/signals/spectra/cepstrum-echoes/), no de esta página.
+Localizar periodicidades de modulación de amplitud, como los fallos de
+rodamiento, es el
+[espectro de la envolvente](/phonometry/es/signals/spectra/cepstrum-echoes/#5-el-espectro-de-la-envolvente-modulaciones-como-líneas),
+también fuera de esta página. El artículo de McFadden no es una norma de
+certificación, así que no hay ninguna cláusula de cumplimiento contra la
+que comprobar la implementación.
+
+## Véase también
+
+- [Cepstro y ecos](/phonometry/es/signals/spectra/cepstrum-echoes/): detección sin referencia de familias de armónicos y bandas laterales, y el espectro de la envolvente.
+- [Correlación y retardo](/phonometry/es/signals/spectra/correlation-delay/): la envolvente de Hilbert que sustenta el análisis de envolvente.
+- [Señales de prueba](/phonometry/es/signals/spectra/test-signals/): el núcleo de retardo fraccionario que usa la alineación de período no entero.
+- Referencia de la API: [`signals.synchronous_average`](/phonometry/es/reference/api/signals/synchronous-average/).

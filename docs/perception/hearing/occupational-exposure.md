@@ -5,7 +5,7 @@
 A working day is rarely measured in one take: the daily exposure level a
 regulation acts on has to be assembled from *samples* of a real shift, and
 reported with an uncertainty a hygienist can defend. `lex_8h` (in
-[Levels](../../signal/levels/levels.md)) turns *one* recording into a daily level. ISO 9612:2009,
+[Levels](../../signals/levels/levels.md)) turns *one* recording into a daily level. ISO 9612:2009,
 the engineering method (accuracy grade 2), is the survey design *around* that
 primitive: how to sample a real working day, how to combine the pieces, and how
 to attach the normative uncertainty every occupational-hygiene report needs. The
@@ -226,9 +226,9 @@ Annex D task-based day with the Directive 2003/10/EC assessment.*
 
 ## See also
 
-- [Levels](../../signal/levels/levels.md): the `lex_8h` / `sound_exposure` dose primitives
+- [Levels](../../signals/levels/levels.md): the `lex_8h` / `sound_exposure` dose primitives
   (IEC 61252) and the $L_{Cpeak}$ these strategies report alongside.
-- [Measurement uncertainty](../../signal/metrology/gum-uncertainty.md): the GUM machinery behind
+- [Measurement uncertainty](../../signals/metrology/gum-uncertainty.md): the GUM machinery behind
   combined and expanded uncertainties.
 - [Theory](../../reference/theory/environment-transport.md): the derivation of the strategy formulas and the
   Annex C budget.

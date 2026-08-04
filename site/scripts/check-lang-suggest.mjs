@@ -53,8 +53,8 @@ async function visit(path, { languages = ['es-ES', 'es'], seed = {}, ua } = {}) 
 
 // 1. First visit, Spanish browser, English page: the banner offers Spanish
 //    and nothing navigates.
-expect('banner: first visit, es browser on an EN page', await visit('/signal/levels/levels/'), {
-	url: `${BASE_PATH}/signal/levels/levels/`,
+expect('banner: first visit, es browser on an EN page', await visit('/signals/levels/levels/'), {
+	url: `${BASE_PATH}/signals/levels/levels/`,
 	banner: true,
 	stored: null,
 });
@@ -62,46 +62,46 @@ expect('banner: first visit, es browser on an EN page', await visit('/signal/lev
 // 2. Same page, English browser: silent.
 expect(
 	'banner: en browser on an EN page stays silent',
-	await visit('/signal/levels/levels/', { languages: ['en-GB', 'en'] }),
-	{ url: `${BASE_PATH}/signal/levels/levels/`, banner: false, stored: null },
+	await visit('/signals/levels/levels/', { languages: ['en-GB', 'en'] }),
+	{ url: `${BASE_PATH}/signals/levels/levels/`, banner: false, stored: null },
 );
 
 // 3. Spanish page, English browser: the banner offers English.
 expect(
 	'banner: en browser on an ES page',
-	await visit('/es/signal/levels/levels/', { languages: ['en-US', 'en'] }),
-	{ url: `${BASE_PATH}/es/signal/levels/levels/`, banner: true, stored: null },
+	await visit('/es/signals/levels/levels/', { languages: ['en-US', 'en'] }),
+	{ url: `${BASE_PATH}/es/signals/levels/levels/`, banner: true, stored: null },
 );
 
 // 4. A stored Spanish choice does not fire on an English URL the visitor
 //    opened deliberately: it offers, it never navigates.
 expect(
 	'no trap: stored es choice on an EN url only offers',
-	await visit('/signal/levels/levels/', { seed: { 'phonometry:lang': 'es' } }),
-	{ url: `${BASE_PATH}/signal/levels/levels/`, banner: true, stored: 'es' },
+	await visit('/signals/levels/levels/', { seed: { 'phonometry:lang': 'es' } }),
+	{ url: `${BASE_PATH}/signals/levels/levels/`, banner: true, stored: 'es' },
 );
 
 // 5. An explicit ?lang=en is a decision: recorded, and silent.
 expect(
 	'explicit ?lang=en wins over the browser list',
-	await visit('/signal/levels/levels/?lang=en'),
-	{ url: `${BASE_PATH}/signal/levels/levels/`, banner: false, stored: 'en' },
+	await visit('/signals/levels/levels/?lang=en'),
+	{ url: `${BASE_PATH}/signals/levels/levels/`, banner: false, stored: 'en' },
 );
 
 // 6. A previous dismissal keeps it quiet.
 expect(
 	'dismissed stays dismissed',
-	await visit('/signal/levels/levels/', { seed: { 'phonometry:lang-dismissed': '1' } }),
-	{ url: `${BASE_PATH}/signal/levels/levels/`, banner: false, stored: null },
+	await visit('/signals/levels/levels/', { seed: { 'phonometry:lang-dismissed': '1' } }),
+	{ url: `${BASE_PATH}/signals/levels/levels/`, banner: false, stored: null },
 );
 
 // 7. Crawlers see nothing.
 expect(
 	'crawler user agent is skipped',
-	await visit('/signal/levels/levels/', {
+	await visit('/signals/levels/levels/', {
 		ua: 'Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)',
 	}),
-	{ url: `${BASE_PATH}/signal/levels/levels/`, banner: false, stored: null },
+	{ url: `${BASE_PATH}/signals/levels/levels/`, banner: false, stored: null },
 );
 
 // 8. The English-only API subtree opts out entirely.
@@ -132,7 +132,7 @@ expect(
 		Object.defineProperty(navigator, 'languages', { get: () => ['es-ES', 'es'] });
 		Object.defineProperty(navigator, 'language', { get: () => 'es-ES' });
 	});
-	await page.goto(`${BASE}${BASE_PATH}/signal/levels/levels/`, {
+	await page.goto(`${BASE}${BASE_PATH}/signals/levels/levels/`, {
 		waitUntil: 'networkidle0',
 		timeout: 60000,
 	});

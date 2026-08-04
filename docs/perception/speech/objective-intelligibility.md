@@ -245,5 +245,5 @@ the room keeps the STI poor.
   channel from its impulse response or a STIPA recording.
 - [Speech Intelligibility Index](speech-intelligibility.md): predicts
   intelligibility from speech, noise and hearing-threshold spectra.
-- [Filter banks](../../signal/filters/filter-banks.md): the one-third-octave bands the front end
+- [Filter banks](../../signals/filters/filter-banks.md): the one-third-octave bands the front end
   groups the DFT into.

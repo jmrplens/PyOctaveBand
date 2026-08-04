@@ -14,7 +14,7 @@ how a working day's exposure is measured and reported.
 
 The three build on each other in one direction: the psychoacoustic models
 consume calibrated signals or band spectra from the
-[core analysis](../signal/index.md); the speech
+[core analysis](../signals/index.md); the speech
 indices consume band levels and, in the SII's case, the hearing thresholds
 that the hearing pages quantify; and the exposure metrics feed the
 hearing-damage model of ISO 1999.

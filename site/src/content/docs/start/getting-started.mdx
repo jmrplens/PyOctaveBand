@@ -68,9 +68,9 @@ standardized bands, smooth it in time and reduce it to metrics:
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_signal_chain.svg" alt="phonometry processing chain: signal, calibration, frequency weighting, octave filter bank, time weighting and metrics, with the standard verified at each stage" width="92%" loading="eager" />
 
 Each stage is an independent function or class you can use on its own; the
-guides cover them left to right ([Calibration](/phonometry/signal/metrology/calibration/) →
-[Frequency Weighting](/phonometry/signal/levels/weighting/) → [Filter Banks](/phonometry/signal/filters/filter-banks/) →
-[Time Weighting](/phonometry/signal/levels/time-weighting/) → [Levels](/phonometry/signal/levels/levels/)).
+guides cover them left to right ([Calibration](/phonometry/signals/metrology/calibration/) →
+[Frequency Weighting](/phonometry/signals/levels/weighting/) → [Filter Banks](/phonometry/signals/filters/filter-banks/) →
+[Time Weighting](/phonometry/signals/levels/time-weighting/) → [Levels](/phonometry/signals/levels/levels/)).
 
 ## Basic Usage: 1/3 Octave Analysis
 
@@ -160,8 +160,8 @@ object exposes a one-line `.plot(language="en"|"es")` figure and, where a
 standard defines a reporting format, a `.report()` method that renders the
 normative PDF fiche.
 
-- [Filter Architecture Gallery](/phonometry/signal/filters/filter-gallery/): choose an architecture and inspect responses
-- [Calibration and dBFS](/phonometry/signal/metrology/calibration/): get real-world SPL values
+- [Filter Architecture Gallery](/phonometry/signals/filters/filter-gallery/): choose an architecture and inspect responses
+- [Calibration and dBFS](/phonometry/signals/metrology/calibration/): get real-world SPL values
 - [Why phonometry](/phonometry/start/why-phonometry/): the conformance-first design philosophy
 - [Conformance report](/phonometry/reference/conformance/): the expected and computed value of all {totalChecks} checks
 - [API Reference](/phonometry/reference/api/): every parameter of every function

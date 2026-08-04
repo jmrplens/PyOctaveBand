@@ -200,7 +200,7 @@ $$
 The digital filter is obtained from the analog poles/zeros via the bilinear
 transform. Because the bilinear transform compresses frequencies near Nyquist,
 the default `high_accuracy` mode designs and runs the filter at an internally
-oversampled rate (≥ 144 kHz); see [Frequency Weighting](../../signal/levels/weighting.md).
+oversampled rate (≥ 144 kHz); see [Frequency Weighting](../../signals/levels/weighting.md).
 
 ## Time Integration
 
@@ -240,7 +240,7 @@ The four zeros against eight poles shape the characteristic response: a rise of 
 
 Since G acts on 0.25 Hz – 315 Hz, far below the Nyquist frequency at audio rates, the frequency warping of the plain bilinear transform (applied without prewarping) is negligible there: about 0.014 % at 315 Hz for $f_s = 48$ kHz, under 0.01 dB on the response. The internal oversampling used for the A/C designs (whose action extends to 16 kHz) is therefore not applied.
 
-See the [Special Weightings guide](../../signal/levels/special-weightings.md) for usage.
+See the [Special Weightings guide](../../signals/levels/special-weightings.md) for usage.
 
 ## Event and dose metrics
 
@@ -266,7 +266,7 @@ It is identical to $L_{EP,d}$ of Directive 86/188/EEC and $L_{EX,8h}$ of ISO 199
 
 **$L_{Cpeak}$** (IEC 61672-1:2013, subclause 5.13) is the absolute maximum of the C-weighted sound pressure expressed in dB, $L_{Cpeak} = 20\log_{10}(\max|p_C(t)|/p_0)$, the quantity behind the 135/137/140 dB(C) occupational action limits. The implementation is verified against the one-cycle and half-cycle reference responses of Table 5.
 
-See the [Levels guide](../../signal/levels/levels.md) for usage and the [Calibration guide](../../signal/metrology/calibration.md) for absolute-scale setup.
+See the [Levels guide](../../signals/levels/levels.md) for usage and the [Calibration guide](../../signals/metrology/calibration.md) for absolute-scale setup.
 
 ## Sound intensity (IEC 61043)
 
@@ -336,7 +336,7 @@ inputs; the output is nearly trapezoidal, not Gaussian, so the interval is
 narrower than $\pm 1.96\,u$), and the GUM Annex H.1 end-gauge example gives
 $k = t_{0.99}(\nu_{\mathrm{eff}} = 16) = 2.92$ and $U_{99} = 93$ nm.
 
-See the [GUM Uncertainty guide](../../signal/metrology/gum-uncertainty.md) for usage.
+See the [GUM Uncertainty guide](../../signals/metrology/gum-uncertainty.md) for usage.
 
 ## References
 

@@ -159,7 +159,7 @@ export const en: HomeContent = {
 		areas: [
 			{
 				name: 'Signal analysis',
-				href: '/phonometry/signal/',
+				href: '/phonometry/signals/',
 				summary: 'Filter banks, weighting, levels, spectra, calibration and uncertainty.',
 				standards: ['IEC 61260-1', 'ANSI S1.11', 'IEC 61672-1', 'ISO 7196', 'IEC 61252', 'ISO 1996-1', 'IEC 60942', 'GUM'],
 			},
@@ -306,7 +306,7 @@ export const es: HomeContent = {
 		areas: [
 			{
 				name: 'Análisis de señal',
-				href: '/phonometry/es/signal/',
+				href: '/phonometry/es/signals/',
 				summary: 'Bancos de filtros, ponderaciones, niveles, espectros, calibración e incertidumbre.',
 				standards: ['IEC 61260-1', 'ANSI S1.11', 'IEC 61672-1', 'ISO 7196', 'IEC 61252', 'ISO 1996-1', 'IEC 60942', 'GUM'],
 			},

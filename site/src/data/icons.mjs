@@ -48,7 +48,7 @@ export const topicIcons = {
 
   // A level trace: quiet, one loud event, the decay. Two features rather than
   // five, because at 16 px a busy trace closes into a smudge.
-  signal: `
+  signals: `
     <path d="M2.6 12.6h3.2l2.6-8.4 3.4 15.6 2.8-9.8 2 4.2h4.8" />
   `,
 

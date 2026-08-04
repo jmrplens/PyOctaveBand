@@ -81,10 +81,10 @@ de la Tabla 4 (discontinua) dentro de 0,1 dB para ráfagas de 200/50/10 ms.*
 
 - Si necesitas **envolventes Fast/Slow/Impulse conformes con la norma**
   (comportamiento de sonómetro, un nivel por muestra), usa
-  [`time_weighting`](/phonometry/es/signal/levels/time-weighting/) de phonometry.
+  [`time_weighting`](/phonometry/es/signals/levels/time-weighting/) de phonometry.
 - Si necesitas un **$L_{eq}$ promediado por bloques por intervalo**, esa es una
   métrica distinta e igualmente válida; puedes calcularla con
-  [`leq`](/phonometry/es/signal/levels/levels/) sobre segmentos consecutivos.
+  [`leq`](/phonometry/es/signals/levels/levels/) sobre segmentos consecutivos.
 - Ambos enfoques son útiles; simplemente responden preguntas distintas. La
   discrepancia reportada en la incidencia #38 proviene de comparar una
   envolvente continua con un integrador por bloques, no de un error de
@@ -131,7 +131,7 @@ estricta, de la edición retirada IEC 61260:1995 / ANSI S1.11-2004 además de
 frente a la clase 1 vigente, y la ponderación A/C se mantiene dentro de las
 tolerancias de clase 1 hasta 16 kHz a las frecuencias de muestreo habituales
 gracias al sobremuestreo interno (consulta
-[Ponderación frecuencial](/phonometry/es/signal/levels/weighting/)).
+[Ponderación frecuencial](/phonometry/es/signals/levels/weighting/)).
 
 ## Cuando lo que está mal es la fuente
 

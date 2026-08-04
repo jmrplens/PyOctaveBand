@@ -1494,7 +1494,7 @@ resolve.
   same ASTM E2611 machinery as a measured specimen.
 - [FDTD Simulation](https://jmrplens.github.io/phonometry/simulation/fdtd-simulation/): the 2D solver behind the virtual
   tubes of section 5.
-- [Calibration and dBFS](https://jmrplens.github.io/phonometry/signal/metrology/calibration/): microphone calibration ahead of
+- [Calibration and dBFS](https://jmrplens.github.io/phonometry/signals/metrology/calibration/): microphone calibration ahead of
   the two-microphone transfer function.
 - API reference: [`materials.absorbers.impedance_tube`](https://jmrplens.github.io/phonometry/reference/api/materials/impedance-tube/).
 

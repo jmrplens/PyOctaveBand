@@ -52,7 +52,7 @@ level.
 
 The surrounding machinery lives nearby: the rating levels and Lden that
 assessments end in are covered in
-[Integrated and Statistical Levels](../../signal/levels/levels.md), the tonal
+[Integrated and Statistical Levels](../../signals/levels/levels.md), the tonal
 counterpart of the impulsive adjustment in
 [Objective audibility of tones in noise](../../perception/psychoacoustics/tone-audibility.md),
 and the sources that feed a propagation calculation in the

@@ -1173,9 +1173,9 @@ conventions.*
 - [Loudspeaker Characterisation (IEC 60268-5)](https://jmrplens.github.io/phonometry/devices/electroacoustics/loudspeakers/): the
   companion rated-characteristics report for the reproducing side of the
   chain.
-- [Calibration and dBFS](https://jmrplens.github.io/phonometry/signal/metrology/calibration/): turning a microphone's rated
+- [Calibration and dBFS](https://jmrplens.github.io/phonometry/signals/metrology/calibration/): turning a microphone's rated
   sensitivity into calibrated sound pressure levels.
-- [Build a sound level meter](https://jmrplens.github.io/phonometry/signal/sound-level-meter/): the measurement chain a
+- [Build a sound level meter](https://jmrplens.github.io/phonometry/signals/sound-level-meter/): the measurement chain a
   characterised microphone feeds.
 - API reference: [`electroacoustics.microphone`](https://jmrplens.github.io/phonometry/reference/api/electroacoustics/microphone/).
 

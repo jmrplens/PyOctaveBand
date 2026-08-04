@@ -1,0 +1,281 @@
+---
+title: "Señales de prueba y herramientas de muestreo"
+description: "La caja de señales del dominio de metrología: salvas de tono IEC 60268-1 con conmutación exacta, ruido de colores con pendiente espectral exacta, remuestreo polifásico tras una especificación antialias explícita, y retardo fraccionario de banda limitada con frontera lineal o circular."
+references:
+  - type: standard
+    organization: "International Electrotechnical Commission"
+    year: 1985
+    title: "Sound system equipment — Part 1: General"
+    designation: "IEC 60268-1:1985"
+    url: "https://webstore.iec.ch/en/publication/1180"
+    note: "Anexo A, cláusula A2: salvas de tono que comienzan en el paso por cero del tono con un número entero de períodos completos (A2.1), trenes repetitivos de salvas a una tasa de repetición dada (A2.2), y las duraciones de salva de la tabla AII contra las que se comprueban a mano los recuentos de muestras."
+  - type: book
+    authors: ["Bendat, J. S.", "Piersol, A. G."]
+    year: 2010
+    title: "Random data: Analysis and measurement procedures"
+    edition: "4.ª ed."
+    publisher: "Wiley"
+    doi: "10.1002/9781118032428"
+    note: "Sección 10.2 (preparación de datos: muestreo, aliasing y el requisito de filtrado antialias que el remuestreador declara explícitamente). ISBN 978-0-470-24877-5."
+---
+
+import ThemeImage from '../../../../../components/ThemeImage.astro';
+
+Una medición es tan fiable como su estímulo y su contabilidad de la
+frecuencia de muestreo. Esta página cubre la caja de señales de
+`phonometry.signals`: **salvas de tono** con la conmutación exacta que
+prescribe IEC 60268-1, los **generadores de ruido de colores** (detallados
+en la [guía de análisis espectral](/phonometry/es/signals/spectra/spectral-analysis/#5-generadores-de-ruido-de-colores)),
+**remuestreo** cuyo rechazo de alias es una especificación declarada y
+verificable en lugar de un valor por defecto de la biblioteca, y **retardo
+fraccionario** que desplaza un registro cualquier fracción de muestra con
+exactitud de banda limitada.
+
+Antes de los detalles, el retrato de familia: qué aspecto tiene cada
+estímulo en el tiempo y dónde se reparte su energía en frecuencia.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_test_signals_es.svg" alt="Cuadrícula con cinco miniaturas etiquetadas de señales de ensayo: ruido blanco con forma de onda irregular y densidad espectral plana de 0 dB por octava, igual potencia por hercio; ruido rosa con forma de onda más suave y densidad de menos 3 dB por octava, igual potencia por octava; una MLS binaria de periodo 2 elevado a m menos 1 muestras con espectro de rayas plano; un esquema tiempo-frecuencia donde el barrido lineal es una recta mientras el exponencial se pega a las frecuencias bajas y dedica igual tiempo a cada octava; y una salva de tono IEC 60268-1 de periodos completos que empieza en un paso por cero, 25 periodos de 5 kHz durante 5 ms" width="92%" />
+
+## 1. Salvas de tono (IEC 60268-1)
+
+La salva sinusoidal conmutada es el estímulo estándar del comportamiento
+dinámico: balística de sonómetros, medidores de cuasipico, potencia
+admisible de altavoces. IEC 60268-1:1985 (cláusula A2.1) fija qué es una
+salva bien formada: "debe comenzar en el paso por cero del tono y constar de
+un número entero de períodos completos". `tone_burst` genera exactamente
+eso, como salva única o como el tren repetitivo de la cláusula A2.2 en el
+que cada salva ocupa un período de repetición completo:
+
+```python
+from phonometry import tone_burst
+
+# Una salva de 5 ms de tono de 5 kHz (25 períodos completos), como en la
+# tabla AII.
+single = tone_burst(48000, 5000, 25)
+print(single.burst_samples)         # 240 muestras = 5 ms a 48 kHz
+
+# Cláusula A2.2: salvas de 5 ms a 10 salvas por segundo.
+train = tone_burst(48000, 5000, 25, repetitions=4, repetition_rate=10)
+print(train.period_samples, train.duty_cycle)   # 4800, 0.05
+train.plot(language="es")           # forma de onda con la envolvente
+```
+
+El resultado lleva el registro, la **envolvente** rectangular de
+conmutación y la contabilidad exacta de muestras (`burst_samples`,
+`onset_sample`, `period_samples`, `duty_cycle`), de modo que un informe de
+ensayo puede declarar su estímulo numéricamente. Como la puerta abarca un
+número entero de períodos completos empezando en un paso por cero, la
+energía de la salva tiene la forma cerrada exacta $A^2 N/2$, que es como se
+verifica el generador.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/tone_burst_train_es.svg" alt="Salvas de tono IEC 60268-1: una salva única de 5 ms de tono de 5 kHz que comienza en un paso por cero con su envolvente rectangular de conmutación, y un tren repetitivo de cuatro salvas a 10 salvas por segundo con un ciclo de trabajo del 5 por ciento" width="82%" loading="eager" />
+
+<details>
+<summary>Mostrar el código de esta figura</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import tone_burst
+
+fs = 48000.0
+single = tone_burst(fs, 5000, 25, pre_silence=0.001, post_silence=0.001)
+train = tone_burst(fs, 5000, 25, repetitions=4, repetition_rate=10)
+
+fig, axes = plt.subplots(2, 1, figsize=(10, 6.4))
+t_ms = 1e3 * np.arange(single.signal.size) / single.fs
+axes[0].plot(t_ms, single.signal, lw=0.9)
+axes[0].plot(t_ms, single.envelope, "r--", label="Envolvente de conmutación")
+axes[0].plot(t_ms, -single.envelope, "r--")
+axes[0].set_xlabel("Tiempo [ms]")
+
+t_s = np.arange(train.signal.size) / train.fs
+axes[1].plot(t_s, train.signal, lw=0.5)
+axes[1].plot(t_s, train.envelope, "r--", label="Envolvente de conmutación")
+axes[1].plot(t_s, -train.envelope, "r--")
+axes[1].set_xlabel("Tiempo [s]")
+
+for ax in axes:
+    ax.set_ylabel("Amplitud")
+    ax.legend(loc="upper right")
+plt.tight_layout()
+plt.show()
+```
+
+</details>
+
+Estas son las salvas que hay detrás de las respuestas de referencia de la
+[balística Fast/Slow/Impulse](/phonometry/es/signals/levels/time-weighting/) (la
+tabla 4 de IEC 61672-1 usa salvas de 4 kHz de 200, 50 y 10 ms) y de los
+ensayos dinámicos de cuasipico de la propia IEC 60268-1 (salvas de 5 kHz de
+1 a 200 ms, tabla AII).
+
+## 2. Remuestreo con especificación antialias declarada
+
+La conversión de frecuencia de muestreo esconde un filtro, y ese filtro
+decide cuánta energía con alias contamina el resultado. `resample_signal`
+remuestrea de forma polifásica racional (44,1 a 48 kHz es la razón 160/147)
+con un FIR paso bajo diseñado *dentro de la función* por el método de la
+ventana de Kaiser, a partir de dos números que controla quien llama:
+
+- `stopband_attenuation_db` (por defecto 120): el rechazo de alias, con la
+  banda atenuada empezando exactamente en la menor de las dos frecuencias
+  de Nyquist, donde se produce el plegado;
+- `transition_width` (por defecto 0,05): la fracción de esa frecuencia de
+  Nyquist cedida a la banda de transición del filtro, de modo que la banda
+  de paso termina en `(1 - transition_width)·f_Nyq` y es plana dentro de la
+  misma cota de rizado de Kaiser $\delta = 10^{-A/20}$.
+
+```python
+from phonometry import noise_signal, resample_signal
+
+x = noise_signal(44100, 5.0, color="pink", seed=1)
+res = resample_signal(x, 44100, 48000)   # 120 dB de rechazo de alias
+print(res.up, res.down)                  # 160, 147
+print(res.n_taps, res.passband_edge_hz)  # FIR diseñado, 20947.5 Hz
+res.plot()   # el filtro antisolapamiento entregado frente a su especificación
+```
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/resampling_antialias_es.svg" alt="Respuesta en magnitud del filtro antisolapamiento diseñado para un remuestreo polifásico de 44,1 a 48 kilohercios sobre un eje de frecuencia logarítmico: banda de paso plana hasta el borde discontinuo justo por debajo de 21 kilohercios, transición abrupta hasta el borde de la banda atenuada en 22,05 kilohercios, y un suelo de banda atenuada que se mantiene por debajo de la línea punteada de atenuación de diseño de menos 120 decibelios a lo largo de la banda rechazada sombreada" width="82%" />
+
+*El filtro antisolapamiento entregado por la conversión 44,1 → 48 kHz por
+defecto: la banda atenuada empieza exactamente en la frecuencia de Nyquist
+menor (donde se pliegan los alias) y se mantiene bajo la línea de diseño de
+−120 dB; la banda de paso termina un 5 % por debajo, plana dentro de la
+misma cota de rizado.*
+
+<details>
+<summary>Mostrar el código de esta figura</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from scipy import signal
+from phonometry import noise_signal, resample_signal
+
+x = noise_signal(44100, 5.0, color="pink", seed=1)
+res = resample_signal(x, 44100, 48000)   # 120 dB de rechazo de alias
+
+# res es el ResampledSignalResult calculado en el ejemplo de arriba.
+# Una línea: el filtro antisolapamiento entregado frente a su especificación:
+res.plot(language="es")
+plt.show()
+
+# A mano, desde los coeficientes que lleva el resultado, reflejando lo que
+# dibuja ResampledSignalResult.plot():
+fs_up = res.original_fs * res.up
+freqs, h = signal.freqz(res.filter_taps, worN=1 << 18, fs=fs_up)
+mag_db = 20 * np.log10(np.maximum(np.abs(h), 1e-300))
+view = (freqs > 0) & (freqs <= 4 * res.stopband_edge_hz)
+
+fig, ax = plt.subplots()
+ax.semilogx(freqs[view], mag_db[view], label="Filtro antisolapamiento |H(f)|")
+ax.axvline(res.passband_edge_hz, color="g", linestyle="--",
+           label="Borde de la banda de paso")
+ax.axvline(res.stopband_edge_hz, color="r", linestyle="--",
+           label="Borde de la banda atenuada (pliegue de alias)")
+ax.axhline(-res.stopband_attenuation_db, color="k", linestyle=":",
+           label="Atenuación de diseño -120 dB")
+ax.axvspan(res.stopband_edge_hz, 4 * res.stopband_edge_hz,
+           color="r", alpha=0.08)
+ax.set(xlabel="Frecuencia [Hz]", ylabel="Magnitud [dB]")
+ax.legend()
+plt.show()
+```
+
+</details>
+
+Los coeficientes diseñados viajan con el resultado (`filter_taps`), así que
+la especificación es *comprobable*: la batería de tests mide la respuesta en
+frecuencia del filtro devuelto y comprueba la desviación en banda de paso y
+la fuga en banda atenuada contra la propia cota de rizado del diseño (el
+diseño apunta internamente 1 dB más allá de lo pedido, de modo que el filtro
+entregado cumple los números declarados y no una aproximación de la fórmula
+de Kaiser). Un tono en banda de paso remuestreado con la especificación por
+defecto coincide con el tono analítico a la nueva frecuencia dentro de
+$10^{-120/20} = 10^{-6}$.
+
+Varios estimadores remuestrean internamente a frecuencias fijas (la
+psicoacústica ECMA-418-2 a 48 kHz, STOI a 10 kHz); esta función es la
+contrapartida pública y documentada para preparar registros fuera de esas
+cadenas.
+
+## 3. Retardo fraccionario
+
+`fractional_delay` desplaza un registro cualquier número de muestras,
+incluidas fracciones de muestra, multiplicando el espectro por la rampa de
+fase $e^{-j 2\pi f D/f_s}$: cada componente se retrasa exactamente `D` muestras.
+Dos convenciones de frontera cubren los dos casos de uso:
+
+- `mode="linear"` (por defecto) rellena el registro con ceros más allá del
+  desplazamiento, de modo que las muestras que salen por un extremo caen en
+  el relleno en lugar de dar la vuelta. Úselo para transitorios y
+  respuestas al impulso; es bit a bit idéntico al núcleo de alineación de
+  [`align_impulse_responses`](/phonometry/es/signals/spectra/correlation-delay/#3-retardo-y-alineación-de-respuestas-al-impulso).
+  Un retardo entero se reduce a un desplazamiento exacto de muestras.
+- `mode="circular"` aplica la rampa sobre el propio registro y da la
+  vuelta. Para registros periódicos es exacto: un tono centrado en un bin
+  de la DFT retrasado `D` muestras es igual al tono retrasado
+  analíticamente con precisión de máquina, y su fase cambia exactamente
+  $-2\pi f D/f_s$ radianes.
+
+```python
+import numpy as np
+from phonometry import fractional_delay
+
+y = fractional_delay(x, 0.37)                    # 0,37 muestras más tarde
+z = fractional_delay(x, -2.5, mode="circular")   # avance, con vuelta
+```
+
+Una sutileza que conviene conocer: un registro real de longitud par no
+puede llevar una componente del bin de Nyquist retrasada fraccionariamente
+(la FFT real inversa conserva solo su parte real). Toda señal muestreada
+correctamente está limitada en banda por debajo de Nyquist, así que en la
+práctica la operación es exacta; para casos sintéticos extremos, las
+longitudes impares evitan el bin por completo.
+
+## 4. Ruido de colores
+
+Los generadores deterministas de ruido de colores (`noise_signal`: blanco,
+rosa, rojo, azul y violeta con pendiente exacta en ley de potencias y
+semillas reproducibles bit a bit) completan la caja; están documentados con
+su verificación espectral en la
+[guía de análisis espectral](/phonometry/es/signals/spectra/spectral-analysis/#5-generadores-de-ruido-de-colores).
+
+## Dónde se usan estas herramientas
+
+Las [figuras de mérito de las ventanas](/phonometry/es/signals/spectra/spectral-analysis/#6-elegir-la-ventana)
+cuantifican la ventana sobre la que descansa toda estimación espectral de la
+biblioteca; el generador de salvas alimenta la balística y los ensayos de
+respuesta dinámica; y el remuestreador y el retardo fraccionario son la
+mitad de muestreo del
+[trabajo de correlación y retardo](/phonometry/es/signals/spectra/correlation-delay/),
+donde la alineación submuestra es la diferencia entre promediar respuestas
+al impulso y emborronarlas.
+
+## Qué cubre esta guía
+
+**Cubierto.** El anexo A, cláusula A2, de la IEC 60268-1:1985: la salva de
+tono que "debe comenzar en el paso por cero del tono y constar de un
+número entero de períodos completos" (A2.1) y el tren repetitivo de salvas
+de A2.2, implementados por `tone_burst` y comprobados a mano contra las
+duraciones de la tabla AII. El requisito antialias de la sección 10.2 de
+Bendat y Piersol, convertido en una especificación explícita y verificable
+por el rechazo de banda eliminada y la anchura de transición de
+`resample_signal`.
+
+**No cubierto.** La IEC 60268-1:1985 es una norma general para equipos de
+sistemas de sonido. Aquí solo se implementan las cláusulas de salvas de
+tono del anexo A; el resto de sus partes (amplificadores, altavoces,
+conectores, etc.) quedan sin tocar. `fractional_delay` y los generadores
+de ruido de colores de `noise_signal` son herramientas de DSP de
+propósito general sin norma que las gobierne; sus afirmaciones de
+exactitud son formas cerradas, no normativas.
+
+## Véase también
+
+- [Ponderación temporal](/phonometry/es/signals/levels/time-weighting/): la balística de detector que ejercitan las salvas de tono (IEC 61672-1, Tabla 4).
+- [Correlación y retardo](/phonometry/es/signals/spectra/correlation-delay/): el trabajo de alineación construido sobre el núcleo de retardo fraccionario.
+- [Promediado síncrono](/phonometry/es/signals/spectra/synchronous-averaging/): alineación de períodos con el mismo desplazamiento de banda limitada cuando $f_s T$ no es entero.
+- [Análisis espectral](/phonometry/es/signals/spectra/spectral-analysis/): la verificación del ruido de colores y las métricas de ventanas.
+- Referencia de la API: [`signals.test_signals`](/phonometry/es/reference/api/signals/test-signals/).

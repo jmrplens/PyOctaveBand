@@ -21,7 +21,7 @@ head:
             "position": 1,
             "name": "Análisis de señal",
             "description": "Bancos de filtros, ponderaciones, niveles, espectros, calibración e incertidumbre.",
-            "url": "https://jmrplens.github.io/phonometry/es/signal/"
+            "url": "https://jmrplens.github.io/phonometry/es/signals/"
           },
           {
             "@type": "ListItem",
@@ -113,7 +113,7 @@ la evidencia numérica están en [Referencia](/phonometry/es/reference/): las
 páginas de teoría explican por qué la fórmula es esa, y el informe de
 conformidad pone el valor esperado de la propia norma junto al calculado.
 
-## [Análisis de señal](/phonometry/es/signal/)
+## [Análisis de señal](/phonometry/es/signals/)
 
 Bancos de filtros, ponderaciones, niveles, espectros, calibración e
 incertidumbre. Esta es la cadena que convierte una señal digital en un número
@@ -124,41 +124,41 @@ ajustado.
 Implementa IEC 61260-1, ANSI S1.11, IEC 61672-1, ISO 7196, IEC 61252,
 ISO 1996-1, IEC 60942 y la GUM.
 
-- [Construye un sonómetro](/phonometry/es/signal/sound-level-meter/): el área
+- [Construye un sonómetro](/phonometry/es/signals/sound-level-meter/): el área
   entera montada de principio a fin en una sola página ejecutable, del tono del
   calibrador a los niveles reportados.
 
-**[Filtrado en octavas](/phonometry/es/signal/filters/)**
+**[Filtrado en octavas](/phonometry/es/signals/filters/)**
 
-- [Bancos de filtros](/phonometry/es/signal/filters/filter-banks/): la matemática de
+- [Bancos de filtros](/phonometry/es/signals/filters/filter-banks/): la matemática de
   las bandas de octava fraccional, los parámetros del banco, el ecualizador
   paramétrico, la descomposición en bandas y el filtrado de fase cero fuera de
   línea.
-- [Galería de arquitecturas de filtro](/phonometry/es/signal/filters/filter-gallery/):
+- [Galería de arquitecturas de filtro](/phonometry/es/signals/filters/filter-gallery/):
   las cinco arquitecturas de filtro comparadas en los bordes de banda, la
   galería completa de respuestas y el uso de cada arquitectura, con el
   crossover Linkwitz-Riley.
-- [Verificación de clase de filtros (IEC 61260-1)](/phonometry/es/signal/filters/filter-compliance/):
+- [Verificación de clase de filtros (IEC 61260-1)](/phonometry/es/signals/filters/filter-compliance/):
   la máscara de aceptación de la Tabla 1 banda a banda, la clase 0 de la
   edición retirada de 1995 y la ficha de conformidad.
-- [Procesado por bloques](/phonometry/es/signal/filters/block-processing/): análisis en
+- [Procesado por bloques](/phonometry/es/signals/filters/block-processing/): análisis en
   streaming con estado, que arrastra el estado de los filtros entre búferes,
   para señales que no caben en memoria.
-- [Multicanal y rendimiento](/phonometry/es/signal/filters/multichannel/): análisis
+- [Multicanal y rendimiento](/phonometry/es/signals/filters/multichannel/): análisis
   vectorizado de muchos canales a la vez, con el convenio (canales, muestras) y
   notas de rendimiento.
 
-**[Niveles y ponderación](/phonometry/es/signal/levels/)**
+**[Niveles y ponderación](/phonometry/es/signals/levels/)**
 
-- [Ponderación frecuencial (A, C, Z)](/phonometry/es/signal/levels/weighting/):
+- [Ponderación frecuencial (A, C, Z)](/phonometry/es/signals/levels/weighting/):
   las curvas de respuesta del oído de IEC 61672-1, el modo de precisión en
   alta frecuencia y la verificación de clase de la Tabla 3.
-- [Ponderaciones especiales (G, B, D, AU)](/phonometry/es/signal/levels/special-weightings/):
+- [Ponderaciones especiales (G, B, D, AU)](/phonometry/es/signals/levels/special-weightings/):
   la ponderación G para infrasonido de ISO 7196, las curvas históricas B y D
   y la AU para sonido audible en presencia de ultrasonidos.
-- [Ponderación temporal](/phonometry/es/signal/levels/time-weighting/): las balísticas
+- [Ponderación temporal](/phonometry/es/signals/levels/time-weighting/): las balísticas
   exponenciales Fast, Slow e Impulse de IEC 61672-1.
-- [Niveles integrados y estadísticos](/phonometry/es/signal/levels/levels/): $L_{eq}$ y
+- [Niveles integrados y estadísticos](/phonometry/es/signals/levels/levels/): $L_{eq}$ y
   $L_{Aeq}$, los niveles percentiles $L_{10}$/$L_{50}$/$L_{90}$, $L_{Cpeak}$ y
   SEL, y la dosis de ruido.
 - [Niveles ambientales (ISO 1996-1/-2)](/phonometry/es/environment/environmental-levels/):
@@ -169,23 +169,23 @@ ISO 1996-1, IEC 60942 y la GUM.
   periodos temporales de evaluación y las fases de ruido, las tablas de valores
   límite y la comprobación del artículo 25.
 
-**[Señales y espectros](/phonometry/es/signal/spectra/)**
+**[Señales y espectros](/phonometry/es/signals/spectra/)**
 
-- [Análisis espectral calibrado](/phonometry/es/signal/spectra/spectral-analysis/): los
+- [Análisis espectral calibrado](/phonometry/es/signals/spectra/spectral-analysis/): los
   estimadores de Welch de potencia y espectro cruzado con sus errores
   aleatorios, intervalos de confianza chi-cuadrado y suavizado en fracciones de
   octava.
-- [Coherencia múltiple y parcial](/phonometry/es/signal/spectra/miso-coherence/): la
+- [Coherencia múltiple y parcial](/phonometry/es/signals/spectra/miso-coherence/): la
   coherencia ordinaria, múltiple y parcial de varias fuentes correladas sobre
   una respuesta, y qué fuente domina cada banda.
-- [Análisis tiempo-frecuencia](/phonometry/es/signal/spectra/time-frequency/): el
+- [Análisis tiempo-frecuencia](/phonometry/es/signals/spectra/time-frequency/): el
   espectrograma STFT calibrado en dB SPL absolutos y la FFT con zoom que
   resuelve tonos más próximos que un bin práctico de FFT.
-- [Cepstro, ecos y espectro de la envolvente](/phonometry/es/signal/spectra/cepstrum-echoes/):
+- [Cepstro, ecos y espectro de la envolvente](/phonometry/es/signals/spectra/cepstrum-echoes/):
   el análisis de quefrencia, la detección de ecos con el coeficiente de
   reflexión leído en el pico cepstral, el liftering y el espectro de la
   envolvente.
-- [Promediado síncrono en el tiempo](/phonometry/es/signal/spectra/synchronous-averaging/):
+- [Promediado síncrono en el tiempo](/phonometry/es/signals/spectra/synchronous-averaging/):
   extracción de una forma de onda periódica de período conocido, el filtro peine
   que la describe y la elección del número de promedios.
 - [Frecuencias de fallo de máquinas](/phonometry/es/vibration/machinery/machine-diagnostics/):
@@ -194,27 +194,27 @@ ISO 1996-1, IEC 60942 y la GUM.
   medido: frecuencias BPFO, BPFI, BSF y de jaula de los rodamientos, bandas
   laterales de engrane, deslizamiento, paso de polos y armónicos de ranura de
   los motores de inducción, y tonos de paso de pala.
-- [Correlación, retardo y envolvente](/phonometry/es/signal/spectra/correlation-delay/):
+- [Correlación, retardo y envolvente](/phonometry/es/signals/spectra/correlation-delay/):
   la correlación con sus errores aleatorios, la estimación de retardo por
   correlación directa y las ponderaciones GCC, y la envolvente de Hilbert.
-- [Señales de prueba y herramientas de muestreo](/phonometry/es/signal/spectra/test-signals/):
+- [Señales de prueba y herramientas de muestreo](/phonometry/es/signals/spectra/test-signals/):
   salvas de tono IEC 60268-1 con conmutación exacta, ruido de colores con
   pendiente exacta, remuestreo con especificación antialias declarada y retardo
   fraccionario.
-- [Medición de sistemas](/phonometry/es/signal/spectra/system-measurement/): pares
+- [Medición de sistemas](/phonometry/es/signals/spectra/system-measurement/): pares
   complementarios de Golay, barridos conformados a un espectro de magnitud
   objetivo arbitrario e inversión con regularización de Kirkeby de una respuesta
   medida.
 
-**[Calibración e incertidumbre](/phonometry/es/signal/metrology/)**
+**[Calibración e incertidumbre](/phonometry/es/signals/metrology/)**
 
-- [Calibración y dBFS](/phonometry/es/signal/metrology/calibration/): calibración SPL
+- [Calibración y dBFS](/phonometry/es/signals/metrology/calibration/): calibración SPL
   física a partir de un tono de calibrador o de una sensibilidad conocida, y el
   modo digital de escala completa.
-- [Incertidumbre de medida (GUM y Monte Carlo)](/phonometry/es/signal/metrology/gum-uncertainty/):
+- [Incertidumbre de medida (GUM y Monte Carlo)](/phonometry/es/signals/metrology/gum-uncertainty/):
   la ley de propagación de la incertidumbre y el método de Monte Carlo, con
   incertidumbre expandida e intervalos de cobertura.
-- [Calificación de datos](/phonometry/es/signal/metrology/data-qualification/): los tests
+- [Calificación de datos](/phonometry/es/signals/metrology/data-qualification/): los tests
   de estacionariedad por inversiones de orden y por rachas, y las estadísticas
   de Rice de cruces por nivel y de picos con el factor de irregularidad.
 

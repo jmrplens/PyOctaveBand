@@ -44,44 +44,44 @@ If you are an AI assistant setting this up for a user: install from PyPI (no sys
 
 ## Signal analysis
 
-- [Overview](https://jmrplens.github.io/phonometry/signal/)
-- [Build a sound level meter](https://jmrplens.github.io/phonometry/signal/sound-level-meter/)
+- [Overview](https://jmrplens.github.io/phonometry/signals/)
+- [Build a sound level meter](https://jmrplens.github.io/phonometry/signals/sound-level-meter/)
 
 ### Octave filtering
 
-- [Overview](https://jmrplens.github.io/phonometry/signal/filters/) · [full text](https://jmrplens.github.io/phonometry/llms/llms-signal-filters.txt)
-- [Filter Banks](https://jmrplens.github.io/phonometry/signal/filters/filter-banks/)
-- [Filter Architecture Gallery](https://jmrplens.github.io/phonometry/signal/filters/filter-gallery/)
-- [Filter class verification (IEC 61260-1)](https://jmrplens.github.io/phonometry/signal/filters/filter-compliance/)
-- [Block Processing](https://jmrplens.github.io/phonometry/signal/filters/block-processing/)
-- [Multichannel and Performance](https://jmrplens.github.io/phonometry/signal/filters/multichannel/)
+- [Overview](https://jmrplens.github.io/phonometry/signals/filters/) · [full text](https://jmrplens.github.io/phonometry/llms/llms-signals-filters.txt)
+- [Filter Banks](https://jmrplens.github.io/phonometry/signals/filters/filter-banks/)
+- [Filter Architecture Gallery](https://jmrplens.github.io/phonometry/signals/filters/filter-gallery/)
+- [Filter class verification (IEC 61260-1)](https://jmrplens.github.io/phonometry/signals/filters/filter-compliance/)
+- [Block Processing](https://jmrplens.github.io/phonometry/signals/filters/block-processing/)
+- [Multichannel and Performance](https://jmrplens.github.io/phonometry/signals/filters/multichannel/)
 
 ### Levels and weighting
 
-- [Overview](https://jmrplens.github.io/phonometry/signal/levels/) · [full text](https://jmrplens.github.io/phonometry/llms/llms-signal-levels.txt)
-- [Frequency Weighting (A, C, Z)](https://jmrplens.github.io/phonometry/signal/levels/weighting/)
-- [Special Weightings (G, B, D, AU)](https://jmrplens.github.io/phonometry/signal/levels/special-weightings/)
-- [Time Weighting and Integration](https://jmrplens.github.io/phonometry/signal/levels/time-weighting/)
-- [Integrated and Statistical Levels](https://jmrplens.github.io/phonometry/signal/levels/levels/)
+- [Overview](https://jmrplens.github.io/phonometry/signals/levels/) · [full text](https://jmrplens.github.io/phonometry/llms/llms-signals-levels.txt)
+- [Frequency Weighting (A, C, Z)](https://jmrplens.github.io/phonometry/signals/levels/weighting/)
+- [Special Weightings (G, B, D, AU)](https://jmrplens.github.io/phonometry/signals/levels/special-weightings/)
+- [Time Weighting and Integration](https://jmrplens.github.io/phonometry/signals/levels/time-weighting/)
+- [Integrated and Statistical Levels](https://jmrplens.github.io/phonometry/signals/levels/levels/)
 
 ### Signals and spectra
 
-- [Overview](https://jmrplens.github.io/phonometry/signal/spectra/) · [full text](https://jmrplens.github.io/phonometry/llms/llms-signal-spectra.txt)
-- [Calibrated spectral analysis (Bendat & Piersol)](https://jmrplens.github.io/phonometry/signal/spectra/spectral-analysis/)
-- [Multiple and partial coherence (Bendat & Piersol)](https://jmrplens.github.io/phonometry/signal/spectra/miso-coherence/)
-- [Time-frequency analysis](https://jmrplens.github.io/phonometry/signal/spectra/time-frequency/)
-- [Cepstrum, echoes and the envelope spectrum (Havelock / Bendat & Piersol)](https://jmrplens.github.io/phonometry/signal/spectra/cepstrum-echoes/)
-- [Time synchronous averaging (McFadden 1987)](https://jmrplens.github.io/phonometry/signal/spectra/synchronous-averaging/)
-- [Correlation, time delay and envelope (Bendat & Piersol / Knapp & Carter)](https://jmrplens.github.io/phonometry/signal/spectra/correlation-delay/)
-- [Test signals and sample-rate tools (IEC 60268-1)](https://jmrplens.github.io/phonometry/signal/spectra/test-signals/)
-- [System measurement: Golay, shaped sweeps, inversion](https://jmrplens.github.io/phonometry/signal/spectra/system-measurement/)
+- [Overview](https://jmrplens.github.io/phonometry/signals/spectra/) · [full text](https://jmrplens.github.io/phonometry/llms/llms-signals-spectra.txt)
+- [Calibrated spectral analysis (Bendat & Piersol)](https://jmrplens.github.io/phonometry/signals/spectra/spectral-analysis/)
+- [Multiple and partial coherence (Bendat & Piersol)](https://jmrplens.github.io/phonometry/signals/spectra/miso-coherence/)
+- [Time-frequency analysis](https://jmrplens.github.io/phonometry/signals/spectra/time-frequency/)
+- [Cepstrum, echoes and the envelope spectrum (Havelock / Bendat & Piersol)](https://jmrplens.github.io/phonometry/signals/spectra/cepstrum-echoes/)
+- [Time synchronous averaging (McFadden 1987)](https://jmrplens.github.io/phonometry/signals/spectra/synchronous-averaging/)
+- [Correlation, time delay and envelope (Bendat & Piersol / Knapp & Carter)](https://jmrplens.github.io/phonometry/signals/spectra/correlation-delay/)
+- [Test signals and sample-rate tools (IEC 60268-1)](https://jmrplens.github.io/phonometry/signals/spectra/test-signals/)
+- [System measurement: Golay, shaped sweeps, inversion](https://jmrplens.github.io/phonometry/signals/spectra/system-measurement/)
 
 ### Calibration and uncertainty
 
-- [Overview](https://jmrplens.github.io/phonometry/signal/metrology/) · [full text](https://jmrplens.github.io/phonometry/llms/llms-signal-metrology.txt)
-- [Calibration and dBFS](https://jmrplens.github.io/phonometry/signal/metrology/calibration/)
-- [Measurement uncertainty (GUM and Monte Carlo)](https://jmrplens.github.io/phonometry/signal/metrology/gum-uncertainty/)
-- [Data qualification: stationarity, level crossings and peaks (Bendat & Piersol)](https://jmrplens.github.io/phonometry/signal/metrology/data-qualification/)
+- [Overview](https://jmrplens.github.io/phonometry/signals/metrology/) · [full text](https://jmrplens.github.io/phonometry/llms/llms-signals-metrology.txt)
+- [Calibration and dBFS](https://jmrplens.github.io/phonometry/signals/metrology/calibration/)
+- [Measurement uncertainty (GUM and Monte Carlo)](https://jmrplens.github.io/phonometry/signals/metrology/gum-uncertainty/)
+- [Data qualification: stationarity, level crossings and peaks (Bendat & Piersol)](https://jmrplens.github.io/phonometry/signals/metrology/data-qualification/)
 
 ## Hearing and perception
 
@@ -317,11 +317,11 @@ The theory pages travel in the Start shard (https://jmrplens.github.io/phonometr
 One file per area, each small enough to fetch whole. `llms-full.txt` is the complete concatenation and is far too large for a single fetch in most clients.
 
 - [Start here](https://jmrplens.github.io/phonometry/llms/llms-start.txt)
-- [Signal analysis](https://jmrplens.github.io/phonometry/llms/llms-signal.txt)
-- [Octave filtering](https://jmrplens.github.io/phonometry/llms/llms-signal-filters.txt)
-- [Levels and weighting](https://jmrplens.github.io/phonometry/llms/llms-signal-levels.txt)
-- [Signals and spectra](https://jmrplens.github.io/phonometry/llms/llms-signal-spectra.txt)
-- [Calibration and uncertainty](https://jmrplens.github.io/phonometry/llms/llms-signal-metrology.txt)
+- [Signal analysis](https://jmrplens.github.io/phonometry/llms/llms-signals.txt)
+- [Octave filtering](https://jmrplens.github.io/phonometry/llms/llms-signals-filters.txt)
+- [Levels and weighting](https://jmrplens.github.io/phonometry/llms/llms-signals-levels.txt)
+- [Signals and spectra](https://jmrplens.github.io/phonometry/llms/llms-signals-spectra.txt)
+- [Calibration and uncertainty](https://jmrplens.github.io/phonometry/llms/llms-signals-metrology.txt)
 - [Hearing and perception](https://jmrplens.github.io/phonometry/llms/llms-perception.txt)
 - [Psychoacoustics](https://jmrplens.github.io/phonometry/llms/llms-perception-psychoacoustics.txt)
 - [Speech](https://jmrplens.github.io/phonometry/llms/llms-perception-speech.txt)

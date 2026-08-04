@@ -32,7 +32,7 @@ const AUDIT_PATHS = [
   `${BASE}/es/`,
   `${BASE}/start/getting-started/`,
   `${BASE}/start/guides/`,
-  `${BASE}/signal/metrology/calibration/`,
+  `${BASE}/signals/metrology/calibration/`,
   `${BASE}/buildings/insulation/insulation-field/`,
   `${BASE}/reference/api/signals/levels/`,
   `${BASE}/reference/conformance/`,
