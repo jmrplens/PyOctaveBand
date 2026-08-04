@@ -50,6 +50,3 @@ against.
   value.
 - [Sound Power by Intensity Scanning](/phonometry/devices/emission/sound-power-intensity/):
   the on-site scanning of ISO 9614-2 and the ISO 9614-3 precision grade.
-- [Sound Power from Surface Vibration (ISO/TS 7849)](/phonometry/devices/emission/vibration-sound-power/):
-  the airborne power estimated from the velocity of the machine's own surface,
-  with the radiation factor deciding how honest the estimate is.
