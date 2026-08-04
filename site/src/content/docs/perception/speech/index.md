@@ -3,7 +3,7 @@ title: "Speech"
 description: "The two standard indices of speech intelligibility and the different questions they answer: the STI of IEC 60268-16, which rates a transmission channel, and the SII of ANSI S3.5, which rates a listening condition."
 ---
 
-Both pages in this section reduce speech intelligibility to a number in
+All three pages in this section reduce speech intelligibility to a number in
 [0, 1], and the art is knowing which number answers your question. The
 **Speech Transmission Index** (STI) rates a *transmission channel*: a room, a
 public-address system, an intercom. The **Speech Intelligibility Index** (SII)

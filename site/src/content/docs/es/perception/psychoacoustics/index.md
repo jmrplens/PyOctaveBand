@@ -10,7 +10,7 @@ filtrado, el enmascaramiento y la compresión del oído. Sobre la sonoridad se
 asientan las sensaciones de **calidad sonora** que distinguen dos sonidos
 igual de fuertes: la agudeza (énfasis en altas frecuencias), la tonalidad
 (tonos discretos audibles), la aspereza (modulación rápida) y la intensidad
-de fluctuación (modulación lenta). Y sobre ellas, una métrica combinada de **molestia** que las pesa en un único escalar.
+de fluctuación (modulación lenta). Y encima, una métrica combinada de **molestia** que pesa la sonoridad, la agudeza, la aspereza y la intensidad de fluctuación en un único escalar.
 
 [Sonoridad](/phonometry/es/perception/psychoacoustics/loudness/) es la página fundacional: el
 método de referencia Zwicker de ISO 532-1 con su ficha de una página, junto
@@ -37,8 +37,8 @@ ISO 1996-2.
 [Molestia psicoacústica e intensidad de fluctuación](/phonometry/es/perception/psychoacoustics/psychoacoustic-annoyance/)
 cierra la cadena con el modelo de Fastl y Zwicker, que combina sonoridad,
 agudeza, aspereza y la sensación de modulación lenta de la intensidad de
-fluctuación en un único valor de molestia. Léela en último lugar: consume
-todo lo que definen las demás páginas.
+fluctuación en un único valor de molestia. Léela en último lugar: sus cuatro
+entradas salen de las páginas anteriores.
 
 ## Páginas de esta sección
 

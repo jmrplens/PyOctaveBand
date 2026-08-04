@@ -36,6 +36,7 @@ convention names. Deterministic: regenerate with ``make llms``.
 
 from __future__ import annotations
 
+import functools
 import pathlib
 import re
 
@@ -73,8 +74,38 @@ AREAS: tuple[tuple[str, str], ...] = (
     ("simulation", "Wave simulation"),
 )
 
-#: Pages that open the documentation rather than belonging to a topic.
-START_ROUTES = ("start/getting-started", "start/why-phonometry", "start/about")
+#: Pages that open the documentation rather than belonging to a topic. The
+#: About page is not here because it has no mirror edition: it is linked, by
+#: absolute URL, from the provenance section instead. It used to be listed and
+#: silently dropped, which is why an unresolvable entry is fatal now.
+START_ROUTES = ("start/getting-started", "start/why-phonometry")
+
+
+def _check_areas_cover_the_tree() -> None:
+    """AREAS keeps the order and the labels; the tree decides membership.
+
+    An unlisted topic folder used to vanish quietly: the page counter rose, the
+    text landed in llms-full.txt, and the page was named nowhere in the index
+    and carried by no shard, with exit 0. The docstring promised that drift
+    could not happen quietly, and for this one list it could.
+    """
+    listed = {slug for slug, _ in AREAS}
+    on_disk = {
+        path.parent.name
+        for path in CONTENT.glob("*/index.md*")
+        if path.parent.name not in ("es", "start", "reference")
+    }
+    missing = sorted(on_disk - listed)
+    ghosts = sorted(listed - on_disk)
+    if missing or ghosts:
+        parts = []
+        if missing:
+            parts.append(
+                "topic folder(s) with no AREAS entry: " + ", ".join(missing)
+            )
+        if ghosts:
+            parts.append("AREAS entr(ies) with no topic folder: " + ", ".join(ghosts))
+        raise SystemExit("generate_llms.py: " + "; ".join(parts))
 
 
 def _version() -> str:
@@ -97,6 +128,7 @@ def _conformance_counts() -> tuple[int, int, int]:
     return int(match[1]), int(match[2]), int(match[3])
 
 
+@functools.cache
 def _routes() -> list[tuple[str, str]]:
     """Every docs/ page as ``(path under docs/, site route)``.
 
@@ -237,6 +269,26 @@ def _area_members() -> dict[str, list[str]]:
     return members
 
 
+@functools.cache
+def _shard_folders() -> dict[str, str]:
+    """Shard slug -> the content folder it names.
+
+    Undoing ``folder.replace("/", "-")`` with one string replace was lossy for
+    a folder nested two levels down: ``devices-emission-vehicles`` mapped back
+    to ``devices/emission-vehicles``, whose overview does not exist, and every
+    consequence was silent. The mapping is recorded at the same walk that
+    creates the slugs, never reconstructed from the slug.
+    """
+    folders = {topic: topic for topic, _ in AREAS}
+    for topic, _ in AREAS:
+        for path in (CONTENT / topic).rglob("index.md*"):
+            if path.parent != CONTENT / topic:
+                folder = path.parent.relative_to(CONTENT).as_posix()
+                folders[folder.replace("/", "-")] = folder
+    return folders
+
+
+@functools.cache
 def _shard_members() -> dict[str, list[str]]:
     """Shard slug -> guide routes, at the finest grouping the tree offers.
 
@@ -287,9 +339,11 @@ def _shard_members() -> dict[str, list[str]]:
             for route in sorted(guides)
             if route.split("/")[0] == topic and route not in claimed
         ]
-        if found:
-            claimed.update(found)
-            shards[slug_of(topic)] = found
+        # Unconditional: a topic whose guides are all claimed by its subgroups
+        # still gets a shard, carrying its own overview. Without it, the five
+        # fully subdivided topics had their overview text in no shard at all.
+        claimed.update(found)
+        shards[slug_of(topic)] = found
     leftover = sorted(guides - claimed)
     if leftover:
         shards["other"] = leftover
@@ -301,6 +355,25 @@ def _page_title(path: pathlib.Path) -> str:
         if line.startswith("# "):
             return line[2:].strip()
     return path.stem
+
+
+def _shard_label(slug: str) -> str:
+    """The human name of a shard: the H1 of the overview it opens with.
+
+    ``slug.capitalize()`` named none of the sections the site shows: it said
+    "Signal metrology" where the site says "Calibration and uncertainty" and
+    "Buildings rooms" where it says "Room acoustics". The overview's own title
+    is the name a reader of the site would recognise, and the mirror carries it
+    now.
+    """
+    labels = dict(AREAS)
+    if slug in labels:
+        return labels[slug]
+    folder = _shard_folders().get(slug, slug)
+    index = DOCS / folder / "index.md"
+    if index.exists():
+        return _page_title(index)
+    return slug.replace("-", " ").capitalize()
 
 
 def _summary(version: str) -> list[str]:
@@ -393,7 +466,7 @@ def _summary(version: str) -> list[str]:
     ]
 
 
-def build_llms_txt(version: str) -> str:
+def build_llms_txt(version: str, shard_slugs: tuple[str, ...]) -> str:
     pages = dict(_routes())
     route_to_file = {route: name for name, route in pages.items()}
     members = _area_members()
@@ -407,21 +480,62 @@ def build_llms_txt(version: str) -> str:
 
     lines = _summary(version)
     lines += ["## Start here", ""]
-    lines += [entry for route in START_ROUTES if (entry := link(route))]
+    for route in START_ROUTES:
+        entry = link(route)
+        if entry is None:
+            # These are listed by hand, so an unresolvable one is always a
+            # bug; the About page went missing this way once, silently.
+            raise SystemExit(
+                f"generate_llms.py: START_ROUTES names {route}, "
+                "which has no mirror page"
+            )
+        lines.append(entry)
     lines += [
         f"- [Guides index]({SITE_URL}/start/guides/)",
         f"- [Glossary of quantities]({SITE_URL}/reference/glossary/)",
         "",
     ]
 
+    shard_of = {
+        route: slug for slug, routes in _shard_members().items() for route in routes
+    }
     for slug, routes in members.items():
         lines += [f"## {labels.get(slug, 'Other guides')}", ""]
         if slug != "other":
             lines.append(f"- [Overview]({SITE_URL}/{slug}/)")
-        lines += [entry for route in routes if (entry := link(route))]
+        # The shards are per subgroup, so the index says which subgroup, and
+        # therefore which shard, each run of guides belongs to: a client that
+        # wants the full text of one part should not have to infer the shard
+        # from the URL path.
+        seen_groups: set[str] = set()
+        for route in routes:
+            group = shard_of.get(route, slug)
+            if group != slug and group not in seen_groups:
+                seen_groups.add(group)
+                folder = _shard_folders().get(group, group)
+                lines += [
+                    "",
+                    f"### {_shard_label(group)}",
+                    "",
+                    (
+                        f"- [Overview]({SITE_URL}/{folder}/) · "
+                        f"[full text]({SITE_URL}/llms/llms-{group}.txt)"
+                    ),
+                ]
+            if entry := link(route):
+                lines.append(entry)
         lines.append("")
 
-    lines += ["## Theory and reference", ""]
+    lines += [
+        "## Theory and reference",
+        "",
+        (
+            "The theory pages travel in the Start shard "
+            f"({SITE_URL}/llms/llms-start.txt); the rest of the reference in "
+            f"{SITE_URL}/llms/llms-reference.txt."
+        ),
+        "",
+    ]
     for route in sorted(
         route
         for route in pages.values()
@@ -466,9 +580,27 @@ def build_llms_txt(version: str) -> str:
         "",
         f"- [Start here]({SITE_URL}/llms/llms-start.txt)",
     ]
-    for slug in _shard_members():
-        label = labels.get(slug, slug.replace("-", " ").capitalize())
-        lines.append(f"- [{label}]({SITE_URL}/llms/llms-{slug}.txt)")
+    # Grouped by topic in the order the site lists them, the topic's own shard
+    # first, so the list reads like the navigation rather than like a sort key.
+    # The slugs are the shards actually built this run: a hand-kept list here
+    # published a link to a shard that a content move could stop producing.
+    listed: set[str] = {"start"}
+    folders = _shard_folders()
+    for topic, _label in AREAS:
+        # Subgroups in the order the topic overview teaches them, matching the
+        # navigation above; alphabetical-by-slug put Calibration before Spectra
+        # in a topic whose overview teaches them the other way round.
+        nav_order = {folder: rank for rank, folder in enumerate(_subgroups(topic))}
+        for slug in [t for t in shard_slugs if t == topic] + sorted(
+            (t for t in shard_slugs if t.startswith(f"{topic}-")),
+            key=lambda t: (nav_order.get(folders.get(t, ""), len(nav_order)), t),
+        ):
+            listed.add(slug)
+            lines.append(f"- [{_shard_label(slug)}]({SITE_URL}/llms/llms-{slug}.txt)")
+    for slug in shard_slugs:
+        if slug not in listed:
+            label = "Other guides" if slug == "other" else _shard_label(slug)
+            lines.append(f"- [{label}]({SITE_URL}/llms/llms-{slug}.txt)")
     lines += [
         f"- [Everything]({SITE_URL}/llms-full.txt)",
         "",
@@ -560,7 +692,8 @@ def build_shards() -> dict[str, str]:
     pages = dict(_routes())
     route_to_file = {route: name for name, route in pages.items()}
     members = _shard_members()
-    labels = dict(AREAS)
+
+    emitted: set[str] = set()
 
     def emit(title: str, routes: list[str]) -> str:
         parts = [
@@ -570,20 +703,50 @@ def build_shards() -> dict[str, str]:
             "",
             "---",
         ]
-        parts += [
-            _body(name, route, pages)
-            for route in routes
-            if (name := route_to_file.get(route)) is not None
-        ]
+        for route in routes:
+            name = route_to_file.get(route)
+            if name is None:
+                continue
+            emitted.add(route)
+            parts.append(_body(name, route, pages))
         return "\n".join(parts)
 
     theory = [route for route in pages.values() if route.startswith("reference/theory")]
-    shards = {"start": emit("start here", [*START_ROUTES, *sorted(theory)])}
+    start_overview = ["start"] if "start" in route_to_file else []
+    shards = {
+        "start": emit("start here", [*start_overview, *START_ROUTES, *sorted(theory)])
+    }
     for slug, routes in members.items():
-        overview = slug.replace("-", "/", 1) if "-" in slug else slug
+        overview = _shard_folders().get(slug, slug)
         shards[slug] = emit(
-            labels.get(slug, slug.replace("-", " ")),
+            _shard_label(slug),
             ([overview] if overview in route_to_file else []) + routes,
+        )
+
+    # The reference pages that are neither theory (in the start shard) nor a
+    # topic's: today that is the bibliography, which was indexed in llms.txt
+    # while its text sat in no shard at all.
+    # The API index stays out: llms.txt lists the whole generated reference as
+    # Optional, one page per module, and a shard duplicating that table would
+    # be the largest file in the set saying the least.
+    reference = sorted(
+        route
+        for route in pages.values()
+        if route.startswith("reference/")
+        and not route.startswith(("reference/theory", "reference/api"))
+    )
+    if reference:
+        shards["reference"] = emit("Reference", reference)
+
+    # Every mirror page belongs to a shard; a page that falls between the
+    # buckets is how the bibliography went missing. The set compared against is
+    # what emit() actually consumed, not a second prediction of it: predicting
+    # exempted the overview of a subgroup with no guides, which no shard holds.
+    allowed_out = {"reference/api"}
+    dropped = sorted(set(pages.values()) - emitted - allowed_out)
+    if dropped:
+        raise SystemExit(
+            "generate_llms.py: mirror page(s) in no shard: " + ", ".join(dropped)
         )
     return shards
 
@@ -595,13 +758,36 @@ def build_llms_full(llms_txt: str) -> str:
     return "\n".join(parts)
 
 
+def _check_readme_covers_the_mirror() -> None:
+    """docs/README.md links every mirror guide page.
+
+    The README is the GitHub front door of the docs, kept by hand, and three
+    pages went missing from it inside one week of merges: nothing looked. The
+    overview index files are exempt because the README's section structure is
+    its own index of the folders.
+    """
+    readme = (DOCS / "README.md").read_text(encoding="utf-8")
+    missing = [
+        name
+        for name, _route in _routes()
+        if not name.endswith("/index.md")
+        and not name.startswith("reference/api")
+        and f"({name})" not in readme
+    ]
+    if missing:
+        raise SystemExit(
+            "generate_llms.py: docs/README.md does not link " + ", ".join(missing)
+        )
+
+
 def main() -> None:
+    _check_areas_cover_the_tree()
+    _check_readme_covers_the_mirror()
     version = _version()
-    llms = build_llms_txt(version)
+    shards = build_shards()
+    llms = build_llms_txt(version, tuple(shards))
     (ROOT / "llms.txt").write_text(llms, encoding="utf-8")
     (ROOT / "llms-full.txt").write_text(build_llms_full(llms), encoding="utf-8")
-
-    shards = build_shards()
 
     # Remove shards this run no longer produces. Regrouping a section renames
     # its shard, and an orphan left behind would keep serving text that

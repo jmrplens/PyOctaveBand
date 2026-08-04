@@ -28,7 +28,10 @@ a dose from the response peaks, and converts it into compressive stress on the
 vertebral endplates and a probability of lumbar injury over a working life.
 
 Use ISO 2631-1 metrics first; when the crest factor or the VDV warns that
-shocks dominate, the ISO 2631-5 model is the dedicated follow-up. The
+shocks dominate, ISO 2631-5 is the dedicated follow-up: its clause 5 model,
+implemented here, covers severe shocks with possible loss of contact with
+the seat, while less severe exposures in which the occupant stays seated
+belong to its Annex A finite-element model. The
 measurement front-end (weighting filters, band analysis) is shared with the
 [core signal analysis](/phonometry/signal/)
 section.

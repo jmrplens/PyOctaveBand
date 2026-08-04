@@ -72,8 +72,9 @@ related EN 12354-5, lives in
   the measured vibration reduction index Kij and the flanking descriptors
   Dn,f and Ln,f.
 - [Heavy and Soft Impact Sources (ISO 16283-2)](/phonometry/buildings/insulation/heavy-impact-sources/):
-  the rubber ball and the bang machine, the impact force exposure level that
-  specifies them, and the A-weighted single number of ISO 717-2 Annex D.
+  the rubber ball and the bang machine, the impact force exposure levels that
+  specify them, the Fast-weighted maximum level and the ISO 717-2 Annex D
+  single number.
 - [Insulation Ratings (ISO 717)](/phonometry/buildings/insulation/insulation-ratings/):
   the ISO 717-1/-2 reference-curve engines, C, Ctr and CI, the enlarged-range
   terms and the ISO 717 fiche.

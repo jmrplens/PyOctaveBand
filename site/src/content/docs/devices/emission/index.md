@@ -44,8 +44,9 @@ against.
   ISO 3745.
 - [Sound Power in the Reverberation Room](/phonometry/devices/emission/sound-power-reverberation/):
   the direct and comparison methods of ISO 3741.
+- [Sound power from surface vibration (ISO/TS 7849)](/phonometry/devices/emission/vibration-sound-power/):
+  the radiated power from the surface-averaged velocity level and the
+  radiation factor, with the Part 1 upper limit and the Part 2 engineering
+  value.
 - [Sound Power by Intensity Scanning](/phonometry/devices/emission/sound-power-intensity/):
   the on-site scanning of ISO 9614-2 and the ISO 9614-3 precision grade.
-- [Sound Power from Surface Vibration (ISO/TS 7849)](/phonometry/devices/emission/vibration-sound-power/):
-  the airborne power estimated from the velocity of the machine's own surface,
-  with the radiation factor deciding how honest the estimate is.

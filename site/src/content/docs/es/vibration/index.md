@@ -73,7 +73,7 @@ de lesión lumbar.
   el modelo de respuesta espinal y la probabilidad de lesión lumbar para
   vibración con múltiples choques.
 
-## Maquinaria
+## [Maquinaria](/phonometry/es/vibration/machinery/)
 
 Convertir un espectro de vibración en un diagnóstico de la máquina que lo produjo.
 

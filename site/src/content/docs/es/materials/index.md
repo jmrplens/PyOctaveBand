@@ -95,8 +95,14 @@ sección de
 - [Metadifusores](/phonometry/es/materials/diffusers/metadiffusers/): difusores de
   Schroeder en sublongitud de onda profunda a partir de rendijas cargadas
   con resonadores.
+- [Resumen de Superficies medidas in situ](/phonometry/es/materials/surfaces/):
+  superficies que no se pueden llevar al laboratorio, caracterizadas donde
+  están.
 - [Absorción in situ de firmes de carretera](/phonometry/es/materials/surfaces/road-absorption/):
   la absorción in situ de pavimentos de ISO 13472-1/-2.
+- [Resumen de Capas resilientes](/phonometry/es/materials/resilient/):
+  lo que hace una capa resiliente bajo un suelo flotante, y la rigidez
+  dinámica que lo fija.
 - [Rigidez dinámica de materiales resilientes (EN 29052-1)](/phonometry/es/materials/resilient/dynamic-stiffness/):
   el método de resonancia que mide lo que hace una capa resiliente bajo un
   suelo flotante, y la rigidez aparente que le pide el capítulo de diseño de

@@ -6,8 +6,8 @@ description: "The chain from a vibrating machine to the noise heard rooms away: 
 A machine fixed to a building radiates sound twice: directly from its own
 vibrating surface, and indirectly by injecting **structure-borne power** into
 the structure, which carries it away and re-radiates it in distant rooms. The
-five pages of this section cover both paths: one estimates the direct
-radiation from the surface vibration itself, and the other four characterise
+six pages of this section cover both paths: one estimates the direct
+radiation from the surface vibration itself, and the other five characterise
 the second, sneakier structure-borne path end to end, from describing the
 vibration and characterising the isolators to quantifying the power and
 predicting the level a listener finally hears.
@@ -21,7 +21,12 @@ measurement acceptance criteria. Source and receiver *mobilities* are what
 decide how much power actually couples across an interface, which is why this
 vocabulary matters.
 
-Two pages then characterise the path elements.
+Three pages then characterise the path elements.
+[Bending-wave transmission at plate junctions (Cremer/Craik/Hopkins)](/phonometry/vibration/structural/junction-transmission/)
+follows the power across the structure itself, with the wave-approach
+transmission coefficients for rigid X, T, L and in-line junctions, their
+diffuse-field angular average, and the coupling loss factor and vibration
+reduction index Kij they yield.
 [Transfer stiffness of resilient elements (ISO 10846)](/phonometry/vibration/structural/transfer-stiffness/)
 measures the dynamic transfer stiffness of the isolators, mounts and hoses
 inserted precisely to break the transmission path, by the direct and indirect

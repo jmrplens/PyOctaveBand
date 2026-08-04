@@ -1,8 +1,25 @@
-# phonometry: materials surfaces
+# phonometry: Surfaces measured in place
 
 Part of https://jmrplens.github.io/phonometry/llms.txt. Full text of the pages in this area.
 
 ---
+
+<!-- source: docs/materials/surfaces/index.md | canonical: https://jmrplens.github.io/phonometry/materials/surfaces/ -->
+Source: https://jmrplens.github.io/phonometry/materials/surfaces/
+
+# Surfaces measured in place
+
+Some surfaces cannot be cut into a sample and carried to a reverberation room.
+A road pavement is the standing case: it is characterised where it lies, with a
+source and a microphone above it and a time window that separates the reflection
+from everything else.
+
+[In-situ road-surface absorption](https://jmrplens.github.io/phonometry/materials/surfaces/road-absorption/)
+implements both ISO 13472 methods, with the Adrienne window the standard
+prescribes and the geometry corrections the measurement needs.
+
+---
+
 
 <!-- source: docs/materials/surfaces/road-absorption.md | canonical: https://jmrplens.github.io/phonometry/materials/surfaces/road-absorption/ -->
 Source: https://jmrplens.github.io/phonometry/materials/surfaces/road-absorption/

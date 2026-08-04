@@ -927,8 +927,12 @@ it; the list grows as guides gain their References sections.
   Springer.
   [doi:10.1007/978-3-540-87662-5](https://doi.org/10.1007/978-3-540-87662-5).
   The systematic treatment of underwater acoustical quantities in the line
-  that ISO 18405 standardised.
-  Cited by [Underwater acoustics](../underwater/underwater-acoustics.md).
+  that ISO 18405 standardised, the Weston energy-flux propagation regimes of
+  shallow water, the sonar equations with seven fully numeric worked examples,
+  and the orca audiogram.
+  Cited by [Underwater acoustics](../underwater/underwater-acoustics.md),
+  [Underwater sound propagation](../underwater/underwater-propagation.md)
+  and [Marine-mammal noise exposure](../underwater/marine-mammal-exposure.md).
 - Medwin, H., & Clay, C. S. (1998). *Fundamentals of acoustical oceanography*.
   Academic Press. ISBN 978-0-12-487570-8.
   [Publisher page](https://shop.elsevier.com/books/fundamentals-of-acoustical-oceanography/medwin/978-0-12-487570-8).
@@ -1029,14 +1033,6 @@ it; the list grows as guides gain their References sections.
   [doi:10.1121/1.1427355](https://doi.org/10.1121/1.1427355).
   The ensemble merchant-ship source-spectrum model.
   Cited by [Underwater sound propagation](../underwater/underwater-propagation.md).
-- Ainslie, M. A. (2010). *Principles of Sonar Performance Modelling*.
-  Springer/Praxis.
-  [doi:10.1007/978-3-540-87662-5](https://doi.org/10.1007/978-3-540-87662-5).
-  The reference treatment of sonar performance prediction: the Weston
-  energy-flux propagation regimes of shallow water, the sonar equations with
-  seven fully numeric worked examples, and the orca audiogram.
-  Cited by [Underwater sound propagation](../underwater/underwater-propagation.md) and
-  [Marine-mammal noise exposure](../underwater/marine-mammal-exposure.md).
 - National Marine Fisheries Service (2018). *2018 Revision to: Technical
   Guidance for Assessing the Effects of Anthropogenic Sound on Marine Mammal
   Hearing (Version 2.0)*. NOAA Technical Memorandum NMFS-OPR-59.
@@ -1121,6 +1117,29 @@ it; the list grows as guides gain their References sections.
   The articulation-band experiments behind the band-importance function of the
   Speech Intelligibility Index.
   Cited by [Speech Intelligibility Index](../perception/speech/speech-intelligibility.md).
+- Taal, C. H., Hendriks, R. C., Heusdens, R., & Jensen, J. (2011). An
+  algorithm for intelligibility prediction of time-frequency weighted noisy
+  speech. *IEEE Transactions on Audio, Speech, and Language Processing*,
+  19(7), 2125-2136.
+  [doi:10.1109/TASL.2011.2114881](https://doi.org/10.1109/TASL.2011.2114881).
+  STOI: the shared one-third-octave front end, the normalisation and
+  signal-to-distortion clipping, and the per-band envelope correlation the
+  index averages.
+  Cited by [Objective Intelligibility (STOI & ESTOI)](../perception/speech/objective-intelligibility.md).
+- Taal, C. H., Hendriks, R. C., Heusdens, R., & Jensen, J. (2010). A
+  short-time objective intelligibility measure for time-frequency weighted
+  noisy speech. *2010 IEEE International Conference on Acoustics, Speech and
+  Signal Processing (ICASSP)*, 4214-4217.
+  [doi:10.1109/ICASSP.2010.5495701](https://doi.org/10.1109/ICASSP.2010.5495701).
+  The short conference version of STOI.
+  Cited by [Objective Intelligibility (STOI & ESTOI)](../perception/speech/objective-intelligibility.md).
+- Jensen, J., & Taal, C. H. (2016). An algorithm for predicting the
+  intelligibility of speech masked by modulated noise maskers. *IEEE/ACM
+  Transactions on Audio, Speech, and Language Processing*, 24(11), 2009-2022.
+  [doi:10.1109/TASLP.2016.2585878](https://doi.org/10.1109/TASLP.2016.2585878).
+  ESTOI: the row- and column-normalised short-time spectrogram and its
+  spectral-correlation intermediate index.
+  Cited by [Objective Intelligibility (STOI & ESTOI)](../perception/speech/objective-intelligibility.md).
 
 ## Psychoacoustics
 

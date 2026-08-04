@@ -31,8 +31,9 @@ distan de ser gaussianas. La página muestra ambas sobre los mismos modelos,
 incluyendo dónde divergen y por qué.
 
 [Calificación de datos](/phonometry/es/signal/metrology/data-qualification/) guarda la
-puerta delante de ambas: todo promedio - un Leq, una PSD de Welch, un
-presupuesto de incertidumbre - supone que el registro es estacionario, y los
+puerta delante de ambas: todo promedio - un Leq, una PSD de Welch, toda
+entrada promediada de un presupuesto de incertidumbre - supone que el
+registro es estacionario, y los
 tests de inversiones de orden y de rachas de Bendat y Piersol lo deciden
 objetivamente a partir de medias cuadráticas por segmento, con las regiones
 de aceptación del propio libro. La misma página trae las estadísticas de

@@ -89,12 +89,21 @@ datos de elemento y a partir de la física del propio elemento.
 
 - [Predicción del aislamiento acústico (EN 12354)](/phonometry/es/buildings/design/insulation-prediction/):
   la transmisión por flancos aérea y de impacto entre salas (EN 12354-1/2).
+- [Predicción detallada por bandas (ISO 12354)](/phonometry/es/buildings/design/detailed-prediction/):
+  la misma predicción banda a banda, con las contribuciones por camino tras
+  R'w y L'n,w.
 - [Predicción del aislamiento de paneles](/phonometry/es/buildings/design/panel-sound-insulation/):
   la ley de masa, la coincidencia, las dobles hojas y las aberturas.
 - [Mejora del aislamiento a impacto de suelos (ISO 16251-1)](/phonometry/es/buildings/design/impact-improvement/):
   la mejora ponderada de un revestimiento blando en una maqueta pesada pequeña.
 - [Predicción del comportamiento de capas elásticas](/phonometry/es/buildings/design/resilient-layers/):
   el lado de la predicción de revestimientos, suelos flotantes y trasdosados.
+- [Potencia acústica estructural de equipos (EN 15657)](/phonometry/es/buildings/design/structure-borne-power/):
+  el método de la placa de recepción y las magnitudes de fuente
+  independientes de la placa.
+- [Ruido estructural instalado (EN 12354-5)](/phonometry/es/buildings/design/installed-structure-borne/):
+  el nivel de presión acústica en el recinto receptor predicho desde las
+  movilidades de fuente y receptor.
 - [Rigidez dinámica de materiales resilientes (EN 29052-1)](/phonometry/es/materials/resilient/dynamic-stiffness/):
   la medición por resonancia de placa de carga detrás de toda predicción de
   suelo flotante.

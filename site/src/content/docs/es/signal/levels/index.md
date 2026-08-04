@@ -6,9 +6,10 @@ description: "De la señal ponderada al número reportado: las ponderaciones fre
 Un sonómetro hace tres cosas a una señal calibrada, en orden: la **pondera en
 frecuencia** para imitar la sensibilidad del oído, la **suaviza en el tiempo**
 con una balística normalizada y la **integra en un nivel**. Las páginas
-de esta sección implementan exactamente esa cadena, una página por etapa,
-siguiendo **IEC 61672-1:2013** tan de cerca que las ponderaciones se
-verifican en CI contra las propias tablas de tolerancia de la norma.
+de esta sección implementan esa cadena etapa a etapa para el nivel
+mostrado: las curvas A/C/Z y las balísticas Fast/Slow/Impulse siguen
+**IEC 61672-1:2013** tan de cerca que las ponderaciones se verifican en CI
+contra las propias tablas de tolerancia de la norma.
 
 [Ponderación frecuencial (A, C, Z)](/phonometry/es/signal/levels/weighting/)
 cubre la primera etapa. La curva A sigue la sensibilidad del oído a niveles

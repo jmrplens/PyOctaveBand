@@ -6,7 +6,7 @@ description: "Fuentes de transporte y energía con métricas de ruido fijadas in
 Las aeronaves y los aerogeneradores son fuentes de ruido lo bastante
 importantes como para tener métricas propias negociadas internacionalmente,
 cada una fijada hasta el último decimal por un marco de certificación o de
-ensayo de tipo. Las tres páginas de esta sección implementan esos marcos, y
+ensayo de tipo. Las cuatro páginas de esta sección implementan esos marcos, y
 comparten una misma anatomía: un **descriptor de fuente** rigurosamente
 normalizado, más **ajustes de propagación** normalizados que colocan la
 fuente en un receptor.

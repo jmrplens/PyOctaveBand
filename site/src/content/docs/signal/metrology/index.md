@@ -28,12 +28,12 @@ from Gaussian. The page shows both on the same models, including where they
 diverge and why.
 
 [Data qualification](/phonometry/signal/metrology/data-qualification/) guards the gate
-in front of both: every average - a Leq, a Welch PSD, an uncertainty budget -
-assumes the record is stationary, and the Bendat & Piersol reverse
+in front of both: every average - a Leq, a Welch PSD, every averaged input
+to an uncertainty budget - assumes the record is stationary, and the Bendat & Piersol reverse
 arrangement and runs tests decide that objectively from segment mean squares,
 with the book's own acceptance regions. The same page carries the Rice
 statistics of level crossings and peaks - apparent frequency, peak rates,
-the irregularity factor - that characterize a qualified Gaussian record and
+the irregularity factor - that characterise a qualified Gaussian record and
 screen for one that is not.
 
 The same discipline extends into the frequency domain: the

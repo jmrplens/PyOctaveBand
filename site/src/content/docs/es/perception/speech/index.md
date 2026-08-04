@@ -3,7 +3,7 @@ title: "Habla"
 description: "Los dos índices normalizados de inteligibilidad del habla y las distintas preguntas que responden: el STI de IEC 60268-16, que valora un canal de transmisión, y el SII de ANSI S3.5, que valora una condición de escucha."
 ---
 
-Las dos páginas de esta sección reducen la inteligibilidad del habla a un
+Las tres páginas de esta sección reducen la inteligibilidad del habla a un
 número en [0, 1], y el arte está en saber qué número responde a tu pregunta.
 El **índice de transmisión del habla** (STI) valora un *canal de
 transmisión*: una sala, un sistema de megafonía, un interfono. El **índice de

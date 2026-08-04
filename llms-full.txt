@@ -46,15 +46,27 @@ If you are an AI assistant setting this up for a user: install from PyPI (no sys
 
 - [Overview](https://jmrplens.github.io/phonometry/signal/)
 - [Build a sound level meter](https://jmrplens.github.io/phonometry/signal/sound-level-meter/)
+
+### Octave filtering
+
+- [Overview](https://jmrplens.github.io/phonometry/signal/filters/) · [full text](https://jmrplens.github.io/phonometry/llms/llms-signal-filters.txt)
 - [Filter Banks](https://jmrplens.github.io/phonometry/signal/filters/filter-banks/)
 - [Filter Architecture Gallery](https://jmrplens.github.io/phonometry/signal/filters/filter-gallery/)
 - [Filter class verification (IEC 61260-1)](https://jmrplens.github.io/phonometry/signal/filters/filter-compliance/)
 - [Block Processing](https://jmrplens.github.io/phonometry/signal/filters/block-processing/)
 - [Multichannel and Performance](https://jmrplens.github.io/phonometry/signal/filters/multichannel/)
+
+### Levels and weighting
+
+- [Overview](https://jmrplens.github.io/phonometry/signal/levels/) · [full text](https://jmrplens.github.io/phonometry/llms/llms-signal-levels.txt)
 - [Frequency Weighting (A, C, Z)](https://jmrplens.github.io/phonometry/signal/levels/weighting/)
 - [Special Weightings (G, B, D, AU)](https://jmrplens.github.io/phonometry/signal/levels/special-weightings/)
 - [Time Weighting and Integration](https://jmrplens.github.io/phonometry/signal/levels/time-weighting/)
 - [Integrated and Statistical Levels](https://jmrplens.github.io/phonometry/signal/levels/levels/)
+
+### Signals and spectra
+
+- [Overview](https://jmrplens.github.io/phonometry/signal/spectra/) · [full text](https://jmrplens.github.io/phonometry/llms/llms-signal-spectra.txt)
 - [Calibrated spectral analysis (Bendat & Piersol)](https://jmrplens.github.io/phonometry/signal/spectra/spectral-analysis/)
 - [Multiple and partial coherence (Bendat & Piersol)](https://jmrplens.github.io/phonometry/signal/spectra/miso-coherence/)
 - [Time-frequency analysis](https://jmrplens.github.io/phonometry/signal/spectra/time-frequency/)
@@ -63,6 +75,10 @@ If you are an AI assistant setting this up for a user: install from PyPI (no sys
 - [Correlation, time delay and envelope (Bendat & Piersol / Knapp & Carter)](https://jmrplens.github.io/phonometry/signal/spectra/correlation-delay/)
 - [Test signals and sample-rate tools (IEC 60268-1)](https://jmrplens.github.io/phonometry/signal/spectra/test-signals/)
 - [System measurement: Golay, shaped sweeps, inversion](https://jmrplens.github.io/phonometry/signal/spectra/system-measurement/)
+
+### Calibration and uncertainty
+
+- [Overview](https://jmrplens.github.io/phonometry/signal/metrology/) · [full text](https://jmrplens.github.io/phonometry/llms/llms-signal-metrology.txt)
 - [Calibration and dBFS](https://jmrplens.github.io/phonometry/signal/metrology/calibration/)
 - [Measurement uncertainty (GUM and Monte Carlo)](https://jmrplens.github.io/phonometry/signal/metrology/gum-uncertainty/)
 - [Data qualification: stationarity, level crossings and peaks (Bendat & Piersol)](https://jmrplens.github.io/phonometry/signal/metrology/data-qualification/)
@@ -70,15 +86,27 @@ If you are an AI assistant setting this up for a user: install from PyPI (no sys
 ## Hearing and perception
 
 - [Overview](https://jmrplens.github.io/phonometry/perception/)
+
+### Psychoacoustics
+
+- [Overview](https://jmrplens.github.io/phonometry/perception/psychoacoustics/) · [full text](https://jmrplens.github.io/phonometry/llms/llms-perception-psychoacoustics.txt)
 - [Loudness](https://jmrplens.github.io/phonometry/perception/psychoacoustics/loudness/)
 - [Advanced Loudness (ISO 532-2/-3, ECMA-418-2)](https://jmrplens.github.io/phonometry/perception/psychoacoustics/advanced-loudness/)
 - [Sound Quality Metrics](https://jmrplens.github.io/phonometry/perception/psychoacoustics/sound-quality/)
 - [Prominent Discrete Tones (ECMA-418-1)](https://jmrplens.github.io/phonometry/perception/psychoacoustics/tone-prominence/)
 - [Objective audibility of tones in noise (ISO/PAS 20065)](https://jmrplens.github.io/phonometry/perception/psychoacoustics/tone-audibility/)
 - [Psychoacoustic annoyance and fluctuation strength (Fastl & Zwicker)](https://jmrplens.github.io/phonometry/perception/psychoacoustics/psychoacoustic-annoyance/)
+
+### Speech
+
+- [Overview](https://jmrplens.github.io/phonometry/perception/speech/) · [full text](https://jmrplens.github.io/phonometry/llms/llms-perception-speech.txt)
 - [Speech Transmission Index (IEC 60268-16)](https://jmrplens.github.io/phonometry/perception/speech/speech-transmission/)
 - [Speech Intelligibility Index (SII)](https://jmrplens.github.io/phonometry/perception/speech/speech-intelligibility/)
 - [Objective intelligibility (STOI & ESTOI)](https://jmrplens.github.io/phonometry/perception/speech/objective-intelligibility/)
+
+### Hearing and exposure
+
+- [Overview](https://jmrplens.github.io/phonometry/perception/hearing/) · [full text](https://jmrplens.github.io/phonometry/llms/llms-perception-hearing.txt)
 - [Hearing threshold (age and reference zero)](https://jmrplens.github.io/phonometry/perception/hearing/hearing-threshold/)
 - [Occupational Noise Exposure (ISO 9612)](https://jmrplens.github.io/phonometry/perception/hearing/occupational-exposure/)
 - [Noise-induced hearing loss (ISO 1999)](https://jmrplens.github.io/phonometry/perception/hearing/noise-induced-hearing-loss/)
@@ -86,6 +114,10 @@ If you are an AI assistant setting this up for a user: install from PyPI (no sys
 ## Rooms and buildings
 
 - [Overview](https://jmrplens.github.io/phonometry/buildings/)
+
+### Room acoustics
+
+- [Overview](https://jmrplens.github.io/phonometry/buildings/rooms/) · [full text](https://jmrplens.github.io/phonometry/llms/llms-buildings-rooms.txt)
 - [Measuring the Room Impulse Response](https://jmrplens.github.io/phonometry/buildings/rooms/room-impulse-response/)
 - [Room Acoustics](https://jmrplens.github.io/phonometry/buildings/rooms/room-acoustics/)
 - [Open-Plan Office Acoustics (ISO 3382-3)](https://jmrplens.github.io/phonometry/buildings/rooms/open-plan-acoustics/)
@@ -93,6 +125,10 @@ If you are an AI assistant setting this up for a user: install from PyPI (no sys
 - [Reverberation-time prediction (Sabine · Eyring · Fitzroy · Arau-Puchades)](https://jmrplens.github.io/phonometry/buildings/rooms/reverberation-prediction/)
 - [Sound absorption in enclosed spaces (EN 12354-6)](https://jmrplens.github.io/phonometry/buildings/rooms/enclosed-space-absorption/)
 - [Room-noise criteria (NC / RC Mark II)](https://jmrplens.github.io/phonometry/buildings/rooms/room-noise/)
+
+### Sound insulation
+
+- [Overview](https://jmrplens.github.io/phonometry/buildings/insulation/) · [full text](https://jmrplens.github.io/phonometry/llms/llms-buildings-insulation.txt)
 - [Laboratory Insulation Measurement](https://jmrplens.github.io/phonometry/buildings/insulation/insulation-lab/)
 - [Sound Insulation by Intensity (ISO 15186)](https://jmrplens.github.io/phonometry/buildings/insulation/insulation-intensity/)
 - [Laboratory Flanking Transmission (ISO 10848)](https://jmrplens.github.io/phonometry/buildings/insulation/flanking-lab/)
@@ -102,6 +138,10 @@ If you are an AI assistant setting this up for a user: install from PyPI (no sys
 - [Façade Sound Insulation](https://jmrplens.github.io/phonometry/buildings/insulation/facade-insulation/)
 - [Spanish Building Code (CTE DB-HR)](https://jmrplens.github.io/phonometry/buildings/insulation/spanish-building-code/)
 - [Heavy and Soft Impact Sources (ISO 16283-2)](https://jmrplens.github.io/phonometry/buildings/insulation/heavy-impact-sources/)
+
+### Insulation design
+
+- [Overview](https://jmrplens.github.io/phonometry/buildings/design/) · [full text](https://jmrplens.github.io/phonometry/llms/llms-buildings-design.txt)
 - [Predicting Sound Insulation (EN 12354)](https://jmrplens.github.io/phonometry/buildings/design/insulation-prediction/)
 - [Detailed Per-Band Prediction (ISO 12354)](https://jmrplens.github.io/phonometry/buildings/design/detailed-prediction/)
 - [Predicting Panel Sound Insulation (mass law, coincidence, double walls)](https://jmrplens.github.io/phonometry/buildings/design/panel-sound-insulation/)
@@ -113,24 +153,52 @@ If you are an AI assistant setting this up for a user: install from PyPI (no sys
 ## Materials and surfaces
 
 - [Overview](https://jmrplens.github.io/phonometry/materials/)
+
+### Absorbers
+
+- [Overview](https://jmrplens.github.io/phonometry/materials/absorbers/) · [full text](https://jmrplens.github.io/phonometry/llms/llms-materials-absorbers.txt)
 - [Sound Absorption Measurement and Rating](https://jmrplens.github.io/phonometry/materials/absorbers/absorption-measurement/)
 - [Airflow Resistance](https://jmrplens.github.io/phonometry/materials/absorbers/airflow-resistance/)
 - [Impedance Tube](https://jmrplens.github.io/phonometry/materials/absorbers/impedance-tube/)
 - [Porous and Multilayer Absorbers](https://jmrplens.github.io/phonometry/materials/absorbers/porous-absorbers/)
 - [Metamaterial Absorbers](https://jmrplens.github.io/phonometry/materials/absorbers/metamaterial-absorbers/)
+
+### Diffusers and surfaces
+
+- [Overview](https://jmrplens.github.io/phonometry/materials/diffusers/) · [full text](https://jmrplens.github.io/phonometry/llms/llms-materials-diffusers.txt)
 - [Diffusers and Their Coefficients](https://jmrplens.github.io/phonometry/materials/diffusers/diffusers/)
 - [Metadiffusers](https://jmrplens.github.io/phonometry/materials/diffusers/metadiffusers/)
-- [Dynamic stiffness of resilient materials (EN 29052-1)](https://jmrplens.github.io/phonometry/materials/resilient/dynamic-stiffness/)
+
+### Surfaces measured in place
+
+- [Overview](https://jmrplens.github.io/phonometry/materials/surfaces/) · [full text](https://jmrplens.github.io/phonometry/llms/llms-materials-surfaces.txt)
 - [In-situ Road-Surface Absorption](https://jmrplens.github.io/phonometry/materials/surfaces/road-absorption/)
+
+### Resilient layers
+
+- [Overview](https://jmrplens.github.io/phonometry/materials/resilient/) · [full text](https://jmrplens.github.io/phonometry/llms/llms-materials-resilient.txt)
+- [Dynamic stiffness of resilient materials (EN 29052-1)](https://jmrplens.github.io/phonometry/materials/resilient/dynamic-stiffness/)
 
 ## Vibration and structure-borne sound
 
 - [Overview](https://jmrplens.github.io/phonometry/vibration/)
+
+### Structure-borne sources
+
+- [Overview](https://jmrplens.github.io/phonometry/vibration/structural/) · [full text](https://jmrplens.github.io/phonometry/llms/llms-vibration-structural.txt)
 - [Mechanical mobility and the FRF family (ISO 7626-1)](https://jmrplens.github.io/phonometry/vibration/structural/mechanical-mobility/)
-- [Dynamic transfer stiffness of resilient elements (ISO 10846)](https://jmrplens.github.io/phonometry/vibration/structural/transfer-stiffness/)
 - [Bending-wave transmission at plate junctions (Cremer / Craik / Hopkins)](https://jmrplens.github.io/phonometry/vibration/structural/junction-transmission/)
+- [Dynamic transfer stiffness of resilient elements (ISO 10846)](https://jmrplens.github.io/phonometry/vibration/structural/transfer-stiffness/)
+
+### Human vibration
+
+- [Overview](https://jmrplens.github.io/phonometry/vibration/human/) · [full text](https://jmrplens.github.io/phonometry/llms/llms-vibration-human.txt)
 - [Human Vibration: Whole-Body and Hand-Arm Exposure](https://jmrplens.github.io/phonometry/vibration/human/human-vibration/)
 - [Multiple-shock whole-body vibration (ISO 2631-5)](https://jmrplens.github.io/phonometry/vibration/human/multiple-shock-vibration/)
+
+### Machinery
+
+- [Overview](https://jmrplens.github.io/phonometry/vibration/machinery/) · [full text](https://jmrplens.github.io/phonometry/llms/llms-vibration-machinery.txt)
 - [Machine fault frequencies (Norton & Karczub)](https://jmrplens.github.io/phonometry/vibration/machinery/machine-diagnostics/)
 
 ## Environment and transport
@@ -138,10 +206,22 @@ If you are an AI assistant setting this up for a user: install from PyPI (no sys
 - [Overview](https://jmrplens.github.io/phonometry/environment/)
 - [Environmental Levels (ISO 1996-1/-2)](https://jmrplens.github.io/phonometry/environment/environmental-levels/)
 - [Spanish Noise Regulation (RD 1367/2007)](https://jmrplens.github.io/phonometry/environment/spanish-noise-regulation/)
+
+### Assessment and regulation
+
+- [Overview](https://jmrplens.github.io/phonometry/environment/assessment/) · [full text](https://jmrplens.github.io/phonometry/llms/llms-environment-assessment.txt)
+- [Impulsive-sound prominence (NT ACOU 112)](https://jmrplens.github.io/phonometry/environment/assessment/impulsive-sound/)
+
+### Outdoor sound
+
+- [Overview](https://jmrplens.github.io/phonometry/environment/propagation/) · [full text](https://jmrplens.github.io/phonometry/llms/llms-environment-propagation.txt)
 - [Outdoor Sound Propagation](https://jmrplens.github.io/phonometry/environment/propagation/outdoor-propagation/)
 - [Spherical ground effect and advanced barriers (Attenborough / Salomons / Bies)](https://jmrplens.github.io/phonometry/environment/propagation/ground-barriers/)
 - [Atmospheric refraction: ray tracing and the parabolic equation (Salomons / Attenborough)](https://jmrplens.github.io/phonometry/environment/propagation/atmospheric-refraction/)
-- [Impulsive-sound prominence (NT ACOU 112)](https://jmrplens.github.io/phonometry/environment/assessment/impulsive-sound/)
+
+### Environmental sources
+
+- [Overview](https://jmrplens.github.io/phonometry/environment/sources/) · [full text](https://jmrplens.github.io/phonometry/llms/llms-environment-sources.txt)
 - [CNOSSOS-EU road traffic source emission](https://jmrplens.github.io/phonometry/environment/sources/cnossos-road-emission/)
 - [CNOSSOS-EU railway source emission](https://jmrplens.github.io/phonometry/environment/sources/cnossos-rail-emission/)
 - [Wind-turbine noise: apparent sound power and tonal audibility (IEC 61400-11)](https://jmrplens.github.io/phonometry/environment/sources/wind-turbine-noise/)
@@ -164,21 +244,37 @@ If you are an AI assistant setting this up for a user: install from PyPI (no sys
 ## Sources and devices
 
 - [Overview](https://jmrplens.github.io/phonometry/devices/)
+
+### Sound power and intensity
+
+- [Overview](https://jmrplens.github.io/phonometry/devices/emission/) · [full text](https://jmrplens.github.io/phonometry/llms/llms-devices-emission.txt)
 - [Sound Power](https://jmrplens.github.io/phonometry/devices/emission/sound-power/)
 - [Sound Power by Pressure Methods (ISO 3744 / ISO 3746 / ISO 3745)](https://jmrplens.github.io/phonometry/devices/emission/sound-power-pressure/)
 - [Sound Power in the Reverberation Room (ISO 3741)](https://jmrplens.github.io/phonometry/devices/emission/sound-power-reverberation/)
 - [Sound Power by Intensity Scanning (ISO 9614-2 / ISO 9614-3)](https://jmrplens.github.io/phonometry/devices/emission/sound-power-intensity/)
 - [Sound Intensity (p-p method)](https://jmrplens.github.io/phonometry/devices/emission/intensity/)
 - [Sound power from surface vibration (ISO/TS 7849)](https://jmrplens.github.io/phonometry/devices/emission/vibration-sound-power/)
+
+### Electroacoustics
+
+- [Overview](https://jmrplens.github.io/phonometry/devices/electroacoustics/) · [full text](https://jmrplens.github.io/phonometry/llms/llms-devices-electroacoustics.txt)
 - [Electroacoustics: distortion and frequency response (IEC 60268-3 / Bendat & Piersol)](https://jmrplens.github.io/phonometry/devices/electroacoustics/electroacoustics/)
 - [Loudspeaker Characterisation (IEC 60268-5)](https://jmrplens.github.io/phonometry/devices/electroacoustics/loudspeakers/)
 - [Microphone Characterisation (IEC 60268-4)](https://jmrplens.github.io/phonometry/devices/electroacoustics/microphones/)
 - [Swept-sine distortion and phase utilities (Farina / Novak)](https://jmrplens.github.io/phonometry/devices/electroacoustics/swept-sine-distortion/)
+
+### Broadcast
+
+- [Overview](https://jmrplens.github.io/phonometry/devices/broadcast/) · [full text](https://jmrplens.github.io/phonometry/llms/llms-devices-broadcast.txt)
+- [Programme loudness and true peak (ITU-R BS.1770 / EBU R 128)](https://jmrplens.github.io/phonometry/devices/broadcast/program-loudness/)
+
+### Noise control
+
+- [Overview](https://jmrplens.github.io/phonometry/devices/noise-control/) · [full text](https://jmrplens.github.io/phonometry/llms/llms-devices-noise-control.txt)
 - [Silencers](https://jmrplens.github.io/phonometry/devices/noise-control/silencers/)
 - [Industrial noise control: HVAC and enclosures](https://jmrplens.github.io/phonometry/devices/noise-control/noise-control/)
 - [Duct-borne noise: fan to room](https://jmrplens.github.io/phonometry/devices/noise-control/duct-path/)
 - [Room to room: partition, receiving room, criterion](https://jmrplens.github.io/phonometry/devices/noise-control/room-to-room/)
-- [Programme loudness and true peak (ITU-R BS.1770 / EBU R 128)](https://jmrplens.github.io/phonometry/devices/broadcast/program-loudness/)
 
 ## Wave simulation
 
@@ -187,6 +283,8 @@ If you are an AI assistant setting this up for a user: install from PyPI (no sys
 - [Elastic waves and fluid-solid coupling](https://jmrplens.github.io/phonometry/simulation/elastic-waves/)
 
 ## Theory and reference
+
+The theory pages travel in the Start shard (https://jmrplens.github.io/phonometry/llms/llms-start.txt); the rest of the reference in https://jmrplens.github.io/phonometry/llms/llms-reference.txt.
 
 - [API Reference](https://jmrplens.github.io/phonometry/reference/api/)
 - [Bibliography](https://jmrplens.github.io/phonometry/reference/bibliography/)
@@ -219,35 +317,41 @@ If you are an AI assistant setting this up for a user: install from PyPI (no sys
 One file per area, each small enough to fetch whole. `llms-full.txt` is the complete concatenation and is far too large for a single fetch in most clients.
 
 - [Start here](https://jmrplens.github.io/phonometry/llms/llms-start.txt)
-- [Buildings design](https://jmrplens.github.io/phonometry/llms/llms-buildings-design.txt)
-- [Buildings insulation](https://jmrplens.github.io/phonometry/llms/llms-buildings-insulation.txt)
-- [Buildings rooms](https://jmrplens.github.io/phonometry/llms/llms-buildings-rooms.txt)
-- [Devices broadcast](https://jmrplens.github.io/phonometry/llms/llms-devices-broadcast.txt)
-- [Devices electroacoustics](https://jmrplens.github.io/phonometry/llms/llms-devices-electroacoustics.txt)
-- [Devices emission](https://jmrplens.github.io/phonometry/llms/llms-devices-emission.txt)
-- [Devices noise control](https://jmrplens.github.io/phonometry/llms/llms-devices-noise-control.txt)
-- [Environment assessment](https://jmrplens.github.io/phonometry/llms/llms-environment-assessment.txt)
-- [Environment propagation](https://jmrplens.github.io/phonometry/llms/llms-environment-propagation.txt)
-- [Environment sources](https://jmrplens.github.io/phonometry/llms/llms-environment-sources.txt)
-- [Materials absorbers](https://jmrplens.github.io/phonometry/llms/llms-materials-absorbers.txt)
-- [Materials diffusers](https://jmrplens.github.io/phonometry/llms/llms-materials-diffusers.txt)
-- [Materials resilient](https://jmrplens.github.io/phonometry/llms/llms-materials-resilient.txt)
-- [Materials surfaces](https://jmrplens.github.io/phonometry/llms/llms-materials-surfaces.txt)
-- [Perception hearing](https://jmrplens.github.io/phonometry/llms/llms-perception-hearing.txt)
-- [Perception psychoacoustics](https://jmrplens.github.io/phonometry/llms/llms-perception-psychoacoustics.txt)
-- [Perception speech](https://jmrplens.github.io/phonometry/llms/llms-perception-speech.txt)
-- [Signal filters](https://jmrplens.github.io/phonometry/llms/llms-signal-filters.txt)
-- [Signal levels](https://jmrplens.github.io/phonometry/llms/llms-signal-levels.txt)
-- [Signal metrology](https://jmrplens.github.io/phonometry/llms/llms-signal-metrology.txt)
-- [Signal spectra](https://jmrplens.github.io/phonometry/llms/llms-signal-spectra.txt)
-- [Vibration human](https://jmrplens.github.io/phonometry/llms/llms-vibration-human.txt)
-- [Vibration machinery](https://jmrplens.github.io/phonometry/llms/llms-vibration-machinery.txt)
-- [Vibration structural](https://jmrplens.github.io/phonometry/llms/llms-vibration-structural.txt)
 - [Signal analysis](https://jmrplens.github.io/phonometry/llms/llms-signal.txt)
+- [Octave filtering](https://jmrplens.github.io/phonometry/llms/llms-signal-filters.txt)
+- [Levels and weighting](https://jmrplens.github.io/phonometry/llms/llms-signal-levels.txt)
+- [Signals and spectra](https://jmrplens.github.io/phonometry/llms/llms-signal-spectra.txt)
+- [Calibration and uncertainty](https://jmrplens.github.io/phonometry/llms/llms-signal-metrology.txt)
+- [Hearing and perception](https://jmrplens.github.io/phonometry/llms/llms-perception.txt)
+- [Psychoacoustics](https://jmrplens.github.io/phonometry/llms/llms-perception-psychoacoustics.txt)
+- [Speech](https://jmrplens.github.io/phonometry/llms/llms-perception-speech.txt)
+- [Hearing and exposure](https://jmrplens.github.io/phonometry/llms/llms-perception-hearing.txt)
+- [Rooms and buildings](https://jmrplens.github.io/phonometry/llms/llms-buildings.txt)
+- [Room acoustics](https://jmrplens.github.io/phonometry/llms/llms-buildings-rooms.txt)
+- [Sound insulation](https://jmrplens.github.io/phonometry/llms/llms-buildings-insulation.txt)
+- [Insulation design](https://jmrplens.github.io/phonometry/llms/llms-buildings-design.txt)
+- [Materials and surfaces](https://jmrplens.github.io/phonometry/llms/llms-materials.txt)
+- [Absorbers](https://jmrplens.github.io/phonometry/llms/llms-materials-absorbers.txt)
+- [Diffusers and surfaces](https://jmrplens.github.io/phonometry/llms/llms-materials-diffusers.txt)
+- [Surfaces measured in place](https://jmrplens.github.io/phonometry/llms/llms-materials-surfaces.txt)
+- [Resilient layers](https://jmrplens.github.io/phonometry/llms/llms-materials-resilient.txt)
+- [Vibration and structure-borne sound](https://jmrplens.github.io/phonometry/llms/llms-vibration.txt)
+- [Structure-borne sources](https://jmrplens.github.io/phonometry/llms/llms-vibration-structural.txt)
+- [Human vibration](https://jmrplens.github.io/phonometry/llms/llms-vibration-human.txt)
+- [Machinery](https://jmrplens.github.io/phonometry/llms/llms-vibration-machinery.txt)
 - [Environment and transport](https://jmrplens.github.io/phonometry/llms/llms-environment.txt)
+- [Assessment and regulation](https://jmrplens.github.io/phonometry/llms/llms-environment-assessment.txt)
+- [Outdoor sound](https://jmrplens.github.io/phonometry/llms/llms-environment-propagation.txt)
+- [Environmental sources](https://jmrplens.github.io/phonometry/llms/llms-environment-sources.txt)
 - [Aircraft noise](https://jmrplens.github.io/phonometry/llms/llms-aircraft.txt)
 - [Underwater acoustics](https://jmrplens.github.io/phonometry/llms/llms-underwater.txt)
+- [Sources and devices](https://jmrplens.github.io/phonometry/llms/llms-devices.txt)
+- [Sound power and intensity](https://jmrplens.github.io/phonometry/llms/llms-devices-emission.txt)
+- [Electroacoustics](https://jmrplens.github.io/phonometry/llms/llms-devices-electroacoustics.txt)
+- [Broadcast](https://jmrplens.github.io/phonometry/llms/llms-devices-broadcast.txt)
+- [Noise control](https://jmrplens.github.io/phonometry/llms/llms-devices-noise-control.txt)
 - [Wave simulation](https://jmrplens.github.io/phonometry/llms/llms-simulation.txt)
+- [Reference](https://jmrplens.github.io/phonometry/llms/llms-reference.txt)
 - [Everything](https://jmrplens.github.io/phonometry/llms-full.txt)
 
 ## Spanish
@@ -973,6 +1077,67 @@ fraction, §4.5.6; the start-of-roll directivity, §4.5.7; and segment summation
 §4.3) through to ground-grid noise contours, with the impedance adjustment
 (§4.2.1). The single-event chain is validated against the ECAC Doc 29 5th ed.
 Vol 3 Part 1 reference workbook.
+
+---
+
+
+<!-- source: docs/aircraft/index.md | canonical: https://jmrplens.github.io/phonometry/aircraft/ -->
+Source: https://jmrplens.github.io/phonometry/aircraft/
+
+# Aircraft and wind energy
+
+Aircraft and wind turbines are noise sources important enough to have their
+own internationally negotiated metrics, each fixed to the last decimal by a
+certification or type-testing framework. The four pages of this section
+implement those frameworks, and they share a common anatomy: a rigorously
+standardised **source descriptor**, plus standardised **propagation
+adjustments** that place the source at a receiver.
+
+[Aircraft noise: Effective Perceived Noise Level](https://jmrplens.github.io/phonometry/aircraft/aircraft-noise/)
+covers fixed-wing certification. The **EPNL** of ICAO Annex 16 condenses a
+one-third-octave time history of a flyover into a single EPNdB value through
+perceived noisiness, a tone correction and a duration correction; the page
+adds the IEC 61265 measurement-system verifier and the SAE ARP 5534
+atmospheric absorption used in the certification chain.
+[Airport Noise (ECAC Doc 29)](https://jmrplens.github.io/phonometry/aircraft/airport-noise/) picks the
+aeroplane up from there: the noise-power-distance tables, the per-segment
+corrections of a flight path (impedance, lateral attenuation, engine
+installation, duration, noise fraction and start-of-roll directivity) and the
+single-event contour over a ground grid.
+
+[Rotorcraft noise: the hemisphere method](https://jmrplens.github.io/phonometry/aircraft/rotorcraft-noise/)
+covers helicopters, whose strong directivity defeats a single-number source
+level. ECAC Doc 32 instead describes the source as a **noise hemisphere**
+(band levels on a grid of emission angles at a 60 m reference distance),
+propagates each ray with spherical spreading, atmospheric absorption and the
+Chien-Soroka ground effect, interpolates between the measured flight
+conditions along the track, and integrates the received history into the
+single-event SEL, LASmax and EPNL and their ground-grid contours.
+
+[Wind-turbine noise: sound power and tonal audibility](https://jmrplens.github.io/phonometry/environment/sources/wind-turbine-noise/)
+covers IEC 61400-11 type testing: the **apparent sound power level** that
+refers the measured immission back to an equivalent point source at the rotor
+centre, and the tonal-audibility chain that decides whether a blade-passing,
+gearbox or generator tone is audible above its masking noise.
+
+The shared physics connects outward: atmospheric absorption comes from the
+same ISO 9613-1 model as
+[Outdoor Sound Propagation](https://jmrplens.github.io/phonometry/environment/propagation/outdoor-propagation/), and the
+wind-turbine tonality test is a cousin of the tonal-audibility methods in
+[Psychoacoustics](https://jmrplens.github.io/phonometry/perception/psychoacoustics/).
+
+## Pages in this section
+
+- [Aircraft noise: Effective Perceived Noise Level](https://jmrplens.github.io/phonometry/aircraft/aircraft-noise/):
+  the ICAO Annex 16 EPNL chain, the IEC 61265 verifier and the SAE ARP 5534
+  absorption.
+- [Airport Noise (ECAC Doc 29)](https://jmrplens.github.io/phonometry/aircraft/airport-noise/): the NPD
+  engine, the single-event segment chain and the ground-grid SEL contour.
+- [Rotorcraft noise: the hemisphere method](https://jmrplens.github.io/phonometry/aircraft/rotorcraft-noise/):
+  the ECAC Doc 32 noise-hemisphere source model, its propagation adjustments
+  and the single-event metrics and contours.
+- [Wind-turbine noise: sound power and tonal audibility](https://jmrplens.github.io/phonometry/environment/sources/wind-turbine-noise/):
+  the IEC 61400-11 apparent sound power level and tonal-audibility chain.
 
 ---
 
@@ -2075,6 +2240,83 @@ not a measurement).
 - [Insulation Ratings (ISO 717)](https://jmrplens.github.io/phonometry/buildings/insulation/insulation-ratings/): the reference-curve
   engine behind the weighted improvement.
 - API reference: [`building.measurement.floor_covering_improvement`](https://jmrplens.github.io/phonometry/reference/api/building/floor-covering-improvement/).
+
+---
+
+
+<!-- source: docs/buildings/design/index.md | canonical: https://jmrplens.github.io/phonometry/buildings/design/ -->
+Source: https://jmrplens.github.io/phonometry/buildings/design/
+
+# Insulation design
+
+The pages of the [Sound insulation](https://jmrplens.github.io/phonometry/buildings/insulation/)
+section answer the question *what does this building achieve?* The pages here
+answer the one that comes first: *what will it achieve, and what should I
+build?* Both halves speak the same language of $R$, $L_n$ and their weighted
+single numbers, but a prediction is assembled from element data instead of
+measured in a finished room, so its inputs, its assumptions and its error bars
+are its own subject.
+
+[Predicting Sound Insulation (EN 12354)](https://jmrplens.github.io/phonometry/buildings/design/insulation-prediction/)
+is the normative model: the airborne and impact flanking transmission between
+two rooms, path by path, from the direct element and the junction vibration
+reduction indices $K_{ij}$. It consumes laboratory element data measured per
+ISO 10140 and junction data measured per ISO 10848, both of which live in
+[Sound insulation](https://jmrplens.github.io/phonometry/buildings/insulation/) beside the
+field measurement the prediction is checked against, and beside the façade
+guide that carries the same family across the building envelope.
+
+[Detailed Per-Band Prediction (ISO 12354)](https://jmrplens.github.io/phonometry/buildings/design/detailed-prediction/)
+runs the same standard band by band instead of on single numbers: the
+laboratory element and junction data are converted to their in-situ values,
+every path is formed per band, and the result shows which path dominates each
+band rather than only whether the room passes.
+
+[Predicting Panel Sound Insulation](https://jmrplens.github.io/phonometry/buildings/design/panel-sound-insulation/)
+goes one level deeper, to where the element $R$ itself comes from: the mass law
+and the coincidence dip of a single panel, the mass-spring-mass behaviour of a
+double wall, transmission through slits and apertures, plate radiation
+efficiency and point mobilities. It is the physics a catalogue value expresses
+in one number.
+
+Two measurements feed the floor half of any design.
+[Floor-Covering Impact Improvement (ISO 16251-1)](https://jmrplens.github.io/phonometry/buildings/design/impact-improvement/)
+gives the weighted improvement $\Delta L_w$ of a soft covering on a small
+heavyweight mock-up, the term EN 12354-2 subtracts from the bare-floor level,
+and
+[Dynamic stiffness of resilient materials (EN 29052-1)](https://jmrplens.github.io/phonometry/materials/resilient/dynamic-stiffness/)
+gives the stiffness per unit area $s'$ of the resilient layer under a floating
+floor, and with it the resonance frequency the whole improvement hangs on.
+
+## Pages in this section
+
+- [Predicting Sound Insulation (EN 12354)](https://jmrplens.github.io/phonometry/buildings/design/insulation-prediction/):
+  the airborne and impact flanking models between rooms (EN 12354-1/2) with
+  their junction vibration reduction indices and prediction fiches.
+- [Detailed Per-Band Prediction (ISO 12354)](https://jmrplens.github.io/phonometry/buildings/design/detailed-prediction/):
+  the per-band detailed model of ISO 12354-1/-2 with in-situ element and
+  junction conversion, the flanking indices per band and the per-path
+  contributions behind the rating.
+- [Predicting Panel Sound Insulation](https://jmrplens.github.io/phonometry/buildings/design/panel-sound-insulation/):
+  the mass law and coincidence dip (Sharp), double walls (Bies), slits and
+  apertures (Gomperts, Wilson-Soroka), radiation efficiency
+  (Leppington/Maidanik) and point mobilities (Cremer).
+- [Floor-Covering Impact Improvement (ISO 16251-1)](https://jmrplens.github.io/phonometry/buildings/design/impact-improvement/):
+  the weighted improvement of a soft floor covering measured on a small
+  heavyweight mock-up.
+- [Predicting Resilient-Layer Performance](https://jmrplens.github.io/phonometry/buildings/design/resilient-layers/):
+  the tapping-machine force model, the cut-off frequency of a soft covering,
+  the floating-floor improvement laws and the ISO 12354-1 Annex D rating of a
+  wall lining.
+- [Dynamic stiffness of resilient materials (EN 29052-1)](https://jmrplens.github.io/phonometry/materials/resilient/dynamic-stiffness/):
+  the load-plate resonance measurement, the enclosed-gas term and the
+  floating-floor natural frequency.
+- [Structure-borne sound power of equipment (EN 15657)](https://jmrplens.github.io/phonometry/buildings/design/structure-borne-power/):
+  the characteristic power a machine injects into a building element, measured
+  on a reception plate.
+- [Installed structure-borne sound (EN 12354-5)](https://jmrplens.github.io/phonometry/buildings/design/installed-structure-borne/):
+  what that power becomes once the machine is mounted on a real element, and
+  the level it produces in the receiving room.
 
 ---
 
@@ -4186,6 +4428,111 @@ Annex I.3 Table I.8 conversion of the flushing-cistern source.
 ---
 
 
+<!-- source: docs/buildings/index.md | canonical: https://jmrplens.github.io/phonometry/buildings/ -->
+Source: https://jmrplens.github.io/phonometry/buildings/
+
+# Rooms and buildings
+
+This section covers sound in the built environment, and it splits along a
+natural line: what happens **inside** one room, and what passes **between**
+rooms. Inside a room, the governing quantity is absorption: it sets the
+reverberation time and the clarity that room acoustics measures (ISO 3382)
+and predicts (Sabine and its refinements, EN 12354-6), while the background
+noise the room settles into is rated against criterion curves
+(ANSI/ASA S12.2). Between rooms, the governing quantity is insulation: how much
+airborne and impact sound a partition and its flanking paths transmit, measured
+in the field (ISO 16283) or the laboratory (ISO 10140) and predicted from
+element data (EN 12354).
+
+Both halves consume coefficients measured elsewhere: the
+[Materials and surfaces](https://jmrplens.github.io/phonometry/materials/)
+section characterises the absorption, impedance and scattering data that the
+room and insulation predictions here rely on.
+
+Start with
+[Measuring the Room Impulse Response](https://jmrplens.github.io/phonometry/buildings/rooms/room-impulse-response/)
+and [Room Acoustics](https://jmrplens.github.io/phonometry/buildings/rooms/room-acoustics/): the impulse response
+the first acquires and the parameters the second derives are the vocabulary
+the rest of the section speaks. If your interest is insulation, read
+[Field Insulation Measurement (ISO 16283)](https://jmrplens.github.io/phonometry/buildings/insulation/insulation-field/)
+next; if it is design-stage prediction, go to
+[Reverberation-time prediction (Sabine, Eyring, Arau)](https://jmrplens.github.io/phonometry/buildings/rooms/reverberation-prediction/)
+and [Predicting Sound Insulation (EN 12354)](https://jmrplens.github.io/phonometry/buildings/design/insulation-prediction/).
+
+## [Room acoustics](https://jmrplens.github.io/phonometry/buildings/rooms/)
+
+The sound field inside a single room: measured from an impulse response, rated
+against criterion curves, and predicted from volume and absorption.
+
+- [Measuring the Room Impulse Response](https://jmrplens.github.io/phonometry/buildings/rooms/room-impulse-response/):
+  the ISO 18233 deterministic acquisition, sweep deconvolution and MLS.
+- [Room Acoustics](https://jmrplens.github.io/phonometry/buildings/rooms/room-acoustics/): the ISO 3382-1/2 room
+  parameters derived from that impulse response.
+- [Open-Plan Office Acoustics (ISO 3382-3)](https://jmrplens.github.io/phonometry/buildings/rooms/open-plan-acoustics/):
+  the speech-privacy quantities of an open-plan floor.
+- [Image sources and the steady-state room field](https://jmrplens.github.io/phonometry/buildings/rooms/room-image-sources/):
+  the deterministic image-source impulse response and the statistical
+  steady-state level.
+- [Room-noise criteria (NC / RC Mark II)](https://jmrplens.github.io/phonometry/buildings/rooms/room-noise/): the
+  ANSI/ASA S12.2-2019 room-noise ratings with their spectral tags.
+- [Reverberation-time prediction (Sabine, Eyring, Arau)](https://jmrplens.github.io/phonometry/buildings/rooms/reverberation-prediction/):
+  Sabine, Eyring, Millington-Sette, Fitzroy and Arau-Puchades models with the
+  air-absorption term.
+- [Sound absorption in enclosed spaces (EN 12354-6)](https://jmrplens.github.io/phonometry/buildings/rooms/enclosed-space-absorption/):
+  the normative prediction of a room's total equivalent absorption area and
+  reverberation time.
+
+## [Sound insulation](https://jmrplens.github.io/phonometry/buildings/insulation/)
+
+Airborne and impact insulation: measured in the building, characterised in the
+laboratory, and predicted from element data.
+
+- [Field Insulation Measurement (ISO 16283)](https://jmrplens.github.io/phonometry/buildings/insulation/insulation-field/):
+  ISO 16283-1/2 field measurement, the Clause 14 report and the ISO 12999-1
+  uncertainty that qualifies it.
+- [Laboratory Insulation Measurement](https://jmrplens.github.io/phonometry/buildings/insulation/insulation-lab/):
+  the ISO 10140 laboratory characterisation of an element.
+- [Sound Insulation by Intensity (ISO 15186)](https://jmrplens.github.io/phonometry/buildings/insulation/insulation-intensity/):
+  the direct-power route to the same indices when flanking is high.
+- [Sound Insulation Survey Method (ISO 10052)](https://jmrplens.github.io/phonometry/buildings/insulation/insulation-survey/):
+  the octave-band control method and its reverberation index.
+- [Laboratory Flanking Transmission (ISO 10848)](https://jmrplens.github.io/phonometry/buildings/insulation/flanking-lab/):
+  the measured junction vibration reduction index and the flanking descriptors.
+- [Insulation Ratings (ISO 717)](https://jmrplens.github.io/phonometry/buildings/insulation/insulation-ratings/): the
+  reference-curve engines behind Rw, DnT,w, Ln,w and their adaptation terms.
+- [Façade Sound Insulation](https://jmrplens.github.io/phonometry/buildings/insulation/facade-insulation/): the
+  building envelope measured (ISO 16283-3) and predicted (EN 12354-3/4).
+- [Spanish Building Code (CTE DB-HR)](https://jmrplens.github.io/phonometry/buildings/insulation/spanish-building-code/):
+  the DB-HR global indices, the clause 2 requirements and the window-size
+  correction.
+
+## [Insulation design](https://jmrplens.github.io/phonometry/buildings/design/)
+
+The same quantities before the building exists: predicted from element data,
+and from the physics of the element itself.
+
+- [Predicting Sound Insulation (EN 12354)](https://jmrplens.github.io/phonometry/buildings/design/insulation-prediction/):
+  airborne and impact flanking transmission between rooms (EN 12354-1/2).
+- [Detailed Per-Band Prediction (ISO 12354)](https://jmrplens.github.io/phonometry/buildings/design/detailed-prediction/):
+  the same prediction band by band, with the per-path contributions behind
+  R'w and L'n,w.
+- [Predicting Panel Sound Insulation](https://jmrplens.github.io/phonometry/buildings/design/panel-sound-insulation/):
+  the mass law, coincidence dip, double walls and apertures.
+- [Floor-Covering Impact Improvement (ISO 16251-1)](https://jmrplens.github.io/phonometry/buildings/design/impact-improvement/):
+  the weighted improvement of a soft covering on a small heavyweight mock-up.
+- [Predicting Resilient-Layer Performance](https://jmrplens.github.io/phonometry/buildings/design/resilient-layers/):
+  the prediction side of coverings, floating floors and wall linings.
+- [Structure-borne sound power of equipment (EN 15657)](https://jmrplens.github.io/phonometry/buildings/design/structure-borne-power/):
+  the reception-plate method and the plate-independent source quantities.
+- [Installed structure-borne sound (EN 12354-5)](https://jmrplens.github.io/phonometry/buildings/design/installed-structure-borne/):
+  the receiving-room sound pressure level predicted from source and receiver
+  mobilities.
+- [Dynamic stiffness of resilient materials (EN 29052-1)](https://jmrplens.github.io/phonometry/materials/resilient/dynamic-stiffness/):
+  the load-plate resonance measurement behind every floating-floor prediction.
+
+---
+
+
 <!-- source: docs/buildings/insulation/facade-insulation.md | canonical: https://jmrplens.github.io/phonometry/buildings/insulation/facade-insulation/ -->
 Source: https://jmrplens.github.io/phonometry/buildings/insulation/facade-insulation/
 
@@ -5466,6 +5813,96 @@ published 25-band reproduction of Formula (4).
   engine that rates the tapping-machine quantities.
 - [Floor-Covering Impact Improvement (ISO 16251-1)](https://jmrplens.github.io/phonometry/buildings/design/impact-improvement/):
   the improvement a soft covering gives against the light source.
+
+---
+
+
+<!-- source: docs/buildings/insulation/index.md | canonical: https://jmrplens.github.io/phonometry/buildings/insulation/ -->
+Source: https://jmrplens.github.io/phonometry/buildings/insulation/
+
+# Sound insulation
+
+Sound insulation has a life cycle, and the pages of this section follow it.
+An element (a wall build-up, a floating floor, a window) is first
+characterised **in the laboratory**, where suppressed flanking isolates its
+direct transmission. That laboratory data feeds a **prediction** of how a
+whole building will perform, flanking paths included. The finished building is
+then **verified in the field**. At every stage the band spectrum is collapsed
+to the **single number** regulations quote, and that collapse is one shared
+engine rather than a step of any single method.
+
+**Laboratory.**
+[Laboratory Insulation Measurement](https://jmrplens.github.io/phonometry/buildings/insulation/insulation-lab/) covers
+the ISO 10140 sound reduction index and normalized impact level with their
+background-noise correction. Two laboratory methods sit beside it:
+[Sound Insulation by Intensity (ISO 15186)](https://jmrplens.github.io/phonometry/buildings/insulation/insulation-intensity/)
+reads the transmitted power off the radiating face when flanking is too high
+for the pressure method, and
+[Laboratory Flanking Transmission (ISO 10848)](https://jmrplens.github.io/phonometry/buildings/insulation/flanking-lab/)
+measures the junction data the prediction consumes. A third, the
+floor-covering improvement of ISO 16251-1, is filed with the design pages it
+feeds.
+
+**Prediction.** The design-stage half has a section of its own,
+[Insulation design](https://jmrplens.github.io/phonometry/buildings/design/): the
+EN 12354 flanking model between rooms, the theoretical insulation of a panel,
+and the two material measurements a floor design consumes.
+
+**Field.**
+[Field Insulation Measurement (ISO 16283)](https://jmrplens.github.io/phonometry/buildings/insulation/insulation-field/)
+covers the engineering-grade airborne and impact measurement in the building,
+its Clause 14 test report and the ISO 12999-1 uncertainty that qualifies it.
+When the question does not deserve that effort,
+[Sound Insulation Survey Method (ISO 10052)](https://jmrplens.github.io/phonometry/buildings/insulation/insulation-survey/)
+trades accuracy for speed with octave bands and a reverberation index.
+
+**Ratings and the envelope.**
+[Insulation Ratings (ISO 717)](https://jmrplens.github.io/phonometry/buildings/insulation/insulation-ratings/) is the
+reference-curve engine every one of those methods ends on, with its spectrum
+adaptation terms C, Ctr and CI. And
+[Façade Sound Insulation](https://jmrplens.github.io/phonometry/buildings/insulation/facade-insulation/) keeps the
+building envelope in one place: measured per ISO 16283-3, predicted per
+EN 12354-3, and radiating outwards per EN 12354-4. National building codes
+restate those ratings in their own global quantities, and
+[Spanish Building Code (CTE DB-HR)](https://jmrplens.github.io/phonometry/buildings/insulation/spanish-building-code/)
+implements the Spanish one: the direct Annex A index over eighteen bands, the
+clause 2 requirement tables and the window-size correction.
+
+Two neighbouring sections complete the picture: the room-side quantities
+(reverberation time, absorption) live in
+[Room acoustics](https://jmrplens.github.io/phonometry/buildings/rooms/), and the
+structure-borne noise of building *equipment*, predicted by the closely
+related EN 12354-5, lives in
+[Structure-borne sources](https://jmrplens.github.io/phonometry/vibration/structural/).
+
+## Pages in this section
+
+- [Field Insulation Measurement (ISO 16283)](https://jmrplens.github.io/phonometry/buildings/insulation/insulation-field/):
+  ISO 16283-1/2 field measurement, its test report and the ISO 12999-1
+  uncertainty.
+- [Laboratory Insulation Measurement](https://jmrplens.github.io/phonometry/buildings/insulation/insulation-lab/):
+  the ISO 10140 characterisation of an element with flanking suppressed.
+- [Sound Insulation by Intensity (ISO 15186)](https://jmrplens.github.io/phonometry/buildings/insulation/insulation-intensity/):
+  the ISO 15186-1/-2 direct-power route to the same indices.
+- [Sound Insulation Survey Method (ISO 10052)](https://jmrplens.github.io/phonometry/buildings/insulation/insulation-survey/):
+  the octave-band control method, its reverberation index and its survey
+  quantities.
+- [Laboratory Flanking Transmission (ISO 10848)](https://jmrplens.github.io/phonometry/buildings/insulation/flanking-lab/):
+  the measured vibration reduction index Kij and the flanking descriptors
+  Dn,f and Ln,f.
+- [Heavy and Soft Impact Sources (ISO 16283-2)](https://jmrplens.github.io/phonometry/buildings/insulation/heavy-impact-sources/):
+  the rubber ball and the bang machine, the impact force exposure levels that
+  specify them, the Fast-weighted maximum level and the ISO 717-2 Annex D
+  single number.
+- [Insulation Ratings (ISO 717)](https://jmrplens.github.io/phonometry/buildings/insulation/insulation-ratings/):
+  the ISO 717-1/-2 reference-curve engines, C, Ctr and CI, the enlarged-range
+  terms and the ISO 717 fiche.
+- [Façade Sound Insulation](https://jmrplens.github.io/phonometry/buildings/insulation/facade-insulation/):
+  the envelope measured (ISO 16283-3), predicted (EN 12354-3) and radiating
+  outwards (EN 12354-4).
+- [Spanish Building Code (CTE DB-HR)](https://jmrplens.github.io/phonometry/buildings/insulation/spanish-building-code/):
+  the DB-HR global indices RA, RA,tr, DnT,A and D2m,nT,Atr, the clause 2
+  requirements and the window-size correction.
 
 ---
 
@@ -7838,6 +8275,82 @@ Formula 5), validated against the three worked cases of Annex E.
 ---
 
 
+<!-- source: docs/buildings/rooms/index.md | canonical: https://jmrplens.github.io/phonometry/buildings/rooms/ -->
+Source: https://jmrplens.github.io/phonometry/buildings/rooms/
+
+# Room acoustics
+
+Almost everything about the sound field inside a room follows from two
+quantities: its **impulse response**, which can be measured, and its **sound
+absorption**, which can be designed. The pages of this section cover the
+measurement chain built on the first, the prediction chain built on the
+second, and the rating of the background noise that occupies the room in
+between.
+
+The measurement chain starts in
+[Measuring the Room Impulse Response](https://jmrplens.github.io/phonometry/buildings/rooms/room-impulse-response/):
+the deterministic excitation signals of ISO 18233, the sweep deconvolution
+that turns a recording into an impulse response, and the MLS alternative.
+[Room Acoustics](https://jmrplens.github.io/phonometry/buildings/rooms/room-acoustics/) then derives the ISO 3382
+parameters from it (reverberation time, EDT, clarity, definition and centre
+time), and
+[Open-Plan Office Acoustics (ISO 3382-3)](https://jmrplens.github.io/phonometry/buildings/rooms/open-plan-acoustics/)
+answers the question a single closed room does not raise: how far speech stays
+intelligible across an open floor, through the spatial decay rate and the
+distraction and privacy distances.
+[Image sources and the steady-state room field](https://jmrplens.github.io/phonometry/buildings/rooms/room-image-sources/)
+approaches the same room deterministically, building its impulse response from
+mirrored sources and its steady-state level from the room constant.
+
+Prediction gets two pages because two traditions coexist.
+[Reverberation-time prediction (Sabine, Eyring, Arau)](https://jmrplens.github.io/phonometry/buildings/rooms/reverberation-prediction/)
+covers the classical statistical formulae (Sabine, Eyring, Millington-Sette,
+Fitzroy and Arau-Puchades), including the models that handle a non-uniform
+absorption distribution.
+[Sound absorption in enclosed spaces (EN 12354-6)](https://jmrplens.github.io/phonometry/buildings/rooms/enclosed-space-absorption/)
+covers the normative European version of the same physics: the total
+equivalent absorption area assembled from surfaces, objects and air, and the
+reverberation time that follows from it, as a standard a design report can
+cite.
+
+[Room-noise criteria (NC / RC Mark II)](https://jmrplens.github.io/phonometry/buildings/rooms/room-noise/)
+answers a different question about the same room: whether its steady
+background noise (ventilation, distant traffic) is acceptable for its use,
+rated against the ANSI/ASA S12.2 criterion curves, with the RC Mark II
+rumble/hiss tag diagnosing *why* a spectrum fails.
+
+Related pages elsewhere: the absorption coefficient the prediction chain
+consumes is measured in
+[Sound Absorption Measurement and Rating](https://jmrplens.github.io/phonometry/materials/absorbers/absorption-measurement/),
+insulation *between* rooms continues in
+[Sound insulation](https://jmrplens.github.io/phonometry/buildings/insulation/), and the
+speech intelligibility a room affords is quantified by the
+[Speech Transmission Index](https://jmrplens.github.io/phonometry/perception/speech/speech-transmission/).
+
+## Pages in this section
+
+- [Measuring the Room Impulse Response](https://jmrplens.github.io/phonometry/buildings/rooms/room-impulse-response/):
+  the ISO 18233 deterministic methods, exponential sweeps and their
+  deconvolution, and MLS.
+- [Room Acoustics](https://jmrplens.github.io/phonometry/buildings/rooms/room-acoustics/): the ISO 3382-1/2
+  parameters (T20, T30, EDT, C50, C80, D50, Ts) with the Schroeder integration
+  and the accredited fiche.
+- [Open-Plan Office Acoustics (ISO 3382-3)](https://jmrplens.github.io/phonometry/buildings/rooms/open-plan-acoustics/):
+  the spatial decay rate of speech and the distraction and privacy distances.
+- [Image sources and the steady-state room field](https://jmrplens.github.io/phonometry/buildings/rooms/room-image-sources/):
+  the deterministic image-source room impulse response (Kuttruff/Vorländer) and
+  the statistical steady-state level with the room constant, critical distance
+  and Schroeder frequency (Bies).
+- [Room-noise criteria (NC / RC Mark II)](https://jmrplens.github.io/phonometry/buildings/rooms/room-noise/):
+  the ANSI/ASA S12.2-2019 NC tangency and RC Mark II ratings.
+- [Reverberation-time prediction (Sabine, Eyring, Arau)](https://jmrplens.github.io/phonometry/buildings/rooms/reverberation-prediction/):
+  the five statistical models with the air-absorption term.
+- [Sound absorption in enclosed spaces (EN 12354-6)](https://jmrplens.github.io/phonometry/buildings/rooms/enclosed-space-absorption/):
+  the normative equivalent-absorption-area and reverberation-time prediction.
+
+---
+
+
 <!-- source: docs/buildings/rooms/open-plan-acoustics.md | canonical: https://jmrplens.github.io/phonometry/buildings/rooms/open-plan-acoustics/ -->
 Source: https://jmrplens.github.io/phonometry/buildings/rooms/open-plan-acoustics/
 
@@ -10034,6 +10547,22 @@ Annex D, the RC Mark II curves (Table D.1), the mid-frequency-average rating
 ---
 
 
+<!-- source: docs/devices/broadcast/index.md | canonical: https://jmrplens.github.io/phonometry/devices/broadcast/ -->
+Source: https://jmrplens.github.io/phonometry/devices/broadcast/
+
+# Broadcast
+
+Broadcasting solved the loudness problem with a measurement rather than a
+compressor: one number per programme, gated so that silence does not dilute it,
+and a range that says how much the programme moves.
+
+[Programme loudness (EBU R 128)](https://jmrplens.github.io/phonometry/devices/broadcast/program-loudness/)
+implements the ITU-R BS.1770 K-weighted chain with the EBU Tech 3341 gating and
+the Tech 3342 loudness range, checked against the EBU's own test set.
+
+---
+
+
 <!-- source: docs/devices/broadcast/program-loudness.md | canonical: https://jmrplens.github.io/phonometry/devices/broadcast/program-loudness/ -->
 Source: https://jmrplens.github.io/phonometry/devices/broadcast/program-loudness/
 
@@ -10826,6 +11355,64 @@ for the characteristic graphs), are covered in
 quantities are verified against exact analytic oracles (synthetic signals with
 known harmonic/intermodulation amplitudes, a clipped-sine Fourier oracle, a
 full DIM test-signal synthesis, and a known LTI path).
+
+---
+
+
+<!-- source: docs/devices/electroacoustics/index.md | canonical: https://jmrplens.github.io/phonometry/devices/electroacoustics/ -->
+Source: https://jmrplens.github.io/phonometry/devices/electroacoustics/
+
+# Electroacoustics
+
+This section turns to devices that are *supposed* to make sound: amplifiers,
+loudspeakers and microphones, and the broadcast programme they end up
+carrying.
+
+[Electroacoustics](https://jmrplens.github.io/phonometry/devices/electroacoustics/electroacoustics/) covers the
+IEC 60268-3 distortion set (THD, THD+N and SINAD, intermodulation and DIM)
+and the H1/H2 frequency-response estimators with coherence. The two device
+families have their own type-test pages:
+[Loudspeaker Characterisation (IEC 60268-5)](https://jmrplens.github.io/phonometry/devices/electroacoustics/loudspeakers/)
+with the radiating-piston model behind a loudspeaker's directivity, and
+[Microphone Characterisation (IEC 60268-4)](https://jmrplens.github.io/phonometry/devices/electroacoustics/microphones/)
+with the polar patterns and the inherent-noise conventions, both ending in a
+one-page accredited fiche.
+[Swept-sine distortion and phase utilities](https://jmrplens.github.io/phonometry/devices/electroacoustics/swept-sine-distortion/)
+extends the bench with the one-sweep alternative: the Farina / Novak
+harmonic separation that turns a single exponential sweep into the full set
+of harmonic frequency responses and a THD measured as a function of the
+excitation frequency, plus the minimum-phase, group-delay and excess-phase
+utilities that dissect what the measured response's phase is made of.
+
+[Programme loudness](https://jmrplens.github.io/phonometry/devices/broadcast/program-loudness/) covers the signal
+the devices carry: the ITU-R BS.1770-5 loudness of a broadcast or streaming
+programme in LUFS, the EBU R 128 normalisation to -23 LUFS, the EBU Mode
+momentary/short-term/integrated meters, the loudness range and the
+oversampled true-peak level in dBTP.
+
+If you are here to bench-test audio gear, go straight to
+[Electroacoustics](https://jmrplens.github.io/phonometry/devices/electroacoustics/electroacoustics/); if you are here to
+level a programme, go to
+[Programme loudness](https://jmrplens.github.io/phonometry/devices/broadcast/program-loudness/). To measure what a
+machine emits rather than what a transducer reproduces, the
+[Sound power and intensity](https://jmrplens.github.io/phonometry/devices/emission/) pages
+are the place to start.
+
+## Pages in this section
+
+- [Electroacoustics: distortion and frequency response](https://jmrplens.github.io/phonometry/devices/electroacoustics/electroacoustics/):
+  the IEC 60268-3 distortion metrics and frequency-response estimation with
+  coherence.
+- [Loudspeaker Characterisation (IEC 60268-5)](https://jmrplens.github.io/phonometry/devices/electroacoustics/loudspeakers/):
+  the sensitivity conventions, the radiating piston and the IEC 60268-5
+  characteristics fiche.
+- [Microphone Characterisation (IEC 60268-4)](https://jmrplens.github.io/phonometry/devices/electroacoustics/microphones/):
+  the sensitivity references, directional patterns and inherent noise of the
+  IEC 60268-4 fiche.
+- [Swept-sine distortion and phase utilities](https://jmrplens.github.io/phonometry/devices/electroacoustics/swept-sine-distortion/):
+  harmonic separation and THD(f) from one exponential sweep (Farina /
+  Novak synchronized swept-sine), and minimum phase, group delay and
+  excess phase from a measured response.
 
 ---
 
@@ -11945,6 +12532,62 @@ grids.
   [doi:10.1002/9781118032428](https://doi.org/10.1002/9781118032428).
   Section 13.1.4: the Hilbert relation between log-magnitude and phase
   behind the minimum-phase reconstruction.
+
+---
+
+
+<!-- source: docs/devices/emission/index.md | canonical: https://jmrplens.github.io/phonometry/devices/emission/ -->
+Source: https://jmrplens.github.io/phonometry/devices/emission/
+
+# Sound power and intensity
+
+The central quantity of this section is the **sound power**: the total
+acoustic energy per second a source radiates. Expressed in decibels as the
+sound power level, it is the figure that goes on a datasheet, feeds a room or
+outdoor prediction and is checked against noise-emission limits.
+
+[Sound Power](https://jmrplens.github.io/phonometry/devices/emission/sound-power/) chooses between the
+standardised routes and closes the job with the ISO 4871 emission
+declaration, and each route has its own page:
+[Sound Power by Pressure Methods](https://jmrplens.github.io/phonometry/devices/emission/sound-power-pressure/)
+for the enveloping surface of ISO 3744/3746 and the precision anechoic grade
+of ISO 3745,
+[Sound Power in the Reverberation Room](https://jmrplens.github.io/phonometry/devices/emission/sound-power-reverberation/)
+for the direct and comparison methods of ISO 3741, and
+[Sound Power by Intensity Scanning](https://jmrplens.github.io/phonometry/devices/emission/sound-power-intensity/)
+for the on-site scanning of ISO 9614-2 and its ISO 9614-3 precision grade.
+
+Behind the intensity-based routes sits **sound intensity** itself: the signed
+power flux that can localise sources and separate them from background noise,
+measured with a two-microphone probe per IEC 61043 and qualified by the
+ISO 9614-1 field indicators, covered in
+[Sound Intensity (p-p)](https://jmrplens.github.io/phonometry/devices/emission/intensity/).
+
+If you are here to measure a machine, start with
+[Sound Power](https://jmrplens.github.io/phonometry/devices/emission/sound-power/) and let its decision guidance
+pick the route; read [Sound Intensity (p-p)](https://jmrplens.github.io/phonometry/devices/emission/intensity/)
+when that route involves an intensity probe. The determined power level is
+what the quieting measures of the
+[Noise control](https://jmrplens.github.io/phonometry/devices/noise-control/) pages are judged
+against.
+
+## Pages in this section
+
+- [Sound Intensity (p-p)](https://jmrplens.github.io/phonometry/devices/emission/intensity/): two-microphone
+  sound intensity per IEC 61043 with the ISO 9614-1 field indicators.
+- [Sound Power](https://jmrplens.github.io/phonometry/devices/emission/sound-power/): choosing the determination
+  method and declaring the noise emission per ISO 4871.
+- [Sound Power by Pressure Methods](https://jmrplens.github.io/phonometry/devices/emission/sound-power-pressure/):
+  the enveloping surface of ISO 3744/3746 and the precision anechoic grade of
+  ISO 3745.
+- [Sound Power in the Reverberation Room](https://jmrplens.github.io/phonometry/devices/emission/sound-power-reverberation/):
+  the direct and comparison methods of ISO 3741.
+- [Sound power from surface vibration (ISO/TS 7849)](https://jmrplens.github.io/phonometry/devices/emission/vibration-sound-power/):
+  the radiated power from the surface-averaged velocity level and the
+  radiation factor, with the Part 1 upper limit and the Part 2 engineering
+  value.
+- [Sound Power by Intensity Scanning](https://jmrplens.github.io/phonometry/devices/emission/sound-power-intensity/):
+  the on-site scanning of ISO 9614-2 and the ISO 9614-3 precision grade.
 
 ---
 
@@ -14227,6 +14870,93 @@ $L_W = 10\log_{10}(P/P_0)$, and the fixed impedance term.
 ---
 
 
+<!-- source: docs/devices/index.md | canonical: https://jmrplens.github.io/phonometry/devices/ -->
+Source: https://jmrplens.github.io/phonometry/devices/
+
+# Sources and devices
+
+Every prediction elsewhere in this documentation starts from a source
+descriptor, and this section is where those descriptors are measured. Its
+common thread is **emission**: numbers that belong to the device rather than
+to the room or the distance it is heard at.
+
+The **sound power and intensity** pages determine the central emission
+quantity, the sound power level: the figure that goes on a datasheet, feeds a
+room or outdoor prediction and is checked against noise-emission limits. The
+**electroacoustics** pages turn to devices that are *supposed* to make sound
+(amplifiers, loudspeakers and microphones) and to the broadcast programme
+they carry, and the **noise control** pages hold the path measures that quiet
+a machine once its emission is known.
+
+If you are here to measure a machine, start with
+[Sound Power](https://jmrplens.github.io/phonometry/devices/emission/sound-power/) and let its decision guidance
+pick the route; read [Sound Intensity (p-p)](https://jmrplens.github.io/phonometry/devices/emission/intensity/)
+when that route involves an intensity probe. If you are here to bench-test
+audio gear, go straight to
+[Electroacoustics](https://jmrplens.github.io/phonometry/devices/electroacoustics/electroacoustics/); if you are here to
+level a programme, go to
+[Programme loudness](https://jmrplens.github.io/phonometry/devices/broadcast/program-loudness/).
+
+## [Sound power and intensity](https://jmrplens.github.io/phonometry/devices/emission/)
+
+The total acoustic emission of a source, and the power flux it is built on.
+
+- [Sound Intensity (p-p)](https://jmrplens.github.io/phonometry/devices/emission/intensity/): two-microphone
+  sound intensity per IEC 61043 with the ISO 9614-1 field indicators.
+- [Sound Power](https://jmrplens.github.io/phonometry/devices/emission/sound-power/): choosing the determination
+  method and declaring the noise emission per ISO 4871.
+- [Sound Power by Pressure Methods](https://jmrplens.github.io/phonometry/devices/emission/sound-power-pressure/):
+  the enveloping surface of ISO 3744/3746 and the precision anechoic grade of
+  ISO 3745.
+- [Sound Power in the Reverberation Room](https://jmrplens.github.io/phonometry/devices/emission/sound-power-reverberation/):
+  the direct and comparison methods of ISO 3741.
+- [Sound Power by Intensity Scanning](https://jmrplens.github.io/phonometry/devices/emission/sound-power-intensity/):
+  the on-site scanning of ISO 9614-2 and the ISO 9614-3 precision grade.
+
+## [Electroacoustics](https://jmrplens.github.io/phonometry/devices/electroacoustics/)
+
+Amplifiers, loudspeakers and microphones on the bench, and the programme
+signal they carry.
+
+- [Electroacoustics: distortion and frequency response](https://jmrplens.github.io/phonometry/devices/electroacoustics/electroacoustics/):
+  the IEC 60268-3 distortion metrics and frequency-response estimation with
+  coherence.
+- [Loudspeaker Characterisation (IEC 60268-5)](https://jmrplens.github.io/phonometry/devices/electroacoustics/loudspeakers/):
+  the sensitivity conventions, the radiating piston and the IEC 60268-5
+  characteristics fiche.
+- [Microphone Characterisation (IEC 60268-4)](https://jmrplens.github.io/phonometry/devices/electroacoustics/microphones/):
+  the sensitivity references, directional patterns and inherent noise of the
+  IEC 60268-4 fiche.
+- [Swept-sine distortion and phase utilities](https://jmrplens.github.io/phonometry/devices/electroacoustics/swept-sine-distortion/):
+  harmonic separation and THD(f) from one exponential sweep (Farina /
+  Novak synchronized swept-sine), and minimum phase, group delay and
+  excess phase from a measured response.
+- [Broadcast](https://jmrplens.github.io/phonometry/devices/broadcast/): the loudness problem solved
+  with a measurement rather than a compressor, one gated number per programme
+  and the range that says how much it moves.
+- [Programme loudness and true peak](https://jmrplens.github.io/phonometry/devices/broadcast/program-loudness/):
+  the ITU-R BS.1770-5 programme loudness and true-peak level with the
+  EBU R 128 normalisation practice, EBU Mode metering and loudness range.
+
+## [Noise control](https://jmrplens.github.io/phonometry/devices/noise-control/)
+
+Industrial noise control on the path, between the machine and whoever hears
+it.
+
+- [Silencers](https://jmrplens.github.io/phonometry/devices/noise-control/silencers/): reactive silencers by the
+  four-pole method and the reactive-versus-dissipative choice.
+- [Duct-Borne Noise: Fan to Room](https://jmrplens.github.io/phonometry/devices/noise-control/duct-path/): the
+  end-to-end fan-to-room calculation against a room criterion, and the
+  higher-order-mode cut-on that limits every plane-wave method.
+- [Room to Room: Partition, Receiving Room, Criterion](https://jmrplens.github.io/phonometry/devices/noise-control/room-to-room/):
+  the composed source-room to receiving-room chain and the transmission loss a
+  partition or an enclosure needs to meet a noise criterion.
+- [Industrial Noise Control: HVAC and Enclosures](https://jmrplens.github.io/phonometry/devices/noise-control/noise-control/):
+  duct attenuation, flow noise and machine-enclosure insertion loss.
+
+---
+
+
 <!-- source: docs/devices/noise-control/duct-path.md | canonical: https://jmrplens.github.io/phonometry/devices/noise-control/duct-path/ -->
 Source: https://jmrplens.github.io/phonometry/devices/noise-control/duct-path/
 
@@ -14962,6 +15692,42 @@ survive past cut-on.
   application of air terminals and air outlets*. The industry row
   structure of the duct-borne calculation sheet (Table 8) that
   `DuctPathResult.table()` and `.report()` follow.
+
+---
+
+
+<!-- source: docs/devices/noise-control/index.md | canonical: https://jmrplens.github.io/phonometry/devices/noise-control/ -->
+Source: https://jmrplens.github.io/phonometry/devices/noise-control/
+
+# Noise control
+
+Machinery noise is attacked at the source, the path and the receiver in turn,
+and this section holds the path measures.
+
+[Silencers](https://jmrplens.github.io/phonometry/devices/noise-control/silencers/) covers the reactive four-pole
+elements (expansion chambers, Helmholtz, quarter-wave and extended-tube
+resonators) with their transmission and insertion loss, and the choice
+between reflection and dissipation, while
+[Industrial Noise Control](https://jmrplens.github.io/phonometry/devices/noise-control/noise-control/) keeps the HVAC
+duct attenuation and flow noise of an installation and the insertion loss of
+a machine enclosure.
+
+What a quieting measure is judged against is the emission of the machine
+itself, and that is determined by the
+[Sound power and intensity](https://jmrplens.github.io/phonometry/devices/emission/) pages.
+
+## Pages in this section
+
+- [Silencers](https://jmrplens.github.io/phonometry/devices/noise-control/silencers/): reactive silencers by the
+  four-pole method and the reactive-versus-dissipative choice.
+- [Duct-Borne Noise: Fan to Room](https://jmrplens.github.io/phonometry/devices/noise-control/duct-path/): the
+  end-to-end fan-to-room calculation against a room criterion, and the
+  higher-order-mode cut-on that limits every plane-wave method.
+- [Room to Room: Partition, Receiving Room, Criterion](https://jmrplens.github.io/phonometry/devices/noise-control/room-to-room/):
+  the composed source-room to receiving-room chain and the transmission loss a
+  partition or an enclosure needs to meet a noise criterion.
+- [Industrial Noise Control: HVAC and Enclosures](https://jmrplens.github.io/phonometry/devices/noise-control/noise-control/):
+  duct attenuation, flow noise and machine-enclosure insertion loss.
 
 ---
 
@@ -16239,6 +17005,27 @@ Note 1), with the onset defined in clauses 4.5-4.7.
 ---
 
 
+<!-- source: docs/environment/assessment/index.md | canonical: https://jmrplens.github.io/phonometry/environment/assessment/ -->
+Source: https://jmrplens.github.io/phonometry/environment/assessment/
+
+# Assessment and regulation
+
+Propagation says what arrives at the receiver. Assessment says what it counts
+as, which is a separate question with its own standards: an indicator averaged
+over the right period, adjustments for the character of the sound, and a limit
+to compare the result against.
+
+[Impulsive-sound prominence (NT ACOU 112)](https://jmrplens.github.io/phonometry/environment/assessment/impulsive-sound/)
+is the adjustment for sound whose impulses make it more annoying than its LAeq
+suggests, in both the Nordtest closed form and the ISO/PAS 1996-3 measurement
+chain. The indicators it adjusts are in
+[Environmental Levels](https://jmrplens.github.io/phonometry/environment/environmental-levels/), and the
+national application of the whole chain is in
+[the Spanish regulation](https://jmrplens.github.io/phonometry/environment/spanish-noise-regulation/).
+
+---
+
+
 <!-- source: docs/environment/environmental-levels.md | canonical: https://jmrplens.github.io/phonometry/environment/environmental-levels/ -->
 Source: https://jmrplens.github.io/phonometry/environment/environmental-levels/
 
@@ -16456,6 +17243,79 @@ clause 6.5 (Formulae 5-6, Table A.1 adjustments). ISO 1996-2:2017,
 noise — Part 2: Determination of sound pressure levels*: the Annex C tonal
 adjustment, the Clause 10.4 residual-noise correction and the Clause 4 /
 Annex F measurement uncertainty budget.
+
+---
+
+
+<!-- source: docs/environment/index.md | canonical: https://jmrplens.github.io/phonometry/environment/ -->
+Source: https://jmrplens.github.io/phonometry/environment/
+
+# Environment and transport
+
+Environmental noise is a source-path-receiver problem stretched over hundreds
+of metres of open air. This section covers both ends of it. The **outdoor
+sound** pages handle the path and the assessment: ISO 9613 predicts, band by
+band, how much level survives divergence, air absorption, the ground and any
+barrier on the way to a receiver, and NT ACOU 112 quantifies when impulsive
+character makes the received sound more annoying than its LAeq suggests.
+
+The **aircraft and wind energy** pages handle transport sources that come with
+their own internationally fixed metrics. Aircraft noise certification runs on
+the Effective Perceived Noise Level of ICAO Annex 16, with the airport-contour
+machinery of ECAC Doc 29 built on top; helicopters get the directional
+noise-hemisphere source model of ECAC Doc 32; and wind turbines are rated by the
+apparent sound power and tonal audibility of IEC 61400-11. What unites them is
+the pattern: a carefully standardised source descriptor plus standardised
+propagation adjustments.
+
+This section leans on the core toolkit more than any other: the rating levels
+and Lden that environmental assessment ends in live in
+[Integrated and Statistical Levels](https://jmrplens.github.io/phonometry/signal/levels/levels/), and the
+atmospheric absorption that every propagation model consumes is shared with
+the room and materials pages. Start with
+[Outdoor Sound Propagation](https://jmrplens.github.io/phonometry/environment/propagation/outdoor-propagation/); it
+introduces the source-path-receiver bookkeeping the transport pages reuse.
+
+## [Assessment and regulation](https://jmrplens.github.io/phonometry/environment/assessment/)
+
+What the received sound is rated against, once it has arrived.
+
+- [Environmental Levels (ISO 1996-1/-2)](https://jmrplens.github.io/phonometry/environment/environmental-levels/):
+  the day-evening-night indicators, the rating level and the adjustments that
+  turn a measured LAeq into an assessed one.
+- [Spanish Noise Regulation (RD 1367/2007)](https://jmrplens.github.io/phonometry/environment/spanish-noise-regulation/):
+  the national application of that chain, with its own limits and its own
+  tonal and impulsive corrections.
+
+## [Outdoor sound](https://jmrplens.github.io/phonometry/environment/propagation/)
+
+The path from an outdoor source to a receiver, and the character of what
+arrives.
+
+- [Outdoor Sound Propagation](https://jmrplens.github.io/phonometry/environment/propagation/outdoor-propagation/):
+  atmospheric absorption (ISO 9613-1) and the ISO 9613-2 general method with
+  its per-term attenuation breakdown.
+- [Impulsive-sound prominence (NT ACOU 112)](https://jmrplens.github.io/phonometry/environment/assessment/impulsive-sound/):
+  the predicted prominence of impulsive sounds and the graduated adjustment
+  added to LAeq.
+
+## [Aircraft and wind energy](https://jmrplens.github.io/phonometry/aircraft/)
+
+Transport and energy sources with their own certification metrics. The
+wind-turbine page lives with the CNOSSOS road and railway emission models in
+[Environmental sources](https://jmrplens.github.io/phonometry/environment/sources/).
+
+- [Aircraft noise: Effective Perceived Noise Level](https://jmrplens.github.io/phonometry/aircraft/aircraft-noise/):
+  the ICAO Annex 16 EPNL, the IEC 61265 measurement-system verifier and the
+  SAE ARP 5534 atmospheric absorption.
+- [Airport Noise (ECAC Doc 29)](https://jmrplens.github.io/phonometry/aircraft/airport-noise/): the
+  noise-power-distance engine, the single-event segment chain and the
+  ground-grid SEL contour.
+- [Rotorcraft noise: the hemisphere method](https://jmrplens.github.io/phonometry/aircraft/rotorcraft-noise/):
+  the ECAC Doc 32 noise-hemisphere source model with its propagation
+  adjustments.
+- [Wind-turbine noise: sound power and tonal audibility](https://jmrplens.github.io/phonometry/environment/sources/wind-turbine-noise/):
+  the IEC 61400-11 apparent sound power level and tonal-audibility chain.
 
 ---
 
@@ -17103,6 +17963,95 @@ infrastructure for the meteorological schemes of Nord2000 and CNOSSOS.
   wedges for arbitrary point source locations. *Journal of the Acoustical
   Society of America*, 69(5), 1266-1276.
   [doi:10.1121/1.385809](https://doi.org/10.1121/1.385809).
+
+---
+
+
+<!-- source: docs/environment/propagation/index.md | canonical: https://jmrplens.github.io/phonometry/environment/propagation/ -->
+Source: https://jmrplens.github.io/phonometry/environment/propagation/
+
+# Outdoor sound
+
+Outdoor sound assessment has two halves: predicting the level a source
+delivers to a distant receiver, and judging the character of the sound that
+actually arrives. The pages of this section split along that line, with the
+prediction half starting one step earlier, at the source itself.
+
+[Outdoor Sound Propagation](https://jmrplens.github.io/phonometry/environment/propagation/outdoor-propagation/) is the
+prediction half. Starting from a source's **sound power**, the ISO 9613-2
+general method subtracts, octave band by octave band, every mechanism that
+attenuates sound on its way: geometrical divergence, atmospheric absorption
+(supplied by the pure-tone coefficient of **ISO 9613-1**), the ground effect
+and barrier screening, with a meteorological correction for long-term
+averages. The page keeps the per-term breakdown visible, so a prediction is
+never a black box: you can see exactly which mechanism buys how many decibels
+at which frequency.
+
+[CNOSSOS-EU railway source emission](https://jmrplens.github.io/phonometry/environment/sources/cnossos-rail-emission/)
+is the source half for the railway. Section 2.3 of Annex II to Directive
+2002/49/EC turns a roughness spectrum, a set of transfer functions and a train
+flow into the two equivalent source lines every strategic noise map in the
+European Union starts from, at 0,5 m and at 4,0 m above the rail head, with
+impact noise, curve squeal, traction, aerodynamic noise above 200 km/h and the
+bridge term each allocated to the height it radiates from.
+
+[Spherical ground effect and advanced barriers](https://jmrplens.github.io/phonometry/environment/propagation/ground-barriers/)
+goes underneath the ISO 9613-2 fits to the wave acoustics they approximate: the
+Weyl-Van der Pol spherical-wave reflection coefficient of a finite-impedance
+ground, and barrier diffraction by the Kurze-Anderson Fresnel number, the exact
+rigid half-plane, thick barriers and the coherent four-path barrier on the
+ground, all resolving the frequency-dependent interference the octave-band terms
+smooth away.
+
+[CNOSSOS-EU road traffic source emission](https://jmrplens.github.io/phonometry/environment/sources/cnossos-road-emission/)
+supplies the source power that a prediction starts from, for the one source
+that dominates almost every noise map: road traffic. The common EU method of
+Annex II to Directive 2002/49/EC builds a rolling and a propulsion sound power
+for each vehicle category, corrects the rolling term for pavement, air
+temperature and studded tyres and the propulsion term for pavement and road
+gradient, applies the junction correction to both, and delivers a directional
+sound power per metre of source line.
+
+[Impulsive-sound prominence (NT ACOU 112)](https://jmrplens.github.io/phonometry/environment/assessment/impulsive-sound/)
+is the assessment half. Noise containing distinct impulses (hammering,
+riveting, pile driving) annoys more than a steady sound of the same LAeq, and
+the Nordtest method quantifies that: from the onset rate and level difference
+of each impulse it computes a predicted **prominence**, and converts it into
+the graduated adjustment KI that is added to the measured LAeq in a rating
+level.
+
+The surrounding machinery lives nearby: the rating levels and Lden that
+assessments end in are covered in
+[Integrated and Statistical Levels](https://jmrplens.github.io/phonometry/signal/levels/levels/), the tonal
+counterpart of the impulsive adjustment in
+[Objective audibility of tones in noise](https://jmrplens.github.io/phonometry/perception/psychoacoustics/tone-audibility/),
+and the sources that feed a propagation calculation in the
+[Sound power and intensity](https://jmrplens.github.io/phonometry/devices/emission/) and
+[Aircraft and wind energy](https://jmrplens.github.io/phonometry/aircraft/)
+sections.
+
+## Pages in this section
+
+- [Outdoor Sound Propagation](https://jmrplens.github.io/phonometry/environment/propagation/outdoor-propagation/):
+  ISO 9613-1 atmospheric absorption and the ISO 9613-2 general method with a
+  per-term octave-band attenuation breakdown.
+- [CNOSSOS-EU railway source emission](https://jmrplens.github.io/phonometry/environment/sources/cnossos-rail-emission/):
+  the common EU railway emission method, from rail and wheel roughness to the
+  directional sound power per metre of the two equivalent source lines.
+- [CNOSSOS-EU road traffic source emission](https://jmrplens.github.io/phonometry/environment/sources/cnossos-road-emission/):
+  the road source of Annex II to Directive 2002/49/EC: rolling and propulsion
+  sound power per vehicle category with the Appendix F database, and the
+  directional sound power per metre of source line.
+- [Spherical ground effect and advanced barriers](https://jmrplens.github.io/phonometry/environment/propagation/ground-barriers/):
+  the Weyl-Van der Pol spherical-wave ground reflection and wave-theoretic
+  barrier diffraction (Kurze-Anderson, exact rigid half-plane, thick barriers
+  and the coherent four-path barrier on the ground).
+- [Atmospheric refraction: rays and the GFPE](https://jmrplens.github.io/phonometry/environment/propagation/atmospheric-refraction/):
+  the refracting atmosphere itself: effective sound-speed profiles, curved rays
+  with their shadow zones, and the Green's function parabolic equation.
+- [Impulsive-sound prominence (NT ACOU 112)](https://jmrplens.github.io/phonometry/environment/assessment/impulsive-sound/):
+  the predicted prominence of impulsive sounds and the graduated LAeq
+  adjustment KI.
 
 ---
 
@@ -18531,6 +19480,25 @@ split into point sources is declared out of scope by the method itself.
   carries a source power to a receiver.
 - [Environmental noise levels](https://jmrplens.github.io/phonometry/environment/environmental-levels/): the $L_{den}$ and
   $L_{night}$ indicators the resulting maps are drawn for.
+
+---
+
+
+<!-- source: docs/environment/sources/index.md | canonical: https://jmrplens.github.io/phonometry/environment/sources/ -->
+Source: https://jmrplens.github.io/phonometry/environment/sources/
+
+# Environmental sources
+
+Before anything propagates there has to be a source, described in the terms the
+propagation model expects: a line power per octave band for traffic, an
+apparent sound power level for a turbine.
+
+[CNOSSOS-EU road traffic](https://jmrplens.github.io/phonometry/environment/sources/cnossos-road-emission/)
+and [CNOSSOS-EU railways](https://jmrplens.github.io/phonometry/environment/sources/cnossos-rail-emission/)
+are the emission halves of the European method, the ones a strategic noise map
+is built on. [Wind-turbine noise](https://jmrplens.github.io/phonometry/environment/sources/wind-turbine-noise/)
+is IEC 61400-11, where the source descriptor and its tonal audibility are
+measured rather than tabulated.
 
 ---
 
@@ -20544,6 +21512,71 @@ every commit.
 ---
 
 
+<!-- source: docs/materials/absorbers/index.md | canonical: https://jmrplens.github.io/phonometry/materials/absorbers/ -->
+Source: https://jmrplens.github.io/phonometry/materials/absorbers/
+
+# Absorbers
+
+An absorber can be characterised at three scales, and this subsection walks
+them in order: the finished product in a reverberation room, the small sample
+in an impedance tube, and the raw material in a flow rig, with the prediction
+models that tie the three together and the metamaterial designs that push
+them past the classical thickness rules.
+
+[Sound Absorption Measurement and Rating](https://jmrplens.github.io/phonometry/materials/absorbers/absorption-measurement/)
+is the product scale: the ISO 354 reverberation-room measurement of the
+random-incidence coefficient α_s, the ISO 11654 weighted rating α_w with its
+letter class that absorber datasheets quote, and the ISO 12999-2 measurement
+uncertainty of both. It also answers the recurring question of when a
+reverberation-room number and a tube number can, and cannot, be compared.
+
+[Airflow Resistance](https://jmrplens.github.io/phonometry/materials/absorbers/airflow-resistance/) is the material
+scale: the ISO 9053-1 static and ISO 9053-2 alternating determination of the
+airflow resistance, specific resistance and resistivity σ, the parameter that
+governs a porous absorber's low-frequency behaviour and anchors every porous
+model downstream.
+
+[Impedance Tube](https://jmrplens.github.io/phonometry/materials/absorbers/impedance-tube/) is the sample scale: the
+complex reflection factor, surface impedance and absorption at normal
+incidence, by the ISO 10534-1 standing-wave-ratio and ISO 10534-2
+transfer-function methods, plus the ASTM E2611 four-microphone transmission
+loss, and the virtual FDTD tube that cross-checks the wave solver against the
+same reduction chains.
+
+[Porous and Multilayer Absorbers](https://jmrplens.github.io/phonometry/materials/absorbers/porous-absorbers/) closes
+the loop with prediction: the Delany-Bazley, Miki and Johnson-Champoux-Allard
+equivalent-fluid models turn the measured resistivity into characteristic
+impedance and wavenumber, and the transfer-matrix multilayer solver predicts
+the absorption of a whole construction, at any incidence and in a diffuse
+field, before anything is built.
+
+[Metamaterial Absorbers](https://jmrplens.github.io/phonometry/materials/absorbers/metamaterial-absorbers/) is where
+the prediction models leave the classical rules behind: slow-sound slit
+panels loaded by Helmholtz resonators reach perfect absorption at critical
+coupling from panels a fortieth of a wavelength deep, with the
+transfer-matrix model, the design solver and the FDTD cross-check of the
+meshed cell.
+
+## Pages in this section
+
+- [Sound Absorption Measurement and Rating](https://jmrplens.github.io/phonometry/materials/absorbers/absorption-measurement/):
+  the ISO 354 reverberation-room measurement, the ISO 11654 weighted rating
+  and class, and the ISO 12999-2 measurement uncertainty.
+- [Airflow Resistance](https://jmrplens.github.io/phonometry/materials/absorbers/airflow-resistance/): the ISO 9053
+  static and alternating methods for the airflow resistance and resistivity.
+- [Impedance Tube](https://jmrplens.github.io/phonometry/materials/absorbers/impedance-tube/): normal-incidence
+  absorption, surface impedance and ASTM E2611 transmission loss, plus the
+  virtual FDTD tube.
+- [Porous and Multilayer Absorbers](https://jmrplens.github.io/phonometry/materials/absorbers/porous-absorbers/):
+  the equivalent-fluid models and the transfer-matrix multilayer solver with
+  perforated, microperforated and membrane layers.
+- [Metamaterial Absorbers](https://jmrplens.github.io/phonometry/materials/absorbers/metamaterial-absorbers/): the
+  critical-coupling condition and the slow-sound slit panel with its design
+  solver.
+
+---
+
+
 <!-- source: docs/materials/absorbers/metamaterial-absorbers.md | canonical: https://jmrplens.github.io/phonometry/materials/absorbers/metamaterial-absorbers/ -->
 Source: https://jmrplens.github.io/phonometry/materials/absorbers/metamaterial-absorbers/
 
@@ -21338,7 +22371,7 @@ $|\mu_a| > 40$ above 50 Hz, and $\mu_b$ falls from 1.0 at 50 Hz to 0.82 at
 even though the printed sentence says "the ratio modulus": the model gives
 $\mu_b(1500) = 0.811 + 0.473j$, whose real part is 1.1 % from the printed
 value while its modulus, 0.939, is 14.5 % away. That is recorded in
-[Errata](/phonometry/reference/errata/), along with the parameter sweep that
+[Errata](https://jmrplens.github.io/phonometry/reference/errata/), along with the parameter sweep that
 fails to bring $|\mu_b|$ anywhere near 0.82. The impedance peak of the book's
 thinner sample is printed as 860 Hz and comes out at 863.5 Hz under the
 $\mathrm{Im}(Z_s)$ peak rule. Everything else, including the whole
@@ -22408,6 +23441,61 @@ against the standards' worked examples and closed forms is tracked in
 ---
 
 
+<!-- source: docs/materials/diffusers/index.md | canonical: https://jmrplens.github.io/phonometry/materials/diffusers/ -->
+Source: https://jmrplens.github.io/phonometry/materials/diffusers/
+
+# Diffusers and surfaces
+
+Where the [Absorbers](https://jmrplens.github.io/phonometry/materials/absorbers/) subsection asks
+how much energy a material removes from the field, this one asks what a
+*surface* does with the sound it returns: how much it throws off the specular
+direction, how evenly it spreads it, and, out on a pavement, how much it
+absorbs where no laboratory can follow. Three guides walk that ground.
+
+[Diffusers and Their Coefficients](https://jmrplens.github.io/phonometry/materials/diffusers/diffusers/) is the
+measurement and design core: the random-incidence **scattering coefficient**
+$s$ of ISO 17497-1, measured on a reverberation-room turntable, the
+**diffusion coefficient** $d$ of ISO 17497-2, measured on a free-field
+goniometer, the Schroeder quadratic-residue design rules with the Fraunhofer
+far-field prediction that grades a well-depth sequence before it is built,
+and the closing argument for why the two coefficients must never be swapped.
+
+[Metadiffusers](https://jmrplens.github.io/phonometry/materials/diffusers/metadiffusers/) shrinks the Schroeder
+diffuser by an order of magnitude: slits loaded by Helmholtz resonators slow
+the sound until a 2 cm panel reproduces the reflection phases of wells 27 cm
+deep, with critical coupling supplying the perfectly absorbing `0` state that
+ternary sequences need. The published quadratic-residue design is evaluated
+end to end, transfer-matrix chain to FDTD cross-check.
+
+[In-situ Road-Surface Absorption](https://jmrplens.github.io/phonometry/materials/surfaces/road-absorption/) takes
+the absorption question outdoors: the ISO 13472-1 subtraction technique
+separates the incident and road-reflected components of an impulse with the
+Adrienne window, and the ISO 13472-2 spot tube presses a portable
+impedance tube onto the pavement for reflective surfaces, with the choice
+between the two methods spelled out.
+
+The neighbours are close: the diffuser panels are surface relatives of the
+[metamaterial absorbers](https://jmrplens.github.io/phonometry/materials/absorbers/metamaterial-absorbers/) built
+from the same slit and resonator cell, the scattering coefficient feeds the
+room predictions of
+[Room acoustics](https://jmrplens.github.io/phonometry/buildings/rooms/), and the road
+methods serve the outdoor-noise interest of
+[Environment and transport](https://jmrplens.github.io/phonometry/environment/).
+
+## Pages in this section
+
+- [Diffusers and Their Coefficients](https://jmrplens.github.io/phonometry/materials/diffusers/diffusers/): the
+  ISO 17497-1 scattering and ISO 17497-2 diffusion coefficients, Schroeder
+  design and the far-field prediction model.
+- [Metadiffusers](https://jmrplens.github.io/phonometry/materials/diffusers/metadiffusers/): deep-subwavelength
+  Schroeder diffusers from resonator-loaded slits, with slow sound and
+  ternary sequences.
+- [In-situ Road-Surface Absorption](https://jmrplens.github.io/phonometry/materials/surfaces/road-absorption/):
+  the ISO 13472-1 subtraction technique and the ISO 13472-2 spot method.
+
+---
+
+
 <!-- source: docs/materials/diffusers/metadiffusers.md | canonical: https://jmrplens.github.io/phonometry/materials/diffusers/metadiffusers/ -->
 Source: https://jmrplens.github.io/phonometry/materials/diffusers/metadiffusers/
 
@@ -22707,6 +23795,106 @@ against the published designs and closed forms is tracked in
 ---
 
 
+<!-- source: docs/materials/index.md | canonical: https://jmrplens.github.io/phonometry/materials/ -->
+Source: https://jmrplens.github.io/phonometry/materials/
+
+# Materials and surfaces
+
+Every room prediction and many an insulation model end up consuming a
+coefficient that describes what a material or a surface does to sound. This
+section covers where those coefficients come from: the laboratory instruments
+that measure them, the single-number ratings that summarise them, the
+prediction models that anticipate them, and the in-situ methods that recover
+them outside the laboratory.
+
+The **Absorbers** subsection covers how much energy a material takes out of
+the field, one instrument or model family per guide.
+[Sound Absorption Measurement and Rating](https://jmrplens.github.io/phonometry/materials/absorbers/absorption-measurement/)
+is the reverberation room: the random-incidence coefficients of ISO 354 and
+the ISO 11654 weighted rating α_w with its letter class, the figure absorber
+datasheets quote, with the ISO 12999-2 measurement uncertainty.
+[Airflow Resistance](https://jmrplens.github.io/phonometry/materials/absorbers/airflow-resistance/) is the flow rig:
+resistance and resistivity per ISO 9053-1/-2, the parameter that governs a
+porous absorber's low-frequency behaviour and anchors most material models.
+[Impedance Tube](https://jmrplens.github.io/phonometry/materials/absorbers/impedance-tube/) is the bench instrument:
+the complex surface impedance, reflection factor and absorption of a small
+sample at normal incidence (ISO 10534-1/-2) and, with four microphones, its
+transmission loss (ASTM E2611), plus the virtual FDTD tube that cross-checks
+the wave solver against the same standards.
+[Porous and Multilayer Absorbers](https://jmrplens.github.io/phonometry/materials/absorbers/porous-absorbers/) turns
+the measured flow resistivity into *predictions*: the Delany-Bazley, Miki and
+Johnson-Champoux-Allard equivalent-fluid models give a porous material's
+characteristic impedance and wavenumber, and a transfer-matrix stack of
+porous, air, perforated, microperforated (Maa) and membrane layers predicts
+the absorption of a whole construction before anything is built.
+[Metamaterial Absorbers](https://jmrplens.github.io/phonometry/materials/absorbers/metamaterial-absorbers/) pushes
+the same transfer matrices past the classical thickness rules: slow-sound
+slit panels loaded by Helmholtz resonators reach perfect absorption at
+critical coupling from deep-subwavelength panels.
+
+The **Diffusers and surfaces** subsection moves from samples to *surfaces*,
+asking not how much energy a surface absorbs but where it sends what it
+reflects. [Diffusers and Their Coefficients](https://jmrplens.github.io/phonometry/materials/diffusers/diffusers/)
+covers the two standardised gradings, the random-incidence **scattering
+coefficient** (ISO 17497-1) and the **diffusion coefficient** (ISO 17497-2),
+together with Schroeder diffuser design and its far-field prediction.
+[Metadiffusers](https://jmrplens.github.io/phonometry/materials/diffusers/metadiffusers/) rebuilds the Schroeder
+diffuser from resonator-loaded slits, one to two orders of magnitude thinner.
+And [In-situ Road-Surface Absorption](https://jmrplens.github.io/phonometry/materials/surfaces/road-absorption/)
+measures the absorption of a pavement where it lies, by the ISO 13472-1
+subtraction technique over an extended surface or the ISO 13472-2 spot tube.
+
+The consumers of these numbers are spread across the site: absorption
+coefficients feed the reverberation predictions in
+[Room acoustics](https://jmrplens.github.io/phonometry/buildings/rooms/), dynamic
+stiffness (measured by a related load-plate method) feeds the floating-floor
+model in [Sound insulation](https://jmrplens.github.io/phonometry/buildings/insulation/),
+and the road-surface methods connect to the outdoor-noise interest of the
+[Environment and transport](https://jmrplens.github.io/phonometry/environment/)
+section.
+
+## Pages in this section
+
+- [Absorbers overview](https://jmrplens.github.io/phonometry/materials/absorbers/): the
+  measurement chain from reverberation room to flow rig to impedance tube,
+  and the prediction models that tie them together.
+- [Sound Absorption Measurement and Rating](https://jmrplens.github.io/phonometry/materials/absorbers/absorption-measurement/):
+  the ISO 354 measurement, the ISO 11654 weighted rating and class, and the
+  ISO 12999-2 uncertainty.
+- [Airflow Resistance](https://jmrplens.github.io/phonometry/materials/absorbers/airflow-resistance/): the ISO 9053
+  static and alternating methods.
+- [Impedance Tube](https://jmrplens.github.io/phonometry/materials/absorbers/impedance-tube/): normal-incidence
+  absorption, impedance and ASTM E2611 transmission loss, plus the virtual
+  FDTD tube.
+- [Porous and Multilayer Absorbers](https://jmrplens.github.io/phonometry/materials/absorbers/porous-absorbers/):
+  the Delany-Bazley, Miki and JCA porous models, the transfer-matrix
+  multilayer solver with perforated, microperforated and membrane layers,
+  and the random-incidence Paris integral.
+- [Metamaterial Absorbers](https://jmrplens.github.io/phonometry/materials/absorbers/metamaterial-absorbers/):
+  critical coupling and the slow-sound slit panel with its design solver.
+- [Diffusers and surfaces overview](https://jmrplens.github.io/phonometry/materials/diffusers/):
+  what a surface does with the sound it returns, from coefficients to
+  metamaterial panels to pavements.
+- [Diffusers and Their Coefficients](https://jmrplens.github.io/phonometry/materials/diffusers/diffusers/):
+  ISO 17497-1/2 scattering and diffusion coefficients, Schroeder design and
+  the far-field prediction.
+- [Metadiffusers](https://jmrplens.github.io/phonometry/materials/diffusers/metadiffusers/): deep-subwavelength
+  Schroeder diffusers from resonator-loaded slits.
+- [Surfaces measured in place overview](https://jmrplens.github.io/phonometry/materials/surfaces/):
+  surfaces that cannot be taken to a laboratory, characterised where they lie.
+- [In-situ Road-Surface Absorption](https://jmrplens.github.io/phonometry/materials/surfaces/road-absorption/):
+  ISO 13472-1/-2 in-situ road-surface absorption.
+- [Resilient layers overview](https://jmrplens.github.io/phonometry/materials/resilient/):
+  what a resilient layer does under a floating floor, and the dynamic
+  stiffness that sets it.
+- [Dynamic stiffness of resilient materials (EN 29052-1)](https://jmrplens.github.io/phonometry/materials/resilient/dynamic-stiffness/):
+  the resonance method that measures what a resilient layer does under a
+  floating floor, and the apparent stiffness the insulation design chapter
+  asks it for.
+
+---
+
+
 <!-- source: docs/materials/resilient/dynamic-stiffness.md | canonical: https://jmrplens.github.io/phonometry/materials/resilient/dynamic-stiffness/ -->
 Source: https://jmrplens.github.io/phonometry/materials/resilient/dynamic-stiffness/
 
@@ -22942,6 +24130,41 @@ relations (Formulae 2-4), the enclosed-gas term (Formula 7, clause 8.2 NOTE
 $s'_a = 111/d$ MN/m³) and the airflow-resistivity regimes (clause 8.2, Formulae
 5-6). Conformance is anchored on the standard's own numeric NOTE plus
 hand-computed closed-form values of the resonance relations.
+
+---
+
+
+<!-- source: docs/materials/resilient/index.md | canonical: https://jmrplens.github.io/phonometry/materials/resilient/ -->
+Source: https://jmrplens.github.io/phonometry/materials/resilient/
+
+# Resilient layers
+
+A floating floor works because a soft layer decouples it from the structure
+below, and how well it works is set by one number: the dynamic stiffness per
+unit area of that layer.
+
+[Dynamic stiffness of resilient materials (EN 29052-1)](https://jmrplens.github.io/phonometry/materials/resilient/dynamic-stiffness/)
+is the resonance measurement that gives it, with the enclosed-gas term that
+makes a porous layer stiffer than its frame alone and the natural frequency the
+finished floor ends up with. What the insulation design chapter does with that
+number is in [Predicting resilient-layer performance](https://jmrplens.github.io/phonometry/buildings/design/resilient-layers/).
+
+---
+
+
+<!-- source: docs/materials/surfaces/index.md | canonical: https://jmrplens.github.io/phonometry/materials/surfaces/ -->
+Source: https://jmrplens.github.io/phonometry/materials/surfaces/
+
+# Surfaces measured in place
+
+Some surfaces cannot be cut into a sample and carried to a reverberation room.
+A road pavement is the standing case: it is characterised where it lies, with a
+source and a microphone above it and a time window that separates the reflection
+from everything else.
+
+[In-situ road-surface absorption](https://jmrplens.github.io/phonometry/materials/surfaces/road-absorption/)
+implements both ISO 13472 methods, with the Adrienne window the standard
+prescribes and the geometry corrections the measurement needs.
 
 ---
 
@@ -23496,6 +24719,61 @@ conditions* (Table 1).
 ---
 
 
+<!-- source: docs/perception/hearing/index.md | canonical: https://jmrplens.github.io/phonometry/perception/hearing/ -->
+Source: https://jmrplens.github.io/phonometry/perception/hearing/
+
+# Hearing and exposure
+
+This section connects three quantities that regulation treats as one story:
+where a population's **hearing threshold** sits, how occupational **noise
+exposure** is measured, and how that exposure **shifts the threshold**
+permanently over a working life.
+
+[Hearing threshold (age and reference zero)](https://jmrplens.github.io/phonometry/perception/hearing/hearing-threshold/)
+establishes the baseline. **ISO 7029:2017** gives the statistical distribution
+of hearing threshold with age for an otologically normal population: the slow,
+high-frequency-first loss of presbycusis, resolved by age, sex and population
+fractile. **ISO 389-7:2005** fixes the other end of the scale: the reference
+threshold of hearing, the physical sound pressure level that audiometric
+0 dB HL corresponds to under free-field and diffuse-field listening.
+
+[Occupational Noise Exposure (ISO 9612)](https://jmrplens.github.io/phonometry/perception/hearing/occupational-exposure/)
+measures the cause. A regulated daily exposure level LEX,8h is assembled from
+samples of a real working day by one of three strategies (task-based,
+job-based or full-day), and reported with the normative Annex C uncertainty
+budget and its one-sided 95 % upper limit, which is what an occupational
+hygienist actually compares against action values.
+
+[Noise-induced hearing loss (ISO 1999)](https://jmrplens.github.io/phonometry/perception/hearing/noise-induced-hearing-loss/)
+predicts the effect. From the exposure level and duration it gives the
+noise-induced permanent threshold shift (NIPTS) with its population spread,
+concentrated at the characteristic 4 kHz notch, and combines it with the
+ISO 7029 age component into the hearing threshold level associated with age
+and noise (HTLAN): the quantity used to estimate hearing handicap and
+compensation risk in an exposed population.
+
+Read the threshold page first, then ISO 9612, then ISO 1999: baseline,
+exposure, damage. That way the pipeline is explicit: ISO 9612 produces the
+LEX,8h that ISO 1999 consumes, and ISO 1999 builds on the ISO 7029
+statistics. The perceptual consequences of a shifted
+threshold, such as reduced speech intelligibility, are picked up by the SII in
+the [Speech section](https://jmrplens.github.io/phonometry/perception/speech/).
+
+## Pages in this section
+
+- [Hearing threshold (age and reference zero)](https://jmrplens.github.io/phonometry/perception/hearing/hearing-threshold/):
+  the ISO 7029:2017 age-related threshold distribution and the ISO 389-7:2005
+  reference threshold of hearing.
+- [Noise-induced hearing loss (ISO 1999)](https://jmrplens.github.io/phonometry/perception/hearing/noise-induced-hearing-loss/):
+  NIPTS and its population distribution, and the combination with age into
+  HTLAN.
+- [Occupational Noise Exposure (ISO 9612)](https://jmrplens.github.io/phonometry/perception/hearing/occupational-exposure/):
+  the three measurement strategies for LEX,8h with the Annex C uncertainty
+  budget.
+
+---
+
+
 <!-- source: docs/perception/hearing/noise-induced-hearing-loss.md | canonical: https://jmrplens.github.io/phonometry/perception/hearing/noise-induced-hearing-loss/ -->
 Source: https://jmrplens.github.io/phonometry/perception/hearing/noise-induced-hearing-loss/
 
@@ -23990,6 +25268,87 @@ and F.
 ---
 
 
+<!-- source: docs/perception/index.md | canonical: https://jmrplens.github.io/phonometry/perception/ -->
+Source: https://jmrplens.github.io/phonometry/perception/
+
+# Hearing and perception
+
+A sound pressure level says how much sound there is; this section is about
+what a **listener** makes of it. Its three subsections answer three different
+questions. **Psychoacoustics** quantifies sensations: how loud a sound is
+perceived to be, how sharp, rough or tonal it is, and how those sensations
+combine into annoyance. **Speech** asks how well spoken words survive the trip
+from a talker to a listener, through a room, a sound system or background
+noise. And **hearing and exposure** covers the ear itself: where the hearing
+threshold sits across age and population, how noise permanently shifts it, and
+how a working day's exposure is measured and reported.
+
+The three build on each other in one direction: the psychoacoustic models
+consume calibrated signals or band spectra from the
+[core analysis](https://jmrplens.github.io/phonometry/signal/); the speech
+indices consume band levels and, in the SII's case, the hearing thresholds
+that the hearing pages quantify; and the exposure metrics feed the
+hearing-damage model of ISO 1999.
+
+A good entry point is [Loudness](https://jmrplens.github.io/phonometry/perception/psychoacoustics/loudness/): it introduces
+the perceptual scale (the sone) and the auditory models that most other
+metrics in this section reuse or extend.
+
+## [Psychoacoustics](https://jmrplens.github.io/phonometry/perception/psychoacoustics/)
+
+The perceptual sensations of sound: loudness and the metrics layered on it.
+
+- [Loudness](https://jmrplens.github.io/phonometry/perception/psychoacoustics/loudness/): the ISO 532-1 Zwicker loudness in
+  sones, plus the ISO 226:2023 equal-loudness contours.
+- [Advanced Loudness (ISO 532-2/-3, ECMA-418-2)](https://jmrplens.github.io/phonometry/perception/psychoacoustics/advanced-loudness/):
+  the Moore-Glasberg stationary and time-varying methods and the Sottek
+  Hearing Model loudness, with the model-choice table.
+- [Sound Quality Metrics](https://jmrplens.github.io/phonometry/perception/psychoacoustics/sound-quality/): sharpness
+  (DIN 45692) and the ECMA-418-2 Sottek Hearing Model tonality, roughness
+  and fluctuation strength.
+- [Prominent Discrete Tones (ECMA-418-1)](https://jmrplens.github.io/phonometry/perception/psychoacoustics/tone-prominence/):
+  the tone-to-noise and prominence ratios that decide whether a discrete tone
+  is prominent.
+- [Objective audibility of tones in noise (ISO/PAS 20065)](https://jmrplens.github.io/phonometry/perception/psychoacoustics/tone-audibility/):
+  the engineering method for the audibility of a tone above the masking
+  threshold, feeding the ISO 1996-2 tonal adjustment.
+- [Psychoacoustic annoyance and fluctuation strength](https://jmrplens.github.io/phonometry/perception/psychoacoustics/psychoacoustic-annoyance/):
+  the Fastl & Zwicker annoyance model combining loudness, sharpness, roughness
+  and fluctuation strength.
+
+## [Speech](https://jmrplens.github.io/phonometry/perception/speech/)
+
+Two complementary indices of speech intelligibility, STI for the
+transmission channel and SII for the listening condition, plus the
+signal-based STOI and ESTOI measures.
+
+- [Speech Transmission Index (STI)](https://jmrplens.github.io/phonometry/perception/speech/speech-transmission/):
+  the IEC 60268-16 modulation transfer function, the indirect method from an
+  impulse response, and direct STIPA measurement.
+- [Speech Intelligibility Index](https://jmrplens.github.io/phonometry/perception/speech/speech-intelligibility/):
+  the ANSI S3.5-1997 one-third-octave-band SII from speech, noise and hearing
+  threshold spectra.
+- [Objective Intelligibility (STOI & ESTOI)](https://jmrplens.github.io/phonometry/perception/speech/objective-intelligibility/):
+  the correlation-based measures for time-frequency weighted noisy speech, from
+  a clean/degraded pair.
+
+## [Hearing and exposure](https://jmrplens.github.io/phonometry/perception/hearing/)
+
+The hearing threshold, what noise does to it, and how exposure is measured.
+
+- [Hearing threshold (age and reference zero)](https://jmrplens.github.io/phonometry/perception/hearing/hearing-threshold/):
+  the ISO 7029:2017 age-related threshold distribution and the ISO 389-7:2005
+  reference threshold of hearing.
+- [Noise-induced hearing loss (ISO 1999)](https://jmrplens.github.io/phonometry/perception/hearing/noise-induced-hearing-loss/):
+  the noise-induced permanent threshold shift and its combination with age
+  into HTLAN.
+- [Occupational Noise Exposure (ISO 9612)](https://jmrplens.github.io/phonometry/perception/hearing/occupational-exposure/):
+  the task-based, job-based and full-day strategies for LEX,8h with the
+  Annex C uncertainty budget.
+
+---
+
+
 <!-- source: docs/perception/psychoacoustics/advanced-loudness.md | canonical: https://jmrplens.github.io/phonometry/perception/psychoacoustics/advanced-loudness/ -->
 Source: https://jmrplens.github.io/phonometry/perception/psychoacoustics/advanced-loudness/
 
@@ -24388,6 +25747,68 @@ and long-term loudness and the peak N_max. ECMA-418-2:2025, *Psychoacoustic
 metrics for ITT equipment — Part 2 (methods for describing human perception
 based on the Sottek Hearing Model)*: the Sottek Hearing Model loudness
 (sone_HMS).
+
+---
+
+
+<!-- source: docs/perception/psychoacoustics/index.md | canonical: https://jmrplens.github.io/phonometry/perception/psychoacoustics/ -->
+Source: https://jmrplens.github.io/phonometry/perception/psychoacoustics/
+
+# Psychoacoustics
+
+Psychoacoustics replaces the question "how many decibels?" with "what does the
+listener perceive?". Its base quantity is **loudness**: a perceptual magnitude
+in sones, computed by auditory models that account for the ear's filtering,
+masking and compression. On top of loudness sit the **sound quality**
+sensations that distinguish two equally loud sounds: sharpness (high-frequency
+emphasis), tonality (audible discrete tones), roughness (fast modulation)
+and fluctuation strength (slow modulation). And on top sits a combined **annoyance** metric that weighs loudness,
+sharpness, roughness and fluctuation strength into a single scalar.
+
+[Loudness](https://jmrplens.github.io/phonometry/perception/psychoacoustics/loudness/) is the foundation page: the Zwicker
+reference method of ISO 532-1 with its one-page fiche, together with the
+ISO 226:2023 equal-loudness contours that anchor the perceptual scale for pure
+tones. The newer model families,
+Moore-Glasberg per ISO 532-2/-3 and the Sottek Hearing Model of ECMA-418-2,
+continue in
+[Advanced Loudness](https://jmrplens.github.io/phonometry/perception/psychoacoustics/advanced-loudness/), which also
+carries the model-choice table.
+[Sound Quality Metrics](https://jmrplens.github.io/phonometry/perception/psychoacoustics/sound-quality/) adds
+sharpness per DIN 45692 and the ECMA-418-2 tonality, roughness and
+fluctuation strength that share the Sottek front-end.
+
+Tones in noise get two dedicated pages because two different questions are
+asked of them.
+[Prominent Discrete Tones (ECMA-418-1)](https://jmrplens.github.io/phonometry/perception/psychoacoustics/tone-prominence/)
+answers a product-noise question: is this tone *prominent* by the
+tone-to-noise and prominence-ratio criteria used in IT-equipment declarations?
+[Objective audibility of tones in noise (ISO/PAS 20065)](https://jmrplens.github.io/phonometry/perception/psychoacoustics/tone-audibility/)
+answers an environmental one: by how many decibels does the tone exceed its
+masking threshold, the audibility that feeds the tonal penalty of
+ISO 1996-2.
+
+[Psychoacoustic annoyance and fluctuation strength](https://jmrplens.github.io/phonometry/perception/psychoacoustics/psychoacoustic-annoyance/)
+closes the chain with the Fastl & Zwicker model, which combines loudness,
+sharpness, roughness and the slow-modulation sensation of fluctuation strength
+into a single annoyance value. Read it last: its four inputs all come from
+the earlier pages.
+
+## Pages in this section
+
+- [Loudness](https://jmrplens.github.io/phonometry/perception/psychoacoustics/loudness/): the ISO 532-1 Zwicker loudness in
+  sones, plus the ISO 226:2023 equal-loudness contours.
+- [Advanced Loudness (ISO 532-2/-3, ECMA-418-2)](https://jmrplens.github.io/phonometry/perception/psychoacoustics/advanced-loudness/):
+  the Moore-Glasberg and Sottek loudness models and the model-choice table.
+- [Sound Quality Metrics](https://jmrplens.github.io/phonometry/perception/psychoacoustics/sound-quality/): sharpness
+  (DIN 45692) and ECMA-418-2 tonality, roughness and fluctuation strength.
+- [Prominent Discrete Tones (ECMA-418-1)](https://jmrplens.github.io/phonometry/perception/psychoacoustics/tone-prominence/):
+  tone-to-noise and prominence ratios with prominence verdicts.
+- [Objective audibility of tones in noise (ISO/PAS 20065)](https://jmrplens.github.io/phonometry/perception/psychoacoustics/tone-audibility/):
+  the audibility of a tone above the masking threshold, feeding the
+  ISO 1996-2 tonal adjustment.
+- [Psychoacoustic annoyance and fluctuation strength](https://jmrplens.github.io/phonometry/perception/psychoacoustics/psychoacoustic-annoyance/):
+  the Fastl & Zwicker annoyance model and the fluctuation-strength models it
+  consumes.
 
 ---
 
@@ -25984,6 +27405,66 @@ ECMA-418-1:2024 (3rd edition), *Psychoacoustic metrics for ITT
 equipment — Part 1: Prominent discrete tones* — the tone-to-noise ratio
 (clause 11), the prominence ratio (clause 12), the critical-band model and the
 frequency-dependent prominence criteria.
+
+---
+
+
+<!-- source: docs/perception/speech/index.md | canonical: https://jmrplens.github.io/phonometry/perception/speech/ -->
+Source: https://jmrplens.github.io/phonometry/perception/speech/
+
+# Speech
+
+All three pages in this section reduce speech intelligibility to a number in
+[0, 1], and the art is knowing which number answers your question. The
+**Speech Transmission Index** (STI) rates a *transmission channel*: a room, a
+public-address system, an intercom. The **Speech Intelligibility Index** (SII)
+rates a *listening condition*: this speech spectrum, in this noise, heard by
+this listener. A reverberant lecture hall is an STI problem; a hearing-aid
+fitting or a cockpit warning heard over engine noise is an SII problem.
+
+The physical difference sits in what each index models. STI
+(**IEC 60268-16**) works on the speech *envelope*: intelligibility degrades
+when reverberation and noise flatten the slow intensity modulations of speech,
+and the index measures how much of that modulation survives the channel, via
+the modulation transfer function. It can be computed indirectly from a
+measured impulse response or measured directly with the STIPA test signal.
+[Speech Transmission Index (STI)](https://jmrplens.github.io/phonometry/perception/speech/speech-transmission/)
+covers the modulation physics, both methods and the Annex F rating bands.
+
+SII (**ANSI S3.5-1997**) works on *audibility*: intelligibility is predicted
+from how much of the speech-bearing spectrum rises above the listener's
+effective threshold, band by band, weighted by each band's importance to
+speech. Noise, self-masking, upward spread of masking and the listener's own
+hearing threshold all enter explicitly, which is why SII extends naturally to
+hearing loss.
+[Speech Intelligibility Index](https://jmrplens.github.io/phonometry/perception/speech/speech-intelligibility/)
+covers all four of the standard's band procedures (critical band,
+equally-contributing critical band, one-third octave and octave), including the
+standard speech spectra for normal to shouted vocal effort.
+
+A third pair of measures, **STOI** and **ESTOI**, answers yet another question:
+given a clean reference *and* a degraded or processed version of the same
+speech, how intelligible is the result? They rate the processing itself,
+which is why they are the standard yardstick for noise reduction and source
+separation.
+
+The two connect back to the rest of the library naturally: the STI consumes
+the impulse responses of
+[Room Acoustics](https://jmrplens.github.io/phonometry/buildings/rooms/room-acoustics/), and the SII consumes the
+hearing thresholds quantified in
+[Hearing threshold](https://jmrplens.github.io/phonometry/perception/hearing/hearing-threshold/).
+
+## Pages in this section
+
+- [Speech Transmission Index (STI)](https://jmrplens.github.io/phonometry/perception/speech/speech-transmission/):
+  the IEC 60268-16 modulation transfer function, the indirect method from an
+  impulse response, and direct STIPA measurement.
+- [Speech Intelligibility Index](https://jmrplens.github.io/phonometry/perception/speech/speech-intelligibility/):
+  the ANSI S3.5-1997 band-importance and band-audibility method, in noise and
+  in hearing loss.
+- [Objective Intelligibility (STOI & ESTOI)](https://jmrplens.github.io/phonometry/perception/speech/objective-intelligibility/):
+  the correlation-based measures for time-frequency weighted noisy speech, from
+  a clean/degraded pair.
 
 ---
 
@@ -29315,8 +30796,12 @@ it; the list grows as guides gain their References sections.
   Springer.
   [doi:10.1007/978-3-540-87662-5](https://doi.org/10.1007/978-3-540-87662-5).
   The systematic treatment of underwater acoustical quantities in the line
-  that ISO 18405 standardised.
-  Cited by [Underwater acoustics](https://jmrplens.github.io/phonometry/underwater/underwater-acoustics/).
+  that ISO 18405 standardised, the Weston energy-flux propagation regimes of
+  shallow water, the sonar equations with seven fully numeric worked examples,
+  and the orca audiogram.
+  Cited by [Underwater acoustics](https://jmrplens.github.io/phonometry/underwater/underwater-acoustics/),
+  [Underwater sound propagation](https://jmrplens.github.io/phonometry/underwater/underwater-propagation/)
+  and [Marine-mammal noise exposure](https://jmrplens.github.io/phonometry/underwater/marine-mammal-exposure/).
 - Medwin, H., & Clay, C. S. (1998). *Fundamentals of acoustical oceanography*.
   Academic Press. ISBN 978-0-12-487570-8.
   [Publisher page](https://shop.elsevier.com/books/fundamentals-of-acoustical-oceanography/medwin/978-0-12-487570-8).
@@ -29417,14 +30902,6 @@ it; the list grows as guides gain their References sections.
   [doi:10.1121/1.1427355](https://doi.org/10.1121/1.1427355).
   The ensemble merchant-ship source-spectrum model.
   Cited by [Underwater sound propagation](https://jmrplens.github.io/phonometry/underwater/underwater-propagation/).
-- Ainslie, M. A. (2010). *Principles of Sonar Performance Modelling*.
-  Springer/Praxis.
-  [doi:10.1007/978-3-540-87662-5](https://doi.org/10.1007/978-3-540-87662-5).
-  The reference treatment of sonar performance prediction: the Weston
-  energy-flux propagation regimes of shallow water, the sonar equations with
-  seven fully numeric worked examples, and the orca audiogram.
-  Cited by [Underwater sound propagation](https://jmrplens.github.io/phonometry/underwater/underwater-propagation/) and
-  [Marine-mammal noise exposure](https://jmrplens.github.io/phonometry/underwater/marine-mammal-exposure/).
 - National Marine Fisheries Service (2018). *2018 Revision to: Technical
   Guidance for Assessing the Effects of Anthropogenic Sound on Marine Mammal
   Hearing (Version 2.0)*. NOAA Technical Memorandum NMFS-OPR-59.
@@ -29509,6 +30986,29 @@ it; the list grows as guides gain their References sections.
   The articulation-band experiments behind the band-importance function of the
   Speech Intelligibility Index.
   Cited by [Speech Intelligibility Index](https://jmrplens.github.io/phonometry/perception/speech/speech-intelligibility/).
+- Taal, C. H., Hendriks, R. C., Heusdens, R., & Jensen, J. (2011). An
+  algorithm for intelligibility prediction of time-frequency weighted noisy
+  speech. *IEEE Transactions on Audio, Speech, and Language Processing*,
+  19(7), 2125-2136.
+  [doi:10.1109/TASL.2011.2114881](https://doi.org/10.1109/TASL.2011.2114881).
+  STOI: the shared one-third-octave front end, the normalisation and
+  signal-to-distortion clipping, and the per-band envelope correlation the
+  index averages.
+  Cited by [Objective Intelligibility (STOI & ESTOI)](https://jmrplens.github.io/phonometry/perception/speech/objective-intelligibility/).
+- Taal, C. H., Hendriks, R. C., Heusdens, R., & Jensen, J. (2010). A
+  short-time objective intelligibility measure for time-frequency weighted
+  noisy speech. *2010 IEEE International Conference on Acoustics, Speech and
+  Signal Processing (ICASSP)*, 4214-4217.
+  [doi:10.1109/ICASSP.2010.5495701](https://doi.org/10.1109/ICASSP.2010.5495701).
+  The short conference version of STOI.
+  Cited by [Objective Intelligibility (STOI & ESTOI)](https://jmrplens.github.io/phonometry/perception/speech/objective-intelligibility/).
+- Jensen, J., & Taal, C. H. (2016). An algorithm for predicting the
+  intelligibility of speech masked by modulated noise maskers. *IEEE/ACM
+  Transactions on Audio, Speech, and Language Processing*, 24(11), 2009-2022.
+  [doi:10.1109/TASLP.2016.2585878](https://doi.org/10.1109/TASLP.2016.2585878).
+  ESTOI: the row- and column-normalised short-time spectrogram and its
+  spectral-correlation intermediate index.
+  Cited by [Objective Intelligibility (STOI & ESTOI)](https://jmrplens.github.io/phonometry/perception/speech/objective-intelligibility/).
 
 ## Psychoacoustics
 
@@ -32837,6 +34337,67 @@ convention on which every architecture places its −3 dB points.
 ---
 
 
+<!-- source: docs/signal/filters/index.md | canonical: https://jmrplens.github.io/phonometry/signal/filters/ -->
+Source: https://jmrplens.github.io/phonometry/signal/filters/
+
+# Octave filtering
+
+Acoustic analysis rarely wants a raw FFT: standards, ratings and human hearing
+all work in **fractional octave bands**, frequency intervals whose width grows
+proportionally with frequency. phonometry implements them as banks of
+recursive filters whose **-3 dB points sit exactly on the ANSI S1.11 band
+edges**, so band levels are comparable whichever filter architecture computes
+them, and whose designs are verified against the class tolerances of
+**IEC 61260-1:2014**.
+
+The foundation page is [Filter Banks](https://jmrplens.github.io/phonometry/signal/filters/filter-banks/). It
+covers the band mathematics, how a signal is decomposed into 1/1, 1/3 or
+arbitrary 1/b octave bands, the parametric EQ and the zero-phase offline mode
+for analysis where filter delay must not smear the result. Under the hood
+every bank is a cascade of second-order sections with multirate decimation,
+which is what keeps low-frequency bands numerically stable. Choosing among
+the five architectures (Butterworth, Chebyshev I/II, Elliptic and Bessel) is
+the job of the
+[Filter Architecture Gallery](https://jmrplens.github.io/phonometry/signal/filters/filter-gallery/): what their
+frequency responses trade against each other, the full response gallery and
+per-architecture usage, plus the Linkwitz-Riley crossover.
+
+Proving a designed bank against those tolerances is the job of
+[Filter Class Verification (IEC 61260-1)](https://jmrplens.github.io/phonometry/signal/filters/filter-compliance/):
+the Table 1 acceptance mask band by band, the stricter class 0 of the
+withdrawn 1995 edition, what a performance class buys in a measurement, and
+the accredited one-page compliance fiche.
+
+The other two pages scale that foundation along two independent axes.
+[Block Processing](https://jmrplens.github.io/phonometry/signal/filters/block-processing/) scales it in *time*:
+signals that never fit in memory (hour-long recordings, live monitoring,
+embedded loggers) are processed buffer by buffer with carried filter state, so
+the result is bit-identical to processing the whole signal at once.
+[Multichannel and Performance](https://jmrplens.github.io/phonometry/signal/filters/multichannel/) scales it in
+*channels*: microphone arrays and multichannel recordings are analysed
+vectorized, one call for all channels, with notes on where the computation
+time actually goes.
+
+Read them in that order. Everything downstream (levels, loudness, room
+parameters) consumes the band signals or band levels these pages produce.
+
+## Pages in this section
+
+- [Filter Banks](https://jmrplens.github.io/phonometry/signal/filters/filter-banks/): the band mathematics,
+  bank parameters, parametric EQ, band decomposition and zero-phase
+  filtering.
+- [Filter Architecture Gallery](https://jmrplens.github.io/phonometry/signal/filters/filter-gallery/): the five
+  architectures compared, the response gallery and per-architecture usage.
+- [Filter Class Verification (IEC 61260-1)](https://jmrplens.github.io/phonometry/signal/filters/filter-compliance/):
+  the Table 1 acceptance mask, class 0 and the compliance fiche.
+- [Block Processing](https://jmrplens.github.io/phonometry/signal/filters/block-processing/): stateful streaming
+  workflows with carried filter state.
+- [Multichannel and Performance](https://jmrplens.github.io/phonometry/signal/filters/multichannel/): vectorized
+  multichannel analysis and performance notes.
+
+---
+
+
 <!-- source: docs/signal/filters/multichannel.md | canonical: https://jmrplens.github.io/phonometry/signal/filters/multichannel/ -->
 Source: https://jmrplens.github.io/phonometry/signal/filters/multichannel/
 
@@ -33047,6 +34608,218 @@ multichannel support adds no normative content of its own: each channel is
 filtered, weighted and time-integrated exactly as the single-channel standards
 prescribe (see [Filter Banks](https://jmrplens.github.io/phonometry/signal/filters/filter-banks/) and [Levels](https://jmrplens.github.io/phonometry/signal/levels/levels/)); the
 vectorization only batches the computation across the channel axis.
+
+---
+
+
+<!-- source: docs/signal/index.md | canonical: https://jmrplens.github.io/phonometry/signal/ -->
+Source: https://jmrplens.github.io/phonometry/signal/
+
+# Signal analysis
+
+Everything in phonometry starts here. This section covers the chain that turns
+a raw digital signal into standards-compliant acoustic numbers: split it into
+**fractional octave bands** (ANSI S1.11 / IEC 61260-1), shape it with the
+**frequency weightings** of IEC 61672-1, smooth it with the **Fast/Slow/Impulse
+time ballistics**, and integrate it into **Leq and statistical levels**. It is,
+in effect, a sound level meter decomposed into composable functions, and every
+other section of the documentation builds on it: a loudness model consumes
+calibrated band levels, a room parameter starts from a filtered impulse
+response, an environmental rating is an adjusted Leq.
+[Build a sound level meter](https://jmrplens.github.io/phonometry/signal/sound-level-meter/) assembles
+that chain end to end on a single runnable page; it is the best starting point
+if you want to see the whole area at work before opening the deep guides.
+
+Around the level chain sit the general signal-analysis tools:
+**calibrated spectral estimates** (Welch PSD and cross-spectral density with
+confidence intervals), **correlation and time-delay estimation** and the
+**Hilbert envelope**, all stated with the Bendat & Piersol error analysis.
+And two transversal concerns complete the core. **Calibration** decides what
+the digital samples mean physically: results can be referenced to a measured
+calibrator tone or a known sensitivity (dB SPL), or stay in digital full
+scale (dBFS). **Measurement uncertainty** (the GUM and its Monte Carlo
+supplement) qualifies any result computed from uncertain inputs, which is
+what makes a number defensible in a report.
+
+If you are new to the library, read
+[Filter Banks](https://jmrplens.github.io/phonometry/signal/filters/filter-banks/) first: it introduces the band
+decomposition every other page assumes. Then
+[Integrated and Statistical Levels](https://jmrplens.github.io/phonometry/signal/levels/levels/) shows the
+metrics most measurements end in, and
+[Calibration and dBFS](https://jmrplens.github.io/phonometry/signal/metrology/calibration/) anchors them to
+physical units.
+
+## [Octave filtering](https://jmrplens.github.io/phonometry/signal/filters/)
+
+Fractional octave band decomposition and the two ways to scale it: streaming
+blocks and multichannel arrays.
+
+- [Filter Banks](https://jmrplens.github.io/phonometry/signal/filters/filter-banks/): the fractional-octave
+  band mathematics, the bank parameters, the parametric EQ, band
+  decomposition and zero-phase offline filtering.
+- [Filter Architecture Gallery](https://jmrplens.github.io/phonometry/signal/filters/filter-gallery/): the five
+  filter architectures compared, the full response gallery and
+  per-architecture usage, with the Linkwitz-Riley crossover.
+- [Filter Class Verification (IEC 61260-1)](https://jmrplens.github.io/phonometry/signal/filters/filter-compliance/):
+  the Table 1 acceptance mask band by band, the class 0 of the withdrawn 1995
+  edition and the compliance fiche.
+- [Block Processing](https://jmrplens.github.io/phonometry/signal/filters/block-processing/): stateful streaming
+  analysis that carries filter state across buffers, for signals that never
+  fit in memory.
+- [Multichannel and Performance](https://jmrplens.github.io/phonometry/signal/filters/multichannel/): vectorized
+  analysis of many channels at once, with performance notes.
+
+## [Levels and weighting](https://jmrplens.github.io/phonometry/signal/levels/)
+
+From weighted signal to reported level: the frequency weightings, the time
+ballistics and the integrated, statistical and rating levels.
+
+- [Frequency Weighting (A, C, Z)](https://jmrplens.github.io/phonometry/signal/levels/weighting/): the
+  IEC 61672-1 ear-response curves, the high-frequency accuracy mode and the
+  Table 3 class verification.
+- [Special Weightings (G, B, D, AU)](https://jmrplens.github.io/phonometry/signal/levels/special-weightings/):
+  the ISO 7196 infrasound G-weighting, the historical B and D curves and AU
+  per IEC 61012.
+- [Time Weighting](https://jmrplens.github.io/phonometry/signal/levels/time-weighting/): Fast, Slow and Impulse
+  exponential ballistics per IEC 61672-1.
+- [Integrated and Statistical Levels](https://jmrplens.github.io/phonometry/signal/levels/levels/): Leq and
+  LAeq, percentile levels L10/L50/L90, LCpeak and SEL, noise dose (IEC 61252),
+  and octave spectrograms.
+- [Environmental Levels (ISO 1996-1/-2)](https://jmrplens.github.io/phonometry/environment/environmental-levels/):
+  Lden, Ldn and the composite rating levels, the tonal adjustment, the
+  residual-noise correction and the uncertainty budget.
+- [Spanish Noise Regulation (RD 1367/2007)](https://jmrplens.github.io/phonometry/environment/spanish-noise-regulation/):
+  the corrected level LKeq, the Kt/Kf/Ki corrections, the evaluation periods
+  and noise phases, and the limit tables.
+
+## [Signals and spectra](https://jmrplens.github.io/phonometry/signal/spectra/)
+
+Fine-grained frequency- and time-domain analysis, every estimate calibrated
+and carrying its statistical quality.
+
+- [Calibrated spectral analysis](https://jmrplens.github.io/phonometry/signal/spectra/spectral-analysis/): the
+  Bendat & Piersol Welch estimators with their statistical quality: PSD and
+  cross-spectral density with chi-square confidence intervals, the coherent
+  output spectrum with the spectral SNR, 1/n-octave smoothing and
+  exact-slope colored-noise generators.
+- [Multiple and partial coherence](https://jmrplens.github.io/phonometry/signal/spectra/miso-coherence/): the
+  multiple-input/output coherence functions for multiple correlated
+  sources and one output, with the conditioning that tells a genuine cause
+  from a source that merely correlates with it, and the partial coherent
+  output spectra that say which source dominates each band.
+- [Time-frequency analysis](https://jmrplens.github.io/phonometry/signal/spectra/time-frequency/): the
+  calibrated STFT spectrogram in absolute units (dB SPL for pascals) and
+  the zoom FFT that resolves tones closer than a practical FFT bin.
+- [Cepstrum, echoes and the envelope spectrum](https://jmrplens.github.io/phonometry/signal/spectra/cepstrum-echoes/):
+  the power, real and complex cepstrum with quefrency analysis, echo
+  detection with the reflection coefficient read off the cepstral peak,
+  lowpass/highpass liftering of a log spectrum, and the envelope spectrum
+  that turns amplitude modulations into discrete lines.
+- [Time synchronous averaging](https://jmrplens.github.io/phonometry/signal/spectra/synchronous-averaging/):
+  extraction of a periodic waveform of known period by time domain averaging,
+  the comb filter that describes it in the frequency domain, the square-root
+  noise-reduction law, and the choice of the number of averages that places a
+  comb node on an interfering order (McFadden 1987).
+- [Machine fault frequencies](https://jmrplens.github.io/phonometry/vibration/machinery/machine-diagnostics/):
+  the kinematic fault-frequency families of rotating machinery (Norton &
+  Karczub Section 8.4) drawn on top of a measured envelope spectrum: bearing
+  BPFO, BPFI, BSF and cage frequencies, gear-mesh sidebands, induction-motor
+  slip, pole-pass and rotor-slot harmonics, and blade-passing tones.
+- [Correlation, time delay and envelope](https://jmrplens.github.io/phonometry/signal/spectra/correlation-delay/):
+  correlation estimates with the Bendat & Piersol random errors, time-delay
+  estimation by direct correlation, cross-spectrum phase slope and the
+  Knapp & Carter GCC weightings, sub-sample impulse-response delay and
+  alignment, and the Hilbert envelope.
+- [Test signals and sample-rate tools](https://jmrplens.github.io/phonometry/signal/spectra/test-signals/):
+  IEC 60268-1 tone bursts with exact gating, resampling with a stated
+  anti-alias specification, and band-limited fractional delay.
+- [System measurement](https://jmrplens.github.io/phonometry/signal/spectra/system-measurement/):
+  complementary Golay pairs, sweeps with an arbitrary target magnitude
+  spectrum by group-delay shaping, and the Kirkeby-regularized inversion of
+  a measured response.
+
+## [Calibration and uncertainty](https://jmrplens.github.io/phonometry/signal/metrology/)
+
+What the numbers mean and how much to trust them.
+
+- [Calibration and dBFS](https://jmrplens.github.io/phonometry/signal/metrology/calibration/): physical SPL
+  calibration from a calibrator tone (IEC 60942) or a known sensitivity, and
+  the digital dBFS mode.
+- [Measurement uncertainty (GUM and Monte Carlo)](https://jmrplens.github.io/phonometry/signal/metrology/gum-uncertainty/):
+  the law of propagation of uncertainty and the Monte Carlo method of
+  ISO/IEC Guide 98-3, with expanded uncertainty and coverage intervals.
+- [Data qualification](https://jmrplens.github.io/phonometry/signal/metrology/data-qualification/): the reverse
+  arrangement and runs stationarity tests on segment statistics, and the Rice
+  level-crossing and peak statistics with the irregularity factor.
+
+---
+
+
+<!-- source: docs/signal/levels/index.md | canonical: https://jmrplens.github.io/phonometry/signal/levels/ -->
+Source: https://jmrplens.github.io/phonometry/signal/levels/
+
+# Levels and weighting
+
+A sound level meter does three things to a calibrated signal, in order: it
+**weights it in frequency** to mimic the ear's sensitivity, it **smooths it in
+time** with a standardised ballistic, and it **integrates it into a level**.
+The pages of this section implement that chain stage by stage for the
+displayed level: the A/C/Z curves and the Fast/Slow/Impulse ballistics
+follow **IEC 61672-1:2013** closely enough that the weightings are
+verified against the standard's own tolerance tables in CI.
+
+[Frequency Weighting (A, C, Z)](https://jmrplens.github.io/phonometry/signal/levels/weighting/) covers the
+first stage. The A-curve tracks hearing sensitivity at moderate levels and
+dominates regulation; C is nearly flat and serves peaks and low-frequency
+checks; Z is unweighted by definition. The rest of the family lives in
+[Special Weightings (G, B, D, AU)](https://jmrplens.github.io/phonometry/signal/levels/special-weightings/):
+the G-curve of **ISO 7196** extends the idea into infrasound, where
+conventional weightings are blind, the historical B and D curves serve legacy
+data, and AU rejects ultrasound from an audible-sound reading per IEC 61012.
+
+[Time Weighting](https://jmrplens.github.io/phonometry/signal/levels/time-weighting/) covers the second stage:
+the exponential Fast (125 ms), Slow (1 s) and Impulse ballistics that decide
+how quickly a displayed level follows the sound. phonometry implements the
+exact time constants, verified against the toneburst responses of the
+standard.
+
+[Integrated and Statistical Levels](https://jmrplens.github.io/phonometry/signal/levels/levels/) is the payoff:
+the equivalent continuous level Leq and its A-weighted LAeq, the percentile
+levels L10/L50/L90 that describe fluctuating noise, LCpeak and SEL, the noise
+dose of IEC 61252, plus the octave spectrogram for visualising level against
+time and band at once. This is the page where most practical measurements
+end, and where the environmental and occupational sections pick up.
+
+Turning those levels into a regulatory verdict is
+[Environmental Levels (ISO 1996-1/-2)](https://jmrplens.github.io/phonometry/environment/environmental-levels/):
+the day-evening-night level Lden and the rating levels of **ISO 1996-1** with
+their adjustments, and the ISO 1996-2 determination chain of tonal
+adjustment, residual-noise correction and the measurement uncertainty budget.
+
+National frameworks build their own index on top of that chain, and
+[Spanish Noise Regulation (RD 1367/2007)](https://jmrplens.github.io/phonometry/environment/spanish-noise-regulation/)
+implements the Spanish one: the corrected level LKeq with its tonal,
+low-frequency and impulsive corrections, the evaluation periods split into
+noise phases, and the limit tables an activity is judged against.
+
+## Pages in this section
+
+- [Frequency Weighting (A, C, Z)](https://jmrplens.github.io/phonometry/signal/levels/weighting/): the
+  IEC 61672-1 A/C/Z curves, the high-frequency accuracy mode and the class
+  verification.
+- [Special Weightings (G, B, D, AU)](https://jmrplens.github.io/phonometry/signal/levels/special-weightings/):
+  the ISO 7196 infrasound G-weighting, the historical B and D curves and AU
+  per IEC 61012.
+- [Time Weighting](https://jmrplens.github.io/phonometry/signal/levels/time-weighting/): Fast, Slow and
+  Impulse exponential ballistics.
+- [Integrated and Statistical Levels](https://jmrplens.github.io/phonometry/signal/levels/levels/): Leq and
+  LAeq, percentile levels, LCpeak/SEL, noise dose and octave spectrograms.
+- [Environmental Levels (ISO 1996-1/-2)](https://jmrplens.github.io/phonometry/environment/environmental-levels/):
+  Lden, Ldn and rating levels, tonal adjustment, residual noise and
+  uncertainty.
+- [Spanish Noise Regulation (RD 1367/2007)](https://jmrplens.github.io/phonometry/environment/spanish-noise-regulation/):
+  the corrected level LKeq, the Kt/Kf/Ki corrections, the evaluation periods
+  and noise phases, and the limit tables.
 
 ---
 
@@ -35488,6 +37261,70 @@ coverage interval (clause 7).
 ---
 
 
+<!-- source: docs/signal/metrology/index.md | canonical: https://jmrplens.github.io/phonometry/signal/metrology/ -->
+Source: https://jmrplens.github.io/phonometry/signal/metrology/
+
+# Calibration and uncertainty
+
+A level printed by software is not yet a measurement. Two things separate the
+one from the other: knowing what the digital samples mean **physically**, and
+knowing how much the result could reasonably be **wrong**. This section covers
+both, and they apply transversally to every other page of the documentation.
+
+[Calibration and dBFS](https://jmrplens.github.io/phonometry/signal/metrology/calibration/) handles the first.
+phonometry works in two reference frames: physical **dB SPL**, established
+either from a recorded calibrator tone (the IEC 60942 field ritual) or from a
+known microphone sensitivity, and digital **dBFS**, levels relative to full
+scale, appropriate when no physical reference exists or when characterising
+the digital chain itself. The page explains how each mode is set up and, just
+as important, which quantities are meaningful in which frame.
+
+[Measurement uncertainty (GUM and Monte Carlo)](https://jmrplens.github.io/phonometry/signal/metrology/gum-uncertainty/)
+handles the second, implementing the *Guide to the Expression of Uncertainty
+in Measurement* (**ISO/IEC Guide 98-3:2008**) and its Monte Carlo
+**Supplement 1**. The GUM route propagates standard uncertainties analytically
+through sensitivity coefficients into a combined and expanded uncertainty,
+with Welch-Satterthwaite effective degrees of freedom; the Monte Carlo route
+propagates whole probability distributions numerically and yields coverage
+intervals that stay honest when the model is non-linear or the inputs are far
+from Gaussian. The page shows both on the same models, including where they
+diverge and why.
+
+[Data qualification](https://jmrplens.github.io/phonometry/signal/metrology/data-qualification/) guards the gate
+in front of both: every average - a Leq, a Welch PSD, every averaged input
+to an uncertainty budget - assumes the record is stationary, and the Bendat & Piersol reverse
+arrangement and runs tests decide that objectively from segment mean squares,
+with the book's own acceptance regions. The same page carries the Rice
+statistics of level crossings and peaks - apparent frequency, peak rates,
+the irregularity factor - that characterise a qualified Gaussian record and
+screen for one that is not.
+
+The same discipline extends into the frequency domain: the
+[Signals and spectra](https://jmrplens.github.io/phonometry/signal/spectra/) pages
+apply the Bendat & Piersol error analysis to Welch spectral estimates, so
+every PSD carries its effective number of averages, its normalized random
+error and a chi-square confidence interval.
+
+The pages meet in practice: an uncertainty budget for an acoustic
+measurement almost always contains a calibration term, and several standards
+implemented elsewhere in the library (ISO 9612, ISO 12999-1) ship uncertainty
+budgets that are specialisations of the GUM machinery described here.
+
+## Pages in this section
+
+- [Calibration and dBFS](https://jmrplens.github.io/phonometry/signal/metrology/calibration/): physical SPL
+  calibration from a calibrator tone or a known sensitivity, and the digital
+  full-scale mode.
+- [Measurement uncertainty (GUM and Monte Carlo)](https://jmrplens.github.io/phonometry/signal/metrology/gum-uncertainty/):
+  the law of propagation of uncertainty and the Monte Carlo method, expanded
+  uncertainty and coverage intervals.
+- [Data qualification](https://jmrplens.github.io/phonometry/signal/metrology/data-qualification/): the reverse
+  arrangement and runs stationarity tests on segment statistics, and the
+  Rice level-crossing and peak statistics with the irregularity factor.
+
+---
+
+
 <!-- source: docs/signal/sound-level-meter.md | canonical: https://jmrplens.github.io/phonometry/signal/sound-level-meter/ -->
 Source: https://jmrplens.github.io/phonometry/signal/sound-level-meter/
 
@@ -36516,6 +38353,131 @@ band-limited kernel with the public
   [doi:10.1109/TASSP.1976.1162830](https://doi.org/10.1109/TASSP.1976.1162830).
   The GCC framework, the Table I weightings and their conditions, and the
   maximum-likelihood (Hannan-Thomson) processor.
+
+---
+
+
+<!-- source: docs/signal/spectra/index.md | canonical: https://jmrplens.github.io/phonometry/signal/spectra/ -->
+Source: https://jmrplens.github.io/phonometry/signal/spectra/
+
+# Signals and spectra
+
+Band levels answer *how much*; this section answers *what is in the signal*.
+Where the rest of the core works in fractional octave bands, these pages work
+with the fine-grained estimators of classical signal analysis: spectral
+densities, correlation functions, delays and envelopes. They share one
+discipline, taken from Bendat & Piersol: every estimate is **calibrated** (the
+same dB SPL / dBFS reference frames as the rest of the library) and carries
+its **statistical quality**, so a spectrum is not just a curve but a curve
+with a confidence interval.
+
+[Calibrated spectral analysis](https://jmrplens.github.io/phonometry/signal/spectra/spectral-analysis/) is the
+frequency-domain half. The Welch power and cross-spectral density estimators
+report their effective number of averages, normalized random errors and
+chi-square confidence intervals; the coherent output spectrum splits a
+measured output into the part explained by an input and the part that is
+noise, with a spectral signal-to-noise ratio; fractional-octave smoothing
+bridges back to the banded world; and the colored-noise generators synthesize
+white, pink, red, blue and violet test signals with an exact power-law slope.
+[Multiple and partial coherence](https://jmrplens.github.io/phonometry/signal/spectra/miso-coherence/) carries
+that same cross-spectral machinery to several correlated sources at once: from
+multiple inputs and one output it separates the coherence a source
+genuinely contributes from the part it merely shares with another, and its
+partial coherent output spectra say which source dominates each band.
+
+[Time-frequency analysis](https://jmrplens.github.io/phonometry/signal/spectra/time-frequency/) is the view in
+between: the calibrated STFT spectrogram shows what happens *when* - a
+passing siren, an impact, a run-up - with every cell reading an absolute
+level in the same scaling as the Welch estimators, and the zoom FFT computes
+the spectrum of a narrow band on an arbitrarily fine grid to separate tones
+closer than a practical FFT bin.
+[Cepstrum, echoes and the envelope spectrum](https://jmrplens.github.io/phonometry/signal/spectra/cepstrum-echoes/)
+works on the *shape* of the spectrum. The power, real and complex cepstrum
+collapse periodic spectral ripple onto quefrency spikes, echo detection reads
+a reflection's delay and coefficient off the cepstral peak, liftering splits
+a log spectrum into smooth envelope and fine structure, and the envelope
+spectrum turns amplitude modulations into discrete lines at the modulation
+frequency.
+[Time synchronous averaging](https://jmrplens.github.io/phonometry/signal/spectra/synchronous-averaging/)
+extracts a repetitive waveform of known period from asynchronous noise by
+ensemble-averaging successive periods: the residual noise falls as the square
+root of the number of averages, and choosing that number to place a comb node
+on an interfering order rejects it far better than the habitual power of two.
+
+[Correlation, time delay and envelope](https://jmrplens.github.io/phonometry/signal/spectra/correlation-delay/)
+is the time-domain half. Auto- and cross-correlation come with the
+Bendat & Piersol normalizations and random errors; time-delay estimation
+offers the direct correlator, the cross-spectrum phase slope and the
+Knapp & Carter generalized cross-correlation weightings (Roth, SCOT, PHAT,
+maximum likelihood); impulse responses can be delayed and aligned with
+sub-sample precision; and the Hilbert transform yields the envelope with
+instantaneous phase and frequency.
+
+[Test signals and sample-rate tools](https://jmrplens.github.io/phonometry/signal/spectra/test-signals/) is
+the toolbox the other two lean on: tone bursts with the exact gating of
+IEC 60268-1 (zero-crossing start, integral full periods, repetitive trains),
+polyphase resampling behind an explicit anti-alias specification whose
+designed filter travels with the result, and band-limited fractional delay
+with a linear or circular boundary, sharing its kernel with the sub-sample
+alignment of impulse responses.
+
+[System measurement](https://jmrplens.github.io/phonometry/signal/spectra/system-measurement/) turns the
+toolbox toward measuring systems themselves: complementary Golay pairs
+deconvolve a time-invariant system with zero correlation noise, the
+Mueller & Massarani shaped sweeps put the excitation energy where a target
+spectrum asks for it while keeping a swept sine's crest factor, and the
+regularized spectral inversion converts a measured response into a safe
+equalizer with an analytic bound on flatness and out-of-band gain.
+
+These estimators feed the rest of the library: transfer functions and
+distortion analysis build on the cross-spectral machinery, room impulse
+response work leans on delay estimation and alignment, and the
+[uncertainty pages](https://jmrplens.github.io/phonometry/signal/metrology/)
+supply the error-analysis vocabulary the estimates are stated in.
+
+## Pages in this section
+
+- [Calibrated spectral analysis](https://jmrplens.github.io/phonometry/signal/spectra/spectral-analysis/):
+  Welch PSD/CSD with chi-square confidence intervals, the coherent output
+  spectrum and spectral SNR, 1/n-octave smoothing and exact-slope
+  colored-noise generators.
+- [Multiple and partial coherence](https://jmrplens.github.io/phonometry/signal/spectra/miso-coherence/):
+  the Bendat & Piersol multiple-input/output coherence functions for
+  multiple correlated sources and one output, with the Gaussian-elimination
+  conditioning that tells a genuine cause from a source that merely
+  correlates with it, and the partial coherent output spectra that say which
+  source dominates each band.
+- [Time-frequency analysis](https://jmrplens.github.io/phonometry/signal/spectra/time-frequency/): the
+  calibrated STFT spectrogram in absolute units (dB SPL for pascals) with
+  the time-versus-frequency resolution trade-off, and the zoom FFT that
+  resolves tones closer than a practical FFT bin.
+- [Cepstrum, echoes and the envelope spectrum](https://jmrplens.github.io/phonometry/signal/spectra/cepstrum-echoes/):
+  the power/real/complex cepstrum with quefrency analysis, echo detection
+  with the reflection coefficient read off the peak, lowpass/highpass
+  liftering, the homomorphic round trip and the envelope spectrum of
+  amplitude modulations.
+- [Time synchronous averaging](https://jmrplens.github.io/phonometry/signal/spectra/synchronous-averaging/):
+  extraction of a periodic waveform of known period by time domain averaging,
+  the comb filter that describes the operation in the frequency domain, the
+  square-root noise-reduction law, and the choice of the number of averages
+  that places a comb node on an interfering order (McFadden 1987).
+- [Machine fault frequencies](https://jmrplens.github.io/phonometry/vibration/machinery/machine-diagnostics/):
+  the kinematic fault-frequency families of rotating machinery (Norton &
+  Karczub Section 8.4) drawn on top of a measured envelope spectrum: bearing
+  BPFO, BPFI, BSF and cage frequencies, gear-mesh sidebands, induction-motor
+  slip, pole-pass and rotor-slot harmonics, and blade-passing tones.
+- [Correlation, time delay and envelope](https://jmrplens.github.io/phonometry/signal/spectra/correlation-delay/):
+  correlation estimates with their random errors, time-delay estimation by
+  direct correlation, phase slope and GCC weightings, sub-sample
+  impulse-response alignment, and the Hilbert envelope.
+- [Test signals and sample-rate tools](https://jmrplens.github.io/phonometry/signal/spectra/test-signals/):
+  IEC 60268-1 tone bursts with exact gating, resampling with a stated
+  anti-alias specification, and band-limited fractional delay.
+- [System measurement](https://jmrplens.github.io/phonometry/signal/spectra/system-measurement/):
+  complementary Golay pairs with exactly noise-free deconvolution to an
+  impulse response, sweeps that follow an arbitrary target magnitude
+  spectrum by group-delay shaping, and the Kirkeby-regularized inversion
+  of a measured response.
 
 ---
 
@@ -39479,6 +41441,60 @@ and its own oracles are covered in
 ---
 
 
+<!-- source: docs/simulation/index.md | canonical: https://jmrplens.github.io/phonometry/simulation/ -->
+Source: https://jmrplens.github.io/phonometry/simulation/
+
+# Wave simulation
+
+Most of this library predicts a number; this section computes the **wave
+field itself**. A finite-difference time-domain (FDTD) solver integrates the
+linear acoustic equations on a 2D grid, so reflection, diffraction,
+interference, modal behaviour and refraction through inhomogeneous media all
+emerge from first principles, and its elastic companion carries the same
+scheme into solids. Both solvers are deterministic (identical inputs give
+bit-identical outputs on the same platform), validated against analytic
+oracles, and double as a cross-check engine for the closed-form models of
+the other sections.
+
+The section splits along the media it simulates. The acoustic page explains
+the numerical method (the staggered leapfrog scheme and its Courant
+stability bound), the building blocks (sources, probes, obstacles and
+boundary conditions, including the locally reacting real-impedance edge),
+the near-to-far-field transformation, when a wave-based simulation is worth
+its cost, what a 2D domain can and cannot say about a 3D problem, and how
+numerical dispersion sets the cells-per-wavelength resolution rule. The
+elastic page extends the same staggered grid to solids: shear waves, free
+surfaces with Rayleigh waves, and fluid-solid coupling with mode
+conversion, Scholte interface waves and immersed-plate transmission.
+
+A good way to read it is alongside the closed-form pages it cross-checks:
+the modal frequencies of [room acoustics](https://jmrplens.github.io/phonometry/buildings/rooms/room-acoustics/)
+reappear as peaks in a simulated room spectrum, the barrier insertion loss of
+[ground effect and barriers](https://jmrplens.github.io/phonometry/environment/propagation/ground-barriers/) can be
+re-derived by placing an obstacle in the domain, and the ray bending of
+[atmospheric refraction](https://jmrplens.github.io/phonometry/environment/propagation/atmospheric-refraction/) emerges
+from a height-dependent sound-speed profile. When a geometry is too irregular
+for those models (odd-shaped rooms, multiple barriers, mixed impedance
+ground), the simulation is the fallback that still gives a quantitative
+answer; when a closed form exists, prefer it, and use the solver to verify
+the assumptions it rests on.
+
+## Pages in this section
+
+- [2D FDTD wave simulation](https://jmrplens.github.io/phonometry/simulation/fdtd-simulation/): the
+  staggered-grid pressure-velocity FDTD method following Attenborough & Van
+  Renterghem (2021) chapter 4, its sources, probes, obstacles and boundary
+  conditions, the near-to-far-field chain, the 2D limits and the numerical
+  dispersion rule.
+- [Elastic waves and fluid-solid coupling](https://jmrplens.github.io/phonometry/simulation/elastic-waves/):
+  the P-SV velocity-stress companion solver (Virieux 1986) on the same
+  grid, with stress-imaging free surfaces, Rayleigh waves, mode conversion,
+  Scholte interface waves and immersed-plate transmission, each validated
+  against its exact closed form.
+
+---
+
+
 <!-- source: docs/start/getting-started.md | canonical: https://jmrplens.github.io/phonometry/start/getting-started/ -->
 Source: https://jmrplens.github.io/phonometry/start/getting-started/
 
@@ -39637,6 +41653,26 @@ the normative PDF fiche.
 - [Conformance report](https://jmrplens.github.io/phonometry/reference/conformance/): the expected and computed value of all 533 checks
 - [API Reference](https://jmrplens.github.io/phonometry/reference/api/): every parameter of every function
 - [Bibliography](https://jmrplens.github.io/phonometry/reference/bibliography/): the books and papers behind every guide, each with a verified link
+
+---
+
+
+<!-- source: docs/start/index.md | canonical: https://jmrplens.github.io/phonometry/start/ -->
+Source: https://jmrplens.github.io/phonometry/start/
+
+# Start
+
+The three pages that open the documentation, before the guides themselves.
+
+[Getting Started](https://jmrplens.github.io/phonometry/start/getting-started/) installs the library and
+walks a first measurement end to end, from a WAV file to a calibrated
+one-third-octave spectrum. [Why phonometry](https://jmrplens.github.io/phonometry/start/why-phonometry/)
+sets out what the library is for and how it is validated against the standards
+it implements. [About](https://jmrplens.github.io/phonometry/start/about/) states who maintains it, how
+to cite it and under what licence.
+
+[All guides](https://jmrplens.github.io/phonometry/start/guides/) is the map: every guide in the library,
+grouped by the topic it belongs to, with a line on each.
 
 ---
 
@@ -39860,6 +41896,74 @@ Spanish, so the document you hand over carries the same numbers the check does.
 The sources behind all of it are collected in the
 [Bibliography](https://jmrplens.github.io/phonometry/reference/bibliography/), every entry with a verified DOI or official
 publisher link.
+
+---
+
+
+<!-- source: docs/underwater/index.md | canonical: https://jmrplens.github.io/phonometry/underwater/ -->
+Source: https://jmrplens.github.io/phonometry/underwater/
+
+# Underwater acoustics
+
+Underwater acoustics runs on the same physics as airborne acoustics but on a
+different scale and a different reference: levels are expressed re **1 µPa**
+(not 20 µPa), exposure re 1 µPa²·s, and the medium itself, with its
+depth-dependent sound speed, refracts sound into channels that carry it for
+kilometres. This section covers the discipline along the source-path-receiver
+chain of the rest of the library.
+
+The **source** half, in
+[Underwater acoustics: radiated noise and pile driving](https://jmrplens.github.io/phonometry/underwater/underwater-acoustics/),
+sets up the ISO 18405 terminology (SPL, SEL and peak levels and their
+references) and applies it to two regulated measurement cases: ships, with
+the radiated noise level of ISO 17208-1 and the equivalent monopole source
+level of ISO 17208-2 via the Lloyd's-mirror surface correction, and
+percussive pile driving, with the single-strike, peak and cumulative sound
+exposure of ISO 18406.
+
+The **path** half now spans two pages.
+[Underwater sound propagation](https://jmrplens.github.io/phonometry/underwater/underwater-propagation/)
+predicts what the sea does to that sound in closed form: geometrical
+spreading plus volume absorption (Francois-Garrison, Ainslie-McColm or
+Thorp), Weston's four shallow-water regimes with their transition ranges, the
+speed of sound in sea water by four formulations, the passive and active sonar
+equation with its detection-range inversion, Rayleigh seabed reflection loss,
+and the Wenz ambient-noise spectrum with JOMOPANS-ECHO ship traffic. When refraction and
+boundaries decide the answer,
+[Underwater propagation solvers](https://jmrplens.github.io/phonometry/underwater/underwater-solvers/)
+computes the field instead: the normal-mode expansion, ray tracing and the
+split-step Fourier parabolic equation, with the guidance for choosing
+between them and the closed forms.
+
+A **receiver** half closes the loop.
+[Marine-mammal noise exposure](https://jmrplens.github.io/phonometry/underwater/marine-mammal-exposure/)
+takes the level a source and a path produce and asks what it does to the
+animals that hear it: the group audiograms of Southall et al., the regulatory
+auditory weighting functions of the NMFS guidance, the TTS and injury onset
+criteria, and the weighted cumulative exposure of a piling campaign measured
+against them.
+
+Read the pages in that order: the reference levels come first because every
+propagation result is expressed in them, and the exposure criteria come last
+because they consume both. Unusually for this site, the theory for these pages
+lives inline with the guides rather than in the theory reference.
+
+## Pages in this section
+
+- [Underwater acoustics: radiated noise and pile driving](https://jmrplens.github.io/phonometry/underwater/underwater-acoustics/):
+  ISO 18405 reference levels, ISO 17208 ship radiated noise and monopole
+  source level, and ISO 18406 pile-driving sound exposure.
+- [Underwater sound propagation](https://jmrplens.github.io/phonometry/underwater/underwater-propagation/):
+  transmission loss, sound speed, the sonar equation, seabed reflection and
+  ocean ambient noise, in closed form.
+- [Underwater propagation solvers](https://jmrplens.github.io/phonometry/underwater/underwater-solvers/):
+  the normal-mode, ray-tracing and parabolic-equation solvers of the
+  stratified waveguide, each validated against an exact closed form, and
+  how to choose a propagation model.
+- [Marine-mammal noise exposure](https://jmrplens.github.io/phonometry/underwater/marine-mammal-exposure/):
+  group audiograms, the regulatory auditory weighting functions with the
+  guidance version selectable, the TTS and injury onset criteria, and a worked
+  pile-driving assessment.
 
 ---
 
@@ -41826,6 +43930,56 @@ values).
 ---
 
 
+<!-- source: docs/vibration/human/index.md | canonical: https://jmrplens.github.io/phonometry/vibration/human/ -->
+Source: https://jmrplens.github.io/phonometry/vibration/human/
+
+# Human vibration
+
+Vibration transmitted to a person is evaluated with a measurement chain
+deliberately parallel to a sound level meter's: the acceleration is
+**frequency-weighted** to reflect how the body responds at each frequency,
+reduced to a **weighted r.m.s.** value or a dose, combined across axes, and
+normalised to a **daily exposure** that regulation can act on. The two pages
+of this section cover the general chain and the special case that breaks it.
+
+[Human Vibration](https://jmrplens.github.io/phonometry/vibration/human/human-vibration/) is the general chain.
+It covers the whole-body and hand-arm frequency weightings of **ISO 8041-1**,
+the weighted r.m.s. acceleration and the running and dose measures of
+**ISO 2631-1** (MTVV, VDV, MSDV, crest factor) that flag shocks a plain
+r.m.s. would hide, vibration in buildings per ISO 2631-2, the hand-arm
+vibration total value and daily exposure A(8) of **ISO 5349-1/-2**, and the
+exposure action and limit values of **Directive 2002/44/EC** that make A(8)
+legally meaningful.
+
+[Multiple-shock whole-body vibration (ISO 2631-5)](https://jmrplens.github.io/phonometry/vibration/human/multiple-shock-vibration/)
+handles exposures the r.m.s. philosophy underestimates: repeated mechanical
+shocks from off-road vehicles, high-speed craft or earth-moving machinery,
+which load the lumbar spine far beyond what their energy average suggests.
+**ISO 2631-5:2018** models the seat-to-spine transfer explicitly, accumulates
+a dose from the response peaks, and converts it into compressive stress on the
+vertebral endplates and a probability of lumbar injury over a working life.
+
+Use ISO 2631-1 metrics first; when the crest factor or the VDV warns that
+shocks dominate, ISO 2631-5 is the dedicated follow-up: its clause 5 model,
+implemented here, covers severe shocks with possible loss of contact with
+the seat, while less severe exposures in which the occupant stays seated
+belong to its Annex A finite-element model. The
+measurement front-end (weighting filters, band analysis) is shared with the
+[core signal analysis](https://jmrplens.github.io/phonometry/signal/)
+section.
+
+## Pages in this section
+
+- [Human Vibration](https://jmrplens.github.io/phonometry/vibration/human/human-vibration/): ISO 8041-1
+  weightings, ISO 2631-1 r.m.s. and dose measures, ISO 5349 daily exposure
+  A(8) and the Directive 2002/44/EC values.
+- [Multiple-shock whole-body vibration (ISO 2631-5)](https://jmrplens.github.io/phonometry/vibration/human/multiple-shock-vibration/):
+  the spinal-response model, acceleration dose and probability of lumbar
+  injury.
+
+---
+
+
 <!-- source: docs/vibration/human/multiple-shock-vibration.md | canonical: https://jmrplens.github.io/phonometry/vibration/human/multiple-shock-vibration/ -->
 Source: https://jmrplens.github.io/phonometry/vibration/human/multiple-shock-vibration/
 
@@ -42075,6 +44229,103 @@ vibration containing multiple shocks*: the seat-to-spine transfer function
 (clause 5.2, Formula 1), the acceleration and daily dose (clause 5.3,
 Formulae 3-5) and the Annex C assessment of adverse health effects (Formulae
 C.1, C.3-C.5, Tables C.1/C.2).
+
+---
+
+
+<!-- source: docs/vibration/index.md | canonical: https://jmrplens.github.io/phonometry/vibration/ -->
+Source: https://jmrplens.github.io/phonometry/vibration/
+
+# Vibration and structure-borne sound
+
+Vibration matters to acoustics twice. First as a **source of sound**: a pump
+or fan bolted to a building injects structure-borne power that travels through
+walls and floors and re-radiates as audible noise rooms away. Second as a
+**human exposure** in its own right: vibration transmitted to a standing,
+seated or hand-gripping person is measured, weighted and limited much like
+noise, with its own metrics and legal action values.
+
+The **structure-borne sources** pages follow the source chain in order. The
+frequency-response-function family of ISO 7626 (receptance, mobility,
+accelerance) is the vocabulary; the transfer stiffness of ISO 10846
+characterises the resilient elements that interrupt the path; ISO/TS 7849
+estimates the airborne power a vibrating surface radiates directly; EN 15657
+measures the structure-borne power a machine injects into a reception plate;
+and EN 12354-5 assembles all of it into the sound pressure level predicted in
+a receiving room. That final prediction is also where this section hands over
+to the [sound insulation](https://jmrplens.github.io/phonometry/buildings/insulation/) models
+of the buildings section.
+
+The **human vibration** pages share the measurement philosophy of a sound
+level meter, applied to acceleration: frequency weightings that reflect body
+response, running and integrated averages, and dose quantities compared
+against the action and limit values of Directive 2002/44/EC, plus the
+dedicated spinal-response model for vibration containing repeated shocks.
+
+Start with
+[Mechanical mobility and the FRF family](https://jmrplens.github.io/phonometry/vibration/structural/mechanical-mobility/)
+if you care about machines and buildings, or with
+[Human Vibration](https://jmrplens.github.io/phonometry/vibration/human/human-vibration/) if you care about
+people.
+
+## [Structure-borne sources](https://jmrplens.github.io/phonometry/vibration/structural/)
+
+From FRF vocabulary to the predicted level in a receiving room.
+
+- [Mechanical mobility and the FRF family (ISO 7626-1)](https://jmrplens.github.io/phonometry/vibration/structural/mechanical-mobility/):
+  receptance, mobility and accelerance with their reciprocals, and the SDOF
+  reference resonator.
+- [Bending-wave transmission at plate junctions (Cremer/Craik/Hopkins)](https://jmrplens.github.io/phonometry/vibration/structural/junction-transmission/):
+  the frequency-independent wave-approach coefficients for rigid X, T, L and
+  in-line junctions, their angular average and the derived coupling loss factor
+  and Kij.
+- [Transfer stiffness of resilient elements (ISO 10846)](https://jmrplens.github.io/phonometry/vibration/structural/transfer-stiffness/):
+  the dynamic transfer stiffness of vibration isolators by the direct and
+  indirect methods.
+- [Sound power from surface vibration (ISO/TS 7849)](https://jmrplens.github.io/phonometry/devices/emission/vibration-sound-power/):
+  radiated airborne power from surface velocity and a radiation factor.
+- [Structure-borne sound power of equipment (EN 15657)](https://jmrplens.github.io/phonometry/buildings/design/structure-borne-power/):
+  the reception-plate method and the plate-independent source quantities.
+- [Installed structure-borne sound (EN 12354-5)](https://jmrplens.github.io/phonometry/buildings/design/installed-structure-borne/):
+  the receiving-room sound pressure level predicted from source and receiver
+  mobilities.
+
+## [Human vibration](https://jmrplens.github.io/phonometry/vibration/human/)
+
+Vibration transmitted to the human body, from daily exposure to spinal injury
+risk.
+
+- [Human Vibration](https://jmrplens.github.io/phonometry/vibration/human/human-vibration/): whole-body and
+  hand-arm weightings (ISO 8041-1), r.m.s. and dose measures (ISO 2631-1),
+  daily exposure A(8) (ISO 5349) and the Directive 2002/44/EC values.
+- [Multiple-shock whole-body vibration (ISO 2631-5)](https://jmrplens.github.io/phonometry/vibration/human/multiple-shock-vibration/):
+  the spinal-response model and the probability of lumbar injury for vibration
+  containing multiple shocks.
+
+## [Machinery](https://jmrplens.github.io/phonometry/vibration/machinery/)
+
+Turning a vibration spectrum into a diagnosis of the machine that made it.
+
+- [Machine fault frequencies](https://jmrplens.github.io/phonometry/vibration/machinery/machine-diagnostics/):
+  the characteristic bearing, gear and shaft frequencies, and the envelope
+  analysis that finds them under the broadband noise of a running machine.
+
+---
+
+
+<!-- source: docs/vibration/machinery/index.md | canonical: https://jmrplens.github.io/phonometry/vibration/machinery/ -->
+Source: https://jmrplens.github.io/phonometry/vibration/machinery/
+
+# Machinery
+
+A rotating machine writes its own state into its vibration spectrum. Each
+defect has a frequency that follows from the geometry, and finding one under
+the broadband noise of a running machine is a signal-processing problem with a
+standard answer.
+
+[Machine fault frequencies](https://jmrplens.github.io/phonometry/vibration/machinery/machine-diagnostics/)
+computes the bearing, gear and shaft frequencies from the geometry and runs the
+envelope analysis that brings a bearing defect out of the noise floor.
 
 ---
 
@@ -42353,6 +44604,73 @@ count.
   analysis for engineers* (2nd ed., Section 8.4). Cambridge University Press.
 
 See the [bibliography](https://jmrplens.github.io/phonometry/reference/bibliography/) for full entries.
+
+---
+
+
+<!-- source: docs/vibration/structural/index.md | canonical: https://jmrplens.github.io/phonometry/vibration/structural/ -->
+Source: https://jmrplens.github.io/phonometry/vibration/structural/
+
+# Structure-borne sources
+
+A machine fixed to a building radiates sound twice: directly from its own
+vibrating surface, and indirectly by injecting **structure-borne power** into
+the structure, which carries it away and re-radiates it in distant rooms. The
+six pages of this section cover both paths: one estimates the direct
+radiation from the surface vibration itself, and the other five characterise
+the second, sneakier structure-borne path end to end, from describing the
+vibration and characterising the isolators to quantifying the power and
+predicting the level a listener finally hears.
+
+The language comes first.
+[Mechanical mobility and the FRF family (ISO 7626-1)](https://jmrplens.github.io/phonometry/vibration/structural/mechanical-mobility/)
+defines the motion-per-force frequency-response functions (receptance,
+mobility, accelerance and their reciprocals) that every later standard speaks,
+with the closed-form SDOF resonator as the reference and the ISO 7626-2
+measurement acceptance criteria. Source and receiver *mobilities* are what
+decide how much power actually couples across an interface, which is why this
+vocabulary matters.
+
+Three pages then characterise the path elements.
+[Bending-wave transmission at plate junctions (Cremer/Craik/Hopkins)](https://jmrplens.github.io/phonometry/vibration/structural/junction-transmission/)
+follows the power across the structure itself, with the wave-approach
+transmission coefficients for rigid X, T, L and in-line junctions, their
+diffuse-field angular average, and the coupling loss factor and vibration
+reduction index Kij they yield.
+[Transfer stiffness of resilient elements (ISO 10846)](https://jmrplens.github.io/phonometry/vibration/structural/transfer-stiffness/)
+measures the dynamic transfer stiffness of the isolators, mounts and hoses
+inserted precisely to break the transmission path, by the direct and indirect
+(transmissibility) methods.
+[Sound power from surface vibration (ISO/TS 7849)](https://jmrplens.github.io/phonometry/devices/emission/vibration-sound-power/)
+handles the direct radiation: the airborne power estimated from surface
+velocity and a radiation factor, without any acoustic measurement.
+
+The last two pages close the chain on the source and the receiver.
+[Structure-borne sound power of equipment (EN 15657)](https://jmrplens.github.io/phonometry/buildings/design/structure-borne-power/)
+measures what a machine injects, via the reception-plate method, and derives
+the plate-independent source quantities (blocked force, characteristic power
+level, free velocity).
+[Installed structure-borne sound (EN 12354-5)](https://jmrplens.github.io/phonometry/buildings/design/installed-structure-borne/)
+consumes exactly those quantities, couples them through source and receiver
+mobilities, and predicts the sound pressure level in the receiving room,
+which is where this section meets the
+[sound insulation](https://jmrplens.github.io/phonometry/buildings/insulation/) models.
+
+## Pages in this section
+
+- [Mechanical mobility and the FRF family (ISO 7626-1)](https://jmrplens.github.io/phonometry/vibration/structural/mechanical-mobility/):
+  the FRF family, conversions and the SDOF reference resonator.
+- [Bending-wave transmission at plate junctions (Cremer/Craik/Hopkins)](https://jmrplens.github.io/phonometry/vibration/structural/junction-transmission/):
+  the wave-approach transmission coefficients for rigid X, T, L and in-line
+  junctions, their angular average and the derived coupling loss factor and Kij.
+- [Transfer stiffness of resilient elements (ISO 10846)](https://jmrplens.github.io/phonometry/vibration/structural/transfer-stiffness/):
+  dynamic transfer stiffness of isolators by the direct and indirect methods.
+- [Sound power from surface vibration (ISO/TS 7849)](https://jmrplens.github.io/phonometry/devices/emission/vibration-sound-power/):
+  radiated airborne power from surface velocity and a radiation factor.
+- [Structure-borne sound power of equipment (EN 15657)](https://jmrplens.github.io/phonometry/buildings/design/structure-borne-power/):
+  the reception-plate method and plate-independent source quantities.
+- [Installed structure-borne sound (EN 12354-5)](https://jmrplens.github.io/phonometry/buildings/design/installed-structure-borne/):
+  the predicted receiving-room level from installed equipment.
 
 ---
 

@@ -1,0 +1,84 @@
+# phonometry: Vibration and structure-borne sound
+
+Part of https://jmrplens.github.io/phonometry/llms.txt. Full text of the pages in this area.
+
+---
+
+<!-- source: docs/vibration/index.md | canonical: https://jmrplens.github.io/phonometry/vibration/ -->
+Source: https://jmrplens.github.io/phonometry/vibration/
+
+# Vibration and structure-borne sound
+
+Vibration matters to acoustics twice. First as a **source of sound**: a pump
+or fan bolted to a building injects structure-borne power that travels through
+walls and floors and re-radiates as audible noise rooms away. Second as a
+**human exposure** in its own right: vibration transmitted to a standing,
+seated or hand-gripping person is measured, weighted and limited much like
+noise, with its own metrics and legal action values.
+
+The **structure-borne sources** pages follow the source chain in order. The
+frequency-response-function family of ISO 7626 (receptance, mobility,
+accelerance) is the vocabulary; the transfer stiffness of ISO 10846
+characterises the resilient elements that interrupt the path; ISO/TS 7849
+estimates the airborne power a vibrating surface radiates directly; EN 15657
+measures the structure-borne power a machine injects into a reception plate;
+and EN 12354-5 assembles all of it into the sound pressure level predicted in
+a receiving room. That final prediction is also where this section hands over
+to the [sound insulation](https://jmrplens.github.io/phonometry/buildings/insulation/) models
+of the buildings section.
+
+The **human vibration** pages share the measurement philosophy of a sound
+level meter, applied to acceleration: frequency weightings that reflect body
+response, running and integrated averages, and dose quantities compared
+against the action and limit values of Directive 2002/44/EC, plus the
+dedicated spinal-response model for vibration containing repeated shocks.
+
+Start with
+[Mechanical mobility and the FRF family](https://jmrplens.github.io/phonometry/vibration/structural/mechanical-mobility/)
+if you care about machines and buildings, or with
+[Human Vibration](https://jmrplens.github.io/phonometry/vibration/human/human-vibration/) if you care about
+people.
+
+## [Structure-borne sources](https://jmrplens.github.io/phonometry/vibration/structural/)
+
+From FRF vocabulary to the predicted level in a receiving room.
+
+- [Mechanical mobility and the FRF family (ISO 7626-1)](https://jmrplens.github.io/phonometry/vibration/structural/mechanical-mobility/):
+  receptance, mobility and accelerance with their reciprocals, and the SDOF
+  reference resonator.
+- [Bending-wave transmission at plate junctions (Cremer/Craik/Hopkins)](https://jmrplens.github.io/phonometry/vibration/structural/junction-transmission/):
+  the frequency-independent wave-approach coefficients for rigid X, T, L and
+  in-line junctions, their angular average and the derived coupling loss factor
+  and Kij.
+- [Transfer stiffness of resilient elements (ISO 10846)](https://jmrplens.github.io/phonometry/vibration/structural/transfer-stiffness/):
+  the dynamic transfer stiffness of vibration isolators by the direct and
+  indirect methods.
+- [Sound power from surface vibration (ISO/TS 7849)](https://jmrplens.github.io/phonometry/devices/emission/vibration-sound-power/):
+  radiated airborne power from surface velocity and a radiation factor.
+- [Structure-borne sound power of equipment (EN 15657)](https://jmrplens.github.io/phonometry/buildings/design/structure-borne-power/):
+  the reception-plate method and the plate-independent source quantities.
+- [Installed structure-borne sound (EN 12354-5)](https://jmrplens.github.io/phonometry/buildings/design/installed-structure-borne/):
+  the receiving-room sound pressure level predicted from source and receiver
+  mobilities.
+
+## [Human vibration](https://jmrplens.github.io/phonometry/vibration/human/)
+
+Vibration transmitted to the human body, from daily exposure to spinal injury
+risk.
+
+- [Human Vibration](https://jmrplens.github.io/phonometry/vibration/human/human-vibration/): whole-body and
+  hand-arm weightings (ISO 8041-1), r.m.s. and dose measures (ISO 2631-1),
+  daily exposure A(8) (ISO 5349) and the Directive 2002/44/EC values.
+- [Multiple-shock whole-body vibration (ISO 2631-5)](https://jmrplens.github.io/phonometry/vibration/human/multiple-shock-vibration/):
+  the spinal-response model and the probability of lumbar injury for vibration
+  containing multiple shocks.
+
+## [Machinery](https://jmrplens.github.io/phonometry/vibration/machinery/)
+
+Turning a vibration spectrum into a diagnosis of the machine that made it.
+
+- [Machine fault frequencies](https://jmrplens.github.io/phonometry/vibration/machinery/machine-diagnostics/):
+  the characteristic bearing, gear and shaft frequencies, and the envelope
+  analysis that finds them under the broadband noise of a running machine.
+
+---
