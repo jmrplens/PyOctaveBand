@@ -1,0 +1,39 @@
+---
+title: "Glossary"
+description: "Every acoustic quantity the guides compute, with its symbol, a one-sentence definition, its unit, the standard and clause that defines it, and the guide that implements it."
+---
+
+import Glossary from '../../../components/Glossary.astro';
+
+The guides each open with the standard they implement, so a quantity is always
+defined where it is used. This page is the other direction: you have a symbol,
+from a report, a specification or a colleague's email, and you want to know
+what it is, what it is measured in, which document defines it and where in this
+documentation it is computed.
+
+Two conventions govern the line that says where a quantity is defined, and they
+matter more than they look.
+Where a clause, formula or table number appears, it is the one the
+implementation cites, taken from the standard the guide implements. Where only
+a designation appears, the standard is established but the defining clause is
+not stated anywhere in this documentation, and inventing a plausible one would
+be worse than leaving it out. A handful of quantities have no governing
+standard at all; their source is the paper or book the model comes from, named
+as such.
+
+Symbols collide across domains, and the glossary does not pretend otherwise. *R*
+is the sound reduction index in building acoustics, the airflow resistance in
+materials, the roughness in psychoacoustics and the cumulative stress variable
+in ISO 2631-5. Sigma is the airflow resistivity of a porous material and the
+radiation efficiency of a plate. *A* is an equivalent absorption area and an
+accelerance. *L*<sub>N</sub> is a percentile level here and a loudness level in
+phon there. Read the symbol together with its domain, which is what the
+grouping below is for.
+
+For the source of each definition rather than the definition itself, the
+[bibliography](/phonometry/reference/bibliography/) lists every cited work with
+a DOI or publisher link, and the
+[conformance report](/phonometry/reference/conformance/) shows the numerical
+check that pins each quantity to its standard's own expected value.
+
+<Glossary lang="en" />
