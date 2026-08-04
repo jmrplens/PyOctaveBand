@@ -23,9 +23,15 @@ too small" and as "a fixed 2,4 dB offset" -- ``sqrt(3)`` and
 ``20 lg sqrt(3)``. Hence :func:`check_ratios`: any multiplicative claim in an
 entry whose value sits within 0,5 % of ``sqrt(2)``, ``sqrt(3)``, ``pi``,
 ``2 pi``, ``1/sqrt(2)``, ``ln 2`` or a small integer is reported, and is an
-error unless that entry cites the page it read. A genuine factor-of-ten misprint trips
-the test too; that is the point, since the way to clear it is to read the page
-as an image.
+error unless that entry cites the page it read. A genuine factor-of-ten
+misprint trips the test too; that is the point, since the way to clear it is
+to read the page as an image.
+
+**The finding, not the procedure.** :func:`check_procedure_is_not_cited` keeps
+the account of how a page was put on screen out of the registry. An entry says
+what a document prints and where; the resolution someone rendered it at is
+method, belongs in ``CONTRIBUTING.md``, and reads to an issuing body like a
+machine's account of itself rather than a finding a maintainer stands behind.
 
 Usage::
 
@@ -118,6 +124,10 @@ PAGE_CITATION = re.compile(
     r"\(\s*printed\s+pp?\.\s*[\w\s,/.-]+?\)",
     re.IGNORECASE,
 )
+
+#: How a page was read: a resolution, or the act of rendering it. The registry
+#: says what the document prints, not how it was put on screen.
+_PROCEDURE = re.compile(r"\b\d+\s*dpi\b|\brender(?:ed|s|ing)?\b", re.IGNORECASE)
 
 #: Ratios that are the signature of a lost glyph rather than an author's error.
 _NAMED_RATIOS: dict[str, float] = {
@@ -260,6 +270,26 @@ def check_ratios(entries: list[Entry]) -> list[RatioHit]:
     return hits
 
 
+def check_procedure_is_not_cited(entries: list[Entry]) -> list[str]:
+    """No entry describes how its page was read.
+
+    An entry states what a document prints and where. How the page was put in
+    front of a reader is method, not evidence: it belongs in CONTRIBUTING.md,
+    where a contributor needs it, and nowhere in a registry that a standards
+    body may one day read. "Verified on a 900 dpi render of page 130" also
+    reads as a machine's account of itself rather than as a finding someone
+    stands behind, which is the opposite of what the entry is for.
+    """
+    problems = [
+        f"{REGISTRY.name}:{entry.line}: entry '{entry.title}' describes how "
+        f"the page was read ({found.group(0)!r}). Cite the document, the PDF "
+        "page and the printed folio; leave the method to CONTRIBUTING.md."
+        for entry in entries
+        if (found := _PROCEDURE.search(entry.body)) is not None
+    ]
+    return problems
+
+
 def check_pages(entries: list[Entry]) -> list[str]:
     """Every entry cites the page it quotes, or is allowlisted with a reason."""
     problems: list[str] = []
@@ -337,7 +367,11 @@ def main(argv: list[str] | None = None) -> int:
         print(f"{len(hits)} ratio signature(s) over {len(entries)} entries.")
         return 0
 
-    problems = check_pages(entries) + check_allowlist(entries)
+    problems = (
+        check_pages(entries)
+        + check_allowlist(entries)
+        + check_procedure_is_not_cited(entries)
+    )
     problems += [
         f"{REGISTRY.name}:{hit.entry.line}: entry '{hit.entry.title}' states "
         f"'{hit.quoted}', a ratio of {hit.ratio:.6g} which is within "
