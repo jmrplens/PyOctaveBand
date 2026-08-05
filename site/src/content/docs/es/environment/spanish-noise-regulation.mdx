@@ -26,6 +26,7 @@ references:
 ---
 
 import ThemeImage from '../../../../components/ThemeImage.astro';
+import ReportPreview from '../../../../components/ReportPreview.astro';
 
 La evaluación acústica en España no termina en un $L_{Aeq}$. El Real Decreto
 1367/2007, que desarrolla la Ley 37/2003 del Ruido, define un índice propio, el
@@ -290,6 +291,16 @@ verdict = environment.assess_activity(
 verdict.plot(language="es")          # los tres criterios por periodo
 verdict.report("acta.pdf")           # acta de inspección acústica, en español
 ```
+
+El acta de ejemplo se regenera con `make reports` y se mantiene renderizada en
+el repositorio; pulse la vista previa para abrir el PDF.
+
+<ReportPreview
+	name="rd1367_activity_example"
+	title="Acta de ejemplo de valoración acústica de actividad RD 1367/2007 (PDF)"
+	description="Acta de inspección acústica de una página, en español: una cabecera de identificación, la tabla de fases de ruido con las cinco fases, sus correcciones Kt, Kf y Ki y el LKeq,Ti resultante (59,0 dB con la máquina ruidosa activa, 54,0 dB para el resto de fuentes), la valoración por periodo frente a los 55 dB de la tabla B1 del anexo III (día 59/60, 57/58 y 56/55, tarde 54/60, 51/58 y 50/55), el gráfico de barras de los niveles de cada periodo frente a sus tres criterios, y el veredicto enmarcado de que la actividad supera los valores límite de inmisión del RD 1367/2007, con el día como periodo determinante (LKeq,x = 57 dB frente a un límite de 55 dB, LK,x = 56 dB)."
+	caption="Acta de inspección acústica (ActivityAssessment.report), los tres criterios por periodo del RD 1367/2007 y el veredicto enmarcado."
+/>
 
 ## Qué cubre esta guía
 

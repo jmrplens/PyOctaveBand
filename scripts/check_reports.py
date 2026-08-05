@@ -89,6 +89,7 @@ raster. Keeping the figures' looser RMS here would let a restyled fill through
 
 from __future__ import annotations
 
+import re
 import sys
 from pathlib import Path
 
@@ -176,9 +177,62 @@ def _problems() -> list[str]:
     return problems
 
 
+#: Where the guides live, and the shape of the component that embeds a fiche.
+DOCS_DIR = "site/src/content/docs"
+EMBEDDED = re.compile(r"<ReportPreview\s[^>]*name=\"([a-z0-9_]+)\"", re.DOTALL)
+
+
+def _shown_in(language: str) -> set[str]:
+    """Fiche names embedded on the pages of one language."""
+    root = Path(DOCS_DIR)
+    pages = (
+        [page for page in root.rglob("*.mdx") if page.relative_to(root).parts[0] == "es"]
+        if language == "es"
+        else [page for page in root.rglob("*.mdx") if page.relative_to(root).parts[0] != "es"]
+    )
+    return {
+        name
+        for page in pages
+        for name in EMBEDDED.findall(page.read_text(encoding="utf-8"))
+    }
+
+
+def _unshown() -> list[str]:
+    """Fiches no reader can see, and previews of fiches that do not exist.
+
+    A fiche is generated so that a guide can show what the library prints. The
+    generator and the staleness check above close the loop from the code to the
+    committed file; nothing closed the one from the file to a reader. Seven
+    fiches were generated, committed, shipped in the built site and embedded on
+    no page in either language, one of them the worked example of the very
+    snippet its guide prints.
+
+    Both languages are checked separately, because a fiche shown on the English
+    page and missing from the Spanish one is invisible to every other gate: the
+    EN/ES parity check compares the two file trees with each other, and a page
+    that exists in both is a page it passes.
+    """
+    generated = {path.stem for path in Path(REPORT_DIR).glob("*.pdf")}
+    problems: list[str] = []
+    for language, label in (("en", "English"), ("es", "Spanish")):
+        shown = _shown_in(language)
+        problems += [
+            f"fiche generated but shown on no {label} page: {name} "
+            '(embed it with <ReportPreview name="..."> in the guide that '
+            "documents its .report())"
+            for name in sorted(generated - shown)
+        ]
+        problems += [
+            f"{label} page embeds a fiche that is not generated: {name} "
+            "(register it in scripts/generate_reports.py and run 'make reports')"
+            for name in sorted(shown - generated)
+        ]
+    return problems
+
+
 def main() -> int:
     """Report every stale fiche; return 1 if there is one."""
-    problems = _problems()
+    problems = _problems() + _unshown()
     if problems:
         print(
             f"::error::{REPORT_DIR} is out of date - "
@@ -189,7 +243,10 @@ def main() -> int:
         return 1
 
     fiches = len(list(Path(REPORT_DIR).glob("*.pdf")))
-    print(f"All {fiches} committed fiches match within tolerance.")
+    print(
+        f"All {fiches} committed fiches match within tolerance, "
+        "and every one of them is shown on a page."
+    )
     return 0
 
 

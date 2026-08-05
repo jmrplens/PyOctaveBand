@@ -27,8 +27,13 @@ function walk(dir) {
 	return out;
 }
 
-// The API reference (reference/api/) is generated in English only; Starlight
-// locale fallback serves it on /es/. Exclude the subtree from parity.
+// The API reference (reference/api/) is published in English in both
+// languages, by decision: it is generated from the docstrings, which are the
+// code's own text, and translating it would mean keeping a second copy of
+// 146 pages in step with every signature change. Starlight's locale fallback
+// serves it on /es/, where the untranslated notice says so (i18n/es.json).
+// Everything else is bilingual and this check is what enforces that, so the
+// exemption is this subtree and nothing else.
 const apiRef = join("reference", "api");
 const isApiRef = (p) => p === apiRef || p.startsWith(apiRef + sep);
 

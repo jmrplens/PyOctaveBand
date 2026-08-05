@@ -32,6 +32,7 @@ references:
 ---
 
 import ThemeImage from '../../../../components/ThemeImage.astro';
+import ReportPreview from '../../../../components/ReportPreview.astro';
 
 The simplified model of
 [Predicting Sound Insulation (EN 12354)](/phonometry/buildings/design/insulation-prediction/) returns one
@@ -400,6 +401,30 @@ $R'_w$ / $L'_{n,w}$, the detailed model's 1,5 dB to 2,5 dB standard deviation an
 PASS/FAIL verdict against a `requirement`. `verbose=True` annexes the band in
 which each path peaks. Both need the ISO 717 rating, so the spectrum must cover
 100 Hz to 3150 Hz (or 125 Hz to 2000 Hz in octaves).
+
+```python
+airborne.report("airborne-prediction.pdf")   # R'w, thirteen paths
+impact.report("impact-prediction.pdf")       # L'n,w, five paths
+```
+
+The example fiches are regenerated with `make reports` and kept rendered in the
+repository; click a preview to open the PDF. Both show the Annex L building of
+this page: the same elements, junctions and floating floor the tables above are
+built from.
+
+<ReportPreview
+	name="iso12354_detailed_airborne_example"
+	title="ISO 12354-1 detailed airborne prediction example report (PDF)"
+	description="One-page detailed airborne prediction fiche for the ISO 12354-1:2017 Annex L building: an identification header with the 20 m2 separating floor and the two 50 m3 dwellings, the share-of-energy table of all thirteen paths (the 2d flanking path largest at 18.0 %, the direct Dd path 6.3 %), the per-band figure stacking each path's contribution under the apparent sound reduction index curve from 50 Hz to 5 kHz, the boxed predicted R'w = 57 dB, the detailed model's 1.5 dB to 2.5 dB standard deviation, and a PASS against a requirement of 52 dB."
+	caption="Detailed airborne prediction fiche (DetailedAirborneResult.report), the thirteen paths of the Annex L building and their energy shares."
+/>
+
+<ReportPreview
+	name="iso12354_detailed_impact_example"
+	title="ISO 12354-2 detailed impact prediction example report (PDF)"
+	description="One-page detailed impact prediction fiche for the same building in the impact direction: the identification header, the share-of-energy table of the direct path and the four flanking paths, the per-band figure of each path's contribution under the apparent normalized impact sound pressure level curve, and the boxed predicted L'n,w = 41 dB with the detailed model's standard deviation and the verdict against the requirement."
+	caption="Detailed impact prediction fiche (DetailedImpactResult.report), the same building excited by the tapping machine."
+/>
 
 ## See also
 

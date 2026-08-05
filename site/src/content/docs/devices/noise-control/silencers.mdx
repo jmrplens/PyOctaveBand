@@ -30,6 +30,7 @@ references:
 
 import ThemeImage from '../../../../components/ThemeImage.astro';
 import Video from '../../../../components/Video.astro';
+import ReportPreview from '../../../../components/ReportPreview.astro';
 
 A silencer earns its keep in a duct: between an engine and its tailpipe,
 between a fan and the room it serves. Two working principles divide the
@@ -324,6 +325,46 @@ Each returns a `ReactiveSilencerResult` with `transmission_loss`,
 `insertion_loss` (when impedances are given), the compound `transfer_matrix`
 and `.plot()`. Advanced layouts chain elements directly with `duct_matrix`,
 `shunt_matrix`, `cascade`, `transmission_loss` and `insertion_loss`.
+
+`ReactiveSilencerResult` also files itself: `.report()` renders a one-page PDF
+in the layout of a silencer performance sheet, with the method-basis line
+naming the plane-wave four-pole method (Munjal Eq. (3.27); Bies §8.8-8.9), an
+optional metadata header (client, device, test environment, instrumentation,
+climate, date), the per-band table of the transmission loss (and of the
+insertion loss when the impedances were given) beside those same curves, the
+boxed mean transmission loss over the analysis bands together with the peak
+value and the device kind, and an optional verdict against a declared minimum
+mean transmission loss. Rendering needs reportlab and, for the embedded
+figure, matplotlib (`pip install "phonometry[report,plot]"`); pass
+`language="es"` for a Spanish fiche.
+
+```python
+import numpy as np
+from phonometry import ReportMetadata, expansion_chamber
+
+# A 0.5 m chamber of area ratio m = 8, at the octave-band centres.
+freqs = np.array([63.0, 125.0, 250.0, 500.0, 1000.0, 2000.0, 4000.0])
+res = expansion_chamber(freqs, length=0.5, chamber_area=0.08, pipe_area=0.01)
+res.report(
+    "silencer_fiche.pdf",
+    metadata=ReportMetadata(
+        specimen="Simple expansion-chamber muffler (m = 8, design case)",
+        measurement_standard="Munjal Eq. (3.27) four-pole model",
+        laboratory="Phonometry Reference Laboratory",
+        requirement=6.0,            # minimum acceptable mean transmission loss
+    ),
+)                                   # mean and peak transmission loss (dB)
+```
+
+The example fiche is regenerated with `make reports` and kept rendered in the
+repository; click the preview to open the PDF.
+
+<ReportPreview
+	name="reactive_silencer_example"
+	title="Reactive-silencer transmission-loss example report (PDF)"
+	description="One-page reactive-silencer fiche: a metadata header with the client, the expansion-chamber muffler of area ratio m = 8 as the noise source, the duct-system design study and the test date, the octave-band transmission-loss table running 7.5, 11.4, 9.9, 12.1, 3.2, 7.0 and 11.1 dB from 63 Hz to 4 kHz beside the same curve plotted against frequency, the boxed mean transmission loss TL = 8.9 dB with the peak transmission loss of 12.1 dB and the device named as an expansion chamber, a PASS verdict against the required minimum of 6.0 dB, and the note that the result is a plane-wave prediction from the declared geometry and not a measurement."
+	caption="Reactive-silencer fiche (ReactiveSilencerResult.report), the mean transmission loss over the analysis bands with its peak value."
+/>
 
 
 ## 2. Reactive or dissipative?

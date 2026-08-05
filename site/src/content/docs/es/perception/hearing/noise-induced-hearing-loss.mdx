@@ -30,6 +30,7 @@ references:
 ---
 
 import ThemeImage from '../../../../../components/ThemeImage.astro';
+import ReportPreview from '../../../../../components/ReportPreview.astro';
 
 **ISO 1999:2013** estima la pérdida auditiva que sufre una población por el
 ruido laboral. Da el **desplazamiento permanente del umbral inducido por ruido**
@@ -119,6 +120,53 @@ frecuencias. Sale del modelo en lugar de imponérsele: el nivel de corte $L_0$
 y los coeficientes $u$, $v$ de la Tabla 1 son mínimos donde el oído es más
 vulnerable, de modo que el mismo $L_{EX,8h}$ compra mucho más desplazamiento a
 4 kHz que a 500 Hz.
+
+### Informe de NIPTS (`.report()`)
+
+`NiptsResult.report(path)` genera una ficha PDF de una página con la
+presentación de la predicción de pérdida auditiva inducida por ruido que emite
+un servicio de higiene laboral para un grupo de exposición, según la
+**ISO 1999:2013** (cláusula 6.3): la línea de base de la predicción, un bloque
+de metadatos opcional (empresa, trabajador(es)/grupo, lugar de trabajo y fecha
+de la evaluación), una tabla con el NIPTS mediano $N_{50}$ y el del fractil
+pedido en las seis frecuencias audiométricas junto al gráfico del espectro con
+su banda de fractiles, el desplazamiento promediado en el conjunto de
+2/3/4 kHz enmarcado con las condiciones de exposición ($L_{EX,8h}$, la
+duración en años y el porcentaje poblacional $Q$), y las notas que mantienen
+honesta la ficha: los valores son una predicción estadística para la población
+expuesta, no el audiograma de nadie, y la ISO 1999 deja al usuario la elección
+de las frecuencias de discapacidad. `verbose=True` añade las columnas de
+dispersión $d_u$/$d_l$; un `requirement` en los metadatos se interpreta como el
+NIPTS representativo máximo admisible y añade una fila APTO/NO APTO (un
+desplazamiento menor es apto). El renderizado necesita reportlab y matplotlib
+(`pip install "phonometry[report,plot]"`); solo se admite
+`engine="reportlab"`, y `language="es"` genera la ficha en español.
+
+```python
+from phonometry import hearing, ReportMetadata
+
+# El caso de 90 dB(A) y 20 años de arriba, décimo más susceptible.
+res = hearing.nipts(90.0, 20.0, fractile=0.9)
+res.report(
+    "nipts_fiche.pdf",
+    metadata=ReportMetadata(
+        client="Taller de calderería de ejemplo",
+        specimen="Soldadores (grupo de exposición homogénea, 4 trabajadores)",
+        test_room="Nave de montaje de acero, línea 2",
+    ),
+    language="es",                  # ficha en español (separador decimal de coma)
+)                                   # NIPTS promediado en 2/3/4 kHz (dB)
+```
+
+La ficha de ejemplo se regenera con `make reports` y se mantiene renderizada en
+el repositorio; pulse la vista previa para abrir el PDF.
+
+<ReportPreview
+	name="iso1999_nipts_example"
+	title="Informe de ejemplo de predicción de NIPTS según ISO 1999 (PDF)"
+	description="Ficha de predicción de la pérdida auditiva inducida por ruido de una página: un encabezado de metadatos (empresa, grupo de trabajadores, lugar de trabajo, fecha de la evaluación), una tabla con el NIPTS mediano N50 y el del fractil pedido de 500 Hz a 6000 Hz (12,9 dB y 17,8 dB a 4000 Hz), el gráfico del espectro con su banda de fractiles del 10 al 90 %, y el NIPTS previsto promediado en 2/3/4 kHz = 13,9 dB enmarcado, para una exposición al ruido LEX,8h = 90 dB durante 20 años con fractil poblacional Q = 10 %."
+	caption="Ficha de predicción de NIPTS (NiptsResult.report), el desplazamiento promediado en el conjunto de 2/3/4 kHz."
+/>
 
 ## 2. Edad y ruido combinados: HTLAN (cláusula 6.1)
 
@@ -228,6 +276,48 @@ el `value` en el fractil pedido; el `HtlanResult` lleva `htla`, `nipts` y el
 `threshold` combinado. Ambos exponen `.plot()`. La componente de edad por sí
 sola es el tema de la guía de
 [umbral de audición](/phonometry/es/perception/hearing/hearing-threshold/).
+
+### Informe de HTLAN (`.report()`)
+
+`HtlanResult.report(path)` genera la ficha hermana para el umbral combinado,
+según la cláusula 6.1 de la **ISO 1999:2013**: la misma línea de base de la
+predicción y el mismo encabezado de metadatos que la ficha de NIPTS, pero con
+una tabla que lleva la componente de edad $H$, la de ruido $N$ y la combinada
+$H'$ en cada frecuencia audiométrica, junto al gráfico de las tres curvas, con
+el umbral promediado en el conjunto de 2/3/4 kHz enmarcado y las condiciones
+del oyente y de la exposición (edad y sexo, $L_{EX,8h}$ durante los años de
+exposición y el porcentaje poblacional $Q$). Sus notas añaden la que importa
+aquí: la componente de edad es la base de datos A evaluada a partir de
+ISO 7029:2017, cuyos valores difieren de la selección ilustrativa de la Tabla
+A.3 de la ISO 1999, que procede de una edición anterior. `verbose=True` añade
+el término de compresión $HN/120$ en una columna propia, y un `requirement` en
+los metadatos se interpreta como el HTLAN representativo máximo admisible.
+
+```python
+from phonometry import hearing, ReportMetadata
+
+# El operario de máquina de 60 años de esta sección, mediana.
+res = hearing.htlan(60, "male", 95.0, 30.0, fractile=0.5)
+res.report(
+    "htlan_fiche.pdf",
+    metadata=ReportMetadata(
+        client="Taller de calderería de ejemplo",
+        specimen="Operario de máquina (60 años, 30 años en el puesto)",
+        test_room="Nave de montaje de acero, línea 2",
+    ),
+    language="es",                  # ficha en español (separador decimal de coma)
+)                                   # HTLAN promediado en 2/3/4 kHz (dB HL)
+```
+
+La ficha de ejemplo se regenera con `make reports` y se mantiene renderizada en
+el repositorio; pulse la vista previa para abrir el PDF.
+
+<ReportPreview
+	name="iso1999_htlan_example"
+	title="Informe de ejemplo de predicción de HTLAN según ISO 1999 (PDF)"
+	description="Ficha de predicción del nivel umbral de audición asociado a la edad y al ruido de una página: un encabezado de metadatos, una tabla con la componente de edad H, la de ruido N y el umbral combinado H' de 500 Hz a 6000 Hz (20,2, 24,8 y 40,8 dB a 4000 Hz), el gráfico de las tres curvas, y el nivel umbral de audición previsto promediado en 2/3/4 kHz = 33,0 dB HL enmarcado, para un oyente varón de 60 años expuesto a LEX,8h = 95 dB durante 30 años con fractil poblacional Q = 50 %."
+	caption="Ficha de umbral por edad y ruido (HtlanResult.report), el HTLAN promediado en el conjunto de 2/3/4 kHz."
+/>
 
 ## Qué cubre esta guía
 

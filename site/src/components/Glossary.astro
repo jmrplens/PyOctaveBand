@@ -1,0 +1,287 @@
+---
+/**
+ * The glossary, rendered from src/data/glossary.mjs.
+ *
+ * The page used to be twelve five-column markdown tables. A table is the right
+ * shape for numbers and the wrong one for a sentence: measured on a phone, the
+ * definition column rendered 135 px wide while the one-word guide link took
+ * 256, and the row needed 775 px of horizontal scroll inside a 358 px screen.
+ * The definition is the content here, so each term is a block that gives the
+ * sentence the whole width, sets the notation and the unit above it, and puts
+ * the standard and the guide underneath as metadata.
+ *
+ * Everything comes from one array: the cards, the anchors, and the
+ * `DefinedTermSet` structured data this page has always published, which used
+ * to be a second hand-written copy of the same 120 entries in the frontmatter
+ * of each language.
+ *
+ * The link to a guide takes its text from that guide's own title, read from
+ * the content collection at build time, so a renamed page cannot leave a stale
+ * label behind: the old tables carried the title by hand and had gone stale in
+ * Spanish. A slug that resolves to no page is a build error rather than a
+ * dangling link, which is what the four-way copy could never notice.
+ */
+import { getCollection } from 'astro:content';
+import katex from 'katex';
+import { glossary } from '../data/glossary.mjs';
+import { basePath, siteUrl } from '../data/site.mjs';
+
+interface Props {
+	/** Locale of the page the glossary is rendered on. */
+	lang?: 'en' | 'es';
+}
+const { lang = 'en' } = Astro.props;
+
+// The two site-wide strings live in one place, which is where astro.config.mjs
+// and the audit scripts read them from; a second copy here would be a second
+// thing to remember on a move.
+const BASE = basePath;
+const SITE = `${siteUrl}${basePath}`;
+/** The locale prefix this page's URLs carry, after the base. */
+const LOCALE = lang === 'es' ? '/es' : '';
+
+/** A field that is either shared by both languages or given per language. */
+const localized = (value: string | Record<string, string> | undefined) =>
+	value === undefined ? undefined : typeof value === 'string' ? value : value[lang];
+
+// Guide titles, by slug, in this locale. Starlight ids carry the locale prefix
+// on the Spanish side and nothing on the English one.
+const docs = await getCollection('docs');
+const titleOf = new Map(
+	docs.map((entry) => [entry.id.replace(/^es\//, ''), entry] as const)
+		.filter(([, entry]) => (lang === 'es') === entry.id.startsWith('es/'))
+		.map(([slug, entry]) => [slug, entry.data.title] as const),
+);
+
+/**
+ * Inline maths in a notation string, as HTML. The notation is written the way
+ * the page reads it, `$L_{Aeq}$, SEL`, so the text between the delimiters is
+ * text and only the delimited runs are typeset.
+ */
+function notation(source: string): string {
+	return source
+		.split(/(\$[^$]+\$)/g)
+		.map((run) =>
+			run.startsWith('$') && run.endsWith('$')
+				? katex.renderToString(run.slice(1, -1), { throwOnError: false })
+				: escape(run),
+		)
+		.join('');
+}
+
+const escape = (text: string) =>
+	text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+
+const terms = glossary.flatMap((group) =>
+	group.terms.map((term) => {
+		const guide = term.guide;
+		const title = guide ? titleOf.get(guide) : undefined;
+		if (guide && !title) {
+			throw new Error(
+				`glossary: term "${term.id}" points at ${guide}, which is not a page in ${lang}`,
+			);
+		}
+		return {
+			...term,
+			group,
+			label: term.symbol ?? localized(term.name) ?? term.id,
+			unitText: localized(term.unit),
+			standardText: localized(term.standard),
+			clauseText: localized(term.clause),
+			qualifierText: localized(term.qualifier),
+			definitionText: localized(term.definition) as string,
+			// The path without the base: the href a browser follows carries it, the
+			// absolute URL in the structured data carries it too, and building both
+			// from the slug keeps neither from having to strip it back off.
+			path: guide ? `${LOCALE}/${guide}/` : undefined,
+			href: guide ? `${BASE}${LOCALE}/${guide}/` : undefined,
+			guideTitle: title,
+		};
+	}),
+);
+
+/**
+ * The notation as a machine reads it: the maths syntax removed, not just the
+ * delimiters, so `$L_{Aeq}$` is the "LAeq" a search engine can match against a
+ * query and not the TeX that produced it.
+ */
+const termCode = (label: string) => plain(label);
+
+/**
+ * A string as a machine reads it: the maths syntax removed, not just the
+ * delimiters, so `$L_{Aeq}$` is the "LAeq" a search engine can match against a
+ * query, and a definition carrying `$\mathrm{THD}_F$` reads as "THDF" rather
+ * than as the TeX that produced it.
+ */
+function plain(source: string): string {
+	return source
+		.replace(/\\(?:text|mathrm|mathit|mathbf|operatorname)\{([^}]*)\}/g, '$1')
+		.replace(/\\[a-zA-Z]+/g, '')
+		.replace(/[$\\{}_^]/g, '');
+}
+
+const jsonld = {
+	'@context': 'https://schema.org',
+	'@type': 'DefinedTermSet',
+	'@id': `${SITE}${LOCALE}/reference/glossary/#glossary`,
+	name: lang === 'es' ? 'Glosario acústico de phonometry' : 'phonometry acoustic glossary',
+	url: `${SITE}${LOCALE}/reference/glossary/`,
+	inLanguage: lang,
+	hasDefinedTerm: terms.map((term) => {
+		const code = termCode(term.label);
+		const where = [term.standardText, term.clauseText].filter(Boolean).map(plain).join(', ');
+		const unit = term.unitText
+			? ` ${lang === 'es' ? 'Unidad' : 'Unit'}: ${plain(term.unitText)}.`
+			: '';
+		return {
+			'@type': 'DefinedTerm',
+			'@id': `${SITE}${LOCALE}/reference/glossary/#${term.id}`,
+			name: code,
+			termCode: code,
+			description: `${plain(term.definitionText)}${unit} ${lang === 'es' ? 'Definida en' : 'Defined in'}: ${where}.`,
+			inDefinedTermSet: { '@id': `${SITE}${LOCALE}/reference/glossary/#glossary` },
+			...(term.path && term.guideTitle
+				? { subjectOf: { '@type': 'TechArticle', name: term.guideTitle, url: `${SITE}${term.path}` } }
+				: {}),
+		};
+	}),
+};
+
+const t =
+	lang === 'es'
+		? { definedIn: 'Definida en', see: 'Guía' }
+		: { definedIn: 'Defined in', see: 'Guide' };
+---
+
+<script type="application/ld+json" set:html={JSON.stringify(jsonld)} is:inline />
+
+{
+	glossary.map((group) => (
+		<section class="glossary-group">
+			<h2 id={group.id}>{group.label[lang]}</h2>
+			<div class="glossary-terms">
+				{terms
+					.filter((term) => term.group === group)
+					.map((term) => (
+						<article class="glossary-term" id={term.id}>
+							<header>
+								<h3 class="notation">
+									<Fragment set:html={notation(term.label)} />
+									{term.qualifierText && <span class="qualifier">({term.qualifierText})</span>}
+								</h3>
+								{term.unitText && <span class="unit">{term.unitText}</span>}
+							</header>
+							<p class="definition" set:html={notation(term.definitionText)} />
+							<footer>
+								<span class="standard">
+									{t.definedIn}: {term.standardText}
+									{term.clauseText && <>, {term.clauseText}</>}
+								</span>
+								{term.href && (
+									<a class="guide" href={term.href}>
+										{term.guideTitle}
+									</a>
+								)}
+							</footer>
+						</article>
+					))}
+			</div>
+		</section>
+	))
+}
+
+<style>
+	/* One column on a phone, two once there is room for two readable measures.
+	   The cards are the content of this page, so they use the article width
+	   rather than a fixed one. */
+	.glossary-terms {
+		display: grid;
+		gap: 0.75rem;
+		grid-template-columns: 1fr;
+		margin-block: 1rem 2rem;
+	}
+
+	@media (min-width: 60rem) {
+		.glossary-terms {
+			grid-template-columns: repeat(2, minmax(0, 1fr));
+		}
+	}
+
+	.glossary-term {
+		border: 1px solid var(--sl-color-gray-5);
+		border-radius: 0.5rem;
+		padding: 0.85rem 1rem 0.75rem;
+		display: flex;
+		flex-direction: column;
+		gap: 0.5rem;
+	}
+
+	/* The anchor target gets a moment of colour, so a reader who followed a
+	   link to one term can see which one answered. */
+	.glossary-term:target {
+		border-color: var(--sl-color-text-accent);
+		box-shadow: 0 0 0 1px var(--sl-color-text-accent);
+	}
+
+	.glossary-term header {
+		display: flex;
+		align-items: baseline;
+		justify-content: space-between;
+		gap: 0.75rem;
+	}
+
+	/* The notation leads the card. It is a heading for the outline and for a
+	   screen reader, not for the type scale, so it takes the body size. */
+	.glossary-term .notation {
+		font-size: var(--sl-text-base);
+		font-weight: 600;
+		margin: 0;
+		border: 0;
+		padding: 0;
+	}
+
+	.glossary-term .qualifier {
+		font-weight: 400;
+		font-size: var(--sl-text-sm);
+		color: var(--sl-color-gray-3);
+		margin-inline-start: 0.35rem;
+	}
+
+	/* The unit is a property of the quantity, not part of its name: it sits
+	   apart, in the corner the eye reaches after the notation. */
+	.glossary-term .unit {
+		flex-shrink: 0;
+		font-size: var(--sl-text-xs);
+		color: var(--sl-color-text-accent);
+		background: var(--sl-color-gray-6);
+		border-radius: 999px;
+		padding: 0.1rem 0.55rem;
+		white-space: nowrap;
+	}
+
+	.glossary-term .definition {
+		margin: 0;
+		font-size: var(--sl-text-sm);
+		line-height: 1.55;
+	}
+
+	.glossary-term footer {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: baseline;
+		justify-content: space-between;
+		gap: 0.25rem 1rem;
+		border-top: 1px solid var(--sl-color-gray-6);
+		padding-top: 0.5rem;
+		font-size: var(--sl-text-xs);
+	}
+
+	.glossary-term .standard {
+		color: var(--sl-color-gray-3);
+	}
+
+	.glossary-term .guide {
+		flex-shrink: 0;
+		font-weight: 600;
+	}
+</style>

@@ -1,0 +1,52 @@
+---
+/**
+ * Starlight's last-updated line, with the date the page was first published.
+ *
+ * The two dates used to sit in different places: the first publication in a
+ * byline under the H1, the last update down here. The byline put the
+ * maintainer's name between the reader and the first sentence of 278 pages to
+ * say what the footer credit and the page's own JSON-LD already said, so it is
+ * gone; the date it carried that nothing else showed moved here, next to the
+ * update it belongs with.
+ *
+ * The dates themselves come from where they always did: the first commit that
+ * added the file (src/lib/page-dates.mjs) and Starlight's own `lastUpdated`
+ * route data. A page published and last touched on the same day shows one
+ * date, not the same date twice.
+ */
+import { firstPublished } from '../lib/page-dates.mjs';
+
+const route = Astro.locals.starlightRoute;
+const { lang, lastUpdated } = route;
+
+const published = firstPublished(route.entry?.filePath ?? '');
+const fmt = (date: Date) => date.toLocaleDateString(lang, { dateStyle: 'medium', timeZone: 'UTC' });
+
+const publishedText = published ? fmt(new Date(published)) : undefined;
+const updatedText = lastUpdated ? fmt(lastUpdated) : undefined;
+const showUpdated = updatedText && updatedText !== publishedText;
+
+const t = lang.startsWith('es')
+  ? { published: 'Publicado el', updated: 'actualizado el', updatedOnly: 'Última actualización:' }
+  : { published: 'Published', updated: 'updated', updatedOnly: 'Last updated:' };
+---
+
+{
+  publishedText ? (
+    <p>
+      {t.published} <time datetime={published}>{publishedText}</time>
+      {showUpdated && (
+        <>
+          {', '}
+          {t.updated} <time datetime={lastUpdated?.toISOString()}>{updatedText}</time>
+        </>
+      )}
+    </p>
+  ) : (
+    updatedText && (
+      <p>
+        {t.updatedOnly} <time datetime={lastUpdated?.toISOString()}>{updatedText}</time>
+      </p>
+    )
+  )
+}

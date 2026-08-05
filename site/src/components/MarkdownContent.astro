@@ -5,6 +5,10 @@
  * typography and land at the very end of the article, after all authored
  * sections. The matching table-of-contents entry comes from src/routeData.ts.
  *
+ * TopicSections opens a topic's landing page, on a narrow screen only, with
+ * the list of that topic's sections: what the sidebar shows a reader who has
+ * one, and what a phone keeps behind the menu button.
+ *
  * The image-zoom runtime (custom element, dialog template, icon symbols) is
  * mounted here by hand. starlight-image-zoom normally installs it by
  * overriding MarkdownContent itself, and it skips that override when the site
@@ -16,6 +20,7 @@ import Default from '@astrojs/starlight/components/MarkdownContent.astro';
 import ImageZoom from 'starlight-image-zoom/components/ImageZoom.astro';
 import ZoomI18n from './ZoomI18n.astro';
 import References from './References.astro';
+import TopicSections from './TopicSections.astro';
 ---
 
-<Default><ZoomI18n><ImageZoom /></ZoomI18n><slot /><References /></Default>
+<Default><ZoomI18n><ImageZoom /></ZoomI18n><TopicSections /><slot /><References /></Default>

@@ -32,6 +32,7 @@ references:
 ---
 
 import ThemeImage from '../../../../../components/ThemeImage.astro';
+import ReportPreview from '../../../../../components/ReportPreview.astro';
 
 El modelo simplificado de
 [Predicción del aislamiento acústico (EN 12354)](/phonometry/es/buildings/design/insulation-prediction/)
@@ -414,6 +415,31 @@ del modelo detallado y un veredicto CUMPLE/NO CUMPLE frente a un `requirement`.
 `verbose=True` añade la banda en la que cada camino alcanza su máximo. Ambos
 necesitan la valoración ISO 717, así que el espectro debe cubrir de 100 Hz a
 3150 Hz (o de 125 Hz a 2000 Hz en bandas de octava).
+
+```python
+airborne.report("prediccion-aereo.pdf", language="es")   # R'w, trece caminos
+impact.report("prediccion-impactos.pdf", language="es")  # L'n,w, cinco caminos
+```
+
+Las fichas de ejemplo se regeneran con `make reports` y se mantienen
+renderizadas en el repositorio; pulse una vista previa para abrir el PDF. Las
+dos muestran el edificio del anexo L de esta página: los mismos elementos, las
+mismas uniones y el mismo suelo flotante con los que se construyen las tablas
+de arriba.
+
+<ReportPreview
+	name="iso12354_detailed_airborne_example"
+	title="Ficha de ejemplo de predicción detallada a ruido aéreo ISO 12354-1 (PDF)"
+	description="Ficha de predicción detallada a ruido aéreo de una página para el edificio del anexo L de ISO 12354-1:2017: cabecera de identificación con el forjado separador de 20 m2 y las dos viviendas de 50 m3, tabla de cuota de energía de los trece caminos (el camino de flanco 2d es el mayor con un 18,0 %, el camino directo Dd un 6,3 %), figura por banda que apila la contribución de cada camino bajo la curva del índice de reducción acústica aparente de 50 Hz a 5 kHz, el R'w = 57 dB predicho y recuadrado, la desviación típica de 1,5 dB a 2,5 dB del modelo detallado y un CUMPLE frente a una exigencia de 52 dB."
+	caption="Ficha de predicción detallada a ruido aéreo (DetailedAirborneResult.report), los trece caminos del edificio del anexo L y sus cuotas de energía."
+/>
+
+<ReportPreview
+	name="iso12354_detailed_impact_example"
+	title="Ficha de ejemplo de predicción detallada a impactos ISO 12354-2 (PDF)"
+	description="Ficha de predicción detallada a impactos de una página para el mismo edificio en la dirección de impactos: la cabecera de identificación, la tabla de cuota de energía del camino directo y de los cuatro caminos de flanco, la figura por banda de la contribución de cada camino bajo la curva del nivel de presión acústica de impactos normalizado aparente, y el L'n,w = 41 dB predicho y recuadrado con la desviación típica del modelo detallado y el veredicto frente a la exigencia."
+	caption="Ficha de predicción detallada a impactos (DetailedImpactResult.report), el mismo edificio excitado por la máquina de impactos."
+/>
 
 ## Véase también
 
