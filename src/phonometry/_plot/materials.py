@@ -27,22 +27,23 @@ if TYPE_CHECKING:
 
     from ..materials.absorbers.airflow_resistance import StaticAirflowResult
     from ..materials.absorbers.biot import BiotWavesResult
-    from ..materials.absorbers.impedance_tube import ImpedanceTubeResult, TransferMatrix
-    from ..materials.absorbers.porous import (
+    from ..materials.absorbers.four_microphone import TransferMatrix
+    from ..materials.absorbers.impedance_tube import ImpedanceTubeResult
+    from ..materials.absorbers.layered import (
         DiffuseFieldAbsorptionResult,
         LayeredAbsorberResult,
-        PorousMediumResult,
     )
+    from ..materials.absorbers.porous import PorousMediumResult
     from ..materials.absorbers.rating import AbsorptionRatingResult
     from ..materials.absorbers.slow_sound import SlitResonatorAbsorberResult
     from ..materials.absorbers.sound_absorption import SoundAbsorptionMeasurement
     from ..materials.absorbers.uncertainty import AbsorptionUncertaintyResult
     from ..materials.diffusers.design import DiffuserPolarResponse
     from ..materials.diffusers.metadiffuser import MetadiffuserResult
+    from ..materials.diffusers.reverberation_room_scattering import ScatteringResult
     from ..materials.diffusers.scattering_diffusion import (
         DiffusionResult,
         DiffusionSpectrum,
-        ScatteringResult,
     )
     from ..materials.resilient.dynamic_stiffness import DynamicStiffnessResult
     from ..materials.surfaces.road_absorption import InsituAbsorptionResult
@@ -219,7 +220,7 @@ def plot_scattering_coefficient(
 ) -> Axes:
     """Random-incidence scattering coefficient ``s`` versus frequency.
 
-    :param result: A :class:`~phonometry.materials.diffusers.scattering_diffusion.ScatteringResult`
+    :param result: A :class:`~phonometry.materials.diffusers.reverberation_room_scattering.ScatteringResult`
         exposing ``frequencies`` and ``scattering``.
     :param ax: Existing axes, or ``None`` to create a figure.
     :param kwargs: Forwarded to the coefficient curve ``plot`` call.
@@ -289,7 +290,7 @@ def plot_scattering_report(
     fill drawn below the curves (svglib drops alpha when it vectorises the SVG,
     so a translucent fill would print as a flat block).
 
-    :param result: A :class:`~phonometry.materials.diffusers.scattering_diffusion.ScatteringResult`.
+    :param result: A :class:`~phonometry.materials.diffusers.reverberation_room_scattering.ScatteringResult`.
     :param ax: Existing axes, or ``None`` to create a figure.
     :param kwargs: Forwarded to the scattering-curve ``plot`` call.
     :return: The axes.
@@ -788,7 +789,7 @@ def plot_layered_absorber(
     Draws the predicted ``alpha(f)`` of the layer stack as the primary curve
     and the reflection-factor magnitude ``|R|(f)`` as a muted companion.
 
-    :param result: A :class:`~phonometry.materials.absorbers.porous.LayeredAbsorberResult`.
+    :param result: A :class:`~phonometry.materials.absorbers.layered.LayeredAbsorberResult`.
     :param ax: Existing axes, or ``None`` to create a figure.
     :param kwargs: Forwarded to the absorption-curve ``plot`` call.
     :return: The axes.
@@ -853,7 +854,7 @@ def plot_diffuse_field_absorption(
 ) -> Axes:
     """Random-incidence (Paris-integral) absorption spectrum.
 
-    :param result: A :class:`~phonometry.materials.absorbers.porous.DiffuseFieldAbsorptionResult`.
+    :param result: A :class:`~phonometry.materials.absorbers.layered.DiffuseFieldAbsorptionResult`.
     :param ax: Existing axes, or ``None`` to create a figure.
     :param kwargs: Forwarded to the absorption-curve ``plot`` call.
     :return: The axes.
@@ -944,7 +945,7 @@ def plot_transfer_matrix(
     hard-backed absorption coefficient ``alpha(f)`` (Eq. (28)) as a muted
     companion on a 0..1 right axis.
 
-    :param matrix: A :class:`~phonometry.materials.absorbers.impedance_tube.TransferMatrix`.
+    :param matrix: A :class:`~phonometry.materials.absorbers.four_microphone.TransferMatrix`.
     :param frequency: Frequency vector ``f``, in hertz, matching the shape of
         the matrix entries.
     :param characteristic_impedance: Characteristic impedance ``rho c`` of the

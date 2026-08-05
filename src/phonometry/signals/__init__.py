@@ -30,6 +30,7 @@ from .envelope import (
 from .inversion import InverseFilterResult, regularized_inverse_filter
 from .levels import laeq, lc_peak, leq, lex_8h, ln_levels, sel, sound_exposure
 from .miso import MISOCoherenceResult, miso_coherence
+from .multitaper import MultitaperSpectralDensityResult, multitaper_psd
 from .phase import (
     PhaseDecompositionResult,
     excess_phase,
@@ -40,16 +41,12 @@ from .phase import (
 from .spectra import (
     CoherentOutputSpectrumResult,
     CrossSpectralDensityResult,
-    MultitaperSpectralDensityResult,
     SpectralDensityResult,
-    WindowMetricsResult,
     coherent_output_spectrum,
     cross_spectral_density,
     fractional_octave_smoothing,
-    multitaper_psd,
     power_spectral_density,
     resolution_bias_error,
-    window_metrics,
 )
 from .synchronous_average import (
     SynchronousAverageResult,
@@ -70,6 +67,7 @@ from .time_frequency import (
     spectrogram,
     zoom_fft,
 )
+from .windows import WindowMetricsResult, window_metrics
 
 __all__ = [
     "AlignedImpulseResponseResult",

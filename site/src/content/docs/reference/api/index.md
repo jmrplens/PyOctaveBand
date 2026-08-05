@@ -31,7 +31,8 @@ La referencia de la API se genera a partir de los docstrings del código (en ing
 | [`filters.weighting`](/phonometry/reference/api/filters/weighting/) | Weighting filters (A, B, C, D, G, AU, Z), time weighting utilities and the Linkwitz-Riley crossover. |
 | [`filters.equalizer`](/phonometry/reference/api/filters/equalizer/) | Parametric equalizer biquads per the RBJ Audio EQ Cookbook. |
 | [`filters.frequencies`](/phonometry/reference/api/filters/frequencies/) | Frequency calculation logic according to ANSI/IEC standards. |
-| [`filters.compliance`](/phonometry/reference/api/filters/compliance/) | IEC 61260-1:2014 filter and IEC 61672-1:2013 weighting class verification. |
+| [`filters.compliance`](/phonometry/reference/api/filters/compliance/) | IEC 61260-1:2014 band-filter class verification. |
+| [`filters.weighting_compliance`](/phonometry/reference/api/filters/weighting-compliance/) | IEC 61672-1:2013 frequency-weighting class verification. |
 
 ## Signal analysis
 
@@ -39,6 +40,8 @@ La referencia de la API se genera a partir de los docstrings del código (en ing
 | :--- | :--- |
 | [`signals.levels`](/phonometry/reference/api/signals/levels/) | Integrated and statistical sound levels (Leq, LAeq, LN percentiles). |
 | [`signals.spectra`](/phonometry/reference/api/signals/spectra/) | Calibrated spectral-density estimation with statistical error analysis. |
+| [`signals.multitaper`](/phonometry/reference/api/signals/multitaper/) | Thomson multitaper spectral estimation (Percival & Walden 1993, Ch. |
+| [`signals.windows`](/phonometry/reference/api/signals/windows/) | Figures of merit of a spectral-analysis taper (Harris 1978). |
 | [`signals.miso`](/phonometry/reference/api/signals/miso/) | Multiple and partial coherence of a multiple-input/single-output system. |
 | [`signals.time_frequency`](/phonometry/reference/api/signals/time-frequency/) | Calibrated time-frequency analysis: STFT spectrogram and zoom FFT. |
 | [`signals.test_signals`](/phonometry/reference/api/signals/test-signals/) | Test signals and sample-rate utilities. |
@@ -111,7 +114,8 @@ La referencia de la API se genera a partir de los docstrings del código (en ing
 
 | Module | Summary |
 | :--- | :--- |
-| [`building.measurement.insulation`](/phonometry/reference/api/building/insulation/) | Field airborne sound insulation (ISO 16283-1:2014) and impact sound insulation (ISO 16283-2), with single-number weighted ratings and spectrum adaptation terms (ISO 717-1 airborne, ISO 717-2 impact). |
+| [`building.measurement.insulation`](/phonometry/reference/api/building/insulation/) | Field measurement of sound insulation: airborne (ISO 16283-1:2014), impact (ISO 16283-2) and facade (ISO 16283-3:2016). |
+| [`building.measurement.ratings`](/phonometry/reference/api/building/ratings/) | Single-number weighted ratings of sound insulation and their spectrum adaptation terms (ISO 717-1 airborne, ISO 717-2 impact). |
 | [`building.prediction.panel_transmission`](/phonometry/reference/api/building/panel-transmission/) | Predicted airborne sound reduction index of panels (Bies, Hansen & Howard 2017, Engineering Noise Control 5e, Section 7.2; Sharp 1973). |
 | [`building.prediction.masonry_cavity_wall`](/phonometry/reference/api/building/masonry-cavity-wall/) | Wall ties in masonry cavity walls: the structural bridge across the cavity (Hopkins 2007, Sections 3.11.3.2 and 4.3.5.4.1). |
 | [`building.measurement.heavy_impact`](/phonometry/reference/api/building/heavy-impact/) | Heavy and soft impact sources: rubber ball and bang machine (ISO 16283-2:2020 Annex A, ISO 10140-5:2010 Annex F, JIS A 1418-2:2019, ISO 717-2:2020 Annex D). |
@@ -126,7 +130,8 @@ La referencia de la API se genera a partir de los docstrings del código (en ing
 | [`building.prediction.detailed_model`](/phonometry/reference/api/building/detailed-model/) | Detailed per-band building prediction (EN/ISO 12354-1/-2:2017). |
 | [`building.measurement.uncertainty`](/phonometry/reference/api/building/uncertainty/) | Measurement uncertainty in building acoustics (ISO 12999-1:2020). |
 | [`building.measurement.floor_covering_improvement`](/phonometry/reference/api/building/floor-covering-improvement/) | Impact-sound improvement of floor coverings on a small mock-up (ISO 16251-1:2014). |
-| [`building.prediction.resilient_layers`](/phonometry/reference/api/building/resilient-layers/) | Prediction of resilient-layer performance: tapping force, coverings, floors, linings. |
+| [`building.prediction.resilient_layers`](/phonometry/reference/api/building/resilient-layers/) | Prediction of resilient-layer performance: tapping force, floor coverings, floating floors. |
+| [`building.prediction.linings`](/phonometry/reference/api/building/linings/) | Prediction of wall and ceiling linings: the weighted improvement an additional layer gives the element behind it (ISO 12354-1:2017 Annex D). |
 | [`building.measurement.structure_borne_power`](/phonometry/reference/api/building/structure-borne-power/) | Structure-borne sound power of building equipment (EN 15657:2018; ISO 9611). |
 | [`building.prediction.installed_structure_borne`](/phonometry/reference/api/building/installed-structure-borne/) | Installed structure-borne sound from service equipment (EN 12354-5:2009). |
 | [`building.regulation.spain`](/phonometry/reference/api/building/spain/) | Spanish building code CTE DB-HR: global indices and requirement checks. |
@@ -140,11 +145,15 @@ La referencia de la API se genera a partir de los docstrings del código (en ing
 | [`materials.absorbers.uncertainty`](/phonometry/reference/api/materials/uncertainty/) | Measurement uncertainty for sound absorption (ISO 12999-2:2020). |
 | [`materials.absorbers.airflow_resistance`](/phonometry/reference/api/materials/airflow-resistance/) | Airflow resistance of porous materials: ISO 9053-1 and ISO 9053-2. |
 | [`materials.resilient.dynamic_stiffness`](/phonometry/reference/api/materials/dynamic-stiffness/) | Dynamic stiffness of resilient materials under floating floors (EN 29052-1:1992). |
-| [`materials.absorbers.impedance_tube`](/phonometry/reference/api/materials/impedance-tube/) | Impedance-tube material characterisation. |
-| [`materials.absorbers.porous`](/phonometry/reference/api/materials/porous/) | Porous-material models and multilayer absorber prediction. |
+| [`materials.absorbers.impedance_tube`](/phonometry/reference/api/materials/impedance-tube/) | Two-microphone transfer-function method in the impedance tube. |
+| [`materials.absorbers.four_microphone`](/phonometry/reference/api/materials/four-microphone/) | Four-microphone transfer-matrix method for the transmission of a specimen. |
+| [`materials.absorbers.standing_wave`](/phonometry/reference/api/materials/standing-wave/) | Standing-wave-ratio method for normal-incidence absorption and impedance. |
+| [`materials.absorbers.porous`](/phonometry/reference/api/materials/porous/) | Porous-material models and resonant sheet impedances. |
+| [`materials.absorbers.layered`](/phonometry/reference/api/materials/layered/) | Declarative layer stacks and the transfer-matrix absorber solver. |
 | [`materials.absorbers.biot`](/phonometry/reference/api/materials/biot/) | Biot poroelastic layers: the three waves and the 6x6 transfer matrix. |
 | [`materials.absorbers.slow_sound`](/phonometry/reference/api/materials/slow-sound/) | Slow-sound slit panels loaded with Helmholtz resonators (perfect absorbers). |
-| [`materials.diffusers.scattering_diffusion`](/phonometry/reference/api/materials/scattering-diffusion/) | Random-incidence scattering and directional diffusion coefficients. |
+| [`materials.diffusers.scattering_diffusion`](/phonometry/reference/api/materials/scattering-diffusion/) | Directional and random-incidence diffusion coefficients in a free field. |
+| [`materials.diffusers.reverberation_room_scattering`](/phonometry/reference/api/materials/reverberation-room-scattering/) | Random-incidence scattering coefficient in a reverberation room. |
 | [`materials.diffusers.design`](/phonometry/reference/api/materials/design/) | Far-field polar response and diffusion coefficient predicted from a diffuser design. |
 | [`materials.diffusers.metadiffuser`](/phonometry/reference/api/materials/metadiffuser/) | Metadiffusers: deep-subwavelength Schroeder-like sound diffusers. |
 | [`materials.surfaces.road_absorption`](/phonometry/reference/api/materials/road-absorption/) | In-situ sound absorption of road surfaces (ISO 13472-1 / ISO 13472-2). |
@@ -188,6 +197,7 @@ La referencia de la API se genera a partir de los docstrings del código (en ing
 | [`aircraft.airport_noise`](/phonometry/reference/api/aeroacoustics/airport-noise/) | Noise-Power-Distance (NPD) event-level interpolation (ECAC Doc 29). |
 | [`aircraft.anp_fleet`](/phonometry/reference/api/aeroacoustics/anp-fleet/) | EASA ANP fleet database bridge for the ECAC Doc 29 airport-noise chain. |
 | [`aircraft.rotorcraft_noise`](/phonometry/reference/api/aeroacoustics/rotorcraft-noise/) | Rotorcraft noise by the hemisphere method (ECAC Doc 32 / NORAH2). |
+| [`aircraft.rotorcraft_propagation`](/phonometry/reference/api/aeroacoustics/rotorcraft-propagation/) | Rotorcraft propagation, ground effect and screening (ECAC Doc 32 / NORAH2). |
 | [`aircraft.measurement_system`](/phonometry/reference/api/aeroacoustics/measurement-system/) | Aircraft-noise measurement-system tolerances (IEC 61265:1995). |
 
 ## Underwater acoustics
@@ -213,7 +223,8 @@ La referencia de la API se genera a partir de los docstrings del código (en ing
 | Module | Summary |
 | :--- | :--- |
 | [`emission.sound_power`](/phonometry/reference/api/power/sound-power/) | Sound power level of a noise source from sound pressure measurements over an enveloping measurement surface: ISO 3744:2010 (engineering, accuracy grade 2) and ISO 3746:2010 (survey, accuracy grade 3). |
-| [`emission.sound_power_intensity`](/phonometry/reference/api/power/sound-power-intensity/) | Sound power level of a noise source by sound-intensity **scanning**: ISO 9614-2:1996 (engineering, grade 2; survey/control, grade 3). |
+| [`emission.sound_power_anechoic`](/phonometry/reference/api/power/sound-power-anechoic/) | Sound power level of a noise source in an anechoic or hemi-anechoic room, from sound pressure measurements over an enveloping surface: ISO 3745:2012 (precision, accuracy grade 1). |
+| [`emission.sound_power_intensity`](/phonometry/reference/api/power/sound-power-intensity/) | Sound power level of a noise source by sound-intensity **scanning**: ISO 9614-2:1996 (engineering, grade 2; survey/control, grade 3) and ISO 9614-3:2002 (precision, grade 1). |
 | [`emission.sound_power_reverberation`](/phonometry/reference/api/power/sound-power-reverberation/) | Sound power level of a noise source measured in a reverberation test room: ISO 3741:2010 (precision method, accuracy grade 1). |
 | [`emission.intensity`](/phonometry/reference/api/power/intensity/) | Two-microphone (p-p) sound intensity per IEC 61043:1993 and the ISO 9614-1:1993 field indicators. |
 | [`emission.intensity_compliance`](/phonometry/reference/api/power/intensity-compliance/) | IEC 61043:1993 sound-intensity instrument class verification. |
@@ -224,7 +235,9 @@ La referencia de la API se genera a partir de los docstrings del código (en ing
 
 | Module | Summary |
 | :--- | :--- |
-| [`electroacoustics.distortion`](/phonometry/reference/api/electroacoustics/distortion/) | Distortion metrics for electroacoustic equipment (IEC 60268-3 / AES17). |
+| [`electroacoustics.distortion`](/phonometry/reference/api/electroacoustics/distortion/) | Harmonic distortion of electroacoustic equipment (IEC 60268-3 / AES17). |
+| [`electroacoustics.intermodulation`](/phonometry/reference/api/electroacoustics/intermodulation/) | Intermodulation distortion of audio equipment (IEC 60268-3 14.12.7-10). |
+| [`electroacoustics.noise_measurements`](/phonometry/reference/api/electroacoustics/noise-measurements/) | Noise measurements of audio equipment (AES17-2015 6.4). |
 | [`electroacoustics.frequency_response`](/phonometry/reference/api/electroacoustics/frequency-response/) | Frequency-response and coherence estimators (Bendat & Piersol). |
 | [`electroacoustics.swept_sine`](/phonometry/reference/api/electroacoustics/swept-sine/) | Harmonic-distortion separation with exponential sweeps (Farina / Novak). |
 | [`electroacoustics.piston`](/phonometry/reference/api/electroacoustics/piston/) | Radiation of a rigid circular piston set in an infinite baffle. |

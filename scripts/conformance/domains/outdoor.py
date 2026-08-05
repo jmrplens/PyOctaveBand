@@ -277,7 +277,7 @@ def _chk_iso10534_1_swr() -> Outcome:
     alpha = float(ph.standing_wave_absorption(ref.ISO10534_1_SWR))
     # The intermediate |r| = (s-1)/(s+1) (Eq. (13)) must match its shared
     # oracle too, so both steps of the chain are pinned.
-    from phonometry.materials.absorbers.impedance_tube import (
+    from phonometry.materials.absorbers.standing_wave import (
         standing_wave_reflection_magnitude,
     )
 

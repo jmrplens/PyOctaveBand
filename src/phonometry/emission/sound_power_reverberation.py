@@ -64,7 +64,7 @@ if TYPE_CHECKING:
     from .._report.metadata import ReportMetadata
 
 from .._internal.levels_math import energy_mean, energy_sum
-from .sound_power import (
+from ._shared import (
     SoundPowerWarning,
     _a_weighting_corrections,
 )

@@ -1,7 +1,8 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
 r"""
 Sound power level of a noise source by sound-intensity **scanning**:
-ISO 9614-2:1996 (engineering, grade 2; survey/control, grade 3).
+ISO 9614-2:1996 (engineering, grade 2; survey/control, grade 3) and
+ISO 9614-3:2002 (precision, grade 1).
 
 A probe is swept continuously over each segment of a hypothetical surface that
 encloses the source, reporting the time-averaged signed normal intensity
@@ -61,6 +62,26 @@ A band achieves the **engineering** grade when criteria 1, 2 and 3 hold, the
 An A-weighted sound power level omits, besides the non-determinable
 :math:`P \le 0` bands, the bands in which criteria 1 and/or 2 are not
 satisfied (clause 10.6 b).
+
+ISO 9614-3:2002 is the same method at precision grade, and that is why it is
+filed here and not in a module of its own: the same probe swept over the same
+enclosing surface, the same partial powers summed the same way (equations (5),
+(8), (9)), only a stricter procedure around them. Part 3 recognises a single
+grade, fixes the bias-error factor at :math:`K = 10` dB, takes as its input the
+result of the two scans that its repeatability criterion compares, and refers
+the level to the reference atmosphere:
+
+.. math::
+
+   L_{W0} = L_W - 15 \log_{10}\!\left( \frac{B}{101325} \cdot
+   \frac{296.15}{273.15 + \theta} \right) \tag{Eq. 10}
+
+Qualification is stricter in the same proportion: four field indicators
+(Annex B) feed five acceptance criteria evaluated per band (Annex C), and a
+band that satisfies the scan-density criterion 5 is qualified as a final
+result even where the field non-uniformity of criterion 4 is not met
+(C.1.6.2). The exclusion of the net-negative bands is the one rule both parts
+state alike (clause 9.2).
 """
 
 from __future__ import annotations
@@ -76,9 +97,9 @@ if TYPE_CHECKING:
 
     from .._report.metadata import ReportMetadata
 
-from .._internal.levels_math import weighted_energy_mean
+from .._internal.levels_math import energy_mean, weighted_energy_mean
+from ._shared import SoundPowerWarning, _a_weighting_corrections, _check_grade
 from .intensity import dynamic_capability_index
-from .sound_power import SoundPowerWarning, _a_weighting_corrections, _check_grade
 
 _P0 = 1.0e-12  #: Reference sound power, in watts (ISO 9614-2, 3.6.3).
 _S0 = 1.0  #: Reference surface area, in square metres (ISO 9614-2, A.2.1).
@@ -585,3 +606,406 @@ def _a_weighted_total(
     if n_bands == 1:
         return float(sound_power_level[0])
     return float("nan")
+
+
+# ===========================================================================
+# ISO 9614-3:2002 - sound power by sound-intensity scanning (precision). The
+# precision sibling of ISO 9614-2 (engineering). Single grade, bias-error
+# factor K = 10 dB, five acceptance criteria, and a meteorologically
+# normalized sound power level LW0 (Eq. 10).
+# ===========================================================================
+
+_P0_INTENSITY = 1.0e-12  #: Reference sound power, in watts (3.6.3).
+_I0 = 1.0e-12  #: Reference sound intensity, in W/m^2 (3.5).
+_K_9614_3 = 10.0  #: Bias-error factor K, in dB (def. 3.11).
+_FS_LIMIT = 2.0  #: Criterion 4 field-non-uniformity limit (Eq. C.4).
+_F_PI_DIFF_LIMIT = 3.0  #: Criterion 3 signed-minus-unsigned limit, dB (Eq. C.3).
+_FS_RATIO_LOW = 0.83  #: Criterion 5 lower bound on FS(1)/FS(2) (Eq. C.5).
+_FS_RATIO_HIGH = 1.2  #: Criterion 5 upper bound on FS(1)/FS(2) (Eq. C.5).
+
+
+@dataclass(frozen=True)
+class PrecisionFieldIndicators:
+    r"""ISO 9614-3:2002 Annex B field indicators (per band).
+
+    ``ft`` is the temporal-variability indicator (= F1 of ISO 9614-1, Eq. B.1),
+    ``None`` unless time-window intensities are supplied. ``f_pi_unsigned`` is
+    the unsigned pressure-intensity indicator (= F2, Eq. B.3, using the mean
+    magnitude of the segment intensities) and ``f_pi_signed`` the signed one
+    (= F3, Eq. B.6, using the algebraic mean); by construction
+    :math:`F_{pI_n}^{\mathrm{signed}} \ge F_{pI_n}^{\mathrm{unsigned}}`.
+    ``fs`` is the field-non-uniformity indicator (= F4, Eq. B.8)."""
+
+    ft: np.ndarray | None
+    f_pi_unsigned: np.ndarray
+    f_pi_signed: np.ndarray
+    fs: np.ndarray
+
+
+@dataclass(frozen=True)
+class PrecisionCriteria:
+    r"""ISO 9614-3:2002 Annex C acceptance criteria (per band, pass/fail).
+
+    Each attribute is a boolean array (True = satisfied) or ``None`` when its
+    inputs are absent. ``criterion_1`` scan repeatability
+    :math:`\lvert L_{I_n}(1) - L_{I_n}(2) \rvert \le s/2` (Eq. C.1);
+    ``criterion_2`` dynamic-capability
+    adequacy :math:`L_d \ge F_{pI_n}^{\mathrm{signed}}` (Eq. C.2);
+    ``criterion_3``
+    :math:`F_{pI_n}^{\mathrm{signed}} - F_{pI_n}^{\mathrm{unsigned}} \le 3` dB
+    (Eq. C.3); ``criterion_4``
+    :math:`F_S \le 2` (Eq. C.4); ``criterion_5`` scan-density convergence
+    :math:`0.83 \le F_S(1)/F_S(2) \le 1.2` (Eq. C.5). ``qualified`` is the
+    conjunction of criteria 1-3 with the field non-uniformity accepted
+    through criterion 4
+    or, where evaluated, criterion 5 (C.1.6.2: a band satisfying criterion 5
+    is qualified as a final result even if :math:`F_S(2) \ge 2`); ``None``
+    unless both criterion 1 and criterion 2 are evaluable."""
+
+    criterion_1: np.ndarray | None
+    criterion_2: np.ndarray | None
+    criterion_3: np.ndarray
+    criterion_4: np.ndarray
+    criterion_5: np.ndarray | None
+    qualified: np.ndarray | None
+
+
+@dataclass(frozen=True)
+class PrecisionIntensityResult:
+    r"""Result of an ISO 9614-3:2002 sound-power-by-scanning determination.
+
+    ``partial_power`` is the signed :math:`P_i = I_{n,i} S_i` per partial
+    surface and band (Eq. 5); ``sound_power`` the signed band total
+    :math:`P = \sum P_i` (Eq. 8) and ``sound_power_level`` its level
+    :math:`L_W = 10 \log_{10}(P/P_0)` (Eq. 9), ``NaN``
+    where :math:`P \le 0` (``not_applicable_band`` True, clause 9.2).
+    ``sound_power_level_normalized`` is ``LW0`` normalized to 23 deg C /
+    101 325 Pa (Eq. 10). ``sound_power_level_a`` is the A-weighted total over
+    applicable bands (``NaN`` without ``frequencies`` and more than one band)."""
+
+    frequencies: np.ndarray | None
+    partial_power: np.ndarray
+    sound_power: np.ndarray
+    sound_power_level: np.ndarray
+    sound_power_level_normalized: np.ndarray
+    not_applicable_band: np.ndarray
+    surface_area: float
+    sound_power_level_a: float
+
+    def plot(self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any) -> Axes:
+        """Plot the ``LW`` spectrum; non-applicable bands are hatched/greyed.
+
+        Requires matplotlib (``pip install phonometry[plot]``); returns the
+        :class:`~matplotlib.axes.Axes`.
+        """
+        from .._i18n import check_language
+        from .._plot.emission import plot_sound_power
+
+        check_language(language)
+        return plot_sound_power(self, ax=ax, language=language, **kwargs)
+
+
+def precision_field_indicators(
+    segment_intensity: np.ndarray,
+    segment_pressure_levels: np.ndarray,
+    *,
+    time_window_intensity: np.ndarray | None = None,
+) -> PrecisionFieldIndicators:
+    r"""ISO 9614-3:2002 Annex B field indicators from segment data.
+
+    Over the ``N`` segments of the whole measurement surface (per band):
+
+    .. math::
+
+       \overline{L_p} = 10 \log_{10}\!\left[ \frac{1}{N}
+       \sum_j 10^{0.1 L_{pj}} \right] \tag{Eq. B.4}
+
+       L_{|I_n|} = 10 \log_{10}\!\left[ \frac{1}{N}
+       \sum_j \frac{|I_{nj}|}{I_0} \right] \tag{Eq. B.5}
+
+       L_{I_n} = 10 \log_{10}\!\left[ \frac{1}{I_0} \left| \frac{1}{N}
+       \sum_j I_{nj} \right| \right] \tag{Eq. B.7}
+
+       F_{pI_n}^{\mathrm{unsigned}} = \overline{L_p} - L_{|I_n|}
+       \tag{Eq. B.3}
+
+       F_{pI_n}^{\mathrm{signed}} = \overline{L_p} - L_{I_n} \tag{Eq. B.6}
+
+       F_S = \frac{1}{\overline{I_n}} \sqrt{ \frac{1}{N-1}
+       \sum_j \left( I_{nj} - \overline{I_n} \right)^2 } \tag{Eq. B.8}
+
+    With ``time_window_intensity`` (an ``(M, NB)`` array of window-averaged
+    intensities) the temporal-variability indicator ``FT`` (Eq. B.1) is also
+    returned.
+
+    :param segment_intensity: ``(N, NB)`` signed segment normal intensity, W/m^2.
+    :param segment_pressure_levels: ``(N, NB)`` segment pressure levels, dB.
+    :param time_window_intensity: Optional ``(M, NB)`` window intensities for FT.
+    :return: :class:`PrecisionFieldIndicators`.
+    """
+    i_n = np.atleast_2d(np.asarray(segment_intensity, dtype=np.float64))
+    lp = np.atleast_2d(np.asarray(segment_pressure_levels, dtype=np.float64))
+    if i_n.shape != lp.shape:
+        raise ValueError(
+            "'segment_intensity' and 'segment_pressure_levels' must have the "
+            f"same shape, got {i_n.shape} and {lp.shape}."
+        )
+    n_seg = i_n.shape[0]
+    if n_seg < 2:
+        raise ValueError("At least two segments are required for the indicators.")
+
+    lp_bar = energy_mean(lp, axis=0)  # Eq. B.4
+    li_unsigned = 10.0 * np.log10(np.mean(np.abs(i_n), axis=0) / _I0)  # Eq. B.5
+    mean_signed = np.mean(i_n, axis=0)
+    li_signed = 10.0 * np.log10(
+        np.maximum(np.abs(mean_signed), np.finfo(float).tiny) / _I0
+    )  # Eq. B.7 (magnitude; sign carried separately by the P<0 rule)
+    f_pi_unsigned = np.asarray(lp_bar - li_unsigned, dtype=np.float64)
+    f_pi_signed = np.asarray(lp_bar - li_signed, dtype=np.float64)
+
+    with np.errstate(divide="ignore", invalid="ignore"):
+        fs = np.sqrt(
+            np.sum((i_n - mean_signed[np.newaxis, :]) ** 2, axis=0) / (n_seg - 1)
+        ) / mean_signed  # Eq. B.8
+    fs = np.asarray(fs, dtype=np.float64)
+
+    ft: np.ndarray | None = None
+    if time_window_intensity is not None:
+        win = np.atleast_2d(np.asarray(time_window_intensity, dtype=np.float64))
+        if win.shape[-1] != i_n.shape[-1]:
+            raise ValueError(
+                "'time_window_intensity' last axis must match the number of bands."
+            )
+        m = win.shape[0]
+        if m < 2:
+            raise ValueError("At least two time windows are required for FT.")
+        mean_t = np.mean(win, axis=0)
+        with np.errstate(divide="ignore", invalid="ignore"):
+            ft = np.asarray(
+                np.sqrt(np.sum((win - mean_t[np.newaxis, :]) ** 2, axis=0) / (m - 1))
+                / mean_t,
+                dtype=np.float64,
+            )  # Eq. B.1
+
+    return PrecisionFieldIndicators(
+        ft=ft, f_pi_unsigned=f_pi_unsigned, f_pi_signed=f_pi_signed, fs=fs
+    )
+
+
+def _sigma_r0_9614_3(nominal: int) -> float:
+    """Per-band sigma_R0 (ISO 9614-3:2002 Table 1), in dB; also criterion-1 s."""
+    if 50 <= nominal <= 160:
+        return 2.0
+    if 200 <= nominal <= 315:
+        return 1.5
+    if 400 <= nominal <= 5000:
+        return 1.0
+    if nominal == 6300:
+        return 2.0
+    raise ValueError(
+        f"No ISO 9614-3:2002 Table 1 sigma_R0 for {nominal} Hz; expected a "
+        "nominal one-third-octave mid-band from 50 Hz to 6300 Hz."
+    )
+
+
+def precision_qualification(
+    indicators: PrecisionFieldIndicators,
+    *,
+    scan_intensity_level_1: np.ndarray | None = None,
+    scan_intensity_level_2: np.ndarray | None = None,
+    pressure_residual_index: float | np.ndarray | None = None,
+    field_nonuniformity_1: np.ndarray | None = None,
+    field_nonuniformity_2: np.ndarray | None = None,
+    frequencies: np.ndarray | None = None,
+    repeatability_limit: float | np.ndarray | None = None,
+) -> PrecisionCriteria:
+    r"""Evaluate the five ISO 9614-3:2002 Annex C acceptance criteria per band.
+
+    :param indicators: The :class:`PrecisionFieldIndicators` (gives criteria 3
+        and 4 directly).
+    :param scan_intensity_level_1: ``LIn(1)`` per band (dB), first scan.
+    :param scan_intensity_level_2: ``LIn(2)`` per band (dB), second scan; with
+        the first scan and ``s`` this gives criterion 1
+        (:math:`\lvert \Delta L \rvert \le s/2`).
+    :param pressure_residual_index: ``delta_pI0`` (dB), scalar or per band; with
+        :math:`K = 10` gives ``Ld`` for criterion 2
+        (:math:`L_d \ge F_{pI_n}^{\mathrm{signed}}`).
+    :param field_nonuniformity_1: ``FS(1)`` per band (initial scan density).
+    :param field_nonuniformity_2: ``FS(2)`` per band (doubled density); with
+        ``FS(1)`` gives criterion 5.
+    :param frequencies: ``(NB,)`` nominal mid-band frequencies (Hz), selecting
+        the criterion-1 limit ``s`` from Table 1.
+    :param repeatability_limit: Override for ``s`` (dB), scalar or per band.
+    :return: :class:`PrecisionCriteria`.
+    """
+    f_pi_signed = indicators.f_pi_signed
+    n_bands = f_pi_signed.shape[0]
+
+    # Criteria 3 and 4 are always available from the indicators.
+    criterion_3 = np.asarray(
+        (f_pi_signed - indicators.f_pi_unsigned) <= _F_PI_DIFF_LIMIT, dtype=bool
+    )
+    criterion_4 = np.asarray(indicators.fs <= _FS_LIMIT, dtype=bool)
+
+    # Criterion 1: |LIn(1) - LIn(2)| <= s/2.
+    criterion_1: np.ndarray | None = None
+    if scan_intensity_level_1 is not None and scan_intensity_level_2 is not None:
+        l1 = np.asarray(scan_intensity_level_1, dtype=np.float64)
+        l2 = np.asarray(scan_intensity_level_2, dtype=np.float64)
+        if repeatability_limit is not None:
+            s = np.broadcast_to(
+                np.asarray(repeatability_limit, dtype=np.float64), (n_bands,)
+            ).astype(np.float64)
+        elif frequencies is not None:
+            nominal = [round(float(f)) for f in np.asarray(frequencies)]
+            s = np.array([_sigma_r0_9614_3(f) for f in nominal], dtype=np.float64)
+        else:
+            raise ValueError(
+                "Criterion 1 needs the limit s: provide 'frequencies' (Table 1) "
+                "or 'repeatability_limit'."
+            )
+        criterion_1 = np.asarray(np.abs(l1 - l2) <= s / 2.0, dtype=bool)
+
+    # Criterion 2: Ld >= F_pIn(signed), Ld = delta_pI0 - K.
+    criterion_2: np.ndarray | None = None
+    if pressure_residual_index is not None:
+        dpi0 = np.broadcast_to(
+            np.asarray(pressure_residual_index, dtype=np.float64), (n_bands,)
+        ).astype(np.float64)
+        ld = dpi0 - _K_9614_3
+        criterion_2 = np.asarray(ld >= f_pi_signed, dtype=bool)
+
+    # Criterion 5: 0,83 <= FS(1)/FS(2) <= 1,2.
+    criterion_5: np.ndarray | None = None
+    if field_nonuniformity_1 is not None and field_nonuniformity_2 is not None:
+        fs1 = np.asarray(field_nonuniformity_1, dtype=np.float64)
+        fs2 = np.asarray(field_nonuniformity_2, dtype=np.float64)
+        with np.errstate(divide="ignore", invalid="ignore"):
+            ratio = fs1 / fs2
+        criterion_5 = np.asarray(
+            (ratio >= _FS_RATIO_LOW) & (ratio <= _FS_RATIO_HIGH), dtype=bool
+        )
+
+    qualified: np.ndarray | None = None
+    if criterion_1 is not None and criterion_2 is not None:
+        # C.1.6.2: where the doubled-density scan satisfies criterion 5, the
+        # band qualifies as a final result even if FS(2) >= 2 fails criterion 4.
+        non_uniformity_ok = (
+            criterion_4 if criterion_5 is None else (criterion_4 | criterion_5)
+        )
+        qualified = criterion_1 & criterion_2 & criterion_3 & non_uniformity_ok
+
+    return PrecisionCriteria(
+        criterion_1=criterion_1,
+        criterion_2=criterion_2,
+        criterion_3=criterion_3,
+        criterion_4=criterion_4,
+        criterion_5=criterion_5,
+        qualified=qualified,
+    )
+
+
+def sound_power_intensity_precision(
+    partial_intensity: np.ndarray,
+    areas: np.ndarray,
+    *,
+    frequencies: np.ndarray | None = None,
+    temperature: float = 23.0,
+    barometric_pressure: float = 101325.0,
+) -> PrecisionIntensityResult:
+    r"""Sound power by intensity scanning, precision (ISO 9614-3:2002).
+
+    ``partial_intensity`` is an ``(N, NB)`` array (or ``(N,)`` for a single
+    band) of the signed normal intensity :math:`I_{ni}` on each of the ``N``
+    partial surfaces (already the two-scan result), and ``areas`` the ``(N,)``
+    partial surface areas :math:`S_i`. The partial powers
+    :math:`P_i = I_{ni} S_i` (Eq. 5) are summed to :math:`P` (Eq. 8) and
+    :math:`L_W = 10 \log_{10}(P/P_0)` (Eq. 9); a band with net :math:`P \le 0` is
+    flagged (``not_applicable_band``, clause 9.2) and reported as ``NaN``.
+    :math:`L_{W0}` normalizes to reference meteorology:
+
+    .. math::
+
+       L_{W0} = L_W - 15 \log_{10}\!\left( \frac{B}{101325} \cdot
+       \frac{296.15}{273.15 + \theta} \right) \tag{Eq. 10}
+
+    :param partial_intensity: ``(N, NB)`` signed normal intensity, W/m^2.
+    :param areas: ``(N,)`` partial surface areas ``Si``, m^2.
+    :param frequencies: ``(NB,)`` nominal mid-band frequencies (Hz), for LWA.
+    :param temperature: Air temperature ``theta`` (deg C), for LW0 (Eq. 10).
+    :param barometric_pressure: Barometric pressure ``B`` (Pa), for LW0.
+    :return: :class:`PrecisionIntensityResult`.
+    """
+    raw_intensity = np.asarray(partial_intensity, dtype=np.float64)
+    seg = np.asarray(areas, dtype=np.float64)
+    if seg.ndim != 1:
+        raise ValueError("'areas' must be a 1D array of partial surface areas.")
+    n_seg = seg.shape[0]
+    # A 1-D input is unambiguously ``(N,)`` segments with one band -> ``(N, 1)``;
+    # a 2-D input is taken as ``(segments, bands)`` as given. Keying off the
+    # original ndim avoids misreading a genuine ``(1, N)`` single-segment,
+    # N-band array as N segments when ``n_seg == N``.
+    if raw_intensity.ndim == 1:
+        intensity = raw_intensity.reshape(-1, 1)
+    else:
+        intensity = np.atleast_2d(raw_intensity)
+    if intensity.shape[0] != n_seg:
+        raise ValueError(
+            f"'partial_intensity' first axis ({intensity.shape[0]}) must match "
+            f"the number of 'areas' ({n_seg})."
+        )
+    if np.any(seg <= 0.0):
+        raise ValueError("All 'areas' must be positive.")
+    if temperature <= -273.15:
+        raise ValueError("'temperature' must be above -273,15 degrees Celsius.")
+    if barometric_pressure <= 0.0:
+        raise ValueError("'barometric_pressure' must be positive (Pa).")
+    n_bands = intensity.shape[1]
+    if frequencies is not None and np.asarray(frequencies).shape != (n_bands,):
+        raise ValueError("'frequencies' length must match the number of bands.")
+
+    partial_power = intensity * seg[:, None]  # Eq. 5
+    total_power = np.sum(partial_power, axis=0)  # Eq. 8
+    not_applicable = total_power <= 0.0
+    with np.errstate(divide="ignore", invalid="ignore"):
+        lw = np.where(
+            total_power > 0.0,
+            10.0 * np.log10(np.maximum(total_power, np.finfo(float).tiny) / _P0_INTENSITY),
+            np.nan,
+        )
+
+    # Eq. 10: meteorological normalization to 23 deg C / 101 325 Pa.
+    norm = 15.0 * np.log10(
+        (barometric_pressure / 101325.0) * (296.15 / (273.15 + temperature))
+    )
+    lw0 = lw - norm
+
+    if np.any(not_applicable):
+        warnings.warn(
+            "Net sound power is non-positive in one or more bands; ISO "
+            "9614-3:2002 is not applicable to those bands (clause 9.2).",
+            SoundPowerWarning,
+            stacklevel=2,
+        )
+
+    # A-weighted total over applicable bands (clause 9.2 / 4.3).
+    if frequencies is not None:
+        freqs = np.asarray(frequencies, dtype=np.float64)
+        ck = _a_weighting_corrections(freqs)
+        contrib = 10.0 ** (0.1 * (lw + ck))
+        total = float(np.sum(contrib[~not_applicable]))
+        lwa = 10.0 * np.log10(total) if total > 0.0 else float("nan")
+    else:
+        freqs = None
+        lwa = float(lw[0]) if n_bands == 1 and not bool(not_applicable[0]) else float("nan")
+
+    return PrecisionIntensityResult(
+        frequencies=freqs,
+        partial_power=np.asarray(partial_power, dtype=np.float64),
+        sound_power=np.asarray(total_power, dtype=np.float64),
+        sound_power_level=np.asarray(lw, dtype=np.float64),
+        sound_power_level_normalized=np.asarray(lw0, dtype=np.float64),
+        not_applicable_band=np.asarray(not_applicable, dtype=bool),
+        surface_area=float(np.sum(seg)),
+        sound_power_level_a=lwa,
+    )

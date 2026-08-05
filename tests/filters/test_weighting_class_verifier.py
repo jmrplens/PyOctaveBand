@@ -18,7 +18,9 @@ from phonometry import (
     verify_weighting_class,
     weighting_class_limits,
 )
-from phonometry.filters.compliance import _WEIGHTING_TABLE3
+from phonometry.filters.weighting_compliance import (
+    _WEIGHTING_TABLE3,
+)
 
 
 def test_masks_match_reference_data() -> None:

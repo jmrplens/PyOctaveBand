@@ -18,32 +18,34 @@ from .metadiffuser import (
     metadiffuser_polar_response,
     metadiffuser_reflection,
 )
-from .scattering_diffusion import (
+from .reverberation_room_scattering import (
     BASE_PLATE_BANDS,
     BASE_PLATE_MAX_SCATTERING,
-    TWO_DIMENSIONAL_SOURCE_WEIGHTS,
-    DiffusionResult,
-    DiffusionSpectrum,
     ScatteringDiffusionWarning,
     ScatteringResult,
     ScatteringUncertainty,
     absorption_coefficient_uncertainty,
     air_attenuation_coefficient,
-    area_factors,
     base_plate_scattering,
     check_base_plate_scattering,
-    diffusion_spectrum,
-    directional_diffusion,
-    directional_diffusion_coefficient,
-    normalized_diffusion_coefficient,
     random_incidence_absorption,
-    random_incidence_diffusion,
     reverberation_time_uncertainty,
     scattering_coefficient,
     scattering_coefficient_spectrum,
     scattering_coefficient_uncertainty,
     specular_absorption_coefficient,
     speed_of_sound,
+)
+from .scattering_diffusion import (
+    TWO_DIMENSIONAL_SOURCE_WEIGHTS,
+    DiffusionResult,
+    DiffusionSpectrum,
+    area_factors,
+    diffusion_spectrum,
+    directional_diffusion,
+    directional_diffusion_coefficient,
+    normalized_diffusion_coefficient,
+    random_incidence_diffusion,
 )
 
 __all__ = [

@@ -22,17 +22,17 @@ if TYPE_CHECKING:
     )
     from ..signals.envelope import EnvelopeResult, EnvelopeSpectrumResult
     from ..signals.miso import MISOCoherenceResult
+    from ..signals.multitaper import MultitaperSpectralDensityResult
     from ..signals.phase import PhaseDecompositionResult
     from ..signals.spectra import (
         CoherentOutputSpectrumResult,
         CrossSpectralDensityResult,
-        MultitaperSpectralDensityResult,
         SpectralDensityResult,
-        WindowMetricsResult,
     )
     from ..signals.synchronous_average import SynchronousAverageResult
     from ..signals.test_signals import ResampledSignalResult, ToneBurstResult
     from ..signals.time_frequency import SpectrogramResult, ZoomFFTResult
+    from ..signals.windows import WindowMetricsResult
 
 from .common import (
     _C_EDGE,
@@ -310,7 +310,7 @@ def plot_multitaper_spectral_density(
     (possibly adaptive) estimator and is drawn as a pale opaque fill.
 
     :param result: A
-        :class:`~phonometry.signals.spectra.MultitaperSpectralDensityResult`.
+        :class:`~phonometry.signals.multitaper.MultitaperSpectralDensityResult`.
     :param ax: Existing axes, or ``None`` to create a figure.
     :param language: Label language, ``"en"`` (default) or ``"es"``.
     :param kwargs: Forwarded to the density ``plot`` call.
@@ -1104,7 +1104,7 @@ def plot_window_metrics(
     With ``ax`` given, only the spectrum panel is drawn on it.
 
     :param result: A
-        :class:`~phonometry.signals.spectra.WindowMetricsResult`.
+        :class:`~phonometry.signals.windows.WindowMetricsResult`.
     :param ax: Existing axes for the spectrum panel, or ``None`` for a
         fresh two-panel figure.
     :param language: Label language, ``"en"`` (default) or ``"es"``.
@@ -1112,7 +1112,7 @@ def plot_window_metrics(
     :return: The spectrum axes (``ax`` given) or the array of two axes.
     """
     from .._i18n import decimal_comma, localize_axes
-    from ..signals.spectra import _WINDOW_OVERSAMPLE, _window_spectrum_db
+    from ..signals.windows import _WINDOW_OVERSAMPLE, _window_spectrum_db
 
     max_bins = 24.0
 

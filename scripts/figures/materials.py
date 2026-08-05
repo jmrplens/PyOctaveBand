@@ -306,7 +306,7 @@ def generate_porous_absorber_designs(output_dir: str) -> None:
         membrane_resonance_frequency,
         miki,
     )
-    from phonometry.materials.absorbers.porous import Layer
+    from phonometry.materials.absorbers.layered import Layer
 
     f = np.logspace(np.log10(50.0), np.log10(5000.0), 500)
     with _warnings.catch_warnings():

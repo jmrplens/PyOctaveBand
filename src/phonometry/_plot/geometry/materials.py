@@ -45,11 +45,9 @@ from ._draft import (
 if TYPE_CHECKING:
     from matplotlib.axes import Axes
 
-    from ...materials.absorbers.impedance_tube import (
-        ImpedanceTubeResult,
-        TransferMatrix,
-    )
-    from ...materials.absorbers.porous import Layer, LayeredAbsorberResult
+    from ...materials.absorbers.four_microphone import TransferMatrix
+    from ...materials.absorbers.impedance_tube import ImpedanceTubeResult
+    from ...materials.absorbers.layered import Layer, LayeredAbsorberResult
     from ...materials.absorbers.slow_sound import (
         HelmholtzResonator,
         SlitResonatorAbsorberResult,
@@ -725,7 +723,7 @@ def plot_transmission_tube_geometry(
     :param kwargs: Forwarded to the tube-bore rectangle.
     :return: The axes.
     """
-    from ...materials.absorbers.impedance_tube import plane_wave_frequency_range_astm
+    from ...materials.absorbers.four_microphone import plane_wave_frequency_range_astm
 
     _check_language(language)
     if min(l1, s1, l2, s2, thickness) <= 0.0:

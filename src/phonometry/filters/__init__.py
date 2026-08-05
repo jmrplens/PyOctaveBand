@@ -9,8 +9,6 @@ from .compliance import (
     class_limits,
     filter_class_compliance,
     verify_filter_class,
-    verify_weighting_class,
-    weighting_class_limits,
 )
 from .core import FilterBankWarning, OctaveFilterBank, octave_filter
 from .equalizer import EQResponseResult, EQSection, ParametricEQ, parametric_eq
@@ -25,6 +23,7 @@ from .weighting import (
     time_weighting,
     weighting_filter,
 )
+from .weighting_compliance import verify_weighting_class, weighting_class_limits
 
 __all__ = [
     "EQResponseResult",

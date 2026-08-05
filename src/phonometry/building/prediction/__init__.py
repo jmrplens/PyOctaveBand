@@ -77,6 +77,13 @@ from .installed_structure_borne import (
     structure_borne_pressure_level_path,
     total_structure_borne_pressure_level,
 )
+from .linings import (
+    LiningImprovementResult,
+    lining_improvement,
+    lining_improvement_in_situ,
+    lining_resonance_frequency,
+    weighted_lining_improvement,
+)
 from .masonry_cavity_wall import (
     WALL_TIE_STIFFNESS,
     WallTieCouplingResult,
@@ -106,7 +113,6 @@ from .resilient_layers import (
     TAPPING_IMPACT_RATE,
     CoveringImprovementResult,
     FloatingFloorImprovementResult,
-    LiningImprovementResult,
     TappingForceResult,
     combined_dynamic_stiffness,
     covering_contact_stiffness,
@@ -117,16 +123,12 @@ from .resilient_layers import (
     force_pulse,
     hammer_impact_velocity,
     hammer_limiting_frequency,
-    lining_improvement,
-    lining_improvement_in_situ,
-    lining_resonance_frequency,
     plate_contact_stiffness,
     resilient_mount_improvement,
     short_pulse_mean_square_force,
     tapping_cut_off_frequency,
     tapping_force_spectrum,
     weighted_floating_floor_improvement,
-    weighted_lining_improvement,
 )
 from .simplified_model import (
     AirbornePredictionResult,

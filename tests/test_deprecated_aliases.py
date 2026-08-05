@@ -437,6 +437,32 @@ def test_narrowed_namespace_falls_back_to_the_module_alias() -> None:
         assert metrology.correlation is ph.correlation
 
 
+def test_a_split_module_alias_still_serves_the_names_that_left() -> None:
+    """Splitting a module must not narrow what its deprecated path serves.
+
+    ``layered_absorber`` moved from ``absorbers.porous`` to ``absorbers.layered``,
+    and the alias ``materials.porous_absorber`` names only the former. The old
+    path has to keep reaching it until 5.0, or a 3.x import fails outright where
+    the deprecation promised a warning, and fails for only some of the module's
+    names, which reads as a bug rather than as a rename.
+    """
+    import importlib
+
+    from phonometry._compat import _MOVED_4X, _SPLIT_INTO
+
+    for new, siblings in _SPLIT_INTO.items():
+        olds = [old for old, target in _MOVED_4X.items() if target == new]
+        assert olds, f"{new} is split but has no deprecated path to serve"
+        for old in olds:
+            shim = importlib.import_module(old)
+            for sibling in siblings:
+                moved = importlib.import_module(sibling)
+                for name in moved.__all__:
+                    with pytest.warns(DeprecationWarning, match="deprecated since"):
+                        assert getattr(shim, name) is getattr(moved, name)
+                assert set(moved.__all__) <= set(dir(shim))
+
+
 def test_moved_module_shims_warn_and_delegate() -> None:
     import importlib
 

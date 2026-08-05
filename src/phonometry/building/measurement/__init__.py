@@ -47,22 +47,12 @@ from .heavy_impact import (
 )
 from .insulation import (
     AirborneInsulationResult,
-    ExtendedImpactRatingResult,
-    ExtendedWeightedRatingResult,
     FacadeInsulationResult,
     ImpactInsulationResult,
-    ImpactRatingResult,
-    WeightedRatingResult,
     airborne_insulation,
     energy_average_level,
     facade_insulation,
-    impact_improvement_adaptation_term,
     impact_insulation,
-    weighted_impact_improvement,
-    weighted_impact_rating,
-    weighted_impact_rating_extended,
-    weighted_rating,
-    weighted_rating_extended,
 )
 from .intensity_insulation import (
     IntensityElementNormalizedResult,
@@ -80,6 +70,18 @@ from .lab_insulation import (
     background_correction,
     lab_airborne_insulation,
     lab_impact_insulation,
+)
+from .ratings import (
+    ExtendedImpactRatingResult,
+    ExtendedWeightedRatingResult,
+    ImpactRatingResult,
+    WeightedRatingResult,
+    impact_improvement_adaptation_term,
+    weighted_impact_improvement,
+    weighted_impact_rating,
+    weighted_impact_rating_extended,
+    weighted_rating,
+    weighted_rating_extended,
 )
 from .structure_borne_power import (
     StructureBornePowerResult,

@@ -72,22 +72,24 @@ from .aircraft.certification import (
 from .aircraft.measurement_system import verify_aircraft_noise_system
 from .aircraft.rotorcraft_noise import (
     FlightPathKinematics,
-    MeanGroundPlaneResult,
     RotorcraftEventResult,
     RotorcraftHemisphere,
     RotorcraftNoiseContourResult,
+    flight_condition_weights,
+    flight_path_kinematics,
+    hemisphere_source_level,
+    interpolated_source_level,
+    rotorcraft_event_level,
+    rotorcraft_noise_contour,
+)
+from .aircraft.rotorcraft_propagation import (
+    MeanGroundPlaneResult,
     TerrainScreeningResult,
     atmospheric_adjustment,
     diffraction_attenuation,
-    flight_condition_weights,
-    flight_path_kinematics,
     ground_effect_adjustment,
-    hemisphere_source_level,
-    interpolated_source_level,
     mean_flow_resistivity,
     mean_ground_plane,
-    rotorcraft_event_level,
-    rotorcraft_noise_contour,
     spherical_spreading_adjustment,
     terrain_screening_adjustment,
 )
@@ -389,25 +391,25 @@ from .building.regulation.spain import (
 )
 from .electroacoustics.distortion import (
     HarmonicDistortionResult,
-    ModulationDistortionResult,
-    difference_frequency_distortion,
-    dynamic_intermodulation_distortion,
-    dynamic_range,
     harmonic_analysis,
     harmonic_distortion,
-    idle_channel_noise,
     itu_r_468_weighting,
-    modulation_distortion,
     sinad,
     thd,
     thd_plus_noise,
-    total_difference_frequency_distortion,
     weighted_thd,
 )
 from .electroacoustics.frequency_response import (
     FrequencyResponseResult,
     coherence,
     transfer_function,
+)
+from .electroacoustics.intermodulation import (
+    ModulationDistortionResult,
+    difference_frequency_distortion,
+    dynamic_intermodulation_distortion,
+    modulation_distortion,
+    total_difference_frequency_distortion,
 )
 from .electroacoustics.loudspeaker import (
     LoudspeakerCharacteristics,
@@ -416,6 +418,10 @@ from .electroacoustics.loudspeaker import (
 from .electroacoustics.microphone import (
     MicrophoneCharacteristics,
     microphone_characteristics,
+)
+from .electroacoustics.noise_measurements import (
+    dynamic_range,
+    idle_channel_noise,
 )
 from .electroacoustics.piston import (
     PistonDirectivity,
@@ -462,29 +468,31 @@ from .emission.intensity_compliance import (
     verify_intensity_class,
 )
 from .emission.sound_power import (
-    MeteorologicalCorrection,
-    PrecisionCriteria,
-    PrecisionFieldIndicators,
-    PrecisionIntensityResult,
-    PrecisionSoundPowerResult,
     SoundPowerResult,
     SoundPowerWarning,
     background_noise_correction,
     environmental_correction,
     measurement_positions,
-    meteorological_corrections,
-    precision_background_correction,
-    precision_field_indicators,
-    precision_positions,
-    precision_qualification,
-    precision_uncertainty,
-    sound_power_anechoic,
-    sound_power_intensity_precision,
     sound_power_pressure,
 )
+from .emission.sound_power_anechoic import (
+    MeteorologicalCorrection,
+    PrecisionSoundPowerResult,
+    meteorological_corrections,
+    precision_background_correction,
+    precision_positions,
+    precision_uncertainty,
+    sound_power_anechoic,
+)
 from .emission.sound_power_intensity import (
+    PrecisionCriteria,
+    PrecisionFieldIndicators,
+    PrecisionIntensityResult,
     SoundPowerIntensityResult,
+    precision_field_indicators,
+    precision_qualification,
     sound_power_intensity,
+    sound_power_intensity_precision,
 )
 from .emission.sound_power_reverberation import (
     ReverberationSoundPowerResult,
@@ -691,8 +699,6 @@ from .filters.compliance import (
     class_limits,
     filter_class_compliance,
     verify_filter_class,
-    verify_weighting_class,
-    weighting_class_limits,
 )
 from .filters.core import (
     FilterBankWarning,
@@ -715,6 +721,10 @@ from .filters.weighting import (
     linkwitz_riley,
     time_weighting,
     weighting_filter,
+)
+from .filters.weighting_compliance import (
+    verify_weighting_class,
+    weighting_class_limits,
 )
 from .hearing.noise_induced_hearing_loss import (
     HtlanResult,
@@ -764,44 +774,37 @@ from .materials.absorbers.biot import (
     frame_quarter_wave_resonance,
     poroelastic_transfer_matrix,
 )
+from .materials.absorbers.four_microphone import (
+    TransferMatrix,
+    air_density_astm,
+    air_layer_transfer_matrix,
+    face_quantities,
+    plane_wave_frequency_range_astm,
+    speed_of_sound_astm,
+    transfer_matrix_one_load,
+    transfer_matrix_two_load,
+    wave_decomposition,
+)
 from .materials.absorbers.impedance_tube import (
     ImpedanceTubeResult,
     ImpedanceTubeWarning,
-    TransferMatrix,
     absorption_from_reflection,
-    air_density_astm,
     air_density_iso,
-    air_layer_transfer_matrix,
     apply_mic_calibration,
     characteristic_impedance,
-    face_quantities,
     hydraulic_diameter,
     mic_calibration_factor,
     normalized_surface_admittance,
     normalized_surface_impedance,
     plane_wave_frequency_range,
-    plane_wave_frequency_range_astm,
     reflection_factor,
-    speed_of_sound_astm,
     speed_of_sound_iso,
-    standing_wave_absorption,
-    standing_wave_normalized_impedance,
-    standing_wave_ratio_from_level,
-    standing_wave_reflection,
-    standing_wave_reflection_magnitude,
     surface_impedance,
-    transfer_matrix_one_load,
-    transfer_matrix_two_load,
     tube_attenuation_constant,
     tube_wavenumber,
     two_microphone_impedance,
-    wave_decomposition,
 )
-from .materials.absorbers.porous import (
-    DELANY_BAZLEY_COEFFICIENTS,
-    DELANY_BAZLEY_VALIDITY,
-    LIMP_FRAME_CRITERIA,
-    MIKI_VALIDITY,
+from .materials.absorbers.layered import (
     AirLayer,
     DiffuseFieldAbsorptionResult,
     LayeredAbsorberResult,
@@ -809,15 +812,22 @@ from .materials.absorbers.porous import (
     MicroperforatedPlateLayer,
     PerforatedPlateLayer,
     PoroelasticLayer,
-    PorousAbsorberWarning,
     PorousLayer,
+    diffuse_field_absorption,
+    layered_absorber,
+    statistical_absorption,
+)
+from .materials.absorbers.porous import (
+    DELANY_BAZLEY_COEFFICIENTS,
+    DELANY_BAZLEY_VALIDITY,
+    LIMP_FRAME_CRITERIA,
+    MIKI_VALIDITY,
+    PorousAbsorberWarning,
     PorousMediumResult,
     decoupling_frequency,
     delany_bazley,
-    diffuse_field_absorption,
     helmholtz_resonance_frequency,
     johnson_champoux_allard,
-    layered_absorber,
     limp_frame,
     limp_frame_applicable,
     membrane_impedance,
@@ -826,7 +836,6 @@ from .materials.absorbers.porous import (
     miki,
     perforated_plate_impedance,
     perforation_end_correction,
-    statistical_absorption,
 )
 from .materials.absorbers.rating import (
     OCTAVE_BANDS,
@@ -857,6 +866,13 @@ from .materials.absorbers.sound_absorption import (
     attenuation_from_alpha,
     measure_sound_absorption,
 )
+from .materials.absorbers.standing_wave import (
+    standing_wave_absorption,
+    standing_wave_normalized_impedance,
+    standing_wave_ratio_from_level,
+    standing_wave_reflection,
+    standing_wave_reflection_magnitude,
+)
 from .materials.absorbers.uncertainty import (
     AbsorptionUncertaintyResult,
     absorption_coverage_factor,
@@ -881,32 +897,34 @@ from .materials.diffusers.metadiffuser import (
     metadiffuser_polar_response,
     metadiffuser_reflection,
 )
-from .materials.diffusers.scattering_diffusion import (
+from .materials.diffusers.reverberation_room_scattering import (
     BASE_PLATE_BANDS,
     BASE_PLATE_MAX_SCATTERING,
-    TWO_DIMENSIONAL_SOURCE_WEIGHTS,
-    DiffusionResult,
-    DiffusionSpectrum,
     ScatteringDiffusionWarning,
     ScatteringResult,
     ScatteringUncertainty,
     absorption_coefficient_uncertainty,
     air_attenuation_coefficient,
-    area_factors,
     base_plate_scattering,
     check_base_plate_scattering,
-    diffusion_spectrum,
-    directional_diffusion,
-    directional_diffusion_coefficient,
-    normalized_diffusion_coefficient,
     random_incidence_absorption,
-    random_incidence_diffusion,
     reverberation_time_uncertainty,
     scattering_coefficient,
     scattering_coefficient_spectrum,
     scattering_coefficient_uncertainty,
     specular_absorption_coefficient,
     speed_of_sound,
+)
+from .materials.diffusers.scattering_diffusion import (
+    TWO_DIMENSIONAL_SOURCE_WEIGHTS,
+    DiffusionResult,
+    DiffusionSpectrum,
+    area_factors,
+    diffusion_spectrum,
+    directional_diffusion,
+    directional_diffusion_coefficient,
+    normalized_diffusion_coefficient,
+    random_incidence_diffusion,
 )
 from .materials.resilient.dynamic_stiffness import (
     DynamicStiffnessResult,
@@ -1217,6 +1235,10 @@ from .signals.miso import (
     MISOCoherenceResult,
     miso_coherence,
 )
+from .signals.multitaper import (
+    MultitaperSpectralDensityResult,
+    multitaper_psd,
+)
 from .signals.phase import (
     PhaseDecompositionResult,
     excess_phase,
@@ -1227,16 +1249,12 @@ from .signals.phase import (
 from .signals.spectra import (
     CoherentOutputSpectrumResult,
     CrossSpectralDensityResult,
-    MultitaperSpectralDensityResult,
     SpectralDensityResult,
-    WindowMetricsResult,
     coherent_output_spectrum,
     cross_spectral_density,
     fractional_octave_smoothing,
-    multitaper_psd,
     power_spectral_density,
     resolution_bias_error,
-    window_metrics,
 )
 from .signals.synchronous_average import (
     SynchronousAverageResult,
@@ -1256,6 +1274,10 @@ from .signals.time_frequency import (
     ZoomFFTResult,
     spectrogram,
     zoom_fft,
+)
+from .signals.windows import (
+    WindowMetricsResult,
+    window_metrics,
 )
 from .simulation.elastic_fdtd import (
     AIR,

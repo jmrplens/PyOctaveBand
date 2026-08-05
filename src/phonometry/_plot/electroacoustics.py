@@ -25,11 +25,9 @@ from .common import (
 if TYPE_CHECKING:
     from matplotlib.axes import Axes
 
-    from ..electroacoustics.distortion import (
-        HarmonicDistortionResult,
-        ModulationDistortionResult,
-    )
+    from ..electroacoustics.distortion import HarmonicDistortionResult
     from ..electroacoustics.frequency_response import FrequencyResponseResult
+    from ..electroacoustics.intermodulation import ModulationDistortionResult
     from ..electroacoustics.loudspeaker import LoudspeakerCharacteristics
     from ..electroacoustics.microphone import MicrophoneCharacteristics
     from ..electroacoustics.piston import PistonDirectivity, RadiatingPistonResult
@@ -203,7 +201,7 @@ def plot_modulation_distortion(
     RMS — the modulation counterpart of :func:`plot_harmonic_distortion`.
 
     :param result: A
-        :class:`~phonometry.electroacoustics.distortion.ModulationDistortionResult`.
+        :class:`~phonometry.electroacoustics.intermodulation.ModulationDistortionResult`.
     :param ax: Existing axes, or ``None`` to create a figure.
     :param language: Label language, ``"en"`` (default) or ``"es"``.
     :param kwargs: Forwarded to the sideband marker ``plot`` call.

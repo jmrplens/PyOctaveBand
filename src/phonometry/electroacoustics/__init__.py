@@ -9,24 +9,25 @@ from .._plot.geometry import (
 )
 from .distortion import (
     HarmonicDistortionResult,
-    ModulationDistortionResult,
-    difference_frequency_distortion,
-    dynamic_intermodulation_distortion,
-    dynamic_range,
     harmonic_analysis,
     harmonic_distortion,
-    idle_channel_noise,
     itu_r_468_weighting,
-    modulation_distortion,
     sinad,
     thd,
     thd_plus_noise,
-    total_difference_frequency_distortion,
     weighted_thd,
 )
 from .frequency_response import FrequencyResponseResult, coherence, transfer_function
+from .intermodulation import (
+    ModulationDistortionResult,
+    difference_frequency_distortion,
+    dynamic_intermodulation_distortion,
+    modulation_distortion,
+    total_difference_frequency_distortion,
+)
 from .loudspeaker import LoudspeakerCharacteristics, loudspeaker_characteristics
 from .microphone import MicrophoneCharacteristics, microphone_characteristics
+from .noise_measurements import dynamic_range, idle_channel_noise
 from .piston import (
     PistonDirectivity,
     RadiatingPistonResult,

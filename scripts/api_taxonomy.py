@@ -57,6 +57,7 @@ _SECTION_LIST: tuple[Section, ...] = (
             "phonometry.filters.equalizer",
             "phonometry.filters.frequencies",
             "phonometry.filters.compliance",
+            "phonometry.filters.weighting_compliance",
         ),
     ),
     Section(
@@ -66,6 +67,8 @@ _SECTION_LIST: tuple[Section, ...] = (
         modules=(
             "phonometry.signals.levels",
             "phonometry.signals.spectra",
+            "phonometry.signals.multitaper",
+            "phonometry.signals.windows",
             "phonometry.signals.miso",
             "phonometry.signals.time_frequency",
             "phonometry.signals.test_signals",
@@ -151,6 +154,7 @@ _SECTION_LIST: tuple[Section, ...] = (
         label_es="Acústica de la edificación",
         modules=(
             "phonometry.building.measurement.insulation",
+            "phonometry.building.measurement.ratings",
             "phonometry.building.prediction.panel_transmission",
             "phonometry.building.prediction.masonry_cavity_wall",
             "phonometry.building.measurement.heavy_impact",
@@ -166,6 +170,7 @@ _SECTION_LIST: tuple[Section, ...] = (
             "phonometry.building.measurement.uncertainty",
             "phonometry.building.measurement.floor_covering_improvement",
             "phonometry.building.prediction.resilient_layers",
+            "phonometry.building.prediction.linings",
             "phonometry.building.measurement.structure_borne_power",
             "phonometry.building.prediction.installed_structure_borne",
             "phonometry.building.regulation.spain",
@@ -182,10 +187,14 @@ _SECTION_LIST: tuple[Section, ...] = (
             "phonometry.materials.absorbers.airflow_resistance",
             "phonometry.materials.resilient.dynamic_stiffness",
             "phonometry.materials.absorbers.impedance_tube",
+            "phonometry.materials.absorbers.four_microphone",
+            "phonometry.materials.absorbers.standing_wave",
             "phonometry.materials.absorbers.porous",
+            "phonometry.materials.absorbers.layered",
             "phonometry.materials.absorbers.biot",
             "phonometry.materials.absorbers.slow_sound",
             "phonometry.materials.diffusers.scattering_diffusion",
+            "phonometry.materials.diffusers.reverberation_room_scattering",
             "phonometry.materials.diffusers.design",
             "phonometry.materials.diffusers.metadiffuser",
             "phonometry.materials.surfaces.road_absorption",
@@ -235,6 +244,7 @@ _SECTION_LIST: tuple[Section, ...] = (
             "phonometry.aircraft.airport_noise",
             "phonometry.aircraft.anp_fleet",
             "phonometry.aircraft.rotorcraft_noise",
+            "phonometry.aircraft.rotorcraft_propagation",
             "phonometry.aircraft.measurement_system",
         ),
     ),
@@ -264,6 +274,7 @@ _SECTION_LIST: tuple[Section, ...] = (
         label_es="Potencia acústica e intensidad",
         modules=(
             "phonometry.emission.sound_power",
+            "phonometry.emission.sound_power_anechoic",
             "phonometry.emission.sound_power_intensity",
             "phonometry.emission.sound_power_reverberation",
             "phonometry.emission.intensity",
@@ -278,6 +289,8 @@ _SECTION_LIST: tuple[Section, ...] = (
         label_es="Electroacústica",
         modules=(
             "phonometry.electroacoustics.distortion",
+            "phonometry.electroacoustics.intermodulation",
+            "phonometry.electroacoustics.noise_measurements",
             "phonometry.electroacoustics.frequency_response",
             "phonometry.electroacoustics.swept_sine",
             "phonometry.electroacoustics.piston",
@@ -359,6 +372,10 @@ OBJECT_MODULE_OVERRIDES: dict[str, str] = {
     "CAM_C": "phonometry.psychoacoustics.erb_scale",
     # Defined in phonometry._internal.warnings, exported at the top level.
     "PhonometryWarning": "phonometry",
+    # Defined in phonometry.emission._shared, where the three sound power
+    # standards share it; documented with the free-field method that raises it
+    # most often.
+    "SoundPowerWarning": "phonometry.emission.sound_power",
     # Defined in phonometry._plot.room; documented helper for the ISO 18233
     # excitation signals that live in room.impulse_response.
     "plot_excitation": "phonometry.room.impulse_response",

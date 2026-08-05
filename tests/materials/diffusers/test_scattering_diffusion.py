@@ -37,32 +37,34 @@ from reference_data import (
     ISO17497_2_QRD_LEVELS,
 )
 
-from phonometry.materials.diffusers.scattering_diffusion import (
+from phonometry.materials.diffusers.reverberation_room_scattering import (
     BASE_PLATE_BANDS,
     BASE_PLATE_MAX_SCATTERING,
-    TWO_DIMENSIONAL_SOURCE_WEIGHTS,
-    DiffusionResult,
-    DiffusionSpectrum,
     ScatteringDiffusionWarning,
     ScatteringResult,
     ScatteringUncertainty,
     absorption_coefficient_uncertainty,
     air_attenuation_coefficient,
-    area_factors,
     base_plate_scattering,
     check_base_plate_scattering,
-    diffusion_spectrum,
-    directional_diffusion,
-    directional_diffusion_coefficient,
-    normalized_diffusion_coefficient,
     random_incidence_absorption,
-    random_incidence_diffusion,
     reverberation_time_uncertainty,
     scattering_coefficient,
     scattering_coefficient_spectrum,
     scattering_coefficient_uncertainty,
     specular_absorption_coefficient,
     speed_of_sound,
+)
+from phonometry.materials.diffusers.scattering_diffusion import (
+    TWO_DIMENSIONAL_SOURCE_WEIGHTS,
+    DiffusionResult,
+    DiffusionSpectrum,
+    area_factors,
+    diffusion_spectrum,
+    directional_diffusion,
+    directional_diffusion_coefficient,
+    normalized_diffusion_coefficient,
+    random_incidence_diffusion,
 )
 
 # Fixed synthetic geometry for the scattering end-to-end oracle.
@@ -687,26 +689,31 @@ def test_diffusion_spectrum_plot_returns_axes() -> None:
 
 
 def test_public_names_in_module_all() -> None:
-    import phonometry.materials.diffusers.scattering_diffusion as mod
+    import phonometry.materials.diffusers.reverberation_room_scattering as part1
+    import phonometry.materials.diffusers.scattering_diffusion as part2
 
     for name in (
         "random_incidence_absorption",
         "specular_absorption_coefficient",
         "scattering_coefficient",
         "base_plate_scattering",
+        "BASE_PLATE_MAX_SCATTERING",
+        "ScatteringDiffusionWarning",
+    ):
+        assert name in part1.__all__
+    for name in (
         "directional_diffusion_coefficient",
         "normalized_diffusion_coefficient",
         "area_factors",
         "random_incidence_diffusion",
-        "BASE_PLATE_MAX_SCATTERING",
-        "ScatteringDiffusionWarning",
     ):
-        assert name in mod.__all__
+        assert name in part2.__all__
 
 
 def test_public_exports() -> None:
     import phonometry
-    import phonometry.materials.diffusers.scattering_diffusion as m
+    import phonometry.materials.diffusers.reverberation_room_scattering as part1
+    import phonometry.materials.diffusers.scattering_diffusion as part2
 
-    for name in m.__all__:
+    for name in (*part1.__all__, *part2.__all__):
         assert hasattr(phonometry, name), name

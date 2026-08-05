@@ -13,7 +13,7 @@ element sound reduction index `R` as a *measured* input, this module
 **predicts** `R(f)` from the physical properties of the construction: the mass
 per unit area, bending stiffness (through the coincidence frequency) and loss
 factor. The prediction feeds the same ISO 717-1 weighting
-([`phonometry.weighted_rating`](/phonometry/reference/api/building/insulation/#weighted_rating)) as the measured quantities, closing the
+([`phonometry.weighted_rating`](/phonometry/reference/api/building/ratings/#weighted_rating)) as the measured quantities, closing the
 chain from panel physics to the single-number `Rw`.
 
 **Mass law (Bies Eq. 7.40/7.42).** A non-stiff panel transmits by forced motion;
@@ -817,7 +817,7 @@ SoundReductionResult.rating(
 
 Single-number weighted rating `Rw` of the predicted `R(f)`.
 
-Delegates to [`phonometry.weighted_rating`](/phonometry/reference/api/building/insulation/#weighted_rating) (ISO 717-1); requires
+Delegates to [`phonometry.weighted_rating`](/phonometry/reference/api/building/ratings/#weighted_rating) (ISO 717-1); requires
 the spectrum to be on the 16 one-third-octave bands (100 Hz to
 3150 Hz) or the 5 octave bands (125 Hz to 2000 Hz).
 
@@ -825,9 +825,9 @@ the spectrum to be on the 16 one-third-octave bands (100 Hz to
 
 | Name | Description |
 | :--- | :--- |
-| `bands` | Band set forwarded to [`phonometry.weighted_rating`](/phonometry/reference/api/building/insulation/#weighted_rating). |
+| `bands` | Band set forwarded to [`phonometry.weighted_rating`](/phonometry/reference/api/building/ratings/#weighted_rating). |
 
-**Returns:** The [`WeightedRatingResult`](/phonometry/reference/api/building/insulation/#weightedratingresult).
+**Returns:** The [`WeightedRatingResult`](/phonometry/reference/api/building/ratings/#weightedratingresult).
 
 ### SoundReductionResult.report()
 

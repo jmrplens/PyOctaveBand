@@ -31,10 +31,12 @@ if TYPE_CHECKING:
     from ..aircraft.certification import EPNLResult
     from ..aircraft.rotorcraft_noise import (
         FlightPathKinematics,
-        MeanGroundPlaneResult,
         RotorcraftEventResult,
         RotorcraftHemisphere,
         RotorcraftNoiseContourResult,
+    )
+    from ..aircraft.rotorcraft_propagation import (
+        MeanGroundPlaneResult,
         TerrainScreeningResult,
     )
 
@@ -418,7 +420,7 @@ def plot_mean_ground_plane(
     """Terrain section with its fitted mean ground plane (ECAC Doc 32 guidance).
 
     :param result: A
-        :class:`~phonometry.aircraft.rotorcraft_noise.MeanGroundPlaneResult`.
+        :class:`~phonometry.aircraft.rotorcraft_propagation.MeanGroundPlaneResult`.
     :param ax: Existing axes, or ``None`` to create a figure.
     :param language: Label language, ``"en"`` (default) or ``"es"``.
     :param kwargs: Forwarded to the terrain ``plot``.
@@ -450,7 +452,7 @@ def plot_terrain_screening(
     """Terrain screening section: profile, line of sight and diffracted path.
 
     :param result: A
-        :class:`~phonometry.aircraft.rotorcraft_noise.TerrainScreeningResult`.
+        :class:`~phonometry.aircraft.rotorcraft_propagation.TerrainScreeningResult`.
     :param ax: Existing axes, or ``None`` to create a figure.
     :param language: Label language, ``"en"`` (default) or ``"es"``.
     :param kwargs: Forwarded to the terrain ``plot``.

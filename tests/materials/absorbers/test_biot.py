@@ -670,7 +670,7 @@ def test_two_bonded_materials_reduce_to_the_two_layer_equivalent_fluid() -> None
     Two *different* bonded poroelastic layers, 0,94 and 0,98 porosity on two
     different Johnson-Champoux-Allard media, driven to the rigid-frame limit of
     A&A Sect. 11.3.4. The result must converge on the same two-layer stack
-    built from :class:`~phonometry.materials.absorbers.porous.PorousLayer`,
+    built from :class:`~phonometry.materials.absorbers.layered.PorousLayer`,
     whose equivalent-fluid path is pinned on published digits and never touches
     ``[Ipp]``. Unlike the equal-porosity split, this exercises the ``phi2/phi1``
     and ``phi1/phi2`` entries of Eq. (11.67), and it is a convergence test: the
@@ -900,7 +900,7 @@ def test_rigid_frame_limit_converges_on_the_jca_equivalent_fluid(
     dynamic behaviour of the material when its frame is supposed motionless",
     and it is then represented by the equivalent-fluid matrix Eq. (11.9) with
     ``rho_eq``, ``K_eq`` - which is exactly what
-    :class:`~phonometry.materials.absorbers.porous.PorousLayer` builds from a
+    :class:`~phonometry.materials.absorbers.layered.PorousLayer` builds from a
     :func:`~phonometry.materials.absorbers.porous.johnson_champoux_allard`
     medium, whose conformance is pinned on published digits.
 
@@ -1192,7 +1192,7 @@ def test_packing_refuses_more_blocks_than_the_assembly_resolves() -> None:
     over half a budget open a block each. Six terms of 10,5 nepers sum to 63,
     inside a 20-neper budget over four blocks, and still pack into six.
     """
-    from phonometry.materials.absorbers.porous import _split_fluid_run
+    from phonometry.materials.absorbers.layered import _split_fluid_run
 
     terms = [("fluid", 1 + 0j, 10.5j)] * 6
     with pytest.raises(ValueError, match="pack into 6 chain blocks"):
