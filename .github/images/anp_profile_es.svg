@@ -178,7 +178,7 @@ L 684.443459 28.318125
      </g>
     </g>
     <g id="text_10">
-     <text style="font-size: 10px; font-family: sans-serif; text-anchor: middle" x="379.829609" y="415.114219" transform="rotate(-0 379.829609 415.114219)">Along-track distance [km]</text>
+     <text style="font-size: 10px; font-family: sans-serif; text-anchor: middle" x="379.829609" y="415.114219" transform="rotate(-0 379.829609 415.114219)">Distancia sobre la ruta [km]</text>
     </g>
    </g>
    <g id="matplotlib.axis_2">
@@ -293,7 +293,7 @@ L 706.008438 49.727935
      </g>
     </g>
     <g id="text_18">
-     <text style="font-size: 10px; font-family: sans-serif; text-anchor: middle" x="14.798438" y="207.416953" transform="rotate(-90 14.798438 207.416953)">Altitude AFE [m]</text>
+     <text style="font-size: 10px; font-family: sans-serif; text-anchor: middle" x="14.798438" y="207.416953" transform="rotate(-90 14.798438 207.416953)">Altitud AFE [m]</text>
     </g>
    </g>
    <g id="line2d_33">
@@ -392,10 +392,10 @@ z
    <g id="legend_1">
     <g id="patch_8">
      <path d="M 59.481781 47.477776 
-L 131.223906 47.477776 
-Q 132.889906 47.477776 132.889906 45.811776 
-L 132.889906 34.149125 
-Q 132.889906 32.483125 131.223906 32.483125 
+L 148.31993 47.477776 
+Q 149.98593 47.477776 149.98593 45.811776 
+L 149.98593 34.149125 
+Q 149.98593 32.483125 148.31993 32.483125 
 L 59.481781 32.483125 
 Q 57.815781 32.483125 57.815781 34.149125 
 L 57.815781 45.811776 
@@ -409,7 +409,7 @@ z
      </g>
     </g>
     <g id="text_21">
-     <text style="font-size: 8.33px; font-family: sans-serif; text-anchor: start" x="84.471781" y="42.144623" transform="rotate(-0 84.471781 42.144623)">ground roll</text>
+     <text style="font-size: 8.33px; font-family: sans-serif; text-anchor: start" x="84.471781" y="42.144623" transform="rotate(-0 84.471781 42.144623)">rodaje en pista</text>
     </g>
    </g>
   </g>

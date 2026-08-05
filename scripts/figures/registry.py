@@ -368,8 +368,6 @@ from .vibration import (
 )
 
 _FIGURE_FUNCS: tuple[Callable[[str], None], ...] = (
-    generate_anp_npd,
-    generate_anp_profile,
     generate_filter_type_comparison,
     generate_filter_responses,
     generate_signal_responses,
@@ -628,6 +626,9 @@ _FIGURE_FUNCS: tuple[Callable[[str], None], ...] = (
     generate_airport_noise,
     generate_airport_contour,
     generate_airport_sor,
+    # The EASA ANP fleet database that feeds that chain for a real aircraft.
+    generate_anp_npd,
+    generate_anp_profile,
     generate_rotorcraft_ground_effect,
     generate_rotorcraft_flyover_event,
     generate_rotorcraft_terrain_screening,

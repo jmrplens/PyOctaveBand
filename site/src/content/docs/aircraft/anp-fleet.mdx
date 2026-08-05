@@ -45,14 +45,26 @@ print(len(db.aircraft_ids))          # 155 aircraft types
 aircraft = db.aircraft("747100")
 print(aircraft.description)          # Boeing 747-100 / JT9DBD
 print(aircraft.engine_type, aircraft.num_engines, aircraft.weight_class)
+print(aircraft.power_parameter, aircraft.mounting)
 ```
 
-An `AnpAircraft` carries the metadata the Doc 29 chain needs downstream: the
-engine type and count, the ICAO wake weight class, and the **power parameter**
-the NPD table is indexed by. That last one matters because it is not a force in
-newtons but whatever quantity the manufacturer tabulated against, corrected net
-thrust in pounds for most jets, and the value you pass later has to be in those
-units.
+An `AnpAircraft` describes itself with the engine type and count and the ICAO
+wake weight class, and carries two fields you will use directly.
+
+The **power parameter** names the quantity the NPD table is indexed by. It
+matters because it is not a force in newtons but whatever the manufacturer
+tabulated against, corrected net thrust in pounds for most jets, so a power you
+pass to `level` has to be in those units.
+
+The engine **mounting** is the one field of the record that the Doc 29 chain
+itself reads. It is derived from the ANP lateral directivity identifier and is
+one of `"wing"`, `"fuselage"` or `"propeller"`, which selects the
+engine-installation correction that the
+[airport-noise guide](/phonometry/aircraft/airport-noise/) applies by hand.
+The choice is not cosmetic: at small depression angles wing and fuselage
+mountings differ by more than a decibel, propellers take none of that
+correction, and the shipped fleet splits 70 / 55 / 30 across the three. An
+identifier the database does not recognise falls back to `"wing"`.
 
 ## 2. The noise-power-distance curves
 
@@ -208,15 +220,20 @@ work unchanged.
 
 ## What this guide covers
 
-- Opening the shipped EASA ANP database, or another CSV export, with
-  `load_anp_database`.
-- What one aircraft record holds: metadata, the power parameter its NPD table is
-  indexed by, the NPD curves per operation and metric, and the default profiles.
-- Reading and interpolating the NPD surface, and drawing the curve family.
-- The fixed-point trajectories, the stage-length bins, and why most aircraft
-  carry procedural steps this bridge does not fly.
-- Running the Doc 29 single-event level and ground-grid contour straight from an
-  aircraft identifier.
+**Covered.** Opening the shipped EASA ANP database (or another ANP CSV export)
+with `load_anp_database`; what one aircraft record holds, including the power
+parameter its NPD table is indexed by and the engine mounting the Doc 29 chain
+reads; reading and interpolating the NPD surface with `npd_curves` and `level`;
+the default fixed-point trajectories and their stage-length bins; and running
+the Doc 29 single-event level and ground-grid contour from an aircraft
+identifier through `event_level` and `noise_contour`.
+
+**Not covered.** The procedural-step profiles, which are how most ANP entries
+describe a departure: turning those into a flight path needs the ICAO Doc 9911
+flight-mechanics performance model, which this bridge does not implement, so
+only the 13 aircraft with fixed-point profiles have a ready-to-use trajectory.
+The database is also read, never written: phonometry ships version 2.3 and does
+not update it.
 
 ## See also
 
@@ -226,3 +243,5 @@ Pages elsewhere on the site that this section leans on:
   itself, built from a hand-written NPD table and flight path.
 - [Aircraft noise: Effective Perceived Noise Level](/phonometry/aircraft/aircraft-noise/):
   the certification metric, which is measured rather than tabulated.
+- API reference:
+  [`aircraft.anp_fleet`](/phonometry/reference/api/aeroacoustics/anp-fleet/).

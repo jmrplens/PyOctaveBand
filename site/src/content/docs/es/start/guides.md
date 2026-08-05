@@ -1,6 +1,6 @@
 ---
 title: "Guías"
-description: "Las 104 guías de phonometry, agrupadas en los diez temas que cubre la biblioteca: para qué sirve cada área, las normas que implementa y un resumen de una línea de cada guía que contiene."
+description: "Las 105 guías de phonometry, agrupadas en los diez temas que cubre la biblioteca: para qué sirve cada área, las normas que implementa y un resumen de una línea de cada guía que contiene."
 head:
   - tag: script
     attrs:
@@ -97,7 +97,7 @@ hay ninguna panorámica del campo: cada página es la documentación de trabajo 
 un módulo, escrita para que un resultado se pueda defender apartado por
 apartado en lugar de darlo por bueno.
 
-Esta página es el mapa. Ciento cuatro guías repartidas en diez temas, y cada
+Esta página es el mapa. Ciento cinco guías repartidas en diez temas, y cada
 área tiene su propio índice con el relato largo de cómo encajan sus piezas. Si
 llegas sin una pregunta concreta, lee primero la
 [introducción](/phonometry/es/start/getting-started/): recorre una señal por toda la
@@ -495,6 +495,9 @@ ECAC Doc 29/32.
 - [Ruido de rotorcraft: el método del hemisferio](/phonometry/es/aircraft/rotorcraft-noise/):
   el modelo de fuente en hemisferio con sus ajustes de propagación, la
   interpolación de condiciones de vuelo y los contornos de suceso único.
+- [La base de datos ANP de flota](/phonometry/es/aircraft/anp-fleet/): las tablas
+  de EASA con curvas nivel-potencia-distancia y trayectorias por defecto, y la
+  cadena de Doc 29 ejecutada desde un identificador de aeronave.
 
 ## [Acústica submarina](/phonometry/es/underwater/)
 

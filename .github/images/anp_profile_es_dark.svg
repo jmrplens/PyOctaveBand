@@ -178,7 +178,7 @@ L 684.443459 28.318125
      </g>
     </g>
     <g id="text_10">
-     <text style="font-size: 10px; font-family: sans-serif; text-anchor: middle; fill: #ffffff" x="379.829609" y="415.114219" transform="rotate(-0 379.829609 415.114219)">Along-track distance [km]</text>
+     <text style="font-size: 10px; font-family: sans-serif; text-anchor: middle; fill: #ffffff" x="379.829609" y="415.114219" transform="rotate(-0 379.829609 415.114219)">Distancia sobre la ruta [km]</text>
     </g>
    </g>
    <g id="matplotlib.axis_2">
@@ -293,7 +293,7 @@ L 706.008438 49.727935
      </g>
     </g>
     <g id="text_18">
-     <text style="font-size: 10px; font-family: sans-serif; text-anchor: middle; fill: #ffffff" x="14.798438" y="207.416953" transform="rotate(-90 14.798438 207.416953)">Altitude AFE [m]</text>
+     <text style="font-size: 10px; font-family: sans-serif; text-anchor: middle; fill: #ffffff" x="14.798438" y="207.416953" transform="rotate(-90 14.798438 207.416953)">Altitud AFE [m]</text>
     </g>
    </g>
    <g id="line2d_33">
@@ -308,9 +308,9 @@ L 305.269763 254.861861
 L 401.76194 191.135241 
 L 513.553612 126.008395 
 L 676.355817 44.599837 
-" clip-path="url(#p145b06fc32)" style="fill: none; stroke: #8dd3c7; stroke-width: 1.5; stroke-linecap: square"/>
+" clip-path="url(#p145b06fc32)" style="fill: none; stroke: #1f77b4; stroke-width: 1.5; stroke-linecap: square"/>
     <defs>
-     <path id="m08d97afdbe" d="M 0 1.5 
+     <path id="m6a7671b2ea" d="M 0 1.5 
 C 0.397805 1.5 0.77937 1.341951 1.06066 1.06066 
 C 1.341951 0.77937 1.5 0.397805 1.5 0 
 C 1.5 -0.397805 1.341951 -0.77937 1.06066 -1.06066 
@@ -320,20 +320,20 @@ C -1.341951 -0.77937 -1.5 -0.397805 -1.5 0
 C -1.5 0.397805 -1.341951 0.77937 -1.06066 1.06066 
 C -0.77937 1.341951 -0.397805 1.5 0 1.5 
 z
-" style="stroke: #8dd3c7"/>
+" style="stroke: #1f77b4"/>
     </defs>
     <g clip-path="url(#p145b06fc32)">
-     <use xlink:href="#m08d97afdbe" x="83.303402" y="370.23407" style="fill: #8dd3c7; stroke: #8dd3c7"/>
-     <use xlink:href="#m08d97afdbe" x="103.266037" y="370.23407" style="fill: #8dd3c7; stroke: #8dd3c7"/>
-     <use xlink:href="#m08d97afdbe" x="127.823101" y="337.670646" style="fill: #8dd3c7; stroke: #8dd3c7"/>
-     <use xlink:href="#m08d97afdbe" x="152.604619" y="317.904648" style="fill: #8dd3c7; stroke: #8dd3c7"/>
-     <use xlink:href="#m08d97afdbe" x="157.185306" y="315.950843" style="fill: #8dd3c7; stroke: #8dd3c7"/>
-     <use xlink:href="#m08d97afdbe" x="252.115469" y="275.279127" style="fill: #8dd3c7; stroke: #8dd3c7"/>
-     <use xlink:href="#m08d97afdbe" x="255.821245" y="272.5438" style="fill: #8dd3c7; stroke: #8dd3c7"/>
-     <use xlink:href="#m08d97afdbe" x="305.269763" y="254.861861" style="fill: #8dd3c7; stroke: #8dd3c7"/>
-     <use xlink:href="#m08d97afdbe" x="401.76194" y="191.135241" style="fill: #8dd3c7; stroke: #8dd3c7"/>
-     <use xlink:href="#m08d97afdbe" x="513.553612" y="126.008395" style="fill: #8dd3c7; stroke: #8dd3c7"/>
-     <use xlink:href="#m08d97afdbe" x="676.355817" y="44.599837" style="fill: #8dd3c7; stroke: #8dd3c7"/>
+     <use xlink:href="#m6a7671b2ea" x="83.303402" y="370.23407" style="fill: #1f77b4; stroke: #1f77b4"/>
+     <use xlink:href="#m6a7671b2ea" x="103.266037" y="370.23407" style="fill: #1f77b4; stroke: #1f77b4"/>
+     <use xlink:href="#m6a7671b2ea" x="127.823101" y="337.670646" style="fill: #1f77b4; stroke: #1f77b4"/>
+     <use xlink:href="#m6a7671b2ea" x="152.604619" y="317.904648" style="fill: #1f77b4; stroke: #1f77b4"/>
+     <use xlink:href="#m6a7671b2ea" x="157.185306" y="315.950843" style="fill: #1f77b4; stroke: #1f77b4"/>
+     <use xlink:href="#m6a7671b2ea" x="252.115469" y="275.279127" style="fill: #1f77b4; stroke: #1f77b4"/>
+     <use xlink:href="#m6a7671b2ea" x="255.821245" y="272.5438" style="fill: #1f77b4; stroke: #1f77b4"/>
+     <use xlink:href="#m6a7671b2ea" x="305.269763" y="254.861861" style="fill: #1f77b4; stroke: #1f77b4"/>
+     <use xlink:href="#m6a7671b2ea" x="401.76194" y="191.135241" style="fill: #1f77b4; stroke: #1f77b4"/>
+     <use xlink:href="#m6a7671b2ea" x="513.553612" y="126.008395" style="fill: #1f77b4; stroke: #1f77b4"/>
+     <use xlink:href="#m6a7671b2ea" x="676.355817" y="44.599837" style="fill: #1f77b4; stroke: #1f77b4"/>
     </g>
    </g>
    <g id="line2d_34">
@@ -392,10 +392,10 @@ z
    <g id="legend_1">
     <g id="patch_8">
      <path d="M 59.481781 47.477776 
-L 131.223906 47.477776 
-Q 132.889906 47.477776 132.889906 45.811776 
-L 132.889906 34.149125 
-Q 132.889906 32.483125 131.223906 32.483125 
+L 148.31993 47.477776 
+Q 149.98593 47.477776 149.98593 45.811776 
+L 149.98593 34.149125 
+Q 149.98593 32.483125 148.31993 32.483125 
 L 59.481781 32.483125 
 Q 57.815781 32.483125 57.815781 34.149125 
 L 57.815781 45.811776 
@@ -409,7 +409,7 @@ z
      </g>
     </g>
     <g id="text_21">
-     <text style="font-size: 8.33px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="84.471781" y="42.144623" transform="rotate(-0 84.471781 42.144623)">ground roll</text>
+     <text style="font-size: 8.33px; font-family: sans-serif; text-anchor: start; fill: #ffffff" x="84.471781" y="42.144623" transform="rotate(-0 84.471781 42.144623)">rodaje en pista</text>
     </g>
    </g>
   </g>

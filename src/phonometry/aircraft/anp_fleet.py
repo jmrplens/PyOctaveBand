@@ -579,9 +579,3 @@ def load_anp_database(path: Path | str | None = None) -> AnpDatabase:
     npd, distances = _parse_npd(_pick("npd", tables))
     profiles = _parse_profiles(_pick("fixed_point", tables))
     return AnpDatabase(aircraft=aircraft, npd=npd, distances=distances, profiles=profiles)
-
-
-# ---------------------------------------------------------------------------
-# Self-contained plotting (lazy matplotlib; labels local to this module so the
-# shared _plot string tables stay untouched).
-# ---------------------------------------------------------------------------

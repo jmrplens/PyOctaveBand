@@ -30,6 +30,11 @@ Chien-Soroka ground effect, interpolates between the measured flight
 conditions along the track, and integrates the received history into the
 single-event SEL, LASmax and EPNL and their ground-grid contours.
 
+[The ANP fleet database](anp-fleet.md) closes the loop on
+the two above: the noise-power-distance tables and default trajectories EASA and
+EUROCONTROL publish for real aircraft types, ready to feed the Doc 29 chain
+without writing a table by hand.
+
 The shared physics connects outward: atmospheric absorption comes from the
 same ISO 9613-1 model as
 [Outdoor Sound Propagation](../environment/propagation/outdoor-propagation.md), and the

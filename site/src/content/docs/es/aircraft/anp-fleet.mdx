@@ -1,6 +1,6 @@
 ---
 title: "La base de datos ANP de flota"
-description: "Ejecutar la cadena de ECAC Doc 29 con una aeronave real: la base de datos ANP de EASA con sus curvas ruido-potencia-distancia y sus trayectorias por defecto, sus perfiles de punto fijo, y los niveles de evento y contornos que alimentan."
+description: "Ejecutar la cadena de ECAC Doc 29 con una aeronave real: la base de datos ANP de EASA con sus curvas nivel-potencia-distancia y sus trayectorias por defecto, sus perfiles de punto fijo, y los niveles de evento y contornos que alimentan."
 references:
   - type: web
     organization: "European Union Aviation Safety Agency"
@@ -15,13 +15,13 @@ references:
     title: "Report on standard method of computing noise contours around civil airports, Volume 2: Technical guide"
     number: "ECAC.CEAC Doc 29, 4th ed."
     url: "https://www.ecac-ceac.org/images/documents/ECAC-Doc_29_4th_edition_Dec_2016_Volume_2.pdf"
-    note: "Las convenciones NPD y de perfil que sigue la base, y la cadena de evento único que alimentan los registros de aeronave. El PDF enlazado es la descarga libre; los volúmenes están catalogados en la página de documentos de ECAC (https://www.ecac-ceac.org/documents/ecac-documents-and-international-agreements)."
+    note: "Las convenciones NPD y de perfil que sigue la base, y la cadena de evento único que alimentan los registros de aeronave. El PDF enlazado es la descarga gratuita; los volúmenes están catalogados en la página de documentos de ECAC (https://www.ecac-ceac.org/documents/ecac-documents-and-international-agreements)."
 ---
 
 import ThemeImage from '../../../../components/ThemeImage.astro';
 
 [Ruido de aeropuertos (ECAC Doc 29)](/phonometry/es/aircraft/airport-noise/)
-calcula un nivel de evento a partir de una tabla ruido-potencia-distancia y una
+calcula un nivel de evento a partir de una tabla nivel-potencia-distancia y una
 trayectoria. Esa guía aporta ambas a mano, que es lo que quieres mientras
 aprendes el método y lo que no quieres nunca después: en un estudio real los
 números salen de la base de datos **Aircraft Noise and Performance (ANP)** que
@@ -45,16 +45,28 @@ print(len(db.aircraft_ids))          # 155 tipos de aeronave
 aircraft = db.aircraft("747100")
 print(aircraft.description)          # Boeing 747-100 / JT9DBD
 print(aircraft.engine_type, aircraft.num_engines, aircraft.weight_class)
+print(aircraft.power_parameter, aircraft.mounting)
 ```
 
-Un `AnpAircraft` lleva los metadatos que la cadena de Doc 29 necesita después:
-el tipo y número de motores, la clase de estela OACI y el **parámetro de
-potencia** con el que está indexada la tabla NPD. Esto último importa porque no
-es una fuerza en newtons sino la magnitud que tabuló el fabricante, empuje neto
-corregido en libras para la mayoría de reactores, y el valor que pases luego
-tiene que ir en esas unidades.
+Un `AnpAircraft` se describe con el tipo y número de motores y la clase de
+estela OACI, y lleva dos campos que usarás directamente.
 
-## 2. Las curvas ruido-potencia-distancia
+El **parámetro de potencia** nombra la magnitud con la que está indexada la
+tabla NPD. Importa porque no es una fuerza en newtons sino lo que tabuló el
+fabricante, empuje neto corregido en libras para la mayoría de reactores, así
+que la potencia que pases a `level` tiene que ir en esas unidades.
+
+El **montaje** de los motores es el único campo del registro que lee la propia
+cadena de Doc 29. Se deriva del identificador de directividad lateral de ANP y
+vale `"wing"`, `"fuselage"` o `"propeller"`, que selecciona la corrección por
+instalación de motores que la
+[guía de ruido de aeropuertos](/phonometry/es/aircraft/airport-noise/) aplica a
+mano. La elección no es cosmética: a ángulos de depresión pequeños el montaje
+en ala y en fuselaje difieren en más de un decibelio, las hélices no reciben
+esa corrección, y la flota distribuida se reparte 70 / 55 / 30 entre los tres.
+Un identificador que la base no reconoce cae a `"wing"`.
+
+## 2. Las curvas nivel-potencia-distancia
 
 `npd_curves` devuelve la superficie NPD tabulada para una operación (`"D"` de
 despegue, `"A"` de aproximación) y una métrica (`"SEL"` o `"LAmax"`): un nivel
@@ -62,7 +74,7 @@ por cada combinación de reglaje de potencia y distancia oblicua. Entre los nodo
 tabulados la interpolación de Doc 29 es logarítmica en distancia y lineal en
 potencia, que es lo que dibujan las curvas de abajo.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anp_npd_es.svg" alt="Curvas ruido-potencia-distancia de un Boeing 747-100 para tres reglajes de empuje tabulados, con el nivel cayendo con la distancia oblicua en eje logarítmico y marcadores en los nodos tabulados" width="82%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anp_npd_es.svg" alt="Curvas nivel-potencia-distancia de un Boeing 747-100 para tres reglajes de empuje tabulados, con el nivel cayendo con la distancia oblicua en eje logarítmico y marcadores en los nodos tabulados" width="82%" />
 
 <details>
 <summary>Ver el código de esta figura</summary>
@@ -210,16 +222,21 @@ desglose por segmentos funcionan igual.
 
 ## Qué cubre esta guía
 
-- Abrir la base ANP de EASA distribuida con el paquete, u otra exportación CSV,
-  con `load_anp_database`.
-- Qué contiene el registro de una aeronave: metadatos, el parámetro de potencia
-  con el que se indexa su tabla NPD, las curvas NPD por operación y métrica, y
-  los perfiles por defecto.
-- Leer e interpolar la superficie NPD, y dibujar la familia de curvas.
-- Las trayectorias de punto fijo, los tramos de etapa, y por qué la mayoría de
-  aeronaves llevan pasos procedimentales que este puente no vuela.
-- Ejecutar el nivel de evento único y el contorno en malla de Doc 29 partiendo
-  de un identificador de aeronave.
+**Cubierto.** Abrir la base ANP de EASA distribuida con el paquete (u otra
+exportación CSV de ANP) con `load_anp_database`; qué contiene el registro de una
+aeronave, incluidos el parámetro de potencia con el que se indexa su tabla NPD y
+el montaje de motores que lee la cadena de Doc 29; leer e interpolar la
+superficie NPD con `npd_curves` y `level`; las trayectorias de punto fijo por
+defecto y sus tramos de etapa; y ejecutar el nivel de evento único y el contorno
+en malla de Doc 29 desde un identificador de aeronave con `event_level` y
+`noise_contour`.
+
+**No cubierto.** Los perfiles de pasos procedimentales, que es como describen su
+despegue la mayoría de las entradas ANP: convertirlos en una trayectoria exige
+el modelo de mecánica del vuelo de ICAO Doc 9911, que este puente no implementa,
+así que solo las 13 aeronaves con perfil de punto fijo tienen trayectoria lista
+para usar. La base además solo se lee, nunca se escribe: phonometry distribuye
+la versión 2.3 y no la actualiza.
 
 ## Véase también
 
@@ -230,3 +247,5 @@ Páginas de otras áreas del sitio en las que se apoya esta sección:
   mano.
 - [Ruido de aeronaves: nivel efectivo de ruido percibido](/phonometry/es/aircraft/aircraft-noise/):
   la métrica de certificación, que se mide en vez de tabularse.
+- Referencia de la API:
+  [`aircraft.anp_fleet`](/phonometry/es/reference/api/aeroacoustics/anp-fleet/).

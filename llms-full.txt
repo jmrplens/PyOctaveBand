@@ -1127,12 +1127,17 @@ print(aircraft.description)          # Boeing 747-100 / JT9DBD
 print(aircraft.engine_type, aircraft.num_engines, aircraft.weight_class)
 ```
 
-An `AnpAircraft` carries the metadata the Doc 29 chain needs downstream: the
-engine type and count, the ICAO wake weight class, and the **power parameter**
-the NPD table is indexed by. That last one matters because it is not a force in
-newtons but whatever quantity the manufacturer tabulated against, corrected net
-thrust in pounds for most jets, and the value you pass later has to be in those
-units.
+An `AnpAircraft` describes itself with the engine type and count and the ICAO
+wake weight class, and carries two fields you will use directly. The **power
+parameter** names the quantity the NPD table is indexed by: not a force in
+newtons but whatever the manufacturer tabulated against, corrected net thrust in
+pounds for most jets, so a power you pass to `level` has to be in those units.
+The engine **mounting** is the one field of the record the Doc 29 chain itself
+reads; it is derived from the ANP lateral directivity identifier, is one of
+`"wing"`, `"fuselage"` or `"propeller"`, and selects the engine-installation
+correction that [Airport noise](https://jmrplens.github.io/phonometry/aircraft/airport-noise/) applies by hand. The shipped
+fleet splits 70 / 55 / 30 across the three, and an unrecognised identifier falls
+back to `"wing"`.
 
 ## The noise-power-distance curves
 
@@ -1152,7 +1157,13 @@ print(curves.level(19000.0, [304.8, 1000.0, 3000.0]))
 
 The distances are metres. The database tabulates them in feet, at the ten Doc 29
 nodes from 200 ft to 25000 ft, and this bridge converts on read so everything
-downstream stays in SI. `curves.plot()` draws the whole family.
+downstream stays in SI. `curves.plot()` draws the whole family:
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anp_npd_dark.svg">
+  <img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anp_npd.svg" alt="Noise-power-distance curves of a Boeing 747-100 for three tabulated thrust settings, each level falling with slant distance on a logarithmic axis, with markers on the tabulated nodes" width="82%">
+</picture>
+
 
 ## The default trajectory
 
@@ -1177,7 +1188,14 @@ from phonometry import load_anp_database
 
 profile = load_anp_database().aircraft("747100").profile("D", stage_length=1)
 print(profile.profile_id, profile.stage_length, profile.path.shape)
+profile.plot()
 ```
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anp_profile_dark.svg">
+  <img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anp_profile.svg" alt="Default departure profile of a Boeing 747-100: altitude against along-track distance, rising from the runway through eleven fixed points, with the ground-roll points marked at zero altitude" width="82%">
+</picture>
+
 
 ## Straight to an event level or a contour
 
@@ -1258,6 +1276,11 @@ propagates each ray with spherical spreading, atmospheric absorption and the
 Chien-Soroka ground effect, interpolates between the measured flight
 conditions along the track, and integrates the received history into the
 single-event SEL, LASmax and EPNL and their ground-grid contours.
+
+[The ANP fleet database](https://jmrplens.github.io/phonometry/aircraft/anp-fleet/) closes the loop on
+the two above: the noise-power-distance tables and default trajectories EASA and
+EUROCONTROL publish for real aircraft types, ready to feed the Doc 29 chain
+without writing a table by hand.
 
 The shared physics connects outward: atmospheric absorption comes from the
 same ISO 9613-1 model as

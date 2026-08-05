@@ -31,6 +31,11 @@ _ES_EXACT = {
     "power parameter: CNT (lb)\nmarkers: tabulated NPD nodes":
         "parámetro de potencia: CNT (lb)\nmarcadores: nodos NPD tabulados",
     "stage length 1, 11 fixed points": "etapa 1, 11 puntos fijos",
+    # The axis labels and the legend come from the library renderer, so they
+    # are worded exactly as src/phonometry/_plot/aircraft.py translates them.
+    "Along-track distance [km]": "Distancia sobre la ruta [km]",
+    "Altitude AFE [m]": "Altitud AFE [m]",
+    "ground roll": "rodaje en pista",
     "Bearing Fault Lines on a Measured Envelope Spectrum":
         "Líneas de fallo del rodamiento sobre un espectro de envolvente medido",
     "envelope spectrum of the 2-4 kHz band":

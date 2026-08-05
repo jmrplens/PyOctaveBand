@@ -33,6 +33,12 @@ Chien-Soroka, interpola entre las condiciones de vuelo medidas a lo largo de
 la trayectoria e integra el historial recibido en el SEL, LASmax y EPNL de
 evento único y sus contornos en malla de tierra.
 
+[La base de datos ANP de flota](/phonometry/es/aircraft/anp-fleet/) cierra el
+círculo de los dos anteriores: las tablas nivel-potencia-distancia y las
+trayectorias por defecto que EASA y EUROCONTROL publican para los tipos de
+aeronave reales, listas para alimentar la cadena de Doc 29 sin escribir una
+tabla a mano.
+
 La física compartida conecta hacia fuera: la absorción atmosférica viene del
 mismo modelo ISO 9613-1 que
 [Propagación del sonido en exteriores](/phonometry/es/environment/propagation/outdoor-propagation/),
@@ -56,5 +62,5 @@ tonalidad es a su vez primo de los métodos de
   el modelo de fuente de hemisferio de ruido de ECAC Doc 32, sus ajustes de
   propagación y las métricas y contornos de evento único.
 - [La base de datos ANP de flota](/phonometry/es/aircraft/anp-fleet/): las
-  tablas de EASA con curvas ruido-potencia-distancia y trayectorias por defecto
+  tablas de EASA con curvas nivel-potencia-distancia y trayectorias por defecto
   que ejecutan la cadena de Doc 29 con una aeronave real.
