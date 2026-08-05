@@ -42,6 +42,7 @@ reports:
           - src/phonometry/_report/**
           - .github/reports/**
           - scripts/generate_reports.py
+          - scripts/reports/**
           - scripts/generate_site_reports.py
           - scripts/check_reports.py
           - scripts/generated_assets.py
