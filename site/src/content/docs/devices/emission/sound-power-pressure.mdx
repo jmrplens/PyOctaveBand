@@ -478,9 +478,11 @@ This is the 40-position hemisphere measurement of section 2, the one whose
 spectrum is plotted above:
 
 ```python
+from phonometry import ReportMetadata
+
 result.report(
     "precision-sound-power.pdf",
-    metadata=emission.ReportMetadata(
+    metadata=ReportMetadata(
         client="Example manufacturing plant",
         specimen="Mid-frequency-peaked machine",
         test_room="Qualified anechoic room, 40-position hemisphere array",

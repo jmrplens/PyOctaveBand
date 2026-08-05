@@ -491,9 +491,11 @@ $K_1$/$K_2$. Es la medición de la sección 2 sobre las 40 posiciones del
 hemisferio, la del espectro representado más arriba:
 
 ```python
+from phonometry import ReportMetadata
+
 result.report(
     "potencia-precision.pdf",
-    metadata=emission.ReportMetadata(
+    metadata=ReportMetadata(
         client="Planta de fabricación de ejemplo",
         specimen="Máquina con pico en medias frecuencias",
         test_room="Sala anecoica cualificada, red de 40 posiciones en hemisferio",
