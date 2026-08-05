@@ -50,6 +50,8 @@
     "http://localhost:4321/phonometry/es/reference/conformance/",
     "http://localhost:4321/phonometry/reference/errata/",
     "http://localhost:4321/phonometry/es/reference/errata/",
+    "http://localhost:4321/phonometry/reference/glossary/",
+    "http://localhost:4321/phonometry/es/reference/glossary/",
     "http://localhost:4321/phonometry/buildings/",
     "http://localhost:4321/phonometry/buildings/rooms/",
     "http://localhost:4321/phonometry/es/buildings/",
