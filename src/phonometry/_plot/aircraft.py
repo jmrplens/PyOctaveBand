@@ -27,6 +27,7 @@ if TYPE_CHECKING:
         NoiseContourResult,
         NpdLevelResult,
     )
+    from ..aircraft.anp_fleet import AnpNpdCurves, AnpProfile
     from ..aircraft.atmospheric_absorption import AircraftBandAttenuation
     from ..aircraft.certification import EPNLResult
     from ..aircraft.rotorcraft_noise import (
@@ -85,6 +86,14 @@ _STRINGS: dict[str, str] = {
     "Diffracted path": "Trayectoria difractada",
     "Diffraction edges": "Bordes de difracción",
     "Terrain screening (ECAC Doc 32 / NORAH2 guidance)": "Apantallamiento por terreno (ECAC Doc 32 / guía NORAH2)",
+    # ANP fleet database (moved here with its renderers: _plot holds one
+    # module per domain). The two axis labels it shares with the Doc 29 NPD
+    # plot are already above, translated identically.
+    "ANP NPD curves": "Curvas NPD ANP",
+    "Along-track distance [km]": "Distancia sobre la ruta [km]",
+    "Altitude AFE [m]": "Altitud AFE [m]",
+    "ANP default profile": "Perfil por defecto ANP",
+    "ground roll": "rodaje en pista",
 }
 
 
@@ -489,4 +498,49 @@ def plot_terrain_screening(
     ax.grid(True, alpha=0.3)
     ax.legend(loc=_LEGEND_UPPER_RIGHT, fontsize="small")
     localize_axes(ax, language)
+    return ax
+
+
+def plot_anp_npd(result: AnpNpdCurves, ax: Axes | None, *,
+              language: str, **kwargs: Any) -> Axes:
+    """Draw the NPD curve at each tabulated power against slant distance."""
+    from ..aircraft.airport_noise import npd_curve
+
+    ax = ax if ax is not None else _new_axes()
+    for i, power in enumerate(result.powers):
+        curve = npd_curve(result.powers, result.distances, result.levels, float(power))
+        ax.plot(curve.distance, curve.level, lw=1.5, label=f"P = {power:g}", **kwargs)
+        ax.plot(result.distances, result.levels[i], "o", ms=3, color="0.4")
+    ax.set_xscale("log")
+    ax.set_xlabel(_t("Slant distance [m]", language))
+    ax.set_ylabel(_t("Event level [dB]", language))
+    ax.set_title(f"{_t('ANP NPD curves', language)} - {result.aircraft_id} "
+                 f"({result.metric}, {result.operation})")
+    ax.grid(True, which="both", alpha=0.3)
+    ax.legend(loc="upper right", fontsize="small")
+    return ax
+
+
+def plot_anp_profile(result: AnpProfile, ax: Axes | None, *,
+                  language: str, **kwargs: Any) -> Axes:
+    """Draw the trajectory altitude against along-track distance."""
+    ax = ax if ax is not None else _new_axes()
+    x_km = result.path[:, 0] / 1000.0
+    z_m = result.path[:, 2]
+    ax.plot(x_km, z_m, "-o", ms=3, lw=1.5, **kwargs)
+    # Highlight the runway points: both endpoints of every roll segment, so the
+    # final point of a roll span is not dropped (the masks are per-segment).
+    seg = result.ground_roll | result.landing_roll
+    roll = np.zeros(result.path.shape[0], dtype=bool)
+    roll[:-1] |= seg
+    roll[1:] |= seg
+    if roll.any():
+        ax.plot(x_km[roll], z_m[roll], "s", ms=6, color="tab:red",
+                label=_t("ground roll", language))
+        ax.legend(loc="upper left", fontsize="small")
+    ax.set_xlabel(_t("Along-track distance [km]", language))
+    ax.set_ylabel(_t("Altitude AFE [m]", language))
+    ax.set_title(f"{_t('ANP default profile', language)} - {result.aircraft_id} "
+                 f"({result.operation})")
+    ax.grid(True, alpha=0.3)
     return ax

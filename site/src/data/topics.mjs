@@ -349,6 +349,7 @@ export const topics = [
       { slug: 'aircraft', label: 'Overview', translations: { es: 'Resumen' } },
       'aircraft/aircraft-noise',
       'aircraft/airport-noise',
+      'aircraft/anp-fleet',
       'aircraft/rotorcraft-noise',
       apiGroup('aeroacoustics'),
     ],

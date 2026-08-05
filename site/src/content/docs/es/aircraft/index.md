@@ -1,11 +1,11 @@
 ---
 title: "Ruido de aeronaves"
-description: "Ruido de aeronaves con métricas fijadas internacionalmente: la cadena de certificación EPNL del Anexo 16 de la ICAO, la maquinaria de contornos de aeropuerto de ECAC Doc 29 y el método del hemisferio para rotorcraft de ECAC Doc 32."
+description: "Ruido de aeronaves con métricas fijadas internacionalmente: la cadena de certificación EPNL del Anexo 16 de la ICAO, la maquinaria de contornos de aeropuerto de ECAC Doc 29, el método del hemisferio para rotorcraft de ECAC Doc 32 y la base de datos ANP de EASA que los alimenta."
 ---
 
 Las aeronaves son fuentes de ruido lo bastante importantes como para tener
 métricas propias negociadas internacionalmente, cada una fijada hasta el
-último decimal por un marco de certificación. Las tres páginas de esta sección
+último decimal por un marco de certificación. Las cuatro páginas de esta sección
 implementan esos marcos, y comparten una misma anatomía: un **descriptor de fuente** rigurosamente
 normalizado, más **ajustes de propagación** normalizados que colocan la
 fuente en un receptor.
@@ -55,3 +55,6 @@ tonalidad es a su vez primo de los métodos de
 - [Ruido de rotorcraft: el método del hemisferio](/phonometry/es/aircraft/rotorcraft-noise/):
   el modelo de fuente de hemisferio de ruido de ECAC Doc 32, sus ajustes de
   propagación y las métricas y contornos de evento único.
+- [La base de datos ANP de flota](/phonometry/es/aircraft/anp-fleet/): las
+  tablas de EASA con curvas ruido-potencia-distancia y trayectorias por defecto
+  que ejecutan la cadena de Doc 29 con una aeronave real.

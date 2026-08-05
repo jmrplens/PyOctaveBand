@@ -350,3 +350,54 @@ def generate_rotorcraft_terrain_screening(output_dir: str) -> None:
     plt.tight_layout()
     save_figure(output_dir, "rotorcraft_terrain_screening.svg")
     plt.close()
+
+
+def generate_anp_npd(output_dir: str) -> None:
+    """NPD curves of a real ANP aircraft, one per tabulated thrust setting."""
+    print("Generating anp_npd...")
+    from phonometry import load_anp_database
+
+    # A real fleet entry rather than a schematic table: the 747-100 is one of
+    # the aircraft whose ANP record carries a fixed-point profile, so the same
+    # aircraft can illustrate the profile figure below.
+    aircraft = load_anp_database().aircraft("747100")
+    curves = aircraft.npd_curves("D", "SEL")
+
+    _fig, ax = plt.subplots(figsize=(10, 6))
+    curves.plot(ax=ax)
+    ax.set_title(f"ANP NPD Curves - {aircraft.description} (SEL, departure)",
+                 fontweight="bold", pad=12)
+    ax.grid(color=COLOR_GRID, linestyle="--", alpha=0.5, which="both")
+    ax.set_axisbelow(True)
+    ax.text(0.02, 0.06,
+            f"power parameter: {aircraft.power_parameter}\n"
+            "markers: tabulated NPD nodes",
+            transform=ax.transAxes, va="bottom", fontsize=9,
+            bbox={"boxstyle": "round", "facecolor": COLOR_GRID, "alpha": 0.6})
+    plt.tight_layout()
+    save_figure(output_dir, "anp_npd.svg")
+    plt.close()
+
+
+def generate_anp_profile(output_dir: str) -> None:
+    """Default fixed-point departure trajectory of a real ANP aircraft."""
+    print("Generating anp_profile...")
+    from phonometry import load_anp_database
+
+    aircraft = load_anp_database().aircraft("747100")
+    profile = aircraft.profile("D", stage_length=1)
+
+    _fig, ax = plt.subplots(figsize=(10, 6))
+    profile.plot(ax=ax)
+    ax.set_title(f"ANP Default Departure Profile - {aircraft.description}",
+                 fontweight="bold", pad=12)
+    ax.grid(color=COLOR_GRID, linestyle="--", alpha=0.5)
+    ax.set_axisbelow(True)
+    ax.text(0.98, 0.06,
+            f"stage length {profile.stage_length}, "
+            f"{profile.path.shape[0]} fixed points",
+            transform=ax.transAxes, va="bottom", ha="right", fontsize=9,
+            bbox={"boxstyle": "round", "facecolor": COLOR_GRID, "alpha": 0.6})
+    plt.tight_layout()
+    save_figure(output_dir, "anp_profile.svg")
+    plt.close()

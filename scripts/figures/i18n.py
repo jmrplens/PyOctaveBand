@@ -23,6 +23,14 @@ _LANG = "en"
 _LANG_SUFFIX = ""
 
 _ES_EXACT = {
+    # ANP fleet database guide
+    "ANP NPD Curves - Boeing 747-100 / JT9DBD (SEL, departure)":
+        "Curvas NPD ANP - Boeing 747-100 / JT9DBD (SEL, despegue)",
+    "ANP Default Departure Profile - Boeing 747-100 / JT9DBD":
+        "Perfil de despegue por defecto ANP - Boeing 747-100 / JT9DBD",
+    "power parameter: CNT (lb)\nmarkers: tabulated NPD nodes":
+        "parámetro de potencia: CNT (lb)\nmarcadores: nodos NPD tabulados",
+    "stage length 1, 11 fixed points": "etapa 1, 11 puntos fijos",
     "Bearing Fault Lines on a Measured Envelope Spectrum":
         "Líneas de fallo del rodamiento sobre un espectro de envolvente medido",
     "envelope spectrum of the 2-4 kHz band":
