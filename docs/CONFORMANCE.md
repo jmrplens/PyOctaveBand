@@ -7,7 +7,7 @@
 > **Auto-generated conformance report - do not hand-edit.** Produced by
 > `make conformance` from the library's own computations checked against the
 > referenced standards. CI regenerates it on every pull request and fails if it
-> is out of date, so edit the checks in `scripts/conformance_report.py`, not this
+> is out of date, so edit the checks in `scripts/conformance/domains/`, not this
 > file. Each row pins a standard and clause to its expected normative value and
 > the value the library computes. Full standards list and methodology:
 > [Theory](https://github.com/jmrplens/phonometry/blob/main/docs/reference/theory/index.md) -

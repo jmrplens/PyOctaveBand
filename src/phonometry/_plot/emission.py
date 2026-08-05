@@ -100,10 +100,15 @@ def plot_sound_power(
     """Sound power level spectrum with the A-weighted total annotated.
 
     Works for :class:`~phonometry.emission.sound_power.SoundPowerResult`,
+    :class:`~phonometry.emission.sound_power_anechoic.PrecisionSoundPowerResult`,
     :class:`~phonometry.emission.sound_power_reverberation.ReverberationSoundPowerResult`
-    and :class:`~phonometry.emission.sound_power_intensity.SoundPowerIntensityResult`;
-    for the intensity (scanning) variant the bands where the net power is
-    non-positive (``negative_band``) are hatched and greyed as unusable.
+    and the two intensity-scanning results,
+    :class:`~phonometry.emission.sound_power_intensity.SoundPowerIntensityResult`
+    and
+    :class:`~phonometry.emission.sound_power_intensity.PrecisionIntensityResult`;
+    for the intensity (scanning) variants the bands where the net power is
+    non-positive (``negative_band`` / ``not_applicable_band``) are hatched and
+    greyed as unusable.
 
     :param result: A sound-power result object exposing
         ``sound_power_level``, ``sound_power_level_a`` and (optionally)

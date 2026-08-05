@@ -46,7 +46,6 @@ from .airport_noise import (
     NoiseContourResult,
     event_level,
     noise_contour,
-    npd_curve,
 )
 
 if TYPE_CHECKING:
@@ -162,8 +161,9 @@ class AnpNpdCurves:
     def plot(self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any) -> Axes:
         """Plot the NPD curve at each tabulated power versus slant distance."""
         from .._i18n import check_language
+        from .._plot.aircraft import plot_anp_npd
 
-        return _plot_npd(self, ax=ax, language=check_language(language), **kwargs)
+        return plot_anp_npd(self, ax=ax, language=check_language(language), **kwargs)
 
 
 @dataclass(frozen=True)
@@ -194,8 +194,9 @@ class AnpProfile:
     def plot(self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any) -> Axes:
         """Plot the trajectory altitude versus along-track distance."""
         from .._i18n import check_language
+        from .._plot.aircraft import plot_anp_profile
 
-        return _plot_profile(self, ax=ax, language=check_language(language), **kwargs)
+        return plot_anp_profile(self, ax=ax, language=check_language(language), **kwargs)
 
 
 @dataclass(frozen=True)
@@ -578,76 +579,3 @@ def load_anp_database(path: Path | str | None = None) -> AnpDatabase:
     npd, distances = _parse_npd(_pick("npd", tables))
     profiles = _parse_profiles(_pick("fixed_point", tables))
     return AnpDatabase(aircraft=aircraft, npd=npd, distances=distances, profiles=profiles)
-
-
-# ---------------------------------------------------------------------------
-# Self-contained plotting (lazy matplotlib; labels local to this module so the
-# shared _plot string tables stay untouched).
-# ---------------------------------------------------------------------------
-_PLOT_LABELS = {
-    "en": {
-        "distance": "Slant distance [m]",
-        "level": "Event level [dB]",
-        "npd_title": "ANP NPD curves",
-        "along": "Along-track distance [km]",
-        "altitude": "Altitude AFE [m]",
-        "profile_title": "ANP default profile",
-        "ground_roll": "ground roll",
-    },
-    "es": {
-        "distance": "Distancia oblicua [m]",
-        "level": "Nivel del evento [dB]",
-        "npd_title": "Curvas NPD ANP",
-        "along": "Distancia sobre la ruta [km]",
-        "altitude": "Altitud AFE [m]",
-        "profile_title": "Perfil por defecto ANP",
-        "ground_roll": "rodaje en pista",
-    },
-}
-
-
-def _plot_npd(result: AnpNpdCurves, ax: Axes | None, *,
-              language: str, **kwargs: Any) -> Axes:
-    import matplotlib.pyplot as plt
-
-    lab = _PLOT_LABELS[language]
-    if ax is None:
-        _, ax = plt.subplots()
-    for i, power in enumerate(result.powers):
-        curve = npd_curve(result.powers, result.distances, result.levels, float(power))
-        ax.plot(curve.distance, curve.level, lw=1.5, label=f"P = {power:g}", **kwargs)
-        ax.plot(result.distances, result.levels[i], "o", ms=3, color="0.4")
-    ax.set_xscale("log")
-    ax.set_xlabel(lab["distance"])
-    ax.set_ylabel(lab["level"])
-    ax.set_title(f"{lab['npd_title']} - {result.aircraft_id} ({result.metric}, {result.operation})")
-    ax.grid(True, which="both", alpha=0.3)
-    ax.legend(loc="upper right", fontsize="small")
-    return ax
-
-
-def _plot_profile(result: AnpProfile, ax: Axes | None, *,
-                  language: str, **kwargs: Any) -> Axes:
-    import matplotlib.pyplot as plt
-
-    lab = _PLOT_LABELS[language]
-    if ax is None:
-        _, ax = plt.subplots()
-    x_km = result.path[:, 0] / 1000.0
-    z_m = result.path[:, 2]
-    ax.plot(x_km, z_m, "-o", ms=3, lw=1.5, **kwargs)
-    # Highlight the runway points: both endpoints of every roll segment, so the
-    # final point of a roll span is not dropped (the masks are per-segment).
-    seg = result.ground_roll | result.landing_roll
-    roll = np.zeros(result.path.shape[0], dtype=bool)
-    roll[:-1] |= seg
-    roll[1:] |= seg
-    if roll.any():
-        ax.plot(x_km[roll], z_m[roll], "s", ms=6, color="tab:red",
-                label=lab["ground_roll"])
-        ax.legend(loc="upper left", fontsize="small")
-    ax.set_xlabel(lab["along"])
-    ax.set_ylabel(lab["altitude"])
-    ax.set_title(f"{lab['profile_title']} - {result.aircraft_id} ({result.operation})")
-    ax.grid(True, alpha=0.3)
-    return ax

@@ -65,7 +65,7 @@ def rewrite_links(body: str, *, relative_to: str) -> str:
     """Point repo-relative markdown links at the GitHub blob.
 
     ``docs/ERRATA.md`` cites source modules and regression tests with paths
-    relative to ``docs/`` (``../tests/reference_data.py``). Those files have no
+    relative to ``docs/`` (``../tests/reference_data/``). Those files have no
     route on the site, so the site copy must reach them on GitHub.
 
     :param body: Markdown body to rewrite.

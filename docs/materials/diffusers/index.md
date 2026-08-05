@@ -46,5 +46,10 @@ methods serve the outdoor-noise interest of
 - [Metadiffusers](metadiffusers.md): deep-subwavelength
   Schroeder diffusers from resonator-loaded slits, with slow sound and
   ternary sequences.
+
+## See also
+
+Pages elsewhere on the site that this section leans on:
+
 - [In-situ Road-Surface Absorption](../surfaces/road-absorption.md):
   the ISO 13472-1 subtraction technique and the ISO 13472-2 spot method.

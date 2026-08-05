@@ -23,9 +23,11 @@ from __future__ import annotations
 import numpy as np
 import pytest
 
-from phonometry.materials.absorbers.impedance_tube import (
+from phonometry.materials.absorbers.four_microphone import (
     air_layer_transfer_matrix,
     transfer_matrix_one_load,
+)
+from phonometry.materials.absorbers.impedance_tube import (
     two_microphone_impedance,
 )
 from phonometry.simulation import FDTD2D

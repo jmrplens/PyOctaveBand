@@ -37,14 +37,14 @@ la mayoría de las mediciones prácticas, y donde arrancan las secciones
 ambiental y laboral.
 
 Convertir esos niveles en un veredicto regulatorio es
-[Niveles ambientales (ISO 1996-1/-2)](/phonometry/es/environment/environmental-levels/):
+[Niveles ambientales (ISO 1996-1/-2)](/phonometry/es/environment/assessment/environmental-levels/):
 el nivel día-tarde-noche Lden y los niveles de valoración de **ISO 1996-1**
 con sus ajustes, y la cadena de determinación de ISO 1996-2 con el ajuste
 tonal, la corrección de ruido residual y el presupuesto de incertidumbre de
 la medición.
 
 Las normativas nacionales construyen su propio índice sobre esa cadena, y
-[Normativa española de ruido (RD 1367/2007)](/phonometry/es/environment/spanish-noise-regulation/)
+[Normativa española de ruido (RD 1367/2007)](/phonometry/es/environment/assessment/spanish-noise-regulation/)
 implementa la española: el nivel corregido LKeq con sus correcciones por
 componentes tonales, de baja frecuencia e impulsivas, los periodos temporales
 de evaluación divididos en fases de ruido, y las tablas de valores límite con
@@ -63,9 +63,14 @@ las que se juzga una actividad.
 - [Niveles integrados y estadísticos](/phonometry/es/signals/levels/levels/): Leq y
   LAeq, niveles percentiles, LCpeak/SEL, dosis de ruido y espectrogramas de
   octava.
-- [Niveles ambientales (ISO 1996-1/-2)](/phonometry/es/environment/environmental-levels/):
+
+## Véase también
+
+Páginas de otras áreas del sitio en las que se apoya esta sección:
+
+- [Niveles ambientales (ISO 1996-1/-2)](/phonometry/es/environment/assessment/environmental-levels/):
   Lden, Ldn y niveles de valoración, ajuste tonal, ruido residual e
   incertidumbre.
-- [Normativa española de ruido (RD 1367/2007)](/phonometry/es/environment/spanish-noise-regulation/):
+- [Normativa española de ruido (RD 1367/2007)](/phonometry/es/environment/assessment/spanish-noise-regulation/):
   el nivel corregido LKeq, las correcciones Kt/Kf/Ki, los periodos temporales
   de evaluación y las fases de ruido, y las tablas de valores límite.

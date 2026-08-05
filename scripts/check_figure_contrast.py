@@ -43,7 +43,7 @@ region reported as invisible in the dark theme sits below 5.
 
 Scope
 -----
-SVG only. The raster figures (``_RASTER_FIGURES`` in ``generate_graphs.py``)
+SVG only. The raster figures (``_RASTER_FIGURES`` in ``scripts/figures/theme.py``)
 are pcolormesh fields, spectrograms and dense time series: they have no
 declarative fill regions to extract, only pixels, and their colour mapping is
 already background-aware through ``_field_cmap``. Inside an SVG the check

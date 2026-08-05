@@ -69,7 +69,7 @@ adequate.
 one-third-octave range 100 Hz to 5000 Hz (18 bands), optionally extended down
 to 50 Hz. The single-number weighted rating uses the ISO 717-1 core range, so
 the automatic rating (`RI,w`, `RI,M,w`, `DI,n,e,w`) is formed via the
-verified [`phonometry.weighted_rating`](/phonometry/reference/api/building/insulation/#weighted_rating) engine only when exactly 16
+verified [`phonometry.weighted_rating`](/phonometry/reference/api/building/ratings/#weighted_rating) engine only when exactly 16
 one-third-octave (100-3150 Hz) or 5 octave (125-2000 Hz) values are supplied.
 
 > Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
@@ -187,7 +187,7 @@ normal sound intensity level `LIn` over the measurement surface of area
 $A_0 = 10$ m² and the number `N` of element units installed
 within the surface.
 The weighted rating `DI,n,e,w` is computed via
-[`phonometry.weighted_rating`](/phonometry/reference/api/building/insulation/#weighted_rating) (ISO 717-1) when exactly 16 or 5 values
+[`phonometry.weighted_rating`](/phonometry/reference/api/building/ratings/#weighted_rating) (ISO 717-1) when exactly 16 or 5 values
 are supplied.
 
 :::note
@@ -248,7 +248,7 @@ The same formula gives the apparent index `R'I` in the field
 [`adaptation_term_kc`](/phonometry/reference/api/building/intensity-insulation/#adaptation_term_kc)), the modified index
 $R_{I,M} = R_I + K_c$
 (Formula (9)) is also formed. Weighted ratings `RI,w` (and `RI,M,w`)
-are computed via [`phonometry.weighted_rating`](/phonometry/reference/api/building/insulation/#weighted_rating) (ISO 717-1) when
+are computed via [`phonometry.weighted_rating`](/phonometry/reference/api/building/ratings/#weighted_rating) (ISO 717-1) when
 exactly 16 one-third-octave (100-3150 Hz) or 5 octave (125-2000 Hz)
 values are supplied.
 

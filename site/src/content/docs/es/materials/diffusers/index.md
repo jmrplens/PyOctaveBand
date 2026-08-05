@@ -50,6 +50,11 @@ métodos de firmes sirven al interés por el ruido exterior de
 - [Metadifusores](/phonometry/es/materials/diffusers/metadiffusers/): difusores de
   Schroeder en sublongitud de onda profunda a partir de rendijas cargadas
   con resonadores, con sonido lento y secuencias ternarias.
+
+## Véase también
+
+Páginas de otras áreas del sitio en las que se apoya esta sección:
+
 - [Absorción in situ de firmes de carretera](/phonometry/es/materials/surfaces/road-absorption/):
   la técnica de sustracción de ISO 13472-1 y el método puntual de
   ISO 13472-2.

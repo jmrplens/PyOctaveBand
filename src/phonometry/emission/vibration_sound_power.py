@@ -284,7 +284,7 @@ class VibrationSoundPowerResult:
         """
         if self.frequencies is None:
             return float("nan")
-        from .sound_power import _a_weighting_corrections
+        from ._shared import _a_weighting_corrections
 
         lw = np.asarray(self.sound_power_level, dtype=np.float64)
         ck = _a_weighting_corrections(

@@ -16,7 +16,7 @@ independent confirmations. They are also validated against the
 standard's own tabulated constants and its Annex C.2 worked example (with
 the official errata applied), and against the independent Hornsby worksheet
 and R CRAN "SII" implementations where they overlap. See
-``tests/reference_data.py`` for the provenance of every constant.
+``tests/reference_data/`` for the provenance of every constant.
 """
 
 from __future__ import annotations
@@ -449,7 +449,7 @@ def test_band_table_transcription(
     This is a transcription pin, not an independent oracle: most of these
     digits come from the same WG S3-79 reference implementation the procedures
     are anchored on (rows 1 to 6 of Table 1 are additionally corroborated by an
-    independent transcription; see ``tests/reference_data.py`` for the
+    independent transcription; see ``tests/reference_data/`` for the
     per-column provenance). It exists because the eight official ``.TST`` cases
     leave most of these cells inert: their strong maskers and their -10 dB
     bands mean that corrupting, for instance, the reference internal noise of

@@ -64,7 +64,7 @@ def test_calibration_1khz_40db_is_one_tu(ref_1k_40: EcmaTonality) -> None:
 
 def test_calibration_constant_is_the_tabulated_c_t() -> None:
     # Clause 6.2.8 tabulates c_T = 2.8758615; the implementation must use the
-    # standard's value verbatim (shared oracle in tests/reference_data.py).
+    # standard's value verbatim (shared oracle in tests/reference_data/).
     from reference_data import ECMA418_2_TONALITY_C_T
 
     from phonometry.psychoacoustics.quality.tonality_ecma import _C_T

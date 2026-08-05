@@ -4,7 +4,7 @@
 Renders a :class:`~phonometry.emission.sound_power.SoundPowerResult`
 (enveloping-surface pressure method, ISO 3744:2010 engineering grade 2 or
 ISO 3746:2010 survey grade 3) or a
-:class:`~phonometry.emission.sound_power.PrecisionSoundPowerResult`
+:class:`~phonometry.emission.sound_power_anechoic.PrecisionSoundPowerResult`
 (precision method in an anechoic or hemi-anechoic room, ISO 3745:2012 grade 1)
 to a one-page PDF laid out like a sound-power test sheet:
 
@@ -60,10 +60,8 @@ from ._sound_power_fiche import (
 from .metadata import ReportMetadata
 
 if TYPE_CHECKING:
-    from ..emission.sound_power import (
-        PrecisionSoundPowerResult,
-        SoundPowerResult,
-    )
+    from ..emission.sound_power import SoundPowerResult
+    from ..emission.sound_power_anechoic import PrecisionSoundPowerResult
 
 
 def _is_precision(result: Any) -> bool:
@@ -261,7 +259,7 @@ def render_sound_power_report(
     :param result: A
         :class:`~phonometry.emission.sound_power.SoundPowerResult`
         (ISO 3744/3746 enveloping-surface pressure method) or a
-        :class:`~phonometry.emission.sound_power.PrecisionSoundPowerResult`
+        :class:`~phonometry.emission.sound_power_anechoic.PrecisionSoundPowerResult`
         (ISO 3745 precision method) carrying the per-band ``sound_power_level``,
         ``surface_pressure_level`` and A-weighted total.
     :param path: Destination path of the PDF file.

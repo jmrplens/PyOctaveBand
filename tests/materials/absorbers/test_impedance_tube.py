@@ -23,38 +23,42 @@ from __future__ import annotations
 import numpy as np
 import pytest
 
+from phonometry.materials.absorbers.four_microphone import (
+    TransferMatrix,
+    air_density_astm,
+    air_layer_transfer_matrix,
+    face_quantities,
+    plane_wave_frequency_range_astm,
+    speed_of_sound_astm,
+    transfer_matrix_one_load,
+    transfer_matrix_two_load,
+    wave_decomposition,
+)
 from phonometry.materials.absorbers.impedance_tube import (
     ImpedanceTubeResult,
     ImpedanceTubeWarning,
-    TransferMatrix,
     absorption_from_reflection,
-    air_density_astm,
     air_density_iso,
-    air_layer_transfer_matrix,
     apply_mic_calibration,
     characteristic_impedance,
-    face_quantities,
     hydraulic_diameter,
     mic_calibration_factor,
     normalized_surface_admittance,
     normalized_surface_impedance,
     plane_wave_frequency_range,
-    plane_wave_frequency_range_astm,
     reflection_factor,
-    speed_of_sound_astm,
     speed_of_sound_iso,
+    surface_impedance,
+    tube_attenuation_constant,
+    tube_wavenumber,
+    two_microphone_impedance,
+)
+from phonometry.materials.absorbers.standing_wave import (
     standing_wave_absorption,
     standing_wave_normalized_impedance,
     standing_wave_ratio_from_level,
     standing_wave_reflection,
     standing_wave_reflection_magnitude,
-    surface_impedance,
-    transfer_matrix_one_load,
-    transfer_matrix_two_load,
-    tube_attenuation_constant,
-    tube_wavenumber,
-    two_microphone_impedance,
-    wave_decomposition,
 )
 
 RHO = 1.204

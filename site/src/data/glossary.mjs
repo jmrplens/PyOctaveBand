@@ -174,7 +174,7 @@ export const glossary = [
         unit: "dB",
         standard: "ISO 1996-1:2016",
         clause: "3.6.4",
-        guide: "environment/environmental-levels",
+        guide: "environment/assessment/environmental-levels",
         definition: {
           en: "Day-evening-night level: the energy mean of the three periods with 5 dB added to the evening and 10 dB to the night.",
           es: "Nivel día-tarde-noche: la media energética de los tres periodos con 5 dB añadidos a la tarde y 10 dB a la noche.",
@@ -186,7 +186,7 @@ export const glossary = [
         unit: "dB",
         standard: "ISO 1996-1:2016",
         clause: "3.6.5",
-        guide: "environment/environmental-levels",
+        guide: "environment/assessment/environmental-levels",
         definition: {
           en: "Day-night level: the same construction with the 10 dB night penalty only.",
           es: "Nivel día-noche: la misma construcción solo con la penalización de 10 dB nocturna.",
@@ -201,7 +201,7 @@ export const glossary = [
           en: "clause 6.5 (Formulae 5 and 6)",
           es: "apartado 6.5 (Fórmulas 5 y 6)",
         },
-        guide: "environment/environmental-levels",
+        guide: "environment/assessment/environmental-levels",
         definition: {
           en: "Rating level: the whole-day composite level after the source-character and time-of-day adjustments.",
           es: "Nivel de valoración: el nivel compuesto de la jornada completa tras los ajustes por carácter de la fuente y por franja horaria.",

@@ -292,7 +292,7 @@ enlarged-range term $C_{100-5000}$, not the core-range one.
 - [Insulation Ratings (ISO 717)](insulation-ratings.md): the reference-curve
   route with $R_w$, $C$, $C_{tr}$ and the enlarged-range terms that DB-HR
   calls simply $C$ and $C_{tr}$.
-- [Spanish Noise Regulation (RD 1367/2007)](../../environment/spanish-noise-regulation.md): where
+- [Spanish Noise Regulation (RD 1367/2007)](../../environment/assessment/spanish-noise-regulation.md): where
   the site's day noise index $L_d$ that Table 2.1 is entered with comes from.
 - [Façade Sound Insulation](facade-insulation.md): the ISO 16283-3 measurement
   of $D_{2m,nT}$ and its EN 12354-3 prediction, which feed the $D_{2m,nT,Atr}$ index of

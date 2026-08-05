@@ -62,7 +62,7 @@ sums its `LW` with the envelope segments only at the final energetic stage.
 The exterior level follows from the simplified Annex E attenuation `Atot` of
 a finite radiating side and $L_p = L_W - A_{tot}$.
 
-Single-number ratings reuse EN ISO 717-1 via [`phonometry.weighted_rating`](/phonometry/reference/api/building/insulation/#weighted_rating)
+Single-number ratings reuse EN ISO 717-1 via [`phonometry.weighted_rating`](/phonometry/reference/api/building/ratings/#weighted_rating)
 (exact for $R'_w + C_{tr}$, a good approximation for `R'w`, Part 3
 NOTE 7).
 
@@ -142,7 +142,7 @@ indices (Formulas 11-12) and the standardized level difference (Formula 13).
 | `area` | Total façade area `S` seen from inside, in m². |
 | `volume` | Receiving-room volume `V`, in m³ (Formula 13). |
 | `delta_l_fs` | Façade-shape term `ΔLfs` in dB (Annex C; 0 for a flat reflecting façade). |
-| `bands` | `"octave"`, `"third-octave"` or `None` (auto) for the single number ratings, passed to [`weighted_rating`](/phonometry/reference/api/building/insulation/#weighted_rating). |
+| `bands` | `"octave"`, `"third-octave"` or `None` (auto) for the single number ratings, passed to [`weighted_rating`](/phonometry/reference/api/building/ratings/#weighted_rating). |
 | `frequencies` | Optional band centre frequencies (Hz), stored on the result for plotting; must match the element band count. |
 
 **Returns:** A [`FacadePredictionResult`](/phonometry/reference/api/building/facade/#facadepredictionresult).

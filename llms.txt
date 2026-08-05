@@ -204,13 +204,13 @@ If you are an AI assistant setting this up for a user: install from PyPI (no sys
 ## Environment and transport
 
 - [Overview](https://jmrplens.github.io/phonometry/environment/)
-- [Environmental Levels (ISO 1996-1/-2)](https://jmrplens.github.io/phonometry/environment/environmental-levels/)
-- [Spanish Noise Regulation (RD 1367/2007)](https://jmrplens.github.io/phonometry/environment/spanish-noise-regulation/)
 
 ### Assessment and regulation
 
 - [Overview](https://jmrplens.github.io/phonometry/environment/assessment/) · [full text](https://jmrplens.github.io/phonometry/llms/llms-environment-assessment.txt)
 - [Impulsive-sound prominence (NT ACOU 112)](https://jmrplens.github.io/phonometry/environment/assessment/impulsive-sound/)
+- [Environmental Levels (ISO 1996-1/-2)](https://jmrplens.github.io/phonometry/environment/assessment/environmental-levels/)
+- [Spanish Noise Regulation (RD 1367/2007)](https://jmrplens.github.io/phonometry/environment/assessment/spanish-noise-regulation/)
 
 ### Outdoor sound
 
@@ -232,6 +232,7 @@ If you are an AI assistant setting this up for a user: install from PyPI (no sys
 - [Aircraft noise: Effective Perceived Noise Level (ICAO Annex 16 / IEC 61265)](https://jmrplens.github.io/phonometry/aircraft/aircraft-noise/)
 - [Airport noise (ECAC Doc 29)](https://jmrplens.github.io/phonometry/aircraft/airport-noise/)
 - [Rotorcraft noise: the hemisphere method (ECAC Doc 32 / NORAH2)](https://jmrplens.github.io/phonometry/aircraft/rotorcraft-noise/)
+- [The ANP fleet database](https://jmrplens.github.io/phonometry/aircraft/anp-fleet/)
 
 ## Underwater acoustics
 
@@ -369,6 +370,7 @@ The generated API reference, one page per module. Fetch these only when a specif
 - [aeroacoustics/certification](https://jmrplens.github.io/phonometry/reference/api/aeroacoustics/certification/)
 - [aeroacoustics/measurement-system](https://jmrplens.github.io/phonometry/reference/api/aeroacoustics/measurement-system/)
 - [aeroacoustics/rotorcraft-noise](https://jmrplens.github.io/phonometry/reference/api/aeroacoustics/rotorcraft-noise/)
+- [aeroacoustics/rotorcraft-propagation](https://jmrplens.github.io/phonometry/reference/api/aeroacoustics/rotorcraft-propagation/)
 - [broadcast/program-loudness](https://jmrplens.github.io/phonometry/reference/api/broadcast/program-loudness/)
 - [building/aperture-transmission](https://jmrplens.github.io/phonometry/reference/api/building/aperture-transmission/)
 - [building/ceiling-plenum](https://jmrplens.github.io/phonometry/reference/api/building/ceiling-plenum/)
@@ -381,8 +383,10 @@ The generated API reference, one page per module. Fetch these only when a specif
 - [building/insulation](https://jmrplens.github.io/phonometry/reference/api/building/insulation/)
 - [building/intensity-insulation](https://jmrplens.github.io/phonometry/reference/api/building/intensity-insulation/)
 - [building/lab-insulation](https://jmrplens.github.io/phonometry/reference/api/building/lab-insulation/)
+- [building/linings](https://jmrplens.github.io/phonometry/reference/api/building/linings/)
 - [building/masonry-cavity-wall](https://jmrplens.github.io/phonometry/reference/api/building/masonry-cavity-wall/)
 - [building/panel-transmission](https://jmrplens.github.io/phonometry/reference/api/building/panel-transmission/)
+- [building/ratings](https://jmrplens.github.io/phonometry/reference/api/building/ratings/)
 - [building/resilient-layers](https://jmrplens.github.io/phonometry/reference/api/building/resilient-layers/)
 - [building/simplified-model](https://jmrplens.github.io/phonometry/reference/api/building/simplified-model/)
 - [building/spain](https://jmrplens.github.io/phonometry/reference/api/building/spain/)
@@ -391,8 +395,10 @@ The generated API reference, one page per module. Fetch these only when a specif
 - [building/uncertainty](https://jmrplens.github.io/phonometry/reference/api/building/uncertainty/)
 - [electroacoustics/distortion](https://jmrplens.github.io/phonometry/reference/api/electroacoustics/distortion/)
 - [electroacoustics/frequency-response](https://jmrplens.github.io/phonometry/reference/api/electroacoustics/frequency-response/)
+- [electroacoustics/intermodulation](https://jmrplens.github.io/phonometry/reference/api/electroacoustics/intermodulation/)
 - [electroacoustics/loudspeaker](https://jmrplens.github.io/phonometry/reference/api/electroacoustics/loudspeaker/)
 - [electroacoustics/microphone](https://jmrplens.github.io/phonometry/reference/api/electroacoustics/microphone/)
+- [electroacoustics/noise-measurements](https://jmrplens.github.io/phonometry/reference/api/electroacoustics/noise-measurements/)
 - [electroacoustics/piston](https://jmrplens.github.io/phonometry/reference/api/electroacoustics/piston/)
 - [electroacoustics/sound-reinforcement](https://jmrplens.github.io/phonometry/reference/api/electroacoustics/sound-reinforcement/)
 - [electroacoustics/swept-sine](https://jmrplens.github.io/phonometry/reference/api/electroacoustics/swept-sine/)
@@ -413,6 +419,7 @@ The generated API reference, one page per module. Fetch these only when a specif
 - [filters/frequencies](https://jmrplens.github.io/phonometry/reference/api/filters/frequencies/)
 - [filters/phonometry](https://jmrplens.github.io/phonometry/reference/api/filters/phonometry/)
 - [filters/weighting](https://jmrplens.github.io/phonometry/reference/api/filters/weighting/)
+- [filters/weighting-compliance](https://jmrplens.github.io/phonometry/reference/api/filters/weighting-compliance/)
 - [hearing/noise-induced-hearing-loss](https://jmrplens.github.io/phonometry/reference/api/hearing/noise-induced-hearing-loss/)
 - [hearing/occupational-exposure](https://jmrplens.github.io/phonometry/reference/api/hearing/occupational-exposure/)
 - [hearing/threshold](https://jmrplens.github.io/phonometry/reference/api/hearing/threshold/)
@@ -420,14 +427,18 @@ The generated API reference, one page per module. Fetch these only when a specif
 - [materials/biot](https://jmrplens.github.io/phonometry/reference/api/materials/biot/)
 - [materials/design](https://jmrplens.github.io/phonometry/reference/api/materials/design/)
 - [materials/dynamic-stiffness](https://jmrplens.github.io/phonometry/reference/api/materials/dynamic-stiffness/)
+- [materials/four-microphone](https://jmrplens.github.io/phonometry/reference/api/materials/four-microphone/)
 - [materials/impedance-tube](https://jmrplens.github.io/phonometry/reference/api/materials/impedance-tube/)
+- [materials/layered](https://jmrplens.github.io/phonometry/reference/api/materials/layered/)
 - [materials/metadiffuser](https://jmrplens.github.io/phonometry/reference/api/materials/metadiffuser/)
 - [materials/porous](https://jmrplens.github.io/phonometry/reference/api/materials/porous/)
 - [materials/rating](https://jmrplens.github.io/phonometry/reference/api/materials/rating/)
+- [materials/reverberation-room-scattering](https://jmrplens.github.io/phonometry/reference/api/materials/reverberation-room-scattering/)
 - [materials/road-absorption](https://jmrplens.github.io/phonometry/reference/api/materials/road-absorption/)
 - [materials/scattering-diffusion](https://jmrplens.github.io/phonometry/reference/api/materials/scattering-diffusion/)
 - [materials/slow-sound](https://jmrplens.github.io/phonometry/reference/api/materials/slow-sound/)
 - [materials/sound-absorption](https://jmrplens.github.io/phonometry/reference/api/materials/sound-absorption/)
+- [materials/standing-wave](https://jmrplens.github.io/phonometry/reference/api/materials/standing-wave/)
 - [materials/uncertainty](https://jmrplens.github.io/phonometry/reference/api/materials/uncertainty/)
 - [metrology/calibration](https://jmrplens.github.io/phonometry/reference/api/metrology/calibration/)
 - [metrology/data-qualification](https://jmrplens.github.io/phonometry/reference/api/metrology/data-qualification/)
@@ -442,6 +453,7 @@ The generated API reference, one page per module. Fetch these only when a specif
 - [power/intensity](https://jmrplens.github.io/phonometry/reference/api/power/intensity/)
 - [power/intensity-compliance](https://jmrplens.github.io/phonometry/reference/api/power/intensity-compliance/)
 - [power/sound-power](https://jmrplens.github.io/phonometry/reference/api/power/sound-power/)
+- [power/sound-power-anechoic](https://jmrplens.github.io/phonometry/reference/api/power/sound-power-anechoic/)
 - [power/sound-power-intensity](https://jmrplens.github.io/phonometry/reference/api/power/sound-power-intensity/)
 - [power/sound-power-reverberation](https://jmrplens.github.io/phonometry/reference/api/power/sound-power-reverberation/)
 - [power/vibration-sound-power](https://jmrplens.github.io/phonometry/reference/api/power/vibration-sound-power/)
@@ -475,11 +487,13 @@ The generated API reference, one page per module. Fetch these only when a specif
 - [signals/inversion](https://jmrplens.github.io/phonometry/reference/api/signals/inversion/)
 - [signals/levels](https://jmrplens.github.io/phonometry/reference/api/signals/levels/)
 - [signals/miso](https://jmrplens.github.io/phonometry/reference/api/signals/miso/)
+- [signals/multitaper](https://jmrplens.github.io/phonometry/reference/api/signals/multitaper/)
 - [signals/phase](https://jmrplens.github.io/phonometry/reference/api/signals/phase/)
 - [signals/spectra](https://jmrplens.github.io/phonometry/reference/api/signals/spectra/)
 - [signals/synchronous-average](https://jmrplens.github.io/phonometry/reference/api/signals/synchronous-average/)
 - [signals/test-signals](https://jmrplens.github.io/phonometry/reference/api/signals/test-signals/)
 - [signals/time-frequency](https://jmrplens.github.io/phonometry/reference/api/signals/time-frequency/)
+- [signals/windows](https://jmrplens.github.io/phonometry/reference/api/signals/windows/)
 - [simulation/elastic-fdtd](https://jmrplens.github.io/phonometry/reference/api/simulation/elastic-fdtd/)
 - [simulation/fdtd](https://jmrplens.github.io/phonometry/reference/api/simulation/fdtd/)
 - [simulation/ntff](https://jmrplens.github.io/phonometry/reference/api/simulation/ntff/)

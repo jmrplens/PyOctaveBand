@@ -54,8 +54,8 @@ of the rest of the package, exactly as printed:
   $[T] = [\Gamma(-h)][\Gamma(0)]^{-1}$ (Eq. (11.34)).
 
 The layer is used through
-[`PoroelasticLayer`](/phonometry/reference/api/materials/porous/#poroelasticlayer) inside
-[`layered_absorber`](/phonometry/reference/api/materials/porous/#layered_absorber), which switches
+[`PoroelasticLayer`](/phonometry/reference/api/materials/layered/#poroelasticlayer) inside
+[`layered_absorber`](/phonometry/reference/api/materials/layered/#layered_absorber), which switches
 to the global-matrix assembly of Sect. 11.5 as soon as a poroelastic layer is
 present, with the coupling matrices of Sect. 11.4 ($[I_{pf}]$ /
 $[J_{pf}]$ Eq. (11.73), $[I_{pp}]$ Eq. (11.67)) and the hard-wall
@@ -109,7 +109,7 @@ $Z_i^s = (P + Q \mu_i) \delta_i / \omega$.
 
 This is an independent derivation of the same physics as the chapter 11
 transfer-matrix assembly reached through
-[`PoroelasticLayer`](/phonometry/reference/api/materials/porous/#poroelasticlayer); the two
+[`PoroelasticLayer`](/phonometry/reference/api/materials/layered/#poroelasticlayer); the two
 agree to machine precision, which is one of the anchors of this module.
 Unlike the transfer matrix, it is restricted to normal incidence, to a
 single layer and to a glued rigid backing.
@@ -442,7 +442,7 @@ $V(M) = [T^p] V(M')$. The wave-amplitude matrix $[\Gamma]$ of
 Table 11.1 behind it is built by `_gamma`.
 
 The layer solver of
-[`layered_absorber`](/phonometry/reference/api/materials/porous/#layered_absorber) does *not*
+[`layered_absorber`](/phonometry/reference/api/materials/layered/#layered_absorber) does *not*
 use this matrix: it assembles the wave amplitudes directly, which avoids
 inverting $[\Gamma(0)]$ and is far better conditioned for a very
 soft or a

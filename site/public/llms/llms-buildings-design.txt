@@ -68,15 +68,20 @@ floor, and with it the resonance frequency the whole improvement hangs on.
   the tapping-machine force model, the cut-off frequency of a soft covering,
   the floating-floor improvement laws and the ISO 12354-1 Annex D rating of a
   wall lining.
-- [Dynamic stiffness of resilient materials (EN 29052-1)](https://jmrplens.github.io/phonometry/materials/resilient/dynamic-stiffness/):
-  the load-plate resonance measurement, the enclosed-gas term and the
-  floating-floor natural frequency.
 - [Structure-borne sound power of equipment (EN 15657)](https://jmrplens.github.io/phonometry/buildings/design/structure-borne-power/):
   the characteristic power a machine injects into a building element, measured
   on a reception plate.
 - [Installed structure-borne sound (EN 12354-5)](https://jmrplens.github.io/phonometry/buildings/design/installed-structure-borne/):
   what that power becomes once the machine is mounted on a real element, and
   the level it produces in the receiving room.
+
+## See also
+
+Pages elsewhere on the site that this section leans on:
+
+- [Dynamic stiffness of resilient materials (EN 29052-1)](https://jmrplens.github.io/phonometry/materials/resilient/dynamic-stiffness/):
+  the load-plate resonance measurement, the enclosed-gas term and the
+  floating-floor natural frequency.
 
 ---
 

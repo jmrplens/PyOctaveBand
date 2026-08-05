@@ -35,7 +35,7 @@ from reference_data import (
 from scipy import signal as sg
 
 from phonometry import WeightingFilter, verify_weighting_class
-from phonometry.filters.compliance import (
+from phonometry.filters.weighting_compliance import (
     _ANSI_S14_TABLE4_B,
     _ANSI_S14_TABLE5_12,
     _IEC61012_AU_HF,

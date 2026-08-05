@@ -39,6 +39,9 @@ from typing import Any
 
 from ._internal.warnings import _warn_renamed
 
+#: Distinguishes "the module has no such name" from a name bound to ``None``.
+_MISSING: Any = object()
+
 #: The one module NT ACOU 112 and ISO/PAS 1996-3 share since 4.0. Three old
 #: paths land on it.
 _IMPULSIVE_SOUND = "phonometry.environment.assessment.impulsive_sound"
@@ -237,6 +240,31 @@ _MOVED_4X: dict[str, str] = {
     # shadowing it is exactly what must not happen.
 }
 
+#: Modules a 4.0 split took public names out of, mapped to the siblings that
+#: received them. The table above pairs one old module with one new one, so
+#: without this a name that changed module *inside* its package would stop
+#: resolving through its deprecated path: ``layered_absorber`` left
+#: ``absorbers.porous`` for ``absorbers.layered``, and the alias
+#: ``materials.porous_absorber`` points only at the former. The split is an
+#: internal filing decision and must not narrow what the alias still serves.
+_SPLIT_INTO: dict[str, tuple[str, ...]] = {
+    "phonometry.filters.compliance": ("phonometry.filters.weighting_compliance",),
+    "phonometry.materials.absorbers.impedance_tube": (
+        "phonometry.materials.absorbers.four_microphone",
+        "phonometry.materials.absorbers.standing_wave",
+    ),
+    "phonometry.materials.absorbers.porous": (
+        "phonometry.materials.absorbers.layered",
+    ),
+    "phonometry.materials.diffusers.scattering_diffusion": (
+        "phonometry.materials.diffusers.reverberation_room_scattering",
+    ),
+    "phonometry.signals.spectra": (
+        "phonometry.signals.multitaper",
+        "phonometry.signals.windows",
+    ),
+}
+
 #: The generations in force, each with the release that deprecated it and the
 #: one that removes it. The 3.2 generation was removed in 4.0, as announced.
 _GENERATIONS: tuple[tuple[dict[str, str], str, str], ...] = (
@@ -259,10 +287,12 @@ def _make_shim(old: str, new: str, since: str, removed_in: str) -> types.ModuleT
             # classes, failing isinstance and pickles. The alias serves the
             # modules registered for it and nothing else.
             raise AttributeError(f"module {old!r} has no attribute {name!r}")
-        target = import_module(new)
-        try:
-            attr = getattr(target, name)
-        except AttributeError:
+        attr = _MISSING
+        for module in (new, *_SPLIT_INTO.get(new, ())):
+            attr = getattr(import_module(module), name, _MISSING)
+            if attr is not _MISSING:
+                break
+        if attr is _MISSING:
             # A renamed package keeps serving the modules that moved out of
             # it: ``environmental.wind_turbine_noise`` is not an attribute of
             # ``environment`` any more, it is an alias of its own. The alias
@@ -270,9 +300,7 @@ def _make_shim(old: str, new: str, since: str, removed_in: str) -> types.ModuleT
             alias = sys.modules.get(f"{old}.{name}")
             if alias is not None:
                 return alias
-            raise AttributeError(
-                f"module {old!r} has no attribute {name!r}"
-            ) from None
+            raise AttributeError(f"module {old!r} has no attribute {name!r}") from None
         _warn_renamed(
             f"the '{old}' module",
             f"'{new}'",
@@ -282,7 +310,9 @@ def _make_shim(old: str, new: str, since: str, removed_in: str) -> types.ModuleT
         return attr
 
     def __dir__() -> list[str]:
-        names = set(dir(import_module(new))) | set(_alias_modules(old))
+        names = set(_alias_modules(old))
+        for module in (new, *_SPLIT_INTO.get(new, ())):
+            names |= set(dir(import_module(module)))
         return sorted(names)
 
     shim.__getattr__ = __getattr__  # type: ignore[method-assign]

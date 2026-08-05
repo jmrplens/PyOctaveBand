@@ -116,7 +116,7 @@ def _a_weighting_octave(frequencies: NDArrayF) -> NDArrayF:
     the emission domain (a lazy sibling import keeps the report leaf free of
     module-level parent imports).
     """
-    from ..emission.sound_power import _a_weighting_corrections
+    from ..emission._shared import _a_weighting_corrections
 
     return np.asarray(_a_weighting_corrections(frequencies), dtype=np.float64)
 

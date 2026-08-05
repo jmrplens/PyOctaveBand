@@ -5,7 +5,7 @@ Renders the two sound-scattering surface descriptors of ISO 17497 to one-page
 PDFs laid out like accredited test reports:
 
 * :func:`render_scattering_report` renders a
-  :class:`~phonometry.materials.diffusers.scattering_diffusion.ScatteringResult` as a
+  :class:`~phonometry.materials.diffusers.reverberation_room_scattering.ScatteringResult` as a
   random-incidence *scattering* coefficient report (ISO 17497-1:2004+A1:2014):
   the standard-basis line, an optional metadata header block, a two-panel body
   with the per-band table (frequency, the random-incidence absorption
@@ -64,10 +64,10 @@ from ._layout import (
 from .metadata import ReportMetadata
 
 if TYPE_CHECKING:
+    from ..materials.diffusers.reverberation_room_scattering import ScatteringResult
     from ..materials.diffusers.scattering_diffusion import (
         DiffusionResult,
         DiffusionSpectrum,
-        ScatteringResult,
     )
 
 
@@ -249,7 +249,7 @@ def render_scattering_report(
     """Render an ISO 17497-1 scattering-coefficient fiche to a PDF at ``path``.
 
     :param result: A
-        :class:`~phonometry.materials.diffusers.scattering_diffusion.ScatteringResult`.
+        :class:`~phonometry.materials.diffusers.reverberation_room_scattering.ScatteringResult`.
     :param path: Destination path of the PDF file.
     :param metadata: Optional :class:`ReportMetadata`; ``None`` renders the body
         with only the measured frequency range. The ``requirement`` field is

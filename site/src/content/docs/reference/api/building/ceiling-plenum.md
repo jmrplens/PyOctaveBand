@@ -80,7 +80,7 @@ ASTM E1414, uses $A_0 = 12$ m2, so an ASTM value runs about
 $10 \log_{10}(12/10) = 0.79$ dB higher than the ISO one.
 
 **Single number.** ISO rates $D_{n,c}$ with the ISO 717-1 curve
-([`phonometry.weighted_rating`](/phonometry/reference/api/building/insulation/#weighted_rating), giving `Dn,c,w`); ASTM E1414 rates it
+([`phonometry.weighted_rating`](/phonometry/reference/api/building/ratings/#weighted_rating), giving `Dn,c,w`); ASTM E1414 rates it
 through ASTM E413 as the **ceiling attenuation class** (CAC). E413 rounds the
 data to the nearest integer (clause 5.2), shifts its reference contour upward in
 1 dB steps while the sum of the deficiencies stays at or below 32 dB and no

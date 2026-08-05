@@ -8,7 +8,7 @@ Oracle strategy (no free fitting anywhere):
   coefficients themselves are the oracle: the models are pinned digit-exact
   at a mid-range digitization point recomputed by hand from Bies 5e
   Table D.1 / Mechel 2e Sect. G.11 Eq. (2) and Miki 1990 Eqs. (30)-(34)
-  (``tests/reference_data.py``).
+  (``tests/reference_data/``).
 - JCA is pinned to its exact closed-form limits (Johnson et al. 1987):
   ``j w rho_e -> sigma`` at DC, ``rho_e -> (T rho/phi)(1 + (1-j) delta_v/L)``
   at high frequency and the isothermal/adiabatic bulk-modulus limits, plus
@@ -40,33 +40,37 @@ import numpy as np
 import pytest
 import reference_data as ref
 
-from phonometry.materials.absorbers.impedance_tube import TransferMatrix
+from phonometry.materials.absorbers.four_microphone import (
+    TransferMatrix,
+)
 
 # The termination admittance the equivalent-fluid recursion consumes, checked
 # bit for bit in TestLayeredAbsorber.
-from phonometry.materials.absorbers.porous import (
-    DELANY_BAZLEY_COEFFICIENTS,
-    DELANY_BAZLEY_VALIDITY,
+from phonometry.materials.absorbers.layered import (
     AirLayer,
     MembraneLayer,
     MicroperforatedPlateLayer,
     PerforatedPlateLayer,
-    PorousAbsorberWarning,
     PorousLayer,
-    PorousMediumResult,
     _termination_admittance,
-    delany_bazley,
     diffuse_field_absorption,
+    layered_absorber,
+    statistical_absorption,
+)
+from phonometry.materials.absorbers.porous import (
+    DELANY_BAZLEY_COEFFICIENTS,
+    DELANY_BAZLEY_VALIDITY,
+    PorousAbsorberWarning,
+    PorousMediumResult,
+    delany_bazley,
     helmholtz_resonance_frequency,
     johnson_champoux_allard,
-    layered_absorber,
     membrane_impedance,
     membrane_resonance_frequency,
     microperforated_plate_impedance,
     miki,
     perforated_plate_impedance,
     perforation_end_correction,
-    statistical_absorption,
 )
 
 RHO0 = 1.205

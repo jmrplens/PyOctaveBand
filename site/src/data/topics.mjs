@@ -311,8 +311,8 @@ export const topics = [
         collapsed: true,
         items: [
           { slug: 'environment/assessment', label: 'Overview', translations: { es: 'Resumen' } },
-          'environment/environmental-levels',
-          'environment/spanish-noise-regulation',
+          'environment/assessment/environmental-levels',
+          'environment/assessment/spanish-noise-regulation',
           'environment/assessment/impulsive-sound',
         ],
       },
@@ -349,6 +349,7 @@ export const topics = [
       { slug: 'aircraft', label: 'Overview', translations: { es: 'Resumen' } },
       'aircraft/aircraft-noise',
       'aircraft/airport-noise',
+      'aircraft/anp-fleet',
       'aircraft/rotorcraft-noise',
       apiGroup('aeroacoustics'),
     ],

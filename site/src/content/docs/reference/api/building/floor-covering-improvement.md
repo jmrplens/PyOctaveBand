@@ -48,12 +48,12 @@ the three one-third-octave values in each octave.
 
 **Weighted improvement.** `ΔLw` is the ISO 717-2 weighted reduction of impact
 sound pressure level (Clause 6.5), computed with the heavyweight reference floor
-via [`phonometry.weighted_impact_improvement`](/phonometry/reference/api/building/insulation/#weighted_impact_improvement) on the 16 rating bands
+via [`phonometry.weighted_impact_improvement`](/phonometry/reference/api/building/ratings/#weighted_impact_improvement) on the 16 rating bands
 100 Hz to 3150 Hz; a wider clause 6.3 spectrum (18 bands 100-5000 Hz,
 optionally extended to 50 Hz) is rated on that sub-range. The statement of
 results (Clause 8 e)) also carries the spectrum adaptation term `CI,Δ`
 (ISO 717-2:2020 Formula (A.4)) via
-[`phonometry.impact_improvement_adaptation_term`](/phonometry/reference/api/building/insulation/#impact_improvement_adaptation_term).
+[`phonometry.impact_improvement_adaptation_term`](/phonometry/reference/api/building/ratings/#impact_improvement_adaptation_term).
 
 > Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
 

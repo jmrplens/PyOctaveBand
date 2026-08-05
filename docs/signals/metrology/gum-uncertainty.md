@@ -209,7 +209,7 @@ those standardized cases:
   propagate them (`Quantity(..., "rectangular")`) through the level model
   rather than quoting the tolerance alone.
 - **Environmental levels.** The ISO 1996-2 combined uncertainty of the
-  [Environmental levels](../../environment/environmental-levels.md) page is Formula (2) of
+  [Environmental levels](../../environment/assessment/environmental-levels.md) page is Formula (2) of
   that standard: the same quadrature sum with the standard's own
   sensitivity coefficients.
 - **Building acoustics.** The per-band and single-number uncertainties of

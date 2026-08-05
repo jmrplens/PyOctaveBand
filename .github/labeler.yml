@@ -28,7 +28,9 @@ figures:
       - any-glob-to-any-file:
           - .github/images/**
           - scripts/generate_graphs.py
+          - scripts/figures/**
           - scripts/generate_diagrams.py
+          - scripts/diagrams/**
           - scripts/check_figures.py
           - scripts/generated_assets.py
           - src/phonometry/_plot/**
@@ -40,6 +42,7 @@ reports:
           - src/phonometry/_report/**
           - .github/reports/**
           - scripts/generate_reports.py
+          - scripts/reports/**
           - scripts/generate_site_reports.py
           - scripts/check_reports.py
           - scripts/generated_assets.py
@@ -54,6 +57,7 @@ conformance:
       - any-glob-to-any-file:
           - docs/CONFORMANCE.md
           - scripts/conformance_report.py
+          - scripts/conformance/**
           - scripts/check_conformance_claims.py
 
 errata:
@@ -66,13 +70,13 @@ validation:
       - any-glob-to-any-file:
           - tests/data/**
           - tests/golden_data.py
-          - tests/reference_data.py
+          - tests/reference_data/**
 
 performance:
   - changed-files:
       - any-glob-to-any-file:
           - scripts/bench.py
-          - tests/test_performance.py
+          - tests/filters/test_performance.py
 
 api:
   - changed-files:

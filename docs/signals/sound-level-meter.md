@@ -116,7 +116,7 @@ all.
 
 Deep guide: [Integrated and Statistical Levels](levels/levels.md),
 which adds noise dose and octave spectrograms; the $L_{den}$ and rating levels
-continue in [Environmental levels](../environment/environmental-levels.md).
+continue in [Environmental levels](../environment/assessment/environmental-levels.md).
 
 ## 5. Band-filter: the spectrum view (IEC 61260-1)
 

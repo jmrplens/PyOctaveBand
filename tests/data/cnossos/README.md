@@ -14,7 +14,7 @@ These are the **2015** coefficients, not the ones the library ships. The
 workbook was computed in 2014 with the database that Commission Directive
 (EU) 2015/996 went on to print in Appendix G of Annex II, before Commission
 Delegated Directive (EU) 2021/1226 replaced Tables G-1b, G-2, G-3a, G-4 and
-G-7. The coefficients of the current text live in `tests/reference_data.py`,
+G-7. The coefficients of the current text live in `tests/reference_data/`,
 transcribed from the Official Journal, and pin the tables shipped in
 `phonometry.environment.sources.cnossos_rail`.
 
@@ -49,7 +49,7 @@ vehicles, 17 280 cases at both source heights, to 0,0055 dB.
 - Official Journal texts are published by the Publications Office of the
   European Union; reuse is authorised under Commission Decision 2011/833/EU,
   provided the source is acknowledged, which the header of every file here and
-  the comments in `tests/reference_data.py` do.
+  the comments in `tests/reference_data/` do.
 - The workbook is `CNOSSOS_ROAD_EMISSION_TEST.xlsx`, delivered with the
   *Testing of Emission DLL's for CNOSSOS-EU Road, Rail and Industry Noise
   Sources* report (Stapelfeldt Ingenieurgesellschaft mbH, Dortmund, doc. rev.
@@ -120,7 +120,7 @@ writes the five flows out explicitly, so the committed cases are readable
 without the reconstruction.
 
 The coefficients of the current text, Tables F-1 to F-4 as they stand after
-(EU) 2021/1226, are *not* here: they live in `tests/reference_data.py`, also
+(EU) 2021/1226, are *not* here: they live in `tests/reference_data/`, also
 machine-transcribed from the Official Journal, and pin the tables shipped in
 `phonometry.environment.sources.cnossos_road`.
 

@@ -34,7 +34,7 @@ _FRONTLOADED_MODULES = (
     "tests/aircraft/test_rotorcraft_norah2.py",
     "tests/test_generate_reports.py",
     "tests/simulation/test_elastic_fluid_solid.py",
-    "tests/test_impact_insulation.py",
+    "tests/building/measurement/test_impact_insulation.py",
     "tests/building/measurement/test_insulation.py",
     "tests/psychoacoustics/quality/test_tonality_ecma.py",
     "tests/psychoacoustics/loudness/test_ecma.py",

@@ -7,14 +7,14 @@ Part of https://jmrplens.github.io/phonometry/llms.txt. Full text of the pages i
 <!-- source: docs/aircraft/index.md | canonical: https://jmrplens.github.io/phonometry/aircraft/ -->
 Source: https://jmrplens.github.io/phonometry/aircraft/
 
-# Aircraft and wind energy
+# Aircraft noise
 
-Aircraft and wind turbines are noise sources important enough to have their
-own internationally negotiated metrics, each fixed to the last decimal by a
-certification or type-testing framework. The four pages of this section
-implement those frameworks, and they share a common anatomy: a rigorously
-standardised **source descriptor**, plus standardised **propagation
-adjustments** that place the source at a receiver.
+Aircraft are noise sources important enough to have their own internationally
+negotiated metrics, each fixed to the last decimal by a certification
+framework. The four pages of this section implement those frameworks, and
+they share a common anatomy: a rigorously standardised **source descriptor**,
+plus standardised **propagation adjustments** that place the source at a
+receiver.
 
 [Aircraft noise: Effective Perceived Noise Level](https://jmrplens.github.io/phonometry/aircraft/aircraft-noise/)
 covers fixed-wing certification. The **EPNL** of ICAO Annex 16 condenses a
@@ -37,17 +37,20 @@ Chien-Soroka ground effect, interpolates between the measured flight
 conditions along the track, and integrates the received history into the
 single-event SEL, LASmax and EPNL and their ground-grid contours.
 
-[Wind-turbine noise: sound power and tonal audibility](https://jmrplens.github.io/phonometry/environment/sources/wind-turbine-noise/)
-covers IEC 61400-11 type testing: the **apparent sound power level** that
-refers the measured immission back to an equivalent point source at the rotor
-centre, and the tonal-audibility chain that decides whether a blade-passing,
-gearbox or generator tone is audible above its masking noise.
+[The ANP fleet database](https://jmrplens.github.io/phonometry/aircraft/anp-fleet/) closes the loop on
+the two above: the noise-power-distance tables and default trajectories EASA and
+EUROCONTROL publish for real aircraft types, ready to feed the Doc 29 chain
+without writing a table by hand.
 
 The shared physics connects outward: atmospheric absorption comes from the
 same ISO 9613-1 model as
 [Outdoor Sound Propagation](https://jmrplens.github.io/phonometry/environment/propagation/outdoor-propagation/), and the
-wind-turbine tonality test is a cousin of the tonal-audibility methods in
-[Psychoacoustics](https://jmrplens.github.io/phonometry/perception/psychoacoustics/).
+same type-testing logic governs
+[Wind-turbine noise](https://jmrplens.github.io/phonometry/environment/sources/wind-turbine-noise/),
+which is filed with the other environmental sources: its IEC 61400-11 apparent
+sound power level and tonal-audibility chain answer the same question for a
+source that is not an aircraft. That tonality test is in turn a cousin of the
+methods in [Psychoacoustics](https://jmrplens.github.io/phonometry/perception/psychoacoustics/).
 
 ## Pages in this section
 
@@ -59,8 +62,9 @@ wind-turbine tonality test is a cousin of the tonal-audibility methods in
 - [Rotorcraft noise: the hemisphere method](https://jmrplens.github.io/phonometry/aircraft/rotorcraft-noise/):
   the ECAC Doc 32 noise-hemisphere source model, its propagation adjustments
   and the single-event metrics and contours.
-- [Wind-turbine noise: sound power and tonal audibility](https://jmrplens.github.io/phonometry/environment/sources/wind-turbine-noise/):
-  the IEC 61400-11 apparent sound power level and tonal-audibility chain.
+- [The ANP fleet database](https://jmrplens.github.io/phonometry/aircraft/anp-fleet/): the EASA tables of
+  noise-power-distance curves and default trajectories that run the Doc 29
+  chain for a real aircraft type.
 
 ---
 
@@ -594,7 +598,7 @@ events of the reference workbook are reproduced end-to-end in the test suite.
 - [Outdoor sound propagation](https://jmrplens.github.io/phonometry/environment/propagation/outdoor-propagation/): the ISO 9613-2
   attenuation terms and the ground effect the lateral attenuation condenses
   into one curve.
-- [Environmental levels](https://jmrplens.github.io/phonometry/environment/environmental-levels/): the $L_{den}$-style
+- [Environmental levels](https://jmrplens.github.io/phonometry/environment/assessment/environmental-levels/): the $L_{den}$-style
   long-term indices that a full airport study accumulates from single events.
 - API reference: [`aircraft.airport_noise`](https://jmrplens.github.io/phonometry/reference/api/aeroacoustics/airport-noise/).
 
@@ -629,6 +633,155 @@ fraction, §4.5.6; the start-of-roll directivity, §4.5.7; and segment summation
 §4.3) through to ground-grid noise contours, with the impedance adjustment
 (§4.2.1). The single-event chain is validated against the ECAC Doc 29 5th ed.
 Vol 3 Part 1 reference workbook.
+
+---
+
+
+<!-- source: docs/aircraft/anp-fleet.md | canonical: https://jmrplens.github.io/phonometry/aircraft/anp-fleet/ -->
+Source: https://jmrplens.github.io/phonometry/aircraft/anp-fleet/
+
+# The ANP fleet database
+
+[Airport noise (ECAC Doc 29)](https://jmrplens.github.io/phonometry/aircraft/airport-noise/) computes an event level from a
+noise-power-distance table and a flight path. That page supplies both by hand,
+which is what you want while learning the method and what you never want
+afterwards: for a real study the numbers come from the **Aircraft Noise and
+Performance (ANP)** database that EASA and EUROCONTROL publish for the aircraft
+types actually flying.
+
+That database ships with phonometry. This page is the bridge between it and the
+Doc 29 functions: how to open it, what one aircraft record holds, and how to go
+from an aircraft identifier to an event level or a contour without writing a
+table yourself.
+
+## Opening the database
+
+`load_anp_database()` with no argument reads the copy shipped with the package.
+Point it at a directory to read any other ANP CSV export instead.
+
+```python
+from phonometry import load_anp_database
+
+db = load_anp_database()
+print(len(db.aircraft_ids))          # 155 aircraft types
+aircraft = db.aircraft("747100")
+print(aircraft.description)          # Boeing 747-100 / JT9DBD
+print(aircraft.engine_type, aircraft.num_engines, aircraft.weight_class)
+```
+
+An `AnpAircraft` describes itself with the engine type and count and the ICAO
+wake weight class, and carries two fields you will use directly. The **power
+parameter** names the quantity the NPD table is indexed by: not a force in
+newtons but whatever the manufacturer tabulated against, corrected net thrust in
+pounds for most jets, so a power you pass to `level` has to be in those units.
+The engine **mounting** is the one field of the record the Doc 29 chain itself
+reads; it is derived from the ANP lateral directivity identifier, is one of
+`"wing"`, `"fuselage"` or `"propeller"`, and selects the engine-installation
+correction that [Airport noise](https://jmrplens.github.io/phonometry/aircraft/airport-noise/) applies by hand. The shipped
+fleet splits 70 / 55 / 30 across the three, and an unrecognised identifier falls
+back to `"wing"`.
+
+## The noise-power-distance curves
+
+`npd_curves` returns the tabulated NPD surface for one operation (`"D"` for
+departure, `"A"` for arrival) and one metric (`"SEL"` or `"LAmax"`): a level for
+each combination of engine power setting and slant distance. Between the
+tabulated nodes the Doc 29 interpolation is logarithmic in distance and linear
+in power.
+
+```python
+from phonometry import load_anp_database
+
+curves = load_anp_database().aircraft("A320-232").npd_curves("D", "SEL")
+print(curves.powers)                       # [10000. 14000. 19000. 23000.] lb
+print(curves.level(19000.0, [304.8, 1000.0, 3000.0]))
+```
+
+The distances are metres. The database tabulates them in feet, at the ten Doc 29
+nodes from 200 ft to 25000 ft, and this bridge converts on read so everything
+downstream stays in SI. `curves.plot()` draws the whole family:
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anp_npd_dark.svg">
+  <img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anp_npd.svg" alt="Noise-power-distance curves of a Boeing 747-100 for three tabulated thrust settings, each level falling with slant distance on a logarithmic axis, with markers on the tabulated nodes" width="82%">
+</picture>
+
+
+## The default trajectory
+
+An aircraft record also carries default trajectories. `profile` returns one as a
+Doc 29 flight path: an `(N, 5)` array of along-track, lateral and vertical
+position plus the power setting and true airspeed, with boolean masks marking
+which segments are the takeoff ground roll or the landing rollout. The **stage
+length** selects the trip-distance bin: a longer stage means more fuel, more
+weight and a shallower climb, so the same aircraft has one profile per bin.
+
+Only the **fixed-point** profiles are read as ready-to-use trajectories. Most
+ANP entries describe their departures as procedural steps instead (climb at this
+rate to that altitude, accelerate, retract flaps), which have to be flown
+through a flight-mechanics performance model before they become a path. That
+model is outside this bridge, so of the 155 aircraft in the shipped database 13
+have a fixed-point departure profile. Asking for one that does not exist raises
+a `KeyError` naming the stage lengths that do. NPD curves, on the other hand,
+are tabulated for every aircraft in the database.
+
+```python
+from phonometry import load_anp_database
+
+profile = load_anp_database().aircraft("747100").profile("D", stage_length=1)
+print(profile.profile_id, profile.stage_length, profile.path.shape)
+profile.plot()
+```
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anp_profile_dark.svg">
+  <img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anp_profile.svg" alt="Default departure profile of a Boeing 747-100: altitude against along-track distance, rising from the runway through eleven fixed points, with the ground-roll points marked at zero altitude" width="82%">
+</picture>
+
+
+## Straight to an event level or a contour
+
+With both halves in the record, the aircraft can run the Doc 29 chain itself.
+`event_level` places one flyover at a receiver, and `noise_contour` sweeps it
+over a ground grid, each wiring the NPD curves and the default profile into the
+functions the airport-noise page builds by hand.
+
+```python
+from phonometry import load_anp_database
+
+aircraft = load_anp_database().aircraft("747100")
+flyover = aircraft.event_level([3000.0, 500.0, 0.0], "D")
+print(round(float(flyover.level), 1))     # SEL in dB at that receiver
+```
+
+The observer is `(x, y, z)` in metres in the runway frame: along the track,
+across it and above the ground. The optional `temperature` and `pressure`
+arguments feed the Doc 29 atmospheric impedance adjustment and default to the
+15 °C and 101.325 kPa of the standard atmosphere.
+
+```python
+import numpy as np
+from phonometry import load_anp_database
+
+contour = load_anp_database().aircraft("747100").noise_contour(
+    "D",
+    x=np.linspace(-2000.0, 12000.0, 40),
+    y=np.linspace(-3000.0, 3000.0, 30),
+)
+print(contour.level.shape)      # (30, 40): one SEL per grid point
+```
+
+Everything these two return is the same result type the airport-noise page uses,
+so the plotting, the contour extraction and the per-segment breakdown all work
+unchanged.
+
+## References
+
+- EASA and EUROCONTROL, *Aircraft Noise and Performance (ANP) database*, version
+  2.3 (2020). <https://www.aircraftnoisemodel.org/>. The provenance of the copy
+  shipped with the package is recorded in `aircraft/data/anp/PROVENANCE.md`.
+- ECAC, *Report on standard method of computing noise contours around civil
+  airports*, Volume 2: Technical guide, Doc 29 4th ed. (2016).
 
 ---
 

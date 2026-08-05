@@ -346,7 +346,7 @@ split into point sources is declared out of scope by the method itself.
 
 - [Outdoor Sound Propagation](https://jmrplens.github.io/phonometry/environment/propagation/outdoor-propagation/): the ISO 9613-2 chain that
   carries a source power to a receiver.
-- [Environmental noise levels](https://jmrplens.github.io/phonometry/environment/environmental-levels/): the $L_{den}$ and
+- [Environmental noise levels](https://jmrplens.github.io/phonometry/environment/assessment/environmental-levels/): the $L_{den}$ and
   $L_{night}$ indicators the resulting maps are drawn for.
 
 ---
@@ -791,7 +791,7 @@ such as depots, stations and loudspeakers, are treated by the industrial method.
 
 - [Outdoor Sound Propagation](https://jmrplens.github.io/phonometry/environment/propagation/outdoor-propagation/): the
   ISO 9613-2 chain that carries a source power to a receiver.
-- [Environmental noise levels](https://jmrplens.github.io/phonometry/environment/environmental-levels/): the
+- [Environmental noise levels](https://jmrplens.github.io/phonometry/environment/assessment/environmental-levels/): the
   $L_{den}$ and $L_{night}$ indicators the resulting maps are drawn for.
 
 ---

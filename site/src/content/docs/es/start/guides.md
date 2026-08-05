@@ -1,6 +1,6 @@
 ---
 title: "Guías"
-description: "Las 104 guías de phonometry, agrupadas en los diez temas que cubre la biblioteca: para qué sirve cada área, las normas que implementa y un resumen de una línea de cada guía que contiene."
+description: "Las 105 guías de phonometry, agrupadas en los diez temas que cubre la biblioteca: para qué sirve cada área, las normas que implementa y un resumen de una línea de cada guía que contiene."
 head:
   - tag: script
     attrs:
@@ -97,7 +97,7 @@ hay ninguna panorámica del campo: cada página es la documentación de trabajo 
 un módulo, escrita para que un resultado se pueda defender apartado por
 apartado en lugar de darlo por bueno.
 
-Esta página es el mapa. Ciento cuatro guías repartidas en diez temas, y cada
+Esta página es el mapa. Ciento cinco guías repartidas en diez temas, y cada
 área tiene su propio índice con el relato largo de cómo encajan sus piezas. Si
 llegas sin una pregunta concreta, lee primero la
 [introducción](/phonometry/es/start/getting-started/): recorre una señal por toda la
@@ -161,10 +161,10 @@ ISO 1996-1, IEC 60942 y la GUM.
 - [Niveles integrados y estadísticos](/phonometry/es/signals/levels/levels/): $L_{eq}$ y
   $L_{Aeq}$, los niveles percentiles $L_{10}$/$L_{50}$/$L_{90}$, $L_{Cpeak}$ y
   SEL, y la dosis de ruido.
-- [Niveles ambientales (ISO 1996-1/-2)](/phonometry/es/environment/environmental-levels/):
+- [Niveles ambientales (ISO 1996-1/-2)](/phonometry/es/environment/assessment/environmental-levels/):
   $L_{den}$, $L_{dn}$ y los niveles de valoración compuestos, el ajuste tonal, la
   corrección de ruido residual y el presupuesto de incertidumbre.
-- [Normativa española de ruido (RD 1367/2007)](/phonometry/es/environment/spanish-noise-regulation/):
+- [Normativa española de ruido (RD 1367/2007)](/phonometry/es/environment/assessment/spanish-noise-regulation/):
   el nivel corregido $L_{Keq}$ con sus correcciones $K_t$, $K_f$ y $K_i$, los
   periodos temporales de evaluación y las fases de ruido, las tablas de valores
   límite y la comprobación del artículo 25.
@@ -495,6 +495,9 @@ ECAC Doc 29/32.
 - [Ruido de rotorcraft: el método del hemisferio](/phonometry/es/aircraft/rotorcraft-noise/):
   el modelo de fuente en hemisferio con sus ajustes de propagación, la
   interpolación de condiciones de vuelo y los contornos de suceso único.
+- [La base de datos ANP de flota](/phonometry/es/aircraft/anp-fleet/): las tablas
+  de EASA con curvas nivel-potencia-distancia y trayectorias por defecto, y la
+  cadena de Doc 29 ejecutada desde un identificador de aeronave.
 
 ## [Acústica submarina](/phonometry/es/underwater/)
 

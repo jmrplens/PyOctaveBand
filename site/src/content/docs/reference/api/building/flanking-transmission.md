@@ -52,7 +52,7 @@ $L_{n,f} = L_2 + 10 \log_{10}(A/A_0)$ (Formula (5)), both with the reference
 absorption
 area $A_0 = 10$ m². Their single-number ratings `Dn,f,w (C; Ctr)` and
 `Ln,f,w (CI)` follow ISO 717-1/-2 through the verified
-[`phonometry.weighted_rating`](/phonometry/reference/api/building/insulation/#weighted_rating) / [`phonometry.weighted_impact_rating`](/phonometry/reference/api/building/insulation/#weighted_impact_rating)
+[`phonometry.weighted_rating`](/phonometry/reference/api/building/ratings/#weighted_rating) / [`phonometry.weighted_impact_rating`](/phonometry/reference/api/building/ratings/#weighted_impact_rating)
 engines, reused unchanged.
 
 **Validity of Kij.** `Kij` rests on a statistical-energy-analysis
@@ -471,7 +471,7 @@ tapping machine on the source-room floor.
 | `receive_level` | Receiving-room average impact SPL `L2` per band, in dB. |
 | `absorption_area` | Receiving-room equivalent absorption area `A` per band, in m². |
 | `reference_area` | `A0`, in m² (default 10 m²). |
-| `bands` | Band spacing passed to [`phonometry.weighted_impact_rating`](/phonometry/reference/api/building/insulation/#weighted_impact_rating); auto-detected when `None`. |
+| `bands` | Band spacing passed to [`phonometry.weighted_impact_rating`](/phonometry/reference/api/building/ratings/#weighted_impact_rating); auto-detected when `None`. |
 
 **Returns:** A [`FlankingImpactLevelResult`](/phonometry/reference/api/building/flanking-transmission/#flankingimpactlevelresult); the single-number rating is formed only for 16 (one-third-octave) or 5 (octave) bands.
 
@@ -507,7 +507,7 @@ area $A_0 = 10$ m².
 | `receive_level` | Receiving-room average SPL `L2` per band, in dB. |
 | `absorption_area` | Receiving-room equivalent absorption area `A` per band, in m². |
 | `reference_area` | `A0`, in m² (default 10 m²). |
-| `bands` | Band spacing passed to [`phonometry.weighted_rating`](/phonometry/reference/api/building/insulation/#weighted_rating); auto-detected when `None`. |
+| `bands` | Band spacing passed to [`phonometry.weighted_rating`](/phonometry/reference/api/building/ratings/#weighted_rating); auto-detected when `None`. |
 
 **Returns:** A [`FlankingLevelDifferenceResult`](/phonometry/reference/api/building/flanking-transmission/#flankingleveldifferenceresult); the single-number rating is formed only for 16 (one-third-octave) or 5 (octave) bands.
 

@@ -254,7 +254,7 @@ def test_alternating_invalid_inputs_raise(kwargs: dict[str, float]) -> None:
 # Worked example, ISO 9053-2:2020 Annex A.3 (page-verified oracle): closed cylinder
 # 100 mm x 100 mm -> V = 7.854e-4 m3, S = 0.0471 m2; IEC 61094-2:2009 air properties
 # at 23 C; f = 2 Hz give b = 1.83e-3 m and kappa' = kappa*0.978 = 1.370. The inputs
-# and expected values are imported from tests/reference_data.py (shared with the
+# and expected values are imported from tests/reference_data/ (shared with the
 # CI conformance report).
 
 def test_thermal_boundary_layer_thickness_annex_a_example() -> None:

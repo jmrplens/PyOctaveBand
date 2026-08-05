@@ -66,12 +66,17 @@ mejora.
   el modelo de fuerza de la máquina de impactos, la frecuencia de corte de un
   revestimiento blando, las leyes de mejora del suelo flotante y la magnitud
   global de un trasdosado según el anexo D de ISO 12354-1.
-- [Rigidez dinámica de materiales resilientes (EN 29052-1)](/phonometry/es/materials/resilient/dynamic-stiffness/):
-  la medición por resonancia de placa de carga, el término del gas encerrado y
-  la frecuencia natural del suelo flotante.
 - [Potencia acústica estructural de equipos (EN 15657)](/phonometry/es/buildings/design/structure-borne-power/):
   la potencia característica que una máquina inyecta en un elemento del
   edificio, medida sobre una placa de recepción.
 - [Sonido estructural instalado (EN 12354-5)](/phonometry/es/buildings/design/installed-structure-borne/):
   en qué se convierte esa potencia con la máquina montada sobre un elemento
   real, y el nivel que produce en el recinto receptor.
+
+## Véase también
+
+Páginas de otras áreas del sitio en las que se apoya esta sección:
+
+- [Rigidez dinámica de materiales resilientes (EN 29052-1)](/phonometry/es/materials/resilient/dynamic-stiffness/):
+  la medición por resonancia de placa de carga, el término del gas encerrado y
+  la frecuencia natural del suelo flotante.

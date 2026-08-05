@@ -70,10 +70,10 @@ ballistics and the integrated, statistical and rating levels.
 - [Integrated and Statistical Levels](levels/levels.md): Leq and
   LAeq, percentile levels L10/L50/L90, LCpeak and SEL, noise dose (IEC 61252),
   and octave spectrograms.
-- [Environmental Levels (ISO 1996-1/-2)](../environment/environmental-levels.md):
+- [Environmental Levels (ISO 1996-1/-2)](../environment/assessment/environmental-levels.md):
   Lden, Ldn and the composite rating levels, the tonal adjustment, the
   residual-noise correction and the uncertainty budget.
-- [Spanish Noise Regulation (RD 1367/2007)](../environment/spanish-noise-regulation.md):
+- [Spanish Noise Regulation (RD 1367/2007)](../environment/assessment/spanish-noise-regulation.md):
   the corrected level LKeq, the Kt/Kf/Ki corrections, the evaluation periods
   and noise phases, and the limit tables.
 

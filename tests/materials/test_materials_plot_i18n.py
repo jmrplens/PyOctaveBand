@@ -25,19 +25,23 @@ from phonometry.materials.absorbers.airflow_resistance import (
     static_airflow_resistance,
 )
 from phonometry.materials.absorbers.impedance_tube import ImpedanceTubeResult
-from phonometry.materials.absorbers.porous import (
+from phonometry.materials.absorbers.layered import (
     PorousLayer,
-    delany_bazley,
     diffuse_field_absorption,
     layered_absorber,
+)
+from phonometry.materials.absorbers.porous import (
+    delany_bazley,
 )
 from phonometry.materials.absorbers.rating import weighted_absorption
 from phonometry.materials.absorbers.sound_absorption import (
     measure_sound_absorption,
 )
+from phonometry.materials.diffusers.reverberation_room_scattering import (
+    scattering_coefficient_spectrum,
+)
 from phonometry.materials.diffusers.scattering_diffusion import (
     directional_diffusion,
-    scattering_coefficient_spectrum,
 )
 from phonometry.materials.resilient.dynamic_stiffness import (
     floating_floor_resonance,

@@ -54,6 +54,11 @@ which is where this section meets the
   junctions, their angular average and the derived coupling loss factor and Kij.
 - [Transfer stiffness of resilient elements (ISO 10846)](transfer-stiffness.md):
   dynamic transfer stiffness of isolators by the direct and indirect methods.
+
+## See also
+
+Pages elsewhere on the site that this section leans on:
+
 - [Sound power from surface vibration (ISO/TS 7849)](../../devices/emission/vibration-sound-power.md):
   radiated airborne power from surface velocity and a radiation factor.
 - [Structure-borne sound power of equipment (EN 15657)](../../buildings/design/structure-borne-power.md):

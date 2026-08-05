@@ -688,7 +688,7 @@ class JunctionTransmissionResult:
         :class:`~matplotlib.axes.Axes`.
         """
         from ..._i18n import check_language
-        from ..._plot.junction import plot_junction_transmission
+        from ..._plot.vibration import plot_junction_transmission
 
         return plot_junction_transmission(
             self, ax=ax, language=check_language(language), **kwargs

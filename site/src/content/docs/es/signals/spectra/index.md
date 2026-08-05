@@ -113,12 +113,6 @@ estimaciones.
   dominio de la frecuencia, la ley de reducción de ruido en raíz cuadrada, y la
   elección del número de promedios que sitúa un nodo del peine sobre un orden
   interferente (McFadden 1987).
-- [Frecuencias de fallo de máquinas](/phonometry/es/vibration/machinery/machine-diagnostics/):
-  las familias cinemáticas de frecuencias de fallo de la maquinaria rotativa
-  (Norton y Karczub, sección 8.4) dibujadas sobre un espectro de envolvente
-  medido: frecuencias BPFO, BPFI, BSF y de jaula de los rodamientos, bandas
-  laterales de engrane, deslizamiento, paso de polos y armónicos de ranura de
-  los motores de inducción, y tonos de paso de pala.
 - [Correlación, retardo y envolvente](/phonometry/es/signals/spectra/correlation-delay/):
   estimaciones de correlación con sus errores aleatorios, estimación del
   retardo por correlación directa, pendiente de fase y ponderaciones GCC,
@@ -133,3 +127,14 @@ estimaciones.
   ruido hacia una respuesta al impulso, barridos que siguen un espectro de
   magnitud objetivo arbitrario conformando el retardo de grupo, y la
   inversión con regularización de Kirkeby de una respuesta medida.
+
+## Véase también
+
+Páginas de otras áreas del sitio en las que se apoya esta sección:
+
+- [Frecuencias de fallo de máquinas](/phonometry/es/vibration/machinery/machine-diagnostics/):
+  las familias cinemáticas de frecuencias de fallo de la maquinaria rotativa
+  (Norton y Karczub, sección 8.4) dibujadas sobre un espectro de envolvente
+  medido: frecuencias BPFO, BPFI, BSF y de jaula de los rodamientos, bandas
+  laterales de engrane, deslizamiento, paso de polos y armónicos de ranura de
+  los motores de inducción, y tonos de paso de pala.

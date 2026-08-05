@@ -79,7 +79,7 @@ def test_calibration_1khz_4hz_is_one_vacil(
 
 def test_calibration_constant_is_the_tabulated_c_f() -> None:
     # Formula 163 tabulates c_F = 0.003840572; the implementation must use
-    # the standard's value verbatim (shared oracle in tests/reference_data.py).
+    # the standard's value verbatim (shared oracle in tests/reference_data/).
     from reference_data import ECMA418_2_FLUCTUATION_C_F
 
     assert _fse._C_F == ECMA418_2_FLUCTUATION_C_F

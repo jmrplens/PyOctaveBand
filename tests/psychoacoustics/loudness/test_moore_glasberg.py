@@ -79,7 +79,7 @@ def test_anchor_single_ear_is_two_thirds_of_binaural() -> None:
 def test_calibration_constant_is_the_tabulated_c() -> None:
     # ISO 532-2 Formula (7) tabulates C = 0.0617 sone/Cam; the implementation
     # must use the standard's value verbatim (shared oracle in
-    # tests/reference_data.py).
+    # tests/reference_data/).
     from reference_data import ISO532_2_C
 
     from phonometry.psychoacoustics.loudness.moore_glasberg import _C_SONE

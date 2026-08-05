@@ -48,8 +48,8 @@ of the rest of the package, exactly as printed:
   :math:`[T] = [\Gamma(-h)][\Gamma(0)]^{-1}` (Eq. (11.34)).
 
 The layer is used through
-:class:`~phonometry.materials.absorbers.porous.PoroelasticLayer` inside
-:func:`~phonometry.materials.absorbers.porous.layered_absorber`, which switches
+:class:`~phonometry.materials.absorbers.layered.PoroelasticLayer` inside
+:func:`~phonometry.materials.absorbers.layered.layered_absorber`, which switches
 to the global-matrix assembly of Sect. 11.5 as soon as a poroelastic layer is
 present, with the coupling matrices of Sect. 11.4 (:math:`[I_{pf}]` /
 :math:`[J_{pf}]` Eq. (11.73), :math:`[I_{pp}]` Eq. (11.67)) and the hard-wall
@@ -521,7 +521,7 @@ def biot_surface_impedance(waves: BiotWavesResult, thickness: float) -> Complex:
 
     This is an independent derivation of the same physics as the chapter 11
     transfer-matrix assembly reached through
-    :class:`~phonometry.materials.absorbers.porous.PoroelasticLayer`; the two
+    :class:`~phonometry.materials.absorbers.layered.PoroelasticLayer`; the two
     agree to machine precision, which is one of the anchors of this module.
     Unlike the transfer matrix, it is restricted to normal incidence, to a
     single layer and to a glued rigid backing.
@@ -649,7 +649,7 @@ def poroelastic_transfer_matrix(
     Table 11.1 behind it is built by :func:`_gamma`.
 
     The layer solver of
-    :func:`~phonometry.materials.absorbers.porous.layered_absorber` does *not*
+    :func:`~phonometry.materials.absorbers.layered.layered_absorber` does *not*
     use this matrix: it assembles the wave amplitudes directly, which avoids
     inverting :math:`[\Gamma(0)]` and is far better conditioned for a very
     soft or a
