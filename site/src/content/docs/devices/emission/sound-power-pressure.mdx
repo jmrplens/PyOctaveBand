@@ -472,6 +472,30 @@ repository; click the preview to open the PDF.
 	caption="Sound power determination fiche (SoundPowerResult.report), an ISO 3744 engineering-grade hemisphere measurement with the K1/K2 corrections and the boxed LWA."
 />
 
+The precision result writes the same sheet from the ISO 3745 side, with the
+meteorological corrections on its basis strip in place of the $K_1$/$K_2$ pair.
+This is the 40-position hemisphere measurement of section 2, the one whose
+spectrum is plotted above:
+
+```python
+result.report(
+    "precision-sound-power.pdf",
+    metadata=emission.ReportMetadata(
+        client="Example manufacturing plant",
+        specimen="Mid-frequency-peaked machine",
+        test_room="Qualified anechoic room, 40-position hemisphere array",
+        measurement_standard="ISO 3745",
+    ),
+)   # LWA = 89.3 dB(A) re 1 pW, U = 4.1 dB
+```
+
+<ReportPreview
+	name="iso3745_precision_power_example"
+	title="ISO 3745 precision sound power determination example report (PDF)"
+	description="One-page ISO 3745 precision sound-power fiche: a header with the client, the noise source and the qualified anechoic room with its 40-position hemisphere array, the octave-band table from 125 Hz to 8 kHz of surface sound-pressure levels Lp and band sound-power levels LW (78.0, 79.0, 82.6, 85.8, 82.6, 78.7 and 78.0 dB), the LW spectrum peaking at 1 kHz, and the boxed A-weighted sound power level LWA = 89.3 dB(A) re 1 pW with the total LW = 90.1 dB, the expanded uncertainty U = 4.1 dB and the measurement surface S = 6.28 m2, over a basis strip stating the applied meteorological corrections C1 = -0.13 dB, C2 = 0.00 dB and C3 = 0.0 dB."
+	caption="Precision sound power fiche (PrecisionSoundPowerResult.report), the ISO 3745 anechoic determination with its meteorological corrections."
+/>
+
 
 ## What this guide covers
 

@@ -485,6 +485,31 @@ el repositorio; haz clic en la vista previa para abrir el PDF.
 	caption="Ficha de determinación de potencia acústica (SoundPowerResult.report), una medición ISO 3744 en hemisferio de grado de ingeniería con las correcciones K1/K2 y el LWA en recuadro."
 />
 
+El resultado de precisión escribe la misma hoja desde el lado de ISO 3745, con
+las correcciones meteorológicas en su tira de base en lugar del par
+$K_1$/$K_2$. Es la medición de la sección 2 sobre las 40 posiciones del
+hemisferio, la del espectro representado más arriba:
+
+```python
+result.report(
+    "potencia-precision.pdf",
+    metadata=emission.ReportMetadata(
+        client="Planta de fabricación de ejemplo",
+        specimen="Máquina con pico en medias frecuencias",
+        test_room="Sala anecoica cualificada, red de 40 posiciones en hemisferio",
+        measurement_standard="ISO 3745",
+    ),
+    language="es",
+)   # LWA = 89,3 dB(A) re 1 pW, U = 4,1 dB
+```
+
+<ReportPreview
+	name="iso3745_precision_power_example"
+	title="Informe de ejemplo de determinación de potencia acústica de precisión ISO 3745 (PDF)"
+	description="Ficha de una página de potencia acústica de precisión ISO 3745: un encabezado con el cliente, la fuente de ruido y la sala anecoica cualificada con su red de 40 posiciones en hemisferio, la tabla en bandas de octava de 125 Hz a 8 kHz de niveles de presión acústica de superficie Lp y niveles de potencia acústica de banda LW (78,0, 79,0, 82,6, 85,8, 82,6, 78,7 y 78,0 dB), el espectro LW con su máximo en 1 kHz, y el recuadro con el nivel de potencia acústica ponderado A LWA = 89,3 dB(A) re 1 pW junto al LW total = 90,1 dB, la incertidumbre expandida U = 4,1 dB y la superficie de medición S = 6,28 m2, sobre una tira de base que indica las correcciones meteorológicas aplicadas C1 = -0,13 dB, C2 = 0,00 dB y C3 = 0,0 dB."
+	caption="Ficha de potencia acústica de precisión (PrecisionSoundPowerResult.report), la determinación anecoica de ISO 3745 con sus correcciones meteorológicas."
+/>
+
 
 ## Qué cubre esta guía
 

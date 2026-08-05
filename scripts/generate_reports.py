@@ -38,6 +38,7 @@ for _threads_var in (
     os.environ.setdefault(_threads_var, "1")
 
 import argparse
+import sys
 from collections.abc import Callable, Sequence
 from typing import Any
 
@@ -45,6 +46,17 @@ import numpy as np
 
 import phonometry as ph
 from phonometry import ReportMetadata
+
+# The ISO 12354 Annex L / Annex G building is assembled once, in tests/, and
+# read from there by the tests and by scripts/conformance_report.py. The two
+# detailed-prediction fiches below show that same building, so they read it
+# from the same place rather than becoming a third transcription of a worked
+# example whose inputs the registry already records two corrections to.
+_TESTS = os.path.normpath(os.path.join(os.path.dirname(__file__), "..", "tests"))
+if _TESTS not in sys.path:
+    sys.path.insert(0, _TESTS)
+
+import reference_data as ref  # noqa: E402  (needs the path above)
 
 #: Committed output directory for the example fiches.
 _DEFAULT_DIR = os.path.normpath(
@@ -2238,6 +2250,154 @@ _SCATTER_FREQS = np.array(
 )
 
 
+def _detailed_building() -> tuple[dict, "np.ndarray", "np.ndarray"]:
+    """The Annex L building in situ, its bands and the floating-floor gain.
+
+    Assembled from the same fixture the tests and the conformance report read,
+    so the two detailed fiches show the building those two already pin rather
+    than a transcription of it.
+    """
+    import iso12354_building as bld
+
+    bands = np.asarray(ref.ISO12354_ANNEX_L_BANDS, dtype=np.float64)
+    situ = {key: ph.in_situ_element(el, bands) for key, el in bld.elements().items()}
+    delta = ph.floating_floor_improvement(
+        bands, resonance_frequency=bld.floating_floor_resonance()
+    )
+    return situ, bands, delta
+
+
+def _detailed_airborne_example() -> tuple[object, ReportMetadata, str]:
+    """Detailed airborne fiche: the ISO 12354-1:2017 Annex L worked example.
+
+    The building the two parts of the standard share: two dwellings one above
+    the other, a 220 mm concrete separating floor of 20 m2 carrying a floating
+    floor, two 365 mm autoclaved aerated concrete external walls and two 200 mm
+    calcium-silicate internal walls, joined by the eight Annex E junctions.
+    The per-band model of Clause 4.2 runs the direct path and the twelve
+    flanking paths band by band, and their energy summation rates to
+    R'w = 57 dB, the Annex L result. Two of the annex's printed inputs are
+    taken corrected rather than as printed, both registered in docs/ERRATA.md:
+    the Formula (C.1) perimeter sums, derived from Formula (C.4) with the
+    unrounded Annex E junction indices, and the external walls' internal loss
+    factor, 0,012 5 from the element specification rather than the 0,013 of the
+    input block.
+    """
+    import iso12354_building as bld
+
+    situ, bands, delta = _detailed_building()
+    result = ph.detailed_airborne_prediction(
+        bands,
+        direct_index=ph.direct_reduction_index(
+            situ["floor"].sound_reduction_index, delta_r_source=delta
+        ),
+        flanking_paths=bld.airborne_paths(situ, delta),
+    )
+    metadata = ReportMetadata(
+        specimen="220 mm concrete separating floor with floating floor (Annex L)",
+        client="Example client",
+        area=20.0,
+        source_volume=50.0,
+        receiving_volume=50.0,
+        test_room="Dwelling above to dwelling below (example)",
+        measurement_standard="EN/ISO 12354-1",
+        test_date="2026-08-05",
+        laboratory="Phonometry reference example",
+        operator="phonometry",
+        report_id="EXAMPLE-12354-1-L",
+        notes=(
+            "Detailed per-band model (Clause 4.2) over the Annex L building: "
+            "365 mm AAC external walls, 200 mm calcium-silicate internal "
+            "walls, eight Annex E junctions, thirteen paths."
+        ),
+        requirement=52.0,
+    )
+    return result, metadata, "iso12354_detailed_airborne_example.pdf"
+
+
+def _detailed_impact_example() -> tuple[object, ReportMetadata, str]:
+    """Detailed impact fiche: the ISO 12354-2:2017 Annex G worked example.
+
+    The airborne example's building, in the impact direction: the same 220 mm
+    concrete floor and floating floor excited by the tapping machine, the
+    per-band normalized impact level of the direct path reduced by the
+    floating floor's improvement, and the four flanking paths of Clause 4.2.
+    The energy summation rates to L'n,w = 41 dB, the Annex G result.
+    """
+    import iso12354_building as bld
+
+    situ, bands, delta = _detailed_building()
+    result = ph.detailed_impact_prediction(
+        bands,
+        direct_level=ph.direct_impact_level(
+            situ["floor"].impact_level, delta_l=delta
+        ),
+        flanking_paths=bld.impact_paths(situ, delta),
+    )
+    metadata = ReportMetadata(
+        specimen="220 mm concrete floor with floating floor (Annex G)",
+        client="Example client",
+        area=20.0,
+        mass_per_area=484.0,
+        receiving_volume=50.0,
+        test_room="Dwelling above to dwelling below (example)",
+        measurement_standard="EN/ISO 12354-2",
+        test_date="2026-08-05",
+        laboratory="Phonometry reference example",
+        operator="phonometry",
+        report_id="EXAMPLE-12354-2-G",
+        notes=(
+            "Detailed per-band model (Clause 4.2) over the Annex L/G "
+            "building: direct path plus four flanking paths, floating floor "
+            "improvement from the resonance frequency of the annex."
+        ),
+        requirement=50.0,
+    )
+    return result, metadata, "iso12354_detailed_impact_example.pdf"
+
+
+def _precision_sound_power_example() -> tuple[object, ReportMetadata, str]:
+    """Precision sound-power fiche: ISO 3745:2012 in an anechoic room.
+
+    The guide's own worked example: a mid-frequency-peaked machine measured
+    over the forty standardized hemisphere positions of Annex E at a radius of
+    1 m (surface S = 2*pi*r^2 = 6,283 m2), with a base spectrum peaked near
+    1 kHz and a 1 dB per-position spread from a seeded generator, so the fiche
+    and the guide print the same numbers. The determination gives an
+    A-weighted sound power level LWA = 89,3 dB(A) re 1 pW. The expanded
+    uncertainty is the Clause 10.5 example: the method's own sigma_omc =
+    2,0 dB at k = 2, over the ISO 3745 Table 1 reproducibility standard
+    deviation of the band.
+    """
+    freqs = np.array([125, 250, 500, 1000, 2000, 4000, 8000], dtype=float)
+    base = 70.0 + 8.0 * np.exp(-(np.log2(freqs / 1000.0) ** 2) / 2.0)
+    rng = np.random.default_rng(7)
+    levels = base[None, :] + rng.normal(0.0, 1.0, (40, freqs.size))
+    result = ph.emission.sound_power_anechoic(
+        levels,
+        "hemisphere",
+        radius=1.0,
+        frequencies=freqs,
+        sigma_omc=2.0,
+    )
+    metadata = ReportMetadata(
+        client="Example manufacturing plant",
+        specimen="Mid-frequency-peaked machine (guide example)",
+        test_room="Qualified anechoic room, 40-position hemisphere array",
+        measurement_standard="ISO 3745",
+        test_date="2026-08-05",
+        laboratory="Phonometry reference example",
+        operator="phonometry",
+        report_id="EXAMPLE-3745",
+        notes=(
+            "Precision grade: Annex E hemisphere array at r = 1 m, "
+            "meteorological corrections at the 23 C / 101,325 kPa reference, "
+            "expanded uncertainty from the Clause 10.5 example."
+        ),
+    )
+    return result, metadata, "iso3745_precision_power_example.pdf"
+
+
 def _scattering_example() -> tuple[object, ReportMetadata, str]:
     """ISO 17497-1 fiche: a random-incidence scattering-coefficient measurement.
 
@@ -3334,6 +3494,9 @@ _FICHES: dict[str, Callable[[], tuple[object, ReportMetadata, str]]] = {
     "hvac_duct_noise_example.pdf": _hvac_example,
     "duct_path_example.pdf": _duct_path_example,
     "rd1367_activity_example.pdf": _rd1367_example,
+    "iso12354_detailed_airborne_example.pdf": _detailed_airborne_example,
+    "iso12354_detailed_impact_example.pdf": _detailed_impact_example,
+    "iso3745_precision_power_example.pdf": _precision_sound_power_example,
 }
 
 #: The registered factories alone, in generation order.
