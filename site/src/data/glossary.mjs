@@ -908,12 +908,8 @@ export const glossary = [
         symbol: "$\\Delta L_w$",
         unit: "dB",
         standard: {
-          en: "ISO 717-2:2020 (measurement in ISO 16251-1:2014",
-          es: "ISO 717-2:2020 (medición en ISO 16251-1:2014",
-        },
-        clause: {
-          en: "Formulae (3) and (4))",
-          es: "Fórmulas (3) y (4))",
+          en: "ISO 717-2:2020 (measurement in ISO 16251-1:2014, Formulae (3) and (4))",
+          es: "ISO 717-2:2020 (medición en ISO 16251-1:2014, Fórmulas (3) y (4))",
         },
         guide: "buildings/design/impact-improvement",
         definition: {
@@ -1492,12 +1488,8 @@ export const glossary = [
           es: "sonio/Bark",
         },
         standard: {
-          en: "ISO 532-1:2017 (sone/Cam form in ISO 532-2:2017",
-          es: "ISO 532-1:2017 (forma en sonio/Cam en ISO 532-2:2017",
-        },
-        clause: {
-          en: "Formula 7)",
-          es: "Fórmula 7)",
+          en: "ISO 532-1:2017 (sone/Cam form in ISO 532-2:2017, Formula 7)",
+          es: "ISO 532-1:2017 (forma en sonio/Cam en ISO 532-2:2017, Fórmula 7)",
         },
         guide: "perception/psychoacoustics/loudness",
         definition: {
@@ -1712,7 +1704,8 @@ export const glossary = [
         id: "imd",
         symbol: "IMD",
         unit: "%",
-        standard: "IEC 60268-3:2013, 14.12.7",
+        standard: "IEC 60268-3:2013",
+        clause: "14.12.7",
         guide: "devices/electroacoustics/electroacoustics",
         definition: {
           en: "Modulation intermodulation distortion: the sidebands a low-frequency tone produces around a high-frequency one.",
@@ -1723,7 +1716,8 @@ export const glossary = [
         id: "dim",
         symbol: "DIM",
         unit: "%",
-        standard: "IEC 60268-3:2013, 14.12.9",
+        standard: "IEC 60268-3:2013",
+        clause: "14.12.9",
         guide: "devices/electroacoustics/electroacoustics",
         definition: {
           en: "Dynamic intermodulation distortion, measured with a 15 kHz sine against a filtered 3.15 kHz square wave.",
@@ -1836,22 +1830,15 @@ export const glossary = [
       },
       {
         id: "l-p-2",
-        name: {
-          en: "$L_p$",
-          es: "Lp",
-        },
+        symbol: "$L_p$",
         qualifier: {
           en: "underwater",
           es: "submarino",
         },
         unit: "dB re 1 µPa",
         standard: {
-          en: "ISO 18405:2017 (mean-square level in ISO 18406:2017",
-          es: "ISO 18405:2017 (nivel cuadrático medio en ISO 18406:2017",
-        },
-        clause: {
-          en: "Formula 7)",
-          es: "Fórmula 7)",
+          en: "ISO 18405:2017 (mean-square level in ISO 18406:2017, Formula 7)",
+          es: "ISO 18405:2017 (nivel cuadrático medio en ISO 18406:2017, Fórmula 7)",
         },
         guide: "underwater/underwater-acoustics",
         definition: {

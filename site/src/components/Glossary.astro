@@ -24,6 +24,7 @@
 import { getCollection } from 'astro:content';
 import katex from 'katex';
 import { glossary } from '../data/glossary.mjs';
+import { basePath, siteUrl } from '../data/site.mjs';
 
 interface Props {
 	/** Locale of the page the glossary is rendered on. */
@@ -31,8 +32,13 @@ interface Props {
 }
 const { lang = 'en' } = Astro.props;
 
-const BASE = (import.meta.env.BASE_URL ?? '/').replace(/\/$/, '');
-const SITE = 'https://jmrplens.github.io/phonometry';
+// The two site-wide strings live in one place, which is where astro.config.mjs
+// and the audit scripts read them from; a second copy here would be a second
+// thing to remember on a move.
+const BASE = basePath;
+const SITE = `${siteUrl}${basePath}`;
+/** The locale prefix this page's URLs carry, after the base. */
+const LOCALE = lang === 'es' ? '/es' : '';
 
 /** A field that is either shared by both languages or given per language. */
 const localized = (value: string | Record<string, string> | undefined) =>
@@ -84,7 +90,11 @@ const terms = glossary.flatMap((group) =>
 			clauseText: localized(term.clause),
 			qualifierText: localized(term.qualifier),
 			definitionText: localized(term.definition) as string,
-			href: guide ? `${BASE}${lang === 'es' ? '/es' : ''}/${guide}/` : undefined,
+			// The path without the base: the href a browser follows carries it, the
+			// absolute URL in the structured data carries it too, and building both
+			// from the slug keeps neither from having to strip it back off.
+			path: guide ? `${LOCALE}/${guide}/` : undefined,
+			href: guide ? `${BASE}${LOCALE}/${guide}/` : undefined,
 			guideTitle: title,
 		};
 	}),
@@ -95,28 +105,43 @@ const terms = glossary.flatMap((group) =>
  * delimiters, so `$L_{Aeq}$` is the "LAeq" a search engine can match against a
  * query and not the TeX that produced it.
  */
-const termCode = (label: string) => label.replace(/[$\\{}_^]/g, '');
+const termCode = (label: string) => plain(label);
+
+/**
+ * A string as a machine reads it: the maths syntax removed, not just the
+ * delimiters, so `$L_{Aeq}$` is the "LAeq" a search engine can match against a
+ * query, and a definition carrying `$\mathrm{THD}_F$` reads as "THDF" rather
+ * than as the TeX that produced it.
+ */
+function plain(source: string): string {
+	return source
+		.replace(/\\(?:text|mathrm|mathit|mathbf|operatorname)\{([^}]*)\}/g, '$1')
+		.replace(/\\[a-zA-Z]+/g, '')
+		.replace(/[$\\{}_^]/g, '');
+}
 
 const jsonld = {
 	'@context': 'https://schema.org',
 	'@type': 'DefinedTermSet',
-	'@id': `${SITE}${lang === 'es' ? '/es' : ''}/reference/glossary/#glossary`,
+	'@id': `${SITE}${LOCALE}/reference/glossary/#glossary`,
 	name: lang === 'es' ? 'Glosario acústico de phonometry' : 'phonometry acoustic glossary',
-	url: `${SITE}${lang === 'es' ? '/es' : ''}/reference/glossary/`,
+	url: `${SITE}${LOCALE}/reference/glossary/`,
 	inLanguage: lang,
 	hasDefinedTerm: terms.map((term) => {
 		const code = termCode(term.label);
-		const where = [term.standardText, term.clauseText].filter(Boolean).join(', ');
-		const unit = term.unitText ? ` ${lang === 'es' ? 'Unidad' : 'Unit'}: ${term.unitText}.` : '';
+		const where = [term.standardText, term.clauseText].filter(Boolean).map(plain).join(', ');
+		const unit = term.unitText
+			? ` ${lang === 'es' ? 'Unidad' : 'Unit'}: ${plain(term.unitText)}.`
+			: '';
 		return {
 			'@type': 'DefinedTerm',
-			'@id': `${SITE}${lang === 'es' ? '/es' : ''}/reference/glossary/#${term.id}`,
+			'@id': `${SITE}${LOCALE}/reference/glossary/#${term.id}`,
 			name: code,
 			termCode: code,
-			description: `${term.definitionText}${unit} ${lang === 'es' ? 'Definida en' : 'Defined in'}: ${where}.`,
-			inDefinedTermSet: { '@id': `${SITE}${lang === 'es' ? '/es' : ''}/reference/glossary/#glossary` },
-			...(term.href && term.guideTitle
-				? { subjectOf: { '@type': 'TechArticle', name: term.guideTitle, url: `${SITE}${term.href.replace(BASE, '')}` } }
+			description: `${plain(term.definitionText)}${unit} ${lang === 'es' ? 'Definida en' : 'Defined in'}: ${where}.`,
+			inDefinedTermSet: { '@id': `${SITE}${LOCALE}/reference/glossary/#glossary` },
+			...(term.path && term.guideTitle
+				? { subjectOf: { '@type': 'TechArticle', name: term.guideTitle, url: `${SITE}${term.path}` } }
 				: {}),
 		};
 	}),
