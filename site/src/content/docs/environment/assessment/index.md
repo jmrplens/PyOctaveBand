@@ -12,6 +12,6 @@ to compare the result against.
 is the adjustment for sound whose impulses make it more annoying than its LAeq
 suggests, in both the Nordtest closed form and the ISO/PAS 1996-3 measurement
 chain. The indicators it adjusts are in
-[Environmental Levels](/phonometry/environment/environmental-levels/), and the
+[Environmental Levels](/phonometry/environment/assessment/environmental-levels/), and the
 national application of the whole chain is in
-[the Spanish regulation](/phonometry/environment/spanish-noise-regulation/).
+[the Spanish regulation](/phonometry/environment/assessment/spanish-noise-regulation/).

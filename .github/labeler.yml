@@ -76,7 +76,7 @@ performance:
   - changed-files:
       - any-glob-to-any-file:
           - scripts/bench.py
-          - tests/test_performance.py
+          - tests/filters/test_performance.py
 
 api:
   - changed-files:

@@ -10,7 +10,7 @@ derives, for every prominent tone, the **audibility** $\Delta L$: how many
 decibels the tone level exceeds the masking threshold of the surrounding noise.
 (Whether a tone is *annoying* is a separate, downstream rating judgement.) It
 is the detailed method that **ISO 1996-2:2017** defers to (the simpler Annex C
-route lives in [environmental measurement](../../environment/environmental-levels.md)); the mean
+route lives in [environmental measurement](../../environment/assessment/environmental-levels.md)); the mean
 audibility $\Delta L$ it produces feeds the ISO 1996-2 tonal adjustment $K_t$.
 
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/tone_audibility_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/tone_audibility.svg" alt="Per-tone audibility ΔL of the nine tones of the ISO/PAS 20065 Annex E combustion-engine spectrum, with the decisive tone at 137.3 Hz highlighted and the ΔL = 0 dB audibility threshold marked" width="82%"></picture>

@@ -1,13 +1,13 @@
 ← [Documentation index](../README.md)
 
-# Aircraft and wind energy
+# Aircraft noise
 
-Aircraft and wind turbines are noise sources important enough to have their
-own internationally negotiated metrics, each fixed to the last decimal by a
-certification or type-testing framework. The four pages of this section
-implement those frameworks, and they share a common anatomy: a rigorously
-standardised **source descriptor**, plus standardised **propagation
-adjustments** that place the source at a receiver.
+Aircraft are noise sources important enough to have their own internationally
+negotiated metrics, each fixed to the last decimal by a certification
+framework. The three pages of this section implement those frameworks, and
+they share a common anatomy: a rigorously standardised **source descriptor**,
+plus standardised **propagation adjustments** that place the source at a
+receiver.
 
 [Aircraft noise: Effective Perceived Noise Level](aircraft-noise.md)
 covers fixed-wing certification. The **EPNL** of ICAO Annex 16 condenses a
@@ -30,17 +30,15 @@ Chien-Soroka ground effect, interpolates between the measured flight
 conditions along the track, and integrates the received history into the
 single-event SEL, LASmax and EPNL and their ground-grid contours.
 
-[Wind-turbine noise: sound power and tonal audibility](../environment/sources/wind-turbine-noise.md)
-covers IEC 61400-11 type testing: the **apparent sound power level** that
-refers the measured immission back to an equivalent point source at the rotor
-centre, and the tonal-audibility chain that decides whether a blade-passing,
-gearbox or generator tone is audible above its masking noise.
-
 The shared physics connects outward: atmospheric absorption comes from the
 same ISO 9613-1 model as
 [Outdoor Sound Propagation](../environment/propagation/outdoor-propagation.md), and the
-wind-turbine tonality test is a cousin of the tonal-audibility methods in
-[Psychoacoustics](../perception/psychoacoustics/index.md).
+same type-testing logic governs
+[Wind-turbine noise](../environment/sources/wind-turbine-noise.md),
+which is filed with the other environmental sources: its IEC 61400-11 apparent
+sound power level and tonal-audibility chain answer the same question for a
+source that is not an aircraft. That tonality test is in turn a cousin of the
+methods in [Psychoacoustics](../perception/psychoacoustics/index.md).
 
 ## Pages in this section
 
@@ -52,5 +50,3 @@ wind-turbine tonality test is a cousin of the tonal-audibility methods in
 - [Rotorcraft noise: the hemisphere method](rotorcraft-noise.md):
   the ECAC Doc 32 noise-hemisphere source model, its propagation adjustments
   and the single-event metrics and contours.
-- [Wind-turbine noise: sound power and tonal audibility](../environment/sources/wind-turbine-noise.md):
-  the IEC 61400-11 apparent sound power level and tonal-audibility chain.

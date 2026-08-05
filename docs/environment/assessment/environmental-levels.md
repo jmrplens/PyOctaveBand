@@ -1,31 +1,6 @@
----
-title: "Environmental Levels (ISO 1996-1/-2)"
-description: "Lden, Ldn and the composite rating levels of ISO 1996-1, with the ISO 1996-2 tonal adjustment, residual-noise correction and measurement uncertainty budget."
-references:
-  - type: standard
-    organization: "International Organization for Standardization"
-    year: 2016
-    title: "Acoustics — Description, measurement and assessment of environmental noise — Part 1: Basic quantities and assessment procedures"
-    designation: "ISO 1996-1:2016"
-    url: "https://www.iso.org/standard/59765.html"
-    note: "Lden (3.6.4), Ldn (3.6.5) and the composite whole-day rating level of clause 6.5 (Formulae 5-6, Table A.1 adjustments)."
-  - type: standard
-    organization: "International Organization for Standardization"
-    year: 2017
-    title: "Acoustics — Description, measurement and assessment of environmental noise — Part 2: Determination of sound pressure levels"
-    designation: "ISO 1996-2:2017"
-    url: "https://www.iso.org/standard/59766.html"
-    note: "The Annex C tonal adjustment (with the survey method and the ISO/PAS 20065 mean-audibility mapping), the Clause 10.4 residual-noise correction and the Clause 4 / Annex F measurement uncertainty budget."
-  - type: standard
-    organization: "British Standards Institution"
-    year: 2003
-    title: "Description and measurement of environmental noise — Guide to quantities and procedures"
-    designation: "BS 7445-1:2003"
-    url: "https://knowledge.bsigroup.com/products/description-and-measurement-of-environmental-noise-guide-to-quantities-and-procedures"
-    note: "The survey-practice companion of ISO 1996-1: which descriptor family fits which assessment question, and the measurement procedures around them (BS 7445-2:1991 covers the land-use data acquisition)."
----
+← [Documentation index](../../README.md)
 
-import ThemeImage from '../../../components/ThemeImage.astro';
+# Environmental Levels (ISO 1996-1/-2)
 
 A community does not hear a single $L_{Aeq}$: it hears a day whose evenings and
 nights matter more, a source whose tones or impulses annoy beyond their
@@ -37,11 +12,11 @@ determination procedures that make the reported number defensible: the
 tonal adjustment, the residual-noise correction and the measurement
 uncertainty budget.
 
-The level computation itself, the $L_{eq}$/$L_{Aeq}$ integrals,
+The level-computation half of the topic, the $L_{eq}$/$L_{Aeq}$ integrals,
 the percentile levels $L_N$, SEL and the noise dose that produce the period
 levels this page consumes, is
-[Integrated and Statistical Levels](/phonometry/signals/levels/levels/); everything
-here assumes those per-period values are already in hand.
+[Integrated and Statistical Levels](../../signals/levels/levels.md); everything here assumes
+those per-period values are already in hand.
 
 ## Environmental noise: Lden, Ldn and rating levels (ISO 1996-1)
 
@@ -63,7 +38,7 @@ r = environment.composite_rating_level([(63.2, 12, 0.0),    # day
                             (51.4, 8, 10.0)])   # night  (+10) == environment.lden
 ```
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/lden_profile.svg" alt="Synthetic 24-hour urban LAeq profile with day, evening and night bands, the +5 and +10 dB weighted period levels and the resulting Lden" width="80%" />
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/lden_profile_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/lden_profile.svg" alt="Synthetic 24-hour urban LAeq profile with day, evening and night bands, the +5 and +10 dB weighted period levels and the resulting Lden" width="80%"></picture>
 
 <details>
 <summary>Show the code for this figure</summary>
@@ -113,14 +88,14 @@ plt.show()
 
 Where you put the microphone changes the number: ISO 1996-2 fixes the receiver positions and their façade corrections. The diagram is measurement context; apply the corrections to your levels before analysis:
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_env_measurement.svg" alt="Environmental noise measurement positions per ISO 1996-2: free field, 2 m from the facade and flush-mounted, with their corrections" width="92%" />
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_env_measurement_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_env_measurement.svg" alt="Environmental noise measurement positions per ISO 1996-2: free field, 2 m from the facade and flush-mounted, with their corrections" width="92%"></picture>
 
 Combine with `laeq()` per time period to go from recordings to $L_{den}$. The
 tonal adjustment itself is justified by the tonal audibility route of the next
 section (fed, for the ISO/PAS 20065 method, by
-[Objective audibility of tones in noise](/phonometry/perception/psychoacoustics/tone-audibility/));
+[Objective audibility of tones in noise](../../perception/psychoacoustics/tone-audibility.md));
 the `tone_to_noise_ratio()` / `prominence_ratio()` verdicts of
-[Prominent Discrete Tones](/phonometry/perception/psychoacoustics/tone-prominence/) are
+[Prominent Discrete Tones](../../perception/psychoacoustics/tone-prominence.md) are
 complementary emission screening, not the $K_t$ basis.
 
 ## Determining levels: tonal adjustment, residual noise and uncertainty (ISO 1996-2)
@@ -142,7 +117,7 @@ exceeding both neighbours by 15/8/5 dB (low/mid/high), and
 `tonal_adjustment_from_mean_audibility` maps the ISO/PAS 20065 mean audibility to
 $K_t$ (Table J.1).
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/tonal_audibility.svg" alt="ISO 1996-2 tonal adjustment Kt as a piecewise function of the tonal audibility: zero below 4 dB, rising linearly to 6 dB between 4 and 10 dB, and 6 dB above, with the four Annex C.5 worked examples and a mid-range tone marked" width="80%" />
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/tonal_audibility_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/tonal_audibility.svg" alt="ISO 1996-2 tonal adjustment Kt as a piecewise function of the tonal audibility: zero below 4 dB, rising linearly to 6 dB between 4 and 10 dB, and 6 dB above, with the four Annex C.5 worked examples and a mid-range tone marked" width="80%"></picture>
 
 <details>
 <summary>Show the code for this figure</summary>
@@ -181,33 +156,19 @@ spread beyond 3 dB, where the substitute grossly inflates.
 ```python
 from phonometry import environment
 
+# Tonal adjustment for a prominent tone:
 tonal = environment.assess_tonal_audibility(54.1, 45.2, 430.0)  # TonalAssessmentResult
 kt = tonal.adjustment                                             # 6 dB
 tonal.plot()   # this audibility on the Kt curve, as in the figure above
+
+# Subtract residual (background) noise from a measured level:
 corr = environment.residual_sound_correction(measured_level=58.0, residual_level=50.0)
+corr.corrected_level, corr.reliable
+
+# Combine an uncertainty budget and expand to 95 %:
 u = environment.combined_standard_uncertainty([0.59, 0.3, 2.0, 0.40, 0.38])  # 2.18 dB (G.2)
 environment.expanded_uncertainty(u)                            # 4.36 dB (k = 2)
 ```
-
-## What this guide covers
-
-**Covered.** ISO 1996-1:2016's $L_{den}$, $L_{dn}$ and composite rating level (clause
-6.5, `environment.lden`/`ldn`/`composite_rating_level`); and ISO
-1996-2:2017's tonal adjustment (Annex C), residual-noise correction (Clause
-10.4) and measurement uncertainty budget (Clause 4, Annex F).
-
-**Not covered.** ISO 1996-2 fixes the receiver positions and the façade
-corrections that turn a raw measurement into the level this page's
-functions expect: those position and correction procedures are not
-implemented, only the arithmetic that follows once you have applied them.
-
-## See also
-
-- [Integrated and Statistical Levels](/phonometry/signals/levels/levels/): the $L_{eq}$/$L_{Aeq}$, percentile and event levels the indicators of this page are assembled from.
-- [Objective audibility of tones in noise (ISO/PAS 20065)](/phonometry/perception/psychoacoustics/tone-audibility/): the tonal audibility whose mean value maps to the $K_t$ adjustment (Table J.1).
-- [Prominent Discrete Tones](/phonometry/perception/psychoacoustics/tone-prominence/): the ECMA-418-1 tone-to-noise and prominence-ratio verdicts, complementary emission screening for the tonal question.
-- [Occupational exposure (ISO 9612)](/phonometry/perception/hearing/occupational-exposure/): the workplace counterpart, from task samples to the daily exposure level with its uncertainty budget.
-- API reference: [`environment.assessment.measurement`](/phonometry/reference/api/environment/measurement/) and [`environment.assessment.rating`](/phonometry/reference/api/environment/rating/).
 
 ## Quick answers
 
@@ -218,3 +179,38 @@ $L_{den}$, the day-evening-night level of ISO 1996-1:2016 (3.6.4), adds
 energy-averaging the whole day, with default periods of 12, 4 and 8 hours,
 adjustable because countries define them differently. The day-night variant
 $L_{dn}$ (3.6.5) keeps only the +10 dB night penalty.
+
+## See also
+
+- [Integrated and Statistical Levels](../../signals/levels/levels.md): the $L_{eq}$/$L_{Aeq}$,
+  percentile and event levels the indicators of this page are assembled from.
+- [Objective audibility of tones in noise](../../perception/psychoacoustics/tone-audibility.md): the tonal
+  audibility whose mean value maps to the $K_t$ adjustment (Table J.1).
+- [Prominent Discrete Tones](../../perception/psychoacoustics/tone-prominence.md): the ECMA-418-1
+  tone-to-noise and prominence-ratio verdicts, complementary emission
+  screening for the tonal question.
+- [Occupational Noise Exposure](../../perception/hearing/occupational-exposure.md): the workplace
+  counterpart, from task samples to the daily exposure level with its
+  uncertainty budget.
+- API reference: [`environment.assessment.measurement`](https://jmrplens.github.io/phonometry/reference/api/environment/measurement/)
+  and [`environment.assessment.rating`](https://jmrplens.github.io/phonometry/reference/api/environment/rating/).
+
+## References
+
+- British Standards Institution. (2003). *Description and measurement of
+  environmental noise — Guide to quantities and procedures* (BS 7445-1:2003).
+  [BSI Knowledge](https://knowledge.bsigroup.com/products/description-and-measurement-of-environmental-noise-guide-to-quantities-and-procedures).
+  The survey-practice companion of ISO 1996-1: which descriptor family fits
+  which assessment question (BS 7445-2:1991 covers the land-use data
+  acquisition).
+
+## Standards
+
+ISO 1996-1:2016, *Acoustics — Description, measurement and assessment of
+environmental noise — Part 1: Basic quantities and assessment procedures*:
+Lden (3.6.4), Ldn (3.6.5) and the composite whole-day rating level of
+clause 6.5 (Formulae 5-6, Table A.1 adjustments). ISO 1996-2:2017,
+*Acoustics — Description, measurement and assessment of environmental
+noise — Part 2: Determination of sound pressure levels*: the Annex C tonal
+adjustment, the Clause 10.4 residual-noise correction and the Clause 4 /
+Annex F measurement uncertainty budget.

@@ -66,7 +66,7 @@ elección, y Bies, Hansen y Howard 2017, §2.5 las repasa en paralelo):
 - **Molestia comunitaria a largo plazo**: $L_{den}$/$L_{dn}$ y los niveles
   de evaluación de ISO 1996-1, que penalizan la energía de tarde y noche
   antes de promediar el día: el asunto de
-  [Niveles ambientales](/phonometry/es/environment/environmental-levels/).
+  [Niveles ambientales](/phonometry/es/environment/assessment/environmental-levels/).
 
 Conviene mantener nítidas dos fronteras con las páginas hermanas. Las
 métricas integradas de esta página evitan deliberadamente el detector
@@ -129,7 +129,7 @@ normativas que sí promedian decibelios directamente son aproximaciones
 deliberadas y lo declaran (ISO 1996-2 ofrece una como sustituto de la
 incertidumbre por mediciones repetidas y avisa de que se infla cuando los
 niveles se dispersan más de 3 dB, ver la sección de incertidumbre de
-[Niveles ambientales](/phonometry/es/environment/environmental-levels/));
+[Niveles ambientales](/phonometry/es/environment/assessment/environmental-levels/));
 en todo lo demás, energía.
 
 ### Parámetros de `leq()` / `laeq()`
@@ -248,7 +248,7 @@ conocidos no dan el $L_{90}$ de las dos horas con ninguna fórmula;
 recalcúlalo sobre la envolvente conjunta. Los valores de $L_{eq}$, en cambio,
 se combinan exactamente promediando energías ponderadas por el tiempo, que es
 lo que hace el `composite_rating_level` de
-[Niveles ambientales](/phonometry/es/environment/environmental-levels/).
+[Niveles ambientales](/phonometry/es/environment/assessment/environmental-levels/).
 
 ### Parámetros de `ln_levels()`
 
@@ -381,7 +381,7 @@ incertidumbre de la ISO 9612, continúa en
 
 Convertir estos niveles en los indicadores regulatorios día-tarde-noche y
 reportarlos con garantías es
-[Niveles ambientales](/phonometry/es/environment/environmental-levels/): los
+[Niveles ambientales](/phonometry/es/environment/assessment/environmental-levels/): los
 descriptores $L_{den}$ y $L_{dn}$, los niveles de evaluación compuestos de
 ISO 1996-1
 con sus ajustes por carácter, y la cadena de determinación de ISO 1996-2 con
@@ -488,13 +488,13 @@ fraccional de `OctaveFilterBank.spectrogram`.
 ($L_{den}$, $L_{dn}$, niveles de evaluación) y los procedimientos de
 determinación de
 la ISO 1996-2 se han trasladado a
-[Niveles ambientales](/phonometry/es/environment/environmental-levels/). La IEC
+[Niveles ambientales](/phonometry/es/environment/assessment/environmental-levels/). La IEC
 61252 se revisó en 2025; aquí solo están las fórmulas de la primera edición
 implementada (1993), no las de la más reciente.
 
 ## Véase también
 
-- [Niveles ambientales (ISO 1996-1/-2)](/phonometry/es/environment/environmental-levels/): los indicadores $L_{den}$/$L_{dn}$, los niveles de evaluación y la cadena de determinación de ISO 1996-2 construidos sobre los niveles de esta página.
+- [Niveles ambientales (ISO 1996-1/-2)](/phonometry/es/environment/assessment/environmental-levels/): los indicadores $L_{den}$/$L_{dn}$, los niveles de evaluación y la cadena de determinación de ISO 1996-2 construidos sobre los niveles de esta página.
 - [Ponderación temporal](/phonometry/es/signals/levels/time-weighting/): el detector Fast/Slow/Impulse sobre el que se definen los niveles percentiles.
 - [Calibración](/phonometry/es/signals/metrology/calibration/): el factor de sensibilidad que convierte unidades digitales en los pascales que todo nivel de esta página asume.
 - [Exposición laboral (ISO 9612)](/phonometry/es/perception/hearing/occupational-exposure/): las estrategias de medición en el puesto de trabajo que alimentan las medidas de dosis.

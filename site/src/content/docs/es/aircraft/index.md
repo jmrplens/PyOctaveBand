@@ -1,13 +1,12 @@
 ---
-title: "Aeronaves y energía eólica"
-description: "Fuentes de transporte y energía con métricas de ruido fijadas internacionalmente: el EPNL del Anexo 16 de la ICAO y la maquinaria de aeropuertos de ECAC Doc 29, el método del hemisferio para rotorcraft de ECAC Doc 32, y la emisión y audibilidad tonal de aerogeneradores de IEC 61400-11."
+title: "Ruido de aeronaves"
+description: "Ruido de aeronaves con métricas fijadas internacionalmente: la cadena de certificación EPNL del Anexo 16 de la ICAO, la maquinaria de contornos de aeropuerto de ECAC Doc 29 y el método del hemisferio para rotorcraft de ECAC Doc 32."
 ---
 
-Las aeronaves y los aerogeneradores son fuentes de ruido lo bastante
-importantes como para tener métricas propias negociadas internacionalmente,
-cada una fijada hasta el último decimal por un marco de certificación o de
-ensayo de tipo. Las cuatro páginas de esta sección implementan esos marcos, y
-comparten una misma anatomía: un **descriptor de fuente** rigurosamente
+Las aeronaves son fuentes de ruido lo bastante importantes como para tener
+métricas propias negociadas internacionalmente, cada una fijada hasta el
+último decimal por un marco de certificación. Las tres páginas de esta sección
+implementan esos marcos, y comparten una misma anatomía: un **descriptor de fuente** rigurosamente
 normalizado, más **ajustes de propagación** normalizados que colocan la
 fuente en un receptor.
 
@@ -34,18 +33,15 @@ Chien-Soroka, interpola entre las condiciones de vuelo medidas a lo largo de
 la trayectoria e integra el historial recibido en el SEL, LASmax y EPNL de
 evento único y sus contornos en malla de tierra.
 
-[Ruido de aerogeneradores: potencia y audibilidad tonal](/phonometry/es/environment/sources/wind-turbine-noise/)
-cubre el ensayo de tipo de IEC 61400-11: el **nivel de potencia acústica
-aparente** que refiere la inmisión medida a una fuente puntual equivalente en
-el centro del rotor, y la cadena de audibilidad tonal que decide si un tono
-de paso de pala, multiplicadora o generador es audible sobre su ruido
-enmascarante.
-
 La física compartida conecta hacia fuera: la absorción atmosférica viene del
 mismo modelo ISO 9613-1 que
 [Propagación del sonido en exteriores](/phonometry/es/environment/propagation/outdoor-propagation/),
-y el ensayo de tonalidad de aerogeneradores es primo de los métodos de
-audibilidad tonal de
+y la misma lógica de ensayo de tipo gobierna el
+[Ruido de aerogeneradores](/phonometry/es/environment/sources/wind-turbine-noise/),
+que está archivado con las demás fuentes ambientales: su nivel de potencia
+acústica aparente de IEC 61400-11 y su cadena de audibilidad tonal responden a
+la misma pregunta para una fuente que no es una aeronave. Ese ensayo de
+tonalidad es a su vez primo de los métodos de
 [Psicoacústica](/phonometry/es/perception/psychoacoustics/).
 
 ## Páginas de esta sección
@@ -59,6 +55,3 @@ audibilidad tonal de
 - [Ruido de rotorcraft: el método del hemisferio](/phonometry/es/aircraft/rotorcraft-noise/):
   el modelo de fuente de hemisferio de ruido de ECAC Doc 32, sus ajustes de
   propagación y las métricas y contornos de evento único.
-- [Ruido de aerogeneradores: potencia y audibilidad tonal](/phonometry/es/environment/sources/wind-turbine-noise/):
-  el nivel de potencia acústica aparente de IEC 61400-11 y la cadena de
-  audibilidad tonal.

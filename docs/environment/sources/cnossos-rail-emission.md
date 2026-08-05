@@ -436,5 +436,5 @@ such as depots, stations and loudspeakers, are treated by the industrial method.
 
 - [Outdoor Sound Propagation](../propagation/outdoor-propagation.md): the
   ISO 9613-2 chain that carries a source power to a receiver.
-- [Environmental noise levels](../environmental-levels.md): the
+- [Environmental noise levels](../assessment/environmental-levels.md): the
   $L_{den}$ and $L_{night}$ indicators the resulting maps are drawn for.

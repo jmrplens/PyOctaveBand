@@ -61,6 +61,11 @@ receptor, que es donde esta sección se encuentra con los modelos de
 - [Rigidez dinámica de transferencia (ISO 10846)](/phonometry/es/vibration/structural/transfer-stiffness/):
   rigidez de transferencia dinámica de aisladores por los métodos directo e
   indirecto.
+
+## Véase también
+
+Páginas de otras áreas del sitio en las que se apoya esta sección:
+
 - [Potencia acústica desde vibración (ISO/TS 7849)](/phonometry/es/devices/emission/vibration-sound-power/):
   potencia aérea radiada desde la velocidad superficial y un factor de
   radiación.

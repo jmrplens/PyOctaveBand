@@ -31,7 +31,7 @@ Bies, Hansen & Howard 2017, §2.5 surveys them side by side):
 - **Long-term community annoyance**: $L_{den}$/$L_{dn}$ and the ISO
   1996-1 rating levels, which weight evening and night energy before
   averaging the day: the subject of
-  [Environmental levels](../../environment/environmental-levels.md).
+  [Environmental levels](../../environment/assessment/environmental-levels.md).
 
 Two boundaries with the sibling pages are worth keeping sharp. The
 integrated metrics here deliberately bypass the exponential detector:
@@ -91,7 +91,7 @@ spread over 10 dB it already costs a couple of decibels. The few normative
 formulas that do average decibels directly are deliberate approximations and
 say so (ISO 1996-2 offers one as a substitute for repeated-measurement
 uncertainty and warns it inflates once levels spread beyond 3 dB, see the
-uncertainty section of [Environmental levels](../../environment/environmental-levels.md));
+uncertainty section of [Environmental levels](../../environment/assessment/environmental-levels.md));
 everywhere else, energy.
 
 ### `leq()` / `laeq()` parameters
@@ -208,7 +208,7 @@ One caution: percentiles do not combine. Two hours with known $L_{90}$
 values do not yield the two-hour $L_{90}$ by any formula; recompute it from
 the pooled envelope. $L_{eq}$ values, by contrast, combine exactly by
 time-weighted energy averaging, which is what the `composite_rating_level`
-of [Environmental levels](../../environment/environmental-levels.md) does.
+of [Environmental levels](../../environment/assessment/environmental-levels.md) does.
 
 ### `ln_levels()` parameters
 
@@ -340,7 +340,7 @@ job samples, with the normative ISO 9612 uncertainty budget, continues in
 
 Turning these levels into the regulatory day-evening-night indicators and
 reporting them defensibly is
-[Environmental levels](../../environment/environmental-levels.md): the $L_{den}$ and $L_{dn}$
+[Environmental levels](../../environment/assessment/environmental-levels.md): the $L_{den}$ and $L_{dn}$
 descriptors, the composite rating levels of ISO 1996-1 with their character
 adjustments, and the ISO 1996-2 determination chain of tonal adjustment,
 residual-noise correction and the measurement uncertainty budget.
@@ -474,4 +474,4 @@ IEC 61252, *Electroacoustics — Specifications for personal sound exposure
 meters*: the sound exposure E in Pa²h and the normalized 8 h level LEX,8h
 (≡ LEP,d), anchored at 3.2 Pa²h ⇔ exactly 90 dB. The ISO 1996-1/-2
 environmental indicators and determination procedures are covered in
-[Environmental levels](../../environment/environmental-levels.md).
+[Environmental levels](../../environment/assessment/environmental-levels.md).

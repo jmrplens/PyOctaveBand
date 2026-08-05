@@ -12,6 +12,6 @@ límite con el que comparar el resultado.
 es la corrección para el sonido cuyos impulsos lo hacen más molesto de lo que
 sugiere su LAeq, tanto en la forma cerrada del Nordtest como en la cadena de
 medición de ISO/PAS 1996-3. Los indicadores que corrige están en
-[Niveles ambientales](/phonometry/es/environment/environmental-levels/), y la
+[Niveles ambientales](/phonometry/es/environment/assessment/environmental-levels/), y la
 aplicación nacional de toda la cadena, en
-[la normativa española](/phonometry/es/environment/spanish-noise-regulation/).
+[la normativa española](/phonometry/es/environment/assessment/spanish-noise-regulation/).

@@ -203,7 +203,7 @@ other only as supporting evidence.
 
 ## See also
 
-- [Environmental levels](../../environment/environmental-levels.md): the ISO 1996-1 rating levels and their Table A.1
+- [Environmental levels](../../environment/assessment/environmental-levels.md): the ISO 1996-1 rating levels and their Table A.1
   tonal adjustments, whose Kt is justified by the ISO/PAS 20065 audibility
   route; these prominence verdicts are complementary emission screening.
 - [Sound Quality Metrics](sound-quality.md): the ECMA-418-2 psychoacoustic

@@ -1,4 +1,4 @@
-← [Documentation index](../README.md)
+← [Documentation index](../../README.md)
 
 # Spanish Noise Regulation (RD 1367/2007)
 
@@ -12,7 +12,7 @@ annual value, and that value is compared against three different criteria read
 off the same limit table. This page implements that chain end to end.
 
 The per-period levels that feed it come from
-[Integrated & Statistical Levels](../signals/levels/levels.md), and the European
+[Integrated & Statistical Levels](../../signals/levels/levels.md), and the European
 $L_{den}$/$L_{dn}$ indicators they coexist with, from
 [Environmental levels](environmental-levels.md).
 
@@ -294,12 +294,12 @@ exceeds 9 dB.
 - [Environmental levels](environmental-levels.md): the $L_{den}$ and $L_{dn}$
   indicators and the ISO 1996-2 adjustments the corrections of the regulation
   coexist with.
-- [Integrated & Statistical Levels](../signals/levels/levels.md): the per-phase $L_{Aeq}$,
+- [Integrated & Statistical Levels](../../signals/levels/levels.md): the per-phase $L_{Aeq}$,
   $L_{Ceq}$ and $L_{AIeq}$ levels that feed the three corrections.
-- [Spanish Building Code (CTE DB-HR)](../buildings/insulation/spanish-building-code.md): the other half
+- [Spanish Building Code (CTE DB-HR)](../../buildings/insulation/spanish-building-code.md): the other half
   of the Spanish framework, which shares the site's day noise index $L_d$ with
   this page.
-- [Impulsive-sound prominence](assessment/impulsive-sound.md): the ISO/PAS 1996-3
+- [Impulsive-sound prominence](impulsive-sound.md): the ISO/PAS 1996-3
   impulsive adjustment, the relative of $K_i$ that is not interchangeable with
   it.
 - API reference: [`environment.assessment.spain`](https://jmrplens.github.io/phonometry/reference/api/environment/spain/).

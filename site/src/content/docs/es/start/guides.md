@@ -161,10 +161,10 @@ ISO 1996-1, IEC 60942 y la GUM.
 - [Niveles integrados y estadísticos](/phonometry/es/signals/levels/levels/): $L_{eq}$ y
   $L_{Aeq}$, los niveles percentiles $L_{10}$/$L_{50}$/$L_{90}$, $L_{Cpeak}$ y
   SEL, y la dosis de ruido.
-- [Niveles ambientales (ISO 1996-1/-2)](/phonometry/es/environment/environmental-levels/):
+- [Niveles ambientales (ISO 1996-1/-2)](/phonometry/es/environment/assessment/environmental-levels/):
   $L_{den}$, $L_{dn}$ y los niveles de valoración compuestos, el ajuste tonal, la
   corrección de ruido residual y el presupuesto de incertidumbre.
-- [Normativa española de ruido (RD 1367/2007)](/phonometry/es/environment/spanish-noise-regulation/):
+- [Normativa española de ruido (RD 1367/2007)](/phonometry/es/environment/assessment/spanish-noise-regulation/):
   el nivel corregido $L_{Keq}$ con sus correcciones $K_t$, $K_f$ y $K_i$, los
   periodos temporales de evaluación y las fases de ruido, las tablas de valores
   límite y la comprobación del artículo 25.

@@ -26,7 +26,7 @@ $$
 
 The adjustments $K_i$ cover time-of-day penalties (ISO 1996-1 Table A.1: evening 5 dB, night 10 dB) as well as source-character adjustments (e.g. tonal penalties), which the ECMA-418-1 TNR/PR assessments can justify objectively.
 
-See the [Environmental levels guide](../../environment/environmental-levels.md) for usage.
+See the [Environmental levels guide](../../environment/assessment/environmental-levels.md) for usage.
 
 ## Impulsive-sound prominence (NT ACOU 112)
 

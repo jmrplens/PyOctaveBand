@@ -77,10 +77,10 @@ valoración.
 - [Niveles integrados y estadísticos](/phonometry/es/signals/levels/levels/): Leq y
   LAeq, niveles percentiles L10/L50/L90, LCpeak y SEL, dosis de ruido
   (IEC 61252), y espectrogramas de octava.
-- [Niveles ambientales (ISO 1996-1/-2)](/phonometry/es/environment/environmental-levels/):
+- [Niveles ambientales (ISO 1996-1/-2)](/phonometry/es/environment/assessment/environmental-levels/):
   Lden, Ldn y los niveles de valoración compuestos, el ajuste tonal, la
   corrección de ruido residual y el presupuesto de incertidumbre.
-- [Normativa española de ruido (RD 1367/2007)](/phonometry/es/environment/spanish-noise-regulation/):
+- [Normativa española de ruido (RD 1367/2007)](/phonometry/es/environment/assessment/spanish-noise-regulation/):
   el nivel corregido LKeq, las correcciones Kt/Kf/Ki, los periodos temporales
   de evaluación y las fases de ruido, y las tablas de valores límite.
 

@@ -14,8 +14,8 @@ Full documentation for phonometry. Also available as a website:
 - [Multichannel](signals/filters/multichannel.md): vectorized multichannel analysis
 - [Calibration and dBFS](signals/metrology/calibration.md): physical SPL and digital analysis
 - [Integrated & Statistical Levels](signals/levels/levels.md): $L_{eq}$, $L_{Aeq}$, $L_{10}$/$L_{50}$/$L_{90}$, $L_{Cpeak}$/SEL, noise dose (IEC 61252), octave spectrogram
-- [Environmental levels](environment/environmental-levels.md): $L_{den}$, $L_{dn}$ and the composite rating levels of ISO 1996-1, with the ISO 1996-2 tonal adjustment, residual-noise correction and measurement uncertainty budget
-- [Spanish Noise Regulation (RD 1367/2007)](environment/spanish-noise-regulation.md): the corrected level $L_{Keq}$ with its tonal, low-frequency and impulsive corrections, the evaluation periods split into noise phases, the acoustic quality objective and immission limit tables, and the Article 25 compliance check of an activity
+- [Environmental levels](environment/assessment/environmental-levels.md): $L_{den}$, $L_{dn}$ and the composite rating levels of ISO 1996-1, with the ISO 1996-2 tonal adjustment, residual-noise correction and measurement uncertainty budget
+- [Spanish Noise Regulation (RD 1367/2007)](environment/assessment/spanish-noise-regulation.md): the corrected level $L_{Keq}$ with its tonal, low-frequency and impulsive corrections, the evaluation periods split into noise phases, the acoustic quality objective and immission limit tables, and the Article 25 compliance check of an activity
 - [Frequency Weighting](signals/levels/weighting.md): A, C, Z curves
 - [Special weightings](signals/levels/special-weightings.md): the ISO 7196 G-weighting for infrasound, the historical B (ANSI S1.4-1983) and D (IEC 537) curves, and AU (IEC 61012) for audible sound in the presence of ultrasound
 - [Time Weighting](signals/levels/time-weighting.md): Fast, Slow, Impulse ballistics

@@ -69,14 +69,6 @@ y las fuentes que alimentan un cálculo de propagación en las secciones de
 - [Propagación del sonido en exteriores](/phonometry/es/environment/propagation/outdoor-propagation/):
   la absorción atmosférica de ISO 9613-1 y el método general de ISO 9613-2
   con desglose de atenuación por término y banda de octava.
-- [Emisión de la fuente ferroviaria CNOSSOS-EU](/phonometry/es/environment/sources/cnossos-rail-emission/):
-  el método común europeo de emisión ferroviaria, de la rugosidad del carril y
-  de la rueda a la potencia acústica direccional por metro de las dos líneas
-  fuente equivalentes.
-- [Emisión de la fuente de tráfico viario CNOSSOS-EU](/phonometry/es/environment/sources/cnossos-road-emission/):
-  la fuente viaria del Anexo II de la Directiva 2002/49/CE: potencia acústica
-  de rodadura y propulsión por categoría de vehículo con la base de datos del
-  Apéndice F, y la potencia acústica direccional por metro de línea fuente.
 - [Efecto suelo esférico y barreras avanzadas](/phonometry/es/environment/propagation/ground-barriers/):
   la reflexión de onda esférica de Weyl-Van der Pol en el suelo y la difracción
   de barreras por teoría ondulatoria (Kurze-Anderson, semiplano rígido exacto,
@@ -85,6 +77,19 @@ y las fuentes que alimentan un cálculo de propagación en las secciones de
   la propia atmósfera refractante: perfiles efectivos de velocidad del sonido,
   rayos curvados con sus zonas de sombra, y la ecuación parabólica de función
   de Green.
+
+## Véase también
+
+Páginas de otras áreas del sitio en las que se apoya esta sección:
+
+- [Emisión de la fuente ferroviaria CNOSSOS-EU](/phonometry/es/environment/sources/cnossos-rail-emission/):
+  el método común europeo de emisión ferroviaria, de la rugosidad del carril y
+  de la rueda a la potencia acústica direccional por metro de las dos líneas
+  fuente equivalentes.
+- [Emisión de la fuente de tráfico viario CNOSSOS-EU](/phonometry/es/environment/sources/cnossos-road-emission/):
+  la fuente viaria del Anexo II de la Directiva 2002/49/CE: potencia acústica
+  de rodadura y propulsión por categoría de vehículo con la base de datos del
+  Apéndice F, y la potencia acústica direccional por metro de línea fuente.
 - [Prominencia de sonidos impulsivos (NT ACOU 112)](/phonometry/es/environment/assessment/impulsive-sound/):
   la prominencia predicha de los sonidos impulsivos y el ajuste graduado KI
   del LAeq.

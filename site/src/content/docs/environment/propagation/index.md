@@ -66,13 +66,6 @@ sections.
 - [Outdoor Sound Propagation](/phonometry/environment/propagation/outdoor-propagation/):
   ISO 9613-1 atmospheric absorption and the ISO 9613-2 general method with a
   per-term octave-band attenuation breakdown.
-- [CNOSSOS-EU railway source emission](/phonometry/environment/sources/cnossos-rail-emission/):
-  the common EU railway emission method, from rail and wheel roughness to the
-  directional sound power per metre of the two equivalent source lines.
-- [CNOSSOS-EU road traffic source emission](/phonometry/environment/sources/cnossos-road-emission/):
-  the road source of Annex II to Directive 2002/49/EC: rolling and propulsion
-  sound power per vehicle category with the Appendix F database, and the
-  directional sound power per metre of source line.
 - [Spherical ground effect and advanced barriers](/phonometry/environment/propagation/ground-barriers/):
   the Weyl-Van der Pol spherical-wave ground reflection and wave-theoretic
   barrier diffraction (Kurze-Anderson, exact rigid half-plane, thick barriers
@@ -80,6 +73,18 @@ sections.
 - [Atmospheric refraction: rays and the GFPE](/phonometry/environment/propagation/atmospheric-refraction/):
   the refracting atmosphere itself: effective sound-speed profiles, curved rays
   with their shadow zones, and the Green's function parabolic equation.
+
+## See also
+
+Pages elsewhere on the site that this section leans on:
+
+- [CNOSSOS-EU railway source emission](/phonometry/environment/sources/cnossos-rail-emission/):
+  the common EU railway emission method, from rail and wheel roughness to the
+  directional sound power per metre of the two equivalent source lines.
+- [CNOSSOS-EU road traffic source emission](/phonometry/environment/sources/cnossos-road-emission/):
+  the road source of Annex II to Directive 2002/49/EC: rolling and propulsion
+  sound power per vehicle category with the Appendix F database, and the
+  directional sound power per metre of source line.
 - [Impulsive-sound prominence (NT ACOU 112)](/phonometry/environment/assessment/impulsive-sound/):
   the predicted prominence of impulsive sounds and the graduated LAeq
   adjustment KI.

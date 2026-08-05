@@ -17,7 +17,7 @@
 # staleness check is the real gate. The hook warns and lets the commit proceed.
 
 if git diff --cached --name-only \
-	| grep -Eq '^(src/phonometry/|scripts/conformance_report\.py|tests/reference_data\.py)'; then
+	| grep -Eq '^(src/phonometry/|scripts/conformance_report\.py|scripts/conformance/|tests/reference_data/)'; then
 	echo "[pre-commit] source changed - regenerating docs/CONFORMANCE.md ..."
 	if make conformance && make site-reports \
 		&& git add docs/CONFORMANCE.md \

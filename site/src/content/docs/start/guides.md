@@ -156,10 +156,10 @@ IEC 61252, ISO 1996-1, IEC 60942 and the GUM.
 - [Integrated and Statistical Levels](/phonometry/signals/levels/levels/): $L_{eq}$ and
   $L_{Aeq}$, the percentile levels $L_{10}$/$L_{50}$/$L_{90}$, $L_{Cpeak}$ and
   SEL, and the noise dose.
-- [Environmental Levels (ISO 1996-1/-2)](/phonometry/environment/environmental-levels/):
+- [Environmental Levels (ISO 1996-1/-2)](/phonometry/environment/assessment/environmental-levels/):
   $L_{den}$, $L_{dn}$ and the composite rating levels, the tonal adjustment, the
   residual-noise correction and the uncertainty budget.
-- [Spanish Noise Regulation (RD 1367/2007)](/phonometry/environment/spanish-noise-regulation/):
+- [Spanish Noise Regulation (RD 1367/2007)](/phonometry/environment/assessment/spanish-noise-regulation/):
   the corrected level $L_{Keq}$ with its $K_t$, $K_f$ and $K_i$ corrections, the
   evaluation periods and noise phases, the limit tables and the Article 25
   compliance check.
