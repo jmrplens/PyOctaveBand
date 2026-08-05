@@ -8,7 +8,7 @@ Oracle strategy (no free fitting anywhere):
   coefficients themselves are the oracle: the models are pinned digit-exact
   at a mid-range digitization point recomputed by hand from Bies 5e
   Table D.1 / Mechel 2e Sect. G.11 Eq. (2) and Miki 1990 Eqs. (30)-(34)
-  (``tests/reference_data.py``).
+  (``tests/reference_data/``).
 - JCA is pinned to its exact closed-form limits (Johnson et al. 1987):
   ``j w rho_e -> sigma`` at DC, ``rho_e -> (T rho/phi)(1 + (1-j) delta_v/L)``
   at high frequency and the isothermal/adiabatic bulk-modulus limits, plus

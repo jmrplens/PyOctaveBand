@@ -461,7 +461,7 @@ def test_weighted_thd_468_emphasises_6khz_products() -> None:
 def test_thd_clipped_sine_fourier_oracle() -> None:
     # Oracle: unit sine symmetrically clipped at 0.7 (48 samples/period);
     # odd-harmonic amplitudes and THD_F from an independent single-period
-    # Fourier series of the sampled waveform (reference_data.py).
+    # Fourier series of the sampled waveform (reference_data/).
     x = np.clip(_tone(1000.0), -0.7, 0.7)
     assert thd(x, FS, 1000.0) == pytest.approx(ref.CLIPPED_SINE_THD_F, rel=1e-9)
     res = harmonic_analysis(x, FS, 1000.0)

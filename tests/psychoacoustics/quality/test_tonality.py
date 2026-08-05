@@ -45,7 +45,7 @@ def _tone_in_noise(
 
 def test_critical_band_examples() -> None:
     """Clause 10 and 12.2 worked examples from the standard text (shared
-    oracles in tests/reference_data.py, also used by the CI report)."""
+    oracles in tests/reference_data/, also used by the CI report)."""
     _, _, dfc_1k = _critical_band(1000.0)
     assert dfc_1k == pytest.approx(ECMA418_1_DFC_1KHZ, abs=0.05)
     _, _, dfc_500 = _critical_band(500.0)

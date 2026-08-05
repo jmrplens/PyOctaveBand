@@ -46,7 +46,7 @@ from phonometry.materials.absorbers.rating import (
 
 # ISO 11654:1997 Annex A worked examples (the "Absorber" alpha_p columns).
 # Bands 250, 500, 1000, 2000, 4000 Hz (the 125 Hz row is not rated).
-# Imported from tests/reference_data.py (shared with the conformance report).
+# Imported from tests/reference_data/ (shared with the conformance report).
 _ANNEX_A1_ALPHA_P = list(ISO11654_ANNEX_A1_ALPHA_P)
 _ANNEX_A2_ALPHA_P = list(ISO11654_ANNEX_A2_ALPHA_P)
 # The tabulated shifted reference curve (shift s = 0.40) shared by both.

@@ -17,7 +17,7 @@ that is what ``test_workbook_*`` asserts.
 
 **The coefficient tables** cannot be pinned by the workbook, which predates the
 2021 amendment, so they are pinned against a second, machine-made transcription
-of the Official Journal text held in ``tests/reference_data.py``.
+of the Official Journal text held in ``tests/reference_data/``.
 
 Everything the workbook does not reach - the studded-tyre speed branches above
 50 km/h, the gradient breakpoints, the 20 km/h floor - is anchored on the exact

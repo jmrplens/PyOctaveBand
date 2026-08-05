@@ -1,0 +1,361 @@
+#  Copyright (c) 2026. Jose Manuel Requena Plens
+"""Every diagram the documentation embeds, under the name it embeds it by.
+
+``DIAGRAMS`` is the catalogue: it maps the base file name of a diagram to
+the builder that draws it, the title printed across the top and the canvas
+height it needs. It is the only place that knows the whole set, which is
+what makes it the place to look when a guide shows a diagram and the
+question is where it comes from; the domain modules only know how to draw.
+``generate_all`` walks the catalogue and writes the four variants of each
+entry into ``output_dir``.
+"""
+
+from __future__ import annotations
+
+import os
+
+from .aircraft import _d_aircraft_certification, _d_rotorcraft_certification
+from .buildings import (
+    _d_enclosed_space_absorption,
+    _d_flanking,
+    _d_impact,
+    _d_installed_paths,
+    _d_insulation_lab,
+    _d_insulation_setup,
+    _d_ir_measurement,
+    _d_iso12999,
+    _d_open_plan,
+    _d_panel_insulation,
+    _d_reception_plate,
+    _d_reverberation_prediction,
+    _d_room_image_sources,
+    _d_room_measurement,
+    _d_room_noise,
+)
+from .canvas import _write
+from .devices import (
+    _d_intensity_scan,
+    _d_loudspeaker_freefield,
+    _d_methods,
+    _d_noise_control,
+    _d_pp_probe,
+    _d_precision_anechoic,
+    _d_program_loudness,
+    _d_surfaces,
+    _d_swept_sine,
+    _d_vibration_sound_power,
+)
+from .environment import (
+    _d_atmospheric_refraction,
+    _d_env_positions,
+    _d_ground_barrier,
+    _d_ground_reflection,
+    _d_impulse_prominence,
+    _d_outdoor,
+    _d_wind_turbine,
+)
+from .materials import (
+    _d_airflow,
+    _d_astm_tube,
+    _d_diffusion_goniometer,
+    _d_dynamic_stiffness_rig,
+    _d_impedance_tube,
+    _d_insitu_subtraction,
+    _d_iso11654,
+    _d_porous_layer,
+    _d_scattering_reverb,
+    _d_spot_tube,
+)
+from .perception import (
+    _d_dosimeter,
+    _d_emission_positions,
+    _d_hearing_threshold,
+    _d_nihl,
+    _d_objective_intelligibility,
+    _d_psychoacoustic_annoyance,
+    _d_sound_quality,
+    _d_speech_intelligibility,
+    _d_sti_chain,
+    _d_tone_audibility,
+    _d_zwicker,
+)
+from .signals import (
+    _d_bank_dataflow,
+    _d_block_processing,
+    _d_calibration_chain,
+    _d_calibration_dataflow,
+    _d_cepstrum_echoes,
+    _d_correlation_delay,
+    _d_data_qualification,
+    _d_equal_loudness_weighting,
+    _d_miso_coherence,
+    _d_multichannel,
+    _d_multirate,
+    _d_signal_chain,
+    _d_slm_chain,
+    _d_slm_pipeline,
+    _d_spectral_analysis,
+    _d_synchronous_averaging,
+    _d_system_measurement,
+    _d_test_signals,
+    _d_time_frequency,
+    _d_time_weighting,
+    _d_uncertainty,
+)
+from .simulation import _d_fdtd
+from .underwater import _d_hydrophone_deployment, _d_sofar_channel
+from .vibration import (
+    _d_human_vibration,
+    _d_junction_rig,
+    _d_mobility_rig,
+    _d_multiple_shock,
+    _d_transfer_stiffness_rig,
+)
+
+DIAGRAMS = {
+    "diagram_calibration_setup": (_d_calibration_chain, "Calibration chain — from calibrator to physical units", 560),
+    "diagram_env_measurement": (_d_env_positions, "Environmental noise measurement positions (ISO 1996-2)", 560),
+    "diagram_tonality_positions": (_d_emission_positions, "Emission measurement positions (ECMA-74)", 560),
+    "diagram_signal_chain": (_d_signal_chain, "phonometry processing chain", 400),
+    "diagram_multirate": (_d_multirate, "Multirate decimation in the octave filter bank", 560),
+    "diagram_pp_probe": (_d_pp_probe, "Two-microphone (p-p) intensity probe", 460),
+    "diagram_sti_chain": (_d_sti_chain, "STI measurement chain (IEC 60268-16)", 400),
+    "diagram_insulation_setup": (
+        _d_insulation_setup, "Airborne sound insulation setup (ISO 16283-1)", 600),
+    "diagram_ir_measurement": (
+        _d_ir_measurement, "Impulse-response measurement chain (ISO 18233)", 440),
+    "diagram_sound_power_surfaces": (
+        _d_surfaces, "ISO 3744 / 3746 sound power measurement surfaces", 640),
+    "diagram_impact_setup": (
+        _d_impact, "ISO 16283-2 impact sound insulation setup", 600),
+    "sound_power_methods": (
+        _d_methods, "Sound power methods compared", 620),
+    "diagram_flanking_paths": (
+        _d_flanking, "Direct and flanking transmission paths (EN 12354)", 640),
+    "diagram_outdoor_geometry": (
+        _d_outdoor, "ISO 9613-2 source–barrier–receiver geometry", 560),
+    "diagram_impedance_tube": (
+        _d_impedance_tube, "Impedance tube: two-microphone method (ISO 10534-2)", 520),
+    "diagram_astm_tube": (
+        _d_astm_tube, "Four-microphone transmission-loss tube (ASTM E2611)", 560),
+    "diagram_airflow_resistance": (
+        _d_airflow, "Airflow resistance: static and alternating methods (ISO 9053-1/-2)", 540),
+    "diagram_scattering_reverb": (
+        _d_scattering_reverb,
+        "Random-incidence scattering in a reverberation room (ISO 17497-1)", 560),
+    "diagram_diffusion_goniometer": (
+        _d_diffusion_goniometer,
+        "Free-field diffusion goniometer (ISO 17497-2)", 580),
+    "diagram_insitu_subtraction": (
+        _d_insitu_subtraction,
+        "In-situ road absorption — subtraction technique (ISO 13472-1)", 560),
+    "diagram_spot_tube": (
+        _d_spot_tube,
+        "In-situ road absorption — spot method (ISO 13472-2)", 540),
+    "diagram_precision_anechoic": (
+        _d_precision_anechoic,
+        "Precision sound power in an anechoic room (ISO 3745)", 600),
+    "diagram_intensity_scan": (
+        _d_intensity_scan,
+        "Precision sound intensity scanning (ISO 9614-3)", 600),
+    "diagram_human_vibration": (
+        _d_human_vibration,
+        "Whole-body vibration measurement chain (ISO 2631-1 / ISO 8041-1)", 580),
+    "diagram_speech_intelligibility": (
+        _d_speech_intelligibility,
+        "Speech Intelligibility Index computation flow (ANSI S3.5-1997)", 600),
+    "diagram_room_measurement": (
+        _d_room_measurement,
+        "Room-acoustics measurement setup (ISO 3382-1 / ISO 3382-2)", 620),
+    "diagram_room_noise": (
+        _d_room_noise,
+        "Room-noise rating methods (ANSI/ASA S12.2-2019): NC and RC Mark II", 580),
+    "diagram_hearing_threshold": (
+        _d_hearing_threshold,
+        "Hearing-threshold model (ISO 7029 age distribution, ISO 389-7 zero)", 600),
+    "diagram_uncertainty": (
+        _d_uncertainty,
+        "Uncertainty: GUM propagation vs Monte Carlo (Guide 98-3)", 540),
+    "diagram_nihl": (
+        _d_nihl,
+        "Noise-induced hearing loss (ISO 1999): NIPTS and HTLAN", 470),
+    "diagram_ntacou112": (
+        _d_impulse_prominence,
+        "Impulsive-sound prominence and LAeq adjustment (NT ACOU 112)", 520),
+    "diagram_iso2631_5": (
+        _d_multiple_shock,
+        "Multiple-shock spinal-response dose and injury risk (ISO 2631-5)", 580),
+    "diagram_en12354_6": (
+        _d_enclosed_space_absorption,
+        "Absorption area and reverberation time of a room (EN 12354-6)", 410),
+    "diagram_time_weighting": (
+        _d_time_weighting,
+        "Exponential-detector chain of the time weightings (IEC 61672-1)", 460),
+    "diagram_block_processing": (
+        _d_block_processing,
+        "Block processing: carrying the filter state versus resetting it", 510),
+    "diagram_multichannel": (
+        _d_multichannel,
+        "Array-shape flow through a per-channel operation", 410),
+    "diagram_open_plan": (
+        _d_open_plan,
+        "Open-plan office spatial decay of speech (ISO 3382-3)", 500),
+    "diagram_iso12999": (
+        _d_iso12999,
+        "Measurement uncertainty from tables to expanded U (ISO 12999-1)", 500),
+    "diagram_iso11654": (
+        _d_iso11654,
+        "Single-number sound-absorption rating (ISO 11654)", 520),
+    "diagram_zwicker": (
+        _d_zwicker,
+        "Zwicker loudness model chain (ISO 532-1)", 490),
+    "diagram_equal_loudness_weighting": (
+        _d_equal_loudness_weighting,
+        "Why A-weighting: an equal-loudness contour, inverted (ISO 226)",
+        560),
+    "diagram_loudspeaker_freefield": (
+        _d_loudspeaker_freefield,
+        "Loudspeaker free-field sensitivity measurement (IEC 60268-5)", 600),
+    "diagram_dosimeter_iso9612": (
+        _d_dosimeter,
+        "Occupational noise exposure measurement (ISO 9612)", 640),
+    "diagram_dynamic_stiffness_rig": (
+        _d_dynamic_stiffness_rig,
+        "Dynamic-stiffness resonance rig (ISO 9052-1)", 560),
+    "diagram_mobility_rig": (
+        _d_mobility_rig,
+        "Mechanical-mobility measurement on a beam (ISO 7626)", 560),
+    "diagram_transfer_stiffness_rig": (
+        _d_transfer_stiffness_rig,
+        "Dynamic transfer stiffness: direct and indirect methods (ISO 10846)", 600),
+    "diagram_reception_plate": (
+        _d_reception_plate,
+        "Reception-plate measurement of structure-borne power (EN 15657)", 560),
+    "diagram_installed_paths": (
+        _d_installed_paths,
+        "Installed structure-borne sound paths (EN 12354-5)", 620),
+    "diagram_wind_turbine_iec61400": (
+        _d_wind_turbine,
+        "Wind-turbine noise measurement geometry (IEC 61400-11)", 640),
+    "diagram_ground_reflection": (
+        _d_ground_reflection,
+        "Ground reflection: direct ray, image source and path difference", 560),
+    "diagram_fdtd": (
+        _d_fdtd,
+        "2D acoustic FDTD wave simulation (staggered leapfrog)", 500),
+    "diagram_slm_chain": (
+        _d_slm_chain,
+        "Sound level meter measurement chain (IEC 61672-1)", 560),
+    "diagram_insulation_lab": (
+        _d_insulation_lab,
+        "Laboratory sound insulation suite (ISO 10140)", 600),
+    "diagram_junction_rig": (
+        _d_junction_rig,
+        "Junction vibration measurement on L- and T-junctions (ISO 10848)", 620),
+    "diagram_vibration_sound_power": (
+        _d_vibration_sound_power,
+        "Sound power from surface vibration (ISO/TS 7849)", 580),
+    "diagram_hydrophone_deployment": (
+        _d_hydrophone_deployment,
+        "Ship radiated-noise measurement geometry (ISO 17208-1)", 640),
+    "diagram_sofar_channel": (
+        _d_sofar_channel,
+        "The SOFAR channel: a deep-ocean sound waveguide", 620),
+    "diagram_atmospheric_refraction": (
+        _d_atmospheric_refraction,
+        "Atmospheric refraction: downwind multipath and the upwind shadow",
+        620),
+    "diagram_aircraft_certification": (
+        _d_aircraft_certification,
+        "Aircraft noise certification points (ICAO Annex 16, Chapter 3)",
+        640),
+    "diagram_rotorcraft_certification": (
+        _d_rotorcraft_certification,
+        "Helicopter overflight noise certification (ICAO Annex 16, Chapter 8)",
+        620),
+    "diagram_swept_sine": (
+        _d_swept_sine,
+        "Swept-sine distortion: deconvolution and harmonic pre-arrivals",
+        620),
+    "diagram_system_measurement": (
+        _d_system_measurement,
+        "Two-channel FRF measurement: the H1 estimator and coherence", 560),
+    "diagram_test_signals": (
+        _d_test_signals,
+        "The test-signal family at a glance", 640),
+    "diagram_spectral_analysis": (
+        _d_spectral_analysis,
+        "The Welch PSD pipeline: segment, taper, average (Bendat & Piersol)",
+        600),
+    "diagram_miso_coherence": (
+        _d_miso_coherence,
+        "MISO coherence: from correlated sources to per-source contributions",
+        540),
+    "diagram_time_frequency": (
+        _d_time_frequency,
+        "The time-frequency trade-off: two tilings of the same record", 560),
+    "diagram_cepstrum_echoes": (
+        _d_cepstrum_echoes,
+        "The cepstrum chain: an echo becomes a quefrency spike", 560),
+    "diagram_synchronous_averaging": (
+        _d_synchronous_averaging,
+        "Time synchronous averaging: trigger, slice, average", 580),
+    "diagram_correlation_delay": (
+        _d_correlation_delay,
+        "Time-delay estimation: two microphones and one correlation peak",
+        640),
+    "diagram_data_qualification": (
+        _d_data_qualification,
+        ("Data qualification: the stationarity decision "
+         "(Bendat & Piersol 10.3)"), 620),
+    "diagram_sound_quality": (
+        _d_sound_quality,
+        "Sound quality beyond loudness: four calibrated sensations", 500),
+    "diagram_tone_audibility": (
+        _d_tone_audibility,
+        "Tone audibility: from spectrum to penalty (ISO/PAS 20065)", 580),
+    "diagram_psychoacoustic_annoyance": (
+        _d_psychoacoustic_annoyance,
+        "Psychoacoustic annoyance: four sensations, one scalar", 520),
+    "diagram_objective_intelligibility": (
+        _d_objective_intelligibility,
+        "STOI and ESTOI: correlating clean against degraded speech", 600),
+    "diagram_program_loudness": (
+        _d_program_loudness,
+        "Programme loudness: the BS.1770 / R 128 metering chain", 670),
+    "diagram_reverberation_prediction": (
+        _d_reverberation_prediction,
+        "Predicting the reverberation time: Sabine against Eyring", 600),
+    "diagram_panel_insulation": (
+        _d_panel_insulation,
+        "Panel between rooms: mass law and the coincidence dip", 540),
+    "diagram_porous_layer": (
+        _d_porous_layer,
+        "Porous absorber on a rigid wall: microstructure to absorption", 590),
+    "diagram_ground_barrier": (
+        _d_ground_barrier,
+        "Barrier diffraction over ground: the Fresnel number at work", 510),
+    "diagram_room_image_sources": (
+        _d_room_image_sources,
+        "Image-source lattice in plan: first reflections of a 7 × 5 m room",
+        665),
+    "diagram_noise_control": (
+        _d_noise_control,
+        "Noise control at the source, along the path and at the receiver",
+        625),
+    "diagram_slm_pipeline": (
+        _d_slm_pipeline,
+        "The sound level meter pipeline: one function per stage", 672),
+    "diagram_calibration_dataflow": (
+        _d_calibration_dataflow,
+        "Calibration data flow: one factor, every level function", 616),
+    "diagram_bank_dataflow": (
+        _d_bank_dataflow,
+        "Inside a band: the decimation decision and the biquad cascade", 680),
+}
+
+
+def generate_all(output_dir: str = ".github/images") -> None:
+    os.makedirs(output_dir, exist_ok=True)
+    for name, (builder, title, height) in DIAGRAMS.items():
+        _write(output_dir, name, builder, title, height)

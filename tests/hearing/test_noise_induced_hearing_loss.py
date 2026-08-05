@@ -46,7 +46,7 @@ _ANNEX_D = {
 
 
 def test_annex_d_table_pins_shared_reference_data() -> None:
-    """Pin the inline Annex D transcription to ``tests/reference_data.py``.
+    """Pin the inline Annex D transcription to ``tests/reference_data/``.
 
     The CI conformance report asserts the shared constants; this guard keeps
     the (larger) inline table and the shared scalars from drifting apart.

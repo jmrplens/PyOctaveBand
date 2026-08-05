@@ -622,7 +622,7 @@ _ANSI_S14_TABLE4_B: list[tuple[float, float]] = [
 # ANSI S1.4-1983 Table V (standard page 6): tolerance limits on relative
 # response levels for Type 1 and Type 2 instruments; the verifier maps them
 # to the class 1 / class 2 verdict slots. (The stricter laboratory Type 0
-# column lives in tests/reference_data.py and is pinned by the CI
+# column lives in tests/reference_data/ and is pinned by the CI
 # conformance report.) Row = (nominal Hz, type1 upper, type1 lower,
 # type2 upper, type2 lower); a -inf lower limit means upper-only.
 # Transcription note, 20 Hz Type 2: the standard prints a bare "+3" there,

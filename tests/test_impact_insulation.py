@@ -42,7 +42,7 @@ _INDEX_500_THIRD = 7
 _INDEX_500_OCTAVE = 2
 
 # ISO 717-2 Annex C, Table C.1 measured Ln (one-third octave, 100-3150).
-# Shared oracle with the CI conformance report (tests/reference_data.py).
+# Shared oracle with the CI conformance report (tests/reference_data/).
 _ANNEX_C1_LN = list(ISO717_2_ANNEX_C1_LN)
 # ISO 717-2 Annex C, Table C.3 measured Ln (octave, 125-2000).
 _ANNEX_C3_LN = [65.3, 64.5, 58.0, 55.8, 43.0]

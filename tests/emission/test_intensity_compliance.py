@@ -5,7 +5,7 @@ IEC 61043:1993 sound-intensity instrument class verification.
 Oracles (independent of the implementation):
 
 * **Table 2** of EN 61043:1994 (standard page 14), transcribed digit for digit
-  in ``tests/reference_data.py`` as :data:`reference_data.IEC61043_TABLE2` and
+  in ``tests/reference_data/`` as :data:`reference_data.IEC61043_TABLE2` and
   cross-checked against the same table reproduced in Fahy, *Sound Intensity*
   2nd ed., Table 6.1 (printed page 136). Every band, every device kind and
   both classes are asserted, plus the structural identity that ties the three

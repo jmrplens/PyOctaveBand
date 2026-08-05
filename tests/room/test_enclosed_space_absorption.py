@@ -21,7 +21,7 @@ from phonometry.room import enclosed_space_absorption as m
 
 _VOLUME = EN12354_6_ANNEX_E_VOLUME
 # The six surfaces of the bare room (area, absorption coefficient at 1000 Hz),
-# shared with the CI conformance report via tests/reference_data.py.
+# shared with the CI conformance report via tests/reference_data/.
 _BARE_SURFACES = EN12354_6_ANNEX_E_BARE_SURFACES
 
 

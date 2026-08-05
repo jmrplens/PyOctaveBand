@@ -136,7 +136,7 @@ def test_scattering_end_to_end_synthetic() -> None:
     alpha_spec = specular_absorption_coefficient(V, S, c3=C, T3=T3, c4=C, T4=T4)
     s = scattering_coefficient(alpha_spec, alpha_s)
 
-    # Shared oracles from tests/reference_data.py (used by the CI report too).
+    # Shared oracles from tests/reference_data/ (used by the CI report too).
     assert float(alpha_s) == pytest.approx(ISO17497_1_CHAIN_ALPHA_S)
     assert float(alpha_spec) == pytest.approx(ISO17497_1_CHAIN_ALPHA_SPEC)
     assert float(s) == pytest.approx(ISO17497_1_CHAIN_SCATTERING)

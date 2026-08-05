@@ -42,7 +42,7 @@ def test_zero_improvement_gives_zero_delta_lw() -> None:
 # Real measured oracle: textile carpet (Foret, Chene & Guigou-Carter, Forum
 # Acusticum 2011, Figure 4). The Delta-L spectrum was digitized from the vector
 # chart to +/- 0,5 dB per band; the ISO 717-2 rating must reproduce the paper's
-# published ΔLw = 29 dB. See tests/reference_data.py for the full provenance.
+# published ΔLw = 29 dB. See tests/reference_data/ for the full provenance.
 # ---------------------------------------------------------------------------
 def test_foret2011_carpet_rates_to_29() -> None:
     """The measured carpet spectrum rates to the paper's ΔLw = 29 dB."""

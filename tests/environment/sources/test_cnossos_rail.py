@@ -5,7 +5,7 @@ Three kinds of assertion, kept deliberately separate because they carry very
 different evidential weight:
 
 1. **Table transcription.** Every shipped Appendix G table is pinned against
-   ``tests/reference_data.py``, whose constants were extracted mechanically
+   ``tests/reference_data/``, whose constants were extracted mechanically
    from the Official Journal text of the instrument that enacted each table:
    Commission Delegated Directive (EU) 2021/1226 (OJ L 269, 28.7.2021) for
    Tables G-1b, G-2, G-3a, G-4 and G-7, Commission Directive (EU) 2015/996

@@ -132,7 +132,7 @@ def test_signal_am_tone_sweep_tracks_literature() -> None:
 
 def test_signal_carrier_sweep_tracks_fig_10_5() -> None:
     # Carrier-frequency sweep of the AM tone (70 dB, m=1, fmod=4 Hz) against
-    # the measured reference values (tests/reference_data.py) and the
+    # the measured reference values (tests/reference_data/) and the
     # qualitative F&Z Fig. 10.5 trend. Would have caught the 10x Bark-constant
     # typo: with 0.76e-4 the sweep read (0.56, ..., 1.10) -- rising toward
     # 8 kHz instead of rolling off.

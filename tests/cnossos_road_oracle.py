@@ -1,7 +1,7 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
 """The (EU) 2015/996 Appendix F database, wrapped once for both readers.
 
-``tests/reference_data.py`` deliberately imports nothing from the library: it
+``tests/reference_data/`` deliberately imports nothing from the library: it
 is the transcribed oracle, and it must not depend on the code it is used to
 check. But both the test suite and the conformance report need those rows as
 ``RoadEmissionCoefficients`` and ``RoadSurfaceCoefficients``, and each was

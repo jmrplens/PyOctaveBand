@@ -24,7 +24,7 @@ from phonometry import (
 )
 
 # (phon, frequency Hz, expected SPL dB) - ISO 226:2023 Table B.1. The
-# (60 phon, 100 Hz) anchor is imported from tests/reference_data.py (shared
+# (60 phon, 100 Hz) anchor is imported from tests/reference_data/ (shared
 # with the CI conformance report) so the two copies cannot drift.
 TABLE_B1 = [
     (20, 20.0, 89.5), (20, 1000.0, 20.0), (20, 12500.0, 33.0),

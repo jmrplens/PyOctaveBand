@@ -528,7 +528,7 @@ def _airborne_prediction_example() -> tuple[object, ReportMetadata, str]:
     Kij feed twelve flanking paths; the direct Dd path plus those twelve make
     thirteen paths whose energy summation (Formula 26) gives R'w = 52.2 -> 52
     dB. The element set and its R'w are the standard's own worked example, run
-    through the tested prediction code (see tests/reference_data.py).
+    through the tested prediction code (see tests/reference_data/).
     """
     ss = 11.5
     paths = []
@@ -620,7 +620,7 @@ def _facade_prediction_example() -> tuple[object, ReportMetadata, str]:
     transmission factors (Formula 10) and the room geometry (Formula 13) gives
     D2m,nT,w = 33 dB (with R'tr,s,w = 31, Ctr = -3). The element set and its
     single-number ratings are the standard's own worked example, run through the
-    tested prediction code (see tests/reference_data.py).
+    tested prediction code (see tests/reference_data/).
     """
     elements = [
         ph.building.FacadeElement("Masonry wall", area=6.0, r=[41, 46, 52, 58, 64]),

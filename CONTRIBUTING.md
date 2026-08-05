@@ -267,6 +267,44 @@ against numpy/scipy, pandas, matplotlib, scikit-learn, statsmodels and librosa).
 | Spelling | American English in identifiers | `normalized_frequencies`, `BAND_CENTERS` |
 | Tests | `test_<module>.py`, 1:1 with the module; cross-cutting suites get a descriptive name | `test_impulse_prominence.py` |
 
+### Module length
+
+There is no line limit, because no Python authority sets one. PEP 8 limits the
+*line*, not the file, and subordinates its own rules to context; the Google
+style guide sets no file limit either. Only two tools ship the rule at all,
+both at 1000 physical lines: pylint's `too-many-lines` (C0302) and Sonar's
+`python:S104`. Both hedge it. pylint's own configuration raises the limit to
+2000 and then disables the checker that carries it; `S104` is not in Sonar's
+default Python profile. ruff has rejected the rule twice as incompatible with
+its formatter, and flake8 has never had it.
+
+What matters is whether the file is **one subject**. A module that implements
+one standard end to end is not too long at 1800 lines when half of it is the
+prose that makes the implementation auditable; that prose is the reason a
+reader can check the code against the clause. A module is too long when it
+holds several subjects that would each be a module someone would look for by
+name: three standards behind three banner comments, a translation table beside
+a plot library, a topography solver inside an aircraft-noise chain.
+
+So the test is not `wc -l`. Ask what the file is about. If the answer needs the
+word "and", and each half has its own constants, its own result types and its
+own callers, it is two modules. If the answer is one sentence and the length is
+what documenting that sentence costs, leave it alone: forcing a split is worse
+than a long file, and a package of fragments is harder to read than the file it
+came from.
+
+A split is a **move**: every name keeps its spelling, its docstring and its
+body, the public API does not change, and the artifacts the module generates
+come out byte-identical. That last one is the proof, and it is why the
+conformance report, the figures and the diagrams are regenerated and diffed
+after any such change.
+
+The one rename a split may carry is a private name that named nothing: the
+diagram builders were `_d1` to `_d9`, referenced from a registry that already
+carried the real name, and moving them was the moment to call them what they
+draw. That is a separate, deliberate change with its own justification, not
+part of the move, and it stops at names no caller outside the file can see.
+
 ### Deprecations
 
 Renames of **published** API keep the old name working for one cycle:

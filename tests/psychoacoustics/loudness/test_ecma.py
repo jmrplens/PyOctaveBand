@@ -49,7 +49,7 @@ def test_calibration_1khz_40db_is_one_sone(ref_1k_40: EcmaLoudness) -> None:
 
 def test_calibration_constant_is_the_tabulated_c_n() -> None:
     # Clause 5.1.8 tabulates c_N = 0.0211964; the implementation must use the
-    # standard's value verbatim (shared oracle in tests/reference_data.py).
+    # standard's value verbatim (shared oracle in tests/reference_data/).
     from reference_data import ECMA418_2_LOUDNESS_C_N
 
     from phonometry.psychoacoustics.loudness.ecma import _C_N
