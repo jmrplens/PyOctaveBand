@@ -56,7 +56,7 @@ _TESTS = os.path.normpath(os.path.join(os.path.dirname(__file__), "..", "tests")
 if _TESTS not in sys.path:
     sys.path.insert(0, _TESTS)
 
-import reference_data as ref  # noqa: E402  (needs the path above)
+import reference_data as ref
 
 #: Committed output directory for the example fiches.
 _DEFAULT_DIR = os.path.normpath(
@@ -2250,7 +2250,7 @@ _SCATTER_FREQS = np.array(
 )
 
 
-def _detailed_building() -> tuple[dict, "np.ndarray", "np.ndarray"]:
+def _detailed_building() -> tuple[dict[str, Any], np.ndarray, np.ndarray]:
     """The Annex L building in situ, its bands and the floating-floor gain.
 
     Assembled from the same fixture the tests and the conformance report read,
