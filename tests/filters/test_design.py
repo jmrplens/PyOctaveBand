@@ -157,11 +157,9 @@ def test_cheby2_low_attenuation_raises() -> None:
 
     with pytest.raises(ValueError, match="3.01"):
         _cheby2_transition_ratio(order=6, attenuation=3.0)
+    low_attenuation = FilterDesign(filter_type="cheby2", attenuation=2.0)
     with pytest.raises(ValueError, match="3.01"):
-        OctaveFilterBank(
-            fs=48000, fraction=3,
-            design=FilterDesign(filter_type="cheby2", attenuation=2.0),
-        )
+        OctaveFilterBank(fs=48000, fraction=3, design=low_attenuation)
 
 
 def test_cheby2_stopband_edges_near_nyquist_stay_valid() -> None:

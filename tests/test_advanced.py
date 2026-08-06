@@ -96,8 +96,9 @@ def test_invalid_inputs() -> None:
         octave_filter(x, fs, order=-1)
 
     # Invalid filter_type
+    invalid_design = FilterDesign(filter_type="invalid_type")
     with pytest.raises(ValueError, match="Invalid filter_type"):
-        octave_filter(x, fs, design=FilterDesign(filter_type="invalid_type"))
+        octave_filter(x, fs, design=invalid_design)
 
 
 def test_short_signal() -> None:

@@ -162,14 +162,15 @@ def test_source_description_is_exclusive() -> None:
     """Exactly one of ``source.level`` / ``source.power_level`` is required."""
     with pytest.raises(ValueError, match="exactly one"):
         room_to_room_transmission(_BANDS, 40.0, 20.0, _ABSORPTION)
+    both_descriptions = SourceRoom(level=90.0, power_level=100.0)
     with pytest.raises(ValueError, match="exactly one"):
         room_to_room_transmission(
-            _BANDS, 40.0, 20.0, _ABSORPTION,
-            source=SourceRoom(level=90.0, power_level=100.0),
+            _BANDS, 40.0, 20.0, _ABSORPTION, source=both_descriptions
         )
+    power_without_room_constant = SourceRoom(power_level=100.0)
     with pytest.raises(ValueError, match="room_constant"):
         room_to_room_transmission(
-            _BANDS, 40.0, 20.0, _ABSORPTION, source=SourceRoom(power_level=100.0)
+            _BANDS, 40.0, 20.0, _ABSORPTION, source=power_without_room_constant
         )
 
 
@@ -190,14 +191,18 @@ def test_validation() -> None:
         room_to_room_transmission(_BANDS, 40.0, 0.0, _ABSORPTION, source=source)
     with pytest.raises(ValueError, match="receiving_absorption"):
         room_to_room_transmission(_BANDS, 40.0, 20.0, _NO_ABSORPTION, source=source)
+    negative_flanking = DesignCriterion(flanking_penalty=-1.0)
     with pytest.raises(ValueError, match="flanking_penalty"):
-        _chain(criterion=DesignCriterion(flanking_penalty=-1.0))
+        _chain(criterion=negative_flanking)
+    unknown_family = DesignCriterion(family="NR")
     with pytest.raises(ValueError, match="criterion"):
-        _chain(criterion=DesignCriterion(family="NR"))
+        _chain(criterion=unknown_family)
+    unknown_model = SourceRoom(level=_SOURCE, model="constant_energy")
     with pytest.raises(ValueError, match="model"):
-        _chain(source=SourceRoom(level=_SOURCE, model="constant_energy"))
+        _chain(source=unknown_model)
+    nan_target = DesignCriterion(target=_NAN)
     with pytest.raises(ValueError, match="target"):
-        _chain(criterion=DesignCriterion(target=_NAN))
+        _chain(criterion=nan_target)
 
 
 def test_plot_smoke() -> None:

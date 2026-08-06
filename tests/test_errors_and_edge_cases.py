@@ -52,8 +52,9 @@ def test_octave_filter_bank_invalid_init() -> None:
     with pytest.raises(ValueError, match="less than the upper limit"):
         OctaveFilterBank(fs=48000, limits=[2000, 1000])
         
+    invalid_design = FilterDesign(filter_type="invalid")
     with pytest.raises(ValueError, match="Invalid filter_type"):
-        OctaveFilterBank(fs=48000, design=FilterDesign(filter_type="invalid"))
+        OctaveFilterBank(fs=48000, design=invalid_design)
 
 
 def test_weighting_filter_invalid() -> None:

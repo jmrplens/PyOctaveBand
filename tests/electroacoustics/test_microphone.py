@@ -288,11 +288,9 @@ def test_reference_frequency_outside_band_rejected() -> None:
 
 def test_noise_voltage_and_stated_level_conflict() -> None:
     f, rel = _flat_response()
+    conflicting_noise = MicrophoneNoise(voltage=1e-6, equivalent_level_db=14.0)
     with pytest.raises(ValueError, match="not both"):
-        microphone_characteristics(
-            f, rel, _M_MV,
-            noise=MicrophoneNoise(voltage=1e-6, equivalent_level_db=14.0),
-        )
+        microphone_characteristics(f, rel, _M_MV, noise=conflicting_noise)
 
 
 def test_nonpositive_frequencies_rejected() -> None:
@@ -302,26 +300,23 @@ def test_nonpositive_frequencies_rejected() -> None:
 
 def test_empty_distortion_rejected() -> None:
     f, rel = _flat_response()
+    empty_distortion = MicrophoneOverload(distortion=([], []))
     with pytest.raises(ValueError, match="at least two"):
-        microphone_characteristics(
-            f, rel, _M_MV, overload=MicrophoneOverload(distortion=([], []))
-        )
+        microphone_characteristics(f, rel, _M_MV, overload=empty_distortion)
 
 
 def test_empty_noise_spectrum_rejected() -> None:
     f, rel = _flat_response()
+    empty_spectrum = MicrophoneNoise(spectrum=([], []))
     with pytest.raises(ValueError, match="at least two"):
-        microphone_characteristics(
-            f, rel, _M_MV, noise=MicrophoneNoise(spectrum=([], []))
-        )
+        microphone_characteristics(f, rel, _M_MV, noise=empty_spectrum)
 
 
 def test_empty_polar_rejected() -> None:
     f, rel = _flat_response()
+    empty_polar = MicrophoneDirectivity(polar=([], []))
     with pytest.raises(ValueError, match="at least two angle points"):
-        microphone_characteristics(
-            f, rel, _M_MV, directivity=MicrophoneDirectivity(polar=([], []))
-        )
+        microphone_characteristics(f, rel, _M_MV, directivity=empty_polar)
 
 
 def test_nonfinite_stated_directivity_index_rejected_with_polar() -> None:
@@ -329,18 +324,16 @@ def test_nonfinite_stated_directivity_index_rejected_with_polar() -> None:
     f, rel = _flat_response()
     angles = np.linspace(0.0, 180.0, 181)
     omnidirectional = np.zeros_like(angles)
+    infinite_index_with_polar = MicrophoneDirectivity(
+        polar=(angles, omnidirectional), index_db=float("inf")
+    )
     with pytest.raises(ValueError, match=r"directivity\.index_db"):
         microphone_characteristics(
-            f, rel, _M_MV,
-            directivity=MicrophoneDirectivity(
-                polar=(angles, omnidirectional), index_db=float("inf")
-            ),
+            f, rel, _M_MV, directivity=infinite_index_with_polar
         )
+    nan_index = MicrophoneDirectivity(index_db=float("nan"))
     with pytest.raises(ValueError, match=r"directivity\.index_db"):
-        microphone_characteristics(
-            f, rel, _M_MV,
-            directivity=MicrophoneDirectivity(index_db=float("nan")),
-        )
+        microphone_characteristics(f, rel, _M_MV, directivity=nan_index)
 
 
 def test_no_noise_input_gives_no_noise_rows() -> None:

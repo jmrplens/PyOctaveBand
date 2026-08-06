@@ -1125,6 +1125,33 @@ def _record_elastic_run(
     return signals, frames, frame_steps
 
 
+def _validated_snapshot_options(
+    recording: ElasticRecording,
+) -> tuple[int | None, str]:
+    """Validate and normalise the snapshot cadence and field."""
+    snapshot_every = recording.snapshot_every
+    snapshot_field = recording.snapshot_field
+    if snapshot_field not in _FIELD_NAMES:
+        raise ValueError(f"snapshot_field must be one of {_FIELD_NAMES}")
+    if snapshot_every is not None:
+        snapshot_every = _integer("snapshot_every", snapshot_every)
+        if snapshot_every < 1:
+            raise ValueError("snapshot_every must be >= 1")
+    return snapshot_every, snapshot_field
+
+
+def _validated_absorbing_layer(
+    boundaries: ElasticBoundaries, absorbing_sides: tuple[str, ...],
+) -> int:
+    """Validate the absorbing-layer thickness; 0 when no side absorbs."""
+    if not absorbing_sides:
+        return 0
+    cells = _integer("absorbing_layer_cells", boundaries.absorbing_layer_cells)
+    if cells < 1:
+        raise ValueError("absorbing_layer_cells must be >= 1")
+    return cells
+
+
 def elastic_fdtd_simulation(
     c_p: float | Field2D,
     c_s: float | Field2D,
@@ -1186,31 +1213,20 @@ def elastic_fdtd_simulation(
     """
     recording = ElasticRecording() if recording is None else recording
     boundaries = ElasticBoundaries() if boundaries is None else boundaries
-    snapshot_every = recording.snapshot_every
-    snapshot_field = recording.snapshot_field
     if len(sources) == 0:
         raise ValueError("at least one source is required")
     duration = _positive_finite("duration", duration)
     fields = _resolve_probe_fields(recording.probe_fields)
-    if snapshot_field not in _FIELD_NAMES:
-        raise ValueError(f"snapshot_field must be one of {_FIELD_NAMES}")
-    if snapshot_every is not None:
-        snapshot_every = _integer("snapshot_every", snapshot_every)
-        if snapshot_every < 1:
-            raise ValueError("snapshot_every must be >= 1")
+    snapshot_every, snapshot_field = _validated_snapshot_options(recording)
     absorbing_sides, free_sides = _parse_elastic_boundaries(boundaries.sides)
-    absorbing_layer_cells = 0
-    if absorbing_sides:
-        absorbing_layer_cells = _integer("absorbing_layer_cells",
-                                         boundaries.absorbing_layer_cells)
-        if absorbing_layer_cells < 1:
-            raise ValueError("absorbing_layer_cells must be >= 1")
+    absorbing_layer_cells = _validated_absorbing_layer(
+        boundaries, absorbing_sides)
 
     sim = ElasticFDTD2D(
         c_p, c_s, dx,
         rho=rho,
         cfl=cfl,
-        sponge_width=absorbing_layer_cells if absorbing_sides else 0,
+        sponge_width=absorbing_layer_cells,
         sponge_sides=absorbing_sides if absorbing_sides else None,
         damping=damping,
         shape=shape,

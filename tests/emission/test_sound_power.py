@@ -173,12 +173,13 @@ def test_k2_room_surface_without_mean_absorption_raises() -> None:
 def test_partial_room_data_raises_via_sound_power_pressure() -> None:
     """The partial-pair guard is enforced through sound_power_pressure too."""
     levels = np.full((10, 1), 90.0)
+    half_specified_room = RoomEnvironment(reverberation_time=1.2)
     with pytest.raises(ValueError, match="volume"):
         sound_power_pressure(
             levels,
             "hemisphere",
             radius=2.0,
-            room=RoomEnvironment(reverberation_time=1.2),
+            room=half_specified_room,
         )
 
 

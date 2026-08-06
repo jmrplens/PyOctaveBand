@@ -754,21 +754,21 @@ def test_event_validation() -> None:
     pos = np.array([[0.0, -50.0, 100.0], [0.0, 50.0, 100.0]])
     with pytest.raises(ValueError, match="receiver"):
         rotorcraft_event_level(hems, [50.0], [0.0], t, pos, (0.0, 0.0, 0.0, 0.0))
+    unknown_method_atmosphere = RotorcraftAtmosphere(atmospheric_method="exact")
     with pytest.raises(ValueError, match="atmospheric_method"):
-        rotorcraft_event_level(
-            hems, [50.0], [0.0], t, pos, (0.0, 0.0),
-            atmosphere=RotorcraftAtmosphere(atmospheric_method="exact"))
+        rotorcraft_event_level(hems, [50.0], [0.0], t, pos, (0.0, 0.0),
+                               atmosphere=unknown_method_atmosphere)
+    mismatched_airspeed_state = RotorcraftTrackState(airspeed=[50.0, 50.0, 50.0])
     with pytest.raises(ValueError, match="airspeed"):
-        rotorcraft_event_level(
-            hems, [50.0], [0.0], t, pos, (0.0, 0.0),
-            track_state=RotorcraftTrackState(airspeed=[50.0, 50.0, 50.0]))
+        rotorcraft_event_level(hems, [50.0], [0.0], t, pos, (0.0, 0.0),
+                               track_state=mismatched_airspeed_state)
     with pytest.raises(ValueError, match="level_offset"):
         rotorcraft_event_level(hems, [50.0], [0.0], t, pos, (0.0, 0.0),
                                level_offset=[1.0, 2.0, 3.0])
+    nan_elevation_ground = RotorcraftGround(ground_elevation=np.nan)
     with pytest.raises(ValueError, match="ground_elevation"):
-        rotorcraft_event_level(
-            hems, [50.0], [0.0], t, pos, (0.0, 0.0),
-            ground=RotorcraftGround(ground_elevation=np.nan))
+        rotorcraft_event_level(hems, [50.0], [0.0], t, pos, (0.0, 0.0),
+                               ground=nan_elevation_ground)
 
 
 def test_event_plot() -> None:

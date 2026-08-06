@@ -308,9 +308,9 @@ def test_event_level_ground_roll_applies_directivity() -> None:
     vref = 160.0 * 0.514444
     expected_delta = _dc(vref, 0.5 * (40.0 + 60.0)) - _dc(vref, 60.0)
     assert flagged_ahead - plain_ahead == pytest.approx(expected_delta, abs=1e-9)
+    mismatched_roll = FlightSegmentState(ground_roll=[True, False])
     with pytest.raises(ValueError, match="ground_roll"):
-        event_level(path, obs, _NP, _ND, _NSEL, _NMAX,
-                    segments=FlightSegmentState(ground_roll=[True, False]))
+        event_level(path, obs, _NP, _ND, _NSEL, _NMAX, segments=mismatched_roll)
     # The directivity is also applied on the maximum metric (Eq. 4-9a) and with
     # a propeller mounting (turboprop ΔSOR curve).
     max_plain = event_level(path, obs, _NP, _ND, _NSEL, _NMAX, metric="maximum").level
@@ -483,9 +483,10 @@ def test_bank_angle_side_asymmetry() -> None:
     same_s = event_level(path, [1500.0, -500.0, 0.0], _NP, _ND, _NSEL, _NMAX).level
     assert port != pytest.approx(stbd)
     assert same_p == pytest.approx(same_s)
+    mismatched_bank = FlightSegmentState(bank=[1.0, 2.0])
     with pytest.raises(ValueError, match="bank"):
         event_level(path, [0.0, 500.0, 0.0], _NP, _ND, _NSEL, _NMAX,
-                    segments=FlightSegmentState(bank=[1.0, 2.0]))
+                    segments=mismatched_bank)
 
 
 def test_bank_angle_sign_follows_doc29_sides() -> None:
@@ -541,9 +542,10 @@ def test_noise_contour_accepts_bank() -> None:
     level = noise_contour(path, _NP, _ND, _NSEL, _NMAX, **kw)
     assert banked.level[0, 0] != pytest.approx(banked.level[1, 0])
     assert level.level[0, 0] == pytest.approx(level.level[1, 0])
+    mismatched_bank = FlightSegmentState(bank=[1.0, 2.0])
     with pytest.raises(ValueError, match="bank"):
         noise_contour(path, _NP, _ND, _NSEL, _NMAX,
-                      segments=FlightSegmentState(bank=[1.0, 2.0]), **kw)
+                      segments=mismatched_bank, **kw)
 
 
 def test_contour_grid_matches_scalar_event_level() -> None:
