@@ -154,7 +154,8 @@ def test_report_renders_oracle_values(tmp_path) -> None:
     # An installed power band value L_Ws,inst = L_Ws,c - D_C at 63 Hz.
     assert f"{_LWSC[0] - _DC:.1f}" in text
     # Nominal band labels and the by-path caption.
-    assert "63" in text and "2000" in text
+    assert "63" in text
+    assert "2000" in text
     assert "Octave-band normalised structure-borne SPL by path" in text
     assert "Transmission paths: 2" in text
 

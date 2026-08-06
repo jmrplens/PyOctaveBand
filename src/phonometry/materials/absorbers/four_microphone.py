@@ -70,6 +70,10 @@ _ASTM_KU_SPACING = 0.40
 #: (ASTM E2611-19, 6.2.3), i.e. ``f_l = c / (100 s)``.
 _ASTM_LOWER_WAVELENGTH_FRACTION = 100.0
 
+#: Shared message of the ``characteristic_impedance`` validation, repeated by
+#: every entry point that takes the air characteristic impedance ``rho c``.
+_IMPEDANCE_POSITIVE = "'characteristic_impedance' must be positive."
+
 __all__ = [
     "TransferMatrix",
     "air_density_astm",
@@ -327,7 +331,7 @@ def face_quantities(
     :return: Tuple ``(p0, pd, u0, ud)`` of face pressures and velocities.
     """
     if characteristic_impedance <= 0.0:
-        raise ValueError("'characteristic_impedance' must be positive.")
+        raise ValueError(_IMPEDANCE_POSITIVE)
     av = np.asarray(a, dtype=np.complex128)
     bv = np.asarray(b, dtype=np.complex128)
     cv = np.asarray(c, dtype=np.complex128)
@@ -408,7 +412,7 @@ class TransferMatrix:
         :return: Transmission loss ``TLn``, in decibels.
         """
         if characteristic_impedance <= 0.0:
-            raise ValueError("'characteristic_impedance' must be positive.")
+            raise ValueError(_IMPEDANCE_POSITIVE)
         rc = characteristic_impedance
         combo = self.t11 + self.t12 / rc + rc * self.t21 + self.t22
         return np.asarray(20.0 * np.log10(np.abs(combo) / 2.0), dtype=np.float64)
@@ -422,7 +426,7 @@ class TransferMatrix:
         :return: Complex reflection coefficient ``R``.
         """
         if characteristic_impedance <= 0.0:
-            raise ValueError("'characteristic_impedance' must be positive.")
+            raise ValueError(_IMPEDANCE_POSITIVE)
         rc = characteristic_impedance
         return np.asarray(
             (self.t11 - rc * self.t21) / (self.t11 + rc * self.t21),
@@ -560,7 +564,7 @@ def air_layer_transfer_matrix(
     :return: The air-layer :class:`TransferMatrix`.
     """
     if characteristic_impedance <= 0.0:
-        raise ValueError("'characteristic_impedance' must be positive.")
+        raise ValueError(_IMPEDANCE_POSITIVE)
     if thickness <= 0.0:
         raise ValueError("'thickness' must be positive.")
     rc = characteristic_impedance

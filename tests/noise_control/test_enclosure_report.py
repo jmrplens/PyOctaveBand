@@ -98,7 +98,8 @@ def test_report_renders_oracle_values(tmp_path) -> None:
     # The build-up correction C to one decimal.
     assert f"{_oracle_correction()[0]:.1f}" in text
     # Nominal band labels and the caption.
-    assert "63" in text and "4000" in text
+    assert "63" in text
+    assert "4000" in text
     assert "Octave-band insertion loss" in text
     # Method basis prose and the surface areas in the boxed result.
     assert "Bies" in text

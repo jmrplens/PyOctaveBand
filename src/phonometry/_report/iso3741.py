@@ -60,6 +60,13 @@ from .metadata import ReportMetadata
 if TYPE_CHECKING:
     from ..emission.sound_power_reverberation import ReverberationSoundPowerResult
 
+#: Band-frequency column heading of the per-band table (translated by ``t``).
+_COL_FREQUENCY = "f [Hz]"
+#: Mean room sound-pressure level column heading (mini-HTML for reportlab).
+_COL_LP = "L<sub>p</sub> [dB]"
+#: Band sound-power level column heading (mini-HTML for reportlab).
+_COL_LW = "L<sub>W</sub> [dB]"
+
 
 def _is_comparison(result: Any) -> bool:
     """Return ``True`` for a comparison-method result, ``False`` for direct."""
@@ -101,7 +108,7 @@ def _value_table(result: Any, verbose: bool, language: str = "en") -> Any:
     labels, fraction = band_labels(getattr(result, "frequencies", None), n)
 
     if not verbose:
-        header = [t("f [Hz]", language), "L<sub>p</sub> [dB]", "L<sub>W</sub> [dB]"]
+        header = [t(_COL_FREQUENCY, language), _COL_LP, _COL_LW]
         widths = [58.0, 58.0, 58.0]
         rows_data = [
             [labels[i], d1(lp[i], language), d1(lw[i], language)] for i in range(n)
@@ -111,10 +118,10 @@ def _value_table(result: Any, verbose: bool, language: str = "en") -> Any:
     k1 = np.asarray(result.background_correction, dtype=np.float64)
     if _is_comparison(result):
         header = [
-            t("f [Hz]", language),
-            "L<sub>p</sub> [dB]",
+            t(_COL_FREQUENCY, language),
+            _COL_LP,
             "K<sub>1</sub> [dB]",
-            "L<sub>W</sub> [dB]",
+            _COL_LW,
         ]
         widths = [45.0, 43.0, 43.0, 43.0]
         rows_data = [
@@ -126,12 +133,12 @@ def _value_table(result: Any, verbose: bool, language: str = "en") -> Any:
     area = np.asarray(result.absorption_area, dtype=np.float64)
     waterhouse = np.asarray(result.waterhouse_correction, dtype=np.float64)
     header = [
-        t("f [Hz]", language),
-        "L<sub>p</sub> [dB]",
+        t(_COL_FREQUENCY, language),
+        _COL_LP,
         "K<sub>1</sub> [dB]",
         "A [m<super>2</super>]",
         "C<sub>w</sub> [dB]",
-        "L<sub>W</sub> [dB]",
+        _COL_LW,
     ]
     widths = [30.0, 29.0, 29.0, 29.0, 29.0, 28.0]
     rows_data = [

@@ -160,11 +160,14 @@ def test_k1_is_per_position() -> None:
 
 
 def test_k1_frequency_length_mismatch_raises() -> None:
+    source_2_bands = np.array([[56.0, 57.0]])
+    background_2_bands = np.array([[50.0, 50.0]])
+    one_frequency = np.array([200.0])
     with pytest.raises(
         ValueError, match="must match the number of 'frequencies'"
     ):
         precision_background_correction(
-            np.array([[56.0, 57.0]]), np.array([[50.0, 50.0]]), np.array([200.0])
+            source_2_bands, background_2_bands, one_frequency
         )
 
 
@@ -309,15 +312,17 @@ def test_hemisphere_per_band_uncertainty_uses_table2() -> None:
 
 def test_anechoic_background_requires_frequencies() -> None:
     """K1 needs the band centres to pick the 6/10 dB floor."""
+    levels = np.full((40, 1), 80.0)
+    background = np.full((40, 1), 60.0)
     with pytest.raises(
         ValueError,
         match="'frequencies' are required with 'background_levels'",
     ):
         sound_power_anechoic(
-            np.full((40, 1), 80.0),
+            levels,
             "hemisphere",
             radius=1.0,
-            background_levels=np.full((40, 1), 60.0),
+            background_levels=background,
         )
 
 
@@ -353,25 +358,27 @@ def test_anechoic_bands_above_10khz_survive_without_lwa() -> None:
 
 
 def test_anechoic_invalid_surface_raises() -> None:
+    levels = np.full((40, 1), 70.0)
     with pytest.raises(
         ValueError, match="'surface' must be 'sphere' or 'hemisphere'"
     ):
-        sound_power_anechoic(np.full((40, 1), 70.0), "box", radius=1.0)  # type: ignore[arg-type]
+        sound_power_anechoic(levels, "box", radius=1.0)  # type: ignore[arg-type]
 
 
 def test_anechoic_missing_radius_raises() -> None:
+    levels = np.full((40, 1), 70.0)
     with pytest.raises(ValueError, match="A positive 'radius' is required"):
-        sound_power_anechoic(np.full((40, 1), 70.0), "sphere")
+        sound_power_anechoic(levels, "sphere")
 
 
 def test_anechoic_areas_wrong_length_raises() -> None:
+    levels = np.full((40, 1), 70.0)
+    short_areas = np.full(10, 1.0)
     with pytest.raises(
         ValueError,
         match="'areas' must have one value per microphone position",
     ):
-        sound_power_anechoic(
-            np.full((40, 1), 70.0), "sphere", radius=1.0, areas=np.full(10, 1.0)
-        )
+        sound_power_anechoic(levels, "sphere", radius=1.0, areas=short_areas)
 
 
 # ==========================================================================
@@ -437,15 +444,19 @@ def test_lw0_shift_off_reference() -> None:
 
 
 def test_intensity_areas_mismatch_raises() -> None:
+    intensity_3_segments = np.full((3,), 1e-5)
+    areas_2_segments = np.array([1.0, 1.0])
     with pytest.raises(
         ValueError, match="'partial_intensity' first axis"
     ):
-        sound_power_intensity_precision(np.full((3,), 1e-5), np.array([1.0, 1.0]))
+        sound_power_intensity_precision(intensity_3_segments, areas_2_segments)
 
 
 def test_intensity_nonpositive_area_raises() -> None:
+    intensity = np.full((2,), 1e-5)
+    areas_with_zero = np.array([1.0, 0.0])
     with pytest.raises(ValueError, match="All 'areas' must be positive"):
-        sound_power_intensity_precision(np.full((2,), 1e-5), np.array([1.0, 0.0]))
+        sound_power_intensity_precision(intensity, areas_with_zero)
 
 
 def test_intensity_single_segment_2d_input_not_transposed() -> None:
@@ -648,22 +659,25 @@ def test_criterion_1_without_limit_raises() -> None:
     i_n = np.full((4, 1), 2.0e-6)
     lp = np.full((4, 1), 60.0)
     ind = precision_field_indicators(i_n, lp)
+    scan_1, scan_2 = np.array([70.0]), np.array([70.2])
     with pytest.raises(
         ValueError, match="Criterion 1 needs the limit s"
     ):
         precision_qualification(
             ind,
-            scan_intensity_level_1=np.array([70.0]),
-            scan_intensity_level_2=np.array([70.2]),
+            scan_intensity_level_1=scan_1,
+            scan_intensity_level_2=scan_2,
         )
 
 
 def test_field_indicators_shape_mismatch_raises() -> None:
+    intensity = np.full((4, 1), 1e-6)
+    mismatched_levels = np.full((3, 1), 60.0)
     with pytest.raises(
         ValueError,
         match="'segment_intensity' and 'segment_pressure_levels' must have",
     ):
-        precision_field_indicators(np.full((4, 1), 1e-6), np.full((3, 1), 60.0))
+        precision_field_indicators(intensity, mismatched_levels)
 
 
 def test_anechoic_result_plot_returns_axes() -> None:

@@ -72,6 +72,9 @@ _ISO_LOWER_WAVELENGTH_FRACTION = 20.0
 #: Shared validation message for the tube diameter arguments.
 _DIAMETER_POSITIVE = "'diameter' must be positive."
 
+#: Shared validation message for the speed-of-sound arguments.
+_SPEED_OF_SOUND_POSITIVE = "'speed_of_sound' must be positive."
+
 #: Aliases accepted for the tube cross-section ``shape`` arguments. A square
 #: tube is the rectangular case with equal sides (ISO 10534-2, 4.1;
 #: ASTM E2611-19, 6.2.5).
@@ -196,7 +199,7 @@ def tube_attenuation_constant(
     :return: Attenuation constant ``k0''``, in nepers per metre.
     """
     if speed_of_sound <= 0.0:
-        raise ValueError("'speed_of_sound' must be positive.")
+        raise ValueError(_SPEED_OF_SOUND_POSITIVE)
     if diameter <= 0.0:
         raise ValueError(_DIAMETER_POSITIVE)
     f = np.asarray(frequency, dtype=np.float64)
@@ -229,7 +232,7 @@ def tube_wavenumber(
     :return: Complex wavenumber ``k0``, in reciprocal metres.
     """
     if speed_of_sound <= 0.0:
-        raise ValueError("'speed_of_sound' must be positive.")
+        raise ValueError(_SPEED_OF_SOUND_POSITIVE)
     f = np.asarray(frequency, dtype=np.float64)
     k_real = 2.0 * np.pi * f / speed_of_sound
     if attenuation is None:
@@ -428,7 +431,7 @@ def _frequency_range(
     if spacing <= 0.0:
         raise ValueError("'spacing' must be positive.")
     if speed_of_sound <= 0.0:
-        raise ValueError("'speed_of_sound' must be positive.")
+        raise ValueError(_SPEED_OF_SOUND_POSITIVE)
     canonical = _canonical_shape(shape)
     f_upper = ku_spacing * speed_of_sound / spacing
     if diameter is not None:

@@ -59,6 +59,8 @@ PrecisionSurface = Literal["sphere", "hemisphere"]
 PrecisionArray = Literal["general", "broadband"]
 PrecisionRoom = Literal["anechoic", "hemi-anechoic"]
 
+_SURFACE_CHOICE_MSG = "'surface' must be 'sphere' or 'hemisphere'."
+
 # --- ISO 3745:2012 Annex D/E, normative microphone coordinates (x/r,y/r,z/r) -
 # Digit-exact, image-verified transcriptions. Positions 1-20 are the primary
 # array; positions 21-40 (the mirror set) are added when the band-SPL spread
@@ -268,7 +270,7 @@ def _precision_table(surface: PrecisionSurface, array: PrecisionArray) -> np.nda
     elif surface == "hemisphere":
         table = _TABLE_E1 if array == "general" else _TABLE_E2
     else:  # pragma: no cover - guarded by the public callers
-        raise ValueError("'surface' must be 'sphere' or 'hemisphere'.")
+        raise ValueError(_SURFACE_CHOICE_MSG)
     norms = np.linalg.norm(table, axis=1)
     if np.any(np.abs(norms - 1.0) > _UNIT_NORM_TOL):
         raise ValueError(
@@ -303,7 +305,7 @@ def precision_positions(
     :return: ``(count, 3)`` microphone coordinates, in metres.
     """
     if surface not in ("sphere", "hemisphere"):
-        raise ValueError("'surface' must be 'sphere' or 'hemisphere'.")
+        raise ValueError(_SURFACE_CHOICE_MSG)
     if array not in ("general", "broadband"):
         raise ValueError("'array' must be 'general' or 'broadband'.")
     if radius is None or radius <= 0:
@@ -480,6 +482,88 @@ def precision_uncertainty(
     return as_float_or_array(u)
 
 
+def _precision_k1(
+    levels: np.ndarray,
+    background_levels: np.ndarray | None,
+    freqs: np.ndarray | None,
+) -> np.ndarray:
+    """Per-position background correction K1i (Eq. 11), zero without background.
+
+    A single background spectrum is broadcast over the microphone positions;
+    any other shape mismatch is rejected.
+    """
+    if background_levels is None:
+        return np.zeros_like(levels)
+    if freqs is None:
+        raise ValueError(
+            "'frequencies' are required with 'background_levels' to select "
+            "the frequency-dependent K1 criterion (ISO 3745:2012 9.4.2)."
+        )
+    n_positions, n_bands = levels.shape
+    bg = np.atleast_2d(np.asarray(background_levels, dtype=np.float64))
+    if bg.shape == (1, n_bands) and n_positions != 1:
+        bg = np.broadcast_to(bg, (n_positions, n_bands))
+    if bg.shape != levels.shape:
+        raise ValueError(
+            "'background_levels' must match 'levels_positions' shape, or be "
+            "a single spectrum of shape (NB,) or (1, NB)."
+        )
+    return precision_background_correction(levels, bg, freqs)
+
+
+def _precision_surface_level(
+    corrected: np.ndarray, areas: np.ndarray | None
+) -> np.ndarray:
+    """Surface time-averaged level Lp_bar: equal-area Eq. 12 or area-weighted
+    Eq. 13 when partial areas ``Si`` are supplied."""
+    if areas is None:
+        return np.asarray(energy_mean(corrected, axis=0), dtype=np.float64)
+    n_positions = corrected.shape[0]
+    seg = np.asarray(areas, dtype=np.float64)
+    if seg.shape != (n_positions,):
+        raise ValueError("'areas' must have one value per microphone position.")
+    if np.any(seg <= 0.0):
+        raise ValueError("All 'areas' must be positive.")
+    return np.asarray(
+        weighted_energy_mean(corrected, seg[:, None], axis=0), dtype=np.float64
+    )
+
+
+def _precision_a_weighted_total(lw: np.ndarray, freqs: np.ndarray | None) -> float:
+    """A-weighted total LWA (Eq. C.1), NaN where it is not defined."""
+    if freqs is None:
+        return float(lw[0]) if lw.shape[0] == 1 else float("nan")
+    try:
+        ck = _a_weighting_corrections(freqs)
+    except ValueError:
+        # Bands outside the ISO 3744 Annex E table (e.g. the 12,5 kHz to
+        # 20 kHz one-third octaves that ISO 3745 covers, Tables 2/3): the
+        # per-band determination stands, only the A-weighted total is
+        # undefined.
+        return float("nan")
+    return float(energy_sum(lw + ck))
+
+
+def _precision_uncertainty_bands(
+    freqs: np.ndarray | None,
+    n_bands: int,
+    room: PrecisionRoom,
+    sigma_omc: float,
+    coverage_factor: float,
+) -> np.ndarray:
+    """Per-band expanded uncertainty (Eq. 24/25), NaN without band centres."""
+    if freqs is None:
+        return np.full(n_bands, np.nan, dtype=np.float64)
+    sigma_bands = np.array(
+        [_sigma_r0_3745(round(float(f)), room) for f in freqs],
+        dtype=np.float64,
+    )
+    return np.asarray(
+        precision_uncertainty(sigma_bands, sigma_omc, coverage_factor),
+        dtype=np.float64,
+    )
+
+
 def sound_power_anechoic(
     levels_positions: np.ndarray,
     surface: PrecisionSurface,
@@ -534,7 +618,7 @@ def sound_power_anechoic(
     :return: :class:`PrecisionSoundPowerResult`.
     """
     if surface not in ("sphere", "hemisphere"):
-        raise ValueError("'surface' must be 'sphere' or 'hemisphere'.")
+        raise ValueError(_SURFACE_CHOICE_MSG)
     if radius is None or radius <= 0:
         raise ValueError("A positive 'radius' is required.")
     levels = np.atleast_2d(np.asarray(levels_positions, dtype=np.float64))
@@ -550,37 +634,13 @@ def sound_power_anechoic(
         raise ValueError("'frequencies' length must match the number of bands.")
 
     # --- per-position background correction K1i (Eq. 11) ------------------
-    if background_levels is not None:
-        if freqs is None:
-            raise ValueError(
-                "'frequencies' are required with 'background_levels' to select "
-                "the frequency-dependent K1 criterion (ISO 3745:2012 9.4.2)."
-            )
-        bg = np.atleast_2d(np.asarray(background_levels, dtype=np.float64))
-        if bg.shape == (1, n_bands) and n_positions != 1:
-            bg = np.broadcast_to(bg, (n_positions, n_bands))
-        if bg.shape != levels.shape:
-            raise ValueError(
-                "'background_levels' must match 'levels_positions' shape, or be "
-                "a single spectrum of shape (NB,) or (1, NB)."
-            )
-        k1 = precision_background_correction(levels, bg, freqs)
-    else:
-        k1 = np.zeros_like(levels)
+    k1 = _precision_k1(levels, background_levels, freqs)
 
     corrected = levels - k1  # Lpi = L'pi(ST) - K1i
 
     # --- surface time-averaged level Lp_bar (Eq. 12 equal / Eq. 13 area) --
     mean_level = energy_mean(levels, axis=0)
-    if areas is None:
-        lp_bar = energy_mean(corrected, axis=0)
-    else:
-        seg = np.asarray(areas, dtype=np.float64)
-        if seg.shape != (n_positions,):
-            raise ValueError("'areas' must have one value per microphone position.")
-        if np.any(seg <= 0.0):
-            raise ValueError("All 'areas' must be positive.")
-        lp_bar = weighted_energy_mean(corrected, seg[:, None], axis=0)
+    lp_bar = _precision_surface_level(corrected, areas)
 
     # --- meteorological corrections C1, C2, C3 (Eq. 14) -------------------
     mc = meteorological_corrections(
@@ -596,19 +656,7 @@ def sound_power_anechoic(
     lw = lp_bar + 10.0 * np.log10(area / _S0) + mc.c1 + mc.c2 + c3
 
     # --- A-weighted total LWA (Eq. C.1) -----------------------------------
-    if freqs is not None:
-        try:
-            ck = _a_weighting_corrections(freqs)
-        except ValueError:
-            # Bands outside the ISO 3744 Annex E table (e.g. the 12,5 kHz to
-            # 20 kHz one-third octaves that ISO 3745 covers, Tables 2/3): the
-            # per-band determination stands, only the A-weighted total is
-            # undefined.
-            lwa = float("nan")
-        else:
-            lwa = energy_sum(lw + ck)
-    else:
-        lwa = float(lw[0]) if n_bands == 1 else float("nan")
+    lwa = _precision_a_weighted_total(lw, freqs)
 
     # --- directivity (Eq. 21) and non-uniformity (Eq. 22) indices ---------
     directivity = np.asarray(corrected - lp_bar[np.newaxis, :], dtype=np.float64)
@@ -623,17 +671,9 @@ def sound_power_anechoic(
 
     # --- uncertainty (Eq. 24/25) ------------------------------------------
     u_a = float(precision_uncertainty(_SIGMA_R0_3745_A, sigma_omc, coverage_factor))
-    if freqs is not None:
-        sigma_bands = np.array(
-            [_sigma_r0_3745(round(float(f)), room) for f in freqs],
-            dtype=np.float64,
-        )
-        u_bands = np.asarray(
-            precision_uncertainty(sigma_bands, sigma_omc, coverage_factor),
-            dtype=np.float64,
-        )
-    else:
-        u_bands = np.full(n_bands, np.nan, dtype=np.float64)
+    u_bands = _precision_uncertainty_bands(
+        freqs, n_bands, room, sigma_omc, coverage_factor
+    )
 
     return PrecisionSoundPowerResult(
         frequencies=freqs,

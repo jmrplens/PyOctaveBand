@@ -356,6 +356,25 @@ def _pick_peaks(spec: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
     return f_p, a_i
 
 
+def _harmonic_members(f_p: np.ndarray, i0: int) -> list[int]:
+    """Peaks that are near-integer multiples of ``f_p[i0]`` (Formulae 88-90).
+
+    Each integer ratio keeps the single peak whose relative deviation from the
+    exact multiple is smallest (Formula 89), and a member is retained only when
+    that deviation stays under 4 % (Formula 90).
+    """
+    ratios = np.round(f_p / f_p[i0]).astype(int)  # Formula 88
+    cand: dict[int, tuple[int, float]] = {}
+    for i in range(f_p.size):
+        r = int(ratios[i])
+        if r <= 0:
+            continue
+        err = abs(f_p[i] / (r * f_p[i0]) - 1.0)  # Formula 89
+        if r not in cand or err < cand[r][1]:
+            cand[r] = (i, err)
+    return [i for i, err in cand.values() if err < 0.04]  # Formula 90
+
+
 def _fundamental_set(
     f_p: np.ndarray, a_tilde: np.ndarray
 ) -> tuple[list[int], int]:
@@ -367,16 +386,7 @@ def _fundamental_set(
     for i0 in range(n):
         if f_p[i0] <= 0.0:
             continue
-        ratios = np.round(f_p / f_p[i0]).astype(int)  # Formula 88
-        cand: dict[int, tuple[int, float]] = {}
-        for i in range(n):
-            r = int(ratios[i])
-            if r <= 0:
-                continue
-            err = abs(f_p[i] / (r * f_p[i0]) - 1.0)  # Formula 89
-            if r not in cand or err < cand[r][1]:
-                cand[r] = (i, err)
-        members = [i for i, err in cand.values() if err < 0.04]  # Formula 90
+        members = _harmonic_members(f_p, i0)
         energy = float(np.sum(a_tilde[members])) if members else 0.0  # Formula 91
         if energy > best_energy:
             best_energy = energy

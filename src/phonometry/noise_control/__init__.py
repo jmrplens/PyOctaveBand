@@ -53,7 +53,12 @@ from .hvac import (
     unlined_circular_duct_attenuation,
     unlined_rectangular_duct_attenuation,
 )
-from .room_to_room import RoomToRoomResult, room_to_room_transmission
+from .room_to_room import (
+    DesignCriterion,
+    RoomToRoomResult,
+    SourceRoom,
+    room_to_room_transmission,
+)
 from .silencers import (
     ReactiveSilencerResult,
     cascade,
@@ -71,6 +76,7 @@ from .silencers import (
 
 __all__ = [
     "ENCLOSURE_MODELS",
+    "DesignCriterion",
     "DuctElement",
     "DuctModeResult",
     "DuctPathResult",
@@ -80,6 +86,7 @@ __all__ = [
     "PlaneWaveWarning",
     "ReactiveSilencerResult",
     "RoomToRoomResult",
+    "SourceRoom",
     "air_terminal_damper_correction",
     "air_terminal_velocity_limit",
     "blade_passing_frequency",

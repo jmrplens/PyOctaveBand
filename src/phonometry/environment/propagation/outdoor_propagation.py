@@ -59,6 +59,9 @@ if TYPE_CHECKING:
 
 #: Reference distance ``d0`` in the divergence term (ISO 9613-2:1996, Eq. (7)), m.
 _D0 = 1.0
+#: Message of the shared guard on the source-to-receiver distance: every term of
+#: the method divides by ``d`` or takes ``log10(d)``, so ``d`` must be positive.
+_DISTANCE_NOT_POSITIVE = "'distance' must be positive."
 #: Speed of sound used for the barrier wavelength ``lambda = c/f``
 #: (ISO 9613-2:1996, clause 7.5 writes ``lambda = 340/f``), in m/s.
 _C_SOUND = 340.0
@@ -129,6 +132,83 @@ class Barrier:
     def is_double(self) -> bool:
         """Whether double diffraction (Eq. (17)/(15)) applies (``e`` given)."""
         return self.edge_separation is not None
+
+
+@dataclass(frozen=True)
+class PropagationGeometry:
+    r"""Source-to-receiver geometry of the propagation path (ISO 9613-2:1996).
+
+    The three lengths every term of the method needs: the straight-line
+    distance ``d`` of the divergence and atmospheric terms (Eq. (7)/(8)), and
+    the two heights above the ground the ground effect of clause 7.3.1 and the
+    meteorological correction of clause 8 are written in.
+
+    :param distance: Straight-line source-to-receiver distance ``d``, in metres.
+    :param source_height: Source height ``hs`` above ground, in metres.
+    :param receiver_height: Receiver height ``hr`` above ground, in metres.
+    :param projected_distance: Ground-plane projected distance ``dp``, in
+        metres; ``None`` defaults to :math:`\sqrt{d^2 - (h_s - h_r)^2}`.
+    """
+
+    distance: float
+    source_height: float
+    receiver_height: float
+    projected_distance: float | None = None
+
+
+@dataclass(frozen=True)
+class GroundFactors:
+    """Ground factors ``G`` of the three regions (ISO 9613-2:1996, clause 7.3.1).
+
+    The general ground method splits the path into a source region, a middle
+    region and a receiver region, each with its own factor between 0 (hard
+    ground: paving, water, ice, compacted ground) and 1 (porous ground: grass,
+    trees, farmland). The default is hard ground throughout.
+
+    :param source: Ground factor ``Gs`` of the source region ([0, 1]).
+    :param middle: Ground factor ``Gm`` of the middle region ([0, 1]).
+    :param receiver: Ground factor ``Gr`` of the receiver region ([0, 1]).
+    """
+
+    source: float = 0.0
+    middle: float = 0.0
+    receiver: float = 0.0
+
+
+@dataclass(frozen=True)
+class AtmosphericConditions:
+    """State of the air behind the atmospheric absorption term ``Aatm``.
+
+    The three quantities the ISO 9613-1 attenuation coefficient ``alpha`` is a
+    function of (ISO 9613-2:1996, Eq. (8) and Table 2). The defaults are the
+    reference conditions of the tabulated coefficients.
+
+    :param temperature: Air temperature, in degrees Celsius.
+    :param relative_humidity: Relative humidity, in percent; ``None`` uses 70.
+    :param pressure: Atmospheric pressure, in kilopascals.
+    """
+
+    temperature: float = 20.0
+    relative_humidity: float | None = None
+    pressure: float = 101.325
+
+
+@dataclass(frozen=True)
+class DirectivityCorrection:
+    r"""Directivity correction :math:`D_c = D_i + D_\Omega` (Eq. (3)).
+
+    The two terms the standard adds to the sound power level of a point source:
+    the directivity index of the source itself and the solid-angle index of the
+    space it radiates into. Both are zero for an omnidirectional source
+    radiating into free space.
+
+    :param index: Source directivity index ``Di``, in decibels.
+    :param d_omega: Solid-angle index ``DOmega``, in decibels (see
+        :func:`directivity_omega` for the alternative ground method).
+    """
+
+    index: float = 0.0
+    d_omega: float = 0.0
 
 
 @dataclass(frozen=True)
@@ -292,7 +372,7 @@ def geometric_divergence(distance: float) -> float:
     :raises ValueError: If ``distance`` is not positive.
     """
     if distance <= 0.0:
-        raise ValueError("'distance' must be positive.")
+        raise ValueError(_DISTANCE_NOT_POSITIVE)
     return float(20.0 * np.log10(distance / _D0) + 11.0)
 
 
@@ -432,7 +512,7 @@ def ground_attenuation(
         if not 0.0 <= g <= 1.0:
             raise ValueError(f"'{name}' must be within [0, 1].")
     if distance <= 0.0:
-        raise ValueError("'distance' must be positive.")
+        raise ValueError(_DISTANCE_NOT_POSITIVE)
     if source_height < 0.0 or receiver_height < 0.0:
         raise ValueError("Source and receiver heights must be non-negative.")
     freqs = np.atleast_1d(np.asarray(frequencies, dtype=np.float64))
@@ -479,7 +559,7 @@ def ground_attenuation_alternative(
     :raises ValueError: If ``distance`` is not positive.
     """
     if distance <= 0.0:
-        raise ValueError("'distance' must be positive.")
+        raise ValueError(_DISTANCE_NOT_POSITIVE)
     agr = 4.8 - (2.0 * mean_height / distance) * (17.0 + 300.0 / distance)
     return float(max(agr, 0.0))
 
@@ -551,7 +631,7 @@ def barrier_attenuation(
     :raises ValueError: If ``distance`` or any frequency is not positive.
     """
     if distance <= 0.0:
-        raise ValueError("'distance' must be positive.")
+        raise ValueError(_DISTANCE_NOT_POSITIVE)
     freqs = np.atleast_1d(np.asarray(frequencies, dtype=np.float64))
     if np.any(freqs <= 0.0):
         raise ValueError("'frequencies' must be positive.")
@@ -709,7 +789,7 @@ def outdoor_propagation_attenuation(
     """
     relative_humidity = 70.0 if relative_humidity is None else relative_humidity
     if distance <= 0.0:
-        raise ValueError("'distance' must be positive.")
+        raise ValueError(_DISTANCE_NOT_POSITIVE)
     freqs = np.atleast_1d(np.asarray(frequencies, dtype=np.float64))
 
     a_div = np.full_like(freqs, geometric_divergence(distance))
@@ -742,21 +822,14 @@ def outdoor_propagation_attenuation(
 
 def predicted_receiver_level(
     sound_power_level: ArrayLike,
-    distance: float,
-    source_height: float,
-    receiver_height: float,
+    geometry: PropagationGeometry,
+    *,
     frequencies: ArrayLike = DEFAULT_FREQUENCIES,
-    ground_source: float = 0.0,
-    ground_middle: float = 0.0,
-    ground_receiver: float = 0.0,
+    ground: GroundFactors | None = None,
     barrier: Barrier | None = None,
-    temperature: float = 20.0,
-    relative_humidity: float | None = None,
-    pressure: float = 101.325,
-    directivity_index: float = 0.0,
-    d_omega: float = 0.0,
+    atmosphere: AtmosphericConditions | None = None,
+    directivity: DirectivityCorrection | None = None,
     c0: float | None = None,
-    projected_distance: float | None = None,
 ) -> NDArray[np.float64]:
     r"""Predicted octave-band receiver level (ISO 9613-2:1996, Eq. (3)/(6)).
 
@@ -774,36 +847,41 @@ def predicted_receiver_level(
 
     :param sound_power_level: Octave-band sound power level ``Lw``, in decibels
         (re 1 pW), one value per frequency.
-    :param distance: Straight-line source-to-receiver distance ``d``, in metres.
-    :param source_height: Source height ``hs``, in metres.
-    :param receiver_height: Receiver height ``hr``, in metres.
+    :param geometry: Source-to-receiver geometry of the path
+        (:class:`PropagationGeometry`): the distance ``d``, the two heights and
+        the optional projected distance ``dp``.
     :param frequencies: Octave-band midband frequencies, in hertz.
-    :param ground_source: Ground factor ``Gs`` ([0, 1]).
-    :param ground_middle: Ground factor ``Gm`` ([0, 1]).
-    :param ground_receiver: Ground factor ``Gr`` ([0, 1]).
+    :param ground: Ground factors of the three regions
+        (:class:`GroundFactors`); ``None`` is hard ground throughout.
     :param barrier: Optional screening obstacle (:class:`Barrier`).
-    :param temperature: Air temperature, in degrees Celsius.
-    :param relative_humidity: Relative humidity, in percent (default 70).
-    :param pressure: Atmospheric pressure, in kilopascals.
-    :param directivity_index: Source directivity index ``Di``, in decibels.
-    :param d_omega: Solid-angle index ``DOmega``, in decibels (see
-        :func:`directivity_omega` for the alternative ground method).
+    :param atmosphere: Air temperature, humidity and pressure behind the
+        atmospheric absorption term (:class:`AtmosphericConditions`); ``None``
+        is the reference air of the tabulated coefficients.
+    :param directivity: Directivity correction ``Dc = Di + DOmega``
+        (:class:`DirectivityCorrection`); ``None`` is an omnidirectional source
+        in free space (:math:`D_c = 0`).
     :param c0: Meteorological factor ``C0``, in decibels; ``None`` returns the
         downwind level ``LfT(DW)`` (:math:`C_{met} = 0`).
-    :param projected_distance: Ground-plane projected distance ``dp``, in metres.
     :return: Predicted octave-band level per frequency, in decibels.
     """
-    relative_humidity = 70.0 if relative_humidity is None else relative_humidity
+    ground = GroundFactors() if ground is None else ground
+    atmosphere = AtmosphericConditions() if atmosphere is None else atmosphere
+    directivity = DirectivityCorrection() if directivity is None else directivity
+    humidity = (70.0 if atmosphere.relative_humidity is None
+                else atmosphere.relative_humidity)
     lw = np.atleast_1d(np.asarray(sound_power_level, dtype=np.float64))
     attenuation = outdoor_propagation_attenuation(
-        distance, source_height, receiver_height, frequencies,
-        ground_source, ground_middle, ground_receiver, barrier,
-        temperature, relative_humidity, pressure, projected_distance,
+        geometry.distance, geometry.source_height, geometry.receiver_height,
+        frequencies, ground.source, ground.middle, ground.receiver, barrier,
+        atmosphere.temperature, humidity, atmosphere.pressure,
+        geometry.projected_distance,
     )
     cmet: float | None = None
     if c0 is not None:
-        dp = _projected_distance(distance, source_height, receiver_height,
-                                 projected_distance)
-        cmet = meteorological_correction(dp, source_height, receiver_height, c0)
-    return _compose_receiver_level(lw, directivity_index, d_omega,
+        dp = _projected_distance(geometry.distance, geometry.source_height,
+                                 geometry.receiver_height,
+                                 geometry.projected_distance)
+        cmet = meteorological_correction(dp, geometry.source_height,
+                                         geometry.receiver_height, c0)
+    return _compose_receiver_level(lw, directivity.index, directivity.d_omega,
                                    attenuation.a_total, cmet)

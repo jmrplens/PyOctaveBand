@@ -68,7 +68,7 @@ _G = 10 ** (3 / 10)
 # Pass-band max limits (min is constant -0.4 dB class 1 / -0.6 dB class 2):
 _PASSBAND_MAX: list[tuple[float, float, float]] = [
     # (exponent, class 1 max, class 2 max)
-    (0.0, 0.4, 0.6),      # Omega = 1
+    (0.0, 0.4, 0.6),      # band centre (Omega of 1)
     (1 / 8, 0.5, 0.7),
     (1 / 4, 0.7, 0.9),
     (3 / 8, 1.4, 1.7),
@@ -94,7 +94,7 @@ _STOPBAND_MIN: list[tuple[float, float, float]] = [
 # reused unchanged for both editions.
 _PASSBAND_MAX_1995: list[tuple[float, float, float, float]] = [
     # (exponent, class 0 max, class 1 max, class 2 max)
-    (0.0, 0.15, 0.3, 0.5),   # Omega = 1
+    (0.0, 0.15, 0.3, 0.5),   # band centre (Omega of 1)
     (1 / 8, 0.2, 0.4, 0.6),
     (1 / 4, 0.4, 0.6, 0.8),
     (3 / 8, 1.1, 1.3, 1.6),
@@ -221,7 +221,6 @@ def class_limits(
 def _verify_band(
     bank: OctaveFilterBank,
     idx: int,
-    spec: dict[str, Any],
     classes_ordered: tuple[int, ...],
     breakpoint_omegas: np.ndarray,
     edition: str,
@@ -338,7 +337,7 @@ def verify_filter_class(
 
     for idx in range(bank.num_bands):
         band_entry, omega_nyq = _verify_band(
-            bank, idx, spec, classes_ordered, breakpoint_omegas, edition, num_points
+            bank, idx, classes_ordered, breakpoint_omegas, edition, num_points
         )
         if omega_nyq < mask_top_omega:
             range_limited = True

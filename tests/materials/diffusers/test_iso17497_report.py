@@ -43,10 +43,10 @@ def _scattering():
     t2 = _T1 * 0.90
     t4 = t2 * (1.0 - np.linspace(0.02, 0.28, _FREQS.size))
     alpha_s = materials.random_incidence_absorption(
-        volume, area, c1=c, T1=_T1, c2=c, T2=t2
+        volume, area, c1=c, t1=_T1, c2=c, t2=t2
     )
     alpha_spec = materials.specular_absorption_coefficient(
-        volume, area, c3=c, T3=_T1, c4=c, T4=t4
+        volume, area, c3=c, t3=_T1, c4=c, t4=t4
     )
     return materials.scattering_coefficient_spectrum(_FREQS, alpha_spec, alpha_s)
 
@@ -149,10 +149,12 @@ def test_scattering_displayed_values_match_oracle(tmp_path) -> None:
     text = _text(str(out))
     assert "0.08" in text  # s(500 Hz) = 0.082 -> 0.08
     assert "0.45" in text  # s(4000 Hz) = 0.454 -> 0.45
-    assert "500" in text and "4000" in text  # band labels
+    assert "500" in text  # band labels
+    assert "4000" in text
     assert "Acoustic Test Client Ltd." in text  # metadata
     # The reverberation-room fields belong to the ISO 17497-1 scattering fiche.
-    assert "Sample area" in text and "Room volume" in text
+    assert "Sample area" in text
+    assert "Room volume" in text
 
 
 def test_scattering_verbose_shows_alpha_spec_one_page(tmp_path) -> None:
@@ -212,7 +214,8 @@ def test_diffusion_displayed_values_match_oracle(tmp_path) -> None:
     text = _text(str(out))
     assert "0.51" in text  # d(500 Hz) = 0.506 -> 0.51
     assert "0.81" in text  # d(4000 Hz) = 0.807 -> 0.81
-    assert "500" in text and "4000" in text  # band labels
+    assert "500" in text  # band labels
+    assert "4000" in text
 
 
 def test_diffusion_omits_room_fields(tmp_path) -> None:

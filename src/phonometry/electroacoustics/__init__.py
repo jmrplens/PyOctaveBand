@@ -25,8 +25,20 @@ from .intermodulation import (
     modulation_distortion,
     total_difference_frequency_distortion,
 )
-from .loudspeaker import LoudspeakerCharacteristics, loudspeaker_characteristics
-from .microphone import MicrophoneCharacteristics, microphone_characteristics
+from .loudspeaker import (
+    LoudspeakerCharacteristics,
+    LoudspeakerDirectivity,
+    LoudspeakerRatings,
+    loudspeaker_characteristics,
+)
+from .microphone import (
+    MicrophoneCharacteristics,
+    MicrophoneDirectivity,
+    MicrophoneElectrical,
+    MicrophoneNoise,
+    MicrophoneOverload,
+    microphone_characteristics,
+)
 from .noise_measurements import dynamic_range, idle_channel_noise
 from .piston import (
     PistonDirectivity,
@@ -58,7 +70,13 @@ __all__ = [
     "FrequencyResponseResult",
     "HarmonicDistortionResult",
     "LoudspeakerCharacteristics",
+    "LoudspeakerDirectivity",
+    "LoudspeakerRatings",
     "MicrophoneCharacteristics",
+    "MicrophoneDirectivity",
+    "MicrophoneElectrical",
+    "MicrophoneNoise",
+    "MicrophoneOverload",
     "ModulationDistortionResult",
     "PistonDirectivity",
     "RadiatingPistonResult",

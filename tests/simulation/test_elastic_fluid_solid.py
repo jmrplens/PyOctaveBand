@@ -438,7 +438,8 @@ def test_air_solid_interface_is_stable_and_reflects_totally() -> None:
         trace_solid[i] = -sim.tyy[340, 1]
     assert np.all(np.isfinite(sim.txx))
     assert np.all(np.isfinite(sim.txy))
-    assert np.all(np.isfinite(sim.vx)) and np.all(np.isfinite(sim.vy))
+    assert np.all(np.isfinite(sim.vx))
+    assert np.all(np.isfinite(sim.vy))
     times = (np.arange(n_steps) + 1) * sim.dt
     z1, z2 = AIR.rho * AIR.c_p, STEEL.rho * STEEL.c_p
     incident = float(trace_air[times < 1.4e-3].max())
@@ -516,8 +517,10 @@ def test_from_regions_and_material_validation() -> None:
         Material(c_p=3000.0, c_s=2500.0, rho=1000.0)
     with pytest.raises(ValueError, match="rho must be positive"):
         Material(c_p=1480.0, c_s=0.0, rho=0.0)
-    assert WATER.is_fluid and AIR.is_fluid
-    assert not STEEL.is_fluid and not ALUMINIUM.is_fluid
+    assert WATER.is_fluid
+    assert AIR.is_fluid
+    assert not STEEL.is_fluid
+    assert not ALUMINIUM.is_fluid
     coerced = Material(c_p=1480, c_s=0, rho=1000)
     assert all(isinstance(v, float)
                for v in (coerced.c_p, coerced.c_s, coerced.rho))

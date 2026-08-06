@@ -27,7 +27,8 @@ segment (§4.3-4.5): [`impedance_adjustment`](/phonometry/reference/api/aeroacou
 [`noise_fraction`](/phonometry/reference/api/aeroacoustics/airport-noise/#noise_fraction) and, behind takeoff ground-roll segments, the
 [`start_of_roll_directivity`](/phonometry/reference/api/aeroacoustics/airport-noise/#start_of_roll_directivity) `ΔSOR` (§4.5.7). [`event_level`](/phonometry/reference/api/aeroacoustics/airport-noise/#event_level)
 assembles and sums them into the `SEL`/`LAmax` of a movement (mark takeoff
-ground-roll segments with its `ground_roll` mask), and [`noise_contour`](/phonometry/reference/api/aeroacoustics/airport-noise/#noise_contour)
+ground-roll segments with the `ground_roll` mask of its
+[`FlightSegmentState`](/phonometry/reference/api/aeroacoustics/airport-noise/#flightsegmentstate)), and [`noise_contour`](/phonometry/reference/api/aeroacoustics/airport-noise/#noise_contour)
 evaluates it over a ground grid.
 
 Source (clean-room, implemented from the standard text): ECAC Doc 29, 4th ed.,
@@ -35,6 +36,31 @@ Vol 2 (2016), §4.2-4.5. Validated per-term and end-to-end against the ECAC
 Doc 29 5th ed. Vol 3 Part 1 reference workbook.
 
 > Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
+
+## AerodromeAtmosphere
+
+```python
+AerodromeAtmosphere(temperature: float = 15.0, pressure: float = 101.325)
+```
+
+The aerodrome air the NPD levels are corrected to (Eq. 4-6/4-7).
+
+The two quantities [`impedance_adjustment`](/phonometry/reference/api/aeroacoustics/airport-noise/#impedance_adjustment) needs, at the standard
+atmosphere by default, so an event at reference conditions needs no
+atmosphere at all.
+
+The Doc 32 rotorcraft chain keeps its own
+[`RotorcraftAtmosphere`](/phonometry/reference/api/aeroacoustics/rotorcraft-noise/#rotorcraftatmosphere)
+instead of sharing this one: it propagates band by band, so it also needs
+the humidity and the absorption method, and its reference conditions are
+the ICAO 25 °C/70 % of the hemisphere database, not the 15 °C of Eq. 4-7.
+
+**Attributes**
+
+| Name | Description |
+| :--- | :--- |
+| `temperature` | Aerodrome air temperature `T`, in °C (default 15). |
+| `pressure` | Aerodrome air pressure `p`, in kPa (default 101.325). |
 
 ## duration_correction
 
@@ -101,11 +127,8 @@ event_level(
     reference_speed: float = 82.31104,
     mounting: str = 'wing',
     metric: str = 'exposure',
-    temperature: float = 15.0,
-    pressure: float = 101.325,
-    ground_roll: NDArray[np.bool_] | list[bool] | None = None,
-    landing_roll: NDArray[np.bool_] | list[bool] | None = None,
-    bank: NDArray[np.float64] | list[float] | None = None,
+    atmosphere: AerodromeAtmosphere = ...,
+    segments: FlightSegmentState = ...,
 ) -> FlyoverResult
 ```
 
@@ -130,11 +153,8 @@ ground-roll segments, and combines them into the exposure level `SEL`
 | `reference_speed` | NPD reference speed, in m/s (default 160 kn). |
 | `mounting` | Engine mounting (`"wing"`/`"fuselage"`/`"propeller"`). |
 | `metric` | `"exposure"` (SEL) or `"maximum"` (LAmax). |
-| `temperature` | Aerodrome air temperature, in °C (impedance adjustment). |
-| `pressure` | Aerodrome air pressure, in kPa (impedance adjustment). |
-| `ground_roll` | Optional boolean mask of length `N-1` marking takeoff ground-roll segments; these receive the start-of-roll directivity `ΔSOR` and reduced noise fraction behind the aircraft (§4.5.6-4.5.7). |
-| `landing_roll` | Optional boolean mask of length `N-1` marking landing rollout segments; ahead of them the reduced fraction (Eq. 4-21b), the nearest-end lateral geometry and no directivity term apply (§4.5.5-4.5.6). |
-| `bank` | Optional per-segment bank angle `ε` in degrees (length `N-1`), measured counter-clockwise about the roll axis (positive in a left turn, starboard wing up); the depression angle becomes $\phi = \beta + \varepsilon$ for observers to starboard (right) of the track and $\phi = \beta - \varepsilon$ for observers to port (§4.5.2). |
+| `atmosphere` | Aerodrome air temperature and pressure, an [`AerodromeAtmosphere`](/phonometry/reference/api/aeroacoustics/airport-noise/#aerodromeatmosphere) (default: the standard atmosphere); they set the impedance adjustment. |
+| `segments` | What each segment is doing, a [`FlightSegmentState`](/phonometry/reference/api/aeroacoustics/airport-noise/#flightsegmentstate) (default: airborne and unbanked): the takeoff ground-roll and landing-rollout masks and the per-segment bank angle. |
 
 **Returns:** A [`FlyoverResult`](/phonometry/reference/api/aeroacoustics/airport-noise/#flyoverresult). If every segment is degenerate (zero length) the level is `-inf`.
 
@@ -143,6 +163,29 @@ ground-roll segments, and combines them into the exposure level `SEL`
 | Exception | When |
 | :--- | :--- |
 | ValueError | If the inputs are invalid. |
+
+## FlightSegmentState
+
+```python
+FlightSegmentState(
+    ground_roll: NDArray[np.bool_] | list[bool] | None = None,
+    landing_roll: NDArray[np.bool_] | list[bool] | None = None,
+    bank: NDArray[np.float64] | list[float] | None = None,
+)
+```
+
+What each segment of a flight path is doing (§4.5.2/4.5.5-4.5.7).
+
+One entry per segment, so every field an `N`-point path fills has length
+`N-1`. Everything left unset describes an airborne, unbanked movement.
+
+**Attributes**
+
+| Name | Description |
+| :--- | :--- |
+| `ground_roll` | Optional boolean mask marking takeoff ground-roll segments; these receive the start-of-roll directivity `ΔSOR` and reduced noise fraction behind the aircraft (§4.5.6-4.5.7). |
+| `landing_roll` | Optional boolean mask marking landing rollout segments; ahead of them the reduced fraction (Eq. 4-21b), the nearest-end lateral geometry and no directivity term apply (§4.5.5-4.5.6). |
+| `bank` | Optional per-segment bank angle `ε` in degrees, measured counter-clockwise about the roll axis (positive in a left turn, starboard wing up); the depression angle becomes $\phi = \beta + \varepsilon$ for observers to starboard (right) of the track and $\phi = \beta - \varepsilon$ for observers to port (§4.5.2). |
 
 ## FlyoverResult
 
@@ -251,11 +294,8 @@ noise_contour(
     reference_speed: float = 82.31104,
     mounting: str = 'wing',
     metric: str = 'exposure',
-    temperature: float = 15.0,
-    pressure: float = 101.325,
-    ground_roll: NDArray[np.bool_] | list[bool] | None = None,
-    landing_roll: NDArray[np.bool_] | list[bool] | None = None,
-    bank: NDArray[np.float64] | list[float] | None = None,
+    atmosphere: AerodromeAtmosphere = ...,
+    segments: FlightSegmentState = ...,
 ) -> NoiseContourResult
 ```
 
@@ -277,11 +317,8 @@ Evaluates [`event_level`](/phonometry/reference/api/aeroacoustics/airport-noise/
 | `reference_speed` | NPD reference speed, in m/s. |
 | `mounting` | Engine mounting. |
 | `metric` | `"exposure"` (SEL) or `"maximum"` (LAmax). |
-| `temperature` | Aerodrome air temperature, in °C (impedance adjustment). |
-| `pressure` | Aerodrome air pressure, in kPa (impedance adjustment). |
-| `ground_roll` | Optional boolean mask (length `N-1`) of takeoff ground-roll segments (see [`event_level`](/phonometry/reference/api/aeroacoustics/airport-noise/#event_level)). |
-| `landing_roll` | Optional boolean mask (length `N-1`) of landing rollout segments (see [`event_level`](/phonometry/reference/api/aeroacoustics/airport-noise/#event_level)). |
-| `bank` | Optional per-segment bank angle `ε` in degrees, length `N-1` (see [`event_level`](/phonometry/reference/api/aeroacoustics/airport-noise/#event_level)). |
+| `atmosphere` | Aerodrome air temperature and pressure, an [`AerodromeAtmosphere`](/phonometry/reference/api/aeroacoustics/airport-noise/#aerodromeatmosphere) (impedance adjustment). |
+| `segments` | What each segment is doing, a [`FlightSegmentState`](/phonometry/reference/api/aeroacoustics/airport-noise/#flightsegmentstate) (see [`event_level`](/phonometry/reference/api/aeroacoustics/airport-noise/#event_level)). |
 
 **Returns:** A [`NoiseContourResult`](/phonometry/reference/api/aeroacoustics/airport-noise/#noisecontourresult).
 

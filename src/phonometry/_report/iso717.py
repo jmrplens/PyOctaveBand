@@ -380,6 +380,54 @@ def _extended_terms(
     return terms
 
 
+def _validated_curves(
+    result: WeightedRatingResult | ImpactRatingResult,
+) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
+    """Band centres, measured and shifted curves, and the unfavourable deviations.
+
+    :raises ValueError: If a curve is missing from the result or the three do
+        not share a length.
+    """
+    centers = result.band_centers
+    measured = result.measured
+    shifted = result.shifted_reference
+    if centers is None or measured is None or shifted is None:
+        raise ValueError(
+            "render_iso717_report() needs 'band_centers', 'measured' and "
+            "'shifted_reference' on the result."
+        )
+    centers = np.asarray(centers, dtype=np.float64)
+    measured = np.asarray(measured, dtype=np.float64)
+    shifted = np.asarray(shifted, dtype=np.float64)
+    if not centers.shape == measured.shape == shifted.shape:
+        raise ValueError(
+            "render_iso717_report() needs 'band_centers', 'measured' and "
+            "'shifted_reference' of equal length."
+        )
+
+    # Unfavourable deviation: reference above measurement (airborne) or
+    # measurement above the reference (impact, the opposite sign).
+    if result.quantity == "impact":
+        deviations = np.maximum(measured - shifted, 0.0)
+    else:
+        deviations = np.maximum(shifted - measured, 0.0)
+    return centers, measured, shifted, deviations
+
+
+def _basis_line(
+    metadata: ReportMetadata | None, rating_part: str, language: str
+) -> str:
+    """Standard-basis line under the title: measurement standard plus rating."""
+    measurement_standard = (
+        metadata.measurement_standard if metadata is not None else None
+    )
+    if measurement_standard:
+        return t("{standard} laboratory measurement of sound insulation. Rating per {part}:2020.", language).format(
+            standard=html.escape(measurement_standard), part=rating_part
+        )
+    return t("Sound insulation rating per {part}:2020.", language).format(part=rating_part)
+
+
 def render_iso717_report(
     result: WeightedRatingResult | ImpactRatingResult,
     path: str,
@@ -424,43 +472,13 @@ def render_iso717_report(
         raise ImportError(_REPORTLAB_HINT) from exc
     accent = colors.HexColor(_ACCENT_HEX)
 
-    centers = result.band_centers
-    measured = result.measured
-    shifted = result.shifted_reference
-    if centers is None or measured is None or shifted is None:
-        raise ValueError(
-            "render_iso717_report() needs 'band_centers', 'measured' and "
-            "'shifted_reference' on the result."
-        )
-    centers = np.asarray(centers, dtype=np.float64)
-    measured = np.asarray(measured, dtype=np.float64)
-    shifted = np.asarray(shifted, dtype=np.float64)
-    if not centers.shape == measured.shape == shifted.shape:
-        raise ValueError(
-            "render_iso717_report() needs 'band_centers', 'measured' and "
-            "'shifted_reference' of equal length."
-        )
-
-    # Unfavourable deviation: reference above measurement (airborne) or
-    # measurement above the reference (impact, the opposite sign).
-    if result.quantity == "impact":
-        deviations = np.maximum(measured - shifted, 0.0)
-    else:
-        deviations = np.maximum(shifted - measured, 0.0)
+    centers, measured, shifted, deviations = _validated_curves(result)
 
     title, rating_part, statement, value_header = _labels(result, language, symbol)
 
     styles, title_style, basis_style, caption_style = document_styles(accent)
 
-    measurement_standard = (
-        metadata.measurement_standard if metadata is not None else None
-    )
-    if measurement_standard:
-        basis = t("{standard} laboratory measurement of sound insulation. Rating per {part}:2020.", language).format(
-            standard=html.escape(measurement_standard), part=rating_part
-        )
-    else:
-        basis = t("Sound insulation rating per {part}:2020.", language).format(part=rating_part)
+    basis = _basis_line(metadata, rating_part, language)
 
     flow: list[Any] = [
         Paragraph(title, title_style),

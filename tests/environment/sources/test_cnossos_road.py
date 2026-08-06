@@ -557,6 +557,7 @@ def test_segment_power_is_the_line_power_plus_ten_log_length() -> None:
 def test_segment_power_feeds_the_propagation_stage() -> None:
     """The emission output is an octave-band ``L_W`` on the 63 Hz - 8 kHz grid."""
     from phonometry.environment.propagation.outdoor_propagation import (
+        PropagationGeometry,
         predicted_receiver_level,
     )
 
@@ -569,7 +570,9 @@ def test_segment_power_feeds_the_propagation_stage() -> None:
     )
     segment = line_source_segment_power(result.total_line_power, 20.0)
     levels = predicted_receiver_level(
-        segment, 100.0, result.source_height, 4.0, frequencies=result.frequencies
+        segment,
+        PropagationGeometry(100.0, result.source_height, 4.0),
+        frequencies=result.frequencies,
     )
     assert levels.shape == (8,)
     assert np.all(levels < segment)

@@ -8,7 +8,12 @@ import numpy as np
 import pytest
 import reference_data as ref
 
-from phonometry import OctaveFilterBank, verify_filter_class
+from phonometry import (
+    BlockProcessing,
+    FilterDesign,
+    OctaveFilterBank,
+    verify_filter_class,
+)
 from phonometry.filters.compliance import (
     _PASSBAND_MAX_1995,
     _PASSBAND_MIN_1995,
@@ -22,7 +27,8 @@ def test_class_limits_table1_anchor_values() -> None:
     G = 10 ** (3 / 10)
     # Passband center: class 1 in [-0.4, +0.4]
     lo, hi = class_limits(1.0, 1, np.array([1.0]))
-    assert lo[0] == pytest.approx(-0.4) and hi[0] == pytest.approx(0.4)
+    assert lo[0] == pytest.approx(-0.4)
+    assert hi[0] == pytest.approx(0.4)
     # Band edge (inside): max +5.3 (class 1)
     lo, hi = class_limits(1.0, 1, np.array([G ** 0.5 * 0.999999]))
     assert hi[0] == pytest.approx(5.3, abs=0.05)
@@ -83,9 +89,10 @@ def test_result_has_per_band_details() -> None:
 def test_stateful_bank_matches_stateless_design() -> None:
     """Stateful banks share the SOS design: verification must agree exactly."""
     stateful = OctaveFilterBank(fs=48000, fraction=1, order=6, limits=[500, 2000],
-                                stateful=True, resample=False)
+                                design=FilterDesign(resample=False),
+                                block_processing=BlockProcessing(stateful=True))
     stateless = OctaveFilterBank(fs=48000, fraction=1, order=6, limits=[500, 2000],
-                                 resample=False)
+                                 design=FilterDesign(resample=False))
     r_stateful = verify_filter_class(stateful)
     r_stateless = verify_filter_class(stateless)
     assert r_stateful["overall_class"] == r_stateless["overall_class"]
@@ -99,7 +106,7 @@ def test_coarse_grid_breakpoints_evaluated_exactly() -> None:
     floor reproduces the dense-grid verdict and binding margin (interpolation
     used to yield garbage margins around -190 dB there)."""
     bank = OctaveFilterBank(fs=48000, fraction=3, order=6, limits=[100, 5000],
-                            filter_type="butter")
+                            design=FilterDesign(filter_type="butter"))
     dense = verify_filter_class(bank)
     coarse = verify_filter_class(bank, num_points=16)
     assert coarse["overall_class"] == dense["overall_class"] == 1
@@ -110,12 +117,13 @@ def test_coarse_grid_breakpoints_evaluated_exactly() -> None:
 
 def test_invalid_inputs_raise() -> None:
     bank = OctaveFilterBank(fs=48000, fraction=1, order=6, limits=[500, 2000])
+    band_centre = np.array([1.0])
     with pytest.raises(ValueError, match="num_points"):
         verify_filter_class(bank, num_points=4)
     with pytest.raises(ValueError, match="filter_class"):
-        class_limits(1.0, 3, np.array([1.0]))
+        class_limits(1.0, 3, band_centre)
     with pytest.raises(ValueError, match="fraction"):
-        class_limits(-1.0, 1, np.array([1.0]))
+        class_limits(-1.0, 1, band_centre)
 
 
 # ---------------------------------------------------------------------------
@@ -206,12 +214,13 @@ def test_range_limited_flag_reports_unverifiable_stopband() -> None:
 
 
 def test_1995_rejects_out_of_range_class_and_bad_edition() -> None:
+    band_centre = np.array([1.0])
     with pytest.raises(ValueError, match="filter_class"):
-        class_limits(1.0, 3, np.array([1.0]), edition="1995")
+        class_limits(1.0, 3, band_centre, edition="1995")
     with pytest.raises(ValueError, match="filter_class"):
-        class_limits(1.0, 0, np.array([1.0]))  # class 0 invalid for 2014
+        class_limits(1.0, 0, band_centre)  # class 0 invalid for 2014
     with pytest.raises(ValueError, match="edition"):
-        class_limits(1.0, 1, np.array([1.0]), edition="2020")
+        class_limits(1.0, 1, band_centre, edition="2020")
     bank = OctaveFilterBank(fs=48000, fraction=1, order=6, limits=[500, 2000])
     with pytest.raises(ValueError, match="edition"):
         verify_filter_class(bank, edition="2020")

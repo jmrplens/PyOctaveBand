@@ -32,7 +32,8 @@ import phonometry as ph
 # --------------------------------------------------------------------------
 def test_monte_carlo_plot_histogram_and_interval() -> None:
     res = _monte_carlo()
-    assert res.samples is not None and res.samples.size == res.trials
+    assert res.samples is not None
+    assert res.samples.size == res.trials
     ax = res.plot()
     bars = [
         p for p in ax.patches

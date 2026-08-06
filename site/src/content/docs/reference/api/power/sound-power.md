@@ -206,6 +206,41 @@ arrays it accepts directly.
 
 **Returns:** The 3-D axes.
 
+## RoomEnvironment
+
+```python
+RoomEnvironment(
+    absorption_area: float | np.ndarray | None = None,
+    reverberation_time: float | np.ndarray | None = None,
+    volume: float | None = None,
+    mean_absorption_coefficient: float | np.ndarray | None = None,
+    room_surface: float | None = None,
+)
+```
+
+Room data behind the environmental correction `K2` (ISO 3744 Annex A).
+
+The three routes the standard offers to the equivalent sound absorption area
+`A` of the test room, in the order [`environmental_correction`](/phonometry/reference/api/power/sound-power/#environmental_correction) tries
+them: `A` itself, the Sabine reverberation time with the room volume
+($A = 0.16 V / T$, Eq. A.3) and the mean absorption coefficient with
+the area of the room boundaries ($A = \alpha S_v$, Eq. A.7). Each
+route is a pair that must be given whole; the empty environment carries no
+room data at all, which is the free field ($K_2 = 0$).
+
+Every field may also be a per-band array, in which case `K2` comes out
+per band with that shape.
+
+**Parameters**
+
+| Name | Description |
+| :--- | :--- |
+| `absorption_area` | Equivalent absorption area `A` (m^2), scalar or per band. |
+| `reverberation_time` | Sabine `T` (s), scalar or per band, with `volume` (Eq. A.3). |
+| `volume` | Room volume `V` (m^3), with `reverberation_time`. |
+| `mean_absorption_coefficient` | `alpha` in (0, 1], scalar or per band, with `room_surface` (Eq. A.7). |
+| `room_surface` | Room boundary area `Sv` (m^2), with `alpha`. |
+
 ## sound_power_pressure
 
 ```python
@@ -219,11 +254,7 @@ sound_power_pressure(
     reflecting_planes: int = 1,
     background_levels: np.ndarray | None = None,
     frequencies: np.ndarray | None = None,
-    absorption_area: float | None = None,
-    reverberation_time: float | None = None,
-    volume: float | None = None,
-    mean_absorption_coefficient: float | None = None,
-    room_surface: float | None = None,
+    room: RoomEnvironment | None = None,
     grade: Grade = 'engineering',
     omc_uncertainty: float = 0.0,
 ) -> SoundPowerResult
@@ -235,8 +266,8 @@ Sound power level from surface pressure levels (ISO 3744/3746:2010).
 pressure levels: one row per microphone position, one column per frequency
 band (or a single column for a directly measured A-weighted level). The
 surface-averaged level is corrected for background noise (`K1`, from
-`background_levels`) and for the test environment (`K2`, from the room
-absorption data) and combined with the measurement surface area:
+`background_levels`) and for the test environment (`K2`, from the
+`room` absorption data) and combined with the measurement surface area:
 
 $$
 L_W = 10 \log_{10}\!\left[ \frac{1}{N_M} \sum_i 10^{0.1 L_{pi}} \right] - K_1 - K_2 + 10 \log_{10}\frac{S}{S_0}
@@ -259,11 +290,7 @@ sound power level is combined via ISO 3744 Annex E.
 | `reflecting_planes` | Number of reflecting planes (1, 2 or 3). |
 | `background_levels` | `(NM, NB)` background levels for `K1`, or a single spectrum `(NB,)` / `(1, NB)` broadcast to every position. |
 | `frequencies` | Band mid-band frequencies (Hz) for the A-weighted total. |
-| `absorption_area` | Equivalent absorption area `A` (m^2) for `K2`. |
-| `reverberation_time` | Sabine `T` (s), with `volume`, for `K2`. |
-| `volume` | Room volume `V` (m^3), with `reverberation_time`. |
-| `mean_absorption_coefficient` | `alpha`, with `room_surface`, for `K2`. |
-| `room_surface` | Room boundary area `Sv` (m^2), with `alpha`. |
+| `room` | Room absorption data behind `K2` ([`RoomEnvironment`](/phonometry/reference/api/power/sound-power/#roomenvironment)); `None` is a room with no data at all, i.e. a free field ($K_2 = 0$). |
 | `grade` | `'engineering'` (ISO 3744) or `'survey'` (ISO 3746). |
 | `omc_uncertainty` | `sigma_omc` (dB), operating/mounting instability. |
 

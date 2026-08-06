@@ -145,6 +145,27 @@ radar tracks (e.g. spline resampling) before differentiating.
 | :--- | :--- |
 | ValueError | If the inputs are invalid. |
 
+## FlightConditionInterpolation
+
+```python
+FlightConditionInterpolation(
+    scaling_factor: float = 2.0,
+    triangles: NDArray[np.int_] | list[list[int]] | None = None,
+)
+```
+
+How a flight condition blends the database hemispheres (Eq. 3-10).
+
+The two settings of [`flight_condition_weights`](/phonometry/reference/api/aeroacoustics/rotorcraft-noise/#flight_condition_weights), which the event and
+contour entry points hand it per track point.
+
+**Attributes**
+
+| Name | Description |
+| :--- | :--- |
+| `scaling_factor` | Flight-condition scaling factor `F_fc` applied to the normalised path angle (default 2, the guidance's empirical value). |
+| `triangles` | Optional precomputed triangulation, shape `(T, 3)` 0-based indices into the database conditions (default `None`: the Delaunay triangulation of the normalised conditions). See [`flight_condition_weights`](/phonometry/reference/api/aeroacoustics/rotorcraft-noise/#flight_condition_weights). |
+
 ## FlightPathKinematics
 
 ```python
@@ -288,22 +309,11 @@ rotorcraft_event_level(
     positions: NDArray[np.float64] | list[list[float]],
     receiver: tuple[float, float] | NDArray[np.float64] | list[float],
     *,
-    receiver_height: float = 1.2,
-    ground_elevation: float = 0.0,
-    airspeed: float | NDArray[np.float64] | list[float] | None = None,
-    path_angle: float | NDArray[np.float64] | list[float] | None = None,
-    heading: float | NDArray[np.float64] | list[float] | None = None,
-    bank_angle: float | NDArray[np.float64] | list[float] | None = None,
-    flow_resistivity: float | str | np.floating[Any] | np.integer[Any] = 'G',
-    temperature: float = 25.0,
-    relative_humidity: float = 70.0,
-    pressure: float = 101.325,
     level_offset: float | NDArray[np.float64] | list[float] = 0.0,
-    scaling_factor: float = 2.0,
-    triangles: NDArray[np.int_] | list[list[int]] | None = None,
-    atmospheric_method: str = 'iso9613',
-    terrain: tuple[NDArray[np.float64], NDArray[np.float64], NDArray[np.float64]] | Sequence[NDArray[np.float64]] | None = None,
-    terrain_resolution: float | None = None,
+    atmosphere: RotorcraftAtmosphere = ...,
+    ground: RotorcraftGround = ...,
+    track_state: RotorcraftTrackState = ...,
+    interpolation: FlightConditionInterpolation = ...,
 ) -> RotorcraftEventResult
 ```
 
@@ -321,8 +331,8 @@ recorded time $t_r = t_e + r/c$ (Eq. 22) and integrated into
 reusing
 [`epnl_from_pnlt`](/phonometry/reference/api/aeroacoustics/certification/#epnl_from_pnlt)).
 
-The flight condition per point comes from the `airspeed`/`path_angle`
-overrides when given (e.g. the smoothed values of a radar-track workflow),
+The flight condition per point comes from the `track_state` overrides
+when given (e.g. the smoothed values of a radar-track workflow),
 otherwise from [`flight_path_kinematics`](/phonometry/reference/api/aeroacoustics/rotorcraft-noise/#flight_path_kinematics) on the track itself, in which
 case the database `airspeeds` must be in m/s. The hemisphere frame is
 oriented by the heading and tilted by the bank angle in turns (guidance
@@ -338,22 +348,11 @@ oriented by the heading and tilted by the bank angle in turns (guidance
 | `times` | Track times, in s, strictly increasing, shape `(N,)`. |
 | `positions` | Track positions `(x, y, z)`, in metres, shape `(N, 3)` (z up, above the ground elevation datum). |
 | `receiver` | Receiver ground position `(x, y)`, in metres. |
-| `receiver_height` | Microphone height above local ground, in metres (default 1.2). |
-| `ground_elevation` | Ground elevation `z` at the site, in metres on the track datum (default 0); source and receiver heights above ground follow from it. |
-| `airspeed` | Per-point airspeed override, scalar or shape `(N,)`. |
-| `path_angle` | Per-point path-angle override, in degrees. |
-| `heading` | Per-point heading override, in degrees. |
-| `bank_angle` | Per-point bank-angle override, in degrees (positive starboard down). |
-| `flow_resistivity` | Ground flow resistivity `σ` in Pa·s/m², or a CNOSSOS class letter (see [`ground_effect_adjustment`](/phonometry/reference/api/aeroacoustics/rotorcraft-propagation/#ground_effect_adjustment)). |
-| `temperature` | Air temperature, in °C (default 25, ICAO reference). |
-| `relative_humidity` | Relative humidity, in % (default 70). |
-| `pressure` | Ambient pressure, in kPa (default 101.325). |
 | `level_offset` | Source-level offset `ΔEPNL` added to the hemisphere levels (Eq. 2 class substitution), in dB (default 0). Scalar or per track point, shape `(N,)`: Chapter-8 substitutions correct climb, level and descent conditions with different certification levels. |
-| `scaling_factor` | Flight-condition scaling factor `F_fc` (default 2). |
-| `triangles` | Optional precomputed flight-condition triangulation (see [`flight_condition_weights`](/phonometry/reference/api/aeroacoustics/rotorcraft-noise/#flight_condition_weights)). |
-| `atmospheric_method` | `"iso9613"` for the pure-tone Eq. 26/27 term (the guidance text), or `"sae"` for the SAE ARP 5534 band-integrated mapping used by the NORAH2 reference implementation (they agree to ~0.05 dB below 3.15 kHz). |
-| `terrain` | Optional digital elevation model `(x, y, z)` on the track frame (`x` and `y` strictly increasing, `z` of shape `(len(y), len(x))`, all in metres on the track datum). When given, every emission-receiver pair is evaluated over its sampled vertical section (guidance §A.4.4/A.4.5): mean-ground-plane ground effect with equivalent heights, and rubber-band diffraction where terrain blocks the line of sight; `ground_elevation` is then taken from the model. The model must cover the whole track and the receiver (fabricating terrain beyond its edges is refused). |
-| `terrain_resolution` | Section sampling step along the path, in metres (default: the elevation model's cell size; sections are capped at 20000 sampling intervals). |
+| `atmosphere` | The air the event propagates through, a [`RotorcraftAtmosphere`](/phonometry/reference/api/aeroacoustics/rotorcraft-noise/#rotorcraftatmosphere) (default: the ICAO reference conditions of the database). |
+| `ground` | The ground under the event, a [`RotorcraftGround`](/phonometry/reference/api/aeroacoustics/rotorcraft-noise/#rotorcraftground) (default: flat ground at the track datum, CNOSSOS class `"G"`, a 1.2 m microphone). A single receiver takes its scalar fields only; the per-grid-point arrays are for the contour. |
+| `track_state` | Per-point airspeed, path angle, heading and bank angle, a [`RotorcraftTrackState`](/phonometry/reference/api/aeroacoustics/rotorcraft-noise/#rotorcrafttrackstate) (default: all derived from the track by [`flight_path_kinematics`](/phonometry/reference/api/aeroacoustics/rotorcraft-noise/#flight_path_kinematics)). |
+| `interpolation` | How the flight condition blends the database hemispheres, a [`FlightConditionInterpolation`](/phonometry/reference/api/aeroacoustics/rotorcraft-noise/#flightconditioninterpolation) (default: `F_fc = 2` over the Delaunay triangulation). |
 
 **Returns:** A [`RotorcraftEventResult`](/phonometry/reference/api/aeroacoustics/rotorcraft-noise/#rotorcrafteventresult).
 
@@ -376,22 +375,11 @@ rotorcraft_noise_contour(
     x: NDArray[np.float64] | list[float],
     y: NDArray[np.float64] | list[float],
     metric: str = 'exposure',
-    receiver_height: float = 1.2,
-    ground_elevation: float | NDArray[np.float64] | list[list[float]] = 0.0,
-    airspeed: float | NDArray[np.float64] | list[float] | None = None,
-    path_angle: float | NDArray[np.float64] | list[float] | None = None,
-    heading: float | NDArray[np.float64] | list[float] | None = None,
-    bank_angle: float | NDArray[np.float64] | list[float] | None = None,
-    flow_resistivity: float | str | NDArray[np.float64] | list[list[float]] = 'G',
-    temperature: float = 25.0,
-    relative_humidity: float = 70.0,
-    pressure: float = 101.325,
     level_offset: float | NDArray[np.float64] | list[float] = 0.0,
-    scaling_factor: float = 2.0,
-    triangles: NDArray[np.int_] | list[list[int]] | None = None,
-    atmospheric_method: str = 'iso9613',
-    terrain: tuple[NDArray[np.float64], NDArray[np.float64], NDArray[np.float64]] | Sequence[NDArray[np.float64]] | None = None,
-    terrain_resolution: float | None = None,
+    atmosphere: RotorcraftAtmosphere = ...,
+    ground: RotorcraftGround = ...,
+    track_state: RotorcraftTrackState = ...,
+    interpolation: FlightConditionInterpolation = ...,
 ) -> RotorcraftNoiseContourResult
 ```
 
@@ -414,22 +402,11 @@ received histories to the exposure (`SEL`, Doc 32 Eq. 27) or maximum
 | `x` | Grid x coordinates, in metres (at least 2). |
 | `y` | Grid y coordinates, in metres (at least 2). |
 | `metric` | `"exposure"` (SEL) or `"maximum"` (LASmax). |
-| `receiver_height` | Microphone height above local ground, in metres. |
-| `ground_elevation` | Ground elevation, in metres on the track datum: a scalar, or one value per grid point (shape `(len(y), len(x))`) for receivers on uneven sites without a full elevation model. |
-| `airspeed` | Per-point airspeed override (see [`rotorcraft_event_level`](/phonometry/reference/api/aeroacoustics/rotorcraft-noise/#rotorcraft_event_level)). |
-| `path_angle` | Per-point path-angle override, in degrees. |
-| `heading` | Per-point heading override, in degrees. |
-| `bank_angle` | Per-point bank-angle override, in degrees. |
-| `flow_resistivity` | Ground flow resistivity `σ` in Pa·s/m², a CNOSSOS class letter, or one value per grid point (shape `(len(y), len(x))`) for heterogeneous ground across the receivers (each receiver's two-ray model uses its local value). |
-| `temperature` | Air temperature, in °C. |
-| `relative_humidity` | Relative humidity, in %. |
-| `pressure` | Ambient pressure, in kPa. |
 | `level_offset` | Source-level offset `ΔEPNL` (Eq. 2), in dB, scalar or per track point. |
-| `scaling_factor` | Flight-condition scaling factor `F_fc` (default 2). |
-| `triangles` | Optional precomputed flight-condition triangulation. |
-| `atmospheric_method` | `"iso9613"` or `"sae"` (see [`rotorcraft_event_level`](/phonometry/reference/api/aeroacoustics/rotorcraft-noise/#rotorcraft_event_level)). |
-| `terrain` | Optional digital elevation model `(x, y, z)` (see [`rotorcraft_event_level`](/phonometry/reference/api/aeroacoustics/rotorcraft-noise/#rotorcraft_event_level)); it must cover the whole track and grid. Every emission-receiver pair then samples its own vertical section, so the cost grows with track points times grid points; keep contour grids modest with terrain. |
-| `terrain_resolution` | Section sampling step, in metres (default: the elevation model's cell size; sections are capped at 20000 sampling intervals). |
+| `atmosphere` | The air the event propagates through, a [`RotorcraftAtmosphere`](/phonometry/reference/api/aeroacoustics/rotorcraft-noise/#rotorcraftatmosphere). |
+| `ground` | The ground under the grid, a [`RotorcraftGround`](/phonometry/reference/api/aeroacoustics/rotorcraft-noise/#rotorcraftground). Its `ground_elevation` and `flow_resistivity` also accept one value per grid point (shape `(len(y), len(x))`), and its `terrain` model must cover the whole track and grid: every emission-receiver pair then samples its own vertical section, so the cost grows with track points times grid points; keep contour grids modest with terrain. |
+| `track_state` | Per-point airspeed, path angle, heading and bank angle (see [`rotorcraft_event_level`](/phonometry/reference/api/aeroacoustics/rotorcraft-noise/#rotorcraft_event_level)). |
+| `interpolation` | How the flight condition blends the database hemispheres, a [`FlightConditionInterpolation`](/phonometry/reference/api/aeroacoustics/rotorcraft-noise/#flightconditioninterpolation). |
 
 **Returns:** A [`RotorcraftNoiseContourResult`](/phonometry/reference/api/aeroacoustics/rotorcraft-noise/#rotorcraftnoisecontourresult).
 
@@ -438,6 +415,36 @@ received histories to the exposure (`SEL`, Doc 32 Eq. 27) or maximum
 | Exception | When |
 | :--- | :--- |
 | ValueError | If the inputs are invalid. |
+
+## RotorcraftAtmosphere
+
+```python
+RotorcraftAtmosphere(
+    temperature: float = 25.0,
+    relative_humidity: float = 70.0,
+    pressure: float = 101.325,
+    atmospheric_method: str = 'iso9613',
+)
+```
+
+The air a rotorcraft event propagates through (Eq. 26/27).
+
+The ICAO reference conditions of the hemisphere database are the defaults,
+so an event flown at those conditions needs no atmosphere at all. The Doc 29
+airport chain keeps its own
+[`AerodromeAtmosphere`](/phonometry/reference/api/aeroacoustics/airport-noise/#aerodromeatmosphere) instead of
+sharing this one: it corrects a broadband NPD level with the impedance of
+Eq. 4-7 alone, with no band-by-band absorption to ask the humidity or the
+method about, and at a different reference temperature.
+
+**Attributes**
+
+| Name | Description |
+| :--- | :--- |
+| `temperature` | Air temperature, in °C (default 25, ICAO reference). |
+| `relative_humidity` | Relative humidity, in % (default 70). |
+| `pressure` | Ambient pressure, in kPa (default 101.325). |
+| `atmospheric_method` | `"iso9613"` for the pure-tone Eq. 26/27 term (the guidance text), or `"sae"` for the SAE ARP 5534 band-integrated mapping used by the NORAH2 reference implementation (they agree to ~0.05 dB below 3.15 kHz). |
 
 ## RotorcraftEventResult
 
@@ -493,6 +500,34 @@ RotorcraftEventResult.plot(
 ```
 
 Plot the A-weighted level time history with its event metrics.
+
+## RotorcraftGround
+
+```python
+RotorcraftGround(
+    receiver_height: float = 1.2,
+    ground_elevation: float | NDArray[np.float64] | list[float] | list[list[float]] = 0.0,
+    flow_resistivity: float | str | np.floating[Any] | np.integer[Any] | NDArray[np.float64] | list[float] | list[list[float]] = 'G',
+    terrain: tuple[NDArray[np.float64], NDArray[np.float64], NDArray[np.float64]] | Sequence[NDArray[np.float64]] | None = None,
+    terrain_resolution: float | None = None,
+)
+```
+
+The ground a rotorcraft event stands on (guidance §A.4.3-A.4.5).
+
+Flat ground at the track datum by default: the microphone height, the
+elevation of the site and the ground type feed the two-ray ground effect,
+and an optional elevation model replaces the flat plane with real terrain.
+
+**Attributes**
+
+| Name | Description |
+| :--- | :--- |
+| `receiver_height` | Microphone height above local ground, in metres (default 1.2). |
+| `ground_elevation` | Ground elevation `z` at the receivers, in metres on the track datum (default 0); source and receiver heights above ground follow from it. A contour grid also accepts one value per grid point (shape `(len(y), len(x))`) for receivers on uneven sites without a full elevation model. |
+| `flow_resistivity` | Ground flow resistivity `σ` in Pa·s/m², or a CNOSSOS class letter (see [`ground_effect_adjustment`](/phonometry/reference/api/aeroacoustics/rotorcraft-propagation/#ground_effect_adjustment)). A contour grid also accepts one value per grid point (shape `(len(y), len(x))`) for heterogeneous ground across the receivers (each receiver's two-ray model uses its local value). |
+| `terrain` | Optional digital elevation model `(x, y, z)` on the track frame (`x` and `y` strictly increasing, `z` of shape `(len(y), len(x))`, all in metres on the track datum). When given, every emission-receiver pair is evaluated over its sampled vertical section (guidance §A.4.4/A.4.5): mean-ground-plane ground effect with equivalent heights, and rubber-band diffraction where terrain blocks the line of sight; `ground_elevation` is then taken from the model. The model must cover the whole track and every receiver (fabricating terrain beyond its edges is refused). |
+| `terrain_resolution` | Section sampling step along the path, in metres (default: the elevation model's cell size; sections are capped at 20000 sampling intervals). |
 
 ## RotorcraftHemisphere
 
@@ -585,3 +620,30 @@ RotorcraftNoiseContourResult.plot(
 ```
 
 Plot filled noise contours over the ground plane.
+
+## RotorcraftTrackState
+
+```python
+RotorcraftTrackState(
+    airspeed: float | NDArray[np.float64] | list[float] | None = None,
+    path_angle: float | NDArray[np.float64] | list[float] | None = None,
+    heading: float | NDArray[np.float64] | list[float] | None = None,
+    bank_angle: float | NDArray[np.float64] | list[float] | None = None,
+)
+```
+
+Per-point flight state of a rotorcraft track (Eq. 16-21).
+
+Every field left unset is derived from the track itself by
+[`flight_path_kinematics`](/phonometry/reference/api/aeroacoustics/rotorcraft-noise/#flight_path_kinematics); a radar-track workflow that has already
+smoothed these quantities hands them over instead. Each is a scalar
+(broadcast over the track) or an array of shape `(N,)`.
+
+**Attributes**
+
+| Name | Description |
+| :--- | :--- |
+| `airspeed` | Airspeed `V_A`, in the units of the database `airspeeds` (the derived values are in m/s). |
+| `path_angle` | Path angle `γ`, in degrees (negative descending). |
+| `heading` | Heading `Θ`, in degrees. |
+| `bank_angle` | Bank angle `Φ`, in degrees (positive starboard down). |

@@ -138,7 +138,7 @@ def generate_airport_noise(output_dir: str) -> None:
 def generate_airport_contour(output_dir: str) -> None:
     """ECAC Doc 29 single-event SEL contour for a departure flight path."""
     print("Generating airport_contour...")
-    from phonometry import noise_contour
+    from phonometry import FlightSegmentState, noise_contour
 
     powers = [8000.0, 12000.0]
     distances = [60.0, 120.0, 240.0, 480.0, 960.0, 1920.0, 3840.0, 7680.0]
@@ -153,7 +153,8 @@ def generate_airport_contour(output_dir: str) -> None:
     power = np.where(xs < 3000.0, 12000.0, 10000.0)
     path = np.column_stack([xs, np.zeros_like(xs), z, power, np.full_like(xs, vref)])
     ground_roll = xs[:-1] < 1500.0  # takeoff roll: segments still on the runway
-    res = noise_contour(path, powers, distances, sel, lmax, ground_roll=ground_roll,
+    res = noise_contour(path, powers, distances, sel, lmax,
+                        segments=FlightSegmentState(ground_roll=ground_roll),
                         x=np.linspace(-2500.0, 20000.0, 56), y=np.linspace(-6000.0, 6000.0, 44))
     ax = res.plot()
     plt.gcf().set_size_inches(10, 5.5)
@@ -263,7 +264,11 @@ def generate_rotorcraft_ground_effect(output_dir: str) -> None:
 def generate_rotorcraft_flyover_event(output_dir: str) -> None:
     """ECAC Doc 32 single-event LA(t) time history of a level flyover."""
     print("Generating rotorcraft_flyover_event...")
-    from phonometry import RotorcraftHemisphere, rotorcraft_event_level
+    from phonometry import (
+        RotorcraftGround,
+        RotorcraftHemisphere,
+        rotorcraft_event_level,
+    )
 
     # Synthetic helicopter-like hemisphere on the standard 31-band 10 deg grid:
     # low-frequency dominated spectrum with a mild forward-lobed directivity.
@@ -282,7 +287,7 @@ def generate_rotorcraft_flyover_event(output_dir: str) -> None:
                              np.full_like(t, 150.0)])
     event = rotorcraft_event_level(
         [hemisphere], [speed], [0.0], t, track, (120.0, 0.0),
-        flow_resistivity="D")
+        ground=RotorcraftGround(flow_resistivity="D"))
 
     _fig, ax = plt.subplots(figsize=(10, 6))
     ax.plot(event.times, event.a_levels, color=COLOR_PRIMARY, lw=2.0,

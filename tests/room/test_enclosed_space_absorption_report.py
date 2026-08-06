@@ -145,7 +145,8 @@ def test_characterisation_has_no_pass_fail_verdict(tmp_path) -> None:
     out = tmp_path / "noverdict.pdf"
     _result().report(str(out), metadata=_metadata(requirement=0.6))
     text = _text(str(out))
-    assert "PASS" not in text and "FAIL" not in text
+    assert "PASS" not in text
+    assert "FAIL" not in text
     assert "Target reverberation time" in text
 
 
@@ -173,4 +174,5 @@ def test_spanish_fiche_uses_comma_decimal(tmp_path) -> None:
     assert "Absorción acústica en un recinto" in text
     assert "Tiempo de reverberación objetivo" in text
     assert re.search(r"\d,\d", text) is not None  # comma decimal separator
-    assert "PASS" not in text and "FAIL" not in text
+    assert "PASS" not in text
+    assert "FAIL" not in text

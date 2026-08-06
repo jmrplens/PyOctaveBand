@@ -371,14 +371,19 @@ att.plot()                        # el desglose apilado de arriba (necesita matp
 # Nivel predicho en el receptor a partir de una potencia acústica por bandas Lw = 95 dB
 lw = np.full(len(bands), 95.0)
 lp = environment.predicted_receiver_level(
-    lw, 200.0, 1.5, 1.5, bands, 1.0, 1.0, 1.0,
-    barrier=barrier, temperature=15.0, relative_humidity=70.0,
+    lw,
+    environment.PropagationGeometry(200.0, 1.5, 1.5),   # d, hs, hr
+    frequencies=bands,
+    ground=environment.GroundFactors(1.0, 1.0, 1.0),    # Gs, Gm, Gr
+    barrier=barrier,
+    atmosphere=environment.AtmosphericConditions(
+        temperature=15.0, relative_humidity=70.0),
 )
 print(np.round(lp, 1))            # [28.8 26.7 24.  21.1 17.9 16.2 12.7 -1. ]
 ```
 
 `predicted_receiver_level` compone $L_{fT}(DW) = L_W + D_c - A$ con
-$D_c = $ `directivity_index` $+ $ `d_omega`. Pasa `c0=` para restar la corrección
+$D_c$ el `DirectivityCorrection` (`index` $+$ `d_omega`). Pasa `c0=` para restar la corrección
 meteorológica $C_{met}$ (Ec. (21)/(22)) banda a banda y obtener una media a largo
 plazo; ten en cuenta que el estándar aplica $C_{met}$ al nivel ponderado A, así
 que la forma por bandas aquí es una **comodidad**, no una lectura literal del

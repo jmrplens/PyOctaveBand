@@ -32,6 +32,8 @@ import numpy as np
 import pytest
 
 from phonometry import (
+    DesignCriterion,
+    SourceRoom,
     enclosure_required_transmission_loss,
     equivalent_absorption_area,
     mean_absorption,
@@ -104,7 +106,7 @@ def test_problem_4_21_noise_reduction(
         tl,
         8.0 * 3.0,
         _receiving_absorption_421(),
-        source_level=90.0,
+        source=SourceRoom(level=90.0),
         label=name,
     )
     assert np.allclose(result.noise_reduction, printed, atol=0.05)
@@ -131,7 +133,7 @@ def test_problem_4_21_partition_transmission_term_is_negligible() -> None:
         tl,
         8.0 * 3.0,
         _receiving_absorption_421(),
-        source_level=90.0,
+        source=SourceRoom(level=90.0),
         include_partition_transmission=True,
     )
     assert np.allclose(with_term.noise_reduction, printed, atol=0.1)
@@ -179,16 +181,18 @@ def _problem_4_18(source_model: str = "constant_volume"):  # type: ignore[no-unt
         _R418_TL,
         5.0 * 3.0,
         equivalent_absorption_area(operator),
-        source_power_level=_R418_LW,
-        source_room_constant=r1,
-        # The blower stands on the floor along the middle of a wall, i.e. in the
-        # intersection of two large flat surfaces (Q = 4), and the problem asks
-        # for a *conservative* estimate, which is Norton's constant-volume
-        # model (Table 4.5): the radiated power rises by 10 lg Q = 6 dB.
-        source_directivity=4.0,
-        source_model=source_model,
-        criterion="NC",
-        target=45.0,
+        source=SourceRoom(
+            power_level=_R418_LW,
+            room_constant=r1,
+            # The blower stands on the floor along the middle of a wall, i.e.
+            # in the intersection of two large flat surfaces (Q = 4), and the
+            # problem asks for a *conservative* estimate, which is Norton's
+            # constant-volume model (Table 4.5): the radiated power rises by
+            # 10 lg Q = 6 dB.
+            directivity=4.0,
+            model=source_model,
+        ),
+        criterion=DesignCriterion(family="NC", target=45.0),
         label="Plant room to operator room",
     )
 

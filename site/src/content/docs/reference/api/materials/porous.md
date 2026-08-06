@@ -56,11 +56,51 @@ passive medium has $\operatorname{Im}(k) < 0$):
   around, [`helmholtz_resonance_frequency`](/phonometry/reference/api/materials/porous/#helmholtz_resonance_frequency) for a perforate and
   [`membrane_resonance_frequency`](/phonometry/reference/api/materials/porous/#membrane_resonance_frequency) for a membrane.
 
+The air all of them propagate through is described by [`AirProperties`](/phonometry/reference/api/materials/porous/#airproperties),
+which carries the six quantities a visco-thermal model can need (speed of
+sound, density, viscosity, Prandtl number, ratio of specific heats and static
+pressure) with the values these models were published with. The narrow-channel
+models of [`slow_sound`](/phonometry/reference/api/materials/slow-sound/) and
+[`metadiffuser`](/phonometry/reference/api/materials/metadiffuser/) take it as a single
+argument.
+
 These are the elements a multilayer absorber is assembled from; declaring a
 stack of them and solving it with the transfer matrix is the subject of
 [`layered`](/phonometry/reference/api/materials/layered/).
 
 > Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
+
+## AirProperties
+
+```python
+AirProperties(
+    speed_of_sound: float = 343.0,
+    density: float = 1.205,
+    viscosity: float = 1.84e-05,
+    prandtl_number: float = 0.71,
+    heat_capacity_ratio: float = 1.4,
+    atmospheric_pressure: float = 101325.0,
+)
+```
+
+State of the air the visco-thermal models propagate through.
+
+The six quantities a narrow-channel model needs: the speed of sound
+`c0` in m/s, the density $\rho_0$ in kg/m3, the dynamic viscosity
+$\eta$ in Pa s, the Prandtl number `Pr`, the ratio of specific
+heats $\gamma$ and the static pressure $P_0$ in Pa (the
+adiabatic bulk modulus is $\kappa_0 = \gamma P_0$). The defaults are
+dry air at 20 degC, the values the models were published with.
+
+Every field is validated on construction, so an impossible air state is
+rejected once, where it is written, rather than at each model that reads
+it.
+
+**Raises**
+
+| Exception | When |
+| :--- | :--- |
+| ValueError | If any quantity is not positive and finite. |
 
 ## decoupling_frequency
 
@@ -99,6 +139,10 @@ matters.
 | Exception | When |
 | :--- | :--- |
 | ValueError | for a non-positive input or a porosity above 1. |
+
+## DEFAULT_AIR
+
+*Constant* (`phonometry.materials.absorbers.porous.AirProperties`).
 
 ## delany_bazley
 

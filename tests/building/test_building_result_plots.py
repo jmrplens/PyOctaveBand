@@ -50,8 +50,10 @@ from phonometry._plot import common as _plotting
 # --------------------------------------------------------------------------
 def test_airborne_rating_carries_curve_fields() -> None:
     res = _airborne_rating()
-    assert res.band_centers is not None and res.band_centers.size == 16
-    assert res.measured is not None and res.shifted_reference is not None
+    assert res.band_centers is not None
+    assert res.band_centers.size == 16
+    assert res.measured is not None
+    assert res.shifted_reference is not None
     # shifted reference read at 500 Hz (index 7) equals the rating.
     assert round(res.shifted_reference[7]) == res.rating
 
@@ -118,7 +120,8 @@ def test_extended_rating_plot_full_range_and_terms_in_title() -> None:
     # Title carries the core rating and the covered Annex B terms.
     title = ax.get_title()
     assert str(res.rating) in title
-    assert "C50-5000" in title and "Ctr,50-5000" in title
+    assert "C50-5000" in title
+    assert "Ctr,50-5000" in title
     plt.close("all")
 
 
@@ -127,7 +130,8 @@ def test_extended_impact_rating_plot_title_carries_ci_50_2500() -> None:
     assert res.ci_50_2500 is not None
     ax = res.plot()
     title = ax.get_title()
-    assert str(res.rating) in title and "CI,50-2500" in title
+    assert str(res.rating) in title
+    assert "CI,50-2500" in title
     # Impact shading uses the opposite sign: measurement above reference.
     assert len(ax.collections) >= 1
     plt.close("all")
@@ -177,7 +181,8 @@ def test_octave_impact_plot_keeps_curve_honest_and_annotates_offset() -> None:
     assert marked, "expected a 500 Hz read-value marker"
     # annotation carries both the rating and the -5 dB octave note.
     texts = " ".join(t.get_text() for t in ax.texts).replace("−", "-")
-    assert str(res.rating) in texts and "-5" in texts.replace(" ", "")
+    assert str(res.rating) in texts
+    assert "-5" in texts.replace(" ", "")
     plt.close("all")
 
 

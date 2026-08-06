@@ -51,6 +51,14 @@ passive medium has :math:`\operatorname{Im}(k) < 0`):
   around, :func:`helmholtz_resonance_frequency` for a perforate and
   :func:`membrane_resonance_frequency` for a membrane.
 
+The air all of them propagate through is described by :class:`AirProperties`,
+which carries the six quantities a visco-thermal model can need (speed of
+sound, density, viscosity, Prandtl number, ratio of specific heats and static
+pressure) with the values these models were published with. The narrow-channel
+models of :mod:`~phonometry.materials.absorbers.slow_sound` and
+:mod:`~phonometry.materials.diffusers.metadiffuser` take it as a single
+argument.
+
 These are the elements a multilayer absorber is assembled from; declaring a
 stack of them and solving it with the transfer matrix is the subject of
 :mod:`~phonometry.materials.absorbers.layered`.
@@ -129,10 +137,12 @@ MIKI_VALIDITY = (0.01, 1.0)
 LIMP_FRAME_CRITERIA: Mapping[str, float] = {"beranek": 0.05, "doutres": 0.2}
 
 __all__ = [
+    "DEFAULT_AIR",
     "DELANY_BAZLEY_COEFFICIENTS",
     "DELANY_BAZLEY_VALIDITY",
     "LIMP_FRAME_CRITERIA",
     "MIKI_VALIDITY",
+    "AirProperties",
     "PorousAbsorberWarning",
     "PorousMediumResult",
     "decoupling_frequency",
@@ -152,6 +162,54 @@ __all__ = [
 
 class PorousAbsorberWarning(PhonometryWarning):
     """Advisory for porous-model use outside the published fit range."""
+
+
+# ---------------------------------------------------------------------------
+# The air the models propagate through
+# ---------------------------------------------------------------------------
+@dataclass(frozen=True)
+class AirProperties:
+    r"""State of the air the visco-thermal models propagate through.
+
+    The six quantities a narrow-channel model needs: the speed of sound
+    ``c0`` in m/s, the density :math:`\rho_0` in kg/m3, the dynamic viscosity
+    :math:`\eta` in Pa s, the Prandtl number ``Pr``, the ratio of specific
+    heats :math:`\gamma` and the static pressure :math:`P_0` in Pa (the
+    adiabatic bulk modulus is :math:`\kappa_0 = \gamma P_0`). The defaults are
+    dry air at 20 degC, the values the models were published with.
+
+    Every field is validated on construction, so an impossible air state is
+    rejected once, where it is written, rather than at each model that reads
+    it.
+
+    :raises ValueError: If any quantity is not positive and finite.
+    """
+
+    speed_of_sound: float = _SPEED_OF_SOUND
+    density: float = _AIR_DENSITY
+    viscosity: float = _AIR_VISCOSITY
+    prandtl_number: float = _PRANDTL_NUMBER
+    heat_capacity_ratio: float = _HEAT_CAPACITY_RATIO
+    atmospheric_pressure: float = _ATMOSPHERIC_PRESSURE
+
+    def __post_init__(self) -> None:
+        """Validate the six quantities.
+
+        :raises ValueError: If any of them is not positive and finite.
+        """
+        require_positive(self.speed_of_sound, "speed_of_sound")
+        # The message keeps the historical parameter name of the models this
+        # field replaces.
+        require_positive(self.density, "air_density")
+        require_positive(self.viscosity, "viscosity")
+        require_positive(self.prandtl_number, "prandtl_number")
+        require_positive(self.heat_capacity_ratio, "heat_capacity_ratio")
+        require_positive(self.atmospheric_pressure, "atmospheric_pressure")
+
+
+#: Dry air at 20 degC, the air every model defaults to. The instance is
+#: immutable, so the models share this one rather than build their own.
+DEFAULT_AIR = AirProperties()
 
 
 # ---------------------------------------------------------------------------

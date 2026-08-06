@@ -223,7 +223,9 @@ def test_virtual_astm_empty_tube_tl_is_zero() -> None:
 
 def test_damping_map_validation() -> None:
     # The per-cell damping map must be 2-D and match the grid.
+    one_dimensional = np.zeros(8)
+    wrong_shape = np.zeros((NY, 9))
     with pytest.raises(ValueError, match="scalar or an"):
-        FDTD2D(C0, DX, shape=(NY, 8), damping=np.zeros(8))
+        FDTD2D(C0, DX, shape=(NY, 8), damping=one_dimensional)
     with pytest.raises(ValueError, match="does not match the"):
-        FDTD2D(C0, DX, shape=(NY, 8), damping=np.zeros((NY, 9)))
+        FDTD2D(C0, DX, shape=(NY, 8), damping=wrong_shape)

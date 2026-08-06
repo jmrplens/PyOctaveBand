@@ -55,6 +55,9 @@ from .metadata import ReportMetadata
 if TYPE_CHECKING:
     from ..emission.declaration import NoiseEmissionDeclaration
 
+#: En dash printed wherever the declaration carries no value for a cell.
+_NOT_DECLARED = "&#8211;"
+
 
 def _basis(
     declaration: NoiseEmissionDeclaration,
@@ -197,14 +200,14 @@ def _single_rows(
 def _emission_cell(value: float | None, language: str = "en") -> str:
     """A per-mode emission-pressure cell, or an en dash when not declared."""
     if value is None:
-        return "&#8211;"
+        return _NOT_DECLARED
     return _fmt_level(value, language)
 
 
 def _emission_declared_cell(value: int | None, language: str = "en") -> str:
     """A per-mode declared emission-pressure cell, or an en dash when absent."""
     if value is None:
-        return "&#8211;"
+        return _NOT_DECLARED
     return format_number(value, language, decimals=0)
 
 
@@ -265,7 +268,7 @@ def _declaration_table(
         identity_bits.append(html.escape(declaration.machine))
     if declaration.operating_conditions:
         identity_bits.append(html.escape(declaration.operating_conditions))
-    identity_text = ", ".join(identity_bits) if identity_bits else "&#8211;"
+    identity_text = ", ".join(identity_bits) if identity_bits else _NOT_DECLARED
 
     span_cols = 1 + n_modes
     data: list[list[Any]] = [

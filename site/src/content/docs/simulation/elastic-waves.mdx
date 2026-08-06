@@ -101,7 +101,10 @@ mirrors `fdtd_simulation` piece by piece: wave-speed maps `c_p` and `c_s`
 (plus `rho`) instead of `c`, `ExplosionSource` (an isotropic stress
 injection) and `ForceSource` (a directional body force) as sources, probes
 that record ``p``, ``vx`` or ``vy``, the same sponge and obstacle
-machinery, and a frozen `ElasticFDTDResult` with the same `.plot()`. The
+machinery, and a frozen `ElasticFDTDResult` with the same `.plot()`. What
+the run writes down travels as one `ElasticRecording` (the probe cells and
+their fields, the snapshot cadence and its field) and how the domain ends
+as one `ElasticBoundaries` (the sides and the sponge thickness). The
 Courant bound depends only on the fastest $c_P$ in the map (Virieux
 Eqs. 6-7), while the resolution rule uses the slowest wave speed anywhere
 in the domain -- the slowest non-zero $c_S$ of the solid cells or, if a
@@ -122,7 +125,8 @@ res = simulation.elastic_fdtd_simulation(
     sources=[simulation.ExplosionSource(
         ix=250, iy=250,
         waveform=simulation.GaussianPulse(0, 0, width=w).value)],
-    probes=[(350, 250), (470, 250)], probe_fields=("p",),
+    recording=simulation.ElasticRecording(
+        probes=[(350, 250), (470, 250)], probe_fields=("p",)),
 )
 t = res.times[1:]
 t1, t2 = (t[np.abs(res.signals[k, 0, 1:]).argmax()] for k in range(2))
@@ -185,8 +189,9 @@ res = simulation.elastic_fdtd_simulation(
     sources=[simulation.ForceSource(
         ix=300, iy=0, direction="y", amplitude=1e6,
         waveform=simulation.GaussianPulse(0, 0, width=w).value)],
-    boundaries={"top": "free"},
-    snapshot_every=steps, snapshot_field="vy",
+    boundaries=simulation.ElasticBoundaries({"top": "free"}),
+    recording=simulation.ElasticRecording(snapshot_every=steps,
+                                          snapshot_field="vy"),
 )
 res.plot(kind="snapshot")
 plt.show()
@@ -321,8 +326,10 @@ res = simulation.elastic_fdtd_simulation(
     c_p, c_s, dx, 0.232, rho=rho,
     sources=[simulation.ExplosionSource(ix=60, iy=89, waveform=ricker,
                                         amplitude=1e3)],
-    boundaries="absorbing", absorbing_layer_cells=20,
-    snapshot_every=steps, snapshot_field="vy",
+    boundaries=simulation.ElasticBoundaries("absorbing",
+                                            absorbing_layer_cells=20),
+    recording=simulation.ElasticRecording(snapshot_every=steps,
+                                          snapshot_field="vy"),
 )
 res.plot(kind="snapshot")
 plt.show()

@@ -172,7 +172,8 @@ def _chk_microphone_cardioid_di() -> Outcome:
     angles = np.linspace(0.0, 179.9, 1800)
     pattern = 20.0 * np.log10((1.0 + np.cos(np.radians(angles))) / 2.0)
     result = ph.microphone_characteristics(
-        f, rel, 12.5, tolerance_db=3.0, polar=(angles, pattern)
+        f, rel, 12.5, tolerance_db=3.0,
+        directivity=ph.MicrophoneDirectivity(polar=(angles, pattern)),
     )
     di = result.directivity_index_db
     if di is None:
@@ -191,7 +192,7 @@ def _chk_microphone_cardioid_di() -> Outcome:
 def _chk_microphone_equivalent_noise() -> Outcome:
     f, rel = _microphone_flat_response()
     result = ph.microphone_characteristics(
-        f, rel, 12.5, tolerance_db=3.0, noise_voltage=2.5e-6
+        f, rel, 12.5, tolerance_db=3.0, noise=ph.MicrophoneNoise(voltage=2.5e-6)
     )
     noise = result.equivalent_noise_level_db
     if noise is None:

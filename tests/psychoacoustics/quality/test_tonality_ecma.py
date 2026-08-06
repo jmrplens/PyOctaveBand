@@ -271,18 +271,21 @@ def test_result_structure(ref_1k_40: EcmaTonality) -> None:
 
 
 def test_invalid_field() -> None:
+    tone = _tone(1000.0, 40.0, seconds=0.5)
     with pytest.raises(ValueError):
-        tonality_ecma(_tone(1000.0, 40.0, seconds=0.5), FS, field="reverberant")
+        tonality_ecma(tone, FS, field="reverberant")
 
 
 def test_invalid_fs() -> None:
+    tone = _tone(1000.0, 40.0, seconds=0.5)
     with pytest.raises(ValueError):
-        tonality_ecma(_tone(1000.0, 40.0, seconds=0.5), 0.0)
+        tonality_ecma(tone, 0.0)
 
 
 def test_empty_signal() -> None:
+    empty = np.array([])
     with pytest.raises(ValueError):
-        tonality_ecma(np.array([]), FS)
+        tonality_ecma(empty, FS)
 
 
 @pytest.mark.xdist_group("ecma-tonality-ref")

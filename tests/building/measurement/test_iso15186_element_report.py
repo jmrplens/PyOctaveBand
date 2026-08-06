@@ -102,7 +102,8 @@ def test_fiche_rating_pinned_to_iso717_1_annex_c(tmp_path) -> None:
     assert "ISO 15186-1:2000" in text
     assert "ISO 717-1:2020" in text
     # Nominal band labels and a couple of DI,n,e values from the table.
-    assert "100" in text and "3150" in text
+    assert "100" in text
+    assert "3150" in text
     assert "26.6" in text  # the 500 Hz band value
     assert "20.4" in text  # the 100 Hz band value
 

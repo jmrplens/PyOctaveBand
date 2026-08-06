@@ -74,6 +74,7 @@ if TYPE_CHECKING:
 
 __all__ = [
     "Grade",
+    "RoomEnvironment",
     "SoundPowerResult",
     # Defined in :mod:`._shared`, which every method module imports; re-exported
     # here because this is the documented path of the warning class.
@@ -86,6 +87,38 @@ __all__ = [
 ]
 
 Surface = Literal["hemisphere", "box"]
+
+
+@dataclass(frozen=True)
+class RoomEnvironment:
+    r"""Room data behind the environmental correction ``K2`` (ISO 3744 Annex A).
+
+    The three routes the standard offers to the equivalent sound absorption area
+    ``A`` of the test room, in the order :func:`environmental_correction` tries
+    them: ``A`` itself, the Sabine reverberation time with the room volume
+    (:math:`A = 0.16 V / T`, Eq. A.3) and the mean absorption coefficient with
+    the area of the room boundaries (:math:`A = \alpha S_v`, Eq. A.7). Each
+    route is a pair that must be given whole; the empty environment carries no
+    room data at all, which is the free field (:math:`K_2 = 0`).
+
+    Every field may also be a per-band array, in which case ``K2`` comes out
+    per band with that shape.
+
+    :param absorption_area: Equivalent absorption area ``A`` (m^2), scalar or
+        per band.
+    :param reverberation_time: Sabine ``T`` (s), scalar or per band, with
+        ``volume`` (Eq. A.3).
+    :param volume: Room volume ``V`` (m^3), with ``reverberation_time``.
+    :param mean_absorption_coefficient: ``alpha`` in (0, 1], scalar or per band,
+        with ``room_surface`` (Eq. A.7).
+    :param room_surface: Room boundary area ``Sv`` (m^2), with ``alpha``.
+    """
+
+    absorption_area: float | np.ndarray | None = None
+    reverberation_time: float | np.ndarray | None = None
+    volume: float | None = None
+    mean_absorption_coefficient: float | np.ndarray | None = None
+    room_surface: float | None = None
 
 
 # --- ISO 3744:2010 Annex B, normative microphone coordinates (x/r,y/r,z/r) ---
@@ -356,6 +389,74 @@ def background_noise_correction(
     return np.asarray(k1, dtype=np.float64)
 
 
+def _require_room_pair(
+    first: Any, second: Any, first_name: str, second_name: str, equation: str
+) -> None:
+    """Reject a half-specified room pair for the ``K2`` absorption area.
+
+    A half-specified room pair must never be read as free field: naming only
+    one member of a pair is a mistake, not a ``K2 = 0`` request.
+
+    :param first: First member of the pair, or ``None``.
+    :param second: Second member of the pair, or ``None``.
+    :param first_name: Argument name of the first member.
+    :param second_name: Argument name of the second member.
+    :param equation: ISO 3744 equation the pair belongs to.
+    :raises ValueError: If exactly one member of the pair is given.
+    """
+    if (first is None) == (second is None):
+        return
+    missing = second_name if second is None else first_name
+    raise ValueError(
+        f"{first_name} and {second_name} must be given together "
+        f"({equation}); '{missing}' is missing."
+    )
+
+
+def _room_absorption_area(
+    reverberation_time: float | np.ndarray | None,
+    volume: float | None,
+    mean_absorption_coefficient: float | np.ndarray | None,
+    room_surface: float | None,
+) -> float | np.ndarray | None:
+    """Equivalent absorption area ``A`` from the room data, or ``None``.
+
+    ``None`` means no room data was supplied at all, i.e. a free field.
+
+    :param reverberation_time: Sabine ``T`` (s), with ``volume`` (Eq. A.3).
+    :param volume: Room volume ``V`` (m^3), with ``reverberation_time``.
+    :param mean_absorption_coefficient: ``alpha``, with ``room_surface``
+        (Eq. A.7).
+    :param room_surface: Room boundary area ``Sv`` (m^2), with ``alpha``.
+    :return: ``A`` in square metres (scalar or per band), or ``None``.
+    :raises ValueError: For a half-specified or non-physical room pair.
+    """
+    _require_room_pair(
+        reverberation_time, volume, "reverberation_time", "volume", "Eq. A.3"
+    )
+    _require_room_pair(
+        mean_absorption_coefficient,
+        room_surface,
+        "mean_absorption_coefficient",
+        "room_surface",
+        "Eq. A.7",
+    )
+    if reverberation_time is not None and volume is not None:
+        t = np.asarray(reverberation_time, dtype=np.float64)
+        if volume <= 0 or np.any(t <= 0.0):
+            raise ValueError("reverberation_time and volume must be > 0.")
+        return 0.16 * volume / t
+    if mean_absorption_coefficient is not None and room_surface is not None:
+        alpha = np.asarray(mean_absorption_coefficient, dtype=np.float64)
+        if room_surface <= 0 or np.any(alpha <= 0.0) or np.any(alpha > 1.0):
+            raise ValueError(
+                "mean_absorption_coefficient must be in (0, 1] and "
+                "room_surface > 0."
+            )
+        return alpha * room_surface
+    return None
+
+
 def environmental_correction(
     surface_area: float,
     *,
@@ -396,44 +497,46 @@ def environmental_correction(
         per band.
     """
     if absorption_area is None:
-        # A half-specified room pair must never be read as free field: naming
-        # only one member of a pair is a mistake, not a K2 = 0 request.
-        if (reverberation_time is None) != (volume is None):
-            missing = "volume" if volume is None else "reverberation_time"
-            raise ValueError(
-                "reverberation_time and volume must be given together "
-                f"(Eq. A.3); '{missing}' is missing."
-            )
-        if (mean_absorption_coefficient is None) != (room_surface is None):
-            missing = (
-                "room_surface"
-                if room_surface is None
-                else "mean_absorption_coefficient"
-            )
-            raise ValueError(
-                "mean_absorption_coefficient and room_surface must be given "
-                f"together (Eq. A.7); '{missing}' is missing."
-            )
-        if reverberation_time is not None and volume is not None:
-            t = np.asarray(reverberation_time, dtype=np.float64)
-            if volume <= 0 or np.any(t <= 0.0):
-                raise ValueError("reverberation_time and volume must be > 0.")
-            absorption_area = 0.16 * volume / t
-        elif mean_absorption_coefficient is not None and room_surface is not None:
-            alpha = np.asarray(mean_absorption_coefficient, dtype=np.float64)
-            if room_surface <= 0 or np.any(alpha <= 0.0) or np.any(alpha > 1.0):
-                raise ValueError(
-                    "mean_absorption_coefficient must be in (0, 1] and "
-                    "room_surface > 0."
-                )
-            absorption_area = alpha * room_surface
-        else:
-            return 0.0
+        absorption_area = _room_absorption_area(
+            reverberation_time, volume, mean_absorption_coefficient, room_surface
+        )
+        if absorption_area is None:
+            return 0.0  # no room data at all: the field is treated as free
     a = np.asarray(absorption_area, dtype=np.float64)
     if np.any(a <= 0.0):
         raise ValueError("absorption_area must be positive.")
     k2 = 10.0 * np.log10(1.0 + 4.0 * surface_area / a)
     return as_float_or_array(k2)
+
+
+def _hemisphere_position_table(
+    grade: Grade, reflecting_planes: int, tones: bool
+) -> tuple[np.ndarray, tuple[int, ...]]:
+    """Coordinate table and row selection for the hemisphere key positions.
+
+    :param grade: ``'engineering'`` (ISO 3744) or ``'survey'`` (ISO 3746).
+    :param reflecting_planes: Number of reflecting planes (1, 2 or 3).
+    :param tones: If True use Table B.1, else Table B.2.
+    :return: The unscaled coordinate table and the rows to take from it.
+    :raises NotImplementedError: For the survey array on three planes.
+    """
+    if grade == "engineering":  # ISO 3744 clause 8.1.1
+        if reflecting_planes == 1:  # positions 1-10, Table B.1 (or B.2 broadband)
+            return (_TABLE_B1 if tones else _TABLE_B2), tuple(range(10))
+        if reflecting_planes == 2:  # positions 2,3,6,7,9 of Table B.2
+            return _TABLE_B2, (1, 2, 5, 6, 8)
+        return _TABLE_B3, (0, 1, 2)  # positions 1,2,3 of Table B.3
+    # survey, ISO 3746 clause 8.2.1
+    if reflecting_planes == 1:  # positions 4,5,6,10 of Table B.1
+        return _TABLE_B1, (3, 4, 5, 9)
+    if reflecting_planes == 2:  # positions 14,15,18 of Table B.2
+        return _TABLE_B2, (13, 14, 17)
+    # positions 14,21,22 of Table B.2 (extended array not transcribed)
+    raise NotImplementedError(
+        "Survey coordinates for a source adjacent to three reflecting "
+        "planes require the extended ISO 3746:2010 Table B.2 positions "
+        "21 and 22 (see Figure B.4)."
+    )
 
 
 def measurement_positions(
@@ -472,24 +575,7 @@ def measurement_positions(
     if reflecting_planes not in (1, 2, 3):
         raise ValueError("'reflecting_planes' must be 1, 2 or 3.")
     grade = _check_grade(grade)
-    if grade == "engineering":  # ISO 3744 clause 8.1.1
-        if reflecting_planes == 1:  # positions 1-10, Table B.1 (or B.2 broadband)
-            table, index = (_TABLE_B1 if tones else _TABLE_B2), tuple(range(10))
-        elif reflecting_planes == 2:  # positions 2,3,6,7,9 of Table B.2
-            table, index = _TABLE_B2, (1, 2, 5, 6, 8)
-        else:  # positions 1,2,3 of Table B.3
-            table, index = _TABLE_B3, (0, 1, 2)
-    else:  # survey, ISO 3746 clause 8.2.1
-        if reflecting_planes == 1:  # positions 4,5,6,10 of Table B.1
-            table, index = _TABLE_B1, (3, 4, 5, 9)
-        elif reflecting_planes == 2:  # positions 14,15,18 of Table B.2
-            table, index = _TABLE_B2, (13, 14, 17)
-        else:  # positions 14,21,22 of Table B.2 (extended array not transcribed)
-            raise NotImplementedError(
-                "Survey coordinates for a source adjacent to three reflecting "
-                "planes require the extended ISO 3746:2010 Table B.2 positions "
-                "21 and 22 (see Figure B.4)."
-            )
+    table, index = _hemisphere_position_table(grade, reflecting_planes, tones)
     return np.asarray(table[list(index)] * radius, dtype=np.float64)
 
 
@@ -516,6 +602,142 @@ def _box_area(
     return 2.0 * (2.0 * a * b + b * c + c * a)
 
 
+def _measurement_surface(
+    surface: Surface,
+    radius: float | None,
+    dimensions: tuple[float, float, float] | None,
+    distance: float | None,
+    reflecting_planes: int,
+    grade: Grade,
+) -> tuple[float, int]:
+    """Measurement surface area ``S`` and the minimum number of positions.
+
+    :param surface: ``'hemisphere'`` (clause 7.2.3) or ``'box'`` (clause 7.2.4).
+    :param radius: Hemisphere radius ``r``, in metres.
+    :param dimensions: Reference box ``(l1, l2, l3)``, in metres.
+    :param distance: Measurement distance ``d``, in metres.
+    :param reflecting_planes: Number of reflecting planes (1, 2 or 3).
+    :param grade: ``'engineering'`` (ISO 3744) or ``'survey'`` (ISO 3746).
+    :return: ``(S, minimum positions)``.
+    :raises ValueError: For an unknown surface or missing/non-physical geometry.
+    """
+    if surface == "hemisphere":
+        if radius is None or radius <= 0:
+            raise ValueError("A positive 'radius' is required for a hemisphere.")
+        return (
+            _hemisphere_area(radius, reflecting_planes),
+            _MIN_HEMI_POSITIONS[grade][reflecting_planes],
+        )
+    if surface == "box":
+        if dimensions is None or distance is None:
+            raise ValueError("'dimensions' and 'distance' are required for a box.")
+        if len(dimensions) != 3 or any(v <= 0 for v in dimensions) or distance <= 0:
+            raise ValueError("'dimensions' must be 3 positive values and 'distance' > 0.")
+        return (
+            _box_area(dimensions, distance, reflecting_planes),
+            _MIN_BOX_POSITIONS[grade],
+        )
+    raise ValueError("'surface' must be 'hemisphere' or 'box'.")
+
+
+def _surface_background_correction(
+    background_levels: np.ndarray | None,
+    levels: np.ndarray,
+    mean_level: np.ndarray,
+    grade: Grade,
+) -> np.ndarray:
+    """Per-band background correction ``K1`` of the surface energy mean.
+
+    :param background_levels: ``(NM, NB)`` background levels, or a single
+        spectrum ``(NB,)`` / ``(1, NB)`` broadcast to every position, or
+        ``None`` for no correction.
+    :param levels: ``(NM, NB)`` sound pressure levels with the source running.
+    :param mean_level: Surface energy mean of ``levels``, per band.
+    :param grade: ``'engineering'`` (ISO 3744) or ``'survey'`` (ISO 3746).
+    :return: ``K1`` per band, in decibels (zeros when no background is given).
+    :raises ValueError: If the background shape is neither of the two accepted.
+    """
+    n_positions, n_bands = levels.shape
+    if background_levels is None:
+        return np.zeros(n_bands, dtype=np.float64)
+    bg = np.atleast_2d(np.asarray(background_levels, dtype=np.float64))
+    # A single background spectrum (shape (NB,) or (1, NB)) is broadcast to
+    # every microphone position; a full (NM, NB) array is used as given.
+    if bg.shape == (1, n_bands) and n_positions != 1:
+        bg = np.broadcast_to(bg, (n_positions, n_bands))
+    if bg.shape != levels.shape:
+        raise ValueError(
+            "'background_levels' must match 'levels_positions' shape, or be "
+            "a single spectrum of shape (NB,) or (1, NB) broadcast to all "
+            "positions."
+        )
+    return background_noise_correction(mean_level, energy_mean(bg, axis=0), grade)
+
+
+def _surface_environmental_correction(
+    area: float,
+    n_bands: int,
+    grade: Grade,
+    room: RoomEnvironment,
+) -> np.ndarray:
+    """Per-band environmental correction ``K2`` broadcast over the bands.
+
+    :param area: Measurement surface area ``S``, in square metres.
+    :param n_bands: Number of frequency bands.
+    :param grade: ``'engineering'`` (ISO 3744) or ``'survey'`` (ISO 3746).
+    :param room: Room data behind ``K2`` (:class:`RoomEnvironment`).
+    :return: ``K2`` per band, in decibels.
+    :raises ValueError: If a per-band room input does not match the bands.
+    """
+    k2_value = environmental_correction(
+        area,
+        absorption_area=room.absorption_area,
+        reverberation_time=room.reverberation_time,
+        volume=room.volume,
+        mean_absorption_coefficient=room.mean_absorption_coefficient,
+        room_surface=room.room_surface,
+    )
+    k2_arr = np.atleast_1d(np.asarray(k2_value, dtype=np.float64))
+    if k2_arr.shape not in ((1,), (n_bands,)):
+        raise ValueError(
+            "per-band environmental inputs (absorption_area / reverberation_time"
+            " / mean_absorption_coefficient) must match the number of bands."
+        )
+    if np.any(k2_arr > _K2_LIMIT[grade]):
+        warnings.warn(
+            f"K2 up to {float(np.max(k2_arr)):.1f} dB exceeds the {grade} "
+            f"validity limit of {_K2_LIMIT[grade]:g} dB. ISO 3744:2010 clause "
+            "4.3.2 states this limit for the A-weighted K2A, so this per-band "
+            "check is conservative; the acoustic environment may not qualify "
+            "for this method.",
+            SoundPowerWarning,
+            stacklevel=3,  # report at the caller of sound_power_pressure
+        )
+    return np.broadcast_to(k2_arr, (n_bands,)).astype(np.float64)
+
+
+def _a_weighted_total(
+    lw: np.ndarray, frequencies: np.ndarray | None, n_bands: int
+) -> tuple[np.ndarray | None, float]:
+    """Band frequencies and the A-weighted total ``LWA`` (ISO 3744 Annex E).
+
+    :param lw: Band sound power levels, in decibels.
+    :param frequencies: Band mid-band frequencies, in hertz, or ``None``.
+    :param n_bands: Number of frequency bands.
+    :return: ``(frequencies as an array or None, LWA)``.
+    :raises ValueError: If the frequencies do not match the number of bands.
+    """
+    if frequencies is None:
+        # A-weighting needs the band centre frequencies; with several bands and
+        # none supplied the A-weighted total is undefined (NaN). A single band
+        # carries no weighting, so LWA = LW.
+        return None, (float(lw[0]) if n_bands == 1 else float("nan"))
+    freqs = np.asarray(frequencies, dtype=np.float64)
+    if freqs.shape[0] != n_bands:
+        raise ValueError("'frequencies' length must match the number of bands.")
+    return freqs, energy_sum(lw + _a_weighting_corrections(freqs))
+
+
 def sound_power_pressure(
     levels_positions: np.ndarray,
     surface: Surface,
@@ -526,11 +748,7 @@ def sound_power_pressure(
     reflecting_planes: int = 1,
     background_levels: np.ndarray | None = None,
     frequencies: np.ndarray | None = None,
-    absorption_area: float | None = None,
-    reverberation_time: float | None = None,
-    volume: float | None = None,
-    mean_absorption_coefficient: float | None = None,
-    room_surface: float | None = None,
+    room: RoomEnvironment | None = None,
     grade: Grade = "engineering",
     omc_uncertainty: float = 0.0,
 ) -> SoundPowerResult:
@@ -540,8 +758,8 @@ def sound_power_pressure(
     pressure levels: one row per microphone position, one column per frequency
     band (or a single column for a directly measured A-weighted level). The
     surface-averaged level is corrected for background noise (``K1``, from
-    ``background_levels``) and for the test environment (``K2``, from the room
-    absorption data) and combined with the measurement surface area:
+    ``background_levels``) and for the test environment (``K2``, from the
+    ``room`` absorption data) and combined with the measurement surface area:
 
     .. math::
 
@@ -562,11 +780,9 @@ def sound_power_pressure(
     :param background_levels: ``(NM, NB)`` background levels for ``K1``, or a
         single spectrum ``(NB,)`` / ``(1, NB)`` broadcast to every position.
     :param frequencies: Band mid-band frequencies (Hz) for the A-weighted total.
-    :param absorption_area: Equivalent absorption area ``A`` (m^2) for ``K2``.
-    :param reverberation_time: Sabine ``T`` (s), with ``volume``, for ``K2``.
-    :param volume: Room volume ``V`` (m^3), with ``reverberation_time``.
-    :param mean_absorption_coefficient: ``alpha``, with ``room_surface``, for ``K2``.
-    :param room_surface: Room boundary area ``Sv`` (m^2), with ``alpha``.
+    :param room: Room absorption data behind ``K2`` (:class:`RoomEnvironment`);
+        ``None`` is a room with no data at all, i.e. a free field
+        (:math:`K_2 = 0`).
     :param grade: ``'engineering'`` (ISO 3744) or ``'survey'`` (ISO 3746).
     :param omc_uncertainty: ``sigma_omc`` (dB), operating/mounting instability.
     :return: :class:`SoundPowerResult`.
@@ -580,20 +796,9 @@ def sound_power_pressure(
     # --- measurement surface area -----------------------------------------
     if reflecting_planes not in (1, 2, 3):
         raise ValueError("'reflecting_planes' must be 1, 2 or 3.")
-    if surface == "hemisphere":
-        if radius is None or radius <= 0:
-            raise ValueError("A positive 'radius' is required for a hemisphere.")
-        area = _hemisphere_area(radius, reflecting_planes)
-        min_positions = _MIN_HEMI_POSITIONS[grade][reflecting_planes]
-    elif surface == "box":
-        if dimensions is None or distance is None:
-            raise ValueError("'dimensions' and 'distance' are required for a box.")
-        if len(dimensions) != 3 or any(v <= 0 for v in dimensions) or distance <= 0:
-            raise ValueError("'dimensions' must be 3 positive values and 'distance' > 0.")
-        area = _box_area(dimensions, distance, reflecting_planes)
-        min_positions = _MIN_BOX_POSITIONS[grade]
-    else:
-        raise ValueError("'surface' must be 'hemisphere' or 'box'.")
+    area, min_positions = _measurement_surface(
+        surface, radius, dimensions, distance, reflecting_planes, grade
+    )
 
     if n_positions < min_positions:
         raise ValueError(
@@ -605,65 +810,17 @@ def sound_power_pressure(
     # --- energy average and background correction K1 ----------------------
     mean_level = energy_mean(levels, axis=0)
     n_bands = mean_level.shape[0]
-    if background_levels is not None:
-        bg = np.atleast_2d(np.asarray(background_levels, dtype=np.float64))
-        # A single background spectrum (shape (NB,) or (1, NB)) is broadcast to
-        # every microphone position; a full (NM, NB) array is used as given.
-        if bg.shape == (1, n_bands) and n_positions != 1:
-            bg = np.broadcast_to(bg, (n_positions, n_bands))
-        if bg.shape != levels.shape:
-            raise ValueError(
-                "'background_levels' must match 'levels_positions' shape, or be "
-                "a single spectrum of shape (NB,) or (1, NB) broadcast to all "
-                "positions."
-            )
-        k1 = background_noise_correction(mean_level, energy_mean(bg, axis=0), grade)
-    else:
-        k1 = np.zeros(n_bands, dtype=np.float64)
+    k1 = _surface_background_correction(background_levels, levels, mean_level, grade)
 
     # --- environmental correction K2 (scalar or per band) -----------------
-    k2_value = environmental_correction(
-        area,
-        absorption_area=absorption_area,
-        reverberation_time=reverberation_time,
-        volume=volume,
-        mean_absorption_coefficient=mean_absorption_coefficient,
-        room_surface=room_surface,
+    k2 = _surface_environmental_correction(
+        area, n_bands, grade, RoomEnvironment() if room is None else room
     )
-    k2_arr = np.atleast_1d(np.asarray(k2_value, dtype=np.float64))
-    if k2_arr.shape not in ((1,), (n_bands,)):
-        raise ValueError(
-            "per-band environmental inputs (absorption_area / reverberation_time"
-            " / mean_absorption_coefficient) must match the number of bands."
-        )
-    if np.any(k2_arr > _K2_LIMIT[grade]):
-        warnings.warn(
-            f"K2 up to {float(np.max(k2_arr)):.1f} dB exceeds the {grade} "
-            f"validity limit of {_K2_LIMIT[grade]:g} dB. ISO 3744:2010 clause "
-            "4.3.2 states this limit for the A-weighted K2A, so this per-band "
-            "check is conservative; the acoustic environment may not qualify "
-            "for this method.",
-            SoundPowerWarning,
-            stacklevel=2,
-        )
-    k2 = np.broadcast_to(k2_arr, (n_bands,)).astype(np.float64)
 
     # --- surface SPL, sound power level and A-weighted total ---------------
     surface_spl = mean_level - k1 - k2
     lw = surface_spl + 10.0 * np.log10(area / _S0)
-
-    if frequencies is not None:
-        freqs = np.asarray(frequencies, dtype=np.float64)
-        if freqs.shape[0] != n_bands:
-            raise ValueError("'frequencies' length must match the number of bands.")
-        ck = _a_weighting_corrections(freqs)
-        lwa = energy_sum(lw + ck)
-    else:
-        freqs = None
-        # A-weighting needs the band centre frequencies; with several bands and
-        # none supplied the A-weighted total is undefined (NaN). A single band
-        # carries no weighting, so LWA = LW.
-        lwa = float(lw[0]) if n_bands == 1 else float("nan")
+    freqs, lwa = _a_weighted_total(lw, frequencies, n_bands)
 
     # --- apparent directivity index per position AND band (Eq. 7) ---------
     # ISO 3744:2010 clause 8.4 requires the apparent directivity indices to be

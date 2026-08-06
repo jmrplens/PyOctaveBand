@@ -81,7 +81,8 @@ def test_reference_condition_constants() -> None:
 def test_reference_condition_finite_positive() -> None:
     # At the reference T0 = 20 degC the model must stay finite and positive.
     alpha = air_attenuation([1000.0], temperature=20.0, relative_humidity=50.0)
-    assert np.all(np.isfinite(alpha)) and np.all(alpha > 0.0)
+    assert np.all(np.isfinite(alpha))
+    assert np.all(alpha > 0.0)
 
 
 # --- Low-frequency f^2 growth (classical + rotational) ----------------------
@@ -228,7 +229,8 @@ def test_atmospheric_attenuation_wraps_air_attenuation() -> None:
     )
     np.testing.assert_allclose(res.frequencies, bands)
     assert (res.temperature, res.relative_humidity, res.pressure) == (20.0, 50.0, 101.325)
-    assert res.distance is None and res.total_attenuation is None
+    assert res.distance is None
+    assert res.total_attenuation is None
 
 
 def test_atmospheric_attenuation_matches_table1_cell() -> None:

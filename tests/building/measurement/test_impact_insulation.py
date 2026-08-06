@@ -257,17 +257,21 @@ def test_impact_energy_averages_positions() -> None:
 
 
 def test_impact_rejects_length_mismatch() -> None:
+    li_2_bands = np.array([60.0, 60.0])
+    t2_1_band = np.array([0.5])
     with pytest.raises(
         ValueError, match="'li' and 't2' must share the same band count"
     ):
-        impact_insulation(np.array([60.0, 60.0]), np.array([0.5]))
+        impact_insulation(li_2_bands, t2_1_band)
 
 
 def test_impact_rejects_bad_reverberation_time() -> None:
+    li = np.array([60.0])
+    zero_t2 = np.array([0.0])
     with pytest.raises(
         ValueError, match="'t2' must contain positive, finite values"
     ):
-        impact_insulation(np.array([60.0]), np.array([0.0]))
+        impact_insulation(li, zero_t2)
 
 
 def test_field_rating_pipeline_lnt_w() -> None:

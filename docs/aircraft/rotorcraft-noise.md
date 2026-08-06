@@ -186,7 +186,7 @@ res = aircraft.rotorcraft_event_level(
     hemispheres, speeds, angles,          # the database
     times, positions,                     # the track (m, z up)
     receiver=(120.0, 0.0),                # ground position of the microphone
-    flow_resistivity="D")                 # grass site
+    ground=aircraft.RotorcraftGround(flow_resistivity="D"))   # grass site
 res.la_max, res.sel, res.epnl             # LASmax, SEL, EPNL
 res.plot()                                # the LA(t) time history
 ```
@@ -218,7 +218,8 @@ t = np.arange(0.0, 130.01, 0.5)
 track = np.column_stack([np.zeros_like(t), speed * (t - 65.0),
                          np.full_like(t, 150.0)])
 event = aircraft.rotorcraft_event_level(
-    [h], [speed], [0.0], t, track, (120.0, 0.0), flow_resistivity="D")
+    [h], [speed], [0.0], t, track, (120.0, 0.0),
+    ground=aircraft.RotorcraftGround(flow_resistivity="D"))
 event.plot()
 plt.show()
 ```
@@ -226,8 +227,8 @@ plt.show()
 </details>
 
 Radar-track workflows can hand the smoothed per-point `airspeed`, `path_angle`,
-`heading` and `bank_angle` directly instead of deriving them from the
-positions; when they are derived, the track is in metres and seconds, so the
+`heading` and `bank_angle` of a `RotorcraftTrackState` directly instead of
+deriving them from the positions; when they are derived, the track is in metres and seconds, so the
 database airspeeds must then be in m/s.
 
 ## 6. Ground-grid contours
@@ -241,14 +242,15 @@ res = aircraft.rotorcraft_noise_contour(
     hemispheres, speeds, angles, times, positions,
     x=np.linspace(-2000.0, 2000.0, 81),
     y=np.linspace(-3000.0, 3000.0, 121),
-    metric="exposure", flow_resistivity="D")
+    metric="exposure",
+    ground=aircraft.RotorcraftGround(flow_resistivity="D"))
 res.plot()                                # filled SEL contours
 ```
 
-The ground may vary across the receivers without a full elevation model:
-`flow_resistivity` and `ground_elevation` accept one value per grid point
-(shape `(len(y), len(x))`), and each receiver's two-ray model then uses its
-local values.
+The ground may vary across the receivers without a full elevation model: the
+`flow_resistivity` and `ground_elevation` of the `RotorcraftGround` accept one
+value per grid point (shape `(len(y), len(x))`), and each receiver's two-ray
+model then uses its local values.
 
 ## 7. Terrain: the mean ground plane and screening
 
@@ -326,16 +328,17 @@ plt.show()
 </details>
 
 The event and contour run over real sites by passing a digital elevation
-model: `terrain=(x, y, z)` on the track frame. Every emission-receiver pair
-then samples its own vertical section at `terrain_resolution` (default: the
-model's cell size) and evaluates it with the machinery above; the receiver
+model in the `RotorcraftGround`: `terrain=(x, y, z)` on the track frame. Every
+emission-receiver pair then samples its own vertical section at
+`terrain_resolution` (default: the model's cell size) and evaluates it with the machinery above; the receiver
 ground comes from the model. The cost grows with track points times grid
 points, so keep contour grids modest with terrain.
 
 ```python
 res = aircraft.rotorcraft_event_level(
     hemispheres, speeds, angles, times, positions, receiver=(1200.0, 300.0),
-    terrain=(tx, ty, tz), flow_resistivity="D")
+    ground=aircraft.RotorcraftGround(terrain=(tx, ty, tz),
+                                     flow_resistivity="D"))
 ```
 
 ## Validation

@@ -7,7 +7,7 @@ Focuses on edge cases that might be problematic in DSP.
 import numpy as np
 import pytest
 
-from phonometry import octave_filter
+from phonometry import LevelCalibration, octave_filter
 
 
 def test_nyquist_frequency_content() -> None:
@@ -107,7 +107,7 @@ def test_huge_calibration_factor() -> None:
     """
     fs = 8000
     x = np.random.default_rng(42).standard_normal(fs)
-    spl, _ = octave_filter(x, fs, calibration_factor=1e10)
+    spl, _ = octave_filter(x, fs, calibration=LevelCalibration(factor=1e10))
     assert np.all(spl > 100) # Should be massive but not Inf
 
 

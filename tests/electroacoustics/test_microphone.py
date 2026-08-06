@@ -32,7 +32,14 @@ import os
 import numpy as np
 import pytest
 
-from phonometry import ReportMetadata, microphone_characteristics
+from phonometry import (
+    MicrophoneDirectivity,
+    MicrophoneElectrical,
+    MicrophoneNoise,
+    MicrophoneOverload,
+    ReportMetadata,
+    microphone_characteristics,
+)
 
 _PDF_MAGIC = b"%PDF"
 _M_MV = 12.5
@@ -131,8 +138,8 @@ def test_cardioid_directivity_index_is_10lg3() -> None:
     angles = np.linspace(0.0, 179.9, 1800)
     pattern = 20.0 * np.log10((1.0 + np.cos(np.radians(angles))) / 2.0)
     result = microphone_characteristics(
-        f, rel, _M_MV, tolerance_db=_TOL, polar=(angles, pattern),
-        polar_frequency=1000.0,
+        f, rel, _M_MV, tolerance_db=_TOL,
+        directivity=MicrophoneDirectivity(polar=(angles, pattern), frequency=1000.0),
     )
     assert result.directivity_index_db == pytest.approx(
         10.0 * math.log10(3.0), abs=5e-3
@@ -148,7 +155,8 @@ def test_omnidirectional_directivity_index_is_zero() -> None:
     f, rel = _flat_response()
     angles = np.linspace(0.0, 180.0, 721)
     result = microphone_characteristics(
-        f, rel, _M_MV, tolerance_db=_TOL, polar=(angles, np.zeros_like(angles))
+        f, rel, _M_MV, tolerance_db=_TOL,
+        directivity=MicrophoneDirectivity(polar=(angles, np.zeros_like(angles))),
     )
     # Trapezoidal quadrature of the 11.2.2 a) integral over 0,25 degree steps.
     assert result.directivity_index_db == pytest.approx(0.0, abs=1e-4)
@@ -160,7 +168,9 @@ def test_stated_directivity_index_is_kept() -> None:
     angles = np.linspace(0.0, 180.0, 721)
     result = microphone_characteristics(
         f, rel, _M_MV, tolerance_db=_TOL,
-        polar=(angles, np.zeros_like(angles)), directivity_index_db=4.5,
+        directivity=MicrophoneDirectivity(
+            polar=(angles, np.zeros_like(angles)), index_db=4.5
+        ),
     )
     assert result.directivity_index_db == pytest.approx(4.5)
 
@@ -170,7 +180,8 @@ def test_front_only_pattern_gives_no_directivity_index() -> None:
     f, rel = _flat_response()
     angles = np.linspace(0.0, 90.0, 91)
     result = microphone_characteristics(
-        f, rel, _M_MV, tolerance_db=_TOL, polar=(angles, np.zeros_like(angles))
+        f, rel, _M_MV, tolerance_db=_TOL,
+        directivity=MicrophoneDirectivity(polar=(angles, np.zeros_like(angles))),
     )
     assert result.directivity_index_db is None
 
@@ -182,7 +193,8 @@ def test_full_circle_cardioid_gives_same_directivity_index() -> None:
     angles = angles[angles != 180.0]  # the exact null is -inf dB
     pattern = 20.0 * np.log10((1.0 + np.cos(np.radians(angles))) / 2.0)
     result = microphone_characteristics(
-        f, rel, _M_MV, tolerance_db=_TOL, polar=(angles, pattern)
+        f, rel, _M_MV, tolerance_db=_TOL,
+        directivity=MicrophoneDirectivity(polar=(angles, pattern)),
     )
     assert result.directivity_index_db == pytest.approx(
         10.0 * math.log10(3.0), abs=5e-3
@@ -194,7 +206,8 @@ def test_front_quarter_beyond_270_gives_no_directivity_index() -> None:
     f, rel = _flat_response()
     angles = np.linspace(270.0, 360.0, 91)
     result = microphone_characteristics(
-        f, rel, _M_MV, tolerance_db=_TOL, polar=(angles, np.zeros_like(angles))
+        f, rel, _M_MV, tolerance_db=_TOL,
+        directivity=MicrophoneDirectivity(polar=(angles, np.zeros_like(angles))),
     )
     assert result.directivity_index_db is None
 
@@ -206,7 +219,7 @@ def test_equivalent_noise_level_from_noise_voltage() -> None:
     """2,5 uV over 12,5 mV/Pa is 200 uPa = 20,0 dB SPL exactly (17.2 d/e)."""
     f, rel = _flat_response()
     result = microphone_characteristics(
-        f, rel, _M_MV, tolerance_db=_TOL, noise_voltage=2.5e-6
+        f, rel, _M_MV, tolerance_db=_TOL, noise=MicrophoneNoise(voltage=2.5e-6)
     )
     assert result.equivalent_noise_level_db == pytest.approx(20.0, abs=1e-12)
     # SNR re 1 Pa: 20 lg(1 Pa / 20 uPa) - L_N = 93,98 - 20,0.
@@ -222,7 +235,7 @@ def test_overload_spl_read_from_distortion_curve() -> None:
     thd = 0.5 * 10.0 ** ((spl - 130.0) * 0.08)
     result = microphone_characteristics(
         f, rel, _M_MV, tolerance_db=_TOL,
-        max_spl_thd_percent=0.5, distortion=(spl, thd),
+        overload=MicrophoneOverload(distortion=(spl, thd), thd_percent=0.5),
     )
     assert result.max_spl_db == pytest.approx(130.0, abs=1e-9)
 
@@ -233,8 +246,10 @@ def test_stated_max_spl_is_kept() -> None:
     spl = np.linspace(100.0, 140.0, 81)
     thd = 0.5 * 10.0 ** ((spl - 130.0) * 0.08)
     result = microphone_characteristics(
-        f, rel, _M_MV, tolerance_db=_TOL, max_spl_db=132.0,
-        max_spl_thd_percent=0.5, distortion=(spl, thd),
+        f, rel, _M_MV, tolerance_db=_TOL,
+        overload=MicrophoneOverload(
+            distortion=(spl, thd), thd_percent=0.5, spl_db=132.0
+        ),
     )
     assert result.max_spl_db == pytest.approx(132.0)
 
@@ -245,7 +260,8 @@ def test_distortion_below_limit_gives_no_max_spl() -> None:
     spl = np.linspace(100.0, 120.0, 41)
     thd = np.full_like(spl, 0.05)
     result = microphone_characteristics(
-        f, rel, _M_MV, tolerance_db=_TOL, distortion=(spl, thd)
+        f, rel, _M_MV, tolerance_db=_TOL,
+        overload=MicrophoneOverload(distortion=(spl, thd)),
     )
     assert result.max_spl_db is None
 
@@ -274,7 +290,8 @@ def test_noise_voltage_and_stated_level_conflict() -> None:
     f, rel = _flat_response()
     with pytest.raises(ValueError, match="not both"):
         microphone_characteristics(
-            f, rel, _M_MV, noise_voltage=1e-6, equivalent_noise_level_db=14.0
+            f, rel, _M_MV,
+            noise=MicrophoneNoise(voltage=1e-6, equivalent_level_db=14.0),
         )
 
 
@@ -286,32 +303,44 @@ def test_nonpositive_frequencies_rejected() -> None:
 def test_empty_distortion_rejected() -> None:
     f, rel = _flat_response()
     with pytest.raises(ValueError, match="at least two"):
-        microphone_characteristics(f, rel, _M_MV, distortion=([], []))
+        microphone_characteristics(
+            f, rel, _M_MV, overload=MicrophoneOverload(distortion=([], []))
+        )
 
 
 def test_empty_noise_spectrum_rejected() -> None:
     f, rel = _flat_response()
     with pytest.raises(ValueError, match="at least two"):
-        microphone_characteristics(f, rel, _M_MV, noise_spectrum=([], []))
+        microphone_characteristics(
+            f, rel, _M_MV, noise=MicrophoneNoise(spectrum=([], []))
+        )
 
 
 def test_empty_polar_rejected() -> None:
     f, rel = _flat_response()
     with pytest.raises(ValueError, match="at least two angle points"):
-        microphone_characteristics(f, rel, _M_MV, polar=([], []))
+        microphone_characteristics(
+            f, rel, _M_MV, directivity=MicrophoneDirectivity(polar=([], []))
+        )
 
 
 def test_nonfinite_stated_directivity_index_rejected_with_polar() -> None:
     """A non-finite stated DI is rejected whether or not a pattern is given."""
     f, rel = _flat_response()
     angles = np.linspace(0.0, 180.0, 181)
-    with pytest.raises(ValueError, match="directivity_index_db"):
+    omnidirectional = np.zeros_like(angles)
+    with pytest.raises(ValueError, match=r"directivity\.index_db"):
         microphone_characteristics(
-            f, rel, _M_MV, polar=(angles, np.zeros_like(angles)),
-            directivity_index_db=float("inf"),
+            f, rel, _M_MV,
+            directivity=MicrophoneDirectivity(
+                polar=(angles, omnidirectional), index_db=float("inf")
+            ),
         )
-    with pytest.raises(ValueError, match="directivity_index_db"):
-        microphone_characteristics(f, rel, _M_MV, directivity_index_db=float("nan"))
+    with pytest.raises(ValueError, match=r"directivity\.index_db"):
+        microphone_characteristics(
+            f, rel, _M_MV,
+            directivity=MicrophoneDirectivity(index_db=float("nan")),
+        )
 
 
 def test_no_noise_input_gives_no_noise_rows() -> None:
@@ -333,11 +362,16 @@ def _example_result():
     nf = np.geomspace(20.0, 20000.0, 31)
     nl = 18.0 - 5.4 * np.log2(nf / 20.0)
     return microphone_characteristics(
-        f, rel, _M_MV, tolerance_db=_TOL, rated_impedance=150.0,
-        minimum_load_impedance=1000.0, noise_voltage=1.25e-6,
-        max_spl_thd_percent=0.5, distortion=(spl, thd), noise_spectrum=(nf, nl),
-        polar=(angles, pattern), polar_frequency=1000.0,
-        powering="Phantom P48 (IEC 61938)", supply_current_ma=3.1,
+        f, rel, _M_MV, tolerance_db=_TOL,
+        directivity=MicrophoneDirectivity(
+            polar=(angles, pattern), frequency=1000.0
+        ),
+        noise=MicrophoneNoise(voltage=1.25e-6, spectrum=(nf, nl)),
+        overload=MicrophoneOverload(distortion=(spl, thd), thd_percent=0.5),
+        electrical=MicrophoneElectrical(
+            rated_impedance=150.0, minimum_load_impedance=1000.0,
+            powering="Phantom P48 (IEC 61938)", supply_current_ma=3.1,
+        ),
     )
 
 

@@ -142,12 +142,15 @@ recording = 0.2 * np.sin(2 * np.pi * 1000 * np.arange(fs) / fs)
 calibration_factor = metrology.sensitivity(calibrator_recording, target_spl=94.0, fs=fs)
 
 # 3. Apply calibration to your measurements
-spl, freq = filters.octave_filter(recording, fs, calibration_factor=calibration_factor)
+spl, freq = filters.octave_filter(
+    recording, fs,
+    calibration=filters.LevelCalibration(factor=calibration_factor))
 # Now 'spl' values are in real-world dB SPL!
 ```
 
-The same `calibration_factor` works across the whole library: `octave_filter`,
-`OctaveFilterBank`, `leq`, `laeq` and `ln_levels`.
+The same factor works across the whole library: `octave_filter` and
+`OctaveFilterBank` take it inside `LevelCalibration(factor=...)`, and `leq`,
+`laeq` and `ln_levels` as `calibration_factor=`.
 
 ## Calibrator assumptions (IEC 60942)
 
@@ -231,8 +234,8 @@ plt.show()
 | `narrowband` | bool | — | default `False` | Estimate the tone with a coherent Goertzel detector near `frequency` (needs `fs`) instead of full-band RMS; rejects broadband hum/noise that otherwise inflates the RMS and shrinks every later level (~−0.44 dB at 20 dB SNR). Enable for noisy coupler recordings |
 
 Returns the sensitivity factor (float) to pass as `calibration_factor=` to
-`octave_filter`, `leq`, `laeq`, `ln_levels`, `lc_peak`, `sel` and the dose
-functions.
+`leq`, `laeq`, `ln_levels`, `lc_peak`, `sel` and the dose functions, and as
+`calibration=LevelCalibration(factor=...)` to `octave_filter`.
 
 ## Field checks, laboratory verification and drift
 
@@ -274,7 +277,7 @@ the `dbfs=True` parameter.
 In this mode:
 
 * **0 dBFS** corresponds to a numeric signal level of 1.0 (RMS or Peak).
-* `calibration_factor` does not apply (dBFS is relative to digital full scale).
+* The calibration factor does not apply (dBFS is relative to digital full scale).
 * Useful for analyzing headroom, digital mastering, or normalized signals.
 
 ```python
@@ -287,7 +290,8 @@ fs = 48000
 recording = 0.2 * np.sin(2 * np.pi * 1000 * np.arange(fs) / fs)
 
 # Assume 'recording' is normalized between -1.0 and 1.0
-spl_dbfs, freq = filters.octave_filter(recording, fs, dbfs=True)
+spl_dbfs, freq = filters.octave_filter(
+    recording, fs, calibration=filters.LevelCalibration(dbfs=True))
 # Results will be negative (e.g., -20 dBFS)
 ```
 

@@ -136,7 +136,8 @@ def test_displayed_absorption_matches_oracle(tmp_path) -> None:
     text = _text(str(out))
     assert "0.80" in text  # alpha(500 Hz) = 1 - 1/5
     assert "1.00" in text  # alpha(1000 Hz) = 1 (quarter-wave resonance)
-    assert "500" in text and "1000" in text  # band labels
+    assert "500" in text  # band labels
+    assert "1000" in text
     assert "400 to 1600" in text  # measured frequency range
     # Anchor the geometry to its label so a bare "100"/"50" cannot match a band
     # centre (1000) or another frequency (500): the value follows its label.

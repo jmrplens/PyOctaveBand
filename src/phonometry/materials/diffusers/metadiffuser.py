@@ -35,15 +35,7 @@ from numpy.typing import ArrayLike
 
 from ..._internal.types import Real
 from ..._internal.validation import require_positive, require_positive_array
-from ..absorbers.porous import (
-    _AIR_DENSITY,
-    _AIR_VISCOSITY,
-    _ATMOSPHERIC_PRESSURE,
-    _HEAT_CAPACITY_RATIO,
-    _PRANDTL_NUMBER,
-    _SPEED_OF_SOUND,
-    Complex,
-)
+from ..absorbers.porous import DEFAULT_AIR, AirProperties, Complex
 from ..absorbers.slow_sound import HelmholtzResonator, slit_helmholtz_absorber
 from .design import (
     DEFAULT_POLAR_ANGLES,
@@ -176,12 +168,7 @@ def metadiffuser_reflection(
     period: float,
     angle: float = 0.0,
     resonator_geometry: str = "slit",
-    speed_of_sound: float = _SPEED_OF_SOUND,
-    air_density: float = _AIR_DENSITY,
-    viscosity: float = _AIR_VISCOSITY,
-    prandtl_number: float = _PRANDTL_NUMBER,
-    heat_capacity_ratio: float = _HEAT_CAPACITY_RATIO,
-    atmospheric_pressure: float = _ATMOSPHERIC_PRESSURE,
+    air: AirProperties = DEFAULT_AIR,
 ) -> MetadiffuserResult:
     r"""Per-well reflection spectra of a metadiffuser panel (Sci. Rep. Eq. (6)).
 
@@ -204,12 +191,12 @@ def metadiffuser_reflection(
     :param resonator_geometry: ``"slit"`` (default) for the paper's
         two-dimensional resonators, ``"square"`` for square-duct necks
         and cavities.
-    :param speed_of_sound: Speed of sound ``c0`` in air, in m/s.
-    :param air_density: Air density ``rho0``, in kg/m3.
-    :param viscosity: Dynamic viscosity ``eta`` of air, in Pa s.
-    :param prandtl_number: Prandtl number ``Pr`` of air.
-    :param heat_capacity_ratio: Ratio of specific heats ``gamma``.
-    :param atmospheric_pressure: Static pressure ``P0``, in Pa.
+    :param air: State of the air the panel radiates into and the slits and
+        resonators are filled with
+        (:class:`~phonometry.materials.absorbers.porous.AirProperties`): its
+        speed of sound ``c0``, density ``rho0``, viscosity ``eta``, Prandtl
+        number ``Pr``, ratio of specific heats ``gamma`` and static pressure
+        ``P0``.
     :return: A :class:`MetadiffuserResult` with one reflection row per well.
     """
     f = require_positive_array(frequency, "frequency")
@@ -225,10 +212,7 @@ def metadiffuser_reflection(
             lattice_step=depth / len(well.resonators),
             period=period, angle=angle,
             resonator_geometry=resonator_geometry,
-            speed_of_sound=speed_of_sound, air_density=air_density,
-            viscosity=viscosity, prandtl_number=prandtl_number,
-            heat_capacity_ratio=heat_capacity_ratio,
-            atmospheric_pressure=atmospheric_pressure,
+            air=air,
         )
         rows[i] = prediction.reflection
     well_alpha = 1.0 - np.abs(rows) ** 2
@@ -253,12 +237,7 @@ def metadiffuser_polar_response(
     source_angle: float = 0.0,
     periods: int = 1,
     resonator_geometry: str = "slit",
-    speed_of_sound: float = _SPEED_OF_SOUND,
-    air_density: float = _AIR_DENSITY,
-    viscosity: float = _AIR_VISCOSITY,
-    prandtl_number: float = _PRANDTL_NUMBER,
-    heat_capacity_ratio: float = _HEAT_CAPACITY_RATIO,
-    atmospheric_pressure: float = _ATMOSPHERIC_PRESSURE,
+    air: AirProperties = DEFAULT_AIR,
 ) -> DiffuserPolarResponse:
     """Far-field polar response of a metadiffuser at one frequency.
 
@@ -283,12 +262,10 @@ def metadiffuser_polar_response(
     :param resonator_geometry: ``"slit"`` (default) for the paper's
         two-dimensional resonators, ``"square"`` for square-duct necks
         and cavities.
-    :param speed_of_sound: Speed of sound ``c0`` in air, in m/s.
-    :param air_density: Air density ``rho0``, in kg/m3.
-    :param viscosity: Dynamic viscosity ``eta`` of air, in Pa s.
-    :param prandtl_number: Prandtl number ``Pr`` of air.
-    :param heat_capacity_ratio: Ratio of specific heats ``gamma``.
-    :param atmospheric_pressure: Static pressure ``P0``, in Pa.
+    :param air: State of the air the panel radiates into and the slits and
+        resonators are filled with
+        (:class:`~phonometry.materials.absorbers.porous.AirProperties`); its
+        speed of sound ``c0`` also carries the far field.
     :return: A
         :class:`~phonometry.materials.diffusers.design.DiffuserPolarResponse`.
     """
@@ -296,11 +273,7 @@ def metadiffuser_polar_response(
     result = metadiffuser_reflection(
         np.asarray([f]), wells, depth=depth, period=period,
         angle=float(np.radians(source_angle)),
-        resonator_geometry=resonator_geometry,
-        speed_of_sound=speed_of_sound, air_density=air_density,
-        viscosity=viscosity, prandtl_number=prandtl_number,
-        heat_capacity_ratio=heat_capacity_ratio,
-        atmospheric_pressure=atmospheric_pressure,
+        resonator_geometry=resonator_geometry, air=air,
     )
     # Sci. Rep. Eq. (1) is the bare Fraunhofer integral of R(x): the
     # piecewise-constant wells carry the aperture factor, but there is no
@@ -308,7 +281,7 @@ def metadiffuser_polar_response(
     return predict_diffuser_polar_response(
         period, f, reflection=result.reflection[:, 0],
         angles=angles, source_angle=source_angle, periods=periods,
-        speed_of_sound=speed_of_sound, include_obliquity=False,
+        speed_of_sound=air.speed_of_sound, include_obliquity=False,
     )
 
 
@@ -322,12 +295,7 @@ def metadiffuser_diffusion_spectrum(
     source_angle: float = 0.0,
     periods: int = 1,
     resonator_geometry: str = "slit",
-    speed_of_sound: float = _SPEED_OF_SOUND,
-    air_density: float = _AIR_DENSITY,
-    viscosity: float = _AIR_VISCOSITY,
-    prandtl_number: float = _PRANDTL_NUMBER,
-    heat_capacity_ratio: float = _HEAT_CAPACITY_RATIO,
-    atmospheric_pressure: float = _ATMOSPHERIC_PRESSURE,
+    air: AirProperties = DEFAULT_AIR,
 ) -> DiffusionSpectrum:
     r"""Normalized diffusion-coefficient spectrum ``d_n(f)`` of a metadiffuser.
 
@@ -349,12 +317,10 @@ def metadiffuser_diffusion_spectrum(
     :param resonator_geometry: ``"slit"`` (default) for the paper's
         two-dimensional resonators, ``"square"`` for square-duct necks
         and cavities.
-    :param speed_of_sound: Speed of sound ``c0`` in air, in m/s.
-    :param air_density: Air density ``rho0``, in kg/m3.
-    :param viscosity: Dynamic viscosity ``eta`` of air, in Pa s.
-    :param prandtl_number: Prandtl number ``Pr`` of air.
-    :param heat_capacity_ratio: Ratio of specific heats ``gamma``.
-    :param atmospheric_pressure: Static pressure ``P0``, in Pa.
+    :param air: State of the air the panel radiates into and the slits and
+        resonators are filled with
+        (:class:`~phonometry.materials.absorbers.porous.AirProperties`); its
+        speed of sound ``c0`` also carries the far field.
     :return: A
         :class:`~phonometry.materials.diffusers.scattering_diffusion.DiffusionSpectrum`
         carrying the raw ``d(f)`` and the normalised ``d_n(f)``.
@@ -367,11 +333,7 @@ def metadiffuser_diffusion_spectrum(
     result = metadiffuser_reflection(
         freqs, cells, depth=depth, period=period,
         angle=float(np.radians(source_angle)),
-        resonator_geometry=resonator_geometry,
-        speed_of_sound=speed_of_sound, air_density=air_density,
-        viscosity=viscosity, prandtl_number=prandtl_number,
-        heat_capacity_ratio=heat_capacity_ratio,
-        atmospheric_pressure=atmospheric_pressure,
+        resonator_geometry=resonator_geometry, air=air,
     )
     raw = np.empty(freqs.size, dtype=np.float64)
     norm = np.empty(freqs.size, dtype=np.float64)
@@ -379,12 +341,12 @@ def metadiffuser_diffusion_spectrum(
         surface = predict_diffuser_polar_response(
             period, float(f), reflection=result.reflection[:, i],
             angles=angles, source_angle=source_angle, periods=periods,
-            speed_of_sound=speed_of_sound, include_obliquity=False,
+            speed_of_sound=air.speed_of_sound, include_obliquity=False,
         )
         reference = predict_diffuser_polar_response(
             period, float(f), reflection=flat,
             angles=angles, source_angle=source_angle, periods=periods,
-            speed_of_sound=speed_of_sound, include_obliquity=False,
+            speed_of_sound=air.speed_of_sound, include_obliquity=False,
         )
         raw[i] = surface.coefficient
         norm[i] = float(

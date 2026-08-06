@@ -130,10 +130,10 @@ from phonometry import materials
 # Four reverberation-time situations reduced to two absorption coefficients.
 # alpha_s from the stationary pair (Eq. 1); alpha_spec from the rotating pair
 # (Eq. 4). V = 200 m^3, S = 10 m^2, c = 343.2 m/s throughout.
-alpha_s = materials.random_incidence_absorption(200.0, 10.0, c1=343.2, T1=8.0,
-                                         c2=343.2, T2=6.0)
-alpha_spec = materials.specular_absorption_coefficient(200.0, 10.0, c3=343.2, T3=7.5,
-                                                c4=343.2, T4=5.0)
+alpha_s = materials.random_incidence_absorption(200.0, 10.0, c1=343.2, t1=8.0,
+                                         c2=343.2, t2=6.0)
+alpha_spec = materials.specular_absorption_coefficient(200.0, 10.0, c3=343.2, t3=7.5,
+                                                c4=343.2, t4=5.0)
 s = materials.scattering_coefficient(alpha_spec, alpha_s)   # Eq. (5)
 print(round(float(alpha_s), 4))     # 0.1343
 print(round(float(alpha_spec), 4))  # 0.2148

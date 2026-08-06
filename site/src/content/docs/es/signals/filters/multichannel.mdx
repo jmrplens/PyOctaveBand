@@ -170,7 +170,8 @@ left = 0.2 * np.sin(2 * np.pi * 1000 * t)
 right = 0.1 * np.sin(2 * np.pi * 500 * t)
 stereo = np.stack([left, right])          # (2, n_samples)
 
-bank = filters.OctaveFilterBank(fs=48000, fraction=3, filter_type='butter')
+bank = filters.OctaveFilterBank(
+    fs=48000, fraction=3, design=filters.FilterDesign(filter_type='butter'))
 
 # Propiedades calculadas
 # bank.freq (centros), bank.freq_d (bordes inferiores), bank.freq_u (superiores), bank.sos

@@ -298,7 +298,8 @@ def test_job_based_high_spread_triggers_c4_advisory():
     samples = [70.0, 80.0, 90.0, 75.0, 85.0]  # wide spread, small N
     with pytest.warns(OccupationalExposureWarning):
         result = job_based_exposure(samples, 8.0)
-    assert result.c1u1 is not None and result.c1u1 > 3.5
+    assert result.c1u1 is not None
+    assert result.c1u1 > 3.5
     assert result.sampling_advisory is True
 
 
@@ -308,8 +309,10 @@ def test_task_based_requires_tasks():
 
 
 def test_task_rejects_nonpositive_duration():
+    # Task.__post_init__ is what rejects it: task_based_exposure never gets to
+    # see an object with a non-positive duration.
     with pytest.raises(ValueError):
-        task_based_exposure([Task(samples=(85.0,), duration_hours=0.0)])
+        Task(samples=(85.0,), duration_hours=0.0)
 
 
 def test_task_rejects_empty_samples():
@@ -328,10 +331,11 @@ def test_job_based_requires_two_samples():
 
 
 def test_duration_range_order_validated():
+    reversed_range = Task(
+        samples=(85.0, 85.0), duration_hours=4.0, duration_range=(6.0, 4.0)
+    )
     with pytest.raises(ValueError):
-        task_based_exposure(
-            [Task(samples=(85.0, 85.0), duration_hours=4.0, duration_range=(6.0, 4.0))]
-        )
+        task_based_exposure([reversed_range])
 
 
 def test_result_dataclasses_are_frozen():

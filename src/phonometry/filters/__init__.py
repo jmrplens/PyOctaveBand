@@ -10,7 +10,15 @@ from .compliance import (
     filter_class_compliance,
     verify_filter_class,
 )
-from .core import FilterBankWarning, OctaveFilterBank, octave_filter
+from .core import (
+    BlockProcessing,
+    FilterBankWarning,
+    FilterDesign,
+    LevelCalibration,
+    OctaveFilterBank,
+    ResponsePlot,
+    octave_filter,
+)
 from .equalizer import EQResponseResult, EQSection, ParametricEQ, parametric_eq
 from .frequencies import (
     nominal_frequencies,
@@ -26,12 +34,16 @@ from .weighting import (
 from .weighting_compliance import verify_weighting_class, weighting_class_limits
 
 __all__ = [
+    "BlockProcessing",
     "EQResponseResult",
     "EQSection",
     "FilterBankWarning",
     "FilterComplianceResult",
+    "FilterDesign",
+    "LevelCalibration",
     "OctaveFilterBank",
     "ParametricEQ",
+    "ResponsePlot",
     "TimeWeighting",
     "WeightingFilter",
     "class_limits",

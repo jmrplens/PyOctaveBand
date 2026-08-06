@@ -36,7 +36,8 @@ def test_zwicker_stationary_returns_single_axes_with_specific_curve() -> None:
     ydata = ax.lines[0].get_ydata()
     np.testing.assert_allclose(ydata, res.specific)
     xdata = ax.lines[0].get_xdata()
-    assert xdata[0] == pytest.approx(0.1) and xdata[-1] == pytest.approx(24.0)
+    assert xdata[0] == pytest.approx(0.1)
+    assert xdata[-1] == pytest.approx(24.0)
     assert "Bark" in ax.get_xlabel()
     assert "sone/Bark" in ax.get_ylabel()
     plt.close("all")
@@ -47,7 +48,8 @@ def test_zwicker_time_varying_returns_two_panels() -> None:
     res = ph.loudness_zwicker(sig, FS, stationary=False)
     assert res.loudness_vs_time is not None
     axes = res.plot()
-    assert isinstance(axes, np.ndarray) and axes.size == 2
+    assert isinstance(axes, np.ndarray)
+    assert axes.size == 2
     np.testing.assert_allclose(axes[0].lines[0].get_ydata(), res.specific)
     np.testing.assert_allclose(axes[1].lines[0].get_ydata(), res.loudness_vs_time)
     plt.close("all")
@@ -62,7 +64,8 @@ def test_moore_glasberg_returns_single_axes_with_specific_curve() -> None:
     assert not isinstance(ax, np.ndarray)
     np.testing.assert_allclose(ax.lines[0].get_ydata(), res.specific)
     xdata = ax.lines[0].get_xdata()
-    assert xdata[0] == pytest.approx(1.8) and xdata[-1] == pytest.approx(38.9)
+    assert xdata[0] == pytest.approx(1.8)
+    assert xdata[-1] == pytest.approx(38.9)
     assert "Cam" in ax.get_xlabel()
     assert "sone/Cam" in ax.get_ylabel()
     plt.close("all")

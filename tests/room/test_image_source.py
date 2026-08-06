@@ -201,9 +201,11 @@ def test_per_band_result_shapes() -> None:
     alpha = np.array([[0.1] * 6, [0.2] * 6, [0.4] * 6]).T  # (6, 3)
     res = image_source_rir((5.0, 4.0, 3.0), (1.2, 1.1, 1.3), (3.5, 2.6, 1.7),
                            alpha, fs=16000, max_order=6, frequencies=freqs)
-    assert res.ir.ndim == 2 and res.ir.shape[0] == 3
+    assert res.ir.ndim == 2
+    assert res.ir.shape[0] == 3
     assert res.amplitudes.shape[0] == 3
-    assert res.frequencies is not None and res.frequencies.size == 3
+    assert res.frequencies is not None
+    assert res.frequencies.size == 3
     # A more absorbing band decays to a lower total energy, monotonically.
     energies = np.sum(res.ir**2, axis=1)
     assert energies[0] > energies[1] > energies[2]
@@ -220,7 +222,8 @@ def test_length_six_is_per_wall_without_frequencies() -> None:
     res = image_source_rir((5.0, 4.0, 3.0), (1.2, 1.1, 1.3), (3.5, 2.6, 1.7),
                            np.array([0.1, 0.1, 0.1, 0.1, 0.1, 0.1]),
                            fs=16000, max_order=5)
-    assert res.ir.ndim == 1 and res.frequencies is None
+    assert res.ir.ndim == 1
+    assert res.frequencies is None
 
 
 def test_length_six_is_per_band_with_six_frequencies() -> None:

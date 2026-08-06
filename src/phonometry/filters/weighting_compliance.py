@@ -361,6 +361,20 @@ def _weighting_response_db(wf: WeightingFilter, frequencies: np.ndarray) -> np.n
     return np.asarray(gain_db[:-1] - gain_db[-1], dtype=np.float64)  # relative to 1 kHz
 
 
+def _band_class(margin1: float, margin2: float) -> int | None:
+    """Narrowest class the band still meets, or ``None`` if it meets neither.
+
+    :param margin1: Distance to the nearer class 1 limit, in decibels.
+    :param margin2: Distance to the nearer class 2 limit, in decibels.
+    :return: ``1``, ``2`` or ``None``.
+    """
+    if margin1 >= 0:
+        return 1
+    if margin2 >= 0:
+        return 2
+    return None
+
+
 def _weighting_band_verdicts(
     freqs_nom: np.ndarray,
     deviation: np.ndarray,
@@ -378,7 +392,7 @@ def _weighting_band_verdicts(
     for i, fm in enumerate(freqs_nom):
         m1 = min(upper1[i] - deviation[i], deviation[i] - lower1[i])
         m2 = min(upper2[i] - deviation[i], deviation[i] - lower2[i])
-        band_class = 1 if m1 >= 0 else (2 if m2 >= 0 else None)
+        band_class = _band_class(m1, m2)
         bands.append(
             {
                 "freq": float(fm),

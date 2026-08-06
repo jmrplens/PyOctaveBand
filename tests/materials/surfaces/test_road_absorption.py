@@ -316,7 +316,8 @@ def test_one_third_octave_band_count_part1() -> None:
     alpha = np.full_like(freq, 0.3)
     centres, band = one_third_octave_absorption(freq, alpha)
     assert centres.shape == (13,)  # 250..4000 Hz, Annex E
-    assert centres[0] == 250.0 and centres[-1] == 4000.0
+    assert centres[0] == 250.0
+    assert centres[-1] == 4000.0
     np.testing.assert_allclose(band, 0.3, atol=1e-9)
 
 

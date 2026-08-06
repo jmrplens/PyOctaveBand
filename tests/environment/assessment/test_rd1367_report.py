@@ -80,8 +80,10 @@ def test_report_writes_one_page_pdf(tmp_path) -> None:
 
 def test_unknown_language_rejected(tmp_path) -> None:
     """An unknown fiche language raises ``ValueError``."""
+    result = _result()
+    out = str(tmp_path / "bad.pdf")
     with pytest.raises(ValueError, match="language"):
-        _result().report(str(tmp_path / "bad.pdf"), language="xx")
+        result.report(out, language="xx")
 
 
 def test_fiche_defaults_to_spanish(tmp_path) -> None:

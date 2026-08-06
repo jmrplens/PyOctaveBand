@@ -18,7 +18,7 @@ import matplotlib.ticker as mticker
 import numpy as np
 from scipy import signal as scipy_signal
 
-from phonometry import OctaveFilterBank
+from phonometry import BlockProcessing, FilterDesign, OctaveFilterBank
 from phonometry._plot.common import format_frequency_axis, theme_fill
 
 from .theme import (
@@ -63,7 +63,8 @@ def generate_filter_type_comparison(output_dir: str) -> None:
     axins.set_xscale("log") # Explicitly set log scale
     
     for f_type, label, color, style in filters:
-        bank = OctaveFilterBank(fs, fraction=fraction, order=order, limits=limits, filter_type=f_type)
+        bank = OctaveFilterBank(fs, fraction=fraction, order=order, limits=limits,
+                                design=FilterDesign(filter_type=f_type))
         
         # Find index of 1000Hz band
         idx = np.argmin(np.abs(np.array(bank.freq) - 1000))
@@ -122,7 +123,8 @@ def generate_filter_responses(output_dir: str) -> None:
         for fraction, order in configs:
             filename = f"filter_{f_type_name}_fraction_{fraction}_order_{order}.png"
             print(f"Generating {filename}...")
-            bank = OctaveFilterBank(fs=fs, fraction=fraction, order=order, limits=[12.0, 20000.0], filter_type=f_type)
+            bank = OctaveFilterBank(fs=fs, fraction=fraction, order=order, limits=[12.0, 20000.0],
+                                    design=FilterDesign(filter_type=f_type))
             
             from phonometry.filters.design import _showfilter
             # Draw first, then save through save_figure so the Spanish
@@ -268,8 +270,10 @@ def generate_decomposition_plot(output_dir: str) -> None:
 
     # Filter into 1/1 octave bands with two different architectures
     # We use Chebyshev II (flat passband, no ripple)
-    bank_butter = OctaveFilterBank(fs=fs, fraction=1, order=6, limits=[100.0, 2000.0], filter_type="butter")
-    bank_cheby2 = OctaveFilterBank(fs=fs, fraction=1, order=6, limits=[100.0, 2000.0], filter_type="cheby2")
+    bank_butter = OctaveFilterBank(fs=fs, fraction=1, order=6, limits=[100.0, 2000.0],
+                                   design=FilterDesign(filter_type="butter"))
+    bank_cheby2 = OctaveFilterBank(fs=fs, fraction=1, order=6, limits=[100.0, 2000.0],
+                                   design=FilterDesign(filter_type="cheby2"))
     
     # Cast to 3-tuple to satisfy mypy unpacking
     _, freq, xb_butter = bank_butter.filter(y, sigbands=True)
@@ -774,7 +778,8 @@ def generate_group_delay_comparison(output_dir: str) -> None:
 
     _, ax = plt.subplots()
     for f_type, label, color, style in filters:
-        bank = OctaveFilterBank(fs, fraction=1, order=6, limits=limits, filter_type=f_type)
+        bank = OctaveFilterBank(fs, fraction=1, order=6, limits=limits,
+                                design=FilterDesign(filter_type=f_type))
         idx = int(np.argmin(np.abs(np.array(bank.freq) - 1000)))
         fsd = fs / bank.factor[idx]
         # Group delay of an SOS cascade = sum of the sections' group delays.
@@ -845,7 +850,8 @@ def generate_block_processing_continuity(output_dir: str) -> None:
 
     def band_output(stateful: bool) -> np.ndarray:
         bank = OctaveFilterBank(fs, fraction=1, limits=[900, 1100],
-                                stateful=stateful, resample=False)
+                                design=FilterDesign(resample=False),
+                                block_processing=BlockProcessing(stateful=stateful))
         if stateful:
             parts = [
                 bank.filter(x[i * block:(i + 1) * block], sigbands=True,
@@ -855,13 +861,15 @@ def generate_block_processing_continuity(output_dir: str) -> None:
         else:
             parts = []
             for i in range(n_blocks):
-                b2 = OctaveFilterBank(fs, fraction=1, limits=[900, 1100], resample=False)
+                b2 = OctaveFilterBank(fs, fraction=1, limits=[900, 1100],
+                                      design=FilterDesign(resample=False))
                 parts.append(b2.filter(x[i * block:(i + 1) * block], sigbands=True,
                                        detrend=False, calculate_level=False)[2][0])
         return np.concatenate(parts)
 
-    continuous = OctaveFilterBank(fs, fraction=1, limits=[900, 1100], resample=False).filter(
-        x, sigbands=True, detrend=False, calculate_level=False)[2][0]
+    continuous = OctaveFilterBank(
+        fs, fraction=1, limits=[900, 1100], design=FilterDesign(resample=False)
+    ).filter(x, sigbands=True, detrend=False, calculate_level=False)[2][0]
     y_stateful = band_output(stateful=True)
     y_stateless = band_output(stateful=False)
 
@@ -908,7 +916,8 @@ def generate_class_mask_overlay(output_dir: str) -> None:
 
     from phonometry.filters.compliance import class_limits
 
-    bank = OctaveFilterBank(fs, fraction=1, order=6, limits=[800, 1200], filter_type="butter")
+    bank = OctaveFilterBank(fs, fraction=1, order=6, limits=[800, 1200],
+                            design=FilterDesign(filter_type="butter"))
     idx = int(np.argmin(np.abs(np.array(bank.freq) - 1000)))
     fm = bank.freq[idx]
     fsd = fs / bank.factor[idx]
@@ -958,7 +967,8 @@ def generate_filter_class0_mask(output_dir: str) -> None:
     fs = 48000
     from phonometry.filters.compliance import class_limits
 
-    bank = OctaveFilterBank(fs, fraction=1, order=6, limits=[800, 1200], filter_type="butter")
+    bank = OctaveFilterBank(fs, fraction=1, order=6, limits=[800, 1200],
+                            design=FilterDesign(filter_type="butter"))
     idx = int(np.argmin(np.abs(np.array(bank.freq) - 1000)))
     fm = bank.freq[idx]
     fsd = fs / bank.factor[idx]

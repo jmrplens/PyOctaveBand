@@ -123,6 +123,10 @@ _ALT_VALIDITY_LIMIT = 0.3
 #: Required specimen-to-background level margin, ISO 9053-2:2020 Formula (4) (dB).
 _ALT_BACKGROUND_MARGIN = 10.0
 
+#: Validation messages shared by the entry points that take the same quantity.
+_AREA_POSITIVE_MSG = "'area' must be positive."
+_FREQUENCY_POSITIVE_MSG = "'frequency' must be positive."
+
 
 class AirflowResistanceWarning(PhonometryWarning):
     """Advisory for out-of-range or non-conforming ISO 9053 airflow inputs."""
@@ -239,7 +243,7 @@ def linear_airflow_velocity(volume_flow_rate: float, area: float) -> float:
     if volume_flow_rate < 0.0:
         raise ValueError("'volume_flow_rate' must be non-negative.")
     if area <= 0.0:
-        raise ValueError("'area' must be positive.")
+        raise ValueError(_AREA_POSITIVE_MSG)
     return volume_flow_rate / area
 
 
@@ -287,7 +291,7 @@ def specific_airflow_resistance(
         if resistance < 0.0:
             raise ValueError("'resistance' must be non-negative.")
         if area <= 0.0:
-            raise ValueError("'area' must be positive.")
+            raise ValueError(_AREA_POSITIVE_MSG)
         return resistance * area
     if pressure_drop is not None and velocity is not None:
         if pressure_drop < 0.0:
@@ -366,7 +370,7 @@ def static_airflow_resistance(
     if bool(np.any(dp < 0.0)):
         raise ValueError("All pressure drops must be non-negative.")
     if area <= 0.0:
-        raise ValueError("'area' must be positive.")
+        raise ValueError(_AREA_POSITIVE_MSG)
     if thickness is not None and thickness <= 0.0:
         raise ValueError("'thickness' must be positive.")
     if evaluation_velocity <= 0.0:
@@ -381,8 +385,10 @@ def static_airflow_resistance(
     b = float(coeffs[1])
 
     dp_eval = a * evaluation_velocity + b * evaluation_velocity**2
-    specific = dp_eval / evaluation_velocity  # R_s = dp/u = a + b*u
-    resistance = specific / area  # R = R_s / A
+    # The specific resistance R_s is dp/u, which for a through-origin fit is
+    # a + b*u; and since R_s = R*A, dividing it by the area gives R.
+    specific = dp_eval / evaluation_velocity
+    resistance = specific / area
     resistivity = None if thickness is None else specific / thickness
 
     return StaticAirflowResult(
@@ -406,7 +412,7 @@ def piston_volume_flow_rate(
     ``A_P`` (m2). Returns ``q_v`` in m3/s.
     """
     if frequency <= 0.0:
-        raise ValueError("'frequency' must be positive.")
+        raise ValueError(_FREQUENCY_POSITIVE_MSG)
     if stroke_amplitude < 0.0:
         raise ValueError("'stroke_amplitude' must be non-negative.")
     if piston_area <= 0.0:
@@ -440,7 +446,7 @@ def thermal_boundary_layer_thickness(
     with the Annex A.3 example (:math:`f = 2` Hz) this is ``1.83e-3 m``.
     """
     if frequency <= 0.0:
-        raise ValueError("'frequency' must be positive.")
+        raise ValueError(_FREQUENCY_POSITIVE_MSG)
     if speed_of_sound <= 0.0:
         raise ValueError("'speed_of_sound' must be positive.")
     if air_density <= 0.0:
@@ -512,7 +518,7 @@ def _warn_alternating_validity(
     stacklevel: int,
 ) -> None:
     """Check the ISO 9053-2:2020 Formula (3)/(4) validity criteria."""
-    if not ratio_term < _ALT_VALIDITY_LIMIT:
+    if ratio_term >= _ALT_VALIDITY_LIMIT:
         warnings.warn(
             f"Validity term (h_t/h_s)*10**((L_ps-L_pt)/20) = {ratio_term:g} is not "
             f"below {_ALT_VALIDITY_LIMIT:g} (ISO 9053-2:2020 Formula (3)); adjust "
@@ -520,8 +526,9 @@ def _warn_alternating_validity(
             AirflowResistanceWarning,
             stacklevel=stacklevel,
         )
-    if background_level is not None and not (
-        level_specimen - background_level > _ALT_BACKGROUND_MARGIN
+    if (
+        background_level is not None
+        and level_specimen - background_level <= _ALT_BACKGROUND_MARGIN
     ):
         warnings.warn(
             f"Specimen-to-background margin {level_specimen - background_level:g} dB "
@@ -574,7 +581,7 @@ def alternating_airflow_resistance(
     1-4 Hz or when the Formula (3)/(4) validity criteria are not met.
     """
     if frequency <= 0.0:
-        raise ValueError("'frequency' must be positive.")
+        raise ValueError(_FREQUENCY_POSITIVE_MSG)
     if cavity_volume <= 0.0:
         raise ValueError("'cavity_volume' must be positive.")
     if piston_stroke_specimen <= 0.0:

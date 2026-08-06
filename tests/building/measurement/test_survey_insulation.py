@@ -78,17 +78,17 @@ def test_airborne_without_volume_has_only_d_dnt() -> None:
     res = survey_airborne_insulation(
         np.full(_OCTAVE, 80.0), np.full(_OCTAVE, 45.0), np.zeros(_OCTAVE)
     )
-    assert res.d_n is None and res.r_prime is None
+    assert res.d_n is None
+    assert res.r_prime is None
     assert res.rating is not None  # DnT,w still available (5 octave bands)
     assert res.r_prime_rating is None
 
 
 def test_airborne_area_without_volume_raises() -> None:
+    source, receiving = np.full(_OCTAVE, 80.0), np.full(_OCTAVE, 45.0)
+    index = np.zeros(_OCTAVE)
     with pytest.raises(ValueError, match="requires 'volume'"):
-        survey_airborne_insulation(
-            np.full(_OCTAVE, 80.0), np.full(_OCTAVE, 45.0), np.zeros(_OCTAVE),
-            area=12.0,
-        )
+        survey_airborne_insulation(source, receiving, index, area=12.0)
 
 
 def test_airborne_energy_averages_positions() -> None:
@@ -181,10 +181,10 @@ def test_service_equipment_scalar_measurements_raises_cleanly() -> None:
 
 
 def test_index_band_count_must_match_levels() -> None:
+    source, receiving = np.full(_OCTAVE, 80.0), np.full(_OCTAVE, 45.0)
+    short_index = np.zeros(3)
     with pytest.raises(ValueError, match="one value per band"):
-        survey_airborne_insulation(
-            np.full(_OCTAVE, 80.0), np.full(_OCTAVE, 45.0), np.zeros(3)
-        )
+        survey_airborne_insulation(source, receiving, short_index)
 
 
 def test_rating_none_off_band_count() -> None:

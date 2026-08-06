@@ -6,7 +6,7 @@ Advanced tests for input validation, edge cases, and robustness.
 import numpy as np
 import pytest
 
-from phonometry import normalized_frequencies, octave_filter
+from phonometry import FilterDesign, normalized_frequencies, octave_filter
 
 
 def test_fraction_validation() -> None:
@@ -97,7 +97,7 @@ def test_invalid_inputs() -> None:
 
     # Invalid filter_type
     with pytest.raises(ValueError, match="Invalid filter_type"):
-        octave_filter(x, fs, filter_type="invalid_type")
+        octave_filter(x, fs, design=FilterDesign(filter_type="invalid_type"))
 
 
 def test_short_signal() -> None:

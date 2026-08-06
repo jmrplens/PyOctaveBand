@@ -370,7 +370,8 @@ def test_minimum_phase_refactor_is_bit_exact(oversample: int) -> None:
     for response in _fixed_responses():
         old = _old_minimum_phase(response, oversample=oversample)
         new = ph.minimum_phase(response, oversample=oversample)
-        assert old.dtype == new.dtype and old.shape == new.shape
+        assert old.dtype == new.dtype
+        assert old.shape == new.shape
         assert np.array_equal(
             old.view(np.float64), new.view(np.float64)
         ), "minimum_phase output changed bitwise after the cepstrum refactor"

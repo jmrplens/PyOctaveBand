@@ -93,6 +93,21 @@ _BAND_INDEX_LABEL = "Band index"
 #: Shared y-axis label of the heavy-impact level figures.
 _MAX_IMPACT_LABEL = "Maximum impact sound pressure level [dB]"
 
+#: Shared y-axis label of the figures drawing the sound reduction index under
+#: its symbol (the panel and aperture transmission predictions).
+_R_INDEX_LABEL = "Sound reduction index $R$ [dB]"
+
+#: Shared y-axis label of the sound-insulation figures that spell the quantity
+#: out instead (the airborne measurement and prediction curves).
+_REDUCTION_INDEX_LABEL = "Sound reduction index [dB]"
+
+#: Shared y-axis label of the impact sound pressure level figures.
+_IMPACT_LEVEL_LABEL = "Impact sound pressure level [dB]"
+
+#: Shared y-axis label of the façade figures, which mix level differences and
+#: reduction indices on the same axis.
+_LEVEL_DIFFERENCE_LABEL = "Level difference / reduction index [dB]"
+
 #: Shared y-axis label of the path-contribution figures (the simplified
 #: single-number bars and the two detailed per-band ones).
 _SHARE_LABEL = "Share of transmitted energy [%]"
@@ -111,17 +126,17 @@ _STRINGS: dict[str, str] = {
     "Band": "Banda",
     _BAND_INDEX_LABEL: "Índice de banda",
     "predicted $R$": "$R$ previsto",
-    "Sound reduction index $R$ [dB]": "Índice de reducción acústica $R$ [dB]",
+    _R_INDEX_LABEL: "Índice de reducción acústica $R$ [dB]",
     "Predicted sound insulation": "Aislamiento acústico previsto",
     "coincidence plateau (A to B)": "meseta de coincidencia (A a B)",
     "coincidence range ($f_{c1}$ to $f_{c2}$)": "rango de coincidencia ($f_{c1}$ a $f_{c2}$)",
     "aperture $R$": "$R$ de abertura",
     "Aperture sound transmission (Gomperts / Wilson-Soroka)": "Transmisión sonora por abertura (Gomperts / Wilson-Soroka)",
-    "Sound reduction index [dB]": "Índice de reducción acústica [dB]",
+    _REDUCTION_INDEX_LABEL: "Índice de reducción acústica [dB]",
     "Sigma unfav.": "Σ desfav.",
     "impact rating": "índice de impacto",
-    "Impact sound pressure level [dB]": "Nivel de presión acústica de impactos [dB]",
-    "Level difference / reduction index [dB]": "Diferencia de nivel / índice de reducción [dB]",
+    _IMPACT_LEVEL_LABEL: "Nivel de presión acústica de impactos [dB]",
+    _LEVEL_DIFFERENCE_LABEL: "Diferencia de nivel / índice de reducción [dB]",
     "Façade sound insulation (ISO 16283-3)": "Aislamiento acústico de fachada (ISO 16283-3)",
     "Reduction index / level difference [dB]": "Índice de reducción / diferencia de nivel [dB]",
     "Façade insulation prediction (EN 12354-3)": "Predicción del aislamiento de fachada (EN 12354-3)",
@@ -297,7 +312,7 @@ def plot_sound_reduction(
         )
     format_frequency_axis(ax, float(freq.min()), float(freq.max()))
     ax.set_xlabel(_t(_FREQ_LABEL, language))
-    ax.set_ylabel(_t("Sound reduction index $R$ [dB]", language))
+    ax.set_ylabel(_t(_R_INDEX_LABEL, language))
     ax.set_title(f"{_t('Predicted sound insulation', language)} ({result.model})")
     ax.legend(loc="best", fontsize="small")
     ax.grid(True, which="both", alpha=0.3)
@@ -328,7 +343,7 @@ def plot_aperture_transmission(
     ax.axhline(0.0, color=_C_MUTED, ls=":", lw=0.9)
     format_frequency_axis(ax, float(freq.min()), float(freq.max()))
     ax.set_xlabel(_t(_FREQ_LABEL, language))
-    ax.set_ylabel(_t("Sound reduction index $R$ [dB]", language))
+    ax.set_ylabel(_t(_R_INDEX_LABEL, language))
     ax.set_title(_t("Aperture sound transmission (Gomperts / Wilson-Soroka)", language))
     ax.legend(loc="best", fontsize="small")
     ax.grid(True, which="both", alpha=0.3)
@@ -362,7 +377,7 @@ def plot_weighted_rating(
             f"{result.rating} dB  ({_t('Sigma unfav.', language)} = "
             f"{format_number(result.unfavourable_sum, language, decimals=1)} dB)"
         ),
-        ylabel=_t("Sound reduction index [dB]", language),
+        ylabel=_t(_REDUCTION_INDEX_LABEL, language),
         ax=ax,
         language=language,
         **kwargs,
@@ -408,7 +423,7 @@ def plot_impact_rating(
             f"{result.rating} dB  ({_t('Sigma unfav.', language)} = "
             f"{format_number(result.unfavourable_sum, language, decimals=1)} dB)"
         ),
-        ylabel=_t("Impact sound pressure level [dB]", language),
+        ylabel=_t(_IMPACT_LEVEL_LABEL, language),
         ax=ax,
         language=language,
         **kwargs,
@@ -537,7 +552,7 @@ def plot_extended_weighted_rating(
         title = f"{title}\n{extended}"
     return _plot_extended_rating(
         result, impact=False, title=title,
-        ylabel=_t("Sound reduction index [dB]", language),
+        ylabel=_t(_REDUCTION_INDEX_LABEL, language),
         span_label="enlarged range (Annex B)", ax=ax, language=language,
         **kwargs,
     )
@@ -571,7 +586,7 @@ def plot_extended_impact_rating(
         )
     return _plot_extended_rating(
         result, impact=True, title=title,
-        ylabel=_t("Impact sound pressure level [dB]", language),
+        ylabel=_t(_IMPACT_LEVEL_LABEL, language),
         span_label="enlarged range (A.2.1)", ax=ax, language=language,
         **kwargs,
     )
@@ -620,7 +635,7 @@ def plot_facade_insulation(
             opts.update(kwargs)
         ax.plot(x, y, "o-", **opts)
 
-    ax.set_ylabel(_t("Level difference / reduction index [dB]", language))
+    ax.set_ylabel(_t(_LEVEL_DIFFERENCE_LABEL, language))
     ax.set_title(_t("Façade sound insulation (ISO 16283-3)", language))
     ax.legend(loc="best", fontsize="small")
     ax.grid(True, alpha=0.3)
@@ -1009,7 +1024,7 @@ def plot_detailed_airborne_prediction(
         )
     return _plot_path_shares(
         result, result.r_prime, total_label="$R'$",
-        ylabel="Sound reduction index [dB]", title=title, ax=ax,
+        ylabel=_REDUCTION_INDEX_LABEL, title=title, ax=ax,
         language=language, **kwargs,
     )
 
@@ -1037,7 +1052,7 @@ def plot_detailed_impact_prediction(
         )
     return _plot_path_shares(
         result, result.l_prime_n, total_label="$L'_n$",
-        ylabel="Impact sound pressure level [dB]", title=title, ax=ax,
+        ylabel=_IMPACT_LEVEL_LABEL, title=title, ax=ax,
         language=language, **kwargs,
     )
 
@@ -1105,7 +1120,7 @@ def plot_airborne_insulation(
         curves.append(("$R'$", np.asarray(result.r_prime, dtype=np.float64)))
     ax = _plot_insulation_bands(
         curves,
-        ylabel=_t("Level difference / reduction index [dB]", language),
+        ylabel=_t(_LEVEL_DIFFERENCE_LABEL, language),
         title=_t("Airborne sound insulation (ISO 16283-1)", language),
         ax=ax,
         **kwargs,
@@ -1136,7 +1151,7 @@ def plot_impact_insulation(
         curves.append(("$L'_n$", np.asarray(result.l_n, dtype=np.float64)))
     ax = _plot_insulation_bands(
         curves,
-        ylabel=_t("Impact sound pressure level [dB]", language),
+        ylabel=_t(_IMPACT_LEVEL_LABEL, language),
         title=_t("Impact sound insulation (ISO 16283-2)", language),
         ax=ax,
         **kwargs,
@@ -1553,7 +1568,7 @@ def plot_plenum_flanking(
         reference_label="$R_S + R_R$ (two ceilings)",
         curve_label="$R_{cl}$ (ceiling/plenum path)",
         fill_label="plenum penalty",
-        ylabel="Sound reduction index $R$ [dB]",
+        ylabel=_R_INDEX_LABEL,
         title=(
             f"{_t('Suspended-ceiling plenum path', language)} "
             f"(h = {format_number(result.plenum_height, language, decimals=2)} m, "

@@ -69,10 +69,12 @@ from .layered import (
     statistical_absorption,
 )
 from .porous import (
+    DEFAULT_AIR,
     DELANY_BAZLEY_COEFFICIENTS,
     DELANY_BAZLEY_VALIDITY,
     LIMP_FRAME_CRITERIA,
     MIKI_VALIDITY,
+    AirProperties,
     PorousAbsorberWarning,
     PorousMediumResult,
     decoupling_frequency,
@@ -135,6 +137,7 @@ from .uncertainty import (
 )
 
 __all__ = [
+    "DEFAULT_AIR",
     "DELANY_BAZLEY_COEFFICIENTS",
     "DELANY_BAZLEY_VALIDITY",
     "LIMP_FRAME_CRITERIA",
@@ -146,6 +149,7 @@ __all__ = [
     "AbsorptionUncertaintyResult",
     "AbsorptionWarning",
     "AirLayer",
+    "AirProperties",
     "AirflowResistanceWarning",
     "BiotWavesResult",
     "CriticalCouplingResult",

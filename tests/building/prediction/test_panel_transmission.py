@@ -337,7 +337,8 @@ def test_plateau_construction_points() -> None:
     # is B/A times higher, so the whole plateau spans exactly the tabulated
     # frequency ratio and its two ends sit at the plateau height.
     res = _brick_wall()
-    assert res.plateau_start is not None and res.plateau_end is not None
+    assert res.plateau_start is not None
+    assert res.plateau_end is not None
     assert res.plateau_end / res.plateau_start == pytest.approx(4.5, rel=1e-12)
     mass_law = mass_law_transmission_loss(
         res.plateau_start, 231.0, incidence="field", field_correction=5.0,

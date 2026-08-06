@@ -106,7 +106,8 @@ def test_report_renders_oracle_values(tmp_path) -> None:
     # The plate velocity levels head the Lv column.
     assert f"{_LV[1]:.1f}" in text
     # Nominal band labels head the table / axis.
-    assert "125" in text and "4000" in text
+    assert "125" in text
+    assert "4000" in text
     # Basis prose and the plate parameters in the boxed result.
     assert "EN 15657:2018" in text
     assert "reception-plate method" in text

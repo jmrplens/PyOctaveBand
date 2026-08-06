@@ -304,7 +304,7 @@ def _chk_room_to_room_noise_reduction() -> Outcome:
         [37.0, 41.0, 48.0, 60.0, 61.0, 61.0],
         8.0 * 3.0,
         ph.equivalent_absorption_area(_N421_SURFACES),
-        source_level=90.0,
+        source=ph.SourceRoom(level=90.0),
     )
     printed = np.array([37.5, 40.8, 49.0, 62.8, 65.3, 65.9])
     worst = float(np.max(np.abs(np.asarray(res.noise_reduction) - printed)))
@@ -336,10 +336,12 @@ def _chk_room_to_room_chain() -> Outcome:
         [39.0, 42.0, 50.0, 58.0, 63.0, 67.0],
         15.0,
         ph.equivalent_absorption_area(operator),
-        source_power_level=[105.0, 103.0, 98.0, 108.0, 107.0, 109.0],
-        source_room_constant=ph.room_constant(268.0, ph.mean_absorption(plant)),
-        source_directivity=4.0,
-        source_model="constant_volume",
+        source=ph.SourceRoom(
+            power_level=[105.0, 103.0, 98.0, 108.0, 107.0, 109.0],
+            room_constant=ph.room_constant(268.0, ph.mean_absorption(plant)),
+            directivity=4.0,
+            model="constant_volume",
+        ),
     )
     printed = np.array([72.3, 60.4, 41.4, 41.0, 33.8, 30.7])
     worst = float(np.max(np.abs(np.asarray(res.received_level) - printed)))

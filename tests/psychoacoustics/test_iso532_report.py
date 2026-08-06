@@ -52,8 +52,11 @@ def _assert_one_page(path: str) -> None:
 def test_loudness_report_writes_pdf(tmp_path) -> None:
     """A stationary Zwicker loudness result renders a one-page PDF fiche."""
     result = _result()
-    assert result.loudness > 0.0 and np.isfinite(result.loudness)
-    assert result.n5 is None and result.n10 is None  # stationary
+    assert result.loudness > 0.0
+    assert np.isfinite(result.loudness)
+    # stationary
+    assert result.n5 is None
+    assert result.n10 is None
     out = tmp_path / "loudness.pdf"
     returned = result.report(str(out))
     assert returned == str(out)
@@ -150,7 +153,8 @@ def test_time_varying_fiche_reports_nmax_percentiles_and_nt(tmp_path) -> None:
     t = np.arange(fs) / fs
     x = 0.2 * np.sin(2.0 * np.pi * 1000.0 * t) * (1.0 + 0.5 * np.sin(2.0 * np.pi * 3.0 * t))
     result = loudness_zwicker(x, fs, field="diffuse")
-    assert result.n5 is not None and result.time is not None
+    assert result.n5 is not None
+    assert result.time is not None
     assert result.field == "diffuse"
     out = tmp_path / "tv.pdf"
     result.report(str(out), metadata=ReportMetadata(requirement=result.loudness + 1.0))
@@ -159,7 +163,8 @@ def test_time_varying_fiche_reports_nmax_percentiles_and_nt(tmp_path) -> None:
     assert "method for time-varying sounds (clause 6)" in text
     assert "Sound field: diffuse (D)" in text
     assert "Maximum loudness Nmax [sone]" in text
-    assert "N5 [sone]" in text and "N10 [sone]" in text
+    assert "N5 [sone]" in text
+    assert "N10 [sone]" in text
     assert "Loudness versus time N(t) (clause 6.5)" in text
     assert "Total loudness N [sone]" not in text
 

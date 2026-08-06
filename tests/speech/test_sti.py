@@ -324,15 +324,19 @@ def test_rating_letters_from_band_edges():
 def test_invalid_inputs_raise():
     ir = np.zeros(FS // 4)
     ir[10] = 1.0
+    # the signals are built outside the raises blocks, so each block holds
+    # exactly the one call whose exception is under test
+    two_dimensional_ir = np.zeros((2, 1000))
+    silent_ir = np.zeros(FS // 4)
 
     with pytest.raises(ValueError, match="1D"):
-        sti_from_impulse_response(np.zeros((2, 1000)), FS)
+        sti_from_impulse_response(two_dimensional_ir, FS)
     with pytest.raises(ValueError, match="positive"):
         sti_from_impulse_response(ir, -1)
     with pytest.raises(ValueError, match="8 kHz octave band"):
         sti_from_impulse_response(ir, 16000)
     with pytest.raises(ValueError, match="silent"):
-        sti_from_impulse_response(np.zeros(FS // 4), FS)
+        sti_from_impulse_response(silent_ir, FS)
     with pytest.raises(ValueError, match="7 octave-band values"):
         sti_from_impulse_response(ir, FS, level=[60.0, 60.0, 60.0])
     with pytest.raises(ValueError, match="scalar or a vector"):
@@ -342,14 +346,18 @@ def test_invalid_inputs_raise():
     with pytest.raises(ValueError, match="not both"):
         sti_from_impulse_response(ir, FS, snr=10.0, level=[60.0] * 7, ambient=[40.0] * 7)
 
+    two_dimensional_signal = np.zeros((2, FS))
     with pytest.raises(ValueError, match="1D"):
-        stipa(np.zeros((2, FS)), FS)
-    with pytest.raises(ValueError, match="too short"):  # noqa: SIM117 - simplefilter must run inside catch_warnings before the call
-        # The 0.5 s clip also triggers the (correct) sub-15 s STIPA warning;
-        # silence it so the test output stays clean while asserting the error.
-        with warnings.catch_warnings():
-            warnings.simplefilter("ignore", UserWarning)
-            stipa(stipa_signal(FS, seconds=18.0, seed=3)[: FS // 2], FS)
+        stipa(two_dimensional_signal, FS)
+    half_second_clip = stipa_signal(FS, seconds=18.0, seed=3)[: FS // 2]
+    # The 0.5 s clip also triggers the (correct) sub-15 s STIPA warning;
+    # silence it so the test output stays clean while asserting the error.
+    # simplefilter has to run inside catch_warnings, before the call, so the
+    # two blocks stay nested rather than combined.
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore", UserWarning)
+        with pytest.raises(ValueError, match="too short"):
+            stipa(half_second_clip, FS)
     with pytest.warns(STIWarning) as tone_warnings:  # noqa: PT031 - the warns block records the whole STIWarning family while running
         # A pure tone leaves other octave bands empty: those bands read
         # m = 0 (TI = 0) with a warning rather than a hard error, so the
@@ -373,10 +381,12 @@ def test_invalid_inputs_raise():
     with pytest.raises(ValueError, match="fs"):
         stipa_signal(8000)
 
+    wrong_shape_mtf = np.full((3, 14), 0.5)
+    negative_mtf = _uniform_mtf(-0.1)
     with pytest.raises(ValueError, match="shape"):
-        _sti_from_mtf(np.full((3, 14), 0.5))
+        _sti_from_mtf(wrong_shape_mtf)
     with pytest.raises(ValueError, match="finite"):
-        _sti_from_mtf(_uniform_mtf(-0.1))
+        _sti_from_mtf(negative_mtf)
 
 
 def test_mtf_above_1_3_warns_and_truncates():

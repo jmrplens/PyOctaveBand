@@ -796,12 +796,14 @@ def test_invalid_inputs() -> None:
         traction_sound_power("steam")
     with pytest.raises(ValueError, match="Unknown bridge type"):
         bridge_transfer("wooden")
+    short_roughness = np.zeros(3)
+    roughness = np.zeros(24)
     with pytest.raises(ValueError, match="must hold 24 values"):
-        total_effective_roughness(np.zeros(3), np.zeros(24), np.zeros(24))
+        total_effective_roughness(short_roughness, roughness, roughness)
     with pytest.raises(ValueError, match="positive number of axles"):
-        rolling_sound_power(np.zeros(24), np.zeros(24), 0)
+        rolling_sound_power(roughness, roughness, 0)
     with pytest.raises(ValueError, match="non-negative number of m"):
-        impact_roughness(np.zeros(24), -1.0)
+        impact_roughness(roughness, -1.0)
     with pytest.raises(ValueError, match="same length"):
         roughness_to_frequency([1.0, 2.0], [1.0], 50.0)
     with pytest.raises(ValueError, match="'wavelengths' must all be positive"):

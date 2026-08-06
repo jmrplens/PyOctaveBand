@@ -266,6 +266,69 @@ def _sensitivity(model: Model, values: np.ndarray, uncertainties: np.ndarray) ->
     return coeffs
 
 
+def _validated_correlation(correlation: ArrayLike | None, n: int) -> np.ndarray | None:
+    """Check a caller-supplied correlation matrix of an ``N``-input budget.
+
+    :param correlation: The ``N x N`` correlation matrix, or ``None``.
+    :param n: Number of input quantities.
+    :return: The matrix as a float array, or ``None`` when none was given.
+    :raises ValueError: If the matrix is not square, symmetric, unit-diagonal
+        and positive semi-definite.
+    """
+    if correlation is None:
+        return None
+    r = np.asarray(correlation, dtype=np.float64)
+    if r.shape != (n, n):
+        raise ValueError(f"correlation must have shape ({n}, {n}); got {r.shape}.")
+    if not np.allclose(r, r.T):
+        raise ValueError("correlation matrix must be symmetric.")
+    if not np.allclose(np.diag(r), 1.0):
+        raise ValueError("correlation matrix diagonal must be 1.0.")
+    # A symmetric, unit-diagonal matrix can still be indefinite, which would
+    # make the variance negative and be silently masked by the clamp that
+    # follows the propagation; reject it.
+    if float(np.min(np.linalg.eigvalsh(r))) < -1e-8:
+        raise ValueError("correlation matrix must be positive semi-definite.")
+    return r
+
+
+def _effective_dof(
+    dofs: np.ndarray,
+    contributions: np.ndarray,
+    combined: float,
+    *,
+    correlated: bool,
+) -> float:
+    """Welch-Satterthwaite effective degrees of freedom (Annex G.4).
+
+    Formula (G.2b) is derived for independent input quantities only and the GUM
+    defines no correlated form: a correlated budget with finite input dof
+    therefore carries NO effective dof (NaN), and expanded() requires an
+    explicit coverage factor from the caller. With all input dof infinite
+    the output is treated as normal and veff stays infinite.
+    """
+    finite = np.isfinite(dofs)
+    if correlated and np.any(finite):
+        import warnings
+
+        warnings.warn(
+            "Welch-Satterthwaite (GUM G.4.1) is defined for independent "
+            "inputs only and the GUM defines no correlated form: the "
+            "effective degrees of freedom are undefined (NaN) for this "
+            "budget, and expanded() requires an explicit coverage_factor.",
+            UncertaintyWarning,
+            stacklevel=3,
+        )
+        return math.nan
+    if correlated:
+        return math.inf
+    if combined > 0.0 and np.any(finite & (contributions > 0.0)):
+        terms = np.where(finite, contributions**4 / np.where(finite, dofs, 1.0), 0.0)
+        denom = float(np.sum(terms))
+        return combined**4 / denom if denom > 0.0 else math.inf
+    return math.inf
+
+
 def combine_uncertainty(
     model: Model,
     quantities: Sequence[Quantity],
@@ -296,19 +359,7 @@ def combine_uncertainty(
     uncert = np.array([q.uncertainty for q in quantities], dtype=np.float64)
     n = values.size
 
-    r = None
-    if correlation is not None:
-        r = np.asarray(correlation, dtype=np.float64)
-        if r.shape != (n, n):
-            raise ValueError(f"correlation must have shape ({n}, {n}); got {r.shape}.")
-        if not np.allclose(r, r.T):
-            raise ValueError("correlation matrix must be symmetric.")
-        if not np.allclose(np.diag(r), 1.0):
-            raise ValueError("correlation matrix diagonal must be 1.0.")
-        # A symmetric, unit-diagonal matrix can still be indefinite, which would
-        # make the variance negative and be silently masked below; reject it.
-        if float(np.min(np.linalg.eigvalsh(r))) < -1e-8:
-            raise ValueError("correlation matrix must be positive semi-definite.")
+    r = _validated_correlation(correlation, n)
 
     coeffs = _sensitivity(model, values, uncert)
     contributions = np.abs(coeffs) * uncert  # ui(y) = |ci| u(xi)
@@ -321,34 +372,10 @@ def combine_uncertainty(
         variance = float(signed @ r @ signed)
     combined = math.sqrt(max(variance, 0.0))
 
-    # Welch-Satterthwaite effective degrees of freedom (Annex G.4). Formula
-    # (G.2b) is derived for independent input quantities only and the GUM
-    # defines no correlated form: a correlated budget with finite input dof
-    # therefore carries NO effective dof (NaN), and expanded() requires an
-    # explicit coverage factor from the caller. With all input dof infinite
-    # the output is treated as normal and veff stays infinite.
     dofs = np.array([q.dof for q in quantities], dtype=np.float64)
-    finite = np.isfinite(dofs)
-    if correlated and np.any(finite):
-        effective_dof = math.nan
-        import warnings
-
-        warnings.warn(
-            "Welch-Satterthwaite (GUM G.4.1) is defined for independent "
-            "inputs only and the GUM defines no correlated form: the "
-            "effective degrees of freedom are undefined (NaN) for this "
-            "budget, and expanded() requires an explicit coverage_factor.",
-            UncertaintyWarning,
-            stacklevel=2,
-        )
-    elif correlated:
-        effective_dof = math.inf
-    elif combined > 0.0 and np.any(finite & (contributions > 0.0)):
-        terms = np.where(finite, contributions**4 / np.where(finite, dofs, 1.0), 0.0)
-        denom = float(np.sum(terms))
-        effective_dof = combined**4 / denom if denom > 0.0 else math.inf
-    else:
-        effective_dof = math.inf
+    effective_dof = _effective_dof(
+        dofs, contributions, combined, correlated=correlated
+    )
 
     return UncertaintyResult(
         value=float(model(*values)),
@@ -409,7 +436,7 @@ def _sample(q: Quantity, size: int, rng: np.random.Generator) -> np.ndarray:
     if q.distribution == "triangular":
         a = u * math.sqrt(6.0)
         left, right = mu - a, mu + a
-        if not left < right:  # zero-width support (u == 0 or underflow)
+        if left >= right:  # zero-width support (u == 0 or underflow)
             return np.full(size, mu)
         return rng.triangular(left, mu, right, size)
     # U-shaped (arcsine): a * cos(theta), theta uniform on [0, pi).

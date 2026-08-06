@@ -76,8 +76,9 @@ def test_nth_order_harmonic_distortion() -> None:
 
 
 def test_harmonic_distortion_rejects_order_below_two() -> None:
+    tone = _tone(1000.0)
     with pytest.raises(ValueError):
-        harmonic_distortion(_tone(1000.0), FS, 1000.0, 1)
+        harmonic_distortion(tone, FS, 1000.0, 1)
 
 
 def test_thd_plus_noise_recovers_noise_floor() -> None:
@@ -137,8 +138,9 @@ def test_thd_plus_noise_pure_tone_is_tiny() -> None:
 
 
 def test_thd_plus_noise_rejects_q_out_of_range() -> None:
+    tone = _tone(1000.0)
     with pytest.raises(ValueError):
-        thd_plus_noise(_tone(1000.0), FS, 1000.0, notch_q=5.0)
+        thd_plus_noise(tone, FS, 1000.0, notch_q=5.0)
 
 
 def test_weighted_thd_attenuates_low_harmonics() -> None:
@@ -151,14 +153,16 @@ def test_weighted_thd_attenuates_low_harmonics() -> None:
 
 
 def test_weighted_thd_rejects_bad_notch_q() -> None:
+    tone = _tone(1000.0)
     with pytest.raises(ValueError):
-        weighted_thd(_tone(1000.0), FS, 1000.0, notch_q=5.0)
+        weighted_thd(tone, FS, 1000.0, notch_q=5.0)
 
 
 def test_thd_plus_noise_rejects_fundamental_above_nyquist() -> None:
     # A fundamental at/above fs/2 cannot be notched (iirnotch would fail).
+    tone = _tone(1000.0)
     with pytest.raises(ValueError):
-        thd_plus_noise(_tone(1000.0), FS, FS / 2.0)
+        thd_plus_noise(tone, FS, FS / 2.0)
 
 
 def test_modulation_distortion_iec_per_order() -> None:
@@ -198,7 +202,8 @@ def test_modulation_distortion_carries_sideband_spectrum() -> None:
         + _tone(fh - 2 * fl, 0.01)
     )
     res = modulation_distortion(x, FS, fl, fh)
-    assert res.f_low == fl and res.f_high == fh
+    assert res.f_low == fl
+    assert res.f_high == fh
     assert res.carrier_amplitude == pytest.approx(ah, rel=1e-6)
     np.testing.assert_allclose(
         res.sideband_frequencies,
@@ -228,14 +233,17 @@ def test_modulation_distortion_plot_marks_carrier_and_sidebands() -> None:
     # The carrier marker sits at (f_high, 0 dB); the four sidebands read
     # 20*lg(a_s / carrier) re the carrier.
     xs = np.concatenate([line.get_xdata() for line in ax.lines])
-    assert fh in xs and fh - 2 * fl in xs and fh + 2 * fl in xs
+    assert fh in xs
+    assert fh - 2 * fl in xs
+    assert fh + 2 * fl in xs
     sb_line = ax.lines[-1]
     np.testing.assert_allclose(
         sb_line.get_ydata(),
         20.0 * np.log10(np.array([0.01, 0.02, 0.02, 0.01]) / 0.25),
         atol=1e-6,
     )
-    assert "d₂" in ax.get_title() and "SMPTE" in ax.get_title()
+    assert "d₂" in ax.get_title()
+    assert "SMPTE" in ax.get_title()
     plt.close("all")
     # Spanish labels and the unknown-language rejection.
     ax_es = res.plot(language="es")
@@ -374,15 +382,17 @@ def test_rejects_non_finite_signal(func) -> None:  # type: ignore[no-untyped-def
 
 
 def test_rejects_bad_fs_and_kind() -> None:
+    tone = _tone(1000.0)
     with pytest.raises(ValueError):
-        thd(_tone(1000.0), 0.0)
+        thd(tone, 0.0)
     with pytest.raises(ValueError):
-        thd(_tone(1000.0), FS, 1000.0, kind="X")  # type: ignore[arg-type]
+        thd(tone, FS, 1000.0, kind="X")  # type: ignore[arg-type]
 
 
 def test_rejects_too_short_signal() -> None:
+    too_short = np.array([0.0, 1.0, 0.0])
     with pytest.raises(ValueError):
-        thd(np.array([0.0, 1.0, 0.0]), FS)
+        thd(too_short, FS)
 
 
 # ---------------------------------------------------------------------------
@@ -472,7 +482,8 @@ def test_thd_clipped_sine_fourier_oracle() -> None:
     assert b[6] == pytest.approx(ref.CLIPPED_SINE_B7, rel=1e-9)
     assert b[8] == pytest.approx(ref.CLIPPED_SINE_B9, rel=1e-9)
     # Even harmonics of a symmetric clip vanish.
-    assert b[1] < 1e-12 and b[3] < 1e-12
+    assert b[1] < 1e-12
+    assert b[3] < 1e-12
 
 
 def test_thd_raises_when_no_harmonic_below_nyquist() -> None:

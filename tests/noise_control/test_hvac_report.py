@@ -103,7 +103,8 @@ def test_report_renders_oracle_values(tmp_path) -> None:
     assert f"{lw[1]:.1f}" in text
     assert f"{lw[4]:.1f}" in text
     # Nominal band labels, caption and method basis.
-    assert "63" in text and "4000" in text
+    assert "63" in text
+    assert "4000" in text
     assert "Octave-band regenerated sound power levels" in text
     assert "VDI 2081-1" in text
     # The fiche reports a model prediction, not an in-duct measurement.
@@ -229,7 +230,8 @@ def test_verdict_boundary_passes_on_the_displayed_value() -> None:
     _, lower = performance_verdict(
         0.25, 0.3, "L", higher_is_better=False, language="en"
     )
-    assert higher and lower
+    assert higher
+    assert lower
 
 
 def test_unknown_engine_rejected(tmp_path) -> None:

@@ -37,9 +37,9 @@ absorption_coefficient_uncertainty(
     area: float,
     *,
     c: ArrayLike,
-    T_a: ArrayLike,
+    t_a: ArrayLike,
     u_a: ArrayLike,
-    T_b: ArrayLike,
+    t_b: ArrayLike,
     u_b: ArrayLike,
 ) -> Real
 ```
@@ -47,11 +47,11 @@ absorption_coefficient_uncertainty(
 Uncertainty of a Sabine absorption coefficient (ISO 17497-1, A.3/A.4).
 
 $$
-u_\alpha = \frac{55.3 V}{c S} \sqrt{(u_b / T_b^2)^2 + (u_a / T_a^2)^2}
+u_\alpha = \frac{55.3 V}{c S} \sqrt{(u_b / t_b^2)^2 + (u_a / t_a^2)^2}
 $$
 
-With situations `(T1, T2)` this is `u(alpha_s)` (Eq. (A.3)); with
-`(T3, T4)` it is `u(alpha_spec)` (Eq. (A.4)). The unsubscripted `c` of
+With situations `(t1, t2)` this is `u(alpha_s)` (Eq. (A.3)); with
+`(t3, t4)` it is `u(alpha_spec)` (Eq. (A.4)). The unsubscripted `c` of
 the standard is taken as a single (mean) speed of sound.
 
 **Parameters**
@@ -61,10 +61,10 @@ the standard is taken as a single (mean) speed of sound.
 | `volume` | Reverberation-room volume `V`, in cubic metres. |
 | `area` | Test-sample area `S`, in square metres. |
 | `c` | Speed of sound `c`, in m/s. |
-| `T_a` | Reverberation time of the first situation, in seconds. |
-| `u_a` | Standard uncertainty of `T_a` (Eq. (A.1)), in seconds. |
-| `T_b` | Reverberation time of the second situation, in seconds. |
-| `u_b` | Standard uncertainty of `T_b` (Eq. (A.1)), in seconds. |
+| `t_a` | Reverberation time of the first situation, in seconds. |
+| `u_a` | Standard uncertainty of `t_a` (Eq. (A.1)), in seconds. |
+| `t_b` | Reverberation time of the second situation, in seconds. |
+| `u_b` | Standard uncertainty of `t_b` (Eq. (A.1)), in seconds. |
 
 **Returns:** Combined standard uncertainty of the absorption coefficient (per band).
 
@@ -127,9 +127,9 @@ base_plate_scattering(
     area: float,
     *,
     c1: ArrayLike,
-    T1: ArrayLike,
+    t1: ArrayLike,
     c3: ArrayLike,
-    T3: ArrayLike,
+    t3: ArrayLike,
     m1: ArrayLike = 0.0,
     m3: ArrayLike = 0.0,
 ) -> Real
@@ -142,7 +142,7 @@ s_{\mathrm{base}} = 55.3 \frac{V}{S} \left( \frac{1}{c_3 T_3} - \frac{1}{c_1 T_1
 $$
 
 Ideally $T_1 = T_3$; a slightly non-symmetrical base plate shortens
-`T3`
+`t3`
 and this quality metric captures the resulting spurious scattering, which
 must not exceed the Table 1 limits (Clause 6.2). See
 [`check_base_plate_scattering`](/phonometry/reference/api/materials/reverberation-room-scattering/#check_base_plate_scattering).
@@ -153,12 +153,12 @@ must not exceed the Table 1 limits (Clause 6.2). See
 | :--- | :--- |
 | `volume` | Reverberation-room volume `V`, in cubic metres. |
 | `area` | Test-sample area `S`, in square metres. |
-| `c1` | Speed of sound during `T1`, in m/s. |
-| `T1` | Reverberation time with the static base plate, in seconds. |
-| `c3` | Speed of sound during `T3`, in m/s. |
-| `T3` | Reverberation time with the rotating base plate, in seconds. |
-| `m1` | Energy attenuation coefficient during `T1`, in 1/m; defaults to 0. |
-| `m3` | Energy attenuation coefficient during `T3`, in 1/m; defaults to 0. |
+| `c1` | Speed of sound during `t1`, in m/s. |
+| `t1` | Reverberation time with the static base plate, in seconds. |
+| `c3` | Speed of sound during `t3`, in m/s. |
+| `t3` | Reverberation time with the rotating base plate, in seconds. |
+| `m1` | Energy attenuation coefficient during `t1`, in 1/m; defaults to 0. |
+| `m3` | Energy attenuation coefficient during `t3`, in 1/m; defaults to 0. |
 
 **Returns:** Base-plate scattering coefficient `s_base` (per band).
 
@@ -205,9 +205,9 @@ random_incidence_absorption(
     area: float,
     *,
     c1: ArrayLike,
-    T1: ArrayLike,
+    t1: ArrayLike,
     c2: ArrayLike,
-    T2: ArrayLike,
+    t2: ArrayLike,
     m1: ArrayLike = 0.0,
     m2: ArrayLike = 0.0,
 ) -> Real
@@ -221,7 +221,7 @@ $$
 
 Situation 1 is the empty room with the (static) base plate present;
 situation 2 adds the test sample, still without turntable rotation
-(Table 2, rows T1 and T2).
+(Table 2, rows t1 and t2).
 
 **Parameters**
 
@@ -229,12 +229,12 @@ situation 2 adds the test sample, still without turntable rotation
 | :--- | :--- |
 | `volume` | Reverberation-room volume `V`, in cubic metres. |
 | `area` | Test-sample area `S`, in square metres. |
-| `c1` | Speed of sound during `T1`, in m/s (see [`speed_of_sound`](/phonometry/reference/api/materials/reverberation-room-scattering/#speed_of_sound)). |
-| `T1` | Reverberation time without sample (base plate only), in seconds. |
-| `c2` | Speed of sound during `T2`, in m/s. |
-| `T2` | Reverberation time with the test sample, in seconds. |
-| `m1` | Energy attenuation coefficient during `T1`, in 1/m (see [`air_attenuation_coefficient`](/phonometry/reference/api/materials/reverberation-room-scattering/#air_attenuation_coefficient)); defaults to 0. |
-| `m2` | Energy attenuation coefficient during `T2`, in 1/m; defaults to 0. |
+| `c1` | Speed of sound during `t1`, in m/s (see [`speed_of_sound`](/phonometry/reference/api/materials/reverberation-room-scattering/#speed_of_sound)). |
+| `t1` | Reverberation time without sample (base plate only), in seconds. |
+| `c2` | Speed of sound during `t2`, in m/s. |
+| `t2` | Reverberation time with the test sample, in seconds. |
+| `m1` | Energy attenuation coefficient during `t1`, in 1/m (see [`air_attenuation_coefficient`](/phonometry/reference/api/materials/reverberation-room-scattering/#air_attenuation_coefficient)); defaults to 0. |
+| `m2` | Energy attenuation coefficient during `t2`, in 1/m; defaults to 0. |
 
 **Returns:** Random-incidence absorption coefficient `alpha_s` (per band).
 
@@ -493,9 +493,9 @@ specular_absorption_coefficient(
     area: float,
     *,
     c3: ArrayLike,
-    T3: ArrayLike,
+    t3: ArrayLike,
     c4: ArrayLike,
-    T4: ArrayLike,
+    t4: ArrayLike,
     m3: ArrayLike = 0.0,
     m4: ArrayLike = 0.0,
 ) -> Real
@@ -508,7 +508,7 @@ $$
 $$
 
 Situation 3 is the rotating base plate without the sample; situation 4 is
-the sample on the rotating turntable (Table 2, rows T3 and T4). The
+the sample on the rotating turntable (Table 2, rows t3 and t4). The
 apparent (specular) absorption includes the energy lost to scattering.
 
 **Parameters**
@@ -517,12 +517,12 @@ apparent (specular) absorption includes the energy lost to scattering.
 | :--- | :--- |
 | `volume` | Reverberation-room volume `V`, in cubic metres. |
 | `area` | Test-sample area `S`, in square metres. |
-| `c3` | Speed of sound during `T3`, in m/s. |
-| `T3` | Reverberation time, rotating base plate without sample, in seconds. |
-| `c4` | Speed of sound during `T4`, in m/s. |
-| `T4` | Reverberation time, sample on the rotating turntable, in seconds. |
-| `m3` | Energy attenuation coefficient during `T3`, in 1/m; defaults to 0. |
-| `m4` | Energy attenuation coefficient during `T4`, in 1/m; defaults to 0. |
+| `c3` | Speed of sound during `t3`, in m/s. |
+| `t3` | Reverberation time, rotating base plate without sample, in seconds. |
+| `c4` | Speed of sound during `t4`, in m/s. |
+| `t4` | Reverberation time, sample on the rotating turntable, in seconds. |
+| `m3` | Energy attenuation coefficient during `t3`, in 1/m; defaults to 0. |
+| `m4` | Energy attenuation coefficient during `t4`, in 1/m; defaults to 0. |
 
 **Returns:** Specular absorption coefficient `alpha_spec` (per band).
 

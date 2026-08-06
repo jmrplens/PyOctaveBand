@@ -83,12 +83,7 @@ critical_coupling_design(
     cavity_length_bounds: tuple[float, float] = (0.002, 0.2),
     end_correction: bool = True,
     slit_radiation: bool = True,
-    speed_of_sound: float = 343.0,
-    air_density: float = 1.205,
-    viscosity: float = 1.84e-05,
-    prandtl_number: float = 0.71,
-    heat_capacity_ratio: float = 1.4,
-    atmospheric_pressure: float = 101325.0,
+    air: AirProperties = ...,
 ) -> CriticalCouplingResult
 ```
 
@@ -118,12 +113,7 @@ point.
 | `cavity_length_bounds` | Search bounds for the cavity length, in metres. |
 | `end_correction` | Include the resonator radiation end corrections. |
 | `slit_radiation` | Include the slit-to-free-air radiation correction. |
-| `speed_of_sound` | Speed of sound `c0` in air, in m/s. |
-| `air_density` | Air density `rho0`, in kg/m3. |
-| `viscosity` | Dynamic viscosity `eta` of air, in Pa s. |
-| `prandtl_number` | Prandtl number `Pr` of air. |
-| `heat_capacity_ratio` | Ratio of specific heats `gamma`. |
-| `atmospheric_pressure` | Static pressure `P0`, in Pa. |
+| `air` | State of the air the panel is designed for ([`AirProperties`](/phonometry/reference/api/materials/porous/#airproperties)): its speed of sound `c0`, density `rho0`, viscosity `eta`, Prandtl number `Pr`, ratio of specific heats `gamma` and static pressure `P0`. |
 
 **Returns:** A [`CriticalCouplingResult`](/phonometry/reference/api/materials/slow-sound/#criticalcouplingresult). A [`SlowSoundAbsorberWarning`](/phonometry/reference/api/materials/slow-sound/#slowsoundabsorberwarning) is emitted (via `warnings.warn`) if the solver does not reach perfect absorption within tolerance.
 
@@ -160,11 +150,7 @@ helmholtz_resonator_impedance(
     lattice_step: float | None = None,
     end_correction: bool = True,
     geometry: str = 'square',
-    air_density: float = 1.205,
-    viscosity: float = 1.84e-05,
-    prandtl_number: float = 0.71,
-    heat_capacity_ratio: float = 1.4,
-    atmospheric_pressure: float = 101325.0,
+    air: AirProperties = ...,
     sum_terms: int = 40,
 ) -> Complex
 ```
@@ -203,11 +189,7 @@ corrections are the 2-D fits of Sci. Rep. 7:5389 Eqs. (11)-(12); both
 | `lattice_step` | Lattice step `a` for the neck-to-slit correction. |
 | `end_correction` | Include the radiation end corrections (default True). |
 | `geometry` | `"square"` (default) for square-duct necks and cavities, `"slit"` for the two-dimensional resonator model. |
-| `air_density` | Air density `rho0`, in kg/m3. |
-| `viscosity` | Dynamic viscosity `eta` of air, in Pa s. |
-| `prandtl_number` | Prandtl number `Pr` of air. |
-| `heat_capacity_ratio` | Ratio of specific heats `gamma`. |
-| `atmospheric_pressure` | Static pressure `P0`, in Pa. |
+| `air` | State of the air in the neck and cavity ([`AirProperties`](/phonometry/reference/api/materials/porous/#airproperties)); the density `rho0`, viscosity `eta`, Prandtl number `Pr`, ratio of specific heats `gamma` and static pressure `P0` are read from it. |
 | `sum_terms` | Transverse modes kept per axis in the duct series. |
 
 **Returns:** Complex acoustic impedance `Z_HR`, in Pa s/m3, shaped like `frequency`.
@@ -316,11 +298,7 @@ rectangular_duct_properties(
     frequency: ArrayLike,
     *,
     side: float,
-    air_density: float = 1.205,
-    viscosity: float = 1.84e-05,
-    prandtl_number: float = 0.71,
-    heat_capacity_ratio: float = 1.4,
-    atmospheric_pressure: float = 101325.0,
+    air: AirProperties = ...,
     sum_terms: int = 40,
 ) -> tuple[Complex, Complex]
 ```
@@ -356,11 +334,7 @@ $28.454\,\eta/\text{side}^2$ as $\omega \to 0$.
 | :--- | :--- |
 | `frequency` | Frequency vector `f`, in hertz. |
 | `side` | Square-duct side length, in metres. |
-| `air_density` | Air density `rho0`, in kg/m3. |
-| `viscosity` | Dynamic viscosity `eta` of air, in Pa s. |
-| `prandtl_number` | Prandtl number `Pr` of air. |
-| `heat_capacity_ratio` | Ratio of specific heats `gamma`. |
-| `atmospheric_pressure` | Static pressure `P0`, in Pa. |
+| `air` | State of the air in the duct ([`AirProperties`](/phonometry/reference/api/materials/porous/#airproperties)); the density `rho0`, viscosity `eta`, Prandtl number `Pr`, ratio of specific heats `gamma` and static pressure `P0` are read from it. |
 | `sum_terms` | Transverse modes kept per axis (default 40). |
 
 **Returns:** `(rho, kappa)` complex arrays shaped like `frequency`.
@@ -372,11 +346,7 @@ slit_effective_properties(
     frequency: ArrayLike,
     *,
     slit_height: float,
-    air_density: float = 1.205,
-    viscosity: float = 1.84e-05,
-    prandtl_number: float = 0.71,
-    heat_capacity_ratio: float = 1.4,
-    atmospheric_pressure: float = 101325.0,
+    air: AirProperties = ...,
 ) -> tuple[Complex, Complex]
 ```
 
@@ -401,11 +371,7 @@ $\kappa_0 = \gamma P_0$.
 | :--- | :--- |
 | `frequency` | Frequency vector `f`, in hertz. |
 | `slit_height` | Slit height `h`, in metres. |
-| `air_density` | Air density `rho0`, in kg/m3. |
-| `viscosity` | Dynamic viscosity `eta` of air, in Pa s. |
-| `prandtl_number` | Prandtl number `Pr` of air. |
-| `heat_capacity_ratio` | Ratio of specific heats `gamma`. |
-| `atmospheric_pressure` | Static pressure `P0`, in Pa. |
+| `air` | State of the air in the slit ([`AirProperties`](/phonometry/reference/api/materials/porous/#airproperties)); the density `rho0`, viscosity `eta`, Prandtl number `Pr`, ratio of specific heats `gamma` and static pressure `P0` are read from it. |
 
 **Returns:** `(rho_s, kappa_s)` complex arrays shaped like `frequency`.
 
@@ -423,12 +389,7 @@ slit_helmholtz_absorber(
     end_correction: bool = True,
     slit_radiation: bool = True,
     resonator_geometry: str = 'square',
-    speed_of_sound: float = 343.0,
-    air_density: float = 1.205,
-    viscosity: float = 1.84e-05,
-    prandtl_number: float = 0.71,
-    heat_capacity_ratio: float = 1.4,
-    atmospheric_pressure: float = 101325.0,
+    air: AirProperties = ...,
 ) -> SlitResonatorAbsorberResult
 ```
 
@@ -459,12 +420,7 @@ only the front air impedance carries `cos(theta)`.
 | `angle` | Polar angle of incidence `theta`, in radians ($0 \le \theta < \pi/2 - 10^{-6}$). |
 | `end_correction` | Include the resonator radiation end corrections. |
 | `slit_radiation` | Include the slit-to-free-air radiation correction. |
-| `speed_of_sound` | Speed of sound `c0` in air, in m/s. |
-| `air_density` | Air density `rho0`, in kg/m3. |
-| `viscosity` | Dynamic viscosity `eta` of air, in Pa s. |
-| `prandtl_number` | Prandtl number `Pr` of air. |
-| `heat_capacity_ratio` | Ratio of specific heats `gamma`. |
-| `atmospheric_pressure` | Static pressure `P0`, in Pa. |
+| `air` | State of the air the panel radiates into and the slit and resonators are filled with ([`AirProperties`](/phonometry/reference/api/materials/porous/#airproperties)): its speed of sound `c0`, density `rho0`, viscosity `eta`, Prandtl number `Pr`, ratio of specific heats `gamma` and static pressure `P0`. |
 
 **Returns:** A [`SlitResonatorAbsorberResult`](/phonometry/reference/api/materials/slow-sound/#slitresonatorabsorberresult).
 

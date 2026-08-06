@@ -6,7 +6,7 @@ Tests for zero-phase (sosfiltfilt) filtering in OctaveFilterBank.
 import numpy as np
 import pytest
 
-from phonometry import OctaveFilterBank
+from phonometry import BlockProcessing, FilterDesign, OctaveFilterBank
 
 FS = 48000
 
@@ -43,9 +43,11 @@ def test_zero_phase_doubles_attenuation() -> None:
 
 
 def test_zero_phase_rejects_stateful() -> None:
-    bank = OctaveFilterBank(fs=FS, stateful=True, resample=False)
+    bank = OctaveFilterBank(fs=FS, design=FilterDesign(resample=False),
+                            block_processing=BlockProcessing(stateful=True))
+    silence = np.zeros(FS)
     with pytest.raises(ValueError, match="zero_phase"):
-        bank.filter(np.zeros(FS), zero_phase=True)
+        bank.filter(silence, zero_phase=True)
 
 
 def test_zero_phase_passband_level_matches() -> None:

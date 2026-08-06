@@ -341,10 +341,10 @@ def _chk_iso17497_1_scattering() -> Outcome:
     t1, t2, t3, t4 = ref.ISO17497_1_CHAIN_T
     c = ref.ISO17497_1_CHAIN_C
     alpha_s = ph.random_incidence_absorption(
-        ref.ISO17497_1_CHAIN_V, ref.ISO17497_1_CHAIN_S, c1=c, T1=t1, c2=c, T2=t2
+        ref.ISO17497_1_CHAIN_V, ref.ISO17497_1_CHAIN_S, c1=c, t1=t1, c2=c, t2=t2
     )
     alpha_spec = ph.specular_absorption_coefficient(
-        ref.ISO17497_1_CHAIN_V, ref.ISO17497_1_CHAIN_S, c3=c, T3=t3, c4=c, T4=t4
+        ref.ISO17497_1_CHAIN_V, ref.ISO17497_1_CHAIN_S, c3=c, t3=t3, c4=c, t4=t4
     )
     s = float(ph.scattering_coefficient(alpha_spec, alpha_s))
     return numeric(ref.ISO17497_1_CHAIN_SCATTERING, s, 1e-9, places=4)

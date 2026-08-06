@@ -28,6 +28,8 @@ import numpy as np
 import pytest
 
 from phonometry import (
+    LoudspeakerDirectivity,
+    LoudspeakerRatings,
     ReportMetadata,
     loudspeaker_characteristics,
     radiating_piston,
@@ -159,8 +161,8 @@ def test_minimum_impedance_uses_rated_range_when_supplied() -> None:
     f, spl = _flat_response()
     fz, z = _dip_below_effective_range()
     result = loudspeaker_characteristics(
-        f, spl, _R, sensitivity_band=(200.0, 4000.0),
-        rated_frequency_range=(30.0, 20000.0), impedance=(fz, z),
+        f, spl, _R, sensitivity_band=(200.0, 4000.0), impedance=(fz, z),
+        ratings=LoudspeakerRatings(frequency_range=(30.0, 20000.0)),
     )
     lo_eff, _ = result.effective_range
     assert lo_eff > 40.0  # the dip sits outside the computed effective range
@@ -229,9 +231,12 @@ def _example_result():
     thd = 0.4 + 2.0 * np.exp(-((np.log2(ft / 70.0)) ** 2) / 0.4)
     return loudspeaker_characteristics(
         f, spl, _R, sensitivity_band=(200.0, 4000.0),
-        rated_frequency_range=(45.0, 20000.0), rated_noise_power=80.0,
-        resonance_frequency=55.0, impedance=(fz, z), distortion=(ft, thd),
-        directivity=pist, polar_frequency=2000.0,
+        impedance=(fz, z), distortion=(ft, thd),
+        directivity=LoudspeakerDirectivity(piston=pist, frequency=2000.0),
+        ratings=LoudspeakerRatings(
+            frequency_range=(45.0, 20000.0), noise_power=80.0,
+            resonance_frequency=55.0,
+        ),
     )
 
 

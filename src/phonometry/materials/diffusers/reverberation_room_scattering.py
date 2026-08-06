@@ -192,7 +192,7 @@ def _sabine_absorption(
     .. math::
 
        55.3 \, \frac{V}{S}
-       \left( \frac{1}{c_b T_b} - \frac{1}{c_a T_a} \right)
+       \left( \frac{1}{c_b t_b} - \frac{1}{c_a t_a} \right)
        - \frac{4 V}{S} (m_b - m_a)
 
     Each situation is the tuple ``(c, T, m)`` of speed of sound (m/s),
@@ -223,9 +223,9 @@ def random_incidence_absorption(
     area: float,
     *,
     c1: ArrayLike,
-    T1: ArrayLike,
+    t1: ArrayLike,
     c2: ArrayLike,
-    T2: ArrayLike,
+    t2: ArrayLike,
     m1: ArrayLike = 0.0,
     m2: ArrayLike = 0.0,
 ) -> Real:
@@ -239,21 +239,21 @@ def random_incidence_absorption(
 
     Situation 1 is the empty room with the (static) base plate present;
     situation 2 adds the test sample, still without turntable rotation
-    (Table 2, rows T1 and T2).
+    (Table 2, rows t1 and t2).
 
     :param volume: Reverberation-room volume ``V``, in cubic metres.
     :param area: Test-sample area ``S``, in square metres.
-    :param c1: Speed of sound during ``T1``, in m/s (see :func:`speed_of_sound`).
-    :param T1: Reverberation time without sample (base plate only), in seconds.
-    :param c2: Speed of sound during ``T2``, in m/s.
-    :param T2: Reverberation time with the test sample, in seconds.
-    :param m1: Energy attenuation coefficient during ``T1``, in 1/m
+    :param c1: Speed of sound during ``t1``, in m/s (see :func:`speed_of_sound`).
+    :param t1: Reverberation time without sample (base plate only), in seconds.
+    :param c2: Speed of sound during ``t2``, in m/s.
+    :param t2: Reverberation time with the test sample, in seconds.
+    :param m1: Energy attenuation coefficient during ``t1``, in 1/m
         (see :func:`air_attenuation_coefficient`); defaults to 0.
-    :param m2: Energy attenuation coefficient during ``T2``, in 1/m; defaults to 0.
+    :param m2: Energy attenuation coefficient during ``t2``, in 1/m; defaults to 0.
     :return: Random-incidence absorption coefficient ``alpha_s`` (per band).
     :raises ValueError: for non-positive ``V``, ``S``, ``c`` or ``T``.
     """
-    return _sabine_absorption(volume, area, (c1, T1, m1), (c2, T2, m2))
+    return _sabine_absorption(volume, area, (c1, t1, m1), (c2, t2, m2))
 
 
 def specular_absorption_coefficient(
@@ -261,9 +261,9 @@ def specular_absorption_coefficient(
     area: float,
     *,
     c3: ArrayLike,
-    T3: ArrayLike,
+    t3: ArrayLike,
     c4: ArrayLike,
-    T4: ArrayLike,
+    t4: ArrayLike,
     m3: ArrayLike = 0.0,
     m4: ArrayLike = 0.0,
 ) -> Real:
@@ -276,21 +276,21 @@ def specular_absorption_coefficient(
        - \frac{4 V}{S} (m_4 - m_3)
 
     Situation 3 is the rotating base plate without the sample; situation 4 is
-    the sample on the rotating turntable (Table 2, rows T3 and T4). The
+    the sample on the rotating turntable (Table 2, rows t3 and t4). The
     apparent (specular) absorption includes the energy lost to scattering.
 
     :param volume: Reverberation-room volume ``V``, in cubic metres.
     :param area: Test-sample area ``S``, in square metres.
-    :param c3: Speed of sound during ``T3``, in m/s.
-    :param T3: Reverberation time, rotating base plate without sample, in seconds.
-    :param c4: Speed of sound during ``T4``, in m/s.
-    :param T4: Reverberation time, sample on the rotating turntable, in seconds.
-    :param m3: Energy attenuation coefficient during ``T3``, in 1/m; defaults to 0.
-    :param m4: Energy attenuation coefficient during ``T4``, in 1/m; defaults to 0.
+    :param c3: Speed of sound during ``t3``, in m/s.
+    :param t3: Reverberation time, rotating base plate without sample, in seconds.
+    :param c4: Speed of sound during ``t4``, in m/s.
+    :param t4: Reverberation time, sample on the rotating turntable, in seconds.
+    :param m3: Energy attenuation coefficient during ``t3``, in 1/m; defaults to 0.
+    :param m4: Energy attenuation coefficient during ``t4``, in 1/m; defaults to 0.
     :return: Specular absorption coefficient ``alpha_spec`` (per band).
     :raises ValueError: for non-positive ``V``, ``S``, ``c`` or ``T``.
     """
-    return _sabine_absorption(volume, area, (c3, T3, m3), (c4, T4, m4))
+    return _sabine_absorption(volume, area, (c3, t3, m3), (c4, t4, m4))
 
 
 def scattering_coefficient(
@@ -460,9 +460,9 @@ def base_plate_scattering(
     area: float,
     *,
     c1: ArrayLike,
-    T1: ArrayLike,
+    t1: ArrayLike,
     c3: ArrayLike,
-    T3: ArrayLike,
+    t3: ArrayLike,
     m1: ArrayLike = 0.0,
     m3: ArrayLike = 0.0,
 ) -> Real:
@@ -475,23 +475,23 @@ def base_plate_scattering(
        - \frac{4 V}{S} (m_3 - m_1)
 
     Ideally :math:`T_1 = T_3`; a slightly non-symmetrical base plate shortens
-    ``T3``
+    ``t3``
     and this quality metric captures the resulting spurious scattering, which
     must not exceed the Table 1 limits (Clause 6.2). See
     :func:`check_base_plate_scattering`.
 
     :param volume: Reverberation-room volume ``V``, in cubic metres.
     :param area: Test-sample area ``S``, in square metres.
-    :param c1: Speed of sound during ``T1``, in m/s.
-    :param T1: Reverberation time with the static base plate, in seconds.
-    :param c3: Speed of sound during ``T3``, in m/s.
-    :param T3: Reverberation time with the rotating base plate, in seconds.
-    :param m1: Energy attenuation coefficient during ``T1``, in 1/m; defaults to 0.
-    :param m3: Energy attenuation coefficient during ``T3``, in 1/m; defaults to 0.
+    :param c1: Speed of sound during ``t1``, in m/s.
+    :param t1: Reverberation time with the static base plate, in seconds.
+    :param c3: Speed of sound during ``t3``, in m/s.
+    :param t3: Reverberation time with the rotating base plate, in seconds.
+    :param m1: Energy attenuation coefficient during ``t1``, in 1/m; defaults to 0.
+    :param m3: Energy attenuation coefficient during ``t3``, in 1/m; defaults to 0.
     :return: Base-plate scattering coefficient ``s_base`` (per band).
     :raises ValueError: for non-positive ``V``, ``S``, ``c`` or ``T``.
     """
-    return _sabine_absorption(volume, area, (c1, T1, m1), (c3, T3, m3))
+    return _sabine_absorption(volume, area, (c1, t1, m1), (c3, t3, m3))
 
 
 def check_base_plate_scattering(
@@ -583,9 +583,9 @@ def absorption_coefficient_uncertainty(
     area: float,
     *,
     c: ArrayLike,
-    T_a: ArrayLike,
+    t_a: ArrayLike,
     u_a: ArrayLike,
-    T_b: ArrayLike,
+    t_b: ArrayLike,
     u_b: ArrayLike,
 ) -> Real:
     r"""Uncertainty of a Sabine absorption coefficient (ISO 17497-1, A.3/A.4).
@@ -593,27 +593,27 @@ def absorption_coefficient_uncertainty(
     .. math::
 
        u_\alpha = \frac{55.3 V}{c S}
-       \sqrt{(u_b / T_b^2)^2 + (u_a / T_a^2)^2}
+       \sqrt{(u_b / t_b^2)^2 + (u_a / t_a^2)^2}
 
-    With situations ``(T1, T2)`` this is ``u(alpha_s)`` (Eq. (A.3)); with
-    ``(T3, T4)`` it is ``u(alpha_spec)`` (Eq. (A.4)). The unsubscripted ``c`` of
+    With situations ``(t1, t2)`` this is ``u(alpha_s)`` (Eq. (A.3)); with
+    ``(t3, t4)`` it is ``u(alpha_spec)`` (Eq. (A.4)). The unsubscripted ``c`` of
     the standard is taken as a single (mean) speed of sound.
 
     :param volume: Reverberation-room volume ``V``, in cubic metres.
     :param area: Test-sample area ``S``, in square metres.
     :param c: Speed of sound ``c``, in m/s.
-    :param T_a: Reverberation time of the first situation, in seconds.
-    :param u_a: Standard uncertainty of ``T_a`` (Eq. (A.1)), in seconds.
-    :param T_b: Reverberation time of the second situation, in seconds.
-    :param u_b: Standard uncertainty of ``T_b`` (Eq. (A.1)), in seconds.
+    :param t_a: Reverberation time of the first situation, in seconds.
+    :param u_a: Standard uncertainty of ``t_a`` (Eq. (A.1)), in seconds.
+    :param t_b: Reverberation time of the second situation, in seconds.
+    :param u_b: Standard uncertainty of ``t_b`` (Eq. (A.1)), in seconds.
     :return: Combined standard uncertainty of the absorption coefficient (per band).
     :raises ValueError: for non-positive ``V``, ``S``, ``c`` or ``T``.
     """
     vol = _positive_scalar(volume, "volume")
     surf = _positive_scalar(area, "area")
     c_arr = _positive_array(c, "c")
-    ta = _positive_array(T_a, "T_a")
-    tb = _positive_array(T_b, "T_b")
+    ta = _positive_array(t_a, "t_a")
+    tb = _positive_array(t_b, "t_b")
     ua = _nonneg_array(u_a, "u_a")
     ub = _nonneg_array(u_b, "u_b")
     prefactor = _SABINE_CONSTANT * vol / (c_arr * surf)

@@ -48,6 +48,9 @@ _NUM_BANDS = 7
 # 7943.3 * 2^0.5 = 11220 Hz), so fs/2 must exceed it.
 _MIN_FS = 22500
 
+#: Rejection message for a non-positive sampling rate.
+_FS_NOT_POSITIVE_MSG = "Sample rate 'fs' must be positive."
+
 # The 14 full-STI modulation frequencies, 0.63-12.5 Hz in nominal
 # one-third-octave steps (Ed.4 A.2.2 = Ed.5).
 _MOD_FREQS = np.array(
@@ -392,7 +395,7 @@ def sti_from_impulse_response(
     if ir_proc.ndim != 1:
         raise ValueError("sti_from_impulse_response expects a 1D impulse response.")
     if fs <= 0:
-        raise ValueError("Sample rate 'fs' must be positive.")
+        raise ValueError(_FS_NOT_POSITIVE_MSG)
     if fs < _MIN_FS:
         raise ValueError(
             f"Sample rate 'fs' must be >= {_MIN_FS} Hz: the 8 kHz octave band "
@@ -534,7 +537,7 @@ def stipa(
     if x_proc.ndim != 1:
         raise ValueError("stipa expects a 1D signal.")
     if fs <= 0:
-        raise ValueError("Sample rate 'fs' must be positive.")
+        raise ValueError(_FS_NOT_POSITIVE_MSG)
     if fs < _MIN_FS:
         raise ValueError(
             f"Sample rate 'fs' must be >= {_MIN_FS} Hz: the 8 kHz octave band "
@@ -603,7 +606,7 @@ def stipa_signal(
     :return: Test signal, 1D array of ``round(seconds * fs)`` samples.
     """
     if fs <= 0:
-        raise ValueError("Sample rate 'fs' must be positive.")
+        raise ValueError(_FS_NOT_POSITIVE_MSG)
     if fs < _MIN_FS:
         raise ValueError(
             f"Sample rate 'fs' must be >= {_MIN_FS} Hz: the 8 kHz half-octave "

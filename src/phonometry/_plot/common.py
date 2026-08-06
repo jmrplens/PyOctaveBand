@@ -390,6 +390,9 @@ def _fill_weight(
     return 1.0
 
 
+#: Axis label of every frequency abscissa these shared renderers draw.
+_LABEL_FREQUENCY_HZ: Final = "Frequency [Hz]"
+
 #: Common axis labels reused across the underwater-propagation plots.
 _LABEL_DEPTH_M: Final = "Depth [m]"
 _LABEL_TL_DB: Final = "Transmission loss [dB]"
@@ -404,7 +407,7 @@ _LABEL_RANGE_KM: Final = "Range [km]"
 #: unchanged: the lookup misses and falls back to the given text. English is
 #: always a no-op, so the byte-identical English guarantee holds.
 _STRINGS: dict[str, str] = {
-    "Frequency [Hz]": "Frecuencia [Hz]",
+    _LABEL_FREQUENCY_HZ: "Frecuencia [Hz]",
     "Band": "Banda",
     "Measured": "Medido",
     "Shifted reference": "Referencia desplazada",
@@ -454,7 +457,7 @@ def _freq_axis(ax: Axes, freqs: np.ndarray, *, language: str = "en") -> None:
     # Suppress the log-scale minor-tick labels (2x10^2, 3x10^2, ...) that would
     # otherwise collide with off-decade band centres such as 750 or 1500 Hz.
     ax.xaxis.set_minor_formatter(mticker.NullFormatter())
-    ax.set_xlabel(_t("Frequency [Hz]", language))
+    ax.set_xlabel(_t(_LABEL_FREQUENCY_HZ, language))
 
 
 def _format_freq(f: float) -> str:
@@ -535,7 +538,7 @@ def _band_axis(
     ax: Axes,
     labels_or_freqs: np.ndarray | Sequence[str] | Sequence[float],
     *,
-    xlabel: str | None = "Frequency [Hz]",
+    xlabel: str | None = _LABEL_FREQUENCY_HZ,
     language: str = "en",
 ) -> np.ndarray:
     """Categorical band x-axis: evenly spaced positions labelled with centres.
@@ -548,7 +551,7 @@ def _band_axis(
     """
     labels = [
         item if isinstance(item, str) else _format_freq(float(item))
-        for item in list(labels_or_freqs)
+        for item in labels_or_freqs
     ]
     positions = np.arange(len(labels), dtype=np.float64)
     ax.set_xticks(positions)
@@ -1054,7 +1057,7 @@ def _plot_band_level_bars(
     n = lw.size
     if frequencies is not None:
         labels = [decimal_comma(f"{f:g}", language) for f in np.asarray(frequencies)]
-        ax.set_xlabel(_t("Frequency [Hz]", language))
+        ax.set_xlabel(_t(_LABEL_FREQUENCY_HZ, language))
     else:
         labels = [str(i + 1) for i in range(n)]
         ax.set_xlabel(_t("Band", language))

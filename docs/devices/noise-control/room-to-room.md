@@ -65,7 +65,9 @@ speaking into the same 8 m x 9 m x 3 m receiving room through the same
 
 ```python
 import numpy as np
-from phonometry import equivalent_absorption_area, room_to_room_transmission
+from phonometry import (
+    SourceRoom, equivalent_absorption_area, room_to_room_transmission,
+)
 
 bands = [125.0, 250.0, 500.0, 1000.0, 2000.0, 4000.0]
 
@@ -85,7 +87,8 @@ partitions = {
 }
 for name, tl in partitions.items():
     res = room_to_room_transmission(
-        bands, tl, 8.0 * 3.0, receiving, source_level=90.0, label=name,
+        bands, tl, 8.0 * 3.0, receiving,
+        source=SourceRoom(level=90.0), label=name,
     )
     print(f"{name:32s} {np.round(res.noise_reduction, 1)}")
 # Two 13 mm wallboards, 64 mm gap  [18.5 26.8 38.  47.8 47.3 43.9]
@@ -130,8 +133,8 @@ $10\log_{10} 4 = 6.02\ \text{dB}$, and without it the printed answers come out
 
 ```python
 from phonometry import (
-    equivalent_absorption_area, mean_absorption, room_constant,
-    room_to_room_transmission,
+    DesignCriterion, SourceRoom, equivalent_absorption_area, mean_absorption,
+    room_constant, room_to_room_transmission,
 )
 
 bands = [125.0, 250.0, 500.0, 1000.0, 2000.0, 4000.0]
@@ -151,11 +154,13 @@ chain = room_to_room_transmission(
     [39.0, 42.0, 50.0, 58.0, 63.0, 67.0],       # TL of the separating wall
     5.0 * 3.0,                                  # the wall is 5 m x 3 m
     equivalent_absorption_area(operator),
-    source_power_level=[105.0, 103.0, 98.0, 108.0, 107.0, 109.0],
-    source_room_constant=room_constant(268.0, mean_absorption(plant)),
-    source_directivity=4.0,                     # floor-wall intersection
-    source_model="constant_volume",              # the conservative bound
-    target=45.0,
+    source=SourceRoom(
+        power_level=[105.0, 103.0, 98.0, 108.0, 107.0, 109.0],
+        room_constant=room_constant(268.0, mean_absorption(plant)),
+        directivity=4.0,                        # floor-wall intersection
+        model="constant_volume",                # the conservative bound
+    ),
+    criterion=DesignCriterion(target=45.0),
     label="Plant room to operator room",
 )
 
@@ -332,7 +337,8 @@ and air leaks**. A ceiling void carried over the partition, a service
 penetration, a door undercut, or the wall simply not reaching the structural
 slab, and the equation's answer becomes an upper bound.
 
-`flanking_penalty` is the explicit debit for that, in decibels off the
+`DesignCriterion.flanking_penalty` is the explicit debit for that, in
+decibels off the
 predicted noise reduction. It is not a model, it is a place to record the
 allowance and have it show up in `.table()` and in the required
 transmission loss rather than get lost:
@@ -342,7 +348,8 @@ transmission loss rather than get lost:
 honest = room_to_room_transmission(
     bands, [39.0, 42.0, 50.0, 58.0, 63.0, 67.0], 15.0,
     equivalent_absorption_area(operator),
-    source_level=chain.source_level, target=45.0, flanking_penalty=3.0,
+    source=SourceRoom(level=chain.source_level),
+    criterion=DesignCriterion(target=45.0, flanking_penalty=3.0),
 )
 print(np.round(honest.received_level, 1))
 # [75.4 63.4 44.4 44.  36.9 33.7]      every band 3 dB worse

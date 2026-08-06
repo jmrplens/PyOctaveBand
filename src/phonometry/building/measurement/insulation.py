@@ -630,6 +630,21 @@ def _as_band_levels(
     return out
 
 
+def _validate_reverberation(t: np.ndarray, t0: float) -> None:
+    """Check the receiving-room reverberation time and its reference.
+
+    ``t2`` must hold one positive, finite value per band and the reference
+    time ``T0`` must be positive; the same requirement applies to every
+    ISO 16283 part.
+    """
+    if t.ndim != 1:
+        raise ValueError("'t2' must be one-dimensional (one value per band).")
+    if not np.all(np.isfinite(t)) or np.any(t <= 0.0):
+        raise ValueError("'t2' must contain positive, finite values.")
+    if t0 <= 0.0:
+        raise ValueError("'t0' must be positive.")
+
+
 def airborne_insulation(
     l1: Sequence[float] | np.ndarray,
     l2: Sequence[float] | np.ndarray,
@@ -678,12 +693,7 @@ def airborne_insulation(
 
     if not (l1_bands.shape == l2_bands.shape == t.shape):
         raise ValueError("'l1', 'l2' and 't2' must share the same band count.")
-    if t.ndim != 1:
-        raise ValueError("'t2' must be one-dimensional (one value per band).")
-    if not np.all(np.isfinite(t)) or np.any(t <= 0.0):
-        raise ValueError("'t2' must contain positive, finite values.")
-    if t0 <= 0.0:
-        raise ValueError("'t0' must be positive.")
+    _validate_reverberation(t, t0)
 
     d = l1_bands - l2_bands
     dnt = d + 10.0 * np.log10(t / t0)
@@ -749,12 +759,7 @@ def impact_insulation(
 
     if li_bands.shape != t.shape:
         raise ValueError("'li' and 't2' must share the same band count.")
-    if t.ndim != 1:
-        raise ValueError("'t2' must be one-dimensional (one value per band).")
-    if not np.all(np.isfinite(t)) or np.any(t <= 0.0):
-        raise ValueError("'t2' must contain positive, finite values.")
-    if t0 <= 0.0:
-        raise ValueError("'t0' must be positive.")
+    _validate_reverberation(t, t0)
 
     l_n_t = li_bands - 10.0 * np.log10(t / t0)
 
@@ -768,6 +773,33 @@ def impact_insulation(
     return ImpactInsulationResult(
         l_n_t=l_n_t, l_n=l_n, li=li_bands, t2=t, t0=t0,
     )
+
+
+def _validate_facade_geometry(
+    area: float | None,
+    volume: float | None,
+    surface_level: Sequence[float] | np.ndarray | None,
+) -> None:
+    """Check the optional façade geometry against the element method.
+
+    ``area`` and ``volume`` must be positive when given, and the apparent
+    sound reduction index needs the surface level, the element area and the
+    receiving-room volume together.
+    """
+    if volume is not None and volume <= 0.0:
+        raise ValueError("'volume' must be positive.")
+    if area is not None and area <= 0.0:
+        raise ValueError("'area' must be positive.")
+    if area is not None and surface_level is None:
+        raise ValueError(
+            "'area' requires 'surface_level' to compute the apparent sound "
+            "reduction index R'."
+        )
+    if surface_level is not None and area is not None and volume is None:
+        raise ValueError(
+            "'volume' is required with 'surface_level' and 'area' to compute "
+            "the apparent sound reduction index R'."
+        )
 
 
 def facade_insulation(
@@ -856,30 +888,12 @@ def facade_insulation(
         raise ValueError(
             "'l1_2m', 'l2' and 't2' must share the same band count."
         )
-    if t.ndim != 1:
-        raise ValueError("'t2' must be one-dimensional (one value per band).")
-    if not np.all(np.isfinite(t)) or np.any(t <= 0.0):
-        raise ValueError("'t2' must contain positive, finite values.")
-    if t0 <= 0.0:
-        raise ValueError("'t0' must be positive.")
+    _validate_reverberation(t, t0)
 
     d_2m = l1_bands - l2_bands
     d_2m_nt = d_2m + 10.0 * np.log10(t / t0)
 
-    if volume is not None and volume <= 0.0:
-        raise ValueError("'volume' must be positive.")
-    if area is not None and area <= 0.0:
-        raise ValueError("'area' must be positive.")
-    if area is not None and surface_level is None:
-        raise ValueError(
-            "'area' requires 'surface_level' to compute the apparent sound "
-            "reduction index R'."
-        )
-    if surface_level is not None and area is not None and volume is None:
-        raise ValueError(
-            "'volume' is required with 'surface_level' and 'area' to compute "
-            "the apparent sound reduction index R'."
-        )
+    _validate_facade_geometry(area, volume, surface_level)
 
     # Sabine equivalent absorption area A = 0,16 V / T (Clause 3.17).
     absorption = 0.16 * volume / t if volume is not None else None

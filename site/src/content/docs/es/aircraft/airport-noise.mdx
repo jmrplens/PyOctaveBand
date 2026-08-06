@@ -134,8 +134,9 @@ power = np.where(xs < 3000.0, 12000.0, 10000.0)
 path = np.column_stack([xs, np.zeros_like(xs), z, power, np.full_like(xs, 82.3)])
 ground_roll = xs[:-1] < 1500.0   # rodaje de despegue: segmentos aún en pista
 
+segments = aircraft.FlightSegmentState(ground_roll=ground_roll)
 contour = aircraft.noise_contour(path, powers, distances, sel, lmax,
-                                 ground_roll=ground_roll,
+                                 segments=segments,
                                  x=np.linspace(-2500.0, 20000.0, 56),
                                  y=np.linspace(-6000.0, 6000.0, 44))
 contour.plot(language="es")   # huella SEL de evento único (requiere matplotlib)
@@ -200,7 +201,8 @@ xs = np.linspace(0.0, 18000.0, 40)
 path = np.column_stack([xs, np.zeros_like(xs), np.clip((xs-1500)*0.11, 0, 2500),
                         np.where(xs < 3000, 12000.0, 10000.0), np.full_like(xs, 82.3)])
 ground_roll = xs[:-1] < 1500.0   # rodaje de despegue: segmentos aún en pista
-aircraft.noise_contour(path, powers, distances, sel, lmax, ground_roll=ground_roll,
+aircraft.noise_contour(path, powers, distances, sel, lmax,
+                 segments=aircraft.FlightSegmentState(ground_roll=ground_roll),
                  x=np.linspace(-2500, 20000, 60),
                  y=np.linspace(-6000, 6000, 48)).plot(language="es")
 ```
@@ -211,10 +213,10 @@ fracción de ruido y la directividad de inicio de rodaje (turbofán y turbohéli
 reproducen los valores de referencia con $< 0{,}01\ \text{dB}$, y la suma
 energética de segmentos coincide con el `SEL` de referencia.
 
-El modelo cubre también el rodaje de aterrizaje (máscara `landing_roll`:
-fracción de ruido reducida Ec. 4-21b, geometría al extremo más cercano, sin
-término de directividad), el ángulo de alabeo por segmento (`bank`, positivo
-con el ala de estribor arriba; el ángulo de depresión es
+El modelo cubre también el rodaje de aterrizaje (la máscara `landing_roll` del
+`FlightSegmentState`: fracción de ruido reducida Ec. 4-21b, geometría al
+extremo más cercano, sin término de directividad), el ángulo de alabeo por
+segmento (su `bank`, positivo con el ala de estribor arriba; el ángulo de depresión es
 $\varphi = \beta + \varepsilon$ para observadores a estribor de la traza y
 $\varphi = \beta - \varepsilon$ para observadores a babor,
 §4.5.2), la geometría lateral §4.5.5 al extremo más cercano detrás

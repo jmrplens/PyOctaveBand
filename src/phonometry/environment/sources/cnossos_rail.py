@@ -1547,6 +1547,38 @@ def _vehicle_spectra(
     return directional, omni, components
 
 
+def _summed_or_silent(
+    rows: list[NDArray[np.float64]], n_bands: int
+) -> NDArray[np.float64]:
+    """Energy sum of the collected spectra, or silence when none was collected."""
+    if not rows:
+        return np.full(n_bands, -np.inf)
+    return _energy_sum(*rows)
+
+
+def _directed_vehicle_power(
+    sources: list[list[NDArray[np.float64]]],
+    omni: list[NDArray[np.float64]],
+    flow: float,
+    hor: NDArray[np.float64],
+    ver: list[NDArray[np.float64]],
+) -> list[NDArray[np.float64] | None]:
+    """Directed power of one vehicle per source height, ``None`` where silent.
+
+    Applies the directivity of (2.3.5) to the directional sources of each
+    height, adds the omnidirectional ones (which all sit at source A) and then
+    the flow term of (2.3.2)/(2.3.4).
+    """
+    totals: list[NDArray[np.float64] | None] = []
+    for h in (0, 1):
+        emitted = list(sources[h])
+        directed = [_energy_sum(*emitted) + hor + ver[h]] if emitted else []  # (2.3.5)
+        if h == 0:
+            directed.extend(omni)
+        totals.append(_energy_sum(*directed) + flow if directed else None)
+    return totals
+
+
 def railway_source_power(
     traffic: RailwayVehicle | list[RailwayVehicle] | tuple[RailwayVehicle, ...],
     track: RailwayTrack,
@@ -1617,22 +1649,13 @@ def railway_source_power(
         for name, height, spectrum in breakdown:
             components[name][height].append(spectrum)
         flow = _flow_term(vehicle, reference_time, track.length)
-        for h in (0, 1):
-            emitted = list(sources[h])
-            directed = (
-                [_energy_sum(*emitted) + hor + ver[h]] if emitted else []
-            )  # (2.3.5)
-            if h == 0:
-                directed.extend(omni)
-            if not directed:
-                continue
-            per_height[h].append(_energy_sum(*directed) + flow)
+        directed = _directed_vehicle_power(sources, omni, flow, hor, ver)
+        for h, total in enumerate(directed):
+            if total is not None:
+                per_height[h].append(total)
 
     third = np.asarray(
-        [
-            _energy_sum(*rows) if rows else np.full(n_bands, -np.inf)
-            for rows in per_height
-        ],
+        [_summed_or_silent(rows, n_bands) for rows in per_height],
         dtype=np.float64,
     )  # (2.3.1)
     octaves = np.asarray(
@@ -1649,8 +1672,8 @@ def railway_source_power(
         total_line_power=_energy_sum(*octaves),
         components={
             name: (
-                _energy_sum(*rows[0]) if rows[0] else np.full(n_bands, -np.inf),
-                _energy_sum(*rows[1]) if rows[1] else np.full(n_bands, -np.inf),
+                _summed_or_silent(rows[0], n_bands),
+                _summed_or_silent(rows[1], n_bands),
             )
             for name, rows in components.items()
         },

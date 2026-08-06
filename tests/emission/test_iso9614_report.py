@@ -25,7 +25,7 @@ import numpy as np
 import pytest
 
 from phonometry import ReportMetadata
-from phonometry.emission import sound_power_intensity
+from phonometry.emission import SoundPowerWarning, sound_power_intensity
 
 _PDF_MAGIC = b"%PDF"
 
@@ -121,7 +121,8 @@ def test_report_renders_oracle_values(tmp_path) -> None:
     assert f"{lw[2]:.1f}" in text
     assert f"{lw[3]:.1f}" in text
     # Nominal band labels head the table / axis (not the exact base-ten centre).
-    assert "125" in text and "4000" in text
+    assert "125" in text
+    assert "4000" in text
     # Method grade and basis prose.
     assert "ISO 9614-2:1996" in text
     assert "engineering grade" in text
@@ -230,7 +231,7 @@ def test_negative_band_reported_as_dash(tmp_path) -> None:
     scan = np.tile(_INTENSITY, (_N_SEG, 1)).copy()
     # Drive the 250 Hz band net-negative (more energy flowing in than out).
     scan[:, 1] = -_INTENSITY[1]
-    with pytest.warns(Warning):
+    with pytest.warns(SoundPowerWarning, match="negative in one or more bands"):
         res = sound_power_intensity(
             scan, np.full(_N_SEG, _SEG_AREA), frequencies=_FREQS, band_type="octave"
         )

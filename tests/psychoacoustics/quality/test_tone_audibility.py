@@ -574,8 +574,9 @@ def test_plot_levels_view_draws_tone_levels_over_frequency() -> None:
 
 
 def test_plot_rejects_unknown_view() -> None:
+    result = _annex_e_result()
     with pytest.raises(ValueError, match="Unknown view"):
-        _annex_e_result().plot(view="spectrum")
+        result.plot(view="spectrum")
 
 
 # ---------------------------------------------------------------------------

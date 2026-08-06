@@ -135,12 +135,12 @@ def _band_range(f_low: float | None, f_high: float | None) -> tuple[int, int]:
     mid = (_F_CENTRE[:-1] + _F_CENTRE[1:]) / 2.0  # inter-band boundaries
     if f_low is not None:
         # z_L: lowest band whose upper boundary exceeds f_low (Formula 56).
-        candidates = np.where(f_low < mid)[0]
+        candidates = np.nonzero(f_low < mid)[0]
         z_lo = int(candidates[0]) if candidates.size else _CBF - 1
     if f_high is not None:
         # z_H: highest band whose lower boundary is below f_high (Formula 57);
         # f_high > mid[j] admits band j+1, so shift the index up by one.
-        candidates = np.where(f_high > mid)[0]
+        candidates = np.nonzero(f_high > mid)[0]
         z_hi = int(candidates[-1]) + 1 if candidates.size else 0
     return z_lo, min(z_hi, _CBF - 1)
 

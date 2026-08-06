@@ -291,6 +291,71 @@ def _level_array(values: np.ndarray, reference: float) -> np.ndarray:
     return np.asarray(10.0 * np.log10(guarded / reference), dtype=np.float64)
 
 
+def _band_integrals(
+    fpos: np.ndarray,
+    i_density: np.ndarray,
+    p_density: np.ndarray,
+    df: float,
+    fraction: int,
+    band_limits: list[float],
+    fs: int,
+) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
+    """Integrate the two spectral densities over the ANSI S1.11/IEC 61260-1 bands.
+
+    Returns the aligned (band centres, band intensities, band mean-square
+    pressures); bands with no spectral bin of their own are dropped, so the
+    arrays can be shorter than the nominal band list.
+    """
+    freq, freq_d, freq_u, _ = _genfreqs(band_limits, fraction, fs)
+    centers: list[float] = []
+    band_i: list[float] = []
+    band_msp: list[float] = []
+    for fc, lo, hi in zip(freq, freq_d, freq_u):
+        mask = (fpos > lo) & (fpos <= hi)
+        if not np.any(mask):
+            continue  # band narrower than the spectral resolution
+        centers.append(float(fc))
+        band_i.append(float(np.sum(i_density[mask]) * df))
+        band_msp.append(float(np.sum(p_density[mask]) * df))
+    return (
+        np.asarray(centers, dtype=np.float64),
+        np.asarray(band_i, dtype=np.float64),
+        np.asarray(band_msp, dtype=np.float64),
+    )
+
+
+def _validate_probe_signals(x1: np.ndarray, x2: np.ndarray) -> None:
+    """Reject microphone signals that are not a matched pair of 1D pressures."""
+    if x1.ndim != 1 or x2.ndim != 1:
+        raise ValueError("sound_intensity expects 1D pressure signals.")
+    if x1.size != x2.size:
+        raise ValueError(
+            f"Microphone signals must have the same length, got {x1.size} and {x2.size}."
+        )
+
+
+def _validate_probe_medium(fs: int, spacing: float, rho: float, c: float) -> None:
+    """Reject a non-physical sample rate, probe spacing or medium."""
+    if fs <= 0:
+        raise ValueError("Sample rate 'fs' must be positive.")
+    if spacing <= 0:
+        raise ValueError("Microphone 'spacing' must be positive.")
+    if rho <= 0:
+        raise ValueError("Air density 'rho' must be positive.")
+    if c <= 0:
+        raise ValueError("Speed of sound 'c' must be positive.")
+
+
+def _validate_band_options(fraction: int | None, limits: list[float] | None) -> None:
+    """Reject an unsupported band fraction or an ill-ordered frequency range."""
+    if fraction is not None and fraction not in (1, 3):
+        raise ValueError("'fraction' must be None, 1 (octave) or 3 (one-third octave).")
+    if limits is not None and (
+        len(limits) != 2 or limits[0] <= 0 or limits[1] <= limits[0]
+    ):
+        raise ValueError("'limits' must be [f_min, f_max] with 0 < f_min < f_max.")
+
+
 def sound_intensity(
     p1: list[float] | np.ndarray,
     p2: list[float] | np.ndarray,
@@ -367,26 +432,9 @@ def sound_intensity(
     """
     x1 = _typesignal(p1)
     x2 = _typesignal(p2)
-    if x1.ndim != 1 or x2.ndim != 1:
-        raise ValueError("sound_intensity expects 1D pressure signals.")
-    if x1.size != x2.size:
-        raise ValueError(
-            f"Microphone signals must have the same length, got {x1.size} and {x2.size}."
-        )
-    if fs <= 0:
-        raise ValueError("Sample rate 'fs' must be positive.")
-    if spacing <= 0:
-        raise ValueError("Microphone 'spacing' must be positive.")
-    if rho <= 0:
-        raise ValueError("Air density 'rho' must be positive.")
-    if c <= 0:
-        raise ValueError("Speed of sound 'c' must be positive.")
-    if fraction is not None and fraction not in (1, 3):
-        raise ValueError("'fraction' must be None, 1 (octave) or 3 (one-third octave).")
-    if limits is not None and (
-        len(limits) != 2 or limits[0] <= 0 or limits[1] <= limits[0]
-    ):
-        raise ValueError("'limits' must be [f_min, f_max] with 0 < f_min < f_max.")
+    _validate_probe_signals(x1, x2)
+    _validate_probe_medium(fs, spacing, rho, c)
+    _validate_band_options(fraction, limits)
     if x1.size < 32:
         raise ValueError(f"Signals too short for a spectral estimate: {x1.size} samples.")
 
@@ -432,21 +480,11 @@ def sound_intensity(
 
     if fraction is not None:
         band_limits = [float(limits[0]), float(limits[1])] if limits else [12.0, 20000.0]
-        freq, freq_d, freq_u, _ = _genfreqs(band_limits, fraction, fs)
-        centers: list[float] = []
-        band_i: list[float] = []
-        band_msp: list[float] = []
-        for fc, lo, hi in zip(freq, freq_d, freq_u):
-            mask = (fpos > lo) & (fpos <= hi)
-            if not np.any(mask):
-                continue  # band narrower than the spectral resolution
-            centers.append(float(fc))
-            band_i.append(float(np.sum(i_density[mask]) * df))
-            band_msp.append(float(np.sum(p_density[mask]) * df))
-        frequency = np.asarray(centers, dtype=np.float64)
-        intensity = np.asarray(band_i, dtype=np.float64)
+        frequency, intensity, band_msp = _band_integrals(
+            fpos, i_density, p_density, df, fraction, band_limits, fs
+        )
         intensity_level = _level_array(np.abs(intensity), _I0)
-        pressure_level = _level_array(np.asarray(band_msp, dtype=np.float64), _P0**2)
+        pressure_level = _level_array(band_msp, _P0**2)
         pressure_intensity_index = pressure_level - intensity_level
         direction = np.where(intensity >= 0.0, 1, -1)
         # IEC 61043:1993, 7.3: finite-difference response sin(k*dr)/(k*dr)

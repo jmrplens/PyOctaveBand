@@ -44,7 +44,8 @@ from phonometry._plot import common as _plotting
 def test_room_acoustics_two_panels_and_bar_heights() -> None:
     res = _room(limits=[250, 2000])
     axes = res.plot()
-    assert isinstance(axes, np.ndarray) and axes.size == 2
+    assert isinstance(axes, np.ndarray)
+    assert axes.size == 2
     ax_times = axes[0]
     n = res.t30.size
     # 3 grouped bars (EDT/T20/T30) per band.

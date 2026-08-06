@@ -27,6 +27,11 @@ from .common import (
     _new_axes,
 )
 
+#: Legend label of the Rice peak-height curve, parameterised by the
+#: irregularity factor ``r`` (Bendat & Piersol 5.5.4); the same in both
+#: languages.
+_RICE_CURVE_LABEL = "Rice (r = {r})"
+
 #: Spanish translations of the fixed strings rendered by the metrology
 #: ``.plot()`` renderers, keyed by their verbatim English text. ``_t``
 #: returns the English key unchanged for any language other than ``"es"``,
@@ -70,7 +75,7 @@ _STRINGS: dict[str, str] = {
     "Level-crossing rate (Bendat & Piersol 5.5.1)":
         "Tasa de cruces por nivel (Bendat y Piersol 5.5.1)",
     "Empirical peak exceedance": "Excedencia empírica de picos",
-    "Rice (r = {r})": "Rice (r = {r})",
+    _RICE_CURVE_LABEL: _RICE_CURVE_LABEL,
     "Rayleigh limit (r = 1)": "Límite de Rayleigh (r = 1)",
     "Gaussian limit (r = 0)": "Límite gaussiano (r = 0)",
     r"Standardized peak height $z = a/\sigma_x$":
@@ -375,7 +380,7 @@ def plot_peak_statistics(
     ax.plot(
         z, result.peak_exceedance(z), color=_C_REFERENCE, lw=1.5,
         label=_t(
-            "Rice (r = {r})", language,
+            _RICE_CURVE_LABEL, language,
             r=format_number(result.irregularity_factor, language, decimals=3,
                             trim=True),
         ),

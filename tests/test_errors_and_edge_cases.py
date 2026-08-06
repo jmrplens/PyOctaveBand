@@ -7,6 +7,7 @@ import numpy as np
 import pytest
 
 from phonometry import (
+    FilterDesign,
     OctaveFilterBank,
     linkwitz_riley,
     octave_filter,
@@ -52,7 +53,7 @@ def test_octave_filter_bank_invalid_init() -> None:
         OctaveFilterBank(fs=48000, limits=[2000, 1000])
         
     with pytest.raises(ValueError, match="Invalid filter_type"):
-        OctaveFilterBank(fs=48000, filter_type="invalid")
+        OctaveFilterBank(fs=48000, design=FilterDesign(filter_type="invalid"))
 
 
 def test_weighting_filter_invalid() -> None:
@@ -153,10 +154,12 @@ def test_octave_filter_vs_class_consistency() -> None:
     filter_type = "butter"
     
     # 1. Using function
-    spl_func, freq_func = octave_filter(x, fs=fs, fraction=fraction, order=order, filter_type=filter_type)
+    spl_func, freq_func = octave_filter(x, fs=fs, fraction=fraction, order=order,
+                                        design=FilterDesign(filter_type=filter_type))
     
     # 2. Using class
-    bank = OctaveFilterBank(fs=fs, fraction=fraction, order=order, filter_type=filter_type)
+    bank = OctaveFilterBank(fs=fs, fraction=fraction, order=order,
+                            design=FilterDesign(filter_type=filter_type))
     spl_class, freq_class = bank.filter(x)
     
     assert np.allclose(spl_func, spl_class)
@@ -245,8 +248,10 @@ def test_calculate_level_invalid_mode() -> None:
     """Verify invalid level calculation mode is rejected."""
     bank = OctaveFilterBank(48000)
 
+    signal = np.array([1.0])
+
     with pytest.raises(ValueError, match="Invalid mode\\. Use 'rms' or 'peak'\\."):
-        bank._calculate_level(np.array([1.0]), "invalid_mode")
+        bank._calculate_level(signal, "invalid_mode")
 
 
 def test_process_bands_without_level_calculation() -> None:

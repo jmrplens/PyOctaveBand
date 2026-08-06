@@ -85,8 +85,9 @@ def test_flat_improvement_shifts_delta_lw_one_for_one() -> None:
 
 
 def test_weighted_improvement_requires_16_bands() -> None:
+    five_bands = np.zeros(5)
     with pytest.raises(ValueError, match="16 one-third-octave"):
-        weighted_impact_improvement(np.zeros(5))
+        weighted_impact_improvement(five_bands)
 
 
 def test_weighted_improvement_rejects_non_finite() -> None:
@@ -195,7 +196,8 @@ def test_baruch_2018_published_spectrum_crosscheck() -> None:
     dlw_simplified = weighted_impact_improvement(baruch_simplified)
     assert dlw_simplified == 15  # matches the paper exactly
     assert dlw_full == 15  # paper prints 16; ISO 717-2 rounding boundary
-    assert abs(dlw_full - 16) <= 1 and abs(dlw_simplified - 15) <= 1
+    assert abs(dlw_full - 16) <= 1
+    assert abs(dlw_simplified - 15) <= 1
     # Both spectra reproduce the same rating through the ISO 16251-1 front-end.
     bare = np.full(16, 75.0)
     res_full = impact_improvement(bare, bare - baruch_full, freqs)
@@ -288,10 +290,12 @@ def test_background_correction_precedes_averaging() -> None:
 
 
 def test_impact_improvement_background_shape_validation() -> None:
+    bare = np.full((2, 2), 80.0)
+    covered = np.full((2, 2), 70.0)
+    mismatched_background = np.full((3, 2), 50.0)  # 3 rows against 2 positions
     with pytest.raises(ValueError, match="'background' must be"):
         impact_improvement(
-            np.full((2, 2), 80.0), np.full((2, 2), 70.0), [500.0, 1000.0],
-            background=np.full((3, 2), 50.0),
+            bare, covered, [500.0, 1000.0], background=mismatched_background,
         )
 
 

@@ -54,7 +54,8 @@ def test_coherence_unity_for_noiseless_path() -> None:
     f, g = coherence(x, y, FS)
     band = (f > 100.0) & (f < 5000.0)
     assert np.mean(g[band]) == pytest.approx(1.0, abs=1e-3)
-    assert np.all(g <= 1.0 + 1e-9) and np.all(g >= 0.0)
+    assert np.all(g <= 1.0 + 1e-9)
+    assert np.all(g >= 0.0)
 
 
 def test_coherence_matches_snr_formula() -> None:
@@ -92,8 +93,10 @@ def test_result_fields_and_plot() -> None:
 
 
 def test_rejects_mismatched_lengths() -> None:
+    x = np.zeros(1000)
+    shorter_y = np.zeros(500)
     with pytest.raises(ValueError):
-        transfer_function(np.zeros(1000), np.zeros(500), FS)
+        transfer_function(x, shorter_y, FS)
 
 
 def test_rejects_bad_estimator_and_overlap() -> None:
@@ -118,8 +121,9 @@ def test_rejects_bad_nperseg() -> None:
 
 
 def test_rejects_too_short_signal() -> None:
+    too_short = np.zeros(10)
     with pytest.raises(ValueError):
-        coherence(np.zeros(10), np.zeros(10), FS)
+        coherence(too_short, too_short, FS)
 
 
 def test_h1_input_noise_bias_matches_theory() -> None:

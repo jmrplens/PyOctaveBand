@@ -40,7 +40,8 @@ def test_weighting_class_limits_shape_and_known_values() -> None:
     assert (lower2[i1k], upper2[i1k]) == (-1.0, 1.0)
     # One-sided limits at the extreme bands (lower = -inf).
     i10 = freqs.tolist().index(10.0)
-    assert math.isinf(lower1[i10]) and lower1[i10] < 0
+    assert math.isinf(lower1[i10])
+    assert lower1[i10] < 0
     assert upper1[i10] == 3.0
     # Asymmetric class 1 limit at 16 kHz.
     i16k = freqs.tolist().index(16000.0)

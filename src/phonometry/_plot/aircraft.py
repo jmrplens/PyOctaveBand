@@ -46,9 +46,19 @@ if TYPE_CHECKING:
 #: returns the English key unchanged for any language other than ``"es"``,
 #: so the English output is byte-for-byte identical to the pre-i18n
 #: renderers.
+#: Labels the renderers repeat; the Spanish table is keyed by the same
+#: constants, so a label is written once.
+_TEN_DB_DOWN_LABEL = "10 dB-down window"
+_TIME_LABEL = "Time [s]"
+_SLANT_DISTANCE_LABEL = "Slant distance [m]"
+_EVENT_LEVEL_LABEL = "Event level [dB]"
+_TERRAIN_PROFILE_LABEL = "Terrain profile"
+_SECTION_DISTANCE_LABEL = "Section distance [m]"
+_HEIGHT_LABEL = "Height [m]"
+
 _STRINGS: dict[str, str] = {
-    "10 dB-down window": "Ventana 10 dB por debajo",
-    "Time [s]": "Tiempo [s]",
+    _TEN_DB_DOWN_LABEL: "Ventana 10 dB por debajo",
+    _TIME_LABEL: "Tiempo [s]",
     "Level [PNdB]": "Nivel [PNdB]",
     "SAE band": "Banda SAE",
     "Pure-tone mid-band (ISO 9613-1)": "Banda media de tono puro (ISO 9613-1)",
@@ -56,8 +66,8 @@ _STRINGS: dict[str, str] = {
     "Attenuation [dB]": "Atenuación [dB]",
     "Aircraft atmospheric absorption (SAE ARP 5534)": "Absorción atmosférica de aeronaves (SAE ARP 5534)",
     "Tabulated": "Tabulados",
-    "Slant distance [m]": "Distancia oblicua [m]",
-    "Event level [dB]": "Nivel del evento [dB]",
+    _SLANT_DISTANCE_LABEL: "Distancia oblicua [m]",
+    _EVENT_LEVEL_LABEL: "Nivel del evento [dB]",
     "Noise-power-distance curve (ECAC Doc 29)": "Curva ruido-potencia-distancia (ECAC Doc 29)",
     "Segment index": "Índice de segmento",
     "Segment {metric} [dB]": "{metric} por segmento [dB]",
@@ -77,10 +87,10 @@ _STRINGS: dict[str, str] = {
     "A-weighted level [dB(A)]": "Nivel ponderado A [dB(A)]",
     "Rotorcraft flyover time history (ECAC Doc 32)": "Historia temporal de sobrevuelo de rotorcraft (ECAC Doc 32)",
     "Rotorcraft noise contour (ECAC Doc 32)": "Curvas de ruido de rotorcraft (ECAC Doc 32)",
-    "Terrain profile": "Perfil del terreno",
+    _TERRAIN_PROFILE_LABEL: "Perfil del terreno",
     "Mean ground plane": "Plano medio del suelo",
-    "Section distance [m]": "Distancia de la sección [m]",
-    "Height [m]": "Altura [m]",
+    _SECTION_DISTANCE_LABEL: "Distancia de la sección [m]",
+    _HEIGHT_LABEL: "Altura [m]",
     "Mean ground plane (NORAH2 guidance Eq. 36-40)": "Plano medio del suelo (guía NORAH2 Ec. 36-40)",
     "Line of sight": "Línea de visión",
     "Diffracted path": "Trayectoria difractada",
@@ -127,13 +137,13 @@ def plot_epnl(result: EPNLResult, ax: Axes | None = None, *, language: str = "en
     # (svglib) does not preserve alpha, so a translucent fill would render solid
     # and hide the PNL/PNLT traces. A light face keeps both curves readable.
     ax.axvspan(t[kf], t[kl], facecolor="#d7eccb", edgecolor="none", zorder=0,
-               label=_t("10 dB-down window", language))
+               label=_t(_TEN_DB_DOWN_LABEL, language))
     ax.plot(t, np.asarray(result.pnl), color=_C_MUTED, lw=1.0, ls="--", label="PNL")
     ax.plot(t, np.asarray(result.pnlt), **{"color": _C_PRIMARY, "lw": 1.4, "label": "PNLT", **kwargs})
     km = int(np.argmax(np.asarray(result.pnlt)))
     ax.plot([t[km]], [result.pnltm], "o", color=_C_REFERENCE,
             label=f"PNLTM = {format_number(result.pnltm, language)} PNdB")
-    ax.set_xlabel(_t("Time [s]", language))
+    ax.set_xlabel(_t(_TIME_LABEL, language))
     ax.set_ylabel(_t("Level [PNdB]", language))
     ax.set_title(
         f"ICAO EPNL = {format_number(result.epnl, language)} EPNdB "
@@ -197,8 +207,8 @@ def plot_npd_level(result: NpdLevelResult, ax: Axes | None = None, *, language: 
     ax.plot(d, lvl, **{"color": _C_PRIMARY, "lw": 1.6, "label": label, **kwargs})
     ax.plot(td, tl, "o", color=_C_REFERENCE, ms=4, label=_t("Tabulated", language))
     ax.set_xscale("log")
-    ax.set_xlabel(_t("Slant distance [m]", language))
-    ax.set_ylabel(_t("Event level [dB]", language))
+    ax.set_xlabel(_t(_SLANT_DISTANCE_LABEL, language))
+    ax.set_ylabel(_t(_EVENT_LEVEL_LABEL, language))
     ax.set_title(_t("Noise-power-distance curve (ECAC Doc 29)", language))
     ax.grid(True, which="both", alpha=0.3)
     ax.legend(loc=_LEGEND_UPPER_RIGHT, fontsize="small")
@@ -329,7 +339,7 @@ def plot_flight_path_kinematics(
             "label": _t("Airspeed $V_A$", language), **kwargs})
     ax.plot(t, result.ground_speed, **{"color": _C_SECONDARY, "lw": 1.4,
             "ls": "--", "label": _t("Ground speed $V_g$", language), **kwargs})
-    ax.set_xlabel(_t("Time [s]", language))
+    ax.set_xlabel(_t(_TIME_LABEL, language))
     ax.set_ylabel(_t("Speed [m/s]", language))
     ax2 = ax.twinx()
     ax2.plot(t, result.path_angle, color=_C_TERTIARY, lw=1.4,
@@ -378,7 +388,7 @@ def plot_rotorcraft_event(
     if np.any(window):
         idx = np.nonzero(window)[0]
         ax.axvspan(t[idx[0]], t[idx[-1]], color=_C_PRIMARY, alpha=0.08,
-                   label=_t("10 dB-down window", language))
+                   label=_t(_TEN_DB_DOWN_LABEL, language))
     ax.set_xlabel(_t("Recorded time [s]", language))
     ax.set_ylabel(_t("A-weighted level [dB(A)]", language))
     ax.set_title(_t("Rotorcraft flyover time history (ECAC Doc 32)", language))
@@ -440,14 +450,14 @@ def plot_mean_ground_plane(
     ax = ax if ax is not None else _new_axes()
     d = np.asarray(result.distances, dtype=np.float64)
     z = np.asarray(result.heights, dtype=np.float64)
-    ax.plot(d, z, **{"color": _C_PRIMARY, "lw": 1.8, "label": _t("Terrain profile", language),
+    ax.plot(d, z, **{"color": _C_PRIMARY, "lw": 1.8, "label": _t(_TERRAIN_PROFILE_LABEL, language),
             **kwargs})
     ax.fill_between(d, z, z.min() - 0.05 * np.ptp(z) - 0.5, color=_C_PRIMARY,
                     alpha=0.08)
     ax.plot(d, result.height(d), color=_C_SECONDARY, lw=1.6, ls="--",
             label=f"{_t('Mean ground plane', language)} (a = {format_number(result.slope, language, decimals=3)})")
-    ax.set_xlabel(_t("Section distance [m]", language))
-    ax.set_ylabel(_t("Height [m]", language))
+    ax.set_xlabel(_t(_SECTION_DISTANCE_LABEL, language))
+    ax.set_ylabel(_t(_HEIGHT_LABEL, language))
     ax.set_title(_t("Mean ground plane (NORAH2 guidance Eq. 36-40)", language))
     ax.grid(True, alpha=0.3)
     ax.legend(loc=_LEGEND_UPPER_RIGHT, fontsize="small")
@@ -473,7 +483,7 @@ def plot_terrain_screening(
     d = np.asarray(result.distances, dtype=np.float64)
     z = np.asarray(result.heights, dtype=np.float64)
     src, rcv = result.source, result.receiver
-    ax.plot(d, z, **{"color": _C_MUTED, "lw": 1.8, "label": _t("Terrain profile", language),
+    ax.plot(d, z, **{"color": _C_MUTED, "lw": 1.8, "label": _t(_TERRAIN_PROFILE_LABEL, language),
             **kwargs})
     floor = min(z.min(), src[1], rcv[1]) - 0.05 * max(np.ptp(z), 1.0) - 0.5
     ax.fill_between(d, z, floor, color=theme_fill(_C_MUTED, ax), zorder=0)
@@ -492,8 +502,8 @@ def plot_terrain_screening(
     ax.plot(*rcv, "s", color=_C_SECONDARY, ms=6)
     ax.annotate("R", rcv, textcoords="offset points", xytext=(0, 8),
                 ha="center", fontsize=10)
-    ax.set_xlabel(_t("Section distance [m]", language))
-    ax.set_ylabel(_t("Height [m]", language))
+    ax.set_xlabel(_t(_SECTION_DISTANCE_LABEL, language))
+    ax.set_ylabel(_t(_HEIGHT_LABEL, language))
     ax.set_title(_t("Terrain screening (ECAC Doc 32 / NORAH2 guidance)", language))
     ax.grid(True, alpha=0.3)
     ax.legend(loc=_LEGEND_UPPER_RIGHT, fontsize="small")
@@ -522,8 +532,8 @@ def plot_anp_npd(
                 **kwargs})
         ax.plot(result.distances, result.levels[i], "o", ms=3, color=_C_MUTED)
     ax.set_xscale("log")
-    ax.set_xlabel(_t("Slant distance [m]", language))
-    ax.set_ylabel(_t("Event level [dB]", language))
+    ax.set_xlabel(_t(_SLANT_DISTANCE_LABEL, language))
+    ax.set_ylabel(_t(_EVENT_LEVEL_LABEL, language))
     ax.set_title(f"{_t('ANP NPD curves', language)} - {result.aircraft_id} "
                  f"({result.metric}, {result.operation})")
     ax.grid(True, which="both", alpha=0.3)

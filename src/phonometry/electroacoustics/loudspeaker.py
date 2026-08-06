@@ -230,6 +230,65 @@ def _effective_range(
 
 
 @dataclass(frozen=True)
+class LoudspeakerDirectivity:
+    """Directional characteristics of the loudspeaker (IEC 60268-5 Clause 23).
+
+    The clause's characteristics travel together: the directional response
+    pattern (23.1), a curve of the sound pressure level against the angle for a
+    stated frequency, and the directivity index read from it (23.3). The
+    pattern may be supplied measured, as ``polar``, or modelled, as the
+    directivity of a radiating piston.
+
+    :ivar piston: A
+        :class:`~phonometry.electroacoustics.RadiatingPistonResult` computed
+        with ``angles`` to supply the pattern and the directivity index; it
+        takes precedence over :attr:`polar` (23.1/23.3).
+    :ivar polar: Directional response pattern as ``(angles_deg, relative_db)``,
+        relative to the on-axis level, when it is not taken from
+        :attr:`piston` (23.1).
+    :ivar frequency: Stated frequency of the directional pattern, in Hz; it
+        also selects which of :attr:`piston`'s frequencies is drawn.
+    :ivar index_db: Directivity index at :attr:`frequency`, in dB (23.3), when
+        not taken from :attr:`piston`.
+    """
+
+    piston: RadiatingPistonResult | None = None
+    polar: tuple[ArrayLike, ArrayLike] | None = None
+    frequency: float | None = None
+    index_db: float | None = None
+
+
+#: No directional characteristics supplied: the Clause 23 default.
+_DEFAULT_DIRECTIVITY = LoudspeakerDirectivity()
+
+
+@dataclass(frozen=True)
+class LoudspeakerRatings:
+    """Manufacturer-stated ratings (IEC 60268-5 Clauses 18 and 19).
+
+    The rated characteristics the report prints rather than computes: the
+    rated input electrical power of Clause 18 and the rated frequency
+    characteristics of Clause 19.
+
+    :ivar frequency_range: Rated frequency range ``(lo, hi)`` in Hz (19.1).
+        When supplied it is also the range over which the 16.1 minimum
+        impedance modulus is evaluated.
+    :ivar noise_power: Rated noise power, in W (18.1).
+    :ivar sinusoidal_power: Rated sinusoidal power, in W (18.4).
+    :ivar resonance_frequency: Resonance frequency, in Hz (19.2).
+    """
+
+    frequency_range: tuple[float, float] | None = None
+    noise_power: float | None = None
+    sinusoidal_power: float | None = None
+    resonance_frequency: float | None = None
+
+
+#: No manufacturer ratings supplied: the Clause 18/19 default.
+_DEFAULT_RATINGS = LoudspeakerRatings()
+
+
+@dataclass(frozen=True)
 class LoudspeakerCharacteristics:
     """Rated loudspeaker characteristics for an IEC 60268-5 report.
 
@@ -410,24 +469,24 @@ class LoudspeakerCharacteristics:
         )
 
 
-def _polar_from_directivity(
-    directivity: RadiatingPistonResult, polar_frequency: float | None
+def _polar_from_piston(
+    piston: RadiatingPistonResult, polar_frequency: float | None
 ) -> tuple[NDArray[np.float64], NDArray[np.float64], float, float | None]:
     """Derive (angles_deg, relative_db, frequency, DI) from a piston result."""
-    if directivity.angles is None or directivity.directivity is None:
+    if piston.angles is None or piston.directivity is None:
         raise ValueError(
-            "'directivity' must be a radiating-piston result computed with "
+            "'directivity.piston' must be a radiating-piston result computed with "
             "'angles' so it carries a directivity pattern."
         )
-    freqs = np.asarray(directivity.frequencies, dtype=np.float64)
+    freqs = np.asarray(piston.frequencies, dtype=np.float64)
     target = float(polar_frequency) if polar_frequency is not None else float(freqs[freqs.size // 2])
     idx = int(np.argmin(np.abs(freqs - target)))
-    pattern = np.asarray(directivity.directivity[idx], dtype=np.float64)
+    pattern = np.asarray(piston.directivity[idx], dtype=np.float64)
     with np.errstate(divide="ignore"):
         rel_db = 20.0 * np.log10(np.abs(pattern))
     rel_db[~np.isfinite(rel_db)] = -120.0
-    angles_deg = np.degrees(np.asarray(directivity.angles, dtype=np.float64))
-    di = float(np.asarray(directivity.directivity_index, dtype=np.float64)[idx])
+    angles_deg = np.degrees(np.asarray(piston.angles, dtype=np.float64))
+    di = float(np.asarray(piston.directivity_index, dtype=np.float64)[idx])
     return angles_deg, rel_db, float(freqs[idx]), di
 
 
@@ -499,25 +558,24 @@ def _resolve_distortion(
 
 
 def _resolve_polar(
-    directivity: RadiatingPistonResult | None,
-    polar: tuple[ArrayLike, ArrayLike] | None,
-    polar_frequency: float | None,
-    directivity_index_db: float | None,
+    directivity: LoudspeakerDirectivity,
 ) -> tuple[
     NDArray[np.float64] | None, NDArray[np.float64] | None, float | None, float | None
 ]:
     """Resolve the optional polar response and directivity index (23.1/23.3)."""
-    if directivity is not None:
-        return _polar_from_directivity(directivity, polar_frequency)
+    polar_frequency = directivity.frequency
+    if directivity.piston is not None:
+        return _polar_from_piston(directivity.piston, polar_frequency)
+    polar = directivity.polar
     if polar is None:
-        return None, None, polar_frequency, directivity_index_db
+        return None, None, polar_frequency, directivity.index_db
     p_ang = np.atleast_1d(np.asarray(polar[0], dtype=np.float64))
     p_db = np.atleast_1d(np.asarray(polar[1], dtype=np.float64))
     if p_ang.ndim != 1 or p_ang.shape != p_db.shape:
         raise ValueError("'polar' angles and levels must be 1-D and equal length.")
     if not (np.all(np.isfinite(p_ang)) and np.all(np.isfinite(p_db))):
         raise ValueError("'polar' angles and levels must be finite.")
-    return p_ang, p_db, polar_frequency, directivity_index_db
+    return p_ang, p_db, polar_frequency, directivity.index_db
 
 
 def loudspeaker_characteristics(
@@ -529,16 +587,10 @@ def loudspeaker_characteristics(
     distance: float = 1.0,
     sensitivity_band: tuple[float, float] | None = None,
     tolerance_db: float = 3.0,
-    rated_frequency_range: tuple[float, float] | None = None,
-    rated_noise_power: float | None = None,
-    rated_sinusoidal_power: float | None = None,
-    resonance_frequency: float | None = None,
     impedance: tuple[ArrayLike, ArrayLike] | None = None,
     distortion: SweptSineDistortionResult | tuple[ArrayLike, ArrayLike] | None = None,
-    directivity: RadiatingPistonResult | None = None,
-    polar: tuple[ArrayLike, ArrayLike] | None = None,
-    polar_frequency: float | None = None,
-    directivity_index_db: float | None = None,
+    directivity: LoudspeakerDirectivity = _DEFAULT_DIRECTIVITY,
+    ratings: LoudspeakerRatings = _DEFAULT_RATINGS,
 ) -> LoudspeakerCharacteristics:
     r"""Assemble the rated loudspeaker characteristics for an IEC 60268-5
     report.
@@ -563,27 +615,18 @@ def loudspeaker_characteristics(
         maximum sensitivity.
     :param tolerance_db: Half-width of the plotted response tolerance band, in
         dB (default 3).
-    :param rated_frequency_range: Manufacturer-stated rated frequency range
-        ``(lo, hi)`` in Hz (19.1). When supplied it is also the range over
-        which the 16.1 minimum impedance modulus is evaluated.
-    :param rated_noise_power: Rated noise power, in W (18.1).
-    :param rated_sinusoidal_power: Rated sinusoidal power, in W (18.4).
-    :param resonance_frequency: Resonance frequency, in Hz (19.2).
     :param impedance: Impedance curve as ``(frequencies, modulus)`` in
         ``(Hz, ohm)`` (16.2).
     :param distortion: THD against frequency, either as a
         :class:`~phonometry.electroacoustics.SweptSineDistortionResult` (its
         ``thd`` ratio is converted to %) or a ``(frequencies, thd_percent)``
         pair (24.1).
-    :param directivity: A
-        :class:`~phonometry.electroacoustics.RadiatingPistonResult` computed
-        with ``angles`` to supply the polar response and directivity index
-        (23.1/23.3).
-    :param polar: Polar response as ``(angles_deg, relative_db)`` when it is not
-        taken from ``directivity``.
-    :param polar_frequency: Frequency of the polar response, in Hz.
-    :param directivity_index_db: Directivity index at ``polar_frequency``, in dB
-        (23.3), when not taken from ``directivity``.
+    :param directivity: Directional characteristics of Clause 23 as a
+        :class:`LoudspeakerDirectivity`: the pattern (measured or from a
+        radiating piston), its stated frequency and the directivity index.
+    :param ratings: Manufacturer-stated ratings of Clauses 18 and 19 as a
+        :class:`LoudspeakerRatings`: the rated frequency range, the rated
+        noise and sinusoidal powers and the resonance frequency.
     :return: A :class:`LoudspeakerCharacteristics`.
     :raises ValueError: If the inputs are invalid.
     """
@@ -603,12 +646,10 @@ def loudspeaker_characteristics(
     sensitivity_level = _characteristic_sensitivity_level(f, spl, band, r, u, d)
     imp_f, imp_z = _resolve_impedance(impedance)
     thd_f, thd_p = _resolve_distortion(distortion)
-    p_ang, p_db, p_freq, di = _resolve_polar(
-        directivity, polar, polar_frequency, directivity_index_db
-    )
+    p_ang, p_db, p_freq, di = _resolve_polar(directivity)
     rated_range = (
-        (float(rated_frequency_range[0]), float(rated_frequency_range[1]))
-        if rated_frequency_range is not None
+        (float(ratings.frequency_range[0]), float(ratings.frequency_range[1]))
+        if ratings.frequency_range is not None
         else None
     )
 
@@ -624,12 +665,14 @@ def loudspeaker_characteristics(
         sensitivity_level_db=sensitivity_level,
         effective_range=effective,
         rated_frequency_range=rated_range,
-        rated_noise_power=_optional_positive(rated_noise_power, "rated_noise_power"),
+        rated_noise_power=_optional_positive(
+            ratings.noise_power, "ratings.noise_power"
+        ),
         rated_sinusoidal_power=_optional_positive(
-            rated_sinusoidal_power, "rated_sinusoidal_power"
+            ratings.sinusoidal_power, "ratings.sinusoidal_power"
         ),
         resonance_frequency=_optional_positive(
-            resonance_frequency, "resonance_frequency"
+            ratings.resonance_frequency, "ratings.resonance_frequency"
         ),
         impedance_frequencies=imp_f,
         impedance_modulus=imp_z,

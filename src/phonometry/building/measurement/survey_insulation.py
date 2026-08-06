@@ -103,6 +103,13 @@ def _validate_report_request(engine: str, language: str) -> None:
             f"Unknown report engine {engine!r}; only 'reportlab' is supported."
         )
 
+#: Refusal raised by every survey-result ``plot()`` when the measured band set
+#: is too coarse for the ISO 717 weighted rating the plot draws against.
+_NO_RATING_TO_PLOT = (
+    "No single-number rating is available to plot (need 5 octave "
+    "or 16 one-third-octave bands)."
+)
+
 #: Reference reverberation time T0 (ISO 10052:2021, Clause 3.3): 0,5 s.
 _T0 = 0.5
 
@@ -354,10 +361,7 @@ class SurveyAirborneResult:
         :class:`~matplotlib.axes.Axes`.
         """
         if self.rating is None:
-            raise ValueError(
-                "No single-number rating is available to plot (need 5 octave "
-                "or 16 one-third-octave bands)."
-            )
+            raise ValueError(_NO_RATING_TO_PLOT)
         return self.rating.plot(ax=ax, **kwargs)
 
     def report(
@@ -445,10 +449,7 @@ class SurveyImpactResult:
     def plot(self, ax: Axes | None = None, **kwargs: Any) -> Axes:
         """Plot ``L'nT`` against the shifted ISO 717-2 reference curve."""
         if self.rating is None:
-            raise ValueError(
-                "No single-number rating is available to plot (need 5 octave "
-                "or 16 one-third-octave bands)."
-            )
+            raise ValueError(_NO_RATING_TO_PLOT)
         return self.rating.plot(ax=ax, **kwargs)
 
     def report(
@@ -523,10 +524,7 @@ class SurveyFacadeResult:
     def plot(self, ax: Axes | None = None, **kwargs: Any) -> Axes:
         """Plot ``D2m,nT`` against the shifted ISO 717-1 reference curve."""
         if self.rating is None:
-            raise ValueError(
-                "No single-number rating is available to plot (need 5 octave "
-                "or 16 one-third-octave bands)."
-            )
+            raise ValueError(_NO_RATING_TO_PLOT)
         return self.rating.plot(ax=ax, **kwargs)
 
     def report(

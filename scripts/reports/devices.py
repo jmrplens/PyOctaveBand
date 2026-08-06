@@ -137,14 +137,17 @@ def _loudspeaker_example() -> tuple[object, ReportMetadata, str]:
         8.0,
         sensitivity_band=(200.0, 4000.0),
         tolerance_db=3.0,
-        rated_frequency_range=(45.0, 22000.0),
-        rated_noise_power=80.0,
-        rated_sinusoidal_power=120.0,
-        resonance_frequency=52.0,
         impedance=(imp_freqs, impedance),
         distortion=(thd_freqs, thd_percent),
-        directivity=directivity,
-        polar_frequency=2000.0,
+        directivity=ph.LoudspeakerDirectivity(
+            piston=directivity, frequency=2000.0
+        ),
+        ratings=ph.LoudspeakerRatings(
+            frequency_range=(45.0, 22000.0),
+            noise_power=80.0,
+            sinusoidal_power=120.0,
+            resonance_frequency=52.0,
+        ),
     )
     metadata = ReportMetadata(
         specimen="Two-way bookshelf loudspeaker, 165 mm woofer",
@@ -204,16 +207,24 @@ def _microphone_example() -> tuple[object, ReportMetadata, str]:
         response,
         12.5,
         tolerance_db=3.0,
-        rated_impedance=150.0,
-        minimum_load_impedance=1000.0,
-        noise_voltage=1.25e-6,
-        max_spl_thd_percent=0.5,
-        distortion=(thd_spl, thd_percent),
-        noise_spectrum=(noise_freqs, noise_levels),
-        polar=(angles, cardioid_db),
-        polar_frequency=1000.0,
-        powering="Phantom P48 (IEC 61938)",
-        supply_current_ma=3.1,
+        directivity=ph.MicrophoneDirectivity(
+            polar=(angles, cardioid_db),
+            frequency=1000.0,
+        ),
+        noise=ph.MicrophoneNoise(
+            voltage=1.25e-6,
+            spectrum=(noise_freqs, noise_levels),
+        ),
+        overload=ph.MicrophoneOverload(
+            distortion=(thd_spl, thd_percent),
+            thd_percent=0.5,
+        ),
+        electrical=ph.MicrophoneElectrical(
+            rated_impedance=150.0,
+            minimum_load_impedance=1000.0,
+            powering="Phantom P48 (IEC 61938)",
+            supply_current_ma=3.1,
+        ),
     )
     metadata = ReportMetadata(
         specimen="Cardioid condenser microphone, 25 mm capsule",

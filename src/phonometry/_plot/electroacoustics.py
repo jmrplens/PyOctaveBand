@@ -3,7 +3,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, Final
 
 import numpy as np
 
@@ -36,6 +36,28 @@ if TYPE_CHECKING:
 
 #: Shared frequency-axis label of the electroacoustics renderers.
 _FREQ_LABEL = "Frequency [Hz]"
+#: Excitation-frequency axis label of the swept-sine panels.
+_EXCITATION_FREQ_LABEL = "Excitation frequency [Hz]"
+#: Magnitude ordinate label of the Bode-style magnitude panels.
+_MAGNITUDE_LABEL = "Magnitude [dB]"
+#: Total-harmonic-distortion ordinate label, in percent.
+_THD_LABEL = "THD [%]"
+#: Panel title of the total-harmonic-distortion characteristic.
+_THD_TITLE = "Total harmonic distortion"
+#: Sound-pressure-level axis label of the datasheet panels.
+_SPL_LABEL = "Sound pressure level [dB]"
+#: Legend entry and title of the loudspeaker on-axis response panel.
+_ON_AXIS_RESPONSE = "On-axis response"
+#: Legend entry and title of the microphone free-field response panel.
+_FREE_FIELD_RESPONSE = "Free-field response"
+#: Legend entry of the rated tolerance band (formatted with ``tol``).
+_TOLERANCE_LABEL = "Tolerance ±{tol} dB"
+#: Legend entry of the effective-frequency-range markers.
+_EFFECTIVE_RANGE = "Effective range"
+#: Matplotlib ``textcoords`` mode for annotations displaced in points.
+_OFFSET_POINTS = "offset points"
+#: Legend placement of the wide datasheet response panels.
+_LEGEND_LOWER_CENTER: Final = "lower center"
 
 #: Datasheet-panel palette shared by the IEC 60268-4/-5 ``.report()`` fiches and
 #: the ``.plot()`` data sheets. The tolerance band is drawn as a *pale opaque*
@@ -63,8 +85,8 @@ _RESPONSE_SPAN_MIC = 25.0
 #: than ``"es"``, so the English output is byte-for-byte identical to the
 #: pre-i18n renderers.
 _STRINGS: dict[str, str] = {
-    "Frequency [Hz]": "Frecuencia [Hz]",
-    "Magnitude [dB]": "Magnitud [dB]",
+    _FREQ_LABEL: "Frecuencia [Hz]",
+    _MAGNITUDE_LABEL: "Magnitud [dB]",
     "Phase [deg]": "Fase [grados]",
     r"Coherence $\gamma^2$": r"Coherencia $\gamma^2$",
     "Harmonic order n  (f = n·f₁)": "Orden del armónico n  (f = n·f₁)",
@@ -72,8 +94,8 @@ _STRINGS: dict[str, str] = {
     "Harmonics": "Armónicos",
     "Frequency response": "Respuesta en frecuencia",
     " and coherence": " y coherencia",
-    "THD [%]": "THD [%]",
-    "Excitation frequency [Hz]": "Frecuencia de excitación [Hz]",
+    _THD_LABEL: "THD [%]",
+    _EXCITATION_FREQ_LABEL: "Frecuencia de excitación [Hz]",
     "Swept-sine THD (Farina / Novak)": "THD de barrido sinusoidal (Farina / Novak)",
     "Harmonic frequency responses ({method} sweep)": "Respuestas en frecuencia de los armónicos (barrido {method})",
     "$R_1$ (resistance)": "$R_1$ (resistencia)",
@@ -82,20 +104,20 @@ _STRINGS: dict[str, str] = {
     "Baffled circular piston radiation impedance": "Impedancia de radiación de un pistón circular con pantalla",
     "Baffled circular piston directivity": "Directividad de un pistón circular con pantalla",
     # --- IEC 60268-4/-5 datasheet panels (shared by .report() and .plot()) ---
-    "Sound pressure level [dB]": "Nivel de presión acústica [dB]",
-    "On-axis response": "Respuesta en el eje",
-    "Tolerance ±{tol} dB": "Tolerancia ±{tol} dB",
+    _SPL_LABEL: "Nivel de presión acústica [dB]",
+    _ON_AXIS_RESPONSE: "Respuesta en el eje",
+    _TOLERANCE_LABEL: "Tolerancia ±{tol} dB",
     "−10 dB reference": "Referencia −10 dB",
-    "Effective range": "Rango efectivo",
+    _EFFECTIVE_RANGE: "Rango efectivo",
     "Impedance |Z| [{ohm}]": "Impedancia |Z| [{ohm}]",
     "Impedance": "Impedancia",
     "Rated impedance": "Impedancia nominal",
     "80 % of rated": "80 % de la nominal",
-    "Total harmonic distortion": "Distorsión armónica total",
+    _THD_TITLE: "Distorsión armónica total",
     "Directional response": "Respuesta direccional",
     "Directional response at {freq} Hz": "Respuesta direccional a {freq} Hz",
     "Reference frequency": "Frecuencia de referencia",
-    "Free-field response": "Respuesta en campo libre",
+    _FREE_FIELD_RESPONSE: "Respuesta en campo libre",
     "Relative response [dB]": "Respuesta relativa [dB]",
     "Band level [dB]": "Nivel de banda [dB]",
     "Inherent noise spectrum": "Espectro de ruido inherente",
@@ -165,7 +187,7 @@ def plot_harmonic_distortion(
             ax.annotate(
                 f"{order}",
                 (order, level),
-                textcoords="offset points",
+                textcoords=_OFFSET_POINTS,
                 xytext=(0, 5),
                 ha="center",
                 fontsize="x-small",
@@ -240,12 +262,12 @@ def plot_modulation_distortion(
             ax.annotate(
                 f"n = {order}",
                 (sb_freqs[idx], max(sb_db[idx], floor)),
-                textcoords="offset points",
+                textcoords=_OFFSET_POINTS,
                 xytext=(0, 5),
                 ha="center",
                 fontsize="x-small",
             )
-    ax.set_xlabel(_t("Frequency [Hz]", language))
+    ax.set_xlabel(_t(_FREQ_LABEL, language))
     ax.set_ylabel(_t("Level re carrier [dB]", language))
     ax.set_ylim(bottom=floor, top=10.0)
     d2 = decimal_comma(f"{result.d2 * 100.0:.3g}", language)
@@ -294,14 +316,14 @@ def plot_frequency_response(
     def _magnitude(axm: Axes) -> None:
         kwargs.setdefault("label", f"|H| ({result.estimator})")
         axm.semilogx(freqs[pos], mag[pos], color=color, **kwargs)
-        axm.set_ylabel(_t("Magnitude [dB]", language))
+        axm.set_ylabel(_t(_MAGNITUDE_LABEL, language))
         axm.grid(True, which="both", alpha=0.3)
         axm.legend(loc=_LEGEND_UPPER_RIGHT, fontsize="small")
 
     fmin, fmax = float(freqs[pos].min()), float(freqs[pos].max())
     if ax is not None:
         _magnitude(ax)
-        ax.set_xlabel(_t("Frequency [Hz]", language))
+        ax.set_xlabel(_t(_FREQ_LABEL, language))
         ax.set_title(f"{_t('Frequency response', language)} ({result.estimator})")
         format_frequency_axis(ax, fmin, fmax)
         localize_axes(ax, language)
@@ -318,7 +340,7 @@ def plot_frequency_response(
     axes[1].grid(True, which="both", alpha=0.3)
     axes[2].semilogx(freqs[pos], coh[pos], color=_C_TERTIARY)
     axes[2].set_ylabel(_t(r"Coherence $\gamma^2$", language))
-    axes[2].set_xlabel(_t("Frequency [Hz]", language))
+    axes[2].set_xlabel(_t(_FREQ_LABEL, language))
     axes[2].set_ylim(0.0, 1.05)
     axes[2].grid(True, which="both", alpha=0.3)
     for axf in axes:
@@ -360,13 +382,13 @@ def plot_swept_sine_distortion(
             100.0 * np.maximum(result.thd, tiny),
             **kwargs,
         )
-        axt.set_ylabel(_t("THD [%]", language))
+        axt.set_ylabel(_t(_THD_LABEL, language))
         axt.grid(True, which="both", alpha=0.3)
         axt.legend(loc=_LEGEND_UPPER_RIGHT, fontsize="small")
 
     if ax is not None:
         _thd_panel(ax)
-        ax.set_xlabel(_t("Excitation frequency [Hz]", language))
+        ax.set_xlabel(_t(_EXCITATION_FREQ_LABEL, language))
         ax.set_title(_t("Swept-sine THD (Farina / Novak)", language))
         format_frequency_axis(ax)
         localize_axes(ax, language)
@@ -391,8 +413,8 @@ def plot_swept_sine_distortion(
             lw=1.6 if k == 0 else 1.2,
             label=f"$|H_{{{order}}}(f)|$",
         )
-    axes[0].set_ylabel(_t("Magnitude [dB]", language))
-    axes[0].set_xlabel(_t("Frequency [Hz]", language))
+    axes[0].set_ylabel(_t(_MAGNITUDE_LABEL, language))
+    axes[0].set_xlabel(_t(_FREQ_LABEL, language))
     axes[0].set_title(
         _t("Harmonic frequency responses ({method} sweep)", language, method=result.method)
     )
@@ -401,7 +423,7 @@ def plot_swept_sine_distortion(
     format_frequency_axis(axes[0])
     localize_axes(axes[0], language)
     _thd_panel(axes[1])
-    axes[1].set_xlabel(_t("Excitation frequency [Hz]", language))
+    axes[1].set_xlabel(_t(_EXCITATION_FREQ_LABEL, language))
     format_frequency_axis(axes[1])
     localize_axes(axes[1], language)
     return axes
@@ -496,7 +518,7 @@ def plot_piston_directivity(
     ax.grid(True, ls=":", lw=0.4, alpha=0.7)
     ax.set_title(_t("Baffled circular piston directivity", language))
     if ka.size > 1:
-        ax.legend(loc="lower center", bbox_to_anchor=(0.5, -0.12),
+        ax.legend(loc=_LEGEND_LOWER_CENTER, bbox_to_anchor=(0.5, -0.12),
                   ncol=min(ka.size, 3), fontsize="small")
     localize_axes(ax, language)
     axes: Axes = ax
@@ -546,25 +568,25 @@ def _draw_loudspeaker_response(
     top = float(np.ceil((max(float(np.max(spl)), ref + tol) + 2.0) / 5.0) * 5.0)
     ax.axhspan(ref - tol, ref + tol, facecolor=_C_TOL_BAND, edgecolor="none",
                zorder=0,
-               label=_t("Tolerance ±{tol} dB", language, tol=_fmt_num(tol, language)))
+               label=_t(_TOLERANCE_LABEL, language, tol=_fmt_num(tol, language)))
     ax.axhline(ref, color=_C_EDGE, lw=0.8, ls="--")
     ax.axhline(ref - 10.0, color=_C_REFERENCE, lw=0.8, ls=":",
                label=_t("−10 dB reference", language))
     ax.semilogx(f, spl, color=_C_PRIMARY, lw=1.4,
-                label=_t("On-axis response", language))
+                label=_t(_ON_AXIS_RESPONSE, language))
     lo, hi = result.effective_range
     for edge in (lo, hi):
         ax.axvline(edge, color=_C_TERTIARY, lw=0.9, ls="-.")
     ax.plot([], [], color=_C_TERTIARY, lw=0.9, ls="-.",
-            label=_t("Effective range", language))
+            label=_t(_EFFECTIVE_RANGE, language))
     ax.set_xlim(float(np.min(f)), float(np.max(f)))
     ax.set_ylim(top - _RESPONSE_SPAN_LSP, top)
-    ax.set_xlabel(_t("Frequency [Hz]", language))
-    ax.set_ylabel(_t("Sound pressure level [dB]", language))
-    ax.set_title(_t("On-axis response", language))
+    ax.set_xlabel(_t(_FREQ_LABEL, language))
+    ax.set_ylabel(_t(_SPL_LABEL, language))
+    ax.set_title(_t(_ON_AXIS_RESPONSE, language))
     _grid(ax)
     format_frequency_axis(ax, float(np.min(f)), float(np.max(f)))
-    ax.legend(loc="lower center", fontsize="small", ncol=2, framealpha=0.85)
+    ax.legend(loc=_LEGEND_LOWER_CENTER, fontsize="small", ncol=2, framealpha=0.85)
 
 
 def _draw_impedance(
@@ -577,7 +599,7 @@ def _draw_impedance(
                label=_t("Rated impedance", language))
     ax.axhline(0.8 * result.rated_impedance, color=_C_REFERENCE, lw=0.8, ls=":",
                label=_t("80 % of rated", language))
-    ax.set_xlabel(_t("Frequency [Hz]", language))
+    ax.set_xlabel(_t(_FREQ_LABEL, language))
     ax.set_ylabel(_t("Impedance |Z| [{ohm}]", language, ohm=_OHM_TEXT))
     ax.set_ylim(bottom=0.0)
     _grid(ax)
@@ -591,11 +613,11 @@ def _draw_loudspeaker_thd(
 ) -> None:
     """Total harmonic distortion against frequency, in percent (24.1)."""
     ax.semilogx(result.thd_frequencies, result.thd_percent, color=_C_PRIMARY, lw=1.3)
-    ax.set_xlabel(_t("Frequency [Hz]", language))
-    ax.set_ylabel(_t("THD [%]", language))
+    ax.set_xlabel(_t(_FREQ_LABEL, language))
+    ax.set_ylabel(_t(_THD_LABEL, language))
     ax.set_ylim(bottom=0.0)
     _grid(ax)
-    ax.set_title(_t("Total harmonic distortion", language))
+    ax.set_title(_t(_THD_TITLE, language))
     format_frequency_axis(ax)
 
 
@@ -637,25 +659,25 @@ def _draw_microphone_response(
     tol = float(result.tolerance_db)
     top = float(np.ceil((max(float(np.max(rel)), tol) + 2.0) / 5.0) * 5.0)
     ax.axhspan(-tol, tol, facecolor=_C_TOL_BAND, edgecolor="none", zorder=0,
-               label=_t("Tolerance ±{tol} dB", language, tol=_fmt_num(tol, language)))
+               label=_t(_TOLERANCE_LABEL, language, tol=_fmt_num(tol, language)))
     ax.axhline(0.0, color=_C_EDGE, lw=0.8, ls="--")
     ax.axvline(result.reference_frequency, color=_C_SECONDARY, lw=0.8, ls=":",
                label=_t("Reference frequency", language))
     ax.semilogx(f, rel, color=_C_PRIMARY, lw=1.4,
-                label=_t("Free-field response", language))
+                label=_t(_FREE_FIELD_RESPONSE, language))
     lo, hi = result.effective_range
     for edge in (lo, hi):
         ax.axvline(edge, color=_C_TERTIARY, lw=0.9, ls="-.")
     ax.plot([], [], color=_C_TERTIARY, lw=0.9, ls="-.",
-            label=_t("Effective range", language))
+            label=_t(_EFFECTIVE_RANGE, language))
     ax.set_xlim(float(np.min(f)), float(np.max(f)))
     ax.set_ylim(top - _RESPONSE_SPAN_MIC, top)
-    ax.set_xlabel(_t("Frequency [Hz]", language))
+    ax.set_xlabel(_t(_FREQ_LABEL, language))
     ax.set_ylabel(_t("Relative response [dB]", language))
-    ax.set_title(_t("Free-field response", language))
+    ax.set_title(_t(_FREE_FIELD_RESPONSE, language))
     _grid(ax)
     format_frequency_axis(ax, float(np.min(f)), float(np.max(f)))
-    ax.legend(loc="lower center", fontsize="small", ncol=2, framealpha=0.85)
+    ax.legend(loc=_LEGEND_LOWER_CENTER, fontsize="small", ncol=2, framealpha=0.85)
 
 
 def _draw_noise_spectrum(
@@ -664,7 +686,7 @@ def _draw_noise_spectrum(
     """Inherent-noise equivalent band-level spectrum (17.2 b)."""
     ax.semilogx(result.noise_frequencies, result.noise_band_levels_db,
                 color=_C_PRIMARY, lw=1.3)
-    ax.set_xlabel(_t("Frequency [Hz]", language))
+    ax.set_xlabel(_t(_FREQ_LABEL, language))
     ax.set_ylabel(_t("Band level [dB]", language))
     _grid(ax)
     ax.set_title(_t("Inherent noise spectrum", language))
@@ -684,11 +706,11 @@ def _draw_microphone_distortion(
     if result.max_spl_db is not None:
         ax.axvline(result.max_spl_db, color=_C_EDGE, lw=0.8, ls="--",
                    label=_t("Max. SPL", language))
-    ax.set_xlabel(_t("Sound pressure level [dB]", language))
-    ax.set_ylabel(_t("THD [%]", language))
+    ax.set_xlabel(_t(_SPL_LABEL, language))
+    ax.set_ylabel(_t(_THD_LABEL, language))
     ax.set_ylim(bottom=0.0)
     _grid(ax)
-    ax.set_title(_t("Total harmonic distortion", language))
+    ax.set_title(_t(_THD_TITLE, language))
     ax.legend(loc="upper left", fontsize="small")
 
 
@@ -866,7 +888,7 @@ def plot_feedback_stability(
         ax.annotate(
             format_number(value, language, decimals=1) + " dB",
             xy=(i, value), xytext=(0, 4 if value >= 0.0 else -12),
-            textcoords="offset points", ha="center", fontsize=8,
+            textcoords=_OFFSET_POINTS, ha="center", fontsize=8,
         )
     ax.axhline(0.0, color=_C_REFERENCE, ls="-", lw=1.2, zorder=2,
                label=_t("Oscillation (0 dB)", language))

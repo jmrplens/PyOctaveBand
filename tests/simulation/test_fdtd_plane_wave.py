@@ -66,7 +66,8 @@ def test_packet_stays_plane_and_supports_carrier() -> None:
     assert float(np.abs(np.diff(sim.p, axis=1)).max()) < 1e-12
     # The carrier is still there: sign changes along the travel axis.
     column = sim.p[:, 0]
-    assert np.any(column > 0.02) and np.any(column < -0.02)
+    assert np.any(column > 0.02)
+    assert np.any(column < -0.02)
 
 
 def test_packet_validation() -> None:

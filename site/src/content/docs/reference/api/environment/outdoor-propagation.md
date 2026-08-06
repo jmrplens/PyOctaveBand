@@ -88,6 +88,30 @@ the nearest exact midband.
 
 **Returns:** `Aatm` per band, in decibels.
 
+## AtmosphericConditions
+
+```python
+AtmosphericConditions(
+    temperature: float = 20.0,
+    relative_humidity: float | None = None,
+    pressure: float = 101.325,
+)
+```
+
+State of the air behind the atmospheric absorption term `Aatm`.
+
+The three quantities the ISO 9613-1 attenuation coefficient `alpha` is a
+function of (ISO 9613-2:1996, Eq. (8) and Table 2). The defaults are the
+reference conditions of the tabulated coefficients.
+
+**Parameters**
+
+| Name | Description |
+| :--- | :--- |
+| `temperature` | Air temperature, in degrees Celsius. |
+| `relative_humidity` | Relative humidity, in percent; `None` uses 70. |
+| `pressure` | Atmospheric pressure, in kilopascals. |
+
 ## Barrier
 
 ```python
@@ -207,6 +231,26 @@ $$
 | `projected_distance` | Ground-plane projected distance `dp`, in metres. |
 
 **Returns:** `DOmega`, in decibels (0 to ~3 dB).
+
+## DirectivityCorrection
+
+```python
+DirectivityCorrection(index: float = 0.0, d_omega: float = 0.0)
+```
+
+Directivity correction $D_c = D_i + D_\Omega$ (Eq. (3)).
+
+The two terms the standard adds to the sound power level of a point source:
+the directivity index of the source itself and the solid-angle index of the
+space it radiates into. Both are zero for an omnidirectional source
+radiating into free space.
+
+**Parameters**
+
+| Name | Description |
+| :--- | :--- |
+| `index` | Source directivity index `Di`, in decibels. |
+| `d_omega` | Solid-angle index `DOmega`, in decibels (see [`directivity_omega`](/phonometry/reference/api/environment/outdoor-propagation/#directivity_omega) for the alternative ground method). |
 
 ## geometric_divergence
 
@@ -329,6 +373,31 @@ solid-angle index [`directivity_omega`](/phonometry/reference/api/environment/ou
 | Exception | When |
 | :--- | :--- |
 | ValueError | If `distance` is not positive. |
+
+## GroundFactors
+
+```python
+GroundFactors(
+    source: float = 0.0,
+    middle: float = 0.0,
+    receiver: float = 0.0,
+)
+```
+
+Ground factors `G` of the three regions (ISO 9613-2:1996, clause 7.3.1).
+
+The general ground method splits the path into a source region, a middle
+region and a receiver region, each with its own factor between 0 (hard
+ground: paving, water, ice, compacted ground) and 1 (porous ground: grass,
+trees, farmland). The default is hard ground throughout.
+
+**Parameters**
+
+| Name | Description |
+| :--- | :--- |
+| `source` | Ground factor `Gs` of the source region ([0, 1]). |
+| `middle` | Ground factor `Gm` of the middle region ([0, 1]). |
+| `receiver` | Ground factor `Gr` of the receiver region ([0, 1]). |
 
 ## meteorological_correction
 
@@ -528,21 +597,14 @@ the total attenuation `A`.
 ```python
 predicted_receiver_level(
     sound_power_level: ArrayLike,
-    distance: float,
-    source_height: float,
-    receiver_height: float,
+    geometry: PropagationGeometry,
+    *,
     frequencies: ArrayLike = (63.0, 125.0, 250.0, 500.0, 1000.0, 2000.0, 4000.0, 8000.0),
-    ground_source: float = 0.0,
-    ground_middle: float = 0.0,
-    ground_receiver: float = 0.0,
+    ground: GroundFactors | None = None,
     barrier: Barrier | None = None,
-    temperature: float = 20.0,
-    relative_humidity: float | None = None,
-    pressure: float = 101.325,
-    directivity_index: float = 0.0,
-    d_omega: float = 0.0,
+    atmosphere: AtmosphericConditions | None = None,
+    directivity: DirectivityCorrection | None = None,
     c0: float | None = None,
-    projected_distance: float | None = None,
 ) -> NDArray[np.float64]
 ```
 
@@ -565,23 +627,42 @@ convenience.
 | Name | Description |
 | :--- | :--- |
 | `sound_power_level` | Octave-band sound power level `Lw`, in decibels (re 1 pW), one value per frequency. |
-| `distance` | Straight-line source-to-receiver distance `d`, in metres. |
-| `source_height` | Source height `hs`, in metres. |
-| `receiver_height` | Receiver height `hr`, in metres. |
+| `geometry` | Source-to-receiver geometry of the path ([`PropagationGeometry`](/phonometry/reference/api/environment/outdoor-propagation/#propagationgeometry)): the distance `d`, the two heights and the optional projected distance `dp`. |
 | `frequencies` | Octave-band midband frequencies, in hertz. |
-| `ground_source` | Ground factor `Gs` ([0, 1]). |
-| `ground_middle` | Ground factor `Gm` ([0, 1]). |
-| `ground_receiver` | Ground factor `Gr` ([0, 1]). |
+| `ground` | Ground factors of the three regions ([`GroundFactors`](/phonometry/reference/api/environment/outdoor-propagation/#groundfactors)); `None` is hard ground throughout. |
 | `barrier` | Optional screening obstacle ([`Barrier`](/phonometry/reference/api/environment/outdoor-propagation/#barrier)). |
-| `temperature` | Air temperature, in degrees Celsius. |
-| `relative_humidity` | Relative humidity, in percent (default 70). |
-| `pressure` | Atmospheric pressure, in kilopascals. |
-| `directivity_index` | Source directivity index `Di`, in decibels. |
-| `d_omega` | Solid-angle index `DOmega`, in decibels (see [`directivity_omega`](/phonometry/reference/api/environment/outdoor-propagation/#directivity_omega) for the alternative ground method). |
+| `atmosphere` | Air temperature, humidity and pressure behind the atmospheric absorption term ([`AtmosphericConditions`](/phonometry/reference/api/environment/outdoor-propagation/#atmosphericconditions)); `None` is the reference air of the tabulated coefficients. |
+| `directivity` | Directivity correction `Dc = Di + DOmega` ([`DirectivityCorrection`](/phonometry/reference/api/environment/outdoor-propagation/#directivitycorrection)); `None` is an omnidirectional source in free space ($D_c = 0$). |
 | `c0` | Meteorological factor `C0`, in decibels; `None` returns the downwind level `LfT(DW)` ($C_{met} = 0$). |
-| `projected_distance` | Ground-plane projected distance `dp`, in metres. |
 
 **Returns:** Predicted octave-band level per frequency, in decibels.
+
+## PropagationGeometry
+
+```python
+PropagationGeometry(
+    distance: float,
+    source_height: float,
+    receiver_height: float,
+    projected_distance: float | None = None,
+)
+```
+
+Source-to-receiver geometry of the propagation path (ISO 9613-2:1996).
+
+The three lengths every term of the method needs: the straight-line
+distance `d` of the divergence and atmospheric terms (Eq. (7)/(8)), and
+the two heights above the ground the ground effect of clause 7.3.1 and the
+meteorological correction of clause 8 are written in.
+
+**Parameters**
+
+| Name | Description |
+| :--- | :--- |
+| `distance` | Straight-line source-to-receiver distance `d`, in metres. |
+| `source_height` | Source height `hs` above ground, in metres. |
+| `receiver_height` | Receiver height `hr` above ground, in metres. |
+| `projected_distance` | Ground-plane projected distance `dp`, in metres; `None` defaults to $\sqrt{d^2 - (h_s - h_r)^2}$. |
 
 ## SourceEmission
 

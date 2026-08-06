@@ -326,10 +326,10 @@ def _scattering_example() -> tuple[object, ReportMetadata, str]:
     t2 = t1 * 0.90  # sample, static turntable
     t4 = t2 * (1.0 - np.linspace(0.02, 0.28, _SCATTER_FREQS.size))
     alpha_s = ph.materials.random_incidence_absorption(
-        volume, area, c1=c, T1=t1, c2=c, T2=t2
+        volume, area, c1=c, t1=t1, c2=c, t2=t2
     )
     alpha_spec = ph.materials.specular_absorption_coefficient(
-        volume, area, c3=c, T3=t3, c4=c, T4=t4
+        volume, area, c3=c, t3=t3, c4=c, t4=t4
     )
     result = ph.materials.scattering_coefficient_spectrum(
         _SCATTER_FREQS, alpha_spec, alpha_s

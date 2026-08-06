@@ -10,7 +10,7 @@ import numpy as np
 import pytest
 from scipy import signal as sg
 
-from phonometry import OctaveFilterBank, octave_filter
+from phonometry import FilterDesign, OctaveFilterBank, octave_filter
 from phonometry.filters.design import _design_sos_filter, _showfilter
 
 
@@ -40,8 +40,8 @@ def test_cheby2_minus3db_at_band_edges(fraction: float) -> None:
     - Gain at every band's lower and upper edge is -3 dB (+/- 0.4 dB).
     """
     bank = OctaveFilterBank(
-        fs=48000, fraction=fraction, order=6,
-        limits=[100, 5000], filter_type="cheby2", attenuation=60.0,
+        fs=48000, fraction=fraction, order=6, limits=[100, 5000],
+        design=FilterDesign(filter_type="cheby2", attenuation=60.0),
     )
     for idx in range(bank.num_bands):
         g_lo, g_hi = _edge_gains_db(bank, idx)
@@ -62,8 +62,10 @@ def test_cheby2_broadband_levels_match_butter() -> None:
     """
     rng = np.random.default_rng(42)
     x = rng.standard_normal(48000 * 5)
-    spl_b, _ = octave_filter(x, 48000, fraction=3, filter_type="butter", limits=[100, 10000])
-    spl_c, _ = octave_filter(x, 48000, fraction=3, filter_type="cheby2", limits=[100, 10000])
+    spl_b, _ = octave_filter(x, 48000, fraction=3, limits=[100, 10000],
+                             design=FilterDesign(filter_type="butter"))
+    spl_c, _ = octave_filter(x, 48000, fraction=3, limits=[100, 10000],
+                             design=FilterDesign(filter_type="cheby2"))
     diff = np.asarray(spl_c) - np.asarray(spl_b)
     assert np.abs(diff).max() < 0.5, f"max deviation {np.abs(diff).max():.2f} dB"
 
@@ -81,8 +83,8 @@ def test_bessel_minus3db_at_band_edges(fraction: float) -> None:
     - Gain at every band's lower and upper edge is -3 dB (+/- 0.6 dB).
     """
     bank = OctaveFilterBank(
-        fs=48000, fraction=fraction, order=6,
-        limits=[100, 5000], filter_type="bessel",
+        fs=48000, fraction=fraction, order=6, limits=[100, 5000],
+        design=FilterDesign(filter_type="bessel"),
     )
     for idx in range(bank.num_bands):
         g_lo, g_hi = _edge_gains_db(bank, idx)
@@ -156,7 +158,10 @@ def test_cheby2_low_attenuation_raises() -> None:
     with pytest.raises(ValueError, match="3.01"):
         _cheby2_transition_ratio(order=6, attenuation=3.0)
     with pytest.raises(ValueError, match="3.01"):
-        OctaveFilterBank(fs=48000, fraction=3, filter_type="cheby2", attenuation=2.0)
+        OctaveFilterBank(
+            fs=48000, fraction=3,
+            design=FilterDesign(filter_type="cheby2", attenuation=2.0),
+        )
 
 
 def test_cheby2_stopband_edges_near_nyquist_stay_valid() -> None:
@@ -183,7 +188,8 @@ def test_cheby2_default_bank_meets_class1(fraction: float) -> None:
     from phonometry import verify_filter_class
 
     bank = OctaveFilterBank(
-        fs=48000, fraction=fraction, order=6, limits=[100, 5000], filter_type="cheby2"
+        fs=48000, fraction=fraction, order=6, limits=[100, 5000],
+        design=FilterDesign(filter_type="cheby2"),
     )
     result = verify_filter_class(bank)
     assert result["overall_class"] == 1, result
@@ -197,15 +203,16 @@ def test_functional_octavefilter_cheby2_default_meets_class1() -> None:
 
     from phonometry import verify_filter_class
 
-    default_att = inspect.signature(octave_filter).parameters["attenuation"].default
+    default_att = inspect.signature(octave_filter).parameters["design"].default.attenuation
     assert default_att == 72.0
     # A bank built with the wrapper's own default passes class 1; and the
     # functional call itself runs without raising.
     bank = OctaveFilterBank(
         fs=48000, fraction=1, order=6, limits=[100, 5000],
-        filter_type="cheby2", attenuation=default_att,
+        design=FilterDesign(filter_type="cheby2", attenuation=default_att),
     )
     assert verify_filter_class(bank)["overall_class"] == 1
     x = np.random.default_rng(0).standard_normal(48000)
-    spl, _ = octave_filter(x, 48000, fraction=1, filter_type="cheby2", limits=[100, 5000])
+    spl, _ = octave_filter(x, 48000, fraction=1, limits=[100, 5000],
+                           design=FilterDesign(filter_type="cheby2"))
     assert np.all(np.isfinite(spl))

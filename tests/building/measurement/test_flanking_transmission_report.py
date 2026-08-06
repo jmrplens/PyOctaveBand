@@ -286,10 +286,11 @@ def test_dnf_fiche_part_selects_basis_designation(tmp_path) -> None:
 def test_dnf_fiche_unknown_part_rejected(tmp_path) -> None:
     """A part outside 2/3/4 is rejected."""
     out = str(tmp_path / "x.pdf")
+    dnf, lnf = _dnf_result(), _lnf_result()
     with pytest.raises(ValueError, match="'part' must be 2, 3 or 4"):
-        _dnf_result().report(out, part=1)
+        dnf.report(out, part=1)
     with pytest.raises(ValueError, match="'part' must be 2, 3 or 4"):
-        _lnf_result().report(out, part=5)
+        lnf.report(out, part=5)
 
 
 def test_dnf_fiche_without_rating_rejected(tmp_path) -> None:

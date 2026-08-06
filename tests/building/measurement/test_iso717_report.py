@@ -278,7 +278,8 @@ def test_octave_band_fiche_declares_octave_bands(tmp_path) -> None:
     "One-third-octave".
     """
     result = weighted_impact_rating([65.0, 68.0, 67.0, 63.0, 58.0])
-    assert result.band_centers is not None and len(result.band_centers) == 5
+    assert result.band_centers is not None
+    assert len(result.band_centers) == 5
     out = tmp_path / "octave.pdf"
     result.report(str(out))
     text = _extract_text(str(out))

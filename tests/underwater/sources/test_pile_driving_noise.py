@@ -90,8 +90,9 @@ def test_pile_strike_metrics_bundle_and_plot() -> None:
 
 
 def test_pile_strike_metrics_rejects_short_signal() -> None:
+    too_short = np.array([1.0])
     with pytest.raises(ValueError):
-        pile_strike_metrics(np.array([1.0]), FS)
+        pile_strike_metrics(too_short, FS)
 
 
 # ---------------------------------------------------------------------------

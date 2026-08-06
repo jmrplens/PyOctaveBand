@@ -43,6 +43,24 @@ if TYPE_CHECKING:
     from ..room.reverberation_prediction import ReverberationModelResult
     from ..room.steady_field import SteadyFieldResult
 
+#: Shared x-axis label of the frequency-domain room plots.
+_FREQUENCY_LABEL = "Frequency [Hz]"
+
+#: Shared time-axis label of the time-domain room plots.
+_TIME_LABEL = "Time [s]"
+
+#: Shared legend entry of the backward-integrated energy-decay curve.
+_SCHROEDER_DECAY_LABEL = "Schroeder decay"
+
+#: Shared y-axis label of the octave-band spectrum plots (NC / RC).
+_OCTAVE_BAND_SPL_LABEL = "Octave-band SPL [dB]"
+
+#: Shared y-axis label of the predicted reverberation-time plots.
+_REVERBERATION_TIME_LABEL = "Reverberation time $T$ [s]"
+
+#: Shared legend entry naming the equivalent absorption area of a curve.
+_ABSORPTION_AREA_LABEL = "$A$ = {value} m²"
+
 #: Spanish translations of the fixed strings rendered by the room ``.plot()``
 #: renderers, keyed by their verbatim English text.  ``_t`` returns the English
 #: key unchanged for any language other than ``"es"``, so the English output is
@@ -50,25 +68,25 @@ if TYPE_CHECKING:
 _STRINGS: dict[str, str] = {
     "Reverberation time [s]": "Tiempo de reverberación [s]",
     "ISO 3382 decay times and clarity": "Tiempos de caída y claridad ISO 3382",
-    "Frequency [Hz]": "Frecuencia [Hz]",
+    _FREQUENCY_LABEL: "Frecuencia [Hz]",
     "Band": "Banda",
     "Broadband": "Banda ancha",
     "Clarity [dB]": "Claridad [dB]",
-    "Time [s]": "Tiempo [s]",
+    _TIME_LABEL: "Tiempo [s]",
     "Level re steady state [dB]": "Nivel re estado estacionario [dB]",
     "ISO 3382 Schroeder decay curve": "Curva de caída de Schroeder ISO 3382",
-    "Schroeder decay": "Decaimiento de Schroeder",
+    _SCHROEDER_DECAY_LABEL: "Decaimiento de Schroeder",
     "Log-magnitude envelope": "Envolvente de magnitud logarítmica",
     "Level re peak [dB]": "Nivel re pico [dB]",
     "Amplitude (norm.)": "Amplitud (norm.)",
     "ISO 18233 impulse response": "Respuesta al impulso ISO 18233",
     "Measured": "Medido",
     "Governing band": "Banda dominante",
-    "Octave-band SPL [dB]": "NPS por bandas de octava [dB]",
+    _OCTAVE_BAND_SPL_LABEL: "NPS por bandas de octava [dB]",
     "Reference RC-": "Referencia RC-",
     "Rumble tolerance (+5 dB)": "Tolerancia de retumbe (+5 dB)",
     "Hiss tolerance (+3 dB)": "Tolerancia de siseo (+3 dB)",
-    "Reverberation time $T$ [s]": "Tiempo de reverberación $T$ [s]",
+    _REVERBERATION_TIME_LABEL: "Tiempo de reverberación $T$ [s]",
     "EN 12354-6 reverberation time": "Tiempo de reverberación EN 12354-6",
     "Reverberation-time models — ": "Modelos de tiempo de reverberación — ",
     " dB per doubling": " dB por duplicación",
@@ -114,7 +132,7 @@ _STRINGS: dict[str, str] = {
     # --- Restaurant crowd self-noise (Long Ch. 17) ---
     "Simultaneous talkers $N$": "Hablantes simultáneos $N$",
     "Self-generated noise level [dB]": "Nivel de ruido autogenerado [dB]",
-    "$A$ = {value} m²": "$A$ = {value} m²",
+    _ABSORPTION_AREA_LABEL: _ABSORPTION_AREA_LABEL,
     "Speech at {value} m": "Habla a {value} m",
     "Communication limit ($L_{SN}$ = -6 dB)":
         "Límite de comunicación ($L_{SN}$ = -6 dB)",
@@ -161,7 +179,6 @@ def plot_room_acoustics(
     freq = result.frequency
     n = np.asarray(result.t30, dtype=np.float64).size
     if freq is None:
-        centers = np.arange(n, dtype=np.float64)
         labels = [_t("Broadband", language)] * n
         use_freq_axis = False
     else:
@@ -199,7 +216,7 @@ def plot_room_acoustics(
 
     if single:
         if use_freq_axis:
-            ax_times.set_xlabel(_t("Frequency [Hz]", language))
+            ax_times.set_xlabel(_t(_FREQUENCY_LABEL, language))
         _localize_band_axes(ax_times, language)
         return ax_times
 
@@ -222,7 +239,7 @@ def plot_room_acoustics(
     _band_axis(
         ax_clarity,
         labels,
-        xlabel=_t("Frequency [Hz]" if use_freq_axis else "Band", language),
+        xlabel=_t(_FREQUENCY_LABEL if use_freq_axis else "Band", language),
         language=language,
     )
     ax_clarity.grid(True, alpha=0.3)
@@ -250,7 +267,7 @@ def plot_decay_curve(
     time = np.asarray(result.time, dtype=np.float64)
     level = np.asarray(result.level, dtype=np.float64)
     kwargs.setdefault("color", _C_PRIMARY)
-    kwargs.setdefault("label", _t("Schroeder decay", language))
+    kwargs.setdefault("label", _t(_SCHROEDER_DECAY_LABEL, language))
     ax.plot(time, level, **kwargs)
 
     if fits:
@@ -264,7 +281,7 @@ def plot_decay_curve(
                 fit_label = f"ajuste {label}" if language == "es" else f"{label} fit"
                 ax.plot(time, fit, style, lw=1, alpha=0.8, label=fit_label)
 
-    ax.set_xlabel(_t("Time [s]", language))
+    ax.set_xlabel(_t(_TIME_LABEL, language))
     ax.set_ylabel(_t("Level re steady state [dB]", language))
     ax.set_ylim(top=3.0)
     ax.set_xlim(left=0.0, right=float(time[-1]) if time.size else None)
@@ -320,7 +337,7 @@ def plot_impulse_response(
         axd.plot(time, env_db, color=_C_PRIMARY_LIGHT, lw=0.8,
                  label=_t("Log-magnitude envelope", language))
         axd.plot(time, edc_db, color=_C_REFERENCE, lw=1.8,
-                 label=_t("Schroeder decay", language))
+                 label=_t(_SCHROEDER_DECAY_LABEL, language))
         axd.set_xlabel(_t(xlabel, language))
         axd.set_ylabel(_t("Level re peak [dB]", language))
         axd.set_ylim(bottom=-80.0, top=5.0)
@@ -389,7 +406,7 @@ def plot_noise_criterion(
                    f"({_format_freq(result.governing_frequency)})"),
         )
     _freq_axis(ax, OCTAVE_BANDS, language=language)
-    ax.set_ylabel(_t("Octave-band SPL [dB]", language))
+    ax.set_ylabel(_t(_OCTAVE_BAND_SPL_LABEL, language))
     ax.set_title(f"ANSI/ASA S12.2 {result.label}")
     ax.legend(loc=_LEGEND_UPPER_RIGHT, fontsize="small")
     ax.grid(True, which="both", alpha=0.3)
@@ -431,7 +448,7 @@ def plot_room_criterion(
     kwargs.setdefault("label", _t("Measured", language))
     ax.plot(freqs[valid], levels[valid], "o-", zorder=3, **kwargs)
     _freq_axis(ax, freqs, language=language)
-    ax.set_ylabel(_t("Octave-band SPL [dB]", language))
+    ax.set_ylabel(_t(_OCTAVE_BAND_SPL_LABEL, language))
     ax.set_title(f"ANSI/ASA S12.2 {result.label}")
     ax.legend(loc=_LEGEND_UPPER_RIGHT, fontsize="small")
     ax.grid(True, which="both", alpha=0.3)
@@ -458,7 +475,7 @@ def plot_enclosed_space_absorption(
     kwargs.setdefault("marker", "o")
     ax.plot(freq, rt, **kwargs)
     _freq_axis(ax, freq, language=language)
-    ax.set_ylabel(_t("Reverberation time $T$ [s]", language))
+    ax.set_ylabel(_t(_REVERBERATION_TIME_LABEL, language))
     ax.set_title(_t("EN 12354-6 reverberation time", language))
     ax.set_ylim(bottom=0.0)
     ax.grid(True, which="both", alpha=0.3)
@@ -503,7 +520,7 @@ def plot_reverberation_models(
             **kwargs,
         )
     _freq_axis(ax, freq, language=language)
-    ax.set_ylabel(_t("Reverberation time $T$ [s]", language))
+    ax.set_ylabel(_t(_REVERBERATION_TIME_LABEL, language))
     ax.set_title(
         f"{_t('Reverberation-time models — ', language)}"
         f"$V$ = {format_number(result.volume, language, decimals=0)} m³, "
@@ -652,7 +669,7 @@ def plot_excitation(
         ax_f.semilogx(freqs[1:], 20.0 * np.log10(
                       np.maximum(ac, 1e-10) / (denom if denom > 0.0 else 1.0)),
                       color=_C_REFERENCE, lw=0.8)
-        ax_f.set_xlabel(_t("Frequency [Hz]", language))
+        ax_f.set_xlabel(_t(_FREQUENCY_LABEL, language))
         ax_f.set_ylabel(_t("Magnitude [dB]", language))
         ax_f.set_title(_t("Magnitude spectrum (flat)", language))
         ax_f.grid(True, which="both", alpha=0.3)
@@ -662,7 +679,7 @@ def plot_excitation(
 
     # Swept sine.
     ax_time.plot(t, x, color=color, lw=0.6, **kwargs)
-    ax_time.set_xlabel(_t("Time [s]", language))
+    ax_time.set_xlabel(_t(_TIME_LABEL, language))
     ax_time.set_ylabel(_t("Amplitude", language))
     ax_time.set_title(_t("ISO 18233 exponential sine sweep", language))
     ax_time.grid(True, alpha=0.3)
@@ -672,8 +689,8 @@ def plot_excitation(
     ax_s = axes[1]
     nperseg = min(n, max(256, min(2048, n // 16)))
     ax_s.specgram(x, NFFT=nperseg, Fs=fs, noverlap=nperseg // 2, cmap="magma")
-    ax_s.set_xlabel(_t("Time [s]", language))
-    ax_s.set_ylabel(_t("Frequency [Hz]", language))
+    ax_s.set_xlabel(_t(_TIME_LABEL, language))
+    ax_s.set_ylabel(_t(_FREQUENCY_LABEL, language))
     ax_s.set_title(_t("Spectrogram (exponential frequency rise)", language))
     localize_axes(ax_s, language)
     return axes
@@ -877,7 +894,7 @@ def plot_shaped_sweep(
                      lw=1.4, ls="--", label=_t("Synthesis target", language))
         axs.axvspan(f1, f2, color=color, alpha=0.08,
                     label=_t("Sweep band", language))
-        axs.set_xlabel(_t("Frequency [Hz]", language))
+        axs.set_xlabel(_t(_FREQUENCY_LABEL, language))
         axs.set_ylabel(_t("Level re in-band max [dB]", language))
         axs.set_ylim(bottom=-60.0, top=8.0)
         axs.grid(True, which="both", alpha=0.3)
@@ -975,7 +992,7 @@ def plot_room_modes(
     ladder.legend(loc=_LEGEND_UPPER_RIGHT, fontsize="small", ncol=2)
 
     if single:
-        ladder.set_xlabel(_t("Frequency [Hz]", language))
+        ladder.set_xlabel(_t(_FREQUENCY_LABEL, language))
     else:
         density_axes = axes[1]
         grid = np.linspace(0.0, result.max_frequency, 200)
@@ -983,7 +1000,7 @@ def plot_room_modes(
         density_axes.plot(grid, density, color=_C_QUATERNARY, lw=1.8,
                           label=_t("Modal density d$N$/d$f$", language))
         density_axes.set_ylabel(_t("Modal density [modes/Hz]", language))
-        density_axes.set_xlabel(_t("Frequency [Hz]", language))
+        density_axes.set_xlabel(_t(_FREQUENCY_LABEL, language))
         density_axes.grid(True, alpha=0.3)
         density_axes.legend(loc="upper left", fontsize="small")
         localize_axes(density_axes, language)
@@ -1019,7 +1036,7 @@ def plot_crowd_noise(
     for row, (area, curve) in enumerate(zip(result.absorption_areas, levels)):
         ax.plot(
             n, curve, color=palette[row % len(palette)], lw=1.8,
-            label=_t("$A$ = {value} m²", language).format(
+            label=_t(_ABSORPTION_AREA_LABEL, language).format(
                 value=format_number(float(area), language, decimals=0)),
             **kwargs,
         )

@@ -128,7 +128,8 @@ def test_report_renders_oracle_values(tmp_path) -> None:
     assert f"{lw[1]:.1f}" in text
     assert f"{lw[2]:.1f}" in text
     # Nominal band labels head the table / axis (not the exact base-ten centre).
-    assert "125" in text and "8000" in text
+    assert "125" in text
+    assert "8000" in text
     # Standard, precision grade and method prose.
     assert "ISO 3741:2010" in text
     assert "precision method, accuracy grade 1" in text

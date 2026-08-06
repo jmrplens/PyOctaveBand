@@ -41,7 +41,7 @@ def test_octave_filter_basic() -> None:
     y = 100 * np.sum([np.sin(2 * np.pi * f * t) for f in freqs], axis=0)
 
     # 1. Filter and get only SPL spectrum
-    spl, freq = phonometry.octave_filter(y, fs=fs, fraction=3, order=6, limits=[12, 20000], show=False)
+    spl, freq = phonometry.octave_filter(y, fs=fs, fraction=3, order=6, limits=[12, 20000])
 
     assert len(spl) == len(freq)
     assert len(freq) > 0
@@ -72,7 +72,7 @@ def test_octave_filter_sigbands() -> None:
 
     # 2. Filter and get signals in time-domain bands
     _, freq, xb = phonometry.octave_filter(
-        y, fs=fs, fraction=1, order=6, limits=[500, 2000], show=False, sigbands=True
+        y, fs=fs, fraction=1, order=6, limits=[500, 2000], sigbands=True
     )
 
     assert len(xb) == len(freq)

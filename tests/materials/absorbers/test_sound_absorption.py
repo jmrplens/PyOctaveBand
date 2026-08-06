@@ -286,8 +286,9 @@ def test_negative_m_raises() -> None:
 def test_m_shape_mismatch_raises() -> None:
     """A per-band 'm' whose shape differs from 't60' is a contract violation."""
     t60 = np.array([3.0, 2.5, 2.0])  # 3 bands
+    m_two_values = np.array([0.001, 0.002])
     with pytest.raises(ValueError, match="'m' must be a scalar"):
-        absorption_area(t60, 200.0, m=np.array([0.001, 0.002]))  # 2 values
+        absorption_area(t60, 200.0, m=m_two_values)
 
 
 def test_m_matching_shape_and_scalar_allowed() -> None:
@@ -437,8 +438,10 @@ def test_measurement_shape_mismatch_raises() -> None:
 def test_measurement_frozen() -> None:
     import dataclasses
 
+    measurement = _measurement()
+    replacement = np.zeros(18)
     with pytest.raises(dataclasses.FrozenInstanceError):
-        _measurement().alpha_s = np.zeros(18)  # type: ignore[misc]
+        measurement.alpha_s = replacement  # type: ignore[misc]
 
 
 def test_measurement_small_room_warns_once() -> None:

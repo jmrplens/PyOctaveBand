@@ -109,7 +109,7 @@ print(mic_xyz.shape)                                    # (10, 3)
 res = emission.sound_power_pressure(
     levels, "hemisphere", radius=1.5, reflecting_planes=1,
     background_levels=background, frequencies=freqs,
-    reverberation_time=0.6, volume=300.0,          # room data -> K2
+    room=emission.RoomEnvironment(reverberation_time=0.6, volume=300.0),  # -> K2
 )
 print(round(res.surface_area, 2))                       # 14.14 m^2 (= 2*pi*1.5^2)
 print(round(float(res.environmental_correction[0]), 2)) # K2 = 2.32 dB
@@ -145,7 +145,7 @@ background = np.full((10, 8), 55.0)
 res = emission.sound_power_pressure(
     levels, "hemisphere", radius=1.5, reflecting_planes=1,
     background_levels=background, frequencies=freqs,
-    reverberation_time=0.6, volume=300.0,          # room data -> K2
+    room=emission.RoomEnvironment(reverberation_time=0.6, volume=300.0),  # -> K2
 )
 
 # res is the SoundPowerResult computed above. One line:
@@ -171,9 +171,9 @@ plt.show()
 
 The A-weighted total $L_{WA}$ is combined from the band powers with the
 ISO 3744 Annex E A-weighting corrections, so it needs `frequencies`. Passing
-the room data (`reverberation_time` + `volume`, or `absorption_area`, or
-`mean_absorption_coefficient` + `room_surface`) enables $K_2$; omit it and the
-field is treated as free ($K_2 = 0$). If the background margin drops below the
+a `RoomEnvironment` as `room` (`reverberation_time` + `volume`, or
+`absorption_area`, or `mean_absorption_coefficient` + `room_surface`) enables
+$K_2$; omit it and the field is treated as free ($K_2 = 0$). If the background margin drops below the
 grade criterion or $K_2$ exceeds the validity limit, a `SoundPowerWarning`
 flags that the levels are upper bounds; the determination still returns.
 
@@ -224,9 +224,10 @@ these habits:
 | `reflecting_planes` | int | — | `1` / `2` / `3`, default `1` | Halves/quarters the hemisphere area |
 | `background_levels` | 2D array or spectrum | dB | `(NM, NB)`, or `(NB,)` / `(1, NB)` | Enables $K_1$; a single spectrum broadcasts to every position |
 | `frequencies` | 1D array | Hz | nominal band centres | Enables $L_{WA}$ (Annex E) |
-| `absorption_area` | float or 1D array | m² | > 0 | $A$ for $K_2$ (direct); per-band array → per-band $K_2$ |
-| `reverberation_time`, `volume` | float/array, float | s, m³ | > 0 | $A = 0.16\,V/T$ for $K_2$; per-band $T$ → per-band $K_2$ |
-| `mean_absorption_coefficient`, `room_surface` | float/array, float | —, m² | `(0,1]`, > 0 | $A = \alpha\,S_v$ (Eq. A.7); per-band $\alpha$ → per-band $K_2$ |
+| `room` | `RoomEnvironment` or None | — | default `None` (free field) | The room data behind $K_2$; its fields are the three routes to $A$ below |
+| `room.absorption_area` | float or 1D array | m² | > 0 | $A$ for $K_2$ (direct); per-band array → per-band $K_2$ |
+| `room.reverberation_time`, `room.volume` | float/array, float | s, m³ | > 0 | $A = 0.16\,V/T$ for $K_2$; per-band $T$ → per-band $K_2$ |
+| `room.mean_absorption_coefficient`, `room.room_surface` | float/array, float | —, m² | `(0,1]`, > 0 | $A = \alpha\,S_v$ (Eq. A.7); per-band $\alpha$ → per-band $K_2$ |
 | `grade` | str | — | `'engineering'` (default) / `'survey'` | ISO 3744 vs ISO 3746 |
 | `omc_uncertainty` | float | dB | default `0.0` | $\sigma_\text{omc}$, operating/mounting instability, folded into $U$ |
 
@@ -445,7 +446,8 @@ surface = np.array([72.0, 76, 80, 82, 81, 78, 73, 66])
 res = emission.sound_power_pressure(
     np.tile(surface, (10, 1)), "hemisphere", radius=4.0,
     background_levels=np.tile(surface - 10.0, (10, 1)),
-    frequencies=freqs, absorption_area=1500.0, grade="engineering",
+    frequencies=freqs, grade="engineering",
+    room=emission.RoomEnvironment(absorption_area=1500.0),
 )
 
 res.report(

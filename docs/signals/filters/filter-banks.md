@@ -87,6 +87,11 @@ architecture, up to the Linkwitz-Riley crossover, is
 
 ## 2. `octave_filter()` / `OctaveFilterBank` parameters
 
+The advanced options travel in four small frozen dataclasses, so the four
+everyday arguments stay first: `FilterDesign` (`design`), `LevelCalibration`
+(`calibration`), `BlockProcessing` (`block_processing`) and `ResponsePlot`
+(`response_plot`). The table names each option by its bundle.
+
 | Parameter | Type | Units | Range / default | Notes |
 | :--- | :--- | :--- | :--- | :--- |
 | `x` | 1D or 2D array | digital units | non-empty | 2D is `[channels, samples]` |
@@ -94,18 +99,19 @@ architecture, up to the Linkwitz-Riley crossover, is
 | `fraction` | int | — | default `1`; common `3`; any $b \ge 1$ | Bands per octave = $b$ |
 | `order` | int | — | default `6` | SOS order per band |
 | `limits` | list `[lo, hi]` | Hz | default `[12, 20000]` | Analysis range |
-| `filter_type` | str | — | `'butter'` (default), `'cheby1'`, `'cheby2'`, `'ellip'`, `'bessel'` | See the [Filter Architecture Gallery](filter-gallery.md) |
-| `ripple` / `attenuation` | float | dB | `ripple` default `0.1`; `attenuation` default `72.0` | Passband ripple / stopband attenuation (cheby/ellip); `cheby2` needs `attenuation` $\ge 70$ for class 1, since scipy pins its equiripple floor at exactly this value |
-| `show` | bool | — | default `False` | Plot the bank response (needs matplotlib) |
+| `design.filter_type` | str | — | `'butter'` (default), `'cheby1'`, `'cheby2'`, `'ellip'`, `'bessel'` | See the [Filter Architecture Gallery](filter-gallery.md) |
+| `design.ripple` / `design.attenuation` | float | dB | `ripple` default `0.1`; `attenuation` default `72.0` | Passband ripple / stopband attenuation (cheby/ellip); `cheby2` needs `attenuation` $\ge 70$ for class 1, since scipy pins its equiripple floor at exactly this value |
+| `design.resample` | bool | — | default `True` | Filter each band on a decimated rate (multirate) |
+| `response_plot.show` | bool | — | default `False` | Plot the bank response (needs matplotlib) |
 | `sigbands` | bool | — | default `False` | Also return the per-band time signals |
 | `mode` | str | — | `'rms'` (default), `'peak'`, `'sum'` | Per-band statistic returned |
 | `nominal` | bool | — | default `False` | Return nominal band labels (e.g. `1000`) instead of exact centre frequencies |
 | `detrend` | bool | — | default `True` | Remove each band's DC offset before the level (improves low-frequency accuracy) |
-| `calibration_factor` | float | — | default `1.0` | Scales the input to pascals (see the Calibration guide) |
-| `dbfs` | bool | — | default `False` | Reference levels to digital full scale instead of 20 µPa |
-| `plot_file` | str or `None` | — | default `None` | Save the bank-response plot to this path |
+| `calibration.factor` | float | — | default `1.0` | Scales the input to pascals (see the Calibration guide) |
+| `calibration.dbfs` | bool | — | default `False` | Reference levels to digital full scale instead of 20 µPa |
+| `response_plot.file` | str or `None` | — | default `None` | Save the bank-response plot to this path |
 | `zero_phase` | bool | — | default `False` | Forward-backward filtering (offline) |
-| `stateful` / `steady_ic` (class) | bool | — | default `False` | Streaming state; see [Block Processing](block-processing.md) |
+| `block_processing.stateful` / `.steady_ic` (class) | bool | — | default `False` | Streaming state; see [Block Processing](block-processing.md) |
 
 `verify_filter_class(bank)` checks the designed bank against the IEC 61260-1
 Table 1 acceptance limits and reports the class (`1`, `2` or `None` if outside both) with per-band
@@ -199,8 +205,12 @@ t = np.linspace(0, 0.5, int(fs * 0.5), endpoint=False)
 y = np.sin(2 * np.pi * 250 * t) + np.sin(2 * np.pi * 1000 * t)
 
 # 2. Compare architectures (Butterworth vs Chebyshev II)
-spl_b, freq, xb_butter = filters.octave_filter(y, fs=fs, fraction=1, sigbands=True, filter_type='butter')
-spl_c2, _, xb_cheby2 = filters.octave_filter(y, fs=fs, fraction=1, sigbands=True, filter_type='cheby2')
+spl_b, freq, xb_butter = filters.octave_filter(
+    y, fs=fs, fraction=1, sigbands=True,
+    design=filters.FilterDesign(filter_type='butter'))
+spl_c2, _, xb_cheby2 = filters.octave_filter(
+    y, fs=fs, fraction=1, sigbands=True,
+    design=filters.FilterDesign(filter_type='cheby2'))
 
 # 'xb_butter' and 'xb_cheby2' contain the time-domain signals per band
 ```
@@ -225,7 +235,7 @@ y = np.sin(2 * np.pi * 250 * t) + np.sin(2 * np.pi * 1000 * t)
 
 bank_b = filters.OctaveFilterBank(fs=fs, fraction=1, order=6, limits=[100.0, 2000.0])
 bank_c = filters.OctaveFilterBank(fs=fs, fraction=1, order=6, limits=[100.0, 2000.0],
-                          filter_type="cheby2")
+                          design=filters.FilterDesign(filter_type="cheby2"))
 _, freq, xb_butter = bank_b.filter(y, sigbands=True)
 _, _, xb_cheby2 = bank_c.filter(y, sigbands=True)
 
@@ -275,7 +285,7 @@ w = np.logspace(np.log10(500), np.log10(2000), 1024)
 fig, ax = plt.subplots(figsize=(9, 5))
 for ftype in ("butter", "cheby1", "cheby2", "ellip", "bessel"):
     bank = filters.OctaveFilterBank(fs, fraction=1, order=6, limits=[800, 1200],
-                            filter_type=ftype)
+                            design=filters.FilterDesign(filter_type=ftype))
     idx = int(np.argmin(np.abs(np.array(bank.freq) - 1000)))
     fsd = fs / bank.factor[idx]
     # Group delay of an SOS cascade = sum of the sections' group delays

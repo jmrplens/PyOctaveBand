@@ -134,8 +134,8 @@ def test_scattering_end_to_end_synthetic() -> None:
         1.0 - expected_alpha_s
     )
 
-    alpha_s = random_incidence_absorption(V, S, c1=C, T1=T1, c2=C, T2=T2)
-    alpha_spec = specular_absorption_coefficient(V, S, c3=C, T3=T3, c4=C, T4=T4)
+    alpha_s = random_incidence_absorption(V, S, c1=C, t1=T1, c2=C, t2=T2)
+    alpha_spec = specular_absorption_coefficient(V, S, c3=C, t3=T3, c4=C, t4=T4)
     s = scattering_coefficient(alpha_spec, alpha_s)
 
     # Shared oracles from tests/reference_data/ (used by the CI report too).
@@ -152,8 +152,8 @@ def test_scattering_end_to_end_synthetic() -> None:
 def test_scattering_end_to_end_above_one_reported() -> None:
     # A very short T4 makes alpha_spec > 1, so s > 1 and is reported as-is.
     T1, T3, T4 = 8.0, 7.5, 2.0
-    alpha_s = random_incidence_absorption(V, S, c1=C, T1=T1, c2=C, T2=6.0)
-    alpha_spec = specular_absorption_coefficient(V, S, c3=C, T3=T3, c4=C, T4=T4)
+    alpha_s = random_incidence_absorption(V, S, c1=C, t1=T1, c2=C, t2=6.0)
+    alpha_spec = specular_absorption_coefficient(V, S, c3=C, t3=T3, c4=C, t4=T4)
     s = float(scattering_coefficient(alpha_spec, alpha_s))
     assert float(alpha_spec) > 1.0
     assert s == pytest.approx(1.2097941324956527)
@@ -162,9 +162,9 @@ def test_scattering_end_to_end_above_one_reported() -> None:
 
 def test_air_attenuation_term_reduces_absorption() -> None:
     # The -(4 V / S)(m2 - m1) term lowers alpha_s when m2 > m1.
-    base = random_incidence_absorption(V, S, c1=C, T1=8.0, c2=C, T2=6.0)
+    base = random_incidence_absorption(V, S, c1=C, t1=8.0, c2=C, t2=6.0)
     with_air = random_incidence_absorption(
-        V, S, c1=C, T1=8.0, c2=C, T2=6.0, m1=0.001, m2=0.002
+        V, S, c1=C, t1=8.0, c2=C, t2=6.0, m1=0.001, m2=0.002
     )
     assert float(with_air) < float(base)
     assert float(base) - float(with_air) == pytest.approx(
@@ -174,7 +174,7 @@ def test_air_attenuation_term_reduces_absorption() -> None:
 
 def test_base_plate_scattering_zero_when_t1_equals_t3() -> None:
     # Eq. (6): a perfectly symmetrical base plate has T1 == T3 => s_base = 0.
-    s_base = base_plate_scattering(V, S, c1=C, T1=7.5, c3=C, T3=7.5)
+    s_base = base_plate_scattering(V, S, c1=C, t1=7.5, c3=C, t3=7.5)
     assert float(s_base) == pytest.approx(0.0)
 
 
@@ -240,7 +240,7 @@ def test_absorption_uncertainty_a3() -> None:
         * math.sqrt((ub / Tb**2) ** 2 + (ua / Ta**2) ** 2)
     )
     u = absorption_coefficient_uncertainty(
-        V, S, c=C, T_a=Ta, u_a=ua, T_b=Tb, u_b=ub
+        V, S, c=C, t_a=Ta, u_a=ua, t_b=Tb, u_b=ub
     )
     assert float(u) == pytest.approx(expected)
     assert float(u) == pytest.approx(0.0028681248003840053)
@@ -494,18 +494,18 @@ def test_absorption_rejects_nonpositive_geometry() -> None:
     with pytest.raises(
         ValueError, match="'volume' must be a positive, finite number"
     ):
-        random_incidence_absorption(0.0, S, c1=C, T1=8.0, c2=C, T2=6.0)
+        random_incidence_absorption(0.0, S, c1=C, t1=8.0, c2=C, t2=6.0)
     with pytest.raises(
         ValueError, match="'area' must be a positive, finite number"
     ):
-        random_incidence_absorption(V, -1.0, c1=C, T1=8.0, c2=C, T2=6.0)
+        random_incidence_absorption(V, -1.0, c1=C, t1=8.0, c2=C, t2=6.0)
 
 
 def test_absorption_rejects_nonpositive_time_and_speed() -> None:
     with pytest.raises(ValueError, match="'T' values must be positive"):
-        random_incidence_absorption(V, S, c1=C, T1=0.0, c2=C, T2=6.0)
+        random_incidence_absorption(V, S, c1=C, t1=0.0, c2=C, t2=6.0)
     with pytest.raises(ValueError, match="'c' values must be positive"):
-        random_incidence_absorption(V, S, c1=-1.0, T1=8.0, c2=C, T2=6.0)
+        random_incidence_absorption(V, S, c1=-1.0, t1=8.0, c2=C, t2=6.0)
 
 
 def test_scattering_rejects_alpha_s_equal_one() -> None:

@@ -15,6 +15,7 @@ import numpy as np
 import pytest
 
 from phonometry import (
+    RoomEnvironment,
     SoundPowerResult,
     SoundPowerWarning,
     background_noise_correction,
@@ -173,7 +174,12 @@ def test_partial_room_data_raises_via_sound_power_pressure() -> None:
     """The partial-pair guard is enforced through sound_power_pressure too."""
     levels = np.full((10, 1), 90.0)
     with pytest.raises(ValueError, match="volume"):
-        sound_power_pressure(levels, "hemisphere", radius=2.0, reverberation_time=1.2)
+        sound_power_pressure(
+            levels,
+            "hemisphere",
+            radius=2.0,
+            room=RoomEnvironment(reverberation_time=1.2),
+        )
 
 
 # --------------------------------------------------------------------------
@@ -229,7 +235,7 @@ def test_full_chain_with_k1_and_k2() -> None:
         "hemisphere",
         radius=r,
         background_levels=bg,
-        absorption_area=300.0,
+        room=RoomEnvironment(absorption_area=300.0),
     )
     expected = 80.0 - k1 - k2 + 10.0 * np.log10(s)
     assert res.sound_power_level[0] == pytest.approx(expected, abs=1e-9)
@@ -338,9 +344,10 @@ def test_background_levels_single_spectrum_broadcasts() -> None:
 
 def test_background_levels_wrong_length_raises() -> None:
     levels = np.tile(np.array([90.0, 92.0, 95.0]), (10, 1))
+    background_two_bands = np.array([70.0, 71.0])
     with pytest.raises(ValueError, match="background_levels"):
         sound_power_pressure(
-            levels, "hemisphere", radius=2.0, background_levels=np.array([70.0, 71.0])
+            levels, "hemisphere", radius=2.0, background_levels=background_two_bands
         )
 
 
@@ -390,7 +397,10 @@ def test_per_band_k2_flows_into_sound_power() -> None:
     t = np.array([1.0, 2.0, 4.0])
     volume = 2000.0  # large enough that per-band K2 stays under the 4 dB limit
     res = sound_power_pressure(
-        levels, "hemisphere", radius=2.0, reverberation_time=t, volume=volume
+        levels,
+        "hemisphere",
+        radius=2.0,
+        room=RoomEnvironment(reverberation_time=t, volume=volume),
     )
     a = 0.16 * volume / t
     expected_k2 = 10.0 * np.log10(1.0 + 4.0 * res.surface_area / a)
@@ -418,8 +428,9 @@ def test_sound_power_level_a_single_band_equals_level() -> None:
 # --------------------------------------------------------------------------
 def test_too_few_positions_raises() -> None:
     """Engineering hemisphere needs >= 10 positions (ISO 3744 clause 8.1.1)."""
+    five_positions = np.full((5, 1), 60.0)
     with pytest.raises(ValueError):
-        sound_power_pressure(np.full((5, 1), 60.0), "hemisphere", radius=2.0)
+        sound_power_pressure(five_positions, "hemisphere", radius=2.0)
 
 
 def test_survey_allows_four_positions() -> None:
@@ -431,13 +442,15 @@ def test_survey_allows_four_positions() -> None:
 
 
 def test_missing_radius_raises() -> None:
+    levels = np.full((10, 1), 60.0)
     with pytest.raises(ValueError):
-        sound_power_pressure(np.full((10, 1), 60.0), "hemisphere")
+        sound_power_pressure(levels, "hemisphere")
 
 
 def test_invalid_surface_raises() -> None:
+    levels = np.full((10, 1), 60.0)
     with pytest.raises(ValueError):
-        sound_power_pressure(np.full((10, 1), 60.0), "sphere", radius=2.0)
+        sound_power_pressure(levels, "sphere", radius=2.0)
 
 
 def test_k2_over_validity_limit_warns() -> None:
@@ -445,7 +458,10 @@ def test_k2_over_validity_limit_warns() -> None:
     r = 2.0
     with pytest.warns(SoundPowerWarning):
         sound_power_pressure(
-            np.full((10, 1), 60.0), "hemisphere", radius=r, absorption_area=10.0
+            np.full((10, 1), 60.0),
+            "hemisphere",
+            radius=r,
+            room=RoomEnvironment(absorption_area=10.0),
         )
 
 

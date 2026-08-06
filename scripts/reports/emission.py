@@ -127,7 +127,7 @@ def _sound_power_example() -> tuple[object, ReportMetadata, str]:
         reflecting_planes=1,
         background_levels=np.tile(surface_pressure - 10.0, (10, 1)),
         frequencies=freqs,
-        absorption_area=1500.0,
+        room=ph.emission.RoomEnvironment(absorption_area=1500.0),
         grade="engineering",
     )
     metadata = ReportMetadata(

@@ -17,6 +17,8 @@ and the exact (bit-for-bit) reduction to the acoustic solver when
 
 from __future__ import annotations
 
+from dataclasses import replace
+
 import matplotlib
 
 matplotlib.use("Agg")
@@ -27,8 +29,10 @@ from scipy.optimize import brentq
 
 from phonometry.building.prediction.panel_transmission import mass_law_transmission_loss
 from phonometry.simulation.elastic_fdtd import (
+    ElasticBoundaries,
     ElasticFDTD2D,
     ElasticFDTDResult,
+    ElasticRecording,
     ExplosionSource,
     ForceSource,
     elastic_fdtd_simulation,
@@ -82,8 +86,10 @@ def body_waves() -> ElasticFDTDResult:
             ForceSource(ix=250, iy=250, direction="y", amplitude=1e6,
                         waveform=GaussianPulse(0, 0, width=w).value),
         ],
-        probes=[(250, 350), (250, 470), (350, 250), (470, 250)],
-        probe_fields=("p", "vy"),
+        recording=ElasticRecording(
+            probes=[(250, 350), (250, 470), (350, 250), (470, 250)],
+            probe_fields=("p", "vy"),
+        ),
     )
 
 
@@ -128,11 +134,13 @@ def test_rayleigh_wave_speed_matches_characteristic_equation() -> None:
         CP_AL, CS_AL, 0.002, 5.0e-4, rho=RHO_AL, shape=(240, 660),
         sources=[ForceSource(ix=60, iy=0, direction="y", amplitude=1e6,
                              waveform=GaussianPulse(0, 0, width=w).value)],
-        probes=[(300, 0), (600, 0)],
-        probe_fields=("vy",),
-        boundaries={"top": "free", "left": "absorbing",
-                    "right": "absorbing", "bottom": "absorbing"},
-        absorbing_layer_cells=40,
+        recording=ElasticRecording(probes=[(300, 0), (600, 0)],
+                                  probe_fields=("vy",)),
+        boundaries=ElasticBoundaries(
+            {"top": "free", "left": "absorbing",
+             "right": "absorbing", "bottom": "absorbing"},
+            absorbing_layer_cells=40,
+        ),
     )
     t1 = _arrival(res, 0, 0)
     t2 = _arrival(res, 1, 0)
@@ -466,16 +474,21 @@ def test_source_validation() -> None:
     [
         ({"sources": []}, "at least one source"),
         ({"duration": 1e-9}, "at least one time step"),
-        ({"probe_fields": ()}, "probe_fields must not be empty"),
-        ({"probe_fields": ("vz",)}, "unknown probe fields"),
-        ({"probe_fields": ("vy", "vy")}, "must not repeat"),
-        ({"snapshot_field": "txx"}, "snapshot_field must be one of"),
-        ({"snapshot_every": 0}, "snapshot_every"),
-        ({"probes": [(99, 0)]}, "outside the grid"),
-        ({"boundaries": {"north": "free"}}, "unknown boundary sides"),
-        ({"boundaries": "anechoic"}, "must be one of"),
-        ({"boundaries": {"left": "open"}}, "must be one of"),
-        ({"boundaries": "absorbing", "absorbing_layer_cells": 0},
+        ({"recording": ElasticRecording(probe_fields=())},
+         "probe_fields must not be empty"),
+        ({"recording": ElasticRecording(probe_fields=("vz",))},
+         "unknown probe fields"),
+        ({"recording": ElasticRecording(probe_fields=("vy", "vy"))},
+         "must not repeat"),
+        ({"recording": ElasticRecording(snapshot_field="txx")},
+         "snapshot_field must be one of"),
+        ({"recording": ElasticRecording(snapshot_every=0)}, "snapshot_every"),
+        ({"recording": ElasticRecording(probes=[(99, 0)])}, "outside the grid"),
+        ({"boundaries": ElasticBoundaries({"north": "free"})},
+         "unknown boundary sides"),
+        ({"boundaries": ElasticBoundaries("anechoic")}, "must be one of"),
+        ({"boundaries": ElasticBoundaries({"left": "open"})}, "must be one of"),
+        ({"boundaries": ElasticBoundaries("absorbing", absorbing_layer_cells=0)},
          "absorbing_layer_cells"),
     ],
 )
@@ -496,16 +509,22 @@ def test_simulation_rejects_invalid_arguments(
 
 # --- Simulation driver: recording, determinism -----------------------------
 
+#: What the small runs record: two probes with all three fields, and a vy
+#: snapshot every 25 steps.
+_SMALL_RECORDING = ElasticRecording(
+    probes=[(30, 15), (20, 25)],
+    probe_fields=("p", "vx", "vy"),
+    snapshot_every=25,
+    snapshot_field="vy",
+)
+
 
 def _small_run(**kwargs: object) -> ElasticFDTDResult:
     defaults: dict[str, object] = {
         "sources": [ExplosionSource(
             ix=10, iy=15, waveform=GaussianPulse(0, 0, width=2e-5).value)],
-        "probes": [(30, 15), (20, 25)],
-        "probe_fields": ("p", "vx", "vy"),
-        "snapshot_every": 25,
-        "snapshot_field": "vy",
-        "boundaries": {"top": "free", "bottom": "absorbing"},
+        "recording": _SMALL_RECORDING,
+        "boundaries": ElasticBoundaries({"top": "free", "bottom": "absorbing"}),
     }
     defaults.update(kwargs)
     return elastic_fdtd_simulation(
@@ -527,7 +546,8 @@ def test_result_records_signals_and_snapshots() -> None:
     assert res.snapshot_field == "vy"
     np.testing.assert_allclose(res.probe_positions[0],
                                [(30 + 0.5) * 0.02, (15 + 0.5) * 0.02])
-    assert res.snapshots is not None and res.snapshot_times is not None
+    assert res.snapshots is not None
+    assert res.snapshot_times is not None
     assert res.snapshots.shape == (n_steps // 25 + 1, 40, 60)
     np.testing.assert_allclose(
         res.snapshot_times, np.arange(n_steps // 25 + 1) * 25 * res.dt)
@@ -537,7 +557,8 @@ def test_result_records_signals_and_snapshots() -> None:
 def test_two_runs_are_bit_identical() -> None:
     a, b = _small_run(), _small_run()
     np.testing.assert_array_equal(a.signals, b.signals)
-    assert a.snapshots is not None and b.snapshots is not None
+    assert a.snapshots is not None
+    assert b.snapshots is not None
     np.testing.assert_array_equal(a.snapshots, b.snapshots)
 
 
@@ -560,7 +581,8 @@ def test_orthogonal_free_sides_pin_both_corner_stresses() -> None:
     sim.add_source(ExplosionSource(
         ix=20, iy=20, waveform=GaussianPulse(0, 0, width=8 * sim.dt).value))
     sim.run(400)
-    assert np.all(np.isfinite(sim.txx)) and np.all(np.isfinite(sim.vy))
+    assert np.all(np.isfinite(sim.txx))
+    assert np.all(np.isfinite(sim.vy))
     for r in (0, -1):
         for c in (0, -1):
             assert sim.txx[r, c] == 0.0
@@ -617,7 +639,7 @@ def test_plot_localizes_labels(small_result: ElasticFDTDResult) -> None:
 
 
 def test_plot_rejects_unknown_kind_and_missing_snapshots() -> None:
-    res = _small_run(snapshot_every=None)
+    res = _small_run(recording=replace(_SMALL_RECORDING, snapshot_every=None))
     with pytest.raises(ValueError, match="kind"):
         res.plot(kind="field")
     with pytest.raises(ValueError, match="no snapshots"):

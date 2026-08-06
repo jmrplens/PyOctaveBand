@@ -209,7 +209,7 @@ res = aircraft.rotorcraft_event_level(
     hemispheres, speeds, angles,      # la base de datos
     times, positions,                 # la trayectoria (m, z hacia arriba)
     receiver=(120.0, 0.0),            # posición en tierra del micrófono
-    flow_resistivity="D")             # emplazamiento de hierba
+    ground=aircraft.RotorcraftGround(flow_resistivity="D"))   # hierba
 res.la_max, res.sel, res.epnl         # LASmax, SEL, EPNL
 res.plot()                            # el historial temporal LA(t)
 ```
@@ -238,7 +238,8 @@ t = np.arange(0.0, 130.01, 0.5)
 track = np.column_stack([np.zeros_like(t), speed * (t - 65.0),
                          np.full_like(t, 150.0)])
 event = aircraft.rotorcraft_event_level(
-    [h], [speed], [0.0], t, track, (120.0, 0.0), flow_resistivity="D")
+    [h], [speed], [0.0], t, track, (120.0, 0.0),
+    ground=aircraft.RotorcraftGround(flow_resistivity="D"))
 event.plot(language="es")
 plt.show()
 ```
@@ -246,9 +247,10 @@ plt.show()
 </details>
 
 Los flujos con trazas radar pueden pasar directamente los valores suavizados por
-punto de `airspeed`, `path_angle`, `heading` y `bank_angle` en lugar de
-derivarlos de las posiciones; cuando se derivan, la trayectoria está en metros
-y segundos, así que la base de datos de velocidades debe estar entonces en m/s.
+punto de `airspeed`, `path_angle`, `heading` y `bank_angle` de un
+`RotorcraftTrackState` en lugar de derivarlos de las posiciones; cuando se
+derivan, la trayectoria está en metros y segundos, así que la base de datos de
+velocidades debe estar entonces en m/s.
 
 ## Contornos en malla de tierra
 
@@ -265,14 +267,15 @@ res = aircraft.rotorcraft_noise_contour(
     hemispheres, speeds, angles, times, positions,
     x=np.linspace(-2000.0, 2000.0, 81),
     y=np.linspace(-3000.0, 3000.0, 121),
-    metric="exposure", flow_resistivity="D")
+    metric="exposure",
+    ground=aircraft.RotorcraftGround(flow_resistivity="D"))
 res.plot()                            # contornos SEL rellenos
 ```
 
 El suelo puede variar entre receptores sin un modelo de elevación completo:
-`flow_resistivity` y `ground_elevation` aceptan un valor por punto de malla
-(forma `(len(y), len(x))`), y el modelo de dos rayos de cada receptor usa
-entonces sus valores locales.
+`flow_resistivity` y `ground_elevation` del `RotorcraftGround` aceptan un valor
+por punto de malla (forma `(len(y), len(x))`), y el modelo de dos rayos de cada
+receptor usa entonces sus valores locales.
 
 ## Terreno: el plano medio del suelo y el apantallamiento
 
@@ -351,8 +354,8 @@ plt.show()
 </details>
 
 El evento y el contorno funcionan sobre emplazamientos reales pasando un
-modelo digital de elevaciones: `terrain=(x, y, z)` en el marco de la
-trayectoria. Cada par emisión-receptor muestrea entonces su propia sección
+modelo digital de elevaciones en el `RotorcraftGround`: `terrain=(x, y, z)` en
+el marco de la trayectoria. Cada par emisión-receptor muestrea entonces su propia sección
 vertical con paso `terrain_resolution` (por defecto, el tamaño de celda del
 modelo) y la evalúa con la maquinaria anterior; el suelo del receptor sale
 del modelo. El coste crece con puntos de trayectoria por puntos de malla, así
@@ -361,7 +364,8 @@ que con terreno conviene mantener mallas de contorno moderadas.
 ```python
 res = aircraft.rotorcraft_event_level(
     hemispheres, speeds, angles, times, positions, receiver=(1200.0, 300.0),
-    terrain=(tx, ty, tz), flow_resistivity="D")
+    ground=aircraft.RotorcraftGround(terrain=(tx, ty, tz),
+                                     flow_resistivity="D"))
 ```
 
 ## Validación

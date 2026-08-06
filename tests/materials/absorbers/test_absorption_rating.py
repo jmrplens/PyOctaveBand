@@ -309,8 +309,9 @@ def test_from_third_octave_rejects_wrong_length() -> None:
 
 def test_weighted_absorption_rejects_multidimensional_input() -> None:
     # A wrongly-shaped (3, 5) array must not be silently flattened (CodeRabbit).
+    two_dimensional = np.zeros((3, 5))
     with pytest.raises(ValueError, match="1-D"):
-        weighted_absorption(np.zeros((3, 5)))
+        weighted_absorption(two_dimensional)
 
 
 def test_weighted_absorption_rejects_non_finite() -> None:

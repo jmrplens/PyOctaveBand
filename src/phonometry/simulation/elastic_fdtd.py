@@ -994,6 +994,49 @@ class ElasticFDTDResult:
         raise ValueError("kind must be 'probes' or 'snapshot'")
 
 
+@dataclass(frozen=True)
+class ElasticRecording:
+    """What an elastic run writes down: probe traces and field snapshots.
+
+    The two ways out of a running simulation. Probes record a time history at
+    named cells, one trace per field of ``probe_fields``; snapshots record the
+    whole domain every ``snapshot_every`` steps for one field. Recording
+    nothing (the default) runs the physics and keeps only the time axis.
+
+    :param probes: Probe cells as ``(ix, iy)`` index pairs.
+    :param probe_fields: Which fields each probe records, drawn from
+        ``("p", "vx", "vy")`` (default ``("vy",)``, the component a surface
+        accelerometer would see).
+    :param snapshot_every: Record a full field snapshot every this many steps
+        (and at :math:`t = 0`); ``None`` records none.
+    :param snapshot_field: Field recorded in the snapshots
+        (``"p"``/``"vx"``/``"vy"``, interpolated to cell centres).
+    """
+
+    probes: Sequence[tuple[int, int]] = ()
+    probe_fields: Sequence[str] = ("vy",)
+    snapshot_every: int | None = None
+    snapshot_field: str = "p"
+
+
+@dataclass(frozen=True)
+class ElasticBoundaries:
+    """How the four edges of the elastic domain are terminated.
+
+    The sponge thickness only means anything where a side is absorbing, which
+    is why it travels with the sides rather than beside them.
+
+    :param sides: ``"rigid"`` (default), ``"absorbing"``, ``"free"``, or a
+        mapping from side name (``left``/``right``/``top``/``bottom``) to one
+        of those.
+    :param absorbing_layer_cells: Sponge-layer thickness for absorbing sides,
+        in cells.
+    """
+
+    sides: str | Mapping[str, str] = "rigid"
+    absorbing_layer_cells: int = 20
+
+
 def _parse_elastic_boundaries(
     boundaries: str | Mapping[str, str],
 ) -> tuple[tuple[str, ...], tuple[str, ...]]:
@@ -1092,14 +1135,10 @@ def elastic_fdtd_simulation(
     rho: float | Field2D,
     shape: tuple[int, int] | None = None,
     cfl: float = 0.6,
-    probes: Sequence[tuple[int, int]] = (),
-    probe_fields: Sequence[str] = ("vy",),
-    boundaries: str | Mapping[str, str] = "rigid",
-    absorbing_layer_cells: int = 20,
+    recording: ElasticRecording | None = None,
+    boundaries: ElasticBoundaries | None = None,
     obstacle_mask: NDArray[np.bool_] | None = None,
     damping: float = 0.0,
-    snapshot_every: int | None = None,
-    snapshot_field: str = "p",
 ) -> ElasticFDTDResult:
     r"""Run a deterministic 2D elastic (P-SV) FDTD simulation.
 
@@ -1134,39 +1173,36 @@ def elastic_fdtd_simulation(
     :param cfl: Courant number in ``(0, 1)`` (Virieux Eqs. 6-7); the time
         step is :math:`\Delta t = C_N\, \Delta x / (c_{p,\max} \sqrt{2})`.
         Default 0.6.
-    :param probes: Probe cells as ``(ix, iy)`` index pairs.
-    :param probe_fields: Which fields each probe records, drawn from
-        ``("p", "vx", "vy")`` (default ``("vy",)``, the component a surface
-        accelerometer would see).
-    :param boundaries: ``"rigid"`` (default), ``"absorbing"``, ``"free"``,
-        or a mapping from side name (``left``/``right``/``top``/``bottom``)
-        to one of those.
-    :param absorbing_layer_cells: Sponge-layer thickness for absorbing
-        sides, in cells.
+    :param recording: What the run records (:class:`ElasticRecording`): the
+        probe cells and their fields, and the snapshot cadence and field.
+        ``None`` records nothing but the time axis.
+    :param boundaries: How the domain edges are terminated
+        (:class:`ElasticBoundaries`); ``None`` is rigid on all four sides.
     :param obstacle_mask: Boolean map, shape ``(ny, nx)``, of rigid cells
         (rasterised interior geometry).
     :param damping: Uniform bulk amplitude decay rate [1/s].
-    :param snapshot_every: Record a full field snapshot every this many
-        steps (and at :math:`t = 0`); ``None`` records none.
-    :param snapshot_field: Field recorded in the snapshots
-        (``"p"``/``"vx"``/``"vy"``, interpolated to cell centres).
     :return: An :class:`ElasticFDTDResult`.
     :raises ValueError: If the inputs are invalid.
     """
+    recording = ElasticRecording() if recording is None else recording
+    boundaries = ElasticBoundaries() if boundaries is None else boundaries
+    snapshot_every = recording.snapshot_every
+    snapshot_field = recording.snapshot_field
     if len(sources) == 0:
         raise ValueError("at least one source is required")
     duration = _positive_finite("duration", duration)
-    fields = _resolve_probe_fields(probe_fields)
+    fields = _resolve_probe_fields(recording.probe_fields)
     if snapshot_field not in _FIELD_NAMES:
         raise ValueError(f"snapshot_field must be one of {_FIELD_NAMES}")
     if snapshot_every is not None:
         snapshot_every = _integer("snapshot_every", snapshot_every)
         if snapshot_every < 1:
             raise ValueError("snapshot_every must be >= 1")
-    absorbing_sides, free_sides = _parse_elastic_boundaries(boundaries)
+    absorbing_sides, free_sides = _parse_elastic_boundaries(boundaries.sides)
+    absorbing_layer_cells = 0
     if absorbing_sides:
         absorbing_layer_cells = _integer("absorbing_layer_cells",
-                                         absorbing_layer_cells)
+                                         boundaries.absorbing_layer_cells)
         if absorbing_layer_cells < 1:
             raise ValueError("absorbing_layer_cells must be >= 1")
 
@@ -1185,7 +1221,7 @@ def elastic_fdtd_simulation(
         sim.add_source(source)
 
     ny, nx = sim.txx.shape
-    probe_ix = _probe_indices(probes, (ny, nx), sim._obstacle)
+    probe_ix = _probe_indices(recording.probes, (ny, nx), sim._obstacle)
 
     steps = round(duration / sim.dt)
     if steps < 1:

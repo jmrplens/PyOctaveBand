@@ -27,6 +27,7 @@ from __future__ import annotations
 import numpy as np
 import pytest
 
+from phonometry.materials.absorbers.porous import AirProperties
 from phonometry.materials.absorbers.slow_sound import (
     CriticalCouplingResult,
     HelmholtzResonator,
@@ -44,6 +45,10 @@ _RHO0 = 1.205
 _C0 = 343.0
 _GAMMA = 1.4
 _P0 = 101325.0
+_AIR = AirProperties(
+    speed_of_sound=_C0, density=_RHO0, viscosity=_ETA,
+    heat_capacity_ratio=_GAMMA, atmospheric_pressure=_P0,
+)
 
 
 def _base_resonator() -> HelmholtzResonator:
@@ -60,10 +65,7 @@ def test_slit_dc_flow_resistivity() -> None:
     """j w rho_s -> 12 eta / h^2 (parallel-plate Poiseuille) as w -> 0."""
     h = 1.2e-3
     f = np.array([1.0e-2])
-    rho_s, _ = slit_effective_properties(
-        f, slit_height=h, air_density=_RHO0, viscosity=_ETA,
-        heat_capacity_ratio=_GAMMA, atmospheric_pressure=_P0,
-    )
+    rho_s, _ = slit_effective_properties(f, slit_height=h, air=_AIR)
     sigma = float((1j * 2.0 * np.pi * f * rho_s)[0].real)
     assert sigma == pytest.approx(12.0 * _ETA / h**2, rel=1e-4)
 
@@ -71,10 +73,7 @@ def test_slit_dc_flow_resistivity() -> None:
 def test_slit_high_frequency_limits() -> None:
     """rho_s -> rho0 and kappa_s -> kappa0 as the boundary layers vanish."""
     f = np.array([2.0e4])
-    rho_s, kap_s = slit_effective_properties(
-        f, slit_height=5.0e-2, air_density=_RHO0, viscosity=_ETA,
-        heat_capacity_ratio=_GAMMA, atmospheric_pressure=_P0,
-    )
+    rho_s, kap_s = slit_effective_properties(f, slit_height=5.0e-2, air=_AIR)
     assert rho_s[0].real == pytest.approx(_RHO0, rel=2e-2)
     assert kap_s[0].real == pytest.approx(_GAMMA * _P0, rel=2e-2)
 
@@ -83,10 +82,7 @@ def test_square_duct_dc_flow_resistivity() -> None:
     """j w rho -> 28.454 eta / side^2 (square-duct Poiseuille) as w -> 0."""
     side = 3.0e-3
     f = np.array([1.0e-2])
-    rho, _ = rectangular_duct_properties(
-        f, side=side, air_density=_RHO0, viscosity=_ETA,
-        heat_capacity_ratio=_GAMMA, atmospheric_pressure=_P0,
-    )
+    rho, _ = rectangular_duct_properties(f, side=side, air=_AIR)
     sigma = float((1j * 2.0 * np.pi * f * rho)[0].real)
     assert sigma == pytest.approx(28.454 * _ETA / side**2, rel=1e-3)
 
@@ -95,8 +91,7 @@ def test_square_duct_high_frequency_limits() -> None:
     """rho -> rho0 and kappa -> kappa0 for a wide duct at high frequency."""
     f = np.array([5.0e4])
     rho, kap = rectangular_duct_properties(
-        f, side=5.0e-2, air_density=_RHO0, viscosity=_ETA,
-        heat_capacity_ratio=_GAMMA, atmospheric_pressure=_P0, sum_terms=120,
+        f, side=5.0e-2, air=_AIR, sum_terms=120,
     )
     assert rho[0].real == pytest.approx(_RHO0, rel=1e-2)
     assert kap[0].real == pytest.approx(_GAMMA * _P0, rel=1e-2)
@@ -123,9 +118,9 @@ def test_duct_reduces_to_slit_in_wide_limit() -> None:
     h = 3.0e-3
     f = np.array([1500.0])
     rho_s, kap_s = slit_effective_properties(f, slit_height=h)
-    # Rebuild the rectangular series directly with a != b (b wide).
-    from phonometry.materials.absorbers import slow_sound as ss
-
+    # Rebuild the rectangular series directly with a != b (b wide), on the
+    # same air the model defaults to.
+    air = AirProperties()
     idx = np.arange(400)
     a2 = ((2 * idx + 1) * np.pi / h) ** 2
     b2 = ((2 * idx + 1) * np.pi / 0.08) ** 2
@@ -133,16 +128,16 @@ def test_duct_reduces_to_slit_in_wide_limit() -> None:
     base = ak2 * bm2
     sab = ak2 + bm2
     w = 2 * np.pi * f[0]
-    g2r = 1j * w * _RHO0 / ss._AIR_VISCOSITY
-    g2k = 1j * w * ss._PRANDTL_NUMBER * _RHO0 / ss._AIR_VISCOSITY
+    g2r = 1j * w * _RHO0 / air.viscosity
+    g2k = 1j * w * air.prandtl_number * _RHO0 / air.viscosity
     sr = np.sum(1.0 / (base * (sab - g2r)))
     sk = np.sum(1.0 / (base * (sab - g2k)))
     rho_d = np.conj(-_RHO0 * h**2 * 0.08**2 / (64.0 * g2r * sr))
     kap_d = np.conj(
-        ss._HEAT_CAPACITY_RATIO * ss._ATMOSPHERIC_PRESSURE
+        air.heat_capacity_ratio * air.atmospheric_pressure
         / (
-            ss._HEAT_CAPACITY_RATIO
-            + (64.0 * (ss._HEAT_CAPACITY_RATIO - 1.0) * g2k / (h**2 * 0.08**2)) * sk
+            air.heat_capacity_ratio
+            + (64.0 * (air.heat_capacity_ratio - 1.0) * g2k / (h**2 * 0.08**2)) * sk
         )
     )
     assert rho_d == pytest.approx(rho_s[0], rel=3e-2)
@@ -164,7 +159,9 @@ def test_resonator_impedance_lumped_helmholtz_limit() -> None:
         cavity_length=40.0e-3, cavity_side=30.0e-3,
     )
     f = np.linspace(150.0, 900.0, 4000)
-    z = helmholtz_resonator_impedance(f, res, air_density=_RHO0, viscosity=_ETA)
+    z = helmholtz_resonator_impedance(
+        f, res, air=AirProperties(density=_RHO0, viscosity=_ETA),
+    )
     # resonance = reactance sign change
     react = z.imag
     cross = np.where(np.sign(react[:-1]) != np.sign(react[1:]))[0]

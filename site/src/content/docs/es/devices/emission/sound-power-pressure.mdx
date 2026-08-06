@@ -110,7 +110,7 @@ print(mic_xyz.shape)                                    # (10, 3)
 res = emission.sound_power_pressure(
     levels, "hemisphere", radius=1.5, reflecting_planes=1,
     background_levels=background, frequencies=freqs,
-    reverberation_time=0.6, volume=300.0,          # datos de sala -> K2
+    room=emission.RoomEnvironment(reverberation_time=0.6, volume=300.0),  # -> K2
 )
 print(round(res.surface_area, 2))                       # 14.14 m^2 (= 2*pi*1.5^2)
 print(round(float(res.environmental_correction[0]), 2)) # K2 = 2.32 dB
@@ -146,7 +146,7 @@ background = np.full((10, 8), 55.0)
 res = emission.sound_power_pressure(
     levels, "hemisphere", radius=1.5, reflecting_planes=1,
     background_levels=background, frequencies=freqs,
-    reverberation_time=0.6, volume=300.0,          # datos de sala -> K2
+    room=emission.RoomEnvironment(reverberation_time=0.6, volume=300.0),  # -> K2
 )
 
 # res es el SoundPowerResult calculado arriba. Una línea:
@@ -173,9 +173,10 @@ plt.show()
 El total ponderado A $L_{WA}$ se combina a partir de las potencias por banda
 con
 las correcciones de ponderación A del Anexo E de ISO 3744, así que necesita
-`frequencies`. Pasar los datos de sala (`reverberation_time` + `volume`,
-o `absorption_area`, o `mean_absorption_coefficient` + `room_surface`) habilita
-$K_2$; omítelos y el campo se trata como libre ($K_2 = 0$). Si el margen de
+`frequencies`. Pasar un `RoomEnvironment` como `room`
+(`reverberation_time` + `volume`, o `absorption_area`, o
+`mean_absorption_coefficient` + `room_surface`) habilita
+$K_2$; omítelo y el campo se trata como libre ($K_2 = 0$). Si el margen de
 fondo cae por debajo del criterio del grado o $K_2$ supera el límite de
 validez, un
 `SoundPowerWarning` avisa de que los niveles son cotas superiores; la
@@ -229,9 +230,10 @@ envolvente se remontan a uno de estos hábitos:
 | `reflecting_planes` | int | — | `1` / `2` / `3`, por defecto `1` | Divide entre dos/cuatro el área de la semiesfera |
 | `background_levels` | array 2D o espectro | dB | `(NM, NB)`, o `(NB,)` / `(1, NB)` | Habilita $K_1$; un espectro único se difunde a todas las posiciones |
 | `frequencies` | array 1D | Hz | centros de banda nominales | Habilita $L_{WA}$ (Anexo E) |
-| `absorption_area` | float o array 1D | m² | > 0 | $A$ para $K_2$ (directo); un array por banda → $K_2$ por banda |
-| `reverberation_time`, `volume` | float/array, float | s, m³ | > 0 | $A = 0{,}16\,V/T$ para $K_2$; $T$ por banda → $K_2$ por banda |
-| `mean_absorption_coefficient`, `room_surface` | float/array, float | —, m² | `(0,1]`, > 0 | $A = \alpha\,S_v$ (Ec. A.7); $\alpha$ por banda → $K_2$ por banda |
+| `room` | `RoomEnvironment` o None | — | por defecto `None` (campo libre) | Los datos de sala tras $K_2$; sus campos son las tres vías hacia $A$ de abajo |
+| `room.absorption_area` | float o array 1D | m² | > 0 | $A$ para $K_2$ (directo); un array por banda → $K_2$ por banda |
+| `room.reverberation_time`, `room.volume` | float/array, float | s, m³ | > 0 | $A = 0{,}16\,V/T$ para $K_2$; $T$ por banda → $K_2$ por banda |
+| `room.mean_absorption_coefficient`, `room.room_surface` | float/array, float | —, m² | `(0,1]`, > 0 | $A = \alpha\,S_v$ (Ec. A.7); $\alpha$ por banda → $K_2$ por banda |
 | `grade` | str | — | `'engineering'` (por defecto) / `'survey'` | ISO 3744 vs ISO 3746 |
 | `omc_uncertainty` | float | dB | por defecto `0.0` | $\sigma_\text{omc}$, inestabilidad de operación/montaje, incorporada a $U$ |
 
@@ -457,7 +459,8 @@ surface = np.array([72.0, 76, 80, 82, 81, 78, 73, 66])
 res = emission.sound_power_pressure(
     np.tile(surface, (10, 1)), "hemisphere", radius=4.0,
     background_levels=np.tile(surface - 10.0, (10, 1)),
-    frequencies=freqs, absorption_area=1500.0, grade="engineering",
+    frequencies=freqs, grade="engineering",
+    room=emission.RoomEnvironment(absorption_area=1500.0),
 )
 
 res.report(

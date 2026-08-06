@@ -34,7 +34,10 @@ import pytest
 from phonometry import (
     DEFAULT_FREQUENCIES,
     Barrier,
+    DirectivityCorrection,
+    GroundFactors,
     OutdoorAttenuation,
+    PropagationGeometry,
     air_attenuation,
     atmospheric_absorption,
     barrier_attenuation,
@@ -368,30 +371,38 @@ class TestPredictedReceiverLevel:
         lw = np.full(len(BANDS), 100.0)
         r = outdoor_propagation_attenuation(200.0, 2.0, 2.0, BANDS,
                                             1.0, 1.0, 1.0)
-        level = predicted_receiver_level(lw, 200.0, 2.0, 2.0, BANDS,
-                                         1.0, 1.0, 1.0)
+        level = predicted_receiver_level(
+            lw, PropagationGeometry(200.0, 2.0, 2.0), frequencies=BANDS,
+            ground=GroundFactors(1.0, 1.0, 1.0))
         assert np.allclose(level, lw - r.a_total)
 
     def test_directivity_and_omega_add(self) -> None:
         lw = np.full(len(BANDS), 90.0)
-        base = predicted_receiver_level(lw, 200.0, 2.0, 2.0, BANDS)
-        boosted = predicted_receiver_level(lw, 200.0, 2.0, 2.0, BANDS,
-                                           directivity_index=2.0, d_omega=3.0)
+        geometry = PropagationGeometry(200.0, 2.0, 2.0)
+        base = predicted_receiver_level(lw, geometry, frequencies=BANDS)
+        boosted = predicted_receiver_level(
+            lw, geometry, frequencies=BANDS,
+            directivity=DirectivityCorrection(index=2.0, d_omega=3.0))
         assert np.allclose(boosted - base, 5.0)
 
     def test_cmet_subtracted(self) -> None:
         lw = np.full(len(BANDS), 90.0)
-        dw = predicted_receiver_level(lw, 400.0, 2.0, 2.0, BANDS, 1.0, 1.0, 1.0)
-        lt = predicted_receiver_level(lw, 400.0, 2.0, 2.0, BANDS, 1.0, 1.0, 1.0,
-                                      c0=2.0)
+        geometry = PropagationGeometry(400.0, 2.0, 2.0)
+        porous = GroundFactors(1.0, 1.0, 1.0)
+        dw = predicted_receiver_level(lw, geometry, frequencies=BANDS,
+                                      ground=porous)
+        lt = predicted_receiver_level(lw, geometry, frequencies=BANDS,
+                                      ground=porous, c0=2.0)
         cmet = meteorological_correction(400.0, 2.0, 2.0, 2.0)
         assert cmet > 0.0
         assert np.allclose(dw - lt, cmet)
 
     def test_level_decreases_with_distance(self) -> None:
         lw = np.full(len(BANDS), 100.0)
-        near = predicted_receiver_level(lw, 100.0, 2.0, 2.0, BANDS)
-        far = predicted_receiver_level(lw, 1000.0, 2.0, 2.0, BANDS)
+        near = predicted_receiver_level(
+            lw, PropagationGeometry(100.0, 2.0, 2.0), frequencies=BANDS)
+        far = predicted_receiver_level(
+            lw, PropagationGeometry(1000.0, 2.0, 2.0), frequencies=BANDS)
         assert np.all(far < near)
 
 
@@ -405,8 +416,9 @@ class TestInputValidation:
             Barrier(source_to_edge=-1.0, edge_to_receiver=50.0)
 
     def test_ground_attenuation_rejects_nonpositive_frequency(self) -> None:
+        with_zero = np.array([0.0, 500.0])
         with pytest.raises(ValueError, match="frequencies"):
-            ground_attenuation(200.0, 2.0, 2.0, np.array([0.0, 500.0]), 1.0, 1.0, 1.0)
+            ground_attenuation(200.0, 2.0, 2.0, with_zero, 1.0, 1.0, 1.0)
 
     def test_ground_attenuation_rejects_nonpositive_distance(self) -> None:
         with pytest.raises(ValueError, match="distance"):
@@ -414,8 +426,9 @@ class TestInputValidation:
 
     def test_barrier_attenuation_rejects_nonpositive_frequency(self) -> None:
         barrier = Barrier(source_to_edge=50.0, edge_to_receiver=50.0)
+        with_negative = np.array([-1.0, 500.0])
         with pytest.raises(ValueError, match="frequencies"):
-            barrier_attenuation(barrier, 90.0, np.array([-1.0, 500.0]))
+            barrier_attenuation(barrier, 90.0, with_negative)
 
 
 def test_public_exports() -> None:
@@ -427,5 +440,7 @@ def test_public_exports() -> None:
         "atmospheric_absorption", "ground_attenuation",
         "ground_attenuation_alternative", "barrier_attenuation",
         "meteorological_correction", "directivity_omega", "DEFAULT_FREQUENCIES",
+        "PropagationGeometry", "GroundFactors", "AtmosphericConditions",
+        "DirectivityCorrection",
     ):
         assert hasattr(phonometry, name), name
