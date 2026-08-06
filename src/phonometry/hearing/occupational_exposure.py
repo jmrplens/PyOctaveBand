@@ -378,17 +378,17 @@ class _BudgetOptions:
     warn: bool
 
 
-def _validated_task_levels(tasks: Sequence[Task]) -> tuple[list[float], list[float]]:
-    """Per-task energy-average levels (Eq 7) and mean durations ``T_m``, validated."""
-    levels: list[float] = []
-    durations: list[float] = []
-    for task in tasks:
-        if len(task.samples) == 0:
-            raise ValueError("Each task needs at least one sample.")
-        if task.duration_hours <= 0:
-            raise ValueError("Task 'duration_hours' must be positive.")
-        levels.append(energy_mean(task.samples))  # Eq 7
-        durations.append(task.duration_hours)
+def _task_levels(tasks: Sequence[Task]) -> tuple[list[float], list[float]]:
+    """Per-task energy-average levels (Eq 7) and mean durations ``T_m``.
+
+    No validation here: :class:`Task` is a frozen dataclass that rejects an
+    empty sample set and a non-positive duration in ``__post_init__``, so an
+    invalid task cannot reach this function. The guards that used to repeat
+    those two checks were unreachable, and the test that appeared to cover them
+    was in fact exercising the constructor.
+    """
+    levels = [energy_mean(task.samples) for task in tasks]  # Eq 7
+    durations = [task.duration_hours for task in tasks]
     return levels, durations
 
 
@@ -494,7 +494,7 @@ def task_based_exposure(
         raise ValueError("'u3' must be non-negative.")
 
     # First pass: task levels and durations (Eq 7, 8).
-    levels, durations = _validated_task_levels(tasks)
+    levels, durations = _task_levels(tasks)
 
     # Daily level: energy sum of contributions (Eq 9 == Eq 10).
     energy = sum((t_m / _T0) * 10.0 ** (0.1 * lp) for lp, t_m in zip(levels, durations))
@@ -624,7 +624,7 @@ def job_based_exposure(
                     OccupationalExposureWarning,
                     stacklevel=2,
                 )
-            result = _with_advisory(result)
+            result = replace(result, sampling_advisory=True)
     return result
 
 
@@ -665,7 +665,3 @@ def full_day_exposure(
         samples, effective_duration_hours, instrument, u3, "full_day", warn, spread_advisory=spread
     )
 
-
-def _with_advisory(result: ExposureResult) -> ExposureResult:
-    """Return a copy of ``result`` with the sampling advisory flag set."""
-    return replace(result, sampling_advisory=True)
