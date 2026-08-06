@@ -229,6 +229,94 @@ def _validate_band_vector(values: Sequence[float] | np.ndarray, name: str) -> np
     return arr
 
 
+def _truncated_mtf(mtf: np.ndarray) -> np.ndarray:
+    """Validate the modulation transfer matrix and truncate it to 1,0.
+
+    Ed.4 A.5.3 NOTE 1 (= Ed.5): a value above 1,3 means the measurement is
+    invalid, and every value is truncated to 1,0 before the chain runs.
+    """
+    m = np.array(mtf, dtype=np.float64)
+    if m.ndim != 2 or m.shape[0] != _NUM_BANDS:
+        raise ValueError(
+            f"'mtf' must have shape ({_NUM_BANDS}, n_modulation_frequencies), "
+            f"got {m.shape}."
+        )
+    if np.any(m < 0.0) or not np.all(np.isfinite(m)):
+        raise ValueError("Modulation transfer values must be finite and >= 0.")
+    if np.any(m > 1.3):
+        warnings.warn(
+            "Modulation transfer values above 1.3 detected: the measurement "
+            "is likely invalid (IEC 60268-16 A.5.3). Values truncated to 1.0.",
+            STIWarning,
+            stacklevel=4,
+        )
+    return np.minimum(m, 1.0)
+
+
+def _snr_vector(
+    snr: float | Sequence[float] | np.ndarray | None,
+) -> np.ndarray | None:
+    """The per-band signal-to-noise ratios, broadcast from a scalar if given."""
+    if snr is None:
+        return None
+    snr_arr = np.asarray(snr, dtype=np.float64)
+    if snr_arr.ndim == 0:
+        return np.full(_NUM_BANDS, float(snr_arr))
+    if snr_arr.shape != (_NUM_BANDS,):
+        raise ValueError(
+            f"'snr' must be a scalar or a vector of {_NUM_BANDS} "
+            f"octave-band values, got shape {snr_arr.shape}."
+        )
+    return snr_arr
+
+
+def _corrected_mtf(
+    m: np.ndarray,
+    snr_arr: np.ndarray | None,
+    level: Sequence[float] | np.ndarray | None,
+    ambient: Sequence[float] | np.ndarray | None,
+) -> tuple[np.ndarray, np.ndarray | None]:
+    """Apply the noise and level-dependent corrections of A.5.3.
+
+    Without absolute levels only the signal-to-noise correction applies; with
+    them the auditory masking and absolute reception threshold join it. Returns
+    the corrected matrix and the validated band levels, which the result
+    carries.
+    """
+    if level is None:
+        if ambient is not None:
+            raise ValueError(
+                "'ambient' requires the speech octave-band levels 'level' to "
+                "form the intensity-domain correction; pass 'snr' instead."
+            )
+        if snr_arr is not None:
+            # I_k / (I_k + I_n,k) with I_n,k = I_k * 10^(-SNR/10).
+            m = m / (1.0 + 10.0 ** (-snr_arr[:, np.newaxis] / 10.0))
+        # No absolute level information: the auditory masking and absolute
+        # reception threshold corrections are skipped.
+        return m, None
+
+    band_levels = _validate_band_vector(level, "level")
+    i_signal = 10.0 ** (band_levels / 10.0)
+    if ambient is not None:
+        ambient_arr = _validate_band_vector(ambient, "ambient")
+    elif snr_arr is not None:
+        ambient_arr = band_levels - snr_arr
+    else:
+        ambient_arr = None
+    i_noise = (
+        10.0 ** (ambient_arr / 10.0) if ambient_arr is not None else np.zeros(_NUM_BANDS)
+    )
+    i_total = i_signal + i_noise
+    level_total = 10.0 * np.log10(i_total)
+    # Masking only acts on the next higher band; 125 Hz is unmasked.
+    i_masking = np.zeros(_NUM_BANDS)
+    i_masking[1:] = i_total[:-1] * 10.0 ** (_masking_amdb(level_total[:-1]) / 10.0)
+    i_threshold = 10.0 ** (_ART_DB / 10.0)
+    factor = i_signal / (i_signal + i_masking + i_threshold + i_noise)
+    return m * factor[:, np.newaxis], band_levels
+
+
 def _sti_from_mtf(
     mtf: np.ndarray,
     snr: float | Sequence[float] | np.ndarray | None = None,
@@ -252,70 +340,13 @@ def _sti_from_mtf(
     instead, with ``ambient`` (or ``level - snr``) defining :math:`I_{n,k}`,
     so the noise degradation is never applied twice.
     """
-    m = np.array(mtf, dtype=np.float64)
-    if m.ndim != 2 or m.shape[0] != _NUM_BANDS:
-        raise ValueError(
-            f"'mtf' must have shape ({_NUM_BANDS}, n_modulation_frequencies), "
-            f"got {m.shape}."
-        )
-    if np.any(m < 0.0) or not np.all(np.isfinite(m)):
-        raise ValueError("Modulation transfer values must be finite and >= 0.")
-    if np.any(m > 1.3):
-        # Ed.4 A.5.3 NOTE 1 (= Ed.5): m > 1,3 indicates an invalid measurement.
-        warnings.warn(
-            "Modulation transfer values above 1.3 detected: the measurement "
-            "is likely invalid (IEC 60268-16 A.5.3). Values truncated to 1.0.",
-            STIWarning,
-            stacklevel=3,
-        )
-    m = np.minimum(m, 1.0)
+    m = _truncated_mtf(mtf)
 
     if snr is not None and ambient is not None:
         raise ValueError("Provide either 'snr' or 'ambient' noise levels, not both.")
 
-    snr_arr: np.ndarray | None = None
-    if snr is not None:
-        snr_arr = np.asarray(snr, dtype=np.float64)
-        if snr_arr.ndim == 0:
-            snr_arr = np.full(_NUM_BANDS, float(snr_arr))
-        elif snr_arr.shape != (_NUM_BANDS,):
-            raise ValueError(
-                f"'snr' must be a scalar or a vector of {_NUM_BANDS} "
-                f"octave-band values, got shape {snr_arr.shape}."
-            )
-
-    band_levels: np.ndarray | None = None
-    if level is None:
-        if ambient is not None:
-            raise ValueError(
-                "'ambient' requires the speech octave-band levels 'level' to "
-                "form the intensity-domain correction; pass 'snr' instead."
-            )
-        if snr_arr is not None:
-            # I_k / (I_k + I_n,k) with I_n,k = I_k * 10^(-SNR/10).
-            m = m / (1.0 + 10.0 ** (-snr_arr[:, np.newaxis] / 10.0))
-        # No absolute level information: the auditory masking and absolute
-        # reception threshold corrections are skipped.
-    else:
-        band_levels = _validate_band_vector(level, "level")
-        i_signal = 10.0 ** (band_levels / 10.0)
-        if ambient is not None:
-            ambient_arr = _validate_band_vector(ambient, "ambient")
-        elif snr_arr is not None:
-            ambient_arr = band_levels - snr_arr
-        else:
-            ambient_arr = None
-        i_noise = (
-            10.0 ** (ambient_arr / 10.0) if ambient_arr is not None else np.zeros(_NUM_BANDS)
-        )
-        i_total = i_signal + i_noise
-        level_total = 10.0 * np.log10(i_total)
-        # Masking only acts on the next higher band; 125 Hz is unmasked.
-        i_masking = np.zeros(_NUM_BANDS)
-        i_masking[1:] = i_total[:-1] * 10.0 ** (_masking_amdb(level_total[:-1]) / 10.0)
-        i_threshold = 10.0 ** (_ART_DB / 10.0)
-        factor = i_signal / (i_signal + i_masking + i_threshold + i_noise)
-        m = m * factor[:, np.newaxis]
+    snr_arr = _snr_vector(snr)
+    m, band_levels = _corrected_mtf(m, snr_arr, level, ambient)
 
     # Effective SNR clipped to +/-15 dB (A.5.4); m = 0 and m = 1 map to the
     # clip limits through the log divergences.
