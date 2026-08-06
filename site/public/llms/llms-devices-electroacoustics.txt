@@ -591,7 +591,10 @@ computed from the response rather than merely repeated:
 
 ```python
 import numpy as np
-from phonometry import loudspeaker_characteristics, radiating_piston, ReportMetadata
+from phonometry import (
+    LoudspeakerDirectivity, ReportMetadata, loudspeaker_characteristics,
+    radiating_piston,
+)
 
 freqs = np.geomspace(30, 24000, 320)
 spl = 87.0 + 1.2 * np.sin(2 * np.log2(freqs / 900.0))
@@ -604,9 +607,11 @@ result = loudspeaker_characteristics(
                6.6 + 24 * np.exp(-(np.log2(np.geomspace(20, 20000, 260) / 52.0) ** 2) / 0.12)),
     distortion=(np.geomspace(50, 5000, 140),
                 0.3 + 2.6 * np.exp(-(np.log2(np.geomspace(50, 5000, 140) / 70.0) ** 2) / 0.45)),
-    directivity=radiating_piston(0.075, np.array([1000.0, 2000.0, 4000.0]),
-                                 angles=np.radians(np.linspace(0, 90, 46))),
-    polar_frequency=2000.0,
+    directivity=LoudspeakerDirectivity(
+        piston=radiating_piston(0.075, np.array([1000.0, 2000.0, 4000.0]),
+                                angles=np.radians(np.linspace(0, 90, 46))),
+        frequency=2000.0,
+    ),
 )
 print(round(result.sensitivity_level_db, 1))                 # dB, 1 W / 1 m
 print(tuple(round(x) for x in result.effective_range))       # Hz
@@ -715,16 +720,20 @@ plt.show()
 ```python
 import matplotlib.pyplot as plt
 import numpy as np
-from phonometry import loudspeaker_characteristics, radiating_piston
+from phonometry import (
+    LoudspeakerDirectivity, loudspeaker_characteristics, radiating_piston,
+)
 
 freqs = np.geomspace(30, 24000, 320)
 spl = 87.0 - 10 * np.log10(1 + (50.0 / freqs) ** 6)
 
 result = loudspeaker_characteristics(
     freqs, spl, rated_impedance=8.0, sensitivity_band=(200.0, 4000.0),
-    directivity=radiating_piston(0.075, np.array([1000.0, 2000.0, 4000.0]),
-                                 angles=np.radians(np.linspace(0, 90, 46))),
-    polar_frequency=2000.0,
+    directivity=LoudspeakerDirectivity(
+        piston=radiating_piston(0.075, np.array([1000.0, 2000.0, 4000.0]),
+                                angles=np.radians(np.linspace(0, 90, 46))),
+        frequency=2000.0,
+    ),
 )
 result.plot(quantity="directivity")
 plt.show()
@@ -1005,7 +1014,10 @@ standard's own definitions rather than merely repeated:
 
 ```python
 import numpy as np
-from phonometry import microphone_characteristics, ReportMetadata
+from phonometry import (
+    MicrophoneDirectivity, MicrophoneElectrical, MicrophoneNoise,
+    MicrophoneOverload, ReportMetadata, microphone_characteristics,
+)
 
 freqs = np.geomspace(20, 20000, 400)
 response = -10 * np.log10(1 + (30.0 / freqs) ** 4)      # low-frequency roll-off
@@ -1018,14 +1030,20 @@ noise_f = np.geomspace(20, 20000, 31)
 
 result = microphone_characteristics(
     freqs, response, 12.5, tolerance_db=3.0,          # 12.5 mV/Pa at 1 kHz
-    rated_impedance=150.0, minimum_load_impedance=1000.0,
-    noise_voltage=1.25e-6,                             # A-weighted, V
-    noise_spectrum=(noise_f, 6.0 + 12.0 * np.log10(1000.0 / noise_f)),
-    max_spl_thd_percent=0.5,
-    distortion=(np.linspace(100, 140, 81),
-                0.5 * 10 ** ((np.linspace(100, 140, 81) - 130.0) * 0.08)),
-    polar=(angles, cardioid), polar_frequency=1000.0,
-    powering="Phantom P48 (IEC 61938)", supply_current_ma=3.1,
+    directivity=MicrophoneDirectivity(polar=(angles, cardioid), frequency=1000.0),
+    noise=MicrophoneNoise(                             # A-weighted, V
+        voltage=1.25e-6,
+        spectrum=(noise_f, 6.0 + 12.0 * np.log10(1000.0 / noise_f)),
+    ),
+    overload=MicrophoneOverload(
+        distortion=(np.linspace(100, 140, 81),
+                    0.5 * 10 ** ((np.linspace(100, 140, 81) - 130.0) * 0.08)),
+        thd_percent=0.5,
+    ),
+    electrical=MicrophoneElectrical(
+        rated_impedance=150.0, minimum_load_impedance=1000.0,
+        powering="Phantom P48 (IEC 61938)", supply_current_ma=3.1,
+    ),
 )
 print(round(result.sensitivity_level_db, 1))            # -38.1 dB re 1 V/Pa
 print(tuple(round(x) for x in result.effective_range))  # Hz
@@ -1088,7 +1106,7 @@ plt.show()
 ```python
 import matplotlib.pyplot as plt
 import numpy as np
-from phonometry import microphone_characteristics
+from phonometry import MicrophoneDirectivity, microphone_characteristics
 
 freqs = np.geomspace(20, 20000, 400)
 response = -10 * np.log10(1 + (30.0 / freqs) ** 4)
@@ -1097,7 +1115,7 @@ cardioid = 20 * np.log10((1 + np.cos(np.radians(angles))) / 2)
 
 result = microphone_characteristics(
     freqs, response, 12.5, tolerance_db=3.0,
-    polar=(angles, cardioid), polar_frequency=1000.0,
+    directivity=MicrophoneDirectivity(polar=(angles, cardioid), frequency=1000.0),
 )
 result.plot(quantity="directivity")
 plt.show()
@@ -1113,15 +1131,18 @@ plt.show()
 ```python
 import matplotlib.pyplot as plt
 import numpy as np
-from phonometry import microphone_characteristics
+from phonometry import MicrophoneNoise, microphone_characteristics
 
 freqs = np.geomspace(20, 20000, 400)
 response = -10 * np.log10(1 + (30.0 / freqs) ** 4)
 noise_f = np.geomspace(20, 20000, 31)
 
 result = microphone_characteristics(
-    freqs, response, 12.5, tolerance_db=3.0, noise_voltage=1.25e-6,
-    noise_spectrum=(noise_f, 6.0 + 12.0 * np.log10(1000.0 / noise_f)),
+    freqs, response, 12.5, tolerance_db=3.0,
+    noise=MicrophoneNoise(
+        voltage=1.25e-6,
+        spectrum=(noise_f, 6.0 + 12.0 * np.log10(1000.0 / noise_f)),
+    ),
 )
 result.plot(quantity="noise")
 plt.show()
@@ -1137,15 +1158,18 @@ plt.show()
 ```python
 import matplotlib.pyplot as plt
 import numpy as np
-from phonometry import microphone_characteristics
+from phonometry import MicrophoneOverload, microphone_characteristics
 
 freqs = np.geomspace(20, 20000, 400)
 response = -10 * np.log10(1 + (30.0 / freqs) ** 4)
 spl_axis = np.linspace(100, 140, 81)
 
 result = microphone_characteristics(
-    freqs, response, 12.5, tolerance_db=3.0, max_spl_thd_percent=0.5,
-    distortion=(spl_axis, 0.5 * 10 ** ((spl_axis - 130.0) * 0.08)),
+    freqs, response, 12.5, tolerance_db=3.0,
+    overload=MicrophoneOverload(
+        distortion=(spl_axis, 0.5 * 10 ** ((spl_axis - 130.0) * 0.08)),
+        thd_percent=0.5,
+    ),
 )
 result.plot(quantity="distortion")
 plt.show()

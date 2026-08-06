@@ -5,6 +5,8 @@ from __future__ import annotations
 
 from .._compat import _namespace_dir, _namespace_shim
 from .airport_noise import (
+    AerodromeAtmosphere,
+    FlightSegmentState,
     FlyoverResult,
     NoiseContourResult,
     NpdLevelResult,
@@ -38,10 +40,14 @@ from .certification import (
 )
 from .measurement_system import verify_aircraft_noise_system
 from .rotorcraft_noise import (
+    FlightConditionInterpolation,
     FlightPathKinematics,
+    RotorcraftAtmosphere,
     RotorcraftEventResult,
+    RotorcraftGround,
     RotorcraftHemisphere,
     RotorcraftNoiseContourResult,
+    RotorcraftTrackState,
     flight_condition_weights,
     flight_path_kinematics,
     hemisphere_source_level,
@@ -63,20 +69,26 @@ from .rotorcraft_propagation import (
 
 __all__ = [
     "NOY_BANDS",
+    "AerodromeAtmosphere",
     "AircraftBandAttenuation",
     "AnpAircraft",
     "AnpDatabase",
     "AnpNpdCurves",
     "AnpProfile",
     "EPNLResult",
+    "FlightConditionInterpolation",
     "FlightPathKinematics",
+    "FlightSegmentState",
     "FlyoverResult",
     "MeanGroundPlaneResult",
     "NoiseContourResult",
     "NpdLevelResult",
+    "RotorcraftAtmosphere",
     "RotorcraftEventResult",
+    "RotorcraftGround",
     "RotorcraftHemisphere",
     "RotorcraftNoiseContourResult",
+    "RotorcraftTrackState",
     "TerrainScreeningResult",
     "atmospheric_adjustment",
     "diffraction_attenuation",

@@ -49,13 +49,16 @@ if TYPE_CHECKING:
     from ..materials.surfaces.road_absorption import InsituAbsorptionResult
 
 _FREQ_LABEL = "Frequency [Hz]"
+_SCATTERING_TITLE = "Random-incidence scattering coefficient (ISO 17497-1)"
+_DIFFUSION_TITLE = "Directional diffusion coefficient (ISO 17497-2)"
+_HARD_BACKED_ALPHA_LABEL = r"Hard-backed absorption $\alpha$"
 
 #: Spanish translations of the fixed strings rendered by the materials
 #: ``.plot()`` renderers, keyed by their verbatim English text.  ``_t`` returns
 #: the English key unchanged for any language other than ``"es"``, so the
 #: English output is byte-for-byte identical to the pre-i18n renderers.
 _STRINGS: dict[str, str] = {
-    "Frequency [Hz]": "Frecuencia [Hz]",
+    _FREQ_LABEL: "Frecuencia [Hz]",
     "Sound absorption coefficient": "Coeficiente de absorción acústica",
     r"Sound absorption coefficient $\alpha_s$":
         r"Coeficiente de absorción acústica $\alpha_s$",
@@ -65,12 +68,12 @@ _STRINGS: dict[str, str] = {
     "class ": "clase ",
     "Sigma unfav. = ": "Sigma desfav. = ",
     "Scattering coefficient s": "Coeficiente de dispersión s",
-    "Random-incidence scattering coefficient (ISO 17497-1)":
+    _SCATTERING_TITLE:
         "Coeficiente de dispersión de incidencia aleatoria (ISO 17497-1)",
     "Diffusion coefficient d = ": "Coeficiente de difusión d = ",
     "Predicted diffuser polar response":
         "Respuesta polar predicha del difusor",
-    "Directional diffusion coefficient (ISO 17497-2)":
+    _DIFFUSION_TITLE:
         "Coeficiente de difusión direccional (ISO 17497-2)",
     "Reflected sound-pressure level L [dB]":
         "Nivel de presión acústica reflejado L [dB]",
@@ -116,7 +119,7 @@ _STRINGS: dict[str, str] = {
     r"Absorption $\alpha_{dif}$": r"Absorción $\alpha_{dif}$",
     "Transmission loss $TL_n$": "Pérdida de transmisión $TL_n$",
     "Transmission loss $TL_n$ [dB]": "Pérdida de transmisión $TL_n$ [dB]",
-    r"Hard-backed absorption $\alpha$":
+    _HARD_BACKED_ALPHA_LABEL:
         r"Absorción con respaldo rígido $\alpha$",
     "ASTM E2611 transfer-matrix quantities":
         "Magnitudes de la matriz de transferencia ASTM E2611",
@@ -200,7 +203,7 @@ def plot_sound_absorption(
     freqs = np.asarray(result.frequencies, dtype=np.float64)
     alpha = np.asarray(result.alpha_s, dtype=np.float64)
     positions = _band_axis(
-        ax, freqs, xlabel=_t("Frequency [Hz]", language), language=language
+        ax, freqs, xlabel=_t(_FREQ_LABEL, language), language=language
     )
     kwargs.setdefault("marker", "o")
     kwargs.setdefault("color", _C_PRIMARY)
@@ -240,7 +243,7 @@ def plot_scattering_coefficient(
     # 1 and those values are kept, not clipped; grow the top so they stay visible.
     top = max(1.05, float(np.nanmax(s)) * 1.05) if s.size else 1.05
     ax.set_ylim(0.0, top)
-    ax.set_title(_t("Random-incidence scattering coefficient (ISO 17497-1)", language))
+    ax.set_title(_t(_SCATTERING_TITLE, language))
     ax.grid(True, alpha=0.3)
     localize_axes(ax, language)
     return ax
@@ -300,7 +303,7 @@ def plot_scattering_report(
     s = np.asarray(result.scattering, dtype=np.float64)
     a_s = np.asarray(result.random_incidence, dtype=np.float64)
     positions = _band_axis(
-        ax, freqs, xlabel=_t("Frequency [Hz]", language), language=language
+        ax, freqs, xlabel=_t(_FREQ_LABEL, language), language=language
     )
     ax.fill_between(
         positions, 0.0, np.clip(s, 0.0, None),
@@ -317,7 +320,7 @@ def plot_scattering_report(
     top = max(1.05, float(np.nanmax(s)) * 1.05) if s.size else 1.05
     ax.set_ylim(0.0, top)
     ax.set_title(
-        _t("Random-incidence scattering coefficient (ISO 17497-1)", language)
+        _t(_SCATTERING_TITLE, language)
     )
     ax.grid(True, axis="y", alpha=0.3)
     _localize_band_axes(ax, language)
@@ -346,7 +349,7 @@ def plot_diffusion_report(
     freqs = np.asarray(result.frequencies, dtype=np.float64)
     d = np.asarray(result.diffusion, dtype=np.float64)
     positions = _band_axis(
-        ax, freqs, xlabel=_t("Frequency [Hz]", language), language=language
+        ax, freqs, xlabel=_t(_FREQ_LABEL, language), language=language
     )
     ax.fill_between(
         positions, 0.0, np.clip(d, 0.0, None),
@@ -364,7 +367,7 @@ def plot_diffusion_report(
     ax.set_ylabel(_t("Coefficient", language))
     ax.set_ylim(0.0, 1.05)
     ax.set_title(
-        _t("Directional diffusion coefficient (ISO 17497-2)", language)
+        _t(_DIFFUSION_TITLE, language)
     )
     ax.grid(True, axis="y", alpha=0.3)
     _localize_band_axes(ax, language)
@@ -404,7 +407,7 @@ def plot_diffusion_polar_report(
             float(np.nanmax(angles_deg)) <= 90.0:
         polar_ax.set_thetamin(-90)
         polar_ax.set_thetamax(90)
-    ax.set_title(_t("Directional diffusion coefficient (ISO 17497-2)", language))
+    ax.set_title(_t(_DIFFUSION_TITLE, language))
     from .._i18n import localize_axes
 
     localize_axes(ax, language)
@@ -427,7 +430,7 @@ def plot_insitu_absorption(
     freqs = np.asarray(result.frequencies, dtype=np.float64)
     alpha = np.asarray(result.absorption, dtype=np.float64)
     positions = _band_axis(
-        ax, freqs, xlabel=_t("Frequency [Hz]", language), language=language
+        ax, freqs, xlabel=_t(_FREQ_LABEL, language), language=language
     )
     kwargs.setdefault("color", _C_PRIMARY)
     ax.bar(positions, np.nan_to_num(alpha), **kwargs)
@@ -967,9 +970,9 @@ def plot_transfer_matrix(
     ax.plot(freqs, tl, **kwargs)
     twin = ax.twinx()
     twin.plot(freqs, alpha, ls="--", color=_C_MUTED,
-              label=_t(r"Hard-backed absorption $\alpha$", language))
+              label=_t(_HARD_BACKED_ALPHA_LABEL, language))
     twin.set_ylim(0.0, 1.05)
-    twin.set_ylabel(_t(r"Hard-backed absorption $\alpha$", language))
+    twin.set_ylabel(_t(_HARD_BACKED_ALPHA_LABEL, language))
     format_frequency_axis(ax, float(freqs.min()), float(freqs.max()))
     ax.set_xlabel(_t(_FREQ_LABEL, language))
     ax.set_ylabel(_t("Transmission loss $TL_n$ [dB]", language))

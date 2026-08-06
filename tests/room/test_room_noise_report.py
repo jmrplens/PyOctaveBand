@@ -230,7 +230,8 @@ def test_verdict_uses_display_rounded_values(tmp_path) -> None:
     out = tmp_path / "boundary.pdf"
     result.report(str(out), metadata=_full_metadata(requirement=40.0))
     text = _extract_text(str(out))
-    assert "PASS" in text and "FAIL" not in text
+    assert "PASS" in text
+    assert "FAIL" not in text
 
 
 def test_nc_sil_designation_renders(tmp_path) -> None:
@@ -286,7 +287,8 @@ def test_report_without_requirement_has_no_verdict(tmp_path) -> None:
     out = tmp_path / "noverdict.pdf"
     _rc_result().report(str(out), metadata=_full_metadata())
     text = _extract_text(str(out))
-    assert "PASS" not in text and "FAIL" not in text
+    assert "PASS" not in text
+    assert "FAIL" not in text
 
 
 # --------------------------------------------------------------------------

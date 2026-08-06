@@ -89,7 +89,8 @@ def test_fractile_ordering_and_median() -> None:
     mid = m.nipts(95.0, 30.0, 0.5).value
     high = m.nipts(95.0, 30.0, 0.9).value
     np.testing.assert_allclose(mid, m.nipts(95.0, 30.0, 0.5).median)
-    assert np.all(low <= mid) and np.all(mid <= high)
+    assert np.all(low <= mid)
+    assert np.all(mid <= high)
 
 
 def test_negative_nipts_clamped_to_zero() -> None:

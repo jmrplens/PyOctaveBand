@@ -100,12 +100,15 @@ recording = 0.2 * np.sin(2 * np.pi * 1000 * np.arange(fs) / fs)
 calibration_factor = metrology.sensitivity(calibrator_recording, target_spl=94.0, fs=fs)
 
 # 3. Aplica la calibración a tus mediciones
-spl, freq = filters.octave_filter(recording, fs, calibration_factor=calibration_factor)
+spl, freq = filters.octave_filter(
+    recording, fs,
+    calibration=filters.LevelCalibration(factor=calibration_factor))
 # ¡Ahora los valores de 'spl' son dB SPL reales!
 ```
 
-El mismo `calibration_factor` funciona en toda la librería: `octave_filter`,
-`OctaveFilterBank`, `leq`, `laeq` y `ln_levels`.
+El mismo factor funciona en toda la librería: `octave_filter` y
+`OctaveFilterBank` lo reciben dentro de `LevelCalibration(factor=...)`, y `leq`,
+`laeq` y `ln_levels` como `calibration_factor=`.
 
 ## Supuestos del calibrador (IEC 60942)
 
@@ -190,8 +193,9 @@ plt.show()
 | `narrowband` | bool | — | defecto `False` | Estima el tono con un detector coherente (Goertzel) cerca de `frequency` (requiere `fs`) en lugar del RMS de banda completa; rechaza el zumbido/ruido de banda ancha que si no infla el RMS y reduce todos los niveles posteriores (~−0,44 dB a 20 dB de SNR). Actívalo para grabaciones de acoplador ruidosas |
 
 Devuelve el factor de sensibilidad (float) para pasarlo como
-`calibration_factor=` a `octave_filter`, `leq`, `laeq`, `ln_levels`, `lc_peak`,
-`sel` y las funciones de dosis.
+`calibration_factor=` a `leq`, `laeq`, `ln_levels`, `lc_peak`, `sel` y las
+funciones de dosis, y como `calibration=LevelCalibration(factor=...)` a
+`octave_filter`.
 
 ## Comprobaciones de campo, verificación de laboratorio y deriva
 
@@ -235,7 +239,7 @@ parámetro `dbfs=True`.
 En este modo:
 
 * **0 dBFS** corresponde a un nivel numérico de señal de 1,0 (RMS o pico).
-* `calibration_factor` no aplica (dBFS es relativo al fondo de escala digital).
+* El factor de calibración no aplica (dBFS es relativo al fondo de escala digital).
 * Útil para analizar headroom, mastering digital o señales normalizadas.
 
 ```python
@@ -248,7 +252,8 @@ fs = 48000
 recording = 0.2 * np.sin(2 * np.pi * 1000 * np.arange(fs) / fs)
 
 # Suponiendo que 'recording' está normalizada entre -1.0 y 1.0
-spl_dbfs, freq = filters.octave_filter(recording, fs, dbfs=True)
+spl_dbfs, freq = filters.octave_filter(
+    recording, fs, calibration=filters.LevelCalibration(dbfs=True))
 # Los resultados serán negativos (p. ej. -20 dBFS)
 ```
 

@@ -91,13 +91,17 @@ def test_report_with_metadata_one_page(tmp_path) -> None:
 
 
 def test_unknown_engine_rejected(tmp_path) -> None:
+    result = _result()
+    out = str(tmp_path / "x.pdf")
     with pytest.raises(ValueError, match="engine"):
-        _result().report(str(tmp_path / "x.pdf"), engine="weasyprint")
+        result.report(out, engine="weasyprint")
 
 
 def test_unknown_language_rejected(tmp_path) -> None:
+    result = _result()
+    out = str(tmp_path / "x.pdf")
     with pytest.raises(ValueError, match="Unknown language"):
-        _result().report(str(tmp_path / "x.pdf"), language="xx")
+        result.report(out, language="xx")
 
 
 def test_displayed_alpha_s_matches_oracle(tmp_path) -> None:
@@ -107,7 +111,8 @@ def test_displayed_alpha_s_matches_oracle(tmp_path) -> None:
     text = _text(str(out))
     assert "0.33" in text  # alpha_s(500 Hz)
     assert "0.61" in text  # alpha_s(1000 Hz)
-    assert "500" in text and "1000" in text  # band labels
+    assert "500" in text  # band labels
+    assert "1000" in text
     assert "343" in text  # speed of sound c (Eq. (6))
 
 

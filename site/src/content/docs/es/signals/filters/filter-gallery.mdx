@@ -67,7 +67,7 @@ fig, ax = plt.subplots(figsize=(9, 5))
 for ftype in ("butter", "cheby1", "cheby2", "ellip", "bessel"):
     # limits selecciona únicamente la banda de octava de 1 kHz
     bank = filters.OctaveFilterBank(fs, fraction=1, order=6, limits=[800, 1200],
-                            filter_type=ftype)
+                            design=filters.FilterDesign(filter_type=ftype))
     idx = int(np.argmin(np.abs(np.array(bank.freq) - 1000)))
     fsd = fs / bank.factor[idx]           # frecuencia real de la banda
     w, h = sosfreqz(bank.sos[idx], worN=16384, fs=fsd)
@@ -84,11 +84,11 @@ plt.show()
 
 | Tipo | Nombre | Ejemplo de uso | Ideal para |
 | :--- | :--- | :--- | :--- |
-| `butter` | **Butterworth** | `octave_filter(x, fs, filter_type='butter')` | Medición acústica general. |
-| `cheby1` | **Chebyshev I** | `octave_filter(x, fs, filter_type='cheby1', ripple=0.1)` | Caída más abrupta a costa de rizado. |
-| `cheby2` | **Chebyshev II** | `octave_filter(x, fs, filter_type='cheby2')` | Banda de paso plana con ceros en la banda atenuada. |
-| `ellip` | **Elíptico** | `octave_filter(x, fs, filter_type='ellip', ripple=0.1)` | Máxima selectividad. |
-| `bessel` | **Bessel** | `octave_filter(x, fs, filter_type='bessel')` | Preservar la forma de los transitorios. |
+| `butter` | **Butterworth** | `octave_filter(x, fs, design=FilterDesign(filter_type='butter'))` | Medición acústica general. |
+| `cheby1` | **Chebyshev I** | `octave_filter(x, fs, design=FilterDesign(filter_type='cheby1', ripple=0.1))` | Caída más abrupta a costa de rizado. |
+| `cheby2` | **Chebyshev II** | `octave_filter(x, fs, design=FilterDesign(filter_type='cheby2'))` | Banda de paso plana con ceros en la banda atenuada. |
+| `ellip` | **Elíptico** | `octave_filter(x, fs, design=FilterDesign(filter_type='ellip', ripple=0.1))` | Máxima selectividad. |
+| `bessel` | **Bessel** | `octave_filter(x, fs, design=FilterDesign(filter_type='bessel'))` | Preservar la forma de los transitorios. |
 
 ## 2. Galería de respuestas del banco
 
@@ -112,10 +112,11 @@ from phonometry import filters
 fs = 48000
 for ftype in ("butter", "cheby1", "cheby2", "ellip", "bessel"):
     for fraction in (1, 3):
-        # show=True dibuja la respuesta en frecuencia del banco
+        # ResponsePlot(show=True) dibuja la respuesta en frecuencia del banco
         filters.OctaveFilterBank(fs=fs, fraction=fraction, order=6,
-                                   limits=[12, 20000], filter_type=ftype,
-                                   show=True)
+                                   limits=[12, 20000],
+                                   design=filters.FilterDesign(filter_type=ftype),
+                                   response_plot=filters.ResponsePlot(show=True))
 ```
 
 </details>
@@ -137,7 +138,8 @@ fs = 48000
 x = 0.2 * np.sin(2 * np.pi * 1000 * np.arange(fs) / fs)
 
 # Medición estándar en tercios de octava
-spl, freq = filters.octave_filter(x, fs, fraction=3, filter_type='butter')
+spl, freq = filters.octave_filter(x, fs, fraction=3,
+                                  design=filters.FilterDesign(filter_type='butter'))
 ```
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/filter_butter_fraction_3_order_6_es.svg" alt="Respuesta en frecuencia del banco Butterworth de tercio de octava" width="60%" />
@@ -150,7 +152,8 @@ from phonometry import filters
 
 # Dibuja la respuesta de este banco (1/3 de octava, orden 6, Butterworth)
 filters.OctaveFilterBank(fs=48000, fraction=3, order=6, limits=[12, 20000],
-                           filter_type='butter', show=True)
+                           design=filters.FilterDesign(filter_type='butter'),
+                           response_plot=filters.ResponsePlot(show=True))
 ```
 
 </details>
@@ -170,7 +173,9 @@ fs = 48000
 x = 0.2 * np.sin(2 * np.pi * 1000 * np.arange(fs) / fs)
 
 # Selectividad con 0.1 dB de rizado en la banda de paso
-spl, freq = filters.octave_filter(x, fs, fraction=3, filter_type='cheby1', ripple=0.1)
+spl, freq = filters.octave_filter(
+    x, fs, fraction=3,
+    design=filters.FilterDesign(filter_type='cheby1', ripple=0.1))
 ```
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/filter_cheby1_fraction_3_order_6_es.svg" alt="Respuesta en frecuencia del banco Chebyshev I de tercio de octava" width="60%" />
@@ -183,7 +188,8 @@ from phonometry import filters
 
 # Dibuja la respuesta de este banco (1/3 de octava, orden 6, Chebyshev I)
 filters.OctaveFilterBank(fs=48000, fraction=3, order=6, limits=[12, 20000],
-                           filter_type='cheby1', ripple=0.1, show=True)
+                           design=filters.FilterDesign(filter_type='cheby1', ripple=0.1),
+                           response_plot=filters.ResponsePlot(show=True))
 ```
 
 </details>
@@ -205,7 +211,8 @@ fs = 48000
 x = 0.2 * np.sin(2 * np.pi * 1000 * np.arange(fs) / fs)
 
 # Banda de paso plana, 72 dB de atenuación por defecto (clase 1)
-spl, freq = filters.octave_filter(x, fs, fraction=3, filter_type='cheby2')
+spl, freq = filters.octave_filter(x, fs, fraction=3,
+                                  design=filters.FilterDesign(filter_type='cheby2'))
 ```
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/filter_cheby2_fraction_3_order_6_es.svg" alt="Respuesta en frecuencia del banco Chebyshev II de tercio de octava" width="60%" />
@@ -218,7 +225,8 @@ from phonometry import filters
 
 # Dibuja la respuesta de este banco (1/3 de octava, orden 6, Chebyshev II)
 filters.OctaveFilterBank(fs=48000, fraction=3, order=6, limits=[12, 20000],
-                           filter_type='cheby2', show=True)
+                           design=filters.FilterDesign(filter_type='cheby2'),
+                           response_plot=filters.ResponsePlot(show=True))
 ```
 
 </details>
@@ -238,7 +246,9 @@ fs = 48000
 x = 0.2 * np.sin(2 * np.pi * 1000 * np.arange(fs) / fs)
 
 # Máxima selectividad para aislamiento extremo entre bandas
-spl, freq = filters.octave_filter(x, fs, fraction=3, filter_type='ellip', ripple=0.1)
+spl, freq = filters.octave_filter(
+    x, fs, fraction=3,
+    design=filters.FilterDesign(filter_type='ellip', ripple=0.1))
 ```
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/filter_ellip_fraction_3_order_6_es.svg" alt="Respuesta en frecuencia del banco elíptico de tercio de octava" width="60%" />
@@ -251,7 +261,8 @@ from phonometry import filters
 
 # Dibuja la respuesta de este banco (1/3 de octava, orden 6, elíptico)
 filters.OctaveFilterBank(fs=48000, fraction=3, order=6, limits=[12, 20000],
-                           filter_type='ellip', ripple=0.1, show=True)
+                           design=filters.FilterDesign(filter_type='ellip', ripple=0.1),
+                           response_plot=filters.ResponsePlot(show=True))
 ```
 
 </details>
@@ -271,7 +282,8 @@ fs = 48000
 x = 0.2 * np.sin(2 * np.pi * 1000 * np.arange(fs) / fs)
 
 # Ideal para análisis de pulsos y preservación de transitorios
-spl, freq = filters.octave_filter(x, fs, fraction=3, filter_type='bessel')
+spl, freq = filters.octave_filter(x, fs, fraction=3,
+                                  design=filters.FilterDesign(filter_type='bessel'))
 ```
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/filter_bessel_fraction_3_order_6_es.svg" alt="Respuesta en frecuencia del banco Bessel de tercio de octava" width="60%" />
@@ -284,7 +296,8 @@ from phonometry import filters
 
 # Dibuja la respuesta de este banco (1/3 de octava, orden 6, Bessel)
 filters.OctaveFilterBank(fs=48000, fraction=3, order=6, limits=[12, 20000],
-                           filter_type='bessel', show=True)
+                           design=filters.FilterDesign(filter_type='bessel'),
+                           response_plot=filters.ResponsePlot(show=True))
 ```
 
 </details>

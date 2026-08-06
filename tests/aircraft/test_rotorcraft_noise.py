@@ -211,7 +211,9 @@ def test_hemisphere_all_nan_band_returns_nan() -> None:
     lv[:, :, 1] = np.nan
     hole = RotorcraftHemisphere(h.frequencies, h.azimuth, h.polar, lv)
     out = hemisphere_source_level(hole, 10.0, 70.0)
-    assert np.isnan(out[1]) and np.isfinite(out[0]) and np.isfinite(out[2])
+    assert np.isnan(out[1])
+    assert np.isfinite(out[0])
+    assert np.isfinite(out[2])
 
 
 def test_hemisphere_plot() -> None:
@@ -433,12 +435,18 @@ def test_propagation_chain_reproduces_prototype_la(
 # --------------------------------------------------------------------------- #
 
 from phonometry.aircraft.rotorcraft_noise import (
+    RotorcraftAtmosphere,
+    RotorcraftGround,
+    RotorcraftTrackState,
     flight_condition_weights,
     flight_path_kinematics,
     interpolated_source_level,
     rotorcraft_event_level,
     rotorcraft_noise_contour,
 )
+
+#: The hard-ground, 0.1 m microphone site the flyover helper measures on.
+_HARD_SITE = RotorcraftGround(receiver_height=0.1, flow_resistivity="H")
 
 
 def _uniform_hemisphere(level: float, bands: list[float] | None = None,
@@ -626,17 +634,16 @@ def test_kinematics_plot() -> None:
 
 def _flyover(level: float = 100.0, bands: list[float] | None = None,
              span: float = 6000.0, dt: float = 0.5, height: float = 100.1,
-             **kwargs: float | str) -> tuple:
+             **kwargs: object) -> tuple:
     """A constant-speed level flyover along y over the origin receiver."""
     speed = 50.0
     t = np.arange(0.0, 2.0 * span / speed + dt / 2.0, dt)
     pos = np.column_stack([np.zeros_like(t), speed * t - span,
                            np.full_like(t, height)])
     hems = [_uniform_hemisphere(level, bands)]
+    kwargs.setdefault("ground", _HARD_SITE)
     res = rotorcraft_event_level(
         hems, [speed], [0.0], t, pos, (0.0, 0.0),
-        receiver_height=float(kwargs.pop("receiver_height", 0.1)),
-        flow_resistivity=kwargs.pop("flow_resistivity", "H"),
         **kwargs)  # type: ignore[arg-type]
     return t, pos, res
 
@@ -658,7 +665,8 @@ def test_event_bank_tilt_moves_azimuth() -> None:
     # Rolling starboard-down by 25 deg swings the below-aircraft receiver to
     # phi = +25 deg in the tilted hemisphere frame (guidance §A.3.4).
     _, _, level_res = _flyover(bands=[31.5])
-    _, _, banked = _flyover(bands=[31.5], bank_angle=25.0)
+    _, _, banked = _flyover(bands=[31.5],
+                            track_state=RotorcraftTrackState(bank_angle=25.0))
     k = int(np.argmin(level_res.distance))
     assert level_res.azimuth[k] == pytest.approx(0.0, abs=1e-6)
     assert banked.azimuth[k] == pytest.approx(25.0, abs=1e-6)
@@ -668,7 +676,8 @@ def test_event_heading_override_mirrors_polar() -> None:
     # Reversing the heading turns approach geometry into recession: the polar
     # angles mirror about 90 deg (the frame is heading-only, no pitch tilt).
     _, _, fwd = _flyover(bands=[31.5])
-    _, _, rev = _flyover(bands=[31.5], heading=180.0)
+    _, _, rev = _flyover(bands=[31.5],
+                         track_state=RotorcraftTrackState(heading=180.0))
     assert np.allclose(fwd.polar + rev.polar, 180.0, atol=1e-9)
 
 
@@ -711,7 +720,8 @@ def test_event_epnl_undefined_off_noy_grid() -> None:
     # A single 31.5 Hz band cannot address the 24 noy bands: EPNL undefined.
     _, _, res = _flyover(bands=[31.5])
     assert np.all(np.isnan(res.pnlt))
-    assert np.isnan(res.pnltm) and np.isnan(res.epnl)
+    assert np.isnan(res.pnltm)
+    assert np.isnan(res.epnl)
 
 
 _NORAH_BANDS = [10.0, 12.5, 16.0, 20.0, 25.0, 31.5, 40.0, 50.0, 63.0, 80.0,
@@ -731,7 +741,9 @@ def test_event_epnl_on_the_standard_grid() -> None:
 
 def test_event_atmospheric_methods_agree_at_low_frequency() -> None:
     _, _, iso = _flyover(bands=[31.5], span=2000.0)
-    _, _, sae = _flyover(bands=[31.5], span=2000.0, atmospheric_method="sae")
+    _, _, sae = _flyover(
+        bands=[31.5], span=2000.0,
+        atmosphere=RotorcraftAtmosphere(atmospheric_method="sae"))
     assert sae.la_max == pytest.approx(iso.la_max, abs=0.05)
     assert sae.sel == pytest.approx(iso.sel, abs=0.05)
 
@@ -742,18 +754,21 @@ def test_event_validation() -> None:
     pos = np.array([[0.0, -50.0, 100.0], [0.0, 50.0, 100.0]])
     with pytest.raises(ValueError, match="receiver"):
         rotorcraft_event_level(hems, [50.0], [0.0], t, pos, (0.0, 0.0, 0.0, 0.0))
+    unknown_method_atmosphere = RotorcraftAtmosphere(atmospheric_method="exact")
     with pytest.raises(ValueError, match="atmospheric_method"):
         rotorcraft_event_level(hems, [50.0], [0.0], t, pos, (0.0, 0.0),
-                               atmospheric_method="exact")
+                               atmosphere=unknown_method_atmosphere)
+    mismatched_airspeed_state = RotorcraftTrackState(airspeed=[50.0, 50.0, 50.0])
     with pytest.raises(ValueError, match="airspeed"):
         rotorcraft_event_level(hems, [50.0], [0.0], t, pos, (0.0, 0.0),
-                               airspeed=[50.0, 50.0, 50.0])
+                               track_state=mismatched_airspeed_state)
     with pytest.raises(ValueError, match="level_offset"):
         rotorcraft_event_level(hems, [50.0], [0.0], t, pos, (0.0, 0.0),
                                level_offset=[1.0, 2.0, 3.0])
+    nan_elevation_ground = RotorcraftGround(ground_elevation=np.nan)
     with pytest.raises(ValueError, match="ground_elevation"):
         rotorcraft_event_level(hems, [50.0], [0.0], t, pos, (0.0, 0.0),
-                               ground_elevation=np.nan)
+                               ground=nan_elevation_ground)
 
 
 def test_event_plot() -> None:

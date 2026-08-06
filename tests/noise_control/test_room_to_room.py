@@ -16,7 +16,7 @@ import math
 import numpy as np
 import pytest
 
-from phonometry import room_to_room_transmission
+from phonometry import DesignCriterion, SourceRoom, room_to_room_transmission
 from phonometry.noise_control.room_to_room import RoomToRoomResult
 
 _BANDS = np.array([125.0, 250.0, 500.0, 1000.0, 2000.0, 4000.0])
@@ -33,8 +33,8 @@ _NAN = float("nan")
 def _chain(**kwargs: object) -> RoomToRoomResult:
     """A plain six-band chain with round numbers, for the option tests."""
     defaults: dict[str, object] = {
-        "source_level": _SOURCE,
-        "criterion": "NC",
+        "source": SourceRoom(level=_SOURCE),
+        "criterion": DesignCriterion(family="NC"),
     }
     defaults.update(kwargs)
     return room_to_room_transmission(
@@ -54,7 +54,7 @@ def test_noise_reduction_closed_form() -> None:
     absorption = np.array([5.0, 10.0, 20.0, 40.0, 60.0, 80.0])
     tl = np.array([20.0, 25.0, 30.0, 35.0, 40.0, 45.0])
     result = room_to_room_transmission(
-        _BANDS, tl, 12.0, absorption, source_level=100.0
+        _BANDS, tl, 12.0, absorption, source=SourceRoom(level=100.0)
     )
     expected = [
         t - 10.0 * math.log10(12.0 / a) for t, a in zip(tl, absorption, strict=True)
@@ -75,7 +75,7 @@ def test_partition_transmission_term_adds_absorption() -> None:
 def test_flanking_penalty_is_a_straight_debit() -> None:
     """The penalty comes off the noise reduction and lands on the received level."""
     plain = _chain()
-    penalised = _chain(flanking_penalty=3.0)
+    penalised = _chain(criterion=DesignCriterion(flanking_penalty=3.0))
     assert np.allclose(penalised.noise_reduction, plain.noise_reduction - 3.0)
     assert np.allclose(penalised.received_level, plain.received_level + 3.0)
     assert penalised.flanking_penalty == pytest.approx(3.0)
@@ -95,10 +95,9 @@ def test_source_power_models_scale_by_ten_lg_q(model: str, expected: float) -> N
         40.0,
         20.0,
         _ABSORPTION,
-        source_power_level=100.0,
-        source_room_constant=50.0,
-        source_directivity=4.0,
-        source_model=model,
+        source=SourceRoom(
+            power_level=100.0, room_constant=50.0, directivity=4.0, model=model
+        ),
     )
     reverberant = 100.0 + 10.0 * math.log10(4.0 / 50.0)
     assert np.allclose(result.source_level, reverberant + expected, atol=1e-3)
@@ -108,7 +107,7 @@ def test_source_power_models_scale_by_ten_lg_q(model: str, expected: float) -> N
 
 def test_required_transmission_loss_closes_the_gap() -> None:
     """The required ``TL`` is the current one plus the criterion exceedance."""
-    result = _chain(target=45.0)
+    result = _chain(criterion=DesignCriterion(target=45.0))
     required = result.required_transmission_loss
     excess = result.exceedance
     assert required is not None
@@ -117,7 +116,8 @@ def test_required_transmission_loss_closes_the_gap() -> None:
     # Re-running with that TL lands exactly on the criterion curve.
     tightened = room_to_room_transmission(
         _BANDS, required, 20.0, _ABSORPTION,
-        source_level=result.source_level, target=45.0,
+        source=SourceRoom(level=result.source_level),
+        criterion=DesignCriterion(target=45.0),
     )
     assert np.allclose(tightened.received_level, result.criterion_curve)
     assert tightened.meets_target is True
@@ -134,8 +134,8 @@ def test_no_target_leaves_the_verdicts_undefined() -> None:
 
 
 def test_rc_criterion_family() -> None:
-    """``criterion="RC"`` rates against the RC Mark II curves of Annex D."""
-    result = _chain(criterion="RC", target=35.0)
+    """``family="RC"`` rates against the RC Mark II curves of Annex D."""
+    result = _chain(criterion=DesignCriterion(family="RC", target=35.0))
     assert result.criterion == "RC"
     assert result.criterion_curve is not None
     # The six bands of this chain are short of the 31.5 Hz to 4 kHz span
@@ -151,52 +151,58 @@ def test_nc_rating_of_the_received_spectrum() -> None:
         [50.0, 55.0, 60.0, 62.0, 62.0, 62.0],
         20.0,
         _ABSORPTION,
-        source_level=_FLAT_SOURCE,
-        target=30.0,
+        source=SourceRoom(level=_FLAT_SOURCE),
+        criterion=DesignCriterion(target=30.0),
     )
     assert result.rating.__class__.__name__ == "NCResult"
     assert np.isfinite(result.rating.rating)
 
 
 def test_source_description_is_exclusive() -> None:
-    """Exactly one of ``source_level`` / ``source_power_level`` is required."""
+    """Exactly one of ``source.level`` / ``source.power_level`` is required."""
     with pytest.raises(ValueError, match="exactly one"):
         room_to_room_transmission(_BANDS, 40.0, 20.0, _ABSORPTION)
+    both_descriptions = SourceRoom(level=90.0, power_level=100.0)
     with pytest.raises(ValueError, match="exactly one"):
         room_to_room_transmission(
-            _BANDS, 40.0, 20.0, _ABSORPTION,
-            source_level=90.0, source_power_level=100.0,
+            _BANDS, 40.0, 20.0, _ABSORPTION, source=both_descriptions
         )
-    with pytest.raises(ValueError, match="source_room_constant"):
+    power_without_room_constant = SourceRoom(power_level=100.0)
+    with pytest.raises(ValueError, match="room_constant"):
         room_to_room_transmission(
-            _BANDS, 40.0, 20.0, _ABSORPTION, source_power_level=100.0
+            _BANDS, 40.0, 20.0, _ABSORPTION, source=power_without_room_constant
         )
 
 
 def test_validation() -> None:
     """Malformed bands, spectra, areas, absorption and options are rejected."""
+    source = SourceRoom(level=90.0)
     with pytest.raises(ValueError, match="non-empty 1-D"):
-        room_to_room_transmission([], 40.0, 20.0, 20.0, source_level=90.0)
+        room_to_room_transmission([], 40.0, 20.0, 20.0, source=source)
     with pytest.raises(ValueError, match="one value per band"):
         room_to_room_transmission(
-            _BANDS, [40.0, 41.0], 20.0, _ABSORPTION, source_level=90.0
+            _BANDS, [40.0, 41.0], 20.0, _ABSORPTION, source=source
         )
     with pytest.raises(ValueError, match="finite"):
         room_to_room_transmission(
-            _BANDS, _NAN_SPECTRUM, 20.0, _ABSORPTION, source_level=90.0
+            _BANDS, _NAN_SPECTRUM, 20.0, _ABSORPTION, source=source
         )
     with pytest.raises(ValueError, match="partition_area"):
-        room_to_room_transmission(_BANDS, 40.0, 0.0, _ABSORPTION, source_level=90.0)
+        room_to_room_transmission(_BANDS, 40.0, 0.0, _ABSORPTION, source=source)
     with pytest.raises(ValueError, match="receiving_absorption"):
-        room_to_room_transmission(_BANDS, 40.0, 20.0, _NO_ABSORPTION, source_level=90.0)
+        room_to_room_transmission(_BANDS, 40.0, 20.0, _NO_ABSORPTION, source=source)
+    negative_flanking = DesignCriterion(flanking_penalty=-1.0)
     with pytest.raises(ValueError, match="flanking_penalty"):
-        _chain(flanking_penalty=-1.0)
+        _chain(criterion=negative_flanking)
+    unknown_family = DesignCriterion(family="NR")
     with pytest.raises(ValueError, match="criterion"):
-        _chain(criterion="NR")
-    with pytest.raises(ValueError, match="source_model"):
-        _chain(source_model="constant_energy")
+        _chain(criterion=unknown_family)
+    unknown_model = SourceRoom(level=_SOURCE, model="constant_energy")
+    with pytest.raises(ValueError, match="model"):
+        _chain(source=unknown_model)
+    nan_target = DesignCriterion(target=_NAN)
     with pytest.raises(ValueError, match="target"):
-        _chain(target=_NAN)
+        _chain(criterion=nan_target)
 
 
 def test_plot_smoke() -> None:
@@ -204,7 +210,7 @@ def test_plot_smoke() -> None:
     import matplotlib
 
     matplotlib.use("Agg")
-    result = _chain(target=45.0, flanking_penalty=2.0)
+    result = _chain(criterion=DesignCriterion(target=45.0, flanking_penalty=2.0))
     ax = result.plot()
     assert ax.get_ylabel() == "Level [dB]"
     assert ax.get_title().startswith("Room-to-room transmission")

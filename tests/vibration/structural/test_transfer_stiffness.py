@@ -172,7 +172,8 @@ def test_indirect_bias_at_the_validity_limit_is_within_1_db() -> None:
     assert abs(k_rec) / k == pytest.approx(1.1)
     bias_db = 20.0 * math.log10(abs(k_rec) / k)
     assert bias_db == pytest.approx(0.828, abs=0.001)
-    assert bias_db <= 1.0 and abs(k_rec) / k - 1.0 <= 0.12
+    assert bias_db <= 1.0
+    assert abs(k_rec) / k - 1.0 <= 0.12
 
 
 def test_linearity_criterion_10_db_step() -> None:

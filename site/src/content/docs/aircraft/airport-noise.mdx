@@ -132,8 +132,9 @@ power = np.where(xs < 3000.0, 12000.0, 10000.0)
 path = np.column_stack([xs, np.zeros_like(xs), z, power, np.full_like(xs, 82.3)])
 ground_roll = xs[:-1] < 1500.0   # takeoff roll: segments still on the runway
 
+segments = aircraft.FlightSegmentState(ground_roll=ground_roll)
 contour = aircraft.noise_contour(path, powers, distances, sel, lmax,
-                                 ground_roll=ground_roll,
+                                 segments=segments,
                                  x=np.linspace(-2500.0, 20000.0, 56),
                                  y=np.linspace(-6000.0, 6000.0, 44))
 contour.plot()   # single-event SEL footprint (needs matplotlib)
@@ -197,7 +198,8 @@ xs = np.linspace(0.0, 18000.0, 40)
 path = np.column_stack([xs, np.zeros_like(xs), np.clip((xs-1500)*0.11, 0, 2500),
                         np.where(xs < 3000, 12000.0, 10000.0), np.full_like(xs, 82.3)])
 ground_roll = xs[:-1] < 1500.0   # takeoff roll: segments still on the runway
-aircraft.noise_contour(path, powers, distances, sel, lmax, ground_roll=ground_roll,
+aircraft.noise_contour(path, powers, distances, sel, lmax,
+                 segments=aircraft.FlightSegmentState(ground_roll=ground_roll),
                  x=np.linspace(-2500, 20000, 60), y=np.linspace(-6000, 6000, 48)).plot()
 ```
 
@@ -207,9 +209,10 @@ the start-of-roll directivity (turbofan and turboprop) reproduce the reference
 values to $< 0.01\ \text{dB}$, and the segment energy sum matches the
 reference `SEL`.
 
-The model also covers the landing rollout (`landing_roll` mask: reduced noise
-fraction Eq. 4-21b, nearest-end geometry, no directivity term), per-segment
-bank angle (`bank`, positive with the starboard wing up; the depression angle
+The model also covers the landing rollout (the `landing_roll` mask of the
+`FlightSegmentState`: reduced noise fraction Eq. 4-21b, nearest-end geometry,
+no directivity term), per-segment bank angle (its `bank`, positive with the
+starboard wing up; the depression angle
 is $\varphi = \beta + \varepsilon$ for observers to starboard of the track and
 $\varphi = \beta - \varepsilon$ for observers to port, §4.5.2), the §4.5.5
 nearest-end lateral

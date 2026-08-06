@@ -474,12 +474,14 @@ def test_result_records_probes_and_snapshots() -> None:
     n_steps = round(5e-3 / res.dt)
     assert res.times.shape == (n_steps + 1,)
     assert res.pressures.shape == (2, n_steps + 1)
-    assert res.times[0] == 0.0 and np.all(res.pressures[:, 0] == 0.0)
+    assert res.times[0] == 0.0
+    assert np.all(res.pressures[:, 0] == 0.0)
     assert res.shape == (40, 60)
     assert res.size == (60 * 0.05, 40 * 0.05)
     np.testing.assert_allclose(res.probe_positions[0],
                                [(30 + 0.5) * 0.05, (20 + 0.5) * 0.05])
-    assert res.snapshots is not None and res.snapshot_times is not None
+    assert res.snapshots is not None
+    assert res.snapshot_times is not None
     assert res.snapshots.shape == (n_steps // 25 + 1, 40, 60)
     np.testing.assert_allclose(
         res.snapshot_times, np.arange(n_steps // 25 + 1) * 25 * res.dt)
@@ -497,7 +499,8 @@ def test_two_runs_are_bit_identical() -> None:
 
     a, b = run(), run()
     assert np.array_equal(a.pressures, b.pressures)
-    assert a.snapshots is not None and b.snapshots is not None
+    assert a.snapshots is not None
+    assert b.snapshots is not None
     assert np.array_equal(a.snapshots, b.snapshots)
 
 

@@ -23,6 +23,10 @@ def _add4(a, b, c, d):  # type: ignore[no-untyped-def]
     return a + b + c + d
 
 
+def _add2(a, b):  # type: ignore[no-untyped-def]
+    return a + b
+
+
 def test_additive_model_combined_uncertainty() -> None:
     # Supplement 1 clause 9.2: y = x1+x2+x3+x4, u(xi)=1 -> uc = 2.0.
     qs = [u.Quantity(0.0, 1.0) for _ in range(4)]
@@ -163,21 +167,20 @@ def test_invalid_inputs_raise() -> None:
         u.combine_uncertainty(lambda: 0.0, [])
     with pytest.raises(ValueError, match="coverage"):
         u.coverage_factor(1.5)
+    pair = [u.Quantity(0, 1)] * 2
+    wrong_shape = np.eye(3)
+    asymmetric = np.array([[1.0, 0.5], [0.2, 1.0]])
+    non_unit_diagonal = np.array([[1.0, 0.0], [0.0, 0.9]])
+    # Symmetric, unit diagonal, but indefinite (|r| > 1).
+    indefinite = np.array([[1.0, 1.5], [1.5, 1.0]])
     with pytest.raises(ValueError, match="shape"):
-        u.combine_uncertainty(_add4, [u.Quantity(0, 1)] * 2, correlation=np.eye(3))
+        u.combine_uncertainty(_add4, pair, correlation=wrong_shape)
     with pytest.raises(ValueError, match="symmetric"):
-        u.combine_uncertainty(
-            lambda a, b: a + b, [u.Quantity(0, 1)] * 2,
-            correlation=np.array([[1.0, 0.5], [0.2, 1.0]]))
+        u.combine_uncertainty(_add2, pair, correlation=asymmetric)
     with pytest.raises(ValueError, match="diagonal"):
-        u.combine_uncertainty(
-            lambda a, b: a + b, [u.Quantity(0, 1)] * 2,
-            correlation=np.array([[1.0, 0.0], [0.0, 0.9]]))
+        u.combine_uncertainty(_add2, pair, correlation=non_unit_diagonal)
     with pytest.raises(ValueError, match="positive semi-definite"):
-        # Symmetric, unit diagonal, but indefinite (|r| > 1).
-        u.combine_uncertainty(
-            lambda a, b: a + b, [u.Quantity(0, 1)] * 2,
-            correlation=np.array([[1.0, 1.5], [1.5, 1.0]]))
+        u.combine_uncertainty(_add2, pair, correlation=indefinite)
     quantities = [u.Quantity(0, 1)]
     with pytest.raises(ValueError, match="trials"):
         u.monte_carlo(_add4, quantities, trials=0)

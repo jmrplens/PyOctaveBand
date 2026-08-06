@@ -364,7 +364,8 @@ def test_delay_std_fields_follow_the_closed_form() -> None:
     x, y = _two_detector_pair(1, 50, 3.0, bandwidth)
     res = ph.time_delay(x, y, FS, method="direct",
                         signal_bandwidth=bandwidth)
-    assert res.delay_std is not None and res.delay_interval is not None
+    assert res.delay_std is not None
+    assert res.delay_interval is not None
     eps = ph.correlation_random_error(
         abs(res.peak_correlation), bandwidth, N / FS
     )
@@ -462,7 +463,8 @@ def test_peak_coefficient_guard_for_out_of_record_delays() -> None:
     x = _white(25, n=4096)
     rho, std, interval = _delay_error(x, x, 5000.0, None, FS)
     assert rho == 0.0
-    assert std is None and interval is None
+    assert std is None
+    assert interval is None
 
 
 def test_alignment_of_identical_irs_is_a_no_op() -> None:

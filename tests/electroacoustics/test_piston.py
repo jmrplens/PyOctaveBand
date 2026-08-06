@@ -111,7 +111,8 @@ def test_directivity_index_high_ka() -> None:
 def test_result_shapes_and_plot() -> None:
     res = radiating_piston(0.1, [100.0, 1000.0], angles=[0.0, 0.3, 0.6])
     assert isinstance(res, RadiatingPistonResult)
-    assert res.directivity is not None and res.directivity.shape == (2, 3)
+    assert res.directivity is not None
+    assert res.directivity.shape == (2, 3)
     assert res.ka.shape == (2,)
     import matplotlib
 

@@ -517,8 +517,9 @@ def test_bw_marginally_unstable_section_raises_value_error() -> None:
     # Large but finite alpha: the rounded a2 lands exactly at -1.0 (poles
     # on the unit circle) with no arithmetic error to flag it.
     for f0, bw in ((23800.0, 1.0), (23900.0, 6.0)):
+        section = ph.EQSection("notch", f0, bw=bw)
         with pytest.raises(ValueError, match="not strictly stable"):
-            ph.ParametricEQ(FS, ph.EQSection("notch", f0, bw=bw))
+            ph.ParametricEQ(FS, section)
 
 
 def test_extreme_but_valid_sections_still_design_stably() -> None:

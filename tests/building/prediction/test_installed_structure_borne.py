@@ -137,13 +137,13 @@ def test_prediction_missing_path_key() -> None:
 
 
 def test_prediction_band_count_mismatch() -> None:
+    power_level = np.array([80.0, 82.0, 78.0])
+    coupling = np.array([9.0, 10.0, 11.0])
+    short_path = [{"adjustment_term": 5.0,
+                   "flanking_reduction_index": np.array([50.0, 52.0]),  # 2 vs 3
+                   "element_area": 12.0}]
     with pytest.raises(ValueError, match="flanking_reduction_index"):
-        installed_source_prediction(
-            np.array([80.0, 82.0, 78.0]), np.array([9.0, 10.0, 11.0]),
-            [{"adjustment_term": 5.0,
-              "flanking_reduction_index": np.array([50.0, 52.0]),  # 2 vs 3 bands
-              "element_area": 12.0}],
-        )
+        installed_source_prediction(power_level, coupling, short_path)
 
 
 def test_prediction_scalar_source_broadcasts_over_path_bands() -> None:
@@ -165,13 +165,11 @@ def test_prediction_scalar_source_broadcasts_over_path_bands() -> None:
 
 
 def test_prediction_scalar_source_band_mismatch_across_paths() -> None:
+    mismatched_path = [{"adjustment_term": np.zeros(2),
+                        "flanking_reduction_index": np.zeros(3),
+                        "element_area": 10.0}]
     with pytest.raises(ValueError, match="adjustment_term"):
-        installed_source_prediction(
-            80.0, 10.0,
-            [{"adjustment_term": np.zeros(2),
-              "flanking_reduction_index": np.zeros(3),
-              "element_area": 10.0}],
-        )
+        installed_source_prediction(80.0, 10.0, mismatched_path)
 
 
 def test_overall_level_numeric() -> None:
@@ -355,11 +353,13 @@ def test_coupling_terms_validate_mobilities() -> None:
 
 
 def test_prediction_frequencies_length_mismatch() -> None:
+    power_level = np.array([80.0, 82.0, 78.0])
+    coupling = np.array([9.0, 10.0, 11.0])
+    paths = [{"adjustment_term": 5.0,
+              "flanking_reduction_index": np.array([50.0, 52.0, 54.0]),
+              "element_area": 12.0}]
+    short_frequencies = np.array([500.0, 1000.0])  # 2 vs 3 bands
     with pytest.raises(ValueError, match="frequencies carries 2"):
         installed_source_prediction(
-            np.array([80.0, 82.0, 78.0]), np.array([9.0, 10.0, 11.0]),
-            [{"adjustment_term": 5.0,
-              "flanking_reduction_index": np.array([50.0, 52.0, 54.0]),
-              "element_area": 12.0}],
-            frequencies=np.array([500.0, 1000.0]),  # 2 vs 3 bands
+            power_level, coupling, paths, frequencies=short_frequencies
         )

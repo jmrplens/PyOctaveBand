@@ -132,7 +132,13 @@ def generate_fdtd_simulation(output_dir: str) -> None:
 def generate_elastic_halfspace_waves(output_dir: str) -> None:
     """Elastic FDTD: P, S and Rayleigh waves in an aluminium half-space."""
     print("Generating elastic_halfspace_waves...")
-    from phonometry import ForceSource, GaussianPulse, elastic_fdtd_simulation
+    from phonometry import (
+        ElasticBoundaries,
+        ElasticRecording,
+        ForceSource,
+        GaussianPulse,
+        elastic_fdtd_simulation,
+    )
 
     # A 0.6 x 0.3 m aluminium block with a free upper surface, struck by a
     # short vertical force at the middle of that surface (Lamb's problem):
@@ -148,8 +154,8 @@ def generate_elastic_halfspace_waves(output_dir: str) -> None:
         c_p, c_s, dx, duration, rho=rho, shape=(300, 600), cfl=cfl,
         sources=[ForceSource(ix=300, iy=0, direction="y", amplitude=1e6,
                              waveform=GaussianPulse(0, 0, width=width).value)],
-        boundaries={"top": "free"},
-        snapshot_every=steps, snapshot_field="vy",
+        boundaries=ElasticBoundaries({"top": "free"}),
+        recording=ElasticRecording(snapshot_every=steps, snapshot_field="vy"),
     )
 
     _fig, ax = plt.subplots(figsize=(9.5, 5.4))
@@ -195,7 +201,12 @@ def _scholte_interface_result() -> Any:
     explosion 10 m above the interface, run until the Scholte train has
     crawled ~330 m along the contact.
     """
-    from phonometry import ExplosionSource, elastic_fdtd_simulation
+    from phonometry import (
+        ElasticBoundaries,
+        ElasticRecording,
+        ExplosionSource,
+        elastic_fdtd_simulation,
+    )
 
     ny, nx, dx = 200, 500, 1.0
     c_p = np.full((ny, nx), 1500.0)
@@ -215,8 +226,8 @@ def _scholte_interface_result() -> Any:
         c_p, c_s, dx, duration, rho=rho,
         sources=[ExplosionSource(ix=60, iy=89, waveform=ricker,
                                  amplitude=1e3)],
-        boundaries="absorbing", absorbing_layer_cells=20,
-        snapshot_every=steps, snapshot_field="vy",
+        boundaries=ElasticBoundaries("absorbing", absorbing_layer_cells=20),
+        recording=ElasticRecording(snapshot_every=steps, snapshot_field="vy"),
     )
 
 

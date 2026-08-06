@@ -55,7 +55,8 @@ def test_complementary_autocorrelation_identity(order: int) -> None:
     """sum of periodic autocorrelations == 2L*delta, machine exact."""
     a, b = golay_pair(order)
     length = 1 << order
-    assert a.size == length and b.size == length
+    assert a.size == length
+    assert b.size == length
     acorr = np.fft.irfft(
         np.abs(np.fft.rfft(a)) ** 2 + np.abs(np.fft.rfft(b)) ** 2, length
     )

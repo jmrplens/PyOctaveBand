@@ -250,10 +250,11 @@ def test_collected_test_modules_have_unique_import_names() -> None:
 def test_sonar_configuration_names_files_that_exist() -> None:
     """A path-keyed analyzer exemption is silently lost when the file moves.
 
-    Every entry here was written with a reason next to it: parameter counts
-    that are the physics, and a re-export list that reads as duplication. The
-    taxonomy work moves the files those reasons are attached to, and nothing
-    else notices.
+    There are no exemptions at present: the parameter counts that motivated
+    them were fixed by grouping the parameters instead, so nothing is hidden
+    from the analyzer. An empty configuration therefore passes. What must never
+    happen again is an entry left pointing at a path the taxonomy work moved,
+    which is what this checks the moment one is added back.
     """
     import re
 
@@ -265,6 +266,5 @@ def test_sonar_configuration_names_files_that_exist() -> None:
         for line in re.findall(r"^sonar\.cpd\.exclusions=(\S+)$", config, re.MULTILINE)
         for path in line.split(",")
     ]
-    assert keyed, "no resourceKey entries found; has the file moved?"
     missing = [path for path in keyed + excluded if not (root / path).exists()]
     assert not missing, f"sonar-project.properties names missing files: {missing}"

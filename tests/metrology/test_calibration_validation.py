@@ -61,8 +61,9 @@ def test_custom_fluctuation_limit() -> None:
 
 
 def test_empty_reference_raises() -> None:
+    empty = np.array([])
     with pytest.raises(ValueError, match="empty"):
-        sensitivity(np.array([]), fs=FS)
+        sensitivity(empty, fs=FS)
 
 
 def test_too_short_recording_warns() -> None:
@@ -129,8 +130,9 @@ def test_narrowband_locks_to_off_nominal_tone() -> None:
 
 
 def test_narrowband_requires_fs() -> None:
+    tone = _cal_tone()
     with pytest.raises(ValueError, match="requires 'fs'"):
-        sensitivity(_cal_tone(), narrowband=True)
+        sensitivity(tone, narrowband=True)
 
 
 def test_table2_row_boundaries() -> None:

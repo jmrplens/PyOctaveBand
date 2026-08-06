@@ -188,11 +188,17 @@ def test_signal_am_bbn_sweep_tracks_literature_trend() -> None:
 
 
 def test_signal_rejects_bad_inputs() -> None:
+    # the signals are built outside the raises blocks, so each block holds
+    # exactly the one call whose exception is under test
+    two_dimensional = np.zeros((2, 2))
+    empty = np.array([])
+    with_nan = np.array([1.0, np.nan])
+    valid = _am_tone(1000.0, 60.0, 1.0, 4.0)
     with pytest.raises(ValueError):
-        fluctuation_strength(np.zeros((2, 2)), _FS)
+        fluctuation_strength(two_dimensional, _FS)
     with pytest.raises(ValueError):
-        fluctuation_strength(np.array([]), _FS)
+        fluctuation_strength(empty, _FS)
     with pytest.raises(ValueError):
-        fluctuation_strength(np.array([1.0, np.nan]), _FS)
+        fluctuation_strength(with_nan, _FS)
     with pytest.raises(ValueError):
-        fluctuation_strength(_am_tone(1000.0, 60.0, 1.0, 4.0), 0.0)
+        fluctuation_strength(valid, 0.0)

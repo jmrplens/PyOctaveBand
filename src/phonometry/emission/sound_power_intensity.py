@@ -104,6 +104,9 @@ from .intensity import dynamic_capability_index
 _P0 = 1.0e-12  #: Reference sound power, in watts (ISO 9614-2, 3.6.3).
 _S0 = 1.0  #: Reference surface area, in square metres (ISO 9614-2, A.2.1).
 
+#: Rejection message for a 'frequencies' vector that does not span the bands.
+_FREQUENCIES_BAND_COUNT_MSG = "'frequencies' length must match the number of bands."
+
 Grade = Literal["engineering", "survey"]
 BandType = Literal["octave", "third"]
 
@@ -280,6 +283,49 @@ def _as_2d(name: str, arr: np.ndarray, n_seg: int, n_bands: int) -> np.ndarray:
     return a
 
 
+def _validate_scan(
+    normal_intensity: np.ndarray,
+    areas: np.ndarray,
+    frequencies: np.ndarray | None,
+    band_type: BandType,
+) -> tuple[np.ndarray, np.ndarray]:
+    """Validate an ISO 9614-2 scan and normalise its arrays.
+
+    Returns the signed normal intensity as ``(N_seg, N_bands)`` and the segment
+    areas as ``(N_seg,)``.
+    """
+    if band_type not in ("octave", "third"):
+        raise ValueError("'band_type' must be 'octave' or 'third'.")
+
+    intensity = np.atleast_2d(np.asarray(normal_intensity, dtype=np.float64))
+    seg = np.asarray(areas, dtype=np.float64)
+    if seg.ndim != 1:
+        raise ValueError("'areas' must be a 1D array of segment areas.")
+    n_seg = seg.shape[0]
+    # A 1D (N_seg,) intensity arrives from atleast_2d as (1, N_seg): transpose.
+    if intensity.shape == (1, n_seg) and n_seg != 1:
+        intensity = intensity.T
+    if intensity.shape[0] != n_seg:
+        raise ValueError(
+            f"'normal_intensity' first axis ({intensity.shape[0]}) must match "
+            f"the number of segment 'areas' ({n_seg})."
+        )
+    if frequencies is not None and np.asarray(frequencies).shape != (intensity.shape[1],):
+        # Validate up front so a mismatched length raises the public ValueError
+        # rather than an IndexError from the Table 2 lookup during classification.
+        raise ValueError(_FREQUENCIES_BAND_COUNT_MSG)
+    if np.any(seg <= 0.0):
+        raise ValueError("All segment 'areas' must be positive.")
+    if n_seg < 4:
+        warnings.warn(
+            f"Only {n_seg} segment(s); ISO 9614-2:1996 clause 8.2 requires at "
+            "least 4 measurement segments.",
+            SoundPowerWarning,
+            stacklevel=3,
+        )
+    return intensity, seg
+
+
 def sound_power_intensity(
     normal_intensity: np.ndarray,
     areas: np.ndarray,
@@ -334,36 +380,9 @@ def sound_power_intensity(
     :return: :class:`SoundPowerIntensityResult`.
     """
     grade = _check_grade(grade)
-    if band_type not in ("octave", "third"):
-        raise ValueError("'band_type' must be 'octave' or 'third'.")
-
-    intensity = np.atleast_2d(np.asarray(normal_intensity, dtype=np.float64))
-    seg = np.asarray(areas, dtype=np.float64)
-    if seg.ndim != 1:
-        raise ValueError("'areas' must be a 1D array of segment areas.")
+    intensity, seg = _validate_scan(normal_intensity, areas, frequencies, band_type)
     n_seg = seg.shape[0]
-    # A 1D (N_seg,) intensity arrives from atleast_2d as (1, N_seg): transpose.
-    if intensity.shape == (1, n_seg) and n_seg != 1:
-        intensity = intensity.T
-    if intensity.shape[0] != n_seg:
-        raise ValueError(
-            f"'normal_intensity' first axis ({intensity.shape[0]}) must match "
-            f"the number of segment 'areas' ({n_seg})."
-        )
     n_bands = intensity.shape[1]
-    if frequencies is not None and np.asarray(frequencies).shape != (n_bands,):
-        # Validate up front so a mismatched length raises the public ValueError
-        # rather than an IndexError from the Table 2 lookup during classification.
-        raise ValueError("'frequencies' length must match the number of bands.")
-    if np.any(seg <= 0.0):
-        raise ValueError("All segment 'areas' must be positive.")
-    if n_seg < 4:
-        warnings.warn(
-            f"Only {n_seg} segment(s); ISO 9614-2:1996 clause 8.2 requires at "
-            "least 4 measurement segments.",
-            SoundPowerWarning,
-            stacklevel=2,
-        )
 
     # --- partial powers, using the mean of the two sweeps when available -----
     repeatability: np.ndarray | None = None
@@ -585,7 +604,7 @@ def _a_weighted_total(
     if frequencies is not None:
         freqs = np.asarray(frequencies, dtype=np.float64)
         if freqs.shape[0] != n_bands:
-            raise ValueError("'frequencies' length must match the number of bands.")
+            raise ValueError(_FREQUENCIES_BAND_COUNT_MSG)
         if omitted is None:
             if n_bands > 1:
                 warnings.warn(
@@ -905,6 +924,27 @@ def precision_qualification(
     )
 
 
+def _precision_a_weighted_total(
+    lw: np.ndarray,
+    not_applicable: np.ndarray,
+    frequencies: np.ndarray | None,
+    n_bands: int,
+) -> float:
+    """A-weighted total over the applicable bands (ISO 9614-3 clause 9.2 / 4.3).
+
+    Without ``frequencies`` there is no weighting to apply: a single applicable
+    band is its own A-weighted total, anything else is ``NaN``.
+    """
+    if frequencies is None:
+        if n_bands == 1 and not bool(not_applicable[0]):
+            return float(lw[0])
+        return float("nan")
+    ck = _a_weighting_corrections(frequencies)
+    contrib = 10.0 ** (0.1 * (lw + ck))
+    total = float(np.sum(contrib[~not_applicable]))
+    return 10.0 * np.log10(total) if total > 0.0 else float("nan")
+
+
 def sound_power_intensity_precision(
     partial_intensity: np.ndarray,
     areas: np.ndarray,
@@ -962,7 +1002,7 @@ def sound_power_intensity_precision(
         raise ValueError("'barometric_pressure' must be positive (Pa).")
     n_bands = intensity.shape[1]
     if frequencies is not None and np.asarray(frequencies).shape != (n_bands,):
-        raise ValueError("'frequencies' length must match the number of bands.")
+        raise ValueError(_FREQUENCIES_BAND_COUNT_MSG)
 
     partial_power = intensity * seg[:, None]  # Eq. 5
     total_power = np.sum(partial_power, axis=0)  # Eq. 8
@@ -989,15 +1029,8 @@ def sound_power_intensity_precision(
         )
 
     # A-weighted total over applicable bands (clause 9.2 / 4.3).
-    if frequencies is not None:
-        freqs = np.asarray(frequencies, dtype=np.float64)
-        ck = _a_weighting_corrections(freqs)
-        contrib = 10.0 ** (0.1 * (lw + ck))
-        total = float(np.sum(contrib[~not_applicable]))
-        lwa = 10.0 * np.log10(total) if total > 0.0 else float("nan")
-    else:
-        freqs = None
-        lwa = float(lw[0]) if n_bands == 1 and not bool(not_applicable[0]) else float("nan")
+    freqs = None if frequencies is None else np.asarray(frequencies, dtype=np.float64)
+    lwa = _precision_a_weighted_total(lw, not_applicable, freqs, n_bands)
 
     return PrecisionIntensityResult(
         frequencies=freqs,

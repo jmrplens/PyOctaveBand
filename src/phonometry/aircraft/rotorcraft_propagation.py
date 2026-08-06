@@ -296,7 +296,9 @@ def _ground_effect(
     zs = _delany_bazley_impedance_grid(np.asarray(frequencies), sig)
     rp = (zs * cos_xi - 1.0) / (zs * cos_xi + 1.0)
     d_num = (1.0 + 1j) / 2.0 * np.sqrt(k * r2) * (1.0 / zs + cos_xi)
-    f_loss = 1.0 + 1j * d_num * np.sqrt(np.pi) * wofz(d_num)   # F(d) = 1 + i·d·√π·w(d)
+    # The boundary-loss factor F(d), which is 1 + i·d·√π·w(d) with w the
+    # Faddeeva function that scipy exposes as wofz.
+    f_loss = 1.0 + 1j * d_num * np.sqrt(np.pi) * wofz(d_num)
     q = rp + (1.0 - rp) * f_loss
     q_mag = np.abs(q)
     psi = np.angle(q)

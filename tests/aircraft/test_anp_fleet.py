@@ -101,11 +101,13 @@ def test_profile_units_and_ground_roll_mask() -> None:
     assert dep.path[0, 2] == pytest.approx(0.0)
     assert dep.path[0, 4] == pytest.approx(35.0 * _KT_MS)
     # Only the initial zero-altitude segment is takeoff ground roll.
-    assert dep.ground_roll[0] and not dep.ground_roll[1:].any()
+    assert dep.ground_roll[0]
+    assert not dep.ground_roll[1:].any()
     assert not dep.landing_roll.any()
     arr = _DB.profile("747100", "arrival")
     # Landing rollout: the trailing zero-altitude segments, no takeoff roll.
-    assert arr.landing_roll[-1] and not arr.ground_roll.any()
+    assert arr.landing_roll[-1]
+    assert not arr.ground_roll.any()
 
 
 @pytest.mark.parametrize("aircraft_id", _REPRESENTATIVE)

@@ -19,7 +19,7 @@ import reference_data as ref
 from scipy import signal as sg
 
 import phonometry as ph
-from phonometry import OctaveFilterBank, WeightingFilter
+from phonometry import FilterDesign, OctaveFilterBank, WeightingFilter
 
 from ..registry import Outcome, numeric, register
 from ..render import _snap
@@ -63,7 +63,10 @@ def _chk_butter_third() -> Outcome:
     "Class 0 (strictest) octave-band filter (butterworth, fs=48 kHz)",
 )
 def _chk_butter_class0_1995() -> Outcome:
-    bank = OctaveFilterBank(48000, fraction=1, order=6, limits=[100, 10000], filter_type="butter")
+    bank = OctaveFilterBank(
+        48000, fraction=1, order=6, limits=[100, 10000],
+        design=FilterDesign(filter_type="butter"),
+    )
     result = ph.verify_filter_class(bank, edition="1995")
     margin = min(b["margin_class0_db"] for b in result["bands"])
     ok = result["overall_class"] == 0

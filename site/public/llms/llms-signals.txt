@@ -277,7 +277,8 @@ preferred frequencies you would read on an instrument.
 
 ```python
 spl, bands = filters.octave_filter(
-    recording, fs, fraction=3, calibration_factor=cal, nominal=True
+    recording, fs, fraction=3, nominal=True,
+    calibration=filters.LevelCalibration(factor=cal),
 )
 # 33 one-third-octave band levels in dB SPL, labeled '12.5' ... '20k'.
 # The '1k' band holds the event: ~70 dB, while its neighbors stay ~25 dB below.

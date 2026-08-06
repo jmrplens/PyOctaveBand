@@ -117,7 +117,8 @@ def test_displayed_values_match_oracle(tmp_path) -> None:
     # Boxed single number delta-Lw (CI,delta) = 19 (-11) dB.
     assert "19 (-11) dB" in text
     # Band labels and a couple of the per-band delta-L values (one decimal).
-    assert "100" in text and "3150" in text  # first and last band centres
+    assert "100" in text  # first band centre
+    assert "3150" in text  # last band centre
     assert "15.0" in text  # delta-L(500 Hz)
     assert "30.0" in text  # delta-L(3150 Hz)
     assert "100 to 3150" in text  # measured frequency range
@@ -148,7 +149,8 @@ def test_requirement_boundary_verdict(tmp_path) -> None:
     assert result.delta_lw == 19
     result.report(str(out), metadata=_metadata(requirement=19.0))
     text = _text(str(out))
-    assert "PASS" in text and "FAIL" not in text
+    assert "PASS" in text
+    assert "FAIL" not in text
 
 
 def test_requirement_fail_verdict(tmp_path) -> None:

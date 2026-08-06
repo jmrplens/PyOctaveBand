@@ -70,6 +70,9 @@ if TYPE_CHECKING:
         DiffusionSpectrum,
     )
 
+#: Header of the band centre-frequency column of every ISO 17497 table.
+_FREQUENCY_COLUMN = "f [Hz]"
+
 
 def _c2(value: float, language: str = "en") -> str:
     """Two decimals (coefficients ``s``, ``d``; ISO 17497 rounds to 0,01)."""
@@ -207,7 +210,7 @@ def _scattering_table(
     if verbose:
         spec = np.asarray(result.specular, dtype=np.float64)
         header = [
-            Paragraph(t("f [Hz]", language), head_style),
+            Paragraph(t(_FREQUENCY_COLUMN, language), head_style),
             Paragraph("&#945;<sub>s</sub>", head_style),
             Paragraph("&#945;<sub>spec</sub>", head_style),
             Paragraph("s", head_style),
@@ -223,7 +226,7 @@ def _scattering_table(
         col_widths = [22 * mm, 22 * mm, 24 * mm, 20 * mm]
     else:
         header = [
-            Paragraph(t("f [Hz]", language), head_style),
+            Paragraph(t(_FREQUENCY_COLUMN, language), head_style),
             Paragraph("&#945;<sub>s</sub>", head_style),
             Paragraph("s", head_style),
         ]
@@ -352,7 +355,7 @@ def _diffusion_table(
     if show_normalized and result.normalized is not None:
         d_n = np.asarray(result.normalized, dtype=np.float64)
         header = [
-            Paragraph(t("f [Hz]", language), head_style),
+            Paragraph(t(_FREQUENCY_COLUMN, language), head_style),
             Paragraph("d", head_style),
             Paragraph("d<sub>n</sub>", head_style),
         ]
@@ -366,7 +369,7 @@ def _diffusion_table(
         col_widths = [20 * mm, 18 * mm, 18 * mm]
     else:
         header = [
-            Paragraph(t("f [Hz]", language), head_style),
+            Paragraph(t(_FREQUENCY_COLUMN, language), head_style),
             Paragraph("d", head_style),
         ]
         rows = [header]

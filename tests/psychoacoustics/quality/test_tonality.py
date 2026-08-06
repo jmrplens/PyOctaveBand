@@ -160,24 +160,29 @@ def test_tnr_proximate_tones_combine() -> None:
 
 
 def test_invalid_inputs() -> None:
+    one_second = np.ones(1000)
+    two_channel = np.ones((2, FS))
+    too_short = np.ones(100)
     with pytest.raises(ValueError, match="fs"):
-        tone_to_noise_ratio(np.ones(1000), 0)
+        tone_to_noise_ratio(one_second, 0)
     with pytest.raises(ValueError, match="1D"):
-        prominence_ratio(np.ones((2, FS)), FS)
+        prominence_ratio(two_channel, FS)
     with pytest.raises(ValueError, match="too short"):
-        tone_to_noise_ratio(np.ones(100), FS)
+        tone_to_noise_ratio(too_short, FS)
 
 
 def test_invalid_resolution_and_tone_freq() -> None:
+    x = np.ones(FS)
     with pytest.raises(ValueError, match="resolution_hz"):
-        tone_to_noise_ratio(np.ones(FS), FS, resolution_hz=0.0)
+        tone_to_noise_ratio(x, FS, resolution_hz=0.0)
     with pytest.raises(ValueError, match="tone_freq"):
-        prominence_ratio(np.ones(FS), FS, tone_freq=-100.0)
+        prominence_ratio(x, FS, tone_freq=-100.0)
 
 
 def test_too_coarse_resolution_raises() -> None:
+    x = np.ones(FS)
     with pytest.raises(ValueError, match="too coarse"):
-        tone_to_noise_ratio(np.ones(FS), FS, resolution_hz=FS / 4.0)
+        tone_to_noise_ratio(x, FS, resolution_hz=FS / 4.0)
 
 
 def test_coarse_resolution_warns_at_low_frequency() -> None:
@@ -230,7 +235,8 @@ def test_plot_draws_criterion_curve_and_the_assessed_tone() -> None:
     at_tone = np.interp(res.frequency, criterion_curve.get_xdata(),
                         criterion_curve.get_ydata())
     assert at_tone == pytest.approx(res.criterion_db, abs=0.1)
-    assert "TNR" in ax.get_title() and "prominent" in ax.get_title()
+    assert "TNR" in ax.get_title()
+    assert "prominent" in ax.get_title()
     plt.close("all")
 
 

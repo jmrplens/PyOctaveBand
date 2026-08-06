@@ -314,7 +314,7 @@ def _chk_doc32_retarded_time() -> Outcome:
                            np.full_like(t, 101.2)])
     res = ph.rotorcraft_event_level(
         [_uniform_hemisphere(100.0)], [50.0], [0.0], t, pos, (0.0, 0.0),
-        receiver_height=1.2, flow_resistivity="H")
+        ground=ph.RotorcraftGround(receiver_height=1.2, flow_resistivity="H"))
     k = int(np.argmin(res.distance))
     return numeric(0.288934, float(res.times[k] - res.emission_times[k]), 1e-5,
                    unit="s", places=6)
@@ -336,7 +336,7 @@ def _chk_doc32_event_sel() -> Outcome:
                            np.full_like(t, 100.1)])
     res = ph.rotorcraft_event_level(
         [_uniform_hemisphere(100.0, [31.5])], [50.0], [0.0], t, pos, (0.0, 0.0),
-        receiver_height=0.1, flow_resistivity="H")
+        ground=ph.RotorcraftGround(receiver_height=0.1, flow_resistivity="H"))
     return numeric(7.982, res.sel - res.la_max, 0.1, unit="dB", places=3)
 
 

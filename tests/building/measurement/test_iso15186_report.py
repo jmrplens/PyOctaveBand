@@ -93,7 +93,8 @@ def test_fiche_rating_pinned_to_iso717_1_annex_c(tmp_path) -> None:
     assert "ISO 15186-1:2000" in text
     assert "ISO 717-1:2020" in text
     # Nominal band labels and a couple of RI values from the table.
-    assert "100" in text and "3150" in text
+    assert "100" in text
+    assert "3150" in text
     assert "26.6" in text  # the 500 Hz band value
     assert "20.4" in text  # the 100 Hz band value
 
@@ -313,7 +314,9 @@ def test_clause8_fpi_wrong_band_count_rejected(tmp_path) -> None:
     """An FpI spectrum not matching the reported bands is rejected."""
     result = _intensity_result()
     out = str(tmp_path / "x.pdf")
+    fpi_5_bands = np.full(5, 4.0)
+    residual_3_bands = np.full(3, 18.0)
     with pytest.raises(ValueError, match="fpi"):
-        result.report(out, fpi=np.full(5, 4.0))
+        result.report(out, fpi=fpi_5_bands)
     with pytest.raises(ValueError, match="residual_index"):
-        result.report(out, residual_index=np.full(3, 18.0))
+        result.report(out, residual_index=residual_3_bands)

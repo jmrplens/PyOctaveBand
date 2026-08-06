@@ -63,16 +63,10 @@ loudspeaker_characteristics(
     distance: float = 1.0,
     sensitivity_band: tuple[float, float] | None = None,
     tolerance_db: float = 3.0,
-    rated_frequency_range: tuple[float, float] | None = None,
-    rated_noise_power: float | None = None,
-    rated_sinusoidal_power: float | None = None,
-    resonance_frequency: float | None = None,
     impedance: tuple[ArrayLike, ArrayLike] | None = None,
     distortion: SweptSineDistortionResult | tuple[ArrayLike, ArrayLike] | None = None,
-    directivity: RadiatingPistonResult | None = None,
-    polar: tuple[ArrayLike, ArrayLike] | None = None,
-    polar_frequency: float | None = None,
-    directivity_index_db: float | None = None,
+    directivity: LoudspeakerDirectivity = ...,
+    ratings: LoudspeakerRatings = ...,
 ) -> LoudspeakerCharacteristics
 ```
 
@@ -94,16 +88,10 @@ distortion and directivity data feed the corresponding report panels.
 | `distance` | Measuring distance of the response, in m (default 1). |
 | `sensitivity_band` | Stated band `(lo, hi)` for the characteristic sensitivity, in Hz; defaults to the one-octave band in the region of maximum sensitivity. |
 | `tolerance_db` | Half-width of the plotted response tolerance band, in dB (default 3). |
-| `rated_frequency_range` | Manufacturer-stated rated frequency range `(lo, hi)` in Hz (19.1). When supplied it is also the range over which the 16.1 minimum impedance modulus is evaluated. |
-| `rated_noise_power` | Rated noise power, in W (18.1). |
-| `rated_sinusoidal_power` | Rated sinusoidal power, in W (18.4). |
-| `resonance_frequency` | Resonance frequency, in Hz (19.2). |
 | `impedance` | Impedance curve as `(frequencies, modulus)` in `(Hz, ohm)` (16.2). |
 | `distortion` | THD against frequency, either as a [`SweptSineDistortionResult`](/phonometry/reference/api/electroacoustics/swept-sine/#sweptsinedistortionresult) (its `thd` ratio is converted to %) or a `(frequencies, thd_percent)` pair (24.1). |
-| `directivity` | A [`RadiatingPistonResult`](/phonometry/reference/api/electroacoustics/piston/#radiatingpistonresult) computed with `angles` to supply the polar response and directivity index (23.1/23.3). |
-| `polar` | Polar response as `(angles_deg, relative_db)` when it is not taken from `directivity`. |
-| `polar_frequency` | Frequency of the polar response, in Hz. |
-| `directivity_index_db` | Directivity index at `polar_frequency`, in dB (23.3), when not taken from `directivity`. |
+| `directivity` | Directional characteristics of Clause 23 as a [`LoudspeakerDirectivity`](/phonometry/reference/api/electroacoustics/loudspeaker/#loudspeakerdirectivity): the pattern (measured or from a radiating piston), its stated frequency and the directivity index. |
+| `ratings` | Manufacturer-stated ratings of Clauses 18 and 19 as a [`LoudspeakerRatings`](/phonometry/reference/api/electroacoustics/loudspeaker/#loudspeakerratings): the rated frequency range, the rated noise and sinusoidal powers and the resonance frequency. |
 
 **Returns:** A [`LoudspeakerCharacteristics`](/phonometry/reference/api/electroacoustics/loudspeaker/#loudspeakercharacteristics).
 
@@ -280,3 +268,57 @@ sensitivity verdict when a requirement is given, and the footer.
 | :--- | :--- |
 | ValueError | If `engine` is not `"reportlab"` or `language` is unknown. |
 | ImportError | If reportlab is not installed (`pip install phonometry[report]`), or matplotlib is missing for the embedded figure (`pip install phonometry[plot]`). |
+
+## LoudspeakerDirectivity
+
+```python
+LoudspeakerDirectivity(
+    piston: RadiatingPistonResult | None = None,
+    polar: tuple[ArrayLike, ArrayLike] | None = None,
+    frequency: float | None = None,
+    index_db: float | None = None,
+)
+```
+
+Directional characteristics of the loudspeaker (IEC 60268-5 Clause 23).
+
+The clause's characteristics travel together: the directional response
+pattern (23.1), a curve of the sound pressure level against the angle for a
+stated frequency, and the directivity index read from it (23.3). The
+pattern may be supplied measured, as `polar`, or modelled, as the
+directivity of a radiating piston.
+
+**Attributes**
+
+| Name | Description |
+| :--- | :--- |
+| `piston` | A [`RadiatingPistonResult`](/phonometry/reference/api/electroacoustics/piston/#radiatingpistonresult) computed with `angles` to supply the pattern and the directivity index; it takes precedence over `polar` (23.1/23.3). |
+| `polar` | Directional response pattern as `(angles_deg, relative_db)`, relative to the on-axis level, when it is not taken from `piston` (23.1). |
+| `frequency` | Stated frequency of the directional pattern, in Hz; it also selects which of `piston`'s frequencies is drawn. |
+| `index_db` | Directivity index at `frequency`, in dB (23.3), when not taken from `piston`. |
+
+## LoudspeakerRatings
+
+```python
+LoudspeakerRatings(
+    frequency_range: tuple[float, float] | None = None,
+    noise_power: float | None = None,
+    sinusoidal_power: float | None = None,
+    resonance_frequency: float | None = None,
+)
+```
+
+Manufacturer-stated ratings (IEC 60268-5 Clauses 18 and 19).
+
+The rated characteristics the report prints rather than computes: the
+rated input electrical power of Clause 18 and the rated frequency
+characteristics of Clause 19.
+
+**Attributes**
+
+| Name | Description |
+| :--- | :--- |
+| `frequency_range` | Rated frequency range `(lo, hi)` in Hz (19.1). When supplied it is also the range over which the 16.1 minimum impedance modulus is evaluated. |
+| `noise_power` | Rated noise power, in W (18.1). |
+| `sinusoidal_power` | Rated sinusoidal power, in W (18.4). |
+| `resonance_frequency` | Resonance frequency, in Hz (19.2). |

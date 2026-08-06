@@ -162,7 +162,8 @@ def test_fiche_labels_bands_with_nominal_frequencies(tmp_path) -> None:
     text = _extract_text(str(out))
     assert "125 Hz" in text
     assert "4 kHz" in text
-    assert "126 Hz" not in text and "3981" not in text
+    assert "126 Hz" not in text
+    assert "3981" not in text
 
 
 def test_range_limited_verdict_prints_qualifying_note(tmp_path) -> None:

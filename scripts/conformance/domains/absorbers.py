@@ -440,14 +440,13 @@ def _chk_slow_sound_perfect_absorption() -> Outcome:
         neck_length=1.0e-3, neck_side=3.0e-3,
         cavity_length=30.0e-3, cavity_side=27.0e-3,
     )
+    air = ph.AirProperties(density=_PA_RHO0, speed_of_sound=_PA_C0)
     design = ph.critical_coupling_design(
-        300.0, res, lattice_step=3.0e-2, period=5.0e-2,
-        air_density=_PA_RHO0, speed_of_sound=_PA_C0,
+        300.0, res, lattice_step=3.0e-2, period=5.0e-2, air=air,
     )
     out = ph.slit_helmholtz_absorber(
         np.array([300.0]), design.resonator, slit_height=design.slit_height,
-        lattice_step=3.0e-2, period=5.0e-2,
-        air_density=_PA_RHO0, speed_of_sound=_PA_C0,
+        lattice_step=3.0e-2, period=5.0e-2, air=air,
     )
     # The check requires the solver to have converged: a non-converged design
     # fails the check outright rather than silently reporting its (imperfect)
@@ -466,7 +465,8 @@ def _chk_slow_sound_slit_resistivity() -> Outcome:
     h = 1.2e-3
     f = np.array([1.0e-2])
     rho_s, _ = ph.slit_effective_properties(
-        f, slit_height=h, air_density=_PA_RHO0, viscosity=eta,
+        f, slit_height=h,
+        air=ph.AirProperties(density=_PA_RHO0, viscosity=eta),
     )
     sigma = float((1j * 2.0 * math.pi * f * rho_s)[0].real)
     return numeric(12.0 * eta / h**2, sigma, 1e-3, rel=True,
@@ -483,7 +483,8 @@ def _chk_slow_sound_duct_resistivity() -> Outcome:
     side = 3.0e-3
     f = np.array([1.0e-2])
     rho, _ = ph.rectangular_duct_properties(
-        f, side=side, air_density=_PA_RHO0, viscosity=eta,
+        f, side=side,
+        air=ph.AirProperties(density=_PA_RHO0, viscosity=eta),
     )
     sigma = float((1j * 2.0 * math.pi * f * rho)[0].real)
     return numeric(28.454 * eta / side**2, sigma, 2e-3, rel=True,

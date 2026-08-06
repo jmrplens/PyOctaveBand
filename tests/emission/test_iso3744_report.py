@@ -118,7 +118,8 @@ def test_report_renders_oracle_values(tmp_path) -> None:
     assert f"{lw[0]:.1f}" in text
     assert f"{lw[3]:.1f}" in text
     # Nominal band labels head the table / axis (not the exact base-ten centre).
-    assert "63" in text and "8000" in text
+    assert "63" in text
+    assert "8000" in text
     # Method and basis prose.
     assert "ISO 3744:2010" in text
     assert "engineering method" in text
@@ -157,7 +158,8 @@ def test_verbose_adds_correction_columns(tmp_path) -> None:
     res.report(str(out), verbose=True)
     _assert_one_page(str(out))
     flat = "".join(_extract_text(str(out)).split())
-    assert "K1" in flat and "K2" in flat
+    assert "K1" in flat
+    assert "K2" in flat
     # K1 = -10 lg(1 - 10^-1) = 0.5 dB (one decimal), shown in the strip and column.
     assert "0.5" in _extract_text(str(out))
 
@@ -227,7 +229,8 @@ def test_precision_report_names_iso3745(tmp_path) -> None:
     text = _extract_text(str(out))
     assert "ISO 3745:2012" in text
     assert "precision method" in text
-    assert "C1 =" in text and "C3 =" in text
+    assert "C1 =" in text
+    assert "C3 =" in text
     # The A-weighted total is boxed re 1 pW.
     assert "re 1 pW" in text
     # The A-weighting is combined per ISO 3745:2012 Annex C (Eq. C.1), not the

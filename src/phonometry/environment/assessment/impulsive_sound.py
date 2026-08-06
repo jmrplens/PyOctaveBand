@@ -382,6 +382,12 @@ DEFAULT_SAMPLE_INTERVAL: float = 0.020
 #: source is *highly impulsive*.
 HIGHLY_IMPULSIVE_LIMIT: float = 5.0
 
+#: The three source categories of Clause 7, which are both the value reported in
+#: ``ImpulsiveSoundResult.category`` and the key of their plot translation.
+_CATEGORY_NOT_IMPULSIVE = "not impulsive"
+_CATEGORY_REGULAR_IMPULSIVE = "regular impulsive"
+_CATEGORY_HIGHLY_IMPULSIVE = "highly impulsive"
+
 _OnsetRateMethod = Literal["least_squares", "upper_half"]
 
 
@@ -684,10 +690,10 @@ def detect_onsets(
 def _categorise(adjustment: float) -> str:
     """Source category from the adjustment (Clause 7)."""
     if adjustment <= 0.0:
-        return "not impulsive"
+        return _CATEGORY_NOT_IMPULSIVE
     if adjustment <= HIGHLY_IMPULSIVE_LIMIT:
-        return "regular impulsive"
-    return "highly impulsive"
+        return _CATEGORY_REGULAR_IMPULSIVE
+    return _CATEGORY_HIGHLY_IMPULSIVE
 
 
 def impulsive_sound_adjustment(
@@ -774,9 +780,9 @@ _PLOT_LABELS: dict[str, dict[str, str]] = {
         "end": "end",
         "ld": "LD",
         "title": "Impulsive-sound prominence (ISO/PAS 1996-3)",
-        "not impulsive": "not impulsive",
-        "regular impulsive": "regular impulsive",
-        "highly impulsive": "highly impulsive",
+        _CATEGORY_NOT_IMPULSIVE: _CATEGORY_NOT_IMPULSIVE,
+        _CATEGORY_REGULAR_IMPULSIVE: _CATEGORY_REGULAR_IMPULSIVE,
+        _CATEGORY_HIGHLY_IMPULSIVE: _CATEGORY_HIGHLY_IMPULSIVE,
         "summary": "P = {p}, K_I = {k} dB ({cat})",
         "nosummary": "no qualifying onset: K_I = 0 dB (not impulsive)",
     },
@@ -789,9 +795,9 @@ _PLOT_LABELS: dict[str, dict[str, str]] = {
         "end": "final",
         "ld": "LD",
         "title": "Prominencia de sonido impulsivo (ISO/PAS 1996-3)",
-        "not impulsive": "no impulsivo",
-        "regular impulsive": "impulsivo regular",
-        "highly impulsive": "altamente impulsivo",
+        _CATEGORY_NOT_IMPULSIVE: "no impulsivo",
+        _CATEGORY_REGULAR_IMPULSIVE: "impulsivo regular",
+        _CATEGORY_HIGHLY_IMPULSIVE: "altamente impulsivo",
         "summary": "P = {p}, K_I = {k} dB ({cat})",
         "nosummary": "sin inicio válido: K_I = 0 dB (no impulsivo)",
     },

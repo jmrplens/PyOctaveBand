@@ -389,6 +389,65 @@ class InstalledSourceResult:
         )
 
 
+#: Keys every transmission path must carry: the adjustment term ``D_sa``, the
+#: flanking reduction index ``R_ij,ref`` and the element area ``S_i``.
+_REQUIRED_PATH_KEYS = (
+    "adjustment_term", "flanking_reduction_index", "element_area",
+)
+#: The subset of :data:`_REQUIRED_PATH_KEYS` that may carry one value per band.
+_PER_BAND_PATH_KEYS = ("adjustment_term", "flanking_reduction_index")
+
+
+def _widest_band_count(n_bands: int, paths: list[dict[str, Any]]) -> int:
+    """Widen *n_bands* to the longest per-band term any path carries.
+
+    Also checks that every path carries the required keys, naming the path and
+    the keys it is missing.
+
+    :raises ValueError: If a path is missing a required key.
+    """
+    for k, p in enumerate(paths):
+        missing = [key for key in _REQUIRED_PATH_KEYS if key not in p]
+        if missing:
+            raise ValueError(
+                f"path {k} is missing required key(s): {', '.join(missing)}."
+            )
+        for key in _PER_BAND_PATH_KEYS:
+            n_bands = max(
+                n_bands, np.atleast_1d(np.asarray(p[key], dtype=np.float64)).size
+            )
+    return n_bands
+
+
+def _path_pressure_levels(
+    lw_inst: np.ndarray, paths: list[dict[str, Any]], n_bands: int
+) -> np.ndarray:
+    """One row of per-band ``L_n,s`` per transmission path, broadcast to *n_bands*.
+
+    :raises ValueError: If a per-band term matches neither one value nor
+        ``n_bands``.
+    """
+    rows = []
+    for k, p in enumerate(paths):
+        for key in _PER_BAND_PATH_KEYS:
+            values = np.atleast_1d(np.asarray(p[key], dtype=np.float64))
+            if values.size not in (1, n_bands):
+                raise ValueError(
+                    f"path {k}: {key!r} has {values.size} bands, expected 1 "
+                    f"or {n_bands} to match the other per-band inputs."
+                )
+        rows.append(
+            np.broadcast_to(
+                structure_borne_pressure_level_path(
+                    lw_inst, p["adjustment_term"],
+                    p["flanking_reduction_index"], p["element_area"],
+                ),
+                (n_bands,),
+            )
+        )
+    return np.asarray(rows, dtype=np.float64)
+
+
 def installed_source_prediction(
     characteristic_power_level: ArrayLike,
     coupling_term: ArrayLike,
@@ -429,47 +488,17 @@ def installed_source_prediction(
             dtype=np.float64,
         )
     )
-    required = ("adjustment_term", "flanking_reduction_index", "element_area")
     # The band count is set by the widest per-band input (the characteristic
     # level, the coupling term or any path's per-band terms); every other
     # per-band input must carry one value or that count, and single values
     # broadcast across the bands.
-    per_band_keys = ("adjustment_term", "flanking_reduction_index")
-    n_bands = lw_inst.size
-    for k, p in enumerate(paths):
-        missing = [key for key in required if key not in p]
-        if missing:
-            raise ValueError(
-                f"path {k} is missing required key(s): {', '.join(missing)}."
-            )
-        for key in per_band_keys:
-            n_bands = max(
-                n_bands, np.atleast_1d(np.asarray(p[key], dtype=np.float64)).size
-            )
+    n_bands = _widest_band_count(lw_inst.size, paths)
     if lw_inst.size not in (1, n_bands):
         raise ValueError(
             f"the source levels carry {lw_inst.size} bands, expected 1 or "
             f"{n_bands} to match the transmission paths."
         )
-    rows = []
-    for k, p in enumerate(paths):
-        for key in per_band_keys:
-            values = np.atleast_1d(np.asarray(p[key], dtype=np.float64))
-            if values.size not in (1, n_bands):
-                raise ValueError(
-                    f"path {k}: {key!r} has {values.size} bands, expected 1 "
-                    f"or {n_bands} to match the other per-band inputs."
-                )
-        rows.append(
-            np.broadcast_to(
-                structure_borne_pressure_level_path(
-                    lw_inst, p["adjustment_term"],
-                    p["flanking_reduction_index"], p["element_area"],
-                ),
-                (n_bands,),
-            )
-        )
-    path_levels = np.asarray(rows, dtype=np.float64)
+    path_levels = _path_pressure_levels(lw_inst, paths, n_bands)
     total = total_structure_borne_pressure_level(path_levels)
     freq = (
         None

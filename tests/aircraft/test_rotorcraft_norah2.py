@@ -66,7 +66,11 @@ import oracle_data
 import pytest
 
 from phonometry.aircraft.rotorcraft_noise import (
+    FlightConditionInterpolation,
+    RotorcraftAtmosphere,
+    RotorcraftGround,
     RotorcraftHemisphere,
+    RotorcraftTrackState,
     rotorcraft_event_level,
     rotorcraft_noise_contour,
 )
@@ -135,7 +139,9 @@ def _parse_hem(path: pathlib.Path) -> tuple[np.ndarray, ...]:
             i += 2
             break
         i += 1
-    assert phi is not None and theta is not None and freqs is not None, path
+    assert phi is not None, path
+    assert theta is not None, path
+    assert freqs is not None, path
     levels = np.full((phi.size, theta.size, freqs.size), np.nan)
     row_ix = None
     for ln in lines[i:]:
@@ -256,11 +262,16 @@ def _run_event(case: pathlib.Path, r22: dict) -> tuple[dict, np.ndarray, object]
         res = rotorcraft_event_level(
             r22["hemispheres"], r22["airspeeds"], r22["path_angles"],
             inp["times"], inp["positions"], (header["XMICM"], header["YMICM"]),
-            receiver_height=header["HMIC"], ground_elevation=header["ZMIC"],
-            airspeed=inp["speed"], path_angle=inp["vang"],
-            heading=inp["heading"], bank_angle=inp["roll"],
-            flow_resistivity=header["SIGMA"], level_offset=inp["ddb"],
-            triangles=r22["triangles"], atmospheric_method="sae")
+            level_offset=inp["ddb"],
+            ground=RotorcraftGround(receiver_height=header["HMIC"],
+                                    ground_elevation=header["ZMIC"],
+                                    flow_resistivity=header["SIGMA"]),
+            track_state=RotorcraftTrackState(
+                airspeed=inp["speed"], path_angle=inp["vang"],
+                heading=inp["heading"], bank_angle=inp["roll"]),
+            interpolation=FlightConditionInterpolation(
+                triangles=r22["triangles"]),
+            atmosphere=RotorcraftAtmosphere(atmospheric_method="sae"))
     return header, rows, res
 
 
@@ -364,21 +375,28 @@ def test_case2_contour_grid(norah_root: pathlib.Path, r22_set: dict) -> None:
     mics = _parse_onl(case.with_suffix(".onl"))
     inp = _parse_inp(case.with_suffix(".inp"))
     xs, ys = np.unique(mics[:, 0]), np.unique(mics[:, 1])
-    assert xs.size == 11 and ys.size == 17
+    assert xs.size == 11
+    assert ys.size == 17
     kwargs = {
-        "x": xs, "y": ys, "receiver_height": 1.2, "ground_elevation": float(mics[0, 2]),
-        "airspeed": inp["speed"], "path_angle": inp["vang"], "heading": inp["heading"],
-        "bank_angle": inp["roll"], "level_offset": inp["ddb"],
-        "triangles": r22_set["triangles"], "atmospheric_method": "sae"}
+        "x": xs, "y": ys, "level_offset": inp["ddb"],
+        "track_state": RotorcraftTrackState(
+            airspeed=inp["speed"], path_angle=inp["vang"],
+            heading=inp["heading"], bank_angle=inp["roll"]),
+        "interpolation": FlightConditionInterpolation(
+            triangles=r22_set["triangles"]),
+        "atmosphere": RotorcraftAtmosphere(atmospheric_method="sae")}
     for sigma, tol_sel, tol_max in ((2.0e5, 0.7, 0.7), (8.0e5, 0.15, 0.7)):
+        ground = RotorcraftGround(receiver_height=1.2,
+                                  ground_elevation=float(mics[0, 2]),
+                                  flow_resistivity=sigma)
         sel = rotorcraft_noise_contour(
             r22_set["hemispheres"], r22_set["airspeeds"], r22_set["path_angles"],
             inp["times"], inp["positions"], metric="exposure",
-            flow_resistivity=sigma, **kwargs)
+            ground=ground, **kwargs)
         lam = rotorcraft_noise_contour(
             r22_set["hemispheres"], r22_set["airspeeds"], r22_set["path_angles"],
             inp["times"], inp["positions"], metric="maximum",
-            flow_resistivity=sigma, **kwargs)
+            ground=ground, **kwargs)
         sub = mics[mics[:, 4] == sigma]
         assert sub.shape[0] > 30
         d_sel, d_max = [], []
@@ -401,7 +419,9 @@ def test_reference_hemisphere_node_lookup(norah_root: pathlib.Path,
     phi, theta, freqs, levels = _parse_hem(
         norah_root / "Hemispheres" / "R22_Flyover_55kts_0deg.hem")
     h = RotorcraftHemisphere(freqs, phi, theta, levels)
-    assert phi.size == 19 and theta.size == 19 and freqs.size == 31
+    assert phi.size == 19
+    assert theta.size == 19
+    assert freqs.size == 31
     from phonometry.aircraft.rotorcraft_noise import hemisphere_source_level
 
     k = int(np.nonzero(freqs == 500.0)[0][0])
@@ -434,23 +454,28 @@ def test_case3_contour_with_elevation_grid(norah_root: pathlib.Path,
     mics = _parse_onl(case.with_suffix(".onl"))
     inp = _parse_inp(case.with_suffix(".inp"))
     xs, ys = np.unique(mics[:, 0]), np.unique(mics[:, 1])
-    ground = np.full((ys.size, xs.size), np.nan)
-    ref_sel = np.full_like(ground, np.nan)
-    ref_max = np.full_like(ground, np.nan)
+    elevation = np.full((ys.size, xs.size), np.nan)
+    ref_sel = np.full_like(elevation, np.nan)
+    ref_max = np.full_like(elevation, np.nan)
     for mic in mics:
         i = int(np.nonzero(ys == mic[1])[0][0])
         j = int(np.nonzero(xs == mic[0])[0][0])
-        ground[i, j] = mic[2]
+        elevation[i, j] = mic[2]
         ref_sel[i, j] = mic[9]
         ref_max[i, j] = mic[8]
-    assert np.all(np.isfinite(ground))
+    assert np.all(np.isfinite(elevation))
     assert np.unique(mics[:, 4]).tolist() == [1.0e5]
     kwargs = {
-        "x": xs, "y": ys, "receiver_height": 1.2, "ground_elevation": ground,
-        "airspeed": inp["speed"], "path_angle": inp["vang"], "heading": inp["heading"],
-        "bank_angle": inp["roll"], "level_offset": inp["ddb"],
-        "triangles": r22_set["triangles"], "atmospheric_method": "sae",
-        "flow_resistivity": 1.0e5}
+        "x": xs, "y": ys, "level_offset": inp["ddb"],
+        "ground": RotorcraftGround(receiver_height=1.2,
+                                   ground_elevation=elevation,
+                                   flow_resistivity=1.0e5),
+        "track_state": RotorcraftTrackState(
+            airspeed=inp["speed"], path_angle=inp["vang"],
+            heading=inp["heading"], bank_angle=inp["roll"]),
+        "interpolation": FlightConditionInterpolation(
+            triangles=r22_set["triangles"]),
+        "atmosphere": RotorcraftAtmosphere(atmospheric_method="sae")}
     sel = rotorcraft_noise_contour(
         r22_set["hemispheres"], r22_set["airspeeds"], r22_set["path_angles"],
         inp["times"], inp["positions"], metric="exposure", **kwargs)
@@ -485,11 +510,16 @@ def test_case2_contour_single_call_with_sigma_map(norah_root: pathlib.Path,
     assert np.all(np.isfinite(sigma))
     assert sorted(np.unique(sigma).tolist()) == [2.0e5, 8.0e5]
     kwargs = {
-        "x": xs, "y": ys, "receiver_height": 1.2, "ground_elevation": float(mics[0, 2]),
-        "airspeed": inp["speed"], "path_angle": inp["vang"], "heading": inp["heading"],
-        "bank_angle": inp["roll"], "level_offset": inp["ddb"],
-        "triangles": r22_set["triangles"], "atmospheric_method": "sae",
-        "flow_resistivity": sigma}
+        "x": xs, "y": ys, "level_offset": inp["ddb"],
+        "ground": RotorcraftGround(receiver_height=1.2,
+                                   ground_elevation=float(mics[0, 2]),
+                                   flow_resistivity=sigma),
+        "track_state": RotorcraftTrackState(
+            airspeed=inp["speed"], path_angle=inp["vang"],
+            heading=inp["heading"], bank_angle=inp["roll"]),
+        "interpolation": FlightConditionInterpolation(
+            triangles=r22_set["triangles"]),
+        "atmosphere": RotorcraftAtmosphere(atmospheric_method="sae")}
     sel = rotorcraft_noise_contour(
         r22_set["hemispheres"], r22_set["airspeeds"], r22_set["path_angles"],
         inp["times"], inp["positions"], metric="exposure", **kwargs)

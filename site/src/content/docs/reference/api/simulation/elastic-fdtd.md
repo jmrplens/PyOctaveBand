@@ -96,14 +96,10 @@ elastic_fdtd_simulation(
     rho: float | Field2D,
     shape: tuple[int, int] | None = None,
     cfl: float = 0.6,
-    probes: Sequence[tuple[int, int]] = (),
-    probe_fields: Sequence[str] = ('vy',),
-    boundaries: str | Mapping[str, str] = 'rigid',
-    absorbing_layer_cells: int = 20,
+    recording: ElasticRecording | None = None,
+    boundaries: ElasticBoundaries | None = None,
     obstacle_mask: NDArray[np.bool_] | None = None,
     damping: float = 0.0,
-    snapshot_every: int | None = None,
-    snapshot_field: str = 'p',
 ) -> ElasticFDTDResult
 ```
 
@@ -140,14 +136,10 @@ $1/\sqrt{r}$ amplitude spreading.
 | `rho` | Density map [kg/m3]; scalar or `(ny, nx)` array. |
 | `shape` | Grid shape `(ny, nx)`, required when `c_p` is scalar. |
 | `cfl` | Courant number in `(0, 1)` (Virieux Eqs. 6-7); the time step is $\Delta t = C_N\, \Delta x / (c_{p,\max} \sqrt{2})$. Default 0.6. |
-| `probes` | Probe cells as `(ix, iy)` index pairs. |
-| `probe_fields` | Which fields each probe records, drawn from `("p", "vx", "vy")` (default `("vy",)`, the component a surface accelerometer would see). |
-| `boundaries` | `"rigid"` (default), `"absorbing"`, `"free"`, or a mapping from side name (`left`/`right`/`top`/`bottom`) to one of those. |
-| `absorbing_layer_cells` | Sponge-layer thickness for absorbing sides, in cells. |
+| `recording` | What the run records ([`ElasticRecording`](/phonometry/reference/api/simulation/elastic-fdtd/#elasticrecording)): the probe cells and their fields, and the snapshot cadence and field. `None` records nothing but the time axis. |
+| `boundaries` | How the domain edges are terminated ([`ElasticBoundaries`](/phonometry/reference/api/simulation/elastic-fdtd/#elasticboundaries)); `None` is rigid on all four sides. |
 | `obstacle_mask` | Boolean map, shape `(ny, nx)`, of rigid cells (rasterised interior geometry). |
 | `damping` | Uniform bulk amplitude decay rate [1/s]. |
-| `snapshot_every` | Record a full field snapshot every this many steps (and at $t = 0$); `None` records none. |
-| `snapshot_field` | Field recorded in the snapshots (`"p"`/`"vx"`/`"vy"`, interpolated to cell centres). |
 
 **Returns:** An [`ElasticFDTDResult`](/phonometry/reference/api/simulation/elastic-fdtd/#elasticfdtdresult).
 
@@ -156,6 +148,27 @@ $1/\sqrt{r}$ amplitude spreading.
 | Exception | When |
 | :--- | :--- |
 | ValueError | If the inputs are invalid. |
+
+## ElasticBoundaries
+
+```python
+ElasticBoundaries(
+    sides: str | Mapping[str, str] = 'rigid',
+    absorbing_layer_cells: int = 20,
+)
+```
+
+How the four edges of the elastic domain are terminated.
+
+The sponge thickness only means anything where a side is absorbing, which
+is why it travels with the sides rather than beside them.
+
+**Parameters**
+
+| Name | Description |
+| :--- | :--- |
+| `sides` | `"rigid"` (default), `"absorbing"`, `"free"`, or a mapping from side name (`left`/`right`/`top`/`bottom`) to one of those. |
+| `absorbing_layer_cells` | Sponge-layer thickness for absorbing sides, in cells. |
 
 ## ElasticFDTD2D
 
@@ -423,6 +436,33 @@ Plot the probe histories or one recorded field snapshot.
 *property*
 
 Domain size `(lx, ly)` [m].
+
+## ElasticRecording
+
+```python
+ElasticRecording(
+    probes: Sequence[tuple[int, int]] = (),
+    probe_fields: Sequence[str] = ('vy',),
+    snapshot_every: int | None = None,
+    snapshot_field: str = 'p',
+)
+```
+
+What an elastic run writes down: probe traces and field snapshots.
+
+The two ways out of a running simulation. Probes record a time history at
+named cells, one trace per field of `probe_fields`; snapshots record the
+whole domain every `snapshot_every` steps for one field. Recording
+nothing (the default) runs the physics and keeps only the time axis.
+
+**Parameters**
+
+| Name | Description |
+| :--- | :--- |
+| `probes` | Probe cells as `(ix, iy)` index pairs. |
+| `probe_fields` | Which fields each probe records, drawn from `("p", "vx", "vy")` (default `("vy",)`, the component a surface accelerometer would see). |
+| `snapshot_every` | Record a full field snapshot every this many steps (and at $t = 0$); `None` records none. |
+| `snapshot_field` | Field recorded in the snapshots (`"p"`/`"vx"`/`"vy"`, interpolated to cell centres). |
 
 ## ExplosionSource
 

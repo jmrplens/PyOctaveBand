@@ -136,7 +136,8 @@ def test_verdict_follows_one_decimal_epnl_at_the_limit(tmp_path) -> None:
     text = _extract_text(str(out)).replace("\n", " ")
     assert "EPNL = 101.0 EPNdB" in text
     assert "margin +0.0" in text
-    assert "PASS" in text and "FAIL" not in text
+    assert "PASS" in text
+    assert "FAIL" not in text
     # Just past the tenth boundary the same limit fails.
     failing = dataclasses.replace(_flyover(), epnl=101.06)
     out2 = tmp_path / "boundary_fail.pdf"

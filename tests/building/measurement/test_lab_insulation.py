@@ -226,55 +226,51 @@ def test_background_correction_feeds_r() -> None:
 
 
 def test_airborne_band_count_mismatch() -> None:
+    l1, t2 = np.full(16, 80.0), np.full(16, 0.8)
+    short_l2 = np.full(5, 30.0)
     with pytest.raises(ValueError, match="band count"):
-        lab_airborne_insulation(
-            np.full(16, 80.0), np.full(5, 30.0), np.full(16, 0.8),
-            area=10.0, volume=50.0,
-        )
+        lab_airborne_insulation(l1, short_l2, t2, area=10.0, volume=50.0)
 
 
 def test_airborne_t2_band_mismatch() -> None:
+    l1, l2 = np.full(16, 80.0), np.full(16, 30.0)
+    short_t2 = np.full(5, 0.8)
     with pytest.raises(ValueError, match="band count"):
-        lab_airborne_insulation(
-            np.full(16, 80.0), np.full(16, 30.0), np.full(5, 0.8),
-            area=10.0, volume=50.0,
-        )
+        lab_airborne_insulation(l1, l2, short_t2, area=10.0, volume=50.0)
 
 
 @pytest.mark.parametrize("area,volume", [(0.0, 50.0), (-1.0, 50.0)])
 def test_airborne_bad_area(area: float, volume: float) -> None:
+    l1, l2, t2 = np.full(16, 80.0), np.full(16, 30.0), np.full(16, 0.8)
     with pytest.raises(ValueError, match="area"):
-        lab_airborne_insulation(
-            np.full(16, 80.0), np.full(16, 30.0), np.full(16, 0.8),
-            area=area, volume=volume,
-        )
+        lab_airborne_insulation(l1, l2, t2, area=area, volume=volume)
 
 
 def test_airborne_bad_volume() -> None:
+    l1, l2, t2 = np.full(16, 80.0), np.full(16, 30.0), np.full(16, 0.8)
     with pytest.raises(ValueError, match="volume"):
-        lab_airborne_insulation(
-            np.full(16, 80.0), np.full(16, 30.0), np.full(16, 0.8),
-            area=10.0, volume=-5.0,
-        )
+        lab_airborne_insulation(l1, l2, t2, area=10.0, volume=-5.0)
 
 
 def test_airborne_bad_t2() -> None:
+    l1, l2 = np.full(16, 80.0), np.full(16, 30.0)
     t2 = np.full(16, 0.8)
     t2[3] = 0.0
     with pytest.raises(ValueError, match="positive"):
-        lab_airborne_insulation(
-            np.full(16, 80.0), np.full(16, 30.0), t2, area=10.0, volume=50.0
-        )
+        lab_airborne_insulation(l1, l2, t2, area=10.0, volume=50.0)
 
 
 def test_impact_t2_band_mismatch() -> None:
+    li = np.full(16, 60.0)
+    short_t2 = np.full(5, 0.8)
     with pytest.raises(ValueError, match="band count"):
-        lab_impact_insulation(np.full(16, 60.0), np.full(5, 0.8), volume=50.0)
+        lab_impact_insulation(li, short_t2, volume=50.0)
 
 
 def test_impact_bad_volume() -> None:
+    li, t2 = np.full(16, 60.0), np.full(16, 0.8)
     with pytest.raises(ValueError, match="volume"):
-        lab_impact_insulation(np.full(16, 60.0), np.full(16, 0.8), volume=0.0)
+        lab_impact_insulation(li, t2, volume=0.0)
 
 
 def test_background_shape_mismatch() -> None:

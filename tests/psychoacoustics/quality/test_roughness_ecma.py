@@ -133,13 +133,15 @@ def test_result_structure(ref_calibration: EcmaRoughness) -> None:
 
 
 def test_invalid_field_raises() -> None:
+    tone = _tone(1000.0, 60.0, 0.5)
     with pytest.raises(ValueError):
-        roughness_ecma(_tone(1000.0, 60.0, 0.5), FS, field="bogus")
+        roughness_ecma(tone, FS, field="bogus")
 
 
 def test_empty_signal_raises() -> None:
+    empty = np.array([])
     with pytest.raises(ValueError):
-        roughness_ecma(np.array([]), FS)
+        roughness_ecma(empty, FS)
 
 
 def test_deterministic(ref_calibration: EcmaRoughness) -> None:

@@ -31,6 +31,7 @@ from .intensity_compliance import (
     verify_intensity_class,
 )
 from .sound_power import (
+    RoomEnvironment,
     SoundPowerResult,
     SoundPowerWarning,
     background_noise_correction,
@@ -91,6 +92,7 @@ __all__ = [
     "PrecisionIntensityResult",
     "PrecisionSoundPowerResult",
     "ReverberationSoundPowerResult",
+    "RoomEnvironment",
     "SoundPowerIntensityResult",
     "SoundPowerResult",
     "SoundPowerWarning",

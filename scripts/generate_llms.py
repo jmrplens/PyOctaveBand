@@ -39,9 +39,27 @@ from __future__ import annotations
 import functools
 import pathlib
 import re
+import subprocess
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 DOCS = ROOT / "docs"
+
+
+@functools.cache
+def _ignored_paths() -> frozenset[str]:
+    """Everything under docs/ that git ignores, as repo-relative paths."""
+    result = subprocess.run(
+        ["git", "ls-files", "--others", "--ignored", "--exclude-standard", "--", "docs"],
+        capture_output=True, text=True, cwd=ROOT, check=False,
+    )
+    return frozenset(result.stdout.split())
+
+
+def _git_ignored(path: pathlib.Path) -> bool:
+    """Is this file one git ignores (a local plan, a scratch note)?"""
+    return path.relative_to(ROOT).as_posix() in _ignored_paths()
+
+
 CONTENT = ROOT / "site" / "src" / "content" / "docs"
 #: Where the per-area shards live. Everything under site/public is served
 #: verbatim at the site root, so these publish at /llms/llms-<area>.txt and
@@ -142,6 +160,11 @@ def _routes() -> list[tuple[str, str]]:
     unmapped: list[str] = []
     for path in sorted(DOCS.rglob("*.md")):
         if path.parent == DOCS and path.stem in NOT_PAGES:
+            continue
+        # Files git ignores are somebody's local working notes, not the mirror:
+        # they have no site page by design, and CI never sees them. Without
+        # this the target cannot run at all in a checkout that has any.
+        if _git_ignored(path):
             continue
         route = path.relative_to(DOCS).with_suffix("").as_posix()
         # A folder's own page is `<folder>/index.md`, as on the site.

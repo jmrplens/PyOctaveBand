@@ -88,7 +88,8 @@ def test_nipts_verdict_against_requirement(tmp_path) -> None:
     out_pass = tmp_path / "pass.pdf"
     res.report(str(out_pass), metadata=ReportMetadata(requirement=15.0))
     text = _extract_text(str(out_pass))
-    assert "PASS" in text and "FAIL" not in text
+    assert "PASS" in text
+    assert "FAIL" not in text
     out_fail = tmp_path / "fail.pdf"
     res.report(str(out_fail), metadata=ReportMetadata(requirement=10.0))
     assert "FAIL" in _extract_text(str(out_fail))

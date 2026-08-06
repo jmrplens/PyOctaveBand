@@ -44,12 +44,7 @@ metadiffuser_diffusion_spectrum(
     source_angle: float = 0.0,
     periods: int = 1,
     resonator_geometry: str = 'slit',
-    speed_of_sound: float = 343.0,
-    air_density: float = 1.205,
-    viscosity: float = 1.84e-05,
-    prandtl_number: float = 0.71,
-    heat_capacity_ratio: float = 1.4,
-    atmospheric_pressure: float = 101325.0,
+    air: AirProperties = ...,
 ) -> DiffusionSpectrum
 ```
 
@@ -74,12 +69,7 @@ exactly as the paper reports `delta_n`.
 | `source_angle` | Angle of incidence `psi`, in degrees. |
 | `periods` | Number of repetitions `N_p` of the single period. |
 | `resonator_geometry` | `"slit"` (default) for the paper's two-dimensional resonators, `"square"` for square-duct necks and cavities. |
-| `speed_of_sound` | Speed of sound `c0` in air, in m/s. |
-| `air_density` | Air density `rho0`, in kg/m3. |
-| `viscosity` | Dynamic viscosity `eta` of air, in Pa s. |
-| `prandtl_number` | Prandtl number `Pr` of air. |
-| `heat_capacity_ratio` | Ratio of specific heats `gamma`. |
-| `atmospheric_pressure` | Static pressure `P0`, in Pa. |
+| `air` | State of the air the panel radiates into and the slits and resonators are filled with ([`AirProperties`](/phonometry/reference/api/materials/porous/#airproperties)); its speed of sound `c0` also carries the far field. |
 
 **Returns:** A [`DiffusionSpectrum`](/phonometry/reference/api/materials/scattering-diffusion/#diffusionspectrum) carrying the raw `d(f)` and the normalised `d_n(f)`.
 
@@ -96,12 +86,7 @@ metadiffuser_polar_response(
     source_angle: float = 0.0,
     periods: int = 1,
     resonator_geometry: str = 'slit',
-    speed_of_sound: float = 343.0,
-    air_density: float = 1.205,
-    viscosity: float = 1.84e-05,
-    prandtl_number: float = 0.71,
-    heat_capacity_ratio: float = 1.4,
-    atmospheric_pressure: float = 101325.0,
+    air: AirProperties = ...,
 ) -> DiffuserPolarResponse
 ```
 
@@ -126,12 +111,7 @@ with
 | `source_angle` | Angle of incidence `psi` of the source, in degrees; also applied to the local slit reflection. |
 | `periods` | Number of repetitions `N_p` of the single period; the grating lobes of a Schroeder-like design require `periods >= 2`. |
 | `resonator_geometry` | `"slit"` (default) for the paper's two-dimensional resonators, `"square"` for square-duct necks and cavities. |
-| `speed_of_sound` | Speed of sound `c0` in air, in m/s. |
-| `air_density` | Air density `rho0`, in kg/m3. |
-| `viscosity` | Dynamic viscosity `eta` of air, in Pa s. |
-| `prandtl_number` | Prandtl number `Pr` of air. |
-| `heat_capacity_ratio` | Ratio of specific heats `gamma`. |
-| `atmospheric_pressure` | Static pressure `P0`, in Pa. |
+| `air` | State of the air the panel radiates into and the slits and resonators are filled with ([`AirProperties`](/phonometry/reference/api/materials/porous/#airproperties)); its speed of sound `c0` also carries the far field. |
 
 **Returns:** A [`DiffuserPolarResponse`](/phonometry/reference/api/materials/design/#diffuserpolarresponse).
 
@@ -146,12 +126,7 @@ metadiffuser_reflection(
     period: float,
     angle: float = 0.0,
     resonator_geometry: str = 'slit',
-    speed_of_sound: float = 343.0,
-    air_density: float = 1.205,
-    viscosity: float = 1.84e-05,
-    prandtl_number: float = 0.71,
-    heat_capacity_ratio: float = 1.4,
-    atmospheric_pressure: float = 101325.0,
+    air: AirProperties = ...,
 ) -> MetadiffuserResult
 ```
 
@@ -177,12 +152,7 @@ air impedance.
 | `period` | Well pitch `d` along the panel face, in metres. |
 | `angle` | Polar angle of incidence `theta`, in radians. |
 | `resonator_geometry` | `"slit"` (default) for the paper's two-dimensional resonators, `"square"` for square-duct necks and cavities. |
-| `speed_of_sound` | Speed of sound `c0` in air, in m/s. |
-| `air_density` | Air density `rho0`, in kg/m3. |
-| `viscosity` | Dynamic viscosity `eta` of air, in Pa s. |
-| `prandtl_number` | Prandtl number `Pr` of air. |
-| `heat_capacity_ratio` | Ratio of specific heats `gamma`. |
-| `atmospheric_pressure` | Static pressure `P0`, in Pa. |
+| `air` | State of the air the panel radiates into and the slits and resonators are filled with ([`AirProperties`](/phonometry/reference/api/materials/porous/#airproperties)): its speed of sound `c0`, density `rho0`, viscosity `eta`, Prandtl number `Pr`, ratio of specific heats `gamma` and static pressure `P0`. |
 
 **Returns:** A [`MetadiffuserResult`](/phonometry/reference/api/materials/metadiffuser/#metadiffuserresult) with one reflection row per well.
 

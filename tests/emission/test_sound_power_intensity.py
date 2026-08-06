@@ -311,14 +311,16 @@ def test_short_frequencies_raises_value_error_not_index_error() -> None:
     ValueError up front, not an IndexError during classification."""
     areas = np.array([0.5, 0.5, 0.5, 0.5])
     intensity = np.column_stack([np.full(4, 5.0e-4), np.full(4, 5.0e-4)])
+    levels = np.full((4, 2), 90.0)
+    short_frequencies = np.array([1000.0])  # one freq, two bands
     with pytest.raises(ValueError, match="frequencies"):
         sound_power_intensity(
             intensity,
             areas,
             normal_intensity_2=intensity,
-            pressure_levels=np.full((4, 2), 90.0),
+            pressure_levels=levels,
             pressure_residual_index=40.0,
-            frequencies=np.array([1000.0]),  # one freq, two bands
+            frequencies=short_frequencies,
         )
 
 
@@ -461,34 +463,37 @@ def test_a_weighting_screening_unavailable_warns_and_sums_all() -> None:
 # Input validation
 # --------------------------------------------------------------------------
 def test_area_length_mismatch_raises() -> None:
+    intensity = np.full((4, 1), 1e-4)
+    three_areas = np.array([0.5, 0.5, 0.5])
     with pytest.raises(ValueError):
-        sound_power_intensity(np.full((4, 1), 1e-4), np.array([0.5, 0.5, 0.5]))
+        sound_power_intensity(intensity, three_areas)
 
 
 def test_pressure_levels_shape_mismatch_raises() -> None:
+    intensity = np.full((4, 1), 1e-4)
+    areas = np.array([0.5, 0.5, 0.5, 0.5])
+    two_band_levels = np.full((4, 2), 90.0)
     with pytest.raises(ValueError):
-        sound_power_intensity(
-            np.full((4, 1), 1e-4),
-            np.array([0.5, 0.5, 0.5, 0.5]),
-            pressure_levels=np.full((4, 2), 90.0),
-        )
+        sound_power_intensity(intensity, areas, pressure_levels=two_band_levels)
 
 
 def test_non_positive_area_raises() -> None:
+    intensity = np.full((4, 1), 1e-4)
+    zero_area = np.array([0.5, 0.5, 0.5, 0.0])
     with pytest.raises(ValueError):
-        sound_power_intensity(
-            np.full((4, 1), 1e-4), np.array([0.5, 0.5, 0.5, 0.0])
-        )
+        sound_power_intensity(intensity, zero_area)
 
 
 def test_fewer_than_four_segments_warns() -> None:
     """Clause 8.2 requires at least 4 segments."""
+    intensity = np.full((3, 1), 5e-4)
+    areas = np.array([0.5, 0.5, 0.5])
     with pytest.warns(SoundPowerWarning):
-        sound_power_intensity(np.full((3, 1), 5e-4), np.array([0.5, 0.5, 0.5]))
+        sound_power_intensity(intensity, areas)
 
 
 def test_bad_grade_raises() -> None:
+    intensity = np.full((4, 1), 1e-4)
+    areas = np.array([0.5, 0.5, 0.5, 0.5])
     with pytest.raises(ValueError):
-        sound_power_intensity(
-            np.full((4, 1), 1e-4), np.array([0.5, 0.5, 0.5, 0.5]), grade="bogus"
-        )
+        sound_power_intensity(intensity, areas, grade="bogus")

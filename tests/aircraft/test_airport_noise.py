@@ -15,6 +15,7 @@ import numpy as np
 import pytest
 
 from phonometry.aircraft.airport_noise import (
+    FlightSegmentState,
     FlyoverResult,
     NoiseContourResult,
     NpdLevelResult,
@@ -291,7 +292,8 @@ def test_event_level_ground_roll_applies_directivity() -> None:
     path = [[0.0, 0.0, 0.0, 12000.0, 40.0], [1500.0, 0.0, 0.0, 12000.0, 60.0]]
     obs = [-400.0, 150.0, 0.0]
     plain = event_level(path, obs, _NP, _ND, _NSEL, _NMAX).level
-    rolled = event_level(path, obs, _NP, _ND, _NSEL, _NMAX, ground_roll=[True]).level
+    rolled = event_level(path, obs, _NP, _ND, _NSEL, _NMAX,
+                         segments=FlightSegmentState(ground_roll=[True])).level
     # Behind SOR, ψ is obtuse; the two differ by exactly ΔSOR plus the reduced
     # noise-fraction switch, so the ground-roll level is not equal to the plain one.
     assert rolled != pytest.approx(plain)
@@ -301,22 +303,24 @@ def test_event_level_ground_roll_applies_directivity() -> None:
     ahead = [2000.0, 150.0, 0.0]  # q > λ: truly ahead of the segment
     from phonometry.aircraft.airport_noise import duration_correction as _dc
     plain_ahead = event_level(path, ahead, _NP, _ND, _NSEL, _NMAX).level
-    flagged_ahead = event_level(path, ahead, _NP, _ND, _NSEL, _NMAX, ground_roll=[True]).level
+    flagged_ahead = event_level(path, ahead, _NP, _ND, _NSEL, _NMAX,
+                                segments=FlightSegmentState(ground_roll=[True])).level
     vref = 160.0 * 0.514444
     expected_delta = _dc(vref, 0.5 * (40.0 + 60.0)) - _dc(vref, 60.0)
     assert flagged_ahead - plain_ahead == pytest.approx(expected_delta, abs=1e-9)
+    mismatched_roll = FlightSegmentState(ground_roll=[True, False])
     with pytest.raises(ValueError, match="ground_roll"):
-        event_level(path, obs, _NP, _ND, _NSEL, _NMAX, ground_roll=[True, False])
+        event_level(path, obs, _NP, _ND, _NSEL, _NMAX, segments=mismatched_roll)
     # The directivity is also applied on the maximum metric (Eq. 4-9a) and with
     # a propeller mounting (turboprop ΔSOR curve).
     max_plain = event_level(path, obs, _NP, _ND, _NSEL, _NMAX, metric="maximum").level
     max_roll = event_level(path, obs, _NP, _ND, _NSEL, _NMAX, metric="maximum",
-                           ground_roll=[True]).level
+                           segments=FlightSegmentState(ground_roll=[True])).level
     assert max_roll != pytest.approx(max_plain)
     prop_roll = event_level(path, obs, _NP, _ND, _NSEL, _NMAX, mounting="propeller",
-                            ground_roll=[True]).level
+                            segments=FlightSegmentState(ground_roll=[True])).level
     jet_roll = event_level(path, obs, _NP, _ND, _NSEL, _NMAX, mounting="wing",
-                           ground_roll=[True]).level
+                           segments=FlightSegmentState(ground_roll=[True])).level
     assert prop_roll != pytest.approx(jet_roll)  # different SOR curves
 
 
@@ -432,10 +436,10 @@ def test_workbook_behind_sor_geometry_matches_h1_fix() -> None:
     path = [[0.0, 0.0, 0.5, 12000.0, 0.0], [1500.0, 0.0, 0.5, 12000.0, 40.0]]
     behind = [-500.0, 0.0, 0.0]
     lvl = event_level(path, behind, _NP, _ND, _NSEL, _NMAX, mounting="fuselage",
-                      ground_roll=[True]).level
+                      segments=FlightSegmentState(ground_roll=[True])).level
     assert np.isfinite(lvl)
     seg = event_level(path, behind, _NP, _ND, _NSEL, _NMAX, mounting="fuselage",
-                      ground_roll=[True]).segment_levels
+                      segments=FlightSegmentState(ground_roll=[True])).segment_levels
     assert seg.size == 1
 
 
@@ -447,13 +451,14 @@ def test_landing_roll_ahead_branch() -> None:
     path = [[0.0, 0.0, 0.5, 8000.0, 70.0], [1200.0, 0.0, 0.5, 8000.0, 30.0]]
     ahead = [3000.0, 400.0, 0.0]
     plain = event_level(path, ahead, _NP, _ND, _NSEL, _NMAX).level
-    landing = event_level(path, ahead, _NP, _ND, _NSEL, _NMAX, landing_roll=[True]).level
+    landing = event_level(path, ahead, _NP, _ND, _NSEL, _NMAX,
+                          segments=FlightSegmentState(landing_roll=[True])).level
     assert landing != pytest.approx(plain)
     # Zero-speed start is legitimate on runway segments (Eq. 4-13b mean speed).
     v0 = [[0.0, 0.0, 0.5, 12000.0, 0.0], [800.0, 0.0, 0.5, 12000.0, 30.0],
           [4000.0, 0.0, 250.0, 12000.0, 80.0]]
     lvl = event_level(v0, [2000.0, 600.0, 0.0], _NP, _ND, _NSEL, _NMAX,
-                      ground_roll=[True, False]).level
+                      segments=FlightSegmentState(ground_roll=[True, False])).level
     assert np.isfinite(lvl)
 
 
@@ -469,14 +474,19 @@ def test_bank_angle_side_asymmetry() -> None:
     # L2: with bank, starboard and port receivers see different Delta_I
     # (phi = beta +/- epsilon per section 4.5.2); without bank they are equal.
     path = [[0.0, 0.0, 300.0, 10000.0, _VREF], [3000.0, 0.0, 400.0, 10000.0, _VREF]]
-    port = event_level(path, [1500.0, 500.0, 0.0], _NP, _ND, _NSEL, _NMAX, bank=[10.0]).level
-    stbd = event_level(path, [1500.0, -500.0, 0.0], _NP, _ND, _NSEL, _NMAX, bank=[10.0]).level
+    banked = FlightSegmentState(bank=[10.0])
+    port = event_level(path, [1500.0, 500.0, 0.0], _NP, _ND, _NSEL, _NMAX,
+                       segments=banked).level
+    stbd = event_level(path, [1500.0, -500.0, 0.0], _NP, _ND, _NSEL, _NMAX,
+                       segments=banked).level
     same_p = event_level(path, [1500.0, 500.0, 0.0], _NP, _ND, _NSEL, _NMAX).level
     same_s = event_level(path, [1500.0, -500.0, 0.0], _NP, _ND, _NSEL, _NMAX).level
     assert port != pytest.approx(stbd)
     assert same_p == pytest.approx(same_s)
+    mismatched_bank = FlightSegmentState(bank=[1.0, 2.0])
     with pytest.raises(ValueError, match="bank"):
-        event_level(path, [0.0, 500.0, 0.0], _NP, _ND, _NSEL, _NMAX, bank=[1.0, 2.0])
+        event_level(path, [0.0, 500.0, 0.0], _NP, _ND, _NSEL, _NMAX,
+                    segments=mismatched_bank)
 
 
 def test_bank_angle_sign_follows_doc29_sides() -> None:
@@ -508,16 +518,17 @@ def test_banked_segment_installation_favours_starboard() -> None:
     # contours). Propeller aircraft have no installation effect, so no
     # asymmetry appears.
     path = [[0.0, 0.0, 300.0, 10000.0, _VREF], [3000.0, 0.0, 300.0, 10000.0, _VREF]]
+    banked15 = FlightSegmentState(bank=[15.0])
     for mounting in ("wing", "fuselage"):
         stbd = event_level(path, [1500.0, -500.0, 0.0], _NP, _ND, _NSEL, _NMAX,
-                           mounting=mounting, bank=[15.0]).level
+                           mounting=mounting, segments=banked15).level
         port = event_level(path, [1500.0, 500.0, 0.0], _NP, _ND, _NSEL, _NMAX,
-                           mounting=mounting, bank=[15.0]).level
+                           mounting=mounting, segments=banked15).level
         assert stbd > port, mounting
     stbd = event_level(path, [1500.0, -500.0, 0.0], _NP, _ND, _NSEL, _NMAX,
-                       mounting="propeller", bank=[15.0]).level
+                       mounting="propeller", segments=banked15).level
     port = event_level(path, [1500.0, 500.0, 0.0], _NP, _ND, _NSEL, _NMAX,
-                       mounting="propeller", bank=[15.0]).level
+                       mounting="propeller", segments=banked15).level
     assert stbd == pytest.approx(port)
 
 
@@ -526,12 +537,15 @@ def test_noise_contour_accepts_bank() -> None:
     # and produces the same port/starboard asymmetry.
     path = [[0.0, 0.0, 300.0, 10000.0, _VREF], [3000.0, 0.0, 400.0, 10000.0, _VREF]]
     kw = {"x": [1400.0, 1600.0], "y": [-500.0, 500.0]}
-    banked = noise_contour(path, _NP, _ND, _NSEL, _NMAX, bank=[10.0], **kw)
+    banked = noise_contour(path, _NP, _ND, _NSEL, _NMAX,
+                           segments=FlightSegmentState(bank=[10.0]), **kw)
     level = noise_contour(path, _NP, _ND, _NSEL, _NMAX, **kw)
     assert banked.level[0, 0] != pytest.approx(banked.level[1, 0])
     assert level.level[0, 0] == pytest.approx(level.level[1, 0])
+    mismatched_bank = FlightSegmentState(bank=[1.0, 2.0])
     with pytest.raises(ValueError, match="bank"):
-        noise_contour(path, _NP, _ND, _NSEL, _NMAX, bank=[1.0, 2.0], **kw)
+        noise_contour(path, _NP, _ND, _NSEL, _NMAX,
+                      segments=mismatched_bank, **kw)
 
 
 def test_contour_grid_matches_scalar_event_level() -> None:
@@ -545,32 +559,31 @@ def test_contour_grid_matches_scalar_event_level() -> None:
         [2500.0, 100.0, 300.0, 10000.0, _VREF],  # climb, slight turn
         [4500.0, 400.0, 700.0, 9000.0, _VREF],
     ]
-    gr = [True, False, False]
-    lr = [False, False, False]
-    bank = [0.0, 0.0, 8.0]
+    segments = FlightSegmentState(ground_roll=[True, False, False],
+                                  landing_roll=[False, False, False],
+                                  bank=[0.0, 0.0, 8.0])
     x = np.linspace(-2000.0, 5000.0, 9)
     y = np.linspace(-1500.0, 1500.0, 7)
     for metric in ("exposure", "maximum"):
         for mounting in ("wing", "propeller"):
             res = noise_contour(path, _NP, _ND, _NSEL, _NMAX, x=x, y=y,
                                 metric=metric, mounting=mounting,
-                                ground_roll=gr, landing_roll=lr, bank=bank)
+                                segments=segments)
             for iy, yv in enumerate(y):
                 for ix, xv in enumerate(x):
                     ref = event_level(path, [xv, yv, 0.0], _NP, _ND, _NSEL,
                                       _NMAX, metric=metric, mounting=mounting,
-                                      ground_roll=gr, landing_roll=lr,
-                                      bank=bank).level
+                                      segments=segments).level
                     assert res.level[iy, ix] == pytest.approx(ref, abs=1e-9), (
                         metric, mounting, xv, yv)
     # Landing rollout branch, separately (ahead-of-rollout geometry).
     land = [[0.0, 0.0, 300.0, 9000.0, _VREF], [2000.0, 0.0, 0.0, 8000.0, 70.0],
             [3200.0, 0.0, 0.0, 4000.0, 0.0]]
-    lmask = [False, True]
+    lmask = FlightSegmentState(landing_roll=[False, True])
     res = noise_contour(land, _NP, _ND, _NSEL, _NMAX, x=[1000.0, 4000.0],
-                        y=[-200.0, 200.0], landing_roll=lmask)
+                        y=[-200.0, 200.0], segments=lmask)
     for iy, yv in enumerate([-200.0, 200.0]):
         for ix, xv in enumerate([1000.0, 4000.0]):
             ref = event_level(land, [xv, yv, 0.0], _NP, _ND, _NSEL, _NMAX,
-                              landing_roll=lmask).level
+                              segments=lmask).level
             assert res.level[iy, ix] == pytest.approx(ref, abs=1e-9)

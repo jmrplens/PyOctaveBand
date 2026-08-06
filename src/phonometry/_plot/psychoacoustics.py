@@ -42,19 +42,28 @@ if TYPE_CHECKING:
     from ..psychoacoustics.quality.tonality_ecma import EcmaTonality
     from ..psychoacoustics.quality.tone_audibility import ToneAudibilityResult
 
+#: Critical-band rate axis label of the Zwicker/DIN 45631 family (Bark scale).
+_AXIS_BARK = "Critical-band rate z [Bark]"
+#: Critical-band rate axis label of the ECMA-418-2 (Sottek Hearing Model) family.
+_AXIS_BARK_HMS = "Critical-band rate z [Bark_HMS]"
+#: Time axis label shared by every time-varying psychoacoustic renderer.
+_AXIS_TIME = "Time [s]"
+#: Frequency axis label shared by the spectral psychoacoustic renderers.
+_AXIS_FREQUENCY = "Frequency [Hz]"
+
 #: Spanish translations of the fixed strings rendered by the
 #: psychoacoustics ``.plot()`` renderers, keyed by their verbatim English
 #: text. ``_t`` returns the English key unchanged for any language other
 #: than ``"es"``, so the English output is byte-for-byte identical to the
 #: pre-i18n renderers.
 _STRINGS: dict[str, str] = {
-    "Critical-band rate z [Bark]": "Razón de banda crítica z [Bark]",
-    "Critical-band rate z [Bark_HMS]": "Razón de banda crítica z [Bark_HMS]",
+    _AXIS_BARK: "Razón de banda crítica z [Bark]",
+    _AXIS_BARK_HMS: "Razón de banda crítica z [Bark_HMS]",
     "Specific loudness N' [sone/Bark]": "Sonoridad específica N' [sonios/Bark]",
     "Specific loudness N' [sone_HMS/Bark_HMS]": "Sonoridad específica N' [sonios_HMS/Bark_HMS]",
     "Specific loudness N' [sone/Cam]": "Sonoridad específica N' [sonios/Cam]",
     "ERB number [Cam]": "Número ERB [Cam]",
-    "Time [s]": "Tiempo [s]",
+    _AXIS_TIME: "Tiempo [s]",
     "Loudness N [sone]": "Sonoridad N [sonios]",
     "Loudness N [sone_HMS]": "Sonoridad N [sonios_HMS]",
     "Loudness [sone]": "Sonoridad [sonios]",
@@ -94,7 +103,7 @@ _STRINGS: dict[str, str] = {
     "margin {m} dB": "margen {m} dB",
     "ECMA-418-1 {name} = {v} dB at {f} Hz: {verdict}":
         "ECMA-418-1 {name} = {v} dB a {f} Hz: {verdict}",
-    "Frequency [Hz]": "Frecuencia [Hz]",
+    _AXIS_FREQUENCY: "Frecuencia [Hz]",
     "Sound pressure level [dB re 20 µPa]": "Nivel de presión acústica [dB re 20 µPa]",
     r"Hearing threshold $T_f$": r"Umbral de audición $T_f$",
     "ISO 226:2023 equal-loudness contours": "Curvas isofónicas ISO 226:2023",
@@ -144,7 +153,7 @@ def plot_zwicker_loudness(
     kwargs.setdefault("color", _C_PRIMARY)
     ax_specific.plot(bark, specific, **kwargs)
     ax_specific.fill_between(bark, specific, color=kwargs["color"], alpha=0.25)
-    ax_specific.set_xlabel(_t("Critical-band rate z [Bark]", language))
+    ax_specific.set_xlabel(_t(_AXIS_BARK, language))
     ax_specific.set_ylabel(_t("Specific loudness N' [sone/Bark]", language))
     ax_specific.set_xlim(0.0, bark[-1])
     ax_specific.set_ylim(bottom=0.0)
@@ -206,7 +215,7 @@ def plot_zwicker_loudness_time(
             result.n10, color=_C_SECONDARY, ls=":", lw=1,
             label="N10=" + format_number(result.n10, language, decimals=2),
         )
-    ax_time.set_xlabel(_t("Time [s]", language))
+    ax_time.set_xlabel(_t(_AXIS_TIME, language))
     ax_time.set_ylabel(_t("Loudness N [sone]", language))
     ax_time.set_ylim(bottom=0.0)
     ax_time.grid(True, alpha=0.3)
@@ -247,7 +256,7 @@ def plot_ecma_loudness(
     kwargs.setdefault("color", _C_PRIMARY)
     ax_specific.plot(bark, specific, **kwargs)
     ax_specific.fill_between(bark, specific, color=kwargs["color"], alpha=0.25)
-    ax_specific.set_xlabel(_t("Critical-band rate z [Bark_HMS]", language))
+    ax_specific.set_xlabel(_t(_AXIS_BARK_HMS, language))
     ax_specific.set_ylabel(_t("Specific loudness N' [sone_HMS/Bark_HMS]", language))
     ax_specific.set_xlim(0.0, bark[-1])
     ax_specific.set_ylim(bottom=0.0)
@@ -264,7 +273,7 @@ def plot_ecma_loudness(
     time = np.asarray(result.time, dtype=np.float64)
     lvt = np.asarray(result.loudness_vs_time, dtype=np.float64)
     ax_time.plot(time, lvt, color=_C_TERTIARY, label="N(l)")
-    ax_time.set_xlabel(_t("Time [s]", language))
+    ax_time.set_xlabel(_t(_AXIS_TIME, language))
     ax_time.set_ylabel(_t("Loudness N [sone_HMS]", language))
     ax_time.set_ylim(bottom=0.0)
     ax_time.grid(True, alpha=0.3)
@@ -335,7 +344,7 @@ def plot_moore_glasberg_time_loudness(
     kwargs.setdefault("lw", 1.8)
     ax.plot(time, ltl, label=_t("Long-term loudness", language), **kwargs)
     ax.axhline(result.n_max, color=_C_REFERENCE, ls="--", lw=1.0, alpha=0.7)
-    ax.set_xlabel(_t("Time [s]", language))
+    ax.set_xlabel(_t(_AXIS_TIME, language))
     ax.set_ylabel(_t("Loudness [sone]", language))
     if time.size:
         ax.set_xlim(time[0], time[-1])
@@ -385,7 +394,7 @@ def plot_ecma_tonality(
     kwargs.setdefault("color", "#d62728")
     ax_specific.plot(bark, specific, **kwargs)
     ax_specific.fill_between(bark, specific, color=kwargs["color"], alpha=0.25)
-    ax_specific.set_xlabel(_t("Critical-band rate z [Bark_HMS]", language))
+    ax_specific.set_xlabel(_t(_AXIS_BARK_HMS, language))
     ax_specific.set_ylabel(_t("Specific tonality T' [tu_HMS]", language))
     ax_specific.set_xlim(0.0, bark[-1])
     ax_specific.set_ylim(bottom=0.0)
@@ -402,7 +411,7 @@ def plot_ecma_tonality(
     time = np.asarray(result.time, dtype=np.float64)
     tvt = np.asarray(result.tonality_vs_time, dtype=np.float64)
     ax_time.plot(time, tvt, color=_C_QUATERNARY, label="T(l)")
-    ax_time.set_xlabel(_t("Time [s]", language))
+    ax_time.set_xlabel(_t(_AXIS_TIME, language))
     ax_time.set_ylabel(_t("Tonality T [tu_HMS]", language))
     ax_time.set_ylim(bottom=0.0)
     ax_time.grid(True, alpha=0.3)
@@ -445,7 +454,7 @@ def _plot_hms_time_and_heatmap(
         kwargs.setdefault("color", color)
     (line,) = ax_time.plot(time, vs_time, **kwargs)
     ax_time.fill_between(time, vs_time, color=line.get_color(), alpha=0.25)
-    ax_time.set_xlabel(_t("Time [s]", language))
+    ax_time.set_xlabel(_t(_AXIS_TIME, language))
     ax_time.set_ylabel(ylabel)
     ax_time.set_ylim(bottom=0.0)
     ax_time.set_title(title)
@@ -461,8 +470,8 @@ def _plot_hms_time_and_heatmap(
             time, bark, spec_vs_time.T, cmap="magma", shading="auto"
         )
         ax_heat.figure.colorbar(mesh, ax=ax_heat, label=heat_label)
-    ax_heat.set_xlabel(_t("Time [s]", language))
-    ax_heat.set_ylabel(_t("Critical-band rate z [Bark_HMS]", language))
+    ax_heat.set_xlabel(_t(_AXIS_TIME, language))
+    ax_heat.set_ylabel(_t(_AXIS_BARK_HMS, language))
     localize_axes(ax_time, language)
     localize_axes(ax_heat, language)
     return axes
@@ -574,7 +583,7 @@ def plot_fluctuation_strength(
     kwargs.setdefault("color", _C_PRIMARY)
     ax.plot(z, spec, **kwargs)
     ax.fill_between(z, spec, color=kwargs["color"], alpha=0.25)
-    ax.set_xlabel(_t("Critical-band rate z [Bark]", language))
+    ax.set_xlabel(_t(_AXIS_BARK, language))
     ax.set_ylabel(_t("Specific fluctuation strength $f'(z)$ [vacil/Bark]", language))
     ax.set_title(_t("Fluctuation strength F = {f} vacil", language).format(
         f=format_number(result.fluctuation_strength, language, decimals=2),
@@ -699,7 +708,7 @@ def plot_tone_assessment(
         name=name, v=format_number(ratio, language, decimals=1),
         f=decimal_comma(f"{ft:g}", language), verdict=verdict,
     ))
-    ax.set_xlabel(_t("Frequency [Hz]", language))
+    ax.set_xlabel(_t(_AXIS_FREQUENCY, language))
     ax.set_ylabel(_t(ylabel, language))
     format_frequency_axis(ax, *_TONE_RANGE_HZ)
     ax.legend(loc="best", fontsize="small")
@@ -833,7 +842,7 @@ def plot_tone_audibility_levels(
         ),
     )
 
-    ax.set_xlabel(_t("Frequency [Hz]", language))
+    ax.set_xlabel(_t(_AXIS_FREQUENCY, language))
     ax.set_ylabel(_t("Sound pressure level [dB]", language))
     ax.set_title(_t("ISO 1996-2 tone-audibility analysis", language))
     format_frequency_axis(ax, float(f1.min()), float(f2.max()))
@@ -893,7 +902,7 @@ def plot_equal_loudness_contours(
 
     ax.set_xlim(fmin, fmax)
     format_frequency_axis(ax, fmin, fmax)
-    ax.set_xlabel(_t("Frequency [Hz]", language))
+    ax.set_xlabel(_t(_AXIS_FREQUENCY, language))
     ax.set_ylabel(_t("Sound pressure level [dB re 20 µPa]", language))
     ax.set_title(_t("ISO 226:2023 equal-loudness contours", language))
     ax.grid(True, which="both", alpha=0.3)

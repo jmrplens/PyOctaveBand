@@ -302,7 +302,11 @@ def generate_piston_directivity(output_dir: str) -> None:
 
 def _loudspeaker_datasheet_example() -> Any:
     """The IEC 60268-5 loudspeaker result shared by the section-7 .plot() figures."""
-    from phonometry import loudspeaker_characteristics, radiating_piston
+    from phonometry import (
+        LoudspeakerDirectivity,
+        loudspeaker_characteristics,
+        radiating_piston,
+    )
 
     freqs = np.geomspace(30, 24000, 320)
     spl = 87.0 + 1.2 * np.sin(2 * np.log2(freqs / 900.0))
@@ -314,15 +318,23 @@ def _loudspeaker_datasheet_example() -> Any:
         freqs, spl, rated_impedance=8.0, sensitivity_band=(200.0, 4000.0),
         impedance=(fz, 6.6 + 24 * np.exp(-(np.log2(fz / 52.0) ** 2) / 0.12)),
         distortion=(thd_f, 0.3 + 2.6 * np.exp(-(np.log2(thd_f / 70.0) ** 2) / 0.45)),
-        directivity=radiating_piston(0.075, np.array([1000.0, 2000.0, 4000.0]),
-                                     angles=np.radians(np.linspace(0, 90, 46))),
-        polar_frequency=2000.0,
+        directivity=LoudspeakerDirectivity(
+            piston=radiating_piston(0.075, np.array([1000.0, 2000.0, 4000.0]),
+                                    angles=np.radians(np.linspace(0, 90, 46))),
+            frequency=2000.0,
+        ),
     )
 
 
 def _microphone_datasheet_example() -> Any:
     """The IEC 60268-4 microphone result shared by the section-8 .plot() figures."""
-    from phonometry import microphone_characteristics
+    from phonometry import (
+        MicrophoneDirectivity,
+        MicrophoneElectrical,
+        MicrophoneNoise,
+        MicrophoneOverload,
+        microphone_characteristics,
+    )
 
     freqs = np.geomspace(20, 20000, 400)
     response = -10 * np.log10(1 + (30.0 / freqs) ** 4)      # low-frequency roll-off
@@ -334,12 +346,19 @@ def _microphone_datasheet_example() -> Any:
     spl_axis = np.linspace(100, 140, 81)
     return microphone_characteristics(
         freqs, response, 12.5, tolerance_db=3.0,          # 12.5 mV/Pa at 1 kHz
-        rated_impedance=150.0, minimum_load_impedance=1000.0,
-        noise_voltage=1.25e-6, max_spl_thd_percent=0.5,
-        noise_spectrum=(noise_f, 6.0 + 12.0 * np.log10(1000.0 / noise_f)),
-        distortion=(spl_axis, 0.5 * 10 ** ((spl_axis - 130.0) * 0.08)),
-        polar=(angles, cardioid), polar_frequency=1000.0,
-        powering="Phantom P48 (IEC 61938)", supply_current_ma=3.1,
+        directivity=MicrophoneDirectivity(polar=(angles, cardioid), frequency=1000.0),
+        noise=MicrophoneNoise(
+            voltage=1.25e-6,
+            spectrum=(noise_f, 6.0 + 12.0 * np.log10(1000.0 / noise_f)),
+        ),
+        overload=MicrophoneOverload(
+            distortion=(spl_axis, 0.5 * 10 ** ((spl_axis - 130.0) * 0.08)),
+            thd_percent=0.5,
+        ),
+        electrical=MicrophoneElectrical(
+            rated_impedance=150.0, minimum_load_impedance=1000.0,
+            powering="Phantom P48 (IEC 61938)", supply_current_ma=3.1,
+        ),
     )
 
 
@@ -707,7 +726,7 @@ def generate_pp_probe_geometry(output_dir: str) -> None:
 def generate_sound_power_pressure_result(output_dir: str) -> None:
     """ISO 3744: enveloping-surface LW spectrum from hemisphere pressure levels."""
     print("Generating sound_power_pressure_result.png...")
-    from phonometry import sound_power_pressure
+    from phonometry import RoomEnvironment, sound_power_pressure
 
     # The sound-power guide's section-1 example: octave-band SPL at the 10
     # hemisphere positions of ISO 3744 (Annex B) around a machine on one
@@ -723,7 +742,7 @@ def generate_sound_power_pressure_result(output_dir: str) -> None:
     result = sound_power_pressure(
         levels, "hemisphere", radius=1.5, reflecting_planes=1,
         background_levels=background, frequencies=freqs,
-        reverberation_time=0.6, volume=300.0,
+        room=RoomEnvironment(reverberation_time=0.6, volume=300.0),
     )
 
     lw = result.sound_power_level
@@ -1214,6 +1233,8 @@ def _norton_plant_room_chain() -> Any:
     the carpeted floor of the 5 x 5 x 3 m operator room.
     """
     from phonometry import (
+        DesignCriterion,
+        SourceRoom,
         equivalent_absorption_area,
         mean_absorption,
         room_constant,
@@ -1238,14 +1259,16 @@ def _norton_plant_room_chain() -> Any:
         [39.0, 42.0, 50.0, 58.0, 63.0, 67.0],
         5.0 * 3.0,
         equivalent_absorption_area(operator),
-        source_power_level=[105.0, 103.0, 98.0, 108.0, 107.0, 109.0],
-        source_room_constant=room_constant(268.0, mean_absorption(plant)),
-        # The blower sits on the floor along the middle of a wall (Q = 4) and
-        # the problem asks for a conservative estimate, i.e. the constant-volume
-        # sound power model of Norton Table 4.5.
-        source_directivity=4.0,
-        source_model="constant_volume",
-        target=45.0,
+        source=SourceRoom(
+            power_level=[105.0, 103.0, 98.0, 108.0, 107.0, 109.0],
+            room_constant=room_constant(268.0, mean_absorption(plant)),
+            # The blower sits on the floor along the middle of a wall (Q = 4)
+            # and the problem asks for a conservative estimate, i.e. the
+            # constant-volume sound power model of Norton Table 4.5.
+            directivity=4.0,
+            model="constant_volume",
+        ),
+        criterion=DesignCriterion(target=45.0),
         label="Plant room to operator room",
     )
 

@@ -119,7 +119,8 @@ def test_report_renders_oracle_values(tmp_path) -> None:
     # The surface velocity levels head the Lv column.
     assert f"{_LV[2]:.1f}" in text
     # Nominal band labels head the table / axis (not the exact base-ten centre).
-    assert "125" in text and "4000" in text
+    assert "125" in text
+    assert "4000" in text
     # Method part and basis prose.
     assert "ISO/TS 7849-2:2009" in text
     assert "engineering method" in text
@@ -162,7 +163,8 @@ def test_broadband_result_has_no_a_weighted_claim(tmp_path) -> None:
     lw = float(85.0 + _S_TERM + _IMP_TERM)
     assert f"{lw:.1f}" in text
     assert "dB(A)" not in text
-    assert "L WA" not in text and "LWA" not in text.replace(" ", "")
+    assert "L WA" not in text
+    assert "LWA" not in text.replace(" ", "")
     # The verdict compares the unweighted LW, not an invented A-weighted value.
     assert "declared limit" in text
 

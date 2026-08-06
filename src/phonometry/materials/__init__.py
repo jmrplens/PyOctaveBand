@@ -29,6 +29,7 @@ from .._plot.geometry import (
     plot_transmission_tube_geometry,
 )
 from .absorbers import (
+    DEFAULT_AIR,
     DELANY_BAZLEY_COEFFICIENTS,
     DELANY_BAZLEY_VALIDITY,
     LIMP_FRAME_CRITERIA,
@@ -41,6 +42,7 @@ from .absorbers import (
     AbsorptionWarning,
     AirflowResistanceWarning,
     AirLayer,
+    AirProperties,
     BiotWavesResult,
     CriticalCouplingResult,
     DiffuseFieldAbsorptionResult,
@@ -216,6 +218,7 @@ from .surfaces import (
 __all__ = [
     "BASE_PLATE_BANDS",
     "BASE_PLATE_MAX_SCATTERING",
+    "DEFAULT_AIR",
     "DEFAULT_MIC_HEIGHT",
     "DEFAULT_POLAR_ANGLES",
     "DEFAULT_SOURCE_HEIGHT",
@@ -235,6 +238,7 @@ __all__ = [
     "AbsorptionUncertaintyResult",
     "AbsorptionWarning",
     "AirLayer",
+    "AirProperties",
     "AirflowResistanceWarning",
     "BiotWavesResult",
     "CriticalCouplingResult",

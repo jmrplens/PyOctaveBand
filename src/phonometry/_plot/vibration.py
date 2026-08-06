@@ -51,20 +51,28 @@ if TYPE_CHECKING:
     from ..vibration.structural.radiation_efficiency import RadiationEfficiencyResult
     from ..vibration.structural.transfer_stiffness import TransferStiffnessResult
 
+#: Shared frequency-axis label of the vibration renderers.
+_FREQ_LABEL = "Frequency [Hz]"
+#: Mobility ordinate label of the ISO 7626 panels.
+_MOBILITY_LABEL = "Mobility $|Y|$ [m/(N·s)]"
+#: Legend entry of the assessed ISO 2631-5 point (stress variable and
+#: injury probability), formatted with ``r`` and ``p``.
+_RISK_LABEL = r"$R$ = {r},  $\Pi$ = {p} %"
+
 #: Spanish translations of the fixed strings rendered by the vibration
 #: ``.plot()`` renderers, keyed by their verbatim English text. ``_t``
 #: returns the English key unchanged for any language other than ``"es"``,
 #: so the English output is byte-for-byte identical to the pre-i18n
 #: renderers.
 _STRINGS: dict[str, str] = {
-    "Frequency [Hz]": "Frecuencia [Hz]",
+    _FREQ_LABEL: "Frecuencia [Hz]",
     "Weighting factor [dB]": "Factor de ponderación [dB]",
     "Unweighted $a_i$": "Sin ponderar $a_i$",
     "r.m.s. acceleration [m/s$^2$]": "Aceleración eficaz [m/s$^2$]",
     "Vibration exposure A(8) [m/s$^2$]": "Exposición a vibración A(8) [m/s$^2$]",
     "driving-point mobility": "movilidad en punto de excitación",
     "transfer mobility": "movilidad de transferencia",
-    "Mobility $|Y|$ [m/(N·s)]": "Movilidad $|Y|$ [m/(N·s)]",
+    _MOBILITY_LABEL: "Movilidad $|Y|$ [m/(N·s)]",
     "Transfer stiffness level $L_k$ [dB re 1 N/m]": "Nivel de rigidez de transferencia $L_k$ [dB re 1 N/m]",
     r"Radiation efficiency $\sigma$": r"Eficiencia de radiación $\sigma$",
     "Stress variable $R$": "Variable de tensión $R$",
@@ -91,7 +99,7 @@ _STRINGS: dict[str, str] = {
     "ISO 2631-5 injury probability — {sex}": "ISO 2631-5 probabilidad de lesión — {sex}",
     "male": "hombre",
     "female": "mujer",
-    r"$R$ = {r},  $\Pi$ = {p} %": r"$R$ = {r},  $\Pi$ = {p} %",
+    _RISK_LABEL: r"$R$ = {r},  $\Pi$ = {p} %",
     "envelope spectrum": "espectro de envolvente",
     "Envelope amplitude": "Amplitud de la envolvente",
     "Predicted fault line": "Línea de fallo prevista",
@@ -152,7 +160,7 @@ def plot_vibration_weighting(
     mag_db = np.asarray(result.magnitude_db, dtype=np.float64)
     kwargs.setdefault("color", _C_PRIMARY)
     ax.semilogx(freqs, mag_db, **kwargs)
-    ax.set_xlabel(_t("Frequency [Hz]", language))
+    ax.set_xlabel(_t(_FREQ_LABEL, language))
     ax.set_ylabel(_t("Weighting factor [dB]", language))
     ax.set_title(_t("Frequency weighting {name} (ISO 8041-1)", language).format(name=result.name))
     ax.grid(True, which="both", alpha=0.3)
@@ -186,7 +194,7 @@ def plot_weighted_spectrum(
     raw = np.asarray(result.band_accelerations, dtype=np.float64)
     weighted = np.asarray(result.weighted, dtype=np.float64)
     positions = _band_axis(ax, freqs, language=language)
-    ax.set_xlabel(_t("Frequency [Hz]", language))
+    ax.set_xlabel(_t(_FREQ_LABEL, language))
     width = 0.4
     # The weighted bars are the primary artist; forward user kwargs there.
     kwargs.setdefault("color", _C_PRIMARY)
@@ -315,8 +323,8 @@ def plot_mobility(
             label=_t("peak at {v} Hz", language).format(
                 v=format_number(freq[peak], language, decimals=1)))
     format_frequency_axis(ax, float(freq.min()), float(freq.max()))
-    ax.set_xlabel(_t("Frequency [Hz]", language))
-    ax.set_ylabel(_t("Mobility $|Y|$ [m/(N·s)]", language))
+    ax.set_xlabel(_t(_FREQ_LABEL, language))
+    ax.set_ylabel(_t(_MOBILITY_LABEL, language))
     ax.set_title(_t("ISO 7626-1 mechanical mobility", language))
     ax.legend(loc="best", fontsize="small")
     ax.grid(True, which="both", alpha=0.3)
@@ -368,7 +376,7 @@ def plot_rigid_mass_calibration(
                  else _t(r"expected $|Y| = 1/(2\pi f m)$", language))
     mag_ylabel = (_t("Accelerance $|A|$ [1/kg]", language)
                   if result.quantity == "accelerance"
-                  else _t("Mobility $|Y|$ [m/(N·s)]", language))
+                  else _t(_MOBILITY_LABEL, language))
     within_label = _t("measured (within tolerance)", language)
     outside_label = _t("measured (out of tolerance)", language)
 
@@ -384,7 +392,7 @@ def plot_rigid_mass_calibration(
         if not np.all(within):
             axd.plot(freq[~within], 100.0 * deviation[~within], "o",
                      color=_C_SECONDARY, zorder=4, label=outside_label)
-        axd.set_xlabel(_t("Frequency [Hz]", language))
+        axd.set_xlabel(_t(_FREQ_LABEL, language))
         axd.set_ylabel(_t("Deviation [%]", language))
         axd.grid(True, which="both", alpha=0.3)
         axd.legend(loc="best", fontsize="small")
@@ -444,7 +452,7 @@ def plot_transfer_stiffness(
     kwargs.setdefault("color", _C_PRIMARY)
     ax.semilogx(freq, level, label=r"$L_k = 20\,\log_{10}(|k_{2,1}|/k_0)$", **kwargs)
     format_frequency_axis(ax, float(freq.min()), float(freq.max()))
-    ax.set_xlabel(_t("Frequency [Hz]", language))
+    ax.set_xlabel(_t(_FREQ_LABEL, language))
     ax.set_ylabel(_t("Transfer stiffness level $L_k$ [dB re 1 N/m]", language))
     ax.set_title(_t("ISO 10846 dynamic transfer stiffness", language))
     ax.legend(loc="best", fontsize="small")
@@ -484,7 +492,7 @@ def plot_radiation_efficiency(
         label=f"$f_c$ = {result.critical_frequency:.0f} Hz",
     )
     format_frequency_axis(ax, float(freq.min()), float(freq.max()))
-    ax.set_xlabel(_t("Frequency [Hz]", language))
+    ax.set_xlabel(_t(_FREQ_LABEL, language))
     ax.set_ylabel(_t(r"Radiation efficiency $\sigma$", language))
     ax.set_title(_t("Plate radiation efficiency (Leppington / Maidanik)", language))
     ax.legend(loc="best", fontsize="small")
@@ -523,7 +531,7 @@ def plot_multiple_shock(
     kwargs.setdefault("zorder", 4)
     kwargs.setdefault("s", 90)
     ax.scatter([result.risk], [100.0 * result.probability],
-               label=_t(r"$R$ = {r},  $\Pi$ = {p} %", language).format(
+               label=_t(_RISK_LABEL, language).format(
                    r=format_number(result.risk, language, decimals=2),
                    p=format_number(100.0 * result.probability, language, decimals=0)),
                **kwargs)
@@ -708,7 +716,7 @@ def plot_fault_frequencies(
     ax.set_ylim(0.0, 1.24 * top)
     _draw_fault_lines(ax, result, f_max, top, language, annotate=annotate)
     ax.set_xlim(0.0, f_max)
-    ax.set_xlabel(_t("Frequency [Hz]", language))
+    ax.set_xlabel(_t(_FREQ_LABEL, language))
     ax.set_title(
         _t("Predicted fault lines: {src}, shaft {fs} Hz", language).format(
             src=_t(result.source, language),
@@ -755,7 +763,7 @@ def plot_power_injection(
     ax.loglog(freq, result.internal_loss_factor2, color=_C_QUATERNARY, ls=":",
               lw=1.3, label=r"$\eta_{2}$")
     format_frequency_axis(ax, float(freq.min()), float(freq.max()))
-    ax.set_xlabel(_t("Frequency [Hz]", language))
+    ax.set_xlabel(_t(_FREQ_LABEL, language))
     ax.set_ylabel(_t("Loss factor", language))
     ax.set_title(
         _t("Power-injection SEA loss factors ({method})", language).format(

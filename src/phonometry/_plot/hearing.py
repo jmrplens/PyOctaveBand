@@ -30,19 +30,25 @@ if TYPE_CHECKING:
 #: returns the English key unchanged for any language other than ``"es"``,
 #: so the English output is byte-for-byte identical to the pre-i18n
 #: renderers.
+#: Labels the renderers repeat; the Spanish table is keyed by the same
+#: constants, so a label is written once.
+_FREQ_LABEL = "Frequency [Hz]"
+_NIPTS_LABEL = "NIPTS [dB]"
+_FRACTILE_LABEL = "Fractile {v}"
+
 _STRINGS: dict[str, str] = {
-    "Frequency [Hz]": "Frecuencia [Hz]",
+    _FREQ_LABEL: "Frecuencia [Hz]",
     "Median": "Mediana",
     "Median $N_{50}$": "Mediana $N_{50}$",
     "Threshold deviation from age 18 [dB]":
         "Desviación del umbral respecto a 18 años [dB]",
-    "NIPTS [dB]": "NIPTS [dB]",
+    _NIPTS_LABEL: _NIPTS_LABEL,
     "Age (HTLA, ISO 7029)": "Edad (HTLA, ISO 7029)",
     "Noise (NIPTS)": "Ruido (NIPTS)",
     "Age + noise (HTLAN)": "Edad + ruido (HTLAN)",
     "Hearing threshold level [dB]": "Nivel del umbral de audición [dB]",
     "A-weighted level [dB]": "Nivel ponderado A [dB]",
-    "Fractile {v}": "Fractil {v}",
+    _FRACTILE_LABEL: "Fractil {v}",
     "ISO 7029 hearing threshold — {sex}, age {age}":
         "ISO 7029 umbral de audición — {sex}, edad {age}",
     "ISO 1999 NIPTS — $L_{{EX,8h}}$ = {lex} dB, {years} yr":
@@ -84,10 +90,10 @@ def plot_age_threshold(
     ax.plot(freqs, median, "o-", label=_t("Median", language), **kwargs)
     if abs(result.fractile - 0.5) > 1e-9:
         ax.plot(freqs, np.asarray(result.threshold, dtype=np.float64), "s--",
-                color=_C_REFERENCE, label=_t("Fractile {v}", language).format(
+                color=_C_REFERENCE, label=_t(_FRACTILE_LABEL, language).format(
                     v=decimal_comma(f"{result.fractile:g}", language)))
     _freq_axis(ax, freqs, language=language)
-    ax.set_xlabel(_t("Frequency [Hz]", language))
+    ax.set_xlabel(_t(_FREQ_LABEL, language))
     ax.set_ylabel(_t("Threshold deviation from age 18 [dB]", language))
     ax.invert_yaxis()  # audiogram convention: worse hearing downward
     ax.set_title(_t("ISO 7029 hearing threshold — {sex}, age {age}", language).format(
@@ -126,11 +132,11 @@ def plot_nipts(
     ax.plot(freqs, median, "o-", label=_t("Median $N_{50}$", language), **kwargs)
     if abs(result.fractile - 0.5) > 1e-9:
         ax.plot(freqs, np.asarray(result.value, dtype=np.float64), "s--",
-                color=_C_REFERENCE, label=_t("Fractile {v}", language).format(
+                color=_C_REFERENCE, label=_t(_FRACTILE_LABEL, language).format(
                     v=decimal_comma(f"{result.fractile:g}", language)))
     _freq_axis(ax, freqs, language=language)
-    ax.set_xlabel(_t("Frequency [Hz]", language))
-    ax.set_ylabel(_t("NIPTS [dB]", language))
+    ax.set_xlabel(_t(_FREQ_LABEL, language))
+    ax.set_ylabel(_t(_NIPTS_LABEL, language))
     ax.invert_yaxis()  # audiogram convention: worse hearing downward
     ax.set_title(_t("ISO 1999 NIPTS — $L_{{EX,8h}}$ = {lex} dB, {years} yr", language).format(
         lex=decimal_comma(f"{result.l_ex:g}", language),
@@ -165,7 +171,7 @@ def plot_htlan(
     ax.plot(freqs, np.asarray(result.threshold, dtype=np.float64), "s--",
             label=_t("Age + noise (HTLAN)", language), **kwargs)
     _freq_axis(ax, freqs, language=language)
-    ax.set_xlabel(_t("Frequency [Hz]", language))
+    ax.set_xlabel(_t(_FREQ_LABEL, language))
     ax.set_ylabel(_t("Hearing threshold level [dB]", language))
     ax.invert_yaxis()  # audiogram convention: worse hearing downward
     ax.set_title(_t("ISO 1999 HTLAN — {sex}, age {age}, {lex} dB / {years} yr", language).format(

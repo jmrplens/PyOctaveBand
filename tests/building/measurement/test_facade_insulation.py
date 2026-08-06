@@ -164,31 +164,35 @@ def test_positions_are_energy_averaged() -> None:
 # Validation
 # --------------------------------------------------------------------------
 def test_band_count_mismatch_raises() -> None:
+    outdoor, indoor_two_bands, rt = _flat(3, 70.0), _flat(2, 30.0), _flat(3, 0.5)
     with pytest.raises(ValueError):
-        facade_insulation(_flat(3, 70.0), _flat(2, 30.0), _flat(3, 0.5))
+        facade_insulation(outdoor, indoor_two_bands, rt)
 
 
 def test_nonpositive_reverberation_raises() -> None:
+    outdoor, indoor = _flat(3, 70.0), _flat(3, 30.0)
+    rt_with_zero = np.array([0.5, 0.0, 0.5])
     with pytest.raises(ValueError):
-        facade_insulation(_flat(3, 70.0), _flat(3, 30.0), np.array([0.5, 0.0, 0.5]))
+        facade_insulation(outdoor, indoor, rt_with_zero)
 
 
 def test_nonpositive_area_volume_raises() -> None:
+    outdoor, indoor, rt = _flat(3, 70.0), _flat(3, 30.0), _flat(3, 0.5)
+    surface = _flat(3, 72.0)
     with pytest.raises(ValueError):
         facade_insulation(
-            _flat(3, 70.0), _flat(3, 30.0), _flat(3, 0.5),
-            area=-1.0, volume=50.0, surface_level=_flat(3, 72.0),
+            outdoor, indoor, rt,
+            area=-1.0, volume=50.0, surface_level=surface,
         )
 
 
 def test_surface_and_area_without_volume_raises() -> None:
     # surface_level + area but no volume: R' would silently be None, so raise
     # a clear error naming 'volume' as the missing input.
+    outdoor, indoor, rt = _flat(3, 70.0), _flat(3, 30.0), _flat(3, 0.5)
+    surface = _flat(3, 72.0)
     with pytest.raises(ValueError, match="volume"):
-        facade_insulation(
-            _flat(3, 70.0), _flat(3, 30.0), _flat(3, 0.5),
-            area=10.0, surface_level=_flat(3, 72.0),
-        )
+        facade_insulation(outdoor, indoor, rt, area=10.0, surface_level=surface)
 
 
 def test_surface_area_and_volume_returns_r_prime() -> None:
@@ -201,19 +205,20 @@ def test_surface_area_and_volume_returns_r_prime() -> None:
 
 
 def test_invalid_method_raises() -> None:
+    outdoor, indoor, rt = _flat(3, 70.0), _flat(3, 30.0), _flat(3, 0.5)
     with pytest.raises(ValueError):
-        facade_insulation(
-            _flat(3, 70.0), _flat(3, 30.0), _flat(3, 0.5), method="airplane"
-        )
+        facade_insulation(outdoor, indoor, rt, method="airplane")
 
 
 def test_invalid_method_on_result_raises() -> None:
     # Direct construction must not bypass the method validation: an unknown
     # method would otherwise be rendered as the loudspeaker quantity R'45.
+    d_2m = np.array([30.0])
+    d_2m_nt = np.array([31.0])
     with pytest.raises(ValueError, match="'method' must be"):
         FacadeInsulationResult(
-            d_2m=np.array([30.0]),
-            d_2m_nt=np.array([31.0]),
+            d_2m=d_2m,
+            d_2m_nt=d_2m_nt,
             d_2m_n=None,
             r_prime=None,
             method="typo",
@@ -221,20 +226,18 @@ def test_invalid_method_on_result_raises() -> None:
 
 
 def test_nonfinite_raises() -> None:
+    outdoor_with_nan = np.array([70.0, np.nan, 70.0])
+    indoor, rt = _flat(3, 30.0), _flat(3, 0.5)
     with pytest.raises(ValueError):
-        facade_insulation(
-            np.array([70.0, np.nan, 70.0]), _flat(3, 30.0), _flat(3, 0.5)
-        )
+        facade_insulation(outdoor_with_nan, indoor, rt)
 
 
 def test_frequencies_length_mismatch_raises() -> None:
     # 'frequencies' shorter than the band count must fail clearly here rather
     # than deferring a confusing matplotlib shape error to plot().
+    outdoor, indoor, rt = _flat(3, 70.0), _flat(3, 30.0), _flat(3, 0.5)
     with pytest.raises(ValueError, match="frequencies"):
-        facade_insulation(
-            _flat(3, 70.0), _flat(3, 30.0), _flat(3, 0.5),
-            frequencies=[125.0, 250.0],
-        )
+        facade_insulation(outdoor, indoor, rt, frequencies=[125.0, 250.0])
 
 
 # --------------------------------------------------------------------------

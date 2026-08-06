@@ -87,8 +87,9 @@ def test_ln_levels_weighting_a() -> None:
 def test_ln_levels_invalid_percentile_raises() -> None:
     from phonometry import ln_levels
 
+    tone = _tone(1000)
     with pytest.raises(ValueError, match="between 0 and 100"):
-        ln_levels(_tone(1000), FS, n=(0,))
+        ln_levels(tone, FS, n=(0,))
 
 
 def test_ln_levels_multichannel() -> None:
@@ -109,20 +110,23 @@ def test_leq_dbfs_ignores_calibration_factor() -> None:
 
 
 def test_leq_empty_signal_raises() -> None:
+    empty = np.array([])
     with pytest.raises(ValueError, match="empty"):
-        leq(np.array([]))
+        leq(empty)
 
 
 def test_leq_nonpositive_calibration_raises() -> None:
+    tone = _tone(1000)
     with pytest.raises(ValueError, match="calibration_factor"):
-        leq(_tone(1000), calibration_factor=-1.0)
+        leq(tone, calibration_factor=-1.0)
 
 
 def test_ln_levels_empty_signal_raises() -> None:
     from phonometry import ln_levels
 
+    empty = np.array([])
     with pytest.raises(ValueError, match="empty"):
-        ln_levels(np.array([]), FS)
+        ln_levels(empty, FS)
 
 
 # ---------------------------------------------------------------------------
@@ -363,14 +367,16 @@ def test_sound_exposure_defaults_to_recording_duration() -> None:
 def test_sel_invalid_fs_raises() -> None:
     from phonometry import sel
 
+    tone = _tone(1000)
     with pytest.raises(ValueError, match="fs"):
-        sel(_tone(1000), 0)
+        sel(tone, 0)
 
 
 def test_sound_exposure_rejects_nonpositive_duration() -> None:
     from phonometry import lex_8h, sound_exposure
 
+    tone = _tone_at_level(90.0)
     with pytest.raises(ValueError, match="duration_hours"):
-        sound_exposure(_tone_at_level(90.0), FS, duration_hours=0)
+        sound_exposure(tone, FS, duration_hours=0)
     with pytest.raises(ValueError, match="duration_hours"):
-        lex_8h(_tone_at_level(90.0), FS, duration_hours=-1.0)
+        lex_8h(tone, FS, duration_hours=-1.0)

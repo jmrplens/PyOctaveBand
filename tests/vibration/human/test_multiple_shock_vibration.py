@@ -227,8 +227,9 @@ def test_injury_risk_rejects_exhausted_strength() -> None:
 
 def test_response_peaks_rejects_2d() -> None:
     # A 2-D response would create a false crossing at the channel seam.
+    two_channels = np.zeros((2, 100))
     with pytest.raises(ValueError, match="1-D time series"):
-        v.response_peaks(np.zeros((2, 100)))
+        v.response_peaks(two_channels)
 
 def test_the_time_guards_reject_nan_and_infinity() -> None:
     """The guards go through require_positive, which rejects both."""

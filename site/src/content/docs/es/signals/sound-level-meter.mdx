@@ -159,7 +159,8 @@ instrumento.
 
 ```python
 spl, bands = filters.octave_filter(
-    recording, fs, fraction=3, calibration_factor=cal, nominal=True
+    recording, fs, fraction=3, nominal=True,
+    calibration=filters.LevelCalibration(factor=cal),
 )
 # 33 niveles de banda de tercio de octava en dB SPL, etiquetados '12.5' ... '20k'.
 # La banda '1k' contiene el evento: ≈70 dB, con sus vecinas ≈25 dB por debajo.

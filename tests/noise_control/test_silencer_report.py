@@ -84,7 +84,8 @@ def test_report_renders_oracle_values(tmp_path) -> None:
     assert f"{tl[1]:.1f}" in text
     assert f"{tl[3]:.1f}" in text
     # Nominal band labels and caption.
-    assert "63" in text and "4000" in text
+    assert "63" in text
+    assert "4000" in text
     assert "Octave-band transmission loss" in text
     # Method basis prose and the device kind.
     assert "Munjal" in text

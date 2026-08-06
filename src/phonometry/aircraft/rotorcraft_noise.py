@@ -738,6 +738,125 @@ def _reference_distance(hemispheres: Sequence[RotorcraftHemisphere]) -> float:
 
 
 @dataclass(frozen=True)
+class RotorcraftAtmosphere:
+    """The air a rotorcraft event propagates through (Eq. 26/27).
+
+    The ICAO reference conditions of the hemisphere database are the defaults,
+    so an event flown at those conditions needs no atmosphere at all. The Doc 29
+    airport chain keeps its own
+    :class:`~phonometry.aircraft.airport_noise.AerodromeAtmosphere` instead of
+    sharing this one: it corrects a broadband NPD level with the impedance of
+    Eq. 4-7 alone, with no band-by-band absorption to ask the humidity or the
+    method about, and at a different reference temperature.
+
+    :ivar temperature: Air temperature, in °C (default 25, ICAO reference).
+    :ivar relative_humidity: Relative humidity, in % (default 70).
+    :ivar pressure: Ambient pressure, in kPa (default 101.325).
+    :ivar atmospheric_method: ``"iso9613"`` for the pure-tone Eq. 26/27 term
+        (the guidance text), or ``"sae"`` for the SAE ARP 5534 band-integrated
+        mapping used by the NORAH2 reference implementation (they agree to
+        ~0.05 dB below 3.15 kHz).
+    """
+
+    temperature: float = 25.0
+    relative_humidity: float = 70.0
+    pressure: float = 101.325
+    atmospheric_method: str = "iso9613"
+
+
+@dataclass(frozen=True)
+class RotorcraftGround:
+    """The ground a rotorcraft event stands on (guidance §A.4.3-A.4.5).
+
+    Flat ground at the track datum by default: the microphone height, the
+    elevation of the site and the ground type feed the two-ray ground effect,
+    and an optional elevation model replaces the flat plane with real terrain.
+
+    :ivar receiver_height: Microphone height above local ground, in metres
+        (default 1.2).
+    :ivar ground_elevation: Ground elevation ``z`` at the receivers, in metres
+        on the track datum (default 0); source and receiver heights above
+        ground follow from it. A contour grid also accepts one value per grid
+        point (shape ``(len(y), len(x))``) for receivers on uneven sites
+        without a full elevation model.
+    :ivar flow_resistivity: Ground flow resistivity ``σ`` in Pa·s/m², or a
+        CNOSSOS class letter (see
+        :func:`~phonometry.aircraft.rotorcraft_propagation.ground_effect_adjustment`).
+        A contour grid also accepts one value per grid point (shape
+        ``(len(y), len(x))``) for heterogeneous ground across the receivers
+        (each receiver's two-ray model uses its local value).
+    :ivar terrain: Optional digital elevation model ``(x, y, z)`` on the
+        track frame (``x`` and ``y`` strictly increasing, ``z`` of shape
+        ``(len(y), len(x))``, all in metres on the track datum). When given,
+        every emission-receiver pair is evaluated over its sampled vertical
+        section (guidance §A.4.4/A.4.5): mean-ground-plane ground effect with
+        equivalent heights, and rubber-band diffraction where terrain blocks
+        the line of sight; ``ground_elevation`` is then taken from the model.
+        The model must cover the whole track and every receiver (fabricating
+        terrain beyond its edges is refused).
+    :ivar terrain_resolution: Section sampling step along the path, in
+        metres (default: the elevation model's cell size; sections are capped
+        at 20000 sampling intervals).
+    """
+
+    receiver_height: float = 1.2
+    ground_elevation: float | NDArray[np.float64] | list[float] | list[list[float]] = 0.0
+    flow_resistivity: float | str | np.floating[Any] | np.integer[Any] \
+        | NDArray[np.float64] | list[float] | list[list[float]] = "G"
+    terrain: tuple[NDArray[np.float64], NDArray[np.float64], NDArray[np.float64]] | Sequence[NDArray[np.float64]] | None = None
+    terrain_resolution: float | None = None
+
+
+@dataclass(frozen=True)
+class RotorcraftTrackState:
+    """Per-point flight state of a rotorcraft track (Eq. 16-21).
+
+    Every field left unset is derived from the track itself by
+    :func:`flight_path_kinematics`; a radar-track workflow that has already
+    smoothed these quantities hands them over instead. Each is a scalar
+    (broadcast over the track) or an array of shape ``(N,)``.
+
+    :ivar airspeed: Airspeed ``V_A``, in the units of the database
+        ``airspeeds`` (the derived values are in m/s).
+    :ivar path_angle: Path angle ``γ``, in degrees (negative descending).
+    :ivar heading: Heading ``Θ``, in degrees.
+    :ivar bank_angle: Bank angle ``Φ``, in degrees (positive starboard down).
+    """
+
+    airspeed: float | NDArray[np.float64] | list[float] | None = None
+    path_angle: float | NDArray[np.float64] | list[float] | None = None
+    heading: float | NDArray[np.float64] | list[float] | None = None
+    bank_angle: float | NDArray[np.float64] | list[float] | None = None
+
+
+@dataclass(frozen=True)
+class FlightConditionInterpolation:
+    """How a flight condition blends the database hemispheres (Eq. 3-10).
+
+    The two settings of :func:`flight_condition_weights`, which the event and
+    contour entry points hand it per track point.
+
+    :ivar scaling_factor: Flight-condition scaling factor ``F_fc`` applied to
+        the normalised path angle (default 2, the guidance's empirical value).
+    :ivar triangles: Optional precomputed triangulation, shape ``(T, 3)``
+        0-based indices into the database conditions (default ``None``: the
+        Delaunay triangulation of the normalised conditions). See
+        :func:`flight_condition_weights`.
+    """
+
+    scaling_factor: float = 2.0
+    triangles: NDArray[np.int_] | list[list[int]] | None = None
+
+
+#: The defaults of the event entry points, one shared instance each: the
+#: bundles are frozen, so a call cannot mutate what the next one receives.
+_ICAO_ATMOSPHERE = RotorcraftAtmosphere()
+_FLAT_GROUND = RotorcraftGround()
+_DERIVED_TRACK_STATE = RotorcraftTrackState()
+_GUIDANCE_INTERPOLATION = FlightConditionInterpolation()
+
+
+@dataclass(frozen=True)
 class _EventSetup:
     """The validated inputs of a single-event run.
 
@@ -776,23 +895,11 @@ def _event_setup(
     times: NDArray[np.float64] | list[float],
     positions: NDArray[np.float64] | list[list[float]],
     *,
-    receiver_height: float,
-    ground_elevation: float | NDArray[np.float64] | list[float] | list[list[float]],
-    airspeed: float | NDArray[np.float64] | list[float] | None,
-    path_angle: float | NDArray[np.float64] | list[float] | None,
-    heading: float | NDArray[np.float64] | list[float] | None,
-    bank_angle: float | NDArray[np.float64] | list[float] | None,
-    flow_resistivity: float | str | np.floating[Any] | np.integer[Any]
-    | NDArray[np.float64] | list[float] | list[list[float]],
-    temperature: float,
-    relative_humidity: float,
-    pressure: float,
     level_offset: float | NDArray[np.float64] | list[float],
-    scaling_factor: float,
-    triangles: NDArray[np.int_] | list[list[int]] | None,
-    atmospheric_method: str,
-    terrain: tuple[NDArray[np.float64], NDArray[np.float64], NDArray[np.float64]] | Sequence[NDArray[np.float64]] | None,
-    terrain_resolution: float | None,
+    atmosphere: RotorcraftAtmosphere,
+    ground: RotorcraftGround,
+    track_state: RotorcraftTrackState,
+    interpolation: FlightConditionInterpolation,
 ) -> _EventSetup:
     """Validate the shared event/contour inputs into one :class:`_EventSetup`.
 
@@ -805,28 +912,31 @@ def _event_setup(
     freqs = _common_frequencies(hemispheres, airspeeds)
     rref = _reference_distance(hemispheres)
     t, p = _validated_track(times, positions)
-    hr = require_positive(receiver_height, "receiver_height")
-    dem = _validated_terrain(terrain)
+    hr = require_positive(ground.receiver_height, "receiver_height")
+    dem = _validated_terrain(ground.terrain)
     if dem is not None:
         _require_dem_coverage(dem, p[:, 0], p[:, 1], "track")
-    spacing = _section_spacing(dem, terrain_resolution)
-    sigma = _setup_resistivity(flow_resistivity, dem)
-    ground = _setup_ground_elevation(ground_elevation, dem)
-    method = require_choice(atmospheric_method, "atmospheric_method", ("iso9613", "sae"))
-    spd, gam, hdg, bank = _resolved_track_state(
-        t, p, airspeed, path_angle, heading, bank_angle)
+    spacing = _section_spacing(dem, ground.terrain_resolution)
+    sigma = _setup_resistivity(ground.flow_resistivity, dem)
+    elevation = _setup_ground_elevation(ground.ground_elevation, dem)
+    method = require_choice(
+        atmosphere.atmospheric_method, "atmospheric_method", ("iso9613", "sae"))
+    spd, gam, hdg, bank = _resolved_track_state(t, p, track_state)
     off = _per_point(level_offset, t.size, "level_offset")
     offsets = off if off is not None else np.zeros(t.size)
-    alpha = _absorption_coefficient(freqs, temperature, relative_humidity, pressure)
+    alpha = _absorption_coefficient(
+        freqs, atmosphere.temperature, atmosphere.relative_humidity,
+        atmosphere.pressure)
     return _EventSetup(
         hemispheres=tuple(hemispheres),
         airspeeds=np.atleast_1d(np.asarray(airspeeds, dtype=np.float64)),
         path_angles=np.atleast_1d(np.asarray(path_angles, dtype=np.float64)),
         frequencies=freqs, times=t, positions=p, speed=spd, gamma=gam,
         heading=hdg, bank=bank, offsets=offsets,
-        ground_elevation=ground, receiver_height=hr,
-        sigma=sigma, alpha=alpha, rref=rref, scaling_factor=scaling_factor,
-        triangles=triangles, band_integrated=method == "sae",
+        ground_elevation=elevation, receiver_height=hr,
+        sigma=sigma, alpha=alpha, rref=rref,
+        scaling_factor=interpolation.scaling_factor,
+        triangles=interpolation.triangles, band_integrated=method == "sae",
         terrain=dem, terrain_resolution=spacing)
 
 
@@ -1116,17 +1226,14 @@ def _noy_band_indices(frequencies: NDArray[np.float64]) -> NDArray[np.intp] | No
 def _resolved_track_state(
     times: NDArray[np.float64],
     positions: NDArray[np.float64],
-    airspeed: float | NDArray[np.float64] | list[float] | None,
-    path_angle: float | NDArray[np.float64] | list[float] | None,
-    heading: float | NDArray[np.float64] | list[float] | None,
-    bank_angle: float | NDArray[np.float64] | list[float] | None,
+    state: RotorcraftTrackState,
 ) -> tuple[NDArray[np.float64], NDArray[np.float64], NDArray[np.float64], NDArray[np.float64]]:
     """Per-point ``(V_A, γ, Θ, Φ)``: explicit overrides, else derived (Eq. 16-21)."""
     n = times.size
-    spd = _per_point(airspeed, n, "airspeed")
-    gam = _per_point(path_angle, n, "path_angle")
-    hdg = _per_point(heading, n, "heading")
-    bank = _per_point(bank_angle, n, "bank_angle")
+    spd = _per_point(state.airspeed, n, "airspeed")
+    gam = _per_point(state.path_angle, n, "path_angle")
+    hdg = _per_point(state.heading, n, "heading")
+    bank = _per_point(state.bank_angle, n, "bank_angle")
     if spd is None or gam is None or hdg is None or bank is None:
         kin = flight_path_kinematics(times, positions)
         spd = kin.airspeed if spd is None else spd
@@ -1144,22 +1251,11 @@ def rotorcraft_event_level(
     positions: NDArray[np.float64] | list[list[float]],
     receiver: tuple[float, float] | NDArray[np.float64] | list[float],
     *,
-    receiver_height: float = 1.2,
-    ground_elevation: float = 0.0,
-    airspeed: float | NDArray[np.float64] | list[float] | None = None,
-    path_angle: float | NDArray[np.float64] | list[float] | None = None,
-    heading: float | NDArray[np.float64] | list[float] | None = None,
-    bank_angle: float | NDArray[np.float64] | list[float] | None = None,
-    flow_resistivity: float | str | np.floating[Any] | np.integer[Any] = "G",
-    temperature: float = 25.0,
-    relative_humidity: float = 70.0,
-    pressure: float = 101.325,
     level_offset: float | NDArray[np.float64] | list[float] = 0.0,
-    scaling_factor: float = 2.0,
-    triangles: NDArray[np.int_] | list[list[int]] | None = None,
-    atmospheric_method: str = "iso9613",
-    terrain: tuple[NDArray[np.float64], NDArray[np.float64], NDArray[np.float64]] | Sequence[NDArray[np.float64]] | None = None,
-    terrain_resolution: float | None = None,
+    atmosphere: RotorcraftAtmosphere = _ICAO_ATMOSPHERE,
+    ground: RotorcraftGround = _FLAT_GROUND,
+    track_state: RotorcraftTrackState = _DERIVED_TRACK_STATE,
+    interpolation: FlightConditionInterpolation = _GUIDANCE_INTERPOLATION,
 ) -> RotorcraftEventResult:
     r"""Rotorcraft single-event level at a receiver (Doc 32 §6.1 / guidance §A.5.1).
 
@@ -1175,8 +1271,8 @@ def rotorcraft_event_level(
     reusing
     :func:`~phonometry.aircraft.certification.epnl_from_pnlt`).
 
-    The flight condition per point comes from the ``airspeed``/``path_angle``
-    overrides when given (e.g. the smoothed values of a radar-track workflow),
+    The flight condition per point comes from the ``track_state`` overrides
+    when given (e.g. the smoothed values of a radar-track workflow),
     otherwise from :func:`flight_path_kinematics` on the track itself, in which
     case the database ``airspeeds`` must be in m/s. The hemisphere frame is
     oriented by the heading and tilted by the bank angle in turns (guidance
@@ -1190,58 +1286,30 @@ def rotorcraft_event_level(
     :param positions: Track positions ``(x, y, z)``, in metres, shape ``(N, 3)``
         (z up, above the ground elevation datum).
     :param receiver: Receiver ground position ``(x, y)``, in metres.
-    :param receiver_height: Microphone height above local ground, in metres
-        (default 1.2).
-    :param ground_elevation: Ground elevation ``z`` at the site, in metres on
-        the track datum (default 0); source and receiver heights above ground
-        follow from it.
-    :param airspeed: Per-point airspeed override, scalar or shape ``(N,)``.
-    :param path_angle: Per-point path-angle override, in degrees.
-    :param heading: Per-point heading override, in degrees.
-    :param bank_angle: Per-point bank-angle override, in degrees (positive
-        starboard down).
-    :param flow_resistivity: Ground flow resistivity ``σ`` in Pa·s/m², or a
-        CNOSSOS class letter (see
-        :func:`~phonometry.aircraft.rotorcraft_propagation.ground_effect_adjustment`).
-    :param temperature: Air temperature, in °C (default 25, ICAO reference).
-    :param relative_humidity: Relative humidity, in % (default 70).
-    :param pressure: Ambient pressure, in kPa (default 101.325).
     :param level_offset: Source-level offset ``ΔEPNL`` added to the hemisphere
         levels (Eq. 2 class substitution), in dB (default 0). Scalar or per
         track point, shape ``(N,)``: Chapter-8 substitutions correct climb,
         level and descent conditions with different certification levels.
-    :param scaling_factor: Flight-condition scaling factor ``F_fc`` (default 2).
-    :param triangles: Optional precomputed flight-condition triangulation (see
-        :func:`flight_condition_weights`).
-    :param atmospheric_method: ``"iso9613"`` for the pure-tone Eq. 26/27 term
-        (the guidance text), or ``"sae"`` for the SAE ARP 5534 band-integrated
-        mapping used by the NORAH2 reference implementation (they agree to
-        ~0.05 dB below 3.15 kHz).
-    :param terrain: Optional digital elevation model ``(x, y, z)`` on the
-        track frame (``x`` and ``y`` strictly increasing, ``z`` of shape
-        ``(len(y), len(x))``, all in metres on the track datum). When given,
-        every emission-receiver pair is evaluated over its sampled vertical
-        section (guidance §A.4.4/A.4.5): mean-ground-plane ground effect with
-        equivalent heights, and rubber-band diffraction where terrain blocks
-        the line of sight; ``ground_elevation`` is then taken from the model.
-        The model must cover the whole track and the receiver (fabricating
-        terrain beyond its edges is refused).
-    :param terrain_resolution: Section sampling step along the path, in
-        metres (default: the elevation model's cell size; sections are capped
-        at 20000 sampling intervals).
+    :param atmosphere: The air the event propagates through, a
+        :class:`RotorcraftAtmosphere` (default: the ICAO reference conditions
+        of the database).
+    :param ground: The ground under the event, a :class:`RotorcraftGround`
+        (default: flat ground at the track datum, CNOSSOS class ``"G"``, a
+        1.2 m microphone). A single receiver takes its scalar fields only;
+        the per-grid-point arrays are for the contour.
+    :param track_state: Per-point airspeed, path angle, heading and bank
+        angle, a :class:`RotorcraftTrackState` (default: all derived from the
+        track by :func:`flight_path_kinematics`).
+    :param interpolation: How the flight condition blends the database
+        hemispheres, a :class:`FlightConditionInterpolation` (default:
+        ``F_fc = 2`` over the Delaunay triangulation).
     :return: A :class:`RotorcraftEventResult`.
     :raises ValueError: If the inputs are invalid.
     """
     setup = _event_setup(
         hemispheres, airspeeds, path_angles, times, positions,
-        receiver_height=receiver_height, ground_elevation=ground_elevation,
-        airspeed=airspeed, path_angle=path_angle, heading=heading,
-        bank_angle=bank_angle, flow_resistivity=flow_resistivity,
-        temperature=temperature, relative_humidity=relative_humidity,
-        pressure=pressure, level_offset=level_offset,
-        scaling_factor=scaling_factor, triangles=triangles,
-        atmospheric_method=atmospheric_method, terrain=terrain,
-        terrain_resolution=terrain_resolution)
+        level_offset=level_offset, atmosphere=atmosphere, ground=ground,
+        track_state=track_state, interpolation=interpolation)
     rx = np.asarray(receiver, dtype=np.float64).ravel()
     if rx.size != 2 or not np.all(np.isfinite(rx)):
         raise ValueError("'receiver' must be a finite (x, y) ground position.")
@@ -1292,22 +1360,11 @@ def rotorcraft_noise_contour(
     x: NDArray[np.float64] | list[float],
     y: NDArray[np.float64] | list[float],
     metric: str = "exposure",
-    receiver_height: float = 1.2,
-    ground_elevation: float | NDArray[np.float64] | list[list[float]] = 0.0,
-    airspeed: float | NDArray[np.float64] | list[float] | None = None,
-    path_angle: float | NDArray[np.float64] | list[float] | None = None,
-    heading: float | NDArray[np.float64] | list[float] | None = None,
-    bank_angle: float | NDArray[np.float64] | list[float] | None = None,
-    flow_resistivity: float | str | NDArray[np.float64] | list[list[float]] = "G",
-    temperature: float = 25.0,
-    relative_humidity: float = 70.0,
-    pressure: float = 101.325,
     level_offset: float | NDArray[np.float64] | list[float] = 0.0,
-    scaling_factor: float = 2.0,
-    triangles: NDArray[np.int_] | list[list[int]] | None = None,
-    atmospheric_method: str = "iso9613",
-    terrain: tuple[NDArray[np.float64], NDArray[np.float64], NDArray[np.float64]] | Sequence[NDArray[np.float64]] | None = None,
-    terrain_resolution: float | None = None,
+    atmosphere: RotorcraftAtmosphere = _ICAO_ATMOSPHERE,
+    ground: RotorcraftGround = _FLAT_GROUND,
+    track_state: RotorcraftTrackState = _DERIVED_TRACK_STATE,
+    interpolation: FlightConditionInterpolation = _GUIDANCE_INTERPOLATION,
 ) -> RotorcraftNoiseContourResult:
     """Rotorcraft single-event level over a ground grid (Doc 32 §6.3).
 
@@ -1324,49 +1381,27 @@ def rotorcraft_noise_contour(
     :param x: Grid x coordinates, in metres (at least 2).
     :param y: Grid y coordinates, in metres (at least 2).
     :param metric: ``"exposure"`` (SEL) or ``"maximum"`` (LASmax).
-    :param receiver_height: Microphone height above local ground, in metres.
-    :param ground_elevation: Ground elevation, in metres on the track datum:
-        a scalar, or one value per grid point (shape ``(len(y), len(x))``)
-        for receivers on uneven sites without a full elevation model.
-    :param airspeed: Per-point airspeed override (see
-        :func:`rotorcraft_event_level`).
-    :param path_angle: Per-point path-angle override, in degrees.
-    :param heading: Per-point heading override, in degrees.
-    :param bank_angle: Per-point bank-angle override, in degrees.
-    :param flow_resistivity: Ground flow resistivity ``σ`` in Pa·s/m², a
-        CNOSSOS class letter, or one value per grid point (shape
-        ``(len(y), len(x))``) for heterogeneous ground across the receivers
-        (each receiver's two-ray model uses its local value).
-    :param temperature: Air temperature, in °C.
-    :param relative_humidity: Relative humidity, in %.
-    :param pressure: Ambient pressure, in kPa.
     :param level_offset: Source-level offset ``ΔEPNL`` (Eq. 2), in dB, scalar
         or per track point.
-    :param scaling_factor: Flight-condition scaling factor ``F_fc`` (default 2).
-    :param triangles: Optional precomputed flight-condition triangulation.
-    :param atmospheric_method: ``"iso9613"`` or ``"sae"`` (see
-        :func:`rotorcraft_event_level`).
-    :param terrain: Optional digital elevation model ``(x, y, z)`` (see
-        :func:`rotorcraft_event_level`); it must cover the whole track and
-        grid. Every emission-receiver pair then samples its own vertical
-        section, so the cost grows with track points times grid points; keep
-        contour grids modest with terrain.
-    :param terrain_resolution: Section sampling step, in metres (default: the
-        elevation model's cell size; sections are capped at 20000 sampling
-        intervals).
+    :param atmosphere: The air the event propagates through, a
+        :class:`RotorcraftAtmosphere`.
+    :param ground: The ground under the grid, a :class:`RotorcraftGround`. Its
+        ``ground_elevation`` and ``flow_resistivity`` also accept one value per
+        grid point (shape ``(len(y), len(x))``), and its ``terrain`` model must
+        cover the whole track and grid: every emission-receiver pair then
+        samples its own vertical section, so the cost grows with track points
+        times grid points; keep contour grids modest with terrain.
+    :param track_state: Per-point airspeed, path angle, heading and bank angle
+        (see :func:`rotorcraft_event_level`).
+    :param interpolation: How the flight condition blends the database
+        hemispheres, a :class:`FlightConditionInterpolation`.
     :return: A :class:`RotorcraftNoiseContourResult`.
     :raises ValueError: If the inputs are invalid.
     """
     setup = _event_setup(
         hemispheres, airspeeds, path_angles, times, positions,
-        receiver_height=receiver_height, ground_elevation=ground_elevation,
-        airspeed=airspeed, path_angle=path_angle, heading=heading,
-        bank_angle=bank_angle, flow_resistivity=flow_resistivity,
-        temperature=temperature, relative_humidity=relative_humidity,
-        pressure=pressure, level_offset=level_offset,
-        scaling_factor=scaling_factor, triangles=triangles,
-        atmospheric_method=atmospheric_method, terrain=terrain,
-        terrain_resolution=terrain_resolution)
+        level_offset=level_offset, atmosphere=atmosphere, ground=ground,
+        track_state=track_state, interpolation=interpolation)
     gx = np.asarray(x, dtype=np.float64).ravel()
     gy = np.asarray(y, dtype=np.float64).ravel()
     if gx.size < 2 or gy.size < 2 or not (np.all(np.isfinite(gx)) and np.all(np.isfinite(gy))):
@@ -1374,8 +1409,8 @@ def rotorcraft_noise_contour(
     key = require_choice(metric, "metric", ("exposure", "maximum"))
     xx, yy = np.meshgrid(gx, gy)
     n_g = xx.size
-    for name, value in (("flow_resistivity", flow_resistivity),
-                        ("ground_elevation", ground_elevation)):
+    for name, value in (("flow_resistivity", ground.flow_resistivity),
+                        ("ground_elevation", ground.ground_elevation)):
         if np.isscalar(value) or isinstance(value, str):
             continue
         shape = np.asarray(value).shape

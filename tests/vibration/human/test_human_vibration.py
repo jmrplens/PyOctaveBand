@@ -177,8 +177,9 @@ def test_apply_weighting_scales_sine_by_magnitude() -> None:
 
 
 def test_apply_weighting_validates() -> None:
+    two_dimensional = np.zeros((2, 2))
     with pytest.raises(ValueError, match="1-D"):
-        hv.apply_weighting(np.zeros((2, 2)), 1000.0, "Wk")
+        hv.apply_weighting(two_dimensional, 1000.0, "Wk")
     with pytest.raises(ValueError, match="positive"):
         hv.apply_weighting([1.0, 2.0], 0.0, "Wk")
 
@@ -365,22 +366,27 @@ def test_hav_vwf_lifetime_matches_table_c1() -> None:
 # ---------------------------------------------------------------------------
 def test_exposure_assessment_hav_zones() -> None:
     below = hv.exposure_assessment(2.0, kind="hav")
-    assert below.zone == "below action" and not below.exceeds_action
+    assert below.zone == "below action"
+    assert not below.exceeds_action
     action = hv.exposure_assessment(3.0, kind="hav")
-    assert action.zone == "action" and action.exceeds_action
+    assert action.zone == "action"
+    assert action.exceeds_action
     assert not action.exceeds_limit
     limit = hv.exposure_assessment(5.5, kind="hav")
-    assert limit.zone == "limit" and limit.exceeds_limit
+    assert limit.zone == "limit"
+    assert limit.exceeds_limit
     assert action.action_value == hv.HAV_EAV_A8
     assert action.limit_value == hv.HAV_ELV_A8
 
 
 def test_exposure_assessment_wbv_a8_and_vdv() -> None:
     a = hv.exposure_assessment(0.6, kind="wbv")
-    assert a.action_value == hv.WBV_EAV_A8 and a.limit_value == hv.WBV_ELV_A8
+    assert a.action_value == hv.WBV_EAV_A8
+    assert a.limit_value == hv.WBV_ELV_A8
     assert a.zone == "action"
     v = hv.exposure_assessment(22.0, kind="wbv", metric="vdv")
-    assert v.action_value == hv.WBV_EAV_VDV and v.limit_value == hv.WBV_ELV_VDV
+    assert v.action_value == hv.WBV_EAV_VDV
+    assert v.limit_value == hv.WBV_ELV_VDV
     assert v.zone == "limit"
 
 

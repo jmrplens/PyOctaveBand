@@ -145,6 +145,11 @@ ejemplos de uso por arquitectura, hasta el crossover Linkwitz-Riley, es la
 
 ## 2. Parámetros de `octave_filter()` / `OctaveFilterBank`
 
+Las opciones avanzadas viajan en cuatro dataclases congeladas, así los cuatro
+argumentos de cada día siguen primero: `FilterDesign` (`design`),
+`LevelCalibration` (`calibration`), `BlockProcessing` (`block_processing`) y
+`ResponsePlot` (`response_plot`). La tabla nombra cada opción por su grupo.
+
 | Parámetro | Tipo | Unidades | Rango / por defecto | Notas |
 | :--- | :--- | :--- | :--- | :--- |
 | `x` | array 1D o 2D | unidades digitales | no vacío | 2D es `[channels, samples]` |
@@ -152,18 +157,19 @@ ejemplos de uso por arquitectura, hasta el crossover Linkwitz-Riley, es la
 | `fraction` | int | — | por defecto `1`; habitual `3`; cualquier $b \ge 1$ | Bandas por octava = $b$ |
 | `order` | int | — | por defecto `6` | Orden SOS por banda |
 | `limits` | lista `[lo, hi]` | Hz | por defecto `[12, 20000]` | Rango de análisis |
-| `filter_type` | str | — | `'butter'` (por defecto), `'cheby1'`, `'cheby2'`, `'ellip'`, `'bessel'` | Consulta la [Galería de arquitecturas de filtro](/phonometry/es/signals/filters/filter-gallery/) |
-| `ripple` / `attenuation` | float | dB | `ripple` defecto `0.1`; `attenuation` defecto `72.0` | Rizado de banda de paso / atenuación en banda atenuada (cheby/ellip); `cheby2` necesita `attenuation` $\ge 70$ para clase 1, ya que scipy fija su suelo equirizado en exactamente este valor |
-| `show` | bool | — | por defecto `False` | Dibuja la respuesta del banco (requiere matplotlib) |
+| `design.filter_type` | str | — | `'butter'` (por defecto), `'cheby1'`, `'cheby2'`, `'ellip'`, `'bessel'` | Consulta la [Galería de arquitecturas de filtro](/phonometry/es/signals/filters/filter-gallery/) |
+| `design.ripple` / `design.attenuation` | float | dB | `ripple` defecto `0.1`; `attenuation` defecto `72.0` | Rizado de banda de paso / atenuación en banda atenuada (cheby/ellip); `cheby2` necesita `attenuation` $\ge 70$ para clase 1, ya que scipy fija su suelo equirizado en exactamente este valor |
+| `design.resample` | bool | — | por defecto `True` | Filtra cada banda a una frecuencia diezmada (multitasa) |
+| `response_plot.show` | bool | — | por defecto `False` | Dibuja la respuesta del banco (requiere matplotlib) |
 | `sigbands` | bool | — | por defecto `False` | Devuelve también las señales temporales por banda |
 | `mode` | str | — | `'rms'` (por defecto), `'peak'`, `'sum'` | Estadístico por banda devuelto |
 | `nominal` | bool | — | por defecto `False` | Devuelve etiquetas nominales (p. ej. `1000`) en vez de las frecuencias centrales exactas |
 | `detrend` | bool | — | por defecto `True` | Elimina el offset DC de cada banda antes del nivel (mejora la precisión en graves) |
-| `calibration_factor` | float | — | por defecto `1.0` | Escala la entrada a pascales (consulta la guía de Calibración) |
-| `dbfs` | bool | — | por defecto `False` | Referencia los niveles a fondo de escala digital en vez de 20 µPa |
-| `plot_file` | str o `None` | — | por defecto `None` | Guarda la gráfica de respuesta del banco en esta ruta |
+| `calibration.factor` | float | — | por defecto `1.0` | Escala la entrada a pascales (consulta la guía de Calibración) |
+| `calibration.dbfs` | bool | — | por defecto `False` | Referencia los niveles a fondo de escala digital en vez de 20 µPa |
+| `response_plot.file` | str o `None` | — | por defecto `None` | Guarda la gráfica de respuesta del banco en esta ruta |
 | `zero_phase` | bool | — | por defecto `False` | Filtrado adelante-atrás (offline) |
-| `stateful` / `steady_ic` (clase) | bool | — | por defecto `False` | Estado en streaming; consulta [Procesado por bloques](/phonometry/es/signals/filters/block-processing/) |
+| `block_processing.stateful` / `.steady_ic` (clase) | bool | — | por defecto `False` | Estado en streaming; consulta [Procesado por bloques](/phonometry/es/signals/filters/block-processing/) |
 
 `verify_filter_class(bank)` comprueba el banco diseñado contra los límites de
 aceptación de la Tabla 1 de IEC 61260-1 e informa de la clase (`1`, `2` o `None` si queda fuera de ambas) con los
@@ -260,8 +266,12 @@ t = np.linspace(0, 0.5, int(fs * 0.5), endpoint=False)
 y = np.sin(2 * np.pi * 250 * t) + np.sin(2 * np.pi * 1000 * t)
 
 # 2. Comparar arquitecturas (Butterworth vs Chebyshev II)
-spl_b, freq, xb_butter = filters.octave_filter(y, fs=fs, fraction=1, sigbands=True, filter_type='butter')
-spl_c2, _, xb_cheby2 = filters.octave_filter(y, fs=fs, fraction=1, sigbands=True, filter_type='cheby2')
+spl_b, freq, xb_butter = filters.octave_filter(
+    y, fs=fs, fraction=1, sigbands=True,
+    design=filters.FilterDesign(filter_type='butter'))
+spl_c2, _, xb_cheby2 = filters.octave_filter(
+    y, fs=fs, fraction=1, sigbands=True,
+    design=filters.FilterDesign(filter_type='cheby2'))
 
 # 'xb_butter' y 'xb_cheby2' contienen las señales por banda en el dominio del tiempo
 ```
@@ -286,7 +296,7 @@ y = np.sin(2 * np.pi * 250 * t) + np.sin(2 * np.pi * 1000 * t)
 
 bank_b = filters.OctaveFilterBank(fs=fs, fraction=1, order=6, limits=[100.0, 2000.0])
 bank_c = filters.OctaveFilterBank(fs=fs, fraction=1, order=6, limits=[100.0, 2000.0],
-                          filter_type="cheby2")
+                          design=filters.FilterDesign(filter_type="cheby2"))
 _, freq, xb_butter = bank_b.filter(y, sigbands=True)
 _, _, xb_cheby2 = bank_c.filter(y, sigbands=True)
 
@@ -338,7 +348,7 @@ w = np.logspace(np.log10(500), np.log10(2000), 1024)
 fig, ax = plt.subplots(figsize=(9, 5))
 for ftype in ("butter", "cheby1", "cheby2", "ellip", "bessel"):
     bank = filters.OctaveFilterBank(fs, fraction=1, order=6, limits=[800, 1200],
-                            filter_type=ftype)
+                            design=filters.FilterDesign(filter_type=ftype))
     idx = int(np.argmin(np.abs(np.array(bank.freq) - 1000)))
     fsd = fs / bank.factor[idx]
     # Retardo de grupo de una cascada SOS = suma del de sus secciones

@@ -6,7 +6,7 @@ Tests for OctaveFilterBank.spectrogram() short-time band levels.
 import numpy as np
 import pytest
 
-from phonometry import OctaveFilterBank
+from phonometry import BlockProcessing, FilterDesign, OctaveFilterBank
 
 FS = 48000
 
@@ -50,14 +50,20 @@ def test_spectrogram_multichannel() -> None:
 
 
 def test_spectrogram_rejects_stateful() -> None:
-    bank = OctaveFilterBank(fs=FS, stateful=True, resample=False)
+    bank = OctaveFilterBank(fs=FS, design=FilterDesign(resample=False),
+                            block_processing=BlockProcessing(stateful=True))
+    silence = np.zeros(FS)
     with pytest.raises(ValueError, match="stateful"):
-        bank.spectrogram(np.zeros(FS))
+        bank.spectrogram(silence)
 
 
 def test_spectrogram_invalid_params_raise() -> None:
     bank = OctaveFilterBank(fs=FS, fraction=1, limits=[100, 5000])
+    # the signals are built outside the raises blocks, so each block holds
+    # exactly the one call whose exception is under test
+    one_second = np.zeros(FS)
+    shorter_than_the_window = np.zeros(1000)
     with pytest.raises(ValueError, match="overlap"):
-        bank.spectrogram(np.zeros(FS), overlap=1.0)
+        bank.spectrogram(one_second, overlap=1.0)
     with pytest.raises(ValueError, match="window_time"):
-        bank.spectrogram(np.zeros(1000), window_time=1.0)
+        bank.spectrogram(shorter_than_the_window, window_time=1.0)

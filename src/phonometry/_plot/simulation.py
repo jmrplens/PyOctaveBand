@@ -19,6 +19,7 @@ if TYPE_CHECKING:
     from ..simulation.fdtd import FDTDResult
 
 _TIME_LABEL = "Time [ms]"
+_PRESSURE_LABEL = "Pressure [Pa]"
 _VELOCITY_LABEL = "Particle velocity [m/s]"
 
 #: Spanish translations of the fixed strings rendered by the simulation
@@ -45,7 +46,7 @@ _STRINGS: dict[str, str] = {
 
 #: Colorbar label of each elastic snapshot field.
 _ELASTIC_FIELD_LABELS = {
-    "p": "Pressure [Pa]",
+    "p": _PRESSURE_LABEL,
     "vx": _VELOCITY_LABEL,
     "vy": _VELOCITY_LABEL,
 }
@@ -176,7 +177,7 @@ def plot_fdtd_probes(
         [result.pressures[k] for k in range(result.pressures.shape[0])],
         _probe_labels(result.probe_positions, language),
         xlabel=_t(_TIME_LABEL, language),
-        ylabel=_t("Pressure [Pa]", language),
+        ylabel=_t(_PRESSURE_LABEL, language),
         title=_t("FDTD probe pressure", language),
         language=language, **kwargs,
     )
@@ -216,7 +217,7 @@ def plot_fdtd_snapshot(
         source_positions=[((s.ix + 0.5) * result.dx, (s.iy + 0.5) * result.dx)
                           for s in result.sources],
         probe_positions=result.probe_positions,
-        colorbar_label=_t("Pressure [Pa]", language),
+        colorbar_label=_t(_PRESSURE_LABEL, language),
         title=_t("FDTD pressure field at t = {t_txt} ms", language,
                  t_txt=t_txt),
         language=language, **kwargs,
@@ -265,7 +266,7 @@ def plot_elastic_probes(
     if set(result.probe_fields) <= {"vx", "vy"}:
         ylabel = _VELOCITY_LABEL
     elif result.probe_fields == ("p",):
-        ylabel = "Pressure [Pa]"
+        ylabel = _PRESSURE_LABEL
     else:
         ylabel = "Signal [Pa, m/s]"
     return _render_probe_lines(

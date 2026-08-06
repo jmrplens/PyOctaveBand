@@ -495,8 +495,9 @@ power = np.where(xs < 3000.0, 12000.0, 10000.0)
 path = np.column_stack([xs, np.zeros_like(xs), z, power, np.full_like(xs, 82.3)])
 ground_roll = xs[:-1] < 1500.0   # takeoff roll: segments still on the runway
 
+segments = aircraft.FlightSegmentState(ground_roll=ground_roll)
 contour = aircraft.noise_contour(path, powers, distances, sel, lmax,
-                                 ground_roll=ground_roll,
+                                 segments=segments,
                                  x=np.linspace(-2500.0, 20000.0, 56),
                                  y=np.linspace(-6000.0, 6000.0, 44))
 contour.plot()   # single-event SEL footprint (needs matplotlib)
@@ -570,9 +571,10 @@ path = np.column_stack([xs, np.zeros_like(xs), np.clip((xs - 1500) * 0.11, 0, 25
                         np.where(xs < 3000, 12000.0, 10000.0), np.full_like(xs, 82.3)])
 ground_roll = xs[:-1] < 1500.0   # takeoff roll: segments still on the runway
 
+segments = aircraft.FlightSegmentState(ground_roll=ground_roll)
 aircraft.event_level(path, [2000.0, 500.0, 0.0], powers, distances, sel, lmax,
-                     ground_roll=ground_roll)  # SEL at a point
-contour = aircraft.noise_contour(path, powers, distances, sel, lmax, ground_roll=ground_roll,
+                     segments=segments)  # SEL at a point
+contour = aircraft.noise_contour(path, powers, distances, sel, lmax, segments=segments,
                            x=np.linspace(-2500, 20000, 60), y=np.linspace(-6000, 6000, 48))
 contour.plot()   # SEL contour over the ground (needs matplotlib)
 ```
@@ -584,9 +586,10 @@ $\Delta_{\text{SOR}}$ (turbofan and turboprop, all 124 ground-roll reference
 rows to $< 0.01\ \text{dB}$) reproduce the reference values, and the segment
 energy sum matches the reference `SEL`.
 
-The model also covers the landing rollout (`landing_roll` mask: reduced noise
-fraction Eq. 4-21b, nearest-end geometry, no directivity term), per-segment
-bank angle (`bank`, §4.5.2 sign convention), the §4.5.5 nearest-end lateral
+The model also covers the landing rollout (the `landing_roll` mask of the
+`FlightSegmentState`: reduced noise fraction Eq. 4-21b, nearest-end geometry,
+no directivity term), per-segment bank angle (its `bank`, §4.5.2 sign
+convention), the §4.5.5 nearest-end lateral
 geometry behind takeoff roll, the Eq. 4-13b average runway-segment speed and
 the recommended 30 m floor on NPD lookups. Seven branch-covering receptor
 events of the reference workbook are reproduced end-to-end in the test suite.
@@ -975,7 +978,7 @@ res = aircraft.rotorcraft_event_level(
     hemispheres, speeds, angles,          # the database
     times, positions,                     # the track (m, z up)
     receiver=(120.0, 0.0),                # ground position of the microphone
-    flow_resistivity="D")                 # grass site
+    ground=aircraft.RotorcraftGround(flow_resistivity="D"))   # grass site
 res.la_max, res.sel, res.epnl             # LASmax, SEL, EPNL
 res.plot()                                # the LA(t) time history
 ```
@@ -1007,7 +1010,8 @@ t = np.arange(0.0, 130.01, 0.5)
 track = np.column_stack([np.zeros_like(t), speed * (t - 65.0),
                          np.full_like(t, 150.0)])
 event = aircraft.rotorcraft_event_level(
-    [h], [speed], [0.0], t, track, (120.0, 0.0), flow_resistivity="D")
+    [h], [speed], [0.0], t, track, (120.0, 0.0),
+    ground=aircraft.RotorcraftGround(flow_resistivity="D"))
 event.plot()
 plt.show()
 ```
@@ -1015,8 +1019,8 @@ plt.show()
 </details>
 
 Radar-track workflows can hand the smoothed per-point `airspeed`, `path_angle`,
-`heading` and `bank_angle` directly instead of deriving them from the
-positions; when they are derived, the track is in metres and seconds, so the
+`heading` and `bank_angle` of a `RotorcraftTrackState` directly instead of
+deriving them from the positions; when they are derived, the track is in metres and seconds, so the
 database airspeeds must then be in m/s.
 
 ## 6. Ground-grid contours
@@ -1030,14 +1034,15 @@ res = aircraft.rotorcraft_noise_contour(
     hemispheres, speeds, angles, times, positions,
     x=np.linspace(-2000.0, 2000.0, 81),
     y=np.linspace(-3000.0, 3000.0, 121),
-    metric="exposure", flow_resistivity="D")
+    metric="exposure",
+    ground=aircraft.RotorcraftGround(flow_resistivity="D"))
 res.plot()                                # filled SEL contours
 ```
 
-The ground may vary across the receivers without a full elevation model:
-`flow_resistivity` and `ground_elevation` accept one value per grid point
-(shape `(len(y), len(x))`), and each receiver's two-ray model then uses its
-local values.
+The ground may vary across the receivers without a full elevation model: the
+`flow_resistivity` and `ground_elevation` of the `RotorcraftGround` accept one
+value per grid point (shape `(len(y), len(x))`), and each receiver's two-ray
+model then uses its local values.
 
 ## 7. Terrain: the mean ground plane and screening
 
@@ -1115,16 +1120,17 @@ plt.show()
 </details>
 
 The event and contour run over real sites by passing a digital elevation
-model: `terrain=(x, y, z)` on the track frame. Every emission-receiver pair
-then samples its own vertical section at `terrain_resolution` (default: the
-model's cell size) and evaluates it with the machinery above; the receiver
+model in the `RotorcraftGround`: `terrain=(x, y, z)` on the track frame. Every
+emission-receiver pair then samples its own vertical section at
+`terrain_resolution` (default: the model's cell size) and evaluates it with the machinery above; the receiver
 ground comes from the model. The cost grows with track points times grid
 points, so keep contour grids modest with terrain.
 
 ```python
 res = aircraft.rotorcraft_event_level(
     hemispheres, speeds, angles, times, positions, receiver=(1200.0, 300.0),
-    terrain=(tx, ty, tz), flow_resistivity="D")
+    ground=aircraft.RotorcraftGround(terrain=(tx, ty, tz),
+                                     flow_resistivity="D"))
 ```
 
 ## Validation

@@ -51,7 +51,8 @@ def test_frequency_response_es() -> None:
     y = np.convolve(x, np.array([0.5, 0.3, 0.1]), mode="same")
     axes = ph.transfer_function(x, y, FS).plot(language="es")
     text = _labels(axes)
-    assert "Respuesta en frecuencia" in text and "coherencia" in text
+    assert "Respuesta en frecuencia" in text
+    assert "coherencia" in text
     assert "Magnitud [dB]" in text
     plt.close("all")
 
@@ -128,8 +129,10 @@ def _loudspeaker() -> ph.electroacoustics.LoudspeakerCharacteristics:
         impedance=(fz, 6.6 + 20 * np.exp(-(np.log2(fz / 52.0) ** 2) / 0.12)),
         distortion=(np.geomspace(50.0, 5000.0, 90),
                     0.4 + 2.0 * np.ones(90)),
-        polar=(np.linspace(0.0, 90.0, 46), -np.linspace(0.0, 12.0, 46)),
-        polar_frequency=2000.0,
+        directivity=ph.LoudspeakerDirectivity(
+            polar=(np.linspace(0.0, 90.0, 46), -np.linspace(0.0, 12.0, 46)),
+            frequency=2000.0,
+        ),
     )
 
 
@@ -139,12 +142,18 @@ def _microphone() -> ph.electroacoustics.MicrophoneCharacteristics:
     ang = np.linspace(0.0, 179.0, 180)
     spl = np.linspace(100.0, 140.0, 41)
     return ph.microphone_characteristics(
-        f, resp, 12.5, tolerance_db=3.0, noise_voltage=1.25e-6,
-        max_spl_thd_percent=0.5,
-        noise_spectrum=(np.geomspace(20.0, 20000.0, 31), np.full(31, 10.0)),
-        distortion=(spl, 0.5 * 10 ** ((spl - 130.0) * 0.08)),
-        polar=(ang, 20 * np.log10((1 + np.cos(np.radians(ang))) / 2)),
-        polar_frequency=1000.0,
+        f, resp, 12.5, tolerance_db=3.0,
+        noise=ph.MicrophoneNoise(
+            voltage=1.25e-6,
+            spectrum=(np.geomspace(20.0, 20000.0, 31), np.full(31, 10.0)),
+        ),
+        overload=ph.MicrophoneOverload(
+            distortion=(spl, 0.5 * 10 ** ((spl - 130.0) * 0.08)), thd_percent=0.5
+        ),
+        directivity=ph.MicrophoneDirectivity(
+            polar=(ang, 20 * np.log10((1 + np.cos(np.radians(ang))) / 2)),
+            frequency=1000.0,
+        ),
     )
 
 

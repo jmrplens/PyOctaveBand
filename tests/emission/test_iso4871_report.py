@@ -184,8 +184,9 @@ def test_declaration_requires_at_least_one_mode() -> None:
 
 def test_unknown_form_is_rejected() -> None:
     """An unknown declaration form is rejected."""
+    modes = _annex_b_modes()
     with pytest.raises(ValueError, match="dual-number"):
-        NoiseEmissionDeclaration(_annex_b_modes(), form="triple")  # type: ignore[arg-type]
+        NoiseEmissionDeclaration(modes, form="triple")  # type: ignore[arg-type]
 
 
 def test_basic_standards_string_is_wrapped() -> None:

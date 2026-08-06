@@ -213,7 +213,8 @@ def test_modal_overlap_brackets_and_excludes_bands() -> None:
         k, 2.0, 4.0, 4.0, frequency=THIRD_OCTAVE, modal_overlap=m
     )
     assert res.bracketed is not None
-    assert bool(res.bracketed[3]) and res.bracketed.sum() == 1
+    assert bool(res.bracketed[3])
+    assert res.bracketed.sum() == 1
     freqs = np.asarray(THIRD_OCTAVE, dtype=float)
     mask = (freqs >= 200.0) & (freqs <= 1250.0) & (m >= 0.25)
     assert res.single_number == pytest.approx(float(np.mean(res.k_ij[mask])))
@@ -225,7 +226,8 @@ def test_modal_overlap_all_bracketed_gives_no_single_number() -> None:
         frequency=THIRD_OCTAVE, modal_overlap=np.full(len(THIRD_OCTAVE), 0.1),
     )
     assert res.single_number is None
-    assert res.bracketed is not None and bool(np.all(res.bracketed))
+    assert res.bracketed is not None
+    assert bool(np.all(res.bracketed))
 
 
 def test_modal_overlap_propagates_to_octave_bands() -> None:

@@ -104,7 +104,8 @@ def test_plenum_more_absorption_more_loss() -> None:
 
 def test_plenum_per_band() -> None:
     tl = hvac.plenum_attenuation(0.1, 1.0, 20.0, np.array([0.1, 0.3, 0.5]))
-    assert isinstance(tl, np.ndarray) and tl.shape == (3,)
+    assert isinstance(tl, np.ndarray)
+    assert tl.shape == (3,)
 
 
 def test_flow_noise_straight_duct_formula() -> None:

@@ -6,7 +6,7 @@ Parametric tests using pytest best practices for signal processing verification.
 import numpy as np
 import pytest
 
-from phonometry import OctaveFilterBank, octave_filter
+from phonometry import FilterDesign, OctaveFilterBank, octave_filter
 
 
 @pytest.mark.parametrize("fraction, expected_bands", [
@@ -129,7 +129,8 @@ def test_frequency_isolation(target_freq: float, filter_type: str) -> None:
     # Generate pure tone
     x = np.sin(2 * np.pi * target_freq * t)
     
-    spl, freq = octave_filter(x, fs, fraction=1, limits=[20.0, 16000.0], filter_type=filter_type)
+    spl, freq = octave_filter(x, fs, fraction=1, limits=[20.0, 16000.0],
+                              design=FilterDesign(filter_type=filter_type))
     
     # Find the band closest to target_freq
     freq_arr = np.array(freq)
@@ -177,7 +178,8 @@ def test_impulse_response_decay(filter_type: str) -> None:
     x[0] = 1.0 # Impulse
     
     # Use sigbands=True to get time domain signals
-    _, _, signals = octave_filter(x, fs, fraction=1, sigbands=True, filter_type=filter_type)
+    _, _, signals = octave_filter(x, fs, fraction=1, sigbands=True,
+                                  design=FilterDesign(filter_type=filter_type))
     
     for band_sig in signals:
         # Check that the end of the signal is close to zero (decayed)

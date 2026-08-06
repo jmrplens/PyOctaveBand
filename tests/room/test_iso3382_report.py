@@ -110,7 +110,8 @@ def _full_metadata(**overrides) -> ReportMetadata:
 def test_synthetic_decay_matches_closed_form() -> None:
     """T20 = T30 = EDT = T per band (within +/-1 %, far below the 5 % JND)."""
     res = _result()
-    assert res.frequency is not None and len(res.frequency) == len(_BANDS)
+    assert res.frequency is not None
+    assert len(res.frequency) == len(_BANDS)
     np.testing.assert_allclose(res.t20, _T60, rtol=0.01)
     np.testing.assert_allclose(res.t30, _T60, rtol=0.01)
     np.testing.assert_allclose(res.edt, _T60, rtol=0.01)
@@ -173,7 +174,8 @@ def test_band_labels_and_reverberation_times_render(tmp_path) -> None:
     assert "1.20" in text  # 500 Hz
     assert "0.85" in text  # 4000 Hz
     # Column headers for the energy parameters are present.
-    assert "EDT" in text and "C80" in text
+    assert "EDT" in text
+    assert "C80" in text
 
 
 def test_mid_frequency_descriptor_and_verdict(tmp_path) -> None:
@@ -196,7 +198,8 @@ def test_report_without_requirement_has_no_verdict(tmp_path) -> None:
     out = tmp_path / "noverdict.pdf"
     _result().report(str(out), metadata=_full_metadata())
     text = _extract_text(str(out))
-    assert "PASS" not in text and "FAIL" not in text
+    assert "PASS" not in text
+    assert "FAIL" not in text
 
 
 def _synthetic_result(
@@ -249,12 +252,14 @@ def test_third_octave_report_renders(tmp_path) -> None:
 def test_band_range_without_mid_octaves_names_the_band(tmp_path) -> None:
     """A range missing the mid bands boxes the first finite T30 band by name."""
     res = room_parameters(_synthetic_ir(), _FS, limits=(2000.0, 4000.0))
-    assert res.frequency is not None and len(res.frequency) == 2
+    assert res.frequency is not None
+    assert len(res.frequency) == 2
     out = tmp_path / "high_bands.pdf"
     res.report(str(out), metadata=_full_metadata())
     text = _extract_text(str(out))
     assert "(2000 Hz)" in text  # the boxed T30 names its band explicitly
-    assert "Tmid" not in text and "T_mid" not in text
+    assert "Tmid" not in text
+    assert "T_mid" not in text
 
 
 def test_edt_label_follows_edts_own_band_coverage(tmp_path) -> None:
@@ -272,7 +277,8 @@ def test_edt_label_follows_edts_own_band_coverage(tmp_path) -> None:
     res.report(str(out), metadata=_full_metadata())
     text = _extract_text(str(out))
     assert "1.15" in text  # T_mid from the two finite T30 bands
-    assert "EDTmid" not in text and "EDT_mid" not in text
+    assert "EDTmid" not in text
+    assert "EDT_mid" not in text
     assert "EDT (1000 Hz) = 1.00 s" in text
 
 
@@ -286,7 +292,8 @@ def test_verdict_uses_display_rounded_values(tmp_path) -> None:
     res.report(str(out), metadata=_full_metadata(requirement=1.15))
     text = _extract_text(str(out))
     assert "1.15" in text
-    assert "PASS" in text and "FAIL" not in text
+    assert "PASS" in text
+    assert "FAIL" not in text
 
 
 def test_single_band_is_not_labeled_broadband(tmp_path) -> None:
@@ -296,7 +303,8 @@ def test_single_band_is_not_labeled_broadband(tmp_path) -> None:
     so the caption must read "Single-band parameters", never "Broadband".
     """
     res = room_parameters(_synthetic_ir(), _FS, limits=(490.0, 510.0), fraction=1)
-    assert res.frequency is not None and len(res.frequency) == 1
+    assert res.frequency is not None
+    assert len(res.frequency) == 1
     out = tmp_path / "single_band.pdf"
     res.report(str(out))
     _assert_one_page(str(out))
@@ -313,7 +321,8 @@ def test_octave_report_many_bands_renders(tmp_path) -> None:
     by octave, not by spurious one-third-octave triplets.
     """
     res = room_parameters(_synthetic_ir(), _FS, limits=(16.0, 16000.0), fraction=1)
-    assert res.frequency is not None and len(res.frequency) > 6
+    assert res.frequency is not None
+    assert len(res.frequency) > 6
     out = tmp_path / "octave_wide.pdf"
     res.report(str(out), metadata=_full_metadata())
     _assert_one_page(str(out))
@@ -343,7 +352,8 @@ def test_broadband_makes_no_mid_frequency_claim(tmp_path) -> None:
     res.report(str(out), metadata=_full_metadata(requirement=1.30))
     text = _extract_text(str(out))
     assert "500-1000" not in text
-    assert "T_mid" not in text and "Tmid" not in text
+    assert "T_mid" not in text
+    assert "Tmid" not in text
     # A verdict is still emitted against the broadband reverberation time.
     assert ("PASS" in text) or ("FAIL" in text)
 

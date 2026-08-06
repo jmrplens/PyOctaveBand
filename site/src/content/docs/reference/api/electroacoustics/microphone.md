@@ -76,20 +76,10 @@ microphone_characteristics(
     *,
     reference_frequency: float = 1000.0,
     tolerance_db: float = 2.0,
-    rated_impedance: float | None = None,
-    minimum_load_impedance: float | None = None,
-    noise_voltage: float | None = None,
-    equivalent_noise_level_db: float | None = None,
-    noise_weighting: str = 'A',
-    max_spl_db: float | None = None,
-    max_spl_thd_percent: float = 1.0,
-    distortion: tuple[ArrayLike, ArrayLike] | None = None,
-    noise_spectrum: tuple[ArrayLike, ArrayLike] | None = None,
-    polar: tuple[ArrayLike, ArrayLike] | None = None,
-    polar_frequency: float | None = None,
-    directivity_index_db: float | None = None,
-    powering: str | None = None,
-    supply_current_ma: float | None = None,
+    directivity: MicrophoneDirectivity = ...,
+    noise: MicrophoneNoise = ...,
+    overload: MicrophoneOverload = ...,
+    electrical: MicrophoneElectrical = ...,
 ) -> MicrophoneCharacteristics
 ```
 
@@ -101,6 +91,9 @@ the equivalent noise level (17.2, when the noise voltage is supplied) are
 computed from the standard's definitions; the optional directional, noise
 and distortion data feed the corresponding report panels.
 
+The optional rated characteristics are grouped as the standard groups
+them, one bundle per clause, so each may be omitted whole.
+
 **Parameters**
 
 | Name | Description |
@@ -110,20 +103,10 @@ and distortion data feed the corresponding report panels.
 | `sensitivity_mv_per_pa` | Rated free-field sensitivity `M` at the reference frequency, in mV/Pa (11.2.1/11.3). |
 | `reference_frequency` | Stated reference frequency, in Hz; the 11.3 standard reference frequency of 1 000 Hz by default. |
 | `tolerance_db` | Half-width of the response tolerance, in dB (default 2), defining the effective frequency range (12.2). |
-| `rated_impedance` | Rated impedance, in ohm (10.2). |
-| `minimum_load_impedance` | Rated minimum permitted load impedance, in ohm (10.3). |
-| `noise_voltage` | Weighted r.m.s. output voltage due to inherent noise, in V (17.2 b); the equivalent noise level is computed from it. |
-| `equivalent_noise_level_db` | Stated equivalent sound pressure level due to inherent noise, in dB SPL (17.1), when not computed from `noise_voltage`. |
-| `noise_weighting` | Weighting of the inherent-noise measurement (default `"A"`, the IEC 60268-1 6.2.1 recommendation). |
-| `max_spl_db` | Stated overload sound pressure level, in dB SPL (15.2); when omitted it is read from `distortion` at `max_spl_thd_percent`. |
-| `max_spl_thd_percent` | Distortion limit defining the overload level, in % (default 1, a common 15.2.1 note value). |
-| `distortion` | Total harmonic distortion against level as `(spl_db, thd_percent)` (14.2). |
-| `noise_spectrum` | Inherent-noise spectrum as `(frequencies, band_levels_db)` in (Hz, dB SPL) (17.2 b). |
-| `polar` | Directional pattern as `(angles_deg, relative_db)` at `polar_frequency` (13.1.2). |
-| `polar_frequency` | Stated frequency of the directional pattern, Hz. |
-| `directivity_index_db` | Stated directivity index, in dB (13.2); when omitted it is computed from `polar` if the pattern reaches the rear. |
-| `powering` | Rated power supply description (9.1), e.g. `"Phantom P48, 48 V (IEC 61938)"`. |
-| `supply_current_ma` | Current drawn from the power supply, in mA (9.1). |
+| `directivity` | Directional characteristics of Clause 13 as a [`MicrophoneDirectivity`](/phonometry/reference/api/electroacoustics/microphone/#microphonedirectivity): the directional pattern, its stated frequency and the directivity index. |
+| `noise` | Inherent noise of Clause 17 as a [`MicrophoneNoise`](/phonometry/reference/api/electroacoustics/microphone/#microphonenoise): the weighted noise voltage or the stated equivalent noise level, its weighting and the noise spectrum. |
+| `overload` | Limiting characteristic of 15.2 with the 14.2 distortion curve it is read from, as a [`MicrophoneOverload`](/phonometry/reference/api/electroacoustics/microphone/#microphoneoverload). |
+| `electrical` | Electrical impedance (Clause 10) and rated power supply (Clause 9) as a [`MicrophoneElectrical`](/phonometry/reference/api/electroacoustics/microphone/#microphoneelectrical). |
 
 **Returns:** A [`MicrophoneCharacteristics`](/phonometry/reference/api/electroacoustics/microphone/#microphonecharacteristics).
 
@@ -307,3 +290,106 @@ of 1 Pa
 ($20 \log_{10}(1\,\mathrm{Pa} / 20\,\mathrm{\mu Pa}) = 93.98$ dB
 SPL) minus the equivalent sound pressure level due to inherent
 noise (17), carrying the same weighting.
+
+## MicrophoneDirectivity
+
+```python
+MicrophoneDirectivity(
+    polar: tuple[ArrayLike, ArrayLike] | None = None,
+    frequency: float | None = None,
+    index_db: float | None = None,
+)
+```
+
+Directional characteristics of the microphone (IEC 60268-4 Clause 13).
+
+The clause's two characteristics travel together: the directional pattern
+(13.1), a curve of the free-field sensitivity level against the angle of
+incidence for a stated frequency, and the directivity index read from it
+(13.2).
+
+**Attributes**
+
+| Name | Description |
+| :--- | :--- |
+| `polar` | Directional pattern as `(angles_deg, relative_db)`, the pattern $G(\theta)$ relative to the reference-axis response, in degrees and dB (13.1.1/13.1.2). |
+| `frequency` | Stated frequency of the directional pattern, in Hz (13.1.1 requires the frequency or frequency band to be stated). |
+| `index_db` | Stated directivity index, in dB (13.2.1); when omitted it is computed from `polar` through the 11.2.2 a) diffuse-field integral if the pattern reaches the rear. |
+
+## MicrophoneElectrical
+
+```python
+MicrophoneElectrical(
+    rated_impedance: float | None = None,
+    minimum_load_impedance: float | None = None,
+    powering: str | None = None,
+    supply_current_ma: float | None = None,
+)
+```
+
+Electrical impedance and rated power supply (IEC 60268-4 Clauses 10/9).
+
+The electrical side of the rated characteristics: the rated (internal)
+impedance and the rated minimum permitted load impedance of Clause 10, and
+the rated power supply of Clause 9.
+
+**Attributes**
+
+| Name | Description |
+| :--- | :--- |
+| `rated_impedance` | Rated (internal) impedance, in ohm (10.2). |
+| `minimum_load_impedance` | Rated minimum permitted load impedance, in ohm (10.3). |
+| `powering` | Rated power supply description (9.1), e.g. the IEC 61938 phantom-powering designation and voltage. |
+| `supply_current_ma` | Current drawn from the power supply, in mA (9.1). |
+
+## MicrophoneNoise
+
+```python
+MicrophoneNoise(
+    voltage: float | None = None,
+    equivalent_level_db: float | None = None,
+    weighting: str = 'A',
+    spectrum: tuple[ArrayLike, ArrayLike] | None = None,
+)
+```
+
+Inherent noise of the microphone (IEC 60268-4 Clause 17).
+
+The clause specifies the equivalent sound pressure level due to inherent
+noise, either stated directly or computed from the weighted inherent-noise
+output voltage, and the band spectrum that voltage was measured over.
+
+**Attributes**
+
+| Name | Description |
+| :--- | :--- |
+| `voltage` | Weighted r.m.s. output voltage due to inherent noise, in V (17.2 b); the equivalent noise level is computed from it. |
+| `equivalent_level_db` | Stated equivalent sound pressure level due to inherent noise, in dB SPL (17.1), when not computed from `voltage`. |
+| `weighting` | Weighting of the inherent-noise measurement (default `"A"`, the IEC 60268-1 6.2.1 recommendation). |
+| `spectrum` | Inherent-noise spectrum as `(frequencies, band_levels_db)` in (Hz, dB SPL) (17.2 b). |
+
+## MicrophoneOverload
+
+```python
+MicrophoneOverload(
+    distortion: tuple[ArrayLike, ArrayLike] | None = None,
+    thd_percent: float = 1.0,
+    spl_db: float | None = None,
+)
+```
+
+Overload sound pressure and the distortion it is read from (14.2/15.2).
+
+The limiting characteristic of IEC 60268-4 15.2 is the maximum sound
+pressure at which the amplitude non-linearity does not exceed a specified
+limit, and 15.2.2 measures it by raising the sound pressure until the
+distortion at the output reaches that limit. The total-harmonic-distortion
+curve of 14.2, the limit and the resulting level are therefore one group.
+
+**Attributes**
+
+| Name | Description |
+| :--- | :--- |
+| `distortion` | Total harmonic distortion against level as `(spl_db, thd_percent)` in (dB SPL, %) (14.2). |
+| `thd_percent` | Distortion limit defining the overload sound pressure level, in % (default 1, a common 15.2.1 note value). |
+| `spl_db` | Stated overload sound pressure level, in dB SPL (15.2); when omitted it is read from `distortion` at `thd_percent`. |

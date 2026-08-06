@@ -293,8 +293,8 @@ es aritmética y se ofrece como tal.
 
 ```python
 from phonometry import (
-    RoadTraffic, RoadVehicleCategory, line_source_segment_power,
-    predicted_receiver_level, road_source_power,
+    PropagationGeometry, RoadTraffic, RoadVehicleCategory,
+    line_source_segment_power, predicted_receiver_level, road_source_power,
 )
 
 result = road_source_power([
@@ -303,7 +303,9 @@ result = road_source_power([
 ])
 segment = line_source_segment_power(result.total_line_power, 20.0)  # tramo de 20 m
 levels = predicted_receiver_level(
-    segment, 100.0, result.source_height, 4.0, frequencies=result.frequencies,
+    segment,
+    PropagationGeometry(100.0, result.source_height, 4.0),
+    frequencies=result.frequencies,
 )
 ```
 

@@ -252,8 +252,9 @@ def test_validation_errors() -> None:
         sound_intensity(good, good, FS, SPACING, limits=[100.0])
     with pytest.raises(ValueError, match="limits"):
         sound_intensity(good, good, FS, SPACING, limits=[1000.0, 100.0])
+    two_dimensional = np.zeros((2, 100))
     with pytest.raises(ValueError, match="1D"):
-        sound_intensity(np.zeros((2, 100)), np.zeros((2, 100)), FS, SPACING)
+        sound_intensity(two_dimensional, two_dimensional, FS, SPACING)
     with pytest.raises(ValueError, match="too short"):
         sound_intensity(good[:8], good[:8], FS, SPACING)
 
@@ -290,10 +291,10 @@ def test_field_indicators_validation() -> None:
         field_indicators([90.0], [1e-3])
     with pytest.raises(ValueError, match="not positive"):
         field_indicators([90.0, 90.0], [1e-3, -2e-3])
+    three_band_lp = np.full((4, 3), 90.0)
+    three_band_in = np.full((4, 3), 1e-3)
     with pytest.raises(ValueError, match="one entry per band"):
-        field_indicators(
-            np.full((4, 3), 90.0), np.full((4, 3), 1e-3), [125.0, 250.0]
-        )
+        field_indicators(three_band_lp, three_band_in, [125.0, 250.0])
 
 
 def test_field_indicators_per_band_matches_per_column_scalars() -> None:
@@ -304,7 +305,8 @@ def test_field_indicators_per_band_matches_per_column_scalars() -> None:
     lp = 74.0 + rng.normal(0.0, 0.8, (8, 4))
     i_n = 1.0e-5 * (1.0 + rng.normal(0.0, 0.2, (8, 4)))
     ind = field_indicators(lp, i_n, freqs)
-    assert isinstance(ind.f2, np.ndarray) and ind.f2.shape == (4,)
+    assert isinstance(ind.f2, np.ndarray)
+    assert ind.f2.shape == (4,)
     np.testing.assert_allclose(ind.frequency, freqs)
     for b in range(4):
         one = field_indicators(lp[:, b], i_n[:, b])
@@ -339,7 +341,8 @@ def test_field_indicators_plot_draws_indicators_and_ld() -> None:
     assert any(np.allclose(y, ld) for y in ydata)
     # F4 rides the twin axis as bars (one patch per band).
     twin = [a for a in ax.figure.axes if a is not ax]
-    assert twin and len(twin[0].patches) == freqs.size
+    assert twin
+    assert len(twin[0].patches) == freqs.size
     assert ax.get_title() == "ISO 9614-1 field indicators"
     plt.close("all")
     ax_es = ind.plot(language="es")
@@ -416,7 +419,8 @@ def test_f1_per_band_matches_the_per_column_scalars() -> None:
     rng = np.random.default_rng(614)
     samples = 3.0e-5 * (1.0 + rng.normal(0.0, 0.25, (10, 4)))
     per_band = temporal_variability_indicator(samples)
-    assert isinstance(per_band, np.ndarray) and per_band.shape == (4,)
+    assert isinstance(per_band, np.ndarray)
+    assert per_band.shape == (4,)
     for b in range(4):
         assert per_band[b] == pytest.approx(
             temporal_variability_indicator(samples[:, b])
@@ -485,7 +489,8 @@ def test_f1_follows_the_shape_of_its_sibling_indicators() -> None:
         [1000.0],
         temporal_intensity=samples_1d,
     )
-    assert np.ndim(per_band.f1) == 1 and np.size(per_band.f1) == 1
+    assert np.ndim(per_band.f1) == 1
+    assert np.size(per_band.f1) == 1
     assert np.ndim(per_band.f4) == 1
     assert np.asarray(per_band.field_is_stationary()).shape == (1,)
 

@@ -529,6 +529,38 @@ def _is_distinct(
     return True
 
 
+def _next_local_maximum(lev: NDArray[np.float64], start: int) -> int:
+    """First local maximum of ``lev`` at or after ``start``.
+
+    A tone cannot sit on a slope, so every line lower than either neighbour is
+    skipped. ``i > 0`` guards the left neighbour so line 0 is not compared
+    against the wrapped-around last line of the spectrum.
+    """
+    n = lev.size
+    i = start
+    while i < n - 1 and (lev[i + 1] > lev[i] or (i > 0 and lev[i - 1] > lev[i])):
+        i += 1
+    return i
+
+
+def _tone_line_run(
+    lev: NDArray[np.float64], start: int, ls: float
+) -> tuple[int, int]:
+    """Strongest line and end of the run of lines above ``LS + 6 dB``.
+
+    :return: ``(peak, resume)``: the strongest line of the run starting at
+        ``start`` and the first line past it, where the search resumes.
+    """
+    n = lev.size
+    peak = start
+    j = start
+    while j < n and lev[j] > ls + _TONE_MARGIN:
+        if lev[j] > lev[peak]:
+            peak = j
+        j += 1
+    return peak, j
+
+
 def _detect_tones(
     lev: NDArray[np.float64],
     freq: NDArray[np.float64],
@@ -556,36 +588,25 @@ def _detect_tones(
 
     i = 0
     while i < n - 1:
-        # Advance off any flank to a local maximum (a tone cannot sit on a slope).
-        # ``i > 0`` guards the left neighbour so line 0 is not compared against
-        # the wrapped-around last line of the spectrum.
-        while i < n - 1 and (
-            lev[i + 1] > lev[i] or (i > 0 and lev[i - 1] > lev[i])
-        ):
-            i += 1
-        peak = i
-        ls = _ls_at(peak)
+        # Advance off any flank to a local maximum.
+        start = _next_local_maximum(lev, i)
+        ls = _ls_at(start)
         if ls is None:
-            i += 1
+            i = start + 1
             continue
         # Extend over the run above LS+6, tracking the strongest line as the peak.
-        j = i
-        while j < n and lev[j] > ls + _TONE_MARGIN:
-            if lev[j] > lev[peak]:
-                peak = j
-            j += 1
-        resume = j
-        if lev[peak] > ls + _TONE_MARGIN:
-            if peak != i:
-                recomputed = _ls_at(peak)
-                if recomputed is None:
-                    i = max(resume, i + 1)
-                    continue
-                ls = recomputed
-            low, high = _tone_line_span(lev, peak, ls)
-            if _is_distinct(lev, freq, peak, low, high, line_spacing):
-                tones.append((peak, low, high, ls))
-        i = max(resume, i + 1)
+        peak, resume = _tone_line_run(lev, start, ls)
+        i = max(resume, start + 1)
+        if lev[peak] <= ls + _TONE_MARGIN:
+            continue
+        if peak != start:
+            recomputed = _ls_at(peak)
+            if recomputed is None:
+                continue
+            ls = recomputed
+        low, high = _tone_line_span(lev, peak, ls)
+        if _is_distinct(lev, freq, peak, low, high, line_spacing):
+            tones.append((peak, low, high, ls))
     return tones
 
 

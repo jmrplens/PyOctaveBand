@@ -284,22 +284,24 @@ def test_airborne_energy_averages_positions() -> None:
 
 
 def test_airborne_rejects_length_mismatch() -> None:
+    two_bands = np.array([80.0, 80.0])
+    one_band = np.array([40.0])
+    one_time = np.array([0.5])
     with pytest.raises(
         ValueError,
         match="'l1', 'l2' and 't2' must share the same band count",
     ):
-        airborne_insulation(
-            np.array([80.0, 80.0]), np.array([40.0]), np.array([0.5])
-        )
+        airborne_insulation(two_bands, one_band, one_time)
 
 
 def test_airborne_requires_both_area_and_volume() -> None:
+    l1 = np.array([80.0])
+    l2 = np.array([40.0])
+    t2 = np.array([0.5])
     with pytest.raises(
         ValueError, match="'area' and 'volume' must be given together"
     ):
-        airborne_insulation(
-            np.array([80.0]), np.array([40.0]), np.array([0.5]), area=10.0
-        )
+        airborne_insulation(l1, l2, t2, area=10.0)
 
 
 def test_field_rating_pipeline_dnt_w() -> None:
@@ -397,7 +399,8 @@ def test_one_decimal_rating_annex_b() -> None:
         one_decimal=True,
     )
     assert res.rating == pytest.approx(ref.ISO12999_1_ANNEX_B_RW)
-    assert res.c_50_5000 is not None and res.ctr_50_5000 is not None
+    assert res.c_50_5000 is not None
+    assert res.ctr_50_5000 is not None
     assert res.rating + res.c_50_5000 == pytest.approx(
         ref.ISO12999_1_ANNEX_B_RW_C50_5000
     )
@@ -429,7 +432,8 @@ def test_impact_extended_ci_50_2500() -> None:
     # Strong low-frequency content raises the enlarged-range term.
     ln_low = [75.0, 75.0, 75.0, *ref.ISO717_2_REFERENCE_FLOOR_LN_R0]
     boosted = weighted_impact_rating_extended(ln_low, freqs)
-    assert boosted.ci_50_2500 is not None and boosted.ci_50_2500 > -11
+    assert boosted.ci_50_2500 is not None
+    assert boosted.ci_50_2500 > -11
 
 
 def test_impact_one_decimal_reference_floor() -> None:
@@ -444,7 +448,8 @@ def test_impact_one_decimal_reference_floor() -> None:
     )
     assert res.rating == pytest.approx(77.6)
     assert res.ci == pytest.approx(-10.3)
-    assert res.core.rating == 78 and res.core.ci == -11
+    assert res.core.rating == 78
+    assert res.core.ci == -11
 
 
 # ---------------------------------------------------------------------------

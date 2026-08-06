@@ -61,16 +61,20 @@ rng = np.random.default_rng(42)
 x = rng.standard_normal(4 * block)
 t = np.arange(x.size) / fs
 
-bank = filters.OctaveFilterBank(fs, fraction=1, limits=[900, 1100],
-                                  stateful=True, resample=False)
+bank = filters.OctaveFilterBank(
+    fs, fraction=1, limits=[900, 1100],
+    design=filters.FilterDesign(resample=False),
+    block_processing=filters.BlockProcessing(stateful=True),
+)
 streamed = np.concatenate([
     bank.filter(x[i * block:(i + 1) * block], sigbands=True,
                 detrend=False, calculate_level=False)[2][0]
     for i in range(4)
 ])
-offline = filters.OctaveFilterBank(fs, fraction=1, limits=[900, 1100],
-                                     resample=False).filter(
-    x, sigbands=True, detrend=False, calculate_level=False)[2][0]
+offline = filters.OctaveFilterBank(
+    fs, fraction=1, limits=[900, 1100],
+    design=filters.FilterDesign(resample=False),
+).filter(x, sigbands=True, detrend=False, calculate_level=False)[2][0]
 print(np.max(np.abs(streamed - offline)))     # 0.0 (exacto bit a bit)
 
 fig, ax = plt.subplots(figsize=(9, 4.5))
@@ -84,10 +88,12 @@ plt.show()
 
 </details>
 
-Crea un banco con estado usando `stateful=True`. El estado interno se inicializa
-a cero por defecto, pero puede inicializarse al régimen permanente de la
-respuesta al escalón (como `scipy.signal.sosfilt_zi`) con `steady_ic=True`.
-Las opciones que deben desactivarse en modo stateful se resumen en la
+Crea un banco con estado usando
+`block_processing=BlockProcessing(stateful=True)`. El estado interno se
+inicializa a cero por defecto, pero puede inicializarse al régimen permanente
+de la respuesta al escalón (como `scipy.signal.sosfilt_zi`) con
+`BlockProcessing(steady_ic=True)`. Las opciones que deben desactivarse en
+modo stateful se resumen en la
 [tabla de restricciones](#restricciones-del-modo-con-estado) al final de esta
 guía.
 
@@ -102,7 +108,11 @@ import soundfile as sf
 from phonometry import filters
 
 fs = 48000
-octave_filter = filters.OctaveFilterBank(fs, 1, stateful=True, resample=False)
+octave_filter = filters.OctaveFilterBank(
+    fs, 1,
+    design=filters.FilterDesign(resample=False),
+    block_processing=filters.BlockProcessing(stateful=True),
+)
 afilter = filters.WeightingFilter(fs, "A", stateful=True)
 
 for block in sf.blocks("measurement.wav", blocksize=256, overlap=0):

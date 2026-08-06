@@ -577,8 +577,9 @@ def test_global_index_validation() -> None:
         hr.db_hr_global_index(_R_PRIME[:10])
     with pytest.raises(ValueError, match="finite"):
         hr.db_hr_global_index([math.nan, *_R_PRIME[1:]])
+    two_dimensional = np.zeros((2, 18))
     with pytest.raises(ValueError, match="one-dimensional"):
-        hr.db_hr_global_index(np.zeros((2, 18)))
+        hr.db_hr_global_index(two_dimensional)
     with pytest.raises(ValueError, match="one value per band"):
         hr.db_hr_global_index(_R_PRIME, frequencies=[100.0, 125.0])
     with pytest.raises(ValueError, match="positive"):
@@ -641,7 +642,6 @@ def test_window_size_and_assessment_validation() -> None:
         hr.window_size_correction(-2.0)
     with pytest.raises(ValueError, match="At least one"):
         hr.assess_db_hr([])
+    impact_requirement = hr.db_hr_impact_requirement("protected", "other_unit")
     with pytest.raises(ValueError, match="finite"):
-        hr.check_db_hr_requirement(
-            math.nan, hr.db_hr_impact_requirement("protected", "other_unit")
-        )
+        hr.check_db_hr_requirement(math.nan, impact_requirement)

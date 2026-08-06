@@ -40,6 +40,8 @@ UNDERWATER_REFERENCE_EXPOSURE = 1e-12
 _IN_AIR_REFERENCE_PRESSURE = 20e-6
 #: Level offset between the 20 µPa and 1 µPa references, ``20·lg(20)`` dB.
 _REFERENCE_OFFSET_DB = 20.0 * np.log10(_IN_AIR_REFERENCE_PRESSURE / UNDERWATER_REFERENCE_PRESSURE)
+#: Rejection message for an all-zero record: no level is defined.
+_NO_ENERGY_MSG = "'pressure' has no energy."
 
 
 def _positive(value: float, name: str) -> float:
@@ -82,7 +84,7 @@ def sound_pressure_level(
     p0 = _positive(reference, "reference")
     mean_square = float(np.mean(sig**2))
     if mean_square <= 0.0:
-        raise ValueError("'pressure' has no energy.")
+        raise ValueError(_NO_ENERGY_MSG)
     return float(10.0 * np.log10(mean_square / p0**2))
 
 
@@ -110,7 +112,7 @@ def sound_exposure_level(
     e0 = _positive(reference, "reference")
     exposure = float(np.sum(sig**2) / fs_v)
     if exposure <= 0.0:
-        raise ValueError("'pressure' has no energy.")
+        raise ValueError(_NO_ENERGY_MSG)
     return float(10.0 * np.log10(exposure / e0))
 
 
@@ -133,7 +135,7 @@ def peak_sound_pressure_level(
     p0 = _positive(reference, "reference")
     peak = float(np.max(np.abs(sig)))
     if peak <= 0.0:
-        raise ValueError("'pressure' has no energy.")
+        raise ValueError(_NO_ENERGY_MSG)
     return float(20.0 * np.log10(peak / p0))
 
 

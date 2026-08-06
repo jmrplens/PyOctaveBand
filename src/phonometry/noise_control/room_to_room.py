@@ -89,6 +89,66 @@ if TYPE_CHECKING:
 
 
 @dataclass(frozen=True)
+class SourceRoom:
+    r"""The source room of the chain: what drives the partition.
+
+    Two ways to say the same thing, and exactly one of them is given. Either
+    the reverberant level in the source room is known (``level``), or the
+    machine's sound power level is (``power_level``), in which case the room
+    constant of the source room is needed to build the reverberant field
+    :math:`L_{p1} = L_W + 10 \log_{10}(4 / R_1)` (Norton 2e, 4.7), and the
+    sound power model of Table 4.5 decides whether the position of the source
+    in the room raises or lowers the power it radiates.
+
+    :param level: Reverberant sound pressure level in the source room
+        ``L_p1``, dB (scalar or per band). Mutually exclusive with
+        ``power_level``.
+    :param power_level: Sound power level of the source ``L_W``, dB re 1 pW
+        (scalar or per band). Requires ``room_constant``.
+    :param room_constant: Room constant of the source room ``R_1``, m2
+        (scalar or per band); from :func:`phonometry.room.room_constant`.
+    :param directivity: Directivity factor ``Q`` of the source in the source
+        room (``1`` in free space, ``2`` on one plane, ``4`` in an edge, ``8``
+        in a corner). Only affects the level through ``model``, because the
+        reverberant field itself is position-independent.
+    :param model: Sound power model of Norton Table 4.5:
+        ``"constant_power"`` (default, the radiated power does not depend on
+        the source position), ``"constant_volume"`` (the conservative upper
+        bound, the power rises by :math:`10 \log_{10} Q`) or
+        ``"constant_pressure"`` (the lower bound, it falls by
+        :math:`10 \log_{10} Q`).
+    """
+
+    level: ArrayLike | None = None
+    power_level: ArrayLike | None = None
+    room_constant: ArrayLike | None = None
+    directivity: float = 1.0
+    model: str = "constant_power"
+
+
+@dataclass(frozen=True)
+class DesignCriterion:
+    """The design criterion the receiving room is held to.
+
+    The verdict half of the chain: which room-criterion family the received
+    spectrum is rated against, the curve it has to stay under, and the
+    allowance a design sheet keeps for the transmission the calculation does
+    not model.
+
+    :param family: Room-criterion family, ``"NC"`` (default) or ``"RC"``.
+    :param target: The design criterion value (e.g. ``45`` for NC 45), or
+        ``None`` for no target, which leaves the verdicts undefined.
+    :param flanking_penalty: Decibels debited from the predicted noise
+        reduction for flanking transmission through mechanical connections and
+        air leaks (Norton's "a few dB"). Default ``0``.
+    """
+
+    family: str = "NC"
+    target: float | None = None
+    flanking_penalty: float = 0.0
+
+
+@dataclass(frozen=True)
 class RoomToRoomResult:
     r"""The room-to-room chain of one partition (Norton 2e, 4.9).
 
@@ -111,7 +171,7 @@ class RoomToRoomResult:
     :ivar flanking_penalty: The debit applied to the predicted noise reduction
         for flanking transmission and air leaks, dB.
     :ivar source_power_level: The source sound power level ``L_W`` the source
-        level was built from, dB re 1 pW, or ``None`` when ``source_level`` was
+        level was built from, dB re 1 pW, or ``None`` when ``source.level`` was
         given directly.
     :ivar criterion: ``"NC"`` or ``"RC"``, the room-criterion family.
     :ivar target: The design criterion value (e.g. ``45`` for NC 45), or
@@ -308,22 +368,16 @@ def room_to_room_transmission(
     partition_area: float,
     receiving_absorption: ArrayLike,
     *,
-    source_level: ArrayLike | None = None,
-    source_power_level: ArrayLike | None = None,
-    source_room_constant: ArrayLike | None = None,
-    source_directivity: float = 1.0,
-    source_model: str = "constant_power",
+    source: SourceRoom | None = None,
     include_partition_transmission: bool = False,
-    flanking_penalty: float = 0.0,
-    criterion: str = "NC",
-    target: float | None = None,
+    criterion: DesignCriterion | None = None,
     label: str = "Room to room",
 ) -> RoomToRoomResult:
     r"""Sound transmission from one room to another (Norton 2e Equation (4.101)).
 
     Computes the noise reduction the partition and the receiving room deliver
     together, and the reverberant spectrum in the receiving room. The
-    source-room level is either given directly as ``source_level`` or built
+    source-room level is either given directly as ``source.level`` or built
     from a sound power level and the source room's room constant, in which case
     the reverberant field alone is used (:func:`phonometry.room.steady_state_spl`
     at ``distance=None``), which is the level that drives the transmission
@@ -337,32 +391,18 @@ def room_to_room_transmission(
     :param receiving_absorption: Equivalent absorption area of the receiving
         room ``S_2 alpha_2`` per band, m2; e.g. from
         :func:`phonometry.room.equivalent_absorption_area`.
-    :param source_level: Reverberant sound pressure level in the source room
-        ``L_p1``, dB (scalar or per band). Mutually exclusive with
-        ``source_power_level``.
-    :param source_power_level: Sound power level of the source ``L_W``, dB re
-        1 pW (scalar or per band). Requires ``source_room_constant``.
-    :param source_room_constant: Room constant of the source room ``R_1``, m2
-        (scalar or per band); from :func:`phonometry.room.room_constant`.
-    :param source_directivity: Directivity factor ``Q`` of the source in the
-        source room (``1`` in free space, ``2`` on one plane, ``4`` in an edge,
-        ``8`` in a corner). Only affects the level through ``source_model``,
-        because the reverberant field itself is position-independent.
-    :param source_model: Sound power model of Norton Table 4.5:
-        ``"constant_power"`` (default, the radiated power does not depend on the
-        source position), ``"constant_volume"`` (the conservative upper bound,
-        the power rises by :math:`10 \log_{10} Q`) or ``"constant_pressure"`` (the
-        lower bound, it falls by :math:`10 \log_{10} Q`).
+    :param source: The source room (:class:`SourceRoom`): its level, or its
+        sound power level with the room constant, directivity and sound power
+        model that turn it into one. Exactly one of the two descriptions is
+        required, so the empty default is rejected.
     :param include_partition_transmission: When ``True`` the ``tau S_w`` term of
         Equation (4.101) is added to the receiving-room absorption, with
         :math:`\tau = 10^{-\mathrm{TL}/10}`. Default ``False``, the form hand
         calculations
         use.
-    :param flanking_penalty: Decibels debited from the predicted noise
-        reduction for flanking transmission through mechanical connections and
-        air leaks (Norton's "a few dB"). Default ``0``.
-    :param criterion: Room-criterion family, ``"NC"`` (default) or ``"RC"``.
-    :param target: The design criterion value (e.g. ``45``), or ``None``.
+    :param criterion: The design criterion (:class:`DesignCriterion`): the
+        family, the target curve and the flanking allowance. ``None`` is the
+        default criterion, an ``"NC"`` family with no target.
     :param label: A short human label of the chain.
     :return: A :class:`RoomToRoomResult`.
     :raises ValueError: If the spectra do not share one value per band, if
@@ -371,39 +411,42 @@ def room_to_room_transmission(
     """
     from ..room.steady_field import SOURCE_POWER_MODELS, steady_state_spl
 
+    source = SourceRoom() if source is None else source
+    criterion = DesignCriterion() if criterion is None else criterion
+
     f = np.atleast_1d(np.asarray(frequencies, dtype=np.float64))
     if f.ndim != 1 or f.size == 0:
         raise ValueError("'frequencies' must be a non-empty 1-D array.")
     n = f.size
 
-    if (source_level is None) == (source_power_level is None):
+    if (source.level is None) == (source.power_level is None):
         raise ValueError(
-            "give exactly one of 'source_level' (the source-room level L_p1) "
-            "or 'source_power_level' (the source sound power level L_W)."
+            "give exactly one of 'source.level' (the source-room level L_p1) "
+            "or 'source.power_level' (the source sound power level L_W)."
         )
-    require_choice(source_model, "source_model", tuple(SOURCE_POWER_MODELS))
+    require_choice(source.model, "source.model", tuple(SOURCE_POWER_MODELS))
     lw: NDArray[np.float64] | None = None
-    if source_power_level is not None:
-        if source_room_constant is None:
+    if source.power_level is not None:
+        if source.room_constant is None:
             raise ValueError(
-                "'source_room_constant' is required with 'source_power_level'; "
+                "'source.room_constant' is required with 'source.power_level'; "
                 "build it with phonometry.room.room_constant."
             )
-        lw = as_band_spectrum(source_power_level, n, "source_power_level")
+        lw = as_band_spectrum(source.power_level, n, "source.power_level")
         lp1 = np.asarray(
             steady_state_spl(
                 lw,
                 None,
-                as_band_spectrum(source_room_constant, n, "source_room_constant"),
-                directivity=source_directivity,
-                source_model=source_model,
+                as_band_spectrum(source.room_constant, n, "source.room_constant"),
+                directivity=source.directivity,
+                source_model=source.model,
             ),
             dtype=np.float64,
         )
-    elif source_level is None:  # pragma: no cover - guarded above
-        raise ValueError("'source_level' must be given.")
+    elif source.level is None:  # pragma: no cover - guarded above
+        raise ValueError("'source.level' must be given.")
     else:
-        lp1 = as_band_spectrum(source_level, n, "source_level")
+        lp1 = as_band_spectrum(source.level, n, "source.level")
 
     tl = as_band_spectrum(transmission_loss, n, "transmission_loss")
     s_w = require_positive(partition_area, "partition_area")
@@ -413,8 +456,10 @@ def room_to_room_transmission(
             "'receiving_absorption' must be positive: a receiving room with no "
             "absorption has no finite reverberant level."
         )
-    penalty = require_non_negative(flanking_penalty, "flanking_penalty")
-    family, goal = validate_target(criterion, target)
+    penalty = require_non_negative(
+        criterion.flanking_penalty, "criterion.flanking_penalty"
+    )
+    family, goal = validate_target(criterion.family, criterion.target)
 
     total_absorption = absorption
     if include_partition_transmission:

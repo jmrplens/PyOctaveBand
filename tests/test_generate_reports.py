@@ -32,7 +32,8 @@ _SCRIPT = (
 
 def _load_generator():
     spec = importlib.util.spec_from_file_location("_generate_reports", _SCRIPT)
-    assert spec is not None and spec.loader is not None
+    assert spec is not None
+    assert spec.loader is not None
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
     return module
@@ -93,13 +94,15 @@ def test_each_example_writes_a_one_page_pdf_and_preview(
     # The factory writes the file it is registered under. This is what lets
     # test_every_registered_fiche_is_committed trust the registry keys.
     assert _MODULE._FICHES.get(p.name) is factory
-    assert p.is_file() and p.stat().st_size > 0
+    assert p.is_file()
+    assert p.stat().st_size > 0
     with open(p, "rb") as handle:
         assert handle.read(4) == b"%PDF"
     assert len(PdfReader(str(p)).pages) == 1
     preview = pathlib.Path(_MODULE.preview_path_for(str(p)))
     assert preview.suffix == ".webp"
-    assert preview.is_file() and preview.stat().st_size > 0
+    assert preview.is_file()
+    assert preview.stat().st_size > 0
     with Image.open(preview) as image:
         assert image.format == "WEBP"
         assert image.width == _MODULE._PREVIEW_WIDTH_PX

@@ -308,10 +308,12 @@ def test_comb_filter_response_validation() -> None:
 def test_comb_filter_response_rejects_overflowing_order() -> None:
     # Finite f and T whose product overflows would give sin(inf) = NaN
     # instead of the documented bounded response.
+    huge_frequency = np.array([1e308])
+    large_frequency = np.array([1e307])
     with pytest.raises(ValueError, match="overflows"):
-        comb_filter_response(np.array([1e308]), 1e308, 3)
+        comb_filter_response(huge_frequency, 1e308, 3)
     with pytest.raises(ValueError, match="overflows"):
-        comb_filter_response(np.array([1e307]), 100.0, 2**40)
+        comb_filter_response(large_frequency, 100.0, 2**40)
 
 
 def test_plot_returns_axes() -> None:

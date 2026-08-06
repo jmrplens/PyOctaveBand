@@ -297,7 +297,7 @@ def _band_envelopes(
     z_comp = _hz_to_bark(freqs)
 
     # Only components above a floor contribute.
-    active = np.where(mag > mag.max() * 1e-4)[0] if mag.size else np.array([], int)
+    active = np.nonzero(mag > mag.max() * 1e-4)[0] if mag.size else np.array([], int)
     f_act = freqs[active]
     lvl_act = lvl[active]
     z_act = z_comp[active]

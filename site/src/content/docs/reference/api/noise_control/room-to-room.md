@@ -65,6 +65,31 @@ partition is specified from.
 
 > Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
 
+## DesignCriterion
+
+```python
+DesignCriterion(
+    family: str = 'NC',
+    target: float | None = None,
+    flanking_penalty: float = 0.0,
+)
+```
+
+The design criterion the receiving room is held to.
+
+The verdict half of the chain: which room-criterion family the received
+spectrum is rated against, the curve it has to stay under, and the
+allowance a design sheet keeps for the transmission the calculation does
+not model.
+
+**Parameters**
+
+| Name | Description |
+| :--- | :--- |
+| `family` | Room-criterion family, `"NC"` (default) or `"RC"`. |
+| `target` | The design criterion value (e.g. `45` for NC 45), or `None` for no target, which leaves the verdicts undefined. |
+| `flanking_penalty` | Decibels debited from the predicted noise reduction for flanking transmission through mechanical connections and air leaks (Norton's "a few dB"). Default `0`. |
+
 ## room_to_room_transmission
 
 ```python
@@ -74,15 +99,9 @@ room_to_room_transmission(
     partition_area: float,
     receiving_absorption: ArrayLike,
     *,
-    source_level: ArrayLike | None = None,
-    source_power_level: ArrayLike | None = None,
-    source_room_constant: ArrayLike | None = None,
-    source_directivity: float = 1.0,
-    source_model: str = 'constant_power',
+    source: SourceRoom | None = None,
     include_partition_transmission: bool = False,
-    flanking_penalty: float = 0.0,
-    criterion: str = 'NC',
-    target: float | None = None,
+    criterion: DesignCriterion | None = None,
     label: str = 'Room to room',
 ) -> RoomToRoomResult
 ```
@@ -91,7 +110,7 @@ Sound transmission from one room to another (Norton 2e Equation (4.101)).
 
 Computes the noise reduction the partition and the receiving room deliver
 together, and the reverberant spectrum in the receiving room. The
-source-room level is either given directly as `source_level` or built
+source-room level is either given directly as `source.level` or built
 from a sound power level and the source room's room constant, in which case
 the reverberant field alone is used ([`phonometry.room.steady_state_spl`](/phonometry/reference/api/rooms/steady-field/#steady_state_spl)
 at `distance=None`), which is the level that drives the transmission
@@ -105,15 +124,9 @@ across the partition.
 | `transmission_loss` | Transmission loss of the partition `TL`, dB; a scalar or one value per band. Measured, tabulated, or predicted by [`phonometry.building.prediction.panel_transmission`](/phonometry/reference/api/building/panel-transmission/). |
 | `partition_area` | Area of the partition between the rooms `S_w`, m2. |
 | `receiving_absorption` | Equivalent absorption area of the receiving room `S_2 alpha_2` per band, m2; e.g. from [`phonometry.room.equivalent_absorption_area`](/phonometry/reference/api/rooms/enclosed-space-absorption/#equivalent_absorption_area). |
-| `source_level` | Reverberant sound pressure level in the source room `L_p1`, dB (scalar or per band). Mutually exclusive with `source_power_level`. |
-| `source_power_level` | Sound power level of the source `L_W`, dB re 1 pW (scalar or per band). Requires `source_room_constant`. |
-| `source_room_constant` | Room constant of the source room `R_1`, m2 (scalar or per band); from [`phonometry.room.room_constant`](/phonometry/reference/api/rooms/steady-field/#room_constant). |
-| `source_directivity` | Directivity factor `Q` of the source in the source room (`1` in free space, `2` on one plane, `4` in an edge, `8` in a corner). Only affects the level through `source_model`, because the reverberant field itself is position-independent. |
-| `source_model` | Sound power model of Norton Table 4.5: `"constant_power"` (default, the radiated power does not depend on the source position), `"constant_volume"` (the conservative upper bound, the power rises by $10 \log_{10} Q$) or `"constant_pressure"` (the lower bound, it falls by $10 \log_{10} Q$). |
+| `source` | The source room ([`SourceRoom`](/phonometry/reference/api/noise_control/room-to-room/#sourceroom)): its level, or its sound power level with the room constant, directivity and sound power model that turn it into one. Exactly one of the two descriptions is required, so the empty default is rejected. |
 | `include_partition_transmission` | When `True` the `tau S_w` term of Equation (4.101) is added to the receiving-room absorption, with $\tau = 10^{-\mathrm{TL}/10}$. Default `False`, the form hand calculations use. |
-| `flanking_penalty` | Decibels debited from the predicted noise reduction for flanking transmission through mechanical connections and air leaks (Norton's "a few dB"). Default `0`. |
-| `criterion` | Room-criterion family, `"NC"` (default) or `"RC"`. |
-| `target` | The design criterion value (e.g. `45`), or `None`. |
+| `criterion` | The design criterion ([`DesignCriterion`](/phonometry/reference/api/noise_control/room-to-room/#designcriterion)): the family, the target curve and the flanking allowance. `None` is the default criterion, an `"NC"` family with no target. |
 | `label` | A short human label of the chain. |
 
 **Returns:** A [`RoomToRoomResult`](/phonometry/reference/api/noise_control/room-to-room/#roomtoroomresult).
@@ -162,7 +175,7 @@ the receiving room deliver together, and what arrives.
 | `noise_reduction` | The delivered noise reduction `NR` per band, dB: Equation (4.101) less `flanking_penalty`. |
 | `received_level` | Reverberant sound pressure level in the receiving room $L_{p2} = L_{p1} - \mathrm{NR}$, dB. |
 | `flanking_penalty` | The debit applied to the predicted noise reduction for flanking transmission and air leaks, dB. |
-| `source_power_level` | The source sound power level `L_W` the source level was built from, dB re 1 pW, or `None` when `source_level` was given directly. |
+| `source_power_level` | The source sound power level `L_W` the source level was built from, dB re 1 pW, or `None` when `source.level` was given directly. |
 | `criterion` | `"NC"` or `"RC"`, the room-criterion family. |
 | `target` | The design criterion value (e.g. `45` for NC 45), or `None`. |
 | `label` | A short human label of the chain. |
@@ -263,3 +276,35 @@ Each entry has `label`, `kind` (one of `"source_power"`,
 a hand calculation writes down, in that order.
 
 **Returns:** The list of row dictionaries, in printing order.
+
+## SourceRoom
+
+```python
+SourceRoom(
+    level: ArrayLike | None = None,
+    power_level: ArrayLike | None = None,
+    room_constant: ArrayLike | None = None,
+    directivity: float = 1.0,
+    model: str = 'constant_power',
+)
+```
+
+The source room of the chain: what drives the partition.
+
+Two ways to say the same thing, and exactly one of them is given. Either
+the reverberant level in the source room is known (`level`), or the
+machine's sound power level is (`power_level`), in which case the room
+constant of the source room is needed to build the reverberant field
+$L_{p1} = L_W + 10 \log_{10}(4 / R_1)$ (Norton 2e, 4.7), and the
+sound power model of Table 4.5 decides whether the position of the source
+in the room raises or lowers the power it radiates.
+
+**Parameters**
+
+| Name | Description |
+| :--- | :--- |
+| `level` | Reverberant sound pressure level in the source room `L_p1`, dB (scalar or per band). Mutually exclusive with `power_level`. |
+| `power_level` | Sound power level of the source `L_W`, dB re 1 pW (scalar or per band). Requires `room_constant`. |
+| `room_constant` | Room constant of the source room `R_1`, m2 (scalar or per band); from [`phonometry.room.room_constant`](/phonometry/reference/api/rooms/steady-field/#room_constant). |
+| `directivity` | Directivity factor `Q` of the source in the source room (`1` in free space, `2` on one plane, `4` in an edge, `8` in a corner). Only affects the level through `model`, because the reverberant field itself is position-independent. |
+| `model` | Sound power model of Norton Table 4.5: `"constant_power"` (default, the radiated power does not depend on the source position), `"constant_volume"` (the conservative upper bound, the power rises by $10 \log_{10} Q$) or `"constant_pressure"` (the lower bound, it falls by $10 \log_{10} Q$). |

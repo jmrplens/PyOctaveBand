@@ -60,11 +60,15 @@ def test_reference_conversion_round_trip() -> None:
 
 
 def test_rejects_invalid_signal() -> None:
+    two_dimensional = np.zeros((2, 2))
+    with_nan = np.array([np.nan, 1.0])
+    valid_tone = _tone(500.0, 0.1, 1.0)
+    silence = np.zeros(100)
     with pytest.raises(ValueError):
-        sound_pressure_level(np.zeros((2, 2)))
+        sound_pressure_level(two_dimensional)
     with pytest.raises(ValueError):
-        sound_pressure_level(np.array([np.nan, 1.0]))
+        sound_pressure_level(with_nan)
     with pytest.raises(ValueError):
-        sound_exposure_level(_tone(500.0, 0.1, 1.0), 0.0)
+        sound_exposure_level(valid_tone, 0.0)
     with pytest.raises(ValueError):
-        sound_pressure_level(np.zeros(100))  # no energy
+        sound_pressure_level(silence)  # no energy

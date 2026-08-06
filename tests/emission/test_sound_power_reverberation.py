@@ -258,10 +258,11 @@ def test_background_shape_mismatch_raises() -> None:
     freqs = np.array([1000.0])
     t60 = np.array([1.5])
     levels = np.full((6, 1), 80.0)
+    mismatched_background = np.full((3, 1), 60.0)  # 3 rows against 6 positions
     with pytest.raises(ValueError, match="background_levels"):
         sound_power_reverberation(
             levels, t60, 200.0, 210.0, freqs,
-            background_levels=np.full((3, 1), 60.0),
+            background_levels=mismatched_background,
         )
 
 
@@ -312,18 +313,16 @@ def test_a_weighted_total_from_bands() -> None:
 # Validation
 # --------------------------------------------------------------------------
 def test_invalid_volume_raises() -> None:
+    lp, t60, freqs = np.array([80.0]), np.array([1.5]), np.array([1000.0])
     with pytest.raises(ValueError):
-        sound_power_reverberation(
-            np.array([80.0]), np.array([1.5]), -1.0, 210.0, np.array([1000.0])
-        )
+        sound_power_reverberation(lp, t60, -1.0, 210.0, freqs)
 
 
 def test_mismatched_shapes_raise() -> None:
+    two_bands = np.array([80.0, 81.0])  # 2 levels against 1 band of T60/freq
+    t60, freqs = np.array([1.5]), np.array([1000.0])
     with pytest.raises(ValueError):
-        sound_power_reverberation(
-            np.array([80.0, 81.0]), np.array([1.5]), 200.0, 210.0,
-            np.array([1000.0]),
-        )
+        sound_power_reverberation(two_bands, t60, 200.0, 210.0, freqs)
 
 
 # --------------------------------------------------------------------------
@@ -331,36 +330,36 @@ def test_mismatched_shapes_raise() -> None:
 # --------------------------------------------------------------------------
 @pytest.mark.parametrize("theta", [-273.0, -300.0, np.inf, np.nan])
 def test_direct_method_invalid_temperature_raises(theta: float) -> None:
+    lp, t60, freqs = np.array([80.0]), np.array([1.5]), np.array([1000.0])
     with pytest.raises(ValueError, match="temperature"):
         sound_power_reverberation(
-            np.array([80.0]), np.array([1.5]), 200.0, 210.0, np.array([1000.0]),
-            temperature=theta,
+            lp, t60, 200.0, 210.0, freqs, temperature=theta,
         )
 
 
 @pytest.mark.parametrize("ps", [0.0, -1.0, np.inf, np.nan])
 def test_direct_method_invalid_pressure_raises(ps: float) -> None:
+    lp, t60, freqs = np.array([80.0]), np.array([1.5]), np.array([1000.0])
     with pytest.raises(ValueError, match="static_pressure"):
         sound_power_reverberation(
-            np.array([80.0]), np.array([1.5]), 200.0, 210.0, np.array([1000.0]),
-            static_pressure=ps,
+            lp, t60, 200.0, 210.0, freqs, static_pressure=ps,
         )
 
 
 def test_comparison_method_invalid_temperature_raises() -> None:
+    levels, levels_ref, lw_ref = (
+        np.array([80.0]), np.array([70.0]), np.array([90.0])
+    )
     with pytest.raises(ValueError, match="temperature"):
-        sound_power_comparison(
-            np.array([80.0]), np.array([70.0]), np.array([90.0]),
-            temperature=-300.0,
-        )
+        sound_power_comparison(levels, levels_ref, lw_ref, temperature=-300.0)
 
 
 def test_comparison_method_invalid_pressure_raises() -> None:
+    levels, levels_ref, lw_ref = (
+        np.array([80.0]), np.array([70.0]), np.array([90.0])
+    )
     with pytest.raises(ValueError, match="static_pressure"):
-        sound_power_comparison(
-            np.array([80.0]), np.array([70.0]), np.array([90.0]),
-            static_pressure=0.0,
-        )
+        sound_power_comparison(levels, levels_ref, lw_ref, static_pressure=0.0)
 
 
 # --------------------------------------------------------------------------
@@ -427,10 +426,11 @@ def test_comparison_wrong_frequency_length_raises_clean_error() -> None:
     levels_ref = np.array([70.0, 71.0, 72.0])
     lw_ref = np.array([90.0, 91.0, 92.0])
     background = np.array([50.0, 51.0, 52.0])
+    short_freqs = np.array([1000.0, 2000.0])  # wrong length (2 != 3)
     with pytest.raises(ValueError, match="length must match"):
         sound_power_comparison(
             levels, levels_ref, lw_ref,
-            frequencies=np.array([1000.0, 2000.0]),  # wrong length (2 != 3)
+            frequencies=short_freqs,
             background_levels=background,
         )
 

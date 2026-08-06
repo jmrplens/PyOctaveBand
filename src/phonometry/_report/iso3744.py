@@ -63,6 +63,13 @@ if TYPE_CHECKING:
     from ..emission.sound_power import SoundPowerResult
     from ..emission.sound_power_anechoic import PrecisionSoundPowerResult
 
+#: Band-frequency column heading of the per-band table (translated by ``t``).
+_COL_FREQUENCY = "f [Hz]"
+#: Surface sound-pressure level column heading (mini-HTML for reportlab).
+_COL_LP = "L<sub>p</sub> [dB]"
+#: Band sound-power level column heading (mini-HTML for reportlab).
+_COL_LW = "L<sub>W</sub> [dB]"
+
 
 def _is_precision(result: Any) -> bool:
     """Return ``True`` for an ISO 3745 precision result, ``False`` for ISO 3744.
@@ -129,12 +136,12 @@ def _value_table(result: Any, verbose: bool, language: str = "en") -> Any:
         k1 = np.asarray(result.background_correction, dtype=np.float64)
         k2 = np.asarray(result.environmental_correction, dtype=np.float64)
         header = [
-            t("f [Hz]", language),
+            t(_COL_FREQUENCY, language),
             "L'<sub>p</sub> [dB]",
             "K<sub>1</sub> [dB]",
             "K<sub>2</sub> [dB]",
-            "L<sub>p</sub> [dB]",
-            "L<sub>W</sub> [dB]",
+            _COL_LP,
+            _COL_LW,
         ]
         widths = [30.0, 29.0, 29.0, 29.0, 29.0, 28.0]
         rows_data = [
@@ -144,10 +151,10 @@ def _value_table(result: Any, verbose: bool, language: str = "en") -> Any:
         ]
     elif verbose and precision:
         header = [
-            t("f [Hz]", language),
+            t(_COL_FREQUENCY, language),
             "L'<sub>p</sub> [dB]",
-            "L<sub>p</sub> [dB]",
-            "L<sub>W</sub> [dB]",
+            _COL_LP,
+            _COL_LW,
         ]
         widths = [45.0, 43.0, 43.0, 43.0]
         rows_data = [
@@ -157,9 +164,9 @@ def _value_table(result: Any, verbose: bool, language: str = "en") -> Any:
         ]
     else:
         header = [
-            t("f [Hz]", language),
-            "L<sub>p</sub> [dB]",
-            "L<sub>W</sub> [dB]",
+            t(_COL_FREQUENCY, language),
+            _COL_LP,
+            _COL_LW,
         ]
         widths = [58.0, 58.0, 58.0]
         rows_data = [

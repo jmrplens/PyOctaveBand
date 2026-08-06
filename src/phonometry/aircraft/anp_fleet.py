@@ -42,6 +42,8 @@ from typing import TYPE_CHECKING, Any
 import numpy as np
 
 from .airport_noise import (
+    AerodromeAtmosphere,
+    FlightSegmentState,
     FlyoverResult,
     NoiseContourResult,
     event_level,
@@ -438,8 +440,10 @@ class AnpDatabase:
             aircraft_id, operation, stage_length)
         return event_level(
             prof.path, observer, p, d, sel, lmax, mounting=acft.mounting,
-            metric=metric, temperature=temperature, pressure=pressure,
-            ground_roll=prof.ground_roll, landing_roll=prof.landing_roll)
+            metric=metric,
+            atmosphere=AerodromeAtmosphere(temperature, pressure),
+            segments=FlightSegmentState(ground_roll=prof.ground_roll,
+                                        landing_roll=prof.landing_roll))
 
     def noise_contour(
         self, aircraft_id: str, operation: str, *,
@@ -466,8 +470,10 @@ class AnpDatabase:
             aircraft_id, operation, stage_length)
         return noise_contour(
             prof.path, p, d, sel, lmax, x=x, y=y, mounting=acft.mounting,
-            metric=metric, temperature=temperature, pressure=pressure,
-            ground_roll=prof.ground_roll, landing_roll=prof.landing_roll)
+            metric=metric,
+            atmosphere=AerodromeAtmosphere(temperature, pressure),
+            segments=FlightSegmentState(ground_roll=prof.ground_roll,
+                                        landing_roll=prof.landing_roll))
 
 
 def _read_tables(path: Path | str | None) -> dict[str, str]:

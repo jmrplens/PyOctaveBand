@@ -23,7 +23,7 @@ import numpy as np
 import reference_data as ref
 from scipy import signal as sg
 
-from phonometry import OctaveFilterBank, WeightingFilter
+from phonometry import FilterDesign, OctaveFilterBank, WeightingFilter
 from phonometry.filters.compliance import class_limits, verify_filter_class
 
 _FILTER_ARCHS = ["butter", "cheby1", "cheby2", "ellip", "bessel"]
@@ -80,7 +80,8 @@ def _filter_class(arch: str, fraction: float) -> FilterClass:
     smoke-test guard asserts the re-derived margin equals the library's).
     """
     bank = OctaveFilterBank(
-        48000, fraction=fraction, order=6, limits=[100, 10000], filter_type=arch
+        48000, fraction=fraction, order=6, limits=[100, 10000],
+        design=FilterDesign(filter_type=arch),
     )
     result = verify_filter_class(bank)
     bands = result["bands"]

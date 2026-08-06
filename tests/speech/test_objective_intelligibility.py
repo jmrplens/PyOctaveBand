@@ -89,7 +89,8 @@ def test_result_fields_and_plot() -> None:
     assert res.extended is False
     assert res.sample_rate == FS
     assert res.band_frequencies.shape == (15,)
-    assert res.band_scores is not None and res.band_scores.shape == (15,)
+    assert res.band_scores is not None
+    assert res.band_scores.shape == (15,)
     assert res.band_frequencies[0] == pytest.approx(150.0)
     res.plot()  # STOI: per-band bars
     ext = stoi(x, y, FS, extended=True)

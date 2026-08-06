@@ -7,6 +7,7 @@ import numpy as np
 import pytest
 
 from phonometry import (
+    LevelCalibration,
     WeightingFilter,
     linkwitz_riley,
     octave_filter,
@@ -42,7 +43,8 @@ def test_calibration_logic() -> None:
     factor = sensitivity(ref_signal, target_spl=94.0)
     
     # Analyze same signal with that factor
-    spl, _ = octave_filter(ref_signal, fs, fraction=1, limits=[800, 1200], calibration_factor=factor)
+    spl, _ = octave_filter(ref_signal, fs, fraction=1, limits=[800, 1200],
+                           calibration=LevelCalibration(factor=factor))
     
     # It should be exactly 94 dB
     assert abs(spl[0] - 94.0) < 0.01
@@ -66,7 +68,8 @@ def test_dbfs_logic() -> None:
     t = np.linspace(0, 1, fs)
     x = np.sin(2 * np.pi * 1000 * t)
     
-    spl, _ = octave_filter(x, fs, fraction=1, limits=[800, 1200], dbfs=True)
+    spl, _ = octave_filter(x, fs, fraction=1, limits=[800, 1200],
+                           calibration=LevelCalibration(dbfs=True))
     
     assert abs(spl[0] - (-3.01)) < 0.05
 
@@ -306,21 +309,25 @@ def test_time_weighting_initial_state_invalid() -> None:
     with pytest.raises(ValueError, match="initial_state"):
         time_weighting(x, fs, mode="fast", initial_state="invalid")
 
+    two_channels = np.ones((2, 10))
+    mismatched_state = np.ones(3)
     with pytest.raises(ValueError, match="broadcastable"):
-        time_weighting(np.ones((2, 10)), fs, mode="fast", initial_state=np.ones(3))
+        time_weighting(two_channels, fs, mode="fast", initial_state=mismatched_state)
 
 
 def test_time_weighting_initial_state_first_rejects_empty_input() -> None:
     """Verify initial_state='first' requires at least one sample."""
+    empty = np.array([])
     with pytest.raises(ValueError, match="initial_state"):
-        time_weighting(np.array([]), 1000, mode="fast", initial_state="first")
+        time_weighting(empty, 1000, mode="fast", initial_state="first")
 
 
 @pytest.mark.parametrize("mode", ["fast", "slow", "impulse"])
 def test_time_weighting_rejects_non_positive_sample_rate(mode: str) -> None:
     """Verify time weighting rejects non-positive sample rates before coefficient math."""
+    x = np.ones(10)
     with pytest.raises(ValueError, match="Sample rate 'fs' must be positive"):
-        time_weighting(np.ones(10), 0, mode=mode)
+        time_weighting(x, 0, mode=mode)
 
 
 def test_time_weighting_impulse_multichannel() -> None:

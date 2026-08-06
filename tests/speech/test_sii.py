@@ -295,12 +295,13 @@ def test_custom_speech_spectrum_accepted() -> None:
 
 
 def test_invalid_inputs_raise() -> None:
+    short_threshold = np.zeros(5)
     with pytest.raises(ValueError, match="18"):
         sii.speech_intelligibility_index([1.0, 2.0, 3.0])
     with pytest.raises(ValueError, match="18"):
         sii.speech_intelligibility_index("normal", noise_spectrum=[1.0, 2.0])
     with pytest.raises(ValueError, match="18"):
-        sii.speech_intelligibility_index("normal", threshold=np.zeros(5))
+        sii.speech_intelligibility_index("normal", threshold=short_threshold)
     with pytest.raises(ValueError, match="vocal_effort"):
         sii.standard_speech_spectrum("whisper")
 
@@ -375,7 +376,8 @@ def test_standard_speech_spectra_plot_returns_axes() -> None:
     # One labelled line per vocal effort; nominal band labels on the x axis.
     assert len(ax_en.lines) == len(res.vocal_efforts)
     labels = [t.get_text() for t in ax_en.get_xticklabels()]
-    assert labels[0] == "160" and labels[-1] == "8k"
+    assert labels[0] == "160"
+    assert labels[-1] == "8k"
     plt.close("all")
 
     ax_es = res.plot(language="es")
@@ -709,15 +711,20 @@ def test_speech_intelligibility_index_rejects_unknown_method() -> None:
 def test_speech_intelligibility_index_checks_band_count_per_method() -> None:
     # An 18-band vector is the wrong length for the 6-band octave procedure,
     # and the message names the procedure and its frequency span.
+    eighteen_bands = np.full(18, 50.0)
+    twentyone_bands = np.full(21, 50.0)
+    eighteen_band_noise = np.full(18, 30.0)
+    six_bands = np.full(6, 50.0)
+    short_importance = np.full(5, 0.2)
     with pytest.raises(ValueError, match="6 octave band values"):
-        sii.speech_intelligibility_index(np.full(18, 50.0), method="octave")
+        sii.speech_intelligibility_index(eighteen_bands, method="octave")
     with pytest.raises(ValueError, match="21 critical-band band values"):
         sii.speech_intelligibility_index(
-            np.full(21, 50.0), np.full(18, 30.0), method="critical-band"
+            twentyone_bands, eighteen_band_noise, method="critical-band"
         )
     with pytest.raises(ValueError, match="band_importance"):
         sii.speech_intelligibility_index(
-            np.full(6, 50.0), method="octave", band_importance=np.full(5, 0.2)
+            six_bands, method="octave", band_importance=short_importance
         )
 
 
@@ -766,8 +773,9 @@ def test_sii_procedure_plot_returns_axes() -> None:
     assert ax_es.get_ylabel() == "Importancia de banda $I_i$"
     assert [line.get_label() for line in ax_es.lines] == ["Banda crítica (21)"]
     plt.close("all")
+    octave = sii.sii_procedure("octave")
     with pytest.raises(ValueError, match="Unknown language"):
-        sii.sii_procedure("octave").plot(language="xx")
+        octave.plot(language="xx")
     plt.close("all")
 
 

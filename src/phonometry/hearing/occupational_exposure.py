@@ -94,21 +94,21 @@ class OccupationalExposureWarning(PhonometryWarning):
 _C4_U1_AXIS: tuple[float, ...] = (0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0, 4.5, 5.0, 5.5, 6.0)
 _C4_N_AXIS: tuple[int, ...] = (3, 4, 5, 6, 7, 8, 9, 10, 12, 14, 16, 18, 20, 25, 30)
 _C4_TABLE: tuple[tuple[float, ...], ...] = (
-    (0.6, 1.6, 3.1, 5.2, 8.0, 11.5, 15.7, 20.6, 26.1, 32.2, 39.0, 46.5),  # N=3
-    (0.4, 0.9, 1.6, 2.5, 3.6, 5.0, 6.7, 8.6, 10.9, 13.4, 16.1, 19.2),  # N=4
-    (0.3, 0.7, 1.2, 1.7, 2.4, 3.3, 4.4, 5.6, 6.9, 8.5, 10.2, 12.1),  # N=5
-    (0.3, 0.6, 0.9, 1.4, 1.9, 2.6, 3.3, 4.2, 5.2, 6.3, 7.6, 8.9),  # N=6
-    (0.2, 0.5, 0.8, 1.2, 1.6, 2.2, 2.8, 3.5, 4.3, 5.1, 6.1, 7.2),  # N=7
-    (0.2, 0.5, 0.7, 1.1, 1.4, 1.9, 2.4, 3.0, 3.6, 4.4, 5.2, 6.1),  # N=8
-    (0.2, 0.4, 0.7, 1.0, 1.3, 1.7, 2.1, 2.6, 3.2, 3.9, 4.6, 5.4),  # N=9
-    (0.2, 0.4, 0.6, 0.9, 1.2, 1.5, 1.9, 2.4, 2.9, 3.5, 4.1, 4.8),  # N=10
-    (0.2, 0.3, 0.5, 0.8, 1.0, 1.3, 1.7, 2.0, 2.5, 2.9, 3.5, 4.0),  # N=12
-    (0.1, 0.3, 0.5, 0.7, 0.9, 1.2, 1.5, 1.8, 2.2, 2.6, 3.0, 3.5),  # N=14
-    (0.1, 0.3, 0.5, 0.6, 0.8, 1.1, 1.3, 1.6, 2.0, 2.3, 2.7, 3.2),  # N=16
-    (0.1, 0.3, 0.4, 0.6, 0.8, 1.0, 1.2, 1.5, 1.8, 2.1, 2.5, 2.9),  # N=18
-    (0.1, 0.3, 0.4, 0.5, 0.7, 0.9, 1.1, 1.4, 1.7, 2.0, 2.3, 2.6),  # N=20
-    (0.1, 0.2, 0.3, 0.5, 0.6, 0.8, 1.0, 1.2, 1.4, 1.7, 2.0, 2.3),  # N=25
-    (0.1, 0.2, 0.3, 0.4, 0.6, 0.7, 0.9, 1.1, 1.3, 1.5, 1.7, 2.0),  # N=30
+    (0.6, 1.6, 3.1, 5.2, 8.0, 11.5, 15.7, 20.6, 26.1, 32.2, 39.0, 46.5),  # row of 3 samples
+    (0.4, 0.9, 1.6, 2.5, 3.6, 5.0, 6.7, 8.6, 10.9, 13.4, 16.1, 19.2),  # row of 4 samples
+    (0.3, 0.7, 1.2, 1.7, 2.4, 3.3, 4.4, 5.6, 6.9, 8.5, 10.2, 12.1),  # row of 5 samples
+    (0.3, 0.6, 0.9, 1.4, 1.9, 2.6, 3.3, 4.2, 5.2, 6.3, 7.6, 8.9),  # row of 6 samples
+    (0.2, 0.5, 0.8, 1.2, 1.6, 2.2, 2.8, 3.5, 4.3, 5.1, 6.1, 7.2),  # row of 7 samples
+    (0.2, 0.5, 0.7, 1.1, 1.4, 1.9, 2.4, 3.0, 3.6, 4.4, 5.2, 6.1),  # row of 8 samples
+    (0.2, 0.4, 0.7, 1.0, 1.3, 1.7, 2.1, 2.6, 3.2, 3.9, 4.6, 5.4),  # row of 9 samples
+    (0.2, 0.4, 0.6, 0.9, 1.2, 1.5, 1.9, 2.4, 2.9, 3.5, 4.1, 4.8),  # row of 10 samples
+    (0.2, 0.3, 0.5, 0.8, 1.0, 1.3, 1.7, 2.0, 2.5, 2.9, 3.5, 4.0),  # row of 12 samples
+    (0.1, 0.3, 0.5, 0.7, 0.9, 1.2, 1.5, 1.8, 2.2, 2.6, 3.0, 3.5),  # row of 14 samples
+    (0.1, 0.3, 0.5, 0.6, 0.8, 1.1, 1.3, 1.6, 2.0, 2.3, 2.7, 3.2),  # row of 16 samples
+    (0.1, 0.3, 0.4, 0.6, 0.8, 1.0, 1.2, 1.5, 1.8, 2.1, 2.5, 2.9),  # row of 18 samples
+    (0.1, 0.3, 0.4, 0.5, 0.7, 0.9, 1.1, 1.4, 1.7, 2.0, 2.3, 2.6),  # row of 20 samples
+    (0.1, 0.2, 0.3, 0.5, 0.6, 0.8, 1.0, 1.2, 1.4, 1.7, 2.0, 2.3),  # row of 25 samples
+    (0.1, 0.2, 0.3, 0.4, 0.6, 0.7, 0.9, 1.1, 1.3, 1.5, 1.7, 2.0),  # row of 30 samples
 )
 
 #: c1*u1 above this value (bold cells of Table C.4) → revise the measurement plan (10.4).
@@ -368,6 +368,100 @@ class ExposureResult:
 # --------------------------------------------------------------------------- #
 # Strategy 1: task-based (Clauses 9 and C.2).
 # --------------------------------------------------------------------------- #
+@dataclass(frozen=True)
+class _BudgetOptions:
+    """Call-level switches of the task-based budget, shared by every task."""
+
+    instrument: InstrumentClass
+    u3: float
+    include_duration_uncertainty: bool
+    warn: bool
+
+
+def _validated_task_levels(tasks: Sequence[Task]) -> tuple[list[float], list[float]]:
+    """Per-task energy-average levels (Eq 7) and mean durations ``T_m``, validated."""
+    levels: list[float] = []
+    durations: list[float] = []
+    for task in tasks:
+        if len(task.samples) == 0:
+            raise ValueError("Each task needs at least one sample.")
+        if task.duration_hours <= 0:
+            raise ValueError("Task 'duration_hours' must be positive.")
+        levels.append(energy_mean(task.samples))  # Eq 7
+        durations.append(task.duration_hours)
+    return levels, durations
+
+
+def _duration_uncertainty(task: Task) -> float:
+    """Task duration standard uncertainty ``u1b`` (Eq C.7), hours.
+
+    Independent duration observations take precedence over a declared
+    ``(T_min, T_max)`` range; without either, the duration is taken as exact.
+    """
+    if task.duration_samples is not None:
+        j = np.asarray(task.duration_samples, dtype=float)
+        if j.size < 2:
+            return 0.0
+        # Eq C.7 divides by J(J-1), like Eq C.6: standard error of the mean.
+        return float(np.std(j, ddof=1) / sqrt(j.size))
+    if task.duration_range is not None:
+        t_min, t_max = task.duration_range
+        if t_max < t_min:
+            raise ValueError("duration_range must be (T_min, T_max) with T_max >= T_min.")
+        return 0.5 * (t_max - t_min)
+    return 0.0
+
+
+def _task_contribution(
+    task: Task,
+    index: int,
+    lp: float,
+    t_m: float,
+    lex_8h: float,
+    options: _BudgetOptions,
+) -> TaskContribution:
+    """One task's Eq C.3 terms (Eq C.4 to C.7) and its Clause 9.3 spread advisory."""
+    samples = np.asarray(task.samples, dtype=float)
+    n = int(samples.size)
+    sample_range = float(samples.max() - samples.min()) if n >= 2 else 0.0
+    spread = n >= 2 and sample_range >= 3.0
+
+    u1a = _task_sampling_uncertainty(task.samples)
+    # c1a (Eq C.4): (T_m/T0) * 10^(0.1 (Lp - LEX,8h)); L* ~ Lp since Q2,Q3 ~ 0.
+    c1a = (t_m / _T0) * 10.0 ** (0.1 * (lp - lex_8h))
+    # c1b (Eq C.5): 4.34 * c1a / T_m.
+    c1b = _C5_FACTOR * c1a / t_m if options.include_duration_uncertainty else 0.0
+    u1b = _duration_uncertainty(task) if options.include_duration_uncertainty else 0.0
+
+    instrument = task.instrument if task.instrument is not None else options.instrument
+    u2 = INSTRUMENT_U2[instrument]
+
+    label = task.label if task.label is not None else f"task {index + 1}"
+    if spread and options.warn:
+        warnings.warn(
+            f"Task '{label}': the {n} measurements span {sample_range:.1f} dB "
+            "(>= 3 dB); ISO 9612 Clause 9.3 recommends additional measurements, "
+            "subdivision, or longer measurement durations.",
+            OccupationalExposureWarning,
+            stacklevel=3,
+        )
+    return TaskContribution(
+        label=label,
+        lp_aeqt=lp,
+        duration_hours=t_m,
+        lex_8h_contribution=lp + 10.0 * log10(t_m / _T0),
+        n_samples=n,
+        sample_range_db=sample_range,
+        spread_advisory=spread,
+        u1a=u1a,
+        c1a=c1a,
+        u1b=u1b,
+        c1b=c1b,
+        u2=u2,
+        u3=options.u3,
+    )
+
+
 def task_based_exposure(
     tasks: Sequence[Task],
     instrument: InstrumentClass = "personal_exposimeter",
@@ -399,76 +493,18 @@ def task_based_exposure(
     if u3 < 0:
         raise ValueError("'u3' must be non-negative.")
 
-    # First pass: task levels, durations and contributions (Eq 7, 8).
-    levels: list[float] = []
-    durations: list[float] = []
-    for task in tasks:
-        if len(task.samples) == 0:
-            raise ValueError("Each task needs at least one sample.")
-        if task.duration_hours <= 0:
-            raise ValueError("Task 'duration_hours' must be positive.")
-        levels.append(energy_mean(task.samples))  # Eq 7
-        durations.append(task.duration_hours)
+    # First pass: task levels and durations (Eq 7, 8).
+    levels, durations = _validated_task_levels(tasks)
 
     # Daily level: energy sum of contributions (Eq 9 == Eq 10).
     energy = sum((t_m / _T0) * 10.0 ** (0.1 * lp) for lp, t_m in zip(levels, durations))
     lex_8h = float(10.0 * log10(energy))
 
     # Second pass: sensitivity coefficients and uncertainty terms.
+    options = _BudgetOptions(instrument, u3, include_duration_uncertainty, warn)
     contributions: list[TaskContribution] = []
     for idx, (task, lp, t_m) in enumerate(zip(tasks, levels, durations)):
-        samples = np.asarray(task.samples, dtype=float)
-        n = int(samples.size)
-        sample_range = float(samples.max() - samples.min()) if n >= 2 else 0.0
-        spread = n >= 2 and sample_range >= 3.0
-
-        u1a = _task_sampling_uncertainty(task.samples)
-        # c1a (Eq C.4): (T_m/T0) * 10^(0.1 (Lp - LEX,8h)); L* ~ Lp since Q2,Q3 ~ 0.
-        c1a = (t_m / _T0) * 10.0 ** (0.1 * (lp - lex_8h))
-        # c1b (Eq C.5): 4.34 * c1a / T_m.
-        c1b = _C5_FACTOR * c1a / t_m if include_duration_uncertainty else 0.0
-
-        u1b = 0.0
-        if include_duration_uncertainty:
-            if task.duration_samples is not None:
-                j = np.asarray(task.duration_samples, dtype=float)
-                if j.size >= 2:
-                    # Eq C.7 divides by J(J-1), like Eq C.6: standard error of the mean.
-                    u1b = float(np.std(j, ddof=1) / sqrt(j.size))
-            elif task.duration_range is not None:
-                t_min, t_max = task.duration_range
-                if t_max < t_min:
-                    raise ValueError("duration_range must be (T_min, T_max) with T_max >= T_min.")
-                u1b = 0.5 * (t_max - t_min)
-
-        u2 = INSTRUMENT_U2[task.instrument] if task.instrument is not None else INSTRUMENT_U2[instrument]
-
-        label = task.label if task.label is not None else f"task {idx + 1}"
-        if spread and warn:
-            warnings.warn(
-                f"Task '{label}': the {n} measurements span {sample_range:.1f} dB "
-                "(>= 3 dB); ISO 9612 Clause 9.3 recommends additional measurements, "
-                "subdivision, or longer measurement durations.",
-                OccupationalExposureWarning,
-                stacklevel=2,
-            )
-        contributions.append(
-            TaskContribution(
-                label=label,
-                lp_aeqt=lp,
-                duration_hours=t_m,
-                lex_8h_contribution=lp + 10.0 * log10(t_m / _T0),
-                n_samples=n,
-                sample_range_db=sample_range,
-                spread_advisory=spread,
-                u1a=u1a,
-                c1a=c1a,
-                u1b=u1b,
-                c1b=c1b,
-                u2=u2,
-                u3=u3,
-            )
-        )
+        contributions.append(_task_contribution(task, idx, lp, t_m, lex_8h, options))
 
     variance = sum(c.variance_contribution for c in contributions)
     u = sqrt(variance)

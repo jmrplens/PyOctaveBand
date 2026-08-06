@@ -75,7 +75,8 @@ def test_randi_and_wales_heitmeyer_run() -> None:
     r = ship_source_spectrum(15.0, 250.0, model="randi")
     w = ship_source_spectrum(model="wales-heitmeyer")
     assert r.vessel_class is None
-    assert w.speed_knots is None and w.length_m is None
+    assert w.speed_knots is None
+    assert w.length_m is None
     # Both give physically plausible source PSD near 100-160 dB at 1 kHz.
     assert 100.0 < _at(r, 1000.0)[0] < 200.0
     assert 100.0 < _at(w, 1000.0)[0] < 200.0

@@ -4,7 +4,7 @@ import pytest
 
 @pytest.mark.parametrize("block_size", [8, 256, 1024])
 def test_block_processing_matches_full_signal(block_size: int):
-    from phonometry import OctaveFilterBank
+    from phonometry import BlockProcessing, FilterDesign, OctaveFilterBank
     """
     Ensure that block-wise processing with preserved filter state
     produces the same result as filtering the full signal at once.
@@ -20,11 +20,15 @@ def test_block_processing_matches_full_signal(block_size: int):
     signal = rng.standard_normal(n_samples)
 
     # --- Full signal processing (reference) ---
-    full_filter = OctaveFilterBank(fs=fs, resample=False)
+    full_filter = OctaveFilterBank(fs=fs, design=FilterDesign(resample=False))
     _full_output_spl, _, full_output_signal = full_filter.filter(signal, sigbands=True, detrend=False)
 
     # --- Block-wise processing ---
-    block_filter = OctaveFilterBank(fs=fs, resample=False, stateful=True, steady_ic=False)
+    block_filter = OctaveFilterBank(
+        fs=fs,
+        design=FilterDesign(resample=False),
+        block_processing=BlockProcessing(stateful=True, steady_ic=False),
+    )
 
     outputs = []
 
@@ -46,21 +50,34 @@ def test_block_processing_matches_full_signal(block_size: int):
     )
 
 def test_resample_and_stateful():
-    from phonometry.filters.core import OctaveFilterBank
+    from phonometry.filters.core import (
+        BlockProcessing,
+        FilterDesign,
+        OctaveFilterBank,
+    )
+    resampling_design = FilterDesign(resample=True)
+    stateful_blocks = BlockProcessing(stateful=True)
     with pytest.raises(ValueError):
-        OctaveFilterBank(48000, resample=True, stateful=True)
+        OctaveFilterBank(
+            48000,
+            design=resampling_design,
+            block_processing=stateful_blocks,
+        )
 
 
 def test_stateful_steady_ic_initialization():
-    from phonometry.filters.core import OctaveFilterBank
+    from phonometry.filters.core import (
+        BlockProcessing,
+        FilterDesign,
+        OctaveFilterBank,
+    )
     # Create a stateful filter bank with steady_ic=True
     bank = OctaveFilterBank(
         fs=48000,
-        stateful=True,
-        steady_ic=True,
         order=2,  # small order is enough for coverage
         fraction=1,  # 1-octave
-        resample=False  # avoid the resampling branch
+        design=FilterDesign(resample=False),  # avoid the resampling branch
+        block_processing=BlockProcessing(stateful=True, steady_ic=True),
     )
 
     # With lazy initialization, zi is allocated on first filter() call.
@@ -86,15 +103,20 @@ def test_stateful_steady_ic_initialization():
 
 def test_stateful_multichannel():
     """Test that stateful processing works with multichannel (e.g. stereo) input."""
-    from phonometry.filters.core import OctaveFilterBank
+    from phonometry.filters.core import (
+        BlockProcessing,
+        FilterDesign,
+        OctaveFilterBank,
+    )
     rng = np.random.default_rng(42)
     n_channels = 4
     fs = 48000
     block_size = 1024
 
     bank = OctaveFilterBank(
-        fs=fs, stateful=True, steady_ic=True,
-        order=2, fraction=1, resample=False,
+        fs=fs, order=2, fraction=1,
+        design=FilterDesign(resample=False),
+        block_processing=BlockProcessing(stateful=True, steady_ic=True),
     )
     stereo_block = rng.standard_normal((n_channels, block_size))
     _spl, _ = bank.filter(stereo_block, detrend=False)
@@ -110,7 +132,11 @@ def test_stateful_multichannel():
     assert spl2.shape[0] == n_channels
 
 def test_detrend_stateful_warning():
-    from phonometry.filters.core import OctaveFilterBank
+    from phonometry.filters.core import (
+        BlockProcessing,
+        FilterDesign,
+        OctaveFilterBank,
+    )
     rng = np.random.default_rng(42)
 
     fs = 48000
@@ -120,7 +146,8 @@ def test_detrend_stateful_warning():
     # Random signal (deterministic via seed)
     signal = rng.standard_normal(n_samples)
 
-    bank = OctaveFilterBank(fs, stateful=True, resample=False)
+    bank = OctaveFilterBank(fs, design=FilterDesign(resample=False),
+                            block_processing=BlockProcessing(stateful=True))
     with pytest.warns(UserWarning, match="block processing"):
         bank.filter(signal, detrend=True)
 

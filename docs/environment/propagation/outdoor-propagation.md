@@ -297,14 +297,19 @@ att.plot()                        # the stacked breakdown above (needs matplotli
 # Predicted receiver level from an octave-band sound power Lw = 95 dB
 lw = np.full(len(bands), 95.0)
 lp = environment.predicted_receiver_level(
-    lw, 200.0, 1.5, 1.5, bands, 1.0, 1.0, 1.0,
-    barrier=barrier, temperature=15.0, relative_humidity=70.0,
+    lw,
+    environment.PropagationGeometry(200.0, 1.5, 1.5),   # d, hs, hr
+    frequencies=bands,
+    ground=environment.GroundFactors(1.0, 1.0, 1.0),    # Gs, Gm, Gr
+    barrier=barrier,
+    atmosphere=environment.AtmosphericConditions(
+        temperature=15.0, relative_humidity=70.0),
 )
 print(np.round(lp, 1))            # [28.8 26.7 24.  21.1 17.9 16.2 12.7 -1. ]
 ```
 
 `predicted_receiver_level` composes $L_{fT}(DW) = L_W + D_c - A$ with
-$D_c = $ `directivity_index` $+ $ `d_omega`. Pass `c0=` to subtract the
+$D_c$ the `DirectivityCorrection` (`index` $+$ `d_omega`). Pass `c0=` to subtract the
 meteorological correction $C_{met}$ (Eq. (21)/(22)) band by band for a long-term
 average; note that the standard applies $C_{met}$ to the A-weighted level, so the
 per-band form here is a **convenience**, not a literal reading of Clause 8.

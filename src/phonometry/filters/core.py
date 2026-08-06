@@ -6,6 +6,7 @@ Core processing logic and FilterBank class for phonometry.
 from __future__ import annotations
 
 import warnings
+from dataclasses import dataclass
 from functools import lru_cache
 from typing import Literal, cast, overload
 
@@ -22,6 +23,126 @@ class FilterBankWarning(PhonometryWarning):
     """Warns about fractional-octave filter-bank processing pitfalls."""
 
 
+#: Filter families the bank knows how to design (see ``OctaveFilterBank``).
+_VALID_FILTERS = ["butter", "cheby1", "cheby2", "ellip", "bessel"]
+
+
+@dataclass(frozen=True)
+class FilterDesign:
+    """How the band-pass filters of a bank are designed.
+
+    The defaults are the design used everywhere in the library: Butterworth
+    sections, evaluated band by band on a decimated sample rate.
+
+    :ivar filter_type: Type of filter ('butter', 'cheby1', 'cheby2', 'ellip',
+        'bessel'). Only ``butter`` meets IEC 61260-1:2014 class 1 with the
+        default parameters (``cheby2`` also does once ``attenuation`` >= 70 dB,
+        see below); ``cheby1``/``ellip``/``bessel`` fail on passband ripple or
+        roll-off regardless of parameters (default 'butter').
+    :ivar ripple: Passband ripple in dB, for cheby1 and ellip (default 0.1).
+    :ivar attenuation: Stopband attenuation in dB (default 72.0). For the
+        ``cheby2`` filter scipy pins the equiripple deep-stopband floor at
+        exactly this value, so it must be >= 70 dB for the bank to meet the
+        IEC 61260-1:2014 class 1 deep-stopband limit (Omega >= G^4). The
+        72 dB default clears class 1 with the same +0.400 dB passband margin
+        as ``butter``.
+    :ivar resample: If True, resampling is performed: each band is filtered on
+        a decimated sample rate (default True).
+    """
+
+    filter_type: str = "butter"
+    ripple: float = 0.1
+    attenuation: float = 72.0
+    resample: bool = True
+
+
+@dataclass(frozen=True)
+class LevelCalibration:
+    """How the energy in a band becomes a level reading.
+
+    :ivar factor: Calibration factor for SPL calculation: multiplies the
+        digital amplitude to obtain pascals (default 1.0).
+    :ivar dbfs: If True, calculate SPL in dBFS, where 0 dB is a full-scale
+        RMS of 1.0, instead of dB SPL re 20 uPa; ``factor`` is then not
+        applied (default False).
+    """
+
+    factor: float = 1.0
+    dbfs: bool = False
+
+
+@dataclass(frozen=True)
+class BlockProcessing:
+    """How the bank carries its filter state from one block to the next.
+
+    :ivar stateful: If True, carry filter state between calls. Useful for
+        block processing (default False).
+    :ivar steady_ic: If True, calculate steady state initial conditions for
+        filter (default False).
+    """
+
+    stateful: bool = False
+    steady_ic: bool = False
+
+
+@dataclass(frozen=True)
+class ResponsePlot:
+    """The filter-response plot drawn while the bank is being designed.
+
+    :ivar show: If True, show the filter response plot (default False).
+    :ivar file: Path to save the filter response plot (default None).
+    """
+
+    show: bool = False
+    file: str | None = None
+
+
+#: The defaults of the bank and of :func:`octave_filter`: the IEC 61260-1
+#: class 1 design, no calibration, no carried state and no response plot.
+#: One shared instance each: the bundles are frozen, so a call cannot
+#: mutate them.
+_DEFAULT_DESIGN = FilterDesign()
+_DEFAULT_CALIBRATION = LevelCalibration()
+_DEFAULT_BLOCK_PROCESSING = BlockProcessing()
+_DEFAULT_RESPONSE_PLOT = ResponsePlot()
+
+
+def _validate_bank_design(
+    fs: int,
+    fraction: float,
+    order: int,
+    limits: list[float] | None,
+    design: FilterDesign,
+    block_processing: BlockProcessing,
+) -> list[float]:
+    """Check the bank design arguments and resolve the frequency limits.
+
+    Raises :class:`ValueError` for any unusable combination and returns the
+    limits actually used, filling in the default ``[12, 20000]`` Hz span when
+    none was given.
+    """
+    if fs <= 0:
+        raise ValueError("Sample rate 'fs' must be positive.")
+    if fraction <= 0:
+        raise ValueError("Bandwidth 'fraction' must be positive.")
+    if order <= 0:
+        raise ValueError("Filter 'order' must be positive.")
+    if limits is None:
+        limits = [12, 20000]
+    if len(limits) != 2:
+        raise ValueError("Limits must be a list of two frequencies [f_min, f_max].")
+    if limits[0] <= 0 or limits[1] <= 0:
+        raise ValueError("Limit frequencies must be positive.")
+    if limits[0] >= limits[1]:
+        raise ValueError("The lower limit must be less than the upper limit.")
+    if design.filter_type not in _VALID_FILTERS:
+        raise ValueError(f"Invalid filter_type. Must be one of {_VALID_FILTERS}")
+    if design.resample and block_processing.stateful:
+        # a stateful resampling algorithm would be required...
+        raise ValueError("Resampling and stateful behaviour (block processing) are not supported.")
+    return limits
+
+
 class OctaveFilterBank:
     """
     A class-based representation of an Octave Filter Bank.
@@ -34,16 +155,11 @@ class OctaveFilterBank:
         fraction: float = 1,
         order: int = 6,
         limits: list[float] | None = None,
-        filter_type: str = "butter",
-        ripple: float = 0.1,
-        attenuation: float = 72.0,
-        show: bool = False,
-        plot_file: str | None = None,
-        calibration_factor: float = 1.0,
-        dbfs: bool = False,
-        stateful: bool = False,
-        steady_ic: bool = False,
-        resample: bool = True,
+        *,
+        design: FilterDesign = _DEFAULT_DESIGN,
+        calibration: LevelCalibration = _DEFAULT_CALIBRATION,
+        block_processing: BlockProcessing = _DEFAULT_BLOCK_PROCESSING,
+        response_plot: ResponsePlot = _DEFAULT_RESPONSE_PLOT,
     ) -> None:
         """
         Initialize the Octave Filter Bank.
@@ -52,59 +168,31 @@ class OctaveFilterBank:
         :param fraction: Bandwidth fraction (e.g., 1 for octave, 3 for 1/3 octave).
         :param order: Filter order.
         :param limits: Frequency limits [f_min, f_max].
-        :param filter_type: Type of filter ('butter', 'cheby1', 'cheby2', 'ellip',
-            'bessel'). Only ``butter`` meets IEC 61260-1:2014 class 1 with the
-            default parameters (``cheby2`` also does once ``attenuation`` >= 70 dB,
-            see below); ``cheby1``/``ellip``/``bessel`` fail on passband ripple or
-            roll-off regardless of parameters.
-        :param ripple: Passband ripple in dB.
-        :param attenuation: Stopband attenuation in dB. Default 72.0. For the
-            ``cheby2`` filter scipy pins the equiripple deep-stopband floor at
-            exactly this value, so it must be >= 70 dB for the bank to meet the
-            IEC 61260-1:2014 class 1 deep-stopband limit (Omega >= G^4). The
-            72 dB default clears class 1 with the same +0.400 dB passband
-            margin as ``butter``.
-        :param show: If True, show the filter response plot.
-        :param plot_file: Path to save the filter response plot.
-        :param calibration_factor: Calibration factor for SPL calculation.
-        :param dbfs: If True, calculate SPL in dBFS.
-        :param stateful: If True, carry filter state between calls. Useful for block processing.
-        :param steady_ic: If True, calculate steady state initial conditions for filter.
-        :param resample: If True, resampling is performed.
+        :param design: How the band filters are designed: family, ripple,
+            stopband attenuation and multirate decimation
+            (:class:`FilterDesign`). Only ``butter`` meets IEC 61260-1:2014
+            class 1 with the default parameters (``cheby2`` also does once
+            ``attenuation`` >= 70 dB); ``cheby1``/``ellip``/``bessel`` fail on
+            passband ripple or roll-off regardless of parameters.
+        :param calibration: How band energy becomes a level: calibration
+            factor and dBFS switch (:class:`LevelCalibration`).
+        :param block_processing: Whether the bank carries its filter state
+            between calls, and how that state starts (:class:`BlockProcessing`).
+        :param response_plot: Whether to show or save the filter response plot
+            drawn while designing the bank (:class:`ResponsePlot`).
         """
-        if fs <= 0:
-            raise ValueError("Sample rate 'fs' must be positive.")
-        if fraction <= 0:
-            raise ValueError("Bandwidth 'fraction' must be positive.")
-        if order <= 0:
-            raise ValueError("Filter 'order' must be positive.")
-        if limits is None:
-            limits = [12, 20000]
-        if len(limits) != 2:
-            raise ValueError("Limits must be a list of two frequencies [f_min, f_max].")
-        if limits[0] <= 0 or limits[1] <= 0:
-            raise ValueError("Limit frequencies must be positive.")
-        if limits[0] >= limits[1]:
-            raise ValueError("The lower limit must be less than the upper limit.")
-            
-        valid_filters = ["butter", "cheby1", "cheby2", "ellip", "bessel"]
-        if filter_type not in valid_filters:
-            raise ValueError(f"Invalid filter_type. Must be one of {valid_filters}")
-
-        if resample and stateful:
-            raise ValueError("Resampling and stateful behaviour (block processing) are not supported.")
-            # a stateful resampling algorithm would be required...
+        limits = _validate_bank_design(fs, fraction, order, limits, design, block_processing)
 
         self.fs = fs
         self.fraction = fraction
         self.order = order
         self.limits = limits
-        self.filter_type = filter_type
-        self.ripple = ripple
-        self.attenuation = attenuation
-        self.calibration_factor = calibration_factor
-        self.dbfs = dbfs
-        self.stateful = stateful
+        self.filter_type = design.filter_type
+        self.ripple = design.ripple
+        self.attenuation = design.attenuation
+        self.calibration_factor = calibration.factor
+        self.dbfs = calibration.dbfs
+        self.stateful = block_processing.stateful
 
         # Generate frequencies
         self.freq, self.freq_d, self.freq_u, self.nominal_freq = _genfreqs(limits, fraction, fs)
@@ -112,24 +200,27 @@ class OctaveFilterBank:
 
 
         # Calculate factors and design SOS
-        if resample:
+        if design.resample:
             headroom = 1.25
-            if filter_type == "cheby2":
+            if design.filter_type == "cheby2":
                 # The cheby2 stopband extends above the band's upper edge;
                 # 5% safety margin so it clears the decimated Nyquist.
-                headroom = max(headroom, 1.05 * _cheby2_headroom(fraction, order, attenuation))
+                headroom = max(
+                    headroom, 1.05 * _cheby2_headroom(fraction, order, design.attenuation)
+                )
             self.factor = _downsamplingfactor(self.freq_u, fs, headroom)
         else:
             self.factor = np.ones(self.num_bands, dtype=int)
 
         self.sos = _design_sos_filter(
-            self.freq, self.freq_d, self.freq_u, fs, order, self.factor, 
-            filter_type, ripple, attenuation, show, plot_file
+            self.freq, self.freq_d, self.freq_u, fs, order, self.factor,
+            design.filter_type, design.ripple, design.attenuation,
+            response_plot.show, response_plot.file
         )
 
         # Calculate initial conditions for filter state
         if self.stateful:
-            self._init_filter_state(steady_ic)
+            self._init_filter_state(block_processing.steady_ic)
 
 
     def _init_filter_state(self, steady_ic: bool) -> None:
@@ -282,26 +373,7 @@ class OctaveFilterBank:
         if zero_phase and self.stateful:
             raise ValueError("zero_phase is not compatible with stateful processing.")
 
-        # Convert input to numpy array
-        x_proc = _typesignal(x)
-
-        # Handle DC offset removal
-        if detrend:
-            if self.stateful:
-                warnings.warn(
-                    "Detrending is not recommended during block processing "
-                    "as it can introduce discontinuities between blocks.",
-                    FilterBankWarning,
-                    stacklevel=2,
-                )
-            # Axis -1 handles both 1D and 2D arrays correctly
-            x_proc = signal.detrend(x_proc, axis=-1, type='constant')
-
-        # Handle multichannel detection
-        is_multichannel = x_proc.ndim > 1
-        if not is_multichannel:
-            x_proc = x_proc[np.newaxis, :]  # Standardize to 2D
-
+        x_proc, is_multichannel = self._prepare_signal(x, detrend)
         num_channels = x_proc.shape[0]
 
         # Process signal across all bands and channels
@@ -323,8 +395,35 @@ class OctaveFilterBank:
 
         if sigbands and xb is not None:
             return spl, freq_out, xb
-        else:
-            return spl, freq_out
+        return spl, freq_out
+
+    def _prepare_signal(
+        self, x: list[float] | np.ndarray, detrend: bool
+    ) -> tuple[np.ndarray, bool]:
+        """Coerce the input to a 2D ``[channels, samples]`` array for filtering.
+
+        Optionally removes the DC offset (warning when that is done on a
+        stateful bank, where it can introduce discontinuities between blocks)
+        and reports whether the caller supplied multichannel input, so the
+        caller can squeeze the results back to 1D.
+        """
+        x_proc = _typesignal(x)
+
+        if detrend:
+            if self.stateful:
+                warnings.warn(
+                    "Detrending is not recommended during block processing "
+                    "as it can introduce discontinuities between blocks.",
+                    FilterBankWarning,
+                    stacklevel=3,
+                )
+            # Axis -1 handles both 1D and 2D arrays correctly
+            x_proc = signal.detrend(x_proc, axis=-1, type='constant')
+
+        is_multichannel = x_proc.ndim > 1
+        if not is_multichannel:
+            x_proc = x_proc[np.newaxis, :]  # Standardize to 2D
+        return x_proc, is_multichannel
 
     def spectrogram(
         self,
@@ -498,11 +597,8 @@ def _cached_filter_bank(
     fraction: float,
     order: int,
     limits: tuple[float, ...] | None,
-    filter_type: str,
-    ripple: float,
-    attenuation: float,
-    calibration_factor: float,
-    dbfs: bool,
+    design: FilterDesign,
+    calibration: LevelCalibration,
 ) -> OctaveFilterBank:
     """Design (or reuse) a stateless filter bank for octave_filter()."""
     return OctaveFilterBank(
@@ -510,115 +606,97 @@ def _cached_filter_bank(
         fraction=fraction,
         order=order,
         limits=list(limits) if limits is not None else None,
-        filter_type=filter_type,
-        ripple=ripple,
-        attenuation=attenuation,
-        calibration_factor=calibration_factor,
-        dbfs=dbfs,
+        design=design,
+        calibration=calibration,
     )
 
 
 @overload
 def octave_filter(
-    x: list[float] | np.ndarray,  # NOSONAR - public API
+    x: list[float] | np.ndarray,
     fs: int,
     fraction: float = 1,
     order: int = 6,
     limits: list[float] | None = None,
-    show: bool = False,
+    *,
     sigbands: Literal[False] = False,
-    plot_file: str | None = None,
     detrend: bool = True,
-    filter_type: str = "butter",
-    ripple: float = 0.1,
-    attenuation: float = 72.0,
-    calibration_factor: float = 1.0,
-    dbfs: bool = False,
     mode: str = "rms",
     nominal: Literal[False] = False,
+    design: FilterDesign = _DEFAULT_DESIGN,
+    calibration: LevelCalibration = _DEFAULT_CALIBRATION,
+    response_plot: ResponsePlot = _DEFAULT_RESPONSE_PLOT,
 ) -> tuple[np.ndarray, list[float]]: ...
 
 
 @overload
 def octave_filter(
-    x: list[float] | np.ndarray,  # NOSONAR - public API
+    x: list[float] | np.ndarray,
     fs: int,
     fraction: float = 1,
     order: int = 6,
     limits: list[float] | None = None,
-    show: bool = False,
+    *,
     sigbands: Literal[True] = True,
-    plot_file: str | None = None,
     detrend: bool = True,
-    filter_type: str = "butter",
-    ripple: float = 0.1,
-    attenuation: float = 72.0,
-    calibration_factor: float = 1.0,
-    dbfs: bool = False,
     mode: str = "rms",
     nominal: Literal[False] = False,
+    design: FilterDesign = _DEFAULT_DESIGN,
+    calibration: LevelCalibration = _DEFAULT_CALIBRATION,
+    response_plot: ResponsePlot = _DEFAULT_RESPONSE_PLOT,
 ) -> tuple[np.ndarray, list[float], list[np.ndarray]]: ...
 
 
 @overload
 def octave_filter(
-    x: list[float] | np.ndarray,  # NOSONAR - public API
+    x: list[float] | np.ndarray,
     fs: int,
     fraction: float = 1,
     order: int = 6,
     limits: list[float] | None = None,
-    show: bool = False,
+    *,
     sigbands: Literal[False] = False,
-    plot_file: str | None = None,
     detrend: bool = True,
-    filter_type: str = "butter",
-    ripple: float = 0.1,
-    attenuation: float = 72.0,
-    calibration_factor: float = 1.0,
-    dbfs: bool = False,
     mode: str = "rms",
     nominal: Literal[True] = ...,
+    design: FilterDesign = _DEFAULT_DESIGN,
+    calibration: LevelCalibration = _DEFAULT_CALIBRATION,
+    response_plot: ResponsePlot = _DEFAULT_RESPONSE_PLOT,
 ) -> tuple[np.ndarray, list[str]]: ...
 
 
 @overload
 def octave_filter(
-    x: list[float] | np.ndarray,  # NOSONAR - public API
+    x: list[float] | np.ndarray,
     fs: int,
     fraction: float = 1,
     order: int = 6,
     limits: list[float] | None = None,
-    show: bool = False,
+    *,
     sigbands: Literal[True] = True,
-    plot_file: str | None = None,
     detrend: bool = True,
-    filter_type: str = "butter",
-    ripple: float = 0.1,
-    attenuation: float = 72.0,
-    calibration_factor: float = 1.0,
-    dbfs: bool = False,
     mode: str = "rms",
     nominal: Literal[True] = ...,
+    design: FilterDesign = _DEFAULT_DESIGN,
+    calibration: LevelCalibration = _DEFAULT_CALIBRATION,
+    response_plot: ResponsePlot = _DEFAULT_RESPONSE_PLOT,
 ) -> tuple[np.ndarray, list[str], list[np.ndarray]]: ...
 
 
 def octave_filter(
-    x: list[float] | np.ndarray,  # NOSONAR - public API
+    x: list[float] | np.ndarray,
     fs: int,
     fraction: float = 1,
     order: int = 6,
     limits: list[float] | None = None,
-    show: bool = False,
+    *,
     sigbands: bool = False,
-    plot_file: str | None = None,
     detrend: bool = True,
-    filter_type: str = "butter",
-    ripple: float = 0.1,
-    attenuation: float = 72.0,
-    calibration_factor: float = 1.0,
-    dbfs: bool = False,
     mode: str = "rms",
     nominal: bool = False,
+    design: FilterDesign = _DEFAULT_DESIGN,
+    calibration: LevelCalibration = _DEFAULT_CALIBRATION,
+    response_plot: ResponsePlot = _DEFAULT_RESPONSE_PLOT,
 ) -> tuple[np.ndarray, list[float]] | tuple[np.ndarray, list[str]] | tuple[np.ndarray, list[float], list[np.ndarray]] | tuple[np.ndarray, list[str], list[np.ndarray]]:
     """
     Filter a signal with octave or fractional octave filter bank.
@@ -639,26 +717,22 @@ def octave_filter(
     :type order: int
     :param limits: Minimum and maximum limit frequencies [f_min, f_max]. Default [12, 20000].
     :type limits: Optional[List[float]]
-    :param show: If True, plot and show the filter response.
-    :type show: bool
     :param sigbands: If True, also return the signal in the time domain divided into bands.
     :type sigbands: bool
-    :param plot_file: Path to save the filter response plot.
-    :type plot_file: Optional[str]
     :param detrend: If True, remove DC offset before filtering. Default: True.
     :type detrend: bool
-    :param filter_type: Type of filter ('butter', 'cheby1', 'cheby2', 'ellip', 'bessel').
-        Default: 'butter' (the only type that meets IEC 61260-1 class 1 with the
-        default parameters).
-    :param ripple: Passband ripple in dB (for cheby1, ellip). Default: 0.1.
-    :param attenuation: Stopband attenuation in dB (for cheby2, ellip). Default: 72.0.
-        For ``cheby2`` scipy pins the deep-stopband floor at exactly this value,
-        so it must be >= 70 dB to clear the IEC 61260-1 class 1 limit (matches
-        :class:`OctaveFilterBank`).
-    :param calibration_factor: Calibration factor for SPL calculation. Default: 1.0.
-    :param dbfs: If True, return results in dBFS. Default: False.
     :param mode: 'rms' or 'peak'. Default: 'rms'.
     :param nominal: If True, return IEC 61260-1 nominal frequency labels (List[str]) instead of exact floats.
+    :param design: How the band filters are designed: family, ripple, stopband
+        attenuation and multirate decimation (:class:`FilterDesign`). The
+        default 'butter' family is the only one that meets IEC 61260-1 class 1
+        with the default parameters; for ``cheby2`` scipy pins the
+        deep-stopband floor at exactly ``attenuation``, so it must be >= 70 dB
+        to clear the class 1 limit (matches :class:`OctaveFilterBank`).
+    :param calibration: How band energy becomes a level: calibration factor
+        and dBFS switch (:class:`LevelCalibration`).
+    :param response_plot: Whether to show or save the filter response plot
+        (:class:`ResponsePlot`). Plotting bypasses the design cache.
     :return: A tuple containing (SPL_array, Frequencies_list) or (SPL_array, Frequencies_list, signals).
         When *nominal=True*, the frequency list contains ``List[str]`` labels instead of floats.
     :rtype: Union[Tuple[np.ndarray, List[float]], Tuple[np.ndarray, List[str]],
@@ -666,30 +740,25 @@ def octave_filter(
         Tuple[np.ndarray, List[str], List[np.ndarray]]]
     """
     
-    if show or plot_file:
+    if response_plot.show or response_plot.file:
         # Plotting has side effects: bypass the cache.
         filter_bank = OctaveFilterBank(
             fs=fs,
             fraction=fraction,
             order=order,
             limits=limits,
-            filter_type=filter_type,
-            ripple=ripple,
-            attenuation=attenuation,
-            show=show,
-            plot_file=plot_file,
-            calibration_factor=calibration_factor,
-            dbfs=dbfs,
+            design=design,
+            calibration=calibration,
+            response_plot=response_plot,
         )
     else:
         # The bank is immutable in non-stateful mode: reuse the design.
         # Pass limits through as-is (tuple for hashability); the bank
         # constructor is the single place that validates them and owns
-        # the default when None.
+        # the default when None. The option bundles are frozen dataclasses,
+        # so they are hashable and compare by value: equal options hit the
+        # same cache entry.
         limits_key = tuple(map(float, limits)) if limits is not None else None
-        filter_bank = _cached_filter_bank(
-            fs, fraction, order, limits_key, filter_type,
-            ripple, attenuation, calibration_factor, dbfs,
-        )
+        filter_bank = _cached_filter_bank(fs, fraction, order, limits_key, design, calibration)
 
     return filter_bank.filter(x, sigbands=sigbands, mode=mode, detrend=detrend, nominal=nominal)  # type: ignore[call-overload,no-any-return]

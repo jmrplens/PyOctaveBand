@@ -188,7 +188,8 @@ def test_report_without_requirement_has_no_verdict(tmp_path) -> None:
     out = tmp_path / "noverdict.pdf"
     _result().report(str(out), metadata=_full_metadata())
     text = _extract_text(str(out))
-    assert "PASS" not in text and "FAIL" not in text
+    assert "PASS" not in text
+    assert "FAIL" not in text
 
 
 # --------------------------------------------------------------------------

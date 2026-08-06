@@ -129,8 +129,9 @@ power = np.where(xs < 3000.0, 12000.0, 10000.0)
 path = np.column_stack([xs, np.zeros_like(xs), z, power, np.full_like(xs, 82.3)])
 ground_roll = xs[:-1] < 1500.0   # takeoff roll: segments still on the runway
 
+segments = aircraft.FlightSegmentState(ground_roll=ground_roll)
 contour = aircraft.noise_contour(path, powers, distances, sel, lmax,
-                                 ground_roll=ground_roll,
+                                 segments=segments,
                                  x=np.linspace(-2500.0, 20000.0, 56),
                                  y=np.linspace(-6000.0, 6000.0, 44))
 contour.plot()   # single-event SEL footprint (needs matplotlib)
@@ -204,9 +205,10 @@ path = np.column_stack([xs, np.zeros_like(xs), np.clip((xs - 1500) * 0.11, 0, 25
                         np.where(xs < 3000, 12000.0, 10000.0), np.full_like(xs, 82.3)])
 ground_roll = xs[:-1] < 1500.0   # takeoff roll: segments still on the runway
 
+segments = aircraft.FlightSegmentState(ground_roll=ground_roll)
 aircraft.event_level(path, [2000.0, 500.0, 0.0], powers, distances, sel, lmax,
-                     ground_roll=ground_roll)  # SEL at a point
-contour = aircraft.noise_contour(path, powers, distances, sel, lmax, ground_roll=ground_roll,
+                     segments=segments)  # SEL at a point
+contour = aircraft.noise_contour(path, powers, distances, sel, lmax, segments=segments,
                            x=np.linspace(-2500, 20000, 60), y=np.linspace(-6000, 6000, 48))
 contour.plot()   # SEL contour over the ground (needs matplotlib)
 ```
@@ -218,9 +220,10 @@ $\Delta_{\text{SOR}}$ (turbofan and turboprop, all 124 ground-roll reference
 rows to $< 0.01\ \text{dB}$) reproduce the reference values, and the segment
 energy sum matches the reference `SEL`.
 
-The model also covers the landing rollout (`landing_roll` mask: reduced noise
-fraction Eq. 4-21b, nearest-end geometry, no directivity term), per-segment
-bank angle (`bank`, §4.5.2 sign convention), the §4.5.5 nearest-end lateral
+The model also covers the landing rollout (the `landing_roll` mask of the
+`FlightSegmentState`: reduced noise fraction Eq. 4-21b, nearest-end geometry,
+no directivity term), per-segment bank angle (its `bank`, §4.5.2 sign
+convention), the §4.5.5 nearest-end lateral
 geometry behind takeoff roll, the Eq. 4-13b average runway-segment speed and
 the recommended 30 m floor on NPD lookups. Seven branch-covering receptor
 events of the reference workbook are reproduced end-to-end in the test suite.
