@@ -122,6 +122,12 @@ snippets:
 snippets-static:
 	$(PYTHON) scripts/check_doc_snippets.py --static
 
+# Catch a paragraph that wraps onto a "-" or a ">", which CommonMark reads as a
+# new block and which then either takes the site build down or publishes a
+# quoted block in the middle of a sentence (see the markdown-wrapping job).
+wrapping:
+	$(PYTHON) scripts/check_markdown_wrapping.py
+
 # Regenerate the committed Starlight API reference (site/src/content/docs/
 # reference/api + site/src/generated/api-sidebar.mjs) from the source
 # docstrings. CI fails if this drifts (see the api-docs job in python-app.yml).

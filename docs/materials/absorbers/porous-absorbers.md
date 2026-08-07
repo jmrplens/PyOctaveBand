@@ -567,8 +567,8 @@ Helmholtz resonator: $m = (\rho_0/\varepsilon)\,[t + 2\delta a +
 end-correction factor $\delta$ per orifice end and the visco-thermal
 resistance $r = (\rho_0/\varepsilon)\sqrt{8\nu\omega}\,(1 + t/2a)$
 (Cox & D'Antonio Eqs. 7.6/7.12). The default end correction is the
-Fok-function interaction fit $\delta = 0.85\,(1 - 1.47\sqrt{\varepsilon}
-+ 0.47\varepsilon^{3/2})$ (Table 7.1), valid for any open area. For a
+Fok-function interaction fit $\delta = 0.85\,(1 - 1.47\sqrt{\varepsilon} +
+0.47\varepsilon^{3/2})$ (Table 7.1), valid for any open area. For a
 shallow cavity the resonance is
 $f_0 = (c_0/2\pi)\sqrt{\varepsilon/(t'\,d)}$ (Eq. 7.4).
 
