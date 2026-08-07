@@ -661,7 +661,30 @@ Fok-function interaction fit
 $\delta = 0.85\,(1 - 1.47\sqrt{\varepsilon} + 0.47\varepsilon^{3/2})$
 (Table 7.1), valid for any open area. For a
 shallow cavity the resonance is
-$f_0 = (c_0/2\pi)\sqrt{\varepsilon/(t'\,d)}$ (Eq. 7.4).
+$f_0 = (c_0/2\pi)\sqrt{\varepsilon/(t'\,d)}$ (Eq. 7.4). In those two
+expressions $t$ is the plate thickness, $a$ the hole **radius**, $\varepsilon$
+the open area (hole area over panel area), $\nu$ the kinematic viscosity of
+air, $t' = t + 2\delta a$ the end-corrected plate thickness and $d$ the cavity
+depth behind the panel.
+
+### The sheet layer classes: parameters
+
+The three sheet layers take positional arguments, and the hole dimension is a
+**radius**, not a diameter — half the drilled hole. Getting that wrong
+computes the resonance and the peak absorption for a hole twice the real size.
+
+| Class | Parameter | Units | Notes |
+| :--- | :--- | :--- | :--- |
+| `PerforatedPlateLayer` | `thickness` | m | Plate thickness $t$ |
+| | `hole_radius` | m | Hole **radius** $a$, half the drilled diameter |
+| | `open_area` | — | Perforation ratio $\varepsilon$ = hole area / panel area |
+| | `end_correction` | — | $\delta$ per orifice end; `None` uses the Fok interaction fit |
+| `MicroperforatedPlateLayer` | `thickness` | m | Plate thickness $t$ |
+| | `hole_radius` | m | Hole **radius** $a$ |
+| | `open_area` | — | Perforation ratio $\varepsilon$ |
+| | `end_correction` | — | Default `0.85`, Maa's piston reactance |
+| `MembraneLayer` | `surface_density` | kg/m² | Mass per unit area $m$ |
+| | `resistance` | Pa·s/m | Added flow resistance; default `0.0` |
 
 **Microperforated panel (MPP).** With submillimetre holes the viscous
 boundary layer fills the orifice and the panel absorbs *without any porous
@@ -686,7 +709,8 @@ $f_2/f_1 = \pi/\mathrm{arccot}(1+r) - 1$ (Maa Eqs. 9–21, Table I).
 import numpy as np
 from phonometry import materials
 
-# Maa (1998) Fig. 5: d = t = 0.2 mm, holes every 2.5 mm, cavity 6 cm.
+# Maa (1998) Fig. 5: hole diameter 0.2 mm (so hole_radius = 0.1 mm),
+# plate 0.2 mm thick, holes every 2.5 mm, cavity 6 cm.
 eps = (np.pi / 4.0) * (0.2 / 2.5) ** 2
 f = np.linspace(100.0, 4000.0, 2000)
 res = materials.layered_absorber(
@@ -715,7 +739,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 from phonometry import materials
 
-# Maa (1998) Fig. 5: d = t = 0.2 mm, holes every 2.5 mm, cavity 6 cm.
+# Maa (1998) Fig. 5: hole diameter 0.2 mm (so hole_radius = 0.1 mm),
+# plate 0.2 mm thick, holes every 2.5 mm, cavity 6 cm.
 eps = (np.pi / 4.0) * (0.2 / 2.5) ** 2
 f = np.linspace(100.0, 4000.0, 1200)
 res = materials.layered_absorber(

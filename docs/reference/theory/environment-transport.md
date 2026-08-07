@@ -26,6 +26,10 @@ $$
 
 The adjustments $K_i$ cover time-of-day penalties (ISO 1996-1 Table A.1: evening 5 dB, night 10 dB) as well as source-character adjustments (e.g. tonal penalties), which the ECMA-418-1 TNR/PR assessments can justify objectively.
 
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/lden_profile_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/lden_profile.svg" alt="Synthetic 24-hour urban LAeq profile with day, evening and night bands, the +5 and +10 dB weighted period levels and the resulting Lden" width="80%"></picture>
+
+*A 24-hour $L_{Aeq}$ profile split into day, evening and night, the +5/+10 dB penalties and the resulting $L_{den}$.*
+
 See the [Environmental levels guide](../../environment/assessment/environmental-levels.md) for usage.
 
 ## Impulsive-sound prominence (NT ACOU 112)
@@ -49,6 +53,15 @@ L_{Ar,T} = 10 \log_{10}\Big[ \frac{1}{T} \sum_N \Delta t_N\ 10^{(L_{Aeq,N} + K_{
 $$
 
 $K_I$ is exactly the kind of source-character adjustment that enters the ISO 1996-1 composite rating level above. The anchors $P(1000\ \text{dB/s}, 30\ \text{dB}) = 9 + 2\log_{10} 30 = 11.95$ and $K_I(P{=}10) = 9.0$ dB are reproduced exactly.
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/impulsive_sound_onsets_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/impulsive_sound_onsets.svg" alt="A-weighted Fast level history of three hammer strikes over a 55 dB(A) background across six seconds: each strike rises from about 52 dB to 89 dB, the detected onset start and end points are marked with the least-squares onset line, the governing level difference of 36.8 dB is annotated, and the title reports a prominence of 11.34 with an adjustment of 11.42 dB, category highly impulsive" width="90%"></picture>
+
+*Both inputs of $P$ are geometry on this trace, which is why the method needs a
+level history and not a level. The onset rate is the slope of the fitted line
+through the rise, in dB/s, and the qualifying threshold of 10 dB/s is a
+steepness on this axis; the level difference is the height of the same rise.
+Three strikes are detected here and only the steepest-and-tallest one governs
+the adjustment.*
 
 See the [Impulse Prominence guide](../../environment/assessment/impulsive-sound.md) for usage.
 
@@ -81,6 +94,10 @@ own printed precision), well inside its stated $\pm 10$ %; passing
 $f_m = 1000 \cdot 10^{k/10}$ (Note 5) used to compute that table. The same
 $\alpha$ is the only route to the ISO 354 power attenuation coefficient
 $m = \alpha/(10 \log_{10} e)$, exposed as `air_attenuation_m`.
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/atmospheric_attenuation_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/atmospheric_attenuation.svg" alt="ISO 9613-1 pure-tone atmospheric attenuation coefficient alpha in dB/km against frequency, on a linear decibel ordinate over a logarithmic frequency axis, for the reference 20 degrees Celsius and 50 percent relative humidity atmosphere, produced by the AtmosphericAttenuation result plot method" width="80%"></picture>
+
+*The ISO 9613-1 coefficient for the 20 °C, 50 % relative-humidity reference atmosphere: the $f^2$ rise spans two decades from 50 Hz to 10 kHz.*
 
 ### Outdoor propagation, general method (ISO 9613-2)
 
@@ -125,6 +142,21 @@ average level subtracts the meteorological correction $C_{met}$ (Eq. (6),
 (21)/(22)). The method's stated accuracy is $\pm 1$ to $\pm 3$ dB for broadband
 noise up to 1000 m (Table 5).
 
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/outdoor_attenuation_breakdown_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/outdoor_attenuation_breakdown.svg" alt="ISO 9613-2 per-octave-band attenuation breakdown as a stacked bar of Adiv, Aatm, Agr and Abar with the total A overlaid, for a 200 m path over porous ground with a 4 m barrier" width="80%"></picture>
+
+*The four terms at their true relative sizes, band by band, for a 200 m path
+over porous ground with a 4 m barrier. $A_{div}$ is 57 dB in every band because
+it is pure geometry. $A_{atm}$ is nothing at 63 Hz and 18.7 dB at 8 kHz, so it
+is the term that decides how far high frequencies travel and no other. $A_{gr}$
+is where the low bands live and is **negative** at 63 Hz (−4.6 dB: the ground
+reflection adds energy rather than removing it). $A_{bar}$ is at its 20 dB cap
+from 2 kHz up but falls to zero at 250 Hz, because the top-edge form subtracts
+the ground effect the screened path gives away, $A_{bar} = D_z - A_{gr} \geq 0$,
+and 250 Hz is exactly where $A_{gr}$ peaks. Which term is worth refining
+depends entirely on the band and the geometry.*
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_outdoor_geometry_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_outdoor_geometry.svg" alt="ISO 9613-2 source-barrier-receiver geometry: a point source at height hs, a barrier whose top edge splits the path into dss and dsr, and a receiver at height hr, with the blocked direct ray and the diffracted ray over the edge, the path difference z and the Dz formula" width="92%"></picture>
+
 ### Occupational noise exposure and uncertainty (ISO 9612)
 
 ISO 9612:2009 is the engineering method (accuracy grade 2) for a worker's daily
@@ -167,6 +199,10 @@ See the [Outdoor Propagation guide](../../environment/propagation/outdoor-propag
 The sound power level $L_W = 10 \log_{10}(P/P_0)$ ($P_0 = 1$ pW) is an
 *emission* quantity: unlike a pressure level it does not depend on the receiver
 distance or the room. Three families of methods recover it.
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sound_power_methods_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sound_power_methods.svg" alt="The three sound power routes side by side: an enveloping pressure surface over a reflecting plane (ISO 3744/3746), a source in a reverberation room sampled by microphones (ISO 3741) and an intensity probe scanning a surface around the source (ISO 9614-2)" width="92%"></picture>
+
+*The three routes to $L_W$: enveloping pressure surface, reverberation room and intensity scan.*
 
 ### Enveloping-surface pressure (ISO 3744/3746)
 

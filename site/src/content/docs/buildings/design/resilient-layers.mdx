@@ -58,9 +58,9 @@ and
 Everything downstream depends on the force the standard tapping machine
 actually injects, and that force is not a property of the machine alone. Each
 hammer is a 0.5 kg mass dropped 40 mm, so it lands at
-$v_0 = \sqrt{2gh} = 0.886\ \text{m/s}$, ten times a second. If the impact were
+$v_\text{h} = \sqrt{2gh} = 0.886\ \text{m/s}$, ten times a second. If the impact were
 short compared with the 0.1 s between impacts, the momentum alone would fix
-the force, giving the line spectrum $|F_n| = 2 m v_0 / T_i$ and the band
+the force, giving the line spectrum $|F_n| = 2 m v_\text{h} / T_i$ and the band
 mean-square force $F_\text{rms}^2 = 3.9 B$ that ISO 10140 measurements on
 concrete are usually reduced with.
 
@@ -70,10 +70,10 @@ mass-spring-dashpot whose pulse splits into two cases:
 
 - **over-critical**, $K m \ge 4 Z_\text{dp}^2$: a single positive pulse, no
   rebound. This is a lightweight walking surface (chipboard, OSB), where the
-  spectrum tends to $|F_n|_\text{lower} = m v_0/T_i$;
+  spectrum tends to $|F_n|_\text{lower} = m v_\text{h}/T_i$;
 - **under-critical**, $K m < 4 Z_\text{dp}^2$: the hammer rebounds and only the
   first positive lobe counts. This is a concrete slab or a screed, where the
-  spectrum sits within 1 dB of $|F_n|_\text{upper} = 2 m v_0/T_i$ below 4 kHz
+  spectrum sits within 1 dB of $|F_n|_\text{upper} = 2 m v_\text{h}/T_i$ below 4 kHz
   and the short-pulse estimate is adequate.
 
 The two limits are 6 dB apart in mean square, which is the whole reason a
@@ -215,9 +215,19 @@ applies is a question about damping, not about the layer:
 
 | Model | Law | When |
 | --- | --- | --- |
-| `"cremer"` | $\Delta L = 40 \log_{10} (f/f_0)$ | Cremer's infinite-plate result; asphalt screeds and dry floating floors, whose internal losses are high enough to behave as infinite plates (ISO 12354-2 Formula C.3) |
+| `"cremer"` | $\Delta L = 40 \log_{10} (f/f_0)$ | Cremer's infinite-plate result; asphalt screeds and dry floating floors, whose internal losses are high enough to behave as infinite plates (ISO 12354-2 Formula C.3). The derivation is reported to hold over $f_0 < f < 4f_0$, so the branch far above resonance is an extrapolation |
 | `"en12354"` | $\Delta L = 30 \log_{10} (f/f_0)$ | sand-cement and calcium-sulfate screeds, whose low loss factor makes them finite plates with a reverberant bending field (Formula C.1) |
 | `"cremer_hammer"` | $40 \log_{10} (f/f_0) + 10 \log_{10}[1 + (f/f_\text{limit})^2]$ | a lightweight walking surface, where the hammer impedance is no longer negligible; tends to 18 dB per octave |
+
+All three laws are written for $f > f_0$, and the library clamps them to zero
+at and below the resonance. That clamp is a convention, not a physical result:
+in the band containing $f_0$ the mass-spring system amplifies, and measured
+floors fall between about $-5$ dB and $0$ dB there — the "worse than bare at
+$f_0$" of the introduction, which no model on this page reproduces. As long as
+$f_0$ sits below the rated range the difference is harmless, but a stiff layer
+or a light screed that puts $f_0$ near 100 Hz produces a $\Delta L_w$ that is
+optimistic in precisely the band that decides the rating. Check where $f_0$
+lands before trusting the number.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/floating_floor_prediction.svg" alt="Improvement of impact sound insulation of a 35 mm floating screed of 73.5 kg per square metre on an 8 meganewton per cubic metre resilient layer: nothing below the 52.8 Hz mass-spring resonance, then the 30 lg law of EN 12354-2 reaching 59 dB at 5 kHz against the steeper 40 lg law of Cremer and the 18 dB per octave branch that includes the tapping-machine hammer impedance" width="80%" />
 

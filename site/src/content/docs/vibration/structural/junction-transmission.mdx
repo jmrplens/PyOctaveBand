@@ -250,14 +250,28 @@ from phonometry import junction_transmission, wave_vibration_reduction_index
 # 100 mm, plate 2 swept from 50 mm to 400 mm.
 h1, cl, rho = 0.1, 3200.0, 2400.0
 ratios = np.linspace(0.5, 4.0, 36)
-kij_corner = []
+curves = {"X corner": [], "X straight": [], "T-junction (1) corner": [],
+          "L corner": []}
 for ratio in ratios:
     h2 = h1 * float(ratio)
-    res = junction_transmission("X", h1, cl, rho * h1, h2, cl, rho * h2)
-    kij_corner.append(res.corner_reduction_index)
+    res_x = junction_transmission("X", h1, cl, rho * h1, h2, cl, rho * h2)
+    curves["X corner"].append(res_x.corner_reduction_index)
+    # Only the corner index is precomputed on the result; the straight path
+    # is the angular average tau13 converted the same way.
+    curves["X straight"].append(float(wave_vibration_reduction_index(
+        res_x.straight_average, res_x.critical_frequency2)))
+    res_t = junction_transmission("T1", h1, cl, rho * h1, h2, cl, rho * h2)
+    curves["T-junction (1) corner"].append(res_t.corner_reduction_index)
+    res_l = junction_transmission("L", h1, cl, rho * h1, h2, cl, rho * h2)
+    curves["L corner"].append(res_l.corner_reduction_index)
 
 fig, ax = plt.subplots()
-ax.plot(ratios, kij_corner, label="X corner")
+for label, values in curves.items():
+    ax.plot(ratios, values, "--" if label == "X straight" else "-", label=label)
+# The identical-plate X-junction: Kij = 10 lg 12 + 5 lg(fc2/1000).
+res_eq = junction_transmission("X", h1, cl, rho * h1, h1, cl, rho * h1)
+ax.scatter([1.0], [res_eq.corner_reduction_index], zorder=6,
+           label="identical plates (tau = 1/12)")
 ax.set_xlabel("Thickness ratio h2/h1")
 ax.set_ylabel("Vibration reduction index Kij [dB]")
 ax.set_title("Wave-approach junction Kij (Hopkins Eq. 5.116)")
@@ -270,15 +284,15 @@ plt.show()
 ## 5. Worked example: feeding Kij into EN 12354
 
 The number this page predicts is exactly what the EN 12354-1 flanking model
-consumes. Take the 100 mm / 200 mm concrete X-junction from the figure at
-the top: its corner path gives $K_{12} = 9.8\ \text{dB}$. Handing that to
+consumes. Take the 100 mm / 200 mm concrete X-junction of section 2's
+$\tau(\theta)$ figure: its corner path gives $K_{12} = 9.8\ \text{dB}$. Handing it to
 `flanking_element` in place of a tabulated Annex E value prices the
 junction's three flanking paths and their effect on the apparent rating:
 
 ```python
 from phonometry import building, junction_transmission
 
-# The 100 mm / 200 mm concrete X-junction of the opening figure:
+# The 100 mm / 200 mm concrete X-junction of the tau(theta) figure:
 res = junction_transmission("X", 0.1, 3200.0, 240.0, 0.2, 3200.0, 480.0)
 k12 = res.corner_reduction_index                     # 9.8 dB (corner path)
 
@@ -451,10 +465,14 @@ method** drives each subsystem in turn while measuring both energies each time.
 That gives four equations for $\eta_1$, $\eta_2$, $\eta_{12}$ and $\eta_{21}$
 with no prior assumption at all, which `power_injection_matrix` solves band by
 band. Reciprocity then becomes a *check* on the measurement rather than an
-input: `modal_density_ratio` compares the measured $\eta_{21}/\eta_{12}$
-against the $n_1/n_2$ computed from the geometry, and a large disagreement
-means the
-subsystem boundaries were drawn in the wrong place.
+input: `PowerInjectionResult.modal_density_ratio` is a property, not a
+function, and it returns only the $n_1/n_2$ *implied* by the measured coupling
+loss factors, $\eta_{21}/\eta_{12}$. Making it a check is the reader's step:
+compare it against the ratio built from the geometry with
+`flat_plate_modal_density` and its siblings, and a large disagreement means the
+subsystem boundaries were drawn in the wrong place. `coupling_strength` is the
+other diagnostic on the same result, and says whether the weak-coupling
+assumption the inversion rests on holds at all.
 
 ## See also
 

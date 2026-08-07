@@ -71,7 +71,7 @@ references:
     issue: 4
     pages: "1084-1091"
     doi: "10.1121/1.1903388"
-    note: "The alternative pressure-based sound-speed equation (\"del-grosso\")."
+    note: "The alternative pressure-based sound-speed equation (\"del_grosso\")."
   - type: article
     authors: ["Mackenzie, K. V."]
     year: 1981
@@ -178,9 +178,10 @@ $$
 Geometrical spreading is $20 \log_{10} R$ (spherical), $10 \log_{10} R$ (cylindrical) or
 spherical up to a transition range $R_0$ and cylindrical beyond it (`"practical"`). The
 volume absorption $\alpha$ (dB/km) comes
-from **Francois–Garrison** (1982, default and reference), **Ainslie–McColm**
-(1998) or **Thorp** (1967, frequency-only); the first two agree to within ~10 %
-across 100 Hz–1 MHz.
+from **Francois-Garrison** (`model="francois-garrison"`, 1982, the default and
+the reference), **Ainslie-McColm** (`"ainslie-mccolm"`, 1998) or **Thorp**
+(`"thorp"`, 1967, frequency-only); the first two agree to within ~10 % across
+100 Hz-1 MHz.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/underwater_transmission_loss.svg" alt="Underwater transmission loss versus range at 10 kHz with the geometrical-spreading and volume-absorption contributions drawn separately, loss increasing downward" width="82%" loading="eager" />
 
@@ -211,7 +212,17 @@ from phonometry import underwater
 ranges = np.linspace(10.0, 20_000.0, 400)
 tl = underwater.transmission_loss(ranges, 10e3, law="practical", transition_range=1000.0,
                           temperature=10.0, salinity=35.0, depth=100.0)
-print(tl.absorption_coefficient, tl.tl[-1])
+print(round(tl.absorption_coefficient, 3), round(float(tl.tl[-1]), 1))
+# 0.95 dB/km, 92.0 dB at 20 km
+
+# The same case on the other two absorption models, so the agreement claim
+# above is checkable rather than asserted:
+for model in ("ainslie-mccolm", "thorp"):
+    other = underwater.transmission_loss(ranges, 10e3, law="practical",
+                              transition_range=1000.0, temperature=10.0,
+                              salinity=35.0, depth=100.0, model=model)
+    print(model, round(other.absorption_coefficient, 3))   # 0.973 / 1.15
+
 tl.plot()   # TL vs range with the spreading/absorption split (needs matplotlib)
 ```
 
@@ -287,9 +298,11 @@ the derivation-consistent form; see
 
 ## Speed of sound in sea water
 
-`sea_water_sound_speed(T, S, depth, model=…)` uses the **UNESCO / Chen–Millero**
-equation (default, in the Wong & Zhu 1995 ITS-90 form), **Del Grosso** (1974),
-**Mackenzie** (1981) or **Medwin** (1975). Depth is converted to pressure with
+`sea_water_sound_speed(T, S, depth, model=…)` uses the **UNESCO / Chen-Millero**
+equation (`model="unesco"`, the default, in the Wong & Zhu 1995 ITS-90 form),
+**Del Grosso** (`"del_grosso"`, note the underscore, unlike the hyphenated
+absorption models above), **Mackenzie** (`"mackenzie"`) or **Medwin**
+(`"medwin"`), all 1974-1981. Depth is converted to pressure with
 Leroy & Parthiot (1998). The four agree to within ~2.5 m/s; Mackenzie's canonical
 check value is 1550.744 m/s at 25 °C, 35 ppt, 1000 m. Medwin's six-term form is
 the coarsest of the family and the one behind the classic rules of thumb
@@ -396,9 +409,33 @@ print(se.figure_of_merit)
 se.plot()   # signal excess vs transmission loss (needs matplotlib)
 ```
 
-Sonar, propagation and ambient levels are in dB re a plane wave of 1 µPa rms
-(spectrum levels). Source levels (below) use the source convention, dB re
-1 µPa²/Hz **at 1 m**.
+The terms, once: $SL$ the source level of the target, $TL$ the one-way
+transmission loss, $NL$ the noise level at the receiver, $DI$ the directivity
+index (array gain), $DT$ the detection threshold and, for the active form, $TS$
+the target strength.
+
+**Two references are in play, and ISO 18405 keeps them apart.** Band and
+broadband levels — the ambient level in a band, $NL$, and $SL$ as used in the
+sonar equation — are re 1 µPa. *Spectral densities*, which is what
+`ocean_ambient_noise` and `ship_source_spectrum` return, are re 1 µPa²/Hz. A
+source level carries an extra squared metre from its reference range, which
+ISO 18405 writes re 1 µPa²m² (equivalently "dB re 1 µPa at 1 m").
+
+**Every term must refer to the same bandwidth.** The sonar equation is a level
+balance, so mixing a broadband source level with an ambient *spectrum* level is
+wrong by $10\log_{10} B$ — tens of decibels at any useful bandwidth, and the
+function cannot catch it because it takes bare decibels. Since the ambient and
+ship-traffic models here are per hertz, the simplest discipline is to work per
+hertz throughout and let the processing bandwidth enter through $DT$; the
+alternative adds $10\log_{10} B$ to a broadband signal *and* to the noise (for
+a tone, to the noise alone, which is the whole of processing gain). The ship
+result carries the decidecade band levels beside its density for exactly this
+conversion.
+
+The figure of merit is quoted below as "dB re m²": Ainslie writes it as a
+maximum *propagation factor* rather than as a loss, and the propagation factor
+has units of m², so the same number that reads as a maximum allowable
+transmission loss in decibels reads as a figure of merit re 1 m².
 
 ### Detection range
 
@@ -575,16 +612,34 @@ plt.show()
 </details>
 
 ```python
+import numpy as np
 from phonometry import underwater
 
 ship = underwater.ship_source_spectrum(18.0, 300.0, vessel_class="containership")
 ship.plot()                     # source spectral density vs frequency
 print(underwater.VESSEL_CLASSES)        # the 13 JOMOPANS-ECHO vessel classes
 
-# Feed the prediction into the ambient noise as the shipping term:
+# `source_psd` is a SOURCE level at 1 m; the `shipping` term of the ambient sum
+# is a RECEIVED spectrum level at the listening position. Propagation is the
+# step between them - here that one ship, 2 km away.
+tl = np.array([float(underwater.transmission_loss(
+    2000.0, float(f), law="practical", transition_range=1000.0).tl[0])
+    for f in ship.frequency])
+received = ship.source_psd - tl
 noise = underwater.ocean_ambient_noise(ship.frequency, wind_speed_knots=10.0,
-                               shipping=ship.source_psd)
+                               shipping=received)
+print(round(float(np.interp(100.0, ship.frequency, noise.spectrum_level)), 1))
+# 97.6 dB re 1 uPa^2/Hz at 100 Hz, against 72.7 for the wind alone. Passing
+# ship.source_psd straight in would print 160.6: a source level is not a
+# received one, and the error is the whole transmission loss.
 ```
+
+Even that is a single-ship estimate. Measured shipping noise at a site is the
+sum over the whole traffic field, so a realistic term integrates many vessels
+over their ranges and classes, which is why `ocean_ambient_noise` leaves the
+shipping spectrum to the caller instead of building one in. One sanity check
+carries most of the value: a composite ambient spectrum above roughly
+120 dB re 1 µPa²/Hz is a units or geometry error, not a noisy sea.
 
 Every closed form above stops being enough when refraction and boundaries
 decide the answer: a sound-speed minimum that traps energy, surface and

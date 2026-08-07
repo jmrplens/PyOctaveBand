@@ -29,10 +29,14 @@ import ThemeImage from '../../../../components/ThemeImage.astro';
 
 Choosing a filter architecture is a trade-off: selectivity, passband ripple
 and phase behaviour cannot all be optimal at once, and each of the five
-architectures phonometry offers resolves the trade-off differently. Because
-every one of them places its **−3 dB points on the ANSI S1.11 band edges**,
-the choice changes how a band rejects its neighbours and how it treats
-transients, not where the band sits. This page puts the architectures side
+architectures phonometry offers resolves the trade-off differently. Three of
+them — Butterworth, Chebyshev II and Bessel — place their **−3 dB points on the
+ANSI S1.11 band edges**, so for those three the choice changes how a band
+rejects its neighbours and how it treats transients, not where the band sits.
+The two equiripple designs are the exception, and section 3 gives the size of
+it: `cheby1` and `ellip` treat the band edges as their ripple edge, so their
+bands are effectively wider and every band level reads a few tenths of a decibel
+high. This page puts the architectures side
 by side: the comparison at the −3 dB crossover, the full 1/1 and 1/3 octave
 response gallery, usage examples per architecture, and the Linkwitz-Riley
 crossover for when the goal is splitting a signal rather than measuring
@@ -92,7 +96,7 @@ plt.show()
 
 Full spectral view of the filter banks for Octave (1/1) and 1/3-Octave fractions.
 
-| Architecture | 1/1 Octave (Fraction=1) | 1/3 Octave (Fraction=3) |
+| Architecture | Octave (`fraction=1`) | One-third octave (`fraction=3`) |
 | :--- | :--- | :--- |
 | **Butterworth** | <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/filter_butter_fraction_1_order_6.svg" alt="Butterworth octave-band filter bank frequency response" width="100%" /> | <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/filter_butter_fraction_3_order_6.svg" alt="Butterworth one-third-octave filter bank frequency response" width="100%" /> |
 | **Chebyshev I** | <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/filter_cheby1_fraction_1_order_6.svg" alt="Chebyshev I octave-band filter bank frequency response" width="100%" /> | <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/filter_cheby1_fraction_3_order_6.svg" alt="Chebyshev I one-third-octave filter bank frequency response" width="100%" /> |
@@ -299,12 +303,32 @@ filters.OctaveFilterBank(fs=48000, fraction=3, order=6, limits=[12, 20000],
 
 </details>
 
-### 6. Linkwitz-Riley (`linkwitz_riley`)
+## 4. Linkwitz-Riley crossover (`linkwitz_riley`)
 
-Specifically designed for **audio crossovers**. Linkwitz-Riley filters (typically
-4th order, but any even order is supported) allow splitting a signal into bands
-that, when summed, result in a perfectly flat magnitude response and zero phase
-difference between bands at the crossover.
+Linkwitz-Riley is not a sixth architecture: it does not build an IEC band, and
+it is not a `FilterDesign(filter_type=…)` value. It is called directly, and it
+does the opposite job — it splits one signal into two branches that recombine
+into a flat magnitude response, which is what a loudspeaker **crossover** needs
+and what a measurement band must never do. Each branch is a Butterworth of order
+`order/2` applied twice, so each is exactly **−6 dB at the crossover frequency**
+(not −3 dB as in the bands above): the branches add to unity in *amplitude*,
+not in power.
+
+Which recombination is flat depends on the parity of `order/2`, and the naive
+sum is wrong for half the even orders:
+
+| `order` | `order/2` | Branch phase difference at $f_c$ | Flat recombination |
+| :---: | :---: | :---: | :--- |
+| 2 | 1 (odd) | 180° | `low - high` |
+| 4 | 2 (even) | 0° | `low + high` |
+| 6 | 3 (odd) | 180° | `low - high` |
+| 8 | 4 (even) | 0° | `low + high` |
+
+At orders 2 and 6 the branches are in antiphase at $f_c$ and `low + high`
+collapses into a deep notch there instead of summing flat. Even in the flat
+cases the sum is **all-pass**, not phase-free: its magnitude is flat to better
+than 0.001 dB from 20 Hz to 20 kHz while its phase turns a full 360° through the
+crossover.
 
 ```python
 import numpy as np
@@ -315,8 +339,10 @@ fs = 48000
 recording = 0.2 * np.sin(2 * np.pi * 1000 * np.arange(fs) / fs)
 
 # Split the recording into Low and High bands at 1000 Hz
-low, high = filters.linkwitz_riley(recording, fs, freq=1000, order=4)
-# Recombined, low + high has a flat magnitude response (allpass sum)
+order = 4
+low, high = filters.linkwitz_riley(recording, fs, freq=1000, order=order)
+# Flat recombination: sum for order/2 even, difference for order/2 odd
+recombined = low + high if (order // 2) % 2 == 0 else low - high
 ```
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/crossover_lr4.svg" alt="Linkwitz-Riley 4th-order crossover: low-pass, high-pass and their flat sum" width="60%" />
@@ -353,14 +379,23 @@ plt.show()
 
 </details>
 
+**In a real crossover** the two branches sum acoustically, not electrically, and
+the flatness above only survives if the two acoustic paths are time-aligned. A
+woofer/tweeter acoustic-centre offset of a few centimetres is enough phase
+rotation at 1 kHz to notch the summation, and the remedy is a delay on the
+forward driver, not a different filter order. Verify by measuring the summed
+on-axis response with the swept-sine method of
+[System measurement](/phonometry/signals/spectra/system-measurement/).
+
 ## What this guide covers
 
 **Covered.** The five architectures every IEC-band bank can be built on
 (Butterworth, Chebyshev I/II, Elliptic, Bessel): their magnitude responses
 compared at the −3 dB crossover and in the full 1/1 and 1/3 octave gallery,
-the ANSI S1.11 −3 dB band-edge convention they all share, and a usage
-example per architecture, plus the Linkwitz-Riley crossover whose low and
-high bands sum to a flat response.
+the band-edge convention (exact for Butterworth, Chebyshev II and Bessel; the
+ripple edge for the two equiripple families), and a usage example per
+architecture, plus the Linkwitz-Riley crossover, whose two branches recombine
+flat — by sum or by difference, depending on the parity of `order/2`.
 
 **Not covered.** The band mathematics, the pole-zero, stability and
 multirate design and the `octave_filter()` / `OctaveFilterBank` parameter
@@ -389,5 +424,9 @@ roll-off at the cost of passband ripple; Chebyshev II keeps the passband
 flat and puts the ripple in the stopband instead; Elliptic offers maximum
 selectivity, with ripple in both bands; and Bessel preserves transient
 waveform shapes thanks to its linear phase response, but has the slowest
-roll-off. Linkwitz-Riley is for audio crossovers: its bands sum to a
-perfectly flat response.
+roll-off. Note that Chebyshev I and Elliptic take the band edges as their
+*ripple* edge rather than their −3 dB point, so their band levels sit a few
+tenths of a decibel above the other three and must not be mixed with them in one
+spectrum. Linkwitz-Riley is not one of the five: it is a crossover, and its two
+branches recombine flat by `low + high` when `order/2` is even and by
+`low - high` when it is odd.

@@ -37,6 +37,7 @@ references:
 ---
 
 import ThemeImage from '../../../components/ThemeImage.astro';
+import Video from '../../../components/Video.astro';
 
 Most of phonometry predicts a **number**: a level, a reverberation time, a
 transmission loss. The `simulation` domain computes the **wave field
@@ -57,6 +58,32 @@ bit-identical outputs on the same platform. It is the engine behind the FDTD
 animations of this documentation, promoted to a public API with sources,
 pressure probes, rasterised obstacles, per-side boundary conditions and a
 frozen result object.
+
+Here is one of those animations, and it is a fair advertisement for what the
+rest of this page builds. Nothing in it is drawn: the colonnade is a boolean
+`obstacle_mask` of rasterised circles and the wavefront is a single one-way
+plane-wave packet with a Gaussian envelope one wavelength wide, launched at
+$x = 0.30$ m into a 4 m × 1 m rigid-walled hall whose two ends absorb through
+sponges hidden outside the frame. The carrier is 800 Hz, so the wavelength is
+42.9 cm and the 10 to 17 cm columns are roughly a quarter to two fifths of it
+— the regime in which a rigid cylinder both casts a readable shadow and
+re-radiates strongly, which is why the coda that fills the hall is structured
+rather than noise. That coda is deterministic multiple scattering: it is what
+a diffuse field looks like *before* any statistical assumption is made about
+it. The mesh is the worked example of the rule
+[section 4](#4-numerical-dispersion-and-accuracy) derives: the tightest gap
+in this layout is 6.6 cm between a column and a wall, so
+$\Delta x = \min(\text{smallest aperture}/4,\ \lambda/8)$ allows up to 1.6 cm,
+and the clip runs at 2.5 mm because a banner needs the definition.
+
+<Video
+  name="anim_fdtd_pillar_hall"
+  width={2400}
+  height={600}
+  displayWidth="100%"
+  title="A wavefront through a hall of columns (2D FDTD)"
+  description="An 800 Hz plane wavefront sweeps a 4 m rigid-walled hall filled with a staggered colonnade of rigid columns 10 to 17 cm across, simulated at 2.5 mm; every column diffracts the front and sheds a scattered wavelet, and the wavelets interfere until the whole hall is filled with structured energy that then drains through the absorbing ends."
+/>
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_fdtd.svg" alt="Pipeline from the domain definition (sound-speed and density maps with the grid spacing dx) and the geometry (obstacle mask and per-side boundary conditions), through the sources injected at grid cells, the staggered-grid leapfrog update of velocity and pressure, and the Courant stability condition, to the frozen FDTDResult with probe histories, field snapshots and a plot method" width="86%" loading="eager" />
 
@@ -89,10 +116,13 @@ $$
             = \frac{c\,\Delta t\,\sqrt{2}}{\Delta x} \le 1,
 $$
 
-and `fdtd_simulation` derives the time step from the `cfl` parameter (the
-Courant number, default 0.6) and the largest sound speed in the map; values
+and `fdtd_simulation` derives the time step from the `cfl` parameter (this
+$\mathrm{CN}$, default 0.6) and the largest sound speed in the map; values
 outside $(0, 1)$ are rejected because the scheme is unconditionally
-meaningless beyond the bound (Eq. 4.14).
+meaningless beyond the bound (Eq. 4.14). Section 4 also uses a *per-axis*
+Courant number $S = c\,\Delta t/\Delta x = \mathrm{CN}/\sqrt{2}$ in the
+dispersion relation; the two are not the same number, and the default
+`cfl = 0.6` means $S = 0.424$.
 
 ```python
 from phonometry import simulation
@@ -521,7 +551,10 @@ $$
 
 with a leading-order relative frequency error of magnitude
 $(1 - S^2)\,(k\,\Delta x)^2 / 24$ along the grid axes (the modelled frequency
-under-reads, so the signed error is negative), where $S = c\,\Delta t / \Delta x$;
+under-reads, so the signed error is negative), where
+$S = c\,\Delta t / \Delta x$ is the **per-axis** Courant number, which for
+square cells is the `cfl` value divided by $\sqrt{2}$ — the default
+`cfl = 0.6` gives $S = 0.424$ and $1 - S^2 = 0.82$;
 the error is largest exactly on-axis and vanishes along the cell diagonal
 at the Courant limit $\mathrm{CN} = 1$. The practical rule is to resolve **at
 least 10 cells per shortest wavelength**, $\Delta x \le c_\text{min} / (10 f_\text{max})$
@@ -603,7 +636,9 @@ Resolve at least 10 cells per shortest wavelength,
 $\Delta x \le c_\text{min} / (10 f_\text{max})$, using the smallest sound
 speed in the domain.
 At exactly 10 cells the on-axis dispersion error bound is about 1.6 %,
-reduced to about 1.4 % at the default ``cfl = 0.6``, and halving $\Delta x$
+reduced to about 1.4 % at the default ``cfl = 0.6`` (the per-axis Courant
+number is then $S = \mathrm{cfl}/\sqrt{2} = 0.424$, so the $1 - S^2$ factor is
+0.82), and halving $\Delta x$
 quarters the error (the scheme is second order). With $\Delta x = 1$ cm the
 10-cell point in air sits at roughly 3.4 kHz.
 
@@ -613,8 +648,11 @@ The explicit scheme is stable only while a wavefront crosses at most one
 cell per time step. With square cells the Courant number is
 $\mathrm{CN} = c\,\Delta t\,\sqrt{2}/\Delta x \le 1$ (Attenborough & Van
 Renterghem Eq. 4.13). `fdtd_simulation` derives the time step from the
-`cfl` parameter (the Courant number, default 0.6) and the largest sound
-speed in the map, rejecting values outside $(0, 1)$.
+`cfl` parameter (that same $\mathrm{CN}$, default 0.6) and the largest sound
+speed in the map, rejecting values outside $(0, 1)$. The *per-axis* Courant
+number of the dispersion relation above is a different number,
+$S = c\,\Delta t/\Delta x = \mathrm{CN}/\sqrt{2}$, which is 0.424 at the
+default.
 
 ### Can I trust the absolute levels from a 2D FDTD run?
 

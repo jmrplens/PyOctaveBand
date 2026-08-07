@@ -223,37 +223,44 @@ def _d_scattering_reverb(s: SVG, th: Theme) -> None:
     s.ellipse(tx, tyc - 12, 82, 15, th.bg, th.secondary, 2.2)   # test sample
     for hx in range(int(tx) - 60, int(tx) + 60, 12):            # sample hatch
         s.line(hx, tyc - 10, hx + 10, tyc - 18, th.secondary, 1.0)
-    s.text(tx, gy + 22, "Turntable (test sample)", 17, th.fg, bold=True)
+    s.text(tx, gy + 22, "Turntable and base plate", 17, th.fg, bold=True)
     _rot_arrow(s, tx, tyc, 150, 205, 340, th.accent, 2.2, ry=26)
-    s.text(445, tyc + 6, "rotating → α_spec", 15, th.accent, anchor="start")
-    s.text(tx, tyc - 42, "stationary → α_s", 15, th.muted)
+    s.text(tx, tyc - 70, "the only thing that moves", 15, th.accent)
+    s.text(tx, tyc - 46, "sample on the plate for T2 and T4", 15, th.muted)
+    # Wall clearance of the turntable rim.
+    s.line(78, 386, tx - 150, 386, th.muted, 1.4)
+    s.line(78, 380, 78, 392, th.muted, 1.4)
+    s.line(tx - 150, 380, tx - 150, 392, th.muted, 1.4)
+    s.text(106, 376, "≥ 1.0 m", 14, th.muted)
 
-    # --- Rotating boom loudspeaker source (upper right) -------------------
-    pvx, pvy = 560.0, 100.0
-    spx, spy = 668.0, 202.0
-    s.circle(pvx, pvy, 5, th.fg)
-    s.line(pvx, pvy, spx, spy, th.fg, 3)
-    s.rect(spx - 26, spy - 26, 40, 52, th.panel, th.primary, rx=6, sw=2)
-    s.circle(spx - 6, spy, 11, th.primary)
-    s.circle(spx - 6, spy, 4, th.bg)
-    _rot_arrow(s, pvx, pvy, 118, -18, 46, th.accent, 2.0)
-    s.text(spx + 8, spy + 46, "Rotating boom source", 18, th.fg, bold=True)
+    # --- Two fixed loudspeaker positions (right) --------------------------
+    for sx, sy, lab in ((648.0, 262.0, "S1"), (752.0, 296.0, "S2")):
+        s.rect(sx - 20, sy - 26, 40, 52, th.panel, th.primary, rx=6, sw=2)
+        s.circle(sx, sy, 11, th.primary)
+        s.circle(sx, sy, 4, th.bg)
+        s.line(sx, sy + 26, sx, gy, th.fg, 2.2)
+        s.line(sx - 14, gy, sx + 14, gy, th.fg, 2.2)
+        s.text(sx, sy - 34, lab, 17, th.fg, bold=True)
+    s.text(700, 196, "fixed sources (≥ 2)", 16, th.muted)
 
-    # --- Microphone on a stand in the room --------------------------------
-    s.mic(468.0, 246.0, gy, 1.0)
-    s.text(468.0, 234.0, "Microphone", 18, th.fg, bold=True)
+    # --- Three fixed microphone positions ---------------------------------
+    for mx, my, lab in ((452.0, 262.0, "M1"), (520.0, 286.0, "M2"),
+                        (586.0, 310.0, "M3")):
+        s.mic(mx, my, gy, 1.0)
+        s.text(mx, my - 12, lab, 16, th.fg, bold=True)
+    s.text(470, 226, "fixed microphones (≥ 3)", 16, th.muted)
 
     # --- Governing relations ----------------------------------------------
     for y, txt, col, bold in (
-        (448, ("Stationary sample → α_s (Eq. 1)   ·   "
-              "rotating / averaged → α_spec (Eq. 4)"), th.fg, True),
-        (478, "s = (α_spec − α_s) / (1 − α_s)   (Eq. 5)", th.accent, True),
-        (508, ("α from 55.3·(V/S)·(1/cT) − 4(V/S)m   "
-              "(Sabine, Table 2 rows T1–T4)"), th.muted, False),
-        (534, "Base-plate check: s_base ≤ Table 1 limit (Clause 6.2)",
-         th.muted, False),
+        (448, ("T1 base plate, static  ·  T2 sample, static  →  α_s (Eq. 1)"),
+         th.fg, True),
+        (474, ("T3 base plate, rotating  ·  T4 sample, rotating  →  "
+               "α_spec (Eq. 4)"), th.fg, True),
+        (502, "s = (α_spec − α_s) / (1 − α_s)   (Eq. 5)", th.accent, True),
+        (528, ("α from 55.3·(V/S)·(1/cT) − 4(V/S)m  ·  the base plate must "
+               "pass the Table 1 ceiling"), th.muted, False),
     ):
-        s.text(450, y, txt, 19 if bold else 18, col, bold=bold)
+        s.text(450, y, txt, 19 if bold else 17, col, bold=bold)
 
 
 # ---------------------------------------------------------------------------

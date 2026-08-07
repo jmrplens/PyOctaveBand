@@ -26,6 +26,10 @@ The three parameters come from Table 1 (p. 4), tabulated at the 29 preferred thi
 
 The standard specifies **no interpolation** between the tabulated frequencies. Formula (1) is specified for **20 phon to 90 phon** between 20 Hz and 4 kHz, and only up to **80 phon between 5 kHz and 12.5 kHz**; above 80 phon the contour therefore stops at 4 kHz. Values outside these limits from Formula (2) are extrapolations the standard labels as informative only.
 
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/equal_loudness_contours_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/equal_loudness_contours.svg" alt="ISO 226:2023 normal equal-loudness-level contours from 20 to 90 phon with the hearing threshold curve" width="80%"></picture>
+
+*The ISO 226:2023 contours from Formula (1), 20 to 90 phon, with the hearing threshold.*
+
 See the [Loudness guide](../../perception/psychoacoustics/loudness.md) for usage.
 
 ## Tone prominence: TNR and PR (ECMA-418-1)
@@ -45,6 +49,15 @@ $$
 $$
 
 **PR** (clause 12) compares the level of the critical band centred on the tone, $L_M$, with the mean power of the two **contiguous** critical bands $L_L$, $L_U$ (edges from the fitted Formulae 21–22 with Tables 2–3): $\mathrm{PR} = 10\log_{10} P_M - 10\log_{10}\left[(P_L + P_U)/2\right]$ (Formula 23). For $f_t \le 171.4$ Hz the lower band is truncated at 20 Hz and its power rescaled to a **100 Hz bandwidth** (Formula 24). The criterion (Formulae 25–26) is 9.0 dB at $f_t \ge 1$ kHz, rising as $9.0 + 10.0\log_{10}(1000/f_t)$ below. Tones are assessed within the 89.1 Hz – 11.2 kHz range of interest (clauses 11.5 / 12.6).
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/tone_prominence_assessment_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/tone_prominence_assessment.svg" alt="Tone-to-noise ratio of a 250 Hz fan tone plotted against the ECMA-418-1 prominence criterion: the criterion falls from about 17 dB at 89 Hz to a flat 8 dB above 1 kHz, and the assessed tone sits at 15.1 dB, 2.1 dB above the 13.0 dB criterion at 250 Hz, so it is prominent" width="88%"></picture>
+
+*The TNR criterion drawn rather than evaluated, over the 89.1 Hz – 11.2 kHz
+range of interest, with one assessed tone on it. Because the criterion is
+$8.0 + 8.33\log_{10}(1000/f_t)$ below 1 kHz and flat above, the same
+tone-to-noise ratio is judged against a different threshold at every frequency:
+the example tone clears its 13.0 dB threshold at 250 Hz by 2.1 dB, while a
+10 dB tone would be prominent anywhere above 1 kHz and not prominent here.*
 
 See the [Prominent Discrete Tones guide](../../perception/psychoacoustics/tone-prominence.md) for usage.
 
@@ -78,6 +91,10 @@ N = 2^{(L_N - 40)/10} \ \text{sone} \qquad \Longleftrightarrow \qquad L_N = 40 +
 $$
 
 below 1 sone the reference program uses $L_N = 40 (N + 0.0005)^{0.35}$, floored at 3 phon.
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/loudness_pattern_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/loudness_pattern.svg" alt="Specific loudness patterns over the Bark scale for a 1 kHz narrowband sound and a broadband sound of equal band level" width="80%"></picture>
+
+*Specific loudness N′(z) over the Bark axis: energy spread over many critical bands sums to more sones than the same band level in a single band.*
 
 See the [Loudness guide](../../perception/psychoacoustics/loudness.md) for usage.
 
@@ -145,6 +162,15 @@ $$
 
 (Formulae 65–111). The single value $R$ is the 90th percentile of $R(l_{50})$ over time (Clause 7.1.10); the constant $c_R$ (Formula 104) calibrates the reference sound (a 1 kHz carrier 100 % amplitude-modulated at 70 Hz at 60 dB SPL) to 1 asper.
 
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/hms_modulation_bandpass_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/hms_modulation_bandpass.svg" alt="ECMA-418-2 slow vs fast modulation perception: fluctuation strength forms a band-pass over modulation frequency peaking near 4 to 6 Hz while roughness of the same 1 kHz amplitude-modulated tones peaks near 70 Hz" width="80%"></picture>
+
+*The modulation-rate weighting the formulae above apply, and the reason the
+range "roughly 20–300 Hz, strongest near 70 Hz" is a band-pass and not a
+threshold: the same 1 kHz carrier modulated slowly is heard as fluctuation
+strength, peaking near 4–6 Hz, and modulated fast is heard as roughness,
+peaking near 70 Hz. Between the two peaks the sensation changes name, not
+degree.*
+
 ### Sharpness (DIN 45692)
 
 Sharpness condenses the high-frequency emphasis of a sound into one number: the $g(z)$-weighted first moment of the ISO 532-1 stationary specific-loudness pattern (DIN 45692:2009, Equation 1):
@@ -155,6 +181,14 @@ g(z) = \begin{cases} 1 & z \le 15.8\ \text{Bark} \\ 0.15\ e^{0.42 (z - 15.8)} + 
 $$
 
 evaluated on the same 240-bin, 0.1-Bark grid. The constant $k$ is not hard-coded but derived from the calibration requirement (clause 6): a critical-band-wide narrowband noise 920–1080 Hz at 60 dB SPL scores exactly 1 acum, and the derived $k = 0.108$ lands inside the normative window $0.105 \le k < 0.115$ (clause 5.2). The informative Annex B weightings are provided under the same 1-acum anchor: von Bismarck (knee at 15 Bark, $0.2\ e^{0.308(z-15)} + 0.8$) and Aures (loudness-dependent, $g(z) = 0.078\ (e^{0.171 z}/z)\ N/\ln(0.05 N + 1)$). The Table A.2 narrow-band targets are reproduced within the clause 6 tolerance (5 % or 0.05 acum): 0.38 acum at 250 Hz, 1.00 at 1 kHz, 1.78 at 2.5 kHz, 2.82 at 4 kHz.
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sharpness_weighting_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sharpness_weighting.svg" alt="DIN 45692 sharpness weighting g(z) against critical-band rate on a log axis, comparing the DIN, von Bismarck and Aures curves with the 15.8 and 15 Bark knees marked" width="80%"></picture>
+
+*The three $g(z)$ weightings of the formula above on one axis: DIN with its
+15.8 Bark knee, von Bismarck with its 15 Bark knee, and the loudness-dependent
+Aures curve, which is why the choice of weighting changes a sharpness value
+only for sounds with energy above the knee (15 to 15.8 Bark, about 2.5 to
+3 kHz) and leaves everything below it untouched.*
 
 See the [Sound Quality Metrics guide](../../perception/psychoacoustics/sound-quality.md) for usage.
 
@@ -190,6 +224,23 @@ $$
 m_{dr} = \frac{2 \sqrt{\left( \sum_t I_k(t) \sin 2 \pi f_m t \right)^2 + \left( \sum_t I_k(t) \cos 2 \pi f_m t \right)^2}}{\sum_t I_k(t)}, \qquad m = \frac{m_{dr}}{0.55}
 $$
 
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sti_band_mti_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sti_band_mti.svg" alt="Modulation transfer index per octave band from 125 Hz to 8 kHz for a hall with a 0.9 s reverberation time and a 15 dB speech-to-noise ratio: the seven bars sit close together between about 0.54 and 0.60, giving STI = 0.58 with the Annex F rating E" width="88%"></picture>
+
+*The seven $\mathrm{MTI}_k$ the weighted sum above consumes, for a hall with
+$T = 0.9$ s and a 15 dB speech-to-noise ratio. Each bar is already the mean of
+14 transmission indices, so this is two stages of averaging below the raw
+$m(F)$; the bars sit within 0.06 of one another, which is the case in which
+the $\beta_k$ redundancy terms subtract almost nothing and the STI is close to
+the plain $\alpha$-weighted mean.*
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sti_vs_t60_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sti_vs_t60.svg" alt="STI versus reverberation time with the IEC 60268-16 Annex F rating bands shaded" width="80%"></picture>
+
+*The end of the chain rather than its middle: what the Schroeder closed form
+does to the STI as reverberation grows, against the Annex F rating bands. The
+curve falls steeply through the range where a room is still usable and
+flattens once the modulation has already been destroyed, which is why halving
+a long reverberation time buys less intelligibility than halving a short one.*
+
 See the [Speech Transmission Index guide](../../perception/speech/speech-transmission.md) for usage.
 
 ## Speech Intelligibility Index (ANSI S3.5)
@@ -216,6 +267,10 @@ $$
 
 and any fractile follows a two-sided Gaussian model (clause 4.4), $\Delta H_Q = \Delta H_{md} + z(Q)\ s$, using the upper spread $s_u$ for $z \ge 0$ (worse than median) and the lower spread $s_l$ otherwise, each a degree-5 polynomial in $Y - 18$ per sex and frequency (clause 4.3, Tables 2–5). At age 18 every deviation is zero by construction. The formulae are established to 80 years at and below 2 kHz and to 70 years above; beyond that the evaluation is an extrapolation. Anchors: at 60 years the medians evaluate to 7.85 dB (male, 1 kHz), 20.21 dB (male, 4 kHz) and 15.32 dB (female, 4 kHz), matching the Table 1 formula to $10^{-3}$.
 
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/hearing_threshold_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/hearing_threshold.svg" alt="Two panels. Left: the ISO 7029 median hearing-threshold deviation for men at ages 20, 40, 60 and 80 on an inverted audiogram axis, with the 10 to 90 percent fractile band around the 70-year curve; the loss deepens toward high frequencies and with age. Right: the ISO 389-7 free-field and diffuse-field reference threshold, coinciding below 1 kHz and diverging above, dipping to a minimum near 3 to 4 kHz" width="96%"></picture>
+
+*The ISO 7029 median age shift with its fractile band (left) and the ISO 389-7 free- and diffuse-field reference thresholds (right).*
+
 See the [Hearing Threshold guide](../../perception/hearing/hearing-threshold.md) for usage.
 
 ## Noise-induced hearing loss (ISO 1999)
@@ -233,6 +288,16 @@ H' = H + N - \frac{H\ N}{120}.
 $$
 
 The Annex D worked examples (Tables D.1–D.4; e.g. 100 dB / 40 yr at 3 kHz: 29/38/60 dB at the 0.10/0.50/0.90 fractiles) are reproduced exactly at the standard's integer rounding, and the Formula 2 hand value at 4 kHz / 20 yr / 90 dB is $N_{50} = 12.94$ dB.
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/nipts_audiogram_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/nipts_audiogram.svg" alt="ISO 1999 noise-induced permanent threshold shift after 40 years at an 8 h-normalised 95 dB(A), on an inverted audiogram axis from 500 Hz to 6000 Hz: the median is near zero at 500 Hz and deepens to about 26 dB at 4000 Hz before recovering at 6000 Hz, and the 10 to 90 percent fractile band around it reaches nearly 37 dB for the most susceptible tenth" width="88%"></picture>
+
+*The model as an audiogram: 40 years at an 8 h-normalised 95 dB(A). The notch
+at 4 kHz is what makes noise-induced loss recognisable in a clinic, and it is
+here only because $L_0$ is lowest (75 dB) in that band. Mind the fractile
+direction the paragraph above states: the edge of the shaded band showing the
+**deeper** shift is the library's `fractile=0.90`, the most susceptible tenth —
+which ISO 1999 and its Annex D column headings label $Q = 10\ \%$. At 4 kHz
+this case runs 19.5 / 26.0 / 36.0 dB at `fractile` 0.10 / 0.50 / 0.90.*
 
 See the [Noise-Induced Hearing Loss guide](../../perception/hearing/noise-induced-hearing-loss.md) for usage.
 

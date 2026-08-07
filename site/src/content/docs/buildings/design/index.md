@@ -1,6 +1,6 @@
 ---
 title: "Insulation design"
-description: "Sound insulation before it is built: the EN 12354 flanking prediction between rooms, the theoretical insulation of a panel from its physical properties, and the two material measurements a floor design consumes (ISO 16251-1 floor coverings, EN 29052-1 dynamic stiffness)."
+description: "Sound insulation before it is built: the EN/ISO 12354 flanking prediction between rooms in its simplified and per-band forms, the theoretical insulation of a panel from its physical properties, the resilient layers a floor or lining design turns on, and the structure-borne sound of building service equipment from the EN 15657 reception plate to the EN 12354-5 receiving-room level."
 ---
 
 The pages of the [Sound insulation](/phonometry/buildings/insulation/)
@@ -33,14 +33,42 @@ double wall, transmission through slits and apertures, plate radiation
 efficiency and point mobilities. It is the physics a catalogue value expresses
 in one number.
 
-Two measurements feed the floor half of any design.
+Two pages here carry the floor half of any design, one measuring and one
+predicting.
 [Floor-Covering Impact Improvement (ISO 16251-1)](/phonometry/buildings/design/impact-improvement/)
-gives the weighted improvement $\Delta L_w$ of a soft covering on a small
-heavyweight mock-up, the term EN 12354-2 subtracts from the bare-floor level,
-and
-[Dynamic stiffness of resilient materials (EN 29052-1)](/phonometry/materials/resilient/dynamic-stiffness/)
-gives the stiffness per unit area $s'$ of the resilient layer under a floating
-floor, and with it the resonance frequency the whole improvement hangs on.
+gives the weighted improvement $\Delta L_w$ of a covering that exists, on a
+small heavyweight mock-up, and that is the term EN 12354-2 subtracts from the
+bare-floor level.
+[Predicting Resilient-Layer Performance](/phonometry/buildings/design/resilient-layers/)
+predicts it for a covering that does not yet exist, from the tapping machine's
+own force spectrum, the cut-off frequency of a soft covering, the 30 lg and
+40 lg floating-floor laws and the ISO 12354-1 Annex D rating of a wall lining.
+Both start from the stiffness per unit area $s'$ of the resilient layer,
+measured per EN 29052-1 in
+[Dynamic stiffness of resilient materials](/phonometry/materials/resilient/dynamic-stiffness/)
+over in the materials section, which sets the resonance the whole improvement
+hangs on.
+
+Building service equipment is a chain of its own, and the two pages only read
+correctly in order.
+[Structure-borne sound power of equipment (EN 15657)](/phonometry/buildings/design/structure-borne-power/)
+characterises a pump, fan or cistern by the power it injects into the
+structure, measured on a reception plate of known dissipation and then made
+plate-independent.
+[Installed structure-borne sound (EN 12354-5)](/phonometry/buildings/design/installed-structure-borne/)
+takes that source description, loses part of it to the coupling term the source
+and receiver mobilities set, and carries the rest to a room that may be several
+junctions away.
+
+One bookkeeping note runs through the whole section: the family exists as
+EN 12354:2000 and as ISO 12354:2017, and the two are not interchangeable in
+every clause. The simplified models on
+[Predicting Sound Insulation](/phonometry/buildings/design/insulation-prediction/)
+follow the 2000 text — including the tabulated flanking correction $K$ that the
+2017 impact part replaced with explicit per-path formulae — while
+[Detailed Per-Band Prediction](/phonometry/buildings/design/detailed-prediction/)
+follows the 2017 text. Check which edition your regulation calls up before
+quoting a correction from either.
 
 ## Pages in this section
 

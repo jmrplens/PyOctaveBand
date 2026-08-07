@@ -91,7 +91,30 @@ t = np.arange(20 * fs) / fs
 x = np.zeros((5, t.size))                     # L, R, C, Ls, Rs
 x[0] = np.sin(2 * np.pi * 997.0 * t)          # 0 dB FS on the left channel
 print(round(broadcast.integrated_loudness(x, fs), 2))   # -3.01  LKFS
+
+# The same waveform on two channels instead of one (see below):
+mono = np.sin(2 * np.pi * 997.0 * t)
+print(round(broadcast.integrated_loudness(mono, fs), 2))               # -3.01
+print(round(broadcast.integrated_loudness(np.vstack([mono, mono]), fs), 2))  # 0.00
 ```
+
+### Channels are summed, not averaged
+
+Formula 2 sums $G_i z_i$ over the channels, so the channel count is part of the
+measurement: the same waveform carried on two channels is exactly
+$10\log_{10} 2 = 3.01$ LU louder than on one. The anchor above shows it — that
+full-scale 997 Hz sine reads −3.01 LKFS on a single channel and 0.00 LKFS as
+dual mono, which is what the last two lines of the snippet above print.
+
+Meter the delivery format, not a stem. A mono podcast delivered as one channel
+is compliant at −23 LUFS as one channel; duplicating it to stereo before
+metering makes it read −20 LUFS and invites a 3 dB correction in the wrong
+direction. The same arithmetic is why the LFE is excluded (Table 3, $G = 0$)
+and why the surround weights are 1.41: the sum is a loudness sum over the
+reproduction layout, so changing the layout changes the number legitimately.
+The `np.vstack` in the snippets below is exactly this — dual mono, the stereo
+delivery of a mono source — and it is why they read 3.01 LU above the
+single-channel value of the same waveform.
 
 The biquad coefficients are tabulated at 48 kHz (Tables 1-2) and returned
 verbatim at that rate; any other rate re-derives them through the analog

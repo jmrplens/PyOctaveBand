@@ -8,6 +8,10 @@ This page collects the theory behind rooms and buildings: impulse-response measu
 
 ANSI/ASA S12.2-2019 rates steady background noise in rooms against families of octave-band curves (16 Hz – 8 kHz). The **NC rating** follows the two-step procedure of clause 5.2.2 on the Table 1 curves (NC-15 to NC-70): the speech interference level $\mathrm{SIL} = \tfrac14(L_{500}+L_{1000}+L_{2000}+L_{4000})$ (clause 3.2) selects the NC-(SIL) curve, and if no band exceeds it the spectrum is designated NC-(SIL); otherwise the tangency method (clause 5.2.3) applies: each measured band is interpolated against the tabulated curve values, the rating is the highest per-band index and the band that sets it is the governing band; the interpolation makes the rating continuous (an NC-42.5 is reported as such, not snapped to a curve). Spectra above NC-70 or below NC-15 fall outside the family and are flagged (>NC-70 with the band of maximum exceedance, or <NC-15) instead of receiving a fabricated number. The **RC Mark II** contour (Annex D) is a pure −5 dB/octave line keyed to its 1000 Hz value with a low-frequency floor of $\max(\mathrm{RC} + 25,\ 55)$ dB at 16/31.5 Hz; the rating is the arithmetic mean of the 500/1000/2000 Hz levels rounded to an integer (clause D.4), and the spectral-quality tag compares the spectrum with the reference contour (clause D.3): rumble "R" when any band at or below 500 Hz exceeds it by more than 5 dB, hiss "H" when any band at or above 1 kHz exceeds it by more than 3 dB (both together "RH"), else neutral "N", reported as e.g. RC-35(N). The generated RC contours reproduce Table D.1 digit for digit, and feeding any Table 1 NC curve back returns its own tangency rating. NCB, RNC (Annex A) and the QAI (clause D.5) are deliberately out of scope.
 
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/room_noise_criteria_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/room_noise_criteria.svg" alt="Two panels for the same ventilation-dominated room spectrum. Left: the measured octave-band levels over the NC curve family, with a red diamond marking the tangent point at 250 Hz that sets the NC-42.5 rating. Right: the same spectrum over the reference RC-35 curve, with the low-frequency bands rising through the shaded rumble tolerance (plus 5 dB below 500 Hz) so the noise is classified RC-35(R), and the hiss tolerance (plus 3 dB at and above 1000 Hz) shaded for comparison" width="96%"></picture>
+
+*The same spectrum rated both ways: NC tangency at the governing band (left) and the RC Mark II reference with the rumble excess (right).*
+
 See the [Room Noise guide](../../buildings/rooms/room-noise.md) for usage.
 
 ## Room and building acoustics (ISO 18233, ISO 3382, ISO 16283, ISO 10140, EN 12354, ISO 12999, ISO 717, ISO 354)
@@ -32,6 +36,10 @@ $$
 
 i.e. a reversed cumulative sum in discrete time. Backward integration cancels the random fluctuation of a single squared IR: for a purely exponential energy decay $p^2(t) = e^{-a t}$ it gives $E(t) = e^{-a t}/a$, an exactly straight line $L(t) = -(10 a / \ln 10)\ t$. Background noise flattens $E(t)$, so integration is truncated at the crossing $t_1$ of the fitted decay line with the noise level and the missing tail is compensated by an exponential with the fitted rate; without that term the finite integral systematically **underestimates** $T$.
 
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/schroeder_decay_dark.webp"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/schroeder_decay.webp" alt="Squared impulse response with its Schroeder backward-integrated decay curve, and the EDT, T20 and T30 regression windows marked" width="80%"></picture>
+
+*A squared impulse response, its Schroeder backward integral and the EDT/T20/T30 regression windows of the next subsection.*
+
 ### Regression windows and validity (ISO 3382-2, Clause 6, Annex B/C)
 
 Reverberation time is a least-squares fit $L = a + b t$ over a window, extrapolated to 60 dB via $T = -60/b$ (Annex C): **EDT** on 0 to −10 dB, **T20** on −5 to −25 dB, **T30** on −5 to −35 dB. A single-slope decay gives EDT = T20 = T30; a fast early / slow late double slope gives EDT < T30. Validity uses the dynamic-range rule of 5.3.3: the noise must sit at least 25 dB below the IR peak for EDT (evaluation span + 15 dB), tightened to 46 dB for T20 and 54 dB for T30 so the tail-compensation bias of a flagged-valid value stays within the 5 % JND. The **curvature** $C = 100\ (T_{30}/T_{20} - 1)$ % (Annex B) flags a non-straight decay above 10 %.
@@ -46,6 +54,15 @@ $$
 
 with $t_e = 50$ ms (C50, speech) or 80 ms (C80, music), and the **centre time** $T_s = \int_0^{\infty} t\ p^2\ dt / \int_0^{\infty} p^2\ dt$. For a pure exponential decay these have closed forms $C_{te} = 10 \log_{10}(e^{a t_e} - 1)$ and $T_s = 1/a$; at $T = 1$ s ($a = 13.8155$) they evaluate to C80 = 3.05 dB, C50 = −0.02 dB, D50 = 0.499 and Ts = 72.4 ms, the values the implementation reproduces. Table A.1 JNDs (EDT 5 %, C80 1 dB, D50 0.05, Ts 10 ms) bound how finely each is worth reporting.
 
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/room_parameters_bands_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/room_parameters_bands.svg" alt="ISO 3382 per-band parameters of a synthetic room impulse response: grouped EDT, T20 and T30 bars per octave band falling from about 1.4 s at 125 Hz to 0.7 s at 4 kHz, over a second panel where C50 and C80 rise with frequency" width="92%"></picture>
+
+*The closed forms above hold for a single exponential decay; a real room gives
+one set of values per band. The upper panel is the decay itself (EDT, T20 and
+T30 falling with frequency as air and surfaces absorb more), the lower panel
+the early/late split of the same impulse response, and C50 and C80 rise with
+frequency for the same reason the decay time falls — the later the energy, the
+more of it the room has already removed.*
+
 ### Open-plan spatial decay (ISO 3382-3, Clause 6)
 
 The spatial decay rate of A-weighted speech is the ordinary least-squares slope of $L_{p,A,S}$ against $\log_{10}(r/r_0)$ ($r_0 = 1$ m) over the 2–16 m positions, rescaled to a per-doubling figure, and the nominal level is read off the same line at 4 m:
@@ -55,6 +72,16 @@ L = a + b\ \log_{10}(r/r_0), \qquad D_{2,S} = -\log_{10}(2)\ b, \qquad L_{p,A,S,
 $$
 
 The distraction distance rD and privacy distance rP are the distances where a **linear** (not logarithmic) regression of STI against distance crosses 0.50 and 0.20; a non-negative fitted slope (STI not falling with distance) makes them undefined, realising the standard's "can prove impossible to determine" note.
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/open_plan_decay_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/open_plan_decay.svg" alt="Open-plan spatial decay: A-weighted speech level and STI against source distance on a log axis, with the D2,S regression, the Lp,A,S,4m marker at 4 m and the rD and rP distance crossings" width="80%"></picture>
+
+*Two regressions on two different axes, which is what makes this clause hard to
+hold in the head. The level line is fitted against $\log_{10}(r/r_0)$ and read
+twice — as the slope $D_{2,S}$ per doubling, and at $r = 4$ m for
+$L_{p,A,S,4\text{m}}$. The STI line is fitted against $r$ itself, **linearly**,
+and read where it crosses 0.50 and 0.20 for the distraction and privacy
+distances. If that second fit comes out flat or rising, the two distances do
+not exist rather than being large.*
 
 ### Image-source room impulse response (Kuttruff 4.1, Vorländer 11)
 
@@ -86,6 +113,10 @@ Per one-third-octave band the level difference $D = L_1 - L_2$ (energy-averaged 
 
 The single-number rating (ISO 717-1, Clause 4.4) shifts the Table 3 **reference curve** in 1 dB steps toward the measured curve until the sum of *unfavourable* deviations $\sum_i \max(0, \text{ref}_i + k - \text{meas}_i)$ is maximal but $\le$ 32.0 dB (16 thirds) or 10.0 dB (5 octaves); the rating $R_w$ is the shifted reference at 500 Hz. The **spectrum adaptation terms** are $C = X_{A1} - X_w$ and $C_{tr} = X_{A2} - X_w$ with $X_{Aj} = -10 \log_{10} \sum_i 10^{(L_{ij} - X_i)/10}$ (Table 4 spectra No. 1 pink noise, No. 2 urban traffic), each rounded to an integer. The ISO 717-1 Annex C worked example ($R_w = 30$, $C = -2$, $C_{tr} = -3$, unfavourable sum 31.8 dB) is reproduced exactly.
 
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/insulation_rating_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/insulation_rating.svg" alt="Measured one-third-octave sound reduction index with the shifted ISO 717-1 reference curve and the resulting weighted rating at 500 Hz" width="80%"></picture>
+
+*A measured R spectrum against the shifted ISO 717-1 reference: the rating is the shifted reference read at 500 Hz.*
+
 ### Impact insulation and absorption (ISO 16283-2, ISO 717-2, ISO 354)
 
 Impact insulation swaps the airborne source for a standardized **tapping
@@ -103,6 +134,16 @@ with the energetic sum $L_{n,\text{sum}} = 10 \log_{10} \sum_i 10^{L_i/10}$ over
 100–2500 Hz (thirds) or 125–2000 Hz (octaves). The ISO 717-2 Annex C examples
 are reproduced exactly (thirds $L_{n,w} = 79$, $C_I = -11$; octaves $54$, $0$),
 via the same monotone shift search as ISO 717-1 run on the negated curves.
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/impact_rating_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/impact_rating.svg" alt="Measured one-third-octave normalized impact sound pressure level with the shifted ISO 717-2 reference curve and the resulting weighted rating read at 500 Hz" width="80%"></picture>
+
+*The mirror image of the airborne figure above, drawn so the flip is visible
+rather than asserted. There the unfavourable deviations were counted where the
+measurement fell **below** the reference; here they are counted where it rises
+**above** it, because a louder receiving room is a worse floor. Everything else
+is the same procedure: the reference curve shifted in 1 dB steps until the
+unfavourable sum is as large as it can be without passing 32.0 dB, and the
+rating read off the shifted reference at 500 Hz.*
 
 Sound absorption (ISO 354) measures the equivalent absorption area from
 Sabine's relation applied to a reverberation room empty and with the specimen:
@@ -206,6 +247,15 @@ hard objects ($\psi \approx 0.072$) raises $A$ to 5.03 m² and drops $T$ to
 0.9 s. The informative Annex D method for irregular spaces and unevenly
 distributed absorption is out of scope.
 
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/enclosed_space_absorption_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/enclosed_space_absorption.svg" alt="Two panels for a 60 cubic metre office with a bare versus acoustically-treated ceiling: the equivalent absorption area per octave band, much higher with the acoustic ceiling, and the reverberation time falling from about five seconds at low frequency for the bare room to under one second with the acoustic ceiling" width="96%"></picture>
+
+*What Formula 1 does band by band: the equivalent absorption area on the left
+and the reverberation time it implies through Formula 5 on the right, for the
+same room bare and treated. The Annex E case quoted above is the same
+arithmetic on a smaller room — $A$ from 2.26 to 5.03 m² and $T$ from 2.1 to
+0.9 s at 1 kHz — and the figure shows why the two move in opposite directions
+and not proportionally.*
+
 See the [Enclosed-Space Absorption guide](../../buildings/rooms/enclosed-space-absorption.md) for usage.
 
 ### Measurement uncertainty (ISO 12999-1)
@@ -259,6 +309,19 @@ transmission path and the double-wall radiation draw on the plate radiation
 efficiency and point mobilities of the
 [vibration theory](vibration.md). The prediction is clean-room from Bies,
 Hansen & Howard (2017), Hopkins (2007) and Cremer, Heckl & Petersson (2005).
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/panel_insulation_concept_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/panel_insulation_concept.svg" alt="Four panels: the single-panel mass law with its coincidence dip, the double wall with the mass-spring-mass resonance and cavity gain, the plate radiation efficiency rising to unity above the critical frequency, and a composite wall whose 1 % open slit caps R at the open-area limit" width="92%"></picture>
+
+*The four behaviours of the paragraph above, one per panel. Top left, the mass
+law rising 6 dB per octave with Sharp's coincidence dip cut into it at $f_c$.
+Top right, the double wall: no better than the combined mass below $f_0$, then
+the cavity term climbing until it saturates. Bottom left, the radiation
+efficiency that decides how much of the plate's vibration becomes sound. Bottom
+right, the ceiling a leak imposes: a 1 % open area holds the composite at
+$10\log_{10}(S/S_a) = 20$ dB however good the wall is, which is the panel worth
+showing a client.*
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/aperture_slit_geometry_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/aperture_slit_geometry.svg" alt="To-scale cross-section of a 2 mm slit through a 100 mm wall: the hatched wall drawn in section with the narrow horizontal air gap at mid-height, an incident-sound arrow pointing at the gap from the left, the 100 mm wall depth and 2 mm slit width dimensioned, and circular transmitted wavefronts sketched spreading from the slit exit on the right" width="80%"></picture>
 
 See the [Predicting Panel Sound Insulation](../../buildings/design/panel-sound-insulation.md) guide for
 usage.

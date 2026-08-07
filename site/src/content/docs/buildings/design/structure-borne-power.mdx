@@ -101,9 +101,12 @@ L_{Ws} = 10\log_{10}\!\left(\frac{2\pi f\,\eta\,m\,S}{f_0\,m_0\,S_0}\right)
          + L_v - 60 \;\;[\mathrm{dB\ re\ 1\ pW}],
 $$
 
-with references $f_0 = 1\ \text{Hz}$, $m_0 = 1\ \text{kg}$,
+with references $f_0 = 1\ \text{Hz}$, $m_0 = 1\ \text{kg}$ (printed as 1 kg; the
+quantity it normalises is a mass per unit area, so the reference is
+$1\ \text{kg/m}^2$ — see the [errata registry](/phonometry/reference/errata/)),
 $S_0 = 1\ \text{m}^2$; the $-60\ \text{dB}$ term is $10\log_{10}(v_0^2/P_0)$ for
-the EN 15657 velocity reference $v_0 = 10^{-9}\ \text{m/s}$. The plate
+the EN 15657 velocity reference $v_0 = 10^{-9}\ \text{m/s}$ and
+$P_0 = 1\ \text{pW}$. The plate
 velocity is the energetic spatial average over the $N$ positions (Formula 12)
 and the loss factor comes from the structural reverberation time $T_s$
 (Formula 13, identical to the ISO 10848 total loss factor):
@@ -142,12 +145,24 @@ attached. The plate-injected power plus the plate's point mobility (see
 [mechanical mobility](/phonometry/vibration/structural/mechanical-mobility/)) yield the
 source description for the EN 12354-5 model through the conversion chain below.
 
+:::caution
+**Two velocity references share the symbol $v_0$.**
+EN 15657 and EN 12354-5 refer velocity levels to $v_0 = 10^{-9}$ m/s (1 nm/s);
+ISO 9611 and ISO/TS 7849 refer them to $5\times10^{-8}$ m/s (50 nm/s). The two
+differ by $20\log_{10}(50) = 33.98$ dB, so a free velocity level taken from an
+ISO 9611 report must be reduced by 34.0 dB before it enters Formula (18) or any
+EN 12354-5 quantity. Section 3 below uses both references, a few lines apart.
+:::
+
 ## 3. From plate power to source quantities (Formulae 15–19)
 
 The plate-injected $L_{Ws}$ is **not** a source descriptor: the same source
 injects a different power into a different receiver. EN 15657 derives the
 plate-independent quantities: the **equivalent blocked force level**
-(Formula 15, re $F_0 = 10^{-6}\ \text{N}$) from the low-mobility plate,
+(Formula 15, re $F_0 = 10^{-6}\ \text{N}$, not the 1 N reference of the
+ISO 16283-2
+[impact force exposure level](/phonometry/buildings/insulation/heavy-impact-sources/),
+120 dB away) from the low-mobility plate,
 
 $$
 L_{Fb,eq} = L_{Ws,\mathrm{low}} - 10\log_{10}\frac{\mathrm{Re}\{Y_{R,\mathrm{low,eq}}\}}{Y_0},
@@ -180,13 +195,44 @@ lwsn = building.characteristic_reception_plate_power(lfb)         # Formula (17)
 inst = building.installed_power_from_reception_plate(lwsn, 24.1e-6)  # Annex I
 print(round(float(lwsn), 1), round(float(inst), 1))         # 61.4 68.2  (Table I.8)
 
-# Free velocity (Formula 18) + blocked force close the source mobility (19):
+# The same Annex I correction taken to the SOURCE mobility instead gives the
+# plate-independent characteristic power level EN 12354-5 asks for as input:
+lwsc = building.installed_power_from_reception_plate(lwsn, 1.0e-3)
+print(round(float(lwsc), 1))                                # 84.4  L_Ws,c
+
+# Free velocity (Formula 18) + blocked force close the source mobility (19).
+# The 1.0e-2 m/(N.s) is EN 15657's minimum specified high-mobility plate
+# mobility, not an arbitrary number.
 lvf = building.equivalent_free_velocity_level(70.0, 1.0e-2)
 print(float(building.source_mobility_from_levels(lvf, lfb)))      # |Y_S,eq| in m/(N·s)
 ```
 
+Read the chain in order. The cistern injects 61.7 dB into the measurement
+plate; stripping that plate's mobility leaves an equivalent blocked force, and
+re-expressing the same force on the standard 10 cm concrete plate of
+$Y_{R,\infty,\text{low}} = 5\times10^{-6}\ \text{m/(N·s)}$ gives
+$L_{Wsn} = 61.4$ dB — the number a manufacturer may declare. Referring the same
+force to the actual receiving wall ($Y = 24.1\times10^{-6}$) adds
+$10\log_{10}(24.1/5.0) = 6.8$ dB and gives 68.2 dB. That step is the section's
+whole lesson: a light, high-mobility receiver accepts more power from the same
+source, so a declared $L_{Wsn}$ compares machines and is never the power a
+particular building will see.
+
+:::caution
+**Two quantities come out of the same correction; do not confuse them.**
+With the *receiver* mobility it gives the installed power level
+$L_{Ws,\mathrm{inst}} = 68.2$ dB. With the *source* mobility it gives the
+plate-independent characteristic power level $L_{Ws,c} = 84.4$ dB, and that is
+what [EN 12354-5](/phonometry/buildings/design/installed-structure-borne/) takes
+as its input, from which it subtracts the coupling term $D_C = 16.2$ dB to
+arrive back at the same 68.2 dB. Feed EN 12354-5 the 84.4, never the 68.2:
+carrying 68.2 forward as the characteristic power level subtracts $D_C$ a
+second time and lands 16 dB low, with no error raised.
+:::
+
 The direct source-side counterpart is the ISO 9611 free velocity level (re
-$v_0 = 5\times10^{-8}\ \text{m/s}$) measured at the contact points of
+$v_0 = 5\times10^{-8}\ \text{m/s}$, the 50 nm/s reference of the callout above,
+not the 1 nm/s of Formula 14) measured at the contact points of
 resiliently mounted
 machinery; its equation (9) position average is `mean_free_velocity_level()`.
 

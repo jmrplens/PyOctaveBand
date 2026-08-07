@@ -1,6 +1,6 @@
 ---
 title: "Bibliography"
-description: "The books and papers behind the guides, grouped by domain: every entry with a verified DOI or official publisher link and a note on what it supports."
+description: "A curated selection of the books and papers behind the guides, grouped by domain: every entry with a verified DOI or official publisher link and a note on what it supports."
 ---
 
 Every guide on this site closes with two citation sections: a **References**
@@ -8,10 +8,13 @@ section listing the books and papers that support the physics on the page
 (APA style, one bullet per source, each with a DOI or an official publisher
 link, and half a sentence on what the entry supports), followed by a
 **Standards** section naming the normative documents the page implements,
-clause by clause. This page collects the References entries of all guides in
-one place, grouped by domain: a curated reading list, and the single source of
-truth for link checking. Each entry lists the guide pages that cite it; the
-list grows as guides gain their References sections.
+clause by clause. This page collects the works the guides lean on most, grouped
+by domain, and each entry lists the guide pages that cite it. It is a **curated
+selection, not the complete citation list**: at the time of writing, two dozen
+DOI-bearing works cited in the guides' own frontmatter do not appear here, among
+them Welch (1967), Harris (1978), Knapp & Carter (1976), Allen & Berkley (1979)
+and Maa (1998). Each guide's own References section, generated from its
+frontmatter, is authoritative for that page.
 
 ## General acoustics
 

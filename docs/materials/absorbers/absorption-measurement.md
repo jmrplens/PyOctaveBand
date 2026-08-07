@@ -189,7 +189,24 @@ print(np.round(alpha, 3))                      # [0.398 0.448 0.498]
 $T_1$ and $T_2$ are exactly the reverberation times
 [`room_parameters`](../../buildings/rooms/room-acoustics.md) returns, so an ISO 3382-2 decay
 measurement of the empty and treated room flows straight into
-`absorption_coefficient`. A room volume below the 150 m³ minimum or a
+`absorption_coefficient`.
+
+Each of those two numbers is read off a decay, and the clip below shows how
+one is read: the squared impulse response is integrated backwards from the
+tail, the Schroeder curve emerges, and the T20 and T30 regressions are fitted
+to a straight portion of it. That is the operation behind $T_1$, and again
+behind $T_2$ — the clip shows a *single* room, not the pair, so it answers
+"where does one $T$ come from" and not "what does subtracting two of them
+cost". The second question is the one that governs this measurement, and
+section 4 puts a number on it: because $\alpha_s$ is a difference of two
+reciprocal decay times, its uncertainty is worst exactly where the two decays
+are most alike, at the low-frequency end.
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anim_schroeder_dark.gif"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anim_schroeder.gif" alt="Animation: the tail energy of a squared impulse response filling from the end while the backward integral advances toward t = 0, the Schroeder decay curve emerging on a companion axis and ending with the T20 and T30 regression lines" width="640" height="360" loading="lazy"></picture>
+
+[Watch the high-resolution video (WebM)](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anim_schroeder.webm)
+
+A room volume below the 150 m³ minimum or a
 sample area outside 10–12 m² raises an advisory `AbsorptionWarning`; the result
 still returns.
 

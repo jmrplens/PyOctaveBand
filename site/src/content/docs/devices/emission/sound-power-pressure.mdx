@@ -290,6 +290,25 @@ the measurement radius. The microphone positions are the standardized
 unit-vector arrays of Tables D.1 (sphere), E.1 (hemisphere) and E.2 (hemisphere,
 broadband).
 
+**The radius is not free** (clauses 8.1/8.2). It must satisfy $r \ge 2 d_0$ with
+$d_0$ the distance from the acoustic centre to the furthest point of the source
+(in a hemi-anechoic room, $r \ge 2 d_0$ or $r \ge 3 h_0$, whichever is larger,
+$h_0$ being the height of the acoustic centre above the floor), $r \ge \lambda/4$
+at the lowest frequency of interest, and $r \ge 1$ m — 0.5 m only for a small,
+low-noise source over a limited band — with the whole surface inside the region
+qualified per Annex A or B. Worked: a 0.6 × 0.5 × 0.7 m benchtop source has
+$d_0 = \sqrt{0.3^2 + 0.25^2 + 0.7^2} = 0.80$ m, so $r \ge 1.6$ m; at a lowest
+band of 100 Hz, $\lambda/4 = 0.86$ m does not bind and neither does the 1 m
+floor. The `radius=1.0` of the examples below therefore fits only a source under
+about 0.5 m of characteristic dimension.
+
+**The array is not free either.** Positions 1 to 20 are used first, and 21 to 40
+are added only when the difference between the highest and lowest level in any
+band of interest is not less than half the number of positions — a check on data
+the reader already has, `levels.max(0) - levels.min(0) >= 0.5 * levels.shape[0]`.
+If 40 positions still fail it, a localized investigation is required and the
+positions then carry unequal areas, which is what `areas=` is for.
+
 ```python
 import numpy as np
 from phonometry import emission
@@ -352,8 +371,14 @@ base = 70.0 + 8.0 * np.exp(-(np.log2(freqs / 1000.0) ** 2) / 2.0)
 rng = np.random.default_rng(7)
 levels = base[None, :] + rng.normal(0.0, 1.0, (40, freqs.size))
 
-result = emission.sound_power_anechoic(levels, "hemisphere", radius=1.0, frequencies=freqs)
+# sigma_omc is the operating-and-mounting standard deviation of Clause 10.5;
+# with the EXAMPLE value 2.0 dB and the default coverage factor k = 2 the
+# expanded uncertainty U = k*sqrt(sigma_R0^2 + sigma_omc^2) is the 4.1 dB the
+# fiche below prints. Left at its default of 0 it reports 1.0 dB.
+result = emission.sound_power_anechoic(levels, "hemisphere", radius=1.0,
+                                       frequencies=freqs, sigma_omc=2.0)
 print(round(result.sound_power_level_a, 1))   # 89.3
+print(round(float(result.uncertainty), 1))    # 4.1  dB
 result.plot()   # LW spectrum, LWA in the title (needs matplotlib)
 ```
 

@@ -25,11 +25,11 @@ references:
     note: "The field airborne method this page implements: the level differences and normalisations."
   - type: standard
     organization: "International Organization for Standardization"
-    year: 2015
+    year: 2020
     title: "Acoustics — Field measurement of sound insulation in buildings and of building elements — Part 2: Impact sound insulation"
-    designation: "ISO 16283-2:2015"
-    url: "https://www.iso.org/standard/59747.html"
-    note: "The field impact method: the standardized and normalized impact levels."
+    designation: "ISO 16283-2:2020"
+    url: "https://www.iso.org/standard/74162.html"
+    note: "The field impact method: the standardized and normalized impact levels, the Clause 14 test report and its Annex C results forms. The 2015 first edition is identical for the normalisations used here."
   - type: standard
     organization: "International Organization for Standardization"
     year: 2020
@@ -77,10 +77,16 @@ prediction of in-situ performance in
 ## How do I compute DnT and R' from a field measurement in Python?
 
 Energy-average the source- and receiving-room levels per one-third-octave band
-and pass them, with the receiving-room reverberation time, to
+across the microphone positions of one loudspeaker position, correct the
+receiving room for background noise, and pass them, with the receiving-room
+reverberation time, to
 `building.airborne_insulation(l1, l2, t2, area=S, volume=V)`. The result
 carries the raw level difference `d`, the standardized `dnt` and, when `area`
-and `volume` are given, the apparent `r_prime`. Impact measurements go through
+and `volume` are given, the apparent `r_prime`. If a single loudspeaker was
+moved between positions, repeat that for each position and combine the
+*results* with Formula (6), not the levels — see
+[Taking the measurement](#taking-the-measurement-iso-16283-1-clauses-7-and-9).
+Impact measurements go through
 `building.impact_insulation(li, t2, volume=V)`, and either spectrum is rated
 with `building.weighted_rating` / `weighted_impact_rating`.
 
@@ -151,11 +157,110 @@ ISO 717-1 reference curve.
 | `area` | float, optional | m² | > 0, with `volume` | Partition area $S$ (enables $R'$) |
 | `volume` | float, optional | m³ | > 0, with `area` | Receiving-room volume $V$ |
 | `t0` | float | s | default `0.5` | Reference reverberation time $T_0$ |
+
 `airborne_insulation()` returns an `AirborneInsulationResult` (`d`, `dnt`,
 `r_prime` or `None`). The reference-curve engine that turns any of those
 spectra into $R_w$, $R'_w$ or $D_{nT,w}$, its spectrum adaptation terms and its
 enlarged-range variants are in
 [Insulation Ratings (ISO 717)](/phonometry/buildings/insulation/insulation-ratings/).
+
+## Taking the measurement (ISO 16283-1 Clauses 7 and 9)
+
+The functions consume band levels; the standard says where those levels come
+from, and getting that wrong changes the answer more than any of the
+arithmetic above.
+
+**The source (Clause 7.1, 7.2).** Sound is generated with loudspeakers
+operated simultaneously in at least two positions, or with a single
+loudspeaker moved to at least two positions. Multiple loudspeakers must be of
+the same type, driven at the same level by similar but uncorrelated signals,
+and each must meet the Annex A directivity requirement. The signal is steady
+with a continuous spectrum, and the energy-average source-room level must not
+change by more than 8 dB between adjacent one-third-octave bands, at least
+above 100 Hz — shape the spectrum (a graphic equaliser is usually needed) or
+fall back to serial band-limited measurements. Loudspeakers stand at least
+0.5 m from any boundary, preferably at least 1.0 m from the separating
+partition, measured to the centre of the nearest speaker unit; different
+positions must not lie in planes parallel to a boundary less than 0.7 m apart,
+must be at least 0.7 m apart, and at least two of them at least 1.4 m apart.
+When the floor is the test element and the loudspeaker is in the upper room,
+its base sits at least 1.0 m above the floor.
+
+**The microphones (Clause 7.3).** A minimum of **five** positions per room —
+and, with a single loudspeaker moved between positions, five per room *per
+loudspeaker position*. No two positions may lie in the same plane relative to
+the room boundaries, and the set must not form a regular grid.
+
+### Correcting for background noise (Clause 9.2)
+
+Measure the receiving room again with the source off, at the same positions
+and with the same averaging, and compare band by band with the combined
+signal-plus-background level $L_{sb}$:
+
+- margin $\ge 10$ dB: use $L_{sb}$ unchanged;
+- $6 < \text{margin} < 10$ dB: subtract the background in energy,
+  $L = 10\log_{10}(10^{L_{sb}/10} - 10^{L_b/10})$ (Formula 14), with both
+  levels first reduced to one decimal place;
+- margin $\le 6$ dB: apply the fixed 1.3 dB correction, and flag the band in
+  the report as being at the limit of measurement.
+
+```python
+import numpy as np
+
+l2_sb = np.array([44.0, 41.0, 39.5, 38.0])   # receiving room, source on
+l2_bg = np.array([30.0, 33.0, 31.0, 34.0])   # receiving room, source off
+margin = l2_sb - l2_bg                       # 14.0  8.0  8.5  4.0 dB
+
+formula_14 = 10 * np.log10(10 ** (l2_sb / 10) - 10 ** (l2_bg / 10))
+l2_corr = np.where(margin >= 10.0, l2_sb,
+                   np.where(margin > 6.0, formula_14, l2_sb - 1.3))
+print(np.round(l2_corr, 2))     # [44.   40.25 38.84 36.7 ]  <- last band flagged
+```
+
+`building.background_correction` exists, but it implements the **ISO 10140-4
+laboratory** rule used on
+[Laboratory Insulation Measurement](/phonometry/buildings/insulation/insulation-lab/),
+whose upper threshold is 15 dB rather than 10 dB. Applied to field data it
+subtracts energy in the 10-15 dB margin band where ISO 16283-1 asks for
+nothing — up to 0.458 dB at a 10 dB margin — and since it acts on the
+receiving room that lands as over-reported insulation, band for band, in $D$.
+Use the three-regime expression above for field levels.
+
+### Averaging over loudspeaker positions (Formula 6)
+
+With **multiple loudspeakers operating simultaneously** (Clause 7.3.3) there
+is one measurement: energy-average the positions in each room, correct for
+background noise, and form $D_{nT}$ or $R'$ once. With a **single loudspeaker
+moved between positions** (Clause 7.3.4) the standard does *not* average the
+levels across loudspeaker positions. It forms the result for each position and
+averages the *results* as transmission factors,
+
+$$
+D_{nT} = -10\log_{10}\left[\frac{1}{m}\sum_{j=1}^{m} 10^{-D_{nT,j}/10}\right],
+$$
+
+which weights the worst position most. The two routes are not the same number:
+
+```python
+import numpy as np
+# `building` is the import of the airborne-insulation block above.
+
+t2 = np.full(16, 0.5)
+l1a, l2a = np.full(16, 80.0), np.full(16, 40.0)   # loudspeaker position 1
+l1b, l2b = np.full(16, 83.0), np.full(16, 37.0)   # loudspeaker position 2
+
+# Clause 7.3.4: one result per loudspeaker position, combined by Formula (6).
+a = building.airborne_insulation(l1a, l2a, t2, area=10.0, volume=50.0)
+b = building.airborne_insulation(l1b, l2b, t2, area=10.0, volume=50.0)
+dnt = -10 * np.log10(np.mean(10.0 ** (-np.vstack([a.dnt, b.dnt]) / 10.0), axis=0))
+print(round(float(dnt[0]), 1), building.weighted_rating(dnt).rating)        # 42.0 42
+
+# Averaging the levels first instead: a different, more flattering number.
+l1m = building.energy_average_level(np.vstack([l1a, l1b]), axis=0)
+l2m = building.energy_average_level(np.vstack([l2a, l2b]), axis=0)
+naive = building.airborne_insulation(l1m, l2m, t2, area=10.0, volume=50.0)
+print(round(float(naive.dnt[0]), 1), building.weighted_rating(naive.dnt).rating)  # 43.0 43
+```
 
 ## Field impact insulation (ISO 16283-2)
 
@@ -374,7 +479,10 @@ from phonometry import building
 # Situation B (same building, different teams) -> the in-situ standard deviation.
 print(building.single_number_uncertainty("r_w", "B"))       # 0.9  dB  (Table 3)
 u = building.band_uncertainty("airborne", "B")              # per-band u (Table 2)
-print(len(u.frequencies), u.uncertainties[10])     # 21 1.1  (the 500 Hz band)
+# Look the band up; never index by position. The impact table has no 500 Hz
+# band at all, so [10] would silently be 630 Hz there.
+i = list(u.frequencies).index(500.0)
+print(len(u.frequencies), u.uncertainties[i])      # 21 1.1  (the 500 Hz band)
 u.plot()   # the per-band u(f) spectrum of Table 2 (needs matplotlib)
 
 # Report R'w = 52 dB with a two-sided 95 % interval (k = 1.96, Table 8):
@@ -459,7 +567,7 @@ power off the radiating face instead of the receiving-room level, is
 
 **Covered.** ISO 16283-1:2014 (airborne field insulation: the level
 difference, standardized $D_{nT}$ and apparent $R'$ of Clause 3.12-3.15 and
-the Clause 7.8 position averaging) and ISO 16283-2:2015 (impact field
+the Clause 7.8 position averaging) and ISO 16283-2:2020 (impact field
 insulation, the same normalisations with the sign flip) through
 `building.energy_average_level`, `building.airborne_insulation` and
 `building.impact_insulation`, each writing the Clause 14 test report with
@@ -471,8 +579,13 @@ single-number ratings quoted here reuse the verified ISO 717-1/ISO 717-2
 engines.
 
 **Not covered.** Every field function here takes levels that the caller has
-already corrected for background noise (Clause 9.2 of ISO 16283-1); the
-background-noise measurement and correction itself is not implemented.
+already corrected for background noise (Clause 9.2 of ISO 16283-1). The
+*measurement* of the background level — source off, same positions, same
+averaging — is the operator's job, and nothing here verifies that the 6 dB
+floor was met; the correction itself is three lines of NumPy, written out
+under [Correcting for background noise](#correcting-for-background-noise-clause-92)
+above. (`building.background_correction` is the ISO 10140-4 *laboratory*
+variant and does not match the field thresholds.)
 ISO 16283-1/-2's own position and procedure requirements (the minimum number
 of source and microphone positions, the low-frequency loudspeaker or
 microphone-sweep procedures) are not checked: energy-averaging happens once

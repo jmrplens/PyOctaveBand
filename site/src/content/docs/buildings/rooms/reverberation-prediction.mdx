@@ -351,8 +351,28 @@ point, that stays diffuse while it decays. The common breakages:
 
 Scattering objects restore the mixing the models assume: a furnished room
 follows the statistical prediction distinctly better than the same room
-bare, beyond what the furniture's own absorption area accounts for. In
-practice, quote a *band* of predictions (Sabine and Eyring, or Fitzroy and
+bare, beyond what the furniture's own absorption area accounts for. The clip
+below is that mechanism with the absorption taken out of it, so only the
+mixing is left: an 800 Hz wavefront enters a 4 m rigid-walled hall filled
+with rigid columns 10 to 17 cm across, a quarter to two fifths of the
+42.9 cm wavelength. Every column diffracts the front and sheds a scattered
+wavelet, the wavelets interfere, and within a few passes the specular front
+has become energy spread over the whole hall with no preferred direction —
+which is the assumption Sabine and Eyring both start from, arriving here as
+a result rather than as a hypothesis. Nothing in the hall absorbs, so what
+you are watching is *only* the redistribution; the decay at the end is the
+energy draining out through the two open ends.
+
+<Video
+  name="anim_fdtd_pillar_hall"
+  width={2400}
+  height={600}
+  displayWidth="100%"
+  title="A wavefront mixing in a hall of columns (2D FDTD)"
+  description="An 800 Hz plane wavefront sweeps a 4 m rigid-walled hall filled with a staggered colonnade of rigid columns 10 to 17 cm across, simulated at 2.5 mm; every column diffracts the front and sheds a scattered wavelet, and the wavelets interfere until the whole hall is filled with structured energy that then drains through the absorbing ends."
+/>
+
+In practice, quote a *band* of predictions (Sabine and Eyring, or Fitzroy and
 Arau-Puchades for axial cases) rather than a single value; where the models
 spread, the room is telling you its field is not diffuse.
 

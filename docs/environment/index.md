@@ -3,11 +3,16 @@
 # Environment and transport
 
 Environmental noise is a source-path-receiver problem stretched over hundreds
-of metres of open air. This section covers both ends of it. The **outdoor
-sound** pages handle the path and the assessment: ISO 9613 predicts, band by
-band, how much level survives divergence, air absorption, the ground and any
-barrier on the way to a receiver, and NT ACOU 112 quantifies when impulsive
-character makes the received sound more annoying than its LAeq suggests.
+of metres of open air. This section covers all three of them. The **propagation**
+pages handle the path: ISO 9613 predicts, band by band, how much level survives
+divergence, air absorption, the ground and any barrier on the way to a receiver,
+and the wave-acoustic ground and refraction models say when that engineering
+method stops being enough.
+
+The **assessment** pages handle what happens once the sound has arrived: the
+ISO 1996 rating level and the day-evening-night indicators, their Spanish
+application in RD 1367/2007, and the NT ACOU 112 adjustment that quantifies when
+impulsive character makes a received sound more annoying than its LAeq suggests.
 
 The **source** pages handle the other end: what emits, described the way an
 environmental model wants it. CNOSSOS-EU gives road traffic and railways a
@@ -16,11 +21,14 @@ by its apparent sound power and its tonal audibility. What unites them is the
 pattern: a carefully standardised source descriptor that the path model above
 then attenuates.
 
-This section leans on the core toolkit more than any other: the rating levels
-and Lden that environmental assessment ends in live in
-[Integrated and Statistical Levels](../signals/levels/levels.md), and the
-atmospheric absorption that every propagation model consumes is shared with
-the room and materials pages. Start with
+This section leans on the core toolkit, but only up to the period level.
+[Integrated and Statistical Levels](../signals/levels/levels.md) supplies
+the LAeq, percentile and event levels of each reference period; what turns those
+period levels into Lden, Ldn and the rating level, with the tonal adjustment,
+the residual-noise correction and the uncertainty budget on top, is
+[Environmental Levels (ISO 1996-1/-2)](assessment/environmental-levels.md),
+in this section. The atmospheric absorption that every propagation model
+consumes is shared with the room and materials pages. Start with
 [Outdoor Sound Propagation](propagation/outdoor-propagation.md); it
 introduces the source-path-receiver bookkeeping the transport pages reuse.
 

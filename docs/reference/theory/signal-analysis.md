@@ -100,6 +100,18 @@ for f, pxx in zip(freq_bins[in_band], psd[in_band]):
     print(f, pxx)
 ```
 
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/signal_response_fraction_3_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/signal_response_fraction_3.svg" alt="One-third-octave spectrum analysis of a six-tone signal with the raw PSD in the background" width="80%"></picture>
+
+*The two objects on one axis, for a six-tone signal at 20, 100, 500, 2000,
+4000 and 15 000 Hz. The grey trace is a Welch PSD ($f_s$ = 48 kHz,
+`nperseg = 8192`, so a fixed 5.86 Hz bin everywhere); the markers are the
+standardized third-octave levels of the same signal. The bin width never
+changes and the band width does: 4.60 Hz at the 20 Hz band, narrower than one
+bin, against 230.77 Hz at 1 kHz and 3657 Hz at 16 kHz. That is why the top
+bands each swallow hundreds of bins while the bottom ones sit inside a single
+one, and why the two answers cannot be converted into each other. (The PSD
+trace is offset vertically for legibility, so read its shape, not its level.)*
+
 This keeps the two concepts separate: phonometry gives standardized
 fractional-octave levels, while Welch gives narrowband FFT bins. With
 `fs=100000` and `nperseg=2**15`, the Welch bin spacing is about 3.05 Hz.
@@ -202,6 +214,10 @@ transform. Because the bilinear transform compresses frequencies near Nyquist,
 the default `high_accuracy` mode designs and runs the filter at an internally
 oversampled rate (≥ 144 kHz); see [Frequency Weighting](../../signals/levels/weighting.md).
 
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/weighting_responses_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/weighting_responses.svg" alt="A, C and Z frequency weighting curves of IEC 61672-1 with a zoom showing the positive region of the A curve (+1.27 dB at 2.5 kHz)" width="80%"></picture>
+
+*The three IEC 61672-1 weighting curves realized by the library, with the small positive region of the A curve magnified. The special B, D and AU curves are charted in [Special Weightings](../../signals/levels/special-weightings.md).*
+
 ## Time Integration
 
 Implemented as a first-order IIR exponential integrator:
@@ -221,6 +237,10 @@ start from the first input energy, or pass a scalar/array with the previous
 mean-square output state. See [Why phonometry](../../start/why-phonometry.md) for the
 IEC 61672-1 tone-burst verification of this implementation.
 
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/time_weighting_analysis_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/time_weighting_analysis.svg" alt="Fast, Slow and Impulse time weighting responses to a noise burst" width="80%"></picture>
+
+*The exponential integrator at the three standard time constants: Fast follows a burst, Slow smooths it and Impulse holds its peak.*
+
 ## G-weighting (ISO 7196)
 
 The G curve extends frequency weighting into the infrasound range. ISO 7196:1995 Table 1 (p. 2) defines it by four zeros at the origin and four complex-conjugate pole pairs, given as coordinates in Hz (multiplied by $2\pi$ to obtain rad/s):
@@ -238,6 +258,13 @@ $$
 
 The four zeros against eight poles shape the characteristic response: a rise of approximately **+12 dB/octave between 1 Hz and 20 Hz**, with roll-offs of approximately **24 dB/octave** below 1 Hz and above 20 Hz. Infrasound needs its own curve because near the hearing threshold the perceived loudness of very-low-frequency tones grows much more steeply with sound pressure level than at mid frequencies (a small dB increase above threshold produces a large loudness jump), so the A curve (anchored at 1 kHz) grossly misrepresents infrasonic annoyance.
 
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/g_weighting_response_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/g_weighting_response.svg" alt="G-weighting frequency response from 0.1 Hz to 1 kHz with the ISO 7196 Table 2 nominal values overlaid" width="80%"></picture>
+
+*The shape those four zeros and four pole pairs make, against the ISO 7196
+Table 2 nominal values: 0 dB at the 10 Hz anchor, the +12 dB/octave climb
+through the infrasound decade below it, and the two 24 dB/octave roll-offs
+that fence the curve off below 1 Hz and above 20 Hz.*
+
 Since G acts on 0.25 Hz – 315 Hz, far below the Nyquist frequency at audio rates, the frequency warping of the plain bilinear transform (applied without prewarping) is negligible there: about 0.014 % at 315 Hz for $f_s = 48$ kHz, under 0.01 dB on the response. The internal oversampling used for the A/C designs (whose action extends to 16 kHz) is therefore not applied.
 
 See the [Special Weightings guide](../../signals/levels/special-weightings.md) for usage.
@@ -249,6 +276,14 @@ See the [Special Weightings guide](../../signals/levels/special-weightings.md) f
 $$
 \mathrm{SEL} = L_{eq,T} + 10 \log_{10}\left(\frac{T}{T_0}\right), \qquad T_0 = 1\ \text{s}
 $$
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sel_concept_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sel_concept.svg" alt="A vehicle pass-by level history with its Leq over the whole event and the equal-energy one-second SEL block" width="80%"></picture>
+
+*What the formula does to an event: the pass-by is replaced by a one-second
+block of the same total energy, which is why SEL exceeds the event's $L_{eq}$
+whenever the event lasts longer than a second, and why two events of the same
+SEL are interchangeable in a dose even when one is loud and short and the
+other quiet and long.*
 
 **Sound exposure** $E$ (IEC 61252, 3.1) is the time integral of the squared A-weighted sound pressure, expressed in pascal-squared hours:
 
@@ -300,6 +335,10 @@ The **pressure-intensity index** $\delta_{pI} = L_p - L_I$ measures how reactive
 
 See the [Sound Intensity guide](../../devices/emission/intensity.md) for usage.
 
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/intensity_demo_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/intensity_demo.svg" alt="Third-octave pressure and intensity levels for a plane progressive wave versus a standing wave" width="92%"></picture>
+
+*The p-p estimator in the two limiting fields: the gap between $L_p$ and $L_I$ is the pressure-intensity index that flags reactive fields.*
+
 ## Measurement uncertainty (ISO/IEC Guide 98-3: GUM and Supplement 1)
 
 Domain budgets like ISO 12999-1 and ISO 9612 Annex C are instances of the
@@ -335,6 +374,17 @@ reproduced: the four-term additive model gives $u_c = 2.0$ and the Monte Carlo
 inputs; the output is nearly trapezoidal, not Gaussian, so the interval is
 narrower than $\pm 1.96\,u$), and the GUM Annex H.1 end-gauge example gives
 $k = t_{0.99}(\nu_{\mathrm{eff}} = 16) = 2.92$ and $U_{99} = 93$ nm.
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/uncertainty_budget_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/uncertainty_budget.svg" alt="Two panels for the A-weighted level example. Left: the GUM uncertainty budget, a horizontal bar chart of each input's contribution to the combined uncertainty with a dashed line at uc of 0.407 dB. Right: the Monte Carlo output histogram overlaid with the GUM Gaussian and the shaded 95 percent coverage interval; the title reads Y equals 74.00 dB, U equals 0.86 dB, k equals 2.11" width="96%"></picture>
+
+*The two routes on one problem — an A-weighted level, not the Supplement 1
+four-term example quoted above. Left is the law of propagation as a budget:
+one bar per input, so the term worth reducing is visible. Right is the
+Supplement 1 route: the Monte Carlo output distribution with the GUM Gaussian
+drawn over it and the 95 % coverage interval shaded. Here the two agree, which
+is what clause 8 calls validation; where the model is non-linear or the output
+visibly non-Gaussian the histogram departs from the curve and the interval is
+read off the fractiles instead.*
 
 See the [GUM Uncertainty guide](../../signals/metrology/gum-uncertainty.md) for usage.
 

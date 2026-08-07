@@ -428,7 +428,7 @@ Sabine absorption area $A = 0.16\ V/T$.
 
 ## Standards
 
-ISO 16283-1:2014 and ISO 16283-2:2015, *Acoustics — Field measurement of
+ISO 16283-1:2014 and ISO 16283-2:2020, *Acoustics — Field measurement of
 sound insulation in buildings and of building elements*: the airborne and
 impact level differences, their normalisations and the Clause 14 test report;
 ISO 12999-1:2020, which tabulates the standard uncertainties per measurement

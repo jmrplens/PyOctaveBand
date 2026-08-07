@@ -35,6 +35,7 @@ references:
 ---
 
 import ThemeImage from '../../../../components/ThemeImage.astro';
+import Video from '../../../../components/Video.astro';
 
 A machine runs in one room, a wall separates that room from an occupied one,
 and someone wants to know what the occupant hears. It is a short chain, and
@@ -73,7 +74,9 @@ $$
 
 with $\text{NR} = L_{p1} - L_{p2}$ the noise reduction between the two
 reverberant fields, $\text{TL} = 10\log_{10}(1/\tau)$ the transmission loss of the
-partition (the quantity UNE calls the sound reduction index $R$), $S_w$ the
+partition — the quantity ISO 10140-2 measures and ISO 717-1 rates as the sound
+reduction index $R$, so the $R$ and $R_w$ of a laboratory test report drop
+straight into this equation — $S_w$ the
 area of the partition and $S_2 \alpha_2$ the equivalent absorption area of
 the receiving room.
 
@@ -370,6 +373,23 @@ prediction because of **flanking transmission through mechanical connections
 and air leaks**. A ceiling void carried over the partition, a service
 penetration, a door undercut, or the wall simply not reaching the structural
 slab, and the equation's answer becomes an upper bound.
+
+The clip below draws what the equation leaves out. The chain of section 3
+prices the direct path only, the **Dd** route through the partition; the
+other three pulses leave the source room over the flanking walls, floor or
+ceiling — **Ff** flank to flank, **Fd** flank to partition, **Df** partition
+to flank — and re-radiate on the far side without ever passing through the
+transmission loss the calculation used. Each path shrinks at every element
+and junction it crosses, which is why no single one has to be large for the
+sum of the three to dominate a good partition.
+
+<Video
+  name="anim_flanking_paths"
+  width={2400}
+  height={1350}
+  title="Energy pulses over the direct and flanking paths"
+  description="Energy pulses leave the source room over the direct Dd path and the flanking Ff, Fd and Df paths, shrinking at each element and junction, and every path label lights up as its pulse re-radiates into the receiving room."
+/>
 
 `DesignCriterion.flanking_penalty` is the explicit debit for that, in
 decibels off the

@@ -66,6 +66,23 @@ print(result["bands"][0])
 # {'freq': 12.589254117941678, 'class': 1, 'checked_to_omega': 3.8127755266765493, 'margin_class1_db': 0.3999999999999595, 'margin_class2_db': 0.5999999999999595}
 ```
 
+**What the margin measures.** It is the minimum, over every normalized frequency
+the band was evaluated at, of the distance to the nearest limit of that class:
+positive when the response stays inside the corridor everywhere, and negative by
+exactly the worst violation when it does not. The reported `class` is the
+strictest class whose margin is non-negative.
+
+Which constraint binds is worth knowing before you try to improve the number. A
+maximally-flat Butterworth is flat at mid-band, where the class 1 corridor is
+±0.4 dB, so its margin *saturates at +0.400 dB* the moment the stopband stops
+being the limiting factor: measured on a 48 kHz one-third-octave bank, order 2
+fails outright (class `None`, worst class 1 margin −27.03 dB) and orders 4, 6, 8
+and 10 all report class 1 with exactly +0.400 dB. Raising the order therefore
+helps only while the margin is negative for a stopband reason; once a design
+passes, the margin is capped by the passband half-corridor and no order will
+move it. A margin of +0.400 dB is not a mediocre result to be improved — it is
+the best a compliant design can report against this mask.
+
 The Table 1 acceptance mask itself is public too: `class_limits(fraction,
 filter_class, omega)` returns the minimum/maximum relative-attenuation
 limits at normalized frequencies $\Omega = f/f_m$, the same limits the
@@ -120,7 +137,9 @@ far-stopband class 1 limit (scipy pins the cheby2 equiripple floor at exactly
 keeps the same +0.400 dB passband margin as Butterworth). Chebyshev I,
 Elliptic and Bessel do
 not meet class limits at order 6: passband ripple (cheby1/ellip) and slow
-roll-off (bessel) violate the mask.
+roll-off (bessel) violate the mask. Class 1 is the strictest verdict this
+edition can return; the stricter class 0 the default bank also clears belongs to
+the withdrawn 1995 mask and is section 2.
 
 ## 2. Class 0 (IEC 61260:1995 / ANSI S1.11-2004)
 
@@ -210,15 +229,21 @@ grades:
   terms, which is why instrument-grade chains specify the class of every
   stage rather than a single overall figure.
 
-**Which architecture reaches which class?** The library's **default, Butterworth
-order 6, meets class 0** in the configurations the conformance suite verifies
-(octave and third-octave banks at 48 kHz), so no special setup is needed for
-laboratory-grade banks in that range. The table below reports the best class
-each architecture reaches under that same order-6 / 48 kHz setup; the other
-architectures fall short of class 0 because they trade the IEC mask for a
-different property *by construction*:
+**Which architecture reaches which class?** Under the 2014 edition, whose only
+classes are 1 and 2, the library's default Butterworth order-6 bank **meets
+class 1** with a +0.400 dB binding margin — that is the ceiling, and section 1
+explains why. Against the stricter 1995 / ANSI S1.11-2004 mask
+(`edition="1995"`) the same default reaches **class 0**; the configuration the
+conformance suite verifies at that class is the *octave-band* bank at 48 kHz,
+so re-run `verify_filter_class(bank, edition="1995")` yourself before writing
+class 0 into a document for any other fraction or sample rate. Writing "class 0
+per IEC 61260-1:2014" is a claim against a class that edition does not define.
 
-| Architecture | Best class (order 6, fs 48 kHz) | Why |
+The table reports the best class each architecture reaches at order 6, fs
+48 kHz, under the 1995 mask; the architectures other than Butterworth fall short
+because they trade the IEC mask for a different property *by construction*:
+
+| Architecture | Best class (order 6, fs 48 kHz, `edition="1995"`) | Why |
 | :--- | :---: | :--- |
 | `butter` (default) | **0** | Maximally-flat pass-band, monotone roll-off; fits the mask |
 | `cheby2` | 1 | Flat pass-band but the mask relationship binds at class 1 |
@@ -226,12 +251,14 @@ different property *by construction*:
 | `ellip` | — | Pass- and stop-band ripple |
 | `bessel` | — | Flat group delay bought with a slow roll-off |
 
-So the sensible default is the common one (Butterworth order 6): it clears
-class 0 in the verified configurations, while the alternative architectures are
-deliberate opt-ins whose purpose (steeper roll-off, linear phase) works against
-the class mask. Away from these settings (very high `fraction` or near-Nyquist
-bands), always re-run `verify_filter_class` to confirm the class you need, and
-raise the order if a band needs more margin.
+Under the 2014 edition the same ranking reads 1 / 1 / — / — / —: `cheby2` joins
+Butterworth at the top because class 0 no longer exists to separate them.
+
+So the sensible default is the common one (Butterworth order 6), while the
+alternative architectures are deliberate opt-ins whose purpose (steeper
+roll-off, linear phase) works against the class mask. Away from these settings
+(very high `fraction` or near-Nyquist bands), always re-run
+`verify_filter_class` to confirm the class you need.
 
 ## 4. The compliance fiche (`.report()`)
 
@@ -349,6 +376,9 @@ the achieved class per band.
 Class 0 is the tightest filter performance class, defined by IEC 61260:1995
 and its US twin ANSI S1.11-2004 and dropped by IEC 61260-1:2014. Its
 passband corridor allows only ±0.15 dB at mid-band, against ±0.3 dB for
-class 1 in the 1995 masks. It stays available through `edition="1995"`, and
-the default order-6 Butterworth bank meets class 0 in the verified 48 kHz
-configurations.
+class 1 in the 1995 masks. It stays available through `edition="1995"`, and the
+default order-6 Butterworth bank meets class 0 in the configuration the
+conformance report verifies, the octave-band bank at 48 kHz. Under
+IEC 61260-1:2014 that same bank is class 1: the 2014 edition defines no class 0,
+so a class 0 claim must cite the 1995 / ANSI S1.11-2004 mask it was measured
+against.

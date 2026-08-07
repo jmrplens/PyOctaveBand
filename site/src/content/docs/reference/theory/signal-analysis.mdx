@@ -104,13 +104,13 @@ $$
 Welch spectrum estimator. Therefore, its result does not have a frequency
 resolution in the `fs / nfft` sense.
 
-For `fraction=3`, the output contains one scalar level per third-octave band.
+For `fraction=3`, the output contains one scalar level per one-third-octave band.
 The relevant frequency granularity is the standardized band definition: center
 frequency, lower edge, and upper edge. Because fractional-octave bands are
 logarithmically spaced, their absolute bandwidth in Hz grows with frequency
 while their relative bandwidth remains approximately constant.
 
-For example, with `fraction=3` and `limits=[12, 20000]`, the exact third-octave
+For example, with `fraction=3` and `limits=[12, 20000]`, the exact one-third-octave
 band around 1 kHz is approximately:
 
 | Nominal band | Lower edge | Center | Upper edge | Bandwidth |
@@ -140,7 +140,7 @@ fs = 100_000
 pressure_signal_pa = 0.02 * np.random.default_rng(0).standard_normal(fs)
 x = pressure_signal_pa
 
-# Standardized third-octave levels from phonometry.
+# Standardized one-third-octave levels from phonometry.
 levels, centers = filters.octave_filter(
     x,
     fs=fs,
@@ -162,15 +162,27 @@ freq_bins, psd = signal.welch(
     scaling="density",
 )
 
-# Example: list the Welch bins inside the third-octave band closest to 1 kHz.
+# Example: list the Welch bins inside the one-third-octave band closest to 1 kHz.
 band_index = int(np.argmin(np.abs(np.asarray(fc) - 1000.0)))
 in_band = (freq_bins >= fl[band_index]) & (freq_bins <= fu[band_index])
 
-print("Selected third-octave band:", labels[band_index])
+print("Selected one-third-octave band:", labels[band_index])
 print("Welch bin spacing:", freq_bins[1] - freq_bins[0], "Hz")
 for f, pxx in zip(freq_bins[in_band], psd[in_band]):
     print(f, pxx)
 ```
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/signal_response_fraction_3.svg" alt="One-third-octave spectrum analysis of a six-tone signal with the raw PSD in the background" width="80%" />
+
+*The two objects on one axis, for a six-tone signal at 20, 100, 500, 2000,
+4000 and 15 000 Hz. The grey trace is a Welch PSD ($f_s$ = 48 kHz,
+`nperseg = 8192`, so a fixed 5.86 Hz bin everywhere); the markers are the
+standardized one-third-octave levels of the same signal. The bin width never
+changes and the band width does: 4.60 Hz at the 20 Hz band, narrower than one
+bin, against 230.77 Hz at 1 kHz and 3657 Hz at 16 kHz. That is why the top
+bands each swallow hundreds of bins while the bottom ones sit inside a single
+one, and why the two answers cannot be converted into each other. (The PSD
+trace is offset vertically for legibility, so read its shape, not its level.)*
 
 This keeps the two concepts separate: phonometry gives standardized
 fractional-octave levels, while Welch gives narrowband FFT bins. With
@@ -290,7 +302,25 @@ $$
 \alpha = 1 - e^{-1 / (f_s \cdot \tau)}
 $$
 
-Where $\tau$ is the time constant (e.g., 125 ms for Fast).
+This is the digital image of the analogue RC detector of the classical sound
+level meter: the squared pressure charges a capacitor through a resistor, so the
+displayed mean square is a one-pole low pass on $p^2$ with time constant $\tau$,
+and $\alpha = 1 - e^{-1/(f_s \tau)}$ is its impulse-invariant discretisation —
+exact at any $f_s$, unlike the $1/(f_s \tau)$ approximation often seen. The two
+standard constants are $\tau = 125$ ms (**Fast**) and $\tau = 1$ s (**Slow**).
+A step input reaches within 1 dB of its final value after about $1.6\tau$ and is
+0.03 dB short at $5\tau$, which is why levels read from the first few time
+constants of a record are biased low.
+
+**Impulse is not this filter.** It cannot be: a single $\alpha$ cannot hold a
+peak, and the figure below shows Impulse holding one. IEC 61672-1 defines the I
+weighting as a fast 35 ms detector followed by a 1.5 s decay, implemented here as
+an *asymmetric* detector — it charges with $\tau = 35$ ms whenever the input
+exceeds the current state and discharges with $\tau = 1.5$ s otherwise — so a
+transient is captured quickly and then held for over a second. That makes I
+neither an r.m.s. nor an energy average, which is why it is reserved for the
+specific regulations that name it and must never be energy-summed across
+intervals.
 
 The default initial condition is $y[-1] = 0$. Use `initial_state='first'` to
 start from the first input energy, or pass a scalar/array with the previous
@@ -316,7 +346,16 @@ $$
 k = \left| \frac{\prod_i (j\omega_{10} - p_i)}{\prod_i (j\omega_{10} - z_i)} \right|, \qquad \omega_{10} = 2\pi \cdot 10 \ \text{rad/s}
 $$
 
-The four zeros against eight poles shape the characteristic response: a rise of approximately **+12 dB/octave between 1 Hz and 20 Hz**, with roll-offs of approximately **24 dB/octave** below 1 Hz and above 20 Hz. Infrasound needs its own curve because near the hearing threshold the perceived loudness of very-low-frequency tones grows much more steeply with sound pressure level than at mid frequencies (a small dB increase above threshold produces a large loudness jump), so the A curve (anchored at 1 kHz) grossly misrepresents infrasonic annoyance.
+The four zeros against eight poles shape the characteristic response: a rise of approximately **+12 dB/octave between 1 Hz and 20 Hz**, with roll-offs of approximately **24 dB/octave** below 1 Hz and above 20 Hz.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/g_weighting_response.svg" alt="G-weighting frequency response from 0.1 Hz to 1 kHz with the ISO 7196 Table 2 nominal values overlaid" width="80%" />
+
+*The shape those four zeros and four pole pairs make, against the ISO 7196
+Table 2 nominal values: 0 dB at the 10 Hz anchor, the +12 dB/octave climb
+through the infrasound decade below it, and the two 24 dB/octave roll-offs
+that fence the curve off below 1 Hz and above 20 Hz.*
+
+Infrasound needs its own curve because near the hearing threshold the perceived loudness of very-low-frequency tones grows much more steeply with sound pressure level than at mid frequencies (a small dB increase above threshold produces a large loudness jump), so the A curve (anchored at 1 kHz) grossly misrepresents infrasonic annoyance.
 
 Since G acts on 0.25 Hz – 315 Hz, far below the Nyquist frequency at audio rates, the frequency warping of the plain bilinear transform (applied without prewarping) is negligible there: about 0.014 % at 315 Hz for $f_s = 48$ kHz, under 0.01 dB on the response. The internal oversampling used for the A/C designs (whose action extends to 16 kHz) is therefore not applied.
 
@@ -329,6 +368,14 @@ See the [Special Weightings guide](/phonometry/signals/levels/special-weightings
 $$
 \mathrm{SEL} = L_{eq,T} + 10 \log_{10}\left(\frac{T}{T_0}\right), \qquad T_0 = 1\ \text{s}
 $$
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sel_concept.svg" alt="A vehicle pass-by level history with its Leq over the whole event and the equal-energy one-second SEL block" width="80%" />
+
+*What the formula does to an event: the pass-by is replaced by a one-second
+block of the same total energy, which is why SEL exceeds the event's $L_{eq}$
+whenever the event lasts longer than a second, and why two events of the same
+SEL are interchangeable in a dose even when one is loud and short and the
+other quiet and long.*
 
 **Sound exposure** $E$ (IEC 61252, 3.1) is the time integral of the squared A-weighted sound pressure, expressed in pascal-squared hours:
 
@@ -356,7 +403,7 @@ $$
 \rho_0 \frac{\partial u}{\partial t} = -\frac{\partial p}{\partial r}
 $$
 
-A p-p probe approximates the pressure gradient by the **finite difference** of two microphones a spacer distance $\Delta r$ apart (IEC 61043:1994, definition 3.2):
+A p-p probe approximates the pressure gradient by the **finite difference** of two microphones a spacer distance $\Delta r$ apart (IEC 61043:1993, definition 3.2):
 
 $$
 p = \frac{p_1 + p_2}{2}, \qquad u = -\frac{1}{\rho_0 \Delta r} \int (p_2 - p_1)\ dt, \qquad I = \overline{p\ u}
@@ -380,7 +427,7 @@ The **pressure-intensity index** $\delta_{pI} = L_p - L_I$ measures how reactive
 
 See the [Sound Intensity guide](/phonometry/devices/emission/intensity/) for usage.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/intensity_demo.svg" alt="Third-octave pressure and intensity levels for a plane progressive wave versus a standing wave" width="92%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/intensity_demo.svg" alt="One-third-octave pressure and intensity levels for a plane progressive wave versus a standing wave" width="92%" />
 
 *The p-p estimator in the two limiting fields: the gap between $L_p$ and $L_I$ is the pressure-intensity index that flags reactive fields.*
 
@@ -419,5 +466,16 @@ reproduced: the four-term additive model gives $u_c = 2.0$ and the Monte Carlo
 inputs; the output is nearly trapezoidal, not Gaussian, so the interval is
 narrower than $\pm 1.96\,u$), and the GUM Annex H.1 end-gauge example gives
 $k = t_{0.99}(\nu_{\mathrm{eff}} = 16) = 2.92$ and $U_{99} = 93$ nm.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/uncertainty_budget.svg" alt="Two panels for the A-weighted level example. Left: the GUM uncertainty budget, a horizontal bar chart of each input's contribution to the combined uncertainty with a dashed line at uc of 0.407 dB. Right: the Monte Carlo output histogram overlaid with the GUM Gaussian and the shaded 95 percent coverage interval; the title reads Y equals 74.00 dB, U equals 0.86 dB, k equals 2.11" width="96%" />
+
+*The two routes on one problem — an A-weighted level, not the Supplement 1
+four-term example quoted above. Left is the law of propagation as a budget:
+one bar per input, so the term worth reducing is visible. Right is the
+Supplement 1 route: the Monte Carlo output distribution with the GUM Gaussian
+drawn over it and the 95 % coverage interval shaded. Here the two agree, which
+is what clause 8 calls validation; where the model is non-linear or the output
+visibly non-Gaussian the histogram departs from the curve and the interval is
+read off the fractiles instead.*
 
 See the [GUM Uncertainty guide](/phonometry/signals/metrology/gum-uncertainty/) for usage.

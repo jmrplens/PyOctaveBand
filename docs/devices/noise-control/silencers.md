@@ -306,12 +306,21 @@ resistivity, is the same material theory as
 
 ## Cross-check against the FDTD solver
 
-The four-pole expansion chamber is cross-checked against the independent 2D
-[FDTD wave solver](../../simulation/fdtd-simulation.md): a plane-wave duct that widens into a
-chamber and narrows back transmits far less at the four-pole TL peak
-($kL = \pi/2$) than at the transparent trough ($kL = \pi$), and the measured
-amplitude ratio reproduces the closed-form peak transmission loss to a fraction
-of a decibel (test `tests/noise_control/test_fdtd_crosscheck.py`).
+That cross-check is the clip embedded in section 1, and it is worth returning
+to it now with the algebra in hand. The four-pole expansion chamber is checked
+against the independent 2D
+[FDTD wave solver](../../simulation/fdtd-simulation.md), which shares no formula and no
+assumption with the transfer-matrix product beyond the wave equation itself: a
+plane-wave duct that widens into the same 0.30 m, $m = 4$ chamber and narrows
+back transmits far less at the four-pole TL peak ($kL = \pi/2$, here 286 Hz)
+than at the transparent trough ($kL = \pi$, 572 Hz). The amplitude ratio
+measured downstream in the field is the transmission loss annotated on the
+clip, 6.5 dB at 286 Hz and 0.0 dB at 572 Hz, against the 6.55 dB the closed
+form gives for $m = 4$ (test `tests/noise_control/test_fdtd_crosscheck.py`).
+Agreement that close rules out an algebra error on either side. The two must
+eventually part company above the duct's first cut-on frequency, where
+higher-order modes propagate: the two-dimensional solver keeps working there
+and the plane-wave algebra does not.
 
 
 ## See also

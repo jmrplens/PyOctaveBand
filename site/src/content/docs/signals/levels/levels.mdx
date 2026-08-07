@@ -353,13 +353,22 @@ integral of the squared A-weighted pressure) and the equivalent
 **normalized 8 h level**:
 
 $$
-E = \int_0^T p_A^2(t)\ dt \quad [\text{Pa}^2\text{h}], \qquad
-L_{EX,8h} = 10\log_{10}\frac{E}{8\ \text{h} \cdot p_0^2}
+E = \int_0^T p_A^2(t)\ dt \quad [\text{Pa}^2\text{h}],\ t\ \text{in hours}
+\qquad
+L_{EX,8h} = 10\log_{10}\frac{E}{T_0\,p_0^2}, \quad T_0 = 8\ \text{h}
 $$
 
+The unit annotation only holds if $t$ is in hours: integrate in seconds and you
+get Pa²s, which is the same exposure expressed 3600 times larger — 35.6 dB out
+if you then feed it to the $L_{EX,8h}$ formula. In practice you integrate in
+seconds and divide by 3600, which is what `sound_exposure` does internally
+(mean square × duration in hours).
+
 The anchor worth memorizing: **3.2 Pa²h ⇔ exactly 90 dB over 8 h** (the CI
-suite enforces it). Half the dose is −3 dB; double duration at the same level
-is +3 dB.
+suite enforces it). It falls straight out of the formula: 90 dB is
+$p_{A,\mathrm{rms}} = 20\,\mu\mathrm{Pa} \times 10^{4.5} = 0.6325$ Pa, and
+$8\ \text{h} \times (0.6325\ \text{Pa})^2 = 3.2\ \text{Pa}^2\text{h}$. Half the
+dose is −3 dB; double duration at the same level is +3 dB.
 
 ### Peak / event / dose parameters
 

@@ -38,6 +38,10 @@ reproduced (E.2.1: 7.4 m/s² for 2.5 h → $A(8) = 4.1$ m/s²; E.3 forestry,
 three tools → 3.6 m/s²), as are the ISO 5349-1 Table C.1 exposure-duration
 rows.
 
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/vibration_weighting_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/vibration_weighting.svg" alt="The whole-body vertical weighting Wk in decibels over 0.4 to 100 Hz: a plateau near -6 dB below 2 Hz, a small +0.5 dB peak near 6 Hz and a roll-off to about -21 dB at 100 Hz" width="88%"></picture>
+
+*The Wk whole-body weighting realized from the ISO 8041-1 cascade.*
+
 ### Multiple shocks (ISO 2631-5)
 
 Repeated shocks damage the lumbar spine through peak compression rather than
@@ -63,6 +67,15 @@ clause 5.2 tolerance; the Annex C worked example (five 40 m/s² shocks per day
 over 20 years) is reproduced: $D_{zd} = 55.97$ m/s², $R = 1.22$,
 $\Pi = 0.37$. The Annex A finite-element spinal model (distributed by ISO as
 separate software) is out of scope.
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/multiple_shock_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/multiple_shock.svg" alt="Left: the seat-to-spine transmissibility rising to about 1.6 near a 5 Hz resonance then rolling off to near zero by 80 Hz. Right: the Weibull probability of lumbar injury versus the stress variable R for male and female, with the 10, 50 and 90 percent risk levels and the Annex C male example at R = 1.22, about 37 percent" width="96%"></picture>
+
+*The two objects of the model. Left, the clause 5.2 seat-to-spine
+transmissibility: unity at DC, peaking at $|H| \approx 1.54$ near 5 Hz and
+rolling off above it, which is why $W_k$ had to be replaced for shocks. Right,
+the Table C.1 Weibull law $\Pi(R)$ with the Annex C worked example marked at
+$R = 1.22$, $\Pi = 0.37$ — the risk rises steeply over a narrow band of $R$, so
+a dose that doubles does not double the probability.*
 
 See the [Human Vibration guide](../../vibration/human/human-vibration.md) and the
 [Multiple-Shock Vibration guide](../../vibration/human/multiple-shock-vibration.md) for usage.
@@ -92,6 +105,25 @@ from Cremer, Heckl & Petersson (2005) and Hopkins (2007).
 
 See the [Predicting Panel Sound Insulation guide](../../buildings/design/panel-sound-insulation.md) for
 usage.
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/mechanical_mobility_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/mechanical_mobility.svg" alt="Normalized receptance, mobility and accelerance magnitudes of a single-degree-of-freedom resonator on a log-log frequency axis, all peaking at the resonance" width="82%"></picture>
+
+*Not one of the closed forms above: this is a **finite** one-degree-of-freedom
+resonator, receptance, mobility and accelerance being the same resonance seen
+through the three kinematic quantities. It is here as the contrast — the
+infinite-structure results are frequency-independent or smoothly falling,
+while anything finite resonates.*
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/mobility_result_lines_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/mobility_result_lines.svg" alt="Driving-point mobility magnitude of a single-degree-of-freedom resonator on log-log axes, climbing along the stiffness line below resonance, falling along the mass line above it, and peaking at one over the damping coefficient at the resonance" width="82%"></picture>
+
+*The same point read as a diagnosis: below resonance the magnitude climbs the
+**stiffness line** $\omega/k$, above it it falls along the **mass line**
+$1/(\omega m)$, and the peak height is set by the damping alone. A real
+structure has many such resonances, and the infinite-structure closed forms
+above are the average the measured mobility oscillates about, not the value it
+takes at a given frequency — which is why they are used with octave or
+third-octave inputs and are least trustworthy in the lowest bands of a small
+or lightly damped element.*
 
 ## References
 

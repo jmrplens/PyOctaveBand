@@ -59,7 +59,9 @@ needs the clause it came from.
 
 ## [Bibliography](/phonometry/reference/bibliography/)
 
-Every book and paper cited by the guides, in one list grouped by domain, each
-entry with a verified DOI or official publisher link, half a sentence on what
-it supports, and the guide pages that cite it. It doubles as a reading list
-for the field and as the single source of truth for link checking.
+A curated selection of the books and papers the guides lean on, in one list
+grouped by domain, each entry with a verified DOI or official publisher link,
+half a sentence on what it supports, and the guide pages that cite it. It is a
+reading list for the field rather than the complete citation index: the
+authoritative list for any one page is that page's own References section,
+generated from its frontmatter.

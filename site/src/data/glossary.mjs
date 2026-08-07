@@ -585,6 +585,10 @@ export const glossary = [
       {
         id: "nr",
         symbol: "NR",
+        qualifier: {
+          en: "curve family",
+          es: "familia de curvas",
+        },
         unit: {
           en: "dB (index)",
           es: "dB (índice)",
@@ -595,8 +599,8 @@ export const glossary = [
         },
         guide: "buildings/rooms/room-noise",
         definition: {
-          en: "Noise rating, the European counterpart curve family of NC. Discussed for comparison and deliberately not implemented.",
-          es: "Noise Rating, la familia de curvas europea equivalente a NC. Se comenta a efectos de comparación y no se implementa deliberadamente.",
+          en: "Noise rating, the European counterpart curve family of NC. Discussed for comparison and deliberately not implemented. Not the NR of the noise-control guides, which is a level drop.",
+          es: "Noise Rating, la familia de curvas europea equivalente a NC. Se comenta a efectos de comparación y no se implementa deliberadamente. No es el NR de las guías de control de ruido, que es una caída de nivel.",
         },
       },
     ],
@@ -723,6 +727,24 @@ export const glossary = [
       es: "Aislamiento acústico",
     },
     terms: [
+      {
+        id: "nr-2",
+        symbol: "NR",
+        qualifier: {
+          en: "level drop",
+          es: "caída de nivel",
+        },
+        unit: "dB",
+        standard: {
+          en: "Norton and Karczub (2003), Equation (4.101)",
+          es: "Norton y Karczub (2003), ecuación (4.101)",
+        },
+        guide: "devices/noise-control/room-to-room",
+        definition: {
+          en: "Noise reduction: the sound pressure level in the source room minus the level in the receiving room, $L_{p1} - L_{p2}$. It is not the transmission loss of the partition: the two differ by a term set by the partition area against the receiving room's absorption, so a small partition into a well-absorbing room delivers more noise reduction than its transmission loss, and a large one into a hard room delivers less.",
+          es: "Reducción de ruido: el nivel de presión acústica del recinto emisor menos el del receptor, $L_{p1} - L_{p2}$. No es la pérdida por transmisión del elemento separador: ambas difieren en un término fijado por la superficie del separador frente a la absorción del recinto receptor, de modo que un separador pequeño hacia un recinto muy absorbente ofrece más reducción de ruido que su pérdida por transmisión, y uno grande hacia un recinto reverberante ofrece menos.",
+        },
+      },
       {
         id: "d-2",
         symbol: "$D$",

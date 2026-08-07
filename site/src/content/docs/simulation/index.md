@@ -36,6 +36,32 @@ ground), the simulation is the fallback that still gives a quantitative
 answer; when a closed form exists, prefer it, and use the solver to verify
 the assumptions it rests on.
 
+Those cross-checks are not only arguments: fifteen of the animations in this
+documentation are output from these two solvers, and they are filed on the
+guides whose physics they settle rather than here. Room modes growing on and
+off resonance appear in [room acoustics](/phonometry/buildings/rooms/room-acoustics/)
+and [reverberation prediction](/phonometry/buildings/rooms/reverberation-prediction/),
+which also carries the hall of columns that turns one wavefront into a mixed
+field; barrier diffraction at two wavelengths in
+[outdoor propagation](/phonometry/environment/propagation/outdoor-propagation/)
+and [ground effect and barriers](/phonometry/environment/propagation/ground-barriers/);
+downwind and upwind refraction in
+[atmospheric refraction](/phonometry/environment/propagation/atmospheric-refraction/);
+the ground-effect lobe pattern in outdoor propagation and in
+[airport noise](/phonometry/aircraft/airport-noise/); the standing-wave and
+transmission tubes in [the impedance tube](/phonometry/materials/absorbers/impedance-tube/);
+the QRD and metadiffuser panels in
+[diffusers](/phonometry/materials/diffusers/diffusers/) and
+[metadiffusers](/phonometry/materials/diffusers/metadiffusers/); the slit
+absorber in [metamaterial absorbers](/phonometry/materials/absorbers/metamaterial-absorbers/);
+the expansion chamber in [silencers](/phonometry/devices/noise-control/silencers/);
+the wall aperture in [panel sound insulation](/phonometry/buildings/design/panel-sound-insulation/);
+and the SOFAR duct in [underwater propagation](/phonometry/underwater/underwater-propagation/).
+The elastic solver adds two: the bending packet entering an L-junction, on
+[junction transmission](/phonometry/vibration/structural/junction-transmission/),
+and the coincidence plate, on panel sound insulation. Both also appear on the
+elastic page below, where the solver that produced them is explained.
+
 ## Pages in this section
 
 - [2D FDTD wave simulation](/phonometry/simulation/fdtd-simulation/): the

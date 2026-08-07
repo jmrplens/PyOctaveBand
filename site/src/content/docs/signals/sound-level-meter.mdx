@@ -26,6 +26,7 @@ references:
 ---
 
 import ThemeImage from '../../../components/ThemeImage.astro';
+import Video from '../../../components/Video.astro';
 
 A sound level meter is not one algorithm but a short pipeline of them, and
 IEC 61672-1 specifies every stage. phonometry implements each stage as an
@@ -85,8 +86,14 @@ cal = metrology.sensitivity(calibrator, target_spl=94.0, fs=fs)
 ```
 
 Deep guide: [Calibration and dBFS](/phonometry/signals/metrology/calibration/), which
-also covers calibrating from a known microphone sensitivity and the digital
-dBFS mode used when no physical reference exists.
+covers the stability check this call runs on the calibrator recording, the
+integer-format rule, and the digital dBFS mode used when no physical reference
+exists. With no calibrator at all the factor can be computed from the chain's
+rated sensitivity rather than measured — a microphone rated $M$ mV/Pa through a
+preamplifier of linear gain $G$ into a converter whose full scale is $V_{FS}$
+volts gives $S = V_{FS} / (M G / 1000)$ pascals per digital unit — but a rated
+factor carries the datasheet's tolerance rather than the ±0.4 dB of a class 1
+calibrator, so it cannot be reported as a calibrated measurement.
 
 ## 3. Weight: frequency and time (IEC 61672-1)
 
@@ -104,14 +111,27 @@ laf_t = 10 * np.log10(np.maximum(envelope, 1e-12) / (2e-5) ** 2)
 # laf_t peaks near 80 dB during the event and settles near 55 dB between.
 ```
 
-You rarely write this chain yourself: every level function of the next step
-applies the frequency weighting internally, and the percentile levels rebuild
-this Fast envelope for you. The energy metrics ($L_{eq}$, SEL) integrate the
-squared weighted signal directly, with no ballistics, exactly as a meter
-does. The chain is shown here because it *is* the meter's display.
+<Video
+  name="anim_time_weighting"
+  width={2400}
+  height={1350}
+  title="The Fast, Slow and Impulse detector ballistics"
+  description="A tone burst drives the RC exponential detector: the capacitor charges and drains while the Fast, Slow and Impulse meter needles follow their own ballistics, and the three level traces build up below to show the fast attack, the slow average and the asymmetric impulse hold."
+/>
+
+The needle in the clip is that `time_weighting` call: a first-order low-pass
+charging and draining on the squared signal. The three needles differ in one
+number, the time constant, which is why Fast catches an event that Slow
+smooths away. You rarely write this chain yourself: every level function of
+the next step applies the frequency weighting internally, and the percentile
+levels rebuild this Fast envelope for you. The energy metrics ($L_{eq}$, SEL)
+integrate the squared weighted signal directly, with no ballistics at all —
+which is why they show no needle movement to follow. The chain is shown here
+because it *is* the meter's display.
 
 Deep guides: [Frequency Weighting (A, C, Z)](/phonometry/signals/levels/weighting/)
-and [Time Weighting](/phonometry/signals/levels/time-weighting/).
+and [Time Weighting](/phonometry/signals/levels/time-weighting/), which takes
+this same clip apart against the IEC 61672-1 tone-burst table.
 
 ## 4. Integrate: the numbers a meter reports
 
@@ -133,11 +153,18 @@ print(f"LAeq {la_eq:.1f} dB | L10 {ln[10]:.1f} | L90 {ln[90]:.1f} "
       f"| LAE {lae:.1f} | LCpeak {lc_pk:.1f}")
 ```
 
-Note the arithmetic the numbers encode: the 1 s event dominates $L_{Aeq}$ (it
-sits 25 dB above the background, far more than the 10 dB the
-nine-times-longer background gets back in duration), $L_{AE}$ is $L_{Aeq}$
-plus $10\log_{10}$ of the 10 s duration, and $L_{90}$ barely notices the event at
-all.
+Note the arithmetic the numbers encode. The event second measures 80.0 dB on its
+own and the nine background seconds 55.0 dB, so in energy the event contributes
+$1 \times 10^{8.00}$ and the background $9 \times 10^{5.50} = 2.9 \times 10^{6}$
+— a ratio of about 35:1, or 15.5 dB. The event's 25 dB head start beats the
+9.5 dB ($10\log_{10}9$) the background wins back on duration, which is why the
+10 s $L_{Aeq}$ of 70.2 dB sits only 0.1 dB above the 70.0 dB the event alone
+would give spread over the same 10 s: the background is almost invisible in the
+energy average. $L_{AE}$ is that $L_{Aeq}$ plus $10\log_{10}(10\ \mathrm{s}/1\
+\mathrm{s}) = 10$ dB, the whole energy compressed into one second. The
+percentiles read the other way round: the event fills exactly 10 % of the
+record, so it lifts $L_{10}$ to 78.0 dB and leaves $L_{90}$ at 54.9 dB, the
+background level.
 
 Deep guide: [Integrated and Statistical Levels](/phonometry/signals/levels/levels/),
 which adds noise dose and octave spectrograms; the $L_{den}$ and rating levels

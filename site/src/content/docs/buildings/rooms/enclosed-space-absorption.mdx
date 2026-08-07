@@ -115,8 +115,13 @@ result = room.enclosed_space_reverberation(
 )
 print(result.reverberation_time.round(2))
 # [2.13 1.03 0.62 0.48 0.43 0.42 0.4 ]
-result.plot()   # the figure below: A and T per octave band
+result.plot()   # A and T per octave band, for this room alone
 ```
+
+The figure below runs that call twice, once with the acoustic tile above and
+once with the ceiling left as bare plaster, so the treatment can be read off as
+a difference. The `[2.13 1.03 …]` printed above is its "acoustic ceiling"
+curve; `result.plot()` draws that curve on its own.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/enclosed_space_absorption.svg" alt="Two panels for a 60 cubic metre office with a bare versus acoustically-treated ceiling: the equivalent absorption area per octave band, much higher with the acoustic ceiling, and the reverberation time falling from about five seconds at low frequency for the bare room to under one second with the acoustic ceiling" width="96%" />
 
@@ -138,6 +143,15 @@ plt.show()
 ```
 
 </details>
+
+*The same 60 m³ office with two ceilings. Swapping 20 m² of plaster for
+acoustic tile multiplies the equivalent absorption area by 4 to 5 above
+500 Hz (4.0 m² to 20.2 m² at 1 kHz) and pulls the reverberation time from
+2.4 s to 0.48 s there. The 125 Hz band, where the tile is weakest, improves
+least — 1.9 m² to 4.5 m², and 5.04 s only down to 2.13 s: a 20 mm porous tile
+is a small fraction of a 2.7 m wavelength and absorbs by friction only where
+the particle velocity is high, so low-frequency control needs depth, an air gap
+or a resonant absorber.*
 
 The `ReverberationResult` carries the per-band absorption area and reverberation
 time, the volume and the object fraction, and its `.plot()` draws the

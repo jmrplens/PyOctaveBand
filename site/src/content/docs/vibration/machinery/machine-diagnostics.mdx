@@ -28,10 +28,11 @@ already provides - the [envelope spectrum and cepstrum](/phonometry/signals/spec
 The working view is the two put together: the envelope spectrum of a
 band-passed vibration record with the predicted lines drawn on top and named.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/bearing_fault_envelope.svg" alt="Envelope spectrum of a band-passed bearing vibration record, plotted from 0 to about 950 hertz, with a dense low noise floor and four tall isolated lines. Vertical dashed red lines mark the predicted outer-race ball pass frequency at 207 hertz and its second, third and fourth harmonics, and each of the four tall measured lines lands exactly on one of them. A dotted green line marks the predicted inner-race ball pass frequency at 293 hertz and a dotted purple line the predicted ball spin frequency at 92 hertz, and no measured line appears at either, which is what identifies the fault as an outer-race spall. A dash-dotted line at 33.3 hertz marks the shaft rate, where a small line does appear." width="92%" loading="eager" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/bearing_fault_envelope.svg" alt="Envelope spectrum of a band-passed bearing vibration record, plotted from 0 to about 950 hertz, with a dense low noise floor and four tall isolated lines. Vertical dashed red lines mark the predicted outer-race ball pass frequency at 207 hertz and its second, third and fourth harmonics, and each of the four tall measured lines lands exactly on one of them. A dotted green line marks the predicted inner-race ball pass frequency at 293 hertz and a dotted purple line the predicted rolling-element rotational frequency BSF at 92 hertz, and no measured line appears at either, which is what identifies the fault as an outer-race spall. A dash-dotted line at 33.3 hertz marks the shaft rate, where a small line does appear." width="92%" loading="eager" />
 
-*The four tall lines land on BPFO and its harmonics; nothing appears on BPFI or
-BSF. That is the diagnosis: a spall on the outer race.*
+*The four tall lines land on BPFO and its harmonics; nothing appears on BPFI,
+on the roller rate BSF or on the 183 Hz BDF where a damaged roller would strike.
+That is the diagnosis: a spall on the outer race.*
 
 <details>
 <summary>Show the code for this figure</summary>
@@ -88,7 +89,13 @@ and writing $g = (d/D)\cos\phi$ and $f_s = N/60$:
 | `BPFI` | element pass frequency, inner race | $Z(f_s/2)(1 + g)$ | (8.9) |
 
 Three of them carry the diagnosis: `BPFO` for an outer-race defect, `BPFI` for
-an inner-race defect, and `BDF` for a damaged rolling element or cage. Two
+an inner-race defect, and `BDF` for a damaged rolling element or cage. The two
+rolling-element rows are one factor of two apart because they answer different
+questions: `BSF` is how fast a roller turns, `BDF` how often a defect on it
+strikes a race — twice per roller revolution, once against each. Evidence of a
+damaged roller is therefore expected at `BDF` (183.3 Hz for the bearing above),
+usually modulated at the cage rate `FTF`, while the line the figure draws at
+91.7 Hz is the roller's rotational rate `BSF`. Two
 identities are worth remembering because they are exact and catch data-entry
 errors instantly: $\text{BPFO} + \text{BPFI} = Z f_s$ always, and
 $\text{BPFO} = Z \times \text{FTF}$ whenever the outer race is stationary.
@@ -173,8 +180,24 @@ sideband spacing that a broken rotor bar puts around `1x`.
 The blade-passing frequency of an impeller with $N$ blades is $f_b = n N f_s$
 (Eq. 8.15); a pump's hydraulic pulsations follow the same form with $N$
 pumping events per revolution (Eq. 8.18), and a rotary
-positive-displacement blower repeats four times per revolution, so it is
-handled by passing $4 \times \text{r/min}$.
+positive-displacement blower repeats four times per revolution, which is
+handled by passing $4 \times \text{r/min}$ with a single "blade":
+
+```python
+from phonometry import blade_pass_frequencies
+
+# A rotary positive-displacement blower at 1200 r/min: four pulsations per
+# revolution, so the pulsation rate is asked for as 4 x r/min with N = 1.
+res = blade_pass_frequencies(4 * 1200.0, 1, harmonics=3)
+print(round(res["BPF"], 1))        # 80.0 Hz, the pulsation rate
+print(round(res.shaft_rate, 1))    # 80.0 Hz - NOT the shaft rate, which is 20
+```
+
+The trick costs the shaft line: `shaft_rate` comes back at $4 f_s$, so read the
+shaft rate from a separate call at the true speed (or from
+`bearing_fault_frequencies`) before combining families with
+`combine_fault_lines`, or a 4th shaft harmonic will be plotted as if it were
+bearing evidence.
 
 In a **ducted axial fan** the blades also interact with the stator vanes and set
 up rotating pressure patterns with $m_L = nN \pm kV$ lobes for $V$ vanes
@@ -187,9 +210,7 @@ count reached from a different harmonic is a different pattern turning at a
 different speed.
 
 ```python
-from phonometry import blade_pass_frequencies
-
-# Six blades, four vanes, 3500 r/min.
+# Six blades, four vanes, 3500 r/min (blade_pass_frequencies imported above).
 res = blade_pass_frequencies(3500.0, 6, harmonics=1, n_vanes=4)
 print(round(res["BPF"]))          # 350
 print(round(res["lobe n=1 m=2"]), round(res["lobe n=1 m=10"]))    # 175 35

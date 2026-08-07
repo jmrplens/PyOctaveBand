@@ -299,7 +299,24 @@ print(f"long-term loudness exceeded 5% of the time: {res.percentiles[5.0]:.3f} s
 res.plot()   # short-term S'(t) and long-term S''(t) loudness vs time
 ```
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/moore_glasberg_time_loudness.svg" alt="Short-term and long-term Moore-Glasberg loudness traces for a tone burst, showing the fast attack of the short-term loudness and the slower release of the long-term loudness" width="80%" />
+The short-term loudness rises within a few tens of milliseconds and falls back
+slowly, mimicking the ear's fast onset sensitivity and its slower recovery; the
+long-term loudness integrates that trace again with a much longer time
+constant, so it barely reacts to a single syllable and instead tracks the
+overall level of an event. The peak of that slow trace, $N_\text{max}$, is the
+standard's predictor of the loudness of a short sound, and its validity stops
+at roughly 5 s because beyond that a listener stops judging the sound as one
+event. That is also why the percentiles sit beside it: for a sound that
+fluctuates without a clear event structure, a percentile of the long-term
+loudness (typically the 5 % value) is the stable statistic, where
+$N_\text{max}$ would be set by the single worst moment.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/moore_glasberg_time_loudness.svg" alt="Short-term and long-term Moore-Glasberg loudness traces for a 200 ms 1 kHz burst at 60 dB SPL inside an 0.8 s record: the short-term trace rises to a peak of 4.8 sone within the shaded burst window and releases quickly, while the long-term trace integrates to 3.6 sone and decays slowly after the burst ends" width="80%" />
+
+*A 200 ms 1 kHz burst at 60 dB SPL: the short-term loudness reaches 4.8 sone
+within a few tens of milliseconds and releases quickly, while the long-term
+loudness integrates to 3.6 sone and decays slowly after the burst ends — the
+pair of time constants ISO 532-3 clauses 7.8/7.9 define.*
 
 <details>
 <summary>Show the code for this figure</summary>
@@ -309,22 +326,19 @@ import matplotlib.pyplot as plt
 import numpy as np
 from phonometry import psychoacoustics
 
-fs = 32000
-t = np.arange(int(1.3 * fs)) / fs
-x = np.sqrt(2) * 2e-5 * 10 ** (40 / 20) * np.sin(2 * np.pi * 1000 * t)
-res = psychoacoustics.loudness_moore_glasberg_time(x, fs, field="free")
+# The figure is a burst, not a steady tone: 1 kHz at 60 dB SPL, gated on
+# between 200 and 400 ms of an 0.8 s record.
+fs = 48000
+t = np.arange(int(0.8 * fs)) / fs
+sig = np.zeros_like(t)
+on = (t >= 0.2) & (t < 0.4)
+sig[on] = np.sqrt(2) * 2e-5 * 10 ** (60 / 20) * np.sin(2 * np.pi * 1000 * t[on])
+burst = psychoacoustics.loudness_moore_glasberg_time(sig, fs)
+print(round(float(burst.short_term_loudness.max()), 1),
+      round(float(burst.long_term_loudness.max()), 1))   # 4.8  3.6
 
 # The result carries both traces on a 1 ms time axis:
-res.plot()
-plt.show()
-
-# Or plot them directly to see the fast STL vs the slow LTL:
-fig, ax = plt.subplots()
-ax.plot(res.time, res.short_term_loudness, label="Short-term S'(t)")
-ax.plot(res.time, res.long_term_loudness, label="Long-term S''(t)")
-ax.set_xlabel("Time [s]")
-ax.set_ylabel("Loudness [sone]")
-ax.legend()
+burst.plot()
 plt.show()
 ```
 
@@ -370,7 +384,12 @@ print(res.specific_loudness.shape)          # (53,) average specific loudness N'
 res.plot()   # average specific loudness N'(z) + time-dependent N(l) at 187.5 Hz
 ```
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sottek_specific_loudness.svg" alt="Sottek Hearing Model average specific loudness N'(z) over the 53 Bark_HMS bands for a 1 kHz tone, peaking at the tone's critical band" width="80%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sottek_specific_loudness.svg" alt="Sottek Hearing Model average specific loudness N'(z) over the 53 Bark_HMS bands for a 1 kHz tone at 60 dB SPL totalling 2.8 sone_HMS, peaking at the tone's critical band near 9 Bark_HMS and falling away on both sides" width="80%" />
+
+*The 1 kHz tone at 60 dB SPL, N = 2.8 sone_HMS — a louder tone than the 40 dB
+anchor of the snippet above, which gives 0.98 sone_HMS. The loudness is the
+area under $N'(z)$, so a broadband sound spreading a low pattern over many
+bands can outweigh this single peak.*
 
 <details>
 <summary>Show the code for this figure</summary>
@@ -380,10 +399,12 @@ import matplotlib.pyplot as plt
 import numpy as np
 from phonometry import psychoacoustics
 
+# The figure is the 60 dB tone, not the 40 dB anchor of the snippet above.
 fs = 48000
 t = np.arange(int(1.2 * fs)) / fs
-x = np.sqrt(2) * 2e-5 * 10 ** (40 / 20) * np.sin(2 * np.pi * 1000 * t)
+x = np.sqrt(2) * 2e-5 * 10 ** (60 / 20) * np.sin(2 * np.pi * 1000 * t)
 res = psychoacoustics.loudness_ecma(x, fs, field="free")
+print(f"N = {res.loudness:.1f} sone_HMS")   # 2.8 sone_HMS
 
 # The result carries the average specific loudness over the 53 Bark_HMS bands:
 res.plot()

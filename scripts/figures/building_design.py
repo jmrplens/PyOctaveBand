@@ -459,11 +459,14 @@ def generate_installed_structure_borne(output_dir: str) -> None:
     yi = (3.0e-5 + 1.0e-5j) * np.ones_like(bands)
     dc = np.array([float(coupling_term(a, b)) for a, b in zip(ys, yi)])
     lws_inst = installed_structure_borne_power_level(lws_c, dc)
+    # Dsa is negative and falls with frequency (Annex F.2, Formula F.3); the
+    # standard's own Annex I columns run from about -14 dB at 63 Hz to -45 dB
+    # at 2 kHz. It enters Formula (18a) with a minus sign.
     paths = [
-        {"adjustment_term": 6.0,
+        {"adjustment_term": np.array([-14., -17., -20., -25., -30., -35., -40.]),
          "flanking_reduction_index": np.array([44., 47., 50., 53., 56., 59., 62.]),
          "element_area": 12.0},
-        {"adjustment_term": 7.0,
+        {"adjustment_term": np.array([-16., -19., -23., -28., -33., -38., -43.]),
          "flanking_reduction_index": np.array([46., 49., 52., 55., 58., 61., 64.]),
          "element_area": 9.0},
     ]

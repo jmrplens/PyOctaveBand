@@ -50,11 +50,38 @@ EN ISO 10052:2004+A1:2010.
 
 The reverberation index is either **measured** (feed the reverberation time to
 `reverberation_index(T)`) or, in a control survey, **estimated** from the room
-type and volume with `estimate_reverberation_index(V, room)` (Table 4:
-furnished `"kitchen"` / `"bathroom"` / `"furnished"`, or the unfurnished
-construction classes `"a"`–`"h"` and the mixed `"a+e"`…`"d+h"`). A fourth
+type and volume with `estimate_reverberation_index(V, room)`: furnished
+`"kitchen"` / `"bathroom"` / `"furnished"`, or the unfurnished construction
+classes `"a"`–`"h"` and the mixed `"a+e"`…`"d+h"`. Clause 6.5 splits that in
+two — **Table 3** classifies the room and gives it its letter, **Table 4**
+turns the letter and the volume into the index. A fourth
 quantity unique to this method is **service-equipment noise** $L_{XY}$: the
 energy average of three A- or C-weighted positions.
+
+The letters are not arbitrary: Table 3 is a 2 × 2 × 2 grid over the weight of
+the walls and ceiling, the hardness of the floor covering and the weight of
+the floor construction.
+
+| Walls and ceiling | Soft covering, light floor | Soft covering, heavy floor | Hard covering, light floor | Hard covering, heavy floor |
+| :--- | :---: | :---: | :---: | :---: |
+| Light | `a` | `b` | `c` | `d` |
+| Heavy | `e` | `f` | `g` | `h` |
+
+A **light wall** is plasterboard or timber studwork, and a heavy wall carrying
+a plasterboard lining counts as light; a **heavy wall** is unlined masonry or
+block. A **light floor** is planks or boards on timber beams, a **heavy
+floor** a concrete slab. The **covering** is carpet (soft) against tiles or
+timber flooring (hard). Where the room mixes two constructions over roughly
+equal areas, average the two letters — that is what the mixed classes
+`"a+e"`…`"d+h"` are; where one construction clearly dominates by area, use its
+letter alone. Note that the covering and the floor construction are two
+separate axes, so "a hard floor" on its own does not pick a class.
+
+Table 4 comes from a statistical survey of European dwellings built between
+1960 and 1980 (NOTE 1): the standard deviation of the tabulated indices is
+about 1 dB, and the table is valid for $T_0 = 0.5\ \text{s}$ and rooms up to
+150 m³. Changed construction methods or habitation habits can shift it
+systematically, so measure $T$ when the result has to hold up.
 
 ```python
 import numpy as np
@@ -69,10 +96,10 @@ print(np.round(res.d_nt, 1))          # [34.5 39.8 45.  50.5 54. ]  DnT = D + k
 print(res.rating.rating, res.rating.c)        # 49 -1  ->  DnT,w (C)
 print(res.r_prime_rating.rating)               # 48  ->  R'w
 
-# No reverberation time measured? Estimate k from Table 4 (heavy walls, hard
-# floor, 35-60 m3 -> class "g").
-k_est = building.estimate_reverberation_index(50.0, "g")
-print(k_est)                                   # [4.5 5.  5.5 5.5 5.5]
+# No reverberation time measured? Classify with Table 3, then read Table 4:
+# heavy masonry walls, concrete slab, tiled floor, 35-60 m3 -> class "h".
+k_est = building.estimate_reverberation_index(50.0, "h")
+print(k_est)                                   # [5.  5.5 6.  5.  5.5]
 
 # Service-equipment noise: energy average of three A-weighted positions.
 se = building.survey_service_equipment_level([35.0, 30.0, 32.0], 3.0, volume=50.0)
@@ -118,6 +145,21 @@ plt.show()
 
 </details>
 
+### Background noise: a floor to meet, not a correction to apply
+
+Unlike the engineering methods, the survey method never corrects for
+background noise (Clause 6.2.1). It fixes a signal-to-noise floor instead:
+adjust the source so that the receiving-room level exceeds the background by
+at least 6 dB in every band, checked by switching the source on and off before
+the run. Where the margin still falls below 6 dB, record the uncorrected level
+and state in the report that the level difference is underestimated — or, for
+service equipment, that the level is overestimated — by an unknown amount.
+That is why no correction call appears anywhere on this page:
+`building.background_correction` implements the ISO 10140-4 laboratory rule
+and must not be applied to survey data. Earlier revisions of this guide said
+the opposite, listing the correction as the caller's job; a survey corrected
+that way is non-conforming and over-reports the insulation.
+
 ### `survey_airborne_insulation()` and friends: parameters
 
 | Parameter | Type | Units | Range / default | Notes |
@@ -128,7 +170,7 @@ plt.show()
 | `volume` | float | m³ | > 0 | Receiving-room $V$ (for $D_n$ / $L'_n$ / $R'$ / normalized) |
 | `area` | float | m² | > 0 | Common-partition $S$ (airborne $R'$; $V/7.5$ rule applied) |
 | `measurements` | array | dB | exactly 3 | Service-equipment positions (`survey_service_equipment_level`) |
-| `room` | str | — | `"kitchen"`/`"bathroom"`/`"furnished"`/`"a"`–`"h"`/`"a+e"`… | `estimate_reverberation_index` room class (Table 4) |
+| `room` | str | — | `"kitchen"`/`"bathroom"`/`"furnished"`/`"a"`–`"h"`/`"a+e"`… | `estimate_reverberation_index` room class (Table 3; the index itself is Table 4) |
 
 `survey_airborne_insulation()` returns a `SurveyAirborneResult` (`d`, `d_nt`,
 `d_n`, `r_prime`, `rating`, `r_prime_rating`); `survey_impact_insulation()` a
@@ -235,7 +277,7 @@ plt.show()
 
 **Covered.** The ISO 10052:2021 survey method: the reverberation index
 $k = 10\log_{10}(T/T_0)$ measured with `building.reverberation_index` or
-estimated from the Table 4 room classes with
+estimated from the Table 3 room classes with
 `building.estimate_reverberation_index`; the survey airborne, impact and
 façade quantities ($D_{nT}$, $D_n$, $R'$ with the $V/7.5$ rule, $L'_{nT}$,
 $L'_n$, $D_{2m,nT}$) via `building.survey_airborne_insulation`,
@@ -248,8 +290,9 @@ fiches through `.report()`.
 **Not covered.** The survey procedure itself (where to hold the meter, the
 fixed measurement heights, the tapping-machine placement of the control
 method) is not checked: the functions consume band levels wherever they
-came from. Background-noise correction is the caller's job, as in the
-engineering methods. The survey method's accuracy statement relative to
+came from. Nothing verifies that the 6 dB signal-to-background floor of
+Clause 6.2.1 was met, and no correction is applied when it was not — that is
+the method's own rule, not an omission. The survey method's accuracy statement relative to
 ISO 16283 is quoted from the standard, not modelled; when the stakes rise,
 step up to
 [Field Insulation Measurement (ISO 16283)](/phonometry/buildings/insulation/insulation-field/).

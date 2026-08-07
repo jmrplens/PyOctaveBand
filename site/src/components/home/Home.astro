@@ -28,6 +28,7 @@ const topicIdOf = (href) => {
 import { Code } from '@astrojs/starlight/components';
 import ThemeImage from '../ThemeImage.astro';
 import ReportPreview from '../ReportPreview.astro';
+import Video from '../Video.astro';
 import type { HomeContent } from '../../data/home';
 
 interface Props {
@@ -88,6 +89,21 @@ const spectrum = lang === 'es'
 		<div class="block-body">
 			<h2>{content.proof.title}</h2>
 			<p class="lead">{content.proof.lead}</p>
+
+			{
+				content.proof.banner && (
+					<Video
+						name="anim_fdtd_pillar_hall"
+						width={2400}
+						height={600}
+						displayWidth="100%"
+						title={content.proof.banner.title}
+						description={content.proof.banner.description}
+						caption={content.proof.banner.caption}
+						id="home-pillar-hall"
+					/>
+				)
+			}
 
 			<div class="demo">
 				<h3>{content.proof.spectrum.title}</h3>

@@ -284,6 +284,7 @@ $dL$ simply carries $L'_{W,\mathrm{eq,line},i} + 10\log_{10}(dL)$, which is
 arithmetic and is offered as such.
 
 ```python
+import numpy as np
 from phonometry import (
     PropagationGeometry, RoadTraffic, RoadVehicleCategory,
     line_source_segment_power, predicted_receiver_level, road_source_power,
@@ -294,12 +295,37 @@ result = road_source_power([
     RoadTraffic(RoadVehicleCategory.HEAVY, 120.0, 80.0),
 ])
 segment = line_source_segment_power(result.total_line_power, 20.0)  # a 20 m segment
+
+# One segment, the one directly opposite a receiver 100 m from the road.
 levels = predicted_receiver_level(
     segment,
     PropagationGeometry(100.0, result.source_height, 4.0),
     frequencies=result.frequencies,
 )
+
+# The road is the energy sum of its segments: 1 km either way, in 20 m steps.
+energy = np.zeros_like(levels)
+for x in np.arange(-990.0, 1000.0, 20.0):        # segment centres along the road
+    energy += 10 ** (predicted_receiver_level(
+        segment,
+        PropagationGeometry(float(np.hypot(100.0, x)), result.source_height, 4.0),
+        frequencies=result.frequencies,
+    ) / 10)
+road = 10 * np.log10(energy)
 ```
+
+Two rules make a segmentation defensible, and neither is method: 2.5.3 declares
+the split out of scope, so this is engineering practice. Each segment must be
+short enough that the point source at its centre stands for the whole segment —
+ISO 9613-2 allows one equivalent point source only where the propagation
+distance exceeds twice the largest source dimension, so a segment seen from
+100 m may be tens of metres long while one seen from 10 m may not. And the road
+must be modelled far enough in both directions that the tails stop mattering:
+beyond roughly ten times the perpendicular offset, adding segments changes the
+total by less than a tenth of a decibel, which is why 1 km either way is enough
+at 100 m here. The two spectra are read out in dB(A) two paragraphs down:
+**52.9 dB(A)** for the single segment against **64.7 dB(A)** for the road, an
+11.8 dB difference that is entirely the arithmetic above.
 
 Note what this is and is not. CNOSSOS-EU has **its own** propagation method in
 section 2.5 of Annex II, and it is not ISO 9613-2: the two differ in the ground
@@ -316,6 +342,13 @@ from phonometry import CNOSSOS_A_WEIGHTING
 
 CNOSSOS_A_WEIGHTING   # (-26.2, -16.1, -8.6, -3.2, 0.0, 1.2, 1.0, -1.1)
 result.a_weighted_line_power
+
+# The two receiver spectra of the segmentation above, A-weighted:
+weight = np.asarray(CNOSSOS_A_WEIGHTING)
+print(round(float(10 * np.log10(np.sum(10 ** ((levels + weight) / 10)))), 1))
+# 52.9 dB(A) - one 20 m segment, not the road
+print(round(float(10 * np.log10(np.sum(10 ** ((road + weight) / 10)))), 1))
+# 64.7 dB(A) - the same road, summed over 2 km: 11.8 dB more
 ```
 
 ## 7. Substituting a national database

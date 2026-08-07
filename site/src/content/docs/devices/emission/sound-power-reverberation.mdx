@@ -19,6 +19,7 @@ references:
 ---
 
 import ThemeImage from '../../../../components/ThemeImage.astro';
+import Video from '../../../../components/Video.astro';
 import ReportPreview from '../../../../components/ReportPreview.astro';
 
 A reverberation room turns its main defect as a listening space into a
@@ -65,6 +66,25 @@ with the speed of sound $c = 20.05\sqrt{273 + \theta}$. The
 terms by a reference sound source of known power $L_W(\text{RSS})$ measured
 in the same room, so the room need not be characterised:
 $L_W = L_W(\text{RSS}) + (L_p(\text{ST}) - L_p(\text{RSS}) + C_2)$.
+
+The right-hand panel of the clip below is this method. The same source runs
+in both rooms; in the anechoic room on the left the microphones see only what
+the source sends their way, so the level falls with distance and the free-field
+route has to integrate over a measurement surface, while in the reverberation
+room on the right the reflected energy fills the space and the level stops
+depending on where a microphone is. That is the whole reason Eq. 20 can
+replace a surface integral with a handful of positions and a room constant —
+and the reason the room, not the array, is what has to be qualified. Both
+routes end on the same $L_W$, because sound power is a property of the source
+and not of the room it is measured in.
+
+<Video
+  name="anim_power_two_rooms"
+  width={2400}
+  height={1350}
+  title="Same source, two rooms, one sound power"
+  description="The same source in an anechoic room and in a reverberation room produces different microphone pressures, and the free-field and diffuse-field formulas converge to the same sound power level L_W."
+/>
 
 ```python
 import numpy as np

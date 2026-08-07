@@ -515,12 +515,15 @@ def _d_open_plan(s: SVG, th: Theme) -> None:
     ]
     cw, cgap = 190.0, 14.0
     cx = (900 - (len(chips) * cw + (len(chips) - 1) * cgap)) / 2
+    s.text(450, 306, "what open_plan_metrics returns", 14, th.muted, "middle")
     for sym, name, note, color in chips:
         s.rect(cx, 320, cw, 118, th.panel, color, rx=10, sw=2)
         s.text(cx + cw / 2, 356, sym, 22, th.fg, "middle", bold=True)
         s.text(cx + cw / 2, 384, name, 15, color, "middle", bold=True)
         s.text(cx + cw / 2, 412, note, 12, th.muted, "middle")
         cx += cw + cgap
+    s.text(450, 464, "Clause 4 also requires the average A-weighted background "
+           "noise  Lp,A,B  (Cl. 6.4)", 13, th.muted, "middle")
 
 
 def _d_iso12999(s: SVG, th: Theme) -> None:

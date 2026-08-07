@@ -51,8 +51,12 @@ to attach the normative uncertainty every occupational-hygiene report needs. The
 
 Describe each activity as a `hearing.Task` with its samples and duration, then
 call `hearing.task_based_exposure(tasks)`. For the Annex D welder's day below
-it returns `lex_8h` = 84.3 dB with an expanded uncertainty $U = 2.7$ dB, so the
-one-sided 95 % `upper_limit` is 87.0 dB. Unstructured days use
+it returns `lex_8h` = 84.3 dB with an `expanded_uncertainty` $U = 3.2$ dB, so
+the one-sided 95 % `upper_limit` is 87.5 dB, because the default includes the
+Annex C duration term $u_{1b}$ built from each task's `duration_range`. The §1
+snippet passes `include_duration_uncertainty=False` to reproduce Annex D case a,
+where the durations are treated as exact, and that is what drops $U$ to 2.7 dB
+and the upper limit to 87.0 dB. Unstructured days use
 `job_based_exposure()` or `full_day_exposure()` on random samples instead.
 
 ## 1. The three measurement strategies (Clauses 9-11)
@@ -65,10 +69,12 @@ L_{EX,8h,m} = L_{p,A,eqT,m} + 10 \log_{10}(T_m/T_0), \qquad T_0 = 8\ \text{h},
 $$
 
 so a loud but short task contributes little. The *job-based* (Clause 10) and
-*full-day* (Clause 11) strategies instead take $N \ge 5$ (or three whole-day)
-random samples over a homogeneous exposure group and normalise the effective-day
-duration. The daily level is the same either way; the strategies differ in how
-the **uncertainty** is built.
+*full-day* (Clause 11) strategies instead take random samples over a homogeneous
+exposure group — $N \ge 5$ samples for the job-based strategy, at least three
+whole shifts for the full-day one — energy-average them, and normalise that
+average to the nominal eight-hour day with the effective working-day duration
+$T_e$ in the same $10\log_{10}(T_e/T_0)$ term. The daily level is the same
+either way; the strategies differ in how the **uncertainty** is built.
 
 **Choosing a strategy.** ISO 9612 Table B.1 picks the strategy from the *work
 pattern*, not from convenience, and the trade-off is coverage against effort.

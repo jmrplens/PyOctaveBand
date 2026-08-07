@@ -36,8 +36,11 @@ ISO 1996-2.
 [Psychoacoustic annoyance and fluctuation strength](psychoacoustic-annoyance.md)
 closes the chain with the Fastl & Zwicker model, which combines loudness,
 sharpness, roughness and the slow-modulation sensation of fluctuation strength
-into a single annoyance value. Read it last: its four inputs all come from
-the earlier pages.
+into a single annoyance value. Read it last: three of its four inputs come from
+the earlier pages, and it supplies the fourth, fluctuation strength, itself, in
+both the Fastl & Zwicker closed form and the Osses 2016 signal model. The
+ECMA-418-2 fluctuation strength on the Sound Quality page is a further,
+normative model of the same sensation, under a different unit name.
 
 ## Pages in this section
 

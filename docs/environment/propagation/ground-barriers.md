@@ -136,6 +136,28 @@ $$
 which tends to 5 dB at the shadow boundary $N \to 0$ and approximates Maekawa's
 point-source curve within about 1.5 dB.
 
+The clip below is that formula as a field. It is the
+[2D FDTD solver](../../simulation/fdtd-simulation.md) run twice on one
+12 × 7 m half-space over rigid ground with a thin rigid screen 2.5 m tall,
+once at 100 Hz and once at 500 Hz, each with a barrier-free reference run over
+the same ground so the annotated insertion loss is a true one. The geometry
+fixes the path difference at 1.06 m for the receiver it marks, so the Fresnel
+number is $N = 0.62$ at 100 Hz and $N = 3.1$ at 500 Hz — the same screen, a
+factor of five apart in $N$ purely because $\lambda$ changed — and the field
+shows what that buys: about 8 dB against about 17 dB. Two things are worth
+watching for. The edge of the lit region running down from the top of the
+screen is the shadow boundary, the $N \to 0$ locus where the formula bottoms
+out at 5 dB; and inside the shadow the field is a cylindrical wave centred on
+the top of the screen, which is what "the edge acts as a secondary source"
+looks like. One caveat: the ground in the clip is perfectly rigid, so it shows
+diffraction alone and none of the finite-impedance ground effect of section 1
+— the coherent four-path model below adds that, and its curve swings tens of
+decibels where this one is smooth.
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anim_fdtd_barrier_dark.gif"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anim_fdtd_barrier.gif" alt="Animation: a point source behind a thin 2.5 metre rigid barrier on reflecting ground, simulated at 100 Hz and 500 Hz side by side; the long wavelength diffracts over the edge and fills the shadow zone, the short wavelength is cast into a deep clean shadow" width="640" height="360" loading="lazy"></picture>
+
+[Watch the high-resolution video (WebM)](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anim_fdtd_barrier.webm)
+
 The thin-screen methods share the same three geometric quantities: the two
 diffracted segments over the edge and the straight path they replace. Drawn on
 the 4 m screen of the snippets, they differ by just 0.15 m.

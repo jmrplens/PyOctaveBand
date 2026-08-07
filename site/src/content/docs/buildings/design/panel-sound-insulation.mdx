@@ -717,20 +717,47 @@ How much airborne power a vibrating plate actually radiates per unit
 mean-square velocity is its **radiation efficiency** $\sigma$, the radiation
 factor $\varepsilon$ that
 [Sound Power from Surface Vibration](/phonometry/devices/emission/vibration-sound-power/)
-(ISO 7849) otherwise takes as a measured input. Below the critical frequency the
-plate radiates weakly (edge and corner modes); above it $\sigma \to 1$
-(Leppington/Maidanik, Hopkins Eqs 2.227-2.230):
+(ISO 7849) otherwise takes as a measured input. It is defined as the ratio of
+the power the plate actually radiates to the power a rigid piston of the same
+area and the same mean-square velocity would radiate, so $\sigma = 1$ means
+"as efficient as a piston" — and, as the numbers below show, a plate can beat
+that near coincidence.
+
+There are three regimes, not two (Leppington/Maidanik, Hopkins
+Eqs 2.227-2.230). **Well below $f_c$** the bending wavelength is shorter than
+the acoustic one, adjacent half-waves cancel each other's volume flow, and only
+the uncancelled strips at the edges and corners radiate. That is why the
+calculation needs the plate's two dimensions and its edge condition: a clamped
+edge radiates more than a simply supported one, and a plate with baffles
+perpendicular to its edges more than one flush in an infinite baffle — the
+`boundary` and `baffle` arguments select between them. **Around $f_c$** the
+trace wavelength of the bending wave matches the acoustic wavelength, the
+Leppington form $(1 - f_c/f)^{-1/2}$ diverges and is capped by the
+at-coincidence expression; the pane below peaks at $\sigma = 2.6$ in the 2 kHz
+band. **Only far above $f_c$** does $\sigma$ settle towards 1: a third of an
+octave past coincidence this pane is still at 1.74.
 
 $$
-\sigma = \frac{1}{\sqrt{1 - f_c/f}} \quad (f > f_c), \qquad \sigma \to 1 .
+\sigma = \frac{1}{\sqrt{1 - f_c/f}} \quad (f > f_c), \qquad
+\sigma \to 1 \quad (f \gg f_c) .
 $$
+
+Two consequences are worth carrying away. A *small* plate is a relatively
+better radiator than a large one of the same material below $f_c$, because the
+radiating edge strip is a larger fraction of it: the 1.5 × 1.25 m pane below
+gives $\sigma = 0.011$ at 100 Hz, a 0.5 × 0.4 m pane of the same glass 0.034.
+And the coincidence dip in $R$ and the coincidence peak in $\sigma$ are the
+same event seen from the two sides — the same $\sigma$ reappears in the
+transmission factor of the detailed EN 12354 model and as the radiation factor
+ISO 7849 measures.
 
 ```python
 from phonometry import radiation_efficiency, sound_power_from_vibration
 
 # The 6 mm glass pane (1.5 x 1.25 m) of the single-panel example above.
 sig = radiation_efficiency(bands, 1.5, 1.25, fc)
-print(sig.radiation_efficiency[bands == 2000].round(2))    # ~2.5 (peak at coincidence)
+print(sig.radiation_efficiency[bands == 2000].round(2))
+# 2.6, the coincidence peak: the plate out-radiates a piston near fc
 
 # Feed the prediction straight into ISO 7849 as the radiation factor:
 lw = sound_power_from_vibration(velocity_level=80.0, area=1.875,

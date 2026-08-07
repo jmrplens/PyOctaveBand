@@ -22,7 +22,7 @@ references:
     title: "Acoustics — Description, measurement and assessment of environmental noise — Part 2: Determination of sound pressure levels"
     designation: "ISO 1996-2:2017"
     url: "https://www.iso.org/standard/59766.html"
-    note: "The tonal-audibility criterion the IEC method reuses comes from the Annex C of its 2007 edition (the 2017 edition carries the tonal methods in Annexes J and K), and its tonal_adjustment consumes the mean audibility."
+    note: "The tonal-audibility criterion the IEC method reuses comes from the Annex C of its 2007 edition (the 2017 edition carries the tonal methods in Annexes J and K), and its Table J.1 mapping, tonal_adjustment_from_mean_audibility, is the one that consumes the bin-mean audibility."
 ---
 
 import ThemeImage from '../../../../components/ThemeImage.astro';
@@ -165,8 +165,19 @@ the 9.5.1 energy averaging of $\Delta L_a$ over the spectra of a wind-speed bin
 $L_a$ criterion anchor to the highest classified tone line, not the probed
 candidate. The audibility formula coincides with ISO 1996-2 Annex C; what is
 specific to IEC 61400-11 is the determination of the tone and masking levels
-and the Zwicker critical band from the spectrum. For a rating adjustment
-$K_T$, pass the mean audibility to the ISO 1996-2 `tonal_adjustment`.
+and the Zwicker critical band from the spectrum. IEC 61400-11 stops at
+$\Delta L_a$ and prescribes no adjustment, so which mapping gives the rating
+adjustment $K_t$ depends on the edition the assessment is made under. The
+9.5.1 energy average over the spectra of a wind-speed bin is a *mean*
+audibility, which is the quantity ISO 1996-2:2017 Table J.1 was written for:
+[`tonal_adjustment_from_mean_audibility`](/phonometry/environment/assessment/environmental-levels/),
+integer 0-6 dB (or `coarse=True` for the 0/3/6 ladder of its note). The
+piecewise (C.4)-(C.6) law of `tonal_adjustment` is the 2007 Annex C mapping and
+applies to one spectrum's $\Delta L_{ta}$, and the two differ by 1 to 2 dB on
+the same input: $\Delta L = 5$ dB gives $K_t = 3$ by Table J.1 and 1.0 dB by
+Annex C, $\Delta L = 9$ dB gives 4 dB and 5.0 dB. The notation differs too:
+this page's $\Delta L_a$ is that page's $\Delta L_{ta}$, and the two printings
+carry the criterion with opposite signs.
 
 ### Assessment report (`.report()`)
 

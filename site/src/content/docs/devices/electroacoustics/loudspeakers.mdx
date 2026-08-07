@@ -108,17 +108,17 @@ whose first null is at $ka\sin\theta = 3.8317$.
 import numpy as np
 from phonometry import radiating_piston
 
-res = radiating_piston(radius=0.1, frequencies=np.geomspace(20, 20000, 200),
+res = radiating_piston(radius=0.075, frequencies=np.geomspace(20, 20000, 200),
                        angles=np.linspace(0.0, np.pi / 2, 91))
-print(round(res.radiation_mass, 4))            # 8 rho a^3 / 3, kg
+print(round(res.radiation_mass, 4))            # 0.0014 kg = 8 rho a^3 / 3
 print(round(float(res.directivity_index[0]), 2))  # 3.01 dB half-space limit
 res.plot()                                      # R1 and X1 vs ka
 ```
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/piston_radiation_impedance.svg" alt="Normalized radiation resistance R1 and reactance X1 of a 75 mm baffled circular piston against ka on a logarithmic axis: R1 rises from ka squared over two through unity with decaying ripples, while the mass-like X1 peaks near ka of 1.4 and decays, with the high-frequency limit R1 equal to 1 marked" width="82%" />
 
-*The `.plot()` of the result is the classic Beranek & Mellow impedance figure
-computed for this piston: below $ka \approx 1$ the load is almost purely
+*The `.plot()` of the 75 mm piston above is the classic Beranek & Mellow
+impedance figure: below $ka \approx 1$ the load is almost purely
 mass-like ($X_1$ dominates and $R_1 \propto (ka)^2$, the regime where a
 loudspeaker's output is stiffness- and mass-limited), and above it the
 resistance settles on $\rho c S$ with interference ripples while the

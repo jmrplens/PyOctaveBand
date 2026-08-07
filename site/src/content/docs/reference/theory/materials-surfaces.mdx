@@ -250,6 +250,15 @@ r = \frac{H_{12} - H_I}{H_R - H_{12}}\ e^{2 j k_0 x_1}, \qquad
 \alpha = 1 - |r|^2, \qquad \frac{Z}{\rho c_0} = \frac{1 + r}{1 - r},
 $$
 
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_impedance_tube.svg" alt="ISO 10534-2 two-microphone impedance tube: a loudspeaker radiating a plane wave down the tube, two microphones flush in the wall at spacing s and distance x1 from the specimen face, the test specimen against a rigid backing, and the incident and reflected waves" width="92%" />
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/impedance_tube_result.svg" alt="ISO 10534-2 two-microphone tube result for a 50 mm porous absorber: the normal-incidence absorption coefficient rising from about 0.2 at 200 Hz towards 0.97 above 1 kHz, with the reflection-factor magnitude falling as its mirror image" width="80%" />
+
+*What the formula returns: $\alpha$ and $|r|$ for a 50 mm porous absorber over
+the working band of a 100 mm tube. The two curves are the same information —
+$\alpha = 1 - |r|^2$ — so the figure is really one measurement drawn twice, and
+the rise with frequency is the layer thickness growing against the wavelength.*
+
 with the complex wavenumber's attenuation lower bound
 $k_0'' = 1.94 \times 10^{-2} \sqrt{f}/(c_0 d)$ (Eq. A.18). ISO 10534-1
 (standing-wave-ratio method) is the closed-form classic:
@@ -277,5 +286,14 @@ analytic air-layer matrix ($\det T = 1$, $T_{11} = T_{22}$,
 $TL = 0\ \text{dB}$, hard-backed $|R| = 1$), synthetic round-trips that
 recover a known $r$, and
 two-load recovery of an asymmetric reciprocal specimen.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_astm_tube.svg" alt="ASTM E2611 four-microphone transmission-loss tube: a sound source, two microphones upstream and two downstream of the test specimen at spacings s1 and s2 and offsets l1 and l2, an adjustable termination for the two-load method, the upstream A and B and downstream C and D travelling waves, and the transfer matrix and transmission-loss relations" width="92%" />
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/transfer_matrix_tl.svg" alt="ASTM E2611 transfer-matrix quantities of a 50 mm porous layer: the normal-incidence transmission loss rising from about 6.6 dB at 200 Hz to over 9 dB at 1.6 kHz on the left axis, and the hard-backed absorption coefficient rising from 0.19 to about 0.97 on the right axis" width="80%" />
+
+*The same four-pole entries answering two different questions: how much sound
+the free-standing layer lets through (the transmission loss above) and how much
+the same layer absorbs once it is backed rigidly. A material can be a good
+absorber and a poor barrier at once, which this pair makes plain.*
 
 See the [Impedance Tube guide](/phonometry/materials/absorbers/impedance-tube/) for usage.

@@ -86,6 +86,11 @@ plt.show()
 
 </details>
 
+The measurement itself is two synchronous channels: `p1` and `p2` are the
+calibrated pressures of the two capsules in pascals, `p1` the one nearer the
+source, acquired on the same analyser at the same sampling rate with the probe
+axis normal to the measurement surface.
+
 ```python
 import numpy as np
 from phonometry import emission
@@ -119,40 +124,40 @@ intensity measurement.*
 ```python
 import matplotlib.pyplot as plt
 import numpy as np
+from scipy import signal
 from phonometry import emission
 
-fs = 48000
-rng = np.random.default_rng(0)
-# The two probe-microphone pressures in Pa, p1 closest to the source.
-#   In a real measurement these are your two calibrated probe recordings;
-#   synthesized here (p2 = p1 delayed one sample) so the guide runs.
-p1 = 0.02 * rng.standard_normal(fs)
-p2 = np.concatenate(([0.0], p1[:-1]))   # p2 = p1 delayed one sample
-res = emission.sound_intensity(p1, p2, fs, spacing=0.012, fraction=3,
-                      limits=[100, 2500])
+fs, dr, c = 48000, 0.012, 343.0
+n = int(fs * 4.0)
 
-# res is the IntensityResult computed in the example above.
-# One line — Lp vs LI per band with the pressure-intensity index on a twin axis:
-res.plot()
-plt.show()
+# Broadband noise, band-limited to 80 Hz - 6 kHz and scaled to about 70 dB SPL.
+rng = np.random.default_rng(2026)
+noise = signal.sosfilt(
+    signal.butter(4, [80.0, 6000.0], btype="bandpass", fs=fs, output="sos"),
+    rng.standard_normal(n),
+)
+noise *= 0.063 / np.std(noise)
+spectrum = np.fft.rfft(noise)
+freqs = np.fft.rfftfreq(n, 1 / fs)
 
-# By hand, from the per-band fields the result carries — mirroring what
-# IntensityResult.plot() draws (bar label, merged twin-axis legend, δpI title):
-fig, ax = plt.subplots()
-ax.semilogx(res.frequency, res.pressure_level, "o-", label="Pressure level Lp")
-ax.semilogx(res.frequency, res.intensity_level, "s--", label="Intensity level LI")
-ax.set_xlabel("Frequency [Hz]")
-ax.set_ylabel("Level [dB]")
-twin = ax.twinx()
-twin.bar(res.frequency, res.pressure_intensity_index,
-         width=res.frequency * 0.2, color="#2ca02c", alpha=0.25,
-         label="δpI = Lp − LI")
-twin.set_ylabel("Pressure-intensity index δpI [dB]")
-# Merge both axes' handles into a single legend, exactly as .plot() does:
-lines, labels = ax.get_legend_handles_labels()
-tlines, tlabels = twin.get_legend_handles_labels()
-ax.legend(lines + tlines, labels + tlabels)
-ax.set_title(f"Lp vs LI  (total δpI = {res.total_pressure_intensity_index:.1f} dB)")
+# Left: a plane progressive wave. Microphone 2 sees the wave dr/c = 35 us later,
+# applied as a phase shift rather than as a whole number of samples.
+plane = emission.sound_intensity(
+    noise, np.fft.irfft(spectrum * np.exp(-2j * np.pi * freqs * dr / c), n),
+    fs, dr, fraction=3, limits=[100.0, 5000.0],
+)
+
+# Right: a standing wave, two equal counter-propagating waves, with the probe
+# centred at x0 = 0.30 m from the rigid termination.
+k, x0 = 2 * np.pi * freqs / c, 0.30
+def at(pos):
+    return np.fft.irfft(spectrum * 2.0 * np.cos(k * pos), n)
+standing = emission.sound_intensity(at(x0 - dr / 2), at(x0 + dr / 2),
+                                    fs, dr, fraction=3, limits=[100.0, 5000.0])
+
+fig, (axl, axr) = plt.subplots(1, 2, figsize=(12, 5), sharey=True)
+plane.plot(ax=axl)
+standing.plot(ax=axr)
 plt.show()
 ```
 
@@ -194,7 +199,7 @@ sample or any whole number of cycles). **$F_1$**, the
 temporal variability indicator, is the coefficient of variation of those
 samples (equations (A.1)–(A.2)), so it is zero for a perfectly steady field
 and grows as the extraneous intensity wanders. Table B.3 asks for action code
-(e) above $F_1 > 0.6$: reduce the variability, measure during quieter periods,
+(e) when $F_1$ exceeds 0.6: reduce the variability, measure during quieter periods,
 or lengthen the averaging time at each position. Annex B also has it evaluated
 immediately before and after the measurement on any one surface (B.1.4).
 
@@ -359,8 +364,9 @@ same 3 dB per doubling the previous section arrived at from the physics.
 
 `intensity_class_compliance` compares a measured $\delta_{pI0}$ spectrum
 against both
-masks band by band and returns the class the chain actually meets:
-the loosest class every band clears, or `None` when some band clears neither:
+masks band by band and returns an `IntensityInstrumentComplianceResult` holding
+the class the chain actually meets: the loosest class every band clears, or
+`None` when some band clears neither.
 
 ```python
 from phonometry import metrology
@@ -438,7 +444,7 @@ repository; click the preview to open the PDF.
 	name="iec61043_intensity_example"
 	title="IEC 61043 sound intensity instrument class verification example report (PDF)"
 	description="One-page instrument-class-verification fiche: a metadata header, a per-band table listing the class 1 and class 2 minima, the measured residual index, the margin and the class achieved in each one-third-octave band from 50 Hz to 6.3 kHz, the measured index drawn as a step curve over the two Table 2 masks with the 100 Hz band ringed below the class 1 minimum, the boxed Class 2 - COMPLIES (binding margin +4.20 dB) result, the microphone separation and equivalent phase mismatch, and a FAIL verdict against the required class 1."
-	caption="Instrument class verification fiche (IntensityClassResult.report), the achieved class with its binding margin and the measured δpI0 over the Table 2 minima rescaled to the 12 mm spacer."
+	caption="Instrument class verification fiche (IntensityInstrumentComplianceResult.report), the achieved class with its binding margin and the measured δpI0 over the Table 2 minima rescaled to the 12 mm spacer."
 />
 
 ### Reading `δpI0` as a phase error
@@ -472,9 +478,14 @@ phase match, and above it for a constant index. The knee sits at 250 Hz for
 the three class 1 columns and for the class 2 processor, and at 630 Hz for the
 class 2 probe and the class 2 complete instrument, which is also where the
 table stops stepping in whole decibels (the instrument goes 14 dB at 315 Hz,
-14,5 dB at 400 Hz, 15 dB at 500 Hz). It is also why a
+14.5 dB at 400 Hz, 15 dB at 500 Hz). It is also why a
 tenth of a degree of channel mismatch is a demanding specification, and why a
 probe must be verified with the spacer it will actually be used with.
+
+## Choosing the probe
+
+Two decisions are made before any data is taken: where the measurement surface
+can be placed, and which spacer goes on the probe.
 
 ### Reactive fields near sources
 
@@ -482,8 +493,8 @@ Close to a source the field turns **reactive**: pressure and particle
 velocity drift toward quadrature, so a large pressure carries little net
 flow. For a small source the quadrature component grows as $1/(kr)$; at
 100 Hz and 0.25 m from the source it is already about twice the active one,
-and $\delta_{pI}$ climbs just as it does in the standing wave of the figure
-above.
+and $\delta_{pI}$ climbs just as it does in the standing wave of the
+two-panel figure at the top of this page.
 The same happens between a machine and a hard reflecting surface, and in
 reverberant rooms where the diffuse field raises pressure without
 transporting energy outward. This is why ISO 9614-1 keeps the measurement
@@ -519,7 +530,7 @@ merged; whichever spacer is fitted, verify $\delta_{pI0}$ with that spacer in
 place, since the index belongs to the probe-spacer-analyzer chain, not to
 the microphones alone.
 
-### `sound_intensity()` parameters
+## `sound_intensity()` parameters
 
 | Parameter | Type | Units | Range / default | Notes |
 | :--- | :--- | :--- | :--- | :--- |
@@ -565,4 +576,9 @@ does with it is grade it against Table 2.
 
 ## See also
 
+- [Sound Power by Intensity Scanning](/phonometry/devices/emission/sound-power-intensity/) — the ISO 9614-2/-3 routes that consume $\delta_{pI}$, the field indicators and the dynamic capability.
+- [Sound Power](/phonometry/devices/emission/sound-power/) — choosing between the intensity, pressure and reverberation-room routes.
+- [Sound power from surface vibration](/phonometry/devices/emission/vibration-sound-power/) — the ISO/TS 7849-2 radiation factor needs an intensity-measured power.
+- [Calibration](/phonometry/signals/metrology/calibration/) — the absolute scaling of the two channels the estimator assumes.
+- [Theory: signal analysis](/phonometry/reference/theory/signal-analysis/) — the cross-spectral derivation behind $I(f) = -\mathrm{Im}\{G_{12}\}/(2\pi f \rho_0 \Delta r)$.
 - API reference: [`emission.intensity`](/phonometry/reference/api/power/intensity/).

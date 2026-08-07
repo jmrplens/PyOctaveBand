@@ -148,13 +148,21 @@ plt.show()
 
 </details>
 
-That flexural wave is worth watching in motion: the
-[bending-wave transmission guide](../vibration/structural/junction-transmission.md) embeds an
-animation of this solver launching a 4 kHz bending packet along a 10 mm
-steel plate into an L-junction, where the corner splits it into the
-reflected and transmitted waves the closed form prices at
-$\tau_{12}(0°) = 0.5$, plus the fast in-plane precursor the pinned-junction
-model deliberately leaves out.
+That flexural wave is worth watching in motion. The clip below is this same
+solver launching a 4 kHz bending packet along a 10 mm steel plate: on the
+control panel the plate runs straight and the packet simply leaves, and on
+the junction panel a perpendicular plate of the same thickness turns the
+corner into a scatterer. The packet splits there into the reflected and
+transmitted bending waves the closed form prices at $\tau_{12}(0°) = 0.5$,
+plus the fast in-plane precursor that races ahead down the receiving plate —
+the mode conversion the pinned-junction model deliberately leaves out, and
+the reason this page needs an elastic solver rather than a flexural one. The
+[bending-wave transmission guide](../vibration/structural/junction-transmission.md) takes
+the same run apart against the EN 12354 vibration reduction index.
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anim_elastic_plate_junction_dark.gif"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anim_elastic_plate_junction.gif" alt="Animation: a 4 kHz bending-wave packet running along a 10 mm steel plate, passing straight through on the control panel and splitting at an L-junction into a reflected wave, a transmitted wave descending the perpendicular plate and a faster in-plane precursor" width="640" height="360" loading="lazy"></picture>
+
+[Watch the high-resolution video (WebM)](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anim_elastic_plate_junction.webm)
 
 ## 4. Fluid-solid coupling at normal incidence
 
@@ -302,13 +310,28 @@ dip within 0.1 % of the 295 kHz resonance. The same suite stress-tests the
 extreme contrast of an air-steel contact (impedance ratio ~$10^5$:1): stable
 over 10 000 steps with the reflected amplitude conserved to 0.5 %.
 
-At oblique incidence the plate physics gets richer, and the
-[panel sound insulation guide](../buildings/design/panel-sound-insulation.md) embeds the
-animation: this solver driving the same 10 mm steel plate, lying in air,
-with a sustained 45° plane wave below and above its coincidence frequency,
-where the trace-matched bending wave re-radiates a growing beam and holds
-the transmitted level at the point where the mass law demands 12 dB more
-blocking.
+At oblique incidence the plate physics gets richer, and the clip below is
+this solver driving the same 10 mm steel plate, now lying in air, with a
+sustained 45° plane wave arriving on it. The two panels differ in **one
+number only** — the drive frequency, $f_c/2 = 603$ Hz on the left and
+$2 f_c = 2413$ Hz on the right, either side of the 1206 Hz coincidence
+frequency the library computes from the same $m''$ and $B'$ used above.
+Everything else, the plate, the angle, the mesh and the colour scale, is
+held fixed. Below $f_c$ the plate reflects almost everything and the
+transmitted level lands on the oblique mass law; above it the acoustic trace
+wavelength matches the free bending wavelength, the plate re-radiates a 45°
+beam that grows along the lit span, and the transmitted level holds at the
+low-frequency figure where the mass law demanded 12 dB more blocking. The
+air below the plate is drawn on both panels with the display gain measured
+off the settled field of the two runs together (×150, that is +44 dB) and
+printed on the canvas: read the *annotations* for levels, not the
+brightness. The
+[panel sound insulation guide](../buildings/design/panel-sound-insulation.md) takes the
+same run apart against the plateau method and the mass law.
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anim_elastic_coincidence_dark.gif"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anim_elastic_coincidence.gif" alt="Animation: two elastic FDTD panels of the same 10 mm steel plate in air under a 45-degree plane wave, at 603 Hz where the plate blocks almost everything and at 2413 Hz where a transmitted beam grows below it" width="640" height="360" loading="lazy"></picture>
+
+[Watch the high-resolution video (WebM)](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anim_elastic_coincidence.webm)
 
 ## Quick answers
 

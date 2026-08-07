@@ -476,6 +476,24 @@ Returns an `OutdoorAttenuation` with `a_div`, `a_atm`, `a_gr`, `a_bar`,
 `a_total` and `d_omega`, all one value per band; its `.plot()` draws the
 stacked per-band breakdown with the total overlaid (the figure above).
 
+:::note
+**The method is octave-band only.** ISO 9613-2 is defined for the eight nominal
+octave bands from 63 Hz to 8 kHz, and its Table 3 has no finer resolution, so
+every frequency passed in is mapped to the *nearest nominal octave* for the
+ground term while divergence and atmospheric absorption stay continuous in
+frequency. A one-third-octave call therefore returns a stepped $A_{gr}$, not a
+refined one: over 400 / 500 / 630 / 800 Hz on porous ground at 100 m,
+`a_gr` comes back as 7.65 / 7.65 / 7.65 / 1.76 dB (three bands sharing the
+500 Hz octave, then the 1 kHz octave) while `a_atm` moves smoothly through
+0.216 / 0.280 / 0.348 / 0.419 dB. Run the prediction in octaves and distribute
+afterwards if a finer spectrum is needed, or use the wave-acoustic
+`ground_effect` of
+[Ground effect and barriers](/phonometry/environment/propagation/ground-barriers/)
+when the interference structure inside an octave is the point. Nothing below
+63 Hz or above 8 kHz is covered at all, so a low-frequency assessment falls
+outside this method.
+:::
+
 ### `Barrier` fields
 
 | Field | Type | Units | Default | Notes |

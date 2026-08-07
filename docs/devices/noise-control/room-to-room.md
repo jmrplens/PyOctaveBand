@@ -337,6 +337,19 @@ and air leaks**. A ceiling void carried over the partition, a service
 penetration, a door undercut, or the wall simply not reaching the structural
 slab, and the equation's answer becomes an upper bound.
 
+The clip below draws what the equation leaves out. The chain of section 3
+prices the direct path only, the **Dd** route through the partition; the
+other three pulses leave the source room over the flanking walls, floor or
+ceiling — **Ff** flank to flank, **Fd** flank to partition, **Df** partition
+to flank — and re-radiate on the far side without ever passing through the
+transmission loss the calculation used. Each path shrinks at every element
+and junction it crosses, which is why no single one has to be large for the
+sum of the three to dominate a good partition.
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anim_flanking_paths_dark.gif"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anim_flanking_paths.gif" alt="Animation: energy pulses leaving the source room over the direct Dd path and the flanking Ff, Fd and Df paths, shrinking at each element and junction, every path label lighting up as its pulse re-radiates into the receiving room" width="640" height="360" loading="lazy"></picture>
+
+[Watch the high-resolution video (WebM)](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anim_flanking_paths.webm)
+
 `DesignCriterion.flanking_penalty` is the explicit debit for that, in
 decibels off the
 predicted noise reduction. It is not a model, it is a place to record the

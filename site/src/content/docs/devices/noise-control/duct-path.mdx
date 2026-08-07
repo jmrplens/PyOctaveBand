@@ -350,10 +350,16 @@ that is what a real sheet uses. When there is none to hand,
 `diffuser_sound_power` is Reynolds's estimate as Long Eqs. 13.27 to 13.33:
 an overall level
 $L_W = 10\log_{10} S_G + 30\log_{10}\xi + 60\log_{10} U_G - 31.3$ from the
-face area, the approach velocity $U_G = Q/S_G$ and the normalised
-pressure-drop coefficient $\xi$, spread over the octaves by the shape
-function $C_D = -11.82 - 0.15 A - 1.13 A^2$ ($-5.82$ for a round device)
-about the peak band $f_P = 48.8\,U_G$.
+face area $S_G$, the approach velocity $U_G = Q/S_G$ and the normalised
+pressure-drop coefficient $\xi = 334.9\,\Delta p/(\rho_0 U_G^2)$ of Eq. 13.28.
+Long writes all four in foot-pound units ($S_G$ in ft², $U_G$ in ft/s,
+$\Delta p$ in inches of water gauge); `diffuser_sound_power` takes and returns
+SI and converts internally, which is why the constants here are quoted on
+Long's units. The spectrum follows as $L_{W,\text{oct}} = L_W + C_D$ with the
+shape function $C_D = -11.82 - 0.15 A - 1.13 A^2$ for a rectangular device
+($-5.82$ for a round one), where $A$ is the distance in octaves from the peak
+band $f_P = 48.8\,U_G$ (Eq. 13.32, $U_G$ in **ft/s**), counted on Long's band
+numbering with band 0 at 32 Hz.
 
 ```python
 from phonometry import diffuser_sound_power
@@ -367,6 +373,11 @@ print(np.round(diffuser_sound_power(None, (24 * IN) ** 2,
                                     pressure_drop=0.05 * IN_WG).values, 1))
 # [ 33.4  32.4  29.1  23.6  15.9   5.9  -6.4 -21. ]
 # Long Table 14.9 prints 33/32/29/23/15/4/0/0 for that row.
+
+# The peak band the shape function is counted from, on Long's units:
+face_velocity = 312 * CFM / (24 * IN) ** 2 / 0.3048   # 1.3 ft/s
+print(round(48.8 * face_velocity, 1))                 # fP = 63.4 Hz
+print(round(np.log2(48.8 * face_velocity / 32.0)))    # band 1: the 63 Hz octave
 ```
 
 The sixth power of velocity in Eq. 13.27 is the design rule: about 18 dB
@@ -540,17 +551,19 @@ for row in total.table():
     print(f"{row['kind']:<12} {row['label'][:26]:<26} "
           f"{[round(float(v)) for v in row['values']]}")
 
-total.report("duct-path.pdf")            # needs phonometry[report]
+supply.report("duct-path-supply.pdf")    # the fiche previewed below
+total.report("duct-path.pdf")            # the combination; needs phonometry[report]
 ```
 
-The example fiche, regenerated with `make reports`, is kept rendered in the
-repository. Click the preview to open the PDF:
+The example fiche is the **supply half** of the sheet, regenerated with
+`make reports` and kept rendered in the repository. Click the preview to open
+the PDF:
 
 <ReportPreview
 	name="duct_path_example"
 	title="Duct-borne noise path calculation example report (PDF)"
 	description="Duct-borne noise path calculation example report: a metadata header with the client, the noise source, the test environment and the date, the octave-band path table listing the fan sound power, each element attenuation as a negative level change, the self-noise rows of the elbow, the silencer and the diffuser, the room effect, the received level and the NC 30 curve, and beneath it the boxed room criterion NC-22.6 at 125 Hz with the verdict that no band exceeds NC 30 beside the cascade chart of every element against the criterion curve."
-	caption="Duct-borne noise path fiche (DuctPathResult.report): the supply path of the worked sheet element by element, rated NC-22.6 and passing NC 30 with 5 dB to spare at 63 Hz."
+	caption="Duct-borne noise path fiche (DuctPathResult.report): the supply path of the worked sheet element by element, rated NC-22.6, governed at 125 Hz, and passing its NC 30 target in every band."
 />
 
 ## 7. What reproduces, and what does not

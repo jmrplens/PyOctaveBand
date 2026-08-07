@@ -123,9 +123,16 @@ designs.
 
 The published design packs a whole $N = 5$ quadratic-residue diffuser into a
 35 cm x 2 cm panel: five slits, each loaded by two resonators, on a 7 cm
-pitch. Its first slit reaches critical coupling (the reflection zero the
-ternary `0` state is built from), and at the 2 kHz evaluation frequency the
-panel scatters like the 27.4 cm deep QRD it mimics.
+pitch. This is a *quadratic-residue* design, so all five slits are meant to
+reflect with $|R_n|$ near one and to differ only in phase. The first slit does
+come close to critical coupling — its absorption peaks at 0.99 — but at
+2305 Hz, above the 2 kHz the phase profile is tuned for, where it still
+reflects 0.97 of the incident pressure. The critically coupled slit that a
+*ternary* sequence needs as its `0` state is the same kind of cell driven
+deliberately onto resonance at the working frequency, which is what
+[`critical_coupling_design`](/phonometry/materials/absorbers/metamaterial-absorbers/)
+solves for. This published panel is the QRD case, and at 2 kHz it scatters
+like the 27.4 cm deep diffuser it mimics.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/metadiffuser_geometry.svg" alt="To-scale cross-section of the published quadratic-residue metadiffuser: a 350 by 20 millimetre panel over a rigid backing with five numbered slits opening at the face, each loaded by two Helmholtz resonators whose necks and cavities shelve sideways into the septum between slits; dimension lines mark the 350 millimetre width, the 70 millimetre pitch, the 14.7 millimetre first slit and the 20 millimetre depth, with the incident sound arriving from above" width="92%" loading="eager" />
 

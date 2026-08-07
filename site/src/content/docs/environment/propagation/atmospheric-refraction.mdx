@@ -233,6 +233,9 @@ cases = [
 ]
 fig, ax = plt.subplots(figsize=(11, 6.2))
 with warnings.catch_warnings():
+    # The PorousAbsorberWarning: a 200 kPa.s/m2 ground runs the one-parameter
+    # impedance model below its published fit range, as every outdoor ground
+    # does (see "Choosing the ground impedance" in the ground-effect guide).
     warnings.simplefilter("ignore")
     for profile, label in cases:
         pe = atmospheric_parabolic_equation(400.0, profile, source_height=2.0,
@@ -294,6 +297,9 @@ axes[0].set(ylabel="Height [m]", ylim=(0, 40), title="Sound rays (upward refract
 axes[0].legend()
 
 with warnings.catch_warnings():
+    # The PorousAbsorberWarning: a 200 kPa.s/m2 ground runs the one-parameter
+    # impedance model below its published fit range, as every outdoor ground
+    # does (see "Choosing the ground impedance" in the ground-effect guide).
     warnings.simplefilter("ignore")
     pe = atmospheric_parabolic_equation(400.0, profile, source_height=zs,
                                         flow_resistivity=200e3,

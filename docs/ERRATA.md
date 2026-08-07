@@ -628,6 +628,38 @@ which is the check that enforces the rule; see
   retained because the library cites the 2006 edition, whose print carries the
   defect; the 2017 edition stands as the confirmation.
 
+## UNE-EN 15657:2018, Clause 7.1, Formula (14) (reference mass dimensionally inconsistent with the quantity it normalises)
+
+- **Location:** Clause 7.1, the sentence introducing Formula (14) (printed
+  p. 14) and Formula (14) itself (printed p. 15), the structural power level
+  injected into the reception plate.
+- **The print:** the sentence reads "a partir del nivel de velocidad promediado
+  espacialmente de la placa $L_v$, de la **masa por unidad de superficie** $m$,
+  del área de la placa $S$ y del factor de pérdida $\eta$, utilizando
+  $f_0 = 1$ Hz, $m_0 = 1$ kg y $S_0 = 1$ m² como referencias", above
+  $L_{Ws} = \left(10\lg\left(\dfrac{2\pi f m \eta S}{f_0 \cdot m_0 \cdot S_0}\right)\right)\text{dB} + L_v - 60\ \text{dB}$.
+- **The problem:** the same sentence defines $m$ as a mass per unit area, in
+  kg/m², and its reference $m_0$ as 1 kg. With $m$ in kg/m² and $S$ in m², the
+  group $2\pi f\,\eta\,m\,S / (f_0 m_0 S_0)$ is dimensionless only if $m_0$ is
+  1 kg/m²; as printed it carries a leftover m⁻². The closing constant confirms
+  the intended reading: $10\lg(f_0 m_0 S_0 v_0^2 / P_0) = -60$ dB with
+  $v_0 = 10^{-9}$ m/s and $P_0 = 1$ pW closes in watts only when $f_0 m_0 S_0$
+  has the units of an area density times an area times a frequency. The numeric
+  result is unaffected, because $10\lg(1) = 0$ whichever unit is attached, which
+  is why the slip survives a worked example.
+- **Evidence:** dimensional analysis of Formula (14) against the definition of
+  $m$ in the sentence above it, and against the $-60$ dB constant it closes on;
+  the sentence and the formula were read as images, not from extracted text.
+  Verified on PDF page 14 (printed p. 14) and PDF page 15 (printed p. 15) of
+  UNE-EN 15657:2018. Only the Spanish-language adoption was read, so this entry
+  does not establish whether the English EN 15657:2018 print carries the same
+  reference.
+- **Library behaviour:** no change required. `characteristic_reception_plate_power`
+  takes `mass_per_area` in kg/m² and reproduces the standard's own worked values,
+  so the intended reading is the implemented one; the guide and the docstring
+  keep the printed reference and name this entry beside it.
+- **Status:** unreported.
+
 ## ISO 12999-1:2020, Table 4 (missing 500 Hz row)
 
 - **Location:** Table 4 (in-situ uncertainties per band).

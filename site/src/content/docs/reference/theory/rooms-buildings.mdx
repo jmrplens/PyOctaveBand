@@ -190,6 +190,15 @@ $$
 
 with $t_e = 50$ ms (C50, speech) or 80 ms (C80, music), and the **centre time** $T_s = \int_0^{\infty} t\ p^2\ dt / \int_0^{\infty} p^2\ dt$. For a pure exponential decay these have closed forms $C_{te} = 10 \log_{10}(e^{a t_e} - 1)$ and $T_s = 1/a$; at $T = 1$ s ($a = 13.8155$) they evaluate to C80 = 3.05 dB, C50 = −0.02 dB, D50 = 0.499 and Ts = 72.4 ms, the values the implementation reproduces. Table A.1 JNDs (EDT 5 %, C80 1 dB, D50 0.05, Ts 10 ms) bound how finely each is worth reporting.
 
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/room_parameters_bands.svg" alt="ISO 3382 per-band parameters of a synthetic room impulse response: grouped EDT, T20 and T30 bars per octave band falling from about 1.4 s at 125 Hz to 0.7 s at 4 kHz, over a second panel where C50 and C80 rise with frequency" width="92%" />
+
+*The closed forms above hold for a single exponential decay; a real room gives
+one set of values per band. The upper panel is the decay itself (EDT, T20 and
+T30 falling with frequency as air and surfaces absorb more), the lower panel
+the early/late split of the same impulse response, and C50 and C80 rise with
+frequency for the same reason the decay time falls — the later the energy, the
+more of it the room has already removed.*
+
 ### Open-plan spatial decay (ISO 3382-3, Clause 6)
 
 The spatial decay rate of A-weighted speech is the ordinary least-squares slope of $L_{p,A,S}$ against $\log_{10}(r/r_0)$ ($r_0 = 1$ m) over the 2–16 m positions, rescaled to a per-doubling figure, and the nominal level is read off the same line at 4 m:
@@ -199,6 +208,16 @@ L = a + b\ \log_{10}(r/r_0), \qquad D_{2,S} = -\log_{10}(2)\ b, \qquad L_{p,A,S,
 $$
 
 The distraction distance rD and privacy distance rP are the distances where a **linear** (not logarithmic) regression of STI against distance crosses 0.50 and 0.20; a non-negative fitted slope (STI not falling with distance) makes them undefined, realising the standard's "can prove impossible to determine" note.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/open_plan_decay.svg" alt="Open-plan spatial decay: A-weighted speech level and STI against source distance on a log axis, with the D2,S regression, the Lp,A,S,4m marker at 4 m and the rD and rP distance crossings" width="80%" />
+
+*Two regressions on two different axes, which is what makes this clause hard to
+hold in the head. The level line is fitted against $\log_{10}(r/r_0)$ and read
+twice — as the slope $D_{2,S}$ per doubling, and at $r = 4$ m for
+$L_{p,A,S,4\text{m}}$. The STI line is fitted against $r$ itself, **linearly**,
+and read where it crosses 0.50 and 0.20 for the distraction and privacy
+distances. If that second fit comes out flat or rising, the two distances do
+not exist rather than being large.*
 
 ### Field insulation and weighted rating (ISO 16283-1, ISO 717-1)
 
@@ -228,6 +247,16 @@ with the energetic sum $L_{n,\text{sum}} = 10 \log_{10} \sum_i 10^{L_i/10}$ over
 are reproduced exactly (thirds $L_{n,w} = 79$, $C_I = -11$; octaves $54$, $0$),
 via the same monotone shift search as ISO 717-1 run on the negated curves.
 
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/impact_rating.svg" alt="Measured one-third-octave normalized impact sound pressure level with the shifted ISO 717-2 reference curve and the resulting weighted rating read at 500 Hz" width="80%" />
+
+*The mirror image of the airborne figure above, drawn so the flip is visible
+rather than asserted. There the unfavourable deviations were counted where the
+measurement fell **below** the reference; here they are counted where it rises
+**above** it, because a louder receiving room is a worse floor. Everything else
+is the same procedure: the reference curve shifted in 1 dB steps until the
+unfavourable sum is as large as it can be without passing 32.0 dB, and the
+rating read off the shifted reference at 500 Hz.*
+
 Sound absorption (ISO 354) measures the equivalent absorption area from
 Sabine's relation applied to a reverberation room empty and with the specimen:
 $A = 55.3\ V/(c\ T) - 4 V m$ (the $4 V m$ term is the air absorption, $m$ the
@@ -240,14 +269,18 @@ $\alpha_s$ is left unclamped and may exceed 1.0 (Clause 3.7 NOTE 2).
 
 ### Laboratory vs field normalization (ISO 10140, ISO 16283)
 
-The field indices carry a prime because they include flanking transmission
-around the partition; the laboratory indices do not, because a qualified
-facility suppresses it. The algebra is otherwise identical, differing only in
-which quantity is normalised. The airborne pair is the direct laboratory sound
-reduction index $R = L_1 - L_2 + 10 \log_{10}(S/A)$ (ISO 10140-2) versus the
-apparent field index $R' = L_1 - L_2 + 10 \log_{10}(S/A)$ (ISO 16283-1), the
-same closed form evaluated with the facility's known $A$ or the room's measured
-$A = 0.16\ V/T$. The impact pair is the normalized laboratory level
+The field indices carry a prime because the receiving-room level they start from
+includes flanking transmission around the partition; the laboratory indices do
+not, because a qualified facility suppresses it. The formulas are therefore the
+*same*, and the prime is a statement about the specimen rather than about the
+arithmetic: the direct laboratory sound reduction index
+$R = L_1 - L_2 + 10 \log_{10}(S/A)$ (ISO 10140-2) and the apparent field index
+$R' = L_1 - L_2 + 10 \log_{10}(S/A)$ (ISO 16283-1) are one closed form,
+evaluated with the facility's known $A$ in the laboratory and with the receiving
+room's measured $A = 0.16\ V/T$ in the field. What differs in *what is
+normalised* is not laboratory against field but airborne against impact: the
+airborne indices scale by the area-to-absorption ratio $S/A$, the impact levels
+by $A/A_0$. The impact pair is the normalized laboratory level
 $L_n = L_i + 10 \log_{10}(A/A_0)$ (ISO 10140-3) versus the field $L'_n$
 (ISO 16283-2), both referenced to $A_0 = 10$ m². Before either is formed the
 receiving-room level is corrected for background noise by the energy
@@ -330,6 +363,15 @@ hard objects ($\psi \approx 0.072$) raises $A$ to 5.03 m² and drops $T$ to
 0.9 s. The informative Annex D method for irregular spaces and unevenly
 distributed absorption is out of scope.
 
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/enclosed_space_absorption.svg" alt="Two panels for a 60 cubic metre office with a bare versus acoustically-treated ceiling: the equivalent absorption area per octave band, much higher with the acoustic ceiling, and the reverberation time falling from about five seconds at low frequency for the bare room to under one second with the acoustic ceiling" width="96%" />
+
+*What Formula 1 does band by band: the equivalent absorption area on the left
+and the reverberation time it implies through Formula 5 on the right, for the
+same room bare and treated. The Annex E case quoted above is the same
+arithmetic on a smaller room — $A$ from 2.26 to 5.03 m² and $T$ from 2.1 to
+0.9 s at 1 kHz — and the figure shows why the two move in opposite directions
+and not proportionally.*
+
 See the [Enclosed-Space Absorption guide](/phonometry/buildings/rooms/enclosed-space-absorption/) for usage.
 
 ### Measurement uncertainty (ISO 12999-1)
@@ -382,6 +424,19 @@ of relative area $S_a/S$ limits the composite to $10\log_{10}(S/S_a)$. The reson
 transmission path and the double-wall radiation draw on the plate radiation
 efficiency and point mobilities of the
 [vibration theory](/phonometry/reference/theory/vibration/).
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/panel_insulation_concept.svg" alt="Four panels: the single-panel mass law with its coincidence dip, the double wall with the mass-spring-mass resonance and cavity gain, the plate radiation efficiency rising to unity above the critical frequency, and a composite wall whose 1 % open slit caps R at the open-area limit" width="92%" />
+
+*The four behaviours of the paragraph above, one per panel. Top left, the mass
+law rising 6 dB per octave with Sharp's coincidence dip cut into it at $f_c$.
+Top right, the double wall: no better than the combined mass below $f_0$, then
+the cavity term climbing until it saturates. Bottom left, the radiation
+efficiency that decides how much of the plate's vibration becomes sound. Bottom
+right, the ceiling a leak imposes: a 1 % open area holds the composite at
+$10\log_{10}(S/S_a) = 20$ dB however good the wall is, which is the panel worth
+showing a client.*
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/aperture_slit_geometry.svg" alt="To-scale cross-section of a 2 mm slit through a 100 mm wall: the hatched wall drawn in section with the narrow horizontal air gap at mid-height, an incident-sound arrow pointing at the gap from the left, the 100 mm wall depth and 2 mm slit width dimensioned, and circular transmitted wavefronts sketched spreading from the slit exit on the right" width="80%" />
 
 See the [Predicting Panel Sound Insulation](/phonometry/buildings/design/panel-sound-insulation/)
 guide for usage.

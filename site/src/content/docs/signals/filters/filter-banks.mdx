@@ -51,8 +51,12 @@ import ThemeImage from '../../../../components/ThemeImage.astro';
 import ReportPreview from '../../../../components/ReportPreview.astro';
 
 phonometry supports several filter types, each with its own transfer function
-characteristic. All banks place their **−3 dB points on the ANSI S1.11 band
-edges**, so band levels are comparable across architectures.
+characteristic. Butterworth, Chebyshev II and Bessel place their **−3 dB points
+on the ANSI S1.11 band edges**, so their band levels are directly comparable.
+The two equiripple designs (Chebyshev I, Elliptic) do not: they take those edges
+as the *ripple* edge instead, which widens the band and biases every band level
+by a fixed few tenths of a decibel — see section 1, because the bias is
+systematic and does not average out.
 
 ## 1. Fractional octave bands: the math
 
@@ -67,10 +71,43 @@ $$
 
 so every 1/3-octave band spans $G^{1/3} \approx 1.2589 \approx 10^{1/10}$:
 ten bands per decade, which is why the nominal frequencies (25, 31.5, 40 …)
-repeat scaled by 10. phonometry designs each band as an SOS cascade whose
-−3 dB points land exactly on $f_1$ and $f_2$ for every architecture; for
-Chebyshev II, Elliptic and Bessel that requires pre-warping the analytic
-band-edge mapping rather than trusting SciPy's default parametrization.
+repeat scaled by 10. phonometry designs each band as an SOS cascade on those
+edges, but where the −3 dB point ends up depends on what the architecture means
+by its design frequency, and only three of the five put it on $f_1$ and $f_2$.
+
+### Where each architecture's −3 dB point actually lands
+
+Butterworth's SciPy design frequency *is* its −3 dB point, so it needs no
+correction. Chebyshev II is designed through its stopband edges, mapped back
+from the band edges analytically, and Bessel is normalized with `norm="mag"`
+rather than SciPy's default phase normalization — both corrections exist so that
+their −3 dB points land on the edges too. Chebyshev I and Elliptic are handed
+the band edges directly, and for those two families SciPy reads them as the
+*equiripple passband* edge: the response there is the ripple depth, not −3 dB.
+Measured on the 1 kHz octave band at 48 kHz with order 6 and the default
+`ripple=0.1`:
+
+| Architecture | Response at $f_1$ and $f_2$ | Noise bandwidth / $(f_2 - f_1)$ | Band-level offset |
+| :--- | :---: | :---: | :---: |
+| `butter` | −3.01 dB | 1.003 | reference |
+| `cheby2` | −3.01 dB | 1.003 | −0.02 dB |
+| `bessel` | −3.01 dB | 0.971 | +0.05 dB |
+| `cheby1` | **−0.10 dB** | 1.066 | **+0.33 dB** |
+| `ellip` | **−0.10 dB** | 1.052 | **+0.25 dB** |
+
+The first three columns are the 1 kHz octave band; the last is the median
+band-level difference from Butterworth over a whole 1/3-octave bank analysing
+20 s of white noise. That last column matters because it is a *bias*, not
+scatter: it does not shrink with averaging time, it is larger than the whole
+class 1 passband corridor (±0.4 dB), and it moves every band at once, so a
+spectrum measured with `cheby1` sits bodily above one measured with `butter`.
+Choose one architecture per campaign, and never mix architectures inside one
+spectrum. Raising `order` shrinks the offset, because a narrower transition band
+pulls the −3 dB point back toward the ripple edge — for `cheby1` the median goes
++0.76 dB at order 4, +0.33 dB at order 6, +0.16 dB at order 8 and +0.04 dB at
+order 12. Lowering `design.ripple` does the opposite of what intuition suggests
+and makes the offset *larger* (+0.62 dB at `ripple=0.02`), because at fixed
+order a flatter passband buys a slower roll-off.
 
 ### Poles, zeros and stability
 
@@ -140,26 +177,50 @@ everyday arguments stay first: `FilterDesign` (`design`), `LevelCalibration`
 (`calibration`), `BlockProcessing` (`block_processing`) and `ResponsePlot`
 (`response_plot`). The table names each option by its bundle.
 
-| Parameter | Type | Units | Range / default | Notes |
-| :--- | :--- | :--- | :--- | :--- |
-| `x` | 1D or 2D array | digital units | non-empty | 2D is `[channels, samples]` |
-| `fs` | int | Hz | > 0 | |
-| `fraction` | int | — | default `1`; common `3`; any $b \ge 1$ | Bands per octave = $b$ |
-| `order` | int | — | default `6` | SOS order per band |
-| `limits` | list `[lo, hi]` | Hz | default `[12, 20000]` | Analysis range |
-| `design.filter_type` | str | — | `'butter'` (default), `'cheby1'`, `'cheby2'`, `'ellip'`, `'bessel'` | See the [Filter Architecture Gallery](/phonometry/signals/filters/filter-gallery/) |
-| `design.ripple` / `design.attenuation` | float | dB | `ripple` default `0.1`; `attenuation` default `72.0` | Passband ripple / stopband attenuation (cheby/ellip); `cheby2` needs `attenuation` $\ge 70$ for class 1, since scipy pins its equiripple floor at exactly this value |
-| `design.resample` | bool | — | default `True` | Filter each band on a decimated rate (multirate) |
-| `response_plot.show` | bool | — | default `False` | Plot the bank response (needs matplotlib) |
-| `sigbands` | bool | — | default `False` | Also return the per-band time signals |
-| `mode` | str | — | `'rms'` (default), `'peak'`, `'sum'` | Per-band statistic returned |
-| `nominal` | bool | — | default `False` | Return nominal band labels (e.g. `1000`) instead of exact centre frequencies |
-| `detrend` | bool | — | default `True` | Remove each band's DC offset before the level (improves low-frequency accuracy) |
-| `calibration.factor` | float | — | default `1.0` | Scales the input to pascals (see the Calibration guide) |
-| `calibration.dbfs` | bool | — | default `False` | Reference levels to digital full scale instead of 20 µPa |
-| `response_plot.file` | str or `None` | — | default `None` | Save the bank-response plot to this path |
-| `zero_phase` | bool | — | default `False` | Forward-backward filtering (offline) |
-| `block_processing.stateful` / `.steady_ic` (class) | bool | — | default `False` | Streaming state; see [Block Processing](/phonometry/signals/filters/block-processing/) |
+Three call sites share this table, and they do not accept the same options, so
+the **Where** column names the one each option belongs to: `octave_filter()` is
+the one-shot function, `OctaveFilterBank(...)` is the constructor, and
+`bank.filter()` is the per-call method.
+
+| Parameter | Where | Type | Units | Range / default | Notes |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| `x` | function, `.filter()` | 1D or 2D array | digital units | non-empty | 2D is `[channels, samples]` |
+| `fs` | function, constructor | int | Hz | > 0 | |
+| `fraction` | function, constructor | int | — | default `1`; common `3`; any $b \ge 1$ | Bands per octave = $b$ |
+| `order` | function, constructor | int | — | default `6` | SOS order per band |
+| `limits` | function, constructor | list `[lo, hi]` | Hz | default `[12, 20000]` | Analysis range |
+| `design.filter_type` | function, constructor | str | — | `'butter'` (default), `'cheby1'`, `'cheby2'`, `'ellip'`, `'bessel'` | See the [Filter Architecture Gallery](/phonometry/signals/filters/filter-gallery/) |
+| `design.ripple` / `design.attenuation` | function, constructor | float | dB | `ripple` default `0.1`; `attenuation` default `72.0` | Passband ripple / stopband attenuation (cheby/ellip); `cheby2` needs `attenuation` $\ge 70$ for class 1, since scipy pins its equiripple floor at exactly this value |
+| `design.resample` | function, constructor | bool | — | default `True` | Filter each band on a decimated rate (multirate) |
+| `response_plot.show` | function, constructor | bool | — | default `False` | Plot the bank response (needs matplotlib) |
+| `response_plot.file` | function, constructor | str or `None` | — | default `None` | Save the bank-response plot to this path |
+| `calibration.factor` | function, constructor | float | — | default `1.0` | Scales the input to pascals (see the Calibration guide) |
+| `calibration.dbfs` | function, constructor | bool | — | default `False` | Reference levels to digital full scale instead of 20 µPa |
+| `block_processing.stateful` / `.steady_ic` | constructor only | bool | — | default `False` | Streaming state; see [Block Processing](/phonometry/signals/filters/block-processing/) |
+| `sigbands` | function, `.filter()` | bool | — | default `False` | Also return the per-band time signals |
+| `mode` | function, `.filter()` | str | — | `'rms'` (default) or `'peak'` | Per-band statistic returned |
+| `nominal` | function, `.filter()` | bool | — | default `False` | Return nominal band labels (e.g. `1000`) instead of exact centre frequencies |
+| `detrend` | function, `.filter()` | bool | — | default `True` | Remove each band's DC offset before the level (improves low-frequency accuracy) |
+| `zero_phase` | `.filter()` only | bool | — | default `False` | Forward-backward filtering (offline); see section 5 |
+| `calculate_level` | `.filter()` only | bool | — | default `True` | `False` returns the band signals without computing levels (use with `sigbands=True`) |
+
+The split is not arbitrary: the one-shot `octave_filter()` designs a bank and
+uses it once, so it carries the design-time options only. `zero_phase` and
+`calculate_level` are decided per call and therefore live on
+`OctaveFilterBank.filter()` — `octave_filter(x, fs, zero_phase=True)` raises
+`TypeError` — while streaming state is fixed when the bank is built.
+
+`mode` has exactly two values. `'rms'` reports the energy-mean level of the band
+over the whole record, which is what every standard means by "band level".
+`'peak'` reports $20\log_{10}$ of the largest absolute sample inside the band,
+against the same 20 µPa reference; it is an instantaneous band peak, not a
+peak-hold reading, it is band-limited and unweighted so it is *not* the
+C-weighted peak $L_{C\text{peak}}$ of the
+[Levels](/phonometry/signals/levels/levels/) guide, and on impulsive signals it
+is dominated by the filter's own ringing — it belongs to transient diagnostics,
+not to level reporting. There is no `'sum'` mode: a total across bands is an
+energy sum the caller performs, `10*np.log10(np.sum(10**(spl/10)))`, never an
+arithmetic mean of decibels.
 
 `verify_filter_class(bank)` checks the designed bank against the IEC 61260-1
 Table 1 acceptance limits and reports the class (`1`, `2` or `None` if outside both) with per-band
@@ -352,9 +413,11 @@ plt.show()
 
 ## 5. Zero-phase filtering
 
-For offline analysis you can eliminate group delay entirely: `zero_phase=True`
-filters each band forward-backward (`scipy.signal.sosfiltfilt`), keeping band
-signals time-aligned with the input. The effective attenuation doubles and the
+For offline analysis you can eliminate group delay entirely:
+`OctaveFilterBank.filter(…, zero_phase=True)` filters each band
+forward-backward (`scipy.signal.sosfiltfilt`), keeping band signals
+time-aligned with the input. It is a per-call option on the bank, not an
+argument of the one-shot `octave_filter()`. The effective attenuation doubles and the
 effective passband narrows, lowering the measured broadband band level by
 ~0.2 to 0.3 dB per band (a pure in-band tone is unaffected); prefer forward
 filtering when the absolute band SPL must match single-pass conventions, and
