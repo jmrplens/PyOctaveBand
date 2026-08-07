@@ -349,12 +349,21 @@ resistivity, is the same material theory as
 
 ## Cross-check against the FDTD solver
 
-The four-pole expansion chamber is cross-checked against the independent 2D
-[FDTD wave solver](https://jmrplens.github.io/phonometry/simulation/fdtd-simulation/): a plane-wave duct that widens into a
-chamber and narrows back transmits far less at the four-pole TL peak
-($kL = \pi/2$) than at the transparent trough ($kL = \pi$), and the measured
-amplitude ratio reproduces the closed-form peak transmission loss to a fraction
-of a decibel (test `tests/noise_control/test_fdtd_crosscheck.py`).
+That cross-check is the clip embedded in section 1, and it is worth returning
+to it now with the algebra in hand. The four-pole expansion chamber is checked
+against the independent 2D
+[FDTD wave solver](https://jmrplens.github.io/phonometry/simulation/fdtd-simulation/), which shares no formula and no
+assumption with the transfer-matrix product beyond the wave equation itself: a
+plane-wave duct that widens into the same 0.30 m, $m = 4$ chamber and narrows
+back transmits far less at the four-pole TL peak ($kL = \pi/2$, here 286 Hz)
+than at the transparent trough ($kL = \pi$, 572 Hz). The amplitude ratio
+measured downstream in the field is the transmission loss annotated on the
+clip, 6.5 dB at 286 Hz and 0.0 dB at 572 Hz, against the 6.55 dB the closed
+form gives for $m = 4$ (test `tests/noise_control/test_fdtd_crosscheck.py`).
+Agreement that close rules out an algebra error on either side. The two must
+eventually part company above the duct's first cut-on frequency, where
+higher-order modes propagate: the two-dimensional solver keeps working there
+and the plane-wave algebra does not.
 
 
 ## See also
@@ -1682,6 +1691,19 @@ prediction because of **flanking transmission through mechanical connections
 and air leaks**. A ceiling void carried over the partition, a service
 penetration, a door undercut, or the wall simply not reaching the structural
 slab, and the equation's answer becomes an upper bound.
+
+The clip below draws what the equation leaves out. The chain of section 3
+prices the direct path only, the **Dd** route through the partition; the
+other three pulses leave the source room over the flanking walls, floor or
+ceiling — **Ff** flank to flank, **Fd** flank to partition, **Df** partition
+to flank — and re-radiate on the far side without ever passing through the
+transmission loss the calculation used. Each path shrinks at every element
+and junction it crosses, which is why no single one has to be large for the
+sum of the three to dominate a good partition.
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anim_flanking_paths_dark.gif"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anim_flanking_paths.gif" alt="Animation: energy pulses leaving the source room over the direct Dd path and the flanking Ff, Fd and Df paths, shrinking at each element and junction, every path label lighting up as its pulse re-radiates into the receiving room" width="640" height="360" loading="lazy"></picture>
+
+[Watch the high-resolution video (WebM)](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anim_flanking_paths.webm)
 
 `DesignCriterion.flanking_penalty` is the explicit debit for that, in
 decibels off the

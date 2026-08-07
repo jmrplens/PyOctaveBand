@@ -133,11 +133,11 @@ If you are an AI assistant setting this up for a user: install from PyPI (no sys
 - [Sound Insulation by Intensity (ISO 15186)](https://jmrplens.github.io/phonometry/buildings/insulation/insulation-intensity/)
 - [Laboratory Flanking Transmission (ISO 10848)](https://jmrplens.github.io/phonometry/buildings/insulation/flanking-lab/)
 - [Field Insulation Measurement (ISO 16283)](https://jmrplens.github.io/phonometry/buildings/insulation/insulation-field/)
+- [Heavy and Soft Impact Sources (ISO 16283-2)](https://jmrplens.github.io/phonometry/buildings/insulation/heavy-impact-sources/)
 - [Sound Insulation Survey Method (ISO 10052)](https://jmrplens.github.io/phonometry/buildings/insulation/insulation-survey/)
 - [Insulation Ratings (ISO 717)](https://jmrplens.github.io/phonometry/buildings/insulation/insulation-ratings/)
 - [Façade Sound Insulation](https://jmrplens.github.io/phonometry/buildings/insulation/facade-insulation/)
 - [Spanish Building Code (CTE DB-HR)](https://jmrplens.github.io/phonometry/buildings/insulation/spanish-building-code/)
-- [Heavy and Soft Impact Sources (ISO 16283-2)](https://jmrplens.github.io/phonometry/buildings/insulation/heavy-impact-sources/)
 
 ### Insulation design
 
@@ -1252,12 +1252,14 @@ Source: https://jmrplens.github.io/phonometry/aircraft/
 
 # Aircraft noise
 
-Aircraft are noise sources important enough to have their own internationally
-negotiated metrics, each fixed to the last decimal by a certification
-framework. The four pages of this section implement those frameworks, and
-they share a common anatomy: a rigorously standardised **source descriptor**,
-plus standardised **propagation adjustments** that place the source at a
-receiver.
+Aircraft noise is computed under internationally negotiated methods of two
+kinds. **Certification** fixes a single number per aircraft type to the last
+decimal, at reference points a standard places around the runway. **Contour
+methods** take that certified fleet and predict what an airport does to the
+ground around it. The four pages of this section cover both, and they share a
+common anatomy: a rigorously standardised **source descriptor** — a spectral
+time history, a noise-power-distance table or a noise hemisphere — plus
+standardised **propagation adjustments** that place the source at a receiver.
 
 [Aircraft noise: Effective Perceived Noise Level](https://jmrplens.github.io/phonometry/aircraft/aircraft-noise/)
 covers fixed-wing certification. The **EPNL** of ICAO Annex 16 condenses a
@@ -1294,6 +1296,25 @@ which is filed with the other environmental sources: its IEC 61400-11 apparent
 sound power level and tonal-audibility chain answer the same question for a
 source that is not an aircraft. That tonality test is in turn a cousin of the
 methods in [Psychoacoustics](https://jmrplens.github.io/phonometry/perception/psychoacoustics/).
+
+Start from the question. To check an aeroplane against a certification limit,
+or to understand where the published numbers for a type come from, start with
+the EPNL page. To predict what a movement does at a street address, use the
+Doc 29 page, with the ANP page supplying the aircraft data. For helicopters the
+hemisphere page replaces both. Read the fixed-wing pages in that order: the EPNL
+page defines the certified metric, the Doc 29 page turns certified aeroplanes
+into ground contours from tables written by hand, and the ANP page replaces
+those hand-written tables with the published fleet data. The rotorcraft page
+stands on its own — a different standard and a different source model — and can
+be read first if helicopters are what you came for.
+
+The three metrics are not interchangeable. EPNL is a *certification* metric of
+one aeroplane at one prescribed point; SEL and LASmax are *single-event*
+assessment metrics at an arbitrary receiver; neither is the long-term index a
+land-use study is finally judged on. And the boundary: this section does not
+compute cumulative multi-event indices, does not synthesise NPD tables from
+engine data, does not model hover, idle or taxi rotorcraft operations, and does
+not touch sonic boom.
 
 ## Pages in this section
 
@@ -2452,14 +2473,42 @@ double wall, transmission through slits and apertures, plate radiation
 efficiency and point mobilities. It is the physics a catalogue value expresses
 in one number.
 
-Two measurements feed the floor half of any design.
+Two pages here carry the floor half of any design, one measuring and one
+predicting.
 [Floor-Covering Impact Improvement (ISO 16251-1)](https://jmrplens.github.io/phonometry/buildings/design/impact-improvement/)
-gives the weighted improvement $\Delta L_w$ of a soft covering on a small
-heavyweight mock-up, the term EN 12354-2 subtracts from the bare-floor level,
-and
-[Dynamic stiffness of resilient materials (EN 29052-1)](https://jmrplens.github.io/phonometry/materials/resilient/dynamic-stiffness/)
-gives the stiffness per unit area $s'$ of the resilient layer under a floating
-floor, and with it the resonance frequency the whole improvement hangs on.
+gives the weighted improvement $\Delta L_w$ of a covering that exists, on a
+small heavyweight mock-up, and that is the term EN 12354-2 subtracts from the
+bare-floor level.
+[Predicting Resilient-Layer Performance](https://jmrplens.github.io/phonometry/buildings/design/resilient-layers/)
+predicts it for a covering that does not yet exist, from the tapping machine's
+own force spectrum, the cut-off frequency of a soft covering, the 30 lg and
+40 lg floating-floor laws and the ISO 12354-1 Annex D rating of a wall lining.
+Both start from the stiffness per unit area $s'$ of the resilient layer,
+measured per EN 29052-1 in
+[Dynamic stiffness of resilient materials](https://jmrplens.github.io/phonometry/materials/resilient/dynamic-stiffness/)
+over in the materials section, which sets the resonance the whole improvement
+hangs on.
+
+Building service equipment is a chain of its own, and the two pages only read
+correctly in order.
+[Structure-borne sound power of equipment (EN 15657)](https://jmrplens.github.io/phonometry/buildings/design/structure-borne-power/)
+characterises a pump, fan or cistern by the power it injects into the
+structure, measured on a reception plate of known dissipation and then made
+plate-independent.
+[Installed structure-borne sound (EN 12354-5)](https://jmrplens.github.io/phonometry/buildings/design/installed-structure-borne/)
+takes that source description, loses part of it to the coupling term the source
+and receiver mobilities set, and carries the rest to a room that may be several
+junctions away.
+
+One bookkeeping note runs through the whole section: the family exists as
+EN 12354:2000 and as ISO 12354:2017, and the two are not interchangeable in
+every clause. The simplified models on
+[Predicting Sound Insulation](https://jmrplens.github.io/phonometry/buildings/design/insulation-prediction/)
+follow the 2000 text — including the tabulated flanking correction $K$ that the
+2017 impact part replaced with explicit per-path formulae — while
+[Detailed Per-Band Prediction](https://jmrplens.github.io/phonometry/buildings/design/detailed-prediction/)
+follows the 2017 text. Check which edition your regulation calls up before
+quoting a correction from either.
 
 ## Pages in this section
 
@@ -6006,8 +6055,10 @@ characterised **in the laboratory**, where suppressed flanking isolates its
 direct transmission. That laboratory data feeds a **prediction** of how a
 whole building will perform, flanking paths included. The finished building is
 then **verified in the field**. At every stage the band spectrum is collapsed
-to the **single number** regulations quote, and that collapse is one shared
-engine rather than a step of any single method.
+to the **single number** regulations quote, and for almost everything that
+collapse is one shared reference-curve engine rather than a step of any single
+method. The exception is the heavy-impact rating of ISO 717-2 Annex D, which
+shifts no curve at all: it sums A-weighted band levels in energy.
 
 **Laboratory.**
 [Laboratory Insulation Measurement](https://jmrplens.github.io/phonometry/buildings/insulation/insulation-lab/) covers
@@ -6030,6 +6081,12 @@ and the two material measurements a floor design consumes.
 [Field Insulation Measurement (ISO 16283)](https://jmrplens.github.io/phonometry/buildings/insulation/insulation-field/)
 covers the engineering-grade airborne and impact measurement in the building,
 its Clause 14 test report and the ISO 12999-1 uncertainty that qualifies it.
+The same standard specifies two more impact sources, a rubber ball and a bang
+machine, for the slow low-frequency thumps a tapping machine says nothing
+about;
+[Heavy and Soft Impact Sources (ISO 16283-2)](https://jmrplens.github.io/phonometry/buildings/insulation/heavy-impact-sources/)
+covers their specification, the Fast-weighted standardization of the maximum
+level and the Annex D rating.
 When the question does not deserve that effort,
 [Sound Insulation Survey Method (ISO 10052)](https://jmrplens.github.io/phonometry/buildings/insulation/insulation-survey/)
 trades accuracy for speed with octave bands and a reverberation index.
@@ -6516,7 +6573,7 @@ Sabine absorption area $A = 0.16\ V/T$.
 
 ## Standards
 
-ISO 16283-1:2014 and ISO 16283-2:2015, *Acoustics — Field measurement of
+ISO 16283-1:2014 and ISO 16283-2:2020, *Acoustics — Field measurement of
 sound insulation in buildings and of building elements*: the airborne and
 impact level differences, their normalisations and the Clause 14 test report;
 ISO 12999-1:2020, which tabulates the standard uncertainties per measurement
@@ -9140,8 +9197,23 @@ point, that stays diffuse while it decays. The common breakages:
 
 Scattering objects restore the mixing the models assume: a furnished room
 follows the statistical prediction distinctly better than the same room
-bare, beyond what the furniture's own absorption area accounts for. In
-practice, quote a *band* of predictions (Sabine and Eyring, or Fitzroy and
+bare, beyond what the furniture's own absorption area accounts for. The clip
+below is that mechanism with the absorption taken out of it, so only the
+mixing is left: an 800 Hz wavefront enters a 4 m rigid-walled hall filled
+with rigid columns 10 to 17 cm across, a quarter to two fifths of the
+42.9 cm wavelength. Every column diffracts the front and sheds a scattered
+wavelet, the wavelets interfere, and within a few passes the specular front
+has become energy spread over the whole hall with no preferred direction —
+which is the assumption Sabine and Eyring both start from, arriving here as
+a result rather than as a hypothesis. Nothing in the hall absorbs, so what
+you are watching is *only* the redistribution; the decay at the end is the
+energy draining out through the two open ends.
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anim_fdtd_pillar_hall_dark.gif"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anim_fdtd_pillar_hall.gif" alt="Animation: an 800 Hz plane wavefront sweeping a 4 metre rigid-walled hall filled with a staggered colonnade of rigid columns, every column shedding a scattered wavelet until the interference of the wavelets fills the hall with structured energy that then drains through the absorbing ends" width="640" height="160" loading="lazy"></picture>
+
+[Watch the high-resolution video (WebM)](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anim_fdtd_pillar_hall.webm)
+
+In practice, quote a *band* of predictions (Sabine and Eyring, or Fitzroy and
 Arau-Puchades for axial cases) rather than a single value; where the models
 spread, the room is telling you its field is not diffuse.
 
@@ -14273,6 +14345,21 @@ terms by a reference sound source of known power $L_W(\text{RSS})$ measured
 in the same room, so the room need not be characterised:
 $L_W = L_W(\text{RSS}) + (L_p(\text{ST}) - L_p(\text{RSS}) + C_2)$.
 
+The right-hand panel of the clip below is this method. The same source runs
+in both rooms; in the anechoic room on the left the microphones see only what
+the source sends their way, so the level falls with distance and the
+free-field route has to integrate over a measurement surface, while in the
+reverberation room on the right the reflected energy fills the space and the
+level stops depending on where a microphone is. That is the whole reason
+Eq. 20 can replace a surface integral with a handful of positions and a room
+constant — and the reason the room, not the array, is what has to be
+qualified. Both routes end on the same $L_W$, because sound power is a
+property of the source and not of the room it is measured in.
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anim_power_two_rooms_dark.gif"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anim_power_two_rooms.gif" alt="Animation: the same source in an anechoic room and in a reverberation room producing different microphone pressures, while the free-field and diffuse-field formulas converge to the same sound power level" width="640" height="360" loading="lazy"></picture>
+
+[Watch the high-resolution video (WebM)](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anim_power_two_rooms.webm)
+
 ```python
 import numpy as np
 from phonometry import emission
@@ -16487,6 +16574,19 @@ and air leaks**. A ceiling void carried over the partition, a service
 penetration, a door undercut, or the wall simply not reaching the structural
 slab, and the equation's answer becomes an upper bound.
 
+The clip below draws what the equation leaves out. The chain of section 3
+prices the direct path only, the **Dd** route through the partition; the
+other three pulses leave the source room over the flanking walls, floor or
+ceiling — **Ff** flank to flank, **Fd** flank to partition, **Df** partition
+to flank — and re-radiate on the far side without ever passing through the
+transmission loss the calculation used. Each path shrinks at every element
+and junction it crosses, which is why no single one has to be large for the
+sum of the three to dominate a good partition.
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anim_flanking_paths_dark.gif"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anim_flanking_paths.gif" alt="Animation: energy pulses leaving the source room over the direct Dd path and the flanking Ff, Fd and Df paths, shrinking at each element and junction, every path label lighting up as its pulse re-radiates into the receiving room" width="640" height="360" loading="lazy"></picture>
+
+[Watch the high-resolution video (WebM)](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anim_flanking_paths.webm)
+
 `DesignCriterion.flanking_penalty` is the explicit debit for that, in
 decibels off the
 predicted noise reduction. It is not a model, it is a place to record the
@@ -16853,12 +16953,21 @@ resistivity, is the same material theory as
 
 ## Cross-check against the FDTD solver
 
-The four-pole expansion chamber is cross-checked against the independent 2D
-[FDTD wave solver](https://jmrplens.github.io/phonometry/simulation/fdtd-simulation/): a plane-wave duct that widens into a
-chamber and narrows back transmits far less at the four-pole TL peak
-($kL = \pi/2$) than at the transparent trough ($kL = \pi$), and the measured
-amplitude ratio reproduces the closed-form peak transmission loss to a fraction
-of a decibel (test `tests/noise_control/test_fdtd_crosscheck.py`).
+That cross-check is the clip embedded in section 1, and it is worth returning
+to it now with the algebra in hand. The four-pole expansion chamber is checked
+against the independent 2D
+[FDTD wave solver](https://jmrplens.github.io/phonometry/simulation/fdtd-simulation/), which shares no formula and no
+assumption with the transfer-matrix product beyond the wave equation itself: a
+plane-wave duct that widens into the same 0.30 m, $m = 4$ chamber and narrows
+back transmits far less at the four-pole TL peak ($kL = \pi/2$, here 286 Hz)
+than at the transparent trough ($kL = \pi$, 572 Hz). The amplitude ratio
+measured downstream in the field is the transmission loss annotated on the
+clip, 6.5 dB at 286 Hz and 0.0 dB at 572 Hz, against the 6.55 dB the closed
+form gives for $m = 4$ (test `tests/noise_control/test_fdtd_crosscheck.py`).
+Agreement that close rules out an algebra error on either side. The two must
+eventually part company above the duct's first cut-on frequency, where
+higher-order modes propagate: the two-dimensional solver keeps working there
+and the plane-wave algebra does not.
 
 
 ## See also
@@ -17803,11 +17912,16 @@ Source: https://jmrplens.github.io/phonometry/environment/
 # Environment and transport
 
 Environmental noise is a source-path-receiver problem stretched over hundreds
-of metres of open air. This section covers both ends of it. The **outdoor
-sound** pages handle the path and the assessment: ISO 9613 predicts, band by
-band, how much level survives divergence, air absorption, the ground and any
-barrier on the way to a receiver, and NT ACOU 112 quantifies when impulsive
-character makes the received sound more annoying than its LAeq suggests.
+of metres of open air. This section covers all three of them. The **propagation**
+pages handle the path: ISO 9613 predicts, band by band, how much level survives
+divergence, air absorption, the ground and any barrier on the way to a receiver,
+and the wave-acoustic ground and refraction models say when that engineering
+method stops being enough.
+
+The **assessment** pages handle what happens once the sound has arrived: the
+ISO 1996 rating level and the day-evening-night indicators, their Spanish
+application in RD 1367/2007, and the NT ACOU 112 adjustment that quantifies when
+impulsive character makes a received sound more annoying than its LAeq suggests.
 
 The **source** pages handle the other end: what emits, described the way an
 environmental model wants it. CNOSSOS-EU gives road traffic and railways a
@@ -17816,11 +17930,14 @@ by its apparent sound power and its tonal audibility. What unites them is the
 pattern: a carefully standardised source descriptor that the path model above
 then attenuates.
 
-This section leans on the core toolkit more than any other: the rating levels
-and Lden that environmental assessment ends in live in
-[Integrated and Statistical Levels](https://jmrplens.github.io/phonometry/signals/levels/levels/), and the
-atmospheric absorption that every propagation model consumes is shared with
-the room and materials pages. Start with
+This section leans on the core toolkit, but only up to the period level.
+[Integrated and Statistical Levels](https://jmrplens.github.io/phonometry/signals/levels/levels/) supplies
+the LAeq, percentile and event levels of each reference period; what turns those
+period levels into Lden, Ldn and the rating level, with the tonal adjustment,
+the residual-noise correction and the uncertainty budget on top, is
+[Environmental Levels (ISO 1996-1/-2)](https://jmrplens.github.io/phonometry/environment/assessment/environmental-levels/),
+in this section. The atmospheric absorption that every propagation model
+consumes is shared with the room and materials pages. Start with
 [Outdoor Sound Propagation](https://jmrplens.github.io/phonometry/environment/propagation/outdoor-propagation/); it
 introduces the source-path-receiver bookkeeping the transport pages reuse.
 
@@ -18363,6 +18480,28 @@ $$
 
 which tends to 5 dB at the shadow boundary $N \to 0$ and approximates Maekawa's
 point-source curve within about 1.5 dB.
+
+The clip below is that formula as a field. It is the
+[2D FDTD solver](https://jmrplens.github.io/phonometry/simulation/fdtd-simulation/) run twice on one
+12 × 7 m half-space over rigid ground with a thin rigid screen 2.5 m tall,
+once at 100 Hz and once at 500 Hz, each with a barrier-free reference run over
+the same ground so the annotated insertion loss is a true one. The geometry
+fixes the path difference at 1.06 m for the receiver it marks, so the Fresnel
+number is $N = 0.62$ at 100 Hz and $N = 3.1$ at 500 Hz — the same screen, a
+factor of five apart in $N$ purely because $\lambda$ changed — and the field
+shows what that buys: about 8 dB against about 17 dB. Two things are worth
+watching for. The edge of the lit region running down from the top of the
+screen is the shadow boundary, the $N \to 0$ locus where the formula bottoms
+out at 5 dB; and inside the shadow the field is a cylindrical wave centred on
+the top of the screen, which is what "the edge acts as a secondary source"
+looks like. One caveat: the ground in the clip is perfectly rigid, so it shows
+diffraction alone and none of the finite-impedance ground effect of section 1
+— the coherent four-path model below adds that, and its curve swings tens of
+decibels where this one is smooth.
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anim_fdtd_barrier_dark.gif"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anim_fdtd_barrier.gif" alt="Animation: a point source behind a thin 2.5 metre rigid barrier on reflecting ground, simulated at 100 Hz and 500 Hz side by side; the long wavelength diffracts over the edge and fills the shadow zone, the short wavelength is cast into a deep clean shadow" width="640" height="360" loading="lazy"></picture>
+
+[Watch the high-resolution video (WebM)](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anim_fdtd_barrier.webm)
 
 The thin-screen methods share the same three geometric quantities: the two
 diffracted segments over the edge and the straight path they replace. Drawn on
@@ -20458,7 +20597,24 @@ print(np.round(alpha, 3))                      # [0.398 0.448 0.498]
 $T_1$ and $T_2$ are exactly the reverberation times
 [`room_parameters`](https://jmrplens.github.io/phonometry/buildings/rooms/room-acoustics/) returns, so an ISO 3382-2 decay
 measurement of the empty and treated room flows straight into
-`absorption_coefficient`. A room volume below the 150 m³ minimum or a
+`absorption_coefficient`.
+
+Each of those two numbers is read off a decay, and the clip below shows how
+one is read: the squared impulse response is integrated backwards from the
+tail, the Schroeder curve emerges, and the T20 and T30 regressions are fitted
+to a straight portion of it. That is the operation behind $T_1$, and again
+behind $T_2$ — the clip shows a *single* room, not the pair, so it answers
+"where does one $T$ come from" and not "what does subtracting two of them
+cost". The second question is the one that governs this measurement, and
+section 4 puts a number on it: because $\alpha_s$ is a difference of two
+reciprocal decay times, its uncertainty is worst exactly where the two decays
+are most alike, at the low-frequency end.
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anim_schroeder_dark.gif"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anim_schroeder.gif" alt="Animation: the tail energy of a squared impulse response filling from the end while the backward integral advances toward t = 0, the Schroeder decay curve emerging on a companion axis and ending with the T20 and T30 regression lines" width="640" height="360" loading="lazy"></picture>
+
+[Watch the high-resolution video (WebM)](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anim_schroeder.webm)
+
+A room volume below the 150 m³ minimum or a
 sample area outside 10–12 m² raises an advisory `AbsorptionWarning`; the result
 still returns.
 
@@ -26021,8 +26177,11 @@ ISO 1996-2.
 [Psychoacoustic annoyance and fluctuation strength](https://jmrplens.github.io/phonometry/perception/psychoacoustics/psychoacoustic-annoyance/)
 closes the chain with the Fastl & Zwicker model, which combines loudness,
 sharpness, roughness and the slow-modulation sensation of fluctuation strength
-into a single annoyance value. Read it last: its four inputs all come from
-the earlier pages.
+into a single annoyance value. Read it last: three of its four inputs come from
+the earlier pages, and it supplies the fourth, fluctuation strength, itself, in
+both the Fastl & Zwicker closed form and the Osses 2016 signal model. The
+ECMA-418-2 fluctuation strength on the Sound Quality page is a further,
+normative model of the same sensation, under a different unit name.
 
 ## Pages in this section
 
@@ -31453,6 +31612,10 @@ $$
 
 The adjustments $K_i$ cover time-of-day penalties (ISO 1996-1 Table A.1: evening 5 dB, night 10 dB) as well as source-character adjustments (e.g. tonal penalties), which the ECMA-418-1 TNR/PR assessments can justify objectively.
 
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/lden_profile_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/lden_profile.svg" alt="Synthetic 24-hour urban LAeq profile with day, evening and night bands, the +5 and +10 dB weighted period levels and the resulting Lden" width="80%"></picture>
+
+*A 24-hour $L_{Aeq}$ profile split into day, evening and night, the +5/+10 dB penalties and the resulting $L_{den}$.*
+
 See the [Environmental levels guide](https://jmrplens.github.io/phonometry/environment/assessment/environmental-levels/) for usage.
 
 ## Impulsive-sound prominence (NT ACOU 112)
@@ -31476,6 +31639,15 @@ L_{Ar,T} = 10 \log_{10}\Big[ \frac{1}{T} \sum_N \Delta t_N\ 10^{(L_{Aeq,N} + K_{
 $$
 
 $K_I$ is exactly the kind of source-character adjustment that enters the ISO 1996-1 composite rating level above. The anchors $P(1000\ \text{dB/s}, 30\ \text{dB}) = 9 + 2\log_{10} 30 = 11.95$ and $K_I(P{=}10) = 9.0$ dB are reproduced exactly.
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/impulsive_sound_onsets_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/impulsive_sound_onsets.svg" alt="A-weighted Fast level history of three hammer strikes over a 55 dB(A) background across six seconds: each strike rises from about 52 dB to 89 dB, the detected onset start and end points are marked with the least-squares onset line, the governing level difference of 36.8 dB is annotated, and the title reports a prominence of 11.34 with an adjustment of 11.42 dB, category highly impulsive" width="90%"></picture>
+
+*Both inputs of $P$ are geometry on this trace, which is why the method needs a
+level history and not a level. The onset rate is the slope of the fitted line
+through the rise, in dB/s, and the qualifying threshold of 10 dB/s is a
+steepness on this axis; the level difference is the height of the same rise.
+Three strikes are detected here and only the steepest-and-tallest one governs
+the adjustment.*
 
 See the [Impulse Prominence guide](https://jmrplens.github.io/phonometry/environment/assessment/impulsive-sound/) for usage.
 
@@ -31508,6 +31680,10 @@ own printed precision), well inside its stated $\pm 10$ %; passing
 $f_m = 1000 \cdot 10^{k/10}$ (Note 5) used to compute that table. The same
 $\alpha$ is the only route to the ISO 354 power attenuation coefficient
 $m = \alpha/(10 \log_{10} e)$, exposed as `air_attenuation_m`.
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/atmospheric_attenuation_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/atmospheric_attenuation.svg" alt="ISO 9613-1 pure-tone atmospheric attenuation coefficient alpha in dB/km against frequency, on a linear decibel ordinate over a logarithmic frequency axis, for the reference 20 degrees Celsius and 50 percent relative humidity atmosphere, produced by the AtmosphericAttenuation result plot method" width="80%"></picture>
+
+*The ISO 9613-1 coefficient for the 20 °C, 50 % relative-humidity reference atmosphere: the $f^2$ rise spans two decades from 50 Hz to 10 kHz.*
 
 ### Outdoor propagation, general method (ISO 9613-2)
 
@@ -31552,6 +31728,21 @@ average level subtracts the meteorological correction $C_{met}$ (Eq. (6),
 (21)/(22)). The method's stated accuracy is $\pm 1$ to $\pm 3$ dB for broadband
 noise up to 1000 m (Table 5).
 
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/outdoor_attenuation_breakdown_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/outdoor_attenuation_breakdown.svg" alt="ISO 9613-2 per-octave-band attenuation breakdown as a stacked bar of Adiv, Aatm, Agr and Abar with the total A overlaid, for a 200 m path over porous ground with a 4 m barrier" width="80%"></picture>
+
+*The four terms at their true relative sizes, band by band, for a 200 m path
+over porous ground with a 4 m barrier. $A_{div}$ is 57 dB in every band because
+it is pure geometry. $A_{atm}$ is nothing at 63 Hz and 18.7 dB at 8 kHz, so it
+is the term that decides how far high frequencies travel and no other. $A_{gr}$
+is where the low bands live and is **negative** at 63 Hz (−4.6 dB: the ground
+reflection adds energy rather than removing it). $A_{bar}$ is at its 20 dB cap
+from 2 kHz up but falls to zero at 250 Hz, because the top-edge form subtracts
+the ground effect the screened path gives away, $A_{bar} = D_z - A_{gr} \geq 0$,
+and 250 Hz is exactly where $A_{gr}$ peaks. Which term is worth refining
+depends entirely on the band and the geometry.*
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_outdoor_geometry_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_outdoor_geometry.svg" alt="ISO 9613-2 source-barrier-receiver geometry: a point source at height hs, a barrier whose top edge splits the path into dss and dsr, and a receiver at height hr, with the blocked direct ray and the diffracted ray over the edge, the path difference z and the Dz formula" width="92%"></picture>
+
 ### Occupational noise exposure and uncertainty (ISO 9612)
 
 ISO 9612:2009 is the engineering method (accuracy grade 2) for a worker's daily
@@ -31594,6 +31785,10 @@ See the [Outdoor Propagation guide](https://jmrplens.github.io/phonometry/enviro
 The sound power level $L_W = 10 \log_{10}(P/P_0)$ ($P_0 = 1$ pW) is an
 *emission* quantity: unlike a pressure level it does not depend on the receiver
 distance or the room. Three families of methods recover it.
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sound_power_methods_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sound_power_methods.svg" alt="The three sound power routes side by side: an enveloping pressure surface over a reflecting plane (ISO 3744/3746), a source in a reverberation room sampled by microphones (ISO 3741) and an intensity probe scanning a surface around the source (ISO 9614-2)" width="92%"></picture>
+
+*The three routes to $L_W$: enveloping pressure surface, reverberation room and intensity scan.*
 
 ### Enveloping-surface pressure (ISO 3744/3746)
 
@@ -31876,6 +32071,10 @@ worked example, the oracle is a synthetic end-to-end chain
 ($V = 200$ m³, $S = 10$ m², $T = 8.0/6.0/7.5/5.0$ s → $s = 0.093$) plus the
 Formula A.5 hand value $u_s = 0.0297$.
 
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/scattering_coefficient_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/scattering_coefficient.svg" alt="The random-incidence scattering coefficient s of a diffusing surface over the 13 one-third-octave bands from 250 to 4000 Hz, rising smoothly from near zero at low frequency towards 0.84 at 4 kHz" width="88%"></picture>
+
+*A random-incidence scattering coefficient rising with frequency as the surface roughness becomes comparable with the wavelength.*
+
 ### Directional diffusion coefficient (ISO 17497-2)
 
 ISO 17497-2:2012 measures, in the free field, how uniformly a surface spreads
@@ -31954,6 +32153,10 @@ float-safe. The two Annex A worked examples are reproduced:
 $\alpha_p = (0.35, 0.70, 0.65, 0.60, 0.55)$ → $\alpha_w = 0.60$, class C; and
 raising 500 Hz to 1.00 keeps $\alpha_w = 0.60$ but adds the indicator, "0.60(M)".
 
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/absorption_rating_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/absorption_rating.svg" alt="ISO 11654 weighted sound absorption rating: the practical absorption spectrum plotted against the shifted reference curve over 250 Hz to 4000 Hz, with the unfavourable deviation at 250 Hz shaded and the weighted coefficient alpha_w read at 500 Hz" width="80%"></picture>
+
+*The ISO 11654 rating: practical absorption against the shifted reference, with the unfavourable deviation shaded and the weighted coefficient read at 500 Hz.*
+
 See the [Sound Absorption Measurement and Rating guide](https://jmrplens.github.io/phonometry/materials/absorbers/absorption-measurement/) for usage.
 
 ### Airflow resistance (ISO 9053-1/2)
@@ -32025,6 +32228,25 @@ analytic air-layer matrix ($\det T = 1$, $T_{11} = T_{22}$,
 $TL = 0\ \text{dB}$, hard-backed $|R| = 1$), synthetic round-trips that
 recover a known $r$, and
 two-load recovery of an asymmetric reciprocal specimen.
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_impedance_tube_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_impedance_tube.svg" alt="ISO 10534-2 two-microphone impedance tube: a loudspeaker radiating a plane wave down the tube, two microphones flush in the wall at spacing s and distance x1 from the specimen face, the test specimen against a rigid backing, and the incident and reflected waves" width="92%"></picture>
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/impedance_tube_result_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/impedance_tube_result.svg" alt="ISO 10534-2 two-microphone tube result for a 50 mm porous absorber: the normal-incidence absorption coefficient rising from about 0.2 at 200 Hz towards 0.97 above 1 kHz, with the reflection-factor magnitude falling as its mirror image" width="80%"></picture>
+
+*What the ISO 10534-2 formula returns: $\alpha$ and $|r|$ for a 50 mm porous
+absorber over the working band of a 100 mm tube. The two curves are the same
+information — $\alpha = 1 - |r|^2$ — so the figure is really one measurement
+drawn twice, and the rise with frequency is the layer thickness growing against
+the wavelength.*
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_astm_tube_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_astm_tube.svg" alt="ASTM E2611 four-microphone transmission-loss tube: a sound source, two microphones upstream and two downstream of the test specimen at spacings s1 and s2 and offsets l1 and l2, an adjustable termination for the two-load method, the upstream A and B and downstream C and D travelling waves, and the transfer matrix and transmission-loss relations" width="92%"></picture>
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/transfer_matrix_tl_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/transfer_matrix_tl.svg" alt="ASTM E2611 transfer-matrix quantities of a 50 mm porous layer: the normal-incidence transmission loss rising from about 6.6 dB at 200 Hz to over 9 dB at 1.6 kHz on the left axis, and the hard-backed absorption coefficient rising from 0.19 to about 0.97 on the right axis" width="80%"></picture>
+
+*The same four-pole entries answering two different questions: how much sound
+the free-standing layer lets through (the transmission loss above) and how much
+the same layer absorbs once it is backed rigidly. A material can be a good
+absorber and a poor barrier at once, which this pair makes plain.*
 
 See the [Impedance Tube guide](https://jmrplens.github.io/phonometry/materials/absorbers/impedance-tube/) for usage.
 
@@ -32108,6 +32330,10 @@ The three parameters come from Table 1 (p. 4), tabulated at the 29 preferred thi
 
 The standard specifies **no interpolation** between the tabulated frequencies. Formula (1) is specified for **20 phon to 90 phon** between 20 Hz and 4 kHz, and only up to **80 phon between 5 kHz and 12.5 kHz**; above 80 phon the contour therefore stops at 4 kHz. Values outside these limits from Formula (2) are extrapolations the standard labels as informative only.
 
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/equal_loudness_contours_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/equal_loudness_contours.svg" alt="ISO 226:2023 normal equal-loudness-level contours from 20 to 90 phon with the hearing threshold curve" width="80%"></picture>
+
+*The ISO 226:2023 contours from Formula (1), 20 to 90 phon, with the hearing threshold.*
+
 See the [Loudness guide](https://jmrplens.github.io/phonometry/perception/psychoacoustics/loudness/) for usage.
 
 ## Tone prominence: TNR and PR (ECMA-418-1)
@@ -32127,6 +32353,15 @@ $$
 $$
 
 **PR** (clause 12) compares the level of the critical band centred on the tone, $L_M$, with the mean power of the two **contiguous** critical bands $L_L$, $L_U$ (edges from the fitted Formulae 21–22 with Tables 2–3): $\mathrm{PR} = 10\log_{10} P_M - 10\log_{10}\left[(P_L + P_U)/2\right]$ (Formula 23). For $f_t \le 171.4$ Hz the lower band is truncated at 20 Hz and its power rescaled to a **100 Hz bandwidth** (Formula 24). The criterion (Formulae 25–26) is 9.0 dB at $f_t \ge 1$ kHz, rising as $9.0 + 10.0\log_{10}(1000/f_t)$ below. Tones are assessed within the 89.1 Hz – 11.2 kHz range of interest (clauses 11.5 / 12.6).
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/tone_prominence_assessment_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/tone_prominence_assessment.svg" alt="Tone-to-noise ratio of a 250 Hz fan tone plotted against the ECMA-418-1 prominence criterion: the criterion falls from about 17 dB at 89 Hz to a flat 8 dB above 1 kHz, and the assessed tone sits at 15.1 dB, 2.1 dB above the 13.0 dB criterion at 250 Hz, so it is prominent" width="88%"></picture>
+
+*The TNR criterion drawn rather than evaluated, over the 89.1 Hz – 11.2 kHz
+range of interest, with one assessed tone on it. Because the criterion is
+$8.0 + 8.33\log_{10}(1000/f_t)$ below 1 kHz and flat above, the same
+tone-to-noise ratio is judged against a different threshold at every frequency:
+the example tone clears its 13.0 dB threshold at 250 Hz by 2.1 dB, while a
+10 dB tone would be prominent anywhere above 1 kHz and not prominent here.*
 
 See the [Prominent Discrete Tones guide](https://jmrplens.github.io/phonometry/perception/psychoacoustics/tone-prominence/) for usage.
 
@@ -32160,6 +32395,10 @@ N = 2^{(L_N - 40)/10} \ \text{sone} \qquad \Longleftrightarrow \qquad L_N = 40 +
 $$
 
 below 1 sone the reference program uses $L_N = 40 (N + 0.0005)^{0.35}$, floored at 3 phon.
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/loudness_pattern_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/loudness_pattern.svg" alt="Specific loudness patterns over the Bark scale for a 1 kHz narrowband sound and a broadband sound of equal band level" width="80%"></picture>
+
+*Specific loudness N′(z) over the Bark axis: energy spread over many critical bands sums to more sones than the same band level in a single band.*
 
 See the [Loudness guide](https://jmrplens.github.io/phonometry/perception/psychoacoustics/loudness/) for usage.
 
@@ -32227,6 +32466,15 @@ $$
 
 (Formulae 65–111). The single value $R$ is the 90th percentile of $R(l_{50})$ over time (Clause 7.1.10); the constant $c_R$ (Formula 104) calibrates the reference sound (a 1 kHz carrier 100 % amplitude-modulated at 70 Hz at 60 dB SPL) to 1 asper.
 
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/hms_modulation_bandpass_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/hms_modulation_bandpass.svg" alt="ECMA-418-2 slow vs fast modulation perception: fluctuation strength forms a band-pass over modulation frequency peaking near 4 to 6 Hz while roughness of the same 1 kHz amplitude-modulated tones peaks near 70 Hz" width="80%"></picture>
+
+*The modulation-rate weighting the formulae above apply, and the reason the
+range "roughly 20–300 Hz, strongest near 70 Hz" is a band-pass and not a
+threshold: the same 1 kHz carrier modulated slowly is heard as fluctuation
+strength, peaking near 4–6 Hz, and modulated fast is heard as roughness,
+peaking near 70 Hz. Between the two peaks the sensation changes name, not
+degree.*
+
 ### Sharpness (DIN 45692)
 
 Sharpness condenses the high-frequency emphasis of a sound into one number: the $g(z)$-weighted first moment of the ISO 532-1 stationary specific-loudness pattern (DIN 45692:2009, Equation 1):
@@ -32237,6 +32485,14 @@ g(z) = \begin{cases} 1 & z \le 15.8\ \text{Bark} \\ 0.15\ e^{0.42 (z - 15.8)} + 
 $$
 
 evaluated on the same 240-bin, 0.1-Bark grid. The constant $k$ is not hard-coded but derived from the calibration requirement (clause 6): a critical-band-wide narrowband noise 920–1080 Hz at 60 dB SPL scores exactly 1 acum, and the derived $k = 0.108$ lands inside the normative window $0.105 \le k < 0.115$ (clause 5.2). The informative Annex B weightings are provided under the same 1-acum anchor: von Bismarck (knee at 15 Bark, $0.2\ e^{0.308(z-15)} + 0.8$) and Aures (loudness-dependent, $g(z) = 0.078\ (e^{0.171 z}/z)\ N/\ln(0.05 N + 1)$). The Table A.2 narrow-band targets are reproduced within the clause 6 tolerance (5 % or 0.05 acum): 0.38 acum at 250 Hz, 1.00 at 1 kHz, 1.78 at 2.5 kHz, 2.82 at 4 kHz.
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sharpness_weighting_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sharpness_weighting.svg" alt="DIN 45692 sharpness weighting g(z) against critical-band rate on a log axis, comparing the DIN, von Bismarck and Aures curves with the 15.8 and 15 Bark knees marked" width="80%"></picture>
+
+*The three $g(z)$ weightings of the formula above on one axis: DIN with its
+15.8 Bark knee, von Bismarck with its 15 Bark knee, and the loudness-dependent
+Aures curve, which is why the choice of weighting changes a sharpness value
+only for sounds with energy above the knee (15 to 15.8 Bark, about 2.5 to
+3 kHz) and leaves everything below it untouched.*
 
 See the [Sound Quality Metrics guide](https://jmrplens.github.io/phonometry/perception/psychoacoustics/sound-quality/) for usage.
 
@@ -32272,6 +32528,23 @@ $$
 m_{dr} = \frac{2 \sqrt{\left( \sum_t I_k(t) \sin 2 \pi f_m t \right)^2 + \left( \sum_t I_k(t) \cos 2 \pi f_m t \right)^2}}{\sum_t I_k(t)}, \qquad m = \frac{m_{dr}}{0.55}
 $$
 
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sti_band_mti_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sti_band_mti.svg" alt="Modulation transfer index per octave band from 125 Hz to 8 kHz for a hall with a 0.9 s reverberation time and a 15 dB speech-to-noise ratio: the seven bars sit close together between about 0.54 and 0.60, giving STI = 0.58 with the Annex F rating E" width="88%"></picture>
+
+*The seven $\mathrm{MTI}_k$ the weighted sum above consumes, for a hall with
+$T = 0.9$ s and a 15 dB speech-to-noise ratio. Each bar is already the mean of
+14 transmission indices, so this is two stages of averaging below the raw
+$m(F)$; the bars sit within 0.06 of one another, which is the case in which
+the $\beta_k$ redundancy terms subtract almost nothing and the STI is close to
+the plain $\alpha$-weighted mean.*
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sti_vs_t60_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sti_vs_t60.svg" alt="STI versus reverberation time with the IEC 60268-16 Annex F rating bands shaded" width="80%"></picture>
+
+*The end of the chain rather than its middle: what the Schroeder closed form
+does to the STI as reverberation grows, against the Annex F rating bands. The
+curve falls steeply through the range where a room is still usable and
+flattens once the modulation has already been destroyed, which is why halving
+a long reverberation time buys less intelligibility than halving a short one.*
+
 See the [Speech Transmission Index guide](https://jmrplens.github.io/phonometry/perception/speech/speech-transmission/) for usage.
 
 ## Speech Intelligibility Index (ANSI S3.5)
@@ -32298,6 +32571,10 @@ $$
 
 and any fractile follows a two-sided Gaussian model (clause 4.4), $\Delta H_Q = \Delta H_{md} + z(Q)\ s$, using the upper spread $s_u$ for $z \ge 0$ (worse than median) and the lower spread $s_l$ otherwise, each a degree-5 polynomial in $Y - 18$ per sex and frequency (clause 4.3, Tables 2–5). At age 18 every deviation is zero by construction. The formulae are established to 80 years at and below 2 kHz and to 70 years above; beyond that the evaluation is an extrapolation. Anchors: at 60 years the medians evaluate to 7.85 dB (male, 1 kHz), 20.21 dB (male, 4 kHz) and 15.32 dB (female, 4 kHz), matching the Table 1 formula to $10^{-3}$.
 
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/hearing_threshold_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/hearing_threshold.svg" alt="Two panels. Left: the ISO 7029 median hearing-threshold deviation for men at ages 20, 40, 60 and 80 on an inverted audiogram axis, with the 10 to 90 percent fractile band around the 70-year curve; the loss deepens toward high frequencies and with age. Right: the ISO 389-7 free-field and diffuse-field reference threshold, coinciding below 1 kHz and diverging above, dipping to a minimum near 3 to 4 kHz" width="96%"></picture>
+
+*The ISO 7029 median age shift with its fractile band (left) and the ISO 389-7 free- and diffuse-field reference thresholds (right).*
+
 See the [Hearing Threshold guide](https://jmrplens.github.io/phonometry/perception/hearing/hearing-threshold/) for usage.
 
 ## Noise-induced hearing loss (ISO 1999)
@@ -32315,6 +32592,16 @@ H' = H + N - \frac{H\ N}{120}.
 $$
 
 The Annex D worked examples (Tables D.1–D.4; e.g. 100 dB / 40 yr at 3 kHz: 29/38/60 dB at the 0.10/0.50/0.90 fractiles) are reproduced exactly at the standard's integer rounding, and the Formula 2 hand value at 4 kHz / 20 yr / 90 dB is $N_{50} = 12.94$ dB.
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/nipts_audiogram_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/nipts_audiogram.svg" alt="ISO 1999 noise-induced permanent threshold shift after 40 years at an 8 h-normalised 95 dB(A), on an inverted audiogram axis from 500 Hz to 6000 Hz: the median is near zero at 500 Hz and deepens to about 26 dB at 4000 Hz before recovering at 6000 Hz, and the 10 to 90 percent fractile band around it reaches nearly 37 dB for the most susceptible tenth" width="88%"></picture>
+
+*The model as an audiogram: 40 years at an 8 h-normalised 95 dB(A). The notch
+at 4 kHz is what makes noise-induced loss recognisable in a clinic, and it is
+here only because $L_0$ is lowest (75 dB) in that band. Mind the fractile
+direction the paragraph above states: the edge of the shaded band showing the
+**deeper** shift is the library's `fractile=0.90`, the most susceptible tenth —
+which ISO 1999 and its Annex D column headings label $Q = 10\ \%$. At 4 kHz
+this case runs 19.5 / 26.0 / 36.0 dB at `fractile` 0.10 / 0.50 / 0.90.*
 
 See the [Noise-Induced Hearing Loss guide](https://jmrplens.github.io/phonometry/perception/hearing/noise-induced-hearing-loss/) for usage.
 
@@ -32388,6 +32675,10 @@ This page collects the theory behind rooms and buildings: impulse-response measu
 
 ANSI/ASA S12.2-2019 rates steady background noise in rooms against families of octave-band curves (16 Hz – 8 kHz). The **NC rating** follows the two-step procedure of clause 5.2.2 on the Table 1 curves (NC-15 to NC-70): the speech interference level $\mathrm{SIL} = \tfrac14(L_{500}+L_{1000}+L_{2000}+L_{4000})$ (clause 3.2) selects the NC-(SIL) curve, and if no band exceeds it the spectrum is designated NC-(SIL); otherwise the tangency method (clause 5.2.3) applies: each measured band is interpolated against the tabulated curve values, the rating is the highest per-band index and the band that sets it is the governing band; the interpolation makes the rating continuous (an NC-42.5 is reported as such, not snapped to a curve). Spectra above NC-70 or below NC-15 fall outside the family and are flagged (>NC-70 with the band of maximum exceedance, or <NC-15) instead of receiving a fabricated number. The **RC Mark II** contour (Annex D) is a pure −5 dB/octave line keyed to its 1000 Hz value with a low-frequency floor of $\max(\mathrm{RC} + 25,\ 55)$ dB at 16/31.5 Hz; the rating is the arithmetic mean of the 500/1000/2000 Hz levels rounded to an integer (clause D.4), and the spectral-quality tag compares the spectrum with the reference contour (clause D.3): rumble "R" when any band at or below 500 Hz exceeds it by more than 5 dB, hiss "H" when any band at or above 1 kHz exceeds it by more than 3 dB (both together "RH"), else neutral "N", reported as e.g. RC-35(N). The generated RC contours reproduce Table D.1 digit for digit, and feeding any Table 1 NC curve back returns its own tangency rating. NCB, RNC (Annex A) and the QAI (clause D.5) are deliberately out of scope.
 
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/room_noise_criteria_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/room_noise_criteria.svg" alt="Two panels for the same ventilation-dominated room spectrum. Left: the measured octave-band levels over the NC curve family, with a red diamond marking the tangent point at 250 Hz that sets the NC-42.5 rating. Right: the same spectrum over the reference RC-35 curve, with the low-frequency bands rising through the shaded rumble tolerance (plus 5 dB below 500 Hz) so the noise is classified RC-35(R), and the hiss tolerance (plus 3 dB at and above 1000 Hz) shaded for comparison" width="96%"></picture>
+
+*The same spectrum rated both ways: NC tangency at the governing band (left) and the RC Mark II reference with the rumble excess (right).*
+
 See the [Room Noise guide](https://jmrplens.github.io/phonometry/buildings/rooms/room-noise/) for usage.
 
 ## Room and building acoustics (ISO 18233, ISO 3382, ISO 16283, ISO 10140, EN 12354, ISO 12999, ISO 717, ISO 354)
@@ -32412,6 +32703,10 @@ $$
 
 i.e. a reversed cumulative sum in discrete time. Backward integration cancels the random fluctuation of a single squared IR: for a purely exponential energy decay $p^2(t) = e^{-a t}$ it gives $E(t) = e^{-a t}/a$, an exactly straight line $L(t) = -(10 a / \ln 10)\ t$. Background noise flattens $E(t)$, so integration is truncated at the crossing $t_1$ of the fitted decay line with the noise level and the missing tail is compensated by an exponential with the fitted rate; without that term the finite integral systematically **underestimates** $T$.
 
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/schroeder_decay_dark.webp"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/schroeder_decay.webp" alt="Squared impulse response with its Schroeder backward-integrated decay curve, and the EDT, T20 and T30 regression windows marked" width="80%"></picture>
+
+*A squared impulse response, its Schroeder backward integral and the EDT/T20/T30 regression windows of the next subsection.*
+
 ### Regression windows and validity (ISO 3382-2, Clause 6, Annex B/C)
 
 Reverberation time is a least-squares fit $L = a + b t$ over a window, extrapolated to 60 dB via $T = -60/b$ (Annex C): **EDT** on 0 to −10 dB, **T20** on −5 to −25 dB, **T30** on −5 to −35 dB. A single-slope decay gives EDT = T20 = T30; a fast early / slow late double slope gives EDT < T30. Validity uses the dynamic-range rule of 5.3.3: the noise must sit at least 25 dB below the IR peak for EDT (evaluation span + 15 dB), tightened to 46 dB for T20 and 54 dB for T30 so the tail-compensation bias of a flagged-valid value stays within the 5 % JND. The **curvature** $C = 100\ (T_{30}/T_{20} - 1)$ % (Annex B) flags a non-straight decay above 10 %.
@@ -32426,6 +32721,15 @@ $$
 
 with $t_e = 50$ ms (C50, speech) or 80 ms (C80, music), and the **centre time** $T_s = \int_0^{\infty} t\ p^2\ dt / \int_0^{\infty} p^2\ dt$. For a pure exponential decay these have closed forms $C_{te} = 10 \log_{10}(e^{a t_e} - 1)$ and $T_s = 1/a$; at $T = 1$ s ($a = 13.8155$) they evaluate to C80 = 3.05 dB, C50 = −0.02 dB, D50 = 0.499 and Ts = 72.4 ms, the values the implementation reproduces. Table A.1 JNDs (EDT 5 %, C80 1 dB, D50 0.05, Ts 10 ms) bound how finely each is worth reporting.
 
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/room_parameters_bands_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/room_parameters_bands.svg" alt="ISO 3382 per-band parameters of a synthetic room impulse response: grouped EDT, T20 and T30 bars per octave band falling from about 1.4 s at 125 Hz to 0.7 s at 4 kHz, over a second panel where C50 and C80 rise with frequency" width="92%"></picture>
+
+*The closed forms above hold for a single exponential decay; a real room gives
+one set of values per band. The upper panel is the decay itself (EDT, T20 and
+T30 falling with frequency as air and surfaces absorb more), the lower panel
+the early/late split of the same impulse response, and C50 and C80 rise with
+frequency for the same reason the decay time falls — the later the energy, the
+more of it the room has already removed.*
+
 ### Open-plan spatial decay (ISO 3382-3, Clause 6)
 
 The spatial decay rate of A-weighted speech is the ordinary least-squares slope of $L_{p,A,S}$ against $\log_{10}(r/r_0)$ ($r_0 = 1$ m) over the 2–16 m positions, rescaled to a per-doubling figure, and the nominal level is read off the same line at 4 m:
@@ -32435,6 +32739,16 @@ L = a + b\ \log_{10}(r/r_0), \qquad D_{2,S} = -\log_{10}(2)\ b, \qquad L_{p,A,S,
 $$
 
 The distraction distance rD and privacy distance rP are the distances where a **linear** (not logarithmic) regression of STI against distance crosses 0.50 and 0.20; a non-negative fitted slope (STI not falling with distance) makes them undefined, realising the standard's "can prove impossible to determine" note.
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/open_plan_decay_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/open_plan_decay.svg" alt="Open-plan spatial decay: A-weighted speech level and STI against source distance on a log axis, with the D2,S regression, the Lp,A,S,4m marker at 4 m and the rD and rP distance crossings" width="80%"></picture>
+
+*Two regressions on two different axes, which is what makes this clause hard to
+hold in the head. The level line is fitted against $\log_{10}(r/r_0)$ and read
+twice — as the slope $D_{2,S}$ per doubling, and at $r = 4$ m for
+$L_{p,A,S,4\text{m}}$. The STI line is fitted against $r$ itself, **linearly**,
+and read where it crosses 0.50 and 0.20 for the distraction and privacy
+distances. If that second fit comes out flat or rising, the two distances do
+not exist rather than being large.*
 
 ### Image-source room impulse response (Kuttruff 4.1, Vorländer 11)
 
@@ -32466,6 +32780,10 @@ Per one-third-octave band the level difference $D = L_1 - L_2$ (energy-averaged 
 
 The single-number rating (ISO 717-1, Clause 4.4) shifts the Table 3 **reference curve** in 1 dB steps toward the measured curve until the sum of *unfavourable* deviations $\sum_i \max(0, \text{ref}_i + k - \text{meas}_i)$ is maximal but $\le$ 32.0 dB (16 thirds) or 10.0 dB (5 octaves); the rating $R_w$ is the shifted reference at 500 Hz. The **spectrum adaptation terms** are $C = X_{A1} - X_w$ and $C_{tr} = X_{A2} - X_w$ with $X_{Aj} = -10 \log_{10} \sum_i 10^{(L_{ij} - X_i)/10}$ (Table 4 spectra No. 1 pink noise, No. 2 urban traffic), each rounded to an integer. The ISO 717-1 Annex C worked example ($R_w = 30$, $C = -2$, $C_{tr} = -3$, unfavourable sum 31.8 dB) is reproduced exactly.
 
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/insulation_rating_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/insulation_rating.svg" alt="Measured one-third-octave sound reduction index with the shifted ISO 717-1 reference curve and the resulting weighted rating at 500 Hz" width="80%"></picture>
+
+*A measured R spectrum against the shifted ISO 717-1 reference: the rating is the shifted reference read at 500 Hz.*
+
 ### Impact insulation and absorption (ISO 16283-2, ISO 717-2, ISO 354)
 
 Impact insulation swaps the airborne source for a standardized **tapping
@@ -32483,6 +32801,16 @@ with the energetic sum $L_{n,\text{sum}} = 10 \log_{10} \sum_i 10^{L_i/10}$ over
 100–2500 Hz (thirds) or 125–2000 Hz (octaves). The ISO 717-2 Annex C examples
 are reproduced exactly (thirds $L_{n,w} = 79$, $C_I = -11$; octaves $54$, $0$),
 via the same monotone shift search as ISO 717-1 run on the negated curves.
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/impact_rating_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/impact_rating.svg" alt="Measured one-third-octave normalized impact sound pressure level with the shifted ISO 717-2 reference curve and the resulting weighted rating read at 500 Hz" width="80%"></picture>
+
+*The mirror image of the airborne figure above, drawn so the flip is visible
+rather than asserted. There the unfavourable deviations were counted where the
+measurement fell **below** the reference; here they are counted where it rises
+**above** it, because a louder receiving room is a worse floor. Everything else
+is the same procedure: the reference curve shifted in 1 dB steps until the
+unfavourable sum is as large as it can be without passing 32.0 dB, and the
+rating read off the shifted reference at 500 Hz.*
 
 Sound absorption (ISO 354) measures the equivalent absorption area from
 Sabine's relation applied to a reverberation room empty and with the specimen:
@@ -32586,6 +32914,15 @@ hard objects ($\psi \approx 0.072$) raises $A$ to 5.03 m² and drops $T$ to
 0.9 s. The informative Annex D method for irregular spaces and unevenly
 distributed absorption is out of scope.
 
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/enclosed_space_absorption_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/enclosed_space_absorption.svg" alt="Two panels for a 60 cubic metre office with a bare versus acoustically-treated ceiling: the equivalent absorption area per octave band, much higher with the acoustic ceiling, and the reverberation time falling from about five seconds at low frequency for the bare room to under one second with the acoustic ceiling" width="96%"></picture>
+
+*What Formula 1 does band by band: the equivalent absorption area on the left
+and the reverberation time it implies through Formula 5 on the right, for the
+same room bare and treated. The Annex E case quoted above is the same
+arithmetic on a smaller room — $A$ from 2.26 to 5.03 m² and $T$ from 2.1 to
+0.9 s at 1 kHz — and the figure shows why the two move in opposite directions
+and not proportionally.*
+
 See the [Enclosed-Space Absorption guide](https://jmrplens.github.io/phonometry/buildings/rooms/enclosed-space-absorption/) for usage.
 
 ### Measurement uncertainty (ISO 12999-1)
@@ -32639,6 +32976,19 @@ transmission path and the double-wall radiation draw on the plate radiation
 efficiency and point mobilities of the
 [vibration theory](https://jmrplens.github.io/phonometry/reference/theory/vibration/). The prediction is clean-room from Bies,
 Hansen & Howard (2017), Hopkins (2007) and Cremer, Heckl & Petersson (2005).
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/panel_insulation_concept_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/panel_insulation_concept.svg" alt="Four panels: the single-panel mass law with its coincidence dip, the double wall with the mass-spring-mass resonance and cavity gain, the plate radiation efficiency rising to unity above the critical frequency, and a composite wall whose 1 % open slit caps R at the open-area limit" width="92%"></picture>
+
+*The four behaviours of the paragraph above, one per panel. Top left, the mass
+law rising 6 dB per octave with Sharp's coincidence dip cut into it at $f_c$.
+Top right, the double wall: no better than the combined mass below $f_0$, then
+the cavity term climbing until it saturates. Bottom left, the radiation
+efficiency that decides how much of the plate's vibration becomes sound. Bottom
+right, the ceiling a leak imposes: a 1 % open area holds the composite at
+$10\log_{10}(S/S_a) = 20$ dB however good the wall is, which is the panel worth
+showing a client.*
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/aperture_slit_geometry_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/aperture_slit_geometry.svg" alt="To-scale cross-section of a 2 mm slit through a 100 mm wall: the hatched wall drawn in section with the narrow horizontal air gap at mid-height, an incident-sound arrow pointing at the gap from the left, the 100 mm wall depth and 2 mm slit width dimensioned, and circular transmitted wavefronts sketched spreading from the slit exit on the right" width="80%"></picture>
 
 See the [Predicting Panel Sound Insulation](https://jmrplens.github.io/phonometry/buildings/design/panel-sound-insulation/) guide for
 usage.
@@ -32860,6 +33210,18 @@ for f, pxx in zip(freq_bins[in_band], psd[in_band]):
     print(f, pxx)
 ```
 
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/signal_response_fraction_3_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/signal_response_fraction_3.svg" alt="One-third-octave spectrum analysis of a six-tone signal with the raw PSD in the background" width="80%"></picture>
+
+*The two objects on one axis, for a six-tone signal at 20, 100, 500, 2000,
+4000 and 15 000 Hz. The grey trace is a Welch PSD ($f_s$ = 48 kHz,
+`nperseg = 8192`, so a fixed 5.86 Hz bin everywhere); the markers are the
+standardized third-octave levels of the same signal. The bin width never
+changes and the band width does: 4.60 Hz at the 20 Hz band, narrower than one
+bin, against 230.77 Hz at 1 kHz and 3657 Hz at 16 kHz. That is why the top
+bands each swallow hundreds of bins while the bottom ones sit inside a single
+one, and why the two answers cannot be converted into each other. (The PSD
+trace is offset vertically for legibility, so read its shape, not its level.)*
+
 This keeps the two concepts separate: phonometry gives standardized
 fractional-octave levels, while Welch gives narrowband FFT bins. With
 `fs=100000` and `nperseg=2**15`, the Welch bin spacing is about 3.05 Hz.
@@ -32962,6 +33324,10 @@ transform. Because the bilinear transform compresses frequencies near Nyquist,
 the default `high_accuracy` mode designs and runs the filter at an internally
 oversampled rate (≥ 144 kHz); see [Frequency Weighting](https://jmrplens.github.io/phonometry/signals/levels/weighting/).
 
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/weighting_responses_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/weighting_responses.svg" alt="A, C and Z frequency weighting curves of IEC 61672-1 with a zoom showing the positive region of the A curve (+1.27 dB at 2.5 kHz)" width="80%"></picture>
+
+*The three IEC 61672-1 weighting curves realized by the library, with the small positive region of the A curve magnified. The special B, D and AU curves are charted in [Special Weightings](https://jmrplens.github.io/phonometry/signals/levels/special-weightings/).*
+
 ## Time Integration
 
 Implemented as a first-order IIR exponential integrator:
@@ -32981,6 +33347,10 @@ start from the first input energy, or pass a scalar/array with the previous
 mean-square output state. See [Why phonometry](https://jmrplens.github.io/phonometry/start/why-phonometry/) for the
 IEC 61672-1 tone-burst verification of this implementation.
 
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/time_weighting_analysis_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/time_weighting_analysis.svg" alt="Fast, Slow and Impulse time weighting responses to a noise burst" width="80%"></picture>
+
+*The exponential integrator at the three standard time constants: Fast follows a burst, Slow smooths it and Impulse holds its peak.*
+
 ## G-weighting (ISO 7196)
 
 The G curve extends frequency weighting into the infrasound range. ISO 7196:1995 Table 1 (p. 2) defines it by four zeros at the origin and four complex-conjugate pole pairs, given as coordinates in Hz (multiplied by $2\pi$ to obtain rad/s):
@@ -32998,6 +33368,13 @@ $$
 
 The four zeros against eight poles shape the characteristic response: a rise of approximately **+12 dB/octave between 1 Hz and 20 Hz**, with roll-offs of approximately **24 dB/octave** below 1 Hz and above 20 Hz. Infrasound needs its own curve because near the hearing threshold the perceived loudness of very-low-frequency tones grows much more steeply with sound pressure level than at mid frequencies (a small dB increase above threshold produces a large loudness jump), so the A curve (anchored at 1 kHz) grossly misrepresents infrasonic annoyance.
 
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/g_weighting_response_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/g_weighting_response.svg" alt="G-weighting frequency response from 0.1 Hz to 1 kHz with the ISO 7196 Table 2 nominal values overlaid" width="80%"></picture>
+
+*The shape those four zeros and four pole pairs make, against the ISO 7196
+Table 2 nominal values: 0 dB at the 10 Hz anchor, the +12 dB/octave climb
+through the infrasound decade below it, and the two 24 dB/octave roll-offs
+that fence the curve off below 1 Hz and above 20 Hz.*
+
 Since G acts on 0.25 Hz – 315 Hz, far below the Nyquist frequency at audio rates, the frequency warping of the plain bilinear transform (applied without prewarping) is negligible there: about 0.014 % at 315 Hz for $f_s = 48$ kHz, under 0.01 dB on the response. The internal oversampling used for the A/C designs (whose action extends to 16 kHz) is therefore not applied.
 
 See the [Special Weightings guide](https://jmrplens.github.io/phonometry/signals/levels/special-weightings/) for usage.
@@ -33009,6 +33386,14 @@ See the [Special Weightings guide](https://jmrplens.github.io/phonometry/signals
 $$
 \mathrm{SEL} = L_{eq,T} + 10 \log_{10}\left(\frac{T}{T_0}\right), \qquad T_0 = 1\ \text{s}
 $$
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sel_concept_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sel_concept.svg" alt="A vehicle pass-by level history with its Leq over the whole event and the equal-energy one-second SEL block" width="80%"></picture>
+
+*What the formula does to an event: the pass-by is replaced by a one-second
+block of the same total energy, which is why SEL exceeds the event's $L_{eq}$
+whenever the event lasts longer than a second, and why two events of the same
+SEL are interchangeable in a dose even when one is loud and short and the
+other quiet and long.*
 
 **Sound exposure** $E$ (IEC 61252, 3.1) is the time integral of the squared A-weighted sound pressure, expressed in pascal-squared hours:
 
@@ -33060,6 +33445,10 @@ The **pressure-intensity index** $\delta_{pI} = L_p - L_I$ measures how reactive
 
 See the [Sound Intensity guide](https://jmrplens.github.io/phonometry/devices/emission/intensity/) for usage.
 
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/intensity_demo_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/intensity_demo.svg" alt="Third-octave pressure and intensity levels for a plane progressive wave versus a standing wave" width="92%"></picture>
+
+*The p-p estimator in the two limiting fields: the gap between $L_p$ and $L_I$ is the pressure-intensity index that flags reactive fields.*
+
 ## Measurement uncertainty (ISO/IEC Guide 98-3: GUM and Supplement 1)
 
 Domain budgets like ISO 12999-1 and ISO 9612 Annex C are instances of the
@@ -33095,6 +33484,17 @@ reproduced: the four-term additive model gives $u_c = 2.0$ and the Monte Carlo
 inputs; the output is nearly trapezoidal, not Gaussian, so the interval is
 narrower than $\pm 1.96\,u$), and the GUM Annex H.1 end-gauge example gives
 $k = t_{0.99}(\nu_{\mathrm{eff}} = 16) = 2.92$ and $U_{99} = 93$ nm.
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/uncertainty_budget_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/uncertainty_budget.svg" alt="Two panels for the A-weighted level example. Left: the GUM uncertainty budget, a horizontal bar chart of each input's contribution to the combined uncertainty with a dashed line at uc of 0.407 dB. Right: the Monte Carlo output histogram overlaid with the GUM Gaussian and the shaded 95 percent coverage interval; the title reads Y equals 74.00 dB, U equals 0.86 dB, k equals 2.11" width="96%"></picture>
+
+*The two routes on one problem — an A-weighted level, not the Supplement 1
+four-term example quoted above. Left is the law of propagation as a budget:
+one bar per input, so the term worth reducing is visible. Right is the
+Supplement 1 route: the Monte Carlo output distribution with the GUM Gaussian
+drawn over it and the 95 % coverage interval shaded. Here the two agree, which
+is what clause 8 calls validation; where the model is non-linear or the output
+visibly non-Gaussian the histogram departs from the curve and the interval is
+read off the fractiles instead.*
 
 See the [GUM Uncertainty guide](https://jmrplens.github.io/phonometry/signals/metrology/gum-uncertainty/) for usage.
 
@@ -33200,6 +33600,10 @@ reproduced (E.2.1: 7.4 m/s² for 2.5 h → $A(8) = 4.1$ m/s²; E.3 forestry,
 three tools → 3.6 m/s²), as are the ISO 5349-1 Table C.1 exposure-duration
 rows.
 
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/vibration_weighting_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/vibration_weighting.svg" alt="The whole-body vertical weighting Wk in decibels over 0.4 to 100 Hz: a plateau near -6 dB below 2 Hz, a small +0.5 dB peak near 6 Hz and a roll-off to about -21 dB at 100 Hz" width="88%"></picture>
+
+*The Wk whole-body weighting realized from the ISO 8041-1 cascade.*
+
 ### Multiple shocks (ISO 2631-5)
 
 Repeated shocks damage the lumbar spine through peak compression rather than
@@ -33225,6 +33629,15 @@ clause 5.2 tolerance; the Annex C worked example (five 40 m/s² shocks per day
 over 20 years) is reproduced: $D_{zd} = 55.97$ m/s², $R = 1.22$,
 $\Pi = 0.37$. The Annex A finite-element spinal model (distributed by ISO as
 separate software) is out of scope.
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/multiple_shock_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/multiple_shock.svg" alt="Left: the seat-to-spine transmissibility rising to about 1.6 near a 5 Hz resonance then rolling off to near zero by 80 Hz. Right: the Weibull probability of lumbar injury versus the stress variable R for male and female, with the 10, 50 and 90 percent risk levels and the Annex C male example at R = 1.22, about 37 percent" width="96%"></picture>
+
+*The two objects of the model. Left, the clause 5.2 seat-to-spine
+transmissibility: unity at DC, peaking at $|H| \approx 1.54$ near 5 Hz and
+rolling off above it, which is why $W_k$ had to be replaced for shocks. Right,
+the Table C.1 Weibull law $\Pi(R)$ with the Annex C worked example marked at
+$R = 1.22$, $\Pi = 0.37$ — the risk rises steeply over a narrow band of $R$, so
+a dose that doubles does not double the probability.*
 
 See the [Human Vibration guide](https://jmrplens.github.io/phonometry/vibration/human/human-vibration/) and the
 [Multiple-Shock Vibration guide](https://jmrplens.github.io/phonometry/vibration/human/multiple-shock-vibration/) for usage.
@@ -33254,6 +33667,25 @@ from Cremer, Heckl & Petersson (2005) and Hopkins (2007).
 
 See the [Predicting Panel Sound Insulation guide](https://jmrplens.github.io/phonometry/buildings/design/panel-sound-insulation/) for
 usage.
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/mechanical_mobility_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/mechanical_mobility.svg" alt="Normalized receptance, mobility and accelerance magnitudes of a single-degree-of-freedom resonator on a log-log frequency axis, all peaking at the resonance" width="82%"></picture>
+
+*Not one of the closed forms above: this is a **finite** one-degree-of-freedom
+resonator, receptance, mobility and accelerance being the same resonance seen
+through the three kinematic quantities. It is here as the contrast — the
+infinite-structure results are frequency-independent or smoothly falling,
+while anything finite resonates.*
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/mobility_result_lines_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/mobility_result_lines.svg" alt="Driving-point mobility magnitude of a single-degree-of-freedom resonator on log-log axes, climbing along the stiffness line below resonance, falling along the mass line above it, and peaking at one over the damping coefficient at the resonance" width="82%"></picture>
+
+*The same point read as a diagnosis: below resonance the magnitude climbs the
+**stiffness line** $\omega/k$, above it it falls along the **mass line**
+$1/(\omega m)$, and the peak height is set by the damping alone. A real
+structure has many such resonances, and the infinite-structure closed forms
+above are the average the measured mobility oscillates about, not the value it
+takes at a given frequency — which is why they are used with octave or
+third-octave inputs and are least trustworthy in the lowest bands of a small
+or lightly damped element.*
 
 ## References
 
@@ -34636,10 +35068,13 @@ Source: https://jmrplens.github.io/phonometry/signals/filters/
 Acoustic analysis rarely wants a raw FFT: standards, ratings and human hearing
 all work in **fractional octave bands**, frequency intervals whose width grows
 proportionally with frequency. phonometry implements them as banks of
-recursive filters whose **-3 dB points sit exactly on the ANSI S1.11 band
-edges**, so band levels are comparable whichever filter architecture computes
-them, and whose designs are verified against the class tolerances of
-**IEC 61260-1:2014**.
+recursive filters whose designs are verified against the class tolerances of
+**IEC 61260-1:2014**. The default Butterworth bank, and the Chebyshev II and
+Bessel alternatives, put their **-3 dB points exactly on the ANSI S1.11 band
+edges**, so their band levels are directly comparable; the two equiripple
+architectures (Chebyshev I, Elliptic) place their ripple edge there instead and
+consequently read a few tenths of a decibel high in every band, which is why a
+campaign should fix one architecture and keep it.
 
 The foundation page is [Filter Banks](https://jmrplens.github.io/phonometry/signals/filters/filter-banks/). It
 covers the band mathematics, how a signal is decomposed into 1/1, 1/3 or
@@ -34928,8 +35363,7 @@ confidence intervals), **correlation and time-delay estimation** and the
 **Hilbert envelope**, all stated with the Bendat & Piersol error analysis.
 And two transversal concerns complete the core. **Calibration** decides what
 the digital samples mean physically: results can be referenced to a measured
-calibrator tone or a known sensitivity (dB SPL), or stay in digital full
-scale (dBFS). **Measurement uncertainty** (the GUM and its Monte Carlo
+calibrator tone (dB SPL), or stay in digital full scale (dBFS). **Measurement uncertainty** (the GUM and its Monte Carlo
 supplement) qualifies any result computed from uncertain inputs, which is
 what makes a number defensible in a report.
 
@@ -35035,8 +35469,8 @@ and carrying its statistical quality.
 What the numbers mean and how much to trust them.
 
 - [Calibration and dBFS](https://jmrplens.github.io/phonometry/signals/metrology/calibration/): physical SPL
-  calibration from a calibrator tone (IEC 60942) or a known sensitivity, and
-  the digital dBFS mode.
+  calibration from a calibrator tone (IEC 60942), the stability check it applies
+  to that recording, and the digital dBFS mode.
 - [Measurement uncertainty (GUM and Monte Carlo)](https://jmrplens.github.io/phonometry/signals/metrology/gum-uncertainty/):
   the law of propagation of uncertainty and the Monte Carlo method of
   ISO/IEC Guide 98-3, with expanded uncertainty and coverage intervals.
@@ -35056,9 +35490,11 @@ A sound level meter does three things to a calibrated signal, in order: it
 **weights it in frequency** to mimic the ear's sensitivity, it **smooths it in
 time** with a standardised ballistic, and it **integrates it into a level**.
 The pages of this section implement that chain stage by stage for the
-displayed level: the A/C/Z curves and the Fast/Slow/Impulse ballistics
-follow **IEC 61672-1:2013** closely enough that the weightings are
-verified against the standard's own tolerance tables in CI.
+displayed level: the A/C/Z curves and the Fast and Slow ballistics of
+**IEC 61672-1:2013**, verified in CI against the standard's own tolerance
+tables (Table 3 for the weightings, Table 4 for the tone-burst responses), plus
+the legacy Impulse ballistics that IEC 61672-1 inherited from IEC 60651 and then
+dropped from its requirements, kept here for older national procedures.
 
 [Frequency Weighting (A, C, Z)](https://jmrplens.github.io/phonometry/signals/levels/weighting/) covers the
 first stage. The A-curve tracks hearing sensitivity at moderate levels and
@@ -35070,10 +35506,11 @@ conventional weightings are blind, the historical B and D curves serve legacy
 data, and AU rejects ultrasound from an audible-sound reading per IEC 61012.
 
 [Time Weighting](https://jmrplens.github.io/phonometry/signals/levels/time-weighting/) covers the second stage:
-the exponential Fast (125 ms), Slow (1 s) and Impulse ballistics that decide
-how quickly a displayed level follows the sound. phonometry implements the
-exact time constants, verified against the toneburst responses of the
-standard.
+the exponential Fast (125 ms) and Slow (1 s) ballistics that decide how quickly
+a displayed level follows the sound, and the legacy asymmetric Impulse
+ballistics (35 ms rise, 1.5 s decay) that came from IEC 60651 and is no longer
+required by IEC 61672-1. phonometry implements the exact time constants,
+verified against the tone-burst responses of the standard.
 
 [Integrated and Statistical Levels](https://jmrplens.github.io/phonometry/signals/levels/levels/) is the payoff:
 the equivalent continuous level Leq and its A-weighted LAeq, the percentile
@@ -35102,8 +35539,9 @@ noise phases, and the limit tables an activity is judged against.
 - [Special Weightings (G, B, D, AU)](https://jmrplens.github.io/phonometry/signals/levels/special-weightings/):
   the ISO 7196 infrasound G-weighting, the historical B and D curves and AU
   per IEC 61012.
-- [Time Weighting](https://jmrplens.github.io/phonometry/signals/levels/time-weighting/): Fast, Slow and
-  Impulse exponential ballistics.
+- [Time Weighting](https://jmrplens.github.io/phonometry/signals/levels/time-weighting/): the Fast and Slow
+  exponential ballistics of IEC 61672-1, and the legacy Impulse ballistics it
+  dropped.
 - [Integrated and Statistical Levels](https://jmrplens.github.io/phonometry/signals/levels/levels/): Leq and
   LAeq, percentile levels, LCpeak/SEL, noise dose and octave spectrograms.
 
@@ -37708,14 +38146,23 @@ laf_t = 10 * np.log10(np.maximum(envelope, 1e-12) / (2e-5) ** 2)
 # laf_t peaks near 80 dB during the event and settles near 55 dB between.
 ```
 
-You rarely write this chain yourself: every level function of the next step
-applies the frequency weighting internally, and the percentile levels rebuild
-this Fast envelope for you. The energy metrics ($L_{eq}$, SEL) integrate the
-squared weighted signal directly, with no ballistics, exactly as a meter
-does. The chain is shown here because it *is* the meter's display.
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anim_time_weighting_dark.gif"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anim_time_weighting.gif" alt="Animation: a tone burst driving the RC exponential detector, the capacitor charging and draining, while the Fast, Slow and Impulse meter needles follow their own ballistics" width="640" height="360" loading="lazy"></picture>
+
+[Watch the high-resolution video (WebM)](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anim_time_weighting.webm)
+
+The needle in the clip is that `time_weighting` call: a first-order low-pass
+charging and draining on the squared signal. The three needles differ in one
+number, the time constant, which is why Fast catches an event that Slow
+smooths away. You rarely write this chain yourself: every level function of
+the next step applies the frequency weighting internally, and the percentile
+levels rebuild this Fast envelope for you. The energy metrics ($L_{eq}$, SEL)
+integrate the squared weighted signal directly, with no ballistics at all —
+which is why they show no needle movement to follow. The chain is shown here
+because it *is* the meter's display.
 
 Deep guides: [Frequency Weighting (A, C, Z)](https://jmrplens.github.io/phonometry/signals/levels/weighting/)
-and [Time Weighting](https://jmrplens.github.io/phonometry/signals/levels/time-weighting/).
+and [Time Weighting](https://jmrplens.github.io/phonometry/signals/levels/time-weighting/), which takes this same clip
+apart against the IEC 61672-1 tone-burst table.
 
 ## 4. Integrate: the numbers a meter reports
 
@@ -40894,13 +41341,21 @@ plt.show()
 
 </details>
 
-That flexural wave is worth watching in motion: the
-[bending-wave transmission guide](https://jmrplens.github.io/phonometry/vibration/structural/junction-transmission/) embeds an
-animation of this solver launching a 4 kHz bending packet along a 10 mm
-steel plate into an L-junction, where the corner splits it into the
-reflected and transmitted waves the closed form prices at
-$\tau_{12}(0°) = 0.5$, plus the fast in-plane precursor the pinned-junction
-model deliberately leaves out.
+That flexural wave is worth watching in motion. The clip below is this same
+solver launching a 4 kHz bending packet along a 10 mm steel plate: on the
+control panel the plate runs straight and the packet simply leaves, and on
+the junction panel a perpendicular plate of the same thickness turns the
+corner into a scatterer. The packet splits there into the reflected and
+transmitted bending waves the closed form prices at $\tau_{12}(0°) = 0.5$,
+plus the fast in-plane precursor that races ahead down the receiving plate —
+the mode conversion the pinned-junction model deliberately leaves out, and
+the reason this page needs an elastic solver rather than a flexural one. The
+[bending-wave transmission guide](https://jmrplens.github.io/phonometry/vibration/structural/junction-transmission/) takes
+the same run apart against the EN 12354 vibration reduction index.
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anim_elastic_plate_junction_dark.gif"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anim_elastic_plate_junction.gif" alt="Animation: a 4 kHz bending-wave packet running along a 10 mm steel plate, passing straight through on the control panel and splitting at an L-junction into a reflected wave, a transmitted wave descending the perpendicular plate and a faster in-plane precursor" width="640" height="360" loading="lazy"></picture>
+
+[Watch the high-resolution video (WebM)](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anim_elastic_plate_junction.webm)
 
 ## 4. Fluid-solid coupling at normal incidence
 
@@ -41048,13 +41503,28 @@ dip within 0.1 % of the 295 kHz resonance. The same suite stress-tests the
 extreme contrast of an air-steel contact (impedance ratio ~$10^5$:1): stable
 over 10 000 steps with the reflected amplitude conserved to 0.5 %.
 
-At oblique incidence the plate physics gets richer, and the
-[panel sound insulation guide](https://jmrplens.github.io/phonometry/buildings/design/panel-sound-insulation/) embeds the
-animation: this solver driving the same 10 mm steel plate, lying in air,
-with a sustained 45° plane wave below and above its coincidence frequency,
-where the trace-matched bending wave re-radiates a growing beam and holds
-the transmitted level at the point where the mass law demands 12 dB more
-blocking.
+At oblique incidence the plate physics gets richer, and the clip below is
+this solver driving the same 10 mm steel plate, now lying in air, with a
+sustained 45° plane wave arriving on it. The two panels differ in **one
+number only** — the drive frequency, $f_c/2 = 603$ Hz on the left and
+$2 f_c = 2413$ Hz on the right, either side of the 1206 Hz coincidence
+frequency the library computes from the same $m''$ and $B'$ used above.
+Everything else, the plate, the angle, the mesh and the colour scale, is
+held fixed. Below $f_c$ the plate reflects almost everything and the
+transmitted level lands on the oblique mass law; above it the acoustic trace
+wavelength matches the free bending wavelength, the plate re-radiates a 45°
+beam that grows along the lit span, and the transmitted level holds at the
+low-frequency figure where the mass law demanded 12 dB more blocking. The
+air below the plate is drawn on both panels with the display gain measured
+off the settled field of the two runs together (×150, that is +44 dB) and
+printed on the canvas: read the *annotations* for levels, not the
+brightness. The
+[panel sound insulation guide](https://jmrplens.github.io/phonometry/buildings/design/panel-sound-insulation/) takes the
+same run apart against the plateau method and the mass law.
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anim_elastic_coincidence_dark.gif"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anim_elastic_coincidence.gif" alt="Animation: two elastic FDTD panels of the same 10 mm steel plate in air under a 45-degree plane wave, at 603 Hz where the plate blocks almost everything and at 2413 Hz where a transmitted beam grows below it" width="640" height="360" loading="lazy"></picture>
+
+[Watch the high-resolution video (WebM)](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anim_elastic_coincidence.webm)
 
 ## Quick answers
 
@@ -41186,6 +41656,27 @@ bit-identical outputs on the same platform. It is the engine behind the FDTD
 animations of this documentation, promoted to a public API with sources,
 pressure probes, rasterised obstacles, per-side boundary conditions and a
 frozen result object.
+
+Here is one of those animations, and it is a fair advertisement for what the
+rest of this page builds. Nothing in it is drawn: the colonnade is a boolean
+`obstacle_mask` of rasterised circles and the wavefront is a single one-way
+plane-wave packet with a Gaussian envelope one wavelength wide, launched at
+$x = 0.30$ m into a 4 m × 1 m rigid-walled hall whose two ends absorb through
+sponges hidden outside the frame. The carrier is 800 Hz, so the wavelength is
+42.9 cm and the 10 to 17 cm columns are roughly a quarter to two fifths of it
+— the regime in which a rigid cylinder both casts a readable shadow and
+re-radiates strongly, which is why the coda that fills the hall is structured
+rather than noise. That coda is deterministic multiple scattering: it is what
+a diffuse field looks like *before* any statistical assumption is made about
+it. The mesh is the worked example of the rule
+[section 4](#4-numerical-dispersion-and-accuracy) derives: the tightest gap in
+this layout is 6.6 cm between a column and a wall, so
+$\Delta x = \min(\text{smallest aperture}/4,\ \lambda/8)$ allows up to 1.6 cm,
+and the clip runs at 2.5 mm because a banner needs the definition.
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anim_fdtd_pillar_hall_dark.gif"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anim_fdtd_pillar_hall.gif" alt="Animation: an 800 Hz plane wavefront sweeping a 4 metre rigid-walled hall filled with a staggered colonnade of rigid columns, every column shedding a scattered wavelet until the interference of the wavelets fills the hall with structured energy that then drains through the absorbing ends" width="640" height="160" loading="lazy"></picture>
+
+[Watch the high-resolution video (WebM)](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anim_fdtd_pillar_hall.webm)
 
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_fdtd_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_fdtd.svg" alt="Pipeline from the domain definition (sound-speed and density maps with the grid spacing dx) and the geometry (obstacle mask and per-side boundary conditions), through the sources injected at grid cells, the staggered-grid leapfrog update of velocity and pressure, and the Courant stability condition, to the frozen FDTDResult with probe histories, field snapshots and a plot method" width="86%"></picture>
 
@@ -41793,6 +42284,32 @@ ground), the simulation is the fallback that still gives a quantitative
 answer; when a closed form exists, prefer it, and use the solver to verify
 the assumptions it rests on.
 
+Those cross-checks are not only arguments: fifteen of the animations in this
+documentation are output from these two solvers, and they are filed on the
+guides whose physics they settle rather than here. Room modes growing on and
+off resonance appear in [room acoustics](https://jmrplens.github.io/phonometry/buildings/rooms/room-acoustics/)
+and [reverberation prediction](https://jmrplens.github.io/phonometry/buildings/rooms/reverberation-prediction/),
+which also carries the hall of columns that turns one wavefront into a mixed
+field; barrier diffraction at two wavelengths in
+[outdoor propagation](https://jmrplens.github.io/phonometry/environment/propagation/outdoor-propagation/)
+and [ground effect and barriers](https://jmrplens.github.io/phonometry/environment/propagation/ground-barriers/);
+downwind and upwind refraction in
+[atmospheric refraction](https://jmrplens.github.io/phonometry/environment/propagation/atmospheric-refraction/);
+the ground-effect lobe pattern in outdoor propagation and in
+[airport noise](https://jmrplens.github.io/phonometry/aircraft/airport-noise/); the standing-wave and
+transmission tubes in [the impedance tube](https://jmrplens.github.io/phonometry/materials/absorbers/impedance-tube/);
+the QRD and metadiffuser panels in
+[diffusers](https://jmrplens.github.io/phonometry/materials/diffusers/diffusers/) and
+[metadiffusers](https://jmrplens.github.io/phonometry/materials/diffusers/metadiffusers/); the slit
+absorber in [metamaterial absorbers](https://jmrplens.github.io/phonometry/materials/absorbers/metamaterial-absorbers/);
+the expansion chamber in [silencers](https://jmrplens.github.io/phonometry/devices/noise-control/silencers/);
+the wall aperture in [panel sound insulation](https://jmrplens.github.io/phonometry/buildings/design/panel-sound-insulation/);
+and the SOFAR duct in [underwater propagation](https://jmrplens.github.io/phonometry/underwater/underwater-propagation/).
+The elastic solver adds two: the bending packet entering an L-junction, on
+[junction transmission](https://jmrplens.github.io/phonometry/vibration/structural/junction-transmission/),
+and the coincidence plate, on panel sound insulation. Both also appear on the
+elastic page below, where the solver that produced them is explained.
+
 ## Pages in this section
 
 - [2D FDTD wave simulation](https://jmrplens.github.io/phonometry/simulation/fdtd-simulation/): the
@@ -41976,17 +42493,37 @@ Source: https://jmrplens.github.io/phonometry/start/
 
 # Start
 
-The three pages that open the documentation, before the guides themselves.
+Four short pages, meant to be read once before anything else. Each answers one
+question, and they are in the order the questions arrive.
 
+**Can I install it and get a number out?**
 [Getting Started](https://jmrplens.github.io/phonometry/start/getting-started/) installs the library and
-walks a first measurement end to end, from a WAV file to a calibrated
-one-third-octave spectrum. [Why phonometry](https://jmrplens.github.io/phonometry/start/why-phonometry/)
-sets out what the library is for and how it is validated against the standards
-it implements. [About](https://jmrplens.github.io/phonometry/start/about/) states who maintains it, how
-to cite it and under what licence.
+runs a first one-third-octave analysis, on a synthetic signal and then on a WAV
+file, and states what a recording must satisfy before those numbers mean
+anything physical. It stops short of a calibrated measurement on purpose:
+[Calibration and dBFS](https://jmrplens.github.io/phonometry/signals/metrology/calibration/) is the next
+step, the one that turns band levels into pascals, and
+[Build a sound level meter](https://jmrplens.github.io/phonometry/signals/sound-level-meter/) runs the
+whole chain end to end.
 
+**Where is the thing I came for?**
 [All guides](https://jmrplens.github.io/phonometry/start/guides/) is the map: every guide in the library,
 grouped by the topic it belongs to, with a line on each.
+
+**Should I trust the number?**
+[Why phonometry](https://jmrplens.github.io/phonometry/start/why-phonometry/) sets out what the library
+is for and how it is validated against the standards it implements, with the
+tone-burst check worked through against the acceptance limits.
+
+**Who is answerable for it, and how do I cite it?**
+[About](https://jmrplens.github.io/phonometry/start/about/) states who maintains it, how to cite it and
+under what licence.
+
+The assumed starting point is Python 3.13 or newer with working NumPy and
+SciPy, and enough acoustics to know what a one-third-octave band and a sound
+pressure level are. Any symbol the guides use without introducing is in the
+[glossary](https://jmrplens.github.io/phonometry/reference/glossary/), with its unit, its defining clause
+and the guide that computes it.
 
 ---
 

@@ -133,11 +133,11 @@ If you are an AI assistant setting this up for a user: install from PyPI (no sys
 - [Sound Insulation by Intensity (ISO 15186)](https://jmrplens.github.io/phonometry/buildings/insulation/insulation-intensity/)
 - [Laboratory Flanking Transmission (ISO 10848)](https://jmrplens.github.io/phonometry/buildings/insulation/flanking-lab/)
 - [Field Insulation Measurement (ISO 16283)](https://jmrplens.github.io/phonometry/buildings/insulation/insulation-field/)
+- [Heavy and Soft Impact Sources (ISO 16283-2)](https://jmrplens.github.io/phonometry/buildings/insulation/heavy-impact-sources/)
 - [Sound Insulation Survey Method (ISO 10052)](https://jmrplens.github.io/phonometry/buildings/insulation/insulation-survey/)
 - [Insulation Ratings (ISO 717)](https://jmrplens.github.io/phonometry/buildings/insulation/insulation-ratings/)
 - [Façade Sound Insulation](https://jmrplens.github.io/phonometry/buildings/insulation/facade-insulation/)
 - [Spanish Building Code (CTE DB-HR)](https://jmrplens.github.io/phonometry/buildings/insulation/spanish-building-code/)
-- [Heavy and Soft Impact Sources (ISO 16283-2)](https://jmrplens.github.io/phonometry/buildings/insulation/heavy-impact-sources/)
 
 ### Insulation design
 

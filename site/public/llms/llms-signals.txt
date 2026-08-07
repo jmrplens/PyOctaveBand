@@ -28,8 +28,7 @@ confidence intervals), **correlation and time-delay estimation** and the
 **Hilbert envelope**, all stated with the Bendat & Piersol error analysis.
 And two transversal concerns complete the core. **Calibration** decides what
 the digital samples mean physically: results can be referenced to a measured
-calibrator tone or a known sensitivity (dB SPL), or stay in digital full
-scale (dBFS). **Measurement uncertainty** (the GUM and its Monte Carlo
+calibrator tone (dB SPL), or stay in digital full scale (dBFS). **Measurement uncertainty** (the GUM and its Monte Carlo
 supplement) qualifies any result computed from uncertain inputs, which is
 what makes a number defensible in a report.
 
@@ -135,8 +134,8 @@ and carrying its statistical quality.
 What the numbers mean and how much to trust them.
 
 - [Calibration and dBFS](https://jmrplens.github.io/phonometry/signals/metrology/calibration/): physical SPL
-  calibration from a calibrator tone (IEC 60942) or a known sensitivity, and
-  the digital dBFS mode.
+  calibration from a calibrator tone (IEC 60942), the stability check it applies
+  to that recording, and the digital dBFS mode.
 - [Measurement uncertainty (GUM and Monte Carlo)](https://jmrplens.github.io/phonometry/signals/metrology/gum-uncertainty/):
   the law of propagation of uncertainty and the Monte Carlo method of
   ISO/IEC Guide 98-3, with expanded uncertainty and coverage intervals.
@@ -229,14 +228,23 @@ laf_t = 10 * np.log10(np.maximum(envelope, 1e-12) / (2e-5) ** 2)
 # laf_t peaks near 80 dB during the event and settles near 55 dB between.
 ```
 
-You rarely write this chain yourself: every level function of the next step
-applies the frequency weighting internally, and the percentile levels rebuild
-this Fast envelope for you. The energy metrics ($L_{eq}$, SEL) integrate the
-squared weighted signal directly, with no ballistics, exactly as a meter
-does. The chain is shown here because it *is* the meter's display.
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anim_time_weighting_dark.gif"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anim_time_weighting.gif" alt="Animation: a tone burst driving the RC exponential detector, the capacitor charging and draining, while the Fast, Slow and Impulse meter needles follow their own ballistics" width="640" height="360" loading="lazy"></picture>
+
+[Watch the high-resolution video (WebM)](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anim_time_weighting.webm)
+
+The needle in the clip is that `time_weighting` call: a first-order low-pass
+charging and draining on the squared signal. The three needles differ in one
+number, the time constant, which is why Fast catches an event that Slow
+smooths away. You rarely write this chain yourself: every level function of
+the next step applies the frequency weighting internally, and the percentile
+levels rebuild this Fast envelope for you. The energy metrics ($L_{eq}$, SEL)
+integrate the squared weighted signal directly, with no ballistics at all —
+which is why they show no needle movement to follow. The chain is shown here
+because it *is* the meter's display.
 
 Deep guides: [Frequency Weighting (A, C, Z)](https://jmrplens.github.io/phonometry/signals/levels/weighting/)
-and [Time Weighting](https://jmrplens.github.io/phonometry/signals/levels/time-weighting/).
+and [Time Weighting](https://jmrplens.github.io/phonometry/signals/levels/time-weighting/), which takes this same clip
+apart against the IEC 61672-1 tone-burst table.
 
 ## 4. Integrate: the numbers a meter reports
 
