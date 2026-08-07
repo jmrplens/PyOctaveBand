@@ -266,21 +266,35 @@ $$
 
 con $d$ el diámetro del tubo, y el espaciado de micrófonos $s$ debe situarse entre
 $0{,}05\,c_0/f_{min}$ y $0{,}45\,c_0/f_{max}$. El rango informado son las bandas de
-tercio de octava de 250 a 1600 Hz.
+tercio de octava de 250 a 1600 Hz y, como la propia norma define un rango de
+frecuencia por los *bordes* de banda, esas frecuencias centrales significan de
+220 Hz a 1800 Hz en banda estrecha, que es de donde salen los dos argumentos de
+abajo.
 
 ```python
 from phonometry import materials
 
 # Frecuencia superior utilizable de un tubo de 100 mm y la ventana de espaciado válida.
 print(round(materials.spot_tube_upper_frequency(0.100, 343.0), 1))      # 1989.4 Hz
+# 220 Hz y 1800 Hz son los bordes exteriores de las bandas de 250 Hz y 1600 Hz.
 s_min, s_max = materials.spot_microphone_spacing_bounds(
     343.0, f_min=220.0, f_max=1800.0)
 print(round(s_min, 3), round(s_max, 3))    # 0.078 0.086  (metros)
 ```
 
-La ventana de frecuencia es el precio de la portabilidad: el diámetro de tubo
-que mantiene la boca sellable sobre pavimento real limita las bandas altas a
-1600 Hz, y la longitud del tubo limita las bajas a 250 Hz, una ventana más
+Tres números, tres límites distintos, y sí se reconcilian. Los 1989 Hz son el
+techo de onda plana del calibre de 100 mm; el rango informado se detiene una
+banda por debajo porque una banda solo es utilizable cuando *toda* su anchura
+cae dentro del rango válido, y la banda de 1600 Hz llega hasta 1800 Hz. El
+suelo de 250 Hz es un límite de **espaciado**, no de longitud: por debajo de
+$f_{min}$ los dos micrófonos están a menos del 5 % de una longitud de onda uno
+de otro y no queda diferencia de fase que resolver. La longitud del tubo
+responde a otra pregunta: tiene que ser suficiente para que se forme una onda
+plana, lo que la cláusula 5.4.2 consigue poniendo los micrófonos al menos a
+$3d$ de la fuente (una longitud mínima de 480 mm para el tubo de 100 mm). La
+ventana de espaciado resultante, de 78 mm a 86 mm aquí, es la razón de que la
+norma especifique $(81 \pm 4)$ mm para una única pareja de micrófonos. Es una
+ventana más
 estrecha que los 250–4000 Hz de la técnica de sustracción. Dentro de ella, la
 reducción es la cadena de ISO 10534-2 sin cambios: la función de
 transferencia entre los dos micrófonos separa las ondas incidente y

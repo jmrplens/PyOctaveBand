@@ -357,13 +357,22 @@ integral temporal de la presión ponderada A al cuadrado) y el **nivel
 normalizado a 8 h** equivalente:
 
 $$
-E = \int_0^T p_A^2(t)\ dt \quad [\text{Pa}^2\text{h}], \qquad
-L_{EX,8h} = 10\log_{10}\frac{E}{8\ \text{h} \cdot p_0^2}
+E = \int_0^T p_A^2(t)\ dt \quad [\text{Pa}^2\text{h}],\ t\ \text{en horas}
+\qquad
+L_{EX,8h} = 10\log_{10}\frac{E}{T_0\,p_0^2}, \quad T_0 = 8\ \text{h}
 $$
 
+La anotación de unidades solo se sostiene si $t$ está en horas: integrando en
+segundos salen Pa²s, que es la misma exposición expresada 3600 veces mayor, y
+35,6 dB de error si luego se mete en la fórmula de $L_{EX,8h}$. En la práctica
+se integra en segundos y se divide entre 3600, que es lo que hace
+`sound_exposure` internamente (media cuadrática × duración en horas).
+
 El ancla que conviene memorizar: **3,2 Pa²h ⇔ exactamente 90 dB durante 8 h**
-(la suite de CI lo verifica). La mitad de dosis son −3 dB; el doble de
-duración al mismo nivel son +3 dB.
+(la suite de CI lo verifica). Sale directamente de la fórmula: 90 dB son
+$p_{A,\mathrm{rms}} = 20\,\mu\mathrm{Pa} \times 10^{4{,}5} = 0{,}6325$ Pa, y
+$8\ \text{h} \times (0{,}6325\ \text{Pa})^2 = 3{,}2\ \text{Pa}^2\text{h}$. La
+mitad de dosis son −3 dB; el doble de duración al mismo nivel son +3 dB.
 
 ### Parámetros de pico / evento / dosis
 

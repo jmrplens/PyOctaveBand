@@ -77,15 +77,24 @@ Todos los conjuntos de criterios vigentes clasifican a los mamíferos marinos en
 grupos auditivos y asignan un filtro a cada uno. Los **códigos de grupo no son
 portables entre versiones de guía**, y la colisión es una trampa real:
 
-| Southall et al. (2019) / NMFS 2024 | NMFS 2018 | Géneros típicos |
-|---|---|---|
-| Cetáceos LF | LF | ballenas barbadas |
-| Cetáceos HF | **MF** | cachalote, zifios y la mayoría de delfínidos |
-| Cetáceos VHF | **HF** | marsopas, *Cephalorhynchus*, *Kogia* |
-| PCW / PW | PW | focas fócidas en agua |
-| OCW / OW | OW | otáridos, en agua |
-| SI, PCA, OCA | — | sirenios y carnívoros en aire |
+| Grupo animal | Southall 2019 | NMFS 2024 | NMFS 2018 | Audiograma |
+|---|---|---|---|---|
+| Ballenas barbadas | LF | LF | LF | no ($F_1$ sin publicar) |
+| Cachalote, zifios y la mayoría de delfínidos | HF | HF | **MF** | sí (`"HF"`) |
+| Marsopas, *Cephalorhynchus*, *Kogia* | VHF | VHF | **HF** | sí (`"VHF"`) |
+| Focas fócidas en agua | PCW | PW | PW | sí (`"PCW"`) |
+| Otáridos en agua | OCW | OW | OW | sí (`"OCW"`) |
+| Sirenios | SI | — | — | sí (`"SI"`) |
+| Focas fócidas en aire | PCA | PA | — | sí (`"PCA"`) |
+| Otáridos en aire | OCA | OA | — | sí (`"OCA"`) |
 
+Lee la columna en la que estás trabajando. `auditory_weighting` y
+`exposure_criteria` toman el código de la `guidance` que selecciones;
+`group_audiogram` toma siempre el código **Southall**, porque los audiogramas
+son los de Southall. Así que `group_audiogram(f, "PW")` lanza un error aunque
+`"PW"` sea un grupo de ponderación válido de NMFS 2024 (hay que pedir `"PCW"`),
+y `auditory_weighting(f, "PCW")` lanza un error con la guía por defecto por la
+razón simétrica.
 `hearing_groups(guidance)` lista los códigos que define cada versión, y pasar un
 código de la versión equivocada lanza un error en vez de devolver en silencio el
 filtro incorrecto.
@@ -257,11 +266,32 @@ golpe registrado al veredicto:
    la acumula sobre el número de golpes (el $+10\log_{10} N$ de la ISO 18406) y
    compara el resultado con los criterios, nivel de pico sin ponderar incluido.
 
+### Qué tiene que cubrir el registro
+
+La suma ponderada recorre las bandas que se le entregan, así que **el registro
+tiene que abarcar la banda de paso del grupo auditivo**. Las frecuencias de
+transición superiores $f_2$ de NMFS 2024 son 26,6 kHz (LF), 129 kHz (HF),
+186 kHz (VHF), 68,3 kHz (PW) y 43,8 kHz (OW), y los rangos auditivos
+generalizados llegan aún más lejos (LF hasta 36 kHz, VHF hasta 165 kHz). Como
+regla, la frecuencia de muestreo tiene que ser unas 2,5 veces el borde de banda
+más alto que importe, así que el registro de 48 kHz de abajo (con bandas
+resueltas hasta unos 20 kHz) sirve para LF, va justo para OW y trunca gravemente
+HF, VHF y PW. Una evaluación de marsopa necesita unos cuantos cientos de
+kilohercios.
+
+`weighted_exposure` no puede detectar un espectro truncado: pondera lo que se le
+da, así que un registro corto simplemente informa de un SEL acumulado menor y de
+ningún aviso. La mitad de pico sin ponderar de la métrica dual tiene que salir
+de ese mismo registro sin recorte y con margen de sobra, que es la razón por la
+que la ISO 18406 hace del margen dinámico un requisito de campaña: una captura
+saturada se lee como un pico conforme.
+
 ```python
 import numpy as np
 from phonometry import underwater
 
-# Un golpe registrado (aquí una ráfaga sintética de 200 Hz con caída).
+# Un golpe registrado (aquí una ráfaga sintética de 200 Hz con caída). 48 kHz
+# basta para el grupo LF usado abajo y para nada por encima de él.
 fs = 48_000
 t = np.arange(int(0.2 * fs)) / fs
 strike = 50.0 * np.exp(-t / 0.06) * np.sin(2 * np.pi * 200.0 * t)
@@ -309,7 +339,9 @@ hostigamiento) quedan fuera de alcance: solo se implementan los criterios de
 efecto auditivo. La biblioteca no elige por el usuario ni el grupo auditivo ni
 el periodo de acumulación, y no modela el movimiento del animal respecto a la
 fuente, de modo que el SEL acumulado que informa es el caso peor de receptor
-estático. La propagación de la fuente al receptor pertenece a
+estático. Tampoco comprueba que el espectro aportado abarque la banda de paso
+del grupo: un registro que se queda corto respecto de $f_2$ se pondera tal cual
+y subestima la exposición. La propagación de la fuente al receptor pertenece a
 [Propagación del sonido submarino](/phonometry/es/underwater/underwater-propagation/).
 
 ## Véase también

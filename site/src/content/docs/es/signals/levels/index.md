@@ -7,9 +7,12 @@ Un sonómetro hace tres cosas a una señal calibrada, en orden: la **pondera en
 frecuencia** para imitar la sensibilidad del oído, la **suaviza en el tiempo**
 con una balística normalizada y la **integra en un nivel**. Las páginas
 de esta sección implementan esa cadena etapa a etapa para el nivel
-mostrado: las curvas A/C/Z y las balísticas Fast/Slow/Impulse siguen
-**IEC 61672-1:2013** tan de cerca que las ponderaciones se verifican en CI
-contra las propias tablas de tolerancia de la norma.
+mostrado: las curvas A/C/Z y las balísticas Fast y Slow de
+**IEC 61672-1:2013**, verificadas en CI contra las propias tablas de tolerancia
+de la norma (la Tabla 3 para las ponderaciones, la Tabla 4 para las respuestas
+a ráfaga de tono), más la balística Impulse heredada que la IEC 61672-1 recibió
+de la IEC 60651 y después retiró de sus requisitos, conservada aquí para
+procedimientos nacionales antiguos.
 
 [Ponderación frecuencial (A, C, Z)](/phonometry/es/signals/levels/weighting/)
 cubre la primera etapa. La curva A sigue la sensibilidad del oído a niveles
@@ -23,10 +26,12 @@ los datos antiguos, y la AU rechaza el ultrasonido de una lectura de sonido
 audible según IEC 61012.
 
 [Ponderación temporal](/phonometry/es/signals/levels/time-weighting/) cubre la
-segunda etapa: las balísticas exponenciales Fast (125 ms), Slow (1 s) e
-Impulse que deciden con qué rapidez el nivel mostrado sigue al sonido.
-phonometry implementa las constantes de tiempo exactas, verificadas contra
-las respuestas a ráfagas de tono de la norma.
+segunda etapa: las balísticas exponenciales Fast (125 ms) y Slow (1 s) que
+deciden con qué rapidez el nivel mostrado sigue al sonido, y la balística
+Impulse asimétrica heredada (35 ms de subida, 1,5 s de caída) que vino de la
+IEC 60651 y que la IEC 61672-1 ya no exige. phonometry implementa las
+constantes de tiempo exactas, verificadas contra las respuestas a ráfagas de
+tono de la norma.
 
 [Niveles integrados y estadísticos](/phonometry/es/signals/levels/levels/) es la
 recompensa: el nivel continuo equivalente Leq y su versión ponderada A LAeq,
@@ -59,7 +64,8 @@ las que se juzga una actividad.
   la ponderación G para infrasonido de ISO 7196, las curvas históricas B y D
   y la AU según IEC 61012.
 - [Ponderación temporal](/phonometry/es/signals/levels/time-weighting/): las
-  balísticas exponenciales Fast, Slow e Impulse.
+  balísticas exponenciales Fast y Slow de IEC 61672-1, y la balística Impulse
+  heredada que retiró.
 - [Niveles integrados y estadísticos](/phonometry/es/signals/levels/levels/): Leq y
   LAeq, niveles percentiles, LCpeak/SEL, dosis de ruido y espectrogramas de
   octava.

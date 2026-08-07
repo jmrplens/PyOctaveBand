@@ -41,6 +41,38 @@ recurso que aún da una respuesta cuantitativa; cuando existe una forma
 cerrada, prefiérela, y usa el solucionador para verificar las hipótesis en
 las que se apoya.
 
+Esos contrastes no son solo argumentos: quince de las animaciones de esta
+documentación son salida de estos dos solucionadores, y están archivadas en las
+guías cuya física zanjan y no aquí. Los modos de sala creciendo en resonancia y
+fuera de ella aparecen en
+[acústica de salas](/phonometry/es/buildings/rooms/room-acoustics/) y en
+[predicción de la reverberación](/phonometry/es/buildings/rooms/reverberation-prediction/),
+que además lleva la sala de columnas que convierte un solo frente de onda en un
+campo mezclado; la difracción por barrera a dos longitudes de onda, en
+[propagación en exteriores](/phonometry/es/environment/propagation/outdoor-propagation/)
+y en [efecto del suelo y barreras](/phonometry/es/environment/propagation/ground-barriers/);
+la refracción a favor y en contra del viento, en
+[refracción atmosférica](/phonometry/es/environment/propagation/atmospheric-refraction/);
+el patrón de lóbulos del efecto del suelo, en propagación en exteriores y en
+[ruido de aeropuerto](/phonometry/es/aircraft/airport-noise/); los tubos de onda
+estacionaria y de transmisión, en
+[el tubo de impedancia](/phonometry/es/materials/absorbers/impedance-tube/); los
+paneles QRD y de metadifusor, en
+[difusores](/phonometry/es/materials/diffusers/diffusers/) y
+[metadifusores](/phonometry/es/materials/diffusers/metadiffusers/); el absorbente
+de rendija, en [absorbentes metamateriales](/phonometry/es/materials/absorbers/metamaterial-absorbers/);
+la cámara de expansión, en [silenciadores](/phonometry/es/devices/noise-control/silencers/);
+la abertura en la pared, en
+[aislamiento acústico de paneles](/phonometry/es/buildings/design/panel-sound-insulation/);
+y el canal SOFAR, en
+[propagación submarina](/phonometry/es/underwater/underwater-propagation/). El
+solucionador elástico aporta dos más: el paquete de flexión que entra en una
+unión en L, en
+[transmisión en uniones](/phonometry/es/vibration/structural/junction-transmission/),
+y la placa en coincidencia, en aislamiento acústico de paneles. Las dos aparecen
+también en la página elástica de más abajo, donde se explica el solucionador que
+las produjo.
+
 ## Páginas de esta sección
 
 - [Simulación de ondas FDTD 2D](/phonometry/es/simulation/fdtd-simulation/): el

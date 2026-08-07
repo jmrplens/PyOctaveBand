@@ -304,7 +304,25 @@ print(f"sonoridad de largo plazo superada el 5% del tiempo: {res.percentiles[5.0
 res.plot()   # sonoridad de corto plazo S'(t) y de largo plazo S''(t) frente al tiempo
 ```
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/moore_glasberg_time_loudness_es.svg" alt="Trazas de sonoridad de corto plazo y de largo plazo de Moore-Glasberg para un pulso de tono, mostrando el ataque rápido de la sonoridad de corto plazo y la relajación más lenta de la de largo plazo" width="80%" />
+La sonoridad de corto plazo sube en unas pocas decenas de milisegundos y cae
+despacio, imitando la sensibilidad rápida del oído al ataque y su recuperación
+más lenta; la de largo plazo vuelve a integrar esa traza con una constante de
+tiempo mucho mayor, así que apenas reacciona a una sílaba suelta y sigue en
+cambio el nivel global de un suceso. El máximo de esa traza lenta,
+$N_\text{max}$, es el predictor que la norma da para la sonoridad de un
+sonido breve, y su validez se acaba hacia los 5 s porque más allá el oyente
+deja de juzgar el sonido como un único suceso. Por eso mismo los percentiles
+van a su lado: para un sonido que fluctúa sin una estructura clara de sucesos,
+un percentil de la sonoridad de largo plazo (típicamente el valor al 5 %) es el
+estadístico estable, donde $N_\text{max}$ lo fijaría el único peor instante.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/moore_glasberg_time_loudness_es.svg" alt="Trazas de sonoridad de corto plazo y de largo plazo de Moore-Glasberg para un pulso de 200 ms a 1 kHz y 60 dB SPL dentro de un registro de 0,8 s: la traza de corto plazo sube hasta un máximo de 4,8 sone dentro de la ventana sombreada del pulso y se relaja deprisa, mientras la de largo plazo integra hasta 3,6 sone y decae lentamente tras el final del pulso" width="80%" />
+
+*Un pulso de 200 ms a 1 kHz y 60 dB SPL: la sonoridad de corto plazo alcanza
+4,8 sone en unas pocas decenas de milisegundos y se relaja deprisa, mientras la
+de largo plazo integra hasta 3,6 sone y decae lentamente tras el final del
+pulso; el par de constantes de tiempo que definen las cláusulas 7.8/7.9 de
+ISO 532-3.*
 
 <details>
 <summary>Mostrar el código de esta figura</summary>
@@ -314,22 +332,19 @@ import matplotlib.pyplot as plt
 import numpy as np
 from phonometry import psychoacoustics
 
-fs = 32000
-t = np.arange(int(1.3 * fs)) / fs
-x = np.sqrt(2) * 2e-5 * 10 ** (40 / 20) * np.sin(2 * np.pi * 1000 * t)
-res = psychoacoustics.loudness_moore_glasberg_time(x, fs, field="free")
+# La figura es un pulso, no un tono estacionario: 1 kHz a 60 dB SPL, abierto
+# entre los 200 y los 400 ms de un registro de 0,8 s.
+fs = 48000
+t = np.arange(int(0.8 * fs)) / fs
+sig = np.zeros_like(t)
+on = (t >= 0.2) & (t < 0.4)
+sig[on] = np.sqrt(2) * 2e-5 * 10 ** (60 / 20) * np.sin(2 * np.pi * 1000 * t[on])
+burst = psychoacoustics.loudness_moore_glasberg_time(sig, fs)
+print(round(float(burst.short_term_loudness.max()), 1),
+      round(float(burst.long_term_loudness.max()), 1))   # 4.8  3.6
 
 # El resultado lleva ambas trazas sobre un eje temporal de 1 ms:
-res.plot(language="es")
-plt.show()
-
-# O dibújalas directamente para ver la STL rápida frente a la LTL lenta:
-fig, ax = plt.subplots()
-ax.plot(res.time, res.short_term_loudness, label="Corto plazo S'(t)")
-ax.plot(res.time, res.long_term_loudness, label="Largo plazo S''(t)")
-ax.set_xlabel("Tiempo [s]")
-ax.set_ylabel("Sonoridad [sone]")
-ax.legend()
+burst.plot(language="es")
 plt.show()
 ```
 
@@ -375,7 +390,12 @@ print(res.specific_loudness.shape)          # (53,) sonoridad específica media 
 res.plot()   # sonoridad específica media N'(z) + N(l) dependiente del tiempo a 187.5 Hz
 ```
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sottek_specific_loudness_es.svg" alt="Sonoridad específica media N'(z) del modelo de Sottek sobre las 53 bandas Bark_HMS para un tono de 1 kHz, con máximo en la banda crítica del tono" width="80%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sottek_specific_loudness_es.svg" alt="Sonoridad específica media N'(z) del modelo de Sottek sobre las 53 bandas Bark_HMS para un tono de 1 kHz a 60 dB SPL que totaliza 2,8 sone_HMS, con máximo en la banda crítica del tono cerca de 9 Bark_HMS y caída a ambos lados" width="80%" />
+
+*El tono de 1 kHz a 60 dB SPL, N = 2,8 sone_HMS: un tono más sonoro que el
+ancla de 40 dB del fragmento de arriba, que da 0,98 sone_HMS. La sonoridad es
+el área bajo $N'(z)$, así que un sonido de banda ancha que reparta un patrón
+bajo sobre muchas bandas puede pesar más que este pico único.*
 
 <details>
 <summary>Mostrar el código de esta figura</summary>
@@ -385,10 +405,12 @@ import matplotlib.pyplot as plt
 import numpy as np
 from phonometry import psychoacoustics
 
+# La figura es el tono de 60 dB, no el ancla de 40 dB del fragmento de arriba.
 fs = 48000
 t = np.arange(int(1.2 * fs)) / fs
-x = np.sqrt(2) * 2e-5 * 10 ** (40 / 20) * np.sin(2 * np.pi * 1000 * t)
+x = np.sqrt(2) * 2e-5 * 10 ** (60 / 20) * np.sin(2 * np.pi * 1000 * t)
 res = psychoacoustics.loudness_ecma(x, fs, field="free")
+print(f"N = {res.loudness:.1f} sone_HMS")   # 2.8 sone_HMS
 
 # El resultado lleva la sonoridad específica media sobre las 53 bandas Bark_HMS:
 res.plot(language="es")

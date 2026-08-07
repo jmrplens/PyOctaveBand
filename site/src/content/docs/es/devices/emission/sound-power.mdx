@@ -129,7 +129,11 @@ primera coincidencia nombra la norma.
    (grado 1); un primer reconocimiento de una nave ruidosa tolera el grado de
    inspección (grado 3). El grado 1 solo existe en una sala de laboratorio
    cualificada (ISO 3741, ISO 3745) o mediante los métodos de intensidad de
-   precisión (ISO 9614-1 en puntos discretos, ISO 9614-3 por barrido).
+   precisión (ISO 9614-1 en puntos discretos, ISO 9614-3 por barrido), de los
+   cuales phonometry implementa solo la forma de barrido: la suma de potencia
+   por puntos discretos de la propia ISO 9614-1 no se ofrece, aunque sí sus
+   indicadores de campo (ver
+   [Intensidad acústica](/phonometry/es/devices/emission/intensity/)).
 2. **¿Puede la fuente viajar al laboratorio?** ISO 3741 quiere la fuente
    pequeña frente a la cámara (volumen no mayor de aproximadamente el 2 % del
    volumen de la cámara) y su ruido estacionario; ISO 3745 la quiere dentro de
@@ -270,6 +274,9 @@ el método de campo difuso en
 [Potencia acústica en cámara reverberante](/phonometry/es/devices/emission/sound-power-reverberation/)
 y los dos métodos de barrido en
 [Potencia acústica por barrido de intensidad](/phonometry/es/devices/emission/sound-power-intensity/).
+La suma de potencia por puntos discretos de la propia ISO 9614-1 no está
+implementada en absoluto; solo lo están sus indicadores de campo, en
+[Intensidad acústica](/phonometry/es/devices/emission/intensity/).
 La estadística de lote de ISO 4871 más allá del caso de máquina única
 $K = 1{,}645\,\sigma_R$ (Anexo A.2.2) se enuncia, no se deriva.
 

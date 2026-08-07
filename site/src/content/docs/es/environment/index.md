@@ -4,12 +4,17 @@ description: "El sonido en exteriores y las fuentes que lo dominan: el modelo de
 ---
 
 El ruido ambiental es un problema fuente-camino-receptor estirado a lo largo
-de cientos de metros de aire libre. Esta sección cubre sus dos extremos. Las
-páginas de **sonido en exteriores** se ocupan del camino y de la evaluación:
-ISO 9613 predice, banda a banda, cuánto nivel sobrevive a la divergencia, la
-absorción del aire, el suelo y cualquier barrera de camino al receptor, y
-NT ACOU 112 cuantifica cuándo el carácter impulsivo hace el sonido recibido
-más molesto de lo que sugiere su LAeq.
+de cientos de metros de aire libre. Esta sección cubre los tres. Las páginas
+de **propagación** se ocupan del camino: ISO 9613 predice, banda a banda,
+cuánto nivel sobrevive a la divergencia, la absorción del aire, el suelo y
+cualquier barrera de camino al receptor, y los modelos ondulatorios de suelo y
+de refracción dicen cuándo ese método de ingeniería deja de bastar.
+
+Las páginas de **evaluación** se ocupan de lo que pasa una vez ha llegado el
+sonido: el nivel de evaluación de ISO 1996 y los indicadores día-tarde-noche,
+su aplicación española en el RD 1367/2007, y el ajuste de NT ACOU 112 que
+cuantifica cuándo el carácter impulsivo hace un sonido recibido más molesto de
+lo que sugiere su LAeq.
 
 Las páginas de **fuentes** se ocupan del otro extremo: lo que emite, descrito
 como lo quiere un modelo ambiental. CNOSSOS-EU da al tráfico viario y al
@@ -18,9 +23,15 @@ valora un aerogenerador por su potencia acústica aparente y su audibilidad
 tonal. Lo que los une es el patrón: un descriptor de fuente cuidadosamente
 normalizado que el modelo de camino de arriba atenúa después.
 
-Esta sección se apoya en el núcleo de la biblioteca más que ninguna otra: los
-niveles de valoración y el Lden en que termina la evaluación ambiental viven
-en [Niveles integrados y estadísticos](/phonometry/es/signals/levels/levels/), y la
+Esta sección se apoya en el núcleo de la biblioteca, pero solo hasta el nivel
+de periodo.
+[Niveles integrados y estadísticos](/phonometry/es/signals/levels/levels/)
+aporta el LAeq, los percentiles y los niveles de suceso de cada periodo de
+referencia; lo que convierte esos niveles de periodo en Lden, Ldn y el nivel de
+evaluación, con la corrección por tonalidad, la corrección por ruido residual y
+el presupuesto de incertidumbre encima, es
+[Niveles ambientales (ISO 1996-1/-2)](/phonometry/es/environment/assessment/environmental-levels/),
+en esta misma sección. La
 absorción atmosférica que consume todo modelo de propagación se comparte con
 las páginas de salas y materiales. Empieza por
 [Propagación del sonido en exteriores](/phonometry/es/environment/propagation/outdoor-propagation/):

@@ -1,6 +1,6 @@
 ---
 title: "Bibliografía"
-description: "Los libros y artículos que sustentan las guías, agrupados por dominio: cada entrada con un DOI verificado o un enlace oficial del editor y una nota sobre qué sustenta."
+description: "Una selección curada de los libros y artículos que sustentan las guías, agrupados por dominio: cada entrada con un DOI verificado o un enlace oficial del editor y una nota sobre qué sustenta."
 ---
 
 Cada guía de este sitio se cierra con dos secciones de citas: una sección
@@ -8,11 +8,14 @@ Cada guía de este sitio se cierra con dos secciones de citas: una sección
 página (estilo APA, un punto por fuente, cada uno con un DOI o un enlace
 oficial del editor, y media frase sobre qué sustenta la entrada), seguida de
 una sección **Normas** que nombra los documentos normativos que la página
-implementa, apartado por apartado. Esta página reúne las entradas de
-Referencias de todas las guías en un solo lugar, agrupadas por dominio: una
-lista de lectura curada y la fuente única de verdad para la comprobación de
-enlaces. Cada entrada lista las guías que la citan; la lista crece a medida
-que las guías incorporan sus secciones de Referencias.
+implementa, apartado por apartado. Esta página reúne las obras en las que más
+se apoyan las guías, agrupadas por dominio, y cada entrada lista las páginas de
+guía que la citan. Es una **selección curada, no la lista completa de citas**:
+en el momento de escribir esto, dos docenas de obras con DOI citadas en el
+frontmatter de las propias guías no aparecen aquí, entre ellas Welch (1967),
+Harris (1978), Knapp y Carter (1976), Allen y Berkley (1979) y Maa (1998). La
+sección de Referencias de cada guía, generada a partir de su frontmatter, es la
+autoridad para esa página.
 
 ## Acústica general
 

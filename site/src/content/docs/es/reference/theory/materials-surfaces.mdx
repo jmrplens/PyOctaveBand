@@ -257,6 +257,16 @@ r = \frac{H_{12} - H_I}{H_R - H_{12}}\ e^{2 j k_0 x_1}, \qquad
 \alpha = 1 - |r|^2, \qquad \frac{Z}{\rho c_0} = \frac{1 + r}{1 - r},
 $$
 
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_impedance_tube_es.svg" alt="Tubo de impedancia de dos micrófonos de ISO 10534-2: un altavoz que radia una onda plana por el tubo, dos micrófonos enrasados en la pared con separación s y a distancia x1 de la cara de la probeta, la probeta contra un fondo rígido y las ondas incidente y reflejada" width="92%" />
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/impedance_tube_result_es.svg" alt="Resultado del tubo de dos micrófonos de ISO 10534-2 para un absorbente poroso de 50 mm: el coeficiente de absorción a incidencia normal sube desde unos 0,2 a 200 Hz hasta 0,97 por encima de 1 kHz, con el módulo del factor de reflexión cayendo como su imagen especular" width="80%" />
+
+*Lo que devuelve la fórmula: $\alpha$ y $|r|$ de un absorbente poroso de 50 mm
+en la banda útil de un tubo de 100 mm. Las dos curvas son la misma información,
+$\alpha = 1 - |r|^2$, así que la figura es en realidad una sola medida dibujada
+dos veces, y el ascenso con la frecuencia es el espesor de la capa creciendo
+frente a la longitud de onda.*
+
 con la cota inferior de atenuación del número de onda complejo
 $k_0'' = 1{,}94 \times 10^{-2} \sqrt{f}/(c_0 d)$ (Ec. A.18). ISO 10534-1
 (método de la razón de onda estacionaria) es el clásico en forma cerrada:
@@ -286,5 +296,15 @@ son identidades físicas: la matriz analítica de una capa de aire
 rígido),
 recorridos de ida y vuelta sintéticos que recuperan una $r$ conocida y la
 recuperación con dos cargas de una muestra recíproca asimétrica.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_astm_tube_es.svg" alt="Tubo de pérdida por transmisión de cuatro micrófonos de ASTM E2611: una fuente sonora, dos micrófonos aguas arriba y dos aguas abajo de la probeta con separaciones s1 y s2 y desplazamientos l1 y l2, una terminación ajustable para el método de dos cargas, las ondas viajeras A y B aguas arriba y C y D aguas abajo, y las relaciones de la matriz de transferencia y de la pérdida por transmisión" width="92%" />
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/transfer_matrix_tl_es.svg" alt="Magnitudes de la matriz de transferencia de ASTM E2611 para una capa porosa de 50 mm: la pérdida por transmisión a incidencia normal sube desde unos 6,6 dB a 200 Hz hasta más de 9 dB a 1,6 kHz en el eje izquierdo, y el coeficiente de absorción con fondo rígido sube de 0,19 a unos 0,97 en el eje derecho" width="80%" />
+
+*Los mismos términos del cuadripolo respondiendo a dos preguntas distintas:
+cuánto sonido deja pasar la capa exenta (la pérdida por transmisión de arriba) y
+cuánto absorbe esa misma capa una vez colocada contra un fondo rígido. Un
+material puede ser un buen absorbente y una mala barrera a la vez, y esta pareja
+lo deja claro.*
 
 Consulta la [guía del tubo de impedancia](/phonometry/es/materials/absorbers/impedance-tube/) para su uso.

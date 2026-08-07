@@ -256,14 +256,28 @@ from phonometry import junction_transmission, wave_vibration_reduction_index
 # 100 mm, placa 2 en barrido de 50 mm a 400 mm.
 h1, cl, rho = 0.1, 3200.0, 2400.0
 ratios = np.linspace(0.5, 4.0, 36)
-kij_corner = []
+curves = {"X esquina": [], "X recta": [], "unión en T (1) esquina": [],
+          "L esquina": []}
 for ratio in ratios:
     h2 = h1 * float(ratio)
-    res = junction_transmission("X", h1, cl, rho * h1, h2, cl, rho * h2)
-    kij_corner.append(res.corner_reduction_index)
+    res_x = junction_transmission("X", h1, cl, rho * h1, h2, cl, rho * h2)
+    curves["X esquina"].append(res_x.corner_reduction_index)
+    # En el resultado solo viene precalculado el índice de esquina; el camino
+    # recto es la media angular tau13 convertida de la misma forma.
+    curves["X recta"].append(float(wave_vibration_reduction_index(
+        res_x.straight_average, res_x.critical_frequency2)))
+    res_t = junction_transmission("T1", h1, cl, rho * h1, h2, cl, rho * h2)
+    curves["unión en T (1) esquina"].append(res_t.corner_reduction_index)
+    res_l = junction_transmission("L", h1, cl, rho * h1, h2, cl, rho * h2)
+    curves["L esquina"].append(res_l.corner_reduction_index)
 
 fig, ax = plt.subplots()
-ax.plot(ratios, kij_corner, label="X esquina")
+for label, values in curves.items():
+    ax.plot(ratios, values, "--" if label == "X recta" else "-", label=label)
+# La unión en X de placas idénticas: Kij = 10 lg 12 + 5 lg(fc2/1000).
+res_eq = junction_transmission("X", h1, cl, rho * h1, h1, cl, rho * h1)
+ax.scatter([1.0], [res_eq.corner_reduction_index], zorder=6,
+           label="placas idénticas (tau = 1/12)")
 ax.set_xlabel("Relación de espesores h2/h1")
 ax.set_ylabel("Índice de reducción de vibraciones Kij [dB]")
 ax.set_title("Kij de unión por el enfoque ondulatorio (Hopkins Ec. 5.116)")
@@ -276,8 +290,9 @@ plt.show()
 ## 5. Ejemplo resuelto: llevar Kij a la EN 12354
 
 El número que predice esta página es exactamente el que consume el modelo de
-flancos de EN 12354-1. Toma la unión en X de hormigón de 100 mm / 200 mm de
-la figura inicial: su camino de esquina da $K_{12} = 9{,}8\ \text{dB}$.
+flancos de EN 12354-1. Toma la unión en X de hormigón de 100 mm / 200 mm de la
+figura de $\tau(\theta)$ del apartado 2: su camino de esquina da
+$K_{12} = 9{,}8\ \text{dB}$.
 Entregarlo a
 `flanking_element` en lugar de un valor tabulado del Anexo E valora los tres
 caminos de flancos de la unión y su efecto sobre el índice aparente:
@@ -285,7 +300,7 @@ caminos de flancos de la unión y su efecto sobre el índice aparente:
 ```python
 from phonometry import building, junction_transmission
 
-# La unión en X de hormigón de 100 mm / 200 mm de la figura inicial:
+# La unión en X de hormigón de 100 mm / 200 mm de la figura de tau(theta):
 res = junction_transmission("X", 0.1, 3200.0, 240.0, 0.2, 3200.0, 480.0)
 k12 = res.corner_reduction_index                     # 9.8 dB (camino de esquina)
 
@@ -468,9 +483,15 @@ midiendo ambas energías en cada caso. Eso da cuatro ecuaciones para $\eta_1$,
 $\eta_2$, $\eta_{12}$ y $\eta_{21}$ sin ninguna hipótesis previa, que
 `power_injection_matrix` resuelve banda a banda. La reciprocidad pasa entonces a
 ser una *comprobación* de la medida en lugar de un dato de entrada:
-`modal_density_ratio` compara el $\eta_{21}/\eta_{12}$ medido con el $n_1/n_2$
-calculado a partir de la geometría, y una discrepancia grande significa que las
-fronteras de los subsistemas se trazaron en el sitio equivocado.
+`PowerInjectionResult.modal_density_ratio` es una propiedad, no una función, y
+devuelve únicamente el $n_1/n_2$ que *implican* los factores de pérdidas por
+acoplamiento medidos, $\eta_{21}/\eta_{12}$. Convertirlo en comprobación es
+tarea del lector: compáralo con la relación construida a partir de la geometría
+con `flat_plate_modal_density` y sus hermanas, y una discrepancia grande
+significa que las fronteras de los subsistemas se trazaron en el sitio
+equivocado. `coupling_strength` es el otro diagnóstico del mismo resultado, y
+dice si la hipótesis de acoplamiento débil sobre la que se apoya la inversión
+se sostiene siquiera.
 
 ## Véase también
 

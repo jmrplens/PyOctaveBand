@@ -3,12 +3,16 @@ title: "Ruido de aeronaves"
 description: "Ruido de aeronaves con métricas fijadas internacionalmente: la cadena de certificación EPNL del Anexo 16 de la ICAO, la maquinaria de contornos de aeropuerto de ECAC Doc 29, el método del hemisferio para rotorcraft de ECAC Doc 32 y la base de datos ANP de EASA que los alimenta."
 ---
 
-Las aeronaves son fuentes de ruido lo bastante importantes como para tener
-métricas propias negociadas internacionalmente, cada una fijada hasta el
-último decimal por un marco de certificación. Las cuatro páginas de esta sección
-implementan esos marcos, y comparten una misma anatomía: un **descriptor de fuente** rigurosamente
-normalizado, más **ajustes de propagación** normalizados que colocan la
-fuente en un receptor.
+El ruido de aeronaves se calcula con métodos negociados internacionalmente de
+dos clases. La **certificación** fija un único número por tipo de aeronave
+hasta el último decimal, en los puntos de referencia que una norma coloca
+alrededor de la pista. Los **métodos de contornos** toman esa flota
+certificada y predicen lo que un aeropuerto hace al terreno que lo rodea. Las
+cuatro páginas de esta sección cubren ambas clases, y comparten una misma
+anatomía: un **descriptor de fuente** rigurosamente normalizado (una historia
+temporal espectral, una tabla nivel-potencia-distancia o un hemisferio de
+ruido), más **ajustes de propagación** normalizados que colocan la fuente en
+un receptor.
 
 [Ruido de aeronaves: nivel efectivo de ruido percibido](/phonometry/es/aircraft/aircraft-noise/)
 cubre la certificación de ala fija. El **EPNL** del Anexo 16 de la ICAO
@@ -49,6 +53,27 @@ acústica aparente de IEC 61400-11 y su cadena de audibilidad tonal responden a
 la misma pregunta para una fuente que no es una aeronave. Ese ensayo de
 tonalidad es a su vez primo de los métodos de
 [Psicoacústica](/phonometry/es/perception/psychoacoustics/).
+
+Empieza por la pregunta. Para contrastar un avión con un límite de
+certificación, o para entender de dónde salen los números publicados de un
+tipo, empieza por la página del EPNL. Para predecir lo que hace un movimiento
+en una dirección concreta de la calle, usa la página de Doc 29, con la página
+de ANP aportando los datos de la aeronave. Para helicópteros, la página del
+hemisferio sustituye a las dos. Lee las páginas de ala fija en ese orden: la
+del EPNL define la métrica certificada, la de Doc 29 convierte aviones
+certificados en contornos sobre el terreno a partir de tablas escritas a mano,
+y la de ANP sustituye esas tablas escritas a mano por los datos de flota
+publicados. La página de rotorcraft se sostiene sola (otra norma y otro modelo
+de fuente) y puede leerse la primera si vienes por los helicópteros.
+
+Las tres métricas no son intercambiables. El EPNL es una métrica de
+*certificación* de un avión en un punto prescrito; el SEL y el LASmax son
+métricas de evaluación de *evento único* en un receptor cualquiera; ninguna es
+el índice de largo plazo con el que finalmente se juzga un estudio de usos del
+suelo. Y el límite: esta sección no calcula índices acumulados de múltiples
+eventos, no sintetiza tablas NPD a partir de datos de motor, no modela
+operaciones de rotorcraft en estacionario, ralentí o rodaje, y no toca el
+estampido sónico.
 
 ## Páginas de esta sección
 

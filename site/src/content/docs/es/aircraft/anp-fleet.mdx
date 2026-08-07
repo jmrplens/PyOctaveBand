@@ -197,8 +197,21 @@ flyover = aircraft.event_level([3000.0, 500.0, 0.0], "D")
 print(round(float(flyover.level), 1))     # SEL en dB en ese receptor
 ```
 
-El observador es `(x, y, z)` en metros en el sistema de la pista: sobre la ruta,
-a través de ella y sobre el suelo. Los argumentos opcionales `temperature` y
+El observador es `(x, y, z)` en metros en el **sistema de la pista**, y el
+origen de ese sistema no es el límite del aeropuerto: $x$ corre a lo largo del
+eje de pista con $x = 0$ en el inicio de carrera para una salida y en el umbral
+de aterrizaje para una llegada, así que los perfiles de llegada llevan $x$
+negativa en aproximación final. Los datos que se distribuyen lo dicen sin
+rodeos: `db.profile("747100", "D", 1).path[0]` empieza en $x = 0$ (suelta de
+frenos) y termina 39,5 km más allá, mientras que
+`db.profile("707", "A", 1).path[0]` empieza en $x = -34,9$ km y acaba 1,5 km
+pasado el umbral, de modo que los dos sistemas están a casi 35 km uno del otro.
+$y$ es el desplazamiento lateral respecto al eje de pista prolongado, positivo
+a estribor del sentido de la marcha; su signo es lo que elige la rama de ángulo
+de depresión de la regla de segmento en viraje. $z$ es la altura del receptor
+sobre el terreno local, dejada en 0 en estos ejemplos, donde Doc 29 mide a
+1,2 m, normalmente una diferencia por debajo del decibelio. Los argumentos
+opcionales `temperature` y
 `pressure` alimentan el ajuste de impedancia atmosférica de Doc 29 y valen por
 defecto los 15 °C y 101,325 kPa de la atmósfera estándar.
 

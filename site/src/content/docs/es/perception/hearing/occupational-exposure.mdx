@@ -54,8 +54,13 @@ en energía.
 
 Describe cada actividad como una `hearing.Task` con sus muestras y su duración
 y llama a `hearing.task_based_exposure(tasks)`. Para la jornada del soldador
-del anexo D que se usa abajo devuelve `lex_8h` = 84,3 dB con una incertidumbre
-expandida $U = 2{,}7$ dB, así que el `upper_limit` unilateral al 95 % es 87,0 dB.
+del anexo D que se usa abajo devuelve `lex_8h` = 84,3 dB con una
+`expanded_uncertainty` $U = 3{,}2$ dB, así que el `upper_limit` unilateral al
+95 % es 87,5 dB, porque por defecto se incluye el término de duración $u_{1b}$
+del anexo C construido a partir del `duration_range` de cada tarea. El
+fragmento del apartado 1 pasa `include_duration_uncertainty=False` para
+reproducir el caso a del anexo D, donde las duraciones se tratan como exactas,
+y eso es lo que baja $U$ a 2,7 dB y el límite superior a 87,0 dB.
 Las jornadas sin estructura usan `job_based_exposure()` o `full_day_exposure()`
 sobre muestras aleatorias.
 
@@ -71,8 +76,11 @@ $$
 
 de modo que una tarea ruidosa pero corta contribuye poco. Las estrategias
 *basadas en la función* (apartado 10) y *de jornada completa* (apartado 11) toman
-en cambio $N \ge 5$ (o tres jornadas completas) muestras aleatorias sobre un grupo
-de exposición homogéneo y normalizan la duración efectiva de la jornada. El nivel
+en cambio muestras aleatorias sobre un grupo de exposición homogéneo — $N \ge 5$
+muestras para la estrategia basada en la función, al menos tres turnos completos
+para la de jornada completa —, las promedian en energía y normalizan ese promedio
+a la jornada nominal de ocho horas con la duración efectiva de la jornada $T_e$
+en el mismo término $10\log_{10}(T_e/T_0)$. El nivel
 diario es el mismo en ambos casos; las estrategias difieren en cómo se construye
 la **incertidumbre**.
 

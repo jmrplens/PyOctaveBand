@@ -144,8 +144,8 @@ broad = psychoacoustics.loudness_zwicker_from_spectrum(np.full(28, 60.0))
 z = np.arange(1, narrow.specific.size + 1) * 0.1          # eje Bark
 fig, ax = plt.subplots()
 for r, color, label in [
-    (broad, "#ff7f0e", f"Banda ancha  N = {broad.loudness:.1f} sone"),
-    (narrow, "#1f77b4", f"Banda estrecha 1 kHz  N = {narrow.loudness:.1f} sone"),
+    (broad, "#d62728", f"Banda ancha plana 60 dB - N = {broad.loudness:.1f} sone"),
+    (narrow, "#1f77b4", f"Banda estrecha 1 kHz - N = {narrow.loudness:.1f} sone"),
 ]:
     ax.fill_between(z, r.specific, color=color, alpha=0.3)
     ax.plot(z, r.specific, color=color, label=label)

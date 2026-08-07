@@ -362,11 +362,18 @@ Standard 70, que es lo que usa una hoja real. Cuando no se dispone de ellos,
 `diffuser_sound_power` es la estimación de Reynolds tal como la dan las
 Ecs. 13.27 a 13.33 de Long: un nivel global
 $L_W = 10\log_{10} S_G + 30\log_{10}\xi + 60\log_{10} U_G - 31{,}3$ a partir
-del área de la cara, la velocidad de aproximación $U_G = Q/S_G$ y el
-coeficiente normalizado de pérdida de carga $\xi$, repartido por octavas
-mediante la función de forma $C_D = -11{,}82 - 0{,}15 A - 1{,}13 A^2$
-($-5{,}82$ si el equipo es circular) en torno a la banda de pico
-$f_P = 48{,}8\,U_G$.
+del área de la cara $S_G$, la velocidad de aproximación $U_G = Q/S_G$ y el
+coeficiente normalizado de pérdida de carga
+$\xi = 334{,}9\,\Delta p/(\rho_0 U_G^2)$ de la Ec. 13.28. Long escribe las
+cuatro en unidades anglosajonas ($S_G$ en ft², $U_G$ en ft/s, $\Delta p$ en
+pulgadas de columna de agua); `diffuser_sound_power` acepta y devuelve SI y
+convierte internamente, que es la razón de que aquí las constantes se citen
+sobre las unidades de Long. El espectro sale como
+$L_{W,\text{oct}} = L_W + C_D$ con la función de forma
+$C_D = -11{,}82 - 0{,}15 A - 1{,}13 A^2$ para un equipo rectangular
+($-5{,}82$ si es circular), donde $A$ es la distancia en octavas a la banda
+de pico $f_P = 48{,}8\,U_G$ (Ec. 13.32, $U_G$ en **ft/s**), contada sobre la
+numeración de bandas de Long con la banda 0 en 32 Hz.
 
 ```python
 from phonometry import diffuser_sound_power
@@ -380,6 +387,11 @@ print(np.round(diffuser_sound_power(None, (24 * IN) ** 2,
                                     pressure_drop=0.05 * IN_WG).values, 1))
 # [ 33.4  32.4  29.1  23.6  15.9   5.9  -6.4 -21. ]
 # La Tabla 14.9 de Long imprime 33/32/29/23/15/4/0/0 en esa fila.
+
+# La banda de pico desde la que se cuenta la función de forma, en unidades de Long:
+face_velocity = 312 * CFM / (24 * IN) ** 2 / 0.3048   # 1.3 ft/s
+print(round(48.8 * face_velocity, 1))                 # fP = 63.4 Hz
+print(round(np.log2(48.8 * face_velocity / 32.0)))    # banda 1: la octava de 63 Hz
 ```
 
 La sexta potencia de la velocidad en la Ec. 13.27 es la regla de diseño:
@@ -560,17 +572,19 @@ for fila in total.table():
     print(f"{fila['kind']:<12} {fila['label'][:26]:<26} "
           f"{[round(float(v)) for v in fila['values']]}")
 
-total.report("ruido-conductos.pdf", language="es")   # necesita phonometry[report]
+impulsion.report("ruido-conductos-impulsion.pdf", language="es")   # la ficha de abajo
+total.report("ruido-conductos.pdf", language="es")   # la combinación; necesita phonometry[report]
 ```
 
-La ficha de ejemplo, regenerada con `make reports`, se mantiene renderizada en
-el repositorio. Pulse la vista previa para abrir el PDF:
+La ficha de ejemplo es la **mitad de impulsión** de la hoja, regenerada con
+`make reports` y mantenida renderizada en el repositorio. Pulse la vista
+previa para abrir el PDF:
 
 <ReportPreview
 	name="duct_path_example"
 	title="Informe de ejemplo del cálculo de un trayecto de ruido por conductos (PDF)"
 	description="Informe de ejemplo del cálculo de un trayecto de ruido por conductos: una cabecera de metadatos con el cliente, la fuente de ruido, el entorno de ensayo y la fecha, la tabla del trayecto por bandas de octava con la potencia acústica del ventilador, la atenuación de cada elemento como cambio de nivel negativo, las filas de ruido regenerado del codo, del silenciador y del difusor, el efecto de sala, el nivel recibido y la curva NC 30, y debajo el criterio de sala NC-22.6 en un recuadro a 125 Hz con el veredicto de que ninguna banda supera NC 30, junto al gráfico de cascada de todos los elementos frente a la curva de criterio."
-	caption="Ficha del trayecto de ruido por conductos (DuctPathResult.report): el trayecto de impulsión de la hoja resuelta elemento a elemento, valorado NC-22.6 y cumpliendo NC 30 con 5 dB de margen a 63 Hz."
+	caption="Ficha del trayecto de ruido por conductos (DuctPathResult.report): el trayecto de impulsión de la hoja resuelta elemento a elemento, valorado NC-22.6, gobernado a 125 Hz y cumpliendo su objetivo NC 30 en todas las bandas."
 />
 
 ## 7. Qué se reproduce y qué no

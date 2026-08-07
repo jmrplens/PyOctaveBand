@@ -26,6 +26,7 @@ references:
 ---
 
 import ThemeImage from '../../../../components/ThemeImage.astro';
+import Video from '../../../../components/Video.astro';
 
 Un sonómetro no es un algoritmo, sino una breve cadena de ellos, e
 IEC 61672-1 especifica cada etapa. phonometry implementa cada etapa como una
@@ -86,8 +87,15 @@ cal = metrology.sensitivity(calibrator, target_spl=94.0, fs=fs)
 ```
 
 Guía de fondo: [Calibración y dBFS](/phonometry/es/signals/metrology/calibration/), que
-cubre también la calibración desde una sensibilidad de micrófono conocida y
-el modo digital dBFS que se usa cuando no existe referencia física.
+cubre la comprobación de estabilidad que esta llamada ejecuta sobre la grabación
+del calibrador, la regla del formato entero y el modo digital dBFS que se usa
+cuando no existe referencia física. Sin ningún calibrador, el factor puede
+calcularse a partir de la sensibilidad nominal de la cadena en vez de medirse
+— un micrófono de sensibilidad nominal $M$ mV/Pa a través de un preamplificador
+de ganancia lineal $G$ hacia un convertidor cuyo fondo de escala es $V_{FS}$
+voltios da $S = V_{FS} / (M G / 1000)$ pascales por unidad digital —, pero un
+factor nominal arrastra la tolerancia de la hoja de datos y no los ±0,4 dB de un
+calibrador de clase 1, así que no puede informarse como una medición calibrada.
 
 ## 3. Pondera: frecuencia y tiempo (IEC 61672-1)
 
@@ -105,16 +113,30 @@ laf_t = 10 * np.log10(np.maximum(envelope, 1e-12) / (2e-5) ** 2)
 # laf_t alcanza unos 80 dB durante el evento y se asienta cerca de 55 dB entre medias.
 ```
 
-Rara vez escribirás esta cadena a mano: todas las funciones de nivel del paso
-siguiente aplican la ponderación frecuencial internamente, y los niveles
-percentiles reconstruyen por ti esta envolvente Fast. Las métricas de energía
-($L_{eq}$, SEL) integran directamente la señal ponderada al cuadrado, sin
-balística, exactamente como hace un sonómetro. La cadena se muestra aquí
-porque *es* la pantalla del sonómetro.
+<Video
+  name="anim_time_weighting"
+  width={2400}
+  height={1350}
+  title="La balística de los detectores Fast, Slow e Impulse"
+  description="Una ráfaga de tono excita el detector exponencial RC: el condensador se carga y se descarga mientras las agujas Fast, Slow e Impulse siguen cada una su propia balística, y las tres trazas de nivel se van construyendo debajo para mostrar el ataque rápido, el promedio lento y la retención asimétrica del impulso."
+/>
+
+La aguja del clip es esa llamada a `time_weighting`: un paso bajo de primer
+orden que se carga y se descarga sobre la señal al cuadrado. Las tres agujas se
+diferencian en un solo número, la constante de tiempo, y por eso Fast atrapa un
+evento que Slow suaviza hasta borrarlo. Rara vez escribirás esta cadena a mano:
+todas las funciones de nivel del paso siguiente aplican la ponderación
+frecuencial internamente, y los niveles percentiles reconstruyen por ti esta
+envolvente Fast. Las métricas de energía ($L_{eq}$, SEL) integran directamente
+la señal ponderada al cuadrado, sin balística ninguna — y por eso no muestran
+ningún movimiento de aguja al que seguir. La cadena se muestra aquí porque *es*
+la pantalla del sonómetro.
 
 Guías de fondo:
 [Ponderación frecuencial (A, C, Z)](/phonometry/es/signals/levels/weighting/) y
-[Ponderación temporal](/phonometry/es/signals/levels/time-weighting/).
+[Ponderación temporal](/phonometry/es/signals/levels/time-weighting/), que
+desmonta este mismo clip frente a la tabla de ráfagas de tono de
+IEC 61672-1.
 
 ## 4. Integra: los números que reporta un sonómetro
 
@@ -137,11 +159,18 @@ print(f"LAeq {la_eq:.1f} dB | L10 {ln[10]:.1f} | L90 {ln[90]:.1f} "
       f"| LAE {lae:.1f} | LCpeak {lc_pk:.1f}")
 ```
 
-Fíjate en la aritmética que codifican los números: el evento de 1 s domina
-el $L_{Aeq}$ (está 25 dB por encima del fondo, mucho más de los 10 dB que el
-fondo, nueve veces más largo, recupera por duración), el $L_{AE}$ es el
-$L_{Aeq}$ más $10\log_{10}$ de los 10 s de duración, y el $L_{90}$ apenas nota el
-evento.
+Fíjate en la aritmética que codifican los números. El segundo del evento mide
+80,0 dB por sí solo y los nueve segundos de fondo 55,0 dB, así que en energía el
+evento aporta $1 \times 10^{8{,}00}$ y el fondo
+$9 \times 10^{5{,}50} = 2{,}9 \times 10^{6}$: una razón de unos 35:1, o 15,5 dB.
+La ventaja de 25 dB del evento gana a los 9,5 dB ($10\log_{10}9$) que el fondo
+recupera por duración, y por eso el $L_{Aeq}$ de 10 s de 70,2 dB queda solo
+0,1 dB por encima de los 70,0 dB que daría el evento solo repartido sobre esos
+mismos 10 s: el fondo es casi invisible en el promedio energético. El $L_{AE}$
+es ese $L_{Aeq}$ más $10\log_{10}(10\ \mathrm{s}/1\ \mathrm{s}) = 10$ dB, toda
+la energía comprimida en un segundo. Los percentiles se leen al revés: el evento
+ocupa exactamente el 10 % del registro, así que sube el $L_{10}$ a 78,0 dB y
+deja el $L_{90}$ en 54,9 dB, el nivel de fondo.
 
 Guía de fondo:
 [Niveles integrados y estadísticos](/phonometry/es/signals/levels/levels/), que añade

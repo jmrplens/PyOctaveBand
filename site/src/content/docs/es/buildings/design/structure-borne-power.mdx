@@ -103,9 +103,13 @@ L_{Ws} = 10\log_{10}\!\left(\frac{2\pi f\,\eta\,m\,S}{f_0\,m_0\,S_0}\right)
          + L_v - 60 \;\;[\mathrm{dB\ re\ 1\ pW}],
 $$
 
-con las referencias $f_0 = 1\ \text{Hz}$, $m_0 = 1\ \text{kg}$,
+con las referencias $f_0 = 1\ \text{Hz}$, $m_0 = 1\ \text{kg}$ (impresa como
+1 kg; la magnitud que normaliza es una masa por unidad de superficie, así que la
+referencia es $1\ \text{kg/m}^2$ — véase el
+[registro de erratas](/phonometry/es/reference/errata/)),
 $S_0 = 1\ \text{m}^2$; el término $-60\ \text{dB}$ es $10\log_{10}(v_0^2/P_0)$ para
-la velocidad de referencia de EN 15657 $v_0 = 10^{-9}\ \text{m/s}$. La
+la velocidad de referencia de EN 15657 $v_0 = 10^{-9}\ \text{m/s}$ y
+$P_0 = 1\ \text{pW}$. La
 velocidad de la placa es la media energética espacial sobre las $N$ posiciones
 (Fórmula 12) y el factor de pérdida procede del tiempo de reverberación
 estructural $T_s$ (Fórmula 13, idéntica al factor de pérdida total de
@@ -147,12 +151,26 @@ inyectada en la placa junto con su movilidad puntual (véase la
 la descripción de la fuente para el modelo de EN 12354-5 a través de la cadena
 de conversión siguiente.
 
+:::caution
+**Dos velocidades de referencia comparten el símbolo $v_0$.**
+EN 15657 y EN 12354-5 refieren los niveles de velocidad a
+$v_0 = 10^{-9}$ m/s (1 nm/s); ISO 9611 e ISO/TS 7849 los refieren a
+$5\times10^{-8}$ m/s (50 nm/s). Las dos se diferencian en
+$20\log_{10}(50) = 33,98$ dB, así que un nivel de velocidad libre tomado de un
+informe ISO 9611 hay que reducirlo en 34,0 dB antes de que entre en la
+Fórmula (18) o en cualquier magnitud de EN 12354-5. El apartado 3 de abajo usa
+las dos referencias con pocas líneas de diferencia.
+:::
+
 ## 3. De la potencia de placa a las magnitudes de fuente (Fórmulas 15–19)
 
 La $L_{Ws}$ inyectada en la placa **no** es un descriptor de la fuente: la misma
 fuente inyecta una potencia distinta en un receptor distinto. La EN 15657
 deriva las magnitudes independientes de la placa: el **nivel de fuerza
-bloqueada equivalente** (Fórmula 15, re $F_0 = 10^{-6}\ \text{N}$) desde la
+bloqueada equivalente** (Fórmula 15, re $F_0 = 10^{-6}\ \text{N}$, no la
+referencia de 1 N del
+[nivel de exposición a la fuerza de impacto](/phonometry/es/buildings/insulation/heavy-impact-sources/)
+de ISO 16283-2, a 120 dB de distancia) desde la
 placa de baja movilidad,
 
 $$
@@ -186,13 +204,45 @@ lwsn = building.characteristic_reception_plate_power(lfb)         # Fórmula (17
 inst = building.installed_power_from_reception_plate(lwsn, 24.1e-6)  # Anexo I
 print(round(float(lwsn), 1), round(float(inst), 1))         # 61.4 68.2  (Tabla I.8)
 
-# La velocidad libre (Fórmula 18) y la fuerza bloqueada cierran la movilidad (19):
+# La misma corrección del Anexo I llevada a la movilidad de la FUENTE da en
+# cambio el nivel de potencia característico independiente de la placa que
+# EN 12354-5 pide como entrada:
+lwsc = building.installed_power_from_reception_plate(lwsn, 1.0e-3)
+print(round(float(lwsc), 1))                                # 84.4  L_Ws,c
+
+# La velocidad libre (Fórmula 18) y la fuerza bloqueada cierran la movilidad (19).
+# El valor 1.0e-2 m/(N.s) es la movilidad mínima especificada por EN 15657 para
+# la placa de alta movilidad, no un número arbitrario.
 lvf = building.equivalent_free_velocity_level(70.0, 1.0e-2)
 print(float(building.source_mobility_from_levels(lvf, lfb)))      # |Y_S,eq| en m/(N·s)
 ```
 
+Lee la cadena en orden. La cisterna inyecta 61,7 dB en la placa de medida;
+quitar la movilidad de esa placa deja una fuerza bloqueada equivalente, y
+volver a expresar esa misma fuerza sobre la placa normalizada de hormigón de
+10 cm, de $Y_{R,\infty,\text{baja}} = 5\times10^{-6}\ \text{m/(N·s)}$, da
+$L_{Wsn} = 61,4$ dB, el número que un fabricante puede declarar. Referir esa
+misma fuerza a la pared receptora real ($Y = 24,1\times10^{-6}$) suma
+$10\log_{10}(24,1/5,0) = 6,8$ dB y da 68,2 dB. Ese paso es toda la lección del
+apartado: un receptor ligero y de movilidad alta acepta más potencia de la misma
+fuente, así que un $L_{Wsn}$ declarado compara máquinas y nunca es la potencia
+que verá un edificio concreto.
+
+:::caution
+**De la misma corrección salen dos magnitudes; no las confundas.**
+Con la movilidad del *receptor* da el nivel de potencia instalada
+$L_{Ws,\mathrm{inst}} = 68,2$ dB. Con la movilidad de la *fuente* da el nivel de
+potencia característico independiente de la placa $L_{Ws,c} = 84,4$ dB, y eso es
+lo que [EN 12354-5](/phonometry/es/buildings/design/installed-structure-borne/)
+toma como entrada, del que resta el término de acoplamiento $D_C = 16,2$ dB para
+volver a los mismos 68,2 dB. Alimenta EN 12354-5 con los 84,4, nunca con los
+68,2: arrastrar 68,2 como nivel de potencia característico resta $D_C$ una
+segunda vez y cae 16 dB por debajo, sin que se levante ningún error.
+:::
+
 El homólogo directo del lado de la fuente es el nivel de velocidad libre de
-ISO 9611 (re $v_0 = 5\times10^{-8}\ \text{m/s}$) medido en los puntos de
+ISO 9611 (re $v_0 = 5\times10^{-8}\ \text{m/s}$, la referencia de 50 nm/s del
+aviso de arriba, no la de 1 nm/s de la Fórmula 14) medido en los puntos de
 contacto de maquinaria
 montada elásticamente; su media por posiciones de la ecuación (9) es
 `mean_free_velocity_level()`.
@@ -222,7 +272,7 @@ sobre el total $L_{Ws}$ (una emisión de potencia es una magnitud donde menos es
 mejor, así que la fuente cumple en el límite o por debajo). `verbose=True` añade
 la columna del factor de pérdidas de la placa $\eta$ a la tabla.
 `language="es"` genera la ficha en español con comas decimales. La franja de
-base recuerda que el nivel inyectado en la placa debe convertirse a las
+base enuncia la Fórmula 14 y recuerda que el nivel inyectado en la placa debe convertirse a las
 magnitudes de fuente independientes de la placa (Fórmulas 15/17) antes de
 alimentar la EN 12354-5.
 

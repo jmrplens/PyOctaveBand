@@ -93,19 +93,25 @@ Directiva solo añade que, cuando una componente real queda entre las dos altura
 del modelo, su energía se distribuye proporcionalmente entre ambas.
 
 Para cada banda de tercio de octava, la ecuación de flujo convierte la potencia
-acústica de un vehículo en potencia por metro de línea (2.3.2) o, para un
-vehículo parado, en el equivalente al ralentí sobre el periodo de referencia
-(2.3.4):
+acústica de un vehículo en potencia por metro de línea (2.3.2):
 
 $$
 L'_{W,\mathrm{eq,line},i}(\psi,\varphi) = L_{W,0,\mathrm{dir},i}(\psi,\varphi)
   + 10\,\log_{10}\!\left(\frac{Q}{1000\,v}\right),
-\qquad
-+\,10\,\log_{10}\!\left(\frac{T_\mathrm{idle}}{T_\mathrm{ref}\,L}\right).
 $$
 
-$Q$ va en vehículos por hora, $v$ en km/h y $L$ es la longitud del tramo de vía
-en metros. Atención a la unidad: el término de flujo usa km/h, mientras que la
+o, para un vehículo parado, la misma potencia direccional referida al tiempo al
+ralentí sobre el periodo de referencia (2.3.4):
+
+$$
+L'_{W,\mathrm{eq,line},i}(\psi,\varphi) = L_{W,0,\mathrm{dir},i}(\psi,\varphi)
+  + 10\,\log_{10}\!\left(\frac{T_\mathrm{idle}}{T_\mathrm{ref}\,L}\right).
+$$
+
+La segunda sustituye a la primera; no se suma a ella. $Q$ va en vehículos por
+hora, $v$ en km/h, $L$ es la longitud del tramo de vía en metros, y
+$T_\mathrm{idle}$ y $T_\mathrm{ref}$ comparten la unidad de tiempo en que se
+den. Atención a la unidad: el término de flujo usa km/h, mientras que la
 conversión de rugosidad dos apartados más abajo usa m/s. Las dos son correctas,
 y confundirlas es el error más caro disponible en este modelo.
 

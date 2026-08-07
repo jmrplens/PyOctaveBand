@@ -688,7 +688,31 @@ interacción de la función de Fok
 $\delta = 0{,}85\,(1 - 1{,}47\sqrt{\varepsilon} + 0{,}47\varepsilon^{3/2})$
 (tabla 7.1), válido para cualquier área abierta. Para una cámara poco
 profunda la resonancia es
-$f_0 = (c_0/2\pi)\sqrt{\varepsilon/(t'\,d)}$ (ec. 7.4).
+$f_0 = (c_0/2\pi)\sqrt{\varepsilon/(t'\,d)}$ (ec. 7.4). En esas dos
+expresiones, $t$ es el espesor de la placa, $a$ el **radio** del orificio,
+$\varepsilon$ el área abierta (área de orificios sobre área de panel), $\nu$ la
+viscosidad cinemática del aire, $t' = t + 2\delta a$ el espesor de placa con
+corrección de extremo y $d$ la profundidad de la cámara tras el panel.
+
+### Las clases de lámina: parámetros
+
+Las tres láminas toman argumentos posicionales, y la dimensión del orificio es
+un **radio**, no un diámetro: la mitad del orificio taladrado. Equivocarse ahí
+calcula la resonancia y la absorción de pico de un orificio del doble del
+tamaño real.
+
+| Clase | Parámetro | Unidades | Notas |
+| :--- | :--- | :--- | :--- |
+| `PerforatedPlateLayer` | `thickness` | m | Espesor de la placa $t$ |
+| | `hole_radius` | m | **Radio** del orificio $a$, la mitad del diámetro taladrado |
+| | `open_area` | — | Razón de perforación $\varepsilon$ = área de orificios / área de panel |
+| | `end_correction` | — | $\delta$ por extremo de orificio; `None` usa el ajuste de interacción de Fok |
+| `MicroperforatedPlateLayer` | `thickness` | m | Espesor de la placa $t$ |
+| | `hole_radius` | m | **Radio** del orificio $a$ |
+| | `open_area` | — | Razón de perforación $\varepsilon$ |
+| | `end_correction` | — | Por defecto `0.85`, la reactancia de pistón de Maa |
+| `MembraneLayer` | `surface_density` | kg/m² | Masa por unidad de superficie $m$ |
+| | `resistance` | Pa·s/m | Resistencia al flujo añadida; por defecto `0.0` |
 
 **Panel microperforado (MPP).** Con orificios submilimétricos la capa
 límite viscosa llena el orificio y el panel absorbe *sin ningún material
@@ -713,7 +737,8 @@ $f_2/f_1 = \pi/\mathrm{arccot}(1+r) - 1$ (Maa, ecs. 9–21, tabla I).
 import numpy as np
 from phonometry import materials
 
-# Maa (1998), fig. 5: d = t = 0,2 mm, orificios cada 2,5 mm, cámara de 6 cm.
+# Maa (1998), fig. 5: diámetro de orificio 0,2 mm (o sea hole_radius = 0,1 mm),
+# placa de 0,2 mm de espesor, orificios cada 2,5 mm, cámara de 6 cm.
 eps = (np.pi / 4.0) * (0.2 / 2.5) ** 2
 f = np.linspace(100.0, 4000.0, 2000)
 res = materials.layered_absorber(
@@ -743,7 +768,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 from phonometry import materials
 
-# Maa (1998), fig. 5: d = t = 0,2 mm, orificios cada 2,5 mm, cámara de 6 cm.
+# Maa (1998), fig. 5: diámetro de orificio 0,2 mm (o sea hole_radius = 0,1 mm),
+# placa de 0,2 mm de espesor, orificios cada 2,5 mm, cámara de 6 cm.
 eps = (np.pi / 4.0) * (0.2 / 2.5) ** 2
 f = np.linspace(100.0, 4000.0, 1200)
 res = materials.layered_absorber(

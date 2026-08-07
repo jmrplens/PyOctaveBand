@@ -137,6 +137,16 @@ $$
 
 **PR** (cláusula 12) compara el nivel de la banda crítica centrada en el tono, $L_M$, con la potencia media de las dos bandas críticas **contiguas** $L_L$, $L_U$ (bordes según las Fórmulas ajustadas 21–22 con las Tablas 2–3): $\mathrm{PR} = 10\log_{10} P_M - 10\log_{10}\left[(P_L + P_U)/2\right]$ (Fórmula 23). Para $f_t \le 171{,}4$ Hz la banda inferior se trunca en 20 Hz y su potencia se reescala a un **ancho de banda de 100 Hz** (Fórmula 24). El criterio (Fórmulas 25–26) es 9,0 dB para $f_t \ge 1$ kHz, y crece como $9{,}0 + 10{,}0\log_{10}(1000/f_t)$ por debajo. Los tonos se evalúan dentro del rango de interés de 89,1 Hz – 11,2 kHz (cláusulas 11.5 / 12.6).
 
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/tone_prominence_assessment_es.svg" alt="Relación tono-ruido de un tono de ventilador de 250 Hz representada frente al criterio de prominencia de ECMA-418-1: el criterio cae desde unos 17 dB a 89 Hz hasta 8 dB constantes por encima de 1 kHz, y el tono evaluado se sitúa en 15,1 dB, 2,1 dB por encima del criterio de 13,0 dB a 250 Hz, así que es prominente" width="88%" />
+
+*El criterio de TNR dibujado en lugar de evaluado, sobre el rango de interés de
+89,1 Hz – 11,2 kHz, con un tono evaluado encima. Como el criterio vale
+$8{,}0 + 8{,}33\log_{10}(1000/f_t)$ por debajo de 1 kHz y es constante por
+encima, una misma relación tono-ruido se juzga contra un umbral distinto en
+cada frecuencia: el tono del ejemplo supera en 2,1 dB su umbral de 13,0 dB a
+250 Hz, mientras que un tono de 10 dB sería prominente en cualquier punto por
+encima de 1 kHz y no lo sería aquí.*
+
 Consulta la [guía de tonos discretos prominentes](/phonometry/es/perception/psychoacoustics/tone-prominence/) para su uso.
 
 ## Sonoridad de Zwicker (ISO 532-1)
@@ -240,6 +250,15 @@ $$
 
 (Fórmulas 65–111). El valor único $R$ es el percentil 90 de $R(l_{50})$ en el tiempo (Cláusula 7.1.10); la constante $c_R$ (Fórmula 104) calibra el sonido de referencia (un portador de 1 kHz modulado en amplitud al 100 % a 70 Hz y 60 dB SPL) a 1 asper.
 
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/hms_modulation_bandpass_es.svg" alt="Percepción de modulación lenta frente a rápida en ECMA-418-2: la intensidad de fluctuación forma un paso banda sobre la frecuencia de modulación con máximo cerca de 4 a 6 Hz, mientras que la aspereza de esos mismos tonos de 1 kHz modulados en amplitud tiene su máximo cerca de 70 Hz" width="80%" />
+
+*La ponderación por tasa de modulación que aplican las fórmulas anteriores, y
+la razón por la que el rango «aproximadamente 20–300 Hz, máxima cerca de
+70 Hz» es un paso banda y no un umbral: el mismo portador de 1 kHz modulado
+despacio se oye como intensidad de fluctuación, con máximo cerca de 4–6 Hz, y
+modulado deprisa se oye como aspereza, con máximo cerca de 70 Hz. Entre los dos
+máximos la sensación cambia de nombre, no de grado.*
+
 ### Agudeza (DIN 45692)
 
 La agudeza (*sharpness*) condensa en un solo número el énfasis en alta frecuencia de un sonido: el primer momento ponderado por $g(z)$ del patrón de sonoridad específica estacionaria de ISO 532-1 (DIN 45692:2009, Ecuación 1):
@@ -250,6 +269,15 @@ g(z) = \begin{cases} 1 & z \le 15{,}8\ \text{Bark} \\ 0{,}15\ e^{0{,}42 (z - 15{
 $$
 
 evaluado sobre la misma malla de 240 puntos a 0,1 Bark. La constante $k$ no está codificada a mano, sino que se deriva del requisito de calibración (cláusula 6): un ruido de banda estrecha de una banda crítica de ancho, 920–1080 Hz a 60 dB SPL, puntúa exactamente 1 acum, y la $k = 0{,}108$ derivada cae dentro de la ventana normativa $0{,}105 \le k < 0{,}115$ (cláusula 5.2). Las ponderaciones informativas del Anexo B se ofrecen bajo el mismo anclaje de 1 acum: von Bismarck (codo en 15 Bark, $0{,}2\ e^{0{,}308(z-15)} + 0{,}8$) y Aures (dependiente de la sonoridad, $g(z) = 0{,}078\ (e^{0{,}171 z}/z)\ N/\ln(0{,}05 N + 1)$). Los objetivos de banda estrecha de la Tabla A.2 se reproducen dentro de la tolerancia de la cláusula 6 (5 % o 0,05 acum): 0,38 acum a 250 Hz, 1,00 a 1 kHz, 1,78 a 2,5 kHz, 2,82 a 4 kHz.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sharpness_weighting_es.svg" alt="Ponderación de agudeza g(z) de DIN 45692 frente a la tasa de banda crítica en eje logarítmico, comparando las curvas DIN, von Bismarck y Aures con los codos de 15,8 y 15 Bark marcados" width="80%" />
+
+*Las tres ponderaciones $g(z)$ de la fórmula anterior en un mismo eje: la DIN
+con su codo en 15,8 Bark, la de von Bismarck con su codo en 15 Bark y la curva
+de Aures, dependiente de la sonoridad. Por eso la elección de ponderación
+cambia un valor de agudeza solo para sonidos con energía por encima del codo
+(de 15 a 15,8 Bark, unos 2,5 a 3 kHz) y deja intacto todo lo que queda por
+debajo.*
 
 Consulta la [guía de métricas de calidad sonora](/phonometry/es/perception/psychoacoustics/sound-quality/) para su uso.
 
@@ -279,7 +307,28 @@ $$
 \mathrm{STI} = \sum_{k=1}^{7} \alpha_k\ \mathrm{MTI}_k - \sum_{k=1}^{6} \beta_k \sqrt{\mathrm{MTI}_k\ \mathrm{MTI}_{k+1}}
 $$
 
-truncado a 1,0. STIPA (Anexo B) muestrea la misma física con solo dos frecuencias de modulación por banda (Tabla B.1) sobre una señal de prueba con índice de modulación de fuente 0,55; las profundidades recibidas se miden por correlación seno/coseno de las envolventes de intensidad $I_k(t)$ filtradas paso-bajo a ~100 Hz sobre un número entero de periodos de modulación:
+truncado a 1,0.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sti_band_mti_es.svg" alt="Índice de transmisión de modulación por banda de octava de 125 Hz a 8 kHz para una sala con 0,9 s de tiempo de reverberación y una relación habla-ruido de 15 dB: las siete barras quedan próximas entre sí, entre unos 0,54 y 0,60, y dan STI = 0,58 con la calificación E del Anexo F" width="88%" />
+
+*Los siete $\mathrm{MTI}_k$ que consume la suma ponderada anterior, para una
+sala con $T = 0{,}9$ s y una relación habla-ruido de 15 dB. Cada barra es ya la
+media de 14 índices de transmisión, así que esto queda dos etapas de promediado
+por debajo del $m(F)$ crudo; las barras caen dentro de 0,06 unas de otras, que
+es el caso en el que los términos de redundancia $\beta_k$ apenas restan nada y
+el STI se acerca a la media simple ponderada por $\alpha$.*
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sti_vs_t60_es.svg" alt="STI frente al tiempo de reverberación con las bandas de calificación del Anexo F de IEC 60268-16 sombreadas" width="80%" />
+
+*El final de la cadena en lugar de su parte central: lo que la forma cerrada de
+Schroeder le hace al STI a medida que crece la reverberación, frente a las
+bandas de calificación del Anexo F. La curva cae abruptamente en el rango en el
+que una sala todavía es utilizable y se aplana una vez que la modulación ya
+está destruida, que es la razón por la que reducir a la mitad un tiempo de
+reverberación largo compra menos inteligibilidad que reducir a la mitad uno
+corto.*
+
+STIPA (Anexo B) muestrea la misma física con solo dos frecuencias de modulación por banda (Tabla B.1) sobre una señal de prueba con índice de modulación de fuente 0,55; las profundidades recibidas se miden por correlación seno/coseno de las envolventes de intensidad $I_k(t)$ filtradas paso-bajo a ~100 Hz sobre un número entero de periodos de modulación:
 
 $$
 m_{dr} = \frac{2 \sqrt{\left( \sum_t I_k(t) \sin 2 \pi f_m t \right)^2 + \left( \sum_t I_k(t) \cos 2 \pi f_m t \right)^2}}{\sum_t I_k(t)}, \qquad m = \frac{m_{dr}}{0{,}55}
@@ -325,12 +374,23 @@ $$
 N_{50} = \big[ u + v \log_{10}(t/t_0) \big]\ (L_{EX,8h} - L_0)^2, \qquad t_0 = 1\ \text{año},
 $$
 
-cuadrático en el exceso sobre el nivel de inicio dependiente de la frecuencia $L_0$ (75 dB a 4 kHz, la banda más sensible, hasta 93 dB a 500 Hz) y cero por debajo; para menos de 10 años escala como $\log_{10}(t+1)/\log_{10} 11$ (Fórmula 3). Los fractiles añaden la dispersión, $N_Q = N_{50} + z\ d_{u,l}$ con $d = (X + Y \log_{10} t)(L_{EX,8h} - L_0)^2$ (cláusula 6.3.2, Fórmulas 4–7, Tablas 2/3), acotada en cero; la convención cuenta la fracción de la población con el desplazamiento *menor*, así que $Q = 0{,}9$ es el decil más susceptible (rango fiable 0,05–0,95). El nivel de umbral de audición asociado a edad y ruido (HTLAN) combina el NIPTS con la componente de edad de ISO 7029 al mismo fractil mediante la suma comprimida (cláusula 6.1, Fórmula 1):
+cuadrático en el exceso sobre el nivel de inicio dependiente de la frecuencia $L_0$ (75 dB a 4 kHz, la banda más sensible, hasta 93 dB a 500 Hz) y cero por debajo; para menos de 10 años escala como $\log_{10}(t+1)/\log_{10} 11$ (Fórmula 3). Los fractiles añaden la dispersión, $N_Q = N_{50} + z\ d_{u,l}$ con $d = (X + Y \log_{10} t)(L_{EX,8h} - L_0)^2$ (cláusula 6.3.2, Fórmulas 4–7, Tablas 2/3), acotada en cero. El `fractile` de la librería cuenta la fracción de la población con el desplazamiento *menor*, así que `fractile=0.9` es el decil más susceptible (rango fiable 0,05–0,95); la $Q$ de la propia ISO 1999 corre al revés, contando el porcentaje con peor audición, así que ese mismo decil es allí $Q = 10\ \%$, igual que en los encabezados de columna del Anexo D. El nivel de umbral de audición asociado a edad y ruido (HTLAN) combina el NIPTS con la componente de edad de ISO 7029 al mismo fractil mediante la suma comprimida (cláusula 6.1, Fórmula 1):
 
 $$
 H' = H + N - \frac{H\ N}{120}.
 $$
 
 Los ejemplos resueltos del Anexo D (Tablas D.1–D.4; p. ej. 100 dB / 40 años a 3 kHz: 29/38/60 dB en los fractiles 0,10/0,50/0,90) se reproducen exactamente con el redondeo a enteros de la norma, y el valor a mano de la Fórmula 2 a 4 kHz / 20 años / 90 dB es $N_{50} = 12{,}94$ dB.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/nipts_audiogram_es.svg" alt="Desplazamiento permanente del umbral inducido por ruido según ISO 1999 tras 40 años a 95 dB(A) normalizados a 8 h, en un eje de audiograma invertido de 500 Hz a 6000 Hz: la mediana es casi nula a 500 Hz y se ahonda hasta unos 26 dB a 4000 Hz antes de recuperarse a 6000 Hz, y la banda de fractiles del 10 al 90 por ciento a su alrededor llega casi a 37 dB para el décimo más susceptible" width="88%" />
+
+*El modelo como audiograma: 40 años a 95 dB(A) normalizados a 8 h. La muesca a
+4 kHz es lo que hace reconocible en consulta la pérdida inducida por ruido, y
+está ahí solo porque $L_0$ es mínimo (75 dB) en esa banda. Atención a la
+dirección del fractil que enuncia el párrafo anterior: el borde de la banda
+sombreada que muestra el desplazamiento **mayor** es el `fractile=0.90` de la
+librería, el décimo más susceptible, al que ISO 1999 y los encabezados de
+columna de su Anexo D llaman $Q = 10\ \%$. A 4 kHz este caso da 19,5 / 26,0 /
+36,0 dB para `fractile` 0,10 / 0,50 / 0,90.*
 
 Consulta la [guía de pérdida auditiva inducida por ruido](/phonometry/es/perception/hearing/noise-induced-hearing-loss/) para su uso.

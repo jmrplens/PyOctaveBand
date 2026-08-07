@@ -82,7 +82,7 @@ fig, ax = plt.subplots()
 ax.semilogx(f, vibration.transfer_stiffness_level(k_true),
             label="$L_k$ real de $k+j\\omega c$")
 ax.semilogx(f, vibration.transfer_stiffness_level(k_indirect), "--",
-            label="método indirecto $-(2\\pi f)^2 m_2 T$")
+            label="método indirecto $-(2\\pi f)^2 m_2 T$")   # aquí no hay brida
 ax.axvline(f0, color="0.6", linestyle=":", label="resonancia $f_0$")
 ax.set(xlabel="Frecuencia [Hz]", ylabel="Nivel de rigidez de transferencia $L_k$ [dB re 1 N/m]")
 ax.grid(True, which="both", alpha=0.3)
@@ -138,16 +138,25 @@ $$
 k_{2,1} = -(2\pi f)^2\,(m_2 + m_f)\,T \qquad (T \ll 1),
 $$
 
-con $m_f$ la masa de la brida de salida. La aproximación es válida bastante por
+con $m_f$ la masa de la brida de salida, que transporta la palabra clave
+`flange_mass=` (vale cero por defecto). No es un refinamiento: la ISO 10846-3
+mide la vibración del centro de masas del *cuerpo compacto* que forman la masa
+de bloqueo junto con la brida de salida del elemento de ensayo, así que $m_f$
+es todo lo que se pese con ella — la brida y cualquier utillaje auxiliar que se
+mueva como parte del elemento de ensayo. Dejada en cero, declara una rigidez
+baja en un factor $m_2/(m_2 + m_f)$. La aproximación es válida bastante por
 encima de la resonancia masa/resorte, donde $T$ es pequeña.
 
 ```python
 import numpy as np
 from phonometry import vibration
 
-# Método indirecto: masa de bloqueo de 10 kg, transmisibilidad 0,01 a 500 Hz.
-k = vibration.transfer_stiffness_indirect(500.0, 0.01, blocking_mass=10.0)
-print(f"{abs(complex(k)):.3e}")            # 9.870e+05  N/m
+# Método indirecto: masa de bloqueo de 10 kg, transmisibilidad 0,01 a 500 Hz,
+# y la brida de salida de 1,2 kg del elemento de ensayo atornillada encima.
+k = vibration.transfer_stiffness_indirect(500.0, 0.01, blocking_mass=10.0,
+                                          flange_mass=1.2)
+print(f"{abs(complex(k)):.3e}")            # 1.105e+06  N/m
+# flange_mass vale 0 por defecto, lo que declara 9.870e+05 N/m: aquí un 12 % baja.
 
 # Agrupa una medición en barrido en un resultado con su nivel y factor de pérdidas:
 f = np.logspace(1.5, 3.3, 200)
@@ -279,7 +288,8 @@ res.report(
 (ISO 10846-2 y -3, 3.17) y el factor de pérdidas (ISO 10846-1, 3.8)
 (`transfer_stiffness_level`, `loss_factor`), el método directo de la
 ISO 10846-2:2008 (`transfer_stiffness_direct`) y el método indirecto de la
-ISO 10846-3:2002 de la Fórmula 1 (`transfer_stiffness_indirect`). También
+ISO 10846-3:2002 de la Fórmula 1 (`transfer_stiffness_indirect`, incluido su
+término `flange_mass=`). También
 están implementadas la aproximación de la fuerza de bloqueo de las
 Ecuaciones 6-7 (`blocking_force_ratio`) y las relaciones FRF del Anexo A /
 Tabla A.2 (`convert_frf`). `TransferStiffnessResult` agrupa una

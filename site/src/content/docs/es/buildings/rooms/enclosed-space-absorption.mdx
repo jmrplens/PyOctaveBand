@@ -115,8 +115,13 @@ result = room.enclosed_space_reverberation(
 )
 print(result.reverberation_time.round(2))
 # [2.13 1.03 0.62 0.48 0.43 0.42 0.4 ]
-result.plot()   # la figura de abajo: A y T por banda de octava
+result.plot()   # A y T por banda de octava, solo para esta sala
 ```
+
+La figura de abajo ejecuta esa llamada dos veces, una con la placa acústica de
+arriba y otra dejando el techo como yeso desnudo, para que el tratamiento se
+lea como una diferencia. El `[2.13 1.03 …]` impreso arriba es su curva de
+«techo acústico»; `result.plot()` dibuja esa curva sola.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/enclosed_space_absorption_es.svg" alt="Dos paneles para una oficina de 60 metros cúbicos con techo desnudo frente a techo acústico: el área de absorción equivalente por banda de octava, mucho mayor con el techo acústico, y el tiempo de reverberación cayendo desde unos cinco segundos a baja frecuencia con el techo desnudo hasta menos de un segundo con el techo acústico" width="96%" />
 
@@ -138,6 +143,16 @@ plt.show()
 ```
 
 </details>
+
+*La misma oficina de 60 m³ con dos techos. Cambiar 20 m² de yeso por placa
+acústica multiplica el área de absorción equivalente por 4 o 5 por encima de
+500 Hz (de 4,0 m² a 20,2 m² a 1 kHz) y baja el tiempo de reverberación ahí de
+2,4 s a 0,48 s. La banda de 125 Hz, donde la placa es más floja, es la que
+menos mejora: de 1,9 m² a 4,5 m², y de 5,04 s solo hasta 2,13 s. Una placa
+porosa de 20 mm es una fracción pequeña de una longitud de onda de 2,7 m y
+absorbe por fricción solo donde la velocidad de partícula es alta, así que el
+control a baja frecuencia necesita espesor, una cámara de aire o un absorbente
+resonante.*
 
 El `ReverberationResult` lleva el área de absorción y el tiempo de reverberación
 por banda, el volumen y la fracción de objetos, y su `.plot()` dibuja el espectro

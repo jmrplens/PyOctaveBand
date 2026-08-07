@@ -242,6 +242,10 @@ casos = [
 ]
 fig, ax = plt.subplots(figsize=(11, 6.2))
 with warnings.catch_warnings():
+    # El PorousAbsorberWarning: un suelo de 200 kPa.s/m2 hace trabajar al
+    # modelo de impedancia de un parámetro por debajo de su rango de ajuste
+    # publicado, como todo suelo exterior (ver «Elección de la impedancia del
+    # suelo» en la guía de efecto suelo).
     warnings.simplefilter("ignore")
     for perfil, etiqueta in casos:
         pe = atmospheric_parabolic_equation(400.0, perfil, source_height=2.0,
@@ -305,6 +309,10 @@ axes[0].set(ylabel="Altura [m]", ylim=(0, 40), title="Rayos sonoros (refracción
 axes[0].legend()
 
 with warnings.catch_warnings():
+    # El PorousAbsorberWarning: un suelo de 200 kPa.s/m2 hace trabajar al
+    # modelo de impedancia de un parámetro por debajo de su rango de ajuste
+    # publicado, como todo suelo exterior (ver «Elección de la impedancia del
+    # suelo» en la guía de efecto suelo).
     warnings.simplefilter("ignore")
     pe = atmospheric_parabolic_equation(400.0, perfil, source_height=zs,
                                         flow_resistivity=200e3,

@@ -136,8 +136,10 @@ La audibilidad **decisiva** de un espectro de banda estrecha es la mayor
 audibilidad de tono en él (apartado 5.3.8). Sobre $J$ espectros escalonados en
 el tiempo, la **audibilidad media** es su media energética (Fórmula 20); un
 espectro en el que no se encuentra ningún tono aporta
-$\Delta L_j = -10\ \text{dB}$ (Fórmula 21). `assess_tones` aplica toda la
-cadena a los tonos de un espectro e informa del tono decisivo.
+$\Delta L_j = -10\ \text{dB}$ (Fórmula 21). `assess_tones` es el punto de
+entrada *por tono*: aplica las Fórmulas (2)-(5) y (12)-(14) a cada tono que se
+le pasa e informa del mayor, que es la audibilidad decisiva solo cuando no hay
+dos tonos audibles que compartan banda crítica.
 
 **Cómo se selecciona la banda decisiva.** El método no barre un conjunto fijo
 de bandas: cada *tono* detectado define su propia banda crítica (§1), la
@@ -161,11 +163,27 @@ LS = [48.91, 49.22, 50.50, 52.85, 58.29, 59.53, 59.71, 61.98, 54.16]
 res = psychoacoustics.assess_tones(fT, LT, LS, 2.7)
 print(round(res.decisive_audibility, 2), res.decisive_frequency)  # 5.01 137.3
 
-# Audibilidad media de los cinco espectros medidos (valores decisivos, Tabla E.3):
+# Los cinco espectros de la campaña del Anexo E, calificados con el Paso 3
+# aplicado (valores decisivos de la Tabla E.3), promediados en energía por la
+# Fórmula 20:
 print(round(psychoacoustics.mean_audibility([9.18, 6.04, 7.46, 2.67, 7.17]), 2))  # 6.98 dB
 
 res.plot(view="levels")   # niveles de tono sobre el ruido enmascarante de su banda crítica
 ```
+
+Los dos números de ese bloque no son el mismo espectro calificado dos veces con
+la misma regla. Los tonos a 118,4, 137,3 y 158,8 Hz caen todos en una misma
+banda crítica, así que el Paso 3 del apartado 5.3.8 los fusiona en un grupo
+`FG` a su nivel combinado $L_T = 72{,}15$ dB, y el valor decisivo de la norma
+para el espectro 1 son los 9,18 dB que abren la lista de `mean_audibility`, no
+los 5,01 dB que imprime la llamada por tono, que es la mayor de las nueve
+audibilidades individuales
+`[0.75, 0.89, 1.02, 1.79, 1.93, 3.47, 4.39, 4.57, 5.01]`. Esos 4,2 dB
+sobreviven al promediado: el valor por tono en lugar de 9,18 baja la media de
+la campaña de 6,98 dB a 5,98 dB, que es $K_t = 3$ dB en vez de 4 dB en la
+Tabla J.1 de ISO 1996-2. Así que usa `analyze_spectrum` (§5), que ejecuta el
+agrupamiento, siempre que se vaya a declarar una audibilidad decisiva, y
+`assess_tones` solo cuando el agrupamiento ya está resuelto.
 
 La misma evaluación se lee de dos maneras. Las barras de audibilidad del
 principio de esta página responden a «cuánto supera cada tono el umbral de

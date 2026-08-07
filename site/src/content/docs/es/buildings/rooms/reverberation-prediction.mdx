@@ -363,7 +363,28 @@ habituales:
 Los objetos difusores restauran la mezcla que los modelos suponen: una sala
 amueblada sigue la predicción estadística claramente mejor que la misma
 sala vacía, más allá de lo que explica el área de absorción propia del
-mobiliario. En la práctica, indica una *banda* de predicciones (Sabine y
+mobiliario. El clip de abajo es ese mecanismo con la absorción quitada de
+en medio, de modo que solo queda la mezcla: un frente de onda de 800 Hz entra
+en una sala rígida de 4 m llena de columnas rígidas de 10 a 17 cm de anchura,
+de un cuarto a dos quintos de la longitud de onda de 42,9 cm. Cada columna
+difracta el frente y suelta una onda dispersada, las ondas dispersadas
+interfieren y en unos pocos pasos el frente especular se ha convertido en
+energía repartida por toda la sala sin dirección preferente, que es la
+hipótesis de la que parten tanto Sabine como Eyring y que aquí aparece como
+resultado en lugar de como hipótesis. Nada absorbe dentro de la sala, así que
+lo que se ve es *solo* la redistribución; el decaimiento del final es la
+energía escapándose por los dos extremos abiertos.
+
+<Video
+  name="anim_fdtd_pillar_hall"
+  width={2400}
+  height={600}
+  displayWidth="100%"
+  title="Un frente de onda mezclándose en una sala de columnas (FDTD 2D)"
+  description="Un frente de onda plano de 800 Hz recorre una sala rígida de 4 m llena de una columnata al tresbolillo de columnas rígidas de 10 a 17 cm de anchura, simulada a 2,5 mm; cada columna difracta el frente y suelta una onda dispersada, y las ondas dispersadas interfieren hasta llenar toda la sala de energía estructurada que después se escapa por los extremos absorbentes."
+/>
+
+En la práctica, indica una *banda* de predicciones (Sabine y
 Eyring, o Fitzroy y Arau-Puchades en los casos axiales) en lugar de un
 único valor; donde los modelos se separan, la sala está diciendo que su
 campo no es difuso.

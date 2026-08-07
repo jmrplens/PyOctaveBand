@@ -205,6 +205,24 @@ desnudo $L_{n,w,eq} = 164 - 35 \log_{10}(m'/m'_0)$ (Anexo B), la mejora del
 revestimiento $\Delta L_w$ (ISO 717-2) y la corrección por flancos $K$ de la
 Tabla 1.
 
+**Comprueba qué edición cita tu reglamento.** El modelo anterior es el de
+EN 12354-2:2000, que condensa toda la transmisión por flancos en la única
+corrección tabulada $K$ que se lee a partir de la masa del elemento separador y
+de la masa media de los flancos. ISO 12354-2:2017 reorganizó ese mismo modelo
+simplificado en fórmulas explícitas camino a camino
+— $L_{n,d,w} = L_{n,eq,0,w} - \Delta L_w - \Delta L_{d,w}$ (15) para el camino
+directo y, para cada camino de flanco,
+$L_{n,ij,w} = L_{n,eq,0,w} - \Delta L_w + (R_{i,w} - R_{j,w})/2 - \Delta R_{j,w}
+- K_{ij} - 10\log_{10}(S_i/l_0 l_{ij})$ (16) —, de modo que **la corrección de
+la Tabla 1 no está en el texto vigente en absoluto**, aunque la física de fondo
+y la declaración de exactitud no hayan cambiado. La edición de 2017 declara
+además un campo de aplicación que el texto de 2000 dejaba implícito
+(apartado 4.3.1): el modelo simplificado se restringe a 100 Hz–3150 Hz y, para
+construcciones ligeras, a la vía del nivel de impactos normalizado por flancos
+medido $L_{nf,ij}$ de la Fórmula (17). La vía por bandas de frecuencia de
+[Predicción detallada por bandas](/phonometry/es/buildings/design/detailed-prediction/)
+está anclada en las ediciones de 2017 de principio a fin.
+
 ```python
 from phonometry import building
 

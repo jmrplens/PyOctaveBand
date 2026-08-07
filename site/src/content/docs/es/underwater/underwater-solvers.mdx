@@ -171,6 +171,21 @@ print(round(float(modes.wavenumbers[0]), 5))    # 0.20885  kr1 calculado
 print(round(np.sqrt(k**2 - (np.pi / 200.0) ** 2), 5))   # 0.20885  exacto
 ```
 
+Esa guía de ondas ideal cumple dos papeles, y no conviene confundirlos. Es el
+oráculo exacto contra el que se comprueba el solucionador, que es para lo que se
+usa aquí, y es además un fondo físicamente *extremo*: un lecho de presión nula
+refleja con módulo unidad e inversión de fase, así que no transmite nada al
+sedimento y no absorbe nada. Una pérdida por transmisión modal o PE calculada
+sobre él subestima, por tanto, la pérdida de cualquier fondo marino real, y la
+diferencia se ensancha con el alcance porque se acumula rebote a rebote. La
+opción rígida es el extremo contrario, ofrecida por la misma razón de validación
+y no como modelo de sedimento. Para un fondo real en aguas someras, tasa el
+lecho con los regímenes de Weston de
+[propagación submarina del sonido](/phonometry/es/underwater/underwater-propagation/),
+cuyo ángulo crítico y gradiente de pérdida por reflexión codifican exactamente
+lo que estas condiciones de contorno omiten, y lee la respuesta modal como una
+cota superior del nivel recibido.
+
 ## 3. Trazado de rayos: tiempos de propagación y zonas de convergencia
 
 En el límite de alta frecuencia la ecuación de Helmholtz colapsa en la
@@ -279,7 +294,7 @@ velocidad del sonido y de absorción nombrados abajo están implementados y
 referenciados en la
 [propagación submarina del sonido](/phonometry/es/underwater/underwater-propagation/).
 
-**Velocidad del sonido.** Las tres ecuaciones coinciden a menos de 1 m/s
+**Velocidad del sonido.** Las cuatro ecuaciones coinciden a menos de 2,5 m/s
 dentro de su dominio común, así que la elección va de *rango de validez*, no
 de exactitud. La forma **UNESCO / Chen-Millero** por defecto (en la
 reformulación de Wong y Zhu de 1995) cubre de 0 a 40 °C, de 0 a 40 ppt y de 0
@@ -290,7 +305,12 @@ autores la prefieren para trabajo de océano profundo dentro de ese dominio
 cambia presión por profundidad directamente (2-30 °C, 25-40 ppt, 0-8000 m),
 lo que la convierte en la opción cómoda cuando se dispone de una profundidad
 de ecosonda y no de una presión de CTD; las otras dos convierten profundidad a
-presión internamente mediante Leroy y Parthiot (1998).
+presión internamente mediante Leroy y Parthiot (1998). **Medwin** (1975) es una
+simplificación de seis términos válida hasta unos 1000 m en aguas someras y
+cálidas; es la más basta de las cuatro y la que hay detrás de las reglas
+prácticas $\partial c/\partial T \approx 4{,}6 - 0{,}110\,T$ m/s por °C y
+$\partial c/\partial z \approx 0{,}016$ m/s por metro, así que resérvala para el
+cálculo mental y las comprobaciones a mano, no para un presupuesto.
 
 **Absorción.** **Francois-Garrison** (1982) es la referencia y el valor por
 defecto: incorpora las relajaciones del ácido bórico, el sulfato de magnesio y

@@ -35,7 +35,7 @@ los motores de número único tras los índices del método de control en
 
 ## Bandas de octava y el índice de reverberación
 
-Los métodos de ingeniería anteriores compran precisión con esfuerzo:
+Los [métodos de ingeniería](/phonometry/es/buildings/insulation/insulation-field/) compran precisión con esfuerzo:
 micrófonos barridos, tiempos de reverberación por banda, corrección de ruido de
 fondo cuidadosa. Para una comprobación rápida en una vivienda, ISO 10052 define
 un **método de control (survey)**: bandas de octava, un sonómetro de mano y una
@@ -52,12 +52,41 @@ reverberación son idénticas en la armonizada EN ISO 10052:2004+A1:2010.
 
 El índice de reverberación se **mide** (pasa el tiempo de reverberación a
 `reverberation_index(T)`) o, en un control, se **estima** a partir del tipo de
-sala y el volumen con `estimate_reverberation_index(V, room)` (Tabla 4:
-amueblada `"kitchen"` / `"bathroom"` / `"furnished"`, o las clases de
-construcción sin amueblar `"a"`–`"h"` y las mixtas `"a+e"`…`"d+h"`). Una cuarta
+sala y el volumen con `estimate_reverberation_index(V, room)`: amueblada
+`"kitchen"` / `"bathroom"` / `"furnished"`, o las clases de construcción sin
+amueblar `"a"`–`"h"` y las mixtas `"a+e"`…`"d+h"`. La cláusula 6.5 separa eso
+en dos: la **Tabla 3** clasifica el recinto y le asigna su letra, y la
+**Tabla 4** convierte la letra y el volumen en el índice. Una cuarta
 magnitud propia de este método es el **ruido de equipos de servicio**
 $L_{XY}$: la
 media energética de tres posiciones ponderadas A o C.
+
+Las letras no son arbitrarias: la Tabla 3 es una malla de 2 × 2 × 2 sobre el
+peso de las paredes y el techo, la dureza del revestimiento del suelo y el
+peso de la construcción del forjado.
+
+| Paredes y techo | Revestimiento blando, forjado ligero | Revestimiento blando, forjado pesado | Revestimiento duro, forjado ligero | Revestimiento duro, forjado pesado |
+| :--- | :---: | :---: | :---: | :---: |
+| Ligeras | `a` | `b` | `c` | `d` |
+| Pesadas | `e` | `f` | `g` | `h` |
+
+Una **pared ligera** es placa de yeso o entramado de madera, y una pared
+pesada con trasdosado de placa de yeso cuenta como ligera; una **pared
+pesada** es fábrica o bloque sin trasdosar. Un **forjado ligero** es
+entablado o tablero sobre viguetas de madera, y un **forjado pesado** una
+losa de hormigón. El **revestimiento** es moqueta (blando) frente a baldosa o
+tarima (duro). Cuando el recinto mezcla dos construcciones sobre áreas
+aproximadamente iguales, promedia las dos letras: eso son las clases mixtas
+`"a+e"`…`"d+h"`; cuando una construcción domina claramente en área, usa su
+letra sola. Fíjate en que el revestimiento y la construcción del forjado son
+dos ejes distintos, así que «suelo duro» por sí solo no elige una clase.
+
+La Tabla 4 procede de un estudio estadístico de viviendas europeas
+construidas entre 1960 y 1980 (NOTA 1): la desviación típica de los índices
+tabulados ronda 1 dB, y la tabla vale para $T_0 = 0{,}5\ \text{s}$ y recintos
+de hasta 150 m³. Un cambio en los métodos constructivos o en los hábitos de
+habitación puede desplazarla sistemáticamente, así que mide $T$ cuando el
+resultado tenga que sostenerse.
 
 ```python
 import numpy as np
@@ -72,10 +101,10 @@ print(np.round(res.d_nt, 1))          # [34.5 39.8 45.  50.5 54. ]  DnT = D + k
 print(res.rating.rating, res.rating.c)        # 49 -1  ->  DnT,w (C)
 print(res.r_prime_rating.rating)               # 48  ->  R'w
 
-# ¿Sin T medido? Estima k con la Tabla 4 (paredes pesadas, suelo duro,
-# 35-60 m³ -> clase "g").
-k_est = building.estimate_reverberation_index(50.0, "g")
-print(k_est)                                   # [4.5 5.  5.5 5.5 5.5]
+# ¿Sin T medido? Clasifica con la Tabla 3 y luego lee la Tabla 4: paredes
+# pesadas de fábrica, losa de hormigón, suelo de baldosa, 35-60 m³ -> clase "h".
+k_est = building.estimate_reverberation_index(50.0, "h")
+print(k_est)                                   # [5.  5.5 6.  5.  5.5]
 
 # Ruido de equipos de servicio: media energética de tres posiciones (dB(A)).
 se = building.survey_service_equipment_level([35.0, 30.0, 32.0], 3.0, volume=50.0)
@@ -121,6 +150,22 @@ plt.show()
 
 </details>
 
+### Ruido de fondo: un umbral que cumplir, no una corrección que aplicar
+
+A diferencia de los métodos de ingeniería, el método de control nunca corrige
+por ruido de fondo (cláusula 6.2.1). Fija en su lugar un umbral de relación
+señal/ruido: ajusta la fuente para que el nivel en el recinto receptor supere
+al fondo en al menos 6 dB en todas las bandas, comprobado encendiendo y
+apagando la fuente antes de la tanda. Donde el margen siga por debajo de
+6 dB, registra el nivel sin corregir y haz constar en el informe que la
+diferencia de niveles queda infravalorada (o, para equipos de servicio, que el
+nivel queda sobrevalorado) en una cantidad desconocida. Por eso no aparece
+ninguna llamada de corrección en toda esta página:
+`building.background_correction` implementa la regla de laboratorio de
+ISO 10140-4 y no debe aplicarse a datos de control. Revisiones anteriores de
+esta guía decían lo contrario, y presentaban la corrección como tarea de quien
+llama; un control corregido así no es conforme y sobrestima el aislamiento.
+
 ### Parámetros de `survey_airborne_insulation()` y afines
 
 | Parámetro | Tipo | Unidades | Rango / def. | Notas |
@@ -131,7 +176,7 @@ plt.show()
 | `volume` | float | m³ | > 0 | Volumen receptor $V$ (para $D_n$ / $L'_n$ / $R'$ / normalizadas) |
 | `area` | float | m² | > 0 | Área de partición común $S$ (aéreo $R'$; regla $V/7{,}5$) |
 | `measurements` | array | dB | exactamente 3 | Posiciones de equipo de servicio (`survey_service_equipment_level`) |
-| `room` | str | — | `"kitchen"`/`"bathroom"`/`"furnished"`/`"a"`–`"h"`/`"a+e"`… | Clase de sala para `estimate_reverberation_index` (Tabla 4) |
+| `room` | str | — | `"kitchen"`/`"bathroom"`/`"furnished"`/`"a"`–`"h"`/`"a+e"`… | Clase de sala para `estimate_reverberation_index` (Tabla 3; el índice en sí es la Tabla 4) |
 
 `survey_airborne_insulation()` devuelve un `SurveyAirborneResult` (`d`, `d_nt`,
 `d_n`, `r_prime`, `rating`, `r_prime_rating`); `survey_impact_insulation()` un
@@ -243,7 +288,7 @@ plt.show()
 **Cubierto.** El método de control de ISO 10052:2021: el índice de
 reverberación $k = 10\log_{10}(T/T_0)$ medido con
 `building.reverberation_index` o estimado desde las clases de recinto de la
-Tabla 4 con `building.estimate_reverberation_index`; las magnitudes de
+Tabla 3 con `building.estimate_reverberation_index`; las magnitudes de
 control aéreas, de impacto y de fachada ($D_{nT}$, $D_n$, $R'$ con la regla
 $V/7,5$, $L'_{nT}$, $L'_n$, $D_{2m,nT}$) mediante
 `building.survey_airborne_insulation`, `building.survey_impact_insulation`
@@ -256,8 +301,10 @@ sobre espectros de 5 octavas o 16 tercios; y las fichas del método con
 **No cubierto.** El propio procedimiento de control (dónde sostener el
 sonómetro, las alturas de medición fijas, la colocación de la máquina de
 impactos del método) no se comprueba: las funciones consumen niveles por
-banda vengan de donde vengan. La corrección de ruido de fondo es tarea de
-quien llama, como en los métodos de ingeniería. La declaración de exactitud
+banda vengan de donde vengan. Nada verifica que se cumpliese el umbral de
+6 dB de señal a fondo de la cláusula 6.2.1, y no se aplica corrección alguna
+cuando no se cumplió: esa es la regla del propio método, no una omisión. La
+declaración de exactitud
 del método frente a ISO 16283 se cita de la norma, no se modela; cuando
 sube lo que hay en juego, pasa a
 [Medición del aislamiento en campo (ISO 16283)](/phonometry/es/buildings/insulation/insulation-field/).

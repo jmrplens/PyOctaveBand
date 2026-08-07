@@ -47,7 +47,8 @@ from phonometry import materials
 res = materials.floating_floor_resonance(
     resonant_frequency=25.0, total_mass_per_area=200.0,
     floor_mass_per_area=120.0,
-    airflow_resistivity=50.0, thickness=0.020, porosity=0.9,
+    airflow_resistivity=50.0,   # kPa.s/m2 (= 50000 Pa.s/m2 de la ISO 9053)
+    thickness=0.020, porosity=0.9,
 )
 res.plot(language="es")
 plt.show()
@@ -150,6 +151,19 @@ $r \ge 100\ \text{kPa}\cdot\text{s/m}^2$, $s' = s'_t + s'_a$ para
 $10 \le r < 100\ \text{kPa}\cdot\text{s/m}^2$, y para
 $r < 10\ \text{kPa}\cdot\text{s/m}^2$ el método solo resuelve $s' = s'_t$
 cuando el término del gas es despreciable.
+
+**Ojo al prefijo.** $r$ es la magnitud que la ISO 9053 llama $\sigma$ y reporta
+en Pa·s/m², mientras que la EN 29052-1 la escribe $r$ y pone sus umbrales en
+**kPa·s/m²**. La biblioteca sigue a la norma, así que `airflow_resistivity` va
+en kPa·s/m²: el único argumento de esta página que no está en SI puro. Una lana
+mineral medida en 50 000 Pa·s/m² entra como `50.0`, no como `50000.0`; un
+[resultado de ISO 9053](/phonometry/es/materials/absorbers/airflow-resistance/)
+se convierte con `sigma / 1000`. Pasar el número en Pa·s/m² cae en silencio en
+la rama $r \ge 100$, que descarta el término del gas encerrado: para la
+determinación de abajo eso convierte $s' = 10{,}49$ MN/m³ en 4,93 MN/m³ y la
+frecuencia natural de diseño de 47,1 Hz en 32,3 Hz, sin ningún aviso, porque la
+rama equivocada es una rama válida.
+
 `floating_floor_resonance` encadena toda la determinación:
 
 ```python
@@ -158,7 +172,8 @@ from phonometry import materials
 res = materials.floating_floor_resonance(
     resonant_frequency=25.0, total_mass_per_area=200.0,
     floor_mass_per_area=120.0,
-    airflow_resistivity=50.0, thickness=0.020, porosity=0.9,
+    airflow_resistivity=50.0,   # kPa.s/m2 (= 50000 Pa.s/m2 de la ISO 9053)
+    thickness=0.020, porosity=0.9,
 )
 print(round(res.dynamic_stiffness / 1e6, 2), round(res.natural_frequency, 1))
 # 10.49 47.1
@@ -193,7 +208,8 @@ from phonometry import ReportMetadata, materials
 res = materials.floating_floor_resonance(
     resonant_frequency=45.0, total_mass_per_area=200.0,
     floor_mass_per_area=110.0,
-    airflow_resistivity=50.0, thickness=0.020, porosity=0.9,
+    airflow_resistivity=50.0,   # kPa.s/m2 (= 50000 Pa.s/m2 de la ISO 9053)
+    thickness=0.020, porosity=0.9,
 )
 res.report(
     "dynamic_stiffness.pdf",
@@ -260,7 +276,9 @@ por métodos sinusoidal, de ruido blanco o de impulso y la extrapola a
 amplitud de fuerza nula, no está implementado: pasa una $f_r$ ya extrapolada.
 La resistividad al flujo lateral $r$ de la cláusula 8.2 también se toma como
 entrada en lugar de medirse; los métodos estático y alterno de la ISO 9053
-están implementados aparte, en `materials.absorbers.airflow_resistance`. El requisito
+están implementados aparte, en `materials.absorbers.airflow_resistance`, y
+reportan $\sigma$ en Pa·s/m² mientras que el argumento `airflow_resistivity` de
+esta página va en kPa·s/m². El requisito
 de selección de probetas de la cláusula 6 (al menos tres probetas de
 200 mm × 200 mm) no se aplica.
 

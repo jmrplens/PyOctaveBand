@@ -65,12 +65,22 @@ $$
 
 donde los $6$ dB son el desfase de campo difuso entre el nivel de presión acústica
 y el nivel de intensidad incidente. La misma fórmula da el índice aparente
-$R'_I$ en campo (ISO 15186-2). Como el método por intensidad *subestima*
-ligeramente la potencia radiada a un recinto receptor real, un **índice
-modificado** $R_{I,M} = R_I + K_c$ reproduce el resultado por presión de la
-ISO 10140-2; el término de adaptación $K_c$ (Anexo B) es
+$R'_I$ en campo (ISO 15186-2). El barrido de intensidad mide directamente la
+potencia transmitida. El método por presión en cámara reverberante no: infiere
+la potencia a partir del nivel del recinto receptor y por eso la *subestima*,
+lo que hace que el $R$ de ISO 10140-2 salga ligeramente alto. El **índice
+modificado** $R_{I,M} = R_I + K_c$ vuelve a añadir ese mismo sesgo al resultado
+por intensidad, de modo que una medición por intensidad pueda contrastarse con
+datos del método por presión (ISO 15186-1, cláusula 3.10 NOTA 1). Informa
+$R_I$ cuando lo que se busca es la potencia transmitida real; informa
+$R_{I,M}$ cuando lo que se busca es la comparabilidad con un resultado de
+ISO 10140-2. Revisiones anteriores de esta guía achacaban el sesgo al propio
+método por intensidad, lo que habría exigido restar $K_c$ en lugar de sumarlo.
+El término de adaptación $K_c$ (Anexo B) es
 $10 \log_{10}(1 + S_{b2}\lambda/8V_2)$ para una sala bien definida, o el
-independiente de la sala $10 \log_{10}(1 + 61{,}4/f)$. Para elementos pequeños, la
+independiente de la sala $10 \log_{10}(1 + 61{,}4/f)$. La primera forma es el
+término de energía de contorno de Waterhouse, lo que deja leer la segunda como
+ese mismo término evaluado a un $S_{b2}/V_2$ fijo. Para elementos pequeños, la
 **diferencia de niveles normalizada por elemento** sustituye $10\log_{10}(S_m/S)$ por
 $10\log_{10}(S_m/A_0) + 10\log_{10} N$ ($A_0 = 10\ \text{m}^2$, $N$ unidades de elemento).
 

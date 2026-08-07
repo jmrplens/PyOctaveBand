@@ -63,8 +63,9 @@ nombre necesite la cláusula de la que viene.
 
 ## [Bibliografía](/phonometry/es/reference/bibliography/)
 
-Todos los libros y artículos que citan las guías, en una sola lista agrupada
-por dominio, cada entrada con un DOI verificado o un enlace oficial del
-editor, media frase sobre qué sustenta y las páginas de guía que la citan.
-Sirve a la vez como lista de lectura del campo y como fuente única de verdad
-para la comprobación de enlaces.
+Una selección curada de los libros y artículos en los que se apoyan las guías,
+en una sola lista agrupada por dominio, cada entrada con un DOI verificado o un
+enlace oficial del editor, media frase sobre qué sustenta y las páginas de guía
+que la citan. Es una lista de lectura del campo más que el índice completo de
+citas: la lista con autoridad para una página concreta es la sección de
+Referencias de esa misma página, generada a partir de su frontmatter.

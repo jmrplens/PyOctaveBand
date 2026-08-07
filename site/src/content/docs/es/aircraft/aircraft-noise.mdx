@@ -74,19 +74,42 @@ pnl = aircraft.perceived_noise_level(spl)      # PNdB
 
 ## Corrección tonal
 
-Las irregularidades espectrales (tonos de ventilador/turbina) se penalizan con
-una **corrección tonal** $C$, hallada con el método de pendientes ("encircling"):
-las pendientes se suavizan a un espectro de fondo $\mathrm{SPL}''$, el exceso
-tonal $F = \mathrm{SPL} - \mathrm{SPL}''$ por encima de 1,5 dB se mapea a un
-factor de corrección (división de frecuencia en 500 Hz / 5000 Hz, con tope de
-6⅔ dB) y se toma el máximo sobre las bandas. La implementación reproduce
-exactamente el ejemplo del turbofán de la Tabla 3-7 del ETM Vol. I
+Un tono puro se juzga mucho más molesto que la misma energía repartida por su
+banda de tercio de octava, así que las irregularidades espectrales (tonos de
+ventilador y de turbina) se penalizan con una **corrección tonal** $C$. El
+método de pendientes ("encircling") reconstruye qué aspecto tendría el espectro
+*sin* el tono suavizando las pendientes de banda a banda hasta un fondo
+$\mathrm{SPL}''$, de modo que el exceso
+$F = \mathrm{SPL} - \mathrm{SPL}''$ es una magnitud que solo contiene el tono.
+Por encima de 1,5 dB se lleva a un factor de corrección con la regla de la
+Tabla A2-2, y se toma el máximo sobre las bandas:
+
+| Banda | $F < 3$ dB | $3 \le F < 20$ dB | $F \ge 20$ dB |
+|---|---|---|---|
+| 50 Hz-400 Hz y 6,3-10 kHz | $F/3 - 0{,}5$ | $F/6$ | $3\tfrac{1}{3}$ dB |
+| 500 Hz-5 kHz | $2F/3 - 1$ | $F/3$ | $6\tfrac{2}{3}$ dB |
+
+La rama de frecuencias medias penaliza un tono el doble de duro, que es la razón
+por la que un tono de ventilador de 2500 Hz domina la corrección de un espectro
+de turbofán. La implementación reproduce exactamente el ejemplo del turbofán de
+la Tabla 3-7 del ETM Vol. I de ICAO Doc 9501
 ($C = 2{,}0\ \text{dB}$ en 2500 Hz).
+
+El método trae dos trampas. Un espectro rizado pero sin tonos puede producir una
+corrección, que la propia norma permite rechazar tras un reanálisis en banda
+estrecha (§4.3.1, paso 10). Y un tono que cae entre dos bandas reparte su
+exceso, de modo que la corrección cruda sale demasiado pequeña; el **ajuste por
+reparto de bandas** $\Delta_B$, el defecto de $C$ en el registro de
+$\mathrm{PNLTM}$ frente a la media de los registros que quedan a menos de un
+segundo de él, lo devuelve antes de localizar la ventana de 10 dB por debajo.
 
 ```python
 from phonometry import aircraft
 
 c = aircraft.tone_correction(spl)              # dB; se suma al PNL para dar PNLT
+# start_band=2 (80 Hz) es el inicio de análisis para avión; un procedimiento de
+# helicóptero empieza en 50 Hz, que es lo que selecciona procedure="helicopter"
+# en effective_perceived_noise_level más abajo.
 ```
 
 ## EPNL
@@ -109,10 +132,13 @@ res.plot()   # historia temporal PNL/PNLT (requiere matplotlib)
 ```
 
 `effective_perceived_noise_level` devuelve un `EPNLResult` con el `pnl` por
-registro, la `tone_correction`, el `pnlt`, el máximo `pnltm`, la
-`duration_correction`, el `epnl` y los `band_limits` de 10 dB por debajo. El
+registro, la `tone_correction`, el `pnlt`, el máximo `pnltm`, el
+`bandsharing_adjustment`, la `duration_correction`, el `epnl` y los
+`band_limits` de 10 dB por debajo. Su argumento `procedure=` arranca el análisis
+en 80 Hz para un avión (el valor por defecto) y en 50 Hz para un helicóptero. El
 ejemplo del método integrado en condiciones de referencia de la Tabla 4-4 del
-ETM Vol. I se reproduce como $\mathrm{EPNL} = 92{,}6\ \text{EPNdB}$.
+ETM Vol. I, que es otra historia temporal de certificación distinta y real, se
+reproduce como $\mathrm{EPNL} = 92{,}6\ \text{EPNdB}$.
 
 <details>
 <summary>Mostrar el código de esta figura</summary>
@@ -178,7 +204,11 @@ res.report(
 ```
 
 La ficha de ejemplo se regenera con `make reports` y se conserva renderizada en
-el repositorio; pulsa la vista previa para abrir el PDF.
+el repositorio; pulsa la vista previa para abrir el PDF. Está renderizada a
+partir de su propio sobrevuelo sintético, más silencioso (EPNL 98,3 EPNdB), y no
+de los espectros de la figura de arriba: si pasas esos por la misma llamada, la
+ficha informa de 114,0 EPNdB y de un NO CUMPLE frente a ese mismo límite de
+101 EPNdB, que es la fila de veredicto haciendo su trabajo.
 
 <ReportPreview
 	name="icao_epnl_example"

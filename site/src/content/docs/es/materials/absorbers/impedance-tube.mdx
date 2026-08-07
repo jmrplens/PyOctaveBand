@@ -386,19 +386,46 @@ figura que incrusta la ficha, matplotlib (`pip install
 genera en inglés por defecto; pasa `language="es"` para una ficha en español
 (cadenas fijas traducidas y coma decimal).
 
+El bloque de abajo es la probeta de la ficha que va debajo: una capa resistiva
+de resistencia al flujo normalizada $\theta = 1$ sobre una cavidad de aire de
+86 mm con respaldo rígido, cuya impedancia superficial
+$z = \theta - \mathrm{j}\cot(k_0 L)$ se conoce en forma cerrada, así que el
+$\alpha$ impreso se puede comprobar a mano: 1,00 en la resonancia de cuarto de
+onda de 1 kHz, donde la lámina adaptada da $z = 1$ y $r = 0$; 0,80 a 500 Hz,
+donde $k_0 L = \pi/4$ y $z = 1 - \mathrm{j}$.
+
 ```python
+import numpy as np
 from phonometry import materials, ReportMetadata
 
-result = materials.two_microphone_impedance(
-    h12, frequency=freqs, spacing=0.05, x1=0.10,
-    speed_of_sound=c0, characteristic_impedance=rho_c, diameter=0.10,
+# Tubo de 100 mm, s = 50 mm, micrófono lejano en x1 = 100 mm, 20 degC / 101 kPa.
+c0 = float(materials.speed_of_sound_iso(293.15))                    # 343.29 m/s
+rho_c = materials.characteristic_impedance(
+    float(materials.air_density_iso(293.15, 101.0)), c0)            # 405.6 Pa.s/m
+diameter, spacing, x1 = 0.100, 0.050, 0.100
+theta, cavity = 1.0, c0 / (4.0 * 1000.0)     # cuarto de onda a 1 kHz: 86 mm
+freqs = np.array([400, 500, 630, 800, 1000, 1250, 1600], dtype=float)
+
+# La función de transferencia que mediría el tubo, sintetizada desde la r conocida.
+k0 = materials.tube_wavenumber(freqs, c0)
+z = theta - 1j / np.tan(2 * np.pi * freqs / c0 * cavity)
+r_known = (z - 1.0) / (z + 1.0)
+x2 = x1 - spacing
+h12_fiche = (np.exp(1j*k0*x2) + r_known*np.exp(-1j*k0*x2)) / \
+            (np.exp(1j*k0*x1) + r_known*np.exp(-1j*k0*x1))
+
+fiche = materials.two_microphone_impedance(
+    h12_fiche, frequency=freqs, spacing=spacing, x1=x1,
+    speed_of_sound=c0, characteristic_impedance=rho_c, diameter=diameter,
 )
-result.report(
+print(np.round(fiche.absorption, 2))    # [0.68 0.8  0.9  0.97 1.   0.96 0.68]
+
+fiche.report(
     "alpha_fiche.pdf",
     metadata=ReportMetadata(
         specimen="Capa resistiva sobre cavidad de aire de 86 mm con respaldo rígido",
-        tube_diameter=0.10,            # m (se imprime como 100 mm)
-        mic_spacing=0.05,              # m (se imprime como 50 mm)
+        tube_diameter=diameter,        # m (se imprime como 100 mm)
+        mic_spacing=spacing,           # m (se imprime como 50 mm)
         measurement_standard="ISO 10534-2",
         laboratory="Phonometry Reference Laboratory",
     ),

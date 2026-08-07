@@ -126,6 +126,16 @@ al día durante 20 años) se reproduce: $D_{zd} = 55{,}97$ m/s², $R = 1{,}22$,
 $\Pi = 0{,}37$. El modelo espinal de elementos finitos del Anexo A
 (distribuido por ISO como software aparte) queda fuera de alcance.
 
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/multiple_shock_es.svg" alt="Izquierda: la transmisibilidad asiento-columna sube hasta cerca de 1,6 en una resonancia próxima a 5 Hz y luego cae casi a cero hacia 80 Hz. Derecha: la probabilidad de Weibull de lesión lumbar frente a la variable de tensión R para hombre y mujer, con los niveles de riesgo del 10, 50 y 90 por ciento y el ejemplo del Anexo C para el hombre en R = 1,22, alrededor del 37 por ciento" width="96%" />
+
+*Los dos objetos del modelo. A la izquierda, la transmisibilidad
+asiento-columna de la cláusula 5.2: unidad en continua, máximo en
+$|H| \approx 1{,}54$ cerca de 5 Hz y caída por encima, que es la razón por la
+que hubo que sustituir $W_k$ para los choques. A la derecha, la ley de Weibull
+$\Pi(R)$ de la Tabla C.1 con el ejemplo resuelto del Anexo C marcado en
+$R = 1{,}22$, $\Pi = 0{,}37$: el riesgo sube abruptamente en una banda estrecha
+de $R$, así que una dosis que se duplica no duplica la probabilidad.*
+
 Consulta la [guía de vibración en humanos](/phonometry/es/vibration/human/human-vibration/) y la
 [guía de vibración con choques múltiples](/phonometry/es/vibration/human/multiple-shock-vibration/) para su uso.
 
@@ -157,4 +167,21 @@ para su uso.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/mechanical_mobility_es.svg" alt="Magnitudes normalizadas de receptancia, movilidad y acelerancia de un resonador de un grado de libertad en un eje de frecuencia log-log, todas con máximo en la resonancia" width="82%" />
 
-*Receptancia, movilidad y acelerancia de un resonador de un grado de libertad: la misma resonancia vista a través de las tres magnitudes cinemáticas.*
+*No es ninguna de las formas cerradas anteriores: este es un resonador
+**finito** de un grado de libertad, y la receptancia, la movilidad y la
+acelerancia son la misma resonancia vista a través de las tres magnitudes
+cinemáticas. Está aquí como contraste: los resultados de estructura infinita
+son independientes de la frecuencia o caen suavemente, mientras que todo lo
+finito resuena.*
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/mobility_result_lines_es.svg" alt="Módulo de la movilidad puntual de un resonador de un grado de libertad en ejes log-log, subiendo por la recta de rigidez por debajo de la resonancia, cayendo por la recta de masa por encima y con un máximo en la resonancia igual a la inversa del coeficiente de amortiguamiento" width="82%" />
+
+*El mismo punto leído como diagnóstico: por debajo de la resonancia el módulo
+sube por la **recta de rigidez** $\omega/k$, por encima cae por la **recta de
+masa** $1/(\omega m)$, y la altura del máximo la fija solo el amortiguamiento.
+Una estructura real tiene muchas resonancias de estas, y las formas cerradas de
+estructura infinita anteriores son la media en torno a la cual oscila la
+movilidad medida, no el valor que toma a una frecuencia dada, que es la razón
+por la que se usan con entradas de octava o tercio de octava y por la que son
+menos fiables en las bandas más bajas de un elemento pequeño o poco
+amortiguado.*

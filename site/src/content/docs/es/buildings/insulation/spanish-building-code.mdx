@@ -231,6 +231,7 @@ protegidos, el área de absorción acústica equivalente debe ser al menos
 0,2 m² por cada metro cúbico de volumen.
 
 ```python
+import numpy as np
 from phonometry import building
 
 facade = building.db_hr_facade_requirement(65.0, "residential", "bedrooms")
@@ -244,9 +245,30 @@ building.db_hr_party_wall_requirement().limit                         # 40 dBA p
 building.db_hr_party_wall_requirement("DnT,A").limit                  # 50 dBA las dos juntas
 building.db_hr_reverberation_requirement("classroom").limit           # 0,7 s
 
-check = building.assess_db_hr([(33.0, facade), (51.44, airborne[0])])
+# La exigencia entre recintos está declarada en DnT,A, así que el R' de la
+# medianería del informe de campo no se puede contrastar con ella tal cual. Hay
+# que rereferenciarlo antes: un recinto receptor de V = 50 m3 con T = 0,5 s
+# detrás de una partición de S = 12 m2 tiene A = 0,16 V / T = 16 m2, y
+# DnT = R' + 10 lg(A/S) + 10 lg(T/T0).
+d_nt = np.asarray(r_prime) + 10 * np.log10(16.0 / 12.0) + 10 * np.log10(0.5 / 0.5)
+building.dnt_a(d_nt).intermediate                   # 52,7 dBA (el R'A era 51,4 dBA)
+
+check = building.assess_db_hr([(33.0, facade), (52.7, airborne[0])])
 check.complies                                      # True
 ```
+
+La magnitud tiene que coincidir con la exigencia. El DB HR declara el límite
+entre recintos en $D_{nT,A}$, y $R'$ y $D_{nT}$ normalizan la misma diferencia
+de niveles por cosas distintas — $R' = D + 10\log_{10}(S/A)$ por el área de la
+partición y la absorción del recinto receptor, $D_{nT} = D + 10\log_{10}(T/T_0)$
+por el tiempo de reverberación —, así que un $R'_A$ de un informe de campo hay
+que convertirlo a través de la $T$ del recinto y del área de la partición antes
+de que signifique algo frente a los 50 dBA. Solo la exigencia de la
+*tabiquería* ($R_A \ge 33$ dBA) está declarada en la familia de $R_A$.
+Revisiones anteriores de esta página contrastaban el $R'_A = 51,4$ dBA de la
+medianería directamente con la exigencia en $D_{nT,A}$: aquí el veredicto salía
+igual por casualidad, pero la comparación era entre dos magnitudes distintas y
+nada garantiza esa coincidencia en general.
 
 `check_db_hr_requirement()` redondea el valor alcanzado como pide el DB HR
 antes de compararlo (a entero en las magnitudes en dB, a un decimal en el
