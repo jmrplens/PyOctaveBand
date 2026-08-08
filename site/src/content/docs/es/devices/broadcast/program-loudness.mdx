@@ -93,7 +93,32 @@ t = np.arange(20 * fs) / fs
 x = np.zeros((5, t.size))                     # L, R, C, Ls, Rs
 x[0] = np.sin(2 * np.pi * 997.0 * t)          # 0 dB FS en el canal izquierdo
 print(round(broadcast.integrated_loudness(x, fs), 2))   # -3.01  LKFS
+
+# La misma forma de onda en dos canales en vez de en uno (ver más abajo):
+mono = np.sin(2 * np.pi * 997.0 * t)
+print(round(broadcast.integrated_loudness(mono, fs), 2))               # -3.01
+print(round(broadcast.integrated_loudness(np.vstack([mono, mono]), fs), 2))  # 0.00
 ```
+
+### Los canales se suman, no se promedian
+
+La Fórmula 2 suma $G_i z_i$ sobre los canales, así que el número de canales
+forma parte de la medida: la misma forma de onda llevada en dos canales es
+exactamente $10\log_{10} 2 = 3,01$ LU más sonora que en uno. El anclaje de
+arriba lo enseña — ese seno de 997 Hz a plena escala marca −3,01 LKFS en un
+solo canal y 0,00 LKFS como mono dual, que es lo que imprimen las dos últimas
+líneas del fragmento anterior.
+
+Se mide el formato de entrega, no un stem. Un pódcast mono entregado como un
+canal cumple a −23 LUFS siendo un canal; duplicarlo a estéreo antes de medir
+hace que marque −20 LUFS e invita a una corrección de 3 dB en el sentido
+equivocado. La misma aritmética explica por qué se excluye el LFE (Tabla 3,
+$G = 0$) y por qué las ponderaciones de los envolventes son 1,41: la suma es
+una suma de sonoridad sobre la disposición de reproducción, de modo que
+cambiar la disposición cambia el número legítimamente. El `np.vstack` de los
+fragmentos siguientes es exactamente esto — mono dual, la entrega estéreo de
+una fuente mono — y es la razón de que marquen 3,01 LU por encima del valor
+de un solo canal de la misma forma de onda.
 
 Los coeficientes de los biquads están tabulados a 48 kHz (Tablas 1-2) y a
 esa frecuencia se devuelven literalmente; cualquier otra frecuencia los

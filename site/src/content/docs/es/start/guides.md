@@ -55,7 +55,7 @@ head:
             "@type": "ListItem",
             "position": 6,
             "name": "Medio ambiente y transporte",
-            "description": "Propagación en exteriores, barreras, refracción, aeronaves, helicópteros y aerogeneradores.",
+            "description": "Propagación en exteriores, barreras, refracción, fuentes viarias, ferroviarias y de aerogenerador, y la valoración construida sobre ellas.",
             "url": "https://jmrplens.github.io/phonometry/es/environment/"
           },
           {
@@ -371,6 +371,8 @@ sonido que le llega, medido en laboratorio o predicho a partir de los
 parámetros del material. Implementa ISO 354, ISO 11654, ISO 10534-1/-2,
 ISO 9053-1/-2, ISO 17497-1/-2, ISO 13472-1/-2, EN 29052-1 e ISO 12999-2.
 
+**[Absorbentes](/phonometry/es/materials/absorbers/)**
+
 - [Medida y clasificación de la absorción sonora](/phonometry/es/materials/absorbers/absorption-measurement/):
   la medición en cámara reverberante ISO 354, la valoración ponderada con su
   clase y la incertidumbre de medida de ambas.
@@ -388,6 +390,8 @@ ISO 9053-1/-2, ISO 17497-1/-2, ISO 13472-1/-2, EN 29052-1 e ISO 12999-2.
   condición de acoplamiento crítico para la absorción perfecta y el panel
   ranurado de sonido lento cargado con resonadores de Helmholtz, con su
   solucionador de diseño.
+**[Difusores y superficies](/phonometry/es/materials/diffusers/)**
+
 - [Difusores y sus coeficientes](/phonometry/es/materials/diffusers/diffusers/): el
   coeficiente de dispersión de incidencia aleatoria, el coeficiente de
   difusión por autocorrelación y el diseño de Schroeder con su predicción en
@@ -398,6 +402,11 @@ ISO 9053-1/-2, ISO 17497-1/-2, ISO 13472-1/-2, EN 29052-1 e ISO 12999-2.
 - [Absorción in situ de firmes de carretera](/phonometry/es/materials/surfaces/road-absorption/):
   la absorción in situ de pavimentos por la técnica de sustracción y el
   método puntual.
+
+El tercer grupo de esta área, Capas elásticas, tiene una sola guía,
+[Rigidez dinámica de materiales resilientes](/phonometry/es/materials/resilient/dynamic-stiffness/),
+listada más arriba dentro de Diseño del aislamiento, junto a la predicción de
+suelo flotante que la consume.
 
 ## [Vibración y ruido estructural](/phonometry/es/vibration/)
 
@@ -457,6 +466,15 @@ IEC 61400-11.
 - [Propagación del sonido en exteriores](/phonometry/es/environment/propagation/outdoor-propagation/):
   la absorción atmosférica y el método general de ISO 9613-2, con el desglose de
   la atenuación por bandas de octava y por términos.
+- [Efecto suelo esférico y barreras avanzadas](/phonometry/es/environment/propagation/ground-barriers/):
+  el coeficiente de reflexión de Weyl-Van der Pol sobre suelo de impedancia
+  finita y la difracción en barreras desde la teoría ondulatoria.
+- [Refracción atmosférica: rayos y GFPE](/phonometry/es/environment/propagation/atmospheric-refraction/):
+  los perfiles de velocidad efectiva del sonido, los rayos curvos con distancia
+  de zona de sombra en forma cerrada y el campo de nivel relativo por GFPE.
+
+**[Fuentes](/phonometry/es/environment/sources/)**
+
 - [Emisión de la fuente de tráfico viario CNOSSOS-EU](/phonometry/es/environment/sources/cnossos-road-emission/):
   la fuente viaria común europea del Anexo II 2.2: potencia acústica de rodadura
   y propulsión por categoría de vehículo y potencia direccional por metro de
@@ -468,15 +486,17 @@ IEC 61400-11.
 - [Ruido de aerogeneradores: potencia y audibilidad tonal](/phonometry/es/environment/sources/wind-turbine-noise/):
   el nivel de potencia acústica aparente referido al centro del rotor y la cadena
   de audibilidad tonal que decide si un tono se oye.
-- [Efecto suelo esférico y barreras avanzadas](/phonometry/es/environment/propagation/ground-barriers/):
-  el coeficiente de reflexión de Weyl-Van der Pol sobre suelo de impedancia
-  finita y la difracción en barreras desde la teoría ondulatoria.
-- [Refracción atmosférica: rayos y GFPE](/phonometry/es/environment/propagation/atmospheric-refraction/):
-  los perfiles de velocidad efectiva del sonido, los rayos curvos con distancia
-  de zona de sombra en forma cerrada y el campo de nivel relativo por GFPE.
+
+**[Evaluación y normativa](/phonometry/es/environment/assessment/)**
+
 - [Prominencia de sonidos impulsivos (NT ACOU 112)](/phonometry/es/environment/assessment/impulsive-sound/):
   la prominencia prevista de cada impulso a partir de su tasa de ataque y su
   diferencia de nivel, y el ajuste que se suma al $L_{Aeq}$.
+
+Las otras dos guías de este grupo, [Niveles ambientales](/phonometry/es/environment/assessment/environmental-levels/)
+y [Normativa española de ruido](/phonometry/es/environment/assessment/spanish-noise-regulation/),
+están listadas más arriba dentro de Análisis de señal, junto a las definiciones
+de nivel sobre las que se construyen.
 
 ## [Ruido de aeronaves](/phonometry/es/aircraft/)
 

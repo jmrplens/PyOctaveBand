@@ -37,8 +37,12 @@ ISO 1996-2.
 [Molestia psicoacústica e intensidad de fluctuación](/phonometry/es/perception/psychoacoustics/psychoacoustic-annoyance/)
 cierra la cadena con el modelo de Fastl y Zwicker, que combina sonoridad,
 agudeza, aspereza y la sensación de modulación lenta de la intensidad de
-fluctuación en un único valor de molestia. Léela en último lugar: sus cuatro
-entradas salen de las páginas anteriores.
+fluctuación en un único valor de molestia. Léela en último lugar: tres de sus
+cuatro entradas salen de las páginas anteriores, y la cuarta, la intensidad de
+fluctuación, la aporta ella misma, tanto en la forma cerrada de Fastl y Zwicker
+como en el modelo de señal de Osses 2016. La intensidad de fluctuación de
+ECMA-418-2 de la página de calidad sonora es un modelo normativo más de esa
+misma sensación, bajo otro nombre de unidad.
 
 ## Páginas de esta sección
 

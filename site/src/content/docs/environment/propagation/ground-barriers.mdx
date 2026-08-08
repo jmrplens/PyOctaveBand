@@ -47,6 +47,7 @@ references:
 ---
 
 import ThemeImage from '../../../../components/ThemeImage.astro';
+import Video from '../../../../components/Video.astro';
 
 The [ISO 9613-2 general method](/phonometry/environment/propagation/outdoor-propagation/) folds
 the ground and barrier terms into tabulated, energy-based corrections. This page
@@ -166,6 +167,32 @@ the effective flow resistivity $\sigma \to \infty$ tends to that hard ground;
 grazing incidence ($h_s, h_r \to 0$) gives $R_p \to -1$; and the ground
 effect is reciprocal under an exchange of source and receiver heights.
 
+### Choosing the ground impedance
+
+Both one-parameter models are being evaluated far **below** their published fit
+range for any outdoor ground, and the `PorousAbsorberWarning` these calls raise
+says so: the range is $0.01 < X < 1$ with $X = \rho_0 f/\sigma$, and the
+grassland above sits at $X = 3.8\times10^{-4}$ at 63 Hz and 0.024 at 4 kHz — the
+asphalt curve of the figure never enters the range at all. Below the range the
+Delany-Bazley regression is an extrapolation whose classic failure is a negative
+real part of the surface impedance; **Miki** is the passivity-constrained refit
+to prefer there (see the fit-range paragraph of
+[Porous absorbers](/phonometry/materials/absorbers/porous-absorbers/)). The
+choice is not cosmetic: on the case above, `model="miki"` moves the excess
+attenuation by up to 3.6 dB (250 Hz band: 0.43 dB with Delany-Bazley,
+−3.18 dB with Miki).
+
+Typical **effective** flow resistivities, the ranges the figure above
+illustrates: fresh snow ≈ 10, forest floor ≈ 50, grassland and pasture
+≈ 150-300, compacted soil and gravel ≈ 1000-3000, asphalt and
+concrete > 20 000 kPa·s/m².
+
+For a real site, fit $\sigma$ to a short-range level-difference measurement
+between two microphone heights over the surface (the template method of
+ANSI/ASA S1.18). The fitted value is an *effective, model-bound* parameter: it
+must be quoted with the impedance model it was fitted with, and it is not the
+EN 29053 airflow resistivity of the same material.
+
 ## 2. Advanced barrier diffraction
 
 Three levels of screening beyond the ISO 9613-2 $D_z$ term are provided by
@@ -182,6 +209,32 @@ $$
 
 which tends to 5 dB at the shadow boundary $N \to 0$ and approximates Maekawa's
 point-source curve within about 1.5 dB.
+
+The clip below is that formula as a field. It is the
+[2D FDTD solver](/phonometry/simulation/fdtd-simulation/) run twice on one
+12 × 7 m half-space over rigid ground with a thin rigid screen 2.5 m tall,
+once at 100 Hz and once at 500 Hz, each with a barrier-free reference run over
+the same ground so the annotated insertion loss is a true one. The geometry
+fixes the path difference at 1.06 m for the receiver it marks, so the Fresnel
+number is $N = 0.62$ at 100 Hz and $N = 3.1$ at 500 Hz — the same screen, a
+factor of five apart in $N$ purely because $\lambda$ changed — and the field
+shows what that buys: about 8 dB against about 17 dB. Two things are worth
+watching for. The edge of the lit region running down from the top of the
+screen is the shadow boundary, the $N \to 0$ locus where the formula bottoms
+out at 5 dB; and inside the shadow the field is a cylindrical wave centred on
+the top of the screen, which is what "the edge acts as a secondary source"
+looks like. One caveat: the ground in the clip is perfectly rigid, so it shows
+diffraction alone and none of the finite-impedance ground effect of section 1
+— the coherent four-path model below adds that, and its curve swings tens of
+decibels where this one is smooth.
+
+<Video
+  name="anim_fdtd_barrier"
+  width={2400}
+  height={1350}
+  title="Barrier diffraction at 100 Hz and 500 Hz (2D FDTD)"
+  description="A 2D FDTD simulation of a point source behind a thin 2.5 metre rigid barrier on reflecting ground, at 100 Hz and 500 Hz side by side. The long wavelength diffracts over the edge and fills the shadow zone with an insertion loss near 8 dB, while the short wavelength is cast into a deep clean shadow of about 17 dB."
+/>
 
 The thin-screen methods share the same three geometric quantities: the two
 diffracted segments over the edge and the straight path they replace. Drawn on

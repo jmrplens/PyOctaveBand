@@ -10,8 +10,10 @@ suprimidos aíslan su transmisión directa. Esos datos de laboratorio alimentan
 una **predicción** de cómo se comportará el edificio completo, caminos de
 flancos incluidos. El edificio terminado se **verifica en campo**. En cada
 etapa el espectro por bandas se reduce al **número único** que citan las
-regulaciones, y esa reducción es un motor compartido y no un paso propio de
-ningún método.
+regulaciones, y en casi todos los casos esa reducción es un único motor de
+curva de referencia compartido y no un paso propio de ningún método. La
+excepción es la valoración de impactos pesados del anexo D de ISO 717-2, que no
+desplaza curva alguna: suma en energía niveles de banda ponderados A.
 
 **Laboratorio.**
 [Medición del aislamiento en laboratorio](/phonometry/es/buildings/insulation/insulation-lab/)
@@ -35,6 +37,12 @@ las dos mediciones de material que consume el diseño de un suelo.
 [Medición del aislamiento en campo (ISO 16283)](/phonometry/es/buildings/insulation/insulation-field/)
 cubre la medición aérea y de impacto con método de ingeniería en el edificio,
 su informe del apartado 14 y la incertidumbre de ISO 12999-1 que lo cualifica.
+La misma norma especifica dos fuentes de impacto más, una pelota de caucho y
+una máquina de neumático, para los golpes lentos de baja frecuencia sobre los
+que una máquina de impactos no dice nada;
+[Fuentes de impacto pesadas y blandas (ISO 16283-2)](/phonometry/es/buildings/insulation/heavy-impact-sources/)
+cubre su especificación, la estandarización del nivel máximo con ponderación
+Fast y la valoración del anexo D.
 Cuando la pregunta no merece ese esfuerzo,
 [Método de control del aislamiento (ISO 10052)](/phonometry/es/buildings/insulation/insulation-survey/)
 cambia exactitud por rapidez con bandas de octava y un índice de reverberación.

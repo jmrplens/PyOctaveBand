@@ -113,17 +113,17 @@ está en $ka\sin\theta = 3{,}8317$.
 import numpy as np
 from phonometry import radiating_piston
 
-res = radiating_piston(radius=0.1, frequencies=np.geomspace(20, 20000, 200),
+res = radiating_piston(radius=0.075, frequencies=np.geomspace(20, 20000, 200),
                        angles=np.linspace(0.0, np.pi / 2, 91))
-print(round(res.radiation_mass, 4))            # 8 rho a^3 / 3, kg
+print(round(res.radiation_mass, 4))            # 0.0014 kg = 8 rho a^3 / 3
 print(round(float(res.directivity_index[0]), 2))  # 3.01 dB, límite de semiespacio
 res.plot()                                      # R1 y X1 vs ka
 ```
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/piston_radiation_impedance_es.svg" alt="Resistencia de radiación normalizada R1 y reactancia X1 de un pistón circular con pantalla de 75 mm frente a ka en eje logarítmico: R1 sube desde ka al cuadrado entre dos hasta la unidad con rizados decrecientes, mientras la X1 de tipo masa alcanza su máximo cerca de ka de 1,4 y decae, con el límite de alta frecuencia R1 igual a 1 marcado" width="82%" />
 
-*El `.plot()` del resultado es la figura clásica de impedancia de Beranek y
-Mellow calculada para este pistón: por debajo de $ka \approx 1$ la carga es
+*El `.plot()` del pistón de 75 mm de arriba es la figura clásica de impedancia
+de Beranek y Mellow: por debajo de $ka \approx 1$ la carga es
 casi puramente de tipo masa ($X_1$ domina y $R_1 \propto (ka)^2$, el régimen
 en el que la salida de un altavoz está limitada por rigidez y masa), y por
 encima la resistencia se asienta en $\rho c S$ con rizados de interferencia

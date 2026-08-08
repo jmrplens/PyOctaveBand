@@ -292,6 +292,7 @@ longitud $dL$ lleva simplemente $L'_{W,\mathrm{eq,line},i} + 10\log_{10}(dL)$, q
 es aritmética y se ofrece como tal.
 
 ```python
+import numpy as np
 from phonometry import (
     PropagationGeometry, RoadTraffic, RoadVehicleCategory,
     line_source_segment_power, predicted_receiver_level, road_source_power,
@@ -302,12 +303,39 @@ result = road_source_power([
     RoadTraffic(RoadVehicleCategory.HEAVY, 120.0, 80.0),
 ])
 segment = line_source_segment_power(result.total_line_power, 20.0)  # tramo de 20 m
+
+# Un tramo, el que queda justo enfrente de un receptor a 100 m de la carretera.
 levels = predicted_receiver_level(
     segment,
     PropagationGeometry(100.0, result.source_height, 4.0),
     frequencies=result.frequencies,
 )
+
+# La carretera es la suma energética de sus tramos: 1 km a cada lado, en pasos de 20 m.
+energy = np.zeros_like(levels)
+for x in np.arange(-990.0, 1000.0, 20.0):        # centros de tramo a lo largo de la vía
+    energy += 10 ** (predicted_receiver_level(
+        segment,
+        PropagationGeometry(float(np.hypot(100.0, x)), result.source_height, 4.0),
+        frequencies=result.frequencies,
+    ) / 10)
+road = 10 * np.log10(energy)
 ```
+
+Dos reglas hacen defendible un troceado, y ninguna de las dos es método: el
+2.5.3 declara el reparto fuera de alcance, así que esto es práctica de
+ingeniería. Cada tramo tiene que ser bastante corto como para que la fuente
+puntual de su centro represente al tramo entero: la ISO 9613-2 solo admite una
+fuente puntual equivalente cuando la distancia de propagación supera el doble
+de la mayor dimensión de la fuente, de modo que un tramo visto desde 100 m
+puede medir decenas de metros y uno visto desde 10 m no. Y la carretera tiene
+que modelarse lo bastante lejos en ambos sentidos como para que las colas dejen
+de importar: más allá de unas diez veces la distancia perpendicular, añadir
+tramos cambia el total en menos de una décima de decibelio, y por eso 1 km a
+cada lado basta a 100 m aquí. Los dos espectros se leen en dB(A) dos párrafos
+más abajo: **52,9 dB(A)** para el tramo aislado frente a **64,7 dB(A)** para la
+carretera, una diferencia de 11,8 dB que es enteramente la aritmética de
+arriba.
 
 Conviene ver qué es esto y qué no. CNOSSOS-EU tiene **su propio** método de
 propagación en el apartado 2.5 del Anexo II, y no es la ISO 9613-2: difieren en
@@ -324,6 +352,13 @@ from phonometry import CNOSSOS_A_WEIGHTING
 
 CNOSSOS_A_WEIGHTING   # (-26.2, -16.1, -8.6, -3.2, 0.0, 1.2, 1.0, -1.1)
 result.a_weighted_line_power
+
+# Los dos espectros en el receptor del troceado de arriba, ponderados A:
+weight = np.asarray(CNOSSOS_A_WEIGHTING)
+print(round(float(10 * np.log10(np.sum(10 ** ((levels + weight) / 10)))), 1))
+# 52.9 dB(A) - un tramo de 20 m, no la carretera
+print(round(float(10 * np.log10(np.sum(10 ** ((road + weight) / 10)))), 1))
+# 64.7 dB(A) - la misma carretera, sumada sobre 2 km: 11.8 dB más
 ```
 
 ## 7. Sustituir por una base de datos nacional

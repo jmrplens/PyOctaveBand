@@ -42,12 +42,22 @@ $$
 
 con $Z_c$ la impedancia característica del aire y $\langle v^2 \rangle$ la
 velocidad vibratoria cuadrática media sobre el área radiante $S$. Expresada en
-niveles (nivel de velocidad re $v_0 = 5\times10^{-8}\ \text{m/s}$), el nivel de
-potencia acústica con ponderación A es
-(Fórmula 12 / 15)
+niveles (nivel de velocidad re $v_0 = 5\times10^{-8}\ \text{m/s}$), cada parte
+escribe esa relación con sus propias magnitudes. La **Parte 1** va ponderada
+en A de principio a fin: un solo nivel de velocidad superficial ponderado A
+$L_{vA}$, el valor fijo $\varepsilon_A = 1$ y un único número ponderado A, el
+*límite superior* del nivel de potencia acústica aérea (Fórmula 12)
 
 $$
-L_W = L_v + 10\log_{10}\frac{S}{S_0} + 10\log_{10}\varepsilon
+L_{WA,\max} = L_{vA} + 10\log_{10}\frac{S}{S_0}
+      + 10\log_{10}\frac{Z_{c,n}}{Z_{c,0}}.
+$$
+
+La **Parte 2** es la contrapartida por bandas, con el factor de radiación
+$\varepsilon_j$ determinado en cada banda (Fórmula 15)
+
+$$
+L_{W,j} = L_{v,j} + 10\log_{10}\frac{S}{S_0} + 10\log_{10}\varepsilon_j
       + 10\log_{10}\frac{Z_{c,n}}{Z_{c,0}},
 $$
 
@@ -55,8 +65,12 @@ donde $S_0 = 1\ \text{m}^2$, la impedancia normalizada
 $Z_{c,n} = 411\ \text{N·s/m}^3$ y la de referencia
 $Z_{c,0} = 400\ \text{N·s/m}^3$ dan el término fijo
 $10\log_{10}(411/400) = 0{,}118\ \text{dB}$.
-Este módulo alimenta las normas de fuente estructural y de predicción
-en edificación (ISO 9611, EN 15657, EN 12354-5).
+Esta guía ejecuta la forma por bandas para las dos partes, de modo que el
+límite superior de la Parte 1 y el valor de ingeniería de la Parte 2 puedan
+compararse banda a banda; un ensayo estricto de Parte 1 es el número único
+ponderado A de arriba, que el objeto resultado lleva como
+`sound_power_level_a`. Este módulo alimenta las normas de fuente estructural
+y de predicción en edificación (ISO 9611, EN 15657, EN 12354-5).
 
 Antes que los niveles, el propio radiador. El modelo de placa de
 `radiation_efficiency` que aporta un factor de radiación predicho retiene su
@@ -142,15 +156,23 @@ lv = np.array([82.0, 85.0, 83.0, 79.0])          # nivel de velocidad por banda 
 
 # Límite superior de la Parte 1 (epsilon = 1):
 upper = emission.sound_power_from_vibration(lv, area=1.6, frequencies=bands)
-print(round(upper.total_level, 1))               # p. ej. 89.4  dB re 1 pW
+print(round(upper.total_level, 1))               # 90.9  dB re 1 pW, sin ponderar
+print(round(upper.sound_power_level_a, 1))       # 88.9  dB(A) re 1 pW
 
 # Valor de ingeniería de la Parte 2 con un factor de radiación medido:
 eps = np.array([0.45, 0.75, 0.95, 1.00])
 eng = emission.sound_power_from_vibration(lv, area=1.6, radiation_factor=eps, frequencies=bands)
 print(np.round(eng.sound_power_level, 1))        # L_W por banda
+print(round(eng.sound_power_level_a, 1))         # 88.4  dB(A) re 1 pW
 
 eng.plot()   # el espectro LW(f), como en la figura de arriba (requiere matplotlib)
 ```
+
+Los dos totales no son intercambiables: `total_level` es la suma en bandas sin
+ponderar $10\lg\sum_j 10^{0{,}1 L_{W,j}}$, mientras que `sound_power_level_a` es
+el total ponderado A que la ficha recuadra y que cita una declaración de ruido.
+Se diferencian en la ponderación A del espectro — 2,0 dB en esta carcasa,
+varios decibelios más en una con mucho peso en baja frecuencia.
 
 ## 2. Nivel de velocidad, calibración y factor de radiación
 
@@ -178,10 +200,22 @@ vibración extraña según la Tabla 2.
 
 Esas posiciones no son libres: la norma divide la superficie radiante $S$ en
 $N$ celdas iguales y coloca un acelerómetro en el centro de cada una. La
-tabla por área da el $N$ inicial; un campo de vibración muy poco uniforme
-puede exigir más posiciones o redistribuirlas.
+Tabla 1 fija el $N$ inicial solo a partir del área — **5** posiciones por
+debajo de 1 m², **10** de 1 m² a 10 m², y $S/S_0$ posiciones por encima
+($S_0 = 1$ m²) —, así que la superficie de 4 m² dibujada abajo lleva diez.
+Hay que aumentar $N$ cuando la dispersión del nivel de velocidad ponderado A
+entre las posiciones, el más alto menos el más bajo en decibelios, supera el
+doble del número de la Tabla 1; un campo muy poco uniforme puede tratarse en
+cambio redistribuyendo las posiciones, lo que hace desiguales las áreas
+parciales $S_i$ y obliga entonces a la Fórmula 11 ponderada por área en vez de
+a la media energética simple. La corrección de la Tabla 2 es una escalera
+sobre esa misma clase de dispersión: con la máquina parada y la instalación
+circundante en marcha, el nivel medio de velocidad extraña debe quedar al
+menos 3 dB por debajo del de la máquina, y `extraneous_velocity_correction`
+devuelve 3 dB con 3 dB de diferencia, 2 dB con 4-5 dB, 1 dB con 6-9 dB y 0 dB
+a partir de 10 dB.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_vibration_sound_power_es.svg" alt="Método de velocidad superficial de ISO/TS 7849: una máquina en ensayo con su superficie de medición vibrante de 2,5 por 1,6 metros dividida en veinte celdas iguales, un acelerómetro en el centro de cada celda, el sonido aéreo radiado saliendo de la superficie, la tabla del número inicial de posiciones de medida y la relación de control LWA = LvA + 10 lg(S/S0) + 10 lg épsilon" width="92%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_vibration_sound_power_es.svg" alt="Método de velocidad superficial de ISO/TS 7849: una máquina en ensayo con su superficie de medición vibrante de 2,5 por 1,6 metros dividida en diez celdas iguales, un acelerómetro en el centro de cada celda, el sonido aéreo radiado saliendo de la superficie, el número inicial de posiciones de medida de la Tabla 1 (5 por debajo de 1 metro cuadrado, 10 de 1 a 10, S entre S0 por encima) y la relación de control LWA = LvA + 10 lg(S/S0) + 10 lg épsilon" width="92%" />
 
 ## 3. Cuándo se rompe la hipótesis del factor de radiación
 
@@ -231,7 +265,10 @@ nivel de velocidad vibratoria superficial $L_v$ y el nivel de potencia acústica
 de banda $L_W$), el espectro de potencia acústica $L_W(f)$ con eje de banda
 nominal, y un nivel de potencia acústica ponderado A $L_{WA}$ (dB re 1 pW)
 recuadrado con el total $L_W$, el área radiante $S$ y el método aplicado al
-lado.
+lado. Esos dos salen del `sound_power_level_a` del resultado (el total
+ponderado A declarable) y de su `total_level` (la suma en bandas sin
+ponderar); las columnas de la tabla salen de `velocity_level`,
+`sound_power_level` y, con `verbose=True`, `radiation_factor`.
 
 Los metadatos se aportan mediante un `ReportMetadata`, cuyos campos aplicables
 aquí son la **descripción de la máquina/fuente** (`specimen`), el **entorno de

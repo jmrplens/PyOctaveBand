@@ -495,6 +495,25 @@ Devuelve un `OutdoorAttenuation` con `a_div`, `a_atm`, `a_gr`, `a_bar`,
 `a_total` y `d_omega`, todos un valor por banda; su `.plot()` dibuja el
 desglose apilado por bandas con el total superpuesto (la figura anterior).
 
+:::note
+**El método es solo de bandas de octava.** La ISO 9613-2 está definida para las
+ocho bandas de octava nominales de 63 Hz a 8 kHz, y su Tabla 3 no tiene más
+resolución, así que toda frecuencia que se pase se lleva a la *octava nominal
+más próxima* para el término de suelo, mientras que la divergencia y la
+absorción atmosférica siguen siendo continuas en frecuencia. Una llamada en
+tercios de octava devuelve por tanto un $A_{gr}$ escalonado, no uno más fino:
+en 400 / 500 / 630 / 800 Hz sobre suelo poroso a 100 m, `a_gr` sale como
+7,65 / 7,65 / 7,65 / 1,76 dB (tres bandas que comparten la octava de 500 Hz y
+luego la de 1 kHz), mientras que `a_atm` avanza suavemente por
+0,216 / 0,280 / 0,348 / 0,419 dB. Si hace falta un espectro más fino, conviene
+ejecutar la predicción en octavas y repartir después, o usar el `ground_effect`
+de acústica ondulatoria de
+[Efecto suelo y barreras](/phonometry/es/environment/propagation/ground-barriers/)
+cuando lo que importa es la estructura de interferencia dentro de una octava.
+Por debajo de 63 Hz o por encima de 8 kHz no hay cobertura alguna, de modo que
+una evaluación en baja frecuencia queda fuera de este método.
+:::
+
 ### Campos de `Barrier`
 
 | Campo | Tipo | Unidades | Def. | Notas |

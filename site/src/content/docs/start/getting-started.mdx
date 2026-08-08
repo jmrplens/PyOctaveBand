@@ -72,9 +72,9 @@ guides cover them left to right ([Calibration](/phonometry/signals/metrology/cal
 [Frequency Weighting](/phonometry/signals/levels/weighting/) → [Filter Banks](/phonometry/signals/filters/filter-banks/) →
 [Time Weighting](/phonometry/signals/levels/time-weighting/) → [Levels](/phonometry/signals/levels/levels/)).
 
-## Basic Usage: 1/3 Octave Analysis
+## A first analysis: one-third-octave bands (uncalibrated)
 
-Analyze a signal and get the Sound Pressure Level (SPL) per frequency band.
+Split a signal into one-third-octave bands and read the level of each one.
 
 ```python
 import numpy as np
@@ -91,12 +91,28 @@ spl, freq = filters.octave_filter(signal, fs=fs, fraction=3)
 print(f"Bands: {freq}")
 # Bands: [12.589254117941678, 15.848931924611138, ..., 19952.623149688785]  (33 bands)
 print(f"SPL [dB]: {spl}")
-# SPL [dB]: [46.88395351 47.96774897 49.04991279 ...]  — ~90.7 dB at 100 Hz and ~90.9 dB at 1 kHz
+# SPL [dB]: [46.88395351 47.96774897 49.04991279 ...]  — 90.71 dB at 100 Hz and 90.95 dB at 1 kHz
 ```
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/signal_response_fraction_3.svg" alt="One-third-octave spectrum analysis of a multi-tone signal with the raw PSD in the background" width="80%" />
+**These are not yet physical levels.** `octave_filter` always returns
+$20\log_{10}(p_\mathrm{rms} / 20\,\mu\mathrm{Pa})$, and with the default
+calibration it takes the numeric value of each sample *to be* the pressure in
+pascals. A unit-amplitude sine is therefore read as 0.7071 Pa rms, which is
+90.97 dB — exactly right for a synthetic signal defined in pascals, and exactly
+wrong for a recording, whose sample values are whatever the converter and the
+gain staging happened to produce. There are two honest ways to get a level you
+can defend. Pass the pascals-per-digital-unit factor obtained from a calibrator
+tone, `calibration=filters.LevelCalibration(factor=S)` — see
+[Calibration and dBFS](/phonometry/signals/metrology/calibration/) — or, when
+the signal never had a physical scale, ask for `LevelCalibration(dbfs=True)` and
+read levels relative to digital full scale, which come out negative and cannot
+be mistaken for an SPL.
 
-*Example of a 1/3 Octave Band spectrum analysis of a complex signal.*
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/signal_response_fraction_3.svg" alt="One-third-octave spectrum analysis of a six-tone signal with the raw PSD in the background" width="80%" />
+
+*A richer example than the snippet above: six tones (20, 100, 500, 2000, 4000
+and 15000 Hz) at amplitude 100, so the band levels run to about 131 dB. The
+grey curve is the raw-signal PSD, shifted down to share the axis.*
 
 <details>
 <summary>Show the code for this figure</summary>
@@ -108,15 +124,16 @@ import numpy as np
 from phonometry import filters
 
 fs = 48000
-t = np.linspace(0, 1, fs, endpoint=False)
-# Composite signal: 100Hz + 1000Hz
-signal = np.sin(2 * np.pi * 100 * t) + np.sin(2 * np.pi * 1000 * t)
+t = np.linspace(0, 5, 5 * fs, endpoint=False)
+# Six tones at amplitude 100, so the bands land around 130 dB
+tones = [20, 100, 500, 2000, 4000, 15000]
+y = 100 * np.sum([np.sin(2 * np.pi * f * t) for f in tones], axis=0)
 # Apply 1/3 octave filter bank
-spl, freq = filters.octave_filter(signal, fs=fs, fraction=3)
+spl, freq = filters.octave_filter(y, fs=fs, fraction=3, limits=[12.0, 20000.0])
 
 # Gray background: the raw-signal PSD (Welch), shifted to sit just below the
 # band SPLs so both spectral shapes share one axis.
-f_psd, psd = scipy.signal.welch(signal, fs, nperseg=8192)
+f_psd, psd = scipy.signal.welch(y, fs, nperseg=8192)
 psd_db = 10 * np.log10(psd + 1e-12)
 psd_db += np.max(spl) - np.max(psd_db) - 5
 
@@ -126,7 +143,8 @@ ax.semilogx(freq, spl, marker="o", markerfacecolor="white",
             label="1/3 octave bands")
 ax.set_xlabel("Frequency [Hz]")
 ax.set_ylabel("SPL [dB]")
-ax.legend()
+ax.set_xlim(11, 25000)
+ax.legend(loc="lower right")
 plt.show()
 ```
 
@@ -141,25 +159,52 @@ from phonometry import filters
 # Load standard WAV file
 fs, signal = wavfile.read("measurement.wav")
 
+# wavfile.read returns (samples, channels); the bank expects (channels, samples)
+if signal.ndim > 1:
+    signal = signal[:, 0]        # measurement microphone on channel 1
+
 # Analyze
 # Note: To obtain real-world SPL values, you must calibrate the input.
 # See the Calibration guide.
 spl, freq = filters.octave_filter(signal, fs=fs, fraction=3)
 ```
 
-Integer audio (e.g. int16 WAV data) is converted to float64 internally, so it is
-safe to pass `wavfile.read` output directly.
+**Reduce a multichannel file to the channel you measured with, or transpose it.**
+The guard above is not decoration: `wavfile.read` returns a `(samples,
+channels)` array, and the bank reads a 2D array as `(channels, samples)`. Pass a
+stereo file as it comes and nothing raises — a 2400-sample stereo array returns
+an `spl` of shape `(2400, 33)`, one spectrum per *pair of samples*, and a
+one-second file takes minutes to produce meaningless numbers. See
+[Multichannel and Performance](/phonometry/signals/filters/multichannel/) for
+the convention, and for the case where several calibrated channels are analysed
+at once, each with its own sensitivity.
+
+**Integer audio is cast, not rescaled.** `wavfile.read` output runs without an
+error because integers are converted to float64 internally, but an int16 sample
+of +32767 enters the bank as 32767.0 rather than 1.0. Every level therefore
+comes out $20\log_{10}(32768) = 90.3$ dB above the same signal read as float —
+measured, a unit-amplitude 1 kHz sine peaks at 90.95 dB and the same sine
+written to int16 peaks at 181.26 dB. Divide by the full-scale value
+(`signal / 32768.0` for int16) before analysing, or let the calibration step
+absorb it: a sensitivity determined from a calibrator recording *in the same
+integer format* already carries the factor. Mixing the two — a float-read
+calibrator and an integer-read measurement, or the reverse — is wrong by 90 dB
+with no symptom. The rules are in
+[Calibration and dBFS](/phonometry/signals/metrology/calibration/).
 
 ## Where to go next
 
-The octave analysis above uses the `filters` core, one of eighteen domain
-namespaces; the sidebar sections walk through the rest, from psychoacoustics
-and room, building and vibration acoustics to environmental, aircraft and
-underwater noise, electroacoustics and FDTD wave simulation. Every result
-object exposes a one-line `.plot(language="en"|"es")` figure and, where a
-standard defines a reporting format, a `.report()` method that renders the
-normative PDF fiche.
+The octave analysis above uses `phonometry.filters`, one of eighteen import
+namespaces. The documentation groups them into **ten areas**, one per sidebar
+topic, from psychoacoustics and room, building and vibration acoustics to
+environmental, aircraft and underwater noise, electroacoustics and FDTD wave
+simulation. Every result object exposes a one-line
+`.plot(language="en"|"es")` figure and, where a standard defines a reporting
+format, a `.report()` method that renders the normative PDF fiche.
 
+- [Build a sound level meter](/phonometry/signals/sound-level-meter/): the same chain run end to end, from the calibrator tone to $L_{AF}(t)$, $L_{Aeq}$, $L_{AE}$, $L_{Cpeak}$, the percentile levels and the class check of every stage
+- [All guides](/phonometry/start/guides/): the map, every guide grouped by topic with a line on each
+- [Glossary](/phonometry/reference/glossary/): a symbol, its unit, its defining clause and the guide that computes it
 - [Filter Architecture Gallery](/phonometry/signals/filters/filter-gallery/): choose an architecture and inspect responses
 - [Calibration and dBFS](/phonometry/signals/metrology/calibration/): get real-world SPL values
 - [Why phonometry](/phonometry/start/why-phonometry/): the conformance-first design philosophy

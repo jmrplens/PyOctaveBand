@@ -373,19 +373,45 @@ fiche embeds, matplotlib (`pip install "phonometry[report,plot]"`); only
 `language="es"` for a Spanish fiche (translated fixed strings and a comma
 decimal separator).
 
+The block below is the specimen of the fiche underneath it: a resistive facing
+of normalised flow resistance $\theta = 1$ over an 86 mm rigidly-backed air
+cavity, whose surface impedance $z = \theta - \mathrm{j}\cot(k_0 L)$ is known
+in closed form, so the printed $\alpha$ can be checked by hand: 1.00 at the
+1 kHz quarter-wave resonance, where the matched screen gives $z = 1$ and
+$r = 0$; 0.80 at 500 Hz, where $k_0 L = \pi/4$ and $z = 1 - \mathrm{j}$.
+
 ```python
+import numpy as np
 from phonometry import materials, ReportMetadata
 
-result = materials.two_microphone_impedance(
-    h12, frequency=freqs, spacing=0.05, x1=0.10,
-    speed_of_sound=c0, characteristic_impedance=rho_c, diameter=0.10,
+# 100 mm tube, s = 50 mm, far microphone at x1 = 100 mm, 20 degC / 101 kPa.
+c0 = float(materials.speed_of_sound_iso(293.15))                    # 343.29 m/s
+rho_c = materials.characteristic_impedance(
+    float(materials.air_density_iso(293.15, 101.0)), c0)            # 405.6 Pa.s/m
+diameter, spacing, x1 = 0.100, 0.050, 0.100
+theta, cavity = 1.0, c0 / (4.0 * 1000.0)          # quarter-wave at 1 kHz: 86 mm
+freqs = np.array([400, 500, 630, 800, 1000, 1250, 1600], dtype=float)
+
+# The transfer function the tube would measure, synthesised from the known r.
+k0 = materials.tube_wavenumber(freqs, c0)
+z = theta - 1j / np.tan(2 * np.pi * freqs / c0 * cavity)
+r_known = (z - 1.0) / (z + 1.0)
+x2 = x1 - spacing
+h12_fiche = (np.exp(1j*k0*x2) + r_known*np.exp(-1j*k0*x2)) / \
+            (np.exp(1j*k0*x1) + r_known*np.exp(-1j*k0*x1))
+
+fiche = materials.two_microphone_impedance(
+    h12_fiche, frequency=freqs, spacing=spacing, x1=x1,
+    speed_of_sound=c0, characteristic_impedance=rho_c, diameter=diameter,
 )
-result.report(
+print(np.round(fiche.absorption, 2))    # [0.68 0.8  0.9  0.97 1.   0.96 0.68]
+
+fiche.report(
     "alpha_fiche.pdf",
     metadata=ReportMetadata(
         specimen="Resistive facing over an 86 mm rigidly-backed air cavity",
-        tube_diameter=0.10,            # m (printed as 100 mm)
-        mic_spacing=0.05,              # m (printed as 50 mm)
+        tube_diameter=diameter,        # m (printed as 100 mm)
+        mic_spacing=spacing,           # m (printed as 50 mm)
         measurement_standard="ISO 10534-2",
         laboratory="Phonometry Reference Laboratory",
     ),

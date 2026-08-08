@@ -76,15 +76,23 @@ Every current criteria set sorts marine mammals into hearing groups and gives
 each one a filter. The **group codes are not portable between guidance
 versions**, and the collision is a real trap:
 
-| Southall et al. (2019) / NMFS 2024 | NMFS 2018 | Typical genera |
-|---|---|---|
-| LF cetaceans | LF | baleen whales |
-| HF cetaceans | **MF** | sperm, beaked and most delphinid whales |
-| VHF cetaceans | **HF** | porpoises, *Cephalorhynchus*, *Kogia* |
-| PCW / PW | PW | phocid seals in water |
-| OCW / OW | OW | otariids, in water |
-| SI, PCA, OCA | — | sirenians and carnivores in air |
+| Animal group | Southall 2019 | NMFS 2024 | NMFS 2018 | Audiogram |
+|---|---|---|---|---|
+| Baleen whales | LF | LF | LF | no ($F_1$ unpublished) |
+| Sperm, beaked and most delphinid whales | HF | HF | **MF** | yes (`"HF"`) |
+| Porpoises, *Cephalorhynchus*, *Kogia* | VHF | VHF | **HF** | yes (`"VHF"`) |
+| Phocid seals in water | PCW | PW | PW | yes (`"PCW"`) |
+| Otariids in water | OCW | OW | OW | yes (`"OCW"`) |
+| Sirenians | SI | — | — | yes (`"SI"`) |
+| Phocid seals in air | PCA | PA | — | yes (`"PCA"`) |
+| Otariids in air | OCA | OA | — | yes (`"OCA"`) |
 
+Read the column you are working in. `auditory_weighting` and
+`exposure_criteria` take the code of the `guidance` you select;
+`group_audiogram` always takes the **Southall** code, because the audiograms are
+Southall's. So `group_audiogram(f, "PW")` raises even though `"PW"` is a valid
+NMFS 2024 weighting group — ask for `"PCW"` — and `auditory_weighting(f, "PCW")`
+raises under the default guidance for the mirror-image reason.
 `hearing_groups(guidance)` lists the codes a version defines, and passing a
 code from the wrong version raises rather than silently returning the wrong
 filter.
@@ -256,11 +264,29 @@ the recorded strike to the verdict:
    accumulates it over the number of strikes (the ISO 18406 $+10\log_{10} N$) and
    compares the result with the criteria, unweighted peak SPL included.
 
+### What the recording has to cover
+
+The weighted sum runs over the bands it is handed, so **the record must span the
+hearing group's passband**. The NMFS 2024 upper transition frequencies $f_2$ are
+26.6 kHz (LF), 129 kHz (HF), 186 kHz (VHF), 68.3 kHz (PW) and 43.8 kHz (OW), and
+the generalised hearing ranges reach further still (LF to 36 kHz, VHF to
+165 kHz). As a rule the sample rate has to be about 2.5 times the highest band
+edge that matters, so the 48 kHz record below — bands resolved to roughly 20 kHz
+— supports LF, is marginal for OW, and truncates HF, VHF and PW badly. A
+porpoise assessment needs a few hundred kilohertz.
+
+`weighted_exposure` cannot detect a truncated spectrum: it weights what it is
+given, so a short record simply reports a lower cumulative SEL and no warning.
+The unweighted peak half of the dual metric has to come from the same record
+with no clipping and headroom to spare, which is why ISO 18406 makes dynamic
+range a survey requirement: a saturated capture reads as a compliant peak.
+
 ```python
 import numpy as np
 from phonometry import underwater
 
-# One recorded strike (here a synthetic 200 Hz decaying burst).
+# One recorded strike (here a synthetic 200 Hz decaying burst). 48 kHz is
+# enough for the LF group used below and for nothing above it.
 fs = 48_000
 t = np.arange(int(0.2 * fs)) / fs
 strike = 50.0 * np.exp(-t / 0.06) * np.sin(2 * np.pi * 200.0 * t)
@@ -306,8 +332,10 @@ step-function and dose-response thresholds used for harassment take estimates)
 are out of scope: only the auditory-effect criteria are implemented. The
 library does not choose a hearing group or an accumulation period for you, and
 it does not model the animal's movement relative to the source, so the
-cumulative SEL it reports is the stationary-receiver worst case. Propagation
-from source to receiver belongs to
+cumulative SEL it reports is the stationary-receiver worst case. It also does
+not check that the supplied spectrum spans the group's passband: a record that
+stops short of $f_2$ is weighted as given and under-reports the exposure.
+Propagation from source to receiver belongs to
 [Underwater sound propagation](/phonometry/underwater/underwater-propagation/).
 
 ## See also

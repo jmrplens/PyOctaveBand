@@ -9,8 +9,10 @@ characterised **in the laboratory**, where suppressed flanking isolates its
 direct transmission. That laboratory data feeds a **prediction** of how a
 whole building will perform, flanking paths included. The finished building is
 then **verified in the field**. At every stage the band spectrum is collapsed
-to the **single number** regulations quote, and that collapse is one shared
-engine rather than a step of any single method.
+to the **single number** regulations quote, and for almost everything that
+collapse is one shared reference-curve engine rather than a step of any single
+method. The exception is the heavy-impact rating of ISO 717-2 Annex D, which
+shifts no curve at all: it sums A-weighted band levels in energy.
 
 **Laboratory.**
 [Laboratory Insulation Measurement](/phonometry/buildings/insulation/insulation-lab/) covers
@@ -33,6 +35,12 @@ and the two material measurements a floor design consumes.
 [Field Insulation Measurement (ISO 16283)](/phonometry/buildings/insulation/insulation-field/)
 covers the engineering-grade airborne and impact measurement in the building,
 its Clause 14 test report and the ISO 12999-1 uncertainty that qualifies it.
+The same standard specifies two more impact sources, a rubber ball and a bang
+machine, for the slow low-frequency thumps a tapping machine says nothing
+about;
+[Heavy and Soft Impact Sources (ISO 16283-2)](/phonometry/buildings/insulation/heavy-impact-sources/)
+covers their specification, the Fast-weighted standardization of the maximum
+level and the Annex D rating.
 When the question does not deserve that effort,
 [Sound Insulation Survey Method (ISO 10052)](/phonometry/buildings/insulation/insulation-survey/)
 trades accuracy for speed with octave bands and a reverberation index.

@@ -63,11 +63,14 @@ ys = (2e-4 + 1e-4j) * (bands / 250.0)        # movilidad de la fuente
 yi = (3e-5 + 1e-5j) * np.ones_like(bands)    # movilidad del receptor
 dc = np.array([float(building.coupling_term(a, b)) for a, b in zip(ys, yi)])
 
-# Dos vías de transmisión: el forjado excitado y una pared de flanco.
+# Dos vías de transmisión: el forjado excitado y una pared de flanco. Dsa es
+# negativo y cae con la frecuencia (Anexo F.2), y entra con signo menos.
 paths = [
-    {"adjustment_term": 6.0, "element_area": 12.0,
+    {"adjustment_term": np.array([-14.0, -17.0, -20.0, -25.0, -30.0, -35.0, -40.0]),
+     "element_area": 12.0,
      "flanking_reduction_index": np.linspace(44.0, 62.0, 7)},
-    {"adjustment_term": 7.0, "element_area": 9.0,
+    {"adjustment_term": np.array([-16.0, -19.0, -23.0, -28.0, -33.0, -38.0, -43.0]),
+     "element_area": 9.0,
      "flanking_reduction_index": np.linspace(46.0, 64.0, 7)},
 ]
 res = building.installed_source_prediction(lws_c, dc, paths, frequencies=bands)
@@ -93,6 +96,16 @@ de fuente alta, Fórmula 19c) y a $-10\log_{10}(|Y_s|\,\mathrm{Re}\{Z_i\})$ para
 velocidad** (movilidad de fuente baja, Fórmula 19d); un soporte elástico añade su
 movilidad de transferencia $Y_k$ dentro del módulo (Fórmula 19e). El nivel de
 potencia **instalada** es entonces (Fórmula 18b) $L_{Ws,\mathrm{inst}} = L_{Ws,c} - D_C$.
+
+Este $L_{Ws,\mathrm{inst}}$ es el mismo que el de la corrección por movilidad
+del Anexo I de la introducción, alcanzado por otro camino: usa la Fórmula (18b)
+cuando $D_C$ se conoce a partir de las dos movilidades, y la corrección directa
+$L_{Ws,n} + 10\log_{10}(Y_{\infty,i}/Y_{\infty,\mathrm{rec}})$ cuando no. Sobre
+la cisterna del Anexo I.3 las dos dan 68,2 dB a 63 Hz, a partir de
+$L_{Ws,c} = 84,4$ dB y $D_C = 16,2$ dB. Fíjate en qué magnitud te entregan:
+$L_{Ws,c}$ es la entrada que toma esta página, y *no* es los 68,2 dB que la
+[página de EN 15657](/phonometry/es/buildings/design/structure-borne-power/)
+imprime como su nivel instalado — meter ese valor aquí resta $D_C$ dos veces.
 
 La física detrás de $D_C$ es la clásica potencia de entrada de una placa
 excitada en un punto: solo la parte real de la movilidad en el punto de
@@ -140,20 +153,70 @@ L_{n,s,ij} = L_{Ws,\mathrm{inst},i} - D_{sa,i} - R_{ij,\mathrm{ref}}
              - 10\log_{10}\frac{S_i}{S_0} - 10\log_{10}\frac{A_0}{4},
 $$
 
-con $S_0 = A_0 = 10\ \text{m}^2$, y los caminos se combinan energéticamente (Fórmula 17):
+con $S_0 = A_0 = 10\ \text{m}^2$, y los caminos se combinan energéticamente (Fórmula 17).
+
+### El término de ajuste $D_{sa}$
+
+Una fuerza puntual bombea energía a ondas de flexión *libres*, mientras que un
+campo acústico incidente excita además ondas *forzadas*. $D_{sa}$ es el factor
+de contabilidad que permite reutilizar el índice de flancos aéreo
+$R_{ij,\mathrm{ref}}$ — una magnitud aérea — para un elemento excitado
+estructuralmente: convierte la potencia estructural inyectada en la potencia
+aérea incidente que dejaría al elemento con la misma energía de vibración libre
+(Fórmula 20a). Para la excitación por fuerza perpendicular de un elemento
+homogéneo eso se convierte en la Fórmula (20b),
+
+$$
+D_{sa,i} = 10\log_{10}\frac{2\pi m_i\,2.2\,\tau_i}{\rho_0 c_0 T_{s,i}\sigma_i}\ \text{dB},
+$$
+
+con $R_i = -10\log_{10}\tau_i$, y el Anexo F.2 da la forma de trabajo
+
+$$
+D_{sa,i} = 10\log_{10}\frac{400\,f_{c,i}\,\sigma_i}{m_i\,f^2}\ \text{dB}
+\qquad\text{(Fórmula F.3)},
+$$
+
+exacta por encima de la frecuencia crítica ($\sigma_i \approx 1$) y buena
+aproximación en todo el rango. Léela así: los elementos más pesados y las
+frecuencias más altas hacen $D_{sa}$ *más negativo*, a razón de
+$-20\log_{10}f$ una vez que $\sigma$ se ha saturado.
+
+:::caution
+**$D_{sa}$ es normalmente negativo — pasa el valor tabulado con el signo con el
+que está impreso.**
+Las columnas del Anexo I de la propia norma van de unos $-14$ dB a 63 Hz a
+$-45$ dB a 2 kHz para elementos corrientes de hormigón y de fábrica. El término
+entra en la Fórmula (18a) con signo menos, así que un $D_{sa}$ negativo *sube*
+el nivel previsto. Revisiones anteriores de esta página pasaban
+`"adjustment_term": 5.0` y `6.0`; copiar ese patrón poniendo en su lugar un
+valor real del Anexo F dejaría la predicción entre unos 20 y 40 dB por debajo en
+todo el espectro, y sin que se levante ningún error.
+:::
+
+Todas las entradas de la Fórmula (F.3) están ya disponibles:
+[`in_situ_element`](/phonometry/es/buildings/design/detailed-prediction/)
+devuelve el tiempo de reverberación estructural in situ, el factor de radiación
+y la $R$ del elemento.
 
 ```python
 import numpy as np
 from phonometry import building
+
+# Fórmula (F.3) para la pared de 92 kg/m2 del edificio resuelto del Anexo I.
+f = np.array([63.0, 125.0, 250.0, 500.0, 1000.0, 2000.0])
+sigma = np.minimum(1.0, np.sqrt(f / 200.0))        # factor de radiación, fc = 200 Hz
+dsa_f3 = 10 * np.log10(400.0 * 200.0 * sigma / (92.0 * f**2))
+print(np.round(dsa_f3, 1))    # [-9.1 -13.6 -18.6 -24.6 -30.6 -36.6]  todos negativos
 
 bands = np.array([250.0, 500.0, 1000.0])
 res = building.installed_source_prediction(
     characteristic_power_level=np.array([80.0, 82.0, 78.0]),
     coupling_term=np.array([9.0, 10.0, 11.0]),
     paths=[
-        {"adjustment_term": 5.0,
+        {"adjustment_term": np.array([-19.0, -25.0, -31.0]),
          "flanking_reduction_index": np.array([50.0, 52.0, 55.0]), "element_area": 12.0},
-        {"adjustment_term": 6.0,
+        {"adjustment_term": np.array([-22.0, -28.0, -34.0]),
          "flanking_reduction_index": np.array([52.0, 54.0, 57.0]), "element_area": 8.0},
     ],
     frequencies=bands,

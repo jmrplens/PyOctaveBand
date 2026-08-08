@@ -298,6 +298,27 @@ absorción del aire sobre el radio de medición. Las posiciones de micrófono so
 conjuntos normalizados de vectores unitarios de las Tablas D.1 (esfera), E.1
 (semiesfera) y E.2 (semiesfera, banda ancha).
 
+**El radio no es libre** (cláusulas 8.1/8.2). Debe cumplir $r \ge 2 d_0$, con
+$d_0$ la distancia del centro acústico al punto más alejado de la fuente (en
+cámara semianecoica, $r \ge 2 d_0$ o $r \ge 3 h_0$, el que sea mayor, siendo
+$h_0$ la altura del centro acústico sobre el suelo), $r \ge \lambda/4$ a la
+frecuencia más baja de interés y $r \ge 1$ m — 0,5 m solo para una fuente
+pequeña y poco ruidosa en una banda limitada — con toda la superficie dentro
+de la región cualificada según el Anexo A o el B. Con números: una fuente de
+sobremesa de 0,6 × 0,5 × 0,7 m tiene
+$d_0 = \sqrt{0{,}3^2 + 0{,}25^2 + 0{,}7^2} = 0{,}80$ m, así que $r \ge 1{,}6$ m;
+con una banda más baja de 100 Hz, $\lambda/4 = 0{,}86$ m no manda, y el suelo
+de 1 m tampoco. El `radius=1.0` de los ejemplos de abajo solo vale, por tanto,
+para una fuente de menos de unos 0,5 m de dimensión característica.
+
+**El conjunto de posiciones tampoco lo es.** Primero se usan las posiciones 1
+a 20, y las 21 a 40 se añaden solo cuando la diferencia entre el nivel más
+alto y el más bajo en alguna banda de interés no es menor que la mitad del
+número de posiciones — una comprobación sobre datos que el lector ya tiene,
+`levels.max(0) - levels.min(0) >= 0.5 * levels.shape[0]`. Si con 40 posiciones
+sigue sin cumplirse, hace falta una investigación localizada y las posiciones
+pasan entonces a tener áreas desiguales, que es para lo que está `areas=`.
+
 ```python
 import numpy as np
 from phonometry import emission
@@ -359,8 +380,15 @@ base = 70.0 + 8.0 * np.exp(-(np.log2(freqs / 1000.0) ** 2) / 2.0)
 rng = np.random.default_rng(7)
 levels = base[None, :] + rng.normal(0.0, 1.0, (40, freqs.size))
 
-result = emission.sound_power_anechoic(levels, "hemisphere", radius=1.0, frequencies=freqs)
+# sigma_omc es la desviación típica de funcionamiento y montaje de la
+# Cláusula 10.5; con el valor de EJEMPLO 2.0 dB y el factor de cobertura por
+# defecto k = 2, la incertidumbre expandida U = k*sqrt(sigma_R0^2 + sigma_omc^2)
+# son los 4.1 dB que imprime la ficha de abajo. Con su valor por defecto 0
+# informa 1.0 dB.
+result = emission.sound_power_anechoic(levels, "hemisphere", radius=1.0,
+                                       frequencies=freqs, sigma_omc=2.0)
 print(round(result.sound_power_level_a, 1))   # 89.3
+print(round(float(result.uncertainty), 1))    # 4.1  dB
 result.plot()   # espectro LW, LWA en el título (requiere matplotlib)
 ```
 

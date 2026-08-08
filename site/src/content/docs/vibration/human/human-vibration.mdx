@@ -109,11 +109,11 @@ weighting, and `Wh` the hand-arm weighting.
 from phonometry import vibration
 
 # The overall weighting response at any frequencies (ISO 8041-1 Formula (5)).
+# 6.3096 Hz is the *true* centre of the nominal 6.3 Hz band, which is where
+# the Annex B tables print their factors.
 resp = vibration.frequency_weighting("Wk", [1.0, 6.3096, 20.0])
 print(resp.magnitude.round(3))      # [0.482 1.054 0.636]  (factors)
 print(resp.magnitude_db.round(2))   # [-6.33  0.46 -3.93]  (dB)
-
-resp.plot()   # the weighting response in dB, as in the figure below (needs matplotlib)
 ```
 
 The factors reproduce the ISO 8041-1 Annex B design-goal tables to their four
@@ -202,16 +202,25 @@ factors.
 import numpy as np
 from phonometry import vibration
 
-# A measured vertical seat spectrum (r.m.s. per one-third octave, m/s^2).
-freqs = np.array([1.0, 2.0, 4.0, 8.0, 16.0, 31.5, 63.0])
-accel = np.array([0.20, 0.45, 0.42, 0.25, 0.12, 0.05, 0.02])
+# A measured vertical seat spectrum (r.m.s. per one-third octave, m/s^2),
+# the same 19 bands the figure below is drawn from.
+freqs = np.array([1.0, 1.25, 1.6, 2.0, 2.5, 3.15, 4.0, 5.0, 6.3, 8.0, 10.0,
+                  12.5, 16.0, 20.0, 25.0, 31.5, 40.0, 63.0, 80.0])
+accel = np.array([0.18, 0.24, 0.33, 0.46, 0.52, 0.55, 0.48, 0.39, 0.31, 0.26,
+                  0.21, 0.17, 0.13, 0.10, 0.078, 0.060, 0.045, 0.028, 0.020])
 
 result = vibration.weighted_acceleration(accel, freqs, "Wk")
-print(round(result.overall, 3))          # 0.555  m/s^2 (a_w)
+print(round(result.overall, 3))          # 1.026  m/s^2 (a_w)
 print(result.weighted.round(3))          # W_i * a_i per band
 
 result.plot()   # unweighted vs weighted bands, as in the figure below (needs matplotlib)
 ```
+
+Those band labels are the nominal ones, for legibility. Passing the true centres
+$10^{n/10}$ Hz (1, 1.259, 1.585, ... 79.433) instead moves $a_w$ from 1.0260 to
+1.0267 m/s², so the caution above is about comparing a *single* $W_i$ against a
+printed table, not about a broadband r.m.s., where the two agree to three
+figures.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/weighted_acceleration.svg" alt="A measured vehicle-seat acceleration spectrum (grey) and its Wk-weighted contribution (blue) over the one-third octaves from 1 to 80 Hz: the weighting attenuates the low and high bands but leaves the 4 to 8 Hz range nearly unchanged, giving a weighted r.m.s. a_w of about 1.03 m/s^2" width="90%" />
 

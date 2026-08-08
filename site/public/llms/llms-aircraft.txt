@@ -9,12 +9,14 @@ Source: https://jmrplens.github.io/phonometry/aircraft/
 
 # Aircraft noise
 
-Aircraft are noise sources important enough to have their own internationally
-negotiated metrics, each fixed to the last decimal by a certification
-framework. The four pages of this section implement those frameworks, and
-they share a common anatomy: a rigorously standardised **source descriptor**,
-plus standardised **propagation adjustments** that place the source at a
-receiver.
+Aircraft noise is computed under internationally negotiated methods of two
+kinds. **Certification** fixes a single number per aircraft type to the last
+decimal, at reference points a standard places around the runway. **Contour
+methods** take that certified fleet and predict what an airport does to the
+ground around it. The four pages of this section cover both, and they share a
+common anatomy: a rigorously standardised **source descriptor** — a spectral
+time history, a noise-power-distance table or a noise hemisphere — plus
+standardised **propagation adjustments** that place the source at a receiver.
 
 [Aircraft noise: Effective Perceived Noise Level](https://jmrplens.github.io/phonometry/aircraft/aircraft-noise/)
 covers fixed-wing certification. The **EPNL** of ICAO Annex 16 condenses a
@@ -51,6 +53,25 @@ which is filed with the other environmental sources: its IEC 61400-11 apparent
 sound power level and tonal-audibility chain answer the same question for a
 source that is not an aircraft. That tonality test is in turn a cousin of the
 methods in [Psychoacoustics](https://jmrplens.github.io/phonometry/perception/psychoacoustics/).
+
+Start from the question. To check an aeroplane against a certification limit,
+or to understand where the published numbers for a type come from, start with
+the EPNL page. To predict what a movement does at a street address, use the
+Doc 29 page, with the ANP page supplying the aircraft data. For helicopters the
+hemisphere page replaces both. Read the fixed-wing pages in that order: the EPNL
+page defines the certified metric, the Doc 29 page turns certified aeroplanes
+into ground contours from tables written by hand, and the ANP page replaces
+those hand-written tables with the published fleet data. The rotorcraft page
+stands on its own — a different standard and a different source model — and can
+be read first if helicopters are what you came for.
+
+The three metrics are not interchangeable. EPNL is a *certification* metric of
+one aeroplane at one prescribed point; SEL and LASmax are *single-event*
+assessment metrics at an arbitrary receiver; neither is the long-term index a
+land-use study is finally judged on. And the boundary: this section does not
+compute cumulative multi-event indices, does not synthesise NPD tables from
+engine data, does not model hover, idle or taxi rotorcraft operations, and does
+not touch sonic boom.
 
 ## Pages in this section
 

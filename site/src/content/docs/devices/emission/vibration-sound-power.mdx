@@ -41,11 +41,22 @@ $$
 
 with $Z_c$ the characteristic impedance of air, $\langle v^2 \rangle$ the
 mean-square vibratory velocity over the radiating area $S$. Expressed in levels
-(velocity level re $v_0 = 5\times10^{-8}\ \text{m/s}$), the A-weighted sound
-power level is (Formula 12 / 15)
+(velocity level re $v_0 = 5\times10^{-8}\ \text{m/s}$), each part writes that
+relation in its own quantities. **Part 1** is A-weighted throughout: one
+A-weighted surface velocity level $L_{vA}$, the fixed $\varepsilon_A = 1$, and a
+single A-weighted number, the *upper limit* of the airborne sound power level
+(Formula 12)
 
 $$
-L_W = L_v + 10\log_{10}\frac{S}{S_0} + 10\log_{10}\varepsilon
+L_{WA,\max} = L_{vA} + 10\log_{10}\frac{S}{S_0}
+      + 10\log_{10}\frac{Z_{c,n}}{Z_{c,0}}.
+$$
+
+**Part 2** is the band-wise counterpart, with the radiation factor
+$\varepsilon_j$ determined for each band (Formula 15)
+
+$$
+L_{W,j} = L_{v,j} + 10\log_{10}\frac{S}{S_0} + 10\log_{10}\varepsilon_j
       + 10\log_{10}\frac{Z_{c,n}}{Z_{c,0}},
 $$
 
@@ -53,8 +64,11 @@ where $S_0 = 1\ \text{m}^2$, the normalized impedance
 $Z_{c,n} = 411\ \text{N·s/m}^3$ and the reference
 $Z_{c,0} = 400\ \text{N·s/m}^3$ give the fixed
 $10\log_{10}(411/400) = 0.118\ \text{dB}$
-term. This module feeds the structure-borne source and building prediction
-standards (ISO 9611, EN 15657, EN 12354-5).
+term. This guide runs the band-wise form for both parts, so that the Part 1
+upper limit and the Part 2 engineering value can be compared band by band; a
+strict Part 1 survey is the single A-weighted number above, which the result
+object carries as `sound_power_level_a`. This module feeds the structure-borne
+source and building prediction standards (ISO 9611, EN 15657, EN 12354-5).
 
 Before any levels, the radiator itself. The `radiation_efficiency` plate model
 that supplies a predicted radiation factor retains its geometry, and
@@ -139,15 +153,23 @@ lv = np.array([82.0, 85.0, 83.0, 79.0])          # mean velocity level per band 
 
 # Part 1 upper limit (epsilon = 1):
 upper = emission.sound_power_from_vibration(lv, area=1.6, frequencies=bands)
-print(round(upper.total_level, 1))               # e.g. 89.4  dB re 1 pW
+print(round(upper.total_level, 1))               # 90.9  dB re 1 pW, unweighted
+print(round(upper.sound_power_level_a, 1))       # 88.9  dB(A) re 1 pW
 
 # Part 2 engineering value with a measured radiation factor:
 eps = np.array([0.45, 0.75, 0.95, 1.00])
 eng = emission.sound_power_from_vibration(lv, area=1.6, radiation_factor=eps, frequencies=bands)
 print(np.round(eng.sound_power_level, 1))        # per-band L_W
+print(round(eng.sound_power_level_a, 1))         # 88.4  dB(A) re 1 pW
 
 eng.plot()   # the LW(f) spectrum, as in the figure above (needs matplotlib)
 ```
+
+The two totals are not interchangeable: `total_level` is the unweighted band sum
+$10\lg\sum_j 10^{0.1 L_{W,j}}$, while `sound_power_level_a` is the A-weighted
+total that the fiche boxes and that a noise declaration quotes. They differ by
+the A-weighting of the spectrum — 2.0 dB on this casing, several decibels more
+on a low-frequency-heavy one.
 
 ## 2. Velocity level, calibration and the radiation factor
 
@@ -173,11 +195,21 @@ and the correction `extraneous_velocity_correction` removes extraneous
 vibration per Table 2.
 
 Those positions are not free: the standard divides the radiating surface $S$
-into $N$ equal cells and puts one accelerometer at the centre of each. The
-area table gives the initial $N$; a strongly non-uniform vibration field can
-call for more positions or a redistribution.
+into $N$ equal cells and puts one accelerometer at the centre of each. Table 1
+fixes the initial $N$ from the area alone — **5** positions below 1 m²,
+**10** from 1 m² to 10 m², and $S/S_0$ positions above that ($S_0 = 1$ m²) — so
+the 4 m² surface drawn below takes ten. Increase $N$ when the spread of the
+A-weighted velocity level over the positions, highest minus lowest in decibels,
+exceeds twice the Table 1 count; a strongly non-uniform field can instead be
+handled by redistributing the positions, which makes the partial areas $S_i$
+unequal and so calls for the area-weighted Formula 11 rather than the plain
+energetic mean. The Table 2 correction is a ladder on the same kind of spread:
+with the machine stopped and the surrounding plant running, the mean extraneous
+velocity level must sit at least 3 dB below the machine's, and
+`extraneous_velocity_correction` returns 3 dB at a 3 dB difference, 2 dB at
+4-5 dB, 1 dB at 6-9 dB and 0 dB from 10 dB up.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_vibration_sound_power.svg" alt="ISO/TS 7849 surface-velocity method: a machine under test with its vibrating measurement surface of 2.5 by 1.6 metres divided into twenty equal cells, an accelerometer at each cell centre, the radiated airborne sound leaving the surface, the table for the initial number of measurement positions and the survey relation LWA = LvA + 10 lg(S/S0) + 10 lg epsilon" width="92%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_vibration_sound_power.svg" alt="ISO/TS 7849 surface-velocity method: a machine under test with its vibrating measurement surface of 2.5 by 1.6 metres divided into ten equal cells, an accelerometer at each cell centre, the radiated airborne sound leaving the surface, the Table 1 initial number of measurement positions (5 below 1 square metre, 10 from 1 to 10, S over S0 above) and the survey relation LWA = LvA + 10 lg(S/S0) + 10 lg epsilon" width="92%" />
 
 ## 3. When the radiation-factor assumption breaks
 
@@ -224,7 +256,11 @@ climate, date), a per-band table (nominal octave/one-third-octave frequency,
 the surface vibratory velocity level $L_v$ and the band sound-power level
 $L_W$), the sound-power spectrum $L_W(f)$ with a nominal band axis, and a boxed
 A-weighted sound power level $L_{WA}$ (dB re 1 pW) with the total $L_W$, the
-radiating area $S$ and the applied method alongside.
+radiating area $S$ and the applied method alongside. Those two come from the
+result's `sound_power_level_a` (the declarable A-weighted total) and
+`total_level` (the unweighted band sum); the table columns come from
+`velocity_level`, `sound_power_level` and, with `verbose=True`,
+`radiation_factor`.
 
 The metadata is supplied through a `ReportMetadata`, whose applicable fields
 here are the **machine/source description** (`specimen`), the **test

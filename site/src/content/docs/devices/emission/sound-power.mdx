@@ -127,7 +127,11 @@ order; the first match names the standard.
    calls for precision (grade 1); a first walk-through of a noisy plant
    tolerates survey grade (grade 3). Grade 1 exists only in a qualified
    laboratory room (ISO 3741, ISO 3745) or via the precision intensity
-   methods (ISO 9614-1 at discrete points, ISO 9614-3 by scanning).
+   methods (ISO 9614-1 at discrete points, ISO 9614-3 by scanning), of
+   which phonometry implements the scanning form only: ISO 9614-1's own
+   discrete-point power summation is not provided, though its field
+   indicators are (see
+   [Sound Intensity](/phonometry/devices/emission/intensity/)).
 2. **Can the source travel to a laboratory?** ISO 3741 wants the source
    small next to the room (volume no more than about 2 % of the room volume)
    and its noise steady; ISO 3745 wants it inside a qualified anechoic or
@@ -263,6 +267,9 @@ the diffuse-field method in
 [Sound Power in the Reverberation Room](/phonometry/devices/emission/sound-power-reverberation/)
 and both scanning methods in
 [Sound Power by Intensity Scanning](/phonometry/devices/emission/sound-power-intensity/).
+ISO 9614-1's own discrete-point power summation is not implemented at all;
+only its field indicators are, in
+[Sound Intensity](/phonometry/devices/emission/intensity/).
 ISO 4871's batch statistics beyond the single-machine
 $K = 1.645\,\sigma_R$ case (Annex A.2.2) are stated, not derived.
 

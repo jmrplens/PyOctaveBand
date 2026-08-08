@@ -6,9 +6,11 @@ A sound level meter does three things to a calibrated signal, in order: it
 **weights it in frequency** to mimic the ear's sensitivity, it **smooths it in
 time** with a standardised ballistic, and it **integrates it into a level**.
 The pages of this section implement that chain stage by stage for the
-displayed level: the A/C/Z curves and the Fast/Slow/Impulse ballistics
-follow **IEC 61672-1:2013** closely enough that the weightings are
-verified against the standard's own tolerance tables in CI.
+displayed level: the A/C/Z curves and the Fast and Slow ballistics of
+**IEC 61672-1:2013**, verified in CI against the standard's own tolerance
+tables (Table 3 for the weightings, Table 4 for the tone-burst responses), plus
+the legacy Impulse ballistics that IEC 61672-1 inherited from IEC 60651 and then
+dropped from its requirements, kept here for older national procedures.
 
 [Frequency Weighting (A, C, Z)](weighting.md) covers the
 first stage. The A-curve tracks hearing sensitivity at moderate levels and
@@ -20,10 +22,11 @@ conventional weightings are blind, the historical B and D curves serve legacy
 data, and AU rejects ultrasound from an audible-sound reading per IEC 61012.
 
 [Time Weighting](time-weighting.md) covers the second stage:
-the exponential Fast (125 ms), Slow (1 s) and Impulse ballistics that decide
-how quickly a displayed level follows the sound. phonometry implements the
-exact time constants, verified against the toneburst responses of the
-standard.
+the exponential Fast (125 ms) and Slow (1 s) ballistics that decide how quickly
+a displayed level follows the sound, and the legacy asymmetric Impulse
+ballistics (35 ms rise, 1.5 s decay) that came from IEC 60651 and is no longer
+required by IEC 61672-1. phonometry implements the exact time constants,
+verified against the tone-burst responses of the standard.
 
 [Integrated and Statistical Levels](levels.md) is the payoff:
 the equivalent continuous level Leq and its A-weighted LAeq, the percentile
@@ -52,8 +55,9 @@ noise phases, and the limit tables an activity is judged against.
 - [Special Weightings (G, B, D, AU)](special-weightings.md):
   the ISO 7196 infrasound G-weighting, the historical B and D curves and AU
   per IEC 61012.
-- [Time Weighting](time-weighting.md): Fast, Slow and
-  Impulse exponential ballistics.
+- [Time Weighting](time-weighting.md): the Fast and Slow
+  exponential ballistics of IEC 61672-1, and the legacy Impulse ballistics it
+  dropped.
 - [Integrated and Statistical Levels](levels.md): Leq and
   LAeq, percentile levels, LCpeak/SEL, noise dose and octave spectrograms.
 

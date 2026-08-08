@@ -1,6 +1,6 @@
 ---
 title: "Diseño del aislamiento"
-description: "El aislamiento acústico antes de construirlo: la predicción de flancos de EN 12354 entre recintos, el aislamiento teórico de un panel a partir de sus propiedades físicas y las dos mediciones de material que consume el diseño de un suelo (revestimientos ISO 16251-1, rigidez dinámica EN 29052-1)."
+description: "El aislamiento acústico antes de construirlo: la predicción de flancos de EN/ISO 12354 entre recintos en sus formas simplificada y por bandas, el aislamiento teórico de un panel a partir de sus propiedades físicas, las capas elásticas de las que depende el diseño de un suelo o de un trasdosado, y el sonido estructural de los equipos de instalaciones desde la placa de recepción de EN 15657 hasta el nivel en el recinto receptor de EN 12354-5."
 ---
 
 Las páginas de la sección de
@@ -36,15 +36,44 @@ de una doble hoja, la transmisión por rendijas y aberturas, la eficiencia de
 radiación de placas y las movilidades puntuales. Es la física que un valor de
 catálogo resume en un número.
 
-Dos mediciones alimentan la mitad de suelos de cualquier diseño.
+Dos páginas de aquí llevan la mitad de suelos de cualquier diseño, una que mide
+y otra que predice.
 [Mejora del aislamiento a impacto de suelos (ISO 16251-1)](/phonometry/es/buildings/design/impact-improvement/)
-da la mejora ponderada $\Delta L_w$ de un revestimiento blando sobre una
-maqueta pesada pequeña, el término que EN 12354-2 resta al nivel del forjado
-desnudo, y
-[Rigidez dinámica de materiales resilientes (EN 29052-1)](/phonometry/es/materials/resilient/dynamic-stiffness/)
-da la rigidez por unidad de superficie $s'$ de la capa elástica bajo un suelo
-flotante y, con ella, la frecuencia de resonancia de la que depende toda la
+da la mejora ponderada $\Delta L_w$ de un revestimiento que ya existe, sobre una
+maqueta pesada pequeña, y ese es el término que EN 12354-2 resta al nivel del
+forjado desnudo.
+[Predicción del comportamiento de capas elásticas](/phonometry/es/buildings/design/resilient-layers/)
+la predice para un revestimiento que todavía no existe, a partir del espectro de
+fuerza de la propia máquina de impactos, la frecuencia de corte de un
+revestimiento blando, las leyes de 30 lg y 40 lg del suelo flotante y la
+magnitud global de un trasdosado según el anexo D de ISO 12354-1.
+Ambas parten de la rigidez por unidad de superficie $s'$ de la capa elástica,
+medida según EN 29052-1 en
+[Rigidez dinámica de materiales resilientes](/phonometry/es/materials/resilient/dynamic-stiffness/)
+en la sección de materiales, que fija la resonancia de la que depende toda la
 mejora.
+
+Los equipos de instalaciones del edificio son una cadena aparte, y sus dos
+páginas solo se leen bien en orden.
+[Potencia acústica estructural de equipos (EN 15657)](/phonometry/es/buildings/design/structure-borne-power/)
+caracteriza una bomba, un ventilador o una cisterna por la potencia que inyecta
+en la estructura, medida sobre una placa de recepción de disipación conocida y
+convertida después en independiente de la placa.
+[Sonido estructural instalado (EN 12354-5)](/phonometry/es/buildings/design/installed-structure-borne/)
+toma esa descripción de fuente, pierde parte de ella en el término de
+acoplamiento que fijan las movilidades de fuente y de receptor, y lleva el resto
+a un recinto que puede estar a varias uniones de distancia.
+
+Una nota de contabilidad recorre toda la sección: la familia existe como
+EN 12354:2000 y como ISO 12354:2017, y las dos no son intercambiables en todas
+las cláusulas. Los modelos simplificados de
+[Predicción del aislamiento acústico](/phonometry/es/buildings/design/insulation-prediction/)
+siguen el texto de 2000 — incluida la corrección tabulada por flancos $K$ que la
+parte de impactos de 2017 sustituyó por fórmulas explícitas camino a camino —
+mientras que
+[Predicción detallada por bandas](/phonometry/es/buildings/design/detailed-prediction/)
+sigue el texto de 2017. Comprueba qué edición invoca tu reglamento antes de
+citar una corrección de cualquiera de las dos.
 
 ## Páginas de esta sección
 

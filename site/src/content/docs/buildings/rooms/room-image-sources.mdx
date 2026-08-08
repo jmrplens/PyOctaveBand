@@ -106,21 +106,23 @@ res = room.image_source_rir(
     receiver=(5.2, 3.4, 1.7),
     absorption=0.12,          # uniform wall absorption (scalar)
     fs=48000,
-    max_order=12,
+    # Enough order to cover a T30 fit; see "Choosing max_order, duration and
+    # fs" below. The default 20 truncates this room's tail by half.
+    max_order=60,
 )
 
 print(res.ir.shape)                          # (n_samples,) broadband RIR
-print(round(res.direct_time * 1000, 2))      # direct-sound arrival, ms
-print(res.times.size == room.audible_image_count(12) + 1)   # images + source
+print(round(res.direct_time * 1000, 2))      # 10.72  direct-sound arrival, ms
+print(res.times.size == room.audible_image_count(60) + 1)   # images + source
 
-res.plot()   # the reflectogram of the figure below
+res.plot()   # the reflectogram; the figure below draws the same room at order 10
 
 # The synthetic RIR flows straight into the ISO 3382 decay analysis.
 params = room.room_parameters(res.ir, res.fs, limits=None)
 print(bool(params.t30_valid[0]))             # True: the decay window is usable
-# T30 rises toward the Eyring estimate as max_order grows (see below); at a low
-# order the specular tail is truncated, so treat this as an order-limited value.
-print(round(float(params.t30[0]), 2))        # reverberation time, s
+print(round(float(params.t30[0]), 2))        # 1.06 s, specular
+print(round(float(room.eyring_reverberation_time(105.0, [(142.0, 0.12)])), 2))
+# 0.93 s, the diffuse-field Eyring estimate for the same room
 ```
 
 `image_source_rir` returns an `ImageSourceResult`. Its `ir` is the sampled RIR
@@ -248,6 +250,52 @@ Returns an `ImageSourceResult` (`ir`, `fs`, `frequencies`, and the exact
 with `.plot()` and a `direct_time` property. `audible_image_count(order)` gives
 the shoebox image count and `reflection_density(t, volume)` the density
 $4\pi c^3 t^2 / V$.
+
+### Choosing `max_order`, `duration` and `fs`
+
+`max_order` is not a quality knob, it is a **time horizon**. The image lattice
+is complete only out to a radius of roughly `max_order` × the shortest room
+dimension, so covering $t$ seconds of decay needs
+
+$$
+\text{order} \approx \frac{c\,t}{L_\text{min}} .
+$$
+
+A T30 fit spans 35 dB, about $0.58\,T$ of decay. The 7 × 5 × 3 m room above has
+$L_\text{min} = 3$ m and an Eyring time near 0.93 s, so it needs
+$343 \times 0.54 / 3 \approx 60$. Below that the tail is simply missing, and
+the fitted T30 comes out short:
+
+| `max_order` | audible images | fitted T30 | runtime |
+| ---: | ---: | ---: | ---: |
+| 12 | 2 624 | 0.28 s | < 0.1 s |
+| 20 (default) | 11 520 | 0.43 s | < 0.1 s |
+| 30 | 37 880 | 0.60 s | < 0.1 s |
+| 40 | 88 640 | 0.75 s | 0.1 s |
+| 60 | 295 360 | 1.06 s | 0.2 s |
+
+The Eyring estimate for this room is 0.93 s, so order 12 is 3.3× short and the
+default 20 is 2.1× short. The cost objection does not apply: order 60 is
+295 360 images and runs in a fifth of a second.
+
+**`t30_valid` cannot see a truncated lattice.** It reads the decay range of
+whatever array it is handed, so it returns `True` at every order in the table
+above. The flag catches a noisy or too-short *recording*; it cannot catch a
+model that stopped generating reflections. A `duration` shorter than the decay
+truncates the tail exactly the same way, and silently.
+
+Two more caveats belong to the same section. `fs` quantises every arrival to
+the sample grid, so early-reflection work — arrival times, ITDG, lateral
+fractions — should read the exact `times` / `amplitudes` table rather than
+peak-pick the sampled `ir`. And `absorption` enters as a real,
+angle-independent pressure reflection factor $\sqrt{1-\alpha}$, so grazing
+incidence is treated like normal incidence.
+
+Finally, the honest boundary: if the order needed to cover the reverberation
+time makes the run impractical — a large room with a small $L_\text{min}$, or a
+long tail — the pure image method is being asked to do a job that belongs to a
+hybrid model with a statistical late tail, or to the
+[FDTD solver](/phonometry/simulation/fdtd-simulation/).
 
 ## 2. Steady-state room field
 
@@ -442,6 +490,39 @@ axial modes stand alone and each is separately audible; by the 175 Hz Schroeder
 frequency ($T = 0.8$ s) the oblique family has filled in and the modal density
 has passed one mode per hertz, which is where the statistical field of §2 takes
 over.*
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+# `room` is the import of the room_modes block above.
+
+# Long, Architectural Acoustics 2nd ed., Table 8.1.
+modes = room.room_modes((7.0, 5.0, 3.0), max_frequency=200.0,
+                        speed_of_sound=344.0, reverberation_time=0.8)
+
+# One line: the mode ladder by family with the modal density below.
+modes.plot()
+plt.show()
+
+# By hand: scatter the eigenfrequencies, one row per family.
+kinds = np.asarray(modes.kinds)
+rows = {"axial": 0, "tangential": 1, "oblique": 2}
+fig, ax = plt.subplots()
+for name, y in rows.items():
+    sel = kinds == name
+    ax.vlines(np.asarray(modes.frequencies)[sel], y, y + 0.8, label=name)
+ax.axvline(modes.schroeder_frequency, ls=":", color="k",
+           label=f"Schroeder {modes.schroeder_frequency:.0f} Hz")
+ax.set_yticks([0.4, 1.4, 2.4], list(rows))
+ax.set_xlabel("Frequency [Hz]")
+ax.legend()
+plt.show()
+```
+
+</details>
 
 ### `room_modes()` parameters
 

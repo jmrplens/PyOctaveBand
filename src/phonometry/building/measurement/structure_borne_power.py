@@ -19,8 +19,10 @@ The power a resonant plate dissipates equals
    L_{Ws} = 10 \log_{10}\frac{2 \pi f \eta\, m S}{f_0 m_0 S_0} + L_v - 60
    \qquad \text{dB re 1 pW}
 
-with the references :math:`f_0 = 1` Hz, :math:`m_0 = 1` kg,
-:math:`S_0 = 1` m²; the fixed ``-60 dB`` term is
+with the references :math:`f_0 = 1` Hz, :math:`m_0 = 1` kg (printed as 1 kg;
+the quantity it normalises is a mass per unit area, so the reference is
+1 kg/m² -- see ``docs/ERRATA.md``), :math:`S_0 = 1` m²;
+the fixed ``-60 dB`` term is
 :math:`10 \log_{10}(v_0^2 / P_0)` for the EN 15657 velocity reference
 :math:`v_0 = 10^{-9}` m/s and :math:`P_0 = 1` pW. The spatial mean velocity
 level is the energetic average over the ``N`` plate positions (Formula 12):

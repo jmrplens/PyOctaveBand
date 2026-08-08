@@ -732,20 +732,48 @@ Cuánta potencia aérea radia realmente una placa vibrante por unidad de velocid
 cuadrática media es su **eficiencia de radiación** $\sigma$: el factor de
 radiación $\varepsilon$ que
 [Potencia acústica a partir de la vibración](/phonometry/es/devices/emission/vibration-sound-power/)
-(ISO 7849) toma en otro caso como entrada medida. Por debajo de la frecuencia
-crítica la placa radia poco (modos de borde y de esquina); por encima
-$\sigma \to 1$ (Leppington/Maidanik, Hopkins Ec. 2.227-2.230):
+(ISO 7849) toma en otro caso como entrada medida. Se define como el cociente
+entre la potencia que la placa radia realmente y la que radiaría un pistón
+rígido de la misma superficie y la misma velocidad cuadrática media, de manera
+que $\sigma = 1$ significa «tan eficiente como un pistón» — y, como muestran los
+números de abajo, cerca de la coincidencia una placa puede superarlo.
+
+Hay tres regímenes, no dos (Leppington/Maidanik, Hopkins Ec. 2.227-2.230). **Muy
+por debajo de $f_c$** la longitud de onda de flexión es más corta que la
+acústica, las semiondas contiguas se cancelan mutuamente el caudal volumétrico y
+solo radian las franjas sin cancelar de los bordes y las esquinas. Por eso el
+cálculo necesita las dos dimensiones de la placa y su condición de borde: un
+borde empotrado radia más que uno simplemente apoyado, y una placa con bafles
+perpendiculares a sus bordes más que una enrasada en un bafle infinito — los
+argumentos `boundary` y `baffle` eligen entre ellos. **Alrededor de $f_c$** la
+longitud de onda de traza de la onda de flexión coincide con la acústica, la
+forma de Leppington $(1 - f_c/f)^{-1/2}$ diverge y queda limitada por la
+expresión en coincidencia; el panel de abajo alcanza un máximo de
+$\sigma = 2,6$ en la banda de 2 kHz. **Solo muy por encima de $f_c$** se asienta
+$\sigma$ hacia 1: un tercio de octava pasada la coincidencia este panel sigue en
+1,74.
 
 $$
-\sigma = \frac{1}{\sqrt{1 - f_c/f}} \quad (f > f_c), \qquad \sigma \to 1 .
+\sigma = \frac{1}{\sqrt{1 - f_c/f}} \quad (f > f_c), \qquad
+\sigma \to 1 \quad (f \gg f_c) .
 $$
+
+Merece la pena llevarse dos consecuencias. Una placa *pequeña* es, por debajo de
+$f_c$, mejor radiador relativo que una grande del mismo material, porque la
+franja de borde que radia es una fracción mayor de ella: el panel de
+1,5 × 1,25 m de abajo da $\sigma = 0,011$ a 100 Hz, y un panel de 0,5 × 0,4 m
+del mismo vidrio, 0,034. Y el valle de coincidencia de $R$ y el pico de
+coincidencia de $\sigma$ son el mismo suceso visto por los dos lados — la misma
+$\sigma$ reaparece en el factor de transmisión del modelo detallado de
+EN 12354 y como el factor de radiación que mide ISO 7849.
 
 ```python
 from phonometry import radiation_efficiency, sound_power_from_vibration
 
 # El panel de vidrio de 6 mm (1.5 x 1.25 m) del ejemplo de panel simple anterior.
 sig = radiation_efficiency(bands, 1.5, 1.25, fc)
-print(sig.radiation_efficiency[bands == 2000].round(2))    # ~2.5 (pico en coincidencia)
+print(sig.radiation_efficiency[bands == 2000].round(2))
+# 2.6, el pico de coincidencia: la placa radia más que un pistón cerca de fc
 
 # Alimenta la predicción directamente a ISO 7849 como el factor de radiación:
 lw = sound_power_from_vibration(velocity_level=80.0, area=1.875,
@@ -903,6 +931,14 @@ real proviene de resonancias de los tramos de panel entre nervios, que ninguna
 de las dos vías predice. Solo la greca sinusoidal tiene aquí rigideces
 equivalentes; la chapa trapezoidal necesita las suyas, de la bibliografía que
 cita Vigran.
+El modelo de llaves está en la misma situación por su lado de salida: las
+entradas son datos impresos, pero no hay tabulado ningún índice de reducción
+acústica publicado de un muro de fábrica con cámara puenteado, así que la
+penalización por bandas que causan las llaves no tiene oráculo numérico y solo
+está anclado el desplazamiento de la resonancia (Hopkins Fig. 4.35, de 26 Hz a
+50 Hz). El factor de pérdidas por acoplamiento no se introduce aquí en un
+análisis estadístico de energía completo; combinarlo con el camino aéreo
+exigiría toda la cadena sala-placa-cámara-placa-sala.
 
 ## Véase también
 

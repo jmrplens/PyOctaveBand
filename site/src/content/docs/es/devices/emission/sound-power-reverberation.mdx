@@ -19,6 +19,7 @@ references:
 ---
 
 import ThemeImage from '../../../../../components/ThemeImage.astro';
+import Video from '../../../../../components/Video.astro';
 import ReportPreview from '../../../../../components/ReportPreview.astro';
 
 Una cámara reverberante convierte su principal defecto como espacio de escucha
@@ -66,6 +67,26 @@ comparación** sustituye los términos de área de absorción, Waterhouse y $C_1
 por una fuente sonora de referencia de potencia conocida $L_W(\text{RSS})$
 medida en la misma cámara, de modo que la cámara no necesita caracterizarse:
 $L_W = L_W(\text{RSS}) + (L_p(\text{ST}) - L_p(\text{RSS}) + C_2)$.
+
+El panel derecho del clip de abajo es este método. La misma fuente suena en
+las dos salas; en la cámara anecoica de la izquierda los micrófonos solo ven
+lo que la fuente les envía, así que el nivel cae con la distancia y la vía de
+campo libre tiene que integrar sobre una superficie de medida, mientras que
+en la cámara reverberante de la derecha la energía reflejada llena el espacio
+y el nivel deja de depender de dónde esté un micrófono. Esa es toda la razón
+de que la Ec. 20 pueda sustituir una integral de superficie por un puñado de
+posiciones y una constante de sala — y la razón de que lo que hay que
+cualificar sea la cámara, no el conjunto de micrófonos. Las dos vías acaban
+en el mismo $L_W$, porque la potencia acústica es una propiedad de la fuente
+y no de la sala en la que se mide.
+
+<Video
+  name="anim_power_two_rooms"
+  width={2400}
+  height={1350}
+  title="La misma fuente, dos salas, una sola potencia acústica"
+  description="La misma fuente en una cámara anecoica y en una cámara reverberante produce presiones distintas en los micrófonos, y las fórmulas de campo libre y de campo difuso convergen al mismo nivel de potencia acústica L_W."
+/>
 
 ```python
 import numpy as np
@@ -191,7 +212,7 @@ El resultado en cámara reverberante (`ReverberationSoundPowerResult`, ISO 3741)
 escribe mediante su propio `.report()` una ficha PDF de una página con el
 formato de una hoja de ensayo de potencia acústica, compartiendo el diseño y
 el contenedor `ReportMetadata` de la
-[ficha de los métodos de presión](/phonometry/es/devices/emission/sound-power-pressure/#informe-de-medicion).
+[ficha de los métodos de presión](/phonometry/es/devices/emission/sound-power-pressure/#3-el-informe-de-medición-report).
 La línea
 de base normativa nombra la ISO 3741:2010 y el grado de precisión (grado 1) e
 indica qué método se empleó, el método directo usando el área de absorción

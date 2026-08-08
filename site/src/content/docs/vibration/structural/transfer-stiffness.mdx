@@ -82,7 +82,7 @@ fig, ax = plt.subplots()
 ax.semilogx(f, vibration.transfer_stiffness_level(k_true),
             label="true $L_k$ of $k+j\\omega c$")
 ax.semilogx(f, vibration.transfer_stiffness_level(k_indirect), "--",
-            label="indirect method $-(2\\pi f)^2 m_2 T$")
+            label="indirect method $-(2\\pi f)^2 m_2 T$")   # no flange here
 ax.axvline(f0, color="0.6", linestyle=":", label="resonance $f_0$")
 ax.set(xlabel="Frequency [Hz]", ylabel="Transfer stiffness level $L_k$ [dB re 1 N/m]")
 ax.grid(True, which="both", alpha=0.3)
@@ -138,16 +138,25 @@ $$
 k_{2,1} = -(2\pi f)^2\,(m_2 + m_f)\,T \qquad (T \ll 1),
 $$
 
-with $m_f$ the mass of the output flange. The approximation is valid well above
-the mass/spring resonance, where $T$ is small.
+with $m_f$ the mass of the output flange, which the `flange_mass=` keyword
+carries (it defaults to zero). It is not a refinement: ISO 10846-3 measures the
+vibration of the mass centre of the *compact body* formed by the blocking mass
+together with the output flange of the test element, so $m_f$ is whatever is
+weighed with it — the flange and any auxiliary fixture that moves as part of the
+test element. Left at zero it reports a stiffness low by $m_2/(m_2 + m_f)$. The
+approximation is valid well above the mass/spring resonance, where $T$ is
+small.
 
 ```python
 import numpy as np
 from phonometry import vibration
 
-# Indirect method: a 10 kg blocking mass, transmissibility 0.01 at 500 Hz.
-k = vibration.transfer_stiffness_indirect(500.0, 0.01, blocking_mass=10.0)
-print(f"{abs(complex(k)):.3e}")            # 9.870e+05  N/m
+# Indirect method: a 10 kg blocking mass, transmissibility 0.01 at 500 Hz,
+# and the 1.2 kg output flange of the test element bolted on top of it.
+k = vibration.transfer_stiffness_indirect(500.0, 0.01, blocking_mass=10.0,
+                                          flange_mass=1.2)
+print(f"{abs(complex(k)):.3e}")            # 1.105e+06  N/m
+# flange_mass defaults to 0, which reports 9.870e+05 N/m: 12 % low here.
 
 # Bundle a swept measurement into a result carrying its level and loss factor:
 f = np.logspace(1.5, 3.3, 200)
@@ -273,7 +282,8 @@ res.report(
 10846-2 and -3, 3.17) and loss factor (ISO 10846-1, 3.8)
 (`transfer_stiffness_level`, `loss_factor`), the ISO 10846-2:2008 direct
 method (`transfer_stiffness_direct`), and the ISO 10846-3:2002 indirect
-method of Formula 1 (`transfer_stiffness_indirect`). The blocking-force
+method of Formula 1 (`transfer_stiffness_indirect`, including its
+`flange_mass=` term). The blocking-force
 approximation of Equations 6-7 (`blocking_force_ratio`) and the Annex A /
 Table A.2 FRF relations (`convert_frf`) are implemented too.
 `TransferStiffnessResult` bundles a swept determination, and `.report()`

@@ -209,6 +209,24 @@ pérdida de transmisión: $f_0 = \tfrac{c}{2\pi}\sqrt{S_n/(l_e V)}$ (Bies Ec. (8
 y $f = c/4l_e$ (Ec. (8.44)). Una **cámara de tubo extendido** aloja ramas de
 cuarto de onda dentro de una cámara de expansión para rellenar sus caídas.
 
+Las dos longitudes son longitudes **efectivas**, y las dos funciones las
+toman así (`neck_length` y `length` están documentadas como $l_e$, con las
+correcciones de extremo incluidas). El aire del cuello no deja de moverse en
+la boca: arrastra consigo un tapón de aire a cada lado, así que la masa que
+resuena contra la cavidad pertenece a un tubo más largo que el que se
+taladró. Hay que añadir unos $0{,}85a$ por extremo embridado y unos $0{,}61a$
+por extremo libre, para un cuello de radio $a$, en los dos extremos de un
+cuello de Helmholtz y solo en el extremo abierto (el del conducto) de un tubo
+de cuarto de onda. El resonador dibujado abajo es el caso de manual: su
+cuello mide 11,3 mm de diámetro ($a = 5{,}64$ mm) y 20 mm de largo, así que
+$l_e \approx 20 + 2 \times 4{,}8 = 29{,}6$ mm y la sintonía baja de los
+122,1 Hz que devuelve la longitud taladrada a 100,3 Hz — un error del 22 % en
+una muesca que la figura de abajo enseña que solo tiene unos pocos hercios de
+ancho. Cuanto más corto y más ancho el cuello, mayor es la corrección en
+términos relativos, que es justo el régimen en el que vive un resonador
+compacto, así que el procedimiento práctico es calcular una longitud nominal,
+construirlo largo y recortarlo contra una medición.
+
 ```python
 import numpy as np
 from phonometry import (
@@ -219,12 +237,23 @@ f = np.linspace(20.0, 600.0, 4000)
 
 hr = helmholtz_resonator(f, duct_area=0.01, neck_area=1e-4,
                          neck_length=0.02, cavity_volume=1e-3)
-print(round(float(hr.resonances[0]), 1))       # frecuencia de sintonía, Hz
+print(round(float(hr.resonances[0]), 1))       # 122.1 Hz, para le = 20 mm
 hr.plot()   # pico de TL en la frecuencia de sintonía (necesita matplotlib)
 
-qw = quarter_wave_resonator(f, duct_area=0.01, length=1.516, branch_area=2e-3,
-                            speed_of_sound=343.24)
-print(round(float(qw.resonances[0]), 1))        # 56.6 Hz (Bies Ejemplo 8.1)
+qw = quarter_wave_resonator(f, duct_area=0.01, length=0.3, branch_area=2e-3)
+print(round(float(qw.resonances[0]), 1))       # 285.8 Hz = c / 4 le
+
+# Ejemplo 8.1 de Bies, el anclaje publicado: un tubo de 1.516 m con c = 343.24 m/s.
+print(round(float(quarter_wave_resonator(
+    f, duct_area=0.01, length=1.516, branch_area=2e-3,
+    speed_of_sound=343.24).resonances[0]), 1))  # 56.6 Hz
+
+# El mismo tubo en gases de escape calientes: c(500 degC) = 343*sqrt(773/293) = 557 m/s
+# (ver la advertencia de abajo), que desplaza la muesca en un factor 1.62.
+f_hot = np.linspace(20.0, 900.0, 6000)
+qw_hot = quarter_wave_resonator(f_hot, duct_area=0.01, length=0.3,
+                                branch_area=2e-3, speed_of_sound=557.0)
+print(round(float(qw_hot.resonances[0]), 1))   # 464.2 Hz, no 285.8
 
 # Una extensión de entrada de L/4 rellena la primera caída de la cámara.
 et = extended_tube_chamber(f, length=0.4, chamber_area=0.04, pipe_area=0.01,
@@ -308,6 +337,27 @@ plantado sobre el mismo conducto.
 *Un tubo de cuarto de onda es solo un tubo cerrado de la longitud correcta:
 0,3 m de tubo colocan el pico en $c/4l_e \approx 285\ \text{Hz}$, y el área de
 rama de 20 cm² solo fija con cuánta fuerza carga el conducto.*
+
+:::caution
+**Sintonizar a la temperatura de trabajo.**
+Todas las frecuencias de esta página son condiciones de longitud de onda, así
+que todas escalan directamente con la velocidad del sonido **en el gas de
+trabajo**: $kL = \pi/2$ para la cámara, $c/4l_e$ para el tubo y la $c$ que va
+delante de la raíz cuadrada de Helmholtz. Para el aire,
+$c(T) = 343\sqrt{T/293}$ con $T$ en kelvin, así que un escape a 500 °C
+(773 K) funciona a unos 557 m/s, un factor 1,62, y el tubo de 0,3 m cortado
+para 285,8 Hz con valores de aire frío canta a 464 Hz en cuanto el tubo se
+calienta. Hay que pasar los valores de trabajo — `speed_of_sound=` y
+`density=`, porque la densidad escala toda impedancia característica y por
+tanto la pérdida de inserción. La llamada con `speed_of_sound=557.0` del
+fragmento del apartado 1 es ese reajuste, y devuelve 464,2 Hz para el mismo
+tubo de 0,3 m.
+
+Un flujo medio desplaza aún más la muesca y rebaja su profundidad, y la
+temperatura cae a lo largo de un escape real, así que un resonador de escape
+se comprueba en los extremos caliente y frío y se acepta con margen en vez de
+diseñarse a un solo valor.
+:::
 
 <details>
 <summary>Mostrar el código de esta figura</summary>
@@ -423,13 +473,23 @@ la resistividad al flujo de aire, es la misma teoría de materiales que
 
 ## Contraste con el solucionador FDTD
 
-La cámara de expansión de cuatro polos se contrasta con el
+Ese contraste es el clip incrustado en el apartado 1, y vale la pena volver a
+él ahora con el álgebra en la mano. La cámara de expansión de cuatro polos se
+contrasta con el
 [solucionador de ondas FDTD 2D](/phonometry/es/simulation/fdtd-simulation/)
-independiente: un conducto de onda plana que se ensancha en una cámara y vuelve a
-estrecharse transmite mucho menos en el máximo de TL de cuatro polos ($kL = \pi/2$)
-que en la caída transparente ($kL = \pi$), y la razón de amplitudes medida
-reproduce la pérdida de transmisión máxima en forma cerrada con una fracción de
-decibelio.
+independiente, que no comparte con el producto de matrices de transferencia
+ninguna fórmula ni ninguna hipótesis más allá de la propia ecuación de ondas:
+un conducto de onda plana que se ensancha en la misma cámara de 0,30 m y
+$m = 4$ y vuelve a estrecharse transmite mucho menos en el máximo de TL de
+cuatro polos ($kL = \pi/2$, aquí 286 Hz) que en la caída transparente
+($kL = \pi$, 572 Hz). La razón de amplitudes medida aguas abajo en el campo es
+la pérdida de transmisión anotada en el clip, 6,5 dB a 286 Hz y 0,0 dB a
+572 Hz, frente a los 6,55 dB que da la forma cerrada para $m = 4$. Un acuerdo
+tan estrecho descarta un error de álgebra en cualquiera de los dos lados. Los
+dos tienen que separarse tarde o temprano por encima de la primera frecuencia
+de corte del conducto, donde se propagan modos de orden superior: el
+solucionador bidimensional sigue funcionando ahí y el álgebra de onda plana
+no.
 
 ## Qué cubre esta guía
 

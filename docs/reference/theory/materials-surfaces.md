@@ -36,6 +36,10 @@ worked example, the oracle is a synthetic end-to-end chain
 ($V = 200$ m³, $S = 10$ m², $T = 8.0/6.0/7.5/5.0$ s → $s = 0.093$) plus the
 Formula A.5 hand value $u_s = 0.0297$.
 
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/scattering_coefficient_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/scattering_coefficient.svg" alt="The random-incidence scattering coefficient s of a diffusing surface over the 13 one-third-octave bands from 250 to 4000 Hz, rising smoothly from near zero at low frequency towards 0.84 at 4 kHz" width="88%"></picture>
+
+*A random-incidence scattering coefficient rising with frequency as the surface roughness becomes comparable with the wavelength.*
+
 ### Directional diffusion coefficient (ISO 17497-2)
 
 ISO 17497-2:2012 measures, in the free field, how uniformly a surface spreads
@@ -114,6 +118,10 @@ float-safe. The two Annex A worked examples are reproduced:
 $\alpha_p = (0.35, 0.70, 0.65, 0.60, 0.55)$ → $\alpha_w = 0.60$, class C; and
 raising 500 Hz to 1.00 keeps $\alpha_w = 0.60$ but adds the indicator, "0.60(M)".
 
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/absorption_rating_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/absorption_rating.svg" alt="ISO 11654 weighted sound absorption rating: the practical absorption spectrum plotted against the shifted reference curve over 250 Hz to 4000 Hz, with the unfavourable deviation at 250 Hz shaded and the weighted coefficient alpha_w read at 500 Hz" width="80%"></picture>
+
+*The ISO 11654 rating: practical absorption against the shifted reference, with the unfavourable deviation shaded and the weighted coefficient read at 500 Hz.*
+
 See the [Sound Absorption Measurement and Rating guide](../../materials/absorbers/absorption-measurement.md) for usage.
 
 ### Airflow resistance (ISO 9053-1/2)
@@ -185,6 +193,25 @@ analytic air-layer matrix ($\det T = 1$, $T_{11} = T_{22}$,
 $TL = 0\ \text{dB}$, hard-backed $|R| = 1$), synthetic round-trips that
 recover a known $r$, and
 two-load recovery of an asymmetric reciprocal specimen.
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_impedance_tube_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_impedance_tube.svg" alt="ISO 10534-2 two-microphone impedance tube: a loudspeaker radiating a plane wave down the tube, two microphones flush in the wall at spacing s and distance x1 from the specimen face, the test specimen against a rigid backing, and the incident and reflected waves" width="92%"></picture>
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/impedance_tube_result_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/impedance_tube_result.svg" alt="ISO 10534-2 two-microphone tube result for a 50 mm porous absorber: the normal-incidence absorption coefficient rising from about 0.2 at 200 Hz towards 0.97 above 1 kHz, with the reflection-factor magnitude falling as its mirror image" width="80%"></picture>
+
+*What the ISO 10534-2 formula returns: $\alpha$ and $|r|$ for a 50 mm porous
+absorber over the working band of a 100 mm tube. The two curves are the same
+information — $\alpha = 1 - |r|^2$ — so the figure is really one measurement
+drawn twice, and the rise with frequency is the layer thickness growing against
+the wavelength.*
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_astm_tube_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_astm_tube.svg" alt="ASTM E2611 four-microphone transmission-loss tube: a sound source, two microphones upstream and two downstream of the test specimen at spacings s1 and s2 and offsets l1 and l2, an adjustable termination for the two-load method, the upstream A and B and downstream C and D travelling waves, and the transfer matrix and transmission-loss relations" width="92%"></picture>
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/transfer_matrix_tl_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/transfer_matrix_tl.svg" alt="ASTM E2611 transfer-matrix quantities of a 50 mm porous layer: the normal-incidence transmission loss rising from about 6.6 dB at 200 Hz to over 9 dB at 1.6 kHz on the left axis, and the hard-backed absorption coefficient rising from 0.19 to about 0.97 on the right axis" width="80%"></picture>
+
+*The same four-pole entries answering two different questions: how much sound
+the free-standing layer lets through (the transmission loss above) and how much
+the same layer absorbs once it is backed rigidly. A material can be a good
+absorber and a poor barrier at once, which this pair makes plain.*
 
 See the [Impedance Tube guide](../../materials/absorbers/impedance-tube.md) for usage.
 

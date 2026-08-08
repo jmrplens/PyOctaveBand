@@ -62,11 +62,14 @@ ys = (2e-4 + 1e-4j) * (bands / 250.0)        # source mobility
 yi = (3e-5 + 1e-5j) * np.ones_like(bands)    # receiver mobility
 dc = np.array([float(building.coupling_term(a, b)) for a, b in zip(ys, yi)])
 
-# Two transmission paths: the excited floor and a flanking wall.
+# Two transmission paths: the excited floor and a flanking wall. Dsa is
+# negative and falls with frequency (Annex F.2), and enters with a minus sign.
 paths = [
-    {"adjustment_term": 6.0, "element_area": 12.0,
+    {"adjustment_term": np.array([-14.0, -17.0, -20.0, -25.0, -30.0, -35.0, -40.0]),
+     "element_area": 12.0,
      "flanking_reduction_index": np.linspace(44.0, 62.0, 7)},
-    {"adjustment_term": 7.0, "element_area": 9.0,
+    {"adjustment_term": np.array([-16.0, -19.0, -23.0, -28.0, -33.0, -38.0, -43.0]),
+     "element_area": 9.0,
      "flanking_reduction_index": np.linspace(46.0, 64.0, 7)},
 ]
 res = building.installed_source_prediction(lws_c, dc, paths, frequencies=bands)
@@ -92,6 +95,16 @@ mobility, Formula 19c) and to $-10\log_{10}(|Y_s|\,\mathrm{Re}\{Z_i\})$ for a **
 (low source mobility, Formula 19d); an elastic support adds its transfer
 mobility $Y_k$ inside the modulus (Formula 19e). The **installed** power level is
 then (Formula 18b) $L_{Ws,\mathrm{inst}} = L_{Ws,c} - D_C$.
+
+This is the same $L_{Ws,\mathrm{inst}}$ as the Annex I mobility correction of
+the introduction, reached by a different route: use Formula (18b) when $D_C$ is
+known from the two mobilities, and the direct correction
+$L_{Ws,n} + 10\log_{10}(Y_{\infty,i}/Y_{\infty,\mathrm{rec}})$ when it is not.
+On the Annex I.3 cistern both give 68.2 dB at 63 Hz, from
+$L_{Ws,c} = 84.4$ dB and $D_C = 16.2$ dB. Note which quantity you are handed:
+$L_{Ws,c}$ is the input this page takes, and it is *not* the 68.2 dB the
+[EN 15657 page](/phonometry/buildings/design/structure-borne-power/) prints as
+its installed level — feeding that in subtracts $D_C$ twice.
 
 The physics behind $D_C$ is the classical power input of a point-excited
 plate: only the real part of the receiver's driving-point mobility absorbs
@@ -137,20 +150,70 @@ L_{n,s,ij} = L_{Ws,\mathrm{inst},i} - D_{sa,i} - R_{ij,\mathrm{ref}}
              - 10\log_{10}\frac{S_i}{S_0} - 10\log_{10}\frac{A_0}{4},
 $$
 
-with $S_0 = A_0 = 10\ \text{m}^2$, and the paths combine energetically (Formula 17):
+with $S_0 = A_0 = 10\ \text{m}^2$, and the paths combine energetically (Formula 17).
+
+### The adjustment term $D_{sa}$
+
+A point force pumps energy into *free* bending waves, while an incident sound
+field drives *forced* waves as well. $D_{sa}$ is the bookkeeping factor that
+lets the airborne flanking index $R_{ij,\mathrm{ref}}$ — an airborne
+quantity — be reused for a structurally excited element: it converts the
+injected structure-borne power into the incident airborne power that would
+leave the element with the same free-vibration energy (Formula 20a). For
+perpendicular force excitation of a homogeneous element that becomes
+Formula (20b),
+
+$$
+D_{sa,i} = 10\log_{10}\frac{2\pi m_i\,2.2\,\tau_i}{\rho_0 c_0 T_{s,i}\sigma_i}\ \text{dB},
+$$
+
+with $R_i = -10\log_{10}\tau_i$, and Annex F.2 gives the working form
+
+$$
+D_{sa,i} = 10\log_{10}\frac{400\,f_{c,i}\,\sigma_i}{m_i\,f^2}\ \text{dB}
+\qquad\text{(Formula F.3)},
+$$
+
+exact above the critical frequency ($\sigma_i \approx 1$) and a good
+approximation over the whole range. Read it: heavier elements and higher
+frequencies make $D_{sa}$ *more negative*, at $-20\log_{10}f$ once $\sigma$
+has saturated.
+
+:::caution
+**$D_{sa}$ is normally negative — pass the tabulated value with its printed
+sign.**
+The standard's own Annex I columns run from about $-14$ dB at 63 Hz to $-45$ dB
+at 2 kHz for ordinary concrete and masonry elements. The term enters
+Formula (18a) with a minus sign, so a negative $D_{sa}$ *raises* the predicted
+level. Earlier revisions of this page passed `"adjustment_term": 5.0` and
+`6.0`; copying that pattern with a real Annex F value in its place would leave
+the prediction roughly 20 to 40 dB low across the spectrum, with no error
+raised.
+:::
+
+Every input of Formula (F.3) is already available:
+[`in_situ_element`](/phonometry/buildings/design/detailed-prediction/) returns
+the in-situ structural reverberation time, the radiation factor and $R$ for the
+element.
 
 ```python
 import numpy as np
 from phonometry import building
+
+# Formula (F.3) for the 92 kg/m2 wall of the Annex I worked building.
+f = np.array([63.0, 125.0, 250.0, 500.0, 1000.0, 2000.0])
+sigma = np.minimum(1.0, np.sqrt(f / 200.0))        # radiation factor, fc = 200 Hz
+dsa_f3 = 10 * np.log10(400.0 * 200.0 * sigma / (92.0 * f**2))
+print(np.round(dsa_f3, 1))    # [-9.1 -13.6 -18.6 -24.6 -30.6 -36.6]  all negative
 
 bands = np.array([250.0, 500.0, 1000.0])
 res = building.installed_source_prediction(
     characteristic_power_level=np.array([80.0, 82.0, 78.0]),
     coupling_term=np.array([9.0, 10.0, 11.0]),
     paths=[
-        {"adjustment_term": 5.0,
+        {"adjustment_term": np.array([-19.0, -25.0, -31.0]),
          "flanking_reduction_index": np.array([50.0, 52.0, 55.0]), "element_area": 12.0},
-        {"adjustment_term": 6.0,
+        {"adjustment_term": np.array([-22.0, -28.0, -34.0]),
          "flanking_reduction_index": np.array([52.0, 54.0, 57.0]), "element_area": 8.0},
     ],
     frequencies=bands,

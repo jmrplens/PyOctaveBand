@@ -49,6 +49,7 @@ references:
 ---
 
 import ThemeImage from '../../../../components/ThemeImage.astro';
+import Video from '../../../../components/Video.astro';
 
 Un fluido transporta una onda; un sólido, una familia de ellas. Esta guía
 cubre el compañero elástico de la
@@ -208,13 +209,27 @@ plt.show()
 
 </details>
 
-Esa onda de flexión merece verse en movimiento: la
+Esa onda de flexión merece verse en movimiento. El clip de abajo es este mismo
+solucionador lanzando un paquete de flexión de 4 kHz por una placa de acero de
+10 mm: en el panel de control la placa sigue recta y el paquete simplemente se
+marcha, y en el panel de la unión una placa perpendicular del mismo espesor
+convierte la esquina en un dispersor. Allí el paquete se parte en las ondas de
+flexión reflejada y transmitida que la forma cerrada tasa en
+$\tau_{12}(0°) = 0{,}5$, más el rápido precursor de onda en el plano que corre
+por delante por la placa receptora: la conversión de modo que el modelo de unión
+articulada deja fuera a propósito, y la razón por la que esta página necesita un
+solucionador elástico y no uno de flexión. La
 [guía de transmisión de onda de flexión](/phonometry/es/vibration/structural/junction-transmission/)
-incrusta una animación de este solucionador lanzando un paquete de flexión
-de 4 kHz por una placa de acero de 10 mm hasta una unión en L, donde la
-esquina lo divide en las ondas reflejada y transmitida que la forma cerrada
-tasa en $\tau_{12}(0°) = 0{,}5$, más el rápido precursor de onda en el plano que
-el modelo de unión articulada deja fuera a propósito.
+desmonta esa misma ejecución frente al índice de reducción vibracional de
+EN 12354.
+
+<Video
+  name="anim_elastic_plate_junction"
+  width={2400}
+  height={1350}
+  title="Ondas de flexión en una unión en L en una simulación FDTD elástica 2D"
+  description="Una fuerza en ráfaga tonal de 4 kHz lanza un paquete de onda de flexión por una placa de acero de 10 mm. En la placa de control recta el paquete sigue de largo y no vuelve nada. En una unión en L con una placa perpendicular idéntica se parte: una parte se refleja, otra dobla la esquina como onda de flexión que baja por la placa vertical, y un precursor de onda en el plano más rápido corre por delante, con el coeficiente de transmisión en forma cerrada de 0,50 a incidencia normal y el índice de reducción vibracional difuso de 5,2 dB anotados."
+/>
 
 ## 4. Acoplamiento fluido-sólido a incidencia normal
 
@@ -366,13 +381,33 @@ somete a esfuerzo el contraste extremo de un contacto aire-acero (razón de
 impedancias ~$10^5$:1): estable durante 10 000 pasos con la amplitud
 reflejada conservada al 0,5 %.
 
-A incidencia oblicua la física de la placa se enriquece, y la
+A incidencia oblicua la física de la placa se enriquece, y el clip de abajo es
+este solucionador excitando la misma placa de acero de 10 mm, ahora tendida en
+aire, con una onda plana sostenida que llega a 45°. Los dos paneles se
+diferencian en **un solo número**: la frecuencia de excitación, $f_c/2 = 603$ Hz
+a la izquierda y $2 f_c = 2413$ Hz a la derecha, a un lado y otro de la
+frecuencia de coincidencia de 1206 Hz que la librería calcula con los mismos
+$m''$ y $B'$ usados más arriba. Todo lo demás (la placa, el ángulo, la malla y
+la escala de color) se mantiene fijo. Por debajo de $f_c$ la placa refleja casi
+todo y el nivel transmitido cae sobre la ley de masas oblicua; por encima, la
+longitud de onda de traza acústica coincide con la longitud de onda de flexión
+libre, la placa re-radia un haz a 45° que crece a lo largo del tramo iluminado y
+el nivel transmitido se mantiene en la cifra de baja frecuencia, justo donde la
+ley de masas exigía 12 dB más de bloqueo. El aire bajo la placa se dibuja en los
+dos paneles con la ganancia de visualización que `_weak_field_gain` mide sobre
+el campo asentado de las dos ejecuciones juntas (×150, es decir, +44 dB) y que
+se imprime en el lienzo: lee las *anotaciones* para los niveles, no el brillo.
+La
 [guía de predicción del aislamiento de paneles](/phonometry/es/buildings/design/panel-sound-insulation/)
-incrusta la animación: este solucionador excitando la misma placa de acero
-de 10 mm, tendida en aire, con una onda plana sostenida a 45° por debajo y
-por encima de su frecuencia de coincidencia, donde la onda de flexión con
-la traza adaptada re-radia un haz creciente y mantiene el nivel transmitido
-en el punto donde la ley de masas exige 12 dB más de bloqueo.
+desmonta esa misma ejecución frente al método de la meseta y a la ley de masas.
+
+<Video
+  name="anim_elastic_coincidence"
+  width={2400}
+  height={1350}
+  title="Coincidencia en una placa de acero de 10 mm en una simulación FDTD elástica 2D"
+  description="Dos campos FDTD elásticos en paralelo de la misma placa de acero de 10 mm tendida en aire mientras una onda plana sostenida llega a 45 grados. A 603 Hz, la mitad de la frecuencia de coincidencia, la onda se refleja casi totalmente y el débil nivel transmitido coincide con la ley de masas oblicua. A 2413 Hz, el doble de la frecuencia de coincidencia, la traza acústica coincide con la longitud de onda de flexión libre y bajo la placa crece un haz transmitido a 45 grados que mantiene el mismo nivel que el panel de baja frecuencia, allí donde la ley de masas predecía 12 dB más de aislamiento; el aire bajo la placa se dibuja en los dos paneles con una ganancia de visualización anotada de 150 veces (+44 dB) para que el campo transmitido sea legible, con la frecuencia de coincidencia de 1206 Hz de la librería y los niveles medido y de ley de masas anotados."
+/>
 
 ## Qué cubre esta guía
 

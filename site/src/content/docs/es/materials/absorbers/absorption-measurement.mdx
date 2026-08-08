@@ -35,6 +35,7 @@ references:
 
 import ThemeImage from '../../../../../components/ThemeImage.astro';
 import ReportPreview from '../../../../../components/ReportPreview.astro';
+import Video from '../../../../../components/Video.astro';
 
 De todos los números que produce un laboratorio de materiales, el coeficiente
 de absorción acústica es el que más lejos viaja: sale de la cámara
@@ -229,7 +230,28 @@ print(np.round(alpha, 3))                      # [0.398 0.448 0.498]
 
 $T_1$ y $T_2$ son exactamente los tiempos de reverberación que devuelve
 [`room_parameters`](/phonometry/es/buildings/rooms/room-acoustics/), así que una medición de decaimiento ISO 3382-2 de la sala
-vacía y tratada fluye directamente a `absorption_coefficient`. Un volumen de
+vacía y tratada fluye directamente a `absorption_coefficient`.
+
+Cada uno de esos dos números se lee de un decaimiento, y el clip de abajo
+enseña cómo se lee uno: la respuesta al impulso al cuadrado se integra hacia
+atrás desde la cola, emerge la curva de Schroeder y las regresiones T20 y T30
+se ajustan a un tramo recto de ella. Esa es la operación que hay detrás de
+$T_1$, y otra vez detrás de $T_2$: el clip enseña una *única* sala, no el par,
+así que responde a «de dónde sale una $T$» y no a «qué cuesta restar dos de
+ellas». La segunda pregunta es la que gobierna esta medición, y la sección 4 le
+pone número: como $\alpha_s$ es una diferencia de dos inversos de tiempos de
+decaimiento, su incertidumbre es peor justo donde los dos decaimientos más se
+parecen, en el extremo de baja frecuencia.
+
+<Video
+  name="anim_schroeder"
+  width={2400}
+  height={1350}
+  title="Integración hacia atrás de Schroeder de la respuesta al impulso al cuadrado"
+  description="La energía de la cola de la respuesta al impulso al cuadrado se rellena desde el final mientras la integral hacia atrás avanza hacia t = 0, y la curva de decaimiento de Schroeder emerge en un eje inferior, terminando con las rectas de regresión T20 y T30."
+/>
+
+Un volumen de
 sala por debajo del mínimo de 150 m³ o un área de muestra fuera de 10–12 m²
 genera un `AbsorptionWarning` de aviso; el resultado se devuelve igualmente.
 
@@ -432,9 +454,18 @@ $$
 \alpha_{st} = \int_0^{\pi/2} \alpha(\theta)\,\sin 2\theta\,\mathrm{d}\theta,
 $$
 
-una integral que pondera sobre todo los ángulos oblicuos; evaluarla exige el
-$\alpha(\theta)$ dependiente del ángulo a partir de la impedancia superficial
-medida, no solo el propio coeficiente a incidencia normal.
+una integral que pondera sobre todo los ángulos oblicuos. Necesita el
+$\alpha(\theta)$ dependiente del ángulo, no el propio coeficiente a incidencia
+normal; pero para una superficie de **reacción local** el $\alpha(\theta)$ se
+deduce solo de la impedancia superficial normalizada, así que la integral tiene
+forma cerrada y un resultado de tubo se convierte en una línea:
+`materials.statistical_absorption(result.normalized_impedance)`, documentada
+con los
+[modelos multicapa](/phonometry/es/materials/absorbers/porous-absorbers/#4-incidencia-oblicua-y-aleatoria).
+Lo que eso no puede hacer es cubrir una capa de **reacción volumétrica**, donde
+el comportamiento oblicuo depende de la refracción dentro del material y la
+integral hay que evaluarla ángulo a ángulo a partir de un modelo:
+`diffuse_field_absorption`, en la misma página.
 
 **Por qué los valores de ISO 354 superan 1.** Un cociente de energía absorbida
 sobre incidente no puede superar la unidad y, sin embargo, los informes de
@@ -560,12 +591,13 @@ de octava y prácticos y para las valoraciones de número único, en
 `sound_absorption_coefficient_uncertainty`,
 `weighted_coefficient_uncertainty` y `single_number_rating_uncertainty`.
 
-**No cubierto.** El coeficiente de absorción estadístico (a incidencia
-aleatoria) $\alpha_{st}$ del promedio angular de Paris se describe pero no se
-calcula: necesita el $\alpha(\theta)$ dependiente del ángulo a partir de la
-impedancia superficial, que el
-[tubo de impedancia](/phonometry/es/materials/absorbers/impedance-tube/) recupera y nada
-aquí consume. Los requisitos de cualificación de la sala de ISO 354 (Anexo A:
+**No cubierto.** Nada de *esta* página consume una impedancia superficial
+medida: la conversión de un resultado de tubo al coeficiente estadístico
+$\alpha_{st}$ vive con los modelos de predicción (`statistical_absorption` para
+una superficie de reacción local, `diffuse_field_absorption` para una de
+reacción volumétrica), y ninguno de los dos sustituye a una medición según
+ISO 354, porque ninguno reproduce el efecto de borde. Los requisitos de
+cualificación de la sala de ISO 354 (Anexo A:
 número de posiciones de altavoz y micrófono, elementos difusores) no se
 comprueban; `absorption_area`/`absorption_coefficient` solo convierten una
 pareja $T_1$/$T_2$ ya medida y emiten un aviso cuando el volumen de la sala o
@@ -593,6 +625,6 @@ lo está.
   $\alpha_s$.
 - [Área de absorción equivalente de recintos amueblados](/phonometry/es/buildings/rooms/enclosed-space-absorption/):
   el presupuesto de absorción EN 12354-6 que alimentan estos coeficientes.
-- [Medición y valoración del aislamiento in situ](/phonometry/es/buildings/insulation/insulation-field/):
+- [Medición del aislamiento en campo (ISO 16283)](/phonometry/es/buildings/insulation/insulation-field/):
   la norma de incertidumbre hermana del aislamiento acústico, ISO 12999-1.
 - Referencia de la API: [`materials.absorbers.sound_absorption`](/phonometry/es/reference/api/materials/sound-absorption/), [`materials.absorbers.rating`](/phonometry/es/reference/api/materials/rating/) y [`materials.absorbers.uncertainty`](/phonometry/es/reference/api/materials/uncertainty/).

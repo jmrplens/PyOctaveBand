@@ -85,9 +85,12 @@ def _d_multiple_shock(s: SVG, th: Theme) -> None:
     s.rect(x0, 48, bw, bh, th.panel, th.fg, rx=10, sw=2)
     s.text(cx, 72, "Vertical seat acceleration  az(t)", 19, th.fg, "middle",
            bold=True)
-    s.text(cx, 92, "band-limited per ISO 2631-1  (0.4 Hz to 100 Hz)", 13,
-           th.muted, "middle")
+    s.text(cx, 92,
+           "conditioned per 5.1.3:  HP 0.01 Hz (2nd order) / LP 80 Hz "
+           "(4th order)", 13, th.muted, "middle")
     s.arrow(cx, 106, cx, 136, th.fg, 1.8)
+    s.text(cx - 26, 128, "not the ISO 2631-1 0.4 Hz / 100 Hz filters", 12,
+           th.secondary, "end")
 
     def _step(y: float, l1: str, l2: str, color: str) -> None:
         s.rect(x0, y, bw, bh, th.panel, color, rx=10, sw=2)

@@ -30,11 +30,12 @@ La vista de trabajo es la unión de ambas cosas: el espectro de envolvente de un
 registro de vibración filtrado en banda con las líneas previstas dibujadas
 encima y con su nombre.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/bearing_fault_envelope_es.svg" alt="Espectro de envolvente de un registro de vibración de rodamiento filtrado en banda, representado de 0 a unos 950 hercios, con un suelo de ruido denso y bajo y cuatro líneas altas aisladas. Unas líneas verticales discontinuas rojas marcan la frecuencia de paso de elementos rodantes por la pista exterior prevista en 207 hercios y sus armónicos segundo, tercero y cuarto, y cada una de las cuatro líneas medidas altas cae exactamente sobre una de ellas. Una línea punteada verde marca la frecuencia de paso por la pista interior prevista en 293 hercios y una línea punteada morada la frecuencia de giro del elemento rodante prevista en 92 hercios, y no aparece ninguna línea medida en ninguna de las dos, que es lo que identifica el fallo como un descascarillado de la pista exterior. Una línea de trazo y punto en 33,3 hercios marca la frecuencia de giro del eje, donde sí aparece una línea pequeña." width="92%" loading="eager" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/bearing_fault_envelope_es.svg" alt="Espectro de envolvente de un registro de vibración de rodamiento filtrado en banda, representado de 0 a unos 950 hercios, con un suelo de ruido denso y bajo y cuatro líneas altas aisladas. Unas líneas verticales discontinuas rojas marcan la frecuencia de paso de elementos rodantes por la pista exterior prevista en 207 hercios y sus armónicos segundo, tercero y cuarto, y cada una de las cuatro líneas medidas altas cae exactamente sobre una de ellas. Una línea punteada verde marca la frecuencia de paso por la pista interior prevista en 293 hercios y una línea punteada morada la frecuencia de rotación del elemento rodante BSF prevista en 92 hercios, y no aparece ninguna línea medida en ninguna de las dos, que es lo que identifica el fallo como un descascarillado de la pista exterior. Una línea de trazo y punto en 33,3 hercios marca la frecuencia de giro del eje, donde sí aparece una línea pequeña." width="92%" loading="eager" />
 
 *Las cuatro líneas altas caen sobre la BPFO y sus armónicos; no aparece nada en
-la BPFI ni en la BSF. Ese es el diagnóstico: un descascarillado en la pista
-exterior.*
+la BPFI, ni en la BSF, la frecuencia de rotación del elemento rodante, ni en la
+BDF de 183 Hz, donde golpearía un elemento rodante dañado. Ese es el
+diagnóstico: un descascarillado en la pista exterior.*
 
 <details>
 <summary>Ver el código de esta figura</summary>
@@ -94,7 +95,15 @@ $f_s = N/60$:
 
 Tres de ellas llevan el diagnóstico: `BPFO` para un defecto en la pista
 exterior, `BPFI` para un defecto en la pista interior y `BDF` para un elemento
-rodante o una jaula dañados. Dos identidades conviene recordarlas porque son
+rodante o una jaula dañados. Las dos filas del elemento rodante se diferencian
+en un factor dos porque responden a preguntas distintas: `BSF` es a qué
+velocidad gira un elemento rodante, y `BDF` con qué frecuencia un defecto suyo
+golpea una pista — dos veces por vuelta del elemento, una contra cada pista. La
+evidencia de un elemento rodante dañado se espera, por tanto, en la `BDF`
+(183,3 Hz para el rodamiento de arriba), normalmente modulada a la frecuencia
+de la jaula `FTF`, mientras que la línea que la figura dibuja en 91,7 Hz es la
+frecuencia de rotación del elemento rodante, la `BSF`. Dos identidades
+conviene recordarlas porque son
 exactas y detectan al instante los errores de introducción de datos:
 $\text{BPFO} + \text{BPFI} = Z f_s$ siempre, y
 $\text{BPFO} = Z \times \text{FTF}$ siempre que la pista exterior esté
@@ -187,8 +196,24 @@ una barra de rotor rota coloca alrededor de `1x`.
 La frecuencia de paso de pala de un rodete de $N$ palas es $f_b = n N f_s$
 (Ec. 8.15); las pulsaciones hidráulicas de una bomba siguen la misma forma
 con $N$ eventos de bombeo por vuelta (Ec. 8.18), y una soplante
-volumétrica rotativa repite cuatro veces por vuelta, así que se trata
-pasando $4 \times \text{r/min}$.
+volumétrica rotativa repite cuatro veces por vuelta, lo que se trata
+pasando $4 \times \text{r/min}$ con una sola «pala»:
+
+```python
+from phonometry import blade_pass_frequencies
+
+# Una soplante volumétrica rotativa a 1200 r/min: cuatro pulsaciones por
+# vuelta, así que la frecuencia de pulsación se pide como 4 x r/min con N = 1.
+res = blade_pass_frequencies(4 * 1200.0, 1, harmonics=3)
+print(round(res["BPF"], 1))        # 80.0 Hz, la frecuencia de pulsación
+print(round(res.shaft_rate, 1))    # 80.0 Hz - NO la del eje, que es 20
+```
+
+El truco cuesta la línea del eje: `shaft_rate` vuelve valiendo $4 f_s$, así que
+lee la frecuencia del eje de una llamada aparte a la velocidad verdadera (o de
+`bearing_fault_frequencies`) antes de combinar familias con
+`combine_fault_lines`, o se dibujará un cuarto armónico del eje como si fuera
+evidencia de rodamiento.
 
 En un **ventilador axial entubado** las palas interaccionan además con los
 álabes del estátor y establecen patrones de presión rotativos con
@@ -201,9 +226,7 @@ porque la Ec. (8.17) lleva $n$, de modo que el mismo número de lóbulos
 alcanzado desde otro armónico es otro patrón, que gira a otra velocidad.
 
 ```python
-from phonometry import blade_pass_frequencies
-
-# Seis palas, cuatro álabes, 3500 r/min.
+# Seis palas, cuatro álabes, 3500 r/min (blade_pass_frequencies importado arriba).
 res = blade_pass_frequencies(3500.0, 6, harmonics=1, n_vanes=4)
 print(round(res["BPF"]))          # 350
 print(round(res["lobe n=1 m=2"]), round(res["lobe n=1 m=10"]))    # 175 35

@@ -42,6 +42,32 @@ ground), the simulation is the fallback that still gives a quantitative
 answer; when a closed form exists, prefer it, and use the solver to verify
 the assumptions it rests on.
 
+Those cross-checks are not only arguments: fifteen of the animations in this
+documentation are output from these two solvers, and they are filed on the
+guides whose physics they settle rather than here. Room modes growing on and
+off resonance appear in [room acoustics](https://jmrplens.github.io/phonometry/buildings/rooms/room-acoustics/)
+and [reverberation prediction](https://jmrplens.github.io/phonometry/buildings/rooms/reverberation-prediction/),
+which also carries the hall of columns that turns one wavefront into a mixed
+field; barrier diffraction at two wavelengths in
+[outdoor propagation](https://jmrplens.github.io/phonometry/environment/propagation/outdoor-propagation/)
+and [ground effect and barriers](https://jmrplens.github.io/phonometry/environment/propagation/ground-barriers/);
+downwind and upwind refraction in
+[atmospheric refraction](https://jmrplens.github.io/phonometry/environment/propagation/atmospheric-refraction/);
+the ground-effect lobe pattern in outdoor propagation and in
+[airport noise](https://jmrplens.github.io/phonometry/aircraft/airport-noise/); the standing-wave and
+transmission tubes in [the impedance tube](https://jmrplens.github.io/phonometry/materials/absorbers/impedance-tube/);
+the QRD and metadiffuser panels in
+[diffusers](https://jmrplens.github.io/phonometry/materials/diffusers/diffusers/) and
+[metadiffusers](https://jmrplens.github.io/phonometry/materials/diffusers/metadiffusers/); the slit
+absorber in [metamaterial absorbers](https://jmrplens.github.io/phonometry/materials/absorbers/metamaterial-absorbers/);
+the expansion chamber in [silencers](https://jmrplens.github.io/phonometry/devices/noise-control/silencers/);
+the wall aperture in [panel sound insulation](https://jmrplens.github.io/phonometry/buildings/design/panel-sound-insulation/);
+and the SOFAR duct in [underwater propagation](https://jmrplens.github.io/phonometry/underwater/underwater-propagation/).
+The elastic solver adds two: the bending packet entering an L-junction, on
+[junction transmission](https://jmrplens.github.io/phonometry/vibration/structural/junction-transmission/),
+and the coincidence plate, on panel sound insulation. Both also appear on the
+elastic page below, where the solver that produced them is explained.
+
 ## Pages in this section
 
 - [2D FDTD wave simulation](https://jmrplens.github.io/phonometry/simulation/fdtd-simulation/): the
@@ -209,13 +235,21 @@ plt.show()
 
 </details>
 
-That flexural wave is worth watching in motion: the
-[bending-wave transmission guide](https://jmrplens.github.io/phonometry/vibration/structural/junction-transmission/) embeds an
-animation of this solver launching a 4 kHz bending packet along a 10 mm
-steel plate into an L-junction, where the corner splits it into the
-reflected and transmitted waves the closed form prices at
-$\tau_{12}(0°) = 0.5$, plus the fast in-plane precursor the pinned-junction
-model deliberately leaves out.
+That flexural wave is worth watching in motion. The clip below is this same
+solver launching a 4 kHz bending packet along a 10 mm steel plate: on the
+control panel the plate runs straight and the packet simply leaves, and on
+the junction panel a perpendicular plate of the same thickness turns the
+corner into a scatterer. The packet splits there into the reflected and
+transmitted bending waves the closed form prices at $\tau_{12}(0°) = 0.5$,
+plus the fast in-plane precursor that races ahead down the receiving plate —
+the mode conversion the pinned-junction model deliberately leaves out, and
+the reason this page needs an elastic solver rather than a flexural one. The
+[bending-wave transmission guide](https://jmrplens.github.io/phonometry/vibration/structural/junction-transmission/) takes
+the same run apart against the EN 12354 vibration reduction index.
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anim_elastic_plate_junction_dark.gif"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anim_elastic_plate_junction.gif" alt="Animation: a 4 kHz bending-wave packet running along a 10 mm steel plate, passing straight through on the control panel and splitting at an L-junction into a reflected wave, a transmitted wave descending the perpendicular plate and a faster in-plane precursor" width="640" height="360" loading="lazy"></picture>
+
+[Watch the high-resolution video (WebM)](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anim_elastic_plate_junction.webm)
 
 ## 4. Fluid-solid coupling at normal incidence
 
@@ -363,13 +397,28 @@ dip within 0.1 % of the 295 kHz resonance. The same suite stress-tests the
 extreme contrast of an air-steel contact (impedance ratio ~$10^5$:1): stable
 over 10 000 steps with the reflected amplitude conserved to 0.5 %.
 
-At oblique incidence the plate physics gets richer, and the
-[panel sound insulation guide](https://jmrplens.github.io/phonometry/buildings/design/panel-sound-insulation/) embeds the
-animation: this solver driving the same 10 mm steel plate, lying in air,
-with a sustained 45° plane wave below and above its coincidence frequency,
-where the trace-matched bending wave re-radiates a growing beam and holds
-the transmitted level at the point where the mass law demands 12 dB more
-blocking.
+At oblique incidence the plate physics gets richer, and the clip below is
+this solver driving the same 10 mm steel plate, now lying in air, with a
+sustained 45° plane wave arriving on it. The two panels differ in **one
+number only** — the drive frequency, $f_c/2 = 603$ Hz on the left and
+$2 f_c = 2413$ Hz on the right, either side of the 1206 Hz coincidence
+frequency the library computes from the same $m''$ and $B'$ used above.
+Everything else, the plate, the angle, the mesh and the colour scale, is
+held fixed. Below $f_c$ the plate reflects almost everything and the
+transmitted level lands on the oblique mass law; above it the acoustic trace
+wavelength matches the free bending wavelength, the plate re-radiates a 45°
+beam that grows along the lit span, and the transmitted level holds at the
+low-frequency figure where the mass law demanded 12 dB more blocking. The
+air below the plate is drawn on both panels with the display gain measured
+off the settled field of the two runs together (×150, that is +44 dB) and
+printed on the canvas: read the *annotations* for levels, not the
+brightness. The
+[panel sound insulation guide](https://jmrplens.github.io/phonometry/buildings/design/panel-sound-insulation/) takes the
+same run apart against the plateau method and the mass law.
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anim_elastic_coincidence_dark.gif"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anim_elastic_coincidence.gif" alt="Animation: two elastic FDTD panels of the same 10 mm steel plate in air under a 45-degree plane wave, at 603 Hz where the plate blocks almost everything and at 2413 Hz where a transmitted beam grows below it" width="640" height="360" loading="lazy"></picture>
+
+[Watch the high-resolution video (WebM)](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anim_elastic_coincidence.webm)
 
 ## Quick answers
 
@@ -501,6 +550,27 @@ bit-identical outputs on the same platform. It is the engine behind the FDTD
 animations of this documentation, promoted to a public API with sources,
 pressure probes, rasterised obstacles, per-side boundary conditions and a
 frozen result object.
+
+Here is one of those animations, and it is a fair advertisement for what the
+rest of this page builds. Nothing in it is drawn: the colonnade is a boolean
+`obstacle_mask` of rasterised circles and the wavefront is a single one-way
+plane-wave packet with a Gaussian envelope one wavelength wide, launched at
+$x = 0.30$ m into a 4 m × 1 m rigid-walled hall whose two ends absorb through
+sponges hidden outside the frame. The carrier is 800 Hz, so the wavelength is
+42.9 cm and the 10 to 17 cm columns are roughly a quarter to two fifths of it
+— the regime in which a rigid cylinder both casts a readable shadow and
+re-radiates strongly, which is why the coda that fills the hall is structured
+rather than noise. That coda is deterministic multiple scattering: it is what
+a diffuse field looks like *before* any statistical assumption is made about
+it. The mesh is the worked example of the rule
+[section 4](#4-numerical-dispersion-and-accuracy) derives: the tightest gap in
+this layout is 6.6 cm between a column and a wall, so
+$\Delta x = \min(\text{smallest aperture}/4,\ \lambda/8)$ allows up to 1.6 cm,
+and the clip runs at 2.5 mm because a banner needs the definition.
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anim_fdtd_pillar_hall_dark.gif"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anim_fdtd_pillar_hall.gif" alt="Animation: an 800 Hz plane wavefront sweeping a 4 metre rigid-walled hall filled with a staggered colonnade of rigid columns, every column shedding a scattered wavelet until the interference of the wavelets fills the hall with structured energy that then drains through the absorbing ends" width="640" height="160" loading="lazy"></picture>
+
+[Watch the high-resolution video (WebM)](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anim_fdtd_pillar_hall.webm)
 
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_fdtd_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_fdtd.svg" alt="Pipeline from the domain definition (sound-speed and density maps with the grid spacing dx) and the geometry (obstacle mask and per-side boundary conditions), through the sources injected at grid cells, the staggered-grid leapfrog update of velocity and pressure, and the Courant stability condition, to the frozen FDTDResult with probe histories, field snapshots and a plot method" width="86%"></picture>
 

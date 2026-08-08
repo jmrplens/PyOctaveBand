@@ -79,14 +79,23 @@ laf_t = 10 * np.log10(np.maximum(envelope, 1e-12) / (2e-5) ** 2)
 # laf_t peaks near 80 dB during the event and settles near 55 dB between.
 ```
 
-You rarely write this chain yourself: every level function of the next step
-applies the frequency weighting internally, and the percentile levels rebuild
-this Fast envelope for you. The energy metrics ($L_{eq}$, SEL) integrate the
-squared weighted signal directly, with no ballistics, exactly as a meter
-does. The chain is shown here because it *is* the meter's display.
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anim_time_weighting_dark.gif"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anim_time_weighting.gif" alt="Animation: a tone burst driving the RC exponential detector, the capacitor charging and draining, while the Fast, Slow and Impulse meter needles follow their own ballistics" width="640" height="360" loading="lazy"></picture>
+
+[Watch the high-resolution video (WebM)](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anim_time_weighting.webm)
+
+The needle in the clip is that `time_weighting` call: a first-order low-pass
+charging and draining on the squared signal. The three needles differ in one
+number, the time constant, which is why Fast catches an event that Slow
+smooths away. You rarely write this chain yourself: every level function of
+the next step applies the frequency weighting internally, and the percentile
+levels rebuild this Fast envelope for you. The energy metrics ($L_{eq}$, SEL)
+integrate the squared weighted signal directly, with no ballistics at all —
+which is why they show no needle movement to follow. The chain is shown here
+because it *is* the meter's display.
 
 Deep guides: [Frequency Weighting (A, C, Z)](levels/weighting.md)
-and [Time Weighting](levels/time-weighting.md).
+and [Time Weighting](levels/time-weighting.md), which takes this same clip
+apart against the IEC 61672-1 tone-burst table.
 
 ## 4. Integrate: the numbers a meter reports
 

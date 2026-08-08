@@ -147,6 +147,15 @@ $$
 P = 3 \log_{10}(\text{tasa de crecimiento}) + 2 \log_{10}(\text{diferencia de nivel}),
 $$
 
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/impulsive_sound_onsets_es.svg" alt="Historial de nivel ponderado A con ponderación temporal F de tres golpes de martillo sobre un fondo de 55 dB(A) a lo largo de seis segundos: cada golpe sube desde unos 52 dB hasta 89 dB, se marcan el inicio y el final detectados del arranque junto con la recta de mínimos cuadrados del arranque, se anota la diferencia de nivel determinante de 36,8 dB y el título indica una prominencia de 11,34 con un ajuste de 11,42 dB, categoría muy impulsivo" width="90%" />
+
+*Las dos entradas de $P$ son geometría sobre esta traza, y por eso el método
+necesita un historial de nivel y no un nivel. La tasa de crecimiento es la
+pendiente de la recta ajustada al arranque, en dB/s, y el umbral de
+cualificación de 10 dB/s es una inclinación sobre este eje; la diferencia de
+nivel es la altura de ese mismo arranque. Aquí se detectan tres golpes y solo
+el más empinado y alto determina el ajuste.*
+
 diseñada para alcanzar en torno a 15 en impulsos muy súbitos e intensos. El ajuste al nivel del periodo de medición toma el impulso determinante (el de mayor $P$) (cláusula 8, Fórmula 2):
 
 $$
@@ -211,6 +220,20 @@ $$
 A = A_{div} + A_{atm} + A_{gr} + A_{bar} + A_{misc}.
 $$
 
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/outdoor_attenuation_breakdown_es.svg" alt="Desglose por bandas de octava de la atenuación de ISO 9613-2 en barras apiladas de Adiv, Aatm, Agr y Abar con la atenuación total A superpuesta, para un recorrido de 200 m sobre suelo poroso con una barrera de 4 m" width="80%" />
+
+*Los cuatro términos a su tamaño relativo real, banda a banda, para un recorrido
+de 200 m sobre suelo poroso con una barrera de 4 m. $A_{div}$ vale 57 dB en
+todas las bandas porque es geometría pura. $A_{atm}$ es nulo a 63 Hz y vale
+18,7 dB a 8 kHz, así que es el término que decide hasta dónde llegan las
+frecuencias altas y ningún otro. $A_{gr}$ es donde viven las bandas bajas y es
+**negativo** a 63 Hz (−4,6 dB: la reflexión en el suelo añade energía en vez de
+quitarla). $A_{bar}$ está en su tope de 20 dB de 2 kHz hacia arriba, pero cae a
+cero a 250 Hz, porque la forma de borde superior resta el efecto del suelo al
+que renuncia el recorrido apantallado, $A_{bar} = D_z - A_{gr} \geq 0$, y
+250 Hz es justo donde $A_{gr}$ alcanza su máximo. Qué término merece la pena
+afinar depende por completo de la banda y de la geometría.*
+
 La biblioteca implementa los cuatro términos generales de la cláusula 7; el
 $A_{misc}$ informativo (vegetación, zonas industriales, edificación) y las
 reflexiones se dejan a criterio del usuario. La **divergencia geométrica** es la
@@ -243,6 +266,8 @@ barrera lateral $A_{bar} = D_z$ y se conserva el término del suelo (Ec. (13)). 
 nivel medio a largo plazo resta la corrección meteorológica $C_{met}$ (Ec. (6),
 (21)/(22)). La exactitud declarada del método es de $\pm 1$ a $\pm 3$ dB para
 ruido de banda ancha hasta 1000 m (Tabla 5).
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_outdoor_geometry_es.svg" alt="Geometría fuente-barrera-receptor de ISO 9613-2: una fuente puntual a la altura hs, una barrera cuyo borde superior parte el recorrido en dss y dsr, y un receptor a la altura hr, con el rayo directo bloqueado y el rayo difractado sobre el borde, la diferencia de recorrido z y la fórmula de Dz" width="92%" />
 
 ### Exposición al ruido en el trabajo e incertidumbre (ISO 9612)
 

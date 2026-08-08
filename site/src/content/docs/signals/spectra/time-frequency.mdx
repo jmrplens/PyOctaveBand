@@ -73,9 +73,15 @@ res.plot()                         # dB image over the time-frequency plane
 ```
 
 The segment length is the whole design decision: $T_B = \text{nperseg}/f_s$
-of time resolution against $B_e \approx 1/T_B$ of frequency resolution, a
-product of one
-(Section 12.6.4.2). Long segments pin frequencies and smear transients;
+of time resolution against $B_e = \mathrm{ENBW}/T_B$ of frequency resolution,
+so their product $T_B B_e$ is fixed by the taper alone — 1 for a rectangular
+window, **1.5 for the Hann default used here** (Section 12.6.4.2, and the
+window figures of merit on the
+[spectral-analysis page](/phonometry/signals/spectra/spectral-analysis/#6-choosing-the-window)).
+The tiling diagram above draws the untapered case, where that product is exactly
+one. Halving the segment length buys twice the time resolution and costs exactly
+half the frequency resolution; nothing buys both.
+Long segments pin frequencies and smear transients;
 short segments do the opposite. And because each cell is a single
 *unaveraged* estimate, random data carries a per-cell normalized random
 error of 1 (Eq. 8.158 with $n_d = 1$; Bendat & Piersol quote
@@ -163,8 +169,10 @@ res.plot()                               # power spectrum in dB over the band
 One distinction matters and the result states it: the **grid** can be made
 arbitrarily fine (`n_points`), but the **resolution** - the ability to
 separate two tones - is set by the record length and taper, reported as
-`resolution_bandwidth` ($B_e = f_s \sum w^2/(\sum w)^2$, i.e. $1/T$
-untapered, $1.5/T$ for Hann). Zooming refines the sampling of the same underlying spectrum;
+`resolution_bandwidth` ($B_e = f_s \sum w^2/(\sum w)^2$, i.e. $1/T_r$
+untapered and $1.5/T_r$ for Hann — the same taper factor as section 1, applied
+here to the record duration $T_r$ rather than to a segment, because the zoom FFT
+transforms the whole record). Zooming refines the sampling of the same underlying spectrum;
 only a longer record separates closer tones.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/zoom_fft_resolution.svg" alt="Zoom FFT of a one-second record containing tones at 997 and 1000 hertz: the coarse 1024-point FFT with 8 hertz bins shows a single broad lump, while the zoom FFT over 980 to 1016 hertz draws two separate mainlobes whose peaks sit exactly on the dotted true-tone frequencies" width="82%" loading="lazy" />

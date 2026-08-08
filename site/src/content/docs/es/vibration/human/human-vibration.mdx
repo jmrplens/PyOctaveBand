@@ -112,11 +112,11 @@ mano-brazo.
 from phonometry import vibration
 
 # La respuesta de ponderación global a cualquier frecuencia (ISO 8041-1, fórmula (5)).
+# 6,3096 Hz es el centro *verdadero* de la banda nominal de 6,3 Hz, que es donde
+# las tablas del Anexo B imprimen sus factores.
 resp = vibration.frequency_weighting("Wk", [1.0, 6.3096, 20.0])
 print(resp.magnitude.round(3))      # [0.482 1.054 0.636]  (factores)
 print(resp.magnitude_db.round(2))   # [-6.33  0.46 -3.93]  (dB)
-
-resp.plot()   # la respuesta de la ponderación en dB, como en la figura de abajo (requiere matplotlib)
 ```
 
 Los factores reproducen las tablas de objetivo de diseño del Anexo B de
@@ -206,16 +206,25 @@ verdaderos al comparar con los factores tabulados.
 import numpy as np
 from phonometry import vibration
 
-# Un espectro vertical de asiento medido (eficaz por tercio de octava, m/s^2).
-freqs = np.array([1.0, 2.0, 4.0, 8.0, 16.0, 31.5, 63.0])
-accel = np.array([0.20, 0.45, 0.42, 0.25, 0.12, 0.05, 0.02])
+# Un espectro vertical de asiento medido (eficaz por tercio de octava, m/s^2),
+# las mismas 19 bandas con las que está dibujada la figura de abajo.
+freqs = np.array([1.0, 1.25, 1.6, 2.0, 2.5, 3.15, 4.0, 5.0, 6.3, 8.0, 10.0,
+                  12.5, 16.0, 20.0, 25.0, 31.5, 40.0, 63.0, 80.0])
+accel = np.array([0.18, 0.24, 0.33, 0.46, 0.52, 0.55, 0.48, 0.39, 0.31, 0.26,
+                  0.21, 0.17, 0.13, 0.10, 0.078, 0.060, 0.045, 0.028, 0.020])
 
 result = vibration.weighted_acceleration(accel, freqs, "Wk")
-print(round(result.overall, 3))          # 0.555  m/s^2 (a_w)
+print(round(result.overall, 3))          # 1.026  m/s^2 (a_w)
 print(result.weighted.round(3))          # W_i * a_i por banda
 
 result.plot()   # bandas sin ponderar frente a ponderadas, como en la figura de abajo (requiere matplotlib)
 ```
+
+Esas etiquetas de banda son las nominales, por legibilidad. Pasar en su lugar
+los centros verdaderos $10^{n/10}$ Hz (1; 1,259; 1,585; ...; 79,433) mueve
+$a_w$ de 1,0260 a 1,0267 m/s², así que la advertencia anterior va de comparar
+un $W_i$ *aislado* con una tabla impresa, no de un valor eficaz de banda ancha,
+donde ambos coinciden en tres cifras.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/weighted_acceleration_es.svg" alt="Un espectro de aceleración de asiento de vehículo medido (gris) y su contribución ponderada por Wk (azul) sobre los tercios de octava de 1 a 80 Hz: la ponderación atenúa las bandas bajas y altas pero deja el rango de 4 a 8 Hz casi inalterado, dando un valor eficaz ponderado a_w de aproximadamente 1,03 m/s^2" width="90%" />
 

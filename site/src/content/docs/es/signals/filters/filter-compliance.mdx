@@ -68,6 +68,25 @@ print(result["bands"][0])
 # {'freq': 12.589254117941678, 'class': 1, 'checked_to_omega': 3.8127755266765493, 'margin_class1_db': 0.3999999999999595, 'margin_class2_db': 0.5999999999999595}
 ```
 
+**Qué mide el margen.** Es el mínimo, sobre todas las frecuencias normalizadas
+en las que se evaluó la banda, de la distancia al límite más próximo de esa
+clase: positivo cuando la respuesta se queda dentro del corredor en todas
+partes, y negativo por exactamente la peor violación cuando no. La `class` que
+se informa es la clase más estricta cuyo margen no es negativo.
+
+Conviene saber qué restricción manda antes de intentar mejorar el número. Un
+Butterworth de planitud máxima es plano en el centro de banda, donde el corredor
+de clase 1 es de ±0,4 dB, así que su margen *satura en +0,400 dB* en cuanto la
+banda atenuada deja de ser el factor limitante: medido sobre un banco de tercios
+de octava a 48 kHz, el orden 2 falla de plano (clase `None`, peor margen de
+clase 1 de −27,03 dB) y los órdenes 4, 6, 8 y 10 informan todos clase 1 con
+exactamente +0,400 dB. Subir el orden ayuda, por tanto, solo mientras el margen
+es negativo por un motivo de banda atenuada; una vez que un diseño cumple, el
+margen queda acotado por la semianchura del corredor de banda de paso y ningún
+orden lo moverá. Un margen de +0,400 dB no es un resultado mediocre que haya que
+mejorar: es lo mejor que puede informar un diseño conforme frente a esta
+máscara.
+
 La propia máscara de aceptación de la Tabla 1 también es pública:
 `class_limits(fraction, filter_class, omega)` devuelve los límites
 mínimo/máximo de atenuación relativa en frecuencias normalizadas
@@ -124,7 +143,10 @@ $\ge 70\ \text{dB}$ cumple; el valor por defecto de 72 dB mantiene el mismo
 margen de banda de paso de +0,400 dB que Butterworth). Chebyshev I, elíptico y
 Bessel no cumplen
 los límites de clase con orden 6: el rizado de banda de paso (cheby1/ellip) y la
-caída lenta (bessel) violan la máscara.
+caída lenta (bessel) violan la máscara. La clase 1 es el veredicto más estricto
+que puede devolver esta edición; la clase 0, más estricta todavía, que el banco
+por defecto también supera, pertenece a la máscara retirada de 1995 y es el
+apartado 2.
 
 ## 2. Clase 0 (IEC 61260:1995 / ANSI S1.11-2004)
 
@@ -217,16 +239,24 @@ calificaciones abstractas:
   un sonómetro de clase 1, y por eso las cadenas con calidad de instrumento
   especifican la clase de cada etapa en lugar de una única cifra global.
 
-**¿Qué arquitectura alcanza qué clase?** El **valor por defecto de la biblioteca,
-Butterworth de orden 6, cumple clase 0** en las configuraciones que verifica
-el conjunto de conformidad (bancos de octava y tercio de octava a 48 kHz), así
-que no hace falta ninguna configuración especial para bancos de laboratorio en
-ese rango. La tabla siguiente indica la mejor clase que alcanza cada arquitectura
-con esa misma configuración de orden 6 / 48 kHz; las demás arquitecturas se
-quedan por debajo de clase 0 porque cambian la máscara IEC por otra propiedad
+**¿Qué arquitectura alcanza qué clase?** Bajo la edición de 2014, cuyas únicas
+clases son la 1 y la 2, el banco Butterworth de orden 6 por defecto de la
+biblioteca **cumple la clase 1** con un margen vinculante de +0,400 dB: ese es
+el techo, y el apartado 1 explica por qué. Frente a la máscara más estricta de
+1995 / ANSI S1.11-2004 (`edition="1995"`) ese mismo valor por defecto alcanza la
+**clase 0**; la configuración que verifica el conjunto de conformidad a esa
+clase es el banco de *bandas de octava* a 48 kHz, así que vuelve a ejecutar
+`verify_filter_class(bank, edition="1995")` por tu cuenta antes de escribir
+clase 0 en un documento para cualquier otra fracción o frecuencia de muestreo.
+Escribir "clase 0 según IEC 61260-1:2014" es una afirmación contra una clase que
+esa edición no define.
+
+La tabla indica la mejor clase que alcanza cada arquitectura con orden 6 y
+fs 48 kHz bajo la máscara de 1995; las arquitecturas distintas de Butterworth se
+quedan por debajo porque cambian la máscara IEC por otra propiedad
 *por construcción*:
 
-| Arquitectura | Mejor clase (orden 6, fs 48 kHz) | Por qué |
+| Arquitectura | Mejor clase (orden 6, fs 48 kHz, `edition="1995"`) | Por qué |
 | :--- | :---: | :--- |
 | `butter` (por defecto) | **0** | Banda de paso máximamente plana, caída monótona; encaja en la máscara |
 | `cheby2` | 1 | Banda de paso plana pero la relación de la máscara limita en clase 1 |
@@ -234,13 +264,15 @@ quedan por debajo de clase 0 porque cambian la máscara IEC por otra propiedad
 | `ellip` | — | Rizado en banda de paso y atenuada |
 | `bessel` | — | Retardo de grupo plano a costa de una caída lenta |
 
-Así que el valor por defecto sensato es el habitual (Butterworth de orden 6):
-supera la clase 0 en las configuraciones verificadas, mientras que las
-arquitecturas alternativas son opciones deliberadas cuyo propósito (caída más
-abrupta, fase lineal) va en contra de la máscara de clase. Fuera de estos
-ajustes (`fraction` muy alto o bandas cercanas a Nyquist), vuelve a ejecutar
-`verify_filter_class` para confirmar la clase que necesitas, y sube el orden si
-una banda necesita más margen.
+Bajo la edición de 2014 esa misma ordenación se lee 1 / 1 / — / — / —:
+`cheby2` se junta con Butterworth en lo más alto porque ya no existe la clase 0
+para separarlos.
+
+Así que el valor por defecto sensato es el habitual (Butterworth de orden 6),
+mientras que las arquitecturas alternativas son opciones deliberadas cuyo
+propósito (caída más abrupta, fase lineal) va en contra de la máscara de clase.
+Fuera de estos ajustes (`fraction` muy alto o bandas cercanas a Nyquist), vuelve
+a ejecutar `verify_filter_class` para confirmar la clase que necesitas.
 
 ## 4. La ficha de conformidad (`.report()`)
 
@@ -363,4 +395,8 @@ La clase 0 es la clase de prestaciones más estricta, definida por IEC
 61260-1:2014. Su corredor de banda de paso admite solo ±0,15 dB en el
 centro de banda, frente a ±0,3 dB para la clase 1 en las máscaras de 1995.
 Sigue accesible con `edition="1995"`, y el banco Butterworth de orden 6 por
-defecto cumple la clase 0 en las configuraciones verificadas a 48 kHz.
+defecto cumple la clase 0 en la configuración que verifica el informe de
+conformidad, el banco de bandas de octava a 48 kHz. Bajo IEC 61260-1:2014 ese
+mismo banco es clase 1: la edición de 2014 no define ninguna clase 0, así que
+una afirmación de clase 0 tiene que citar la máscara de 1995 / ANSI S1.11-2004
+frente a la que se midió.

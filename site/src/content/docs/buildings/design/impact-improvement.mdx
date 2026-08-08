@@ -201,6 +201,14 @@ $$
 \Delta L = 40 \log_{10} \frac{f}{f_0}\ \text{dB (asphalt, dry screeds)}.
 $$
 
+Both are written for $f > f_0$ only, and taken as zero at and below the
+resonance. That is a convention: in the band containing $f_0$ the mass-spring
+system amplifies and measured floors fall between about $-5$ dB and $0$ dB
+there, so a design whose $f_0$ lands inside the rated 100-3150 Hz range rates
+optimistically in exactly the band that decides the number. Here $f_0$ is
+52.8 Hz, comfortably below the range, which is why the spectrum below starts
+clean at 100 Hz.
+
 ```python
 import numpy as np
 from phonometry import building, materials

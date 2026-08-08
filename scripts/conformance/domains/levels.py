@@ -47,7 +47,7 @@ def _chk_leq_sine() -> Outcome:
 
 @register(
     "Levels & dosimetry",
-    "IEC 61252:1995 (LEX,8h)",
+    "IEC 61252:1993 (LEX,8h)",
     "8 h exposure to 90 dB(A) noise",
 )
 def _chk_lex_8h() -> Outcome:

@@ -80,13 +80,30 @@ tens of centimetres deep, have their own guide:
 ## 1. Random-incidence scattering coefficient (ISO 17497-1)
 
 The scattering coefficient $s$ is the fraction of reflected energy that does
-**not** leave the surface in the specular direction. ISO 17497-1 measures it in a
-reverberation room from four reverberation-time situations: with the test sample
-mounted on a turntable and held **stationary**, and with the turntable
-**rotating** (which averages the phase-coherent specular reflection away), each
-with and without a reflecting base plate.
+**not** leave the surface in the specular direction. ISO 17497-1 measures it in
+a reverberation room from four reverberation times. The turntable and its rigid
+circular base plate stay in the room for all four, symmetrical about the axis
+of rotation and sized to the sample; what changes is whether the **test sample**
+is on the plate and whether the plate **turns** (Table 2):
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_scattering_reverb.svg" alt="ISO 17497-1 random-incidence scattering setup: a reverberation room with the test sample on a turntable, a rotating loudspeaker boom and a microphone, measuring reverberation time with the sample stationary (giving the random-incidence absorption) and rotating (giving the specular absorption), from which the scattering coefficient is derived" width="92%" loading="eager" />
+| | Test sample | Turntable |
+| :--- | :--- | :--- |
+| $T_1$ | not present | not rotating |
+| $T_2$ | present | not rotating |
+| $T_3$ | not present | rotating |
+| $T_4$ | present | rotating |
+
+$(T_1, T_2)$ is an ordinary ISO 354 absorption measurement of the specimen and
+yields the random-incidence $\alpha_s$; $(T_3, T_4)$ repeats it under rotation
+and yields the specular $\alpha_{spec}$. The area $S$ in both formulas is the
+**specimen** area, not the base-plate area. The pair $(T_1, T_3)$ is not waste
+either: it is the base-plate quality check of Eq. (6), below.
+
+Sanity check before you compute anything: adding the sample always shortens the
+decay, so $T_2 < T_1$ and $T_4 < T_3$. A negative absorption coefficient means
+the members of a pair went in the wrong way round.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_scattering_reverb.svg" alt="ISO 17497-1 random-incidence scattering setup: a reverberation room with the test sample on a turntable and base plate at least 1 m from the walls, two fixed loudspeaker positions and three fixed microphone positions, the turntable the only thing that moves, and the Table 2 mapping of T1 to T4 onto the random-incidence and specular absorption coefficients from which the scattering coefficient is derived" width="92%" loading="eager" />
 
 **Absorption from reverberation time (Clause 6).** Each situation converts to a
 Sabine absorption coefficient with the standard's own air-attenuation term:
@@ -98,9 +115,9 @@ $$
 
 where $V$ is the room volume, $S$ the sample area, $T$ the reverberation time,
 $c$ the speed of sound (Eq. (2): $c = 343.2\sqrt{(273.15+t)/293.15}$) and $m$ the
-power attenuation coefficient of air. The **stationary** pair gives the
-random-incidence absorption $\alpha_s$ (Eq. (1)); the **rotating** pair gives the
-specular absorption $\alpha_{spec}$ (Eq. (4)).
+power attenuation coefficient of air. The **static** pair $(T_1, T_2)$ gives the
+random-incidence absorption $\alpha_s$ (Eq. (1)); the **rotating** pair
+$(T_3, T_4)$ gives the specular absorption $\alpha_{spec}$ (Eq. (4)).
 
 **Scattering coefficient (Eq. (5)).** The two combine into
 
@@ -116,12 +133,14 @@ energy everywhere, raising $\alpha_{spec}$ towards 1 and $s$ towards 1.
 from phonometry import materials
 
 # Four reverberation-time situations reduced to two absorption coefficients.
-# alpha_s from the stationary pair (Eq. 1); alpha_spec from the rotating pair
-# (Eq. 4). V = 200 m^3, S = 10 m^2, c = 343.2 m/s throughout.
-alpha_s = materials.random_incidence_absorption(200.0, 10.0, c1=343.2, t1=8.0,
-                                         c2=343.2, t2=6.0)
-alpha_spec = materials.specular_absorption_coefficient(200.0, 10.0, c3=343.2, t3=7.5,
-                                                c4=343.2, t4=5.0)
+# alpha_s from the static pair (Eq. 1); alpha_spec from the rotating pair
+# (Eq. 4). V = 200 m^3, S = 10 m^2 (the SAMPLE area), c = 343.2 m/s throughout.
+alpha_s = materials.random_incidence_absorption(200.0, 10.0,
+                                         c1=343.2, t1=8.0,   # T1 base plate, static
+                                         c2=343.2, t2=6.0)   # T2 sample, static
+alpha_spec = materials.specular_absorption_coefficient(200.0, 10.0,
+                                                c3=343.2, t3=7.5,  # T3 base plate, rotating
+                                                c4=343.2, t4=5.0)  # T4 sample, rotating
 s = materials.scattering_coefficient(alpha_spec, alpha_s)   # Eq. (5)
 print(round(float(alpha_s), 4))     # 0.1343
 print(round(float(alpha_spec), 4))  # 0.2148
@@ -137,7 +156,7 @@ import numpy as np
 from phonometry import materials
 
 # A 13-band measurement (250-4000 Hz): the random-incidence absorption alpha_s
-# (stationary sample) and the specular absorption alpha_spec (rotating
+# (sample on the static turntable) and the specular absorption alpha_spec (rotating
 # turntable). A diffuser scatters more with frequency, so s(f) rises.
 freqs = np.array([250, 315, 400, 500, 630, 800, 1000,
                   1250, 1600, 2000, 2500, 3150, 4000], float)
@@ -165,7 +184,7 @@ import numpy as np
 from phonometry import materials
 
 # A 13-band measurement (250-4000 Hz): the random-incidence absorption alpha_s
-# (stationary sample) and the specular absorption alpha_spec (rotating
+# (sample on the static turntable) and the specular absorption alpha_spec (rotating
 # turntable). A diffuser scatters more with frequency, so s(f) rises.
 freqs = np.array([250, 315, 400, 500, 630, 800, 1000,
                   1250, 1600, 2000, 2500, 3150, 4000], float)
@@ -243,9 +262,25 @@ $$
 
 A perfectly uniform polar response ($L_i$ all equal) gives $d = 1$; a single
 sharp specular lobe gives $d = 0$. When receivers subtend unequal solid angles,
-Formula (6) area-weights each energy by $N_i$ from Formula (8), and those area
-factors are evaluated in **radians**, which is why a 5° spacing at the zenith
-produces a weight near 1.57, not 51.9.
+Formula (6) area-weights each energy by $N_i = A_i / A_\text{min}$ from
+Formula (8), with
+
+$$
+A_i = \frac{4\pi}{\Delta\phi}\sin^2\frac{\Delta\theta}{4}\ (\theta = 0),
+\qquad
+A_i = 2\sin\theta\,\sin\frac{\Delta\theta}{2}\ (0 < \theta < 90°),
+\qquad
+A_i = \sin\frac{\Delta\theta}{2}\ (\theta = 90°).
+$$
+
+Every angle in those three forms is handled in **radians**, including the
+$\Delta\phi$ under the $4\pi$ of the zenith term — that is what keeps the
+zenith dimensionally consistent with the other two. On the standard
+5° × 5° hemisphere the areas come out 0.0685 at the zenith, 0.0076 at
+$\theta = 5°$ (the smallest, so $A_\text{min}$) and 0.0436 at the pole, so the
+weights run 9.01 at the zenith, 1 on the first ring off it and 5.74 at the
+pole. Check yours with `materials.area_factors(elevations, delta_theta=5.0)`
+before feeding a hand-built weight vector into Formula (6).
 
 The rig those formulas assume is worth drawing to scale.
 `plot_goniometer_geometry` lays out the standard arrangement in plan: the
@@ -277,6 +312,13 @@ The animation below runs that goniometer experiment numerically: the same
 plane wavefront hits a flat rigid panel and a Schroeder diffuser (an $N = 7$
 quadratic-residue profile), and the scattered energy on the receiver arc turns
 a collimated specular beam ($d = 0.32$) into a wide fan ($d = 0.63$).
+
+Those two numbers are not comparable with the coefficients computed below. The
+simulated panels are a single short period read in the near field of a 2-D
+grid; the prediction that follows is a six-period 3.6 m array read in the far
+field, where the periodicity funnels the energy into a few grating lobes and
+drives every coefficient down. Diffusion coefficients only compare within one
+geometry, one arc and one distance — which is why ISO 17497-2 fixes all three.
 
 <Video
   name="anim_fdtd_diffusion"

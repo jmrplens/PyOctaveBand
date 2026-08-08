@@ -22,7 +22,7 @@ references:
     title: "Acoustics — Description, measurement and assessment of environmental noise — Part 2: Determination of sound pressure levels"
     designation: "ISO 1996-2:2017"
     url: "https://www.iso.org/standard/59766.html"
-    note: "El criterio de audibilidad tonal que reutiliza el método IEC procede del anexo C de su edición de 2007 (la edición de 2017 lleva los métodos tonales en los anexos J y K), y su tonal_adjustment consume la audibilidad media."
+    note: "El criterio de audibilidad tonal que reutiliza el método IEC procede del anexo C de su edición de 2007 (la edición de 2017 lleva los métodos tonales en los anexos J y K), y su mapeo de la Tabla J.1, tonal_adjustment_from_mean_audibility, es el que consume la audibilidad media del intervalo."
 ---
 
 import ThemeImage from '../../../../../components/ThemeImage.astro';
@@ -173,8 +173,20 @@ anclan a la
 línea de tono clasificada más alta, no al candidato sondeado. La fórmula de
 audibilidad coincide con la del Anexo C de la ISO 1996-2; lo específico de la
 IEC 61400-11 es la determinación de los niveles de tono y enmascaramiento y la
-banda crítica de Zwicker a partir del espectro. Para un ajuste de valoración
-$K_T$, pasa la audibilidad media al `tonal_adjustment` de la ISO 1996-2.
+banda crítica de Zwicker a partir del espectro. La IEC 61400-11 se detiene en
+$\Delta L_a$ y no prescribe ningún ajuste, así que qué mapeo da el ajuste de
+valoración $K_t$ depende de la edición bajo la que se haga la evaluación. El
+promedio energético de 9.5.1 sobre los espectros de un intervalo de velocidad
+de viento es una audibilidad *media*, que es la magnitud para la que se
+escribió la Tabla J.1 de la ISO 1996-2:2017:
+[`tonal_adjustment_from_mean_audibility`](/phonometry/es/environment/assessment/environmental-levels/),
+entero de 0 a 6 dB (o `coarse=True` para la escala 0/3/6 de su nota). La ley a
+tramos (C.4)-(C.6) de `tonal_adjustment` es el mapeo del Anexo C de 2007 y se
+aplica al $\Delta L_{ta}$ de un único espectro, y las dos difieren entre 1 y
+2 dB con la misma entrada: $\Delta L = 5$ dB da $K_t = 3$ por la Tabla J.1 y
+1,0 dB por el Anexo C, y $\Delta L = 9$ dB da 4 dB y 5,0 dB. También difiere la
+notación: el $\Delta L_a$ de esta página es el $\Delta L_{ta}$ de aquella, y
+las dos impresiones llevan el criterio con signos opuestos.
 
 ### Informe de evaluación (`.report()`)
 

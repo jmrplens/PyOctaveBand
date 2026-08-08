@@ -55,7 +55,7 @@ head:
             "@type": "ListItem",
             "position": 6,
             "name": "Environment and transport",
-            "description": "Outdoor propagation, barriers, refraction, aircraft, rotorcraft and wind turbines.",
+            "description": "Outdoor propagation, barriers, refraction, road, rail and wind-turbine sources, and the assessment built on them.",
             "url": "https://jmrplens.github.io/phonometry/environment/"
           },
           {
@@ -356,6 +356,8 @@ reaches it, measured in a laboratory or predicted from the material
 parameters. Implements ISO 354, ISO 11654, ISO 10534-1/-2, ISO 9053-1/-2,
 ISO 17497-1/-2, ISO 13472-1/-2, EN 29052-1 and ISO 12999-2.
 
+**[Absorbers](/phonometry/materials/absorbers/)**
+
 - [Sound Absorption Measurement and Rating](/phonometry/materials/absorbers/absorption-measurement/):
   the ISO 354 reverberation-room measurement, the weighted rating and its
   class, and the measurement uncertainty of both.
@@ -371,6 +373,8 @@ ISO 17497-1/-2, ISO 13472-1/-2, EN 29052-1 and ISO 12999-2.
 - [Metamaterial Absorbers](/phonometry/materials/absorbers/metamaterial-absorbers/): the
   critical-coupling condition for perfect absorption and the slow-sound slit
   panel loaded by Helmholtz resonators, with its design solver.
+**[Diffusers and surfaces](/phonometry/materials/diffusers/)**
+
 - [Diffusers and Their Coefficients](/phonometry/materials/diffusers/diffusers/): the
   random-incidence scattering coefficient, the autocorrelation diffusion
   coefficient, and Schroeder design with its far-field prediction.
@@ -380,6 +384,11 @@ ISO 17497-1/-2, ISO 13472-1/-2, EN 29052-1 and ISO 12999-2.
 - [In-situ Road-Surface Absorption](/phonometry/materials/surfaces/road-absorption/):
   in-situ road-surface absorption by the subtraction technique and the spot
   method.
+
+The third group of this area, Resilient layers, has one guide,
+[Dynamic stiffness of resilient materials](/phonometry/materials/resilient/dynamic-stiffness/),
+listed above under Insulation design beside the floating-floor prediction that
+consumes it.
 
 ## [Vibration and structure-borne sound](/phonometry/vibration/)
 
@@ -435,6 +444,15 @@ and IEC 61400-11.
 - [Outdoor Sound Propagation](/phonometry/environment/propagation/outdoor-propagation/):
   atmospheric absorption and the ISO 9613-2 general method, with a per-term
   octave-band attenuation breakdown.
+- [Spherical ground effect and advanced barriers](/phonometry/environment/propagation/ground-barriers/):
+  the Weyl-Van der Pol reflection coefficient over finite-impedance ground, and
+  wave-theoretic barrier diffraction.
+- [Atmospheric refraction: rays and the GFPE](/phonometry/environment/propagation/atmospheric-refraction/):
+  effective sound-speed profiles, curved rays with a closed-form shadow-zone
+  distance, and the GFPE relative-level field.
+
+**[Sources](/phonometry/environment/sources/)**
+
 - [CNOSSOS-EU road traffic source emission](/phonometry/environment/sources/cnossos-road-emission/):
   the common EU road source of Annex II 2.2: rolling and propulsion sound power
   per vehicle category and the directional power per metre of source line.
@@ -445,15 +463,16 @@ and IEC 61400-11.
 - [Wind-turbine noise: sound power and tonal audibility](/phonometry/environment/sources/wind-turbine-noise/):
   the apparent sound power level referred to the rotor centre, and the tonal
   audibility chain that decides whether a tone is audible.
-- [Spherical ground effect and advanced barriers](/phonometry/environment/propagation/ground-barriers/):
-  the Weyl-Van der Pol reflection coefficient over finite-impedance ground, and
-  wave-theoretic barrier diffraction.
-- [Atmospheric refraction: rays and the GFPE](/phonometry/environment/propagation/atmospheric-refraction/):
-  effective sound-speed profiles, curved rays with a closed-form shadow-zone
-  distance, and the GFPE relative-level field.
+
+**[Assessment and regulation](/phonometry/environment/assessment/)**
+
 - [Impulsive-sound prominence (NT ACOU 112)](/phonometry/environment/assessment/impulsive-sound/):
   the predicted prominence of each impulse from its onset rate and level
   difference, and the adjustment added to $L_{Aeq}$.
+
+The two remaining guides of this group, [Environmental Levels](/phonometry/environment/assessment/environmental-levels/)
+and [Spanish Noise Regulation](/phonometry/environment/assessment/spanish-noise-regulation/),
+are listed above under Signal analysis, beside the level definitions they build on.
 
 ## [Aircraft noise](/phonometry/aircraft/)
 

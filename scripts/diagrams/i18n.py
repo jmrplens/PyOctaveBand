@@ -134,8 +134,11 @@ _ES: dict[str, str] = {
         "nivel ajustado por impulsos sobre el tiempo de referencia  (Nota 1)",
     "Vertical seat acceleration  az(t)":
         "Aceleración vertical del asiento  az(t)",
-    "band-limited per ISO 2631-1  (0.4 Hz to 100 Hz)":
-        "limitada en banda según ISO 2631-1  (0,4 Hz a 100 Hz)",
+    "conditioned per 5.1.3:  HP 0.01 Hz (2nd order) / LP 80 Hz (4th order)":
+        "acondicionada según 5.1.3:  PA 0,01 Hz (2.º orden) / PB 80 Hz "
+        "(4.º orden)",
+    "not the ISO 2631-1 0.4 Hz / 100 Hz filters":
+        "no los filtros de 0,4 Hz / 100 Hz de ISO 2631-1",
     "Spinal response  Az(t)  (clause 5.2, Formula 1/2)":
         "Respuesta de la columna  Az(t)  (cláusula 5.2, Fórmula 1/2)",
     "seat-to-spine transfer function H(f): 1 zero, 6 poles":
@@ -416,18 +419,23 @@ _ES: dict[str, str] = {
     "Random-incidence scattering in a reverberation room (ISO 17497-1)":
         "Dispersión a incidencia aleatoria en cámara reverberante (ISO 17497-1)",
     "Reverberation room": "Cámara reverberante",
-    "Turntable (test sample)": "Plataforma giratoria (probeta)",
-    "Rotating boom source": "Fuente en brazo giratorio",
-    "stationary → α_s": "estática → α_s",
-    "rotating → α_spec": "girando → α_spec",
-    "Stationary sample → α_s (Eq. 1)   ·   rotating / averaged → α_spec (Eq. 4)":
-        "Probeta estática → α_s (Ec. 1)   ·   girando / promediada → α_spec (Ec. 4)",
+    "Turntable and base plate": "Plataforma giratoria y placa base",
+    "sample on the plate for T2 and T4":
+        "probeta sobre la placa en T2 y T4",
+    "the only thing that moves": "lo único que se mueve",
+    # "≥ 1.0 m" (the turntable wall clearance) is already in the table above.
+    "fixed sources (≥ 2)": "fuentes fijas (≥ 2)",
+    "fixed microphones (≥ 3)": "micrófonos fijos (≥ 3)",
+    "T1 base plate, static  ·  T2 sample, static  →  α_s (Eq. 1)":
+        "T1 placa base, estática  ·  T2 probeta, estática  →  α_s (Ec. 1)",
+    "T3 base plate, rotating  ·  T4 sample, rotating  →  α_spec (Eq. 4)":
+        "T3 placa base, girando  ·  T4 probeta, girando  →  α_spec (Ec. 4)",
     "s = (α_spec − α_s) / (1 − α_s)   (Eq. 5)":
         "s = (α_spec − α_s) / (1 − α_s)   (Ec. 5)",
-    "α from 55.3·(V/S)·(1/cT) − 4(V/S)m   (Sabine, Table 2 rows T1–T4)":
-        "α con 55,3·(V/S)·(1/cT) − 4(V/S)m   (Sabine, filas T1–T4 de la Tabla 2)",
-    "Base-plate check: s_base ≤ Table 1 limit (Clause 6.2)":
-        "Placa base: s_base ≤ límite de la Tabla 1 (Cláusula 6.2)",
+    "α from 55.3·(V/S)·(1/cT) − 4(V/S)m  ·  the base plate must pass the "
+    "Table 1 ceiling":
+        "α con 55,3·(V/S)·(1/cT) − 4(V/S)m  ·  la placa base debe cumplir el "
+        "límite de la Tabla 1",
     # d16 - ISO 17497-2 free-field diffusion goniometer
     "Free-field diffusion goniometer (ISO 17497-2)":
         "Goniómetro de difusión en campo libre (ISO 17497-2)",
@@ -535,6 +543,11 @@ _ES: dict[str, str] = {
         "Flujo de formas de array en una operación por canal",
     "Open-plan office spatial decay of speech (ISO 3382-3)":
         "Caída espacial del habla en oficina diáfana (ISO 3382-3)",
+    "what open_plan_metrics returns": "lo que devuelve open_plan_metrics",
+    "Clause 4 also requires the average A-weighted background "
+    "noise  Lp,A,B  (Cl. 6.4)":
+        "La cláusula 4 exige además el ruido de fondo medio ponderado A  "
+        "Lp,A,B  (cl. 6.4)",
     "Measurement uncertainty from tables to expanded U (ISO 12999-1)":
         "Incertidumbre de medición: de las tablas a la U expandida (ISO 12999-1)",
     "Single-number sound-absorption rating (ISO 11654)":

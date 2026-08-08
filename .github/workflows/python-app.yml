@@ -307,6 +307,28 @@ jobs:
     - name: Run every snippet the guides print
       run: python scripts/check_doc_snippets.py
 
+  # The guides are hard-wrapped, so a sentence can wrap onto a "-" or a ">" and
+  # stop being a sentence: CommonMark ends the paragraph at the marker. One
+  # variant takes the site build down (unclosed inline maths, which MDX then
+  # evaluates as JavaScript); the other is silent and ships a quoted block in
+  # the middle of a paragraph. Needs no dependencies, so it runs on its own
+  # rather than waiting behind an install.
+  markdown-hazards:
+    name: Markdown renders the way it reads
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+    - uses: actions/checkout@v7
+      with:
+        persist-credentials: false
+    - name: Set up Python 3.13
+      uses: actions/setup-python@v7
+      with:
+        python-version: "3.13"
+    - name: Check the hand-written markdown
+      run: python scripts/check_markdown_hazards.py
+
   # The committed example .report() fiches (.github/reports) must match a fresh
   # `make reports` run. Same drift gate as the figures, one layer further down
   # the pipeline: the fiches are what the documentation links to as worked

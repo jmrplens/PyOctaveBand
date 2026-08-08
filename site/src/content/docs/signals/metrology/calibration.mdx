@@ -73,11 +73,14 @@ changes: touch the gain knob and you must recalibrate.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_calibration_setup.svg" alt="Calibration chain: sound calibrator coupled on the microphone, preamplifier, ADC and sensitivity producing pascals per digital unit" width="92%" loading="eager" />
 
-## Physical Calibration (Sound Level Meter)
+## Calibrating a recording, end to end
 
-To get accurate SPL measurements from a digital recording, you must first
-calculate the sensitivity of your measurement chain using a reference tone
-(e.g., 94 dB @ 1 kHz).
+The three steps below are the whole physical-SPL workflow: a calibrator take,
+one call to `sensitivity()`, and the factor handed to a level function. Both
+recordings must come from the same chain with nothing touched in between. The
+same factor works across the whole library: `octave_filter` and
+`OctaveFilterBank` take it inside `LevelCalibration(factor=...)`, and `leq`,
+`laeq` and `ln_levels` as `calibration_factor=`.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_calibration_dataflow.svg" alt="Calibration data flow: the calibrator recording and the measurement recording come from the same untouched chain, sensitivity() turns the first into the factor S in pascals per digital unit and, given fs, checks the short-term stability of IEC 60942, every level function accepts that factor as calibration_factor, and the result is levels in dB SPL re 20 µPa; with no calibrator the factor stays at 1 and the samples are read as pascals, so dbfs=True is what gives levels referred to digital full scale" width="92%" />
 
@@ -101,12 +104,8 @@ calibration_factor = metrology.sensitivity(calibrator_recording, target_spl=94.0
 spl, freq = filters.octave_filter(
     recording, fs,
     calibration=filters.LevelCalibration(factor=calibration_factor))
-# Now 'spl' values are in real-world dB SPL!
+# spl is now in dB SPL re 20 µPa
 ```
-
-The same factor works across the whole library: `octave_filter` and
-`OctaveFilterBank` take it inside `LevelCalibration(factor=...)`, and `leq`,
-`laeq` and `ln_levels` as `calibration_factor=`.
 
 ## Calibrator assumptions (IEC 60942)
 
@@ -130,10 +129,19 @@ When you pass the sample rate (and `validate=True`, the default),
 IEC 60942:2017 checks the calibrator itself (5.3.3): the *short-term level
 fluctuation*, the absolute difference between each of the maximum and minimum
 F-time-weighted levels and the mean level, must not exceed the Table 2 class 1
-limit for the calibrator's nominal frequency (0.07 dB at and above 160 Hz, relaxed
-to 0.10 dB below 160 Hz and 0.20 dB at or below 63 Hz, where the F
-time-weighting itself ripples). Pass `frequency=` to select the right row for non-1 kHz
-calibrators. A `CalibrationWarning` flags badly coupled microphones or handling
+limit for the calibrator's nominal frequency. Table 2 gives three disjoint rows,
+and they must not be read as overlapping ranges:
+
+| Nominal frequency | Class 1 limit | |
+| :--- | :---: | :--- |
+| 160 Hz to 16 kHz | 0.07 dB | the strict row, and the one a 1 kHz calibrator is judged on |
+| above 63 Hz to below 160 Hz | 0.10 dB | |
+| 31.5 Hz to 63 Hz | 0.20 dB | where the F time weighting itself ripples on the tone |
+
+Table 2 spans 31.5 Hz to 16 kHz and specifies nothing outside it, so a
+`frequency` below 31.5 Hz or above 16 kHz falls back to the strict 0.07 dB
+rather than to the relaxed low-frequency rows. Pass `frequency=` to select the
+right row for non-1 kHz calibrators. A `CalibrationWarning` flags badly coupled microphones or handling
 noise before they silently corrupt every calibrated level. The recording must
 be at least 2 s long (1 s for the F-integrator to settle plus 1 s of settled
 envelope); shorter recordings get a warning instead of an unreliable verdict.
@@ -224,7 +232,7 @@ chain with a class 2 calibrator silently downgrades every derived level to
 class 2 accuracy, because the calibrator's wider level tolerance enters
 $S$ directly.
 
-## Digital Analysis (dBFS)
+## Digital analysis (dBFS)
 
 If you are working with digital audio files (e.g., WAV, FLAC) and want to
 analyze levels relative to Full Scale rather than physical pressure, you can use
@@ -251,14 +259,16 @@ spl_dbfs, freq = filters.octave_filter(
 # Results will be negative (e.g., -20 dBFS)
 ```
 
-## RMS vs Peak Levels
+## RMS versus peak levels
 
-phonometry supports two measurement modes to align with professional software
-like BK:
+Levels can be read two ways, and both are in use in commercial analysers:
 
-- **RMS (`mode='rms'`)**: Energy-based level (standard).
-- **Peak (`mode='peak'`)**: Absolute maximum value reached in the frame
-  (Peak-holding).
+- **RMS (`mode='rms'`)** integrates energy over the frame, which is what every
+  standardized level ($L_{eq}$, $L_{Aeq}$, $L_N$) is defined on.
+- **Peak (`mode='peak'`)** holds the largest instantaneous value in the frame,
+  which is what impact and peak-limit criteria such as $L_{Cpeak}$ are checked
+  against. Note that the band peak returned here is band-limited and
+  unweighted, so it is not itself $L_{Cpeak}$.
 
 ```python
 import numpy as np
@@ -283,8 +293,18 @@ abruptly may read up to ~1 dB high. This is inherent to IIR band filters
 ## Integer audio input
 
 Integer signals (e.g. int16 from `scipy.io.wavfile.read`) are converted to
-float64 internally before any squaring, so calibration and level results are
-identical whether you pass the raw integer array or a float conversion.
+float64 internally before any squaring. The conversion is a dtype cast, not a
+rescaling: an int16 sample of +32767 enters as 32767.0, not as 1.0. That is
+harmless *as long as the calibrator recording and the measurement are in the
+same format*, because `sensitivity` then returns a factor 32768 times smaller
+and the two cancel exactly — a tone that reads 87.958 dB from float arrays reads
+87.958 dB from the int16 arrays of the same recordings. It is not harmless
+otherwise: the same tone read uncalibrated is 87.94 dB as float and 172.14 dB as
+int16, a $20\log_{10}(32768) = 90.3$ dB offset, and applying a float-derived
+sensitivity to an integer-read measurement (or the reverse) carries that offset
+straight into the result with no symptom. Either keep both recordings in one
+format, or divide both by the full-scale value (`x / 32768.0` for int16) before
+anything else.
 
 ## What this guide covers
 

@@ -47,35 +47,65 @@ La prueba rigurosa para la ponderación temporal es la **respuesta a ráfaga de
 tono** (IEC 61672-1, Tabla 4), usando una ráfaga senoidal de 4 kHz referida al
 nivel de régimen estacionario.
 
+### Cómo se ejecuta la comprobación
+
+La Tabla 4 fija la excitación pero no el montaje, así que aquí va el montaje. Se
+genera una senoide de 4 kHz a 48 kHz durante 3 s. La **referencia** es el nivel
+Fast estacionario de esa senoide continua, promediado sobre su último medio
+segundo: una vez asentado el integrador, este es el $L_A$ en la notación de la
+norma. La ráfaga de la duración indicada se recorta después de *esa misma*
+senoide, de modo que su fase y su amplitud son idénticas a las del tono de
+referencia, y se rodea de ceros. La **respuesta** es el máximo de la envolvente
+Fast de esa ráfaga, expresado respecto de la referencia:
+$10\log_{10}(\max \text{env} / \text{ref})$, que es el $L_{AFmax} - L_A$ de la
+norma. Fíjate en qué verifica y qué no: la IEC 61672-1 enuncia estos límites
+para el dispositivo de entrada eléctrica sobre un rango definido de niveles
+estacionarios y sin indicación de sobrecarga (cláusulas 5.9.5-5.9.6), así que
+los números de abajo verifican la *balística*, no un instrumento completo. Los
+mismos valores de referencia están transcritos en
+`tests/filters/test_iec_compliance.py` para F y S y para la columna $L_{AE}$.
+
 **Resultados de phonometry (FAST):**
 
-| Duración de la ráfaga | Objetivo IEC (dB) | phonometry (dB) | Error (dB) | Estado |
-| :--- | :--- | :--- | :--- | :--- |
-| 200 ms | −1,0 | −0,98 | +0,02 | ✅ PASA |
-| 50 ms | −4,8 | −4,82 | −0,02 | ✅ PASA |
-| 10 ms | −11,1 | −11,14 | −0,04 | ✅ PASA |
-| 1 ms | −21,0 | −20,99 | +0,01 | ✅ PASA |
+| Duración de la ráfaga | Objetivo IEC (dB) | Límite clase 1 (dB) | phonometry (dB) | Error (dB) | Estado |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| 200 ms | −1,0 | ±0,5 | −0,98 | +0,02 | ✅ PASA |
+| 50 ms | −4,8 | ±1,0 | −4,82 | −0,02 | ✅ PASA |
+| 10 ms | −11,1 | ±1,0 | −11,14 | −0,04 | ✅ PASA |
+| 1 ms | −21,0 | +1,0 / −2,0 | −20,99 | +0,01 | ✅ PASA |
 
 **Resultados de python-acoustics (FAST, pasando la señal al cuadrado como
 requiere esa librería):**
 
-| Duración de la ráfaga | Objetivo IEC (dB) | python-acoustics (dB) | Error (dB) | Estado |
-| :--- | :--- | :--- | :--- | :--- |
-| 200 ms | −1,0 | −0,97 | +0,03 | ✅ PASA |
-| 50 ms | −4,8 | −3,93 | **+0,87** | ⚠️ FALLA |
-| 10 ms | −11,1 | −10,90 | +0,20 | ✅ PASA |
-| 1 ms | −21,0 | −20,90 | +0,10 | ✅ PASA |
+| Duración de la ráfaga | Objetivo IEC (dB) | Límite clase 1 (dB) | python-acoustics (dB) | Error (dB) | Estado |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| 200 ms | −1,0 | ±0,5 | −0,97 | +0,03 | ✅ PASA |
+| 50 ms | −4,8 | ±1,0 | −3,93 | **+0,87** | ✅ PASA |
+| 10 ms | −11,1 | ±1,0 | −10,90 | +0,20 | ✅ PASA |
+| 1 ms | −21,0 | +1,0 / −2,0 | −20,90 | +0,10 | ✅ PASA |
 
-phonometry mantiene alta precisión en todos los casos. El enfoque por bloques
-se desvía significativamente (más de 0,8 dB) en la ráfaga de 50 ms porque los
-bloques de 125 ms no pueden resolver con precisión eventos transitorios cortos;
-el resultado depende de cómo se alinee la ráfaga con los límites de los
-bloques.
+**Las dos librerías pasan todas las filas mostradas**, y decir lo contrario
+sería exagerar el caso: lo que importa aquí es la *forma* del error, no un
+incumplimiento. phonometry se queda dentro de 0,05 dB de la referencia de la
+Tabla 4 en todas las duraciones, menos del 5 % del margen de clase 1, porque a
+un detector exponencial continuo no le queda ningún parámetro libre que
+equivocar. El integrador por bloques también se queda dentro de clase 1, pero
+gasta 0,87 de los 1,0 dB disponibles a 50 ms, y los gasta por un motivo que es
+suerte y no diseño: cómo se reparte la ráfaga a caballo de un bloque de 125 ms.
+Lee las dos tablas junto a la primera columna de la Tabla 4, que se estrecha a
+±0,5 dB para ráfagas de 200 ms y más largas: en ese extremo a un integrador por
+bloques no le queda margen que perder.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/tone_burst_iec_es.svg" alt="Respuestas de la envolvente Fast a ráfagas de 200, 50 y 10 ms alcanzando exactamente los valores de referencia de la Tabla 4 de IEC 61672-1" width="80%" loading="eager" />
 
 *Envolventes Fast medidas (azul) coincidiendo con los valores de referencia
 de la Tabla 4 (discontinua) dentro de 0,1 dB para ráfagas de 200/50/10 ms.*
+
+El generador que hay detrás de esta figura es
+`scripts/figures/signals.py::generate_tone_burst_iec`, y es el procedimiento
+descrito arriba con tres de las filas de la Tabla 4: imprime
+`env_db.max() - target`, que es la columna Error de la primera tabla, de modo
+que las filas de phonometry se pueden reproducir directamente.
 
 ## Qué significa esto en la práctica
 

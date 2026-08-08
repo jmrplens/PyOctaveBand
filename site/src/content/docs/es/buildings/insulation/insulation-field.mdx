@@ -25,11 +25,11 @@ references:
     note: "El método aéreo de campo que implementa esta página: las diferencias de nivel y normalizaciones."
   - type: standard
     organization: "International Organization for Standardization"
-    year: 2015
+    year: 2020
     title: "Acoustics — Field measurement of sound insulation in buildings and of building elements — Part 2: Impact sound insulation"
-    designation: "ISO 16283-2:2015"
-    url: "https://www.iso.org/standard/59747.html"
-    note: "El método de impactos de campo: los niveles de impactos estandarizado y normalizado."
+    designation: "ISO 16283-2:2020"
+    url: "https://www.iso.org/standard/74162.html"
+    note: "El método de impactos de campo: los niveles de impactos estandarizado y normalizado, el informe de ensayo del apartado 14 y los formularios de resultados de su Anexo C. La primera edición de 2015 es idéntica en las normalizaciones que se usan aquí."
   - type: standard
     organization: "International Organization for Standardization"
     year: 2020
@@ -77,10 +77,16 @@ y la predicción del comportamiento in situ en
 ## ¿Cómo calculo DnT y R' a partir de una medición en campo con Python?
 
 Promedia en energía los niveles de los recintos emisor y receptor por banda de
-tercio de octava y pásalos, junto con el tiempo de reverberación del recinto
+tercio de octava sobre las posiciones de micrófono de una misma posición de
+altavoz, corrige el recinto receptor por ruido de fondo y pásalos, junto con el
+tiempo de reverberación del recinto
 receptor, a `building.airborne_insulation(l1, l2, t2, area=S, volume=V)`. El
 resultado lleva la diferencia de niveles bruta `d`, la estandarizada `dnt` y,
-cuando se dan `area` y `volume`, la aparente `r_prime`. Las mediciones de
+cuando se dan `area` y `volume`, la aparente `r_prime`. Si se ha movido un único
+altavoz entre posiciones, repite eso para cada posición y combina los
+*resultados* con la Fórmula (6), no los niveles; véase
+[La medición](#la-medicion-iso-16283-1).
+Las mediciones de
 impactos pasan por `building.impact_insulation(li, t2, volume=V)`, y cualquiera
 de los dos espectros se valora con `building.weighted_rating` /
 `weighted_impact_rating`.
@@ -152,11 +158,117 @@ función a `weighted_rating`, de modo que cada banda quede alineada índice a
 | `area` | float, opcional | m² | > 0, con `volume` | Superficie del cerramiento $S$ (habilita $R'$) |
 | `volume` | float, opcional | m³ | > 0, con `area` | Volumen del recinto receptor $V$ |
 | `t0` | float | s | por defecto `0.5` | Tiempo de reverberación de referencia $T_0$ |
+
 `airborne_insulation()` devuelve un `AirborneInsulationResult` (`d`, `dnt`,
 `r_prime` o `None`). El motor de curva de referencia que convierte cualquiera
 de esos espectros en $R_w$, $R'_w$ o $D_{nT,w}$, sus términos de adaptación
 espectral y sus variantes de rango ampliado están en
 [Índices globales de aislamiento (ISO 717)](/phonometry/es/buildings/insulation/insulation-ratings/).
+
+<span id="la-medicion-iso-16283-1"></span>
+
+## La medición (apartados 7 y 9 de ISO 16283-1)
+
+Las funciones consumen niveles por banda; la norma dice de dónde salen esos
+niveles, y equivocarse ahí cambia el resultado más que cualquiera de las
+operaciones anteriores.
+
+**La fuente (apartados 7.1 y 7.2).** El sonido se genera con altavoces
+funcionando simultáneamente en dos posiciones como mínimo, o con un único
+altavoz desplazado a dos posiciones como mínimo. Si son varios altavoces han de
+ser del mismo tipo, excitados al mismo nivel con señales similares pero no
+correlacionadas, y cada uno debe cumplir el requisito de directividad del
+Anexo A. La señal es estacionaria y de espectro continuo, y el nivel promediado
+en energía del recinto emisor no debe variar más de 8 dB entre bandas de tercio
+de octava contiguas, al menos por encima de 100 Hz — conforma el espectro
+(normalmente hace falta un ecualizador gráfico) o recurre a mediciones
+sucesivas en banda limitada. Los altavoces se sitúan a 0,5 m como mínimo de
+cualquier paramento, preferiblemente a 1,0 m como mínimo del elemento
+separador, medido hasta el centro del altavoz más próximo; posiciones distintas
+no deben quedar en planos paralelos a un paramento separados menos de 0,7 m,
+deben distar entre sí 0,7 m como mínimo y al menos dos de ellas 1,4 m como
+mínimo. Cuando el elemento de ensayo es el forjado y el altavoz está en el
+recinto superior, su base queda a 1,0 m como mínimo sobre el suelo.
+
+**Los micrófonos (apartado 7.3).** Un mínimo de **cinco** posiciones por
+recinto — y, con un único altavoz desplazado entre posiciones, cinco por
+recinto *y por posición de altavoz*. No puede haber dos posiciones en el mismo
+plano respecto a los paramentos del recinto, y el conjunto no debe formar una
+retícula regular.
+
+<span id="correccion-por-ruido-de-fondo"></span>
+
+### Corrección por ruido de fondo (apartado 9.2)
+
+Mide otra vez el recinto receptor con la fuente apagada, en las mismas
+posiciones y con el mismo promediado, y compara banda a banda con el nivel
+combinado de señal más fondo $L_{sb}$:
+
+- margen $\ge 10$ dB: usa $L_{sb}$ sin tocarlo;
+- $6 < \text{margen} < 10$ dB: resta el fondo en energía,
+  $L = 10\log_{10}(10^{L_{sb}/10} - 10^{L_b/10})$ (Fórmula 14), con los dos
+  niveles reducidos antes a un decimal;
+- margen $\le 6$ dB: aplica la corrección fija de 1,3 dB y señala la banda en
+  el informe como que está en el límite de la medición.
+
+```python
+import numpy as np
+
+l2_sb = np.array([44.0, 41.0, 39.5, 38.0])   # recinto receptor, fuente encendida
+l2_bg = np.array([30.0, 33.0, 31.0, 34.0])   # recinto receptor, fuente apagada
+margin = l2_sb - l2_bg                       # 14.0  8.0  8.5  4.0 dB
+
+formula_14 = 10 * np.log10(10 ** (l2_sb / 10) - 10 ** (l2_bg / 10))
+l2_corr = np.where(margin >= 10.0, l2_sb,
+                   np.where(margin > 6.0, formula_14, l2_sb - 1.3))
+print(np.round(l2_corr, 2))     # [44.   40.25 38.84 36.7 ]  <- última banda señalada
+```
+
+`building.background_correction` existe, pero implementa la regla de
+**laboratorio de ISO 10140-4** que se usa en
+[Medición del aislamiento en laboratorio](/phonometry/es/buildings/insulation/insulation-lab/),
+cuyo umbral superior es de 15 dB y no de 10 dB. Aplicada a datos de campo resta
+energía en la franja de margen de 10-15 dB en la que ISO 16283-1 no pide nada
+— hasta 0,458 dB con un margen de 10 dB — y, como actúa sobre el recinto
+receptor, eso acaba siendo aislamiento declarado de más, banda a banda, en $D$.
+Para niveles de campo usa la expresión de tres regímenes de arriba.
+
+### Promediado sobre posiciones de altavoz (Fórmula 6)
+
+Con **varios altavoces funcionando simultáneamente** (apartado 7.3.3) hay una
+sola medición: promedia en energía las posiciones de cada recinto, corrige por
+ruido de fondo y forma $D_{nT}$ o $R'$ una sola vez. Con un **único altavoz
+desplazado entre posiciones** (apartado 7.3.4) la norma *no* promedia los
+niveles entre posiciones de altavoz. Forma el resultado para cada posición y
+promedia los *resultados* como factores de transmisión,
+
+$$
+D_{nT} = -10\log_{10}\left[\frac{1}{m}\sum_{j=1}^{m} 10^{-D_{nT,j}/10}\right],
+$$
+
+que es lo que da más peso a la peor posición. Las dos vías no dan el mismo
+número:
+
+```python
+import numpy as np
+# `building` es el import del bloque de aislamiento a ruido aéreo de arriba.
+
+t2 = np.full(16, 0.5)
+l1a, l2a = np.full(16, 80.0), np.full(16, 40.0)   # posición de altavoz 1
+l1b, l2b = np.full(16, 83.0), np.full(16, 37.0)   # posición de altavoz 2
+
+# Apartado 7.3.4: un resultado por posición de altavoz, combinados con la Fórmula (6).
+a = building.airborne_insulation(l1a, l2a, t2, area=10.0, volume=50.0)
+b = building.airborne_insulation(l1b, l2b, t2, area=10.0, volume=50.0)
+dnt = -10 * np.log10(np.mean(10.0 ** (-np.vstack([a.dnt, b.dnt]) / 10.0), axis=0))
+print(round(float(dnt[0]), 1), building.weighted_rating(dnt).rating)        # 42.0 42
+
+# Promediar antes los niveles: otro número, más halagüeño.
+l1m = building.energy_average_level(np.vstack([l1a, l1b]), axis=0)
+l2m = building.energy_average_level(np.vstack([l2a, l2b]), axis=0)
+naive = building.airborne_insulation(l1m, l2m, t2, area=10.0, volume=50.0)
+print(round(float(naive.dnt[0]), 1), building.weighted_rating(naive.dnt).rating)  # 43.0 43
+```
 
 ## Aislamiento a ruido de impactos en campo (ISO 16283-2)
 
@@ -383,7 +495,10 @@ from phonometry import building
 # Situación B (mismo edificio, equipos distintos) -> la desviación típica in situ.
 print(building.single_number_uncertainty("r_w", "B"))       # 0.9  dB  (Tabla 3)
 u = building.band_uncertainty("airborne", "B")              # u por banda (Tabla 2)
-print(len(u.frequencies), u.uncertainties[10])     # 21 1.1  (la banda de 500 Hz)
+# Busca la banda; nunca indexes por posición. La tabla de impactos no tiene
+# banda de 500 Hz siquiera, así que ahí [10] sería 630 Hz sin avisar.
+i = list(u.frequencies).index(500.0)
+print(len(u.frequencies), u.uncertainties[i])      # 21 1.1  (la banda de 500 Hz)
 u.plot()   # el espectro por banda u(f) de la Tabla 2 (requiere matplotlib)
 
 # Informa R'w = 52 dB con un intervalo bilateral al 95 % (k = 1.96, Tabla 8):
@@ -470,7 +585,7 @@ receptor, es
 
 **Cubierto.** La ISO 16283-1:2014 (aislamiento a ruido aéreo de campo: la diferencia
 de niveles, la $D_{nT}$ estandarizada y el $R'$ aparente de los apartados 3.12
-a 3.15 y el promediado de posiciones del apartado 7.8) y la ISO 16283-2:2015
+a 3.15 y el promediado de posiciones del apartado 7.8) y la ISO 16283-2:2020
 (aislamiento a ruido de impactos de campo, las mismas normalizaciones con el
 signo invertido) mediante `building.energy_average_level`,
 `building.airborne_insulation` y `building.impact_insulation`, cada una con su
@@ -483,8 +598,13 @@ globales citados aquí reutilizan los motores verificados de
 ISO 717-1/ISO 717-2.
 
 **No cubierto.** Todas las funciones de campo de aquí toman niveles que el
-usuario ya ha corregido por ruido de fondo (apartado 9.2 de la ISO 16283-1);
-la medición y corrección del ruido de fondo en sí no está implementada. Los
+usuario ya ha corregido por ruido de fondo (apartado 9.2 de la ISO 16283-1). La
+*medición* del nivel de fondo — fuente apagada, mismas posiciones, mismo
+promediado — es cosa del operador, y aquí nada verifica que se haya cumplido el
+suelo de 6 dB; la corrección en sí son tres líneas de NumPy, escritas en
+[Corrección por ruido de fondo](#correccion-por-ruido-de-fondo)
+más arriba. (`building.background_correction` es la variante de *laboratorio*
+de ISO 10140-4 y no coincide con los umbrales de campo.) Los
 propios requisitos de posición y procedimiento de la ISO 16283-1/-2 (el número
 mínimo de posiciones de fuente y micrófono, los procedimientos de baja
 frecuencia con altavoz móvil o barrido de micrófono) no se comprueban: el

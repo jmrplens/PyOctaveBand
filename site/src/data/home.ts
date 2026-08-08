@@ -51,6 +51,12 @@ export interface HomeContent {
 	proof: {
 		title: string;
 		lead: string;
+		/**
+		 * The banner clip that opens the block. Optional while the Spanish
+		 * strings are still to be written: a locale without it simply renders
+		 * the block without the clip.
+		 */
+		banner?: { title: string; description: string; caption: string };
 		spectrum: { title: string; note: string; code: string; alt: string; caption: string };
 		fiche: { title: string; note: string; code: string; caption: string; description: string; linkTitle: string };
 	};
@@ -65,14 +71,20 @@ export interface HomeContent {
  */
 const DOI = '10.5281/zenodo.21215280';
 
+// `octave_filter` is the one-shot function and returns a pair of arrays, so the
+// "draws itself" claim has to be carried by a result object: the PSD estimate
+// returns a SpectralDensityResult and `.plot()` on it is the whole figure call.
 const SPECTRUM_CODE = `import numpy as np
-from phonometry import filters
+from phonometry import filters, signals
 
 fs = 48_000
 t = np.linspace(0, 1, fs, endpoint=False)
 signal = np.sin(2 * np.pi * 100 * t) + np.sin(2 * np.pi * 1000 * t)
 
-spl, freq = filters.octave_filter(signal, fs=fs, fraction=3)`;
+spl, freq = filters.octave_filter(signal, fs=fs, fraction=3)
+
+psd = signals.power_spectral_density(signal, fs=fs)
+ax = psd.plot()          # the result draws itself`;
 
 // The call that renders the committed fiche shown beside it
 // (scripts/generate_reports.py), with the metadata block cut to the four
@@ -134,13 +146,20 @@ export const en: HomeContent = {
 	},
 	proof: {
 		title: 'What it looks like in use',
-		lead: 'Two things the library does that are hard to claim and easy to show: the result of an analysis draws itself, and where a standard prescribes a reporting layout, the same result renders that layout as a PDF.',
+		lead: 'Three things the library does that are hard to claim and easy to show: it computes wave fields and renders them, the result of an analysis draws itself, and where a standard prescribes a reporting layout, the same result renders that layout as a PDF.',
+		banner: {
+			title: 'A wavefront through a hall of columns (2D FDTD)',
+			description:
+				'An 800 Hz plane wavefront sweeps a 4 m rigid-walled hall filled with a staggered colonnade of rigid columns 10 to 17 cm across, simulated at 2.5 mm; every column diffracts the front and sheds a scattered wavelet, and the wavelets interfere until the whole hall is filled with structured energy that then drains through the absorbing ends.',
+			caption:
+				'An 800 Hz front through a hall of rigid columns, 2D FDTD at 2.5 mm: every column diffracts the front until the scattered wavelets fill the hall.',
+		},
 		spectrum: {
 			title: 'An analysis, and the figure it draws',
-			note: 'One-third-octave band levels of a two-tone signal, per IEC 61260-1 band edges, with the raw power spectral density behind them. The figure below is the one committed to the documentation, not a mock-up.',
+			note: 'One-third-octave band levels per the IEC 61260-1 band edges, and the power spectral density of the same record — which is a result object, so one call draws it. The figure below is committed to the documentation, not a mock-up; it is drawn from a six-tone signal rather than the two-tone one in the snippet, so that the band structure is worth looking at.',
 			code: SPECTRUM_CODE,
-			alt: 'One-third-octave spectrum of a two-tone signal, with the raw power spectral density in the background',
-			caption: 'From the Getting Started guide: 33 bands from 12.6 Hz to 20 kHz, peaking at 100 Hz and 1 kHz.',
+			alt: 'One-third-octave spectrum of a six-tone signal, with the raw power spectral density in the background',
+			caption: 'From the Getting Started guide: 33 bands from 12.6 Hz to 20 kHz, with tones at 20, 100, 500, 2000, 4000 and 15 000 Hz standing out of the spectrum behind them.',
 		},
 		fiche: {
 			title: 'A rating, and the fiche it renders',

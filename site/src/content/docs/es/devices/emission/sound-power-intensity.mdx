@@ -315,7 +315,7 @@ El resultado de barrido por intensidad (`SoundPowerIntensityResult`,
 ISO 9614-2) escribe mediante su propio `.report()` una ficha PDF de una
 página con el formato de una hoja de ensayo de potencia acústica,
 compartiendo el diseño y el contenedor `ReportMetadata` de la
-[ficha de los métodos de presión](/phonometry/es/devices/emission/sound-power-pressure/#informe-de-medicion).
+[ficha de los métodos de presión](/phonometry/es/devices/emission/sound-power-pressure/#3-el-informe-de-medición-report).
 La línea de base normativa nombra la ISO 9614-2:1996 y el grado de
 medición, la tabla por bandas lista el nivel de potencia acústica de banda
 $L_W$ derivado de la intensidad, y el recuadro del $L_{WA}$ recoge el $L_W$
@@ -385,8 +385,9 @@ estilo acreditado mediante `.report()`.
 **No cubierto.** ISO 9614-1, el método de intensidad de puntos fijos
 discretos, no es una de las vías de aquí: solo se reutilizan sus
 indicadores de campo, y la determinación de potencia por puntos discretos
-en sí pertenece a la
-[guía de intensidad acústica](/phonometry/es/devices/emission/intensity/). El sesgo
+no está implementada en absoluto; la
+[guía de intensidad acústica](/phonometry/es/devices/emission/intensity/) cubre la
+sonda y los indicadores de campo del Anexo A que ambas partes comparten. El sesgo
 por diferencias finitas de la sonda y el índice de intensidad residual de
 presión son propiedades medidas del instrumento, cubiertas en la misma
 guía. La elección entre las cinco vías, y la declaración ISO 4871 que un

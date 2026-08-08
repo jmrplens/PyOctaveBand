@@ -35,6 +35,32 @@ ground), the simulation is the fallback that still gives a quantitative
 answer; when a closed form exists, prefer it, and use the solver to verify
 the assumptions it rests on.
 
+Those cross-checks are not only arguments: fifteen of the animations in this
+documentation are output from these two solvers, and they are filed on the
+guides whose physics they settle rather than here. Room modes growing on and
+off resonance appear in [room acoustics](../buildings/rooms/room-acoustics.md)
+and [reverberation prediction](../buildings/rooms/reverberation-prediction.md),
+which also carries the hall of columns that turns one wavefront into a mixed
+field; barrier diffraction at two wavelengths in
+[outdoor propagation](../environment/propagation/outdoor-propagation.md)
+and [ground effect and barriers](../environment/propagation/ground-barriers.md);
+downwind and upwind refraction in
+[atmospheric refraction](../environment/propagation/atmospheric-refraction.md);
+the ground-effect lobe pattern in outdoor propagation and in
+[airport noise](../aircraft/airport-noise.md); the standing-wave and
+transmission tubes in [the impedance tube](../materials/absorbers/impedance-tube.md);
+the QRD and metadiffuser panels in
+[diffusers](../materials/diffusers/diffusers.md) and
+[metadiffusers](../materials/diffusers/metadiffusers.md); the slit
+absorber in [metamaterial absorbers](../materials/absorbers/metamaterial-absorbers.md);
+the expansion chamber in [silencers](../devices/noise-control/silencers.md);
+the wall aperture in [panel sound insulation](../buildings/design/panel-sound-insulation.md);
+and the SOFAR duct in [underwater propagation](../underwater/underwater-propagation.md).
+The elastic solver adds two: the bending packet entering an L-junction, on
+[junction transmission](../vibration/structural/junction-transmission.md),
+and the coincidence plate, on panel sound insulation. Both also appear on the
+elastic page below, where the solver that produced them is explained.
+
 ## Pages in this section
 
 - [2D FDTD wave simulation](fdtd-simulation.md): the

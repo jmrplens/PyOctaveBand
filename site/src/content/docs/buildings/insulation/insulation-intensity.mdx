@@ -63,11 +63,20 @@ $$
 
 where the $6$ dB is the diffuse-field offset between the sound pressure level
 and the incident intensity level. The same formula gives the apparent index
-$R'_I$ in the field (ISO 15186-2). Because the intensity method slightly
-*underestimates* the power radiated into a real receiving room, a **modified
-index** $R_{I,M} = R_I + K_c$ reproduces the ISO 10140-2 pressure result; the
-adaptation term $K_c$ (Annex B) is $10 \log_{10}(1 + S_{b2}\lambda/8V_2)$ for a
-well-defined room, or the room-independent $10 \log_{10}(1 + 61.4/f)$. For small
+$R'_I$ in the field (ISO 15186-2). The intensity scan measures the transmitted
+power directly. The reverberation-room pressure method does not: it infers the
+power from the receiving-room level and so *underestimates* it, which makes the
+ISO 10140-2 $R$ come out slightly high. The **modified index**
+$R_{I,M} = R_I + K_c$ adds that same bias back to the intensity result, so an
+intensity measurement can be quoted against pressure-method data
+(ISO 15186-1, Clause 3.10 NOTE 1). Report $R_I$ when the aim is the true
+transmitted power; report $R_{I,M}$ when the aim is comparability with an
+ISO 10140-2 result. Earlier revisions of this guide blamed the bias on the
+intensity method itself, which would have called for subtracting $K_c$, not
+adding it. The adaptation term $K_c$ (Annex B) is $10 \log_{10}(1 + S_{b2}\lambda/8V_2)$ for a
+well-defined room, or the room-independent $10 \log_{10}(1 + 61.4/f)$. The
+first form is the Waterhouse boundary-energy term, which makes the second
+readable as that same term evaluated at a fixed $S_{b2}/V_2$. For small
 elements the **element normalized level difference** replaces $10\log_{10}(S_m/S)$
 with $10\log_{10}(S_m/A_0) + 10\log_{10} N$ ($A_0 = 10\ \text{m}^2$, $N$ element units).
 

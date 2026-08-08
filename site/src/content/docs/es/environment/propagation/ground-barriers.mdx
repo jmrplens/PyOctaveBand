@@ -47,6 +47,7 @@ references:
 ---
 
 import ThemeImage from '../../../../../components/ThemeImage.astro';
+import Video from '../../../../../components/Video.astro';
 
 El [método general ISO 9613-2](/phonometry/es/environment/propagation/outdoor-propagation/)
 pliega los términos de suelo y barrera en correcciones tabuladas basadas en
@@ -167,6 +168,34 @@ tiende a ese suelo rígido; la incidencia rasante ($h_s, h_r \to 0$) da
 $R_p \to -1$; y el efecto suelo es recíproco al intercambiar las alturas de
 fuente y receptor.
 
+### Elección de la impedancia del suelo
+
+Ambos modelos de un parámetro se están evaluando muy **por debajo** de su
+rango de ajuste publicado para cualquier suelo exterior, y el
+`PorousAbsorberWarning` que emiten estas llamadas lo dice: el rango es
+$0{,}01 < X < 1$ con $X = \rho_0 f/\sigma$, y la pradera de arriba se sitúa en
+$X = 3{,}8\times10^{-4}$ a 63 Hz y 0,024 a 4 kHz; la curva del asfalto de la
+figura no llega a entrar en el rango en ningún punto. Por debajo del rango, la
+regresión de Delany-Bazley es una extrapolación cuyo fallo clásico es una parte
+real negativa de la impedancia de superficie; **Miki** es el reajuste con
+restricción de pasividad que conviene preferir ahí (ver el párrafo del rango de
+ajuste en [Absorbentes porosos](/phonometry/es/materials/absorbers/porous-absorbers/)).
+La elección no es cosmética: en el caso de arriba, `model="miki"` mueve la
+atenuación en exceso hasta 3,6 dB (banda de 250 Hz: 0,43 dB con Delany-Bazley,
+−3,18 dB con Miki).
+
+Resistividades al flujo **efectivas** típicas, los rangos que ilustra la figura
+de arriba: nieve reciente ≈ 10, suelo forestal ≈ 50, pradera y pasto
+≈ 150-300, tierra compactada y grava ≈ 1000-3000, asfalto y
+hormigón > 20 000 kPa·s/m².
+
+Para un emplazamiento real, $\sigma$ se ajusta a una medida de diferencia de
+niveles a corta distancia entre dos alturas de micrófono sobre la superficie
+(el método de plantillas de ANSI/ASA S1.18). El valor ajustado es un parámetro
+*efectivo y ligado al modelo*: hay que citarlo junto con el modelo de
+impedancia con el que se ajustó, y no es la resistividad al flujo de aire de
+EN 29053 del mismo material.
+
 ## 2. Difracción de barreras avanzada
 
 `barrier_insertion_loss` y sus piezas dan tres niveles de apantallamiento más
@@ -184,6 +213,34 @@ $$
 
 que tiende a 5 dB en el límite de sombra $N \to 0$ y aproxima la curva de
 fuente puntual de Maekawa dentro de unos 1,5 dB.
+
+El clip de abajo es esa fórmula convertida en campo. Es el
+[solver FDTD 2D](/phonometry/es/simulation/fdtd-simulation/) ejecutado dos veces
+sobre un mismo semiespacio de 12 × 7 m sobre suelo rígido con una pantalla
+rígida delgada de 2,5 m de alto, una vez a 100 Hz y otra a 500 Hz, cada una con
+una simulación de referencia sin barrera sobre el mismo suelo para que la
+pérdida por inserción anotada sea una pérdida real. La geometría fija la
+diferencia de caminos en 1,06 m para el receptor que marca, así que el número
+de Fresnel es $N = 0{,}62$ a 100 Hz y $N = 3{,}1$ a 500 Hz (la misma pantalla,
+un factor cinco de diferencia en $N$ solo porque ha cambiado $\lambda$), y el
+campo enseña lo que eso compra: unos 8 dB frente a unos 17 dB. Hay dos cosas
+que merece la pena mirar. El borde de la región iluminada que baja desde lo
+alto de la pantalla es la frontera de sombra, el lugar geométrico $N \to 0$
+donde la fórmula toca fondo en 5 dB; y dentro de la sombra el campo es una onda
+cilíndrica centrada en lo alto de la pantalla, que es el aspecto que tiene «el
+borde actúa como fuente secundaria». Una advertencia: el suelo del clip es
+perfectamente rígido, así que muestra difracción sola y nada del efecto suelo
+de impedancia finita de la sección 1; el modelo coherente de cuatro caminos de
+más abajo sí lo añade, y su curva oscila decenas de decibelios donde esta es
+suave.
+
+<Video
+  name="anim_fdtd_barrier"
+  width={2400}
+  height={1350}
+  title="Difracción por barrera a 100 Hz y 500 Hz (FDTD 2D)"
+  description="Una simulación FDTD 2D de una fuente puntual tras una barrera rígida delgada de 2,5 metros sobre suelo reflectante, a 100 Hz y 500 Hz en paralelo. La longitud de onda larga difracta sobre el borde y llena la zona de sombra con una pérdida por inserción cercana a 8 dB, mientras que la corta cae en una sombra profunda y limpia de unos 17 dB."
+/>
 
 Los métodos de pantalla delgada comparten las mismas tres magnitudes
 geométricas: los dos segmentos difractados sobre el borde y el camino recto

@@ -21,8 +21,7 @@ confidence intervals), **correlation and time-delay estimation** and the
 **Hilbert envelope**, all stated with the Bendat & Piersol error analysis.
 And two transversal concerns complete the core. **Calibration** decides what
 the digital samples mean physically: results can be referenced to a measured
-calibrator tone or a known sensitivity (dB SPL), or stay in digital full
-scale (dBFS). **Measurement uncertainty** (the GUM and its Monte Carlo
+calibrator tone (dB SPL), or stay in digital full scale (dBFS). **Measurement uncertainty** (the GUM and its Monte Carlo
 supplement) qualifies any result computed from uncertain inputs, which is
 what makes a number defensible in a report.
 
@@ -128,8 +127,8 @@ and carrying its statistical quality.
 What the numbers mean and how much to trust them.
 
 - [Calibration and dBFS](metrology/calibration.md): physical SPL
-  calibration from a calibrator tone (IEC 60942) or a known sensitivity, and
-  the digital dBFS mode.
+  calibration from a calibrator tone (IEC 60942), the stability check it applies
+  to that recording, and the digital dBFS mode.
 - [Measurement uncertainty (GUM and Monte Carlo)](metrology/gum-uncertainty.md):
   the law of propagation of uncertainty and the Monte Carlo method of
   ISO/IEC Guide 98-3, with expanded uncertainty and coverage intervals.

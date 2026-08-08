@@ -1,6 +1,6 @@
 ---
 title: "Time Weighting"
-description: "Fast, Slow and Impulse ballistics per IEC 61672-1."
+description: "The exponential detector of IEC 61672-1:2013: the Fast and Slow time constants, the legacy Impulse ballistics that standard dropped, the tone-burst verification against Table 4, the initial-state options and streaming across blocks."
 references:
   - type: standard
     organization: "International Electrotechnical Commission"
@@ -175,7 +175,9 @@ $$
 | `x` | 1D or 2D array | pressure (any scale) | non-empty | Squared internally; output is a mean-square envelope |
 | `fs` | int | Hz | > 0 | |
 | `mode` | str | — | `'fast'` (default), `'slow'`, `'impulse'` | $\tau$ = 125 ms / 1 s / 35 ms attack + 1.5 s decay |
+| `initial_state` | `None` / `'zero'` / `'first'` / float / array | mean square of $x$ | default `None` (= `'zero'`) | Integrator state $y[-1]$; see sections 5 and 6 |
 | `TimeWeighting(fs, mode)` (class) | — | — | — | Stateful variant for streaming: `process(x)` carries the integrator state between blocks |
+| `TimeWeighting.reset()` | — | — | — | Drops the carried state so the next `process()` starts from rest |
 
 The output has the units of $x^2$: take `10*log10(y / p0**2)` for SPL or use
 the level functions, which do it for you.
@@ -223,10 +225,28 @@ plt.show()
 
 ## 5. Initial state
 
-By default, the exponential integrator starts from rest (`y[-1] = 0`). Passing
-`initial_state=None` leaves this default unspecified, while `initial_state='zero'`
-requests the same zero state explicitly. If the recorded segment begins after a
-steady signal is already present, you can start from the first sample energy instead:
+The integrator needs a starting value for $y[-1]$, and there are four ways to
+give it.
+
+- **`None` (the default) and `'zero'` are the same thing**, a start from rest, so
+  the level climbs through the settling ramp of section 1.
+- **`'first'` seeds it with the square of the very first sample**, $x[0]^2$. That
+  is an unbiased but extremely noisy estimate of the mean square — one degree of
+  freedom — and for a tone it depends entirely on the phase at the cut. In the
+  snippet below it is *exactly zero*, because a sine starting at $t = 0$ starts
+  at a zero crossing, so `'first'` there is bit-identical to `'zero'`.
+- **A float** resumes a state you saved yourself, which is what block processing
+  does in section 6.
+- **An array** broadcastable to the input shape without the time axis does the
+  same per channel.
+
+If the record is a continuation of a signal already running, seed the integrator
+with something robust — the mean square of the first half second,
+`initial_state=float(np.mean(recording[:fs // 2] ** 2))`, is a far better
+estimate than a single sample. If the record is the *start* of the event, do not
+seed at all: let it start from rest and discard the first $5\tau$ (0.6 s Fast,
+5 s Slow), which is exactly what `ln_levels` does internally before computing
+percentiles.
 
 ```python
 import numpy as np
@@ -236,7 +256,10 @@ from phonometry import filters
 fs = 48000
 recording = 0.2 * np.sin(2 * np.pi * 1000 * np.arange(fs) / fs)
 
-energy_envelope = filters.time_weighting(recording, fs, mode='fast', initial_state='first')
+# Robust seed: the mean square of the first half second, not one sample.
+energy_envelope = filters.time_weighting(
+    recording, fs, mode='fast',
+    initial_state=float(np.mean(recording[:fs // 2] ** 2)))
 ```
 
 ## 6. Block processing

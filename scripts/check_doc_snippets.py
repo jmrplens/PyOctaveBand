@@ -74,7 +74,6 @@ _SKIP: dict[str, str] = {
     "detailed-prediction": "excerpt: starts from the paths of the prose",
     "electroacoustics": "excerpt: starts from the captured signal of the prose",
     "flanking-lab": "excerpt: starts from the measured levels of the prose",
-    "impedance-tube": "excerpt: starts from the measured spectrum of the prose",
     "impulsive-sound": "excerpt: starts from the recording of the prose",
     "intensity": "excerpt: starts from the band levels of the prose",
     "machine-diagnostics": "excerpt: starts from the record of the prose",
@@ -92,11 +91,6 @@ _SKIP: dict[str, str] = {
     "time-frequency": "excerpt: starts from the record of the prose",
     "time-weighting": "excerpt: starts from the block stream of the prose",
     "underwater-acoustics": "excerpt: starts from the hydrophone record",
-    # Known defect, not an excerpt: the constant the fiche needs is defined in
-    # multiple_shock_vibration but is not re-exported by the vibration
-    # namespace the page imports, so the snippet cannot run as printed.
-    "multiple-shock-vibration": "teaches vibration.RISK_THRESHOLDS_MALE, which "
-                                "the package does not export",
 }
 
 #: Timeout per page, generous enough for the FDTD and ECMA pages.

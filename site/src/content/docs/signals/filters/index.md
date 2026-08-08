@@ -6,10 +6,13 @@ description: "Fractional octave band analysis in phonometry: the ANSI S1.11 / IE
 Acoustic analysis rarely wants a raw FFT: standards, ratings and human hearing
 all work in **fractional octave bands**, frequency intervals whose width grows
 proportionally with frequency. phonometry implements them as banks of
-recursive filters whose **-3 dB points sit exactly on the ANSI S1.11 band
-edges**, so band levels are comparable whichever filter architecture computes
-them, and whose designs are verified against the class tolerances of
-**IEC 61260-1:2014**.
+recursive filters whose designs are verified against the class tolerances of
+**IEC 61260-1:2014**. The default Butterworth bank, and the Chebyshev II and
+Bessel alternatives, put their **-3 dB points exactly on the ANSI S1.11 band
+edges**, so their band levels are directly comparable; the two equiripple
+architectures (Chebyshev I, Elliptic) place their ripple edge there instead and
+consequently read a few tenths of a decibel high in every band, which is why a
+campaign should fix one architecture and keep it.
 
 The foundation page is [Filter Banks](/phonometry/signals/filters/filter-banks/). It
 covers the band mathematics, how a signal is decomposed into 1/1, 1/3 or

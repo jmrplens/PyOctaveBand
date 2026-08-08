@@ -72,18 +72,40 @@ pnl = aircraft.perceived_noise_level(spl)      # PNdB
 
 ## Tone correction
 
-Spectral irregularities (fan/turbine tones) are penalised by a **tone
-correction** $C$, found with the slope ("encircling") method: slopes are
-smoothed to a background spectrum $\mathrm{SPL}''$, the tone excess
-$F = \mathrm{SPL} - \mathrm{SPL}''$ above 1.5 dB is mapped to a correction
-factor (frequency-split at 500 Hz / 5000 Hz, capped at 6⅔ dB), and the maximum
-over bands is taken. The implementation reproduces the ICAO Doc 9501 ETM Vol. I
-Table 3-7 turbofan example exactly ($C = 2.0\ \text{dB}$ at 2500 Hz).
+A pure tone is judged much noisier than the same energy spread across its
+one-third-octave band, so spectral irregularities (fan and turbine tones) are
+penalised by a **tone correction** $C$. The slope ("encircling") method
+reconstructs what the spectrum would look like *without* the tone by smoothing
+the band-to-band slopes into a background $\mathrm{SPL}''$, so the excess
+$F = \mathrm{SPL} - \mathrm{SPL}''$ is a tone-only quantity. Above 1.5 dB it is
+mapped to a correction factor by the rule of Table A2-2, and the maximum over
+bands is taken:
+
+| Band | $F < 3$ dB | $3 \le F < 20$ dB | $F \ge 20$ dB |
+|---|---|---|---|
+| 50 Hz-400 Hz and 6.3-10 kHz | $F/3 - 0.5$ | $F/6$ | $3\tfrac{1}{3}$ dB |
+| 500 Hz-5 kHz | $2F/3 - 1$ | $F/3$ | $6\tfrac{2}{3}$ dB |
+
+The mid-band branch penalises a tone twice as hard, which is why a 2500 Hz fan
+tone dominates the correction of a turbofan spectrum. The implementation
+reproduces the ICAO Doc 9501 ETM Vol. I Table 3-7 turbofan example exactly
+($C = 2.0\ \text{dB}$ at 2500 Hz).
+
+Two traps come with the method. A rippled but tone-free spectrum can produce a
+correction, which the standard itself allows you to reject after a narrow-band
+re-analysis (§4.3.1 Step 10). And a tone falling between two bands splits its
+excess, so the raw correction comes out too small; the **bandsharing
+adjustment** $\Delta_B$ — the shortfall of $C$ at the $\mathrm{PNLTM}$ record
+against the mean of the records within one second of it — adds it back before
+the 10 dB-down window is located.
 
 ```python
 from phonometry import aircraft
 
 c = aircraft.tone_correction(spl)              # dB; added to PNL to give PNLT
+# start_band=2 (80 Hz) is the aeroplane start of analysis; a helicopter
+# procedure starts at 50 Hz, which is what procedure="helicopter" selects in
+# effective_perceived_noise_level below.
 ```
 
 ## EPNL
@@ -106,9 +128,12 @@ res.plot()   # PNL/PNLT time history (needs matplotlib)
 ```
 
 `effective_perceived_noise_level` returns an `EPNLResult` bundling the per-record
-`pnl`, `tone_correction`, `pnlt`, the peak `pnltm`, the `duration_correction`,
-the `epnl` and the 10 dB-down `band_limits`. The reference-condition
-integrated-method example of ETM Vol. I Table 4-4 is reproduced as
+`pnl`, `tone_correction`, `pnlt`, the peak `pnltm`, the `bandsharing_adjustment`,
+the `duration_correction`, the `epnl` and the 10 dB-down `band_limits`. Its
+`procedure=` argument starts the analysis at 80 Hz for an aeroplane (the
+default) and at 50 Hz for a helicopter. The reference-condition
+integrated-method example of ETM Vol. I Table 4-4 — a different, real
+certification time history — is reproduced as
 $\mathrm{EPNL} = 92.6\ \text{EPNdB}$.
 
 <details>
@@ -173,7 +198,10 @@ res.report(
 ```
 
 The example fiche is regenerated with `make reports` and kept rendered in the
-repository; click the preview to open the PDF.
+repository; click the preview to open the PDF. It is rendered from its own,
+quieter synthetic flyover (EPNL 98.3 EPNdB), not from the spectra of the figure
+above: run those through the same call and the fiche reports 114.0 EPNdB and a
+FAIL against the same 101 EPNdB limit, which is the verdict row doing its job.
 
 <ReportPreview
 	name="icao_epnl_example"

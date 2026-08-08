@@ -1,6 +1,6 @@
 ---
 title: "Ponderación temporal"
-description: "Ponderación temporal Fast, Slow e Impulse según IEC 61672-1."
+description: "El detector exponencial de IEC 61672-1:2013: las constantes de tiempo Fast y Slow, la balística Impulse heredada que esa norma retiró, la verificación con ráfaga de tono frente a la Tabla 4, las opciones de estado inicial y el streaming entre bloques."
 references:
   - type: standard
     organization: "International Electrotechnical Commission"
@@ -184,7 +184,9 @@ $$
 | `x` | array 1D o 2D | presión (cualquier escala) | no vacío | Se eleva al cuadrado internamente; la salida es una envolvente cuadrática media |
 | `fs` | int | Hz | > 0 | |
 | `mode` | str | — | `'fast'` (por defecto), `'slow'`, `'impulse'` | $\tau$ = 125 ms / 1 s / ataque de 35 ms + caída de 1,5 s |
+| `initial_state` | `None` / `'zero'` / `'first'` / float / array | cuadrado medio de $x$ | por defecto `None` (= `'zero'`) | Estado del integrador $y[-1]$; ver los apartados 5 y 6 |
 | `TimeWeighting(fs, mode)` (clase) | — | — | — | Variante con estado para streaming: `process(x)` conserva el estado del integrador entre bloques |
+| `TimeWeighting.reset()` | — | — | — | Descarta el estado arrastrado para que el siguiente `process()` arranque del reposo |
 
 La salida tiene las unidades de $x^2$: toma `10*log10(y / p0**2)` para SPL o
 usa las funciones de nivel, que lo hacen por ti.
@@ -232,11 +234,30 @@ plt.show()
 
 ## 5. Estado inicial
 
-Por defecto, el integrador exponencial parte del reposo (`y[-1] = 0`). Pasar
-`initial_state=None` deja ese comportamiento por defecto, mientras que
-`initial_state='zero'` lo solicita explícitamente. Si el segmento grabado
-comienza con una señal estacionaria ya presente, puedes partir de la energía de
-la primera muestra:
+El integrador necesita un valor de partida para $y[-1]$, y hay cuatro maneras
+de dárselo.
+
+- **`None` (el valor por defecto) y `'zero'` son lo mismo**, un arranque desde
+  el reposo, así que el nivel sube por la rampa de establecimiento del
+  apartado 1.
+- **`'first'` lo siembra con el cuadrado de la primerísima muestra**, $x[0]^2$.
+  Es una estimación insesgada pero extremadamente ruidosa del cuadrado medio
+  (un grado de libertad) y, para un tono, depende por completo de la fase en el
+  corte. En el fragmento de abajo vale *exactamente cero*, porque un seno que
+  empieza en $t = 0$ empieza en un paso por cero, así que ahí `'first'` es
+  idéntico bit a bit a `'zero'`.
+- **Un float** reanuda un estado que hayas guardado tú, que es lo que hace el
+  procesado por bloques del apartado 6.
+- **Un array** difundible a la forma de la entrada sin el eje temporal hace lo
+  mismo por canal.
+
+Si el registro es la continuación de una señal que ya venía sonando, siembra el
+integrador con algo robusto: el cuadrado medio del primer medio segundo,
+`initial_state=float(np.mean(recording[:fs // 2] ** 2))`, es una estimación
+mucho mejor que una muestra suelta. Si el registro es el *comienzo* del suceso,
+no siembres nada: deja que arranque del reposo y descarta los primeros $5\tau$
+(0,6 s en Fast, 5 s en Slow), que es exactamente lo que `ln_levels` hace por
+dentro antes de calcular percentiles.
 
 ```python
 import numpy as np
@@ -246,7 +267,10 @@ from phonometry import filters
 fs = 48000
 recording = 0.2 * np.sin(2 * np.pi * 1000 * np.arange(fs) / fs)
 
-energy_envelope = filters.time_weighting(recording, fs, mode='fast', initial_state='first')
+# Semilla robusta: el cuadrado medio del primer medio segundo, no una muestra.
+energy_envelope = filters.time_weighting(
+    recording, fs, mode='fast',
+    initial_state=float(np.mean(recording[:fs // 2] ** 2)))
 ```
 
 ## 6. Procesado por bloques

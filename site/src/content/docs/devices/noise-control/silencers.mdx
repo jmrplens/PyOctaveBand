@@ -204,6 +204,22 @@ $f_0 = \tfrac{c}{2\pi}\sqrt{S_n/(l_e V)}$ (Bies Eq. (8.46)) and $f = c/4l_e$
 (Eq. (8.44)). An **extended-tube chamber** buries quarter-wave side branches in
 an expansion chamber to fill the plain chamber's troughs.
 
+Both lengths are **effective** lengths, and both functions take them that way
+(`neck_length` and `length` are documented as $l_e$, end corrections included).
+The air in a neck does not stop moving at the mouth: it drags a slug of air
+along on each side, so the mass that resonates against the cavity belongs to a
+tube longer than the one that was drilled. Add about $0.85a$ per flanged end
+and about $0.61a$ per free end, for a neck of radius $a$, at both ends of a
+Helmholtz neck and at the open (duct) end only of a quarter-wave stub. The
+resonator drawn below is the case in point: its neck is 11.3 mm across
+($a = 5.64$ mm) and 20 mm long, so $l_e \approx 20 + 2 \times 4.8 =
+29.6$ mm and the tuning falls from the 122.1 Hz the drilled length returns to
+100.3 Hz — a 22 % error on a notch the figure below shows to be only a few
+hertz wide. The shorter and wider the neck, the larger the correction in
+relative terms, which is exactly the regime a compact resonator lives in, so
+the practical procedure is to compute a nominal length, build it long, and
+trim it against a measurement.
+
 ```python
 import numpy as np
 from phonometry import (
@@ -214,12 +230,23 @@ f = np.linspace(20.0, 600.0, 4000)
 
 hr = helmholtz_resonator(f, duct_area=0.01, neck_area=1e-4,
                          neck_length=0.02, cavity_volume=1e-3)
-print(round(float(hr.resonances[0]), 1))       # tuning frequency, Hz
+print(round(float(hr.resonances[0]), 1))       # 122.1 Hz, for le = 20 mm
 hr.plot()   # TL spike at the tuning frequency (needs matplotlib)
 
-qw = quarter_wave_resonator(f, duct_area=0.01, length=1.516, branch_area=2e-3,
-                            speed_of_sound=343.24)
-print(round(float(qw.resonances[0]), 1))        # 56.6 Hz (Bies Example 8.1)
+qw = quarter_wave_resonator(f, duct_area=0.01, length=0.3, branch_area=2e-3)
+print(round(float(qw.resonances[0]), 1))       # 285.8 Hz = c / 4 le
+
+# Bies Example 8.1, the published anchor: a 1.516 m stub at c = 343.24 m/s.
+print(round(float(quarter_wave_resonator(
+    f, duct_area=0.01, length=1.516, branch_area=2e-3,
+    speed_of_sound=343.24).resonances[0]), 1))  # 56.6 Hz
+
+# The same stub in hot exhaust gas: c(500 degC) = 343*sqrt(773/293) = 557 m/s
+# (see the caution below), which moves the notch by a factor 1.62.
+f_hot = np.linspace(20.0, 900.0, 6000)
+qw_hot = quarter_wave_resonator(f_hot, duct_area=0.01, length=0.3,
+                                branch_area=2e-3, speed_of_sound=557.0)
+print(round(float(qw_hot.resonances[0]), 1))   # 464.2 Hz, not 285.8
 
 # An inlet extension of L/4 fills the first expansion-chamber trough.
 et = extended_tube_chamber(f, length=0.4, chamber_area=0.04, pipe_area=0.01,
@@ -302,6 +329,24 @@ same duct.
 *A quarter-wave stub is just a closed tube of the right length: 0.3 m of
 pipe puts the spike at $c/4l_e \approx 285\ \text{Hz}$, and the 20 cm² branch
 area only sets how strongly the stub loads the duct.*
+
+:::caution
+**Tune at the working temperature.**
+Every frequency on this page is a wavelength condition, so all of them scale
+directly with the speed of sound **in the working gas**: $kL = \pi/2$ for the
+chamber, $c/4l_e$ for the stub, and the $c$ in front of the Helmholtz square
+root. For air, $c(T) = 343\sqrt{T/293}$ with $T$ in kelvin, so an exhaust at
+500 °C (773 K) runs at about 557 m/s, a factor 1.62, and the 0.3 m stub cut for
+285.8 Hz on cold-air values sings at 464 Hz once the pipe is hot. Pass the
+working values — `speed_of_sound=` and `density=`, since the density scales
+every characteristic impedance and therefore the insertion loss. The
+`speed_of_sound=557.0` call in the section 1 snippet above is that retune, and
+it prints 464.2 Hz for the same 0.3 m stub.
+
+A mean flow shifts the notch further and lowers its depth, and the temperature
+falls along a real tailpipe, so an exhaust resonator is checked at the hot and
+cold extremes and accepted with margin rather than designed at one value.
+:::
 
 <details>
 <summary>Show the code for this figure</summary>
@@ -409,12 +454,21 @@ by the airflow resistivity, is the same material theory as
 
 ## Cross-check against the FDTD solver
 
-The four-pole expansion chamber is cross-checked against the independent 2D
-[FDTD wave solver](/phonometry/simulation/fdtd-simulation/): a plane-wave duct that
-widens into a chamber and narrows back transmits far less at the four-pole TL
-peak ($kL = \pi/2$) than at the transparent trough ($kL = \pi$), and the
-measured amplitude ratio reproduces the closed-form peak transmission loss to a
-fraction of a decibel.
+That cross-check is the clip embedded in section 1, and it is worth returning
+to it now with the algebra in hand. The four-pole expansion chamber is checked
+against the independent 2D
+[FDTD wave solver](/phonometry/simulation/fdtd-simulation/), which shares no
+formula and no assumption with the transfer-matrix product beyond the wave
+equation itself: a plane-wave duct that widens into the same 0.30 m, $m = 4$
+chamber and narrows back transmits far less at the four-pole TL peak
+($kL = \pi/2$, here 286 Hz) than at the transparent trough ($kL = \pi$,
+572 Hz). The amplitude ratio measured downstream in the field is the
+transmission loss annotated on the clip, 6.5 dB at 286 Hz and 0.0 dB at
+572 Hz, against the 6.55 dB the closed form gives for $m = 4$. Agreement that
+close rules out an algebra error on either side. The two must eventually part
+company above the duct's first cut-on frequency, where higher-order modes
+propagate: the two-dimensional solver keeps working there and the plane-wave
+algebra does not.
 
 
 ## What this guide covers

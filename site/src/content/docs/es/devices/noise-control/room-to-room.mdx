@@ -35,6 +35,7 @@ references:
 ---
 
 import ThemeImage from '../../../../../components/ThemeImage.astro';
+import Video from '../../../../../components/Video.astro';
 
 Una máquina funciona en un recinto, un muro separa ese recinto de otro
 ocupado, y alguien quiere saber qué oye el ocupante. Es una cadena corta, y
@@ -75,7 +76,9 @@ $$
 
 con $\text{NR} = L_{p1} - L_{p2}$ la reducción de ruido entre los dos campos
 reverberantes, $\text{TL} = 10\log_{10}(1/\tau)$ la pérdida por transmisión de la
-partición (la magnitud que UNE llama índice de reducción acústica $R$), $S_w$
+partición — la magnitud que mide ISO 10140-2 y que ISO 717-1 valora como
+índice de reducción acústica $R$, de modo que el $R$ y el $R_w$ de un informe
+de ensayo de laboratorio entran directamente en esta ecuación —, $S_w$
 el área de la partición y $S_2 \alpha_2$ el área de absorción sonora
 equivalente del recinto receptor.
 
@@ -378,6 +381,24 @@ conexiones mecánicas y fugas de aire**. Un falso techo continuo por encima de
 la partición, un paso de instalaciones, el hueco bajo una puerta, o
 simplemente el muro que no llega al forjado, y la respuesta de la ecuación
 pasa a ser una cota superior.
+
+El clip de abajo dibuja lo que la ecuación deja fuera. La cadena del
+apartado 3 tarifa solo el camino directo, la vía **Dd** a través de la
+partición; los otros tres pulsos salen del recinto emisor por los muros,
+el suelo o el techo de flanco — **Ff** de flanco a flanco, **Fd** de flanco a
+partición, **Df** de partición a flanco — y vuelven a radiar al otro lado sin
+haber pasado nunca por la pérdida por transmisión que usó el cálculo. Cada
+camino mengua en cada elemento y en cada unión que atraviesa, y por eso
+ninguno tiene que ser grande por sí solo para que la suma de los tres domine
+sobre una buena partición.
+
+<Video
+  name="anim_flanking_paths"
+  width={2400}
+  height={1350}
+  title="Pulsos de energía por el camino directo y los de flanco"
+  description="Los pulsos de energía salen del recinto emisor por el camino directo Dd y por los caminos de flanco Ff, Fd y Df, menguando en cada elemento y en cada unión, y la etiqueta de cada camino se enciende cuando su pulso vuelve a radiar en el recinto receptor."
+/>
 
 `DesignCriterion.flanking_penalty` es el cargo explícito por eso, en
 decibelios restados a la

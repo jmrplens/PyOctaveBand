@@ -92,18 +92,25 @@ a real component sits between the two model heights, its energy is distributed
 proportionately over them.
 
 For each 1/3-octave band the flow equation turns a single-vehicle sound power
-into a power per metre of line (2.3.2), or, for a stationary vehicle, into the
-idling equivalent over the reference period (2.3.4):
+into a power per metre of line (2.3.2):
 
 $$
 L'_{W,\mathrm{eq,line},i}(\psi,\varphi) = L_{W,0,\mathrm{dir},i}(\psi,\varphi)
   + 10\,\log_{10}\!\left(\frac{Q}{1000\,v}\right),
-\qquad
-+\,10\,\log_{10}\!\left(\frac{T_\mathrm{idle}}{T_\mathrm{ref}\,L}\right).
 $$
 
-$Q$ is in vehicles per hour, $v$ in km/h, $L$ the length of the track section in
-metres. Note the unit: the flow term uses km/h, while the roughness conversion
+or, for a stationary vehicle, the same directional power referred to the idling
+time over the reference period (2.3.4):
+
+$$
+L'_{W,\mathrm{eq,line},i}(\psi,\varphi) = L_{W,0,\mathrm{dir},i}(\psi,\varphi)
+  + 10\,\log_{10}\!\left(\frac{T_\mathrm{idle}}{T_\mathrm{ref}\,L}\right).
+$$
+
+The second replaces the first; it does not add to it. $Q$ is in vehicles per
+hour, $v$ in km/h, $L$ the length of the track section in metres, and
+$T_\mathrm{idle}$ and $T_\mathrm{ref}$ share whatever unit of time they are
+given in. Note the unit: the flow term uses km/h, while the roughness conversion
 two sections down uses m/s. Both are correct, and mixing them up is the single
 most expensive mistake available in this model.
 

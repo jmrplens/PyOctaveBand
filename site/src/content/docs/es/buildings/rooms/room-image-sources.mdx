@@ -108,21 +108,24 @@ res = room.image_source_rir(
     receiver=(5.2, 3.4, 1.7),
     absorption=0.12,          # absorción de pared uniforme (escalar)
     fs=48000,
-    max_order=12,
+    # Orden suficiente para cubrir un ajuste de T30; véase «Elegir max_order,
+    # duration y fs» más abajo. El 20 por defecto trunca a la mitad la cola de
+    # esta sala.
+    max_order=60,
 )
 
 print(res.ir.shape)                          # (n_muestras,) RIR de banda ancha
-print(round(res.direct_time * 1000, 2))      # llegada del sonido directo, ms
-print(res.times.size == room.audible_image_count(12) + 1)   # imágenes + fuente
+print(round(res.direct_time * 1000, 2))      # 10.72  llegada del sonido directo, ms
+print(res.times.size == room.audible_image_count(60) + 1)   # imágenes + fuente
 
-res.plot()   # el reflectograma de la figura de abajo
+res.plot()   # el reflectograma; la figura de abajo dibuja la misma sala a orden 10
 
 # La RIR sintética entra directa en el análisis de decaimiento de ISO 3382.
 params = room.room_parameters(res.ir, res.fs, limits=None)
 print(bool(params.t30_valid[0]))             # True: la ventana de decaimiento es usable
-# T30 crece hacia la estimación de Eyring al aumentar max_order (ver abajo); a
-# orden bajo la cola especular se trunca, trátalo como un valor limitado por orden.
-print(round(float(params.t30[0]), 2))        # tiempo de reverberación, s
+print(round(float(params.t30[0]), 2))        # 1.06 s, especular
+print(round(float(room.eyring_reverberation_time(105.0, [(142.0, 0.12)])), 2))
+# 0.93 s, la estimación difusa de Eyring para la misma sala
 ```
 
 `image_source_rir` devuelve un `ImageSourceResult`. Su `ir` es la RIR muestreada
@@ -252,6 +255,56 @@ reflexiones `times`/`distances`/`orders`/`amplitudes`/`image_positions`) con
 `.plot()` y una propiedad `direct_time`. `audible_image_count(order)` da el
 recuento de imágenes de la caja de zapatos y `reflection_density(t, volume)` la
 densidad $4\pi c^3 t^2 / V$.
+
+### Elegir `max_order`, `duration` y `fs`
+
+`max_order` no es un mando de calidad, es un **horizonte temporal**. La retícula
+de imágenes solo está completa hasta un radio de aproximadamente `max_order` ×
+la dimensión más corta de la sala, así que cubrir $t$ segundos de decaimiento
+exige
+
+$$
+\text{orden} \approx \frac{c\,t}{L_\text{min}} .
+$$
+
+Un ajuste de T30 abarca 35 dB, unos $0{,}58\,T$ de decaimiento. La sala de
+7 × 5 × 3 m de arriba tiene $L_\text{min} = 3$ m y un tiempo de Eyring cercano a
+0,93 s, así que necesita $343 \times 0{,}54 / 3 \approx 60$. Por debajo de eso
+la cola sencillamente falta, y la T30 ajustada sale corta:
+
+| `max_order` | imágenes audibles | T30 ajustada | tiempo de ejecución |
+| ---: | ---: | ---: | ---: |
+| 12 | 2 624 | 0,28 s | < 0,1 s |
+| 20 (por defecto) | 11 520 | 0,43 s | < 0,1 s |
+| 30 | 37 880 | 0,60 s | < 0,1 s |
+| 40 | 88 640 | 0,75 s | 0,1 s |
+| 60 | 295 360 | 1,06 s | 0,2 s |
+
+La estimación de Eyring para esta sala es de 0,93 s, así que el orden 12 se
+queda corto por un factor de 3,3 y el 20 por defecto, por un factor de 2,1. La
+objeción del coste no vale: el orden 60 son 295 360 imágenes y se resuelve en
+dos décimas de segundo.
+
+**`t30_valid` no ve una retícula truncada.** Lee el rango de decaimiento del
+array que le entreguen, así que devuelve `True` en todos los órdenes de la tabla
+anterior. La bandera detecta una *grabación* ruidosa o demasiado corta; no puede
+detectar un modelo que dejó de generar reflexiones. Una `duration` más corta que
+el decaimiento trunca la cola exactamente igual, y en silencio.
+
+Otras dos advertencias pertenecen a este mismo apartado. `fs` cuantiza todas las
+llegadas a la retícula de muestreo, así que el trabajo con reflexiones tempranas
+— tiempos de llegada, ITDG, fracciones laterales — debe leer la tabla exacta
+`times` / `amplitudes` en lugar de buscar picos en la `ir` muestreada. Y
+`absorption` entra como un factor de reflexión de presión real e independiente
+del ángulo $\sqrt{1-\alpha}$, de modo que la incidencia rasante se trata igual
+que la normal.
+
+Y por último, la frontera honesta: si el orden que hace falta para cubrir el
+tiempo de reverberación vuelve impracticable la ejecución — una sala grande con
+un $L_\text{min}$ pequeño, o una cola larga — al método de imágenes puro se le
+está pidiendo un trabajo que corresponde a un modelo híbrido con cola tardía
+estadística, o al
+[solver FDTD](/phonometry/es/simulation/fdtd-simulation/).
 
 ## 2. Campo estacionario de sala
 
@@ -447,6 +500,39 @@ unos 60 Hz los modos axiales están aislados y cada uno es audible por separado;
 hacia la frecuencia de Schroeder de 175 Hz ($T = 0{,}8$ s) la familia oblicua ya
 ha rellenado el espectro y la densidad modal ha superado un modo por hercio, que
 es donde toma el relevo el campo estadístico del apartado 2.*
+
+<details>
+<summary>Mostrar el código de esta figura</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+# `room` es el import del bloque de room_modes de arriba.
+
+# Long, Architectural Acoustics 2.ª ed., tabla 8.1.
+modes = room.room_modes((7.0, 5.0, 3.0), max_frequency=200.0,
+                        speed_of_sound=344.0, reverberation_time=0.8)
+
+# En una línea: la escalera de modos por familia con la densidad modal debajo.
+modes.plot(language="es")
+plt.show()
+
+# A mano: dispersión de las frecuencias propias, una fila por familia.
+kinds = np.asarray(modes.kinds)
+rows = {"axial": 0, "tangential": 1, "oblique": 2}
+fig, ax = plt.subplots()
+for name, y in rows.items():
+    sel = kinds == name
+    ax.vlines(np.asarray(modes.frequencies)[sel], y, y + 0.8, label=name)
+ax.axvline(modes.schroeder_frequency, ls=":", color="k",
+           label=f"Schroeder {modes.schroeder_frequency:.0f} Hz")
+ax.set_yticks([0.4, 1.4, 2.4], list(rows))
+ax.set_xlabel("Frecuencia [Hz]")
+ax.legend()
+plt.show()
+```
+
+</details>
 
 ### Parámetros de `room_modes()`
 

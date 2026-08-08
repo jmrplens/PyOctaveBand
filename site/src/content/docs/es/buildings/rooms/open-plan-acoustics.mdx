@@ -25,7 +25,8 @@ import ReportPreview from '../../../../../components/ReportPreview.astro';
 Una oficina diáfana no es un problema de reverberación; es un problema de
 privacidad, y una sala que luce bien en los parámetros de sala cerrada puede
 suspenderlo igualmente. ISO 3382-3 caracteriza por ello la oficina con
-cuatro números únicos medidos a lo largo de una línea de puestos de trabajo,
+cuatro números únicos — $r_D$, $D_{2,S}$, $L_{p,A,S,4m}$ y el ruido de fondo
+medio $L_{p,A,B}$ — medidos a lo largo de una línea de puestos de trabajo,
 alejándose de un hablante. Esta guía cubre esa cadena de medición: las
 magnitudes, la línea de medición a escala y la ficha acreditada. Las
 respuestas al impulso y los niveles que la sustentan se adquieren como en
@@ -41,7 +42,12 @@ La acústica de oficinas diáfanas trata de la **privacidad del habla**: con
 qué rapidez el habla de un hablante se desvanece hasta la ininteligibilidad a
 medida que uno se aleja. Los niveles y el STI se miden a lo largo de una fila
 de puestos de trabajo (al menos 4 posiciones, preferiblemente 6–10), y cuatro
-magnitudes de un solo número resumen la sala. La **tasa de decaimiento
+magnitudes de un solo número resumen la sala: la distancia de distracción
+$r_D$, la tasa de decaimiento espacial $D_{2,S}$, el nivel de habla a 4 m
+$L_{p,A,S,4m}$ y el ruido de fondo medio ponderado A $L_{p,A,B}$
+(apartado 6.4). La distancia de privacidad $r_P$ y el STI en el puesto más
+cercano son añadidos opcionales; `open_plan_metrics` devuelve $D_{2,S}$,
+$L_{p,A,S,4m}$, $r_D$ y $r_P$. La **tasa de decaimiento
 espacial** del habla ponderada A es la pendiente del nivel frente a
 $\log_{10}(r/r_0)$, escalada a una cifra por duplicación usando solo las posiciones
 de 2–16 m,
@@ -56,7 +62,21 @@ distracción** $r_D$ (STI = 0,50) y la **distancia de privacidad** $r_P$
 Las buenas oficinas empujan $r_D$ por debajo de ~5 m; las malas dejan el habla
 molesta más allá de 10 m.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_open_plan_es.svg" alt="Línea de medición de oficina diáfana ISO 3382-3 desde la fuente a 1 m a lo largo de posiciones de 2 m a 16 m, que alimenta las cuatro magnitudes de índice único D2,S, Lp,A,S,4m, rD y rP" width="86%" />
+$L_{p,A,B}$ es la cuarta magnitud exigida y no es un adorno: el ruido de fondo
+se mide en bandas de octava en todas las posiciones con la misma integración de
+$\ge 10$ s, se pondera A y se promedia sobre la línea, y esa media es el
+enmascarador frente al que se calcula el STI de cada posición. Promediarlo
+espacialmente es lo que deja $r_D$ y $r_P$ sin ambigüedad. Es también la razón
+de que el diseño de una oficina diáfana tenga dos palancas y no una
+— **atenuación** (mamparas, techo absorbente, distribución: suben $D_{2,S}$ y
+bajan $L_{p,A,S,4m}$) y **enmascaramiento** (subir el fondo para que el habla
+pierda antes la inteligibilidad) — y de que la oficina se mida amueblada,
+desocupada y con las instalaciones en marcha. Una oficina medida con la
+ventilación o el sistema de enmascaramiento bajados devuelve un STI mayor en
+todas las posiciones y desplaza las dos distancias metros hacia fuera sin que
+nada haya cambiado en la sala.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_open_plan_es.svg" alt="Línea de medición de oficina diáfana ISO 3382-3 desde la fuente a 1 m a lo largo de posiciones de 2 m a 16 m, que alimenta las cuatro magnitudes que devuelve open_plan_metrics, D2,S, Lp,A,S,4m, rD y rP, con una nota de que el apartado 4 exige además el ruido de fondo medio ponderado A Lp,A,B" width="86%" />
 
 ```python
 import numpy as np
@@ -166,12 +186,89 @@ plt.show()
 
 </details>
 
+### Del ruido rosa medido a $L_{p,A,S,n}$
+
+Un altavoz no es un hablante, así que ISO 3382-3 no usa nunca su nivel
+directamente. El apartado 6.2 mide la *sala* con ruido rosa y después vuelve a
+vestir el resultado con el espectro de una voz real. De cada posición no se
+guarda su nivel absoluto, sino la atenuación banda a banda respecto a la fuente
+a 1 m (Ec. 1-2), de modo que el nivel de salida del altavoz se cancela y solo
+tiene que quedar lo bastante por encima del fondo:
+
+$$
+L_{p,Ls,1m,i} \approx L_{W,Ls,i} - 11\ \text{dB},
+\qquad
+D_{n,i} = L_{p,Ls,1m,i} - L_{p,Ls,n,i} .
+$$
+
+Esa atenuación se aplica después al espectro de habla de esfuerzo normal
+(Ec. 3), se pondera A y se suma en energía sobre las siete bandas de octava
+(Ec. 4):
+
+$$
+L_{p,S,n,i} = L_{p,S,1m,i} - D_{n,i},
+\qquad
+L_{p,A,S,n} = 10\log_{10}\sum_i 10^{(L_{p,S,n,i} + A_i)/10} .
+$$
+
+La Tabla 1 aporta el espectro omnidireccional de esfuerzo normal y las
+ponderaciones A:
+
+| Banda $i$ | $f$ [Hz] | $L_{p,S,1m,i}$ [dB] | $A_i$ [dB] |
+| ---: | ---: | ---: | ---: |
+| 1 | 125 | 49,9 | −16,1 |
+| 2 | 250 | 54,3 | −8,6 |
+| 3 | 500 | 58,0 | −3,2 |
+| 4 | 1000 | 52,0 | 0,0 |
+| 5 | 2000 | 44,8 | +1,2 |
+| 6 | 4000 | 38,8 | +1,0 |
+| 7 | 8000 | 33,5 | −1,1 |
+
+cuyo total ponderado A es 57,4 dB: una voz que habla con normalidad a 1 m.
+
+**La lectura ponderada A del ruido rosa en el sonómetro no es la entrada que
+espera `open_plan_metrics`.** Meterla da un nivel absoluto que es el del
+altavoz, no el de un hablante, así que $L_{p,A,S,4m}$ sale directamente mal y
+$D_{2,S}$ queda sesgada por la diferencia espectral entre el ruido rosa y el
+habla. Ejecuta antes la cadena de cuatro pasos:
+
+```python
+import numpy as np
+# `room` es el import del bloque de open_plan_metrics de arriba.
+
+# Tabla 1 de ISO 3382-3: habla unisex de esfuerzo normal a 1 m, omnidireccional,
+# y la ponderación A, bandas de octava de 125 Hz a 8 kHz.
+speech_1m = np.array([49.9, 54.3, 58.0, 52.0, 44.8, 38.8, 33.5])
+a_weight = np.array([-16.1, -8.6, -3.2, 0.0, 1.2, 1.0, -1.1])
+
+# Niveles de ruido rosa medidos por banda de octava, una fila por posición de medición.
+pink = np.array([
+    [72.0, 71.0, 70.0, 69.0, 67.0, 64.0, 60.0],
+    [67.0, 66.0, 64.5, 63.0, 60.5, 57.0, 52.5],
+    [63.5, 62.0, 60.0, 58.0, 55.0, 51.0, 46.0],
+    [60.0, 58.5, 56.0, 53.5, 50.0, 45.5, 40.0],
+])
+source_1m = np.full(7, 90.0) - 11.0        # Ec. (1): Lp,Ls,1m = Lw,Ls - 11 dB
+
+d_n = source_1m - pink                     # Ec. (2): atenuación por banda
+speech_n = speech_1m - d_n                 # Ec. (3): revestida de habla
+lp_a_s = 10 * np.log10(np.sum(10 ** ((speech_n + a_weight) / 10), axis=1))
+print(np.round(lp_a_s, 1))                 # [48.  42.4 37.8 33.8]  Ec. (4)
+
+dist = np.array([2.0, 4.0, 8.0, 16.0])
+chain = room.open_plan_metrics(dist, lp_a_s, 0.70 - 0.03 * dist)
+print(round(chain.d2s, 1), round(chain.lp_as_4m, 1))     # 4.7 42.9
+```
+
+La aritmética de bandas en sí — ponderación A y suma en energía — es la misma
+que en [Niveles](/phonometry/es/signals/levels/levels/).
+
 ### Parámetros de `open_plan_metrics()`
 
 | Parámetro | Tipo | Unidades | Rango / valor por defecto | Notas |
 | :--- | :--- | :--- | :--- | :--- |
 | `positions_m` | array 1D | m | ≥ 4 posiciones, todas > 0 | Distancias fuente-receptor |
-| `spl_a_speech` | array 1D | dB | misma longitud | Nivel de habla ponderado A $L_{p,A,S,n}$ por posición |
+| `spl_a_speech` | array 1D | dB | misma longitud | Nivel de habla ponderado A $L_{p,A,S,n}$ por posición, procedente de la cadena de las Ec. (1)-(4) del apartado 6.2 — **no** los dB(A) de ruido rosa medidos |
 | `sti_values` | array 1D | — | misma longitud | STI por posición (método completo de IEC 60268-16) |
 
 Devuelve un `OpenPlanResult` con `d2s`, `lp_as_4m`, `rd` y `rp`; su
@@ -187,7 +284,7 @@ posición puede medirse a su vez con las herramientas STIPA de la
 `OpenPlanResult.report(path)` renderiza una ficha PDF de una página con el
 formato de un informe de medición de privacidad acústica en oficinas diáfanas:
 la línea de norma base, un bloque de cabecera de metadatos opcional, una tabla
-compacta de las cuatro magnitudes de número único del apartado 4 ($D_{2,S}$,
+compacta de las cuatro magnitudes que devuelve `open_plan_metrics` ($D_{2,S}$,
 $L_{p,A,S,4m}$, la distancia de distracción $r_D$ y la distancia de privacidad
 $r_P$) apilada sobre la gráfica de decaimiento espacial a todo el ancho del
 resultado (`.plot()`, la regresión del apartado 6.2 en el eje logarítmico de
@@ -393,6 +490,10 @@ los ocupantes del capítulo 17 de *Architectural Acoustics* 2.ª ed. de Long
 de `open_plan_metrics` en lugar de calcularse dentro de la función: mídela
 con las herramientas STIPA de la
 [guía del Índice de transmisión del habla](/phonometry/es/perception/speech/speech-transmission/).
+La cuarta magnitud de número único exigida, el ruido de fondo medio ponderado A
+$L_{p,A,B}$, tampoco se calcula aquí: es la media energética ponderada A de los
+niveles de fondo por banda de octava de cada posición, y le corresponde ir en el
+informe junto a las tres que sí produce esta página.
 El propio procedimiento de medición de la norma (la directividad del
 altavoz, las condiciones amueblada frente a desocupada, la captura del
 ruido de fondo) no se comprueba: la función consume distancias, niveles y

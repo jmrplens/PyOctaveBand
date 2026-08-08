@@ -46,34 +46,63 @@ The rigorous test for time weighting is the **Tone Burst Response**
 (IEC 61672-1, Table 4), using a 4 kHz sine burst referenced to the steady-state
 level.
 
+### How the check is run
+
+Table 4 fixes the excitation but not the plumbing, so here is the plumbing. A
+4 kHz sine is generated at 48 kHz for 3 s. The **reference** is the steady Fast
+level of that continuous sine, averaged over its last half second — once the
+integrator has settled, this is $L_A$ in the standard's notation. The burst of
+the stated duration is then cut out of *the same* sine, so its phase and
+amplitude are identical to the reference tone's, and zeros surround it. The
+**response** is the maximum of the Fast envelope of that burst, expressed
+relative to the reference: $10\log_{10}(\max \text{env} / \text{ref})$, which is
+the standard's $L_{AFmax} - L_A$. Note what this does and does not verify:
+IEC 61672-1 states these limits for the electrical input facility over a defined
+range of steady levels with no overload indicated (clauses 5.9.5-5.9.6), so the
+numbers below verify the *ballistics*, not a complete instrument. The same
+reference values are transcribed in `tests/filters/test_iec_compliance.py` for F
+and S and for the $L_{AE}$ column.
+
 **phonometry results (FAST):**
 
-| Burst duration | IEC target (dB) | phonometry (dB) | Error (dB) | Status |
-| :--- | :--- | :--- | :--- | :--- |
-| 200 ms | −1.0 | −0.98 | +0.02 | ✅ PASS |
-| 50 ms | −4.8 | −4.82 | −0.02 | ✅ PASS |
-| 10 ms | −11.1 | −11.14 | −0.04 | ✅ PASS |
-| 1 ms | −21.0 | −20.99 | +0.01 | ✅ PASS |
+| Burst duration | IEC target (dB) | Class 1 limit (dB) | phonometry (dB) | Error (dB) | Status |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| 200 ms | −1.0 | ±0.5 | −0.98 | +0.02 | ✅ PASS |
+| 50 ms | −4.8 | ±1.0 | −4.82 | −0.02 | ✅ PASS |
+| 10 ms | −11.1 | ±1.0 | −11.14 | −0.04 | ✅ PASS |
+| 1 ms | −21.0 | +1.0 / −2.0 | −20.99 | +0.01 | ✅ PASS |
 
 **python-acoustics results (FAST, squared signal passed as required by that
 library):**
 
-| Burst duration | IEC target (dB) | python-acoustics (dB) | Error (dB) | Status |
-| :--- | :--- | :--- | :--- | :--- |
-| 200 ms | −1.0 | −0.97 | +0.03 | ✅ PASS |
-| 50 ms | −4.8 | −3.93 | **+0.87** | ⚠️ FAIL |
-| 10 ms | −11.1 | −10.90 | +0.20 | ✅ PASS |
-| 1 ms | −21.0 | −20.90 | +0.10 | ✅ PASS |
+| Burst duration | IEC target (dB) | Class 1 limit (dB) | python-acoustics (dB) | Error (dB) | Status |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| 200 ms | −1.0 | ±0.5 | −0.97 | +0.03 | ✅ PASS |
+| 50 ms | −4.8 | ±1.0 | −3.93 | **+0.87** | ✅ PASS |
+| 10 ms | −11.1 | ±1.0 | −10.90 | +0.20 | ✅ PASS |
+| 1 ms | −21.0 | +1.0 / −2.0 | −20.90 | +0.10 | ✅ PASS |
 
-phonometry maintains high precision across all test cases. The block-based
-approach deviates significantly (> 0.8 dB) for the 50 ms burst because 125 ms
-blocks cannot resolve short transient events accurately; the result depends on
-how the burst aligns with the block boundaries.
+**Both libraries pass every row shown**, and saying otherwise would be
+overstating the case — the point here is the *shape* of the error, not a
+compliance failure. phonometry stays within 0.05 dB of the Table 4 reference at
+every duration, under 5 % of the class 1 budget, because a continuous
+exponential detector has no free parameter left to get wrong. The block
+integrator stays inside class 1 too, but it spends 0.87 of the 1.0 dB available
+at 50 ms, and it spends it for a reason that is luck rather than design: how the
+burst happens to straddle a 125 ms block. Read the two tables together with the
+first column of Table 4, which tightens to ±0.5 dB for bursts of 200 ms and
+longer — at that end a block integrator has no margin left to lose.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/tone_burst_iec.svg" alt="Fast envelope responses to 200, 50 and 10 ms tone bursts peaking exactly at the IEC 61672-1 Table 4 reference values" width="80%" loading="eager" />
 
 *Measured Fast envelopes (blue) matching the Table 4 reference values
 (dashed) within 0.1 dB for 200/50/10 ms bursts.*
+
+The generator behind this figure is
+`scripts/figures/signals.py::generate_tone_burst_iec`, and it is the procedure
+described above with three of the Table 4 rows: it prints
+`env_db.max() - target`, which is the Error column of the first table, so the
+phonometry rows can be reproduced directly.
 
 ## What this means in practice
 

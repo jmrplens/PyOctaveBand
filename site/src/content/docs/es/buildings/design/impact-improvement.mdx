@@ -211,6 +211,14 @@ $$
 \Delta L = 40 \log_{10} \frac{f}{f_0}\ \text{dB (asfalto, losas secas)}.
 $$
 
+Las dos están escritas solo para $f > f_0$ y se toman como cero en la resonancia
+y por debajo de ella. Eso es un convenio: en la banda que contiene $f_0$ el
+sistema masa-muelle amplifica y los suelos medidos caen ahí entre unos $-5$ dB y
+$0$ dB, así que un diseño cuya $f_0$ cae dentro del rango valorado de
+100-3150 Hz se valora de forma optimista justo en la banda que decide el número.
+Aquí $f_0$ vale 52,8 Hz, holgadamente por debajo del rango, y por eso el
+espectro de abajo arranca limpio en 100 Hz.
+
 ```python
 import numpy as np
 from phonometry import building, materials

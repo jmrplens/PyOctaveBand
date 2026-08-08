@@ -11,11 +11,17 @@ references:
     note: "Lden (3.6.4), Ldn (3.6.5) y el nivel de evaluación compuesto de jornada completa del apartado 6.5 (Fórmulas 5-6, ajustes de la Tabla A.1)."
   - type: standard
     organization: "International Organization for Standardization"
+    year: 2007
+    title: "Acoustics — Description, measurement and assessment of environmental noise — Part 2: Determination of sound pressure levels"
+    designation: "ISO 1996-2:2007"
+    note: "Anexo C: el ancho de banda crítico de la Tabla C.1, la audibilidad de la Fórmula (C.3) y el ajuste a tramos de las Fórmulas (C.4)-(C.6). Es el método de ingeniería autocontenido que implementa la biblioteca; la reimpresión corregida de 2009 es idéntica en esta parte."
+  - type: standard
+    organization: "International Organization for Standardization"
     year: 2017
     title: "Acoustics — Description, measurement and assessment of environmental noise — Part 2: Determination of sound pressure levels"
     designation: "ISO 1996-2:2017"
     url: "https://www.iso.org/standard/59766.html"
-    note: "El ajuste tonal del Anexo C (con el método de cribado y el mapeo de audibilidad media de ISO/PAS 20065), la corrección de ruido residual del apartado 10.4 y el balance de incertidumbre de medida del apartado 4 / Anexo F."
+    note: "La corrección de ruido residual del apartado 10.4, el balance de incertidumbre de medida del apartado 4 / Anexo F, el mapeo de audibilidad media de la Tabla J.1 del Anexo J y el método de cribado del Anexo K."
   - type: standard
     organization: "British Standards Institution"
     year: 2003
@@ -109,7 +115,7 @@ plt.show()
 | :--- | :--- | :--- |
 | `lden(lday, levening, lnight, hours=(12, 4, 8))` | $L_{Aeq}$ por periodo [dB]; `hours` debe sumar 24 | +5 dB tarde, +10 dB noche (3.6.4) |
 | `ldn(lday, lnight, hours=(15, 9))` | | +10 dB noche (3.6.5) |
-| `composite_rating_level(periods)` | iterable de `(level_db, hours, adjustment_db)` | Fórmulas generales (5)-(6); ajustes según la Tabla A.1 |
+| `composite_rating_level(periods)` | iterable de `(level_db, hours, adjustment_db)`; horas positivas, finitas y sumando 24 | Fórmulas generales (5)-(6); ajustes según la Tabla A.1 |
 
 Dónde pones el micrófono cambia el número: ISO 1996-2 fija las posiciones del receptor y sus correcciones de fachada. El diagrama es contexto de medida; aplica las correcciones a tus niveles antes del análisis:
 
@@ -131,7 +137,12 @@ nivel de valoración y las penalizaciones por periodo están en ISO 1996-1 (arri
 ISO 1996-2 aporta el ajuste tonal, la corrección de ruido residual y el
 presupuesto de incertidumbre.
 
-**Ajuste tonal (método de ingeniería, Anexo C).** A partir del nivel tonal
+**Ajuste tonal (método de ingeniería, Anexo C de ISO 1996-2:2007).** La edición
+de 2017 abandonó el algoritmo autocontenido y remite en su lugar a ISO/PAS 20065
+([Audibilidad objetiva de tonos en ruido](/phonometry/es/perception/psychoacoustics/tone-audibility/));
+lo que conserva es la tabla del Anexo J que convierte una audibilidad *media* en
+un ajuste entero. El algoritmo de 2007 es el implementado aquí, porque funciona
+sobre un único espectro. A partir del nivel tonal
 sumado en energía $L_{pt}$ y el nivel de ruido enmascarante $L_{pn}$ en la banda
 crítica alrededor de un tono, la audibilidad sobre el umbral de enmascaramiento es
 $\Delta L_{ta} = L_{pt} - L_{pn} + 2 + \log_{10}[1 + (f_c/502)^{2{,}5}]$ dB (Fórmula (C.3)),
@@ -196,9 +207,11 @@ environment.expanded_uncertainty(u)                            # 4,36 dB (k = 2)
 
 **Cubierto.** El $L_{den}$, el $L_{dn}$ y el nivel de valoración compuesto de la ISO
 1996-1:2016 (apartado 6.5,
-`environment.lden`/`ldn`/`composite_rating_level`); y el ajuste tonal
-(anexo C), la corrección de ruido residual (apartado 10.4) y el balance de
-incertidumbre de medida (apartado 4, anexo F) de la ISO 1996-2:2017.
+`environment.lden`/`ldn`/`composite_rating_level`); y el ajuste tonal del
+anexo C de la ISO 1996-2:2007 junto con la corrección de ruido residual
+(apartado 10.4), el balance de incertidumbre de medida (apartado 4, anexo F),
+el mapeo de audibilidad media del anexo J y el método de cribado del anexo K
+de la ISO 1996-2:2017.
 
 **No cubierto.** La ISO 1996-2 fija las posiciones del receptor y las
 correcciones de fachada que convierten una medida en bruto en el nivel que

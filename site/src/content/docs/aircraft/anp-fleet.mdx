@@ -195,8 +195,19 @@ flyover = aircraft.event_level([3000.0, 500.0, 0.0], "D")
 print(round(float(flyover.level), 1))     # SEL in dB at that receiver
 ```
 
-The observer is `(x, y, z)` in metres in the runway frame: along the track,
-across it and above the ground. The optional `temperature` and `pressure`
+The observer is `(x, y, z)` in metres in the **runway frame**, and the origin
+of that frame is not the airport boundary: $x$ runs along the runway centre
+line with $x = 0$ at start of roll for a departure and at the landing threshold
+for an arrival, so arrival profiles carry negative $x$ on final approach. The
+shipped data says it plainly — `db.profile("747100", "D", 1).path[0]` starts at
+$x = 0$ (brake release) and ends 39.5 km downrange, while
+`db.profile("707", "A", 1).path[0]` starts at $x = -34.9$ km and ends 1.5 km
+past the threshold, so the two frames are nearly 35 km apart. $y$ is the lateral
+offset from the extended centre line, positive to starboard of the direction of
+travel; its sign is what selects the depression-angle branch of the
+banked-segment rule. $z$ is the receiver height above local ground, left at 0 in
+these examples where Doc 29 measures at 1.2 m, normally a difference under a
+decibel. The optional `temperature` and `pressure`
 arguments feed the Doc 29 atmospheric impedance adjustment and default to the
 15 °C and 101.325 kPa of the standard atmosphere.
 

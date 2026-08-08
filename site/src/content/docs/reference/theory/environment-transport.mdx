@@ -147,6 +147,15 @@ $$
 P = 3 \log_{10}(\text{onset rate}) + 2 \log_{10}(\text{level difference}),
 $$
 
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/impulsive_sound_onsets.svg" alt="A-weighted Fast level history of three hammer strikes over a 55 dB(A) background across six seconds: each strike rises from about 52 dB to 89 dB, the detected onset start and end points are marked with the least-squares onset line, the governing level difference of 36.8 dB is annotated, and the title reports a prominence of 11.34 with an adjustment of 11.42 dB, category highly impulsive" width="90%" />
+
+*Both inputs of $P$ are geometry on this trace, which is why the method needs a
+level history and not a level. The onset rate is the slope of the fitted line
+through the rise, in dB/s, and the qualifying threshold of 10 dB/s is a
+steepness on this axis; the level difference is the height of the same rise.
+Three strikes are detected here and only the steepest-and-tallest one governs
+the adjustment.*
+
 designed to peak around 15 for very sudden, loud impulses. The adjustment to the measurement-period level takes the governing (highest-$P$) impulse (clause 8, Formula 2):
 
 $$
@@ -209,6 +218,19 @@ $$
 A = A_{div} + A_{atm} + A_{gr} + A_{bar} + A_{misc}.
 $$
 
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/outdoor_attenuation_breakdown.svg" alt="ISO 9613-2 per-octave-band attenuation breakdown as a stacked bar of Adiv, Aatm, Agr and Abar with the total A overlaid, for a 200 m path over porous ground with a 4 m barrier" width="80%" />
+
+*The four terms at their true relative sizes, band by band, for a 200 m path
+over porous ground with a 4 m barrier. $A_{div}$ is 57 dB in every band because
+it is pure geometry. $A_{atm}$ is nothing at 63 Hz and 18.7 dB at 8 kHz, so it
+is the term that decides how far high frequencies travel and no other. $A_{gr}$
+is where the low bands live and is **negative** at 63 Hz (−4.6 dB: the ground
+reflection adds energy rather than removing it). $A_{bar}$ is at its 20 dB cap
+from 2 kHz up but falls to zero at 250 Hz, because the top-edge form subtracts
+the ground effect the screened path gives away, $A_{bar} = D_z - A_{gr} \geq 0$,
+and 250 Hz is exactly where $A_{gr}$ peaks. Which term is worth refining
+depends entirely on the band and the geometry.*
+
 The library implements the four general terms of Clause 7; the informative
 $A_{misc}$ (foliage, industrial sites, housing) and reflections are left to the
 caller. **Geometrical divergence** is spherical spreading from a point source,
@@ -239,6 +261,8 @@ barrier $A_{bar} = D_z$ and the ground term is kept (Eq. (13)). The long-term
 average level subtracts the meteorological correction $C_{met}$ (Eq. (6),
 (21)/(22)). The method's stated accuracy is $\pm 1$ to $\pm 3$ dB for broadband
 noise up to 1000 m (Table 5).
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_outdoor_geometry.svg" alt="ISO 9613-2 source-barrier-receiver geometry: a point source at height hs, a barrier whose top edge splits the path into dss and dsr, and a receiver at height hr, with the blocked direct ray and the diffracted ray over the edge, the path difference z and the Dz formula" width="92%" />
 
 ### Occupational noise exposure and uncertainty (ISO 9612)
 

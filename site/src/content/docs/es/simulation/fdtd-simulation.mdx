@@ -37,6 +37,7 @@ references:
 ---
 
 import ThemeImage from '../../../../components/ThemeImage.astro';
+import Video from '../../../../components/Video.astro';
 
 La mayor parte de phonometry predice un **número**: un nivel, un tiempo de
 reverberación, una pérdida por transmisión. El dominio `simulation` calcula el
@@ -59,6 +60,33 @@ producen salidas idénticas bit a bit en la misma plataforma. Es el motor de
 las animaciones FDTD de esta documentación, promocionado a API pública con
 fuentes, sondas de presión, obstáculos rasterizados, condiciones de contorno
 por lado y un objeto de resultado congelado.
+
+Aquí tienes una de esas animaciones, y es un anuncio honesto de lo que
+construye el resto de la página. En ella no hay nada dibujado: la columnata es
+una `obstacle_mask` booleana de círculos rasterizados y el frente de onda es un
+único paquete de onda plana unidireccional con una envolvente gaussiana de una
+longitud de onda de ancho, lanzado en $x = 0{,}30$ m dentro de una sala de
+4 m × 1 m de paredes rígidas cuyos dos extremos absorben mediante esponjas
+ocultas fuera del encuadre. La portadora es de 800 Hz, así que la longitud de
+onda es de 42,9 cm y las columnas de 10 a 17 cm son aproximadamente de un cuarto
+a dos quintos de ella: el régimen en el que un cilindro rígido a la vez proyecta
+una sombra legible y rerradia con fuerza, que es la razón por la que la cola que
+llena la sala está estructurada y no es ruido. Esa cola es dispersión múltiple
+determinista: es el aspecto que tiene un campo difuso *antes* de hacer ninguna
+hipótesis estadística sobre él. La malla es el ejemplo resuelto de la regla que
+deduce la [sección 4](#dispersion-numerica-y-precision): el hueco más
+estrecho de esta disposición es de 6,6 cm entre una columna y una pared, así que
+$\Delta x = \min(\text{apertura más pequeña}/4,\ \lambda/8)$ permite hasta
+1,6 cm, y el clip corre a 2,5 mm porque un banner necesita la definición.
+
+<Video
+  name="anim_fdtd_pillar_hall"
+  width={2400}
+  height={600}
+  displayWidth="100%"
+  title="Un frente de onda a través de una sala de columnas (FDTD 2D)"
+  description="Un frente de onda plano de 800 Hz recorre una sala de 4 m de paredes rígidas llena de una columnata al tresbolillo de columnas rígidas de 10 a 17 cm de diámetro, simulada a 2,5 mm; cada columna difracta el frente y desprende una ondícula dispersada, y las ondículas interfieren hasta que toda la sala se llena de energía estructurada que después se drena por los extremos absorbentes."
+/>
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_fdtd_es.svg" alt="Flujo desde la definición del dominio (mapas de velocidad del sonido y densidad con el paso de malla dx) y la geometría (máscara de obstáculos y condiciones de contorno por lado), pasando por las fuentes inyectadas en celdas, la actualización leapfrog en malla escalonada de velocidad y presión y la condición de estabilidad de Courant, hasta el FDTDResult congelado con historias de sonda, instantáneas del campo y un método plot" width="86%" loading="eager" />
 
@@ -94,10 +122,13 @@ $$
             = \frac{c\,\Delta t\,\sqrt{2}}{\Delta x} \le 1,
 $$
 
-y `fdtd_simulation` deriva el paso temporal del parámetro `cfl` (el número de
-Courant, por defecto 0,6) y de la mayor velocidad del sonido del mapa; los
+y `fdtd_simulation` deriva el paso temporal del parámetro `cfl` (este
+$\mathrm{CN}$, por defecto 0,6) y de la mayor velocidad del sonido del mapa; los
 valores fuera de $(0, 1)$ se rechazan porque el esquema carece de sentido
-más allá del límite (Ec. 4.14).
+más allá del límite (Ec. 4.14). La sección 4 usa además un número de Courant
+*por eje*, $S = c\,\Delta t/\Delta x = \mathrm{CN}/\sqrt{2}$, en la relación de
+dispersión; los dos no son el mismo número, y el `cfl = 0.6` por defecto
+significa $S = 0{,}424$.
 
 ```python
 from phonometry import simulation
@@ -525,6 +556,8 @@ de una sala 3D. Trate las ejecuciones 2D como secciones y demostraciones, y
 valide cualquier afirmación cuantitativa 3D contra una forma cerrada o un
 solucionador 3D.
 
+<span id="dispersion-numerica-y-precision"></span>
+
 ## 4. Dispersión numérica y precisión
 
 La malla discreta propaga cada frecuencia a una velocidad ligeramente
@@ -542,7 +575,10 @@ $$
 con un error relativo de frecuencia a primer orden de magnitud
 $(1 - S^2)\,(k\,\Delta x)^2 / 24$ sobre los ejes de la malla (la frecuencia
 modelada queda por debajo de la real, así que el error con signo es
-negativo), con $S = c\,\Delta t / \Delta x$; el error es máximo exactamente sobre un
+negativo), donde $S = c\,\Delta t / \Delta x$ es el número de Courant **por
+eje**, que con celdas cuadradas es el valor de `cfl` dividido por $\sqrt{2}$:
+el `cfl = 0.6` por defecto da $S = 0{,}424$ y $1 - S^2 = 0{,}82$; el error es
+máximo exactamente sobre un
 eje y se anula a lo largo de la diagonal de las celdas en el límite de
 Courant $\mathrm{CN} = 1$. La regla práctica es resolver **al menos 10 celdas por
 longitud de onda más corta**, $\Delta x \le c_\text{min} / (10 f_\text{max})$ con la velocidad
@@ -632,7 +668,9 @@ $\Delta x \le c_\text{min} / (10 f_\text{max})$, con la velocidad de sonido
 más baja del
 dominio. Con exactamente 10 celdas la cota del error de dispersión sobre el
 eje es alrededor del 1,6 %, reducida a en torno al 1,4 % con el
-``cfl = 0.6`` por defecto, y reducir $\Delta x$ a la mitad divide el error entre
+``cfl = 0.6`` por defecto (el número de Courant por eje es entonces
+$S = \mathrm{cfl}/\sqrt{2} = 0{,}424$, así que el factor $1 - S^2$ vale 0,82), y
+reducir $\Delta x$ a la mitad divide el error entre
 cuatro (el esquema es de segundo orden). Con $\Delta x = 1$ cm el punto de 10
 celdas en aire queda hacia los 3,4 kHz.
 
@@ -642,8 +680,11 @@ El esquema explícito solo es estable mientras un frente de onda cruce como
 mucho una celda por paso temporal. Con celdas cuadradas el número de Courant
 es $\mathrm{CN} = c\,\Delta t\,\sqrt{2}/\Delta x \le 1$ (Attenborough y Van
 Renterghem, Ec. 4.13). `fdtd_simulation` deriva el paso temporal del
-parámetro `cfl` (el número de Courant, por defecto 0,6) y de la mayor
-velocidad del sonido del mapa, y rechaza los valores fuera de $(0, 1)$.
+parámetro `cfl` (ese mismo $\mathrm{CN}$, por defecto 0,6) y de la mayor
+velocidad del sonido del mapa, y rechaza los valores fuera de $(0, 1)$. El
+número de Courant *por eje* de la relación de dispersión de más arriba es un
+número distinto, $S = c\,\Delta t/\Delta x = \mathrm{CN}/\sqrt{2}$, que vale
+0,424 con el valor por defecto.
 
 ### ¿Puedo fiarme de los niveles absolutos de una ejecución FDTD 2D?
 

@@ -22,6 +22,27 @@ animations of this documentation, promoted to a public API with sources,
 pressure probes, rasterised obstacles, per-side boundary conditions and a
 frozen result object.
 
+Here is one of those animations, and it is a fair advertisement for what the
+rest of this page builds. Nothing in it is drawn: the colonnade is a boolean
+`obstacle_mask` of rasterised circles and the wavefront is a single one-way
+plane-wave packet with a Gaussian envelope one wavelength wide, launched at
+$x = 0.30$ m into a 4 m × 1 m rigid-walled hall whose two ends absorb through
+sponges hidden outside the frame. The carrier is 800 Hz, so the wavelength is
+42.9 cm and the 10 to 17 cm columns are roughly a quarter to two fifths of it
+— the regime in which a rigid cylinder both casts a readable shadow and
+re-radiates strongly, which is why the coda that fills the hall is structured
+rather than noise. That coda is deterministic multiple scattering: it is what
+a diffuse field looks like *before* any statistical assumption is made about
+it. The mesh is the worked example of the rule
+[section 4](#4-numerical-dispersion-and-accuracy) derives: the tightest gap in
+this layout is 6.6 cm between a column and a wall, so
+$\Delta x = \min(\text{smallest aperture}/4,\ \lambda/8)$ allows up to 1.6 cm,
+and the clip runs at 2.5 mm because a banner needs the definition.
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anim_fdtd_pillar_hall_dark.gif"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anim_fdtd_pillar_hall.gif" alt="Animation: an 800 Hz plane wavefront sweeping a 4 metre rigid-walled hall filled with a staggered colonnade of rigid columns, every column shedding a scattered wavelet until the interference of the wavelets fills the hall with structured energy that then drains through the absorbing ends" width="640" height="160" loading="lazy"></picture>
+
+[Watch the high-resolution video (WebM)](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anim_fdtd_pillar_hall.webm)
+
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_fdtd_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_fdtd.svg" alt="Pipeline from the domain definition (sound-speed and density maps with the grid spacing dx) and the geometry (obstacle mask and per-side boundary conditions), through the sources injected at grid cells, the staggered-grid leapfrog update of velocity and pressure, and the Courant stability condition, to the frozen FDTDResult with probe histories, field snapshots and a plot method" width="86%"></picture>
 
 ## 1. The scheme: a wave equation on a grid

@@ -50,7 +50,7 @@ y vuelve a comprobarlo después de cada sesión, verifica sonómetro y
 calibrador periódicamente en laboratorio (IEC 61672-3 e IEC 60942; Bies,
 Hansen y Howard 2017, §3.4) y trata la diferencia pre/post como tu cota de
 deriva. La sección de
-[campo, laboratorio y deriva](#comprobaciones-de-campo-verificación-de-laboratorio-y-deriva)
+[campo, laboratorio y deriva](#comprobaciones-verificacion-y-deriva)
 de más abajo convierte eso en reglas concretas, y el recorrido
 [Construye un sonómetro](/phonometry/es/signals/sound-level-meter/) empieza
 exactamente en este paso antes de calcular ningún nivel.
@@ -75,11 +75,14 @@ nada cambie en la cadena: si tocas la ganancia, recalibra.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_calibration_setup_es.svg" alt="Cadena de calibración: calibrador acústico acoplado al micrófono, preamplificador, ADC y sensitivity produciendo pascales por unidad digital" width="92%" loading="eager" />
 
-## Calibración física (sonómetro)
+## Calibrar una grabación de principio a fin
 
-Para obtener mediciones SPL precisas a partir de una grabación digital, primero
-debes calcular la sensibilidad de tu cadena de medición usando un tono de
-referencia (p. ej. 94 dB @ 1 kHz).
+Los tres pasos de abajo son todo el flujo de trabajo de SPL físico: una toma del
+calibrador, una llamada a `sensitivity()` y el factor entregado a una función de
+nivel. Las dos grabaciones tienen que venir de la misma cadena sin tocar nada
+entre medias. El mismo factor funciona en toda la librería: `octave_filter` y
+`OctaveFilterBank` lo reciben dentro de `LevelCalibration(factor=...)`, y `leq`,
+`laeq` y `ln_levels` como `calibration_factor=`.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_calibration_dataflow_es.svg" alt="Flujo de datos de la calibración: la grabación del calibrador y la grabación de medición proceden de la misma cadena sin tocar, sensitivity() convierte la primera en el factor S en pascales por unidad digital y, si se le pasa fs, comprueba la estabilidad a corto plazo de IEC 60942, toda función de nivel acepta ese factor como calibration_factor y el resultado son niveles en dB SPL re 20 µPa; sin calibrador el factor vale 1 y las muestras se leen como pascales, así que es dbfs=True lo que da niveles referidos al fondo de escala digital" width="92%" />
 
@@ -103,12 +106,8 @@ calibration_factor = metrology.sensitivity(calibrator_recording, target_spl=94.0
 spl, freq = filters.octave_filter(
     recording, fs,
     calibration=filters.LevelCalibration(factor=calibration_factor))
-# ¡Ahora los valores de 'spl' son dB SPL reales!
+# spl está ahora en dB SPL re 20 µPa
 ```
-
-El mismo factor funciona en toda la librería: `octave_filter` y
-`OctaveFilterBank` lo reciben dentro de `LevelCalibration(factor=...)`, y `leq`,
-`laeq` y `ln_levels` como `calibration_factor=`.
 
 ## Supuestos del calibrador (IEC 60942)
 
@@ -132,11 +131,20 @@ Si pasas la frecuencia de muestreo (y `validate=True`, el valor por defecto),
 IEC 60942:2017 comprueba el calibrador (5.3.3): la *fluctuación de nivel a
 corto plazo*, el valor absoluto de la diferencia entre cada uno de los niveles
 máximo y mínimo con ponderación temporal F y el nivel medio, no debe superar
-el límite de clase 1 de la Tabla 2 para la frecuencia nominal del calibrador
-(0,07 dB desde 160 Hz, relajado a 0,10 dB por debajo de 160 Hz y a 0,20 dB por
-debajo de 63 Hz, donde la propia ponderación F ondula). Pasa `frequency=` para
-seleccionar la fila correcta en calibradores que no sean de 1 kHz. Un
-`CalibrationWarning` delata micrófonos mal acoplados o ruido de manipulación
+el límite de clase 1 de la Tabla 2 para la frecuencia nominal del calibrador.
+La Tabla 2 da tres filas disjuntas, y no deben leerse como rangos solapados:
+
+| Frecuencia nominal | Límite de clase 1 | |
+| :--- | :---: | :--- |
+| 160 Hz a 16 kHz | 0,07 dB | la fila estricta, y con la que se juzga un calibrador de 1 kHz |
+| por encima de 63 Hz y por debajo de 160 Hz | 0,10 dB | |
+| 31,5 Hz a 63 Hz | 0,20 dB | donde la propia ponderación temporal F ondula sobre el tono |
+
+La Tabla 2 abarca de 31,5 Hz a 16 kHz y no especifica nada fuera de ese rango,
+así que una `frequency` por debajo de 31,5 Hz o por encima de 16 kHz recae en
+los 0,07 dB estrictos y no en las filas relajadas de baja frecuencia. Pasa
+`frequency=` para seleccionar la fila correcta en calibradores que no sean de
+1 kHz. Un `CalibrationWarning` delata micrófonos mal acoplados o ruido de manipulación
 antes de que corrompan silenciosamente todos los niveles calibrados. La
 grabación debe durar al menos 2 s (1 s para que el integrador F se asiente más
 1 s de envolvente estable); con grabaciones más cortas se avisa en lugar de dar
@@ -196,6 +204,8 @@ Devuelve el factor de sensibilidad (float) para pasarlo como
 `calibration_factor=` a `leq`, `laeq`, `ln_levels`, `lc_peak`, `sel` y las
 funciones de dosis, y como `calibration=LevelCalibration(factor=...)` a
 `octave_filter`.
+
+<span id="comprobaciones-verificacion-y-deriva"></span>
 
 ## Comprobaciones de campo, verificación de laboratorio y deriva
 
@@ -257,13 +267,17 @@ spl_dbfs, freq = filters.octave_filter(
 # Los resultados serán negativos (p. ej. -20 dBFS)
 ```
 
-## RMS vs niveles de pico
+## RMS frente a niveles de pico
 
-phonometry admite dos modos de medición, alineados con software profesional
-como BK:
+Los niveles se pueden leer de dos maneras, y las dos se usan en los analizadores
+comerciales:
 
-- **RMS (`mode='rms'`)**: nivel energético (estándar).
-- **Pico (`mode='peak'`)**: máximo absoluto alcanzado en el frame (peak-holding).
+- **RMS (`mode='rms'`)** integra energía sobre el frame, que es sobre lo que
+  está definido todo nivel normalizado ($L_{eq}$, $L_{Aeq}$, $L_N$).
+- **Pico (`mode='peak'`)** retiene el mayor valor instantáneo del frame, que es
+  contra lo que se comprueban los criterios de impacto y de límite de pico como
+  $L_{Cpeak}$. Ojo: el pico de banda que se devuelve aquí está limitado en banda
+  y sin ponderar, así que no es en sí mismo $L_{Cpeak}$.
 
 ```python
 import numpy as np
@@ -289,9 +303,19 @@ del procesado.
 ## Entrada de audio entero
 
 Las señales enteras (p. ej. int16 de `scipy.io.wavfile.read`) se convierten
-internamente a float64 antes de cualquier elevación al cuadrado, así que la
-calibración y los niveles son idénticos tanto si pasas el array entero crudo
-como una conversión a float.
+internamente a float64 antes de cualquier elevación al cuadrado. La conversión
+es un cambio de dtype, no un reescalado: una muestra int16 de +32767 entra como
+32767.0, no como 1.0. Eso es inofensivo *mientras la grabación del calibrador y
+la medición estén en el mismo formato*, porque entonces `sensitivity` devuelve
+un factor 32768 veces menor y los dos se cancelan exactamente: un tono que marca
+87,958 dB desde arrays float marca 87,958 dB desde los arrays int16 de las
+mismas grabaciones. No es inofensivo en el caso contrario: el mismo tono leído
+sin calibrar da 87,94 dB como float y 172,14 dB como int16, una desviación de
+$20\log_{10}(32768) = 90{,}3$ dB, y aplicar una sensibilidad derivada de float a
+una medición leída como entero (o al revés) arrastra esa desviación al resultado
+sin ningún síntoma. O se mantienen las dos grabaciones en un solo formato, o se
+dividen las dos por el valor de fondo de escala (`x / 32768.0` para int16) antes
+de nada.
 
 ## Qué cubre esta guía
 

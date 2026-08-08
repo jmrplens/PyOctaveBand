@@ -59,8 +59,9 @@ tapping-machine chain lives in
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/heavy_impact_sources.svg" alt="Two panels: the octave-band impact force exposure levels of the rubber ball and the bang machine with their printed tolerance bands from 31.5 Hz to 500 Hz, and the ISO 717-2 Annex D rating of a field measurement showing the measured octave levels, their A-weighted contributions and the resulting single number" width="92%" />
 
 *Left: the two source specifications are pure spectra of force, not geometry.
-Right: the rating adds the A-weighted band contributions in energy, so the
-63 Hz band decides almost everything.*
+Right: the rating adds the A-weighted band contributions in energy, and the
+A-weighting is 23 dB steeper at 63 Hz than at 500 Hz, so the quietest measured
+band ends up deciding the number.*
 
 ## Both sources are specified by the energy of their force pulse
 
@@ -73,8 +74,12 @@ L_{FE} = 10\log_{10}\!\left[\frac{1}{T_\text{ref}}
 \int_{t_1}^{t_2}\frac{F^2(t)}{F_0^2}\,\mathrm{d}t\right]\ \text{dB re 1 N},
 $$
 
-with $F_0 = 1$ N, $T_\text{ref} = 1$ s and $t_2 - t_1$ the duration of the
-impact. Both characteristics require a **single-peak** waveform of
+with $F_0 = 1$ N (ISO 16283-2:2020 Annex A), $T_\text{ref} = 1$ s and
+$t_2 - t_1$ the duration of the impact. Watch the reference: EN 15657 refers
+its blocked-force levels to $F_0 = 10^{-6}$ N, 120 dB away, so a force level
+carried between this page and
+[Structure-borne sound power of equipment](/phonometry/buildings/design/structure-borne-power/)
+without conversion is wrong by exactly that. Both characteristics require a **single-peak** waveform of
 $20 \pm 2$ ms (JIS A 1418-2:2019 A.2 b)). The octave-band values are printed
 identically in ISO 16283-2:2020 Table A.1, ISO 10140-5:2010 Table F.1 and
 JIS A 1418-2:2019 Table A.2 for the ball; the bang machine appears only in
@@ -88,7 +93,8 @@ JIS A 1418-2:2019 Table A.1.
 | 250 | 17.0 ± 2.0 | 11.5 ± 2.0 |
 | 500 | 12.5 ± 2.0 | 5.5 ± 2.0 |
 
-The bang machine puts 8 dB more energy into the two lowest octaves and 7 dB
+The bang machine puts 8 to 9 dB more energy into the two lowest octaves (8 dB
+at 31.5 Hz, 9 dB at 63 Hz) and 7 dB
 less into the top one, which is why the two sources are not interchangeable and
 why a floor can pass one and fail the other.
 
@@ -232,7 +238,7 @@ Because the A-weighting is 23 dB steeper at 63 Hz than at 500 Hz, a heavy
 source's rating is dominated by whichever band survives that slope. For the
 Table D.4 spectrum the four A-weighted contributions are 39.1, 48.3, 49.3 and
 52.6 dB, so the 500 Hz band carries the most weight even though 63 Hz is the
-loudest band by 10 dB.
+loudest measured band, 9.5 dB above it.
 
 ## What this guide covers
 

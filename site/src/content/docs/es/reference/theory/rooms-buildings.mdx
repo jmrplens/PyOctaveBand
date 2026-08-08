@@ -190,6 +190,16 @@ $$
 
 con $t_e = 50$ ms (C50, habla) o 80 ms (C80, música), y el **tiempo central** $T_s = \int_0^{\infty} t\ p^2\ dt / \int_0^{\infty} p^2\ dt$. Para un decaimiento puramente exponencial tienen formas cerradas $C_{te} = 10 \log_{10}(e^{a t_e} - 1)$ y $T_s = 1/a$; a $T = 1$ s ($a = 13{,}8155$) evalúan a C80 = 3,05 dB, C50 = −0,02 dB, D50 = 0,499 y Ts = 72,4 ms, los valores que reproduce la implementación. Las JND de la Tabla A.1 (EDT 5 %, C80 1 dB, D50 0,05, Ts 10 ms) acotan con qué finura merece la pena informar cada una.
 
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/room_parameters_bands_es.svg" alt="Parámetros por banda de ISO 3382 de una respuesta al impulso de sala sintética: barras agrupadas de EDT, T20 y T30 por banda de octava que caen desde unos 1,4 s a 125 Hz hasta 0,7 s a 4 kHz, sobre un segundo panel donde C50 y C80 crecen con la frecuencia" width="92%" />
+
+*Las formas cerradas anteriores valen para un único decaimiento exponencial;
+una sala real da un juego de valores por banda. El panel superior es el
+decaimiento en sí (EDT, T20 y T30 cayendo con la frecuencia a medida que el
+aire y las superficies absorben más), el inferior es el reparto
+temprano/tardío de esa misma respuesta al impulso, y C50 y C80 crecen con la
+frecuencia por la misma razón por la que cae el tiempo de reverberación: cuanto
+más tardía es la energía, mayor parte de ella ha eliminado ya la sala.*
+
 ### Decaimiento espacial en oficinas diáfanas (ISO 3382-3, Cláusula 6)
 
 La tasa de decaimiento espacial del habla ponderada A es la pendiente por mínimos cuadrados ordinarios de $L_{p,A,S}$ frente a $\log_{10}(r/r_0)$ ($r_0 = 1$ m) sobre las posiciones de 2–16 m, reescalada a una cifra por duplicación, y el nivel nominal se lee en la misma recta a 4 m:
@@ -199,6 +209,16 @@ L = a + b\ \log_{10}(r/r_0), \qquad D_{2,S} = -\log_{10}(2)\ b, \qquad L_{p,A,S,
 $$
 
 La distancia de distracción rD y la distancia de privacidad rP son las distancias donde una regresión **lineal** (no logarítmica) del STI frente a la distancia cruza 0,50 y 0,20; una pendiente ajustada no negativa (el STI no decrece con la distancia) las deja indefinidas, materializando la nota de la norma de que "puede resultar imposible de determinar".
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/open_plan_decay_es.svg" alt="Decaimiento espacial en oficina diáfana: nivel de habla ponderado A y STI frente a la distancia a la fuente en eje logarítmico, con la regresión de D2,S, el marcador de Lp,A,S,4m a 4 m y los cruces de las distancias rD y rP" width="80%" />
+
+*Dos regresiones sobre dos ejes distintos, que es lo que hace difícil de
+retener esta cláusula. La recta de nivel se ajusta frente a
+$\log_{10}(r/r_0)$ y se lee dos veces: como la pendiente $D_{2,S}$ por
+duplicación y en $r = 4$ m para $L_{p,A,S,4\text{m}}$. La recta del STI se
+ajusta frente a $r$ mismo, de forma **lineal**, y se lee donde cruza 0,50 y
+0,20 para las distancias de distracción y de privacidad. Si ese segundo ajuste
+sale plano o creciente, las dos distancias no existen, no es que sean grandes.*
 
 ### Aislamiento en campo e índice ponderado (ISO 16283-1, ISO 717-1)
 
@@ -229,6 +249,17 @@ ISO 717-2 se reproducen exactamente (tercios $L_{n,w} = 79$, $C_I = -11$;
 octavas $54$, $0$), mediante la misma búsqueda de desplazamiento monótono que
 ISO 717-1 ejecutada sobre las curvas negadas.
 
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/impact_rating_es.svg" alt="Nivel de presión acústica de impactos normalizado medido en tercios de octava con la curva de referencia de ISO 717-2 desplazada y el índice ponderado resultante leído a 500 Hz" width="80%" />
+
+*La imagen especular de la figura de ruido aéreo anterior, dibujada para que la
+inversión se vea en vez de enunciarse. Allí las desviaciones desfavorables se
+contaban donde la medición quedaba **por debajo** de la referencia; aquí se
+cuentan donde la supera **por arriba**, porque un recinto receptor más ruidoso
+es un forjado peor. Todo lo demás es el mismo procedimiento: la curva de
+referencia desplazada en pasos de 1 dB hasta que la suma desfavorable es lo
+mayor posible sin pasar de 32,0 dB, y el índice leído en la referencia
+desplazada a 500 Hz.*
+
 La absorción acústica (ISO 354) mide el área de absorción equivalente a partir de
 la relación de Sabine aplicada a una cámara reverberante vacía y con la muestra:
 $A = 55{,}3\ V/(c\ T) - 4 V m$ (el término $4 V m$ es la absorción del aire, $m$ el
@@ -242,14 +273,19 @@ NOTA 2).
 
 ### Normalización en laboratorio frente a campo (ISO 10140, ISO 16283)
 
-Los índices de campo llevan una prima porque incluyen la transmisión por flancos
-alrededor del cerramiento; los índices de laboratorio no, porque una instalación
-cualificada la suprime. El álgebra es por lo demás idéntica, y difiere solo en
-qué magnitud se normaliza. El par a ruido aéreo es el índice de reducción acústica
-directo de laboratorio $R = L_1 - L_2 + 10 \log_{10}(S/A)$ (ISO 10140-2) frente
-al índice aparente de campo $R' = L_1 - L_2 + 10 \log_{10}(S/A)$ (ISO 16283-1),
-la misma forma cerrada evaluada con el $A$ conocido de la instalación o el
-$A = 0{,}16\ V/T$ medido de la sala. El par a impactos es el nivel normalizado de
+Los índices de campo llevan una prima porque el nivel del recinto receptor del
+que parten incluye la transmisión por flancos alrededor del cerramiento; los
+índices de laboratorio no, porque una instalación cualificada la suprime. Las
+fórmulas son, por tanto, las *mismas*, y la prima es una afirmación sobre la
+probeta y no sobre la aritmética: el índice de reducción acústica directo de
+laboratorio $R = L_1 - L_2 + 10 \log_{10}(S/A)$ (ISO 10140-2) y el índice
+aparente de campo $R' = L_1 - L_2 + 10 \log_{10}(S/A)$ (ISO 16283-1) son una
+única forma cerrada, evaluada con el $A$ conocido de la instalación en el
+laboratorio y con el $A = 0{,}16\ V/T$ medido del recinto receptor en campo. Lo
+que difiere en *qué se normaliza* no es laboratorio frente a campo, sino ruido
+aéreo frente a impactos: los índices a ruido aéreo escalan por la razón
+superficie-absorción $S/A$, y los niveles de impactos por $A/A_0$. El par a
+impactos es el nivel normalizado de
 laboratorio $L_n = L_i + 10 \log_{10}(A/A_0)$ (ISO 10140-3) frente al $L'_n$ de
 campo (ISO 16283-2), ambos referidos a $A_0 = 10$ m². Antes de formar cualquiera
 de ellos, el nivel del recinto receptor se corrige por ruido de fondo mediante la
@@ -335,6 +371,15 @@ reproducen: la sala desnuda de 29,75 m³ da $A = 2{,}26$ m² y $T = 2{,}1$ s a
 baja $T$ a 0,9 s. El método informativo del Anexo D para espacios irregulares
 y absorción distribuida de forma no uniforme queda fuera de alcance.
 
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/enclosed_space_absorption_es.svg" alt="Dos paneles para una oficina de 60 metros cúbicos con techo desnudo frente a techo tratado acústicamente: el área de absorción equivalente por banda de octava, mucho mayor con el techo acústico, y el tiempo de reverberación cayendo desde unos cinco segundos en baja frecuencia para la sala desnuda hasta menos de un segundo con el techo acústico" width="96%" />
+
+*Lo que hace la Fórmula 1 banda a banda: el área de absorción equivalente a la
+izquierda y el tiempo de reverberación que implica por la Fórmula 5 a la
+derecha, para la misma sala desnuda y tratada. El caso del Anexo E citado más
+arriba es esta misma aritmética sobre una sala más pequeña ($A$ de 2,26 a
+5,03 m² y $T$ de 2,1 a 0,9 s a 1 kHz), y la figura muestra por qué las dos se
+mueven en sentidos opuestos y no de forma proporcional.*
+
 Consulta la [guía de absorción acústica en recintos](/phonometry/es/buildings/rooms/enclosed-space-absorption/) para su uso.
 
 ### Incertidumbre de medición (ISO 12999-1)
@@ -362,7 +407,7 @@ correlacionada es la suma en cuadratura ponderada en energía de las
 incertidumbres por banda (Fórmula B.2).
 
 Consulta las guías de [acústica de salas](/phonometry/es/buildings/rooms/room-acoustics/) y de
-[medición del aislamiento en campo](/phonometry/es/buildings/insulation/insulation-field/) para su uso.
+[medición del aislamiento en campo (ISO 16283)](/phonometry/es/buildings/insulation/insulation-field/) para su uso.
 
 ### Predicción del aislamiento de paneles (Bies 7.2, Hopkins 2.9/4.3.10, Cremer 5)
 
@@ -391,6 +436,20 @@ abertura desnuda de área relativa $S_a/S$ limita la composición a
 $10\log_{10}(S/S_a)$. El camino de transmisión resonante y la radiación de la pared
 doble se apoyan en la eficiencia de radiación de placa y las movilidades
 puntuales de la [teoría de vibración](/phonometry/es/reference/theory/vibration/).
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/panel_insulation_concept_es.svg" alt="Cuatro paneles: la ley de masas de una hoja simple con su valle de coincidencia, la pared doble con la resonancia masa-muelle-masa y la ganancia de cámara, la eficiencia de radiación de la placa subiendo a la unidad por encima de la frecuencia crítica, y una pared compuesta cuya rendija abierta del 1 % limita R al tope del área abierta" width="92%" />
+
+*Los cuatro comportamientos del párrafo anterior, uno por panel. Arriba a la
+izquierda, la ley de masas subiendo 6 dB por octava con el valle de coincidencia
+de Sharp recortado en $f_c$. Arriba a la derecha, la pared doble: no mejor que
+la masa combinada por debajo de $f_0$, y luego el término de cámara subiendo
+hasta saturar. Abajo a la izquierda, la eficiencia de radiación que decide
+cuánta de la vibración de la placa se convierte en sonido. Abajo a la derecha,
+el techo que impone una fuga: un área abierta del 1 % deja la composición en
+$10\log_{10}(S/S_a) = 20$ dB por buena que sea la pared, que es el panel que
+merece la pena enseñar a un cliente.*
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/aperture_slit_geometry_es.svg" alt="Sección a escala de una rendija de 2 mm a través de una pared de 100 mm: la pared rayada dibujada en sección con la estrecha ranura de aire horizontal a media altura, una flecha de sonido incidente que apunta a la ranura desde la izquierda, las cotas de los 100 mm de espesor de pared y los 2 mm de ancho de rendija, y frentes de onda circulares transmitidos esbozados expandiéndose desde la salida de la rendija a la derecha" width="80%" />
 
 Consulta la guía [Predicción del aislamiento de paneles](/phonometry/es/buildings/design/panel-sound-insulation/)
 para su uso.

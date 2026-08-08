@@ -30,10 +30,14 @@ import ThemeImage from '../../../../../components/ThemeImage.astro';
 Elegir una arquitectura de filtro es un compromiso: la selectividad, el
 rizado de banda de paso y el comportamiento de fase no pueden ser óptimos a
 la vez, y cada una de las cinco arquitecturas que ofrece phonometry
-resuelve el compromiso de forma distinta. Como todas sitúan sus **puntos de
-−3 dB en los bordes de banda de ANSI S1.11**, la elección cambia cómo
-rechaza una banda a sus vecinas y cómo trata los transitorios, no dónde se
-sitúa la banda. Esta página pone las arquitecturas frente a frente: la
+resuelve el compromiso de forma distinta. Tres de ellas — Butterworth,
+Chebyshev II y Bessel — sitúan sus **puntos de −3 dB en los bordes de banda de
+ANSI S1.11**, así que para esas tres la elección cambia cómo rechaza una banda a
+sus vecinas y cómo trata los transitorios, no dónde se sitúa la banda. Los dos
+diseños de rizado constante son la excepción, y el apartado 3 da su tamaño:
+`cheby1` y `ellip` toman los bordes de banda como su borde de rizado, así que
+sus bandas son efectivamente más anchas y todos sus niveles por banda salen unas
+décimas de decibelio altos. Esta página pone las arquitecturas frente a frente: la
 comparación en el cruce a −3 dB, la galería completa de respuestas en
 octava y tercio de octava, ejemplos de uso por arquitectura y el crossover
 Linkwitz-Riley para cuando el objetivo es dividir una señal en lugar de
@@ -94,7 +98,7 @@ plt.show()
 
 Vista espectral completa de los bancos para octava (1/1) y tercio de octava (1/3).
 
-| Arquitectura | Octava 1/1 (fraction=1) | Octava 1/3 (fraction=3) |
+| Arquitectura | Octava (`fraction=1`) | Tercio de octava (`fraction=3`) |
 | :--- | :--- | :--- |
 | **Butterworth** | <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/filter_butter_fraction_1_order_6_es.svg" alt="Respuesta en frecuencia del banco de filtros Butterworth de banda de octava" width="100%" /> | <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/filter_butter_fraction_3_order_6_es.svg" alt="Respuesta en frecuencia del banco Butterworth de tercio de octava" width="100%" /> |
 | **Chebyshev I** | <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/filter_cheby1_fraction_1_order_6_es.svg" alt="Respuesta en frecuencia del banco Chebyshev I de banda de octava" width="100%" /> | <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/filter_cheby1_fraction_3_order_6_es.svg" alt="Respuesta en frecuencia del banco Chebyshev I de tercio de octava" width="100%" /> |
@@ -302,12 +306,32 @@ filters.OctaveFilterBank(fs=48000, fraction=3, order=6, limits=[12, 20000],
 
 </details>
 
-### 6. Linkwitz-Riley (`linkwitz_riley`)
+## 4. Crossover Linkwitz-Riley (`linkwitz_riley`)
 
-Diseñado específicamente para **crossovers de audio**. Los filtros Linkwitz-Riley
-(típicamente de 4.º orden, aunque se admite cualquier orden par) permiten dividir
-una señal en bandas que, al sumarse, producen una respuesta en magnitud
-perfectamente plana y sin diferencia de fase entre bandas en el cruce.
+Linkwitz-Riley no es una sexta arquitectura: no construye una banda IEC ni es un
+valor de `FilterDesign(filter_type=…)`. Se llama directamente, y hace el trabajo
+contrario: divide una señal en dos ramas que se recombinan en una respuesta
+plana en magnitud, que es lo que necesita un **crossover** de altavoz y lo que
+una banda de medida no debe hacer jamás. Cada rama es un Butterworth de orden
+`order/2` aplicado dos veces, así que cada una queda exactamente a **−6 dB en la
+frecuencia de cruce** (no a −3 dB como las bandas de arriba): las ramas suman a
+la unidad en *amplitud*, no en potencia.
+
+Qué recombinación es plana depende de la paridad de `order/2`, y la suma ingenua
+es incorrecta para la mitad de los órdenes pares:
+
+| `order` | `order/2` | Diferencia de fase entre ramas en $f_c$ | Recombinación plana |
+| :---: | :---: | :---: | :--- |
+| 2 | 1 (impar) | 180° | `low - high` |
+| 4 | 2 (par) | 0° | `low + high` |
+| 6 | 3 (impar) | 180° | `low - high` |
+| 8 | 4 (par) | 0° | `low + high` |
+
+Con los órdenes 2 y 6 las ramas quedan en antifase en $f_c$ y `low + high` se
+hunde ahí en una muesca profunda en vez de sumar plano. Incluso en los casos
+planos la suma es **paso todo**, no libre de fase: su magnitud es plana con
+mejor de 0,001 dB de 20 Hz a 20 kHz mientras su fase gira 360° completos a
+través del cruce.
 
 ```python
 import numpy as np
@@ -318,8 +342,10 @@ fs = 48000
 recording = 0.2 * np.sin(2 * np.pi * 1000 * np.arange(fs) / fs)
 
 # Dividir la grabación en bandas grave y aguda a 1000 Hz
-low, high = filters.linkwitz_riley(recording, fs, freq=1000, order=4)
-# Recombinada, low + high tiene una respuesta plana en magnitud (suma paso todo)
+order = 4
+low, high = filters.linkwitz_riley(recording, fs, freq=1000, order=order)
+# Recombinación plana: suma si order/2 es par, diferencia si order/2 es impar
+recombined = low + high if (order // 2) % 2 == 0 else low - high
 ```
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/crossover_lr4_es.svg" alt="Crossover Linkwitz-Riley de 4.º orden: paso-bajo, paso-alto y su suma plana" width="60%" />
@@ -356,15 +382,25 @@ plt.show()
 
 </details>
 
+**En un crossover real** las dos ramas suman acústicamente, no eléctricamente, y
+la planitud de arriba solo sobrevive si los dos caminos acústicos están
+alineados en el tiempo. Un desfase de unos pocos centímetros entre los centros
+acústicos del woofer y el tweeter basta como rotación de fase a 1 kHz para
+hundir la suma en una muesca, y el remedio es un retardo en el altavoz
+adelantado, no otro orden de filtro. Se comprueba midiendo la respuesta sumada
+en eje con el método de barrido senoidal de
+[Medición de sistemas](/phonometry/es/signals/spectra/system-measurement/).
+
 ## Qué cubre esta guía
 
 **Cubierto.** Las cinco arquitecturas sobre las que puede construirse
 cualquier banco de bandas IEC (Butterworth, Chebyshev I/II, elíptico,
 Bessel): sus respuestas en magnitud comparadas en el cruce a −3 dB y en la
-galería completa de octava y tercio de octava, el convenio de bordes de
-banda a −3 dB de ANSI S1.11 que todas comparten, y un ejemplo de uso por
-arquitectura, más el crossover Linkwitz-Riley cuyas bandas grave y aguda
-suman una respuesta plana.
+galería completa de octava y tercio de octava, el convenio de bordes de banda
+(exacto para Butterworth, Chebyshev II y Bessel; el borde de rizado para las dos
+familias de rizado constante), y un ejemplo de uso por arquitectura, más el
+crossover Linkwitz-Riley, cuyas dos ramas se recombinan planas por suma o por
+diferencia según la paridad de `order/2`.
 
 **No cubierto.** Las matemáticas de banda, el diseño de polos y ceros,
 estabilidad y multitasa y la referencia de parámetros de `octave_filter()`
@@ -394,5 +430,10 @@ abrupta a costa de rizado en la banda de paso; Chebyshev II mantiene la
 banda de paso plana y traslada el rizado a la banda atenuada; el elíptico
 ofrece la máxima selectividad, con rizado en ambas bandas; y Bessel
 preserva la forma de los transitorios gracias a su respuesta de fase
-lineal, pero tiene la caída más lenta. Linkwitz-Riley es para crossovers de
-audio: sus bandas suman una respuesta perfectamente plana.
+lineal, pero tiene la caída más lenta. Conviene tener presente que Chebyshev I y
+el elíptico toman los bordes de banda como su borde de *rizado* y no como su
+punto de −3 dB, así que sus niveles por banda quedan unas décimas de decibelio
+por encima de los de las otras tres y no deben mezclarse con ellos en un mismo
+espectro. Linkwitz-Riley no es una de las cinco: es un crossover, y sus dos
+ramas se recombinan planas con `low + high` cuando `order/2` es par y con
+`low - high` cuando es impar.

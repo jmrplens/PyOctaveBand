@@ -362,12 +362,16 @@ y en cómo se expresa la propagación ascendente del enmascaramiento, y `method=
 elige uno. El valor por omisión es el procedimiento por tercios de octava usado
 arriba.
 
-| `method=` | Bandas | Intervalo | Constantes | Propagación de la máscara |
-| :--- | ---: | :--- | :--- | :--- |
-| `"critical-band"` | 21 | 100 Hz a 9500 Hz | Tabla 1 | entre los límites de banda tabulados |
-| `"equally-contributing"` | 17 | 300 Hz a 6400 Hz | Tabla 2 | entre los límites de banda tabulados |
-| `"one-third-octave"` | 18 | 160 Hz a 8000 Hz | Tabla 3 | entre las frecuencias centrales de banda |
-| `"octave"` | 6 | 177 Hz a 11314 Hz | Tabla 4 | ninguna |
+| `method=` | Bandas | Centros de banda | Límites de banda | Constantes | Propagación de la máscara |
+| :--- | ---: | :--- | :--- | :--- | :--- |
+| `"critical-band"` | 21 | 150 Hz a 8500 Hz | 100 Hz a 9500 Hz | Tabla 1 | entre los límites de banda tabulados |
+| `"equally-contributing"` | 17 | 350 Hz a 5800 Hz | 300 Hz a 6400 Hz | Tabla 2 | entre los límites de banda tabulados |
+| `"one-third-octave"` | 18 | 160 Hz a 8000 Hz | 143 Hz a 8980 Hz (calculados) | Tabla 3 | entre las frecuencias centrales de banda |
+| `"octave"` | 6 | 250 Hz a 8000 Hz | 177 Hz a 11314 Hz | Tabla 4 | ninguna |
+
+Las dos columnas son `sii_procedure(method).frequencies` y `.band_edges`; solo
+los límites de tercio de octava se calculan a partir de los centros en vez de
+estar tabulados.
 
 Todos los procedimientos recorren la misma cadena del apartado 2: la automáscara
 del habla, la propagación ascendente del enmascaramiento, el ruido interno
@@ -639,10 +643,11 @@ propagación ascendente del enmascaramiento y el ruido interno equivalente. El
 
 ### ¿Cuál de los cuatro procedimientos por bandas de ANSI S3.5 debo usar?
 
-ANSI S3.5-1997 define cuatro: bandas críticas (21 bandas, 100 Hz a 9500 Hz),
-bandas críticas de contribución equitativa (17 bandas, 300 Hz a 6400 Hz), tercio
-de octava (18 bandas, 160 Hz a 8000 Hz) y octava (6 bandas, 250 Hz a 8000 Hz
-nominales). Usa `method="one-third-octave"` por omisión: es la resolución más
+ANSI S3.5-1997 define cuatro, citados aquí por el centro de banda: bandas
+críticas (21 bandas, centros de 150 Hz a 8500 Hz), bandas críticas de
+contribución equitativa (17 bandas, centros de 350 Hz a 5800 Hz), tercio de
+octava (18 bandas, centros de 160 Hz a 8000 Hz) y octava (6 bandas, centros de
+250 Hz a 8000 Hz). Usa `method="one-third-octave"` por omisión: es la resolución más
 fina y el único procedimiento cuya tabla trae los espectros de voz elevado, alto
 y de grito. Usa `method="critical-band"` para alinear el índice con un modelo de
 enmascaramiento o sonoridad por bandas críticas (Bark),

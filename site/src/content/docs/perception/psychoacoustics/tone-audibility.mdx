@@ -133,8 +133,10 @@ tone through that chain, down to the $K_t$ the mean audibility earns.
 The **decisive** audibility of one narrow-band spectrum is the largest tone
 audibility in it (clause 5.3.8). Over $J$ staggered spectra the **mean
 audibility** is their energy mean (Formula 20); a spectrum in which no tone is
-found contributes $\Delta L_j = -10\ \text{dB}$ (Formula 21). `assess_tones` applies the whole
-chain to a spectrum's tones and reports the decisive tone.
+found contributes $\Delta L_j = -10\ \text{dB}$ (Formula 21). `assess_tones` is
+the *per-tone* entry point: it applies Formulae (2)-(5) and (12)-(14) to each
+tone it is given and reports the largest, which is the decisive audibility only
+when no two audible tones share a critical band.
 
 **How the decisive band is selected.** The method does not scan a fixed set of
 bands: each detected *tone* defines its own critical band (§1), the audibility
@@ -158,11 +160,25 @@ LS = [48.91, 49.22, 50.50, 52.85, 58.29, 59.53, 59.71, 61.98, 54.16]
 res = psychoacoustics.assess_tones(fT, LT, LS, 2.7)
 print(round(res.decisive_audibility, 2), res.decisive_frequency)  # 5.01 137.3
 
-# Mean audibility of the five measured spectra (Table E.3 decisive values):
+# The five spectra of the Annex E campaign, rated with Step 3 applied
+# (Table E.3 decisive values), energy-averaged by Formula 20:
 print(round(psychoacoustics.mean_audibility([9.18, 6.04, 7.46, 2.67, 7.17]), 2))  # 6.98 dB
 
 res.plot(view="levels")   # tone levels above their critical-band masking noise
 ```
+
+The two numbers in that block are not the same spectrum rated twice by the same
+rule. The tones at 118.4, 137.3 and 158.8 Hz all fall in one critical band, so
+clause 5.3.8 Step 3 merges them into an `FG` group at their combined level
+$L_T = 72.15$ dB, and the standard's decisive value for spectrum 1 is the
+9.18 dB that opens the `mean_audibility` list — not the 5.01 dB the per-tone
+call prints, which is the largest of the nine individual audibilities
+`[0.75, 0.89, 1.02, 1.79, 1.93, 3.47, 4.39, 4.57, 5.01]`. Those 4.2 dB survive
+the averaging: the per-tone value in place of 9.18 pulls the campaign mean from
+6.98 dB to 5.98 dB, which is $K_t = 3$ dB instead of 4 dB in ISO 1996-2
+Table J.1. So use `analyze_spectrum` (§5), which runs the grouping,
+whenever a decisive audibility is going to be reported, and `assess_tones` only
+when the grouping has already been resolved.
 
 The same assessment reads two ways. The audibility bars at the top of this
 page answer "how far above the masking threshold is each tone"; the levels

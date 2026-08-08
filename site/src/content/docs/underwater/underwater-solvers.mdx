@@ -166,6 +166,20 @@ print(round(float(modes.wavenumbers[0]), 5))    # 0.20885  computed kr1
 print(round(np.sqrt(k**2 - (np.pi / 200.0) ** 2), 5))   # 0.20885  exact
 ```
 
+That ideal waveguide plays two roles, and they should not be confused. It is the
+exact oracle the solver is checked against — which is why it is used here — and
+it is also a physically *extreme* bottom: a pressure-release bed reflects with
+unit magnitude and a phase inversion, so it transmits nothing into the sediment
+and absorbs nothing. A modal or PE transmission loss computed over it therefore
+understates the loss of any real seabed, and the gap widens with range because
+it accumulates over bounces. The rigid option is the opposite extreme, offered
+for the same validation reason and not as a sediment model. For a real bottom in
+shallow water, price the seabed with the Weston regimes of
+[Underwater sound propagation](/phonometry/underwater/underwater-propagation/),
+whose critical angle and reflection-loss gradient encode exactly what these
+boundary conditions omit, and read the modal answer as an upper bound on the
+received level.
+
 ## 3. Ray tracing: travel times and convergence zones
 
 In the high-frequency limit the Helmholtz equation collapses to the eikonal
@@ -268,7 +282,7 @@ source level, levels re 1 µPa). The sound-speed and absorption models named
 below are implemented and referenced in
 [Underwater sound propagation](/phonometry/underwater/underwater-propagation/).
 
-**Sound speed.** The three equations agree to within about 1 m/s inside their
+**Sound speed.** The four equations agree to within about 2.5 m/s inside their
 common domain, so the choice is about *validity range*, not accuracy. The
 default **UNESCO / Chen-Millero** form (as recast by Wong & Zhu 1995) covers
 0–40 °C, 0–40 ppt and 0–1000 bar, the widest envelope, and is the
@@ -278,7 +292,11 @@ domain (much of the SOFAR-channel literature uses it). **Mackenzie** (1981)
 trades pressure for depth directly (2–30 °C, 25–40 ppt, 0–8000 m), which makes
 it the convenient choice when you have an echo-sounder depth rather than a CTD
 pressure; the other two convert depth to pressure through Leroy & Parthiot
-(1998) internally.
+(1998) internally. **Medwin** (1975) is a six-term simplification valid to about
+1000 m in shallow, warm water; it is the coarsest of the four and the one behind
+the rules of thumb $\partial c/\partial T \approx 4.6 - 0.110\,T$ m/s per °C and
+$\partial c/\partial z \approx 0.016$ m/s per metre, so keep it for mental
+arithmetic and hand checks, not for a budget.
 
 **Absorption.** **Francois–Garrison** (1982) is the reference and the default:
 it carries the boric-acid, magnesium-sulfate and pure-water relaxations with

@@ -58,9 +58,9 @@ y en
 Todo lo que sigue depende de la fuerza que la máquina de impactos normalizada
 inyecta realmente, y esa fuerza no es una propiedad solo de la máquina. Cada
 martillo es una masa de 0,5 kg que cae desde 40 mm, de modo que llega a
-$v_0 = \sqrt{2gh} = 0{,}886\ \text{m/s}$, diez veces por segundo. Si el impacto
+$v_\text{h} = \sqrt{2gh} = 0{,}886\ \text{m/s}$, diez veces por segundo. Si el impacto
 fuese corto frente a los 0,1 s entre golpes, la cantidad de movimiento fijaría
-por sí sola la fuerza y daría el espectro de líneas $|F_n| = 2 m v_0 / T_i$ y
+por sí sola la fuerza y daría el espectro de líneas $|F_n| = 2 m v_\text{h} / T_i$ y
 la fuerza cuadrática media por banda $F_\text{rms}^2 = 3{,}9 B$ con la que se
 reducen habitualmente las medidas ISO 10140 sobre hormigón.
 
@@ -70,11 +70,11 @@ un sistema masa-resorte-amortiguador cuyo impulso se divide en dos casos:
 
 - **sobrecrítico**, $K m \ge 4 Z_\text{dp}^2$: un único impulso positivo, sin
   rebote. Es el caso de una superficie de paso ligera (tablero de partículas,
-  OSB), donde el espectro tiende a $|F_n|_\text{lower} = m v_0/T_i$;
+  OSB), donde el espectro tiende a $|F_n|_\text{lower} = m v_\text{h}/T_i$;
 - **subcrítico**, $K m < 4 Z_\text{dp}^2$: el martillo rebota y solo cuenta el
   primer lóbulo positivo. Es el caso de una losa de hormigón o una solera,
   donde el espectro queda a menos de 1 dB de
-  $|F_n|_\text{upper} = 2 m v_0/T_i$ por debajo de 4 kHz y la estimación de
+  $|F_n|_\text{upper} = 2 m v_\text{h}/T_i$ por debajo de 4 kHz y la estimación de
   impulso corto es suficiente.
 
 Los dos límites distan 6 dB en valor cuadrático medio, que es justo la razón
@@ -221,11 +221,21 @@ se aplica es una pregunta sobre el amortiguamiento, no sobre la capa:
 
 | Modelo | Ley | Cuándo |
 | --- | --- | --- |
-| `"cremer"` | $\Delta L = 40 \log_{10} (f/f_0)$ | resultado de placa infinita de Cremer; soleras de asfalto y suelos flotantes secos, cuyas pérdidas internas bastan para comportarse como placas infinitas (fórmula C.3 de ISO 12354-2) |
+| `"cremer"` | $\Delta L = 40 \log_{10} (f/f_0)$ | resultado de placa infinita de Cremer; soleras de asfalto y suelos flotantes secos, cuyas pérdidas internas bastan para comportarse como placas infinitas (fórmula C.3 de ISO 12354-2). La deducción se declara válida en $f_0 < f < 4f_0$, así que la rama muy por encima de la resonancia es una extrapolación |
 | `"en12354"` | $\Delta L = 30 \log_{10} (f/f_0)$ | soleras de mortero de cemento y de sulfato de calcio, cuyo bajo factor de pérdidas las convierte en placas finitas con campo reverberante de flexión (fórmula C.1) |
 | `"cremer_hammer"` | $40 \log_{10} (f/f_0) + 10 \log_{10}[1 + (f/f_\text{limit})^2]$ | superficie de paso ligera, donde la impedancia del martillo ya no es despreciable; tiende a 18 dB por octava |
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/floating_floor_prediction_es.svg" alt="Mejora del aislamiento a ruido de impactos de una solera flotante de 73,5 kg por metro cuadrado sobre una capa elástica de 8 meganewton por metro cúbico: nada por debajo de la resonancia masa-resorte de 52,8 Hz y después la ley 30 lg de EN 12354-2 alcanzando 59 dB a 5 kHz, frente a la ley 40 lg de Cremer, más pronunciada, y a la rama de 18 dB por octava que incluye la impedancia del martillo de la máquina de impactos" width="80%" />
+Las tres leyes están escritas para $f > f_0$, y la biblioteca las recorta a cero
+en la resonancia y por debajo de ella. Ese recorte es un convenio, no un
+resultado físico: en la banda que contiene $f_0$ el sistema masa-resorte
+amplifica, y los suelos medidos caen ahí entre unos $-5$ dB y $0$ dB — el
+*peor que la desnuda en $f_0$* de la introducción, que ningún modelo de esta
+página reproduce. Mientras $f_0$ quede por debajo del rango valorado la
+diferencia es inocua, pero una capa rígida o una solera ligera que sitúe $f_0$
+cerca de 100 Hz produce un $\Delta L_w$ optimista justo en la banda que decide
+la valoración. Comprueba dónde cae $f_0$ antes de fiarte del número.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/floating_floor_prediction_es.svg" alt="Mejora del aislamiento a ruido de impactos de una solera flotante de 35 mm y 73,5 kg por metro cuadrado sobre una capa elástica de 8 meganewton por metro cúbico: nada por debajo de la resonancia masa-resorte de 52,8 Hz y después la ley 30 lg de EN 12354-2 alcanzando 59 dB a 5 kHz, frente a la ley 40 lg de Cremer, más pronunciada, y a la rama de 18 dB por octava que incluye la impedancia del martillo de la máquina de impactos" width="80%" />
 
 <details>
 <summary>Ver el código de esta figura</summary>
@@ -342,7 +352,7 @@ from phonometry import (
 )
 
 # Placa de yeso de 9,5 mm laminada con 32 mm de EPS (s' = 65 MN/m3), adherida
-# con pelladas a una pared de bloque de hormigón celular de 51 kg/m2.
+# con pelladas a una pared de bloque de hormigón celular de 100 mm y 51 kg/m2.
 f0 = lining_resonance_frequency(51.0, 6.3, dynamic_stiffness=65e6)
 round(f0)                                       # 542 Hz: justo en medio
 round(weighted_lining_improvement(f0, 45.0))    # -9 dB, empeora las cosas

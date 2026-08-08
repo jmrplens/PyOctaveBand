@@ -81,14 +81,32 @@ dispersan como pozos de decenas de centímetros, tienen su propia guía:
 ## 1. Coeficiente de dispersión de incidencia aleatoria (ISO 17497-1)
 
 El coeficiente de dispersión $s$ es la fracción de energía reflejada que **no**
-abandona la superficie en la dirección especular. ISO 17497-1 lo mide en una cámara
-reverberante a partir de cuatro situaciones de tiempo de reverberación: con la
-muestra de ensayo montada sobre una plataforma giratoria y mantenida
-**inmóvil**, y con la plataforma **en rotación** (que promedia y elimina la
-reflexión especular coherente en fase), cada una con y sin una placa base
-reflectante.
+abandona la superficie en la dirección especular. ISO 17497-1 lo mide en una
+cámara reverberante a partir de cuatro tiempos de reverberación. La plataforma
+giratoria y su placa base circular rígida permanecen en la sala en los cuatro
+casos, simétricas respecto al eje de rotación y dimensionadas a la muestra; lo
+que cambia es si la **muestra de ensayo** está sobre la placa y si la placa
+**gira** (Tabla 2):
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_scattering_reverb_es.svg" alt="Montaje de dispersión de incidencia aleatoria de ISO 17497-1: una cámara reverberante con la muestra de ensayo sobre una plataforma giratoria, un brazo de altavoz giratorio y un micrófono, midiendo el tiempo de reverberación con la muestra inmóvil (que da la absorción de incidencia aleatoria) y en rotación (que da la absorción especular), a partir de los cuales se deriva el coeficiente de dispersión" width="92%" loading="eager" />
+| | Muestra de ensayo | Plataforma giratoria |
+| :--- | :--- | :--- |
+| $T_1$ | ausente | sin girar |
+| $T_2$ | presente | sin girar |
+| $T_3$ | ausente | girando |
+| $T_4$ | presente | girando |
+
+$(T_1, T_2)$ es una medición de absorción ISO 354 corriente de la probeta y da
+el $\alpha_s$ de incidencia aleatoria; $(T_3, T_4)$ la repite bajo rotación y
+da el $\alpha_{spec}$ especular. El área $S$ de ambas fórmulas es el área de la
+**probeta**, no la de la placa base. La pareja $(T_1, T_3)$ tampoco se
+desperdicia: es la comprobación de calidad de la placa base de la ec. (6), más
+abajo.
+
+Comprobación de coherencia antes de calcular nada: añadir la muestra siempre
+acorta el decaimiento, así que $T_2 < T_1$ y $T_4 < T_3$. Un coeficiente de
+absorción negativo significa que los miembros de una pareja entraron al revés.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_scattering_reverb_es.svg" alt="Montaje de dispersión de incidencia aleatoria de ISO 17497-1: una cámara reverberante con la muestra de ensayo sobre una plataforma giratoria y su placa base a al menos 1 m de las paredes, dos posiciones fijas de altavoz y tres posiciones fijas de micrófono, siendo la plataforma lo único que se mueve, y el mapeo de la Tabla 2 de T1 a T4 sobre los coeficientes de absorción de incidencia aleatoria y especular a partir de los cuales se deriva el coeficiente de dispersión" width="92%" loading="eager" />
 
 **Absorción a partir del tiempo de reverberación (cláusula 6).** Cada situación se
 convierte en un coeficiente de absorción de Sabine con el propio término de
@@ -101,9 +119,10 @@ $$
 
 donde $V$ es el volumen de la sala, $S$ el área de la muestra, $T$ el tiempo de
 reverberación, $c$ la velocidad del sonido (ec. (2): $c = 343{,}2\sqrt{(273{,}15+t)/293{,}15}$)
-y $m$ el coeficiente de atenuación en potencia del aire. El par **inmóvil** da la
-absorción de incidencia aleatoria $\alpha_s$ (ec. (1)); el par **en rotación** da
-la absorción especular $\alpha_{spec}$ (ec. (4)).
+y $m$ el coeficiente de atenuación en potencia del aire. El par **inmóvil**
+$(T_1, T_2)$ da la absorción de incidencia aleatoria $\alpha_s$ (ec. (1)); el
+par **en rotación** $(T_3, T_4)$ da la absorción especular $\alpha_{spec}$
+(ec. (4)).
 
 **Coeficiente de dispersión (ec. (5)).** Ambos se combinan en
 
@@ -121,11 +140,13 @@ from phonometry import materials
 
 # Cuatro situaciones de tiempo de reverberación reducidas a dos coeficientes de absorción.
 # alpha_s del par inmóvil (ec. 1); alpha_spec del par en rotación (ec. 4).
-# V = 200 m^3, S = 10 m^2, c = 343.2 m/s en todo momento.
-alpha_s = materials.random_incidence_absorption(200.0, 10.0, c1=343.2, t1=8.0,
-                                         c2=343.2, t2=6.0)
-alpha_spec = materials.specular_absorption_coefficient(200.0, 10.0, c3=343.2, t3=7.5,
-                                                c4=343.2, t4=5.0)
+# V = 200 m^3, S = 10 m^2 (el área de la MUESTRA), c = 343.2 m/s en todo momento.
+alpha_s = materials.random_incidence_absorption(200.0, 10.0,
+                                         c1=343.2, t1=8.0,   # T1 placa base, inmóvil
+                                         c2=343.2, t2=6.0)   # T2 muestra, inmóvil
+alpha_spec = materials.specular_absorption_coefficient(200.0, 10.0,
+                                                c3=343.2, t3=7.5,  # T3 placa base, en rotación
+                                                c4=343.2, t4=5.0)  # T4 muestra, en rotación
 s = materials.scattering_coefficient(alpha_spec, alpha_s)   # ec. (5)
 print(round(float(alpha_s), 4))     # 0.1343
 print(round(float(alpha_spec), 4))  # 0.2148
@@ -141,8 +162,8 @@ import numpy as np
 from phonometry import materials
 
 # Una medición de 13 bandas (250-4000 Hz): la absorción de incidencia aleatoria
-# alpha_s (muestra inmóvil) y la absorción especular alpha_spec (plataforma en
-# rotación). Un difusor dispersa más con la frecuencia, así que s(f) crece.
+# alpha_s (muestra sobre la plataforma inmóvil) y la absorción especular alpha_spec
+# (plataforma en rotación). Un difusor dispersa más con la frecuencia, así que s(f) crece.
 freqs = np.array([250, 315, 400, 500, 630, 800, 1000,
                   1250, 1600, 2000, 2500, 3150, 4000], float)
 alpha_s = np.full_like(freqs, 0.10)
@@ -169,8 +190,8 @@ import numpy as np
 from phonometry import materials
 
 # Una medición de 13 bandas (250-4000 Hz): la absorción de incidencia aleatoria
-# alpha_s (muestra inmóvil) y la absorción especular alpha_spec (plataforma en
-# rotación). Un difusor dispersa más con la frecuencia, así que s(f) crece.
+# alpha_s (muestra sobre la plataforma inmóvil) y la absorción especular alpha_spec
+# (plataforma en rotación). Un difusor dispersa más con la frecuencia, así que s(f) crece.
 freqs = np.array([250, 315, 400, 500, 630, 800, 1000,
                   1250, 1600, 2000, 2500, 3150, 4000], float)
 alpha_s = np.full_like(freqs, 0.10)
@@ -248,9 +269,25 @@ $$
 
 Una respuesta polar perfectamente uniforme ($L_i$ todos iguales) da $d = 1$; un
 único lóbulo especular agudo da $d = 0$. Cuando los receptores subtienden ángulos
-sólidos desiguales, la fórmula (6) pondera por área cada energía con $N_i$ de la
-fórmula (8), y esos factores de área se evalúan en **radianes**, razón por la que
-un espaciado de 5° en el cenit produce un peso cercano a 1,57, no a 51,9.
+sólidos desiguales, la fórmula (6) pondera por área cada energía con
+$N_i = A_i / A_\text{min}$ de la fórmula (8), con
+
+$$
+A_i = \frac{4\pi}{\Delta\phi}\sin^2\frac{\Delta\theta}{4}\ (\theta = 0),
+\qquad
+A_i = 2\sin\theta\,\sin\frac{\Delta\theta}{2}\ (0 < \theta < 90°),
+\qquad
+A_i = \sin\frac{\Delta\theta}{2}\ (\theta = 90°).
+$$
+
+Todos los ángulos de esas tres formas se manejan en **radianes**, incluido el
+$\Delta\phi$ bajo el $4\pi$ del término del cenit: eso es lo que mantiene el
+cenit dimensionalmente coherente con los otros dos. En el hemisferio estándar
+de 5° × 5° las áreas salen 0,0685 en el cenit, 0,0076 en $\theta = 5°$ (la
+menor, así que $A_\text{min}$) y 0,0436 en el polo, de modo que los pesos van
+9,01 en el cenit, 1 en el primer anillo contiguo y 5,74 en el polo. Conviene
+comprobar los propios con `materials.area_factors(elevations, delta_theta=5.0)`
+antes de meter un vector de pesos construido a mano en la fórmula (6).
 
 El montaje que asumen esas fórmulas merece dibujarse a escala.
 `plot_goniometer_geometry` traza la disposición estándar en planta: el
@@ -283,6 +320,14 @@ mismo frente de onda plano incide sobre un panel rígido plano y sobre un
 difusor de Schroeder (un perfil de residuos cuadráticos con $N = 7$), y la
 energía dispersada sobre el arco de receptores convierte un haz especular
 colimado ($d = 0{,}32$) en un abanico ancho ($d = 0{,}63$).
+
+Esos dos números no son comparables con los coeficientes que se calculan más
+abajo. Los paneles simulados son un único periodo corto leído en el campo
+próximo de una malla 2D; la predicción que sigue es un array de seis periodos y
+3,6 m leído en campo lejano, donde la periodicidad encauza la energía hacia unos
+pocos lóbulos de red y hunde todos los coeficientes. Los coeficientes de
+difusión solo se comparan dentro de una misma geometría, un mismo arco y una
+misma distancia, que es justo lo que fija la ISO 17497-2 con los tres.
 
 <Video
   name="anim_fdtd_diffusion"
