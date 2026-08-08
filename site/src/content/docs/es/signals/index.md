@@ -153,7 +153,7 @@ calibrada y acompañada de su calidad estadística.
   submuestral y alineación de respuestas al impulso, y la envolvente de
   Hilbert.
 - [Señales de prueba y herramientas de muestreo](/phonometry/es/signals/spectra/test-signals/):
-  ráfagas de tono IEC 60268-1 con conmutación exacta, remuestreo con
+  ráfagas tonales IEC 60268-1 con conmutación exacta, remuestreo con
   especificación antialias declarada y retardo fraccionario de banda limitada.
 - [Medición de sistemas](/phonometry/es/signals/spectra/system-measurement/):
   pares complementarios de Golay, barridos con un espectro de magnitud

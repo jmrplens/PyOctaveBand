@@ -176,7 +176,7 @@ $y[n-1]$, que es el mismo valor que la API funcional devuelve como
 ### Trampas del streaming
 
 - **El preprocesado por bloque crea costuras.** Cualquier cosa calculada a
-  partir de un solo bloque que debería ser global, como el eliminación de tendencia
+  partir de un solo bloque que debería ser global, como la eliminación de tendencia
   (restar la media del propio bloque) o la normalización, da a cada bloque
   una operación ligeramente distinta: las salidas ya no se concatenan en el
   resultado continuo. Por eso `detrend` debe ser `False` en modo con estado.
@@ -218,7 +218,7 @@ for x in audio_stream(block):            # tu callback de captura
 
 | Opción | Comportamiento con estado | Motivo |
 | :--- | :--- | :--- |
-| `detrend` | debe ser `False` | El eliminación de tendencia por bloque crea discontinuidades en las fronteras |
+| `detrend` | debe ser `False` | La eliminación de tendencia por bloque crea discontinuidades en las fronteras |
 | `resample` | debe ser `False` | El remuestreador no conserva estado |
 | `zero_phase` | no soportado | El filtrado bidireccional necesita la señal completa |
 | `high_accuracy` (ponderación) | por defecto se resuelve a `False` (el diseño bilineal clásico, consulta [Ponderación frecuencial](/phonometry/es/signals/levels/weighting/)); pasar `True` explícito lanza `ValueError` | El remuestreo polifásico interno es incompatible con bloques |

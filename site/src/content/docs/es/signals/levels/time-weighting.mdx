@@ -1,6 +1,6 @@
 ---
 title: "Ponderación temporal"
-description: "El detector exponencial de IEC 61672-1:2013: las constantes de tiempo Fast y Slow, la balística Impulse heredada que esa norma retiró, la verificación con ráfaga de tono frente a la Tabla 4, las opciones de estado inicial y el streaming entre bloques."
+description: "El detector exponencial de IEC 61672-1:2013: las constantes de tiempo Fast y Slow, la balística Impulse heredada que esa norma retiró, la verificación con ráfaga tonal frente a la Tabla 4, las opciones de estado inicial y el streaming entre bloques."
 references:
   - type: standard
     organization: "International Electrotechnical Commission"
@@ -8,7 +8,7 @@ references:
     title: "Electroacoustics — Sound level meters — Part 1: Specifications"
     designation: "IEC 61672-1:2013"
     url: "https://webstore.iec.ch/en/publication/5708"
-    note: "El detector exponencial de ponderación temporal (apartado 3.8) con las constantes de tiempo F y S (apartado 5.7), y las respuestas de referencia a ráfagas de tono de 4 kHz de la Tabla 4 (límites de aceptación de clase 1) contra las que se verifica la balística en CI."
+    note: "El detector exponencial de ponderación temporal (apartado 3.8) con las constantes de tiempo F y S (apartado 5.7), y las respuestas de referencia a ráfagas tonales de 4 kHz de la Tabla 4 (límites de aceptación de clase 1) contra las que se verifica la balística en CI."
   - type: standard
     organization: "American National Standards Institute"
     year: 1983
@@ -36,7 +36,7 @@ la rapidez con la que el nivel sigue a la señal. Esta página es ese
 detector, implementado como un filtro recursivo exacto por muestra: las
 características Fast y Slow de IEC 61672-1:2013 (apartado 5.7), la
 balística asimétrica heredada Impulse, estado en streaming para el
-procesado por bloques y la verificación con ráfagas de tono contra la
+procesado por bloques y la verificación con ráfagas tonales contra la
 Tabla 4 de la norma.
 
 Los nombres son más antiguos que las matemáticas. FAST y SLOW eran
@@ -90,7 +90,7 @@ instantes de una grabación.
   width={2400}
   height={1350}
   title="La balística de los detectores Fast, Slow e Impulse"
-  description="Una ráfaga de tono excita el detector exponencial RC: el condensador se carga y se descarga mientras las agujas de los medidores Fast, Slow e Impulse siguen cada una su propia balística, y las tres trazas de nivel se construyen debajo mostrando el ataque rápido, el promedio lento y la retención asimétrica del modo Impulse."
+  description="Una ráfaga tonal excita el detector exponencial RC: el condensador se carga y se descarga mientras las agujas de los medidores Fast, Slow e Impulse siguen cada una su propia balística, y las tres trazas de nivel se construyen debajo mostrando el ataque rápido, el promedio lento y la retención asimétrica del modo Impulse."
 />
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/time_weighting_analysis_es.svg" alt="Respuestas de las ponderaciones temporales Fast, Slow e Impulse a una ráfaga de ruido" width="80%" />
@@ -193,7 +193,7 @@ usa las funciones de nivel, que lo hacen por ti.
 
 ## 4. Respuesta temporal verificada (IEC 61672-1, Tabla 4)
 
-La respuesta de la envolvente Fast a ráfagas de tono de 4 kHz cae exactamente
+La respuesta de la envolvente Fast a ráfagas tonales de 4 kHz cae exactamente
 sobre los valores de referencia de la norma: el ejemplo de abajo verifica la
 fila de la ráfaga Fast de 200 ms; la batería de CI cubre la Tabla 4 completa,
 de 1 s a 1 ms en F y de 1 s a 2 ms en S, con límites de aceptación de clase 1:
@@ -323,7 +323,7 @@ lento.
 Consulta [Niveles integrados y estadísticos](/phonometry/es/signals/levels/levels/)
 para las métricas $L_{eq}$/$L_N$ construidas sobre estas envolventes, y
 [Por qué phonometry](/phonometry/es/start/why-phonometry/) para la
-verificación con ráfagas de tono de IEC 61672-1.
+verificación con ráfagas tonales de IEC 61672-1.
 
 ## Qué cubre esta guía
 
@@ -331,7 +331,7 @@ verificación con ráfagas de tono de IEC 61672-1.
 IEC 61672-1:2013 (apartado 3.8) con las constantes de tiempo Fast y Slow
 (apartado 5.7), implementado como el filtro recursivo de `time_weighting`
 y la clase `TimeWeighting` para streaming, verificado en CI contra las
-referencias de ráfaga de tono de clase 1 de la Tabla 4. La balística
+referencias de ráfaga tonal de clase 1 de la Tabla 4. La balística
 asimétrica heredada Impulse (35 ms de ataque, 1,5 s de caída), trasladada
 a las normas internacionales desde las características FAST/SLOW/IMPULSE
 de ANSI S1.4-1983.

@@ -217,7 +217,7 @@ ISO 1996-1, IEC 60942 y la GUM.
   la correlación con sus errores aleatorios, la estimación de retardo por
   correlación directa y las ponderaciones GCC, y la envolvente de Hilbert.
 - [Señales de prueba y herramientas de muestreo](/phonometry/es/signals/spectra/test-signals/):
-  ráfagas de tono IEC 60268-1 con conmutación exacta, ruido de colores con
+  ráfagas tonales IEC 60268-1 con conmutación exacta, ruido de colores con
   pendiente exacta, remuestreo con especificación antialias declarada y retardo
   fraccionario.
 - [Medición de sistemas](/phonometry/es/signals/spectra/system-measurement/): pares

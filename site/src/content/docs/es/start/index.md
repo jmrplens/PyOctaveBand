@@ -39,7 +39,7 @@ cada una.
 **¿Me puedo fiar del número?**
 [Por qué phonometry](/phonometry/es/start/why-phonometry/) explica para qué
 sirve la biblioteca y cómo se valida contra las normas que implementa, con la
-comprobación de ráfagas de tono desarrollada frente a los límites de
+comprobación de ráfagas tonales desarrollada frente a los límites de
 aceptación.
 
 **¿Quién responde de ella y cómo la cito?**

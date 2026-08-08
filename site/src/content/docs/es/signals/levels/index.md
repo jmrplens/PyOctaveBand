@@ -10,7 +10,7 @@ de esta sección implementan esa cadena etapa a etapa para el nivel
 mostrado: las curvas A/C/Z y las balísticas Fast y Slow de
 **IEC 61672-1:2013**, verificadas en CI contra las propias tablas de tolerancia
 de la norma (la Tabla 3 para las ponderaciones, la Tabla 4 para las respuestas
-a ráfaga de tono), más la balística Impulse heredada que la IEC 61672-1 recibió
+a ráfaga tonal), más la balística Impulse heredada que la IEC 61672-1 recibió
 de la IEC 60651 y después retiró de sus requisitos, conservada aquí para
 procedimientos nacionales antiguos.
 

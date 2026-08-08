@@ -96,7 +96,7 @@ frecuencia instantáneas.
 
 [Señales de prueba y herramientas de
 muestreo](/phonometry/es/signals/spectra/test-signals/)
-es la caja de herramientas que hay debajo de todo lo demás: ráfagas de tono
+es la caja de herramientas que hay debajo de todo lo demás: ráfagas tonales
 con la conmutación exacta de IEC 60268-1 (inicio en el paso por cero, número
 entero de periodos completos, trenes repetitivos) que ejercitan las balísticas
 del detector, remuestreo polifásico tras una especificación antialias
@@ -159,7 +159,7 @@ estimaciones.
   alineación submuestral de respuestas al impulso, y la envolvente de
   Hilbert.
 - [Señales de prueba y herramientas de muestreo](/phonometry/es/signals/spectra/test-signals/):
-  ráfagas de tono IEC 60268-1 con conmutación exacta, remuestreo con
+  ráfagas tonales IEC 60268-1 con conmutación exacta, remuestreo con
   especificación antialias declarada y retardo fraccionario de banda
   limitada.
 - [Medición de sistemas](/phonometry/es/signals/spectra/system-measurement/):

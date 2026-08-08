@@ -1,6 +1,6 @@
 ---
 title: "Señales de prueba y herramientas de muestreo"
-description: "La caja de señales del dominio de metrología: ráfagas de tono IEC 60268-1 con conmutación exacta, ruido de colores con pendiente espectral exacta, remuestreo polifásico tras una especificación antialias explícita, y retardo fraccionario de banda limitada con frontera lineal o circular."
+description: "La caja de señales del dominio de metrología: ráfagas tonales IEC 60268-1 con conmutación exacta, ruido de colores con pendiente espectral exacta, remuestreo polifásico tras una especificación antialias explícita, y retardo fraccionario de banda limitada con frontera lineal o circular."
 references:
   - type: standard
     organization: "International Electrotechnical Commission"
@@ -8,7 +8,7 @@ references:
     title: "Sound system equipment — Part 1: General"
     designation: "IEC 60268-1:1985"
     url: "https://webstore.iec.ch/en/publication/1180"
-    note: "Anexo A, apartado A2: ráfagas de tono que comienzan en el paso por cero del tono con un número entero de periodos completos (A2.1), trenes repetitivos de salvas a una tasa de repetición dada (A2.2), y las duraciones de salva de la tabla AII contra las que se comprueban a mano los recuentos de muestras."
+    note: "Anexo A, apartado A2: ráfagas tonales que comienzan en el paso por cero del tono con un número entero de periodos completos (A2.1), trenes repetitivos de salvas a una tasa de repetición dada (A2.2), y las duraciones de salva de la tabla AII contra las que se comprueban a mano los recuentos de muestras."
   - type: book
     authors: ["Bendat, J. S.", "Piersol, A. G."]
     year: 2010
@@ -23,7 +23,7 @@ import ThemeImage from '../../../../../components/ThemeImage.astro';
 
 Una medición es tan fiable como su estímulo y su contabilidad de la
 frecuencia de muestreo. Esta página cubre la caja de señales de
-`phonometry.signals`: **ráfagas de tono** con la conmutación exacta que
+`phonometry.signals`: **ráfagas tonales** con la conmutación exacta que
 prescribe IEC 60268-1, los **generadores de ruido de colores** (detallados
 en la [guía de análisis
 espectral](/phonometry/es/signals/spectra/spectral-analysis/#5-generadores-de-ruido-de-colores)),
@@ -35,7 +35,7 @@ exactitud de banda limitada.
 Antes de los detalles, el retrato de familia: qué aspecto tiene cada
 estímulo en el tiempo y dónde se reparte su energía en frecuencia.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_test_signals_es.svg" alt="Cuadrícula con cinco miniaturas etiquetadas de señales de ensayo: ruido blanco con forma de onda irregular y densidad espectral plana de 0 dB por octava, igual potencia por hercio; ruido rosa con forma de onda más suave y densidad de menos 3 dB por octava, igual potencia por octava; una MLS binaria de periodo 2 elevado a m menos 1 muestras con espectro de rayas plano; un esquema tiempo-frecuencia donde el barrido lineal es una recta mientras el exponencial se pega a las frecuencias bajas y dedica igual tiempo a cada octava; y una ráfaga de tono IEC 60268-1 de periodos completos que empieza en un paso por cero, 25 periodos de 5 kHz durante 5 ms" width="92%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_test_signals_es.svg" alt="Cuadrícula con cinco miniaturas etiquetadas de señales de ensayo: ruido blanco con forma de onda irregular y densidad espectral plana de 0 dB por octava, igual potencia por hercio; ruido rosa con forma de onda más suave y densidad de menos 3 dB por octava, igual potencia por octava; una MLS binaria de periodo 2 elevado a m menos 1 muestras con espectro de rayas plano; un esquema tiempo-frecuencia donde el barrido lineal es una recta mientras el exponencial se pega a las frecuencias bajas y dedica igual tiempo a cada octava; y una ráfaga tonal IEC 60268-1 de periodos completos que empieza en un paso por cero, 25 periodos de 5 kHz durante 5 ms" width="92%" />
 
 ## 1. Ráfagas de tono (IEC 60268-1)
 
@@ -275,7 +275,7 @@ exactitud son formas cerradas, no normativas.
 
 ## Véase también
 
-- [Ponderación temporal](/phonometry/es/signals/levels/time-weighting/): la balística de detector que ejercitan las ráfagas de tono (IEC 61672-1, Tabla 4).
+- [Ponderación temporal](/phonometry/es/signals/levels/time-weighting/): la balística de detector que ejercitan las ráfagas tonales (IEC 61672-1, Tabla 4).
 - [Correlación y retardo](/phonometry/es/signals/spectra/correlation-delay/): el trabajo de alineación construido sobre el núcleo de retardo fraccionario.
 - [Promediado síncrono](/phonometry/es/signals/spectra/synchronous-averaging/): alineación de periodos con el mismo desplazamiento de banda limitada cuando $f_s T$ no es entero.
 - [Análisis espectral](/phonometry/es/signals/spectra/spectral-analysis/): la verificación del ruido de colores y las métricas de ventanas.

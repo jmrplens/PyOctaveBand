@@ -65,7 +65,7 @@ sigue la columna entera de una vez; un detector que promedia sobre bloques fijos
 de 125 ms no tiene ningún $T_b$ dentro, y solo puede acertar allí donde la
 ráfaga llene un bloque por casualidad.
 
-## Verificación frente a IEC 61672-1 (ráfagas de tono)
+## Verificación frente a IEC 61672-1 (ráfagas tonales)
 
 La prueba rigurosa para la ponderación temporal es la **respuesta a ráfaga de
 tono** (IEC 61672-1, Tabla 4), usando una ráfaga sinusoidal de 4 kHz referida al
@@ -159,7 +159,7 @@ respuesta calculada no se sale nunca de la banda que dibuja la norma; no
 significa que el error sea cero, y el tamaño del margen es el número
 interesante.
 
-El caso de las ráfagas de tono de arriba no es una comprobación aislada. Para
+El caso de las ráfagas tonales de arriba no es una comprobación aislada. Para
 cada norma que la biblioteca implementa, los valores de referencia y los límites
 de aceptación se transcriben del texto oficial a la batería de tests, de modo
 que cualquier regresión hace fallar la CI. Una muestra del núcleo de
@@ -168,7 +168,7 @@ metrología:
 | Norma | Qué se verifica | Archivo de test |
 | :--- | :--- | :--- |
 | IEC 61672-1:2013 Tabla 3 | Ponderación A/C/Z en las 34 frecuencias nominales, límites de clase 1, a 48 y 96 kHz | `tests/filters/test_iec_weighting_table3.py` |
-| IEC 61672-1:2013 Tabla 4 | Respuestas F/S a ráfagas de tono (de 1 s a 1 ms) y la columna $L_{AE}$ para `sel()` | `tests/filters/test_iec_compliance.py` |
+| IEC 61672-1:2013 Tabla 4 | Respuestas F/S a ráfagas tonales (de 1 s a 1 ms) y la columna $L_{AE}$ para `sel()` | `tests/filters/test_iec_compliance.py` |
 | IEC 61672-1:2013 Tabla 5 | Respuestas de pico de un ciclo/medio ciclo de `lc_peak()`, límites de clase 1 | `tests/signals/test_levels.py` |
 | IEC 61260-1:2014 Tabla 1 | Límites de aceptación de clase 1/2 del banco de filtros mediante `verify_filter_class()` | `tests/filters/test_compliance.py` |
 | ISO 7196:1995 Tabla 2 | Ponderación G (infrasonidos) en todos los valores nominales de respuesta, 0,25–315 Hz | `tests/filters/test_g_weighting.py` |
