@@ -867,9 +867,9 @@ de lectura:
 
 Reunido a lo largo de las bandas de tercio de octava, el coeficiente de difusión
 $d(f)$ forma un `DiffusionSpectrum`, cuyo `report(path)` genera un informe de
-ensayo de difusión de una página (ISO 17497-2, Apartado 8.5): la tabla por banda
+ensayo de difusión de una página (ISO 17497-2, apartado 8.5): la tabla por banda
 de $d$ junto a la curva $d(f)$ con eje de bandas, con un titular de
-caracterización enmarcado. Según el Apartado 8.4, el coeficiente de incidencia
+caracterización enmarcado. Según el apartado 8.4, el coeficiente de incidencia
 aleatoria es a su vez una magnitud por banda, la media de los coeficientes
 direccionales sobre las posiciones de fuente banda a banda (**no** una media a
 través de las frecuencias), de modo que aquí $d$ es un coeficiente por banda.
@@ -884,7 +884,7 @@ from phonometry import materials
 # práctica, la d de incidencia aleatoria de cada banda es la media, sobre las
 # posiciones de fuente, de los coeficientes direccionales: para la banda k, se
 # promedia directional_diffusion_coefficient sobre las fuentes con
-# random_incidence_diffusion (Apartado 8.4).
+# random_incidence_diffusion (apartado 8.4).
 freqs = np.array([250, 500, 1000, 2000, 4000], float)
 d = np.array([0.30, 0.45, 0.60, 0.75, 0.88])
 spectrum = materials.diffusion_spectrum(freqs, d)

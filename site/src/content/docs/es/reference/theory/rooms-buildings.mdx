@@ -176,7 +176,7 @@ es decir, una suma acumulada invertida en tiempo discreto. La integración inver
 
 *Una respuesta al impulso al cuadrado, su integral inversa de Schroeder y las ventanas de regresión EDT/T20/T30 del siguiente apartado.*
 
-### Ventanas de regresión y validez (ISO 3382-2, Apartado 6, Anexo B/C)
+### Ventanas de regresión y validez (ISO 3382-2, apartado 6, Anexo B/C)
 
 El tiempo de reverberación es un ajuste por mínimos cuadrados $L = a + b t$ sobre una ventana, extrapolado a 60 dB mediante $T = -60/b$ (Anexo C): **EDT** de 0 a −10 dB, **T20** de −5 a −25 dB, **T30** de −5 a −35 dB. Un decaimiento de una sola pendiente da EDT = T20 = T30; una doble pendiente rápida al principio y lenta al final da EDT < T30. La validez se basa en la regla de rango dinámico de 5.3.3: el ruido debe situarse al menos 25 dB por debajo del pico de la respuesta al impulso para EDT (rango de evaluación + 15 dB), aumentado a 46 dB para T20 y 54 dB para T30 de modo que el sesgo de compensación de cola de un valor marcado como válido se mantenga dentro del 5 % del JND. La **curvatura** $C = 100\ (T_{30}/T_{20} - 1)$ % (Anexo B) señala un decaimiento no recto por encima del 10 %.
 
@@ -200,7 +200,7 @@ temprano/tardío de esa misma respuesta al impulso, y C50 y C80 crecen con la
 frecuencia por la misma razón por la que cae el tiempo de reverberación: cuanto
 más tardía es la energía, mayor parte de ella ha eliminado ya la sala.*
 
-### Decaimiento espacial en oficinas diáfanas (ISO 3382-3, Apartado 6)
+### Decaimiento espacial en oficinas diáfanas (ISO 3382-3, apartado 6)
 
 La tasa de decaimiento espacial del habla ponderada A es la pendiente por mínimos cuadrados ordinarios de $L_{p,A,S}$ frente a $\log_{10}(r/r_0)$ ($r_0 = 1$ m) sobre las posiciones de 2–16 m, reescalada a una cifra por duplicación, y el nivel nominal se lee en la misma recta a 4 m:
 
@@ -228,7 +228,7 @@ sale plano o creciente, las dos distancias no existen, no es que sean grandes.*
 
 Por banda de tercio de octava, la diferencia de niveles $D = L_1 - L_2$ (promediada en energía sobre las posiciones de micrófono, $L = 10 \log_{10}[(1/n) \sum_i 10^{L_i/10}]$) se normaliza de dos formas: la diferencia de niveles estandarizada $D_{nT} = D + 10 \log_{10}(T/T_0)$ con $T_0 = 0{,}5$ s (de modo que $D_{nT} = D$ cuando $T = T_0$), y el índice de reducción acústica aparente $R' = D + 10 \log_{10}(S/A)$ con el área de absorción de Sabine $A = 0{,}16\ V / T$, por tanto $R' = D + 10 \log_{10}[S T / (0{,}16\ V)]$.
 
-El índice de un solo número (ISO 717-1, Apartado 4.4) desplaza la **curva de referencia** de la Tabla 3 en pasos de 1 dB hacia la curva medida hasta que la suma de desviaciones *desfavorables* $\sum_i \max(0, \text{ref}_i + k - \text{meas}_i)$ es máxima pero $\le$ 32,0 dB (16 tercios) o 10,0 dB (5 octavas); el índice $R_w$ es la referencia desplazada a 500 Hz. Los **términos de adaptación espectral** son $C = X_{A1} - X_w$ y $C_{tr} = X_{A2} - X_w$ con $X_{Aj} = -10 \log_{10} \sum_i 10^{(L_{ij} - X_i)/10}$ (espectros de la Tabla 4: n.º 1 ruido rosa, n.º 2 tráfico urbano), cada uno redondeado a un entero. El ejemplo resuelto del Anexo C de ISO 717-1 ($R_w = 30$, $C = -2$, $C_{tr} = -3$, suma desfavorable 31,8 dB) se reproduce exactamente.
+El índice de un solo número (ISO 717-1, apartado 4.4) desplaza la **curva de referencia** de la Tabla 3 en pasos de 1 dB hacia la curva medida hasta que la suma de desviaciones *desfavorables* $\sum_i \max(0, \text{ref}_i + k - \text{meas}_i)$ es máxima pero $\le$ 32,0 dB (16 tercios) o 10,0 dB (5 octavas); el índice $R_w$ es la referencia desplazada a 500 Hz. Los **términos de adaptación espectral** son $C = X_{A1} - X_w$ y $C_{tr} = X_{A2} - X_w$ con $X_{Aj} = -10 \log_{10} \sum_i 10^{(L_{ij} - X_i)/10}$ (espectros de la Tabla 4: n.º 1 ruido rosa, n.º 2 tráfico urbano), cada uno redondeado a un entero. El ejemplo resuelto del Anexo C de ISO 717-1 ($R_w = 30$, $C = -2$, $C_{tr} = -3$, suma desfavorable 31,8 dB) se reproduce exactamente.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/insulation_rating_es.svg" alt="Índice de reducción acústica medido en tercios de octava con la curva de referencia de ISO 717-1 desplazada y el índice ponderado resultante a 500 Hz" width="80%" />
 
@@ -272,7 +272,7 @@ es $A_T = A_2 - A_1$ y su coeficiente $\alpha_s = A_T/S$. Con la velocidad del
 sonido de la Ec. (6), $c = 331 + 0{,}6\ t$ (°C), y $m$ convertido de un
 coeficiente de atenuación de ISO 9613-1 mediante $m = \alpha / (10 \log_{10} e)$. Como
 la difracción y la dispersión de borde interceptan más que el área plana de la
-muestra, $\alpha_s$ se deja sin saturar y puede superar 1,0 (Apartado 3.7
+muestra, $\alpha_s$ se deja sin saturar y puede superar 1,0 (apartado 3.7
 NOTA 2).
 
 ### Normalización en laboratorio frente a campo (ISO 10140, ISO 16283)
@@ -296,7 +296,7 @@ de ellos, el nivel del recinto receptor se corrige por ruido de fondo mediante l
 resta energética $L = 10 \log_{10}(10^{L_{sb}/10} - 10^{L_b/10})$ para un margen
 señal-fondo de 6–15 dB, saturada en un valor fijo de $1{,}3$ dB (el límite de
 medición) en 6 dB o por debajo y omitida en 15 dB o por encima (ISO 10140-4,
-Apartado 4.3), el análogo de laboratorio de la regla 6/10 dB de ISO 16283-1. La
+apartado 4.3), el análogo de laboratorio de la regla 6/10 dB de ISO 16283-1. La
 extensión a fachadas (ISO 16283-3) sustituye el nivel del recinto emisor por el
 nivel 2 m frente a la fachada, $D_{2m} = L_{1,2m} - L_2$, y añade una corrección
 fija por ángulo de incidencia al índice de reducción acústica del elemento, $-1{,}5$
@@ -344,12 +344,12 @@ revestimiento $\Delta L_w$ (ISO 717-2) y la corrección por flancos $K$ de la
 Tabla 1. Los ejemplos resueltos del Anexo H.3 de EN 12354-1 ($R'_w = 52$ dB) y del
 Anexo E.3 de EN 12354-2 ($L'_{n,w} = 45$ dB) se reproducen exactamente; se
 declara que el modelo simplificado tiene una desviación típica de unos 2 dB
-(Apartado 5).
+(apartado 5).
 
 ### Absorción acústica en recintos (EN 12354-6)
 
 EN 12354-6:2003 predice el área de absorción equivalente de un recinto a
-partir de sus partes (el modelo normativo de el Apartado 4). El total
+partir de sus partes (el modelo normativo del apartado 4). El total
 (Fórmula 1) suma las superficies, los objetos y el aire:
 
 $$

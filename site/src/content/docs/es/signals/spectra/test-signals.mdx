@@ -55,7 +55,7 @@ from phonometry import tone_burst
 single = tone_burst(48000, 5000, 25)
 print(single.burst_samples)         # 240 muestras = 5 ms a 48 kHz
 
-# Apartado A2.2: salvas de 5 ms a 10 salvas por segundo.
+# apartado A2.2: salvas de 5 ms a 10 salvas por segundo.
 train = tone_burst(48000, 5000, 25, repetitions=4, repetition_rate=10)
 print(train.period_samples, train.duty_cycle)   # 4800, 0.05
 train.plot(language="es")           # forma de onda con la envolvente

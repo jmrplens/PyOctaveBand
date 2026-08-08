@@ -22,7 +22,7 @@ references:
     title: "Acoustics — Determination of sound power levels and sound energy levels of noise sources using sound pressure — Precision methods for anechoic rooms and hemi-anechoic rooms"
     designation: "ISO 3745:2012"
     url: "https://www.iso.org/standard/45362.html"
-    note: "El método de precisión en cámara anecoica de la sección 2: el nivel de potencia de el Apartado 8, la corrección de fondo por posición (Ec. 11), las correcciones meteorológicas y las mallas de micrófonos normalizadas."
+    note: "El método de precisión en cámara anecoica de la sección 2: el nivel de potencia del apartado 8, la corrección de fondo por posición (Ec. 11), las correcciones meteorológicas y las mallas de micrófonos normalizadas."
   - type: standard
     organization: "International Organization for Standardization"
     year: 2010
@@ -283,7 +283,7 @@ posición y una corrección meteorológica explícita.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_precision_anechoic_es.svg" alt="Potencia acústica de precisión de ISO 3745 en una cámara anecoica: paredes revestidas de cuñas, el dispositivo bajo ensayo en el centro y un conjunto hemisférico de micrófonos a un radio fijo, con el nivel de potencia acústica formado a partir de la presión promediada en la superficie más las correcciones de área, ruido de fondo y meteorológica" width="92%" />
 
-**Nivel de potencia acústica (Apartado 8).** El nivel de potencia acústica por banda es
+**Nivel de potencia acústica (apartado 8).** El nivel de potencia acústica por banda es
 el nivel de presión promediado en la superficie más el término de superficie y las
 correcciones:
 
@@ -354,7 +354,7 @@ print(round(float(k1[0, 0]), 4))      # 1.2563
 mc = emission.meteorological_corrections(23.0, 101.325)
 print(round(mc.c1, 4), round(mc.c2, 4))   # -0.1282 0.0
 
-# Incertidumbre expandida (EJEMPLO de el Apartado 10.5): sigma_R0 = 0.5, sigma_omc = 2.0,
+# Incertidumbre expandida (EJEMPLO del apartado 10.5): sigma_R0 = 0.5, sigma_omc = 2.0,
 # k = 2 -> U = 4.1 dB.
 print(round(emission.precision_uncertainty(0.5, 2.0, 2.0), 3))   # 4.123
 ```
@@ -381,7 +381,7 @@ rng = np.random.default_rng(7)
 levels = base[None, :] + rng.normal(0.0, 1.0, (40, freqs.size))
 
 # sigma_omc es la desviación típica de funcionamiento y montaje de la
-# Apartado 10.5; con el valor de EJEMPLO 2.0 dB y el factor de cobertura por
+# apartado 10.5; con el valor de EJEMPLO 2.0 dB y el factor de cobertura por
 # defecto k = 2, la incertidumbre expandida U = k*sqrt(sigma_R0^2 + sigma_omc^2)
 # son los 4.1 dB que imprime la ficha de abajo. Con su valor por defecto 0
 # informa 1.0 dB.
@@ -554,8 +554,8 @@ las posiciones de micrófono del Anexo B (`measurement_positions`,
 determinación de precisión de ISO 3745 (`sound_power_anechoic`): las mallas
 fijas de los Anexos D/E (`precision_positions`), la corrección de fondo por
 posición (`precision_background_correction`, Ec. 11), las correcciones
-meteorológicas $C_1$/$C_2$/$C_3$ y la incertidumbre expandida de el
-Apartado 10.5 (`precision_uncertainty`). Ambos resultados presentan la
+meteorológicas $C_1$/$C_2$/$C_3$ y la incertidumbre expandida del
+apartado 10.5 (`precision_uncertainty`). Ambos resultados presentan la
 ficha de potencia acústica de estilo acreditado mediante `.report()`.
 
 **No cubierto.** Ninguno de los dos métodos ejecuta el ensayo de

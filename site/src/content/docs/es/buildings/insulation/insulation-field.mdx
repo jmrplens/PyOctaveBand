@@ -278,7 +278,7 @@ t2 = np.full(16, 0.5)
 l1a, l2a = np.full(16, 80.0), np.full(16, 40.0)   # posición de altavoz 1
 l1b, l2b = np.full(16, 83.0), np.full(16, 37.0)   # posición de altavoz 2
 
-# Apartado 7.3.4: un resultado por posición de altavoz, combinados con la Fórmula (6).
+# apartado 7.3.4: un resultado por posición de altavoz, combinados con la Fórmula (6).
 a = building.airborne_insulation(l1a, l2a, t2, area=10.0, volume=50.0)
 b = building.airborne_insulation(l1b, l2b, t2, area=10.0, volume=50.0)
 dnt = -10 * np.log10(np.mean(10.0 ** (-np.vstack([a.dnt, b.dnt]) / 10.0), axis=0))
@@ -358,7 +358,7 @@ corners = np.array([                      # filas: esquinas, columnas: las 3 ban
 ])
 l_default = np.array([49.5, 51.2, 48.6])
 
-l_corner = corners.max(axis=0)            # Apartado 8.5: la esquina más alta, por banda
+l_corner = corners.max(axis=0)            # apartado 8.5: la esquina más alta, por banda
 print(l_corner)                           # [54.6 56.9 52.7]  (tres esquinas distintas)
 
 l_lf = 10 * np.log10((10 ** (0.1 * l_corner) + 2 * 10 ** (0.1 * l_default)) / 3)

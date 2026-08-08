@@ -172,7 +172,7 @@ plt.show()
 ```
 </details>
 
-**Corrección de ruido residual (Apartado 10.4).** `residual_sound_correction()`
+**Corrección de ruido residual (apartado 10.4).** `residual_sound_correction()`
 aplica $L = 10\log_{10}(10^{L'/10} - 10^{L_\text{res}/10})$ (Fórmula (16)). Con un
 residual dentro de 3 dB del nivel medido no se permite corrección alguna: el
 valor declarable es entonces el nivel medido *sin corregir* $L'$, como cota
@@ -181,7 +181,7 @@ superior del sonido específico (expuesto como `reportable_upper_bound`, con
 niveles percentiles (Anexo I) y rechaza ordenaciones de percentiles
 invertidas.
 
-**Incertidumbre de medición (Apartado 4, Anexo F).**
+**Incertidumbre de medición (apartado 4, Anexo F).**
 `combined_standard_uncertainty()` forma $u = \sqrt{\sum (c_j u_j)^2}$ (Fórmula (2))
 y `expanded_uncertainty()` aplica $k = 2$ (95 %) o $k = 1{,}3$ (80 %);
 `residual_correction_uncertainty()` lleva la sensibilidad de la corrección residual
