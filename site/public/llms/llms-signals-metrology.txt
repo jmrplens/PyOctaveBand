@@ -9,18 +9,19 @@ Source: https://jmrplens.github.io/phonometry/signals/metrology/
 
 # Calibration and uncertainty
 
-A level printed by software is not yet a measurement. Two things separate the
-one from the other: knowing what the digital samples mean **physically**, and
-knowing how much the result could reasonably be **wrong**. This section covers
-both, and they apply transversally to every other page of the documentation.
+A level printed by software is not yet a measurement. Three things separate
+the one from the other: knowing that the record deserves to be **averaged at
+all**, knowing what the digital samples mean **physically**, and knowing how
+much the result could reasonably be **wrong**. This section covers all three,
+and they apply transversally to every other page of the documentation.
 
-[Calibration and dBFS](https://jmrplens.github.io/phonometry/signals/metrology/calibration/) handles the first.
-phonometry works in two reference frames: physical **dB SPL**, established
-either from a recorded calibrator tone (the IEC 60942 field ritual) or from a
-known microphone sensitivity, and digital **dBFS**, levels relative to full
-scale, appropriate when no physical reference exists or when characterising
-the digital chain itself. The page explains how each mode is set up and, just
-as important, which quantities are meaningful in which frame.
+[Calibration and dBFS](https://jmrplens.github.io/phonometry/signals/metrology/calibration/) handles the
+physical meaning. phonometry works in two reference frames: physical **dB
+SPL**, established from a recorded calibrator tone (the IEC 60942 field
+ritual), and digital **dBFS**, levels relative to full scale, appropriate when
+no physical reference exists or when characterising the digital chain itself.
+The page explains how each mode is set up and, just as important, which
+quantities are meaningful in which frame.
 
 [Measurement uncertainty (GUM and Monte Carlo)](https://jmrplens.github.io/phonometry/signals/metrology/gum-uncertainty/)
 handles the second, implementing the *Guide to the Expression of Uncertainty
@@ -56,14 +57,32 @@ budgets that are specialisations of the GUM machinery described here.
 ## Pages in this section
 
 - [Calibration and dBFS](https://jmrplens.github.io/phonometry/signals/metrology/calibration/): physical SPL
-  calibration from a calibrator tone or a known sensitivity, and the digital
-  full-scale mode.
+  calibration from a calibrator tone, the stability check it applies to that
+  recording, and the digital full-scale mode.
 - [Measurement uncertainty (GUM and Monte Carlo)](https://jmrplens.github.io/phonometry/signals/metrology/gum-uncertainty/):
   the law of propagation of uncertainty and the Monte Carlo method, expanded
   uncertainty and coverage intervals.
 - [Data qualification](https://jmrplens.github.io/phonometry/signals/metrology/data-qualification/): the reverse
   arrangement and runs stationarity tests on segment statistics, and the
   Rice level-crossing and peak statistics with the irregularity factor.
+
+## What this section does not cover
+
+Nothing here checks an instrument or a calibrator. The IEC 60942 conformance
+tests of the calibrator itself — generated level, frequency, distortion, and
+the corrections for static pressure and temperature — are not implemented, so
+pass an already corrected `target_spl` when the manual asks for one, and the
+IEC 61672-3 periodic tests are cited as laboratory practice rather than run.
+The dBFS half of the calibration page sits outside any standard and makes no
+physical claim: it is a reference frame, not a measurement. Data qualification
+implements the quantitative core of Bendat & Piersol's section 10.3 only —
+classifying a record's type, validating it against physical limits and editing
+out glitches remain manual steps, as the book describes them. And an
+uncertainty budget is a model of *your* measurement: the library propagates
+whatever you declare, and never invents the terms. Where a standard publishes
+its own budget the guides say so, as ISO 9612 does for [occupational
+exposure](https://jmrplens.github.io/phonometry/perception/hearing/occupational-exposure/) and ISO 12999-1
+for [sound insulation](https://jmrplens.github.io/phonometry/buildings/insulation/).
 
 ---
 

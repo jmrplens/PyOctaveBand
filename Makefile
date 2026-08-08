@@ -103,6 +103,7 @@ brand:
 
 llms:
 	$(PYTHON) scripts/mirror_overviews.py
+	$(PYTHON) scripts/mirror_glossary.py
 	$(PYTHON) scripts/generate_llms.py
 
 # Regenerate README_PYPI.md (the PyPI long description) from README.md:

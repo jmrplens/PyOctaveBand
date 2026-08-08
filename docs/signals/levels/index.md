@@ -71,3 +71,22 @@ Pages elsewhere on the site that this section leans on:
 - [Spanish Noise Regulation (RD 1367/2007)](../../environment/assessment/spanish-noise-regulation.md):
   the corrected level LKeq, the Kt/Kf/Ki corrections, the evaluation periods
   and noise phases, and the limit tables.
+
+## What this section does not cover
+
+These pages implement the signal processing of a sound level meter, not the
+meter. The rest of IEC 61672-1 — level ranges, overload indication, the
+self-generated noise floor, the directional response and the IEC 61672-3
+periodic tests — is not implemented anywhere in the library, so nothing here
+assigns a class to a physical instrument; [Build a sound level
+meter](../sound-level-meter.md) states exactly what a class
+verdict from the library does and does not mean. Two curves come without a
+verdict of any kind: ISO 7196 defines a single ±1 dB tolerance for G with no
+class structure, and the withdrawn IEC 537 left no tolerance table behind for
+D, so both curves filter a signal but neither reaches
+`verify_weighting_class`, and they are pinned against their published tables in
+the conformance report instead. The noise dose is the 1993
+first edition of IEC 61252 only, not the 2025 revision. And a dose is a
+quantity, not a verdict: the exposure strategies, the sampling plan and the
+limits that decide whether a worker is over-exposed are [Occupational exposure
+(ISO 9612)](../../perception/hearing/occupational-exposure.md).

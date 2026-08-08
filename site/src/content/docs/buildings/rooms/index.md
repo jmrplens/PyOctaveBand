@@ -1,6 +1,6 @@
 ---
 title: "Room acoustics"
-description: "The sound field inside a single room: impulse-response measurement (ISO 18233), the ISO 3382 parameters, open-plan speech privacy, the ANSI S12.2 room-noise ratings, and reverberation-time prediction by the classical formulae and the EN 12354-6 normative model."
+description: "The sound field inside a single room: impulse-response measurement (ISO 18233), the ISO 3382 parameters, open-plan speech privacy, image sources, the steady-state field and the rectangular-room modes, the ANSI S12.2 room-noise ratings, and reverberation-time prediction by the classical formulae and the EN 12354-6 normative model."
 ---
 
 Almost everything about the sound field inside a room follows from two
@@ -9,6 +9,14 @@ absorption**, which can be designed. The pages of this section cover the
 measurement chain built on the first, the prediction chain built on the
 second, and the rating of the background noise that occupies the room in
 between.
+
+One boundary runs through all of it: the **Schroeder frequency**. Above it a
+room has so many overlapping modes that a statistical description is the honest
+one, and every reverberation formula and decay parameter on these pages lives
+there. Below it the modes are discrete and separable, and no statistical model
+applies — which is why the measurement and prediction pages alike carry validity
+caveats at their lowest bands. A reader chasing a low-frequency problem should
+start from the modal treatment rather than from the decay parameters.
 
 The measurement chain starts in
 [Measuring the Room Impulse Response](/phonometry/buildings/rooms/room-impulse-response/):
@@ -23,9 +31,20 @@ intelligible across an open floor, through the spatial decay rate and the
 distraction and privacy distances.
 [Image sources and the steady-state room field](/phonometry/buildings/rooms/room-image-sources/)
 approaches the same room deterministically, building its impulse response from
-mirrored sources and its steady-state level from the room constant.
+mirrored sources, its steady-state level from the room constant, and, below the
+Schroeder frequency where both of those give out, the discrete normal modes of
+the shoebox itself.
 
-Prediction gets two pages because two traditions coexist.
+Before the two prediction pages, one page answers a different question about the
+same room.
+[Room-noise criteria (NC / RC Mark II)](/phonometry/buildings/rooms/room-noise/)
+asks whether its steady background noise (ventilation, distant traffic) is
+acceptable for its use, rated against the ANSI/ASA S12.2 criterion curves, with
+the RC Mark II rumble/hiss tag diagnosing *why* a spectrum fails.
+
+Prediction gets two pages because two traditions coexist. Both are diffuse-field
+statistical models fed by the same laboratory absorption coefficients, so they
+are not rival physics; they differ in what they are admissible for.
 [Reverberation-time prediction (Sabine, Eyring, Arau)](/phonometry/buildings/rooms/reverberation-prediction/)
 covers the classical statistical formulae (Sabine, Eyring, Millington-Sette,
 Fitzroy and Arau-Puchades), including the models that handle a non-uniform
@@ -36,11 +55,19 @@ equivalent absorption area assembled from surfaces, objects and air, and the
 reverberation time that follows from it, as a standard a design report can
 cite.
 
-[Room-noise criteria (NC / RC Mark II)](/phonometry/buildings/rooms/room-noise/)
-answers a different question about the same room: whether its steady
-background noise (ventilation, distant traffic) is acceptable for its use,
-rated against the ANSI/ASA S12.2 criterion curves, with the RC Mark II
-rumble/hiss tag diagnosing *why* a spectrum fails.
+**Which one?** Cite EN 12354-6 when the deliverable is a design report under a
+European building-acoustics framework, when the room is an ordinary building
+space inside the clause 4.6 validity limits, and when the receiving-room
+absorption has to feed an EN 12354 insulation prediction. Use the classical
+family when the room falls outside that scope — a hall, a theatre, an
+industrial space, or a room whose absorption is concentrated on one axis so that
+an axial model is needed — or when a *band* of predictions rather than a single
+normative value is what the situation deserves. Both share one failure mode, the
+loss of diffusivity, and they fail in the same direction: the measured
+reverberation time comes out longer than predicted, by up to a factor of two in
+the low-diffusivity rooms the standard's own accuracy clause records. And
+neither replaces a measurement — the measured counterpart is
+[Room Acoustics](/phonometry/buildings/rooms/room-acoustics/).
 
 Related pages elsewhere: the absorption coefficient the prediction chain
 consumes is measured in
@@ -61,12 +88,40 @@ speech intelligibility a room affords is quantified by the
 - [Open-Plan Office Acoustics (ISO 3382-3)](/phonometry/buildings/rooms/open-plan-acoustics/):
   the spatial decay rate of speech and the distraction and privacy distances.
 - [Image sources and the steady-state room field](/phonometry/buildings/rooms/room-image-sources/):
-  the deterministic image-source room impulse response (Kuttruff/Vorländer) and
+  the deterministic image-source room impulse response (Kuttruff/Vorländer),
   the statistical steady-state level with the room constant, critical distance
-  and Schroeder frequency (Bies).
+  and Schroeder frequency (Bies), and the rectangular-room normal modes with
+  their axial, tangential and oblique families, mode count and modal density
+  (Long).
 - [Room-noise criteria (NC / RC Mark II)](/phonometry/buildings/rooms/room-noise/):
   the ANSI/ASA S12.2-2019 NC tangency and RC Mark II ratings.
 - [Reverberation-time prediction (Sabine, Eyring, Arau)](/phonometry/buildings/rooms/reverberation-prediction/):
   the five statistical models with the air-absorption term.
 - [Sound absorption in enclosed spaces (EN 12354-6)](/phonometry/buildings/rooms/enclosed-space-absorption/):
   the normative equivalent-absorption-area and reverberation-time prediction.
+
+## What this section does not cover
+
+**Nothing here is a wave solver.** The image-source model is specular only: it
+carries no diffraction, no scattering off a diffuser and no finite-impedance
+boundary, and it stops when the reflection order runs out rather than when the
+sound does. Below the Schroeder frequency, where the statistical models give
+out, what this section offers is the mode *positions* of a rigid rectangular
+box — not the field of a real room at low frequency. For that, the
+[wave simulation](/phonometry/simulation/) section runs an FDTD solver on the
+actual geometry.
+
+**No auralisation, no ray tracer, no room model.** There is no geometry
+importer, no material database and no renderer: the pages take dimensions,
+coefficients and impulse responses as inputs, and give back parameters. The
+absorption coefficients themselves come from
+[Materials and surfaces](/phonometry/materials/absorbers/), and the model errs
+optimistically when the room is not diffuse — outside the EN 12354-6 clause 4.6
+limits (no dimension more than five times another, opposite surfaces within a
+factor of three in absorption, object fraction below 0.2) the measured
+reverberation time can reach twice the predicted one.
+
+Two coverage boundaries follow the standards. Only the normative clause 4 model
+of EN 12354-6 is implemented, not its informative Annex D method for irregular
+spaces. And nothing in this section measures insulation *between* rooms: that is
+[Sound insulation](/phonometry/buildings/insulation/).

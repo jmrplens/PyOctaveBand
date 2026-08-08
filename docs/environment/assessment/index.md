@@ -3,14 +3,90 @@
 # Assessment and regulation
 
 Propagation says what arrives at the receiver. Assessment says what it counts
-as, which is a separate question with its own standards: an indicator averaged
-over the right period, adjustments for the character of the sound, and a limit
-to compare the result against.
+as, which is a separate question with its own standards. It is a chain with
+three links: an **indicator** averages the sound over a defined period;
+**adjustments** add decibels for character the average does not capture, tone
+by tone and impulse by impulse; and a **limit**, always national, decides.
+ISO 1996 supplies the first two links, and a national regulation supplies the
+third together with its own version of the second.
+
+[Environmental Levels (ISO
+1996-1/-2)](environmental-levels.md) is the
+indicator and adjustment layer, and the page most readers of this subsection
+want. Lden weights the evening by +5 dB and the night by +10 dB over default
+12/4/8 h periods, adjustable because Member States define them differently;
+Ldn is the day-night variant; and the composite rating level of clause 6.5
+generalises both to arbitrary periods with source and character adjustments,
+from +5 dB for regularly impulsive sound to +12 dB for highly impulsive sound.
+The ISO 1996-2 half of the page *determines* rather than defines: the Annex C
+tonal adjustment, the clause 10.4 correction for residual noise, and the
+Annex F uncertainty budget that says how much the rating level is worth. It
+starts from period levels you already have; producing those is [Integrated and
+Statistical Levels](../../signals/levels/levels.md).
 
 [Impulsive-sound prominence (NT ACOU 112)](impulsive-sound.md)
 is the adjustment for sound whose impulses make it more annoying than its LAeq
 suggests, in both the Nordtest closed form and the ISO/PAS 1996-3 measurement
-chain. The indicators it adjusts are in
-[Environmental Levels](environmental-levels.md), and the
-national application of the whole chain is in
-[the Spanish regulation](spanish-noise-regulation.md).
+chain: from the onset rate and level difference of each impulse it predicts a
+prominence and converts it into the graduated adjustment KI added to the
+measured LAeq. It is the measurement that replaces an assessor's judgement in
+the character-adjustment slot of the chain above, and it ends in a `.report()`
+assessment fiche.
+
+[Spanish Noise Regulation (RD 1367/2007)](spanish-noise-regulation.md)
+is what the whole chain looks like once a state has legislated it: the
+corrected level LKeq with its tonal, low-frequency and impulsive corrections
+Kt, Kf and Ki, evaluation periods split into noise phases, and the limit tables
+an activity is judged against by land use. Read it as the worked example of a
+national layer even if you do not work in Spain — it shows which parts of
+ISO 1996 a regulation typically restates, and which it replaces. Kf, the
+correction driven by the difference between the C-weighted and the A-weighted
+level, has no counterpart in ISO 1996 at all.
+
+Read Environmental Levels first, then the impulsive-sound page as the
+adjustment that feeds it, then the Spanish regulation as the national assembly
+of both.
+
+## Pages in this section
+
+- [Environmental Levels (ISO 1996-1/-2)](environmental-levels.md):
+  Lden, Ldn and the composite rating level of clause 6.5, the Annex C tonal
+  adjustment, the clause 10.4 residual-noise correction and the Annex F
+  uncertainty budget.
+- [Impulsive-sound prominence (NT ACOU 112)](impulsive-sound.md):
+  the predicted prominence of impulsive sounds, the graduated LAeq adjustment
+  KI, the ISO/PAS 1996-3 measurement chain and the assessment fiche.
+- [Spanish Noise Regulation (RD 1367/2007)](spanish-noise-regulation.md):
+  the corrected level LKeq, the Kt/Kf/Ki corrections, the evaluation periods
+  and noise phases, and the immission limit tables.
+
+## See also
+
+Pages elsewhere on the site that this section leans on:
+
+- [Integrated and Statistical Levels](../../signals/levels/levels.md): the
+  LAeq, percentile and event levels of each reference period, which every
+  indicator here starts from.
+- [Objective audibility of tones in noise](../../perception/psychoacoustics/tone-audibility.md):
+  the ISO/PAS 20065 engineering method whose mean audibility the ISO 1996-2
+  tonal adjustment maps into decibels.
+- [Outdoor Sound Propagation](../propagation/outdoor-propagation.md):
+  the path that delivered the sound to the receiver being assessed.
+
+## What this section does not cover
+
+The library starts where the sound level meter stops. ISO 1996-2 fixes the
+receiver positions and the façade corrections that turn a raw measurement into
+the level these functions expect, and those position and correction procedures
+are **not implemented** — only the arithmetic that follows once you have
+applied them. The same is true nationally: the Annex IV measurement procedures
+of RD 1367/2007 (microphone positions, series duration, number of
+measurements) are not implemented either, and the acoustic zoning, noise maps
+and action plans of Ley 37/2003 are planning instruments rather than
+calculations. Two published alternatives are deliberately absent: only the
+graduated KI of NT ACOU 112 Formula 2 is implemented, not the flat 5 dB
+fallback of its Note 4, and the ISO 1996-1 Table A.1 category adjustments
+appear only as the assessor's-judgement baseline the measurement replaces.
+Finally, no limit table other than the Spanish one is built in: a limit is
+national, and the library gives you the rating level to compare against
+whichever one applies.

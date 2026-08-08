@@ -210,6 +210,11 @@ const spectrum = lang === 'es'
 							<a class="step-link" href={s.href}>
 								{s.linkText}
 							</a>
+							{s.also && (
+								<a class="step-link step-link-also" href={s.also.href}>
+									{s.also.linkText}
+								</a>
+							)}
 						</li>
 					))
 				}
@@ -581,6 +586,13 @@ const spectrum = lang === 'es'
 		margin-top: auto;
 		font-size: var(--sl-text-sm);
 		align-self: flex-start;
+	}
+	/* The subordinate destination of a step. Only the first link keeps the
+	   `auto` top margin that pushes the pair to the bottom of the card; this
+	   one sits directly under it, or the free space would be split between
+	   the two and the pair would come apart. */
+	.step-link-also {
+		margin-top: 0.35rem;
 	}
 	ol.steps :global(.expressive-code) {
 		margin-bottom: 0.9rem;

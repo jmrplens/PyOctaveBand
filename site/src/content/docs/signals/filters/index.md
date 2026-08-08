@@ -58,3 +58,21 @@ parameters) consumes the band signals or band levels these pages produce.
   workflows with carried filter state.
 - [Multichannel and Performance](/phonometry/signals/filters/multichannel/): vectorized
   multichannel analysis and performance notes.
+
+## What this section does not cover
+
+`verify_filter_class` checks a designed digital response against Table 1 of
+IEC 61260-1. The standard's conformance tests for the physical filter — overload
+recovery, linearity, the environmental influence quantities — apply to an
+instrument and are not implemented, so a class verdict here is a statement about
+the design and not about a device. Near Nyquist the bilinear transform warps
+the frequency axis and the bank carries no correction for it, unlike the
+`high_accuracy` option of the weighting filters: the stopband beyond the
+processing Nyquist is reported as `range_limited` rather than verified, so keep
+the top band edge comfortably below Nyquist or raise `fs`. Two operations do
+not stream: zero-phase forward-backward filtering needs the whole signal, and
+rank statistics such as L90 have to be computed once on the pooled
+envelope. And the per-channel path never mixes channels — delay between two
+microphones, or how much of one channel a second explains, is
+[Correlation and delay](/phonometry/signals/spectra/correlation-delay/) and
+[Multiple and partial coherence](/phonometry/signals/spectra/miso-coherence/).

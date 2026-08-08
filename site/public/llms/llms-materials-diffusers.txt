@@ -12,8 +12,9 @@ Source: https://jmrplens.github.io/phonometry/materials/diffusers/
 Where the [Absorbers](https://jmrplens.github.io/phonometry/materials/absorbers/) subsection asks
 how much energy a material removes from the field, this one asks what a
 *surface* does with the sound it returns: how much it throws off the specular
-direction, how evenly it spreads it, and, out on a pavement, how much it
-absorbs where no laboratory can follow. Three guides walk that ground.
+direction and how evenly it spreads it. Two guides walk that ground, and a
+third family of surface measurements — pavements characterised where they lie —
+has its own subsection nested inside this group.
 
 [Diffusers and Their Coefficients](https://jmrplens.github.io/phonometry/materials/diffusers/diffusers/) is the
 measurement and design core: the random-incidence **scattering coefficient**
@@ -30,12 +31,10 @@ deep, with critical coupling supplying the perfectly absorbing `0` state that
 ternary sequences need. The published quadratic-residue design is evaluated
 end to end, transfer-matrix chain to FDTD cross-check.
 
-[In-situ Road-Surface Absorption](https://jmrplens.github.io/phonometry/materials/surfaces/road-absorption/) takes
-the absorption question outdoors: the ISO 13472-1 subtraction technique
-separates the incident and road-reflected components of an impulse with the
-Adrienne window, and the ISO 13472-2 spot tube presses a portable
-impedance tube onto the pavement for reflective surfaces, with the choice
-between the two methods spelled out.
+[Surfaces measured in place](https://jmrplens.github.io/phonometry/materials/surfaces/) takes the
+absorption question outdoors, to the surfaces that have no sample: it covers
+the ISO 13472-1 subtraction technique and the ISO 13472-2 spot tube, and the
+decision between them.
 
 The neighbours are close: the diffuser panels are surface relatives of the
 [metamaterial absorbers](https://jmrplens.github.io/phonometry/materials/absorbers/metamaterial-absorbers/) built
@@ -58,8 +57,26 @@ methods serve the outdoor-noise interest of
 
 Pages elsewhere on the site that this section leans on:
 
-- [In-situ Road-Surface Absorption](https://jmrplens.github.io/phonometry/materials/surfaces/road-absorption/):
+- [Surfaces measured in place](https://jmrplens.github.io/phonometry/materials/surfaces/) and its guide
+  [In-situ Road-Surface Absorption](https://jmrplens.github.io/phonometry/materials/surfaces/road-absorption/):
   the ISO 13472-1 subtraction technique and the ISO 13472-2 spot method.
+
+## What this section does not cover
+
+Both prediction models here are **design estimates, not measurements**. The
+Fraunhofer far field the diffuser and metadiffuser pages share loses accuracy
+at low frequency, at grazing angles and over strongly absorbing surfaces, and
+it ignores edge diffraction, so it grades a well-depth sequence before it is
+built and does not replace an ISO 17497-2 measurement; the metadiffuser model
+is locally reacting on top of that, with no coupling between wells. Only the
+quadratic-residue depth sequence has a dedicated helper — primitive-root and
+modulated arrangements are discussed as design guidance and enter through the
+explicit depth or reflection arguments. The inverse problem, solving resonator
+geometries for a target phase profile, is not automated: the workflow matches
+phases by evaluation. On the measurement side the library reduces the data but
+does not run the rig: the ISO 17497-1 turntable and the ISO 17497-2 goniometer
+supply the reverberation times and the polar response, and what is implemented
+is the arithmetic that turns them into a coefficient.
 
 ---
 

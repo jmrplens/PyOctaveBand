@@ -120,6 +120,44 @@ function plain(source: string): string {
 		.replace(/[$\\{}_^]/g, '');
 }
 
+/**
+ * The character a reader is actually holding. `plain()` drops a Greek command
+ * along with the rest of the TeX, which is right for a search index and wrong
+ * for a symbol index: someone scanning for the sigma on a datasheet has to find
+ * a row that says sigma. This keeps the letter and drops everything else.
+ */
+const GREEK: Record<string, string> = {
+	alpha: 'α', beta: 'β', gamma: 'γ', delta: 'δ', Delta: 'Δ', epsilon: 'ε',
+	varepsilon: 'ε', zeta: 'ζ', eta: 'η', theta: 'θ', vartheta: 'ϑ', kappa: 'κ',
+	lambda: 'λ', Lambda: 'Λ', mu: 'µ', nu: 'ν', xi: 'ξ', pi: 'π', rho: 'ρ',
+	sigma: 'σ', Sigma: 'Σ', tau: 'τ', upsilon: 'υ', phi: 'φ', varphi: 'φ',
+	Phi: 'Φ', chi: 'χ', psi: 'ψ', omega: 'ω', Omega: 'Ω', infty: '∞',
+};
+
+function scannable(source: string): string {
+	return source
+		.replace(/\\(?:text|mathrm|mathit|mathbf|operatorname)\{([^}]*)\}/g, '$1')
+		.replace(/\\([a-zA-Z]+)/g, (_match, name: string) => GREEK[name] ?? '')
+		.replace(/[$\\{}^]/g, '')
+		.replace(/_/g, '');
+}
+
+const GREEK_LETTERS = new Set(Object.values(GREEK));
+
+/**
+ * The bucket a symbol files under: its first Latin letter, its own character if
+ * it is Greek, a digit bucket for the rest. One letter with four meanings ends
+ * up as one row with the four side by side, which is the case the domain
+ * grouping below cannot serve.
+ */
+function indexKey(label: string): string {
+	for (const character of scannable(label)) {
+		if (GREEK_LETTERS.has(character)) return character;
+		if (/[A-Za-z]/.test(character)) return character.toUpperCase();
+	}
+	return '#';
+}
+
 const jsonld = {
 	'@context': 'https://schema.org',
 	'@type': 'DefinedTermSet',
@@ -147,13 +185,52 @@ const jsonld = {
 	}),
 };
 
+// The symbol index: Latin letters first, then the Greek ones, each row holding
+// every entry whose notation starts with that character.
+const index = new Map<string, { id: string; scan: string; qualifier?: string }[]>();
+for (const term of terms) {
+	const key = indexKey(term.label);
+	const row = index.get(key) ?? [];
+	row.push({ id: term.id, scan: scannable(term.label), qualifier: term.qualifierText });
+	index.set(key, row);
+}
+const indexRows = [...index.entries()].sort(([a], [b]) => {
+	const greek = (key: string) => (GREEK_LETTERS.has(key) ? 1 : 0);
+	return greek(a) - greek(b) || a.localeCompare(b, 'en');
+});
+
 const t =
 	lang === 'es'
-		? { definedIn: 'Definida en', see: 'Guía' }
-		: { definedIn: 'Defined in', see: 'Guide' };
+		? {
+				definedIn: 'Definida en',
+				see: 'Guía',
+				index: 'Índice de símbolos: todos los significados de una letra, juntos',
+			}
+		: {
+				definedIn: 'Defined in',
+				see: 'Guide',
+				index: 'Symbol index: every meaning of a letter, side by side',
+			};
 ---
 
 <script type="application/ld+json" set:html={JSON.stringify(jsonld)} is:inline />
+
+<details class="symbol-index">
+	<summary>{t.index}</summary>
+	<div>
+		{indexRows.map(([letter, entries]) => (
+			<p class="symbol-index-row">
+				<b>{letter}</b>
+				{entries.map((entry) => (
+					<a href={`#${entry.id}`}>
+						{entry.scan}
+						{entry.qualifier && <span class="qualifier"> ({entry.qualifier})</span>}
+					</a>
+				))}
+			</p>
+		))}
+	</div>
+</details>
 
 {
 	glossary.map((group) => (
@@ -191,6 +268,41 @@ const t =
 }
 
 <style>
+	/* The symbol index is closed by default: it is the answer for a reader who
+	   has a letter and no domain, and dead weight for everyone else. */
+	.symbol-index {
+		border: 1px solid var(--sl-color-gray-5);
+		border-radius: 0.5rem;
+		padding: 0.5rem 0.85rem;
+		margin-block: 1rem 1.5rem;
+	}
+
+	.symbol-index summary {
+		cursor: pointer;
+		font-size: var(--sl-text-sm);
+		font-weight: 600;
+	}
+
+	/* One row per letter, wrapping: the four meanings of R end up side by side,
+	   which is the whole point of the index. */
+	.symbol-index-row {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: baseline;
+		gap: 0.15rem 0.75rem;
+		margin: 0.4rem 0 0;
+		font-size: var(--sl-text-sm);
+	}
+
+	.symbol-index-row b {
+		flex: 0 0 1.6rem;
+		color: var(--sl-color-text-accent);
+	}
+
+	.symbol-index-row .qualifier {
+		color: var(--sl-color-gray-3);
+	}
+
 	/* One column on a phone, two once there is room for two readable measures.
 	   The cards are the content of this page, so they use the article width
 	   rather than a fixed one. */

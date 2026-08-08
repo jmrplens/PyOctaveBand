@@ -122,9 +122,9 @@ If you are an AI assistant setting this up for a user: install from PyPI (no sys
 - [Room Acoustics](https://jmrplens.github.io/phonometry/buildings/rooms/room-acoustics/)
 - [Open-Plan Office Acoustics (ISO 3382-3)](https://jmrplens.github.io/phonometry/buildings/rooms/open-plan-acoustics/)
 - [Image sources and the steady-state room field (Kuttruff / Vorländer / Bies)](https://jmrplens.github.io/phonometry/buildings/rooms/room-image-sources/)
+- [Room-noise criteria (NC / RC Mark II)](https://jmrplens.github.io/phonometry/buildings/rooms/room-noise/)
 - [Reverberation-time prediction (Sabine · Eyring · Fitzroy · Arau-Puchades)](https://jmrplens.github.io/phonometry/buildings/rooms/reverberation-prediction/)
 - [Sound absorption in enclosed spaces (EN 12354-6)](https://jmrplens.github.io/phonometry/buildings/rooms/enclosed-space-absorption/)
-- [Room-noise criteria (NC / RC Mark II)](https://jmrplens.github.io/phonometry/buildings/rooms/room-noise/)
 
 ### Sound insulation
 
@@ -208,8 +208,8 @@ If you are an AI assistant setting this up for a user: install from PyPI (no sys
 ### Assessment and regulation
 
 - [Overview](https://jmrplens.github.io/phonometry/environment/assessment/) · [full text](https://jmrplens.github.io/phonometry/llms/llms-environment-assessment.txt)
-- [Impulsive-sound prominence (NT ACOU 112)](https://jmrplens.github.io/phonometry/environment/assessment/impulsive-sound/)
 - [Environmental Levels (ISO 1996-1/-2)](https://jmrplens.github.io/phonometry/environment/assessment/environmental-levels/)
+- [Impulsive-sound prominence (NT ACOU 112)](https://jmrplens.github.io/phonometry/environment/assessment/impulsive-sound/)
 - [Spanish Noise Regulation (RD 1367/2007)](https://jmrplens.github.io/phonometry/environment/assessment/spanish-noise-regulation/)
 
 ### Outdoor sound
@@ -253,8 +253,8 @@ If you are an AI assistant setting this up for a user: install from PyPI (no sys
 - [Sound Power by Pressure Methods (ISO 3744 / ISO 3746 / ISO 3745)](https://jmrplens.github.io/phonometry/devices/emission/sound-power-pressure/)
 - [Sound Power in the Reverberation Room (ISO 3741)](https://jmrplens.github.io/phonometry/devices/emission/sound-power-reverberation/)
 - [Sound Power by Intensity Scanning (ISO 9614-2 / ISO 9614-3)](https://jmrplens.github.io/phonometry/devices/emission/sound-power-intensity/)
-- [Sound Intensity (p-p method)](https://jmrplens.github.io/phonometry/devices/emission/intensity/)
 - [Sound power from surface vibration (ISO/TS 7849)](https://jmrplens.github.io/phonometry/devices/emission/vibration-sound-power/)
+- [Sound Intensity (p-p method)](https://jmrplens.github.io/phonometry/devices/emission/intensity/)
 
 ### Electroacoustics
 
@@ -272,10 +272,10 @@ If you are an AI assistant setting this up for a user: install from PyPI (no sys
 ### Noise control
 
 - [Overview](https://jmrplens.github.io/phonometry/devices/noise-control/) · [full text](https://jmrplens.github.io/phonometry/llms/llms-devices-noise-control.txt)
-- [Silencers](https://jmrplens.github.io/phonometry/devices/noise-control/silencers/)
-- [Industrial noise control: HVAC and enclosures](https://jmrplens.github.io/phonometry/devices/noise-control/noise-control/)
 - [Duct-borne noise: fan to room](https://jmrplens.github.io/phonometry/devices/noise-control/duct-path/)
 - [Room to room: partition, receiving room, criterion](https://jmrplens.github.io/phonometry/devices/noise-control/room-to-room/)
+- [Silencers](https://jmrplens.github.io/phonometry/devices/noise-control/silencers/)
+- [Industrial noise control: HVAC and enclosures](https://jmrplens.github.io/phonometry/devices/noise-control/noise-control/)
 
 ## Wave simulation
 
@@ -289,6 +289,7 @@ The theory pages travel in the Start shard (https://jmrplens.github.io/phonometr
 
 - [API Reference](https://jmrplens.github.io/phonometry/reference/api/)
 - [Bibliography](https://jmrplens.github.io/phonometry/reference/bibliography/)
+- [Glossary](https://jmrplens.github.io/phonometry/reference/glossary/)
 - [Theoretical Background](https://jmrplens.github.io/phonometry/reference/theory/)
 - [Theory: Environment and Transport](https://jmrplens.github.io/phonometry/reference/theory/environment-transport/)
 - [Theory: Materials and Surfaces](https://jmrplens.github.io/phonometry/reference/theory/materials-surfaces/)

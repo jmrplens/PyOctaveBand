@@ -42,20 +42,41 @@ coefficient** (ISO 17497-1) and the **diffusion coefficient** (ISO 17497-2),
 together with Schroeder diffuser design and its far-field prediction.
 [Metadiffusers](diffusers/metadiffusers.md) rebuilds the Schroeder
 diffuser from resonator-loaded slits, one to two orders of magnitude thinner.
-And [In-situ Road-Surface Absorption](surfaces/road-absorption.md)
-measures the absorption of a pavement where it lies, by the ISO 13472-1
-subtraction technique over an extended surface or the ISO 13472-2 spot tube.
+
+Nested inside that group is **Surfaces measured in place**, for the surfaces
+that have no sample. A pavement cannot be cut out and carried indoors without
+destroying the connected pore structure that governs its absorption, so the
+laboratory geometry is replaced by a time window over an extended surface, or
+by a tube pressed onto the road.
+[In-situ Road-Surface Absorption](surfaces/road-absorption.md)
+measures it where it lies, by the ISO 13472-1 subtraction technique or the
+ISO 13472-2 spot tube, and says which of the two a given pavement allows.
+
+The **Resilient layers** subsection covers the one material property here that
+is mechanical rather than acoustic: a resilient layer is characterised not by
+what it does to airborne sound but by how softly it supports a mass, so its
+measurement is a resonance and not an absorption. A floating floor is a
+mass-spring system, the screed is the mass and the layer is the spring, and the
+dynamic stiffness per unit area s' of the layer sets the resonance above which
+the floor starts working.
+[Dynamic stiffness of resilient materials (EN 29052-1)](resilient/dynamic-stiffness.md)
+is the load-plate resonance measurement that produces s', with the enclosed-gas
+term that makes an air-permeable layer stiffer than its frame alone.
 
 The consumers of these numbers are spread across the site: absorption
 coefficients feed the reverberation predictions in
-[Room acoustics](../buildings/rooms/index.md), dynamic
-stiffness (measured by a related load-plate method) feeds the floating-floor
-model in [Sound insulation](../buildings/insulation/index.md),
+[Room acoustics](../buildings/rooms/index.md); the dynamic stiffness measured
+here feeds the floating-floor model of
+[Sound insulation](../buildings/insulation/index.md) through
+[Predicting resilient-layer performance](../buildings/design/resilient-layers.md);
 and the road-surface methods connect to the outdoor-noise interest of the
 [Environment and transport](../environment/index.md)
 section.
 
-## Pages in this section
+## [Absorbers](absorbers/index.md)
+
+How much energy a material takes out of the field, one instrument or model
+family per guide.
 
 - [Absorbers overview](absorbers/index.md): the
   measurement chain from reverberation room to flow rig to impedance tube,
@@ -74,9 +95,15 @@ section.
   and the random-incidence Paris integral.
 - [Metamaterial Absorbers](absorbers/metamaterial-absorbers.md):
   critical coupling and the slow-sound slit panel with its design solver.
+
+## [Diffusers and surfaces](diffusers/index.md)
+
+Where a surface sends what it reflects, and the surfaces that can only be
+measured in place.
+
 - [Diffusers and surfaces overview](diffusers/index.md):
   what a surface does with the sound it returns, from coefficients to
-  metamaterial panels to pavements.
+  metamaterial panels.
 - [Diffusers and Their Coefficients](diffusers/diffusers.md):
   ISO 17497-1/2 scattering and diffusion coefficients, Schroeder design and
   the far-field prediction.
@@ -86,6 +113,11 @@ section.
   surfaces that cannot be taken to a laboratory, characterised where they lie.
 - [In-situ Road-Surface Absorption](surfaces/road-absorption.md):
   ISO 13472-1/-2 in-situ road-surface absorption.
+
+## [Resilient layers](resilient/index.md)
+
+The mechanical property a floating floor is designed around.
+
 - [Resilient layers overview](resilient/index.md):
   what a resilient layer does under a floating floor, and the dynamic
   stiffness that sets it.
@@ -93,3 +125,38 @@ section.
   the resonance method that measures what a resilient layer does under a
   floating floor, and the apparent stiffness the insulation design chapter
   asks it for.
+
+## What this section does not cover
+
+Everything here characterises a **material or a surface**, never a
+construction. The transmission loss of a wall, the impact improvement of a
+floor and the flanking paths of a junction are
+[Sound insulation](../buildings/insulation/index.md) and
+[Insulation design](../buildings/design/index.md); this section supplies the
+coefficients they consume. Two boundaries inside the measurements themselves
+are worth knowing before you start. The in-situ road methods implement
+ISO 13472-1:2002 and ISO 13472-2:2010; **their 2022 and 2025 revisions are not
+implemented**. And the resilient-layer measurement expects a resonant frequency
+that has already been extrapolated to zero force amplitude by clause 7 of
+EN 29052-1, a procedure that is not implemented, and an airflow resistivity
+supplied as an input rather than measured in place. Nothing in this section
+predicts a material from its chemistry or its manufacture: the models run
+forwards from measured macroscopic parameters — flow resistivity, porosity,
+tortuosity — to an impedance, and there is no inverse solver that recovers
+those parameters from a measured impedance curve.
+
+## Before and after these pages
+
+Every coefficient on these pages is derived from band levels or from a
+transfer function between microphones, so the filtering, weighting and
+calibration that produce them are in [Signal analysis](../signals/index.md),
+and [Build a sound level meter](../signals/sound-level-meter.md) runs
+that chain end to end on one runnable page. The derivations are in [Materials
+and surfaces theory](../reference/theory/materials-surfaces.md): the characterisation
+quantities, the in-situ subtraction and the scattering and diffusion
+coefficients.
+
+If you arrived here from a search and want the shape of the whole library,
+[What do you need to measure?](https://jmrplens.github.io/phonometry/start/tasks/) indexes it by the job
+and [All guides](https://jmrplens.github.io/phonometry/start/guides/) lists every page with a line on
+each.

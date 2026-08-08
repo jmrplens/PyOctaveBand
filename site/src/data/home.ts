@@ -39,6 +39,12 @@ export interface Step {
 	code?: string;
 	href: string;
 	linkText: string;
+	/**
+	 * A second, subordinate destination for the same step. Optional while the
+	 * Spanish strings are still to be written: a locale without it renders the
+	 * step with one link, exactly as before.
+	 */
+	also?: { href: string; linkText: string };
 }
 
 export interface HomeContent {
@@ -115,7 +121,7 @@ export const en: HomeContent = {
 	statsLabel: 'The library in four numbers',
 	stats: [
 		{ value: checksRatio, label: 'conformance checks passing', href: '/phonometry/reference/conformance/' },
-		{ value: String(standards), label: `standards referenced, across ${domains} domains` },
+		{ value: String(standards), label: `standards referenced, across ${domains} test domains`, href: '/phonometry/reference/conformance/' },
 		{ value: String(figures), label: 'figures, each in light and dark, English and Spanish' },
 		{ value: String(fiches), label: 'PDF fiches in the reporting format their standard defines, rendered by .report()' },
 	],
@@ -124,7 +130,7 @@ export const en: HomeContent = {
 		body: [
 			'phonometry is a Python library for acoustic measurement, analysis and prediction. You give it a signal, a measured spectrum or a set of geometrical and material inputs; it gives you the quantity the standard defines, with the intermediate terms still visible.',
 			'Every result is a typed, frozen dataclass. It carries the inputs it was computed from, it draws its own figure with a one-line <code>.plot()</code> in English or Spanish, and where a standard defines a reporting format it renders a one-page PDF fiche with <code>.report()</code>.',
-			`It is written and maintained by one person, published under the MIT licence on <a href="https://pypi.org/project/phonometry/">PyPI</a>, archived with a <a href="https://doi.org/${DOI}">DOI on Zenodo</a>, and currently at version ${version}. It needs Python 3.13 or newer with NumPy and SciPy; matplotlib, numba and reportlab are optional extras.`,
+			`It is written and maintained by one person, published under the MIT licence on <a href="https://pypi.org/project/phonometry/">PyPI</a>, archived with a <a href="https://doi.org/${DOI}">DOI on Zenodo</a>, and currently at version ${version}. It needs Python 3.13 or newer with NumPy and SciPy. Optional extras add the rest: <code>[plot]</code> for the figures, <code>[perf]</code> for the faster impulse ballistics, <code>[report]</code> for the PDF fiches, and <code>[full]</code> for all three.`,
 		],
 	},
 	who: {
@@ -163,7 +169,7 @@ export const en: HomeContent = {
 		},
 		fiche: {
 			title: 'A rating, and the fiche it renders',
-			note: 'The weighted airborne rating of ISO 717-1 over the 16 one-third-octave bands the rating uses, rendered in a laboratory report layout: metadata header, band table, the curve against the shifted reference, the boxed single-number result and the verdict against the requirement. The code is the call that renders the fiche beside it, with the metadata block cut to the fields discussed here.',
+			note: 'The weighted airborne rating of ISO 717-1 over the 16 one-third-octave bands the rating uses, rendered in a laboratory report layout: metadata header, band table, the curve against the shifted reference, the boxed single-number result and the verdict against the requirement. The code is the call that renders the fiche beside it, with the metadata block cut to the fields discussed here. Reading the result: Rw is the value of the standard reference curve, at 500 Hz, after it has been shifted as far towards the measured curve as the unfavourable-deviation rule allows (their sum may reach 32.0 dB and here stops at 23.7 dB), so one number stands in for sixteen. The terms in brackets are the spectrum adaptation terms C and Ctr, which are added to Rw rather than replacing it and say how the same element performs against a pink-noise-like source and against urban road traffic: 30 and 28 dB for this pane. The verdict is a pass because the requirement was written against Rw alone; written against Rw + Ctr, as national codes for facades often are, the same pane would fail it.',
 			code: FICHE_CODE,
 			caption: 'Airborne rating fiche (SoundReductionResult.report), Rw (C; Ctr).',
 			linkTitle: 'Airborne ISO 717-1 example report (PDF)',
@@ -173,7 +179,7 @@ export const en: HomeContent = {
 	},
 	coverage: {
 		title: 'What it covers',
-		lead: `Ten areas, ${guides} guides, ${apiPages} API reference pages. Each row links to the area overview; the designations are the standards actually implemented there, not a reading list.`,
+		lead: `Ten documentation areas over eighteen import namespaces: ${guides} guides and ${apiPages} API reference pages. Each row links to the area overview; the designations are the standards actually implemented there, not a reading list.`,
 		headers: ['Area', 'Standards implemented'],
 		areas: [
 			{
@@ -209,8 +215,8 @@ export const en: HomeContent = {
 			{
 				name: 'Environment and transport',
 				href: '/phonometry/environment/',
-				summary: 'Outdoor propagation, barriers, refraction, environmental indicators, traffic and wind-turbine sources.',
-				standards: ['ISO 9613-1/-2', 'ISO 1996-1/-2', 'ISO/PAS 1996-3', 'NT ACOU 112', 'CNOSSOS-EU (2002/49/EC Annex II)', 'IEC 61400-11'],
+				summary: 'Outdoor propagation, barriers, refraction, environmental indicators, traffic and wind-turbine sources. Of CNOSSOS-EU, the source side of Annex II: the propagation method of its section 2.5 is not implemented, and outdoor attenuation here goes through ISO 9613-2 instead.',
+				standards: ['ISO 9613-1/-2', 'ISO 1996-1/-2', 'ISO/PAS 1996-3', 'NT ACOU 112', 'CNOSSOS-EU (2002/49/EC Annex II, 2.2 and 2.3)', 'IEC 61400-11'],
 			},
 			{
 				name: 'Aircraft noise',
@@ -244,22 +250,24 @@ export const en: HomeContent = {
 		steps: [
 			{
 				title: 'Install it',
-				body: 'Python 3.13 or newer. The base install pulls in NumPy and SciPy; the full extra adds plotting, the faster impulse ballistics and PDF fiche rendering.',
+				body: 'Python 3.13 or newer. The base install pulls in NumPy and SciPy; the [full] extra adds the other three, [plot] for the figures, [perf] for the faster impulse ballistics and [report] for the PDF fiches.',
 				code: 'pip install phonometry[full]',
 				href: '/phonometry/start/getting-started/',
 				linkText: 'Installation options',
 			},
 			{
 				title: 'Run one analysis end to end',
-				body: 'Getting Started walks the whole processing chain once, on a synthetic signal and then on a WAV file: calibration, frequency weighting, the filter bank, time weighting and the levels that come out.',
+				body: 'Getting Started splits a signal into one-third-octave bands, then anchors those bands to a calibrator tone so the levels are decibels re 20 µPa rather than decibels re nothing, and reduces them to one A-weighted level. Build a sound level meter carries the same chain to the end: the Fast ballistics, LAeq, SEL, LCpeak, the percentile levels and the class check of every stage.',
 				href: '/phonometry/start/getting-started/',
 				linkText: 'Getting Started',
+				also: { href: '/phonometry/signals/sound-level-meter/', linkText: 'Build a sound level meter' },
 			},
 			{
-				title: 'Go to your own domain',
-				body: 'Each guide opens with the standard it implements, the quantities it defines and the assumptions, then the code, then the figure. When you need the exact signature, the API reference has one page per module.',
-				href: '/phonometry/reference/api/',
-				linkText: 'API reference',
+				title: 'Go to the page for your job',
+				body: `What do you need to measure? is the same library indexed by the task instead of the subject: a job on the left, the guide that answers it and the standard it implements on the right. All guides is the full inventory, ${guides} of them grouped by topic. Each one opens with the standard it implements, the quantities that standard defines and the assumptions the implementation makes, then the runnable code and the figure it draws, and closes with a Covered / Not covered statement, so you know before you start what the page will and will not answer. When you need an exact signature rather than a method, the API reference has one page per module.`,
+				href: '/phonometry/start/tasks/',
+				linkText: 'What do you need to measure?',
+				also: { href: '/phonometry/start/guides/', linkText: 'All guides' },
 			},
 		],
 	},

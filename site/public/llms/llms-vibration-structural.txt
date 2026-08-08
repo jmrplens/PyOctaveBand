@@ -11,9 +11,10 @@ Source: https://jmrplens.github.io/phonometry/vibration/structural/
 
 A machine fixed to a building radiates sound twice: directly from its own
 vibrating surface, and indirectly by injecting **structure-borne power** into
-the structure, which carries it away and re-radiates it in distant rooms. The
-six pages of this section cover both paths: one estimates the direct
-radiation from the surface vibration itself, and the other five characterise
+the structure, which carries it away and re-radiates it in distant rooms. Six
+pages cover both paths, three of them here and three elsewhere on the site: one
+estimates the direct radiation from the surface vibration itself, and the other
+five characterise
 the second, sneakier structure-borne path end to end, from describing the
 vibration and characterising the isolators to quantifying the power and
 predicting the level a listener finally hears.
@@ -72,6 +73,30 @@ Pages elsewhere on the site that this section leans on:
   the reception-plate method and plate-independent source quantities.
 - [Installed structure-borne sound (EN 12354-5)](https://jmrplens.github.io/phonometry/buildings/design/installed-structure-borne/):
   the predicted receiving-room level from installed equipment.
+
+## What this section does not cover
+
+The junction coefficients are a **closed-form idealisation** for a rigid,
+simply supported junction between homogeneous plates, not a measurement: the
+empirical vibration reduction index obtained from a direction-averaged velocity
+level difference is ISO 10848, in [Laboratory flanking
+transmission](https://jmrplens.github.io/phonometry/buildings/insulation/flanking-lab/). The
+straight-section coefficient is undefined for the T and L geometries, which
+have no collinear third plate, so only the corner path applies there.
+
+The FRF page implements ISO 7626-1 and the ISO 7626-2 acceptance criteria for
+an attached exciter; **impact-hammer excitation (ISO 7626-5) is named for
+context only**, with nothing that synthesises or processes an impact spectrum,
+and the conversions return element-wise *free* reciprocals — correct for a
+driving-point or single-path use, not for a full FRF matrix, whose blocked
+matrix quantities are not built.
+
+On the isolator page, parts 4 and 5 of ISO 10846 are not implemented, and two
+of the standard's own validity checks are described rather than computed: the
+rigid blocking-mass inequality, and the clause 7.6 linearity criterion (two
+input spectra 10 dB apart agreeing within 1.5 dB). Finally, nothing here
+designs an isolator or a floating base: the pages characterise elements and
+predict transmission, and the sizing decision stays yours.
 
 ---
 

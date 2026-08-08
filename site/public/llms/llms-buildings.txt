@@ -31,7 +31,9 @@ and [Room Acoustics](https://jmrplens.github.io/phonometry/buildings/rooms/room-
 the first acquires and the parameters the second derives are the vocabulary
 the rest of the section speaks. If your interest is insulation, read
 [Field Insulation Measurement (ISO 16283)](https://jmrplens.github.io/phonometry/buildings/insulation/insulation-field/)
-next; if it is design-stage prediction, go to
+next, and note that impact sources other than the tapping machine have their own
+page, since ISO 16283-2 is the clause a field engineer usually arrives with; if
+it is design-stage prediction, go to
 [Reverberation-time prediction (Sabine, Eyring, Arau)](https://jmrplens.github.io/phonometry/buildings/rooms/reverberation-prediction/)
 and [Predicting Sound Insulation (EN 12354)](https://jmrplens.github.io/phonometry/buildings/design/insulation-prediction/).
 
@@ -72,6 +74,9 @@ laboratory, and predicted from element data.
   the direct-power route to the same indices when flanking is high.
 - [Sound Insulation Survey Method (ISO 10052)](https://jmrplens.github.io/phonometry/buildings/insulation/insulation-survey/):
   the octave-band control method and its reverberation index.
+- [Heavy and Soft Impact Sources (ISO 16283-2)](https://jmrplens.github.io/phonometry/buildings/insulation/heavy-impact-sources/):
+  the rubber ball and the bang machine, the impact force exposure level that
+  specifies them and the ISO 717-2 Annex D single number.
 - [Laboratory Flanking Transmission (ISO 10848)](https://jmrplens.github.io/phonometry/buildings/insulation/flanking-lab/):
   the measured junction vibration reduction index and the flanking descriptors.
 - [Insulation Ratings (ISO 717)](https://jmrplens.github.io/phonometry/buildings/insulation/insulation-ratings/): the
@@ -105,5 +110,45 @@ and from the physics of the element itself.
   mobilities.
 - [Dynamic stiffness of resilient materials (EN 29052-1)](https://jmrplens.github.io/phonometry/materials/resilient/dynamic-stiffness/):
   the load-plate resonance measurement behind every floating-floor prediction.
+
+## What this section does not cover
+
+**The library starts after the microphone and stops before the geometry.** On
+the measurement side, every function takes band levels already averaged over
+positions and already corrected for background noise: the position counts, the
+low-frequency procedures, the signal-to-background floors and the test-facility
+qualifications of ISO 16283, ISO 10140 and ISO 3382 are the operator's job, and
+nothing here checks that they were done. On the prediction side, the element
+ratings, the junction indices and the covering improvements are inputs you
+supply from measurement or from a standard's own annex; none is derived from a
+drawing.
+
+**Nothing here is a wave solver or a room model.** There is no geometry
+importer, no material database, no ray tracer and no auralisation: the room
+pages take dimensions, absorption coefficients and impulse responses and give
+back parameters, and the image-source model is specular only. An actual
+low-frequency field in a real shape is [wave
+simulation](https://jmrplens.github.io/phonometry/simulation/).
+
+**And a prediction is not a verdict.** The single-number ratings and the
+national indices are computed here, but the limit values they are judged
+against are national — the Spanish code is implemented as a worked example of
+one such framework, not as the rule everywhere — and the requirement always
+comes from your regulation.
+
+## Before and after these pages
+
+Every quantity on these pages starts from band levels or from a filtered
+impulse response, so the calibration, weighting and fractional-octave
+filtering behind them are in [Signal analysis](https://jmrplens.github.io/phonometry/signals/), and
+[Build a sound level meter](https://jmrplens.github.io/phonometry/signals/sound-level-meter/) runs that
+chain end to end on one runnable page. The derivations sit in [Rooms and
+buildings theory](https://jmrplens.github.io/phonometry/reference/theory/rooms-buildings/), from the Schroeder integration
+to the EN 12354 path sums.
+
+If you arrived here from a search and want the shape of the whole library,
+[What do you need to measure?](https://jmrplens.github.io/phonometry/start/tasks/) indexes it by the job
+and [All guides](https://jmrplens.github.io/phonometry/start/guides/) lists every page with a line on
+each.
 
 ---

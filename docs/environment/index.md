@@ -32,6 +32,15 @@ consumes is shared with the room and materials pages. Start with
 [Outdoor Sound Propagation](propagation/outdoor-propagation.md); it
 introduces the source-path-receiver bookkeeping the transport pages reuse.
 
+The three jobs this section is normally used for combine the subsections
+differently. A **strategic noise map** is a CNOSSOS source model, a propagation
+model and Lden. A **plant or permit assessment** is a measured sound power
+(determined in [Sources and devices](../devices/emission/index.md)), ISO 9613-2
+to the nearest dwelling, and the ISO 1996 rating level with its adjustments.
+An **activity inspection** is a sound level meter at a receiver point and
+RD 1367/2007, or whichever national regulation applies, with no propagation
+model in the chain at all.
+
 ## [Assessment and regulation](assessment/index.md)
 
 What the received sound is rated against, once it has arrived.
@@ -41,7 +50,7 @@ What the received sound is rated against, once it has arrived.
   turn a measured LAeq into an assessed one.
 - [Spanish Noise Regulation (RD 1367/2007)](assessment/spanish-noise-regulation.md):
   the national application of that chain, with its own limits and its own
-  tonal and impulsive corrections.
+  tonal, low-frequency and impulsive corrections.
 - [Impulsive-sound prominence (NT ACOU 112)](assessment/impulsive-sound.md):
   the predicted prominence of impulsive sounds and the graduated adjustment
   added to LAeq.
@@ -53,10 +62,12 @@ arrives.
 
 - [Outdoor Sound Propagation](propagation/outdoor-propagation.md):
   atmospheric absorption (ISO 9613-1) and the ISO 9613-2 general method with
-  its per-term attenuation breakdown.
-- [Ground effect and barriers](propagation/ground-barriers.md):
-  the ground attenuation of ISO 9613-2 and the insertion loss a barrier adds
-  to the path.
+  its per-term attenuation breakdown, including the tabulated ground term and
+  the barrier screening term.
+- [Spherical ground effect and advanced barriers](propagation/ground-barriers.md):
+  the wave acoustics underneath those two fits — the Weyl-Van der Pol
+  spherical-wave reflection coefficient over finite-impedance ground, and
+  wave-theoretic screen diffraction.
 - [Atmospheric refraction](propagation/atmospheric-refraction.md):
   how wind and temperature gradients bend a ray into or out of a shadow zone.
 
@@ -77,3 +88,42 @@ strength per band, ready for the path above to attenuate.
 Aircraft are the other transport source with internationally fixed metrics,
 and they have a topic of their own:
 [Aircraft noise](../aircraft/index.md).
+
+## What this section does not cover
+
+Only the source side of CNOSSOS-EU Annex II is implemented, and only two of its
+four sources. The **industrial source** of section 2.4 and Appendix H, and the
+**aircraft source** of sections 2.6 and 2.7, are not implemented; aircraft noise
+is covered by the ICAO and ECAC methods in [Aircraft
+noise](../aircraft/index.md), which is a different family of models, and a
+non-vehicle machine is characterised as a sound power in [Sources and
+devices](../devices/emission/index.md). The **CNOSSOS propagation method** of
+section 2.5 is not implemented either: the path here is ISO 9613-2, a different
+model, so a chain built from CNOSSOS sources and this library's propagation is
+not a CNOSSOS calculation and should not be reported as one.
+
+Nothing here is a mapping engine. There is no terrain model, no city geometry
+and no GIS layer: the propagation functions take one source, one receiver and
+the ground between them, both refraction models assume flat ground at z = 0,
+and how a source line is split into point sources is declared out of scope by
+CNOSSOS itself. On the assessment side, the library starts where the sound
+level meter stops — the ISO 1996-2 receiver positions and façade corrections,
+and the RD 1367/2007 Annex IV measurement procedures (microphone positions,
+series duration, number of measurements), are not implemented, only the
+arithmetic that follows once you have applied them. Acoustic zoning, noise maps
+and action plans under Ley 37/2003 are planning instruments, not calculations.
+
+## Before and after these pages
+
+Every rating here is an adjusted $L_{eq}$, so the calibration, weighting and
+time integration that produce it are in [Signal
+analysis](../signals/index.md), and [Build a sound level
+meter](../signals/sound-level-meter.md) runs that chain end to end on
+one runnable page. The derivations are in [Environment and transport
+theory](../reference/theory/environment-transport.md): the ISO 1996-1 descriptors, the
+NT ACOU 112 prominence criterion and the ISO 9613 attenuation terms.
+
+If you arrived here from a search and want the shape of the whole library,
+[What do you need to measure?](https://jmrplens.github.io/phonometry/start/tasks/) indexes it by the job
+and [All guides](https://jmrplens.github.io/phonometry/start/guides/) lists every page with a line on
+each.

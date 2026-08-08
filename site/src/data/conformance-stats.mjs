@@ -85,4 +85,36 @@ export const standards = stats.standards;
 /** "427 / 427", for the landing-page stat tile. */
 export const checksRatio = `${passingChecks} / ${totalChecks}`;
 
-export default { passingChecks, totalChecks, domains, standards, checksRatio };
+/**
+ * Confirmed defects in published sources, counted from `docs/ERRATA.md`.
+ *
+ * The registry lives beside the conformance report and is transplanted into
+ * the site by `scripts/generate_site_reports.py`, so the source document is
+ * the one authority for the count. One `##` heading is one entry; the single
+ * `#` is the document title. Counted for the same reason the check counts are
+ * parsed rather than typed: "dozens" was the only vague number left on the
+ * page that argues nothing should be taken on trust.
+ */
+function countErrata() {
+  const path = join(dirname(REPORT), 'ERRATA.md');
+  if (!existsSync(path)) {
+    throw new Error(
+      `${path} not found. It is the source of the errata count; regenerate ` +
+        'the reports or fix the path.',
+    );
+  }
+  const entries = readFileSync(path, 'utf8').match(/^## .+$/gm);
+  return entries ? entries.length : 0;
+}
+
+/** Confirmed entries in the errata registry. */
+export const errataEntries = countErrata();
+
+export default {
+  passingChecks,
+  totalChecks,
+  domains,
+  standards,
+  checksRatio,
+  errataEntries,
+};

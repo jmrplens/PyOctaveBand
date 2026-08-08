@@ -2,7 +2,9 @@
 
 # Theoretical Background
 
-The theory reference explains the standards, the mathematics and the design decisions behind every phonometry module. It is split into six domain pages, listed below with the sections each one hosts. Theory for the underwater modules lives with its guides: [Underwater Acoustics](../../underwater/underwater-acoustics.md), [Underwater Propagation](../../underwater/underwater-propagation.md) and [Underwater Propagation Solvers](../../underwater/underwater-solvers.md).
+The theory reference collects the derivations, clause references and design decisions for the areas whose mathematics is **shared across many guides**. A theory page maps an implemented method back to the clause, equation and table of the standard or textbook it comes from, states the physics behind each correction term and the assumptions that bound it, and gives the reference values the validation suite checks against. It does not show workflows: that is what the guides are for.
+
+Several areas keep their theory **inside their guides** instead, because the derivation and the single method it serves would otherwise be separated for nothing: the underwater modules ([Underwater Acoustics](../../underwater/underwater-acoustics.md), [Underwater Propagation](../../underwater/underwater-propagation.md), [Underwater Propagation Solvers](../../underwater/underwater-solvers.md) and [Marine-Mammal Noise Exposure](../../underwater/marine-mammal-exposure.md)), the aircraft certification and contour methods ([Aircraft noise](../../aircraft/index.md)), the CNOSSOS-EU road and railway emission models ([Environment and transport](../../environment/index.md)), the IEC 60268 electroacoustic measurements, the BS.1770 broadcast chain and the noise-control models ([Sources and devices](../../devices/index.md)), and the FDTD and elastic solvers ([Wave simulation](../../simulation/index.md)). Everything below is listed with the sections each domain page hosts.
 
 ## [Signal Analysis](signal-analysis.md)
 
@@ -49,3 +51,5 @@ The theory reference explains the standards, the mathematics and the design deci
 ## [Vibration](vibration.md)
 
 - [Human vibration (ISO 8041-1, ISO 2631-1/2, ISO 5349-1/2, Directive 2002/44/EC)](vibration.md#human-vibration-iso-8041-1-iso-2631-12-iso-5349-12-directive-200244ec)
+- [Multiple shocks (ISO 2631-5)](vibration.md#multiple-shocks-iso-2631-5)
+- [Point mobilities and radiation efficiency (Cremer 5, Hopkins 2.9)](vibration.md#point-mobilities-and-radiation-efficiency-cremer-5-hopkins-29)

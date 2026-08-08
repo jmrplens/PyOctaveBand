@@ -22,7 +22,45 @@ hearing-damage model of ISO 1999.
 
 A good entry point is [Loudness](/phonometry/perception/psychoacoustics/loudness/): it introduces
 the perceptual scale (the sone) and the auditory models that most other
-metrics in this section reuse or extend.
+metrics in this section reuse or extend. The derivations behind these methods —
+the critical-band and excitation-pattern models, the masking formulations and
+the modulation-transfer chain — are gathered on the [perception theory
+page](/phonometry/reference/theory/perception/), which the individual guides
+cite clause by clause.
+
+### Reading the numbers
+
+Almost every perceptual scale in this section is defined by a **reference
+sound** rather than by a physical unit, so the first thing to learn about each
+is its anchor: the sound that reads exactly 1.
+
+| Quantity | Unit | The sound that reads 1 | Criterion? | Page |
+|---|---|---|---|---|
+| Loudness | sone | 1 kHz tone at 40 dB SPL (also 40 phon) | none | [Loudness](/phonometry/perception/psychoacoustics/loudness/) |
+| Sharpness | acum | critical-band-wide noise at 1 kHz, 60 dB SPL | none | [Sound Quality Metrics](/phonometry/perception/psychoacoustics/sound-quality/) |
+| Roughness | asper | 1 kHz tone at 60 dB, fully modulated at 70 Hz | 0.2 asper (informative) | [Sound Quality Metrics](/phonometry/perception/psychoacoustics/sound-quality/) |
+| Fluctuation strength | vacil | the same carrier modulated at 4 Hz | 0.2 vacil (informative) | [Sound Quality Metrics](/phonometry/perception/psychoacoustics/sound-quality/) |
+| Tonality | tu_HMS | 1 kHz tone at 40 dB SPL | 0.4 tu_HMS (informative) | [Sound Quality Metrics](/phonometry/perception/psychoacoustics/sound-quality/) |
+| Tone audibility | dB | — (a level difference above masking) | ISO 1996-2 adjustment | [Tone audibility](/phonometry/perception/psychoacoustics/tone-audibility/) |
+| STI | 0 to 1 | — | Annex F letters, U to A+ | [Speech Transmission Index](/phonometry/perception/speech/speech-transmission/) |
+| SII | 0 to 1 | — | none standardised | [Speech Intelligibility Index](/phonometry/perception/speech/speech-intelligibility/) |
+| Threshold shift | dB HL | — (a difference of two hearing levels) | ISO 1999 statistics | [Noise-induced hearing loss](/phonometry/perception/hearing/noise-induced-hearing-loss/) |
+
+Loudness, sharpness, roughness and fluctuation strength are **ratio scales
+with no pass/fail line**: twice the number means twice the sensation, so a
+20-sone appliance is heard as about twice as loud as a 10-sone one, which is
+why appliance declarations set limits in sones rather than in decibels. The
+tonal metrics and the speech indices do carry criteria, which is why the tone
+pages end in a verdict and the loudness pages do not.
+
+The three speech numbers all live in [0, 1] and are **not the same number**. An
+STI of 0.6 falls in Annex F band D, typical of a good lecture room; an SII of
+0.6 means roughly 60 % of the importance-weighted speech spectrum is audible;
+and a STOI of 0.6 has no absolute meaning at all, because the mapping from
+index to words understood is fitted per listening-test corpus, so STOI is only
+ever read as a difference between two processors on the same material. Never
+substitute one for another in a specification, and when a requirement quotes a
+number, check which standard it belongs to before computing anything.
 
 ## [Psychoacoustics](/phonometry/perception/psychoacoustics/)
 
@@ -75,3 +113,46 @@ The hearing threshold, what noise does to it, and how exposure is measured.
 - [Occupational Noise Exposure (ISO 9612)](/phonometry/perception/hearing/occupational-exposure/):
   the task-based, job-based and full-day strategies for LEX,8h with the
   Annex C uncertainty budget.
+
+## What this section does not cover
+
+**No listener is tested here, and no verdict about a person is issued.** Every
+model on these pages predicts what a population, or a standard listener, would
+perceive from a calibrated signal: none of them runs an audiometric session,
+none diagnoses a hearing loss, and ISO 1999 explicitly declines to define a
+hearing handicap or a compensable fence — that line is national regulation, and
+nothing here applies one. Every prominence and audibility verdict is likewise
+the numeric criterion only: ECMA-418-1 also requires aural confirmation of a
+prominent tone, and that stays with you.
+
+**Everything is monaural.** The binaural combinations of ECMA-418-2 are not
+implemented, so a two-channel recording is analysed one ear at a time, and
+nothing here models localisation, spatial release from masking or binaural
+loudness summation.
+
+**No listening test is replaced.** STOI returns the correlation-based index and
+not a percentage of words understood, because that mapping is fitted per
+listening-test corpus; the SII returns an audibility fraction and not a score;
+and no page predicts annoyance in a community, which is a social-survey
+quantity rather than a psychoacoustic one — the community indicators are
+[Environment and transport](/phonometry/environment/).
+
+Finally, these models start from a **calibrated** signal or spectrum in
+pascals, because every one of them is level-dependent. Feeding them raw
+soundcard samples produces a number with an arbitrary reference, which is a
+different failure from a wrong answer: it looks plausible.
+
+## Before and after these pages
+
+Every model here consumes a calibrated signal or a calibrated spectrum, so the
+calibration and weighting that produce one are in [Signal
+analysis](/phonometry/signals/), and [Build a sound level
+meter](/phonometry/signals/sound-level-meter/) runs that chain end to end on
+one runnable page. The derivations are in [Perception and hearing
+theory](/phonometry/reference/theory/perception/), from the equal-loudness contours to the
+modulation transfer function.
+
+If you arrived here from a search and want the shape of the whole library,
+[What do you need to measure?](/phonometry/start/tasks/) indexes it by the job
+and [All guides](/phonometry/start/guides/) lists every page with a line on
+each.
