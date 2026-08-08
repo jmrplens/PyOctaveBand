@@ -1,6 +1,6 @@
 ---
 title: "Absorbentes porosos y multicapa"
-description: "Predicción de la absorción a partir de los parámetros del material: los modelos porosos de Delany-Bazley, Miki y Johnson-Champoux-Allard, el modelo multicapa por matrices de transferencia con capas perforadas, microperforadas (Maa) y de membrana, y la integral de Paris de incidencia aleatoria."
+description: "Predicción de la absorción a partir de los parámetros del material: los modelos porosos de Delany-Bazley, Miki y Johnson-Champoux-Allard, el modelo multicapa por matrices de transferencia con capas perforadas, microperforadas (Maa) y de membrana, la corrección de esqueleto flexible y la capa poroelástica de Biot completa con su resonancia de esqueleto, y la integral de Paris de incidencia aleatoria."
 references:
   - type: book
     authors: ["Mechel, F. P. (Ed.)"]
@@ -101,7 +101,12 @@ microperforados, membranas) predice el coeficiente de absorción de toda la
 construcción antes de construir nada. Esta página cubre los tres modelos
 porosos (Delany–Bazley, Miki, Johnson–Champoux–Allard), el modelo
 multicapa, las capas resonantes de Maa y la integral de incidencia aleatoria
-(Paris). Las contrapartes de medida están en las guías del
+(Paris). Los tres modelos suponen que el esqueleto no se mueve nunca; la
+página cubre además qué hacer cuando sí lo hace: la corrección de inercia de
+esqueleto flexible por debajo de la frecuencia de desacoplo, y la capa
+poroelástica de Biot completa, cuya onda del esqueleto produce una resonancia
+de cuarto de onda que ningún fluido equivalente puede reproducir. Las
+contrapartes de medida están en las guías del
 [tubo de impedancia](/phonometry/es/materials/absorbers/impedance-tube/) y de la
 [cámara reverberante](/phonometry/es/materials/absorbers/absorption-measurement/); la
 valoración del espectro predicho vive en la
@@ -140,7 +145,12 @@ secc. G.12).
 **Miki** (1990) reajustó los mismos datos de Delany–Bazley bajo una
 restricción de pasividad (positivo-real), de modo que el modelo se mantiene
 físicamente bien comportado por debajo del rango de ajuste; es la elección
-habitual cuando un modelo de un parámetro debe evaluarse en banda ancha.
+habitual cuando un modelo de un parámetro debe evaluarse en banda ancha. Miki
+enuncia su propia ventana de validez en la variable $Y = f/\sigma$ del
+artículo, $0{,}01 < Y < 1{,}0$: la ventana de Delany–Bazley dividida por
+$\rho_0$, de modo que las dos difieren en un factor de alrededor de 1,2 y no
+por un desliz de pluma. La biblioteca avisa sobre $X$ en `delany_bazley` y
+sobre $Y$ en `miki`, cada uno frente a su propio rango publicado.
 
 **Johnson–Champoux–Allard (JCA)** es el modelo semifenomenológico de cinco
 parámetros (Cox & D'Antonio 3e ecs. 6.19–6.25): la resistividad al flujo
@@ -215,6 +225,124 @@ $k$ recuperados por la
 [reducción de matriz de transferencia ASTM E2611](/phonometry/es/materials/absorbers/impedance-tube/))
 se conecta al modelo de capas exactamente igual que uno modelado.
 
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/porous_model_comparison_es.svg" alt="Panel izquierdo: la impedancia característica normalizada de un material de 20 kPa s por metro cuadrado con Delany-Bazley, Miki y Johnson-Champoux-Allard de 20 hercios a 20 kilohercios en ejes log-log, con la ventana de ajuste de 0,01 a 1 en la variable del absorbente sombreada; las tres curvas se superponen dentro de la ventana y se separan por debajo. Panel derecho: la parte real de la impedancia de entrada de una capa de 50 mm con respaldo rígido con los mismos tres modelos, donde la curva de Delany-Bazley se hace negativa por debajo de 74,6 hercios mientras que Miki y JCA siguen positivas" width="90%" />
+
+*Los tres modelos, y lo que cuesta salirse del rango de ajuste. Dentro de la
+ventana $0{,}01 < X < 1$ las curvas son prácticamente el mismo material, que es
+la razón de que los ajustes de un parámetro se sigan usando. Por debajo se
+separan, y el panel derecho enseña la consecuencia en la magnitud que usa de
+verdad quien diseña: para esta capa de 50 mm con respaldo rígido, Delany–Bazley
+devuelve una resistencia **negativa** por debajo de 74,6 Hz, una capa pasiva que
+genera energía. La restricción de pasividad de Miki la mantiene positiva, y JCA
+es física en todo el rango por construcción. El aviso `PorousAbsorberWarning`
+salta aquí; los valores extrapolados se devuelven igualmente, así que darse
+cuenta es cosa de quien llama.*
+
+<details>
+<summary>Mostrar el código de esta figura</summary>
+
+```python
+f_cmp = np.geomspace(20.0, 20000.0, 400)
+for name, medium in (
+    ("Delany-Bazley", materials.delany_bazley(f_cmp, 20000.0)),
+    ("Miki", materials.miki(f_cmp, 20000.0)),
+):
+    zs = materials.layered_absorber(
+        f_cmp, [materials.PorousLayer(0.05, medium)]
+    ).normalized_impedance
+    below = f_cmp[zs.real < 0.0]
+    print(name, "Re(Zs) < 0 por debajo de",
+          f"{below.max():.1f} Hz" if below.size else "nunca")
+# Delany-Bazley Re(Zs) < 0 por debajo de 74.6 Hz
+# Miki Re(Zs) < 0 nunca
+```
+
+</details>
+
+### 1.1 De dónde salen los cinco números de JCA
+
+Delany–Bazley y Miki necesitan un número medido. JCA necesita cinco, y quien
+tenga una muestra real ha de sacar los otros cuatro de algún sitio.
+
+**La resistividad al flujo $\sigma$** es la única que tiene una norma detrás:
+ISO 9053-1 o -2, en la
+[guía de resistencia al flujo de aire](/phonometry/es/materials/absorbers/airflow-resistance/).
+Es además la primera que hay que volver a medir cuando un modelo y una medida
+discrepan.
+
+**La porosidad $\phi$** es la porosidad *abierta* (conectada): la relación
+entre el volumen de aire y el volumen total, contando solo el aire que no queda
+encerrado dentro del esqueleto, de modo que una burbuja cerrada de una espuma
+pertenece al esqueleto y no a $\phi$ (Allard & Atalla 2e, secc. 2.5.1). Se mide
+por métodos de desplazamiento de gas (Zwikker y Kosten 1949; Champoux et al.
+1991) y, para la mayoría de los materiales fibrosos y las espumas de celda
+abierta, «queda muy cerca de 1», que es la razón de que 0,95–0,99 sea una
+conjetura de partida defendible y de que $\phi$ rara vez sea el parámetro que
+importa.
+
+**La tortuosidad $\alpha_\infty$** es una propiedad intrínseca de la
+microgeometría: es aquello a lo que tiende la densidad efectiva, multiplicado
+por $\rho_0$, cuando se anula el espesor de piel viscoso. Se puede evaluar a
+partir de medidas de conductividad eléctrica sobre un esqueleto saturado con un
+fluido conductor (secc. 4.9), o junto con las dos longitudes características
+mediante transmisión ultrasónica (secc. 5.3.5). Vale 1 para poros rectos
+normales a la superficie y crece con cualquier dispersión de la velocidad
+microscópica.
+
+**Las longitudes características $\Lambda$, $\Lambda'$** son las más difíciles
+de obtener directamente: el método de referencia es la transmisión ultrasónica
+en dos gases (helio y aire), y la espuma resuelta del propio libro, con
+$\phi = 0{,}98$, sale con $\Lambda = 202$ µm, $\Lambda' = 367$ µm y
+$\alpha_\infty = 1{,}05$ justo de esa medida (Leclaire et al. 1996, reproducida
+como fig. 5.5). Fíjate en la relación: ahí $\Lambda'/\Lambda \approx 1{,}8$, ni
+1 ni 3. Es una propiedad de la geometría del poro, así que trátala como algo
+que hay que *encontrar*, no que suponer. Cuando no se dispone de un banco
+ultrasónico, la vía práctica es un ajuste inverso contra una impedancia
+superficial medida a incidencia normal, la magnitud que devuelve el
+[tubo de impedancia](/phonometry/es/materials/absorbers/impedance-tube/); y cuando
+ni siquiera eso está al alcance, el recurso en forma cerrada
+$\Lambda = \Lambda' = \sqrt{8\alpha_\infty\eta/(\phi\sigma)}$ con
+$\alpha_\infty = 1$ hace que JCA vuelva a caer sobre Delany–Bazley dentro de su
+rango de ajuste.
+
+El ajuste inverso son unas pocas líneas, y merece la pena ejecutarlo primero
+contra una «medida» sintética para poder comprobar la recuperación:
+
+```python
+from scipy.optimize import least_squares
+
+f_fit = np.geomspace(200.0, 1600.0, 40)      # la banda útil de un tubo de 100 mm
+
+def surface_impedance(sigma, viscous):
+    """Zs normalizada de una capa JCA de 50 mm con respaldo rígido."""
+    medium = materials.johnson_champoux_allard(
+        f_fit, sigma, porosity=0.98, tortuosity=1.05,
+        viscous_length=viscous, thermal_length=2.5 * viscous,
+    )
+    layer = materials.layered_absorber(f_fit, [materials.PorousLayer(0.05, medium)])
+    return layer.normalized_impedance
+
+# Hace las veces del resultado de tubo: una probeta cuyos parámetros verdaderos
+# conocemos.
+measured = surface_impedance(22000.0, 9.0e-5)
+
+def residual(p):                              # sigma en kPa s/m2, Lambda en um
+    z = surface_impedance(p[0] * 1e3, p[1] * 1e-6)
+    return np.concatenate([(z - measured).real, (z - measured).imag])
+
+fit = least_squares(residual, x0=[10.0, 50.0],
+                    bounds=([1.0, 10.0], [200.0, 500.0]))
+print(round(fit.x[0] * 1e3), round(fit.x[1], 1))   # 22000 90.0 -- ambos recuperados
+```
+
+Van con él dos advertencias. Ajustar los cinco parámetros a la vez está
+indeterminado frente a un solo espectro de impedancia: mantén $\phi$ en su valor
+medido o cercano a la unidad, mantén $\alpha_\infty$ salvo que haya una razón
+para moverlo, y deja que el ajuste encuentre $\sigma$ y las longitudes. Y cuando
+una $\sigma$ ajustada sale lejos de la respuesta del banco de flujo, cree al
+banco: un ajuste que ha absorbido un error de montaje dentro de los parámetros
+del material predecirá mal cualquier otra construcción.
+
 ### Esqueletos flexibles: cuando el armazón se mueve (Allard & Atalla 11.3.4)
 
 Todos los modelos anteriores suponen que el esqueleto no se mueve. Eso solo es
@@ -243,12 +371,9 @@ $$
 
 donde $\tilde\rho_{\text{eq}}$ es la densidad efectiva de esqueleto rígido de
 cualquiera de los tres modelos anteriores y $\rho_t$ es la densidad total
-aparente del material. El anclaje de la corrección es la propia ecuación
-impresa, transcrita término a término frente a la página; el libro no tabula
-ninguna densidad flexible calculada. Dos límites que enuncia en prosa también
-son exactos y se comprueban, pero corroboran sin fijar la forma: ninguno
-restringe los términos en $\rho_0$, y una variante de la misma ecuación con el
-signo cambiado satisface ambos. Los límites son:
+aparente del material. En qué se ancla esa forma, y con qué debilidad, lo
+expone la nota de validación del final de este apartado. Tiene dos límites que
+merece la pena conocer como física:
 
 - **esqueleto pesado**: al crecer $\rho_1$ la corrección se anula y se
   recupera el resultado de esqueleto rígido;
@@ -271,7 +396,7 @@ densidad efectiva de esqueleto rígido se dispara y la flexible se asienta en
 $\rho_t/\rho_0 = 25,9$.*
 
 <details>
-<summary>Ver el código de esta figura</summary>
+<summary>Mostrar el código de esta figura</summary>
 
 ```python
 import matplotlib.pyplot as plt
@@ -395,6 +520,40 @@ cada onda. La onda cuyo $|\mu|$ es grande es la onda **del aire**, la que un
 fluido equivalente ya modela; la otra es la onda **del esqueleto**, que no tiene
 ningún equivalente en un fluido.
 
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/biot_waves_es.svg" alt="Panel superior: las partes real e imaginaria de los dos números de onda de compresión de Biot y la parte real del número de onda de cizalla frente a la frecuencia de 50 a 1500 hercios para una capa de lana de vidrio, con el intercambio de raíces de 495 hercios marcado por una línea vertical punteada. Panel inferior: los módulos de las dos razones de velocidad en eje logarítmico, la del aire plana por encima de 42 y la del esqueleto sobre la línea de la unidad" width="88%" />
+
+*Las tres ondas que predice la teoría de Biot donde un fluido equivalente
+predice una, para la lana de vidrio de la tabla 6.1 de Allard & Atalla. El
+panel inferior es lo que las nombra: $|\mu_a|$ nunca baja de 42, así que en la
+onda del aire se mueve el fluido de los poros y el esqueleto apenas, y esa es la
+onda que ya describen los modelos de fluido equivalente. $|\mu_b|$ se queda en
+1, así que en la onda del esqueleto el fluido y el esqueleto se mueven juntos, y
+ningún fluido equivalente tiene siquiera esa rama. La línea punteada en 495 Hz
+es donde las dos raíces de compresión del modelo intercambian su lugar; el
+etiquetado sigue a $|\mu|$ y no al orden de los autovalores, así que las curvas
+siguen siendo continuas al cruzarla.*
+
+<details>
+<summary>Mostrar el código de esta figura</summary>
+
+```python
+# El BiotWavesResult de la lana de vidrio de la tabla 6.1. Su .plot() dibuja el
+# panel superior; el inferior son dos de sus campos.
+f_biot = np.linspace(50.0, 1500.0, 1451)
+biot = materials.biot_waves(
+    materials.johnson_champoux_allard(
+        f_biot, 40e3, porosity=0.94, tortuosity=1.06,
+        viscous_length=0.56e-4, thermal_length=1.1e-4,
+    ),
+    porosity=0.94, tortuosity=1.06, frame_density=130.0,
+    shear_modulus=2.2e6 * (1 + 0.1j),
+)
+print(round(float(abs(biot.airborne_velocity_ratio).min()), 1))    # 42.4
+print(round(float(abs(biot.frame_borne_velocity_ratio[0])), 3))    # 1.002
+```
+
+</details>
+
 `biot_waves` recibe el fluido equivalente de esqueleto *rígido* de los poros,
 normalmente un resultado de `johnson_champoux_allard`. Es deliberado: la inercia
 del esqueleto es asunto del propio modelo de Biot, así que pasarle un medio de
@@ -425,7 +584,7 @@ real y el máximo agudo de la parte imaginaria que el libro mide y dibuja en su
 fig. 6.10.*
 
 <details>
-<summary>Ver el código de esta figura</summary>
+<summary>Mostrar el código de esta figura</summary>
 
 ```python
 import matplotlib.pyplot as plt
@@ -566,8 +725,8 @@ reflexión $R(\theta)$ y $\alpha(\theta) = 1 - |R|^2$. Una única capa porosa
 sobre pared rígida se reduce a la forma cerrada de libro
 $Z_s = -j Z_c \cot(k d)$ (Mechel secc. D.3, ec. 1).
 
-Antes de las matrices, la imagen física: una capa porosa con respaldo rígido
-es un fluido equivalente resumido en cinco números medibles. La capa de 50 mm
+Detrás de las matrices hay una sola imagen física: una capa porosa con respaldo
+rígido es un fluido equivalente resumido en cinco números medibles. La capa de 50 mm
 de abajo, evaluada con el modelo JCA de cinco parámetros al que pertenecen
 esos números, absorbe el 91 % de una onda de 1 kHz en incidencia normal; el
 código que sigue pasa la misma capa por el ajuste de Miki de un parámetro,
@@ -588,6 +747,41 @@ print(round(res.absorption[i], 3))               # 0.937 a 1 kHz
 
 res.plot()   # alpha(f) con |R| superpuesto
 ```
+
+**Separar la capa de la pared.** La jugada más habitual del diseño de
+absorbentes no es más material, es una cámara, y la razón está en la condición
+de contorno. Una capa porosa disipa a través de la velocidad de partícula de sus
+poros, y un respaldo rígido fuerza esa velocidad a cero en la pared, así que una
+capa delgada frente a la longitud de onda queda en la zona muerta y no hace casi
+nada en baja frecuencia. Sepárala $d$ de la pared y quedará cerca del máximo de
+velocidad a la frecuencia en la que la cámara es un cuarto de longitud de onda,
+$c_0/4d$, que son 858 Hz para una cámara de 100 mm (la propia presencia de la
+capa baja todavía más la ganancia útil). Merece la pena ver la aritmética:
+
+```python
+# La misma manta de 50 mm, pegada a la pared y separada de ella.
+bands_gap = np.array([125.0, 250.0, 500.0, 1000.0])
+med_gap = materials.miki(bands_gap, 20000.0)
+flat = materials.layered_absorber(bands_gap, [materials.PorousLayer(0.05, med_gap)])
+spaced = materials.layered_absorber(
+    bands_gap, [materials.PorousLayer(0.05, med_gap), materials.AirLayer(0.10)]
+)
+thick = materials.layered_absorber(bands_gap, [materials.PorousLayer(0.15, med_gap)])
+print(np.round(flat.absorption, 2))     # [0.09 0.26 0.62 0.94]  50 mm en la pared
+print(np.round(spaced.absorption, 2))   # [0.44 0.78 0.9  0.77]  50 mm + cámara 100 mm
+print(np.round(thick.absorption, 2))    # [0.52 0.71 0.8  0.89]  150 mm en la pared
+```
+
+A 250 Hz la capa de 50 mm sobre una cámara de 100 mm supera a 150 mm de manta
+maciza, 0,78 frente a 0,71, con un tercio del material y los mismos 150 mm de
+profundidad total. La jugada trae dos límites: la ganancia desaparece por encima
+de la primera media onda de la cámara, donde la capa vuelve a caer en un nodo de
+velocidad (se ve en la curva separada quedando por debajo de la pegada a 1 kHz),
+y sobre una superficie grande hay que compartimentar la cámara o el campo se
+propaga lateralmente por dentro en incidencia oblicua. Esta es la contraparte de
+predicción de los
+[montajes tipo E-*xxx* y G-*xxx*](/phonometry/es/materials/absorbers/absorption-measurement/#12-la-probeta-y-su-montaje-apartado-62-y-anexo-b)
+de ISO 354, cuyo sufijo es exactamente esta $d$.
 
 El modelo multicapa evalúa las magnitudes físicas mediante una recursión de
 admitancias numéricamente robusta (inmune al desbordamiento
@@ -693,6 +887,24 @@ expresiones, $t$ es el espesor de la placa, $a$ el **radio** del orificio,
 $\varepsilon$ el área abierta (área de orificios sobre área de panel), $\nu$ la
 viscosidad cinemática del aire, $t' = t + 2\delta a$ el espesor de placa con
 corrección de extremo y $d$ la profundidad de la cámara tras el panel.
+
+**Por qué un panel perforado necesita material poroso detrás.** La fórmula de
+resonancia coloca el pico; la *resistencia* decide su altura y su anchura, y ahí
+es donde un panel perforado corriente es flojo. Sus orificios miden milímetros,
+así que la pérdida viscosa de cada tapón es una fracción pequeña de
+$\rho_0 c_0$: sobre una cámara vacía la construcción es un resonador de Q alta
+que absorbe en una banda estrecha y no hace casi nada fuera de ella. El arreglo
+habitual es poner la resistencia que falta dentro de la cámara, una capa porosa
+o un velo resistivo, lo que baja y ensancha el pico hacia la condición de
+adaptación. Esa es exactamente la razón de que el diseño «perforado + poroso» de
+la figura de arriba lleve un `PorousLayer` detrás de la placa, y de que el MPP
+de más abajo pueda prescindir de él: sus orificios submilimétricos aportan ellos
+mismos la resistencia. De ahí salen dos consecuencias de diseño: colocar la capa
+porosa donde la velocidad de partícula es alta, es decir, contra la placa
+perforada y no tumbada sobre el respaldo rígido, y apuntar a una resistencia
+total al flujo del orden de $\rho_0 c_0$. Ese mismo enunciado leído como
+adaptación de impedancia es la condición de acoplamiento crítico de la
+[guía de metaabsorbentes](/phonometry/es/materials/absorbers/metamaterial-absorbers/).
 
 ### Las clases de lámina: parámetros
 
@@ -800,6 +1012,99 @@ isoterma, Cox ecs. 7.9/7.10). Las formas cerradas se exponen como
 `helmholtz_resonance_frequency` y `membrane_resonance_frequency`; la
 respuesta completa en frecuencia sale de la misma pila de capas.
 
+### La impedancia de lámina en sí
+
+Las clases de capa de arriba entregan su impedancia de transferencia al
+modelo multicapa, y el modelo devuelve $\alpha(f)$, que es como se
+*evalúa* una lámina resonante, no como se *diseña*. Toda relación de diseño de
+esta sección está escrita en $r$ y $\omega m$, así que las mismas impedancias
+están expuestas por separado: `perforated_plate_impedance`,
+`microperforated_plate_impedance` y `membrane_impedance`, que devuelven $z$ en
+Pa·s/m antes de normalizar, más `perforation_end_correction` para el factor de
+Fok. Con ellas el argumento de diseño se cierra sobre sí mismo: la reactancia
+cruza la $-\cot(\omega D/c_0)$ de la cámara en la resonancia, y la resistencia
+*ahí* fija tanto la altura del pico $4r/(1+r)^2$ como el ancho de banda:
+
+```python
+# La geometría de la propia fig. 5 de Maa, leída como impedancia en su pico de
+# 677,5 Hz.
+rho_c = 1.205 * 343.0
+f_peak = np.array([677.5])
+z_mpp = materials.microperforated_plate_impedance(
+    f_peak, thickness=0.2e-3, hole_radius=0.1e-3, open_area=eps
+)
+r_mpp = float(z_mpp.real[0]) / rho_c
+print(round(r_mpp, 3), round(float(z_mpp.imag[0]) / rho_c, 3))   # 1.531 1.077
+print(round(4 * r_mpp / (1 + r_mpp) ** 2, 3))    # 0.956 = el alpha del pico de arriba
+
+# El mismo panel con orificios milimétricos: un orden de magnitud menos de
+# resistencia, de ahí el pico estrecho que necesita respaldo poroso.
+z_perf = materials.perforated_plate_impedance(
+    f_peak, thickness=0.006, hole_radius=0.0025, open_area=0.05
+)
+print(round(float(z_perf.real[0]) / rho_c, 4))   # 0.0925, 16 veces menor
+
+# Una membrana es reactancia pura salvo que se aporte una resistencia de fijación.
+print(np.round(materials.membrane_impedance(f_peak, surface_density=2.0), 1))
+# [0.+8513.6j]
+
+# La interacción de Fok: los orificios apretados acortan el tapón efectivo.
+print(round(materials.perforation_end_correction(0.05), 3))   # 0.575 frente a 0.85
+```
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sheet_transfer_impedance_es.svg" alt="Resistencia y reactancia normalizadas del panel microperforado de Maa frente a la frecuencia de 100 hercios a 4 kilohercios, con la reactancia de cotangente negativa de su cámara de 60 mm dibujada como una segunda curva. Las dos reactancias se cruzan cerca de 677 hercios, donde la resistencia vale 1,53, y un eje acompañante muestra la absorción alcanzando 0,96 exactamente a esa frecuencia" width="84%" />
+
+*Toda la regla de diseño de esta sección en una imagen. La reactancia del panel
+$x(f)$ y la de la cámara $-\cot(\omega D/c_0)$ se cruzan en 677 Hz: ese cruce es
+la resonancia, y la coloca la geometría. Lo que ocurre *en* el cruce lo fija la
+resistencia de ahí, $r = 1{,}53$, que da $4r/(1+r)^2 = 0{,}96$, el pico que
+calcula la pila, recuperado a partir de dos números. Un panel con orificios
+milimétricos tiene una $r$ dieciséis veces menor, así que su cruce sería igual
+de agudo y mucho menos absorbente, que es todo el argumento a favor de los
+orificios submilimétricos o del respaldo poroso.*
+
+<details>
+<summary>Mostrar el código de esta figura</summary>
+
+```python
+f_sheet = np.geomspace(100.0, 4000.0, 400)
+z_sheet = materials.microperforated_plate_impedance(
+    f_sheet, thickness=0.2e-3, hole_radius=0.1e-3, open_area=eps
+) / rho_c
+cavity = -1.0 / np.tan(2.0 * np.pi * f_sheet * 0.06 / 343.0)
+print(round(float(z_sheet.real[0]), 2), round(float(cavity[0]), 2))
+```
+
+</details>
+
+### Construir lo que predice la pila
+
+La pila de matrices de transferencia supone una construcción infinita,
+lateralmente uniforme y de reacción local. Para que esa hipótesis sobreviva en
+obra tienen que cumplirse cinco cosas.
+
+1. **Compartimenta o rellena la cámara que hay tras una lámina resonante.** El
+   modelo unidimensional y la hipótesis de reacción local necesitan los dos
+   celdas pequeñas frente a la longitud de onda a la frecuencia de diseño. Una
+   cámara sin compartimentar tras una lámina perforada deja que el campo se
+   propague lateralmente, lo que convierte un diseño de reacción local en uno de
+   reacción volumétrica y suele ensanchar y bajar el pico.
+2. **Sella el perímetro contra el soporte**, o la cámara queda ventilada y la
+   resonancia para la que se sintonizó no existe.
+3. **Comprueba el área abierta contra la lámina que realmente compraste.** La
+   $\varepsilon$ del modelo es la relación geométrica
+   $(\pi/4)(d_\text{orificio}/b)^2$ para orificios de diámetro
+   $d_\text{orificio}$ a un paso $b$. Las rebabas, la pintura y los orificios
+   submilimétricos parcialmente obturados mueven directamente la resistencia del
+   MPP, y la resistencia es de lo que depende la altura del pico.
+4. **Monta la membrana flexible y sin tensión.** Sujetarla y rigidizarla añade
+   una fuerza recuperadora que el modelo $z = j\omega m$ no tiene, y empuja
+   $f_0$ por encima de la estimación $60/\sqrt{m d}$.
+5. **No des el respaldo por supuesto.** La pila dibujada termina en una pared
+   rígida; una construcción sobre un soporte elástico necesita que esa
+   impedancia de respaldo se pase explícitamente con `termination=` en lugar de
+   dejarla en `"rigid"`.
+
 ## 4. Incidencia oblicua y aleatoria
 
 `layered_absorber(..., angle=theta)` evalúa la pila completa de reacción
@@ -815,7 +1120,20 @@ $$
 $$
 
 evaluada por cuadratura de Gauss–Legendre en `diffuse_field_absorption`
-(``angle_limit`` por defecto 90°; se usan truncamientos a 75–87°). Para una
+(``angle_limit`` por defecto 90°; se usan truncamientos a 75–87°). Ese
+truncamiento no es decoración y merece una regla de decisión. El integrando
+pondera sobre todo los ángulos oblicuos, y es justo cerca de la incidencia
+rasante donde la teoría del plano infinito deja de describir un ensayo real:
+una probeta finita y montada no se comporta como una capa ilimitada a 85°, y un
+campo difuso sobre una muestra de 10 a 12 m² sencillamente no entrega la
+energía rasante que supone la integral completa, así que el resultado sin
+truncar tiende a quedar por debajo de los valores medidos. Lo que hace la
+práctica se sigue de ahí: truncar en torno a 78° cuando la intención es
+compararse con una medición en cámara reverberante, y mantener 90° cuando la
+intención es el coeficiente teórico de incidencia aleatoria de una superficie
+infinita. Un $\alpha_{dif}$ truncado es una magnitud de ingeniería ajustada y
+no una magnitud física, así que el límite debe citarse junto al número: el
+fragmento de abajo imprime el tamaño de la decisión. Para una
 superficie de *reacción local* con impedancia normalizada conocida la
 integral tiene la forma cerrada de Mechel ec. 10, expuesta como
 `statistical_absorption`; su máximo sobre todas las impedancias pasivas es
@@ -835,6 +1153,11 @@ print(np.round(diffuse.absorption, 2))   # [0.37 0.68 0.9  0.95]
 diffuse.plot()   # alpha_dif(f); superpón normal.absorption para comparar
 
 print(round(float(materials.statistical_absorption(1.567 + 0j)), 3))  # 0.951
+
+# Cuánto vale el truncamiento, sobre la misma capa.
+truncated = materials.diffuse_field_absorption(f, layers, angle_limit=np.radians(78.0))
+print(np.round(truncated.absorption - diffuse.absorption, 3))
+# [-0.001  0.01   0.019  0.018]  unas centésimas, y van en el sentido correcto
 ```
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diffuse_field_absorption_es.svg" alt="Absorción de incidencia aleatoria de una capa porosa de 50 mm por la integral de Paris comparada con su coeficiente a incidencia normal: la curva de campo difuso queda claramente por encima de la de incidencia normal por debajo de 700 Hz y ambas convergen hacia 0,95 a alta frecuencia" width="80%" />
@@ -865,6 +1188,60 @@ ax = diffuse.plot(language="es")
 ax.plot(f, normal.absorption, "--", label="Incidencia normal alpha(0)")
 ax.legend()
 plt.show()
+```
+
+</details>
+
+**No compares esto con el $\alpha_s$ de una hoja de características.** La integral de
+Paris se evalúa sobre una capa *infinita y lateralmente uniforme*. Una medición
+ISO 354 se hace sobre una probeta montada de 10 a 12 m² cuyos bordes difractan
+energía hacia dentro, que es la razón de que el $\alpha_s$ medido supere 1 de
+forma rutinaria y de que el mismo producto salga distinto en dos salas. Espera
+que el valor medido corra por encima del $\alpha_{dif}$ predicho en torno a 0,1
+a 0,2 en las bandas medias, y más cuanto menor sea la probeta y mayor su
+relación perímetro-superficie. El corolario para el ajuste de modelos es la
+mitad importante: ajusta los parámetros del material contra una medida de tubo,
+o contra la predicción difusa de un modelo en el que confíes, y nunca contra el
+$\alpha_s$ de una hoja de características, porque el excedente de tamaño finito se
+absorbería dentro de una resistividad al flujo equivocada y se propagaría
+después a todas las construcciones que predigas con ella. Para lo que la
+predicción *sí* sirve es para comparar construcciones, para dimensionar un
+tratamiento antes de que exista y para alimentar un cálculo de sala que espera
+entrada de incidencia aleatoria; una especificación escrita contra un
+$\alpha_s$ medido sigue teniendo que cerrarse con una medida.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/oblique_absorption_es.svg" alt="Panel izquierdo: coeficiente de absorción frente al ángulo de incidencia de 0 a 90 grados para una capa porosa de 50 mm con respaldo rígido a 250, 500, 1000 y 2000 hercios, cada curva continua de reacción volumétrica acompañada por una discontinua de reacción local, con el truncamiento de 78 grados marcado. Panel derecho: el coeficiente de campo difuso integrado frente al coeficiente estadístico de reacción local a lo largo de la frecuencia, con el techo de 0,951 de la forma cerrada dibujado como línea punteada" width="88%" />
+
+*El integrando que consume el promedio de Paris, y las dos maneras de
+promediarlo. Izquierda: $\alpha(\theta)$ de la misma capa de 50 mm a cuatro
+frecuencias, cada curva continua de reacción volumétrica
+(`layered_absorber(..., angle=theta)`, en la que las capas fluidas refractan)
+acompañada por la curva de reacción local obtenida de la misma impedancia
+superficial a incidencia normal. Las dos coinciden en incidencia normal por
+construcción, se separan en el intervalo de 40° a 75° donde el integrando de
+Paris lleva la mayor parte de su peso (el modelo volumétrico absorbe más, porque
+la onda refracta y viaja más lejos dentro de la capa) y vuelven a converger
+cuando ambas se desploman hacia cero en rasante. La elección del modelo de
+reacción es, por tanto, una elección sobre la parte de la integral que más
+importa. Derecha: los dos resultados integrados a lo largo de la frecuencia, con
+el máximo de 0,951 de la forma cerrada de reacción local dibujado como un techo
+que ninguna impedancia pasiva puede superar.*
+
+<details>
+<summary>Mostrar el código de esta figura</summary>
+
+```python
+# alpha(theta) a una frecuencia, de las dos maneras.
+theta = np.radians(np.linspace(0.0, 88.0, 60))
+f_one = np.array([1000.0])
+layers_one = [materials.PorousLayer(0.05, materials.miki(f_one, 20000.0))]
+bulk = [float(materials.layered_absorber(f_one, layers_one, angle=float(t)).absorption[0])
+        for t in theta]
+z_normal = materials.layered_absorber(f_one, layers_one).normalized_impedance[0]
+local = [1.0 - abs((z_normal * np.cos(t) - 1.0) / (z_normal * np.cos(t) + 1.0)) ** 2
+         for t in theta]
+print(round(bulk[0], 3), round(bulk[-1], 3))     # 0.937 0.161
+print(round(local[0], 3), round(local[-1], 3))   # 0.937 0.138
 ```
 
 </details>
@@ -937,10 +1314,22 @@ transferencia (`layered_absorber` con `AirLayer`, `PorousLayer`,
 `PoroelasticLayer`, `PerforatedPlateLayer`, `MicroperforatedPlateLayer` y
 `MembraneLayer`) y los
 coeficientes de incidencia aleatoria por la integral de Paris
-(`diffuse_field_absorption`, `statistical_absorption`).
+(`diffuse_field_absorption`, `statistical_absorption`). Las impedancias de
+transferencia de lámina que consumen las clases de capa también están expuestas
+por separado, que es como se diseña una lámina resonante en vez de solo
+evaluarla: `perforated_plate_impedance`, `microperforated_plate_impedance`,
+`membrane_impedance` y `perforation_end_correction`.
 
-**No cubierto.** El libro de Cox y D'Antonio trata tanto difusores como
-absorbentes, pero esta guía solo implementa la mitad de absorbentes. La
+**No cubierto.** Aquí no se mide nada: los cinco parámetros de JCA, el módulo
+de cizalla y el coeficiente de Poisson del esqueleto y la geometría de la lámina
+son todos entradas, y la sección 1.1 dice de dónde salen sin implementar
+ninguno de esos métodos de caracterización (solo se muestra el ajuste inverso
+contra una impedancia medida, y eso es `scipy.optimize`, no esta biblioteca).
+Las reglas de construcción del final de la sección 3 son práctica de ingeniería
+sin norma detrás, y la diferencia de tamaño finito entre un $\alpha_{dif}$
+predicho y un $\alpha_s$ medido se enuncia pero no se modela: nada de aquí
+reproduce el efecto de borde. El libro de Cox y D'Antonio trata tanto difusores
+como absorbentes, pero esta guía solo implementa la mitad de absorbentes. La
 predicción del difusor de gradiente de fase de Schroeder vive en un módulo
 aparte (`materials.diffusers.design`), documentada en
 [Difusores y sus coeficientes](/phonometry/es/materials/diffusers/diffusers/) y, para los

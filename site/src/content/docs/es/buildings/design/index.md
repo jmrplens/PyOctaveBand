@@ -34,20 +34,23 @@ tienes son magnitudes globales ponderadas de catálogo — $R_w$, $\Delta L_w$, 
 masa por unidad de superficie — y la pregunta es si la partición cumple un
 límite. Ejecuta el detallado cuando tienes espectros de elemento y de unión por
 bandas, o las propiedades de material a partir de las cuales la norma puede
-calcularlos, y la pregunta es *qué trayectoria corregir en qué banda*. La elección no
-va de exactitud sobre la valoración: sobre el propio edificio resuelto de la
-norma, los dos coinciden holgadamente dentro de la dispersión que declaran, y el
-modelo aéreo detallado no tiene error sistemático y su desviación típica es de
-1,5 dB a 2,5 dB (apartado 5) frente a unos 2 dB del simplificado. Lo que compra
-el modelo detallado es el espectro que hay detrás del número único.
+calcularlos, y la pregunta es *qué trayectoria corregir en qué banda*. La
+elección no va de exactitud sobre la valoración: sobre el propio edificio del
+ejemplo resuelto de la norma, los dos coinciden holgadamente dentro de la
+dispersión que declaran, y el modelo aéreo detallado no tiene error sistemático
+y su desviación típica es de 1,5 dB a 2,5 dB (apartado 5) frente a unos 2 dB del
+simplificado. Lo que compra el modelo detallado es el espectro que hay detrás
+del número único.
 
 [Predicción del aislamiento de
 paneles](/phonometry/es/buildings/design/panel-sound-insulation/)
 baja un nivel más, hasta el origen del propio $R$ de elemento: la ley de masas y
-el valle de coincidencia de un panel simple, el comportamiento masa-muelle-masa
-de una doble hoja, la transmisión por rendijas y aberturas, la eficiencia de
-radiación de placas y las movilidades puntuales. Es la física que un valor de
-catálogo resume en un número.
+el valle de coincidencia de un panel simple, el atajo de la meseta que estima a
+mano la curva entera, el *rango* de coincidencia de una chapa grecada o nervada,
+el comportamiento masa-muelle-masa de una doble hoja y el puente de las llaves
+que limita a un muro de fábrica con cámara, la transmisión por rendijas y
+aberturas, la eficiencia de radiación de placas y las movilidades puntuales. Es
+la física que un valor de catálogo resume en un número.
 
 Dos páginas de aquí llevan la mitad de suelos de cualquier diseño, una que mide
 y otra que predice.
@@ -78,17 +81,31 @@ toma esa descripción de fuente, pierde parte de ella en el término de
 acoplamiento que fijan las movilidades de fuente y de receptor, y lleva el resto
 a un recinto que puede estar a varias uniones de distancia.
 
-Una nota de contabilidad recorre toda la sección: la familia existe como
-EN 12354:2000 y como ISO 12354:2017, y las dos no son intercambiables en todos
-los apartados. Los modelos simplificados de
-[Predicción del aislamiento
-acústico](/phonometry/es/buildings/design/insulation-prediction/)
-siguen el texto de 2000 — incluida la corrección tabulada por flancos $K$ que la
-parte de impactos de 2017 sustituyó por fórmulas explícitas trayectoria a trayectoria —
-mientras que
-[Predicción detallada por bandas](/phonometry/es/buildings/design/detailed-prediction/)
-sigue el texto de 2017. Comprueba qué edición invoca tu reglamento antes de
-citar una corrección de cualquiera de las dos.
+**¿EN 12354 o ISO 12354?** Una nota de contabilidad recorre toda la sección. La
+familia de predicción la publicó CEN como EN 12354-1 a -6 y más tarde la reeditó
+ISO como segunda edición, ISO 12354-1:2017 e ISO 12354-2:2017, que no es palabra
+por palabra el texto anterior: donde una fórmula cambió entre una impresión y
+otra, el [registro de erratas](/phonometry/es/reference/errata/) recoge las dos.
+Las partes 3 a 6 conservan su designación EN en las ediciones que se usan aquí.
+Cada guía dice de qué edición se leyó — EN 12354-1:2000 y EN 12354-2:2000 para
+los modelos simplificados de
+[Predicción del aislamiento acústico](/phonometry/es/buildings/design/insulation-prediction/),
+incluida la corrección tabulada por flancos $K$ que la parte de impactos de 2017
+sustituyó por fórmulas explícitas trayectoria a trayectoria; ISO 12354-1:2017 e
+ISO 12354-2:2017 para los modelos por bandas y los ejemplos resueltos de los
+anexos L y G de
+[Predicción detallada por bandas](/phonometry/es/buildings/design/detailed-prediction/);
+y EN 12354-3:2000 a EN 12354-6:2003 para fachadas, equipamientos y recintos
+cerrados. Comprueba qué edición invoca tu reglamento antes de citar un apartado o
+una corrección de cualquiera de las dos.
+
+Y una advertencia que imprimen las dos partes, en el apartado 5: los modelos
+predicen el comportamiento *medido* de los edificios **suponiendo una buena
+ejecución y una exactitud de medición alta**. Una predicción es, por tanto, una
+afirmación sobre una construcción bien ejecutada, no sobre la que se va a
+construir; el consejo de la propia norma es variar los datos de entrada inciertos
+y leer la dispersión de la respuesta, que el anexo K de ISO 12354-1:2017
+sistematiza en una incertidumbre sobre el resultado.
 
 Toda predicción de aquí parte de datos medidos que vinieron de otro sitio, y el
 informe de diseño tiene que decir de dónde. El $R$ y el $L_n$ de elemento salen
@@ -114,9 +131,12 @@ construido se contrasta al final con la medición en campo de ISO 16283 en
   los datos de elemento y de unión, los índices por flancos banda a banda y las
   contribuciones por trayectoria que hay detrás de la valoración.
 - [Predicción del aislamiento de paneles](/phonometry/es/buildings/design/panel-sound-insulation/):
-  la ley de masas y la coincidencia (Sharp), las dobles hojas (Bies), las
-  rendijas y aberturas (Gomperts, Wilson-Soroka), la eficiencia de radiación
-  (Leppington/Maidanik) y las movilidades puntuales (Cremer).
+  la ley de masas, el atajo de la meseta y el valle de coincidencia de un panel
+  simple (Sharp, Norton), el rango de coincidencia de una chapa grecada o
+  nervada (Vigran/Heckl), las dobles hojas y el puente de las llaves de un muro
+  de fábrica con cámara (Bies, Hopkins), las rendijas y aberturas (Gomperts,
+  Wilson-Soroka), la eficiencia de radiación (Leppington/Maidanik) y las
+  movilidades puntuales (Cremer).
 - [Mejora del aislamiento a impacto de suelos (ISO 16251-1)](/phonometry/es/buildings/design/impact-improvement/):
   la mejora ponderada de un revestimiento de suelo blando medida sobre una
   maqueta pesada pequeña.

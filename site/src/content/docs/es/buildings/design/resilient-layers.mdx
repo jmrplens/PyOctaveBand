@@ -53,6 +53,15 @@ lado de la medida está en
 y en
 [Rigidez dinámica de materiales resilientes](/phonometry/es/materials/resilient/dynamic-stiffness/).
 
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_resilient_buildups_es.svg" alt="Tres construcciones elásticas en sección con sus análogos masa-resorte: una solera flotante sobre una capa continua remontada contra la pared, una superficie de paso sobre apoyos discretos, y un trasdosado adherido con pelladas junto al mismo trasdosado sobre montantes con la cámara rellena" width="92%" />
+
+Cada fórmula de más abajo la elige un detalle constructivo, así que conviene
+tener a la vista los tres montajes: una capa elástica continua bajo una solera,
+apoyos discretos bajo una superficie de paso, y un trasdosado fijado a una pared
+por adherencia o sobre montantes con cámara. Cuál de ellos hayas construido
+decide qué ley se aplica — y, como muestra la última sección de esta página, si
+la predicción significa algo siquiera.
+
 ## La excitación: la máquina de impactos como masa-resorte-amortiguador
 
 Todo lo que sigue depende de la fuerza que la máquina de impactos normalizada
@@ -116,6 +125,49 @@ res.power_input_level         # 10 lg(Win/1 pW), sube 3 dB por duplicación
 res.plot()                    # el espectro de fuerza con ambas asíntotas
 ```
 
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/tapping_force_spectrum_es.svg" alt="Espectro de fuerza de la máquina de impactos sobre una losa de hormigón de 140 mm y sobre una superficie de paso de tablero de partículas de 22 mm, cada uno con sus asíntotas superior e inferior de cantidad de movimiento, su frecuencia de corte y la frecuencia límite del martillo marcadas, y el salto de 6 dB entre las dos asíntotas anotado" width="88%" />
+
+*La misma máquina, dos suelos. Sobre el hormigón el martillo rebota
+(**subcrítico**) y el espectro se pega a la asíntota superior
+$|F_n|_\text{upper} = 2mv_\text{h}/T_i$ con menos de 1 dB de diferencia en todo
+el rango de la acústica de la edificación, con su corte en 6948 Hz y su
+frecuencia límite del martillo en 120 kHz — las dos muy fuera de lo que se
+valora. Sobre el tablero de partículas de 22 mm la superficie cede, el martillo
+no rebota (**sobrecrítico**) y las dos frecuencias se desploman hasta la mitad
+del rango: $f_\text{co}$ = 589 Hz y $f_\text{limit}$ = 555 Hz, así que el
+espectro se dobla hacia la asíntota inferior $mv_\text{h}/T_i$ justo donde cae
+una banda valorada. Las dos asíntotas están separadas 6,0 dB en valor cuadrático
+medio, y ese salto es toda la razón por la que un nivel de máquina de impactos
+medido sobre un forjado de madera no se puede comparar con uno medido sobre
+hormigón: la máquina está inyectando una fuerza distinta.*
+
+<details>
+<summary>Mostrar el código de esta figura</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+# Los nombres vienen del bloque de importación de más arriba.
+
+freqs = np.logspace(np.log10(50.0), np.log10(20000.0), 400)
+fig, ax = plt.subplots()
+for label, rho_s, c_s, nu_s, h_s in (("hormigón de 140 mm", 2200.0, 3800.0, 0.2, 0.14),
+                                     ("tablero de 22 mm", 650.0, 2400.0, 0.3, 0.022)):
+    e_s = rho_s * c_s**2 * (1 - nu_s**2)
+    z_s = infinite_plate_impedance(plate_bending_stiffness(e_s, h_s, nu_s),
+                                   rho_s * h_s)
+    k_s = plate_contact_stiffness(e_s, poisson_ratio=nu_s)
+    r = tapping_force_spectrum(freqs, k_s, z_s)
+    ax.loglog(freqs, r.peak_force, label=f"{label} (fco = {r.cut_off_frequency:.0f} Hz)")
+    ax.axhline(r.upper_limit, ls="--", lw=0.8)
+    ax.axhline(r.lower_limit, ls=":", lw=0.8)
+ax.set(xlabel="Frecuencia [Hz]", ylabel="Fuerza de línea $|F_n|$ [N]")
+ax.legend()
+plt.show()
+```
+
+</details>
+
 ## Revestimientos de suelo blandos: la frecuencia de corte es el diseño
 
 Un revestimiento blando sobre un suelo pesado no cambia nada salvo la fuerza
@@ -150,7 +202,7 @@ ceros donde les corresponde.
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/soft_covering_prediction_es.svg" alt="Mejora prevista del aislamiento a ruido de impactos de dos revestimientos de suelo blandos sobre una losa de hormigón de 140 mm: un revestimiento rígido de PVC cuya frecuencia de corte de 2318 Hz lo deja inútil en todo el rango de edificación, y un revestimiento con soporte elástico cuya frecuencia de corte de 100 Hz da 70 dB a 5 kHz, cada uno frente a su estimación de dos rectas de 12 dB por octava" width="80%" />
 
 <details>
-<summary>Ver el código de esta figura</summary>
+<summary>Mostrar el código de esta figura</summary>
 
 ```python
 import matplotlib.pyplot as plt
@@ -191,7 +243,7 @@ d = 0.005
 covering = covering_contact_stiffness(2.8e8 * d, d)
 res = covering_improvement([125.0, 250.0, 500.0, 1000.0], covering, plate, z)
 round(res.cut_off_frequency)        # 100 Hz
-round(res.bare_cut_off_frequency)   # 6948 Hz, la corte de la losa desnuda
+round(res.bare_cut_off_frequency)   # 6948 Hz, el corte de la losa desnuda
 res.improvement                     # 3,2 / 17,0 / 33,3 / 43,0 dB, por banda
 res.two_line                        # 3,9 / 15,9 / 27,9 / 40,0 dB, la estimación
 res.line_improvement                # por línea de Fourier, ceros en 3, 5, 7 fco
@@ -238,7 +290,7 @@ la valoración. Comprueba dónde cae $f_0$ antes de fiarte del número.
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/floating_floor_prediction_es.svg" alt="Mejora del aislamiento a ruido de impactos de una solera flotante de 35 mm y 73,5 kg por metro cuadrado sobre una capa elástica de 8 meganewton por metro cúbico: nada por debajo de la resonancia masa-resorte de 52,8 Hz y después la ley 30 lg de EN 12354-2 alcanzando 59 dB a 5 kHz, frente a la ley 40 lg de Cremer, más pronunciada, y a la rama de 18 dB por octava que incluye la impedancia del martillo de la máquina de impactos" width="80%" />
 
 <details>
-<summary>Ver el código de esta figura</summary>
+<summary>Mostrar el código de esta figura</summary>
 
 ```python
 import matplotlib.pyplot as plt
@@ -372,6 +424,63 @@ res.plot()   # las magnitudes del anexo D frente a fo, con este sistema marcado
 # Una magnitud de laboratorio se traslada a obra con la fórmula (D.8).
 round(lining_improvement_in_situ(10.0, 100.0, 60.0), 1)  # 4,4 dB con Rw 60
 ```
+
+## Qué suponen las fórmulas sobre la ejecución
+
+Todos los modelos de esta página suponen que la capa elástica es la *única*
+conexión mecánica entre las dos masas. Ninguno de ellos ve un puente rígido, así
+que todos son cotas superiores de una construcción bien ejecutada — y en obra la
+distancia entre una predicción y una medición es mucho más a menudo un puente
+que una $s'$ equivocada.
+
+**Empieza por la $s'$ correcta.** El anexo C de ISO 12354-2 la matiza tres
+veces, en las Fórmulas (C.2), (C.4)/(C.5) y (C.6), con la misma frase: la
+rigidez dinámica por unidad de superficie conforme a EN 29052-1 **medida sin
+ninguna precarga**. Una rigidez declarada bajo carga de servicio es otro número,
+y como $f_0 \propto \sqrt{s'}$, un factor de dos en la rigidez declarada mueve la
+resonancia en $\sqrt{2}$ y desplaza todo el espectro de mejora en
+$30\lg\sqrt{2} = 4{,}5$ dB con la ley de 30 lg y 6,0 dB con la de 40 lg. La
+[guía de rigidez dinámica](/phonometry/es/materials/resilient/dynamic-stiffness/)
+enseña qué hace la placa de carga y por qué es como es.
+
+**La ley en serie lleva una condición impresa debajo.** A la Fórmula (C.6),
+$s'_\text{tot} = (\sum 1/s'_i)^{-1}$, le sigue literalmente esto: solo se
+sostiene si cada capa elástica cubre toda la superficie del suelo sin
+separaciones ni cortes, por ejemplo por tuberías de calefacción o de
+abastecimiento de agua o por dispositivos eléctricos. Las instalaciones que
+atraviesan una capa la invalidan, por tanto; la capa se tiende *por encima* de
+ellas, no rodeándolas.
+
+**Y luego los puentes.** Son las maneras en que la hipótesis falla en obra, más
+o menos por orden de frecuencia:
+
+- la solera en contacto con la pared, porque la banda perimetral se cortó corta,
+  se dobló hacia dentro antes del vertido, o se recortó a ras y luego el rodapié
+  la rejuntó por encima;
+- la solera tocando una penetración de instalaciones — una tubería, un tubo
+  corrugado, una caja de suelo — que no se enfundó en un manguito;
+- restos y goterones de mortero dejados sobre la capa elástica antes del
+  vertido, cada uno un puente puntual;
+- rodapiés, umbrales de puerta o acabados de suelo fijados *a través* de la losa
+  flotante hasta la estructura de debajo;
+- un trasdosado adherido con pelladas demasiado numerosas o demasiado grandes,
+  que lleva la construcción del caso blando previsto al caso adherido de D.1;
+- con apoyos discretos, cualquier contacto que no sean los propios apoyos.
+
+La escala es brutal y la firma es reconocible. Un puñado de puentes puntuales
+puede costar 10 dB o más; un contacto perimetral continuo puede eliminar la
+mejora casi por completo. Y como un puente cortocircuita el resorte en lugar de
+desafinarlo, un suelo flotante puenteado pierde en *todo* el rango por encima de
+$f_0$ y no en una banda — que es como se distingue de una $s'$ equivocada o de
+una resonancia mal colocada en una
+[medición en campo](/phonometry/es/buildings/insulation/insulation-field/).
+
+Para los trasdosados el mismo punto tiene un número, y ya está en esta página:
+la fórmula del anexo D la elige la fijación, así que una placa prevista sobre
+montantes con la cámara rellena pero ejecutada con pelladas mueve $f_0$ de
+70,8 Hz a 542 Hz y convierte una ganancia de +13,8 dB en una pérdida de
+$-9{,}0$ dB. Casi veintitrés decibelios, por una decisión de obra que nunca llegó
+a un plano.
 
 ## Qué está anclado en un número publicado y qué no
 

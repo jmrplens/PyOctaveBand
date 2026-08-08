@@ -82,8 +82,12 @@ amplitud formada por la divergencia esférica $1/(4\pi r_n)$, el producto de los
 **factores de reflexión de presión** de pared $R_w = \sqrt{1 - \alpha_w}$ cada
 uno elevado al número de reflexiones $k_{w,n}$ que esa imagen hizo en la pared
 $w$, y la pérdida de presión del aire $e^{-m r_n/2}$ a lo largo del camino ($m$
-el coeficiente de atenuación de intensidad, de modo que la intensidad cae como
-$e^{-m r}$). Una caja de zapatos tiene exactamente
+el coeficiente de atenuación de potencia (intensidad) en neper por metro, de modo
+que la intensidad cae como $e^{-m r}$ y la presión como $e^{-m r/2}$: el mismo $m$
+que las guías de
+[tiempo de reverberación](/phonometry/es/buildings/rooms/reverberation-prediction/)
+y de [EN 12354-6](/phonometry/es/buildings/rooms/enclosed-space-absorption/)
+entregan a sus términos $4mV$). Una caja de zapatos tiene exactamente
 $\tfrac{2}{3}(2 i_0^3 + 3 i_0^2 + 4 i_0)$ imágenes audibles hasta el orden de
 reflexión $i_0$ (1560 en el orden 10), y la densidad de reflexiones crece como
 $\mathrm{d}N/\mathrm{d}t = 4\pi c^3 t^2 / V$.
@@ -183,10 +187,11 @@ retícula de salas espejo, coloreadas por orden de reflexión.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/image_source_plan_es.svg" alt="Vista en planta de la retícula de fuentes imagen de una sala de 7 por 5 metros perfilada en el centro, con la fuente como estrella roja en (2, 1.6), el receptor como triángulo azul en (5.2, 3.4), y las fuentes imagen en el plano de la fuente coloreadas por orden de reflexión, primer orden naranja, segundo orden verde y tercer orden morado, extendiéndose en una retícula regular de salas espejo hasta unos 26 metros" width="88%" />
 
-*La retícula de la que sale el reflectograma, a escala: cada imagen vive en
-una sala espejo en el plano de altura de la fuente, y solo su distancia al
-receptor fija el tiempo de llegada y la divergencia $1/(4\pi r)$ de esa
-reflexión.*
+*La misma sala, fuente y receptor que el reflectograma de arriba, dibujados hasta
+tercer orden para que la retícula siga siendo legible: el reflectograma llega al
+orden 10 y esta planta es sus tres primeras capas. Cada imagen vive en una sala
+espejo en el plano de altura de la fuente, y solo su distancia al receptor fija el
+tiempo de llegada y la divergencia $1/(4\pi r)$ de esa reflexión.*
 
 <details>
 <summary>Mostrar el código de esta figura</summary>
@@ -196,7 +201,7 @@ import matplotlib.pyplot as plt
 from phonometry import room
 
 res = room.image_source_rir((7.0, 5.0, 3.0), (2.0, 1.6, 1.5),
-                            (5.2, 3.4, 1.7), 0.3, fs=16000, max_order=3)
+                            (5.2, 3.4, 1.7), 0.12, fs=48000, max_order=3)
 
 # Una línea: la retícula de imágenes en planta, coloreada por orden.
 res.plot_geometry(language="es")
@@ -216,13 +221,54 @@ coeficiente de intensidad `m` de `air_attenuation_m`) añade la pérdida de aire
 import numpy as np
 from phonometry import room
 
-freqs = [250.0, 500.0, 1000.0, 2000.0]
-alpha = np.array([[0.10, 0.15, 0.25, 0.40]] * 6)     # (6 paredes, 4 bandas)
+freqs = [250.0, 500.0, 1000.0, 2000.0, 4000.0]
+alpha = np.array([[0.10, 0.15, 0.25, 0.40, 0.50]] * 6)   # (6 paredes, 5 bandas)
 res = room.image_source_rir((7.0, 5.0, 3.0), (2.0, 1.6, 1.5), (5.2, 3.4, 1.7),
-                            alpha, fs=48000, max_order=12, frequencies=freqs)
-print(res.ir.shape)                                  # (4 bandas, n_muestras)
-print(np.round(np.sum(res.ir ** 2, axis=1), 4))      # más absorción -> menos energía
+                            alpha, fs=48000, max_order=60, frequencies=freqs)
+print(res.ir.shape)                                  # (5 bandas, n_muestras)
+res.plot()   # un decaimiento por banda; la figura de abajo añade el término de aire
 ```
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/image_source_bands_es.svg" alt="Curvas de decaimiento de Schroeder de las cinco bandas de octava de una sala de 7 por 5 por 3 metros, cada banda dibujada dos veces: continua sin atenuación del aire y a trazos con el coeficiente m a 20 grados Celsius y 50 por ciento de humedad relativa. Las bandas se abren en abanico desde un decaimiento de 1,06 segundos a 250 hercios hasta 0,25 segundos a 4 kilohercios, y cada curva a trazos queda solo ligeramente por debajo de su pareja continua, con una diferencia que se ensancha al subir la frecuencia" width="88%" />
+
+*La rama por bandas de `image_source_rir` para la sala propia de esta página,
+cada banda dibujada sin aire (continua) y con $m$ a 20 °C y 50 % de HR (a trazos).
+Las bandas se abren en abanico porque la absorción de las paredes sube con la
+frecuencia, de T30 = 1,06 s a 250 Hz a 0,25 s a 4 kHz. El término de aire es aquí
+el segundo mecanismo, mucho menor: quita un 0,4 % al decaimiento de 250 Hz y un
+4,4 % al de 4 kHz. Ese es el tamaño honesto del efecto en una sala de 105 m³ — las
+reflexiones sencillamente no recorren distancia suficiente — y es la razón de que
+la absorción del aire sea un
+[efecto de volumen](/phonometry/es/buildings/rooms/reverberation-prediction/#1-sabine-eyring-y-millington-sette)
+más que un efecto de frecuencia: pon esas mismas paredes alrededor de 2 000 m³ y
+el mismo argumento le quita decenas de por ciento a la banda más alta.*
+
+<details>
+<summary>Mostrar el código de esta figura</summary>
+
+```python
+import matplotlib.pyplot as plt
+# `np`, `room`, `freqs` y `alpha` vienen del bloque por bandas de arriba.
+
+# environment.air_attenuation_m(freqs, 20.0, 50.0), Np/m a 20 C y 50 % de HR
+m = [3.02e-4, 6.28e-4, 1.074e-3, 2.277e-3, 6.831e-3]
+
+fig, ax = plt.subplots()
+for attenuation, style in ((0.0, "-"), (m, "--")):
+    banded = room.image_source_rir(
+        (7.0, 5.0, 3.0), (2.0, 1.6, 1.5), (5.2, 3.4, 1.7), alpha,
+        fs=48000, max_order=60, frequencies=freqs,
+        air_attenuation=attenuation,
+    )
+    for row, f in zip(banded.ir, freqs):
+        time, level = room.decay_curve(row, banded.fs)
+        ax.plot(time, level, style, label=f"{f:g} Hz")
+ax.set_xlabel("Tiempo [s]")
+ax.set_ylabel("Nivel re régimen permanente [dB]")
+plt.show()
+```
+
+</details>
 
 **Reproducir el decaimiento estadístico.** La tasa de decaimiento inicial de la
 RIR sintética reproduce el tiempo de reverberación de **Eyring**
@@ -235,6 +281,57 @@ que la estimación difusa de Eyring — exactamente la anisotropía que los
 se construyeron para corregir. El modelo capta solo reflexiones especulares (sin
 difracción ni difusión) y es exacto para factores de reflexión de pared reales e
 independientes del ángulo.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/image_source_anisotropy_es.svg" alt="Tiempo de decaimiento inicial especular frente al alargamiento de la sala a volumen constante y absorción media constante: la predicción de Eyring baja despacio a medida que se estira la sala mientras el decaimiento especular sube, de modo que la razón entre ambos crece de 1,05 en un cubo a unos 2,5 en un pasillo de seis a uno, y deja la banda sombreada de más menos 10 por ciento alrededor de Eyring con un alargamiento de aproximadamente 1,5 a 1" width="88%" />
+
+*Los mismos 105 m³ y la misma $\bar\alpha$ = 0,12 uniforme, estirados de un cubo a
+un pasillo 6:1. Eyring *baja* al estirar la sala, porque estirar a volumen
+constante añade área de contorno; el decaimiento especular *sube*, porque el eje
+largo sigue devolviendo energía que el recorrido libre medio ya había dado por
+perdida. Los dos coinciden dentro de un 5 % para el cubo — la tolerancia
+documentada del apartado de validación de más abajo — y se separan de inmediato:
+pasado aproximadamente 1,5:1 el decaimiento especular queda fuera de la banda de
+±10 %, y en 6:1 es 2,5 veces la estimación de Eyring. Esta es la anisotropía que
+motiva los modelos de Fitzroy y Arau-Puchades, y la razón de que la guía de
+predicción del tiempo de reverberación liste las salas desproporcionadas entre los
+casos en que fallan todas las fórmulas estadísticas.*
+
+<details>
+<summary>Mostrar el código de esta figura</summary>
+
+```python
+import matplotlib.pyplot as plt
+# `np` y `room` son las importaciones del bloque por bandas de arriba.
+
+volume, alpha = 105.0, 0.12
+side = volume ** (1.0 / 3.0)
+ratios, specular, eyring = [1.0, 1.5, 2.0, 3.0, 4.0, 5.0, 6.0], [], []
+for r in ratios:
+    lx, ly = side * r ** (2.0 / 3.0), side * r ** (-1.0 / 3.0)
+    area = 2.0 * (2.0 * lx * ly + ly * ly)      # una caja lx x ly x ly
+    eyring.append(room.eyring_reverberation_time(volume, [(area, alpha)]))
+    res = room.image_source_rir((lx, ly, ly), (lx * 0.28, ly * 0.32, ly * 0.5),
+                                (lx * 0.74, ly * 0.68, ly * 0.57), alpha,
+                                fs=48000, max_order=60)
+    # La pendiente inicial de la densidad de energía reverberante, desde la
+    # tabla exacta de reflexiones y no desde la RI muestreada.
+    edges = np.arange(0.0, float(np.max(res.times)), 0.004)
+    energy, _ = np.histogram(res.times, bins=edges, weights=np.asarray(res.amplitudes) ** 2)
+    centres, good = 0.5 * (edges[:-1] + edges[1:]), energy > 0.0
+    level = 10.0 * np.log10(np.where(good, energy, 1.0) / energy[good][0])
+    band = good & (level <= -1.0) & (level >= -20.0)
+    specular.append(-60.0 / np.polyfit(centres[band], level[band], 1)[0])
+
+fig, ax = plt.subplots()
+ax.plot(ratios, eyring, "--", label="Eyring")
+ax.plot(ratios, specular, "-o", label="especular (fuentes imagen)")
+ax.set_xlabel("Alargamiento de la sala $L_x : L_y = L_z$")
+ax.set_ylabel("Tiempo de reverberación [s]")
+ax.legend()
+plt.show()
+```
+
+</details>
 
 ### Parámetros de `image_source_rir()`
 
@@ -252,7 +349,8 @@ independientes del ángulo.
 
 Devuelve un `ImageSourceResult` (`ir`, `fs`, `frequencies` y la tabla exacta de
 reflexiones `times`/`distances`/`orders`/`amplitudes`/`image_positions`) con
-`.plot()` y una propiedad `direct_time`. `audible_image_count(order)` da el
+`.plot()`, `.plot_geometry()` (la planta de salas espejo de arriba) y una
+propiedad `direct_time`. `audible_image_count(order)` da el
 recuento de imágenes de la caja de zapatos y `reflection_density(t, volume)` la
 densidad $4\pi c^3 t^2 / V$.
 
@@ -284,6 +382,49 @@ La estimación de Eyring para esta sala es de 0,93 s, así que el orden 12 se
 queda corto por un factor de 3,3 y el 20 por defecto, por un factor de 2,1. La
 objeción del coste no vale: el orden 60 son 295 360 imágenes y se resuelve en
 dos décimas de segundo.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/image_source_order_convergence_es.svg" alt="T30 y EDT ajustados de la sala de 7 por 5 por 3 metros frente al corte de orden de reflexión, de 8 a 60: ambos suben de forma pronunciada y casi lineal con el orden, y la T30 cruza la línea de Eyring de 0,93 segundos y su banda sombreada de más menos 10 por ciento hacia el orden 51 y sigue subiendo, mientras un segundo eje muestra el recuento de imágenes audibles creciendo de unas 800 a 295 mil" width="88%" />
+
+*T30 leída por `room_parameters` sobre la RIR sintética, frente al orden con el que
+se construyó la retícula. La subida es el truncamiento: cada orden extra añade una
+capa de llegadas más tardías, así que la ventana de ajuste sigue encontrando más
+decaimiento que ajustar. La regla de completitud fija el **suelo** — por debajo del
+orden que cubre la ventana de ajuste el número está sencillamente mal, que es lo
+que cuantifica la tabla de arriba —, pero no es un criterio de convergencia. Pasado
+el cruce, la T30 especular sigue derivando por encima de Eyring, porque una sala de
+7 × 5 × 3 no es casi cúbica y su eje largo sostiene energía que la estimación de
+campo difuso ya ha gastado; la figura siguiente barre exactamente eso. Lee la T30
+de este modelo como una magnitud especular dependiente del orden, no como una
+predicción de un tiempo de reverberación medido.*
+
+<details>
+<summary>Mostrar el código de esta figura</summary>
+
+```python
+import matplotlib.pyplot as plt
+# `room` es la importación del bloque del apartado 1 de arriba.
+
+orders = list(range(8, 62, 2))
+t30 = []
+for order in orders:
+    res = room.image_source_rir((7.0, 5.0, 3.0), (2.0, 1.6, 1.5),
+                                (5.2, 3.4, 1.7), 0.12, fs=48000,
+                                max_order=order)
+    params = room.room_parameters(res.ir, res.fs, limits=None)
+    t30.append(float(params.t30[0]))
+
+eyring = float(room.eyring_reverberation_time(105.0, [(142.0, 0.12)]))
+fig, ax = plt.subplots()
+ax.plot(orders, t30, "-o", label="T30 de la RIR sintética")
+ax.axhline(eyring, ls="--", label=f"Eyring, {eyring:.2f} s")
+ax.fill_between(orders, 0.9 * eyring, 1.1 * eyring, alpha=0.15)
+ax.set_xlabel("max_order")
+ax.set_ylabel("Tiempo de reverberación [s]")
+ax.legend()
+plt.show()
+```
+
+</details>
 
 **`t30_valid` no ve una retícula truncada.** Lee el rango de decaimiento del
 array que le entreguen, así que devuelve `True` en todos los órdenes de la tabla
@@ -324,6 +465,32 @@ suelo duro, 4 en una arista, 8 en una esquina). Los dos términos se cruzan en l
 campo directo y duplicar la distancia baja el nivel 6 dB; más lejos manda el
 campo reverberante y alejarse apenas ayuda.
 
+El $(1-\bar\alpha)$ del denominador de $R$ y el 4 de la ecuación del nivel salen
+de la misma contabilidad. Solo la potencia que *no* se absorbe en el primer
+encuentro pasa a construir el campo reverberante, que es lo que divide $A$ entre
+$(1-\bar\alpha)$; y el 4 es el factor de campo difuso entre densidad de energía e
+intensidad incidente sobre una superficie, el mismo 4 que aparece en el término de
+aire $4mV$ de las fórmulas de reverberación. Eso le da a $R$ su lectura: es el
+área de ventana abierta que retiraría potencia al mismo ritmo, así que una sala con
+$R$ = 25 m² se comporta, en lo que respecta a un oyente lejano, como una sala con
+25 m² de ventana abierta. Por tanto $R$ siempre supera al área de Sabine
+$A = S\bar\alpha$, y la diferencia se desvanece cuando $\bar\alpha \to 0$, que es
+la razón de que el módulo prefiera $R$ y de que el $A/16\pi$ de Kuttruff coincida
+con él en una sala viva.
+
+Dónde se monta una fuente no es un detalle, porque $Q$ mueve $r_c$ como
+$\sqrt{Q}$: la misma máquina tiene una distancia crítica de 1,11 m sobre un
+soporte y de 3,14 m en la esquina del mismo taller. La lámina de abajo fija los
+cuatro valores a montajes reales.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_directivity_factor_es.svg" alt="Cuatro celdas isométricas en fila que muestran la misma fuente compacta radiando hacia un ángulo sólido sombreado: en campo libre sobre un soporte hacia 4 pi estereorradianes con Q igual a 1, sobre la solera hacia 2 pi con Q igual a 2, contra una pared sobre la solera hacia pi con Q igual a 4, y en una esquina triedra hacia pi entre 2 con Q igual a 8; cada celda imprime la distancia crítica que da ese montaje en un taller con una constante de sala de 62 metros cuadrados: 1,11, 1,57, 2,22 y 3,14 metros" width="92%" />
+
+*Los cuatro valores de $Q$ como cuatro montajes, con la distancia crítica que
+produce cada uno en el taller de 12 × 8 × 4 m de la figura de abajo
+($R$ = 62 m²). $Q$ multiplica solo el término directo: la meseta reverberante no
+se mueve, así que montar una máquina en la esquina sube el nivel cerca de ella sin
+cambiar el nivel en el extremo opuesto de la sala.*
+
 ```python
 from phonometry import room
 
@@ -337,10 +504,11 @@ print(round(field.critical_distance, 2))       # 0.71 m
 field.plot()                                    # directo / reverberante / total vs distancia
 ```
 
-El `SteadyFieldResult.plot()` dibuja los niveles directo, reverberante y total
-frente a la distancia con la distancia crítica marcada: la curva total sigue el
-campo directo $1/r^2$ cerca de la fuente y se aplana en la meseta reverberante
-más allá de $r_c$.
+Sobre una sala que merece dibujarse — un taller de 12 × 8 × 4 m, $S$ = 352 m²,
+$\bar\alpha$ = 0,15, así que $R$ = 62 m² —, `SteadyFieldResult.plot()` dibuja los
+niveles directo, reverberante y total frente a la distancia con la distancia
+crítica marcada: la curva total sigue el campo directo $1/r^2$ cerca de la fuente
+y se aplana en la meseta reverberante más allá de $r_c$ = 1,11 m.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/steady_state_field_es.svg" alt="Campo estacionario de sala de una fuente de 90 dB en un taller con constante de sala de 62 metros cuadrados: el nivel de presión acústica total sigue el campo directo de 6 dB por duplicación cerca de la fuente, cruza la meseta reverberante constante en la distancia crítica de 1,11 m y se aplana sobre ella más allá" width="80%" />
 
@@ -382,6 +550,49 @@ plt.show()
 
 </details>
 
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/steady_state_directivity_es.svg" alt="Panel izquierdo, el nivel estacionario total frente a la distancia en un taller de 12 por 8 por 4 metros para factores de directividad de fuente de 1, 2, 4 y 8: las cuatro curvas comparten una misma meseta reverberante lejos de la fuente y se separan cerca de ella, con la distancia crítica marcada desplazándose de 1,11 a 3,14 metros como la raíz cuadrada de Q. Panel derecho, la misma sala con Q fijo en 2 y la absorción media escalonada en 0,05, 0,15 y 0,35: la meseta baja con la absorción mientras que la asíntota de campo directo cerca de la fuente no se mueve" width="92%" />
+
+*Izquierda: $Q$ mueve el cruce, no la meseta. Duplicar $Q$ sube el campo directo
+3 dB y empuja $r_c$ hacia fuera un factor $\sqrt{2}$, pero el nivel reverberante
+lejos de la fuente es idéntico en las cuatro curvas, porque $Q$ nunca entra en el
+término $4/R$. Derecha: la absorción hace lo contrario. Escalonar $\bar\alpha$ de
+0,05 a 0,35 lleva la constante de sala de 18,5 m² a 189,5 m² y la meseta de
+83,3 dB a 73,2 dB — 10,1 dB, exactamente $10\lg(R_2/R_1)$ — mientras que la
+asíntota de campo cercano no se mueve. Ese es el contenido preciso de «más allá de
+$r_c$ solo la absorción, y no la distancia, baja el nivel», y son siete veces más
+absorción para 10 dB.*
+
+<details>
+<summary>Mostrar el código de esta figura</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+# `room` es la importación del bloque de campo estacionario de arriba.
+
+grid = np.logspace(-1, 1.3, 200)
+fig, (left, right) = plt.subplots(1, 2, figsize=(12.5, 5.0), sharey=True)
+for q in (1.0, 2.0, 4.0, 8.0):
+    field = room.steady_state_field(sound_power_level=90.0, surface_area=352.0,
+                                    mean_absorption=0.15, distances=grid,
+                                    directivity=q)
+    left.semilogx(field.distances, field.total, label=f"Q = {q:g}")
+    left.axvline(field.critical_distance, ls=":", alpha=0.5)
+for absorption in (0.05, 0.15, 0.35):
+    field = room.steady_state_field(sound_power_level=90.0, surface_area=352.0,
+                                    mean_absorption=absorption, distances=grid,
+                                    directivity=2.0)
+    right.semilogx(field.distances, field.total,
+                   label=rf"$\bar\alpha$ = {absorption:g}")
+for ax in (left, right):
+    ax.set_xlabel("Distancia a la fuente [m]")
+    ax.legend()
+left.set_ylabel("Nivel de presión acústica [dB]")
+plt.show()
+```
+
+</details>
+
 Los bloques se exponen por separado, de modo que una medición
 de emisión fluye directa a una predicción de nivel:
 
@@ -392,6 +603,43 @@ R = room.room_constant(100.0, 0.2)                     # constante de sala de Bi
 print(round(float(room.critical_distance(R)), 3))      # 0.705 m (Q = 1)
 print(round(float(room.steady_state_spl(90.0, 5.0, R)), 2))   # nivel a 5 m, dB
 ```
+
+**$Q$ entra dos veces, y la segunda es una decisión de modelado.** Siempre
+concentra el campo directo en $Q/(4\pi r^2)$. Que *además* aumente la potencia
+radiada depende del comportamiento en impedancia de la propia fuente (Norton y
+Karczub, 2.ª ed., tabla 4.5), y `steady_state_spl` lo expone como `source_model`.
+Una fuente de **potencia constante** radia $\Pi_0$ esté donde esté — el valor por
+defecto, y el modelo adecuado para una máquina cuya salida fijan sus propias
+pérdidas internas. Una fuente de **velocidad de volumen constante** queda cargada
+por los contornos reflectantes y radia $\Pi_0 Q$, de modo que una esquina añade
+$10\lg Q$ = 9 dB por encima de la concentración por directividad; esa es la cota
+superior conservadora que declarar cuando se desconoce el tipo de fuente. Una
+fuente de **presión constante** radia $\Pi_0/Q$, la cota inferior teórica.
+
+```python
+# `room` y `R` vienen del bloque de arriba.
+print([round(float(room.steady_state_spl(90.0, 5.0, R, directivity=8.0,
+                                         source_model=model)), 1)
+       for model in room.SOURCE_POWER_MODELS])
+# [82.7, 91.7, 73.7] dB para constant_power / constant_volume / constant_pressure
+```
+
+Dieciocho decibelios entre las cotas, para una sola máquina montada en esquina.
+Las normas dejan la elección al ingeniero, así que declara qué modelo supone un
+nivel previsto en cualquier informe que lo lleve.
+
+**Cuánto vale la meseta reverberante.** Como la meseta es $L_W + 10\lg(4/R)$,
+añadir absorción la cambia en $10\lg(R_2/R_1)$: duplicar la constante de sala
+compra 3 dB, y una rehabilitación realista en un taller duro compra quizá de 5 a
+8 dB antes de que el denominador $(1-\bar\alpha)$ sature el rendimiento. De ahí se
+siguen dos consecuencias. Tratar la sala solo ayuda a los receptores **más allá**
+de la distancia crítica, así que un operario de pie junto a la máquina no gana
+nada con un techo acústico y ahí la solución es la fuente, un cerramiento o una
+pantalla. Y la meseta plana es una idealización: en un espacio industrial grande o
+achatado el nivel sigue bajando con la distancia bastante más allá del cruce
+previsto, así que este modelo sobrestima el nivel lejos de la fuente, subestima el
+beneficio de la distancia, y el cruce se lee mejor como una referencia de orden de
+magnitud que como una frontera.
 
 La distancia de reverberación de Kuttruff ($r_c = \sqrt{A/16\pi}$ para $Q = 1$)
 usa el área de absorción de Sabine $A = S\bar\alpha$ en lugar de la constante de
@@ -406,6 +654,24 @@ modal-a-difuso, un cruce heurístico y no un corte abrupto: bastante por debajo
 dominan los modos discretos y los supuestos difusos de $R$ y $r_c$ pierden
 fiabilidad, bastante por encima los modos se solapan y esta imagen estadística
 se cumple. En salas límite conviene comprobar banda a banda.
+
+La constante 2000 está a un solo razonamiento del material que esta página ya
+lleva. El amortiguamiento da a cada modo una anchura de banda a media potencia de
+unos $2{,}2/T$ hercios, así que los modos de una sala que decae son resonancias
+solapadas y no rayas; el número de ellos por hercio es la **densidad modal** que
+se deriva en el §3, que crece con el cuadrado de la frecuencia, así que el
+solapamiento se vuelve inevitable por encima de cierta frecuencia. Pide
+aproximadamente tres modos dentro de una anchura de banda — impón
+$3 \approx (2,2/T)\,(4\pi V f^2/c_0^3)$ — y despejar $f$ da
+$f_s \approx 2000\sqrt{T/V}$ con $c_0 \approx 343$ m/s. De ahí salen tres cosas.
+La constante codifica una *elección* de cuánto solapamiento cuenta como difuso,
+así que los autores más estrictos citan 4000 para la misma física. Una sala grande
+alcanza la transición a una frecuencia más baja simplemente porque tiene más modos
+a cualquier frecuencia. Y la transición es suave, así que una banda que quede a
+caballo de $f_s$ debe comprobarse posición a posición en lugar de darse por buena.
+La figura de la escalera de modos del §3 muestra el cruce directamente: su
+densidad modal supera un modo por hercio justo alrededor de la frecuencia de
+Schroeder marcada.
 
 ```python
 from phonometry import room
@@ -557,6 +823,66 @@ existen las tablas de proporciones de Bolt y otros. Y los modos se apiñan al
 subir la frecuencia, hasta fundirse en el continuo que supone el modelo
 estadístico del apartado 2.
 
+La degeneración es algo que se cuenta, no una cuestión de gusto. Tres salas del
+mismo volumen de 105 m³, enumeradas hasta 200 Hz, contienen aproximadamente el
+mismo *número* de modos y un número de *frecuencias* completamente distinto.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/room_proportion_modes_es.svg" alt="Tres filas apiladas de marcas de modos hasta 200 hercios para tres salas del mismo volumen de 105 metros cúbicos, coloreadas por familia: un cubo de 4,72 metros cuyas marcas se amontonan en unas pocas frecuencias separadas por huecos vacíos amplios, una sala de 7,49 por 3,74 por 3,74 metros algo mejor, y una sala de proporciones de Bolt de 3,40 por 4,77 por 6,47 metros cuyas marcas están repartidas casi uniformemente; un cuarto panel debajo representa la separación entre frecuencias distintas consecutivas de las tres salas" width="88%" />
+
+*El mismo volumen en tres formas. El cubo de 4,72 m enumera 132 modos en solo
+**26 frecuencias distintas** — un amontonamiento de cinco a uno — con un hueco de
+15,0 Hz en la escalera; la sala 2:1:1 logra 36 frecuencias distintas de 129 y un
+hueco aún mayor, de 22,9 Hz; la sala de proporciones de Bolt 1 : 1,4 : 1,9 da
+**121 frecuencias distintas de 126** y su mayor hueco es de 9,5 Hz. Las
+frecuencias amontonadas se oyen como coloración en esas notas, y los huecos entre
+ellas como notas que la sala se traga. Esto es lo que compra la proporción, y en
+fase de proyecto no cuesta nada.*
+
+<details>
+<summary>Mostrar el código de esta figura</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+# `room` es el import del bloque de room_modes de arriba.
+
+volume = 105.0
+half = (volume / 2.0) ** (1 / 3)
+bolt = (volume / (1.0 * 1.4 * 1.9)) ** (1 / 3)
+shapes = {
+    "cubo": (volume ** (1 / 3),) * 3,
+    "2 : 1 : 1": (2 * half, half, half),
+    "Bolt 1 : 1,4 : 1,9": (bolt, 1.4 * bolt, 1.9 * bolt),
+}
+fig, axes = plt.subplots(len(shapes), 1, sharex=True)
+for ax, (name, dims) in zip(axes, shapes.items()):
+    modes = room.room_modes(dims, max_frequency=200.0)
+    freqs = np.asarray(modes.frequencies)
+    ax.vlines(freqs, 0, 1)
+    ax.set_ylabel(f"{name}\n{np.unique(np.round(freqs, 1)).size} distintas")
+axes[-1].set_xlabel("Frecuencia [Hz]")
+plt.show()
+```
+
+</details>
+
+**Dónde está la presión.** La forma modal de $(n_x, n_y, n_z)$ en una caja rígida
+es el producto de cosenos
+$\cos(n_x\pi x/l_x)\cos(n_y\pi y/l_y)\cos(n_z\pi z/l_z)$, y dos consecuencias de
+esa única fórmula valen más que toda la lista de frecuencias. Todos los modos
+tienen un **antinodo de presión en cada esquina**, porque ahí todos los cosenos
+valen $\pm 1$, que es la razón de que un subwoofer y una trampa de graves vayan
+los dos en una esquina, y de que un micrófono situado en una lea de más en las
+bandas bajas. Y un eje cuyo orden sea impar tiene un **nodo en su punto medio**,
+así que una posición de escucha situada exactamente a la mitad de una dimensión de
+la sala queda en un nulo de todos los modos axiales impares de ese eje; las
+posiciones de medición en baja frecuencia se apartan de los planos medios por la
+misma razón. La fuente importa tanto como el receptor: una fuente situada en el
+plano nodal de un modo no puede excitarlo en absoluto. Lo que el modelo de paredes
+rígidas no puede decirte es con cuánta fuerza resuena cada resonancia, porque eso
+lo fija el amortiguamiento que omite: para eso, malla la sala y ejecuta el
+[simulación FDTD 2D](/phonometry/es/simulation/fdtd-simulation/).
+
 ## Validación
 
 Las implementaciones se comprueban contra las formas cerradas y los anclajes
@@ -598,7 +924,7 @@ $Q$, distancia crítica) implementado por `room.steady_state_field`,
 de Long (las frecuencias propias de la sala rectangular de la ec. (8.43)
 con su clasificación axial/tangencial/oblicua, y el recuento de modos y la
 densidad modal de Morse y Pierce de las ecs. (8.45) y (8.46))
-implementado por `room.modes`, `room.room_mode_frequency`,
+implementado por `room.room_modes`, `room.room_mode_frequency`,
 `room.room_mode_count` y `room.room_modal_density`.
 
 **No cubierto.** El modelo de fuentes imagen solo capta reflexiones

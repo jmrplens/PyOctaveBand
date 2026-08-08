@@ -1,6 +1,6 @@
 ---
 title: "Predicción del aislamiento de paneles"
-description: "Aislamiento acústico aéreo teórico de paneles a partir de sus propiedades físicas: ley de masas y valle de coincidencia (Sharp), pared doble masa-muelle-masa, transmisión por rendijas y orificios (Gomperts), eficiencia de radiación de placa (Leppington/Maidanik) y movilidades puntuales de placas y vigas infinitas (Cremer)."
+description: "Aislamiento acústico aéreo teórico de paneles a partir de sus propiedades físicas: la ley de masas, el atajo de la meseta y el valle de coincidencia de un panel simple (Sharp, Norton), el rango de coincidencia de una chapa ortótropa o grecada (Vigran/Heckl), el comportamiento masa-muelle-masa de la pared doble y el puente de las llaves de un muro de fábrica con cámara (Hopkins), transmisión por rendijas y orificios (Gomperts), eficiencia de radiación de placa (Leppington/Maidanik) y movilidades puntuales de placas y vigas infinitas (Cremer)."
 references:
   - type: book
     authors: ["Bies, D. A.", "Hansen, C. H.", "Howard, C. Q."]
@@ -32,6 +32,14 @@ references:
     publisher: "Taylor & Francis"
     doi: "10.1201/9781482266016"
     note: "Sections 3.7.3.3 (orthotropic plate eigenfrequencies, Eqs 3.113-3.115 after Timoshenko & Woinowsky-Krieger) and 6.5.3 (orthotropic panel transmission, Eqs 6.107-6.113 after Heckl 1960 and Hansen 1993). ISBN 978-0-415-42853-8."
+  - type: book
+    authors: ["Norton, M. P.", "Karczub, D. G."]
+    year: 2003
+    title: "Fundamentals of noise and vibration analysis for engineers"
+    edition: "2.ª ed."
+    publisher: "Cambridge University Press"
+    doi: "10.1017/CBO9781139163927"
+    note: "Apartado 3.9.1: el método de la meseta según Watters, con la Tabla 3.1 (densidad superficial por milímetro, altura de la meseta y relación de frecuencias B/A) detrás de PLATEAU_MATERIALS; Ecs. 3.104/3.106 (ley de masas a incidencia de campo), Ec. 3.110 (la rama por encima de la coincidencia de la variante coincidence_model='cremer') y el problema 3.11, el muro de ladrillo resuelto que se reproduce aquí. ISBN 978-0-521-49913-2."
   - type: article
     authors: ["Hopkins, C.", "Wilson, R.", "Craik, R. J. M."]
     year: 1999
@@ -39,6 +47,19 @@ references:
     journal: "Applied Acoustics 58, 51-68"
     doi: "10.1016/S0003-682X(98)00068-1"
     note: "La medición que hay detrás de las filas de 50 mm de la Tabla A4 de Hopkins: mariposa 1,7 MN/m, doble triángulo 16,1 MN/m y torsión vertical 94,0 MN/m."
+  - type: article
+    authors: ["Hall, R.", "Hopkins, C."]
+    year: 2001
+    title: "The measurement of dynamic stiffness of wall ties used in masonry cavity walls"
+    journal: "Proceedings of the Institute of Acoustics 23(8), 259-266"
+    note: "La fila de cámara de 100 mm de la Tabla A4 de Hopkins: la llave de torsión vertical propietaria, con 43,4 MN/m."
+  - type: article
+    authors: ["Craik, R. J. M.", "Wilson, R."]
+    year: 1995
+    title: "Sound transmission through masonry cavity walls"
+    journal: "Journal of Sound and Vibration 179(1), 79-96"
+    doi: "10.1006/jsvi.1995.0006"
+    note: "Tabla 1: los mismos tipos de llave medidos con una cámara de 85 mm (mariposa 1,1 MN/m, doble triángulo 4,3 MN/m), que corroboran el orden de la Tabla A4 pero no sus valores, porque la rigidez dinámica se define para una anchura de cámara dada."
 ---
 
 import ThemeImage from '../../../../../components/ThemeImage.astro';
@@ -51,10 +72,28 @@ construirlo. Cubre el aislamiento aéreo de un panel simple (la ley de masas y e
 valle de coincidencia), la pared doble (su resonancia masa-muelle-masa), la
 transmisión por rendijas y aberturas que limita cualquier construcción real, la
 eficiencia de radiación de una placa en flexión y las movilidades puntuales que
-fijan la potencia vibratoria que una estructura absorbe. Las magnitudes medidas
+fijan la potencia vibratoria que una estructura absorbe. Junto a eso lleva tres
+atajos y casos particulares que dan esas mismas fuentes: el **método de la
+meseta**, una estimación a mano de la curva entera de un panel simple a partir
+de una tabla de materiales (Norton 3.9.1); el **panel ortótropo**, donde una
+chapa grecada o nervada tiene dos frecuencias críticas y, por tanto, un *rango*
+de coincidencia en lugar de un valle (Vigran 6.5.3); y el **puente de las
+llaves**, que limita a un muro de fábrica con cámara valgan lo que valgan sus
+hojas (Hopkins 4.3.5.4). Las magnitudes medidas
 que estas predicciones alimentan están en
 [Predicción del aislamiento (EN 12354)](/phonometry/es/buildings/design/insulation-prediction/)
 y [Medición del aislamiento en campo (ISO 16283)](/phonometry/es/buildings/insulation/insulation-field/).
+
+**Una nota sobre dos símbolos antes de que empiecen las fórmulas.** El índice de
+reducción acústica $R$ de las normas europeas y la pérdida por transmisión $TL$
+de la bibliografía norteamericana que sigue esta página son la *misma magnitud*,
+$TL \equiv R = -10\lg\tau$; la página conserva el símbolo de cada fuente para que
+sus fórmulas se puedan contrastar con el texto impreso, y por eso los resultados
+exponen `transmission_loss` y lo valoran como $R_w$. Del mismo modo, aquí se
+escribe la masa por unidad de superficie $m''$, que es la notación de Bies y de
+Hopkins para el $m'$ que usan las guías de ISO 12354; $m$ a secas está reservado
+en el resto del sitio para el coeficiente de atenuación de potencia del aire de
+las fórmulas de reverberación, en 1/m.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/panel_insulation_concept_es.svg" alt="Cuatro paneles: la ley de masas de panel simple con su valle de coincidencia, la pared doble con la resonancia masa-muelle-masa y la ganancia de cámara, la eficiencia de radiación de la placa creciendo hasta la unidad por encima de la frecuencia crítica, y una pared compuesta cuya rendija abierta del 1 % limita R al límite de área abierta" width="92%" loading="eager" />
 
@@ -124,6 +163,24 @@ El espectro predicho entra directamente en el índice ISO 717-1 mediante
 `res.rating()`, y en EN 12354 como el $R$ de elemento «predicho» allí donde la
 norma exigiría una medida de laboratorio.
 
+**¿Qué factor de pérdidas es $\eta$?** El factor de pérdidas **total** del
+elemento *tal como está montado*, no el factor de pérdidas interno del material.
+En un elemento montado, el total es el interno más el de radiación más las
+pérdidas en los bordes, y para un elemento pesado en un hueco de ensayo domina
+el término de bordes: el anexo C de ISO 12354-1 da
+$\eta_\text{tot,lab} \approx \eta_\text{int} + m'/(485\sqrt{f}) \approx 0{,}01 +
+m'/(485\sqrt{f})$ para elementos por debajo de 800 kg/m², al alcance sin salir
+de la biblioteca como `laboratory_total_loss_factor`. Para este vidrio de
+15 kg/m² esa estimación vale 0,011 a 500 Hz, apenas por encima del valor
+interno; para un forjado de hormigón de 484 kg/m² vale 0,055, cinco veces la
+cifra del material. La vía medida es el tiempo de reverberación estructural y
+$\eta = 2{,}2/(fT_s)$, la misma magnitud que miden las guías de
+[ISO 10848](/phonometry/es/buildings/insulation/flanking-lab/) y de
+[EN 15657](/phonometry/es/buildings/design/structure-borne-power/).
+Conviene saber qué hay en juego: la profundidad del valle lleva $10\lg\eta$, así
+que un factor de tres en $\eta$ mueve la región de coincidencia 4,8 dB y no
+cambia nada por debajo de $f_c/2$.
+
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/single_panel_rating_es.svg" alt="Índice de reducción acústica previsto de un vidrio flotado de 6 mm por banda de tercio de octava frente a la curva de referencia ISO 717-1 desplazada, con el valle de coincidencia hacia 2100 Hz marcado, las desviaciones desfavorables sombreadas y el índice Rw anotado" width="80%" />
 
 *El espectro de Sharp previsto se evalúa exactamente como una medición: el
@@ -167,7 +224,7 @@ ax.fill_between(w.band_centers, w.measured, w.shifted_reference,
                 alpha=0.3, label="desviaciones desfavorables")
 ax.axvline(fc, ls=":", color="tab:green", label=f"fc = {fc:.0f} Hz")
 ax.set_xlabel("Frecuencia [Hz]")
-ax.set_ylabel("Índice de reducción acústica R [dB]")
+ax.set_ylabel("Índice de reducción acústica $R$ (pérdida por transmisión $TL$) [dB]")
 ax.set_title(f"Rw = {w.rating} dB  (C={w.c:+d}; Ctr={w.ctr:+d})")
 ax.legend()
 plt.show()
@@ -235,7 +292,7 @@ estimación por meseta sustituye toda la región de coincidencia por un único
 valor plano, que es exactamente lo que dice ser: una estimación, no la caída.*
 
 <details>
-<summary>Ver el código de esta figura</summary>
+<summary>Mostrar el código de esta figura</summary>
 
 ```python
 import matplotlib.pyplot as plt
@@ -305,7 +362,7 @@ abajo, a menudo hasta unos pocos cientos de hercios, mientras $f_{c2}$ se sube
 a 15 kHz o 30 kHz. En todo ese tramo domina la transmisión resonante y $R$ se
 aplana muy por debajo de la ley de masas de una placa plana de la misma masa.
 
-La impedancia de onda flexional depende ahora del azimut $\vartheta$ además del
+La impedancia de onda de flexión depende ahora del azimut $\vartheta$ además del
 ángulo de incidencia $\varphi$ (Heckl 1960; Hansen 1993; Vigran ec. 6.108, que
 es la ec. 7.30 de Bies):
 
@@ -404,7 +461,7 @@ Sharp). A lo largo del rango de coincidencia la chapa grecada cede hasta 13 dB,
 y $R_w$ baja de 28 dB a 25 dB, con un panel más rígido y apenas más pesado.*
 
 <details>
-<summary>Ver el código de esta figura</summary>
+<summary>Mostrar el código de esta figura</summary>
 
 ```python
 import matplotlib.pyplot as plt
@@ -451,7 +508,8 @@ ax.semilogx(bands, flat.transmission_loss, "-o", ms=4, label="chapa plana")
 ax.semilogx(bands, corrugated.transmission_loss, "-s", ms=4,
             label="grecada, integral")
 ax.semilogx(bands, heckl.transmission_loss, "--", label="aproximación de Heckl")
-ax.set(xlabel="Frecuencia [Hz]", ylabel="Pérdida por transmisión TL [dB]")
+ax.set(xlabel="Frecuencia [Hz]",
+       ylabel="Índice de reducción acústica $R$ (pérdida por transmisión $TL$) [dB]")
 ax.legend()
 plt.show()
 ```
@@ -670,7 +728,7 @@ from phonometry import (
 
 # Una rendija de 2 mm x 100 mm de fondo: su transmisión tiene máximos en las
 # resonancias de media longitud de onda del fondo de la rendija.
-print(slit_resonance_frequencies(0.1, 0.002, orders=2).round().tolist())   # [~1500, ~3100]
+print(slit_resonance_frequencies(depth=0.1, width=0.002, orders=2).round().tolist())  # [~1500, ~3100]
 
 # Una pared de Rw = 50 dB con el 1 % de su área abierta como rendija queda limitada:
 print(round(float(composite_transmission_loss([0.99, 0.01], [50.0, 0.0])), 1))   # 20.0
@@ -696,7 +754,7 @@ import numpy as np
 from phonometry import slit_transmission_coefficient
 
 f = np.geomspace(100.0, 5000.0, 200)
-result = slit_transmission_coefficient(f, 0.002, 0.1)
+result = slit_transmission_coefficient(f, width=0.002, depth=0.1)
 
 # Una línea: la sección de la pared con la rendija a escala.
 result.plot_geometry(language="es")
@@ -766,6 +824,42 @@ del mismo vidrio, 0,034. Y el valle de coincidencia de $R$ y el pico de
 coincidencia de $\sigma$ son el mismo suceso visto por los dos lados — la misma
 $\sigma$ reaparece en el factor de transmisión del modelo detallado de
 EN 12354 y como el factor de radiación que mide ISO 7849.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/radiation_efficiency_panels_es.svg" alt="Izquierda: eficiencia de radiación frente a la frecuencia para un vidrio de 1,5 por 1,25 metros y otro de 0,5 por 0,4 metros del mismo vidrio, los dos con la frecuencia crítica y la línea de la unidad marcadas, que muestra que el vidrio pequeño radia tres veces mejor por debajo de la coincidencia. Derecha: la placa simplemente apoyada y con bafle que supone el modelo, dibujada a escala" width="92%" />
+
+*Tres regímenes en un mismo eje. Por debajo de $f_c$ los dos vidrios se
+diferencian en un factor de tres en $\sigma$ aunque son el mismo vidrio — el más
+pequeño radia relativamente mejor, porque su franja de borde sin cancelar es una
+fracción mayor de él. En la coincidencia los dos superan la unidad: el vidrio de
+1,5 × 1,25 m llega a 2,61 en la banda de 2 kHz, que es la que contiene
+$f_c$ = 2107 Hz. Por encima, $\sigma$ vuelve hacia 1 solo despacio: todavía 1,74
+un tercio de octava pasada la coincidencia y 1,32 a 5 kHz. El panel de la derecha
+es la geometría que supone el modelo y la razón de que necesite dos dimensiones y
+una condición de borde.*
+
+<details>
+<summary>Mostrar el código de esta figura</summary>
+
+```python
+import matplotlib.pyplot as plt
+
+sig_big = radiation_efficiency(bands, 1.5, 1.25, fc)
+sig_small = radiation_efficiency(bands, 0.5, 0.4, fc)
+
+fig, (ax_l, ax_r) = plt.subplots(1, 2, figsize=(11, 4.5))
+ax_l.loglog(bands, sig_big.radiation_efficiency, "-o", ms=3, label="1,5 x 1,25 m")
+ax_l.loglog(bands, sig_small.radiation_efficiency, "-s", ms=3, label="0,5 x 0,4 m")
+ax_l.axhline(1.0, ls=":")
+ax_l.axvline(fc, ls=":", color="r")
+ax_l.set(xlabel="Frecuencia [Hz]", ylabel=r"Eficiencia de radiación $\sigma$")
+ax_l.legend()
+
+# Una línea — la placa con bafle que supone el modelo:
+sig_big.plot_geometry(ax=ax_r)
+plt.show()
+```
+
+</details>
 
 ```python
 from phonometry import radiation_efficiency, sound_power_from_vibration
@@ -865,7 +959,8 @@ fig.tight_layout(); plt.show()
 | `mass1` / `mass2` | float | kg/m² | > 0 | Densidades superficiales de las hojas |
 | `gap` | float | m | > 0 | Profundidad de cámara $d$ |
 | `cavity_medium` | `PorousMediumResult` | — | defecto `None` | Relleno poroso; baja $f_0$ |
-| `width` / `depth` (rendija) | float | m | > 0 | Anchura $w$ / fondo $d$ de la rendija |
+| `width` (rendija) | float | m | > 0 | Anchura $w$ de la rendija. Tercer argumento posicional de `slit_transmission_coefficient`, **segundo** de `slit_resonance_frequencies` |
+| `depth` (rendija) | float | m | > 0 | Fondo $d$ de la rendija (el espesor de la pared). Cuarto argumento posicional de `slit_transmission_coefficient`, **primero** de `slit_resonance_frequencies` |
 | `field` / `position` (rendija) | str | — | `'diffuse'`/`'normal'`, `'mid'`/`'edge'` | Campo incidente y posición |
 | `radius` / `depth` (orificio) | float | m | > 0 | Radio $a$ / fondo $d$ del orificio |
 | `areas` / `reduction_indices` | seq | m² / dB | longitud $N$ | Elementos de la composición (1-D o (N, bandas)) |

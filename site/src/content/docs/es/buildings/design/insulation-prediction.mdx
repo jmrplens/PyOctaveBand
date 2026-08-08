@@ -97,10 +97,62 @@ $$
 
 donde $l_0 = 1$ m es la longitud de acoplamiento de referencia, $l_f$ la longitud
 de acoplamiento de la unión y $K_{ij}$ el **índice de reducción vibratoria** de
-la unión (Anexo E, empírico en la relación de masas
-$M = \log_{10}(m'_{\perp,i}/m'_i)$).
+la unión.
+
+### Cómo leer $K_{ij}$
+
+$K_{ij}$ es una propiedad de la unión sola, y ese es todo su sentido. Es el
+promedio de las dos diferencias de nivel de velocidad medidas a través de la
+unión, corregido por la longitud de acoplamiento y por las longitudes de
+absorción equivalentes de los dos elementos, así que la misma unión lleva el
+mismo $K_{ij}$ se construya en el edificio que se construya — que es lo que
+permite que exista un catálogo de tipos de unión. Cuanto mayor, mejor: $K_{ij}$
+entra en la Fórmula (28a) con signo más, así que un valor alto es una unión que
+no deja pasar la vibración. Los órdenes de magnitud conviene llevarlos en la
+cabeza. Una unión rígida en cruz de masas parecidas anda por 8–13 dB y una unión
+rígida en T unos 3 dB por debajo (el Anexo E.3.2/E.3.3 da
+$K_{13} = 8{,}7 + 17{,}1M + 5{,}7M^2$ y $5{,}7 + 14{,}1M + 5{,}7M^2$); las
+uniones en esquina y de cambio de espesor del Anexo E.3.6 bajan a $15M - 3$ dB
+(con suelo en $-2$ dB) y $5M^2 - 5$ dB, así que con la relación de masas del
+ejemplo resuelto devuelven 0,1 dB y $-4{,}8$ dB — una unión que no esconde nada;
+y una unión con capa elástica intermedia o de doble hoja ligera puede pasar de
+20 dB (la misma relación de masas por un `flexible_t` da 20,9 dB). Ese extremo
+superior es lo que hace casi invisible a la pared interior del ejemplo resuelto
+de más abajo: es el elemento más débil de la lista, con $R_w$ = 33 dB, y sin
+embargo los 33,5 dB tabulados para su $K_{Ff}$ sacan su trayectoria Ff de la suma
+por completo. En este modelo, un elemento malo detrás de una unión buena gana a
+un elemento bueno detrás de una unión mala. Para el modelo simplificado, los
+valores del Anexo E se leen una sola vez, a 500 Hz, y hacen las veces de una
+magnitud que solo es aproximadamente independiente de la frecuencia.
+
+El argumento de masas es donde encallan los lectores. Los ajustes del Anexo E son
+cuadráticos en $M = \lg(m'_{\perp,i}/m'_i)$ — el **logaritmo** decimal de la
+relación de masas, con $m'_i$ el elemento que lleva la trayectoria y
+$m'_{\perp,i}$ el elemento perpendicular de la unión (Fórmula E.3). La biblioteca
+toma la **relación de masas en sí** y forma $M$ internamente, así que
+`mass_ratio=1.61` significa que el elemento perpendicular pesa 1,61 veces más por
+unidad de superficie. Se acepta cualquier número positivo, así que pasar un valor
+ya logaritmado devuelve una respuesta verosímil pero equivocada:
+`junction_vibration_reduction("rigid_cross", "through", 0.2068)` devuelve
+$-0{,}3$ dB donde la respuesta es 12,5 dB. Y como $m'_i$ es el elemento *de la
+trayectoria de transmisión*, la misma unión tiene una relación de masas distinta
+para $K_{13}$ y para $K_{12}$ — la relación es por trayectoria, no por unión.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_junction_catalogue_es.svg" alt="El catálogo de uniones del Anexo E: cruz rígida, T rígida, T con capa elástica intermedia, esquina, cambio de espesor y una pared ligera de doble hoja encontrándose con un forjado homogéneo, cada una con sus elementos numerados, sus ramas de trayectoria coloreadas, la longitud de acoplamiento marcada y la relación de masas resuelta en uno de los paneles" width="92%" />
+
+Cada dibujo de arriba se corresponde con un par de argumentos
+`(junction_type, path)`, y la rama de trayectoria importa tanto como el tipo de
+unión: sobre la misma cruz rígida del ejemplo resuelto, `path='through'` da
+12,5 dB y `path='corner'`, 8,9 dB.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/prediction_flanking_demo_es.svg" alt="Índices de reducción acústica por trayectoria para el ejemplo del Anexo H.3 de EN 12354-1 y la fracción de energía transmitida de cada trayectoria, mostrando la trayectoria directa dominando en R'w = 52 dB" width="80%" />
+
+*Arriba, los índices por trayectoria; abajo, la fracción de energía transmitida.
+La trayectoria directa es el mayor contribuyente individual, con el 33 %, y aun
+así dos tercios de lo que llega al recinto receptor ha rodeado la pared — que son
+los 5 dB entre $R_{s,w} = 57$ dB y $R'_w = 52$ dB. La línea discontinua es el
+$R'_w$ ensamblado, que queda necesariamente por debajo de todas las trayectorias
+individuales.*
 
 ```python
 import numpy as np
@@ -135,7 +187,7 @@ res.plot()   # fracción de energía transmitida por trayectoria, de mayor a men
 ```
 
 <details>
-<summary>Ver el código de esta figura</summary>
+<summary>Mostrar el código de esta figura</summary>
 
 ```python
 import matplotlib.pyplot as plt
@@ -181,19 +233,43 @@ Cada trayectoria por flancos añadida rebaja estrictamente $R'_w$ por debajo de
 la directa
 $R_{Dd,w} = 57$; `res.paths` expone la fracción de energía transmitida de cada
 trayectoria, de modo que la trayectoria dominante queda visible.
-`flanking_element` es una
-función de conveniencia que construye de una vez las tres trayectorias de una
-unión; el constructor
-de trayectoria única que hay detrás, `flanking_path`, construye una
-trayectoria `Ff`, `Df`
-o `Fd` cada vez (Fórmula 28a). El Apartado 4.4.2 también
+
+**Lee el reparto como un presupuesto, porque ese es el rendimiento práctico de
+todo el modelo.** La trayectoria directa es aquí el mayor contribuyente
+individual y aun así solo lleva el 33 % de la energía transmitida: dos tercios de
+lo que llega ha rodeado la pared. Así que perfeccionar el elemento separador —
+hacerlo infinitamente bueno, no solo mejor — elimina como mucho un tercio del
+total, que son $-10\lg(1 - 0{,}33) = 1{,}8$ dB. Especificar una partición más
+pesada en esta construcción sería dinero tirado; el forjado, el techo y la
+fachada llevan el resto, y un detalle de unión o un trasdosado sobre *ellos* es
+lo que mueve la respuesta. La regla se generaliza: la mejor mejora alcanzable
+arreglando una trayectoria es $-10\lg(1 - \text{su fracción de energía})$ dB, así
+que una trayectoria por debajo de un 10 % del total vale como mucho 0,5 dB y no
+merece la pena tocarla, mientras que una al 50 % vale 3 dB y una al 80 %, 7 dB.
+Ordena las trayectorias, gasta en lo alto de la lista y para cuando la siguiente
+esté por debajo de un decibelio.
+
+`flanking_element` es una función de conveniencia que construye de una vez las
+tres trayectorias de una unión; el constructor de trayectoria única que hay
+detrás, `flanking_path`, construye una trayectoria `Ff`, `Df` o `Fd` cada vez
+(Fórmula 28a). El apartado 4.4.2 también
 impone un límite inferior $K_{ij} \ge K_{ij,\min}$ a partir de la geometría de
 la unión (Fórmula 29). Pasa el área del elemento de flanco a
 `flanking_element(..., flanking_area=...)` y la saturación se aplica
 automáticamente trayectoria a trayectoria; o calcula el límite con
 `junction_min_vibration_reduction` y pásalo a
 `flanking_path(..., kij_min=...)`, que eleva un $K_{ij}$ por debajo del límite
-hasta el mínimo:
+hasta el mínimo.
+
+¿Y por qué hay un límite inferior? $K_{ij}$ está definido respecto de las
+longitudes de absorción equivalentes de los dos elementos, así que en elementos
+pequeños la propia normalización limita cuánto aislamiento de unión se puede
+reclamar: la energía que llega a un elemento pequeño y poco amortiguado no tiene
+dónde disiparse salvo de vuelta por la unión por la que vino. El límite sube,
+por tanto, conforme los elementos se encogen o la longitud de acoplamiento crece.
+En elementos a escala de vivienda suele ser negativo y estar inactivo; una
+predicción en la que la saturación *sí* actúa es señal de que se está aplicando
+un valor tabulado del Anexo E fuera de la geometría sobre la que se ajustó.
 
 ```python
 from phonometry import building
@@ -204,6 +280,38 @@ from phonometry import building
 print(round(building.junction_min_vibration_reduction(coupling_length=4.5,
                                              s_i=11.5, s_j=11.5), 1))     # -1.1
 ```
+
+### Dos trasdosados sobre una misma trayectoria no se suman
+
+`delta_r_ff`, `delta_r_fd`, `delta_r_df` y el `delta_r` de `flanking_path` son
+cada uno la mejora **combinada** de una trayectoria entera, no la magnitud global
+de un trasdosado. Una trayectoria tiene normalmente dos extremos, y los dos
+pueden ir trasdosados: un trasdosado de pared en el lado emisor y un techo
+suspendido en el lado receptor están los dos sobre la misma trayectoria $Ff$. No
+se suman. La Fórmula (22) de ISO 12354-1:2017 para la trayectoria directa y la
+Fórmula (23) para cada trayectoria por flancos dan las dos
+
+$$
+\Delta R_{ij,w} = \Delta R_{i,w} + \frac{\Delta R_{j,w}}{2}
+\quad\text{o}\quad
+\Delta R_{j,w} + \frac{\Delta R_{i,w}}{2}\ \text{dB},
+$$
+
+con la regla que decide cuál de las dos: **se toma la mitad del valor del
+trasdosado de valor menor; ahora bien, si los dos trasdosados tienen valor
+negativo, se toma la mitad del valor del trasdosado de valor mayor.** Así que dos
+trasdosados de +12 dB y +6 dB dan 12 + 3 = 15 dB, no 18; y dos de $-4$ dB y
+$-9$ dB dan $-9 - 2 = -11$ dB, porque con los dos negativos el que se parte por la
+mitad es el *menos* negativo. La regla de signos invierte cuál de los dos se
+parte por la mitad, y es la parte en la que sigue equivocándose un lector atento.
+
+La física que hay detrás de esa mitad es que dos trasdosados en serie sobre la
+misma trayectoria vibratoria no son independientes: el segundo actúa sobre un
+campo que el primero ya ha reducido, así que su magnitud global completa — medida
+sobre un elemento desnudo — no está disponible por segunda vez. El apartado 4.3.3
+de ISO 12354-2 lleva la misma regla allí donde coexisten un revestimiento de
+suelo y un trasdosado del lado receptor. La trayectoria directa toma su propio
+$\Delta R_{Dd,w}$ combinado a través de `delta_r_direct`.
 
 La contrapartida a impactos (EN 12354-2, Fórmula 21) es una resta directa:
 $L'_{n,w} = L_{n,w,eq} - \Delta L_w + K$, con el nivel equivalente del suelo
@@ -229,6 +337,32 @@ medido $L_{nf,ij}$ de la Fórmula (17). La vía por bandas de frecuencia de
 [Predicción detallada por bandas](/phonometry/es/buildings/design/detailed-prediction/)
 está anclada en las ediciones de 2017 de principio a fin.
 
+**Qué son las dos masas de entrada y dónde se acaba la forma cerrada.** El
+$164 - 35\lg(m'/m'_0)$ del Anexo B no es una teoría: es una regresión ajustada a
+forjados **pesados homogéneos** medidos entre **100 y 600 kg/m²**, y
+`equivalent_impact_level` lanza un `UserWarning` cuando se le llama fuera de esa
+franja. Dentro funciona porque el nivel de impactos de una losa masiva desnuda lo
+fijan su masa y el factor de pérdidas aproximadamente constante de la
+construcción de fábrica. Fuera falla porque un forjado ligero o nervado radia a
+través de sus propias resonancias y no como una placa homogénea amortiguada — así
+que la forma cerrada no significa nada para un forjado de placa alveolar, de
+viguetas y bovedillas o de entramado de madera, tenga la masa que tenga, y es una
+extrapolación para una bóveda de 900 kg/m². La $m'$ que pide es la masa del
+**forjado estructural desnudo**, sin revestimiento y sin techo; el efecto del
+revestimiento es $\Delta L_w$ y se resta aparte.
+
+La masa de flancos es, otra vez, una magnitud distinta: la **media aritmética
+sobre los elementos de flanco homogéneos del recinto receptor que no llevan
+ninguna capa adicional**. Una pared de flanco trasdosada queda fuera de la media,
+no entra en ella con su masa desnuda. La propia Tabla 1 se aplica al caso de
+salas una sobre otra del ejemplo del Anexo E.3, y es una *búsqueda discreta del
+valor tabulado más próximo*, no una interpolación: 145 kg/m² y 150 kg/m²
+devuelven los dos $K$ = 2 dB, y las masas fuera de 100–900 kg/m² (separador) o de
+100–500 kg/m² (flancos) se saturan en el extremo más cercano en lugar de
+extrapolarse. Todo junto, un edificio ligero queda fuera de esta vía simplificada
+de impactos entera y necesita la vía del nivel de impactos normalizado por
+flancos medido que prescribe la edición de 2017.
+
 ```python
 from phonometry import building
 
@@ -238,6 +372,9 @@ ln_eq = building.equivalent_impact_level(322.0)                   # 164 - 35 lg(
 k = building.impact_flanking_correction(322.0, 145.0)             # Tabla 1 (sep 322, flk 145)
 imp = building.predicted_impact_insulation(ln_w_eq=ln_eq, delta_l_w=33.0, k_correction=k)
 print(round(ln_eq, 1), k, round(imp.l_prime_n_w, 1))     # 76.2 2 45.2  ->  L'n,w = 45 dB
+
+# La búsqueda es discreta: la siguiente masa de flancos tabulada da el mismo K.
+print(building.impact_flanking_correction(322.0, 150.0))          # 2, sin cambio
 
 # Fórmula (3) exacta: L'nT,w = L'n,w - 10 lg(0.032 V). El redondeo del propio
 # Anexo E.3 a 10 lg(V/30) queda 0.18 dB por debajo; ambos dan L'nT,w = 43 dB.
@@ -313,8 +450,8 @@ ausente, una fuga alrededor del elemento separador.
 | `k_ff` / `k_fd` / `k_df` | float | dB | — | $K_{ij}$ de la unión para las tres trayectorias |
 | `separating_area` | float | m² | > 0 | Superficie del elemento separador $S_s$ |
 | `coupling_length` | float | m | > 0 | Longitud de acoplamiento de la unión $l_f$ |
-| `delta_r_ff` / `delta_r_fd` / `delta_r_df` | float | dB | por defecto `0` | Mejoras del trasdosado por trayectoria |
-| `flanking_area` | float | m² | por defecto `None` | Área del elemento de flanco $S_F$; activa la saturación automática a $K_{ij,\min}$ (Apartado 4.4.2 / Fórmula 29) |
+| `delta_r_ff` / `delta_r_fd` / `delta_r_df` | float | dB | por defecto `0` | Mejora **combinada** del trasdosado de la trayectoria entera, los dos extremos juntos (Fórmula 23) |
+| `flanking_area` | float | m² | por defecto `None` | Área del elemento de flanco $S_F$; activa la saturación automática a $K_{ij,\min}$ (apartado 4.4.2 / Fórmula 29) |
 
 ### Parámetros de `flanking_path()`
 
@@ -326,14 +463,64 @@ ausente, una fuga alrededor del elemento separador.
 | `k_ij` | float | dB | — | Índice de reducción vibratoria de la unión para esta trayectoria |
 | `separating_area` | float | m² | > 0 | Área del elemento separador $S_s$ |
 | `coupling_length` | float | m | > 0 | Longitud de acoplamiento $l_f$ |
-| `delta_r` | float | dB | def.: `0` | Mejora por revestimiento en esta trayectoria |
+| `delta_r` | float | dB | def.: `0` | Mejora **combinada** del trasdosado de esta trayectoria, los dos extremos juntos (Fórmula 23) |
 | `kij_min` | float | dB | def.: `None` | Si se da, `k_ij` se acota inferiormente a este mínimo de la Fórmula (29) |
 
 `predicted_airborne_insulation()` devuelve un `AirbornePredictionResult`
 (`r_prime_w`, `r_direct_w`, `paths` de `PathContribution`, `dominant`);
 `predicted_impact_insulation()` un `ImpactPredictionResult` (`l_prime_n_w`,
 `ln_w_eq`, `delta_l_w`, `k_correction`). El modelo simplificado lleva una
-desviación típica declarada de unos 2 dB (Apartado 5).
+desviación típica declarada de unos 2 dB (apartado 5).
+
+### Cuándo se aplica el modelo simplificado
+
+El apartado 4.4.4 de ISO 12354-1:2017 fija tres condiciones, y ninguna es de
+aritmética.
+
+- **Dependencia parecida con la frecuencia.** El modelo supone elementos cuyo
+  índice de reducción acústica tiene una forma a grandes rasgos parecida frente a
+  la frecuencia, porque trabaja sobre números únicos y un número único no puede
+  llevar dos formas distintas. Una pared de fábrica flanqueada por fábrica es el
+  terreno propio del modelo; una partición ligera de doble hoja junto a un
+  forjado de hormigón está nombrada explícitamente como el caso en el que la
+  exactitud puede ser menor.
+- **Geometría a escala de vivienda.** Se aplica sobre todo a viviendas cuyas
+  dimensiones de elemento se parezcan a las de una instalación de ensayo.
+  Aléjate de eso — una nave, una sala de máquinas, una unión muy larga — y la
+  desviación crece.
+- **Solo recintos adyacentes.** El apartado 4.2.4 restringe toda la familia a la
+  transmisión entre recintos que comparten el elemento separador, y las
+  trayectorias secundarias que cruzan más de una unión se desprecian. Cuando la
+  fuente está a varias uniones de distancia, la
+  [vía de EN 12354-5](/phonometry/es/buildings/design/installed-structure-borne/)
+  encadena en su lugar los índices de unión.
+
+Y la desviación típica de unos 2 dB no es una tolerancia sobre tu respuesta. El
+apartado 5 la imprime *suponiendo buena ejecución y una exactitud de medición
+alta*, y añade el consejo que la hace utilizable: varía los datos de entrada,
+sobre todo en situaciones complicadas y con elementos atípicos, y lee la
+dispersión del resultado; el Anexo K lo sistematiza en una incertidumbre derivada
+de la exactitud de cada dato acústico de entrada.
+
+Los datos de unión merecen su propia advertencia, porque su dispersión es mayor
+que la del modelo. El Anexo E.3.1 dice cuatro cosas que la búsqueda de esta
+página no muestra. Solo hay datos para uniones en las que los elementos de un
+lado y de otro **en el mismo plano tienen la misma masa**. Los puntos medidos se
+dispersan típicamente **±3 dB** alrededor de las líneas impresas, y «en algunos
+casos la desviación puede ser mucho mayor debido a variaciones en los detalles de
+la unión y en la ejecución» — que es más que los ~2 dB del modelo entero, así que
+en la mayoría de las predicciones reales el dato de unión, y no la suma, domina
+el error. Los valores de $K_{ij}$ se dedujeron de modo que la diferencia de nivel
+de velocidad estimada de la unión sea correcta *en promedio*, lo que los deja en
+general **5 dB por debajo** de la diferencia de nivel de velocidad de la unión
+promediada en las dos direcciones, así que un $D_{v,ij}$ medido no se puede
+sustituir por un $K_{ij}$ sin ese paso. Y la independencia con la frecuencia vale
+«al menos en el rango de frecuencias de 125 Hz a 2000 Hz»; fuera de él el efecto
+de la frecuencia puede ser mayor. La salida son los datos medidos: ISO 10848-4
+para uniones pesadas — que el propio Anexo E.3.1 recomienda recopilar a escala
+nacional — y el
+[laboratorio de flancos](/phonometry/es/buildings/insulation/flanking-lab/)
+cuando la unión es ligera, no homogénea o simplemente no está en el catálogo.
 
 ### Informe de predicción EN 12354 (`.report()`)
 
@@ -442,8 +629,15 @@ Fórmula (21) $L'_{n,w} = L_{n,w,eq} - \Delta L_w + K$ mediante
 `building.standardized_impact_level`. Ambos resultados escriben una ficha de
 predicción con `.report()`.
 
-**No cubierto.** Los modelos *detallados* por banda de ambas partes; las
-predicciones de aquí se quedan en los índices globales ponderados. Los
+**No cubierto.** Los modelos *detallados* por banda de ambas partes son el asunto
+de
+[Predicción detallada por bandas (ISO 12354)](/phonometry/es/buildings/design/detailed-prediction/):
+la misma norma ejecutada banda a banda, con los datos de laboratorio de elemento
+y de unión convertidos a sus valores in situ antes de formar las trayectorias.
+Usa el modelo simplificado de aquí cuando solo conozcas las magnitudes globales
+ponderadas de los elementos y la pregunta sea si el recinto cumple; usa el
+detallado cuando existan los espectros de elemento y la pregunta sea qué
+trayectoria fija qué banda. Los
 propios datos de los elementos ($R_w$, $\Delta R_w$, $\Delta L_w$, masa por
 unidad de superficie) se toman como dados, de datos de laboratorio o de las
 estimaciones de ley de masas de
@@ -465,6 +659,14 @@ recintos](/phonometry/es/buildings/rooms/enclosed-space-absorption/).
 - [Aislamiento acústico de fachadas](/phonometry/es/buildings/insulation/facade-insulation/):
   las predicciones de EN 12354-3 y EN 12354-4 a través del cerramiento del
   edificio, con la medición de ISO 16283-3 con la que se contrastan.
+- [Predicción detallada por bandas (ISO 12354)](/phonometry/es/buildings/design/detailed-prediction/):
+  las mismas dos partes ejecutadas banda a banda, con la conversión in situ de
+  los datos de elemento y de unión que el modelo de número único de aquí toma
+  como dados.
+- [Transmisión de onda de flexión en uniones de placas](/phonometry/es/vibration/structural/junction-transmission/):
+  el enfoque ondulatorio que hay detrás de $K_{ij}$, con el índice representado
+  frente a la relación de espesores de placa para las uniones en X, T y L del
+  catálogo de más arriba.
 - [Medición del aislamiento en campo (ISO 16283)](/phonometry/es/buildings/insulation/insulation-field/):
   las magnitudes in situ medidas con las que se contrasta la predicción.
 - [Índices globales de aislamiento (ISO 717)](/phonometry/es/buildings/insulation/insulation-ratings/):

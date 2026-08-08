@@ -58,9 +58,32 @@ $$
 con $\Delta p$ la diferencia de presión a través de la probeta, $q_v$ el flujo
 volumétrico, $A$ la sección transversal y $d$ el espesor. Nótese que la
 resistencia específica al flujo de aire $R_s$ está en **Pa·s/m** (no Pa·s/m²); la
-resistividad al flujo de aire $\sigma$ es $R_s$ por metro de espesor.
+resistividad al flujo de aire $\sigma$ es $R_s$ por metro de espesor. Dos
+funciones auxiliares recorren esa cadena desde lo que muestra realmente un
+instrumento: `linear_airflow_velocity(q_v, area)` es la definición
+$u = q_v/A$ del apartado 3.4 (un banco lee un flujo volumétrico en un
+rotámetro, nunca una velocidad), y `specific_airflow_resistance(resistance,
+area)` es el $R_s = R\,A$ del apartado 3.2, que además admite la otra vía,
+`specific_airflow_resistance(pressure_drop=…, velocity=…)`, para un banco que
+registra $\Delta p$ y $u$ y nunca llega a formar $R$.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_airflow_resistance_es.svg" alt="Bancos de medición de la resistencia al flujo de aire: el método estático de ISO 9053-1 con una probeta en un portamuestras, un flujo laminar estacionario q_v y un manómetro diferencial que lee la caída de presión; y el método alterno de ISO 9053-2 con un pistón oscilante que acciona una cavidad terminada por la probeta o por un tapón hermético, y un micrófono que lee el nivel de la cavidad" width="92%" />
+**En qué dirección debe ir el flujo.** $A$ se define como el área
+*perpendicular a la dirección del flujo*, y esa dirección es una elección, no
+una formalidad: un panel fibroso cuyas fibras están tumbadas en el plano se
+opone al flujo a través del espesor de forma bastante distinta que al flujo en
+el plano, así que $\sigma$ es una propiedad direccional de todo material con
+microestructura orientada. El apartado 7.1 de ISO 9053-2 lo dice de forma
+explícita: una probeta no homogénea se mide en una o varias orientaciones
+elegidas, y la orientación va al informe (el apartado 9 (g) de ISO 9053-1 pide
+lo mismo). Excita la probeta en la dirección en la que el sonido la va a
+atravesar en servicio, que para una capa montada en pared significa a través
+del espesor. Una resistividad medida de canto no encajará ni con la capa ni con
+los modelos de la sección 4, y un desajuste de orientación que pasa inadvertido
+es una de las razones habituales de que un espectro medido en tubo de
+impedancia se niegue a coincidir con un modelo ajustado a partir de un valor de
+catálogo.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_airflow_resistance_es.svg" alt="Bancos de medición de la resistencia al flujo de aire. A la izquierda, el método estático de ISO 9053-1: una probeta sellada por su borde dentro de una celda de medición, apoyada sobre una rejilla de soporte perforada, con al menos un diámetro de espacio libre por encima, un comparador de espesor en contacto con la probeta ya colocada, una fuente de flujo que alimenta un caudalímetro debajo y un manómetro diferencial a través de la probeta, ambos instrumentos anotados con su tolerancia del cinco por ciento. A la derecha, el método alterno de ISO 9053-2: un pistón oscilante que acciona una cavidad terminada bien por la celda de medición que lleva la probeta, bien por un tapón hermético, cada una con su propia carrera, y un micrófono que lee el nivel de la cavidad" width="92%" />
 
 
 ## 2. Método estático (ISO 9053-1)
@@ -72,6 +95,23 @@ por el origen**, $\Delta p = a\,u + b\,u^2$, y $\Delta p$ y $R_s$ se leen a la
 velocidad de referencia $u = 0{,}5\ \text{mm/s}$ (apartado 7.5); la velocidad más
 alta no debe superar los 15 mm/s. Como $R_s = \Delta p/u = a + b\,u$, el término
 lineal $a$ es la resistencia específica al flujo de aire a velocidad nula.
+
+Ninguna de las dos velocidades es arbitraria, y el apartado 7.5 dice por qué.
+Una onda plana de velocidad de partícula 0,5 mm/s lleva una presión acústica de
+0,2 Pa, es decir, 80 dB, así que la velocidad de referencia sitúa el banco de
+flujo estacionario en la amplitud con la que el material se va a encontrar de
+verdad en uso, que es toda la razón por la que una medida aerodinámica predice
+una magnitud acústica. El techo de 15 mm/s es la misma aritmética a 110 dB, y la
+norma avisa de que algunos materiales ya son no lineales ahí. Esa no linealidad
+es además la razón de que el ajuste se fuerce a pasar por el origen y se lea por
+abajo: $\Delta p$ debe anularse con $u$, el coeficiente lineal $a$ es la
+resistencia viscosa (de Darcy) que quiere la acústica, y el coeficiente
+cuadrático $b$ es la corrección inercial que crece con la velocidad. Del mismo
+apartado se sigue una trampa: una «permeabilidad al aire» textil según ISO 9237
+se mide a velocidades de diez a cien veces mayores y por tanto da una
+resistividad *distinta*, y mayor, así que una cifra de permeabilidad de hoja de
+datos nunca puede sustituir a una $\sigma$ medida en los modelos de la
+sección 4.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/airflow_resistance_es.svg" alt="Resistencia al flujo de aire por el método estático de ISO 9053-1: la caída de presión medida frente a la velocidad lineal del flujo, ajustada con una cuadrática que pasa por el origen, con la resistencia específica al flujo de aire evaluada a la velocidad de referencia de 0,5 mm/s" width="80%" />
 
@@ -112,7 +152,13 @@ import numpy as np
 from phonometry import materials
 
 area = np.pi * 0.05**2            # celda de 100 mm de diámetro [m^2]
-u = np.array([0.5, 1, 2, 4, 8, 12]) * 1e-3      # velocidad lineal [m/s]
+
+# Lo que lee de verdad el banco: un rotámetro entre la fuente y la probeta
+# (aquí en ml/min) y un manómetro diferencial. El apartado 3.4 convierte lo
+# primero en la velocidad lineal a la que evalúa la norma.
+q_v = np.array([236.0, 471.0, 942.0, 1885.0, 3770.0, 5655.0]) * 1e-6 / 60.0
+u = np.array([materials.linear_airflow_velocity(q, area) for q in q_v])
+print(np.round(u * 1e3, 2))       # [ 0.5  1.   2.   4.   8.  12. ] mm/s
 dp = 1.6e4 * u + 4.0e5 * u**2                    # caída de presión medida [Pa]
 
 r = materials.static_airflow_resistance(u, dp, area=area, thickness=0.05)
@@ -120,8 +166,89 @@ print(round(r.specific_resistance))   # 16200   R_s [Pa*s/m]
 print(round(r.resistivity))           # 324000  sigma [Pa*s/m^2]
 print(round(r.linear_coefficient))    # 16000   a = R_s cuando u -> 0
 r.plot()   # la figura de arriba: dp(u) ajustada con el punto de evaluación
+
+# El mismo R_s directamente desde la pareja que dan el manómetro y el rotámetro,
+# sin formar antes R (apartado 3.2, segunda forma de llamada).
+print(round(materials.specific_airflow_resistance(pressure_drop=8.1, velocity=0.5e-3)))
 ```
 
+Esos seis caudales son lo que necesita una celda de 100 mm para cubrir el rango
+del apartado: la velocidad de referencia de 0,5 mm/s son 236 ml/min a través de
+esa sección, y el techo de 15 mm/s son unos 7 l/min, así que el rotámetro tiene
+que resolver un factor de treinta y acertar en el extremo bajo, que es donde
+ocurre la evaluación. `linear_airflow_velocity` es solo escalar, de ahí la
+comprensión de lista.
+
+
+### 2.1 Manejar el banco estático
+
+La aritmética de arriba es la mitad fácil. Todo lo que decide si el número está
+bien ocurre antes del primer escalón de flujo, y la ISO 9053-1 lo detalla en los
+apartados 5 a 7.
+
+**La probeta y la celda.** La probeta debe ser lo bastante ancha como para ser
+representativa: al menos 10 poros de ancho para una espuma, 10 fibras para un
+material fibroso, 10 granos para uno granular y, cuando la microestructura se
+desconoce, al menos 95 mm de diámetro o 90 mm en el lado menor
+(apartado 6.2.1). La celda de medición tiene las *mismas* dimensiones laterales
+que la probeta (con un mínimo propio de 29 mm, apartado 5.2) y necesita un espacio
+libre de al menos un diámetro por delante de la probeta para que el flujo llegue
+laminar y unidireccional, y se recomienda más de un diámetro por detrás para
+probetas delgadas y de baja porosidad. La probeta descansa sobre un soporte
+perforado o una rejilla de hilo fino con al menos un 50 % de superficie abierta
+repartida uniformemente, agujeros no menores de 3 mm y una resistencia al flujo
+de aire inferior al 1 % de la de la probeta; el apartado 5.2 llega a dar la
+forma cerrada $R_s = 8\eta h/(\phi r^2)$ de una placa perforada, de modo que el
+soporte se pueda comprobar en vez de suponer.
+
+**Las dos formas de equivocarse, y su signo.** Los dos mecanismos de error
+dominantes son unilaterales, lo que los hace diagnosticables. Una fuga alrededor
+del borde de la probeta es una resistencia *en paralelo* con la probeta, así que
+la $R$ medida sale siempre **demasiado baja**; el apartado 7.2 sella el borde
+con una capa fina de vaselina, cinta de sellado de roscas o anillos, y avisa de
+que la vaselina no debe penetrar en la probeta, porque dentro de los poros hace
+lo contrario y lee alto. La compresión es la imagen especular: $\sigma$ sube con
+fuerza con la densidad aparente, así que una probeta metida a presión en la
+celda lee **demasiado alto**, de forma repetible y convincente, y por eso el
+apartado 6.2.2 exige que el espesor no se modifique al colocar la probeta en la
+celda. Las probetas delgadas solo pueden apilarse si la microestructura lo
+soporta y, en materiales fibrosos o no tejidos, solo con orientación de fibra
+coincidente; cuando eso es imposible, el Anexo A da a cambio una vía por tubo de
+impedancia. El diagnóstico que conviene recordar: una resistencia que deriva *a
+la baja* según sube el caudal suele ser una fuga que se abre bajo presión, no
+una no linealidad del material, que empuja en sentido contrario.
+
+**Espesor en posición.** El espesor que define $d$, y con él la densidad
+aparente ensayada, se mide con la probeta dentro de la celda, llevando el
+comparador al contacto con la cara superior y comprimiéndola ligeramente
+(apartados 7.3 y 7.4), no con una regla sobre el banco de antemano.
+
+**Tolerancias de los instrumentos.** El flujo volumétrico y la presión
+diferencial deben ser buenos cada uno a ±5 % del valor indicado (apartados 5.4
+y 5.5), la toma de flujo se sitúa entre la fuente y la probeta, y el instrumento
+de presión debe resolver hasta 0,1 Pa, cosa que el ejemplo resuelto de arriba
+necesita, porque toda la lectura a la velocidad de referencia son 8,1 Pa. La
+fuente de flujo debería alcanzar 0,5 mm/s y mantenerla estable (apartado 5.3).
+
+**¿Es utilizable el propio banco?** El apartado 5.6 es la única comprobación que
+responde a eso, y nada de esta biblioteca la realiza: debe medirse al menos una
+probeta patrón *calibrada* antes de una serie de mediciones, al menos una vez al
+día, después de cualquier cambio de equipo o de software y después de cualquier
+cambio significativo de condiciones: 0,5 kPa de presión, 5 °C de temperatura o
+5 % de humedad. El patrón se fabrica normalmente con poros cilíndricos rectos
+precisamente porque su resistencia sale en forma cerrada del mismo
+$8\eta h/(\phi r^2)$, así que la comprobación es contra la teoría y no contra
+otro laboratorio, y el valor medido debe caer dentro de un ±10 % de ella.
+Registra la comprobación junto a la medición (el campo `notes` de la ficha es el
+sitio), porque el objeto de resultado solo lleva el ajuste.
+
+**Cuánto acuerdo esperar.** Normalmente se miden tres probetas (apartado 6.3), y
+el apartado 8 sitúa la reproducibilidad interlaboratorio en torno al 15 % para
+espumas de celda abierta, y «notablemente» peor para materiales granulares o con
+poros semicerrados, dominada exactamente por la fuga y la compresión anteriores.
+Un desacuerdo del 20 % con un valor de catálogo no es, por tanto, prueba de un
+instrumento defectuoso; un desacuerdo del 20 % entre tus propias tres probetas
+sí lo es.
 
 ### Informe de ISO 9053-1 (`.report()`)
 
@@ -186,7 +313,35 @@ R = \frac{\kappa'\,P_S}{2\pi f\,V}\cdot\frac{h_t}{h_s}\cdot
     10^{(L_{p,s} - L_{p,t})/20},
 $$
 
-donde $\kappa'$ es la relación **efectiva** de calores específicos. La conducción de
+con $P_S$ la presión estática (atmosférica), $f$ la frecuencia del pistón, $V$
+el volumen de la cavidad de aire (incluida toda tubería de conexión, con el
+pistón a media carrera), $L_{p,s}$ y $L_{p,t}$ los niveles de presión acústica
+de la cavidad medidos con la celda de medición que lleva la probeta y con la
+terminación hermética, $h_s$ y $h_t$ las amplitudes de carrera del pistón
+correspondientes, y $\kappa'$ la relación **efectiva** de calores específicos.
+
+**Qué está diciendo la fórmula.** La terminación hermética es la referencia: con
+ella la cavidad es una compliancia sellada, todo el volumen que barre el pistón
+se emplea en comprimir el aire y el nivel es alto. Pon la probeta en su lugar y
+la mayor parte de ese flujo se escapa en cambio por los poros, de modo que el
+nivel de la cavidad cae, y esa caída $L_{p,t} - L_{p,s}$ *es* la medida. La
+relación de carreras $h_t/h_s$ solo normaliza las dos tandas a la misma
+velocidad de volumen, que es la razón de que las dos carreras sean
+deliberadamente desiguales: la NOTA 1 del apartado 6.2 de ISO 9053-2 da 1,4 mm
+con la terminación hermética frente a 14 mm con la probeta para un pistón de
+10 mm, una celda de 100 mm y una cavidad cercana a $10^{-3}$ m³, exactamente el
+ejemplo de abajo, para que los dos niveles caigan dentro del rango útil del
+analizador. Merece la pena quedarse con dos consecuencias. Solo entra una
+*diferencia* de nivel a una frecuencia, así que el dispositivo de medida
+acústica no necesita calibración absoluta y su respuesta en frecuencia no es
+crítica; lo que importa es la linealidad de nivel (apartado 8.7). Y el orden de
+las tandas lo fija el apartado 8.5/8.6: medir $P_S$, fijar la carrera a $h_s$,
+leer la frecuencia del pistón, el nivel de fondo $L_{p,b}$ (con la fuente en
+marcha y sin celda ni terminación montadas) y después $L_{p,s}$; solo entonces
+cambiar a la terminación hermética, fijar $h_t$, confirmar que la frecuencia no
+se ha movido y leer $L_{p,t}$.
+
+La conducción de
 calor entre el aire oscilante y las paredes de la cavidad hace que la compresión
 no sea plenamente adiabática; el Anexo A normativo corrige $\kappa$ a la baja
 hasta
@@ -198,9 +353,13 @@ $$
 l_h = \frac{k_a}{\rho_0 c_0 C_P},
 $$
 
-con $S$ y $V$ la superficie y el volumen de la cavidad y $b$ el espesor de la
-capa límite térmica. Para la cavidad de ejemplo del Anexo A.3 esto da
-$\kappa' = 1{,}370$, cerca de un 2 % por debajo del adiabático 1,4008.
+con $S$ y $V$ la superficie y el volumen de la cavidad, $b$ el espesor de la
+capa límite térmica (`thermal_boundary_layer_thickness`), $l_h$ la longitud
+característica de difusión térmica construida a partir de la conductividad
+térmica $k_a$, la densidad $\rho_0$, la velocidad del sonido $c_0$ y el calor
+específico a presión constante $C_P$, y $\omega = 2\pi f$. Para la cavidad de
+ejemplo del Anexo A.3 esto da $\kappa' = 1{,}370$, cerca de un 2 % por debajo
+del adiabático 1,4008.
 
 ```python
 from phonometry import materials
@@ -208,6 +367,7 @@ from phonometry import materials
 # Cavidad del Anexo A.3: cilindro cerrado de 100 mm x 100 mm, pistón a 2 Hz
 kp = materials.effective_kappa(cavity_surface=0.0471, cavity_volume=7.854e-4, frequency=2.0)
 print(round(kp, 3))               # 1.37   relación efectiva de calores específicos
+print(round(materials.thermal_boundary_layer_thickness(2.0) * 1e3, 2))   # 1.83 mm
 
 R = materials.alternating_airflow_resistance(
     level_specimen=74.0, level_termination=90.0,
@@ -217,11 +377,111 @@ R = materials.alternating_airflow_resistance(
 print(round(R))                   # 222956  resistencia al flujo de aire R [Pa*s/m^3]
 ```
 
+$b$ es 1,83 mm a 2 Hz, escala milimétrica frente a una cavidad de 100 mm de
+lado. Esa es la razón de que $\kappa'$ entre por la *relación
+superficie-volumen* $S/V$ y no por el tamaño absoluto de la cavidad: solo el
+aire que queda dentro de una capa límite junto a la pared intercambia calor con
+ella, así que un banco reducido a escala manteniendo la forma conserva el mismo
+$b$ mientras $S/V$ crece, y la corrección crece con él.
+
 Pasa el resultado de `effective_kappa` a `alternating_airflow_resistance` para
 una cifra conforme al Anexo A; en caso contrario, su argumento `kappa_prime`
-adopta por defecto el adiabático sin corregir 1,4. La llamada avisa (mediante
-`AirflowResistanceWarning`) cuando la frecuencia del pistón sale de 1–4 Hz o
-fallan los criterios de validez de las Fórmulas (3)/(4).
+adopta por defecto el adiabático sin corregir 1,4.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/effective_kappa_es.svg" alt="Relación efectiva de calores específicos frente a la frecuencia del pistón en la banda normativa de 1 a 4 Hz para tres cavidades de relación superficie-volumen 30, 60 y 120 por metro, todas por debajo del valor adiabático discontinuo 1,4008, con el punto del Anexo A.3 de ISO 9053-2 marcado a 2 hercios y un eje a la derecha que lee el error porcentual en R que causaría usar el valor adiabático" width="80%" />
+
+*La corrección del Anexo A en toda la banda de pistón de 1 a 4 Hz. Cae al caer
+la frecuencia (una capa límite más gruesa alcanza a más aire) y sube con la
+relación superficie-volumen de la cavidad, que es la única magnitud geométrica
+de la que depende. Para la cavidad del Anexo A.3, con $S/V = 60$ 1/m, la
+corrección es de alrededor del 2 % y, como $R$ es proporcional a $\kappa'$,
+saltársela sesga en esa misma cantidad toda resistencia declarada. Una cavidad
+el doble de compacta duplica la penalización, así que un banco reducido a escala
+no puede tratar la corrección como opcional.*
+
+<details>
+<summary>Mostrar el código de esta figura</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+
+f = np.linspace(1.0, 4.0, 120)
+for s_over_v in (30.0, 60.0, 120.0):
+    volume = 7.854e-4                      # el volumen de cavidad del Anexo A.3
+    kappa = [materials.effective_kappa(cavity_surface=s_over_v * volume,
+                                       cavity_volume=volume, frequency=fi)
+             for fi in f]
+    plt.plot(f, kappa, label=f"S/V = {s_over_v:g} 1/m")
+plt.axhline(1.4008, ls="--", label="adiabático 1.4008")
+plt.plot([2.0], [materials.effective_kappa(cavity_surface=0.0471,
+                                           cavity_volume=7.854e-4,
+                                           frequency=2.0)], "D")
+plt.xlabel("Frecuencia del pistón f [Hz]")
+plt.ylabel("Relación efectiva de calores específicos")
+plt.legend()
+plt.show()
+```
+
+</details>
+
+**Criterios de aceptación (apartado 8.7).** La Fórmula (2) solo es válida cuando
+se cumplen dos condiciones. La Fórmula (3),
+$(h_t/h_s)\,10^{(L_{p,s}-L_{p,t})/20} < 0{,}3$, mantiene la Fórmula (2)
+linealizada lo bastante cerca de la relación exacta del Anexo B; la Fórmula (4),
+$L_{p,s} - L_{p,b} > 10$ dB, mantiene la influencia del fondo sobre $L_{p,s}$
+por debajo de 0,4 dB para ruido no correlacionado (un fondo correlacionado
+necesita más). `alternating_airflow_resistance` admite `background_level`
+precisamente para poder comprobar la segunda, y avisa mediante
+`AirflowResistanceWarning` cuando falla cualquiera de las dos o cuando la
+frecuencia del pistón sale de 1–4 Hz. Cuando una falla, la norma ofrece cuatro
+mandos: cambiar la longitud de la probeta, el diámetro de la probeta, el volumen
+de la cavidad, la frecuencia del pistón o la carrera del pistón. También
+conviene comprobar que el flujo que el pistón impulsa a través de la probeta cae
+en la ventana recomendada: el apartado 6.2 da $q_v = 2\pi f h A_P$ y la
+Fórmula (1) $v_s = q_v/A$, y recomienda velocidades eficaces entre 0,5 mm/s y
+4 mm/s, el mismo régimen físico que la velocidad de referencia del método
+estático.
+
+```python
+# La misma tanda, con el nivel de fondo para que la comprobación de la
+# Fórmula (4) esté activa, y el flujo que el pistón impulsa realmente a través
+# de una celda de 100 mm.
+R = materials.alternating_airflow_resistance(
+    level_specimen=74.0, level_termination=90.0,
+    piston_stroke_specimen=14e-3, piston_stroke_termination=1.4e-3,
+    frequency=2.0, cavity_volume=7.854e-4, kappa_prime=kp,
+    background_level=52.0,          # Fórmula (4): 74.0 - 52.0 = 22 dB > 10 dB
+)
+piston_area = np.pi * 0.005**2                          # pistón de 10 mm
+q_s = materials.piston_volume_flow_rate(2.0, 14e-3, piston_area)
+print(round(q_s / area * 1e3, 2))   # 1.76 mm/s, dentro de la ventana 0.5-4 mm/s
+
+# Fórmula (3): la relación que la norma limita a 0.3.
+print(round((1.4e-3 / 14e-3) * 10 ** ((74.0 - 90.0) / 20), 3))   # 0.016
+
+# Completa la cadena que el método estático da gratis: R -> R_s -> sigma.
+r_s = materials.specific_airflow_resistance(R, area)
+print(round(r_s, 1), round(r_s / 0.05))    # 1751.1 Pa*s/m, 35022 Pa*s/m^2
+```
+
+**Qué devuelve la parte 2, y qué no.** A diferencia del método estático,
+`alternating_airflow_resistance` devuelve una resistencia a secas en Pa·s/m³, no
+un objeto de resultado: no hay equivalente de `StaticAirflowResult`, así que no
+hay `.plot()` ni ficha de ISO 9053-2, y los dos pasos hasta $R_s$ y $\sigma$ son
+cosa de quien llama, que es lo que hacen las dos últimas líneas de arriba. Lo
+que compra la parte 2 a cambio son las probetas que la parte 1 no puede
+sostener: materiales muy abiertos o muy delgados cuya caída de presión estática
+es demasiado pequeña para leerla frente a la fuga del propio banco, y muestras
+delicadas o granulares que un flujo estacionario deformaría o desplazaría. Los
+dos métodos deberían coincidir dentro de la reproducibilidad citada arriba
+cuando la probeta está bien sellada, con una excepción documentada: la NOTA del
+apartado 5 de ISO 9053-2 avisa de que, para materiales cuya frecuencia de
+transición visco-inercial queda por debajo de 100 Hz (fibras metálicas o
+vegetales gruesas, espumas de baja porosidad con poros grandes, pavimentos de
+carretera gruesos), el método estático puede dar legítimamente una respuesta
+distinta. La parte 1 sigue siendo el método de referencia siempre que sea
+posible una lectura estática estable.
 
 
 ## 4. Qué alimenta la resistividad
@@ -258,6 +518,47 @@ manta de 50 mm quiere por tanto una resistividad de entre unos 8 kPa·s/m² y
 33 kPa·s/m², que es exactamente donde se agrupan los productos absorbentes
 comerciales.
 
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/flow_resistivity_window_es.svg" alt="Panel izquierdo: absorción a incidencia normal frente a la frecuencia para una capa porosa de 50 mm con respaldo rígido, con resistividades al flujo de 2, 8, 20, 33 y 100 kPa s por metro cuadrado, que muestra una capa transparente en el valor más bajo y una reflectante en el más alto. Panel derecho: la absorción a 500 Hz y a 1 kHz y el valor en campo difuso frente al cociente adimensional sigma d entre rho0 c0 en eje logarítmico, con la región entre 1 y 4 sombreada" width="88%" />
+
+*La ventana, dibujada. Izquierda: la misma capa de 50 mm con respaldo rígido a
+cinco resistividades. La capa de 2 kPa·s/m² es demasiado transparente en todas
+partes: la onda la atraviesa, se refleja en la pared y vuelve a salir. La de
+100 kPa·s/m² va por delante por debajo de unos 400 Hz, donde más resistencia
+todavía ayuda, y después se satura cerca de 0,89 mientras las tres curvas de la
+ventana llegan a 1: por encima de 1 kHz la onda se está reflejando en la cara
+antes de que los poros puedan actuar. Derecha: la misma familia leída frente al
+adimensional $\sigma d/(\rho_0 c_0)$, con la ventana de $1$ a $4$ sombreada. El
+óptimo es plano por arriba, que es el punto práctico: una dispersión de catálogo
+de decenas de por ciento dentro de la ventana no cuesta casi nada, y la misma
+dispersión justo fuera cuesta muchísimo. Fíjate además en que la curva de campo
+difuso alcanza su máximo más abajo en el eje que la de incidencia normal, así
+que una capa optimizada en el tubo es ligeramente demasiado resistiva para una
+sala. La ventana es guía de ingeniería y no forma parte de ninguna de las dos
+partes de ISO 9053.*
+
+<details>
+<summary>Mostrar el código de esta figura</summary>
+
+```python
+f_win = np.geomspace(100.0, 5000.0, 200)
+for sigma in (2e3, 8e3, 20e3, 33e3, 100e3):
+    layer = materials.layered_absorber(
+        f_win, [materials.PorousLayer(0.05, materials.miki(f_win, sigma))]
+    )
+    plt.semilogx(f_win, layer.absorption, label=f"{sigma/1e3:g} kPa s/m^2")
+plt.xlabel("Frecuencia [Hz]")
+plt.ylabel("Absorción a incidencia normal")
+plt.legend()
+plt.show()
+```
+
+</details>
+
+La probeta resuelta de la sección 2 es un contraejemplo útil: sus
+324 kPa·s/m² están un orden de magnitud por encima del techo de la ventana, así
+que a 50 mm no es en absoluto un absorbente de volumen, sino un velo resistivo,
+del tipo que va delante de una cámara y no solo contra una pared.
+
 Órdenes de magnitud típicos, como orientación más que como diseño: las lanas
 de vidrio van desde unos pocos kPa·s/m² en calidades térmicas ligeras hasta
 algunas decenas de kPa·s/m² en paneles acústicos densos; las lanas de roca
@@ -288,9 +589,13 @@ de tocar el modelo, es $\sigma$.
 apartado 7.5 (`static_airflow_resistance`, la regresión por el origen y la
 velocidad de evaluación de 0,5 mm/s) y el método alterno de la Fórmula (2) de
 ISO 9053-2 con la relación efectiva de calores específicos del Anexo A
-(`effective_kappa`, `alternating_airflow_resistance`), incluidos los avisos
-de validez de 1-4 Hz y de las Fórmulas (3)/(4), y la ficha de estilo
-acreditado de ISO 9053-1.
+(`effective_kappa`, `thermal_boundary_layer_thickness`,
+`alternating_airflow_resistance`), incluidos los avisos de validez de 1-4 Hz y
+de las Fórmulas (3)/(4), y la ficha de estilo acreditado de ISO 9053-1. Las
+conversiones de definición que los conectan con lo que lee un banco son
+`linear_airflow_velocity` (apartado 3.4), `specific_airflow_resistance`
+(apartado 3.2, en sus dos formas de llamada) y `piston_volume_flow_rate`
+(apartado 6.2 de ISO 9053-2).
 
 **No cubierto.** Los modelos de fluido equivalente que consumen la
 resistividad (Delany-Bazley, Miki, Johnson-Champoux-Allard) viven en

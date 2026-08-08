@@ -96,6 +96,13 @@ index.reported     # 51 dBA, el entero que define la exigencia
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/dbhr_global_index_es.svg" alt="Índice global R'A del CTE DB-HR: índice de reducción acústica aparente por banda en barras con el nivel transmitido ponderado por el espectro de ruido rosa en cada banda, cuya suma energética fija el índice de 51,4 dBA" width="80%" />
 
+*`DbHrGlobalIndexResult.plot()` dibuja el aislamiento por bandas junto con el
+nivel transmitido ponderado por el espectro normalizado. Lo interesante es la
+segunda curva: enseña de un vistazo qué bandas cargan con la suma energética y,
+por tanto, dónde hay que mejorar el elemento. Aquí el nivel transmitido
+ponderado tiene su máximo en las bandas graves, donde `R'` es más flojo, así
+que el índice de 51,4 dBA se decide bastante por debajo de 500 Hz.*
+
 <details>
 <summary>Mostrar el código de esta figura</summary>
 
@@ -191,10 +198,17 @@ franjas del índice de ruido día $L_d$ del emplazamiento
 ($L_d \le 60$, $60 < L_d \le 65$, $65 < L_d \le 70$, $70 < L_d \le 75$ y
 $L_d > 75$ dBA):
 
-| Uso y recinto | $\le 60$ | 60-65 | 65-70 | 70-75 | $> 75$ |
-| :--- | ---: | ---: | ---: | ---: | ---: |
-| Residencial y hospitalario, dormitorios; cultural, sanitario, docente y administrativo, estancias | 30 | 32 | 37 | 42 | 47 |
-| Residencial y hospitalario, estancias; cultural, sanitario, docente y administrativo, aulas | 30 | 30 | 32 | 37 | 42 |
+| Uso | Recinto | `db_hr_facade_requirement(ld, use, room)` | $\le 60$ | 60-65 | 65-70 | 70-75 | $> 75$ |
+| :--- | :--- | :--- | ---: | ---: | ---: | ---: | ---: |
+| Residencial, hospitalario | Dormitorios | `"residential"`, `"bedrooms"` | 30 | 32 | 37 | 42 | 47 |
+| Residencial, hospitalario | Estancias | `"residential"`, `"living"` | 30 | 30 | 32 | 37 | 42 |
+| Cultural, sanitario, docente, administrativo | Estancias | `"cultural"`, `"living"` | 30 | 32 | 37 | 42 | 47 |
+| Cultural, sanitario, docente, administrativo | Aulas | `"educational"`, `"classrooms"` | 30 | 30 | 32 | 37 | 42 |
+
+La misma palabra significa cosas distintas en los dos grupos de uso, y por eso
+la columna única de «uso y recinto» de la tabla impresa se malinterpreta con
+facilidad: las *estancias* llevan la fila más estricta bajo un uso cultural o
+docente y la más benévola bajo un uso residencial.
 
 Tres reglas modifican la lectura: una fachada que no esté directamente
 expuesta al ruido dominante (un patio cerrado, un entorno tranquilo) se evalúa
@@ -311,13 +325,40 @@ prácticamente nada, mientras que mejorar la ventana en 5 dBA lo sube 4,1 dBA,
 casi el incremento completo. Sobre el elemento más débil es donde compensa
 actuar.
 
-## Gráficos
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/composite_facade_weak_element_es.svg" alt="RA global de la fachada frente al RA de la ventana de 20 a 55 dBA para tres valores de la parte ciega de 40, 50 y 60 dBA, sobre la geometría del Ejemplo 7.5 de 6 metros cuadrados de parte ciega y 2 metros cuadrados de ventana, con los tres casos impresos marcados y cada curva saturando en la asíntota de su propia parte ciega" width="88%" />
 
-`DbHrGlobalIndexResult.plot()` dibuja el aislamiento por bandas con el nivel
-transmitido ponderado por el espectro normalizado, como en la figura de arriba:
-enseña de un vistazo qué bandas dominan la suma energética y, por tanto, dónde
-hay que mejorar el elemento. `DbHrAssessment.plot()` dibuja los valores
-alcanzados contra sus límites, uno por exigencia comprobada.
+*La regla práctica, generalizada. Mientras la ventana es el elemento débil las
+tres curvas se superponen (la parte ciega es irrelevante, que es la razón por
+la que sumarle 10 dBA compró 0,4 dBA) y cada curva solo despega cuando la
+ventana se acerca a unos pocos decibelios de ella, para aplanarse después sobre
+el valor de la parte ciega como asíntota. El diseño se lee en el eje x:
+trabaja sobre el elemento que la curva todavía sigue.*
+
+<details>
+<summary>Mostrar el código de esta figura</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+# `composite_transmission_loss` es el import del bloque de arriba.
+
+window = np.linspace(20.0, 55.0, 351)
+fig, ax = plt.subplots()
+for blind in (40.0, 50.0, 60.0):
+    overall = [composite_transmission_loss([6.0, 2.0], [blind, float(w)])
+               for w in window]
+    ax.plot(window, overall, label=f"parte ciega RA = {blind:g} dBA")
+    ax.axhline(blind, linestyle=":", alpha=0.6)
+for w_val, blind in ((26.0, 40.0), (26.0, 50.0), (31.0, 40.0)):
+    ax.plot([w_val], [composite_transmission_loss([6.0, 2.0], [blind, w_val])],
+            "o", color="black")
+ax.set(xlabel="RA de la ventana [dBA]  (2 m2 de una fachada de 8 m2)",
+       ylabel="RA global de la fachada [dBA]")
+ax.legend()
+plt.show()
+```
+
+</details>
 
 ## Qué cubre esta guía
 

@@ -64,20 +64,62 @@ de referencia** de ISO 717-1: una curva de referencia fija se desplaza en
 pasos de 1 dB hacia la curva medida hasta que la suma de desviaciones
 *desfavorables* (donde la medición cae por debajo de la referencia) es lo más
 grande posible pero no mayor que 32,0 dB (16 bandas de tercio de octava) o
-10,0 dB (5 bandas de octava). El índice ($R_w$, $R'_w$, $D_{nT,w}$ …) es la
-referencia desplazada leída a 500 Hz. Los **términos de adaptación
-espectral** $C$ (ruido rosa) y $C_{tr}$ (tráfico urbano) añaden la
-penalización en baja frecuencia de una fuente real.
+10,0 dB (5 bandas de octava). Los dos topes son una sola regla, no dos
+constantes: $32{,}0 = 2{,}0 \times 16$ y $10{,}0 = 2{,}0 \times 5$, así que lo
+que el método permite en realidad es **una desviación desfavorable media de
+2 dB por banda**. El índice ($R_w$, $R'_w$, $D_{nT,w}$ …) es la
+referencia desplazada leída a 500 Hz.
 
-Los dos términos vuelven a valorar la misma curva medida frente a los dos espectros
-de fuente del Anexo A de ISO 717-1: $C$ frente a ruido rosa ponderado A,
-representativo de las actividades domésticas (habla, música, radio,
-televisión), y $C_{tr}$ frente a tráfico rodado urbano ponderado A, cuya
-energía se concentra en baja frecuencia. Están definidos de modo que el
+La curva de referencia en sí (ISO 717-1:2020, Tabla 3) tampoco es arbitraria.
+Sube 9 dB por octava de 100 Hz a 500 Hz, después solo 4 dB en la octava
+siguiente, y es plana a partir de 1250 Hz. Un motor de valoración que lleve esa
+forma es deliberadamente indulgente en baja frecuencia e implacable por encima
+de 1 kHz, que es la razón por la que una construcción con un valle en baja
+frecuencia puede valorarse bien, y la razón por la que existe $C_{tr}$: para
+devolverle la penalización. El objeto de resultado entrega la curva en su
+posición desplazada, así que la curva sin desplazar está a una resta de
+distancia:
+
+```python
+import numpy as np
+from phonometry import building
+
+R = [20.4, 16.3, 17.7, 22.6, 22.4, 22.7, 24.8, 26.6,
+     28.0, 30.5, 31.8, 32.5, 33.4, 33.0, 31.0, 25.5]
+w = building.weighted_rating(R)
+
+# La curva se desplaza hasta que lee `rating` a 500 Hz; sin desplazar lee ahí
+# 52 dB, así que el desplazamiento aplicado fue 52 - rating.
+reference = np.asarray(w.shifted_reference) + (52 - w.rating)
+print(w.rating, 52 - w.rating)          # 30 22   (desplazada 22 dB hacia abajo)
+print(reference.astype(int).tolist())
+# [33, 36, 39, 42, 45, 48, 51, 52, 53, 54, 55, 56, 56, 56, 56, 56]
+```
+
+Los **términos de adaptación espectral** $C$ (ruido rosa) y $C_{tr}$ (tráfico
+urbano) añaden la penalización en baja frecuencia de una fuente real. Los dos
+salen de una única definición (apartado 4.5, Fórmulas (1) y (2)): revalorar el
+espectro medido frente a un espectro de fuente normalizado y restar el índice
+basado en la curva,
+
+$$
+C_j = X_{A,j} - X_w, \qquad
+X_{A,j} = -10\log_{10}\sum_i 10^{(L_{i,j} - X_i)/10},
+$$
+
+donde $L_{i,j}$ es el nivel del espectro de fuente $j$ en la banda $i$ (los dos
+espectros están ponderados A y normalizados a 0 dB globales) y $X_i$ el
+aislamiento medido en esa banda, con un decimal. Los dos términos se
+diferencian **solo** en qué espectro se sustituye: el n.º 1, ruido rosa
+ponderado A, representativo de las actividades domésticas (habla, música,
+radio, televisión), da $C$; el n.º 2, tráfico rodado urbano ponderado A, cuya
+energía se concentra en baja frecuencia, da $C_{tr}$. De modo que el
 índice más el término ($R_w + C$ para un índice de laboratorio, $R'_w + C$ o
-$D_{nT,w} + C$ para las magnitudes de campo de esta guía, e igual con
-$C_{tr}$) es la diferencia de nivel ponderada A conseguida frente a esa
-fuente. Para leerlos:
+$D_{nT,w} + C$ para las magnitudes de la
+[guía de campo](/phonometry/es/buildings/insulation/insulation-field/), e igual
+con $C_{tr}$) es la diferencia de nivel ponderada A que la construcción
+consigue frente a esa fuente, que es lo que hace que lo que merece la pena
+especificar sea la suma y no el índice a secas. Para leerlos:
 
 * $C$ se mantiene pequeño en la mayoría de construcciones (0 a −2 dB es lo
   típico): el espectro rosa se parece a la ponderación ya implícita en la
@@ -93,18 +135,81 @@ fuente. Para leerlos:
   reglamentación lo diga) entre viviendas, los dos requisitos de ejemplo de
   ISO 717-1, 5.3.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/insulation_rating_es.svg" alt="Índice de reducción acústica medido en tercios de octava con la curva de referencia de ISO 717-1 desplazada y el índice ponderado resultante a 500 Hz" width="80%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/insulation_adaptation_terms_es.svg" alt="Izquierda: el índice de reducción acústica de un muro de hormigón denso de 150 mm y el de una doble hoja de 12 kg por metro cuadrado sobre montantes metálicos con cámara de 90 mm, ambos frente a la misma curva de referencia ISO 717-1 desplazada a Rw = 49 dB. Derecha: un diagrama de barras agrupadas de Rw, Rw + C y Rw + Ctr para las dos construcciones, idénticas en Rw y separadas 6 dB en Rw + Ctr" width="92%" />
+
+*Dos construcciones, un mismo índice. Los dos espectros salen de los propios
+modelos de panel de la biblioteca, el método de Sharp para la hoja de hormigón
+y el modelo masa-aire-masa de doble pared para la ligera, y los dos se valoran
+en $R_w = 49$ dB, así que una especificación escrita solo sobre $R_w$ las trata
+como intercambiables. No lo son: la doble hoja entra en el rango valorado
+todavía saliendo de su resonancia masa-aire-masa de 82 Hz y, frente al tráfico,
+cede 6 dB más que el muro de hormigón. $R_w + C_{tr}$ es aquello sobre lo que
+realmente se especifica una fachada a una calle con tráfico.*
+
+<details>
+<summary>Mostrar el código de esta figura</summary>
 
 ```python
-from phonometry import building
+import matplotlib.pyplot as plt
+import numpy as np
+# `building` es el import del bloque de la curva de referencia de arriba.
 
-# Índice de un solo número desde un espectro R medido de 16 bandas (ISO 717-1 Anexo C)
-R = [20.4, 16.3, 17.7, 22.6, 22.4, 22.7, 24.8, 26.6,
-     28.0, 30.5, 31.8, 32.5, 33.4, 33.0, 31.0, 25.5]
-w = building.weighted_rating(R)
+freqs = np.array([100, 125, 160, 200, 250, 315, 400, 500, 630, 800,
+                  1000, 1250, 1600, 2000, 2500, 3150], dtype=float)
+
+# Hormigón denso de 150 mm: m' = 2300 x 0.15 = 345 kg/m2, fc = 125 Hz.
+heavy = np.round(building.single_panel_transmission_loss(
+    freqs, 345.0, critical_frequency=125.0).transmission_loss, 1)
+# Doble hoja sobre montantes metálicos: 12 kg/m2 por hoja, cámara de 90 mm.
+light_result = building.double_wall_transmission_loss(freqs, mass1=12.0,
+                                                      mass2=12.0, gap=0.09)
+light = np.round(light_result.transmission_loss, 1)
+
+w_heavy = building.weighted_rating(heavy)
+w_light = building.weighted_rating(light)
+print(w_heavy.rating, w_heavy.c, w_heavy.ctr)   # 49 -2 -7
+print(w_light.rating, w_light.c, w_light.ctr)   # 49 -5 -13
+print(round(light_result.resonance_frequency, 1))            # 81.5 Hz
+
+fig, (ax_spec, ax_bar) = plt.subplots(1, 2, figsize=(13.0, 5.8))
+x = np.arange(16)
+ax_spec.plot(x, w_heavy.shifted_reference, "--", label="referencia desplazada")
+ax_spec.plot(x, heavy, "-o", label="hormigón denso de 150 mm")
+ax_spec.plot(x, light, "-s", label="doble hoja, 12 kg/m2 + 90 mm")
+ax_spec.set_xticks(x, [f"{f:g}" for f in freqs], rotation=45, fontsize=8)
+ax_spec.set(xlabel="Frecuencia [Hz]",
+            ylabel="Índice de reducción acústica R [dB]")
+ax_spec.legend()
+
+groups = ("Rw", "Rw + C", "Rw + Ctr")
+xb = np.arange(3)
+ax_bar.bar(xb - 0.19, [w_heavy.rating, w_heavy.rating + w_heavy.c,
+                       w_heavy.rating + w_heavy.ctr], width=0.36,
+           label="hormigón")
+ax_bar.bar(xb + 0.19, [w_light.rating, w_light.rating + w_light.c,
+                       w_light.rating + w_light.ctr], width=0.36,
+           label="doble hoja")
+ax_bar.set_xticks(xb, groups)
+ax_bar.set_ylabel("Número global [dB]")
+ax_bar.legend()
+plt.show()
+```
+
+</details>
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/insulation_rating_es.svg" alt="Índice de reducción acústica medido en tercios de octava con la curva de referencia de ISO 717-1 desplazada y el índice ponderado resultante a 500 Hz" width="80%" />
+
+*La referencia desplazada se ha detenido donde el área desfavorable sombreada
+suma 31,8 dB: un paso más de 1 dB hacia abajo se pasaría del tope de 32,0 dB.
+El índice se lee después sobre esa curva a 500 Hz, no sobre la medición: el
+espectro medido toca ahí 26,6 dB, y $R_w$ es 30 dB.*
+
+```python
+# `building`, `R` y `w` vienen del bloque de la curva de referencia de arriba.
 print(w.rating, w.c, w.ctr)                          # 30 -2 -3  ->  Rw(C;Ctr) = 30(-2;-3)
+print(w.unfavourable_sum)                            # 31.8  (tope 32.0 = 2.0 x 16)
 
-w.plot()   # R' medido frente a la referencia ISO 717-1 desplazada, desviaciones sombreadas (requiere matplotlib)
+w.plot()   # R medido frente a la referencia ISO 717-1 desplazada, desviaciones sombreadas (requiere matplotlib)
 ```
 
 <details>
@@ -125,7 +230,7 @@ plt.show()
 
 # A mano, con los campos de la curva por banda que ahora lleva el resultado:
 fig, ax = plt.subplots()
-ax.semilogx(w.band_centers, w.measured, "o-", label="R' medido")
+ax.semilogx(w.band_centers, w.measured, "o-", label="R medido")
 ax.semilogx(w.band_centers, w.shifted_reference, "s--", label="Referencia desplazada")
 ax.fill_between(w.band_centers, w.measured, w.shifted_reference,
                 where=w.measured < w.shifted_reference, interpolate=True,
@@ -146,8 +251,10 @@ plt.show()
 | `values_by_band` | array 1D | dB | 16 (tercios) o 5 (octavas) | $R$, $R'$, $D_{nT}$ … medidos por banda |
 | `bands` | str o `None` | — | `'third-octave'` / `'octave'` / `None` | `None` lo infiere del número de bandas |
 
-`weighted_rating()` devuelve un `WeightedRatingResult`
-(`rating`, `c`, `ctr`, `unfavourable_sum`, todos enteros salvo la suma).
+`weighted_rating()` devuelve un `WeightedRatingResult` (`rating`, `c`, `ctr`,
+`unfavourable_sum`, todos enteros salvo la suma), más los tres campos con los
+que se dibujan las figuras de esta página: `band_centers`, `measured` y
+`shifted_reference`, y `quantity`, que nombra lo que se ha valorado.
 
 ## Índices de ruido de impactos (ISO 717-2)
 
@@ -157,8 +264,27 @@ medición *supera* la referencia** (el ruido de impactos es peor cuanto más
 alto), el signo opuesto a ISO 717-1. El índice ($L_{n,w}$, $L'_{n,w}$,
 $L'_{nT,w}$) es la referencia desplazada leída a 500 Hz; para bandas de octava se reduce además
 en 5 dB. El término de adaptación espectral $C_I = L_{n,\text{sum}} - 15 - L_{n,w}$
+(Fórmulas (A.1) a (A.3) de ISO 717-2:2020)
 usa la suma energética sobre 100–2500 Hz (los primeros 15 tercios, excluyendo
-3150 Hz) o 125–2000 Hz (octavas). Para mediciones ampliadas hasta 50 Hz,
+3150 Hz) o 125–2000 Hz (octavas).
+
+Los $-15$ dB son un desplazamiento de normalización, no física: se eligen para
+que $C_I$ salga **en torno a cero** en un forjado másico con un revestimiento
+eficaz, ligeramente positivo en un forjado de viguetas de madera cuyos picos de
+baja frecuencia dominan, y hasta $-15$ dB en un forjado de hormigón desnudo o
+mal revestido (A.1). Leído así, el $C_I = -11$ dB del ejemplo de más abajo dice
+que el espectro medido es mucho más plano y está mucho más cargado hacia la
+alta frecuencia que la curva de referencia, es decir, una losa desnuda y no un
+forjado con revestimiento, así que el forjado es mejor en las bajas frecuencias
+que excitan las pisadas de lo que sugiere por sí solo $L'_{nT,w} = 79$ dB. El
+corolario es una trampa de diseño: un revestimiento blando actúa donde la curva
+de referencia es más exigente, así que mejora el número único más de lo que
+mejora lo que oye el vecino. La suma sin ponderar sobre la que se construye
+$C_I$ existe precisamente porque se correlaciona mejor con el ruido de pisadas
+ponderado A que la valoración por curva de referencia, y por eso los requisitos
+se escriben a veces sobre $L'_{n,w} + C_I$ en lugar de sobre $L'_{n,w}$.
+
+Para mediciones ampliadas hasta 50 Hz,
 `weighted_impact_rating_extended` devuelve además el término de rango ampliado
 $C_{I,50\text{–}2500}$ (NOTA de A.2.1) y, con `one_decimal=True`, el índice en
 pasos de 0,1 dB usado en las declaraciones de incertidumbre (reproduce los
@@ -166,6 +292,11 @@ valores impresos $L_{n,r,0,w} = 77{,}6$ dB y $C_{I,r,0} = -10{,}3$ dB de
 A.2.2).
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/impact_rating_es.svg" alt="Nivel de presión acústica de impactos normalizado medido en tercios de octava con la curva de referencia de ISO 717-2 desplazada y el índice ponderado resultante leído a 500 Hz" width="80%" />
+
+*La misma regla de ajuste con el signo invertido: el área sombreada es donde la
+medición se eleva **por encima** de la referencia, y la curva se desplaza hacia
+arriba hasta que esa área alcanza 28,0 dB frente al mismo tope de 32,0 dB. Un
+forjado valorado así es peor cuanto más alto es su número.*
 
 ```python
 import numpy as np
@@ -181,7 +312,7 @@ l_nt = np.array([62.1, 63.2, 63.5, 66.2, 68.5, 70.0, 71.7, 73.1,
 res_imp = building.weighted_impact_rating(l_nt)
 print(res_imp.rating, res_imp.ci, res_imp.unfavourable_sum)   # 79 -11 28.0  ->  L'nT,w(CI)=79(-11)
 
-# Los datos en banda de octava llevan la reducción extra de -5 dB (Apartado 4.3.2)
+# Los datos en banda de octava llevan la reducción extra de -5 dB (apartado 4.3.2)
 octave = np.array([65.3, 64.5, 58.0, 55.8, 43.0])
 print(building.weighted_impact_rating(octave).rating)  # 54
 
@@ -237,7 +368,8 @@ octavas 54, $C_I = 0$).
 | `bands` | str o `None` | — | `'third-octave'` / `'octave'` / `None` | `None` lo infiere del número de bandas |
 
 `weighted_impact_rating()` devuelve un `ImpactRatingResult` (`rating`,
-`ci` enteros, `unfavourable_sum` en dB).
+`ci` enteros, `unfavourable_sum` en dB), con los mismos tres campos de dibujo
+que el resultado aéreo: `band_centers`, `measured` y `shifted_reference`.
 
 ## Rangos de frecuencia ampliados e índices con un decimal
 
@@ -335,7 +467,9 @@ un recuadro, una fila de veredicto opcional y un pie con el descargo fijo.
 `ImpactRatingResult.report()` etiqueta la ficha de impactos de ISO 717-2
 ($L_{n,w}(C_I)$, con el signo contrario). `SoundReductionResult.report()` es
 una utilidad que valora el $R(f)$ predicho y escribe su ficha en una sola
-llamada.
+llamada; ese resultado sale de los modelos de panel EN 12354 de
+[Aislamiento acústico de paneles](/phonometry/es/buildings/design/panel-sound-insulation/),
+así que es el único punto de entrada de aquí cuya entrada nunca se midió.
 
 Los metadatos del informe se pasan como una dataclase congelada `ReportMetadata`
 (todos los campos opcionales; solo se representan los suministrados y los campos
@@ -401,7 +535,7 @@ renderizadas en el repositorio; pulsa cualquier vista previa para abrir el PDF.
 <ReportPreview
 	name="iso717_impact_example"
 	title="Informe de ejemplo de impactos ISO 717-2 (PDF)"
-	description="Ficha de aislamiento a ruido de impactos con el mismo formato acreditado para el nivel de presión acústica de impactos normalizado Ln: la cabecera de metadatos, la tabla de Ln en tercios de octava junto a la curva medida frente a la referencia desplazada con la lectura a 500 Hz, el resultado de un solo número Ln,w (CI) en caja y una fila de veredicto NO CUMPLE frente al requisito de 53 dB (un nivel de impacto más bajo es mejor)."
+	description="Ficha de aislamiento a ruido de impactos con el mismo formato acreditado para el nivel de presión acústica de impactos normalizado Ln: la cabecera de metadatos, la tabla de Ln en tercios de octava junto a la curva medida frente a la referencia desplazada con la lectura a 500 Hz, el resultado de un solo número Ln,w (CI) en un recuadro y una fila de veredicto NO CUMPLE frente al requisito de 53 dB (un nivel de impacto más bajo es mejor)."
 	caption="Ficha de índice de impactos (ImpactRatingResult.report), Ln,w (CI)."
 />
 
@@ -446,7 +580,13 @@ por bandas ya medido (o predicho) de las guías de
 [método de control](/phonometry/es/buildings/insulation/insulation-survey/) o
 [flancos](/phonometry/es/buildings/insulation/flanking-lab/). El número único de fachada
 del Anexo F de ISO 16283-3 y el $D_{n,f,w}$ de flancos reutilizan estos
-motores desde sus propias guías en lugar de duplicarlos.
+motores desde sus propias guías en lugar de duplicarlos. Un miembro de la
+familia ISO 717 falta a propósito: el nivel máximo de impactos ponderado A del
+**Anexo D de ISO 717-2:2020**, que valora la pelota de caucho y la máquina de
+neumático. No desplaza curva alguna, es una suma energética de niveles de banda
+ponderados A, así que no lo produce ninguno de los dos motores de esta página y
+vive con las fuentes que valora, en
+[Fuentes de impacto pesadas y blandas](/phonometry/es/buildings/insulation/heavy-impact-sources/).
 
 ## Véase también
 

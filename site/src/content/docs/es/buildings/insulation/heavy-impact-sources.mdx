@@ -37,6 +37,13 @@ references:
     publisher: "Butterworth-Heinemann"
     doi: "10.4324/9780080550473"
     note: "La Sección 3.6.4 describe las fuentes de impacto pesadas y explica por qué no existe un método de predicción sencillo equivalente. ISBN 978-0-7506-6526-1."
+  - type: article
+    authors: ["Kim, K. W.", "Park, S. H.", "Shin, H. K.", "Kim, K. C."]
+    year: 2023
+    title: "Changes of floor impact sound regulations and future improvement directions in Korea"
+    journal: "Proceedings of Forum Acusticum 2023 (10th Convention of the European Acoustics Association)"
+    doi: "10.61782/fa.2023.0364"
+    note: "La Tabla 1 recoge la revisión de agosto de 2022: la fuente pesada pasó a ser la pelota de caucho, el índice L'iA,Fmax a través de KS F ISO 10140-5 y KS F ISO 717-2, el requisito obligatorio de 49 dB (antes 50 dB) y los cuatro grados a intervalos de 4 dB. La única escala reglamentaria publicada para la magnitud que calcula esta página."
 ---
 
 import ThemeImage from '../../../../../components/ThemeImage.astro';
@@ -66,6 +73,54 @@ geometría. Derecha: la valoración suma en energía las contribuciones
 ponderadas A, y la ponderación A cae 23 dB más a 63 Hz que a 500 Hz, así que
 acaba decidiendo el número la banda medida más silenciosa.*
 
+<details>
+<summary>Mostrar el código de esta figura</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+
+from phonometry import (
+    a_weighted_maximum_impact_level,
+    heavy_impact_source_limits,
+    heavy_impact_source_specification,
+)
+
+fig, (ax_src, ax_rate) = plt.subplots(1, 2, figsize=(13.0, 5.6))
+
+# Izquierda: los espectros nominales impresos dentro de sus bandas de
+# tolerancia impresas.
+labels = {"rubber_ball": "pelota de caucho", "bang_machine": "máquina de neumático"}
+x = np.arange(5)
+for source in ("rubber_ball", "bang_machine"):
+    spec = heavy_impact_source_specification(source)
+    _f, lower, upper = heavy_impact_source_limits(source)
+    label = labels[source]
+    ax_src.fill_between(x, lower, upper, alpha=0.30, label=f"tolerancia de la {label}")
+    ax_src.plot(x, spec.force_exposure_level, "-o", label=f"{label} nominal")
+ax_src.set_xticks(x, ["31.5", "63", "125", "250", "500"])
+ax_src.set(xlabel="Frecuencia [Hz]",
+           ylabel="Nivel de exposición a la fuerza de impacto LFE [dB re 1 N]")
+ax_src.legend()
+
+# Derecha: la Tabla D.4 de ISO 717-2:2020, los niveles medidos frente a sus
+# contribuciones ponderadas A, con la suma energética trazada sobre ellas.
+res = a_weighted_maximum_impact_level([65.3, 64.5, 58.0, 55.8])
+xr = np.arange(4)
+ax_rate.bar(xr - 0.19, res.levels, width=0.36, label="Li,Fmax (medido)")
+ax_rate.bar(xr + 0.19, res.corrected, width=0.36, label="Li,Fmax + A (Tabla D.3)")
+ax_rate.axhline(res.rating, label=f"LiA,Fmax = {res.rating} dB")
+ax_rate.set_xticks(xr, ["63", "125", "250", "500"])
+ax_rate.set(xlabel="Frecuencia [Hz]",
+            ylabel="Nivel máximo de presión acústica de impactos [dB]")
+ax_rate.text(0.02, 0.03, f"suma sin redondear = {res.unrounded:.6f} dB",
+             transform=ax_rate.transAxes, va="bottom", ha="left")
+ax_rate.legend()
+plt.show()
+```
+
+</details>
+
 ## Ambas fuentes se especifican por la energía de su impulso de fuerza
 
 Una fuente pesada no se define por su forma sino por el **nivel de exposición a
@@ -83,8 +138,9 @@ sus niveles de fuerza bloqueada a $F_0 = 10^{-6}$ N, 120 dB más abajo, así que
 un nivel de fuerza que pase entre esta página y
 [Potencia acústica estructural de equipos](/phonometry/es/buildings/design/structure-borne-power/)
 sin convertir está equivocado exactamente en eso.
-Ambas características exigen una forma de onda de **pico único** de
-$20 \pm 2$ ms (JIS A 1418-2:2019 A.2 b)). Los valores por bandas de octava se
+Ambas fuentes exigen una forma de onda de **pico único** de
+$20 \pm 2$ ms (JIS A 1418-2:2019 A.2 b), donde a las dos se las llama la
+*característica de impacto* blanda y la dura). Los valores por bandas de octava se
 imprimen de forma idéntica en la Tabla A.1 de ISO 16283-2:2020, la Tabla F.1 de
 ISO 10140-5:2010 y la Tabla A.2 de JIS A 1418-2:2019 para la pelota; la máquina
 de neumático solo aparece en la Tabla A.1 de JIS A 1418-2:2019.
@@ -102,12 +158,9 @@ más bajas (8 dB a 31,5 Hz, 9 dB a 63 Hz) y 7 dB menos en la más alta, y por es
 intercambiables y un forjado puede cumplir con una y fallar con la otra.
 
 ```python
-from phonometry import (
-    check_heavy_impact_source,
-    heavy_impact_source_limits,
-    heavy_impact_source_specification,
-    impact_force_exposure_level,
-)
+from phonometry import check_heavy_impact_source, impact_force_exposure_level
+# `heavy_impact_source_specification` y `heavy_impact_source_limits` son los
+# imports del bloque de figura de arriba.
 
 spec = heavy_impact_source_specification("rubber_ball")
 print(spec.drop_height, spec.effective_mass)      # 1.0 m, 2.5 kg
@@ -117,7 +170,11 @@ freqs, lower, upper = heavy_impact_source_limits("bang_machine")
 print(list(zip(freqs, lower, upper))[0])          # (31.5, 46.0, 48.0)
 
 # Una calibración: cinco LFE medidos por octava frente a la tabla impresa.
-check = check_heavy_impact_source([39.4, 30.2, 23.6, 18.5, 12.9])
+# Nombra la fuente: la comprobación toma la pelota de caucho por defecto, y los
+# límites de la máquina de neumático leídos arriba rechazarían de plano una
+# pelota conforme.
+check = check_heavy_impact_source([39.4, 30.2, 23.6, 18.5, 12.9],
+                                  source="rubber_ball")
 print(check.passed, list(check.within_tolerance))
 check.plot()   # LFE medido sobre la banda de tolerancia (requiere matplotlib)
 ```
@@ -163,6 +220,23 @@ desde la base de la pelota; y un neumático de automóvil inflado a
 $(2{,}4 \pm 0{,}2)\times 10^5$ Pa con una masa efectiva de
 $(7{,}3 \pm 0{,}2)$ kg, dejado caer desde 85 cm.
 
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_heavy_impact_sources_es.svg" alt="Tres fuentes de impacto sobre un mismo forjado: la máquina de impactos ISO con sus cinco martillos de 500 g cayendo 40 mm, la pelota de caucho de 180 mm con su pared de 30 mm y la caída de un metro acotada desde la base de la pelota, y el neumático de la máquina de neumático dejado caer 85 cm, con la cadena de calibración del Anexo C de JIS debajo mostrando el filtro de octava colocado antes del analizador" width="92%" />
+
+### Qué fuente elegir
+
+La elección no es libre, y no es cuestión de gusto. La **pelota de caucho** es
+la fuente que adoptó la normalización internacional: la especifican tanto el
+Anexo A de ISO 16283-2:2020 como el Anexo F de ISO 10140-5:2010, con ella mide
+el apartado 6.3.2 de ISO 10052:2021, y es lo bastante ligera para usarla sin
+riesgo sobre un forjado ligero de madera. La **máquina de neumático** solo
+existe en JIS A 1418-2:2019 y se usa donde lo pide la práctica nacional, sobre
+todo en Japón y Corea; su neumático de 7,3 kg dejado caer desde 85 cm entrega
+de 8 a 9 dB más de fuerza en las dos octavas más bajas, que es justo lo que la
+hace más exigente sobre un forjado pesado y lo que la hace capaz de dañar un
+forjado ligero. Usa la pelota salvo que una reglamentación nacional o una
+especificación de cliente nombre la máquina de neumático, y no declares nunca
+un resultado de una frente a un límite escrito para la otra.
+
 ## El recinto receptor: un nivel máximo no se corrige como un promedio
 
 La magnitud valorada es un **máximo** de un nivel con ponderación temporal
@@ -190,12 +264,63 @@ $T = 1{,}7275$ s), donde su valor es $1/e$. Cuando $T = T_0$ el corchete se
 reduce a 1 y toda la corrección se queda en el término de volumen, como debe
 ser.
 
+La constante $1{,}7275$ s **no** es un límite de integración: es la ponderación
+temporal Fast escrita como tiempo de reverberación. Una caída exponencial de
+$T$ segundos tiene una constante de tiempo energética
+$\tau = T/(6\ln 10) = T/13{,}82$, así que un recinto con
+$T = 13{,}82 \times 0{,}125\ \text{s} = 1{,}7275\ \text{s}$ decae exactamente
+con la constante de tiempo de $0{,}125$ s del propio detector Fast, y
+$C = T/1{,}7275$ es la razón entre las dos. Muy por debajo de $C = 1$ el
+detector sigue la caída y la corrección se comporta como el promedio energético
+$10\log_{10}(T/T_0)$; muy por encima el detector no puede seguirla, el pico que
+declara deja de crecer con $T$ y la corrección se satura. ISO 16283-2:2020
+imprime la constante sin deducirla y remite a su Referencia [1] para el
+fundamento.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/fast_reverberation_correction_es.svg" alt="El término restado a un nivel medido frente al tiempo de reverberación del recinto receptor de 0,2 a 5 segundos: el término del máximo Fast, 10 lg de g(C) entre g(C0), subiendo hasta unos 5 dB, frente al término del promedio energético, 10 lg de T entre T0, subiendo hasta 10 dB, con la región en la que difieren más de 1 dB sombreada y con T0 = 0,5 s y T = 1,7275 s marcados" width="88%" />
+
+*Las dos curvas son el término que la estandarización *resta* del nivel medido,
+así que son directamente comparables. En $T = T_0$ se anulan a la vez, como debe
+ser. Por encima se separan: la corrección del promedio energético sigue
+creciendo sin límite, porque la energía se sigue acumulando, mientras que el
+término Fast se aplana, porque un detector de 0,125 s deja de resolver más
+caída. En $T = 5$ s la regla del promedio energético quitaría 10,0 dB y la regla
+Fast quita 5,1 dB, y esa divergencia es toda la razón por la que ISO 16283-2
+define una estandarización aparte para un máximo.*
+
+<details>
+<summary>Mostrar el código de esta figura</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+
+from phonometry import fast_reverberation_correction
+
+t = np.linspace(0.2, 5.0, 481)
+fast = np.asarray(fast_reverberation_correction(t), dtype=float)
+energy = 10 * np.log10(t / 0.5)
+print(round(float(fast[-1]), 1), round(float(energy[-1]), 1))    # 5.1 10.0
+
+fig, ax = plt.subplots()
+ax.fill_between(t, fast, energy, where=np.abs(fast - energy) > 1.0,
+                interpolate=True, alpha=0.25, label="más de 1 dB de diferencia")
+ax.plot(t, fast, label="máximo Fast: 10 lg[g(C)/g(C0)]")
+ax.plot(t, energy, "--", label="promedio energético: 10 lg(T/T0)")
+ax.set(xlabel="Tiempo de reverberación del recinto receptor T [s]",
+       ylabel="Término restado al nivel medido [dB]")
+ax.legend()
+plt.show()
+```
+
+</details>
+
 ```python
 from phonometry import (
-    fast_reverberation_correction,
     heavy_impact_octave_levels,
     standardized_maximum_impact_level,
 )
+# `fast_reverberation_correction` es el import del bloque de figura de arriba.
 
 freqs = [63.0, 125.0, 250.0, 500.0]
 li_fmax = [65.3, 64.5, 58.0, 55.8]           # promediado en energía sobre posiciones
@@ -209,6 +334,59 @@ res.plot()   # espectros medido y estandarizado (requiere matplotlib)
 # Las mediciones en tercios se combinan en octavas con la Fórmula (20):
 print(heavy_impact_octave_levels([60.0] * 6))   # +10 lg 3 dB por octava
 ```
+
+## La medición in situ (apartados 6 a 9 de ISO 16283-2:2020)
+
+Las funciones de más arriba consumen niveles ya promediados sobre posiciones.
+ISO 16283-2:2020 dice cómo se eligen esas posiciones, y la pelota de caucho se
+separa de la máquina de impactos en casi cada paso.
+
+**Cómo se deja caer la pelota (apartado 7.2.3).** Caída libre vertical desde
+$(100 \pm 1)$ cm, medidos desde la **base** de la pelota hasta la superficie del
+forjado ensayado, no desde la mano del operador ni desde el centro de la pelota.
+**Cuatro o más** posiciones sobre el forjado o la escalera que se ensaya; en un
+forjado ligero de viguetas, una de ellas debería quedar sobre una vigueta y otra
+en el centro del forjado, porque esos son los dos extremos de la movilidad
+puntual.
+
+**Micrófonos (apartados 7.3.1, 7.3.2 y 7.6).** Solo posiciones fijas: el
+micrófono motorizado en movimiento continuo y el barrido manual que sí puede
+usar la máquina de impactos **no** están disponibles para la pelota, porque un
+nivel máximo no se puede promediar espacialmente a lo largo de un recorrido
+como sí se promedia una energía. Las posiciones fijas pueden ir en trípode sin
+nadie en el recinto, o con un operador presente cuyo tronco se mantenga al
+menos a la distancia de un brazo del micrófono. Repártelas por el espacio
+permitido, sin que haya dos en el mismo plano respecto a los paramentos y sin
+formar una retícula regular, guardando al menos 0,7 m entre posiciones, 0,5 m a
+los paramentos del recinto y 1,0 m al elemento que se excita. El número de
+posiciones de micrófono es igual al de posiciones de fuente, o un múltiplo
+entero de él: con cuatro o cinco posiciones de fuente, al menos dos mediciones
+en cada una desde al menos dos posiciones de micrófono distintas; con seis o
+más, una medición por posición de fuente desde una posición de micrófono
+distinta cada vez.
+
+**El promediado, en dos etapas (apartados 7.8.3 y 7.3.4).** Primero promedia en
+energía los niveles máximos sobre las posiciones de micrófono que corresponden a
+una posición de pelota (Fórmula (14)); después promedia en energía esos
+resultados por posición sobre las posiciones de pelota (Fórmula (9)). Solo
+entonces se aplica la estandarización de las Fórmulas (4), (5) y (6).
+Promediarlo todo de una sola pasada no es la misma operación.
+
+**Dos cosas que hace la máquina de impactos y la pelota no.** El procedimiento
+de esquina en baja frecuencia del apartado 8 se aplica solo a la máquina de
+impactos: la NOTA 2 del apartado 6 dice sin rodeos que todavía no se ha
+demostrado ninguna relación entre las mediciones en esquina y las de la zona
+central para un nivel *máximo* con ponderación Fast, así que no hay nada que
+combinar. Y el nivel de la pelota **no se corrige por ruido de fondo** (NOTA del
+apartado 9), porque no puede establecerse si un máximo que representa el fondo
+ha afectado al máximo que representa el impacto. En su lugar, mantén el fondo
+bajo y decláralo.
+
+El método de control llega a la misma magnitud por una vía más corta:
+[el apartado 6.3.2 de ISO 10052:2021](/phonometry/es/buildings/insulation/insulation-survey/#realizar-el-control-apartados-5-y-6)
+mide el máximo Fast en bandas de octava durante unos 10 s desde al menos dos
+posiciones fijas separadas más de 0,7 m, una cerca del centro y otra a distinta
+altura, a 0,5 m como mínimo de los paramentos y a 1,0 m del impacto.
 
 ## El número único es una suma ponderada A, no una curva desplazada
 
@@ -232,7 +410,7 @@ El ejemplo resuelto de la Tabla D.4 se reproduce exactamente, incluido el
 resultado intermedio sin redondear que imprime la norma:
 
 ```python
-from phonometry import a_weighted_maximum_impact_level
+# `a_weighted_maximum_impact_level` es el import del bloque de figura de arriba.
 
 # ISO 717-2:2020 Tabla D.4: una medición in situ en bandas de octava.
 res = a_weighted_maximum_impact_level([65.3, 64.5, 58.0, 55.8])
@@ -248,6 +426,25 @@ pendiente. Para el espectro de la Tabla D.4 las cuatro contribuciones
 ponderadas A son 39,1; 48,3; 49,3 y 52,6 dB, así que la banda de 500 Hz es la
 que más pesa aunque la de 63 Hz sea la banda medida más alta, 9,5 dB por
 encima de ella.
+
+Lee esos 55 dB como se lee una magnitud de impacto: **más alto es peor**, igual
+que cualquier nivel de impacto de este sitio. Es un máximo, no un promedio, así
+que no es comparable con un $L'_{nT,w}$ ni con un $L'_{n,w}$ de la máquina de
+impactos, y ISO no le fija ningún límite: los criterios de impacto pesado son
+nacionales. El más desarrollado es el de Corea, donde el ruido de impacto en
+vivienda colectiva está regulado desde 2004 y las reglas se reescribieron en
+agosto de 2022: la fuente pesada pasó a ser la pelota de caucho, el índice de
+evaluación pasó a ser exactamente el $L'_{iA,F\max}$ de esta sección (a través
+de KS F ISO 10140-5 y KS F ISO 717-2), y el requisito obligatorio de prestación
+se fijó en **49 dB**, más estricto que los 50 dB del esquema anterior con
+máquina de neumático. Por encima de ese umbral hay cuatro grados a intervalos
+de 4 dB, siendo el grado 1 el mejor: $L \le 37$, $37 < L \le 41$,
+$41 < L \le 45$ y $45 < L \le 49$ dB. Frente a esa escala, los 55 dB del
+ejemplo resuelto son un forjado que incumple el requisito de plano. Como el
+número lo fijan las bandas de baja frecuencia, lo que lo mueve es la masa y la
+desolidarización estructural (un forjado más grueso, un suelo flotante sobre
+una capa elástica blanda, un techo desolidarizado) y *no* un revestimiento
+blando, que actúa donde la ponderación A ya ha descartado la energía.
 
 ## Qué cubre esta guía
 
@@ -267,10 +464,13 @@ octavas de la Fórmula (20), con `building.standardized_maximum_impact_level`,
 del Anexo D de ISO 717-2:2020 con las correcciones de la Tabla D.3, con
 `building.a_weighted_maximum_impact_level`.
 
-**No cubierto.** El procedimiento de medición in situ en sí (las cuatro o más
-posiciones de caída del Anexo A de ISO 10140-3, las posiciones de micrófono y
-el procedimiento de esquina en baja frecuencia) no está automatizado: las
-funciones consumen niveles ya promediados en energía sobre las posiciones. No
+**No cubierto.** El procedimiento in situ documentado más arriba no está
+automatizado: las funciones consumen niveles ya promediados en energía sobre
+las posiciones de micrófono de una posición de pelota y después sobre las
+posiciones de pelota, y nada comprueba la altura de caída, las cuatro o más
+posiciones de fuente, las separaciones de micrófono ni el promediado en dos
+etapas. Tampoco lo está la guía de disposición horizontal del Anexo E de
+ISO 16283-2:2020, que es informativo. No
 hay ningún modelo de predicción que lleve de una solución constructiva a un
 nivel de impacto pesado; Hopkins afirma sin rodeos que la complejidad de la
 fuerza de entrada y el uso de un máximo con ponderación temporal no dejan

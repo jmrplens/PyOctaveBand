@@ -135,18 +135,17 @@ El diseño publicado empaqueta un difusor de residuo cuadrático $N = 5$
 completo en un panel de 35 cm x 2 cm: cinco ranuras, cada una cargada con
 dos resonadores, con paso de 7 cm. Este es un diseño de *residuo cuadrático*,
 así que las cinco ranuras están pensadas para reflejar con $|R_n|$ cercano a
-uno y diferenciarse solo en fase. La primera ranura sí se acerca al
-acoplamiento crítico (su absorción alcanza un máximo de 0,99), pero a 2305 Hz,
-por encima de los 2 kHz para los que está ajustado el perfil de fases, donde
-todavía refleja 0,97 de la presión incidente. La ranura en acoplamiento
+uno y diferenciarse solo en fase. Dos de ellas, las ranuras 1 y 4, sí se
+acercan al acoplamiento crítico (su absorción alcanza un máximo de 0,99), pero
+a 2305 Hz y a 2260 Hz, por encima de los 2 kHz para los que está ajustado el
+perfil de fases, donde todavía reflejan 0,97 de la presión incidente. La
+ranura en acoplamiento
 crítico que una secuencia *ternaria* necesita como estado `0` es esa misma
 clase de celda llevada a propósito a resonancia en la frecuencia de trabajo,
 que es lo que resuelve
 [`critical_coupling_design`](/phonometry/es/materials/absorbers/metamaterial-absorbers/).
 Este panel publicado es el caso QRD, y a 2 kHz dispersa
 como el difusor de 27,4 cm de profundidad al que imita.
-
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/metadiffuser_geometry_es.svg" alt="Sección a escala del metadifusor de residuo cuadrático publicado: un panel de 350 por 20 milímetros sobre respaldo rígido con cinco ranuras numeradas que se abren en la cara, cada una cargada con dos resonadores de Helmholtz cuyos cuellos y cavidades se alojan lateralmente en el tabique entre ranuras; las cotas marcan los 350 milímetros de anchura, el paso de 70 milímetros, la primera ranura de 14,7 milímetros y los 20 milímetros de espesor, con el sonido incidente llegando desde arriba" width="92%" loading="eager" />
 
 Como en la comparación de campo lejano publicada, la respuesta polar repite
 la secuencia de cinco pozos seis veces (`periods=6`, un panel de 2,1 m):
@@ -165,6 +164,8 @@ from phonometry import (
 # ajustado para imitar un QRD diseñado a 500 Hz cuyos pozos llegarían a
 # 27,4 cm de profundidad.
 mm = 1e-3
+# El orden de las columnas sigue la tabla publicada; HelmholtzResonator toma
+# (neck_length, neck_side, cavity_length, cavity_side), de ahí el reordenado.
 filas = [  # ranura h, cuello l_n, cavidad l_c, cuello w_n, cavidad w_c [mm]
     (14.7, 13.0, 16.4, 6.2, 9.0),
     (30.9, 9.1, 4.3, 3.5, 9.0),
@@ -172,18 +173,25 @@ filas = [  # ranura h, cuello l_n, cavidad l_c, cuello w_n, cavidad w_c [mm]
     (15.7, 13.3, 17.0, 6.3, 9.0),
     (20.3, 18.0, 20.7, 3.2, 9.0),
 ]
-pozos = [
-    MetadiffuserWell(
-        h * mm,
-        2 * (HelmholtzResonator(ln * mm, wn * mm, lc * mm, wc * mm),),
-    )
-    for h, ln, lc, wn, wc in filas
-]
+pozos = []
+for h, ln, lc, wn, wc in filas:
+    resonador = HelmholtzResonator(ln * mm, wn * mm, lc * mm, wc * mm)
+    # dos resonadores idénticos por ranura
+    pozos.append(MetadiffuserWell(h * mm, (resonador, resonador)))
 
 f = np.arange(1800.0, 2601.0, 5.0)
 panel = metadiffuser_reflection(f, pozos, depth=0.02, period=0.07)
 alfa1 = panel.well_absorption[0]
 print(round(float(alfa1.max()), 2), int(f[alfa1.argmax()]))  # 0.99 2305
+
+# Lo que el panel absorbe donde se usa, no donde resuena.
+i2k = int(np.argmin(np.abs(f - 2000.0)))
+print(np.round(panel.well_absorption[:, i2k], 3))
+# [0.054 0.009 0.009 0.055 0.032]
+print(round(float(panel.absorption[i2k]), 3))       # 0.032
+peak = int(f[panel.absorption.argmax()])
+print(round(float(panel.absorption.max()), 3), peak)
+# 0.253 2260
 
 # Comparación de campo lejano: la secuencia de cinco pozos repetida seis
 # veces (2,1 m).
@@ -192,10 +200,72 @@ polar = metadiffuser_polar_response(2000.0, pozos, depth=0.02,
 print(round(polar.coefficient, 2))                           # 0.32
 ```
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/metadiffuser_polar_es.svg" alt="Diagrama polar semicircular a 2 kilohercios que compara la respuesta en campo lejano del panel metadifusor de 2 centímetros, en trazo continuo, con el difusor de residuo cuadrático de 27,4 centímetros de profundidad al que imita, en trazo discontinuo: los dos patrones de lóbulos de red se superponen casi exactamente en todo el arco de menos 90 a más 90 grados" width="92%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/metadiffuser_geometry_es.svg" alt="Sección a escala del metadifusor de residuo cuadrático publicado: un panel de 350 por 20 milímetros sobre respaldo rígido con cinco ranuras numeradas que se abren en la cara, cada una cargada con dos resonadores de Helmholtz cuyos cuellos y cavidades se alojan lateralmente en el tabique entre ranuras; las cotas marcan los 350 milímetros de anchura, el paso de 70 milímetros, la primera ranura de 14,7 milímetros y los 20 milímetros de espesor, con el sonido incidente llegando desde arriba" width="92%" loading="eager" />
+
+*Un periodo a escala: cinco ranuras de 14,7 mm a 30,9 mm de alto con paso de
+70 mm dentro de un panel de 350 mm × 20 mm, cada una cargada con dos
+resonadores de Helmholtz alojados lateralmente en el tabique que la separa de
+su vecina. El panel entero tiene 20 mm de espesor frente a los 686 mm de
+longitud de onda de su diseño de referencia de 500 Hz: una parte entre 34.*
 
 <details>
-<summary>Ver el código de esta figura</summary>
+<summary>Mostrar el código de esta figura</summary>
+
+```python
+import matplotlib.pyplot as plt
+
+# `panel` es el MetadiffuserResult calculado arriba, y retiene la geometría
+# para la que se calculó, así que redibuja su propia sección:
+panel.plot_geometry()
+plt.show()
+
+# A partir de una lista de pozos a secas, sin calcular antes una reflexión, el
+# mismo dibujo sale de materials.plot_metadiffuser_panel_geometry(
+#     pozos, depth=0.02, period=0.07).
+```
+
+</details>
+
+En la frecuencia de diseño de 2 kHz el panel es esencialmente una red de fase:
+refleja el 96,8 % de la energía incidente y absorbe el 3,2 %, y por ranura no
+más del 5,5 %. Trescientos hercios más arriba es otra superficie. Las ranuras 1
+y 4 pasan por el acoplamiento crítico en 2305 Hz y 2260 Hz con coeficientes de
+absorción de 0,99, así que dos quintas partes de la superficie del panel se
+convierten por un momento en un absorbente casi perfecto y la media de la cara
+llega a 0,25. El `.plot()` del resultado dibuja exactamente eso.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/metadiffuser_absorption_es.svg" alt="Coeficiente de absorción frente a la frecuencia de 1800 a 2600 hercios para las cinco ranuras del metadifusor publicado y su media de cara: las ranuras 2, 3 y 5 se quedan en el rango de pocos por ciento en toda la banda, mientras que la ranura 4 alcanza 0,99 cerca de 2260 hercios y la ranura 1, 0,99 cerca de 2305 hercios, lo que sube la media de cara desde 0,03 en la frecuencia de diseño de 2 kilohercios hasta unos 0,25 entre las dos resonancias" width="88%" />
+
+*Un metadifusor no es sin pérdidas, y la pérdida no es plana. En la frecuencia
+de diseño la media de cara es 0,03, algo que un modelo de sala normalmente
+puede ignorar junto al coeficiente de difusión; entre los dos picos de
+acoplamiento crítico es 0,25, y eso no puede. El panel hace además de
+absorbente de banda estrecha a 2,3 kHz, se quisiera o no, y el espectro de
+absorción tiene su sitio en la hoja de características junto al espectro de difusión.*
+
+<details>
+<summary>Mostrar el código de esta figura</summary>
+
+```python
+import matplotlib.pyplot as plt
+
+# `panel` es el MetadiffuserResult calculado arriba. En una línea:
+panel.plot()
+plt.show()
+```
+
+</details>
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/metadiffuser_polar_es.svg" alt="Diagrama polar semicircular a 2 kilohercios que compara la respuesta en campo lejano del panel metadifusor de 2 centímetros, en trazo continuo, con el difusor de residuo cuadrático de 27,4 centímetros de profundidad al que imita, en trazo discontinuo: los dos patrones de lóbulos de red se superponen casi exactamente en todo el arco de menos 90 a más 90 grados" width="92%" />
+
+*La afirmación de toda la guía, en una superposición: los mismos lóbulos de red
+en las mismas direcciones y a los mismos niveles, con un panel 13,7 veces más
+delgado. Las dos respuestas son seis periodos de la secuencia de cinco pozos, un
+array de 2,1 m, así que la única diferencia entre ellas es cómo llega cada pozo
+a su fase de reflexión.*
+
+<details>
+<summary>Mostrar el código de esta figura</summary>
 
 ```python
 import numpy as np
@@ -289,6 +359,90 @@ objetivos = np.degrees(np.angle(np.exp(-2j * k * profundidades)))
 print(np.round(objetivos))                          # [ 72. -72. -72.  72.   0.]
 ```
 
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/metadiffuser_phase_match_es.svg" alt="Dos paneles: a la izquierda, la fase de reflexión de cada una de las cinco ranuras a 2 kilohercios frente al índice de ranura, con los cuadrados del metadifusor asentados sobre los círculos huecos de los objetivos del difusor de residuo cuadrático y el módulo de reflexión anotado junto a cada punto; a la derecha, el error de fase de cada ranura respecto a su objetivo de 1600 a 2600 hercios, con las cinco curvas pasando por cero a 2 kilohercios y saliendo de una banda sombreada de más menos diez grados a un par de cientos de hercios a cada lado" width="92%" />
+
+*Izquierda: todo el truco. Cinco ranuras de 20 mm de profundidad caen sobre las
+fases de pozos de hasta 27,4 cm, con menos de 3° de error, y siguen reflejando
+de 0,97 a 1,00 de la presión incidente. Derecha: el límite del truco. La fase
+del pozo rígido es lineal en frecuencia y la de la ranura cargada no lo es, así
+que el ajuste solo es exacto donde se llevó a cero. Las ranuras 2 y 3 tienen
+geometría idéntica y sus curvas coinciden; la ranura 5, el miembro de
+profundidad nula de la secuencia, es la única que se mantiene dentro de 10° más
+allá de unos pocos cientos de hercios.*
+
+<details>
+<summary>Mostrar el código de esta figura</summary>
+
+```python
+import matplotlib.pyplot as plt
+
+# `pozos` y `profundidades` vienen de los bloques de arriba.
+barrido = np.linspace(1600.0, 2600.0, 201)
+barrida = metadiffuser_reflection(barrido, pozos, depth=0.02, period=0.07)
+k_barrido = 2 * np.pi * barrido / 343.0
+fase_objetivo = np.angle(np.exp(-2j * np.outer(profundidades, k_barrido)))
+error = np.degrees(np.angle(np.exp(1j * (np.angle(barrida.reflection)
+                                         - fase_objetivo))))
+fig, ax = plt.subplots()
+ax.axhspan(-10.0, 10.0, color="#2ca02c", alpha=0.15)
+etiquetas = ("ranura 1", "ranura 2", "ranura 3", "ranura 4", "ranura 5")
+for fila, etiqueta in zip(error, etiquetas):
+    ax.plot(barrido, fila, label=etiqueta)
+ax.set_ylim(-100.0, 100.0)
+ax.set_xlabel("Frecuencia [Hz]")
+ax.set_ylabel("Error de fase frente al objetivo QRD [grados]")
+ax.legend()
+plt.show()
+```
+
+</details>
+
+**El segundo paso, resuelto.** El párrafo de arriba dice «ajusta cada ranura
+hasta que la cadena reproduzca esa fase», que es una búsqueda y no una fórmula,
+y la página se la debe al lector. El espacio de parámetros de una ranura son
+cuatro números (su altura y la longitud de cuello, el lado de cuello y la
+longitud de cavidad de sus resonadores) y `metadiffuser_reflection` sobre un
+panel es barato, así que la búsqueda es un bucle. La profundidad $L$ del panel
+la fija la aplicación antes que nada; después, la longitud de cavidad es el
+mando grueso sobre la resonancia y con ella sobre la fase, el cuello es el mando
+fino, y la altura de ranura es el mando grueso sobre cuánta pérdida lleva la
+ranura. Barrer el único parámetro grueso recupera la longitud de cavidad
+publicada con un paso de rejilla de error:
+
+```python
+import numpy as np
+
+# `filas`, `pozos` y `objetivos` vienen de los bloques de arriba. Reconstruye el
+# panel con una longitud de cavidad candidata en la ranura 1 y quédate con la
+# geometría que caiga más cerca de su fase objetivo sin dejar de reflejarlo casi
+# todo.
+def panel_con(cavidad_mm):
+    prueba = [(14.7, 13.0, cavidad_mm, 6.2, 9.0)] + filas[1:]
+    construidos = []
+    for h, ln, lc, wn, wc in prueba:
+        resonador = HelmholtzResonator(ln * mm, wn * mm, lc * mm, wc * mm)
+        construidos.append(MetadiffuserWell(h * mm, (resonador, resonador)))
+    return metadiffuser_reflection(np.array([2000.0]), construidos,
+                                   depth=0.02, period=0.07)
+
+mejor = None
+for cavidad_mm in np.linspace(4.0, 22.0, 60):
+    r1 = complex(panel_con(cavidad_mm).reflection[0, 0])
+    if abs(r1) < 0.9:            # el suelo que se pone quien diseña a |R_n|
+        continue
+    err = abs(np.degrees(np.angle(np.exp(
+        1j * (np.angle(r1) - np.radians(objetivos[0]))))))
+    if mejor is None or err < mejor[1]:
+        mejor = (cavidad_mm, err)
+print(round(mejor[0], 2), round(mejor[1], 1))   # 16.81 1.1
+# La tabla publicada da 16,4 mm para esta ranura: un paso de rejilla de error.
+```
+
+Cinco bucles como ese, uno por ranura, son todo el problema inverso. La
+biblioteca los deja explícitos en lugar de envolverlos porque la función de
+coste es de quien diseña: cuánto error de fase resulta aceptable, dónde se
+sitúa el suelo de $|R_n|$ y cuánta absorción puede permitirse la aplicación.
+
 Que un panel de 2 cm clave las fases de pozos de 27,4 cm con un error de
 pocos grados es todo el truco, y los límites del truco merecen decirse sin
 rodeos:
@@ -317,7 +471,97 @@ La reducción a un coeficiente valorado es entonces idéntica al flujo
 clásico: `metadiffuser_polar_response` para una frecuencia y
 `metadiffuser_diffusion_spectrum` para el coeficiente normalizado banda a
 banda, ambos frente a la referencia plana de igual huella de la fórmula (7)
-de ISO 17497-2.
+de ISO 17497-2. Ejecutar esa comprobación sobre el panel publicado es la única
+forma honesta de enunciar su ancho de banda, y la respuesta es más estrecha de
+lo que sugiere la superposición monofrecuencia:
+
+```python
+import numpy as np
+
+# Los dos paneles son seis periodos de cinco pozos de 7 cm, así que la única
+# diferencia entre ellos es cómo llega cada pozo a su fase.
+bandas = np.array([500, 630, 800, 1000, 1250, 1600, 2000,
+                   2500, 3150, 4000, 5000], float)
+meta = materials.metadiffuser_diffusion_spectrum(bandas, pozos, depth=0.02,
+                                                 period=0.07, periods=6)
+qrd = materials.predicted_diffusion_spectrum(
+    0.07, bandas, depths=profundidades, periods=6, include_obliquity=False)
+print(np.round(meta.normalized, 2))
+# [0.   0.   0.   0.01 0.08 0.12 0.32 0.17 0.24 0.12 0.06]
+print(np.round(qrd.normalized, 2))
+# [-0.    0.    0.02  0.39  0.29  0.09  0.32 -0.    0.04  0.14  0.  ]
+```
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/metadiffuser_spectrum_es.svg" alt="Coeficiente de difusión normalizado sobre las bandas de tercio de octava de 500 a 5000 hercios para el panel metadifusor de 2 centímetros y el difusor de residuo cuadrático de 27,4 centímetros de profundidad al que imita, los dos con seis periodos: la región por debajo de 980 hercios aparece sombreada porque ahí no existe ningún lóbulo de red, las dos curvas se encuentran en 0,32 en la frecuencia de sintonía de 2 kilohercios, y en el resto siguen caminos distintos" width="88%" />
+
+*La equivalencia es un punto, no una banda. A 2 kHz los dos paneles puntúan 0,32
+y 0,32; a un tercio de octava a cada lado son superficies distintas, y el
+metadifusor pierde las bandas de 1 kHz y 1,25 kHz que la rejilla profunda
+conserva, porque sus ranuras todavía no han alcanzado ahí las fases objetivo.
+Por debajo de $c/L = 980$ Hz la región sombreada no es una propiedad de ninguno
+de los dos diseños: el periodo de 35 cm es más corto que una longitud de onda,
+no existe lóbulo de red que rellenar, y el coeficiente normalizado de cualquier
+panel de este periodo se desploma hacia cero.*
+
+<details>
+<summary>Mostrar el código de esta figura</summary>
+
+```python
+import matplotlib.pyplot as plt
+
+# `meta` y `qrd` son los dos DiffusionSpectrum calculados arriba.
+fig, ax = plt.subplots()
+ax.axvspan(bandas[0], 343.0 / (5 * 0.07), color="#9e9e9e", alpha=0.16)
+ax.semilogx(bandas, qrd.normalized, "o--", label="QRD, pozos de hasta 27,4 cm")
+ax.semilogx(bandas, meta.normalized, "s-", label="Metadifusor, panel de 2 cm")
+ax.set_xlabel("Frecuencia [Hz]")
+ax.set_ylabel("Coeficiente de difusión normalizado")
+ax.legend()
+plt.show()
+```
+
+</details>
+
+La regla de diseño que se sigue es la que implican los puntos de arriba:
+sintonizar en el centro de la banda que necesita la aplicación, ejecutar esta
+comprobación antes de comprometerse, y leer la superposición polar
+monofrecuencia como una ilustración y no como una especificación.
+
+## 4. Construir uno, y comprobarlo
+
+Todo lo anterior es un modelo de un panel que aún no existe. Entre la tabla de
+milímetros y una superficie en una pared se interponen tres cosas.
+
+**Fabricación.** La cadena supone paredes rígidas, lisas y estancas. Imprime o
+mecaniza en un material rígido y mantén los tabiques entre ranuras lo bastante
+gruesos como para que no flexen a la frecuencia de trabajo; un tabique que se
+mueve añade una compliancia que el modelo no tiene. Espera que los cuellos
+impresos salgan por debajo de medida y más rugosos que lo dibujado, y las dos
+cosas suben la pérdida viscotérmica dentro del resonador y recortan $|R_n|$, la
+magnitud que este diseño mantiene entre 0,97 y 1,00, así que no hay mucho de
+donde regalar.
+
+**Tolerancia.** Enúnciala en grados y no en adjetivos, usando el bucle de la
+sección 3 al revés: reconstruye el panel con un lado de cuello perturbado y lee
+la fase que vuelve. En la ranura 1 publicada, un error de $\pm 0{,}1$ mm sobre
+el cuello de 6,2 mm mueve su fase de reflexión unos pocos grados a 2 kHz, cosa
+que la figura de arriba pone en contexto: es pequeño frente a la dispersión que
+el diseño ya arrastra a lo largo de un tercio de octava, y grande frente a los
+3° dentro de los que caen ahora mismo las cinco ranuras.
+
+**Verificación, a dos escalas.** Celda a celda, `metadiffuser_reflection`
+devuelve exactamente lo que daría una medición con dos micrófonos de esa celda
+en un tubo de impedancia rectangular de un periodo de ancho, incluida
+`well_absorption`, así que una sola ranura se puede comprobar antes de
+comprometer el panel; ese es el método del
+[tubo de impedancia](/phonometry/es/materials/absorbers/impedance-tube/) sin
+cambios. El panel entero se califica en un goniómetro ISO 17497-2, que necesita
+el array de seis periodos y 2,1 m y un panel plano de referencia de la misma
+huella medido con la cadena idéntica; la
+[guía de difusores](/phonometry/es/materials/diffusers/diffusers/) da ese
+procedimiento. Como el diseño está sintonizado a una frecuencia, la nota honesta
+es el $d_\mathrm{norm}$ banda a banda de esa medición, y no el coeficiente a
+2 kHz.
 
 ## Qué cubre esta guía
 

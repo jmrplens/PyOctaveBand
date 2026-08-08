@@ -1,6 +1,6 @@
 ---
 title: "Método de control del aislamiento (ISO 10052)"
-description: "El método de control (survey) del aislamiento acústico de ISO 10052: bandas de octava, un sonómetro de mano y el índice de reverberación en lugar de tiempos de reverberación por banda, con las magnitudes aéreas, de impacto, de fachada y de equipamiento y sus fichas."
+description: "El método de control (survey) del aislamiento acústico de ISO 10052: bandas de octava, un sonómetro de mano y el índice de reverberación en lugar de tiempos de reverberación por banda, con las magnitudes aéreas, de impacto, de fachada y de equipamiento, el procedimiento de barrido y sus fichas."
 references:
   - type: book
     authors: ["Vigran, T. E."]
@@ -35,20 +35,38 @@ los motores de número único tras los índices del método de control en
 
 ## Bandas de octava y el índice de reverberación
 
-Los [métodos de
-ingeniería](/phonometry/es/buildings/insulation/insulation-field/) compran
-precisión con esfuerzo:
-micrófonos barridos, tiempos de reverberación por banda, corrección de ruido de
-fondo cuidadosa. Para una comprobación rápida en una vivienda, ISO 10052 define
-un **método de control (survey)**: bandas de octava, un sonómetro de mano y una
-sola magnitud, el **índice de reverberación** $k = 10\log_{10}(T/T_0)$
-($T_0 = 0{,}5\ \text{s}$), que arrastra la corrección del recinto receptor.
-Cada magnitud del control es entonces una simple suma de $k$: la diferencia
-de niveles estandarizada $D_{nT} = D + k$, la normalizada
-$D_n = D + k + 10\log_{10}(A_0 T_0/(0{,}16\,V))$, la aparente
-$R' = D + k + 10\log_{10}(S T_0/(0{,}16\,V))$ (usando $V/7{,}5$ como $S$ cuando es
-mayor) y, para impactos y fachadas, $L'_{nT} = L_i - k$ y
-$D_{2m,nT} = D_{2m} + k$. Las referencias a
+Un solo número sustituye a toda la corrección del recinto receptor. Donde los
+[métodos de ingeniería](/phonometry/es/buildings/insulation/insulation-field/)
+llevan un tiempo de reverberación medido por banda a cada magnitud, ISO 10052
+condensa esa corrección en el **índice de reverberación**
+$k = 10\log_{10}(T/T_0)$ ($T_0 = 0{,}5\ \text{s}$), que puede medirse pero
+normalmente se lee en una tabla a partir de la construcción y el volumen del
+recinto. Cada magnitud del control es entonces una suma o una resta de $k$:
+
+$$
+D_{nT} = D + k, \qquad
+D_n = D + k + 10\log_{10}\frac{A_0 T_0}{0{,}16\,V}, \qquad
+R' = D + k + 10\log_{10}\frac{S T_0}{0{,}16\,V},
+$$
+
+$$
+L'_{nT} = L_i - k, \qquad
+L'_n = L_i - k - 10\log_{10}\frac{A_0 T_0}{0{,}16\,V}, \qquad
+D_{2m,nT} = D_{2m} + k,
+$$
+
+con $A_0 = 10\ \text{m}^2$ y $V$ el volumen del recinto receptor. Las dos
+magnitudes normalizadas llevan el mismo término
+$10\log_{10}(A_0 T_0/(0{,}16\,V))$ con signos opuestos, porque una diferencia de
+niveles mejora cuando el recinto receptor es más absorbente y un nivel de
+impactos baja. Cuando no se ha medido el área de la partición común, el método
+de control sustituye $S$ por $V/7{,}5$ si este resulta mayor, siendo $V$ el
+volumen del recinto receptor, que debería ser el menor de la pareja
+(apartado 3.6). Es un área de partición por defecto deducida de las
+proporciones típicas de una vivienda y, como solo puede aumentar $S$, solo
+puede aumentar $R'$ frente a un área medida; haz constar en el informe cuándo
+se ha usado, junto con el otro caso que también señala el apartado 3.6, un área
+común por debajo de 10 m². Las referencias a
 apartados siguen ISO 10052:2021; las fórmulas y la tabla del índice de
 reverberación son idénticas en la armonizada EN ISO 10052:2004+A1:2010.
 
@@ -58,10 +76,11 @@ sala y el volumen con `estimate_reverberation_index(V, room)`: amueblada
 `"kitchen"` / `"bathroom"` / `"furnished"`, o las clases de construcción sin
 amueblar `"a"`–`"h"` y las mixtas `"a+e"`…`"d+h"`. El apartado 6.5 separa eso
 en dos: la **Tabla 3** clasifica el recinto y le asigna su letra, y la
-**Tabla 4** convierte la letra y el volumen en el índice. Una cuarta
-magnitud propia de este método es el **ruido de equipamientos**
-$L_{XY}$: la
-media energética de tres posiciones ponderadas A o C.
+**Tabla 4** convierte la letra y el volumen en el índice. Una cuarta magnitud
+propia de este método es el **ruido de equipamientos** $L_{XY}$, la
+media energética de tres mediciones ponderadas A o C tomadas siguiendo una
+receta de posiciones fija que se detalla en
+[Realizar el control](#realizar-el-control-apartados-5-y-6).
 
 Las letras no son arbitrarias: la Tabla 3 es una malla de 2 × 2 × 2 sobre el
 peso de las paredes y el techo, la dureza del revestimiento del suelo y el
@@ -108,8 +127,13 @@ print(res.r_prime_rating.rating)               # 48  ->  R'w
 k_est = building.estimate_reverberation_index(50.0, "h")
 print(k_est)                                   # [5.  5.5 6.  5.  5.5]
 
-# Ruido de equipamientos: media energética de tres posiciones (dB(A)).
-se = building.survey_service_equipment_level([35.0, 30.0, 32.0], 3.0, volume=50.0)
+# Ruido de equipamientos: una medición en esquina y luego dos centrales
+# (apartado 6.3.4), cada una sobre un ciclo de funcionamiento completo distinto.
+se = building.survey_service_equipment_level(
+    [35.0, 30.0, 32.0],          # posición 1 (esquina), luego dos en la posición 2
+    reverberation_index=3.0,     # k escalar = 3 dB, es decir, T ~ 1 s
+    volume=50.0,
+)
 print(round(float(se.l_xy), 1), round(float(se.l_xy_nt), 1))   # 32.8 29.8
 
 res.plot()   # DnT vs curva de referencia ISO 717-1 desplazada (necesita matplotlib)
@@ -152,6 +176,117 @@ plt.show()
 
 </details>
 
+### Parámetros de `survey_airborne_insulation()` y afines
+
+| Parámetro | Tipo | Unidades | Rango / def. | Notas |
+| :--- | :--- | :--- | :--- | :--- |
+| `l1` / `l2` | array 1D o 2D | dB | uno/banda, o `(posiciones, bandas)` | Niveles emisor / receptor (o exterior `l1_2m`) |
+| `li` | array 1D o 2D | dB | uno/banda, o `(posiciones, bandas)` | Niveles de impacto (media energética de posiciones) |
+| `reverberation_index` | escalar o array 1D | dB | uno por banda | $k$ de `reverberation_index` o `estimate_reverberation_index`; `survey_service_equipment_level()` también acepta un $k$ escalar |
+| `volume` | float | m³ | > 0 | Volumen receptor $V$ (para $D_n$ / $L'_n$ / $R'$ / normalizadas) |
+| `area` | float | m² | > 0 | Área de partición común $S$ (aéreo $R'$; regla $V/7{,}5$) |
+| `measurements` | array | dB | exactamente 3 | Posiciones de equipo de servicio (`survey_service_equipment_level`) |
+| `room` | str | — | `"kitchen"`/`"bathroom"`/`"furnished"`/`"a"`–`"h"`/`"a+e"`… | Clase de sala para `estimate_reverberation_index` (Tabla 3; el índice en sí es la Tabla 4) |
+
+`survey_airborne_insulation()` devuelve un `SurveyAirborneResult` (`d`, `d_nt`,
+`d_n`, `r_prime`, `rating`, `r_prime_rating`); `survey_impact_insulation()` un
+`SurveyImpactResult` (`l_i`, `l_nt`, `l_n`, `rating`);
+`survey_facade_insulation()` un `SurveyFacadeResult` (`d_2m`, `d_2m_nt`,
+`d_2m_n`, `rating`); `survey_service_equipment_level()` un
+`SurveyServiceEquipmentResult` (`l_xy`, `l_xy_nt`, `l_xy_n`).
+
+## Realizar el control (apartados 5 y 6)
+
+Todo lo anterior consume niveles por banda. Lo que separa a ISO 10052 de
+[ISO 16283](/phonometry/es/buildings/insulation/insulation-field/) no es la
+aritmética, que es más sencilla, sino *cómo se obtienen esos niveles*: una
+postura del cuerpo, un barrido y un cronómetro en lugar de cinco posiciones
+fijas de micrófono por recinto. El procedimiento es lo bastante corto para
+citarlo entero.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_survey_sweep_es.svg" alt="Planta de una habitación de vivienda con el altavoz en la esquina opuesta al elemento separador, a 0,5 m como mínimo de las dos paredes y orientado hacia la esquina, el operador cerca del centro y de espaldas, y el micrófono sostenido con el brazo extendido barriendo un arco de 180 grados cuatro veces en unos 30 segundos, con un alzado al lado que muestra el brazo subiendo y bajando en cada pasada" width="92%" loading="eager" />
+
+**El instrumento (apartado 5).** Un sonómetro de clase 1 o de clase 2 según
+IEC 61672-1, con filtros según IEC 61260, ajustado con un calibrador antes de
+cada medición para que las lecturas sean niveles absolutos. El micrófono debe
+ser de campo difuso; a uno de campo libre hay que aplicarle su corrección de
+campo difuso. La máquina de impactos y la pelota de caucho deben cumplir los
+Anexos E y F de ISO 10140-5:2021 y el Anexo A de ISO 16283-2:2020. Puertas y
+ventanas permanecen cerradas y las persianas normalmente abiertas durante todo
+el ensayo (apartado 6.1).
+
+**La fuente, entre recintos (apartado 6.2.2).** Ruido estacionario de espectro
+continuo; se admite ruido filtrado por bandas de octava, y un espectro de banda
+ancha puede conformarse para ganar relación señal/ruido en alta frecuencia en el
+recinto receptor. Sitúa el altavoz en una **esquina del recinto opuesta al
+elemento separador**, a 0,5 m como mínimo de los paramentos y, si es un sistema
+de un solo altavoz, orientado hacia la esquina. Pueden funcionar varias fuentes
+a la vez siempre que sean del mismo tipo, excitadas al mismo nivel con señales
+similares pero no correlacionadas; varios altavoces dentro de una misma caja
+deben excitarse en fase. Una pareja vertical se ensaya desde el recinto
+**inferior** y una pareja horizontal desigual desde el recinto **mayor**, salvo
+que se haya acordado de antemano el otro sentido.
+
+**El barrido (apartado 6.3.1).** El aislamiento a ruido aéreo necesita el nivel
+medio en los dos recintos; el de impactos, solo en el receptor. En cada uno,
+colócate cerca del centro del suelo *de espaldas* al altavoz (recinto emisor) o
+al elemento separador (recinto receptor), sostén el sonómetro con el brazo
+extendido y mueve el micrófono cuatro veces en horizontal describiendo 180°,
+subiendo y bajando el brazo suavemente en cada pasada. Las cuatro rotaciones
+llevan unos **30 s en total**, que son también el tiempo de integración. La
+alternativa admitida es un micrófono giratorio sobre soporte: al menos 10°
+respecto a la horizontal y radio de barrido de 1 m como mínimo. Sin un
+analizador de octavas en tiempo real, repite el barrido completo una vez por
+banda y lee cada $L_{eq}$ de 30 s.
+
+**La máquina de impactos (apartado 6.2.3).** Cerca del centro del suelo del
+recinto emisor, con la línea de martillos sobre la diagonal del recinto. Con un
+forjado y una losa isótropos basta una posición. En un forjado nervado o de
+viguetas añade dos más, de forma que tres posiciones queden repartidas al azar
+por la superficie del suelo, con la línea de martillos a 45° respecto a los
+nervios y toda posición a 0,5 m como mínimo de los bordes del forjado.
+
+**La pelota de caucho (apartado 6.3.2).** La rama pesada/blanda mide el nivel
+**máximo con ponderación Fast** $L_{i,Fmax}$ en bandas de octava, unos 10 s por
+medición, desde al menos dos posiciones fijas, una cerca del centro y otra a
+distinta altura, separadas más de 0,7 m, a 0,5 m como mínimo de cualquier
+paramento y a 1,0 m como mínimo de la posición de impacto, promediadas sobre
+posiciones banda a banda. Su número único es la suma ponderada A del Anexo D de
+ISO 717-2:2020, no una curva de referencia desplazada; véase
+[Fuentes de impacto pesadas y blandas](/phonometry/es/buildings/insulation/heavy-impact-sources/).
+Usa protección auditiva al medir en el recinto emisor.
+
+**La fachada (apartados 6.2.4 y 6.3.3).** Con altavoz, sitúalo en el exterior
+con un ángulo de incidencia lo más próximo posible a 45°, preferiblemente sobre
+el terreno, con la distancia oblicua $r$ de la fuente al centro del elemento de
+ensayo de **7 m** como mínimo ($d > 5$ m desde la fachada) y la posición
+elegida de modo que el nivel varíe lo menos posible sobre el elemento, menos de
+5 dB por banda en toda la fachada (apartado 5). El micrófono exterior queda a
+$(2{,}0 \pm 0{,}2)$ m del plano de la fachada, o más afuera si es lo que hace
+falta para guardar 1 m con la parte más próxima de la fachada, por ejemplo una
+barandilla. Integra 30 s dentro y fuera. Con tráfico rodado en su lugar, mide
+los dos lados **simultáneamente** durante 60 s con al menos 15 vehículos
+pasando, y repite el barrido interior a lo largo de ese periodo; a veces hacen
+falta tres o cinco posiciones fijas.
+
+**Equipamientos (apartado 6.3.4).** Dos posiciones fijas, tres
+mediciones. La posición 1 va cerca de las superficies aparentemente más duras
+del recinto, preferiblemente a 0,5 m de los paramentos y del suelo o el techo,
+o sea, en la práctica, en una esquina. La posición 2 va en el campo
+reverberante, en la zona central del recinto. Toma **una** medición en la
+posición 1 y **dos** en la posición 2, cada una cubriendo un ciclo de
+funcionamiento completo en condiciones normales, y cada una sobre un ciclo
+distinto. Ninguna posición puede quedar a menos de 1,5 m de una fuente como una
+boca de ventilación. Prescindir de la posición en esquina y tomar tres
+centrales es la forma más fácil de sesgar esta magnitud a la baja.
+
+**El conjunto de bandas (apartado 6.4, Tabla 2).** El aislamiento a ruido aéreo
+y el aislamiento a impactos con máquina de impactos se miden en las cinco
+bandas de octava de 125 Hz a 2000 Hz; la fuente de impacto pesada/blanda usa de
+63 Hz a 500 Hz, que es la razón por la que 63 Hz aparece ahí y en ningún otro
+sitio. El ruido de equipamientos es un único nivel ponderado A o C entre
+63 Hz y 8000 Hz con la ponderación temporal indicada.
+
 ### Ruido de fondo: un umbral que cumplir, no una corrección que aplicar
 
 A diferencia de los métodos de ingeniería, el método de control nunca corrige
@@ -168,24 +303,27 @@ ISO 10140-4 y no debe aplicarse a datos de control. Revisiones anteriores de
 esta guía decían lo contrario, y presentaban la corrección como tarea de quien
 llama; un control corregido así no es conforme y sobrestima el aislamiento.
 
-### Parámetros de `survey_airborne_insulation()` y afines
+El método de tráfico para fachadas es el caso incómodo: el fondo del recinto
+receptor no se separa fácilmente de la señal de tráfico, así que la regla se
+convierte en un deber de diligencia: mantén el ruido de las fuentes del interior
+del edificio tan bajo como sea posible y hazlo constar en el informe si
+sospechas que ha contaminado el resultado, porque solo puede hacer que la
+fachada parezca mejor de lo que es.
 
-| Parámetro | Tipo | Unidades | Rango / def. | Notas |
-| :--- | :--- | :--- | :--- | :--- |
-| `l1` / `l2` | array 1D o 2D | dB | uno/banda, o `(posiciones, bandas)` | Niveles emisor / receptor (o exterior `l1_2m`) |
-| `li` | array 1D o 2D | dB | uno/banda, o `(posiciones, bandas)` | Niveles de impacto (media energética de posiciones) |
-| `reverberation_index` | escalar o array 1D | dB | uno por banda | $k$ de `reverberation_index` o `estimate_reverberation_index`; `survey_service_equipment_level()` también acepta un $k$ escalar |
-| `volume` | float | m³ | > 0 | Volumen receptor $V$ (para $D_n$ / $L'_n$ / $R'$ / normalizadas) |
-| `area` | float | m² | > 0 | Área de partición común $S$ (aéreo $R'$; regla $V/7{,}5$) |
-| `measurements` | array | dB | exactamente 3 | Posiciones de equipo de servicio (`survey_service_equipment_level`) |
-| `room` | str | — | `"kitchen"`/`"bathroom"`/`"furnished"`/`"a"`–`"h"`/`"a+e"`… | Clase de sala para `estimate_reverberation_index` (Tabla 3; el índice en sí es la Tabla 4) |
+### Cuánta exactitud recupera el método de control
 
-`survey_airborne_insulation()` devuelve un `SurveyAirborneResult` (`d`, `d_nt`,
-`d_n`, `r_prime`, `rating`, `r_prime_rating`); `survey_impact_insulation()` un
-`SurveyImpactResult` (`l_i`, `l_nt`, `l_n`, `rating`);
-`survey_facade_insulation()` un `SurveyFacadeResult`;
-`survey_service_equipment_level()` un `SurveyServiceEquipmentResult` (`l_xy`,
-`l_xy_nt`, `l_xy_n`).
+El compromiso con el que abre esta página tiene un tamaño publicado. La NOTA del
+apartado 6.6 afirma que se estima que los resultados del método de control y los
+del método de ingeniería correspondiente concuerdan **dentro de ± 2 dB**, y el
+propio apartado 6.6 exige comprobar de vez en cuando la reproducibilidad del
+procedimiento de acuerdo con ISO 12999-1, en particular tras cualquier cambio de
+procedimiento o de instrumentación, la misma norma sobre la que va la
+[sección de incertidumbre de la guía de campo](/phonometry/es/buildings/insulation/insulation-field/#incertidumbre-de-medicion-iso-12999-1).
+Un índice de reverberación *estimado* se suma a eso: los índices tabulados de la
+Tabla 4 llevan una desviación típica de en torno a 1 dB (NOTA 1 de la Tabla 4),
+y esa dispersión entra directamente en todas las magnitudes de esta página,
+banda a banda. Mide $T$ cuando el resultado tenga que sobrevivir a una disputa;
+estímalo cuando la pregunta sea si una partición está más o menos donde debería.
 
 ## Informes del método de control ISO 10052 (`.report()`)
 
@@ -300,22 +438,32 @@ desde exactamente tres posiciones mediante
 sobre espectros de 5 octavas o 16 tercios; y las fichas del método con
 `.report()`.
 
-**No cubierto.** El propio procedimiento de control (dónde sostener el
-sonómetro, las alturas de medición fijas, la colocación de la máquina de
-impactos del método) no se comprueba: las funciones consumen niveles por
-banda vengan de donde vengan. Nada verifica que se cumpliese el umbral de
-6 dB de señal a fondo del apartado 6.2.1, y no se aplica corrección alguna
-cuando no se cumplió: esa es la regla del propio método, no una omisión. La
-declaración de exactitud
-del método frente a ISO 16283 se cita de la norma, no se modela; cuando
+**No cubierto.** El procedimiento de control de
+[Realizar el control](#realizar-el-control-apartados-5-y-6) está documentado
+aquí, pero no se *comprueba*: las funciones consumen niveles por banda vengan
+de donde vengan, así que nada verifica el barrido, la esquina de la fuente, las
+posiciones de la máquina de impactos ni la receta de una esquina más dos
+centrales de los equipamientos. Tampoco verifica que se cumpliese el
+umbral de 6 dB de señal a fondo del apartado 6.2.1, y no se aplica corrección
+alguna cuando no se cumplió: esa es la regla del propio método, no una omisión.
+La concordancia de ± 2 dB con el método de ingeniería es la estimación de la
+propia norma (NOTA del apartado 6.6), no algo que esta biblioteca modele ni
+propague: ningún resultado de control lleva incertidumbre. Cuando
 sube lo que hay en juego, pasa a
-[Medición del aislamiento en campo (ISO 16283)](/phonometry/es/buildings/insulation/insulation-field/).
+[Medición del aislamiento en campo (ISO 16283)](/phonometry/es/buildings/insulation/insulation-field/),
+cuya maquinaria de ISO 12999-1 sí produce una. El modelo de informe del Anexo A
+y los ciclos de funcionamiento de equipamientos del Anexo B también
+quedan fuera de la biblioteca.
 
 ## Véase también
 
 - [Medición del aislamiento en campo (ISO 16283)](/phonometry/es/buildings/insulation/insulation-field/):
   las mediciones de grado de ingeniería aéreas, de impacto y de fachada que
   este método aproxima, y su incertidumbre ISO 12999-1.
+- [Fuentes de impacto pesadas y blandas](/phonometry/es/buildings/insulation/heavy-impact-sources/):
+  la pelota de caucho del apartado 6.3.2, su nivel de exposición a la fuerza de
+  impacto y el número único del Anexo D de ISO 717-2 que declara la rama
+  pesada/blanda del control.
 - [Índices globales de aislamiento (ISO 717)](/phonometry/es/buildings/insulation/insulation-ratings/):
   los motores de curva de referencia tras los índices del método de control.
 - [Acústica de salas](/phonometry/es/buildings/rooms/room-acoustics/): los tiempos de

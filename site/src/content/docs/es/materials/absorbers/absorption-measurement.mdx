@@ -52,23 +52,55 @@ datos de los absorbentes. Y como un coeficiente sin su incertidumbre es solo
 medio resultado, ISO 12999-2 aporta la **incertidumbre de medida** de ambos.
 La contraparte a incidencia normal medida sobre muestras pequeñas vive en la
 guía del [tubo de impedancia](/phonometry/es/materials/absorbers/impedance-tube/); la
-sección final explica cuándo cada uno de los dos es la herramienta adecuada.
+sección final, después de la incertidumbre, explica cuándo cada uno de los dos
+es la herramienta adecuada y por qué los dos números no coinciden.
 
 ## 1. Medición en cámara reverberante (ISO 354)
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_iso354_room_es.svg" alt="Planta de una cámara reverberante ISO 354 con paredes no paralelas: la probeta rectangular de 10,8 metros cuadrados sobre el suelo, con sus bordes deliberadamente no paralelos a los bordes de la sala y una separación de 0,75 metros acotada hasta el paramento más cercano, tres posiciones de micrófono y dos posiciones de altavoz con sus reglas de separación, paneles difusores suspendidos cerca del techo, un recuadro que muestra la sala vacía dando T1 y A1 sobre la sala con la probeta dando T2 y A2, y una franja que compara en sección los montajes de tipo A y de tipo E-400" width="92%" loading="eager" />
 
 La medición en cámara reverberante propiamente dicha es
 `measure_sound_absorption`. Toma el tiempo de reverberación en tercios de
 octava de la sala vacía ($T_1$) y de la sala con la probeta instalada ($T_2$),
 el volumen de la sala $V$ y el área de la probeta $S$, y devuelve un
-`SoundAbsorptionMeasurement` inmutable. Las áreas de absorción equivalente
-salen de la ecuación de Sabine (ISO 354:2003 Ec. (5)/(7)),
-$A = 55{,}3\,V/(c\,T) - 4\,V\,m$, con la velocidad del sonido de la Ec. (6),
-$c = 331 + 0{,}6\,t$; el coeficiente de absorción acústica es
-$\alpha_s = (A_2 - A_1)/S$ (Ec. (8)/(9)). El coeficiente puede superar 1,0 por
-efectos de borde y difracción (apartado 3.7 NOTA 2) y nunca se recorta. La
-atenuación del aire entra solo por el coeficiente por banda $m$ (por defecto 0,
-la referencia sin atenuación); pasa `attenuation_from_alpha` de un valor de
-ISO 9613-1 cuando haga falta.
+`SoundAbsorptionMeasurement` inmutable. Las áreas de absorción acústica
+equivalente salen de la ecuación de Sabine (ISO 354:2003 Ecs. (5) y (7)), y el
+coeficiente, de su diferencia (Ecs. (8)/(9)):
+
+$$
+A = \frac{55{,}3\ V}{c\ T} - 4 V m, \qquad
+\alpha_s = \frac{A_2 - A_1}{S}, \qquad c = 331 + 0{,}6\ t ,
+$$
+
+con $c$ la velocidad del sonido construida a partir de la temperatura del aire
+de la sala $t$ en °C (Ec. (6), válida de 15 a 30 °C) y $m$ el coeficiente de
+atenuación en potencia del aire en 1/m. El coeficiente puede superar 1,0 por
+efectos de borde y difracción (apartado 3.7 NOTA 2) y nunca se recorta; la
+[sección final](#tubo-o-camara-reverberante) explica por qué.
+
+**El término de atenuación del aire $m$, y por qué el 0 por defecto no es un
+atajo.** $\alpha_s$ es una *diferencia* de dos áreas de absorción, así que una
+misma $m$ entra igual en $A_1$ y en $A_2$ y el término $-4Vm$ se cancela de
+forma exacta: `measure_sound_absorption` propaga una única $m$ a las dos, y por
+eso el valor por defecto $m = 0$ no cambia nada mientras los dos decaimientos
+se hayan medido con el mismo clima. Solo sobrevive la diferencia $m_2 - m_1$,
+que es la razón por la que el apartado 6.3.2 pide medir $T_1$ y $T_2$ a
+temperatura y humedad relativa casi iguales, dentro de
+$30\ \% \le \text{HR} \le 90\ \%$ y con $t \ge 15$ °C durante todo el ensayo.
+El término en sí es cualquier cosa menos pequeño: para la sala de 200 m³ del
+ejemplo de abajo a 21,4 °C y 54 % de HR, la atenuación de ISO 9613-1 hace que
+$4Vm$ valga unos 0,9 m² a 1 kHz, 4,9 m² a 4 kHz y 7,2 m² a 5 kHz, frente a un
+área de absorción de la sala vacía de unos 7,7 m² en esa banda superior. Unas
+pocas unidades de humedad de deriva entre las dos tandas mueven por tanto
+$\alpha_s$ más que la mayor parte del efecto que se está midiendo. Cuando el
+clima sí ha derivado, baja a `absorption_coefficient` y aporta un valor
+distinto por medición como `m1`/`m2` (con `temperature1`/`temperature2`);
+`measure_sound_absorption` supone un único clima. La $m$ por banda sale de una
+atenuación $\alpha$ de ISO 9613-1 en dB/m
+(`environment.air_attenuation(freqs, temperature=21.4,
+relative_humidity=54.0, pressure=101.325)`) convertida con
+`materials.attenuation_from_alpha(alpha)`, que es la propia
+$m = \alpha/(10 \lg e)$ de ISO 354.
 
 La ISO 354 es una caracterización: produce el espectro de $\alpha_s$, no un
 número único. El coeficiente ponderado $\alpha_w$ es una magnitud de la
@@ -86,11 +118,11 @@ t_empty = np.array([9.0, 9.0, 8.8, 8.6, 8.4, 8.2, 8.0, 7.8, 7.5, 7.2,
 t_specimen = np.array([8.4, 8.2, 7.7, 7.2, 6.5, 5.7, 4.9, 4.2, 3.6, 3.15,
                        2.85, 2.65, 2.55, 2.5, 2.55, 2.6, 2.7, 2.85])
 
-m = materials.measure_sound_absorption(
+meas = materials.measure_sound_absorption(
     freqs, t_empty, t_specimen, volume=200.0, area=10.8, temperature=20.0
 )
-print(m.alpha_s[7])   # alpha_s a 500 Hz: 0.328...
-m.plot()              # alpha_s frente a la frecuencia en tercios de octava
+print(meas.alpha_s[7])   # alpha_s a 500 Hz: 0.328...
+meas.plot()              # alpha_s frente a la frecuencia en tercios de octava
 ```
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sound_absorption_measurement_es.svg" alt="Absorción acústica en cámara reverberante ISO 354: el espectro de alpha_s de una probeta de absorbente poroso en las bandas de tercio de octava de 100 Hz a 5000 Hz, subiendo desde casi cero a baja frecuencia hasta un máximo ancho en torno a 0,69 cerca de 1600 Hz y suavizándose por encima" width="80%" />
@@ -115,17 +147,17 @@ t_empty = np.array([9.0, 9.0, 8.8, 8.6, 8.4, 8.2, 8.0, 7.8, 7.5, 7.2,
                     6.9, 6.6, 6.2, 5.8, 5.4, 5.0, 4.6, 4.2])
 t_specimen = np.array([8.4, 8.2, 7.7, 7.2, 6.5, 5.7, 4.9, 4.2, 3.6, 3.15,
                        2.85, 2.65, 2.55, 2.5, 2.55, 2.6, 2.7, 2.85])
-m = materials.measure_sound_absorption(
+meas = materials.measure_sound_absorption(
     freqs, t_empty, t_specimen, volume=200.0, area=10.8, temperature=20.0
 )
 
 # Una línea: el espectro de alpha_s sobre el eje de bandas de tercio de octava.
-m.plot(language="es")
+meas.plot(language="es")
 plt.show()
 
 # A mano, desde los campos del resultado:
 fig, ax = plt.subplots()
-ax.plot(np.arange(freqs.size), m.alpha_s, "o-")
+ax.plot(np.arange(freqs.size), meas.alpha_s, "o-")
 ax.set_xticks(np.arange(freqs.size))
 ax.set_xticklabels([f"{f:g}" if f < 1000 else f"{f/1000:g}k" for f in freqs],
                    rotation=45)
@@ -136,6 +168,157 @@ plt.show()
 
 </details>
 
+
+### 1.1 Cómo se miden en realidad $T_1$ y $T_2$ (apartado 7)
+
+Los dos tiempos de reverberación son medidas de decaimiento corrientes (la
+maquinaria es la que se describe en
+[acústica de salas](/phonometry/es/buildings/rooms/room-acoustics/)), pero la
+ISO 354 restringe la geometría y el promediado mucho más de lo que lo hace un
+ensayo general de sala, porque todo el resultado es la *diferencia* de dos
+números que a baja frecuencia son casi iguales.
+
+**Dónde van los transductores (apartado 7.1).** Tanto los micrófonos como la
+fuente sonora son omnidireccionales. Las posiciones de micrófono están
+separadas al menos 1,5 m entre sí, 2 m de cualquier fuente sonora y 1 m de
+cualquier paramento de la sala *y de la probeta*; las posiciones de fuente
+están separadas al menos 3 m. Las curvas de decaimiento medidas en posiciones
+de micrófono distintas no deben combinarse de ninguna manera: son decaimientos
+separados, promediados solo como tiempos de reverberación.
+
+**Cuántos decaimientos (apartado 7.1.4).** Al menos doce curvas de decaimiento
+espacialmente independientes: el número de posiciones de micrófono por el
+número de posiciones de fuente debe llegar a 12, con un mínimo de tres
+posiciones de micrófono y dos de fuente. Se pueden excitar varias fuentes a la
+vez si sus potencias radiadas coinciden dentro de 3 dB en todas las bandas de
+tercio de octava, y eso permite bajar a seis curvas.
+
+**Cómo se excita la sala (apartado 7.2 o 7.3).** Se admiten dos métodos. El
+método de *ruido interrumpido* alimenta un altavoz con ruido de espectro
+continuo, de banda ancha o de banda limitada: con ruido de banda ancha y un
+analizador en tiempo real, los niveles de presión acústica resultantes deben
+diferir en menos de 6 dB entre bandas de tercio de octava adyacentes, y el
+ruido de banda limitada debe tener al menos un tercio de octava de ancho. La
+excitación debe durar lo suficiente para alcanzar el régimen permanente (al
+menos la mitad del tiempo de reverberación esperado) y arrancar lo bastante
+alto como para que el fondo del rango de evaluación siga despejando el ruido de
+fondo en 10 dB. Como un único decaimiento interrumpido es una muestra
+estadística, promediar en una misma posición de micrófono y fuente es
+obligatorio: **al menos tres** decaimientos, y al menos diez si la
+repetibilidad ha de igualar la del otro método. El método de la *respuesta al
+impulso integrada* (un barrido o una secuencia de longitud máxima
+deconvolucionada en la respuesta al impulso) es determinista y no necesita
+ningún promediado, y por eso es el método preferible cuando la instrumentación
+lo permite.
+
+**Cómo se lee cada decaimiento (apartado 7.4.1).** Por banda: arrancar 5 dB por
+debajo del nivel inicial, evaluar sobre un rango de 20 dB y mantener el extremo
+inferior de ese rango al menos 10 dB por encima del ruido de fondo global; es
+decir, un $T_{20}$ extrapolado a 60 dB. $T_1$ y $T_2$ son entonces la media
+aritmética sobre todas las medidas de esa banda, con al menos dos decimales
+(apartado 8.1.1).
+
+**Y luego, otra vez.** Toda la retícula se repite con la probeta instalada y
+*sin cambiar nada más*: mismas posiciones, misma excitación, mismo clima.
+Cualquier diferencia entre las dos tandas que no sea la probeta acaba dentro de
+$A_2 - A_1$ y se declara como absorción.
+
+### 1.2 La probeta y su montaje (apartado 6.2 y Anexo B)
+
+**Geometría (apartado 6.2.1).** La superficie de ensayo está entre 10 m² y
+12 m²; por encima de un volumen de sala de 200 m³ el límite *superior* se
+multiplica por $(V/200)^{2/3}$, y una probeta poco absorbente debería usar el
+límite superior. La probeta es rectangular, con una relación anchura-longitud
+entre 0,7 y 1, colocada de modo que ninguna parte quede a menos de 1 m de un
+paramento de la sala y nunca a menos de 0,75 m, y con sus bordes preferiblemente
+*no* paralelos al borde de sala más cercano: las dos reglas existen para
+mantener la probeta fuera de los máximos de presión de los paramentos. Una
+probeta pesada puede, en su lugar, apoyarse verticalmente contra una pared
+descansando sobre el suelo, y entonces la separación de 0,75 m no se aplica.
+
+**El montaje es parte del resultado.** El Anexo B es normativo y define el
+catálogo de montajes que cita una hoja de características:
+
+| Tipo | Qué es |
+| :--- | :--- |
+| A | Probeta apoyada o fijada directamente contra un paramento de la sala, normalmente el suelo de la cámara reverberante, sin cámara de aire |
+| B | Pegada a una placa de yeso con pelladas de adhesivo y calzos de 3 mm en las cuatro esquinas, de modo que se conserva una cámara de aire delgada |
+| E-*xxx* | Montada sobre una cámara de aire estanca en un bastidor de al menos 20 kg/m²; el sufijo es la distancia en milímetros desde la **cara expuesta** de la probeta hasta el paramento de la sala que tiene detrás; se ensaya a E-200, E-300 o E-400 |
+| G-*xxx* | Colgada paralela a un paramento de la sala (cortinas, colgaduras, estores); el sufijo es de nuevo la distancia de la cara al paramento; se ensaya a G-100, y las demás separaciones en múltiplos de 50 mm |
+| I | Materiales proyectados o aplicados con llana, aplicados sobre un soporte y ensayados después como un tipo A con marco |
+| J | Absorbentes unitarios (almohadillas y bafles) en dos o tres filas paralelas sobre 10 m² a 15 m² de suelo, rodeados de una barrera no absorbente |
+
+El sufijo es una profundidad de cámara, y la profundidad de cámara mueve la
+respuesta más que la mayoría de las elecciones de material. Predecir la misma
+manta de 50 mm ($\sigma = 20$ kPa·s/m²) con los
+[modelos multicapa](/phonometry/es/materials/absorbers/porous-absorbers/) da
+$\alpha_w = 0{,}70(\text{H})$, clase C, tendida como tipo A, y
+$\alpha_w = 0{,}90$, clase A, sobre un montaje tipo E-400: dos clases para un
+mismo producto, porque los 350 mm de aire que quedan detrás llevan la capa al
+máximo de velocidad de partícula a 250 Hz (donde el coeficiente predicho pasa
+de 0,37 a 0,86). Un $\alpha_s$ o un $\alpha_w$ citados sin su montaje no son,
+por tanto, una propiedad del material, sino un resultado de instalación, y por
+eso el campo `mounting` de la ficha de abajo no es decoración.
+
+**El borde perimetral (Anexo B.2).** Los bordes de la probeta deben sellarse o
+cubrirse para que no absorban, *salvo* que el producto se instale normalmente
+con los bordes vistos, en cuyo caso quedan abiertos y el área de los bordes se
+suma a $S$. En cualquier caso, el tratamiento va al informe. Cuando se usa un
+marco reflectante, debe ser macizo y no hueco, sin cámara de aire entre marco,
+probeta y paramento de la sala, de al menos 1,0 mm de acero o 12,5 mm de placa
+de yeso o de madera, bien tope a tope y sellado, y con su cara expuesta
+enrasada con la cara de la probeta. Hay una consecuencia fácil de pasar por
+alto: el apartado 6.2.1.3 exige que la medición de la **sala vacía** se haga
+*sin* el marco ni los laterales de la probeta (con la excepción de la barrera
+de un montaje tipo J), o la absorción del propio marco nunca se cancela en
+$A_2 - A_1$.
+
+### 1.3 ¿Es la sala apta para medir? (apartado 6.1 y Anexo A)
+
+Tres comprobaciones deciden si una sala puede usarse siquiera, y esta
+biblioteca no realiza ninguna: `measure_sound_absorption` solo emite un
+`AbsorptionWarning` de aviso sobre el volumen y el área de la probeta.
+
+1. **Volumen y forma (apartados 6.1.1 y 6.1.2).** $V \ge 150$ m³, y para una
+   sala nueva se recomienda encarecidamente al menos 200 m³; por encima de unos
+   500 m³ las bandas de alta frecuencia pierden exactitud porque la absorción
+   del aire domina el decaimiento. La forma debe cumplir
+   $l_\text{max} < 1{,}9\,V^{1/3}$, con $l_\text{max}$ la línea recta más larga
+   dentro de la sala (la diagonal mayor de una sala rectangular), y dos
+   dimensiones cualesquiera de la sala no deben guardar una relación de números
+   enteros pequeños: las dos condiciones reparten los modos de baja frecuencia.
+2. **Absorción de la sala vacía (apartado 6.1.4).** $A_1$ no debe superar el
+   techo de la Tabla 1, que es de 6,5 m² de 100 Hz a 800 Hz para una sala de
+   200 m³ y sube pasando por 7,0 m² a 1 kHz hasta 14,0 m² a 5 kHz; para otro
+   volumen, toda la tabla se escala por $(V/200)^{2/3}$. La curva $A_1(f)$ debe
+   además ser suave, sin ningún valle ni pico que difiera más del 15 % de la
+   media de las dos bandas de tercio de octava adyacentes. Es la única
+   comprobación que dice si la sala es de por sí acústicamente lo bastante
+   silenciosa como para ver siquiera una probeta: una sala con fugas, revestida
+   o abarrotada gasta en sí misma su presupuesto de absorción.
+3. **Difusividad (Anexo A).** Los difusores son láminas de baja absorción, de
+   unos 5 kg/m², de 0,8 m² a 3 m² por cara cada una, ligeramente curvadas,
+   orientadas al azar y repartidas por la sala; la alternativa son las palas
+   rotatorias, cuya frecuencia de giro no debe guardar una relación de números
+   enteros pequeños con la frecuencia de repetición de los decaimientos. El
+   procedimiento de cualificación de A.2 es empírico: montar una probeta porosa
+   homogénea de 5 cm a 10 cm de espesor cuya absorción supere 0,9 entre 500 Hz
+   y 4000 Hz, medirla sin difusores, después con unos 5 m² de difusores y
+   después en escalones sucesivos de 5 m², y representar el coeficiente medio
+   entre 500 Hz y 5000 Hz frente al área de difusores. La curva sube y luego se
+   aplana; el óptimo está donde deja de subir. En una sala rectangular eso suele
+   caer entre el 15 % y el 25 % de la superficie total de la sala (contando las
+   dos caras de cada difusor).
+
+**Qué debe llevar el informe (apartado 9).** La ficha de abajo contiene la
+descripción de la probeta, $S$, el montaje, $V$, $c$, la temperatura y la
+humedad y las tablas de $T_1$/$T_2$ y $A_1$/$A_2$ (con `verbose=True`), es
+decir, los puntos (c), (e) en parte, (f) y (g). Cuatro puntos del apartado 9 no
+tienen campo en `ReportMetadata` y debe añadirlos el laboratorio: la forma de la
+sala y su **superficie total** $S_t$, el número y el tamaño de los difusores, el
+número de posiciones de micrófono y de fuente, y el tratamiento dado a los
+bordes de la probeta. Los resultados se declaran con $A_T$ redondeado a 0,1 m² y
+$\alpha_s$ a 0,01 (apartado 8.3).
 
 ### Informe ISO 354 (`.report()`)
 
@@ -165,11 +348,11 @@ decimal).
 ```python
 from phonometry import materials, ReportMetadata
 
-m = materials.measure_sound_absorption(
+meas = materials.measure_sound_absorption(
     freqs, t_empty, t_specimen, volume=200.0, area=10.8,
     temperature=20.0, humidity=54.0,
 )
-m.report(
+meas.report(
     "alpha_s_fiche.pdf",
     metadata=ReportMetadata(
         specimen="Absorbente poroso de 50 mm sobre cámara de aire de 100 mm",
@@ -189,27 +372,18 @@ m.report(
 />
 
 
-## 2. Áreas de absorción a partir de los decaimientos de la sala
+## 2. La misma inversión sobre arrays a secas: `absorption_area` y `absorption_coefficient`
 
-El área de absorción acústica equivalente $A$ que gobierna $R'$, $L'_n$, la
-corrección ambiental $K_2$ de ISO 3744 y el término de absorción de ISO 3741 se
-mide a su vez en una cámara reverberante
-(ISO 354). Mide el tiempo de reverberación de la cámara **vacía** ($T_1$) y de
-nuevo **con la muestra de ensayo instalada** ($T_2$); la absorción de la muestra
-es la diferencia de las dos áreas de Sabine, y dividiendo por el área cubierta
-se obtiene el coeficiente de absorción:
-
-$$
-A = \frac{55{,}3\ V}{c\ T} - 4 V m, \qquad
-\alpha_s = \frac{A_2 - A_1}{S}, \qquad c = 331 + 0{,}6\ t ,
-$$
-
-con $c$ a partir de la temperatura del aire de la cámara $t$ en °C (válida
-15–30 °C) y $m$ el coeficiente de atenuación en potencia del aire (por defecto
-0; convierte un $\alpha$ de ISO 9613-1 en dB/m con `attenuation_from_alpha`).
-Como los efectos de borde y difracción pueden dispersar más energía de la que
-intercepta el área plana de la muestra, $\alpha_s$ puede superar 1,0 y nunca se
-satura (ISO 354 Apartado 3.7).
+La sección 1 devuelve un `SoundAbsorptionMeasurement` completo: lleva los
+metadatos de la sala y de la probeta, se representa a sí mismo y genera la ficha
+ISO 354. Cuando lo único que se quiere es la aritmética (dentro de un bucle, de
+un ajuste, de una importación de hoja de cálculo, o cuando la magnitud de
+interés es el área de absorción equivalente de la propia sala y no un
+coeficiente de probeta), las mismas Ecs. (5) a (9) están expuestas como dos
+funciones de array a secas. El área de absorción equivalente $A$ es además lo
+que gobierna $R'$, $L'_n$, la corrección ambiental $K_2$ de ISO 3744 y el
+término de absorción de ISO 3741, y `absorption_area` es el punto de entrada que
+usan esos cálculos.
 
 ```python
 import numpy as np
@@ -231,6 +405,54 @@ print(np.round(alpha, 3))                      # [0.398 0.448 0.498]
 $T_1$ y $T_2$ son exactamente los tiempos de reverberación que devuelve
 [`room_parameters`](/phonometry/es/buildings/rooms/room-acoustics/), así que una medición de decaimiento ISO 3382-2 de la sala
 vacía y tratada fluye directamente a `absorption_coefficient`.
+
+El objeto de resultado de la sección 1 conserva todos los intermedios de esa
+inversión (`t_empty`, `t_specimen`, `absorption_area_empty` y
+`absorption_area_with_specimen`), y merece la pena mirarlos, porque enseñan
+dónde el método es fuerte y dónde se está quedando sin señal:
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sound_absorption_inversion_es.svg" alt="Dos paneles apilados sobre el eje de tercios de octava de 100 Hz a 5 kHz. El panel superior traza el tiempo de reverberación de la sala vacía T1 y el tiempo con la probeta T2, que casi coinciden a 100 Hz y se separan mucho por encima de 500 Hz. El panel inferior traza las áreas de absorción equivalente A1 y A2 con la diferencia A2 menos A1 rellena entre ambas, y un eje a la derecha que lee el alpha_s resultante" width="86%" />
+
+*Toda la inversión de ISO 354 del ejemplo de la sección 1, dibujada: los dos
+tiempos de decaimiento (arriba) y las dos áreas de Sabine a las que invierten
+(abajo), con la diferencia rellena $A_2 - A_1$ dividida por $S = 10{,}8$ m²
+dando el $\alpha_s$ del eje derecho. A 100 Hz los dos decaimientos difieren en
+0,6 s de 9 s y la banda rellena apenas se ve, que es exactamente la razón de que
+la incertidumbre de la sección 4 sea ahí la peor. Para 1,6 kHz la probeta ha
+reducido el decaimiento a menos de la mitad y la diferencia es inconfundible.*
+
+<details>
+<summary>Mostrar el código de esta figura</summary>
+
+```python
+import matplotlib.pyplot as plt
+
+# `meas` es el SoundAbsorptionMeasurement de la sección 1; toda magnitud que
+# dibuja la figura es un campo suyo.
+fig, (ax_t, ax_a) = plt.subplots(2, 1, sharex=True, figsize=(10, 7))
+band = np.arange(freqs.size)
+ax_t.plot(band, meas.t_empty, "o-", label="T1 (sala vacía)")
+ax_t.plot(band, meas.t_specimen, "s-", label="T2 (probeta instalada)")
+ax_t.set_ylabel("Tiempo de reverberación [s]")
+ax_t.legend()
+
+a1 = meas.absorption_area_empty
+a2 = meas.absorption_area_with_specimen
+ax_a.plot(band, a1, "o-", label="A1 (sala vacía)")
+ax_a.plot(band, a2, "s-", label="A2 (con probeta)")
+ax_a.fill_between(band, a1, a2, alpha=0.25, label="A2 - A1")
+ax_a.set_ylabel("Área de absorción equivalente [m$^2$]")
+ax_a.set_xticks(band)
+ax_a.set_xticklabels([f"{f:g}" if f < 1000 else f"{f/1000:g}k" for f in freqs],
+                     rotation=45)
+ax_a.set_xlabel("Frecuencia [Hz]")
+ax_a.legend()
+plt.show()
+
+print(np.round((a2 - a1) / 10.8 - meas.alpha_s, 12).max())   # 0.0: el mismo alpha_s
+```
+
+</details>
 
 Cada uno de esos dos números se lee de un decaimiento, y el clip de abajo
 enseña cómo se lee uno: la respuesta al impulso al cuadrado se integra hacia
@@ -310,6 +532,28 @@ A (0,90–1,00), B (0,80–0,85), C (0,60–0,75), D (0,30–0,55), E (0,15–0,
 clasificado» (0,00–0,10). Como $\alpha_w$ es siempre un múltiplo de $0{,}05$, estos
 rangos particionan la rejilla de forma exacta.
 
+**Lo que la valoración no puede decir.** La ISO 11654 acota su alcance en el
+apartado 1.2, y los cuatro límites que enuncia ahí son exactamente los casos con
+los que se topa quien ejerce. La curva de referencia arranca en la octava de
+250 Hz, así que todo lo que la probeta hace entre 100 Hz y 200 Hz queda fuera de
+la valoración por construcción, y la norma dice que la valoración «no es
+apropiada por debajo de esta frecuencia»; un tratamiento de graves y un panel de
+medias frecuencias pueden compartir $\alpha_w$ y diferir en medio coeficiente a
+125 Hz. La valoración tampoco es «aplicable a menos que las aplicaciones cubran
+todo el rango de frecuencias de la curva de referencia»: si solo importa una
+parte del rango, la norma devuelve al lector al espectro, y señala los
+indicadores de forma como la pista de que un $\alpha_w$ modesto con una `(L)`
+puede ser el mejor producto para un problema de baja frecuencia. Está acotada a
+aplicaciones *rutinarias* (oficinas normales, pasillos, aulas, hospitales) y se
+declara inapropiada para los «entornos cualificados que requieren un diseño
+acústico cuidadoso por parte de un especialista», donde solo sirve el espectro
+completo. Y «a menudo no es adecuada para aplicarla a elementos individuales,
+como sillas, bafles, etc.» (cuya absorción es un área equivalente por objeto y
+no un coeficiente) «ni es aplicable a barreras de carretera ni a pavimentos de
+carretera», que tienen [EN 1793-1](#incertidumbre-de-medida-de-la-absorcion) e
+[ISO 13472](/phonometry/es/materials/surfaces/road-absorption/) propias. Por eso
+la ficha imprime siempre el espectro completo junto al número único.
+
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/absorption_rating_es.svg" alt="Valoración ponderada de absorción acústica de ISO 11654: el espectro de absorción práctica trazado frente a la curva de referencia desplazada de 250 Hz a 4000 Hz, con la desviación desfavorable a 250 Hz sombreada y el coeficiente ponderado alpha_w leído a 500 Hz" width="80%" />
 
 *El ejemplo resuelto del Anexo A.2: la curva de referencia se desplaza hacia
@@ -373,6 +617,25 @@ print(result.rating_label)          # 0.60(M)
 print(result.third_octave_alpha_s)  # el alpha_s de entrada, retenido para la ficha
 ```
 
+**¿Es ese un buen número?** La absorción sigue al espesor frente a la longitud
+de onda, así que cada vez que se quiere bajar una octava la frecuencia útil hay
+que doblar el espesor o la profundidad de cámara, y la escalera es corta.
+Predecir un material de la clase de la lana mineral ($\sigma = 20$ kPa·s/m²)
+pegado contra una pared con los
+[modelos multicapa](/phonometry/es/materials/absorbers/porous-absorbers/) da un
+coeficiente de incidencia aleatoria a 500 Hz de unos 0,32 para una manta de
+25 mm, 0,68 para 50 mm y 0,89 para 100 mm; a 250 Hz esos mismos tres dan 0,14,
+0,37 y 0,74. Separar la capa de 50 mm de la pared sobre una cámara de 100 mm
+sube su valor a 250 Hz de 0,37 a 0,68: la cámara compra aproximadamente la
+octava que habría comprado doblar el material. Una superficie dura pintada o
+sellada se queda en unas pocas centésimas en todo el rango. La lectura práctica:
+la clase A es casi siempre una construcción gruesa o separada de la pared, y no
+una superficie ingeniosa; y una probeta delgada que declara un $\alpha_s$ de
+medias frecuencias por encima de 1,1, o una cola creciente en baja frecuencia,
+está enseñando un efecto de borde o una fuga de montaje, no un buen material.
+Los valores medidos según ISO 354 corren además por encima de estos predichos,
+en torno a 0,1 a 0,2 en las bandas medias, por la razón de muestra finita que
+expone la sección final.
 
 ### Informe de ISO 11654 (`.report()`)
 
@@ -432,6 +695,128 @@ el repositorio; pulsa la vista previa para abrir el PDF.
 />
 
 
+<span id="incertidumbre-de-medida-de-la-absorcion"></span>
+
+## 4. Incertidumbre de medida de la absorción (ISO 12999-2)
+
+Un coeficiente de absorción valorado significa poco sin su incertidumbre. La
+ISO 12999-2:2020 da la incertidumbre típica $u$ de las magnitudes que produce una
+medida en cámara reverberante (ISO 354) y sus valoraciones (ISO 11654, EN 1793-1),
+estimada a partir de ensayos interlaboratorio según ISO 5725. Es la compañera,
+en absorción acústica, de la incertidumbre de aislamiento de la ISO 12999-1
+([Medición del aislamiento en campo (ISO 16283)](/phonometry/es/buildings/insulation/insulation-field/)).
+
+**Bandas de tercio de octava (apartado 5).** Para el coeficiente de absorción, la
+desviación típica de reproducibilidad es $\sigma_R = m_R\,\alpha_s + n_R$
+(fórmula (1)), y para el área de absorción equivalente
+$\sigma_R = m_R\,A_T + n_R\,S$ con $S = 10\ \text{m}^2$ (fórmula (2)), donde
+$m_R$ y $n_R$ son las constantes de regresión dependientes de la frecuencia de
+la Tabla 1 (63–5000 Hz), que nada tienen que ver con el coeficiente de
+atenuación en potencia del aire $m$ de la sección 1: comparten la letra que usan
+las normas, no su significado. El valor de repetibilidad es
+$\sigma_r = 0{,}6\,\sigma_R$ (fórmula (3)). Conviene fijarse en que el término
+$n_R$ de la fórmula (2) va multiplicado por un área de referencia *fija* de
+10 m² y no por el área de la propia probeta, de modo que el $A_T$ de una probeta
+pequeña es proporcionalmente mucho menos cierto que el de una grande, que es una
+razón más por la que ISO 354 sujeta la superficie de ensayo entre 10 m² y 12 m².
+
+**Coeficiente práctico (apartado 6).** Para el coeficiente práctico de ISO 11654,
+$\sigma_R = m_R\,\alpha_p + n_R$ en bandas de octava con las constantes de la
+Tabla 2 (250–4000 Hz); de nuevo $\sigma_r = 0{,}6\,\sigma_R$. La Tabla 2 cubre
+solo esas cinco octavas, así que la octava de 125 Hz no tiene incertidumbre
+tabulada y `practical_coefficient_uncertainty` la rechaza en lugar de devolver
+un hueco.
+
+**Números únicos (apartado 7).** El coeficiente ponderado $\alpha_w$ tiene una
+incertidumbre típica constante ($\sigma_R = 0{,}035$, $\sigma_r = 0{,}020$); la
+valoración de número único $DL_{\alpha,\text{NRD}}$ de EN 1793-1 escala con el
+valor ($\sigma_R = 0{,}10\,DL_\alpha$, $\sigma_r = 0{,}02\,DL_\alpha$).
+
+**Declaración (apartado 8).** La incertidumbre expandida es $U = k\,u$
+(fórmula (10)) con el factor de cobertura $k$ de la Tabla 3 ($k = 2{,}0$ al 95 %,
+gaussiano; para otra confianza, léela de esa misma tabla con
+`absorption_coverage_factor`, que devuelve 2,6 al 99 %). El $U$ declarado se
+redondea a dos decimales para los coeficientes de absorción y a un decimal para
+el área equivalente y $DL_{\alpha,\text{NRD}}$.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/absorption_uncertainty_es.svg" alt="Incertidumbre del coeficiente de absorción acústica ISO 12999-2: el espectro medido de alpha_s en bandas de tercio de octava de 63 Hz a 5000 Hz con una banda sombreada de más-menos U con factor de cobertura k = 2, reproduciendo el ejemplo resuelto de la Tabla 4 de la norma" width="80%" />
+
+*El ejemplo resuelto de la Tabla 4: el espectro de $\alpha_s$ medido con su
+franja de $\pm U$ a $k = 2$ (95 %), donde $\sigma_R = m_R\,\alpha_s + n_R$ toma
+$m_R$ y $n_R$ de la Tabla 1. La franja es una U poco profunda: $\pm 0{,}33$ en la
+banda de 63 Hz, se estrecha hasta $\pm 0{,}08$ de 250 Hz a 2 kHz y se vuelve a
+abrir hasta $\pm 0{,}16$ a 5 kHz. El ancho lo fija casi por completo la banda y
+no el absorbente: el extremo bajo es el campo modal de la sala, y el extremo
+alto, la absorción del aire por la que hay que corregir los dos decaimientos. El
+$U$ representado es el declarado, redondeado a dos decimales como exige el
+apartado 8.*
+
+<details>
+<summary>Mostrar el código de esta figura</summary>
+
+```python
+import matplotlib.pyplot as plt
+from phonometry import materials
+
+# Ejemplo resuelto de la Tabla 4 de ISO 12999-2: alpha_s por tercio de octava.
+freqs = [63, 80, 100, 125, 160, 200, 250, 315, 400, 500,
+         630, 800, 1000, 1250, 1600, 2000, 2500, 3150, 4000, 5000]
+alpha_s = [0.33, 0.35, 0.39, 0.38, 0.37, 0.36, 0.36, 0.36, 0.43, 0.49,
+           0.58, 0.63, 0.68, 0.71, 0.73, 0.75, 0.77, 0.79, 0.81, 0.81]
+result = materials.sound_absorption_coefficient_uncertainty(alpha_s, freqs, confidence=0.95)
+result.plot(language="es")   # alpha_s con la banda +/-U (k = 2) de reproducibilidad
+plt.show()
+```
+</details>
+
+```python
+from phonometry import materials
+
+# Incertidumbre de reproducibilidad de alpha_s a 1000 Hz (Tabla 1: m=0,040, n=0,015).
+r = materials.sound_absorption_coefficient_uncertainty([0.68], [1000], confidence=0.95)
+print(round(float(r.standard_uncertainty[0]), 4))            # 0.0422 (sigma_R)
+print(float(r.reported_expanded_uncertainty[0]))             # 0.08  (U, k=2)
+r.plot()   # la figura de arriba: alpha_s con su banda +/-U (k = 2)
+
+# Misma banda y mismo valor, pero repitiendo en el propio banco en lugar de en
+# otro laboratorio: sigma_r = 0,6 sigma_R (fórmula (3)).
+rr = materials.sound_absorption_coefficient_uncertainty(
+    [0.68], [1000], condition="repeatability"
+)
+print(round(float(rr.standard_uncertainty[0]), 5))           # 0.02532 = 0.6 x 0.0422
+
+# Las otras dos magnitudes que produce esta página, fórmula (2) y apartado 6.
+at = materials.equivalent_area_uncertainty([12.4], [1000], confidence=0.95)
+print(float(at.reported_expanded_uncertainty[0]))            # 1.3 m^2 sobre A_T = 12.4 m^2
+ap = materials.practical_coefficient_uncertainty(
+    [0.35, 1.00, 0.65, 0.60, 0.55], [250, 500, 1000, 2000, 4000]
+)
+print(list(ap.reported_expanded_uncertainty))                # [0.07, 0.08, 0.08, 0.08, 0.1]
+
+# Valoraciones de número único (ejemplos resueltos del apartado 7).
+print(float(materials.weighted_coefficient_uncertainty(0.70).reported_expanded_uncertainty[0]))  # 0.07
+print(float(materials.single_number_rating_uncertainty(8.1).reported_expanded_uncertainty[0]))   # 1.6
+```
+
+**Qué significan esos números.** Una incertidumbre expandida de 0,08 sobre un
+$\alpha_s$ de tercio de octava es una afirmación sobre *dos* laboratorios:
+midiendo el mismo producto, ambos correctamente, pueden declarar legítimamente
+0,64 y 0,72, de modo que una especificación escrita con dos decimales no es
+contrastable, y un valor de hoja de características que falle frente a tu propia medida
+por menos que la $U$ combinada es acuerdo, no discrepancia. Dentro de un mismo
+laboratorio se aplica en su lugar la cifra de repetibilidad, 0,6 del valor de
+reproducibilidad, una dispersión un 40 % más estrecha, así que una repetición en
+tu propio banco que caiga fuera de la banda estrecha señala a la probeta, al
+montaje o a la sala, no al método. Los números únicos son peores de lo que
+parecen: $U(\alpha_w) = 0{,}07$ supera el paso de 0,05 con el que se cita
+$\alpha_w$, de modo que un producto medido en 0,85 (clase B) no se distingue de
+otro en 0,90 (clase A) con un solo ensayo. Un concurso que se juegue a una letra
+de clase es un concurso decidido por el ruido de la medida; pide en su lugar el
+espectro y la incertidumbre, y cita $U$ junto a $\alpha_w$ en la ficha.
+
+
+<span id="tubo-o-camara-reverberante"></span>
+
 ## ¿Tubo o cámara reverberante?
 
 El tubo y la cámara reverberante entregan ambos un número llamado «coeficiente
@@ -467,6 +852,41 @@ Lo que eso no puede hacer es cubrir una capa de **reacción volumétrica**, dond
 el comportamiento oblicuo depende de la refracción dentro del material y la
 integral hay que evaluarla ángulo a ángulo a partir de un modelo:
 `diffuse_field_absorption`, en la misma página.
+
+Merece la pena ver el tamaño de la brecha, porque «suele salir más alto» no es
+una afirmación útil de diseño:
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diffuse_field_absorption_es.svg" alt="Coeficiente de absorción de una capa porosa de 50 mm con respaldo rígido frente a la frecuencia de 125 Hz a 4 kHz: el promedio de Paris a incidencia aleatoria queda por encima de la curva a incidencia normal, y las dos convergen a medida que la capa se hace gruesa frente a la longitud de onda" width="80%" />
+
+*Lo que lee el tubo y lo que lee la cámara, para la misma capa porosa de 50 mm
+con respaldo rígido ($\sigma = 20$ kPa·s/m², Miki): el tubo mide $\alpha(0°)$,
+la curva discontinua, mientras que la cámara mide el promedio de Paris sobre
+todos los ángulos, la continua. La brecha es más ancha donde la capa es delgada
+frente a la longitud de onda, justo la región de baja frecuencia en la que un
+número a incidencia normal sustituido en un presupuesto de Sabine o de
+EN 12354-6 subestimaría la absorción instalada, y se cierra a medida que la capa
+se hace eléctricamente gruesa. Es una comparación de modelos sobre una capa
+infinita, así que es una cota inferior de la diferencia real: una probeta finita
+según ISO 354 le suma encima el efecto de borde.*
+
+<details>
+<summary>Mostrar el código de esta figura</summary>
+
+```python
+import matplotlib.pyplot as plt
+
+# Una capa porosa de 50 mm sobre respaldo rígido, predicha de las dos maneras.
+f = np.geomspace(125.0, 4000.0, 200)
+layers = [materials.PorousLayer(0.05, materials.miki(f, 20000.0))]
+normal = materials.layered_absorber(f, layers)
+diffuse = materials.diffuse_field_absorption(f, layers)
+ax = diffuse.plot(language="es")
+ax.plot(f, normal.absorption, ls="--", label="Incidencia normal")
+ax.legend()
+plt.show()
+```
+
+</details>
 
 **Por qué los valores de ISO 354 superan 1.** Un cociente de energía absorbida
 sobre incidente no puede superar la unidad y, sin embargo, los informes de
@@ -511,71 +931,6 @@ de $\alpha_s$: alimentar coeficientes a incidencia normal en un presupuesto de
 Sabine o de EN 12354-6 subestima sistemáticamente la absorción instalada.
 
 
-## 4. Incertidumbre de medida de la absorción (ISO 12999-2)
-
-Un coeficiente de absorción valorado significa poco sin su incertidumbre. La
-ISO 12999-2:2020 da la incertidumbre típica $u$ de las magnitudes que produce una
-medida en cámara reverberante (ISO 354) y sus valoraciones (ISO 11654, EN 1793-1),
-estimada a partir de ensayos interlaboratorio según ISO 5725. Es la compañera,
-en absorción acústica, de la incertidumbre de aislamiento de la ISO 12999-1
-([Medición del aislamiento en campo (ISO 16283)](/phonometry/es/buildings/insulation/insulation-field/)).
-
-**Bandas de tercio de octava (apartado 5).** Para el coeficiente de absorción, la
-desviación típica de reproducibilidad es $\sigma_R = m\,\alpha_s + n$ (fórmula (1)),
-y para el área de absorción equivalente $\sigma_R = m\,A_T + n\,S$ con
-$S = 10\ \text{m}^2$ (fórmula (2)), donde $m$ y $n$ son las constantes dependientes
-de la frecuencia de la Tabla 1 (63–5000 Hz). El valor de repetibilidad es
-$\sigma_r = 0{,}6\,\sigma_R$ (fórmula (3)).
-
-**Coeficiente práctico (apartado 6).** Para el coeficiente práctico de ISO 11654,
-$\sigma_R = m\,\alpha_p + n$ en bandas de octava con las constantes de la Tabla 2
-(250–4000 Hz); de nuevo $\sigma_r = 0{,}6\,\sigma_R$.
-
-**Números únicos (apartado 7).** El coeficiente ponderado $\alpha_w$ tiene una
-incertidumbre típica constante ($\sigma_R = 0{,}035$, $\sigma_r = 0{,}020$); la
-valoración de número único $DL_{\alpha,\text{NRD}}$ de EN 1793-1 escala con el
-valor ($\sigma_R = 0{,}10\,DL_\alpha$, $\sigma_r = 0{,}02\,DL_\alpha$).
-
-**Declaración (apartado 8).** La incertidumbre expandida es $U = k\,u$
-(fórmula (10)) con el factor de cobertura $k$ de la Tabla 3 ($k = 2{,}0$ al 95 %,
-gaussiano). El $U$ declarado se redondea a dos decimales para los coeficientes de
-absorción y a un decimal para el área equivalente y $DL_{\alpha,\text{NRD}}$.
-
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/absorption_uncertainty_es.svg" alt="Incertidumbre del coeficiente de absorción acústica ISO 12999-2: el espectro medido de alpha_s en bandas de tercio de octava de 63 Hz a 5000 Hz con una banda sombreada de más-menos U con factor de cobertura k = 2, reproduciendo el ejemplo resuelto de la Tabla 4 de la norma" width="80%" />
-
-<details>
-<summary>Ver el código de esta figura</summary>
-
-```python
-import matplotlib.pyplot as plt
-from phonometry import materials
-
-# Ejemplo resuelto de la Tabla 4 de ISO 12999-2: alpha_s por tercio de octava.
-freqs = [63, 80, 100, 125, 160, 200, 250, 315, 400, 500,
-         630, 800, 1000, 1250, 1600, 2000, 2500, 3150, 4000, 5000]
-alpha_s = [0.33, 0.35, 0.39, 0.38, 0.37, 0.36, 0.36, 0.36, 0.43, 0.49,
-           0.58, 0.63, 0.68, 0.71, 0.73, 0.75, 0.77, 0.79, 0.81, 0.81]
-result = materials.sound_absorption_coefficient_uncertainty(alpha_s, freqs, confidence=0.95)
-result.plot(language="es")   # alpha_s con la banda +/-U (k = 2) de reproducibilidad
-plt.show()
-```
-</details>
-
-```python
-from phonometry import materials
-
-# Incertidumbre de reproducibilidad de alpha_s a 1000 Hz (Tabla 1: m=0,040, n=0,015).
-r = materials.sound_absorption_coefficient_uncertainty([0.68], [1000], confidence=0.95)
-print(round(float(r.standard_uncertainty[0]), 4))            # 0.0422 (sigma_R)
-print(float(r.reported_expanded_uncertainty[0]))             # 0.08  (U, k=2)
-r.plot()   # la figura de arriba: alpha_s con su banda +/-U (k = 2)
-
-# Valoraciones de número único (ejemplos resueltos del apartado 7).
-print(float(materials.weighted_coefficient_uncertainty(0.70).reported_expanded_uncertainty[0]))  # 0.07
-print(float(materials.single_number_rating_uncertainty(8.1).reported_expanded_uncertainty[0]))   # 1.6
-```
-
-
 ## Qué cubre esta guía
 
 **Cubierto.** La inversión de Sabine de ISO 354:2003 (Ecs. (5)-(9)) en
@@ -587,23 +942,32 @@ el desplazamiento de la curva de referencia del apartado 4.2, los
 indicadores de forma del apartado 4.3 y la clase de absorción de la
 Tabla B.1, construidos por `weighted_absorption` y
 `weighted_absorption_from_third_octave`. Las fórmulas de incertidumbre de
-medida de ISO 12999-2:2020 (apartados 5-8) para los coeficientes de tercio
-de octava y prácticos y para las valoraciones de número único, en
-`sound_absorption_coefficient_uncertainty`,
-`weighted_coefficient_uncertainty` y `single_number_rating_uncertainty`.
+medida de ISO 12999-2:2020 (apartados 5-8), una función por magnitud:
+`sound_absorption_coefficient_uncertainty` (fórmula (1)),
+`equivalent_area_uncertainty` (fórmula (2)),
+`practical_coefficient_uncertainty` (apartado 6),
+`weighted_coefficient_uncertainty` y `single_number_rating_uncertainty`
+(apartado 7), cada una admitiendo `condition="reproducibility"` o
+`"repeatability"` para la fórmula (3), con el factor de cobertura de la Tabla 3
+en `absorption_coverage_factor`.
 
 **No cubierto.** Nada de *esta* página consume una impedancia superficial
 medida: la conversión de un resultado de tubo al coeficiente estadístico
 $\alpha_{st}$ vive con los modelos de predicción (`statistical_absorption` para
 una superficie de reacción local, `diffuse_field_absorption` para una de
 reacción volumétrica), y ninguno de los dos sustituye a una medición según
-ISO 354, porque ninguno reproduce el efecto de borde. Los requisitos de
-cualificación de la sala de ISO 354 (Anexo A:
-número de posiciones de altavoz y micrófono, elementos difusores) no se
-comprueban; `absorption_area`/`absorption_coefficient` solo convierten una
-pareja $T_1$/$T_2$ ya medida y emiten un aviso cuando el volumen de la sala o
-el área de la probeta salen de los límites del apartado 6. La fórmula de
-incertidumbre de ISO 12999-2 para la valoración de número único de EN 1793-1
+ISO 354, porque ninguno reproduce el efecto de borde. Los requisitos de sala y
+de probeta del apartado 6 y del Anexo A se *describen* en las secciones 1.2 y
+1.3, pero no se *comprueban*: nada de aquí verifica la regla de forma, el techo
+de la Tabla 1 sobre $A_1$, la cualificación de difusividad ni el número de
+posiciones de micrófono y de fuente, y `absorption_area` /
+`absorption_coefficient` solo convierten una pareja $T_1$/$T_2$ ya medida y
+emiten un aviso cuando el volumen de la sala o el área de la probeta salen de
+los límites del apartado 6. Tampoco entra en el alcance la propia medida del
+decaimiento: los métodos de ruido interrumpido y de respuesta al impulso
+integrada del apartado 7 pertenecen a la
+[acústica de salas](/phonometry/es/buildings/rooms/room-acoustics/). La fórmula
+de incertidumbre de ISO 12999-2 para la valoración de número único de EN 1793-1
 $DL_{\alpha,\text{NRD}}$ está implementada, pero el propio método de medida
 in situ de EN 1793-1 (dispositivos reductores de ruido de tráfico rodado) no
 lo está.

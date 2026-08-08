@@ -111,6 +111,17 @@ El equilibrio es delicado por diseño, y `critical_coupling_design` lo
 resuelve numéricamente en lugar de por tanteo: en la geometría devuelta la
 impedancia normalizada queda en $1 + 0j$ y la reflexión en cero.
 
+Dos longitudes fijan la geometría del panel y aparecen en todas las llamadas de
+abajo. El **paso de red** `lattice_step` = $a$ es la separación entre
+resonadores sucesivos *a lo largo* de una ranura, así que una ranura cargada
+con $N$ resonadores tiene $L = N a$ de profundidad; eso, y no la cavidad del
+propio resonador, es lo que hace que el panel del ejemplo tenga 30 mm de
+espesor. El **periodo** `period` = $d$ es la separación entre ranuras *a lo
+ancho* de la cara del panel, de modo que una ranura de altura $h$ sirve a cada
+periodo y la cara frontal se refiere al área de celda $S_0 = d\,a$. El
+resonador en sí se describe aparte por los lados y las longitudes de su cuello
+y de su cavidad.
+
 ```python
 import numpy as np
 from phonometry import (
@@ -133,6 +144,37 @@ print(round(z.real, 2), round(z.imag, 2))       # 1.0 -0.0  (adaptada)
 print(round(float(np.abs(res.reflection[0])), 3))   # 0.0   (cero de reflexión)
 ```
 
+Esos dos números impresos son toda la prueba de la adaptación, y es una
+lástima, porque el equilibrio se ve mejor de lo que se lee:
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/critical_coupling_impedance_es.svg" alt="Panel izquierdo: las partes real e imaginaria de la impedancia superficial normalizada a 300 hercios frente a la altura de ranura, entre la mitad y dos veces y media el valor resuelto, con guías horizontales en uno y en cero y la altura resuelta marcada donde se cumplen las dos, y un eje acompañante que muestra la absorción a 300 hercios alcanzando su máximo exactamente ahí. Panel derecho: el lugar geométrico de la impedancia en el plano complejo de 150 a 500 hercios para las ranuras subamortiguada, con acoplamiento crítico y sobreamortiguada, con el punto adaptado uno más cero j marcado; el lazo del acoplamiento crítico pasa por él y los otros dos lo esquivan por lados opuestos" width="90%" />
+
+*Lo que resuelve `critical_coupling_design`. Izquierda: se barre la altura de
+ranura a la frecuencia de diseño y las dos condiciones de adaptación se cruzan
+en el mismo punto, $\mathrm{Re}(z) = 1$ e $\mathrm{Im}(z) = 0$ a 0,978 mm,
+donde la absorción llega a 1. Derecha: las mismas tres ranuras como lugares
+geométricos en el plano complejo. La sobreamortiguada y la subamortiguada
+fallan por razones opuestas, y el lugar geométrico dice de qué lado estás; la
+curva de absorción por sí sola, no.*
+
+<details>
+<summary>Mostrar el código de esta figura</summary>
+
+```python
+# La impedancia a 300 Hz en función de la altura de ranura, una línea cada una.
+for factor in (0.6, 1.0, 1.7):
+    z_h = slit_helmholtz_absorber(
+        np.array([300.0]), design.resonator, slit_height=factor * design.slit_height,
+        lattice_step=3.0e-2, period=5.0e-2,
+    ).normalized_impedance[0]
+    print(factor, round(z_h.real, 2), round(z_h.imag, 2))
+# 0.6 2.61 3.34   sobreamortiguada: demasiado resistiva, y ya no resuena a 300 Hz
+# 1.0 1.0 -0.0    adaptada
+# 1.7 0.52 -1.93  subamortiguada: pérdida insuficiente
+```
+
+</details>
+
 ## 2. El panel ranurado de sonido lento
 
 Un panel rígido perforado por una red periódica de ranuras finas cerradas,
@@ -141,7 +183,7 @@ Helmholtz, es un absorbente de reacción local y muy sublongitud de onda
 (Jiménez et al. 2017). Los resonadores frenan el sonido dentro de la ranura y
 bajan su resonancia muy por debajo de la frecuencia de cuarto de onda, de modo
 que un panel de pocos centímetros resuena en las centenas bajas de hercios.
-Las pérdidas visco-térmicas en la ranura submilimétrica y en los cuellos de
+Las pérdidas viscotérmicas en la ranura submilimétrica y en los cuellos de
 los resonadores son las que hacen posible la absorción *perfecta*: cuando la
 pérdida intrínseca compensa exactamente la fuga de la estructura, el cero del
 coeficiente de reflexión cae sobre el eje de frecuencia real y $\alpha = 1$
@@ -155,8 +197,29 @@ derivación $[[1,0],[1/Z_{HR},1]]$ y una corrección de radiación de la ranura.
 El coeficiente de reflexión con fondo rígido es
 $R = (T_{11}\cos\theta - Z_0 T_{21})/(T_{11}\cos\theta + Z_0 T_{21})$ con
 $Z_0 = \rho_0 c_0 / S_0$ y $\alpha = 1 - |R|^2$. La ranura usa los parámetros
-visco-térmicos de canal estrecho y los cuellos y cavidades cuadrados la serie
+viscotérmicos de canal estrecho y los cuellos y cavidades cuadrados la serie
 de conducto rectangular de Stinson (1991).
+
+Todos los símbolos de esa cadena: $M_s$ es el medio paso de red de la propia
+ranura, $M_{HR}^{(n)}$ la admitancia en derivación del $n$-ésimo resonador con
+$Z_{HR}$ su impedancia de entrada (cuello más cavidad, con las correcciones de
+radiación de extremo de Jiménez et al. 2016), y $M_{\Delta l}$ la corrección de
+radiación de la boca de la ranura. $\kappa_s$, $\rho_s$ y $S_s$ son el módulo
+de compresibilidad efectivo viscotérmico, la densidad efectiva y la sección de
+la ranura. $S_0 = d\,a$ es el área de un periodo de la cara del panel, así que
+$Z_0 = \rho_0 c_0/S_0$ es la impedancia de adaptación de la sección 1 *referida
+a esa misma área*: el panel está adaptado cuando el sonido que entra por un
+periodo lo consume exactamente ese periodo. Ojo con el doble uso del símbolo:
+en la sección 1 $Z_0$ es la impedancia del medio $\rho_0 c_0$, y aquí es esa
+impedancia dividida por una sección.
+
+Fíjate en qué cambia realmente el cálculo de diseño. Dada una frecuencia objetivo,
+resintoniza la **longitud de cavidad** del resonador y resuelve la **altura de
+ranura**; el paso de red y el periodo se quedan como se pasaron. Para el diseño
+de 300 Hz de abajo, la cavidad pasa de los 30 mm del resonador de partida a
+44,7 mm y la ranura queda en 0,978 mm, mientras que el panel sigue teniendo
+30 mm de profundidad porque $L = N a = 1 \times 30$ mm, que son $\lambda/38$ a
+300 Hz. Quien quiera un panel más hondo añade resonadores, no cavidad.
 
 `critical_coupling_design` invierte el modelo: dada una frecuencia y un ángulo
 objetivo, ajusta la longitud de la cavidad (que fija la resonancia) y la altura
@@ -260,7 +323,7 @@ $\lambda/38$ de profundidad; estrechar la ranura sobreamortigua la resonancia
 y ensancharla la subamortigua, y ambos bajan el pico por debajo de uno.*
 
 <details>
-<summary>Ver el código de esta figura</summary>
+<summary>Mostrar el código de esta figura</summary>
 
 ```python
 import matplotlib.pyplot as plt
@@ -305,6 +368,40 @@ rompe y la reflexión la reconstruye.
   description="Un tono plano de 300 Hz en un tubo FDTD 2D llega a la celda de acoplamiento crítico mallada, con su ranura de 0,98 mm y su resonador de Helmholtz resueltos en la rejilla y mostrados en un panel ampliado. A la altura de ranura de diseño la envolvente de presión queda plana y se anota la absorción 1,00 de la biblioteca; la ranura 1,7 veces más ancha sostiene una onda estacionaria profunda frente al panel y la absorción cae a 0,34."
 />
 
+### Fuera de la incidencia normal
+
+Todos los fragmentos y figuras de arriba son a incidencia normal, y la
+condición de adaptación lleva un $\cos\theta$:
+$\mathrm{Re}(Z)\cos\theta = Z_0$. La estructura es de reacción local, así que
+la cadena interna no depende del ángulo y con $\theta$ solo se mueve la
+impedancia del aire en la cara frontal: un panel adaptado a incidencia normal
+se desadapta por tanto de forma progresiva según crece el ángulo, sin que la
+resonancia se mueva en frecuencia. Cuánto cuesta eso es una pregunta que el
+modelo responde directamente, y la respuesta es más suave de lo que sugiere el
+álgebra:
+
+```python
+# El mismo diseño de 300 Hz, evaluado fuera de la normal. Tanto el cálculo de
+# diseño como el evaluador toman `angle` en radianes.
+for degrees in (0.0, 15.0, 30.0, 45.0, 60.0):
+    off = slit_helmholtz_absorber(
+        np.array([300.0]), design.resonator, slit_height=design.slit_height,
+        lattice_step=3.0e-2, period=5.0e-2, angle=np.radians(degrees),
+    )
+    print(degrees, round(float(off.absorption[0]), 3))
+# 0.0 1.0 / 15.0 1.0 / 30.0 0.995 / 45.0 0.971 / 60.0 0.889
+```
+
+El pico se queda en 300 Hz y solo cae a 0,89 a 60°, que es lo que el artículo
+original quiere decir con absorción *casi omnidireccional*. De ahí salen dos
+opciones de diseño. Sintonizar al ángulo que el panel vaya a ver
+mayoritariamente (`critical_coupling_design` toma el mismo argumento `angle`)
+cuando la instalación tiene una dirección dominante; o aceptar el diseño a
+incidencia normal, que es la elección más tolerante frente al ángulo. En
+cualquier caso, espera que una medición en cámara reverberante de un panel así
+salga por debajo del $\alpha = 1$ a incidencia normal, ya que el campo difuso
+pondera justo los ángulos oblicuos donde peor es la adaptación.
+
 ## 3. ¿Cuánto de lento es el sonido?
 
 El nombre del mecanismo se puede medir. El resultado de la matriz de
@@ -348,6 +445,74 @@ El sonido lento lleva la resonancia al régimen de sublongitud de onda
 profunda; el acoplamiento crítico hace después que esa resonancia sea
 perfectamente absorbente.
 
+Cuatro escalares son un relato pobre de una relación de dispersión, así que
+aquí está:
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/slow_sound_dispersion_es.svg" alt="Velocidad de fase dentro de la ranura cargada dividida por la velocidad en aire libre, frente a la frecuencia de 50 a 3000 hercios, cayendo desde unos 0,2 hasta un mínimo de 0,08 cerca de 380 hercios y subiendo después con fuerza al pasar la resonancia del resonador en 484 hercios, por encima de la cual la región queda en gris como rama cerrada. Una línea plana en la unidad marca la ranura vacía, la frecuencia de diseño de 300 hercios está marcada en 0,11, y un segundo eje lee la frecuencia de cuarto de onda de la profundidad fija de 30 mm construida con esa velocidad de fase, que cruza la frecuencia de diseño donde resuena el panel" width="86%" />
+
+*El mecanismo que da nombre a la guía, en frecuencia. La ranura vacía se queda
+en 1 por definición; la cargada cae a un mínimo de 0,08 $c_0$ cerca de 379 Hz y
+después sube con fuerza cuando los resonadores pasan su propia resonancia en
+485 Hz, por encima de la cual la rama propagante se cierra. En el punto de
+diseño de 300 Hz la velocidad de fase es 0,11 $c_0$ = 37 m/s, lo que hace de la
+profundidad fija de 30 mm un cuarto de longitud de onda a 308 Hz, donde resuena
+el panel. Esos mismos 30 mm de aire simple serían un cuarto de onda a 2858 Hz,
+y esa relación es todo el argumento de que el panel sea delgado. La misma curva
+explica el panel metadifusor de 2 cm de la
+[guía de metadifusores](/phonometry/es/materials/diffusers/metadiffusers/).*
+
+<details>
+<summary>Mostrar el código de esta figura</summary>
+
+```python
+f_sweep = np.geomspace(50.0, 3000.0, 400)
+swept = slit_helmholtz_absorber(
+    f_sweep, design.resonator, slit_height=design.slit_height,
+    lattice_step=3.0e-2, period=5.0e-2,
+)
+c_ratio = 2 * np.pi * f_sweep / swept.effective_wavenumber.real / 343.0
+print(round(float(c_ratio.min()), 3), round(float(f_sweep[c_ratio.argmin()])))  # 0.08 381
+```
+
+</details>
+
+### De dónde sale el número de onda efectivo
+
+El número de onda que devuelve el resultado no es un número ajustado: es el
+producto de dos modelos viscotérmicos que la biblioteca también expone por
+separado. La ranura vacía ya tiene una densidad efectiva y un módulo de
+compresibilidad complejos, fijados por las capas límite viscosa y térmica
+contra sus paredes, que es la razón de que una ranura submilimétrica tenga
+pérdidas siquiera, y cada resonador añade una impedancia en derivación en
+paralelo con ella.
+
+```python
+# La ranura vacía, a la frecuencia y a la altura de ranura de diseño.
+rho_e, k_e = materials.slit_effective_properties(
+    np.array([300.0]), slit_height=design.slit_height
+)
+print(np.round(rho_e, 3))      # [1.355-0.203j]  frente a 1.205 kg/m^3 en aire libre
+print(f"{k_e[0]:.3e}")         # 1.332e+05+7.725e+03j  frente a 1.419e+05 Pa adiabático
+
+# La impedancia en derivación de un resonador, a ambos lados de su propia
+# resonancia en 484 Hz.
+z_hr = materials.helmholtz_resonator_impedance(
+    np.array([300.0, 484.0, 800.0]), design.resonator,
+    slit_height=design.slit_height, lattice_step=3.0e-2,
+)
+print(np.sign(z_hr.imag))      # [-1. -1.  1.]  compliancia debajo, masa encima
+```
+
+Por debajo de su propia resonancia la derivación es una compliancia: añade
+rigidez a la ranura sin añadir masa móvil, y eso es exactamente lo que baja la
+velocidad de fase. `materials.rectangular_duct_properties(f, side=1.0e-3)` da
+la misma pareja efectiva para un conducto cuadrado cuando la geometría de
+guiado es un conducto y no una ranura, y las tres toman un estado
+`AirProperties` (velocidad del sonido, densidad, viscosidad, número de Prandtl,
+relación de calores específicos, presión atmosférica), así que un diseño para
+un conducto de escape caliente o para una cabina en altura cambia un argumento
+en lugar del modelo.
+
 ## 4. Los absorbentes resonantes clásicos bajo la misma óptica
 
 El acoplamiento crítico no es exclusivo de los metamateriales; es el
@@ -379,14 +544,95 @@ de la [guía de porosos y multicapa](/phonometry/es/materials/absorbers/porous-a
   pérdida», y `critical_coupling_design` lo responde exactamente para el
   panel ranurado.
 
-El precio de la resonancia es el ancho de banda: un pico con acoplamiento
-crítico es estrecho, y lejos de él el panel refleja como la pared rígida que
-casi es. Los metaabsorbentes de banda ancha apilan celdas desintonizadas lado
-a lado (el absorbente iridiscente de Jiménez et al. 2017 encadena
-resonadores de dimensiones graduadas justo por esto); en la biblioteca el
-espectro de cualquier geometría candidata sale de `slit_helmholtz_absorber`
-sobre un array de frecuencias, así que un diseño graduado es un bucle sobre
-celdas.
+El precio de la resonancia es el ancho de banda, y merece un número y no un
+adjetivo. El diseño de 300 Hz mantiene $\alpha \geq 0{,}8$ de 282 Hz a 320 Hz y
+$\alpha \geq 0{,}5$ de 266 Hz a 341 Hz, un tercio de octava, frente a una manta
+porosa de 50 mm que da alrededor de 0,68 a 500 Hz y sigue funcionando décadas
+de frecuencia por encima. Un metaabsorbente es por tanto una herramienta para un
+problema tonal o modal *conocido*, no un tratamiento general: compra
+profundidad con ancho de banda.
+
+La respuesta habitual es dejar de pedirle todo el trabajo a una sola celda.
+Encadenar $N$ resonadores a lo largo de una ranura es justo para lo que está el
+argumento de lista de la biblioteca:
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/graded_slit_absorber_es.svg" alt="Absorción frente a la frecuencia de 120 a 700 hercios para tres paneles: una única celda con acoplamiento crítico y un pico estrecho que llega a 1,0 cerca de 320 hercios, una cadena de cuatro resonadores graduados a lo largo de una ranura con dos lóbulos que llegan a 1,0 cerca de 150 hercios y a 0,95 cerca de 295 hercios, y una cadena de cuatro resonadores idénticos con dos lóbulos más bajos. Bajo cada curva, unas barras sombreadas marcan dónde supera cada una 0,8, sumando 38, 51 y 22 hercios respectivamente" width="86%" />
+
+*Lo que compra una cadena, y lo que cuesta. Medido como el intervalo total de
+frecuencia por encima de $\alpha = 0{,}8$, y no como la distancia entre los
+puntos extremos, que en una cadena esconde un valle, una celda da 38 Hz, los
+cuatro resonadores graduados dan 51 Hz en dos lóbulos, y cuatro resonadores
+*idénticos* de la misma profundidad total dan solo 22 Hz. Así que las etapas de
+más no compran ancho de banda por sí solas: desintonizarlas es lo que hace que
+la profundidad rinda, que es toda la idea detrás de los diseños de atrapamiento
+arcoíris de Jiménez et al. (2017). El coste es geométrico e inevitable, ya que
+$L = N a$: el panel de cuatro etapas tiene 120 mm de profundidad frente a los
+30 mm de la celda única, y su altura de ranura (1,2 mm aquí) es un compromiso
+que ya no está críticamente acoplado a ninguna etapa.*
+
+<details>
+<summary>Mostrar el código de esta figura</summary>
+
+```python
+# `slit_helmholtz_absorber` acepta una lista: esa es la cadena de la ranura.
+f_chain = np.linspace(120.0, 700.0, 700)
+graded = [critical_coupling_design(target, base, lattice_step=3.0e-2,
+                                   period=5.0e-2).resonator
+          for target in (250.0, 320.0, 410.0, 520.0)]
+chain = slit_helmholtz_absorber(f_chain, graded, slit_height=1.20e-3,
+                                lattice_step=3.0e-2, period=5.0e-2)
+step = float(f_chain[1] - f_chain[0])
+print(round(float(chain.absorption.max()), 3),
+      round(float(np.sum(chain.absorption >= 0.8)) * step))     # 0.999 51
+```
+
+</details>
+
+## 5. Del modelo a un panel medido
+
+Nada de lo anterior se ha construido. Entre la geometría resuelta y un panel
+que se pueda poner delante de un instrumento se interponen cuatro cosas.
+
+**La tolerancia de la ranura es un parámetro de diseño.** La ranura resuelta
+son 0,978 mm, y el equilibrio de pérdidas lo fija esa dimensión submilimétrica.
+Manteniendo la frecuencia de diseño en 300 Hz, una ranura mecanizada 0,02 mm
+estrecha o ancha sigue dando $\alpha = 0{,}997$; a ±0,05 mm queda en 0,982 y
+0,984; a ±0,10 mm ha caído a 0,931 y 0,939. Así que unas pocas centésimas de
+milímetro son la tolerancia de trabajo, y una décima es donde el panel deja de
+ser *perfecto*. Fíjate en cómo falla cada error: una ranura estrecha
+sobreamortigua ($z = 1{,}09 + 0{,}27\mathrm{j}$ a −0,05 mm) y una ancha
+subamortigua ($0{,}93 - 0{,}24\mathrm{j}$ a +0,05 mm). Yerra por ancho. El
+modelo viscotérmico supone paredes rígidas y lisas, así que la rugosidad de la
+fabricación aditiva es pérdida *extra* que empuja hacia el sobreamortiguamiento
+a un panel construido tal cual se diseñó; un prototipo cortado algo ancho y
+repasado después converge desde el lado correcto.
+
+**Un panel periódico no encaja en un tubo cualquiera.** El apartado 6 de
+ISO 10534-2 exige cortar una probeta de estructura lateral regular *siguiendo
+las líneas de simetría* de esa estructura y, cuando las unidades estructurales
+no encajan en la sección del tubo, medir varias probetas moviendo el corte
+respecto a la estructura. El periodo de 50 mm de aquí no encaja en absoluto en
+un tubo de 29 mm, y en un tubo circular de 100 mm solo encaja como dos periodos
+enteros a lo largo de un diámetro, que no es un corte simétrico. La vía limpia
+es un **tubo cuadrado o rectangular cuyo lado sea un número entero de
+periodos**, con las paredes rígidas del tubo haciendo de planos de simetría de
+la red infinita; y entonces hay que recalcular el techo de onda plana para esa
+geometría con `plane_wave_frequency_range(..., shape="rectangular")` sobre el
+lado mayor, y no sobre un diámetro nominal.
+
+**Pon el plano de referencia donde lo pone el modelo.** El $x = 0$ del tubo es
+la cara del panel, no la boca de la ranura ni el frente del marco; un milímetro
+de error ahí rota la impedancia medida sin tocar la absorción, exactamente como
+describe la
+[guía del tubo de impedancia](/phonometry/es/materials/absorbers/impedance-tube/#3-método-de-la-función-de-transferencia-iso-10534-2).
+
+**O medirlo como superficie.** Si el panel está pensado para una sala y no para
+un conducto, la verificación honesta es una probeta de 10 a 12 m² en cámara
+reverberante según
+[ISO 354](/phonometry/es/materials/absorbers/absorption-measurement/), y el
+resultado será el coeficiente de incidencia aleatoria, y no el $\alpha = 1$ que
+promete el diseño a incidencia normal, por la razón expuesta arriba en el
+apartado de incidencia fuera de la normal.
 
 ## Qué cubre esta guía
 
@@ -399,13 +645,21 @@ como contenedor de geometría y el `effective_wavenumber` y
 `effective_impedance` recuperados expuestos en el resultado), y el
 cálculo de diseño por acoplamiento crítico (`critical_coupling_design`)
 que ajusta longitud de cavidad y altura de ranura hasta que el cero de
-reflexión queda sobre el eje de frecuencia real.
+reflexión queda sobre el eje de frecuencia real. También están expuestos los
+dos bloques constructivos viscotérmicos con los que se ensambla la cadena
+(`slit_effective_properties`, `rectangular_duct_properties` y
+`helmholtz_resonator_impedance`, todos con un estado `AirProperties`), y
+`slit_helmholtz_absorber` acepta una *lista* de resonadores, que es la cadena
+graduada de la sección 4.
 
 **No cubierto.** Ninguna norma de medida rige estos modelos de predicción;
-un panel construido se verificaría en el
+la sección 5 expone la vía por la que se verificaría un panel construido, en el
 [tubo de impedancia](/phonometry/es/materials/absorbers/impedance-tube/) (ISO 10534-2) o
 en la [cámara reverberante](/phonometry/es/materials/absorbers/absorption-measurement/)
-(ISO 354). Los absorbentes de membrana y membrana decorada de la sección 4 se
+(ISO 354), pero nada de aquí ejecuta nada de eso: las cifras de tolerancia y de
+ángulo citadas son evaluaciones del modelo, y la rugosidad de una ranura
+impresa, el marco, el montaje y el tamaño finito del panel quedan todos fuera
+del modelo. Los absorbentes de membrana y membrana decorada de la sección 4 se
 tratan solo como contexto; las capas clásicas perforadas, microperforadas y
 de membrana están implementadas en
 [Absorbentes porosos y

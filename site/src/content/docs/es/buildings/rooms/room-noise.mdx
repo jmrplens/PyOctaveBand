@@ -1,6 +1,6 @@
 ---
 title: "Criterios de ruido de salas (NC / RC Mark II)"
-description: "Las valoraciones de ruido de salas de ANSI/ASA S12.2-2019: la valoración de criterios de ruido (NC) sobre las curvas de la Tabla 1 (designación NC-(SIL) con el método de tangencia cuando se supera), y la valoración Room Criteria Mark II (RC) con su etiqueta espectral de retumbo/siseo/neutro (Anexo D)."
+description: "Las valoraciones de ruido de salas de ANSI/ASA S12.2-2019: la valoración de criterios de ruido (NC) sobre las curvas de la Tabla 1 (la designación NC-(SIL), que recurre al método de tangencia cuando una banda sube por encima de esa curva), y la valoración Room Criteria Mark II (RC) con su etiqueta espectral de retumbo/siseo/neutro (Anexo D)."
 references:
   - type: article
     authors: ["Beranek, L. L."]
@@ -54,7 +54,88 @@ banda de octava en las diez bandas de 16 Hz a 8000 Hz.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_room_noise_es.svg" alt="Los dos métodos de valoración de ANSI S12.2 a partir de un espectro por bandas de octava: a la izquierda el método de tangencia NC (de las curvas de la Tabla 1, el valor NC en cada banda, después NC es la curva más alta tocada, dando NC-NN con una banda determinante); a la derecha el método RC Mark II (la media de frecuencias medias LMF de los niveles de 500, 1000 y 2000 Hz redondeada para dar RC-NN, después la etiqueta espectral R de retumbo, H de siseo o N de neutro por las reglas de desviación del apartado D.3)" width="94%" loading="eager" />
 
+## 0. Medir el espectro
+
+Las dos valoraciones consumen diez números, y la norma es concreta sobre cómo se
+obtienen esos diez números. El apartado 5.2.5 (repetido en el 5.1.2 para los
+criterios ponderados A) fija el instrumento, la altura y las holguras.
+
+**El instrumento y la magnitud.** La magnitud medida es $L_{\mathrm{EQ}}$ por
+banda de octava, tomada con un instrumento **integrador-promediador**, no una
+aguja leída a ojo. El apartado 5.1.1 fija el mínimo para los criterios ponderados
+A en un instrumento que cumpla al menos los requisitos de **clase 2** de la
+ANSI/ASA S1.4 parte 3 / IEC 61672-3; usa una cadena de clase 1 cuando el resultado
+vaya a discutirse. Hay dos geometrías admisibles: caracterizar una **posición
+concreta**, en cuyo caso el micrófono se sitúa en esa posición, o caracterizar
+**todo el recinto**, en cuyo caso el micrófono se pasea despacio por él a **no más
+de 0,5 m/s durante no menos de 20 s**.
+
+**Dónde va el micrófono.** A la altura de oído de los ocupantes — **1,6 m** de pie
+y **1,2 m** sentados para adultos, **1,1 m** y **0,75 m** para niños — y a no menos
+de **0,6 m** de cualquier superficie reflectante, **1,2 m** de la intersección de
+dos, o **2,4 m** de la intersección de tres. La regla de separación es la que
+muerde en una sala pequeña: un micrófono metido en una esquina ve la duplicación
+de presión de las bandas bajas y puede sumar varios decibelios por debajo de
+250 Hz, suficiente para fabricar una etiqueta de retumbo o para mover la banda
+determinante del NC.
+
+**La condición de funcionamiento.** La sala se mide **desocupada**, con las
+instalaciones funcionando en su **condición de diseño**, no con la maquinaria a
+carga parcial; los criterios informativos del Anexo C y del Anexo D están escritos
+para ese estado, con la actividad humana excluida. Los sucesos intermitentes (una
+puerta, una impresora, un vehículo que pasa) se excluyen de la integración o se
+declaran por separado.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_room_noise_setup_es.svg" alt="Sección de una oficina de 6,0 por 2,7 m servida desde un plenum de techo: el conducto de impulsión y el difusor sobre el falso techo y la climatizadora al otro lado de la pared en su condición de diseño, un ocupante sentado, el micrófono de medición acotado a 1,2 m sobre el suelo con la altura de 1,6 m de pie insinuada en el mismo soporte, las zonas de exclusión del micrófono de 0,6 m, 1,2 m y 2,4 m dibujadas frente a una superficie, una arista de dos superficies y la esquina triedra, el recorrido alternativo de barrido lento a 0,5 metros por segundo durante al menos 20 segundos, y el ensayo de cribado del apartado 5.3.2 que decide si un único espectro puede valorarse siquiera" width="94%" />
+
+:::caution[Las dos octavas más bajas son las frágiles]
+La propia NOTA del 5.2.5 de la norma deja constancia de lo que hace incómodas las
+bandas de 16 Hz y 31,5 Hz: a esas longitudes de onda «puede producirse duplicación
+de presión bastante más allá de las distancias de separación dadas arriba», así que
+un barrido de un recinto grande puede salir sesgado hacia arriba; y «cuanto más
+baja es la frecuencia, más estrecho es el ancho de banda y, por tanto, mayor la
+fluctuación temporal», así que una integración corta en la octava de 16 Hz — de
+apenas unos 11 Hz de ancho — se dispersa. Usa instrumentación con respuesta real
+por debajo de 20 Hz, monta una pantalla antiviento incluso en interior, integra
+durante el tiempo suficiente y, si las bandas más bajas siguen siendo dudosas,
+declara desde 31,5 Hz y dilo. Las dos bandas son aquí determinantes: de ellas se
+leen la etiqueta RC y la marca de fuera de rango del NC.
+:::
+
+La aritmética por bandas de octava que hay detrás del espectro de entrada
+— filtros, ponderación, promediado energético — está en
+[Niveles](/phonometry/es/signals/levels/levels/) y
+[Bancos de filtros](/phonometry/es/signals/filters/filter-banks/).
+
 ## 1. Criterios de ruido: designación SIL y tangencia
+
+### Antes de valorar: ¿es estacionario el ruido?
+
+:::caution
+Las dos valoraciones de espectro único suponen un campo sonoro **estacionario**, y
+el apartado 5.3.2 hace de eso un ensayo y no una hipótesis. Criba el campo
+buscando **oleadas** y **grandes fluctuaciones aleatorias** *antes* de calcular
+ninguna de las dos valoraciones:
+
+- Las **oleadas** (5.3.2.1) se criban de oído o visualmente, vigilando las bandas
+  de octava de 16, 31,5 y 63 Hz con el instrumento en respuesta **rápida** y
+  ponderación **Z** («plana»).
+- Las **grandes fluctuaciones aleatorias** (5.3.2.2) se criban a partir de las
+  diferencias $L_{\mathrm{MAX}} - L_{\mathrm{EQ}}$ y $L_{10} - L_{\mathrm{EQ}}$ en
+  las bandas de 16, 31,5, 63 y 125 Hz, de nuevo en rápida, frente a la Tabla 3:
+
+  | Diferencia | 16, 31,5 y 63 Hz combinadas | 125 Hz |
+  | :--- | ---: | ---: |
+  | $L_{\mathrm{MAX}} - L_{\mathrm{EQ}}$ | 7 dB | 6 dB |
+  | $L_{10} - L_{\mathrm{EQ}}$ | 3,5 dB | 3 dB |
+
+Supera cualquiera de esos valores y quedan indicadas grandes fluctuaciones
+aleatorias. Un campo que no pase alguna de las dos cribas pertenece al método
+**RNC** del apartado 5.3, que necesita una serie temporal en lugar de un único
+espectro y que este módulo no implementa, así que `noise_criterion` y
+`room_criterion` devolverían un número que no es la respuesta de la norma para esa
+sala. Las dos funciones suponen que la criba se ha superado.
+:::
 
 Las **curvas NC** (ANSI/ASA S12.2-2019, Tabla 1) son una familia de límites por
 banda de octava, cada una designada por su valor a 1000 Hz (de NC-15 hasta
@@ -100,18 +181,49 @@ por debajo de la curva NC-15) recibe por tanto `rating = nan` y una marca
 `'>NC-70 (63 Hz)'` (gobierna la banda con mayor exceso sobre NC-70) o
 `'<NC-15'`; nunca se fabrican números del estilo `NC-71` o `NC-14`.
 
+### Leer el exceso en baja frecuencia
+
+La valoración de tangencia se detiene en «¿qué banda?», pero el apartado 5.2.4 da
+un paso más y pregunta «¿por cuánto, y eso importa?». El procedimiento tiene cuatro
+pasos, en el orden de la norma: calcular el SIL; seleccionar la curva de criterio
+NC **con el mismo número** que el SIL; representar el espectro medido frente a esa
+curva; y leer las diferencias en las bandas de octava **por debajo de 500 Hz**
+frente a la Tabla 2.
+
+| Desviación por encima de la curva NC-(SIL) | 31,5 Hz | 63 Hz | 125 Hz | 250 Hz |
+| :--- | :---: | :---: | :---: | :---: |
+| Posible insatisfacción grave | — | 6–9 dB | 6–9 dB | 6–9 dB |
+| Insatisfacción grave probable | — | > 9 dB | > 9 dB | > 9 dB |
+
+La columna de 31,5 Hz está en blanco en la norma porque no había datos suficientes
+para cuantificarla. Merece la pena saberlo, porque estas bandas no son un modelo:
+proceden de espectros *medidos* en oficinas, salas de conferencias y salas de
+reuniones donde el ruido de baja frecuencia ya había sido lo bastante severo como
+para exigir obras correctoras en la instalación de climatización. Así que el
+procedimiento es diagnóstico, no de cumple/no cumple: más de 9 dB por encima de la
+curva en cualquiera de las bandas de 63, 125 o 250 Hz significa que las quejas
+serán *probablemente* lo bastante fuertes como para exigir medidas correctoras. La
+nota al pie de la tabla añade la otra mitad de la historia: en algunas de esas
+mismas salas los niveles de 31,5 Hz eran lo bastante altos como para indicar
+vibración y traqueteo claramente perceptibles, que es la condición detrás de la
+etiqueta $RV$ que este módulo no implementa.
+
+Todo lo que necesita el procedimiento está ya en el resultado: `nc.sil` selecciona
+la curva, `nc.levels` lleva el espectro medido, y `verbose=True` en la ficha
+(apartado 4) imprime el contorno NC por banda que leyó el método de tangencia.
+
 ## 2. Room Criteria Mark II: valoración y etiqueta espectral
 
 Las curvas **RC Mark II** (ANSI/ASA S12.2-2019, Anexo D, Tabla D.1) tienen una
 pendiente constante de **−5 dB/octava**, ancladas a su valor a 1000 Hz, con el
 nivel de 16 Hz igual al de 31,5 Hz y un suelo de baja frecuencia de 55 dB. La
-valoración numérica es la **media de frecuencias medias** $\text{LMF}$, la
+valoración numérica es la **media de frecuencias medias** $L_\text{MF}$, la
 media de los niveles de 500, 1000 y 2000 Hz, redondeada al decibelio más
 próximo (apartado D.4):
 
 $$
-\text{LMF} = \tfrac{1}{3}\left(L_{500} + L_{1000} + L_{2000}\right),
-\qquad \text{RC} = \operatorname{redondeo}(\text{LMF}).
+L_\text{MF} = \tfrac{1}{3}\left(L_{500} + L_{1000} + L_{2000}\right),
+\qquad \text{RC} = \operatorname{redondeo}(L_\text{MF}).
 $$
 
 Una **etiqueta espectral** describe entonces el *carácter* del ruido según cómo
@@ -119,6 +231,23 @@ se desvía el espectro de la curva RC de referencia (apartado D.3): **retumbo**
 ($R$) cuando una banda a 500 Hz o por debajo supera la curva en más de 5 dB,
 **siseo** ($H$) cuando una banda a 1000 Hz o por encima la supera en más de
 3 dB, y **neutro** ($N$) cuando no ocurre ninguna de las dos.
+
+Ninguna de esas cuatro reglas de forma es arbitraria. La pendiente de
+**−5 dB por octava** es el punto de equilibrio en el que un fondo de ventilación
+de banda ancha se oye anodino en lugar de retumbante o siseante, lo bastante
+próximo a la propia sensibilidad decreciente del oído como para que el espectro no
+tenga timbre propio, y por eso el Anexo D se dedujo de 68 oficinas en las que nadie
+se quejaba. El **suelo de 55 dB** de los números RC bajos existe porque por debajo
+de él la pregunta deja de ser la audibilidad y pasa a ser la **vibración y el
+traqueteo** perceptibles en paredes, techos y conductos ligeros: esa región es lo
+que abordan la etiqueta $RV$ y su ensayo aparte de la Tabla 6, y es el mismo efecto
+que recogía la nota al pie de la Tabla 2 a 31,5 Hz. Las **tolerancias asimétricas**
+se siguen de dónde cae el exceso: un exceso en baja frecuencia se reparte entre las
+cuatro bandas de 500 Hz y por debajo y se tolera hasta 5 dB antes de colorear el
+sonido, mientras que un exceso en alta frecuencia a 1 kHz o por encima cae de
+lleno en el rango del habla y resulta molesto ya con 3 dB. La etiqueta se calcula
+solo sobre las bandas realmente suministradas, y por eso un espectro al que le
+falten bandas se valora igualmente pero emite un `UserWarning`.
 
 ```python
 import numpy as np
@@ -131,13 +260,31 @@ print(rc.label)             # RC-35(R)   -  una sala retumbante
 print(round(rc.lmf, 1))     # 35.3
 print(rc.classification)    # R
 rc.plot()   # el espectro sobre la referencia RC (panel derecho de abajo)
+
+# Toda la familia de la Tabla D.1 está a una llamada, así que existe un objetivo
+# de diseño antes que ningún espectro: rc_curve(índice) devuelve los niveles por
+# banda de octava de una curva RC dada, sobre esas mismas bandas de 16 Hz - 8 kHz.
+target = room.rc_curve(35.0)
+print(target.round(1))      # [60. 60. 55. 50. 45. 40. 35. 30. 25. 20.]
+print((spl - target).round(1))   # [ 2.  2.  4.  7.  7.  2.  0. -1. -1. -1.]
 ```
+
+Esa última línea es el número frente al que se escribe una especificación: banda a
+banda, cuánto queda la sala por encima o por debajo de «RC-35(N)». `rc_curve`
+acepta cualquier índice, mientras que la Tabla D.1 solo tabula de RC-25 a RC-50,
+que es lo que señala `RCResult.out_of_family`.
 
 El fuerte contenido de baja frecuencia de este espectro eleva las bandas de
 63–250 Hz muy por encima de la curva de referencia, así que el ruido se etiqueta
 como $R$ (retumbo): el «zumbido» subjetivo de una climatizadora sobredimensionada.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/room_noise_criteria_es.svg" alt="Dos paneles para el mismo espectro de sala dominado por la ventilación. Izquierda: los niveles medidos por banda de octava sobre la familia de curvas NC, con un rombo rojo que marca el punto de tangencia a 250 Hz que fija la valoración NC-42,5. Derecha: el mismo espectro sobre la curva de referencia RC-35, con las bandas de baja frecuencia atravesando la tolerancia de retumbo sombreada (más 5 dB por debajo de 500 Hz) de modo que el ruido se clasifica como RC-35(R), y la tolerancia de siseo (más 3 dB a 1000 Hz y por encima) sombreada para comparar" width="96%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/room_noise_criteria_es.svg" alt="Dos paneles para el mismo espectro de sala dominado por la ventilación. Izquierda: los niveles medidos por banda de octava sobre la familia de curvas NC, con un rombo rojo que marca el punto de tangencia a 250 Hz que fija la valoración NC-42,5. Derecha: el mismo espectro sobre la familia RC Mark II dibujada de RC-25 a RC-50, que muestra la pendiente constante de menos 5 dB por octava desembocando en el suelo plano de baja frecuencia de 55 dB, con la curva de referencia RC-35 resaltada, las bandas de baja frecuencia atravesando la tolerancia de retumbo sombreada (más 5 dB por debajo de 500 Hz) de modo que el ruido se clasifica como RC-35(R), y la tolerancia de siseo (más 3 dB a 1000 Hz y por encima) sombreada para comparar" width="96%" />
+
+*Los mismos diez números leídos de dos maneras. A la izquierda, la familia NC de la
+Tabla 1 con la tangencia de 250 Hz que fija NC-42,5; a la derecha, la familia RC de
+la Tabla D.1, cuyas rectas de −5 dB/octava se aplanan sobre el suelo de 55 dB a 16
+y 31,5 Hz, con el espectro medido rompiendo la tolerancia de retumbo de +5 dB de su
+referencia RC-35.*
 
 <details>
 <summary>Mostrar el código de esta figura</summary>
@@ -154,7 +301,10 @@ room.noise_criterion(spl).plot(language="es")
 room.room_criterion(spl).plot(language="es")
 plt.show()
 
-# A mano, reproduciendo lo que dibujan NCResult.plot() / RCResult.plot():
+# A mano, reproduciendo lo que dibujan NCResult.plot() / RCResult.plot().
+# Cualquiera de las dos familias puede construirse también curva a curva con
+# las funciones públicas room.nc_curve(índice) y room.rc_curve(índice), que es
+# lo que hace el panel RC de abajo; OCTAVE_BANDS también se reexporta arriba.
 from phonometry.room.noise_criteria import NC_CURVES, NC_INDICES, OCTAVE_BANDS
 nc, rc = room.noise_criterion(spl), room.room_criterion(spl)
 fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 5))
@@ -166,6 +316,8 @@ gov = spl[OCTAVE_BANDS == nc.governing_frequency][0]
 ax1.plot([nc.governing_frequency], [gov], "D", color="#d62728")
 ax1.set_xscale("log"); ax1.set_title(f"NC-{nc.rating:g}")
 
+for idx in range(25, 51, 5):        # la familia de la Tabla D.1, RC-25 a RC-50
+    ax2.plot(OCTAVE_BANDS, room.rc_curve(float(idx)), color="#bbbbbb", lw=0.8)
 ref = rc.reference_curve
 low, high = OCTAVE_BANDS <= 500, OCTAVE_BANDS >= 1000
 ax2.plot(OCTAVE_BANDS, ref, "s--", color="#7f7f7f", label=f"Referencia RC-{rc.rating}")
@@ -193,14 +345,99 @@ panel de arriba. El apartado D.4 espera al menos las bandas de octava de
 pero emite un `UserWarning` porque las bandas ausentes se omiten en las pruebas
 de desviación de la etiqueta.
 
-Los criterios de ruido balanceados (NCB), el criterio de ruido de sala para
-ruido de baja frecuencia fluctuante (RNC, que necesita una serie temporal en
-lugar de un único espectro), la etiqueta de vibración y traqueteo ($RV$, que
-necesita la prueba de la Tabla 6) y el índice numérico de evaluación de calidad
-(QAI, que la norma remite a referencias externas) no forman parte de este
-módulo.
-
 ## 3. Elegir un criterio: NC, RC Mark II o NR
+
+### Qué valoración debería cumplir una sala
+
+Una valoración por sí sola no es una respuesta, y la norma lo sabe: la S12.2
+acompaña cada método con una tabla informativa de criterios recomendados por uso
+— una tabla ponderada A (Anexo C, Tabla C.1), una tabla NC/RNC (Anexo C, Tabla
+C.2, a la que apunta el apartado 5.2.6) y una tabla RC Mark II (Anexo D, Tabla
+D.2). Una especificación normalmente cita una de ellas, o un equivalente nacional.
+Referencias de la tabla NC/RNC:
+
+| Uso | NC / RNC recomendado |
+| :--- | :---: |
+| Salas de conciertos, teatros de ópera, salas de recitales | 15–18 |
+| Estudios de televisión y radiodifusión (captación cercana) | 15–25 |
+| Grandes auditorios y teatros de texto (> 500 butacas) | 20–25 |
+| Auditorios pequeños (≤ 500 butacas) | 25–30 |
+| Dormitorios | 25–30 |
+| Aulas y salas de conferencias, espacio docente ≤ 566 m³ | 25–30 |
+| Aulas y salas de conferencias, espacio docente > 566 m³ | 30–35 |
+| Viviendas, salas de estar | 30–40 |
+| Habitaciones y suites de hotel | 30–35 |
+| Zonas de oficina diáfana | 35–40 |
+| Zonas de servicio de hotel | 40–50 |
+
+Son valores **informativos** y con la sala **desocupada**, con el ruido de la
+actividad humana excluido, y la tabla RC añade `(N)` a cada entrada: normalmente
+solo debería aceptarse como especificación un espectro neutro (apartado D.3.1).
+Léelos como intervalos: una valoración dentro del intervalo cumple, y la banda
+determinante te dice dónde es más fino el margen. Están escritos además para ruido
+**estacionario**, así que una fuente intermitente se evalúa aparte y, según la
+criba del principio del apartado 1, una fluctuante o con oleadas no se evalúa con
+estos métodos en absoluto.
+
+### Los dos números no están en la misma escala
+
+El espectro del apartado 1 se valora en **NC-42,5** y ese mismo espectro en el
+apartado 2 se valora en **RC-35**. No ha pasado nada raro: son escalas distintas y
+no deben sustituirse nunca la una por la otra. El NC por tangencia lo fija la única
+banda peor, esté donde esté — aquí el retumbo de 250 Hz —, mientras que el número
+RC es la media aritmética de los niveles de 500, 1000 y 2000 Hz e ignora todo lo
+demás en su parte numérica, y traslada el carácter del espectro a la etiqueta. Un
+espectro retumbante se valora por tanto siempre peor en NC que en RC, y el tamaño
+de la diferencia NC menos RC es en sí una medida del desequilibrio; una sala en la
+que los dos casi coinciden ya sigue la forma del criterio. De ahí sale la
+regla de especificación: valora frente a la familia que cite la especificación,
+declara las dos cuando el cliente quiera un diagnóstico, y no afirmes nunca el
+cumplimiento de un límite NC usando un valor RC, ni al revés.
+
+El corolario es lo que merece la pena llevarse. Dos salas pueden compartir
+valoración NC y no parecerse en nada:
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/nc_blind_spot_es.svg" alt="Dos espectros por bandas de octava que se valoran los dos en NC-40. Panel izquierdo: sobre la familia de curvas NC, un espectro de retumbo de conducto que toca la curva NC-40 a 125 Hz y un espectro de siseo de difusor que toca esa misma curva a 4000 Hz, con una única valoración impresa para los dos. Panel derecho: los dos mismos espectros como desviaciones respecto a sus propias curvas de referencia RC Mark II, frente al umbral escalonado del apartado D.3 de más 5 dB a 500 Hz y por debajo y más 3 dB a 1000 Hz y por encima, de modo que el espectro de retumbo rompe el umbral en baja frecuencia y se etiqueta RC-34(R) mientras que el de siseo lo rompe en alta frecuencia y se etiqueta RC-36(H)" width="96%" />
+
+*Las dos salas son NC-40, y al método de tangencia no le queda nada que decir sobre
+la diferencia. El panel derecho representa cada espectro frente a su **propia**
+curva de referencia RC: la sala con retumbo de conducto queda de 7 a 8 dB por
+encima en las bandas por debajo de 250 Hz, y la del difusor de 12 a 13 dB por
+encima a partir de 2 kHz, y el umbral del D.3 convierte eso en una letra:
+RC-34(R) frente a RC-36(H).*
+
+<details>
+<summary>Mostrar el código de esta figura</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+# `room` es el import del fragmento del apartado 1 de arriba.
+
+bands = np.array([16, 31.5, 63, 125, 250, 500, 1000, 2000, 4000, 8000])
+rumbly = np.array([66.0, 64.0, 62.0, 56.0, 48.0, 40.0, 34.0, 28.0, 24.0, 19.0])
+hissy = np.array([52.0, 52.0, 50.0, 46.0, 43.0, 39.0, 35.0, 34.0, 38.0, 34.0])
+
+for spectrum in (rumbly, hissy):
+    nc, rc = room.noise_criterion(spectrum), room.room_criterion(spectrum)
+    print(nc.label, rc.label)     # NC-40 (125 Hz) RC-34(R) / NC-40 (4000 Hz) RC-36(H)
+
+# El panel derecho: cada espectro frente a su propia curva de referencia, con el
+# umbral del apartado D.3 como un escalón (+5 dB por debajo de 500 Hz, +3 por encima).
+threshold = np.where(bands <= 500.0, 5.0, 3.0)
+fig, ax = plt.subplots()
+ax.step(bands, threshold, where="mid", ls="--", color="k", label="Umbral de etiqueta")
+for spectrum, name in ((rumbly, "Retumbo de conducto"), (hissy, "Siseo de difusor")):
+    rc = room.room_criterion(spectrum)
+    ax.plot(bands, spectrum - rc.reference_curve, "o-", label=f"{name} — {rc.label}")
+ax.set_xscale("log")
+ax.set_xlabel("Frecuencia central de banda de octava [Hz]")
+ax.set_ylabel("Nivel menos la curva RC propia de la sala [dB]")
+ax.legend()
+plt.show()
+```
+
+</details>
 
 Las dos valoraciones responden a preguntas distintas, y existe una
 tercera familia que este módulo deliberadamente no implementa:
@@ -244,7 +481,11 @@ más) apunta al extremo terminal: velocidades de paso excesivas en difusores
 y rejillas o una compuerta estrangulada cerca de la salida, y es el rango
 que enmascara el habla. Una etiqueta neutra (`N`) significa que el nivel
 aún puede estar mal, pero el carácter es correcto: reduce todo el espectro
-en lugar de remodelarlo.
+en lugar de remodelarlo, lo que normalmente significa más absorción en la sala
+antes que más revestimiento de conductos, así que le pasa el problema a
+[Predicción del tiempo de reverberación](/phonometry/es/buildings/rooms/reverberation-prediction/)
+y a
+[Absorción acústica en recintos](/phonometry/es/buildings/rooms/enclosed-space-absorption/).
 
 ## 4. Informes de ruido de salas (`.report()`)
 
@@ -305,7 +546,48 @@ en el repositorio; pulsa una vista previa para abrir el PDF.
 	caption="Ficha de Room Criteria (RCResult.report), la valoración RC y su etiqueta espectral."
 />
 
+## Qué cubre esta guía
+
+**Cubierto.** La Tabla 1 y los apartados 5.2.2/5.2.3 de la ANSI/ASA S12.2-2019
+— la designación NC-(SIL) y el método de tangencia con su banda determinante —
+mediante `room.noise_criterion`; y la familia informativa RC Mark II del Anexo D,
+Tabla D.1 (`room.rc_curve`), con la valoración por media de frecuencias medias del
+apartado D.4 y la etiqueta neutro/retumbo/siseo del apartado D.3, mediante
+`room.room_criterion`. Las dos trabajan sobre las diez bandas de octava de 16 Hz a
+8 kHz, y cada resultado genera su propia ficha de una página con `.report()`. Las
+condiciones de medición del apartado 5.2.5, el procedimiento de exceso en baja
+frecuencia del apartado 5.2.4 y las tablas de criterios de los Anexos C y D se
+citan aquí para planificar y para leer los resultados.
+
+**No cubierto.** El ensayo de cribado del apartado 5.3.2 se describe en el
+apartado 1 pero no está implementado: quien mide debe realizarlo, porque un
+espectro que no lo supere queda fuera del dominio de las dos funciones. Los
+criterios de ruido balanceados (NCB), el criterio de ruido de sala para ruido de
+baja frecuencia fluctuante (RNC, que necesita una serie temporal en lugar de un
+único espectro), la etiqueta de vibración y traqueteo ($RV$, que necesita el
+ensayo de la Tabla 6) y el índice numérico de evaluación de calidad (QAI, que la
+norma remite a referencias externas) no forman parte de este módulo. Tampoco la
+familia de curvas NR (ver el apartado 3). Las tablas de criterios se reproducen
+solo como referencias: consulta la norma, o el documento nacional o del cliente que
+rija el encargo, antes de citar un límite.
+
 ## Véase también
 
+- [Acústica de salas](/phonometry/es/buildings/rooms/room-acoustics/): los
+  parámetros de decaimiento ISO 3382 de esa misma sala, medidos a partir de una
+  respuesta al impulso.
+- [Predicción del tiempo de reverberación](/phonometry/es/buildings/rooms/reverberation-prediction/)
+  y
+  [Absorción acústica en recintos](/phonometry/es/buildings/rooms/enclosed-space-absorption/):
+  la absorción que baja todo un espectro una vez que la etiqueta dice que el
+  carácter es correcto.
+- [Índice de transmisión del habla](/phonometry/es/perception/speech/speech-transmission/):
+  la inteligibilidad que las dos familias de criterios se construyeron para
+  proteger.
+- [Niveles](/phonometry/es/signals/levels/levels/) y
+  [Bancos de filtros](/phonometry/es/signals/filters/filter-banks/): la medición
+  por bandas de octava que produce el espectro de entrada.
+- [Medición del aislamiento en campo (ISO 16283)](/phonometry/es/buildings/insulation/insulation-field/):
+  cuando la fuente está en el local de al lado y no encima.
 - Referencia de la API: [`room.noise_criteria`](/phonometry/es/reference/api/rooms/noise-criteria/).
 - Teoría: [Criterios de ruido de salas (ANSI S12.2)](/phonometry/es/reference/theory/rooms-buildings/#criterios-de-ruido-de-salas-ansi-s122): cómo se construyen las familias NC, RC Mark II y NR y qué buscaba penalizar cada una.

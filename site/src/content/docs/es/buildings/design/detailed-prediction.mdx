@@ -52,6 +52,37 @@ que la norma ofrece sobre sus propios números.
 
 ## La cadena, banda a banda
 
+Antes de nada: la norma parte todos los elementos en dos, y toda la cadena de
+abajo es una de las dos ramas. Un **elemento de Tipo A** (apartado 3.3.5) es
+aquel cuyo tiempo de reverberación estructural lo fijan principalmente los
+elementos a los que está conectado, al menos hasta la banda de tercio de octava
+de 1 kHz, y a través del cual el nivel de vibración cae menos de 6 dB en la
+dirección perpendicular a la línea de unión. El hormigón vertido in situ, la
+madera maciza incluida la contralaminada, el vidrio, el plástico, el metal y la
+fábrica de bloques con un acabado que la conecte mecánicamente son los ejemplos
+que da la propia norma. Un **elemento de Tipo B** (3.3.6) es cualquier otra cosa,
+típicamente placa de yeso o revestimiento de madera sobre un entramado de madera
+o de metal. La distinción no es académica: es exactamente por lo que la cadena de
+Tipo A arma el factor de pérdidas a partir del perímetro de uniones, porque en un
+elemento de Tipo A las uniones *son* el amortiguamiento. Para un elemento de
+Tipo B la norma toma $T_{s,\text{situ}} = T_{s,\text{lab}}$, así que la
+corrección in situ vale 0 dB y $R_\text{situ} = R$.
+
+El edificio del Anexo L, y los pasos 1 a 5 de abajo, son la rama de Tipo A. Dos
+consecuencias conviene llevárselas. La clasificación es **por banda de
+frecuencia** — las notas 2 de las dos definiciones dicen que una pared de fábrica
+puede ser de Tipo A en bajas y medias y de Tipo B en lo alto del rango —, así que
+el título binario de la sección de construcciones ligeras de más abajo simplifica
+una frontera que en realidad se mueve con la frecuencia. Y en una unión mixta
+(apartado 4.2.2.3, «por ejemplo, una pared de Tipo B sobre un forjado de
+Tipo A») la fórmula (10) todavía se puede usar como aproximación, tomando la
+longitud de absorción equivalente del elemento de Tipo B como su superficie
+dividida por la longitud de referencia,
+$a_{i,\text{situ}} = S_{i,\text{situ}}/l_0$ (fórmula 13). Ejecutar
+`in_situ_element` sobre una partición de entramado, en cambio, arma un factor de
+pérdidas total a partir de unas uniones que no controlan su amortiguamiento, y
+nada te avisará.
+
 Ambas partes comparten la misma maquinaria, así que el edificio se describe una
 sola vez y las cadenas de ruido aéreo y de impactos leen los mismos datos de
 elemento in situ.
@@ -121,6 +152,95 @@ fórmula (12).
 recinto con cuatro elementos de flanco, y $L'_n = 10\log_{10}\sum 10^{L_n/10}$ sobre
 las cinco trayectorias de impactos, y después ISO 717.
 
+## Partir de datos de elemento medidos
+
+El apartado 4.1 es explícito sobre de dónde deberían salir los números: los datos
+acústicos de los elementos implicados *deberían tomarse principalmente de
+mediciones normalizadas de laboratorio*, y se deben declarar las fuentes de los
+datos utilizados. El cálculo del Anexo B con el que abre esta página es el
+recurso para cuando no existe medición. Un proyecto real suele partir de una hoja
+de catálogo o de un informe de ensayo ISO 10140, y esa vía tiene sus propios tres
+pasos.
+
+**El traslado al edificio es un traslado de factor de pérdidas.** El laboratorio
+midió el elemento en un marco de ensayo cuyo amortiguamiento no es el del
+edificio, así que la fórmula (9) reescala el índice por el cociente de los dos
+tiempos de reverberación estructurales,
+$R_\text{situ} = R - 10\lg(T_{s,\text{situ}}/T_{s,\text{lab}})$, y la fórmula (5)
+de la parte 2 hace lo mismo con el nivel de impactos **con el signo cambiado**.
+Lee el signo: un elemento más amortiguado en el edificio que en el marco de
+ensayo tiene un $T_s$ más corto in situ, lo que *sube* su índice y *baja* su
+nivel de impactos; un elemento menos amortiguado pierde índice. La propia nota de
+la norma añade que $R_\text{situ} = R$ es una primera aproximación utilizable, y
+para un elemento de Tipo B es exacta.
+
+**$T_{s,\text{lab}}$ sale del informe de ensayo, o del Anexo C.** Si el
+laboratorio lo imprimió, úsalo. Si no, la fórmula (C.3) estima el factor de
+pérdidas total de laboratorio como
+$\eta_\text{tot,lab} \approx \eta_\text{int} + m'/(485\sqrt{f}) \approx 0{,}01 +
+m'/(485\sqrt{f})$, válida para elementos por debajo de $m'$ = 800 kg/m², con
+$\eta_\text{int}$ tomado normalmente como 0,01 (la tabla B.1 del Anexo B lo
+tabula por material). `laboratory_total_loss_factor` es esa fórmula y
+`structural_reverberation_time` la convierte en $T_s = 2{,}2/(f\eta_\text{tot})$;
+$T_{s,\text{situ}}$ sale de la misma cadena de la fórmula (C.1) que la página ya
+ejecuta.
+
+**Las trayectorias por flancos necesitan una corrección más que la directa.** Por
+debajo de su frecuencia crítica, un $R$ de laboratorio contiene transmisión
+forzada, que una trayectoria por flancos no lleva: por una unión solo pasan ondas
+de flexión libres. El Anexo B.1 corrige, por tanto, un $R$ medido a transmisión
+resonante únicamente antes de que entre en una trayectoria por flancos — la
+estimación de 8 dB para un elemento de entramado simple sin cámara —, mientras
+que la trayectoria **directa** conserva la transmisión forzada que midió el
+laboratorio. Eso es `resonant_sound_reduction_index`, y
+`in_situ_element(..., resonant_only=True)` hace lo mismo sobre un elemento
+calculado.
+
+Los cuatro nombres de abajo (`laboratory_total_loss_factor`,
+`structural_reverberation_time`, `in_situ_reduction_index` e
+`in_situ_impact_level`) son nombres de primer nivel de `phonometry`; añádelos al
+bloque de importación de la sección anterior para ejecutar esto.
+
+```python
+# Un R y un Ln de laboratorio medidos para el forjado separador de 220 mm,
+# trasladados al edificio. `el` es el elemento in situ de la sección de arriba,
+# cuyo `reverberation_time` es Ts,situ.
+eta_lab = laboratory_total_loss_factor(bands, mass_per_area=484.0,
+                                       internal_loss_factor=0.005)   # (C.3)
+ts_lab = structural_reverberation_time(bands, eta_lab)               # (C.1)
+print(np.round(ts_lab[[0, 10]], 3))                    # [0.301 0.089] s
+print(np.round(el.reverberation_time[[0, 10]], 3))     # [0.53  0.152] s, in situ
+
+r_situ = in_situ_reduction_index(r_measured, el.reverberation_time, ts_lab)
+ln_situ = in_situ_impact_level(ln_measured, el.reverberation_time, ts_lab)
+# Este forjado está *menos* amortiguado en el edificio que en el marco de ensayo
+# (Ts,situ es el mayor de los dos), así que la fórmula (9) le quita de 2,0 a
+# 2,5 dB de índice en todo el rango y la fórmula (5) de la parte 2 se los suma a
+# su nivel de impactos.
+
+# Una trayectoria por flancos toma la forma de transmisión resonante únicamente
+# de ese mismo índice medido; la directa, no.
+r_flanking = resonant_sound_reduction_index(r_situ, bands, critical_frequency=76.8)
+```
+
+### Qué necesitas antes de empezar
+
+| Magnitud | De dónde sale |
+| :--- | :--- |
+| $R$, $L_n$ por banda | Informe de ensayo ISO 10140-2 / ISO 10140-3 — **con el tiempo de reverberación estructural de laboratorio del mismo informe** |
+| $\Delta R$ de un trasdosado | Anexo G de ISO 10140-1, o Anexo D de ISO 12354-1 |
+| $\Delta L$ de un revestimiento | [ISO 16251-1](/phonometry/es/buildings/design/impact-improvement/) o ISO 10140-3 |
+| $K_{ij}$ por unión | ISO 10848-1/-4, o el [catálogo del Anexo E](/phonometry/es/buildings/design/insulation-prediction/) |
+| $m'$, $f_c$, $\eta_\text{int}$, $c_L$ | La hoja de características del material, o la tabla B.1 del Anexo B |
+| Superficies y longitudes de acoplamiento | Los planos, medidas **de superficie a superficie** |
+
+Esa última fila cambia una respuesta: una longitud de acoplamiento medida de
+superficie a superficie en lugar de de eje a eje se diferencia en el espesor de
+una hoja en un elemento trasdosado o de doble hoja, y $l_{ij}$ entra directamente
+en la fórmula (10). El apartado 4.1 exige además declarar la procedencia de cada
+dato de entrada, que en una ficha es para lo que está el campo `notes` de
+`ReportMetadata`.
+
 ## El edificio resuelto del Anexo L / Anexo G
 
 El Anexo L de ISO 12354-1:2017 y el Anexo G de ISO 12354-2:2017 describen el
@@ -133,6 +253,19 @@ bandas, una por magnitud intermedia, lo que convierte el ejemplo en un oráculo
 completo del modelo. Ocho defectos de esas tablas impresas están registrados en
 [Erratas](/phonometry/es/reference/errata/), y el conjunto de datos de abajo
 toma las lecturas corregidas.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_iso12354_annexl_es.svg" alt="El edificio resuelto del Anexo L de ISO 12354-1: una sección de dos viviendas superpuestas que muestra el forjado separador de 220 mm con su losa flotante, las dos fachadas y las dos particiones interiores con sus masas y sus frecuencias críticas y el Kij de cada unión, y una planta del forjado separador con las cuatro longitudes de acoplamiento acotadas y las trece trayectorias de transmisión contadas" width="92%" />
+
+El dibujo es lo que ata la lista de elementos a los números que multiplica el
+fragmento de código. La suma de perímetro del forjado separador son 9 m de borde
+exterior más 9 m de borde interior porque el forjado de 5,00 m × 4,00 m se
+encuentra con una fachada en cada borde de 4,00 m y con una partición interior en
+cada borde de 5,00 m, y cada una de esas uniones lleva el forjado por encima y
+por debajo. El perímetro propio de una fachada toma 8,0 m de unión horizontal
+(sus bordes superior e inferior, 4,00 m cada uno) y 2,75 m de vertical. Las
+uniones de forjado con fachada son T rígidas y las de forjado con partición
+interior, cruces rígidas. Y las trece trayectorias son una trayectoria directa
+más tres por cada elemento de flanco, $1 + 4\times3$.
 
 ```python
 import numpy as np
@@ -218,7 +351,7 @@ ningún trabajo sobre el forjado movería ya el resultado. El número único
 $R'_w = 57$ dB no dice nada de eso.*
 
 <details>
-<summary>Ver el código de esta figura</summary>
+<summary>Mostrar el código de esta figura</summary>
 
 ```python
 import matplotlib.pyplot as plt
@@ -319,6 +452,40 @@ print(np.round(imp.l_prime_n[[3, 10]], 1))     # [54.  35.9]   total de la tabla
 print(imp.rating.rating, imp.rating.ci)        # 41 2           impreso 41,0 (2)
 ```
 
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/detailed_impact_paths_es.svg" alt="Cuotas por banda apiladas de la energía transmitida por las cinco trayectorias de impacto del edificio del Anexo G de ISO 12354-2 con el nivel de presión acústica de impactos normalizado aparente superpuesto, la trayectoria directa a través del forjado excitado dominando en todas las bandas y la resonancia del suelo flotante marcada en el eje de frecuencias" width="92%" />
+
+*La mitad de impactos del mismo edificio, y es una imagen distinta de la de ruido
+aéreo. Hay cinco trayectorias, no trece, porque solo se excita el forjado: la
+máquina de impactos se apoya en él, así que hay una trayectoria directa y una
+trayectoria Df hacia cada una de las cuatro paredes, y ninguna Ff ni Fd. La
+trayectoria directa a través del forjado excitado manda en todas las bandas. Esa
+es la lección práctica — un problema de impactos se arregla en el forjado emisor,
+no en las uniones.*
+
+<details>
+<summary>Mostrar el código de esta figura</summary>
+
+```python
+# Una línea: las contribuciones por camino y banda con L'n superpuesto.
+imp.plot()
+plt.show()
+```
+
+</details>
+
+Lee la valoración de la misma manera. $L'_{n,w} = 41$ dB con $C_I = +2$ dB
+significa que el nivel sin ponderar, el que importa para el caminar, queda por
+encima de la valoración ponderada, que es la firma de un forjado cuya mejora se
+concentra arriba — exactamente lo que hace un suelo flotante con
+$f_0 = 52{,}8$ Hz y una ley de 30 lg. Hay tres palancas que lo mueven, en el
+orden en que el modelo les responde: una capa elástica *más blanda* baja $f_0$ y
+levanta toda la curva de mejora; una losa base *más pesada* baja directamente el
+nivel desnudo a través de la fórmula (B.2) de la parte 2; y una unión mejor no
+hace casi nada mientras no se haya resuelto la trayectoria directa. Fíjate además
+en que el $\Delta L$ del suelo flotante se resta igual de la trayectoria directa
+y de todas las trayectorias por flancos, porque las cinco arrancan en el mismo
+forjado excitado.
+
 ## Simplificado frente a detallado
 
 La norma aplica su modelo simplificado al mismo edificio (tablas L.10 / G.10):
@@ -344,6 +511,23 @@ mismas trayectorias: la fórmula (14) de la parte 2 a partir de
 $\overline{D}_{v,ij,n}$ y la fórmula (13) de la parte 2 a partir de un nivel
 de impactos normalizado por flancos medido $L_{n,f}$.
 
+A diferencia de la cadena de Tipo A, esta rama consume datos de unión
+**medidos**, así que sus cuatro entradas son arrays por banda sobre `bands` que
+salen de un sitio concreto. `r_wall_leaf` es el índice de reducción acústica de
+laboratorio de la hoja por banda (ISO 10140-2), corregido por debajo de su
+frecuencia crítica a transmisión resonante únicamente porque una trayectoria por
+flancos solo lleva ondas de flexión libres. `dv_n` es la diferencia de niveles de
+velocidad de la unión promediada en las dos direcciones y **normalizada**, en dB,
+medida según
+[ISO 10848-2](/phonometry/es/buildings/insulation/flanking-lab/) y referida a una
+longitud de referencia de 1 m. `dnf_13` es la diferencia de niveles por flancos
+normalizada $D_{n,f}$ de una unión medida en laboratorio, en dB, que la llamada
+reescala por el cociente entre las longitudes de acoplamiento de obra y de
+laboratorio. Y `lnf_13` es su gemelo de impactos, el nivel de impactos
+normalizado por flancos $L_{n,f}$ en dB, que reescala por superficie y por
+longitud de acoplamiento. El bloque de abajo es un extracto: parte de esos cuatro
+arrays.
+
 ```python
 from phonometry import (flanking_impact_level_from_flanking_level,
                         flanking_reduction_index_from_flanking_level,
@@ -351,6 +535,11 @@ from phonometry import (flanking_impact_level_from_flanking_level,
                         resonant_sound_reduction_index)
 
 # ISO 12354-1 L.2.1: edificio de entramado de madera, forjado 20 m2, unión 4 m.
+r_wall_leaf = ...   # R medido de la hoja interior por banda, dB (ISO 10140-2)
+dv_n = ...          # dif. de niveles de velocidad de unión normalizada, dB (ISO 10848-2)
+dnf_13 = ...        # dif. de niveles por flancos normalizada de laboratorio Dn,f, dB
+lnf_13 = ...        # nivel de impactos normalizado por flancos de laboratorio Ln,f, dB
+
 r_star = resonant_sound_reduction_index(r_wall_leaf, bands,
                                         critical_frequency=2200.0)   # +8 dB bajo fc
 r_ff = flanking_reduction_index_from_normalized_difference(
@@ -422,7 +611,7 @@ impact.report("prediccion-impactos.pdf", language="es")  # L'n,w, cinco trayecto
 ```
 
 Las fichas de ejemplo se regeneran con `make reports` y se mantienen
-renderizadas en el repositorio; Pulsa una vista previa para abrir el PDF. Las
+renderizadas en el repositorio; pulsa una vista previa para abrir el PDF. Las
 dos muestran el edificio del anexo L de esta página: los mismos elementos, las
 mismas uniones y el mismo suelo flotante con los que se construyen las tablas
 de arriba.
@@ -440,6 +629,43 @@ de arriba.
 	description="Ficha de predicción detallada a impactos de una página para el mismo edificio en la dirección de impactos: la cabecera de identificación, la tabla de cuota de energía de la trayectoria directa y de las cuatro trayectorias por flancos, la figura por banda de la contribución de cada trayectoria bajo la curva del nivel de presión acústica de impactos normalizado aparente, y el L'n,w = 41 dB predicho y recuadrado con la desviación típica del modelo detallado y el veredicto frente a la exigencia."
 	caption="Ficha de predicción detallada a impactos (DetailedImpactResult.report), el mismo edificio excitado por la máquina de impactos."
 />
+
+## Qué cubre esta guía
+
+**Cubierto.** La cadena por bandas del apartado 4.2 para elementos de **Tipo A**:
+el índice de reducción acústica y el nivel de impactos de elemento homogéneo del
+Anexo B y la conversión in situ del Anexo C mediante `HomogeneousElement`,
+`in_situ_element` y `perimeter_absorption_coefficient`; el traslado de datos de
+laboratorio *medidos* mediante `laboratory_total_loss_factor`,
+`structural_reverberation_time`, `in_situ_reduction_index` e
+`in_situ_impact_level` (fórmula 9 y fórmula 5 de la parte 2); la caída de unión
+in situ de la fórmula (10); las trayectorias aéreas directa y por flancos de las
+fórmulas (14)/(15) mediante `direct_reduction_index` y `airborne_flanking_path` y
+sus gemelas de impactos `direct_impact_level` e `impact_flanking_path`; las vías
+de **Tipo B** de las fórmulas (16)/(17) y la corrección resonante del Anexo
+B.1/B.2 mediante `resonant_sound_reduction_index`; el ensamblaje y la valoración
+ISO 717 mediante `detailed_airborne_prediction` y `detailed_impact_prediction`;
+la identidad de reciprocidad B.3/B.4 de la parte 2 mediante
+`reciprocity_impact_level`; y las dos fichas mediante `.report()`. El apartado 5
+declara que el modelo a ruido aéreo no tiene error sistemático y que su
+desviación típica es de 1,5 dB a 2,5 dB para edificios de elementos homogéneos,
+suponiendo una buena ejecución — la cifra menor cuando se tiene en cuenta cada
+aspecto, la mayor en situaciones complejas o cuando se desprecia el tiempo de
+reverberación estructural.
+
+**No cubierto.** Aquí solo se calculan elementos homogéneos del Anexo B; el
+espectro de un elemento ligero, doble o compuesto es un dato de entrada, que sale
+de
+[Predicción del aislamiento de paneles](/phonometry/es/buildings/design/panel-sound-insulation/)
+o de un informe de ensayo. El propio catálogo de uniones del Anexo E vive en
+[Predicción del aislamiento acústico (EN 12354)](/phonometry/es/buildings/design/insulation-prediction/),
+igual que las tablas por defecto de los anexos D y F de las demás partes. La rama
+de Tipo B se muestra a partir de sus entradas normativas en lugar de resolverse
+de principio a fin. La transmisión aérea a través de cámaras y de techos
+suspendidos no se lleva en absoluto, y la nota 1 del apartado 3.3.4 advierte de
+que ahí «puede contribuir o incluso dominar». Y la valoración ISO 717 necesita el
+espectro entero: de 100 Hz a 3150 Hz en tercios de octava, o de 125 Hz a 2000 Hz
+en octavas.
 
 ## Véase también
 

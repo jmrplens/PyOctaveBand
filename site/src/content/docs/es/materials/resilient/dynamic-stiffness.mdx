@@ -13,13 +13,14 @@ references:
     organization: "International Organization for Standardization"
     year: 1989
     title: "Acoustics — Determination of dynamic stiffness — Part 1: Materials used under floating floors in dwellings"
-    designation: "ISO 9052-1:1989"
+    designation: "EN 29052-1:1992 (ISO 9052-1:1989)"
     url: "https://www.iso.org/standard/16620.html"
-    note: "El original internacional de EN 29052-1:1992, el método que implementa esta página: la rigidez dinámica por unidad de superficie (Fórmula 1), las relaciones de resonancia (Fórmulas 2-4), el término del gas encerrado (Fórmula 7, NOTA del apartado 8.2 s'a = 111/d MN/m³) y los regímenes por resistividad al flujo (Fórmulas 5-6). La conformidad se ancla en la NOTA numérica de la propia norma más valores en forma cerrada calculados a mano de las relaciones de resonancia."
+    note: "La EN 29052-1:1992 es la adopción europea idéntica de la ISO 9052-1:1989 y es la designación que usa esta página en todo momento; la URL de ISO es la citable. El método implementado aquí: la rigidez dinámica por unidad de superficie (Fórmula 1), las relaciones de resonancia (Fórmulas 2-4), el término del gas encerrado (Fórmula 7, NOTA del apartado 8.2 s'a = 111/d MN/m³) y los regímenes por resistividad al flujo (Fórmulas 5-6). La conformidad se ancla en la NOTA numérica de la propia norma más valores en forma cerrada calculados a mano de las relaciones de resonancia."
 ---
 
 import ThemeImage from '../../../../../components/ThemeImage.astro';
 import ReportPreview from '../../../../../components/ReportPreview.astro';
+import Video from '../../../../../components/Video.astro';
 
 Un **suelo flotante** es una losa pesada que descansa sobre una capa elástica;
 ambos forman un sistema masa-resorte cuya **frecuencia natural** determina cuánto
@@ -34,6 +35,15 @@ reacción local y excluye expresamente los suelos flotantes.)
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/dynamic_stiffness_es.svg" alt="Frecuencia natural del suelo flotante frente a la rigidez dinámica por unidad de superficie de la capa elástica para un suelo flotante ligero y uno pesado, con un punto de diseño" width="82%" loading="eager" />
 
+*Todo el problema de diseño en un gráfico: $f_0 = (1/2\pi)\sqrt{s'/m'}$, así
+que la frecuencia natural cae con la raíz cuadrada de la rigidez dinámica de la
+capa y sube con la raíz cuadrada de uno partido por la masa superficial de la
+losa. Dividir $s'$ entre cuatro reduce $f_0$ a la mitad, y cuadruplicar la masa
+de la losa hace lo mismo. Un suelo flotante solo mejora el aislamiento bastante
+por encima de $f_0$, que es la razón de que el objetivo de diseño sea una capa
+blanda bajo una losa pesada, y también la razón de que el extremo derecho plano
+de la curva signifique que una capa más rígida cuesta menos de lo que parece.*
+
 <details>
 <summary>Mostrar el código de esta figura</summary>
 
@@ -42,18 +52,10 @@ import matplotlib.pyplot as plt
 import numpy as np
 from phonometry import materials
 
-# Una línea: a partir de una resonancia medida, el resultado dibuja su propia
-# curva de diseño f0(s') con la determinación marcada:
-res = materials.floating_floor_resonance(
-    resonant_frequency=25.0, total_mass_per_area=200.0,
-    floor_mass_per_area=120.0,
-    airflow_resistivity=50.0,   # kPa.s/m2 (= 50000 Pa.s/m2 de la ISO 9053)
-    thickness=0.020, porosity=0.9,
-)
-res.plot(language="es")
-plt.show()
+# La curva de diseño para un suelo flotante ligero y uno pesado (Fórmula 2).
 
-# A mano, la misma curva de diseño para un suelo flotante ligero y uno pesado:
+# Una determinación medida dibuja la misma curva con su propio punto marcado;
+# `floating_floor_resonance` y sus argumentos son el tema de la sección 2.
 s = np.logspace(np.log10(2.0), np.log10(100.0), 300)   # MN/m3
 for m in (40.0, 120.0):
     plt.semilogx(s, materials.natural_frequency(s * 1e6, m), label=f"m' = {m:g} kg/m²")
@@ -83,15 +85,112 @@ $$
 s'_t = 4\pi^2\,m'_t\,f_r^2 .
 $$
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_dynamic_stiffness_rig_es.svg" alt="Banco de resonancia ISO 9052-1: un excitador vertical y un acelerómetro sobre la placa de carga encima de la probeta resiliente de 200 mm por 200 mm, leído como un sistema masa-resorte cuyo pico de respuesta da la frecuencia de resonancia y la rigidez dinámica aparente" width="92%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_dynamic_stiffness_rig_es.svg" alt="Banco de resonancia de EN 29052-1 en tres paneles: las tres disposiciones de excitación de las figuras 1 a 3, una sobre cimentación rígida con la placa de carga excitada y medida, y dos sobre una placa base aislada de al menos 100 kg donde se miden las dos placas y el excitador ataca o la placa de carga o la placa base; debajo, los requisitos de probeta y de carga con el lecho de yeso, la placa de carga de acero y el cordón de vaselina, y el modelo masa-resorte cuyo pico de respuesta da la frecuencia de resonancia" width="92%" />
 
-En la disposición de ensayo la probeta queda entre la base rígida y una placa
+En la disposición de ensayo la probeta queda entre una placa base y una placa
 de carga cuya masa total por unidad de superficie, placa más carga añadida, es de
 200 kg/m² (8 kg sobre la probeta de 0,04 m²). Esa carga reproduce la precarga
-estática de un suelo flotante típico, unos 2 kPa. Un excitador vertical mueve
-la placa, un acelerómetro recoge su respuesta y la resonancia vertical
-fundamental $f_r$ del sistema placa-probeta se lee del pico de la respuesta;
-la Fórmula 4 la convierte en $s'_t$.
+estática de un suelo flotante típico, unos 2 kPa, y es la razón de que el
+alcance de la norma se detenga por debajo de 0,4 kPa y por encima de 4 kPa de
+carga. Un excitador vertical mueve el sistema, un acelerómetro recoge su
+respuesta y la resonancia vertical fundamental $f_r$ del sistema placa-probeta
+se lee del pico de la respuesta; la Fórmula 4 la convierte en $s'_t$.
+
+### 1.1 Obtener $f_r$
+
+La biblioteca toma $f_r$ como entrada, y el apartado 7 es cómo la produce un
+laboratorio. Se ofrecen tres señales de excitación y se declaran
+**equivalentes**: sinusoidal, ruido blanco e impulso. La sinusoidal es el
+método de referencia en caso de discrepancia; las excitaciones por ruido blanco
+y por impulso se analizan como una respuesta en frecuencia según ISO 7626-2 o
+por excitación por impacto. Las tres disposiciones dibujadas arriba difieren en
+dónde va el excitador y en qué se mide: sobre una base rígida cuya velocidad es
+despreciable frente a la de la placa de carga, basta con la placa de carga;
+sobre una placa base de al menos 100 kg apoyada en soportes blandos se miden las
+dos placas. Se use la que se use, la disposición debe permitir únicamente
+movimiento vertical, sin componentes de rotación, y se declara junto al
+resultado.
+
+El procedimiento sinusoidal es un barrido a **fuerza de excitación constante**.
+El problema está en que $f_r$ suele depender de esa fuerza, porque una capa
+resiliente es no lineal: excítala más fuerte y se ablanda, y el pico se desplaza
+hacia abajo en frecuencia. Así que la norma no pide una resonancia, pide la
+resonancia que tendría el material a amplitud tendente a cero:
+
+1. Barrer a una amplitud de fuerza y leer el pico.
+2. Repetir en **al menos tres** amplitudes de fuerza dentro del intervalo que
+   selecciona la rigidez esperada: $0{,}2\ \text{N} \le F \le 0{,}8\ \text{N}$
+   para $s' > 50$ MN/m³, y $0{,}1\ \text{N} \le F \le 0{,}4\ \text{N}$ para
+   $s' \le 50$ MN/m³.
+3. Extrapolar linealmente los puntos $(F, f_r)$ hasta fuerza nula. **Esa
+   ordenada en el origen** es la $f_r$ que espera la biblioteca.
+
+```python
+import numpy as np
+
+# `materials` lo importa el bloque de arriba. Tres barridos sinusoidales dentro
+# del intervalo de 0,1 a 0,4 N (esta capa está muy por debajo de 50 MN/m3), cada
+# uno con su propio pico: la capa se ablanda al excitarla más fuerte, así que
+# f_r se desplaza hacia abajo.
+force = np.array([0.10, 0.25, 0.40])          # N
+peak = np.array([25.6, 25.0, 24.4])           # Hz, leídos de la respuesta
+
+slope, intercept = np.polyfit(force, peak, 1)
+print(round(float(intercept), 2))             # 26.0  Hz con F -> 0
+s_t = materials.apparent_dynamic_stiffness(resonant_frequency=intercept,
+                                           total_mass_per_area=200.0)
+print(round(s_t / 1e6, 3))                    # 5.337  MN/m3
+# Tomar en su lugar el barrido más excitado tal cual da 4.701 MN/m3, un 12 %
+# por debajo, y con él una f0 de suelo flotante un 5 % por debajo.
+```
+
+Hay un material que echa por tierra la lectura del pico. Cuando el
+amortiguamiento interno es alto, el máximo de vibración vertical no queda
+pronunciado, y la respuesta de la norma es dejar de mirar el módulo: localizar
+la resonancia a partir del **desfase** entre la señal de excitación y la de
+vibración. Esa fase no es una lectura de repuesto de lo mismo: es una lectura
+más afilada, y ver un barrido pasar por $f_r$ enseña por qué.
+
+<Video
+  name="anim_dynamic_stiffness_sweep"
+  width={2400}
+  height={1350}
+  title="Barrido de un banco EN 29052-1 a través de su resonancia"
+  description="Un barrido sinusoidal de 8 Hz a 60 Hz excita la placa de carga de 8 kg sobre su probeta resiliente mientras se siguen el módulo y la fase de la respuesta. Por debajo de la resonancia de 25 Hz la placa se mueve en fase con la fuerza; en resonancia la amplitud alcanza su máximo y el movimiento se retrasa un cuarto de ciclo, cruzando los menos 90 grados; por encima, la placa se mueve contra la fuerza hacia la antifase. La placa se observa de forma estroboscópica a la frecuencia de excitación y su movimiento se dibuja en una escala de amplitud comprimida, de modo que lo que se mueve en pantalla es la relación de fase y no la oscilación de 25 Hz en sí."
+/>
+
+El pico del módulo es ancho, que es lo que hace de él el factor de pérdidas,
+mientras que la fase pasa por $-90°$ de forma abrupta y lo cruza en $f_r$ sea
+cual sea el amortiguamiento. Esa es toda la razón de que la norma ofrezca la
+lectura de fase para materiales amortiguados, y merece la pena tenerla en
+cualquier banco, porque un pico de 2 Hz de ancho es un pico que se puede leer
+con 2 Hz de error.
+
+### 1.2 Preparar la probeta y el banco
+
+La $f_r$ medida la deciden el asiento y las tolerancias del banco al menos
+tanto como el material, y las dos cosas son normativas.
+
+- **Probetas.** Al menos tres, de 200 mm × 200 mm cada una (apartado 6). Sus
+  superficies solo cuentan como lisas si las irregularidades quedan por debajo
+  de 3 mm.
+- **Asiento.** Cubrir la probeta con una lámina de plástico impermeable de unos
+  0,02 mm de espesor, aplicar una pasta fina de yeso de París y agua de al
+  menos 5 mm de espesor para que quede cubierta cualquier irregularidad, y
+  asentar sobre ella la placa de carga **antes de que fragüe el yeso**. Un
+  contacto seco o parcial hace que la carga descanse sobre parte del área de la
+  probeta, rigidiza la lectura y sesga $f_r$ hacia arriba.
+- **Materiales de celda cerrada.** Sellar la junta entre la probeta y la base
+  alrededor del perímetro con un cordón de vaselina. Un perímetro sin sellar
+  cambia lo que puede hacer el gas encerrado de la sección 2.
+- **Placas.** La placa de carga es de acero, cuadrada de (200 ± 3) mm, y tanto
+  ella como la base tienen irregularidades de perfil por debajo de 0,5 mm y son
+  lo bastante rígidas como para evitar ondas de flexión en el rango de
+  frecuencias de interés.
+- **La carga es un presupuesto, no una placa.** La carga total sobre la probeta
+  es de 8 kg ± 0,5 kg **incluyendo todo el equipo de medición y de
+  excitación**, así que el acelerómetro, la varilla de excitación y cualquier
+  otra cosa que descanse sobre la placa cuentan contra ella.
 
 ```python
 from phonometry import materials
@@ -145,12 +244,73 @@ print(round(materials.enclosed_gas_stiffness(thickness=0.020, porosity=0.9) / 1e
 # 5.56  MN/m3   (los 111/20 = 5.55 MN/m3 de la NOTA)
 ```
 
+Ese término no es una corrección de redondeo. A 20 mm ya es mayor que la
+rigidez de esqueleto que midió el banco, y por debajo de unos 22 mm el resorte
+es el aire de los poros y no el material.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/enclosed_gas_stiffness_es.svg" alt="Gráfico log-log de la rigidez dinámica por unidad de área frente al espesor bajo carga de 5 a 60 milímetros: la rigidez del esqueleto es una línea horizontal en 4,94 meganewtons por metro cúbico, el término del gas encerrado cae como 111 partido por el espesor y la cruza cerca de 22 milímetros, y su suma es la rigidez instalada, con la determinación resuelta marcada en 20 milímetros y un eje a la derecha que da la frecuencia natural de un recrecido de 120 kilogramos por metro cuadrado" width="88%" />
+
+*La inversión que decide si una capa delgada puede llegar a ser blanda. La
+rigidez de esqueleto $s'_t$ es una propiedad del material y le da igual el
+espesor de la capa; el término del gas encerrado
+$s'_a = p_0/(d\varepsilon)$ no, y crece sin límite según se adelgaza la capa.
+Por debajo del cruce, cerca de 22 mm, el aire de los poros es el más rígido de
+los dos resortes, así que una capa permeable de 10 mm no puede ser blanda por
+blando que sea su esqueleto: 11 MN/m³ solo de gas devuelven $f_0$ por encima de
+50 Hz sobre un recrecido de 120 kg/m². El eje derecho es la misma $s'$ leída
+como esa frecuencia natural.*
+
+<details>
+<summary>Mostrar el código de esta figura</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+
+# `materials` se importa arriba. La suma del apartado 8.2 frente al espesor
+# bajo carga, con el término de esqueleto fijo en los 4,94 MN/m3 de la
+# determinación resuelta.
+d_mm = np.logspace(np.log10(5.0), np.log10(60.0), 300)
+s_gas = np.array([materials.enclosed_gas_stiffness(thickness=d * 1e-3,
+                                                   porosity=0.9) / 1e6
+                  for d in d_mm])
+fig, ax = plt.subplots()
+ax.loglog(d_mm, np.full_like(d_mm, 4.935), "--", label="s't, esqueleto")
+ax.loglog(d_mm, s_gas, "-.", label="s'a, gas encerrado")
+ax.loglog(d_mm, 4.935 + s_gas, "-", label="s' instalada")
+ax.set_xlabel("Espesor bajo carga d [mm]")
+ax.set_ylabel("Rigidez dinámica por unidad de área [MN/m³]")
+ax.legend()
+plt.show()
+```
+
+</details>
+
 La rigidez dinámica del material *instalado* la fija entonces la resistividad
 lateral al flujo $r$ (apartado 8.2): $s' = s'_t$ para
 $r \ge 100\ \text{kPa}\cdot\text{s/m}^2$, $s' = s'_t + s'_a$ para
 $10 \le r < 100\ \text{kPa}\cdot\text{s/m}^2$, y para
 $r < 10\ \text{kPa}\cdot\text{s/m}^2$ el método solo resuelve $s' = s'_t$
 cuando el término del gas es despreciable.
+
+**Por qué decide algo la resistividad lateral.** Bajo la placa de carga la capa
+está comprimida, y el aire de los poros tiene dos salidas: puede escaparse
+lateralmente fuera de la capa, o puede comprimirse en su sitio junto con el
+esqueleto. Solo en el segundo caso es un resorte en paralelo con el esqueleto, y
+la resistividad lateral al flujo es exactamente lo que decide cuál de las dos
+ocurre. Eso se corresponde con las tres ramas. Con $r$ **alta** el aire queda
+atrapado tanto en la probeta de 200 mm como bajo un suelo completo, así que la
+$s'_t$ que midió el banco ya lo contiene y no se añade nada. Con $r$
+**intermedia** escapa de la probeta pequeña pero no de un suelo de varios metros
+de lado, así que la norma calcula $s'_a$ y lo vuelve a sumar. Con $r$ **baja**
+escapa de los dos: no hay resorte de gas que sumar, pero el método tampoco puede
+ya separar las dos contribuciones. En ese tercer caso, declarar $s' = s'_t$ con
+la reserva, y enunciar el error estimado de despreciar $s'_a$: la norma pide
+exactamente eso. Fíjate además en de dónde sale $r$: es la misma propiedad
+viscosa que mide la ISO 9053, pero a lo largo de la capa en lugar de a través
+de ella, y aquí es una entrada y no algo que determine el método. Toma la
+porosidad $\varepsilon$ de $s'_a$ como el 0,9 de la norma salvo que se haya
+medido.
 
 **Ojo al prefijo.** $r$ es la magnitud que la ISO 9053 llama $\sigma$ y da
 en Pa·s/m², mientras que la EN 29052-1 la escribe $r$ y pone sus umbrales en
@@ -254,10 +414,71 @@ de la Fórmula 4 se degrada. De la precarga se derivan tres trampas prácticas:
   soporte la carga. Un contacto seco e irregular concentra la fuerza,
   rigidiza la respuesta localmente y sesga $f_r$ hacia arriba.
 
+### 3.1 Leer $s'$, y qué compra
+
 La frecuencia natural que importa al final no es la $f_r$ del banco sino la
-$f_0$ del suelo instalado según la Fórmula 2: el suelo flotante solo mejora
-el aislamiento bastante por encima de $f_0$, y por eso una $s'$ baja (una
-capa blanda bajo una losa pesada) es el objetivo de diseño.
+$f_0$ del suelo instalado según la Fórmula 2. De ahí salen dos preguntas, y la
+página le debe respuesta a las dos.
+
+**¿Es 10,5 MN/m³ un buen número?** Las capas resilientes que se usan bajo
+recrecidos van desde unos pocos MN/m³ en productos elastoméricos blandos y lanas
+minerales de baja densidad hasta varias decenas en paneles más rígidos, así que
+la determinación resuelta queda en mitad del rango utilizable. El límite
+inferior se lo pone el término del gas encerrado: para una capa con un 90 % de
+porosidad, él solo aporta unos $111/d$ MN/m³ con $d$ en milímetros, así que una
+capa permeable delgada no puede ser blanda haga lo que haga su esqueleto.
+
+**¿Qué compra una $f_0$ baja?** El suelo flotante mejora el aislamiento a
+impactos en $\Delta L = 30\lg(f/f_0)$ para recrecidos de mortero de cemento y de
+sulfato de calcio (Fórmula (C.1) de ISO 12354-2), y en $40\lg(f/f_0)$ para
+asfalto y suelos secos. Así que los 47 Hz de la determinación resuelta dan unos
+31 dB a 500 Hz y nada en absoluto en $f_0$ y por debajo; y reducir $f_0$ a la
+mitad compra unos 9 dB en toda la banda, que es la razón de ser de todo el
+método. El objetivo práctico es mantener $f_0$ por debajo de la banda de interés
+más baja.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/floating_floor_transmissibility_es.svg" alt="Dos paneles: a la izquierda, la respuesta de la placa de carga del banco frente a la frecuencia, con un pico en 25 hercios para una excitación pequeña y en 22 hercios, con un pico más bajo, cuando se sobreexcita; a la derecha, la mejora del aislamiento a impactos frente a la frecuencia para dos capas resilientes, creciendo como treinta veces el logaritmo de la frecuencia partida por la frecuencia natural desde 47 hercios y desde 32 hercios, con la curva de aislamiento masa-resorte ideal que muestra en rojo sombreado la amplificación por debajo de raíz de dos veces la frecuencia natural" width="92%" />
+
+*Izquierda: el pico que lee quien maneja el banco, y lo que le hace
+sobreexcitarlo: la resonancia se desplaza hacia abajo en frecuencia y se
+aplana, que es toda la razón de la extrapolación de la sección 1.1. Derecha: lo
+que hace el suelo instalado con el resultado. Por debajo de $\sqrt{2}\,f_0$ no
+se gana nada; la región sombreada es donde un suelo flotante masa-resorte sin
+amortiguar sería peor que no poner suelo flotante, y la ley de ISO 12354-2
+trunca eso a cero en lugar de predecir el pico ideal, porque un recrecido real
+sobre una capa real está amortiguado. Reducir $s'$ a la mitad baja $f_0$ en un
+factor $\sqrt{2}$ y sube toda la curva unos 5 dB: 30,8 dB frente a 35,6 dB a
+500 Hz para las dos capas dibujadas.*
+
+<details>
+<summary>Mostrar el código de esta figura</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+
+# `materials` se importa arriba. La ley de ISO 12354-2 en forma cerrada para la
+# determinación resuelta y para una capa la mitad de rígida; la biblioteca
+# evalúa esa misma ley, con sus ramas, en floating_floor_improvement_spectrum
+# (ver la guía de predicción de capas elásticas).
+bands = np.array([50, 63, 80, 100, 125, 160, 200, 250, 315, 400, 500,
+                  630, 800, 1000, 1250, 1600, 2000, 2500, 3150], float)
+fig, ax = plt.subplots()
+for stiffness in (10.49e6, 5.0e6):
+    f0 = float(materials.natural_frequency(stiffness, 120.0))
+    delta_l = np.maximum(30.0 * np.log10(bands / f0), 0.0)   # Fórmula (C.1)
+    ax.semilogx(bands, delta_l, "o-", label=f"f0 = {f0:.0f} Hz")
+ax.set_xlabel("Frecuencia [Hz]")
+ax.set_ylabel("Mejora del aislamiento a impactos [dB]")
+ax.legend()
+plt.show()
+```
+
+</details>
+
+Cuánta mejora compra eso realmente banda a banda, y en qué se convierte como
+número único ponderado, es
+[Predicción del comportamiento de capas elásticas](/phonometry/es/buildings/design/resilient-layers/).
 
 ## Qué cubre esta guía
 
@@ -273,17 +494,30 @@ de informe de ensayo del apartado 9.
 
 **No cubierto.** El procedimiento de medición del apartado 7, que extrae
 la frecuencia de resonancia $f_r$ de la señal bruta de excitación-respuesta
-por métodos sinusoidal, de ruido blanco o de impulso y la extrapola a
-amplitud de fuerza nula, no está implementado: pasa una $f_r$ ya extrapolada.
+por métodos sinusoidal, de ruido blanco o de impulso, no está implementado:
+pasa una $f_r$ ya extrapolada, obtenida como describe la sección 1.1 (la
+extrapolación en sí es un ajuste por recta, que la sección 1.1 muestra).
 La resistividad al flujo lateral $r$ del apartado 8.2 también se toma como
 entrada en lugar de medirse; los métodos estático y alterno de la ISO 9053
 están implementados aparte, en `materials.absorbers.airflow_resistance`, y
 dan $\sigma$ en Pa·s/m² mientras que el argumento `airflow_resistivity` de
 esta página va en kPa·s/m². El requisito
 de selección de probetas del apartado 6 (al menos tres probetas de
-200 mm × 200 mm) no se aplica.
+200 mm × 200 mm) no se aplica, y tampoco el contenido de informe de la
+apartado 9: la ficha de abajo lleva la disposición de excitación y el tipo de
+señal solo si se aportan en los metadatos.
 
 ## Véase también
 
+- [Predicción del comportamiento de capas elásticas](/phonometry/es/buildings/design/resilient-layers/):
+  qué hace el lado del diseño con $s'$, desde la resonancia masa-resorte hasta
+  las leyes de mejora por encima de ella y su número único ponderado.
+- [Predicción del aislamiento acústico (EN 12354)](/phonometry/es/buildings/design/insulation-prediction/):
+  el término de suelo flotante que alimenta esta medición.
+- [Resistencia al flujo de aire](/phonometry/es/materials/absorbers/airflow-resistance/):
+  la determinación ISO 9053 de la resistividad lateral $r$ que necesita el
+  apartado 8.2, declarada allí como $\sigma$ en Pa·s/m².
+- [Capas elásticas: visión general](/phonometry/es/materials/resilient/): dónde
+  encaja esta medición entre las guías de materiales.
 - Referencia de la API: [`materials.resilient.dynamic_stiffness`](/phonometry/es/reference/api/materials/dynamic-stiffness/).
 - Teoría: [Movilidades puntuales y eficiencia de radiación](/phonometry/es/reference/theory/vibration/#movilidades-puntuales-y-eficiencia-de-radiación-cremer-5-hopkins-29): la resonancia masa-resorte que mide el banco de EN 29052-1, vista como una movilidad.

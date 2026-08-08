@@ -1,5 +1,5 @@
 ---
-title: "Acústica de salas"
+title: "Parámetros acústicos de salas (ISO 3382-1/2)"
 description: "El análisis del decaimiento de la respuesta al impulso medida según ISO 3382-1/2: la curva de Schroeder, EDT, T20, T30, claridad, definición y tiempo central, las marcas de validez que los mantienen honestos y la ficha acreditada."
 references:
   - type: book
@@ -103,6 +103,24 @@ tiene una **diferencia apenas perceptible** (ISO 3382-1 Tabla A.1: EDT 5 %,
 C80 1 dB, D50 0,05, Ts 10 ms) que fija con qué precisión merece la pena
 informarlo.
 
+**Dónde está $t = 0$.** Las tres integrales de energía empiezan en la llegada del
+**sonido directo**, no al principio del archivo. La ISO 3382-1, A.3.4, sitúa ese
+punto donde la respuesta sube por primera vez de forma apreciable por encima del
+fondo estando todavía más de 20 dB por debajo de su máximo, y `room_parameters`
+aplica ese disparo banda a banda antes de integrar, de modo que cualquier retardo
+de propagación y de sistema que arrastre la grabación se elimina automáticamente:
+una RI medida no necesita recorte manual. Importa de forma asimétrica. Los tiempos
+de reverberación usan solo la *pendiente* del decaimiento y les da igual dónde
+empiece, pero C50, C80 y $T_s$ integran *desde* $t = 0$, así que un origen situado
+un milisegundo tarde deja fuera parte del sonido directo y puede mover C50 y C80
+varios decibelios y $T_s$ decenas de milisegundos, dejando T20 y T30 casi
+intactos: el error es invisible en el número que todo el mundo comprueba. El
+detector yerra deliberadamente por el lado temprano, que es la dirección
+inofensiva. De ahí salen dos reglas de trabajo: no recortes nunca una RI a mano
+para quitarle el retardo previo, y desconfía de los C50/C80 de una grabación
+cuyo sonido directo sea débil o venga precedido de resonancias por un procesado
+externo, porque entonces el disparo puede llegar tarde.
+
 <Video
   name="anim_schroeder"
   width={2400}
@@ -145,7 +163,7 @@ room.decay_curve(ir, fs).plot()   # curva de Schroeder con los ajustes EDT/T20/T
 ```
 
 <details>
-<summary>Ver el código de esta figura</summary>
+<summary>Mostrar el código de esta figura</summary>
 
 ```python
 import matplotlib.pyplot as plt
@@ -182,6 +200,26 @@ Para este decaimiento de pendiente única, EDT, T20 y T30 devuelven todos
 ≈ 1,0 s, y los parámetros de energía coinciden con sus formas cerradas
 (C80 = 3,05 dB, D50 = 0,499, Ts = 72 ms). Una sala real tiene una pendiente
 inicial más pronunciada, así que EDT < T30.
+
+**Qué significan los parámetros de energía.** C50 y D50 son la misma medida en
+dos unidades, ligadas por $C_{50} = 10\lg[D_{50}/(1-D_{50})]$ — la pareja impresa
+arriba la cumple, ya que $D_{50}$ = 0,499 da $C_{50}$ = −0,02 dB —, así que un
+espacio para el habla que apunte a $D_{50} > 0{,}5$ está apuntando a
+$C_{50} > 0$ dB, y no tiene sentido citar los dos como si fueran pruebas
+independientes. Para música, el C80 de salas de conciertos y polivalentes
+desocupadas de hasta 25 000 m³ suele ir entre −5 dB y +5 dB (la columna de
+«intervalo típico» de la Tabla A.1 de la ISO 3382-1), donde los valores negativos
+se leen como sala mezclada o reverberante y los superiores a unos +3 dB como seca;
+el $T_s$ de esas mismas salas va entre 60 ms y 260 ms y se mueve en sentido
+inverso a la claridad, y el $D_{50}$ entre 0,3 y 0,7. Con esos intervalos van dos
+cautelas. Son valores de una sola posición en salas *desocupadas*, y el público
+acorta el decaimiento y sube la claridad, así que una sala ocupada no queda
+descrita por ellos. Y a diferencia del T30, los parámetros de energía son
+magnitudes de energía temprana que varían mucho de butaca en butaca, así que un
+valor de una sola posición dice poco: declara la media espacial con su dispersión
+(más abajo). La columna de DAP fija la resolución de declaración en el otro
+sentido: una diferencia de 0,5 dB de C80 entre dos diseños no es ninguna
+diferencia.
 
 Sobre un decaimiento real, dependiente de la frecuencia, el `.plot()` por
 bandas es el resumen de trabajo de toda la medición: los tiempos de caída
@@ -233,9 +271,10 @@ plt.show()
 
 </details>
 
-**Leer EDT, T20 y T30 unos contra otros.** Los tres tiempos extrapolan el
-mismo decaimiento de 60 dB desde ventanas distintas, así que su desacuerdo
-lleva información:
+### Leer EDT, T20 y T30 unos frente a otros
+
+Los tres tiempos extrapolan el mismo decaimiento de 60 dB desde ventanas
+distintas, así que su desacuerdo lleva información:
 
 - **T20 ≈ T30** (curvatura por debajo del 10 %): el decaimiento se acerca
   a una única pendiente recta en ambas ventanas de evaluación, algo
@@ -260,7 +299,64 @@ lleva información:
   una butaca apunta a un eco o a una superficie focalizante que concentra
   allí energía tardía.
 
-**Cuánto decaimiento permite el suelo de ruido.** Una ventana de ajuste
+Los tres casos son tres formas, y merece la pena verlas una al lado de la otra
+antes de tener que diagnosticar alguna.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/decay_signatures_es.svg" alt="Tres paneles que comparten el eje de nivel, cada uno con la curva de decaimiento de Schroeder de una respuesta al impulso sintética y con su EDT, T20, T30 y curvatura impresos: un decaimiento recto de pendiente única con curvatura cercana a cero, un decaimiento combado de dos exponenciales con un codo visible y una curvatura muy por encima del diez por ciento, y un decaimiento precedido de un sonido directo fuerte y una reflexión temprana cuyo tiempo de decaimiento inicial cae muy por debajo del T30" width="92%" />
+
+*Tres decaimientos, un mismo eje, todos leídos por `room_parameters`. A la
+izquierda, una única exponencial con $T$ = 1,0 s: EDT, T20 y T30 devuelven todos
+1,00 s y la curvatura es del −0,1 %. En el centro, un volumen acoplado — el 98 %
+de la energía decayendo a 0,6 s sobre una cola de 2,5 s — que pone un codo visible
+en la curva de Schroeder y devuelve EDT 0,72 s, T20 1,78 s, T30 2,18 s y una
+curvatura del **23 %**: ningún número único lo describe. A la derecha, la misma
+cola de 1,0 s precedida de un racimo de reflexiones tempranas fuertes en los
+primeros 25 ms: T20 y T30 quedan intactos en 0,99 s y 1,00 s, la curvatura se
+queda en el 0,5 % y el **EDT se desploma a 0,58 s** — la butaca suena más seca de
+lo que dice su tiempo de reverberación, y solo el EDT lo sabe.*
+
+<details>
+<summary>Mostrar el código de esta figura</summary>
+
+```python
+import matplotlib.pyplot as plt
+# `np`, `fs` y `room` son las importaciones del bloque de decaimiento de arriba.
+
+rng = np.random.default_rng(3382)
+span = np.arange(int(4.0 * fs)) / fs
+
+
+def energy(t60):                       # la envolvente de p^2 de un decaimiento T60 = t60
+    return np.exp(-6.0 * np.log(10.0) / t60 * span)
+
+
+noise = rng.standard_normal(span.size)
+tail = noise * np.sqrt(energy(1.0))
+
+early = tail.copy()                    # un racimo de reflexiones tempranas fuertes
+amplitude = np.sqrt(6.0 * float(np.sum(tail ** 2)) / 8.0)
+for k, i in enumerate(np.linspace(0, int(0.025 * fs), 8).astype(int)):
+    early[i] += amplitude * 0.85 ** k * (1.0 if k % 2 == 0 else -1.0)
+
+cases = {
+    "pendiente única": tail,
+    "volumen acoplado": noise * np.sqrt(0.98 * energy(0.6) + 0.02 * energy(2.5)),
+    "energía temprana fuerte": early,
+}
+fig, axes = plt.subplots(1, 3, sharey=True, figsize=(13.0, 4.4))
+for ax, (name, signal) in zip(axes, cases.items()):
+    res = room.room_parameters(signal, fs, limits=None)
+    room.decay_curve(signal, fs).plot(ax=ax, language="es")
+    ax.set_title(f"{name}\nEDT {res.edt[0]:.2f}  T20 {res.t20[0]:.2f}  "
+                 f"T30 {res.t30[0]:.2f}  C {res.curvature[0]:.0f} %")
+plt.show()
+```
+
+</details>
+
+### Cuánto rango de decaimiento permite el suelo de ruido
+
+Una ventana de ajuste
 vale lo que el rango de decaimiento que tiene debajo. La **relación
 impulso-ruido** (INR) es la distancia de nivel entre el pico de la RI
 filtrada en banda y su suelo de ruido; la ventana de ajuste más un margen
@@ -269,10 +365,13 @@ menos 35 dB de rango útil de decaimiento para T20 y 45 dB para T30. Un
 rango escaso sesga el tiempo ajustado hacia arriba, hacia la cola plana que
 el suelo de ruido impone a la curva de decaimiento, y el sesgo crece en
 silencio antes de que el ajuste falle a la vista (Hak, Wenmaekers y van
-Luxemburg, 2012). `room_parameters` informa del `dynamic_range` por banda y
-endurece los límites de aceptación a 46 dB (T20) y 54 dB (T30) antes de
+Luxemburg, 2012). `room_parameters` declara esa INR por banda como
+`dynamic_range` y endurece los límites de aceptación a 46 dB (T20) y 54 dB (T30)
+antes de
 marcar un valor como válido, de modo que el sesgo residual de truncado y
-compensación de un tiempo marcado válido quede dentro de la DAP del 5 %.
+compensación de un tiempo marcado válido quede dentro del 5 %: la DAP relativa
+que la Tabla A.1 tabula para el EDT y el valor que por costumbre se aplica a T20
+y T30, para los que la tabla no da ninguna.
 Cuando una banda no supera su indicador, el orden de remedios es: usa T20
 en lugar de T30 (su ventana necesita 10 dB menos de rango según los mínimos
 ISO, 8 dB con los límites endurecidos); sube la INR en la
@@ -280,9 +379,98 @@ adquisición, porque duplicar la longitud del barrido o el número de
 promedios síncronos gana 3 dB cada vez; y solo entonces recurre al EDT,
 nunca a un ajuste estirado dentro del ruido.
 
-Por debajo de la **frecuencia de Schroeder** $f_s \approx 2000\sqrt{T/V}$
+**De dónde sale el suelo de ruido, y cómo perderlo.** El nivel de fondo se estima
+a partir de la **última décima parte** de la respuesta recortada por el origen,
+así que la grabación tiene que contener de verdad el fondo estacionario de la sala
+*después* de que el decaimiento haya terminado: medio segundo o más. Un archivo
+recortado al decaimiento audible, o un `length=` fijado solo al decaimiento, hace
+que el analizador mida señal decayendo como si fuera ruido: el suelo estimado
+queda demasiado alto, el punto de truncado se adelanta, la cola compensada se
+calcula desde el cruce equivocado y las marcas de validez por banda se aplican a
+un rango dinámico ficticio, todo ello sin error ni aviso. Graba silencio después
+de la excitación (el mismo silencio que pide la ISO 18233, 6.2.2.3), consérvalo en
+el archivo y deja que `room_parameters` encuentre el cruce en lugar de recortar a
+ojo. El diagnóstico de este fallo: un `dynamic_range` inverosímilmente grande en
+una banda que debería ser ruidosa, junto con una curvatura cercana a cero, es la
+firma de una cola de ruido ausente.
+
+Todo el balance cabe en un dibujo, y el sesgo que controla también.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_decay_range_es.svg" alt="Nivel frente al tiempo de una respuesta al impulso filtrada en una banda: el pico en 0 dB, la respuesta al impulso al cuadrado cayendo como una recta, una meseta horizontal de ruido de fondo en menos 55 decibelios, una acotación vertical entre ambos etiquetada INR, el cruce de la recta ajustada con la estimación de ruido marcado como punto de truncado y la región posterior sombreada como cola compensada, y a la derecha una regla apilada con las ventanas de evaluación de EDT, T20 y T30, cada una con una prolongación rayada de margen de 15 decibelios y los umbrales de indicador de 46 y 54 decibelios marcados frente a la acotación de INR" width="92%" />
+
+*El balance de niveles de una banda. La INR es todo el espacio vertical del que
+dispones; la ventana de evaluación más el margen de 15 dB del apartado 5.3.3 de la
+ISO 3382-1 tiene que caber dentro, que es de donde salen los 35 dB (T20) y los
+45 dB (T30). La integración se detiene donde la recta ajustada cruza la estimación
+de fondo, y la cola posterior se sustituye por la continuación exponencial del
+ajuste: una compensación cuyo sesgo residual es positivo, y por eso phonometry
+añade otros 11 dB y 9 dB de holgura antes de dar una banda por válida.*
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/decay_range_bias_es.svg" alt="Error porcentual del T20 y del T30 ajustados frente al rango dinámico devuelto, de 25 a 80 decibelios, para un decaimiento sintético de un segundo: ambos errores son positivos y crecen al reducirse el rango dinámico, el T30 sale de la banda sombreada de más menos cinco por ciento por debajo de unos 54 decibelios y el T20 por debajo de unos 46 decibelios, con marcas verticales en los mínimos ISO de 35 y 45 decibelios y la región marcada como no válida rayada" width="88%" />
+
+*Un decaimiento sintético de $T$ = 1,0 s con su suelo de ruido barrido, medido con
+`room_parameters`. El sesgo es siempre **positivo** — la cola plana de ruido solo
+puede hacer que el decaimiento ajustado parezca más largo — y crece al reducirse
+el rango: +0,4 % con 70 dB, +1,3 % (T30) con 61 dB, +3,1 % con 55 dB, +6,6 % con
+46 dB y +8,8 % para el T20 con 37 dB, justo por encima del mínimo ISO. Ese es todo
+el argumento a favor de los indicadores endurecidos: con los propios mínimos de la
+ISO de 35 dB y 45 dB el sesgo que sobrevive ya queda fuera de la DAP del 5 %, y
+solo con 46 dB y 54 dB cae dentro. Por debajo de unos 34 dB el ajuste ni siquiera
+converge y los parámetros devuelven NaN, que es el fallo visible al que el sesgo
+se va acercando.*
+
+<details>
+<summary>Mostrar el código de esta figura</summary>
+
+```python
+import matplotlib.pyplot as plt
+# `np`, `fs` y `room` son las importaciones del bloque de decaimiento de arriba.
+
+rng = np.random.default_rng(3382)
+grid = np.arange(int(3.0 * fs)) / fs
+clean = rng.standard_normal(grid.size) * np.exp(-3.0 * np.log(10.0) * grid)
+noise = rng.standard_normal(grid.size)
+peak = float(np.max(np.abs(clean)))
+
+ranges, bias20, bias30 = [], [], []
+for inr in range(25, 81, 3):
+    res = room.room_parameters(clean + noise * peak * 10 ** (-inr / 20.0),
+                               fs, limits=None)
+    ranges.append(float(res.dynamic_range[0]))
+    bias20.append(100.0 * (float(res.t20[0]) - 1.0))
+    bias30.append(100.0 * (float(res.t30[0]) - 1.0))
+
+fig, ax = plt.subplots()
+ax.plot(ranges, bias20, "-o", label="T20")
+ax.plot(ranges, bias30, "-s", label="T30")
+ax.axhspan(-5.0, 5.0, alpha=0.15)
+for limit, name in ((35.0, "ISO T20"), (45.0, "ISO T30"),
+                    (46.0, "indicador T20"), (54.0, "indicador T30")):
+    ax.axvline(limit, ls=":", alpha=0.6)
+ax.set_xlabel("dynamic_range (INR) [dB]")
+ax.set_ylabel("Error del tiempo de decaimiento ajustado [%]")
+ax.legend()
+plt.show()
+```
+
+</details>
+
+### Por debajo de la frecuencia de Schroeder: modos, no decaimiento
+
+Por debajo de la **frecuencia de Schroeder**
+$f_s \approx 2000\sqrt{T/V}$ ($V$ en m³, $T$ en s)
 estas estadísticas de caída dejan de contar toda la historia: el campo lo
-gobiernan **modos propios** discretos. La simulación siguiente excita la
+gobiernan **modos propios** discretos. La constante no es una constante física.
+Cada modo amortiguado hasta un tiempo de reverberación $T$ tiene una anchura de
+banda a media potencia de unos $2{,}2/T$ hercios, la densidad modal crece como
+$4\pi Vf^2/c_0^3$, y exigir aproximadamente tres modos dentro de una anchura de
+banda da $2000\sqrt{T/V}$: una *elección* de cuánto solapamiento cuenta como
+difuso, que es la razón de que los textos más estrictos citen 4000 para la misma
+física. La transición es suave, así que una banda que quede a caballo de $f_s$
+debe comprobarse posición a posición en lugar de darse por buena, y la
+[escalera de modos](/phonometry/es/buildings/rooms/room-image-sources/#3-modos-de-una-sala-rectangular)
+de la guía de fuentes imagen enumera lo que hay ahí abajo de verdad. La
+simulación siguiente excita la
 misma sala rígida de 5 m por 3,5 m en su modo (2,1) y después entre dos
 modos; en resonancia un patrón de onda estacionaria con líneas nodales
 fijas crece hasta dominar el mapa de presión RMS, fuera de resonancia la
@@ -305,17 +493,73 @@ se organiza en ese patrón nodal (2,1).
 | `fs` | int | Hz | > 0 | Frecuencia de muestreo |
 | `limits` | (float, float) o `None` | Hz | por defecto `(125.0, 4000.0)` | Límites de centros de banda; `None` = banda única de banda ancha |
 | `fraction` | int | — | `1` (octava, por defecto) / `3` (tercio) | Fracción de ancho de banda |
-| `zero_phase` | bool | — | defecto `False` | Filtrado de octava hacia delante y atrás (NOTA de ISO 3382-2, 7.3, que relaja $BT > 16$ a $BT > 4$); elimina el retardo de grupo del filtro antes de la integración inversa y reduce aproximadamente a la mitad el sesgo de T30 corto a 125 Hz (~+4,9 % → +2,4 % con $T$ = 0,2 s). `decay_curve` también lo acepta |
+| `zero_phase` | bool | — | defecto `False` | Filtrado de octava hacia delante y atrás (NOTA de ISO 3382-2, 7.3, que relaja $B\,T > 16$ a $B\,T > 4$); elimina el retardo de grupo del filtro antes de la integración inversa y reduce aproximadamente a la mitad el sesgo de T30 corto a 125 Hz (~+4,9 % → +2,4 % con $T$ = 0,2 s). `decay_curve` también lo acepta |
+
+$B\,T$ es el **producto anchura de banda por tiempo**: $B$ la anchura de banda de
+la banda de análisis en hercios y $T$ el tiempo de reverberación en esa banda, en
+segundos. Los dos símbolos de esa celda no son el mismo $T$ que el del filtro:
+«$T$ = 0,2 s» se refiere al tiempo de reverberación. La octava de 125 Hz mide unos
+88 Hz de ancho, así que un decaimiento de 0,2 s da $B\,T \approx 18$ y apenas
+supera el umbral de 16 del apartado 7.3 de la ISO 3382-2; reduce el decaimiento a
+la mitad o pasa a tercios de octava y ya no lo supera, que es el régimen para el
+que existe la relajación de la NOTA.
 
 Devuelve un `RoomAcousticsResult`: `frequency` (centros de banda, o `None` en
 banda ancha), `edt`/`t20`/`t30` (s), `c50`/`c80` (dB), `d50`, `ts` (s),
-`dynamic_range` (dB), los indicadores `edt_valid`/`t20_valid`/`t30_valid`
+`dynamic_range` (dB, la INR por banda: pico filtrado en banda menos suelo de
+ruido), los indicadores `edt_valid`/`t20_valid`/`t30_valid`
 (ISO 3382-1, 5.3.3: ruido ≥ 25 dB por debajo del pico para EDT, endurecido a
 46 dB para T20 y 54 dB para T30 para que el sesgo de compensación de cola de un
 valor marcado como válido quede dentro de la DAP del 5 %) y `curvature`
 $C = 100\ (T_{30}/T_{20} - 1)$ % (valores por encima del 10 % señalan un
 decaimiento no recto). `decay_curve(ir, fs, band=None, fraction=1, zero_phase=False)`
 devuelve solo la curva `(time, level)` para una banda o la respuesta de banda ancha.
+
+### Promediar sobre posiciones
+
+Todo lo anterior analiza una única respuesta al impulso; un parámetro de sala
+declarado nunca es una única respuesta al impulso. El apartado 8 de la ISO 3382-2
+da dos procedimientos admisibles, y el que soporta esta API es el primero: la
+**media aritmética de los tiempos de reverberación individuales sobre todas las
+combinaciones fuente-micrófono independientes** (la alternativa, promediar el
+conjunto de curvas de decaimiento con sus inicios sincronizados, es otra operación
+y no es lo que hace promediar `t30`). Con ella viajan cuatro reglas. La desviación
+típica entre posiciones forma parte de la respuesta, no es un añadido de
+diagnóstico, y debe declararse siempre que supere la DAP del parámetro.
+$T_\text{mid}$, el descriptor de sala de número único habitual, es la media de las
+octavas de 500 Hz y 1 kHz. Los parámetros de energía varían entre butacas mucho
+más que el T30, así que su dispersión es el número interesante y no una molestia.
+Y una banda que no supera su marca de validez en algunas posiciones no debe
+colarse en la media sin más: enmascárala y di cuántas posiciones sobrevivieron.
+
+```python
+# `np`, `fs` y `room` son las importaciones del bloque de decaimiento de arriba.
+
+# medida: una respuesta al impulso por combinación fuente-micrófono. Tres
+# decaimientos sintéticos de 0,95, 1,00 y 1,08 s hacen de tres posiciones.
+rng = np.random.default_rng(3382)
+grid = np.arange(int(3.0 * fs)) / fs
+responses = [rng.standard_normal(grid.size) * np.exp(-3.0 * np.log(10.0) / t60 * grid)
+             for t60 in (0.95, 1.00, 1.08)]
+
+results = [room.room_parameters(each, fs) for each in responses]
+t30 = np.array([res.t30 for res in results])
+valid = np.array([res.t30_valid for res in results])
+
+mean = np.nanmean(np.where(valid, t30, np.nan), axis=0)
+spread = np.nanstd(np.where(valid, t30, np.nan), axis=0)
+print(np.round(mean, 2))                  # [0.99 1.   1.02 1.02 1.03 1.01] s
+print(np.round(100.0 * spread / mean, 1))  # [4.  4.7 4.8 5.1 4.9 4.8] %
+print(int(valid.sum(axis=0).min()))        # 3 posiciones superaron la marca
+```
+
+Aquí la dispersión va del 4 al 5 %, justo en la DAP, así que le corresponde ir en
+el informe junto a la media: tres posiciones que coinciden dentro de un 5 % son
+tres posiciones que discrepan de forma audible. Fíjate también en para qué sirve
+la máscara: `np.nanmean` sobre el array enmascarado es la media aritmética que
+prescribe el apartado 8 a), pero solo sobre las combinaciones cuya banda haya
+superado de verdad la marca, y el número de supervivientes forma parte del
+resultado.
 
 ### Informe ISO 3382 (`.report()`)
 
@@ -362,17 +606,36 @@ result = room.room_parameters(ir, fs)   # bandas de octava 125 Hz - 4 kHz
 result.report(
     "ficha_sala.pdf",
     metadata=ReportMetadata(
-        specimen="Auditorio pequeño, desocupado, totalmente amueblado",
+        # El estado de la sala que pide el apartado 9.2 e): amueblamiento y
+        # número de personas presentes (el apartado 4.1 admite como mucho dos
+        # para representar el estado desocupado).
+        specimen="Auditorio pequeño, totalmente amueblado, desocupado (1 operador presente)",
         test_room="Auditorio A",
         room_volume=2830.0, area=340.0,
         source_positions=2, receiver_positions=8,
-        measurement_standard="ISO 3382-1",
+        # El apartado 9.2 i) exige declarar el grado de exactitud.
+        measurement_standard="ISO 3382-2 (grado de ingeniería)",
         temperature=21.0, relative_humidity=45.0,
         laboratory="Laboratorio de referencia Phonometry",
+        notes="16 combinaciones fuente-micrófono, 2 decaimientos cada una; "
+              "posiciones y alturas en la planta acotada adjunta",
         requirement=1.3,           # añade un veredicto frente a un T_mid objetivo
     ),
 )                                  # T_mid + la tabla de parámetros por banda
 ```
+
+Tres de esas entradas están ahí porque el apartado 9.2 de la ISO 3382-2 las pide
+y la ficha no tiene un campo propio para ninguna. El apartado 9.2 i) exige el
+**grado de exactitud** — control, ingeniería o precisión —, así que le corresponde
+ir en `measurement_standard` en lugar de quedar sobreentendido. El apartado 9.2 e)
+exige el **estado de la sala**, el amueblamiento y el número de personas
+presentes, y el apartado 4.1 fija lo que puede significar «desocupada»: sin
+personas, o como mucho dos autorizadas a representar el estado desocupado salvo
+que se especifique otra cosa; eso va en `specimen`. Y los apartados 9.2 c) e i)
+juntos exigen una **planta acotada** con las posiciones de fuente y de micrófono y
+sus alturas, que la ficha no dibuja: elabórala aparte y remite a ella, como hace
+aquí `notes`. El apartado 9.2 f) añade la temperatura y la humedad relativa solo
+para el método de precisión, que los campos de clima ya llevan.
 
 La ficha de ejemplo se regenera con `make reports` y se mantiene renderizada en
 el repositorio; pulsa la vista previa para abrir el PDF.
@@ -384,14 +647,12 @@ el repositorio; pulsa la vista previa para abrir el PDF.
 	caption="Ficha de parámetros acústicos de salas (RoomAcousticsResult.report), T_mid y la tabla por banda."
 />
 
-## El resto de la cadena de medición
-
-Dos secciones que vivían en esta página tienen guías propias: la
-adquisición de la respuesta al impulso, con los barridos y la MLS de
-ISO 18233 y las reglas de colocación, es
-[Medición de la respuesta al impulso](/phonometry/es/buildings/rooms/room-impulse-response/);
-y las métricas del habla de oficinas diáfanas de ISO 3382-3, con su ficha,
-son [Acústica de oficinas diáfanas](/phonometry/es/buildings/rooms/open-plan-acoustics/).
+Con los parámetros en la mano, los dos eslabones vecinos de la cadena son la
+adquisición que produjo la respuesta al impulso
+([Medición de la respuesta al impulso](/phonometry/es/buildings/rooms/room-impulse-response/))
+y, para una planta diáfana en lugar de una sala cerrada, la línea de puestos de
+trabajo de la ISO 3382-3
+([Acústica de oficinas diáfanas](/phonometry/es/buildings/rooms/open-plan-acoustics/)).
 
 ## Qué cubre esta guía
 
@@ -453,4 +714,4 @@ Cada banda de la respuesta al impulso se convierte en una curva de decaimiento m
 
 ### ¿Cuánto rango de decaimiento necesito para un T20 o T30 válido?
 
-La ventana de ajuste más un margen de seguridad debe caber dentro de la relación impulso-ruido, la distancia de nivel entre el pico de la RI filtrada en banda y su suelo de ruido: la ISO 3382 exige al menos 35 dB de rango útil de decaimiento para T20 y 45 dB para T30. Un rango escaso sesga el tiempo ajustado hacia arriba, así que `room_parameters` endurece sus indicadores de validez a 46 dB y 54 dB, manteniendo el sesgo dentro de la DAP del 5 %.
+La ventana de ajuste más un margen de seguridad debe caber dentro de la relación impulso-ruido (`res.dynamic_range`), la distancia de nivel entre el pico de la RI filtrada en banda y su suelo de ruido: la ISO 3382 exige al menos 35 dB de rango útil de decaimiento para T20 y 45 dB para T30. Un rango escaso sesga el tiempo ajustado hacia arriba, así que `room_parameters` endurece sus indicadores de validez a 46 dB y 54 dB, manteniendo el sesgo dentro de la DAP del 5 %. El suelo de ruido se estima a partir de la última décima parte de la respuesta, así que la grabación debe contener silencio después del decaimiento.

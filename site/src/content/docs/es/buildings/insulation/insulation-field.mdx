@@ -50,7 +50,7 @@ references:
     title: "Acoustics — Determination and application of measurement uncertainties in building acoustics — Part 1: Sound insulation"
     designation: "ISO 12999-1:2020"
     url: "https://www.iso.org/standard/73930.html"
-    note: "Las incertidumbres típicas por situación de medición (Apartado 5.2) y los factores de cobertura de la Tabla 8; su marco de precisión se apoya en ISO 5725 (contexto, no implementada directamente)."
+    note: "Las incertidumbres típicas por situación de medición (apartado 5.2) y los factores de cobertura de la Tabla 8; su marco de precisión se apoya en ISO 5725 (contexto, no implementada directamente)."
 ---
 
 import ThemeImage from '../../../../../components/ThemeImage.astro';
@@ -122,6 +122,19 @@ laboratorio](/phonometry/es/buildings/insulation/insulation-lab/);
 la predicción que tiende el puente entre ambos es
 [EN 12354](/phonometry/es/buildings/design/insulation-prediction/).
 
+Una sola medición da las tres magnitudes, así que **cuál de ellas va al informe
+es una cuestión reglamentaria, no de medición.** $D_{nT}$ describe la pareja de
+recintos tal como la viven los ocupantes, y es en lo que la mayoría de los
+códigos nacionales para vivienda declaran sus exigencias. $R'$ describe la
+partición, normalizada por su área, y es lo que necesita una comparación frente
+a un $R_w$ de laboratorio o a una predicción EN 12354. Mide una vez y declara
+después la magnitud en la que está escrita la exigencia, diciendo cuál es: un
+$R'_A$ no se puede contrastar con un límite en $D_{nT,A}$ sin convertirlo antes
+a través de la $T$ del recinto y del área de la partición; véase
+[Código Técnico de la Edificación (CTE DB-HR)](/phonometry/es/buildings/insulation/spanish-building-code/),
+que declara su exigencia entre recintos en $D_{nT,A}$ y la de la tabiquería en
+$R_A$.
+
 ```python
 import numpy as np
 from phonometry import building
@@ -148,6 +161,13 @@ Calcula `l1`, `l2` y `t2` en las mismas 16 bandas de tercio de octava de
 pásalos a `airborne_insulation`. Alimenta el espectro `dnt` (o `r_prime`) de esa
 función a `weighted_rating`, de modo que cada banda quede alineada índice a
 índice con la curva de referencia ISO 717-1.
+
+Vale la pena llevarse la escala: en una pared o un forjado separador entre
+viviendas las exigencias nacionales se sitúan típicamente en torno a
+$D_{nT,w} = 50$ dB y rara vez por debajo de 45 dB, así que los 40 dB de este
+ejemplo deliberadamente plano las incumplirían todas. En una magnitud aérea más
+alto es mejor, y 5 dB son más o menos el escalón entre una solución
+constructiva que funciona y otra que genera quejas.
 
 ### Parámetros de `airborne_insulation()`
 
@@ -271,6 +291,81 @@ naive = building.airborne_insulation(l1m, l2m, t2, area=10.0, volume=50.0)
 print(round(float(naive.dnt[0]), 1), building.weighted_rating(naive.dnt).rating)  # 43.0 43
 ```
 
+<span id="recintos-pequenos-apartado-8"></span>
+
+### Recintos pequeños: el procedimiento de baja frecuencia (apartado 8)
+
+Este es fácil de pasar por alto y es **obligatorio**. Cuando el recinto emisor
+o el receptor, o los dos, tiene un volumen menor que 25 m³, calculado al metro
+cúbico más próximo, de modo que un dormitorio de 25,4 m³ no lo activa y uno de
+24,6 m³ sí, las bandas de tercio de octava de 50 Hz, 63 Hz y 80 Hz deben
+medirse además en las esquinas de ese recinto (apartados 6 y 8.1). La mayoría
+de los dormitorios europeos y todos los baños quedan por debajo del umbral, así
+que este es el caso normal cuando se trabaja en vivienda, no un caso límite. Va
+**además** del procedimiento por defecto, no en su lugar, y la misma regla de
+los 25 m³ rige el tiempo de reverberación.
+
+La razón la da la propia NOTA 1 de la norma: a esas frecuencias el campo de un
+recinto pequeño es modal, la variación espacial es grande, y el promedio de la
+zona central no es ni repetible ni representativo de lo que oye un ocupante. Un
+máximo de presión modal siempre queda en una esquina, así que las mediciones en
+esquina acotan el campo por arriba.
+
+**Cómo se toma una medición en esquina (apartados 8.3 y 8.4).** Un micrófono
+fijo, de 0,3 m a 0,4 m de *cada* uno de los tres paramentos que forman la
+esquina (las tres distancias no tienen por qué ser iguales), a 1,0 m como
+mínimo de cualquier altavoz, lo que en la práctica descarta la esquina que
+ocupa el altavoz. Mide al menos **cuatro** esquinas, dos a nivel de suelo y dos
+a nivel de techo, contiguas o no al elemento separador; cada esquina debe estar
+formada por tres superficies mutuamente perpendiculares de 0,5 m² como mínimo,
+sin mobiliario a menos de 0,5 m. Cuando eso sea imposible, se admiten esquinas
+con ángulos entre pares de superficies de 45° a 135°, o con un objeto, por
+ejemplo un armario, formando una de las superficies. Promedia al menos 15 s por
+posición. Con un único altavoz desplazado entre posiciones, repite las cuatro
+esquinas en cada posición.
+
+**Cómo entran las esquinas en el resultado (apartado 8.5).** Para cada una de
+las tres bandas por separado, toma la **más alta** de las esquinas medidas, que
+puede ser una esquina distinta en cada banda, como $L_\text{Corner}$; con
+varias posiciones de altavoz, promedia en energía esos máximos por posición
+(Fórmula (12)). Después combínala con el promedio $L$ del procedimiento por
+defecto en una ponderación 1:2 (Fórmula (13)):
+
+$$
+L_{LF} = 10\log_{10}\left[\frac{10^{0,1 L_\text{Corner}} + 2 \cdot 10^{0,1 L}}{3}\right].
+$$
+
+$L_{LF}$ sustituye a $L$ en esas tres bandas, y $D_{nT}$ o $R'$ se forman
+después exactamente igual que antes. Como $L_\text{Corner}$ puede superar a $L$
+en varios decibelios, el procedimiento sube por igual el nivel del recinto
+emisor y el del receptor: el efecto sobre la *diferencia* de niveles es lo que
+los dos recintos no tienen en común, que es justo la información que tira el
+procedimiento por defecto. El apartado 9.1 añade la consecuencia para el ruido
+de fondo: hace falta una medición de fondo **en cada esquina utilizada**,
+porque cada banda puede venir de una esquina distinta y necesitar por tanto su
+propia corrección.
+
+```python
+# `np` y `building` son los imports de los bloques de arriba.
+
+# 50, 63 y 80 Hz. Cuatro esquinas medidas en un recinto receptor de 22 m3, con
+# una posición de altavoz; al lado, el promedio de la zona central por defecto.
+corners = np.array([                      # filas: esquinas, columnas: las 3 bandas
+    [52.1, 55.4, 49.8],
+    [54.6, 53.0, 51.2],
+    [51.0, 56.9, 50.4],
+    [53.3, 54.1, 52.7],
+])
+l_default = np.array([49.5, 51.2, 48.6])
+
+l_corner = corners.max(axis=0)            # Apartado 8.5: la esquina más alta, por banda
+print(l_corner)                           # [54.6 56.9 52.7]  (tres esquinas distintas)
+
+l_lf = 10 * np.log10((10 ** (0.1 * l_corner) + 2 * 10 ** (0.1 * l_default)) / 3)
+print(np.round(l_lf, 1))                  # [51.9 54.  50.4]
+print(np.round(l_lf - l_default, 1))      # [2.4 2.8 1.8]  dB por encima del valor por defecto
+```
+
 ## Aislamiento a ruido de impactos en campo (ISO 16283-2)
 
 El ruido de pisadas se valora al revés. En lugar de cuánto *bloquea* un
@@ -293,6 +388,16 @@ $L_i$; el nivel **normalizado** $L'_n$ (referido a un área de absorción de
 **menos**: más reverberación *reduce* $L'_{nT}$, al contrario que el $D_{nT}$
 aéreo.
 
+La máquina de impactos no es la única fuente que especifica ISO 16283-2. Sus
+martillos entregan una excitación dura y casi estacionaria cuya energía se
+sitúa por encima de 100 Hz, lo que dice casi nada de los golpes lentos y de
+baja frecuencia de los que se quejan de verdad los ocupantes: un niño saltando,
+un adulto caminando descalzo. Para esos, la misma norma especifica una **pelota
+de caucho** (Anexo A), valorada por un motor completamente distinto: un nivel
+máximo con ponderación Fast y la suma ponderada A del Anexo D de ISO 717-2, no
+una curva de referencia desplazada. Tiene guía propia,
+[Fuentes de impacto pesadas y blandas](/phonometry/es/buildings/insulation/heavy-impact-sources/).
+
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_impact_setup_es.svg" alt="Montaje de aislamiento a impactos en campo: una máquina de impactos normalizada sobre el suelo del recinto emisor superior, micrófonos promediados en energía en el recinto receptor inferior, y el tiempo de reverberación del recinto receptor" width="92%" />
 
 ```python
@@ -313,7 +418,7 @@ print(round(float(imp.l_n[0]), 1))            # 64.1  normalizado a A0 = 10 m^2
 res_imp = building.weighted_impact_rating(imp.l_n_t)
 print(res_imp.rating, res_imp.ci, res_imp.unfavourable_sum)   # 79 -11 28.0  ->  L'nT,w(CI)=79(-11)
 
-# Los datos en banda de octava llevan la reducción extra de -5 dB (Apartado 4.3.2)
+# Los datos en banda de octava llevan la reducción extra de -5 dB (apartado 4.3.2)
 octave = np.array([65.3, 64.5, 58.0, 55.8, 43.0])
 print(building.weighted_impact_rating(octave).rating)  # 54
 ```
@@ -321,6 +426,17 @@ print(building.weighted_impact_rating(octave).rating)  # 54
 Pasa el `l_n_t` (o `l_n`) de `impact_insulation` directamente a
 `weighted_impact_rating`; el índice y $C_I$ reproducen los valores del Anexo C
 de ISO 717-2 (tercios $L'_{nT,w} = 79$, $C_I = -11$; octava 54, $C_I = 0$).
+
+Aquí el signo de la escala se invierte: en una magnitud de impacto **más bajo
+es mejor**. Los límites nacionales para vivienda se sitúan en la franja de 50 a
+60 dB, así que $L'_{nT,w} = 79$ dB es un forjado estructural desnudo, sin
+revestimiento y sin capa flotante, que incumple por unos 20 dB: el ejemplo del
+Anexo C es un caso pésimo, no uno típico. Cerrar un hueco de ese tamaño pide un
+suelo flotante sobre una capa elástica o un techo desolidarizado, no una
+moqueta; véanse
+[Predicción del aislamiento acústico (EN 12354)](/phonometry/es/buildings/design/insulation-prediction/)
+y
+[Predicción del comportamiento de capas elásticas](/phonometry/es/buildings/design/resilient-layers/).
 
 ### Parámetros de `impact_insulation()`
 
@@ -456,14 +572,14 @@ renderizadas en el repositorio; pulsa cualquier vista previa para abrir el PDF.
 <ReportPreview
 	name="iso16283_airborne_example"
 	title="Informe de ejemplo aéreo in situ ISO 16283-1 (PDF)"
-	description="Informe de ensayo de aislamiento a ruido aéreo in situ entre viviendas de una página: la cabecera de metadatos (cliente, descripción de la construcción, superficie del cerramiento, volúmenes de las salas, clima), la tabla de DnT en tercios de octava junto a la curva medida frente a la referencia desplazada, el índice de campo DnT,w (C; Ctr) en caja, la declaración del método de ingeniería y un veredicto CUMPLE frente al requisito de 50 dB."
+	description="Informe de ensayo de aislamiento a ruido aéreo in situ entre viviendas de una página: la cabecera de metadatos (cliente, descripción de la construcción, superficie del cerramiento, volúmenes de las salas, clima), la tabla de DnT en tercios de octava junto a la curva medida frente a la referencia desplazada, el índice de campo DnT,w (C; Ctr) en un recuadro, la declaración del método de ingeniería y un veredicto CUMPLE frente al requisito de 50 dB."
 	caption="Ficha aérea in situ (AirborneInsulationResult.report), DnT,w (C; Ctr)."
 />
 
 <ReportPreview
 	name="iso16283_impact_example"
 	title="Informe de ejemplo de impactos in situ ISO 16283-2 (PDF)"
-	description="Informe de ensayo de aislamiento a ruido de impactos in situ de un suelo con la máquina de impactos, de una página: la cabecera de metadatos, la tabla de L'nT en tercios de octava junto a la curva medida frente a la referencia desplazada con la lectura a 500 Hz, el índice de campo L'nT,w (CI) en caja, la declaración del método de ingeniería y un veredicto NO CUMPLE frente al requisito de 58 dB (un nivel de impactos más bajo es mejor)."
+	description="Informe de ensayo de aislamiento a ruido de impactos in situ de un suelo con la máquina de impactos, de una página: la cabecera de metadatos, la tabla de L'nT en tercios de octava junto a la curva medida frente a la referencia desplazada con la lectura a 500 Hz, el índice de campo L'nT,w (CI) en un recuadro, la declaración del método de ingeniería y un veredicto NO CUMPLE frente al requisito de 58 dB (un nivel de impactos más bajo es mejor)."
 	caption="Ficha de impactos in situ (ImpactInsulationResult.report), L'nT,w (CI)."
 />
 
@@ -475,7 +591,7 @@ Un índice sin incertidumbre es solo medio resultado. ISO 12999-1 no vuelve a
 medir nada; tabula la **incertidumbre típica** $u$ de cada magnitud de
 aislamiento acústico, derivada de ensayos interlaboratorio, y prescribe cómo
 expandirla y combinarla. Qué desviación típica es $u$ depende de la **situación
-de medición** (Apartado 5.2):
+de medición** (apartado 5.2):
 
 | Situación | Significado | Incertidumbre típica $u$ |
 | :--- | :--- | :--- |
@@ -510,8 +626,21 @@ print(round(uv.lower, 1), round(uv.upper, 1))      # 50.2 53.8  ->  52 ± 1.8 dB
 # Declarar conformidad usa el factor UNILATERAL (k = 1.65): ¿supera R'w de forma
 # demostrable un requisito de 50 dB?
 uc = building.uncertain_value(52.0, "rprime_w", "B", one_sided=True)
+print(round(uc.expanded_uncertainty, 2))                # 1.48  = 1.65 x 0.9
+print(round(52.0 - uc.expanded_uncertainty, 2))         # 50.52 = la cota inferior
 print(building.satisfies_lower_requirement(52.0, uc.expanded_uncertainty, 50.0))   # True
 ```
+
+Eso es todo lo que hay dentro de `satisfies_lower_requirement`: los 52,0
+medidos menos la incertidumbre expandida unilateral de 1,48 son 50,52, que
+siguen superando los 50,0, así que la conformidad se puede *declarar* y no solo
+observar. La elección del factor es lo importante. Declarar un valor es una
+afirmación bilateral (el valor verdadero está en algún punto de un intervalo) y
+lleva $k = 1{,}96$. Declarar conformidad es una afirmación unilateral: solo
+importa el extremo inferior, porque nada está en juego si la pared es mejor de
+lo que se dice, así que $k = 1{,}65$ da la misma confianza del 95 % en el lado
+que cuenta. Usar aquí el factor bilateral exigiría 1,76 dB de margen en vez de
+1,48 dB y suspendería resultados que sí cumplen.
 
 Las magnitudes a impactos ofrecen solo las situaciones B/C (Tabla 4, sin banda de
 500 Hz en la edición de 2020), y $\Delta L$ solo la situación A. Los descriptores
@@ -521,6 +650,14 @@ son insensibles a mayúsculas y con alias (`rprime_w`/`dnt_w`→`r_w`,
 `reduce_by_independent_measurements` ($u/\sqrt{m}$).
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/insulation_uncertainty_demo_es.svg" alt="Un índice ponderado informado con su incertidumbre expandida bilateral al 95 % en las situaciones A, B y C, con la incertidumbre de reproducibilidad más ancha y la de repetibilidad más estrecha" width="80%" />
+
+*El mismo índice, declarado de tres maneras. Cuál de los intervalos se aplica no
+es una propiedad de la medición sino de la pregunta: la situación A es lo que
+declara un laboratorio para una probeta, la B aquello dentro de lo cual deberían
+coincidir dos equipos que midan la misma partición ya instalada, y la C aquello
+dentro de lo cual debería coincidir un equipo consigo mismo. La B es la más
+ancha de las tres que un informe de campo puede reclamar honestamente, y es la
+que decide si un resultado supera una exigencia.*
 
 <details>
 <summary>Mostrar el código de esta figura</summary>
@@ -554,7 +691,7 @@ plt.show()
 | :--- | :--- | :--- | :--- | :--- |
 | `measurand` | str | — | `'airborne'` / `'impact'` / `'impact_reduction'` | Selecciona la Tabla 2 / 4 / 6 |
 | `quantity` | str | — | `'r_w'`, `'ln_w'`, `'delta_lw'` (+ alias, variantes `+c`/`+ctr`) | Descriptor de un solo número |
-| `situation` | str | — | `'A'` / `'B'` / `'C'` | Situación de medición (Apartado 5.2) |
+| `situation` | str | — | `'A'` / `'B'` / `'C'` | Situación de medición (apartado 5.2) |
 | `value` | float | dB | — | Mejor estimación $y$ a la que adjuntar $U$ |
 | `coverage` | float | — | por defecto `0.95` | Nivel de confianza (Tabla 8) |
 | `one_sided` | bool | — | por defecto `False` | Factor unilateral para verificaciones de conformidad |
@@ -568,7 +705,7 @@ lectura `COVERAGE_FACTORS` expone la Tabla 8 indexada por `(confidence, one_side
 
 ## Más allá de la medición entre dos recintos
 
-Tres mediciones que compartían esta página tienen ahora guías propias, y una
+Tres mediciones vecinas tienen guías propias, y una
 cuarta las acompaña. El cerramiento del edificio, medido frente al nivel a 2 m
 por delante y previsto a partir de sus elementos, es
 [Aislamiento acústico de fachadas](/phonometry/es/buildings/insulation/facade-insulation/).
@@ -606,11 +743,17 @@ mínimo de 6 dB; la corrección en sí son tres líneas de NumPy, escritas en
 [Corrección por ruido de fondo](#correccion-por-ruido-de-fondo)
 más arriba. (`building.background_correction` es la variante de *laboratorio*
 de ISO 10140-4 y no coincide con los umbrales de campo.) Los
-propios requisitos de posición y procedimiento de la ISO 16283-1/-2 (el número
-mínimo de posiciones de fuente y micrófono, los procedimientos de baja
-frecuencia con altavoz móvil o barrido de micrófono) no se comprueban: el
-promediado en energía ocurre una vez que se proporcionan las posiciones, pero
-nada aquí verifica cuántas se tomaron ni dónde. Los demás miembros de la
+propios requisitos de posición y procedimiento de la ISO 16283-1/-2 (los
+recuentos, las distancias y el promediado de
+[La medición](#la-medicion-iso-16283-1)
+y las mediciones en esquina de
+[Recintos pequeños](#recintos-pequenos-apartado-8)) están
+documentados aquí y no se comprueban en ninguna parte: el promediado en energía
+ocurre una vez que se proporcionan las posiciones, pero nada verifica cuántas
+se tomaron, dónde, ni que se haya llegado a comprobar el umbral de los 25 m³.
+La combinación de las Fórmulas (12) y (13) del procedimiento de baja frecuencia
+son las dos líneas de NumPy impresas más arriba, no una función de la
+biblioteca. Los demás miembros de la
 familia están cubiertos por sus propias guías: la parte de fachada ISO 16283-3
 ([Aislamiento acústico de
 fachadas](/phonometry/es/buildings/insulation/facade-insulation/)),
@@ -633,6 +776,9 @@ intensidad](/phonometry/es/buildings/insulation/insulation-intensity/)).
 - [Método de control del aislamiento (ISO 10052)](/phonometry/es/buildings/insulation/insulation-survey/):
   el método de control en bandas de octava que toma estos métodos de ingeniería
   como referencia.
+- [Fuentes de impacto pesadas y blandas](/phonometry/es/buildings/insulation/heavy-impact-sources/):
+  la pelota de caucho y la máquina de neumático, las otras fuentes de impacto de
+  ISO 16283-2, y la valoración del Anexo D de ISO 717-2 que las acompaña.
 - [Medición del aislamiento en laboratorio](/phonometry/es/buildings/insulation/insulation-lab/):
   la caracterización de elementos de ISO 10140 con la que se comparan estas
   magnitudes de campo.
