@@ -404,13 +404,20 @@ def generate_structure_borne_power(output_dir: str) -> None:
     from phonometry import reception_plate_power
 
     bands = np.array([50.0, 100.0, 200.0, 400.0, 800.0, 1600.0, 3150.0])
-    # A pump-like source on a low-mobility (heavy) and a high-mobility (light)
-    # reception plate; the two determinations should agree within the method.
-    lv_low = np.array([88.0, 90.0, 87.0, 84.0, 80.0, 76.0, 71.0])
-    lv_high = lv_low + 6.0                      # lighter plate vibrates more
-    res_low = reception_plate_power(lv_low, bands, mass_per_area=600.0, area=2.0,
-                                    reverberation_time=0.8)
-    res_high = reception_plate_power(lv_high, bands, mass_per_area=150.0, area=2.0,
+    # A pump-like source on the two plates EN 15657 specifies. Low-mobility
+    # (clause 7.2.2): 100 mm concrete of 2 300 kg/m3, so m = 230 kg/m2, over
+    # 3,15 m x 2,23 m = 7,0 m2 with Ts = 0,25 s, which keeps eta >= 0,08
+    # through the 50-100 Hz bands. High-mobility (clause 7.3.2): 1 mm
+    # perforated steel, m = 7,9 kg/m2, over 2,0 m2 in its support frame.
+    lv_low = np.array([72.0, 74.0, 71.0, 68.0, 64.0, 60.0, 55.0])
+    # Their point mobilities are 4,9e-6 and 1,1e-2 m/(N.s); driven by a source
+    # of |Y_S| ~ 1e-3 m/(N.s) the light plate's spatial-mean velocity level runs
+    # 35,1 dB higher, of which 12,0 dB is extra injected power and the rest is
+    # its far smaller eta*m*S dissipating it.
+    lv_high = lv_low + 35.1
+    res_low = reception_plate_power(lv_low, bands, mass_per_area=230.0, area=7.0,
+                                    reverberation_time=0.25)
+    res_high = reception_plate_power(lv_high, bands, mass_per_area=7.9, area=2.0,
                                      reverberation_time=0.5)
 
     x = np.arange(bands.size)
@@ -580,7 +587,7 @@ def generate_panel_insulation_concept(output_dir: str) -> None:
     ax.axvline(fc, color=COLOR_SECONDARY, ls=":", lw=1.2, label="$f_c$")
     ax.set_title("Single panel: mass law and coincidence",
                  fontweight="bold", pad=10)
-    ax.set_ylabel("Sound reduction index R [dB]")
+    ax.set_ylabel("Sound reduction index $R$ (transmission loss $TL$) [dB]")
     ax.set_xlabel("Frequency [Hz]")
     ax.legend(loc="upper left", fontsize=9)
     ax.grid(True, which="both", alpha=0.3)
@@ -598,7 +605,7 @@ def generate_panel_insulation_concept(output_dir: str) -> None:
     ax.axvline(f0, color=COLOR_SECONDARY, ls=":", lw=1.2, label="$f_0$")
     ax.set_title("Double wall: mass-spring-mass resonance",
                  fontweight="bold", pad=10)
-    ax.set_ylabel("Sound reduction index R [dB]")
+    ax.set_ylabel("Sound reduction index $R$ (transmission loss $TL$) [dB]")
     ax.set_xlabel("Frequency [Hz]")
     ax.legend(loc="upper left", fontsize=9)
     ax.grid(True, which="both", alpha=0.3)
@@ -637,7 +644,7 @@ def generate_panel_insulation_concept(output_dir: str) -> None:
                alpha=0.5, label="open-area limit")
     ax.set_title("Composite wall with a small aperture",
                  fontweight="bold", pad=10)
-    ax.set_ylabel("Sound reduction index R [dB]")
+    ax.set_ylabel("Sound reduction index $R$ (transmission loss $TL$) [dB]")
     ax.set_xlabel("Frequency [Hz]")
     ax.legend(loc="upper left", fontsize=9)
     ax.grid(True, which="both", alpha=0.3)
@@ -827,7 +834,7 @@ def generate_single_panel_rating(output_dir: str) -> None:
     ax.axvline(idx_fc, color=COLOR_TERTIARY, linestyle=":", linewidth=1.6,
                zorder=4, label=f"coincidence fc = {fc:.0f} Hz")
 
-    ax.set_ylabel("Sound reduction index R [dB]")
+    ax.set_ylabel("Sound reduction index $R$ (transmission loss $TL$) [dB]")
     ax.set_title("Predicted Single-Panel Insulation Rated per ISO 717-1",
                  fontweight="bold", pad=12)
     ax.grid(color=COLOR_GRID, linestyle="--", alpha=0.5, zorder=0)
@@ -885,7 +892,7 @@ def generate_plateau_transmission_loss(output_dir: str) -> None:
     ax.axvline(idx_fc, color=COLOR_TERTIARY, linestyle=":", linewidth=1.6,
                zorder=4, label="critical frequency fc")
 
-    ax.set_ylabel("Transmission loss TL [dB]")
+    ax.set_ylabel("Sound reduction index $R$ (transmission loss $TL$) [dB]")
     ax.set_title("Plateau Estimate Against the Physical Panel Model",
                  fontweight="bold", pad=12)
     ax.grid(color=COLOR_GRID, linestyle="--", alpha=0.5, zorder=0)
@@ -970,7 +977,7 @@ def generate_orthotropic_transmission_loss(output_dir: str) -> None:
     ax.plot(x, heckl.transmission_loss, "--", color=COLOR_TERTIARY,
             linewidth=1.8, zorder=4, label="Heckl's approximation")
 
-    ax.set_ylabel("Transmission loss TL [dB]")
+    ax.set_ylabel("Sound reduction index $R$ (transmission loss $TL$) [dB]")
     ax.set_title("Corrugating a Sheet Flattens Its Sound Reduction Index",
                  fontweight="bold", pad=12)
     ax.grid(color=COLOR_GRID, linestyle="--", alpha=0.5, zorder=0)
@@ -998,4 +1005,352 @@ def generate_orthotropic_transmission_loss(output_dir: str) -> None:
                   "edgecolor": COLOR_GRID})
     plt.tight_layout()
     save_figure(output_dir, "orthotropic_transmission_loss.svg")
+    plt.close()
+
+
+def generate_coupling_term_regimes(output_dir: str) -> None:
+    """EN 12354-5 coupling term against the source-to-receiver mobility ratio."""
+    print("Generating coupling_term_regimes...")
+    from phonometry import (
+        coupling_term,
+        coupling_term_force_source,
+        coupling_term_velocity_source,
+    )
+
+    # The receiver mobility of the guide's pump example, held fixed while the
+    # source mobility sweeps six decades around it along the same phase.
+    y_i = 3e-5 + 1e-5j
+    ratio = np.logspace(-3.0, 3.0, 400)
+    y_s = abs(y_i) * ratio * (2 + 1j) / abs(2 + 1j)
+
+    exact = np.array([float(coupling_term(a, y_i)) for a in y_s])
+    force = np.array([float(coupling_term_force_source(a, y_i)) for a in y_s])
+    velocity = np.array(
+        [float(coupling_term_velocity_source(a, 1.0 / y_i)) for a in y_s]
+    )
+
+    _fig, ax = plt.subplots(figsize=(10, 6.2))
+    ax.semilogx(ratio, exact, "-", color=COLOR_PRIMARY, linewidth=2.4,
+                zorder=5, label="Formula 19b (exact, complex mobilities)")
+    ax.semilogx(ratio, force, "--", color=COLOR_SECONDARY, linewidth=1.8,
+                zorder=4, label="force-source limit (19c)")
+    ax.semilogx(ratio, velocity, ":", color=COLOR_TERTIARY, linewidth=1.8,
+                zorder=4, label="velocity-source limit (19d)")
+    for style, y_k in (("-.", 1e-4), ((0, (5, 2, 1, 2)), 1e-3)):
+        with_mount = np.array(
+            [float(coupling_term(a, y_i, transfer_mobility=y_k)) for a in y_s]
+        )
+        ax.semilogx(ratio, with_mount, linestyle=style, color=COLOR_MUTED,
+                    linewidth=1.8, zorder=3,
+                    label=f"elastic support Yk = {y_k:g} m/(N s)  (19e)")
+
+    # The exact curve's minimum: matched mobilities, best power transfer.
+    low = int(np.argmin(exact))
+    ax.plot(ratio[low], exact[low], "v", color=COLOR_PRIMARY, markersize=9,
+            zorder=6)
+    ax.annotate(f"matched mobilities: {exact[low]:.1f} dB",
+                xy=(ratio[low], exact[low]), xytext=(ratio[low], exact[low] - 7.0),
+                ha="center", fontsize=9, color=COLOR_FG,
+                arrowprops={"arrowstyle": "->", "lw": 1.0})
+
+    pump = abs(y_i) * 7.0710678 * (2 + 1j) / abs(2 + 1j)
+    pump_dc = float(coupling_term(pump, y_i))
+    ax.plot(7.0710678, pump_dc, "o", color=COLOR_FG, markersize=8, zorder=7)
+    ax.annotate(f"pump on a concrete slab: {pump_dc:.1f} dB",
+                xy=(7.0710678, pump_dc), xytext=(30.0, pump_dc - 12.0),
+                fontsize=9, color=COLOR_FG,
+                arrowprops={"arrowstyle": "->", "lw": 1.0})
+
+    ax.set_xlabel("Mobility ratio |Ys| / |Yi|")
+    ax.set_ylabel("Coupling term D_C [dB]")
+    ax.set_title("EN 12354-5 Coupling Term and Its Two Limits",
+                 fontweight="bold", pad=12)
+    ax.grid(which="both", color=COLOR_GRID, linestyle="--", alpha=0.5, zorder=0)
+    ax.set_axisbelow(True)
+    ax.legend(loc="upper left", fontsize=9)
+
+    info = [
+        "D_C = 10 log10(|Ys + Yi + Yk|² / (|Ys| Re{Yi}))",
+        "left: velocity source (stiff receiver takes more)",
+        "right: force source (stiff receiver takes less)",
+    ]
+    ax.text(0.985, 0.03, "\n".join(info), transform=ax.transAxes,
+            va="bottom", ha="right", fontsize=9, color=COLOR_FG,
+            bbox={"boxstyle": "round,pad=0.5", "facecolor": COLOR_PANEL,
+                  "edgecolor": COLOR_GRID})
+    plt.tight_layout()
+    save_figure(output_dir, "coupling_term_regimes.svg")
+    plt.close()
+
+
+def generate_tapping_force_spectrum(output_dir: str) -> None:
+    """The tapping machine's force spectrum on concrete and on chipboard."""
+    print("Generating tapping_force_spectrum...")
+    from phonometry import (
+        hammer_limiting_frequency,
+        infinite_plate_impedance,
+        plate_bending_stiffness,
+        plate_contact_stiffness,
+        tapping_force_spectrum,
+    )
+
+    freqs = np.logspace(np.log10(50.0), np.log10(20000.0), 500)
+    surfaces = (
+        ("140 mm concrete slab", 2200.0, 3800.0, 0.2, 0.14, COLOR_PRIMARY),
+        ("22 mm chipboard walking surface", 650.0, 2400.0, 0.3, 0.022,
+         COLOR_SECONDARY),
+    )
+
+    _fig, ax = plt.subplots(figsize=(10, 6.2))
+    upper = lower = 0.0
+    for label, rho, c_l, nu, h, colour in surfaces:
+        modulus = rho * c_l**2 * (1 - nu**2)
+        impedance = infinite_plate_impedance(
+            plate_bending_stiffness(modulus, h, nu), rho * h
+        )
+        stiffness = plate_contact_stiffness(modulus, poisson_ratio=nu)
+        res = tapping_force_spectrum(freqs, stiffness, impedance)
+        upper, lower = res.upper_limit, res.lower_limit
+        regime = "over-critical" if res.over_critical else "under-critical"
+        ax.loglog(freqs, res.peak_force, "-", color=colour, linewidth=2.4,
+                  zorder=5,
+                  label=f"{label} ({regime}, fco = {res.cut_off_frequency:.0f} Hz)")
+        ax.axvline(res.cut_off_frequency, color=colour, linestyle=":",
+                   linewidth=1.4, zorder=3)
+        f_limit = float(hammer_limiting_frequency(impedance))
+        if freqs[0] < f_limit < freqs[-1]:
+            ax.axvline(f_limit, color=colour, linestyle="-.", linewidth=1.2,
+                       zorder=3)
+            ax.annotate(f"f_limit = {f_limit:.0f} Hz", xy=(f_limit, lower * 0.55),
+                        xytext=(f_limit * 1.25, lower * 0.35), fontsize=9,
+                        color=colour,
+                        arrowprops={"arrowstyle": "->", "lw": 1.0,
+                                    "color": colour})
+
+    ax.axhline(upper, color=COLOR_MUTED, linestyle="--", linewidth=1.6,
+               zorder=4, label="|Fn|upper = 2 m vh / Ti  (rebound)")
+    ax.axhline(lower, color=COLOR_MUTED, linestyle="-.", linewidth=1.6,
+               zorder=4, label="|Fn|lower = m vh / Ti  (no rebound)")
+    ax.annotate("", xy=(90.0, upper), xytext=(90.0, lower),
+                arrowprops={"arrowstyle": "<->", "lw": 1.4})
+    ax.text(97.0, (upper * lower) ** 0.5,
+            f"6.0 dB in mean square\n({lower:.2f} N to {upper:.2f} N)",
+            fontsize=9, color=COLOR_FG, va="center")
+
+    ax.set_xlabel(LABEL_FREQ_HZ)
+    ax.set_ylabel("Line force |Fn| [N]")
+    ax.set_title("Tapping-Machine Force: the Floor Decides the Excitation",
+                 fontweight="bold", pad=12)
+    ax.grid(which="both", color=COLOR_GRID, linestyle="--", alpha=0.5, zorder=0)
+    ax.set_axisbelow(True)
+    ax.legend(loc="lower left", fontsize=9)
+
+    info = [
+        "0.5 kg hammer dropped 40 mm, 10 impacts per second",
+        "building acoustics range shaded",
+    ]
+    ax.axvspan(100.0, 3150.0, color=theme_fill(COLOR_TERTIARY, ax), zorder=1)
+    ax.text(0.985, 0.97, "\n".join(info), transform=ax.transAxes,
+            va="top", ha="right", fontsize=9, color=COLOR_FG,
+            bbox={"boxstyle": "round,pad=0.5", "facecolor": COLOR_PANEL,
+                  "edgecolor": COLOR_GRID})
+    plt.tight_layout()
+    save_figure(output_dir, "tapping_force_spectrum.svg")
+    plt.close()
+
+
+def generate_detailed_impact_paths(output_dir: str) -> None:
+    """ISO 12354-2 Annex G: the five impact paths of the worked building."""
+    print("Generating detailed_impact_paths...")
+    import sys
+    from pathlib import Path
+
+    tests = str(Path(__file__).resolve().parents[2] / "tests")
+    if tests not in sys.path:
+        sys.path.insert(0, tests)
+    import iso12354_building as bld
+
+    from phonometry import (
+        detailed_impact_prediction,
+        direct_impact_level,
+        floating_floor_improvement,
+        in_situ_element,
+    )
+
+    bands = np.array([50, 63, 80, 100, 125, 160, 200, 250, 315, 400, 500, 630,
+                      800, 1000, 1250, 1600, 2000, 2500, 3150], dtype=float)
+    situ = {k: in_situ_element(e, bands) for k, e in bld.elements().items()}
+    f_0 = bld.floating_floor_resonance()
+    delta = floating_floor_improvement(bands, resonance_frequency=f_0)
+    res = detailed_impact_prediction(
+        bands,
+        direct_level=direct_impact_level(situ["floor"].impact_level,
+                                         delta_l=delta),
+        flanking_paths=bld.impact_paths(situ, delta),
+    )
+    assert res.rating is not None
+
+    _fig, ax = plt.subplots(figsize=(10, 6.2))
+    x = _band_index_axis(ax, bands)
+    palette = [COLOR_TERTIARY, COLOR_PRIMARY, COLOR_SECONDARY, "#9467bd",
+               "#ff9896"]
+    bottom = np.zeros(x.size)
+    for colour, k in enumerate_paths(res):
+        share = 100.0 * res.fractions[k]
+        ax.bar(x, share, bottom=bottom, width=0.85,
+               color=palette[colour % len(palette)], edgecolor="none", zorder=2,
+               label=res.paths[k].label)
+        bottom = bottom + share
+    ax.set_ylim(0.0, 100.0)
+    ax.set_ylabel("Share of transmitted energy [%]")
+    ax.set_title("ISO 12354-2 Detailed Model: the Direct Path Governs (Annex G)",
+                 fontweight="bold", pad=12)
+    ax.set_axisbelow(True)
+
+    twin = ax.twinx()
+    twin.plot(x, res.l_prime_n, "-o", color=COLOR_FG, linewidth=2.0,
+              markersize=4, zorder=5, label="L'n (apparent)")
+    twin.set_ylabel("Apparent normalized impact level L'n [dB]")
+    idx_f0 = float(np.interp(np.log10(f_0), np.log10(bands), x))
+    twin.axvline(idx_f0, color=COLOR_MUTED, linestyle=":", linewidth=1.6,
+                 zorder=4, label=f"floating floor fo = {f_0:.1f} Hz")
+    handles, labels = ax.get_legend_handles_labels()
+    extra, extra_labels = twin.get_legend_handles_labels()
+    ax.legend(handles + extra, labels + extra_labels, loc="upper right",
+              fontsize=9, ncol=3)
+
+    info = [
+        "five paths, not thirteen: only the floor is excited",
+        f"L'n,w (CI) = {res.rating.rating} ({res.rating.ci}) dB",
+    ]
+    ax.text(0.015, 0.03, "\n".join(info), transform=ax.transAxes,
+            va="bottom", ha="left", fontsize=10, color=COLOR_FG,
+            bbox={"boxstyle": "round,pad=0.5", "facecolor": COLOR_PANEL,
+                  "edgecolor": COLOR_GRID})
+    plt.tight_layout()
+    save_figure(output_dir, "detailed_impact_paths.svg")
+    plt.close()
+
+
+def enumerate_paths(result: object) -> list[tuple[int, int]]:
+    """``(colour index, path index)`` with the largest contributor first."""
+    fractions = result.fractions  # type: ignore[attr-defined]
+    order = list(np.argsort(-fractions.max(axis=1)))
+    return [(i, int(k)) for i, k in enumerate(order)]
+
+
+def generate_radiation_efficiency_panels(output_dir: str) -> None:
+    """Plate radiation efficiency for two pane sizes, and the baffled plate."""
+    print("Generating radiation_efficiency_panels...")
+    from phonometry import radiation_efficiency
+
+    bands = np.array([50, 63, 80, 100, 125, 160, 200, 250, 315, 400, 500, 630,
+                      800, 1000, 1250, 1600, 2000, 2500, 3150, 4000, 5000],
+                     dtype=float)
+    f_c = 2107.0                       # the page's 6 mm float glass pane
+    big = radiation_efficiency(bands, 1.5, 1.25, f_c)
+    small = radiation_efficiency(bands, 0.5, 0.4, f_c)
+
+    _fig, (ax_l, ax_r) = plt.subplots(1, 2, figsize=(13.0, 5.6))
+    ax_l.loglog(bands, big.radiation_efficiency, "-o", color=COLOR_PRIMARY,
+                linewidth=2.2, markersize=5, zorder=5,
+                label="1.5 m x 1.25 m pane")
+    ax_l.loglog(bands, small.radiation_efficiency, "-s", color=COLOR_SECONDARY,
+                linewidth=2.2, markersize=5, zorder=5,
+                label="0.5 m x 0.4 m pane, same glass")
+    ax_l.axhline(1.0, color=COLOR_MUTED, linestyle="--", linewidth=1.4,
+                 zorder=3, label="sigma = 1 (as efficient as a piston)")
+    ax_l.axvline(f_c, color=COLOR_TERTIARY, linestyle=":", linewidth=1.6,
+                 zorder=3, label=f"critical frequency fc = {f_c:.0f} Hz")
+    peak = float(big.radiation_efficiency.max())
+    ax_l.annotate(f"coincidence peak: sigma = {peak:.2f}",
+                  xy=(2000.0, peak), xytext=(260.0, peak * 1.05), fontsize=9,
+                  color=COLOR_FG,
+                  arrowprops={"arrowstyle": "->", "lw": 1.0})
+    ax_l.set_xlabel(LABEL_FREQ_HZ)
+    ax_l.set_ylabel("Radiation efficiency sigma")
+    ax_l.set_title("Edge Radiation, Coincidence and the Slow Return to Unity",
+                   fontweight="bold", pad=12)
+    ax_l.grid(which="both", color=COLOR_GRID, linestyle="--", alpha=0.5,
+              zorder=0)
+    ax_l.set_axisbelow(True)
+    ax_l.legend(loc="upper left", fontsize=9)
+
+    ratio = float(small.radiation_efficiency[bands == 100][0]
+                  / big.radiation_efficiency[bands == 100][0])
+    ax_l.text(0.985, 0.03,
+              (f"at 100 Hz the small pane radiates {ratio:.1f} times better:\n"
+               "the uncancelled edge strip is a larger fraction of it"),
+              transform=ax_l.transAxes, va="bottom", ha="right", fontsize=9,
+              color=COLOR_FG,
+              bbox={"boxstyle": "round,pad=0.5", "facecolor": COLOR_PANEL,
+                    "edgecolor": COLOR_GRID})
+
+    big.plot_geometry(ax=ax_r)
+    plt.tight_layout()
+    save_figure(output_dir, "radiation_efficiency_panels.svg")
+    plt.close()
+
+
+def generate_structure_borne_conversion(output_dir: str) -> None:
+    """EN 15657 to EN 12354-5: the two quantities one correction produces."""
+    print("Generating structure_borne_conversion...")
+    from phonometry import (
+        characteristic_reception_plate_power,
+        equivalent_blocked_force_level,
+        installed_power_from_reception_plate,
+    )
+
+    # The flushing cistern of EN 12354-5 Annex I.3 at its wall contact, whose
+    # printed Table I.8 columns the library reproduces to a tenth of a decibel.
+    bands = np.array([63.0, 125.0, 250.0, 500.0, 1000.0, 2000.0])
+    l_ws = np.array([61.7, 59.8, 47.2, 44.9, 38.8, 27.2])   # on the test plate
+    l_fb = equivalent_blocked_force_level(l_ws, 5.34e-6)    # Formula (15)
+    l_wsn = characteristic_reception_plate_power(l_fb)       # Formula (17)
+    installed = installed_power_from_reception_plate(l_wsn, 24.1e-6)
+    characteristic = installed_power_from_reception_plate(l_wsn, 1.0e-3)
+    d_c = 16.2                                               # Annex I.9
+
+    x = np.arange(bands.size)
+    _fig, ax = plt.subplots(figsize=(10, 6.2))
+    ax.plot(x, l_ws, "-o", color=COLOR_MUTED, linewidth=2.0, markersize=5,
+            zorder=4, label="L_Ws measured on the test plate (Y = 5.34e-6)")
+    ax.plot(x, l_wsn, "-s", color=COLOR_PRIMARY, linewidth=2.4, markersize=6,
+            zorder=5,
+            label="L_Wsn on the standard plate (Y = 5e-6): what is declared")
+    ax.plot(x, installed, "-^", color=COLOR_TERTIARY, linewidth=2.4,
+            markersize=6, zorder=5,
+            label="L_Ws,inst on the receiving wall (Y = 24.1e-6)")
+    ax.plot(x, characteristic, "-D", color=COLOR_SECONDARY, linewidth=2.4,
+            markersize=6, zorder=5,
+            label="L_Ws,c with the source mobility (Y = 1e-3): the input to "
+                  "EN 12354-5")
+    ax.plot(x, characteristic - d_c, "x", color=COLOR_FG, markersize=9,
+            markeredgewidth=2.0, zorder=6,
+            label=f"L_Ws,c - D_C, D_C = {d_c:g} dB: back to L_Ws,inst")
+
+    # The step the section exists to teach, marked in the lowest band.
+    ax.annotate("", xy=(0, installed[0]), xytext=(0, l_wsn[0]),
+                arrowprops={"arrowstyle": "<->", "lw": 1.6})
+    ax.text(0.12, 0.5 * (l_wsn[0] + installed[0]),
+            f"+{installed[0] - l_wsn[0]:.1f} dB = 10 lg(24.1/5.0):\n"
+            "a lighter receiver accepts more power",
+            fontsize=9, color=COLOR_FG, va="center")
+
+    _band_index_axis(ax, bands)
+    ax.set_ylabel("Structure-borne power level [dB re 1 pW]")
+    ax.set_title("One Source, Four Levels: the EN 15657 Conversion Chain",
+                 fontweight="bold", pad=12)
+    ax.grid(color=COLOR_GRID, linestyle="--", alpha=0.5, zorder=0)
+    ax.set_axisbelow(True)
+    ax.legend(loc="lower left", fontsize=8.5)
+    ax.text(0.985, 0.97,
+            "EN 12354-5 Annex I.3 flushing cistern, wall contact\n"
+            "markers reproduce the printed Table I.8 columns",
+            transform=ax.transAxes, va="top", ha="right", fontsize=9,
+            color=COLOR_FG,
+            bbox={"boxstyle": "round,pad=0.5", "facecolor": COLOR_PANEL,
+                  "edgecolor": COLOR_GRID})
+    plt.tight_layout()
+    save_figure(output_dir, "structure_borne_conversion.svg")
     plt.close()

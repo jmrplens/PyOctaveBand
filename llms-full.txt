@@ -2518,10 +2518,12 @@ detailed model buys is the spectrum behind the single number.
 
 [Predicting Panel Sound Insulation](https://jmrplens.github.io/phonometry/buildings/design/panel-sound-insulation/)
 goes one level deeper, to where the element $R$ itself comes from: the mass law
-and the coincidence dip of a single panel, the mass-spring-mass behaviour of a
-double wall, transmission through slits and apertures, plate radiation
-efficiency and point mobilities. It is the physics a catalogue value expresses
-in one number.
+and the coincidence dip of a single panel, the plateau shortcut that estimates
+the whole curve by hand, the coincidence *range* of a corrugated or ribbed sheet,
+the mass-spring-mass behaviour of a double wall and the wall-tie bridge that
+limits a masonry cavity one, transmission through slits and apertures, plate
+radiation efficiency and point mobilities. It is the physics a catalogue value
+expresses in one number.
 
 Two pages here carry the floor half of any design, one measuring and one
 predicting.
@@ -2550,15 +2552,29 @@ takes that source description, loses part of it to the coupling term the source
 and receiver mobilities set, and carries the rest to a room that may be several
 junctions away.
 
-One bookkeeping note runs through the whole section: the family exists as
-EN 12354:2000 and as ISO 12354:2017, and the two are not interchangeable in
-every clause. The simplified models on
-[Predicting Sound Insulation](https://jmrplens.github.io/phonometry/buildings/design/insulation-prediction/)
-follow the 2000 text — including the tabulated flanking correction $K$ that the
-2017 impact part replaced with explicit per-path formulae — while
-[Detailed Per-Band Prediction](https://jmrplens.github.io/phonometry/buildings/design/detailed-prediction/)
-follows the 2017 text. Check which edition your regulation calls up before
-quoting a correction from either.
+**EN 12354 or ISO 12354?** One bookkeeping note runs through the whole section.
+The prediction family was published by CEN as EN 12354-1 to -6 and later
+reissued by ISO as a second edition, ISO 12354-1:2017 and ISO 12354-2:2017,
+which is not word for word the earlier text: where a formula changed between the
+prints, the [errata registry](https://jmrplens.github.io/phonometry/reference/errata/) records both. Parts
+3 to 6 keep their EN designation in the editions used here. Every guide names
+the edition it was read from — EN 12354-1:2000 and EN 12354-2:2000 for the
+simplified models on
+[Predicting Sound Insulation](https://jmrplens.github.io/phonometry/buildings/design/insulation-prediction/),
+including the tabulated flanking correction $K$ that the 2017 impact part
+replaced with explicit per-path formulae; ISO 12354-1:2017 and ISO 12354-2:2017
+for the per-band models and the Annex L/G worked examples of
+[Detailed Per-Band Prediction](https://jmrplens.github.io/phonometry/buildings/design/detailed-prediction/);
+and EN 12354-3:2000 to EN 12354-6:2003 for façades, service equipment and
+enclosed spaces. Check which edition your regulation calls up before quoting a
+clause or a correction from either.
+
+And one caveat both parts print, in Clause 5: the models predict the *measured*
+performance of buildings **assuming good workmanship and high measurement
+accuracy**. A prediction is therefore a statement about a correctly built
+construction, not about the one that will be built; the standard's own advice is
+to vary the uncertain inputs and read the spread in the answer, which
+ISO 12354-1:2017 Annex K systematises into an uncertainty on the result.
 
 Every prediction here starts from measured data that came from somewhere else,
 and the design report has to say where. The element $R$ and $L_n$ come from
@@ -2583,9 +2599,11 @@ measurement in [Sound insulation](https://jmrplens.github.io/phonometry/building
   junction conversion, the flanking indices per band and the per-path
   contributions behind the rating.
 - [Predicting Panel Sound Insulation](https://jmrplens.github.io/phonometry/buildings/design/panel-sound-insulation/):
-  the mass law and coincidence dip (Sharp), double walls (Bies), slits and
-  apertures (Gomperts, Wilson-Soroka), radiation efficiency
-  (Leppington/Maidanik) and point mobilities (Cremer).
+  the mass law, the plateau shortcut and the coincidence dip of a single panel
+  (Sharp, Norton), the coincidence range of a corrugated or ribbed sheet
+  (Vigran/Heckl), double walls and the wall-tie bridge of a masonry cavity wall
+  (Bies, Hopkins), slits and apertures (Gomperts, Wilson-Soroka), radiation
+  efficiency (Leppington/Maidanik) and point mobilities (Cremer).
 - [Floor-Covering Impact Improvement (ISO 16251-1)](https://jmrplens.github.io/phonometry/buildings/design/impact-improvement/):
   the weighted improvement of a soft floor covering measured on a small
   heavyweight mock-up.
@@ -4820,7 +4838,8 @@ laboratory, and predicted from element data.
   the rubber ball and the bang machine, the impact force exposure level that
   specifies them and the ISO 717-2 Annex D single number.
 - [Laboratory Flanking Transmission (ISO 10848)](https://jmrplens.github.io/phonometry/buildings/insulation/flanking-lab/):
-  the measured junction vibration reduction index and the flanking descriptors.
+  the measured junction vibration reduction index, the flanking descriptors,
+  and the suspended-ceiling plenum path with its ceiling attenuation class.
 - [Insulation Ratings (ISO 717)](https://jmrplens.github.io/phonometry/buildings/insulation/insulation-ratings/): the
   reference-curve engines behind Rw, DnT,w, Ln,w and their adaptation terms.
 - [Façade Sound Insulation](https://jmrplens.github.io/phonometry/buildings/insulation/facade-insulation/): the
@@ -6259,8 +6278,9 @@ related EN 12354-5, lives in
   the octave-band control method, its reverberation index and its survey
   quantities.
 - [Laboratory Flanking Transmission (ISO 10848)](https://jmrplens.github.io/phonometry/buildings/insulation/flanking-lab/):
-  the measured vibration reduction index Kij and the flanking descriptors
-  Dn,f and Ln,f.
+  the measured vibration reduction index Kij, the flanking descriptors Dn,f
+  and Ln,f, and the suspended-ceiling plenum path with its normalized ceiling
+  attenuation Dn,c and ceiling attenuation class.
 - [Heavy and Soft Impact Sources (ISO 16283-2)](https://jmrplens.github.io/phonometry/buildings/insulation/heavy-impact-sources/):
   the rubber ball and the bang machine, the impact force exposure levels that
   specify them, the Fast-weighted maximum level and the ISO 717-2 Annex D
@@ -10133,6 +10153,26 @@ plt.show()
 
 </details>
 
+### `image_source_rir()` parameters
+
+| Parameter | Type | Units | Range / default | Notes |
+| :--- | :--- | :--- | :--- | :--- |
+| `dimensions` | (float, float, float) | m | all > 0 | Room lengths `(Lx, Ly, Lz)` |
+| `source` / `receiver` | (float, float, float) | m | strictly inside the room | Positions `(x, y, z)` |
+| `absorption` | scalar / (6,) / (n,) / (6, n) | -- | `[0, 1]` | Uniform, per-wall, per-band, or per-wall per-band |
+| `fs` | int | Hz | > 0 | Sample rate |
+| `max_order` | int | -- | >= 0, default 20 | Reflection-order cut-off |
+| `speed_of_sound` | float | m/s | > 0, default 343 | Speed of sound `c` |
+| `air_attenuation` | float or (n,) | Np/m | >= 0, default 0 | Air power (intensity) attenuation coefficient `m` |
+| `duration` | float, optional | s | > 0 | RIR length (default: last image arrival) |
+| `frequencies` | (n,), optional | Hz | -- | Band centres labelling a per-band result |
+
+Returns an `ImageSourceResult` (`ir`, `fs`, `frequencies`, and the exact
+`times`/`distances`/`orders`/`amplitudes`/`image_positions` reflection table)
+with `.plot()`, `.plot_geometry()` and a `direct_time` property.
+`audible_image_count(order)` gives the shoebox image count and
+`reflection_density(t, volume)` the density $4\pi c^3 t^2 / V$.
+
 **Reproducing the statistical decay.** The fitted initial decay slope of the
 reverberant energy density of the synthetic RIR recovers the **Eyring**
 reverberation time $T = -24 V \ln 10 / (c S \ln(1 - \bar\alpha))$ (Kuttruff
@@ -10242,6 +10282,26 @@ plt.show()
 ```
 
 </details>
+
+### `steady_state_field()` parameters
+
+| Parameter | Type | Units | Range / default | Notes |
+| :--- | :--- | :--- | :--- | :--- |
+| `sound_power_level` | float | dB re 1 pW | -- | Source power level `Lw` |
+| `surface_area` | float | m2 | > 0 | Total boundary area `S` |
+| `mean_absorption` | float | -- | `(0, 1)` | Mean Sabine absorption `alpha_bar` |
+| `distances` | 1D array, optional | m | > 0 | Distance grid (default: `0.1 rc` to `10 rc`) |
+| `directivity` | float | -- | > 0, default 1 | Source directivity factor `Q` |
+| `characteristic_impedance` | float, optional | Pa*s/m | > 0 | Adds the `10 lg(rho c / 400)` term |
+
+Returns a `SteadyFieldResult` (`distances`, `direct`, `reverberant`, `total`,
+`critical_distance`, `room_constant`) with `.plot()`. The pieces
+`room_constant`, `critical_distance`, `schroeder_frequency` and
+`steady_state_spl` are also callable directly, and each accepts per-band arrays.
+`steady_state_spl` additionally takes `source_model`, one of `constant_power`
+(the default), `constant_volume` or `constant_pressure`: whether the mounting
+that raises `Q` also raises the radiated power is a modelling choice worth up to
+18 dB for a corner source, and it should be stated in any report.
 
 The **Schroeder frequency**
 
@@ -25150,7 +25210,7 @@ $$
 s'_t = 4\pi^2\,m'_t\,f_r^2 .
 $$
 
-<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_dynamic_stiffness_rig_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_dynamic_stiffness_rig.svg" alt="ISO 9052-1 resonance rig: a vertical exciter and an accelerometer on the load plate over the 200 mm by 200 mm resilient specimen, read as a mass-spring system whose response peak gives the resonant frequency and the apparent dynamic stiffness" width="92%"></picture>
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_dynamic_stiffness_rig_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_dynamic_stiffness_rig.svg" alt="EN 29052-1 resonance rig in three panels: the three excitation arrangements of Figures 1 to 3, one on a rigid foundation with the load plate driven and measured, two on an isolated baseplate of at least 100 kg where both plates are measured and the exciter drives either the load plate or the baseplate; below, the specimen and load requirements with the plaster bed, the steel load plate and the petroleum-jelly fillet, and the mass-spring model whose response peak gives the resonant frequency" width="92%"></picture>
 
 In the test arrangement the specimen lies between the rigid foundation and a
 load plate whose total mass per unit area, plate plus added load, is
@@ -32861,14 +32921,14 @@ check that pins each quantity to its standard's own expected value.
 
 | Symbol | Definition | Unit | Defined in | Computed in |
 | :--- | :--- | :--- | :--- | :--- |
-| $T_{20}$ | Reverberation time extrapolated to a 60 dB decay from a least-squares fit over −5 dB to −25 dB of the Schroeder curve. | s | ISO 3382-2:2008, Clause 6 and Annex C | [Room Acoustics](https://jmrplens.github.io/phonometry/buildings/rooms/room-acoustics/) |
-| $T_{30}$ | The same extrapolation from a fit over −5 dB to −35 dB, the usual choice when the decay range allows it. | s | ISO 3382-2:2008, Clause 6 and Annex C | [Room Acoustics](https://jmrplens.github.io/phonometry/buildings/rooms/room-acoustics/) |
-| $T_{60}$, RT | Reverberation time as such: the time for the sound energy to fall by 60 dB. Measured in practice as $T_{20}$ or $T_{30}$. | s | ISO 3382-1:2009 | [Room Acoustics](https://jmrplens.github.io/phonometry/buildings/rooms/room-acoustics/) |
-| EDT | Early decay time: the same slope taken over the first 10 dB of decay, which tracks perceived reverberance rather than the tail. | s | ISO 3382-1:2009 (just-noticeable difference in Table A.1) | [Room Acoustics](https://jmrplens.github.io/phonometry/buildings/rooms/room-acoustics/) |
-| $C_{50}$ | Clarity for speech: the energy ratio between the first 50 ms of the impulse response and everything after it. | dB | ISO 3382-1:2009 | [Room Acoustics](https://jmrplens.github.io/phonometry/buildings/rooms/room-acoustics/) |
-| $C_{80}$ | Clarity for music: the same ratio with the boundary at 80 ms. | dB | ISO 3382-1:2009 (just-noticeable difference in Table A.1) | [Room Acoustics](https://jmrplens.github.io/phonometry/buildings/rooms/room-acoustics/) |
-| $D_{50}$ | Definition, or Deutlichkeit: the fraction of the total energy arriving in the first 50 ms. | dimensionless | ISO 3382-1:2009 (just-noticeable difference in Table A.1) | [Room Acoustics](https://jmrplens.github.io/phonometry/buildings/rooms/room-acoustics/) |
-| $T_s$ (centre time) | Centre time: the centre of gravity of the squared impulse response in time, a boundary-free alternative to the clarity indices. It runs to tens of milliseconds in a room; the building-prediction guides write $T_s$ for something else entirely, the structural reverberation time of a plate, which is seconds. | s | ISO 3382-1:2009, Equation (A.13) | [Room Acoustics](https://jmrplens.github.io/phonometry/buildings/rooms/room-acoustics/) |
+| $T_{20}$ | Reverberation time extrapolated to a 60 dB decay from a least-squares fit over −5 dB to −25 dB of the Schroeder curve. | s | ISO 3382-2:2008, Clause 6 and Annex C | [Room acoustic parameters (ISO 3382-1/2)](https://jmrplens.github.io/phonometry/buildings/rooms/room-acoustics/) |
+| $T_{30}$ | The same extrapolation from a fit over −5 dB to −35 dB, the usual choice when the decay range allows it. | s | ISO 3382-2:2008, Clause 6 and Annex C | [Room acoustic parameters (ISO 3382-1/2)](https://jmrplens.github.io/phonometry/buildings/rooms/room-acoustics/) |
+| $T_{60}$, RT | Reverberation time as such: the time for the sound energy to fall by 60 dB. Measured in practice as $T_{20}$ or $T_{30}$. | s | ISO 3382-1:2009 | [Room acoustic parameters (ISO 3382-1/2)](https://jmrplens.github.io/phonometry/buildings/rooms/room-acoustics/) |
+| EDT | Early decay time: the same slope taken over the first 10 dB of decay, which tracks perceived reverberance rather than the tail. | s | ISO 3382-1:2009 (just-noticeable difference in Table A.1) | [Room acoustic parameters (ISO 3382-1/2)](https://jmrplens.github.io/phonometry/buildings/rooms/room-acoustics/) |
+| $C_{50}$ | Clarity for speech: the energy ratio between the first 50 ms of the impulse response and everything after it. | dB | ISO 3382-1:2009 | [Room acoustic parameters (ISO 3382-1/2)](https://jmrplens.github.io/phonometry/buildings/rooms/room-acoustics/) |
+| $C_{80}$ | Clarity for music: the same ratio with the boundary at 80 ms. | dB | ISO 3382-1:2009 (just-noticeable difference in Table A.1) | [Room acoustic parameters (ISO 3382-1/2)](https://jmrplens.github.io/phonometry/buildings/rooms/room-acoustics/) |
+| $D_{50}$ | Definition, or Deutlichkeit: the fraction of the total energy arriving in the first 50 ms. | dimensionless | ISO 3382-1:2009 (just-noticeable difference in Table A.1) | [Room acoustic parameters (ISO 3382-1/2)](https://jmrplens.github.io/phonometry/buildings/rooms/room-acoustics/) |
+| $T_s$ (centre time) | Centre time: the centre of gravity of the squared impulse response in time, a boundary-free alternative to the clarity indices. It runs to tens of milliseconds in a room; the building-prediction guides write $T_s$ for something else entirely, the structural reverberation time of a plate, which is seconds. | s | ISO 3382-1:2009, Equation (A.13) | [Room acoustic parameters (ISO 3382-1/2)](https://jmrplens.github.io/phonometry/buildings/rooms/room-acoustics/) |
 | $A$ | Equivalent sound absorption area of a room: the area of a perfectly absorbing surface that would give the same reverberation time. | m² | ISO 354:2003, Equations (5) and (7) | [Sound Absorption Measurement and Rating](https://jmrplens.github.io/phonometry/materials/absorbers/absorption-measurement/) |
 | NC | Noise criteria rating of a background spectrum: the speech interference level selects the curve, and the tangency method rates the spectrum when a band exceeds it. | dB (index) | ANSI/ASA S12.2-2019, 5.2.2 and 5.2.3 (curves in Table 1) | [Room-noise criteria (NC / RC Mark II)](https://jmrplens.github.io/phonometry/buildings/rooms/room-noise/) |
 | SIL | Speech interference level: the average of the 500, 1000, 2000 and 4000 Hz octave-band levels. | dB | ANSI/ASA S12.2-2019, clause 3.2 | [Room-noise criteria (NC / RC Mark II)](https://jmrplens.github.io/phonometry/buildings/rooms/room-noise/) |

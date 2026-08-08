@@ -269,6 +269,7 @@ from figures.room import (
 )
 from figures.schematics import (
     animate_comb_filtering,
+    animate_dynamic_stiffness_sweep,
     animate_flanking_paths,
     animate_instantaneous_intensity,
     animate_intensity_scan_power,
@@ -400,6 +401,7 @@ __all__ = [
     "_RASTER_FIGURES",
     "_VARIANTS",
     "animate_comb_filtering",
+    "animate_dynamic_stiffness_sweep",
     "animate_elastic_coincidence",
     "animate_elastic_plate_junction",
     "animate_fdtd_aperture_slit",

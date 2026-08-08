@@ -51,6 +51,33 @@ numbers.
 
 ## The chain, band by band
 
+Before any of it: the standard splits every element in two, and the whole chain
+below is one of the two branches. A **Type A element** (clause 3.3.5) is one
+whose structural reverberation time is primarily determined by the elements it is
+connected to, up to at least the 1 kHz one-third-octave band, and across which
+the vibration level falls by less than 6 dB in the direction perpendicular to the
+junction line. Cast in-situ concrete, solid wood including cross-laminated
+timber, glass, plastic, metal and blockwork with a finish that mechanically
+connects it are the standard's own examples. A **Type B element** (3.3.6) is
+anything else, typically plasterboard or timber cladding on a timber or metal
+frame. The distinction is not academic: it is exactly why the Type A chain
+assembles the loss factor from the junction perimeter, because for a Type A
+element the junctions *are* the damping. For a Type B element the standard takes
+$T_{s,\text{situ}} = T_{s,\text{lab}}$, so the in-situ correction is 0 dB and
+$R_\text{situ} = R$.
+
+The Annex L building, and steps 1 to 5 below, are the Type A branch. Two
+consequences are worth carrying. The classification is **per frequency band** —
+Notes 2 to both definitions say a masonry wall can be Type A low and mid and
+Type B at the top of the range — so the binary heading of the lightweight section
+further down is a simplification of a boundary that actually moves with
+frequency. And at a mixed junction (clause 4.2.2.3, "for example Type B wall on
+Type A floor") Formula (10) may still be used as an approximation, with the Type
+B element's equivalent absorption length taken as its area over the reference
+length, $a_{i,\text{situ}} = S_{i,\text{situ}}/l_0$ (Formula 13). Running
+`in_situ_element` on a framed partition instead assembles a total loss factor
+from junctions that do not control its damping, and nothing will warn you.
+
 Both parts share the same machinery, so a building is described once and the
 airborne and impact chains read the same in-situ element data.
 
@@ -115,6 +142,88 @@ $L_n = 155 - 30\log_{10} m' + 10\log_{10} T_s + 10\log_{10}\sigma + 10\log_{10}(
 four-flanking-element room, and $L'_n = 10\log_{10}\sum 10^{L_n/10}$ over the five
 impact paths, then ISO 717.
 
+## Starting from measured element data
+
+Clause 4.1 is explicit about where the numbers should come from: acoustic data on
+the elements involved *should be taken primarily from standardized laboratory
+measurements*, and the sources of data used shall be stated. The Annex B
+calculation the page opens with is the fallback for when no measurement exists.
+A real project usually starts from a catalogue sheet or an ISO 10140 test report,
+and that route has its own three steps.
+
+**The transfer to the building is a loss-factor transfer.** The laboratory
+measured the element in a test frame whose damping is not the building's, so
+Formula (9) rescales the index by the ratio of the two structural reverberation
+times, $R_\text{situ} = R - 10\lg(T_{s,\text{situ}}/T_{s,\text{lab}})$, and Part 2
+Formula (5) does the same for the impact level **with the sign reversed**. Read
+the sign: an element more heavily damped in the building than in the test frame
+has a shorter $T_s$ in situ, which *raises* its index and *lowers* its impact
+level; an element more lightly damped loses index. The standard's own note adds
+that $R_\text{situ} = R$ is a usable first approximation, and for a Type B
+element it is exact.
+
+**$T_{s,\text{lab}}$ comes from the test report, or from Annex C.** If the
+laboratory printed it, use it. If not, Formula (C.3) estimates the laboratory
+total loss factor as
+$\eta_\text{tot,lab} \approx \eta_\text{int} + m'/(485\sqrt{f}) \approx 0{,}01 +
+m'/(485\sqrt{f})$, valid for elements below $m'$ = 800 kg/m², with
+$\eta_\text{int}$ normally taken as 0,01 (Annex B Table B.1 lists it per
+material). `laboratory_total_loss_factor` is that formula and
+`structural_reverberation_time` turns it into $T_s = 2{,}2/(f\eta_\text{tot})$;
+$T_{s,\text{situ}}$ comes from the same Formula (C.1) chain the page already runs.
+
+**Flanking paths need one more correction than the direct path.** Below its
+critical frequency a laboratory $R$ contains forced transmission, which a
+flanking path does not carry: only free bending waves cross a junction. Annex B.1
+therefore corrects a measured $R$ to resonant transmission only before it enters
+a flanking path — the 8 dB estimate for a single frame element without a cavity —
+while the **direct** path keeps the forced transmission the laboratory measured.
+That is `resonant_sound_reduction_index`, and `in_situ_element(...,
+resonant_only=True)` does the same on a calculated element.
+
+The four names below (`laboratory_total_loss_factor`,
+`structural_reverberation_time`, `in_situ_reduction_index` and
+`in_situ_impact_level`) are top-level `phonometry` names; add them to the import
+block of the previous section to run this.
+
+```python
+# A measured laboratory R and Ln for the 220 mm separating floor, transferred to
+# the building. `el` is the in-situ element of the section above, whose
+# `reverberation_time` is Ts,situ.
+eta_lab = laboratory_total_loss_factor(bands, mass_per_area=484.0,
+                                       internal_loss_factor=0.005)   # (C.3)
+ts_lab = structural_reverberation_time(bands, eta_lab)               # (C.1)
+print(np.round(ts_lab[[0, 10]], 3))                    # [0.301 0.089] s
+print(np.round(el.reverberation_time[[0, 10]], 3))     # [0.53  0.152] s, in situ
+
+r_situ = in_situ_reduction_index(r_measured, el.reverberation_time, ts_lab)
+ln_situ = in_situ_impact_level(ln_measured, el.reverberation_time, ts_lab)
+# This floor is *less* damped in the building than in the test frame (Ts,situ is
+# the longer of the two), so Formula (9) takes 2.0 to 2.5 dB off its index across
+# the range and Part 2 Formula (5) adds the same to its impact level.
+
+# A flanking path takes the resonant-only form of the same measured index;
+# the direct path does not.
+r_flanking = resonant_sound_reduction_index(r_situ, bands, critical_frequency=76.8)
+```
+
+### What you need before you start
+
+| Quantity | Where it comes from |
+| :--- | :--- |
+| $R$, $L_n$ per band | ISO 10140-2 / ISO 10140-3 test report — **with the laboratory structural reverberation time from the same report** |
+| $\Delta R$ of a lining | ISO 10140-1 Annex G, or ISO 12354-1 Annex D |
+| $\Delta L$ of a covering | [ISO 16251-1](/phonometry/buildings/design/impact-improvement/) or ISO 10140-3 |
+| $K_{ij}$ per junction | ISO 10848-1/-4, or the [Annex E catalogue](/phonometry/buildings/design/insulation-prediction/) |
+| $m'$, $f_c$, $\eta_\text{int}$, $c_L$ | the material data sheet, or Annex B Table B.1 |
+| Areas and coupling lengths | the drawings, measured **surface to surface** |
+
+That last row changes an answer: a coupling length measured surface to surface
+rather than centre to centre differs by a leaf thickness on a lined or
+double-leaf element, and $l_{ij}$ enters Formula (10) directly. Clause 4.1 also
+requires the source of every input to be stated, which on a fiche is what the
+`notes` field of `ReportMetadata` is for.
+
 ## The worked building of Annex L / Annex G
 
 ISO 12354-1:2017 Annex L and ISO 12354-2:2017 Annex G describe the **same**
@@ -127,6 +236,18 @@ intermediate quantity, which makes the example a complete oracle for the
 model. Eight defects of those printed tables are recorded in
 [Errata](/phonometry/reference/errata/), and the fixture below takes the
 corrected readings.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_iso12354_annexl.svg" alt="The ISO 12354-1 Annex L worked building: a section through two stacked dwellings showing the 220 mm separating floor with its floating screed, the two external and two internal walls with their masses and critical frequencies and the Kij of each junction, and a plan of the separating floor with the four coupling lengths dimensioned and the thirteen transmission paths counted" width="92%" />
+
+The drawing is what ties the element list to the numbers the snippet multiplies.
+The separating floor's perimeter sum is 9 m of external edge plus 9 m of internal
+edge because the 5,00 m × 4,00 m floor meets an external wall along each 4,00 m
+edge and an internal wall along each 5,00 m edge, and each of those junctions
+carries the floor above and below it. An external wall's own perimeter takes
+8,0 m of horizontal junction (its top and bottom edges, 4,00 m each) and 2,75 m
+of vertical. The floor-to-external-wall junctions are rigid T, the
+floor-to-internal-wall junctions rigid cross. And the thirteen paths are one
+direct path plus three per flanking element, $1 + 4\times3$.
 
 ```python
 import numpy as np
@@ -309,6 +430,37 @@ print(np.round(imp.l_prime_n[[3, 10]], 1))     # [54.  35.9]   Table G.1 total
 print(imp.rating.rating, imp.rating.ci)        # 41 2           printed 41,0 (2)
 ```
 
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/detailed_impact_paths.svg" alt="Stacked per-band shares of the transmitted energy for the five impact paths of the ISO 12354-2 Annex G building with the apparent normalized impact sound pressure level overlaid, the direct path through the excited floor dominating in every band and the floating floor resonance marked on the frequency axis" width="92%" />
+
+*The impact half of the same building, and it is a different picture from the
+airborne one. There are five paths, not thirteen, because only the floor is
+excited: the tapping machine stands on it, so there is one direct path and one
+Df path into each of the four walls, and no Ff or Fd. The direct path through the
+excited floor governs in every band. That is the practical lesson — an impact
+problem is fixed at the source floor, not at the junctions.*
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+# One line — the per-band path contributions with L'n overlaid:
+imp.plot()
+plt.show()
+```
+
+</details>
+
+Read the rating the same way. $L'_{n,w} = 41$ dB with $C_I = +2$ dB means the
+unweighted, walking-relevant level sits above the weighted rating, which is the
+signature of a floor whose improvement is concentrated high up — exactly what a
+floating floor with $f_0 = 52{,}8$ Hz and a 30 lg law does. Three levers move it,
+in the order the model responds to them: a *softer* resilient layer lowers $f_0$
+and lifts the whole improvement curve; a *heavier* base slab lowers the bare
+level directly through Part 2's Formula (B.2); and a better junction does almost
+nothing until the direct path has been dealt with. Note too that the floating
+floor's $\Delta L$ is subtracted from the direct path and from every flanking
+path alike, because all five start at the same excited floor.
+
 ## Simplified against detailed
 
 The standard applies its simplified model to the same building (Tables L.10 /
@@ -333,6 +485,21 @@ cavity). The impact side offers the same two routes: Part 2 Formula (14) from
 $\overline{D}_{v,ij,n}$ and Part 2 Formula (13) from a measured normalized
 flanking impact level $L_{n,f}$.
 
+Unlike the Type A chain, this branch consumes **measured** junction data, so its
+four inputs are per-band arrays over `bands` that come from somewhere specific.
+`r_wall_leaf` is the leaf's laboratory sound reduction index per band
+(ISO 10140-2), corrected below its critical frequency to resonant transmission
+only because a flanking path carries free bending waves alone. `dv_n` is the
+**normalized** direction-averaged velocity level difference of the junction in
+dB, measured per
+[ISO 10848-2](/phonometry/buildings/insulation/flanking-lab/) and referred to a
+reference length of 1 m. `dnf_13` is the normalized flanking level difference
+$D_{n,f}$ of a junction measured in a laboratory, in dB, which the call re-scales
+by the ratio of the site and laboratory coupling lengths. And `lnf_13` is its
+impact counterpart, the normalized flanking impact level $L_{n,f}$ in dB, which
+re-scales by both area and coupling length. The block below is an excerpt: it
+starts from those four arrays.
+
 ```python
 from phonometry import (flanking_impact_level_from_flanking_level,
                         flanking_reduction_index_from_flanking_level,
@@ -340,6 +507,11 @@ from phonometry import (flanking_impact_level_from_flanking_level,
                         resonant_sound_reduction_index)
 
 # ISO 12354-1 L.2.1: a wood frame building, floor 20 m2, junction 4 m.
+r_wall_leaf = ...   # measured R of the inner leaf per band, dB (ISO 10140-2)
+dv_n = ...          # normalized junction velocity level difference, dB (ISO 10848-2)
+dnf_13 = ...        # laboratory normalized flanking level difference Dn,f, dB
+lnf_13 = ...        # laboratory normalized flanking impact level Ln,f, dB
+
 r_star = resonant_sound_reduction_index(r_wall_leaf, bands,
                                         critical_frequency=2200.0)   # +8 dB below fc
 r_ff = flanking_reduction_index_from_normalized_difference(
@@ -425,6 +597,39 @@ built from.
 	description="One-page detailed impact prediction fiche for the same building in the impact direction: the identification header, the share-of-energy table of the direct path and the four flanking paths, the per-band figure of each path's contribution under the apparent normalized impact sound pressure level curve, and the boxed predicted L'n,w = 41 dB with the detailed model's standard deviation and the verdict against the requirement."
 	caption="Detailed impact prediction fiche (DetailedImpactResult.report), the same building excited by the tapping machine."
 />
+
+## What this guide covers
+
+**Covered.** The Clause 4.2 per-band chain for **Type A** elements: the Annex B
+homogeneous-element sound reduction index and impact level and the Annex C
+in-situ conversion through `HomogeneousElement`, `in_situ_element` and
+`perimeter_absorption_coefficient`; the transfer of *measured* laboratory data
+through `laboratory_total_loss_factor`, `structural_reverberation_time`,
+`in_situ_reduction_index` and `in_situ_impact_level` (Formula 9 and Part 2
+Formula 5); the Formula (10) in-situ junction drop; the Formula (14)/(15) direct
+and flanking airborne paths through `direct_reduction_index` and
+`airborne_flanking_path` and their impact twins `direct_impact_level` and
+`impact_flanking_path`; the Formula (16)/(17) **Type B** routes and the Annex
+B.1/B.2 resonant correction through `resonant_sound_reduction_index`; the
+assembly and ISO 717 rating through `detailed_airborne_prediction` and
+`detailed_impact_prediction`; the Part 2 B.3/B.4 reciprocity identity through
+`reciprocity_impact_level`; and the two fiches through `.report()`. The airborne
+model is stated by Clause 5 to carry no bias error and a standard deviation of
+1,5 dB to 2,5 dB for buildings of homogeneous elements, assuming good workmanship
+— the lower figure when every aspect is taken into account, the higher for
+complex situations or when the structural reverberation time is neglected.
+
+**Not covered.** Only homogeneous Annex B elements are calculated here; the
+spectrum of a lightweight, double or composite element is an input, from
+[Predicting Panel Sound Insulation](/phonometry/buildings/design/panel-sound-insulation/)
+or from a test report. The Annex E junction catalogue itself lives on
+[Predicting Sound Insulation](/phonometry/buildings/design/insulation-prediction/),
+as do the Annex D and F default tables of the other parts. The Type B branch is
+shown from its standard inputs rather than worked end to end. Airborne
+transmission through cavities and suspended ceilings is not carried at all, and
+clause 3.3.4 Note 1 warns it "can contribute to or even dominate" there. And the
+ISO 717 rating needs the whole spectrum: 100 Hz to 3150 Hz in one-third octaves,
+or 125 Hz to 2000 Hz in octaves.
 
 ## See also
 

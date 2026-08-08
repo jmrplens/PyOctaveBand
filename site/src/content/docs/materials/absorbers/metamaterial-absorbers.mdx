@@ -109,6 +109,16 @@ loss to match. The balance is delicate by design, and the library's
 returned geometry the normalised impedance sits at $1 + 0j$ and the
 reflection at zero.
 
+Two lengths set the panel geometry and appear in every call below. The
+**lattice step** `lattice_step` = $a$ is the spacing between successive
+resonators *along* one slit, so a slit loaded by $N$ resonators is
+$L = N a$ deep — that, and not the resonator's own cavity, is what makes the
+panel 30 mm thick in the example. The **period** `period` = $d$ is the spacing
+between slits *across* the panel face, so one slit of height $h$ serves each
+period and the front face is referred to the cell area $S_0 = d\,a$. The
+resonator itself is described separately by its neck and cavity sides and
+lengths.
+
 ```python
 import numpy as np
 from phonometry import (
@@ -130,6 +140,36 @@ z = res.normalized_impedance[0]
 print(round(z.real, 2), round(z.imag, 2))       # 1.0 -0.0  (matched)
 print(round(float(np.abs(res.reflection[0])), 3))   # 0.0   (reflection zero)
 ```
+
+Those two printed numbers are the whole of the evidence for the match, which
+is a pity, because the balance is easier to see than to read:
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/critical_coupling_impedance.svg" alt="Left panel: the real and imaginary parts of the normalised surface impedance at 300 hertz against slit height over half to two and a half times the solved value, with horizontal guides at one and zero and the solved height marked where both are met, and a companion axis showing the absorption at 300 hertz peaking exactly there. Right panel: the impedance locus in the complex plane from 150 to 500 hertz for the under-damped, critically coupled and over-damped slits, with the matched point one plus zero j marked; the critically coupled loop passes through it and the other two miss it on either side" width="90%" />
+
+*What `critical_coupling_design` is solving. Left: sweep the slit height at
+the design frequency and the two matching conditions cross the same point —
+$\mathrm{Re}(z) = 1$ and $\mathrm{Im}(z) = 0$ at 0.978 mm, where the
+absorption reaches 1. Right: the same three slits as loci in the complex
+plane. Over-damped and under-damped fail for opposite reasons, and the locus
+says which side you are on; the absorption curve alone does not.*
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+# The impedance at 300 Hz as a function of slit height, in one line each.
+for factor in (0.6, 1.0, 1.7):
+    z_h = slit_helmholtz_absorber(
+        np.array([300.0]), design.resonator, slit_height=factor * design.slit_height,
+        lattice_step=3.0e-2, period=5.0e-2,
+    ).normalized_impedance[0]
+    print(factor, round(z_h.real, 2), round(z_h.imag, 2))
+# 0.6 2.61 3.34   over-damped: too resistive, and no longer resonant at 300 Hz
+# 1.0 1.0 -0.0    matched
+# 1.7 0.52 -1.93  under-damped: too little loss
+```
+
+</details>
 
 ## 2. The slow-sound slit panel
 
@@ -153,6 +193,26 @@ $R = (T_{11}\cos\theta - Z_0 T_{21})/(T_{11}\cos\theta + Z_0 T_{21})$ with
 $Z_0 = \rho_0 c_0 / S_0$ and $\alpha = 1 - |R|^2$. The slit uses the
 narrow-channel visco-thermal parameters and the square necks and cavities the
 rectangular-duct series of Stinson (1991).
+
+Every symbol in that chain: $M_s$ is the half-lattice step of the slit itself,
+$M_{HR}^{(n)}$ the shunt admittance of the $n$-th resonator with $Z_{HR}$ its
+input impedance (neck plus cavity, with the radiation end corrections of
+Jiménez et al. 2016), and $M_{\Delta l}$ the radiation correction of the slit
+mouth. $\kappa_s$, $\rho_s$ and $S_s$ are the visco-thermal effective bulk
+modulus, effective density and cross-section of the slit. $S_0 = d\,a$ is the
+area of one period of the panel face, so $Z_0 = \rho_0 c_0/S_0$ is the
+section 1 matching impedance *referred to that same area* — the panel is
+matched when the sound entering one period is exactly consumed by it. Note the
+symbol does double duty: in section 1 $Z_0$ is the medium impedance
+$\rho_0 c_0$, here it is that impedance divided by a cross-section.
+
+Watch what the solver actually changes. Given a target frequency it retunes
+the resonator's **cavity length** and solves for the **slit height**; the
+lattice step and the period stay as passed. For the 300 Hz design below the
+cavity goes from the 30 mm of the starting resonator to 44.7 mm and the slit
+lands at 0.978 mm, while the panel stays 30 mm deep because
+$L = N a = 1 \times 30$ mm — which is $\lambda/38$ at 300 Hz. A reader who
+wants a deeper panel adds resonators, not cavity.
 
 `critical_coupling_design` inverts the model: given a target frequency and
 angle it tunes the cavity length (which sets the resonance) and the slit
@@ -298,6 +358,39 @@ the height the loss balance breaks and the reflection rebuilds it.
   description="A 300 Hz plane tone in a 2D FDTD tube meets the meshed critical-coupling cell, its 0.98 mm slit and Helmholtz resonator resolved on the grid and shown in a zoomed panel. At the design slit height the pressure envelope stays flat and the annotated library absorption is 1.00; the 1.7 times wider slit stands a deep wave in front of the panel and the absorption drops to 0.34."
 />
 
+### Off normal incidence
+
+Every snippet and figure above is at normal incidence, and the matching
+condition carries a $\cos\theta$: $\mathrm{Re}(Z)\cos\theta = Z_0$. The
+structure is locally reacting, so the internal chain is angle-independent and
+only the front-face air impedance moves with $\theta$ — a panel matched at
+normal incidence therefore becomes progressively mismatched as the angle
+grows, without the resonance moving in frequency. How much it costs is a
+question the model answers directly, and the answer is milder than the
+algebra suggests:
+
+```python
+# The same 300 Hz design, evaluated off normal. Both the solver and the
+# evaluator take `angle` in radians.
+for degrees in (0.0, 15.0, 30.0, 45.0, 60.0):
+    off = slit_helmholtz_absorber(
+        np.array([300.0]), design.resonator, slit_height=design.slit_height,
+        lattice_step=3.0e-2, period=5.0e-2, angle=np.radians(degrees),
+    )
+    print(degrees, round(float(off.absorption[0]), 3))
+# 0.0 1.0 / 15.0 1.0 / 30.0 0.995 / 45.0 0.971 / 60.0 0.889
+```
+
+The peak stays at 300 Hz and falls only to 0.89 at 60°, which is what the
+source paper means by *quasi-omnidirectional* absorption. Two design options
+follow. Tune at the angle the panel will mostly see —
+`critical_coupling_design` takes the same `angle` argument — when the
+installation has a dominant direction; or accept the normal-incidence design,
+which is the more tolerant choice across angle. Either way, expect a
+reverberation-room measurement of such a panel to come out below the
+normal-incidence $\alpha = 1$, since the diffuse field weights exactly the
+oblique angles where the match is worst.
+
 ## 3. How slow is the sound?
 
 The name of the mechanism is measurable. The transfer-matrix result retains
@@ -339,6 +432,70 @@ section 1 places its reflection zero. Slow sound moves the resonance into the
 deep-subwavelength regime; critical coupling then makes that resonance
 perfectly absorbing.
 
+Four scalars are a thin account of a dispersion relation, so here it is:
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/slow_sound_dispersion.svg" alt="Phase speed inside the loaded slit divided by the free-air speed, against frequency from 50 to 3000 hertz, falling from about 0.2 to a minimum of 0.08 near 380 hertz and then rising steeply past the resonator resonance at 484 hertz, above which the region is greyed as a closed branch. A flat line at unity marks the empty slit, the 300 hertz design frequency is marked at 0.11, and a second axis reads the quarter-wave frequency of the fixed 30 mm depth built from that phase speed, crossing the design frequency where the panel resonates" width="86%" />
+
+*The mechanism the guide is named after, over frequency. The empty slit sits
+on 1 by definition; the loaded one falls to a minimum of 0.08 $c_0$ near
+379 Hz and then climbs steeply as the resonators pass their own resonance at
+485 Hz, above which the propagating branch closes. At the 300 Hz design point
+the phase speed is 0.11 $c_0$ = 37 m/s, which makes the fixed 30 mm depth a
+quarter wavelength at 308 Hz — where the panel resonates. The same 30 mm of
+plain air would be a quarter wave at 2858 Hz, and that ratio is the whole
+argument for the panel being thin. The same curve explains the 2 cm
+metadiffuser panel of the
+[metadiffuser guide](/phonometry/materials/diffusers/metadiffusers/).*
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+f_sweep = np.geomspace(50.0, 3000.0, 400)
+swept = slit_helmholtz_absorber(
+    f_sweep, design.resonator, slit_height=design.slit_height,
+    lattice_step=3.0e-2, period=5.0e-2,
+)
+c_ratio = 2 * np.pi * f_sweep / swept.effective_wavenumber.real / 343.0
+print(round(float(c_ratio.min()), 3), round(float(f_sweep[c_ratio.argmin()])))  # 0.08 381
+```
+
+</details>
+
+### Where the effective wavenumber comes from
+
+The wavenumber the result returns is not a fitted number: it is the product of
+two visco-thermal models the library also exposes on their own. The empty slit
+already has a complex effective density and bulk modulus, set by the viscous
+and thermal boundary layers against its walls — which is why a sub-millimetre
+slit is lossy at all — and each resonator adds a shunt impedance in parallel
+with it.
+
+```python
+# The empty slit, at the design frequency and slit height.
+rho_e, k_e = materials.slit_effective_properties(
+    np.array([300.0]), slit_height=design.slit_height
+)
+print(np.round(rho_e, 3))      # [1.355-0.203j]  against free air 1.205 kg/m^3
+print(f"{k_e[0]:.3e}")         # 1.332e+05+7.725e+03j  against adiabatic 1.419e+05 Pa
+
+# One resonator's shunt impedance, either side of its own resonance at 484 Hz.
+z_hr = materials.helmholtz_resonator_impedance(
+    np.array([300.0, 484.0, 800.0]), design.resonator,
+    slit_height=design.slit_height, lattice_step=3.0e-2,
+)
+print(np.sign(z_hr.imag))      # [-1. -1.  1.]  compliance below, mass above
+```
+
+Below its own resonance the shunt is a compliance: it adds stiffness to the
+slit without adding moving mass, and that is exactly what lowers the phase
+speed. `materials.rectangular_duct_properties(f, side=1.0e-3)` gives the same
+effective pair for a square duct when the guiding geometry is a duct rather
+than a slit, and all three take an `AirProperties` state (speed of sound,
+density, viscosity, Prandtl number, heat-capacity ratio, atmospheric
+pressure), so a design for a hot exhaust duct or a cabin at altitude changes
+one argument rather than the model.
+
 ## 4. Classical resonant absorbers through the same lens
 
 Critical coupling is not exclusive to metamaterials; it is the organising
@@ -366,13 +523,91 @@ principle hiding inside the classical resonant absorbers of the
   "how thick"; the resonant family asks "how lossy", and
   `critical_coupling_design` answers it for the slit panel exactly.
 
-The price of resonance is bandwidth: a critically coupled peak is narrow, and
-away from it the panel reflects like the rigid wall it almost is. Broadband
-metamaterial absorbers stack detuned cells side by side (the iridescent
-absorber of Jiménez et al. 2017 chains resonators of graded dimensions for
-exactly this reason); in the library the spectrum of any candidate geometry
-comes from `slit_helmholtz_absorber` over a frequency array, so a graded
-design is a loop over cells.
+The price of resonance is bandwidth, and it is worth a number rather than an
+adjective. The 300 Hz design keeps $\alpha \geq 0.8$ from 282 Hz to 320 Hz and
+$\alpha \geq 0.5$ from 266 Hz to 341 Hz — a third of an octave, against a
+50 mm porous blanket that gives about 0.68 at 500 Hz and keeps working over
+decades above it. A metamaterial absorber is therefore a tool for a *known*
+tonal or modal problem, not a general treatment: it buys depth with bandwidth.
+
+The usual answer is to stop asking one cell to do the work. Chaining $N$
+resonators along one slit is what the library's own list argument is for:
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/graded_slit_absorber.svg" alt="Absorption against frequency from 120 to 700 hertz for three panels: a single critically coupled cell with one narrow peak reaching 1.0 near 320 hertz, a chain of four graded resonators along one slit with two lobes reaching 1.0 near 150 hertz and 0.95 near 295 hertz, and a chain of four identical resonators with two lower lobes. Shaded bars beneath each curve mark where each exceeds 0.8, totalling 38, 51 and 22 hertz respectively" width="86%" />
+
+*What a chain buys, and what it costs. Measured as the total frequency
+interval above $\alpha = 0.8$ — not as the span between the outermost points,
+which for a chain hides a dip — one cell gives 38 Hz, the four graded
+resonators give 51 Hz in two lobes, and four *identical* resonators of the
+same total depth give only 22 Hz. So the extra stages alone do not buy
+bandwidth: detuning them is what makes the depth pay, which is the whole idea
+behind the rainbow-trapping designs of Jiménez et al. (2017). The cost is
+geometric and unavoidable, since $L = N a$: the four-stage panel is 120 mm
+deep against the single cell's 30 mm, and its slit height (1.2 mm here) is a
+compromise no longer critically coupled to any one stage.*
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+# `slit_helmholtz_absorber` takes a list: that is the chain along the slit.
+f_chain = np.linspace(120.0, 700.0, 700)
+graded = [critical_coupling_design(target, base, lattice_step=3.0e-2,
+                                   period=5.0e-2).resonator
+          for target in (250.0, 320.0, 410.0, 520.0)]
+chain = slit_helmholtz_absorber(f_chain, graded, slit_height=1.20e-3,
+                                lattice_step=3.0e-2, period=5.0e-2)
+step = float(f_chain[1] - f_chain[0])
+print(round(float(chain.absorption.max()), 3),
+      round(float(np.sum(chain.absorption >= 0.8)) * step))     # 0.999 51
+```
+
+</details>
+
+## 5. From the solver to a measured panel
+
+Nothing above has been built. Four things stand between the solved geometry
+and a panel that can be put in front of an instrument.
+
+**The slit tolerance is a design parameter.** The solved slit is 0.978 mm, and
+the loss balance is set by that sub-millimetre dimension. Holding the design
+frequency at 300 Hz, a slit machined 0.02 mm narrow or wide still gives
+$\alpha = 0.997$; at ±0.05 mm it is 0.982 and 0.984; at ±0.10 mm it has
+fallen to 0.931 and 0.939. So a few hundredths of a millimetre is the working
+tolerance, and a tenth is where the panel stops being *perfect*. Note which
+way the two errors fail: a narrow slit over-damps ($z = 1.09 + 0.27\mathrm{j}$
+at −0.05 mm) and a wide one under-damps ($0.93 - 0.24\mathrm{j}$ at
++0.05 mm). Err wide. The visco-thermal model assumes smooth rigid walls, so
+additive-manufacturing roughness is *extra* loss that pushes an as-designed
+panel towards over-damping; a prototype cut slightly wide and trimmed converges
+from the right side.
+
+**A periodic panel does not fit an arbitrary tube.** ISO 10534-2 Clause 6
+requires a specimen with a regular lateral structure to be cut *along the lines
+of symmetry* of that structure, and where the structural units do not fit the
+tube cross-section, to be measured on several specimens with the cut moved
+relative to the structure. The 50 mm period here does not fit a 29 mm tube at
+all and fits a 100 mm circular tube only as two whole periods across one
+diameter, which is not a symmetric cut. The clean route is a **square or
+rectangular tube whose side is an integer number of periods**, with the rigid
+tube walls acting as the symmetry planes of the infinite array — and then the
+plane-wave ceiling has to be recomputed for that geometry with
+`plane_wave_frequency_range(..., shape="rectangular")` on the maximum side
+length, not on a nominal diameter.
+
+**Put the reference plane where the model does.** The tube's $x = 0$ is the
+panel face, not the mouth of the slit and not the front of the frame; a
+millimetre of error there rotates the measured impedance without touching the
+absorption, exactly as the
+[impedance-tube guide](/phonometry/materials/absorbers/impedance-tube/#3-transfer-function-method-iso-10534-2)
+describes.
+
+**Or measure it as a surface.** If the panel is meant for a room rather than
+for a duct, the honest verification is a 10–12 m² specimen in a reverberation
+room to [ISO 354](/phonometry/materials/absorbers/absorption-measurement/), and the
+result will be the random-incidence coefficient, not the $\alpha = 1$ the
+normal-incidence design promises — for the reason set out under off-normal
+incidence above.
 
 ## What this guide covers
 
@@ -384,12 +619,20 @@ radiation end corrections and the slit-radiation term
 container and the retrieved `effective_wavenumber` and `effective_impedance`
 exposed on the result), and the critical-coupling design solver
 (`critical_coupling_design`) that tunes cavity length and slit height until
-the reflection zero sits on the real-frequency axis.
+the reflection zero sits on the real-frequency axis. The two visco-thermal
+building blocks the chain is assembled from are exposed as well
+(`slit_effective_properties`, `rectangular_duct_properties` and
+`helmholtz_resonator_impedance`, all taking an `AirProperties` state), and
+`slit_helmholtz_absorber` accepts a *list* of resonators, which is the graded
+chain of section 4.
 
 **Not covered.** No measurement standard governs these prediction models;
-a built panel would be verified in the
+section 5 sets out the route a built panel would be verified along, in the
 [impedance tube](/phonometry/materials/absorbers/impedance-tube/) (ISO 10534-2) or the
-[reverberation room](/phonometry/materials/absorbers/absorption-measurement/) (ISO 354).
+[reverberation room](/phonometry/materials/absorbers/absorption-measurement/) (ISO 354),
+but nothing here performs any of it: the tolerance and angle figures quoted
+are model evaluations, and the roughness of a printed slit, the frame, the
+mounting and the finite panel size are all outside the model.
 The membrane and decorated-membrane absorbers of section 4 are discussed as
 context only; the classical perforated, microperforated and membrane layers
 are implemented in

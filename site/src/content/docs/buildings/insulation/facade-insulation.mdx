@@ -72,12 +72,21 @@ Annex F example below, `fac.d_2m_nt_w` is 33 dB.
 
 ## Field measurement (ISO 16283-3)
 
-The same source/receiver logic reaches the building **façade**, but now the
-source is *outdoors*: a loudspeaker at 45° or the road traffic itself. Rather
-than a level difference across an internal partition, ISO 16283-3 references the
-receiving-room level $L_2$ to the level **2 m in front of the façade**
-$L_{1,2m}$, giving the level difference $D_{2m}$ and, exactly as in the airborne
-case, its standardized and normalized forms:
+A façade measurement asks a question an internal partition never does: **what
+is outside, and where is it?** There is no source room, so the reference level
+has to be established in a free field that a reflecting building is standing
+in, and every quantity on this page inherits the geometry of that choice.
+ISO 16283-3 resolves it by splitting the method twice over — a *global* result
+that describes the whole envelope as built, against an *element* result that
+describes one component; and a *loudspeaker* source that the operator controls,
+against *road traffic* that is free but arrives from everywhere. Those two
+splits give the four combinations of Table 1 (plus railway and aircraft in
+Annex E), and they are chosen on different grounds, which
+[Choosing and running the method](#choosing-and-running-the-method-clauses-9-and-10)
+sets out. The quantities themselves follow from the choice: ISO 16283-3
+references the receiving-room level $L_2$ to the level **2 m in front of the
+façade** $L_{1,2m}$, giving the level difference $D_{2m}$ and, exactly as in
+the airborne case, its standardized and normalized forms:
 
 $$
 D_{2m} = L_{1,2m} - L_2, \quad
@@ -98,6 +107,98 @@ $$
 
 The façade quantity is airborne, so its single-number rating uses the
 **ISO 717-1** reference curve through `weighted_rating` unchanged (Annex F).
+
+Neither constant is arbitrary. A microphone fastened on the façade reads
+incident *plus* reflected pressure, because the façade is the reflector; the
+subtraction converts that surface level back to the level of the incident wave
+alone, and how much has to come off depends on the geometry the sound arrives
+with. ISO 16283-3 states the assumption behind each in its own definitions:
+the $-1.5$ dB of $R'_{45°}$ "is based on the assumption that the sound is
+incident from one angle only, 45°, and the sound field in the receiving room
+approximates to a diffuse field" (3.12, Note 3), while the $-3$ dB of
+$R'_{tr,s}$ assumes the sound arrives "from all angles" (3.13, Note 2). So the
+1.5 dB between the two methods is a statement about the *source*, not about the
+wall, and it is why a loudspeaker result is labelled $D_{ls,2m,nT}$ and a
+traffic result $D_{tr,2m,nT}$ rather than both being called the same thing.
+
+The 2 m of the global method is a compromise of the same kind. Closer in, the
+microphone reads a pressure dominated by the façade's own reflection and by
+whatever detail of the elevation it happens to sit against; much further out,
+it stops describing this façade and starts describing the street. Two metres is
+far enough that the direct and reflected paths have settled into a stable sum
+over most of the range and close enough to stay in the façade's field — but the
+standard is candid about the cost, noting under Clause 9.6.1 that "systematic
+errors will occur at low frequencies due to interference effects". The
+practical consequence is the one to carry away: the reference level of a
+$D_{2m,nT}$ is measured in front of a reflecting surface and is therefore
+higher than the free field the same source would produce with the building
+removed, so a $D_{2m,nT}$ and an internal $D_{nT}$ are not the same kind of
+number even when they are the same size.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_facade_setup.svg" alt="Section through a dwelling facade: a loudspeaker on the ground with the 45 degree plus or minus 5 degree incidence line to the centre of an 11.5 square metre test specimen, the slant distance r dimensioned at 5 m for the element method and 7 m for the global method and the perpendicular D beneath it, a microphone fastened flush on the specimen with its 10 mm parallel and 3 mm normal tolerances, and the global microphone 2.0 plus or minus 0.2 m from the facade plane at 1.5 m above the receiving-room floor" width="92%" loading="eager" />
+
+### Choosing and running the method (Clauses 9 and 10)
+
+**Global or element.** They answer different questions and ISO 16283-3
+Table 1 says which is preferred for which. The **global** methods give
+$D_{2m,nT}$ (or $D_{2m,n}$) and "quantify the airborne sound insulation of a
+whole façade or a whole building in a specified situation"; that result
+"cannot be compared with a sound reduction index obtained in a laboratory",
+because it is a property of the building as built. The **element** methods give
+$R'_{45°}$ or $R'_{tr,s}$ and are the route when the aim is to characterise one
+component or to compare against laboratory data. Method 1, element loudspeaker,
+is the *preferred* way to estimate an element's apparent index; method 6, global
+road traffic, is the *preferred* way to estimate the global insulation of a
+façade exposed to road traffic.
+
+**Loudspeaker or traffic.** A loudspeaker is controllable and always
+admissible; traffic is free and is what the façade actually faces, but it comes
+with conditions. Traffic varies, so indoor and outdoor levels **must be measured
+simultaneously**; the average must include at least **50 vehicle pass-bys**; and
+the receiving-room background must be at least 10 dB below the measured
+equivalent level, because a background correction normally cannot be applied at
+all under a varying source (Clause 10.2). The traffic must flow approximately
+along a straight line within ±60° of the angle of sight from the façade, with
+deviations up to ±15°, and the elevation angle from the point of closest
+approach must be under ±40° (Clause 10.3.2). The standard also states the
+ceiling on the element traffic method plainly: background noise usually limits
+it to elements or façades with $R'_w < 40$ dB (Clause 10.1 NOTE).
+
+**Where the loudspeaker goes (Clauses 9.3 and 9.4).** Angle of incidence
+45° ± 5°, preferably on the ground or as high above it as practice allows, at a
+slant distance $r$ from the source to the centre of the specimen of at least
+**5 m** ($D > 3.5$ m) for the element method and at least **7 m** ($D > 5$ m)
+for the global method — the larger distance because the global method must
+illuminate the whole façade evenly, not one element. Choose the position so the
+level varies as little as possible over the specimen: the directivity
+requirement is under 5 dB of local variation per band over a surface the size
+and orientation of the specimen, relaxed to 10 dB (and stated in the report)
+where one dimension exceeds 5 m. The source spectrum must be steady and
+continuous, with the one-third-octave levels inside an octave differing by no
+more than 6 dB at 125 Hz, 5 dB at 250 Hz and 4 dB above; and it must put the
+receiving-room level at least 6 dB over the background.
+
+**Where the microphones go.** *Element method* (Clause 9.5.1): the microphone is
+fastened directly to the specimen, either with its axis parallel to the surface
+(centre of the membrane ≤ 10 mm from it) or normal to it (≤ 3 mm), with a
+hemispherical windscreen, securely fixed so it cannot move — and so that the
+fixing itself does not change what the specimen transmits. Use **3 to 10** fixed
+positions, distributed evenly but asymmetrically and never in a regular grid.
+The count is not chosen up front: begin with $n = 3$, and if any two positions
+differ by more than $n$ dB in any band, add positions, up to 10. A specimen
+mounted in a **recess** takes 10 positions outright, and a difference above
+10 dB must be stated in the report. *Global method* (Clauses 9.6.1 and 10.4.1):
+one microphone $(2.0 \pm 0.2)$ m from the plane of the façade, in front of the
+middle of it, at a height of **1.5 m above the receiving-room floor** — or 1 m
+in front of a balustrade or similar protrusion where one intervenes. A room
+with more than one outside wall, or a very large one, needs a position on each
+façade, and a very large façade needs several loudspeaker positions each
+complying with Clause 9.4 in full.
+
+None of this is checked by the functions below: `facade_insulation` and
+`facade_sound_reduction` energy-average whatever positions they are given
+(Clause 9.5.1, Formula (7)) and combine loudspeaker positions with Formula (8)
+if you do it yourself.
 
 ```python
 import numpy as np
@@ -254,6 +355,12 @@ absorption $\alpha_w$). Single-number ratings reuse EN ISO 717-1
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/facade_prediction.svg" alt="Per-element partial sound reduction indices and the resulting façade apparent reduction R' and standardized level difference D2m,nT for the EN 12354-3 Annex F worked example, the air inlet limiting the low bands" width="80%" />
 
+*A composite façade is governed by its worst element, and the drawn curves say
+which one that is band by band: the air inlet, a fraction of a square metre,
+holds the low bands down while the 6 m² wall is doing nothing to limit the
+result. The two output curves sit far below every element curve because the
+composite is an energy sum of transmitted power, not an average of indices.*
+
 ```python
 from phonometry import building
 
@@ -308,11 +415,13 @@ fig.tight_layout(); plt.show()
 
 </details>
 
-The composite is easier to reason about drawn as areas. `plot_facade_elements`
-tiles the elevation with every element's drawn area equal to its real area
-(here a 6 m² masonry wall, a 1.5 m² window and its 0.3 m² roller shutter box),
-and a prediction that retained its `elements` redraws its own façade with
-`fac.plot_geometry()`.
+The composite is easier to reason about drawn as areas. The elevation below is
+a **second, simpler façade** than the Annex F one above — a 6 m² masonry wall,
+a 1.5 m² window and its 0.3 m² roller shutter box, chosen so the tiles are
+legible — not a drawing of the prediction just computed.
+`plot_facade_elements` tiles it with every element's drawn area equal to its
+real area, and a prediction that retained its `elements` redraws *its own*
+façade with `fac.plot_geometry()`.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/facade_elevation_geometry.svg" alt="To-scale elevation of a composite facade: a hatched 6 m2 masonry wall, a 1.5 m2 window and a narrow 0.3 m2 roller shutter box drawn as tiles of a 3.95 m by 1.97 m facade whose drawn areas equal their real areas, each tile labelled with its area and the overall width and height dimensioned" width="88%" />
 
@@ -413,7 +522,10 @@ seg = building.radiated_sound_power(
     r_prime_cap=40.0, octave_bands=bands)
 print(round(seg.l_w[0], 1), round(seg.l_w[1], 1))     # 59.8 61.2  (LW at 63/125 Hz)
 
-# Exterior level 5 m in front of the centre of the 60×10 m side (LWA = 62.9 dB(A)).
+# The exterior level is computed for a whole SIDE, not for the segment above.
+# Annex G Table G.8 sums side 1's three segments to LWA = 62.9 dB(A) over the
+# full 10 x 60 m side; Table G.9 then reads the level 5 m in front of its
+# centre. (`seg.l_w_dba` is 58.2 dB(A): one segment of that side, not the side.)
 a_tot = building.outdoor_attenuation(width=60.0, height=10.0, distance=5.0)
 print(round(a_tot, 1), round(building.outdoor_level(62.9, a_tot), 1))   # 26.3 36.6
 
@@ -485,6 +597,7 @@ plt.show()
 | `radiated_sound_power(r_prime_cap)` | float | dB | default `None` (off) | Optional field cap on $R'$, an Annex G example footnote (it uses 40 dB), not part of Formula (2)/(3) |
 | `radiated_sound_power(octave_bands)` | seq of int | Hz | default `None` | Octave centres matching the bands; enables the A-weighted $L_{WA}$ |
 | `facade_sound_reduction(frequencies)` | seq | Hz | default `None`; length = band count | Band centres carried on the result for plotting |
+| `facade_sound_reduction(bands)` | str or `None` | — | `'octave'` / `'third-octave'` / `None` | Which band set the input is in; `None` infers it from the count, as on the [ratings page](/phonometry/buildings/insulation/insulation-ratings/) |
 | `outdoor_attenuation(width, height, distance)` | float | m | > 0 | Finite radiating side and reception distance (Annex E) |
 | `outdoor_level(l_w, attenuation)` | float or seq | dB | broadcast-compatible | Exterior $L_p$ from one or more sides (Formula E.1) |
 
@@ -601,9 +714,16 @@ one-page fiche through `.report()`.
 
 **Not covered.** The band levels handed to `facade_insulation` are assumed
 already corrected for background noise, and ISO 16283-3's own procedural
-requirements (the number and placement of loudspeaker and microphone
-positions, the low-frequency procedure, the choice between the global and the
-element method) are not checked. The EN 12354-3 and EN 12354-4 worked examples
+requirements — the ones set out under
+[Choosing and running the method](#choosing-and-running-the-method-clauses-9-and-10)
+— are documented but not checked: nothing verifies the 45° ± 5° incidence, the
+5 m / 7 m slant distances, the 3→10 microphone escalation and its recess
+special case, the 50 pass-bys and the simultaneity of a traffic measurement, or
+that the method chosen matches the question asked. The low-frequency corner
+procedure of Clause 7 (the façade counterpart of the
+[ISO 16283-1 procedure](/phonometry/buildings/insulation/insulation-field/#small-rooms-the-low-frequency-procedure-clause-8),
+triggered by the same 25 m³ receiving-room threshold) is not implemented
+either, and neither are the railway and aircraft methods of Annex E. The EN 12354-3 and EN 12354-4 worked examples
 of the 2000 editions carry small internal rounding inconsistencies at the
 higher octave bands, noted where they appear: the implementation follows the
 formulas rather than the printed rows.

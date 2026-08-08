@@ -45,14 +45,25 @@ probe physics and its field indicators are the subject of the
 
 ## Measuring the transmitted power directly (ISO 15186-1)
 
+The quantity being measured is a **surface integral**: the net sound power
+crossing an imaginary surface drawn around the radiating face of the specimen,
+$W = \int_S \mathbf{I} \cdot \mathbf{n}\, \mathrm{d}S$, where $\mathbf{I}$ is
+the time-averaged intensity vector and $\mathbf{n}$ the outward normal. Two
+consequences follow, and between them they are the whole method. First, a
+source *outside* the closed surface contributes nothing to the integral: what
+enters through one face leaves through another, so a flanking wall radiating
+into the same receiving room cancels itself out and only the enclosed specimen
+survives. Second, the sign matters — a patch of surface where energy is
+flowing back *towards* the specimen subtracts, which is why the standard
+carries a minus-sign rule (Clause 6.4.6) that no pressure-based method needs.
+The probe reads $\mathbf{I} \cdot \mathbf{n}$ point by point and the operator
+performs the integration by moving it, which makes the scan pattern part of
+the measurement rather than a matter of technique.
 
-The [ISO 10140 laboratory method](/phonometry/buildings/insulation/insulation-lab/) reads
-the transmitted power *indirectly*, from the
-receiving-room level and its absorption area; this breaks down when flanking
-paths leak power the room integrates in anyway. The **sound-intensity** method
-(ISO 15186) sidesteps that: an intensity probe scans a measurement surface that
-encloses the specimen and measures the radiated power *directly*, so only the
-element under test contributes. It is the tool of choice when flanking is high
+That is what the pressure method cannot do. It reads the transmitted power
+*indirectly*, from the receiving-room level and its absorption area, and the
+room integrates every watt that arrives whichever path carried it. The
+intensity method is therefore the tool of choice when flanking is high
 (ISO 15186-1:2000, Clause 1). From the source-room level $L_{p1}$ and the
 average normal intensity level $L_{In}$ over the surface (area $S_m$), for a
 specimen of area $S$,
@@ -98,6 +109,9 @@ print(res.rating.rating)                     # 38  ->  RI,w (ISO 717-1 engine)
 
 # Qualify the measurement surface: FpI = Lp - LIn must stay < 10 dB (< 6 dB when
 # the receiving side is absorbing); the probe's residual index must exceed FpI+10.
+# Lp is the receiving-room pressure level measured over the same surface, if
+# possible simultaneously with the scan (Clause 6.4.2). Here it sits 6 dB above
+# LIn, i.e. exactly on the absorbing-specimen criterion.
 fpi = building.surface_pressure_intensity_indicator(np.full(16, 46.0), l_in)
 print(round(float(fpi[0]), 1))               # 6.0
 
@@ -109,11 +123,7 @@ res.plot()   # measured RI vs shifted ISO 717-1 reference (needs matplotlib)
 *The modified index $R_{I,M} = R_I + K_c$ lifts $R_I$ (most at the low bands,
 where $K_c$ is largest), so an intensity measurement reproduces the ISO 10140-2
 pressure result. The automatic rating is formed only for exactly 16
-one-third-octave or 5 octave values (`rating`/`rating_modified` are `None`
-otherwise). Subareas scanned separately are combined first with
-`combine_subareas` (Formulas (11)-(12)); a subarea whose net energy flows back
-towards the specimen enters with a negative area, applying the minus-sign rule
-of Clause 6.4.6 while $S_m$ keeps the unsigned area sum.*
+one-third-octave or 5 octave values.*
 
 <details>
 <summary>Show the code for this figure</summary>
@@ -148,6 +158,147 @@ plt.show()
 
 </details>
 
+## Scanning the measurement surface (Clause 6.4)
+
+A method defined by how a probe is moved is not documented by its formula.
+Everything below fixes a number that the formula then consumes, and none of it
+is checked by the functions on this page.
+
+**The surface (Clause 6.4.1).** The measurement surface totally encloses the
+test specimen. A specimen in a niche deeper than 0.1 m is normally measured on
+the flat surface of the niche opening; otherwise, and for most small building
+elements, the surface is box-shaped. Choose the measurement distance in the
+**0.1 m to 0.3 m** band. Below 0.1 m the near field of the vibrating element
+makes the intensity change sign repeatedly, so the integral stops converging;
+above 0.3 m a box-shaped surface picks up too much of the room.
+
+**Qualifying the surface (Clause 6.4.2).** Measure $L_{In}$ and, if possible
+simultaneously, the surface-averaged pressure level $L_p$, and form the
+surface pressure-intensity indicator $F_{pI} = L_p - L_{In}$ (Formula (10)).
+The surface fails qualification if the measured intensity is negative, or if
+$F_{pI} > 10$ dB for a sound-reflecting specimen or $> 6$ dB for one with an
+absorbing surface facing the receiving room. The remedy is **ordered**: first
+increase the measurement distance by 5 cm to 10 cm; only if that fails, add
+absorption to the receiving room. The criterion applies per scan and per
+loudspeaker position, and to the *total* surface — not to individual subareas
+(for discrete positions, to the surface average). The standard's rule of thumb
+for how much absorption is enough is $S/A < 1.25$, with $S$ the measurement
+surface and $A$ the receiving room's absorption area, and the more flanking
+there is the larger $A$ has to be.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/intensity_field_indicator.svg" alt="The surface pressure-intensity indicator FpI per one-third-octave band from 100 Hz to 3150 Hz, exceeding the 10 dB reflecting-specimen criterion in the three lowest bands and settling at 6.5 dB above 630 Hz, with the 10 dB and 6 dB criterion lines drawn" width="88%" />
+
+*Qualification is per band, and it fails where a receiving room is least
+absorbent. Here the three lowest bands sit above the 10 dB line, so the surface
+is not qualified for a reflecting specimen at all and the scan is not yet a
+result; and even the qualified part sits above the 6 dB line, so this surface
+could not be used for a specimen with an absorbing face. The remedy is ordered
+by the standard: add 5 cm to 10 cm of measurement distance first, and only then
+put absorption into the receiving room.*
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+# `np` and `building` are the imports of the first block above.
+
+freqs = [100, 125, 160, 200, 250, 315, 400, 500, 630, 800,
+         1000, 1250, 1600, 2000, 2500, 3150]
+l_p = np.array([64.0, 63.0, 61.5, 59.0, 57.5, 56.0, 55.0, 54.0,
+                53.0, 52.0, 51.0, 50.5, 50.0, 50.0, 51.0, 55.0])
+l_in_q = np.array([51.5, 51.5, 51.0, 49.5, 49.0, 48.0, 47.5, 47.0,
+                   46.5, 45.5, 44.5, 44.0, 43.5, 43.5, 44.5, 48.5])
+f_pi = building.surface_pressure_intensity_indicator(l_p, l_in_q)
+print(int((f_pi > 10.0).sum()), "bands fail the reflecting criterion")   # 3
+
+fig, ax = plt.subplots()
+x = np.arange(len(freqs))
+ax.fill_between(x, 0.0, f_pi, where=f_pi > 10.0, alpha=0.25,
+                label="surface not qualified")
+ax.plot(x, f_pi, "-o", label="FpI = Lp - LIn (Formula (10))")
+ax.axhline(10.0, ls="--", label="10 dB: reflecting specimen (6.4.2)")
+ax.axhline(6.0, ls=":", label="6 dB: absorbing specimen")
+ax.set_xticks(x, [str(f) for f in freqs], rotation=45, fontsize=8)
+ax.set(xlabel="Frequency [Hz]",
+       ylabel="Surface pressure-intensity indicator FpI [dB]")
+ax.legend()
+plt.show()
+```
+
+</details>
+
+**The scan (Clause 6.4.3).** Hold the probe **normal** to the surface with its
+positive direction pointing outwards, away from the element. Scan in parallel
+lines, turning at each edge, with the line spacing normally equal to the
+measurement distance and denser where radiation is irregular (leaks). Keep the
+scan speed constant between **0.1 m/s and 0.3 m/s**, make the scanning time of
+each subarea proportional to its area, and interrupt the measurement when
+crossing from one subarea to the next rather than stopping mid-area. Where a
+box-shaped surface meets the partition, scan as close to the wall as possible:
+that intersection is where radiated power is most easily lost out of the
+integral.
+
+**Two scans, not one (Clause 6.4.5).** For each fixed loudspeaker position,
+carry out **two complete scans** with the scanning path turned 90° between
+them. If they differ by less than 1.0 dB in every band, the result is their
+arithmetic average; if any band differs by more, **the measurement is not
+valid** — repeat the pair, and if it still fails, change the line density, the
+surface or the environment. With several loudspeaker positions, run a
+qualifying pair for each and report the arithmetic mean of all scans. With a
+moving loudspeaker, each scan takes one complete traverse (at least one for
+doors, windows and small elements, two for walls) and the total
+scanning/traverse time per pattern is at least 120 s for windows, doors and
+small elements and at least 600 s for walls.
+
+**Discrete positions instead (Clause 6.4.4).** Space the positions at roughly
+the measurement distance, denser for leaky or inhomogeneous specimens but at
+constant distance, follow the grade 2 procedure of ISO 9614-1 and check the
+array with its Annex B, and dwell at least 10 s per position. A moving
+loudspeaker needs at least two traverses over the complete set of positions
+for doors, windows and small elements, and eight for walls.
+
+**Background noise (Clause 6.5).** Both the pressure level and the intensity
+level must exceed the background by at least 10 dB. The standard's own test is
+elegant: with $F_{pI} < 10$ dB, drop the source level by 10 dB; if $F_{pI}$
+moves by less than 1 dB, the requirement is met.
+
+### Combining subareas, and the sign that comes with them
+
+A large or inhomogeneous specimen is scanned as several subareas $S_{mi}$, and
+`combine_subareas` performs the area-weighted energy average of Formula (11)
+with $S_m = \sum_i |S_{mi}|$ (Formula (12)). Clause 6.4.6 adds the rule with no
+counterpart anywhere in the pressure methods: where a subarea's net intensity
+points the *wrong way* — energy flowing back towards the test object — a minus
+sign goes before that $S_{mi}$ in Formula (11). Express it by passing that
+subarea's area as a negative number; its energy is then subtracted from the
+numerator while $S_m$ keeps the unsigned sum.
+
+```python
+# `np` and `building` are the imports of the first block above.
+
+# Three subareas of one 12 m2 surface: the two panes and the frame. The frame
+# strip reads a net inward flow, so its area enters Formula (11) negative.
+l_in_sub = np.array([
+    np.full(16, 41.0),    # 5.0 m2, outward
+    np.full(16, 39.0),    # 5.5 m2, outward
+    np.full(16, 33.0),    # 1.5 m2, INWARD -> negative area
+])
+l_in_comb, s_m = building.combine_subareas(l_in_sub, [5.0, 5.5, -1.5])
+print(round(float(l_in_comb[0]), 2), s_m)     # 39.36 12.0
+
+# Ignoring the sign inflates the transmitted power, i.e. lowers RI:
+l_in_naive, _ = building.combine_subareas(l_in_sub, [5.0, 5.5, 1.5])
+print(round(float(l_in_naive[0] - l_in_comb[0]), 2))   # 0.24
+```
+
+A subarea reading inward is not a curiosity to be signed away. It means the
+enclosing surface is cutting through the field of something *outside* it — a
+flanking element, a second source in the receiving room — so the qualification
+of Clause 6.4.2 should be re-checked before the number is reported at all.
+$S_m$ keeps the unsigned area because it is the area actually scanned, which
+is what the $10\log_{10}(S_m/S)$ term of $R_I$ needs.
+
 ### `intensity_sound_reduction()` / `adaptation_term_kc()` parameters
 
 | Parameter | Type | Units | Range / default | Notes |
@@ -159,12 +310,18 @@ plt.show()
 | `kc` | 1D array | dB | one per band / `None` | Adaptation term for the modified index |
 | `freq` | 1D array | Hz | > 0 | Midband frequencies (`adaptation_term_kc`) |
 | `boundary_area` / `volume` | float | m² / m³ | > 0, both or neither | Room $S_{b2}$ / $V_2$ for Formula (B.1) |
+| `n` | int | element units | ≥ 1, default `1` | Number of identical elements (`intensity_element_normalized_difference` only) |
 
 `intensity_sound_reduction()` returns an `IntensityReductionResult` (`r_i`,
 `r_i_modified`, `rating`, `rating_modified`);
 `intensity_element_normalized_difference()` an
 `IntensityElementNormalizedResult` (`d_i_n_e`, `rating`);
-`surface_pressure_intensity_indicator()` and `combine_subareas()` return arrays.
+`surface_pressure_intensity_indicator()` returns an array and
+`combine_subareas()` a `(LIn, Sm)` pair. The `rating` fields are formed only
+for exactly 16 one-third-octave or 5 octave values and are `None` otherwise,
+so a scan taken over the full ISO 15186-1 range of 100 Hz to 5000 Hz
+(Clause 6.6, 18 bands) must be trimmed to the ISO 717-1 range before it can be
+rated.
 
 
 ## ISO 15186-1 intensity test report (`.report()`)
@@ -345,10 +502,14 @@ the two-microphone acquisition and phase-mismatch calibration behind
 $L_{p1}$ and $L_{In}$) is not implemented: both levels are taken as
 already-measured inputs, and the ISO 15186-1 report fiche states explicitly
 that it has no field for the measurement-surface geometry or the
-scanning-versus-discrete-point acquisition method. ISO 15186-2's own field
-procedure (loudspeaker positions, the façade cases) and the low-frequency
-Part 3 variant are not implemented either: the formulas here apply
-unchanged to field data, but nothing checks how that data was acquired.
+scanning-versus-discrete-point acquisition method. Nothing here enforces the
+Clause 6.4 acquisition documented above either — the 0.1–0.3 m stand-off, the
+0.1–0.3 m/s scan speed, the 90°-rotated second scan and its 1.0 dB validity
+test, the 10 dB background margin — so a single scan will produce a number
+just as readily as a qualified pair. ISO 15186-2's own field procedure
+(loudspeaker positions, the façade cases) and the low-frequency Part 3 variant
+are not implemented either: the formulas here apply unchanged to field data,
+but nothing checks how that data was acquired.
 
 ## See also
 

@@ -90,6 +90,35 @@ f_l, f_u = materials.plane_wave_frequency_range(0.020, 343.2, diameter=0.029)
 print(round(f_l, 1), round(f_u, 1))     # 858.0 6864.0
 ```
 
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/tube_working_ranges.svg" alt="Horizontal bars on a shared logarithmic frequency axis from 100 Hz to 8 kHz with the one-third-octave grid marked: a 100 mm bore with 100 mm and 50 mm microphone spacings, a 29 mm bore with 20 mm spacing, and the same 100 mm bore under the ASTM E2611 limits, each bar labelled with the limit that binds it at either end, and the overlap between the large and the small tube hatched" width="86%" />
+
+*Which tube sees which bands. Each bar is a geometry, and each end is labelled
+with the constraint that binds it: the low end is always the
+$c_0/(20 s)$ phase-resolution floor, while the top end is the cut-on
+$0.58\,c_0/d$ for a wide-spaced tube and the spacing singularity
+$0.45\,c_0/s$ once the microphones are far apart. The 100 mm tube with 100 mm
+spacing covers the 200 Hz to 1250 Hz one-third-octave bands and the 29 mm tube
+with 20 mm spacing the 1 kHz to 5 kHz bands, so the pair splices in the
+1 kHz to 1.25 kHz overlap — and even together they do not reach the 100 Hz,
+125 Hz and 160 Hz bands, which is why low-frequency absorption data come from
+the reverberation room and not from a tube. The ASTM bar is the same hardware
+under E2611's constants: wider at the bottom (a 1 % of wavelength floor
+instead of 5 %) and narrower at the top (a $0.40\,c$ spacing bound instead of
+$0.45\,c$).*
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+for spacing, diameter in ((0.100, 0.100), (0.050, 0.100), (0.020, 0.029)):
+    iso = materials.plane_wave_frequency_range(spacing, 343.2, diameter=diameter)
+    astm = materials.plane_wave_frequency_range_astm(spacing, 343.2, diameter=diameter)
+    print(f"{diameter * 1e3:.0f} mm bore, s = {spacing * 1e3:.0f} mm:",
+          f"ISO {iso[0]:.0f}-{iso[1]:.0f} Hz, ASTM {astm[0]:.0f}-{astm[1]:.0f} Hz")
+```
+
+</details>
+
 Those limits are easier to see on the hardware itself.
 `plot_impedance_tube_geometry` draws a tube to scale with its plane-wave
 band worked out, and a measured `two_microphone_impedance` result that was
@@ -121,6 +150,38 @@ plt.show()
 
 </details>
 
+### 1.1 Where the microphones may sit
+
+The working range is set by $d$ and $s$; *where along the tube* the pair goes
+is a separate set of constraints, and Clause 4.3 fixes both ends of it.
+
+**Away from the source.** The loudspeaker radiates cross-modes as well as the
+plane wave. Below the first cut-on they die out within about three tube
+diameters, so the nearest microphone is recommended to be at least three
+diameters from the source and shall in any case be no closer than one — 300 mm
+and 100 mm respectively on the 100 mm tube of the figure above.
+
+**Away from the specimen.** The specimen distorts the field near its face too,
+and the minimum depends on what the specimen looks like: half a diameter for a
+*non-structured* sample, one diameter for a *semi-laterally structured* one,
+and two diameters for a *strongly asymmetrical* one. On a 100 mm tube that is
+50 mm, 100 mm and 200 mm — so the $x_1$ = 150 mm of the figure above is
+comfortable for a plain porous sample, adequate for a perforated facing and
+too close for a strongly structured specimen such as a resonator array. Nothing
+enforces this: `reflection_factor` only rejects $x_1 \le 0$, so an $x_1$ chosen
+by eye can sit inside the evanescent near field of a perforated sample and
+still return a perfectly plausible-looking spectrum.
+
+**How well the distances must be known.** Fixed microphone positions to
+±0.2 mm or better and traversing ones to ±0.5 mm (Clause 4.5); the reference
+plane's position relative to microphone 1 reported to ±0.5 mm (Clause 7.1);
+and the microphone diameter under 20 % of the spacing, and small against
+$c_0/f_u$, so the capsule averages a negligible piece of the wave
+(Clause 4.4). The reference plane, $x = 0$, is normally the specimen surface,
+but a profiled or laterally structured specimen has its reference plane placed
+some distance *in front* of it — and $x_1$ is measured to that plane, not to
+the sample holder.
+
 The same helper covers square and rectangular tubes: pass `shape="square"` or
 `shape="rectangular"` and the Eq. (3) factor replaces the circular one, with
 $d$ the maximum side length. The four-microphone branch keeps its own limits
@@ -141,10 +202,15 @@ absorption of the modelled sample through the same reduction chain.
 
 ## 2. Standing-wave-ratio method (ISO 10534-1)
 
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_standing_wave_tube.svg" alt="ISO 10534-1 standing-wave apparatus in side view: a loudspeaker sealed to the left end driven with one pure tone at a time through a narrowband analyser, a probe microphone on a graduated carriage running along the tube axis, the test specimen against the rigid backing at the right with its face marked x = 0, the standing-wave envelope drawn inside the tube with its maxima decaying away from the specimen, the level difference between the first maximum and the first minimum, and the first minimum dimensioned from the specimen face" width="92%" />
+
 A probe traverses the standing wave
 and reads the level difference $\Delta L = L_\text{max} - L_\text{min}$ between a
-pressure maximum and the adjacent minimum. The standing-wave ratio, reflection
-magnitude and absorption follow in closed form:
+pressure maximum and the adjacent minimum. The standing-wave ratio — written
+$s$ in ISO 10534-1, the same letter Part 2 uses for the microphone spacing of
+section 1; the two never appear in the same equation, and the code keeps them
+apart as `swr` and `spacing` — follows in closed form together with the
+reflection magnitude and the absorption:
 
 $$
 s = 10^{\Delta L/20}, \qquad |r| = \frac{s-1}{s+1}, \qquad
@@ -225,18 +291,68 @@ same complex $r$, and hence the same normalised impedance
 $Z/\rho c_0 = (1+r)/(1-r)$, that the transfer-function method of section 3
 computes from $H_{12}$ in one shot.
 
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/standing_wave_envelope.svg" alt="The standing-wave envelope level in decibels along the first metre of a 100 mm tube at 500 Hz for three terminations: a rigid wall whose minima plunge off the axis with the first at the specimen face, the worked sample of reflection magnitude 0.5 whose first minimum sits 12 centimetres out at minus 6 decibels, and a near-anechoic termination that is almost flat. A dotted copy of the 0.5 case carries the ISO 10534-2 tube attenuation, and the levels of its first three minima are annotated" width="84%" />
+
+*What the carriage actually traverses, drawn as the level the analyser shows
+at 500 Hz in a 100 mm tube. The rigid wall ($|r| = 1$) has its minima on zero
+pressure and the first of them at the face, $\Phi = -\pi$; the worked sample
+($|r| = 0.5$) reads $\Delta L$ = 9.54 dB between the maximum and the adjacent
+minimum, the first of them at $x_{\min,1}$ = 12 cm, and the
+quarter-wavelength ruler converts that distance into $\Phi = -54.1°$; the
+near-anechoic case ($|r| = 0.1$) modulates by only 1.74 dB, which is why the
+method loses precision exactly where an absorber is good. The dotted curve is
+the same $|r| = 0.5$ sample with the Eq. (A.18) tube attenuation: the further
+from the face, the more the reflected wave has decayed, so the notches fill
+in — the first three minima read −5.99, −5.92 and −5.85 dB. That drift is
+small here because Eq. (A.18) is a lower bound; ISO 10534-1's approximate
+extrapolation (Annex A.2.1.4) is offered while the first-to-second minimum
+difference stays under 2 dB, and above that the attenuation has to be measured
+on the empty tube. Either way it is why the operator reads the minimum
+*nearest* the sample.*
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+# The interior field of section 2, for three reflection factors.
+c0 = 343.2
+x = np.linspace(0.0, 1.0, 800)
+k = 2 * np.pi * 500.0 / c0
+for magnitude, phi in ((1.0, -np.pi), (0.5, np.radians(-54.1)), (0.1, 0.0)):
+    envelope = np.sqrt(1 + magnitude**2 + 2 * magnitude * np.cos(2 * k * x - phi))
+    print(round(float(envelope.min()), 3), round(float(envelope.max()), 3))
+
+# The attenuated variant uses the Eq. (A.18) lower-bound constant.
+print(round(float(materials.tube_attenuation_constant(500.0, c0, 0.10)), 4))
+```
+
+</details>
+
+Magnitude and position are the two halves of the reading, and the library
+takes them together: `standing_wave_reflection(swr, x_min1, wavelength)`
+returns the complex $r$ (Eqs. (17)-(23)) and
+`standing_wave_normalized_impedance` the ratio $Z/\rho c_0$ (Eqs. (24)-(26)).
+Both accept arrays, so a stepper-motor traverse that logs $(\Delta L,
+x_{\min,1})$ per tone reduces to two calls:
+
 ```python
 import numpy as np
 from phonometry import materials
 
-# One 500 Hz reading: 9.54 dB between max and min, first minimum 12 cm out.
-f, c0 = 500.0, 343.2
-swr = float(materials.standing_wave_ratio_from_level(9.542))
-r_mag = float(materials.standing_wave_reflection_magnitude(swr))
-phase = 4 * np.pi * 0.12 * f / c0 - np.pi         # Phi from x_min,1
-refl = r_mag * np.exp(1j * phase)
-print(round(r_mag, 2), round(np.degrees(phase), 1))   # 0.5 -54.1
-print(np.round((1 + refl) / (1 - refl), 2))           # Z / rho c0: (1.13-1.22j)
+# A three-tone traverse: the level difference and the first-minimum distance
+# read at each frequency, which is all the method produces.
+f = np.array([500.0, 1000.0, 2000.0])
+c0 = 343.2
+level_difference = np.array([9.542, 6.021, 3.522])   # L_max - L_min [dB]
+x_min1 = np.array([0.120, 0.061, 0.030])             # first minimum [m]
+
+swr = materials.standing_wave_ratio_from_level(level_difference)
+lam = c0 / f
+r = materials.standing_wave_reflection(swr, x_min1, lam)
+z = materials.standing_wave_normalized_impedance(swr, x_min1, lam)
+print(np.round(np.abs(r), 2))                  # [0.5  0.33 0.2 ]
+print(np.round(np.degrees(np.angle(r)), 1))    # [-54.1 -52.  -54.1]
+print(np.round(z, 2))                          # Z / rho c0
 ```
 
 Two practical cautions from the standard's own text. The minima far from the
@@ -260,8 +376,22 @@ r = \frac{H_{12} - H_I}{H_R - H_{12}}\,e^{\,2 j k_0 x_1}, \qquad
 \alpha = 1 - |r|^2, \qquad \frac{Z}{\rho c_0} = \frac{1+r}{1-r},
 $$
 
-with $H_I = e^{-j k_0 s}$, $H_R = e^{+j k_0 s}$, microphone spacing $s$ and $x_1$
-the distance from the sample to the farther microphone.
+with $H_I = e^{-j k_0 s}$, $H_R = e^{+j k_0 s}$, microphone spacing $s$ (the
+Part 2 meaning of the letter again) and $x_1$ the distance from the reference
+plane to the farther microphone.
+
+**What an error in $x_1$ costs, and what it does not.** $x_1$ enters only
+through $e^{\,2 j k_0 x_1}$, a pure phase rotation. It therefore leaves
+$|r|$ — and hence the absorption spectrum — completely untouched, while
+rotating the real and imaginary parts of the surface impedance. At 1.5 kHz in
+air a 2 mm error in $x_1$ rotates the reflection phase by about 6°, enough to
+move a flow resistivity fitted from that impedance noticeably. The practical
+consequences are two: measure $x_1$ to the *reference plane* — the specimen
+face, or the plane in front of a profiled specimen — rather than to the sample
+holder, since a specimen that does not sit where it was meant to moves $x_1$
+with it; and read a healthy-looking $\alpha$ beside an implausible impedance
+(a negative real part, say) as an $x_1$ or a mismatch fault, not as a material
+result.
 
 <Video
   name="anim_standing_wave_tube"
@@ -289,14 +419,135 @@ r = materials.reflection_factor(h12, spacing=spacing, x1=x1, wavenumber=k0)
 print(np.round(materials.absorption_from_reflection(r), 3))     # [0.75 0.75 0.75]
 print(np.round(materials.normalized_surface_impedance(r), 2))   # Z / rho c0
 # [1.15-1.23j 1.15-1.23j 1.15-1.23j]
+print(np.round(materials.normalized_surface_admittance(r), 2))  # its reciprocal,
+# [0.41+0.43j 0.41+0.43j 0.41+0.43j]     what an impedance boundary condition wants
 ```
 
 The high-level `two_microphone_impedance` wraps this chain and returns an
 `ImpedanceTubeResult` with absorption, reflection factor, surface impedance and
 normalised impedance, applying the plane-wave frequency-range check and optional
-tube attenuation; correct any microphone mismatch beforehand with
-`apply_mic_calibration`. Its `.plot()` draws the absorption spectrum
-$\alpha(f)$ with the reflection-factor magnitude $|r|$ overlaid.
+tube attenuation. Its `.plot()` draws the absorption spectrum
+$\alpha(f)$ with the reflection-factor magnitude $|r|$ overlaid, and
+`normalized_surface_admittance(r)` gives the reciprocal quantity that a
+locally-reacting boundary condition — an FDTD or BEM wall, the library's own
+solver — consumes.
+
+### 3.1 Correcting the channel mismatch (Clause 7.5)
+
+A channel is a microphone plus its preamplifier plus its analyser input, and no
+two are identical. ISO 10534-2 Clause 7.5 does not recommend correcting for
+that, it **requires** it: "one of the following procedures … shall be used".
+Annex E.1.2 is blunter still — with two microphones the phase mismatch "is
+unavoidable and shall be compensated for" — and E.1.3 adds that the amplitudes
+should be within 0.3 dB of each other to begin with. The correction is a
+complex division applied exactly where $|r|$ is small and the phase of
+$H_{12}$ carries the whole answer, which is why the symptom of skipping it is
+frequency-dependent wander rather than an offset: the snippet below leaves a
+0.5 dB / 1° mismatch uncorrected on a specimen whose true absorption is 0.75
+and gets 0.73, 0.78 and 0.72 in three neighbouring bands. On a near-perfect
+absorber the same mismatch pushes the spectrum against the $\alpha = 1$
+ceiling, which is where the classic uncorrected-tube signature — an absorption
+just above 1 or just below 0 — comes from.
+
+Both permitted procedures use the same measurement, made twice:
+
+1. Place an absorptive specimen in the tube and measure $H_{12}^{I}$ in the
+   standard configuration.
+2. **Physically interchange the two microphone cartridges**, so that A takes
+   the exact position B occupied and vice versa, *without* moving the cables
+   on the preamplifier or the analyser. Measure $H_{12}^{II}$.
+3. Form $H_c = \sqrt{H_{12}^{I}/H_{12}^{II}}$ (Eq. (10)) and divide the working
+   transfer function by it.
+
+The difference between the two procedures is only how often step 2 is done.
+Clause 7.5.1 repeats the swap for *every* specimen, which suits a small number
+of samples; Clause 7.5.2 determines $H_c$ once against a calibration specimen
+and keeps it for the whole series, which suits a production run — after which
+the microphones must stay where they are. The one-microphone technique of
+Annex B needs no correction at all, because there is only one channel: it buys
+that with measurement time, and it is the same argument that makes the
+standing-wave method of section 2 the arbitration method.
+
+```python
+# A channel pair mismatched by 0.5 dB and 1 degree, and its removal. The two
+# configurations differ by exactly that factor, which is what Eq. (10) recovers.
+mismatch = 10 ** (0.5 / 20) * np.exp(1j * np.radians(1.0))
+h12_i = h12 * mismatch            # standard configuration
+h12_ii = h12 / mismatch           # microphones physically interchanged
+
+hc = materials.mic_calibration_factor(h12_i, h12_ii)
+print(round(float(np.abs(hc[0])), 4), round(float(np.degrees(np.angle(hc[0]))), 2))
+# 1.0593 1.0 -- the mismatch itself, recovered
+h12_corrected = materials.apply_mic_calibration(h12_i, hc)
+print(float(np.abs(h12_corrected - h12).max()) < 1e-12)   # True
+
+# What the uncorrected data would have claimed, on a sample of alpha = 0.75:
+bad = materials.reflection_factor(h12_i, spacing=spacing, x1=x1, wavenumber=k0)
+print(np.round(materials.absorption_from_reflection(bad), 3))   # [0.732 0.775 0.718]
+```
+
+### 3.2 The rest of the instrument
+
+The reduction chain above is a few lines; the conditions that make its inputs
+trustworthy are most of ISO 10534-2. In the order they matter:
+
+- **The air, measured rather than assumed (Clause 7.2).** $c_0$ and $\rho c_0$
+  are not constants of the method, they are readings. The tube air temperature
+  must be measured and held to ±1 K with a transducer accurate to ±0.5 K, and
+  the atmospheric pressure to ±0.5 kPa (Clause 4.12); Eq. (5) turns the first
+  into $c_0$ and Eq. (7) the pair into $\rho$. The library exposes both:
+  `speed_of_sound_iso(temperature)` takes kelvin, and
+  `air_density_iso(temperature, atmospheric_pressure)` takes kelvin and
+  kilopascals — the fiche snippet below feeds them straight into
+  `two_microphone_impedance` instead of literals. Note that the ASTM E2611
+  helpers of section 4 take degrees Celsius, and the two are not
+  interchangeable.
+- **Excitation (Clause 4.10, 7.3).** A stationary signal with a flat spectral
+  density over the range of interest: random, pseudo-random, periodic
+  pseudo-random or chirp. The level must sit at least 10 dB above the
+  background at *every* frequency of interest, and any frequency whose response
+  is 60 dB below the maximum is rejected outright. The number of spectral
+  averages follows from the accuracy wanted on $H_{12}$; a bandwidth-time
+  product of 50 to 100 is the usual target (Annex E.2), and the record must be
+  much longer than $2x_1/c_0$ or time aliasing corrupts it (Eq. (E.1)).
+- **Warm-up (Clause 5).** At least 10 minutes of loudspeaker operation before
+  the first measurement, so the tube air temperature has stopped drifting.
+- **The source end (Clauses 4.9, 4.11).** The loudspeaker membrane covers at
+  least two thirds of the tube cross-section, sits in an insulating box against
+  airborne flanking to the microphones, and is elastically isolated from the
+  tube — structure-borne excitation of the tube wall is a classic mimic of
+  absorption. At least 200 mm of effective absorbent lining near the
+  loudspeaker damps the air-column resonances.
+- **The specimen end (Clause 4.7).** The back plate is rigid and tightly fixed,
+  a metal plate of at least 20 mm being recommended, because it is the rigid
+  termination most measurements rest on. A separate sample holder must match
+  the tube bore to ±0.2 % and be sealed with vaseline rather than an elastic
+  gasket.
+- **The analyser (Clause 4.8).** More than 65 dB of dynamic range, and
+  transfer-function errors from non-linearity, resolution, instability and
+  temperature under 0.2 dB.
+
+Everything the ISO 10534-2 report needs about the geometry is already in the
+fiche's metadata block — tube diameter and shape, microphone spacing, mounting,
+temperature and pressure — so that block reads as a report checklist rather
+than decoration.
+
+**Tube attenuation, and when to switch it on.** The plane wave in the tube is
+not lossless: viscous and thermal boundary layers at the wall attenuate the
+incident and the reflected wave over the distance $x_1$, and attenuation that
+is not accounted for is read as sample absorption. `tube_attenuation_constant`
+is the Eq. (A.18) estimate, $k_0'' = 1.94\times10^{-2}\sqrt{f}/(c_0 d)$, and
+its scaling says where it matters: it grows as $\sqrt{f}$ and falls as $1/d$,
+so a 29 mm tube suffers roughly three and a half times the loss of a 100 mm one
+at the same frequency, and moving the microphone pair closer to the specimen
+reduces it directly. It matters most for a near-perfect absorber, where the
+reflected wave is already weak. Two cautions come with it. Clause A.2.1.5 says
+plainly that this estimate ignores porous or dirty walls and any object in the
+tube, so it is a **lower limit**: a large discrepancy is a sign to clean or
+re-qualify the tube, not a number to trust. And the standard prefers the
+measured route — determine the attenuation from the empty tube at mid and upper
+frequencies (Eqs. (A.13)/(A.14), after every modification of the tube) and
+extrapolate downwards.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/impedance_tube_result.svg" alt="ISO 10534-2 two-microphone tube result for a 50 mm porous absorber: the normal-incidence absorption coefficient rising from about 0.2 at 200 Hz towards 0.97 above 1 kHz, with the reflection-factor magnitude falling as its mirror image" width="80%" />
 
@@ -438,6 +689,36 @@ $$
              + \rho c\,T_{21} + T_{22}}{2}\right|.
 $$
 
+**What a "load" is, and why there are two of them.** A load is a downstream
+termination. The matrix has four unknowns, and one measurement of the four
+microphone transfer functions supplies only two independent equations, so the
+general method changes the termination and repeats the whole measurement:
+E2611 Clause 8.5.4.1 solves the two sets together (Eq. (22)). In practice the
+tube ends in a weakly anechoic termination — a wedge or pyramid of glass fibre
+about 30 cm long — and Clause 6.2.8 asks for it to be *easily removable*
+precisely so that an open or a blocked end can provide the second load. All
+four transfer functions of each load are referenced to one common channel, and
+each of them carries the same switched-configuration mismatch correction as
+section 3 (Clause 8.5.3): the four-microphone method does not escape that
+requirement, it multiplies it. The source end is sealed and isolated from the
+tube (Clause 6.4.2), as in Part 2.
+
+**The one-load method is not the general method with fewer steps.** Clause
+8.5.4.2 closes the system instead by *assuming* the specimen is geometrically
+symmetric — "presenting the same physical properties to the sound field on
+either side" — so that reciprocity gives $T_{11} = T_{22}$ and
+$T_{11}T_{22} - T_{12}T_{21} = 1$ (Eq. (23)), and one termination, preferably
+the anechoic one, is enough. That holds for a homogeneous layer and fails for
+any asymmetric build-up: a facing on one side, a gradient density, a mounted
+membrane, a stack of unequal layers — which is most of what people actually put
+in a transmission tube. `transfer_matrix_one_load` does not and cannot detect
+the asymmetry: it warns about the plane-wave range and about an ill-conditioned
+denominator, and otherwise returns a plausible, wrong matrix, and with it a
+wrong transmission loss. The rule is simple: if the specimen has a front and a
+back, use two loads. If you believe it is symmetric, run both solvers and
+compare. None of this touches the hard-backed absorption route of section 3,
+which needs only the surface impedance.
+
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_astm_tube.svg" alt="ASTM E2611 four-microphone transmission-loss tube: a sound source, two microphones upstream and two downstream of the test specimen at spacings s1 and s2 and offsets l1 and l2, an adjustable termination for the two-load method, the upstream A and B and downstream C and D travelling waves, and the transfer matrix and transmission-loss relations" width="92%" />
 
 To scale it looks like this. A `TransferMatrix` recovered by the two-load or
@@ -518,6 +799,24 @@ tm.plot(f, 407.0)   # TL(f) with the hard-backed absorption overlaid
 *The same four-pole entries answer two different questions: how much sound
 the free-standing layer lets through (the transmission loss, Eq. (26)) and
 how much the rigidly-backed layer absorbs (Eq. (28)).*
+
+**A tube TL is not a sound reduction index.** The fiche of section 3 warns
+that the normal-incidence $\alpha$ is not the random-incidence $\alpha_s$; the
+same warning applies on the transmission side and is missed more often. What
+the tube measures is the transmission loss of a specimen a few centimetres
+across, for one plane wave at one angle, with the specimen edges clamped by
+the tube wall. What the
+[sound reduction index $R$](/phonometry/buildings/insulation/insulation-lab/) is,
+is a diffuse-field quantity measured on a full-size element with its real
+mounting, and it carries the element's own bending waves, its edge conditions
+and its coincidence dip — none of which exist inside a tube. Expect the
+normal-incidence value to sit *above* a field-incidence estimate for a
+mass-controlled layer, and expect the tube to miss the resonance and
+coincidence dips of a real panel entirely. Use the tube TL to compare
+materials and to fit and verify a transfer-matrix model; then predict the
+construction with the model, or with
+[EN 12354](/phonometry/buildings/design/insulation-prediction/), and never by
+carrying the tube number into a partition calculation.
 
 <details>
 <summary>Show the code for this figure</summary>
@@ -654,10 +953,14 @@ resolve.
 
 **Covered.** The impedance-tube trio. The ISO 10534-1 standing-wave-ratio
 method (`standing_wave_ratio_from_level`, `standing_wave_reflection_magnitude`,
-`standing_wave_absorption`). The ISO 10534-2 transfer-function method with its
+`standing_wave_absorption`, and the position half of the reading in
+`standing_wave_reflection` and `standing_wave_normalized_impedance`). The
+ISO 10534-2 transfer-function method with its
 Clause 4 frequency-range check (`two_microphone_impedance`,
 `plane_wave_frequency_range`, `reflection_factor`, `absorption_from_reflection`,
-`normalized_surface_impedance`, `apply_mic_calibration`,
+`normalized_surface_impedance`, `normalized_surface_admittance`, the Clause 7.2
+air properties `speed_of_sound_iso` and `air_density_iso`, the Clause 7.5
+mismatch pair `mic_calibration_factor` and `apply_mic_calibration`, and
 `tube_attenuation_constant`). The ASTM E2611 four-microphone transfer-matrix
 method (`transfer_matrix_two_load`, `transfer_matrix_one_load`,
 `TransferMatrix`, `plane_wave_frequency_range_astm`, `hydraulic_diameter`),
@@ -672,6 +975,13 @@ ISO 10534-1:1996 is implemented as its European adoption
 BS EN ISO 10534-1:2001, not read directly from the 1996 ISO text; its
 probe-traverse refinements (extrapolating the minimum levels to the sample
 face, probe-body corrections) are described in section 2 but not automated.
+Neither are the equipment and procedure clauses of sections 1.1 and 3.2: the
+near-field distances of Clause 4.3, the position tolerances of Clause 4.5, the
+signal-to-noise floor of Clause 7.3 and the warm-up of Clause 5 are stated for
+the operator, and nothing in the library checks that any of them was met.
+`tube_attenuation_constant` implements only the Eq. (A.18) estimate, which the
+standard itself calls a lower limit; the measured determination of
+Eqs. (A.13)/(A.14) from the empty tube is not implemented.
 The random-incidence $\alpha_s$ of the reverberation room is a different
 quantity with its own guide:
 [Sound Absorption Measurement and Rating](/phonometry/materials/absorbers/absorption-measurement/).

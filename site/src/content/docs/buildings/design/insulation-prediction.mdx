@@ -92,10 +92,57 @@ R_{ij,w} = \tfrac{R_{i,w} + R_{j,w}}{2} + \Delta R_{ij,w} + K_{ij}
 $$
 
 where $l_0 = 1$ m is the reference coupling length, $l_f$ the junction coupling
-length and $K_{ij}$ the junction's **vibration reduction index** (Annex E,
-empirical in the mass ratio $M = \log_{10}(m'_{\perp,i}/m'_i)$).
+length and $K_{ij}$ the junction's **vibration reduction index**.
+
+### Reading $K_{ij}$
+
+$K_{ij}$ is a property of the junction alone, and that is the whole point of it.
+It is the average of the two velocity level differences measured across the
+junction, corrected for the coupling length and for the equivalent absorption
+lengths of the two elements, so the same junction carries the same $K_{ij}$
+whatever building it is built into — which is what lets a catalogue of junction
+types exist. Bigger is better: $K_{ij}$ enters Formula (28a) with a plus sign, so
+a high value is a junction that does not pass vibration on. The ranges are worth
+carrying in your head. A rigid cross junction of similar masses sits around
+8–13 dB and a rigid T junction about 3 dB lower (Annex E.3.2/E.3.3 give
+$K_{13} = 8{,}7 + 17{,}1M + 5{,}7M^2$ and $5{,}7 + 14{,}1M + 5{,}7M^2$); the
+corner and thickness-change junctions of Annex E.3.6 fall to $15M - 3$ dB
+(floored at $-2$ dB) and $5M^2 - 5$ dB, so at the worked example's mass ratio
+they return 0,1 dB and $-4{,}8$ dB — a junction that hides nothing; and a
+resilient interlayer or a lightweight double-leaf junction can exceed 20 dB
+(the same mass ratio through a `flexible_t` gives 20,9 dB). That upper range is
+what makes the internal wall of the worked example below almost invisible: it is
+the weakest element on the list at $R_w$ = 33 dB, yet the 33,5 dB tabulated for
+its $K_{Ff}$ takes its Ff path out of the sum entirely. On this model a bad
+element behind a good junction beats a good element behind a bad one. For the
+simplified model the Annex E values are read once, at 500 Hz, and stand in for a
+quantity that is only approximately frequency-independent.
+
+The mass argument is the place readers come unstuck. The Annex E fits are
+quadratic in $M = \lg(m'_{\perp,i}/m'_i)$ — the base-ten **logarithm** of the
+mass ratio, with $m'_i$ the element carrying the path and $m'_{\perp,i}$ the
+perpendicular element of the junction (Formula E.3). The library takes the
+**mass ratio itself** and forms $M$ internally, so `mass_ratio=1.61` means the
+perpendicular element is 1,61 times as heavy per unit area. Any positive number
+is accepted, so passing an already-logged value returns a plausible but wrong
+answer: `junction_vibration_reduction("rigid_cross", "through", 0.2068)` returns
+$-0{,}3$ dB where the answer is 12,5 dB. And because $m'_i$ is the element *in
+the transmission path*, the same junction has a different mass ratio for
+$K_{13}$ and for $K_{12}$ — the ratio is per path, not per junction.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_junction_catalogue.svg" alt="The Annex E junction catalogue: rigid cross, rigid T, T with a flexible interlayer, corner, thickness change and a lightweight double-leaf wall meeting a homogeneous floor, each with its elements numbered, its path branches coloured, the coupling length marked and the mass ratio worked for one panel" width="92%" />
+
+Each drawing above maps onto one `(junction_type, path)` argument pair, and the
+path branch matters as much as the junction type: on the same rigid cross of the
+worked example, `path='through'` gives 12,5 dB and `path='corner'` 8,9 dB.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/prediction_flanking_demo.svg" alt="Per-path sound reduction indices for the EN 12354-1 Annex H.3 example and each path's share of the transmitted energy, showing the direct path dominating at R'w = 52 dB" width="80%" />
+
+*Per-path indices above, share of transmitted energy below. The direct path is
+the strongest single contributor at 33 %, yet two thirds of what arrives in the
+receiving room has gone around the wall — which is the 5 dB between
+$R_{s,w} = 57$ dB and $R'_w = 52$ dB. The dashed line is the assembled $R'_w$,
+which necessarily sits below every individual path.*
 
 ```python
 import numpy as np
@@ -174,7 +221,23 @@ plt.show()
 
 Every added flanking path strictly lowers $R'_w$ below the direct $R_{Dd,w} = 57$;
 `res.paths` exposes each path's share of the transmitted energy so the dominant
-path is visible. `flanking_element` is a convenience that builds one junction's
+path is visible.
+
+**Read the split as a budget, because that is the practical yield of the whole
+model.** The direct path is the largest single contributor here and it still
+carries only 33 % of the transmitted energy: two thirds of what arrives has gone
+*around* the wall. So perfecting the separating wall — making it infinitely good,
+not merely better — removes at most a third of the total, which is
+$-10\lg(1 - 0.33) = 1.8$ dB. Specifying a heavier partition on this construction
+would be wasted money; the floor, the ceiling and the façade carry the rest, and
+a junction detail or a lining on *them* is what moves the answer. The rule
+generalises: the best achievable improvement from fixing one path is
+$-10\lg(1 - \text{its energy fraction})$ dB, so a path below about 10 % of the
+total is worth at most 0,5 dB and is not worth touching, while a path at 50 % is
+worth 3 dB and one at 80 % is worth 7 dB. Rank the paths, spend on the top of the
+list, and stop when the next one is under a decibel.
+
+`flanking_element` is a convenience that builds one junction's
 three paths at once; the single-path constructor behind it, `flanking_path`,
 builds one `Ff`, `Df` or `Fd` path at a time (Formula 28a). Clause 4.4.2 also
 enforces a floor $K_{ij} \ge K_{ij,\min}$ from the junction geometry
@@ -183,7 +246,16 @@ enforces a floor $K_{ij} \ge K_{ij,\min}$ from the junction geometry
 automatically per path; or compute the floor yourself with
 `junction_min_vibration_reduction` and pass it to
 `flanking_path(..., kij_min=...)`, which raises a below-floor $K_{ij}$ to the
-minimum:
+minimum.
+
+Why a floor at all? $K_{ij}$ is defined relative to the equivalent absorption
+lengths of the two elements, so on small elements the normalisation itself limits
+how much junction isolation may be claimed: energy arriving at a small, lightly
+damped element has nowhere to be dissipated except back across the junction it
+came through. The floor therefore rises as the elements shrink or the coupling
+length grows. On dwelling-scale elements it is normally negative and inactive; a
+prediction in which the clamp *is* active is a signal that an Annex E tabulated
+value is being applied outside the geometry it was fitted on.
 
 ```python
 from phonometry import building
@@ -194,6 +266,36 @@ from phonometry import building
 print(round(building.junction_min_vibration_reduction(coupling_length=4.5,
                                              s_i=11.5, s_j=11.5), 1))     # -1.1
 ```
+
+### Two linings on one path do not add
+
+`delta_r_ff`, `delta_r_fd`, `delta_r_df` and `flanking_path`'s `delta_r` are each
+the **combined** improvement of one whole path, not one lining's rating. A path
+usually has two ends, and both may be lined: a wall lining on the source side and
+a suspended ceiling on the receiving side both sit on the same $Ff$ path. They do
+not add. ISO 12354-1:2017 Formula (22) for the direct path and Formula (23) for
+each flanking path both give
+
+$$
+\Delta R_{ij,w} = \Delta R_{i,w} + \frac{\Delta R_{j,w}}{2}
+\quad\text{or}\quad
+\Delta R_{j,w} + \frac{\Delta R_{i,w}}{2}\ \text{dB},
+$$
+
+with the rule that decides which of the two: **half the value is taken for the
+lining with the lower value; however, if both linings have a negative value, half
+the value is taken for the lining with the higher value.** So two linings of
++12 dB and +6 dB give 12 + 3 = 15 dB, not 18; and two of $-4$ dB and $-9$ dB give
+$-9 - 2 = -11$ dB, because with both negative it is the *less* negative one that
+is halved. The sign rule inverts which lining is halved, and it is the part a
+careful reader still gets wrong.
+
+The physics behind the halving is that two linings in series on the same
+vibrational path are not independent: the second one operates on a field the
+first has already reduced, so its full rating — measured on a bare element — is
+not available a second time. ISO 12354-2 Clause 4.3.3 carries the same rule where
+a floor covering and a receiving-side lining coexist. The direct path takes its
+own combined $\Delta R_{Dd,w}$ through `delta_r_direct`.
 
 The impact counterpart (EN 12354-2, Formula 21) is a direct subtraction:
 $L'_{n,w} = L_{n,w,eq} - \Delta L_w + K$, with the bare-floor equivalent level
@@ -217,6 +319,30 @@ The frequency-band route of
 [Detailed Sound Insulation Prediction](/phonometry/buildings/design/detailed-prediction/)
 is anchored on the 2017 editions throughout.
 
+**What the two mass inputs are, and where the closed form stops.** Annex B's
+$164 - 35\lg(m'/m'_0)$ is not a theory: it is a regression fitted to measured
+**homogeneous heavyweight** floors between **100 and 600 kg/m²**, and
+`equivalent_impact_level` raises a `UserWarning` when it is called outside that
+band. It works inside it because a bare massive slab's impact level is set by its
+mass and by the roughly constant loss factor of masonry construction. It fails
+outside it because a light or ribbed floor radiates through its own resonances
+rather than as a damped homogeneous plate — so the closed form is meaningless for
+a hollow-core, beam-and-block or joisted deck at any mass, and an extrapolation
+for a 900 kg/m² vault. The $m'$ it wants is the mass of the **bare structural
+floor**, without covering and without ceiling; the covering's effect is
+$\Delta L_w$ and is subtracted separately.
+
+The flanking mass is a different quantity again: the arithmetic **mean over the
+homogeneous flanking elements of the receiving room that carry no additional
+layer**. A lined or dry-lined flanking wall is left out of the mean, not averaged
+in at its bare mass. Table 1 itself applies to the rooms-one-above-the-other case
+of the Annex E.3 example, and it is a *discrete nearest-neighbour lookup*, not an
+interpolation: 145 kg/m² and 150 kg/m² both return $K$ = 2 dB, and masses outside
+100–900 kg/m² (separating) or 100–500 kg/m² (flanking) clamp to the nearest edge
+rather than extrapolating. Taken together, a lightweight building is outside this
+whole simplified impact route and needs the measured normalised flanking impact
+level path the 2017 edition prescribes.
+
 ```python
 from phonometry import building
 
@@ -226,6 +352,9 @@ ln_eq = building.equivalent_impact_level(322.0)                   # 164 - 35 lg(
 k = building.impact_flanking_correction(322.0, 145.0)             # Table 1 (sep 322, flk 145)
 imp = building.predicted_impact_insulation(ln_w_eq=ln_eq, delta_l_w=33.0, k_correction=k)
 print(round(ln_eq, 1), k, round(imp.l_prime_n_w, 1))     # 76.2 2 45.2  ->  L'n,w = 45 dB
+
+# The lookup is discrete: the next tabulated flanking mass gives the same K.
+print(building.impact_flanking_correction(322.0, 150.0))          # 2, unchanged
 
 # Exact Formula (3): L'nT,w = L'n,w - 10 lg(0.032 V). Annex E.3's own rounding
 # of the factor to 10 lg(V/30) sits 0.18 dB below; both give L'nT,w = 43 dB.
@@ -301,7 +430,7 @@ element.
 | `k_ff` / `k_fd` / `k_df` | float | dB | — | Junction $K_{ij}$ for the three paths |
 | `separating_area` | float | m² | > 0 | Separating-element area $S_s$ |
 | `coupling_length` | float | m | > 0 | Junction coupling length $l_f$ |
-| `delta_r_ff` / `delta_r_fd` / `delta_r_df` | float | dB | default `0` | Lining improvements per path |
+| `delta_r_ff` / `delta_r_fd` / `delta_r_df` | float | dB | default `0` | **Combined** lining improvement of the whole path, both ends together (Formula 23) |
 | `flanking_area` | float | m² | default `None` | Flanking-element area $S_F$; enables the automatic $K_{ij,\min}$ clamp (Clause 4.4.2 / Formula 29) |
 
 ### `flanking_path()` parameters
@@ -314,7 +443,7 @@ element.
 | `k_ij` | float | dB | — | Junction vibration-reduction index for this path |
 | `separating_area` | float | m² | > 0 | Separating-element area $S_s$ |
 | `coupling_length` | float | m | > 0 | Junction coupling length $l_f$ |
-| `delta_r` | float | dB | default `0` | Lining improvement on this path |
+| `delta_r` | float | dB | default `0` | **Combined** lining improvement of this path, both ends together (Formula 23) |
 | `kij_min` | float | dB | default `None` | When given, `k_ij` is floored at this Formula (29) minimum |
 
 `predicted_airborne_insulation()` returns an `AirbornePredictionResult`
@@ -322,6 +451,52 @@ element.
 `predicted_impact_insulation()` an `ImpactPredictionResult` (`l_prime_n_w`,
 `ln_w_eq`, `delta_l_w`, `k_correction`). The simplified model carries a reported
 standard deviation of about 2 dB (Clause 5).
+
+### When the simplified model applies
+
+Clause 4.4.4 of ISO 12354-1:2017 sets three conditions, and none of them is
+about arithmetic.
+
+- **Similar frequency dependence.** The model assumes elements whose sound
+  reduction index has a broadly similar shape against frequency, since it works
+  on single numbers and a single number cannot carry two different shapes. A
+  masonry wall flanked by masonry is the model's home ground; a lightweight
+  double-leaf partition beside a concrete floor is explicitly named as the case
+  where the accuracy may be less.
+- **Dwelling-scale geometry.** It applies mainly to dwellings whose element
+  dimensions are similar to those of a test facility. Move far from that — a
+  hall, a plant room, a very long junction — and the deviation grows.
+- **Adjacent rooms only.** Clause 4.2.4 restricts the whole family to
+  transmission between rooms that share the separating element, and secondary
+  paths crossing more than one junction are neglected. Where the source is
+  several junctions away, the
+  [EN 12354-5 route](/phonometry/buildings/design/installed-structure-borne/)
+  chains the junction indices instead.
+
+And the ~2 dB standard deviation is not a tolerance on your answer. Clause 5
+prints it *assuming good workmanship and high measurement accuracy*, and adds the
+advice that makes it usable: vary the input data, especially in complicated
+situations and with atypical elements, and read the spread in the result;
+Annex K systematises that into an uncertainty derived from the accuracy of every
+acoustic input.
+
+The junction data deserve their own warning, because their spread is larger than
+the model's. Annex E.3.1 states four things the page's lookup does not show.
+Data exist only for junctions where the elements on either side **in the same
+plane have the same mass**. The measured points scatter by a typical **±3 dB**
+about the printed lines, and "in some cases the deviation can be much larger due
+to variations in junction details and in workmanship" — which is larger than the
+~2 dB of the whole model, so on most real predictions the junction input, not the
+summation, dominates the error. The $K_{ij}$ values were deduced so that the
+estimated junction velocity level difference is right *on average*, which puts
+them generally **5 dB below** the direction-averaged junction velocity level
+difference, so a measured $D_{v,ij}$ cannot be substituted for a $K_{ij}$ without
+that step. And the frequency independence holds "at least in the frequency range
+from 125 Hz to 2 000 Hz"; outside it the frequency effect can be larger. The way
+out is measured data: ISO 10848-4 for heavy junctions — which Annex E.3.1 itself
+recommends gathering at national level — and the
+[flanking laboratory](/phonometry/buildings/insulation/flanking-lab/) where the
+junction is lightweight, non-homogeneous or simply not in the catalogue.
 
 ### EN 12354 prediction report (`.report()`)
 
@@ -425,8 +600,13 @@ subtraction $L'_{n,w} = L_{n,w,eq} - \Delta L_w + K$ through
 `building.standardized_impact_level`. Both results write a prediction fiche
 with `.report()`.
 
-**Not covered.** The *detailed* per-band models of both parts; the
-predictions here stop at the weighted single-number ratings. The element
+**Not covered.** The *detailed* per-band models of both parts are the subject of
+[Detailed Per-Band Prediction (ISO 12354)](/phonometry/buildings/design/detailed-prediction/):
+the same standard run band by band, with the laboratory element and junction data
+converted to their in-situ values before the paths are formed. Use the simplified
+model here when only the weighted element ratings are known and the question is
+whether the room passes; use the detailed one when the element spectra exist and
+the question is which path sets which band. The element
 inputs themselves ($R_w$, $\Delta R_w$, $\Delta L_w$, mass per unit area)
 are taken as given, from laboratory data or from the mass-law estimates of
 [Predicting Panel Sound Insulation](/phonometry/buildings/design/panel-sound-insulation/).
@@ -443,6 +623,12 @@ and EN 12354-6's absorption model in
 - [Façade Sound Insulation](/phonometry/buildings/insulation/facade-insulation/): the
   EN 12354-3 and EN 12354-4 predictions across the building envelope, with the
   ISO 16283-3 measurement they are compared against.
+- [Detailed Per-Band Prediction (ISO 12354)](/phonometry/buildings/design/detailed-prediction/):
+  the same two parts run band by band, with the in-situ conversion of the
+  element and junction data the single-number model here takes as given.
+- [Bending-wave transmission at plate junctions](/phonometry/vibration/structural/junction-transmission/):
+  the wave approach behind $K_{ij}$, with the index plotted against the plate
+  thickness ratio for the X, T and L junctions of the catalogue above.
 - [Field Insulation Measurement (ISO 16283)](/phonometry/buildings/insulation/insulation-field/):
   the measured in-situ quantities the prediction is checked against.
 - [Insulation Ratings (ISO 717)](/phonometry/buildings/insulation/insulation-ratings/): the

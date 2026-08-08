@@ -82,9 +82,8 @@ plt.show()
 ## 1. Coupling and installed power
 
 Only part of the characteristic power is injected into the supporting element;
-the loss is the **coupling term** $D_C$ (always positive), set for a point
-excitation by the source mobility $Y_s$ and the receiver mobility $Y_i$
-(Formula 19b):
+the loss is the **coupling term** $D_C$, set for a point excitation by the
+source mobility $Y_s$ and the receiver mobility $Y_i$ (Formula 19b):
 
 $$
 D_{C,i} = 10\log_{10}\frac{|Y_s + Y_i|^2}{|Y_s|\,\mathrm{Re}\{Y_i\}},
@@ -95,6 +94,23 @@ mobility, Formula 19c) and to $-10\log_{10}(|Y_s|\,\mathrm{Re}\{Z_i\})$ for a **
 (low source mobility, Formula 19d); an elastic support adds its transfer
 mobility $Y_k$ inside the modulus (Formula 19e). The **installed** power level is
 then (Formula 18b) $L_{Ws,\mathrm{inst}} = L_{Ws,c} - D_C$.
+
+The two limits are usable once the mobilities differ by about an order of
+magnitude: at $|Y_s|/|Y_i| = 10$ the force-source form is 0.8 dB below the exact
+Formula 19b value and at 100 it is 0.1 dB below, while between those extremes the
+phase relationship decides the answer and Formula 19b must be evaluated with
+complex mobilities rather than magnitudes. Read the two idealisations
+physically: a **force source** imposes its force whatever the receiver does, so a
+stiffer receiver simply vibrates less and accepts less power, and $D_C$ stops
+depending on the receiver's magnitude at all; a **velocity source** imposes its
+motion, so a stiffer receiver now takes *more* power out of it and the dependence
+inverts. A pump on a concrete slab is the textbook force source; a heavy machine
+bolted rigidly to a light timber floor is the case where the intuition flips, and
+the mid range — a mounted machine near its support resonance — is where $D_C$ is
+smallest and can even go negative, because the $|Y_s + Y_i|^2$ numerator collapses
+when the two mobilities are comparable and in antiphase. The exact curve bottoms
+out at matched mobilities, which is best power transfer and therefore worst
+isolation.
 
 This is the same $L_{Ws,\mathrm{inst}}$ as the Annex I mobility correction of
 the introduction, reached by a different route: use Formula (18b) when $D_C$ is
@@ -123,9 +139,120 @@ from phonometry import building
 
 # A near-force source (Y_s >> Y_i) on a concrete floor:
 dc = building.coupling_term(2e-4 + 1e-4j, 3e-5 + 1e-5j)
-print(round(float(dc), 2))                                          # ~8.5 dB
-print(round(float(building.installed_structure_borne_power_level(82.0, dc)), 1))  # installed L_Ws
+print(round(float(dc), 2))                                          # 9.86 dB
+print(round(float(building.installed_structure_borne_power_level(82.0, dc)), 1))  # 72.1 dB
+
+# The two limits, for comparison: |Y_s|/|Y_i| is only 7 here, so the
+# force-source form is already 1.1 dB away from the exact Formula 19b value.
+print(round(float(building.coupling_term_force_source(2e-4 + 1e-4j, 3e-5 + 1e-5j)), 2))      # 8.72
+print(round(float(building.coupling_term_velocity_source(2e-4 + 1e-4j, 1 / (3e-5 + 1e-5j))), 2))  # -8.27
 ```
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/coupling_term_regimes.svg" alt="Coupling term against the source-to-receiver mobility ratio: the exact Formula 19b curve with its force-source and velocity-source asymptotes, the minimum at matched mobilities, the pump example marked, and two elastic-support curves showing the decibels a mount buys" width="92%" />
+
+*The whole of Formula 19b on one axis. Far to the right the source is a force
+source and $D_C$ follows $10\lg(|Y_s|/\mathrm{Re}\{Y_i\})$; far to the left it is
+a velocity source and follows $-10\lg(|Y_s|\,\mathrm{Re}\{Z_i\})$; the exact curve
+leaves both asymptotes within about a decade of matched mobilities, where it
+reaches its minimum of 6.2 dB — maximum power transfer, minimum isolation. The
+pump of the snippet sits at a ratio of only 7.1, which is why its exact 9.9 dB is
+1.1 dB above the force-source limit. Adding an elastic support (Formula 19e)
+shifts the whole curve up: a transfer mobility of $10^{-4}$ m/(N·s) buys 2.7 dB
+at the pump's ratio and one of $10^{-3}$ buys 13.7 dB, which is the isolation
+budget of a mount read straight off the coupling term.*
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+# `building` is the module imported by the snippet above.
+
+yi = 3e-5 + 1e-5j                     # receiver mobility, fixed
+ratio = np.logspace(-3.0, 3.0, 400)   # |Y_s| / |Y_i|
+ys = abs(yi) * ratio * (2 + 1j) / abs(2 + 1j)
+
+exact = np.array([float(building.coupling_term(a, yi)) for a in ys])
+force = np.array([float(building.coupling_term_force_source(a, yi)) for a in ys])
+velocity = np.array([float(building.coupling_term_velocity_source(a, 1 / yi))
+                     for a in ys])
+
+fig, ax = plt.subplots()
+ax.semilogx(ratio, exact, label="Formula 19b (exact)")
+ax.semilogx(ratio, force, "--", label="force source (19c)")
+ax.semilogx(ratio, velocity, ":", label="velocity source (19d)")
+for yk in (1e-4, 1e-3):               # elastic support, Formula 19e
+    ax.semilogx(ratio, [float(building.coupling_term(a, yi, transfer_mobility=yk))
+                        for a in ys], label=f"with $Y_k$ = {yk:g} m/(N·s)")
+ax.plot(7.07, 9.86, "o")              # the pump of the snippet
+ax.set(xlabel="Mobility ratio $|Y_s| / |Y_i|$", ylabel="Coupling term $D_C$ [dB]")
+ax.legend()
+plt.show()
+```
+
+</details>
+
+### Where the machine is fixed is part of $Y_i$
+
+The receiver mobility is not a material constant of the element; it is a
+property of the *point* the machine is bolted to. EN 12354-5 Annex F.3 gives
+three routes to it, in decreasing order of authority.
+
+**Measured.** Point mobilities at the actual contact points, normal to the
+surface, per ISO 7626-1 with single-point translational excitation per
+ISO 7626-2 (impact excitation per ISO 7626-5 is allowed), narrowband and then
+reduced to one-third octaves. The receiver must **not** be dynamically loaded
+while its mobility is measured — an important asymmetry with the source, which
+is isolated or freely suspended instead.
+
+**Calculated, mid-panel.** For excitation in the centre area of a large
+homogeneous element, Formula (F.4) gives the real, frequency-independent
+infinite-plate value $Y_{i,\infty} = 1/(8\sqrt{m'B'}) = (2{,}3\,c_L\rho t^2)^{-1}$,
+which is `vibration.infinite_plate_mobility(B, m)` in the library.
+It is valid only *above* the element's lowest resonance
+$f_{11} = (c_0^2/4f_c)(1/l_1^2 + 1/l_2^2)$ (Formula F.5); below $f_{11}$ the
+mobility turns complex and is set by the stiffness of the element's supports, not
+by its own mass and bending stiffness. For the 5,00 m × 4,00 m, 220 mm concrete
+floor of the worked building $f_{11}$ is 39 Hz, comfortably below the range, but
+for a 1,20 m × 0,80 m concrete plinth of the same thickness it is 781 Hz, right in
+the middle of it — so on small stiff elements the closed form is the wrong tool.
+Elements with beams split again (Formula F.3.2): below $f_{11}$ use the effective
+bending stiffness $\sqrt{B'_xB'_y}$; above it, excitation between the beams uses
+the plate field and excitation on a beam uses the beam's own mobility.
+
+**Corrected for the fixing position.** Near a rigid edge the real part collapses
+as $\mathrm{Re}\{Y_i\} = \mathrm{Re}\{Y_{i,\infty}\}\,[1 - J_0(2k_Ba)]$ (Formula
+F.6a, with a corner form F.6b), $a$ being the distance to the edge. This makes
+the fixing distance a design variable rather than a detail: on that same concrete
+floor at 63 Hz, bolting the machine 0,20 m from a wall leaves 6,5 % of the
+mid-panel real mobility — 11,9 dB less injected power — and 0,50 m leaves 37 %,
+worth 4,3 dB. Move a pump towards a junction and it feeds the building less.
+
+```python
+import numpy as np
+from scipy.special import j0
+
+rho, c_l, t = 2200.0, 3800.0, 0.220         # concrete, 220 mm
+m, b = rho * t, c_l**2 * rho * t**3 / 12.0  # mass per area, bending stiffness
+y_inf = 1.0 / (8.0 * np.sqrt(m * b))        # Formula (F.4), mid-panel
+print(f"{y_inf:.3g}")                       # 1.07e-06 m/(N.s)
+
+f_c = 343.0**2 / (1.8 * c_l * t)            # critical frequency
+f_11 = 343.0**2 / (4 * f_c) * (1 / 5.0**2 + 1 / 4.0**2)
+print(round(f_c, 1), round(f_11, 1))        # 78.2 Hz, 38.6 Hz -> F.4 valid here
+
+f, a = 63.0, 0.20                           # 0.20 m from a rigid edge
+k_b = np.sqrt(2 * np.pi * f) * (m / b) ** 0.25
+print(round(float(1 - j0(2 * k_b * a)), 3))                    # 0.065
+print(round(float(-10 * np.log10(1 - j0(2 * k_b * a))), 1))    # 11.9 dB less
+```
+
+The transfer mobility $Y_k$ of Formula (19e) is not a plate quantity at all: it
+is the dynamic transfer stiffness of the mount, measured on the
+[ISO 10846 rig](/phonometry/vibration/structural/transfer-stiffness/). The fixing
+position and the mount's data sheet both belong in the report's `notes`, because
+they are the two things that make a repeat prediction reproducible.
 
 ## 2. Transmission to the receiving room
 
@@ -140,6 +267,27 @@ its own adjustment term and flanking index:
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_installed_paths.svg" alt="EN 12354-5 installation paths: a pump on resilient mounts injects structure-borne power into the floor slab, the excited floor radiates into the receiving room below, a second path travels along the slab into the flanking wall, and the prediction cascade runs from the characteristic power to the normalised sound pressure level" width="92%" />
 
+The diagram draws the simple case, one junction between the excited element and
+the radiator. In parts 1 and 2 the two rooms always share the separating element,
+and clause 4.2.4 of ISO 12354-1 says in so many words that the model describes
+transmission between *adjacent* rooms. Service equipment breaks that assumption
+routinely: the standard's own flushing-cistern example puts the receiving room
+diagonally below the bathroom, and a riser or a lift shaft can be three junctions
+away from whoever complains. Annex F.1 says what to do. $K_{ij}$ then stops being
+the invariant of one junction and has to be read as covering the whole chain: the
+junction indices add along the path (Formula F.1), the intermediate elements'
+equivalent absorption lengths may be taken numerically equal to their areas as a
+first estimate for large or well-damped elements, and an adjustment $\Delta K$
+covers the longitudinal and in-plane waves that bending-wave theory misses —
+about 4 dB for two junctions and 6 dB for three or more, with the chained
+$K_{ij}$ floored near $-5$ dB, which corresponds to total structure-borne
+transmission. Two consequences for the input you supply here: an
+$R_{ij,\mathrm{ref}}$ computed for a single junction over-predicts the insulation
+of a multi-junction route, and several distinct routes usually join the same
+element pair, each of which must be counted as its own path or folded into one
+effective $R_{ij,\mathrm{ref}}$ first. Where the paths become many, Annex F.1
+points at a full SEA model instead.
+
 Each transmission path $i \to j$ gives a normalised sound pressure level from the
 installed power, the structure-to-airborne adjustment term $D_{sa}$, the flanking
 sound reduction index $R_{ij,\mathrm{ref}}$ (EN 12354-1) and the element area
@@ -150,7 +298,33 @@ L_{n,s,ij} = L_{Ws,\mathrm{inst},i} - D_{sa,i} - R_{ij,\mathrm{ref}}
              - 10\log_{10}\frac{S_i}{S_0} - 10\log_{10}\frac{A_0}{4},
 $$
 
-with $S_0 = A_0 = 10\ \text{m}^2$, and the paths combine energetically (Formula 17).
+with $S_0 = A_0 = 10\ \text{m}^2$. Read the five terms in order, because each one
+undoes a different normalisation. $L_{Ws,\mathrm{inst},i}$ is the power that
+actually entered element $i$. $D_{sa,i}$ converts that structural excitation into
+the equivalent *airborne* excitation, so that the next term may be an airborne
+quantity at all. $R_{ij,\mathrm{ref}}$ is that airborne flanking index, defined
+for a reference element of $S_0 = 10\ \text{m}^2$. $10\lg(S_i/S_0)$ therefore
+puts the real element back: the same injected power spread over a larger element
+gives a smaller vibration amplitude per unit area, so a bigger $S_i$ lowers the
+radiated level. And $10\lg(A_0/4)$ turns radiated power into a reverberant sound
+pressure level, through the diffuse-field relation
+$p^2 = 4\rho_0c_0W/A$ evaluated at the reference absorption area $A_0$. That last
+term is what "normalised" means on this page: the result is the level the room
+*would* have if its equivalent absorption area were 10 m². A real room with more
+absorption than that measures lower; ISO 16032 field measurements of service
+equipment are usually *standardised* instead, referred to a reverberation time of
+0,5 s, and the two are not interchangeable.
+
+The paths then combine energetically, band by band (Formula 17):
+
+$$
+L_{n,s} = 10\log_{10}\sum_{ij} 10^{L_{n,s,ij}/10}.
+$$
+
+`res.total_level` is that per-band combination and `res.overall_level` the sum
+over the spectrum of it. For the flushing cistern of Annex I.3 the four paths
+total 41,4 dB at 63 Hz and the whole spectrum closes at 29 dB(A) — see the
+weighting note below the snippet.
 
 ### The adjustment term $D_{sa}$
 
@@ -228,6 +402,35 @@ The `InstalledSourceResult` carries the per-path levels, the total per band, the
 installed power level and `.overall_level`, and its `.plot()` draws the whole
 cascade.
 
+### `overall_level` is not the number a regulation limits
+
+`overall_level` is the plain energetic sum of the per-band $L_{n,s}$ over the
+bands you supplied. It is **not** A-weighted, and the quantity every national
+requirement for service-equipment noise is written in — and the quantity the
+ISO 16032 field measurement produces — is the A-weighted single number
+$L_{n,s}(A)$. Both of EN 12354-5's worked examples close on one: 26 dB(A) for the
+Annex I.2 whirlpool bath and 29 dB(A) for the Annex I.3 cistern. The gap is not
+small. Service-equipment spectra are weighted to the low bands, exactly where the
+A-weighting is steepest, so for the Annex I.3 cistern the unweighted sum is
+44,0 dB against the standard's 29 dB(A) — fifteen decibels of headroom that does
+not exist. Weight the band levels before summing them:
+
+```python
+import numpy as np
+
+# Annex I.3 total per octave band, and the A-weighting corrections for those
+# nominal centres (ISO 3744 Annex E Table E.2 / IEC 61672-1).
+l_ns = np.array([41.4, 39.6, 30.5, 28.9, 18.5, 4.4])       # 63 Hz to 2 kHz
+a_corr = np.array([-26.2, -16.1, -8.6, -3.2, 0.0, 1.2])
+print(round(float(10 * np.log10(np.sum(10 ** (0.1 * l_ns)))), 1))            # 44.0 dB
+print(round(float(10 * np.log10(np.sum(10 ** (0.1 * (l_ns + a_corr))))), 1))  # 29.3 dB(A)
+```
+
+Read a result against that scale, not against the unweighted total: 29 dB(A) for a
+cistern and 26 dB(A) for a whirlpool bath are what the standard's own conforming
+examples produce, and dwelling limits for service equipment usually sit in the
+low thirties.
+
 ## 3. The prediction report (`.report()`)
 
 A prediction ends as a *document*. The `InstalledSourceResult` exposes a
@@ -250,6 +453,15 @@ is better). `verbose=True` adds one column per transmission path (up to five);
 otherwise only the installed power and the combined total are shown.
 `language="es"` renders the Spanish fiche with comma decimals. The basis strip
 states Formulae 18a/17 and the prediction disclaimer.
+
+Two numbers in the snippet below are the standard's, not invented: `16.2` is the
+coupling term of the Annex I.3 cistern at its wall contact, and the `lwc` array is
+that cistern's characteristic power level, the 84,4 dB the
+[EN 15657 page](/phonometry/buildings/design/structure-borne-power/) derives at
+63 Hz. `requirement` is compared against `overall_level`, so the 45 dB below is an
+*unweighted* band-sum limit; a regulation stated in dB(A) has to be checked
+against the A-weighted sum of the previous section instead, and against this
+example's spectrum the two differ by about 15 dB.
 
 ```python
 import numpy as np

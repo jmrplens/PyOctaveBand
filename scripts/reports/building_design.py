@@ -170,11 +170,14 @@ def _facade_prediction_example() -> tuple[object, ReportMetadata, str]:
 def _structure_borne_power_example() -> tuple[object, ReportMetadata, str]:
     """Structure-borne source power fiche: an EN 15657 reception-plate test.
 
-    A pump fixed to a reception plate of mass per area m = 25 kg/m2 and area
-    S = 1,2 m2 whose structural reverberation time Ts = 0,3 s gives the plate
-    loss factor eta = 2,2/(f*Ts) (Formula 13). The spatial-average plate
-    velocity level (Formula 12) per octave band (125 Hz to 4 kHz) is
-    Lv = [88, 90, 86, 82, 78, 73] dB re 1e-9 m/s, and the structure-borne sound
+    A pump fixed to the low-mobility reception plate EN 15657 clause 7.2.2
+    specifies: 100 mm concrete of 2 300 kg/m3, so a mass per area
+    m = 230 kg/m2, over 3,15 m x 2,23 m = 7,0 m2 (above the 5 m2 minimum, sides
+    near sqrt(2):1) with a structural reverberation time Ts = 0,25 s, which
+    gives the plate loss factor eta = 2,2/(f*Ts) (Formula 13) and keeps it at
+    or above the required 0,08 through the 50-100 Hz bands. The spatial-average
+    plate velocity level (Formula 12) per octave band (125 Hz to 4 kHz) is
+    Lv = [70, 72, 68, 64, 60, 55] dB re 1e-9 m/s, and the structure-borne sound
     power injected into the plate is
     L_Ws = 10*lg(2*pi*f*eta*m*S) + Lv - 60 dB re 1 pW (Formula 14). The band
     levels are dominated by the 250 Hz band and sum to a total L_Ws near 65 dB
@@ -183,9 +186,9 @@ def _structure_borne_power_example() -> tuple[object, ReportMetadata, str]:
     EN 12354-5 use, as the basis strip states.
     """
     freqs = np.array([125, 250, 500, 1000, 2000, 4000], dtype=float)
-    lv = np.array([88.0, 90.0, 86.0, 82.0, 78.0, 73.0])
+    lv = np.array([70.0, 72.0, 68.0, 64.0, 60.0, 55.0])
     result = ph.reception_plate_power(
-        lv, freqs, mass_per_area=25.0, area=1.2, reverberation_time=0.3
+        lv, freqs, mass_per_area=230.0, area=7.0, reverberation_time=0.25
     )
     metadata = ReportMetadata(
         client="Example building services contractor",

@@ -71,7 +71,8 @@ laboratory, and predicted from element data.
   the rubber ball and the bang machine, the impact force exposure level that
   specifies them and the ISO 717-2 Annex D single number.
 - [Laboratory Flanking Transmission (ISO 10848)](insulation/flanking-lab.md):
-  the measured junction vibration reduction index and the flanking descriptors.
+  the measured junction vibration reduction index, the flanking descriptors,
+  and the suspended-ceiling plenum path with its ceiling attenuation class.
 - [Insulation Ratings (ISO 717)](insulation/insulation-ratings.md): the
   reference-curve engines behind Rw, DnT,w, Ln,w and their adaptation terms.
 - [Façade Sound Insulation](insulation/facade-insulation.md): the

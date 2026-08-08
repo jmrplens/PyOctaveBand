@@ -139,7 +139,7 @@ $$
 s'_t = 4\pi^2\,m'_t\,f_r^2 .
 $$
 
-<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_dynamic_stiffness_rig_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_dynamic_stiffness_rig.svg" alt="ISO 9052-1 resonance rig: a vertical exciter and an accelerometer on the load plate over the 200 mm by 200 mm resilient specimen, read as a mass-spring system whose response peak gives the resonant frequency and the apparent dynamic stiffness" width="92%"></picture>
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_dynamic_stiffness_rig_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_dynamic_stiffness_rig.svg" alt="EN 29052-1 resonance rig in three panels: the three excitation arrangements of Figures 1 to 3, one on a rigid foundation with the load plate driven and measured, two on an isolated baseplate of at least 100 kg where both plates are measured and the exciter drives either the load plate or the baseplate; below, the specimen and load requirements with the plaster bed, the steel load plate and the petroleum-jelly fillet, and the mass-spring model whose response peak gives the resonant frequency" width="92%"></picture>
 
 In the test arrangement the specimen lies between the rigid foundation and a
 load plate whose total mass per unit area, plate plus added load, is

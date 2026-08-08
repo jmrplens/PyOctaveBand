@@ -141,67 +141,101 @@ def _d_astm_tube(s: SVG, th: Theme) -> None:
 def _d_airflow(s: SVG, th: Theme) -> None:
     """ISO 9053-1 static and ISO 9053-2 alternating airflow-resistance rigs."""
     # --- Left panel: static (DC) method -----------------------------------
-    s.rect(55, 70, 385, 430, th.panel, th.fg, rx=8, sw=2)
-    s.text(247, 100, "Static method (ISO 9053-1)", 21, th.fg, bold=True)
+    s.rect(38, 70, 400, 560, th.panel, th.fg, rx=8, sw=2)
+    s.text(238, 100, "Static method (ISO 9053-1)", 21, th.fg, bold=True)
 
-    cx = 200.0
+    cx = 150.0
     holder_l, holder_r = cx - 45, cx + 45
-    top_y, bot_y = 170.0, 430.0
-    # Vertical specimen holder (tube).
+    top_y, bot_y = 150.0, 440.0
+    # Vertical measurement cell (Clause 5.2).
     s.line(holder_l, top_y, holder_l, bot_y, th.fg, 2.5)
     s.line(holder_r, top_y, holder_r, bot_y, th.fg, 2.5)
-    # Specimen (hatched disc) in the middle.
-    spec_y, spec_h = 285.0, 46.0
+    # Specimen (hatched disc) with its edge seal.
+    spec_y, spec_h = 262.0, 40.0
     s.rect(holder_l, spec_y, 90, spec_h, th.bg, th.secondary, sw=2)
-    for hy in range(int(spec_y) + 8, int(spec_y + spec_h), 10):
-        s.line(holder_l + 4, hy, holder_r - 4, hy - 8, th.secondary, 1.0)
-    s.text(cx, spec_y + spec_h + 22, "specimen (A, d)", 17, th.secondary, bold=True)
-    # Steady laminar flow up through the holder.
-    s.arrow(cx, bot_y - 6, cx, spec_y + spec_h + 34, th.accent, 2.4)
-    s.arrow(cx, spec_y - 12, cx, top_y + 8, th.accent, 2.4)
-    s.text(cx, bot_y + 22, "laminar flow  q_v", 18, th.accent, bold=True)
+    for hy in range(int(spec_y) + 10, int(spec_y + spec_h) + 8, 10):
+        s.line(holder_l + 4, min(hy, spec_y + spec_h - 2),
+               holder_r - 4, max(hy - 10, spec_y + 2), th.secondary, 1.0)
+    s.rect(holder_l - 6, spec_y, 8, spec_h, th.accent)
+    s.rect(holder_r - 2, spec_y, 8, spec_h, th.accent)
+    s.text(holder_l - 12, spec_y + 26, "seal", 15, th.accent, bold=True,
+           anchor="end")
+    s.text(cx - 6, spec_y - 30, "specimen  A, d", 16, th.secondary, bold=True)
+    # Perforated support under the specimen.
+    for gx in range(int(holder_l) + 8, int(holder_r) - 2, 12):
+        s.line(gx, spec_y + spec_h + 22, gx, spec_y + spec_h + 34, th.fg, 2.0)
+    s.line(holder_l, spec_y + spec_h + 22, holder_r, spec_y + spec_h + 22,
+           th.fg, 1.6)
+    s.text(holder_r + 10, spec_y + spec_h + 34, "grid", 15, th.muted,
+           anchor="start")
+    # Steady laminar flow up through the holder, from a controlled source.
+    s.arrow(cx, bot_y - 6, cx, spec_y + spec_h + 46, th.accent, 2.4)
+    s.arrow(cx, spec_y - 46, cx, top_y + 26, th.accent, 2.4)
+    s.rect(cx - 44, bot_y + 8, 88, 36, th.bg, th.accent, rx=8, sw=2)
+    s.text(cx, bot_y + 32, "q_v", 18, th.accent, bold=True, mono=True)
+    s.rect(cx - 44, bot_y + 56, 88, 34, th.bg, th.muted, rx=8, sw=1.6)
+    s.text(cx, bot_y + 78, "flow source", 15, th.muted)
     # Differential manometer across the specimen (pressure taps).
-    tap_x = holder_r + 8
-    s.line(holder_r, spec_y - 4, tap_x + 40, spec_y - 4, th.primary, 1.6)
-    s.line(holder_r, spec_y + spec_h + 4, tap_x + 40, spec_y + spec_h + 4, th.primary, 1.6)
-    s.rect(tap_x + 40, spec_y - 26, 74, spec_h + 44, th.bg, th.primary, rx=8, sw=2)
-    s.text(tap_x + 77, spec_y + 8, "Δp", 22, th.primary, bold=True, mono=True)
-    s.text(tap_x + 77, spec_y + 34, "manom.", 15, th.muted)
-    s.text(247, 478, "R = Δp / q_v   (through-origin fit at 0.5 mm/s)",
+    tap_x = holder_r + 34
+    s.line(holder_r, spec_y + 2, tap_x, spec_y + 2, th.primary, 1.6)
+    s.line(holder_r, spec_y + spec_h - 2, tap_x, spec_y + spec_h - 2,
+           th.primary, 1.6)
+    s.rect(tap_x, spec_y - 18, 82, spec_h + 34, th.bg, th.primary, rx=8, sw=2)
+    s.text(tap_x + 41, spec_y + 24, "Δp", 22, th.primary, bold=True, mono=True)
+    # Thickness gauge resting on the specimen, in position (Clause 7.3).
+    s.circle(cx + 62, top_y + 42, 14, th.bg, th.muted, 1.8)
+    s.text(cx + 62, top_y + 48, "d", 16, th.muted, bold=True, italic=True)
+    s.line(cx + 62, top_y + 56, cx + 62, spec_y - 2, th.muted, 1.6, dash="4,3")
+    s.line(cx + 30, spec_y - 2, cx + 70, spec_y - 2, th.muted, 1.8)
+    # The free space Clause 5.2 asks for ahead of the specimen.
+    s.dim(holder_l - 26, spec_y, holder_l - 26, top_y, "≥ 1 bore", offset=0,
+          size=14, label_side="left")
+
+    for yy, txt in (
+        (546, "cell ≥ 29 mm bore, ≥ 1 bore of free space above"),
+        (568, "q_v and Δp each to ±5 %, Δp readable to 0.1 Pa"),
+        (590, "grid ≥ 50 % open, R < 1 %; d measured in position"),
+    ):
+        s.text(238, yy, txt, 14, th.muted)
+    s.text(238, 616, "R = Δp / q_v   (through-origin fit at 0.5 mm/s)",
            16, th.fg, bold=True)
 
     # --- Right panel: alternating (AC) method -----------------------------
-    s.rect(460, 70, 385, 430, th.panel, th.fg, rx=8, sw=2)
-    s.text(652, 100, "Alternating method (ISO 9053-2)", 21, th.fg, bold=True)
+    s.rect(460, 70, 400, 560, th.panel, th.fg, rx=8, sw=2)
+    s.text(660, 100, "Alternating method (ISO 9053-2)", 21, th.fg, bold=True)
 
     cav_l, cav_r = 590.0, 715.0
-    cav_top, cav_bot = 160.0, 360.0
+    cav_top, cav_bot = 210.0, 410.0
     # Cavity walls.
     s.rect(cav_l, cav_top, cav_r - cav_l, cav_bot - cav_top, th.bg, th.fg, sw=2.5)
     s.text((cav_l + cav_r) / 2, (cav_top + cav_bot) / 2 - 6, "cavity", 18, th.fg)
     s.text((cav_l + cav_r) / 2, (cav_top + cav_bot) / 2 + 18, "V", 20, th.fg,
            bold=True, italic=True)
-    # Specimen / airtight termination on top.
+    # Specimen cell, or the airtight termination that replaces it.
     s.rect(cav_l, cav_top - 26, cav_r - cav_l, 26, th.bg, th.secondary, sw=2)
     for hx in range(int(cav_l) + 8, int(cav_r), 11):
         s.line(hx, cav_top - 4, hx - 14, cav_top - 22, th.secondary, 1.0)
-    s.text((cav_l + cav_r) / 2, cav_top - 36, "specimen / airtight", 16,
-           th.secondary, bold=True)
+    s.text((cav_l + cav_r) / 2, cav_top - 36, "measurement cell → L_p,s (h_s)",
+           15, th.secondary, bold=True)
+    s.text((cav_l + cav_r) / 2, cav_top - 58,
+           "airtight termination → L_p,t (h_t)", 15, th.muted)
     # Piston at the bottom, oscillating.
     s.rect(cav_l, cav_bot, cav_r - cav_l, 26, th.panel, th.primary, sw=2)
-    s.arrow((cav_l + cav_r) / 2, cav_bot + 58, (cav_l + cav_r) / 2, cav_bot + 30,
+    s.arrow((cav_l + cav_r) / 2, cav_bot + 62, (cav_l + cav_r) / 2, cav_bot + 34,
             th.primary, 2.2)
-    s.arrow((cav_l + cav_r) / 2, cav_bot + 30, (cav_l + cav_r) / 2, cav_bot + 58,
+    s.arrow((cav_l + cav_r) / 2, cav_bot + 34, (cav_l + cav_r) / 2, cav_bot + 62,
             th.primary, 2.2)
-    s.text((cav_l + cav_r) / 2, cav_bot + 80, "piston  f = 1–4 Hz", 18,
+    s.text((cav_l + cav_r) / 2, cav_bot + 84, "piston  f = 1–4 Hz", 18,
            th.primary, bold=True)
+    s.text((cav_l + cav_r) / 2, cav_bot + 106, "q_v = 2π f h A_P", 15, th.muted,
+           mono=True)
     # Microphone in the cavity wall.
     s.circle(cav_r + 2, (cav_top + cav_bot) / 2, 6, th.fg)
     s.line(cav_r + 2, (cav_top + cav_bot) / 2, cav_r + 60,
            (cav_top + cav_bot) / 2, th.muted, 1.4)
     s.text(cav_r + 66, (cav_top + cav_bot) / 2 + 6, "L_p", 20, th.fg,
            bold=True, mono=True, anchor="start")
-    s.text(652, 478, "R from L_p,s − L_p,t   (κ′ per Annex A)",
+    s.text(660, 616, "R from L_p,s − L_p,t   (κ′ per Annex A)",
            16, th.fg, bold=True)
 
 
@@ -499,75 +533,149 @@ def _d_iso11654(s: SVG, th: Theme) -> None:
 # Dynamic-stiffness resonance rig (ISO 9052-1 / EN 29052-1)
 # ---------------------------------------------------------------------------
 
-def _d_dynamic_stiffness_rig(s: SVG, th: Theme) -> None:
-    """ISO 9052-1 rig: exciter and accelerometer on the load plate over the
-    resilient specimen, read as a mass-spring resonance."""
-    # ===== Left: rig cross-section =====
-    s.text(240, 74, "Resonance rig", 22, th.fg, bold=True)
-    gy = 466.0
-    s.ground(gy, 50, 430)
-    s.text(56, gy + 34, "Rigid foundation", 17, th.muted, anchor="start")
+def _dsr_arrangement(s: SVG, th: Theme, cx: float, base_y: float, *,
+                     rigid: bool, drive_plate: bool, both: bool,
+                     title: str, note: str) -> None:
+    """One EN 29052-1 excitation arrangement, drawn to a common baseline.
 
-    x0, x1 = 150.0, 330.0
-    spec_top, plate_h = 400.0, 26.0
+    ``rigid`` draws the hatched foundation of the first arrangement; the
+    other two stand on a baseplate of at least 100 kg carried on soft
+    mounts. ``drive_plate`` puts the exciter on the load plate rather than
+    under the baseplate, and ``both`` adds the second accelerometer.
+    """
+    half = 72.0
+    x0, x1 = cx - half, cx + half
+    spec_h, plate_h = 38.0, 20.0
+    spec_top = base_y - spec_h
     plate_top = spec_top - plate_h
-    # Resilient specimen (soft diagonal hatching).
+
+    s.text(cx, 96, title, 16, th.fg, bold=True)
+    s.text(cx, 116, note, 14, th.muted)
+
+    if rigid:
+        s.ground(base_y, x0 - 40, x1 + 40)
+        s.text(cx, base_y + 34, "Rigid foundation", 14, th.muted)
+    else:
+        s.rect(x0 - 40, base_y, 2 * half + 80, 24, th.panel, th.fg, sw=1.8)
+        s.text(cx, base_y + 17, "Baseplate ≥ 100 kg", 13, th.muted)
+        for sx in (x0 - 16, x1 + 16):
+            _spring_v(s, sx, base_y + 24, base_y + 96, th.muted, coils=3,
+                      width=9.0, sw=1.6)
+        s.line(x0 - 40, base_y + 96, x1 + 40, base_y + 96, th.muted, 1.6)
+
+    # Resilient specimen (soft diagonal hatching) and the load plate on it.
+    s.rect(x0, spec_top, x1 - x0, spec_h, th.panel, th.accent, sw=1.8)
+    for hx in range(int(x0) + 12, int(x1) + 1, 20):
+        s.line(hx, spec_top, hx - 10, base_y, th.accent, 0.9)
+    s.rect(x0 - 8, plate_top, x1 - x0 + 16, plate_h, th.panel, th.primary,
+           rx=3, sw=2.0)
+
+    # Excitation: on the load plate, or under the baseplate from below.
+    if drive_plate:
+        _exciter(s, cx - 30.0, plate_top, stinger=16.0, w=52.0, h=32.0)
+        s.arrow(cx - 30.0, plate_top - 13, cx - 30.0, plate_top - 1,
+                th.secondary, 2.0)
+        s.text(cx - 30.0, plate_top - 58, "F", 16, th.secondary, mono=True,
+               bold=True)
+    else:
+        _exciter(s, cx, base_y + 24, stinger=18.0, w=52.0, h=32.0, up=True)
+        s.arrow(cx, base_y + 38, cx, base_y + 26, th.secondary, 2.0)
+        s.text(cx - 40, base_y + 52, "F", 16, th.secondary, anchor="end",
+               mono=True, bold=True)
+
+    _accel(s, cx + 38.0, plate_top)
+    if both:
+        _accel(s, x1 + 24.0, base_y)
+
+
+def _d_dynamic_stiffness_rig(s: SVG, th: Theme) -> None:
+    """EN 29052-1 rig: the three excitation arrangements of Figures 1 to 3,
+    the specimen preparation of Clauses 5 and 6, and the Formula 4 reading."""
+    s.text(450, 56, "The three excitation arrangements (Figures 1 to 3)", 21,
+           th.fg, bold=True)
+
+    base_y = 300.0
+    _dsr_arrangement(s, th, 158.0, base_y, rigid=True, drive_plate=True,
+                     both=False,
+                     title="Rigid base",
+                     note="load plate measured")
+    _dsr_arrangement(s, th, 450.0, base_y, rigid=False, drive_plate=True,
+                     both=True,
+                     title="Isolated baseplate",
+                     note="load plate driven, both measured")
+    _dsr_arrangement(s, th, 742.0, base_y, rigid=False, drive_plate=False,
+                     both=True,
+                     title="Isolated baseplate",
+                     note="baseplate driven, both measured")
+    s.text(450, 440,
+           "all three are equivalent; sinusoidal excitation is the reference "
+           "method in case of dispute (7.1)", 15, th.muted, italic=True)
+
+    # ===== The specimen under the plate, and what the standard fixes =====
+    s.text(215, 502, "Specimen and load (Clauses 5 and 6)", 19, th.fg,
+           bold=True)
+    gy = 690.0
+    s.ground(gy, 60, 320)
+    x0, x1 = 110.0, 300.0
+    spec_top, plate_h, bed_h = 626.0, 24.0, 9.0
+    plate_top = spec_top - bed_h - plate_h
     s.rect(x0, spec_top, x1 - x0, gy - spec_top, th.panel, th.accent, sw=2)
     for hx in range(int(x0) + 14, int(x1) + 1, 22):
         s.line(hx, spec_top, hx - 12, gy, th.accent, 0.9)
-    # Load plate on top of the specimen.
-    s.rect(x0 - 12, plate_top, x1 - x0 + 24, plate_h, th.panel, th.primary,
+    # Plaster bed on its foil, between the specimen and the load plate.
+    s.rect(x0, spec_top - bed_h, x1 - x0, bed_h, th.panel, th.secondary,
+           sw=1.4)
+    s.rect(x0 - 10, plate_top, x1 - x0 + 20, plate_h, th.panel, th.primary,
            rx=3, sw=2.2)
-    s.text(x1 + 26, plate_top + 19, "Load plate", 18, th.fg, anchor="start",
-           bold=True)
-    s.text(x1 + 26, plate_top + 43, "m′t = 200 kg/m²", 15, th.muted,
+    s.line(x1, spec_top - bed_h / 2, 312, 566, th.secondary, 1.1, dash="3,3")
+    s.text(318, 562, "plaster of Paris ≥ 5 mm on 0.02 mm foil", 13,
+           th.secondary, anchor="start")
+    s.text(318, 592, "Load plate, steel", 15, th.fg, anchor="start", bold=True)
+    s.text(318, 611, "(200 ± 3) mm square, flat to 0.5 mm", 13, th.muted,
            anchor="start")
-    s.text(x1 + 26, spec_top + 40, "Resilient specimen", 17, th.fg,
+    s.text(318, 629, "8 kg ± 0.5 kg with every device on it", 13, th.muted,
            anchor="start")
-    s.text(x1 + 26, spec_top + 62, "200 mm × 200 mm", 15, th.muted,
+    s.text(318, 657, "Resilient specimen, 200 mm × 200 mm", 15, th.fg,
+           anchor="start", bold=True)
+    s.text(318, 676, "three of them; irregularities < 3 mm", 13, th.muted,
            anchor="start")
-    s.dim(x0, spec_top, x0, gy, "d", offset=-30, size=18)
-    # Exciter, drive force and accelerometer on the plate.
-    _exciter(s, 205.0, plate_top)
-    s.text(205, plate_top - 100, "Exciter", 18, th.fg, bold=True)
-    _motion_arrows(s, 256.0, plate_top - 36, 24.0, th.secondary)
-    s.text(268, plate_top - 30, "F(t)", 16, th.secondary, anchor="start",
-           mono=True)
-    _accel(s, 300.0, plate_top)
-    s.text(x1 + 26, plate_top - 14, "Accelerometer", 16, th.fg, anchor="start")
-    s.line(309, plate_top - 8, x1 + 20, plate_top - 18, th.muted, 1.1,
-           dash="3,3")
+    s.dim(x0, spec_top, x0, gy, "d", offset=-30, size=17)
+    # Petroleum-jelly fillet, closed-cell materials only.
+    s.path(f"M {x0} {gy} L {x0} {gy - 13} Q {x0 - 15} {gy - 5} {x0 - 17} {gy} Z",
+           fill=th.secondary, stroke=th.secondary, sw=1.0)
+    s.line(x0 - 12, gy - 4, 96, 722, th.secondary, 1.1, dash="3,3")
+    s.text(100, 726, "petroleum-jelly fillet (closed-cell materials)", 13,
+           th.secondary, anchor="start")
 
-    # ===== Right: the mass-spring reading =====
-    s.text(680, 74, "Mass-spring model", 22, th.fg, bold=True)
-    mx = 680.0
-    s.rect(mx - 60, 120, 120, 62, th.panel, th.primary, rx=8, sw=2.2)
-    s.text(mx, 158, "m′t", 22, th.fg, mono=True, bold=True)
-    _spring_v(s, mx, 182, 288, th.accent, coils=4)
-    s.text(mx + 26, 240, "s′t", 20, th.accent, anchor="start", mono=True,
-           bold=True)
-    s.ground(288, mx - 70, mx + 70)
-    _motion_arrows(s, mx - 92, 151, 26, th.secondary)
-
-    # Response curve with the resonance read at its peak.
-    ax0, ax1, base = 540.0, 850.0, 420.0
-    s.line(ax0, base, ax1, base, th.muted, 1.4)
-    s.line(ax0, base, ax0, 330.0, th.muted, 1.4)
-    pk = 660.0
-    s.path(f"M {ax0 + 6} {base - 12} C {pk - 60} {base - 16} {pk - 34} 336 "
-           f"{pk} 334 C {pk + 34} 336 {pk + 70} {base - 8} {ax1 - 6} {base - 4}",
-           stroke=th.primary, sw=2.4)
-    s.line(pk, base, pk, 336, th.muted, 1.2, dash="4,3")
-    s.text(pk, base + 22, "fr", 18, th.secondary, mono=True, bold=True)
-    s.text((ax0 + ax1) / 2, base + 48, "resonance read from the response peak",
-           15, th.muted, italic=True)
-
-    # Headline relations.
-    s.text(450, 524, "s′t = 4π² m′t fr²   (Formula 4)", 21, th.primary,
+    # Headline relations, under the specimen half.
+    s.text(258, 776, "s′t = 4π² m′t fr²   (Formula 4)", 20, th.primary,
            bold=True, mono=True)
-    s.text(450, 550,
-           "then f₀ = (1/2π)·√(s′/m′) for the installed floating floor   (Formula 2)",
-           16, th.muted, mono=True)
+    s.text(258, 806, "f₀ = (1/2π)·√(s′/m′)   (Formula 2)", 16, th.muted,
+           mono=True)
+
+    # ===== Right: the mass-spring reading and the response peak =====
+    s.text(700, 502, "Mass-spring model", 19, th.fg, bold=True)
+    mx = 700.0
+    s.rect(mx - 52, 534, 104, 46, th.panel, th.primary, rx=8, sw=2.2)
+    s.text(mx, 563, "m′t", 20, th.fg, mono=True, bold=True)
+    _spring_v(s, mx, 580, 640, th.accent, coils=4)
+    s.text(mx + 24, 618, "s′t", 19, th.accent, anchor="start", mono=True,
+           bold=True)
+    s.ground(640, mx - 62, mx + 62)
+    _motion_arrows(s, mx - 78, 557, 20, th.secondary)
+
+    ax0, ax1, base = 590.0, 862.0, 800.0
+    s.line(ax0, base, ax1, base, th.muted, 1.4)
+    s.line(ax0, base, ax0, 700.0, th.muted, 1.4)
+    pk = 700.0
+    s.path(f"M {ax0 + 6} {base - 10} C {pk - 56} {base - 14} {pk - 30} 712 "
+           f"{pk} 710 C {pk + 30} 712 {pk + 64} {base - 7} {ax1 - 6} {base - 3}",
+           stroke=th.primary, sw=2.4)
+    s.line(pk, base, pk, 712, th.muted, 1.2, dash="4,3")
+    s.text(pk, base + 20, "fr", 17, th.secondary, mono=True, bold=True)
+    s.text((ax0 + ax1) / 2, base + 44,
+           "read at the peak, extrapolated to zero force", 14, th.muted,
+           italic=True)
 
 
 # ---------------------------------------------------------------------------
@@ -658,3 +766,215 @@ def _d_porous_layer(s: SVG, th: Theme) -> None:
     s.text(80, 556,
            "viscous friction in the pores and heat exchange with the frame dissipate the sound energy",
            17, th.muted, anchor="start")
+
+
+# ---------------------------------------------------------------------------
+# d24 - ISO 354 reverberation-room sound absorption
+# ---------------------------------------------------------------------------
+
+def _d_iso354_room(s: SVG, th: Theme) -> None:
+    """ISO 354 reverberation-room absorption measurement (plan + two states)."""
+    # --- The room in plan, with non-parallel walls (Clause 6.1.2) ----------
+    s.path("M 46 100 L 596 82 L 610 424 L 60 410 Z", fill=th.panel,
+           stroke=th.fg, sw=3)
+    s.text(60, 76, "Reverberation room · plan", 20, th.fg, bold=True,
+           anchor="start")
+    s.text(596, 76, "V = 200 m³ (≥ 150 m³)", 17, th.muted, anchor="end")
+
+    # Suspended diffusers near the ceiling (Annex A.1).
+    for dx, dy, tilt in ((132.0, 164.0, 14.0), (232.0, 150.0, -20.0),
+                         (334.0, 166.0, 12.0), (436.0, 152.0, -14.0)):
+        s.path(f"M {dx - 32} {dy + tilt} Q {dx} {dy - 12} {dx + 32} {dy - tilt}",
+               stroke=th.muted, sw=3.0)
+    s.text(284, 120, "diffusers  0.8–3 m² each, ≈ 5 kg/m² (Annex A)", 15,
+           th.muted)
+
+    # --- Test specimen on the floor, edges deliberately non-parallel ------
+    ax_, ay = 122.0, 296.0        # corners, clockwise from top left
+    bx, by = 316.0, 272.0
+    cx_, cy = 330.0, 372.0
+    dx_, dy = 136.0, 396.0
+    s.path(f"M {ax_} {ay} L {bx} {by} L {cx_} {cy} L {dx_} {dy} Z",
+           fill=th.bg, stroke=th.secondary, sw=2.4)
+    for i in range(1, 14):        # hatch parallel to the short edges
+        t = i / 14.0
+        s.line(ax_ + t * (bx - ax_), ay + t * (by - ay),
+               dx_ + t * (cx_ - dx_), dy + t * (cy - dy), th.secondary, 1.0)
+    s.text(226, 262, "Test specimen  S = 10.8 m²", 17, th.secondary, bold=True)
+    s.text(226, 452, "10–12 m², width/length 0.7–1, edges not parallel to the room",
+           15, th.muted)
+    # Clearance from the nearest room boundary (Clause 6.2.1.2).
+    s.dim(66.0, 340.0, 122.0, 340.0, "≥ 0.75 m", offset=0, size=15)
+
+    # --- Two source and three microphone positions (Clause 7.1) -----------
+    for sx, sy, lab in ((470.0, 200.0, "S1"), (548.0, 344.0, "S2")):
+        s.rect(sx - 19, sy - 25, 38, 50, th.panel, th.primary, rx=6, sw=2)
+        s.circle(sx, sy, 10, th.primary)
+        s.circle(sx, sy, 4, th.bg)
+        s.text(sx + 26, sy + 5, lab, 16, th.fg, bold=True, anchor="start")
+    s.line(470, 200, 548, 344, th.muted, 1.1, dash="4,4")
+    s.text(478, 288, "≥ 3 m", 15, th.muted, anchor="end")
+
+    for mx, my, lab in ((392.0, 186.0, "M1"), (392.0, 296.0, "M2"),
+                        (446.0, 386.0, "M3")):
+        s.circle(mx, my, 7, th.fg)
+        s.circle(mx, my, 2.6, th.bg)
+        s.text(mx - 12, my + 5, lab, 16, th.fg, bold=True, anchor="end")
+    s.line(392, 186, 392, 296, th.muted, 1.1, dash="4,4")
+    s.text(400, 246, "≥ 1.5 m", 15, th.muted, anchor="start")
+    s.text(400, 480,
+           "microphones ≥ 1.5 m apart, ≥ 2 m from a source, ≥ 1 m from any "
+           "surface and from the specimen", 15, th.muted)
+
+    # --- Right column: the two states the whole method rests on -----------
+    s.rect(628, 82, 244, 342, th.bg, th.muted, rx=8, sw=1.6)
+    s.text(750, 114, "The measurement is a difference", 16, th.fg, bold=True)
+    for top, title, note, col in (
+        (146.0, "1 · empty room", "T₁  →  A₁", th.primary),
+        (274.0, "2 · specimen installed", "T₂  →  A₂", th.secondary),
+    ):
+        s.text(750, top, title, 16, col, bold=True)
+        s.path(f"M 656 {top + 14} L 842 {top + 8} L 848 {top + 78} "
+               f"L 660 {top + 84} Z", fill=th.panel, stroke=th.fg, sw=1.8)
+        if top > 200:
+            s.rect(690, top + 34, 92, 26, th.bg, th.secondary, sw=1.8)
+            for hx in range(696, 782, 12):
+                s.line(hx, top + 57, hx + 14, top + 37, th.secondary, 0.9)
+        s.text(750, top + 106, note, 19, col, bold=True, mono=True)
+    s.text(750, 412, "α_s = (A₂ − A₁) / S", 19, th.accent, bold=True, mono=True)
+
+    # --- Mounting strip: Type A on the floor, and a Type E air space ------
+    s.text(60, 524, "Annex B mounting (part of the result)", 17, th.fg,
+           bold=True, anchor="start")
+    for x0, lab, gap in ((80.0, "Type A: directly on the rigid floor", 0.0),
+                         (470.0, "Type E-400: 400 mm face to floor", 30.0)):
+        base = 590.0
+        s.line(x0 - 14, base, x0 + 224, base, th.fg, 3.0)
+        s.rect(x0 + 30, base - 16 - gap, 150, 16, th.bg, th.secondary, sw=1.8)
+        for hx in range(int(x0) + 36, int(x0) + 176, 12):
+            s.line(hx, base - 2 - gap, hx + 10, base - 15 - gap, th.secondary, 0.9)
+        if gap:
+            s.dim(x0 + 196, base, x0 + 196, base - 16 - gap, "400 mm",
+                  offset=26, size=14, label_side="right")
+        else:
+            s.rect(x0 + 16, base - 16, 14, 16, th.fg)
+            s.rect(x0 + 180, base - 16, 14, 16, th.fg)
+            s.text(x0 + 105, base - 28, "perimeter frame, flush", 14, th.muted)
+        s.text(x0 + 105, base + 24, lab, 15, th.fg)
+
+    # --- Governing relations and acceptance checks ------------------------
+    for y, txt, col, bold in (
+        (646, "A = 55.3 V/(c T) − 4 V m   ·   c = 331 + 0.6 t  (15–30 °C)",
+         th.fg, True),
+        (672, ("≥ 12 spatially independent decays = ≥ 3 microphones × ≥ 2 sources "
+               "· T₂₀ read from −5 dB over 20 dB"), th.muted, False),
+        (696, ("the empty-room A₁ must clear the Table 1 ceiling, and T₁ is "
+               "measured without the specimen frame"), th.muted, False),
+    ):
+        s.text(450, y, txt, 17 if bold else 15, col, bold=bold)
+
+
+# ---------------------------------------------------------------------------
+# d25 - ISO 10534-1 standing-wave-ratio apparatus
+# ---------------------------------------------------------------------------
+
+def _d_standing_wave_tube(s: SVG, th: Theme) -> None:
+    """ISO 10534-1 standing-wave apparatus: probe carriage and the minima."""
+    import math
+
+    tube_top, tube_bot, mid = 216.0, 346.0, 281.0
+    tube_l, tube_r = 156.0, 838.0
+    back_w, spec_w = 22.0, 46.0
+    face = tube_r - back_w - spec_w              # the specimen face: x = 0
+
+    # --- Tube, source and specimen ---------------------------------------
+    s.rect(tube_l, tube_top, tube_r - tube_l, tube_bot - tube_top, th.bg,
+           th.fg, sw=3)
+    s.rect(58, mid - 44, 66, 88, th.panel, th.primary, rx=6, sw=2)
+    s.path(f"M 124 {mid - 17} L 124 {mid + 17} L {tube_l} {tube_bot} "
+           f"L {tube_l} {tube_top} Z", fill=th.panel, stroke=th.primary, sw=2)
+    s.circle(90, mid, 11, th.primary)
+    s.text(92, 180, "Loudspeaker", 19, th.fg, bold=True)
+    s.text(92, 202, "one pure tone at a time", 15, th.muted)
+
+    s.rect(tube_r - back_w, tube_top, back_w, tube_bot - tube_top, th.fg)
+    s.rect(face, tube_top, spec_w, tube_bot - tube_top, th.panel, th.secondary,
+           sw=2)
+    for hx in range(int(face) + 8, int(face + spec_w), 11):
+        s.line(hx, tube_bot - 4, hx - 15, tube_top + 4, th.secondary, 1.0)
+    s.text(tube_r, 202, "Test specimen on the rigid backing", 17,
+           th.secondary, bold=True, anchor="end")
+    s.line(face, 208, face, tube_bot + 14, th.accent, 1.6, dash="5,4")
+    s.text(face + 6, tube_bot + 26, "x = 0", 16, th.accent, bold=True,
+           anchor="start")
+
+    # --- Graduated rail and the probe carriage ----------------------------
+    rail_y, car_x = 150.0, 430.0
+    s.line(tube_l + 24, rail_y, face, rail_y, th.fg, 2.4)
+    x_tick = face
+    while x_tick > tube_l + 24:
+        s.line(x_tick, rail_y, x_tick, rail_y - 8, th.muted, 1.0)
+        x_tick -= 26.0
+    s.rect(car_x - 34, rail_y - 2, 68, 24, th.panel, th.primary, rx=5, sw=2)
+    s.line(car_x, rail_y + 22, car_x, mid, th.fg, 2.4)
+    s.circle(car_x, mid, 5.5, th.fg)
+    s.text(car_x, rail_y - 20, "probe microphone on a graduated carriage", 16,
+           th.fg, bold=True)
+    s.arrow(car_x + 42, rail_y + 10, car_x + 116, rail_y + 10, th.accent, 2.0)
+    s.arrow(car_x - 42, rail_y + 10, car_x - 116, rail_y + 10, th.accent, 2.0)
+
+    # --- The standing-wave envelope inside the tube, filling in leftwards -
+    span = (tube_bot - tube_top) / 2.0 - 8.0
+    wavelength = 214.0                       # px per acoustic wavelength
+    phi = math.radians(-54.1)
+
+    def envelope(x: float) -> float:
+        d = face - x
+        r_eff = 0.5 * math.exp(-0.0014 * d)   # wall losses, exaggerated
+        return math.sqrt(1.0 + r_eff**2
+                         + 2.0 * r_eff * math.cos(2.0 * math.pi * d / wavelength
+                                                  - phi))
+
+    def y_of(env: float) -> float:
+        return mid - (env - 1.0) * span / 0.62
+
+    pts = [(x, y_of(envelope(x)))
+           for x in [face - 3.0 * i for i in range(int((face - tube_l - 8) / 3))]]
+    s.path("M " + " L ".join(f"{px:.1f} {py:.1f}" for px, py in pts),
+           stroke=th.primary, sw=2.4)
+    s.text(250, tube_top - 12, "|p(x)| envelope", 16, th.primary)
+
+    # The adjacent maximum and minimum the operator reads.
+    x_min1 = face - wavelength * (phi + math.pi) / (2 * math.pi)
+    x_max1 = x_min1 - wavelength / 2.0
+    for px, lab in ((x_max1, "L_max"), (x_min1, "L_min")):
+        py = y_of(envelope(px))
+        s.circle(px, py, 5.5, th.secondary)
+        s.text(px, py - 14, lab, 15, th.secondary, bold=True)
+    s.dim(x_max1 - 46, y_of(envelope(x_max1)), x_max1 - 46, y_of(envelope(x_min1)),
+          "ΔL = 9.54 dB", offset=0, size=16, label_side="left")
+    s.line(x_max1 - 52, y_of(envelope(x_max1)), x_max1, y_of(envelope(x_max1)),
+           th.muted, 0.9, dash="3,3")
+    s.line(x_max1 - 52, y_of(envelope(x_min1)), x_min1, y_of(envelope(x_min1)),
+           th.muted, 0.9, dash="3,3")
+    s.dim(x_min1, tube_bot + 14, face, tube_bot + 14, "x_min,1 = 12 cm",
+          offset=46, size=16)
+    s.text(340, tube_bot + 104,
+           "minima far from the specimen fill in (wall losses, exaggerated "
+           "here): read the nearest one", 15, th.muted)
+
+    # --- The reduction chain, verbatim from the guide ---------------------
+    for i, txt in enumerate((
+        "s = 10^(ΔL/20) = 3",
+        "|r| = (s − 1)/(s + 1) = 0.5",
+        "α = 1 − |r|² = 0.75",
+        "Φ = 4π x_min,1/λ − π = −54.1°",
+        "Z/ρc₀ = (1 + r)/(1 − r) = 1.13 − 1.22j",
+    )):
+        s.text(450, 490 + 24 * i, txt, 17, th.fg, mono=True)
+    s.text(450, 622,
+           "one channel: the microphone sensitivity cancels and there is no "
+           "inter-channel phase mismatch", 17, th.accent, bold=True)
+    s.text(450, 648,
+           "magnitude from the ratio, phase from the position — which is why "
+           "Part 1 is the arbitration method", 15, th.muted)
