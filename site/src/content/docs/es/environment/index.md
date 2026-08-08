@@ -38,6 +38,16 @@ las páginas de salas y materiales. Empieza por
 introduce la contabilidad fuente-camino-receptor que las páginas de
 transporte reutilizan.
 
+Los tres trabajos para los que se usa normalmente esta sección combinan las
+subsecciones de manera distinta. Un **mapa estratégico de ruido** es un modelo
+de fuente CNOSSOS, un modelo de propagación y el Lden. La **evaluación de una
+instalación o de una licencia** es una potencia acústica medida (determinada en
+[Fuentes y dispositivos](/phonometry/es/devices/emission/)), la ISO 9613-2 hasta
+la vivienda más próxima, y el nivel de evaluación de ISO 1996 con sus ajustes.
+Una **inspección de actividad** es un sonómetro en un punto receptor y el
+RD 1367/2007, o la reglamentación nacional que corresponda, sin ningún modelo
+de propagación en la cadena.
+
 ## [Evaluación y normativa](/phonometry/es/environment/assessment/)
 
 Con qué se compara el sonido recibido, una vez ha llegado.
@@ -47,7 +57,7 @@ Con qué se compara el sonido recibido, una vez ha llegado.
   que convierten un LAeq medido en uno evaluado.
 - [Normativa española de ruido (RD 1367/2007)](/phonometry/es/environment/assessment/spanish-noise-regulation/):
   la aplicación nacional de esa cadena, con sus propios límites y sus propias
-  correcciones por tonalidad e impulsividad.
+  correcciones por tonalidad, baja frecuencia e impulsividad.
 - [Prominencia de sonidos impulsivos (NT ACOU 112)](/phonometry/es/environment/assessment/impulsive-sound/):
   la prominencia predicha de los sonidos impulsivos y el ajuste graduado
   añadido al LAeq.
@@ -59,10 +69,12 @@ llega.
 
 - [Propagación del sonido en exteriores](/phonometry/es/environment/propagation/outdoor-propagation/):
   absorción atmosférica (ISO 9613-1) y el método general de ISO 9613-2 con su
-  desglose de atenuación término a término.
+  desglose de atenuación término a término, incluidos el término de suelo
+  tabulado y el término de apantallamiento por barrera.
 - [Efecto suelo esférico y barreras avanzadas](/phonometry/es/environment/propagation/ground-barriers/):
-  la atenuación del suelo de ISO 9613-2 y la pérdida por inserción que añade
-  una barrera al camino.
+  la acústica ondulatoria que hay debajo de esos dos ajustes — el coeficiente
+  de reflexión de onda esférica de Weyl-Van der Pol sobre un suelo de
+  impedancia finita, y la difracción de pantallas por teoría ondulatoria.
 - [Refracción atmosférica: rayos y GFPE](/phonometry/es/environment/propagation/atmospheric-refraction/):
   cómo los gradientes de viento y temperatura curvan un rayo hacia dentro o
   fuera de una zona de sombra.
@@ -85,3 +97,47 @@ fuente por banda, lista para que el camino de arriba la atenúe.
 Las aeronaves son la otra fuente de transporte con métricas fijadas
 internacionalmente, y tienen un área propia:
 [Ruido de aeronaves](/phonometry/es/aircraft/).
+
+## Qué no cubre esta sección
+
+Del Anexo II de CNOSSOS-EU solo está implementado el lado de la fuente, y solo
+dos de sus cuatro fuentes. La **fuente industrial** del apartado 2.4 y el
+Apéndice H, y la **fuente de aeronaves** de los apartados 2.6 y 2.7, no están
+implementadas; el ruido de aeronaves lo cubren los métodos de la ICAO y de la
+ECAC en [Ruido de aeronaves](/phonometry/es/aircraft/), que es una familia de
+modelos distinta, y una máquina que no es un vehículo se caracteriza como una
+potencia acústica en [Fuentes y
+dispositivos](/phonometry/es/devices/emission/). Tampoco está implementado el
+**método de propagación de CNOSSOS** del apartado 2.5: el camino de aquí es la
+ISO 9613-2, un modelo distinto, así que una cadena construida con fuentes
+CNOSSOS y la propagación de esta biblioteca no es un cálculo CNOSSOS y no debe
+reportarse como tal.
+
+Nada de aquí es un motor de mapas. No hay modelo de terreno, ni geometría de
+ciudad, ni capa GIS: las funciones de propagación toman una fuente, un receptor
+y el suelo entre ambos, los dos modelos de refracción asumen un suelo plano en
+z = 0, y cómo se descompone una línea fuente en fuentes puntuales lo declara
+fuera de alcance el propio CNOSSOS. Del lado de la evaluación, la biblioteca
+empieza donde termina el sonómetro — las posiciones del receptor y las
+correcciones de fachada de ISO 1996-2, y los procedimientos de medición del
+anexo IV del RD 1367/2007 (posiciones de micrófono, duración de las series,
+número de mediciones), no están implementados, solo la aritmética que sigue una
+vez aplicados. La zonificación acústica, los mapas de ruido y los planes de
+acción de la Ley 37/2003 son instrumentos de planificación, no cálculos.
+
+## Antes y después de estas páginas
+
+Toda evaluación de aquí es un $L_{eq}$ corregido, así que la calibración, la
+ponderación y la integración temporal que lo producen están en [Análisis de
+señal](/phonometry/es/signals/), y [Construye un
+sonómetro](/phonometry/es/signals/sound-level-meter/) recorre esa cadena de
+principio a fin en una sola página ejecutable. Las derivaciones están en la
+[teoría de medio ambiente y
+transporte](/phonometry/es/reference/theory/environment-transport/): los
+descriptores de ISO 1996-1, el criterio de prominencia de NT ACOU 112 y los
+términos de atenuación de ISO 9613.
+
+Si has llegado aquí desde una búsqueda y quieres la forma de la biblioteca
+entera, [¿Qué necesitas medir?](/phonometry/es/start/tasks/) la indexa por el
+trabajo y [Todas las guías](/phonometry/es/start/guides/) lista todas las
+páginas con una línea sobre cada una.

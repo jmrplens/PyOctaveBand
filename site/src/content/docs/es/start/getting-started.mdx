@@ -1,6 +1,6 @@
 ---
 title: "Primeros pasos"
-description: "Instala phonometry y ejecuta tu primer análisis de octava fraccional."
+description: "Instala phonometry, ejecuta tu primer análisis en tercios de octava y calíbralo."
 ---
 
 import ThemeImage from '../../../../components/ThemeImage.astro';
@@ -9,20 +9,21 @@ import { totalChecks } from '../../../../data/conformance-stats.mjs';
 phonometry es una biblioteca de Python para la medida acústica, desde los
 bancos de filtros de octava fraccional y la ponderación frecuencial hasta los
 niveles sonoros y las métricas normalizadas. Cada métrica se verifica frente a
-la norma que la rige, {totalChecks} comprobaciones numéricas en total.
+la norma que la rige: {totalChecks} comprobaciones numéricas en total.
 Instálala con `pip install phonometry`; el primer ejemplo de abajo filtra una
 señal en tercios de octava y devuelve el nivel de presión acústica de cada
-banda.
+banda, y el apartado siguiente ancla esos niveles a un tono de calibrador, que
+es lo que los convierte en una medición.
 
 ## Instalación
 
-**Opción 1: Desde PyPI (recomendada)**
+### Desde PyPI (recomendada)
 
 ```bash
 pip install phonometry
 ```
 
-Extras opcionales:
+### Extras opcionales
 
 ```bash
 pip install phonometry[plot]    # matplotlib, para gráficas de respuesta y métodos .plot() de resultados
@@ -45,7 +46,7 @@ una instalación simple obtiene la última versión. numba solo acelera la
 ponderación temporal `impulse`, de modo que si prefieres mantener NumPy al día,
 instala `phonometry[plot,report]` y deja fuera `[perf]`.
 
-**Opción 2: Clonar e instalar**
+### Desde un clon
 
 ```bash
 git clone https://github.com/jmrplens/phonometry.git
@@ -53,7 +54,7 @@ cd phonometry
 pip install .
 ```
 
-**Opción 3: Submódulo de git**
+### Como submódulo de git
 
 ```bash
 git submodule add https://github.com/jmrplens/phonometry.git
@@ -69,8 +70,27 @@ en bandas normalizadas, suavizarla en el tiempo y reducirla a métricas:
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_signal_chain_es.svg" alt="Cadena de procesado de phonometry: señal, calibración, ponderación frecuencial, banco de filtros de octava, ponderación temporal y métricas, con la norma verificada en cada etapa" width="92%" loading="eager" />
 
-Cada etapa es una función o clase independiente que puedes usar por separado;
-las guías las recorren de izquierda a derecha ([Calibración](/phonometry/es/signals/metrology/calibration/) →
+Léela como una secuencia de decisiones y no como una receta fija. **La
+calibración va primero** porque todo lo que viene después es un cociente
+respecto a 20 µPa, así que un factor de escala equivocado desplaza todos los
+números posteriores en la misma cantidad y nada de lo que viene detrás puede
+detectarlo. **La ponderación frecuencial** la define IEC 61672-1 como un único
+filtro aplicado a la señal de banda ancha; aplicar en su lugar correcciones de
+ponderación banda a banda después del banco es un atajo que solo se sostiene
+para una señal estacionaria. **El banco** decide la resolución en frecuencia, y
+**la balística y las métricas** deciden el comportamiento temporal, actuando
+las dos sobre la señal ponderada y en ese orden, porque la ponderación temporal
+exponencial eleva la señal al cuadrado y por tanto no conmuta con nada de lo
+anterior.
+
+El ejemplo del apartado siguiente recorre **Señal → Octava** y nada más: sin
+calibración, así que sus niveles son pascales por hipótesis y no por medición;
+sin ponderación, así que son Z (sin ponderar); sin balística, así que cada banda
+es un único valor eficaz sobre todo el registro. «Dar sentido físico a las
+muestras», más abajo, devuelve la primera etapa a su sitio, y cada etapa es una
+función o clase independiente que puedes usar por separado; las guías las
+recorren de izquierda a derecha
+([Calibración](/phonometry/es/signals/metrology/calibration/) →
 [Ponderación frecuencial](/phonometry/es/signals/levels/weighting/) → [Bancos de filtros](/phonometry/es/signals/filters/filter-banks/) →
 [Ponderación temporal](/phonometry/es/signals/levels/time-weighting/) → [Niveles](/phonometry/es/signals/levels/levels/)).
 
@@ -95,6 +115,36 @@ print(f"Bandas: {freq}")
 print(f"SPL [dB]: {spl}")
 # SPL [dB]: [46.88395351 47.96774897 49.04991279 ...]  — 90,71 dB en 100 Hz y 90,95 dB en 1 kHz
 ```
+
+**Las frecuencias de banda salen como números, no como las etiquetas de un
+analizador.** IEC 61260-1 sitúa las frecuencias centrales sobre una rejilla en
+base 10, $f_m = 1000\cdot 10^{\,x/10b}$ con $b = 3$ para los tercios de octava,
+que es por lo que la más baja es 12,589 Hz y la más alta 19 952,6 Hz. Los
+números redondos que imprime un sonómetro de mano son las designaciones
+*nominales* que la misma norma da a esas mismas bandas: pasa `nominal=True` y
+`freq` vuelve como `['12.5', '16', …, '20k']`, que es lo que quieres en un eje o
+en un informe, mientras que los valores exactos son lo que quieres para
+calcular. Hay 33 bandas porque el rango por defecto va de 12 Hz a 20 kHz;
+`limits=[f_min, f_max]` lo estrecha, y estrecharlo suele merecer la pena:
+consulta [Bancos de
+filtros](/phonometry/es/signals/filters/filter-banks/) para la rejilla.
+
+**Lee el espectro antes de fiarte de él.** Dos de las 33 bandas contienen la
+señal: 90,71 dB en 100 Hz y 90,95 dB en 1 kHz, ambas a menos de 0,3 dB de
+90,97 dB, el nivel de una senoide de amplitud unidad leída como pascales
+($20\log_{10}(0{,}7071/20\,\mu\mathrm{Pa})$). Esa coincidencia es la comprobación
+de que el banco hace una aritmética defendible; el pequeño déficit en 100 Hz es
+la respuesta del filtro de banda diezmado en su propio centro, no energía
+perdida. Todo lo demás de la gráfica es el banco de filtros mirándose a sí
+mismo: los 63,79 dB en 80 Hz y los 65,13 dB en 125 Hz, y los 53,18 dB en 800 Hz
+y los 62,10 dB en 1,25 kHz, son los dos tonos colándose por las faldas de los
+filtros contiguos, de 27 a 29 dB por debajo; la subida lenta de 46,88 dB en
+12,5 Hz a 54,71 dB en 50 Hz es la banda atenuada lejana de esos filtros más el
+suelo numérico. La regla práctica que se deduce: en un espectro de bandas, trata
+como artefacto del análisis todo lo que quede más de unos 40 dB por debajo de la
+banda más alta, hasta que una medida de fondo diga lo contrario. [Verificación
+de clase de filtro](/phonometry/es/signals/filters/filter-compliance/) es la
+máscara que fija cuánto tienen que caer esas faldas.
 
 **Todavía no son niveles físicos.** `octave_filter` devuelve siempre
 $20\log_{10}(p_\mathrm{rms} / 20\,\mu\mathrm{Pa})$ y, con la calibración por
@@ -154,23 +204,170 @@ plt.show()
 
 </details>
 
-## Analizar un archivo de audio
+Esa misma llamada puede dibujar además el banco que acaba de diseñar, que es
+para lo que sirve el extra `[plot]`: pasa
+`response_plot=filters.ResponsePlot(show=True)` y los 33 filtros de banda
+aparecen en un mismo eje antes de que vuelvan los niveles.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/filter_butter_fraction_3_order_6_es.svg" alt="Respuesta en frecuencia del banco de filtros Butterworth de tercio de octava, 33 bandas de 12,5 Hz a 20 kHz con orden 6" width="80%" />
+
+*El banco por defecto: Butterworth, orden 6, tercio de octava. Cada curva cruza
+−3 dB en sus propios bordes de banda, que es de donde salen las faldas del
+párrafo anterior, y la máscara de clase 1 de IEC 61260-1 es la que fija con qué
+rapidez tienen que caer.*
+
+<details>
+<summary>Mostrar el código de esta figura</summary>
 
 ```python
+spl, freq = filters.octave_filter(
+    signal, fs=fs, fraction=3, response_plot=filters.ResponsePlot(show=True)
+)
+```
+
+</details>
+
+La [Galería de arquitecturas de
+filtro](/phonometry/es/signals/filters/filter-gallery/) tiene esta misma lámina
+para las otras cuatro arquitecturas.
+
+## Dar sentido físico a las muestras
+
+Los niveles de arriba no son una medición, porque nada conectó los números del
+array con una presión. Esa conexión es un único factor $S$, la **sensibilidad**
+en pascales por unidad digital, y se obtiene grabando un calibrador de nivel
+conocido a través del mismo micrófono, preamplificador, interfaz y ajuste de
+ganancia con los que vas a medir. Un calibrador acústico de clase 1 produce
+94 dB re 20 µPa a 1 kHz, que son $2\times10^{-5}\cdot10^{94/20} = 1{,}0024$ Pa
+eficaces, y no 1 Pa: una diferencia de 0,02 dB que vale la pena tomarse en
+serio, porque se propaga a todos los niveles posteriores.
+
+```python
+# Lo que la cadena de adquisición le hace a la presión. Este micrófono, este
+# preamplificador y esta interfaz entregan juntos 0.005 unidades digitales por
+# pascal; en una medición real nunca conoces este número, que es justo para lo
+# que sirve el calibrador.
+chain = 0.005
+
+# Lo que el calibrador escribe en disco: 3 s de 1 kHz a 94 dB re 20 uPa.
+p94 = 2e-5 * 10 ** (94.0 / 20)                       # 1.0024 Pa eficaces
+calibrator = chain * np.sqrt(2) * p94 * np.sin(
+    2 * np.pi * 1000 * np.arange(3 * fs) / fs
+)
+
+# ...y la medición: los mismos dos tonos por la misma cadena.
+recording = chain * signal
+
+# La sensibilidad es la presión conocida entre el valor eficaz del tono grabado.
+cal = p94 / np.sqrt(np.mean(calibrator ** 2))
+print(f"{cal:.1f} Pa por unidad digital")
+# 200.0 Pa por unidad digital
+
+spl, bands = filters.octave_filter(
+    recording, fs=fs, fraction=3, nominal=True,
+    calibration=filters.LevelCalibration(factor=cal),
+)
+print(f"{bands[9]} Hz: {spl[9]:.2f} dB SPL, {bands[19]}: {spl[19]:.2f} dB SPL")
+# 100 Hz: 90.71 dB SPL, 1k: 90.95 dB SPL
+```
+
+Hay dos cosas que merece la pena notar. Los niveles calibrados son **los mismos
+números que en el primer análisis**, porque allí la señal sintética estaba
+definida en pascales y esta grabación es ese mismo campo visto a través de una
+cadena que el calibrador acaba de deshacer; pero esta vez son decibelios re
+20 µPa porque los ha puesto ahí una medición, no porque lo hayamos supuesto. Y
+esa misma grabación leída sin el factor da 44,93 dB en la banda de 1 kHz,
+46,0 dB por debajo: un nivel sin calibrar no es aproximadamente correcto, está
+desviado en lo que haya dado la cadena de ganancia.
+
+En la práctica no se divide a mano. `metrology.sensitivity(calibrator,
+target_spl=94.0, fs=fs)` devuelve ese mismo factor y, de paso, comprueba la
+estabilidad a corto plazo del tono grabado igual que IEC 60942 cualifica al
+propio calibrador, de modo que un micrófono mal acoplado se detecta aquí en vez
+de corromper en silencio todos los niveles posteriores. [Calibración y
+dBFS](/phonometry/es/signals/metrology/calibration/) lleva esa llamada, la regla
+de deriva antes/después y la alternativa digital en dBFS para señales que nunca
+tuvieron escala física.
+
+## Un número en lugar de treinta y tres
+
+Un sonómetro muestra un nivel, no un espectro. Sobre una señal calibrada ese
+nivel es una línea, porque tanto la ponderación A como el promedio energético
+están definidos sobre la presión de banda ancha:
+
+```python
+weighted = filters.weighting_filter(cal * recording, fs, curve="A")
+laeq = 10 * np.log10(np.mean(weighted ** 2) / (2e-5) ** 2)
+print(f"LAeq = {laeq:.2f} dB(A)")
+# LAeq = 91.03 dB(A)
+```
+
+El nivel sin ponderar de ese mismo segundo es 93,98 dB: la ponderación A quita
+casi 3 dB, prácticamente todos del tono de 100 Hz, al que la curva atenúa unos
+19 dB. `signals.laeq(recording, fs, calibration_factor=cal)` es la forma de una
+línea de las dos anteriores y aplica la ponderación internamente, así que no
+ponderes nunca A la señal antes de pasarla a una función de nivel: eso la
+pondera dos veces. Las envolventes Fast y Slow, $L_{AE}$, $L_{Cpeak}$ y los
+niveles percentiles son llamadas de la misma clase: [Ponderación
+temporal](/phonometry/es/signals/levels/time-weighting/) y [Niveles integrados y
+estadísticos](/phonometry/es/signals/levels/levels/) las tienen, y [Construye un
+sonómetro](/phonometry/es/signals/sound-level-meter/) recorre la cadena entera,
+del tono de calibrador a todas ellas, en una sola página.
+
+## Analizar un archivo de audio
+
+Una medición real son **dos** grabaciones, no una, y las condiciones en que se
+hacen deciden lo que valen los niveles:
+
+- **La misma cadena, sin tocar nada por medio.** Graba primero el tono de
+  calibrador y después la medición, con el mismo micrófono, preamplificador,
+  interfaz y ganancia. Fija la ganancia antes del tono de calibrador y no la
+  vuelvas a mover: el factor solo vale mientras la cadena siga como se calibró, y
+  un mando de ganancia tocado es un error mayor que cualquier deriva.
+- **Deja los picos de 10 a 12 dB por debajo del fondo de escala y desactiva todo
+  lo automático.** El control automático de ganancia, la supresión de ruido, la
+  limitación y la ecualización de la interfaz cambian todos el nivel en función
+  del nivel, así que una muestra procesada ya no se puede convertir en un nivel
+  de presión acústica. Una recortada tampoco.
+- **Graba a 48 kHz o más.** A 44,1 kHz se descartan las bandas por encima de
+  $f_s/2$: el banco devuelve 32 bandas que terminan en 15 848,9 Hz en lugar de
+  las 33 que terminan en 19 952,6 Hz de arriba, y lo avisa con un
+  `PhonometryWarning`.
+- **Repite la comprobación del calibrador al final.** La diferencia entre antes
+  y después es la cota de deriva de todo lo capturado en medio, y un criterio
+  habitual invalida la serie cuando supera 0,5 dB.
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_calibration_setup_es.svg" alt="Cadena de calibración: calibrador acústico acoplado en el micrófono a 94,0 dB y 1 kHz, preamplificador, interfaz de audio y la sensibilidad que convierte unidades digitales en pascales" width="92%" />
+
+*La primera de las dos grabaciones: el calibrador acoplado sobre la cápsula a
+94,0 dB / 1 kHz, por el mismo preamplificador e interfaz que la medición que
+viene después, produciendo el factor de pascales por unidad digital del que
+depende todo lo que sigue.*
+
+```python
+import numpy as np
 from scipy.io import wavfile
 from phonometry import filters
 
-# Cargar un archivo WAV estándar
+# Los dos archivos salen de la misma cadena, en este orden y sin tocar nada.
+fs, calibrator = wavfile.read("calibrator.wav")
 fs, signal = wavfile.read("measurement.wav")
 
 # wavfile.read devuelve (muestras, canales); el banco espera (canales, muestras)
+if calibrator.ndim > 1:
+    calibrator = calibrator[:, 0]
 if signal.ndim > 1:
     signal = signal[:, 0]        # micrófono de medida en el canal 1
 
-# Analizar
-# Nota: para obtener valores SPL reales debes calibrar la entrada.
-# Consulta la guía de calibración.
-spl, freq = filters.octave_filter(signal, fs=fs, fraction=3)
+# Sensibilidad en pascales por unidad digital, a partir del tono de calibrador
+# de 94 dB. metrology.sensitivity(calibrator, target_spl=94.0, fs=fs) es la
+# llamada de la biblioteca, y valida además la estabilidad del tono.
+cal = 2e-5 * 10 ** (94.0 / 20) / np.sqrt(np.mean(calibrator.astype(float) ** 2))
+
+spl, freq = filters.octave_filter(
+    signal, fs=fs, fraction=3, nominal=True,
+    calibration=filters.LevelCalibration(factor=cal),
+)
 ```
 
 **Reduce un archivo multicanal al canal con el que mediste, o traspónlo.** La
@@ -198,6 +395,20 @@ factor incorporado. Mezclar los dos, un calibrador leído como float con una
 medida leída como entero, o al revés, se equivoca en 90 dB sin ningún síntoma.
 Las reglas están en
 [Calibración y dBFS](/phonometry/es/signals/metrology/calibration/).
+
+**Un número por banda, sobre el archivo entero.** `octave_filter` devuelve un
+único nivel eficaz por banda para todo el array, quitando antes la media
+(`detrend=True`); responde a «cuánta energía hubo en cada banda durante esta
+grabación», que es la pregunta correcta para una fuente estacionaria y la
+equivocada para cualquier cosa que cambie. Un paso de vehículo, una máquina que
+cicla o una sala por la que alguien pasa vuelven como un promedio energético que
+nadie había pedido. Si el nivel se mueve durante el registro, trocea la señal y
+llama al banco por trozos, o toma la vía normalizada y usa la balística
+exponencial Fast/Slow que muestra un sonómetro; `mode="peak"` da el pico de
+banda en lugar del promedio, y un pico de banda no es el $L_{Cpeak}$. Hay un
+suelo por el otro lado: un filtro de banda necesita varios ciclos de su propia
+frecuencia central para establecerse, así que un registro de un segundo dice muy
+poco sobre las bandas de 12,5 o 16 Hz por muchos dígitos que devuelva.
 
 ## Siguientes pasos
 

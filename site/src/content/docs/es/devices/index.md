@@ -1,6 +1,6 @@
 ---
 title: "Fuentes y dispositivos"
-description: "Caracterizar lo que emite el sonido: determinación de la potencia acústica por métodos de presión, cámara reverberante e intensidad (series ISO 3740 e ISO 9614), intensidad acústica con dos micrófonos (IEC 61043), las métricas de distorsión, altavoces y micrófonos de IEC 60268, la separación armónica con barridos y THD(f) (Farina / Novak), los silenciadores reactivos y el control de ruido industrial, y la sonoridad de programa y pico verdadero de UIT-R BS.1770-5 / EBU R 128."
+description: "Caracterizar lo que emite el sonido: determinación de la potencia acústica por métodos de presión, cámara reverberante, intensidad y vibración superficial (series ISO 3740 e ISO 9614, ISO/TS 7849), intensidad acústica con dos micrófonos (IEC 61043), las métricas de distorsión, altavoces y micrófonos de IEC 60268, la separación armónica con barridos y THD(f) (Farina / Novak), los silenciadores reactivos y el control de ruido industrial, y la sonoridad de programa y pico verdadero de UIT-R BS.1770-5 / EBU R 128."
 ---
 
 Toda predicción del resto de esta documentación parte de un descriptor de
@@ -11,7 +11,9 @@ la distancia desde la que se escucha.
 Las páginas de **potencia acústica e intensidad** determinan la magnitud
 central de la emisión, el nivel de potencia acústica: la cifra que va en una
 hoja de datos, alimenta una predicción de sala o de exteriores y se compara
-con los límites de emisión de ruido. Las páginas de **electroacústica** se
+con los límites de emisión de ruido, incluida la vía que lo lee de la propia
+vibración de la carcasa cuando no se puede colocar ningún micrófono. Las
+páginas de **electroacústica** se
 vuelven hacia los dispositivos que *deben* producir sonido (amplificadores,
 altavoces y micrófonos) y hacia el programa de radiodifusión que transportan,
 y las páginas de **control de ruido** reúnen las medidas del camino que
@@ -19,7 +21,8 @@ silencian una máquina una vez conocida su emisión.
 
 Si vienes a medir una máquina, empieza por
 [Potencia acústica](/phonometry/es/devices/emission/sound-power/) y deja que su guía de
-decisión elija la ruta; lee
+decisión elija la ruta, que puede acabar en una sonda de intensidad o, cuando
+solo se puede medir vibración, en la propia superficie radiante; lee
 [Intensidad acústica (p-p)](/phonometry/es/devices/emission/intensity/) cuando esa ruta
 implique una sonda de intensidad. Si vienes a caracterizar equipos de audio,
 ve directamente a
@@ -45,6 +48,11 @@ se construye.
   los métodos directo y de comparación de ISO 3741.
 - [Potencia acústica por barrido de intensidad](/phonometry/es/devices/emission/sound-power-intensity/):
   el barrido in situ de ISO 9614-2 y el grado de precisión ISO 9614-3.
+- [Potencia acústica desde vibración (ISO/TS 7849)](/phonometry/es/devices/emission/vibration-sound-power/):
+  la potencia radiada a partir del nivel de velocidad promediado en la
+  superficie y el factor de radiación, para el caso en que la máquina no puede
+  moverse, la sala no está calificada y solo se dispone de un acelerómetro: el
+  límite superior de la Parte 1 y el valor de ingeniería de la Parte 2.
 
 ## [Electroacústica](/phonometry/es/devices/electroacoustics/)
 
@@ -88,3 +96,54 @@ Control de ruido industrial en el camino, entre la máquina y quien la oye.
 - [Control de ruido industrial: HVAC y cerramientos](/phonometry/es/devices/noise-control/noise-control/):
   atenuación en conductos, ruido de flujo y pérdida de inserción de
   cerramientos de máquina.
+
+## Qué no cubre esta sección
+
+**Aquí no se califica ningún recinto.** La calificación de campo libre de una
+sala anecoica de ISO 3745, la calificación de la cámara reverberante de ISO 3741
+y el ensayo de intensidad residual de una sonda de IEC 61043 se dan todos por
+hechos: la biblioteca avisa de los criterios orientativos gruesos que una norma
+declara explícitamente y califica un índice residual que aportas tú, pero no
+certifica ni una sala ni un instrumento. El mismo límite recorre las páginas de
+electroacústica, que **reducen y presentan curvas que aporta el laboratorio** en
+vez de decirte cómo adquirirlas, y la ISO/TS 7849, cuyos apartados 5 a 7 sobre
+instrumentación, instalación y posiciones de medición son práctica de
+laboratorio que esta biblioteca asume.
+
+Conviene conocer tres ausencias concretas antes de planificar un trabajo. La
+suma de potencia en puntos fijos discretos de ISO 9614-1 **no está implementada
+en absoluto**: sí lo están solo sus indicadores de campo, reutilizados por las
+vías de barrido. Los silenciadores disipativos de conducto revestido **no se
+modelan a partir de las propiedades del revestimiento** en ningún sitio: los
+elementos reactivos se calculan exactamente, y las cifras de codo revestido y de
+plenum son tablas de instalación interpoladas. Y aquí ninguna página predice la
+pérdida por transmisión de un panel: `enclosure_insertion_loss` combina un valor
+que aportas tú con la corrección interior, y la predicción en sí es [Diseño del
+aislamiento](/phonometry/es/buildings/design/).
+
+Las ediciones están fijadas en vez de vigentes en dos sitios: las métricas de
+distorsión siguen AES17-2015 y no la revisión de 2020, y el informe de
+características nominales de micrófono sigue IEC 60268-4:2014 y no el de 2018.
+El audio basado en objetos (Anexo 4 de BS.1770-5) queda fuera de alcance, y la
+biblioteca no implementa ningún renderizador espacial, así que un programa
+basado en objetos hay que renderizarlo a una disposición de altavoces antes de
+poder medirlo.
+
+## Antes y después de estas páginas
+
+Toda magnitud de emisión de aquí se calcula a partir de niveles de banda o de un
+par de intensidad, así que la calibración, la ponderación y el filtrado que hay
+detrás están en [Análisis de señal](/phonometry/es/signals/), y [Construye un
+sonómetro](/phonometry/es/signals/sound-level-meter/) recorre esa cadena de
+principio a fin en una sola página ejecutable. Las derivaciones están repartidas
+por física y no por tema: [la determinación de la potencia
+acústica](/phonometry/es/reference/theory/environment-transport/#determinación-de-la-potencia-acústica-iso-374437453746-iso-3741-iso-9614-23)
+está en Medio ambiente y transporte, y [la intensidad
+acústica](/phonometry/es/reference/theory/signal-analysis/#intensidad-acústica-iec-61043),
+en Análisis de señal. Las páginas de electroacústica y de control de ruido
+llevan sus derivaciones en línea.
+
+Si has llegado aquí desde una búsqueda y quieres la forma de la biblioteca
+entera, [¿Qué necesitas medir?](/phonometry/es/start/tasks/) la indexa por el
+trabajo y [Todas las guías](/phonometry/es/start/guides/) lista todas las
+páginas con una línea sobre cada una.

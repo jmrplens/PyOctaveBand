@@ -23,7 +23,49 @@ exposición alimentan el modelo de daño auditivo de ISO 1999.
 
 Un buen punto de entrada es [Sonoridad](/phonometry/es/perception/psychoacoustics/loudness/):
 introduce la escala perceptiva (el sonio) y los modelos auditivos que la
-mayoría de las demás métricas de esta sección reutilizan o extienden.
+mayoría de las demás métricas de esta sección reutilizan o extienden. Las
+derivaciones que sustentan estos métodos, los modelos de banda crítica y de
+patrón de excitación, las formulaciones del enmascaramiento y la cadena de
+transferencia de modulación, están reunidas en la [página de teoría de la
+percepción](/phonometry/es/reference/theory/perception/), que las guías
+individuales citan apartado a apartado.
+
+### Cómo leer las cifras
+
+Casi todas las escalas perceptivas de esta sección quedan definidas por un
+**sonido de referencia** y no por una unidad física, así que lo primero que hay
+que aprender de cada una es su ancla: el sonido que vale exactamente 1.
+
+| Magnitud | Unidad | El sonido que vale 1 | ¿Criterio? | Página |
+|---|---|---|---|---|
+| Sonoridad | sonio | tono de 1 kHz a 40 dB SPL (también 40 fonios) | ninguno | [Sonoridad](/phonometry/es/perception/psychoacoustics/loudness/) |
+| Agudeza | acum | ruido del ancho de una banda crítica a 1 kHz y 60 dB SPL | ninguno | [Métricas de calidad sonora](/phonometry/es/perception/psychoacoustics/sound-quality/) |
+| Aspereza | asper | tono de 1 kHz a 60 dB, totalmente modulado a 70 Hz | 0,2 asper (informativo) | [Métricas de calidad sonora](/phonometry/es/perception/psychoacoustics/sound-quality/) |
+| Intensidad de fluctuación | vacil | la misma portadora modulada a 4 Hz | 0,2 vacil (informativo) | [Métricas de calidad sonora](/phonometry/es/perception/psychoacoustics/sound-quality/) |
+| Tonalidad | tu_HMS | tono de 1 kHz a 40 dB SPL | 0,4 tu_HMS (informativo) | [Métricas de calidad sonora](/phonometry/es/perception/psychoacoustics/sound-quality/) |
+| Audibilidad de tonos | dB | — (una diferencia de nivel sobre el enmascaramiento) | ajuste de ISO 1996-2 | [Audibilidad de tonos](/phonometry/es/perception/psychoacoustics/tone-audibility/) |
+| STI | 0 a 1 | — | letras del Anexo F, de U a A+ | [Índice de transmisión del habla](/phonometry/es/perception/speech/speech-transmission/) |
+| SII | 0 a 1 | — | ninguno normalizado | [Índice de inteligibilidad del habla](/phonometry/es/perception/speech/speech-intelligibility/) |
+| Desplazamiento del umbral | dB HL | — (una diferencia entre dos niveles de audición) | estadística de ISO 1999 | [Pérdida auditiva inducida por ruido](/phonometry/es/perception/hearing/noise-induced-hearing-loss/) |
+
+La sonoridad, la agudeza, la aspereza y la intensidad de fluctuación son
+**escalas de razón sin línea de aprobado**: el doble de número significa el
+doble de sensación, así que un electrodoméstico de 20 sonios se oye
+aproximadamente el doble de fuerte que uno de 10, y por eso las declaraciones de
+electrodomésticos fijan sus límites en sonios y no en decibelios. Las métricas tonales y los
+índices de habla sí llevan criterios, y por eso las páginas de tonos terminan
+en un veredicto y las de sonoridad no.
+
+Las tres cifras del habla viven todas en [0, 1] y **no son el mismo número**.
+Un STI de 0,6 cae en la banda D del Anexo F, típica de una buena sala de
+conferencias; un SII de 0,6 significa que en torno al 60 % del espectro del
+habla ponderado por importancia es audible; y un STOI de 0,6 no tiene ningún
+significado absoluto, porque la correspondencia entre el índice y las palabras
+entendidas se ajusta para cada corpus de pruebas de escucha, de modo que el
+STOI solo se lee como diferencia entre dos procesadores sobre el mismo
+material. Nunca sustituyas un índice por otro en una especificación y, cuando
+un requisito cite una cifra, comprueba a qué norma pertenece antes de calcular
+nada.
 
 ## [Psicoacústica](/phonometry/es/perception/psychoacoustics/)
 
@@ -77,3 +119,49 @@ El umbral de audición, lo que el ruido le hace y cómo se mide la exposición.
 - [Exposición al ruido en el trabajo (ISO 9612)](/phonometry/es/perception/hearing/occupational-exposure/):
   las estrategias por tareas, por puesto y de jornada completa para LEX,8h
   con el presupuesto de incertidumbre del Anexo C.
+
+## Qué no cubre esta sección
+
+**Aquí no se examina a ningún oyente ni se emite un veredicto sobre una
+persona.** Todos los modelos de estas páginas predicen lo que percibiría una
+población, o un oyente normalizado, a partir de una señal calibrada: ninguno
+realiza una sesión audiométrica, ninguno diagnostica una pérdida auditiva, e
+ISO 1999 declina explícitamente definir un hándicap auditivo o un umbral
+indemnizable, esa línea es regulación nacional y aquí no se aplica ninguna.
+Todo veredicto de prominencia y de audibilidad es igualmente el criterio
+numérico y nada más: ECMA-418-1 exige además la confirmación auditiva de un
+tono prominente, y eso queda de tu lado.
+
+**Todo es monoaural.** Las combinaciones binaurales de ECMA-418-2 no están
+implementadas, así que una grabación de dos canales se analiza oído a oído, y
+aquí nada modela la localización, la liberación espacial del enmascaramiento ni
+la suma binaural de sonoridad.
+
+**Ninguna prueba de escucha queda sustituida.** El STOI devuelve el índice
+basado en correlación y no un porcentaje de palabras entendidas, porque esa
+correspondencia se ajusta para cada corpus de pruebas de escucha; el SII
+devuelve una fracción de audibilidad y no una puntuación; y ninguna página
+predice la molestia en una comunidad, que es una magnitud de encuesta social y
+no psicoacústica: los indicadores comunitarios están en [Medio ambiente y
+transporte](/phonometry/es/environment/).
+
+Por último, estos modelos parten de una señal o un espectro **calibrados** en
+pascales, porque todos ellos dependen del nivel. Alimentarlos con muestras
+crudas de una tarjeta de sonido produce una cifra con una referencia
+arbitraria, que es un fallo distinto de una respuesta equivocada: parece
+plausible.
+
+## Antes y después de estas páginas
+
+Todos los modelos de aquí consumen una señal calibrada o un espectro calibrado,
+de modo que la calibración y las ponderaciones que los producen están en
+[Análisis de señal](/phonometry/es/signals/), y [Construye un
+sonómetro](/phonometry/es/signals/sound-level-meter/) recorre esa cadena de
+principio a fin en una única página ejecutable. Las derivaciones están en
+[Percepción y audición](/phonometry/es/reference/theory/perception/), desde las
+curvas isofónicas hasta la función de transferencia de modulación.
+
+Si has llegado aquí desde una búsqueda y quieres la forma del conjunto de la
+biblioteca, [¿Qué necesitas medir?](/phonometry/es/start/tasks/) la indexa por
+el trabajo a realizar y [Todas las guías](/phonometry/es/start/guides/) enumera
+todas las páginas con una línea sobre cada una.

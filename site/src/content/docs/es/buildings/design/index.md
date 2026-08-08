@@ -29,6 +29,18 @@ datos de laboratorio de elemento y de unión se convierten a sus valores in
 situ, cada camino se forma por banda y el resultado muestra qué camino domina
 cada banda, no solo si el recinto cumple.
 
+**¿Cuál de los dos ejecutas?** Ejecuta el modelo simplificado cuando lo que
+tienes son magnitudes globales ponderadas de catálogo — $R_w$, $\Delta L_w$, una
+masa por unidad de superficie — y la pregunta es si la partición cumple un
+límite. Ejecuta el detallado cuando tienes espectros de elemento y de unión por
+bandas, o las propiedades de material a partir de las cuales la norma puede
+calcularlos, y la pregunta es *qué camino corregir en qué banda*. La elección no
+va de exactitud sobre la valoración: sobre el propio edificio resuelto de la
+norma, los dos coinciden holgadamente dentro de la dispersión que declaran, y el
+modelo aéreo detallado no tiene error sistemático y su desviación típica es de
+1,5 dB a 2,5 dB (cláusula 5) frente a unos 2 dB del simplificado. Lo que compra
+el modelo detallado es el espectro que hay detrás del número único.
+
 [Predicción del aislamiento de paneles](/phonometry/es/buildings/design/panel-sound-insulation/)
 baja un nivel más, hasta el origen del propio $R$ de elemento: la ley de masa y
 la caída de coincidencia de un panel simple, el comportamiento masa-muelle-masa
@@ -75,6 +87,20 @@ mientras que
 sigue el texto de 2017. Comprueba qué edición invoca tu reglamento antes de
 citar una corrección de cualquiera de las dos.
 
+Toda predicción de aquí parte de datos medidos que vinieron de otro sitio, y el
+informe de diseño tiene que decir de dónde. El $R$ y el $L_n$ de elemento salen
+de ISO 10140-2 y -3, junto con el tiempo de reverberación estructural de
+laboratorio impreso en ese mismo informe, porque la conversión in situ lo
+necesita. Los índices de unión $K_{ij}$ salen de una medición según ISO 10848 o
+del catálogo de tipos de unión del anexo E de EN 12354-1. La mejora del
+revestimiento de suelo $\Delta L_w$ sale de ISO 16251-1 o de un ensayo
+ISO 10140-3 a tamaño real. La $s'$ de la capa elástica sale de EN 29052-1. Y
+para los equipos de instalaciones, la potencia estructural característica sale
+de la placa de recepción de EN 15657. Dos de las páginas de esta sección son
+ellas mismas mediciones de ese tipo, que alimentan a las demás; el resultado
+construido se contrasta al final con la medición en campo de ISO 16283 en
+[Aislamiento acústico](/phonometry/es/buildings/insulation/).
+
 ## Páginas de esta sección
 
 - [Predicción del aislamiento acústico (EN 12354)](/phonometry/es/buildings/design/insulation-prediction/):
@@ -109,3 +135,34 @@ Páginas de otras áreas del sitio en las que se apoya esta sección:
 - [Rigidez dinámica de materiales resilientes (EN 29052-1)](/phonometry/es/materials/resilient/dynamic-stiffness/):
   la medición por resonancia de placa de carga, el término del gas encerrado y
   la frecuencia natural del suelo flotante.
+
+## Qué no cubre esta sección
+
+**Una predicción vale lo que valen los datos de elemento que le des, y la
+biblioteca toma esos datos como dados.** Las magnitudes globales de los
+elementos, los índices de unión, la mejora del revestimiento y los términos de
+ajuste de estructural a aéreo de los anexos D y F de EN 12354-5 son entradas que
+aportas tú desde una medición o desde los propios anexos de las normas; ninguno
+se deriva aquí. La página de predicción simplificada se detiene por diseño en
+los números únicos ponderados, y la página detallada es donde viven los modelos
+por bandas.
+
+Todo modelo de panel lleva un rango de validez del que no pasa, y las guías lo
+señalan uno a uno: el método de panel simple de Sharp no es válido por debajo de
+aproximadamente 1,5 veces la primera resonancia del panel, el modelo de rendija
+de Gomperts solo se sostiene mientras la rendija sea estrecha frente a la
+longitud de onda, de la eficiencia de radiación solo está implementado el método
+n.º 1 de Leppington, y las vías ortótropas son modelos de panel infinito que se
+pierden el valle entre 2 kHz y 4 kHz que muestra la chapa grecada real. Del lado
+de las capas elásticas, el modelo de fuerza de la máquina de impactos supone una
+impedancia de punto de excitación independiente de la frecuencia, así que un
+forjado ligero con viguetas o rastreles queda fuera; los revestimientos blandos
+se tratan como resortes lineales; no hay predicción por bandas de la mejora de
+un trasdosado, porque el anexo D es un método de magnitud global; y las fuentes
+de impacto pesadas, como la pelota de caucho, no las cubre ninguno de estos
+modelos — su valoración está en
+[Fuentes de impacto pesadas y blandas](/phonometry/es/buildings/insulation/heavy-impact-sources/).
+
+Dos fronteras de edición: solo está implementada la edición de 2009 de
+EN 12354-5, no la revisión de 2023, y las páginas simplificada y detallada
+siguen ediciones distintas de la familia 12354, como dice la nota de más arriba.

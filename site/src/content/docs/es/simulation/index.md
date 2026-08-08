@@ -14,6 +14,15 @@ salidas idénticas bit a bit en la misma plataforma), están validados contra
 oráculos analíticos y sirven además como motor de contraste para los modelos
 en forma cerrada de las demás secciones.
 
+El dominio 2D es una **sección**, y eso tiene una consecuencia que conviene
+zanjar antes de que salga ningún número del solucionador: un punto del plano es
+físicamente una fuente lineal infinita, así que las amplitudes caen como la
+raíz cuadrada inversa de la distancia, unos 3 dB por duplicación en lugar de 6.
+Los patrones de interferencia y difracción, los tiempos de llegada y las
+frecuencias modales son fieles; los niveles absolutos y las tasas de caída
+pertenecen a esa geometría y no a una sala 3D. Una afirmación cuantitativa 3D
+necesita detrás una forma cerrada o un solucionador 3D.
+
 La sección se divide según los medios que simula. La página acústica
 explica el método numérico (el esquema leapfrog escalonado y su límite de
 estabilidad de Courant), los bloques de construcción (fuentes, sondas,
@@ -73,7 +82,38 @@ y la placa en coincidencia, en aislamiento acústico de paneles. Las dos aparece
 también en la página elástica de más abajo, donde se explica el solucionador que
 las produjo.
 
+Varias de esas guías hacen algo más que ilustrar: ejecutan una **medición
+normalizada entera dentro del dominio**. La guía del tubo de impedancia realiza
+las reducciones de la ISO 10534-2 y la ASTM E2611 sobre un tubo simulado y
+recupera la absorción y la pérdida por transmisión analíticas de la probeta;
+las guías de difusores y metadifusores excitan paneles mallados con una onda
+plana y transforman el campo cercano en una respuesta polar; las guías de
+aislamiento de paneles y de unión entre placas lanzan ondas de flexión en una
+placa y observan cómo suceden la coincidencia y el reparto en la unión. En cada
+caso el solucionador hace las veces de laboratorio, que es lo que convierte la
+comparación con la forma cerrada en un ensayo de verdad y no en una
+demostración.
+
+Preparar una ejecución es una cadena, y cada eslabón fija el siguiente. La
+frecuencia más alta que necesitas y la velocidad del sonido **más lenta** de
+cualquier punto del dominio fijan el tamaño de celda, a través de la regla de
+celdas por longitud de onda que impone la dispersión numérica. El tamaño de
+celda y la velocidad **más rápida** fijan después el paso temporal, a través del
+límite de estabilidad de Courant. El dominio tiene que albergar la geometría más
+el margen para las capas absorbentes, que a su vez se dimensionan por la
+frecuencia **más baja**. La ejecución debe durar lo suficiente para que el campo
+atraviese el dominio, y para una respuesta en régimen permanente lo suficiente
+para que el transitorio se haya ido antes de que se abra la ventana de análisis.
+El coste es celdas por pasos, así que partir por la mitad el tamaño de celda
+cuesta ocho veces más en 2D — un factor cuatro en celdas y un factor dos en
+pasos. La página acústica da los números de cada eslabón, y la página elástica
+añade el muestreo extra que exigen las superficies libres y las ondas de
+interfase.
+
 ## Páginas de esta sección
+
+Lee primero la página acústica: la elástica da por supuesto su vocabulario y lo
+dice en su propia apertura.
 
 - [Simulación de ondas FDTD 2D](/phonometry/es/simulation/fdtd-simulation/): el
   método FDTD presión-velocidad en malla escalonada según el capítulo 4 de
@@ -85,3 +125,42 @@ las produjo.
   misma malla, con superficies libres por imagen de esfuerzos, ondas de
   Rayleigh, conversión de modo, ondas de interfase de Scholte y transmisión
   de placas sumergidas, cada una validada contra su forma cerrada exacta.
+
+## Qué no cubre esta sección
+
+**Dos dimensiones, y no hay forma de esquivarlo.** Todo lo que una sección 2D
+no puede decir de una sala 3D, no lo dice ninguno de los dos solucionadores, y
+la divergencia cilíndrica de más arriba es solo la consecuencia más visible. El
+contorno abierto es una capa absorbente de rampa cuadrática — el precursor
+sencillo de una capa perfectamente adaptada, no una PML —, así que la incidencia
+rasante se absorbe menos limpiamente que la normal, y el solucionador elástico
+no tiene ninguna PML elástica, lo que más se nota en las ondas de Rayleigh
+rasantes. El medio no se mueve: **el viento y la advección por flujo no se
+modelan**, así que un estudio de refracción aquí sale de un perfil de velocidad
+del sonido dependiente de la altura y no de un campo de flujo. El único contorno
+de impedancia es uno real independiente de la frecuencia, así que un absorbente
+poroso hay que mallarlo en vez de declararlo. Del lado elástico el sólido es
+isótropo y puramente elástico: sin anisotropía y sin amortiguamiento
+viscoelástico más allá de la tasa de caída volumétrica, así que no se puede
+introducir un factor de pérdidas del material.
+
+Y aquí no hay ningún paquete de acústica de salas. No hay importador de
+geometría, ni biblioteca de materiales, ni trazador de rayos, ni auralización,
+ni solucionador 3D: los obstáculos se rasterizan sobre la malla a partir de
+formas que defines tú, y la salida es un campo que analizas tú.
+
+## Antes y después de estas páginas
+
+Los campos que producen estos solucionadores se leen con las mismas
+herramientas que una medición: el filtrado, la ponderación y las funciones de
+nivel de [Análisis de señal](/phonometry/es/signals/), con [Construye un
+sonómetro](/phonometry/es/signals/sound-level-meter/) recorriendo esa cadena de
+principio a fin en una sola página ejecutable. No hay página de referencia de
+teoría para los solucionadores; las derivaciones, las condiciones de
+estabilidad y los oráculos analíticos se quedan dentro de las dos guías de
+arriba.
+
+Si has llegado aquí desde una búsqueda y quieres la forma de la biblioteca
+entera, [¿Qué necesitas medir?](/phonometry/es/start/tasks/) la indexa por el
+trabajo y [Todas las guías](/phonometry/es/start/guides/) lista todas las
+páginas con una línea sobre cada una.

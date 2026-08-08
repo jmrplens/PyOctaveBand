@@ -1,10 +1,10 @@
 ---
 title: "Por qué phonometry"
-description: "La filosofía de diseño basada en conformidad: un caso de estudio de ponderación temporal IEC 61672-1, la batería numérica de conformidad y comparación con otras librerías."
+description: "La filosofía de diseño basada en conformidad: un caso de estudio de ponderación temporal IEC 61672-1, la batería numérica de conformidad, el registro de defectos encontrados en las propias normas publicadas y cómo se compara phonometry con otras librerías de Python."
 ---
 
 import ThemeImage from '../../../../components/ThemeImage.astro';
-import { totalChecks, domains, standards } from '../../../../data/conformance-stats.mjs';
+import { totalChecks, domains, standards, errataEntries } from '../../../../data/conformance-stats.mjs';
 
 phonometry es un conjunto de herramientas de medición acústica basado en
 normas. Su elemento diferenciador no es la lista de funcionalidades, sino cómo
@@ -41,6 +41,30 @@ significa "ponderación temporal exponencial": los eventos pasados se olvidan
 exponencialmente. Un polo en el eje real positivo crece sin límite; el reinicio
 por bloques lo oculta, pero cambia la naturaleza de la medición.
 
+De esa ecuación salen además los valores de referencia del apartado siguiente, y
+vale la pena deducirlos una vez en lugar de dar por buena la Tabla 4. Intégrala
+partiendo del reposo sobre una ráfaga de duración $T_b$ y la envolvente alcanza
+$(1-e^{-T_b/\tau})$ del valor estacionario que acabaría produciendo ese mismo
+tono, así que el nivel máximo con ponderación temporal respecto del régimen
+estacionario es
+
+$$
+\delta_{\text{ref}} = 10\lg\!\left(1 - e^{-T_b/\tau}\right)
+$$
+
+que es la Ecuación (7) de IEC 61672-1:2013. Con $\tau_F = 0,125$ s da
+−0,98 dB a 200 ms, −4,82 dB a 50 ms, −11,14 dB a 10 ms y −20,99 dB a
+1 ms: la columna «Objetivo IEC» entera de la Tabla 4, con el redondeo de la
+propia norma. CI exige la identidad en todas las filas de Fast y Slow
+(`test_delta_ref_equation7_consistency`, con una tolerancia de 0,15 dB), de modo
+que la transcripción de la tabla está comprobada y no simplemente creída.
+
+La consecuencia sostiene el resto de esta página. Como la respuesta es una
+función suave de $T_b/\tau$, un detector que resuelva de verdad la ecuación
+sigue la columna entera de una vez; un detector que promedia sobre bloques fijos
+de 125 ms no tiene ningún $T_b$ dentro, y solo puede acertar allí donde la
+ráfaga llene un bloque por casualidad.
+
 ## Verificación frente a IEC 61672-1 (ráfagas de tono)
 
 La prueba rigurosa para la ponderación temporal es la **respuesta a ráfaga de
@@ -65,7 +89,7 @@ los números de abajo verifican la *balística*, no un instrumento completo. Los
 mismos valores de referencia están transcritos en
 `tests/filters/test_iec_compliance.py` para F y S y para la columna $L_{AE}$.
 
-**Resultados de phonometry (FAST):**
+**Resultados de phonometry (ponderación Fast):**
 
 | Duración de la ráfaga | Objetivo IEC (dB) | Límite clase 1 (dB) | phonometry (dB) | Error (dB) | Estado |
 | :--- | :--- | :--- | :--- | :--- | :--- |
@@ -74,8 +98,8 @@ mismos valores de referencia están transcritos en
 | 10 ms | −11,1 | ±1,0 | −11,14 | −0,04 | ✅ PASA |
 | 1 ms | −21,0 | +1,0 / −2,0 | −20,99 | +0,01 | ✅ PASA |
 
-**Resultados de python-acoustics (FAST, pasando la señal al cuadrado como
-requiere esa librería):**
+**Resultados de python-acoustics (ponderación Fast, pasando la señal al cuadrado
+como requiere esa librería):**
 
 | Duración de la ráfaga | Objetivo IEC (dB) | Límite clase 1 (dB) | python-acoustics (dB) | Error (dB) | Estado |
 | :--- | :--- | :--- | :--- | :--- | :--- |
@@ -122,6 +146,19 @@ que las filas de phonometry se pueden reproducir directamente.
 
 ## Verificación por conformidad en toda la librería
 
+Una nota sobre qué es una **clase de prestaciones**, ya que todos los veredictos
+de esta página lo son. En IEC 61672-1 e IEC 61260-1 una clase no es un grado de
+exactitud, sino una banda de tolerancia con nombre alrededor de una respuesta
+nominal: la clase 1 es la banda estrecha, pensada para trabajo de precisión, y
+la clase 2 la ancha, para reconocimientos generales, y las dos se ensanchan en
+los extremos del rango de frecuencias, que es donde más cuesta cumplirlas. La
+clase 0 era una banda todavía más estrecha, de la edición retirada de 1995 de
+IEC 61260, y aquí se mantiene como objetivo adicional voluntario para el banco
+Butterworth por defecto. Así que un PASA en esta página significa que la
+respuesta calculada no se sale nunca de la banda que dibuja la norma; no
+significa que el error sea cero, y el tamaño del margen es el número
+interesante.
+
 El caso de las ráfagas de tono de arriba no es una comprobación aislada. Para
 cada norma que la librería implementa, los valores de referencia y los límites
 de aceptación se transcriben del texto oficial a la batería de tests, de modo
@@ -139,6 +176,7 @@ metrología:
 | ECMA-418-1:2024 | Prominencia tonal TNR/PR: anchos de banda críticos, separación de proximidad y criterios de prominencia frente a los ejemplos resueltos de los apartados 10–12 | `tests/psychoacoustics/quality/test_tonality.py` |
 | ISO 1996-1:2016 | `lden()`, `ldn()` y `composite_rating_level()` frente a valores de las fórmulas calculados a mano | `tests/environment/assessment/test_rating.py` |
 | IEC 60942:2017 Tabla 2 | Límites de estabilidad a corto plazo del calibrador (dependientes de la frecuencia, clase 1) en `sensitivity()` | `tests/metrology/test_calibration_validation.py` |
+| IEC 61252:1993 | Las magnitudes de exposición sonora personal, `sound_exposure()` y el nivel normalizado a 8 h `lex_8h()` | `tests/signals/test_levels.py` |
 
 La misma disciplina se aplica mucho más allá del núcleo de metrología: hoy la
 batería ejecuta {totalChecks} comprobaciones numéricas de conformidad en {domains} dominios y
@@ -151,17 +189,20 @@ completo (el valor esperado y el valor que calcula la librería para cada
 comprobación, regenerado en cada pull request) está publicado como
 [informe de conformidad](/phonometry/es/reference/conformance/).
 
-Más allá de la dosis de ruido al estilo IEC 61252 (`sound_exposure()`,
-`lex_8h()`), la misma mentalidad de "primero la norma" se refleja en la parte
-numérica: los bancos de filtros sitúan sus puntos de −3 dB en los bordes de
-banda de **ANSI S1.11 / IEC 61260-1** para todas las arquitecturas (incluidos
-Chebyshev II y Bessel, donde la parametrización cruda de scipy no lo haría),
-el banco Butterworth por defecto se verifica también frente a la clase 0, más
+La misma costumbre de "primero la norma" aparece por debajo del nivel de las
+métricas completas, en la parte numérica. Los bancos de filtros sitúan sus
+puntos de −3 dB en los bordes de banda de **ANSI S1.11 / IEC 61260-1** para las
+tres arquitecturas cuya parametrización lo permite, Butterworth, Chebyshev II y
+Bessel, las dos últimas mediante correcciones que la parametrización cruda de
+scipy no aplicaría; Chebyshev I y el elíptico leen esos mismos bordes como su
+borde de banda de paso con rizado constante, algo que se declara con su coste
+medido en [Bancos de filtros](/phonometry/es/signals/filters/filter-banks/). El
+banco Butterworth por defecto se verifica también frente a la clase 0, más
 estricta, de la edición retirada IEC 61260:1995 / ANSI S1.11-2004 además de
-frente a la clase 1 vigente, y la ponderación A/C se mantiene dentro de las
+frente a la clase 1 vigente. Y la ponderación A/C se mantiene dentro de las
 tolerancias de clase 1 hasta 16 kHz a las frecuencias de muestreo habituales
-gracias al sobremuestreo interno (consulta
-[Ponderación frecuencial](/phonometry/es/signals/levels/weighting/)).
+gracias al sobremuestreo interno (consulta [Ponderación
+frecuencial](/phonometry/es/signals/levels/weighting/)).
 
 ## Cuando lo que está mal es la fuente
 
@@ -179,7 +220,7 @@ puede ser correcto, la evidencia independiente y la lectura que implementa la
 librería. Cuando esa lectura cambia algún número que la librería reporta, la
 entrada nombra la comprobación o el test que lo fija; cuando no lo cambia,
 porque el defecto es una etiqueta, una referencia cruzada o una tabla que la
-librería nunca lee, la entrada lo dice así. Ya son decenas, entre
+librería nunca lee, la entrada lo dice así. Ya son {errataEntries}, entre
 normas, documentos de guía, libros y artículos de revista, cada uno marcado
 como reportado al organismo emisor o no. Un defecto listado ahí nunca es un
 defecto del método: en todos los casos la lectura pretendida se ha podido
@@ -191,8 +232,8 @@ desde otra implementación hereda lo que la errata le hiciera hacer, y nada en
 
 ## Dónde encaja phonometry en el ecosistema Python
 
-- **python-acoustics** se archivó en febrero de 2024 y ya no se mantiene. Su
-  comparación de arriba refleja el último código publicado.
+- **python-acoustics** se archivó en febrero de 2024 y ya no se mantiene; la
+  comparación de arriba se ejecutó contra su última versión publicada.
 - **acoustic-toolbox**, el sucesor comunitario de python-acoustics, construye
   sus ponderaciones temporal y frecuencial de IEC 61672-1 sobre `pyoctaveband`,
   el nombre anterior de esta biblioteca, que desde la 2.1.0 es un envoltorio

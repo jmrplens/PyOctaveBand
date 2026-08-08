@@ -10,7 +10,20 @@ sonido dependiente de la profundidad, refracta el sonido en canales que lo
 transportan durante kilómetros. Esta sección cubre la disciplina siguiendo la
 cadena fuente-camino-receptor del resto de la biblioteca.
 
-La mitad de **fuente**, en
+Esa diferencia de referencia es la trampa más habitual para quien llega desde
+la acústica aérea, y conviene zanjarla antes que nada. La misma presión
+expresada re 1 µPa es **26 dB mayor** que expresada re 20 µPa, y eso es
+aritmética. Encima de eso, la misma presión en el agua transporta muchísima
+menos intensidad que en el aire, porque la impedancia característica del agua
+de mar es unas 3 700 veces la del aire. Un 120 dB submarino y un 120 dB aéreo
+describen, por tanto, situaciones físicas completamente distintas, y los dos no
+deben compararse nunca. La regla que sigue esta sección es sencilla: todo nivel
+lleva su referencia explícita, una conversión entre ambos convenios es puro
+recambio de referencia y nunca una equivalencia energética, y el único sitio
+donde aparece aquí la referencia aérea es en los dos grupos auditivos de
+carnívoros en aire de la página de exposición.
+
+La etapa de **fuente**, en
 [Acústica submarina: ruido radiado e hincado de pilotes](/phonometry/es/underwater/underwater-acoustics/),
 establece la terminología de ISO 18405 (niveles SPL, SEL y de pico y sus
 referencias) y la aplica a dos casos de medición regulados: los buques, con
@@ -19,7 +32,7 @@ equivalente de ISO 17208-2 mediante la corrección de superficie del espejo
 de Lloyd, y el hincado percusivo de pilotes, con la exposición sonora de un
 golpe, de pico y acumulada de ISO 18406.
 
-La mitad de **camino** abarca ahora dos páginas. La primera,
+La etapa de **camino** abarca dos páginas. La primera,
 [Propagación submarina del sonido](/phonometry/es/underwater/underwater-propagation/),
 predice lo que el mar hace con ese sonido en forma cerrada: divergencia
 geométrica más absorción volumétrica (Francois-Garrison, Ainslie-McColm o
@@ -34,7 +47,7 @@ calcula el campo en su lugar: la expansión en modos normales, el trazado de
 rayos y la ecuación parabólica split-step de Fourier, con la guía para
 elegir entre ellos y las formas cerradas.
 
-Una mitad de **receptor** cierra el círculo.
+Una etapa de **receptor** cierra el círculo.
 [Exposición a ruido de mamíferos marinos](/phonometry/es/underwater/marine-mammal-exposure/)
 toma el nivel que producen una fuente y un camino y pregunta qué le hace a los
 animales que lo oyen: los audiogramas de grupo de Southall et al., las
@@ -64,3 +77,57 @@ de teoría.
   audiogramas de grupo, las funciones de ponderación auditiva regulatorias con
   la versión de guía seleccionable, los criterios de inicio de TTS y de lesión,
   y una evaluación trabajada de hincado de pilotes.
+
+## Qué no cubre esta sección
+
+**La disciplina de medida no está implementada, solo su aritmética.** El
+promediado de cuatro pasadas y tres hidrófonos de la ISO 17208-1, sus
+comprobaciones de geometría de CPA y profundidad de agua, el puntuado de su
+ventana de datos de ±30° y su corrección de ruido de fondo quedan a cargo del
+operador; la biblioteca aporta los niveles de ruido radiado y de fuente
+monopolar en forma cerrada que vienen después. La propia ISO 18406 excluye el
+vibrohincado y las tablestacas de su alcance, así que el ruido del hincado
+continuo no tiene forma cerrada aquí ni en ningún otro lugar de la biblioteca.
+
+**El lecho marino es delgado.** La página de formas cerradas lo modela como una
+reflexión de Rayleigh fluido-fluido sin pérdidas, así que la atenuación del
+sedimento queda fuera de alcance, y los tres solvers asumen una columna de agua
+**independiente de la distancia**, sin fondo absorbente ni elástico y sin
+batimetría real — lo que deja fuera por completo los problemas dependientes de
+la distancia. El solver de rayos devuelve caminos y tiempos de propagación pero
+no amplitudes (sin intensidad de tubo de rayos, sin corrección de cáusticas), y
+la ecuación parabólica es la forma estándar de ángulos pequeños de Tappert y no
+una variante de gran angular de Padé. Para la física del lecho elástico que
+estos solvers fluidos dejan fuera, el [solucionador de ondas
+elásticas](/phonometry/es/simulation/elastic-waves/) es lo más parecido que
+tiene la biblioteca.
+
+**La página de exposición evalúa la audición, no la conducta.** Solo se
+implementan los criterios de efecto auditivo; los umbrales de perturbación
+conductual, de los que dependen las estimaciones de hostigamiento, quedan fuera
+de alcance. Nada elige por ti el grupo auditivo ni el periodo de acumulación, y
+nada modela el movimiento del animal respecto a la fuente, de modo que la
+exposición acumulada que informa es el caso peor de receptor estático. No hay
+audiograma para los cetáceos de baja frecuencia, porque la publicación de origen
+no imprime uno de sus parámetros.
+
+Dos límites menores: el espectro de ruido ambiente deja fuera la banda de
+turbulencia de baja frecuencia y no lleva ningún modelo integrado de tráfico
+marítimo lejano — hay que aportar un espectro de tráfico propio — y la ecuación
+de sonar activo es solo monostática.
+
+## Antes y después de estas páginas
+
+Todo nivel de aquí es un nivel re 1 µPa calculado a partir de un registro de
+hidrófono, así que la calibración, la ponderación y la estimación espectral que
+hay detrás están en [Análisis de señal](/phonometry/es/signals/), y [Construye
+un sonómetro](/phonometry/es/signals/sound-level-meter/) recorre esa cadena de
+principio a fin en una sola página ejecutable, en aire pero con las mismas
+funciones. La teoría submarina está deliberadamente fuera de la referencia de
+teoría: vive junto a las cuatro guías de arriba, donde se introduce con ellas el
+sistema de magnitudes de la ISO 18405.
+
+Si has llegado aquí desde una búsqueda y quieres la forma de la biblioteca
+entera, [¿Qué necesitas medir?](/phonometry/es/start/tasks/) la indexa por el
+trabajo y [Todas las guías](/phonometry/es/start/guides/) lista todas las
+páginas con una línea sobre cada una.

@@ -26,8 +26,10 @@ y [Acústica de salas](/phonometry/es/buildings/rooms/room-acoustics/): la respu
 impulso que adquiere la primera y los parámetros que deriva la segunda son el
 vocabulario que habla el resto de la sección. Si tu interés es el
 aislamiento, sigue con
-[Medición del aislamiento en campo (ISO 16283)](/phonometry/es/buildings/insulation/insulation-field/);
-si es la predicción en fase de diseño, ve a
+[Medición del aislamiento en campo (ISO 16283)](/phonometry/es/buildings/insulation/insulation-field/),
+y ten en cuenta que las fuentes de impacto distintas de la máquina de impactos
+tienen página propia, porque ISO 16283-2 es el apartado con el que suele llegar
+un técnico de campo; si es la predicción en fase de diseño, ve a
 [Predicción del tiempo de reverberación (Sabine, Arau)](/phonometry/es/buildings/rooms/reverberation-prediction/)
 y [Predicción del aislamiento acústico (EN 12354)](/phonometry/es/buildings/design/insulation-prediction/).
 
@@ -70,6 +72,10 @@ laboratorio y predicho a partir de datos de elemento.
   la vía de potencia directa hacia los mismos índices cuando hay muchos flancos.
 - [Método de control del aislamiento (ISO 10052)](/phonometry/es/buildings/insulation/insulation-survey/):
   el método de control en bandas de octava y su índice de reverberación.
+- [Fuentes de impacto pesadas y blandas (ISO 16283-2)](/phonometry/es/buildings/insulation/heavy-impact-sources/):
+  la pelota de caucho y la máquina de neumático, el nivel de exposición a la
+  fuerza de impacto que las especifica y el número único del anexo D de
+  ISO 717-2.
 - [Transmisión por flancos en laboratorio (ISO 10848)](/phonometry/es/buildings/insulation/flanking-lab/):
   el índice de reducción de vibraciones de unión medido y los descriptores de
   flanco.
@@ -107,3 +113,45 @@ datos de elemento y a partir de la física del propio elemento.
 - [Rigidez dinámica de materiales resilientes (EN 29052-1)](/phonometry/es/materials/resilient/dynamic-stiffness/):
   la medición por resonancia de placa de carga detrás de toda predicción de
   suelo flotante.
+
+## Qué no cubre esta sección
+
+**La biblioteca empieza después del micrófono y se detiene antes de la
+geometría.** Del lado de la medición, cada función toma niveles por bandas ya
+promediados sobre las posiciones y ya corregidos por el ruido de fondo: el
+número de posiciones, los procedimientos de baja frecuencia, los mínimos de
+señal frente al ruido de fondo y las cualificaciones de la instalación de
+ensayo de ISO 16283, ISO 10140 e ISO 3382 son cosa del operador, y aquí nada
+comprueba que se hayan cumplido. Del lado de la predicción, los índices
+globales de los elementos, los índices de unión y las mejoras de los
+revestimientos son entradas que aportas tú desde una medición o desde el propio
+anexo de una norma; ninguna se deriva de un plano.
+
+**Aquí no hay ningún solucionador de ondas ni ningún modelo de sala.** No hay
+importador de geometría, ni base de datos de materiales, ni trazador de rayos,
+ni auralización: las páginas de sala toman dimensiones, coeficientes de
+absorción y respuestas al impulso y devuelven parámetros, y el modelo de
+fuentes imagen es solo especular. Un campo real a baja frecuencia en una forma
+real es la [simulación de ondas](/phonometry/es/simulation/).
+
+**Y una predicción no es un veredicto.** Los índices globales y los índices
+nacionales se calculan aquí, pero los valores límite frente a los que se juzgan
+son nacionales — el código español está implementado como ejemplo resuelto de
+uno de esos marcos, no como la regla en todas partes — y la exigencia sale
+siempre de tu reglamentación.
+
+## Antes y después de estas páginas
+
+Toda magnitud de estas páginas parte de niveles por bandas o de una respuesta
+al impulso filtrada, así que la calibración, la ponderación y el filtrado en
+octavas fraccionales que hay detrás están en [Análisis de
+señal](/phonometry/es/signals/), y [Construye un
+sonómetro](/phonometry/es/signals/sound-level-meter/) recorre esa cadena de
+principio a fin en una sola página ejecutable. Las derivaciones están en la
+[teoría de salas y edificación](/phonometry/es/reference/theory/rooms-buildings/),
+desde la integración de Schroeder hasta las sumas de trayectos de EN 12354.
+
+Si has llegado aquí desde una búsqueda y quieres la forma de la biblioteca
+entera, [¿Qué necesitas medir?](/phonometry/es/start/tasks/) la indexa por el
+trabajo y [Todas las guías](/phonometry/es/start/guides/) lista todas las
+páginas con una línea sobre cada una.

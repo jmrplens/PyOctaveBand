@@ -13,8 +13,39 @@ dB SPL / dBFS que el resto de la biblioteca) y lleva consigo su **calidad
 estadística**, de modo que un espectro no es solo una curva, sino una curva
 con su intervalo de confianza.
 
+Bajo esa disciplina hay ocho páginas, en seis familias: los estimadores del
+dominio de la frecuencia ([análisis
+espectral](/phonometry/es/signals/spectra/spectral-analysis/), [coherencia
+múltiple y parcial](/phonometry/es/signals/spectra/miso-coherence/)), el
+terreno intermedio tiempo-frecuencia
+([espectrogramas](/phonometry/es/signals/spectra/time-frequency/)), los métodos
+sobre la forma del espectro
+([cepstro](/phonometry/es/signals/spectra/cepstrum-echoes/)), los métodos del
+dominio del período ([promediado
+síncrono](/phonometry/es/signals/spectra/synchronous-averaging/)), los
+estimadores del dominio del tiempo ([correlación y
+retardo](/phonometry/es/signals/spectra/correlation-delay/)), y la caja de
+herramientas de estímulo y de sistema ([señales de
+prueba](/phonometry/es/signals/spectra/test-signals/), [medición de
+sistemas](/phonometry/es/signals/spectra/system-measurement/)).
+
+Se diferencian en lo que estiman y comparten dos decisiones. La primera es la
+**longitud de segmento**. Fija el ancho de banda de resolución de una PSD, la
+forma de celda de un espectrograma, el número de promedios que hay detrás de
+cada intervalo de confianza, el retardo más largo que puede ver una
+correlación cruzada generalizada y los grados de libertad que le quedan a una
+estimación MISO condicionada, así que elegirla una vez y mantenerla es lo que
+hace mutuamente consistentes una PSD, una coherencia y un retardo calculados
+sobre el mismo registro. La segunda es la **estacionariedad**. Todo promedio
+de estas páginas, y toda fórmula de error citada a su lado, supone que el
+proceso no derivó mientras se grababa, que es exactamente lo que deciden los
+tests de [calificación de
+datos](/phonometry/es/signals/metrology/data-qualification/); cuando un
+registro no los pasa, las herramientas honestas son las vistas de tiempo corto
+y no las promediadas.
+
 [Análisis espectral calibrado](/phonometry/es/signals/spectra/spectral-analysis/) es
-la mitad del dominio de la frecuencia. Los estimadores de Welch de densidad
+donde empieza la familia del dominio de la frecuencia. Los estimadores de Welch de densidad
 espectral de potencia y cruzada reportan su número efectivo de promedios, sus
 errores aleatorios normalizados y sus intervalos de confianza chi-cuadrado;
 el espectro de salida coherente separa una salida medida en la parte
@@ -51,7 +82,7 @@ peine sobre un orden interferente lo rechaza mucho mejor que la potencia de
 dos habitual.
 
 [Correlación, retardo y envolvente](/phonometry/es/signals/spectra/correlation-delay/)
-es la mitad del dominio del tiempo. La autocorrelación y la correlación
+es donde empieza su contrapartida en el dominio del tiempo. La autocorrelación y la correlación
 cruzada vienen con las normalizaciones y los errores aleatorios de Bendat y
 Piersol; la estimación del retardo ofrece el correlador directo, la pendiente
 de fase del espectro cruzado y las ponderaciones de la correlación cruzada
@@ -61,13 +92,17 @@ submuestral; y la transformada de Hilbert produce la envolvente con fase y
 frecuencia instantáneas.
 
 [Señales de prueba y herramientas de muestreo](/phonometry/es/signals/spectra/test-signals/)
-es la caja de herramientas en la que se apoyan las otras dos: salvas de tono
+es la caja de herramientas que hay debajo de todo lo demás: salvas de tono
 con la conmutación exacta de IEC 60268-1 (inicio en el paso por cero, número
-entero de períodos completos, trenes repetitivos), remuestreo polifásico
-tras una especificación antialias explícita cuyo filtro diseñado viaja con
-el resultado, y retardo fraccionario de banda limitada con frontera lineal o
-circular, que comparte su núcleo con la alineación submuestral de respuestas
-al impulso.
+entero de períodos completos, trenes repetitivos) que ejercitan las balísticas
+del detector, remuestreo polifásico tras una especificación antialias
+explícita cuyo filtro diseñado viaja con el resultado y que necesita toda
+comparación entre frecuencias de muestreo distintas, y retardo fraccionario de
+banda limitada con frontera lineal o circular, cuyo núcleo comparten la
+alineación de respuestas al impulso de
+[Correlación, retardo y envolvente](/phonometry/es/signals/spectra/correlation-delay/)
+y la alineación de períodos no enteros de
+[Promediado síncrono en el tiempo](/phonometry/es/signals/spectra/synchronous-averaging/).
 
 [Medición de sistemas](/phonometry/es/signals/spectra/system-measurement/) orienta la
 caja de herramientas hacia la medición de los propios sistemas: los pares
@@ -138,3 +173,23 @@ Páginas de otras áreas del sitio en las que se apoya esta sección:
   medido: frecuencias BPFO, BPFI, BSF y de jaula de los rodamientos, bandas
   laterales de engrane, deslizamiento, paso de polos y armónicos de ranura de
   los motores de inducción, y tonos de paso de pala.
+
+## Qué no cubre esta sección
+
+Estos son los estimadores del libro de Bendat y Piersol, no un método de
+certificación: ninguna página de aquí lleva números de apartado ni límites de
+aceptación, y ningún resultado es un veredicto de cumplimiento. Faltan de
+verdad tres capacidades que un lector busca. **Las llegadas múltiples no se
+separan.** `time_delay` y `echo_detection` informan solo del mayor pico, así
+que un registro con un camino directo más varias reflexiones necesita
+localización manual de picos o llamadas repetidas sobre bandas más estrechas.
+**No hay geometría multisensor.** La estimación de retardo es por pares; no hay
+un solucionador TDOA incorporado, ni beamformer, ni localización de fuentes, y
+un sistema de varias salidas necesita una llamada a `miso_coherence` por
+salida. **No hay rasgos perceptuales.** El cepstro es el de frecuencia lineal,
+sin escala mel ni variante MFCC. Dos estimadores que comparten el núcleo de
+Welch de esta sección se documentan allí donde se usan: la función de
+transferencia y la coherencia ordinaria en
+[Electroacústica](/phonometry/es/devices/electroacoustics/electroacoustics/), y
+la sonda de intensidad de dos micrófonos en [Intensidad
+acústica](/phonometry/es/devices/emission/intensity/).

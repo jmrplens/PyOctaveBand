@@ -68,11 +68,19 @@ El método es la razón de ser del proyecto, y es deliberadamente estrecho:
 No todas las normas publican un ejemplo numérico. Cuando no lo hacen, la
 implementación se ancla a las expresiones en forma cerrada del texto normativo
 y se fija con un caso sintetizado a un resultado conocido, lo que es una
-garantía más débil que un ejemplo resuelto transcrito y así se etiqueta en el
-informe. Prefiero decirlo con claridad antes que redondearlo al alza.
+garantía más débil que un ejemplo resuelto transcrito. Esas comprobaciones lo
+dicen en el
+[informe de conformidad](/phonometry/es/reference/conformance/), en la propia
+celda del valor esperado y no como una marca aparte por la que pudieras
+filtrar: la expresión que hay que buscar es «forma cerrada» o «analítico».
+Prefiero decirlo con claridad antes que redondearlo al alza, y prefiero que
+sepas qué clase de evidencia tienes entre manos: una comprobación en forma
+cerrada demuestra que la implementación concuerda con las ecuaciones tal como
+están escritas, y no puede detectar una mala lectura del apartado del que
+salieron esas ecuaciones. Por eso existe a su lado el [registro de
+erratas](/phonometry/es/reference/errata/).
 
-Los números son públicos. El
-[informe de conformidad](/phonometry/es/reference/conformance/) recoge, para
+Los números son públicos: ese informe recoge, para
 cada comprobación, la norma y el apartado, el valor esperado normativo, el
 valor que calcula realmente la librería, la diferencia y un veredicto de apto o
 no apto; CI lo regenera en cada pull request, así que no puede desviarse del
@@ -104,9 +112,12 @@ originales saca a la luz de vez en cuando defectos en las propias fuentes:
 erratas de imprenta, ejemplos resueltos que contradicen su propio texto
 normativo, redacciones ambiguas. No los sorteo en silencio. Cada caso
 confirmado queda registrado en el
-[registro de erratas](https://github.com/jmrplens/phonometry/blob/main/docs/ERRATA.md)
-con la localización, la evidencia, la lectura que implementa la librería y si
-se ha comunicado al organismo emisor. El registro cubre por igual normas (ISO,
+[registro de erratas](/phonometry/es/reference/errata/) con la localización, la
+evidencia, la lectura que implementa la librería y si se ha comunicado al
+organismo emisor. Se mantiene como
+[`docs/ERRATA.md`](https://github.com/jmrplens/phonometry/blob/main/docs/ERRATA.md)
+en el repositorio y se trasplanta al sitio al compilar, así que los dos no
+pueden discrepar. El registro cubre por igual normas (ISO,
 IEC, EN), documentos de orientación e informes técnicos, libros de texto y
 artículos de revista. Si no estás de acuerdo con alguna de esas lecturas, esa
 es justo la clase de incidencia que quiero recibir.
@@ -125,7 +136,7 @@ la versión que hayas ejecutado realmente.
 APA:
 
 > Requena-Plens, J. M. (2026). *phonometry: acoustic measurement toolkit for
-> Python* (Versión 3.3.0) [Software].
+> Python (formerly PyOctaveBand)* (Versión 3.3.0) [Software].
 > https://doi.org/10.5281/zenodo.21215280
 
 BibTeX:
@@ -161,7 +172,33 @@ las normas que implementa, tal como se describe más arriba, pero no es un
 instrumento calibrado y no tiene ninguna acreditación. Decidir si un resultado
 es adecuado para tu propósito sigue siendo cosa tuya.
 
+En concreto, para los laboratorios y las consultoras para los que está escrita
+sobre todo: la librería calcula y documenta, no mide, así que **la trazabilidad
+se queda en la cadena de instrumentación** — un calibrador y un micrófono con
+certificados en vigor, e instrumentación con aprobación de modelo allí donde la
+medición tenga efectos legales. Las entidades de acreditación esperan que **el
+software de cálculo esté validado para su uso previsto y que quede registro de
+ello**, y el documento que sirve para eso es el informe de conformidad de la
+versión exacta que se ejecutó: fija la versión, archiva su informe junto con los
+datos de medición y guarda al lado el registro de erratas, ya que documenta cada
+punto en el que la lectura implementada difiere de una fuente impresa. Y la
+maquinaria de incertidumbre propaga lo que le des: la tolerancia del calibrador
+y la deriva antes/después siguen siendo cosa tuya.
+
 Las normas en sí tienen los derechos de autor de sus organismos emisores y no
 se redistribuyen aquí. Esta documentación cita apartados y valores de
 referencia en la medida necesaria para explicar y verificar las
 implementaciones; no sustituye a la compra de los documentos.
+
+## Adónde ir a partir de aquí
+
+Si has llegado hasta aquí y quieres empezar a usarla, [Primeros
+pasos](/phonometry/es/start/getting-started/) instala la librería y ejecuta un
+primer análisis calibrado, [¿Qué necesitas
+medir?](/phonometry/es/start/tasks/) encuentra la página de un trabajo
+concreto, y [Todas las guías](/phonometry/es/start/guides/) es el mapa de la
+biblioteca entera agrupada por temas. Si has venido a comprobar un número y no
+a instalar nada, el [informe de
+conformidad](/phonometry/es/reference/conformance/) y el [registro de
+erratas](/phonometry/es/reference/errata/) son las dos páginas que responden a
+eso.

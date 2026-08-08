@@ -13,10 +13,6 @@ funciones componibles, y todas las demás secciones de la documentación se
 apoyan en él: un modelo de sonoridad consume niveles de banda calibrados, un
 parámetro de sala parte de una respuesta al impulso filtrada, una valoración
 ambiental es un Leq ajustado.
-[Construye un sonómetro](/phonometry/es/signals/sound-level-meter/) monta esa
-cadena de principio a fin en una sola página ejecutable; es el mejor punto de
-partida si quieres ver el área entera en funcionamiento antes de abrir las
-guías de fondo.
 
 Alrededor de la cadena de niveles están las herramientas generales de
 análisis de señal: las **estimaciones espectrales calibradas** (PSD y
@@ -25,19 +21,47 @@ densidad espectral cruzada de Welch con intervalos de confianza), la
 todas expresadas con el análisis de error de Bendat y Piersol. Y dos
 preocupaciones transversales completan el núcleo. La **calibración** decide
 qué significan físicamente las muestras digitales: los resultados pueden
-referirse a un tono de calibrador medido o a una sensibilidad conocida
-(dB SPL), o quedarse en escala digital completa (dBFS). La **incertidumbre
-de medida** (la GUM y su suplemento de Monte Carlo) cualifica cualquier
-resultado calculado a partir de entradas inciertas, que es lo que hace
-defendible un número en un informe.
+referirse a un tono de calibrador medido (dB SPL), o quedarse en escala
+digital completa (dBFS). La **incertidumbre de medida** (la GUM y su
+suplemento de Monte Carlo) cualifica cualquier resultado calculado a partir de
+entradas inciertas, que es lo que hace defendible un número en un informe.
 
-Si acabas de llegar a la biblioteca, lee primero
-[Bancos de filtros](/phonometry/es/signals/filters/filter-banks/): presenta la
-descomposición en bandas que el resto de páginas da por supuesta. Después,
-[Niveles integrados y estadísticos](/phonometry/es/signals/levels/levels/) muestra las
-métricas en las que terminan la mayoría de las mediciones, y
-[Calibración y dBFS](/phonometry/es/signals/metrology/calibration/) las ancla a unidades
-físicas.
+Tres convenios recorren todas las páginas de abajo, y todos los snippets del
+sitio los dan por supuestos. Una señal es un array de NumPy de presión
+acústica con **el tiempo en el último eje**, así que un canal es `(n,)` y
+varios canales en paralelo son `(canales, muestras)`. La frecuencia de
+muestreo viaja siempre como argumento `fs` explícito: no se lee nada de la
+cabecera de un archivo, porque la biblioteca nunca abre el archivo. Y se
+espera que el array contenga **pascales**, que es la razón de que una función
+de nivel aplicada a muestras crudas de tarjeta de sonido devuelva un número
+con una referencia arbitraria, y de que toda función de nivel acepte también
+un `calibration_factor` en pascales por unidad digital o la salida de
+emergencia `dbfs=True`. Las métricas simples vuelven como floats y arrays; las
+más ricas vuelven como objetos de resultado inmutables que exponen `.plot()`.
+[Calibración y dBFS](/phonometry/es/signals/metrology/calibration/) resuelve el
+tercer convenio por completo, y [Multicanal y
+rendimiento](/phonometry/es/signals/filters/multichannel/) el primero.
+
+Dos maneras de entrar. Para ver la cadena entera funcionando de una vez,
+ejecuta [Construye un sonómetro](/phonometry/es/signals/sound-level-meter/):
+calibra contra un tono de calibrador, aplica las ponderaciones frecuencial y
+temporal, integra en Leq, SEL y niveles percentiles, divide la señal en bandas
+de octava y comprueba la clase de cada etapa, en una sola página ejecutable.
+Para aprender las piezas en orden de dependencia, empieza por [Bancos de
+filtros](/phonometry/es/signals/filters/filter-banks/), que presenta la
+descomposición en bandas que el resto de páginas da por supuesta, después
+[Niveles integrados y estadísticos](/phonometry/es/signals/levels/levels/) para
+las métricas en las que terminan la mayoría de las mediciones, y [Calibración
+y dBFS](/phonometry/es/signals/metrology/calibration/) para anclarlas a
+pascales.
+
+## [Construye un sonómetro](/phonometry/es/signals/sound-level-meter/)
+
+- [Construye un sonómetro](/phonometry/es/signals/sound-level-meter/): la cadena
+  entera montada en una sola página ejecutable (la calibración, las
+  ponderaciones frecuencial y temporal, los niveles integrados y estadísticos,
+  la descomposición en bandas y el veredicto de clase de cada etapa) como
+  introducción resuelta a las cuatro subsecciones de abajo.
 
 ## [Filtrado en octavas](/phonometry/es/signals/filters/)
 
@@ -115,8 +139,9 @@ calibrada y acompañada de su calidad estadística.
   frecuencia, la ley de reducción de ruido en raíz cuadrada, y la elección del
   número de promedios que sitúa un nodo del peine sobre un orden interferente
   (McFadden 1987).
-- [Frecuencias de fallo de máquinas](/phonometry/es/vibration/machinery/machine-diagnostics/):
-  las familias cinemáticas de frecuencias de fallo de la maquinaria rotativa
+- [Frecuencias de fallo de máquinas](/phonometry/es/vibration/machinery/machine-diagnostics/)
+  (en la sección de vibraciones): las familias cinemáticas de frecuencias de
+  fallo de la maquinaria rotativa
   (Norton y Karczub, sección 8.4) dibujadas sobre un espectro de envolvente
   medido: frecuencias BPFO, BPFI, BSF y de jaula de los rodamientos, bandas
   laterales de engrane, deslizamiento, paso de polos y armónicos de ranura de
@@ -140,8 +165,8 @@ calibrada y acompañada de su calidad estadística.
 Qué significan los números y cuánto fiarse de ellos.
 
 - [Calibración y dBFS](/phonometry/es/signals/metrology/calibration/): calibración SPL
-  física a partir de un tono de calibrador (IEC 60942) o de una sensibilidad
-  conocida, y el modo digital dBFS.
+  física a partir de un tono de calibrador (IEC 60942), la comprobación de
+  estabilidad que aplica a esa grabación, y el modo digital dBFS.
 - [Incertidumbre de medida (GUM y Monte Carlo)](/phonometry/es/signals/metrology/gum-uncertainty/):
   la ley de propagación de la incertidumbre y el método de Monte Carlo de
   ISO/IEC Guide 98-3, con incertidumbre expandida e intervalos de cobertura.
@@ -149,3 +174,38 @@ Qué significan los números y cuánto fiarse de ellos.
   de estacionariedad por inversiones de orden y por rachas sobre estadísticas
   de segmento, y las estadísticas de Rice de cruces por nivel y de picos con el
   factor de irregularidad.
+
+## Qué no cubre esta sección
+
+Faltan cuatro cosas que un lector espera razonablemente encontrar aquí, y cada
+guía lo dice en su propio bloque «No cubierto». **Aquí no se verifica ningún
+instrumento.** `verify_filter_class` y `verify_weighting_class` comprueban una
+respuesta digital diseñada frente a las tablas de tolerancias de IEC 61260-1 y
+de IEC 61672-1; los ensayos de evaluación de patrón de IEC 61672-3 que un
+sonómetro físico necesita para su aprobación de tipo, y los ensayos de
+conformidad del propio calibrador de IEC 60942, no se ejecutan, así que un
+veredicto de clase de aquí describe el algoritmo y no un aparato construido.
+**Aquí no se abre ningún archivo.** Nada en la biblioteca decodifica WAV, FLAC
+ni ningún otro contenedor: toda función toma un array que ya has leído, que es
+la razón de que `fs` sea siempre un argumento. **Aquí no hay procesado de
+arrays.** La correlación y el retardo modelan un único camino común entre
+exactamente dos sensores e informan solo del mayor pico; no hay un solucionador
+TDOA multisensor, ni beamformer, ni localización de fuentes. **Aquí no hay
+rasgos perceptuales.** El cepstro de aquí es el de frecuencia lineal, sin
+escala mel ni variante MFCC, y la sonoridad como sensación pertenece a
+[Psicoacústica](/phonometry/es/perception/psychoacoustics/), no a las métricas
+energéticas de esta sección.
+
+## Antes y después de estas páginas
+
+Las derivaciones que hay detrás de estas páginas están en la [teoría del
+análisis de señal](/phonometry/es/reference/theory/signal-analysis/): la rejilla
+de bandas, las curvas de ponderación, la integración temporal, la aproximación
+de intensidad y el marco de incertidumbre. Si todavía no has ejecutado nada,
+[Primeros pasos](/phonometry/es/start/getting-started/) instala la biblioteca y
+calibra un primer análisis.
+
+Si has llegado aquí desde una búsqueda y quieres la forma de la biblioteca
+entera, [¿Qué necesitas medir?](/phonometry/es/start/tasks/) la indexa por el
+trabajo y [Todas las guías](/phonometry/es/start/guides/) lista todas las
+páginas con una línea sobre cada una.

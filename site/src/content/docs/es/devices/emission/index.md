@@ -1,6 +1,6 @@
 ---
 title: "Potencia acústica e intensidad"
-description: "La emisión acústica total de una fuente: determinación de la potencia acústica por las rutas de presión, cámara reverberante y barrido de intensidad (series ISO 3740 e ISO 9614), la declaración de emisión de ruido de ISO 4871, y la intensidad acústica con dos micrófonos según IEC 61043 con los indicadores de campo de ISO 9614-1."
+description: "La emisión acústica total de una fuente: determinación de la potencia acústica por las rutas de presión, cámara reverberante, barrido de intensidad y vibración superficial (series ISO 3740 e ISO 9614, ISO/TS 7849), la declaración de emisión de ruido de ISO 4871, y la intensidad acústica con dos micrófonos según IEC 61043 con los indicadores de campo de ISO 9614-1."
 ---
 
 La magnitud central de esta sección es la **potencia acústica**: la energía
@@ -20,6 +20,20 @@ para los métodos directo y de comparación de ISO 3741, y
 [Potencia acústica por barrido de intensidad](/phonometry/es/devices/emission/sound-power-intensity/)
 para el barrido in situ de ISO 9614-2 y su grado de precisión ISO 9614-3.
 
+Una cuarta ruta no mide sonido en absoluto.
+[Potencia acústica desde la vibración superficial (ISO/TS 7849)](/phonometry/es/devices/emission/vibration-sound-power/)
+estima la potencia radiada a partir del nivel de velocidad promediado en la
+superficie y un factor de radiación, que es lo que queda cuando la máquina no
+puede llevarse a una sala calificada y su entorno es demasiado ruidoso para una
+superficie envolvente: la Parte 1 da un valor de límite superior solo con la
+velocidad, y la Parte 2 un valor de ingeniería una vez estimado como es debido
+el factor de radiación. Además responde a una pregunta algo distinta de la de
+las cuatro rutas acústicas — caracteriza lo que radia la *estructura*, y queda
+ciega al sonido que escapa por aberturas, tomas y salidas — y es el puente
+natural con las páginas de ruido estructural, porque esa misma velocidad
+superficial es la que mide [Vibración y ruido
+estructural](/phonometry/es/vibration/).
+
 Detrás de las rutas por intensidad está la propia **intensidad acústica**: el
 flujo de potencia con signo que puede localizar fuentes y separarlas del
 ruido de fondo, medido con una sonda de dos micrófonos según IEC 61043 y
@@ -30,7 +44,10 @@ Si vienes a medir una máquina, empieza por
 [Potencia acústica](/phonometry/es/devices/emission/sound-power/) y deja que su guía de
 decisión elija la ruta; lee
 [Intensidad acústica (p-p)](/phonometry/es/devices/emission/intensity/) cuando esa ruta
-implique una sonda de intensidad. El nivel de potencia determinado es la
+implique una sonda de intensidad, y ve a
+[Potencia acústica desde la vibración superficial](/phonometry/es/devices/emission/vibration-sound-power/)
+cuando la máquina no pueda salir de su instalación y el fondo sea demasiado
+alto para cualquier método de presión. El nivel de potencia determinado es la
 referencia contra la que se juzgan las medidas correctoras de las páginas de
 [Control de ruido](/phonometry/es/devices/noise-control/).
 
@@ -53,3 +70,29 @@ referencia contra la que se juzgan las medidas correctoras de las páginas de
   el valor de ingeniería de la Parte 2.
 - [Potencia acústica por barrido de intensidad](/phonometry/es/devices/emission/sound-power-intensity/):
   el barrido in situ de ISO 9614-2 y el grado de precisión ISO 9614-3.
+
+## Qué no cubre esta sección
+
+Los métodos de determinación empiezan después de haber calificado el recinto y
+la sonda. La calificación de campo libre de una sala anecoica o semianecoica de
+ISO 3745, la calificación de la cámara reverberante de ISO 3741 (recuento de
+frecuencias propias o comparación con una fuente de referencia) y el ensayo de
+intensidad residual de IEC 61043 de una cadena de sonda y analizador se **dan
+por supuestos, no se ejecutan**: la biblioteca avisa de los criterios
+orientativos gruesos que las normas declaran explícitamente — el volumen mínimo
+de la Tabla 1, el número de posiciones, una dispersión entre posiciones superior
+a 1,5 dB, la validez de K₂ en ISO 3744 — y califica un índice de intensidad
+residual que has medido tú. La corrección meteorológica C₃ de ISO 3745
+necesita igualmente un coeficiente de absorción del aire que aportas tú; aquí no
+se calcula a partir de ISO 9613-1.
+
+Una vía falta a propósito: **la suma de potencia en puntos fijos discretos de
+ISO 9614-1 no está implementada en absoluto**, y sí lo están solo sus
+indicadores de campo del Anexo A, reutilizados por las dos partes de barrido. En
+la vía de vibración, los apartados de medición 5 a 7 de ambas partes de ISO/TS
+7849 son práctica de laboratorio y no código, y solo está implementado el factor
+de radiación de una sola máquina de la Fórmula 8, así que una determinación de
+lote o de familia necesita un valor ya promediado. Por último, aquí no se reduce
+la emisión de ninguna máquina: silenciar una fuente es [Control de
+ruido](/phonometry/es/devices/noise-control/), y un valor de emisión declarado
+es la entrada de ese trabajo, no su resultado.

@@ -4,10 +4,13 @@ description: "Caracterizar y predecir absorbentes acústicos: la medición en c�
 ---
 
 Un absorbente puede caracterizarse a tres escalas, y esta subsección las
-recorre en orden: el producto terminado en una cámara reverberante, la
-muestra pequeña en un tubo de impedancia y la materia prima en un banco de
-flujo, con los modelos de predicción que atan las tres y los diseños de
-metamaterial que los llevan más allá de las reglas clásicas de espesor.
+recorre desde el producto terminado hacia dentro: el producto montado en una
+cámara reverberante, la materia prima en un banco de flujo y la muestra
+pequeña en un tubo de impedancia — el banco de flujo antes que el tubo porque
+la resistividad que mide es el único parámetro del que parte todo modelo
+contra el que se ajusta el tubo. Después vienen los modelos de predicción que
+atan las tres escalas, y los diseños de metamaterial que las llevan más allá
+de las reglas clásicas de espesor.
 
 [Medida y clasificación de la absorción sonora](/phonometry/es/materials/absorbers/absorption-measurement/)
 es la escala de producto: la medición en cámara reverberante ISO 354 del
@@ -63,3 +66,22 @@ el solucionador de diseño y la validación cruzada FDTD de la celda mallada.
 - [Metaabsorbentes](/phonometry/es/materials/absorbers/metamaterial-absorbers/): la
   condición de acoplamiento crítico y el panel ranurado de sonido lento con
   su solucionador de diseño.
+
+## Qué no cubre esta sección
+
+Ninguna de estas páginas cualifica un laboratorio. Los requisitos de sala del
+anexo A de ISO 354 — el número de posiciones de altavoz y de micrófono, los
+elementos difusores — no se comprueban; las funciones convierten un par de
+decaimientos ya medido y solo avisan cuando el volumen de la sala o el área de
+la muestra se sale de los límites del apartado 6. Se citan dos ediciones que no
+están implementadas: el código sigue el método de la función de transferencia
+de ISO 10534-2 de 1998/2001, no la edición de 2023, y ASTM E2611-19, no
+E2611-24. Los refinamientos del recorrido de la sonda de ISO 10534-1
+(extrapolar los mínimos hasta la cara de la muestra, correcciones por el cuerpo
+de la sonda) se describen pero no se automatizan. Los modelos de predicción van
+en un solo sentido: convierten una resistividad en una impedancia, y no hay
+ningún solver inverso que recupere los parámetros del material a partir de una
+curva medida. Y ninguna norma de medida gobierna los diseños de metamaterial —
+un panel construido se verifica en el tubo de impedancia o en la cámara
+reverberante como cualquier otro absorbente, y por eso esa página da una
+predicción y no una valoración.

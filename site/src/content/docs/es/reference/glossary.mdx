@@ -1,6 +1,6 @@
 ---
 title: "Glosario"
-description: "Todas las magnitudes acústicas que calculan las guías, con su símbolo, una definición de una frase, su unidad, la norma y el apartado que la define y la guía que la implementa."
+description: "Las magnitudes acústicas que más a menudo calculan las guías, cada una con su símbolo, una definición de una frase, su unidad, la norma y el apartado que la define y la guía que la implementa."
 ---
 
 import Glossary from '../../../../components/Glossary.astro';
@@ -9,10 +9,11 @@ Cada guía empieza por la norma que implementa, así que una magnitud siempre
 queda definida allí donde se usa. Esta página va en sentido contrario: tienes un
 símbolo, sacado de un informe, de un pliego o del correo de un colega, y quieres
 saber qué es, en qué se mide, qué documento lo define y dónde se calcula en esta
-documentación.
+documentación. Una magnitud que no esté aquí sigue estando definida allí donde
+se calcula: toda guía enuncia sus magnitudes antes de su código.
 
-Dos convenios rigen la línea que dice dónde queda definida cada magnitud, y
-pesan más de lo que parece. Cuando
+Dos convenios rigen la línea que dice dónde queda definida cada magnitud, y los
+dos pesan más de lo que parece. Cuando
 aparece un apartado, una fórmula o una tabla, es el que cita la implementación,
 tomado de la norma que implementa la guía. Cuando solo aparece una designación,
 la norma está establecida pero el apartado que define la magnitud no se enuncia
@@ -20,14 +21,52 @@ en ninguna parte de esta documentación, y inventar uno verosímil sería peor q
 omitirlo. Unas pocas magnitudes no tienen norma aplicable: su fuente es el
 artículo o el libro del que sale el modelo, citado como tal.
 
-Los símbolos chocan entre dominios, y el glosario no disimula. *R* es el índice
-de reducción acústica en edificación, la resistencia al flujo de aire en
-materiales, la aspereza en psicoacústica y la variable de tensión acumulada en
-ISO 2631-5. Sigma es la resistividad al flujo de aire de un material poroso y la
-eficiencia de radiación de una placa. *A* es un área de absorción equivalente y
-una acelerancia. *L*<sub>N</sub> es un nivel percentil aquí y un nivel de
-sonoridad en fonios allá. El símbolo se lee junto con su dominio, y para eso
-sirve la agrupación de abajo.
+Un tercer convenio rige la unidad, y es el que más a menudo se pierde entre una
+medición y un informe. Un decibelio es siempre un cociente, así que una entrada
+cuya unidad diga *re* algo — dB re 20 µPa en aire, dB re 1 µPa en agua, dB re
+1 pW para potencia, dB re 1 pW/m² para intensidad, dB re 50 nm/s para un nivel
+de velocidad — es un **nivel absoluto**, y la magnitud de referencia forma parte
+de la unidad. Una entrada cuya unidad es un dB a secas es una **diferencia de
+niveles o un índice**: $D$, $R$, $R_w$, $C$, $C_{tr}$, $\Delta L_w$, $K_{ij}$,
+donde la referencia se cancela y no aplica ninguna. Dos números solo se pueden
+sumar o restar cuando son de la misma clase, y el error más común en un informe
+es restar dos niveles referidos a magnitudes distintas, o sumar un índice a un
+nivel.
+
+## Símbolos que chocan
+
+Los símbolos chocan entre dominios, y el glosario no disimula. Algunos choques
+son inofensivos porque las dos magnitudes nunca se encuentran en un mismo
+cálculo; otros cambian un número en decenas de decibelios, o en un escalón
+entero de índice, y esos son los de abajo. Cuando dos entradas comparten
+símbolo, el matiz entre corchetes que sigue a la notación dice cuál estás
+leyendo, y en el sitio hay sobre las fichas un índice de símbolos que lista una
+al lado de otra todas las acepciones de una letra: la respuesta para quien tiene
+el símbolo pero no el dominio, que es el único caso al que la agrupación por
+dominios no puede servir.
+
+| Símbolo | Acepciones que no son la misma magnitud |
+| :--- | :--- |
+| $C$ | La **curvatura del decaimiento** $100\,(T_{30}/T_{20} - 1)$ en tanto por ciento, y el **término de adaptación espectral** de ISO 717-1 en decibelios. Los dos se definen en una misma página, [Salas y edificación](/phonometry/es/reference/theory/rooms-buildings/), separados por un par de secciones. |
+| TL | La **pérdida por transmisión** de una partición, la **pérdida por transmisión** de un elemento de conducto (otra medida distinta, con una terminación anecoica en la definición) y la **pérdida por transmisión** submarina de la ecuación del sonar. Tres dominios, tres cálculos sin relación. |
+| NR | La familia de curvas de **valoración de ruido** de un criterio de sala, y la **reducción de ruido** $L_{p1} - L_{p2}$ entre dos recintos en control de ruido. |
+| $\alpha$ | El **coeficiente de absorción** de una superficie, el **coeficiente de atenuación atmosférica** por unidad de longitud (dB/m aquí, dB/km en ISO 9613-2), el **coeficiente de absorción de volumen** del agua de mar (dB/km) y la **tortuosidad** $\alpha_\infty$ de un modelo poroso, que no es una absorción en absoluto. |
+| $A$ | Un **área de absorción equivalente** en m², una **acelerancia** en 1/kg y la **atenuación total** de ISO 9613-2 en dB. |
+| $D$ | Una **diferencia de niveles**, la definición $D_{50}$, la **ponderación D** retirada, la corrección de directividad $D_c$ y el apantallamiento por barrera $D_z$ de ISO 9613-2, la tasa de decaimiento espacial $D_{2,S}$ de una oficina diáfana, y el **índice de directividad** $D = 20\log_{10}(M_0/M_\mathrm{diff})$ de un micrófono. |
+| $H$ | La **receptancia** de ISO 7626-1, los **estimadores de respuesta en frecuencia** $H_1$ y $H_2$, y las **funciones de transferencia armónicas** $H_n$ de una medida con barrido, donde $H_2$ es el segundo armónico y no el estimador con ruido en la entrada. |
+| $\eta$ | El **factor de pérdidas** de un elemento elástico, el **factor de pérdidas por acoplamiento** $\eta_{ij}$ de una unión, y los factores de pérdidas **interno** y **total** de un elemento constructivo. |
+| $\tau$ | El **factor de transmisión** de una partición, la **constante de tiempo** de un detector, el **retardo** de una correlación y la **temperatura del aire** en CNOSSOS-EU. |
+| $T_s$ | El **tiempo central** de una respuesta al impulso de sala de ISO 3382-1, de decenas de milisegundos por lo general; el **tiempo de reverberación estructural** de una placa, que son segundos; y el número de **meses al año con neumáticos con clavos montados** en CNOSSOS-EU. |
+| $R$ | El **índice de reducción acústica** en edificación, la **resistencia al flujo de aire** en materiales, la **aspereza** en psicoacústica y la **variable de tensión acumulada** de ISO 2631-5. |
+| $\sigma$ | La **resistividad al flujo de aire** de un material poroso, la **eficiencia de radiación** de una placa y la **desviación típica** $\sigma_R$ de una situación de medida en acústica de la edificación. |
+| $L_N$, $L_n$ | $L_N$ es un **nivel percentil** en ruido ambiental, un **nivel de sonoridad** en fonios y el nivel equivalente al **ruido propio** de un micrófono; $L_n$, con el subíndice en minúscula, es el **nivel de presión acústica de impactos normalizado** de ISO 10140-3. En acústica de la edificación, la caja del subíndice es toda la diferencia. |
+| $v_0$ | Una **velocidad de referencia** de 1 nm/s en EN 15657 y EN 12354-5, y de 50 nm/s en ISO/TS 7849 e ISO 9611: 34 dB de diferencia, dentro de una misma sección de una misma área. |
+| $F_0$ | Una **fuerza de referencia** de 1 N en ISO 16283-2, y de 1 µN en EN 15657: 120 dB de diferencia. |
+| $K_1$ | La **corrección por ruido de fondo** de ISO 3744 en dB, y un **coeficiente de temperatura** de CNOSSOS-EU en dB/°C. |
+| $F$ | La **intensidad de fluctuación** en vacil, la ponderación temporal **Fast** y la **frecuencia de modulación** en $m(F)$, las tres en esta misma página. |
+
+Cuando dos acepciones se encuentran dentro de una misma sección de navegación,
+la guía lo advierte en el primer uso; esta tabla es la lista de todo el sitio.
 
 Si lo que buscas es la fuente de cada definición y no la definición en sí, la
 [bibliografía](/phonometry/es/reference/bibliography/) recoge todas las obras

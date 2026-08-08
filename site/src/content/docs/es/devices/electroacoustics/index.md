@@ -16,7 +16,31 @@ con el modelo del pistón radiante que hay detrás de la directividad de un
 altavoz, y
 [Caracterización de micrófonos (IEC 60268-4)](/phonometry/es/devices/electroacoustics/microphones/),
 con los patrones polares y los convenios de ruido propio, ambas terminadas en
-una ficha acreditada de una página.
+un informe de una página maquetado como lo maqueta un laboratorio acreditado,
+con la tabla de características nominales junto a los paneles de respuesta,
+polar y de ruido trazados según las convenciones de escala de IEC 60263. Lo que
+convierte una hoja así en un informe de ensayo y no en un estudio de diseño son
+los datos de entrada medidos y la norma declarada, y las dos cosas las aportas
+tú. La página de altavoces vuelve luego a poner el dispositivo caracterizado en
+una sala con un micrófono abierto, donde la pregunta deja de ser un número de
+hoja de datos y pasa a ser si el lazo es estable: el criterio de Long de
+ganancia antes de la realimentación, la corrección por número de micrófonos
+abiertos y el margen de 10 dB para el que se diseña un sistema ecualizado se
+calculan ahí. Si estás diseñando o diagnosticando un sistema de refuerzo sonoro
+en vez de ensayando un altavoz, esa es la sección a la que ir.
+
+Las tres páginas de dispositivo se dividen por lo que se somete a ensayo y, por
+tanto, por el aspecto que tiene el banco. Un **amplificador** trabaja sobre su
+impedancia de carga nominal desde su alimentación y su impedancia de fuente
+nominales, y las condiciones normalizadas de medición de la IEC 60268-3
+(apartado 3.1.3) bajan después la f.e.m. de fuente 10 dB por debajo del valor
+nominal, así que una cifra de distorsión no significa nada si no se dice en cuál
+de las dos se tomó. Un **altavoz** se mide en su eje de referencia a una
+distancia declarada, en campo libre o en campo libre de semiespacio, con su
+montaje declarado. Un **micrófono** se mide contra una referencia calibrada. Las
+dos páginas de ensayo de tipo parten de curvas medidas en vez de decirte cómo
+adquirirlas, así que las condiciones en las que se tomaron esas curvas viajan
+con cada número de la ficha resultante y le pertenecen.
 [Distorsión con barridos y utilidades de fase](/phonometry/es/devices/electroacoustics/swept-sine-distortion/)
 amplía el banco de pruebas con la alternativa de un solo barrido: la
 separación armónica de Farina / Novak, que convierte un único barrido
@@ -55,3 +79,30 @@ partida son las páginas de
   separación armónica y THD(f) con un solo barrido exponencial (barrido
   sincronizado de Farina / Novak), y fase mínima, retardo de grupo y exceso
   de fase de una respuesta medida.
+- [Radiodifusión](/phonometry/es/devices/broadcast/): el problema de la
+  sonoridad resuelto con una medición y no con un compresor, un número con
+  puerta por programa y el rango que dice cuánto se mueve.
+- [Sonoridad de programa y pico verdadero](/phonometry/es/devices/broadcast/program-loudness/):
+  la sonoridad de programa y el nivel de pico verdadero de UIT-R BS.1770-5 con
+  la práctica de normalización de EBU R 128, la medición en modo EBU y el rango
+  de sonoridad.
+
+## Qué no cubre esta sección
+
+Las páginas de ensayo de tipo **reducen y presentan** lo que midió un
+laboratorio; no lo adquieren. La respuesta de campo libre, los cortes polares,
+el espectro de ruido y el barrido de distorsión frente a nivel entran como
+datos, y aquí no hay ningún procedimiento que te diga cómo llevar la cámara
+anecoica o la medición por sustitución que los produjo. Dos de las ediciones
+implementadas están fijadas en vez de vigentes: las métricas de distorsión
+siguen AES17-2015 y no la revisión de 2020, y el informe de micrófono sigue
+IEC 60268-4:2014 y no el de 2018. La extracción de parámetros de Thiele-Small a
+partir de una curva de impedancia no está implementada, y los valores eléctricos
+y mecánicos de potencia admisible de la cláusula 17 de IEC 60268-5 los declara
+el fabricante, no se calculan. El criterio de realimentación es una contabilidad
+de niveles, no un modelo acústico: consume dos niveles de campo directo que
+aportas tú, no los calcula a partir de un patrón de cobertura, y no predice ni
+la frecuencia de acoplo ni el efecto de un ecualizador o de un desplazador de
+frecuencia. Y la IEC 60268-16, el índice de transmisión del habla, no forma
+parte de esta sección en absoluto: está en
+[Habla](/phonometry/es/perception/speech/).
